@@ -1,0 +1,24 @@
+/*---------------------------------------
+  CTA SECTION
+-----------------------------------------*/
+.cta-section {
+  background-image: url('/images/millennial-group-young-businesspeople.jpg');
+  background-repeat: no-repeat;
+  background-position: top;
+  background-size: cover;
+  position: relative;
+  padding-top: 150px;
+  padding-bottom: 75px;
+}
+
+.cta-section .custom-border-btn:hover {
+  background: var(--white-color);
+  color: var(--custom-btn-bg-color);
+}
+
+@media screen and (max-width: 991px) {
+  .cta-section {
+    padding-top: 50px;
+    padding-bottom: 50px;
+  }
+}

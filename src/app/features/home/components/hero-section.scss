@@ -1,0 +1,85 @@
+/*---------------------------------------
+  HERO SECTION
+-----------------------------------------*/
+.hero-section {
+  background-image: url('/images/close-up-young-business-team-working.jpg');
+  background-repeat: no-repeat;
+  background-size: cover;
+  background-position: top;
+  position: relative;
+  padding-top: 150px;
+  padding-bottom: 150px;
+}
+
+.hero-section .section-overlay {
+  background: var(--primary-color);
+}
+
+.hero-section .custom-border-btn {
+  border-color: var(--secondary-color);
+  color: var(--secondary-color);
+  background-color: #ffffff;
+}
+
+.hero-section .custom-border-btn:hover {
+  background: var(--secondary-color);
+  color: var(--white-color);
+}
+
+.hero-form {
+  background-color: #ffc929;
+  border-radius: var(--border-radius-small);
+  padding: 40px;
+}
+
+.hero-form .form-control {
+  padding-bottom: 10px;
+}
+
+.hero-form button[type="submit"] {
+  padding-top: 10px;
+  padding-bottom: 8px;
+}
+
+.hero-form .input-group-text i {
+  position: relative;
+  top: 2px;
+}
+
+.hero-section .badge {
+  background: transparent;
+  color: var(--white-color);
+}
+
+.hero-section .badge:hover {
+  background: var(--white-color);
+  color: var(--primary-color);
+}
+
+.hero-title {
+  font-size: var(--h1-font-size);
+  line-height: 1.2;
+}
+
+/*---------------------------------------
+  CATEGORIES SECTION
+-----------------------------------------*/
+.categories-section {
+  padding-top: 100px;
+  padding-bottom: 50px;
+}
+
+@media screen and (max-width: 991px) {
+  .hero-section {
+    padding-top: 100px;
+    padding-bottom: 100px;
+  }
+
+  .hero-form button[type="submit"] {
+    margin-bottom: 0;
+  }
+
+  .badge {
+    margin-top: 5px;
+  }
+}

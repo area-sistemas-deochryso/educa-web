@@ -1,0 +1,113 @@
+/*---------------------------------------
+  COUNTER SECTION
+-----------------------------------------*/
+.contador {
+  padding-top: 100px;
+  padding-bottom: 100px;
+  padding-left: 50px;
+  padding-right: 50px;
+}
+
+.custom-text-block {
+  background: var(--green-color);
+  padding: 80px 60px;
+  height: 100%;
+}
+
+.counter-thumb {
+  margin: 20px;
+  margin-bottom: 0;
+}
+
+.counter-number,
+.counter-text {
+  color: var(--secondary-color);
+  display: block;
+}
+
+.counter-number,
+.counter-number-text {
+  color: var(--dark-color);
+  font-size: var(--h1-font-size);
+  line-height: normal;
+}
+
+.custom-text-block .counter-number,
+.custom-text-block .counter-number-text {
+  color: var(--white-color);
+}
+
+.video-thumb {
+  position: relative;
+  overflow: hidden;
+  height: 100%;
+}
+
+.video-info {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
+
+.youtube-icon {
+  background: var(--custom-btn-bg-color);
+  font-size: var(--h2-font-size);
+  color: var(--white-color);
+  border-radius: var(--border-radius-large);
+  width: 90px;
+  height: 90px;
+  line-height: 110px;
+  text-align: center;
+  display: block;
+  animation: pulse-animation 2s infinite;
+  transition: all 0.5s;
+}
+
+.youtube-icon:hover {
+  color: var(--white-color);
+}
+
+.about-image {
+  display: block;
+  object-fit: cover;
+  height: 100%;
+}
+
+.custom-border-radius-start {
+  border-radius: var(--border-radius-medium) 0 0 var(--border-radius-medium);
+}
+
+.custom-border-radius-end {
+  border-radius: 0 var(--border-radius-medium) var(--border-radius-medium) 0;
+}
+
+@media screen and (max-width: 991px) {
+  .custom-text-block {
+    padding: 50px 30px;
+  }
+
+  .counter-number,
+  .counter-number-text {
+    font-size: var(--h2-font-size);
+  }
+
+  .custom-border-radius-start {
+    border-radius: var(--border-radius-medium) var(--border-radius-medium) 0 0;
+  }
+
+  .custom-border-radius-end {
+    border-radius: 0 0 var(--border-radius-medium) var(--border-radius-medium);
+  }
+}
+
+@media screen and (max-width: 480px) {
+  .counter-thumb {
+    margin: 10px;
+  }
+
+  .counter-number,
+  .counter-number-text {
+    font-size: var(--h3-font-size);
+  }
+}
