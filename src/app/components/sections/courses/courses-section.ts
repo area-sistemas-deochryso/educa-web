@@ -24,7 +24,7 @@ export class CoursesSectionComponent {
       title: 'Tema 01',
       duration: '30 minutos',
       subject: 'Matemáticas',
-      logo: 'images/logos/google.png',
+      logo: 'images/logos/google.webp',
       link: 'https://www.tiktok.com/@educa.com/video/7301428896308759814'
     },
     {
@@ -32,7 +32,7 @@ export class CoursesSectionComponent {
       title: 'Tema 02',
       duration: '30 minutos',
       subject: 'Comunicación',
-      logo: 'images/logos/apple.png',
+      logo: 'images/logos/apple.webp',
       link: 'https://www.tiktok.com/@educa.com/video/7385670015594302725'
     },
     {
@@ -40,7 +40,7 @@ export class CoursesSectionComponent {
       title: 'Tema 03',
       duration: '30 minutos',
       subject: 'C.T.A',
-      logo: 'images/logos/meta.png',
+      logo: 'images/logos/meta.webp',
       link: 'https://www.tiktok.com/@educa.com/video/7357100697281629445'
     },
     {
@@ -48,7 +48,7 @@ export class CoursesSectionComponent {
       title: 'Tema 04',
       duration: '20 minutos',
       subject: 'Personal Social',
-      logo: 'images/logos/slack.png',
+      logo: 'images/logos/slack.webp',
       link: 'https://www.tiktok.com/@educa.com/video/7345115007236967686'
     },
     {
@@ -56,7 +56,7 @@ export class CoursesSectionComponent {
       title: 'Tema 05',
       duration: '30 minutos',
       subject: 'Arte',
-      logo: 'images/logos/creative-market.png',
+      logo: 'images/logos/creative-market.webp',
       link: 'https://www.tiktok.com/@educa.com/video/7350417755209862405'
     }
   ];

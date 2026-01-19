@@ -1,11 +1,19 @@
 .faq-page {
 	.site-header {
-		background-image: url('/images/site-header/close-up-young-business-team-working.jpg');
+		background-image: url('/images/site-header/close-up-young-business-team-working.webp');
 		background-repeat: no-repeat;
 		background-size: cover;
 		background-position: center;
 		position: relative;
 		padding: 150px 0;
+
+		@supports (background-image: image-set(url('') type('image/avif'))) {
+			background-image: image-set(
+				url('/images/site-header/close-up-young-business-team-working.avif') type('image/avif'),
+				url('/images/site-header/close-up-young-business-team-working.webp') type('image/webp'),
+				url('/images/site-header/close-up-young-business-team-working.jpg') type('image/jpeg')
+			);
+		}
 
 		.section-overlay {
 			position: absolute;

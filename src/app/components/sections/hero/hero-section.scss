@@ -2,13 +2,21 @@
   HERO SECTION
 -----------------------------------------*/
 .hero-section {
-  background-image: url('/images/team/close-up-young-business-team-working.jpg');
+  background-image: url('/images/team/close-up-young-business-team-working.webp');
   background-repeat: no-repeat;
   background-size: cover;
   background-position: top;
   position: relative;
   padding-top: 150px;
   padding-bottom: 150px;
+
+  @supports (background-image: image-set(url('') type('image/avif'))) {
+    background-image: image-set(
+      url('/images/team/close-up-young-business-team-working.avif') type('image/avif'),
+      url('/images/team/close-up-young-business-team-working.webp') type('image/webp'),
+      url('/images/team/close-up-young-business-team-working.jpg') type('image/jpeg')
+    );
+  }
 }
 
 .hero-section .section-overlay {

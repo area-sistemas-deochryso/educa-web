@@ -31,7 +31,11 @@
                 </div>
 
                 <div class="reviews-body">
-                  <img src="images/common/left-quote.png" class="quote-icon img-fluid" alt="Quote" loading="lazy">
+                  <picture>
+                    <source srcset="images/common/left-quote.avif" type="image/avif">
+                    <source srcset="images/common/left-quote.webp" type="image/webp">
+                    <img src="images/common/left-quote.png" class="quote-icon img-fluid" alt="Quote" loading="lazy">
+                  </picture>
                   <h4 class="reviews-title">{{ testimonial.text }}</h4>
                 </div>
               </div>

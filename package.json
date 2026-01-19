@@ -10,7 +10,8 @@
 		"test:watch": "vitest",
 		"test:coverage": "vitest run --coverage",
 		"compodoc": "node -e \"fs.rmSync('documentacion', { recursive: true, force: true })\" && compodoc -p tsconfig.doc.json -s -w -o --port 8080",
-		"start:prod": "node --max_old_space_size=8192 ./node_modules/@angular/cli/bin/ng serve --configuration production"
+		"start:prod": "node --max_old_space_size=8192 ./node_modules/@angular/cli/bin/ng serve --configuration production",
+		"convert-images": "node scripts/convert-images.mjs"
 	},
 	"prettier": {
 		"printWidth": 100,
@@ -58,12 +59,13 @@
 		"xlsx": "^0.18.5"
 	},
 	"devDependencies": {
+		"@analogjs/vitest-angular": "^1.14.0",
 		"@angular/build": "^21.0.3",
 		"@angular/cli": "^21.0.3",
 		"@angular/compiler-cli": "^21.0.0",
-		"@analogjs/vitest-angular": "^1.14.0",
 		"@compodoc/compodoc": "^1.1.25",
 		"jsdom": "^26.0.0",
+		"sharp": "^0.34.5",
 		"typescript": "~5.9.2",
 		"vite": "^6.0.0",
 		"vitest": "^4.0.0"

@@ -22,35 +22,35 @@ export class TestimonialsSectionComponent implements OnInit, OnDestroy {
       name: 'Diego Pérez',
       role: '4° de Secundaria',
       text: 'He estado en este colegio desde primaria y siempre he sentido que es como una segunda casa. Los profesores son muy dedicados y se preocupan por nuestro aprendizaje y bienestar. Además, las actividades extracurriculares me han ayudado a descubrir mis pasiones y talentos. Estoy muy agradecido por todas las oportunidades que he tenido aquí.',
-      avatar: 'images/avatar/portrait-charming-middle-aged-attractive-woman-with-blonde-hair.jpg'
+      avatar: 'images/avatar/portrait-charming-middle-aged-attractive-woman-with-blonde-hair.webp'
     },
     {
       id: 2,
       name: 'Valentina Ruiz',
       role: '3° de Primaria',
       text: 'Me encanta venir al colegio porque siempre aprendemos cosas nuevas y divertidas. Mis profesores son muy amables y siempre están dispuestos a ayudarme. Me gusta mucho participar en las actividades de arte y deportes. ¡Me siento muy feliz de estar en este colegio!',
-      avatar: 'images/avatar/portrait-charming-middle-aged-attractive-woman-with-blonde-hair.jpg'
+      avatar: 'images/avatar/portrait-charming-middle-aged-attractive-woman-with-blonde-hair.webp'
     },
     {
       id: 3,
       name: 'Jorge Martínez',
       role: 'Padre de Mateo (6° de Primaria)',
       text: 'Como padre, es muy importante para mí que mi hijo reciba una educación integral. En este colegio no solo se enfocan en lo académico, sino también en los valores y el desarrollo personal. Los maestros son muy profesionales y siempre están disponibles para discutir el progreso de los estudiantes. Estoy muy satisfecho con la calidad de la educación y el ambiente positivo que se fomenta aquí.',
-      avatar: 'images/avatar/portrait-charming-middle-aged-attractive-woman-with-blonde-hair.jpg'
+      avatar: 'images/avatar/portrait-charming-middle-aged-attractive-woman-with-blonde-hair.webp'
     },
     {
       id: 4,
       name: 'María Fernández',
       role: 'Madre de Camila, 2° de Secundaria',
       text: 'Desde que mi hija ingresó al colegio, he visto un crecimiento increíble en su confianza y habilidades sociales. Ella ha encontrado un espacio seguro para expresarse y aprender. Me encanta cómo el colegio fomenta la creatividad y el pensamiento crítico, y la comunidad es muy acogedora y solidaria. Definitivamente fue la mejor elección para su educación.',
-      avatar: 'images/avatar/portrait-charming-middle-aged-attractive-woman-with-blonde-hair.jpg'
+      avatar: 'images/avatar/portrait-charming-middle-aged-attractive-woman-with-blonde-hair.webp'
     },
     {
       id: 5,
       name: 'Lucía Gómez',
       role: '5 años, Nivel Inicial',
       text: 'Me gusta mucho mi colegio porque juego y aprendo con mis amigos. Mis profesoras son muy cariñosas y siempre nos enseñan cosas interesantes. Me gusta dibujar, cantar y escuchar cuentos. ¡Estoy muy feliz aquí!',
-      avatar: 'images/avatar/portrait-charming-middle-aged-attractive-woman-with-blonde-hair.jpg'
+      avatar: 'images/avatar/portrait-charming-middle-aged-attractive-woman-with-blonde-hair.webp'
     }
   ];
 
