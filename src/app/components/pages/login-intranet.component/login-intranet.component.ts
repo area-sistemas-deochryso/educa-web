@@ -68,7 +68,7 @@ export class LoginIntranetComponent implements OnInit {
 			return;
 		}
 
-		const success = this.authService.login(user, pass);
+		const success = this.authService.login(user, pass, this.rememberPassword);
 
 		if (success) {
 			this.router.navigate(['/intranet']);

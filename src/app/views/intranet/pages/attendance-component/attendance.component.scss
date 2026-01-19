@@ -37,7 +37,7 @@ $color-no: #f44336;
 	margin-bottom: 1.5rem;
 
 	h2 {
-		font-size: 0.95rem;
+		font-size: 1.1rem;
 		font-weight: 600;
 		color: var(--intranet-default-text-color);
 		margin: 0 0 1rem 2rem;
@@ -46,16 +46,11 @@ $color-no: #f44336;
 
 .legend-content {
 	display: flex;
-	flex-direction: column;
-	gap: 0.75rem;
+	flex-wrap: wrap;
+	gap: 1.5rem 3rem;
 	padding: 1rem 3rem;
 	border: 1px solid var(--intranet-alternative-text-color);
 	border-radius: 10px;
-}
-
-.legend-row {
-	display: flex;
-	gap: 3rem;
 }
 
 .legend-item {
@@ -72,7 +67,7 @@ $color-no: #f44336;
 }
 
 .legend-text {
-	font-size: 0.9rem;
+	font-size: 0.85rem;
 	color: var(--intranet-soft-text-color);
 }
 
@@ -131,12 +126,12 @@ $color-no: #f44336;
 :host ::ng-deep .month-select {
 	&.p-select {
 		background: transparent;
-		border: 1px solid #ccc;
+		border: 1px solid var(--intranet-soft-text-color);
 		border-radius: 4px;
 
 		.p-select-label {
 			padding: 0.5rem 1rem;
-			font-size: 0.9rem;
+			font-size: 0.85rem;
 			color: var(--intranet-soft-text-color);
 		}
 
@@ -163,6 +158,27 @@ $color-no: #f44336;
 		border: 1px solid var(--intranet-alternative-text-color);
 		border-radius: 10px;
 		overflow: hidden;
+
+		// Scrollbar con fondo transparente
+		.p-datatable-table-container {
+			&::-webkit-scrollbar {
+				height: 8px;
+				background: transparent;
+			}
+
+			&::-webkit-scrollbar-track {
+				background: transparent;
+			}
+
+			&::-webkit-scrollbar-thumb {
+				background: var(--intranet-soft-text-color);
+				border-radius: 4px;
+			}
+
+			// Firefox
+			scrollbar-width: thin;
+			scrollbar-color: var(--intranet-soft-text-color) transparent;
+		}
 
 		.p-datatable-header {
 			background: transparent;
@@ -234,10 +250,6 @@ $color-no: #f44336;
 				&.day-col {
 					padding: 8px;
 					border-left: 1px solid #ddd;
-				}
-
-				&.total-col {
-					font-size: 0.9rem;
 				}
 			}
 
@@ -315,7 +327,7 @@ $color-no: #f44336;
 		padding: 1rem;
 	}
 
-	.legend-row {
+	.legend-content {
 		flex-direction: column;
 		gap: 0.5rem;
 	}
@@ -350,13 +362,13 @@ $color-no: #f44336;
 	}
 
 	.summary-count {
-		font-size: 0.75rem;
+		font-size: 0.85rem;
 	}
 
 	:host ::ng-deep .attendance-table.double-entry {
 		&.p-datatable {
 			.p-datatable-thead > tr > th {
-				font-size: 0.7rem;
+				font-size: 0.85rem;
 				padding: 0.5rem 0.25rem;
 
 				&.week-col {
@@ -369,12 +381,12 @@ $color-no: #f44336;
 			}
 
 			.p-datatable-tbody > tr > td {
-				font-size: 0.75rem;
+				font-size: 0.85rem;
 				padding: 0.35rem;
 			}
 
 			.p-datatable-tfoot > tr > td {
-				font-size: 0.7rem;
+				font-size: 0.85rem;
 				padding: 0.5rem 0.25rem;
 			}
 		}
@@ -390,7 +402,7 @@ $color-no: #f44336;
 	:host ::ng-deep .attendance-table.double-entry {
 		&.p-datatable {
 			.p-datatable-thead > tr > th {
-				font-size: 0.6rem;
+				font-size: 0.85rem;
 
 				&.week-col {
 					width: 55px;
@@ -402,11 +414,11 @@ $color-no: #f44336;
 			}
 
 			.p-datatable-tbody > tr > td {
-				font-size: 0.65rem;
+				font-size: 0.85rem;
 			}
 
 			.p-datatable-tfoot > tr > td {
-				font-size: 0.6rem;
+				font-size: 0.85rem;
 			}
 		}
 	}

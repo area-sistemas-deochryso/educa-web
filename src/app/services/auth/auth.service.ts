@@ -16,7 +16,10 @@ export class AuthService {
 	loginAttempts$: Observable<number> = this.loginAttemptsSubject.asObservable();
 
 	private checkStoredAuth(): boolean {
-		return sessionStorage.getItem(this.AUTH_KEY) === 'true';
+		return (
+			localStorage.getItem(this.AUTH_KEY) === 'true' ||
+			sessionStorage.getItem(this.AUTH_KEY) === 'true'
+		);
 	}
 
 	get isAuthenticated(): boolean {
@@ -35,7 +38,7 @@ export class AuthService {
 		return this.loginAttempts >= this.MAX_LOGIN_ATTEMPTS;
 	}
 
-	login(username: string, password: string): boolean {
+	login(username: string, password: string, rememberMe: boolean = false): boolean {
 		if (this.isBlocked) {
 			return false;
 		}
@@ -45,7 +48,11 @@ export class AuthService {
 
 		if (isValid) {
 			this.isAuthenticatedSubject.next(true);
-			sessionStorage.setItem(this.AUTH_KEY, 'true');
+			if (rememberMe) {
+				localStorage.setItem(this.AUTH_KEY, 'true');
+			} else {
+				sessionStorage.setItem(this.AUTH_KEY, 'true');
+			}
 			this.resetAttempts();
 			return true;
 		}
@@ -56,6 +63,7 @@ export class AuthService {
 
 	logout(): void {
 		this.isAuthenticatedSubject.next(false);
+		localStorage.removeItem(this.AUTH_KEY);
 		sessionStorage.removeItem(this.AUTH_KEY);
 		this.resetAttempts();
 	}
