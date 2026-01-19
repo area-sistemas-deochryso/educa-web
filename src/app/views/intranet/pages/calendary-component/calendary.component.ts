@@ -1,11 +1,9 @@
 import { Component } from '@angular/core';
 
 @Component({
-  selector: 'app-calendary.component',
-  imports: [],
-  templateUrl: './calendary.component.html',
-  styleUrl: './calendary.component.scss',
+	selector: 'app-calendary.component',
+	imports: [],
+	templateUrl: './calendary.component.html',
+	styleUrl: './calendary.component.scss',
 })
-export class CalendaryComponent {
-
-}
+export class CalendaryComponent {}

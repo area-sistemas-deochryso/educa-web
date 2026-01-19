@@ -12,21 +12,303 @@
 		</div>
 
 		<div class="calendar-grid">
-			<!-- Encabezados de días -->
 			@for (day of dayHeaders; track day) {
 				<div class="day-header">{{ day }}</div>
 			}
 
-			<!-- Días del calendario -->
 			@for (calDay of calendarDays; track $index) {
 				<div
 					class="day-cell"
 					[class.other-month]="!calDay.isCurrentMonth"
 					[class.today]="calDay.isToday"
+					[class.selected]="selectedDay === calDay.day"
+					(click)="onDayClick($event, calDay)"
 				>
 					{{ calDay.day }}
 				</div>
 			}
 		</div>
 	</div>
+
+	<!-- Menu popup para días -->
+	<p-menu #dayMenu [model]="menuItems" [popup]="true" [appendTo]="'body'" styleClass="calendar-day-menu" />
+
+	<!-- Menu popup para cursos -->
+	<p-menu #courseMenu [model]="courseMenuItems" [popup]="true" [appendTo]="'body'" styleClass="course-menu" />
+
+	<!-- Modal de Horarios de Cursos -->
+	<p-dialog
+		[(visible)]="showScheduleModal"
+		[modal]="true"
+		[dismissableMask]="true"
+		[draggable]="false"
+		[resizable]="false"
+		styleClass="schedule-modal"
+		[showHeader]="false"
+	>
+		<div class="modal-content">
+			<h2>Horarios de Cursos</h2>
+			<div class="schedule-table">
+				<div class="schedule-header">
+					<span class="col-name">Nombre Curso</span>
+					<span class="col-time">Hora</span>
+				</div>
+				@for (course of courseSchedules; track course.name) {
+					<div class="schedule-row clickable" (click)="onCourseClick($event, course.name)">
+						<span class="col-name">{{ course.name }}</span>
+						<span class="col-time">{{ course.time }}</span>
+					</div>
+				}
+			</div>
+		</div>
+	</p-dialog>
+
+	<!-- Modal de Resumen -->
+	<p-dialog
+		[(visible)]="showSummaryModal"
+		[modal]="true"
+		[dismissableMask]="true"
+		[draggable]="false"
+		[resizable]="false"
+		styleClass="summary-modal"
+		[showHeader]="false"
+	>
+		<div class="modal-content">
+			<h2>Resumen</h2>
+			<div class="summary-table">
+				<div class="summary-header">
+					<span class="col-name">Nombre Curso</span>
+					<span class="col-asis">Asis</span>
+					<span class="col-nota">Nota</span>
+				</div>
+				@for (course of courseSummaries; track course.name) {
+					<div class="summary-row clickable" (click)="onCourseClick($event, course.name)">
+						<span class="col-name">{{ course.name }}</span>
+						<span class="col-asis" [class]="getAttendanceClass(course.attendance)">
+							{{ course.attendance }}
+						</span>
+						<span class="col-nota" [class]="getGradeClass(course.grade)">
+							{{ course.grade }}
+						</span>
+					</div>
+				}
+				<div class="summary-row summary-total">
+					<span class="col-name">{{ getCourseCount() }} cursos</span>
+					<span class="col-asis">{{ getTotalAttendance() }}</span>
+					<span class="col-nota">{{ getTotalGrade() }}</span>
+				</div>
+			</div>
+		</div>
+	</p-dialog>
+
+	<!-- Modal de Detalles del Curso -->
+	<p-dialog
+		[(visible)]="showDetailsModal"
+		[modal]="true"
+		[dismissableMask]="true"
+		[draggable]="false"
+		[resizable]="false"
+		styleClass="details-modal"
+		[showHeader]="false"
+	>
+		<div class="modal-content details-content">
+			<h2>{{ currentCourseDetails.name }}</h2>
+			<div class="details-layout">
+				<div class="details-left">
+					<!-- Buscador de semanas -->
+					<div class="search-box">
+						<i class="pi pi-search"></i>
+						<input
+							type="text"
+							placeholder="BUSCAR ARCHIVO, SEMANA O TEMA..."
+							[(ngModel)]="weekSearchTerm"
+						/>
+					</div>
+
+					<!-- Semanas expandibles -->
+					<div class="weeks-accordion">
+						@for (week of filteredWeeks; track week.id) {
+							<div class="week-item" [class.expanded]="week.expanded">
+								<div class="week-header" (click)="toggleWeek(week)">
+									<span>{{ week.name }}</span>
+									<i class="pi" [class.pi-chevron-down]="!week.expanded" [class.pi-chevron-up]="week.expanded"></i>
+								</div>
+								@if (week.expanded) {
+									<div class="week-content">
+										<p class="teacher-message">{{ week.teacherMessage }}</p>
+										<div class="week-item-row">
+											<div class="item-icon">
+												<i class="pi pi-paperclip"></i>
+											</div>
+											<div class="item-info">
+												<strong>{{ week.attachments.count }} Archivos Adjuntos</strong>
+												<span>{{ week.attachments.unread }} sin leer · {{ week.attachments.reviewed }} revisado</span>
+												<a class="item-link">Ver archivos</a>
+											</div>
+										</div>
+										<div class="week-item-row">
+											<div class="item-icon">
+												<i class="pi pi-file-edit"></i>
+											</div>
+											<div class="item-info">
+												<strong>{{ week.pendingTasks.count }} Tareas Pendientes</strong>
+												<span>{{ week.pendingTasks.unread }} sin leer</span>
+												<a class="item-link">Ver Tareas</a>
+											</div>
+										</div>
+										<div class="week-item-row">
+											<div class="item-icon">
+												<i class="pi pi-check-circle"></i>
+											</div>
+											<div class="item-info">
+												<strong>{{ week.submittedTasks.count }} Tarea Enviada</strong>
+												<span>{{ week.submittedTasks.unread }} sin leer · {{ week.submittedTasks.reviewed }} revisadas</span>
+												<a class="item-link">Ver Entregas</a>
+											</div>
+										</div>
+									</div>
+								}
+							</div>
+						}
+					</div>
+
+					<!-- Evaluaciones expandibles -->
+					<div class="evaluations-section" [class.expanded]="evaluationsExpanded">
+						<div class="eval-header" (click)="toggleEvaluations()">
+							<span>EVALUACIONES</span>
+							<i class="pi" [class.pi-chevron-down]="!evaluationsExpanded" [class.pi-chevron-up]="evaluationsExpanded"></i>
+						</div>
+						@if (evaluationsExpanded) {
+							<div class="eval-content">
+								<div class="eval-icon">
+									<i class="pi pi-file"></i>
+								</div>
+								<div class="eval-list">
+									@for (evaluation of currentCourseDetails.evaluations; track evaluation.name) {
+										<span>{{ evaluation.name }}</span>
+									}
+								</div>
+							</div>
+						}
+					</div>
+				</div>
+
+				<div class="details-right">
+					<div class="student-info">
+						<div class="avatar-placeholder">
+							<i class="pi pi-user"></i>
+						</div>
+						<span class="student-name">Tupac Yupanqui<br/>María José</span>
+					</div>
+
+					<!-- Buscador de cursos -->
+					<div class="course-search-section">
+						<p><strong>Cursos:</strong></p>
+						<div class="course-search-box">
+							<input
+								type="text"
+								placeholder="Ingrese nombre curso"
+								[(ngModel)]="courseSearchTerm"
+								(input)="onCourseSearch()"
+								(blur)="hideCourseDropdown()"
+							/>
+							@if (showCourseDropdown) {
+								<div class="course-dropdown">
+									@for (course of courseSearchResults; track course) {
+										<div class="course-option" (click)="selectCourse(course)">
+											{{ course }}
+										</div>
+									}
+								</div>
+							}
+						</div>
+						<p class="link" (click)="openScheduleFromDetails()">HORARIOS</p>
+						<p class="link" (click)="openSummaryFromDetails()">NOTAS / ASISTENCIAS</p>
+					</div>
+
+					<div class="course-name-section">
+						<p><strong>{{ currentCourseDetails.name }}</strong></p>
+						<p class="link" (click)="openGradesFromDetails()">CALIFICACIONES</p>
+						<p class="link" (click)="openSummaryFromDetails()">NOTAS / ASISTENCIAS</p>
+					</div>
+
+					<div class="work-group">
+						<p><strong>Grupo de Trabajo</strong></p>
+						@for (member of currentCourseDetails.workGroup; track member) {
+							<div class="group-member">
+								<i class="pi pi-user"></i>
+								<span>{{ member }}</span>
+							</div>
+						}
+					</div>
+
+					<div class="teacher-section">
+						<p><strong>Docente</strong></p>
+						<div class="group-member">
+							<i class="pi pi-user"></i>
+							<span>{{ currentCourseDetails.teacher }}</span>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</p-dialog>
+
+	<!-- Modal de Calificaciones -->
+	<p-dialog
+		[(visible)]="showGradesModal"
+		[modal]="true"
+		[dismissableMask]="true"
+		[draggable]="false"
+		[resizable]="false"
+		styleClass="grades-modal"
+		[showHeader]="false"
+	>
+		<div class="modal-content grades-content">
+			<h2>{{ currentCourseDetails.name }}</h2>
+			<div class="grades-table">
+				<div class="grades-header">
+					<span class="col-eval">Evaluaciones</span>
+					<span class="col-grade">Nota</span>
+				</div>
+				@for (evaluation of currentCourseDetails.evaluations; track evaluation.name) {
+					<div class="grades-row">
+						<span class="col-eval" [class.eval-link]="$first">{{ evaluation.name }}</span>
+						@if (simulationMode && evaluation.editable) {
+							<input
+								type="number"
+								class="grade-input"
+								[value]="evaluation.tempGrade"
+								min="0"
+								max="20"
+								(input)="updateTempGrade(evaluation, $any($event.target).value)"
+							/>
+						} @else {
+							<span class="col-grade" [class]="getGradeClass(getDisplayGrade(evaluation))">
+								{{ getDisplayGrade(evaluation) }}
+							</span>
+						}
+					</div>
+				}
+				<div class="grades-row grades-total">
+					<span class="col-eval">
+						<button
+							class="simulate-btn"
+							[class.active]="simulationMode"
+							(click)="toggleSimulation()"
+						>
+							{{ simulationMode ? 'Cancelar simulación' : 'Simular promedio' }}
+						</button>
+					</span>
+					<span class="col-grade-label">Promedio</span>
+					<span class="col-grade" [class]="getGradeClass(currentAverage)">
+						{{ currentAverage }}
+					</span>
+				</div>
+			</div>
+			@if (simulationMode) {
+				<p class="simulation-note">Modifica las notas para simular tu promedio. Los cambios no se guardarán.</p>
+			}
+		</div>
+	</p-dialog>
 </div>
