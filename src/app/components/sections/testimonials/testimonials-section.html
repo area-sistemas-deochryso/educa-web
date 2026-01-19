@@ -13,7 +13,8 @@
                   <img
                     [src]="testimonial.avatar"
                     class="avatar-image img-fluid"
-                    [alt]="testimonial.name">
+                    [alt]="testimonial.name"
+                    loading="lazy">
 
                   <div class="d-flex align-items-center justify-content-between flex-wrap w-100 ms-3">
                     <p class="mb-0">
@@ -30,7 +31,7 @@
                 </div>
 
                 <div class="reviews-body">
-                  <img src="images/common/left-quote.png" class="quote-icon img-fluid" alt="Quote">
+                  <img src="images/common/left-quote.png" class="quote-icon img-fluid" alt="Quote" loading="lazy">
                   <h4 class="reviews-title">{{ testimonial.text }}</h4>
                 </div>
               </div>

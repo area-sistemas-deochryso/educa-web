@@ -15,7 +15,7 @@
         @for (course of courses; track course.id) {
           <div class="job-thumb d-flex">
             <div class="job-image-wrap bg-white shadow-lg">
-              <img [src]="course.logo" class="job-image img-fluid" [alt]="course.subject">
+              <img [src]="course.logo" class="job-image img-fluid" [alt]="course.subject" loading="lazy">
             </div>
 
             <div class="job-body d-flex flex-wrap flex-auto align-items-center ms-4">
@@ -39,7 +39,11 @@
               </div>
 
               <div class="job-section-btn-wrap">
-                <a [href]="course.link" target="_blank" class="custom-btn btn">Aprende ahora</a>
+                <a [href]="course.link"
+                   target="_blank"
+                   class="custom-btn btn"
+                   pTooltip="Ver clase en TikTok"
+                   tooltipPosition="left">Aprende ahora</a>
               </div>
             </div>
           </div>

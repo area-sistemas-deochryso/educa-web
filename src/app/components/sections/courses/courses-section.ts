@@ -1,4 +1,5 @@
 import { Component } from '@angular/core';
+import { Tooltip } from 'primeng/tooltip';
 
 interface Course {
   id: number;
@@ -12,7 +13,7 @@ interface Course {
 @Component({
   selector: 'app-courses-section',
   standalone: true,
-  imports: [],
+  imports: [Tooltip],
   templateUrl: './courses-section.html',
   styleUrl: './courses-section.scss',
 })

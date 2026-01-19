@@ -178,4 +178,18 @@
   :host ::ng-deep .navbar-expand-lg .navbar-nav .nav-link.custom-btn {
     margin-top: 10px;
   }
+
+  /* Mobile dropdown improvements */
+  .dropdown-menu {
+    box-shadow: none;
+    border: 0;
+    margin-top: 0;
+    padding-left: 15px;
+    background: transparent;
+  }
+
+  .dropdown-item {
+    border-bottom: 0;
+    padding: 8px 10px;
+  }
 }

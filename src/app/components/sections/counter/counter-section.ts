@@ -1,4 +1,4 @@
-import { Component, OnInit, OnDestroy, ElementRef, ViewChild, AfterViewInit } from '@angular/core';
+import { Component, OnDestroy, AfterViewInit, ChangeDetectorRef, inject } from '@angular/core';
 
 @Component({
   selector: 'app-counter-section',
@@ -7,14 +7,14 @@ import { Component, OnInit, OnDestroy, ElementRef, ViewChild, AfterViewInit } fr
   templateUrl: './counter-section.html',
   styleUrl: './counter-section.scss',
 })
-export class CounterSectionComponent implements OnInit, AfterViewInit, OnDestroy {
+export class CounterSectionComponent implements AfterViewInit, OnDestroy {
+  private cdr = inject(ChangeDetectorRef);
+
   targetCount = 500;
   displayedCount = 0;
   private animationFrameId: number | null = null;
   private observer: IntersectionObserver | null = null;
   private hasAnimated = false;
-
-  ngOnInit(): void {}
 
   ngAfterViewInit(): void {
     this.setupIntersectionObserver();
@@ -49,19 +49,24 @@ export class CounterSectionComponent implements OnInit, AfterViewInit, OnDestroy
   }
 
   private animateCounter(): void {
-    const duration = 1000;
+    const duration = 2000;
     const startTime = performance.now();
+
+    const easeOutQuad = (t: number): number => t * (2 - t);
 
     const animate = (currentTime: number) => {
       const elapsed = currentTime - startTime;
       const progress = Math.min(elapsed / duration, 1);
+      const easedProgress = easeOutQuad(progress);
 
-      this.displayedCount = Math.floor(progress * this.targetCount);
+      this.displayedCount = Math.floor(easedProgress * this.targetCount);
+      this.cdr.detectChanges();
 
       if (progress < 1) {
         this.animationFrameId = requestAnimationFrame(animate);
       } else {
         this.displayedCount = this.targetCount;
+        this.cdr.detectChanges();
       }
     };
 

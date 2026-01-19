@@ -4,7 +4,7 @@
       <!-- Logo y Contacto -->
       <div class="col-lg-4 col-md-6 col-12 mb-3">
         <div class="d-flex align-items-center mb-4">
-          <img src="images/logo.png" class="img-fluid logo-image" alt="Educa.com.pe Logo">
+          <img src="images/logo.png" class="img-fluid logo-image" alt="Educa.com.pe Logo" loading="lazy">
         </div>
 
         <p class="mb-2">
@@ -83,7 +83,10 @@
               placeholder="tucorreo@gmail.com"
               required>
 
-            <button type="submit" class="form-control">
+            <button type="submit"
+                    class="form-control"
+                    pTooltip="Suscríbete a nuestras novedades"
+                    tooltipPosition="top">
               <i class="bi-send"></i>
             </button>
           </div>
@@ -112,21 +115,24 @@
         <div class="col-lg-5 col-12 mt-2 mt-lg-0">
           <ul class="social-icon">
             <li class="social-icon-item">
-              <a href="https://www.facebook.com/educa.com.pe/" target="_blank" class="social-icon-link bi-facebook"></a>
+              <a href="https://www.facebook.com/educa.com.pe/" target="_blank" class="social-icon-link bi-facebook" pTooltip="Síguenos en Facebook" tooltipPosition="top"></a>
             </li>
             <li class="social-icon-item">
-              <a href="https://www.instagram.com/educa.com.pe/" target="_blank" class="social-icon-link bi-instagram"></a>
+              <a href="https://www.instagram.com/educa.com.pe/" target="_blank" class="social-icon-link bi-instagram" pTooltip="Síguenos en Instagram" tooltipPosition="top"></a>
             </li>
             <li class="social-icon-item">
-              <a href="https://www.youtube.com/channel/UCIhisBQWBIFkU1qOV7FeFHg" target="_blank" class="social-icon-link bi-youtube"></a>
+              <a href="https://www.youtube.com/channel/UCIhisBQWBIFkU1qOV7FeFHg" target="_blank" class="social-icon-link bi-youtube" pTooltip="Mira nuestros videos en YouTube" tooltipPosition="top"></a>
             </li>
             <li class="social-icon-item">
-              <a href="https://www.tiktok.com/@educa.com" target="_blank" class="social-icon-link bi-tiktok"></a>
+              <a href="https://www.tiktok.com/@educa.com" target="_blank" class="social-icon-link bi-tiktok" pTooltip="Síguenos en TikTok" tooltipPosition="top"></a>
             </li>
           </ul>
         </div>
 
-        <a class="back-top-icon bi-arrow-up smoothscroll d-flex justify-content-center align-items-center" (click)="scrollToTop()"></a>
+        <a class="back-top-icon bi-arrow-up smoothscroll d-flex justify-content-center align-items-center"
+           (click)="scrollToTop()"
+           pTooltip="Volver arriba"
+           tooltipPosition="left"></a>
       </div>
     </div>
   </div>

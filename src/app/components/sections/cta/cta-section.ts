@@ -1,9 +1,10 @@
 import { Component } from '@angular/core';
+import { Tooltip } from 'primeng/tooltip';
 
 @Component({
   selector: 'app-cta-section',
   standalone: true,
-  imports: [],
+  imports: [Tooltip],
   templateUrl: './cta-section.html',
   styleUrl: './cta-section.scss',
 })

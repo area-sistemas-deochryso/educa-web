@@ -1,5 +1,6 @@
 import { Component } from '@angular/core';
 import { FormsModule } from '@angular/forms';
+import { Tooltip } from 'primeng/tooltip';
 
 interface ContactForm {
   name: string;
@@ -9,7 +10,7 @@ interface ContactForm {
 @Component({
   selector: 'app-hero-section',
   standalone: true,
-  imports: [FormsModule],
+  imports: [FormsModule, Tooltip],
   templateUrl: './hero-section.html',
   styleUrl: './hero-section.scss',
 })

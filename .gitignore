@@ -8,6 +8,16 @@ out-tsc/
 tmp/
 
 # ======================
+# Testing (Vitest)
+# ======================
+coverage/
+
+# ======================
+# Documentation (Compodoc)
+# ======================
+documentacion/
+
+# ======================
 # Logs
 # ======================
 npm-debug.log*

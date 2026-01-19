@@ -1,11 +1,12 @@
 import { Component } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { FormsModule } from '@angular/forms';
+import { Tooltip } from 'primeng/tooltip';
 
 @Component({
   selector: 'app-footer',
   standalone: true,
-  imports: [RouterLink, FormsModule],
+  imports: [RouterLink, FormsModule, Tooltip],
   templateUrl: './footer.html',
   styleUrl: './footer.scss',
 })
