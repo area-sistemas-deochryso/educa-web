@@ -1,0 +1,31 @@
+<header class="intranet-header">
+	<div class="header-container">
+		<a routerLink="/" class="logo-link">
+			<img src="images/logo.png" alt="Educa.com Logo" class="logo" />
+		</a>
+
+		<nav class="intranet-nav">
+			<a
+				routerLink="/intranet"
+				routerLinkActive="active"
+				[routerLinkActiveOptions]="{ exact: true }"
+				class="nav-item"
+			>
+				Inicio
+			</a>
+			<a routerLink="/intranet/asistencia" routerLinkActive="active" class="nav-item">
+				Asistencia
+			</a>
+			<a routerLink="/intranet/horarios" routerLinkActive="active" class="nav-item">
+				Horarios
+			</a>
+			<a routerLink="/intranet/Calendario" routerLinkActive="active" class="nav-item">
+				Calendario
+			</a>
+		</nav>
+	</div>
+</header>
+
+<main class="intranet-content">
+	<router-outlet />
+</main>

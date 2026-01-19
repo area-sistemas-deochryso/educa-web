@@ -1,0 +1,167 @@
+<div class="attendance-container">
+	<div class="page-header">
+		<i class="pi pi-clipboard"></i>
+		<h1>Asistencias</h1>
+	</div>
+
+	<!-- Leyenda -->
+	<section class="legend-section">
+		<h2>Leyenda</h2>
+		<div class="legend-content">
+			<div class="legend-row">
+				<div class="legend-item">
+					<span class="legend-color status-temprano"></span>
+					<span class="legend-text">T = Temprano</span>
+				</div>
+				<div class="legend-item">
+					<span class="legend-color status-fuera"></span>
+					<span class="legend-text">F = Fuera de horario</span>
+				</div>
+			</div>
+			<div class="legend-row">
+				<div class="legend-item">
+					<span class="legend-color status-atiempo"></span>
+					<span class="legend-text">A = A tiempo</span>
+				</div>
+				<div class="legend-item">
+					<span class="legend-color status-no"></span>
+					<span class="legend-text">N = No asistió</span>
+				</div>
+			</div>
+		</div>
+	</section>
+
+	<!-- Tabla de Ingresos -->
+	<section class="attendance-section">
+		<div class="section-header">
+			<div class="section-title-row">
+				<h2>{{ ingresos.title }}</h2>
+				<div class="status-summary">
+					<div class="summary-item">
+						<span class="summary-color status-temprano"></span>
+						<span class="summary-count">{{ ingresos.counts.T }}T</span>
+					</div>
+					<div class="summary-item">
+						<span class="summary-color status-atiempo"></span>
+						<span class="summary-count">{{ ingresos.counts.A }}A</span>
+					</div>
+					<div class="summary-item">
+						<span class="summary-color status-fuera"></span>
+						<span class="summary-count">{{ ingresos.counts.F }}F</span>
+					</div>
+					<div class="summary-item">
+						<span class="summary-color status-no"></span>
+						<span class="summary-count">{{ ingresos.counts.N }}N</span>
+					</div>
+				</div>
+			</div>
+			<p-select
+				[options]="monthOptions"
+				[(ngModel)]="ingresos.selectedMonth"
+				(ngModelChange)="onMonthChange(ingresos)"
+				optionLabel="label"
+				optionValue="value"
+				styleClass="month-select"
+			/>
+		</div>
+
+		<p-table [value]="ingresos.weeks" styleClass="attendance-table double-entry">
+			<ng-template pTemplate="header">
+				<tr>
+					<th class="week-col header-cell"></th>
+					@for (day of dayHeaders; track day) {
+						<th class="day-col">{{ day }}</th>
+					}
+					<th class="total-col">Total</th>
+				</tr>
+			</ng-template>
+			<ng-template pTemplate="body" let-week>
+				<tr>
+					<td class="week-col header-cell">{{ week.week }}</td>
+					@for (day of week.days; track $index) {
+						<td class="day-col">
+							<div class="day-square" [class]="getStatusClass(day.status)"></div>
+						</td>
+					}
+					<td class="total-col">{{ week.total }}</td>
+				</tr>
+			</ng-template>
+			<ng-template pTemplate="footer">
+				<tr>
+					<td class="week-col header-cell">Total</td>
+					@for (total of ingresos.columnTotals; track $index) {
+						<td class="day-col footer-total">{{ total }}</td>
+					}
+					<td class="total-col footer-total grand-total">{{ ingresos.grandTotal }}</td>
+				</tr>
+			</ng-template>
+		</p-table>
+	</section>
+
+	<!-- Tabla de Salidas -->
+	<section class="attendance-section">
+		<div class="section-header">
+			<div class="section-title-row">
+				<h2>{{ salidas.title }}</h2>
+				<div class="status-summary">
+					<div class="summary-item">
+						<span class="summary-color status-temprano"></span>
+						<span class="summary-count">{{ salidas.counts.T }}T</span>
+					</div>
+					<div class="summary-item">
+						<span class="summary-color status-atiempo"></span>
+						<span class="summary-count">{{ salidas.counts.A }}A</span>
+					</div>
+					<div class="summary-item">
+						<span class="summary-color status-fuera"></span>
+						<span class="summary-count">{{ salidas.counts.F }}F</span>
+					</div>
+					<div class="summary-item">
+						<span class="summary-color status-no"></span>
+						<span class="summary-count">{{ salidas.counts.N }}N</span>
+					</div>
+				</div>
+			</div>
+			<p-select
+				[options]="monthOptions"
+				[(ngModel)]="salidas.selectedMonth"
+				(ngModelChange)="onMonthChange(salidas)"
+				optionLabel="label"
+				optionValue="value"
+				styleClass="month-select"
+			/>
+		</div>
+
+		<p-table [value]="salidas.weeks" styleClass="attendance-table double-entry">
+			<ng-template pTemplate="header">
+				<tr>
+					<th class="week-col header-cell"></th>
+					@for (day of dayHeaders; track day) {
+						<th class="day-col">{{ day }}</th>
+					}
+					<th class="total-col">Total</th>
+				</tr>
+			</ng-template>
+			<ng-template pTemplate="body" let-week>
+				<tr>
+					<td class="week-col header-cell">{{ week.week }}</td>
+					@for (day of week.days; track $index) {
+						<td class="day-col">
+							<div class="day-square" [class]="getStatusClass(day.status)"></div>
+						</td>
+					}
+					<td class="total-col">{{ week.total }}</td>
+				</tr>
+			</ng-template>
+			<ng-template pTemplate="footer">
+				<tr>
+					<td class="week-col header-cell">Total</td>
+					@for (total of salidas.columnTotals; track $index) {
+						<td class="day-col footer-total">{{ total }}</td>
+					}
+					<td class="total-col footer-total grand-total">{{ salidas.grandTotal }}</td>
+				</tr>
+			</ng-template>
+		</p-table>
+	</section>
+</div>

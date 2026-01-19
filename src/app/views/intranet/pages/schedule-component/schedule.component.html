@@ -1,0 +1,32 @@
+<div class="schedule-container">
+	<div class="calendar-card">
+		<div class="calendar-header">
+			<i class="pi pi-calendar"></i>
+			<span>Calendario</span>
+		</div>
+
+		<div class="calendar-navigation">
+			<button class="nav-btn" (click)="previousMonth()">&lt;</button>
+			<span class="month-year">{{ monthYearDisplay }}</span>
+			<button class="nav-btn" (click)="nextMonth()">&gt;</button>
+		</div>
+
+		<div class="calendar-grid">
+			<!-- Encabezados de días -->
+			@for (day of dayHeaders; track day) {
+				<div class="day-header">{{ day }}</div>
+			}
+
+			<!-- Días del calendario -->
+			@for (calDay of calendarDays; track $index) {
+				<div
+					class="day-cell"
+					[class.other-month]="!calDay.isCurrentMonth"
+					[class.today]="calDay.isToday"
+				>
+					{{ calDay.day }}
+				</div>
+			}
+		</div>
+	</div>
+</div>

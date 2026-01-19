@@ -1,0 +1,418 @@
+// Colores de estado
+$color-temprano: #253470;
+$color-atiempo: #77a02d;
+$color-fuera: #ffcc0c;
+$color-no: #f44336;
+
+.attendance-container {
+	padding: 1.5rem;
+	font-family: var(--intranet-font-family);
+	background-color: var(--intranet-background-color);
+	min-height: 100%;
+}
+
+.page-header {
+	display: flex;
+	align-items: center;
+	gap: 0.75rem;
+	margin-bottom: 1.5rem;
+
+	i {
+		font-size: 1.5rem;
+		color: var(--intranet-default-text-color);
+	}
+
+	h1 {
+		font-size: 1.5rem;
+		font-weight: 600;
+		color: var(--intranet-default-text-color);
+		margin: 0;
+	}
+}
+
+// Seccion de leyenda
+.legend-section {
+	border-radius: 10px;
+	padding: 1.7rem;
+	margin-bottom: 1.5rem;
+
+	h2 {
+		font-size: 0.95rem;
+		font-weight: 600;
+		color: var(--intranet-default-text-color);
+		margin: 0 0 1rem 2rem;
+	}
+}
+
+.legend-content {
+	display: flex;
+	flex-direction: column;
+	gap: 0.75rem;
+	padding: 1rem 3rem;
+	border: 1px solid var(--intranet-alternative-text-color);
+	border-radius: 10px;
+}
+
+.legend-row {
+	display: flex;
+	gap: 3rem;
+}
+
+.legend-item {
+	display: flex;
+	align-items: center;
+	gap: 0.5rem;
+	min-width: 180px;
+}
+
+.legend-color {
+	width: 20px;
+	height: 20px;
+	border-radius: 2px;
+}
+
+.legend-text {
+	font-size: 0.9rem;
+	color: var(--intranet-soft-text-color);
+}
+
+// Seccion de asistencias
+.attendance-section {
+	border-radius: 10px;
+	padding: 1.5rem;
+	margin-bottom: 1.5rem;
+}
+
+.section-header {
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+	margin-bottom: 1.2rem;
+
+	h2 {
+		font-size: 1rem;
+		font-weight: 600;
+		color: var(--intranet-default-text-color);
+		margin: 0;
+	}
+}
+
+.section-title-row {
+	display: flex;
+	align-items: center;
+	gap: 1.5rem;
+}
+
+.status-summary {
+	display: flex;
+	align-items: center;
+	gap: 1rem;
+}
+
+.summary-item {
+	display: flex;
+	align-items: center;
+	gap: 0.35rem;
+}
+
+.summary-color {
+	width: 20px;
+	height: 20px;
+	border-radius: 2px;
+}
+
+.summary-count {
+	font-size: 0.85rem;
+	font-weight: 500;
+	color: var(--intranet-soft-text-color);
+}
+
+// PrimeNG Select - fondo transparente
+:host ::ng-deep .month-select {
+	&.p-select {
+		background: transparent;
+		border: 1px solid #ccc;
+		border-radius: 4px;
+
+		.p-select-label {
+			padding: 0.5rem 1rem;
+			font-size: 0.9rem;
+			color: var(--intranet-soft-text-color);
+		}
+
+		.p-select-dropdown {
+			background: transparent;
+			color: var(--intranet-soft-text-color);
+		}
+
+		&:hover {
+			border-color: var(--intranet-accent-color-blue);
+		}
+
+		&.p-focus {
+			border-color: var(--intranet-accent-color-blue);
+			box-shadow: none;
+		}
+	}
+}
+
+// PrimeNG Table - Cuadro de doble entrada
+:host ::ng-deep .attendance-table.double-entry {
+	&.p-datatable {
+		background: transparent;
+		border: 1px solid var(--intranet-alternative-text-color);
+		border-radius: 10px;
+		overflow: hidden;
+
+		.p-datatable-header {
+			background: transparent;
+			border: none;
+		}
+
+		// Header row - transparente
+		.p-datatable-thead > tr > th {
+			background: transparent;
+			color: var(--intranet-default-text-color);
+			font-weight: 600;
+			font-size: 0.85rem;
+			padding: 0.75rem 0.5rem;
+			text-align: center;
+			border: 1px solid #ddd;
+			border-right: none;
+
+			&:last-child {
+				border-right: 1px solid #ddd;
+			}
+
+			// Primera columna sin borde
+			&.header-cell {
+				border: none;
+			}
+
+			&.week-col {
+				width: 100px;
+			}
+
+			&.day-col {
+				width: auto;
+				border-left: 1px solid #ddd;
+			}
+
+			&.total-col {
+				width: 100px;
+			}
+		}
+
+		// Body rows
+		.p-datatable-tbody > tr {
+			background: transparent;
+
+			> td {
+				background: transparent;
+				padding: 0.5rem;
+				text-align: center;
+				vertical-align: middle;
+				border: 1px solid #ddd;
+				border-top: none;
+				border-right: none;
+				font-size: 0.85rem;
+				color: var(--intranet-soft-text-color);
+
+				&:last-child {
+					border-right: 1px solid #ddd;
+				}
+
+				// Primera columna - sin borde
+				&.header-cell {
+					background: transparent;
+					color: var(--intranet-default-text-color);
+					font-weight: 600;
+					text-align: center;
+					border: none;
+				}
+
+				&.day-col {
+					padding: 8px;
+					border-left: 1px solid #ddd;
+				}
+
+				&.total-col {
+					font-size: 0.9rem;
+				}
+			}
+
+			&:hover > td:not(.header-cell) {
+				background: rgba(0, 0, 0, 0.02);
+			}
+		}
+
+		// Footer row
+		.p-datatable-tfoot > tr > td {
+			background: transparent;
+			padding: 0.75rem 0.5rem;
+			text-align: center;
+			border: 1px solid #ddd;
+			border-top: none;
+			border-right: none;
+			font-size: 0.85rem;
+			color: var(--intranet-soft-text-color);
+
+			&:last-child {
+				border-right: 1px solid #ddd;
+			}
+
+			// Primera columna del footer - sin borde
+			&.header-cell {
+				background: transparent;
+				color: var(--intranet-default-text-color);
+				font-weight: 600;
+				border: none;
+			}
+
+			&.day-col {
+				border-left: 1px solid #ddd;
+			}
+
+			&.footer-total {
+				font-weight: 500;
+			}
+
+			&.grand-total {
+				font-weight: 600;
+				color: var(--intranet-default-text-color);
+			}
+		}
+	}
+}
+
+.day-square {
+	width: 50px;
+	height: 50px;
+	border-radius: 2px;
+	margin: 0 auto;
+}
+
+// Clases de estado
+.status-temprano {
+	background-color: $color-temprano;
+}
+
+.status-atiempo {
+	background-color: $color-atiempo;
+}
+
+.status-fuera {
+	background-color: $color-fuera;
+}
+
+.status-no {
+	background-color: $color-no;
+}
+
+// Responsive
+@media screen and (max-width: 768px) {
+	.attendance-container {
+		padding: 1rem;
+	}
+
+	.legend-row {
+		flex-direction: column;
+		gap: 0.5rem;
+	}
+
+	.legend-item {
+		min-width: auto;
+	}
+
+	.section-header {
+		flex-direction: column;
+		align-items: flex-start;
+		gap: 0.75rem;
+	}
+
+	:host ::ng-deep .month-select {
+		width: 100%;
+	}
+
+	.section-title-row {
+		flex-direction: column;
+		align-items: flex-start;
+		gap: 0.5rem;
+	}
+
+	.status-summary {
+		gap: 0.75rem;
+	}
+
+	.summary-color {
+		width: 16px;
+		height: 16px;
+	}
+
+	.summary-count {
+		font-size: 0.75rem;
+	}
+
+	:host ::ng-deep .attendance-table.double-entry {
+		&.p-datatable {
+			.p-datatable-thead > tr > th {
+				font-size: 0.7rem;
+				padding: 0.5rem 0.25rem;
+
+				&.week-col {
+					width: 70px;
+				}
+
+				&.total-col {
+					width: 70px;
+				}
+			}
+
+			.p-datatable-tbody > tr > td {
+				font-size: 0.75rem;
+				padding: 0.35rem;
+			}
+
+			.p-datatable-tfoot > tr > td {
+				font-size: 0.7rem;
+				padding: 0.5rem 0.25rem;
+			}
+		}
+	}
+
+	.day-square {
+		width: 35px;
+		height: 35px;
+	}
+}
+
+@media screen and (max-width: 480px) {
+	:host ::ng-deep .attendance-table.double-entry {
+		&.p-datatable {
+			.p-datatable-thead > tr > th {
+				font-size: 0.6rem;
+
+				&.week-col {
+					width: 55px;
+				}
+
+				&.total-col {
+					width: 55px;
+				}
+			}
+
+			.p-datatable-tbody > tr > td {
+				font-size: 0.65rem;
+			}
+
+			.p-datatable-tfoot > tr > td {
+				font-size: 0.6rem;
+			}
+		}
+	}
+
+	.day-square {
+		width: 28px;
+		height: 28px;
+	}
+}

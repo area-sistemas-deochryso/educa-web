@@ -1,0 +1,61 @@
+<div class="login-overlay">
+	<div class="login-modal">
+		<div class="login-header">
+			<h2>INICIAR SESIÓN</h2>
+			<img src="images/logo.png" alt="Educa.com Logo" class="login-logo" />
+		</div>
+
+		<form class="login-form" (ngSubmit)="onLogin()">
+			@if (showError) {
+				<div class="error-message">
+					<i class="pi pi-exclamation-circle"></i>
+					<span>{{ errorMessage }}</span>
+				</div>
+			}
+
+			<div class="input-group">
+				<i class="pi pi-user"></i>
+				<input
+					type="text"
+					pInputText
+					placeholder="Usuario"
+					[(ngModel)]="username"
+					name="username"
+					[disabled]="isBlocked"
+					appUppercaseInput
+				/>
+			</div>
+
+			<div class="input-group">
+				<i class="pi pi-lock"></i>
+				<input
+					type="text"
+					pInputText
+					placeholder="Contraseña"
+					[(ngModel)]="password"
+					name="password"
+					[disabled]="isBlocked"
+					appUppercaseInput
+					class="password-field"
+				/>
+			</div>
+
+			<div class="options-row">
+				<label class="remember-checkbox">
+					<p-checkbox [(ngModel)]="rememberPassword" [binary]="true" name="remember" />
+					<span>Recordar contraseña</span>
+				</label>
+				<a href="#" class="forgot-link">¿Ha olvidado la contraseña?</a>
+			</div>
+
+			<div class="button-row">
+				<button type="submit" class="login-btn" [disabled]="isBlocked">
+					<span class="btn-label">Ingresar</span>
+					<span class="btn-icon">
+						<i class="pi pi-arrow-right"></i>
+					</span>
+				</button>
+			</div>
+		</form>
+	</div>
+</div>
