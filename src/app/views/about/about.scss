@@ -1,0 +1,22 @@
+.about-page {
+	.hero-section {
+		background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+		color: white;
+
+		h1 {
+			margin-bottom: 1rem;
+		}
+	}
+
+	.content-section {
+		h2 {
+			color: #333;
+			margin-bottom: 1rem;
+		}
+
+		p {
+			color: #666;
+			line-height: 1.8;
+		}
+	}
+}

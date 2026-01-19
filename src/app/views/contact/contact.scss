@@ -1,0 +1,34 @@
+.contact-page {
+	.hero-section {
+		background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
+		color: white;
+
+		h1 {
+			margin-bottom: 1rem;
+		}
+	}
+
+	.contact-section {
+		h2 {
+			color: #333;
+			margin-bottom: 1.5rem;
+		}
+
+		li {
+			color: #666;
+
+			i {
+				color: #11998e;
+			}
+		}
+
+		.btn-primary {
+			background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
+			border: none;
+
+			&:hover {
+				opacity: 0.9;
+			}
+		}
+	}
+}
