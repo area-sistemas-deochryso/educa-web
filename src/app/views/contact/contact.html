@@ -1,56 +1,161 @@
 <main class="contact-page">
-	<section class="hero-section py-5">
+	<!-- Header -->
+	<header class="site-header">
+		<div class="section-overlay"></div>
 		<div class="container">
 			<div class="row">
-				<div class="col-12 text-center">
-					<h1 class="display-4 fw-bold">Contacto</h1>
-					<p class="lead">Estamos aquí para ayudarte</p>
+				<div class="col-lg-12 col-12 text-center">
+					<h1 class="text-white">Conócenos</h1>
+					<nav aria-label="breadcrumb">
+						<ol class="breadcrumb justify-content-center">
+							<li class="breadcrumb-item"><a routerLink="/">Inicio</a></li>
+							<li class="breadcrumb-item active" aria-current="page">Contacto</li>
+						</ol>
+					</nav>
+				</div>
+			</div>
+		</div>
+	</header>
+
+	<!-- Contact Section -->
+	<section class="contact-section section-padding">
+		<div class="container">
+			<div class="row justify-content-center">
+				<!-- Map -->
+				<div class="col-lg-6 col-12 mb-lg-5 mb-3">
+					<iframe
+						src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3901.80595895851!2d-77.00884102389674!3d-12.056867988180763!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x9105c61e9f804109%3A0x8d22388e1d132797!2sEduca.com!5e0!3m2!1sen!2sth!4v1722525000931!5m2!1sen!2sth"
+						width="100%"
+						height="450"
+						style="border:0; border-radius: 15px;"
+						allowfullscreen=""
+						loading="lazy"
+						referrerpolicy="no-referrer-when-downgrade">
+					</iframe>
+				</div>
+
+				<!-- Contact Info -->
+				<div class="col-lg-5 col-12 mb-3 mx-auto">
+					<div class="contact-info-wrap">
+						<div class="contact-info d-flex align-items-center mb-3">
+							<i class="custom-icon bi-building"></i>
+							<p class="mb-0">
+								<span class="contact-info-small-title">Nuestro colegio</span>
+								Pje. Satelite 175, El Agustino 15003, Peru
+							</p>
+						</div>
+
+						<div class="contact-info d-flex align-items-center">
+							<i class="custom-icon bi-globe"></i>
+							<p class="mb-0">
+								<span class="contact-info-small-title">Web</span>
+								<a href="https://educa.com.pe/" class="site-footer-link">
+									https://educa.com.pe/
+								</a>
+							</p>
+						</div>
+
+						<div class="contact-info d-flex align-items-center">
+							<i class="custom-icon bi-telephone"></i>
+							<p class="mb-0">
+								<span class="contact-info-small-title">Teléfono</span>
+								<a href="tel:+51986176572" class="site-footer-link">
+									+51 986 176 572
+								</a>
+							</p>
+						</div>
+
+						<div class="contact-info d-flex align-items-center">
+							<i class="custom-icon bi-envelope"></i>
+							<p class="mb-0">
+								<span class="contact-info-small-title">Correo</span>
+								<a href="mailto:educa.com175@hotmail.com" class="site-footer-link">
+									educa.com175&#64;hotmail.com
+								</a>
+							</p>
+						</div>
+					</div>
+				</div>
+
+				<!-- Contact Form -->
+				<div class="col-lg-8 col-12 mx-auto">
+					<form
+						class="custom-form contact-form"
+						action="https://formspree.io/f/mzzprebk"
+						method="POST">
+						<h2 class="text-center mb-4">¿Listo para ser parte de la educación del futuro?</h2>
+
+						<div class="row">
+							<div class="col-lg-6 col-md-6 col-12">
+								<label for="full-name">Nombre y apellido</label>
+								<input
+									type="text"
+									name="full-name"
+									id="full-name"
+									class="form-control"
+									placeholder="Nombre y Apellido"
+									required>
+							</div>
+
+							<div class="col-lg-6 col-md-6 col-12">
+								<label for="email">Correo</label>
+								<input
+									type="email"
+									name="email"
+									id="email"
+									pattern="[^ &#64;]*&#64;[^ &#64;]*"
+									class="form-control"
+									placeholder="tucorreo&#64;gmail.com"
+									required>
+							</div>
+
+							<div class="col-lg-12 col-12">
+								<label for="message">Mensaje</label>
+								<textarea
+									name="message"
+									rows="6"
+									class="form-control"
+									id="message"
+									placeholder="¿Cómo podemos ayudarte?">
+								</textarea>
+							</div>
+
+							<div class="col-lg-4 col-md-4 col-6 mx-auto">
+								<button type="submit" class="form-control">Contáctenos</button>
+							</div>
+						</div>
+					</form>
 				</div>
 			</div>
 		</div>
 	</section>
 
-	<section class="contact-section py-5">
+	<!-- CTA Section -->
+	<section class="cta-section">
+		<div class="section-overlay"></div>
 		<div class="container">
 			<div class="row">
-				<div class="col-lg-6">
-					<h2>Información de Contacto</h2>
-					<ul class="list-unstyled">
-						<li class="mb-3">
-							<i class="bi bi-geo-alt me-2"></i>
-							<strong>Dirección:</strong> Av. Principal 123, Lima, Perú
-						</li>
-						<li class="mb-3">
-							<i class="bi bi-telephone me-2"></i>
-							<strong>Teléfono:</strong> +51 1 234 5678
-						</li>
-						<li class="mb-3">
-							<i class="bi bi-envelope me-2"></i>
-							<strong>Email:</strong> info&#64;educa.com.pe
-						</li>
-						<li class="mb-3">
-							<i class="bi bi-clock me-2"></i>
-							<strong>Horario:</strong> Lunes a Viernes 8:00 - 17:00
-						</li>
-					</ul>
+				<div class="col-lg-6 col-10">
+					<h2 class="text-white mb-2">Conoce la educación del mañana, conoce Educa.com</h2>
+					<p class="text-white">
+						Enseñamos de forma integral, creemos en el poder transformador del
+						aprendizaje continuo, la exploración y la libre experimentación.
+					</p>
 				</div>
-				<div class="col-lg-6">
-					<h2>Envíanos un Mensaje</h2>
-					<form>
-						<div class="mb-3">
-							<label for="name" class="form-label">Nombre</label>
-							<input type="text" class="form-control" id="name" placeholder="Tu nombre">
-						</div>
-						<div class="mb-3">
-							<label for="email" class="form-label">Email</label>
-							<input type="email" class="form-control" id="email" placeholder="tu@email.com">
-						</div>
-						<div class="mb-3">
-							<label for="message" class="form-label">Mensaje</label>
-							<textarea class="form-control" id="message" rows="4" placeholder="Tu mensaje"></textarea>
-						</div>
-						<button type="submit" class="btn btn-primary">Enviar Mensaje</button>
-					</form>
+				<div class="col-lg-4 col-12 ms-auto">
+					<div class="custom-border-btn-wrap d-flex align-items-center mt-lg-4 mt-2">
+						<a
+							href="mailto:educa.com175@hotmail.com?subject=Consulta&body=Hola, quisiera saber más sobre los programas educativos."
+							class="custom-btn custom-border-btn btn me-4">
+							Contáctanos
+						</a>
+						<a
+							href="https://www.facebook.com/educa.com.pe"
+							target="_blank"
+							class="custom-link">
+							Conoce más
+						</a>
+					</div>
 				</div>
 			</div>
 		</div>

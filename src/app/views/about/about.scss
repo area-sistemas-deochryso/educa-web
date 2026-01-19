@@ -1,22 +1,207 @@
 .about-page {
-	.hero-section {
-		background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-		color: white;
+	.site-header {
+		background-image: url('/images/site-header/close-up-young-business-team-working.jpg');
+		background-repeat: no-repeat;
+		background-size: cover;
+		background-position: center;
+		position: relative;
+		padding: 150px 0;
+
+		.section-overlay {
+			position: absolute;
+			top: 0;
+			left: 0;
+			width: 100%;
+			height: 100%;
+			background: var(--primary-color);
+			opacity: 0.85;
+		}
+
+		.container {
+			position: relative;
+			z-index: 1;
+		}
 
 		h1 {
-			margin-bottom: 1rem;
+			font-size: 3rem;
+			font-weight: 700;
+		}
+
+		nav[aria-label="breadcrumb"] {
+			background: var(--white-color);
+			border-radius: var(--border-radius-large);
+			display: inline-block;
+			padding: 7px 16px 3px 16px;
+		}
+
+		.breadcrumb {
+			background: transparent;
+			margin-bottom: 0;
+
+			a {
+				color: var(--primary-color);
+				text-decoration: none;
+
+				&:hover {
+					color: var(--secondary-color);
+				}
+			}
+
+			.active {
+				color: var(--p-color);
+			}
 		}
 	}
 
-	.content-section {
-		h2 {
-			color: #333;
-			margin-bottom: 1rem;
+	.about-section {
+		padding: 100px 0;
+
+		.about-info-text {
+			h2 {
+				color: var(--primary-color);
+				font-weight: 700;
+			}
+
+			h4 {
+				color: var(--secondary-color);
+			}
+
+			p {
+				color: #666;
+				line-height: 1.8;
+			}
 		}
 
-		p {
-			color: #666;
-			line-height: 1.8;
+		.about-image-wrap {
+			position: relative;
+
+			.about-image {
+				width: 100%;
+				border-radius: 20px;
+			}
+
+			.about-info {
+				position: absolute;
+				bottom: 20px;
+				left: 20px;
+				background: var(--primary-color);
+				padding: 15px 25px;
+				border-radius: 10px;
+
+				h4 {
+					font-size: 2rem;
+					font-weight: 700;
+				}
+			}
+		}
+	}
+
+	.services-section {
+		background: #f8f9fa;
+		padding: 100px 0;
+
+		h2 {
+			color: var(--primary-color);
+			font-weight: 700;
+		}
+
+		.services-block {
+			background: #fff;
+			padding: 30px;
+			border-radius: 15px;
+			box-shadow: 0 5px 20px rgba(0, 0, 0, 0.08);
+			height: 100%;
+			transition: transform 0.3s ease;
+
+			&:hover {
+				transform: translateY(-5px);
+			}
+
+			.services-block-title-wrap {
+				display: flex;
+				align-items: center;
+				margin-bottom: 20px;
+
+				.services-block-icon {
+					font-size: 2.5rem;
+					color: var(--primary-color);
+					margin-right: 15px;
+				}
+
+				.services-block-title {
+					margin: 0;
+					color: var(--primary-color);
+				}
+			}
+
+			.services-block-body p {
+				color: #666;
+				margin: 0;
+				line-height: 1.7;
+			}
+		}
+	}
+
+	.cta-section {
+		background-image: url('/images/team/millennial-group-young-businesspeople.jpg');
+		background-repeat: no-repeat;
+		background-position: top;
+		background-size: cover;
+		position: relative;
+		padding-top: 150px;
+		padding-bottom: 75px;
+
+		.section-overlay {
+			position: absolute;
+			top: 0;
+			left: 0;
+			width: 100%;
+			height: 100%;
+			background: var(--secondary-color);
+			opacity: 0.7;
+		}
+
+		.container {
+			position: relative;
+			z-index: 1;
+		}
+
+		.custom-border-btn {
+			background: transparent;
+			border-color: var(--white-color);
+			color: var(--white-color);
+
+			&:hover {
+				background: var(--white-color);
+				color: var(--secondary-color);
+			}
+		}
+
+		.custom-link {
+			color: var(--white-color);
+
+			&:hover {
+				color: var(--white-color);
+				opacity: 0.8;
+			}
+		}
+	}
+}
+
+@media screen and (max-width: 991px) {
+	.about-page {
+		.site-header {
+			padding: 80px 0;
+
+			h1 {
+				font-size: 2rem;
+			}
+		}
+
+		.about-section,
+		.services-section,
+		.cta-section {
+			padding: 60px 0;
 		}
 	}
 }
