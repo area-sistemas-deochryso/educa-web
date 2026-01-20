@@ -10,7 +10,7 @@
 		"test:watch": "vitest",
 		"test:coverage": "vitest run --coverage",
 		"compodoc": "node -e \"fs.rmSync('documentacion', { recursive: true, force: true })\" && compodoc -p tsconfig.doc.json -s -w -o --port 8080",
-		"start:prod": "node --max_old_space_size=8192 ./node_modules/@angular/cli/bin/ng serve --configuration production",
+		"start:prod": "node --max_old_space_size=8192 ./node_modules/@angular/cli/bin/ng serve --configuration production --port=4202",
 		"convert-images": "node scripts/convert-images.mjs"
 	},
 	"prettier": {
