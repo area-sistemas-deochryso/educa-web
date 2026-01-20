@@ -1,9 +1,43 @@
-import { Component, inject, signal, OnInit, OnDestroy } from '@angular/core';
+import { Component, inject, signal, OnInit, OnDestroy, HostListener } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterLink } from '@angular/router';
 import { NotificationsService, SeasonalNotification, NotificationPriority } from '@app/services';
 import { ToastModule } from 'primeng/toast';
 import { MessageService } from 'primeng/api';
+
+interface PriorityInfo {
+	priority: NotificationPriority;
+	label: string;
+	description: string;
+	color: string;
+}
+
+const PRIORITY_LEGEND: PriorityInfo[] = [
+	{
+		priority: 'urgent',
+		label: 'Urgente',
+		description: 'Requiere atención inmediata. Fechas límite próximas o vencidas.',
+		color: '#dc2626',
+	},
+	{
+		priority: 'high',
+		label: 'Importante',
+		description: 'Alta prioridad. Acciones pendientes que requieren atención pronto.',
+		color: '#ffcc0c',
+	},
+	{
+		priority: 'medium',
+		label: 'Normal',
+		description: 'Prioridad estándar. Información relevante para tu día a día.',
+		color: '#253470',
+	},
+	{
+		priority: 'low',
+		label: 'Informativo',
+		description: 'Baja prioridad. Datos generales y recordatorios.',
+		color: '#77a02d',
+	},
+];
 
 @Component({
 	selector: 'app-floating-notification-bell',
@@ -23,6 +57,11 @@ export class FloatingNotificationBellComponent implements OnInit, OnDestroy {
 	isPanelOpen = this.notificationsService.isPanelOpen;
 	unreadByPriority = this.notificationsService.unreadByPriority;
 	highestPriority = this.notificationsService.highestPriority;
+
+	// Context menu
+	showContextMenu = false;
+	contextMenuPosition = { x: 0, y: 0 };
+	priorityLegend = PRIORITY_LEGEND;
 
 	private hasShownToast = false;
 
@@ -136,5 +175,21 @@ export class FloatingNotificationBellComponent implements OnInit, OnDestroy {
 
 	trackById(_index: number, notification: SeasonalNotification): string {
 		return notification.id;
+	}
+
+	// Context menu methods
+	onContextMenu(event: MouseEvent): void {
+		event.preventDefault();
+		this.contextMenuPosition = { x: event.clientX, y: event.clientY };
+		this.showContextMenu = true;
+	}
+
+	@HostListener('document:click')
+	onDocumentClick(): void {
+		this.showContextMenu = false;
+	}
+
+	closeContextMenu(): void {
+		this.showContextMenu = false;
 	}
 }

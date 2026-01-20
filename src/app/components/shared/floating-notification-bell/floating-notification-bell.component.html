@@ -9,6 +9,7 @@
 			[class.ringing]="unreadCount() > 0"
 			[class]="getBadgePriorityClass()"
 			(click)="togglePanel()"
+			(contextmenu)="onContextMenu($event)"
 			title="Notificaciones"
 		>
 			<i class="pi pi-bell"></i>
@@ -18,6 +19,35 @@
 				}}</span>
 			}
 		</button>
+
+		<!-- Context menu de colores -->
+		@if (showContextMenu) {
+			<div
+				class="bell-context-menu"
+				[style.left.px]="contextMenuPosition.x"
+				[style.top.px]="contextMenuPosition.y"
+				(click)="$event.stopPropagation()"
+			>
+				<div class="context-menu-header">
+					<i class="pi pi-palette"></i>
+					<span>Significado de colores</span>
+					<button class="close-menu-btn" (click)="closeContextMenu()">
+						<i class="pi pi-times"></i>
+					</button>
+				</div>
+				<div class="context-menu-content">
+					@for (item of priorityLegend; track item.priority) {
+						<div class="priority-item">
+							<div class="priority-color" [style.background]="item.color"></div>
+							<div class="priority-info">
+								<span class="priority-label">{{ item.label }}</span>
+								<span class="priority-description">{{ item.description }}</span>
+							</div>
+						</div>
+					}
+				</div>
+			</div>
+		}
 	</div>
 }
 
