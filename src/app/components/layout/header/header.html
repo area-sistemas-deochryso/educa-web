@@ -99,17 +99,17 @@
 			</ul>
 		</div>
 
-		<div>
-			<!-- ! ANTES DE HACER UN PUSH COMENTAR ESTA SECCIÓN -->
-			<a
-				class="nav-link"
-				routerLink="/intranet"
-				routerLinkActive="active"
-				[routerLinkActiveOptions]="{ exact: true }"
-			>
-				Intranet</a
-			>
-		</div>
-		<!-- ! ANTES DE HACER UN PUSH COMENTAR ESTA SECCIÓN -->
+		@if (showIntranetLink) {
+			<div>
+				<a
+					class="nav-link"
+					routerLink="/intranet"
+					routerLinkActive="active"
+					[routerLinkActiveOptions]="{ exact: true }"
+				>
+					Intranet
+				</a>
+			</div>
+		}
 	</div>
 </nav>
