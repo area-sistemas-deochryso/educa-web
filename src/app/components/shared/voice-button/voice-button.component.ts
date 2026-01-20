@@ -27,12 +27,21 @@ export class VoiceButtonComponent implements AfterViewInit, OnDestroy {
 	currentDragY = 0;
 	lockThreshold = 80; // píxeles para activar el lock
 	showLockIndicator = false;
+	isVisible = true;
 
 	private touchStartTime = 0;
 
 	ngAfterViewInit(): void {
 		if (!this.voiceService.isSupported) {
 			console.warn('Voice recognition not supported');
+		}
+	}
+
+	@HostListener('document:keydown', ['$event'])
+	onKeyDown(event: KeyboardEvent): void {
+		if (event.ctrlKey && event.code === 'Space') {
+			event.preventDefault();
+			this.isVisible = !this.isVisible;
 		}
 	}
 
