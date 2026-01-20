@@ -2,7 +2,7 @@ import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable, catchError, of } from 'rxjs';
 
-import { environment } from '@app/environment';
+import { environment } from '@env/environment';
 
 import { ResumenAsistencia, HijoApoderado } from './asistencia.models';
 
