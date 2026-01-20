@@ -151,6 +151,31 @@ $color-no: #f44336;
 	}
 }
 
+// PrimeNG Select Panel/Overlay - fondo igual que la página
+:host ::ng-deep .p-select-overlay {
+	background: var(--intranet-background-color) !important;
+	border: 1px solid var(--intranet-soft-text-color);
+	border-radius: 4px;
+
+	.p-select-list {
+		background: transparent;
+	}
+
+	.p-select-option {
+		color: var(--intranet-soft-text-color);
+
+		&:hover {
+			background: var(--intranet-accent-color-green);
+			color: white;
+		}
+
+		&.p-select-option-selected {
+			background: var(--intranet-accent-color-green);
+			color: white;
+		}
+	}
+}
+
 // PrimeNG Table - Cuadro de doble entrada
 :host ::ng-deep .attendance-table.double-entry {
 	&.p-datatable {
@@ -302,6 +327,12 @@ $color-no: #f44336;
 	height: 50px;
 	border-radius: 2px;
 	margin: 0 auto;
+	cursor: default;
+
+	&.day-empty {
+		background-color: transparent;
+		border: 1px dashed #ccc;
+	}
 }
 
 // Clases de estado

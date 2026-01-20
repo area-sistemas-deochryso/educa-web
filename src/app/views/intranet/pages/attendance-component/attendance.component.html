@@ -2,6 +2,9 @@
 	<div class="page-header">
 		<i class="pi pi-clipboard"></i>
 		<h1>Asistencias</h1>
+		@if (loading) {
+			<i class="pi pi-spin pi-spinner"></i>
+		}
 	</div>
 
 	<!-- Leyenda -->
@@ -76,7 +79,15 @@
 					<td class="week-col header-cell">{{ week.week }}</td>
 					@for (day of week.days; track $index) {
 						<td class="day-col">
-							<div class="day-square" [class]="getStatusClass(day.status)"></div>
+							@if (isDayValid(day)) {
+								<div
+									class="day-square"
+									[class]="getStatusClass(day.status)"
+									[title]="day.hora || ''"
+								></div>
+							} @else {
+								<div class="day-square day-empty"></div>
+							}
 						</td>
 					}
 					<td class="total-col">{{ week.total }}</td>
@@ -143,7 +154,15 @@
 					<td class="week-col header-cell">{{ week.week }}</td>
 					@for (day of week.days; track $index) {
 						<td class="day-col">
-							<div class="day-square" [class]="getStatusClass(day.status)"></div>
+							@if (isDayValid(day)) {
+								<div
+									class="day-square"
+									[class]="getStatusClass(day.status)"
+									[title]="day.hora || ''"
+								></div>
+							} @else {
+								<div class="day-square day-empty"></div>
+							}
 						</td>
 					}
 					<td class="total-col">{{ week.total }}</td>

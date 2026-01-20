@@ -5,8 +5,14 @@ import { Router } from '@angular/router';
 import { InputTextModule } from 'primeng/inputtext';
 import { CheckboxModule } from 'primeng/checkbox';
 import { ButtonModule } from 'primeng/button';
-import { AuthService } from '../../../services';
-import { UppercaseInputDirective } from '../../../pipes';
+import { Select } from 'primeng/select';
+
+import { AuthService, UserRole } from '../../../services';
+
+interface RolOption {
+	label: string;
+	value: UserRole;
+}
 
 @Component({
 	selector: 'app-login-intranet',
@@ -16,17 +22,26 @@ import { UppercaseInputDirective } from '../../../pipes';
 		InputTextModule,
 		CheckboxModule,
 		ButtonModule,
-		UppercaseInputDirective,
+		Select,
 	],
 	templateUrl: './login-intranet.component.html',
 	styleUrl: './login-intranet.component.scss',
 })
 export class LoginIntranetComponent implements OnInit {
-	username: string | null = null;
-	password: string | null = null;
-	rememberPassword = false;
+	dni: string = '';
+	password: string = '';
+	selectedRol: UserRole = 'Estudiante';
+	rememberMe = false;
 	errorMessage = '';
 	showError = false;
+	isLoading = false;
+
+	roles: RolOption[] = [
+		{ label: 'Estudiante', value: 'Estudiante' },
+		{ label: 'Apoderado', value: 'Apoderado' },
+		{ label: 'Profesor', value: 'Profesor' },
+		{ label: 'Director', value: 'Director' },
+	];
 
 	constructor(
 		private router: Router,
@@ -54,11 +69,17 @@ export class LoginIntranetComponent implements OnInit {
 		this.showError = false;
 		this.errorMessage = '';
 
-		const user = this.username?.trim() || '';
-		const pass = this.password?.trim() || '';
+		const dniValue = this.dni.trim();
+		const passValue = this.password.trim();
 
-		if (!user || !pass) {
-			this.errorMessage = 'Por favor ingrese usuario y contraseña';
+		if (!dniValue || !passValue) {
+			this.errorMessage = 'Por favor ingrese DNI y contraseña';
+			this.showError = true;
+			return;
+		}
+
+		if (dniValue.length !== 8) {
+			this.errorMessage = 'El DNI debe tener 8 dígitos';
 			this.showError = true;
 			return;
 		}
@@ -68,24 +89,37 @@ export class LoginIntranetComponent implements OnInit {
 			return;
 		}
 
-		const success = this.authService.login(user, pass, this.rememberPassword);
+		this.isLoading = true;
 
-		if (success) {
-			this.router.navigate(['/intranet']);
-		} else {
-			if (this.authService.isBlocked) {
-				this.errorMessage = 'Ha excedido el número máximo de intentos. Será redirigido...';
+		this.authService.login(dniValue, passValue, this.selectedRol).subscribe({
+			next: response => {
+				this.isLoading = false;
+
+				if (response.token) {
+					this.router.navigate(['/intranet']);
+				} else {
+					if (this.authService.isBlocked) {
+						this.errorMessage =
+							'Ha excedido el número máximo de intentos. Será redirigido...';
+						this.showError = true;
+						setTimeout(() => this.goBack(), 2000);
+					} else {
+						this.errorMessage =
+							response.mensaje ||
+							`Credenciales incorrectas. Intentos restantes: ${this.remainingAttempts}`;
+						this.showError = true;
+					}
+				}
+			},
+			error: () => {
+				this.isLoading = false;
+				this.errorMessage = 'Error de conexión. Intente nuevamente.';
 				this.showError = true;
-				setTimeout(() => this.goBack(), 2000);
-			} else {
-				this.errorMessage = `Credenciales incorrectas. Intentos restantes: ${this.remainingAttempts}`;
-				this.showError = true;
-			}
-		}
+			},
+		});
 	}
 
 	private goBack(): void {
-		// Volver a la pantalla anterior (página principal)
 		this.router.navigate(['/']);
 	}
 }

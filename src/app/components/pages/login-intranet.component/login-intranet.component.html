@@ -14,46 +14,66 @@
 			}
 
 			<div class="input-group">
-				<i class="pi pi-user"></i>
+				<i class="pi pi-id-card"></i>
 				<input
 					type="text"
 					pInputText
-					placeholder="Usuario"
-					[(ngModel)]="username"
-					name="username"
-					[disabled]="isBlocked"
-					appUppercaseInput
+					placeholder="DNI"
+					[(ngModel)]="dni"
+					name="dni"
+					[disabled]="isBlocked || isLoading"
+					maxlength="8"
+					pattern="[0-9]*"
 				/>
 			</div>
 
 			<div class="input-group">
 				<i class="pi pi-lock"></i>
 				<input
-					type="text"
+					type="password"
 					pInputText
 					placeholder="Contraseña"
 					[(ngModel)]="password"
 					name="password"
-					[disabled]="isBlocked"
-					appUppercaseInput
-					class="password-field"
+					[disabled]="isBlocked || isLoading"
+				/>
+			</div>
+
+			<div class="input-group">
+				<i class="pi pi-users"></i>
+				<p-select
+					[options]="roles"
+					[(ngModel)]="selectedRol"
+					name="rol"
+					optionLabel="label"
+					optionValue="value"
+					placeholder="Seleccione rol"
+					[disabled]="isBlocked || isLoading"
+					class="w-full"
 				/>
 			</div>
 
 			<div class="options-row">
 				<label class="remember-checkbox">
-					<p-checkbox [(ngModel)]="rememberPassword" [binary]="true" name="remember" />
-					<span>Recordar contraseña</span>
+					<p-checkbox [(ngModel)]="rememberMe" [binary]="true" name="remember" />
+					<span>Recordar sesión</span>
 				</label>
 				<a href="#" class="forgot-link">¿Ha olvidado la contraseña?</a>
 			</div>
 
 			<div class="button-row">
-				<button type="submit" class="login-btn" [disabled]="isBlocked">
-					<span class="btn-label">Ingresar</span>
-					<span class="btn-icon">
-						<i class="pi pi-arrow-right"></i>
-					</span>
+				<button type="submit" class="login-btn" [disabled]="isBlocked || isLoading">
+					@if (isLoading) {
+						<span class="btn-label">Ingresando...</span>
+						<span class="btn-icon">
+							<i class="pi pi-spin pi-spinner"></i>
+						</span>
+					} @else {
+						<span class="btn-label">Ingresar</span>
+						<span class="btn-icon">
+							<i class="pi pi-arrow-right"></i>
+						</span>
+					}
 				</button>
 			</div>
 		</form>
