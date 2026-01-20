@@ -1,6 +1,7 @@
 import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { DialogModule } from 'primeng/dialog';
+import { logger } from '@app/helpers';
 
 export interface Submission {
 	id: number;
@@ -68,7 +69,7 @@ export class SubmissionsModalComponent {
 
 	viewSubmission(submission: Submission): void {
 		this.markAsRead(submission);
-		console.log('Viendo entrega:', submission.taskTitle);
+		logger.log('Viendo entrega:', submission.taskTitle);
 	}
 
 	getGradeClass(grade: number | null): string {

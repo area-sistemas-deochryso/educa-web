@@ -6,9 +6,11 @@ import {
 	HostListener,
 	AfterViewInit,
 	OnDestroy,
+	signal,
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { VoiceRecognitionService } from '@app/services';
+import { logger } from '@app/helpers';
 
 @Component({
 	selector: 'app-voice-button',
@@ -29,12 +31,65 @@ export class VoiceButtonComponent implements AfterViewInit, OnDestroy {
 	showLockIndicator = false;
 	isVisible = true;
 
+	isOnline = signal(false);
+	isSecureContext = signal(this.checkSecureContext());
+
 	private touchStartTime = 0;
+	private connectivityCheckInterval: ReturnType<typeof setInterval> | null = null;
+
+	private checkSecureContext(): boolean {
+		return (
+			window.isSecureContext ||
+			location.protocol === 'https:' ||
+			location.hostname === 'localhost' ||
+			location.hostname === '127.0.0.1'
+		);
+	}
+
+	private async checkRealConnectivity(): Promise<boolean> {
+		if (!navigator.onLine) {
+			return false;
+		}
+
+		try {
+			const controller = new AbortController();
+			const timeoutId = setTimeout(() => controller.abort(), 3000);
+
+			const response = await fetch('https://www.google.com/favicon.ico', {
+				method: 'HEAD',
+				mode: 'no-cors',
+				cache: 'no-store',
+				signal: controller.signal,
+			});
+
+			clearTimeout(timeoutId);
+			return true;
+		} catch {
+			return false;
+		}
+	}
+
+	private async updateConnectivityStatus(): Promise<void> {
+		const online = await this.checkRealConnectivity();
+		this.isOnline.set(online);
+	}
 
 	ngAfterViewInit(): void {
 		if (!this.voiceService.isSupported) {
-			console.warn('Voice recognition not supported');
+			logger.warn('Voice recognition not supported');
 		}
+
+		// Verificar conectividad inicial
+		this.updateConnectivityStatus();
+
+		// Verificar periódicamente cada 5 segundos
+		this.connectivityCheckInterval = setInterval(() => {
+			this.updateConnectivityStatus();
+		}, 5000);
+
+		// También escuchar eventos del navegador para reaccionar más rápido
+		window.addEventListener('online', () => this.updateConnectivityStatus());
+		window.addEventListener('offline', () => this.isOnline.set(false));
 	}
 
 	@HostListener('document:keydown', ['$event'])
@@ -47,6 +102,9 @@ export class VoiceButtonComponent implements AfterViewInit, OnDestroy {
 
 	ngOnDestroy(): void {
 		this.voiceService.stop();
+		if (this.connectivityCheckInterval) {
+			clearInterval(this.connectivityCheckInterval);
+		}
 	}
 
 	// Touch events para móvil

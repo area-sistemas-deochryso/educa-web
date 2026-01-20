@@ -2,6 +2,7 @@ import { Component } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { Tooltip } from 'primeng/tooltip';
+import { logger } from '@app/helpers';
 
 @Component({
   selector: 'app-footer',
@@ -15,7 +16,7 @@ export class FooterComponent {
 
   onNewsletterSubmit(): void {
     if (this.newsletterEmail) {
-      console.log('Newsletter subscription:', this.newsletterEmail);
+      logger.log('Newsletter subscription:', this.newsletterEmail);
       this.newsletterEmail = '';
     }
   }

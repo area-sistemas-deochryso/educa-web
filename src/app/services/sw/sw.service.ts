@@ -1,6 +1,7 @@
 import { Injectable, inject, PLATFORM_ID } from '@angular/core';
 import { isPlatformBrowser } from '@angular/common';
 import { BehaviorSubject } from 'rxjs';
+import { logger } from '@app/helpers';
 
 @Injectable({
 	providedIn: 'root',
@@ -36,19 +37,19 @@ export class SwService {
 		this._isOnline.next(navigator.onLine);
 
 		window.addEventListener('online', () => {
-			console.log('[SwService] Conexión restaurada');
+			logger.log('[SwService] Conexión restaurada');
 			this._isOnline.next(true);
 		});
 
 		window.addEventListener('offline', () => {
-			console.log('[SwService] Sin conexión - usando cache');
+			logger.log('[SwService] Sin conexión - usando cache');
 			this._isOnline.next(false);
 		});
 	}
 
 	private async registerServiceWorker(): Promise<void> {
 		if (!('serviceWorker' in navigator)) {
-			console.warn('[SwService] Service Workers no soportados en este navegador');
+			logger.warn('[SwService] Service Workers no soportados en este navegador');
 			return;
 		}
 
@@ -57,7 +58,7 @@ export class SwService {
 				scope: '/',
 			});
 
-			console.log('[SwService] Service Worker registrado:', this.registration.scope);
+			logger.log('[SwService] Service Worker registrado:', this.registration.scope);
 			this._isRegistered.next(true);
 
 			// Verificar actualizaciones
@@ -66,7 +67,7 @@ export class SwService {
 				if (newWorker) {
 					newWorker.addEventListener('statechange', () => {
 						if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
-							console.log('[SwService] Nueva versión disponible');
+							logger.log('[SwService] Nueva versión disponible');
 							this._updateAvailable.next(true);
 						}
 					});
@@ -75,17 +76,17 @@ export class SwService {
 
 			// Escuchar mensajes del Service Worker
 			navigator.serviceWorker.addEventListener('message', event => {
-				console.log('[SwService] Mensaje del SW:', event.data);
+				logger.log('[SwService] Mensaje del SW:', event.data);
 			});
 		} catch (error) {
-			console.error('[SwService] Error al registrar Service Worker:', error);
+			logger.error('[SwService] Error al registrar Service Worker:', error);
 		}
 	}
 
 	async clearCache(): Promise<void> {
 		if (this.registration?.active) {
 			this.registration.active.postMessage({ type: 'CLEAR_CACHE' });
-			console.log('[SwService] Cache limpiado');
+			logger.log('[SwService] Cache limpiado');
 		}
 	}
 
@@ -104,7 +105,7 @@ export class SwService {
 			const result = await this.registration.unregister();
 			if (result) {
 				this._isRegistered.next(false);
-				console.log('[SwService] Service Worker desregistrado');
+				logger.log('[SwService] Service Worker desregistrado');
 			}
 			return result;
 		}

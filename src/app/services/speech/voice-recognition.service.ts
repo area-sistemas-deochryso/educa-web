@@ -1,5 +1,13 @@
 import { Injectable, signal, inject } from '@angular/core';
 import { Router } from '@angular/router';
+import {
+	VOICE_COMMANDS,
+	MONTH_NAMES,
+	VoiceCommandConfig,
+	VoiceCommandContext,
+	ScrollDirection,
+} from './voice-commands.config';
+import { logger } from '@app/helpers';
 
 export interface VoiceCommand {
 	patterns: string[];
@@ -36,10 +44,11 @@ export class VoiceRecognitionService {
 	private activeInput: HTMLInputElement | HTMLTextAreaElement | null = null;
 	private commands: VoiceCommand[] = [];
 	private registeredModals: Map<string, RegisteredModal> = new Map();
+	private commandListeners: ((command: string, params?: string) => void)[] = [];
 
 	constructor() {
 		this.initRecognition();
-		this.registerDefaultCommands();
+		this.loadCommandsFromConfig();
 	}
 
 	private initRecognition(): void {
@@ -47,7 +56,7 @@ export class VoiceRecognitionService {
 		const SpeechRecognitionAPI = windowRef.SpeechRecognition || windowRef.webkitSpeechRecognition;
 
 		if (!SpeechRecognitionAPI) {
-			console.warn('[VoiceRecognition] API no soportada en este navegador');
+			logger.warn('[VoiceRecognition] API no soportada en este navegador');
 			return;
 		}
 
@@ -74,7 +83,6 @@ export class VoiceRecognitionService {
 			if (final) {
 				const processed = this.processTranscript(final);
 				if (!processed) {
-					// No fue un comando, agregar al transcript
 					const current = this.transcript();
 					this.transcript.set(current ? `${current} ${final}` : final);
 					this.updateActiveInput();
@@ -83,9 +91,8 @@ export class VoiceRecognitionService {
 		};
 
 		this.recognition.onerror = (event: any) => {
-			console.error('[VoiceRecognition] Error:', event.error);
+			logger.error('[VoiceRecognition] Error:', event.error);
 
-			// Manejar errores específicos
 			switch (event.error) {
 				case 'network':
 					this.error.set('Error de red. Verifica tu conexión a internet y que uses HTTPS.');
@@ -97,10 +104,7 @@ export class VoiceRecognitionService {
 					this.stop();
 					break;
 				case 'no-speech':
-					// No hacer nada, es normal
-					break;
 				case 'aborted':
-					// Ignorar, fue cancelado intencionalmente
 					break;
 				default:
 					this.error.set(`Error: ${event.error}`);
@@ -110,7 +114,6 @@ export class VoiceRecognitionService {
 
 		this.recognition.onend = () => {
 			if (this.isLocked() && this.isListening()) {
-				// Reiniciar si está bloqueado
 				this.recognition?.start();
 			} else {
 				this.isListening.set(false);
@@ -118,149 +121,66 @@ export class VoiceRecognitionService {
 		};
 	}
 
-	private monthNames: Record<string, number> = {
-		enero: 1,
-		febrero: 2,
-		marzo: 3,
-		abril: 4,
-		mayo: 5,
-		junio: 6,
-		julio: 7,
-		agosto: 8,
-		septiembre: 9,
-		setiembre: 9,
-		octubre: 10,
-		noviembre: 11,
-		diciembre: 12,
-	};
-
-	private registerDefaultCommands(): void {
-		// Comandos de navegación
-		this.commands = [
-			{
-				patterns: ['ir a inicio', 've a inicio', 'inicio'],
-				action: () => this.router.navigate(['/intranet']),
-				description: 'Navegar a inicio',
-			},
-			{
-				patterns: ['ir a asistencia', 've a asistencia', 'asistencia'],
-				action: () => this.router.navigate(['/intranet/asistencia']),
-				description: 'Navegar a asistencia',
-			},
-			{
-				patterns: ['ir a horario', 'ir a horarios', 've a horarios', 'horarios', 'horario'],
-				action: () => this.router.navigate(['/intranet/horarios']),
-				description: 'Navegar a horarios',
-			},
-			{
-				patterns: ['ir a calendario', 've a calendario', 'calendario'],
-				action: () => this.router.navigate(['/intranet/Calendario']),
-				description: 'Navegar a calendario',
-			},
-			// Comandos de paginación
-			{
-				patterns: ['siguiente página', 'página siguiente', 'siguiente'],
-				action: () => this.emitCommand('next-page'),
-				description: 'Ir a la siguiente página',
-			},
-			{
-				patterns: ['página anterior', 'anterior'],
-				action: () => this.emitCommand('prev-page'),
-				description: 'Ir a la página anterior',
-			},
-			{
-				patterns: ['página (\\d+)', 'ir a página (\\d+)'],
-				action: (params) => this.emitCommand('goto-page', params),
-				description: 'Ir a una página específica',
-			},
-			// Comandos de control
-			{
-				patterns: ['cerrar', 'cerrar modal', 'cerrar ventana'],
-				action: () => this.emitCommand('close-modal'),
-				description: 'Cerrar modal activo',
-			},
-			{
-				patterns: ['borrar', 'limpiar', 'borrar texto'],
-				action: () => {
-					this.transcript.set('');
-					this.updateActiveInput();
-				},
-				description: 'Borrar el texto dictado',
-			},
-			// Comandos de fecha - meses
-			{
-				patterns: [
-					'ir a enero',
-					'enero',
-					'ir a febrero',
-					'febrero',
-					'ir a marzo',
-					'marzo',
-					'ir a abril',
-					'abril',
-					'ir a mayo',
-					'mayo',
-					'ir a junio',
-					'junio',
-					'ir a julio',
-					'julio',
-					'ir a agosto',
-					'agosto',
-					'ir a septiembre',
-					'septiembre',
-					'ir a setiembre',
-					'setiembre',
-					'ir a octubre',
-					'octubre',
-					'ir a noviembre',
-					'noviembre',
-					'ir a diciembre',
-					'diciembre',
-				],
-				action: () => {}, // Se maneja en processTranscript
-				description: 'Cambiar mes',
-			},
-			// Comandos de fecha - años
-			{
-				patterns: ['ir a (20\\d{2})', 'año (20\\d{2})', '(20\\d{2})'],
-				action: (params) => this.emitCommand('change-year', params),
-				description: 'Cambiar año',
-			},
-			// Comandos de scroll/navegación en página
-			{
-				patterns: ['baja', 'bajar', 'abajo', 'scroll abajo'],
-				action: () => this.scrollPage('down'),
-				description: 'Bajar en la página',
-			},
-			{
-				patterns: ['sube', 'subir', 'arriba', 'scroll arriba'],
-				action: () => this.scrollPage('up'),
-				description: 'Subir en la página',
-			},
-			{
-				patterns: ['izquierda', 'scroll izquierda'],
-				action: () => this.scrollPage('left'),
-				description: 'Scroll a la izquierda',
-			},
-			{
-				patterns: ['derecha', 'scroll derecha'],
-				action: () => this.scrollPage('right'),
-				description: 'Scroll a la derecha',
-			},
-			{
-				patterns: ['al inicio', 'ir al inicio', 'principio'],
-				action: () => this.scrollPage('top'),
-				description: 'Ir al inicio de la página',
-			},
-			{
-				patterns: ['al final', 'ir al final', 'fin'],
-				action: () => this.scrollPage('bottom'),
-				description: 'Ir al final de la página',
-			},
-		];
+	/**
+	 * Carga los comandos desde la configuración centralizada
+	 */
+	private loadCommandsFromConfig(): void {
+		this.commands = VOICE_COMMANDS.map((config) => this.configToCommand(config));
 	}
 
-	private scrollPage(direction: 'up' | 'down' | 'left' | 'right' | 'top' | 'bottom'): void {
+	/**
+	 * Convierte una configuración de comando a un VoiceCommand ejecutable
+	 */
+	private configToCommand(config: VoiceCommandConfig): VoiceCommand {
+		return {
+			patterns: config.patterns,
+			description: config.description,
+			action: (params?: string) => this.executeCommand(config, params),
+		};
+	}
+
+	/**
+	 * Ejecuta un comando según su tipo de acción
+	 */
+	private executeCommand(config: VoiceCommandConfig, params?: string): void {
+		const context: VoiceCommandContext = {
+			router: this.router,
+			emitCommand: (cmd, p) => this.emitCommand(cmd, p),
+			clearTranscript: () => {
+				this.transcript.set('');
+				this.updateActiveInput();
+			},
+			params,
+		};
+
+		switch (config.actionType) {
+			case 'navigate':
+				if (config.route) {
+					this.router.navigate([config.route]);
+				}
+				break;
+
+			case 'emit':
+				if (config.emitCommand) {
+					this.emitCommand(config.emitCommand, params);
+				}
+				break;
+
+			case 'scroll':
+				if (config.scrollDirection) {
+					this.scrollPage(config.scrollDirection);
+				}
+				break;
+
+			case 'custom':
+				if (config.customAction) {
+					config.customAction(context);
+				}
+				break;
+		}
+	}
+
+	private scrollPage(direction: ScrollDirection): void {
 		const scrollAmount = 300;
 		const scrollOptions: ScrollToOptions = { behavior: 'smooth' };
 
@@ -289,8 +209,7 @@ export class VoiceRecognitionService {
 	private processMonthCommand(text: string): boolean {
 		const normalizedText = text.toLowerCase().trim();
 
-		// Buscar mes en el texto
-		for (const [monthName, monthNumber] of Object.entries(this.monthNames)) {
+		for (const [monthName, monthNumber] of Object.entries(MONTH_NAMES)) {
 			if (normalizedText.includes(monthName)) {
 				this.lastCommand.set(`Cambiar a ${monthName}`);
 				this.emitCommand('change-month', monthNumber.toString());
@@ -324,6 +243,7 @@ export class VoiceRecognitionService {
 			return true;
 		}
 
+		// Buscar en comandos registrados
 		for (const command of this.commands) {
 			for (const pattern of command.patterns) {
 				const regex = new RegExp(`^${pattern}$`, 'i');
@@ -342,7 +262,6 @@ export class VoiceRecognitionService {
 	}
 
 	private processModalCommand(text: string): boolean {
-		// Detectar "abrir X" o "cerrar X"
 		const openMatch = text.match(/^abrir\s+(.+)$/i);
 		const closeMatch = text.match(/^cerrar\s+(.+)$/i);
 
@@ -355,7 +274,6 @@ export class VoiceRecognitionService {
 				setTimeout(() => this.lastCommand.set(null), 2000);
 				return true;
 			}
-			// Emitir comando genérico si no está registrado
 			this.lastCommand.set(`Abrir ${modalName}`);
 			this.emitCommand('open-modal', modalName);
 			setTimeout(() => this.lastCommand.set(null), 2000);
@@ -371,7 +289,6 @@ export class VoiceRecognitionService {
 				setTimeout(() => this.lastCommand.set(null), 2000);
 				return true;
 			}
-			// Emitir comando genérico si no está registrado
 			this.lastCommand.set(`Cerrar ${modalName}`);
 			this.emitCommand('close-modal', modalName);
 			setTimeout(() => this.lastCommand.set(null), 2000);
@@ -384,21 +301,22 @@ export class VoiceRecognitionService {
 	private findModal(name: string): RegisteredModal | undefined {
 		const normalizedName = name.toLowerCase().trim();
 
-		// Buscar por nombre exacto
 		if (this.registeredModals.has(normalizedName)) {
 			return this.registeredModals.get(normalizedName);
 		}
 
-		// Buscar por aliases
 		for (const modal of this.registeredModals.values()) {
 			if (modal.aliases.some((alias) => alias.toLowerCase() === normalizedName)) {
 				return modal;
 			}
-			// Búsqueda parcial
 			if (modal.name.toLowerCase().includes(normalizedName) || normalizedName.includes(modal.name.toLowerCase())) {
 				return modal;
 			}
-			if (modal.aliases.some((alias) => alias.toLowerCase().includes(normalizedName) || normalizedName.includes(alias.toLowerCase()))) {
+			if (
+				modal.aliases.some(
+					(alias) => alias.toLowerCase().includes(normalizedName) || normalizedName.includes(alias.toLowerCase())
+				)
+			) {
 				return modal;
 			}
 		}
@@ -406,8 +324,13 @@ export class VoiceRecognitionService {
 		return undefined;
 	}
 
-	private commandListeners: ((command: string, params?: string) => void)[] = [];
+	// =========================================================================
+	// API PÚBLICA
+	// =========================================================================
 
+	/**
+	 * Suscribirse a eventos de comandos
+	 */
 	onCommand(callback: (command: string, params?: string) => void): () => void {
 		this.commandListeners.push(callback);
 		return () => {
@@ -420,19 +343,25 @@ export class VoiceRecognitionService {
 		this.commandListeners.forEach((cb) => cb(command, params));
 	}
 
+	/**
+	 * Inicia el reconocimiento de voz
+	 */
 	start(): void {
 		if (!this.recognition || this.isListening()) return;
 
 		try {
-			this.error.set(null); // Limpiar error anterior
+			this.error.set(null);
 			this.recognition.start();
 			this.isListening.set(true);
 		} catch (e) {
-			console.error('[VoiceRecognition] Error al iniciar:', e);
+			logger.error('[VoiceRecognition] Error al iniciar:', e);
 			this.error.set('No se pudo iniciar el reconocimiento de voz.');
 		}
 	}
 
+	/**
+	 * Detiene el reconocimiento de voz
+	 */
 	stop(): void {
 		if (!this.recognition) return;
 
@@ -441,21 +370,33 @@ export class VoiceRecognitionService {
 		this.recognition.stop();
 	}
 
+	/**
+	 * Bloquea el micrófono para grabación continua
+	 */
 	lock(): void {
 		this.isLocked.set(true);
 	}
 
+	/**
+	 * Desbloquea el micrófono y detiene la grabación
+	 */
 	unlock(): void {
 		this.isLocked.set(false);
 		this.stop();
 	}
 
+	/**
+	 * Limpia el transcript actual
+	 */
 	clear(): void {
 		this.transcript.set('');
 		this.interimTranscript.set('');
 		this.updateActiveInput();
 	}
 
+	/**
+	 * Establece el input activo para dictado
+	 */
 	setActiveInput(input: HTMLInputElement | HTMLTextAreaElement | null): void {
 		this.activeInput = input;
 	}
@@ -467,14 +408,15 @@ export class VoiceRecognitionService {
 		}
 	}
 
+	/**
+	 * Indica si el navegador soporta reconocimiento de voz
+	 */
 	get isSupported(): boolean {
 		return 'SpeechRecognition' in window || 'webkitSpeechRecognition' in window;
 	}
 
 	/**
-	 * Registra un modal para poder abrirlo/cerrarlo por voz
-	 * @param modal Configuración del modal con nombre, aliases y funciones
-	 * @returns Función para desregistrar el modal
+	 * Registra un modal para control por voz
 	 */
 	registerModal(modal: RegisteredModal): () => void {
 		const key = modal.name.toLowerCase();
@@ -496,5 +438,23 @@ export class VoiceRecognitionService {
 	 */
 	getRegisteredModals(): string[] {
 		return Array.from(this.registeredModals.keys());
+	}
+
+	/**
+	 * Añade un comando dinámicamente en tiempo de ejecución
+	 */
+	addCommand(command: VoiceCommand): () => void {
+		this.commands.push(command);
+		return () => {
+			const index = this.commands.indexOf(command);
+			if (index > -1) this.commands.splice(index, 1);
+		};
+	}
+
+	/**
+	 * Obtiene todos los comandos registrados (para debug/documentación)
+	 */
+	getRegisteredCommands(): { pattern: string; description: string }[] {
+		return this.commands.flatMap((cmd) => cmd.patterns.map((p) => ({ pattern: p, description: cmd.description })));
 	}
 }

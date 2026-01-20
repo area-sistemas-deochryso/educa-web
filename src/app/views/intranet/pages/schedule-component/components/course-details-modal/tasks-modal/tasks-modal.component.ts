@@ -1,6 +1,7 @@
 import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { DialogModule } from 'primeng/dialog';
+import { logger } from '@app/helpers';
 
 export interface Task {
 	id: number;
@@ -80,6 +81,6 @@ export class TasksModalComponent {
 
 	openTask(task: Task): void {
 		this.markAsRead(task);
-		console.log('Abriendo tarea:', task.title);
+		logger.log('Abriendo tarea:', task.title);
 	}
 }

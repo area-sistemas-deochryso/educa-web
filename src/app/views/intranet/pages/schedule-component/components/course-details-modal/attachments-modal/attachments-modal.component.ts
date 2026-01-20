@@ -1,6 +1,7 @@
 import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { DialogModule } from 'primeng/dialog';
+import { logger } from '@app/helpers';
 
 export interface Attachment {
 	id: number;
@@ -52,6 +53,6 @@ export class AttachmentsModalComponent {
 
 	downloadAttachment(attachment: Attachment): void {
 		this.markAsRead(attachment);
-		console.log('Descargando:', attachment.name);
+		logger.log('Descargando:', attachment.name);
 	}
 }
