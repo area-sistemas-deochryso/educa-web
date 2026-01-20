@@ -11,6 +11,7 @@ import {
 import { CommonModule } from '@angular/common';
 import { VoiceRecognitionService } from '@app/services';
 import { logger } from '@app/helpers';
+import { VOICE_COMMANDS, VoiceCommandCategory } from '@app/services/speech/voice-commands.config';
 
 @Component({
 	selector: 'app-voice-button',
@@ -30,6 +31,20 @@ export class VoiceButtonComponent implements AfterViewInit, OnDestroy {
 	lockThreshold = 80; // píxeles para activar el lock
 	showLockIndicator = false;
 	isVisible = true;
+
+	// Context menu
+	showContextMenu = false;
+	contextMenuPosition = { x: 0, y: 0 };
+	voiceCommands = VOICE_COMMANDS;
+	categories: VoiceCommandCategory[] = ['navigation', 'scroll', 'pagination', 'modal', 'date', 'control'];
+	categoryLabels: Record<VoiceCommandCategory, string> = {
+		navigation: 'Navegación',
+		scroll: 'Scroll',
+		pagination: 'Paginación',
+		modal: 'Modales',
+		date: 'Fechas',
+		control: 'Control',
+	};
 
 	isOnline = signal(false);
 	isSecureContext = signal(this.checkSecureContext());
@@ -124,6 +139,8 @@ export class VoiceButtonComponent implements AfterViewInit, OnDestroy {
 
 	// Mouse events para desktop
 	onMouseDown(event: MouseEvent): void {
+		// Ignorar clic derecho (button 2)
+		if (event.button === 2) return;
 		this.startRecording(event.clientY);
 	}
 
@@ -194,5 +211,30 @@ export class VoiceButtonComponent implements AfterViewInit, OnDestroy {
 
 	get dragOffset(): number {
 		return Math.min(this.currentDragY, this.lockThreshold + 20);
+	}
+
+	// Context menu methods
+	onContextMenu(event: MouseEvent): void {
+		event.preventDefault();
+		this.contextMenuPosition = { x: event.clientX, y: event.clientY };
+		this.showContextMenu = true;
+	}
+
+	@HostListener('document:click')
+	onDocumentClick(): void {
+		this.showContextMenu = false;
+	}
+
+	closeContextMenu(): void {
+		this.showContextMenu = false;
+	}
+
+	getCommandsByCategory(category: VoiceCommandCategory) {
+		return this.voiceCommands.filter((cmd) => cmd.category === category);
+	}
+
+	getCommandPatterns(patterns: string[]): string {
+		// Mostrar solo el primer patrón de forma legible
+		return patterns[0].replace(/\(.*?\)/g, '...').replace(/\\/g, '');
 	}
 }

@@ -49,6 +49,7 @@
 			[class.dragging]="isDragging"
 			[style.transform]="isDragging ? 'translateY(-' + dragOffset + 'px)' : ''"
 			(mousedown)="onMouseDown($event)"
+			(contextmenu)="onContextMenu($event)"
 			(touchstart)="onTouchStart($event)"
 			(touchmove)="onTouchMove($event)"
 			(touchend)="onTouchEnd()"
@@ -83,6 +84,41 @@
 				Mantén presionado para hablar
 				<br />
 				<small>Desliza hacia arriba para bloquear</small>
+			</div>
+		}
+
+		<!-- Context menu de comandos -->
+		@if (showContextMenu) {
+			<div
+				class="voice-context-menu"
+				[style.left.px]="contextMenuPosition.x"
+				[style.top.px]="contextMenuPosition.y"
+				(click)="$event.stopPropagation()"
+			>
+				<div class="context-menu-header">
+					<i class="pi pi-list"></i>
+					<span>Comandos de voz</span>
+					<button class="close-menu-btn" (click)="closeContextMenu()">
+						<i class="pi pi-times"></i>
+					</button>
+				</div>
+				<div class="context-menu-content">
+					@for (category of categories; track category) {
+						@if (getCommandsByCategory(category).length > 0) {
+							<div class="command-category">
+								<div class="category-title">{{ categoryLabels[category] }}</div>
+								<div class="command-list">
+									@for (cmd of getCommandsByCategory(category); track cmd.description) {
+										<div class="command-item">
+											<span class="command-pattern">"{{ getCommandPatterns(cmd.patterns) }}"</span>
+											<span class="command-description">{{ cmd.description }}</span>
+										</div>
+									}
+								</div>
+							</div>
+						}
+					}
+				</div>
 			</div>
 		}
 	</div>
