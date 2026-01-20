@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { TableModule } from 'primeng/table';
 import { Select } from 'primeng/select';
+import { TooltipModule } from 'primeng/tooltip';
 
 import { AsistenciaService, AsistenciaDetalle, ResumenAsistencia } from '@app/services';
 import { AuthService } from '@app/services';
@@ -54,7 +55,7 @@ const ATTENDANCE_STORAGE_KEY = 'attendance_selected_month';
 
 @Component({
 	selector: 'app-attendance',
-	imports: [CommonModule, FormsModule, TableModule, Select],
+	imports: [CommonModule, FormsModule, TableModule, Select, TooltipModule],
 	templateUrl: './attendance.component.html',
 	styleUrl: './attendance.component.scss',
 })

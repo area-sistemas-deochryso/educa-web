@@ -1,0 +1,89 @@
+@if (voiceService.isSupported) {
+	<div class="voice-container">
+		<!-- Indicador de bloqueo -->
+		@if (showLockIndicator || voiceService.isLocked()) {
+			<div class="lock-indicator" [class.active]="voiceService.isLocked()">
+				<i class="pi pi-lock"></i>
+			</div>
+		}
+
+		<!-- Panel de transcripción cuando está bloqueado -->
+		@if (voiceService.isLocked()) {
+			<div class="transcript-panel">
+				<div class="transcript-header">
+					<span class="recording-indicator">
+						<span class="pulse"></span>
+						Grabando...
+					</span>
+					<button class="clear-btn" (click)="clearTranscript()" title="Borrar">
+						<i class="pi pi-trash"></i>
+					</button>
+				</div>
+				<div class="transcript-content">
+					@if (voiceService.transcript() || voiceService.interimTranscript()) {
+						<span class="final">{{ voiceService.transcript() }}</span>
+						<span class="interim">{{ voiceService.interimTranscript() }}</span>
+					} @else {
+						<span class="placeholder">Habla ahora...</span>
+					}
+				</div>
+				@if (voiceService.lastCommand()) {
+					<div class="command-feedback">
+						<i class="pi pi-check-circle"></i>
+						{{ voiceService.lastCommand() }}
+					</div>
+				}
+				<button class="stop-btn" (click)="stopLocked()">
+					<i class="pi pi-stop-circle"></i>
+					Detener
+				</button>
+			</div>
+		}
+
+		<!-- Botón principal de voz -->
+		<button
+			#voiceButton
+			class="voice-button"
+			[class.listening]="voiceService.isListening()"
+			[class.locked]="voiceService.isLocked()"
+			[class.dragging]="isDragging"
+			[style.transform]="isDragging ? 'translateY(-' + dragOffset + 'px)' : ''"
+			(mousedown)="onMouseDown($event)"
+			(touchstart)="onTouchStart($event)"
+			(touchmove)="onTouchMove($event)"
+			(touchend)="onTouchEnd()"
+		>
+			@if (voiceService.isLocked()) {
+				<i class="pi pi-microphone"></i>
+			} @else if (voiceService.isListening()) {
+				<div class="sound-waves">
+					<span></span>
+					<span></span>
+					<span></span>
+				</div>
+			} @else {
+				<i class="pi pi-microphone"></i>
+			}
+		</button>
+
+		<!-- Mensaje de error -->
+		@if (voiceService.error()) {
+			<div class="error-panel">
+				<i class="pi pi-exclamation-triangle"></i>
+				<span>{{ voiceService.error() }}</span>
+				<button class="dismiss-btn" (click)="dismissError()">
+					<i class="pi pi-times"></i>
+				</button>
+			</div>
+		}
+
+		<!-- Tooltip de instrucciones -->
+		@if (!voiceService.isListening() && !voiceService.isLocked() && !voiceService.error()) {
+			<div class="voice-tooltip">
+				Mantén presionado para hablar
+				<br />
+				<small>Desliza hacia arriba para bloquear</small>
+			</div>
+		}
+	</div>
+}

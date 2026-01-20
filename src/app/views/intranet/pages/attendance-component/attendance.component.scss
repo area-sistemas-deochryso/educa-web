@@ -28,6 +28,36 @@ $color-no: #f44336;
 		color: var(--intranet-default-text-color);
 		margin: 0;
 	}
+
+	.reload-btn {
+		margin-left: auto;
+		width: 36px;
+		height: 36px;
+		border: 1px solid var(--intranet-soft-text-color);
+		border-radius: 50%;
+		background: transparent;
+		color: var(--intranet-soft-text-color);
+		cursor: pointer;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		transition: all 0.2s ease;
+
+		i {
+			font-size: 1rem;
+		}
+
+		&:hover:not(:disabled) {
+			border-color: var(--intranet-accent-color-blue);
+			color: var(--intranet-accent-color-blue);
+			background: rgba(37, 52, 112, 0.05);
+		}
+
+		&:disabled {
+			opacity: 0.6;
+			cursor: not-allowed;
+		}
+	}
 }
 
 // Seccion de leyenda
