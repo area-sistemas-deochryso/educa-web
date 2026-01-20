@@ -1,0 +1,59 @@
+<p-dialog
+	[visible]="visible"
+	(visibleChange)="onVisibleChange($event)"
+	[modal]="true"
+	[dismissableMask]="true"
+	[draggable]="false"
+	[resizable]="false"
+	styleClass="tasks-modal"
+	[showHeader]="false"
+>
+	<div class="modal-content">
+		<h2>Tareas Pendientes</h2>
+		<p class="week-label">{{ weekName }}</p>
+
+		<div class="tasks-list">
+			@for (task of tasks; track task.id) {
+				<div class="task-item" [class.unread]="!task.isRead" (click)="openTask(task)">
+					<div class="task-icon">
+						<i class="pi pi-file-edit"></i>
+					</div>
+					<div class="task-info">
+						<div class="task-header">
+							<span class="task-title">{{ task.title }}</span>
+							@if (!task.isRead) {
+								<span class="unread-badge">Nuevo</span>
+							}
+						</div>
+						<span class="task-description">{{ task.description }}</span>
+						<div class="task-meta">
+							<span class="due-date">
+								<i class="pi pi-calendar"></i>
+								Fecha límite: {{ task.dueDate }}
+							</span>
+							<span class="days-remaining" [class.urgent]="getDaysRemaining(task.dueDate) === 'Hoy' || getDaysRemaining(task.dueDate) === 'Mañana'">
+								{{ getDaysRemaining(task.dueDate) }}
+							</span>
+						</div>
+					</div>
+					<div class="task-status">
+						<span class="status-badge" [ngClass]="getStatusClass(task.status)">
+							{{ getStatusLabel(task.status) }}
+						</span>
+					</div>
+				</div>
+			}
+		</div>
+
+		@if (tasks.length === 0) {
+			<div class="empty-state">
+				<i class="pi pi-check-circle"></i>
+				<p>No hay tareas pendientes</p>
+			</div>
+		}
+
+		<div class="modal-footer">
+			<span class="count-info">{{ tasks.length }} tareas pendientes</span>
+		</div>
+	</div>
+</p-dialog>

@@ -1,0 +1,66 @@
+<p-dialog
+	[visible]="visible"
+	(visibleChange)="onVisibleChange($event)"
+	[modal]="true"
+	[dismissableMask]="true"
+	[draggable]="false"
+	[resizable]="false"
+	styleClass="submissions-modal"
+	[showHeader]="false"
+>
+	<div class="modal-content">
+		<h2>Entregas Enviadas</h2>
+		<p class="week-label">{{ weekName }}</p>
+
+		<div class="submissions-list">
+			@for (submission of submissions; track submission.id) {
+				<div class="submission-item" [class.unread]="!submission.isRead" (click)="viewSubmission(submission)">
+					<div class="submission-icon" [ngClass]="getStatusClass(submission.status)">
+						<i class="pi" [ngClass]="getStatusIcon(submission.status)"></i>
+					</div>
+					<div class="submission-info">
+						<div class="submission-header">
+							<span class="submission-title">{{ submission.taskTitle }}</span>
+							@if (!submission.isRead) {
+								<span class="unread-badge">Nuevo</span>
+							}
+						</div>
+						<div class="submission-meta">
+							<span class="submitted-date">
+								<i class="pi pi-send"></i>
+								Enviado: {{ submission.submittedDate }}
+							</span>
+						</div>
+						@if (submission.feedback) {
+							<div class="submission-feedback">
+								<i class="pi pi-comment"></i>
+								<span>{{ submission.feedback }}</span>
+							</div>
+						}
+					</div>
+					<div class="submission-status">
+						<span class="status-badge" [ngClass]="getStatusClass(submission.status)">
+							{{ getStatusLabel(submission.status) }}
+						</span>
+						@if (submission.grade !== null) {
+							<span class="grade" [ngClass]="getGradeClass(submission.grade)">
+								{{ submission.grade }}/20
+							</span>
+						}
+					</div>
+				</div>
+			}
+		</div>
+
+		@if (submissions.length === 0) {
+			<div class="empty-state">
+				<i class="pi pi-inbox"></i>
+				<p>No hay entregas enviadas</p>
+			</div>
+		}
+
+		<div class="modal-footer">
+			<span class="count-info">{{ submissions.length }} entregas</span>
+		</div>
+	</div>
+</p-dialog>

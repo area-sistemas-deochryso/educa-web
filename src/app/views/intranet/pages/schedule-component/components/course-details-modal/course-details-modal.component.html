@@ -38,7 +38,7 @@
 										<div class="item-info">
 											<strong>{{ week.attachments.count }} Archivos Adjuntos</strong>
 											<span>{{ week.attachments.unread }} sin leer · {{ week.attachments.reviewed }} revisado</span>
-											<a class="item-link">Ver archivos</a>
+											<a class="item-link" (click)="openAttachments(week)">Ver archivos</a>
 										</div>
 									</div>
 									<div class="week-item-row">
@@ -48,7 +48,7 @@
 										<div class="item-info">
 											<strong>{{ week.pendingTasks.count }} Tareas Pendientes</strong>
 											<span>{{ week.pendingTasks.unread }} sin leer</span>
-											<a class="item-link">Ver Tareas</a>
+											<a class="item-link" (click)="openTasks(week)">Ver Tareas</a>
 										</div>
 									</div>
 									<div class="week-item-row">
@@ -58,7 +58,7 @@
 										<div class="item-info">
 											<strong>{{ week.submittedTasks.count }} Tarea Enviada</strong>
 											<span>{{ week.submittedTasks.unread }} sin leer · {{ week.submittedTasks.reviewed }} revisadas</span>
-											<a class="item-link">Ver Entregas</a>
+											<a class="item-link" (click)="openSubmissions(week)">Ver Entregas</a>
 										</div>
 									</div>
 								</div>
@@ -146,3 +146,18 @@
 		</div>
 	</div>
 </p-dialog>
+
+<app-attachments-modal
+	[(visible)]="showAttachmentsModal"
+	[weekName]="selectedWeekName"
+/>
+
+<app-tasks-modal
+	[(visible)]="showTasksModal"
+	[weekName]="selectedWeekName"
+/>
+
+<app-submissions-modal
+	[(visible)]="showSubmissionsModal"
+	[weekName]="selectedWeekName"
+/>

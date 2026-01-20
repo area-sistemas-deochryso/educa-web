@@ -1,0 +1,41 @@
+<p-dialog
+	[visible]="visible"
+	(visibleChange)="onVisibleChange($event)"
+	[modal]="true"
+	[dismissableMask]="true"
+	[draggable]="false"
+	[resizable]="false"
+	styleClass="attachments-modal"
+	[showHeader]="false"
+>
+	<div class="modal-content">
+		<h2>Archivos Adjuntos</h2>
+		<p class="week-label">{{ weekName }}</p>
+
+		<div class="attachments-list">
+			@for (attachment of attachments; track attachment.id) {
+				<div class="attachment-item" [class.unread]="!attachment.isRead">
+					<div class="attachment-icon">
+						<i class="pi" [ngClass]="getIcon(attachment.type)"></i>
+					</div>
+					<div class="attachment-info">
+						<span class="attachment-name">{{ attachment.name }}</span>
+						<span class="attachment-meta">{{ attachment.size }} · {{ attachment.date }}</span>
+					</div>
+					<div class="attachment-actions">
+						@if (!attachment.isRead) {
+							<span class="unread-badge">Nuevo</span>
+						}
+						<button class="action-btn" (click)="downloadAttachment(attachment)" title="Descargar">
+							<i class="pi pi-download"></i>
+						</button>
+					</div>
+				</div>
+			}
+		</div>
+
+		<div class="modal-footer">
+			<span class="count-info">{{ attachments.length }} archivos</span>
+		</div>
+	</div>
+</p-dialog>

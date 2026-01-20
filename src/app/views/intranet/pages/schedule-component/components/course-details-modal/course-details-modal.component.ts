@@ -2,6 +2,9 @@ import { Component, EventEmitter, Input, Output, OnChanges, SimpleChanges } from
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { DialogModule } from 'primeng/dialog';
+import { AttachmentsModalComponent } from './attachments-modal/attachments-modal.component';
+import { TasksModalComponent } from './tasks-modal/tasks-modal.component';
+import { SubmissionsModalComponent } from './submissions-modal/submissions-modal.component';
 
 export interface WeekContent {
 	id: number;
@@ -28,7 +31,7 @@ export interface CourseDetails {
 
 @Component({
 	selector: 'app-course-details-modal',
-	imports: [CommonModule, FormsModule, DialogModule],
+	imports: [CommonModule, FormsModule, DialogModule, AttachmentsModalComponent, TasksModalComponent, SubmissionsModalComponent],
 	templateUrl: './course-details-modal.component.html',
 	styleUrl: './course-details-modal.component.scss',
 })
@@ -45,6 +48,12 @@ export class CourseDetailsModalComponent implements OnChanges {
 	courseSearchResults: string[] = [];
 	showCourseDropdown = false;
 	evaluationsExpanded = false;
+
+	// Modales de contenido de semana
+	showAttachmentsModal = false;
+	showTasksModal = false;
+	showSubmissionsModal = false;
+	selectedWeekName = '';
 
 	currentCourseDetails: CourseDetails = this.getDefaultCourseDetails('');
 
@@ -153,5 +162,20 @@ export class CourseDetailsModalComponent implements OnChanges {
 	onOpenGrades(): void {
 		this.visibleChange.emit(false);
 		this.openGrades.emit(this.currentCourseDetails.name);
+	}
+
+	openAttachments(week: WeekContent): void {
+		this.selectedWeekName = week.name;
+		this.showAttachmentsModal = true;
+	}
+
+	openTasks(week: WeekContent): void {
+		this.selectedWeekName = week.name;
+		this.showTasksModal = true;
+	}
+
+	openSubmissions(week: WeekContent): void {
+		this.selectedWeekName = week.name;
+		this.showSubmissionsModal = true;
 	}
 }
