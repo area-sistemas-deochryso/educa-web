@@ -1,11 +1,11 @@
-import { Component, OnInit, ChangeDetectorRef, inject } from '@angular/core';
+import { Component, OnInit, OnDestroy, ChangeDetectorRef, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { TableModule } from 'primeng/table';
 import { Select } from 'primeng/select';
 import { TooltipModule } from 'primeng/tooltip';
 
-import { AsistenciaService, AsistenciaDetalle, ResumenAsistencia } from '@app/services';
+import { AsistenciaService, AsistenciaDetalle, ResumenAsistencia, VoiceRecognitionService } from '@app/services';
 import { AuthService } from '@app/services';
 
 type AttendanceStatus = 'T' | 'A' | 'F' | 'N';
@@ -59,10 +59,12 @@ const ATTENDANCE_STORAGE_KEY = 'attendance_selected_month';
 	templateUrl: './attendance.component.html',
 	styleUrl: './attendance.component.scss',
 })
-export class AttendanceComponent implements OnInit {
+export class AttendanceComponent implements OnInit, OnDestroy {
 	private asistenciaService = inject(AsistenciaService);
 	private authService = inject(AuthService);
 	private cdr = inject(ChangeDetectorRef);
+	private voiceService = inject(VoiceRecognitionService);
+	private voiceUnsubscribe: (() => void) | null = null;
 
 	studentName = '';
 	loading = false;
@@ -104,6 +106,37 @@ export class AttendanceComponent implements OnInit {
 			this.restoreSelectedMonth();
 			this.loadAsistencias();
 		}
+		this.setupVoiceCommands();
+	}
+
+	ngOnDestroy(): void {
+		if (this.voiceUnsubscribe) {
+			this.voiceUnsubscribe();
+		}
+	}
+
+	private setupVoiceCommands(): void {
+		this.voiceUnsubscribe = this.voiceService.onCommand((command, params) => {
+			if (command === 'change-month' && params) {
+				const month = parseInt(params, 10);
+				if (month >= 1 && month <= 12) {
+					this.ingresos.selectedMonth = month;
+					this.salidas.selectedMonth = month;
+					this.saveSelectedMonth();
+					this.loadAsistencias();
+					this.cdr.detectChanges();
+				}
+			} else if (command === 'change-year' && params) {
+				const year = parseInt(params, 10);
+				if (year >= 2000 && year <= 2100) {
+					this.ingresos.selectedYear = year;
+					this.salidas.selectedYear = year;
+					this.saveSelectedMonth();
+					this.loadAsistencias();
+					this.cdr.detectChanges();
+				}
+			}
+		});
 	}
 
 	private restoreSelectedMonth(): void {

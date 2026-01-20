@@ -7,6 +7,13 @@ export interface VoiceCommand {
 	description: string;
 }
 
+export interface RegisteredModal {
+	name: string;
+	aliases: string[];
+	open: () => void;
+	close: () => void;
+}
+
 interface IWindow extends Window {
 	SpeechRecognition: any;
 	webkitSpeechRecognition: any;
@@ -28,6 +35,7 @@ export class VoiceRecognitionService {
 
 	private activeInput: HTMLInputElement | HTMLTextAreaElement | null = null;
 	private commands: VoiceCommand[] = [];
+	private registeredModals: Map<string, RegisteredModal> = new Map();
 
 	constructor() {
 		this.initRecognition();
@@ -110,6 +118,22 @@ export class VoiceRecognitionService {
 		};
 	}
 
+	private monthNames: Record<string, number> = {
+		enero: 1,
+		febrero: 2,
+		marzo: 3,
+		abril: 4,
+		mayo: 5,
+		junio: 6,
+		julio: 7,
+		agosto: 8,
+		septiembre: 9,
+		setiembre: 9,
+		octubre: 10,
+		noviembre: 11,
+		diciembre: 12,
+	};
+
 	private registerDefaultCommands(): void {
 		// Comandos de navegación
 		this.commands = [
@@ -163,11 +187,142 @@ export class VoiceRecognitionService {
 				},
 				description: 'Borrar el texto dictado',
 			},
+			// Comandos de fecha - meses
+			{
+				patterns: [
+					'ir a enero',
+					'enero',
+					'ir a febrero',
+					'febrero',
+					'ir a marzo',
+					'marzo',
+					'ir a abril',
+					'abril',
+					'ir a mayo',
+					'mayo',
+					'ir a junio',
+					'junio',
+					'ir a julio',
+					'julio',
+					'ir a agosto',
+					'agosto',
+					'ir a septiembre',
+					'septiembre',
+					'ir a setiembre',
+					'setiembre',
+					'ir a octubre',
+					'octubre',
+					'ir a noviembre',
+					'noviembre',
+					'ir a diciembre',
+					'diciembre',
+				],
+				action: () => {}, // Se maneja en processTranscript
+				description: 'Cambiar mes',
+			},
+			// Comandos de fecha - años
+			{
+				patterns: ['ir a (20\\d{2})', 'año (20\\d{2})', '(20\\d{2})'],
+				action: (params) => this.emitCommand('change-year', params),
+				description: 'Cambiar año',
+			},
+			// Comandos de scroll/navegación en página
+			{
+				patterns: ['baja', 'bajar', 'abajo', 'scroll abajo'],
+				action: () => this.scrollPage('down'),
+				description: 'Bajar en la página',
+			},
+			{
+				patterns: ['sube', 'subir', 'arriba', 'scroll arriba'],
+				action: () => this.scrollPage('up'),
+				description: 'Subir en la página',
+			},
+			{
+				patterns: ['izquierda', 'scroll izquierda'],
+				action: () => this.scrollPage('left'),
+				description: 'Scroll a la izquierda',
+			},
+			{
+				patterns: ['derecha', 'scroll derecha'],
+				action: () => this.scrollPage('right'),
+				description: 'Scroll a la derecha',
+			},
+			{
+				patterns: ['al inicio', 'ir al inicio', 'principio'],
+				action: () => this.scrollPage('top'),
+				description: 'Ir al inicio de la página',
+			},
+			{
+				patterns: ['al final', 'ir al final', 'fin'],
+				action: () => this.scrollPage('bottom'),
+				description: 'Ir al final de la página',
+			},
 		];
+	}
+
+	private scrollPage(direction: 'up' | 'down' | 'left' | 'right' | 'top' | 'bottom'): void {
+		const scrollAmount = 300;
+		const scrollOptions: ScrollToOptions = { behavior: 'smooth' };
+
+		switch (direction) {
+			case 'up':
+				window.scrollBy({ top: -scrollAmount, ...scrollOptions });
+				break;
+			case 'down':
+				window.scrollBy({ top: scrollAmount, ...scrollOptions });
+				break;
+			case 'left':
+				window.scrollBy({ left: -scrollAmount, ...scrollOptions });
+				break;
+			case 'right':
+				window.scrollBy({ left: scrollAmount, ...scrollOptions });
+				break;
+			case 'top':
+				window.scrollTo({ top: 0, ...scrollOptions });
+				break;
+			case 'bottom':
+				window.scrollTo({ top: document.body.scrollHeight, ...scrollOptions });
+				break;
+		}
+	}
+
+	private processMonthCommand(text: string): boolean {
+		const normalizedText = text.toLowerCase().trim();
+
+		// Buscar mes en el texto
+		for (const [monthName, monthNumber] of Object.entries(this.monthNames)) {
+			if (normalizedText.includes(monthName)) {
+				this.lastCommand.set(`Cambiar a ${monthName}`);
+				this.emitCommand('change-month', monthNumber.toString());
+				setTimeout(() => this.lastCommand.set(null), 2000);
+				return true;
+			}
+		}
+
+		return false;
 	}
 
 	private processTranscript(text: string): boolean {
 		const normalizedText = text.toLowerCase().trim();
+
+		// Primero intentar comandos de mes (tienen prioridad)
+		if (this.processMonthCommand(normalizedText)) {
+			return true;
+		}
+
+		// Luego comandos de año
+		const yearMatch = normalizedText.match(/(20\d{2})/);
+		if (yearMatch) {
+			this.lastCommand.set(`Cambiar a año ${yearMatch[1]}`);
+			this.emitCommand('change-year', yearMatch[1]);
+			setTimeout(() => this.lastCommand.set(null), 2000);
+			return true;
+		}
+
+		// Comandos de modal (abrir/cerrar + nombre)
+		if (this.processModalCommand(normalizedText)) {
+			return true;
+		}
 
 		for (const command of this.commands) {
 			for (const pattern of command.patterns) {
@@ -184,6 +339,71 @@ export class VoiceRecognitionService {
 		}
 
 		return false;
+	}
+
+	private processModalCommand(text: string): boolean {
+		// Detectar "abrir X" o "cerrar X"
+		const openMatch = text.match(/^abrir\s+(.+)$/i);
+		const closeMatch = text.match(/^cerrar\s+(.+)$/i);
+
+		if (openMatch) {
+			const modalName = openMatch[1].trim();
+			const modal = this.findModal(modalName);
+			if (modal) {
+				this.lastCommand.set(`Abrir ${modal.name}`);
+				modal.open();
+				setTimeout(() => this.lastCommand.set(null), 2000);
+				return true;
+			}
+			// Emitir comando genérico si no está registrado
+			this.lastCommand.set(`Abrir ${modalName}`);
+			this.emitCommand('open-modal', modalName);
+			setTimeout(() => this.lastCommand.set(null), 2000);
+			return true;
+		}
+
+		if (closeMatch) {
+			const modalName = closeMatch[1].trim();
+			const modal = this.findModal(modalName);
+			if (modal) {
+				this.lastCommand.set(`Cerrar ${modal.name}`);
+				modal.close();
+				setTimeout(() => this.lastCommand.set(null), 2000);
+				return true;
+			}
+			// Emitir comando genérico si no está registrado
+			this.lastCommand.set(`Cerrar ${modalName}`);
+			this.emitCommand('close-modal', modalName);
+			setTimeout(() => this.lastCommand.set(null), 2000);
+			return true;
+		}
+
+		return false;
+	}
+
+	private findModal(name: string): RegisteredModal | undefined {
+		const normalizedName = name.toLowerCase().trim();
+
+		// Buscar por nombre exacto
+		if (this.registeredModals.has(normalizedName)) {
+			return this.registeredModals.get(normalizedName);
+		}
+
+		// Buscar por aliases
+		for (const modal of this.registeredModals.values()) {
+			if (modal.aliases.some((alias) => alias.toLowerCase() === normalizedName)) {
+				return modal;
+			}
+			// Búsqueda parcial
+			if (modal.name.toLowerCase().includes(normalizedName) || normalizedName.includes(modal.name.toLowerCase())) {
+				return modal;
+			}
+			if (modal.aliases.some((alias) => alias.toLowerCase().includes(normalizedName) || normalizedName.includes(alias.toLowerCase()))) {
+				return modal;
+			}
+		}
+
+		return undefined;
 	}
 
 	private commandListeners: ((command: string, params?: string) => void)[] = [];
@@ -249,5 +469,32 @@ export class VoiceRecognitionService {
 
 	get isSupported(): boolean {
 		return 'SpeechRecognition' in window || 'webkitSpeechRecognition' in window;
+	}
+
+	/**
+	 * Registra un modal para poder abrirlo/cerrarlo por voz
+	 * @param modal Configuración del modal con nombre, aliases y funciones
+	 * @returns Función para desregistrar el modal
+	 */
+	registerModal(modal: RegisteredModal): () => void {
+		const key = modal.name.toLowerCase();
+		this.registeredModals.set(key, modal);
+		return () => {
+			this.registeredModals.delete(key);
+		};
+	}
+
+	/**
+	 * Desregistra un modal por nombre
+	 */
+	unregisterModal(name: string): void {
+		this.registeredModals.delete(name.toLowerCase());
+	}
+
+	/**
+	 * Obtiene la lista de modales registrados
+	 */
+	getRegisteredModals(): string[] {
+		return Array.from(this.registeredModals.keys());
 	}
 }

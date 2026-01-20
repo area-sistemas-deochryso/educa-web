@@ -1,10 +1,11 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, OnDestroy, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ScheduleCalendarComponent } from './components/schedule-calendar/schedule-calendar.component';
 import { ScheduleModalComponent } from './components/schedule-modal/schedule-modal.component';
 import { SummaryModalComponent } from './components/summary-modal/summary-modal.component';
 import { CourseDetailsModalComponent } from './components/course-details-modal/course-details-modal.component';
 import { GradesModalComponent } from './components/grades-modal/grades-modal.component';
+import { VoiceRecognitionService } from '@app/services';
 
 interface ScheduleModalState {
 	schedule?: boolean;
@@ -28,7 +29,10 @@ const STORAGE_KEY = 'schedule_modals_state';
 	templateUrl: './schedule.component.html',
 	styleUrl: './schedule.component.scss',
 })
-export class ScheduleComponent implements OnInit {
+export class ScheduleComponent implements OnInit, OnDestroy {
+	private voiceService = inject(VoiceRecognitionService);
+	private voiceUnsubscribers: (() => void)[] = [];
+
 	showScheduleModal = false;
 	showSummaryModal = false;
 	showDetailsModal = false;
@@ -38,6 +42,83 @@ export class ScheduleComponent implements OnInit {
 
 	ngOnInit(): void {
 		this.restoreModalsState();
+		this.registerVoiceModals();
+	}
+
+	ngOnDestroy(): void {
+		this.voiceUnsubscribers.forEach((unsub) => unsub());
+	}
+
+	private registerVoiceModals(): void {
+		// Registrar modal de horario
+		this.voiceUnsubscribers.push(
+			this.voiceService.registerModal({
+				name: 'horario',
+				aliases: ['horarios', 'mi horario', 'el horario', 'schedule'],
+				open: () => this.openScheduleModal(),
+				close: () => this.onScheduleModalClose(),
+			})
+		);
+
+		// Registrar modal de resumen
+		this.voiceUnsubscribers.push(
+			this.voiceService.registerModal({
+				name: 'resumen',
+				aliases: ['resumen académico', 'el resumen', 'summary', 'resumen de cursos'],
+				open: () => this.openSummaryModal(),
+				close: () => this.onSummaryModalClose(),
+			})
+		);
+
+		// Registrar modal de notas
+		this.voiceUnsubscribers.push(
+			this.voiceService.registerModal({
+				name: 'notas',
+				aliases: ['calificaciones', 'mis notas', 'las notas', 'grades'],
+				open: () => {
+					if (this.selectedCourse) {
+						this.openGradesModal(this.selectedCourse);
+					}
+				},
+				close: () => this.onGradesModalClose(),
+			})
+		);
+
+		// Registrar modal de detalles
+		this.voiceUnsubscribers.push(
+			this.voiceService.registerModal({
+				name: 'detalles',
+				aliases: ['detalles del curso', 'detalle', 'información del curso'],
+				open: () => {
+					if (this.selectedCourse) {
+						this.openDetailsModal(this.selectedCourse);
+					}
+				},
+				close: () => this.onDetailsModalClose(),
+			})
+		);
+
+		// Listener para comandos genéricos de cerrar modal
+		this.voiceUnsubscribers.push(
+			this.voiceService.onCommand((command) => {
+				if (command === 'close-modal') {
+					this.closeActiveModal();
+				}
+			})
+		);
+	}
+
+	private closeActiveModal(): void {
+		// Cerrar el modal activo (prioridad al más reciente)
+		if (this.showGradesModal) {
+			this.onGradesModalClose();
+		} else if (this.showDetailsModal) {
+			this.onDetailsModalClose();
+		} else if (this.showSummaryModal) {
+			this.onSummaryModalClose();
+		} else if (this.showScheduleModal) {
+			this.onScheduleModalClose();
+		}
 	}
 
 	private getModalsState(): ScheduleModalState {
