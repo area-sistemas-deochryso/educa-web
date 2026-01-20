@@ -5,12 +5,30 @@
 	[dismissableMask]="true"
 	[draggable]="false"
 	[resizable]="false"
-	styleClass="details-modal"
+	[styleClass]="'details-modal' + (isExpanded ? ' expanded' : '')"
 	[showHeader]="false"
 >
 	<div class="modal-content details-content">
+		<div class="modal-controls">
+			<button
+				class="control-btn"
+				(click)="toggleExpand()"
+				[pTooltip]="isExpanded ? 'Contraer' : 'Maximizar'"
+				tooltipPosition="bottom"
+			>
+				<i class="pi" [class.pi-window-maximize]="!isExpanded" [class.pi-window-minimize]="isExpanded"></i>
+			</button>
+			<button
+				class="control-btn close-btn"
+				(click)="onVisibleChange(false)"
+				pTooltip="Cerrar"
+				tooltipPosition="bottom"
+			>
+				<i class="pi pi-times"></i>
+			</button>
+		</div>
 		<h2>{{ currentCourseDetails.name }}</h2>
-		<div class="details-layout">
+		<div class="details-layout" [class.left-side]="isLeftSide">
 			<div class="details-left">
 				<div class="search-box">
 					<i class="pi pi-search"></i>
@@ -88,6 +106,14 @@
 			</div>
 
 			<div class="details-right">
+				<button
+					class="side-toggle-btn"
+					(click)="toggleSide()"
+					[pTooltip]="isLeftSide ? 'Mover panel a la derecha' : 'Mover panel a la izquierda'"
+					tooltipPosition="top"
+				>
+					<i class="pi" [class.pi-arrow-right]="isLeftSide" [class.pi-arrow-left]="!isLeftSide"></i>
+				</button>
 				<div class="student-info">
 					<div class="avatar-placeholder">
 						<i class="pi pi-user"></i>

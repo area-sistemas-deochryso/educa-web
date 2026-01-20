@@ -50,6 +50,8 @@ interface LegendItem {
 	status: AttendanceStatus;
 }
 
+const ATTENDANCE_STORAGE_KEY = 'attendance_selected_month';
+
 @Component({
 	selector: 'app-attendance',
 	imports: [CommonModule, FormsModule, TableModule, Select],
@@ -98,8 +100,28 @@ export class AttendanceComponent implements OnInit {
 		const user = this.authService.currentUser;
 		if (user) {
 			this.studentName = user.nombreCompleto;
+			this.restoreSelectedMonth();
 			this.loadAsistencias();
 		}
+	}
+
+	private restoreSelectedMonth(): void {
+		const stored = localStorage.getItem(ATTENDANCE_STORAGE_KEY);
+		if (stored) {
+			const { month, year } = JSON.parse(stored);
+			this.ingresos.selectedMonth = month;
+			this.ingresos.selectedYear = year;
+			this.salidas.selectedMonth = month;
+			this.salidas.selectedYear = year;
+		}
+	}
+
+	private saveSelectedMonth(): void {
+		const data = {
+			month: this.ingresos.selectedMonth,
+			year: this.ingresos.selectedYear,
+		};
+		localStorage.setItem(ATTENDANCE_STORAGE_KEY, JSON.stringify(data));
 	}
 
 	private createEmptyTable(type: string): AttendanceTable {
@@ -398,6 +420,7 @@ export class AttendanceComponent implements OnInit {
 	onMonthChange(table: AttendanceTable): void {
 		this.ingresos.selectedMonth = table.selectedMonth;
 		this.salidas.selectedMonth = table.selectedMonth;
+		this.saveSelectedMonth();
 		this.loadAsistencias();
 	}
 }

@@ -5,19 +5,22 @@
 	/>
 
 	<app-schedule-modal
-		[(visible)]="showScheduleModal"
+		[visible]="showScheduleModal"
+		(visibleChange)="$event ? null : onScheduleModalClose()"
 		(openDetails)="openDetailsModal($event)"
 		(openGrades)="openGradesModal($event)"
 	/>
 
 	<app-summary-modal
-		[(visible)]="showSummaryModal"
+		[visible]="showSummaryModal"
+		(visibleChange)="$event ? null : onSummaryModalClose()"
 		(openDetails)="openDetailsModal($event)"
 		(openGrades)="openGradesModal($event)"
 	/>
 
 	<app-course-details-modal
-		[(visible)]="showDetailsModal"
+		[visible]="showDetailsModal"
+		(visibleChange)="$event ? null : onDetailsModalClose()"
 		[courseName]="selectedCourse"
 		(openSchedule)="openScheduleModal()"
 		(openSummary)="openSummaryModal()"
@@ -25,7 +28,8 @@
 	/>
 
 	<app-grades-modal
-		[(visible)]="showGradesModal"
+		[visible]="showGradesModal"
+		(visibleChange)="$event ? null : onGradesModalClose()"
 		[courseName]="selectedCourse"
 	/>
 </div>

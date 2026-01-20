@@ -2,6 +2,7 @@ import { Component, EventEmitter, Input, Output, OnChanges, SimpleChanges } from
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { DialogModule } from 'primeng/dialog';
+import { TooltipModule } from 'primeng/tooltip';
 import { AttachmentsModalComponent } from './attachments-modal/attachments-modal.component';
 import { TasksModalComponent } from './tasks-modal/tasks-modal.component';
 import { SubmissionsModalComponent } from './submissions-modal/submissions-modal.component';
@@ -31,7 +32,7 @@ export interface CourseDetails {
 
 @Component({
 	selector: 'app-course-details-modal',
-	imports: [CommonModule, FormsModule, DialogModule, AttachmentsModalComponent, TasksModalComponent, SubmissionsModalComponent],
+	imports: [CommonModule, FormsModule, DialogModule, TooltipModule, AttachmentsModalComponent, TasksModalComponent, SubmissionsModalComponent],
 	templateUrl: './course-details-modal.component.html',
 	styleUrl: './course-details-modal.component.scss',
 })
@@ -48,6 +49,18 @@ export class CourseDetailsModalComponent implements OnChanges {
 	courseSearchResults: string[] = [];
 	showCourseDropdown = false;
 	evaluationsExpanded = false;
+
+	// Estados de layout del modal
+	isExpanded = false;
+	isLeftSide = false;
+
+	toggleExpand(): void {
+		this.isExpanded = !this.isExpanded;
+	}
+
+	toggleSide(): void {
+		this.isLeftSide = !this.isLeftSide;
+	}
 
 	// Modales de contenido de semana
 	showAttachmentsModal = false;
