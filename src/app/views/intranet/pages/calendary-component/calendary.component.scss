@@ -1,0 +1,656 @@
+.calendar-container {
+	padding: 2rem;
+	max-width: 1400px;
+	margin: 0 auto;
+	font-family: var(--intranet-font-family, 'Inter', sans-serif);
+}
+
+// =============================================================================
+// HEADER
+// =============================================================================
+
+.calendar-header {
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+	margin-bottom: 1rem;
+	padding: 1.5rem 0;
+	flex-wrap: wrap;
+	gap: 1rem;
+
+	.header-content {
+		display: flex;
+		align-items: center;
+		gap: 1rem;
+	}
+
+	.header-icon {
+		width: 56px;
+		height: 56px;
+		border-radius: 16px;
+		background: linear-gradient(135deg, var(--intranet-accent-color-blue, #253470), #1a2550);
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		box-shadow: 0 4px 12px rgba(37, 52, 112, 0.25);
+
+		i {
+			font-size: 1.6rem;
+			color: white;
+		}
+	}
+
+	.header-text {
+		h1 {
+			margin: 0 0 0.25rem;
+			font-size: 1.5rem;
+			font-weight: var(--intranet-font-weight-bold, bold);
+			color: var(--intranet-default-text-color, #171717);
+		}
+
+		p {
+			margin: 0;
+			font-size: 0.95rem;
+			color: var(--intranet-soft-text-color, #5e5e5e);
+		}
+	}
+
+	.header-actions {
+		display: flex;
+		align-items: center;
+		gap: 1rem;
+		flex-wrap: wrap;
+	}
+}
+
+// =============================================================================
+// YEAR SEARCH & TODAY BUTTON
+// =============================================================================
+
+.year-search {
+	display: flex;
+	align-items: center;
+	background: var(--intranet-background-color, white);
+	border-radius: 12px;
+	border: 2px solid var(--intranet-accent-color-green, #28a745);
+	overflow: hidden;
+	transition: all 0.3s ease;
+
+	&:focus-within {
+		box-shadow: 0 0 0 3px rgba(40, 167, 69, 0.15);
+	}
+}
+
+.year-input {
+	width: 110px;
+	height: 44px;
+	padding: 0 1rem;
+	border: none;
+	background: transparent;
+	font-size: 0.95rem;
+	color: var(--intranet-default-text-color, #171717);
+	outline: none;
+
+	&::placeholder {
+		color: var(--intranet-soft-text-color, #999);
+	}
+
+	// Hide number input arrows
+	&::-webkit-outer-spin-button,
+	&::-webkit-inner-spin-button {
+		-webkit-appearance: none;
+		margin: 0;
+	}
+	-moz-appearance: textfield;
+}
+
+.search-btn {
+	width: 44px;
+	height: 44px;
+	border: none;
+	background: var(--intranet-accent-color-green, #28a745);
+	cursor: pointer;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	transition: all 0.2s ease;
+
+	i {
+		font-size: 1rem;
+		color: white;
+	}
+
+	&:hover {
+		background: #1e7e34;
+	}
+}
+
+.today-btn {
+	display: flex;
+	align-items: center;
+	gap: 0.5rem;
+	height: 48px;
+	padding: 0 1.5rem;
+	border-radius: 12px;
+	border: none;
+	background: linear-gradient(135deg, #f5a623, #e09000);
+	color: white;
+	font-weight: 600;
+	font-size: 0.95rem;
+	cursor: pointer;
+	transition: all 0.2s ease;
+	box-shadow: 0 4px 12px rgba(245, 166, 35, 0.3);
+
+	i {
+		font-size: 1.1rem;
+	}
+
+	&:hover {
+		transform: translateY(-2px);
+		box-shadow: 0 6px 16px rgba(245, 166, 35, 0.4);
+	}
+}
+
+// =============================================================================
+// CALENDAR LEGEND
+// =============================================================================
+
+.calendar-legend {
+	display: flex;
+	align-items: center;
+	gap: 1.5rem;
+	margin-bottom: 1.5rem;
+	padding: 0.75rem 1rem;
+	background: var(--intranet-background-color, white);
+	border-radius: 12px;
+	box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+	flex-wrap: wrap;
+}
+
+.legend-item {
+	display: flex;
+	align-items: center;
+	gap: 0.5rem;
+	font-size: 0.875rem;
+	color: var(--intranet-soft-text-color, #5e5e5e);
+}
+
+.legend-dot {
+	width: 16px;
+	height: 16px;
+	border-radius: 50%;
+
+	&.today-dot {
+		border: 3px solid #f5a623;
+		background: transparent;
+	}
+
+	&.holiday-dot {
+		background: #dc3545;
+	}
+
+	&.event-dot {
+		background: #28a745;
+	}
+
+	&.range-dot {
+		background: var(--intranet-accent-color-blue, #253470);
+	}
+}
+
+// =============================================================================
+// MONTHS GRID
+// =============================================================================
+
+.months-grid {
+	display: grid;
+	grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+	gap: 1.5rem;
+}
+
+.month-card {
+	background: var(--intranet-background-color, white);
+	border-radius: 20px;
+	padding: 1.5rem;
+	box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+	border: 2px solid transparent;
+	transition: all 0.3s ease;
+
+	&:hover {
+		border-color: var(--intranet-accent-color-blue, #253470);
+		box-shadow: 0 8px 24px rgba(37, 52, 112, 0.12);
+	}
+}
+
+.month-title {
+	margin: 0 0 1rem;
+	font-size: 1.25rem;
+	font-weight: var(--intranet-font-weight-bold, bold);
+	color: var(--intranet-accent-color-blue, #253470);
+	text-align: center;
+	padding-bottom: 0.75rem;
+	border-bottom: 2px solid rgba(37, 52, 112, 0.1);
+}
+
+// =============================================================================
+// WEEKDAYS HEADER
+// =============================================================================
+
+.weekdays-header {
+	display: grid;
+	grid-template-columns: repeat(7, 1fr);
+	gap: 0.25rem;
+	margin-bottom: 0.5rem;
+}
+
+.weekday {
+	text-align: center;
+	font-size: 0.75rem;
+	font-weight: 600;
+	color: var(--intranet-soft-text-color, #5e5e5e);
+	text-transform: uppercase;
+	padding: 0.5rem 0;
+}
+
+// =============================================================================
+// DAYS GRID
+// =============================================================================
+
+.days-grid {
+	display: grid;
+	grid-template-columns: repeat(7, 1fr);
+	gap: 0.25rem;
+}
+
+.day-cell {
+	aspect-ratio: 1;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	border-radius: 10px;
+	cursor: default;
+	transition: all 0.2s ease;
+	position: relative;
+
+	.day-number {
+		font-size: 0.9rem;
+		font-weight: 500;
+		color: var(--intranet-default-text-color, #171717);
+	}
+
+	&.other-month {
+		.day-number {
+			color: var(--intranet-soft-text-color, #ccc);
+		}
+	}
+
+	// Clickable days (holidays and events)
+	&.clickable {
+		cursor: pointer;
+
+		&:hover {
+			transform: scale(1.1);
+			z-index: 2;
+		}
+	}
+
+	// Día actual - círculo amarillo
+	&.today {
+		position: relative;
+		z-index: 1;
+
+		&::before {
+			content: '';
+			position: absolute;
+			inset: 2px;
+			border-radius: 50%;
+			border: 3px solid #f5a623;
+			background: transparent;
+		}
+
+		.day-number {
+			color: var(--intranet-default-text-color, #171717);
+			font-weight: 700;
+			position: relative;
+			z-index: 2;
+		}
+	}
+
+	// Feriados - número rojo
+	&.holiday:not(.today) {
+		.day-number {
+			color: #dc3545;
+			font-weight: 600;
+		}
+
+		&:hover {
+			background: rgba(220, 53, 69, 0.1);
+		}
+	}
+
+	// Eventos - número verde (inicio de evento)
+	&.has-event:not(.today):not(.holiday) {
+		.day-number {
+			color: #28a745;
+			font-weight: 600;
+		}
+
+		&:hover {
+			background: rgba(40, 167, 69, 0.1);
+		}
+	}
+
+	// Días en rango - número azul (días intermedios)
+	&.in-range:not(.today):not(.holiday):not(.has-event) {
+		.day-number {
+			color: var(--intranet-accent-color-blue, #253470);
+			font-weight: 600;
+		}
+
+		&:hover {
+			background: rgba(37, 52, 112, 0.1);
+		}
+	}
+
+	// Fin de evento - número verde (último día del rango)
+	&.event-end:not(.today):not(.holiday):not(.has-event):not(.in-range) {
+		.day-number {
+			color: #28a745;
+			font-weight: 600;
+		}
+
+		&:hover {
+			background: rgba(40, 167, 69, 0.1);
+		}
+	}
+
+	&:not(.other-month):not(.today):not(.clickable):hover {
+		background: rgba(37, 52, 112, 0.08);
+	}
+}
+
+// =============================================================================
+// MODAL
+// =============================================================================
+
+.modal-overlay {
+	position: fixed;
+	inset: 0;
+	background: rgba(0, 0, 0, 0.5);
+	backdrop-filter: blur(4px);
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	z-index: 1000;
+	padding: 1rem;
+	animation: fadeIn 0.2s ease;
+}
+
+@keyframes fadeIn {
+	from {
+		opacity: 0;
+	}
+	to {
+		opacity: 1;
+	}
+}
+
+.modal-content {
+	background: white;
+	border-radius: 24px;
+	max-width: 480px;
+	width: 100%;
+	max-height: 90vh;
+	overflow-y: auto;
+	position: relative;
+	box-shadow: 0 24px 48px rgba(0, 0, 0, 0.2);
+	animation: slideUp 0.3s ease;
+
+	&.holiday-modal {
+		border-top: 4px solid #dc3545;
+	}
+
+	&.event-modal {
+		border-top: 4px solid #28a745;
+	}
+}
+
+@keyframes slideUp {
+	from {
+		opacity: 0;
+		transform: translateY(20px);
+	}
+	to {
+		opacity: 1;
+		transform: translateY(0);
+	}
+}
+
+.modal-close {
+	position: absolute;
+	top: 1rem;
+	right: 1rem;
+	width: 36px;
+	height: 36px;
+	border-radius: 50%;
+	border: none;
+	background: #f5f5f5;
+	cursor: pointer;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	transition: all 0.2s ease;
+	z-index: 1;
+
+	i {
+		font-size: 1rem;
+		color: #666;
+	}
+
+	&:hover {
+		background: #e0e0e0;
+
+		i {
+			color: #333;
+		}
+	}
+}
+
+.modal-header {
+	display: flex;
+	align-items: flex-start;
+	gap: 1rem;
+	padding: 1.5rem 1.5rem 1rem;
+}
+
+.modal-icon {
+	width: 56px;
+	height: 56px;
+	border-radius: 16px;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	flex-shrink: 0;
+
+	i {
+		font-size: 1.5rem;
+		color: white;
+	}
+
+	&.holiday-icon {
+		background: linear-gradient(135deg, #dc3545, #c82333);
+	}
+
+	&.event-icon {
+		background: linear-gradient(135deg, #28a745, #1e7e34);
+	}
+}
+
+.modal-title-section {
+	flex: 1;
+	padding-right: 2rem;
+}
+
+.modal-badge {
+	display: inline-block;
+	padding: 0.25rem 0.75rem;
+	border-radius: 20px;
+	font-size: 0.75rem;
+	font-weight: 600;
+	text-transform: uppercase;
+	letter-spacing: 0.5px;
+	margin-bottom: 0.5rem;
+
+	&.holiday-badge {
+		background: rgba(220, 53, 69, 0.1);
+		color: #dc3545;
+	}
+
+	&.event-badge {
+		background: rgba(40, 167, 69, 0.1);
+		color: #28a745;
+	}
+}
+
+.modal-title {
+	margin: 0;
+	font-size: 1.5rem;
+	font-weight: 700;
+	color: var(--intranet-default-text-color, #171717);
+	line-height: 1.3;
+}
+
+.modal-body {
+	padding: 0 1.5rem 1.5rem;
+}
+
+.modal-date,
+.modal-info {
+	display: flex;
+	align-items: center;
+	gap: 0.75rem;
+	padding: 0.75rem 1rem;
+	background: #f8f9fa;
+	border-radius: 12px;
+	margin-bottom: 0.75rem;
+
+	i {
+		font-size: 1rem;
+		color: var(--intranet-accent-color-blue, #253470);
+	}
+
+	span {
+		font-size: 0.95rem;
+		color: var(--intranet-default-text-color, #171717);
+
+		&::first-letter {
+			text-transform: uppercase;
+		}
+	}
+}
+
+.modal-description {
+	margin: 1rem 0 0;
+	font-size: 1rem;
+	line-height: 1.7;
+	color: var(--intranet-soft-text-color, #5e5e5e);
+}
+
+// =============================================================================
+// RESPONSIVE
+// =============================================================================
+
+@media (max-width: 768px) {
+	.calendar-container {
+		padding: 1.25rem;
+	}
+
+	.calendar-header {
+		flex-direction: column;
+		align-items: flex-start;
+
+		.header-actions {
+			width: 100%;
+			justify-content: flex-end;
+			gap: 0.75rem;
+		}
+	}
+
+	.calendar-legend {
+		gap: 1rem;
+	}
+
+	.months-grid {
+		grid-template-columns: 1fr;
+	}
+
+	.month-card {
+		padding: 1.25rem;
+	}
+
+	.day-cell {
+		.day-number {
+			font-size: 0.8rem;
+		}
+	}
+
+	.modal-content {
+		margin: 0.5rem;
+		border-radius: 20px;
+	}
+
+	.modal-header {
+		flex-direction: column;
+		align-items: center;
+		text-align: center;
+		padding-top: 2.5rem;
+	}
+
+	.modal-title-section {
+		padding-right: 0;
+	}
+
+	.modal-title {
+		font-size: 1.25rem;
+	}
+}
+
+@media (max-width: 480px) {
+	.header-icon {
+		width: 48px;
+		height: 48px;
+
+		i {
+			font-size: 1.4rem;
+		}
+	}
+
+	.header-text h1 {
+		font-size: 1.25rem;
+	}
+
+	.legend-item span:not(.legend-dot) {
+		font-size: 0.75rem;
+	}
+
+	.year-input {
+		width: 90px;
+		height: 40px;
+		padding: 0 0.75rem;
+		font-size: 0.875rem;
+	}
+
+	.search-btn {
+		width: 40px;
+		height: 40px;
+	}
+
+	.today-btn {
+		height: 44px;
+		padding: 0 1rem;
+
+		span {
+			display: none;
+		}
+	}
+}

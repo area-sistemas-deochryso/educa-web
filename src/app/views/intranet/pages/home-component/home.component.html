@@ -1,1 +1,250 @@
-<p>home.component works!</p>
+<app-intranet-background></app-intranet-background>
+<div class="home-container">
+	<!-- Toast de PrimeNG para notificaciones impactantes -->
+	<p-toast position="top-right"></p-toast>
+
+	<!-- Campana de Notificaciones Flotante -->
+	@if (notificationCount() > 0) {
+		<div class="notification-bell-container" [class.has-unread]="unreadCount() > 0">
+			<button
+				class="notification-bell"
+				[class.ringing]="unreadCount() > 0"
+				[class]="getBadgePriorityClass()"
+				(click)="togglePanel()"
+				title="Notificaciones"
+			>
+				<i class="pi pi-bell"></i>
+				@if (unreadCount() > 0) {
+					<span class="bell-badge pulse" [class]="getBadgePriorityClass()">{{
+						unreadCount()
+					}}</span>
+				}
+			</button>
+		</div>
+	}
+
+	<!-- Panel de Notificaciones (solo visible al hacer clic en la campana) -->
+	@if (notificationCount() > 0 && isPanelOpen()) {
+		<div class="notifications-overlay" (click)="togglePanel()"></div>
+		<section class="notifications-section panel-open">
+			<div class="notifications-header">
+				<div class="header-left">
+					<div
+						class="bell-icon-animated"
+						[class.ringing]="unreadCount() > 0"
+						[class]="getBadgePriorityClass()"
+					>
+						<i class="pi pi-bell"></i>
+					</div>
+					<div class="header-text">
+						<h2>Notificaciones</h2>
+						<span class="notification-subtitle">
+							{{ notificationCount() }} notificación{{
+								notificationCount() > 1 ? 'es' : ''
+							}}
+							@if (unreadCount() > 0) {
+								<span class="unread-indicator" [class]="getBadgePriorityClass()">
+									({{ unreadCount() }} sin leer)
+								</span>
+							}
+						</span>
+						<!-- Conteo por prioridad -->
+						@if (unreadCount() > 0) {
+							<div class="priority-summary">
+								@if (unreadByPriority().urgent > 0) {
+									<span class="priority-badge priority-urgent"
+										>{{ unreadByPriority().urgent }} urgente{{
+											unreadByPriority().urgent > 1 ? 's' : ''
+										}}</span
+									>
+								}
+								@if (unreadByPriority().high > 0) {
+									<span class="priority-badge priority-high"
+										>{{ unreadByPriority().high }} importante{{
+											unreadByPriority().high > 1 ? 's' : ''
+										}}</span
+									>
+								}
+								@if (unreadByPriority().medium > 0) {
+									<span class="priority-badge priority-medium"
+										>{{ unreadByPriority().medium }} normal{{
+											unreadByPriority().medium > 1 ? 'es' : ''
+										}}</span
+									>
+								}
+								@if (unreadByPriority().low > 0) {
+									<span class="priority-badge priority-low"
+										>{{ unreadByPriority().low }} info</span
+									>
+								}
+							</div>
+						}
+					</div>
+				</div>
+				<div class="header-actions">
+					@if (unreadCount() > 0) {
+						<button
+							class="action-btn mark-read-btn"
+							(click)="markAllAsRead()"
+							title="Marcar todas como leídas"
+						>
+							<i class="pi pi-check-circle"></i>
+							<span class="btn-text">Marcar leídas</span>
+						</button>
+					}
+					@if (notificationCount() > 1) {
+						<button
+							class="action-btn dismiss-all-btn"
+							(click)="dismissAll()"
+							title="Descartar todas"
+						>
+							<i class="pi pi-times-circle"></i>
+							<span class="btn-text">Descartar</span>
+						</button>
+					}
+				</div>
+			</div>
+
+			<div class="notifications-list">
+				@for (
+					notification of notifications();
+					track trackById($index, notification);
+					let i = $index
+				) {
+					<div
+						class="notification-card"
+						[class]="getPriorityClass(notification.priority)"
+						[class.is-read]="isRead(notification.id)"
+						[class.is-unread]="!isRead(notification.id)"
+						[style.animation-delay]="i * 100 + 'ms'"
+						(click)="markAsRead(notification.id)"
+					>
+						<!-- Indicador de no leído -->
+						@if (!isRead(notification.id)) {
+							<div
+								class="unread-dot pulse"
+								[class]="getPriorityClass(notification.priority)"
+							></div>
+						}
+
+						<div class="notification-icon" [class]="'icon-' + notification.type">
+							<i
+								class="pi"
+								[class]="notification.icon || getTypeIcon(notification.type)"
+							></i>
+						</div>
+
+						<div class="notification-content">
+							<div class="notification-meta">
+								<span
+									class="notification-type-badge"
+									[attr.data-type]="notification.type"
+								>
+									{{ getTypeLabel(notification.type) }}
+								</span>
+								<span
+									class="priority-indicator"
+									[attr.data-priority]="notification.priority"
+								>
+									@switch (notification.priority) {
+										@case ('urgent') {
+											Urgente
+										}
+										@case ('high') {
+											Importante
+										}
+										@case ('medium') {
+											Normal
+										}
+										@case ('low') {
+											Info
+										}
+									}
+								</span>
+							</div>
+							<h3 class="notification-title">{{ notification.title }}</h3>
+							<p class="notification-message">{{ notification.message }}</p>
+
+							@if (notification.actionUrl) {
+								<a
+									[routerLink]="notification.actionUrl"
+									class="notification-action"
+									(click)="$event.stopPropagation()"
+								>
+									<span>{{ notification.actionText || 'Ver más' }}</span>
+									<i class="pi pi-arrow-right"></i>
+								</a>
+							}
+						</div>
+
+						@if (notification.dismissible !== false) {
+							<button
+								class="notification-dismiss"
+								(click)="
+									dismissNotification(notification.id); $event.stopPropagation()
+								"
+								title="Descartar"
+							>
+								<i class="pi pi-times"></i>
+							</button>
+						}
+					</div>
+				}
+			</div>
+		</section>
+	}
+
+	<!-- Sección de Bienvenida -->
+	<section class="welcome-section">
+		<div class="welcome-content">
+			<div class="welcome-icon">
+				<i class="pi pi-graduation-cap"></i>
+			</div>
+			<div class="welcome-text">
+				<h1>Bienvenido a tu Intranet</h1>
+				<p>Aquí encontrarás toda la información relevante para tu día a día académico.</p>
+			</div>
+		</div>
+	</section>
+
+	<!-- Accesos Rápidos -->
+	<section class="quick-access">
+		<h2>Accesos Rápidos</h2>
+		<div class="quick-access-grid">
+			<a routerLink="/intranet/asistencia" class="quick-access-card">
+				<div class="card-icon">
+					<i class="pi pi-check-square"></i>
+				</div>
+				<span>Asistencia</span>
+			</a>
+			<a routerLink="/intranet/horarios" class="quick-access-card">
+				<div class="card-icon">
+					<i class="pi pi-calendar"></i>
+				</div>
+				<span>Horarios</span>
+			</a>
+			<a routerLink="/intranet/Calendario" class="quick-access-card">
+				<div class="card-icon">
+					<i class="pi pi-calendar-plus"></i>
+				</div>
+				<span>Calendario</span>
+			</a>
+			<!-- Cambia dinámicamente según hay notificaciones sin leer -->
+			@if (unreadCount() > 0) {
+				<button
+					class="quick-access-card notification-quick-access"
+					[class]="getBadgePriorityClass()"
+					(click)="togglePanel()"
+				>
+					<div class="card-icon" [class]="getBadgePriorityClass()">
+						<i class="pi pi-bell"></i>
+						<span class="quick-badge" [class]="getBadgePriorityClass()">{{
+							unreadCount()
+						}}</span>
+					</div>
+					<span>Notificaciones</span>
+				</button>
+			}
+		</div>
+	</section>
+</div>

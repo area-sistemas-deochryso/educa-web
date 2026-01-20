@@ -1,0 +1,12 @@
+<div class="intranet-background">
+	@for (circle of circles(); track trackById($index, circle)) {
+		<div
+			class="decoration-circle"
+			[style.left.px]="circle.x"
+			[style.top.px]="circle.y"
+			[style.width.px]="circle.size"
+			[style.height.px]="circle.size"
+			[style.background]="circle.color"
+		></div>
+	}
+</div>

@@ -1,1 +1,174 @@
-Calendary works!
+<app-intranet-background></app-intranet-background>
+<div class="calendar-container">
+	<!-- Header -->
+	<header class="calendar-header">
+		<div class="header-content">
+			<div class="header-icon">
+				<i class="pi pi-calendar"></i>
+			</div>
+			<div class="header-text">
+				<h1>Calendario Académico</h1>
+				<p>Año escolar {{ currentYear() }}</p>
+			</div>
+		</div>
+		<div class="header-actions">
+			<button class="today-btn" (click)="goToToday()" title="Ir a hoy">
+				<i class="pi pi-calendar"></i>
+				<span>Hoy</span>
+			</button>
+			<div class="year-search">
+				<input
+					type="number"
+					[(ngModel)]="searchYear"
+					(keydown)="onSearchKeydown($event)"
+					placeholder="Buscar año"
+					min="1900"
+					max="2100"
+					class="year-input"
+				/>
+				<button class="search-btn" (click)="goToYear()" title="Buscar año">
+					<i class="pi pi-search"></i>
+				</button>
+			</div>
+		</div>
+	</header>
+
+	<!-- Legend -->
+	<div class="calendar-legend">
+		<div class="legend-item">
+			<span class="legend-dot today-dot"></span>
+			<span>Hoy</span>
+		</div>
+		<div class="legend-item">
+			<span class="legend-dot event-dot"></span>
+			<span>Evento</span>
+		</div>
+		<div class="legend-item">
+			<span class="legend-dot range-dot"></span>
+			<span>Período</span>
+		</div>
+		<div class="legend-item">
+			<span class="legend-dot holiday-dot"></span>
+			<span>Feriado</span>
+		</div>
+	</div>
+
+	<!-- Months Grid -->
+	<div class="months-grid">
+		@for (month of calendar(); track trackByMonth($index, month)) {
+			<section class="month-card" [id]="month.id">
+				<h2 class="month-title">{{ month.name }}</h2>
+				<div class="weekdays-header">
+					@for (day of weekDays; track day) {
+						<span class="weekday">{{ day }}</span>
+					}
+				</div>
+				<div class="days-grid">
+					@for (day of month.days; track trackByDay($index, day)) {
+						<div
+							class="day-cell"
+							[class.other-month]="!day.isCurrentMonth"
+							[class.today]="day.isToday"
+							[class.holiday]="day.isHoliday && day.isCurrentMonth"
+							[class.has-event]="
+								day.hasEvent && day.isCurrentMonth && !day.isHoliday && !day.isToday
+							"
+							[class.in-range]="
+								day.isInEventRange && day.isCurrentMonth && !day.isHoliday && !day.isToday
+							"
+							[class.event-end]="
+								day.isEventEnd && day.isCurrentMonth && !day.isHoliday && !day.isToday
+							"
+							[class.clickable]="
+								day.isCurrentMonth && (day.isHoliday || day.hasEvent || day.isInEventRange || day.isEventEnd)
+							"
+							[id]="day.isToday ? 'today' : null"
+							[title]="day.holiday?.name || day.event?.title || day.rangeEvent?.title || ''"
+							(click)="openDayModal(day)"
+						>
+							<span class="day-number">{{ day.date }}</span>
+						</div>
+					}
+				</div>
+			</section>
+		}
+	</div>
+</div>
+
+<!-- Modal -->
+@if (showModal()) {
+	<div class="modal-overlay" (click)="onOverlayClick($event)">
+		<div
+			class="modal-content"
+			[class.holiday-modal]="modalData()?.type === 'holiday'"
+			[class.event-modal]="modalData()?.type === 'event'"
+		>
+			<button class="modal-close" (click)="closeModal()">
+				<i class="pi pi-times"></i>
+			</button>
+
+			@if (modalData(); as data) {
+				<div class="modal-header">
+					<div
+						class="modal-icon"
+						[class.holiday-icon]="data.type === 'holiday'"
+						[class.event-icon]="data.type === 'event'"
+					>
+						<i
+							class="pi"
+							[ngClass]="
+								data.type === 'holiday' ? data.holiday?.icon : data.event?.icon
+							"
+						></i>
+					</div>
+					<div class="modal-title-section">
+						<span
+							class="modal-badge"
+							[class.holiday-badge]="data.type === 'holiday'"
+							[class.event-badge]="data.type === 'event'"
+						>
+							{{
+								data.type === 'holiday'
+									? getHolidayTypeLabel(data.holiday!.type)
+									: getEventTypeLabel(data.event!.type)
+							}}
+						</span>
+						<h2 class="modal-title">
+							{{ data.type === 'holiday' ? data.holiday?.name : data.event?.title }}
+						</h2>
+					</div>
+				</div>
+
+				<div class="modal-body">
+					<div class="modal-date">
+						<i class="pi pi-calendar"></i>
+						<span>{{ formatDate(data.date) }}</span>
+					</div>
+
+					@if (data.type === 'event' && data.event) {
+						@if (data.event.time) {
+							<div class="modal-info">
+								<i class="pi pi-clock"></i>
+								<span>{{ data.event.time }}</span>
+							</div>
+						}
+						@if (data.event.location) {
+							<div class="modal-info">
+								<i class="pi pi-map-marker"></i>
+								<span>{{ data.event.location }}</span>
+							</div>
+						}
+					}
+
+					<p class="modal-description">
+						{{
+							data.type === 'holiday'
+								? data.holiday?.description
+								: data.event?.description
+						}}
+					</p>
+				</div>
+			}
+		</div>
+	</div>
+}

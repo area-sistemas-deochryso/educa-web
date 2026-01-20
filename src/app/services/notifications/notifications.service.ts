@@ -1,0 +1,430 @@
+import { Injectable, signal, inject, PLATFORM_ID, computed } from '@angular/core';
+import { isPlatformBrowser } from '@angular/common';
+import {
+	SeasonalNotification,
+	NotificationType,
+	NotificationPriority,
+	getTodayNotifications,
+} from './notifications.config';
+import { logger } from '@app/helpers';
+
+const DISMISSED_KEY = 'educa_dismissed_notifications';
+const LAST_CHECK_KEY = 'educa_last_notification_check';
+const READ_KEY = 'educa_read_notifications';
+
+/** Conteo por prioridad */
+export interface PriorityCount {
+	urgent: number;
+	high: number;
+	medium: number;
+	low: number;
+}
+
+@Injectable({
+	providedIn: 'root',
+})
+export class NotificationsService {
+	private platformId = inject(PLATFORM_ID);
+
+	/** Notificaciones activas para mostrar */
+	readonly activeNotifications = signal<SeasonalNotification[]>([]);
+
+	/** Indica si hay notificaciones sin leer */
+	readonly hasUnread = signal(false);
+
+	/** Contador de notificaciones */
+	readonly count = signal(0);
+
+	/** Contador de no leídas */
+	readonly unreadCount = signal(0);
+
+	/** Panel de notificaciones abierto */
+	readonly isPanelOpen = signal(false);
+
+	/** Conteo por prioridad de notificaciones no leídas */
+	readonly unreadByPriority = signal<PriorityCount>({ urgent: 0, high: 0, medium: 0, low: 0 });
+
+	/** Prioridad más alta de las no leídas */
+	readonly highestPriority = computed<NotificationPriority | null>(() => {
+		const counts = this.unreadByPriority();
+		if (counts.urgent > 0) return 'urgent';
+		if (counts.high > 0) return 'high';
+		if (counts.medium > 0) return 'medium';
+		if (counts.low > 0) return 'low';
+		return null;
+	});
+
+	/** Audio para sonido de notificación */
+	private notificationSound: HTMLAudioElement | null = null;
+
+	private dismissedIds: Set<string> = new Set();
+	private readIds: Set<string> = new Set();
+	private checkInterval: ReturnType<typeof setInterval> | null = null;
+	private hasPlayedSound = false;
+
+	constructor() {
+		if (isPlatformBrowser(this.platformId)) {
+			this.initSound();
+			this.loadDismissedNotifications();
+			this.loadReadNotifications();
+			this.checkNotifications();
+			this.startPeriodicCheck();
+		}
+	}
+
+	/**
+	 * Inicializa el sonido de notificación
+	 */
+	private initSound(): void {
+		this.notificationSound = new Audio();
+		// Sonido corto de campana (base64 para no depender de archivos externos)
+		this.notificationSound.src = 'data:audio/wav;base64,UklGRnoGAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YQoGAACBhYqFbF1fdH2AgICAgICAgH95dnRxcHBwcHBwcHBwcHBwcHBwcHJydHZ4enx+gIKEhoeIiImJiYmIh4aEgoB+fHp4dnRycHBwcHBwcHBwcHBwcHBxcnR2eHp8foGChIaHiImKioqKiYiHhYOBf31/f4GDhYeIiYqLi4uLioqJh4aEgoB+fHp4dnRycHBwcHBwcHBwcHFxcnN0dXd4eXt8fX+AgYKDhIWGh4eHh4eGhoWEg4KBgH9+fXx7enh3dnV0c3JycXFxcXFxcXJyc3R1dnh5e3x+f4GCg4SFhoaHh4iIiIiIh4aFhIOCgYB/fn18e3p5eHd2dXRzc3JycnJycnJyc3N0dXZ3eHl6e3x9fn+AgYKDg4SEhYWFhYWFhYSEg4OCgYGAgH9/fn59fHx7e3p6eXl5eXl5eXl5eXp6e3t8fH1+fn+AgIGBgoKDg4ODg4ODg4ODg4OCgoKBgYGAgICAf39/fn5+fn5+fn5+fn5+fn5/f39/gICAgICBgYGBgYGBgYGBgYGBgYGBgYGBgYGBgYGBgYGAgICAgICAgICAgICAgICAgICAgH9/f39/f39/f39/f39/f39/f39/f4CAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIB/f39/f39/f39/f39/f4CAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAf39/f39/f39/f39/f4CAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIA=';
+		this.notificationSound.volume = 0.5;
+	}
+
+	/**
+	 * Carga las notificaciones descartadas del localStorage
+	 */
+	private loadDismissedNotifications(): void {
+		try {
+			const stored = localStorage.getItem(DISMISSED_KEY);
+			if (stored) {
+				const data = JSON.parse(stored) as { ids: string[]; date: string };
+				// Limpiar descartados del día anterior
+				const storedDate = new Date(data.date).toDateString();
+				const today = new Date().toDateString();
+
+				if (storedDate === today) {
+					this.dismissedIds = new Set(data.ids);
+				} else {
+					// Nuevo día, limpiar descartados
+					this.clearDismissed();
+				}
+			}
+		} catch (e) {
+			logger.error('[Notifications] Error loading dismissed:', e);
+			this.clearDismissed();
+		}
+	}
+
+	/**
+	 * Guarda las notificaciones descartadas
+	 */
+	private saveDismissedNotifications(): void {
+		try {
+			const data = {
+				ids: Array.from(this.dismissedIds),
+				date: new Date().toISOString(),
+			};
+			localStorage.setItem(DISMISSED_KEY, JSON.stringify(data));
+		} catch (e) {
+			logger.error('[Notifications] Error saving dismissed:', e);
+		}
+	}
+
+	/**
+	 * Limpia las notificaciones descartadas
+	 */
+	private clearDismissed(): void {
+		this.dismissedIds.clear();
+		localStorage.removeItem(DISMISSED_KEY);
+	}
+
+	/**
+	 * Carga las notificaciones leídas del localStorage
+	 */
+	private loadReadNotifications(): void {
+		try {
+			const stored = localStorage.getItem(READ_KEY);
+			if (stored) {
+				const data = JSON.parse(stored) as { ids: string[]; date: string };
+				const storedDate = new Date(data.date).toDateString();
+				const today = new Date().toDateString();
+
+				if (storedDate === today) {
+					this.readIds = new Set(data.ids);
+				} else {
+					this.clearRead();
+				}
+			}
+		} catch (e) {
+			logger.error('[Notifications] Error loading read:', e);
+			this.clearRead();
+		}
+	}
+
+	/**
+	 * Guarda las notificaciones leídas
+	 */
+	private saveReadNotifications(): void {
+		try {
+			const data = {
+				ids: Array.from(this.readIds),
+				date: new Date().toISOString(),
+			};
+			localStorage.setItem(READ_KEY, JSON.stringify(data));
+		} catch (e) {
+			logger.error('[Notifications] Error saving read:', e);
+		}
+	}
+
+	/**
+	 * Limpia las notificaciones leídas
+	 */
+	private clearRead(): void {
+		this.readIds.clear();
+		localStorage.removeItem(READ_KEY);
+	}
+
+	/**
+	 * Verifica las notificaciones del día
+	 */
+	checkNotifications(): void {
+		const today = new Date();
+		const todayNotifications = getTodayNotifications(today);
+
+		// Filtrar las que ya fueron descartadas
+		const active = todayNotifications.filter((n) => !this.dismissedIds.has(n.id));
+
+		// Ordenar por prioridad
+		const priorityOrder = { urgent: 0, high: 1, medium: 2, low: 3 };
+		active.sort((a, b) => priorityOrder[a.priority] - priorityOrder[b.priority]);
+
+		// Contar no leídas
+		const unread = active.filter((n) => !this.readIds.has(n.id));
+
+		// Calcular conteo por prioridad
+		const priorityCounts: PriorityCount = { urgent: 0, high: 0, medium: 0, low: 0 };
+		unread.forEach((n) => {
+			priorityCounts[n.priority]++;
+		});
+
+		this.activeNotifications.set(active);
+		this.count.set(active.length);
+		this.unreadCount.set(unread.length);
+		this.hasUnread.set(unread.length > 0);
+		this.unreadByPriority.set(priorityCounts);
+
+		logger.log(`[Notifications] ${active.length} activas, ${unread.length} sin leer`, priorityCounts);
+
+		// Guardar última verificación
+		localStorage.setItem(LAST_CHECK_KEY, today.toISOString());
+
+		// Reproducir sonido si hay no leídas y no se ha reproducido aún
+		if (unread.length > 0 && !this.hasPlayedSound) {
+			this.playSound();
+			this.hasPlayedSound = true;
+		}
+
+		// Solicitar permiso para notificaciones del navegador si hay urgentes
+		if (active.some((n) => n.priority === 'urgent')) {
+			this.requestBrowserNotificationPermission();
+		}
+	}
+
+	/**
+	 * Inicia verificación periódica (cada hora)
+	 */
+	private startPeriodicCheck(): void {
+		// Verificar cada hora
+		this.checkInterval = setInterval(() => {
+			this.checkNotifications();
+		}, 60 * 60 * 1000);
+	}
+
+	/**
+	 * Reproduce el sonido de notificación
+	 */
+	playSound(): void {
+		if (this.notificationSound) {
+			this.notificationSound.currentTime = 0;
+			this.notificationSound.play().catch((e) => {
+				logger.warn('[Notifications] No se pudo reproducir sonido:', e);
+			});
+		}
+	}
+
+	/**
+	 * Actualiza el conteo por prioridad basado en notificaciones no leídas
+	 */
+	private updatePriorityCounts(): void {
+		const unread = this.activeNotifications().filter((n) => !this.readIds.has(n.id));
+		const priorityCounts: PriorityCount = { urgent: 0, high: 0, medium: 0, low: 0 };
+		unread.forEach((n) => {
+			priorityCounts[n.priority]++;
+		});
+		this.unreadByPriority.set(priorityCounts);
+	}
+
+	/**
+	 * Marca una notificación como leída
+	 */
+	markAsRead(notificationId: string): void {
+		if (!this.readIds.has(notificationId)) {
+			this.readIds.add(notificationId);
+			this.saveReadNotifications();
+
+			const unread = this.activeNotifications().filter((n) => !this.readIds.has(n.id));
+			this.unreadCount.set(unread.length);
+			this.hasUnread.set(unread.length > 0);
+			this.updatePriorityCounts();
+
+			logger.log(`[Notifications] Leída: ${notificationId}`);
+		}
+	}
+
+	/**
+	 * Marca todas como leídas
+	 */
+	markAllAsRead(): void {
+		this.activeNotifications().forEach((n) => this.readIds.add(n.id));
+		this.saveReadNotifications();
+		this.unreadCount.set(0);
+		this.hasUnread.set(false);
+		this.unreadByPriority.set({ urgent: 0, high: 0, medium: 0, low: 0 });
+		logger.log('[Notifications] Todas marcadas como leídas');
+	}
+
+	/**
+	 * Verifica si una notificación está leída
+	 */
+	isRead(notificationId: string): boolean {
+		return this.readIds.has(notificationId);
+	}
+
+	/**
+	 * Abre/cierra el panel de notificaciones
+	 */
+	togglePanel(): void {
+		this.isPanelOpen.update((v) => !v);
+		if (this.isPanelOpen()) {
+			this.playSound();
+		}
+	}
+
+	/**
+	 * Cierra el panel
+	 */
+	closePanel(): void {
+		this.isPanelOpen.set(false);
+	}
+
+	/**
+	 * Descarta una notificación
+	 */
+	dismiss(notificationId: string): void {
+		const notification = this.activeNotifications().find((n) => n.id === notificationId);
+
+		// Solo descartar si es dismissible
+		if (notification?.dismissible !== false) {
+			this.dismissedIds.add(notificationId);
+			this.saveDismissedNotifications();
+
+			// Actualizar lista activa
+			const updated = this.activeNotifications().filter((n) => n.id !== notificationId);
+			this.activeNotifications.set(updated);
+			this.count.set(updated.length);
+
+			// Actualizar no leídas
+			const unread = updated.filter((n) => !this.readIds.has(n.id));
+			this.unreadCount.set(unread.length);
+			this.hasUnread.set(unread.length > 0);
+			this.updatePriorityCounts();
+
+			logger.log(`[Notifications] Descartada: ${notificationId}`);
+		}
+	}
+
+	/**
+	 * Descarta todas las notificaciones (excepto las no dismissible)
+	 */
+	dismissAll(): void {
+		const active = this.activeNotifications();
+		active.forEach((n) => {
+			if (n.dismissible !== false) {
+				this.dismissedIds.add(n.id);
+			}
+		});
+		this.saveDismissedNotifications();
+
+		// Mantener solo las no dismissible
+		const remaining = active.filter((n) => n.dismissible === false);
+		this.activeNotifications.set(remaining);
+		this.count.set(remaining.length);
+
+		// Actualizar no leídas
+		const unread = remaining.filter((n) => !this.readIds.has(n.id));
+		this.unreadCount.set(unread.length);
+		this.hasUnread.set(unread.length > 0);
+		this.updatePriorityCounts();
+
+		logger.log('[Notifications] Todas descartadas');
+	}
+
+	/**
+	 * Obtiene notificaciones por tipo
+	 */
+	getByType(type: NotificationType): SeasonalNotification[] {
+		return this.activeNotifications().filter((n) => n.type === type);
+	}
+
+	/**
+	 * Solicita permiso para notificaciones del navegador
+	 */
+	private async requestBrowserNotificationPermission(): Promise<void> {
+		if (!('Notification' in window)) {
+			logger.warn('[Notifications] Browser notifications not supported');
+			return;
+		}
+
+		if (Notification.permission === 'default') {
+			const permission = await Notification.requestPermission();
+			logger.log(`[Notifications] Permission: ${permission}`);
+		}
+	}
+
+	/**
+	 * Muestra una notificación nativa del navegador
+	 */
+	async showBrowserNotification(notification: SeasonalNotification): Promise<void> {
+		if (!('Notification' in window) || Notification.permission !== 'granted') {
+			return;
+		}
+
+		try {
+			const browserNotif = new Notification(notification.title, {
+				body: notification.message,
+				icon: '/images/common/icono.png',
+				tag: notification.id,
+				requireInteraction: notification.priority === 'urgent',
+			});
+
+			browserNotif.onclick = () => {
+				window.focus();
+				if (notification.actionUrl) {
+					window.location.href = notification.actionUrl;
+				}
+				browserNotif.close();
+			};
+		} catch (e) {
+			logger.error('[Notifications] Error showing browser notification:', e);
+		}
+	}
+
+	/**
+	 * Muestra notificaciones urgentes como notificaciones del navegador
+	 */
+	showUrgentAsBrowserNotifications(): void {
+		const urgent = this.activeNotifications().filter((n) => n.priority === 'urgent');
+		urgent.forEach((n) => this.showBrowserNotification(n));
+	}
+
+	/**
+	 * Limpia el intervalo al destruir
+	 */
+	ngOnDestroy(): void {
+		if (this.checkInterval) {
+			clearInterval(this.checkInterval);
+		}
+	}
+}
