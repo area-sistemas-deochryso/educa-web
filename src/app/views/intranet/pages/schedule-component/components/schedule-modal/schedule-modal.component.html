@@ -1,0 +1,28 @@
+<p-dialog
+	[visible]="visible"
+	(visibleChange)="onVisibleChange($event)"
+	[modal]="true"
+	[dismissableMask]="true"
+	[draggable]="false"
+	[resizable]="false"
+	styleClass="schedule-modal"
+	[showHeader]="false"
+>
+	<div class="modal-content">
+		<h2>Horarios de Cursos</h2>
+		<div class="schedule-table">
+			<div class="schedule-header">
+				<span class="col-name">Nombre Curso</span>
+				<span class="col-time">Hora</span>
+			</div>
+			@for (course of courseSchedules; track course.name) {
+				<div class="schedule-row clickable" (click)="onCourseClick($event, course.name)">
+					<span class="col-name">{{ course.name }}</span>
+					<span class="col-time">{{ course.time }}</span>
+				</div>
+			}
+		</div>
+	</div>
+</p-dialog>
+
+<p-menu #courseMenu [model]="courseMenuItems" [popup]="true" [appendTo]="'body'" styleClass="course-menu" />

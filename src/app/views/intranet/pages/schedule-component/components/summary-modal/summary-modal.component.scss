@@ -1,0 +1,116 @@
+:host ::ng-deep {
+	.summary-modal.p-dialog {
+		border-radius: 10px;
+		overflow: hidden;
+		background-color: #ffffff;
+		max-width: 90vw;
+
+		.p-dialog-content {
+			padding: 0;
+			background: transparent;
+		}
+	}
+}
+
+.modal-content {
+	padding: 2rem;
+	background-color: #ffffff;
+	min-width: 400px;
+
+	h2 {
+		font-size: 1.25rem;
+		font-weight: 600;
+		color: var(--intranet-default-text-color);
+		margin: 0 0 1.5rem 0;
+		text-align: center;
+	}
+}
+
+.summary-table {
+	border: 1px solid #ddd;
+	border-radius: 8px;
+	overflow: hidden;
+}
+
+.summary-header,
+.summary-row {
+	display: flex;
+	padding: 0.75rem 1rem;
+	align-items: center;
+}
+
+.summary-header {
+	background-color: rgba(0, 0, 0, 0.03);
+	font-weight: 600;
+	color: var(--intranet-default-text-color);
+	border-bottom: 1px solid #ddd;
+}
+
+.summary-row {
+	border-bottom: 1px solid #ddd;
+
+	&:last-child {
+		border-bottom: none;
+	}
+
+	&.clickable {
+		cursor: pointer;
+		transition: background-color 0.2s;
+
+		&:hover {
+			background-color: rgba(0, 0, 0, 0.03);
+		}
+	}
+
+	.col-name {
+		color: var(--intranet-accent-color-blue);
+		font-size: 0.85rem;
+		text-decoration: underline;
+	}
+
+	&.summary-total {
+		background-color: rgba(0, 0, 0, 0.03);
+
+		.col-name {
+			color: var(--intranet-default-text-color);
+			text-decoration: none;
+			font-weight: 500;
+		}
+
+		.col-asis,
+		.col-nota {
+			font-weight: 600;
+			color: var(--intranet-default-text-color);
+		}
+	}
+}
+
+.col-name {
+	flex: 1;
+	font-size: 0.9rem;
+}
+
+.col-asis,
+.col-nota {
+	width: 60px;
+	text-align: center;
+	font-size: 0.9rem;
+	font-weight: 500;
+}
+
+.grade-red,
+.attendance-red {
+	color: #f44336;
+}
+
+.grade-green,
+.attendance-green {
+	color: #77a02d;
+}
+
+@media screen and (max-width: 768px) {
+	.modal-content {
+		min-width: auto;
+		padding: 1.5rem;
+	}
+}

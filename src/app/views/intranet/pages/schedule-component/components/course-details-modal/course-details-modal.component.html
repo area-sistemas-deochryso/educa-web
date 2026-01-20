@@ -1,0 +1,148 @@
+<p-dialog
+	[visible]="visible"
+	(visibleChange)="onVisibleChange($event)"
+	[modal]="true"
+	[dismissableMask]="true"
+	[draggable]="false"
+	[resizable]="false"
+	styleClass="details-modal"
+	[showHeader]="false"
+>
+	<div class="modal-content details-content">
+		<h2>{{ currentCourseDetails.name }}</h2>
+		<div class="details-layout">
+			<div class="details-left">
+				<div class="search-box">
+					<i class="pi pi-search"></i>
+					<input
+						type="text"
+						placeholder="BUSCAR ARCHIVO, SEMANA O TEMA..."
+						[(ngModel)]="weekSearchTerm"
+					/>
+				</div>
+
+				<div class="weeks-accordion">
+					@for (week of filteredWeeks; track week.id) {
+						<div class="week-item" [class.expanded]="week.expanded">
+							<div class="week-header" (click)="toggleWeek(week)">
+								<span>{{ week.name }}</span>
+								<i class="pi" [class.pi-chevron-down]="!week.expanded" [class.pi-chevron-up]="week.expanded"></i>
+							</div>
+							@if (week.expanded) {
+								<div class="week-content">
+									<p class="teacher-message">{{ week.teacherMessage }}</p>
+									<div class="week-item-row">
+										<div class="item-icon">
+											<i class="pi pi-paperclip"></i>
+										</div>
+										<div class="item-info">
+											<strong>{{ week.attachments.count }} Archivos Adjuntos</strong>
+											<span>{{ week.attachments.unread }} sin leer · {{ week.attachments.reviewed }} revisado</span>
+											<a class="item-link">Ver archivos</a>
+										</div>
+									</div>
+									<div class="week-item-row">
+										<div class="item-icon">
+											<i class="pi pi-file-edit"></i>
+										</div>
+										<div class="item-info">
+											<strong>{{ week.pendingTasks.count }} Tareas Pendientes</strong>
+											<span>{{ week.pendingTasks.unread }} sin leer</span>
+											<a class="item-link">Ver Tareas</a>
+										</div>
+									</div>
+									<div class="week-item-row">
+										<div class="item-icon">
+											<i class="pi pi-check-circle"></i>
+										</div>
+										<div class="item-info">
+											<strong>{{ week.submittedTasks.count }} Tarea Enviada</strong>
+											<span>{{ week.submittedTasks.unread }} sin leer · {{ week.submittedTasks.reviewed }} revisadas</span>
+											<a class="item-link">Ver Entregas</a>
+										</div>
+									</div>
+								</div>
+							}
+						</div>
+					}
+				</div>
+
+				<div class="evaluations-section" [class.expanded]="evaluationsExpanded">
+					<div class="eval-header" (click)="toggleEvaluations()">
+						<span>EVALUACIONES</span>
+						<i class="pi" [class.pi-chevron-down]="!evaluationsExpanded" [class.pi-chevron-up]="evaluationsExpanded"></i>
+					</div>
+					@if (evaluationsExpanded) {
+						<div class="eval-content">
+							<div class="eval-icon">
+								<i class="pi pi-file"></i>
+							</div>
+							<div class="eval-list">
+								@for (evaluation of currentCourseDetails.evaluations; track evaluation.name) {
+									<span>{{ evaluation.name }}</span>
+								}
+							</div>
+						</div>
+					}
+				</div>
+			</div>
+
+			<div class="details-right">
+				<div class="student-info">
+					<div class="avatar-placeholder">
+						<i class="pi pi-user"></i>
+					</div>
+					<span class="student-name">Tupac Yupanqui<br/>María José</span>
+				</div>
+
+				<div class="course-search-section">
+					<p><strong>Cursos:</strong></p>
+					<div class="course-search-box">
+						<input
+							type="text"
+							placeholder="Ingrese nombre curso"
+							[(ngModel)]="courseSearchTerm"
+							(input)="onCourseSearch()"
+							(blur)="hideCourseDropdown()"
+						/>
+						@if (showCourseDropdown) {
+							<div class="course-dropdown">
+								@for (course of courseSearchResults; track course) {
+									<div class="course-option" (click)="selectCourse(course)">
+										{{ course }}
+									</div>
+								}
+							</div>
+						}
+					</div>
+					<p class="link" (click)="onOpenSchedule()">HORARIOS</p>
+					<p class="link" (click)="onOpenSummary()">NOTAS / ASISTENCIAS</p>
+				</div>
+
+				<div class="course-name-section">
+					<p><strong>{{ currentCourseDetails.name }}</strong></p>
+					<p class="link" (click)="onOpenGrades()">CALIFICACIONES</p>
+					<p class="link" (click)="onOpenSummary()">NOTAS / ASISTENCIAS</p>
+				</div>
+
+				<div class="work-group">
+					<p><strong>Grupo de Trabajo</strong></p>
+					@for (member of currentCourseDetails.workGroup; track member) {
+						<div class="group-member">
+							<i class="pi pi-user"></i>
+							<span>{{ member }}</span>
+						</div>
+					}
+				</div>
+
+				<div class="teacher-section">
+					<p><strong>Docente</strong></p>
+					<div class="group-member">
+						<i class="pi pi-user"></i>
+						<span>{{ currentCourseDetails.teacher }}</span>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+</p-dialog>

@@ -1,0 +1,92 @@
+:host ::ng-deep {
+	.schedule-modal.p-dialog {
+		border-radius: 10px;
+		overflow: hidden;
+		background-color: #ffffff;
+		max-width: 90vw;
+
+		.p-dialog-content {
+			padding: 0;
+			background: transparent;
+		}
+	}
+}
+
+.modal-content {
+	padding: 2rem;
+	background-color: #ffffff;
+	min-width: 400px;
+
+	h2 {
+		font-size: 1.25rem;
+		font-weight: 600;
+		color: var(--intranet-default-text-color);
+		margin: 0 0 1.5rem 0;
+		text-align: center;
+	}
+}
+
+.schedule-table {
+	border: 1px solid #ddd;
+	border-radius: 8px;
+	overflow: hidden;
+}
+
+.schedule-header,
+.schedule-row {
+	display: flex;
+	padding: 0.75rem 1rem;
+}
+
+.schedule-header {
+	background-color: rgba(0, 0, 0, 0.03);
+	font-weight: 600;
+	color: var(--intranet-default-text-color);
+	border-bottom: 1px solid #ddd;
+}
+
+.schedule-row {
+	border-bottom: 1px solid #ddd;
+
+	&:last-child {
+		border-bottom: none;
+	}
+
+	&.clickable {
+		cursor: pointer;
+		transition: background-color 0.2s;
+
+		&:hover {
+			background-color: rgba(0, 0, 0, 0.03);
+		}
+	}
+
+	.col-name {
+		color: var(--intranet-accent-color-blue);
+		font-size: 0.85rem;
+		text-decoration: underline;
+	}
+
+	.col-time {
+		color: var(--intranet-soft-text-color);
+		font-size: 0.85rem;
+	}
+}
+
+.col-name {
+	flex: 1;
+	font-size: 0.9rem;
+}
+
+.col-time {
+	width: 150px;
+	text-align: right;
+	font-size: 0.9rem;
+}
+
+@media screen and (max-width: 768px) {
+	.modal-content {
+		min-width: auto;
+		padding: 1.5rem;
+	}
+}

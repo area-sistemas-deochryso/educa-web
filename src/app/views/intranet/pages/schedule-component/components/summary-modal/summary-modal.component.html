@@ -1,0 +1,39 @@
+<p-dialog
+	[visible]="visible"
+	(visibleChange)="onVisibleChange($event)"
+	[modal]="true"
+	[dismissableMask]="true"
+	[draggable]="false"
+	[resizable]="false"
+	styleClass="summary-modal"
+	[showHeader]="false"
+>
+	<div class="modal-content">
+		<h2>Resumen</h2>
+		<div class="summary-table">
+			<div class="summary-header">
+				<span class="col-name">Nombre Curso</span>
+				<span class="col-asis">Asis</span>
+				<span class="col-nota">Nota</span>
+			</div>
+			@for (course of courseSummaries; track course.name) {
+				<div class="summary-row clickable" (click)="onCourseClick($event, course.name)">
+					<span class="col-name">{{ course.name }}</span>
+					<span class="col-asis" [class]="getAttendanceClass(course.attendance)">
+						{{ course.attendance }}
+					</span>
+					<span class="col-nota" [class]="getGradeClass(course.grade)">
+						{{ course.grade }}
+					</span>
+				</div>
+			}
+			<div class="summary-row summary-total">
+				<span class="col-name">{{ getCourseCount() }} cursos</span>
+				<span class="col-asis">{{ getTotalAttendance() }}</span>
+				<span class="col-nota">{{ getTotalGrade() }}</span>
+			</div>
+		</div>
+	</div>
+</p-dialog>
+
+<p-menu #courseMenu [model]="courseMenuItems" [popup]="true" [appendTo]="'body'" styleClass="course-menu" />

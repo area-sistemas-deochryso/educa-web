@@ -1,0 +1,165 @@
+:host ::ng-deep {
+	.grades-modal.p-dialog {
+		border-radius: 10px;
+		overflow: hidden;
+		background-color: #ffffff;
+		max-width: 500px;
+
+		.p-dialog-content {
+			padding: 0;
+			background: transparent;
+		}
+	}
+}
+
+.modal-content {
+	padding: 2rem;
+	background-color: #ffffff;
+
+	h2 {
+		font-size: 1.25rem;
+		font-weight: 600;
+		color: var(--intranet-default-text-color);
+		margin: 0 0 1.5rem 0;
+		text-align: center;
+	}
+}
+
+.grades-content {
+	min-width: 350px;
+}
+
+.grades-table {
+	border: 1px solid #ddd;
+	border-radius: 8px;
+	overflow: hidden;
+}
+
+.grades-header {
+	display: flex;
+	padding: 0.75rem 1rem;
+	background-color: rgba(0, 0, 0, 0.03);
+	font-weight: 600;
+	color: var(--intranet-default-text-color);
+	border-bottom: 1px solid #ddd;
+}
+
+.grades-row {
+	display: flex;
+	padding: 0.75rem 1rem;
+	align-items: center;
+	border-bottom: 1px solid #ddd;
+
+	&:last-child {
+		border-bottom: none;
+	}
+
+	&.grades-total {
+		background-color: rgba(0, 0, 0, 0.03);
+	}
+}
+
+.col-eval {
+	flex: 1;
+	font-size: 0.85rem;
+	color: var(--intranet-default-text-color);
+
+	&.eval-link {
+		color: var(--intranet-accent-color-blue);
+		text-decoration: underline;
+		cursor: pointer;
+	}
+}
+
+.col-grade {
+	width: 50px;
+	text-align: center;
+	font-size: 0.9rem;
+	font-weight: 500;
+}
+
+.col-grade-label {
+	color: var(--intranet-accent-color-blue);
+	font-size: 0.85rem;
+	margin-right: 1rem;
+}
+
+.grade-red {
+	color: #f44336;
+}
+
+.grade-green {
+	color: #77a02d;
+}
+
+.simulate-btn {
+	background: transparent;
+	border: 1px solid var(--intranet-default-text-color);
+	border-radius: 4px;
+	padding: 0.35rem 0.75rem;
+	font-size: 0.75rem;
+	color: var(--intranet-default-text-color);
+	cursor: pointer;
+	transition: all 0.2s;
+
+	&:hover {
+		background-color: var(--intranet-default-text-color);
+		color: #ffffff;
+	}
+
+	&.active {
+		background-color: #f44336;
+		border-color: #f44336;
+		color: #ffffff;
+
+		&:hover {
+			background-color: #d32f2f;
+			border-color: #d32f2f;
+		}
+	}
+}
+
+.grade-input {
+	width: 50px;
+	text-align: center;
+	padding: 0.25rem;
+	border: 1px solid var(--intranet-accent-color-blue);
+	border-radius: 4px;
+	font-size: 0.9rem;
+	font-weight: 500;
+	color: var(--intranet-default-text-color);
+	outline: none;
+
+	&:focus {
+		border-color: var(--intranet-accent-color-green);
+		box-shadow: 0 0 0 2px rgba(119, 160, 45, 0.2);
+	}
+
+	&::-webkit-outer-spin-button,
+	&::-webkit-inner-spin-button {
+		-webkit-appearance: none;
+		margin: 0;
+	}
+	-moz-appearance: textfield;
+}
+
+.simulation-note {
+	margin-top: 1rem;
+	padding: 0.75rem;
+	background-color: rgba(255, 193, 7, 0.1);
+	border: 1px solid rgba(255, 193, 7, 0.3);
+	border-radius: 4px;
+	font-size: 0.75rem;
+	color: var(--intranet-soft-text-color);
+	text-align: center;
+}
+
+@media screen and (max-width: 768px) {
+	.modal-content {
+		padding: 1.5rem;
+	}
+
+	.grades-content {
+		min-width: auto;
+	}
+}
