@@ -1,4 +1,4 @@
-import { Routes } from '@angular/router';
+import { Routes } from '@angular/router'; //
 
 export const routes: Routes = [
 	{
@@ -8,8 +8,7 @@ export const routes: Routes = [
 	},
 	{
 		path: '',
-		loadComponent: () =>
-			import('./components/layout').then((m) => m.MainLayoutComponent),
+		loadComponent: () => import('./components/layout').then((m) => m.MainLayoutComponent),
 		children: [
 			{
 				path: '',
@@ -47,7 +46,9 @@ export const routes: Routes = [
 			{
 				path: 'niveles/secundaria',
 				loadComponent: () =>
-					import('./views/levels/secundaria/secundaria').then((m) => m.SecundariaComponent),
+					import('./views/levels/secundaria/secundaria').then(
+						(m) => m.SecundariaComponent,
+					),
 				title: 'Educa.com.pe - Nivel Secundaria',
 			},
 			{
