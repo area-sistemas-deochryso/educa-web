@@ -30,7 +30,7 @@ export class AttendanceDataService {
 		asistencias: AsistenciaDetalle[],
 		month: number,
 		year: number,
-		studentName: string
+		studentName: string,
 	): { ingresos: AttendanceTable; salidas: AttendanceTable } {
 		const { ingresos, salidas } = this.buildWeeksFromAsistencias(asistencias, month, year);
 
@@ -56,10 +56,10 @@ export class AttendanceDataService {
 	private buildWeeksFromAsistencias(
 		asistencias: AsistenciaDetalle[],
 		mes: number,
-		anio: number
+		anio: number,
 	): { ingresos: AttendanceWeek[]; salidas: AttendanceWeek[] } {
 		const asistenciaMap = new Map<string, AsistenciaDetalle>();
-		asistencias.forEach(a => {
+		asistencias.forEach((a) => {
 			const fecha = new Date(a.fecha);
 			const dateKey = this.formatDateKey(fecha);
 			asistenciaMap.set(dateKey, a);
@@ -78,8 +78,18 @@ export class AttendanceDataService {
 
 			weekDates.forEach((date, dayIndex) => {
 				if (date === null) {
-					ingresosDays.push({ day: DAY_HEADERS[dayIndex], date: null, status: 'N', hora: null });
-					salidasDays.push({ day: DAY_HEADERS[dayIndex], date: null, status: 'N', hora: null });
+					ingresosDays.push({
+						day: DAY_HEADERS[dayIndex],
+						date: null,
+						status: 'N',
+						hora: null,
+					});
+					salidasDays.push({
+						day: DAY_HEADERS[dayIndex],
+						date: null,
+						status: 'N',
+						hora: null,
+					});
 					return;
 				}
 
@@ -148,7 +158,12 @@ export class AttendanceDataService {
 			for (let i = 0; i < 5; i++) {
 				const dayOfWeek = currentDate.getDay();
 
-				if (dayOfWeek >= 1 && dayOfWeek <= 5 && currentDate.getMonth() === mes - 1 && currentDate <= lastDay) {
+				if (
+					dayOfWeek >= 1 &&
+					dayOfWeek <= 5 &&
+					currentDate.getMonth() === mes - 1 &&
+					currentDate <= lastDay
+				) {
 					week.push(new Date(currentDate));
 				} else if (week.length < 5) {
 					week.push(null);
@@ -163,7 +178,7 @@ export class AttendanceDataService {
 				}
 			}
 
-			if (week.some(d => d !== null)) {
+			if (week.some((d) => d !== null)) {
 				while (week.length < 5) {
 					week.push(null);
 				}
@@ -222,8 +237,8 @@ export class AttendanceDataService {
 	private calculateCounts(weeks: AttendanceWeek[]): StatusCounts {
 		const counts: StatusCounts = { T: 0, A: 0, F: 0, N: 0 };
 
-		weeks.forEach(week => {
-			week.days.forEach(day => {
+		weeks.forEach((week) => {
+			week.days.forEach((day) => {
 				if (day.date !== null) {
 					counts[day.status]++;
 				}
@@ -239,7 +254,7 @@ export class AttendanceDataService {
 		for (let dayIndex = 0; dayIndex < 5; dayIndex++) {
 			let attended = 0;
 			let total = 0;
-			weeks.forEach(week => {
+			weeks.forEach((week) => {
 				if (week.days[dayIndex]?.date !== null) {
 					total++;
 					if (week.days[dayIndex]?.status !== 'N') {
@@ -257,8 +272,8 @@ export class AttendanceDataService {
 		let totalAttended = 0;
 		let totalPossible = 0;
 
-		weeks.forEach(week => {
-			week.days.forEach(day => {
+		weeks.forEach((week) => {
+			week.days.forEach((day) => {
 				if (day.date !== null) {
 					totalPossible++;
 					if (day.status !== 'N') {

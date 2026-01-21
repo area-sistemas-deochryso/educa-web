@@ -16,7 +16,11 @@
 				[pTooltip]="isExpanded ? 'Contraer' : 'Maximizar'"
 				tooltipPosition="bottom"
 			>
-				<i class="pi" [class.pi-window-maximize]="!isExpanded" [class.pi-window-minimize]="isExpanded"></i>
+				<i
+					class="pi"
+					[class.pi-window-maximize]="!isExpanded"
+					[class.pi-window-minimize]="isExpanded"
+				></i>
 			</button>
 			<button
 				class="control-btn close-btn"
@@ -44,7 +48,11 @@
 						<div class="week-item" [class.expanded]="week.expanded">
 							<div class="week-header" (click)="toggleWeek(week)">
 								<span>{{ week.name }}</span>
-								<i class="pi" [class.pi-chevron-down]="!week.expanded" [class.pi-chevron-up]="week.expanded"></i>
+								<i
+									class="pi"
+									[class.pi-chevron-down]="!week.expanded"
+									[class.pi-chevron-up]="week.expanded"
+								></i>
 							</div>
 							@if (week.expanded) {
 								<div class="week-content">
@@ -54,9 +62,17 @@
 											<i class="pi pi-paperclip"></i>
 										</div>
 										<div class="item-info">
-											<strong>{{ week.attachments.count }} Archivos Adjuntos</strong>
-											<span>{{ week.attachments.unread }} sin leer · {{ week.attachments.reviewed }} revisado</span>
-											<a class="item-link" (click)="openAttachments(week)">Ver archivos</a>
+											<strong
+												>{{ week.attachments.count }} Archivos
+												Adjuntos</strong
+											>
+											<span
+												>{{ week.attachments.unread }} sin leer ·
+												{{ week.attachments.reviewed }} revisado</span
+											>
+											<a class="item-link" (click)="openAttachments(week)"
+												>Ver archivos</a
+											>
 										</div>
 									</div>
 									<div class="week-item-row">
@@ -64,9 +80,14 @@
 											<i class="pi pi-file-edit"></i>
 										</div>
 										<div class="item-info">
-											<strong>{{ week.pendingTasks.count }} Tareas Pendientes</strong>
+											<strong
+												>{{ week.pendingTasks.count }} Tareas
+												Pendientes</strong
+											>
 											<span>{{ week.pendingTasks.unread }} sin leer</span>
-											<a class="item-link" (click)="openTasks(week)">Ver Tareas</a>
+											<a class="item-link" (click)="openTasks(week)"
+												>Ver Tareas</a
+											>
 										</div>
 									</div>
 									<div class="week-item-row">
@@ -74,9 +95,17 @@
 											<i class="pi pi-check-circle"></i>
 										</div>
 										<div class="item-info">
-											<strong>{{ week.submittedTasks.count }} Tarea Enviada</strong>
-											<span>{{ week.submittedTasks.unread }} sin leer · {{ week.submittedTasks.reviewed }} revisadas</span>
-											<a class="item-link" (click)="openSubmissions(week)">Ver Entregas</a>
+											<strong
+												>{{ week.submittedTasks.count }} Tarea
+												Enviada</strong
+											>
+											<span
+												>{{ week.submittedTasks.unread }} sin leer ·
+												{{ week.submittedTasks.reviewed }} revisadas</span
+											>
+											<a class="item-link" (click)="openSubmissions(week)"
+												>Ver Entregas</a
+											>
 										</div>
 									</div>
 								</div>
@@ -88,7 +117,11 @@
 				<div class="evaluations-section" [class.expanded]="evaluationsExpanded">
 					<div class="eval-header" (click)="toggleEvaluations()">
 						<span>EVALUACIONES</span>
-						<i class="pi" [class.pi-chevron-down]="!evaluationsExpanded" [class.pi-chevron-up]="evaluationsExpanded"></i>
+						<i
+							class="pi"
+							[class.pi-chevron-down]="!evaluationsExpanded"
+							[class.pi-chevron-up]="evaluationsExpanded"
+						></i>
 					</div>
 					@if (evaluationsExpanded) {
 						<div class="eval-content">
@@ -96,7 +129,10 @@
 								<i class="pi pi-file"></i>
 							</div>
 							<div class="eval-list">
-								@for (evaluation of currentCourseDetails.evaluations; track evaluation.name) {
+								@for (
+									evaluation of currentCourseDetails.evaluations;
+									track evaluation.name
+								) {
 									<span>{{ evaluation.name }}</span>
 								}
 							</div>
@@ -109,16 +145,22 @@
 				<button
 					class="side-toggle-btn"
 					(click)="toggleSide()"
-					[pTooltip]="isLeftSide ? 'Mover panel a la derecha' : 'Mover panel a la izquierda'"
+					[pTooltip]="
+						isLeftSide ? 'Mover panel a la derecha' : 'Mover panel a la izquierda'
+					"
 					tooltipPosition="top"
 				>
-					<i class="pi" [class.pi-arrow-right]="isLeftSide" [class.pi-arrow-left]="!isLeftSide"></i>
+					<i
+						class="pi"
+						[class.pi-arrow-right]="isLeftSide"
+						[class.pi-arrow-left]="!isLeftSide"
+					></i>
 				</button>
 				<div class="student-info">
 					<div class="avatar-placeholder">
 						<i class="pi pi-user"></i>
 					</div>
-					<span class="student-name">Tupac Yupanqui<br/>María José</span>
+					<span class="student-name">Tupac Yupanqui<br />María José</span>
 				</div>
 
 				<div class="course-search-section">
@@ -146,7 +188,9 @@
 				</div>
 
 				<div class="course-name-section">
-					<p><strong>{{ currentCourseDetails.name }}</strong></p>
+					<p>
+						<strong>{{ currentCourseDetails.name }}</strong>
+					</p>
 					<p class="link" (click)="onOpenGrades()">CALIFICACIONES</p>
 					<p class="link" (click)="onOpenSummary()">NOTAS / ASISTENCIAS</p>
 				</div>
@@ -173,17 +217,8 @@
 	</div>
 </p-dialog>
 
-<app-attachments-modal
-	[(visible)]="showAttachmentsModal"
-	[weekName]="selectedWeekName"
-/>
+<app-attachments-modal [(visible)]="showAttachmentsModal" [weekName]="selectedWeekName" />
 
-<app-tasks-modal
-	[(visible)]="showTasksModal"
-	[weekName]="selectedWeekName"
-/>
+<app-tasks-modal [(visible)]="showTasksModal" [weekName]="selectedWeekName" />
 
-<app-submissions-modal
-	[(visible)]="showSubmissionsModal"
-	[weekName]="selectedWeekName"
-/>
+<app-submissions-modal [(visible)]="showSubmissionsModal" [weekName]="selectedWeekName" />

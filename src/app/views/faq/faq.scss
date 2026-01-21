@@ -9,9 +9,12 @@
 
 		@supports (background-image: image-set(url('') type('image/avif'))) {
 			background-image: image-set(
-				url('/images/site-header/close-up-young-business-team-working.avif') type('image/avif'),
-				url('/images/site-header/close-up-young-business-team-working.webp') type('image/webp'),
-				url('/images/site-header/close-up-young-business-team-working.jpg') type('image/jpeg')
+				url('/images/site-header/close-up-young-business-team-working.avif')
+					type('image/avif'),
+				url('/images/site-header/close-up-young-business-team-working.webp')
+					type('image/webp'),
+				url('/images/site-header/close-up-young-business-team-working.jpg')
+					type('image/jpeg')
 			);
 		}
 
@@ -35,7 +38,7 @@
 			font-weight: 700;
 		}
 
-		nav[aria-label="breadcrumb"] {
+		nav[aria-label='breadcrumb'] {
 			background: var(--white-color);
 			border-radius: var(--border-radius-large);
 			display: inline-block;

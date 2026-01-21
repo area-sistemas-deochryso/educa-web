@@ -1,59 +1,77 @@
 <section class="reviews-section section-padding">
-  <div class="container">
-    <div class="row">
-      <div class="col-lg-12 col-12">
-        <h2 class="text-center mb-5">Testimonios</h2>
+	<div class="container">
+		<div class="row">
+			<div class="col-lg-12 col-12">
+				<h2 class="text-center mb-5">Testimonios</h2>
 
-        <!-- Carousel Container -->
-        <div class="reviews-carousel-container">
-          <div class="reviews-carousel" [style.transform]="'translateX(' + (-currentSlide * 50) + '%)'">
-            @for (testimonial of testimonials; track testimonial.id) {
-              <div class="reviews-thumb">
-                <div class="reviews-info d-flex align-items-center">
-                  <img
-                    [src]="testimonial.avatar"
-                    class="avatar-image img-fluid"
-                    [alt]="testimonial.name"
-                    loading="lazy">
+				<!-- Carousel Container -->
+				<div class="reviews-carousel-container">
+					<div
+						class="reviews-carousel"
+						[style.transform]="'translateX(' + -currentSlide * 50 + '%)'"
+					>
+						@for (testimonial of testimonials; track testimonial.id) {
+							<div class="reviews-thumb">
+								<div class="reviews-info d-flex align-items-center">
+									<img
+										[src]="testimonial.avatar"
+										class="avatar-image img-fluid"
+										[alt]="testimonial.name"
+										loading="lazy"
+									/>
 
-                  <div class="d-flex align-items-center justify-content-between flex-wrap w-100 ms-3">
-                    <p class="mb-0">
-                      <strong>{{ testimonial.name }}</strong>
-                      <small>{{ testimonial.role }}</small>
-                    </p>
+									<div
+										class="d-flex align-items-center justify-content-between flex-wrap w-100 ms-3"
+									>
+										<p class="mb-0">
+											<strong>{{ testimonial.name }}</strong>
+											<small>{{ testimonial.role }}</small>
+										</p>
 
-                    <div class="reviews-icons">
-                      @for (star of [1,2,3,4,5]; track star) {
-                        <i class="bi-star-fill"></i>
-                      }
-                    </div>
-                  </div>
-                </div>
+										<div class="reviews-icons">
+											@for (star of [1, 2, 3, 4, 5]; track star) {
+												<i class="bi-star-fill"></i>
+											}
+										</div>
+									</div>
+								</div>
 
-                <div class="reviews-body">
-                  <picture>
-                    <source srcset="images/common/left-quote.avif" type="image/avif">
-                    <source srcset="images/common/left-quote.webp" type="image/webp">
-                    <img src="images/common/left-quote.png" class="quote-icon img-fluid" alt="Quote" loading="lazy">
-                  </picture>
-                  <h4 class="reviews-title">{{ testimonial.text }}</h4>
-                </div>
-              </div>
-            }
-          </div>
+								<div class="reviews-body">
+									<picture>
+										<source
+											srcset="images/common/left-quote.avif"
+											type="image/avif"
+										/>
+										<source
+											srcset="images/common/left-quote.webp"
+											type="image/webp"
+										/>
+										<img
+											src="images/common/left-quote.png"
+											class="quote-icon img-fluid"
+											alt="Quote"
+											loading="lazy"
+										/>
+									</picture>
+									<h4 class="reviews-title">{{ testimonial.text }}</h4>
+								</div>
+							</div>
+						}
+					</div>
 
-          <!-- Carousel Dots -->
-          <div class="carousel-dots">
-            @for (dot of getDots(); track dot; let i = $index) {
-              <span
-                class="dot"
-                [class.active]="i === currentSlide"
-                (click)="goToSlide(i)">
-              </span>
-            }
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
+					<!-- Carousel Dots -->
+					<div class="carousel-dots">
+						@for (dot of getDots(); track dot; let i = $index) {
+							<span
+								class="dot"
+								[class.active]="i === currentSlide"
+								(click)="goToSlide(i)"
+							>
+							</span>
+						}
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
 </section>

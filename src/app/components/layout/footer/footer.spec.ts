@@ -1,7 +1,8 @@
-import { describe, it, expect, beforeEach } from 'vitest';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { testProviders } from '../../../../test-setup';
+import { beforeEach, describe, expect, it } from 'vitest';
+
 import { FooterComponent } from './footer';
+import { testProviders } from '../../../../test-setup';
 
 describe('FooterComponent', () => {
 	let component: FooterComponent;

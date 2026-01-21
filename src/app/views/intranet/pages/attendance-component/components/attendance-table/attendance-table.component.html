@@ -12,6 +12,9 @@
 						optionValue="value"
 						styleClass="hijo-select"
 						[style]="{ minWidth: '200px' }"
+						[filter]="true"
+						filterBy="label"
+						filterPlaceholder="Buscar..."
 					/>
 				} @else {
 					{{ table().title }}
@@ -43,6 +46,9 @@
 			optionLabel="label"
 			optionValue="value"
 			styleClass="month-select"
+			[filter]="true"
+			filterBy="label"
+			filterPlaceholder="Buscar mes..."
 		/>
 	</div>
 

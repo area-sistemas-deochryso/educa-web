@@ -2,104 +2,104 @@
   REVIEWS/TESTIMONIALS SECTION
 -----------------------------------------*/
 .reviews-section {
-  background: var(--section-bg-color);
+	background: var(--section-bg-color);
 }
 
 .reviews-carousel-container {
-  overflow: hidden;
-  position: relative;
+	overflow: hidden;
+	position: relative;
 }
 
 .reviews-carousel {
-  display: flex;
-  transition: transform 0.5s ease-in-out;
+	display: flex;
+	transition: transform 0.5s ease-in-out;
 }
 
 .reviews-thumb {
-  background: var(--white-color);
-  border-radius: var(--border-radius-medium);
-  position: relative;
-  overflow: hidden;
-  margin-bottom: 24px;
-  min-width: 50%;
-  box-sizing: border-box;
-  padding-right: 15px;
-  padding-left: 15px;
+	background: var(--white-color);
+	border-radius: var(--border-radius-medium);
+	position: relative;
+	overflow: hidden;
+	margin-bottom: 24px;
+	min-width: 50%;
+	box-sizing: border-box;
+	padding-right: 15px;
+	padding-left: 15px;
 }
 
 .reviews-thumb > * {
-  background: var(--white-color);
-  border-radius: var(--border-radius-medium);
+	background: var(--white-color);
+	border-radius: var(--border-radius-medium);
 }
 
 .avatar-image {
-  border: 5px solid var(--section-bg-color);
-  border-radius: var(--border-radius-large);
-  width: 65px;
-  height: 65px;
-  object-fit: cover;
+	border: 5px solid var(--section-bg-color);
+	border-radius: var(--border-radius-large);
+	width: 65px;
+	height: 65px;
+	object-fit: cover;
 }
 
 .reviews-body {
-  position: relative;
-  padding: 30px 40px 30px 70px;
+	position: relative;
+	padding: 30px 40px 30px 70px;
 }
 
 .reviews-info {
-  position: relative;
-  padding: 40px 40px 20px 40px;
+	position: relative;
+	padding: 40px 40px 20px 40px;
 }
 
 .reviews-title {
-  color: var(--p-color);
-  font-size: 18px;
-  font-weight: var(--font-weight-light);
-  line-height: 1.6;
+	color: var(--p-color);
+	font-size: 18px;
+	font-weight: var(--font-weight-light);
+	line-height: 1.6;
 }
 
 .reviews-info strong,
 .reviews-info small {
-  display: block;
+	display: block;
 }
 
 .reviews-info strong {
-  color: var(--dark-color);
-  line-height: normal;
+	color: var(--dark-color);
+	line-height: normal;
 }
 
 .quote-icon {
-  position: absolute;
-  top: 0;
-  left: 30px;
-  opacity: 0.05;
+	position: absolute;
+	top: 0;
+	left: 30px;
+	opacity: 0.05;
 }
 
 /* Carousel Dots */
 .carousel-dots {
-  display: flex;
-  justify-content: center;
-  margin-top: 20px;
-  gap: 10px;
+	display: flex;
+	justify-content: center;
+	margin-top: 20px;
+	gap: 10px;
 }
 
 .dot {
-  background: var(--white-color);
-  border: 5px solid transparent;
-  border-radius: 50%;
-  width: 15px;
-  height: 15px;
-  cursor: pointer;
-  transition: all 0.3s;
+	background: var(--white-color);
+	border: 5px solid transparent;
+	border-radius: 50%;
+	width: 15px;
+	height: 15px;
+	cursor: pointer;
+	transition: all 0.3s;
 }
 
 .dot.active,
 .dot:hover {
-  background: var(--white-color);
-  border-color: var(--custom-btn-bg-color);
+	background: var(--white-color);
+	border-color: var(--custom-btn-bg-color);
 }
 
 @media screen and (max-width: 991px) {
-  .reviews-thumb {
-    min-width: 100%;
-  }
+	.reviews-thumb {
+		min-width: 100%;
+	}
 }

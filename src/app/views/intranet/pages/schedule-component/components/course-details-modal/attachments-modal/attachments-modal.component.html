@@ -20,13 +20,19 @@
 					</div>
 					<div class="attachment-info">
 						<span class="attachment-name">{{ attachment.name }}</span>
-						<span class="attachment-meta">{{ attachment.size }} · {{ attachment.date }}</span>
+						<span class="attachment-meta"
+							>{{ attachment.size }} · {{ attachment.date }}</span
+						>
 					</div>
 					<div class="attachment-actions">
 						@if (!attachment.isRead) {
 							<span class="unread-badge">Nuevo</span>
 						}
-						<button class="action-btn" (click)="downloadAttachment(attachment)" title="Descargar">
+						<button
+							class="action-btn"
+							(click)="downloadAttachment(attachment)"
+							title="Descargar"
+						>
 							<i class="pi pi-download"></i>
 						</button>
 					</div>

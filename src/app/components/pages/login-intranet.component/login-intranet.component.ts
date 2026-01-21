@@ -16,14 +16,7 @@ interface RolOption {
 
 @Component({
 	selector: 'app-login-intranet',
-	imports: [
-		CommonModule,
-		FormsModule,
-		InputTextModule,
-		CheckboxModule,
-		ButtonModule,
-		Select,
-	],
+	imports: [CommonModule, FormsModule, InputTextModule, CheckboxModule, ButtonModule, Select],
 	templateUrl: './login-intranet.component.html',
 	styleUrl: './login-intranet.component.scss',
 })
@@ -92,7 +85,7 @@ export class LoginIntranetComponent implements OnInit {
 		this.isLoading = true;
 
 		this.authService.login(dniValue, passValue, this.selectedRol).subscribe({
-			next: response => {
+			next: (response) => {
 				this.isLoading = false;
 
 				if (response.token) {

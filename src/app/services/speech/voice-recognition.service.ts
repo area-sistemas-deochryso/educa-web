@@ -1,4 +1,5 @@
-import { Injectable, signal, inject } from '@angular/core';
+import { Injectable, signal, inject, PLATFORM_ID } from '@angular/core';
+import { isPlatformBrowser } from '@angular/common';
 import { Router } from '@angular/router';
 import {
 	VOICE_COMMANDS,
@@ -31,6 +32,7 @@ interface IWindow extends Window {
 	providedIn: 'root',
 })
 export class VoiceRecognitionService {
+	private platformId = inject(PLATFORM_ID);
 	private router = inject(Router);
 	private recognition: any = null;
 
@@ -46,14 +48,63 @@ export class VoiceRecognitionService {
 	private registeredModals: Map<string, RegisteredModal> = new Map();
 	private commandListeners: ((command: string, params?: string) => void)[] = [];
 
+	/** Audio para sonido de inicio de grabación (estilo WhatsApp) */
+	private startSound: HTMLAudioElement | null = null;
+	/** Audio para sonido de fin de grabación */
+	private stopSound: HTMLAudioElement | null = null;
+
 	constructor() {
-		this.initRecognition();
-		this.loadCommandsFromConfig();
+		if (isPlatformBrowser(this.platformId)) {
+			this.initSounds();
+			this.initRecognition();
+			this.loadCommandsFromConfig();
+		}
+	}
+
+	/**
+	 * Inicializa los sonidos del micrófono (estilo WhatsApp)
+	 * Usa sonidos de Mixkit - https://mixkit.co/free-sound-effects/
+	 */
+	private initSounds(): void {
+		// Sonido de inicio: tono de confirmación suave
+		this.startSound = new Audio();
+		this.startSound.src = 'sounds/mic-start.mp3';
+		this.startSound.volume = 0.4;
+
+		// Sonido de fin: pop suave
+		this.stopSound = new Audio();
+		this.stopSound.src = 'sounds/mic-stop.mp3';
+		this.stopSound.volume = 0.4;
+	}
+
+	/**
+	 * Reproduce el sonido de inicio de grabación
+	 */
+	private playStartSound(): void {
+		if (this.startSound) {
+			this.startSound.currentTime = 0;
+			this.startSound.play().catch((e) => {
+				logger.warn('[VoiceRecognition] No se pudo reproducir sonido de inicio:', e);
+			});
+		}
+	}
+
+	/**
+	 * Reproduce el sonido de fin de grabación
+	 */
+	private playStopSound(): void {
+		if (this.stopSound) {
+			this.stopSound.currentTime = 0;
+			this.stopSound.play().catch((e) => {
+				logger.warn('[VoiceRecognition] No se pudo reproducir sonido de fin:', e);
+			});
+		}
 	}
 
 	private initRecognition(): void {
 		const windowRef = window as unknown as IWindow;
-		const SpeechRecognitionAPI = windowRef.SpeechRecognition || windowRef.webkitSpeechRecognition;
+		const SpeechRecognitionAPI =
+			windowRef.SpeechRecognition || windowRef.webkitSpeechRecognition;
 
 		if (!SpeechRecognitionAPI) {
 			logger.warn('[VoiceRecognition] API no soportada en este navegador');
@@ -95,12 +146,16 @@ export class VoiceRecognitionService {
 
 			switch (event.error) {
 				case 'network':
-					this.error.set('Error de red. Verifica tu conexión a internet y que uses HTTPS.');
+					this.error.set(
+						'Error de red. Verifica tu conexión a internet y que uses HTTPS.',
+					);
 					this.stop();
 					break;
 				case 'not-allowed':
 				case 'service-not-allowed':
-					this.error.set('Permiso de micrófono denegado. Habilítalo en la configuración del navegador.');
+					this.error.set(
+						'Permiso de micrófono denegado. Habilítalo en la configuración del navegador.',
+					);
 					this.stop();
 					break;
 				case 'no-speech':
@@ -309,12 +364,17 @@ export class VoiceRecognitionService {
 			if (modal.aliases.some((alias) => alias.toLowerCase() === normalizedName)) {
 				return modal;
 			}
-			if (modal.name.toLowerCase().includes(normalizedName) || normalizedName.includes(modal.name.toLowerCase())) {
+			if (
+				modal.name.toLowerCase().includes(normalizedName) ||
+				normalizedName.includes(modal.name.toLowerCase())
+			) {
 				return modal;
 			}
 			if (
 				modal.aliases.some(
-					(alias) => alias.toLowerCase().includes(normalizedName) || normalizedName.includes(alias.toLowerCase())
+					(alias) =>
+						alias.toLowerCase().includes(normalizedName) ||
+						normalizedName.includes(alias.toLowerCase()),
 				)
 			) {
 				return modal;
@@ -353,6 +413,7 @@ export class VoiceRecognitionService {
 			this.error.set(null);
 			this.recognition.start();
 			this.isListening.set(true);
+			this.playStartSound();
 		} catch (e) {
 			logger.error('[VoiceRecognition] Error al iniciar:', e);
 			this.error.set('No se pudo iniciar el reconocimiento de voz.');
@@ -365,9 +426,15 @@ export class VoiceRecognitionService {
 	stop(): void {
 		if (!this.recognition) return;
 
+		const wasListening = this.isListening();
 		this.isLocked.set(false);
 		this.isListening.set(false);
 		this.recognition.stop();
+
+		// Solo reproducir sonido si estaba escuchando activamente
+		if (wasListening) {
+			this.playStopSound();
+		}
 	}
 
 	/**
@@ -455,6 +522,8 @@ export class VoiceRecognitionService {
 	 * Obtiene todos los comandos registrados (para debug/documentación)
 	 */
 	getRegisteredCommands(): { pattern: string; description: string }[] {
-		return this.commands.flatMap((cmd) => cmd.patterns.map((p) => ({ pattern: p, description: cmd.description })));
+		return this.commands.flatMap((cmd) =>
+			cmd.patterns.map((p) => ({ pattern: p, description: cmd.description })),
+		);
 	}
 }

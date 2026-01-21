@@ -1,75 +1,75 @@
 import { Component, OnDestroy, AfterViewInit, ChangeDetectorRef, inject } from '@angular/core';
 
 @Component({
-  selector: 'app-counter-section',
-  standalone: true,
-  imports: [],
-  templateUrl: './counter-section.html',
-  styleUrl: './counter-section.scss',
+	selector: 'app-counter-section',
+	standalone: true,
+	imports: [],
+	templateUrl: './counter-section.html',
+	styleUrl: './counter-section.scss',
 })
 export class CounterSectionComponent implements AfterViewInit, OnDestroy {
-  private cdr = inject(ChangeDetectorRef);
+	private cdr = inject(ChangeDetectorRef);
 
-  targetCount = 500;
-  displayedCount = 0;
-  private animationFrameId: number | null = null;
-  private observer: IntersectionObserver | null = null;
-  private hasAnimated = false;
+	targetCount = 500;
+	displayedCount = 0;
+	private animationFrameId: number | null = null;
+	private observer: IntersectionObserver | null = null;
+	private hasAnimated = false;
 
-  ngAfterViewInit(): void {
-    this.setupIntersectionObserver();
-  }
+	ngAfterViewInit(): void {
+		this.setupIntersectionObserver();
+	}
 
-  ngOnDestroy(): void {
-    if (this.animationFrameId) {
-      cancelAnimationFrame(this.animationFrameId);
-    }
-    if (this.observer) {
-      this.observer.disconnect();
-    }
-  }
+	ngOnDestroy(): void {
+		if (this.animationFrameId) {
+			cancelAnimationFrame(this.animationFrameId);
+		}
+		if (this.observer) {
+			this.observer.disconnect();
+		}
+	}
 
-  private setupIntersectionObserver(): void {
-    const element = document.querySelector('.counter-thumb');
-    if (!element) return;
+	private setupIntersectionObserver(): void {
+		const element = document.querySelector('.counter-thumb');
+		if (!element) return;
 
-    this.observer = new IntersectionObserver(
-      (entries) => {
-        entries.forEach((entry) => {
-          if (entry.isIntersecting && !this.hasAnimated) {
-            this.hasAnimated = true;
-            this.animateCounter();
-          }
-        });
-      },
-      { threshold: 0.5 }
-    );
+		this.observer = new IntersectionObserver(
+			(entries) => {
+				entries.forEach((entry) => {
+					if (entry.isIntersecting && !this.hasAnimated) {
+						this.hasAnimated = true;
+						this.animateCounter();
+					}
+				});
+			},
+			{ threshold: 0.5 },
+		);
 
-    this.observer.observe(element);
-  }
+		this.observer.observe(element);
+	}
 
-  private animateCounter(): void {
-    const duration = 2000;
-    const startTime = performance.now();
+	private animateCounter(): void {
+		const duration = 2000;
+		const startTime = performance.now();
 
-    const easeOutQuad = (t: number): number => t * (2 - t);
+		const easeOutQuad = (t: number): number => t * (2 - t);
 
-    const animate = (currentTime: number) => {
-      const elapsed = currentTime - startTime;
-      const progress = Math.min(elapsed / duration, 1);
-      const easedProgress = easeOutQuad(progress);
+		const animate = (currentTime: number) => {
+			const elapsed = currentTime - startTime;
+			const progress = Math.min(elapsed / duration, 1);
+			const easedProgress = easeOutQuad(progress);
 
-      this.displayedCount = Math.floor(easedProgress * this.targetCount);
-      this.cdr.detectChanges();
+			this.displayedCount = Math.floor(easedProgress * this.targetCount);
+			this.cdr.detectChanges();
 
-      if (progress < 1) {
-        this.animationFrameId = requestAnimationFrame(animate);
-      } else {
-        this.displayedCount = this.targetCount;
-        this.cdr.detectChanges();
-      }
-    };
+			if (progress < 1) {
+				this.animationFrameId = requestAnimationFrame(animate);
+			} else {
+				this.displayedCount = this.targetCount;
+				this.cdr.detectChanges();
+			}
+		};
 
-    this.animationFrameId = requestAnimationFrame(animate);
-  }
+		this.animationFrameId = requestAnimationFrame(animate);
+	}
 }

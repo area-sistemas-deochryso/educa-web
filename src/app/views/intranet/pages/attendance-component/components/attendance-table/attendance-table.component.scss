@@ -123,6 +123,42 @@ $color-no: #f44336;
 	border: 1px solid var(--intranet-soft-text-color);
 	border-radius: 4px;
 
+	// Estilos del filtro/buscador
+	.p-select-filter-container {
+		padding: 0.5rem;
+		background: transparent;
+
+		.p-select-filter,
+		input.p-select-filter,
+		input.p-select-filter.p-inputtext {
+			width: 100%;
+			padding: 0.5rem 0.75rem;
+			border: none !important;
+			border-bottom: 1px solid var(--intranet-accent-color-green) !important;
+			border-radius: 0;
+			background: transparent !important;
+			color: var(--intranet-default-text-color);
+			font-size: 0.85rem;
+			box-shadow: none !important;
+
+			&:focus,
+			&:focus-visible {
+				outline: none !important;
+				border: none !important;
+				border-bottom: 1px solid var(--intranet-accent-color-green) !important;
+				box-shadow: none !important;
+			}
+
+			&::placeholder {
+				color: var(--intranet-soft-text-color);
+			}
+		}
+
+		.p-icon {
+			color: var(--intranet-accent-color-green) !important;
+		}
+	}
+
 	.p-select-list {
 		background: transparent;
 	}

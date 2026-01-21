@@ -1,20 +1,19 @@
 import { HttpClient, HttpErrorResponse } from '@angular/common/http';
-import { Injectable } from '@angular/core';
+import { inject, Injectable } from '@angular/core';
 import { BehaviorSubject, Observable, catchError, map, of, tap } from 'rxjs';
 
 import { environment } from '@env/environment';
 
 import { AuthUser, LoginRequest, LoginResponse, UserProfile, UserRole } from './auth.models';
-
-// Constantes fijas para el storage
-const TOKEN_KEY = 'educa_token';
-const USER_KEY = 'educa_user';
+import { StorageService } from '../storage';
 
 @Injectable({
 	providedIn: 'root',
 })
 export class AuthService {
 	private readonly MAX_LOGIN_ATTEMPTS = 3;
+	private http = inject(HttpClient);
+	private storage = inject(StorageService);
 
 	private isAuthenticatedSubject = new BehaviorSubject<boolean>(this.hasValidToken());
 	private currentUserSubject = new BehaviorSubject<AuthUser | null>(this.getStoredUser());
@@ -26,22 +25,12 @@ export class AuthService {
 
 	private readonly apiUrl = `${environment.apiUrl}/api/Auth`;
 
-	constructor(private http: HttpClient) {}
-
 	private hasValidToken(): boolean {
-		return !!localStorage.getItem(TOKEN_KEY);
+		return this.storage.hasToken();
 	}
 
 	private getStoredUser(): AuthUser | null {
-		const userJson = localStorage.getItem(USER_KEY);
-		if (userJson) {
-			try {
-				return JSON.parse(userJson);
-			} catch {
-				return null;
-			}
-		}
-		return null;
+		return this.storage.getUser();
 	}
 
 	get isAuthenticated(): boolean {
@@ -53,7 +42,7 @@ export class AuthService {
 	}
 
 	get token(): string | null {
-		return localStorage.getItem(TOKEN_KEY);
+		return this.storage.getToken();
 	}
 
 	get loginAttempts(): number {
@@ -90,7 +79,7 @@ export class AuthService {
 		};
 
 		return this.http.post<LoginResponse>(`${this.apiUrl}/login`, request).pipe(
-			tap(response => {
+			tap((response) => {
 				if (response.token) {
 					this.handleSuccessfulLogin(response);
 				} else {
@@ -107,7 +96,7 @@ export class AuthService {
 					sedeId: 0,
 					mensaje: error.error?.mensaje || 'Error al iniciar sesión',
 				});
-			})
+			}),
 		);
 	}
 
@@ -121,8 +110,8 @@ export class AuthService {
 		};
 
 		// Siempre guardar en localStorage
-		localStorage.setItem(TOKEN_KEY, response.token);
-		localStorage.setItem(USER_KEY, JSON.stringify(user));
+		this.storage.setToken(response.token);
+		this.storage.setUser(user);
 
 		this.isAuthenticatedSubject.next(true);
 		this.currentUserSubject.next(user);
@@ -134,7 +123,7 @@ export class AuthService {
 	 */
 	getProfile(): Observable<UserProfile | null> {
 		return this.http.get<UserProfile>(`${this.apiUrl}/perfil`).pipe(
-			tap(profile => {
+			tap((profile) => {
 				// Actualizar usuario con datos del perfil
 				const currentUser = this.currentUser;
 				if (currentUser && profile) {
@@ -144,10 +133,10 @@ export class AuthService {
 						nombreCompleto: profile.nombreCompleto,
 					};
 					this.currentUserSubject.next(updatedUser);
-					localStorage.setItem(USER_KEY, JSON.stringify(updatedUser));
+					this.storage.setUser(updatedUser);
 				}
 			}),
-			catchError(() => of(null))
+			catchError(() => of(null)),
 		);
 	}
 
@@ -159,12 +148,11 @@ export class AuthService {
 			return of(false);
 		}
 
-		return this.getProfile().pipe(map(profile => !!profile));
+		return this.getProfile().pipe(map((profile) => !!profile));
 	}
 
 	logout(): void {
-		localStorage.removeItem(TOKEN_KEY);
-		localStorage.removeItem(USER_KEY);
+		this.storage.clearAuth();
 
 		this.isAuthenticatedSubject.next(false);
 		this.currentUserSubject.next(null);

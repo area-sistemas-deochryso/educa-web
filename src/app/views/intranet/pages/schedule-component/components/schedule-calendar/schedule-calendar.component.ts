@@ -29,8 +29,18 @@ export class ScheduleCalendarComponent implements OnInit {
 	dayHeaders = ['Lun', 'Mar', 'Mie', 'Jue', 'Vie', 'Sáb', 'Dom'];
 
 	monthNames = [
-		'ENERO', 'FEBRERO', 'MARZO', 'ABRIL', 'MAYO', 'JUNIO',
-		'JULIO', 'AGOSTO', 'SEPTIEMBRE', 'OCTUBRE', 'NOVIEMBRE', 'DICIEMBRE',
+		'ENERO',
+		'FEBRERO',
+		'MARZO',
+		'ABRIL',
+		'MAYO',
+		'JUNIO',
+		'JULIO',
+		'AGOSTO',
+		'SEPTIEMBRE',
+		'OCTUBRE',
+		'NOVIEMBRE',
+		'DICIEMBRE',
 	];
 
 	menuItems: MenuItem[] = [
@@ -57,12 +67,19 @@ export class ScheduleCalendarComponent implements OnInit {
 
 		const prevMonthLastDay = new Date(this.currentYear, this.currentMonth, 0).getDate();
 		for (let i = startDayOfWeek - 1; i >= 0; i--) {
-			this.calendarDays.push({ day: prevMonthLastDay - i, isCurrentMonth: false, isToday: false });
+			this.calendarDays.push({
+				day: prevMonthLastDay - i,
+				isCurrentMonth: false,
+				isToday: false,
+			});
 		}
 
 		const today = new Date();
 		for (let day = 1; day <= lastDay.getDate(); day++) {
-			const isToday = day === today.getDate() && this.currentMonth === today.getMonth() && this.currentYear === today.getFullYear();
+			const isToday =
+				day === today.getDate() &&
+				this.currentMonth === today.getMonth() &&
+				this.currentYear === today.getFullYear();
 			this.calendarDays.push({ day, isCurrentMonth: true, isToday });
 		}
 

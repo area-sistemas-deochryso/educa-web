@@ -58,7 +58,7 @@ export class GradesModalComponent implements OnChanges {
 	toggleSimulation(): void {
 		this.simulationMode = !this.simulationMode;
 		if (this.simulationMode) {
-			this.currentCourseGrades.evaluations.forEach(eval_ => {
+			this.currentCourseGrades.evaluations.forEach((eval_) => {
 				eval_.tempGrade = eval_.grade;
 				eval_.editable = true;
 			});
@@ -68,7 +68,7 @@ export class GradesModalComponent implements OnChanges {
 	}
 
 	resetTempGrades(): void {
-		this.currentCourseGrades.evaluations.forEach(eval_ => {
+		this.currentCourseGrades.evaluations.forEach((eval_) => {
 			eval_.tempGrade = undefined;
 			eval_.editable = false;
 		});
@@ -88,8 +88,8 @@ export class GradesModalComponent implements OnChanges {
 	}
 
 	get currentAverage(): number {
-		const grades = this.currentCourseGrades.evaluations.map(e =>
-			this.simulationMode && e.tempGrade !== undefined ? e.tempGrade : e.grade
+		const grades = this.currentCourseGrades.evaluations.map((e) =>
+			this.simulationMode && e.tempGrade !== undefined ? e.tempGrade : e.grade,
 		);
 		const sum = grades.reduce((a, b) => a + b, 0);
 		return Math.round((sum / grades.length) * 10) / 10;

@@ -20,7 +20,8 @@ export const CALENDAR_EVENTS: CalendarEvent[] = [
 		date: '2026-01-02',
 		endDate: '2026-01-15',
 		title: 'Matrícula Anticipada',
-		description: 'Período de matrícula anticipada con descuento especial. Válido del 2 al 15 de enero.',
+		description:
+			'Período de matrícula anticipada con descuento especial. Válido del 2 al 15 de enero.',
 		type: 'academic',
 		icon: 'pi-calendar-plus',
 		time: '8:00 AM - 5:00 PM',
@@ -49,7 +50,8 @@ export const CALENDAR_EVENTS: CalendarEvent[] = [
 	{
 		date: '2026-03-01',
 		title: 'Inicio de clases',
-		description: 'Primer día del año escolar 2026. Bienvenida a todos los estudiantes y apertura oficial de las actividades académicas.',
+		description:
+			'Primer día del año escolar 2026. Bienvenida a todos los estudiantes y apertura oficial de las actividades académicas.',
 		type: 'academic',
 		icon: 'pi-book',
 		time: '8:00 AM',
@@ -58,7 +60,8 @@ export const CALENDAR_EVENTS: CalendarEvent[] = [
 	{
 		date: '2026-03-08',
 		title: 'Día Internacional de la Mujer',
-		description: 'Celebramos a todas las mujeres que hacen posible la educación. Actividades conmemorativas.',
+		description:
+			'Celebramos a todas las mujeres que hacen posible la educación. Actividades conmemorativas.',
 		type: 'cultural',
 		icon: 'pi-heart',
 		time: '10:00 AM',
@@ -67,7 +70,8 @@ export const CALENDAR_EVENTS: CalendarEvent[] = [
 	{
 		date: '2026-03-15',
 		title: 'Reunión de padres',
-		description: 'Primera reunión general de padres de familia. Se presentará el plan curricular y las normas del año escolar.',
+		description:
+			'Primera reunión general de padres de familia. Se presentará el plan curricular y las normas del año escolar.',
 		type: 'meeting',
 		icon: 'pi-users',
 		time: '6:00 PM',
@@ -76,7 +80,8 @@ export const CALENDAR_EVENTS: CalendarEvent[] = [
 	{
 		date: '2026-04-20',
 		title: 'Día del libro',
-		description: 'Celebración del Día Mundial del Libro. Actividades de lectura, intercambio de libros y presentaciones literarias.',
+		description:
+			'Celebración del Día Mundial del Libro. Actividades de lectura, intercambio de libros y presentaciones literarias.',
 		type: 'cultural',
 		icon: 'pi-book',
 		time: '10:00 AM',
@@ -95,7 +100,8 @@ export const CALENDAR_EVENTS: CalendarEvent[] = [
 		date: '2026-05-15',
 		endDate: '2026-05-22',
 		title: 'Exámenes parciales',
-		description: 'Período de evaluaciones parciales del primer bimestre. Revisar el cronograma de exámenes por grado.',
+		description:
+			'Período de evaluaciones parciales del primer bimestre. Revisar el cronograma de exámenes por grado.',
 		type: 'academic',
 		icon: 'pi-file-edit',
 		time: '8:00 AM',
@@ -104,7 +110,8 @@ export const CALENDAR_EVENTS: CalendarEvent[] = [
 	{
 		date: '2026-06-07',
 		title: 'Día de la bandera',
-		description: 'Ceremonia cívica en honor al Día de la Bandera. Desfile escolar y actividades patrióticas.',
+		description:
+			'Ceremonia cívica en honor al Día de la Bandera. Desfile escolar y actividades patrióticas.',
 		type: 'cultural',
 		icon: 'pi-flag',
 		time: '9:00 AM',
@@ -122,7 +129,8 @@ export const CALENDAR_EVENTS: CalendarEvent[] = [
 	{
 		date: '2026-07-06',
 		title: 'Día del maestro',
-		description: 'Homenaje a todos los docentes de la institución. Actuaciones especiales y reconocimientos.',
+		description:
+			'Homenaje a todos los docentes de la institución. Actuaciones especiales y reconocimientos.',
 		type: 'cultural',
 		icon: 'pi-heart',
 		time: '10:00 AM',
@@ -141,7 +149,8 @@ export const CALENDAR_EVENTS: CalendarEvent[] = [
 		date: '2026-08-15',
 		endDate: '2026-08-22',
 		title: 'Olimpiadas deportivas',
-		description: 'Olimpiadas deportivas interescolares. Competencias de fútbol, vóley, básquet y atletismo.',
+		description:
+			'Olimpiadas deportivas interescolares. Competencias de fútbol, vóley, básquet y atletismo.',
 		type: 'sports',
 		icon: 'pi-trophy',
 		time: '8:00 AM',
@@ -159,7 +168,8 @@ export const CALENDAR_EVENTS: CalendarEvent[] = [
 	{
 		date: '2026-09-23',
 		title: 'Día de la Primavera y del Estudiante',
-		description: 'Celebración del Día de la Primavera y la Juventud. Festival de música, baile y elección de reinas.',
+		description:
+			'Celebración del Día de la Primavera y la Juventud. Festival de música, baile y elección de reinas.',
 		type: 'cultural',
 		icon: 'pi-sun',
 		time: '10:00 AM',
@@ -168,7 +178,8 @@ export const CALENDAR_EVENTS: CalendarEvent[] = [
 	{
 		date: '2026-10-31',
 		title: 'Festival de disfraces',
-		description: 'Festival de Halloween con concurso de disfraces, decoración de aulas y actividades recreativas.',
+		description:
+			'Festival de Halloween con concurso de disfraces, decoración de aulas y actividades recreativas.',
 		type: 'cultural',
 		icon: 'pi-star',
 		time: '9:00 AM',
@@ -178,7 +189,8 @@ export const CALENDAR_EVENTS: CalendarEvent[] = [
 		date: '2026-11-15',
 		endDate: '2026-11-28',
 		title: 'Exámenes finales',
-		description: 'Período de evaluaciones finales. Prepararse con anticipación revisando el material del año.',
+		description:
+			'Período de evaluaciones finales. Prepararse con anticipación revisando el material del año.',
 		type: 'academic',
 		icon: 'pi-file-edit',
 		time: '8:00 AM',
@@ -187,7 +199,8 @@ export const CALENDAR_EVENTS: CalendarEvent[] = [
 	{
 		date: '2026-12-15',
 		title: 'Clausura del año escolar',
-		description: 'Ceremonia de clausura y entrega de libretas. Premiación a los mejores estudiantes del año.',
+		description:
+			'Ceremonia de clausura y entrega de libretas. Premiación a los mejores estudiantes del año.',
 		type: 'academic',
 		icon: 'pi-graduation-cap',
 		time: '10:00 AM',

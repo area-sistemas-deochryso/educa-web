@@ -2,31 +2,31 @@
   CTA SECTION
 -----------------------------------------*/
 .cta-section {
-  background-image: url('/images/team/millennial-group-young-businesspeople.webp');
-  background-repeat: no-repeat;
-  background-position: top;
-  background-size: cover;
-  position: relative;
-  padding-top: 150px;
-  padding-bottom: 75px;
+	background-image: url('/images/team/millennial-group-young-businesspeople.webp');
+	background-repeat: no-repeat;
+	background-position: top;
+	background-size: cover;
+	position: relative;
+	padding-top: 150px;
+	padding-bottom: 75px;
 
-  @supports (background-image: image-set(url('') type('image/avif'))) {
-    background-image: image-set(
-      url('/images/team/millennial-group-young-businesspeople.avif') type('image/avif'),
-      url('/images/team/millennial-group-young-businesspeople.webp') type('image/webp'),
-      url('/images/team/millennial-group-young-businesspeople.jpg') type('image/jpeg')
-    );
-  }
+	@supports (background-image: image-set(url('') type('image/avif'))) {
+		background-image: image-set(
+			url('/images/team/millennial-group-young-businesspeople.avif') type('image/avif'),
+			url('/images/team/millennial-group-young-businesspeople.webp') type('image/webp'),
+			url('/images/team/millennial-group-young-businesspeople.jpg') type('image/jpeg')
+		);
+	}
 }
 
 .cta-section .custom-border-btn:hover {
-  background: var(--white-color);
-  color: var(--custom-btn-bg-color);
+	background: var(--white-color);
+	color: var(--custom-btn-bg-color);
 }
 
 @media screen and (max-width: 991px) {
-  .cta-section {
-    padding-top: 50px;
-    padding-bottom: 50px;
-  }
+	.cta-section {
+		padding-top: 50px;
+		padding-bottom: 50px;
+	}
 }

@@ -12,12 +12,29 @@
 				[class.other-month]="!day.isCurrentMonth"
 				[class.today]="day.isToday"
 				[class.holiday]="day.isHoliday && day.isCurrentMonth"
-				[class.has-event]="day.hasEvent && day.isCurrentMonth && !day.isHoliday && !day.isToday"
-				[class.event-start-range]="day.hasEvent && day.event?.endDate && day.isCurrentMonth && !day.isHoliday && !day.isToday"
-				[class.in-range]="day.isInEventRange && day.isCurrentMonth && !day.isHoliday && !day.isToday"
-				[class.event-end]="day.isEventEnd && day.isCurrentMonth && !day.isHoliday && !day.isToday"
-				[class.clickable]="day.isCurrentMonth && (day.isHoliday || day.hasEvent || day.isInEventRange || day.isEventEnd)"
-				[attr.data-event]="(day.event?.endDate ? day.event?.title : null) || day.rangeEvent?.title || null"
+				[class.has-event]="
+					day.hasEvent && day.isCurrentMonth && !day.isHoliday && !day.isToday
+				"
+				[class.event-start-range]="
+					day.hasEvent &&
+					day.event?.endDate &&
+					day.isCurrentMonth &&
+					!day.isHoliday &&
+					!day.isToday
+				"
+				[class.in-range]="
+					day.isInEventRange && day.isCurrentMonth && !day.isHoliday && !day.isToday
+				"
+				[class.event-end]="
+					day.isEventEnd && day.isCurrentMonth && !day.isHoliday && !day.isToday
+				"
+				[class.clickable]="
+					day.isCurrentMonth &&
+					(day.isHoliday || day.hasEvent || day.isInEventRange || day.isEventEnd)
+				"
+				[attr.data-event]="
+					(day.event?.endDate ? day.event?.title : null) || day.rangeEvent?.title || null
+				"
 				[id]="day.isToday ? 'today' : null"
 				[title]="day.holiday?.name || day.event?.title || day.rangeEvent?.title || ''"
 				(click)="onDayClick(day)"
@@ -25,7 +42,13 @@
 				(mouseleave)="onDayHover(day, false)"
 			>
 				<span class="day-number">{{ day.date }}</span>
-				@if (day.hasEvent && day.event?.endDate && day.isCurrentMonth && !day.isHoliday && !day.isToday) {
+				@if (
+					day.hasEvent &&
+					day.event?.endDate &&
+					day.isCurrentMonth &&
+					!day.isHoliday &&
+					!day.isToday
+				) {
 					<span class="range-indicator range-start"></span>
 				}
 				@if (day.isEventEnd && day.isCurrentMonth && !day.isHoliday && !day.isToday) {

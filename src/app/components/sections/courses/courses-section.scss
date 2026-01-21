@@ -2,84 +2,84 @@
   JOB/COURSES SECTION
 -----------------------------------------*/
 .job-thumb {
-  border-radius: var(--border-radius-small);
-  margin-bottom: 25px;
-  padding: 25px;
-  transition: all 0.5s ease;
+	border-radius: var(--border-radius-small);
+	margin-bottom: 25px;
+	padding: 25px;
+	transition: all 0.5s ease;
 }
 
 .job-thumb:hover,
 .job-thumb:nth-of-type(even) {
-  background: var(--white-color);
-  box-shadow: 0 1rem 3rem rgba(0, 0, 0, 0.175);
+	background: var(--white-color);
+	box-shadow: 0 1rem 3rem rgba(0, 0, 0, 0.175);
 }
 
 .job-title-link {
-  color: var(--dark-color);
+	color: var(--dark-color);
 }
 
 .job-thumb p {
-  font-size: 18px;
+	font-size: 18px;
 }
 
 .job-thumb .badge {
-  border: 0;
+	border: 0;
 }
 
 .job-image-wrap {
-  border-radius: var(--border-radius-large);
-  width: 80px;
-  min-width: 80px;
-  height: 80px;
+	border-radius: var(--border-radius-large);
+	width: 80px;
+	min-width: 80px;
+	height: 80px;
 }
 
 .job-image {
-  display: block;
-  margin: auto;
-  padding: 20px;
+	display: block;
+	margin: auto;
+	padding: 20px;
 }
 
 .job-body {
-  flex: auto;
+	flex: auto;
 }
 
 .job-location {
-  min-width: 175px;
+	min-width: 175px;
 }
 
 .job-location,
 .job-date {
-  margin-right: 20px;
+	margin-right: 20px;
 }
 
 .job-date {
-  min-width: 155px;
+	min-width: 155px;
 }
 
 .job-section-btn-wrap {
-  margin-left: auto;
+	margin-left: auto;
 }
 
 @media screen and (min-width: 1025px) {
-  .job-featured-section .job-thumb {
-    max-width: 1120px;
-    margin-right: auto;
-    margin-left: auto;
-  }
+	.job-featured-section .job-thumb {
+		max-width: 1120px;
+		margin-right: auto;
+		margin-left: auto;
+	}
 }
 
 @media screen and (max-width: 991px) {
-  .job-body p {
-    font-size: var(--btn-font-size);
-  }
+	.job-body p {
+		font-size: var(--btn-font-size);
+	}
 
-  .job-location {
-    min-width: 140px;
-  }
+	.job-location {
+		min-width: 140px;
+	}
 }
 
 @media screen and (max-width: 480px) {
-  .job-date {
-    margin-top: 5px;
-  }
+	.job-date {
+		margin-top: 5px;
+	}
 }

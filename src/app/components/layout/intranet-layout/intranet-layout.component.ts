@@ -5,7 +5,13 @@ import { FloatingNotificationBellComponent } from '../../shared/floating-notific
 
 @Component({
 	selector: 'app-intranet-layout',
-	imports: [RouterOutlet, RouterLink, RouterLinkActive, VoiceButtonComponent, FloatingNotificationBellComponent],
+	imports: [
+		RouterOutlet,
+		RouterLink,
+		RouterLinkActive,
+		VoiceButtonComponent,
+		FloatingNotificationBellComponent,
+	],
 	templateUrl: './intranet-layout.component.html',
 	styleUrl: './intranet-layout.component.scss',
 })

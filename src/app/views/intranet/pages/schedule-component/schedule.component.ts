@@ -6,16 +6,8 @@ import { ScheduleModalComponent } from './components/schedule-modal/schedule-mod
 import { SummaryModalComponent } from './components/summary-modal/summary-modal.component';
 import { CourseDetailsModalComponent } from './components/course-details-modal/course-details-modal.component';
 import { GradesModalComponent } from './components/grades-modal/grades-modal.component';
-import { VoiceRecognitionService } from '@app/services';
-
-interface ScheduleModalState {
-	schedule?: boolean;
-	summary?: boolean;
-	details?: { visible: boolean; course: string };
-	grades?: { visible: boolean; course: string };
-}
-
-const STORAGE_KEY = 'schedule_modals_state';
+import { VoiceRecognitionService, StorageService } from '@app/services';
+import { ScheduleModalsState } from '@app/services/storage';
 
 @Component({
 	selector: 'app-schedule',
@@ -33,6 +25,7 @@ const STORAGE_KEY = 'schedule_modals_state';
 export class ScheduleComponent implements OnInit, OnDestroy {
 	private voiceService = inject(VoiceRecognitionService);
 	private route = inject(ActivatedRoute);
+	private storage = inject(StorageService);
 	private voiceUnsubscribers: (() => void)[] = [];
 
 	showScheduleModal = false;
@@ -82,7 +75,7 @@ export class ScheduleComponent implements OnInit, OnDestroy {
 				aliases: ['horarios', 'mi horario', 'el horario', 'schedule'],
 				open: () => this.openScheduleModal(),
 				close: () => this.onScheduleModalClose(),
-			})
+			}),
 		);
 
 		// Registrar modal de resumen
@@ -92,7 +85,7 @@ export class ScheduleComponent implements OnInit, OnDestroy {
 				aliases: ['resumen académico', 'el resumen', 'summary', 'resumen de cursos'],
 				open: () => this.openSummaryModal(),
 				close: () => this.onSummaryModalClose(),
-			})
+			}),
 		);
 
 		// Registrar modal de notas
@@ -106,7 +99,7 @@ export class ScheduleComponent implements OnInit, OnDestroy {
 					}
 				},
 				close: () => this.onGradesModalClose(),
-			})
+			}),
 		);
 
 		// Registrar modal de detalles
@@ -120,7 +113,7 @@ export class ScheduleComponent implements OnInit, OnDestroy {
 					}
 				},
 				close: () => this.onDetailsModalClose(),
-			})
+			}),
 		);
 
 		// Listener para comandos genéricos de cerrar modal
@@ -129,7 +122,7 @@ export class ScheduleComponent implements OnInit, OnDestroy {
 				if (command === 'close-modal') {
 					this.closeActiveModal();
 				}
-			})
+			}),
 		);
 	}
 
@@ -146,19 +139,15 @@ export class ScheduleComponent implements OnInit, OnDestroy {
 		}
 	}
 
-	private getModalsState(): ScheduleModalState {
-		const stored = localStorage.getItem(STORAGE_KEY);
-		return stored ? JSON.parse(stored) : {};
+	private getModalsState(): ScheduleModalsState {
+		return this.storage.getScheduleModalsState();
 	}
 
-	private saveModalState(modal: keyof ScheduleModalState, value: boolean | { visible: boolean; course: string }): void {
-		const state = this.getModalsState();
-		if (value === false || (typeof value === 'object' && !value.visible)) {
-			delete state[modal];
-		} else {
-			state[modal] = value as any;
-		}
-		localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+	private saveModalState(
+		modal: keyof ScheduleModalsState,
+		value: boolean | { visible: boolean; course: string },
+	): void {
+		this.storage.updateScheduleModalState(modal, value);
 	}
 
 	private restoreModalsState(): void {

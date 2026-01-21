@@ -77,17 +77,23 @@
 
 	&.status-pending-review {
 		background-color: rgba(33, 150, 243, 0.1);
-		i { color: #2196f3; }
+		i {
+			color: #2196f3;
+		}
 	}
 
 	&.status-reviewed {
 		background-color: rgba(119, 160, 45, 0.1);
-		i { color: #77a02d; }
+		i {
+			color: #77a02d;
+		}
 	}
 
 	&.status-returned {
 		background-color: rgba(255, 152, 0, 0.1);
-		i { color: #ff9800; }
+		i {
+			color: #ff9800;
+		}
 	}
 }
 

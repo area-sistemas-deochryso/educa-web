@@ -5,10 +5,10 @@ import {
 	ResumenAsistencia,
 	SalonProfesor,
 	VoiceRecognitionService,
+	StorageService,
 } from '@app/services';
 import { Component, OnDestroy, OnInit, computed, inject, signal } from '@angular/core';
 
-import { ATTENDANCE_STORAGE_KEY } from './attendance.config';
 import { AttendanceDataService } from './services/attendance-data.service';
 import { AttendanceHeaderComponent } from './components/attendance-header/attendance-header.component';
 import { AttendanceLegendComponent } from './components/attendance-legend/attendance-legend.component';
@@ -16,10 +16,6 @@ import { AttendanceTable } from './attendance.types';
 import { AttendanceTableComponent } from './components/attendance-table/attendance-table.component';
 import { AuthService } from '@app/services';
 import { CommonModule } from '@angular/common';
-
-const SELECTED_HIJO_KEY = 'educa_selected_hijo';
-const SELECTED_ESTUDIANTE_KEY = 'educa_selected_estudiante';
-const SELECTED_SALON_KEY = 'educa_selected_salon';
 
 @Component({
 	selector: 'app-attendance',
@@ -37,6 +33,7 @@ export class AttendanceComponent implements OnInit, OnDestroy {
 	private authService = inject(AuthService);
 	private voiceService = inject(VoiceRecognitionService);
 	private attendanceDataService = inject(AttendanceDataService);
+	private storage = inject(StorageService);
 	private voiceUnsubscribe: (() => void) | null = null;
 
 	userRole: string = '';
@@ -53,9 +50,7 @@ export class AttendanceComponent implements OnInit, OnDestroy {
 	selectedHijoId = signal<number | null>(null);
 
 	// Para profesor (salones + selección de estudiante)
-	userRaw = localStorage.getItem('educa_user');
-
-	nombreProfesor: string | null = this.userRaw ? JSON.parse(this.userRaw).nombreCompleto : null;
+	nombreProfesor: string | null = this.storage.getUser()?.nombreCompleto ?? null;
 
 	salones = signal<SalonProfesor[]>([]);
 	selectedSalonId = signal<number | null>(null);
@@ -141,38 +136,33 @@ export class AttendanceComponent implements OnInit, OnDestroy {
 	}
 
 	private restoreSelectedMonth(): void {
-		const stored = localStorage.getItem(ATTENDANCE_STORAGE_KEY);
-		if (stored) {
-			const { month, year } = JSON.parse(stored);
+		const data = this.storage.getAttendanceMonth();
+		if (data) {
 			this.ingresos.update((table) => ({
 				...table,
-				selectedMonth: month,
-				selectedYear: year,
+				selectedMonth: data.month,
+				selectedYear: data.year,
 			}));
 			this.salidas.update((table) => ({
 				...table,
-				selectedMonth: month,
-				selectedYear: year,
+				selectedMonth: data.month,
+				selectedYear: data.year,
 			}));
 		}
 	}
 
 	private saveSelectedMonth(): void {
-		const data = {
+		this.storage.setAttendanceMonth({
 			month: this.ingresos().selectedMonth,
 			year: this.ingresos().selectedYear,
-		};
-		localStorage.setItem(ATTENDANCE_STORAGE_KEY, JSON.stringify(data));
+		});
 	}
 
 	private restoreSelectedHijo(): void {
-		const stored = localStorage.getItem(SELECTED_HIJO_KEY);
-		if (stored) {
-			const hijoId = parseInt(stored, 10);
-			if (this.hijos().some((h) => h.estudianteId === hijoId)) {
-				this.selectedHijoId.set(hijoId);
-				return;
-			}
+		const hijoId = this.storage.getSelectedHijoId();
+		if (hijoId !== null && this.hijos().some((h) => h.estudianteId === hijoId)) {
+			this.selectedHijoId.set(hijoId);
+			return;
 		}
 		const firstHijo = this.hijos()[0];
 		if (firstHijo) {
@@ -183,7 +173,7 @@ export class AttendanceComponent implements OnInit, OnDestroy {
 	private saveSelectedHijo(): void {
 		const id = this.selectedHijoId();
 		if (id) {
-			localStorage.setItem(SELECTED_HIJO_KEY, id.toString());
+			this.storage.setSelectedHijoId(id);
 		}
 	}
 
@@ -216,13 +206,12 @@ export class AttendanceComponent implements OnInit, OnDestroy {
 
 	onIngresosMonthChange(month: number): void {
 		this.ingresos.update((table) => ({ ...table, selectedMonth: month }));
-		this.saveSelectedMonth();
-		this.reloadCurrentData();
+		this.reloadIngresosData();
 	}
 
 	onSalidasMonthChange(month: number): void {
 		this.salidas.update((table) => ({ ...table, selectedMonth: month }));
-		this.reloadCurrentData();
+		this.reloadSalidasData();
 	}
 
 	private loadIngresosData(): void {
@@ -326,6 +315,52 @@ export class AttendanceComponent implements OnInit, OnDestroy {
 		});
 	}
 
+	private loadHijoIngresos(): void {
+		const hijoId = this.selectedHijoId();
+		const hijo = this.selectedHijo();
+		if (!hijoId || !hijo) return;
+
+		const selectedMonth = this.ingresos().selectedMonth;
+		const selectedYear = this.ingresos().selectedYear;
+
+		this.asistenciaService.getAsistenciaHijo(hijoId, selectedMonth, selectedYear).subscribe({
+			next: (response) => {
+				if (response) {
+					const tables = this.attendanceDataService.processAsistencias(
+						response.detalle,
+						selectedMonth,
+						selectedYear,
+						hijo.nombreCompleto,
+					);
+					this.ingresos.set(tables.ingresos);
+				}
+			},
+		});
+	}
+
+	private loadHijoSalidas(): void {
+		const hijoId = this.selectedHijoId();
+		const hijo = this.selectedHijo();
+		if (!hijoId || !hijo) return;
+
+		const selectedMonth = this.salidas().selectedMonth;
+		const selectedYear = this.salidas().selectedYear;
+
+		this.asistenciaService.getAsistenciaHijo(hijoId, selectedMonth, selectedYear).subscribe({
+			next: (response) => {
+				if (response) {
+					const tables = this.attendanceDataService.processAsistencias(
+						response.detalle,
+						selectedMonth,
+						selectedYear,
+						hijo.nombreCompleto,
+					);
+					this.salidas.set(tables.salidas);
+				}
+			},
+		});
+	}
+
 	// === PROFESOR ===
 	private loadSalonesProfesor(): void {
 		this.loading.set(true);
@@ -347,13 +382,10 @@ export class AttendanceComponent implements OnInit, OnDestroy {
 	}
 
 	private restoreSelectedSalon(): void {
-		const stored = localStorage.getItem(SELECTED_SALON_KEY);
-		if (stored) {
-			const salonId = parseInt(stored, 10);
-			if (this.salones().some((s) => s.salonId === salonId)) {
-				this.selectedSalonId.set(salonId);
-				return;
-			}
+		const salonId = this.storage.getSelectedSalonId();
+		if (salonId !== null && this.salones().some((s) => s.salonId === salonId)) {
+			this.selectedSalonId.set(salonId);
+			return;
 		}
 		const firstSalon = this.salones()[0];
 		if (firstSalon) {
@@ -364,7 +396,7 @@ export class AttendanceComponent implements OnInit, OnDestroy {
 	private saveSelectedSalon(): void {
 		const id = this.selectedSalonId();
 		if (id) {
-			localStorage.setItem(SELECTED_SALON_KEY, id.toString());
+			this.storage.setSelectedSalonId(id);
 		}
 	}
 
@@ -413,13 +445,10 @@ export class AttendanceComponent implements OnInit, OnDestroy {
 	}
 
 	private restoreSelectedEstudiante(): void {
-		const stored = localStorage.getItem(SELECTED_ESTUDIANTE_KEY);
-		if (stored) {
-			const estudianteId = parseInt(stored, 10);
-			if (this.estudiantes().some((e) => e.estudianteId === estudianteId)) {
-				this.selectedEstudianteId.set(estudianteId);
-				return;
-			}
+		const estudianteId = this.storage.getSelectedEstudianteId();
+		if (estudianteId !== null && this.estudiantes().some((e) => e.estudianteId === estudianteId)) {
+			this.selectedEstudianteId.set(estudianteId);
+			return;
 		}
 		const firstEstudiante = this.estudiantes()[0];
 		if (firstEstudiante) {
@@ -430,7 +459,7 @@ export class AttendanceComponent implements OnInit, OnDestroy {
 	private saveSelectedEstudiante(): void {
 		const id = this.selectedEstudianteId();
 		if (id) {
-			localStorage.setItem(SELECTED_ESTUDIANTE_KEY, id.toString());
+			this.storage.setSelectedEstudianteId(id);
 		}
 	}
 
@@ -464,6 +493,61 @@ export class AttendanceComponent implements OnInit, OnDestroy {
 		this.loading.set(false);
 	}
 
+	private loadEstudianteIngresos(): void {
+		const salon = this.selectedSalon;
+		if (!salon) return;
+
+		const selectedMonth = this.ingresos().selectedMonth;
+		const selectedYear = this.ingresos().selectedYear;
+
+		this.asistenciaService
+			.getAsistenciasGrado(salon.grado, salon.seccion, selectedMonth, selectedYear)
+			.subscribe({
+				next: (estudiantes) => {
+					this.estudiantes.set(estudiantes);
+					const estudiante = estudiantes.find(
+						(e) => e.estudianteId === this.selectedEstudianteId(),
+					);
+					if (estudiante) {
+						const tables = this.attendanceDataService.processAsistencias(
+							estudiante.asistencias,
+							selectedMonth,
+							selectedYear,
+							estudiante.nombreCompleto,
+						);
+						this.ingresos.set(tables.ingresos);
+					}
+				},
+			});
+	}
+
+	private loadEstudianteSalidas(): void {
+		const salon = this.selectedSalon;
+		if (!salon) return;
+
+		const selectedMonth = this.salidas().selectedMonth;
+		const selectedYear = this.salidas().selectedYear;
+
+		this.asistenciaService
+			.getAsistenciasGrado(salon.grado, salon.seccion, selectedMonth, selectedYear)
+			.subscribe({
+				next: (estudiantes) => {
+					const estudiante = estudiantes.find(
+						(e) => e.estudianteId === this.selectedEstudianteId(),
+					);
+					if (estudiante) {
+						const tables = this.attendanceDataService.processAsistencias(
+							estudiante.asistencias,
+							selectedMonth,
+							selectedYear,
+							estudiante.nombreCompleto,
+						);
+						this.salidas.set(tables.salidas);
+					}
+				},
+			});
+	}
+
 	private reloadCurrentData(): void {
 		if (this.userRole === 'Apoderado') {
 			this.loadHijoAsistencias();
@@ -471,6 +555,26 @@ export class AttendanceComponent implements OnInit, OnDestroy {
 			this.loadEstudiantesSalon();
 		} else {
 			this.loadAsistencias();
+		}
+	}
+
+	private reloadIngresosData(): void {
+		if (this.userRole === 'Apoderado') {
+			this.loadHijoIngresos();
+		} else if (this.userRole === 'Profesor') {
+			this.loadEstudianteIngresos();
+		} else {
+			this.loadIngresosData();
+		}
+	}
+
+	private reloadSalidasData(): void {
+		if (this.userRole === 'Apoderado') {
+			this.loadHijoSalidas();
+		} else if (this.userRole === 'Profesor') {
+			this.loadEstudianteSalidas();
+		} else {
+			this.loadSalidasData();
 		}
 	}
 

@@ -3,59 +3,59 @@ import { FormsModule } from '@angular/forms';
 import { Tooltip } from 'primeng/tooltip';
 
 interface ContactForm {
-  name: string;
-  phone: string;
+	name: string;
+	phone: string;
 }
 
 @Component({
-  selector: 'app-hero-section',
-  standalone: true,
-  imports: [FormsModule, Tooltip],
-  templateUrl: './hero-section.html',
-  styleUrl: './hero-section.scss',
+	selector: 'app-hero-section',
+	standalone: true,
+	imports: [FormsModule, Tooltip],
+	templateUrl: './hero-section.html',
+	styleUrl: './hero-section.scss',
 })
 export class HeroSectionComponent {
-  formData: ContactForm = {
-    name: '',
-    phone: ''
-  };
+	formData: ContactForm = {
+		name: '',
+		phone: '',
+	};
 
-  isSubmitting = false;
+	isSubmitting = false;
 
-  onSubmit(): void {
-    if (this.formData.name && this.formData.phone) {
-      this.isSubmitting = true;
+	onSubmit(): void {
+		if (this.formData.name && this.formData.phone) {
+			this.isSubmitting = true;
 
-      // Simular envío a Formspree o backend
-      const formspreeUrl = 'https://formspree.io/f/mzzprebk';
+			// Simular envío a Formspree o backend
+			const formspreeUrl = 'https://formspree.io/f/mzzprebk';
 
-      fetch(formspreeUrl, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(this.formData),
-      })
-        .then(() => {
-          alert('¡Gracias por contactarnos! Nos comunicaremos contigo pronto.');
-          this.formData = { name: '', phone: '' };
-        })
-        .catch(() => {
-          alert('Hubo un error al enviar el formulario. Por favor, intenta de nuevo.');
-        })
-        .finally(() => {
-          this.isSubmitting = false;
-        });
-    }
-  }
+			fetch(formspreeUrl, {
+				method: 'POST',
+				headers: {
+					'Content-Type': 'application/json',
+				},
+				body: JSON.stringify(this.formData),
+			})
+				.then(() => {
+					alert('¡Gracias por contactarnos! Nos comunicaremos contigo pronto.');
+					this.formData = { name: '', phone: '' };
+				})
+				.catch(() => {
+					alert('Hubo un error al enviar el formulario. Por favor, intenta de nuevo.');
+				})
+				.finally(() => {
+					this.isSubmitting = false;
+				});
+		}
+	}
 
-  scrollToSection(event: Event, sectionId: string): void {
-    event.preventDefault();
-    const element = document.getElementById(sectionId);
-    if (element) {
-      const navbarHeight = document.querySelector('.navbar')?.clientHeight || 0;
-      const offsetTop = element.offsetTop - navbarHeight;
-      window.scrollTo({ top: offsetTop, behavior: 'smooth' });
-    }
-  }
+	scrollToSection(event: Event, sectionId: string): void {
+		event.preventDefault();
+		const element = document.getElementById(sectionId);
+		if (element) {
+			const navbarHeight = document.querySelector('.navbar')?.clientHeight || 0;
+			const offsetTop = element.offsetTop - navbarHeight;
+			window.scrollTo({ top: offsetTop, behavior: 'smooth' });
+		}
+	}
 }

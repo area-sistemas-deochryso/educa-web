@@ -75,7 +75,7 @@ export class SwService {
 			});
 
 			// Escuchar mensajes del Service Worker
-			navigator.serviceWorker.addEventListener('message', event => {
+			navigator.serviceWorker.addEventListener('message', (event) => {
 				logger.log('[SwService] Mensaje del SW:', event.data);
 			});
 		} catch (error) {

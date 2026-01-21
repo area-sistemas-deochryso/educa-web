@@ -489,3 +489,43 @@ strong {
 		line-height: 35px;
 	}
 }
+
+/*---------------------------------------
+  PRIMENG SELECT FILTER - INTRANET
+-----------------------------------------*/
+.p-select-overlay {
+	.p-select-filter-container {
+		padding: 0.5rem;
+		background: transparent;
+
+		.p-select-filter,
+		input.p-select-filter,
+		input.p-select-filter.p-inputtext {
+			width: 100%;
+			padding: 0.5rem 0.75rem;
+			border: none !important;
+			border-bottom: 1px solid var(--intranet-accent-color-green) !important;
+			border-radius: 0;
+			background: transparent;
+			color: var(--intranet-default-text-color);
+			font-size: 0.85rem;
+			box-shadow: none !important;
+
+			&:focus,
+			&:focus-visible {
+				outline: none !important;
+				border: none !important;
+				border-bottom: 1px solid var(--intranet-accent-color-green) !important;
+				box-shadow: none !important;
+			}
+
+			&::placeholder {
+				color: var(--intranet-soft-text-color);
+			}
+		}
+
+		.p-icon {
+			color: var(--intranet-accent-color-green);
+		}
+	}
+}

@@ -4,7 +4,12 @@ import { Observable, catchError, of } from 'rxjs';
 
 import { environment } from '@env/environment';
 
-import { ResumenAsistencia, HijoApoderado, EstudianteAsistencia, SalonProfesor } from './asistencia.models';
+import {
+	ResumenAsistencia,
+	HijoApoderado,
+	EstudianteAsistencia,
+	SalonProfesor,
+} from './asistencia.models';
 
 @Injectable({
 	providedIn: 'root',
@@ -47,7 +52,11 @@ export class AsistenciaService {
 	 * Apoderado: Obtener asistencia de un hijo
 	 * GET /api/ConsultaAsistencia/apoderado/hijo/{estudianteId}/asistencias?mes={mes}&año={año}
 	 */
-	getAsistenciaHijo(estudianteId: number, mes?: number, anio?: number): Observable<ResumenAsistencia | null> {
+	getAsistenciaHijo(
+		estudianteId: number,
+		mes?: number,
+		anio?: number,
+	): Observable<ResumenAsistencia | null> {
 		const params: Record<string, string> = {};
 
 		if (mes !== undefined) {
@@ -58,7 +67,9 @@ export class AsistenciaService {
 		}
 
 		return this.http
-			.get<ResumenAsistencia>(`${this.apiUrl}/apoderado/hijo/${estudianteId}/asistencias`, { params })
+			.get<ResumenAsistencia>(`${this.apiUrl}/apoderado/hijo/${estudianteId}/asistencias`, {
+				params,
+			})
 			.pipe(catchError(() => of(null)));
 	}
 
@@ -76,7 +87,12 @@ export class AsistenciaService {
 	 * Profesor: Obtener asistencias de estudiantes por grado/sección
 	 * GET /api/ConsultaAsistencia/profesor/grado?grado={grado}&seccion={seccion}&mes={mes}&anio={anio}
 	 */
-	getAsistenciasGrado(grado: string, seccion: string, mes?: number, anio?: number): Observable<EstudianteAsistencia[]> {
+	getAsistenciasGrado(
+		grado: string,
+		seccion: string,
+		mes?: number,
+		anio?: number,
+	): Observable<EstudianteAsistencia[]> {
 		const params: Record<string, string> = {
 			grado,
 			seccion,

@@ -17,35 +17,40 @@ export const PERU_HOLIDAYS: Holiday[] = [
 	{
 		date: '01-01',
 		name: 'Año Nuevo',
-		description: 'Celebración del inicio del nuevo año. Día de reflexión y nuevos comienzos para todas las familias peruanas.',
+		description:
+			'Celebración del inicio del nuevo año. Día de reflexión y nuevos comienzos para todas las familias peruanas.',
 		type: 'national',
 		icon: 'pi-sparkles',
 	},
 	{
 		date: '03-08',
 		name: 'Día Internacional de la Mujer',
-		description: 'Celebramos a todas las mujeres. Día de reconocimiento a la lucha por la igualdad de derechos.',
+		description:
+			'Celebramos a todas las mujeres. Día de reconocimiento a la lucha por la igualdad de derechos.',
 		type: 'special',
 		icon: 'pi-heart',
 	},
 	{
 		date: '05-01',
 		name: 'Día del Trabajo',
-		description: 'Conmemoración internacional de los trabajadores. Se honra la lucha por los derechos laborales y la dignidad del trabajo.',
+		description:
+			'Conmemoración internacional de los trabajadores. Se honra la lucha por los derechos laborales y la dignidad del trabajo.',
 		type: 'national',
 		icon: 'pi-briefcase',
 	},
 	{
 		date: '06-07',
 		name: 'Día de la Bandera',
-		description: 'Conmemoración del Día de la Bandera del Perú. Símbolo de unidad e identidad nacional.',
+		description:
+			'Conmemoración del Día de la Bandera del Perú. Símbolo de unidad e identidad nacional.',
 		type: 'special',
 		icon: 'pi-flag',
 	},
 	{
 		date: '06-29',
 		name: 'San Pedro y San Pablo',
-		description: 'Festividad religiosa en honor a los apóstoles San Pedro y San Pablo, pilares de la Iglesia Católica.',
+		description:
+			'Festividad religiosa en honor a los apóstoles San Pedro y San Pablo, pilares de la Iglesia Católica.',
 		type: 'national',
 		icon: 'pi-sun',
 	},
@@ -59,49 +64,56 @@ export const PERU_HOLIDAYS: Holiday[] = [
 	{
 		date: '07-23',
 		name: 'Día de la Fuerza Aérea del Perú',
-		description: 'Se conmemora la creación de la Fuerza Aérea del Perú y se rinde homenaje a los héroes de la aviación nacional.',
+		description:
+			'Se conmemora la creación de la Fuerza Aérea del Perú y se rinde homenaje a los héroes de la aviación nacional.',
 		type: 'national',
 		icon: 'pi-send',
 	},
 	{
 		date: '07-28',
 		name: 'Día de la Independencia',
-		description: 'Aniversario de la proclamación de la independencia del Perú por Don José de San Martín en 1821. Día de la Patria.',
+		description:
+			'Aniversario de la proclamación de la independencia del Perú por Don José de San Martín en 1821. Día de la Patria.',
 		type: 'national',
 		icon: 'pi-flag',
 	},
 	{
 		date: '07-29',
 		name: 'Día de la Independencia',
-		description: 'Segundo día de celebración patria. Gran Parada y Desfile Cívico Militar en honor a las Fuerzas Armadas.',
+		description:
+			'Segundo día de celebración patria. Gran Parada y Desfile Cívico Militar en honor a las Fuerzas Armadas.',
 		type: 'national',
 		icon: 'pi-flag',
 	},
 	{
 		date: '08-06',
 		name: 'Batalla de Junín',
-		description: 'Conmemoración de la victoria patriota en la Batalla de Junín (1824), preludio de la independencia sudamericana.',
+		description:
+			'Conmemoración de la victoria patriota en la Batalla de Junín (1824), preludio de la independencia sudamericana.',
 		type: 'national',
 		icon: 'pi-star',
 	},
 	{
 		date: '08-30',
 		name: 'Santa Rosa de Lima',
-		description: 'Festividad de Santa Rosa de Lima, primera santa de América, patrona de Lima, Perú y las Américas.',
+		description:
+			'Festividad de Santa Rosa de Lima, primera santa de América, patrona de Lima, Perú y las Américas.',
 		type: 'national',
 		icon: 'pi-heart',
 	},
 	{
 		date: '09-23',
 		name: 'Día de la Primavera y del Estudiante',
-		description: 'Celebración del Día de la Primavera y la Juventud. Día dedicado a los estudiantes.',
+		description:
+			'Celebración del Día de la Primavera y la Juventud. Día dedicado a los estudiantes.',
 		type: 'special',
 		icon: 'pi-sun',
 	},
 	{
 		date: '10-08',
 		name: 'Combate de Angamos',
-		description: 'Homenaje al héroe Miguel Grau Seminario y la Marina de Guerra del Perú. Día de la Marina.',
+		description:
+			'Homenaje al héroe Miguel Grau Seminario y la Marina de Guerra del Perú. Día de la Marina.',
 		type: 'national',
 		icon: 'pi-compass',
 	},
@@ -115,28 +127,32 @@ export const PERU_HOLIDAYS: Holiday[] = [
 	{
 		date: '11-01',
 		name: 'Día de Todos los Santos',
-		description: 'Día dedicado a honrar a todos los santos. Las familias visitan los cementerios para recordar a sus seres queridos.',
+		description:
+			'Día dedicado a honrar a todos los santos. Las familias visitan los cementerios para recordar a sus seres queridos.',
 		type: 'national',
 		icon: 'pi-star-fill',
 	},
 	{
 		date: '12-08',
 		name: 'Inmaculada Concepción',
-		description: 'Festividad católica que celebra la concepción inmaculada de la Virgen María, libre de pecado original.',
+		description:
+			'Festividad católica que celebra la concepción inmaculada de la Virgen María, libre de pecado original.',
 		type: 'national',
 		icon: 'pi-sun',
 	},
 	{
 		date: '12-09',
 		name: 'Batalla de Ayacucho',
-		description: 'Conmemoración de la Batalla de Ayacucho (1824), victoria decisiva que selló la independencia de Sudamérica.',
+		description:
+			'Conmemoración de la Batalla de Ayacucho (1824), victoria decisiva que selló la independencia de Sudamérica.',
 		type: 'national',
 		icon: 'pi-star',
 	},
 	{
 		date: '12-25',
 		name: 'Navidad',
-		description: 'Celebración del nacimiento de Jesucristo. Día de unión familiar, intercambio de regalos y tradiciones navideñas.',
+		description:
+			'Celebración del nacimiento de Jesucristo. Día de unión familiar, intercambio de regalos y tradiciones navideñas.',
 		type: 'national',
 		icon: 'pi-gift',
 	},
@@ -146,14 +162,16 @@ export const PERU_HOLIDAYS: Holiday[] = [
 	{
 		date: '2024-03-28',
 		name: 'Jueves Santo',
-		description: 'Conmemoración de la Última Cena de Jesús con sus apóstoles. Inicio del Triduo Pascual.',
+		description:
+			'Conmemoración de la Última Cena de Jesús con sus apóstoles. Inicio del Triduo Pascual.',
 		type: 'national',
 		icon: 'pi-sun',
 	},
 	{
 		date: '2024-03-29',
 		name: 'Viernes Santo',
-		description: 'Día de recogimiento que conmemora la crucifixión y muerte de Jesucristo. Procesiones en todo el país.',
+		description:
+			'Día de recogimiento que conmemora la crucifixión y muerte de Jesucristo. Procesiones en todo el país.',
 		type: 'national',
 		icon: 'pi-sun',
 	},
@@ -161,14 +179,16 @@ export const PERU_HOLIDAYS: Holiday[] = [
 	{
 		date: '2025-04-17',
 		name: 'Jueves Santo',
-		description: 'Conmemoración de la Última Cena de Jesús con sus apóstoles. Inicio del Triduo Pascual.',
+		description:
+			'Conmemoración de la Última Cena de Jesús con sus apóstoles. Inicio del Triduo Pascual.',
 		type: 'national',
 		icon: 'pi-sun',
 	},
 	{
 		date: '2025-04-18',
 		name: 'Viernes Santo',
-		description: 'Día de recogimiento que conmemora la crucifixión y muerte de Jesucristo. Procesiones en todo el país.',
+		description:
+			'Día de recogimiento que conmemora la crucifixión y muerte de Jesucristo. Procesiones en todo el país.',
 		type: 'national',
 		icon: 'pi-sun',
 	},
@@ -176,14 +196,16 @@ export const PERU_HOLIDAYS: Holiday[] = [
 	{
 		date: '2026-04-02',
 		name: 'Jueves Santo',
-		description: 'Conmemoración de la Última Cena de Jesús con sus apóstoles. Inicio del Triduo Pascual.',
+		description:
+			'Conmemoración de la Última Cena de Jesús con sus apóstoles. Inicio del Triduo Pascual.',
 		type: 'national',
 		icon: 'pi-sun',
 	},
 	{
 		date: '2026-04-03',
 		name: 'Viernes Santo',
-		description: 'Día de recogimiento que conmemora la crucifixión y muerte de Jesucristo. Procesiones en todo el país.',
+		description:
+			'Día de recogimiento que conmemora la crucifixión y muerte de Jesucristo. Procesiones en todo el país.',
 		type: 'national',
 		icon: 'pi-sun',
 	},
@@ -191,14 +213,16 @@ export const PERU_HOLIDAYS: Holiday[] = [
 	{
 		date: '2027-03-25',
 		name: 'Jueves Santo',
-		description: 'Conmemoración de la Última Cena de Jesús con sus apóstoles. Inicio del Triduo Pascual.',
+		description:
+			'Conmemoración de la Última Cena de Jesús con sus apóstoles. Inicio del Triduo Pascual.',
 		type: 'national',
 		icon: 'pi-sun',
 	},
 	{
 		date: '2027-03-26',
 		name: 'Viernes Santo',
-		description: 'Día de recogimiento que conmemora la crucifixión y muerte de Jesucristo. Procesiones en todo el país.',
+		description:
+			'Día de recogimiento que conmemora la crucifixión y muerte de Jesucristo. Procesiones en todo el país.',
 		type: 'national',
 		icon: 'pi-sun',
 	},

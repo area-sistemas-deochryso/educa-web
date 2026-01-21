@@ -18,7 +18,11 @@
 					>
 						<i
 							class="pi"
-							[ngClass]="modalData.type === 'holiday' ? modalData.holiday?.icon : modalData.event?.icon"
+							[ngClass]="
+								modalData.type === 'holiday'
+									? modalData.holiday?.icon
+									: modalData.event?.icon
+							"
 						></i>
 					</div>
 					<div class="modal-title-section">
@@ -34,7 +38,11 @@
 							}}
 						</span>
 						<h2 class="modal-title">
-							{{ modalData.type === 'holiday' ? modalData.holiday?.name : modalData.event?.title }}
+							{{
+								modalData.type === 'holiday'
+									? modalData.holiday?.name
+									: modalData.event?.title
+							}}
 						</h2>
 					</div>
 				</div>
@@ -61,7 +69,11 @@
 					}
 
 					<p class="modal-description">
-						{{ modalData.type === 'holiday' ? modalData.holiday?.description : modalData.event?.description }}
+						{{
+							modalData.type === 'holiday'
+								? modalData.holiday?.description
+								: modalData.event?.description
+						}}
 					</p>
 				</div>
 			}

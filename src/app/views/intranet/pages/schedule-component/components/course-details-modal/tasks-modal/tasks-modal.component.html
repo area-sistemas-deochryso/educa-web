@@ -31,7 +31,13 @@
 								<i class="pi pi-calendar"></i>
 								Fecha límite: {{ task.dueDate }}
 							</span>
-							<span class="days-remaining" [class.urgent]="getDaysRemaining(task.dueDate) === 'Hoy' || getDaysRemaining(task.dueDate) === 'Mañana'">
+							<span
+								class="days-remaining"
+								[class.urgent]="
+									getDaysRemaining(task.dueDate) === 'Hoy' ||
+									getDaysRemaining(task.dueDate) === 'Mañana'
+								"
+							>
 								{{ getDaysRemaining(task.dueDate) }}
 							</span>
 						</div>

@@ -28,7 +28,10 @@
 							(input)="updateTempGrade(evaluation, $any($event.target).value)"
 						/>
 					} @else {
-						<span class="col-grade" [class]="getGradeClass(getDisplayGrade(evaluation))">
+						<span
+							class="col-grade"
+							[class]="getGradeClass(getDisplayGrade(evaluation))"
+						>
 							{{ getDisplayGrade(evaluation) }}
 						</span>
 					}
@@ -51,7 +54,9 @@
 			</div>
 		</div>
 		@if (simulationMode) {
-			<p class="simulation-note">Modifica las notas para simular tu promedio. Los cambios no se guardarán.</p>
+			<p class="simulation-note">
+				Modifica las notas para simular tu promedio. Los cambios no se guardarán.
+			</p>
 		}
 	</div>
 </p-dialog>

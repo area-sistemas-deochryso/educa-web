@@ -1,10 +1,11 @@
 import { HttpInterceptorFn } from '@angular/common/http';
+import { inject } from '@angular/core';
 import { logger } from '@app/helpers';
-
-const TOKEN_KEY = 'educa_token';
+import { StorageService } from '@app/services';
 
 export const authInterceptor: HttpInterceptorFn = (req, next) => {
-	const token = localStorage.getItem(TOKEN_KEY);
+	const storage = inject(StorageService);
+	const token = storage.getToken();
 
 	logger.log('[Interceptor] URL:', req.url);
 	logger.log('[Interceptor] Token exists:', !!token);

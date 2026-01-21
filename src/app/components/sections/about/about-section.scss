@@ -2,70 +2,70 @@
   ABOUT SECTION
 -----------------------------------------*/
 .about-section .custom-text-block {
-  background: var(--secondary-color);
-  background-color: var(--green-color);
+	background: var(--secondary-color);
+	background-color: var(--green-color);
 }
 
 .custom-text-block {
-  background: var(--green-color);
-  padding: 80px 60px;
-  height: 100%;
+	background: var(--green-color);
+	padding: 80px 60px;
+	height: 100%;
 }
 
 .about-image-wrap,
 .video-thumb {
-  position: relative;
-  overflow: hidden;
-  height: 100%;
+	position: relative;
+	overflow: hidden;
+	height: 100%;
 }
 
 .about-info {
-  background: var(--primary-color);
-  border-radius: var(--border-radius-medium);
-  border-top: 30px solid var(--secondary-color);
-  position: absolute;
-  bottom: 0;
-  right: 0;
-  margin: 20px;
-  padding: 20px;
+	background: var(--primary-color);
+	border-radius: var(--border-radius-medium);
+	border-top: 30px solid var(--secondary-color);
+	position: absolute;
+	bottom: 0;
+	right: 0;
+	margin: 20px;
+	padding: 20px;
 }
 
 .about-image {
-  display: block;
-  object-fit: cover;
-  height: 100%;
+	display: block;
+	object-fit: cover;
+	height: 100%;
 }
 
 .custom-border-radius-start {
-  border-radius: var(--border-radius-medium) 0 0 var(--border-radius-medium);
+	border-radius: var(--border-radius-medium) 0 0 var(--border-radius-medium);
 }
 
 .custom-border-radius-end {
-  border-radius: 0 var(--border-radius-medium) var(--border-radius-medium) 0;
+	border-radius: 0 var(--border-radius-medium) var(--border-radius-medium) 0;
 }
 
 .instagram-block {
-  position: relative;
-  height: 100%;
+	position: relative;
+	height: 100%;
 }
 
 .instagram-block-text {
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
+	position: absolute;
+	top: 50%;
+	left: 50%;
+	transform: translate(-50%, -50%);
 }
 
 @media screen and (max-width: 991px) {
-  .custom-text-block {
-    padding: 50px 30px;
-  }
+	.custom-text-block {
+		padding: 50px 30px;
+	}
 
-  .custom-border-radius-start {
-    border-radius: var(--border-radius-medium) var(--border-radius-medium) 0 0;
-  }
+	.custom-border-radius-start {
+		border-radius: var(--border-radius-medium) var(--border-radius-medium) 0 0;
+	}
 
-  .custom-border-radius-end {
-    border-radius: 0 0 var(--border-radius-medium) var(--border-radius-medium);
-  }
+	.custom-border-radius-end {
+		border-radius: 0 0 var(--border-radius-medium) var(--border-radius-medium);
+	}
 }

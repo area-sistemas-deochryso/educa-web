@@ -35,7 +35,7 @@ export class AttendanceTableComponent {
 	getStatusClass = getStatusClass;
 
 	get hijosOptions(): HijoOption[] {
-		return this.hijos().map(h => ({
+		return this.hijos().map((h) => ({
 			label: `${h.nombreCompleto} (${h.grado} - ${h.seccion})`,
 			value: h.estudianteId,
 		}));

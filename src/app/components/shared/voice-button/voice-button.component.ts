@@ -3,7 +3,6 @@ import {
 	Component,
 	ElementRef,
 	HostListener,
-	OnDestroy,
 	ViewChild,
 	computed,
 	inject,
@@ -56,44 +55,6 @@ export class VoiceButtonComponent implements AfterViewInit {
 
 	isOnline = signal(false);
 	isSecureContext = computed(() => this.checkSecureContext());
-
-	private connectivityCheckInterval: ReturnType<typeof setInterval> | null = null;
-	private isCheckingConnectivity = false;
-
-	/**
-	 * Probe de conectividad REAL:
-	 * - Si falla (timeout, fetch error, etc.) => offline
-	 * - Usa mismo origin para evitar CORS
-	 */
-	private async checkRealConnectivity(): Promise<boolean> {
-		if (!navigator.onLine) return false;
-		if (this.isCheckingConnectivity) return this.isOnline(); // evita solapamiento
-
-		this.isCheckingConnectivity = true;
-		try {
-			const controller = new AbortController();
-			const timeoutId = setTimeout(() => controller.abort(), 2500);
-
-			// ⚠️ Recomendado: mismo origen (assets) => sin CORS y muy estable
-			// Agregamos cache-busting para evitar caches agresivos sin usar no-store
-			const url = `/assets/ping.txt?ts=${Date.now()}`;
-
-			const res = await fetch(url, {
-				method: 'GET',
-				cache: 'no-cache',
-				signal: controller.signal,
-			});
-
-			clearTimeout(timeoutId);
-
-			// Si no responde OK => consideramos offline para tu lógica
-			return res.ok;
-		} catch {
-			return false;
-		} finally {
-			this.isCheckingConnectivity = false;
-		}
-	}
 
 	private checkSecureContext(): boolean {
 		return (

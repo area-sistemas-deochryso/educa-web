@@ -119,7 +119,12 @@ export class CalendaryComponent implements OnInit, AfterViewInit {
 		};
 	}
 
-	private createCalendarDay(date: number, fullDate: Date, isCurrentMonth: boolean, isToday = false): CalendarDay {
+	private createCalendarDay(
+		date: number,
+		fullDate: Date,
+		isCurrentMonth: boolean,
+		isToday = false,
+	): CalendarDay {
 		const holiday = isHoliday(fullDate);
 		const event = getEvent(fullDate);
 		const rangeEvent = isDateInEventRange(fullDate);

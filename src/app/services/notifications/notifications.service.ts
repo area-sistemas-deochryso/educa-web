@@ -7,10 +7,7 @@ import {
 	getTodayNotifications,
 } from './notifications.config';
 import { logger } from '@app/helpers';
-
-const DISMISSED_KEY = 'educa_dismissed_notifications';
-const LAST_CHECK_KEY = 'educa_last_notification_check';
-const READ_KEY = 'educa_read_notifications';
+import { StorageService } from '../storage';
 
 /** Conteo por prioridad */
 export interface PriorityCount {
@@ -25,6 +22,7 @@ export interface PriorityCount {
 })
 export class NotificationsService {
 	private platformId = inject(PLATFORM_ID);
+	private storage = inject(StorageService);
 
 	/** Notificaciones activas para mostrar */
 	readonly activeNotifications = signal<SeasonalNotification[]>([]);
@@ -69,6 +67,7 @@ export class NotificationsService {
 			this.loadReadNotifications();
 			this.checkNotifications();
 			this.startPeriodicCheck();
+			this.listenToServiceWorker();
 		}
 	}
 
@@ -83,13 +82,91 @@ export class NotificationsService {
 	}
 
 	/**
+	 * Escucha mensajes del Service Worker (Push notifications)
+	 * Push es el wake-up call - el SW nos notifica cuando llega algo
+	 */
+	private listenToServiceWorker(): void {
+		if (!('serviceWorker' in navigator)) {
+			logger.warn('[Notifications] Service Worker no soportado');
+			return;
+		}
+
+		navigator.serviceWorker.addEventListener('message', (event) => {
+			const { type, payload } = event.data || {};
+
+			switch (type) {
+				case 'PUSH_RECEIVED':
+					this.handlePushReceived(payload);
+					break;
+				case 'NOTIFICATION_CLICKED':
+					this.handleNotificationClicked(payload);
+					break;
+				case 'NOTIFICATION_CLOSED':
+					this.handleNotificationClosed(payload);
+					break;
+				default:
+					logger.log('[Notifications] SW message:', event.data);
+			}
+		});
+
+		logger.log('[Notifications] Escuchando mensajes del Service Worker');
+	}
+
+	/**
+	 * Maneja la recepción de un Push
+	 * Reproduce sonido y actualiza estado
+	 */
+	private handlePushReceived(payload: any): void {
+		logger.log('[Notifications] Push recibido:', payload);
+
+		// Reproducir sonido de notificación
+		this.playSound();
+
+		// Incrementar contador de no leídas
+		this.unreadCount.update((count) => count + 1);
+		this.hasUnread.set(true);
+
+		// Actualizar conteo por prioridad si viene en el payload
+		if (payload?.priority) {
+			this.unreadByPriority.update((counts) => ({
+				...counts,
+				[payload.priority]: (counts[payload.priority as keyof PriorityCount] || 0) + 1,
+			}));
+		}
+
+		// Re-verificar notificaciones locales también
+		this.checkNotifications();
+	}
+
+	/**
+	 * Maneja click en notificación nativa
+	 */
+	private handleNotificationClicked(payload: any): void {
+		logger.log('[Notifications] Notification clicked:', payload);
+
+		// Marcar como leída si tiene ID
+		if (payload?.id) {
+			this.markAsRead(payload.id);
+		}
+
+		// Navegar a la URL si se especificó (la navegación la maneja el SW)
+	}
+
+	/**
+	 * Maneja cierre de notificación sin click
+	 */
+	private handleNotificationClosed(payload: any): void {
+		logger.log('[Notifications] Notification closed:', payload);
+		// Opcional: marcar como leída o dejar sin leer
+	}
+
+	/**
 	 * Carga las notificaciones descartadas del localStorage
 	 */
 	private loadDismissedNotifications(): void {
 		try {
-			const stored = localStorage.getItem(DISMISSED_KEY);
-			if (stored) {
-				const data = JSON.parse(stored) as { ids: string[]; date: string };
+			const data = this.storage.getDismissedNotifications();
+			if (data) {
 				// Limpiar descartados del día anterior
 				const storedDate = new Date(data.date).toDateString();
 				const today = new Date().toDateString();
@@ -112,11 +189,10 @@ export class NotificationsService {
 	 */
 	private saveDismissedNotifications(): void {
 		try {
-			const data = {
+			this.storage.setDismissedNotifications({
 				ids: Array.from(this.dismissedIds),
 				date: new Date().toISOString(),
-			};
-			localStorage.setItem(DISMISSED_KEY, JSON.stringify(data));
+			});
 		} catch (e) {
 			logger.error('[Notifications] Error saving dismissed:', e);
 		}
@@ -127,7 +203,7 @@ export class NotificationsService {
 	 */
 	private clearDismissed(): void {
 		this.dismissedIds.clear();
-		localStorage.removeItem(DISMISSED_KEY);
+		this.storage.removeDismissedNotifications();
 	}
 
 	/**
@@ -135,9 +211,8 @@ export class NotificationsService {
 	 */
 	private loadReadNotifications(): void {
 		try {
-			const stored = localStorage.getItem(READ_KEY);
-			if (stored) {
-				const data = JSON.parse(stored) as { ids: string[]; date: string };
+			const data = this.storage.getReadNotifications();
+			if (data) {
 				const storedDate = new Date(data.date).toDateString();
 				const today = new Date().toDateString();
 
@@ -158,11 +233,10 @@ export class NotificationsService {
 	 */
 	private saveReadNotifications(): void {
 		try {
-			const data = {
+			this.storage.setReadNotifications({
 				ids: Array.from(this.readIds),
 				date: new Date().toISOString(),
-			};
-			localStorage.setItem(READ_KEY, JSON.stringify(data));
+			});
 		} catch (e) {
 			logger.error('[Notifications] Error saving read:', e);
 		}
@@ -173,7 +247,7 @@ export class NotificationsService {
 	 */
 	private clearRead(): void {
 		this.readIds.clear();
-		localStorage.removeItem(READ_KEY);
+		this.storage.removeReadNotifications();
 	}
 
 	/**
@@ -205,10 +279,13 @@ export class NotificationsService {
 		this.hasUnread.set(unread.length > 0);
 		this.unreadByPriority.set(priorityCounts);
 
-		logger.log(`[Notifications] ${active.length} activas, ${unread.length} sin leer`, priorityCounts);
+		logger.log(
+			`[Notifications] ${active.length} activas, ${unread.length} sin leer`,
+			priorityCounts,
+		);
 
 		// Guardar última verificación
-		localStorage.setItem(LAST_CHECK_KEY, today.toISOString());
+		this.storage.setLastNotificationCheck(today.toISOString());
 
 		// Reproducir sonido si hay no leídas y no se ha reproducido aún
 		if (unread.length > 0 && !this.hasPlayedSound) {
@@ -227,9 +304,12 @@ export class NotificationsService {
 	 */
 	private startPeriodicCheck(): void {
 		// Verificar cada hora
-		this.checkInterval = setInterval(() => {
-			this.checkNotifications();
-		}, 60 * 60 * 1000);
+		this.checkInterval = setInterval(
+			() => {
+				this.checkNotifications();
+			},
+			60 * 60 * 1000,
+		);
 	}
 
 	/**

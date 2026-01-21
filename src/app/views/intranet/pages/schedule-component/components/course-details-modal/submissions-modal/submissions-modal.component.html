@@ -14,7 +14,11 @@
 
 		<div class="submissions-list">
 			@for (submission of submissions; track submission.id) {
-				<div class="submission-item" [class.unread]="!submission.isRead" (click)="viewSubmission(submission)">
+				<div
+					class="submission-item"
+					[class.unread]="!submission.isRead"
+					(click)="viewSubmission(submission)"
+				>
 					<div class="submission-icon" [ngClass]="getStatusClass(submission.status)">
 						<i class="pi" [ngClass]="getStatusIcon(submission.status)"></i>
 					</div>

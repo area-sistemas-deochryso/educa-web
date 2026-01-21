@@ -306,3 +306,114 @@ self.addEventListener('message', event => {
 		listCachedUrls();
 	}
 });
+
+// =============================================================================
+// PUSH NOTIFICATIONS
+// Push es el wake-up call, no el mensaje completo.
+// El SW recibe el push, muestra notificación nativa y avisa a la app.
+// =============================================================================
+
+// Recibir Push del servidor
+self.addEventListener('push', event => {
+	console.log('[SW] Push recibido');
+
+	let data = {
+		title: 'EducaWeb',
+		body: 'Tienes una nueva notificación',
+		icon: '/images/common/icono.png',
+		url: '/',
+		tag: 'educa-notification',
+		priority: 'medium'
+	};
+
+	// Intentar parsear el payload del push
+	if (event.data) {
+		try {
+			const payload = event.data.json();
+			data = { ...data, ...payload };
+		} catch (e) {
+			// Si no es JSON, usar el texto como body
+			data.body = event.data.text() || data.body;
+		}
+	}
+
+	console.log('[SW] Push data:', data);
+
+	// Opciones de la notificación nativa
+	const options = {
+		body: data.body,
+		icon: data.icon || '/images/common/icono.png',
+		badge: '/images/common/badge-72.png',
+		tag: data.tag || 'educa-notification',
+		data: {
+			url: data.url || '/',
+			id: data.id,
+			priority: data.priority
+		},
+		requireInteraction: data.priority === 'urgent' || data.priority === 'high',
+		vibrate: data.priority === 'urgent' ? [200, 100, 200] : [100, 50, 100],
+		actions: data.actions || []
+	};
+
+	// Mostrar notificación nativa Y notificar a la app
+	event.waitUntil(
+		Promise.all([
+			self.registration.showNotification(data.title, options),
+			notifyClients({
+				type: 'PUSH_RECEIVED',
+				payload: data
+			})
+		])
+	);
+});
+
+// Click en notificación nativa
+self.addEventListener('notificationclick', event => {
+	console.log('[SW] Notification click:', event.notification.tag);
+
+	event.notification.close();
+
+	const url = event.notification.data?.url || '/';
+	const notificationId = event.notification.data?.id;
+
+	event.waitUntil(
+		clients.matchAll({ type: 'window', includeUncontrolled: true }).then(clientList => {
+			// Buscar si hay una ventana abierta
+			for (const client of clientList) {
+				if (client.url.includes(self.location.origin) && 'focus' in client) {
+					// Notificar a la app que se hizo click
+					client.postMessage({
+						type: 'NOTIFICATION_CLICKED',
+						payload: { id: notificationId, url }
+					});
+					return client.focus();
+				}
+			}
+			// Si no hay ventana abierta, abrir una nueva
+			if (clients.openWindow) {
+				return clients.openWindow(url);
+			}
+		})
+	);
+});
+
+// Notificación cerrada sin click
+self.addEventListener('notificationclose', event => {
+	console.log('[SW] Notification closed:', event.notification.tag);
+
+	const notificationId = event.notification.data?.id;
+
+	// Notificar a la app que se cerró
+	notifyClients({
+		type: 'NOTIFICATION_CLOSED',
+		payload: { id: notificationId }
+	});
+});
+
+// Helper para notificar a todos los clientes (ventanas de la app)
+async function notifyClients(message) {
+	const allClients = await clients.matchAll({ type: 'window', includeUncontrolled: true });
+	for (const client of allClients) {
+		client.postMessage(message);
+	}
+}

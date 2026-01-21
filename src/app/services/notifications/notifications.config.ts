@@ -55,7 +55,13 @@ export function isMonth(date: Date, month: number): boolean {
 /**
  * Verifica si está dentro de un rango de fechas específicas
  */
-export function isWithinDateRange(date: Date, startMonth: number, startDay: number, endMonth: number, endDay: number): boolean {
+export function isWithinDateRange(
+	date: Date,
+	startMonth: number,
+	startDay: number,
+	endMonth: number,
+	endDay: number,
+): boolean {
 	const month = date.getMonth() + 1;
 	const day = date.getDate();
 
@@ -194,7 +200,8 @@ export const ACADEMICO_NOTIFICATIONS: SeasonalNotification[] = [
 		id: 'notas-primer-bimestre',
 		type: 'academico',
 		title: 'Notas del Primer Bimestre',
-		message: 'Ya están disponibles las notas del primer bimestre. Revisa tu rendimiento académico.',
+		message:
+			'Ya están disponibles las notas del primer bimestre. Revisa tu rendimiento académico.',
 		icon: 'pi-chart-bar',
 		priority: 'high',
 		shouldShow: (date) => isMonth(date, 5) && isWithinMonthDays(date, 1, 7),
@@ -284,14 +291,17 @@ export const FESTIVIDAD_NOTIFICATIONS: SeasonalNotification[] = [
 		id: 'semana-santa',
 		type: 'festividad',
 		title: 'Vacaciones de Semana Santa',
-		message: 'Disfruta de las vacaciones de Semana Santa. Las clases se reanudan el lunes siguiente.',
+		message:
+			'Disfruta de las vacaciones de Semana Santa. Las clases se reanudan el lunes siguiente.',
 		icon: 'pi-sun',
 		priority: 'medium',
 		shouldShow: (date) => {
 			// Semana Santa generalmente entre 20 marzo - 20 abril
 			const month = date.getMonth() + 1;
 			const day = date.getDate();
-			return (month === 3 && day >= 24 && day <= 31) || (month === 4 && day >= 1 && day <= 10);
+			return (
+				(month === 3 && day >= 24 && day <= 31) || (month === 4 && day >= 1 && day <= 10)
+			);
 		},
 		dismissible: true,
 	},
@@ -476,7 +486,8 @@ export const FESTIVIDAD_NOTIFICATIONS: SeasonalNotification[] = [
 		id: 'batalla-ayacucho',
 		type: 'festividad',
 		title: 'Batalla de Ayacucho',
-		message: 'Conmemoración de la Batalla de Ayacucho (1824), victoria que selló la independencia.',
+		message:
+			'Conmemoración de la Batalla de Ayacucho (1824), victoria que selló la independencia.',
 		icon: 'pi-star',
 		priority: 'low',
 		shouldShow: (date) => isExactDate(date, 12, 9),

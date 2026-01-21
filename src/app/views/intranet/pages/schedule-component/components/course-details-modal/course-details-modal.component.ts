@@ -33,7 +33,15 @@ export interface CourseDetails {
 
 @Component({
 	selector: 'app-course-details-modal',
-	imports: [CommonModule, FormsModule, DialogModule, TooltipModule, AttachmentsModalComponent, TasksModalComponent, SubmissionsModalComponent],
+	imports: [
+		CommonModule,
+		FormsModule,
+		DialogModule,
+		TooltipModule,
+		AttachmentsModalComponent,
+		TasksModalComponent,
+		SubmissionsModalComponent,
+	],
 	templateUrl: './course-details-modal.component.html',
 	styleUrl: './course-details-modal.component.scss',
 })
@@ -89,7 +97,8 @@ export class CourseDetailsModalComponent implements OnChanges {
 				id: i + 1,
 				name: `SEMANA ${i + 1}`,
 				expanded: false,
-				teacherMessage: 'Mensaje del docente: _______________________________________________',
+				teacherMessage:
+					'Mensaje del docente: _______________________________________________',
 				attachments: { count: 5, unread: 4, reviewed: 1 },
 				pendingTasks: { count: 2, unread: 2 },
 				submittedTasks: { count: 1, unread: 1, reviewed: 0 },
@@ -101,7 +110,12 @@ export class CourseDetailsModalComponent implements OnChanges {
 				{ name: 'Examen Calificado 4', grade: 0 },
 				{ name: 'Examen Calificado 5', grade: 0 },
 			],
-			workGroup: ['Tupac Yupanqui María José', 'García López Pedro', 'Rodríguez Silva Ana', 'Mendoza Quispe Carlos'],
+			workGroup: [
+				'Tupac Yupanqui María José',
+				'García López Pedro',
+				'Rodríguez Silva Ana',
+				'Mendoza Quispe Carlos',
+			],
 			teacher: 'Sifuentes García Diana Isabella',
 		};
 	}
@@ -116,9 +130,8 @@ export class CourseDetailsModalComponent implements OnChanges {
 			return this.currentCourseDetails.weeks;
 		}
 		const term = this.weekSearchTerm.toLowerCase();
-		return this.currentCourseDetails.weeks.filter(week =>
-			week.name.toLowerCase().includes(term) ||
-			`semana ${week.id}`.includes(term)
+		return this.currentCourseDetails.weeks.filter(
+			(week) => week.name.toLowerCase().includes(term) || `semana ${week.id}`.includes(term),
 		);
 	}
 
@@ -133,8 +146,8 @@ export class CourseDetailsModalComponent implements OnChanges {
 	onCourseSearch(): void {
 		if (this.courseSearchTerm.trim()) {
 			const term = this.courseSearchTerm.toLowerCase();
-			this.courseSearchResults = this.validCourses.filter(course =>
-				course.toLowerCase().includes(term)
+			this.courseSearchResults = this.validCourses.filter((course) =>
+				course.toLowerCase().includes(term),
 			);
 			this.showCourseDropdown = this.courseSearchResults.length > 0;
 		} else {

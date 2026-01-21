@@ -208,9 +208,7 @@
 					@if (notification.dismissible !== false) {
 						<button
 							class="notification-dismiss"
-							(click)="
-								dismissNotification(notification.id); $event.stopPropagation()
-							"
+							(click)="dismissNotification(notification.id); $event.stopPropagation()"
 							title="Descartar"
 						>
 							<i class="pi pi-times"></i>
