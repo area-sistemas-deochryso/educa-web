@@ -34,6 +34,7 @@ const SESSION_KEYS = {
 const LOCAL_KEYS = {
 	TOKEN: 'educa_persistent_token',
 	USER: 'educa_persistent_user',
+	REMEMBER_TOKEN: 'educa_remember_token', // Token para autocompletar login (no se borra con logout)
 } as const;
 
 @Injectable({
@@ -133,6 +134,8 @@ export class SessionStorageService {
 			// Guardar en localStorage para persistir
 			this.setLocalItem(LOCAL_KEYS.TOKEN, token);
 			this.setLocalItem(SESSION_KEYS.REMEMBER_ME, 'true');
+			// Guardar token para autocompletar (no se borra con logout)
+			this.setLocalItem(LOCAL_KEYS.REMEMBER_TOKEN, token);
 			// Limpiar sessionStorage
 			this.removeItem(SESSION_KEYS.TOKEN);
 		} else {
@@ -184,6 +187,19 @@ export class SessionStorageService {
 		this.removeToken();
 		this.removeUser();
 		this.removeLocalItem(SESSION_KEYS.REMEMBER_ME);
+		// Nota: REMEMBER_TOKEN NO se borra, se usa para autocompletar el login
+	}
+
+	// ============================================
+	// REMEMBER TOKEN - Para autocompletar login
+	// ============================================
+
+	getRememberToken(): string | null {
+		return this.getLocalItem(LOCAL_KEYS.REMEMBER_TOKEN);
+	}
+
+	clearRememberToken(): void {
+		this.removeLocalItem(LOCAL_KEYS.REMEMBER_TOKEN);
 	}
 
 	// ============================================

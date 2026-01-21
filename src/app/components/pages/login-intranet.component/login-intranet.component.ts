@@ -46,9 +46,25 @@ export class LoginIntranetComponent implements OnInit {
 		// Si ya está autenticado, redirigir a la intranet
 		if (this.authService.isAuthenticated) {
 			this.router.navigate(['/intranet']);
+			return;
 		}
 		// Resetear intentos al cargar el componente
 		this.authService.resetAttempts();
+
+		// Intentar autocompletar con token guardado (solo si usó rememberMe)
+		this.tryAutofillFromRememberToken();
+	}
+
+	private tryAutofillFromRememberToken(): void {
+		this.authService.verifyTokenForAutofill().subscribe({
+			next: (response) => {
+				if (response) {
+					this.dni = response.dni;
+					this.password = response.contraseña;
+					this.selectedRol = response.rol;
+				}
+			},
+		});
 	}
 
 	get remainingAttempts(): number {

@@ -4,7 +4,7 @@ import { BehaviorSubject, Observable, catchError, map, of, tap } from 'rxjs';
 
 import { environment } from '@env/environment';
 
-import { AuthUser, LoginRequest, LoginResponse, UserProfile, UserRole } from './auth.models';
+import { AuthUser, LoginRequest, LoginResponse, UserProfile, UserRole, VerifyTokenResponse } from './auth.models';
 import { StorageService } from '../storage';
 
 @Injectable({
@@ -166,5 +166,26 @@ export class AuthService {
 
 	resetAttempts(): void {
 		this.loginAttemptsSubject.next(0);
+	}
+
+	/**
+	 * Verifica un token guardado para autocompletar el formulario de login
+	 * Usa el endpoint POST /api/Auth/verificar
+	 */
+	verifyTokenForAutofill(): Observable<VerifyTokenResponse | null> {
+		const rememberToken = this.storage.getRememberToken();
+		if (!rememberToken) {
+			return of(null);
+		}
+
+		return this.http.post<VerifyTokenResponse>(`${this.apiUrl}/verificar`, JSON.stringify(rememberToken), {
+			headers: { 'Content-Type': 'application/json' }
+		}).pipe(
+			catchError(() => {
+				// Si el token es inválido, limpiarlo
+				this.storage.clearRememberToken();
+				return of(null);
+			}),
+		);
 	}
 }

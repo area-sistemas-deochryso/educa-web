@@ -40,3 +40,13 @@ export interface AuthUser {
 	sedeId: number;
 	dni?: string;
 }
+
+// Response del endpoint POST /api/Auth/verificar
+export interface VerifyTokenResponse {
+	dni: string;
+	contraseña: string;
+	rol: UserRole;
+	nombreCompleto: string;
+	entityId: number;
+	sedeId: number;
+}

@@ -67,6 +67,14 @@ export class StorageService {
 		this.session.clearAuth();
 	}
 
+	getRememberToken(): string | null {
+		return this.session.getRememberToken();
+	}
+
+	clearRememberToken(): void {
+		this.session.clearRememberToken();
+	}
+
 	// ============================================
 	// NOTIFICATIONS - Delegado a IndexedDB (async)
 	// Con fallback síncrono para compatibilidad
