@@ -7,11 +7,13 @@ import {
 	computed,
 	inject,
 	signal,
+	OnInit,
+	OnDestroy,
 } from '@angular/core';
 import { VOICE_COMMANDS, VoiceCommandCategory } from '@app/services/speech/voice-commands.config';
 
 import { CommonModule } from '@angular/common';
-import { VoiceRecognitionService } from '@app/services';
+import { VoiceRecognitionService, KeyboardShortcutsService } from '@app/services';
 import { logger } from '@app/helpers';
 
 @Component({
@@ -21,17 +23,18 @@ import { logger } from '@app/helpers';
 	templateUrl: './voice-button.component.html',
 	styleUrl: './voice-button.component.scss',
 })
-export class VoiceButtonComponent implements AfterViewInit {
+export class VoiceButtonComponent implements OnInit, AfterViewInit, OnDestroy {
 	@ViewChild('voiceButton') voiceButton!: ElementRef<HTMLButtonElement>;
 
 	voiceService = inject(VoiceRecognitionService);
+	private keyboardService = inject(KeyboardShortcutsService);
 
 	isDragging = false;
 	dragStartY = 0;
 	currentDragY = 0;
 	lockThreshold = 80;
 	showLockIndicator = false;
-	isVisible = true;
+	isVisible = signal(true);
 
 	showContextMenu = false;
 	contextMenuPosition = { x: 0, y: 0 };
@@ -65,19 +68,21 @@ export class VoiceButtonComponent implements AfterViewInit {
 		);
 	}
 
+	ngOnInit(): void {
+		// Registrar atajo de teclado
+		this.keyboardService.register('toggle-voice-button', () => {
+			this.isVisible.update((v) => !v);
+		});
+	}
+
 	ngAfterViewInit(): void {
 		if (!this.voiceService.isSupported) {
 			logger.warn('Voice recognition not supported');
 		}
 	}
 
-	// --- resto de tu componente sin cambios ---
-	@HostListener('document:keydown', ['$event'])
-	onKeyDown(event: KeyboardEvent): void {
-		if (event.ctrlKey && event.code === 'Space') {
-			event.preventDefault();
-			this.isVisible = !this.isVisible;
-		}
+	ngOnDestroy(): void {
+		this.keyboardService.unregister('toggle-voice-button');
 	}
 
 	onTouchStart(event: TouchEvent): void {

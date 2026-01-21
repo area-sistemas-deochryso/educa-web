@@ -4,3 +4,4 @@ export * from './asistencia';
 export * from './sw';
 export * from './notifications';
 export * from './storage';
+export * from './keyboard';

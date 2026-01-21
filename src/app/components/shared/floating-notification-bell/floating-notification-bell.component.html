@@ -1,7 +1,7 @@
 <!-- Toast de PrimeNG para notificaciones impactantes -->
 <p-toast position="top-right"></p-toast>
 
-<!-- Campana de Notificaciones Flotante -->
+<!-- Campana de Notificaciones Flotante (Alt+B para abrir/cerrar panel) -->
 @if (notificationCount() > 0) {
 	<div class="notification-bell-container" [class.has-unread]="unreadCount() > 0">
 		<button
@@ -51,8 +51,8 @@
 	</div>
 }
 
-<!-- Panel de Notificaciones (solo visible al hacer clic en la campana) -->
-@if (notificationCount() > 0 && isPanelOpen()) {
+<!-- Panel de Notificaciones (Alt+B para abrir/cerrar) -->
+@if (isPanelOpen()) {
 	<div class="notifications-overlay" (click)="togglePanel()"></div>
 	<section class="notifications-section panel-open">
 		<div class="notifications-header">
@@ -66,46 +66,50 @@
 				</div>
 				<div class="header-text">
 					<h2>Notificaciones</h2>
-					<span class="notification-subtitle">
-						{{ notificationCount() }} notificación{{
-							notificationCount() > 1 ? 'es' : ''
-						}}
+					@if (notificationCount() > 0) {
+						<span class="notification-subtitle">
+							{{ notificationCount() }} notificación{{
+								notificationCount() > 1 ? 'es' : ''
+							}}
+							@if (unreadCount() > 0) {
+								<span class="unread-indicator" [class]="getBadgePriorityClass()">
+									({{ unreadCount() }} sin leer)
+								</span>
+							}
+						</span>
+						<!-- Conteo por prioridad -->
 						@if (unreadCount() > 0) {
-							<span class="unread-indicator" [class]="getBadgePriorityClass()">
-								({{ unreadCount() }} sin leer)
-							</span>
+							<div class="priority-summary">
+								@if (unreadByPriority().urgent > 0) {
+									<span class="priority-badge priority-urgent"
+										>{{ unreadByPriority().urgent }} urgente{{
+											unreadByPriority().urgent > 1 ? 's' : ''
+										}}</span
+									>
+								}
+								@if (unreadByPriority().high > 0) {
+									<span class="priority-badge priority-high"
+										>{{ unreadByPriority().high }} importante{{
+											unreadByPriority().high > 1 ? 's' : ''
+										}}</span
+									>
+								}
+								@if (unreadByPriority().medium > 0) {
+									<span class="priority-badge priority-medium"
+										>{{ unreadByPriority().medium }} normal{{
+											unreadByPriority().medium > 1 ? 'es' : ''
+										}}</span
+									>
+								}
+								@if (unreadByPriority().low > 0) {
+									<span class="priority-badge priority-low"
+										>{{ unreadByPriority().low }} info</span
+									>
+								}
+							</div>
 						}
-					</span>
-					<!-- Conteo por prioridad -->
-					@if (unreadCount() > 0) {
-						<div class="priority-summary">
-							@if (unreadByPriority().urgent > 0) {
-								<span class="priority-badge priority-urgent"
-									>{{ unreadByPriority().urgent }} urgente{{
-										unreadByPriority().urgent > 1 ? 's' : ''
-									}}</span
-								>
-							}
-							@if (unreadByPriority().high > 0) {
-								<span class="priority-badge priority-high"
-									>{{ unreadByPriority().high }} importante{{
-										unreadByPriority().high > 1 ? 's' : ''
-									}}</span
-								>
-							}
-							@if (unreadByPriority().medium > 0) {
-								<span class="priority-badge priority-medium"
-									>{{ unreadByPriority().medium }} normal{{
-										unreadByPriority().medium > 1 ? 'es' : ''
-									}}</span
-								>
-							}
-							@if (unreadByPriority().low > 0) {
-								<span class="priority-badge priority-low"
-									>{{ unreadByPriority().low }} info</span
-								>
-							}
-						</div>
+					} @else {
+						<span class="notification-subtitle">No hay notificaciones</span>
 					}
 				</div>
 			</div>
@@ -133,90 +137,137 @@
 			</div>
 		</div>
 
-		<div class="notifications-list">
-			@for (
-				notification of notifications();
-				track trackById($index, notification);
-				let i = $index
-			) {
-				<div
-					class="notification-card"
-					[class]="getPriorityClass(notification.priority)"
-					[class.is-read]="isRead(notification.id)"
-					[class.is-unread]="!isRead(notification.id)"
-					[style.animation-delay]="i * 100 + 'ms'"
-					(click)="markAsRead(notification.id)"
-				>
-					<!-- Indicador de no leído -->
-					@if (!isRead(notification.id)) {
-						<div
-							class="unread-dot pulse"
-							[class]="getPriorityClass(notification.priority)"
-						></div>
-					}
+		@if (notificationCount() > 0) {
+			<div class="notifications-list">
+				@for (
+					notification of notifications();
+					track trackById($index, notification);
+					let i = $index
+				) {
+					<div
+						class="notification-card"
+						[class]="getPriorityClass(notification.priority)"
+						[class.is-read]="isRead(notification.id)"
+						[class.is-unread]="!isRead(notification.id)"
+						[style.animation-delay]="i * 100 + 'ms'"
+						(click)="markAsRead(notification.id)"
+					>
+						<!-- Indicador de no leído -->
+						@if (!isRead(notification.id)) {
+							<div
+								class="unread-dot pulse"
+								[class]="getPriorityClass(notification.priority)"
+							></div>
+						}
 
-					<div class="notification-icon" [class]="'icon-' + notification.type">
-						<i
-							class="pi"
-							[class]="notification.icon || getTypeIcon(notification.type)"
-						></i>
-					</div>
-
-					<div class="notification-content">
-						<div class="notification-meta">
-							<span
-								class="notification-type-badge"
-								[attr.data-type]="notification.type"
-							>
-								{{ getTypeLabel(notification.type) }}
-							</span>
-							<span
-								class="priority-indicator"
-								[attr.data-priority]="notification.priority"
-							>
-								@switch (notification.priority) {
-									@case ('urgent') {
-										Urgente
-									}
-									@case ('high') {
-										Importante
-									}
-									@case ('medium') {
-										Normal
-									}
-									@case ('low') {
-										Info
-									}
-								}
-							</span>
+						<div class="notification-icon" [class]="'icon-' + notification.type">
+							<i
+								class="pi"
+								[class]="notification.icon || getTypeIcon(notification.type)"
+							></i>
 						</div>
-						<h3 class="notification-title">{{ notification.title }}</h3>
-						<p class="notification-message">{{ notification.message }}</p>
 
-						@if (notification.actionUrl) {
-							<a
-								[routerLink]="notification.actionUrl"
-								class="notification-action"
-								(click)="$event.stopPropagation()"
+						<div class="notification-content">
+							<div class="notification-meta">
+								<span
+									class="notification-type-badge"
+									[attr.data-type]="notification.type"
+								>
+									{{ getTypeLabel(notification.type) }}
+								</span>
+								<span
+									class="priority-indicator"
+									[attr.data-priority]="notification.priority"
+								>
+									@switch (notification.priority) {
+										@case ('urgent') {
+											Urgente
+										}
+										@case ('high') {
+											Importante
+										}
+										@case ('medium') {
+											Normal
+										}
+										@case ('low') {
+											Info
+										}
+									}
+								</span>
+							</div>
+							<h3 class="notification-title">{{ notification.title }}</h3>
+							<p class="notification-message">{{ notification.message }}</p>
+
+							@if (notification.actionUrl) {
+								<a
+									[routerLink]="notification.actionUrl"
+									class="notification-action"
+									(click)="$event.stopPropagation()"
+								>
+									<span>{{ notification.actionText || 'Ver más' }}</span>
+									<i class="pi pi-arrow-right"></i>
+								</a>
+							}
+						</div>
+
+						@if (notification.dismissible !== false) {
+							<button
+								class="notification-dismiss"
+								(click)="dismissNotification(notification.id); $event.stopPropagation()"
+								title="Descartar"
 							>
-								<span>{{ notification.actionText || 'Ver más' }}</span>
-								<i class="pi pi-arrow-right"></i>
-							</a>
+								<i class="pi pi-times"></i>
+							</button>
 						}
 					</div>
+				}
+			</div>
+		} @else {
+			<div class="notifications-empty">
+				<i class="pi pi-inbox"></i>
+				<p>No tienes notificaciones pendientes</p>
+			</div>
+		}
 
-					@if (notification.dismissible !== false) {
-						<button
-							class="notification-dismiss"
-							(click)="dismissNotification(notification.id); $event.stopPropagation()"
-							title="Descartar"
-						>
-							<i class="pi pi-times"></i>
-						</button>
-					}
-				</div>
-			}
-		</div>
+		<!-- Historial de descartadas -->
+		@if (dismissedCount() > 0) {
+			<div class="dismissed-section">
+				<button class="dismissed-toggle" (click)="toggleDismissedHistory()">
+					<i class="pi" [class.pi-chevron-down]="!showDismissedHistory()" [class.pi-chevron-up]="showDismissedHistory()"></i>
+					<span>{{ dismissedCount() }} descartada{{ dismissedCount() > 1 ? 's' : '' }}</span>
+				</button>
+
+				@if (showDismissedHistory()) {
+					<div class="dismissed-list">
+						<div class="dismissed-header">
+							<span>Notificaciones descartadas</span>
+							<button class="restore-all-btn" (click)="restoreAll()" title="Restaurar todas">
+								<i class="pi pi-refresh"></i>
+								<span>Restaurar todas</span>
+							</button>
+						</div>
+						@for (notification of dismissedNotifications(); track trackById($index, notification)) {
+							<div class="dismissed-card" [class]="getPriorityClass(notification.priority)">
+								<div class="dismissed-icon">
+									<i class="pi" [class]="notification.icon || getTypeIcon(notification.type)"></i>
+								</div>
+								<div class="dismissed-content">
+									<span class="dismissed-title">{{ notification.title }}</span>
+									<span class="dismissed-type">{{ getTypeLabel(notification.type) }}</span>
+								</div>
+								<button
+									class="restore-btn"
+									(click)="restoreNotification(notification.id)"
+									title="Restaurar"
+								>
+									<i class="pi pi-undo"></i>
+								</button>
+							</div>
+						}
+					</div>
+				}
+			</div>
+		}
 
 		<!-- Link para ver todas en /intranet -->
 		<div class="notifications-footer">

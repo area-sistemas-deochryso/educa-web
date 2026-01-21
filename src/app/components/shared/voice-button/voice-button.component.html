@@ -1,4 +1,4 @@
-@if (voiceService.isSupported && isVisible && isSecureContext()) {
+@if (voiceService.isSupported && isVisible() && isSecureContext()) {
 	<div class="voice-container">
 		<!-- Indicador de bloqueo -->
 		@if (showLockIndicator || voiceService.isLocked()) {

@@ -1,7 +1,12 @@
-import { Component, inject, signal, OnInit, OnDestroy, HostListener } from '@angular/core';
+import { Component, inject, OnInit, OnDestroy, HostListener } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterLink } from '@angular/router';
-import { NotificationsService, SeasonalNotification, NotificationPriority } from '@app/services';
+import {
+	NotificationsService,
+	SeasonalNotification,
+	NotificationPriority,
+	KeyboardShortcutsService,
+} from '@app/services';
 import { ToastModule } from 'primeng/toast';
 import { MessageService } from 'primeng/api';
 
@@ -48,6 +53,7 @@ const PRIORITY_LEGEND: PriorityInfo[] = [
 })
 export class FloatingNotificationBellComponent implements OnInit, OnDestroy {
 	private notificationsService = inject(NotificationsService);
+	private keyboardService = inject(KeyboardShortcutsService);
 	private messageService = inject(MessageService);
 
 	notifications = this.notificationsService.activeNotifications;
@@ -57,6 +63,9 @@ export class FloatingNotificationBellComponent implements OnInit, OnDestroy {
 	isPanelOpen = this.notificationsService.isPanelOpen;
 	unreadByPriority = this.notificationsService.unreadByPriority;
 	highestPriority = this.notificationsService.highestPriority;
+	dismissedNotifications = this.notificationsService.dismissedNotifications;
+	dismissedCount = this.notificationsService.dismissedCount;
+	showDismissedHistory = this.notificationsService.showDismissedHistory;
 
 	// Context menu
 	showContextMenu = false;
@@ -66,6 +75,11 @@ export class FloatingNotificationBellComponent implements OnInit, OnDestroy {
 	private hasShownToast = false;
 
 	ngOnInit(): void {
+		// Registrar atajo de teclado para abrir/cerrar panel de notificaciones
+		this.keyboardService.register('toggle-notification-bell', () => {
+			this.notificationsService.togglePanel();
+		});
+
 		// Mostrar toast de PrimeNG si hay notificaciones urgentes o importantes
 		setTimeout(() => {
 			if (this.unreadCount() > 0 && !this.hasShownToast) {
@@ -76,6 +90,7 @@ export class FloatingNotificationBellComponent implements OnInit, OnDestroy {
 	}
 
 	ngOnDestroy(): void {
+		this.keyboardService.unregister('toggle-notification-bell');
 		this.notificationsService.closePanel();
 	}
 
@@ -124,6 +139,18 @@ export class FloatingNotificationBellComponent implements OnInit, OnDestroy {
 
 	dismissAll(): void {
 		this.notificationsService.dismissAll();
+	}
+
+	restoreNotification(id: string): void {
+		this.notificationsService.restore(id);
+	}
+
+	restoreAll(): void {
+		this.notificationsService.restoreAll();
+	}
+
+	toggleDismissedHistory(): void {
+		this.notificationsService.toggleDismissedHistory();
 	}
 
 	markAsRead(id: string): void {

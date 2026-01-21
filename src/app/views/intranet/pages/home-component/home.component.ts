@@ -1,35 +1,23 @@
-import { Component, inject } from '@angular/core';
-import { CommonModule } from '@angular/common';
-import { NotificationsService } from '@app/services';
+import { Component } from '@angular/core';
 import { IntranetBackground } from '../../components/intranet-background/intranet-background';
 import { QuickAccessCard } from '../../components/quick-access-card/quick-access-card';
 import { QuickAccessCardMenu } from '../../components/quick-access-card-menu/quick-access-card-menu';
+import { WelcomeSection } from '../../components/welcome-section/welcome-section';
+import { NotificationQuickAccess } from '../../components/notification-quick-access/notification-quick-access';
 import { COURSE_NAMES } from '../schedule-component/courses.config';
 
 @Component({
 	selector: 'app-home.component',
-	imports: [CommonModule, IntranetBackground, QuickAccessCard, QuickAccessCardMenu],
+	imports: [
+		IntranetBackground,
+		QuickAccessCard,
+		QuickAccessCardMenu,
+		WelcomeSection,
+		NotificationQuickAccess,
+	],
 	templateUrl: './home.component.html',
 	styleUrl: './home.component.scss',
 })
 export class HomeComponent {
-	private notificationsService = inject(NotificationsService);
-
-	unreadCount = this.notificationsService.unreadCount;
-	highestPriority = this.notificationsService.highestPriority;
-
 	availableCourses = COURSE_NAMES;
-
-	togglePanel(): void {
-		this.notificationsService.togglePanel();
-	}
-
-	/**
-	 * Obtiene la clase de color del badge según la prioridad más alta
-	 */
-	getBadgePriorityClass(): string {
-		const priority = this.highestPriority();
-		if (!priority) return '';
-		return `badge-${priority}`;
-	}
 }

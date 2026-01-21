@@ -39,6 +39,15 @@ export class NotificationsService {
 	/** Panel de notificaciones abierto */
 	readonly isPanelOpen = signal(false);
 
+	/** Notificaciones descartadas del día */
+	readonly dismissedNotifications = signal<SeasonalNotification[]>([]);
+
+	/** Contador de descartadas */
+	readonly dismissedCount = computed(() => this.dismissedNotifications().length);
+
+	/** Mostrar historial de descartadas */
+	readonly showDismissedHistory = signal(false);
+
 	/** Conteo por prioridad de notificaciones no leídas */
 	readonly unreadByPriority = signal<PriorityCount>({ urgent: 0, high: 0, medium: 0, low: 0 });
 
@@ -260,6 +269,10 @@ export class NotificationsService {
 		// Filtrar las que ya fueron descartadas
 		const active = todayNotifications.filter((n) => !this.dismissedIds.has(n.id));
 
+		// Obtener las descartadas
+		const dismissed = todayNotifications.filter((n) => this.dismissedIds.has(n.id));
+		this.dismissedNotifications.set(dismissed);
+
 		// Ordenar por prioridad
 		const priorityOrder = { urgent: 0, high: 1, medium: 2, low: 3 };
 		active.sort((a, b) => priorityOrder[a.priority] - priorityOrder[b.priority]);
@@ -377,7 +390,7 @@ export class NotificationsService {
 	 */
 	togglePanel(): void {
 		this.isPanelOpen.update((v) => !v);
-		if (this.isPanelOpen()) {
+		if (this.isPanelOpen() && this.unreadCount() > 0) {
 			this.playSound();
 		}
 	}
@@ -396,7 +409,7 @@ export class NotificationsService {
 		const notification = this.activeNotifications().find((n) => n.id === notificationId);
 
 		// Solo descartar si es dismissible
-		if (notification?.dismissible !== false) {
+		if (notification?.dismissible !== false && notification) {
 			this.dismissedIds.add(notificationId);
 			this.saveDismissedNotifications();
 
@@ -404,6 +417,9 @@ export class NotificationsService {
 			const updated = this.activeNotifications().filter((n) => n.id !== notificationId);
 			this.activeNotifications.set(updated);
 			this.count.set(updated.length);
+
+			// Actualizar lista de descartadas
+			this.dismissedNotifications.update((dismissed) => [...dismissed, notification]);
 
 			// Actualizar no leídas
 			const unread = updated.filter((n) => !this.readIds.has(n.id));
@@ -420,9 +436,12 @@ export class NotificationsService {
 	 */
 	dismissAll(): void {
 		const active = this.activeNotifications();
+		const newlyDismissed: SeasonalNotification[] = [];
+
 		active.forEach((n) => {
 			if (n.dismissible !== false) {
 				this.dismissedIds.add(n.id);
+				newlyDismissed.push(n);
 			}
 		});
 		this.saveDismissedNotifications();
@@ -431,6 +450,9 @@ export class NotificationsService {
 		const remaining = active.filter((n) => n.dismissible === false);
 		this.activeNotifications.set(remaining);
 		this.count.set(remaining.length);
+
+		// Actualizar lista de descartadas
+		this.dismissedNotifications.update((dismissed) => [...dismissed, ...newlyDismissed]);
 
 		// Actualizar no leídas
 		const unread = remaining.filter((n) => !this.readIds.has(n.id));
@@ -446,6 +468,35 @@ export class NotificationsService {
 	 */
 	getByType(type: NotificationType): SeasonalNotification[] {
 		return this.activeNotifications().filter((n) => n.type === type);
+	}
+
+	/**
+	 * Restaura una notificación descartada
+	 */
+	restore(notificationId: string): void {
+		if (this.dismissedIds.has(notificationId)) {
+			this.dismissedIds.delete(notificationId);
+			this.saveDismissedNotifications();
+			this.checkNotifications();
+			logger.log(`[Notifications] Restaurada: ${notificationId}`);
+		}
+	}
+
+	/**
+	 * Restaura todas las notificaciones descartadas
+	 */
+	restoreAll(): void {
+		this.dismissedIds.clear();
+		this.saveDismissedNotifications();
+		this.checkNotifications();
+		logger.log('[Notifications] Todas restauradas');
+	}
+
+	/**
+	 * Alterna la vista del historial de descartadas
+	 */
+	toggleDismissedHistory(): void {
+		this.showDismissedHistory.update((v) => !v);
 	}
 
 	/**
