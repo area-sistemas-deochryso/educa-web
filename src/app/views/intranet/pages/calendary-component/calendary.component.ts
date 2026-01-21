@@ -1,44 +1,25 @@
 import { Component, OnInit, AfterViewInit, signal, inject, PLATFORM_ID } from '@angular/core';
 import { CommonModule, isPlatformBrowser } from '@angular/common';
-import { FormsModule } from '@angular/forms';
 import { ActivatedRoute } from '@angular/router';
 import { IntranetBackground } from '../../components/intranet-background/intranet-background';
-import { isHoliday, Holiday } from './holidays.config';
-import { getEvent, isDateInEventRange, isDateEventEnd, CalendarEvent } from './events.config';
-
-interface CalendarDay {
-	date: number;
-	isCurrentMonth: boolean;
-	isToday: boolean;
-	isWeekend: boolean;
-	isHoliday: boolean;
-	hasEvent: boolean;
-	isInEventRange: boolean; // Día intermedio en un rango de evento
-	isEventEnd: boolean; // Último día de un rango de evento
-	holiday: Holiday | null;
-	event: CalendarEvent | null;
-	rangeEvent: CalendarEvent | null; // Evento del rango (para días intermedios y finales)
-	fullDate: Date;
-}
-
-interface CalendarMonth {
-	name: string;
-	year: number;
-	month: number; // 0-indexed
-	days: CalendarDay[];
-	id: string;
-}
-
-interface ModalData {
-	type: 'holiday' | 'event';
-	date: Date;
-	holiday?: Holiday;
-	event?: CalendarEvent;
-}
+import { CalendarHeaderComponent } from './components/calendar-header/calendar-header.component';
+import { CalendarLegendComponent } from './components/calendar-legend/calendar-legend.component';
+import { CalendarMonthCardComponent } from './components/calendar-month-card/calendar-month-card.component';
+import { CalendarDayModalComponent } from './components/calendar-day-modal/calendar-day-modal.component';
+import { CalendarDay, CalendarMonth, ModalData } from './calendar.types';
+import { isHoliday } from './holidays.config';
+import { getEvent, isDateInEventRange, isDateEventEnd } from './events.config';
 
 @Component({
 	selector: 'app-calendary.component',
-	imports: [CommonModule, FormsModule, IntranetBackground],
+	imports: [
+		CommonModule,
+		IntranetBackground,
+		CalendarHeaderComponent,
+		CalendarLegendComponent,
+		CalendarMonthCardComponent,
+		CalendarDayModalComponent,
+	],
 	templateUrl: './calendary.component.html',
 	styleUrl: './calendary.component.scss',
 })
@@ -48,16 +29,12 @@ export class CalendaryComponent implements OnInit, AfterViewInit {
 
 	calendar = signal<CalendarMonth[]>([]);
 	currentYear = signal(new Date().getFullYear());
-	searchYear = '';
 	today = new Date();
 
-	// Modal
 	showModal = signal(false);
 	modalData = signal<ModalData | null>(null);
 
-	weekDays = ['Dom', 'Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb'];
-
-	monthNames = [
+	private monthNames = [
 		'Enero',
 		'Febrero',
 		'Marzo',
@@ -104,7 +81,7 @@ export class CalendaryComponent implements OnInit, AfterViewInit {
 		const firstDay = new Date(year, month, 1);
 		const lastDay = new Date(year, month + 1, 0);
 		const daysInMonth = lastDay.getDate();
-		const startingDay = firstDay.getDay(); // 0 = Sunday
+		const startingDay = firstDay.getDay();
 
 		const days: CalendarDay[] = [];
 
@@ -113,24 +90,7 @@ export class CalendaryComponent implements OnInit, AfterViewInit {
 		for (let i = startingDay - 1; i >= 0; i--) {
 			const date = prevMonthLastDay - i;
 			const fullDate = new Date(year, month - 1, date);
-			const holiday = isHoliday(fullDate);
-			const event = getEvent(fullDate);
-			const rangeEvent = isDateInEventRange(fullDate);
-			const endEvent = isDateEventEnd(fullDate);
-			days.push({
-				date,
-				isCurrentMonth: false,
-				isToday: false,
-				isWeekend: fullDate.getDay() === 0 || fullDate.getDay() === 6,
-				isHoliday: holiday !== null,
-				hasEvent: event !== null,
-				isInEventRange: rangeEvent !== null,
-				isEventEnd: endEvent !== null,
-				holiday,
-				event,
-				rangeEvent: rangeEvent || endEvent,
-				fullDate,
-			});
+			days.push(this.createCalendarDay(date, fullDate, false));
 		}
 
 		// Current month's days
@@ -140,49 +100,14 @@ export class CalendaryComponent implements OnInit, AfterViewInit {
 				this.today.getDate() === date &&
 				this.today.getMonth() === month &&
 				this.today.getFullYear() === year;
-			const holiday = isHoliday(fullDate);
-			const event = getEvent(fullDate);
-			const rangeEvent = isDateInEventRange(fullDate);
-			const endEvent = isDateEventEnd(fullDate);
-
-			days.push({
-				date,
-				isCurrentMonth: true,
-				isToday,
-				isWeekend: fullDate.getDay() === 0 || fullDate.getDay() === 6,
-				isHoliday: holiday !== null,
-				hasEvent: event !== null,
-				isInEventRange: rangeEvent !== null,
-				isEventEnd: endEvent !== null,
-				holiday,
-				event,
-				rangeEvent: rangeEvent || endEvent,
-				fullDate,
-			});
+			days.push(this.createCalendarDay(date, fullDate, true, isToday));
 		}
 
 		// Next month's days to complete the grid (6 rows * 7 days = 42)
 		const remainingDays = 42 - days.length;
 		for (let date = 1; date <= remainingDays; date++) {
 			const fullDate = new Date(year, month + 1, date);
-			const holiday = isHoliday(fullDate);
-			const event = getEvent(fullDate);
-			const rangeEvent = isDateInEventRange(fullDate);
-			const endEvent = isDateEventEnd(fullDate);
-			days.push({
-				date,
-				isCurrentMonth: false,
-				isToday: false,
-				isWeekend: fullDate.getDay() === 0 || fullDate.getDay() === 6,
-				isHoliday: holiday !== null,
-				hasEvent: event !== null,
-				isInEventRange: rangeEvent !== null,
-				isEventEnd: endEvent !== null,
-				holiday,
-				event,
-				rangeEvent: rangeEvent || endEvent,
-				fullDate,
-			});
+			days.push(this.createCalendarDay(date, fullDate, false));
 		}
 
 		return {
@@ -194,12 +119,33 @@ export class CalendaryComponent implements OnInit, AfterViewInit {
 		};
 	}
 
+	private createCalendarDay(date: number, fullDate: Date, isCurrentMonth: boolean, isToday = false): CalendarDay {
+		const holiday = isHoliday(fullDate);
+		const event = getEvent(fullDate);
+		const rangeEvent = isDateInEventRange(fullDate);
+		const endEvent = isDateEventEnd(fullDate);
+
+		return {
+			date,
+			isCurrentMonth,
+			isToday,
+			isWeekend: fullDate.getDay() === 0 || fullDate.getDay() === 6,
+			isHoliday: holiday !== null,
+			hasEvent: event !== null,
+			isInEventRange: rangeEvent !== null,
+			isEventEnd: endEvent !== null,
+			holiday,
+			event,
+			rangeEvent: rangeEvent || endEvent,
+			fullDate,
+		};
+	}
+
 	scrollToToday(): void {
 		const todayElement = document.getElementById('today');
 		if (todayElement) {
 			todayElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
 		} else {
-			// Fallback: scroll to current month
 			const currentMonth = this.today.getMonth();
 			this.scrollToElement(`month-${currentMonth}`);
 		}
@@ -212,17 +158,7 @@ export class CalendaryComponent implements OnInit, AfterViewInit {
 		}
 	}
 
-	previousYear(): void {
-		this.currentYear.update((y) => y - 1);
-		this.generateYearCalendar();
-	}
-
-	nextYear(): void {
-		this.currentYear.update((y) => y + 1);
-		this.generateYearCalendar();
-	}
-
-	goToToday(): void {
+	onGoToToday(): void {
 		const todayYear = new Date().getFullYear();
 		if (this.currentYear() !== todayYear) {
 			this.currentYear.set(todayYear);
@@ -231,23 +167,12 @@ export class CalendaryComponent implements OnInit, AfterViewInit {
 		setTimeout(() => this.scrollToToday(), 100);
 	}
 
-	goToYear(): void {
-		const year = parseInt(this.searchYear, 10);
-		if (!isNaN(year) && year >= 1900 && year <= 2100) {
-			this.currentYear.set(year);
-			this.generateYearCalendar();
-			this.searchYear = '';
-		}
+	onGoToYear(year: number): void {
+		this.currentYear.set(year);
+		this.generateYearCalendar();
 	}
 
-	onSearchKeydown(event: KeyboardEvent): void {
-		if (event.key === 'Enter') {
-			this.goToYear();
-		}
-	}
-
-	// Modal methods
-	openDayModal(day: CalendarDay): void {
+	onDayClick(day: CalendarDay): void {
 		if (!day.isCurrentMonth) return;
 
 		if (day.isHoliday && day.holiday) {
@@ -265,7 +190,6 @@ export class CalendaryComponent implements OnInit, AfterViewInit {
 			});
 			this.showModal.set(true);
 		} else if ((day.isInEventRange || day.isEventEnd) && day.rangeEvent) {
-			// Abrir modal para días dentro de un rango o el día final
 			this.modalData.set({
 				type: 'event',
 				date: day.fullDate,
@@ -275,51 +199,12 @@ export class CalendaryComponent implements OnInit, AfterViewInit {
 		}
 	}
 
-	closeModal(): void {
+	onCloseModal(): void {
 		this.showModal.set(false);
 		this.modalData.set(null);
 	}
 
-	onOverlayClick(event: MouseEvent): void {
-		if ((event.target as HTMLElement).classList.contains('modal-overlay')) {
-			this.closeModal();
-		}
-	}
-
-	formatDate(date: Date): string {
-		return date.toLocaleDateString('es-PE', {
-			weekday: 'long',
-			year: 'numeric',
-			month: 'long',
-			day: 'numeric',
-		});
-	}
-
-	getHolidayTypeLabel(type: string): string {
-		const labels: Record<string, string> = {
-			national: 'Feriado Nacional',
-			regional: 'Feriado Regional',
-			special: 'Día Especial',
-		};
-		return labels[type] || type;
-	}
-
-	getEventTypeLabel(type: string): string {
-		const labels: Record<string, string> = {
-			academic: 'Evento Académico',
-			cultural: 'Evento Cultural',
-			sports: 'Evento Deportivo',
-			meeting: 'Reunión',
-			other: 'Otro',
-		};
-		return labels[type] || type;
-	}
-
 	trackByMonth(_index: number, month: CalendarMonth): string {
 		return month.id;
-	}
-
-	trackByDay(index: number, _day: CalendarDay): number {
-		return index;
 	}
 }

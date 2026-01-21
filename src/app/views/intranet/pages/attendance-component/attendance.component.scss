@@ -1,9 +1,3 @@
-// Colores de estado
-$color-temprano: #253470;
-$color-atiempo: #77a02d;
-$color-fuera: #ffcc0c;
-$color-no: #f44336;
-
 .attendance-container {
 	padding: 1.5rem;
 	font-family: var(--intranet-font-family);
@@ -11,481 +5,57 @@ $color-no: #f44336;
 	min-height: 100%;
 }
 
-.page-header {
+.salon-selector {
 	display: flex;
 	align-items: center;
 	gap: 0.75rem;
 	margin-bottom: 1.5rem;
+	padding: 1rem 1.25rem;
+	background: var(--intranet-background-color, white);
+	border-radius: 12px;
+	box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
 
-	i {
-		font-size: 1.5rem;
-		color: var(--intranet-default-text-color);
-	}
-
-	h1 {
-		font-size: 1.5rem;
+	label {
 		font-weight: 600;
-		color: var(--intranet-default-text-color);
-		margin: 0;
-	}
-
-	.reload-btn {
-		margin-left: auto;
-		width: 36px;
-		height: 36px;
-		border: 1px solid var(--intranet-soft-text-color);
-		border-radius: 50%;
-		background: transparent;
-		color: var(--intranet-soft-text-color);
-		cursor: pointer;
-		display: flex;
-		align-items: center;
-		justify-content: center;
-		transition: all 0.2s ease;
-
-		i {
-			font-size: 1rem;
-		}
-
-		&:hover:not(:disabled) {
-			border-color: var(--intranet-accent-color-blue);
-			color: var(--intranet-accent-color-blue);
-			background: rgba(37, 52, 112, 0.05);
-		}
-
-		&:disabled {
-			opacity: 0.6;
-			cursor: not-allowed;
-		}
-	}
-}
-
-// Seccion de leyenda
-.legend-section {
-	border-radius: 10px;
-	padding: 1.7rem;
-	margin-bottom: 1.5rem;
-
-	h2 {
-		font-size: 1.1rem;
-		font-weight: 600;
-		color: var(--intranet-default-text-color);
-		margin: 0 0 1rem 2rem;
-	}
-}
-
-.legend-content {
-	display: flex;
-	flex-wrap: wrap;
-	gap: 1.5rem 3rem;
-	padding: 1rem 3rem;
-	border: 1px solid var(--intranet-alternative-text-color);
-	border-radius: 10px;
-}
-
-.legend-item {
-	display: flex;
-	align-items: center;
-	gap: 0.5rem;
-	min-width: 180px;
-}
-
-.legend-color {
-	width: 20px;
-	height: 20px;
-	border-radius: 2px;
-}
-
-.legend-text {
-	font-size: 0.85rem;
-	color: var(--intranet-soft-text-color);
-}
-
-// Seccion de asistencias
-.attendance-section {
-	border-radius: 10px;
-	padding: 1.5rem;
-	margin-bottom: 1.5rem;
-}
-
-.section-header {
-	display: flex;
-	justify-content: space-between;
-	align-items: center;
-	margin-bottom: 1.2rem;
-
-	h2 {
+		color: var(--intranet-default-text-color, #1e1e1e);
 		font-size: 1rem;
-		font-weight: 600;
-		color: var(--intranet-default-text-color);
+	}
+
+	select {
+		padding: 0.5rem 1rem;
+		border: 1px solid var(--intranet-border-color, #e0e0e0);
+		border-radius: 8px;
+		background: var(--intranet-background-color, white);
+		color: var(--intranet-default-text-color, #1e1e1e);
+		font-size: 1rem;
+		font-family: var(--intranet-font-family);
+		cursor: pointer;
+		min-width: 200px;
+
+		&:focus {
+			outline: none;
+			border-color: var(--intranet-primary-color, #3b82f6);
+			box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.1);
+		}
+	}
+}
+
+.no-data {
+	text-align: center;
+	padding: 3rem;
+	color: var(--intranet-soft-text-color, #5e5e5e);
+	background: var(--intranet-background-color, white);
+	border-radius: 12px;
+	box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+
+	p {
 		margin: 0;
+		font-size: 1.1rem;
 	}
 }
 
-.section-title-row {
-	display: flex;
-	align-items: center;
-	gap: 1.5rem;
-}
-
-.status-summary {
-	display: flex;
-	align-items: center;
-	gap: 1rem;
-}
-
-.summary-item {
-	display: flex;
-	align-items: center;
-	gap: 0.35rem;
-}
-
-.summary-color {
-	width: 20px;
-	height: 20px;
-	border-radius: 2px;
-}
-
-.summary-count {
-	font-size: 0.85rem;
-	font-weight: 500;
-	color: var(--intranet-soft-text-color);
-}
-
-// PrimeNG Select - fondo transparente
-:host ::ng-deep .month-select {
-	&.p-select {
-		background: transparent;
-		border: 1px solid var(--intranet-soft-text-color);
-		border-radius: 4px;
-
-		.p-select-label {
-			padding: 0.5rem 1rem;
-			font-size: 0.85rem;
-			color: var(--intranet-soft-text-color);
-		}
-
-		.p-select-dropdown {
-			background: transparent;
-			color: var(--intranet-soft-text-color);
-		}
-
-		&:hover {
-			border-color: var(--intranet-accent-color-blue);
-		}
-
-		&.p-focus {
-			border-color: var(--intranet-accent-color-blue);
-			box-shadow: none;
-		}
-	}
-}
-
-// PrimeNG Select Panel/Overlay - fondo igual que la página
-:host ::ng-deep .p-select-overlay {
-	background: var(--intranet-background-color) !important;
-	border: 1px solid var(--intranet-soft-text-color);
-	border-radius: 4px;
-
-	.p-select-list {
-		background: transparent;
-	}
-
-	.p-select-option {
-		color: var(--intranet-soft-text-color);
-
-		&:hover {
-			background: var(--intranet-accent-color-green);
-			color: white;
-		}
-
-		&.p-select-option-selected {
-			background: var(--intranet-accent-color-green);
-			color: white;
-		}
-	}
-}
-
-// PrimeNG Table - Cuadro de doble entrada
-:host ::ng-deep .attendance-table.double-entry {
-	&.p-datatable {
-		background: transparent;
-		border: 1px solid var(--intranet-alternative-text-color);
-		border-radius: 10px;
-		overflow: hidden;
-
-		// Scrollbar con fondo transparente
-		.p-datatable-table-container {
-			&::-webkit-scrollbar {
-				height: 8px;
-				background: transparent;
-			}
-
-			&::-webkit-scrollbar-track {
-				background: transparent;
-			}
-
-			&::-webkit-scrollbar-thumb {
-				background: var(--intranet-soft-text-color);
-				border-radius: 4px;
-			}
-
-			// Firefox
-			scrollbar-width: thin;
-			scrollbar-color: var(--intranet-soft-text-color) transparent;
-		}
-
-		.p-datatable-header {
-			background: transparent;
-			border: none;
-		}
-
-		// Header row - transparente
-		.p-datatable-thead > tr > th {
-			background: transparent;
-			color: var(--intranet-default-text-color);
-			font-weight: 600;
-			font-size: 0.85rem;
-			padding: 0.75rem 0.5rem;
-			text-align: center;
-			border: 1px solid #ddd;
-			border-right: none;
-
-			&:last-child {
-				border-right: 1px solid #ddd;
-			}
-
-			// Primera columna sin borde
-			&.header-cell {
-				border: none;
-			}
-
-			&.week-col {
-				width: 100px;
-			}
-
-			&.day-col {
-				width: auto;
-				border-left: 1px solid #ddd;
-			}
-
-			&.total-col {
-				width: 100px;
-			}
-		}
-
-		// Body rows
-		.p-datatable-tbody > tr {
-			background: transparent;
-
-			> td {
-				background: transparent;
-				padding: 0.5rem;
-				text-align: center;
-				vertical-align: middle;
-				border: 1px solid #ddd;
-				border-top: none;
-				border-right: none;
-				font-size: 0.85rem;
-				color: var(--intranet-soft-text-color);
-
-				&:last-child {
-					border-right: 1px solid #ddd;
-				}
-
-				// Primera columna - sin borde
-				&.header-cell {
-					background: transparent;
-					color: var(--intranet-default-text-color);
-					font-weight: 600;
-					text-align: center;
-					border: none;
-				}
-
-				&.day-col {
-					padding: 8px;
-					border-left: 1px solid #ddd;
-				}
-			}
-
-			&:hover > td:not(.header-cell) {
-				background: rgba(0, 0, 0, 0.02);
-			}
-		}
-
-		// Footer row
-		.p-datatable-tfoot > tr > td {
-			background: transparent;
-			padding: 0.75rem 0.5rem;
-			text-align: center;
-			border: 1px solid #ddd;
-			border-top: none;
-			border-right: none;
-			font-size: 0.85rem;
-			color: var(--intranet-soft-text-color);
-
-			&:last-child {
-				border-right: 1px solid #ddd;
-			}
-
-			// Primera columna del footer - sin borde
-			&.header-cell {
-				background: transparent;
-				color: var(--intranet-default-text-color);
-				font-weight: 600;
-				border: none;
-			}
-
-			&.day-col {
-				border-left: 1px solid #ddd;
-			}
-
-			&.footer-total {
-				font-weight: 500;
-			}
-
-			&.grand-total {
-				font-weight: 600;
-				color: var(--intranet-default-text-color);
-			}
-		}
-	}
-}
-
-.day-square {
-	width: 50px;
-	height: 50px;
-	border-radius: 2px;
-	margin: 0 auto;
-	cursor: default;
-
-	&.day-empty {
-		background-color: transparent;
-		border: 1px dashed #ccc;
-	}
-}
-
-// Clases de estado
-.status-temprano {
-	background-color: $color-temprano;
-}
-
-.status-atiempo {
-	background-color: $color-atiempo;
-}
-
-.status-fuera {
-	background-color: $color-fuera;
-}
-
-.status-no {
-	background-color: $color-no;
-}
-
-// Responsive
 @media screen and (max-width: 768px) {
 	.attendance-container {
 		padding: 1rem;
-	}
-
-	.legend-content {
-		flex-direction: column;
-		gap: 0.5rem;
-	}
-
-	.legend-item {
-		min-width: auto;
-	}
-
-	.section-header {
-		flex-direction: column;
-		align-items: flex-start;
-		gap: 0.75rem;
-	}
-
-	:host ::ng-deep .month-select {
-		width: 100%;
-	}
-
-	.section-title-row {
-		flex-direction: column;
-		align-items: flex-start;
-		gap: 0.5rem;
-	}
-
-	.status-summary {
-		gap: 0.75rem;
-	}
-
-	.summary-color {
-		width: 16px;
-		height: 16px;
-	}
-
-	.summary-count {
-		font-size: 0.85rem;
-	}
-
-	:host ::ng-deep .attendance-table.double-entry {
-		&.p-datatable {
-			.p-datatable-thead > tr > th {
-				font-size: 0.85rem;
-				padding: 0.5rem 0.25rem;
-
-				&.week-col {
-					width: 70px;
-				}
-
-				&.total-col {
-					width: 70px;
-				}
-			}
-
-			.p-datatable-tbody > tr > td {
-				font-size: 0.85rem;
-				padding: 0.35rem;
-			}
-
-			.p-datatable-tfoot > tr > td {
-				font-size: 0.85rem;
-				padding: 0.5rem 0.25rem;
-			}
-		}
-	}
-
-	.day-square {
-		width: 35px;
-		height: 35px;
-	}
-}
-
-@media screen and (max-width: 480px) {
-	:host ::ng-deep .attendance-table.double-entry {
-		&.p-datatable {
-			.p-datatable-thead > tr > th {
-				font-size: 0.85rem;
-
-				&.week-col {
-					width: 55px;
-				}
-
-				&.total-col {
-					width: 55px;
-				}
-			}
-
-			.p-datatable-tbody > tr > td {
-				font-size: 0.85rem;
-			}
-
-			.p-datatable-tfoot > tr > td {
-				font-size: 0.85rem;
-			}
-		}
-	}
-
-	.day-square {
-		width: 28px;
-		height: 28px;
 	}
 }

@@ -3,11 +3,7 @@ import { CommonModule } from '@angular/common';
 import { DialogModule } from 'primeng/dialog';
 import { Menu, MenuModule } from 'primeng/menu';
 import { MenuItem } from 'primeng/api';
-
-export interface CourseSchedule {
-	name: string;
-	time: string;
-}
+import { CourseSchedule, getCourseSchedules } from '../../courses.config';
 
 @Component({
 	selector: 'app-schedule-modal',
@@ -24,13 +20,7 @@ export class ScheduleModalComponent {
 
 	selectedCourse: string | null = null;
 
-	courseSchedules: CourseSchedule[] = [
-		{ name: 'Matemáticas Avanzadas', time: '8:00 a.m. - 9:45 a.m.' },
-		{ name: 'Física General', time: '10:00 a.m. - 11:45 a.m.' },
-		{ name: 'Química Orgánica', time: '12:00 p.m. - 12:45 p.m.' },
-		{ name: 'Historia del Perú', time: '1:00 p.m. - 2:45 p.m.' },
-		{ name: 'Literatura Universal', time: '3:00 p.m. - 5:00 p.m.' },
-	];
+	courseSchedules: CourseSchedule[] = getCourseSchedules();
 
 	courseMenuItems: MenuItem[] = [
 		{ label: 'Ver Detalles', command: () => this.onOpenDetails() },

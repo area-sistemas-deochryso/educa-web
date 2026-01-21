@@ -1,0 +1,74 @@
+// Colores de estado
+$color-temprano: #253470;
+$color-atiempo: #77a02d;
+$color-fuera: #ffcc0c;
+$color-no: #f44336;
+
+.legend-section {
+	border-radius: 10px;
+	padding: 1.7rem;
+	margin-bottom: 1.5rem;
+
+	h2 {
+		font-size: 1.1rem;
+		font-weight: 600;
+		color: var(--intranet-default-text-color);
+		margin: 0 0 1rem 2rem;
+	}
+}
+
+.legend-content {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 1.5rem 3rem;
+	padding: 1rem 3rem;
+	border: 1px solid var(--intranet-alternative-text-color);
+	border-radius: 10px;
+}
+
+.legend-item {
+	display: flex;
+	align-items: center;
+	gap: 0.5rem;
+	min-width: 180px;
+}
+
+.legend-color {
+	width: 20px;
+	height: 20px;
+	border-radius: 2px;
+}
+
+.legend-text {
+	font-size: 0.85rem;
+	color: var(--intranet-soft-text-color);
+}
+
+// Clases de estado
+.status-temprano {
+	background-color: $color-temprano;
+}
+
+.status-atiempo {
+	background-color: $color-atiempo;
+}
+
+.status-fuera {
+	background-color: $color-fuera;
+}
+
+.status-no {
+	background-color: $color-no;
+}
+
+// Responsive
+@media screen and (max-width: 768px) {
+	.legend-content {
+		flex-direction: column;
+		gap: 0.5rem;
+	}
+
+	.legend-item {
+		min-width: auto;
+	}
+}

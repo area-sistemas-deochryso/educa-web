@@ -3,12 +3,7 @@ import { CommonModule } from '@angular/common';
 import { DialogModule } from 'primeng/dialog';
 import { Menu, MenuModule } from 'primeng/menu';
 import { MenuItem } from 'primeng/api';
-
-export interface CourseSummary {
-	name: string;
-	attendance: number;
-	grade: number;
-}
+import { CourseSummary, getCourseSummaries } from '../../courses.config';
 
 @Component({
 	selector: 'app-summary-modal',
@@ -25,13 +20,7 @@ export class SummaryModalComponent {
 
 	selectedCourse: string | null = null;
 
-	courseSummaries: CourseSummary[] = [
-		{ name: 'Matemáticas Avanzadas', attendance: 0, grade: 0 },
-		{ name: 'Física General', attendance: 20, grade: 20 },
-		{ name: 'Química Orgánica', attendance: 0, grade: 4 },
-		{ name: 'Historia del Perú', attendance: 20, grade: 20 },
-		{ name: 'Literatura Universal', attendance: 0, grade: 16 },
-	];
+	courseSummaries: CourseSummary[] = getCourseSummaries();
 
 	courseMenuItems: MenuItem[] = [
 		{ label: 'Ver Detalles', command: () => this.onOpenDetails() },

@@ -1,0 +1,26 @@
+<div class="filter-container">
+	<div class="filter-group">
+		<label>Grado</label>
+		<p-select
+			[options]="gradoOptions"
+			[ngModel]="selectedGrado"
+			(ngModelChange)="onGradoChange($event)"
+			optionLabel="label"
+			optionValue="value"
+			placeholder="Seleccionar grado"
+			styleClass="filter-select"
+		/>
+	</div>
+	<div class="filter-group">
+		<label>Sección</label>
+		<p-select
+			[options]="seccionOptions"
+			[ngModel]="selectedSeccion"
+			(ngModelChange)="onSeccionChange($event)"
+			optionLabel="label"
+			optionValue="value"
+			placeholder="Seleccionar sección"
+			styleClass="filter-select"
+		/>
+	</div>
+</div>

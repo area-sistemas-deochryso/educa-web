@@ -1,0 +1,88 @@
+<section class="attendance-section">
+	<div class="section-header">
+		<div class="section-title-row">
+			<h2>
+				@if (hasHijos) {
+					{{ table().title.split(' de ')[0] }} de
+					<p-select
+						[options]="hijosOptions"
+						[ngModel]="selectedHijoId()"
+						(ngModelChange)="onHijoChange($event)"
+						optionLabel="label"
+						optionValue="value"
+						styleClass="hijo-select"
+						[style]="{ minWidth: '200px' }"
+					/>
+				} @else {
+					{{ table().title }}
+				}
+			</h2>
+			<div class="status-summary">
+				<div class="summary-item">
+					<span class="summary-color status-temprano"></span>
+					<span class="summary-count">{{ table().counts.T }}T</span>
+				</div>
+				<div class="summary-item">
+					<span class="summary-color status-atiempo"></span>
+					<span class="summary-count">{{ table().counts.A }}A</span>
+				</div>
+				<div class="summary-item">
+					<span class="summary-color status-fuera"></span>
+					<span class="summary-count">{{ table().counts.F }}F</span>
+				</div>
+				<div class="summary-item">
+					<span class="summary-color status-no"></span>
+					<span class="summary-count">{{ table().counts.N }}N</span>
+				</div>
+			</div>
+		</div>
+		<p-select
+			[options]="monthOptions"
+			[ngModel]="table().selectedMonth"
+			(ngModelChange)="onMonthChange($event)"
+			optionLabel="label"
+			optionValue="value"
+			styleClass="month-select"
+		/>
+	</div>
+
+	<p-table [value]="table().weeks" styleClass="attendance-table double-entry">
+		<ng-template pTemplate="header">
+			<tr>
+				<th class="week-col header-cell"></th>
+				@for (day of dayHeaders; track day) {
+					<th class="day-col">{{ day }}</th>
+				}
+				<th class="total-col">Total</th>
+			</tr>
+		</ng-template>
+		<ng-template pTemplate="body" let-week>
+			<tr>
+				<td class="week-col header-cell">{{ week.week }}</td>
+				@for (day of week.days; track $index) {
+					<td class="day-col">
+						@if (isDayValid(day)) {
+							<div
+								class="day-square"
+								[class]="getStatusClass(day.status)"
+								[title]="day.hora || ''"
+							></div>
+						} @else {
+							<div class="day-square day-empty"></div>
+						}
+					</td>
+				}
+				<td class="total-col">{{ week.total }}</td>
+			</tr>
+		</ng-template>
+		<ng-template pTemplate="footer">
+			<tr>
+				<td class="week-col header-cell">Total</td>
+				@for (total of table().columnTotals; track $index) {
+					<td class="day-col footer-total">{{ total }}</td>
+				}
+				<td class="total-col footer-total grand-total">{{ table().grandTotal }}</td>
+			</tr>
+		</ng-template>
+	</p-table>
+</section>

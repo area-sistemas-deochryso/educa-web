@@ -1,0 +1,70 @@
+@if (visible()) {
+	<div class="modal-overlay" (click)="onOverlayClick($event)">
+		<div
+			class="modal-content"
+			[class.holiday-modal]="data()?.type === 'holiday'"
+			[class.event-modal]="data()?.type === 'event'"
+		>
+			<button class="modal-close" (click)="onClose()">
+				<i class="pi pi-times"></i>
+			</button>
+
+			@if (data(); as modalData) {
+				<div class="modal-header">
+					<div
+						class="modal-icon"
+						[class.holiday-icon]="modalData.type === 'holiday'"
+						[class.event-icon]="modalData.type === 'event'"
+					>
+						<i
+							class="pi"
+							[ngClass]="modalData.type === 'holiday' ? modalData.holiday?.icon : modalData.event?.icon"
+						></i>
+					</div>
+					<div class="modal-title-section">
+						<span
+							class="modal-badge"
+							[class.holiday-badge]="modalData.type === 'holiday'"
+							[class.event-badge]="modalData.type === 'event'"
+						>
+							{{
+								modalData.type === 'holiday'
+									? getHolidayTypeLabel(modalData.holiday!.type)
+									: getEventTypeLabel(modalData.event!.type)
+							}}
+						</span>
+						<h2 class="modal-title">
+							{{ modalData.type === 'holiday' ? modalData.holiday?.name : modalData.event?.title }}
+						</h2>
+					</div>
+				</div>
+
+				<div class="modal-body">
+					<div class="modal-date">
+						<i class="pi pi-calendar"></i>
+						<span>{{ formatDate(modalData.date) }}</span>
+					</div>
+
+					@if (modalData.type === 'event' && modalData.event) {
+						@if (modalData.event.time) {
+							<div class="modal-info">
+								<i class="pi pi-clock"></i>
+								<span>{{ modalData.event.time }}</span>
+							</div>
+						}
+						@if (modalData.event.location) {
+							<div class="modal-info">
+								<i class="pi pi-map-marker"></i>
+								<span>{{ modalData.event.location }}</span>
+							</div>
+						}
+					}
+
+					<p class="modal-description">
+						{{ modalData.type === 'holiday' ? modalData.holiday?.description : modalData.event?.description }}
+					</p>
+				</div>
+			}
+		</div>
+	</div>
+}

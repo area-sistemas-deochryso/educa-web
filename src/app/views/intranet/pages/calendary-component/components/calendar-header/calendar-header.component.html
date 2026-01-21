@@ -1,0 +1,31 @@
+<header class="calendar-header">
+	<div class="header-content">
+		<div class="header-icon">
+			<i class="pi pi-calendar"></i>
+		</div>
+		<div class="header-text">
+			<h1>Calendario Académico</h1>
+			<p>Año escolar {{ currentYear() }}</p>
+		</div>
+	</div>
+	<div class="header-actions">
+		<button class="today-btn" (click)="onGoToToday()" title="Ir a hoy">
+			<i class="pi pi-calendar"></i>
+			<span>Hoy</span>
+		</button>
+		<div class="year-search">
+			<input
+				type="number"
+				[(ngModel)]="searchYear"
+				(keydown)="onSearchKeydown($event)"
+				placeholder="Buscar año"
+				min="1900"
+				max="2100"
+				class="year-input"
+			/>
+			<button class="search-btn" (click)="onGoToYear()" title="Buscar año">
+				<i class="pi pi-search"></i>
+			</button>
+		</div>
+	</div>
+</header>

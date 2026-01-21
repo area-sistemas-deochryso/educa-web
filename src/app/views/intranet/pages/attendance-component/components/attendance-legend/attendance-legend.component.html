@@ -1,0 +1,11 @@
+<section class="legend-section">
+	<h2>Leyenda</h2>
+	<div class="legend-content">
+		@for (item of legendItems; track item.code) {
+			<div class="legend-item">
+				<span class="legend-color" [class]="getStatusClass(item.status)"></span>
+				<span class="legend-text">{{ item.code }} = {{ item.label }}</span>
+			</div>
+		}
+	</div>
+</section>

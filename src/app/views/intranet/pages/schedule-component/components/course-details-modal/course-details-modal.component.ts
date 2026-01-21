@@ -6,6 +6,7 @@ import { TooltipModule } from 'primeng/tooltip';
 import { AttachmentsModalComponent } from './attachments-modal/attachments-modal.component';
 import { TasksModalComponent } from './tasks-modal/tasks-modal.component';
 import { SubmissionsModalComponent } from './submissions-modal/submissions-modal.component';
+import { COURSE_NAMES } from '../../courses.config';
 
 export interface WeekContent {
 	id: number;
@@ -70,13 +71,7 @@ export class CourseDetailsModalComponent implements OnChanges {
 
 	currentCourseDetails: CourseDetails = this.getDefaultCourseDetails('');
 
-	validCourses = [
-		'Matemáticas Avanzadas',
-		'Física General',
-		'Química Orgánica',
-		'Historia del Perú',
-		'Literatura Universal',
-	];
+	validCourses = COURSE_NAMES;
 
 	ngOnChanges(changes: SimpleChanges): void {
 		if (changes['courseName'] && this.courseName) {

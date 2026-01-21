@@ -1,0 +1,16 @@
+<div class="page-header">
+	<i class="pi pi-clipboard"></i>
+	<h1>Asistencias</h1>
+	@if (loading()) {
+		<i class="pi pi-spin pi-spinner"></i>
+	}
+	<button
+		class="reload-btn"
+		(click)="onReload()"
+		[disabled]="loading()"
+		pTooltip="Recargar datos"
+		tooltipPosition="bottom"
+	>
+		<i class="pi pi-refresh" [class.pi-spin]="loading()"></i>
+	</button>
+</div>

@@ -17,40 +17,49 @@
 	<section class="quick-access">
 		<h2>Accesos Rápidos</h2>
 		<div class="quick-access-grid">
-			<a routerLink="/intranet/asistencia" class="quick-access-card">
-				<div class="card-icon">
-					<i class="pi pi-check-square"></i>
-				</div>
-				<span>Asistencia</span>
-			</a>
-			<a routerLink="/intranet/horarios" class="quick-access-card">
-				<div class="card-icon">
-					<i class="pi pi-calendar"></i>
-				</div>
-				<span>Horarios</span>
-			</a>
-			<a routerLink="/intranet/Calendario" class="quick-access-card">
-				<div class="card-icon">
-					<i class="pi pi-calendar-plus"></i>
-				</div>
-				<span>Calendario</span>
-			</a>
-			<!-- Cambia dinámicamente según hay notificaciones sin leer -->
-			@if (unreadCount() > 0) {
-				<button
-					class="quick-access-card notification-quick-access"
-					[class]="getBadgePriorityClass()"
-					(click)="togglePanel()"
-				>
-					<div class="card-icon" [class]="getBadgePriorityClass()">
-						<i class="pi pi-bell"></i>
+			<app-quick-access-card-menu
+				label="Contenido del curso"
+				path="/intranet/horarios"
+				modal="details"
+				icon="pi-book"
+				[courses]="availableCourses"
+			/>
+			<app-quick-access-card
+				label="Horario"
+				path="/intranet/horarios"
+				modal="schedule"
+				icon="pi-calendar"
+			/>
+			<app-quick-access-card
+				label="Notas"
+				path="/intranet/horarios"
+				modal="grades"
+				icon="pi-star"
+			/>
+			<app-quick-access-card
+				label="Resumen"
+				path="/intranet/horarios"
+				modal="summary"
+				icon="pi-chart-bar"
+			/>
+
+			<!-- Notificaciones - siempre visible, badge solo si hay sin leer -->
+			<button
+				class="quick-access-card"
+				[class.notification-quick-access]="unreadCount() > 0"
+				[ngClass]="unreadCount() > 0 ? getBadgePriorityClass() : ''"
+				(click)="togglePanel()"
+			>
+				<div class="card-icon" [ngClass]="unreadCount() > 0 ? getBadgePriorityClass() : ''">
+					<i class="pi pi-bell"></i>
+					@if (unreadCount() > 0) {
 						<span class="quick-badge" [class]="getBadgePriorityClass()">{{
 							unreadCount()
 						}}</span>
-					</div>
-					<span>Notificaciones</span>
-				</button>
-			}
+					}
+				</div>
+				<span>Notificaciones</span>
+			</button>
 		</div>
 	</section>
 </div>

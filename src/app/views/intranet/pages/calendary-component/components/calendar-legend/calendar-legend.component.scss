@@ -1,0 +1,79 @@
+.calendar-legend {
+	display: flex;
+	align-items: center;
+	gap: 1.5rem;
+	margin-bottom: 1.5rem;
+	padding: 0.75rem 1rem;
+	background: var(--intranet-background-color, white);
+	border-radius: 12px;
+	box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+	flex-wrap: wrap;
+}
+
+.legend-item {
+	display: flex;
+	align-items: center;
+	gap: 0.5rem;
+	font-size: 0.875rem;
+	color: var(--intranet-soft-text-color, #5e5e5e);
+}
+
+.legend-dot {
+	width: 16px;
+	height: 16px;
+	border-radius: 50%;
+
+	&.today-dot {
+		border: 3px solid #f5a623;
+		background: transparent;
+	}
+
+	&.holiday-dot {
+		background: #dc3545;
+	}
+
+	&.event-dot {
+		background: #28a745;
+	}
+}
+
+.legend-triangle-container {
+	width: 16px;
+	height: 16px;
+	position: relative;
+	background: #f0f0f0;
+	border-radius: 3px;
+}
+
+.legend-triangle {
+	position: absolute;
+	width: 0;
+	height: 0;
+	border-style: solid;
+
+	&.start {
+		top: 0;
+		left: 0;
+		border-width: 10px 10px 0 0;
+		border-color: #28a745 transparent transparent transparent;
+	}
+
+	&.end {
+		top: 0;
+		right: 0;
+		border-width: 0 10px 10px 0;
+		border-color: transparent #28a745 transparent transparent;
+	}
+}
+
+@media (max-width: 768px) {
+	.calendar-legend {
+		gap: 1rem;
+	}
+}
+
+@media (max-width: 480px) {
+	.legend-item span:not(.legend-dot) {
+		font-size: 0.75rem;
+	}
+}

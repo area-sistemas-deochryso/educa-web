@@ -1,5 +1,6 @@
 import { Component, OnInit, OnDestroy, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { ActivatedRoute } from '@angular/router';
 import { ScheduleCalendarComponent } from './components/schedule-calendar/schedule-calendar.component';
 import { ScheduleModalComponent } from './components/schedule-modal/schedule-modal.component';
 import { SummaryModalComponent } from './components/summary-modal/summary-modal.component';
@@ -31,6 +32,7 @@ const STORAGE_KEY = 'schedule_modals_state';
 })
 export class ScheduleComponent implements OnInit, OnDestroy {
 	private voiceService = inject(VoiceRecognitionService);
+	private route = inject(ActivatedRoute);
 	private voiceUnsubscribers: (() => void)[] = [];
 
 	showScheduleModal = false;
@@ -43,6 +45,29 @@ export class ScheduleComponent implements OnInit, OnDestroy {
 	ngOnInit(): void {
 		this.restoreModalsState();
 		this.registerVoiceModals();
+		this.handleQueryParams();
+	}
+
+	private handleQueryParams(): void {
+		this.route.queryParams.subscribe((params) => {
+			const modal = params['modal'];
+			if (modal) {
+				switch (modal) {
+					case 'schedule':
+						this.openScheduleModal();
+						break;
+					case 'summary':
+						this.openSummaryModal();
+						break;
+					case 'grades':
+						this.openGradesModal(params['course'] || '');
+						break;
+					case 'details':
+						this.openDetailsModal(params['course'] || '');
+						break;
+				}
+			}
+		});
 	}
 
 	ngOnDestroy(): void {

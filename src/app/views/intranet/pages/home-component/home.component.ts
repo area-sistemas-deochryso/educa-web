@@ -1,12 +1,14 @@
 import { Component, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { RouterLink } from '@angular/router';
 import { NotificationsService } from '@app/services';
 import { IntranetBackground } from '../../components/intranet-background/intranet-background';
+import { QuickAccessCard } from '../../components/quick-access-card/quick-access-card';
+import { QuickAccessCardMenu } from '../../components/quick-access-card-menu/quick-access-card-menu';
+import { COURSE_NAMES } from '../schedule-component/courses.config';
 
 @Component({
 	selector: 'app-home.component',
-	imports: [CommonModule, RouterLink, IntranetBackground],
+	imports: [CommonModule, IntranetBackground, QuickAccessCard, QuickAccessCardMenu],
 	templateUrl: './home.component.html',
 	styleUrl: './home.component.scss',
 })
@@ -15,6 +17,8 @@ export class HomeComponent {
 
 	unreadCount = this.notificationsService.unreadCount;
 	highestPriority = this.notificationsService.highestPriority;
+
+	availableCourses = COURSE_NAMES;
 
 	togglePanel(): void {
 		this.notificationsService.togglePanel();

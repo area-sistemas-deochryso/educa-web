@@ -1,0 +1,37 @@
+<section class="month-card" [id]="month().id">
+	<h2 class="month-title">{{ month().name }}</h2>
+	<div class="weekdays-header">
+		@for (day of weekDays; track day) {
+			<span class="weekday">{{ day }}</span>
+		}
+	</div>
+	<div class="days-grid">
+		@for (day of month().days; track trackByDay($index, day)) {
+			<div
+				class="day-cell"
+				[class.other-month]="!day.isCurrentMonth"
+				[class.today]="day.isToday"
+				[class.holiday]="day.isHoliday && day.isCurrentMonth"
+				[class.has-event]="day.hasEvent && day.isCurrentMonth && !day.isHoliday && !day.isToday"
+				[class.event-start-range]="day.hasEvent && day.event?.endDate && day.isCurrentMonth && !day.isHoliday && !day.isToday"
+				[class.in-range]="day.isInEventRange && day.isCurrentMonth && !day.isHoliday && !day.isToday"
+				[class.event-end]="day.isEventEnd && day.isCurrentMonth && !day.isHoliday && !day.isToday"
+				[class.clickable]="day.isCurrentMonth && (day.isHoliday || day.hasEvent || day.isInEventRange || day.isEventEnd)"
+				[attr.data-event]="(day.event?.endDate ? day.event?.title : null) || day.rangeEvent?.title || null"
+				[id]="day.isToday ? 'today' : null"
+				[title]="day.holiday?.name || day.event?.title || day.rangeEvent?.title || ''"
+				(click)="onDayClick(day)"
+				(mouseenter)="onDayHover(day, true)"
+				(mouseleave)="onDayHover(day, false)"
+			>
+				<span class="day-number">{{ day.date }}</span>
+				@if (day.hasEvent && day.event?.endDate && day.isCurrentMonth && !day.isHoliday && !day.isToday) {
+					<span class="range-indicator range-start"></span>
+				}
+				@if (day.isEventEnd && day.isCurrentMonth && !day.isHoliday && !day.isToday) {
+					<span class="range-indicator range-end"></span>
+				}
+			</div>
+		}
+	</div>
+</section>

@@ -35,5 +35,34 @@ export interface HijoApoderado {
 	relacion: string;
 }
 
+// Estudiante con asistencias (EstudianteAsistenciaDto) - Para profesor
+export interface EstudianteAsistencia {
+	estudianteId: number;
+	dni: string;
+	nombreCompleto: string;
+	grado: string;
+	seccion: string;
+	asistencias: AsistenciaDetalle[];
+}
+
+// Estudiante del salón (EstudianteSalonDto)
+export interface EstudianteSalon {
+	estudianteId: number;
+	dni: string;
+	nombreCompleto: string;
+}
+
+// Salón del profesor (SalonProfesorDto)
+export interface SalonProfesor {
+	salonId: number;
+	grado: string;
+	seccion: string;
+	nombreSalon: string;
+	anio: number;
+	esTutor: boolean;
+	totalEstudiantes: number;
+	estudiantes: EstudianteSalon[];
+}
+
 // Estados de asistencia para la UI
 export type AttendanceStatus = 'T' | 'A' | 'F' | 'N';

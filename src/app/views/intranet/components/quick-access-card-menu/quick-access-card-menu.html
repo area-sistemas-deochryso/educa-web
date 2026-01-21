@@ -1,0 +1,8 @@
+<button class="quick-access-card" (click)="onCardClick($event)">
+	<div class="card-icon">
+		<i class="pi" [class]="icon()"></i>
+	</div>
+	<span>{{ label() }}</span>
+</button>
+
+<p-menu #coursesMenu [model]="menuItems" [popup]="true" [appendTo]="'body'" styleClass="courses-quick-menu" />

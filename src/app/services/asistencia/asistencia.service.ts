@@ -4,7 +4,7 @@ import { Observable, catchError, of } from 'rxjs';
 
 import { environment } from '@env/environment';
 
-import { ResumenAsistencia, HijoApoderado } from './asistencia.models';
+import { ResumenAsistencia, HijoApoderado, EstudianteAsistencia, SalonProfesor } from './asistencia.models';
 
 @Injectable({
 	providedIn: 'root',
@@ -60,5 +60,37 @@ export class AsistenciaService {
 		return this.http
 			.get<ResumenAsistencia>(`${this.apiUrl}/apoderado/hijo/${estudianteId}/asistencias`, { params })
 			.pipe(catchError(() => of(null)));
+	}
+
+	/**
+	 * Profesor: Obtener salones asignados con estudiantes
+	 * GET /api/ConsultaAsistencia/profesor/salones
+	 */
+	getSalonesProfesor(): Observable<SalonProfesor[]> {
+		return this.http
+			.get<SalonProfesor[]>(`${this.apiUrl}/profesor/salones`)
+			.pipe(catchError(() => of([])));
+	}
+
+	/**
+	 * Profesor: Obtener asistencias de estudiantes por grado/sección
+	 * GET /api/ConsultaAsistencia/profesor/grado?grado={grado}&seccion={seccion}&mes={mes}&anio={anio}
+	 */
+	getAsistenciasGrado(grado: string, seccion: string, mes?: number, anio?: number): Observable<EstudianteAsistencia[]> {
+		const params: Record<string, string> = {
+			grado,
+			seccion,
+		};
+
+		if (mes !== undefined) {
+			params['mes'] = mes.toString();
+		}
+		if (anio !== undefined) {
+			params['anio'] = anio.toString();
+		}
+
+		return this.http
+			.get<EstudianteAsistencia[]>(`${this.apiUrl}/profesor/grado`, { params })
+			.pipe(catchError(() => of([])));
 	}
 }
