@@ -39,8 +39,8 @@ export class StorageService {
 		return this.session.getToken();
 	}
 
-	setToken(token: string): void {
-		this.session.setToken(token);
+	setToken(token: string, rememberMe: boolean = false): void {
+		this.session.setToken(token, rememberMe);
 	}
 
 	removeToken(): void {
@@ -55,8 +55,8 @@ export class StorageService {
 		return this.session.getUser();
 	}
 
-	setUser(user: AuthUser): void {
-		this.session.setUser(user);
+	setUser(user: AuthUser, rememberMe: boolean = false): void {
+		this.session.setUser(user, rememberMe);
 	}
 
 	removeUser(): void {

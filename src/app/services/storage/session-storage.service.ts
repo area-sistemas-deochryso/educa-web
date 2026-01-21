@@ -21,6 +21,7 @@ const SESSION_KEYS = {
 	// Auth (más seguro que localStorage para tokens)
 	TOKEN: 'educa_session_token',
 	USER: 'educa_session_user',
+	REMEMBER_ME: 'educa_remember_me',
 
 	// UI State
 	SCHEDULE_MODALS_STATE: 'educa_schedule_modals',
@@ -28,6 +29,11 @@ const SESSION_KEYS = {
 
 	// Navigation state
 	LAST_ROUTE: 'educa_last_route',
+} as const;
+
+const LOCAL_KEYS = {
+	TOKEN: 'educa_persistent_token',
+	USER: 'educa_persistent_user',
 } as const;
 
 @Injectable({
@@ -78,19 +84,69 @@ export class SessionStorageService {
 	}
 
 	// ============================================
-	// AUTH - Token y Usuario (sesión)
+	// AUTH - Token y Usuario (sesión o persistente)
 	// ============================================
 
+	private getLocalItem(key: string): string | null {
+		if (!this.isBrowser) return null;
+		return localStorage.getItem(key);
+	}
+
+	private setLocalItem(key: string, value: string): void {
+		if (!this.isBrowser) return;
+		localStorage.setItem(key, value);
+	}
+
+	private removeLocalItem(key: string): void {
+		if (!this.isBrowser) return;
+		localStorage.removeItem(key);
+	}
+
+	private getLocalJSON<T>(key: string): T | null {
+		try {
+			const value = this.getLocalItem(key);
+			return value ? JSON.parse(value) : null;
+		} catch (e) {
+			logger.error(`[SessionStorage] Error parsing localStorage JSON for key ${key}:`, e);
+			return null;
+		}
+	}
+
+	private setLocalJSON<T>(key: string, value: T): void {
+		try {
+			this.setLocalItem(key, JSON.stringify(value));
+		} catch (e) {
+			logger.error(`[SessionStorage] Error stringifying localStorage JSON for key ${key}:`, e);
+		}
+	}
+
 	getToken(): string | null {
+		// Primero verificar localStorage (sesión persistente)
+		const persistentToken = this.getLocalItem(LOCAL_KEYS.TOKEN);
+		if (persistentToken) return persistentToken;
+		// Luego sessionStorage (sesión temporal)
 		return this.getItem(SESSION_KEYS.TOKEN);
 	}
 
-	setToken(token: string): void {
-		this.setItem(SESSION_KEYS.TOKEN, token);
+	setToken(token: string, rememberMe: boolean = false): void {
+		if (rememberMe) {
+			// Guardar en localStorage para persistir
+			this.setLocalItem(LOCAL_KEYS.TOKEN, token);
+			this.setLocalItem(SESSION_KEYS.REMEMBER_ME, 'true');
+			// Limpiar sessionStorage
+			this.removeItem(SESSION_KEYS.TOKEN);
+		} else {
+			// Guardar solo en sessionStorage
+			this.setItem(SESSION_KEYS.TOKEN, token);
+			// Limpiar localStorage
+			this.removeLocalItem(LOCAL_KEYS.TOKEN);
+			this.removeLocalItem(SESSION_KEYS.REMEMBER_ME);
+		}
 	}
 
 	removeToken(): void {
 		this.removeItem(SESSION_KEYS.TOKEN);
+		this.removeLocalItem(LOCAL_KEYS.TOKEN);
 	}
 
 	hasToken(): boolean {
@@ -98,20 +154,36 @@ export class SessionStorageService {
 	}
 
 	getUser(): AuthUser | null {
+		// Primero verificar localStorage (sesión persistente)
+		const persistentUser = this.getLocalJSON<AuthUser>(LOCAL_KEYS.USER);
+		if (persistentUser) return persistentUser;
+		// Luego sessionStorage (sesión temporal)
 		return this.getJSON<AuthUser>(SESSION_KEYS.USER);
 	}
 
-	setUser(user: AuthUser): void {
-		this.setJSON(SESSION_KEYS.USER, user);
+	setUser(user: AuthUser, rememberMe: boolean = false): void {
+		if (rememberMe) {
+			// Guardar en localStorage para persistir
+			this.setLocalJSON(LOCAL_KEYS.USER, user);
+			// Limpiar sessionStorage
+			this.removeItem(SESSION_KEYS.USER);
+		} else {
+			// Guardar solo en sessionStorage
+			this.setJSON(SESSION_KEYS.USER, user);
+			// Limpiar localStorage
+			this.removeLocalItem(LOCAL_KEYS.USER);
+		}
 	}
 
 	removeUser(): void {
 		this.removeItem(SESSION_KEYS.USER);
+		this.removeLocalItem(LOCAL_KEYS.USER);
 	}
 
 	clearAuth(): void {
 		this.removeToken();
 		this.removeUser();
+		this.removeLocalItem(SESSION_KEYS.REMEMBER_ME);
 	}
 
 	// ============================================

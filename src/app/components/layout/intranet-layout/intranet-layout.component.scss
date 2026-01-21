@@ -72,6 +72,31 @@
 	}
 }
 
+.logout-btn {
+	display: flex;
+	align-items: center;
+	gap: 0.5rem;
+	background: transparent;
+	border: none;
+	color: var(--intranet-soft-text-color);
+	font-size: 0.95rem;
+	font-weight: 500;
+	font-family: var(--intranet-font-family);
+	cursor: pointer;
+	padding: 0.4rem 0.8rem;
+	border-radius: 4px;
+	transition: all 0.2s ease;
+
+	i {
+		font-size: 1rem;
+	}
+
+	&:hover {
+		color: var(--intranet-accent-color-blue);
+		background-color: rgba(37, 52, 112, 0.08);
+	}
+}
+
 .intranet-content {
 	flex: 1;
 	background-color: var(--intranet-background-color);

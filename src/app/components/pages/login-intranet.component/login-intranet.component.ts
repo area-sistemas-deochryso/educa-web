@@ -28,6 +28,7 @@ export class LoginIntranetComponent implements OnInit {
 	errorMessage = '';
 	showError = false;
 	isLoading = false;
+	showPassword = false;
 
 	roles: RolOption[] = [
 		{ label: 'Estudiante', value: 'Estudiante' },
@@ -84,7 +85,7 @@ export class LoginIntranetComponent implements OnInit {
 
 		this.isLoading = true;
 
-		this.authService.login(dniValue, passValue, this.selectedRol).subscribe({
+		this.authService.login(dniValue, passValue, this.selectedRol, this.rememberMe).subscribe({
 			next: (response) => {
 				this.isLoading = false;
 
@@ -114,5 +115,9 @@ export class LoginIntranetComponent implements OnInit {
 
 	private goBack(): void {
 		this.router.navigate(['/']);
+	}
+
+	togglePasswordVisibility(): void {
+		this.showPassword = !this.showPassword;
 	}
 }

@@ -59,8 +59,9 @@ export class AuthService {
 
 	/**
 	 * Login usando el endpoint POST /api/Auth/login
+	 * @param rememberMe Si es true, la sesión persiste al cerrar el navegador
 	 */
-	login(dni: string, password: string, rol: UserRole): Observable<LoginResponse> {
+	login(dni: string, password: string, rol: UserRole, rememberMe: boolean = false): Observable<LoginResponse> {
 		if (this.isBlocked) {
 			return of({
 				token: '',
@@ -81,7 +82,7 @@ export class AuthService {
 		return this.http.post<LoginResponse>(`${this.apiUrl}/login`, request).pipe(
 			tap((response) => {
 				if (response.token) {
-					this.handleSuccessfulLogin(response);
+					this.handleSuccessfulLogin(response, rememberMe);
 				} else {
 					this.incrementAttempts();
 				}
@@ -100,7 +101,7 @@ export class AuthService {
 		);
 	}
 
-	private handleSuccessfulLogin(response: LoginResponse): void {
+	private handleSuccessfulLogin(response: LoginResponse, rememberMe: boolean): void {
 		const user: AuthUser = {
 			token: response.token,
 			rol: response.rol,
@@ -109,9 +110,9 @@ export class AuthService {
 			sedeId: response.sedeId,
 		};
 
-		// Siempre guardar en localStorage
-		this.storage.setToken(response.token);
-		this.storage.setUser(user);
+		// Guardar según la preferencia de "recordar sesión"
+		this.storage.setToken(response.token, rememberMe);
+		this.storage.setUser(user, rememberMe);
 
 		this.isAuthenticatedSubject.next(true);
 		this.currentUserSubject.next(user);

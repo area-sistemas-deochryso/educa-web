@@ -12,6 +12,7 @@ export const INTRANET_ROUTES: Routes = [
 		loadComponent: () =>
 			import('../../components/layout').then((m) => m.IntranetLayoutComponent),
 		canActivate: [authGuard],
+		canActivateChild: [authGuard],
 		children: [
 			{
 				path: '',
