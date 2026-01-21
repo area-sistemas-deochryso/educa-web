@@ -1,4 +1,4 @@
-@if (voiceService.isSupported && isVisible && isSecureContext() && isOnline()) {
+@if (voiceService.isSupported && isVisible && isSecureContext()) {
 	<div class="voice-container">
 		<!-- Indicador de bloqueo -->
 		@if (showLockIndicator || voiceService.isLocked()) {
@@ -108,10 +108,17 @@
 							<div class="command-category">
 								<div class="category-title">{{ categoryLabels[category] }}</div>
 								<div class="command-list">
-									@for (cmd of getCommandsByCategory(category); track cmd.description) {
+									@for (
+										cmd of getCommandsByCategory(category);
+										track cmd.description
+									) {
 										<div class="command-item">
-											<span class="command-pattern">"{{ getCommandPatterns(cmd.patterns) }}"</span>
-											<span class="command-description">{{ cmd.description }}</span>
+											<span class="command-pattern"
+												>"{{ getCommandPatterns(cmd.patterns) }}"</span
+											>
+											<span class="command-description">{{
+												cmd.description
+											}}</span>
 										</div>
 									}
 								</div>
