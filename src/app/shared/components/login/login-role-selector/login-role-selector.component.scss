@@ -1,0 +1,82 @@
+.input-group {
+	display: flex;
+	align-items: center;
+	gap: 1rem;
+	border-bottom: 1px solid #a0a0a0;
+	padding: 1rem 0.5rem;
+	margin: 0 auto 0.25rem auto;
+	width: calc(100% - 5rem);
+
+	i {
+		color: #707070;
+		font-size: 1.1rem;
+	}
+}
+
+:host ::ng-deep {
+	p-select,
+	.p-select {
+		flex: 1;
+		background: transparent !important;
+		border: none !important;
+
+		.p-select-label {
+			background: transparent !important;
+			border: none !important;
+			padding: 0 !important;
+			font-size: 1.1rem;
+			color: var(--intranet-soft-text-color) !important;
+
+			&.p-placeholder {
+				color: var(--intranet-soft-text-color) !important;
+			}
+		}
+
+		.p-select-trigger {
+			background: transparent !important;
+			border: none !important;
+			color: var(--intranet-soft-text-color) !important;
+		}
+
+		&.p-focus,
+		&:focus,
+		&:hover {
+			box-shadow: none !important;
+			border: none !important;
+			outline: none !important;
+			background: transparent !important;
+		}
+	}
+
+	.p-select-overlay,
+	.p-select-panel {
+		background-color: var(--intranet-white-color) !important;
+		border: 1px solid var(--intranet-soft-text-color) !important;
+		box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15) !important;
+
+		.p-select-items {
+			padding: 0 !important;
+
+			.p-select-item {
+				color: var(--intranet-default-text-color) !important;
+				background: transparent !important;
+				padding: 0.75rem 1rem !important;
+
+				&:hover {
+					background-color: var(--intranet-background-color) !important;
+				}
+
+				&.p-highlight,
+				&.p-select-item-selected {
+					background-color: var(--intranet-accent-color-blue) !important;
+					color: white !important;
+				}
+
+				&:focus {
+					box-shadow: none !important;
+					outline: none !important;
+				}
+			}
+		}
+	}
+}

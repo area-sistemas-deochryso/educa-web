@@ -1,0 +1,90 @@
+.options-row {
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+	margin: 0.5rem auto 0 auto;
+	width: calc(100% - 5rem);
+	padding: 0 0.5rem;
+}
+
+:host ::ng-deep {
+	.remember-checkbox {
+		display: flex;
+		align-items: center;
+		gap: 0.4rem;
+		cursor: pointer;
+
+		span {
+			color: var(--intranet-soft-text-color);
+			font-size: 0.8rem;
+			font-weight: 400;
+		}
+	}
+
+	.forgot-link {
+		color: var(--intranet-accent-color-blue);
+		font-size: 0.85rem;
+		font-style: italic;
+		text-decoration: none;
+		font-weight: 400;
+
+		&:hover {
+			text-decoration: underline;
+		}
+	}
+
+	p-checkbox,
+	.p-checkbox {
+		width: 14px !important;
+		height: 14px !important;
+
+		.p-checkbox-box,
+		.p-checkbox-input,
+		> div {
+			width: 14px !important;
+			height: 14px !important;
+			background: transparent !important;
+			background-color: transparent !important;
+			box-shadow: none !important;
+			border: 1px solid var(--intranet-soft-text-color) !important;
+			border-radius: 2px !important;
+		}
+
+		&.p-checkbox-checked,
+		&.p-highlight {
+			.p-checkbox-box,
+			> div {
+				background: transparent !important;
+				border-color: var(--intranet-accent-color-blue) !important;
+			}
+
+			.p-checkbox-icon,
+			svg {
+				color: var(--intranet-accent-color-blue) !important;
+				fill: var(--intranet-accent-color-blue) !important;
+			}
+		}
+
+		&:hover {
+			.p-checkbox-box,
+			> div {
+				background: transparent !important;
+				box-shadow: none !important;
+				border-color: var(--intranet-alternative-text-color) !important;
+			}
+		}
+	}
+
+	.p-checkbox-checked .p-checkbox-box {
+		background: transparent !important;
+		border-color: var(--intranet-accent-color-blue) !important;
+	}
+}
+
+@media screen and (max-width: 576px) {
+	.options-row {
+		flex-direction: column;
+		gap: 1rem;
+		align-items: flex-start;
+	}
+}

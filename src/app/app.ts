@@ -1,6 +1,6 @@
 import { Component, inject } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
-import { SwService } from '@app/services';
+import { SwService } from '@core/services';
 
 @Component({
 	selector: 'app-root',

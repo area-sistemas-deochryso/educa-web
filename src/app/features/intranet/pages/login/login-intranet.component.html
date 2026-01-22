@@ -1,0 +1,68 @@
+<div class="login-overlay">
+	<div class="login-modal">
+		<app-login-header title="INICIAR SESIÓN" logoSrc="images/logo.png" />
+
+		<form class="login-form" (ngSubmit)="onLogin()" autocomplete="on">
+			<app-login-error-message [message]="errorMessage" [show]="showError" />
+
+			<app-login-input>
+				<i class="pi pi-id-card"></i>
+				<input
+					type="text"
+					pInputText
+					placeholder="DNI"
+					[(ngModel)]="dni"
+					name="dni"
+					autocomplete="username"
+					[disabled]="isDisabled"
+					maxlength="8"
+					pattern="[0-9]*"
+				/>
+			</app-login-input>
+
+			<app-login-input>
+				<i
+					class="pi password-toggle"
+					[class.pi-lock]="!showPassword"
+					[class.pi-lock-open]="showPassword"
+					(click)="togglePasswordVisibility()"
+				></i>
+				<input
+					[type]="showPassword ? 'text' : 'password'"
+					pInputText
+					placeholder="Contraseña"
+					[(ngModel)]="password"
+					name="password"
+					autocomplete="current-password"
+					[disabled]="isDisabled"
+				/>
+			</app-login-input>
+
+			<app-login-role-selector>
+				<i class="pi pi-users"></i>
+				<p-select
+					[options]="roles"
+					[(ngModel)]="selectedRol"
+					name="rol"
+					optionLabel="label"
+					optionValue="value"
+					placeholder="Seleccione rol"
+					[disabled]="isDisabled"
+					class="w-full"
+				/>
+			</app-login-role-selector>
+
+			<app-login-options>
+				<label class="remember-checkbox">
+					<p-checkbox [(ngModel)]="rememberMe" [binary]="true" name="remember" />
+					<span>Recordar sesión</span>
+				</label>
+				<a href="#" class="forgot-link" (click)="onForgotPassword($event)">
+					¿Ha olvidado la contraseña?
+				</a>
+			</app-login-options>
+
+			<app-login-button [isLoading]="isLoading" [disabled]="isDisabled" />
+		</form>
+	</div>
+</div>

@@ -6,7 +6,7 @@ import { provideAnimationsAsync } from '@angular/platform-browser/animations/asy
 import { providePrimeNG } from 'primeng/config';
 import { provideRouter } from '@angular/router';
 import { routes } from './app.routes';
-import { authInterceptor } from './interceptors';
+import { authInterceptor } from '@core/interceptors';
 
 export const appConfig: ApplicationConfig = {
 	providers: [

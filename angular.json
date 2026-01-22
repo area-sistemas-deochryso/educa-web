@@ -94,8 +94,8 @@
 							"sourceMap": true,
 							"fileReplacements": [
 								{
-									"replace": "src/app/environment/environment.ts",
-									"with": "src/app/environment/environment.development.ts"
+									"replace": "src/app/config/environment.ts",
+									"with": "src/app/config/environment.development.ts"
 								}
 							]
 						}
