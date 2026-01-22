@@ -43,7 +43,6 @@
 		"@ngrx/operators": "^21.0.1",
 		"@ngrx/signals": "^21.0.1",
 		"@primeng/themes": "^21.0.4",
-		"bootstrap": "^5.3.8",
 		"bootstrap-icons": "^1.13.1",
 		"exceljs": "^4.4.0",
 		"file-saver": "^2.0.5",

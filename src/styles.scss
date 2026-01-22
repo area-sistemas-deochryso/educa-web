@@ -3,8 +3,8 @@
   Estilos Globales
 */
 
-/* Bootstrap Custom - Solo módulos usados */
-@use 'styles/bootstrap-custom';
+/* Sistema de utilidades SCSS custom (reemplaza Bootstrap) */
+@use 'scss';
 
 /* PrimeIcons */
 @import 'primeicons/primeicons.css';
@@ -340,35 +340,6 @@ strong {
 
 .badge:hover {
 	background: var(--custom-btn-bg-color);
-	color: var(--white-color);
-}
-
-/*---------------------------------------
-  PAGINATION
------------------------------------------*/
-.pagination {
-	margin-top: 30px;
-	margin-bottom: 0;
-}
-
-.page-link {
-	border-color: var(--border-color);
-	border-radius: var(--border-radius-large);
-	color: var(--p-color);
-	font-size: var(--copyright-font-size);
-	padding: 0;
-	width: 45px;
-	height: 45px;
-	line-height: 45px;
-	text-align: center;
-	margin-right: 10px;
-	margin-left: 10px;
-}
-
-.page-item.active .page-link,
-.page-link:hover {
-	background: var(--secondary-color);
-	border-color: transparent;
 	color: var(--white-color);
 }
 

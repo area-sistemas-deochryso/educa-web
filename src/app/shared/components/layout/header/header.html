@@ -1,6 +1,6 @@
 <nav class="navbar navbar-expand-lg">
 	<div class="container">
-		<a class="navbar-brand d-flex align-items-center" routerLink="/">
+		<a class="navbar-brand d-flex align-items-center" routerLink="/" (click)="closeMenu()">
 			<picture>
 				<source srcset="images/logo.avif" type="image/avif" />
 				<source srcset="images/logo.webp" type="image/webp" />
@@ -11,16 +11,15 @@
 		<button
 			class="navbar-toggler"
 			type="button"
-			data-bs-toggle="collapse"
-			data-bs-target="#navbarNav"
+			(click)="toggleMenu()"
+			[attr.aria-expanded]="isMenuOpen()"
 			aria-controls="navbarNav"
-			aria-expanded="false"
 			aria-label="Toggle navigation"
 		>
 			<span class="navbar-toggler-icon"></span>
 		</button>
 
-		<div class="collapse navbar-collapse" id="navbarNav">
+		<div class="navbar-collapse" [class.show]="isMenuOpen()" id="navbarNav">
 			<ul class="navbar-nav align-items-center ms-lg-5">
 				<li class="nav-item">
 					<a
@@ -28,37 +27,40 @@
 						routerLink="/"
 						routerLinkActive="active"
 						[routerLinkActiveOptions]="{ exact: true }"
+						(click)="closeMenu()"
 					>
 						Inicio
 					</a>
 				</li>
 
 				<li class="nav-item">
-					<a class="nav-link" routerLink="/nosotros" routerLinkActive="active">
+					<a
+						class="nav-link"
+						routerLink="/nosotros"
+						routerLinkActive="active"
+						(click)="closeMenu()"
+					>
 						Nosotros
 					</a>
 				</li>
 
-				<li class="nav-item dropdown">
+				<li class="nav-item dropdown" [class.show]="isDropdownOpen()">
 					<a
 						class="nav-link dropdown-toggle"
 						role="button"
-						id="navbarLightDropdownMenuLink"
-						data-bs-toggle="dropdown"
-						aria-expanded="false"
+						(click)="toggleDropdown($event)"
+						[attr.aria-expanded]="isDropdownOpen()"
 					>
 						Niveles
 					</a>
 
-					<ul
-						class="dropdown-menu dropdown-menu-light"
-						aria-labelledby="navbarLightDropdownMenuLink"
-					>
+					<ul class="dropdown-menu dropdown-menu-light">
 						<li>
 							<a
 								class="dropdown-item"
 								routerLink="/niveles/inicial"
 								routerLinkActive="active"
+								(click)="closeMenu()"
 								>Inicial</a
 							>
 						</li>
@@ -67,6 +69,7 @@
 								class="dropdown-item"
 								routerLink="/niveles/primaria"
 								routerLinkActive="active"
+								(click)="closeMenu()"
 								>Primaria</a
 							>
 						</li>
@@ -75,6 +78,7 @@
 								class="dropdown-item"
 								routerLink="/niveles/secundaria"
 								routerLinkActive="active"
+								(click)="closeMenu()"
 								>Secundaria</a
 							>
 						</li>
@@ -82,7 +86,12 @@
 				</li>
 
 				<li class="nav-item">
-					<a class="nav-link" routerLink="/contacto" routerLinkActive="active">
+					<a
+						class="nav-link"
+						routerLink="/contacto"
+						routerLinkActive="active"
+						(click)="closeMenu()"
+					>
 						Contacto
 					</a>
 				</li>
@@ -92,6 +101,7 @@
 						class="nav-link"
 						routerLink="/preguntas-frecuentes"
 						routerLinkActive="active"
+						(click)="closeMenu()"
 					>
 						Preguntas Frecuentes
 					</a>

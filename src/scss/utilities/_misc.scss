@@ -1,0 +1,111 @@
+// =============================================================================
+// MISC UTILITIES - img-fluid, shadow-*, bg-*, w-*, position-*, overflow-*
+// =============================================================================
+
+// Images
+.img-fluid {
+  max-width: 100%;
+  height: auto;
+}
+
+.img-thumbnail {
+  padding: 0.25rem;
+  background-color: var(--white-color);
+  border: 1px solid var(--border-color);
+  border-radius: var(--border-radius-small);
+  max-width: 100%;
+  height: auto;
+}
+
+// Shadows
+.shadow-sm { box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075); }
+.shadow { box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15); }
+.shadow-lg { box-shadow: 0 1rem 3rem rgba(0, 0, 0, 0.175); }
+.shadow-none { box-shadow: none; }
+
+// Width utilities
+.w-25 { width: 25%; }
+.w-50 { width: 50%; }
+.w-75 { width: 75%; }
+.w-100 { width: 100%; }
+.w-auto { width: auto; }
+.w-full { width: 100%; }
+
+// Height utilities
+.h-25 { height: 25%; }
+.h-50 { height: 50%; }
+.h-75 { height: 75%; }
+.h-100 { height: 100%; }
+.h-auto { height: auto; }
+
+// Max width/height
+.mw-100 { max-width: 100%; }
+.mh-100 { max-height: 100%; }
+
+// Background colors (usando variables CSS existentes)
+.bg-white { background-color: var(--white-color); }
+.bg-transparent { background-color: transparent; }
+.bg-primary { background-color: var(--primary-color); }
+.bg-secondary { background-color: var(--secondary-color); }
+.bg-dark { background-color: var(--dark-color); }
+.bg-light { background-color: var(--section-bg-color); }
+
+// Position utilities
+.position-static { position: static; }
+.position-relative { position: relative; }
+.position-absolute { position: absolute; }
+.position-fixed { position: fixed; }
+.position-sticky { position: sticky; }
+
+// Top/Right/Bottom/Left
+.top-0 { top: 0; }
+.top-50 { top: 50%; }
+.top-100 { top: 100%; }
+.bottom-0 { bottom: 0; }
+.bottom-50 { bottom: 50%; }
+.bottom-100 { bottom: 100%; }
+.start-0 { left: 0; }
+.start-50 { left: 50%; }
+.start-100 { left: 100%; }
+.end-0 { right: 0; }
+.end-50 { right: 50%; }
+.end-100 { right: 100%; }
+
+// Translate center
+.translate-middle {
+  transform: translate(-50%, -50%);
+}
+
+// Overflow
+.overflow-auto { overflow: auto; }
+.overflow-hidden { overflow: hidden; }
+.overflow-visible { overflow: visible; }
+.overflow-scroll { overflow: scroll; }
+
+// Visibility
+.visible { visibility: visible; }
+.invisible { visibility: hidden; }
+
+// Border utilities
+.border { border: 1px solid var(--border-color); }
+.border-0 { border: 0; }
+.border-top { border-top: 1px solid var(--border-color); }
+.border-bottom { border-bottom: 1px solid var(--border-color); }
+.border-start { border-left: 1px solid var(--border-color); }
+.border-end { border-right: 1px solid var(--border-color); }
+
+// Border radius
+.rounded { border-radius: var(--border-radius-small); }
+.rounded-0 { border-radius: 0; }
+.rounded-1 { border-radius: 0.2rem; }
+.rounded-2 { border-radius: 0.25rem; }
+.rounded-3 { border-radius: 0.3rem; }
+.rounded-circle { border-radius: 50%; }
+.rounded-pill { border-radius: 50rem; }
+
+// Clearfix
+.clearfix::after {
+  display: block;
+  clear: both;
+  content: "";
+}

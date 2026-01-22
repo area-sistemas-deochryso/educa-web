@@ -1,0 +1,21 @@
+// =============================================================================
+// SISTEMA DE UTILIDADES SCSS - Entry Point
+// Reemplaza Bootstrap CSS con utilidades custom
+// =============================================================================
+
+// Reset (normaliza user agent styles)
+@use 'reset';
+
+// Utilities
+@use 'utilities/grid';
+@use 'utilities/flex';
+@use 'utilities/spacing';
+@use 'utilities/text';
+@use 'utilities/misc';
+
+// Components
+@use 'components/navbar';
+@use 'components/breadcrumb';
+@use 'components/forms';
+@use 'components/pagination';
+@use 'components/tables';

@@ -144,3 +144,12 @@
 		margin-top: 50px;
 	}
 }
+
+/*---------------------------------------
+  FIXES MIGRACION BOOTSTRAP
+-----------------------------------------*/
+:host ::ng-deep {
+	.footer-title {
+		margin-top: 0;
+	}
+}

@@ -1,0 +1,72 @@
+// =============================================================================
+// GRID SYSTEM - container, row, col-*
+// =============================================================================
+
+@use 'sass:map';
+@use '../variables' as *;
+
+// Container
+.container {
+  width: 100%;
+  padding-right: calc($grid-gutter / 2);
+  padding-left: calc($grid-gutter / 2);
+  margin-right: auto;
+  margin-left: auto;
+
+  @each $breakpoint, $max-width in $container-max-widths {
+    @include media-up($breakpoint) {
+      max-width: $max-width;
+    }
+  }
+}
+
+// Row
+.row {
+  display: flex;
+  flex-wrap: wrap;
+  margin-right: calc($grid-gutter / -2);
+  margin-left: calc($grid-gutter / -2);
+
+  > * {
+    flex-shrink: 0;
+    width: 100%;
+    max-width: 100%;
+    padding-right: calc($grid-gutter / 2);
+    padding-left: calc($grid-gutter / 2);
+  }
+}
+
+// Column mixin
+@mixin make-col($size) {
+  flex: 0 0 auto;
+  width: calc(100% * $size / $grid-columns);
+}
+
+// Base columns (mobile-first)
+@for $i from 1 through $grid-columns {
+  .col-#{$i} {
+    @include make-col($i);
+  }
+}
+
+// Auto column
+.col-auto {
+  flex: 0 0 auto;
+  width: auto;
+}
+
+// Responsive columns
+@each $breakpoint, $min-width in $breakpoints {
+  @include media-up($breakpoint) {
+    @for $i from 1 through $grid-columns {
+      .col-#{$breakpoint}-#{$i} {
+        @include make-col($i);
+      }
+    }
+
+    .col-#{$breakpoint}-auto {
+      flex: 0 0 auto;
+      width: auto;
+    }
+  }
+}
