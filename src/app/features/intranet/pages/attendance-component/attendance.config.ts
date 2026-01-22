@@ -1,4 +1,4 @@
-import { AttendanceStatus, MonthOption, LegendItem } from './attendance.types';
+import { AttendanceStatus, LegendItem, MonthOption } from './attendance.types';
 
 export const ATTENDANCE_STORAGE_KEY = 'attendance_selected_month';
 
@@ -22,7 +22,7 @@ export const DAY_HEADERS = ['Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes'
 export const LEGEND_ITEMS: LegendItem[] = [
 	{ code: 'T', label: 'Temprano', status: 'T' },
 	{ code: 'A', label: 'A tiempo', status: 'A' },
-	{ code: 'F', label: 'Fuera de horario', status: 'F' },
+	{ code: 'F', label: 'Fuera de hora', status: 'F' },
 	{ code: 'N', label: 'No asistió', status: 'N' },
 ];
 

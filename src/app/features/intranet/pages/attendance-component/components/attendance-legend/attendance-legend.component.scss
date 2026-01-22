@@ -1,5 +1,6 @@
 // Colores de estado
-$color-temprano: #253470;
+// $color-temprano: #253470;
+$color-temprano: #506ad0;
 $color-atiempo: #77a02d;
 $color-fuera: #ffcc0c;
 $color-no: #f44336;
@@ -73,5 +74,11 @@ $color-no: #f44336;
 
 	.legend-item {
 		min-width: auto;
+	}
+}
+
+@media screen and (max-width: 480px) {
+	.legend-content {
+		padding: 1rem !important;
 	}
 }

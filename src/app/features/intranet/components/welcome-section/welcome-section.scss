@@ -67,3 +67,15 @@
 		}
 	}
 }
+
+@media (max-width: 480px) {
+	.welcome-section {
+		display: flex;
+		flex-direction: row;
+		.welcome-content {
+			.welcome-text > *:not(h1) {
+				padding: 0 0.7em;
+			}
+		}
+	}
+}

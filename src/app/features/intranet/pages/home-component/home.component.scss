@@ -45,3 +45,9 @@
 		gap: 1.25rem;
 	}
 }
+
+@media (max-width: 480px) {
+	.quick-access-grid {
+		grid-template-columns: repeat(1, 1fr);
+	}
+}

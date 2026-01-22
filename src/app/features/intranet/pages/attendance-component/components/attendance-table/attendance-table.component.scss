@@ -1,5 +1,6 @@
 // Colores de estado
-$color-temprano: #253470;
+// $color-temprano: #253470;
+$color-temprano: #506ad0;
 $color-atiempo: #77a02d;
 $color-fuera: #ffcc0c;
 $color-no: #f44336;
@@ -445,7 +446,7 @@ $color-no: #f44336;
 	}
 
 	.day-cell {
-		min-width: 40px;
+		min-width: 70px;
 		min-height: 40px;
 		padding: 3px;
 
@@ -485,7 +486,6 @@ $color-no: #f44336;
 	}
 
 	.day-cell {
-		min-width: 35px;
 		min-height: 35px;
 		padding: 2px;
 
