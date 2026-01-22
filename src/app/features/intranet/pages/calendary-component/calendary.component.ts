@@ -1,7 +1,6 @@
 import { Component, OnInit, AfterViewInit, signal, inject, PLATFORM_ID } from '@angular/core';
-import { CommonModule, isPlatformBrowser } from '@angular/common';
+import { isPlatformBrowser } from '@angular/common';
 import { ActivatedRoute } from '@angular/router';
-import { IntranetBackground } from '../../components/intranet-background/intranet-background';
 import { CalendarHeaderComponent } from './components/calendar-header/calendar-header.component';
 import { CalendarLegendComponent } from './components/calendar-legend/calendar-legend.component';
 import { CalendarMonthCardComponent } from './components/calendar-month-card/calendar-month-card.component';
@@ -13,8 +12,6 @@ import { getEvent, isDateInEventRange, isDateEventEnd } from './events.config';
 @Component({
 	selector: 'app-calendary.component',
 	imports: [
-		CommonModule,
-		IntranetBackground,
 		CalendarHeaderComponent,
 		CalendarLegendComponent,
 		CalendarMonthCardComponent,

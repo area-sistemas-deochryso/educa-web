@@ -1,4 +1,12 @@
-import { Component, OnDestroy, AfterViewInit, ChangeDetectorRef, inject } from '@angular/core';
+import {
+	Component,
+	OnDestroy,
+	AfterViewInit,
+	ChangeDetectorRef,
+	inject,
+	PLATFORM_ID,
+} from '@angular/core';
+import { isPlatformBrowser } from '@angular/common';
 
 @Component({
 	selector: 'app-counter-section',
@@ -9,6 +17,7 @@ import { Component, OnDestroy, AfterViewInit, ChangeDetectorRef, inject } from '
 })
 export class CounterSectionComponent implements AfterViewInit, OnDestroy {
 	private cdr = inject(ChangeDetectorRef);
+	private platformId = inject(PLATFORM_ID);
 
 	targetCount = 500;
 	displayedCount = 0;
@@ -17,7 +26,9 @@ export class CounterSectionComponent implements AfterViewInit, OnDestroy {
 	private hasAnimated = false;
 
 	ngAfterViewInit(): void {
-		this.setupIntersectionObserver();
+		if (isPlatformBrowser(this.platformId)) {
+			this.setupIntersectionObserver();
+		}
 	}
 
 	ngOnDestroy(): void {

@@ -1,4 +1,15 @@
 <div class="login-header">
 	<h2>{{ title }}</h2>
-	<img [src]="logoSrc" alt="Educa.com Logo" class="login-logo" />
+	<picture>
+		<source srcset="images/logo.avif" type="image/avif" />
+		<source srcset="images/logo.webp" type="image/webp" />
+		<img
+			[src]="logoSrc"
+			alt="Educa.com Logo"
+			class="login-logo"
+			width="200"
+			height="53"
+			fetchpriority="high"
+		/>
+	</picture>
 </div>
