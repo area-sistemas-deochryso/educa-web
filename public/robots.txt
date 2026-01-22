@@ -1,0 +1,16 @@
+# robots.txt for educa.com.pe
+# https://www.robotstxt.org/robotstxt.html
+
+User-agent: *
+Allow: /
+
+# Block private/authenticated areas
+Disallow: /intranet/
+Disallow: /api/
+
+# Block common non-content paths
+Disallow: /*.json$
+Disallow: /*.js.map$
+
+# Sitemap location
+Sitemap: https://educa.com.pe/sitemap.xml
