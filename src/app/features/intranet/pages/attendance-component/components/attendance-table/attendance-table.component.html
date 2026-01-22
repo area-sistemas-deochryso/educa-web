@@ -68,13 +68,14 @@
 				@for (day of week.days; track $index) {
 					<td class="day-col">
 						@if (isDayValid(day)) {
-							<div
-								class="day-square"
-								[class]="getStatusClass(day.status)"
-								[title]="day.hora || ''"
-							></div>
+							<div class="day-cell" [class]="getStatusClass(day.status)">
+								<span class="day-status">{{ day.status }}</span>
+								@if (day.hora) {
+									<span class="day-hora">{{ day.hora }}</span>
+								}
+							</div>
 						} @else {
-							<div class="day-square day-empty"></div>
+							<div class="day-cell day-empty"></div>
 						}
 					</td>
 				}

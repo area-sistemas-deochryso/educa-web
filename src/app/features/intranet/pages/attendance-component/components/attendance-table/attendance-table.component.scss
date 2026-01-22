@@ -324,12 +324,31 @@ $color-no: #f44336;
 	}
 }
 
-.day-square {
-	width: 50px;
-	height: 50px;
-	border-radius: 2px;
+.day-cell {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	justify-content: center;
+	min-width: 50px;
+	min-height: 50px;
+	padding: 4px;
+	border-radius: 4px;
 	margin: 0 auto;
 	cursor: default;
+
+	.day-status {
+		font-size: 1rem;
+		font-weight: 600;
+		color: white;
+		line-height: 1;
+	}
+
+	.day-hora {
+		font-size: 0.65rem;
+		color: rgba(255, 255, 255, 0.9);
+		margin-top: 2px;
+		line-height: 1;
+	}
 
 	&.day-empty {
 		background-color: transparent;
@@ -412,9 +431,18 @@ $color-no: #f44336;
 		}
 	}
 
-	.day-square {
-		width: 35px;
-		height: 35px;
+	.day-cell {
+		min-width: 40px;
+		min-height: 40px;
+		padding: 3px;
+
+		.day-status {
+			font-size: 0.85rem;
+		}
+
+		.day-hora {
+			font-size: 0.55rem;
+		}
 	}
 }
 
@@ -443,8 +471,17 @@ $color-no: #f44336;
 		}
 	}
 
-	.day-square {
-		width: 28px;
-		height: 28px;
+	.day-cell {
+		min-width: 35px;
+		min-height: 35px;
+		padding: 2px;
+
+		.day-status {
+			font-size: 0.75rem;
+		}
+
+		.day-hora {
+			font-size: 0.5rem;
+		}
 	}
 }
