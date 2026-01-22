@@ -3,6 +3,9 @@
 	align-items: center;
 	gap: 0.75rem;
 	margin-bottom: 1.5rem;
+	// Dimensiones fijas para evitar CLS
+	min-height: 40px;
+	contain: layout style;
 
 	i {
 		font-size: 1.5rem;

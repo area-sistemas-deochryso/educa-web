@@ -3,60 +3,61 @@
 
 	<app-attendance-legend />
 
-	@if (userRole === 'Apoderado') {
-		<!-- Vista Apoderado: selector integrado en las tablas -->
-		@if (hijos().length > 0) {
-			<app-attendance-table
-				[table]="ingresos()"
-				[hijos]="hijos()"
-				[selectedHijoId]="selectedHijoId()"
-				(monthChange)="onIngresosMonthChange($event)"
-				(hijoChange)="selectHijo($event)"
-			/>
-			<app-attendance-table
-				[table]="salidas()"
-				[hijos]="hijos()"
-				[selectedHijoId]="selectedHijoId()"
-				(monthChange)="onSalidasMonthChange($event)"
-				(hijoChange)="selectHijo($event)"
-			/>
-		} @else if (!loading()) {
-			<app-empty-state message="No se encontraron hijos registrados." />
-		}
-	} @else if (userRole === 'Profesor') {
-		<!-- Vista Profesor: selector de salón + selector de estudiante -->
-		@if (salones().length > 0) {
-			<app-salon-selector
-				[salones]="salones()"
-				[selectedSalonId]="selectedSalonId()"
-				[nombreProfesor]="nombreProfesor"
-				(salonChange)="selectSalon($event)"
-			/>
-
-			@if (estudiantes().length > 0) {
+	@switch (userRole) {
+		@case ('Apoderado') {
+			@if (hijos().length > 0) {
 				<app-attendance-table
 					[table]="ingresos()"
-					[hijos]="estudiantesAsHijos()"
-					[selectedHijoId]="selectedEstudianteId()"
+					[hijos]="hijos()"
+					[selectedHijoId]="selectedHijoId()"
 					(monthChange)="onIngresosMonthChange($event)"
-					(hijoChange)="selectEstudiante($event)"
+					(hijoChange)="selectHijo($event)"
 				/>
 				<app-attendance-table
 					[table]="salidas()"
-					[hijos]="estudiantesAsHijos()"
-					[selectedHijoId]="selectedEstudianteId()"
+					[hijos]="hijos()"
+					[selectedHijoId]="selectedHijoId()"
 					(monthChange)="onSalidasMonthChange($event)"
-					(hijoChange)="selectEstudiante($event)"
+					(hijoChange)="selectHijo($event)"
 				/>
 			} @else if (!loading()) {
-				<app-empty-state message="No se encontraron estudiantes en este salón." />
+				<app-empty-state message="No se encontraron hijos registrados." />
 			}
-		} @else if (!loading()) {
-			<app-empty-state message="No tiene salones asignados." />
 		}
-	} @else {
-		<!-- Vista Estudiante: tablas propias -->
-		<app-attendance-table [table]="ingresos()" (monthChange)="onIngresosMonthChange($event)" />
-		<app-attendance-table [table]="salidas()" (monthChange)="onSalidasMonthChange($event)" />
+		@case ('Profesor') {
+			@if (salones().length > 0) {
+				<app-salon-selector
+					[salones]="salones()"
+					[selectedSalonId]="selectedSalonId()"
+					[nombreProfesor]="nombreProfesor"
+					(salonChange)="selectSalon($event)"
+				/>
+
+				@if (estudiantes().length > 0) {
+					<app-attendance-table
+						[table]="ingresos()"
+						[hijos]="estudiantesAsHijos()"
+						[selectedHijoId]="selectedEstudianteId()"
+						(monthChange)="onIngresosMonthChange($event)"
+						(hijoChange)="selectEstudiante($event)"
+					/>
+					<app-attendance-table
+						[table]="salidas()"
+						[hijos]="estudiantesAsHijos()"
+						[selectedHijoId]="selectedEstudianteId()"
+						(monthChange)="onSalidasMonthChange($event)"
+						(hijoChange)="selectEstudiante($event)"
+					/>
+				} @else if (!loading()) {
+					<app-empty-state message="No se encontraron estudiantes en este salón." />
+				}
+			} @else if (!loading()) {
+				<app-empty-state message="No tiene salones asignados." />
+			}
+		}
+		@default {
+			<app-attendance-table [table]="ingresos()" (monthChange)="onIngresosMonthChange($event)" />
+			<app-attendance-table [table]="salidas()" (monthChange)="onSalidasMonthChange($event)" />
+		}
 	}
 </div>

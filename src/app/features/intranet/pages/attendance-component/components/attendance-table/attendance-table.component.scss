@@ -8,6 +8,9 @@ $color-no: #f44336;
 	border-radius: 10px;
 	padding: 1.5rem;
 	margin-bottom: 1.5rem;
+	// Reservar espacio mínimo para evitar CLS
+	min-height: 350px;
+	contain: layout style;
 }
 
 .section-header {
@@ -64,6 +67,9 @@ $color-no: #f44336;
 		background: transparent;
 		border: none;
 		border-bottom: 1px solid var(--intranet-soft-text-color, #5e5e5e);
+		// Dimensiones fijas para evitar CLS
+		min-width: 200px;
+		min-height: 32px;
 
 		.p-select-label {
 			padding: 0.15rem 0.25rem;
@@ -94,6 +100,9 @@ $color-no: #f44336;
 		background: transparent;
 		border: 1px solid var(--intranet-soft-text-color);
 		border-radius: 4px;
+		// Dimensiones fijas para evitar CLS
+		min-width: 120px;
+		min-height: 38px;
 
 		.p-select-label {
 			padding: 0.5rem 1rem;
@@ -185,6 +194,10 @@ $color-no: #f44336;
 		border: 1px solid var(--intranet-alternative-text-color);
 		border-radius: 10px;
 		overflow: hidden;
+		// Optimizar rendering para evitar CLS
+		contain: layout style;
+		content-visibility: auto;
+		contain-intrinsic-size: auto 280px;
 
 		// Scrollbar con fondo transparente
 		.p-datatable-table-container {

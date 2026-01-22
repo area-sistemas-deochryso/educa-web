@@ -1,5 +1,4 @@
-import { Component, input, output } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import { ChangeDetectionStrategy, Component, input, output } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { SalonProfesor } from '@core/services';
 
@@ -10,7 +9,8 @@ import { SalonProfesor } from '@core/services';
 @Component({
 	selector: 'app-salon-selector',
 	standalone: true,
-	imports: [CommonModule, FormsModule],
+	imports: [FormsModule],
+	changeDetection: ChangeDetectionStrategy.OnPush,
 	template: `
 		<div class="salon-selector">
 			<label>Salón:</label>

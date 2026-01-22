@@ -1,5 +1,4 @@
-import { Component, input } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import { ChangeDetectionStrategy, Component, input } from '@angular/core';
 
 /**
  * Componente presentacional (Dumb) para estados vacíos.
@@ -8,7 +7,7 @@ import { CommonModule } from '@angular/common';
 @Component({
 	selector: 'app-empty-state',
 	standalone: true,
-	imports: [CommonModule],
+	changeDetection: ChangeDetectionStrategy.OnPush,
 	template: `
 		<div class="no-data">
 			<p>{{ message() }}</p>

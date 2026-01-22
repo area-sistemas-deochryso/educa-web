@@ -7,12 +7,10 @@ import { AttendanceLegendComponent } from './components/attendance-legend/attend
 import { AttendanceTableComponent } from './components/attendance-table/attendance-table.component';
 import { SalonSelectorComponent } from './components/salon-selector/salon-selector.component';
 import { EmptyStateComponent } from './components/empty-state/empty-state.component';
-import { CommonModule } from '@angular/common';
 
 @Component({
 	selector: 'app-attendance',
 	imports: [
-		CommonModule,
 		AttendanceHeaderComponent,
 		AttendanceLegendComponent,
 		AttendanceTableComponent,

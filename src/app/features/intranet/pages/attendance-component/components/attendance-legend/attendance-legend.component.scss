@@ -8,6 +8,9 @@ $color-no: #f44336;
 	border-radius: 10px;
 	padding: 1.7rem;
 	margin-bottom: 1.5rem;
+	// Dimensiones fijas para evitar CLS
+	min-height: 120px;
+	contain: layout style;
 
 	h2 {
 		font-size: 1.1rem;

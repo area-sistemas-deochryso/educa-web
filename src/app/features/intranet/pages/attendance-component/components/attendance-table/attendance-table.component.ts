@@ -1,5 +1,4 @@
-import { Component, input, output } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import { ChangeDetectionStrategy, Component, input, output } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { TableModule } from 'primeng/table';
 import { Select } from 'primeng/select';
@@ -15,9 +14,10 @@ export interface HijoOption {
 @Component({
 	selector: 'app-attendance-table',
 	standalone: true,
-	imports: [CommonModule, FormsModule, TableModule, Select],
+	imports: [FormsModule, TableModule, Select],
 	templateUrl: './attendance-table.component.html',
 	styleUrl: './attendance-table.component.scss',
+	changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class AttendanceTableComponent {
 	table = input.required<AttendanceTable>();

@@ -3,6 +3,8 @@
 	font-family: var(--intranet-font-family);
 	background-color: var(--intranet-background-color);
 	min-height: 100%;
+	// Reservar espacio mínimo para evitar CLS
+	contain: layout style;
 }
 
 .salon-selector {
