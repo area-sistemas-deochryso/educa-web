@@ -21,31 +21,17 @@
 				(hijoChange)="selectHijo($event)"
 			/>
 		} @else if (!loading()) {
-			<div class="no-data">
-				<p>No se encontraron hijos registrados.</p>
-			</div>
+			<app-empty-state message="No se encontraron hijos registrados." />
 		}
 	} @else if (userRole === 'Profesor') {
 		<!-- Vista Profesor: selector de salón + selector de estudiante -->
 		@if (salones().length > 0) {
-			<div class="salon-selector">
-				<label>Salón:</label>
-				<select (change)="selectSalon(+$any($event.target).value)">
-					@for (salon of salones(); track salon.salonId) {
-						<option
-							[value]="salon.salonId"
-							[selected]="salon.salonId === selectedSalonId()"
-						>
-							{{ salon.nombreSalon }}
-							@if (salon.esTutor) {
-								(Tutor {{ nombreProfesor }})
-							} @else {
-								(Profesor {{ nombreProfesor }})
-							}
-						</option>
-					}
-				</select>
-			</div>
+			<app-salon-selector
+				[salones]="salones()"
+				[selectedSalonId]="selectedSalonId()"
+				[nombreProfesor]="nombreProfesor"
+				(salonChange)="selectSalon($event)"
+			/>
 
 			@if (estudiantes().length > 0) {
 				<app-attendance-table
@@ -63,14 +49,10 @@
 					(hijoChange)="selectEstudiante($event)"
 				/>
 			} @else if (!loading()) {
-				<div class="no-data">
-					<p>No se encontraron estudiantes en este salón.</p>
-				</div>
+				<app-empty-state message="No se encontraron estudiantes en este salón." />
 			}
 		} @else if (!loading()) {
-			<div class="no-data">
-				<p>No tiene salones asignados.</p>
-			</div>
+			<app-empty-state message="No tiene salones asignados." />
 		}
 	} @else {
 		<!-- Vista Estudiante: tablas propias -->

@@ -2,8 +2,8 @@
 	<div class="login-modal">
 		<app-login-header title="INICIAR SESIÓN" logoSrc="images/logo.png" />
 
-		<form class="login-form" (ngSubmit)="onLogin()" autocomplete="on">
-			<app-login-error-message [message]="errorMessage" [show]="showError" />
+		<form class="login-form" [formGroup]="loginForm" (ngSubmit)="onLogin()" autocomplete="on">
+			<app-login-error-message [message]="errorMessage()" [show]="showError()" />
 
 			<app-login-input>
 				<i class="pi pi-id-card"></i>
@@ -11,39 +11,38 @@
 					type="text"
 					pInputText
 					placeholder="DNI"
-					[(ngModel)]="dni"
-					name="dni"
+					formControlName="dni"
 					autocomplete="username"
-					[disabled]="isDisabled"
+					[attr.disabled]="isDisabled ? '' : null"
 					maxlength="8"
 					pattern="[0-9]*"
 				/>
 			</app-login-input>
+			<app-form-error [control]="loginForm.controls.dni" />
 
 			<app-login-input>
 				<i
 					class="pi password-toggle"
-					[class.pi-lock]="!showPassword"
-					[class.pi-lock-open]="showPassword"
+					[class.pi-lock]="!showPassword()"
+					[class.pi-lock-open]="showPassword()"
 					(click)="togglePasswordVisibility()"
 				></i>
 				<input
-					[type]="showPassword ? 'text' : 'password'"
+					[type]="showPassword() ? 'text' : 'password'"
 					pInputText
 					placeholder="Contraseña"
-					[(ngModel)]="password"
-					name="password"
+					formControlName="password"
 					autocomplete="current-password"
-					[disabled]="isDisabled"
+					[attr.disabled]="isDisabled ? '' : null"
 				/>
 			</app-login-input>
+			<app-form-error [control]="loginForm.controls.password" />
 
 			<app-login-role-selector>
 				<i class="pi pi-users"></i>
 				<p-select
 					[options]="roles"
-					[(ngModel)]="selectedRol"
-					name="rol"
+					formControlName="rol"
 					optionLabel="label"
 					optionValue="value"
 					placeholder="Seleccione rol"
@@ -54,7 +53,7 @@
 
 			<app-login-options>
 				<label class="remember-checkbox">
-					<p-checkbox [(ngModel)]="rememberMe" [binary]="true" name="remember" />
+					<p-checkbox formControlName="rememberMe" [binary]="true" />
 					<span>Recordar sesión</span>
 				</label>
 				<a href="#" class="forgot-link" (click)="onForgotPassword($event)">
@@ -62,7 +61,7 @@
 				</a>
 			</app-login-options>
 
-			<app-login-button [isLoading]="isLoading" [disabled]="isDisabled" />
+			<app-login-button [isLoading]="isLoading()" [disabled]="isDisabled" />
 		</form>
 	</div>
 </div>

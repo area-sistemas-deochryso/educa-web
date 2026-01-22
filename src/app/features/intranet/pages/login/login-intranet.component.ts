@@ -1,12 +1,14 @@
-import { Component, OnInit } from '@angular/core';
-import { CommonModule } from '@angular/common';
-import { FormsModule } from '@angular/forms';
-import { Router } from '@angular/router';
-import { InputTextModule } from 'primeng/inputtext';
-import { CheckboxModule } from 'primeng/checkbox';
-import { Select } from 'primeng/select';
+import { Component, OnInit, inject, signal } from '@angular/core'
+import { CommonModule } from '@angular/common'
+import { ReactiveFormsModule, FormBuilder, Validators } from '@angular/forms'
+import { Router } from '@angular/router'
+import { InputTextModule } from 'primeng/inputtext'
+import { CheckboxModule } from 'primeng/checkbox'
+import { Select } from 'primeng/select'
 
-import { AuthService, UserRole } from '@core/services';
+import { AuthService, UserRole } from '@core/services'
+import { AppValidators, LoginFormGroup } from '@shared/validators'
+import { FormErrorComponent } from '@shared/components/form-error'
 import {
 	LoginHeaderComponent,
 	LoginErrorMessageComponent,
@@ -15,16 +17,17 @@ import {
 	RolOption,
 	LoginOptionsComponent,
 	LoginButtonComponent,
-} from '@shared/components/login';
+} from '@shared/components/login'
 
 @Component({
 	selector: 'app-login-intranet',
 	imports: [
 		CommonModule,
-		FormsModule,
+		ReactiveFormsModule,
 		InputTextModule,
 		CheckboxModule,
 		Select,
+		FormErrorComponent,
 		LoginHeaderComponent,
 		LoginErrorMessageComponent,
 		LoginInputComponent,
@@ -36,124 +39,124 @@ import {
 	styleUrl: './login-intranet.component.scss',
 })
 export class LoginIntranetComponent implements OnInit {
-	dni = '';
-	password = '';
-	selectedRol: UserRole = 'Estudiante';
-	rememberMe = false;
-	errorMessage = '';
-	showError = false;
-	isLoading = false;
-	showPassword = false;
+	private fb = inject(FormBuilder)
+	private router = inject(Router)
+	private authService = inject(AuthService)
+
+	// Form tipado
+	loginForm: LoginFormGroup = this.fb.group({
+		dni: this.fb.nonNullable.control('', [Validators.required, AppValidators.dni()]),
+		password: this.fb.nonNullable.control('', [Validators.required, Validators.minLength(4)]),
+		rol: this.fb.nonNullable.control<UserRole>('Estudiante'),
+		rememberMe: this.fb.nonNullable.control(false),
+	})
+
+	// Estado con Signals
+	errorMessage = signal('')
+	showError = signal(false)
+	isLoading = signal(false)
+	showPassword = signal(false)
 
 	roles: RolOption[] = [
 		{ label: 'Estudiante', value: 'Estudiante' },
 		{ label: 'Apoderado', value: 'Apoderado' },
 		{ label: 'Profesor', value: 'Profesor' },
 		{ label: 'Director', value: 'Director' },
-	];
-
-	constructor(
-		private router: Router,
-		private authService: AuthService,
-	) {}
+	]
 
 	ngOnInit(): void {
 		if (this.authService.isAuthenticated) {
-			this.router.navigate(['/intranet']);
-			return;
+			this.router.navigate(['/intranet'])
+			return
 		}
-		this.authService.resetAttempts();
-		this.tryAutofillFromRememberToken();
+		this.authService.resetAttempts()
+		this.tryAutofillFromRememberToken()
 	}
 
 	private tryAutofillFromRememberToken(): void {
 		this.authService.verifyTokenForAutofill().subscribe({
-			next: (response) => {
+			next: response => {
 				if (response) {
-					this.dni = response.dni;
-					this.password = response.contraseña;
-					this.selectedRol = response.rol;
+					this.loginForm.patchValue({
+						dni: response.dni,
+						password: response.contraseña,
+						rol: response.rol,
+					})
 				}
 			},
-		});
+		})
 	}
 
 	get remainingAttempts(): number {
-		return this.authService.remainingAttempts;
+		return this.authService.remainingAttempts
 	}
 
 	get isBlocked(): boolean {
-		return this.authService.isBlocked;
+		return this.authService.isBlocked
 	}
 
 	get isDisabled(): boolean {
-		return this.isBlocked || this.isLoading;
+		return this.isBlocked || this.isLoading()
 	}
 
 	onLogin(): void {
-		this.showError = false;
-		this.errorMessage = '';
+		this.showError.set(false)
+		this.errorMessage.set('')
 
-		const dniValue = this.dni.trim();
-		const passValue = this.password.trim();
+		// Marcar todos los campos como touched para mostrar errores
+		this.loginForm.markAllAsTouched()
 
-		if (!dniValue || !passValue) {
-			this.errorMessage = 'Por favor ingrese DNI y contraseña';
-			this.showError = true;
-			return;
-		}
-
-		if (dniValue.length !== 8) {
-			this.errorMessage = 'El DNI debe tener 8 dígitos';
-			this.showError = true;
-			return;
+		if (this.loginForm.invalid) {
+			this.errorMessage.set('Por favor, corrija los errores en el formulario')
+			this.showError.set(true)
+			return
 		}
 
 		if (this.isBlocked) {
-			this.goBack();
-			return;
+			this.goBack()
+			return
 		}
 
-		this.isLoading = true;
+		this.isLoading.set(true)
+		const { dni, password, rol, rememberMe } = this.loginForm.getRawValue()
 
-		this.authService.login(dniValue, passValue, this.selectedRol, this.rememberMe).subscribe({
-			next: (response) => {
-				this.isLoading = false;
+		this.authService.login(dni, password, rol, rememberMe).subscribe({
+			next: response => {
+				this.isLoading.set(false)
 
 				if (response.token) {
-					this.router.navigate(['/intranet']);
+					this.router.navigate(['/intranet'])
 				} else {
 					if (this.authService.isBlocked) {
-						this.errorMessage =
-							'Ha excedido el número máximo de intentos. Será redirigido...';
-						this.showError = true;
-						setTimeout(() => this.goBack(), 2000);
+						this.errorMessage.set('Ha excedido el numero maximo de intentos. Sera redirigido...')
+						this.showError.set(true)
+						setTimeout(() => this.goBack(), 2000)
 					} else {
-						this.errorMessage =
-							response.mensaje ||
-							`Credenciales incorrectas. Intentos restantes: ${this.remainingAttempts}`;
-						this.showError = true;
+						this.errorMessage.set(
+							response.mensaje || `Credenciales incorrectas. Intentos restantes: ${this.remainingAttempts}`
+						)
+						this.showError.set(true)
 					}
 				}
 			},
 			error: () => {
-				this.isLoading = false;
-				this.errorMessage = 'Error de conexión. Intente nuevamente.';
-				this.showError = true;
+				this.isLoading.set(false)
+				this.errorMessage.set('Error de conexion. Intente nuevamente.')
+				this.showError.set(true)
 			},
-		});
+		})
 	}
 
 	onForgotPassword(event: Event): void {
-		event.preventDefault();
-		// TODO: Implementar recuperación de contraseña
+		event.preventDefault()
+		// TODO: Implementar recuperacion de contrasena
 	}
 
 	togglePasswordVisibility(): void {
-		this.showPassword = !this.showPassword;
+		this.showPassword.update(v => !v)
 	}
 
 	private goBack(): void {
-		this.router.navigate(['/']);
+		this.router.navigate(['/'])
 	}
 }
