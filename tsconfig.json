@@ -27,7 +27,8 @@
       "@env": ["src/app/config"],
       "@env/*": ["src/app/config/*"],
       "@data": ["src/app/data"],
-      "@data/*": ["src/app/data/*"]
+      "@data/*": ["src/app/data/*"],
+      "@test": ["src/test-setup"]
     }
   },
   "angularCompilerOptions": {

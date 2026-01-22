@@ -2,6 +2,8 @@ import { TestBed } from '@angular/core/testing';
 import { BrowserTestingModule, platformBrowserTesting } from '@angular/platform-browser/testing';
 import { provideZonelessChangeDetection } from '@angular/core';
 import { provideRouter } from '@angular/router';
+import { provideHttpClient } from '@angular/common/http';
+import { provideHttpClientTesting } from '@angular/common/http/testing';
 
 // Mock IntersectionObserver for jsdom environment
 class MockIntersectionObserver implements IntersectionObserver {
@@ -26,8 +28,44 @@ Object.defineProperty(globalThis, 'IntersectionObserver', {
 	value: MockIntersectionObserver,
 });
 
-TestBed.initTestEnvironment(BrowserTestingModule, platformBrowserTesting(), {
-	teardown: { destroyAfterEach: false },
+// Mock ResizeObserver for jsdom
+class MockResizeObserver implements ResizeObserver {
+	constructor(private callback: ResizeObserverCallback) {}
+	observe(): void {}
+	unobserve(): void {}
+	disconnect(): void {}
+}
+
+Object.defineProperty(globalThis, 'ResizeObserver', {
+	writable: true,
+	configurable: true,
+	value: MockResizeObserver,
 });
 
-export const testProviders = [provideZonelessChangeDetection(), provideRouter([])];
+// Mock matchMedia
+Object.defineProperty(window, 'matchMedia', {
+	writable: true,
+	value: (query: string) => ({
+		matches: false,
+		media: query,
+		onchange: null,
+		addListener: () => {},
+		removeListener: () => {},
+		addEventListener: () => {},
+		removeEventListener: () => {},
+		dispatchEvent: () => true,
+	}),
+});
+
+// Initialize TestBed
+TestBed.initTestEnvironment(BrowserTestingModule, platformBrowserTesting(), {
+	teardown: { destroyAfterEach: true },
+});
+
+// Common test providers
+export const testProviders = [
+	provideZonelessChangeDetection(),
+	provideRouter([]),
+	provideHttpClient(),
+	provideHttpClientTesting(),
+];

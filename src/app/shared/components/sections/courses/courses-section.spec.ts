@@ -1,6 +1,6 @@
 import { describe, it, expect, beforeEach } from 'vitest';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { testProviders } from '../../../../test-setup';
+import { testProviders } from '@test';
 import { CoursesSectionComponent } from './courses-section';
 
 describe('CoursesSectionComponent', () => {

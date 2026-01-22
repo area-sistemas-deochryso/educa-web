@@ -2,7 +2,7 @@ import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { beforeEach, describe, expect, it } from 'vitest';
 
 import { FooterComponent } from './footer';
-import { testProviders } from '../../../../test-setup';
+import { testProviders } from '@test';
 
 describe('FooterComponent', () => {
 	let component: FooterComponent;

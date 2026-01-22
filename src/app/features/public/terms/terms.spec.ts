@@ -1,24 +1,28 @@
 import { describe, it, expect, beforeEach } from 'vitest';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { testProviders } from '@test';
-import { HomeComponent } from './home';
+import { TermsComponent } from './terms';
 
-describe('HomeComponent', () => {
-	let component: HomeComponent;
-	let fixture: ComponentFixture<HomeComponent>;
+describe('TermsComponent', () => {
+	let component: TermsComponent;
+	let fixture: ComponentFixture<TermsComponent>;
 
 	beforeEach(async () => {
 		await TestBed.configureTestingModule({
-			imports: [HomeComponent],
+			imports: [TermsComponent],
 			providers: testProviders,
 		}).compileComponents();
 
-		fixture = TestBed.createComponent(HomeComponent);
+		fixture = TestBed.createComponent(TermsComponent);
 		component = fixture.componentInstance;
 		await fixture.whenStable();
 	});
 
 	it('should create', () => {
 		expect(component).toBeTruthy();
+	});
+
+	it('should render without errors', () => {
+		expect(fixture.nativeElement).toBeTruthy();
 	});
 });
