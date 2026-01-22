@@ -1,52 +1,52 @@
-import { Injectable } from '@angular/core'
-import { Observable, catchError, of, map } from 'rxjs'
-import { BaseRepository } from './base.repository'
-import { logger } from '@core/helpers'
+import { Injectable } from '@angular/core';
+import { Observable, catchError, of, map } from 'rxjs';
+import { BaseRepository } from './base.repository';
+import { logger } from '@core/helpers';
 
 export interface User {
-	id: number
-	dni: string
-	nombreCompleto: string
-	email?: string
-	telefono?: string
-	rol: string
-	activo: boolean
-	fechaCreacion?: string
+	id: number;
+	dni: string;
+	nombreCompleto: string;
+	email?: string;
+	telefono?: string;
+	rol: string;
+	activo: boolean;
+	fechaCreacion?: string;
 }
 
 export interface CreateUserDto {
-	dni: string
-	nombreCompleto: string
-	email?: string
-	telefono?: string
-	rol: string
-	password: string
+	dni: string;
+	nombreCompleto: string;
+	email?: string;
+	telefono?: string;
+	rol: string;
+	password: string;
 }
 
 export interface UpdateUserDto {
-	nombreCompleto?: string
-	email?: string
-	telefono?: string
-	activo?: boolean
+	nombreCompleto?: string;
+	email?: string;
+	telefono?: string;
+	activo?: boolean;
 }
 
 @Injectable({
 	providedIn: 'root',
 })
 export class UserRepository extends BaseRepository<User, CreateUserDto, UpdateUserDto> {
-	protected endpoint = '/api/Users'
-	protected entityName = 'User'
+	protected endpoint = '/api/Users';
+	protected entityName = 'User';
 
 	/**
 	 * Buscar usuario por DNI
 	 */
 	getByDni(dni: string): Observable<User | null> {
 		return this.httpService['get']<User>(`${this.endpoint}/dni/${dni}`).pipe(
-			catchError(error => {
-				logger.error('[UserRepository] getByDni error:', error)
-				return of(null)
-			})
-		)
+			catchError((error) => {
+				logger.error('[UserRepository] getByDni error:', error);
+				return of(null);
+			}),
+		);
 	}
 
 	/**
@@ -58,11 +58,11 @@ export class UserRepository extends BaseRepository<User, CreateUserDto, UpdateUs
 			newPassword,
 		}).pipe(
 			map(() => true),
-			catchError(error => {
-				logger.error('[UserRepository] changePassword error:', error)
-				throw error
-			})
-		)
+			catchError((error) => {
+				logger.error('[UserRepository] changePassword error:', error);
+				throw error;
+			}),
+		);
 	}
 
 	/**
@@ -70,10 +70,10 @@ export class UserRepository extends BaseRepository<User, CreateUserDto, UpdateUs
 	 */
 	toggleActive(userId: number): Observable<User | null> {
 		return this.httpService['patch']<User>(`${this.endpoint}/${userId}/toggle-active`, {}).pipe(
-			catchError(error => {
-				logger.error('[UserRepository] toggleActive error:', error)
-				return of(null)
-			})
-		)
+			catchError((error) => {
+				logger.error('[UserRepository] toggleActive error:', error);
+				return of(null);
+			}),
+		);
 	}
 }

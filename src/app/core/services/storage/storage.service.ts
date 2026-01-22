@@ -39,8 +39,13 @@ export class StorageService {
 		return this.session.getToken();
 	}
 
-	setToken(token: string, rememberMe: boolean = false): void {
-		this.session.setToken(token, rememberMe);
+	setToken(
+		token: string,
+		rememberMe: boolean = false,
+		nombreCompleto?: string,
+		rol?: string,
+	): void {
+		this.session.setToken(token, rememberMe, nombreCompleto, rol);
 	}
 
 	removeToken(): void {
@@ -73,6 +78,10 @@ export class StorageService {
 
 	clearRememberToken(): void {
 		this.session.clearRememberToken();
+	}
+
+	getAllPersistentTokens(): Array<{ token: string; sessionKey: string }> {
+		return this.session.getAllPersistentTokens();
 	}
 
 	// ============================================
@@ -265,7 +274,9 @@ export class StorageService {
 			logger.log('[Storage] Migrated dismissed notifications to IndexedDB');
 		}
 
-		const legacyRead = this._getSyncFallback<NotificationStorageData>('educa_read_notifications');
+		const legacyRead = this._getSyncFallback<NotificationStorageData>(
+			'educa_read_notifications',
+		);
 		if (legacyRead) {
 			await this.idb.setReadNotifications(legacyRead);
 			logger.log('[Storage] Migrated read notifications to IndexedDB');

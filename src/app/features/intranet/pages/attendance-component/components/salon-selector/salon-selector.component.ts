@@ -1,7 +1,7 @@
-import { Component, input, output } from '@angular/core'
-import { CommonModule } from '@angular/common'
-import { FormsModule } from '@angular/forms'
-import { SalonProfesor } from '@core/services'
+import { Component, input, output } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
+import { SalonProfesor } from '@core/services';
 
 /**
  * Componente presentacional (Dumb) para la selección de salón.
@@ -16,7 +16,10 @@ import { SalonProfesor } from '@core/services'
 			<label>Salón:</label>
 			<select (change)="onSalonChange($event)">
 				@for (salon of salones(); track salon.salonId) {
-					<option [value]="salon.salonId" [selected]="salon.salonId === selectedSalonId()">
+					<option
+						[value]="salon.salonId"
+						[selected]="salon.salonId === selectedSalonId()"
+					>
 						{{ salon.nombreSalon }}
 						@if (salon.esTutor) {
 							(Tutor {{ nombreProfesor() }})
@@ -65,14 +68,14 @@ import { SalonProfesor } from '@core/services'
 	],
 })
 export class SalonSelectorComponent {
-	salones = input.required<SalonProfesor[]>()
-	selectedSalonId = input.required<number | null>()
-	nombreProfesor = input<string | null>(null)
+	salones = input.required<SalonProfesor[]>();
+	selectedSalonId = input.required<number | null>();
+	nombreProfesor = input<string | null>(null);
 
-	salonChange = output<number>()
+	salonChange = output<number>();
 
 	onSalonChange(event: Event): void {
-		const select = event.target as HTMLSelectElement
-		this.salonChange.emit(+select.value)
+		const select = event.target as HTMLSelectElement;
+		this.salonChange.emit(+select.value);
 	}
 }

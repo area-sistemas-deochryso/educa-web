@@ -1,1 +1,1 @@
-export * from './destroy.service'
+export * from './destroy.service';

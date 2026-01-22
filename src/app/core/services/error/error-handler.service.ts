@@ -1,6 +1,6 @@
-import { Injectable, signal, computed, inject } from '@angular/core'
-import { HttpErrorResponse } from '@angular/common/http'
-import { Router } from '@angular/router'
+import { Injectable, signal, computed, inject } from '@angular/core';
+import { HttpErrorResponse } from '@angular/common/http';
+import { Router } from '@angular/router';
 import {
 	AppError,
 	ErrorSeverity,
@@ -8,142 +8,142 @@ import {
 	ErrorNotification,
 	HttpErrorDetails,
 	HTTP_ERROR_MESSAGES,
-} from './error.models'
-import { logger } from '@core/helpers'
+} from './error.models';
+import { logger } from '@core/helpers';
 
 @Injectable({
 	providedIn: 'root',
 })
 export class ErrorHandlerService {
-	private router = inject(Router)
+	private router = inject(Router);
 
 	// Estado con Signals
-	private readonly _errors = signal<AppError[]>([])
-	private readonly _currentNotification = signal<ErrorNotification | null>(null)
+	private readonly _errors = signal<AppError[]>([]);
+	private readonly _currentNotification = signal<ErrorNotification | null>(null);
 
 	// Computed signals publicos
-	readonly errors = this._errors.asReadonly()
-	readonly currentNotification = this._currentNotification.asReadonly()
-	readonly hasErrors = computed(() => this._errors().length > 0)
-	readonly lastError = computed(() => this._errors()[this._errors().length - 1] ?? null)
+	readonly errors = this._errors.asReadonly();
+	readonly currentNotification = this._currentNotification.asReadonly();
+	readonly hasErrors = computed(() => this._errors().length > 0);
+	readonly lastError = computed(() => this._errors()[this._errors().length - 1] ?? null);
 
 	// Contador de errores por tipo
 	readonly errorCounts = computed(() => {
-		const errors = this._errors()
+		const errors = this._errors();
 		return {
-			http: errors.filter(e => e.source === 'http').length,
-			client: errors.filter(e => e.source === 'client').length,
-			validation: errors.filter(e => e.source === 'validation').length,
-		}
-	})
+			http: errors.filter((e) => e.source === 'http').length,
+			client: errors.filter((e) => e.source === 'client').length,
+			validation: errors.filter((e) => e.source === 'validation').length,
+		};
+	});
 
 	/**
 	 * Maneja errores HTTP del interceptor
 	 */
 	handleHttpError(error: HttpErrorResponse, context?: Record<string, unknown>): AppError {
-		const details = this.extractHttpDetails(error)
-		const message = this.getHttpErrorMessage(error)
+		const details = this.extractHttpDetails(error);
+		const message = this.getHttpErrorMessage(error);
 
 		const appError = this.createError(message, 'error', 'http', {
 			statusCode: error.status,
 			originalError: error,
 			context: { ...context, httpDetails: details },
-		})
+		});
 
 		this.showNotification({
 			severity: 'error',
 			summary: 'Error de conexion',
 			detail: message,
 			life: error.status === 401 ? 3000 : 5000,
-		})
+		});
 
 		// Redirigir al login si es 401
 		if (error.status === 401) {
-			setTimeout(() => this.router.navigate(['/intranet/login']), 2000)
+			setTimeout(() => this.router.navigate(['/intranet/login']), 2000);
 		}
 
-		return appError
+		return appError;
 	}
 
 	/**
 	 * Maneja errores de cliente (JavaScript errors)
 	 */
 	handleClientError(error: Error, context?: Record<string, unknown>): AppError {
-		logger.error('[ErrorHandler] Client error:', error)
+		logger.error('[ErrorHandler] Client error:', error);
 
 		const appError = this.createError(
 			'Ha ocurrido un error inesperado. Por favor, recargue la pagina.',
 			'error',
 			'client',
-			{ originalError: error, context }
-		)
+			{ originalError: error, context },
+		);
 
 		this.showNotification({
 			severity: 'error',
 			summary: 'Error de aplicacion',
 			detail: appError.message,
 			life: 5000,
-		})
+		});
 
-		return appError
+		return appError;
 	}
 
 	/**
 	 * Maneja errores de validacion
 	 */
 	handleValidationError(message: string, context?: Record<string, unknown>): AppError {
-		const appError = this.createError(message, 'warn', 'validation', { context })
+		const appError = this.createError(message, 'warn', 'validation', { context });
 
 		this.showNotification({
 			severity: 'warn',
 			summary: 'Error de validacion',
 			detail: message,
 			life: 4000,
-		})
+		});
 
-		return appError
+		return appError;
 	}
 
 	/**
 	 * Muestra notificacion informativa
 	 */
 	showInfo(summary: string, detail: string, life = 3000): void {
-		this.showNotification({ severity: 'info', summary, detail, life })
+		this.showNotification({ severity: 'info', summary, detail, life });
 	}
 
 	/**
 	 * Muestra notificacion de exito
 	 */
 	showSuccess(summary: string, detail: string, life = 3000): void {
-		this.showNotification({ severity: 'success', summary, detail, life })
+		this.showNotification({ severity: 'success', summary, detail, life });
 	}
 
 	/**
 	 * Muestra notificacion de advertencia
 	 */
 	showWarning(summary: string, detail: string, life = 4000): void {
-		this.showNotification({ severity: 'warn', summary, detail, life })
+		this.showNotification({ severity: 'warn', summary, detail, life });
 	}
 
 	/**
 	 * Muestra notificacion de error
 	 */
 	showError(summary: string, detail: string, life = 5000): void {
-		this.showNotification({ severity: 'error', summary, detail, life })
+		this.showNotification({ severity: 'error', summary, detail, life });
 	}
 
 	/**
 	 * Limpia la notificacion actual
 	 */
 	clearNotification(): void {
-		this._currentNotification.set(null)
+		this._currentNotification.set(null);
 	}
 
 	/**
 	 * Limpia todos los errores
 	 */
 	clearErrors(): void {
-		this._errors.set([])
+		this._errors.set([]);
 	}
 
 	// Metodos privados
@@ -151,7 +151,7 @@ export class ErrorHandlerService {
 		message: string,
 		severity: ErrorSeverity,
 		source: ErrorSource,
-		options: Partial<AppError> = {}
+		options: Partial<AppError> = {},
 	): AppError {
 		const error: AppError = {
 			id: crypto.randomUUID(),
@@ -160,16 +160,16 @@ export class ErrorHandlerService {
 			source,
 			timestamp: new Date(),
 			...options,
-		}
+		};
 
-		this._errors.update(errors => [...errors.slice(-49), error]) // Max 50 errores
-		logger.error(`[ErrorHandler] ${source}:`, message, options.context)
+		this._errors.update((errors) => [...errors.slice(-49), error]); // Max 50 errores
+		logger.error(`[ErrorHandler] ${source}:`, message, options.context);
 
-		return error
+		return error;
 	}
 
 	private showNotification(notification: ErrorNotification): void {
-		this._currentNotification.set(notification)
+		this._currentNotification.set(notification);
 	}
 
 	private extractHttpDetails(error: HttpErrorResponse): HttpErrorDetails {
@@ -180,22 +180,22 @@ export class ErrorHandlerService {
 			statusText: error.statusText,
 			message: error.message,
 			body: error.error,
-		}
+		};
 	}
 
 	private getHttpErrorMessage(error: HttpErrorResponse): string {
 		// Primero intentar obtener mensaje del backend
 		if (error.error?.mensaje) {
-			return error.error.mensaje
+			return error.error.mensaje;
 		}
 		if (error.error?.message) {
-			return error.error.message
+			return error.error.message;
 		}
 
 		// Usar mensaje predefinido por codigo
 		return (
 			HTTP_ERROR_MESSAGES[error.status] ??
 			`Error ${error.status}: ${error.statusText || 'Error desconocido'}`
-		)
+		);
 	}
 }

@@ -1,4 +1,4 @@
-import { computed, inject } from '@angular/core'
+import { computed, inject } from '@angular/core';
 import {
 	signalStore,
 	withState,
@@ -6,26 +6,26 @@ import {
 	withMethods,
 	patchState,
 	withHooks,
-} from '@ngrx/signals'
-import { rxMethod } from '@ngrx/signals/rxjs-interop'
-import { pipe, switchMap, tap } from 'rxjs'
-import { tapResponse } from '@ngrx/operators'
+} from '@ngrx/signals';
+import { rxMethod } from '@ngrx/signals/rxjs-interop';
+import { pipe, switchMap, tap } from 'rxjs';
+import { tapResponse } from '@ngrx/operators';
 
-import { AuthUser, LoginResponse, UserRole } from '@core/services/auth/auth.models'
-import { StorageService } from '@core/services/storage'
+import { AuthUser, LoginResponse, UserRole } from '@core/services/auth/auth.models';
+import { StorageService } from '@core/services/storage';
 
 /**
  * Estado de autenticación
  */
 export interface AuthState {
-	user: AuthUser | null
-	isAuthenticated: boolean
-	isLoading: boolean
-	error: string | null
-	loginAttempts: number
+	user: AuthUser | null;
+	isAuthenticated: boolean;
+	isLoading: boolean;
+	error: string | null;
+	loginAttempts: number;
 }
 
-const MAX_LOGIN_ATTEMPTS = 3
+const MAX_LOGIN_ATTEMPTS = 3;
 
 /**
  * Estado inicial
@@ -36,7 +36,7 @@ const initialState: AuthState = {
 	isLoading: false,
 	error: null,
 	loginAttempts: 0,
-}
+};
 
 /**
  * NgRx Signals Store para autenticación.
@@ -97,14 +97,14 @@ export const AuthStore = signalStore(
 		 * Inicializa el store con datos del storage
 		 */
 		initialize(): void {
-			const storedUser = storage.getUser()
-			const hasToken = storage.hasToken()
+			const storedUser = storage.getUser();
+			const hasToken = storage.hasToken();
 
 			if (storedUser && hasToken) {
 				patchState(store, {
 					user: storedUser,
 					isAuthenticated: true,
-				})
+				});
 			}
 		},
 
@@ -117,14 +117,14 @@ export const AuthStore = signalStore(
 				isAuthenticated: true,
 				error: null,
 				loginAttempts: 0,
-			})
+			});
 		},
 
 		/**
 		 * Actualiza el estado de carga
 		 */
 		setLoading(isLoading: boolean): void {
-			patchState(store, { isLoading })
+			patchState(store, { isLoading });
 		},
 
 		/**
@@ -134,14 +134,14 @@ export const AuthStore = signalStore(
 			patchState(store, {
 				error,
 				isLoading: false,
-			})
+			});
 		},
 
 		/**
 		 * Limpia el error
 		 */
 		clearError(): void {
-			patchState(store, { error: null })
+			patchState(store, { error: null });
 		},
 
 		/**
@@ -150,14 +150,14 @@ export const AuthStore = signalStore(
 		incrementAttempts(): void {
 			patchState(store, {
 				loginAttempts: store.loginAttempts() + 1,
-			})
+			});
 		},
 
 		/**
 		 * Resetea los intentos de login
 		 */
 		resetAttempts(): void {
-			patchState(store, { loginAttempts: 0 })
+			patchState(store, { loginAttempts: 0 });
 		},
 
 		/**
@@ -170,10 +170,10 @@ export const AuthStore = signalStore(
 				nombreCompleto: response.nombreCompleto,
 				entityId: response.entityId,
 				sedeId: response.sedeId,
-			}
+			};
 
-			storage.setToken(response.token, rememberMe)
-			storage.setUser(user, rememberMe)
+			storage.setToken(response.token, rememberMe);
+			storage.setUser(user, rememberMe);
 
 			patchState(store, {
 				user,
@@ -181,7 +181,7 @@ export const AuthStore = signalStore(
 				isLoading: false,
 				error: null,
 				loginAttempts: 0,
-			})
+			});
 		},
 
 		/**
@@ -192,32 +192,32 @@ export const AuthStore = signalStore(
 				error: message,
 				isLoading: false,
 				loginAttempts: store.loginAttempts() + 1,
-			})
+			});
 		},
 
 		/**
 		 * Cierra la sesión del usuario
 		 */
 		logout(): void {
-			storage.clearAuth()
+			storage.clearAuth();
 
 			patchState(store, {
 				user: null,
 				isAuthenticated: false,
 				error: null,
 				loginAttempts: 0,
-			})
+			});
 		},
 
 		/**
 		 * Actualiza datos parciales del usuario
 		 */
 		updateUser(updates: Partial<AuthUser>): void {
-			const currentUser = store.user()
+			const currentUser = store.user();
 			if (currentUser) {
-				const updatedUser = { ...currentUser, ...updates }
-				patchState(store, { user: updatedUser })
-				storage.setUser(updatedUser)
+				const updatedUser = { ...currentUser, ...updates };
+				patchState(store, { user: updatedUser });
+				storage.setUser(updatedUser);
 			}
 		},
 	})),
@@ -225,12 +225,12 @@ export const AuthStore = signalStore(
 	withHooks({
 		onInit(store) {
 			// Inicializar con datos del storage al crear el store
-			store.initialize()
+			store.initialize();
 		},
-	})
-)
+	}),
+);
 
 /**
  * Tipo del AuthStore para inyección
  */
-export type AuthStoreType = InstanceType<typeof AuthStore>
+export type AuthStoreType = InstanceType<typeof AuthStore>;

@@ -1,5 +1,5 @@
-import { Component, input } from '@angular/core'
-import { CommonModule } from '@angular/common'
+import { Component, input } from '@angular/core';
+import { CommonModule } from '@angular/common';
 
 /**
  * Componente presentacional (Dumb) para estados vacíos.
@@ -35,5 +35,5 @@ import { CommonModule } from '@angular/common'
 	],
 })
 export class EmptyStateComponent {
-	message = input.required<string>()
+	message = input.required<string>();
 }

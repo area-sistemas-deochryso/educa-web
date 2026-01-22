@@ -8,8 +8,7 @@ export const routes: Routes = [
 	},
 	{
 		path: '',
-		loadComponent: () =>
-			import('@shared/components/layout').then((m) => m.MainLayoutComponent),
+		loadComponent: () => import('@shared/components/layout').then((m) => m.MainLayoutComponent),
 		children: [
 			{
 				path: '',
@@ -31,26 +30,31 @@ export const routes: Routes = [
 			},
 			{
 				path: 'preguntas-frecuentes',
-				loadComponent: () =>
-					import('@features/public/faq/faq').then((m) => m.FaqComponent),
+				loadComponent: () => import('@features/public/faq/faq').then((m) => m.FaqComponent),
 				title: 'Educa.com.pe - Preguntas Frecuentes',
 			},
 			{
 				path: 'niveles/inicial',
 				loadComponent: () =>
-					import('@features/public/levels/inicial/inicial').then((m) => m.InicialComponent),
+					import('@features/public/levels/inicial/inicial').then(
+						(m) => m.InicialComponent,
+					),
 				title: 'Educa.com.pe - Nivel Inicial',
 			},
 			{
 				path: 'niveles/primaria',
 				loadComponent: () =>
-					import('@features/public/levels/primaria/primaria').then((m) => m.PrimariaComponent),
+					import('@features/public/levels/primaria/primaria').then(
+						(m) => m.PrimariaComponent,
+					),
 				title: 'Educa.com.pe - Nivel Primaria',
 			},
 			{
 				path: 'niveles/secundaria',
 				loadComponent: () =>
-					import('@features/public/levels/secundaria/secundaria').then((m) => m.SecundariaComponent),
+					import('@features/public/levels/secundaria/secundaria').then(
+						(m) => m.SecundariaComponent,
+					),
 				title: 'Educa.com.pe - Nivel Secundaria',
 			},
 			{

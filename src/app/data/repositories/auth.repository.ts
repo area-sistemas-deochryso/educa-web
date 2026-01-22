@@ -1,23 +1,23 @@
-import { Injectable } from '@angular/core'
-import { Observable, catchError, of } from 'rxjs'
-import { BaseRepository } from './base.repository'
-import { LoginRequest, LoginResponse, UserProfile, VerifyTokenResponse } from '@core/services/auth'
-import { logger } from '@core/helpers'
+import { Injectable } from '@angular/core';
+import { Observable, catchError, of } from 'rxjs';
+import { BaseRepository } from './base.repository';
+import { LoginRequest, LoginResponse, UserProfile, VerifyTokenResponse } from '@core/services/auth';
+import { logger } from '@core/helpers';
 
 @Injectable({
 	providedIn: 'root',
 })
 export class AuthRepository extends BaseRepository<UserProfile> {
-	protected endpoint = '/api/Auth'
-	protected entityName = 'Auth'
+	protected endpoint = '/api/Auth';
+	protected entityName = 'Auth';
 
 	/**
 	 * Iniciar sesion
 	 */
 	login(credentials: LoginRequest): Observable<LoginResponse> {
 		return this.httpService['post']<LoginResponse>(`${this.endpoint}/login`, credentials).pipe(
-			catchError(error => {
-				logger.error('[AuthRepository] Login error:', error)
+			catchError((error) => {
+				logger.error('[AuthRepository] Login error:', error);
 				return of({
 					token: '',
 					rol: credentials.rol,
@@ -25,9 +25,9 @@ export class AuthRepository extends BaseRepository<UserProfile> {
 					entityId: 0,
 					sedeId: 0,
 					mensaje: error.error?.mensaje || 'Error al iniciar sesion',
-				})
-			})
-		)
+				});
+			}),
+		);
 	}
 
 	/**
@@ -35,11 +35,11 @@ export class AuthRepository extends BaseRepository<UserProfile> {
 	 */
 	getProfile(): Observable<UserProfile | null> {
 		return this.httpService['get']<UserProfile>(`${this.endpoint}/perfil`).pipe(
-			catchError(error => {
-				logger.error('[AuthRepository] Get profile error:', error)
-				return of(null)
-			})
-		)
+			catchError((error) => {
+				logger.error('[AuthRepository] Get profile error:', error);
+				return of(null);
+			}),
+		);
 	}
 
 	/**
@@ -49,12 +49,12 @@ export class AuthRepository extends BaseRepository<UserProfile> {
 		return this.httpService['post']<VerifyTokenResponse>(
 			`${this.endpoint}/verificar`,
 			JSON.stringify(token),
-			{ headers: { 'Content-Type': 'application/json' } }
+			{ headers: { 'Content-Type': 'application/json' } },
 		).pipe(
-			catchError(error => {
-				logger.error('[AuthRepository] Verify token error:', error)
-				return of(null)
-			})
-		)
+			catchError((error) => {
+				logger.error('[AuthRepository] Verify token error:', error);
+				return of(null);
+			}),
+		);
 	}
 }

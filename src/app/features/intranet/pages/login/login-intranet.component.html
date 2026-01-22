@@ -52,13 +52,13 @@
 			</app-login-role-selector>
 
 			<app-login-options>
-				<label class="remember-checkbox">
-					<p-checkbox formControlName="rememberMe" [binary]="true" />
+				<label class="remember-toggle">
 					<span>Recordar sesión</span>
+					<p-toggleSwitch formControlName="rememberMe" />
 				</label>
-				<a href="#" class="forgot-link" (click)="onForgotPassword($event)">
+				<!-- <a href="#" class="forgot-link" (click)="onForgotPassword($event)">
 					¿Ha olvidado la contraseña?
-				</a>
+				</a> -->
 			</app-login-options>
 
 			<app-login-button [isLoading]="isLoading()" [disabled]="isDisabled" />

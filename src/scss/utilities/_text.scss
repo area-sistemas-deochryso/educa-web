@@ -6,49 +6,117 @@
 @use '../variables' as *;
 
 // Text alignment
-.text-start { text-align: left; }
-.text-end { text-align: right; }
-.text-center { text-align: center; }
+.text-start {
+	text-align: left;
+}
+.text-end {
+	text-align: right;
+}
+.text-center {
+	text-align: center;
+}
 
 // Text colors (usando variables CSS existentes)
-.text-white { color: var(--white-color); }
-.text-dark { color: var(--dark-color); }
-.text-primary { color: var(--primary-color); }
-.text-secondary { color: var(--secondary-color); }
-.text-muted { color: var(--p-color); }
+.text-white {
+	color: var(--white-color);
+}
+.text-dark {
+	color: var(--dark-color);
+}
+.text-primary {
+	color: var(--primary-color);
+}
+.text-secondary {
+	color: var(--secondary-color);
+}
+.text-muted {
+	color: var(--p-color);
+}
 
 // Font weight
-.fw-light { font-weight: var(--font-weight-light); }
-.fw-normal { font-weight: var(--font-weight-normal); }
-.fw-semibold { font-weight: var(--font-weight-semibold); }
-.fw-bold { font-weight: var(--font-weight-bold); }
+.fw-light {
+	font-weight: var(--font-weight-light);
+}
+.fw-normal {
+	font-weight: var(--font-weight-normal);
+}
+.fw-semibold {
+	font-weight: var(--font-weight-semibold);
+}
+.fw-bold {
+	font-weight: var(--font-weight-bold);
+}
 
 // Font style
-.fst-italic { font-style: italic; }
-.fst-normal { font-style: normal; }
+.fst-italic {
+	font-style: italic;
+}
+.fst-normal {
+	font-style: normal;
+}
 
 // Text decoration
-.text-decoration-none { text-decoration: none; }
-.text-decoration-underline { text-decoration: underline; }
+.text-decoration-none {
+	text-decoration: none;
+}
+.text-decoration-underline {
+	text-decoration: underline;
+}
 
 // Text transform
-.text-lowercase { text-transform: lowercase; }
-.text-uppercase { text-transform: uppercase; }
-.text-capitalize { text-transform: capitalize; }
+.text-lowercase {
+	text-transform: lowercase;
+}
+.text-uppercase {
+	text-transform: uppercase;
+}
+.text-capitalize {
+	text-transform: capitalize;
+}
 
 // Display headings (usados en terms/privacy)
-.display-1 { font-size: 5rem; font-weight: 300; line-height: 1.2; }
-.display-2 { font-size: 4.5rem; font-weight: 300; line-height: 1.2; }
-.display-3 { font-size: 4rem; font-weight: 300; line-height: 1.2; }
-.display-4 { font-size: 3.5rem; font-weight: 300; line-height: 1.2; }
-.display-5 { font-size: 3rem; font-weight: 300; line-height: 1.2; }
-.display-6 { font-size: 2.5rem; font-weight: 300; line-height: 1.2; }
+.display-1 {
+	font-size: 5rem;
+	font-weight: 300;
+	line-height: 1.2;
+}
+.display-2 {
+	font-size: 4.5rem;
+	font-weight: 300;
+	line-height: 1.2;
+}
+.display-3 {
+	font-size: 4rem;
+	font-weight: 300;
+	line-height: 1.2;
+}
+.display-4 {
+	font-size: 3.5rem;
+	font-weight: 300;
+	line-height: 1.2;
+}
+.display-5 {
+	font-size: 3rem;
+	font-weight: 300;
+	line-height: 1.2;
+}
+.display-6 {
+	font-size: 2.5rem;
+	font-weight: 300;
+	line-height: 1.2;
+}
 
 // Responsive text alignment
 @each $breakpoint, $min-width in $breakpoints {
-  @include media-up($breakpoint) {
-    .text-#{$breakpoint}-start { text-align: left; }
-    .text-#{$breakpoint}-end { text-align: right; }
-    .text-#{$breakpoint}-center { text-align: center; }
-  }
+	@include media-up($breakpoint) {
+		.text-#{$breakpoint}-start {
+			text-align: left;
+		}
+		.text-#{$breakpoint}-end {
+			text-align: right;
+		}
+		.text-#{$breakpoint}-center {
+			text-align: center;
+		}
+	}
 }

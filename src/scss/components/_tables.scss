@@ -3,52 +3,52 @@
 // =============================================================================
 
 .table {
-  width: 100%;
-  margin-bottom: 1rem;
-  color: var(--dark-color);
-  vertical-align: top;
-  border-color: var(--border-color);
+	width: 100%;
+	margin-bottom: 1rem;
+	color: var(--dark-color);
+	vertical-align: top;
+	border-color: var(--border-color);
 
-  > :not(caption) > * > * {
-    padding: 0.5rem 0.5rem;
-    background-color: transparent;
-    border-bottom-width: 1px;
-    box-shadow: inset 0 0 0 9999px transparent;
-  }
+	> :not(caption) > * > * {
+		padding: 0.5rem 0.5rem;
+		background-color: transparent;
+		border-bottom-width: 1px;
+		box-shadow: inset 0 0 0 9999px transparent;
+	}
 
-  > tbody {
-    vertical-align: inherit;
-  }
+	> tbody {
+		vertical-align: inherit;
+	}
 
-  > thead {
-    vertical-align: bottom;
-  }
+	> thead {
+		vertical-align: bottom;
+	}
 }
 
 .table-bordered {
-  > :not(caption) > * {
-    border-width: 1px 0;
+	> :not(caption) > * {
+		border-width: 1px 0;
 
-    > * {
-      border-width: 0 1px;
-    }
-  }
+		> * {
+			border-width: 0 1px;
+		}
+	}
 }
 
 .table-striped {
-  > tbody > tr:nth-of-type(odd) > * {
-    background-color: rgba(0, 0, 0, 0.05);
-  }
+	> tbody > tr:nth-of-type(odd) > * {
+		background-color: rgba(0, 0, 0, 0.05);
+	}
 }
 
 .table-hover {
-  > tbody > tr:hover > * {
-    background-color: rgba(0, 0, 0, 0.075);
-  }
+	> tbody > tr:hover > * {
+		background-color: rgba(0, 0, 0, 0.075);
+	}
 }
 
 // Responsive table
 .table-responsive {
-  overflow-x: auto;
-  -webkit-overflow-scrolling: touch;
+	overflow-x: auto;
+	-webkit-overflow-scrolling: touch;
 }

@@ -1,1 +1,1 @@
-export * from './modal-manager.service'
+export * from './modal-manager.service';

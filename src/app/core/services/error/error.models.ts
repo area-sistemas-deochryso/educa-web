@@ -1,32 +1,32 @@
-export type ErrorSeverity = 'info' | 'warn' | 'error' | 'success'
-export type ErrorSource = 'http' | 'client' | 'validation' | 'unknown'
+export type ErrorSeverity = 'info' | 'warn' | 'error' | 'success';
+export type ErrorSource = 'http' | 'client' | 'validation' | 'unknown';
 
 export interface AppError {
-	id: string
-	message: string
-	severity: ErrorSeverity
-	source: ErrorSource
-	timestamp: Date
-	statusCode?: number
-	originalError?: unknown
-	context?: Record<string, unknown>
+	id: string;
+	message: string;
+	severity: ErrorSeverity;
+	source: ErrorSource;
+	timestamp: Date;
+	statusCode?: number;
+	originalError?: unknown;
+	context?: Record<string, unknown>;
 }
 
 export interface HttpErrorDetails {
-	url: string
-	method: string
-	statusCode: number
-	statusText: string
-	message: string
-	body?: unknown
+	url: string;
+	method: string;
+	statusCode: number;
+	statusText: string;
+	message: string;
+	body?: unknown;
 }
 
 export interface ErrorNotification {
-	severity: ErrorSeverity
-	summary: string
-	detail: string
-	life?: number
-	sticky?: boolean
+	severity: ErrorSeverity;
+	summary: string;
+	detail: string;
+	life?: number;
+	sticky?: boolean;
 }
 
 /**
@@ -45,4 +45,4 @@ export const HTTP_ERROR_MESSAGES: Record<number, string> = {
 	502: 'El servidor no esta disponible temporalmente.',
 	503: 'Servicio no disponible. Intente mas tarde.',
 	504: 'El servidor no responde. Intente mas tarde.',
-}
+};

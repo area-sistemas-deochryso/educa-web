@@ -1,7 +1,7 @@
-import { Component, inject } from '@angular/core'
-import { RouterOutlet } from '@angular/router'
-import { SwService } from '@core/services'
-import { ToastContainerComponent } from '@shared/components/toast-container'
+import { Component, inject } from '@angular/core';
+import { RouterOutlet } from '@angular/router';
+import { SwService } from '@core/services';
+import { ToastContainerComponent } from '@shared/components/toast-container';
 
 @Component({
 	selector: 'app-root',
@@ -11,6 +11,6 @@ import { ToastContainerComponent } from '@shared/components/toast-container'
 	styleUrl: './app.scss',
 })
 export class App {
-	private swService = inject(SwService)
-	title = 'Educa.com.pe'
+	private swService = inject(SwService);
+	title = 'Educa.com.pe';
 }

@@ -90,7 +90,9 @@ export class IndexedDBService {
 
 				// Store para notificaciones
 				if (!db.objectStoreNames.contains(STORES.NOTIFICATIONS)) {
-					const notifStore = db.createObjectStore(STORES.NOTIFICATIONS, { keyPath: 'id' });
+					const notifStore = db.createObjectStore(STORES.NOTIFICATIONS, {
+						keyPath: 'id',
+					});
 					notifStore.createIndex('type', 'type', { unique: false });
 					notifStore.createIndex('date', 'date', { unique: false });
 				}
@@ -137,7 +139,10 @@ export class IndexedDBService {
 				};
 
 				request.onerror = () => {
-					logger.error('[IndexedDB] Error getting dismissed notifications:', request.error);
+					logger.error(
+						'[IndexedDB] Error getting dismissed notifications:',
+						request.error,
+					);
 					resolve(null);
 				};
 			} catch (e) {
@@ -168,7 +173,10 @@ export class IndexedDBService {
 
 				transaction.oncomplete = () => resolve();
 				transaction.onerror = () => {
-					logger.error('[IndexedDB] Error saving dismissed notifications:', transaction.error);
+					logger.error(
+						'[IndexedDB] Error saving dismissed notifications:',
+						transaction.error,
+					);
 					resolve();
 				};
 			} catch (e) {

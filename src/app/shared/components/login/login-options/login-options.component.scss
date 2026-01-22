@@ -8,10 +8,11 @@
 }
 
 :host ::ng-deep {
-	.remember-checkbox {
+	.remember-checkbox,
+	.remember-toggle {
 		display: flex;
 		align-items: center;
-		gap: 0.4rem;
+		gap: 0.5rem;
 		cursor: pointer;
 
 		span {
@@ -78,6 +79,32 @@
 	.p-checkbox-checked .p-checkbox-box {
 		background: transparent !important;
 		border-color: var(--intranet-accent-color-blue) !important;
+	}
+
+	// Estilos para ToggleSwitch
+	p-toggleswitch,
+	.p-toggleswitch {
+		.p-toggleswitch-slider {
+			background-color: var(--intranet-soft-text-color);
+			border: none;
+
+			&::before {
+				background-color: white;
+			}
+		}
+
+		&.p-highlight .p-toggleswitch-slider {
+			background-color: var(--intranet-accent-color-blue);
+		}
+
+		&:hover:not(.p-disabled) .p-toggleswitch-slider {
+			background-color: var(--intranet-alternative-text-color);
+		}
+
+		&.p-highlight:hover:not(.p-disabled) .p-toggleswitch-slider {
+			background-color: var(--intranet-accent-color-blue);
+			opacity: 0.9;
+		}
 	}
 }
 

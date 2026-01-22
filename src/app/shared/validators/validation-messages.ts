@@ -1,5 +1,5 @@
 export interface ValidationMessageConfig {
-	[key: string]: string | ((params: Record<string, unknown>) => string)
+	[key: string]: string | ((params: Record<string, unknown>) => string);
 }
 
 /**
@@ -42,7 +42,7 @@ export const VALIDATION_MESSAGES: ValidationMessageConfig = {
 	// Range
 	range: (params: Record<string, unknown>) =>
 		`El valor debe estar entre ${params['min']} y ${params['max']}`,
-}
+};
 
 /**
  * Obtiene el mensaje de error para un validador
@@ -50,17 +50,17 @@ export const VALIDATION_MESSAGES: ValidationMessageConfig = {
 export function getValidationMessage(
 	errorKey: string,
 	errorParams?: Record<string, unknown>,
-	customMessages?: ValidationMessageConfig
+	customMessages?: ValidationMessageConfig,
 ): string {
 	// Buscar en mensajes custom primero
-	const messages = { ...VALIDATION_MESSAGES, ...customMessages }
-	const message = messages[errorKey]
+	const messages = { ...VALIDATION_MESSAGES, ...customMessages };
+	const message = messages[errorKey];
 
 	if (typeof message === 'function') {
-		return message(errorParams ?? {})
+		return message(errorParams ?? {});
 	}
 
-	return message || `Error de validacion: ${errorKey}`
+	return message || `Error de validacion: ${errorKey}`;
 }
 
 /**
@@ -68,11 +68,11 @@ export function getValidationMessage(
  */
 export function getControlErrors(
 	errors: Record<string, unknown> | null,
-	customMessages?: ValidationMessageConfig
+	customMessages?: ValidationMessageConfig,
 ): string[] {
-	if (!errors) return []
+	if (!errors) return [];
 
 	return Object.entries(errors).map(([key, params]) =>
-		getValidationMessage(key, params as Record<string, unknown>, customMessages)
-	)
+		getValidationMessage(key, params as Record<string, unknown>, customMessages),
+	);
 }

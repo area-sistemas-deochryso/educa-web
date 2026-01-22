@@ -14,5 +14,7 @@ export class WelcomeSection {
 	title = input<string>('Bienvenido a tu Intranet');
 
 	/** Subtítulo descriptivo */
-	subtitle = input<string>('Aquí encontrarás toda la información relevante para tu día a día académico.');
+	subtitle = input<string>(
+		'Aquí encontrarás toda la información relevante para tu día a día académico.',
+	);
 }

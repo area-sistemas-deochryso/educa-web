@@ -1,4 +1,4 @@
-import { AbstractControl, ValidationErrors, ValidatorFn } from '@angular/forms'
+import { AbstractControl, ValidationErrors, ValidatorFn } from '@angular/forms';
 
 /**
  * Validadores custom reutilizables para formularios
@@ -9,13 +9,13 @@ export class AppValidators {
 	 */
 	static dni(): ValidatorFn {
 		return (control: AbstractControl): ValidationErrors | null => {
-			if (!control.value) return null
+			if (!control.value) return null;
 
-			const value = control.value.toString().trim()
-			const isValid = /^\d{8}$/.test(value)
+			const value = control.value.toString().trim();
+			const isValid = /^\d{8}$/.test(value);
 
-			return isValid ? null : { dni: true }
-		}
+			return isValid ? null : { dni: true };
+		};
 	}
 
 	/**
@@ -26,23 +26,23 @@ export class AppValidators {
 	 */
 	static password(minLength = 6): ValidatorFn {
 		return (control: AbstractControl): ValidationErrors | null => {
-			if (!control.value) return null
+			if (!control.value) return null;
 
-			const value = control.value
-			const errors: ValidationErrors = {}
+			const value = control.value;
+			const errors: ValidationErrors = {};
 
 			if (value.length < minLength) {
-				errors['minLength'] = { requiredLength: minLength, actualLength: value.length }
+				errors['minLength'] = { requiredLength: minLength, actualLength: value.length };
 			}
 			if (!/[a-zA-Z]/.test(value)) {
-				errors['noLetter'] = true
+				errors['noLetter'] = true;
 			}
 			if (!/\d/.test(value)) {
-				errors['noNumber'] = true
+				errors['noNumber'] = true;
 			}
 
-			return Object.keys(errors).length ? { password: errors } : null
-		}
+			return Object.keys(errors).length ? { password: errors } : null;
+		};
 	}
 
 	/**
@@ -55,19 +55,19 @@ export class AppValidators {
 	 */
 	static strongPassword(): ValidatorFn {
 		return (control: AbstractControl): ValidationErrors | null => {
-			if (!control.value) return null
+			if (!control.value) return null;
 
-			const value = control.value
-			const errors: ValidationErrors = {}
+			const value = control.value;
+			const errors: ValidationErrors = {};
 
-			if (value.length < 8) errors['minLength'] = true
-			if (!/[A-Z]/.test(value)) errors['noUppercase'] = true
-			if (!/[a-z]/.test(value)) errors['noLowercase'] = true
-			if (!/\d/.test(value)) errors['noNumber'] = true
-			if (!/[!@#$%^&*(),.?":{}|<>]/.test(value)) errors['noSpecial'] = true
+			if (value.length < 8) errors['minLength'] = true;
+			if (!/[A-Z]/.test(value)) errors['noUppercase'] = true;
+			if (!/[a-z]/.test(value)) errors['noLowercase'] = true;
+			if (!/\d/.test(value)) errors['noNumber'] = true;
+			if (!/[!@#$%^&*(),.?":{}|<>]/.test(value)) errors['noSpecial'] = true;
 
-			return Object.keys(errors).length ? { strongPassword: errors } : null
-		}
+			return Object.keys(errors).length ? { strongPassword: errors } : null;
+		};
 	}
 
 	/**
@@ -75,13 +75,13 @@ export class AppValidators {
 	 */
 	static email(): ValidatorFn {
 		return (control: AbstractControl): ValidationErrors | null => {
-			if (!control.value) return null
+			if (!control.value) return null;
 
-			const emailPattern = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/
-			const isValid = emailPattern.test(control.value)
+			const emailPattern = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+			const isValid = emailPattern.test(control.value);
 
-			return isValid ? null : { email: true }
-		}
+			return isValid ? null : { email: true };
+		};
 	}
 
 	/**
@@ -89,13 +89,13 @@ export class AppValidators {
 	 */
 	static phoneNumber(): ValidatorFn {
 		return (control: AbstractControl): ValidationErrors | null => {
-			if (!control.value) return null
+			if (!control.value) return null;
 
-			const value = control.value.toString().trim()
-			const isValid = /^9\d{8}$/.test(value)
+			const value = control.value.toString().trim();
+			const isValid = /^9\d{8}$/.test(value);
 
-			return isValid ? null : { phoneNumber: true }
-		}
+			return isValid ? null : { phoneNumber: true };
+		};
 	}
 
 	/**
@@ -103,13 +103,13 @@ export class AppValidators {
 	 */
 	static matchFields(field1: string, field2: string): ValidatorFn {
 		return (control: AbstractControl): ValidationErrors | null => {
-			const value1 = control.get(field1)?.value
-			const value2 = control.get(field2)?.value
+			const value1 = control.get(field1)?.value;
+			const value2 = control.get(field2)?.value;
 
-			if (!value1 || !value2) return null
+			if (!value1 || !value2) return null;
 
-			return value1 === value2 ? null : { mismatch: { field1, field2 } }
-		}
+			return value1 === value2 ? null : { mismatch: { field1, field2 } };
+		};
 	}
 
 	/**
@@ -121,10 +121,10 @@ export class AppValidators {
 				control.value === null ||
 				control.value === undefined ||
 				control.value === '' ||
-				(typeof control.value === 'string' && !control.value.trim())
+				(typeof control.value === 'string' && !control.value.trim());
 
-			return isEmpty ? { required: { fieldName } } : null
-		}
+			return isEmpty ? { required: { fieldName } } : null;
+		};
 	}
 
 	/**
@@ -132,13 +132,13 @@ export class AppValidators {
 	 */
 	static range(min: number, max: number): ValidatorFn {
 		return (control: AbstractControl): ValidationErrors | null => {
-			if (control.value === null || control.value === undefined) return null
+			if (control.value === null || control.value === undefined) return null;
 
-			const value = Number(control.value)
-			if (isNaN(value)) return { range: { min, max, actual: control.value } }
+			const value = Number(control.value);
+			if (isNaN(value)) return { range: { min, max, actual: control.value } };
 
-			return value >= min && value <= max ? null : { range: { min, max, actual: value } }
-		}
+			return value >= min && value <= max ? null : { range: { min, max, actual: value } };
+		};
 	}
 
 	/**
@@ -146,11 +146,11 @@ export class AppValidators {
 	 */
 	static onlyLetters(): ValidatorFn {
 		return (control: AbstractControl): ValidationErrors | null => {
-			if (!control.value) return null
+			if (!control.value) return null;
 
-			const isValid = /^[a-zA-ZáéíóúÁÉÍÓÚñÑüÜ\s]+$/.test(control.value)
-			return isValid ? null : { onlyLetters: true }
-		}
+			const isValid = /^[a-zA-ZáéíóúÁÉÍÓÚñÑüÜ\s]+$/.test(control.value);
+			return isValid ? null : { onlyLetters: true };
+		};
 	}
 
 	/**
@@ -158,10 +158,10 @@ export class AppValidators {
 	 */
 	static onlyNumbers(): ValidatorFn {
 		return (control: AbstractControl): ValidationErrors | null => {
-			if (!control.value) return null
+			if (!control.value) return null;
 
-			const isValid = /^\d+$/.test(control.value.toString())
-			return isValid ? null : { onlyNumbers: true }
-		}
+			const isValid = /^\d+$/.test(control.value.toString());
+			return isValid ? null : { onlyNumbers: true };
+		};
 	}
 }

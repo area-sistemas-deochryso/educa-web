@@ -1,7 +1,7 @@
-import { Injectable, OnDestroy, DestroyRef, Directive } from '@angular/core'
-import { Subject, Observable, MonoTypeOperatorFunction } from 'rxjs'
-import { takeUntil } from 'rxjs/operators'
-import { takeUntilDestroyed } from '@angular/core/rxjs-interop'
+import { Injectable, OnDestroy, DestroyRef, Directive } from '@angular/core';
+import { Subject, Observable, MonoTypeOperatorFunction } from 'rxjs';
+import { takeUntil } from 'rxjs/operators';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
 /**
  * Servicio para manejar el ciclo de vida de subscripciones.
@@ -33,23 +33,23 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop'
  */
 @Injectable()
 export class DestroyService implements OnDestroy {
-	private readonly destroy$ = new Subject<void>()
+	private readonly destroy$ = new Subject<void>();
 
 	/**
 	 * Observable que emite cuando el servicio/componente se destruye
 	 */
-	readonly onDestroy$ = this.destroy$.asObservable()
+	readonly onDestroy$ = this.destroy$.asObservable();
 
 	/**
 	 * Operador para cancelar subscripciones automáticamente
 	 */
 	takeUntil<T>(): MonoTypeOperatorFunction<T> {
-		return takeUntil<T>(this.destroy$)
+		return takeUntil<T>(this.destroy$);
 	}
 
 	ngOnDestroy(): void {
-		this.destroy$.next()
-		this.destroy$.complete()
+		this.destroy$.next();
+		this.destroy$.complete();
 	}
 }
 
@@ -72,7 +72,7 @@ export class DestroyService implements OnDestroy {
  * ```
  */
 export function untilDestroyed<T>(destroyRef: DestroyRef): MonoTypeOperatorFunction<T> {
-	return takeUntilDestroyed<T>(destroyRef)
+	return takeUntilDestroyed<T>(destroyRef);
 }
 
 /**
@@ -92,15 +92,15 @@ export function untilDestroyed<T>(destroyRef: DestroyRef): MonoTypeOperatorFunct
  */
 @Directive()
 export abstract class DestroyableComponent implements OnDestroy {
-	protected readonly destroy$ = new Subject<void>()
+	protected readonly destroy$ = new Subject<void>();
 
 	protected untilDestroyed<T>(): MonoTypeOperatorFunction<T> {
-		return takeUntil<T>(this.destroy$)
+		return takeUntil<T>(this.destroy$);
 	}
 
 	ngOnDestroy(): void {
-		this.destroy$.next()
-		this.destroy$.complete()
+		this.destroy$.next();
+		this.destroy$.complete();
 	}
 }
 
@@ -108,35 +108,35 @@ export abstract class DestroyableComponent implements OnDestroy {
  * Utilidad para manejar intervalos y timeouts con cleanup automático
  */
 export class TimerManager {
-	private intervals: ReturnType<typeof setInterval>[] = []
-	private timeouts: ReturnType<typeof setTimeout>[] = []
+	private intervals: ReturnType<typeof setInterval>[] = [];
+	private timeouts: ReturnType<typeof setTimeout>[] = [];
 
 	setInterval(callback: () => void, ms: number): ReturnType<typeof setInterval> {
-		const id = setInterval(callback, ms)
-		this.intervals.push(id)
-		return id
+		const id = setInterval(callback, ms);
+		this.intervals.push(id);
+		return id;
 	}
 
 	setTimeout(callback: () => void, ms: number): ReturnType<typeof setTimeout> {
-		const id = setTimeout(callback, ms)
-		this.timeouts.push(id)
-		return id
+		const id = setTimeout(callback, ms);
+		this.timeouts.push(id);
+		return id;
 	}
 
 	clearInterval(id: ReturnType<typeof setInterval>): void {
-		clearInterval(id)
-		this.intervals = this.intervals.filter(i => i !== id)
+		clearInterval(id);
+		this.intervals = this.intervals.filter((i) => i !== id);
 	}
 
 	clearTimeout(id: ReturnType<typeof setTimeout>): void {
-		clearTimeout(id)
-		this.timeouts = this.timeouts.filter(t => t !== id)
+		clearTimeout(id);
+		this.timeouts = this.timeouts.filter((t) => t !== id);
 	}
 
 	clearAll(): void {
-		this.intervals.forEach(id => clearInterval(id))
-		this.timeouts.forEach(id => clearTimeout(id))
-		this.intervals = []
-		this.timeouts = []
+		this.intervals.forEach((id) => clearInterval(id));
+		this.timeouts.forEach((id) => clearTimeout(id));
+		this.intervals = [];
+		this.timeouts = [];
 	}
 }

@@ -12,7 +12,7 @@ export interface Adapter<TSource, TTarget> {
 	/**
 	 * Transforma un objeto de origen a destino
 	 */
-	adapt(source: TSource): TTarget
+	adapt(source: TSource): TTarget;
 }
 
 /**
@@ -25,27 +25,27 @@ export interface BidirectionalAdapter<TSource, TTarget> extends Adapter<TSource,
 	/**
 	 * Transforma un objeto de destino a origen (inversa)
 	 */
-	reverse(target: TTarget): TSource
+	reverse(target: TTarget): TSource;
 }
 
 /**
  * Clase base abstracta para adaptadores con funcionalidad común
  */
 export abstract class BaseAdapter<TSource, TTarget> implements Adapter<TSource, TTarget> {
-	abstract adapt(source: TSource): TTarget
+	abstract adapt(source: TSource): TTarget;
 
 	/**
 	 * Adapta una lista de objetos
 	 */
 	adaptList(sources: TSource[]): TTarget[] {
-		return sources.map(source => this.adapt(source))
+		return sources.map((source) => this.adapt(source));
 	}
 
 	/**
 	 * Adapta un objeto nullable
 	 */
 	adaptOrNull(source: TSource | null | undefined): TTarget | null {
-		return source ? this.adapt(source) : null
+		return source ? this.adapt(source) : null;
 	}
 }
 
@@ -56,12 +56,12 @@ export abstract class BaseBidirectionalAdapter<TSource, TTarget>
 	extends BaseAdapter<TSource, TTarget>
 	implements BidirectionalAdapter<TSource, TTarget>
 {
-	abstract reverse(target: TTarget): TSource
+	abstract reverse(target: TTarget): TSource;
 
 	/**
 	 * Reversa una lista de objetos
 	 */
 	reverseList(targets: TTarget[]): TSource[] {
-		return targets.map(target => this.reverse(target))
+		return targets.map((target) => this.reverse(target));
 	}
 }

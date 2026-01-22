@@ -1,3 +1,3 @@
-export * from './validators'
-export * from './validation-messages'
-export * from './form.models'
+export * from './validators';
+export * from './validation-messages';
+export * from './form.models';

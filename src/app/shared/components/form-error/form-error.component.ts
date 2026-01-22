@@ -1,8 +1,8 @@
-import { Component, Input, inject, OnInit, DestroyRef } from '@angular/core'
-import { CommonModule } from '@angular/common'
-import { AbstractControl } from '@angular/forms'
-import { takeUntilDestroyed } from '@angular/core/rxjs-interop'
-import { getValidationMessage, ValidationMessageConfig } from '@shared/validators'
+import { Component, Input, inject, OnInit, DestroyRef } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { AbstractControl } from '@angular/forms';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { getValidationMessage, ValidationMessageConfig } from '@shared/validators';
 
 @Component({
 	selector: 'app-form-error',
@@ -33,38 +33,40 @@ import { getValidationMessage, ValidationMessageConfig } from '@shared/validator
 	],
 })
 export class FormErrorComponent implements OnInit {
-	@Input({ required: true }) control!: AbstractControl
-	@Input() customMessages?: ValidationMessageConfig
-	@Input() showOnTouched = true
+	@Input({ required: true }) control!: AbstractControl;
+	@Input() customMessages?: ValidationMessageConfig;
+	@Input() showOnTouched = true;
 
-	private destroyRef = inject(DestroyRef)
+	private destroyRef = inject(DestroyRef);
 
-	errorMessages: string[] = []
+	errorMessages: string[] = [];
 
 	ngOnInit(): void {
-		this.control.statusChanges.pipe(takeUntilDestroyed(this.destroyRef)).subscribe(() => this.updateErrors())
+		this.control.statusChanges
+			.pipe(takeUntilDestroyed(this.destroyRef))
+			.subscribe(() => this.updateErrors());
 
-		this.updateErrors()
+		this.updateErrors();
 	}
 
 	get shouldShowErrors(): boolean {
-		if (!this.control.errors) return false
+		if (!this.control.errors) return false;
 
 		if (this.showOnTouched) {
-			return this.control.touched || this.control.dirty
+			return this.control.touched || this.control.dirty;
 		}
 
-		return true
+		return true;
 	}
 
 	private updateErrors(): void {
 		if (!this.control.errors) {
-			this.errorMessages = []
-			return
+			this.errorMessages = [];
+			return;
 		}
 
 		this.errorMessages = Object.entries(this.control.errors).map(([key, params]) =>
-			getValidationMessage(key, params as Record<string, unknown>, this.customMessages)
-		)
+			getValidationMessage(key, params as Record<string, unknown>, this.customMessages),
+		);
 	}
 }

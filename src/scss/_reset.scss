@@ -6,94 +6,99 @@
 *,
 *::before,
 *::after {
-  box-sizing: border-box;
+	box-sizing: border-box;
 }
 
 // Body
 body {
-  margin: 0;
-  font-family: var(--body-font-family);
-  font-size: 1rem;
-  font-weight: 400;
-  line-height: 1.5;
-  -webkit-text-size-adjust: 100%;
-  -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
+	margin: 0;
+	font-family: var(--body-font-family);
+	font-size: 1rem;
+	font-weight: 400;
+	line-height: 1.5;
+	-webkit-text-size-adjust: 100%;
+	-webkit-tap-highlight-color: rgba(0, 0, 0, 0);
 }
 
 // Headings
-h1, h2, h3, h4, h5, h6 {
-  margin-top: 0;
-  margin-bottom: 0.5rem;
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+	margin-top: 0;
+	margin-bottom: 0.5rem;
 }
 
 // Paragraphs
 p {
-  margin-top: 0;
-  margin-bottom: 1rem;
+	margin-top: 0;
+	margin-bottom: 1rem;
 }
 
 // Lists
 ol,
 ul {
-  margin: 0;
-  padding: 0;
+	margin: 0;
+	padding: 0;
 }
 
 // Para listas dentro de nav (como breadcrumbs, menus)
 nav ol,
 nav ul {
-  list-style: none;
+	list-style: none;
 }
 
 // Definition lists
 dl {
-  margin-top: 0;
-  margin-bottom: 1rem;
+	margin-top: 0;
+	margin-bottom: 1rem;
 }
 
 dt {
-  font-weight: 700;
+	font-weight: 700;
 }
 
 dd {
-  margin-bottom: 0.5rem;
-  margin-left: 0;
+	margin-bottom: 0.5rem;
+	margin-left: 0;
 }
 
 // Blockquote
 blockquote {
-  margin: 0 0 1rem;
+	margin: 0 0 1rem;
 }
 
 // Links
 a {
-  text-decoration: none;
+	text-decoration: none;
 
-  &:hover {
-    text-decoration: none;
-  }
+	&:hover {
+		text-decoration: none;
+	}
 }
 
 // Figures
 figure {
-  margin: 0 0 1rem;
+	margin: 0 0 1rem;
 }
 
 // Images
 img,
 svg {
-  vertical-align: middle;
+	vertical-align: middle;
 }
 
 // Tables
 table {
-  caption-side: bottom;
-  border-collapse: collapse;
+	caption-side: bottom;
+	border-collapse: collapse;
 }
 
 th {
-  text-align: inherit;
-  text-align: -webkit-match-parent;
+	text-align: inherit;
+	text-align: -webkit-match-parent;
 }
 
 thead,
@@ -102,22 +107,22 @@ tfoot,
 tr,
 td,
 th {
-  border-color: inherit;
-  border-style: solid;
-  border-width: 0;
+	border-color: inherit;
+	border-style: solid;
+	border-width: 0;
 }
 
 // Forms
 label {
-  display: inline-block;
+	display: inline-block;
 }
 
 button {
-  border-radius: 0;
+	border-radius: 0;
 }
 
 button:focus:not(:focus-visible) {
-  outline: 0;
+	outline: 0;
 }
 
 input,
@@ -125,106 +130,106 @@ button,
 select,
 optgroup,
 textarea {
-  margin: 0;
-  font-family: inherit;
-  font-size: inherit;
-  line-height: inherit;
+	margin: 0;
+	font-family: inherit;
+	font-size: inherit;
+	line-height: inherit;
 }
 
 button,
 select {
-  text-transform: none;
+	text-transform: none;
 }
 
-[role="button"] {
-  cursor: pointer;
+[role='button'] {
+	cursor: pointer;
 }
 
 select {
-  word-wrap: normal;
+	word-wrap: normal;
 
-  &:disabled {
-    opacity: 1;
-  }
+	&:disabled {
+		opacity: 1;
+	}
 }
 
 button,
-[type="button"],
-[type="reset"],
-[type="submit"] {
-  -webkit-appearance: button;
+[type='button'],
+[type='reset'],
+[type='submit'] {
+	-webkit-appearance: button;
 
-  &:not(:disabled) {
-    cursor: pointer;
-  }
+	&:not(:disabled) {
+		cursor: pointer;
+	}
 }
 
 ::-moz-focus-inner {
-  padding: 0;
-  border-style: none;
+	padding: 0;
+	border-style: none;
 }
 
 textarea {
-  resize: vertical;
+	resize: vertical;
 }
 
 fieldset {
-  min-width: 0;
-  padding: 0;
-  margin: 0;
-  border: 0;
+	min-width: 0;
+	padding: 0;
+	margin: 0;
+	border: 0;
 }
 
 legend {
-  float: left;
-  width: 100%;
-  padding: 0;
-  margin-bottom: 0.5rem;
-  font-size: 1.5rem;
-  line-height: inherit;
+	float: left;
+	width: 100%;
+	padding: 0;
+	margin-bottom: 0.5rem;
+	font-size: 1.5rem;
+	line-height: inherit;
 }
 
 // Fix para inputs de tipo search en Chrome
-[type="search"] {
-  outline-offset: -2px;
-  -webkit-appearance: textfield;
+[type='search'] {
+	outline-offset: -2px;
+	-webkit-appearance: textfield;
 }
 
 ::-webkit-search-decoration {
-  -webkit-appearance: none;
+	-webkit-appearance: none;
 }
 
 ::-webkit-color-swatch-wrapper {
-  padding: 0;
+	padding: 0;
 }
 
 ::-webkit-file-upload-button {
-  font: inherit;
-  -webkit-appearance: button;
+	font: inherit;
+	-webkit-appearance: button;
 }
 
 // Output
 output {
-  display: inline-block;
+	display: inline-block;
 }
 
 // iframes
 iframe {
-  border: 0;
+	border: 0;
 }
 
 // Summary
 summary {
-  display: list-item;
-  cursor: pointer;
+	display: list-item;
+	cursor: pointer;
 }
 
 // Progress
 progress {
-  vertical-align: baseline;
+	vertical-align: baseline;
 }
 
 // Hidden attribute
 [hidden] {
-  display: none !important;
+	display: none !important;
 }

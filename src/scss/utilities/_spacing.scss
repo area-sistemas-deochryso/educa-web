@@ -7,70 +7,162 @@
 
 // Base spacing utilities
 @each $size, $value in $spacers {
-  // Margin all sides
-  .m-#{$size} { margin: $value; }
+	// Margin all sides
+	.m-#{$size} {
+		margin: $value;
+	}
 
-  // Margin individual sides
-  .mt-#{$size} { margin-top: $value; }
-  .mb-#{$size} { margin-bottom: $value; }
-  .ms-#{$size} { margin-left: $value; }
-  .me-#{$size} { margin-right: $value; }
+	// Margin individual sides
+	.mt-#{$size} {
+		margin-top: $value;
+	}
+	.mb-#{$size} {
+		margin-bottom: $value;
+	}
+	.ms-#{$size} {
+		margin-left: $value;
+	}
+	.me-#{$size} {
+		margin-right: $value;
+	}
 
-  // Margin X/Y axis
-  .mx-#{$size} { margin-left: $value; margin-right: $value; }
-  .my-#{$size} { margin-top: $value; margin-bottom: $value; }
+	// Margin X/Y axis
+	.mx-#{$size} {
+		margin-left: $value;
+		margin-right: $value;
+	}
+	.my-#{$size} {
+		margin-top: $value;
+		margin-bottom: $value;
+	}
 
-  // Padding all sides
-  .p-#{$size} { padding: $value; }
+	// Padding all sides
+	.p-#{$size} {
+		padding: $value;
+	}
 
-  // Padding individual sides
-  .pt-#{$size} { padding-top: $value; }
-  .pb-#{$size} { padding-bottom: $value; }
-  .ps-#{$size} { padding-left: $value; }
-  .pe-#{$size} { padding-right: $value; }
+	// Padding individual sides
+	.pt-#{$size} {
+		padding-top: $value;
+	}
+	.pb-#{$size} {
+		padding-bottom: $value;
+	}
+	.ps-#{$size} {
+		padding-left: $value;
+	}
+	.pe-#{$size} {
+		padding-right: $value;
+	}
 
-  // Padding X/Y axis
-  .px-#{$size} { padding-left: $value; padding-right: $value; }
-  .py-#{$size} { padding-top: $value; padding-bottom: $value; }
+	// Padding X/Y axis
+	.px-#{$size} {
+		padding-left: $value;
+		padding-right: $value;
+	}
+	.py-#{$size} {
+		padding-top: $value;
+		padding-bottom: $value;
+	}
 }
 
 // Auto margins
-.mx-auto { margin-left: auto; margin-right: auto; }
-.my-auto { margin-top: auto; margin-bottom: auto; }
-.ms-auto { margin-left: auto; }
-.me-auto { margin-right: auto; }
-.mt-auto { margin-top: auto; }
-.mb-auto { margin-bottom: auto; }
+.mx-auto {
+	margin-left: auto;
+	margin-right: auto;
+}
+.my-auto {
+	margin-top: auto;
+	margin-bottom: auto;
+}
+.ms-auto {
+	margin-left: auto;
+}
+.me-auto {
+	margin-right: auto;
+}
+.mt-auto {
+	margin-top: auto;
+}
+.mb-auto {
+	margin-bottom: auto;
+}
 
 // Responsive spacing
 @each $breakpoint, $min-width in $breakpoints {
-  @include media-up($breakpoint) {
-    @each $size, $value in $spacers {
-      // Margin
-      .m-#{$breakpoint}-#{$size} { margin: $value; }
-      .mt-#{$breakpoint}-#{$size} { margin-top: $value; }
-      .mb-#{$breakpoint}-#{$size} { margin-bottom: $value; }
-      .ms-#{$breakpoint}-#{$size} { margin-left: $value; }
-      .me-#{$breakpoint}-#{$size} { margin-right: $value; }
-      .mx-#{$breakpoint}-#{$size} { margin-left: $value; margin-right: $value; }
-      .my-#{$breakpoint}-#{$size} { margin-top: $value; margin-bottom: $value; }
+	@include media-up($breakpoint) {
+		@each $size, $value in $spacers {
+			// Margin
+			.m-#{$breakpoint}-#{$size} {
+				margin: $value;
+			}
+			.mt-#{$breakpoint}-#{$size} {
+				margin-top: $value;
+			}
+			.mb-#{$breakpoint}-#{$size} {
+				margin-bottom: $value;
+			}
+			.ms-#{$breakpoint}-#{$size} {
+				margin-left: $value;
+			}
+			.me-#{$breakpoint}-#{$size} {
+				margin-right: $value;
+			}
+			.mx-#{$breakpoint}-#{$size} {
+				margin-left: $value;
+				margin-right: $value;
+			}
+			.my-#{$breakpoint}-#{$size} {
+				margin-top: $value;
+				margin-bottom: $value;
+			}
 
-      // Padding
-      .p-#{$breakpoint}-#{$size} { padding: $value; }
-      .pt-#{$breakpoint}-#{$size} { padding-top: $value; }
-      .pb-#{$breakpoint}-#{$size} { padding-bottom: $value; }
-      .ps-#{$breakpoint}-#{$size} { padding-left: $value; }
-      .pe-#{$breakpoint}-#{$size} { padding-right: $value; }
-      .px-#{$breakpoint}-#{$size} { padding-left: $value; padding-right: $value; }
-      .py-#{$breakpoint}-#{$size} { padding-top: $value; padding-bottom: $value; }
-    }
+			// Padding
+			.p-#{$breakpoint}-#{$size} {
+				padding: $value;
+			}
+			.pt-#{$breakpoint}-#{$size} {
+				padding-top: $value;
+			}
+			.pb-#{$breakpoint}-#{$size} {
+				padding-bottom: $value;
+			}
+			.ps-#{$breakpoint}-#{$size} {
+				padding-left: $value;
+			}
+			.pe-#{$breakpoint}-#{$size} {
+				padding-right: $value;
+			}
+			.px-#{$breakpoint}-#{$size} {
+				padding-left: $value;
+				padding-right: $value;
+			}
+			.py-#{$breakpoint}-#{$size} {
+				padding-top: $value;
+				padding-bottom: $value;
+			}
+		}
 
-    // Responsive auto margins
-    .mx-#{$breakpoint}-auto { margin-left: auto; margin-right: auto; }
-    .my-#{$breakpoint}-auto { margin-top: auto; margin-bottom: auto; }
-    .ms-#{$breakpoint}-auto { margin-left: auto; }
-    .me-#{$breakpoint}-auto { margin-right: auto; }
-    .mt-#{$breakpoint}-auto { margin-top: auto; }
-    .mb-#{$breakpoint}-auto { margin-bottom: auto; }
-  }
+		// Responsive auto margins
+		.mx-#{$breakpoint}-auto {
+			margin-left: auto;
+			margin-right: auto;
+		}
+		.my-#{$breakpoint}-auto {
+			margin-top: auto;
+			margin-bottom: auto;
+		}
+		.ms-#{$breakpoint}-auto {
+			margin-left: auto;
+		}
+		.me-#{$breakpoint}-auto {
+			margin-right: auto;
+		}
+		.mt-#{$breakpoint}-auto {
+			margin-top: auto;
+		}
+		.mb-#{$breakpoint}-auto {
+			margin-bottom: auto;
+		}
+	}
 }

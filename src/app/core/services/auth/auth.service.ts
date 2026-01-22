@@ -1,10 +1,17 @@
 import { HttpClient, HttpErrorResponse } from '@angular/common/http';
 import { inject, Injectable } from '@angular/core';
-import { BehaviorSubject, Observable, catchError, map, of, tap } from 'rxjs';
+import { BehaviorSubject, Observable, catchError, forkJoin, map, of, tap } from 'rxjs';
 
 import { environment } from '@env/environment';
 
-import { AuthUser, LoginRequest, LoginResponse, UserProfile, UserRole, VerifyTokenResponse } from './auth.models';
+import {
+	AuthUser,
+	LoginRequest,
+	LoginResponse,
+	UserProfile,
+	UserRole,
+	VerifyTokenResponse,
+} from './auth.models';
 import { StorageService } from '../storage';
 
 @Injectable({
@@ -61,7 +68,12 @@ export class AuthService {
 	 * Login usando el endpoint POST /api/Auth/login
 	 * @param rememberMe Si es true, la sesión persiste al cerrar el navegador
 	 */
-	login(dni: string, password: string, rol: UserRole, rememberMe: boolean = false): Observable<LoginResponse> {
+	login(
+		dni: string,
+		password: string,
+		rol: UserRole,
+		rememberMe: boolean = false,
+	): Observable<LoginResponse> {
 		if (this.isBlocked) {
 			return of({
 				token: '',
@@ -111,7 +123,8 @@ export class AuthService {
 		};
 
 		// Guardar según la preferencia de "recordar sesión"
-		this.storage.setToken(response.token, rememberMe);
+		// Pasar nombreCompleto y rol para generar la clave de sesión única
+		this.storage.setToken(response.token, rememberMe, response.nombreCompleto, response.rol);
 		this.storage.setUser(user, rememberMe);
 
 		this.isAuthenticatedSubject.next(true);
@@ -178,14 +191,40 @@ export class AuthService {
 			return of(null);
 		}
 
-		return this.http.post<VerifyTokenResponse>(`${this.apiUrl}/verificar`, JSON.stringify(rememberToken), {
-			headers: { 'Content-Type': 'application/json' }
-		}).pipe(
-			catchError(() => {
-				// Si el token es inválido, limpiarlo
-				this.storage.clearRememberToken();
-				return of(null);
-			}),
+		return this.http
+			.post<VerifyTokenResponse>(`${this.apiUrl}/verificar`, JSON.stringify(rememberToken), {
+				headers: { 'Content-Type': 'application/json' },
+			})
+			.pipe(
+				catchError(() => {
+					// Si el token es inválido, limpiarlo
+					this.storage.clearRememberToken();
+					return of(null);
+				}),
+			);
+	}
+
+	/**
+	 * Verifica TODOS los tokens persistentes guardados para autocompletado
+	 * Retorna un array con la información de cada usuario verificado
+	 */
+	verifyAllStoredTokens(): Observable<VerifyTokenResponse[]> {
+		const persistentTokens = this.storage.getAllPersistentTokens();
+
+		if (persistentTokens.length === 0) {
+			return of([]);
+		}
+
+		const verifyRequests = persistentTokens.map(({ token }) =>
+			this.http
+				.post<VerifyTokenResponse>(`${this.apiUrl}/verificar`, JSON.stringify(token), {
+					headers: { 'Content-Type': 'application/json' },
+				})
+				.pipe(catchError(() => of(null))),
+		);
+
+		return forkJoin(verifyRequests).pipe(
+			map((responses) => responses.filter((r): r is VerifyTokenResponse => r !== null)),
 		);
 	}
 }

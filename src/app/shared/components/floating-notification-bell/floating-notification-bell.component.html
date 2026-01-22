@@ -213,7 +213,9 @@
 						@if (notification.dismissible !== false) {
 							<button
 								class="notification-dismiss"
-								(click)="dismissNotification(notification.id); $event.stopPropagation()"
+								(click)="
+									dismissNotification(notification.id); $event.stopPropagation()
+								"
 								title="Descartar"
 							>
 								<i class="pi pi-times"></i>
@@ -233,27 +235,52 @@
 		@if (dismissedCount() > 0) {
 			<div class="dismissed-section">
 				<button class="dismissed-toggle" (click)="toggleDismissedHistory()">
-					<i class="pi" [class.pi-chevron-down]="!showDismissedHistory()" [class.pi-chevron-up]="showDismissedHistory()"></i>
-					<span>{{ dismissedCount() }} descartada{{ dismissedCount() > 1 ? 's' : '' }}</span>
+					<i
+						class="pi"
+						[class.pi-chevron-down]="!showDismissedHistory()"
+						[class.pi-chevron-up]="showDismissedHistory()"
+					></i>
+					<span
+						>{{ dismissedCount() }} descartada{{
+							dismissedCount() > 1 ? 's' : ''
+						}}</span
+					>
 				</button>
 
 				@if (showDismissedHistory()) {
 					<div class="dismissed-list">
 						<div class="dismissed-header">
 							<span>Notificaciones descartadas</span>
-							<button class="restore-all-btn" (click)="restoreAll()" title="Restaurar todas">
+							<button
+								class="restore-all-btn"
+								(click)="restoreAll()"
+								title="Restaurar todas"
+							>
 								<i class="pi pi-refresh"></i>
 								<span>Restaurar todas</span>
 							</button>
 						</div>
-						@for (notification of dismissedNotifications(); track trackById($index, notification)) {
-							<div class="dismissed-card" [class]="getPriorityClass(notification.priority)">
+						@for (
+							notification of dismissedNotifications();
+							track trackById($index, notification)
+						) {
+							<div
+								class="dismissed-card"
+								[class]="getPriorityClass(notification.priority)"
+							>
 								<div class="dismissed-icon">
-									<i class="pi" [class]="notification.icon || getTypeIcon(notification.type)"></i>
+									<i
+										class="pi"
+										[class]="
+											notification.icon || getTypeIcon(notification.type)
+										"
+									></i>
 								</div>
 								<div class="dismissed-content">
 									<span class="dismissed-title">{{ notification.title }}</span>
-									<span class="dismissed-type">{{ getTypeLabel(notification.type) }}</span>
+									<span class="dismissed-type">{{
+										getTypeLabel(notification.type)
+									}}</span>
 								</div>
 								<button
 									class="restore-btn"

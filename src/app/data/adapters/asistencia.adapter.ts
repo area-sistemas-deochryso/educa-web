@@ -1,46 +1,46 @@
-import { Injectable } from '@angular/core'
-import { BaseAdapter } from './base.adapter'
-import { AsistenciaDetalle, HijoApoderado, ResumenAsistencia } from '@core/services'
+import { Injectable } from '@angular/core';
+import { BaseAdapter } from './base.adapter';
+import { AsistenciaDetalle, HijoApoderado, ResumenAsistencia } from '@core/services';
 
 /**
  * Modelo de vista para una asistencia
  */
 export interface AsistenciaView {
-	id: number
-	fecha: Date
-	sede: string
-	entrada: string | null
-	salida: string | null
-	estadoIngreso: 'temprano' | 'puntual' | 'tarde' | 'ausente'
-	estadoSalida: 'normal' | 'temprano' | 'tarde' | 'ausente'
-	completa: boolean
-	observacion: string | null
+	id: number;
+	fecha: Date;
+	sede: string;
+	entrada: string | null;
+	salida: string | null;
+	estadoIngreso: 'temprano' | 'puntual' | 'tarde' | 'ausente';
+	estadoSalida: 'normal' | 'temprano' | 'tarde' | 'ausente';
+	completa: boolean;
+	observacion: string | null;
 }
 
 /**
  * Modelo de vista para el resumen de asistencias
  */
 export interface ResumenView {
-	totalDias: number
-	asistidos: number
-	faltas: number
-	tardanzas: number
-	porcentaje: number
-	porcentajeFormateado: string
-	asistencias: AsistenciaView[]
+	totalDias: number;
+	asistidos: number;
+	faltas: number;
+	tardanzas: number;
+	porcentaje: number;
+	porcentajeFormateado: string;
+	asistencias: AsistenciaView[];
 }
 
 /**
  * Modelo de vista para un hijo/estudiante
  */
 export interface HijoView {
-	id: number
-	dni: string
-	nombre: string
-	grado: string
-	seccion: string
-	gradoSeccion: string
-	relacion: string
+	id: number;
+	dni: string;
+	nombre: string;
+	grado: string;
+	seccion: string;
+	gradoSeccion: string;
+	relacion: string;
 }
 
 /**
@@ -61,42 +61,42 @@ export class AsistenciaAdapter extends BaseAdapter<AsistenciaDetalle, Asistencia
 			estadoSalida: this.getEstadoSalida(source.horaSalida),
 			completa: source.estado === 'Completa',
 			observacion: source.observacion,
-		}
+		};
 	}
 
 	private formatHora(fechaHora: string): string {
-		const date = new Date(fechaHora)
-		return date.toLocaleTimeString('es-PE', { hour: '2-digit', minute: '2-digit' })
+		const date = new Date(fechaHora);
+		return date.toLocaleTimeString('es-PE', { hour: '2-digit', minute: '2-digit' });
 	}
 
 	private getEstadoIngreso(horaEntrada: string | null): AsistenciaView['estadoIngreso'] {
-		if (!horaEntrada) return 'ausente'
+		if (!horaEntrada) return 'ausente';
 
-		const fecha = new Date(horaEntrada)
-		const hora = fecha.getHours()
-		const minutos = fecha.getMinutes()
+		const fecha = new Date(horaEntrada);
+		const hora = fecha.getHours();
+		const minutos = fecha.getMinutes();
 
 		if (hora < 7 || (hora === 7 && minutos < 30)) {
-			return 'temprano'
+			return 'temprano';
 		} else if (hora === 7 || (hora === 8 && minutos === 0)) {
-			return 'puntual'
+			return 'puntual';
 		}
-		return 'tarde'
+		return 'tarde';
 	}
 
 	private getEstadoSalida(horaSalida: string | null): AsistenciaView['estadoSalida'] {
-		if (!horaSalida) return 'ausente'
+		if (!horaSalida) return 'ausente';
 
-		const fecha = new Date(horaSalida)
-		const hora = fecha.getHours()
-		const minutos = fecha.getMinutes()
+		const fecha = new Date(horaSalida);
+		const hora = fecha.getHours();
+		const minutos = fecha.getMinutes();
 
 		if (hora > 14 || (hora === 14 && minutos >= 30)) {
-			return 'normal'
+			return 'normal';
 		} else if (hora === 14) {
-			return 'temprano'
+			return 'temprano';
 		}
-		return 'tarde'
+		return 'tarde';
 	}
 }
 
@@ -108,7 +108,7 @@ export class AsistenciaAdapter extends BaseAdapter<AsistenciaDetalle, Asistencia
 })
 export class ResumenAsistenciaAdapter extends BaseAdapter<ResumenAsistencia, ResumenView> {
 	constructor(private asistenciaAdapter: AsistenciaAdapter) {
-		super()
+		super();
 	}
 
 	adapt(source: ResumenAsistencia): ResumenView {
@@ -120,7 +120,7 @@ export class ResumenAsistenciaAdapter extends BaseAdapter<ResumenAsistencia, Res
 			porcentaje: source.porcentajeAsistencia,
 			porcentajeFormateado: `${source.porcentajeAsistencia.toFixed(1)}%`,
 			asistencias: this.asistenciaAdapter.adaptList(source.detalle),
-		}
+		};
 	}
 }
 
@@ -140,6 +140,6 @@ export class HijoAdapter extends BaseAdapter<HijoApoderado, HijoView> {
 			seccion: source.seccion,
 			gradoSeccion: `${source.grado} - ${source.seccion}`,
 			relacion: source.relacion,
-		}
+		};
 	}
 }
