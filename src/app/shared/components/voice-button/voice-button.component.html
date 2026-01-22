@@ -15,7 +15,7 @@
 						<span class="pulse"></span>
 						Grabando...
 					</span>
-					<button class="clear-btn" (click)="clearTranscript()" title="Borrar">
+					<button class="clear-btn" (click)="clearTranscript()" title="Borrar" aria-label="Borrar transcripción">
 						<i class="pi pi-trash"></i>
 					</button>
 				</div>
@@ -48,6 +48,14 @@
 			[class.locked]="voiceService.isLocked()"
 			[class.dragging]="isDragging"
 			[style.transform]="isDragging ? 'translateY(-' + dragOffset + 'px)' : ''"
+			[attr.aria-label]="
+				voiceService.isLocked()
+					? 'Micrófono bloqueado, grabando'
+					: voiceService.isListening()
+						? 'Escuchando comando de voz'
+						: 'Activar comando de voz'
+			"
+			[attr.aria-pressed]="voiceService.isListening() || voiceService.isLocked()"
 			(mousedown)="onMouseDown($event)"
 			(contextmenu)="onContextMenu($event)"
 			(touchstart)="onTouchStart($event)"
@@ -72,7 +80,7 @@
 			<div class="error-panel">
 				<i class="pi pi-exclamation-triangle"></i>
 				<span>{{ voiceService.error() }}</span>
-				<button class="dismiss-btn" (click)="dismissError()">
+				<button class="dismiss-btn" (click)="dismissError()" aria-label="Cerrar mensaje de error">
 					<i class="pi pi-times"></i>
 				</button>
 			</div>
@@ -98,7 +106,7 @@
 				<div class="context-menu-header">
 					<i class="pi pi-list"></i>
 					<span>Comandos de voz</span>
-					<button class="close-menu-btn" (click)="closeContextMenu()">
+					<button class="close-menu-btn" (click)="closeContextMenu()" aria-label="Cerrar menú de comandos">
 						<i class="pi pi-times"></i>
 					</button>
 				</div>

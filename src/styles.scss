@@ -9,8 +9,18 @@
 /* PrimeIcons */
 @import 'primeicons/primeicons.css';
 
+/* Override font-display for PrimeIcons to prevent FOIT (Flash of Invisible Text) */
+@font-face {
+	font-family: 'primeicons';
+	font-display: swap;
+	src:
+		url('primeicons/fonts/primeicons.woff2') format('woff2'),
+		url('primeicons/fonts/primeicons.woff') format('woff'),
+		url('primeicons/fonts/primeicons.ttf') format('truetype');
+}
+
 /* Google Fonts - optimized with display=swap for faster initial render */
-@import url('https://fonts.googleapis.com/css2?family=League+Spartan:wght@300;400;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=League+Spartan:wght@300;400;600;700&family=Inter:wght@300;400;500;600;700&display=swap');
 
 /*---------------------------------------
   CUSTOM PROPERTIES (VARIABLES)
@@ -500,6 +510,75 @@ strong {
 
 		.p-icon {
 			color: var(--intranet-accent-color-green);
+		}
+	}
+}
+
+/*---------------------------------------
+  PRIMENG TOAST - ACCESSIBILITY FIX
+-----------------------------------------*/
+.p-toast {
+	// Estilos globales para todos los toasts
+	.p-toast-message-content {
+		.p-toast-summary {
+			color: #171717 !important;
+			font-weight: 600;
+		}
+
+		.p-toast-detail {
+			color: #2c2c2c !important;
+		}
+	}
+
+	// Toast de información
+	.p-toast-message-info {
+		background: #e0f2fe !important;
+		border-left: 4px solid #0284c7 !important;
+
+		.p-toast-message-icon,
+		.p-toast-close-button {
+			color: #0369a1 !important;
+		}
+	}
+
+	// Toast de éxito
+	.p-toast-message-success {
+		background: #dcfce7 !important;
+		border-left: 4px solid #16a34a !important;
+
+		.p-toast-message-icon,
+		.p-toast-close-button {
+			color: #15803d !important;
+		}
+	}
+
+	// Toast de advertencia (amarillo) - WCAG AA compliant
+	.p-toast-message-warn {
+		background: #fef3c7 !important;
+		border-left: 4px solid #b45309 !important;
+
+		.p-toast-message-icon,
+		.p-toast-close-button {
+			color: #92400e !important;
+		}
+
+		.p-toast-summary {
+			color: #78350f !important;
+		}
+
+		.p-toast-detail {
+			color: #451a03 !important;
+		}
+	}
+
+	// Toast de error
+	.p-toast-message-error {
+		background: #fee2e2 !important;
+		border-left: 4px solid #dc2626 !important;
+
+		.p-toast-message-icon,
+		.p-toast-close-button {
+			color: #b91c1c !important;
 		}
 	}
 }

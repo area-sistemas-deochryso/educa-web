@@ -1,7 +1,11 @@
 <header class="intranet-header">
 	<div class="header-container">
 		<a routerLink="/" class="logo-link">
-			<img src="images/logo.png" alt="Educa.com Logo" class="logo" />
+			<picture>
+				<source srcset="images/logo.avif" type="image/avif" />
+				<source srcset="images/logo.webp" type="image/webp" />
+				<img src="images/logo.png" alt="Educa.com Logo" class="logo" />
+			</picture>
 		</a>
 
 		<nav class="intranet-nav">
