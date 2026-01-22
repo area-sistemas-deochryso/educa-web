@@ -19,8 +19,7 @@
 		url('primeicons/fonts/primeicons.ttf') format('truetype');
 }
 
-/* Google Fonts - optimized with display=swap for faster initial render */
-@import url('https://fonts.googleapis.com/css2?family=League+Spartan:wght@300;400;600;700&family=Inter:wght@300;400;500;600;700&display=swap');
+/* Google Fonts loaded via index.html with non-blocking preload */
 
 /*---------------------------------------
   CUSTOM PROPERTIES (VARIABLES)
