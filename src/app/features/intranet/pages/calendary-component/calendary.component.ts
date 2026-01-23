@@ -8,6 +8,7 @@ import { CalendarDayModalComponent } from '../../components/calendar/calendar-da
 import { CalendarDay, CalendarMonth, ModalData } from './calendar.types';
 import { isHoliday } from './holidays.config';
 import { getEvent, isDateInEventRange, isDateEventEnd } from './events.config';
+import { CalendarUtilsService } from '../../services/calendar/calendar-utils.service';
 
 @Component({
 	selector: 'app-calendary.component',
@@ -23,6 +24,7 @@ import { getEvent, isDateInEventRange, isDateEventEnd } from './events.config';
 export class CalendaryComponent implements OnInit, AfterViewInit {
 	private platformId = inject(PLATFORM_ID);
 	private route = inject(ActivatedRoute);
+	private calendarUtils = inject(CalendarUtilsService);
 
 	calendar = signal<CalendarMonth[]>([]);
 	currentYear = signal(new Date().getFullYear());
@@ -30,21 +32,6 @@ export class CalendaryComponent implements OnInit, AfterViewInit {
 
 	showModal = signal(false);
 	modalData = signal<ModalData | null>(null);
-
-	private monthNames = [
-		'Enero',
-		'Febrero',
-		'Marzo',
-		'Abril',
-		'Mayo',
-		'Junio',
-		'Julio',
-		'Agosto',
-		'Septiembre',
-		'Octubre',
-		'Noviembre',
-		'Diciembre',
-	];
 
 	ngOnInit(): void {
 		this.generateYearCalendar();
@@ -75,40 +62,14 @@ export class CalendaryComponent implements OnInit, AfterViewInit {
 	}
 
 	private generateMonth(year: number, month: number): CalendarMonth {
-		const firstDay = new Date(year, month, 1);
-		const lastDay = new Date(year, month + 1, 0);
-		const daysInMonth = lastDay.getDate();
-		const startingDay = firstDay.getDay();
+		const baseDays = this.calendarUtils.generateMonthDays(year, month);
 
-		const days: CalendarDay[] = [];
-
-		// Previous month's days
-		const prevMonthLastDay = new Date(year, month, 0).getDate();
-		for (let i = startingDay - 1; i >= 0; i--) {
-			const date = prevMonthLastDay - i;
-			const fullDate = new Date(year, month - 1, date);
-			days.push(this.createCalendarDay(date, fullDate, false));
-		}
-
-		// Current month's days
-		for (let date = 1; date <= daysInMonth; date++) {
-			const fullDate = new Date(year, month, date);
-			const isToday =
-				this.today.getDate() === date &&
-				this.today.getMonth() === month &&
-				this.today.getFullYear() === year;
-			days.push(this.createCalendarDay(date, fullDate, true, isToday));
-		}
-
-		// Next month's days to complete the grid (6 rows * 7 days = 42)
-		const remainingDays = 42 - days.length;
-		for (let date = 1; date <= remainingDays; date++) {
-			const fullDate = new Date(year, month + 1, date);
-			days.push(this.createCalendarDay(date, fullDate, false));
-		}
+		const days: CalendarDay[] = baseDays.map((dayInfo) =>
+			this.createCalendarDay(dayInfo.date, dayInfo.fullDate, dayInfo.isCurrentMonth, dayInfo.isToday),
+		);
 
 		return {
-			name: this.monthNames[month],
+			name: this.calendarUtils.monthNames[month],
 			year,
 			month,
 			days,

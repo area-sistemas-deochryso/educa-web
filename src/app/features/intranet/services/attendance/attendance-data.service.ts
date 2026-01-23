@@ -1,4 +1,4 @@
-import { Injectable } from '@angular/core';
+import { Injectable, inject } from '@angular/core';
 import { AsistenciaDetalle } from '@core/services';
 import {
 	AttendanceStatus,
@@ -8,11 +8,14 @@ import {
 	StatusCounts,
 } from '../../pages/attendance-component/attendance.types';
 import { DAY_HEADERS } from '../../pages/attendance-component/attendance.config';
+import { CalendarUtilsService } from '../calendar/calendar-utils.service';
 
 @Injectable({
 	providedIn: 'root',
 })
 export class AttendanceDataService {
+	private calendarUtils = inject(CalendarUtilsService);
+
 	createEmptyTable(title: string): AttendanceTable {
 		const now = new Date();
 		return {
@@ -61,11 +64,11 @@ export class AttendanceDataService {
 		const asistenciaMap = new Map<string, AsistenciaDetalle>();
 		asistencias.forEach((a) => {
 			const fecha = new Date(a.fecha);
-			const dateKey = this.formatDateKey(fecha);
+			const dateKey = this.calendarUtils.formatDateKey(fecha);
 			asistenciaMap.set(dateKey, a);
 		});
 
-		const weeks = this.getWeeksOfMonth(mes, anio);
+		const weeks = this.calendarUtils.getWorkWeeksOfMonth(mes, anio);
 		const ingresosWeeks: AttendanceWeek[] = [];
 		const salidasWeeks: AttendanceWeek[] = [];
 
@@ -94,7 +97,7 @@ export class AttendanceDataService {
 				}
 
 				validDaysCount++;
-				const dateKey = this.formatDateKey(date);
+				const dateKey = this.calendarUtils.formatDateKey(date);
 				const asistencia = asistenciaMap.get(dateKey);
 
 				const ingresoStatus = this.getIngresoStatus(asistencia);
@@ -132,65 +135,6 @@ export class AttendanceDataService {
 		});
 
 		return { ingresos: ingresosWeeks, salidas: salidasWeeks };
-	}
-
-	private getWeeksOfMonth(mes: number, anio: number): (Date | null)[][] {
-		const weeks: (Date | null)[][] = [];
-		const firstDay = new Date(anio, mes - 1, 1);
-		const lastDay = new Date(anio, mes, 0);
-
-		let currentDate = new Date(firstDay);
-		const firstDayOfWeek = currentDate.getDay();
-
-		if (firstDayOfWeek === 0) {
-			currentDate.setDate(currentDate.getDate() + 1);
-		} else if (firstDayOfWeek !== 1) {
-			currentDate.setDate(currentDate.getDate() + (8 - firstDayOfWeek));
-		}
-
-		if (currentDate.getMonth() !== mes - 1) {
-			currentDate = new Date(firstDay);
-		}
-
-		while (currentDate <= lastDay) {
-			const week: (Date | null)[] = [];
-
-			for (let i = 0; i < 5; i++) {
-				const dayOfWeek = currentDate.getDay();
-
-				if (
-					dayOfWeek >= 1 &&
-					dayOfWeek <= 5 &&
-					currentDate.getMonth() === mes - 1 &&
-					currentDate <= lastDay
-				) {
-					week.push(new Date(currentDate));
-				} else if (week.length < 5) {
-					week.push(null);
-				}
-
-				currentDate.setDate(currentDate.getDate() + 1);
-
-				if (currentDate.getDay() === 6) {
-					currentDate.setDate(currentDate.getDate() + 2);
-				} else if (currentDate.getDay() === 0) {
-					currentDate.setDate(currentDate.getDate() + 1);
-				}
-			}
-
-			if (week.some((d) => d !== null)) {
-				while (week.length < 5) {
-					week.push(null);
-				}
-				weeks.push(week);
-			}
-		}
-
-		return weeks;
-	}
-
-	private formatDateKey(date: Date): string {
-		return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`;
 	}
 
 	private formatHora(fechaHora: string): string {
