@@ -1,5 +1,5 @@
 <header class="intranet-header">
-	<div class="header-container">
+	<div class="header-container desktop-header">
 		<a routerLink="/" class="logo-link">
 			<picture>
 				<source srcset="images/logo.avif" type="image/avif" />
@@ -15,29 +15,36 @@
 			</picture>
 		</a>
 
-		<nav class="intranet-nav">
-			<a
-				routerLink="/intranet"
-				routerLinkActive="active"
-				[routerLinkActiveOptions]="{ exact: true }"
-				class="nav-item"
-			>
-				Inicio
-			</a>
-			<a routerLink="/intranet/asistencia" routerLinkActive="active" class="nav-item">
-				Asistencia
-			</a>
-			<a routerLink="/intranet/horarios" routerLinkActive="active" class="nav-item">
-				Horarios
-			</a>
-			<a routerLink="/intranet/Calendario" routerLinkActive="active" class="nav-item">
-				Calendario
-			</a>
-			<button class="logout-btn" (click)="logout()">
-				<i class="pi pi-sign-out"></i>
-				<span>Cerrar sesión</span>
-			</button>
+		<nav class="nav-links">
+			@for (item of navItems; track item.route) {
+				<app-nav-item
+					[route]="item.route"
+					[label]="item.label"
+					[icon]="item.icon"
+					[exact]="item.exact ?? false"
+				/>
+			}
 		</nav>
+
+		<app-logout-button (logoutClick)="logout()" />
+	</div>
+
+	<div class="header-container mobile-header">
+		<a routerLink="/" class="logo-link">
+			<picture>
+				<source srcset="images/logo.avif" type="image/avif" />
+				<source srcset="images/logo.webp" type="image/webp" />
+				<img
+					src="images/logo.png"
+					alt="Educa.com Logo"
+					class="logo"
+					width="120"
+					height="40"
+					fetchpriority="high"
+				/>
+			</picture>
+		</a>
+		<app-mobile-menu [items]="navItems" (logoutClick)="logout()" />
 	</div>
 </header>
 

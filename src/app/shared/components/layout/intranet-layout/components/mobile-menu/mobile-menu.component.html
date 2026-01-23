@@ -1,0 +1,44 @@
+<button class="hamburger-btn" (click)="toggle()" [class.open]="isOpen()" aria-label="Menú">
+	<span class="hamburger-line"></span>
+	<span class="hamburger-line"></span>
+	<span class="hamburger-line"></span>
+</button>
+
+@if (isOpen()) {
+	<div class="menu-overlay" (click)="close()"></div>
+	<nav class="mobile-nav">
+		<a routerLink="/" class="logo-link" (click)="close()">
+			<picture>
+				<source srcset="images/logo.avif" type="image/avif" />
+				<source srcset="images/logo.webp" type="image/webp" />
+				<img
+					src="images/logo.png"
+					alt="Educa.com Logo"
+					class="logo"
+					width="120"
+					height="40"
+				/>
+			</picture>
+		</a>
+
+		<div class="nav-items">
+			@for (item of items; track item.route) {
+				<a
+					[routerLink]="item.route"
+					routerLinkActive="active"
+					[routerLinkActiveOptions]="{ exact: item.exact ?? false }"
+					class="mobile-nav-item"
+					(click)="close()"
+				>
+					<i [class]="item.icon"></i>
+					<span>{{ item.label }}</span>
+				</a>
+			}
+		</div>
+
+		<button class="mobile-logout-btn" (click)="onLogout()">
+			<i class="pi pi-sign-out"></i>
+			<span>Cerrar sesión</span>
+		</button>
+	</nav>
+}

@@ -1,0 +1,21 @@
+.logout-btn {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	background: transparent;
+	border: none;
+	color: var(--intranet-alternative-text-color);
+	cursor: pointer;
+	padding: 0.5rem;
+	border-radius: 6px;
+	transition: all 0.2s ease;
+
+	i {
+		font-size: 1.2rem;
+	}
+
+	&:hover {
+		color: var(--intranet-accent-color-blue);
+		background-color: rgba(37, 52, 112, 0.08);
+	}
+}
