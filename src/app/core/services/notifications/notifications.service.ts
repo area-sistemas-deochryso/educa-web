@@ -378,6 +378,23 @@ export class NotificationsService {
 	}
 
 	/**
+	 * Marca una notificación como no leída
+	 */
+	markAsUnread(notificationId: string): void {
+		if (this.readIds.has(notificationId)) {
+			this.readIds.delete(notificationId);
+			this.saveReadNotifications();
+
+			const unread = this.activeNotifications().filter((n) => !this.readIds.has(n.id));
+			this.unreadCount.set(unread.length);
+			this.hasUnread.set(unread.length > 0);
+			this.updatePriorityCounts();
+
+			logger.log(`[Notifications] No leída: ${notificationId}`);
+		}
+	}
+
+	/**
 	 * Marca todas como leídas
 	 */
 	markAllAsRead(): void {
@@ -387,6 +404,19 @@ export class NotificationsService {
 		this.hasUnread.set(false);
 		this.unreadByPriority.set({ urgent: 0, high: 0, medium: 0, low: 0 });
 		logger.log('[Notifications] Todas marcadas como leídas');
+	}
+
+	/**
+	 * Marca todas como no leídas
+	 */
+	markAllAsUnread(): void {
+		this.readIds.clear();
+		this.saveReadNotifications();
+		const active = this.activeNotifications();
+		this.unreadCount.set(active.length);
+		this.hasUnread.set(active.length > 0);
+		this.updatePriorityCounts();
+		logger.log('[Notifications] Todas marcadas como no leídas');
 	}
 
 	/**

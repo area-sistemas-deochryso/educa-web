@@ -98,7 +98,10 @@ describe('AuthService', () => {
 			});
 
 			const req = httpMock.expectOne((r) => r.url.includes('/api/Auth/login'));
-			req.flush({ mensaje: 'Credenciales inválidas' }, { status: 401, statusText: 'Unauthorized' });
+			req.flush(
+				{ mensaje: 'Credenciales inválidas' },
+				{ status: 401, statusText: 'Unauthorized' },
+			);
 		});
 
 		it('should block after max login attempts', () => {

@@ -1,0 +1,22 @@
+<div class="notification-bell-container" [class.has-unread]="unreadCount() > 0">
+	<button
+		class="notification-bell"
+		[class.ringing]="unreadCount() > 0"
+		[class]="badgePriorityClass()"
+		(click)="onTogglePanel()"
+		(contextmenu)="onContextMenu($event)"
+		title="Notificaciones"
+	>
+		<i class="pi pi-bell"></i>
+		@if (unreadCount() > 0) {
+			<span class="bell-badge pulse" [class]="badgePriorityClass()">{{ unreadCount() }}</span>
+		}
+	</button>
+
+	<app-priority-legend-menu
+		[show]="showContextMenu"
+		[position]="contextMenuPosition"
+		[priorityLegend]="priorityLegend"
+		(close)="onCloseContextMenu()"
+	/>
+</div>

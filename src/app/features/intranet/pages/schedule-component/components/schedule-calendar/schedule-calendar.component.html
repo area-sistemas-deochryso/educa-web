@@ -1,7 +1,17 @@
 <div class="calendar-card">
 	<div class="calendar-header">
-		<i class="pi pi-calendar"></i>
-		<span>Calendario</span>
+		<div class="header-left">
+			<i class="pi pi-calendar"></i>
+			<span>Calendario</span>
+		</div>
+		<button
+			class="today-btn"
+			(click)="goToToday()"
+			pTooltip="Ir al día actual"
+			tooltipPosition="left"
+		>
+			<i class="pi pi-replay"></i>
+		</button>
 	</div>
 
 	<div class="calendar-navigation">

@@ -1,0 +1,65 @@
+<div
+	class="notification-card"
+	[class]="priorityClass"
+	[class.is-read]="isRead"
+	[class.is-unread]="!isRead"
+	[style.animation-delay]="animationDelay + 'ms'"
+	(click)="onCardClick()"
+>
+	@if (!isRead) {
+		<div class="unread-dot pulse" [class]="priorityClass"></div>
+	}
+
+	<div class="notification-icon" [class]="'icon-' + notification.type">
+		<i class="pi" [class]="notification.icon || getTypeIcon(notification.type)"></i>
+	</div>
+
+	<div class="notification-content">
+		<div class="notification-meta">
+			<span class="notification-type-badge" [attr.data-type]="notification.type">
+				{{ getTypeLabel(notification.type) }}
+			</span>
+			<span class="priority-indicator" [attr.data-priority]="notification.priority">
+				{{ getPriorityLabel(notification.priority) }}
+			</span>
+		</div>
+		<h3 class="notification-title">{{ notification.title }}</h3>
+		<p class="notification-message">{{ notification.message }}</p>
+
+		@if (notification.actionUrl) {
+			<a
+				[routerLink]="notification.actionUrl"
+				class="notification-action"
+				(click)="onActionClick($event)"
+			>
+				<span>{{ notification.actionText || 'Ver más' }}</span>
+				<i class="pi pi-arrow-right"></i>
+			</a>
+		}
+	</div>
+
+	<div class="notification-actions">
+		@if (!isRead) {
+			<button
+				class="notification-mark-read"
+				(click)="onMarkAsRead($event)"
+				title="Marcar como leída"
+			>
+				<i class="pi pi-eye"></i>
+			</button>
+		} @else {
+			<button
+				class="notification-mark-unread"
+				(click)="onMarkAsUnread($event)"
+				title="Marcar como no leída"
+			>
+				<i class="pi pi-eye-slash"></i>
+			</button>
+		}
+		@if (notification.dismissible !== false) {
+			<button class="notification-dismiss" (click)="onDismiss($event)" title="Descartar">
+				<i class="pi pi-times"></i>
+			</button>
+		}
+	</div>
+</div>

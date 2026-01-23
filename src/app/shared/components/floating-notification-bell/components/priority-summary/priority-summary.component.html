@@ -1,0 +1,20 @@
+<div class="priority-summary">
+	@if (unreadByPriority.urgent > 0) {
+		<span class="priority-badge priority-urgent">
+			{{ unreadByPriority.urgent }} urgente{{ unreadByPriority.urgent > 1 ? 's' : '' }}
+		</span>
+	}
+	@if (unreadByPriority.high > 0) {
+		<span class="priority-badge priority-high">
+			{{ unreadByPriority.high }} importante{{ unreadByPriority.high > 1 ? 's' : '' }}
+		</span>
+	}
+	@if (unreadByPriority.medium > 0) {
+		<span class="priority-badge priority-medium">
+			{{ unreadByPriority.medium }} normal{{ unreadByPriority.medium > 1 ? 'es' : '' }}
+		</span>
+	}
+	@if (unreadByPriority.low > 0) {
+		<span class="priority-badge priority-low">{{ unreadByPriority.low }} info</span>
+	}
+</div>

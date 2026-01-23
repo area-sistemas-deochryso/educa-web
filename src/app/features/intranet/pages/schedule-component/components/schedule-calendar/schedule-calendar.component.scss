@@ -10,18 +10,46 @@
 .calendar-header {
 	display: flex;
 	align-items: center;
-	gap: 0.5rem;
+	justify-content: space-between;
 	margin-bottom: 1.5rem;
 
-	i {
-		font-size: 1.25rem;
-		color: var(--intranet-default-text-color);
+	.header-left {
+		display: flex;
+		align-items: center;
+		gap: 0.5rem;
+
+		i {
+			font-size: 1.25rem;
+			color: var(--intranet-default-text-color);
+		}
+
+		span {
+			font-size: 1rem;
+			font-weight: 500;
+			color: var(--intranet-default-text-color);
+		}
 	}
 
-	span {
-		font-size: 1rem;
-		font-weight: 500;
-		color: var(--intranet-default-text-color);
+	.today-btn {
+		background: transparent;
+		border: none;
+		cursor: pointer;
+		padding: 0.5rem;
+		border-radius: 50%;
+		transition: background-color 0.2s;
+
+		i {
+			font-size: 1.1rem;
+			color: var(--intranet-accent-color-blue);
+		}
+
+		&:hover {
+			background-color: rgba(0, 0, 0, 0.05);
+
+			i {
+				color: var(--intranet-accent-color-green);
+			}
+		}
 	}
 }
 

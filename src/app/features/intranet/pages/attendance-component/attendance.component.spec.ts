@@ -6,7 +6,12 @@ import { testProviders } from '@test';
 import { AttendanceComponent } from './attendance.component';
 import { AttendanceFacade } from './services/attendance.facade';
 import { AttendanceDataService } from './services/attendance-data.service';
-import { VoiceRecognitionService, AsistenciaService, AuthService, StorageService } from '@core/services';
+import {
+	VoiceRecognitionService,
+	AsistenciaService,
+	AuthService,
+	StorageService,
+} from '@core/services';
 
 describe('AttendanceComponent', () => {
 	let facadeMock: Partial<AttendanceFacade>;
@@ -75,7 +80,9 @@ describe('AttendanceComponent', () => {
 		};
 		attendanceDataServiceMock = {
 			createEmptyTable: vi.fn().mockReturnValue(emptyTable),
-			processAsistencias: vi.fn().mockReturnValue({ ingresos: emptyTable, salidas: emptyTable }),
+			processAsistencias: vi
+				.fn()
+				.mockReturnValue({ ingresos: emptyTable, salidas: emptyTable }),
 		};
 
 		await TestBed.configureTestingModule({

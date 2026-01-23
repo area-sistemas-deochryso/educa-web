@@ -2,6 +2,7 @@ import { Component, EventEmitter, Input, OnInit, Output, ViewChild } from '@angu
 import { CommonModule } from '@angular/common';
 import { Menu, MenuModule } from 'primeng/menu';
 import { MenuItem } from 'primeng/api';
+import { TooltipModule } from 'primeng/tooltip';
 
 export interface CalendarDay {
 	day: number | null;
@@ -11,7 +12,7 @@ export interface CalendarDay {
 
 @Component({
 	selector: 'app-schedule-calendar',
-	imports: [CommonModule, MenuModule],
+	imports: [CommonModule, MenuModule, TooltipModule],
 	templateUrl: './schedule-calendar.component.html',
 	styleUrl: './schedule-calendar.component.scss',
 })
@@ -114,5 +115,12 @@ export class ScheduleCalendarComponent implements OnInit {
 	onDayClick(event: Event, calDay: CalendarDay): void {
 		this.selectedDay = calDay.day;
 		this.dayMenu.toggle(event);
+	}
+
+	goToToday(): void {
+		const today = new Date();
+		this.currentMonth = today.getMonth();
+		this.currentYear = today.getFullYear();
+		this.generateCalendar();
 	}
 }

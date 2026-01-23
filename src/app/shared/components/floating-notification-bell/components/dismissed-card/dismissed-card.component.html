@@ -1,0 +1,12 @@
+<div class="dismissed-card" [class]="priorityClass">
+	<div class="dismissed-icon">
+		<i class="pi" [class]="notification.icon || getTypeIcon(notification.type)"></i>
+	</div>
+	<div class="dismissed-content">
+		<span class="dismissed-title">{{ notification.title }}</span>
+		<span class="dismissed-type">{{ getTypeLabel(notification.type) }}</span>
+	</div>
+	<button class="restore-btn" (click)="onRestore()" title="Restaurar">
+		<i class="pi pi-undo"></i>
+	</button>
+</div>

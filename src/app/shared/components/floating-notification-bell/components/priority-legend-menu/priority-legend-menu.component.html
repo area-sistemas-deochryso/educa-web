@@ -1,0 +1,27 @@
+@if (show) {
+	<div
+		class="bell-context-menu"
+		[style.left.px]="position.x"
+		[style.top.px]="position.y"
+		(click)="onMenuClick($event)"
+	>
+		<div class="context-menu-header">
+			<i class="pi pi-palette"></i>
+			<span>Significado de colores</span>
+			<button class="close-menu-btn" (click)="onClose()">
+				<i class="pi pi-times"></i>
+			</button>
+		</div>
+		<div class="context-menu-content">
+			@for (item of priorityLegend; track item.priority) {
+				<div class="priority-item">
+					<div class="priority-color" [style.background]="item.color"></div>
+					<div class="priority-info">
+						<span class="priority-label">{{ item.label }}</span>
+						<span class="priority-description">{{ item.description }}</span>
+					</div>
+				</div>
+			}
+		</div>
+	</div>
+}

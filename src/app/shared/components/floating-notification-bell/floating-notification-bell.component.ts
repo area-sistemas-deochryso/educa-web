@@ -1,21 +1,14 @@
 import { Component, inject, OnInit, OnDestroy, HostListener } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { RouterLink } from '@angular/router';
-import {
-	NotificationsService,
-	SeasonalNotification,
-	NotificationPriority,
-	KeyboardShortcutsService,
-} from '@core/services';
+import { NotificationPriority, KeyboardShortcutsService } from '@core/services';
 import { ToastModule } from 'primeng/toast';
 import { MessageService } from 'primeng/api';
-
-interface PriorityInfo {
-	priority: NotificationPriority;
-	label: string;
-	description: string;
-	color: string;
-}
+import {
+	PriorityInfo,
+	NotificationBellButtonComponent,
+	NotificationsPanelComponent,
+} from './components';
+import { NotificationsPanelContext } from './notifications-panel.context';
 
 const PRIORITY_LEGEND: PriorityInfo[] = [
 	{
@@ -46,28 +39,29 @@ const PRIORITY_LEGEND: PriorityInfo[] = [
 
 @Component({
 	selector: 'app-floating-notification-bell',
-	imports: [CommonModule, RouterLink, ToastModule],
-	providers: [MessageService],
+	imports: [
+		CommonModule,
+		ToastModule,
+		NotificationBellButtonComponent,
+		NotificationsPanelComponent,
+	],
+	providers: [MessageService, NotificationsPanelContext],
 	templateUrl: './floating-notification-bell.component.html',
 	styleUrl: './floating-notification-bell.component.scss',
 })
 export class FloatingNotificationBellComponent implements OnInit, OnDestroy {
-	private notificationsService = inject(NotificationsService);
+	private context = inject(NotificationsPanelContext);
 	private keyboardService = inject(KeyboardShortcutsService);
 	private messageService = inject(MessageService);
 
-	notifications = this.notificationsService.activeNotifications;
-	hasNotifications = this.notificationsService.hasUnread;
-	notificationCount = this.notificationsService.count;
-	unreadCount = this.notificationsService.unreadCount;
-	isPanelOpen = this.notificationsService.isPanelOpen;
-	unreadByPriority = this.notificationsService.unreadByPriority;
-	highestPriority = this.notificationsService.highestPriority;
-	dismissedNotifications = this.notificationsService.dismissedNotifications;
-	dismissedCount = this.notificationsService.dismissedCount;
-	showDismissedHistory = this.notificationsService.showDismissedHistory;
+	// Expose context signals for template
+	notificationCount = this.context.notificationCount;
+	unreadCount = this.context.unreadCount;
+	isPanelOpen = this.context.isPanelOpen;
+	highestPriority = this.context.highestPriority;
+	badgePriorityClass = this.context.badgePriorityClass;
 
-	// Context menu
+	// Context menu state (local to this component)
 	showContextMenu = false;
 	contextMenuPosition = { x: 0, y: 0 };
 	priorityLegend = PRIORITY_LEGEND;
@@ -77,7 +71,7 @@ export class FloatingNotificationBellComponent implements OnInit, OnDestroy {
 	ngOnInit(): void {
 		// Registrar atajo de teclado para abrir/cerrar panel de notificaciones
 		this.keyboardService.register('toggle-notification-bell', () => {
-			this.notificationsService.togglePanel();
+			this.context.togglePanel();
 		});
 
 		// Mostrar toast de PrimeNG si hay notificaciones urgentes o importantes
@@ -91,7 +85,7 @@ export class FloatingNotificationBellComponent implements OnInit, OnDestroy {
 
 	ngOnDestroy(): void {
 		this.keyboardService.unregister('toggle-notification-bell');
-		this.notificationsService.closePanel();
+		this.context.closePanel();
 	}
 
 	/**
@@ -104,7 +98,7 @@ export class FloatingNotificationBellComponent implements OnInit, OnDestroy {
 		if (!priority) return;
 
 		// Reproducir sonido
-		this.notificationsService.playSound();
+		this.context.playSound();
 
 		const severityMap: Record<NotificationPriority, string> = {
 			urgent: 'error',
@@ -130,78 +124,7 @@ export class FloatingNotificationBellComponent implements OnInit, OnDestroy {
 	}
 
 	togglePanel(): void {
-		this.notificationsService.togglePanel();
-	}
-
-	dismissNotification(id: string): void {
-		this.notificationsService.dismiss(id);
-	}
-
-	dismissAll(): void {
-		this.notificationsService.dismissAll();
-	}
-
-	restoreNotification(id: string): void {
-		this.notificationsService.restore(id);
-	}
-
-	restoreAll(): void {
-		this.notificationsService.restoreAll();
-	}
-
-	toggleDismissedHistory(): void {
-		this.notificationsService.toggleDismissedHistory();
-	}
-
-	markAsRead(id: string): void {
-		this.notificationsService.markAsRead(id);
-	}
-
-	markAllAsRead(): void {
-		this.notificationsService.markAllAsRead();
-	}
-
-	isRead(id: string): boolean {
-		return this.notificationsService.isRead(id);
-	}
-
-	getPriorityClass(priority: string): string {
-		return `notification-${priority}`;
-	}
-
-	/**
-	 * Obtiene la clase de color del badge según la prioridad más alta
-	 */
-	getBadgePriorityClass(): string {
-		const priority = this.highestPriority();
-		if (!priority) return '';
-		return `badge-${priority}`;
-	}
-
-	getTypeIcon(type: string): string {
-		const icons: Record<string, string> = {
-			matricula: 'pi-user-plus',
-			pago: 'pi-wallet',
-			academico: 'pi-chart-bar',
-			festividad: 'pi-star',
-			evento: 'pi-calendar',
-		};
-		return icons[type] || 'pi-bell';
-	}
-
-	getTypeLabel(type: string): string {
-		const labels: Record<string, string> = {
-			matricula: 'Matrícula',
-			pago: 'Pago',
-			academico: 'Académico',
-			festividad: 'Festividad',
-			evento: 'Evento',
-		};
-		return labels[type] || type;
-	}
-
-	trackById(_index: number, notification: SeasonalNotification): string {
-		return notification.id;
+		this.context.togglePanel();
 	}
 
 	// Context menu methods

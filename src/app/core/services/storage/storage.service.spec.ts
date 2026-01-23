@@ -93,7 +93,12 @@ describe('StorageService', () => {
 
 		it('should delegate setToken to session service', () => {
 			service.setToken('new-token', true, 'User', 'Estudiante');
-			expect(sessionMock.setToken).toHaveBeenCalledWith('new-token', true, 'User', 'Estudiante');
+			expect(sessionMock.setToken).toHaveBeenCalledWith(
+				'new-token',
+				true,
+				'User',
+				'Estudiante',
+			);
 		});
 
 		it('should delegate hasToken to session service', () => {

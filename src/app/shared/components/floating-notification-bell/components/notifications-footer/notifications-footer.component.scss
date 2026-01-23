@@ -1,0 +1,31 @@
+.notifications-footer {
+	margin-top: 1.5rem;
+	padding-top: 1.25rem;
+	border-top: 1px solid var(--intranet-border-color, #e5e5e5);
+	text-align: center;
+}
+
+.view-all-link {
+	display: inline-flex;
+	align-items: center;
+	gap: 0.5rem;
+	color: var(--intranet-accent-color-blue, #253470);
+	font-size: 0.95rem;
+	font-weight: 600;
+	text-decoration: none;
+	padding: 0.75rem 1.5rem;
+	background: rgba(37, 52, 112, 0.08);
+	border-radius: 12px;
+	transition: all 0.2s ease;
+
+	i {
+		font-size: 1.1rem;
+	}
+
+	&:hover {
+		background: var(--intranet-accent-color-blue, #253470);
+		color: white;
+		transform: translateY(-2px);
+		box-shadow: 0 4px 12px rgba(37, 52, 112, 0.3);
+	}
+}

@@ -1,0 +1,61 @@
+<div class="notifications-header">
+	<div class="header-left">
+		<div
+			class="bell-icon-animated"
+			[class.ringing]="unreadCount() > 0"
+			[class]="badgePriorityClass()"
+		>
+			<i class="pi pi-bell"></i>
+		</div>
+		<div class="header-text">
+			<h2>Notificaciones</h2>
+			@if (notificationCount() > 0) {
+				<span class="notification-subtitle">
+					{{ notificationCount() }} notificación{{ notificationCount() > 1 ? 'es' : '' }}
+					@if (unreadCount() > 0) {
+						<span class="unread-indicator" [class]="badgePriorityClass()">
+							({{ unreadCount() }} sin leer)
+						</span>
+					}
+				</span>
+				@if (unreadCount() > 0) {
+					<app-priority-summary [unreadByPriority]="unreadByPriority()" />
+				}
+			} @else {
+				<span class="notification-subtitle">No hay notificaciones</span>
+			}
+		</div>
+	</div>
+	<div class="header-actions">
+		@if (unreadCount() > 0) {
+			<button
+				class="action-btn mark-read-btn"
+				(click)="onMarkAllAsRead()"
+				title="Marcar todas como leídas"
+			>
+				<i class="pi pi-check-circle"></i>
+				<span class="btn-text">Marcar leídas</span>
+			</button>
+		}
+		@if (hasReadNotifications()) {
+			<button
+				class="action-btn mark-unread-btn"
+				(click)="onMarkAllAsUnread()"
+				title="Marcar todas como no leídas"
+			>
+				<i class="pi pi-circle"></i>
+				<span class="btn-text">Marcar no leídas</span>
+			</button>
+		}
+		@if (notificationCount() > 1) {
+			<button
+				class="action-btn dismiss-all-btn"
+				(click)="onDismissAll()"
+				title="Descartar todas"
+			>
+				<i class="pi pi-times-circle"></i>
+				<span class="btn-text">Descartar</span>
+			</button>
+		}
+	</div>
+</div>

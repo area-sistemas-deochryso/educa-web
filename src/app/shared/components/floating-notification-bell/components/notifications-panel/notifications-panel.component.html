@@ -1,0 +1,31 @@
+<div class="notifications-overlay" (click)="onOverlayClick()"></div>
+<section class="notifications-section panel-open">
+	<app-notifications-panel-header />
+
+	@if (notificationCount() > 0) {
+		<div class="notifications-list">
+			@for (
+				notification of notifications();
+				track trackById($index, notification);
+				let i = $index
+			) {
+				<app-notification-card
+					[notification]="notification"
+					[isRead]="isRead(notification.id)"
+					[animationDelay]="i * 100"
+				/>
+			}
+		</div>
+	} @else {
+		<div class="notifications-empty">
+			<i class="pi pi-inbox"></i>
+			<p>No tienes notificaciones pendientes</p>
+		</div>
+	}
+
+	@if (dismissedCount() > 0) {
+		<app-dismissed-section />
+	}
+
+	<app-notifications-footer (linkClick)="onFooterLinkClick()" />
+</section>

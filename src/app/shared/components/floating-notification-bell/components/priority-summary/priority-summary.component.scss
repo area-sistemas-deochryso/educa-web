@@ -1,0 +1,44 @@
+$priority-urgent: #dc2626;
+
+.priority-summary {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 0.6rem;
+	margin-top: 0.75rem;
+}
+
+.priority-badge {
+	font-size: 0.7rem;
+	padding: 0.3rem 0.6rem;
+	border-radius: 6px;
+	font-weight: 600;
+	text-transform: uppercase;
+	letter-spacing: 0.5px;
+
+	&.priority-urgent {
+		background: rgba(220, 38, 38, 0.15);
+		color: $priority-urgent;
+	}
+
+	&.priority-high {
+		background: rgba(255, 204, 12, 0.2);
+		color: #b8960a;
+	}
+
+	&.priority-medium {
+		background: rgba(37, 52, 112, 0.15);
+		color: var(--intranet-accent-color-blue, #253470);
+	}
+
+	&.priority-low {
+		background: rgba(119, 160, 45, 0.15);
+		color: var(--intranet-accent-color-green, #77a02d);
+	}
+}
+
+@media (max-width: 768px) {
+	.priority-summary {
+		flex-direction: column;
+		gap: 0.4rem;
+	}
+}

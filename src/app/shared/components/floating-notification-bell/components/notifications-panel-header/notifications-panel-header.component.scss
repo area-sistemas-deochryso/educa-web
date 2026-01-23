@@ -1,0 +1,237 @@
+$priority-urgent: #dc2626;
+
+@keyframes bell-ring {
+	0% {
+		transform: rotate(0);
+	}
+	10% {
+		transform: rotate(15deg);
+	}
+	20% {
+		transform: rotate(-15deg);
+	}
+	30% {
+		transform: rotate(10deg);
+	}
+	40% {
+		transform: rotate(-10deg);
+	}
+	50% {
+		transform: rotate(5deg);
+	}
+	60% {
+		transform: rotate(-5deg);
+	}
+	70% {
+		transform: rotate(2deg);
+	}
+	80% {
+		transform: rotate(-2deg);
+	}
+	90%,
+	100% {
+		transform: rotate(0);
+	}
+}
+
+@keyframes shake {
+	0%,
+	100% {
+		transform: translateX(0);
+	}
+	10%,
+	30%,
+	50%,
+	70%,
+	90% {
+		transform: translateX(-4px);
+	}
+	20%,
+	40%,
+	60%,
+	80% {
+		transform: translateX(4px);
+	}
+}
+
+.notifications-header {
+	display: flex;
+	justify-content: space-between;
+	align-items: flex-start;
+	margin-bottom: 1.75rem;
+	padding-bottom: 1.25rem;
+	border-bottom: 2px solid var(--intranet-accent-color-yellow, #ffcc0c);
+
+	.header-left {
+		display: flex;
+		align-items: flex-start;
+		gap: 1rem;
+	}
+
+	.header-text {
+		h2 {
+			margin: 0;
+			font-size: 1.35rem;
+			color: var(--intranet-default-text-color, #171717);
+			font-weight: var(--intranet-font-weight-bold, bold);
+		}
+	}
+
+	.notification-subtitle {
+		font-size: 0.85rem;
+		color: var(--intranet-soft-text-color, #5e5e5e);
+	}
+
+	.unread-indicator {
+		font-weight: 600;
+
+		&.badge-urgent {
+			color: $priority-urgent;
+		}
+
+		&.badge-high {
+			color: #d4a700;
+		}
+
+		&.badge-medium {
+			color: var(--intranet-accent-color-blue, #253470);
+		}
+
+		&.badge-low {
+			color: var(--intranet-accent-color-green, #77a02d);
+		}
+	}
+
+	.header-actions {
+		display: flex;
+		gap: 0.75rem;
+	}
+}
+
+.bell-icon-animated {
+	width: 54px;
+	height: 54px;
+	border-radius: 16px;
+	background: linear-gradient(135deg, var(--intranet-accent-color-yellow, #ffcc0c), #e6b800);
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	box-shadow: 0 6px 16px rgba(255, 204, 12, 0.4);
+
+	&.badge-urgent {
+		background: linear-gradient(135deg, $priority-urgent, #b91c1c);
+		box-shadow: 0 6px 16px rgba(220, 38, 38, 0.4);
+
+		i {
+			color: white;
+		}
+	}
+
+	&.badge-high,
+	&.badge-medium,
+	&.badge-low {
+		background: linear-gradient(135deg, var(--intranet-accent-color-yellow, #ffcc0c), #e6b800);
+		box-shadow: 0 6px 16px rgba(255, 204, 12, 0.4);
+	}
+
+	i {
+		font-size: 1.6rem;
+		color: var(--intranet-default-text-color, #171717);
+	}
+
+	&.ringing {
+		animation: shake 0.5s ease-in-out;
+		animation-iteration-count: 3;
+
+		i {
+			animation: bell-ring 0.8s ease infinite;
+		}
+	}
+}
+
+.action-btn {
+	display: flex;
+	align-items: center;
+	gap: 0.5rem;
+	padding: 0.6rem 1rem;
+	border-radius: 10px;
+	font-size: 0.85rem;
+	font-weight: 500;
+	cursor: pointer;
+	transition: all 0.2s ease;
+	border: none;
+
+	i {
+		font-size: 1rem;
+	}
+
+	.btn-text {
+		display: inline;
+	}
+}
+
+.mark-read-btn {
+	background: rgba(119, 160, 45, 0.1);
+	color: var(--intranet-accent-color-green, #77a02d);
+
+	&:hover {
+		background: var(--intranet-accent-color-green, #77a02d);
+		color: white;
+		transform: translateY(-2px);
+		box-shadow: 0 4px 12px rgba(119, 160, 45, 0.3);
+	}
+}
+
+.mark-unread-btn {
+	background: rgba(37, 52, 112, 0.1);
+	color: var(--intranet-accent-color-blue, #253470);
+
+	&:hover {
+		background: var(--intranet-accent-color-blue, #253470);
+		color: white;
+		transform: translateY(-2px);
+		box-shadow: 0 4px 12px rgba(37, 52, 112, 0.3);
+	}
+}
+
+.dismiss-all-btn {
+	background: rgba(220, 38, 38, 0.1);
+	color: $priority-urgent;
+
+	&:hover {
+		background: $priority-urgent;
+		color: white;
+		transform: translateY(-2px);
+		box-shadow: 0 4px 12px rgba(220, 38, 38, 0.3);
+	}
+}
+
+@media (max-width: 768px) {
+	.notifications-header {
+		flex-direction: column;
+		align-items: flex-start;
+		gap: 1.25rem;
+
+		.header-actions {
+			width: 100%;
+
+			.action-btn {
+				flex: 1;
+				justify-content: center;
+			}
+		}
+	}
+
+	.bell-icon-animated {
+		width: 48px;
+		height: 48px;
+
+		i {
+			font-size: 1.35rem;
+		}
+	}
+
+	.action-btn .btn-text {
+		display: none;
+	}
+}

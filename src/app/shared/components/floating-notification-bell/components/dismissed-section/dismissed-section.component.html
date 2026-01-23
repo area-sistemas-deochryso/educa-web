@@ -1,0 +1,25 @@
+<div class="dismissed-section">
+	<button class="dismissed-toggle" (click)="onToggleHistory()">
+		<i
+			class="pi"
+			[class.pi-chevron-down]="!showHistory()"
+			[class.pi-chevron-up]="showHistory()"
+		></i>
+		<span>{{ dismissedCount() }} descartada{{ dismissedCount() > 1 ? 's' : '' }}</span>
+	</button>
+
+	@if (showHistory()) {
+		<div class="dismissed-list">
+			<div class="dismissed-header">
+				<span>Notificaciones descartadas</span>
+				<button class="restore-all-btn" (click)="onRestoreAll()" title="Restaurar todas">
+					<i class="pi pi-refresh"></i>
+					<span>Restaurar todas</span>
+				</button>
+			</div>
+			@for (notification of dismissedNotifications(); track trackById($index, notification)) {
+				<app-dismissed-card [notification]="notification" (restore)="onRestore($event)" />
+			}
+		</div>
+	}
+</div>
