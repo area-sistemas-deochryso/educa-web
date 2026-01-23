@@ -7,7 +7,11 @@ import {
 	AttendanceTable,
 	StatusCounts,
 } from '../../pages/attendance-component/attendance.types';
-import { DAY_HEADERS } from '../../pages/attendance-component/attendance.config';
+import {
+	DAY_HEADERS,
+	getIngresoStatusFromTime,
+	getSalidaStatusFromTime,
+} from '../../pages/attendance-component/attendance.config';
 import { CalendarUtilsService } from '../calendar/calendar-utils.service';
 
 @Injectable({
@@ -148,16 +152,7 @@ export class AttendanceDataService {
 		}
 
 		const horaEntrada = new Date(asistencia.horaEntrada);
-		const hora = horaEntrada.getHours();
-		const minutos = horaEntrada.getMinutes();
-
-		if (hora < 7 || (hora === 7 && minutos < 30)) {
-			return 'T';
-		} else if (hora === 7 || (hora === 8 && minutos === 0)) {
-			return 'A';
-		} else {
-			return 'F';
-		}
+		return getIngresoStatusFromTime(horaEntrada.getHours(), horaEntrada.getMinutes());
 	}
 
 	private getSalidaStatus(asistencia: AsistenciaDetalle | undefined): AttendanceStatus {
@@ -166,16 +161,7 @@ export class AttendanceDataService {
 		}
 
 		const horaSalida = new Date(asistencia.horaSalida);
-		const hora = horaSalida.getHours();
-		const minutos = horaSalida.getMinutes();
-
-		if (hora > 14 || (hora === 14 && minutos >= 30)) {
-			return 'A';
-		} else if (hora === 14) {
-			return 'T';
-		} else {
-			return 'F';
-		}
+		return getSalidaStatusFromTime(horaSalida.getHours(), horaSalida.getMinutes());
 	}
 
 	private calculateCounts(weeks: AttendanceWeek[]): StatusCounts {
