@@ -1,17 +1,14 @@
+import { AuthUser, LoginResponse } from '@core/services/auth/auth.models';
 import { computed, inject } from '@angular/core';
 import {
-	signalStore,
-	withState,
-	withComputed,
-	withMethods,
 	patchState,
+	signalStore,
+	withComputed,
 	withHooks,
+	withMethods,
+	withState,
 } from '@ngrx/signals';
-import { rxMethod } from '@ngrx/signals/rxjs-interop';
-import { pipe, switchMap, tap } from 'rxjs';
-import { tapResponse } from '@ngrx/operators';
 
-import { AuthUser, LoginResponse, UserRole } from '@core/services/auth/auth.models';
 import { StorageService } from '@core/services/storage';
 
 /**

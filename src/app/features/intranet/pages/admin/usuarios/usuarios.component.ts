@@ -1,0 +1,393 @@
+import { Component, DestroyRef, inject, OnInit, signal, computed } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { FormsModule } from '@angular/forms';
+import { CommonModule } from '@angular/common';
+import { forkJoin, switchMap } from 'rxjs';
+
+import { TableModule } from 'primeng/table';
+import { ButtonModule } from 'primeng/button';
+import { DialogModule } from 'primeng/dialog';
+import { TooltipModule } from 'primeng/tooltip';
+import { TagModule } from 'primeng/tag';
+import { ProgressSpinnerModule } from 'primeng/progressspinner';
+import { InputTextModule } from 'primeng/inputtext';
+import { SelectModule } from 'primeng/select';
+import { DrawerModule } from 'primeng/drawer';
+import { ToggleSwitch } from 'primeng/toggleswitch';
+import { PasswordModule } from 'primeng/password';
+import { DatePickerModule } from 'primeng/datepicker';
+
+import {
+	UsuariosService,
+	UsuarioLista,
+	UsuarioDetalle,
+	CrearUsuarioRequest,
+	ActualizarUsuarioRequest,
+	UsuariosEstadisticas,
+	ROLES_USUARIOS,
+	RolUsuario,
+} from '@core/services';
+
+@Component({
+	selector: 'app-usuarios',
+	standalone: true,
+	imports: [
+		CommonModule,
+		FormsModule,
+		TableModule,
+		ButtonModule,
+		DialogModule,
+		TooltipModule,
+		TagModule,
+		ProgressSpinnerModule,
+		InputTextModule,
+		SelectModule,
+		DrawerModule,
+		ToggleSwitch,
+		PasswordModule,
+		DatePickerModule,
+	],
+	templateUrl: './usuarios.component.html',
+	styleUrl: './usuarios.component.scss',
+})
+export class UsuariosComponent implements OnInit {
+	private usuariosService = inject(UsuariosService);
+	private destroyRef = inject(DestroyRef);
+
+	// State
+	usuarios = signal<UsuarioLista[]>([]);
+	estadisticas = signal<UsuariosEstadisticas | null>(null);
+	loading = signal(false);
+
+	// Dialogs
+	dialogVisible = signal(false);
+	detailDrawerVisible = signal(false);
+	isEditing = signal(false);
+
+	// Form
+	selectedUsuario = signal<UsuarioDetalle | null>(null);
+	formData = signal<Partial<CrearUsuarioRequest & ActualizarUsuarioRequest>>({});
+
+	// Filters
+	searchTerm = signal('');
+	filterRol = signal<RolUsuario | null>(null);
+	filterEstado = signal<boolean | null>(null);
+
+	// Options
+	rolesDisponibles = ROLES_USUARIOS;
+	rolesOptions = [{ label: 'Todos los roles', value: null as RolUsuario | null }].concat(
+		ROLES_USUARIOS.map((r) => ({ label: r, value: r as RolUsuario | null })),
+	);
+	rolesSelectOptions = ROLES_USUARIOS.map((r) => ({ label: r, value: r }));
+	estadoOptions = [
+		{ label: 'Todos', value: null },
+		{ label: 'Activos', value: true },
+		{ label: 'Inactivos', value: false },
+	];
+
+	// Computed - Validations
+	dniError = computed(() => {
+		const dni = this.formData().dni || '';
+		if (!dni) return null;
+		if (!/^\d+$/.test(dni)) return 'El DNI solo debe contener numeros';
+		if (dni.length !== 8) return 'El DNI debe tener exactamente 8 digitos';
+		return null;
+	});
+
+	correoError = computed(() => {
+		const correo = this.formData().correo || '';
+		if (!correo) return null;
+		const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+		if (!emailRegex.test(correo)) return 'Ingrese un correo valido';
+		return null;
+	});
+
+	// Computed - Filtered data
+	filteredUsuarios = computed(() => {
+		let data = this.usuarios();
+		const search = this.searchTerm().toLowerCase();
+		const filtroRol = this.filterRol();
+		const filtroEstado = this.filterEstado();
+
+		if (search) {
+			data = data.filter(
+				(u) =>
+					u.nombreCompleto.toLowerCase().includes(search) ||
+					u.dni.includes(search) ||
+					u.correo?.toLowerCase().includes(search),
+			);
+		}
+
+		if (filtroRol) {
+			data = data.filter((u) => u.rol === filtroRol);
+		}
+
+		if (filtroEstado !== null) {
+			data = data.filter((u) => u.estado === filtroEstado);
+		}
+
+		return data;
+	});
+
+	ngOnInit(): void {
+		this.loadData();
+	}
+
+	loadData(): void {
+		this.loading.set(true);
+
+		forkJoin({
+			usuarios: this.usuariosService.listarUsuarios(),
+			estadisticas: this.usuariosService.obtenerEstadisticas(),
+		})
+			.pipe(takeUntilDestroyed(this.destroyRef))
+			.subscribe({
+				next: ({ usuarios, estadisticas }) => {
+					this.usuarios.set(usuarios);
+					this.estadisticas.set(estadisticas);
+					this.loading.set(false);
+				},
+				error: () => {
+					this.loading.set(false);
+				},
+			});
+	}
+
+	refresh(): void {
+		this.loadData();
+	}
+
+	clearFilters(): void {
+		this.searchTerm.set('');
+		this.filterRol.set(null);
+		this.filterEstado.set(null);
+	}
+
+	// === Detail Drawer ===
+	openDetail(usuario: UsuarioLista): void {
+		this.usuariosService
+			.obtenerUsuario(usuario.rol, usuario.id)
+			.pipe(takeUntilDestroyed(this.destroyRef))
+			.subscribe((detalle) => {
+				if (detalle) {
+					this.selectedUsuario.set(detalle);
+					this.detailDrawerVisible.set(true);
+				}
+			});
+	}
+
+	closeDetail(): void {
+		this.detailDrawerVisible.set(false);
+	}
+
+	// === Edit Dialog ===
+	openNew(): void {
+		this.selectedUsuario.set(null);
+		this.formData.set({
+			dni: '',
+			nombres: '',
+			apellidos: '',
+			contrasena: '',
+			rol: undefined,
+			estado: true,
+		});
+		this.isEditing.set(false);
+		this.dialogVisible.set(true);
+	}
+
+	editUsuario(usuario: UsuarioLista): void {
+		this.usuariosService
+			.obtenerUsuario(usuario.rol, usuario.id)
+			.pipe(takeUntilDestroyed(this.destroyRef))
+			.subscribe((detalle) => {
+				if (detalle) {
+					this.selectedUsuario.set(detalle);
+					this.formData.set({
+						dni: detalle.dni,
+						nombres: detalle.nombres,
+						apellidos: detalle.apellidos,
+						contrasena: '',
+						rol: detalle.rol as RolUsuario,
+						estado: detalle.estado,
+						telefono: detalle.telefono,
+						correo: detalle.correo,
+						sedeId: detalle.sedeId,
+						fechaNacimiento: detalle.fechaNacimiento,
+						grado: detalle.grado,
+						seccion: detalle.seccion,
+					});
+					this.isEditing.set(true);
+					this.dialogVisible.set(true);
+				}
+			});
+	}
+
+	editFromDetail(): void {
+		const usuario = this.selectedUsuario();
+		if (usuario) {
+			this.closeDetail();
+			this.editUsuario(usuario);
+		}
+	}
+
+	hideDialog(): void {
+		this.dialogVisible.set(false);
+	}
+
+	saveUsuario(): void {
+		const data = this.formData();
+		this.loading.set(true);
+
+		const operation$ = this.isEditing()
+			? (() => {
+					const usuario = this.selectedUsuario();
+					if (!usuario) return null;
+					const request: ActualizarUsuarioRequest = {
+						dni: data.dni!,
+						nombres: data.nombres!,
+						apellidos: data.apellidos!,
+						contrasena: data.contrasena || undefined,
+						estado: data.estado ?? true,
+						telefono: data.telefono,
+						correo: data.correo,
+						sedeId: data.sedeId,
+						fechaNacimiento: data.fechaNacimiento,
+						grado: data.grado,
+						seccion: data.seccion,
+					};
+					return this.usuariosService.actualizarUsuario(usuario.rol, usuario.id, request);
+				})()
+			: (() => {
+					if (!data.rol || !data.contrasena) return null;
+					const request: CrearUsuarioRequest = {
+						dni: data.dni!,
+						nombres: data.nombres!,
+						apellidos: data.apellidos!,
+						contrasena: data.contrasena,
+						rol: data.rol,
+						telefono: data.telefono,
+						correo: data.correo,
+						sedeId: data.sedeId,
+						fechaNacimiento: data.fechaNacimiento,
+						grado: data.grado,
+						seccion: data.seccion,
+					};
+					return this.usuariosService.crearUsuario(request);
+				})();
+
+		if (!operation$) {
+			this.loading.set(false);
+			return;
+		}
+
+		operation$
+			.pipe(
+				switchMap(() =>
+					forkJoin({
+						usuarios: this.usuariosService.listarUsuarios(),
+						estadisticas: this.usuariosService.obtenerEstadisticas(),
+					}),
+				),
+				takeUntilDestroyed(this.destroyRef),
+			)
+			.subscribe({
+				next: ({ usuarios, estadisticas }) => {
+					this.usuarios.set(usuarios);
+					this.estadisticas.set(estadisticas);
+					this.loading.set(false);
+					this.hideDialog();
+				},
+				error: (err) => {
+					console.error('Error:', err);
+					this.loading.set(false);
+				},
+			});
+	}
+
+	deleteUsuario(usuario: UsuarioLista): void {
+		if (confirm(`¿Está seguro de eliminar al usuario "${usuario.nombreCompleto}"?`)) {
+			this.loading.set(true);
+			this.usuariosService
+				.eliminarUsuario(usuario.rol, usuario.id)
+				.pipe(
+					switchMap(() =>
+						forkJoin({
+							usuarios: this.usuariosService.listarUsuarios(),
+							estadisticas: this.usuariosService.obtenerEstadisticas(),
+						}),
+					),
+					takeUntilDestroyed(this.destroyRef),
+				)
+				.subscribe({
+					next: ({ usuarios, estadisticas }) => {
+						this.usuarios.set(usuarios);
+						this.estadisticas.set(estadisticas);
+						this.loading.set(false);
+					},
+					error: (err) => {
+						console.error('Error al eliminar:', err);
+						this.loading.set(false);
+					},
+				});
+		}
+	}
+
+	toggleEstado(usuario: UsuarioLista): void {
+		this.loading.set(true);
+		this.usuariosService
+			.cambiarEstado(usuario.rol, usuario.id, !usuario.estado)
+			.pipe(
+				switchMap(() =>
+					forkJoin({
+						usuarios: this.usuariosService.listarUsuarios(),
+						estadisticas: this.usuariosService.obtenerEstadisticas(),
+					}),
+				),
+				takeUntilDestroyed(this.destroyRef),
+			)
+			.subscribe({
+				next: ({ usuarios, estadisticas }) => {
+					this.usuarios.set(usuarios);
+					this.estadisticas.set(estadisticas);
+					this.loading.set(false);
+				},
+				error: (err) => {
+					console.error('Error al cambiar estado:', err);
+					this.loading.set(false);
+				},
+			});
+	}
+
+	// === UI Helpers ===
+	getRolSeverity(rol: string): 'success' | 'info' | 'warn' | 'danger' | 'secondary' {
+		switch (rol) {
+			case 'Director':
+				return 'danger';
+			case 'Profesor':
+				return 'warn';
+			case 'Apoderado':
+				return 'info';
+			case 'Estudiante':
+				return 'success';
+			default:
+				return 'secondary';
+		}
+	}
+
+	getEstadoSeverity(estado: boolean): 'success' | 'danger' {
+		return estado ? 'success' : 'danger';
+	}
+
+	isFormValid(): boolean {
+		const data = this.formData();
+		if (!data.dni || !data.nombres || !data.apellidos) return false;
+		if (!this.isEditing() && (!data.rol || !data.contrasena)) return false;
+		if (this.dniError()) return false;
+		if (this.correoError()) return false;
+		return true;
+	}
+
+	updateFormField(field: string, value: unknown): void {
+		this.formData.update((current) => ({ ...current, [field]: value }));
+	}
+}

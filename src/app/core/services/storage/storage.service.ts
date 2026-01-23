@@ -5,6 +5,7 @@ import {
 	ScheduleModalsState,
 	NotificationStorageData,
 	AttendanceMonthData,
+	PermisosStorageData,
 } from './storage.models';
 import { SessionStorageService } from './session-storage.service';
 import { PreferencesStorageService } from './preferences-storage.service';
@@ -82,6 +83,23 @@ export class StorageService {
 
 	getAllPersistentTokens(): Array<{ token: string; sessionKey: string }> {
 		return this.session.getAllPersistentTokens();
+	}
+
+	// ============================================
+	// PERMISOS - Delegado a SessionStorage
+	// (permisos del usuario por sesión)
+	// ============================================
+
+	getPermisos(): PermisosStorageData | null {
+		return this.session.getPermisos();
+	}
+
+	setPermisos(permisos: PermisosStorageData): void {
+		this.session.setPermisos(permisos);
+	}
+
+	clearPermisos(): void {
+		this.session.clearPermisos();
 	}
 
 	// ============================================
@@ -253,6 +271,7 @@ export class StorageService {
 
 	clearAll(): void {
 		this.clearAuth();
+		this.clearPermisos();
 		this.clearNotifications();
 		this.clearScheduleModalsState();
 		this.clearAttendance();

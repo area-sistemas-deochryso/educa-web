@@ -1,12 +1,12 @@
 import { VoiceRecognitionService } from '@core/services';
 import { Component, DestroyRef, OnDestroy, OnInit, inject } from '@angular/core';
 
-import { AttendanceFacade } from './services/attendance.facade';
-import { AttendanceHeaderComponent } from './components/attendance-header/attendance-header.component';
-import { AttendanceLegendComponent } from './components/attendance-legend/attendance-legend.component';
-import { AttendanceTableComponent } from './components/attendance-table/attendance-table.component';
-import { SalonSelectorComponent } from './components/salon-selector/salon-selector.component';
-import { EmptyStateComponent } from './components/empty-state/empty-state.component';
+import { AttendanceFacade } from '../../services/attendance/attendance.facade';
+import { AttendanceHeaderComponent } from '../../components/attendance/attendance-header/attendance-header.component';
+import { AttendanceLegendComponent } from '../../components/attendance/attendance-legend/attendance-legend.component';
+import { AttendanceTableComponent } from '../../components/attendance/attendance-table/attendance-table.component';
+import { SalonSelectorComponent } from '../../components/attendance/salon-selector/salon-selector.component';
+import { EmptyStateComponent } from '../../components/attendance/empty-state/empty-state.component';
 
 @Component({
 	selector: 'app-attendance',

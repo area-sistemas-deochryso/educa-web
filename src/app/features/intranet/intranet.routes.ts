@@ -1,5 +1,5 @@
 import { Routes } from '@angular/router';
-import { authGuard } from '@core/guards';
+import { authGuard, permisosGuard } from '@core/guards';
 import { IntranetLayoutComponent } from '@shared/components/layout';
 
 export const INTRANET_ROUTES: Routes = [
@@ -12,7 +12,7 @@ export const INTRANET_ROUTES: Routes = [
 		path: '',
 		component: IntranetLayoutComponent,
 		canActivate: [authGuard],
-		canActivateChild: [authGuard],
+		canActivateChild: [authGuard, permisosGuard],
 		children: [
 			{
 				path: '',
@@ -37,12 +37,38 @@ export const INTRANET_ROUTES: Routes = [
 				title: 'Intranet - Horarios',
 			},
 			{
-				path: 'Calendario',
+				path: 'calendario',
 				loadComponent: () =>
 					import('./pages/calendary-component/calendary.component').then(
 						(m) => m.CalendaryComponent,
 					),
 				title: 'Intranet - Calendario',
+			},
+			{
+				path: 'admin/permisos/roles',
+				loadComponent: () =>
+					import('./pages/admin/permisos-roles').then((m) => m.PermisosRolesComponent),
+				title: 'Intranet - Permisos por Rol',
+			},
+			{
+				path: 'admin/permisos/usuarios',
+				loadComponent: () =>
+					import('./pages/admin/permisos-usuarios').then(
+						(m) => m.PermisosUsuariosComponent,
+					),
+				title: 'Intranet - Permisos por Usuario',
+			},
+			{
+				path: 'admin/usuarios',
+				loadComponent: () =>
+					import('./pages/admin/usuarios').then((m) => m.UsuariosComponent),
+				title: 'Intranet - Gestión de Usuarios',
+			},
+			{
+				path: 'admin/vistas',
+				loadComponent: () =>
+					import('./pages/admin/vistas').then((m) => m.VistasComponent),
+				title: 'Intranet - Gestión de Vistas',
 			},
 		],
 	},

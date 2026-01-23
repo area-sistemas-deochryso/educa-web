@@ -9,6 +9,7 @@
 	background-color: var(--intranet-background-color);
 	padding: 0 2rem;
 	border-bottom: 1px solid #c0c0c0;
+	overflow: visible;
 }
 
 .header-container {
@@ -17,6 +18,7 @@
 	max-width: 1400px;
 	margin: 0 auto;
 	height: 60px;
+	overflow: visible;
 }
 
 .desktop-header {
@@ -43,6 +45,7 @@
 	display: flex;
 	align-items: center;
 	gap: 1.5rem;
+	overflow: visible;
 }
 
 .intranet-content {

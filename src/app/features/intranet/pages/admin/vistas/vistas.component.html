@@ -1,0 +1,289 @@
+<div class="vistas-container">
+	<!-- Header -->
+	<header class="page-header">
+		<div class="header-left">
+			<div class="header-icon">
+				<i class="pi pi-eye"></i>
+			</div>
+			<div class="header-text">
+				<h1>Administracion de Vistas</h1>
+				<p>Gestiona las vistas y rutas del sistema</p>
+			</div>
+		</div>
+		<button
+			pButton
+			label="Refrescar"
+			icon="pi pi-refresh"
+			class="p-button-outlined"
+			(click)="refresh()"
+		></button>
+	</header>
+
+	<!-- Stats Cards -->
+	<section class="stats-section">
+		<div class="stat-card">
+			<div class="stat-content">
+				<span class="stat-label">Total Vistas</span>
+				<span class="stat-value">{{ totalVistas() }}</span>
+				<span class="stat-sublabel">rutas registradas</span>
+			</div>
+			<div class="stat-icon">
+				<i class="pi pi-eye"></i>
+			</div>
+		</div>
+
+		<div class="stat-card">
+			<div class="stat-content">
+				<span class="stat-label">Vistas Activas</span>
+				<span class="stat-value">{{ vistasActivas() }}</span>
+				<span class="stat-sublabel">disponibles</span>
+			</div>
+			<div class="stat-icon">
+				<i class="pi pi-check-circle"></i>
+			</div>
+		</div>
+
+		<div class="stat-card">
+			<div class="stat-content">
+				<span class="stat-label">Vistas Inactivas</span>
+				<span class="stat-value">{{ vistasInactivas() }}</span>
+				<span class="stat-sublabel">deshabilitadas</span>
+			</div>
+			<div class="stat-icon">
+				<i class="pi pi-ban"></i>
+			</div>
+		</div>
+
+		<div class="stat-card">
+			<div class="stat-content">
+				<span class="stat-label">Modulos</span>
+				<span class="stat-value">{{ totalModulos() }}</span>
+				<span class="stat-sublabel">categorias</span>
+			</div>
+			<div class="stat-icon">
+				<i class="pi pi-folder"></i>
+			</div>
+		</div>
+	</section>
+
+	<!-- Filters -->
+	<section class="filters-section">
+		<div class="search-box">
+			<i class="pi pi-search"></i>
+			<input
+				type="text"
+				pInputText
+				placeholder="Buscar por nombre o ruta..."
+				[ngModel]="searchTerm()"
+				(ngModelChange)="searchTerm.set($event)"
+			/>
+		</div>
+
+		<p-select
+			[options]="modulosOptions()"
+			[ngModel]="filterModulo()"
+			(ngModelChange)="filterModulo.set($event)"
+			placeholder="Todos los modulos"
+			[style]="{ minWidth: '180px' }"
+		/>
+
+		<p-select
+			[options]="estadoOptions"
+			[ngModel]="filterEstado()"
+			(ngModelChange)="filterEstado.set($event)"
+			placeholder="Estado"
+			[style]="{ minWidth: '140px' }"
+		/>
+
+		<button
+			pButton
+			label="Limpiar"
+			icon="pi pi-filter-slash"
+			class="p-button-text"
+			(click)="clearFilters()"
+		></button>
+
+		<div class="filter-spacer"></div>
+
+		<button
+			pButton
+			label="Nueva Vista"
+			icon="pi pi-plus"
+			class="p-button-success"
+			(click)="openNew()"
+		></button>
+	</section>
+
+	<!-- Table -->
+	@if (loading()) {
+		<div class="loading-container">
+			<p-progressSpinner strokeWidth="4" />
+		</div>
+	} @else {
+		<section class="table-section">
+			<p-table
+				[value]="filteredVistas()"
+				[paginator]="true"
+				[rows]="10"
+				[rowsPerPageOptions]="[5, 10, 25, 50]"
+				[showCurrentPageReport]="true"
+				currentPageReportTemplate="Mostrando {first} a {last} de {totalRecords} vistas"
+				styleClass="p-datatable-sm"
+			>
+				<ng-template #header>
+					<tr>
+						<th style="width: 70px" pSortableColumn="id">
+							ID <p-sortIcon field="id" />
+						</th>
+						<th style="width: 120px">MODULO</th>
+						<th pSortableColumn="nombre">NOMBRE <p-sortIcon field="nombre" /></th>
+						<th pSortableColumn="ruta">RUTA <p-sortIcon field="ruta" /></th>
+						<th style="width: 100px" pSortableColumn="estado">
+							ESTADO <p-sortIcon field="estado" />
+						</th>
+						<th style="width: 140px">ACCIONES</th>
+					</tr>
+				</ng-template>
+
+				<ng-template #body let-vista>
+					<tr>
+						<td class="text-center">
+							<span class="id-badge">{{ vista.id }}</span>
+						</td>
+						<td>
+							<span class="modulo-badge">
+								<i class="pi pi-folder"></i>
+								{{ getModuloFromRuta(vista.ruta) }}
+							</span>
+						</td>
+						<td>
+							<span class="nombre-text">{{ vista.nombre }}</span>
+						</td>
+						<td>
+							<span class="ruta-text">{{ vista.ruta }}</span>
+						</td>
+						<td class="text-center">
+							<p-tag
+								[value]="vista.estado === 1 ? 'Activa' : 'Inactiva'"
+								[severity]="getEstadoSeverity(vista.estado)"
+							/>
+						</td>
+						<td>
+							<div class="actions">
+								<button
+									pButton
+									icon="pi pi-pencil"
+									class="p-button-rounded p-button-text p-button-info"
+									pTooltip="Editar"
+									(click)="editVista(vista)"
+								></button>
+								<button
+									pButton
+									[icon]="vista.estado === 1 ? 'pi pi-ban' : 'pi pi-check'"
+									class="p-button-rounded p-button-text"
+									[class.p-button-warning]="vista.estado === 1"
+									[class.p-button-success]="vista.estado !== 1"
+									[pTooltip]="vista.estado === 1 ? 'Desactivar' : 'Activar'"
+									(click)="toggleEstado(vista)"
+								></button>
+								<button
+									pButton
+									icon="pi pi-trash"
+									class="p-button-rounded p-button-text p-button-danger"
+									pTooltip="Eliminar"
+									(click)="deleteVista(vista)"
+								></button>
+							</div>
+						</td>
+					</tr>
+				</ng-template>
+
+				<ng-template #emptymessage>
+					<tr>
+						<td colspan="6" class="empty-message">
+							<div class="empty-state">
+								<i class="pi pi-eye-slash"></i>
+								<p>No se encontraron vistas</p>
+								<span>Intenta ajustar los filtros de busqueda</span>
+							</div>
+						</td>
+					</tr>
+				</ng-template>
+			</p-table>
+		</section>
+	}
+</div>
+
+<!-- Edit/Create Dialog -->
+<p-dialog
+	[(visible)]="dialogVisible"
+	[header]="isEditing() ? 'Editar Vista' : 'Nueva Vista'"
+	[modal]="true"
+	[style]="{ width: '500px' }"
+	[draggable]="false"
+	[resizable]="false"
+	styleClass="edit-vista-dialog"
+>
+	<div class="dialog-content">
+		<div class="form-fields">
+			<div class="field">
+				<label for="ruta">Ruta *</label>
+				<input
+					id="ruta"
+					type="text"
+					pInputText
+					[ngModel]="formData().ruta"
+					(ngModelChange)="updateFormField('ruta', $event)"
+					placeholder="/intranet/modulo/vista"
+				/>
+				<small class="field-hint">Ejemplo: /intranet/admin/usuarios</small>
+			</div>
+
+			<div class="field">
+				<label for="nombre">Nombre *</label>
+				<input
+					id="nombre"
+					type="text"
+					pInputText
+					[ngModel]="formData().nombre"
+					(ngModelChange)="updateFormField('nombre', $event)"
+					placeholder="Nombre descriptivo de la vista"
+				/>
+			</div>
+
+			@if (isEditing()) {
+				<div class="field">
+					<label for="estado">Estado</label>
+					<div class="estado-switch">
+						<p-toggleswitch
+							id="estado"
+							[ngModel]="formData().estado === 1"
+							(ngModelChange)="updateFormField('estado', $event ? 1 : 0)"
+						/>
+						<span>{{ formData().estado === 1 ? 'Activa' : 'Inactiva' }}</span>
+					</div>
+				</div>
+			}
+		</div>
+	</div>
+
+	<ng-template #footer>
+		<div class="dialog-footer">
+			<button
+				pButton
+				label="Cancelar"
+				icon="pi pi-times"
+				class="p-button-text"
+				(click)="hideDialog()"
+			></button>
+			<button
+				pButton
+				label="Guardar"
+				icon="pi pi-check"
+				class="p-button-success"
+				(click)="saveVista()"
+				[disabled]="!isFormValid()"
+			></button>
+		</div>
+	</ng-template>
+</p-dialog>

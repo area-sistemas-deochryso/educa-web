@@ -7,7 +7,13 @@ import { InputTextModule } from 'primeng/inputtext';
 import { ToggleSwitch } from 'primeng/toggleswitch';
 import { Select } from 'primeng/select';
 
-import { AuthService, UserRole, VerifyTokenResponse } from '@core/services';
+import {
+	AuthService,
+	UserRole,
+	VerifyTokenResponse,
+	UserPermisosService,
+	SwService,
+} from '@core/services';
 import { AppValidators, LoginFormGroup } from '@shared/validators';
 import { FormErrorComponent } from '@shared/components/form-error';
 import {
@@ -43,6 +49,8 @@ export class LoginIntranetComponent implements OnInit, OnDestroy {
 	private fb = inject(FormBuilder);
 	private router = inject(Router);
 	private authService = inject(AuthService);
+	private userPermisosService = inject(UserPermisosService);
+	private swService = inject(SwService);
 	private destroy$ = new Subject<void>();
 
 	// Form tipado
@@ -166,6 +174,9 @@ export class LoginIntranetComponent implements OnInit, OnDestroy {
 				this.isLoading.set(false);
 
 				if (response.token) {
+					// Limpiar cache del SW y permisos de sesión anterior para forzar recarga
+					this.swService.clearCache();
+					this.userPermisosService.clear();
 					this.router.navigate(['/intranet']);
 				} else {
 					if (this.authService.isBlocked) {

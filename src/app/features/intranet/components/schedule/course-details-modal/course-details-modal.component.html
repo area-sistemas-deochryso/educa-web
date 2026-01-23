@@ -1,0 +1,97 @@
+<p-dialog
+	[visible]="visible"
+	(visibleChange)="onVisibleChange($event)"
+	[modal]="true"
+	[dismissableMask]="true"
+	[draggable]="false"
+	[resizable]="false"
+	[styleClass]="'details-modal' + (isExpanded ? ' expanded' : '')"
+	[showHeader]="false"
+>
+	<div class="modal-content details-content">
+		<app-modal-controls
+			[isExpanded]="isExpanded"
+			(expand)="toggleExpand()"
+			(close)="onVisibleChange(false)"
+		/>
+
+		<h2>{{ currentCourseDetails.name }}</h2>
+
+		<div class="details-layout" [class.left-side]="isLeftSide">
+			<div class="details-left">
+				<app-week-search-box
+					[searchTerm]="weekSearchTerm"
+					(searchTermChange)="weekSearchTerm = $event"
+				/>
+
+				<div class="weeks-accordion">
+					@for (week of filteredWeeks; track week.id) {
+						<app-week-accordion-item
+							[week]="week"
+							(toggle)="toggleWeek(week)"
+							(openAttachments)="openAttachments(week)"
+							(openTasks)="openTasks(week)"
+							(openSubmissions)="openSubmissions(week)"
+						/>
+					}
+				</div>
+
+				<app-evaluations-accordion
+					[expanded]="evaluationsExpanded"
+					[evaluations]="currentCourseDetails.evaluations"
+					(toggle)="toggleEvaluations()"
+				/>
+			</div>
+
+			<div class="details-right">
+				<button
+					class="side-toggle-btn"
+					(click)="toggleSide()"
+					[pTooltip]="
+						isLeftSide ? 'Mover panel a la derecha' : 'Mover panel a la izquierda'
+					"
+					tooltipPosition="top"
+				>
+					<i
+						class="pi"
+						[class.pi-arrow-right]="isLeftSide"
+						[class.pi-arrow-left]="!isLeftSide"
+					></i>
+				</button>
+
+				<app-student-card lastName="Tupac Yupanqui" firstName="María José" />
+
+				<app-course-search
+					[searchTerm]="courseSearchTerm"
+					[results]="courseSearchResults"
+					[showDropdown]="showCourseDropdown"
+					(searchTermChange)="courseSearchTerm = $event"
+					(search)="onCourseSearch()"
+					(blur)="hideCourseDropdown()"
+					(select)="selectCourse($event)"
+				/>
+
+				<app-sidebar-links [links]="courseSearchLinks" (linkClick)="onLinkClick($event)" />
+
+				<app-sidebar-links
+					[title]="currentCourseDetails.name"
+					[links]="courseNameLinks"
+					(linkClick)="onLinkClick($event)"
+				/>
+
+				<app-member-list
+					title="Grupo de Trabajo"
+					[members]="currentCourseDetails.workGroup"
+				/>
+
+				<app-member-list title="Docente" [members]="[currentCourseDetails.teacher]" />
+			</div>
+		</div>
+	</div>
+</p-dialog>
+
+<app-attachments-modal [(visible)]="showAttachmentsModal" [weekName]="selectedWeekName" />
+
+<app-tasks-modal [(visible)]="showTasksModal" [weekName]="selectedWeekName" />
+
+<app-submissions-modal [(visible)]="showSubmissionsModal" [weekName]="selectedWeekName" />

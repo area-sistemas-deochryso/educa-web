@@ -1,3 +1,8 @@
+:host {
+	display: inline-block;
+	min-width: fit-content;
+}
+
 .nav-item {
 	display: flex;
 	align-items: center;
@@ -10,9 +15,19 @@
 	border-radius: 6px;
 	position: relative;
 	transition: all 0.2s ease;
+	background: transparent;
+	border: none;
+	cursor: pointer;
+	font-family: inherit;
 
 	i {
 		font-size: 1.1rem;
+	}
+
+	.chevron {
+		font-size: 0.75rem;
+		margin-left: 0.25rem;
+		transition: transform 0.2s ease;
 	}
 
 	&::after {
@@ -42,4 +57,119 @@
 			width: 80%;
 		}
 	}
+
+	&.parent {
+		&::after {
+			display: none;
+		}
+	}
 }
+
+.nav-dropdown {
+	position: relative;
+
+	&.open > .nav-item.parent .chevron {
+		transform: rotate(180deg);
+	}
+
+	&.active > .nav-item.parent {
+		color: #5c7a28;
+	}
+}
+
+.dropdown-menu {
+	display: block !important;
+	position: absolute;
+	top: 100%;
+	left: 0;
+	min-width: 200px;
+	min-height: 50px;
+	background: var(--intranet-background-color);
+	border: 1px solid #c0c0c0;
+	border-radius: 8px;
+	box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+	padding: 0.5rem;
+	z-index: 1000;
+	margin-top: 0.25rem;
+}
+
+.dropdown-item {
+	display: flex;
+	align-items: center;
+	gap: 0.5rem;
+	padding: 0.625rem 0.75rem;
+	min-height: 40px;
+	min-width: 150px;
+	color: var(--intranet-default-text-color);
+	text-decoration: none;
+	font-size: 0.9rem;
+	font-weight: 500;
+	border-radius: 6px;
+	transition: all 0.15s ease;
+
+	i {
+		font-size: 1rem;
+		width: 20px;
+		text-align: center;
+	}
+
+	&:hover {
+		background-color: rgba(92, 122, 40, 0.1);
+		color: #5c7a28;
+	}
+
+	&.active {
+		background-color: rgba(92, 122, 40, 0.15);
+		color: #5c7a28;
+	}
+}
+
+.submenu-item {
+	width: 100%;
+	min-width: 150px;
+	min-height: 40px;
+
+	::ng-deep .nav-dropdown {
+		width: 100%;
+
+		.nav-item.parent {
+			width: 100%;
+			min-height: 40px;
+			padding: 0.625rem 0.75rem;
+			font-size: 0.9rem;
+			border-radius: 6px;
+			color: var(--intranet-default-text-color);
+
+			&:hover {
+				background-color: rgba(92, 122, 40, 0.1);
+				color: #5c7a28;
+			}
+
+			i:first-child {
+				width: 20px;
+				text-align: center;
+			}
+
+			.chevron {
+				margin-left: auto;
+				transform: rotate(-90deg);
+			}
+		}
+
+		&.open > .nav-item.parent .chevron {
+			transform: rotate(0deg);
+		}
+
+		.dropdown-menu {
+			position: relative;
+			box-shadow: none;
+			border: none;
+			margin-top: 0.25rem;
+			margin-left: 1rem;
+			padding: 0;
+			border-left: 2px solid rgba(92, 122, 40, 0.2);
+			border-radius: 0;
+		}
+	}
+}
+

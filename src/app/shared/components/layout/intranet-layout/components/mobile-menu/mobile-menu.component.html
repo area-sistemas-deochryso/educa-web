@@ -22,17 +22,78 @@
 		</a>
 
 		<div class="nav-items">
-			@for (item of items; track item.route) {
-				<a
-					[routerLink]="item.route"
-					routerLinkActive="active"
-					[routerLinkActiveOptions]="{ exact: item.exact ?? false }"
-					class="mobile-nav-item"
-					(click)="close()"
-				>
-					<i [class]="item.icon"></i>
-					<span>{{ item.label }}</span>
-				</a>
+			@for (item of items; track item.label) {
+				@if (item.children && item.children.length > 0) {
+					<!-- Parent item with children -->
+					<div class="nav-group" [class.expanded]="isExpanded(item.label)">
+						<button class="mobile-nav-item parent" (click)="toggleSubmenu(item.label)">
+							<i [class]="item.icon"></i>
+							<span>{{ item.label }}</span>
+							<i class="pi pi-chevron-down chevron"></i>
+						</button>
+						@if (isExpanded(item.label)) {
+							<div class="submenu">
+								@for (child of item.children; track child.label) {
+									@if (child.children && child.children.length > 0) {
+										<!-- Nested parent -->
+										<div class="nav-group nested" [class.expanded]="isExpanded(child.label)">
+											<button
+												class="mobile-nav-item parent nested"
+												(click)="toggleSubmenu(child.label)"
+											>
+												<i [class]="child.icon"></i>
+												<span>{{ child.label }}</span>
+												<i class="pi pi-chevron-down chevron"></i>
+											</button>
+											@if (isExpanded(child.label)) {
+												<div class="submenu nested">
+													@for (grandchild of child.children; track grandchild.label) {
+														<a
+															[routerLink]="grandchild.route"
+															routerLinkActive="active"
+															[routerLinkActiveOptions]="{
+																exact: grandchild.exact ?? false,
+															}"
+															class="mobile-nav-item leaf"
+															(click)="close()"
+														>
+															<i [class]="grandchild.icon"></i>
+															<span>{{ grandchild.label }}</span>
+														</a>
+													}
+												</div>
+											}
+										</div>
+									} @else {
+										<!-- Leaf child -->
+										<a
+											[routerLink]="child.route"
+											routerLinkActive="active"
+											[routerLinkActiveOptions]="{ exact: child.exact ?? false }"
+											class="mobile-nav-item leaf"
+											(click)="close()"
+										>
+											<i [class]="child.icon"></i>
+											<span>{{ child.label }}</span>
+										</a>
+									}
+								}
+							</div>
+						}
+					</div>
+				} @else {
+					<!-- Simple leaf item -->
+					<a
+						[routerLink]="item.route"
+						routerLinkActive="active"
+						[routerLinkActiveOptions]="{ exact: item.exact ?? false }"
+						class="mobile-nav-item"
+						(click)="close()"
+					>
+						<i [class]="item.icon"></i>
+						<span>{{ item.label }}</span>
+					</a>
+				}
 			}
 		</div>
 

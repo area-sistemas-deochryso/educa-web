@@ -1,7 +1,7 @@
 import { Injectable, inject, PLATFORM_ID } from '@angular/core';
 import { isPlatformBrowser } from '@angular/common';
 import { logger } from '@app/core/helpers';
-import { AuthUser, ScheduleModalsState } from './storage.models';
+import { AuthUser, ScheduleModalsState, PermisosStorageData } from './storage.models';
 
 /**
  * SessionStorageService - Para datos que deben existir solo durante la sesión del navegador
@@ -24,6 +24,9 @@ const SESSION_KEYS = {
 	REMEMBER_ME_PREFIX: 'educa_remember_me',
 	CURRENT_SESSION_KEY: 'educa_current_session', // Guarda la clave de la sesión activa
 
+	// Permisos de usuario (se guarda por sesión)
+	PERMISOS_PREFIX: 'educa_session_permisos',
+
 	// UI State
 	SCHEDULE_MODALS_STATE: 'educa_schedule_modals',
 	LAST_NOTIFICATION_CHECK: 'educa_last_notif_check',
@@ -38,6 +41,7 @@ const LOCAL_KEYS = {
 	REMEMBER_ME_PREFIX: 'educa_remember_me',
 	REMEMBER_TOKEN: 'educa_remember_token', // Token para autocompletar login (no se borra con logout)
 	CURRENT_SESSION_KEY: 'educa_current_persistent_session', // Guarda la clave de la sesión persistente activa
+	PERMISOS_PREFIX: 'educa_persistent_permisos', // Permisos persistentes para "remember me"
 } as const;
 
 @Injectable({
@@ -364,10 +368,14 @@ export class SessionStorageService {
 			const sessionTokenKey = `${SESSION_KEYS.TOKEN_PREFIX}_${sessionKey}`;
 			const sessionUserKey = `${SESSION_KEYS.USER_PREFIX}_${sessionKey}`;
 			const sessionRememberMeKey = `${SESSION_KEYS.REMEMBER_ME_PREFIX}_${sessionKey}`;
+			const sessionPermisosKey = `${SESSION_KEYS.PERMISOS_PREFIX}_${sessionKey}`;
+			const localPermisosKey = `${LOCAL_KEYS.PERMISOS_PREFIX}_${sessionKey}`;
 
 			this.removeItem(sessionTokenKey);
 			this.removeItem(sessionUserKey);
 			this.removeItem(sessionRememberMeKey);
+			this.removeItem(sessionPermisosKey);
+			this.removeLocalItem(localPermisosKey);
 		}
 
 		// Limpiar claves de sesión activa (pero NO los tokens/users persistentes)
@@ -470,11 +478,111 @@ export class SessionStorageService {
 	}
 
 	// ============================================
+	// PERMISOS - Permisos del usuario por sesión
+	// ============================================
+
+	getPermisos(): PermisosStorageData | null {
+		// Obtener la clave de sesión activa
+		const sessionKey =
+			this.getLocalItem(LOCAL_KEYS.CURRENT_SESSION_KEY) ||
+			this.getItem(SESSION_KEYS.CURRENT_SESSION_KEY);
+
+		if (!sessionKey) {
+			logger.warn('[SessionStorage] getPermisos - No session key found');
+			return null;
+		}
+
+		// Primero verificar localStorage (sesión persistente)
+		const localPermisosKey = `${LOCAL_KEYS.PERMISOS_PREFIX}_${sessionKey}`;
+		const persistentPermisos = this.getLocalJSON<PermisosStorageData>(localPermisosKey);
+		if (persistentPermisos) {
+			logger.log('[SessionStorage] getPermisos - Found in localStorage');
+			return persistentPermisos;
+		}
+
+		// Luego sessionStorage (sesión temporal)
+		const sessionPermisosKey = `${SESSION_KEYS.PERMISOS_PREFIX}_${sessionKey}`;
+		const sessionPermisos = this.getJSON<PermisosStorageData>(sessionPermisosKey);
+		if (sessionPermisos) {
+			logger.log('[SessionStorage] getPermisos - Found in sessionStorage');
+		}
+		return sessionPermisos;
+	}
+
+	setPermisos(permisos: PermisosStorageData): void {
+		// Obtener la clave de sesión activa
+		const sessionKey =
+			this.getLocalItem(LOCAL_KEYS.CURRENT_SESSION_KEY) ||
+			this.getItem(SESSION_KEYS.CURRENT_SESSION_KEY);
+
+		if (!sessionKey) {
+			logger.warn(
+				'[SessionStorage] setPermisos - No session key found, cannot save permisos',
+			);
+			return;
+		}
+
+		// Determinar si es sesión persistente (rememberMe) o temporal
+		const isPersistent = !!this.getLocalItem(LOCAL_KEYS.CURRENT_SESSION_KEY);
+
+		if (isPersistent) {
+			// Guardar en localStorage para persistir
+			const localPermisosKey = `${LOCAL_KEYS.PERMISOS_PREFIX}_${sessionKey}`;
+			this.setLocalJSON(localPermisosKey, permisos);
+			logger.log('[SessionStorage] setPermisos - Saved to localStorage');
+		} else {
+			// Guardar solo en sessionStorage
+			const sessionPermisosKey = `${SESSION_KEYS.PERMISOS_PREFIX}_${sessionKey}`;
+			this.setJSON(sessionPermisosKey, permisos);
+			logger.log('[SessionStorage] setPermisos - Saved to sessionStorage');
+		}
+	}
+
+	clearPermisos(): void {
+		if (!this.isBrowser) return;
+
+		// Limpiar TODOS los permisos de sessionStorage (todas las claves que empiecen con el prefijo)
+		const sessionPermisosPrefix = SESSION_KEYS.PERMISOS_PREFIX + '_';
+		const sessionKeysToRemove: string[] = [];
+
+		for (let i = 0; i < sessionStorage.length; i++) {
+			const key = sessionStorage.key(i);
+			if (key && key.startsWith(sessionPermisosPrefix)) {
+				sessionKeysToRemove.push(key);
+			}
+		}
+
+		sessionKeysToRemove.forEach((key) => {
+			sessionStorage.removeItem(key);
+			logger.log('[SessionStorage] clearPermisos - Removed from sessionStorage:', key);
+		});
+
+		// Limpiar TODOS los permisos de localStorage (todas las claves que empiecen con el prefijo)
+		const localPermisosPrefix = LOCAL_KEYS.PERMISOS_PREFIX + '_';
+		const localKeysToRemove: string[] = [];
+
+		for (let i = 0; i < localStorage.length; i++) {
+			const key = localStorage.key(i);
+			if (key && key.startsWith(localPermisosPrefix)) {
+				localKeysToRemove.push(key);
+			}
+		}
+
+		localKeysToRemove.forEach((key) => {
+			localStorage.removeItem(key);
+			logger.log('[SessionStorage] clearPermisos - Removed from localStorage:', key);
+		});
+
+		logger.log('[SessionStorage] clearPermisos - All permisos cleared from both storages');
+	}
+
+	// ============================================
 	// UTILIDADES
 	// ============================================
 
 	clearAll(): void {
 		this.clearAuth();
+		this.clearPermisos();
 		this.clearScheduleModalsState();
 		this.removeItem(SESSION_KEYS.LAST_NOTIFICATION_CHECK);
 		this.removeItem(SESSION_KEYS.LAST_ROUTE);

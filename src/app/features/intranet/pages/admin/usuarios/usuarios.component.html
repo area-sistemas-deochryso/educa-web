@@ -1,0 +1,474 @@
+<div class="usuarios-container">
+	<!-- Header -->
+	<header class="page-header">
+		<div class="header-left">
+			<div class="header-icon">
+				<i class="pi pi-users"></i>
+			</div>
+			<div class="header-text">
+				<h1>Administracion de Usuarios</h1>
+				<p>Gestiona todos los usuarios del sistema</p>
+			</div>
+		</div>
+		<button
+			pButton
+			label="Refrescar"
+			icon="pi pi-refresh"
+			class="p-button-outlined"
+			(click)="refresh()"
+		></button>
+	</header>
+
+	<!-- Stats Cards -->
+	@if (estadisticas()) {
+		<section class="stats-section">
+			<div class="stat-card">
+				<div class="stat-content">
+					<span class="stat-label">Total Usuarios</span>
+					<span class="stat-value">{{ estadisticas()?.totalUsuarios }}</span>
+					<span class="stat-sublabel">usuarios registrados</span>
+				</div>
+				<div class="stat-icon">
+					<i class="pi pi-users"></i>
+				</div>
+			</div>
+
+			<div class="stat-card">
+				<div class="stat-content">
+					<span class="stat-label">Directores</span>
+					<span class="stat-value">{{ estadisticas()?.totalDirectores }}</span>
+					<span class="stat-sublabel">administradores</span>
+				</div>
+				<div class="stat-icon">
+					<i class="pi pi-user"></i>
+				</div>
+			</div>
+
+			<div class="stat-card">
+				<div class="stat-content">
+					<span class="stat-label">Profesores</span>
+					<span class="stat-value">{{ estadisticas()?.totalProfesores }}</span>
+					<span class="stat-sublabel">docentes</span>
+				</div>
+				<div class="stat-icon">
+					<i class="pi pi-graduation-cap"></i>
+				</div>
+			</div>
+
+			<div class="stat-card">
+				<div class="stat-content">
+					<span class="stat-label">Estudiantes</span>
+					<span class="stat-value">{{ estadisticas()?.totalEstudiantes }}</span>
+					<span class="stat-sublabel">alumnos</span>
+				</div>
+				<div class="stat-icon">
+					<i class="pi pi-book"></i>
+				</div>
+			</div>
+		</section>
+	}
+
+	<!-- Filters -->
+	<section class="filters-section">
+		<div class="search-box">
+			<i class="pi pi-search"></i>
+			<input
+				type="text"
+				pInputText
+				placeholder="Buscar por nombre, DNI o correo..."
+				[ngModel]="searchTerm()"
+				(ngModelChange)="searchTerm.set($event)"
+			/>
+		</div>
+
+		<p-select
+			[options]="rolesOptions"
+			[ngModel]="filterRol()"
+			(ngModelChange)="filterRol.set($event)"
+			placeholder="Todos los roles"
+			[style]="{ minWidth: '160px' }"
+		/>
+
+		<p-select
+			[options]="estadoOptions"
+			[ngModel]="filterEstado()"
+			(ngModelChange)="filterEstado.set($event)"
+			placeholder="Estado"
+			[style]="{ minWidth: '140px' }"
+		/>
+
+		<button
+			pButton
+			label="Limpiar"
+			icon="pi pi-filter-slash"
+			class="p-button-text"
+			(click)="clearFilters()"
+		></button>
+
+		<div class="filter-spacer"></div>
+
+		<button
+			pButton
+			label="Nuevo Usuario"
+			icon="pi pi-plus"
+			class="p-button-success"
+			(click)="openNew()"
+		></button>
+	</section>
+
+	<!-- Table -->
+	@if (loading()) {
+		<div class="loading-container">
+			<p-progressSpinner strokeWidth="4" />
+		</div>
+	} @else {
+		<section class="table-section">
+			<p-table
+				[value]="filteredUsuarios()"
+				[paginator]="true"
+				[rows]="10"
+				[rowsPerPageOptions]="[5, 10, 25, 50]"
+				[showCurrentPageReport]="true"
+				currentPageReportTemplate="Mostrando {first} a {last} de {totalRecords} usuarios"
+				styleClass="p-datatable-sm"
+			>
+				<ng-template #header>
+					<tr>
+						<th style="width: 80px" pSortableColumn="id">
+							ID <p-sortIcon field="id" />
+						</th>
+						<th style="width: 100px" pSortableColumn="dni">
+							DNI <p-sortIcon field="dni" />
+						</th>
+						<th pSortableColumn="nombreCompleto">
+							NOMBRE <p-sortIcon field="nombreCompleto" />
+						</th>
+						<th style="width: 120px" pSortableColumn="rol">
+							ROL <p-sortIcon field="rol" />
+						</th>
+						<th style="width: 100px" pSortableColumn="estado">
+							ESTADO <p-sortIcon field="estado" />
+						</th>
+						<th style="width: 140px">ACCIONES</th>
+					</tr>
+				</ng-template>
+
+				<ng-template #body let-usuario>
+					<tr>
+						<td class="text-center">
+							<span class="id-badge">{{ usuario.id }}</span>
+						</td>
+						<td>
+							<span class="dni-text">{{ usuario.dni }}</span>
+						</td>
+						<td>
+							<div class="user-cell">
+								<div class="user-avatar">
+									<i class="pi pi-user"></i>
+								</div>
+								<div class="user-info">
+									<span class="user-name">{{ usuario.nombreCompleto }}</span>
+									@if (usuario.correo) {
+										<span class="user-email">{{ usuario.correo }}</span>
+									}
+								</div>
+							</div>
+						</td>
+						<td>
+							<p-tag [value]="usuario.rol" [severity]="getRolSeverity(usuario.rol)" />
+						</td>
+						<td class="text-center">
+							<p-tag
+								[value]="usuario.estado ? 'Activo' : 'Inactivo'"
+								[severity]="getEstadoSeverity(usuario.estado)"
+							/>
+						</td>
+						<td>
+							<div class="actions">
+								<button
+									pButton
+									icon="pi pi-eye"
+									class="p-button-rounded p-button-text p-button-secondary"
+									pTooltip="Ver detalles"
+									(click)="openDetail(usuario)"
+								></button>
+								<button
+									pButton
+									icon="pi pi-pencil"
+									class="p-button-rounded p-button-text p-button-info"
+									pTooltip="Editar"
+									(click)="editUsuario(usuario)"
+								></button>
+								<button
+									pButton
+									[icon]="usuario.estado ? 'pi pi-ban' : 'pi pi-check'"
+									class="p-button-rounded p-button-text"
+									[class.p-button-warning]="usuario.estado"
+									[class.p-button-success]="!usuario.estado"
+									[pTooltip]="usuario.estado ? 'Desactivar' : 'Activar'"
+									(click)="toggleEstado(usuario)"
+								></button>
+							</div>
+						</td>
+					</tr>
+				</ng-template>
+
+				<ng-template #emptymessage>
+					<tr>
+						<td colspan="6" class="empty-message">
+							<div class="empty-state">
+								<i class="pi pi-users"></i>
+								<p>No se encontraron usuarios</p>
+								<span>Intenta ajustar los filtros de busqueda</span>
+							</div>
+						</td>
+					</tr>
+				</ng-template>
+			</p-table>
+		</section>
+	}
+</div>
+
+<!-- Detail Drawer -->
+<p-drawer
+	[(visible)]="detailDrawerVisible"
+	position="right"
+	[style]="{ width: '450px' }"
+	[modal]="true"
+>
+	<ng-template pTemplate="header">
+		<div class="drawer-header">
+			<span>Detalles del Usuario</span>
+		</div>
+	</ng-template>
+
+	@if (selectedUsuario()) {
+		<div class="detail-content">
+			<div class="detail-avatar">
+				<i class="pi pi-user"></i>
+			</div>
+
+			<div class="detail-name">{{ selectedUsuario()?.nombreCompleto }}</div>
+
+			<p-tag
+				[value]="selectedUsuario()?.rol || ''"
+				[severity]="getRolSeverity(selectedUsuario()?.rol || '')"
+			/>
+
+			<div class="detail-info">
+				<div class="info-item">
+					<span class="info-label">DNI</span>
+					<span class="info-value">{{ selectedUsuario()?.dni }}</span>
+				</div>
+				<div class="info-item">
+					<span class="info-label">Estado</span>
+					<p-tag
+						[value]="selectedUsuario()?.estado ? 'Activo' : 'Inactivo'"
+						[severity]="getEstadoSeverity(selectedUsuario()?.estado || false)"
+					/>
+				</div>
+				@if (selectedUsuario()?.correo) {
+					<div class="info-item">
+						<span class="info-label">Correo</span>
+						<span class="info-value">{{ selectedUsuario()?.correo }}</span>
+					</div>
+				}
+				@if (selectedUsuario()?.telefono) {
+					<div class="info-item">
+						<span class="info-label">Telefono</span>
+						<span class="info-value">{{ selectedUsuario()?.telefono }}</span>
+					</div>
+				}
+				@if (selectedUsuario()?.sedeNombre) {
+					<div class="info-item">
+						<span class="info-label">Sede</span>
+						<span class="info-value">{{ selectedUsuario()?.sedeNombre }}</span>
+					</div>
+				}
+				@if (selectedUsuario()?.grado) {
+					<div class="info-item">
+						<span class="info-label">Grado</span>
+						<span class="info-value">{{ selectedUsuario()?.grado }}</span>
+					</div>
+				}
+				@if (selectedUsuario()?.seccion) {
+					<div class="info-item">
+						<span class="info-label">Seccion</span>
+						<span class="info-value">{{ selectedUsuario()?.seccion }}</span>
+					</div>
+				}
+				<div class="info-item">
+					<span class="info-label">Fecha de Registro</span>
+					<span class="info-value">{{
+						selectedUsuario()?.fechaRegistro | date: 'dd/MM/yyyy'
+					}}</span>
+				</div>
+			</div>
+		</div>
+
+		<div class="drawer-footer">
+			<button
+				pButton
+				label="Cerrar"
+				icon="pi pi-times"
+				class="p-button-text"
+				(click)="closeDetail()"
+			></button>
+			<button
+				pButton
+				label="Editar"
+				icon="pi pi-pencil"
+				class="p-button-primary"
+				(click)="editFromDetail()"
+			></button>
+		</div>
+	}
+</p-drawer>
+
+<!-- Edit/Create Dialog -->
+<p-dialog
+	[(visible)]="dialogVisible"
+	[header]="isEditing() ? 'Editar Usuario' : 'Nuevo Usuario'"
+	[modal]="true"
+	[style]="{ width: '600px' }"
+	[draggable]="false"
+	[resizable]="false"
+	styleClass="edit-usuario-dialog"
+>
+	<div class="dialog-content">
+		<div class="form-grid">
+			@if (!isEditing()) {
+				<div class="field full-width">
+					<label for="rol">Rol *</label>
+					<p-select
+						id="rol"
+						[options]="rolesSelectOptions"
+						[ngModel]="formData().rol"
+						(ngModelChange)="updateFormField('rol', $event)"
+						placeholder="Seleccione el rol"
+						[style]="{ width: '100%' }"
+					/>
+				</div>
+			}
+
+			<div class="field">
+				<label for="dni">DNI *</label>
+				<input
+					id="dni"
+					type="text"
+					pInputText
+					[ngModel]="formData().dni"
+					(ngModelChange)="updateFormField('dni', $event)"
+					placeholder="12345678"
+					maxlength="8"
+					[class.ng-invalid]="dniError()"
+					[class.ng-dirty]="formData().dni"
+				/>
+				@if (dniError()) {
+					<small class="p-error">{{ dniError() }}</small>
+				}
+			</div>
+
+			<div class="field">
+				<label for="contrasena">{{ isEditing() ? 'Nueva Contraseña' : 'Contraseña *' }}</label>
+				<p-password
+					id="contrasena"
+					[ngModel]="formData().contrasena"
+					(ngModelChange)="updateFormField('contrasena', $event)"
+					[placeholder]="isEditing() ? 'Dejar vacío para mantener' : 'Ingrese contrasena'"
+					[toggleMask]="true"
+					[feedback]="false"
+					[style]="{ width: '100%' }"
+					[inputStyle]="{ width: '100%' }"
+				/>
+			</div>
+
+			<div class="field">
+				<label for="nombres">Nombres *</label>
+				<input
+					id="nombres"
+					type="text"
+					pInputText
+					[ngModel]="formData().nombres"
+					(ngModelChange)="updateFormField('nombres', $event)"
+					placeholder="Nombres del usuario"
+				/>
+			</div>
+
+			<div class="field">
+				<label for="apellidos">Apellidos *</label>
+				<input
+					id="apellidos"
+					type="text"
+					pInputText
+					[ngModel]="formData().apellidos"
+					(ngModelChange)="updateFormField('apellidos', $event)"
+					placeholder="Apellidos del usuario"
+				/>
+			</div>
+
+			<div class="field">
+				<label for="correo">Correo</label>
+				<input
+					id="correo"
+					type="email"
+					pInputText
+					[ngModel]="formData().correo"
+					(ngModelChange)="updateFormField('correo', $event)"
+					placeholder="correo@ejemplo.com"
+					[class.ng-invalid]="correoError()"
+					[class.ng-dirty]="formData().correo"
+				/>
+				@if (correoError()) {
+					<small class="p-error">{{ correoError() }}</small>
+				}
+			</div>
+
+			<div class="field">
+				<label for="telefono">Telefono</label>
+				<input
+					id="telefono"
+					type="text"
+					pInputText
+					[ngModel]="formData().telefono"
+					(ngModelChange)="updateFormField('telefono', $event)"
+					placeholder="999999999"
+				/>
+			</div>
+
+			@if (isEditing()) {
+				<div class="field full-width">
+					<label for="estado">Estado</label>
+					<div class="estado-switch">
+						<p-toggleswitch
+							id="estado"
+							[ngModel]="formData().estado"
+							(ngModelChange)="updateFormField('estado', $event)"
+						/>
+						<span>{{ formData().estado ? 'Activo' : 'Inactivo' }}</span>
+					</div>
+				</div>
+			}
+		</div>
+	</div>
+
+	<ng-template #footer>
+		<div class="dialog-footer">
+			<button
+				pButton
+				label="Cancelar"
+				icon="pi pi-times"
+				class="p-button-text"
+				(click)="hideDialog()"
+			></button>
+			<button
+				pButton
+				label="Guardar"
+				icon="pi pi-check"
+				class="p-button-success"
+				(click)="saveUsuario()"
+				[disabled]="!isFormValid()"
+			></button>
+		</div>
+	</ng-template>
+</p-dialog>

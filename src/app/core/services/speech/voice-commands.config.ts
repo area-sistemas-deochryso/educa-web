@@ -108,7 +108,7 @@ export const VOICE_COMMANDS: VoiceCommandConfig[] = [
 		description: 'Navegar a calendario',
 		category: 'navigation',
 		actionType: 'navigate',
-		route: '/intranet/Calendario',
+		route: '/intranet/calendario',
 	},
 
 	// =========================================================================

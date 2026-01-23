@@ -9,3 +9,6 @@ export * from './error';
 export * from './http';
 export * from './destroy';
 export * from './modal';
+export * from './user';
+export * from './permisos';
+export * from './usuarios';

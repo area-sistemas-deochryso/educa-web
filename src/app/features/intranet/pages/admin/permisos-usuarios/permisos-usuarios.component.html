@@ -1,0 +1,487 @@
+<div class="permisos-container">
+	<!-- Header -->
+	<header class="page-header">
+		<div class="header-left">
+			<div class="header-icon">
+				<i class="pi pi-shield"></i>
+			</div>
+			<div class="header-text">
+				<h1>Administracion de Permisos</h1>
+				<p>Gestiona permisos personalizados por usuario</p>
+			</div>
+		</div>
+		<button
+			pButton
+			label="Refrescar"
+			icon="pi pi-refresh"
+			class="p-button-outlined"
+			(click)="refresh()"
+		></button>
+	</header>
+
+	<!-- Filters -->
+	<section class="filters-section">
+		<div class="search-box">
+			<i class="pi pi-search"></i>
+			<input
+				type="text"
+				pInputText
+				placeholder="Buscar por usuario..."
+				[ngModel]="searchTerm()"
+				(ngModelChange)="searchTerm.set($event)"
+			/>
+		</div>
+
+		<p-select
+			[options]="rolesOptions"
+			[ngModel]="filterRol()"
+			(ngModelChange)="filterRol.set($event)"
+			placeholder="Todos los roles"
+			[style]="{ minWidth: '180px' }"
+		/>
+
+		<button
+			pButton
+			label="Limpiar filtros"
+			icon="pi pi-filter-slash"
+			class="p-button-text"
+			(click)="clearFilters()"
+		></button>
+
+		<div class="filter-spacer"></div>
+
+		<button
+			pButton
+			label="Nuevo Permiso"
+			icon="pi pi-plus"
+			class="p-button-success"
+			(click)="openNew()"
+		></button>
+	</section>
+
+	<!-- Stats Cards -->
+	<section class="stats-section">
+		<div class="stat-card">
+			<div class="stat-content">
+				<span class="stat-label">Usuarios con Override</span>
+				<span class="stat-value">{{ totalUsuarios() }}</span>
+				<span class="stat-sublabel">permisos personalizados</span>
+			</div>
+			<div class="stat-icon users">
+				<i class="pi pi-users"></i>
+			</div>
+		</div>
+
+		<div class="stat-card">
+			<div class="stat-content">
+				<span class="stat-label">Roles Disponibles</span>
+				<span class="stat-value">{{ rolesDisponibles.length }}</span>
+				<span class="stat-sublabel">roles del sistema</span>
+			</div>
+			<div class="stat-icon roles">
+				<i class="pi pi-id-card"></i>
+			</div>
+		</div>
+
+		<div class="stat-card">
+			<div class="stat-content">
+				<span class="stat-label">Modulos</span>
+				<span class="stat-value">{{ totalModulos() }}</span>
+				<span class="stat-sublabel">modulos del sistema</span>
+			</div>
+			<div class="stat-icon modules">
+				<i class="pi pi-th-large"></i>
+			</div>
+		</div>
+
+		<div class="stat-card">
+			<div class="stat-content">
+				<span class="stat-label">Vistas Totales</span>
+				<span class="stat-value">{{ vistas().length }}</span>
+				<span class="stat-sublabel">vistas disponibles</span>
+			</div>
+			<div class="stat-icon views">
+				<i class="pi pi-eye"></i>
+			</div>
+		</div>
+	</section>
+
+	<!-- Table -->
+	@if (loading()) {
+		<div class="loading-container">
+			<p-progressSpinner strokeWidth="4" />
+		</div>
+	} @else {
+		<section class="table-section">
+			<p-table
+				[value]="filteredPermisos()"
+				[paginator]="true"
+				[rows]="10"
+				[rowsPerPageOptions]="[5, 10, 25, 50]"
+				[showCurrentPageReport]="true"
+				currentPageReportTemplate="Mostrando {first} a {last} de {totalRecords} usuarios"
+				styleClass="p-datatable-sm"
+			>
+				<ng-template #header>
+					<tr>
+						<th style="width: 80px" pSortableColumn="usuarioId">
+							ID <p-sortIcon field="usuarioId" />
+						</th>
+						<th pSortableColumn="nombreUsuario">
+							USUARIO <p-sortIcon field="nombreUsuario" />
+						</th>
+						<th style="width: 140px" pSortableColumn="rol">
+							ROL <p-sortIcon field="rol" />
+						</th>
+						<th style="width: 100px">VISTAS</th>
+						<th style="width: 100px">MODULOS</th>
+						<th style="width: 120px">PERMISOS</th>
+						<th style="width: 140px">ACCIONES</th>
+					</tr>
+				</ng-template>
+
+				<ng-template #body let-permiso>
+					<tr>
+						<td class="text-center">
+							<span class="id-badge">{{ permiso.usuarioId }}</span>
+						</td>
+						<td>
+							<div class="user-cell">
+								<div class="user-avatar">
+									<i class="pi pi-user"></i>
+								</div>
+								<span class="user-name">{{
+									permiso.nombreUsuario || 'Usuario ' + permiso.usuarioId
+								}}</span>
+							</div>
+						</td>
+						<td>
+							<p-tag [value]="permiso.rol" [severity]="getRolSeverity(permiso.rol)" />
+						</td>
+						<td class="text-center">
+							<span class="count-badge">{{ permiso.vistas.length }}</span>
+						</td>
+						<td class="text-center">
+							<span class="count-badge secondary">{{
+								getModulosCount(permiso.vistas)
+							}}</span>
+						</td>
+						<td class="text-center">
+							<span class="permisos-badge">
+								<i class="pi pi-user"></i> Usuario
+							</span>
+						</td>
+						<td>
+							<div class="actions">
+								<button
+									pButton
+									icon="pi pi-eye"
+									class="p-button-rounded p-button-text p-button-secondary"
+									pTooltip="Ver detalles"
+									(click)="openDetail(permiso)"
+								></button>
+								<button
+									pButton
+									icon="pi pi-pencil"
+									class="p-button-rounded p-button-text p-button-info"
+									pTooltip="Editar"
+									(click)="editPermiso(permiso)"
+								></button>
+								<button
+									pButton
+									icon="pi pi-trash"
+									class="p-button-rounded p-button-text p-button-danger"
+									pTooltip="Eliminar"
+									(click)="deletePermiso(permiso)"
+								></button>
+							</div>
+						</td>
+					</tr>
+				</ng-template>
+
+				<ng-template #emptymessage>
+					<tr>
+						<td colspan="7" class="empty-message">
+							<div class="empty-state">
+								<i class="pi pi-inbox"></i>
+								<p>No hay permisos personalizados configurados</p>
+								<span>Los usuarios usaran los permisos de su rol por defecto</span>
+							</div>
+						</td>
+					</tr>
+				</ng-template>
+			</p-table>
+		</section>
+	}
+</div>
+
+<!-- Detail Drawer -->
+<p-drawer
+	[(visible)]="detailDrawerVisible"
+	position="right"
+	[style]="{ width: '500px' }"
+	[modal]="true"
+>
+	<ng-template pTemplate="header">
+		<div class="drawer-header">
+			<span
+				>Usuario:
+				{{ selectedPermiso()?.nombreUsuario || 'ID ' + selectedPermiso()?.usuarioId }}</span
+			>
+		</div>
+	</ng-template>
+
+	@if (selectedPermiso()) {
+		<div class="detail-content">
+			<!-- Info Summary -->
+			<div class="detail-summary">
+				<div class="summary-item">
+					<span class="summary-label">Usuario</span>
+					<span class="summary-value">{{
+						selectedPermiso()?.nombreUsuario || 'ID ' + selectedPermiso()?.usuarioId
+					}}</span>
+				</div>
+				<div class="summary-item">
+					<span class="summary-label">Rol</span>
+					<p-tag
+						[value]="selectedPermiso()?.rol || ''"
+						[severity]="getRolSeverity(selectedPermiso()?.rol || '')"
+					/>
+				</div>
+				<div class="summary-item">
+					<span class="summary-label">Permisos</span>
+					<span class="summary-value"
+						>{{ selectedPermiso()?.vistas?.length }} vistas en
+						{{ getModulosCount(selectedPermiso()?.vistas || []) }} modulos</span
+					>
+				</div>
+			</div>
+
+			<!-- Modules and Views -->
+			<div class="detail-modules">
+				<h3>Modulos y Vistas</h3>
+				@for (modulo of getModuloVistasForDetail(); track modulo.nombre) {
+					<div class="module-group">
+						<div class="module-header">
+							<i class="pi pi-folder"></i>
+							<span class="module-name">{{ modulo.nombre }}</span>
+							<span class="module-count">{{ modulo.vistas.length }} vistas</span>
+						</div>
+						<div class="module-vistas">
+							@for (vista of modulo.vistas; track vista.id) {
+								<div class="vista-item">
+									<i class="pi pi-check-circle"></i>
+									<div class="vista-info">
+										<span class="vista-nombre">{{ vista.nombre }}</span>
+										<span class="vista-ruta">{{ vista.ruta }}</span>
+									</div>
+								</div>
+							}
+						</div>
+					</div>
+				}
+			</div>
+		</div>
+
+		<div class="drawer-footer">
+			<button
+				pButton
+				label="Cerrar"
+				icon="pi pi-times"
+				class="p-button-text"
+				(click)="closeDetail()"
+			></button>
+			<button
+				pButton
+				label="Editar Permisos"
+				icon="pi pi-pencil"
+				class="p-button-primary"
+				(click)="editFromDetail()"
+			></button>
+		</div>
+	}
+</p-drawer>
+
+<!-- Edit Dialog -->
+<p-dialog
+	[(visible)]="dialogVisible"
+	[header]="
+		isEditing()
+			? 'Editar Permisos - ' + (selectedPermiso()?.nombreUsuario || 'Usuario')
+			: 'Nuevo Permiso Personalizado'
+	"
+	[modal]="true"
+	[style]="{ width: '900px', maxHeight: '90vh' }"
+	[draggable]="false"
+	[resizable]="false"
+	styleClass="edit-permisos-dialog"
+>
+	<div class="dialog-content">
+		<!-- User Info Header -->
+		@if (isEditing()) {
+			<div class="dialog-user-header">
+				<div class="user-info">
+					<i class="pi pi-user"></i>
+					<span class="user-name">{{
+						selectedPermiso()?.nombreUsuario || 'Usuario ' + selectedUsuarioId()
+					}}</span>
+					<p-tag
+						[value]="selectedRol() || ''"
+						[severity]="getRolSeverity(selectedRol() || '')"
+					/>
+				</div>
+				<div class="vistas-count">
+					<i class="pi pi-check"></i> {{ getVistasCountLabel() }}
+				</div>
+			</div>
+		} @else {
+			<div class="new-user-form">
+				<div class="field-row">
+					<div class="field">
+						<label for="rol">Rol del Usuario</label>
+						<p-select
+							id="rol"
+							[options]="rolesSelectOptions"
+							[ngModel]="selectedRol()"
+							(ngModelChange)="selectedRol.set($event)"
+							placeholder="Seleccione el rol"
+							[style]="{ width: '100%' }"
+							(onChange)="loadVistasFromRol()"
+						/>
+					</div>
+					<div class="field">
+						<label for="usuario">Usuario</label>
+						<p-autoComplete
+							id="usuario"
+							[ngModel]="selectedUsuario()"
+							[suggestions]="usuariosSugeridos()"
+							(completeMethod)="buscarUsuarios($event)"
+							(onSelect)="onUsuarioSeleccionado($event)"
+							(onClear)="onUsuarioClear()"
+							field="nombreCompleto"
+							optionLabel="nombreCompleto"
+							[placeholder]="selectedRol() ? 'Buscar usuario por nombre...' : 'Seleccione un rol primero'"
+							[disabled]="!selectedRol()"
+							[style]="{ width: '100%' }"
+							[inputStyle]="{ width: '100%' }"
+							[showClear]="true"
+							[dropdown]="true"
+							[minLength]="0"
+						>
+							<ng-template let-usuario pTemplate="item">
+								<div class="autocomplete-item">
+									<i class="pi pi-user"></i>
+									<div class="user-info-autocomplete">
+										<span class="user-name-autocomplete">{{ usuario.nombreCompleto }}</span>
+										@if (usuario.dni) {
+											<span class="user-dni">DNI: {{ usuario.dni }}</span>
+										}
+									</div>
+								</div>
+							</ng-template>
+						</p-autoComplete>
+					</div>
+				</div>
+			</div>
+		}
+
+		<!-- Module Tabs -->
+		@if (modulosVistas().length > 0) {
+			<div class="modules-tabs-container">
+				<div class="modules-tabs">
+					@for (modulo of modulosVistas(); track modulo.nombre; let i = $index) {
+						<button
+							class="module-tab"
+							[class.active]="activeModuloIndex() === i"
+							(click)="activeModuloIndex.set(i)"
+						>
+							<i class="pi pi-folder"></i>
+							{{ modulo.nombre }}
+							<span
+								class="tab-count"
+								[class.has-selection]="modulo.seleccionadas > 0"
+								>{{ modulo.seleccionadas }}</span
+							>
+						</button>
+					}
+				</div>
+
+				<!-- Vistas Content -->
+				<div class="vistas-content">
+					<div class="vistas-header">
+						<label class="select-all">
+							<p-checkbox
+								[ngModel]="isAllModuloSelected()"
+								(ngModelChange)="toggleAllVistasModulo()"
+								[binary]="true"
+							/>
+							<span>Seleccionar todas las vistas</span>
+						</label>
+						<span class="selection-count">
+							{{ modulosVistas()[activeModuloIndex()]?.seleccionadas }} de
+							{{ modulosVistas()[activeModuloIndex()]?.total }} seleccionadas
+						</span>
+					</div>
+
+					<div class="vistas-search">
+						<i class="pi pi-search"></i>
+						<input
+							type="text"
+							pInputText
+							placeholder="Buscar por ruta..."
+							[ngModel]="vistasBusqueda()"
+							(ngModelChange)="vistasBusqueda.set($event)"
+						/>
+					</div>
+
+					<div class="vistas-grid">
+						@for (vista of vistasFiltradas(); track vista.id) {
+							<div
+								class="vista-checkbox"
+								[class.selected]="isVistaSelected(vista.ruta)"
+							>
+								<p-checkbox
+									[ngModel]="isVistaSelected(vista.ruta)"
+									(ngModelChange)="toggleVista(vista.ruta)"
+									[binary]="true"
+								/>
+								<div class="vista-details" (click)="toggleVista(vista.ruta)">
+									<span class="vista-name">{{ vista.nombre }}</span>
+									<span class="vista-path">{{ vista.ruta }}</span>
+								</div>
+							</div>
+						}
+					</div>
+				</div>
+			</div>
+		} @else {
+			<div class="no-vistas">
+				<i class="pi pi-info-circle"></i>
+				<p>Seleccione un rol para cargar las vistas disponibles</p>
+			</div>
+		}
+	</div>
+
+	<ng-template #footer>
+		<div class="dialog-footer">
+			<button
+				pButton
+				label="Cancelar"
+				icon="pi pi-times"
+				class="p-button-text"
+				(click)="hideDialog()"
+			></button>
+			<button
+				pButton
+				label="Guardar Cambios"
+				icon="pi pi-check"
+				class="p-button-success"
+				(click)="savePermiso()"
+				[disabled]="
+					(!isEditing() && (!selectedUsuarioId() || !selectedRol())) ||
+					selectedVistas().length === 0
+				"
+			></button>
+		</div>
+	</ng-template>
+</p-dialog>

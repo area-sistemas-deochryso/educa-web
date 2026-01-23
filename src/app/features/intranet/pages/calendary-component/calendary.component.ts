@@ -1,10 +1,10 @@
 import { Component, OnInit, AfterViewInit, signal, inject, PLATFORM_ID } from '@angular/core';
 import { isPlatformBrowser } from '@angular/common';
 import { ActivatedRoute } from '@angular/router';
-import { CalendarHeaderComponent } from './components/calendar-header/calendar-header.component';
-import { CalendarLegendComponent } from './components/calendar-legend/calendar-legend.component';
-import { CalendarMonthCardComponent } from './components/calendar-month-card/calendar-month-card.component';
-import { CalendarDayModalComponent } from './components/calendar-day-modal/calendar-day-modal.component';
+import { CalendarHeaderComponent } from '../../components/calendar/calendar-header/calendar-header.component';
+import { CalendarLegendComponent } from '../../components/calendar/calendar-legend/calendar-legend.component';
+import { CalendarMonthCardComponent } from '../../components/calendar/calendar-month-card/calendar-month-card.component';
+import { CalendarDayModalComponent } from '../../components/calendar/calendar-day-modal/calendar-day-modal.component';
 import { CalendarDay, CalendarMonth, ModalData } from './calendar.types';
 import { isHoliday } from './holidays.config';
 import { getEvent, isDateInEventRange, isDateEventEnd } from './events.config';

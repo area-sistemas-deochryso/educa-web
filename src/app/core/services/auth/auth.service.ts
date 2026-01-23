@@ -166,6 +166,8 @@ export class AuthService {
 	}
 
 	logout(): void {
+		// Limpiar permisos ANTES de clearAuth, porque clearAuth borra el sessionKey
+		this.storage.clearPermisos();
 		this.storage.clearAuth();
 
 		this.isAuthenticatedSubject.next(false);

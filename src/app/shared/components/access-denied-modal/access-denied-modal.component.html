@@ -1,0 +1,37 @@
+<p-dialog
+	[visible]="visible()"
+	[modal]="true"
+	[closable]="false"
+	[dismissableMask]="false"
+	[draggable]="false"
+	[resizable]="false"
+	styleClass="access-denied-dialog"
+	[style]="{ width: '400px' }"
+>
+	<ng-template #header>
+		<div class="dialog-header">
+			<i class="pi pi-lock header-icon"></i>
+			<span class="header-title">Acceso Denegado</span>
+		</div>
+	</ng-template>
+
+	<div class="dialog-content">
+		<p class="message">No tienes los permisos necesarios para acceder a esta vista.</p>
+		@if (rutaDenegada()) {
+			<p class="route-info">
+				<span class="label">Ruta solicitada:</span>
+				<code class="route">{{ rutaDenegada() }}</code>
+			</p>
+		}
+		<p class="suggestion">Contacta al administrador si crees que deberias tener acceso.</p>
+	</div>
+
+	<ng-template #footer>
+		<p-button
+			label="Entendido"
+			icon="pi pi-check"
+			(onClick)="close()"
+			styleClass="p-button-sm"
+		/>
+	</ng-template>
+</p-dialog>

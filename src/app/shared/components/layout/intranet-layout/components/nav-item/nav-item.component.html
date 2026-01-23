@@ -1,9 +1,49 @@
-<a
-	[routerLink]="route"
-	routerLinkActive="active"
-	[routerLinkActiveOptions]="{ exact: exact }"
-	class="nav-item"
->
-	<i [class]="icon"></i>
-	<span>{{ label }}</span>
-</a>
+@if (hasChildren()) {
+	<!-- Parent with dropdown -->
+	<div class="nav-dropdown" [class.open]="isOpen()" [class.active]="isActive()">
+		<button class="nav-item parent" (click)="toggle()">
+			<i [class]="icon"></i>
+			<span>{{ label }}</span>
+			<i class="pi pi-chevron-down chevron"></i>
+		</button>
+
+		@if (isOpen()) {
+			<div class="dropdown-menu">
+				@for (child of children; track child.label) {
+					@if (child.children && child.children.length > 0) {
+						<!-- Nested submenu -->
+						<div class="submenu-item">
+							<app-nav-item
+								[label]="child.label"
+								[icon]="child.icon"
+								[children]="child.children"
+							/>
+						</div>
+					} @else {
+						<!-- Leaf item -->
+						<a
+							[routerLink]="child.route"
+							routerLinkActive="active"
+							[routerLinkActiveOptions]="{ exact: child.exact ?? false }"
+							class="dropdown-item"
+						>
+							<i [class]="child.icon"></i>
+							<span>{{ child.label }}</span>
+						</a>
+					}
+				}
+			</div>
+		}
+	</div>
+} @else {
+	<!-- Simple link -->
+	<a
+		[routerLink]="route"
+		routerLinkActive="active"
+		[routerLinkActiveOptions]="{ exact: exact }"
+		class="nav-item"
+	>
+		<i [class]="icon"></i>
+		<span>{{ label }}</span>
+	</a>
+}

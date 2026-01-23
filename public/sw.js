@@ -6,6 +6,14 @@ const CACHE_EXPIRY = 24 * 60 * 60 * 1000; // 24 horas
 // URLs de API que queremos cachear (solo GET)
 const API_URL_PATTERNS = ['/api/'];
 
+// URLs que NUNCA deben cachearse (datos específicos por usuario/sesión)
+const NO_CACHE_PATTERNS = [
+	'/api/sistema/permisos',
+	'/api/Auth/perfil',
+	'/api/Auth/login',
+	'/api/Auth/verificar',
+];
+
 // Abrir/crear la base de datos IndexedDB
 function openDB() {
 	return new Promise((resolve, reject) => {
@@ -175,6 +183,11 @@ async function cleanExpiredCache() {
 
 // Verificar si la URL debe ser cacheada
 function shouldCache(url) {
+	// Primero verificar si está en la lista de exclusión
+	if (NO_CACHE_PATTERNS.some(pattern => url.includes(pattern))) {
+		console.log('[SW] URL excluida del cache:', url);
+		return false;
+	}
 	return API_URL_PATTERNS.some(pattern => url.includes(pattern));
 }
 

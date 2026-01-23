@@ -24,5 +24,13 @@ export interface AttendanceMonthData {
 	year: number;
 }
 
+/** Datos de permisos del usuario */
+export interface PermisosStorageData {
+	usuarioId: number;
+	rol: string;
+	vistasPermitidas: string[];
+	tienePermisosPersonalizados: boolean;
+}
+
 /** Re-exportar AuthUser para conveniencia */
 export type { AuthUser };

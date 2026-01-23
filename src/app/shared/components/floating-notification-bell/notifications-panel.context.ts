@@ -1,9 +1,5 @@
 import { Injectable, Signal, inject, computed } from '@angular/core';
-import {
-	NotificationsService,
-	SeasonalNotification,
-	NotificationPriority,
-} from '@core/services';
+import { NotificationsService, SeasonalNotification, NotificationPriority } from '@core/services';
 import { UnreadByPriority } from './components';
 
 /**
@@ -28,8 +24,7 @@ export class NotificationsPanelContext {
 	readonly highestPriority: Signal<NotificationPriority | null> =
 		this.notificationsService.highestPriority;
 	readonly isPanelOpen: Signal<boolean> = this.notificationsService.isPanelOpen;
-	readonly showDismissedHistory: Signal<boolean> =
-		this.notificationsService.showDismissedHistory;
+	readonly showDismissedHistory: Signal<boolean> = this.notificationsService.showDismissedHistory;
 
 	// Computed signals
 	readonly badgePriorityClass: Signal<string> = computed(() => {
