@@ -69,6 +69,7 @@
 					<td class="day-col">
 						@if (isDayValid(day)) {
 							<div class="day-cell" [class]="getStatusClass(day.status)">
+								<span class="day-number">{{ day.date | date: 'd' }}</span>
 								<span class="day-status">{{ day.status }}</span>
 								@if (day.hora) {
 									<span class="day-hora">{{ day.hora }}</span>
