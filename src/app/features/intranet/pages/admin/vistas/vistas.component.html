@@ -146,7 +146,7 @@
 				</ng-template>
 
 				<ng-template #body let-vista>
-					<tr>
+					<tr [class.row-inactive]="vista.estado !== 1">
 						<td class="text-center">
 							<span class="id-badge">{{ vista.id }}</span>
 						</td>

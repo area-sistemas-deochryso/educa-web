@@ -154,7 +154,7 @@
 				</ng-template>
 
 				<ng-template #body let-usuario>
-					<tr>
+					<tr [class.row-inactive]="!usuario.estado">
 						<td class="text-center">
 							<span class="id-badge">{{ usuario.id }}</span>
 						</td>

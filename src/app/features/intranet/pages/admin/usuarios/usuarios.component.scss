@@ -414,6 +414,20 @@
 			&:hover > td {
 				background: var(--surface-100);
 			}
+
+			// Filas de usuarios inactivos
+			&.row-inactive {
+				opacity: 0.5;
+
+				> td {
+					background: var(--surface-100);
+				}
+
+				&:hover > td {
+					opacity: 1;
+					background: var(--surface-200);
+				}
+			}
 		}
 
 		.p-paginator {
