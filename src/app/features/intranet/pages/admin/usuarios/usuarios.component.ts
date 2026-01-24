@@ -1,8 +1,17 @@
-import { Component, DestroyRef, inject, OnInit, signal, computed } from '@angular/core';
+import {
+	ChangeDetectionStrategy,
+	Component,
+	DestroyRef,
+	inject,
+	OnInit,
+	signal,
+	computed,
+} from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
-import { forkJoin, switchMap } from 'rxjs';
+import { forkJoin } from 'rxjs';
+import { filter, debounceTime } from 'rxjs/operators';
 
 import { TableModule } from 'primeng/table';
 import { ButtonModule } from 'primeng/button';
@@ -17,6 +26,7 @@ import { ToggleSwitch } from 'primeng/toggleswitch';
 import { PasswordModule } from 'primeng/password';
 import { DatePickerModule } from 'primeng/datepicker';
 
+import { logger } from '@core/helpers';
 import {
 	UsuariosService,
 	UsuarioLista,
@@ -26,7 +36,10 @@ import {
 	UsuariosEstadisticas,
 	ROLES_USUARIOS,
 	RolUsuario,
+	ErrorHandlerService,
+	SwService,
 } from '@core/services';
+import { AdminUtilsService } from '@shared/services';
 
 @Component({
 	selector: 'app-usuarios',
@@ -49,10 +62,14 @@ import {
 	],
 	templateUrl: './usuarios.component.html',
 	styleUrl: './usuarios.component.scss',
+	changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class UsuariosComponent implements OnInit {
 	private usuariosService = inject(UsuariosService);
 	private destroyRef = inject(DestroyRef);
+	private errorHandler = inject(ErrorHandlerService);
+	private swService = inject(SwService);
+	readonly adminUtils = inject(AdminUtilsService);
 
 	// State
 	usuarios = signal<UsuarioLista[]>([]);
@@ -131,6 +148,32 @@ export class UsuariosComponent implements OnInit {
 
 	ngOnInit(): void {
 		this.loadData();
+		this.setupCacheRefresh();
+	}
+
+	/** Auto-refresh cuando el SW detecta datos nuevos del servidor */
+	private setupCacheRefresh(): void {
+		// Actualizar lista de usuarios directamente desde el evento (sin nuevo fetch)
+		this.swService.cacheUpdated$
+			.pipe(
+				filter((event) => event.url.includes('/usuarios') && !event.url.includes('estadisticas')),
+				takeUntilDestroyed(this.destroyRef),
+			)
+			.subscribe((event) => {
+				logger.log('[UsuariosComponent] Lista usuarios actualizada desde SW');
+				this.usuarios.set(event.data as UsuarioLista[]);
+			});
+
+		// Actualizar estadísticas directamente desde el evento
+		this.swService.cacheUpdated$
+			.pipe(
+				filter((event) => event.url.includes('/usuarios/estadisticas')),
+				takeUntilDestroyed(this.destroyRef),
+			)
+			.subscribe((event) => {
+				logger.log('[UsuariosComponent] Estadísticas actualizadas desde SW');
+				this.estadisticas.set(event.data as UsuariosEstadisticas);
+			});
 	}
 
 	loadData(): void {
@@ -147,7 +190,9 @@ export class UsuariosComponent implements OnInit {
 					this.estadisticas.set(estadisticas);
 					this.loading.set(false);
 				},
-				error: () => {
+				error: (err) => {
+					logger.error('Error al cargar datos:', err);
+					this.errorHandler.showError('Error', 'No se pudieron cargar los usuarios');
 					this.loading.set(false);
 				},
 			});
@@ -280,28 +325,17 @@ export class UsuariosComponent implements OnInit {
 			return;
 		}
 
-		operation$
-			.pipe(
-				switchMap(() =>
-					forkJoin({
-						usuarios: this.usuariosService.listarUsuarios(),
-						estadisticas: this.usuariosService.obtenerEstadisticas(),
-					}),
-				),
-				takeUntilDestroyed(this.destroyRef),
-			)
-			.subscribe({
-				next: ({ usuarios, estadisticas }) => {
-					this.usuarios.set(usuarios);
-					this.estadisticas.set(estadisticas);
-					this.loading.set(false);
-					this.hideDialog();
-				},
-				error: (err) => {
-					console.error('Error:', err);
-					this.loading.set(false);
-				},
-			});
+		operation$.pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
+			next: () => {
+				this.hideDialog();
+				this.loadData();
+			},
+			error: (err) => {
+				logger.error('Error:', err);
+				this.errorHandler.showError('Error', 'No se pudo guardar el usuario');
+				this.loading.set(false);
+			},
+		});
 	}
 
 	deleteUsuario(usuario: UsuarioLista): void {
@@ -309,23 +343,12 @@ export class UsuariosComponent implements OnInit {
 			this.loading.set(true);
 			this.usuariosService
 				.eliminarUsuario(usuario.rol, usuario.id)
-				.pipe(
-					switchMap(() =>
-						forkJoin({
-							usuarios: this.usuariosService.listarUsuarios(),
-							estadisticas: this.usuariosService.obtenerEstadisticas(),
-						}),
-					),
-					takeUntilDestroyed(this.destroyRef),
-				)
+				.pipe(takeUntilDestroyed(this.destroyRef))
 				.subscribe({
-					next: ({ usuarios, estadisticas }) => {
-						this.usuarios.set(usuarios);
-						this.estadisticas.set(estadisticas);
-						this.loading.set(false);
-					},
+					next: () => this.loadData(),
 					error: (err) => {
-						console.error('Error al eliminar:', err);
+						logger.error('Error al eliminar:', err);
+						this.errorHandler.showError('Error', 'No se pudo eliminar el usuario');
 						this.loading.set(false);
 					},
 				});
@@ -336,48 +359,18 @@ export class UsuariosComponent implements OnInit {
 		this.loading.set(true);
 		this.usuariosService
 			.cambiarEstado(usuario.rol, usuario.id, !usuario.estado)
-			.pipe(
-				switchMap(() =>
-					forkJoin({
-						usuarios: this.usuariosService.listarUsuarios(),
-						estadisticas: this.usuariosService.obtenerEstadisticas(),
-					}),
-				),
-				takeUntilDestroyed(this.destroyRef),
-			)
+			.pipe(takeUntilDestroyed(this.destroyRef))
 			.subscribe({
-				next: ({ usuarios, estadisticas }) => {
-					this.usuarios.set(usuarios);
-					this.estadisticas.set(estadisticas);
-					this.loading.set(false);
-				},
+				next: () => this.loadData(),
 				error: (err) => {
-					console.error('Error al cambiar estado:', err);
+					logger.error('Error al cambiar estado:', err);
+					this.errorHandler.showError('Error', 'No se pudo cambiar el estado');
 					this.loading.set(false);
 				},
 			});
 	}
 
 	// === UI Helpers ===
-	getRolSeverity(rol: string): 'success' | 'info' | 'warn' | 'danger' | 'secondary' {
-		switch (rol) {
-			case 'Director':
-				return 'danger';
-			case 'Profesor':
-				return 'warn';
-			case 'Apoderado':
-				return 'info';
-			case 'Estudiante':
-				return 'success';
-			default:
-				return 'secondary';
-		}
-	}
-
-	getEstadoSeverity(estado: boolean): 'success' | 'danger' {
-		return estado ? 'success' : 'danger';
-	}
-
 	isFormValid(): boolean {
 		const data = this.formData();
 		if (!data.dni || !data.nombres || !data.apellidos) return false;

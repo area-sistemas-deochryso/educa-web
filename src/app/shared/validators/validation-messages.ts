@@ -1,6 +1,7 @@
-export interface ValidationMessageConfig {
-	[key: string]: string | ((params: Record<string, unknown>) => string);
-}
+export type ValidationMessageConfig = Record<
+	string,
+	string | ((params: Record<string, unknown>) => string)
+>;
 
 /**
  * Mensajes de error en espanol para validadores

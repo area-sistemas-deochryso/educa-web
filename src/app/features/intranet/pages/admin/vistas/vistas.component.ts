@@ -1,8 +1,15 @@
-import { Component, DestroyRef, inject, OnInit, signal, computed } from '@angular/core';
+import {
+	ChangeDetectionStrategy,
+	Component,
+	DestroyRef,
+	inject,
+	OnInit,
+	signal,
+	computed,
+} from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
-import { switchMap } from 'rxjs';
 
 import { TableModule } from 'primeng/table';
 import { ButtonModule } from 'primeng/button';
@@ -14,7 +21,9 @@ import { InputTextModule } from 'primeng/inputtext';
 import { SelectModule } from 'primeng/select';
 import { ToggleSwitch } from 'primeng/toggleswitch';
 
-import { PermisosService, Vista } from '@core/services';
+import { logger } from '@core/helpers';
+import { ErrorHandlerService, PermisosService, Vista } from '@core/services';
+import { AdminUtilsService } from '@shared/services';
 
 interface VistaForm {
 	ruta: string;
@@ -40,10 +49,13 @@ interface VistaForm {
 	],
 	templateUrl: './vistas.component.html',
 	styleUrl: './vistas.component.scss',
+	changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class VistasComponent implements OnInit {
 	private permisosService = inject(PermisosService);
 	private destroyRef = inject(DestroyRef);
+	private errorHandler = inject(ErrorHandlerService);
+	readonly adminUtils = inject(AdminUtilsService);
 
 	// State
 	vistas = signal<Vista[]>([]);
@@ -73,7 +85,7 @@ export class VistasComponent implements OnInit {
 	modulos = computed(() => {
 		const modulosSet = new Set<string>();
 		this.vistas().forEach((v) => {
-			modulosSet.add(this.getModuloFromRuta(v.ruta));
+			modulosSet.add(this.adminUtils.getModuloFromRuta(v.ruta));
 		});
 		return Array.from(modulosSet).sort();
 	});
@@ -103,12 +115,13 @@ export class VistasComponent implements OnInit {
 		if (search) {
 			data = data.filter(
 				(v) =>
-					v.nombre.toLowerCase().includes(search) || v.ruta.toLowerCase().includes(search),
+					v.nombre.toLowerCase().includes(search) ||
+					v.ruta.toLowerCase().includes(search),
 			);
 		}
 
 		if (filtroModulo) {
-			data = data.filter((v) => this.getModuloFromRuta(v.ruta) === filtroModulo);
+			data = data.filter((v) => this.adminUtils.getModuloFromRuta(v.ruta) === filtroModulo);
 		}
 
 		if (filtroEstado !== null) {
@@ -128,9 +141,16 @@ export class VistasComponent implements OnInit {
 		this.permisosService
 			.getVistas()
 			.pipe(takeUntilDestroyed(this.destroyRef))
-			.subscribe((vistas) => {
-				this.vistas.set(vistas);
-				this.loading.set(false);
+			.subscribe({
+				next: (vistas) => {
+					this.vistas.set(vistas);
+					this.loading.set(false);
+				},
+				error: (err) => {
+					logger.error('Error al cargar vistas:', err);
+					this.errorHandler.showError('Error', 'No se pudieron cargar las vistas');
+					this.loading.set(false);
+				},
 			});
 	}
 
@@ -191,22 +211,17 @@ export class VistasComponent implements OnInit {
 			return;
 		}
 
-		operation$
-			.pipe(
-				switchMap(() => this.permisosService.getVistas()),
-				takeUntilDestroyed(this.destroyRef),
-			)
-			.subscribe({
-				next: (vistas) => {
-					this.vistas.set(vistas);
-					this.loading.set(false);
-					this.hideDialog();
-				},
-				error: (err) => {
-					console.error('Error:', err);
-					this.loading.set(false);
-				},
-			});
+		operation$.pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
+			next: () => {
+				this.hideDialog();
+				this.loadData();
+			},
+			error: (err) => {
+				logger.error('Error:', err);
+				this.errorHandler.showError('Error', 'No se pudo guardar la vista');
+				this.loading.set(false);
+			},
+		});
 	}
 
 	deleteVista(vista: Vista): void {
@@ -214,17 +229,12 @@ export class VistasComponent implements OnInit {
 			this.loading.set(true);
 			this.permisosService
 				.eliminarVista(vista.id)
-				.pipe(
-					switchMap(() => this.permisosService.getVistas()),
-					takeUntilDestroyed(this.destroyRef),
-				)
+				.pipe(takeUntilDestroyed(this.destroyRef))
 				.subscribe({
-					next: (vistas) => {
-						this.vistas.set(vistas);
-						this.loading.set(false);
-					},
+					next: () => this.loadData(),
 					error: (err) => {
-						console.error('Error al eliminar:', err);
+						logger.error('Error al eliminar:', err);
+						this.errorHandler.showError('Error', 'No se pudo eliminar la vista');
 						this.loading.set(false);
 					},
 				});
@@ -240,33 +250,18 @@ export class VistasComponent implements OnInit {
 				nombre: vista.nombre,
 				estado: nuevoEstado,
 			})
-			.pipe(
-				switchMap(() => this.permisosService.getVistas()),
-				takeUntilDestroyed(this.destroyRef),
-			)
+			.pipe(takeUntilDestroyed(this.destroyRef))
 			.subscribe({
-				next: (vistas) => {
-					this.vistas.set(vistas);
-					this.loading.set(false);
-				},
+				next: () => this.loadData(),
 				error: (err) => {
-					console.error('Error al cambiar estado:', err);
+					logger.error('Error al cambiar estado:', err);
+					this.errorHandler.showError('Error', 'No se pudo cambiar el estado');
 					this.loading.set(false);
 				},
 			});
 	}
 
 	// === UI Helpers ===
-	getModuloFromRuta(ruta: string): string {
-		const cleanRuta = ruta.startsWith('/') ? ruta.substring(1) : ruta;
-		const parts = cleanRuta.split('/');
-		return parts[0] || 'general';
-	}
-
-	getEstadoSeverity(estado: number | null): 'success' | 'danger' {
-		return estado === 1 ? 'success' : 'danger';
-	}
-
 	isFormValid(): boolean {
 		const data = this.formData();
 		return !!(data.ruta && data.nombre);

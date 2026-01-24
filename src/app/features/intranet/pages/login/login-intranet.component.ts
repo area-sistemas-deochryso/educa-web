@@ -123,7 +123,7 @@ export class LoginIntranetComponent implements OnInit, OnDestroy {
 		}
 	}
 
-	private autofillFromUser(user: VerifyTokenResponse, includeDni: boolean = true): void {
+	private autofillFromUser(user: VerifyTokenResponse, includeDni = true): void {
 		const patchData: Partial<{ dni: string; password: string; rol: UserRole }> = {
 			password: user.contraseña,
 			rol: user.rol,

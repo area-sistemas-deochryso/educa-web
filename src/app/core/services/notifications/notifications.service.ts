@@ -71,8 +71,8 @@ export class NotificationsService {
 	/** Audio para sonido de notificación */
 	private notificationSound: HTMLAudioElement | null = null;
 
-	private dismissedIds: Set<string> = new Set();
-	private readIds: Set<string> = new Set();
+	private dismissedIds = new Set<string>();
+	private readIds = new Set<string>();
 	private hasPlayedSound = false;
 
 	constructor() {

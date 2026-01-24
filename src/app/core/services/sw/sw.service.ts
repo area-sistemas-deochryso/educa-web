@@ -1,7 +1,13 @@
 import { Injectable, inject, PLATFORM_ID } from '@angular/core';
 import { isPlatformBrowser } from '@angular/common';
-import { BehaviorSubject } from 'rxjs';
+import { BehaviorSubject, Subject } from 'rxjs';
 import { logger } from '@core/helpers';
+
+export interface CacheUpdateEvent {
+	url: string;
+	originalUrl: string;
+	data: unknown;
+}
 
 @Injectable({
 	providedIn: 'root',
@@ -13,10 +19,13 @@ export class SwService {
 	private _isOnline = new BehaviorSubject<boolean>(true);
 	private _isRegistered = new BehaviorSubject<boolean>(false);
 	private _updateAvailable = new BehaviorSubject<boolean>(false);
+	private _cacheUpdated = new Subject<CacheUpdateEvent>();
 
 	isOnline$ = this._isOnline.asObservable();
 	isRegistered$ = this._isRegistered.asObservable();
 	updateAvailable$ = this._updateAvailable.asObservable();
+	/** Emite cuando el SW actualiza el caché en background con datos nuevos */
+	cacheUpdated$ = this._cacheUpdated.asObservable();
 
 	get isOnline(): boolean {
 		return this._isOnline.value;
@@ -77,9 +86,24 @@ export class SwService {
 			// Escuchar mensajes del Service Worker
 			navigator.serviceWorker.addEventListener('message', (event) => {
 				logger.log('[SwService] Mensaje del SW:', event.data);
+				this.handleSwMessage(event.data);
 			});
 		} catch (error) {
 			logger.error('[SwService] Error al registrar Service Worker:', error);
+		}
+	}
+
+	private handleSwMessage(data: { type: string; payload?: unknown }): void {
+		if (!data?.type) return;
+
+		switch (data.type) {
+			case 'CACHE_UPDATED':
+				const payload = data.payload as CacheUpdateEvent;
+				if (payload) {
+					logger.log('[SwService] Caché actualizado para:', payload.url);
+					this._cacheUpdated.next(payload);
+				}
+				break;
 		}
 	}
 

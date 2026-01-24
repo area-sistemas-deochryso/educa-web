@@ -2,6 +2,7 @@ import { Injectable, inject, signal, computed, DestroyRef, effect } from '@angul
 import { takeUntilDestroyed, toSignal } from '@angular/core/rxjs-interop';
 import { tap, catchError, of, Observable, map, firstValueFrom } from 'rxjs';
 
+import { logger } from '@core/helpers';
 import { AuthService } from '../auth';
 import { StorageService } from '../storage';
 import { PermisosService } from './permisos.service';
@@ -37,7 +38,11 @@ export class UserPermisosService {
 	private wasAuthenticated = false;
 
 	constructor() {
-		console.log('[UserPermisosService] Constructor - intentando cargar desde storage');
+		logger.tagged(
+			'UserPermisosService',
+			'log',
+			'Constructor - intentando cargar desde storage',
+		);
 		// Intentar cargar permisos desde storage al iniciar
 		this.loadFromStorage();
 
@@ -47,7 +52,11 @@ export class UserPermisosService {
 
 			if (!authenticated) {
 				// Usuario cerró sesión - limpiar todo
-				console.log('[UserPermisosService] Usuario no autenticado - limpiando permisos');
+				logger.tagged(
+					'UserPermisosService',
+					'log',
+					'Usuario no autenticado - limpiando permisos',
+				);
 				this._permisos.set(null);
 				this._loaded.set(false);
 				this._loading.set(false);
@@ -56,8 +65,10 @@ export class UserPermisosService {
 			} else if (!this.wasAuthenticated) {
 				// Usuario acaba de iniciar sesión (transición de no autenticado a autenticado)
 				// Forzar reset de flags para permitir nueva carga
-				console.log(
-					'[UserPermisosService] Nuevo login detectado - reseteando estado para nueva carga',
+				logger.tagged(
+					'UserPermisosService',
+					'log',
+					'Nuevo login detectado - reseteando estado para nueva carga',
 				);
 				this._permisos.set(null);
 				this._loaded.set(false);
@@ -74,17 +85,28 @@ export class UserPermisosService {
 	 * Carga los permisos desde el storage si existen
 	 */
 	private loadFromStorage(): void {
-		console.log('[UserPermisosService] loadFromStorage() - buscando en storage...');
+		logger.tagged('UserPermisosService', 'log', 'loadFromStorage() - buscando en storage...');
 		const storedPermisos = this.storageService.getPermisos();
-		console.log('[UserPermisosService] loadFromStorage() - resultado:', storedPermisos);
+		logger.tagged(
+			'UserPermisosService',
+			'log',
+			'loadFromStorage() - resultado:',
+			storedPermisos,
+		);
 		if (storedPermisos) {
 			this._permisos.set(storedPermisos);
 			this._loaded.set(true);
-			console.log(
-				'[UserPermisosService] loadFromStorage() - permisos cargados desde storage exitosamente',
+			logger.tagged(
+				'UserPermisosService',
+				'log',
+				'loadFromStorage() - permisos cargados desde storage exitosamente',
 			);
 		} else {
-			console.log('[UserPermisosService] loadFromStorage() - no hay permisos en storage');
+			logger.tagged(
+				'UserPermisosService',
+				'log',
+				'loadFromStorage() - no hay permisos en storage',
+			);
 		}
 	}
 
@@ -92,7 +114,7 @@ export class UserPermisosService {
 	 * Guarda los permisos en storage
 	 */
 	private saveToStorage(permisos: PermisosUsuarioResultado): void {
-		console.log('[UserPermisosService] saveToStorage() - guardando:', permisos);
+		logger.tagged('UserPermisosService', 'log', 'saveToStorage() - guardando:', permisos);
 		this.storageService.setPermisos(permisos);
 	}
 
@@ -142,15 +164,19 @@ export class UserPermisosService {
 	 * @returns true si los permisos se cargaron correctamente, false si falló
 	 */
 	async ensurePermisosLoaded(): Promise<boolean> {
-		console.log('[UserPermisosService] ensurePermisosLoaded() - INICIO');
-		console.log(
-			'[UserPermisosService] ensurePermisosLoaded() - isAuthenticated:',
+		logger.tagged('UserPermisosService', 'log', 'ensurePermisosLoaded() - INICIO');
+		logger.tagged(
+			'UserPermisosService',
+			'log',
+			'ensurePermisosLoaded() - isAuthenticated:',
 			this.authService.isAuthenticated,
 		);
 
 		if (!this.authService.isAuthenticated) {
-			console.log(
-				'[UserPermisosService] ensurePermisosLoaded() - No autenticado, limpiando y retornando false',
+			logger.tagged(
+				'UserPermisosService',
+				'log',
+				'ensurePermisosLoaded() - No autenticado, limpiando y retornando false',
 			);
 			this.clear();
 			return false;
@@ -158,35 +184,45 @@ export class UserPermisosService {
 
 		// Si ya están cargados y tenemos permisos, retornar éxito
 		if (this._loaded() && this._permisos() !== null) {
-			console.log(
-				'[UserPermisosService] ensurePermisosLoaded() - Ya cargados, retornando true',
+			logger.tagged(
+				'UserPermisosService',
+				'log',
+				'ensurePermisosLoaded() - Ya cargados, retornando true',
 			);
 			return true;
 		}
 
 		// Si ya intentamos y falló, retornar false sin reintentar
 		if (this._loadFailed()) {
-			console.log(
-				'[UserPermisosService] ensurePermisosLoaded() - Ya falló anteriormente, retornando false',
+			logger.tagged(
+				'UserPermisosService',
+				'log',
+				'ensurePermisosLoaded() - Ya falló anteriormente, retornando false',
 			);
 			return false;
 		}
 
 		// Si no están cargando, iniciar la carga
 		if (!this._loading()) {
-			console.log(
-				'[UserPermisosService] ensurePermisosLoaded() - Iniciando carga desde API...',
+			logger.tagged(
+				'UserPermisosService',
+				'log',
+				'ensurePermisosLoaded() - Iniciando carga desde API...',
 			);
 			this._loading.set(true);
 			this._loadFailed.set(false);
 
 			try {
-				console.log(
-					'[UserPermisosService] ensurePermisosLoaded() - Llamando getMisPermisos()...',
+				logger.tagged(
+					'UserPermisosService',
+					'log',
+					'ensurePermisosLoaded() - Llamando getMisPermisos()...',
 				);
 				const permisos = await firstValueFrom(this.permisosService.getMisPermisos());
-				console.log(
-					'[UserPermisosService] ensurePermisosLoaded() - Respuesta del API:',
+				logger.tagged(
+					'UserPermisosService',
+					'log',
+					'ensurePermisosLoaded() - Respuesta del API:',
 					permisos,
 				);
 				this._permisos.set(permisos);
@@ -196,13 +232,17 @@ export class UserPermisosService {
 				if (permisos) {
 					this.saveToStorage(permisos);
 				}
-				console.log(
-					'[UserPermisosService] ensurePermisosLoaded() - Carga exitosa, retornando true',
+				logger.tagged(
+					'UserPermisosService',
+					'log',
+					'ensurePermisosLoaded() - Carga exitosa, retornando true',
 				);
 				return true;
 			} catch (error) {
-				console.error(
-					'[UserPermisosService] ensurePermisosLoaded() - ERROR en la carga:',
+				logger.tagged(
+					'UserPermisosService',
+					'error',
+					'ensurePermisosLoaded() - ERROR en la carga:',
 					error,
 				);
 				this._loading.set(false);
@@ -213,13 +253,17 @@ export class UserPermisosService {
 		}
 
 		// Si está cargando, esperar a que termine y verificar resultado
-		console.log(
-			'[UserPermisosService] ensurePermisosLoaded() - Ya está cargando, esperando...',
+		logger.tagged(
+			'UserPermisosService',
+			'log',
+			'ensurePermisosLoaded() - Ya está cargando, esperando...',
 		);
 		await this.waitForLoaded();
 		const result = !this._loadFailed() && this._permisos() !== null;
-		console.log(
-			'[UserPermisosService] ensurePermisosLoaded() - Espera terminada, resultado:',
+		logger.tagged(
+			'UserPermisosService',
+			'log',
+			'ensurePermisosLoaded() - Espera terminada, resultado:',
 			result,
 		);
 		return result;
@@ -248,9 +292,11 @@ export class UserPermisosService {
 	tienePermiso(ruta: string): boolean {
 		const vistas = this.vistasPermitidas();
 
-		console.log('[UserPermisosService] tienePermiso("' + ruta + '")');
-		console.log(
-			'[UserPermisosService] tienePermiso - loaded:',
+		logger.tagged('UserPermisosService', 'log', 'tienePermiso("' + ruta + '")');
+		logger.tagged(
+			'UserPermisosService',
+			'log',
+			'tienePermiso - loaded:',
 			this._loaded(),
 			'vistas:',
 			vistas,
@@ -259,15 +305,21 @@ export class UserPermisosService {
 		// Si los permisos están cargados pero el array está vacío,
 		// significa que no hay permisos configurados -> permitir todo
 		if (this._loaded() && vistas.length === 0) {
-			console.log(
-				'[UserPermisosService] tienePermiso - No hay permisos configurados, permitiendo todo',
+			logger.tagged(
+				'UserPermisosService',
+				'log',
+				'tienePermiso - No hay permisos configurados, permitiendo todo',
 			);
 			return true;
 		}
 
 		// Si no hay permisos cargados aún, denegar por defecto
 		if (!this._loaded()) {
-			console.log('[UserPermisosService] tienePermiso - Permisos no cargados, denegando');
+			logger.tagged(
+				'UserPermisosService',
+				'log',
+				'tienePermiso - Permisos no cargados, denegando',
+			);
 			return false;
 		}
 
@@ -282,8 +334,10 @@ export class UserPermisosService {
 			// Solo coincidencia exacta - NO permitir acceso a rutas hijas
 			const match = rutaNormalizada === vistaNormalizada;
 			if (match) {
-				console.log(
-					'[UserPermisosService] tienePermiso - Match exacto encontrado:',
+				logger.tagged(
+					'UserPermisosService',
+					'log',
+					'tienePermiso - Match exacto encontrado:',
 					vista,
 					'===',
 					ruta,
@@ -292,7 +346,7 @@ export class UserPermisosService {
 			return match;
 		});
 
-		console.log('[UserPermisosService] tienePermiso("' + ruta + '") =', resultado);
+		logger.tagged('UserPermisosService', 'log', 'tienePermiso("' + ruta + '") =', resultado);
 		return resultado;
 	}
 

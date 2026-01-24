@@ -9,6 +9,8 @@ import {
 } from '@angular/core';
 import { RouterLink, RouterLinkActive, Router, NavigationEnd } from '@angular/router';
 import { filter } from 'rxjs';
+
+import { logger } from '@core/helpers';
 import { NavMenuItem } from '../mobile-menu';
 
 @Component({
@@ -55,17 +57,17 @@ export class NavItemComponent {
 	private debugDropdownStyles(): void {
 		const dropdown = this.elementRef.nativeElement.querySelector('.dropdown-menu');
 		if (!dropdown) {
-			console.log(`[${this.label}] dropdown-menu NOT FOUND in DOM`);
+			logger.debug(`[${this.label}] dropdown-menu NOT FOUND in DOM`);
 			return;
 		}
 
 		const styles = window.getComputedStyle(dropdown);
 		const rect = dropdown.getBoundingClientRect();
 
-		console.log(`[${this.label}] dropdown-menu DEBUG:`);
-		console.log('  children:', this.children);
-		console.log('  Element:', dropdown);
-		console.log('  BoundingClientRect:', {
+		logger.debug(`[${this.label}] dropdown-menu DEBUG:`);
+		logger.debug('  children:', this.children);
+		logger.debug('  Element:', dropdown);
+		logger.debug('  BoundingClientRect:', {
 			top: rect.top,
 			left: rect.left,
 			width: rect.width,
@@ -73,7 +75,7 @@ export class NavItemComponent {
 			bottom: rect.bottom,
 			right: rect.right,
 		});
-		console.log('  Computed Styles:', {
+		logger.debug('  Computed Styles:', {
 			display: styles.display,
 			visibility: styles.visibility,
 			opacity: styles.opacity,
@@ -100,7 +102,9 @@ export class NavItemComponent {
 		while (parent && level < 5) {
 			const parentStyles = window.getComputedStyle(parent);
 			if (parentStyles.overflow !== 'visible') {
-				console.log(`  Parent [${level}] ${parent.tagName}.${parent.className} has overflow: ${parentStyles.overflow}`);
+				logger.debug(
+					`  Parent [${level}] ${parent.tagName}.${parent.className} has overflow: ${parentStyles.overflow}`,
+				);
 			}
 			parent = parent.parentElement;
 			level++;

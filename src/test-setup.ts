@@ -10,7 +10,7 @@ class MockIntersectionObserver implements IntersectionObserver {
 	// eslint-disable-next-line unicorn/no-null
 	readonly root: Element | Document | null = null;
 	readonly rootMargin: string = '';
-	readonly thresholds: ReadonlyArray<number> = [];
+	readonly thresholds: readonly number[] = [];
 
 	constructor(private callback: IntersectionObserverCallback) {}
 

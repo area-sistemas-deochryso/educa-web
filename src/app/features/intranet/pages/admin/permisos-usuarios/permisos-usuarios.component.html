@@ -156,20 +156,21 @@
 							</div>
 						</td>
 						<td>
-							<p-tag [value]="permiso.rol" [severity]="getRolSeverity(permiso.rol)" />
+							<p-tag
+								[value]="permiso.rol"
+								[severity]="adminUtils.getRolSeverity(permiso.rol)"
+							/>
 						</td>
 						<td class="text-center">
 							<span class="count-badge">{{ permiso.vistas.length }}</span>
 						</td>
 						<td class="text-center">
 							<span class="count-badge secondary">{{
-								getModulosCount(permiso.vistas)
+								adminUtils.getModulosCount(permiso.vistas)
 							}}</span>
 						</td>
 						<td class="text-center">
-							<span class="permisos-badge">
-								<i class="pi pi-user"></i> Usuario
-							</span>
+							<span class="permisos-badge"> <i class="pi pi-user"></i> Usuario </span>
 						</td>
 						<td>
 							<div class="actions">
@@ -245,14 +246,15 @@
 					<span class="summary-label">Rol</span>
 					<p-tag
 						[value]="selectedPermiso()?.rol || ''"
-						[severity]="getRolSeverity(selectedPermiso()?.rol || '')"
+						[severity]="adminUtils.getRolSeverity(selectedPermiso()?.rol || '')"
 					/>
 				</div>
 				<div class="summary-item">
 					<span class="summary-label">Permisos</span>
 					<span class="summary-value"
 						>{{ selectedPermiso()?.vistas?.length }} vistas en
-						{{ getModulosCount(selectedPermiso()?.vistas || []) }} modulos</span
+						{{ adminUtils.getModulosCount(selectedPermiso()?.vistas || []) }}
+						modulos</span
 					>
 				</div>
 			</div>
@@ -327,7 +329,7 @@
 					}}</span>
 					<p-tag
 						[value]="selectedRol() || ''"
-						[severity]="getRolSeverity(selectedRol() || '')"
+						[severity]="adminUtils.getRolSeverity(selectedRol() || '')"
 					/>
 				</div>
 				<div class="vistas-count">
@@ -360,7 +362,11 @@
 							(onClear)="onUsuarioClear()"
 							field="nombreCompleto"
 							optionLabel="nombreCompleto"
-							[placeholder]="selectedRol() ? 'Buscar usuario por nombre...' : 'Seleccione un rol primero'"
+							[placeholder]="
+								selectedRol()
+									? 'Buscar usuario por nombre...'
+									: 'Seleccione un rol primero'
+							"
 							[disabled]="!selectedRol()"
 							[style]="{ width: '100%' }"
 							[inputStyle]="{ width: '100%' }"
@@ -372,7 +378,9 @@
 								<div class="autocomplete-item">
 									<i class="pi pi-user"></i>
 									<div class="user-info-autocomplete">
-										<span class="user-name-autocomplete">{{ usuario.nombreCompleto }}</span>
+										<span class="user-name-autocomplete">{{
+											usuario.nombreCompleto
+										}}</span>
 										@if (usuario.dni) {
 											<span class="user-dni">DNI: {{ usuario.dni }}</span>
 										}

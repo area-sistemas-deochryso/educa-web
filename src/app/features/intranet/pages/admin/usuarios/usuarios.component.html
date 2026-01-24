@@ -175,12 +175,15 @@
 							</div>
 						</td>
 						<td>
-							<p-tag [value]="usuario.rol" [severity]="getRolSeverity(usuario.rol)" />
+							<p-tag
+								[value]="usuario.rol"
+								[severity]="adminUtils.getRolSeverity(usuario.rol)"
+							/>
 						</td>
 						<td class="text-center">
 							<p-tag
 								[value]="usuario.estado ? 'Activo' : 'Inactivo'"
-								[severity]="getEstadoSeverity(usuario.estado)"
+								[severity]="adminUtils.getEstadoSeverity(usuario.estado)"
 							/>
 						</td>
 						<td>
@@ -252,7 +255,7 @@
 
 			<p-tag
 				[value]="selectedUsuario()?.rol || ''"
-				[severity]="getRolSeverity(selectedUsuario()?.rol || '')"
+				[severity]="adminUtils.getRolSeverity(selectedUsuario()?.rol || '')"
 			/>
 
 			<div class="detail-info">
@@ -264,7 +267,9 @@
 					<span class="info-label">Estado</span>
 					<p-tag
 						[value]="selectedUsuario()?.estado ? 'Activo' : 'Inactivo'"
-						[severity]="getEstadoSeverity(selectedUsuario()?.estado || false)"
+						[severity]="
+							adminUtils.getEstadoSeverity(selectedUsuario()?.estado || false)
+						"
 					/>
 				</div>
 				@if (selectedUsuario()?.correo) {
@@ -370,7 +375,9 @@
 			</div>
 
 			<div class="field">
-				<label for="contrasena">{{ isEditing() ? 'Nueva Contraseña' : 'Contraseña *' }}</label>
+				<label for="contrasena">{{
+					isEditing() ? 'Nueva Contraseña' : 'Contraseña *'
+				}}</label>
 				<p-password
 					id="contrasena"
 					[ngModel]="formData().contrasena"

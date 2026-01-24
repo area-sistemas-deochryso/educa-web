@@ -8,8 +8,8 @@ describe('SessionStorageService', () => {
 	let service: SessionStorageService;
 
 	// Mock storage
-	let mockSessionStorage: { [key: string]: string };
-	let mockLocalStorage: { [key: string]: string };
+	let mockSessionStorage: Record<string, string>;
+	let mockLocalStorage: Record<string, string>;
 
 	beforeEach(() => {
 		mockSessionStorage = {};

@@ -145,10 +145,7 @@ export class PermisosService {
 
 	// ========== BÚSQUEDA DE USUARIOS ==========
 
-	buscarUsuarios(
-		termino?: string,
-		rol?: string,
-	): Observable<UsuarioBusquedaResultado> {
+	buscarUsuarios(termino?: string, rol?: string): Observable<UsuarioBusquedaResultado> {
 		const params: Record<string, string> = {};
 		if (termino) params['termino'] = termino;
 		if (rol) params['rol'] = rol;

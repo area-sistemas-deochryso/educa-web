@@ -36,7 +36,10 @@
 								@for (child of item.children; track child.label) {
 									@if (child.children && child.children.length > 0) {
 										<!-- Nested parent -->
-										<div class="nav-group nested" [class.expanded]="isExpanded(child.label)">
+										<div
+											class="nav-group nested"
+											[class.expanded]="isExpanded(child.label)"
+										>
 											<button
 												class="mobile-nav-item parent nested"
 												(click)="toggleSubmenu(child.label)"
@@ -47,7 +50,10 @@
 											</button>
 											@if (isExpanded(child.label)) {
 												<div class="submenu nested">
-													@for (grandchild of child.children; track grandchild.label) {
+													@for (
+														grandchild of child.children;
+														track grandchild.label
+													) {
 														<a
 															[routerLink]="grandchild.route"
 															routerLinkActive="active"
@@ -69,7 +75,9 @@
 										<a
 											[routerLink]="child.route"
 											routerLinkActive="active"
-											[routerLinkActiveOptions]="{ exact: child.exact ?? false }"
+											[routerLinkActiveOptions]="{
+												exact: child.exact ?? false,
+											}"
 											class="mobile-nav-item leaf"
 											(click)="close()"
 										>

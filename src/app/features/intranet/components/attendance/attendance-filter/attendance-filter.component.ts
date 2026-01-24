@@ -44,8 +44,8 @@ export class AttendanceFilterComponent implements OnInit {
 	gradoOptions = GRADOS;
 	seccionOptions = SECCIONES;
 
-	selectedGrado: string = '';
-	selectedSeccion: string = '';
+	selectedGrado = '';
+	selectedSeccion = '';
 
 	ngOnInit(): void {
 		this.selectedGrado = this.grado();

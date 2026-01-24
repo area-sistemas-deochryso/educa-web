@@ -1,8 +1,16 @@
-import { Component, DestroyRef, inject, OnInit, signal, computed } from '@angular/core';
+import {
+	ChangeDetectionStrategy,
+	Component,
+	DestroyRef,
+	inject,
+	OnInit,
+	signal,
+	computed,
+} from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
-import { forkJoin, switchMap } from 'rxjs';
+import { forkJoin } from 'rxjs';
 
 import { TableModule } from 'primeng/table';
 import { ButtonModule } from 'primeng/button';
@@ -16,7 +24,16 @@ import { CheckboxModule } from 'primeng/checkbox';
 import { DrawerModule } from 'primeng/drawer';
 import { SelectModule } from 'primeng/select';
 
-import { PermisosService, PermisoRol, Vista, ROLES_DISPONIBLES, RolTipo } from '@core/services';
+import { logger } from '@core/helpers';
+import {
+	PermisosService,
+	PermisoRol,
+	Vista,
+	ROLES_DISPONIBLES,
+	RolTipo,
+	ErrorHandlerService,
+} from '@core/services';
+import { AdminUtilsService } from '@shared/services';
 
 interface ModuloVistas {
 	nombre: string;
@@ -45,10 +62,13 @@ interface ModuloVistas {
 	],
 	templateUrl: './permisos-roles.component.html',
 	styleUrl: './permisos-roles.component.scss',
+	changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class PermisosRolesComponent implements OnInit {
 	private permisosService = inject(PermisosService);
 	private destroyRef = inject(DestroyRef);
+	private errorHandler = inject(ErrorHandlerService);
+	readonly adminUtils = inject(AdminUtilsService);
 
 	// State
 	permisosRol = signal<PermisoRol[]>([]);
@@ -82,7 +102,7 @@ export class PermisosRolesComponent implements OnInit {
 	totalModulos = computed(() => {
 		const modulos = new Set<string>();
 		this.vistas().forEach((v) => {
-			const modulo = this.getModuloFromRuta(v.ruta);
+			const modulo = this.adminUtils.getModuloFromRuta(v.ruta);
 			modulos.add(modulo);
 		});
 		return modulos.size;
@@ -127,7 +147,9 @@ export class PermisosRolesComponent implements OnInit {
 					this.updateRolesSelectOptions();
 					this.loading.set(false);
 				},
-				error: () => {
+				error: (err) => {
+					logger.error('Error al cargar datos:', err);
+					this.errorHandler.showError('Error', 'No se pudieron cargar los permisos');
 					this.loading.set(false);
 				},
 			});
@@ -208,29 +230,17 @@ export class PermisosRolesComponent implements OnInit {
 			return;
 		}
 
-		operation$
-			.pipe(
-				switchMap(() =>
-					forkJoin({
-						vistas: this.permisosService.getVistas(),
-						permisosRol: this.permisosService.getPermisosRol(),
-					}),
-				),
-				takeUntilDestroyed(this.destroyRef),
-			)
-			.subscribe({
-				next: ({ vistas, permisosRol }) => {
-					this.vistas.set(vistas.filter((v) => v.estado === 1));
-					this.permisosRol.set(permisosRol);
-					this.updateRolesSelectOptions();
-					this.loading.set(false);
-					this.hideDialog();
-				},
-				error: (err) => {
-					console.error('Error:', err);
-					this.loading.set(false);
-				},
-			});
+		operation$.pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
+			next: () => {
+				this.hideDialog();
+				this.loadData();
+			},
+			error: (err) => {
+				logger.error('Error:', err);
+				this.errorHandler.showError('Error', 'No se pudo guardar el permiso');
+				this.loading.set(false);
+			},
+		});
 	}
 
 	deletePermiso(permiso: PermisoRol): void {
@@ -238,24 +248,12 @@ export class PermisosRolesComponent implements OnInit {
 			this.loading.set(true);
 			this.permisosService
 				.eliminarPermisoRol(permiso.id)
-				.pipe(
-					switchMap(() =>
-						forkJoin({
-							vistas: this.permisosService.getVistas(),
-							permisosRol: this.permisosService.getPermisosRol(),
-						}),
-					),
-					takeUntilDestroyed(this.destroyRef),
-				)
+				.pipe(takeUntilDestroyed(this.destroyRef))
 				.subscribe({
-					next: ({ vistas, permisosRol }) => {
-						this.vistas.set(vistas.filter((v) => v.estado === 1));
-						this.permisosRol.set(permisosRol);
-						this.updateRolesSelectOptions();
-						this.loading.set(false);
-					},
+					next: () => this.loadData(),
 					error: (err) => {
-						console.error('Error al eliminar:', err);
+						logger.error('Error al eliminar:', err);
+						this.errorHandler.showError('Error', 'No se pudo eliminar el permiso');
 						this.loading.set(false);
 					},
 				});
@@ -263,19 +261,13 @@ export class PermisosRolesComponent implements OnInit {
 	}
 
 	// === Module/Vista helpers ===
-	getModuloFromRuta(ruta: string): string {
-		const cleanRuta = ruta.startsWith('/') ? ruta.substring(1) : ruta;
-		const parts = cleanRuta.split('/');
-		return parts[0] || 'general';
-	}
-
 	private buildModulosVistas(vistasSeleccionadas: string[]): void {
 		const vistasActivas = this.vistas();
 		const modulosMap = new Map<string, Vista[]>();
 
 		// Agrupar vistas por módulo
 		vistasActivas.forEach((vista) => {
-			const modulo = this.getModuloFromRuta(vista.ruta);
+			const modulo = this.adminUtils.getModuloFromRuta(vista.ruta);
 			const moduloCapitalized = modulo.charAt(0).toUpperCase() + modulo.slice(1);
 
 			if (!modulosMap.has(moduloCapitalized)) {
@@ -356,30 +348,8 @@ export class PermisosRolesComponent implements OnInit {
 	}
 
 	// === UI Helpers ===
-	getRolSeverity(rol: string): 'success' | 'info' | 'warn' | 'danger' | 'secondary' {
-		switch (rol) {
-			case 'Director':
-				return 'danger';
-			case 'Profesor':
-				return 'warn';
-			case 'Apoderado':
-				return 'info';
-			case 'Estudiante':
-				return 'success';
-			default:
-				return 'secondary';
-		}
-	}
-
-	getModulosCount(vistas: string[]): number {
-		const modulos = new Set<string>();
-		vistas.forEach((v) => modulos.add(this.getModuloFromRuta(v)));
-		return modulos.size;
-	}
-
 	getVistasCountLabel(): string {
-		const count = this.selectedVistas().length;
-		return count === 1 ? '1 vista seleccionada' : `${count} vistas seleccionadas`;
+		return this.adminUtils.getVistasCountLabel(this.selectedVistas().length);
 	}
 
 	getModuloVistasForDetail(): ModuloVistas[] {
@@ -390,7 +360,7 @@ export class PermisosRolesComponent implements OnInit {
 		const vistasActivas = this.vistas();
 
 		permiso.vistas.forEach((ruta) => {
-			const modulo = this.getModuloFromRuta(ruta);
+			const modulo = this.adminUtils.getModuloFromRuta(ruta);
 			const moduloCapitalized = modulo.charAt(0).toUpperCase() + modulo.slice(1);
 			const vista = vistasActivas.find((v) => v.ruta === ruta);
 

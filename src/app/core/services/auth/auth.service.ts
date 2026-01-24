@@ -72,7 +72,7 @@ export class AuthService {
 		dni: string,
 		password: string,
 		rol: UserRole,
-		rememberMe: boolean = false,
+		rememberMe = false,
 	): Observable<LoginResponse> {
 		if (this.isBlocked) {
 			return of({

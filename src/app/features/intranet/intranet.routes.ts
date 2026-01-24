@@ -66,8 +66,7 @@ export const INTRANET_ROUTES: Routes = [
 			},
 			{
 				path: 'admin/vistas',
-				loadComponent: () =>
-					import('./pages/admin/vistas').then((m) => m.VistasComponent),
+				loadComponent: () => import('./pages/admin/vistas').then((m) => m.VistasComponent),
 				title: 'Intranet - Gestión de Vistas',
 			},
 		],

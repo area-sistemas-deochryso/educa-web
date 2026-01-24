@@ -7,7 +7,7 @@ export class SpeechService {
 	private synthesis = window.speechSynthesis;
 	readonly isSpeaking = signal(false);
 
-	speak(text: string, lang: string = 'es-ES'): void {
+	speak(text: string, lang = 'es-ES'): void {
 		if (!this.synthesis) return;
 
 		this.stop();

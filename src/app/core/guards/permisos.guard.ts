@@ -1,6 +1,7 @@
 import { inject } from '@angular/core';
 import { CanActivateFn, Router, ActivatedRouteSnapshot } from '@angular/router';
 
+import { logger } from '@core/helpers';
 import { AuthService, UserPermisosService, ErrorHandlerService } from '@core/services';
 
 /**
@@ -17,20 +18,24 @@ export const permisosGuard: CanActivateFn = async (route: ActivatedRouteSnapshot
 
 	// Si no está autenticado, no verificar permisos (el authGuard se encarga)
 	if (!authService.isAuthenticated) {
-		console.log('[PermisosGuard] No autenticado, permitiendo paso (authGuard se encarga)');
+		logger.tagged(
+			'PermisosGuard',
+			'log',
+			'No autenticado, permitiendo paso (authGuard se encarga)',
+		);
 		return true;
 	}
 
 	// Construir la ruta completa desde la raíz
 	const fullPath = getFullPath(route);
-	console.log('[PermisosGuard] Verificando permisos para:', fullPath);
+	logger.tagged('PermisosGuard', 'log', 'Verificando permisos para:', fullPath);
 
 	// Esperar a que los permisos estén cargados
 	const permisosLoaded = await userPermisosService.ensurePermisosLoaded();
 
 	// Si falló la carga de permisos, redirigir al login
 	if (!permisosLoaded) {
-		console.log('[PermisosGuard] Fallo al cargar permisos, redirigiendo a login');
+		logger.tagged('PermisosGuard', 'log', 'Fallo al cargar permisos, redirigiendo a login');
 		authService.logout();
 		router.navigate(['/intranet/login']);
 		return false;
@@ -40,7 +45,13 @@ export const permisosGuard: CanActivateFn = async (route: ActivatedRouteSnapshot
 	const tienePermiso = userPermisosService.tienePermiso(fullPath);
 
 	if (!tienePermiso) {
-		console.log('[PermisosGuard] Sin permiso para:', fullPath, '- Redirigiendo a /intranet');
+		logger.tagged(
+			'PermisosGuard',
+			'log',
+			'Sin permiso para:',
+			fullPath,
+			'- Redirigiendo a /intranet',
+		);
 		errorHandler.showWarning(
 			'Acceso denegado',
 			'No cuenta con los permisos suficientes para acceder a esta vista.',
@@ -49,7 +60,7 @@ export const permisosGuard: CanActivateFn = async (route: ActivatedRouteSnapshot
 		return false;
 	}
 
-	console.log('[PermisosGuard] Acceso permitido a:', fullPath);
+	logger.tagged('PermisosGuard', 'log', 'Acceso permitido a:', fullPath);
 	return true;
 };
 

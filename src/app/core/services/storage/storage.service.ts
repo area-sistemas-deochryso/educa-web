@@ -40,12 +40,7 @@ export class StorageService {
 		return this.session.getToken();
 	}
 
-	setToken(
-		token: string,
-		rememberMe: boolean = false,
-		nombreCompleto?: string,
-		rol?: string,
-	): void {
+	setToken(token: string, rememberMe = false, nombreCompleto?: string, rol?: string): void {
 		this.session.setToken(token, rememberMe, nombreCompleto, rol);
 	}
 
@@ -61,7 +56,7 @@ export class StorageService {
 		return this.session.getUser();
 	}
 
-	setUser(user: AuthUser, rememberMe: boolean = false): void {
+	setUser(user: AuthUser, rememberMe = false): void {
 		this.session.setUser(user, rememberMe);
 	}
 
@@ -81,7 +76,7 @@ export class StorageService {
 		this.session.clearRememberToken();
 	}
 
-	getAllPersistentTokens(): Array<{ token: string; sessionKey: string }> {
+	getAllPersistentTokens(): { token: string; sessionKey: string }[] {
 		return this.session.getAllPersistentTokens();
 	}
 

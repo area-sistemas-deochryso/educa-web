@@ -109,7 +109,7 @@ export class CalendarUtilsService {
 			firstMonday = new Date(year, monthIndex, 1 - (firstDayOfWeek - 1));
 		}
 
-		let currentMonday = new Date(firstMonday);
+		const currentMonday = new Date(firstMonday);
 
 		// Iterar mientras el lunes actual pueda tener días del mes
 		while (currentMonday.getTime() <= lastDay.getTime()) {

@@ -3,9 +3,7 @@ import { Observable, catchError, of, map } from 'rxjs';
 import { BaseHttpService } from '@core/services/http';
 import { logger } from '@core/helpers';
 
-export interface QueryParams {
-	[key: string]: string | number | boolean | undefined;
-}
+export type QueryParams = Record<string, string | number | boolean | undefined>;
 
 export interface PaginatedResponse<T> {
 	data: T[];

@@ -110,20 +110,21 @@
 				<ng-template #body let-permiso>
 					<tr>
 						<td>
-							<p-tag [value]="permiso.rol" [severity]="getRolSeverity(permiso.rol)" />
+							<p-tag
+								[value]="permiso.rol"
+								[severity]="adminUtils.getRolSeverity(permiso.rol)"
+							/>
 						</td>
 						<td class="text-center">
 							<span class="count-badge">{{ permiso.vistas.length }}</span>
 						</td>
 						<td class="text-center">
 							<span class="count-badge secondary">{{
-								getModulosCount(permiso.vistas)
+								adminUtils.getModulosCount(permiso.vistas)
 							}}</span>
 						</td>
 						<td class="text-center">
-							<span class="permisos-badge">
-								<i class="pi pi-id-card"></i> Rol
-							</span>
+							<span class="permisos-badge"> <i class="pi pi-id-card"></i> Rol </span>
 						</td>
 						<td>
 							<span class="role-description">
@@ -214,7 +215,7 @@
 					<span class="summary-label">Rol</span>
 					<p-tag
 						[value]="selectedPermiso()?.rol || ''"
-						[severity]="getRolSeverity(selectedPermiso()?.rol || '')"
+						[severity]="adminUtils.getRolSeverity(selectedPermiso()?.rol || '')"
 					/>
 				</div>
 				<div class="summary-item">
@@ -224,7 +225,7 @@
 				<div class="summary-item">
 					<span class="summary-label">Modulos</span>
 					<span class="summary-value">{{
-						getModulosCount(selectedPermiso()?.vistas || [])
+						adminUtils.getModulosCount(selectedPermiso()?.vistas || [])
 					}}</span>
 				</div>
 			</div>
@@ -292,7 +293,7 @@
 					<i class="pi pi-id-card"></i>
 					<p-tag
 						[value]="selectedRol() || ''"
-						[severity]="getRolSeverity(selectedRol() || '')"
+						[severity]="adminUtils.getRolSeverity(selectedRol() || '')"
 					/>
 				</div>
 				<div class="vistas-count">

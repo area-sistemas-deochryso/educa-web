@@ -65,7 +65,12 @@ export class CalendaryComponent implements OnInit, AfterViewInit {
 		const baseDays = this.calendarUtils.generateMonthDays(year, month);
 
 		const days: CalendarDay[] = baseDays.map((dayInfo) =>
-			this.createCalendarDay(dayInfo.date, dayInfo.fullDate, dayInfo.isCurrentMonth, dayInfo.isToday),
+			this.createCalendarDay(
+				dayInfo.date,
+				dayInfo.fullDate,
+				dayInfo.isCurrentMonth,
+				dayInfo.isToday,
+			),
 		);
 
 		return {

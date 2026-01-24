@@ -214,12 +214,7 @@ export class SessionStorageService {
 		return sessionToken;
 	}
 
-	setToken(
-		token: string,
-		rememberMe: boolean = false,
-		nombreCompleto?: string,
-		rol?: string,
-	): void {
+	setToken(token: string, rememberMe = false, nombreCompleto?: string, rol?: string): void {
 		logger.log('[SessionStorage] setToken called with:', {
 			rememberMe,
 			nombreCompleto,
@@ -316,7 +311,7 @@ export class SessionStorageService {
 		return this.getJSON<AuthUser>(sessionUserKey);
 	}
 
-	setUser(user: AuthUser, rememberMe: boolean = false): void {
+	setUser(user: AuthUser, rememberMe = false): void {
 		// NOTA: No llamar a cleanPreviousUserSessions aquí porque ya se llamó en setToken
 		// y borraría el token que acabamos de guardar
 
@@ -403,10 +398,10 @@ export class SessionStorageService {
 	 * Obtiene todos los tokens persistentes guardados de sesiones recordadas
 	 * @returns Array de objetos con token y sessionKey
 	 */
-	getAllPersistentTokens(): Array<{ token: string; sessionKey: string }> {
+	getAllPersistentTokens(): { token: string; sessionKey: string }[] {
 		if (!this.isBrowser) return [];
 
-		const tokens: Array<{ token: string; sessionKey: string }> = [];
+		const tokens: { token: string; sessionKey: string }[] = [];
 		const prefix = LOCAL_KEYS.TOKEN_PREFIX + '_';
 
 		for (let i = 0; i < localStorage.length; i++) {

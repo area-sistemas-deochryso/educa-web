@@ -63,11 +63,7 @@ export class UsuariosService {
 			.pipe(catchError(() => of(null)));
 	}
 
-	verificarDni(
-		rol: string,
-		dni: string,
-		exceptoId?: number,
-	): Observable<{ existe: boolean }> {
+	verificarDni(rol: string, dni: string, exceptoId?: number): Observable<{ existe: boolean }> {
 		const params: Record<string, string> = {};
 		if (exceptoId) params['exceptoId'] = exceptoId.toString();
 

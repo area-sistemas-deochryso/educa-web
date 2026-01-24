@@ -238,7 +238,12 @@ function createCacheResponse(data, cacheStatus) {
 	});
 }
 
-// Estrategia Cache First: devolver cache inmediatamente, actualizar en segundo plano
+// Comparar dos objetos/arrays para detectar cambios
+function hasDataChanged(oldData, newData) {
+	return JSON.stringify(oldData) !== JSON.stringify(newData);
+}
+
+// Estrategia Stale-While-Revalidate: devolver cache inmediatamente, actualizar y notificar
 async function handleFetch(request) {
 	const url = request.url;
 	console.log('[SW] Interceptando:', url);
@@ -254,9 +259,23 @@ async function handleFetch(request) {
 			fetch(request.clone())
 				.then(response => {
 					if (response.ok) {
-						response.json().then(data => {
-							saveToCache(url, data);
-							console.log('[SW] Cache actualizado en segundo plano');
+						response.json().then(async data => {
+							// Solo notificar si los datos realmente cambiaron
+							if (hasDataChanged(cachedData, data)) {
+								await saveToCache(url, data);
+								console.log('[SW] Cache actualizado - notificando a la app');
+								// Notificar a la app que hay datos nuevos
+								notifyClients({
+									type: 'CACHE_UPDATED',
+									payload: {
+										url: normalizeUrl(url),
+										originalUrl: url,
+										data: data,
+									},
+								});
+							} else {
+								console.log('[SW] Datos sin cambios, no se notifica');
+							}
 						});
 					}
 				})

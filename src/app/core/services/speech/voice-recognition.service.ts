@@ -45,7 +45,7 @@ export class VoiceRecognitionService {
 
 	private activeInput: HTMLInputElement | HTMLTextAreaElement | null = null;
 	private commands: VoiceCommand[] = [];
-	private registeredModals: Map<string, RegisteredModal> = new Map();
+	private registeredModals = new Map<string, RegisteredModal>();
 	private commandListeners: ((command: string, params?: string) => void)[] = [];
 
 	/** Audio para sonido de inicio de grabación (estilo WhatsApp) */
