@@ -2,6 +2,7 @@ import {
 	ChangeDetectionStrategy,
 	Component,
 	inject,
+	input,
 	output,
 	signal,
 	viewChild,
@@ -22,6 +23,7 @@ import { UserProfileService } from '@core/services';
 export class UserProfileMenuComponent {
 	private userProfile = inject(UserProfileService);
 
+	popoverStyleClass = input<string>('');
 	logoutClick = output<void>();
 
 	readonly popover = viewChild.required<Popover>('profilePopover');

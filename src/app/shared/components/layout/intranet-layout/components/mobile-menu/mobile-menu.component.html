@@ -105,9 +105,11 @@
 			}
 		</div>
 
-		<button class="mobile-logout-btn" (click)="onLogout()">
-			<i class="pi pi-sign-out"></i>
-			<span>Cerrar sesión</span>
-		</button>
+		<div class="user-profile-section">
+			<app-user-profile-menu
+				popoverStyleClass="profile-popover-mobile"
+				(logoutClick)="onLogout()"
+			/>
+		</div>
 	</nav>
 }

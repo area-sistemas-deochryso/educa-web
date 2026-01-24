@@ -91,7 +91,7 @@ $priority-urgent: #dc2626;
 		}
 	}
 
-	span {
+	> span {
 		font-weight: 600;
 		font-size: 1rem;
 		color: var(--intranet-alternative-text-color, #2c2c2c);
@@ -193,11 +193,12 @@ $priority-urgent: #dc2626;
 
 	&.badge-high {
 		background: #ffcc0c;
-		color: var(--intranet-default-text-color, #171717);
+		color: white;
 	}
 
 	&.badge-medium {
 		background: var(--intranet-accent-color-blue, #253470);
+		color: white;
 	}
 
 	&.badge-low {

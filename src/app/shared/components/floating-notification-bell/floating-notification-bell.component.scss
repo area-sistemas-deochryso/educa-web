@@ -150,7 +150,7 @@ $priority-low: var(--intranet-accent-color-green, #77a02d); // Verde info
 	right: 0;
 	bottom: 0;
 	background: rgba(0, 0, 0, 0.3);
-	z-index: 998;
+	z-index: 996; // Debajo del mobile-nav (z-index 1000)
 	backdrop-filter: blur(2px);
 }
 
@@ -162,7 +162,7 @@ $priority-low: var(--intranet-accent-color-green, #77a02d); // Verde info
 	position: fixed;
 	top: 100px;
 	right: 24px;
-	z-index: 1000;
+	z-index: 998; // Debajo del mobile-nav (z-index 1000)
 
 	&.has-unread {
 		.notification-bell {
@@ -332,7 +332,7 @@ $priority-low: var(--intranet-accent-color-green, #77a02d); // Verde info
 	padding: 1.75rem;
 	border: 2px solid var(--intranet-accent-color-yellow, #ffcc0c);
 	box-shadow: 0 12px 40px rgba(0, 0, 0, 0.18);
-	z-index: 999;
+	z-index: 997; // Debajo del mobile-nav (z-index 1000)
 	backdrop-filter: blur(12px);
 }
 

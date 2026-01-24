@@ -16,7 +16,7 @@
 
 <p-popover
 	#profilePopover
-	class="profile-popover"
+	[styleClass]="'profile-popover ' + popoverStyleClass()"
 	(onShow)="onPopoverShow()"
 	(onHide)="onPopoverHide()"
 >

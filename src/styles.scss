@@ -602,3 +602,28 @@ strong {
 		}
 	}
 }
+
+/*---------------------------------------
+  USER PROFILE POPOVER - ARROW POSITION
+-----------------------------------------*/
+.p-popover.profile-popover {
+	// Mover el popover a la izquierda para alinear la flecha con el chevron
+	margin-left: -3rem !important;
+
+	// Mover la flecha al lado derecho (cerca del chevron)
+	&::before,
+	&::after {
+		left: auto !important;
+		right: 1rem !important;
+	}
+}
+
+/*---------------------------------------
+  MOBILE MENU - USER PROFILE POPOVER FIX
+-----------------------------------------*/
+.p-popover.profile-popover-mobile {
+	// Posicionar dentro del mobile-nav sin overflow
+	width: calc(280px - 2rem) !important;
+	max-width: calc(80vw - 2rem) !important;
+	translate: 2rem 0;
+}

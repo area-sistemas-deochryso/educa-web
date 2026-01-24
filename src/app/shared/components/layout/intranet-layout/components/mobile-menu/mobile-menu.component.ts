@@ -1,5 +1,6 @@
-import { Component, Input, Output, EventEmitter, signal } from '@angular/core';
+import { Component, Input, output, signal } from '@angular/core';
 import { RouterLink, RouterLinkActive } from '@angular/router';
+import { UserProfileMenuComponent } from '../user-profile-menu';
 
 export interface NavMenuItem {
 	route?: string;
@@ -12,13 +13,13 @@ export interface NavMenuItem {
 @Component({
 	selector: 'app-mobile-menu',
 	standalone: true,
-	imports: [RouterLink, RouterLinkActive],
+	imports: [RouterLink, RouterLinkActive, UserProfileMenuComponent],
 	templateUrl: './mobile-menu.component.html',
 	styleUrl: './mobile-menu.component.scss',
 })
 export class MobileMenuComponent {
 	@Input({ required: true }) items: NavMenuItem[] = [];
-	@Output() logoutClick = new EventEmitter<void>();
+	logoutClick = output<void>();
 
 	isOpen = signal(false);
 	expandedItems = signal<Set<string>>(new Set());

@@ -61,7 +61,7 @@ $priority-urgent: #dc2626;
 	position: fixed;
 	top: 100px;
 	right: 24px;
-	z-index: 1000;
+	z-index: 998; // Debajo del mobile-nav (z-index 1000)
 
 	&.has-unread {
 		.notification-bell {
