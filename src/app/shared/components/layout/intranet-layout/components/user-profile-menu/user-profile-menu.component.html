@@ -1,0 +1,37 @@
+<button
+	class="profile-trigger"
+	[class.open]="isOpen()"
+	(click)="toggleMenu($event)"
+	type="button"
+>
+	<div class="profile-avatar-wrapper">
+		<p-avatar [label]="initials()" shape="circle" size="normal" class="profile-avatar" />
+	</div>
+	<div class="profile-info">
+		<span class="profile-name">{{ displayName() }}</span>
+		<span class="profile-role">{{ userRole() }}</span>
+	</div>
+	<i class="pi pi-chevron-down chevron-icon"></i>
+</button>
+
+<p-popover
+	#profilePopover
+	class="profile-popover"
+	(onShow)="onPopoverShow()"
+	(onHide)="onPopoverHide()"
+>
+	<div class="popover-content">
+		<div class="popover-header">
+			<p-avatar [label]="initials()" shape="circle" size="large" class="popover-avatar" />
+			<div class="popover-user-info">
+				<span class="popover-name">{{ displayName() }}</span>
+				<span class="popover-role">{{ userRole() }}</span>
+			</div>
+		</div>
+		<div class="popover-divider"></div>
+		<button class="logout-btn" (click)="onLogout()" type="button">
+			<i class="pi pi-sign-out"></i>
+			<span>Cerrar sesión</span>
+		</button>
+	</div>
+</p-popover>

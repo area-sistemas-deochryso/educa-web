@@ -5,7 +5,7 @@ import { FloatingNotificationBellComponent } from '@shared/components/floating-n
 import { AuthService, UserPermisosService, SwService } from '@core/services';
 import {
 	NavItemComponent,
-	LogoutButtonComponent,
+	UserProfileMenuComponent,
 	MobileMenuComponent,
 	NavMenuItem,
 } from './components';
@@ -19,7 +19,7 @@ import { INTRANET_MENU, NavItemWithPermiso } from './intranet-menu.config';
 		VoiceButtonComponent,
 		FloatingNotificationBellComponent,
 		NavItemComponent,
-		LogoutButtonComponent,
+		UserProfileMenuComponent,
 		MobileMenuComponent,
 	],
 	templateUrl: './intranet-layout.component.html',
