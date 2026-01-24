@@ -37,7 +37,7 @@ function normalizeUrl(url) {
 	try {
 		const urlObj = new URL(url);
 		// Remover parámetros que cambian frecuentemente pero mantener los importantes
-		const paramsToKeep = ['mes', 'anio', 'month', 'year', 'id', 'page', 'limit'];
+		const paramsToKeep = ['mes', 'anio', 'month', 'year', 'id', 'page', 'limit', 'grado', 'seccion'];
 		const newParams = new URLSearchParams();
 
 		for (const [key, value] of urlObj.searchParams) {

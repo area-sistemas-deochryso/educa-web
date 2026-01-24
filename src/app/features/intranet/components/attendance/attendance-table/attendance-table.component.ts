@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, input, output } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, input, output } from '@angular/core';
 import { DatePipe } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { TableModule } from 'primeng/table';
@@ -43,16 +43,15 @@ export class AttendanceTableComponent {
 
 	getStatusClass = getStatusClass;
 
-	get hijosOptions(): HijoOption[] {
-		return this.hijos().map((h) => ({
+	// Computed signals para reactividad con OnPush
+	readonly hijosOptions = computed<HijoOption[]>(() =>
+		this.hijos().map((h) => ({
 			label: `${h.nombreCompleto} (${h.grado} - ${h.seccion})`,
 			value: h.estudianteId,
-		}));
-	}
+		})),
+	);
 
-	get hasHijos(): boolean {
-		return this.hijos().length > 0;
-	}
+	readonly hasHijos = computed(() => this.hijos().length > 0);
 
 	isDayValid(day: AttendanceDay): boolean {
 		return day.date !== null;

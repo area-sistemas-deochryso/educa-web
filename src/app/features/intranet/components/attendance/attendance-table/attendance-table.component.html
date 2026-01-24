@@ -2,10 +2,10 @@
 	<div class="section-header">
 		<div class="section-title-row">
 			<h2>
-				@if (hasHijos) {
+				@if (hasHijos()) {
 					{{ table().title.split(' de ')[0] }} de
 					<p-select
-						[options]="hijosOptions"
+						[options]="hijosOptions()"
 						[ngModel]="selectedHijoId()"
 						(ngModelChange)="onHijoChange($event)"
 						optionLabel="label"
