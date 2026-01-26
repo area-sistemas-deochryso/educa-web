@@ -9,7 +9,6 @@ import {
 	SalonProfesor,
 	StorageService,
 	UserProfileService,
-	AppUserRole,
 } from '@core/services';
 import { AttendanceDataService } from './attendance-data.service';
 import { AttendanceTable } from '../../pages/attendance-component/attendance.types';
@@ -168,7 +167,7 @@ export class AttendanceFacade {
 						this.salidas.set(tables.salidas);
 					}
 				},
-				error: (err) => {
+				error: () => {
 					this.error.set('Error al cargar asistencias');
 				},
 			});

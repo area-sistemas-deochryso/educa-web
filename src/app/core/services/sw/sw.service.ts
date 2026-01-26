@@ -97,13 +97,14 @@ export class SwService {
 		if (!data?.type) return;
 
 		switch (data.type) {
-			case 'CACHE_UPDATED':
+			case 'CACHE_UPDATED': {
 				const payload = data.payload as CacheUpdateEvent;
 				if (payload) {
 					logger.log('[SwService] Caché actualizado para:', payload.url);
 					this._cacheUpdated.next(payload);
 				}
 				break;
+			}
 		}
 	}
 

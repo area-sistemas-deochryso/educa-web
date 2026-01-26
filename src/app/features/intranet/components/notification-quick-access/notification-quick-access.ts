@@ -8,7 +8,7 @@ import { NotificationsService } from '@core/services';
 	templateUrl: './notification-quick-access.html',
 	styleUrl: './notification-quick-access.scss',
 })
-export class NotificationQuickAccess {
+export class NotificationQuickAccessComponent {
 	private notificationsService = inject(NotificationsService);
 
 	unreadCount = this.notificationsService.unreadCount;

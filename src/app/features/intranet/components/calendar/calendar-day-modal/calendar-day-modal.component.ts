@@ -12,10 +12,10 @@ export class CalendarDayModalComponent {
 	visible = input.required<boolean>();
 	data = input.required<ModalData | null>();
 
-	close = output<void>();
+	closeModal = output<void>();
 
 	onClose(): void {
-		this.close.emit();
+		this.closeModal.emit();
 	}
 
 	onOverlayClick(event: MouseEvent): void {

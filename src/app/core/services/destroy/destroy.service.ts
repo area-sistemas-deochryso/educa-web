@@ -1,5 +1,5 @@
 import { Injectable, OnDestroy, DestroyRef, Directive } from '@angular/core';
-import { Subject, Observable, MonoTypeOperatorFunction } from 'rxjs';
+import { Subject, MonoTypeOperatorFunction } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 

@@ -1,7 +1,6 @@
 import { Injectable, inject, signal, computed, effect } from '@angular/core';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { AuthService } from '../auth';
-import { UserRole } from '../auth/auth.models';
 
 export type AppUserRole = 'Estudiante' | 'Apoderado' | 'Profesor' | 'Director' | '';
 

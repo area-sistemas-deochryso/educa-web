@@ -20,10 +20,10 @@ export class PriorityLegendMenuComponent {
 	@Input() position = { x: 0, y: 0 };
 	@Input({ required: true }) priorityLegend!: PriorityInfo[];
 
-	@Output() close = new EventEmitter<void>();
+	@Output() closeMenu = new EventEmitter<void>();
 
 	onClose(): void {
-		this.close.emit();
+		this.closeMenu.emit();
 	}
 
 	onMenuClick(event: Event): void {

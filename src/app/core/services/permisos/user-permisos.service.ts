@@ -1,6 +1,6 @@
 import { Injectable, inject, signal, computed, DestroyRef, effect } from '@angular/core';
 import { takeUntilDestroyed, toSignal } from '@angular/core/rxjs-interop';
-import { tap, catchError, of, Observable, map, firstValueFrom } from 'rxjs';
+import { tap, catchError, of, firstValueFrom } from 'rxjs';
 
 import { logger } from '@core/helpers';
 import { AuthService } from '../auth';

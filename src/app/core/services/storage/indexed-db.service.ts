@@ -198,7 +198,7 @@ export class IndexedDBService {
 
 				transaction.oncomplete = () => resolve();
 				transaction.onerror = () => resolve();
-			} catch (e) {
+			} catch {
 				resolve();
 			}
 		});
@@ -227,7 +227,7 @@ export class IndexedDBService {
 					logger.error('[IndexedDB] Error getting read notifications:', request.error);
 					resolve(null);
 				};
-			} catch (e) {
+			} catch {
 				resolve(null);
 			}
 		});
@@ -254,7 +254,7 @@ export class IndexedDBService {
 
 				transaction.oncomplete = () => resolve();
 				transaction.onerror = () => resolve();
-			} catch (e) {
+			} catch {
 				resolve();
 			}
 		});
@@ -272,7 +272,7 @@ export class IndexedDBService {
 
 				transaction.oncomplete = () => resolve();
 				transaction.onerror = () => resolve();
-			} catch (e) {
+			} catch {
 				resolve();
 			}
 		});
@@ -290,7 +290,7 @@ export class IndexedDBService {
 
 				transaction.oncomplete = () => resolve();
 				transaction.onerror = () => resolve();
-			} catch (e) {
+			} catch {
 				resolve();
 			}
 		});
@@ -326,7 +326,7 @@ export class IndexedDBService {
 				};
 
 				request.onerror = () => resolve(null);
-			} catch (e) {
+			} catch {
 				resolve(null);
 			}
 		});
@@ -352,7 +352,7 @@ export class IndexedDBService {
 
 				transaction.oncomplete = () => resolve();
 				transaction.onerror = () => resolve();
-			} catch (e) {
+			} catch {
 				resolve();
 			}
 		});
@@ -370,7 +370,7 @@ export class IndexedDBService {
 
 				transaction.oncomplete = () => resolve();
 				transaction.onerror = () => resolve();
-			} catch (e) {
+			} catch {
 				resolve();
 			}
 		});
@@ -402,7 +402,7 @@ export class IndexedDBService {
 
 				transaction.oncomplete = () => resolve();
 				transaction.onerror = () => resolve();
-			} catch (e) {
+			} catch {
 				resolve();
 			}
 		});

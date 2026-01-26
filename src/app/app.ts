@@ -10,7 +10,7 @@ import { ToastContainerComponent } from '@shared/components/toast-container';
 	templateUrl: './app.html',
 	styleUrl: './app.scss',
 })
-export class App {
+export class AppComponent {
 	private swService = inject(SwService);
 	title = 'Educa.com.pe';
 }
