@@ -34,7 +34,7 @@ import { SalonProfesor } from '@core/services';
 	styles: [
 		`
 			.salon-selector {
-				display: flex;
+				display: inline-flex;
 				align-items: center;
 				gap: 0.5rem;
 				margin-bottom: 1rem;
@@ -45,10 +45,12 @@ import { SalonProfesor } from '@core/services';
 				label {
 					font-weight: 600;
 					color: var(--text-color);
+					white-space: nowrap;
 				}
 
 				select {
-					flex: 1;
+					min-width: 200px;
+					max-width: 350px;
 					padding: 0.5rem;
 					border: 1px solid var(--surface-border);
 					border-radius: var(--border-radius);

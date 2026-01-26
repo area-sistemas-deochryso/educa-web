@@ -66,3 +66,19 @@ export interface SalonProfesor {
 
 // Estados de asistencia para la UI
 export type AttendanceStatus = 'T' | 'A' | 'F' | 'N';
+
+// Director: Estadísticas del día
+export interface EstadisticasDia {
+	fecha: string;
+	totalEstudiantes: number;
+	conEntrada: number;
+	asistenciasCompletas: number;
+	faltas: number;
+	porcentajeAsistencia: number;
+}
+
+// Director: Grado disponible para filtro
+export interface GradoSeccion {
+	grado: string;
+	seccion: string;
+}

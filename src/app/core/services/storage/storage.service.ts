@@ -256,6 +256,31 @@ export class StorageService {
 		this.preferences.clearSelectedEstudianteId();
 	}
 
+	// Director attendance
+	getSelectedGradoSeccionDirector(): { grado: string; seccion: string } | null {
+		return this.preferences.getSelectedGradoSeccionDirector();
+	}
+
+	setSelectedGradoSeccionDirector(gs: { grado: string; seccion: string }): void {
+		this.preferences.setSelectedGradoSeccionDirector(gs);
+	}
+
+	clearSelectedGradoSeccionDirector(): void {
+		this.preferences.clearSelectedGradoSeccionDirector();
+	}
+
+	getSelectedEstudianteDirectorId(): number | null {
+		return this.preferences.getSelectedEstudianteDirectorId();
+	}
+
+	setSelectedEstudianteDirectorId(id: number): void {
+		this.preferences.setSelectedEstudianteDirectorId(id);
+	}
+
+	clearSelectedEstudianteDirectorId(): void {
+		this.preferences.clearSelectedEstudianteDirectorId();
+	}
+
 	clearAttendance(): void {
 		this.preferences.clearAttendancePreferences();
 	}

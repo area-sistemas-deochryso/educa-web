@@ -4,6 +4,8 @@ import { finalize } from 'rxjs';
 import {
 	AsistenciaService,
 	EstudianteAsistencia,
+	EstadisticasDia,
+	GradoSeccion,
 	HijoApoderado,
 	ResumenAsistencia,
 	SalonProfesor,
@@ -85,6 +87,28 @@ export class AttendanceFacade {
 		}));
 	});
 
+	// Para director
+	readonly gradosSecciones = signal<GradoSeccion[]>([]);
+	readonly selectedGradoSeccion = signal<GradoSeccion | null>(null);
+	readonly estadisticasDia = signal<EstadisticasDia | null>(null);
+	readonly estudiantesDirector = signal<EstudianteAsistencia[]>([]);
+	readonly selectedEstudianteDirectorId = signal<number | null>(null);
+	readonly selectedEstudianteDirector = computed(() => {
+		const id = this.selectedEstudianteDirectorId();
+		return this.estudiantesDirector().find((e) => e.estudianteId === id) || null;
+	});
+	readonly estudiantesDirectorAsHijos = computed<HijoApoderado[]>(() => {
+		return this.estudiantesDirector().map((e) => ({
+			estudianteId: e.estudianteId,
+			dni: e.dni,
+			nombreCompleto: e.nombreCompleto,
+			grado: e.grado,
+			seccion: e.seccion,
+			relacion: 'Estudiante',
+		}));
+	});
+	readonly downloadingPdf = signal(false);
+
 	/**
 	 * Inicializa el facade con el usuario actual
 	 */
@@ -98,6 +122,8 @@ export class AttendanceFacade {
 			this.loadHijos(destroyRef);
 		} else if (role === 'Profesor') {
 			this.loadSalonesProfesor(destroyRef);
+		} else if (role === 'Director') {
+			this.loadGradosSeccionesDirector(destroyRef);
 		} else {
 			this.loadAsistencias(destroyRef);
 		}
@@ -560,6 +586,250 @@ export class AttendanceFacade {
 			});
 	}
 
+	// === DIRECTOR ===
+
+	private loadGradosSeccionesDirector(destroyRef: DestroyRef): void {
+		this.loading.set(true);
+		this.error.set(null);
+
+		this.asistenciaService
+			.getGradosSeccionesDisponibles()
+			.pipe(
+				takeUntilDestroyed(destroyRef),
+				finalize(() => {
+					if (this.gradosSecciones().length === 0) {
+						this.loading.set(false);
+					}
+				}),
+			)
+			.subscribe({
+				next: (grados) => {
+					this.gradosSecciones.set(grados);
+					if (grados.length > 0) {
+						this.restoreSelectedGradoSeccion();
+						this.loadEstudiantesDirector(destroyRef);
+						this.loadEstadisticasDirector(destroyRef);
+					}
+				},
+				error: () => {
+					this.error.set('Error al cargar grados');
+					this.loading.set(false);
+				},
+			});
+	}
+
+	selectGradoSeccion(gradoSeccion: GradoSeccion, destroyRef: DestroyRef): void {
+		const current = this.selectedGradoSeccion();
+		if (current?.grado === gradoSeccion.grado && current?.seccion === gradoSeccion.seccion)
+			return;
+
+		this.selectedGradoSeccion.set(gradoSeccion);
+		this.saveSelectedGradoSeccion();
+		this.loadEstudiantesDirector(destroyRef);
+	}
+
+	private restoreSelectedGradoSeccion(): void {
+		const saved = this.storage.getSelectedGradoSeccionDirector();
+		if (
+			saved &&
+			this.gradosSecciones().some(
+				(gs) => gs.grado === saved.grado && gs.seccion === saved.seccion,
+			)
+		) {
+			this.selectedGradoSeccion.set(saved);
+			return;
+		}
+		const first = this.gradosSecciones()[0];
+		if (first) {
+			this.selectedGradoSeccion.set(first);
+		}
+	}
+
+	private saveSelectedGradoSeccion(): void {
+		const gs = this.selectedGradoSeccion();
+		if (gs) {
+			this.storage.setSelectedGradoSeccionDirector(gs);
+		}
+	}
+
+	loadEstudiantesDirector(destroyRef: DestroyRef): void {
+		const gs = this.selectedGradoSeccion();
+		if (!gs) {
+			this.loading.set(false);
+			return;
+		}
+
+		this.loading.set(true);
+
+		this.asistenciaService
+			.getReporteDirector(undefined, gs.grado, gs.seccion)
+			.pipe(
+				takeUntilDestroyed(destroyRef),
+				finalize(() => {
+					if (this.estudiantesDirector().length === 0) {
+						this.loading.set(false);
+					}
+				}),
+			)
+			.subscribe({
+				next: (estudiantes) => {
+					this.estudiantesDirector.set(estudiantes);
+					if (estudiantes.length > 0) {
+						this.restoreSelectedEstudianteDirector();
+						this.loadEstudianteDirectorAsistencias();
+					}
+				},
+				error: () => {
+					this.error.set('Error al cargar estudiantes');
+					this.loading.set(false);
+				},
+			});
+	}
+
+	selectEstudianteDirector(estudianteId: number): void {
+		if (this.selectedEstudianteDirectorId() === estudianteId) return;
+
+		this.selectedEstudianteDirectorId.set(estudianteId);
+		this.saveSelectedEstudianteDirector();
+		this.loadEstudianteDirectorAsistencias();
+	}
+
+	private restoreSelectedEstudianteDirector(): void {
+		const estudianteId = this.storage.getSelectedEstudianteDirectorId();
+		if (
+			estudianteId !== null &&
+			this.estudiantesDirector().some((e) => e.estudianteId === estudianteId)
+		) {
+			this.selectedEstudianteDirectorId.set(estudianteId);
+			return;
+		}
+		const first = this.estudiantesDirector()[0];
+		if (first) {
+			this.selectedEstudianteDirectorId.set(first.estudianteId);
+		}
+	}
+
+	private saveSelectedEstudianteDirector(): void {
+		const id = this.selectedEstudianteDirectorId();
+		if (id) {
+			this.storage.setSelectedEstudianteDirectorId(id);
+		}
+	}
+
+	private loadEstudianteDirectorAsistencias(): void {
+		const estudiante = this.selectedEstudianteDirector();
+		if (!estudiante) {
+			this.loading.set(false);
+			return;
+		}
+
+		const { selectedMonth, selectedYear } = this.ingresos();
+
+		const tables = this.attendanceDataService.processAsistencias(
+			estudiante.asistencias,
+			selectedMonth,
+			selectedYear,
+			estudiante.nombreCompleto,
+		);
+		this.ingresos.set(tables.ingresos);
+		this.salidas.set(tables.salidas);
+		this.loading.set(false);
+	}
+
+	loadEstadisticasDirector(destroyRef: DestroyRef): void {
+		this.asistenciaService
+			.getEstadisticasDirector()
+			.pipe(takeUntilDestroyed(destroyRef))
+			.subscribe({
+				next: (estadisticas) => {
+					this.estadisticasDia.set(estadisticas);
+				},
+			});
+	}
+
+	loadEstudianteDirectorIngresos(destroyRef: DestroyRef): void {
+		const gs = this.selectedGradoSeccion();
+		if (!gs) return;
+
+		const { selectedMonth, selectedYear } = this.ingresos();
+
+		this.asistenciaService
+			.getReporteDirector(undefined, gs.grado, gs.seccion)
+			.pipe(takeUntilDestroyed(destroyRef))
+			.subscribe({
+				next: (estudiantes) => {
+					this.estudiantesDirector.set(estudiantes);
+					const estudiante = estudiantes.find(
+						(e) => e.estudianteId === this.selectedEstudianteDirectorId(),
+					);
+					if (estudiante) {
+						const tables = this.attendanceDataService.processAsistencias(
+							estudiante.asistencias,
+							selectedMonth,
+							selectedYear,
+							estudiante.nombreCompleto,
+						);
+						this.ingresos.set(tables.ingresos);
+					}
+				},
+			});
+	}
+
+	loadEstudianteDirectorSalidas(destroyRef: DestroyRef): void {
+		const gs = this.selectedGradoSeccion();
+		if (!gs) return;
+
+		const { selectedMonth, selectedYear } = this.salidas();
+
+		this.asistenciaService
+			.getReporteDirector(undefined, gs.grado, gs.seccion)
+			.pipe(takeUntilDestroyed(destroyRef))
+			.subscribe({
+				next: (estudiantes) => {
+					const estudiante = estudiantes.find(
+						(e) => e.estudianteId === this.selectedEstudianteDirectorId(),
+					);
+					if (estudiante) {
+						const tables = this.attendanceDataService.processAsistencias(
+							estudiante.asistencias,
+							selectedMonth,
+							selectedYear,
+							estudiante.nombreCompleto,
+						);
+						this.salidas.set(tables.salidas);
+					}
+				},
+			});
+	}
+
+	descargarPdfAsistenciaDia(destroyRef: DestroyRef): void {
+		const gs = this.selectedGradoSeccion();
+		if (!gs) return;
+
+		this.downloadingPdf.set(true);
+
+		this.asistenciaService
+			.descargarPdfAsistenciaDia(gs.grado, gs.seccion)
+			.pipe(
+				takeUntilDestroyed(destroyRef),
+				finalize(() => this.downloadingPdf.set(false)),
+			)
+			.subscribe({
+				next: (blob) => {
+					const url = window.URL.createObjectURL(blob);
+					const a = document.createElement('a');
+					a.href = url;
+					const today = new Date().toISOString().split('T')[0];
+					a.download = `Asistencia_${gs.grado}_${gs.seccion}_${today}.pdf`;
+					a.click();
+					window.URL.revokeObjectURL(url);
+				},
+				error: () => {
+					this.error.set('Error al descargar PDF');
+				},
+			});
+	}
+
 	// === MÉTODOS PÚBLICOS DE RECARGA ===
 
 	reloadCurrentData(destroyRef: DestroyRef): void {
@@ -568,6 +838,8 @@ export class AttendanceFacade {
 			this.loadHijoAsistencias(destroyRef);
 		} else if (role === 'Profesor') {
 			this.loadEstudiantesSalon(destroyRef);
+		} else if (role === 'Director') {
+			this.loadEstudiantesDirector(destroyRef);
 		} else {
 			this.loadAsistencias(destroyRef);
 		}
@@ -579,6 +851,8 @@ export class AttendanceFacade {
 			this.loadHijoIngresos(destroyRef);
 		} else if (role === 'Profesor') {
 			this.loadEstudianteIngresos(destroyRef);
+		} else if (role === 'Director') {
+			this.loadEstudianteDirectorIngresos(destroyRef);
 		} else {
 			this.loadIngresosData(destroyRef);
 		}
@@ -590,6 +864,8 @@ export class AttendanceFacade {
 			this.loadHijoSalidas(destroyRef);
 		} else if (role === 'Profesor') {
 			this.loadEstudianteSalidas(destroyRef);
+		} else if (role === 'Director') {
+			this.loadEstudianteDirectorSalidas(destroyRef);
 		} else {
 			this.loadSalidasData(destroyRef);
 		}

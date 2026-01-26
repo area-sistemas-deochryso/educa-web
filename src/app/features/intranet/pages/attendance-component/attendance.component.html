@@ -55,6 +55,42 @@
 				<app-empty-state message="No tiene salones asignados." />
 			}
 		}
+		@case ('Director') {
+			<app-estadisticas-dia
+				[estadisticas]="estadisticasDia()"
+				[downloadingPdf]="downloadingPdf()"
+				(descargarPdf)="descargarPdfAsistenciaDia()"
+			/>
+
+			@if (gradosSecciones().length > 0) {
+				<app-grado-seccion-selector
+					[gradosSecciones]="gradosSecciones()"
+					[selectedGradoSeccion]="selectedGradoSeccion()"
+					(gradoSeccionChange)="selectGradoSeccion($event)"
+				/>
+
+				@if (estudiantesDirector().length > 0) {
+					<app-attendance-table
+						[table]="ingresos()"
+						[hijos]="estudiantesDirectorAsHijos()"
+						[selectedHijoId]="selectedEstudianteDirectorId()"
+						(monthChange)="onIngresosMonthChange($event)"
+						(hijoChange)="selectEstudianteDirector($event)"
+					/>
+					<app-attendance-table
+						[table]="salidas()"
+						[hijos]="estudiantesDirectorAsHijos()"
+						[selectedHijoId]="selectedEstudianteDirectorId()"
+						(monthChange)="onSalidasMonthChange($event)"
+						(hijoChange)="selectEstudianteDirector($event)"
+					/>
+				} @else if (!loading()) {
+					<app-empty-state message="No se encontraron estudiantes en este grado/sección." />
+				}
+			} @else if (!loading()) {
+				<app-empty-state message="No hay grados/secciones disponibles." />
+			}
+		}
 		@default {
 			<app-attendance-table
 				[table]="ingresos()"

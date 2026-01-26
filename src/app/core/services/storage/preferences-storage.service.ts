@@ -23,6 +23,9 @@ const PREFERENCES_KEYS = {
 	SELECTED_HIJO: 'educa_pref_selected_hijo',
 	SELECTED_SALON: 'educa_pref_selected_salon',
 	SELECTED_ESTUDIANTE: 'educa_pref_selected_estudiante',
+	// Director attendance preferences
+	SELECTED_GRADO_SECCION_DIRECTOR: 'educa_pref_selected_grado_seccion_director',
+	SELECTED_ESTUDIANTE_DIRECTOR: 'educa_pref_selected_estudiante_director',
 
 	// UI Preferences
 	THEME: 'educa_pref_theme',
@@ -31,6 +34,11 @@ const PREFERENCES_KEYS = {
 } as const;
 
 export type ThemePreference = 'light' | 'dark' | 'system';
+
+export interface GradoSeccionPref {
+	grado: string;
+	seccion: string;
+}
 
 @Injectable({
 	providedIn: 'root',
@@ -134,11 +142,39 @@ export class PreferencesStorageService {
 		this.removeItem(PREFERENCES_KEYS.SELECTED_ESTUDIANTE);
 	}
 
+	// Director preferences
+	getSelectedGradoSeccionDirector(): GradoSeccionPref | null {
+		return this.getJSON<GradoSeccionPref>(PREFERENCES_KEYS.SELECTED_GRADO_SECCION_DIRECTOR);
+	}
+
+	setSelectedGradoSeccionDirector(gs: GradoSeccionPref): void {
+		this.setJSON(PREFERENCES_KEYS.SELECTED_GRADO_SECCION_DIRECTOR, gs);
+	}
+
+	clearSelectedGradoSeccionDirector(): void {
+		this.removeItem(PREFERENCES_KEYS.SELECTED_GRADO_SECCION_DIRECTOR);
+	}
+
+	getSelectedEstudianteDirectorId(): number | null {
+		const value = this.getItem(PREFERENCES_KEYS.SELECTED_ESTUDIANTE_DIRECTOR);
+		return value ? parseInt(value, 10) : null;
+	}
+
+	setSelectedEstudianteDirectorId(id: number): void {
+		this.setItem(PREFERENCES_KEYS.SELECTED_ESTUDIANTE_DIRECTOR, id.toString());
+	}
+
+	clearSelectedEstudianteDirectorId(): void {
+		this.removeItem(PREFERENCES_KEYS.SELECTED_ESTUDIANTE_DIRECTOR);
+	}
+
 	clearAttendancePreferences(): void {
 		this.clearAttendanceMonth();
 		this.clearSelectedHijoId();
 		this.clearSelectedSalonId();
 		this.clearSelectedEstudianteId();
+		this.clearSelectedGradoSeccionDirector();
+		this.clearSelectedEstudianteDirectorId();
 	}
 
 	// ============================================

@@ -1,12 +1,15 @@
 import { VoiceRecognitionService } from '@core/services';
 import { Component, DestroyRef, OnDestroy, OnInit, inject } from '@angular/core';
 
+import { GradoSeccion } from '@core/services';
 import { AttendanceFacade } from '../../services/attendance/attendance.facade';
 import { AttendanceHeaderComponent } from '../../components/attendance/attendance-header/attendance-header.component';
 import { AttendanceLegendComponent } from '../../components/attendance/attendance-legend/attendance-legend.component';
 import { AttendanceTableComponent } from '../../components/attendance/attendance-table/attendance-table.component';
 import { SalonSelectorComponent } from '../../components/attendance/salon-selector/salon-selector.component';
 import { EmptyStateComponent } from '../../components/attendance/empty-state/empty-state.component';
+import { GradoSeccionSelectorComponent } from '../../components/attendance/grado-seccion-selector/grado-seccion-selector.component';
+import { EstadisticasDiaComponent } from '../../components/attendance/estadisticas-dia/estadisticas-dia.component';
 
 @Component({
 	selector: 'app-attendance',
@@ -16,6 +19,8 @@ import { EmptyStateComponent } from '../../components/attendance/empty-state/emp
 		AttendanceTableComponent,
 		SalonSelectorComponent,
 		EmptyStateComponent,
+		GradoSeccionSelectorComponent,
+		EstadisticasDiaComponent,
 	],
 	providers: [AttendanceFacade],
 	templateUrl: './attendance.component.html',
@@ -82,6 +87,29 @@ export class AttendanceComponent implements OnInit, OnDestroy {
 		return this.facade.estudiantesAsHijos;
 	}
 
+	// Para director
+	get gradosSecciones() {
+		return this.facade.gradosSecciones;
+	}
+	get selectedGradoSeccion() {
+		return this.facade.selectedGradoSeccion;
+	}
+	get estadisticasDia() {
+		return this.facade.estadisticasDia;
+	}
+	get estudiantesDirector() {
+		return this.facade.estudiantesDirector;
+	}
+	get selectedEstudianteDirectorId() {
+		return this.facade.selectedEstudianteDirectorId;
+	}
+	get estudiantesDirectorAsHijos() {
+		return this.facade.estudiantesDirectorAsHijos;
+	}
+	get downloadingPdf() {
+		return this.facade.downloadingPdf;
+	}
+
 	ngOnInit(): void {
 		this.facade.initialize(this.destroyRef);
 		this.setupVoiceCommands();
@@ -133,6 +161,19 @@ export class AttendanceComponent implements OnInit, OnDestroy {
 
 	selectEstudiante(estudianteId: number): void {
 		this.facade.selectEstudiante(estudianteId);
+	}
+
+	// Director
+	selectGradoSeccion(gs: GradoSeccion): void {
+		this.facade.selectGradoSeccion(gs, this.destroyRef);
+	}
+
+	selectEstudianteDirector(estudianteId: number): void {
+		this.facade.selectEstudianteDirector(estudianteId);
+	}
+
+	descargarPdfAsistenciaDia(): void {
+		this.facade.descargarPdfAsistenciaDia(this.destroyRef);
 	}
 
 	reloadAll(): void {

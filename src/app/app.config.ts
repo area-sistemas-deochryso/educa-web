@@ -1,8 +1,17 @@
-import { ApplicationConfig, ErrorHandler, provideBrowserGlobalErrorListeners } from '@angular/core';
+import {
+	ApplicationConfig,
+	ErrorHandler,
+	LOCALE_ID,
+	provideBrowserGlobalErrorListeners,
+} from '@angular/core';
 import { provideHttpClient, withFetch, withInterceptors } from '@angular/common/http';
 import { PreloadAllModules, withPreloading } from '@angular/router';
+import { registerLocaleData } from '@angular/common';
+import localeEs from '@angular/common/locales/es-PE';
 
 import Aura from '@primeng/themes/aura';
+
+registerLocaleData(localeEs, 'es-PE');
 import { provideAnimationsAsync } from '@angular/platform-browser/animations/async';
 import { providePrimeNG } from 'primeng/config';
 import { provideRouter } from '@angular/router';
@@ -26,6 +35,7 @@ export const appConfig: ApplicationConfig = {
 			},
 		}),
 		{ provide: ErrorHandler, useClass: GlobalErrorHandler },
+		{ provide: LOCALE_ID, useValue: 'es-PE' },
 		provideClientHydration(withEventReplay()),
 	],
 };

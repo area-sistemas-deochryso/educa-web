@@ -9,7 +9,7 @@ export const environment = {
 	apiUrl: 'https://educacom.azurewebsites.net',
 
 	// Feature flags
-	showIntranetLink: false,
+	showIntranetLink: true, //? volver a false para ocultar de nuevo el botón de intranet
 };
 
 export type Environment = typeof environment;

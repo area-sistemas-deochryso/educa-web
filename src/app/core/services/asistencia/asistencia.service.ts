@@ -1,6 +1,6 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { Observable, catchError, of } from 'rxjs';
+import { Observable, catchError, of, map } from 'rxjs';
 
 import { environment } from '@env/environment';
 
@@ -9,6 +9,8 @@ import {
 	HijoApoderado,
 	EstudianteAsistencia,
 	SalonProfesor,
+	EstadisticasDia,
+	GradoSeccion,
 } from './asistencia.models';
 
 @Injectable({
@@ -108,5 +110,89 @@ export class AsistenciaService {
 		return this.http
 			.get<EstudianteAsistencia[]>(`${this.apiUrl}/profesor/grado`, { params })
 			.pipe(catchError(() => of([])));
+	}
+
+	// === DIRECTOR ===
+
+	/**
+	 * Director: Obtener reporte de asistencia con filtros opcionales
+	 * GET /api/ConsultaAsistencia/director/reporte?fecha={fecha}&grado={grado}&seccion={seccion}
+	 */
+	getReporteDirector(
+		fecha?: Date,
+		grado?: string,
+		seccion?: string,
+	): Observable<EstudianteAsistencia[]> {
+		const params: Record<string, string> = {};
+
+		if (fecha) {
+			params['fecha'] = fecha.toISOString().split('T')[0];
+		}
+		if (grado) {
+			params['grado'] = grado;
+		}
+		if (seccion) {
+			params['seccion'] = seccion;
+		}
+
+		return this.http
+			.get<EstudianteAsistencia[]>(`${this.apiUrl}/director/reporte`, { params })
+			.pipe(catchError(() => of([])));
+	}
+
+	/**
+	 * Director: Obtener estadísticas del día
+	 * GET /api/ConsultaAsistencia/director/estadisticas?fecha={fecha}
+	 */
+	getEstadisticasDirector(fecha?: Date): Observable<EstadisticasDia | null> {
+		const params: Record<string, string> = {};
+
+		if (fecha) {
+			params['fecha'] = fecha.toISOString().split('T')[0];
+		}
+
+		return this.http
+			.get<EstadisticasDia>(`${this.apiUrl}/director/estadisticas`, { params })
+			.pipe(catchError(() => of(null)));
+	}
+
+	/**
+	 * Director: Descargar PDF de asistencia del día
+	 * GET /api/ConsultaAsistencia/director/asistencia-dia/pdf?grado={grado}&seccion={seccion}&fecha={fecha}
+	 */
+	descargarPdfAsistenciaDia(grado: string, seccion: string, fecha?: Date): Observable<Blob> {
+		const params: Record<string, string> = { grado, seccion };
+
+		if (fecha) {
+			params['fecha'] = fecha.toISOString().split('T')[0];
+		}
+
+		return this.http.get(`${this.apiUrl}/director/asistencia-dia/pdf`, {
+			params,
+			responseType: 'blob',
+		});
+	}
+
+	/**
+	 * Director: Obtener grados/secciones disponibles de la sede
+	 * Extrae los grados únicos del reporte
+	 */
+	getGradosSeccionesDisponibles(): Observable<GradoSeccion[]> {
+		return this.getReporteDirector().pipe(
+			catchError(() => of([] as EstudianteAsistencia[])),
+			map((estudiantes) => {
+				const unique = new Map<string, GradoSeccion>();
+				estudiantes.forEach((e) => {
+					const key = `${e.grado}-${e.seccion}`;
+					if (!unique.has(key)) {
+						unique.set(key, { grado: e.grado, seccion: e.seccion });
+					}
+				});
+				return Array.from(unique.values()).sort((a, b) => {
+					const gradoComp = a.grado.localeCompare(b.grado);
+					return gradoComp !== 0 ? gradoComp : a.seccion.localeCompare(b.seccion);
+				});
+			}),
+		);
 	}
 }

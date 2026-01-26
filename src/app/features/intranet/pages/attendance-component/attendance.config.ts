@@ -36,12 +36,12 @@ export const INGRESO_TIME_CONFIG: AttendanceTimeConfig = {
 /**
  * Configuración de horas para INGRESOS (entrada) - Horario de verano (enero y febrero):
  * - Temprano (T): antes de las 8:30
- * - A tiempo (A): entre 8:30 y 9:00
- * - Fuera de hora (F): después de las 9:00
+ * - A tiempo (A): entre 8:30 y 9:30
+ * - Fuera de hora (F): después de las 9:30
  */
 export const INGRESO_TIME_CONFIG_VERANO: AttendanceTimeConfig = {
 	temprano: { hour: 8, minute: 30 }, // Antes de 8:30 = Temprano
-	aTiempo: { hour: 9, minute: 0 }, // Entre 8:30 y 9:00 = A tiempo, después = Fuera
+	aTiempo: { hour: 9, minute: 30 }, // Entre 8:30 y 9:30 = A tiempo, después = Fuera
 };
 
 /**
@@ -57,13 +57,13 @@ export const SALIDA_TIME_CONFIG: AttendanceTimeConfig = {
 
 /**
  * Configuración de horas para SALIDAS - Horario de verano (enero y febrero):
- * - Fuera de hora (F): antes de las 13:30
- * - Temprano (T): entre 13:30 y 13:59
- * - A tiempo (A): a partir de las 14:00
+ * - Fuera de hora (F): antes de las 12:45
+ * - Temprano (T): entre 12:45 y 13:14
+ * - A tiempo (A): a partir de las 13:15
  */
 export const SALIDA_TIME_CONFIG_VERANO: AttendanceTimeConfig = {
-	temprano: { hour: 13, minute: 30 }, // Antes de 13:30 = Fuera de hora
-	aTiempo: { hour: 14, minute: 0 }, // A partir de 14:00 = A tiempo
+	temprano: { hour: 12, minute: 45 }, // Antes de 12:45 = Fuera de hora
+	aTiempo: { hour: 13, minute: 15 }, // A partir de 13:15 = A tiempo
 };
 
 /**
