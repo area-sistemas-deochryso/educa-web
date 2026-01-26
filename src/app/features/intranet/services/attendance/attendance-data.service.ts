@@ -104,8 +104,8 @@ export class AttendanceDataService {
 				const dateKey = this.calendarUtils.formatDateKey(date);
 				const asistencia = asistenciaMap.get(dateKey);
 
-				const ingresoStatus = this.getIngresoStatus(asistencia);
-				const salidaStatus = this.getSalidaStatus(asistencia);
+				const ingresoStatus = this.getIngresoStatus(asistencia, mes);
+				const salidaStatus = this.getSalidaStatus(asistencia, mes);
 
 				if (ingresoStatus !== 'N') ingresosAttendedCount++;
 				if (salidaStatus !== 'N') salidasAttendedCount++;
@@ -146,22 +146,22 @@ export class AttendanceDataService {
 		return date.toLocaleTimeString('es-PE', { hour: '2-digit', minute: '2-digit' });
 	}
 
-	private getIngresoStatus(asistencia: AsistenciaDetalle | undefined): AttendanceStatus {
+	private getIngresoStatus(asistencia: AsistenciaDetalle | undefined, month: number): AttendanceStatus {
 		if (!asistencia || !asistencia.horaEntrada) {
 			return 'N';
 		}
 
 		const horaEntrada = new Date(asistencia.horaEntrada);
-		return getIngresoStatusFromTime(horaEntrada.getHours(), horaEntrada.getMinutes());
+		return getIngresoStatusFromTime(horaEntrada.getHours(), horaEntrada.getMinutes(), month);
 	}
 
-	private getSalidaStatus(asistencia: AsistenciaDetalle | undefined): AttendanceStatus {
+	private getSalidaStatus(asistencia: AsistenciaDetalle | undefined, month: number): AttendanceStatus {
 		if (!asistencia || !asistencia.horaSalida) {
 			return 'N';
 		}
 
 		const horaSalida = new Date(asistencia.horaSalida);
-		return getSalidaStatusFromTime(horaSalida.getHours(), horaSalida.getMinutes());
+		return getSalidaStatusFromTime(horaSalida.getHours(), horaSalida.getMinutes(), month);
 	}
 
 	private calculateCounts(weeks: AttendanceWeek[]): StatusCounts {

@@ -17,7 +17,7 @@ export interface AttendanceTimeConfig {
 }
 
 /**
- * Configuración de horas para INGRESOS (entrada):
+ * Configuración de horas para INGRESOS (entrada) - Horario regular (marzo-diciembre):
  * - Temprano (T): antes de las 7:30
  * - A tiempo (A): entre 7:30 y 8:00
  * - Fuera de hora (F): después de las 8:00
@@ -28,7 +28,18 @@ export const INGRESO_TIME_CONFIG: AttendanceTimeConfig = {
 };
 
 /**
- * Configuración de horas para SALIDAS:
+ * Configuración de horas para INGRESOS (entrada) - Horario de verano (enero y febrero):
+ * - Temprano (T): antes de las 8:30
+ * - A tiempo (A): entre 8:30 y 9:00
+ * - Fuera de hora (F): después de las 9:00
+ */
+export const INGRESO_TIME_CONFIG_VERANO: AttendanceTimeConfig = {
+	temprano: { hour: 8, minute: 30 }, // Antes de 8:30 = Temprano
+	aTiempo: { hour: 9, minute: 0 }, // Entre 8:30 y 9:00 = A tiempo, después = Fuera
+};
+
+/**
+ * Configuración de horas para SALIDAS - Horario regular (marzo-diciembre):
  * - Fuera de hora (F): antes de las 14:00
  * - Temprano (T): entre 14:00 y 14:29
  * - A tiempo (A): a partir de las 14:30
@@ -37,6 +48,24 @@ export const SALIDA_TIME_CONFIG: AttendanceTimeConfig = {
 	temprano: { hour: 14, minute: 0 }, // Antes de 14:00 = Fuera de hora
 	aTiempo: { hour: 14, minute: 30 }, // A partir de 14:30 = A tiempo
 };
+
+/**
+ * Configuración de horas para SALIDAS - Horario de verano (enero y febrero):
+ * - Fuera de hora (F): antes de las 13:30
+ * - Temprano (T): entre 13:30 y 13:59
+ * - A tiempo (A): a partir de las 14:00
+ */
+export const SALIDA_TIME_CONFIG_VERANO: AttendanceTimeConfig = {
+	temprano: { hour: 13, minute: 30 }, // Antes de 13:30 = Fuera de hora
+	aTiempo: { hour: 14, minute: 0 }, // A partir de 14:00 = A tiempo
+};
+
+/**
+ * Determina si un mes es horario de verano (enero o febrero).
+ */
+export function isHorarioVerano(month: number): boolean {
+	return month === 1 || month === 2;
+}
 
 /**
  * Compara una hora con un límite de tiempo.
@@ -53,26 +82,45 @@ export function compareTime(hour: number, minute: number, limit: TimeLimit): num
 
 /**
  * Determina el estado de ingreso basado en la hora de entrada.
+ * @param hour Hora de entrada
+ * @param minute Minutos de entrada
+ * @param month Mes (1-12) para aplicar horario de verano en enero/febrero
  */
-export function getIngresoStatusFromTime(hour: number, minute: number): AttendanceStatus {
-	if (compareTime(hour, minute, INGRESO_TIME_CONFIG.temprano) < 0) {
-		return 'T'; // Antes de 7:30 = Temprano
-	} else if (compareTime(hour, minute, INGRESO_TIME_CONFIG.aTiempo) <= 0) {
-		return 'A'; // Entre 7:30 y 8:00 = A tiempo
+export function getIngresoStatusFromTime(
+	hour: number,
+	minute: number,
+	month?: number,
+): AttendanceStatus {
+	const config =
+		month && isHorarioVerano(month) ? INGRESO_TIME_CONFIG_VERANO : INGRESO_TIME_CONFIG;
+
+	if (compareTime(hour, minute, config.temprano) < 0) {
+		return 'T'; // Temprano
+	} else if (compareTime(hour, minute, config.aTiempo) <= 0) {
+		return 'A'; // A tiempo
 	}
-	return 'F'; // Después de 8:00 = Fuera de hora
+	return 'F'; // Fuera de hora
 }
 
 /**
  * Determina el estado de salida basado en la hora de salida.
+ * @param hour Hora de salida
+ * @param minute Minutos de salida
+ * @param month Mes (1-12) para aplicar horario de verano en enero/febrero
  */
-export function getSalidaStatusFromTime(hour: number, minute: number): AttendanceStatus {
-	if (compareTime(hour, minute, SALIDA_TIME_CONFIG.temprano) < 0) {
-		return 'F'; // Antes de 14:00 = Fuera de hora (salió muy temprano)
-	} else if (compareTime(hour, minute, SALIDA_TIME_CONFIG.aTiempo) < 0) {
-		return 'T'; // Entre 14:00 y 14:29 = Temprano
+export function getSalidaStatusFromTime(
+	hour: number,
+	minute: number,
+	month?: number,
+): AttendanceStatus {
+	const config = month && isHorarioVerano(month) ? SALIDA_TIME_CONFIG_VERANO : SALIDA_TIME_CONFIG;
+
+	if (compareTime(hour, minute, config.temprano) < 0) {
+		return 'F'; // Fuera de hora (salió muy temprano)
+	} else if (compareTime(hour, minute, config.aTiempo) < 0) {
+		return 'T'; // Temprano
 	}
-	return 'A'; // A partir de 14:30 = A tiempo
+	return 'A'; // A tiempo
 }
 
 export const MONTH_OPTIONS: MonthOption[] = [
