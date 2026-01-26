@@ -12,4 +12,3 @@ export * from './modal';
 export * from './user';
 export * from './permisos';
 export * from './usuarios';
-export * from './signalr';
