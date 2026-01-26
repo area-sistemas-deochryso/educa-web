@@ -3,13 +3,17 @@ import { Component, DestroyRef, OnDestroy, OnInit, inject } from '@angular/core'
 
 import { GradoSeccion } from '@core/services';
 import { AttendanceFacade } from '../../services/attendance/attendance.facade';
-import { AttendanceHeaderComponent } from '../../components/attendance/attendance-header/attendance-header.component';
+import {
+	AttendanceHeaderComponent,
+	ViewMode,
+} from '../../components/attendance/attendance-header/attendance-header.component';
 import { AttendanceLegendComponent } from '../../components/attendance/attendance-legend/attendance-legend.component';
 import { AttendanceTableComponent } from '../../components/attendance/attendance-table/attendance-table.component';
 import { SalonSelectorComponent } from '../../components/attendance/salon-selector/salon-selector.component';
 import { EmptyStateComponent } from '../../components/attendance/empty-state/empty-state.component';
 import { GradoSeccionSelectorComponent } from '../../components/attendance/grado-seccion-selector/grado-seccion-selector.component';
 import { EstadisticasDiaComponent } from '../../components/attendance/estadisticas-dia/estadisticas-dia.component';
+import { AsistenciaDiaListComponent } from '../../components/attendance/asistencia-dia-list/asistencia-dia-list.component';
 
 @Component({
 	selector: 'app-attendance',
@@ -21,6 +25,7 @@ import { EstadisticasDiaComponent } from '../../components/attendance/estadistic
 		EmptyStateComponent,
 		GradoSeccionSelectorComponent,
 		EstadisticasDiaComponent,
+		AsistenciaDiaListComponent,
 	],
 	providers: [AttendanceFacade],
 	templateUrl: './attendance.component.html',
@@ -85,6 +90,17 @@ export class AttendanceComponent implements OnInit, OnDestroy {
 	}
 	get estudiantesAsHijos() {
 		return this.facade.estudiantesAsHijos;
+	}
+
+	// Modo día/mes para profesor
+	get viewMode() {
+		return this.facade.viewMode;
+	}
+	get fechaDia() {
+		return this.facade.fechaDia;
+	}
+	get estudiantesDia() {
+		return this.facade.estudiantesDia;
 	}
 
 	// Para director
@@ -161,6 +177,19 @@ export class AttendanceComponent implements OnInit, OnDestroy {
 
 	selectEstudiante(estudianteId: number): void {
 		this.facade.selectEstudiante(estudianteId);
+	}
+
+	// Modo día/mes
+	onViewModeChange(mode: ViewMode): void {
+		this.facade.setViewMode(mode, this.destroyRef);
+	}
+
+	onFechaDiaChange(fecha: Date): void {
+		this.facade.setFechaDia(fecha, this.destroyRef);
+	}
+
+	selectSalonDia(salonId: number): void {
+		this.facade.selectSalonDia(salonId, this.destroyRef);
 	}
 
 	// Director

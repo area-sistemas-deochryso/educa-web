@@ -1,8 +1,31 @@
 <div class="page-header">
 	<i class="pi pi-clipboard"></i>
-	<h1>Asistencias</h1>
+	<div class="title-container">
+		<h1>Asistencias</h1>
+		@if (showModeSelector()) {
+			<span class="separator">/</span>
+			<div class="mode-selector">
+				<button
+					type="button"
+					class="mode-btn"
+					[class.active]="selectedMode() === 'mes'"
+					(click)="onModeSelect('mes')"
+				>
+					Mes
+				</button>
+				<button
+					type="button"
+					class="mode-btn"
+					[class.active]="selectedMode() === 'dia'"
+					(click)="onModeSelect('dia')"
+				>
+					Día
+				</button>
+			</div>
+		}
+	</div>
 	@if (loading()) {
-		<i class="pi pi-spin pi-spinner"></i>
+		<i class="pi pi-spin pi-spinner loading-spinner"></i>
 	}
 	<button
 		class="reload-btn"

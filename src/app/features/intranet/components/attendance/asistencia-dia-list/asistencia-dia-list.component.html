@@ -1,0 +1,105 @@
+<p-card styleClass="asistencia-dia-card">
+	<ng-template #header>
+		<div class="card-header">
+			<h3><i class="pi pi-calendar-clock"></i> Asistencia del día</h3>
+			<p-datepicker
+				[(ngModel)]="fechaValue"
+				[showIcon]="true"
+				[maxDate]="today"
+				dateFormat="dd/mm/yy"
+				(onSelect)="onFechaSelect($event)"
+				styleClass="fecha-picker"
+			/>
+		</div>
+	</ng-template>
+
+	@if (loading()) {
+		<div class="skeleton-container">
+			@for (_ of skeletonRows; track $index) {
+				<p-skeleton height="3rem" styleClass="skeleton-row" />
+			}
+		</div>
+	} @else if (estudiantesDelDia().length === 0) {
+		<div class="empty-state">
+			<i class="pi pi-users"></i>
+			<p>No hay registros de asistencia para esta fecha</p>
+		</div>
+	} @else {
+		<p-table [value]="estudiantesDelDia()" styleClass="p-datatable-sm asistencia-table">
+			<ng-template #header>
+				<tr>
+					<th style="width: 50px">#</th>
+					<th>Estudiante</th>
+					<th style="width: 100px" class="text-center">Entrada</th>
+					<th style="width: 100px" class="text-center">Salida</th>
+					<th style="width: 80px" class="text-center">Estado</th>
+				</tr>
+			</ng-template>
+			<ng-template #body let-estudiante let-i="rowIndex">
+				<tr>
+					<td class="row-number">{{ i + 1 }}</td>
+					<td>
+						<div class="estudiante-info">
+							<span class="nombre">{{ estudiante.nombreCompleto }}</span>
+							<span class="dni">DNI: {{ estudiante.dni }}</span>
+						</div>
+					</td>
+					<td class="text-center">
+						<span class="hora" [class.hora-empty]="!estudiante.horaEntrada">
+							@if (estudiante.horaEntrada) {
+								<i class="pi pi-sign-in"></i>
+							}
+							{{ formatTime(estudiante.horaEntrada) }}
+						</span>
+					</td>
+					<td class="text-center">
+						<span class="hora" [class.hora-empty]="!estudiante.horaSalida">
+							@if (estudiante.horaSalida) {
+								<i class="pi pi-sign-out"></i>
+							}
+							{{ formatTime(estudiante.horaSalida) }}
+						</span>
+					</td>
+					<td class="text-center">
+						<span class="estado-box" [class]="getStatusClass(estudiante.estadoCodigo)">
+							{{ estudiante.estadoCodigo }}
+						</span>
+					</td>
+				</tr>
+			</ng-template>
+		</p-table>
+
+		<div class="resumen-footer">
+			<div class="stat-badge total">
+				<i class="pi pi-users"></i>
+				<span class="value">{{ estadisticas().total }}</span>
+				<span class="label">Total</span>
+			</div>
+			<div class="stat-badge temprano">
+				<span class="status-indicator status-temprano">T</span>
+				<span class="value">{{ estadisticas().temprano }}</span>
+				<span class="label">Temprano</span>
+			</div>
+			<div class="stat-badge atiempo">
+				<span class="status-indicator status-atiempo">A</span>
+				<span class="value">{{ estadisticas().aTiempo }}</span>
+				<span class="label">A tiempo</span>
+			</div>
+			<div class="stat-badge fuera">
+				<span class="status-indicator status-fuera">F</span>
+				<span class="value">{{ estadisticas().fueraHora }}</span>
+				<span class="label">Fuera hora</span>
+			</div>
+			<div class="stat-badge no-asistio">
+				<span class="status-indicator status-no">N</span>
+				<span class="value">{{ estadisticas().noAsistio }}</span>
+				<span class="label">No asistió</span>
+			</div>
+			<div class="stat-badge pendiente">
+				<span class="status-indicator status-pendiente">-</span>
+				<span class="value">{{ estadisticas().pendiente }}</span>
+				<span class="label">Pendiente</span>
+			</div>
+		</div>
+	}
+</p-card>

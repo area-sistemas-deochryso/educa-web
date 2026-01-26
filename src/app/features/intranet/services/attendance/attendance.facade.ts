@@ -15,6 +15,8 @@ import {
 import { AttendanceDataService } from './attendance-data.service';
 import { AttendanceTable } from '../../pages/attendance-component/attendance.types';
 
+export type ViewMode = 'mes' | 'dia';
+
 export interface AttendanceState {
 	loading: boolean;
 	error: string | null;
@@ -74,6 +76,11 @@ export class AttendanceFacade {
 		const id = this.selectedEstudianteId();
 		return this.estudiantes().find((e) => e.estudianteId === id) || null;
 	});
+
+	// Modo día/mes para profesor
+	readonly viewMode = signal<ViewMode>('mes');
+	readonly fechaDia = signal<Date>(new Date());
+	readonly estudiantesDia = signal<EstudianteAsistencia[]>([]);
 
 	// Estudiantes como HijoApoderado para reusar el selector
 	readonly estudiantesAsHijos = computed<HijoApoderado[]>(() => {
@@ -584,6 +591,58 @@ export class AttendanceFacade {
 					}
 				},
 			});
+	}
+
+	// === PROFESOR: MODO DÍA ===
+
+	setViewMode(mode: ViewMode, destroyRef: DestroyRef): void {
+		if (this.viewMode() === mode) return;
+		this.viewMode.set(mode);
+
+		if (mode === 'dia') {
+			this.loadAsistenciaDia(destroyRef);
+		} else {
+			this.loadEstudiantesSalon(destroyRef);
+		}
+	}
+
+	setFechaDia(fecha: Date, destroyRef: DestroyRef): void {
+		this.fechaDia.set(fecha);
+		this.loadAsistenciaDia(destroyRef);
+	}
+
+	loadAsistenciaDia(destroyRef: DestroyRef): void {
+		const salon = this.selectedSalon();
+		if (!salon) {
+			this.loading.set(false);
+			return;
+		}
+
+		this.loading.set(true);
+		this.error.set(null);
+
+		this.asistenciaService
+			.getAsistenciaDia(salon.grado, salon.seccion, this.fechaDia())
+			.pipe(
+				takeUntilDestroyed(destroyRef),
+				finalize(() => this.loading.set(false)),
+			)
+			.subscribe({
+				next: (estudiantes) => {
+					this.estudiantesDia.set(estudiantes);
+				},
+				error: () => {
+					this.error.set('Error al cargar asistencias del día');
+				},
+			});
+	}
+
+	selectSalonDia(salonId: number, destroyRef: DestroyRef): void {
+		if (this.selectedSalonId() === salonId) return;
+
+		this.selectedSalonId.set(salonId);
+		this.saveSelectedSalon();
+		this.loadAsistenciaDia(destroyRef);
 	}
 
 	// === DIRECTOR ===

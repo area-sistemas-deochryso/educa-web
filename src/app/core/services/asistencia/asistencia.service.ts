@@ -22,6 +22,16 @@ export class AsistenciaService {
 	constructor(private http: HttpClient) {}
 
 	/**
+	 * Formatea una fecha a YYYY-MM-DD usando zona horaria local (evita desfase UTC)
+	 */
+	private formatDateLocal(fecha: Date): string {
+		const year = fecha.getFullYear();
+		const month = String(fecha.getMonth() + 1).padStart(2, '0');
+		const day = String(fecha.getDate()).padStart(2, '0');
+		return `${year}-${month}-${day}`;
+	}
+
+	/**
 	 * Estudiante: Obtener mis asistencias
 	 * GET /api/ConsultaAsistencia/estudiante/mis-asistencias?mes={mes}&año={año}
 	 */
@@ -112,6 +122,22 @@ export class AsistenciaService {
 			.pipe(catchError(() => of([])));
 	}
 
+	/**
+	 * Profesor: Obtener asistencia de un grado/sección en un día específico
+	 * GET /api/ConsultaAsistencia/profesor/asistencia-dia?grado={grado}&seccion={seccion}&fecha={fecha}
+	 */
+	getAsistenciaDia(grado: string, seccion: string, fecha: Date): Observable<EstudianteAsistencia[]> {
+		const params: Record<string, string> = {
+			grado,
+			seccion,
+			fecha: this.formatDateLocal(fecha),
+		};
+
+		return this.http
+			.get<EstudianteAsistencia[]>(`${this.apiUrl}/profesor/asistencia-dia`, { params })
+			.pipe(catchError(() => of([])));
+	}
+
 	// === DIRECTOR ===
 
 	/**
@@ -126,7 +152,7 @@ export class AsistenciaService {
 		const params: Record<string, string> = {};
 
 		if (fecha) {
-			params['fecha'] = fecha.toISOString().split('T')[0];
+			params['fecha'] = this.formatDateLocal(fecha);
 		}
 		if (grado) {
 			params['grado'] = grado;
@@ -148,7 +174,7 @@ export class AsistenciaService {
 		const params: Record<string, string> = {};
 
 		if (fecha) {
-			params['fecha'] = fecha.toISOString().split('T')[0];
+			params['fecha'] = this.formatDateLocal(fecha);
 		}
 
 		return this.http
@@ -164,7 +190,7 @@ export class AsistenciaService {
 		const params: Record<string, string> = { grado, seccion };
 
 		if (fecha) {
-			params['fecha'] = fecha.toISOString().split('T')[0];
+			params['fecha'] = this.formatDateLocal(fecha);
 		}
 
 		return this.http.get(`${this.apiUrl}/director/asistencia-dia/pdf`, {

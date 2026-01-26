@@ -3,20 +3,66 @@
 	align-items: center;
 	gap: 0.75rem;
 	margin-bottom: 1.5rem;
-	// Dimensiones fijas para evitar CLS
 	min-height: 40px;
 	contain: layout style;
 
-	i {
+	> i:first-child {
 		font-size: 1.5rem;
 		color: var(--intranet-default-text-color);
 	}
 
-	h1 {
-		font-size: 1.5rem;
-		font-weight: 600;
-		color: var(--intranet-default-text-color);
-		margin: 0;
+	.title-container {
+		display: flex;
+		align-items: center;
+		gap: 0.5rem;
+
+		h1 {
+			font-size: 1.5rem;
+			font-weight: 600;
+			color: var(--intranet-default-text-color);
+			margin: 0;
+		}
+
+		.separator {
+			font-size: 1.5rem;
+			font-weight: 300;
+			color: var(--intranet-soft-text-color);
+		}
+
+		.mode-selector {
+			display: flex;
+			gap: 0.25rem;
+			background: var(--intranet-background-color);
+			border-radius: 6px;
+			padding: 0.25rem;
+
+			.mode-btn {
+				padding: 0.375rem 0.75rem;
+				border: none;
+				border-radius: 4px;
+				background: transparent;
+				color: var(--intranet-soft-text-color);
+				font-size: 0.9rem;
+				font-weight: 500;
+				cursor: pointer;
+				transition: all 0.2s ease;
+
+				&:hover:not(.active) {
+					color: var(--intranet-alternative-text-color);
+					background: rgba(255, 255, 255, 0.5);
+				}
+
+				&.active {
+					background: var(--intranet-accent-color-blue);
+					color: var(--intranet-white-color);
+				}
+			}
+		}
+	}
+
+	.loading-spinner {
+		font-size: 1rem;
+		color: var(--intranet-accent-color-blue);
 	}
 
 	.reload-btn {

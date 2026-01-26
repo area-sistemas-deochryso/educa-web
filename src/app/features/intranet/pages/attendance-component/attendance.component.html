@@ -1,5 +1,11 @@
 <div class="attendance-container">
-	<app-attendance-header [loading]="loading()" (reload)="reloadAll()" />
+	<app-attendance-header
+		[loading]="loading()"
+		[showModeSelector]="userRole === 'Profesor'"
+		[selectedMode]="viewMode()"
+		(modeChange)="onViewModeChange($event)"
+		(reload)="reloadAll()"
+	/>
 
 	<app-attendance-legend />
 
@@ -30,26 +36,35 @@
 					[salones]="salones()"
 					[selectedSalonId]="selectedSalonId()"
 					[nombreProfesor]="nombreProfesor"
-					(salonChange)="selectSalon($event)"
+					(salonChange)="viewMode() === 'dia' ? selectSalonDia($event) : selectSalon($event)"
 				/>
 
-				@if (estudiantes().length > 0) {
-					<app-attendance-table
-						[table]="ingresos()"
-						[hijos]="estudiantesAsHijos()"
-						[selectedHijoId]="selectedEstudianteId()"
-						(monthChange)="onIngresosMonthChange($event)"
-						(hijoChange)="selectEstudiante($event)"
+				@if (viewMode() === 'mes') {
+					@if (estudiantes().length > 0) {
+						<app-attendance-table
+							[table]="ingresos()"
+							[hijos]="estudiantesAsHijos()"
+							[selectedHijoId]="selectedEstudianteId()"
+							(monthChange)="onIngresosMonthChange($event)"
+							(hijoChange)="selectEstudiante($event)"
+						/>
+						<app-attendance-table
+							[table]="salidas()"
+							[hijos]="estudiantesAsHijos()"
+							[selectedHijoId]="selectedEstudianteId()"
+							(monthChange)="onSalidasMonthChange($event)"
+							(hijoChange)="selectEstudiante($event)"
+						/>
+					} @else if (!loading()) {
+						<app-empty-state message="No se encontraron estudiantes en este salón." />
+					}
+				} @else {
+					<app-asistencia-dia-list
+						[estudiantes]="estudiantesDia()"
+						[fecha]="fechaDia()"
+						[loading]="loading()"
+						(fechaChange)="onFechaDiaChange($event)"
 					/>
-					<app-attendance-table
-						[table]="salidas()"
-						[hijos]="estudiantesAsHijos()"
-						[selectedHijoId]="selectedEstudianteId()"
-						(monthChange)="onSalidasMonthChange($event)"
-						(hijoChange)="selectEstudiante($event)"
-					/>
-				} @else if (!loading()) {
-					<app-empty-state message="No se encontraron estudiantes en este salón." />
 				}
 			} @else if (!loading()) {
 				<app-empty-state message="No tiene salones asignados." />
