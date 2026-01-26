@@ -9,7 +9,7 @@ import { MenuItem } from 'primeng/api';
 	templateUrl: './quick-access-card-menu.html',
 	styleUrl: './quick-access-card-menu.scss',
 })
-export class QuickAccessCardMenu {
+export class QuickAccessCardMenuComponent {
 	@ViewChild('coursesMenu') coursesMenu!: Menu;
 
 	/** Texto visible en la tarjeta */

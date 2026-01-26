@@ -15,13 +15,13 @@ import { FormsModule } from '@angular/forms';
 					[placeholder]="placeholder"
 					[ngModel]="searchTerm"
 					(ngModelChange)="searchTermChange.emit($event)"
-					(input)="search.emit()"
-					(blur)="blur.emit()"
+					(input)="searchTriggered.emit()"
+					(blur)="blurTriggered.emit()"
 				/>
 				@if (showDropdown && results.length > 0) {
 					<div class="course-dropdown">
 						@for (course of results; track course) {
-							<div class="course-option" (mousedown)="select.emit(course)">
+							<div class="course-option" (mousedown)="selectTriggered.emit(course)">
 								{{ course }}
 							</div>
 						}
@@ -96,7 +96,7 @@ export class CourseSearchComponent {
 	@Input() results: string[] = [];
 	@Input() showDropdown = false;
 	@Output() searchTermChange = new EventEmitter<string>();
-	@Output() search = new EventEmitter<void>();
-	@Output() blur = new EventEmitter<void>();
-	@Output() select = new EventEmitter<string>();
+	@Output() searchTriggered = new EventEmitter<void>();
+	@Output() blurTriggered = new EventEmitter<void>();
+	@Output() selectTriggered = new EventEmitter<string>();
 }

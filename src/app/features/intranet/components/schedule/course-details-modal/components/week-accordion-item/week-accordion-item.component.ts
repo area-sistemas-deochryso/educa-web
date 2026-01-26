@@ -18,7 +18,7 @@ export interface WeekData {
 	imports: [CommonModule, WeekContentRowComponent],
 	template: `
 		<div class="week-item" [class.expanded]="week.expanded">
-			<div class="week-header" (click)="toggle.emit()">
+			<div class="week-header" (click)="toggleTriggered.emit()">
 				<span>{{ week.name }}</span>
 				<i
 					class="pi"
@@ -112,7 +112,7 @@ export interface WeekData {
 })
 export class WeekAccordionItemComponent {
 	@Input({ required: true }) week!: WeekData;
-	@Output() toggle = new EventEmitter<void>();
+	@Output() toggleTriggered = new EventEmitter<void>();
 	@Output() openAttachments = new EventEmitter<void>();
 	@Output() openTasks = new EventEmitter<void>();
 	@Output() openSubmissions = new EventEmitter<void>();

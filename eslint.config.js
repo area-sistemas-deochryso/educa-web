@@ -59,6 +59,10 @@ module.exports = tseslint.config(
 		files: ['**/*.html'],
 		extends: [...angular.configs.templateRecommended, ...angular.configs.templateAccessibility],
 		rules: {
+			// Disable rules that conflict with PrimeNG
+			// PrimeNG's pButton directive generates content internally via label/icon attributes
+			'@angular-eslint/template/elements-content': 'off',
+
 			// Disable rules that are too strict for most projects
 			'@angular-eslint/template/click-events-have-key-events': 'off',
 			'@angular-eslint/template/interactive-supports-focus': 'off',

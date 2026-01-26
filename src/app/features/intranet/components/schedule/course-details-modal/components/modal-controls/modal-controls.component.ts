@@ -22,7 +22,7 @@ import { TooltipModule } from 'primeng/tooltip';
 			</button>
 			<button
 				class="control-btn close-btn"
-				(click)="close.emit()"
+				(click)="closeTriggered.emit()"
 				pTooltip="Cerrar"
 				tooltipPosition="bottom"
 			>
@@ -78,5 +78,5 @@ import { TooltipModule } from 'primeng/tooltip';
 export class ModalControlsComponent {
 	@Input() isExpanded = false;
 	@Output() expand = new EventEmitter<void>();
-	@Output() close = new EventEmitter<void>();
+	@Output() closeTriggered = new EventEmitter<void>();
 }

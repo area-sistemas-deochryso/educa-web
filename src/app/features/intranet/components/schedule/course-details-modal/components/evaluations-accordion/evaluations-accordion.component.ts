@@ -12,7 +12,7 @@ export interface Evaluation {
 	imports: [CommonModule],
 	template: `
 		<div class="evaluations-section" [class.expanded]="expanded">
-			<div class="eval-header" (click)="toggle.emit()">
+			<div class="eval-header" (click)="toggleTriggered.emit()">
 				<span>EVALUACIONES</span>
 				<i
 					class="pi"
@@ -97,5 +97,5 @@ export interface Evaluation {
 export class EvaluationsAccordionComponent {
 	@Input() expanded = false;
 	@Input() evaluations: Evaluation[] = [];
-	@Output() toggle = new EventEmitter<void>();
+	@Output() toggleTriggered = new EventEmitter<void>();
 }

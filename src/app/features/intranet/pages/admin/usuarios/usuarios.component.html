@@ -316,6 +316,12 @@
 						<span class="info-value">{{ selectedUsuario()?.seccion }}</span>
 					</div>
 				}
+				@if (selectedUsuario()?.correoApoderado) {
+					<div class="info-item">
+						<span class="info-label">Correo del Apoderado</span>
+						<span class="info-value">{{ selectedUsuario()?.correoApoderado }}</span>
+					</div>
+				}
 				<div class="info-item">
 					<span class="info-label">Fecha de Registro</span>
 					<span class="info-value">{{
@@ -456,6 +462,25 @@
 					placeholder="999999999"
 				/>
 			</div>
+
+			@if (isEstudiante()) {
+				<div class="field">
+					<label for="correoApoderado">Correo del Apoderado</label>
+					<input
+						id="correoApoderado"
+						type="email"
+						pInputText
+						[ngModel]="formData().correoApoderado"
+						(ngModelChange)="updateFormField('correoApoderado', $event)"
+						placeholder="correo@ejemplo.com"
+						[class.ng-invalid]="correoApoderadoError()"
+						[class.ng-dirty]="formData().correoApoderado"
+					/>
+					@if (correoApoderadoError()) {
+						<small class="p-error">{{ correoApoderadoError() }}</small>
+					}
+				</div>
+			}
 
 			@if (isEditing()) {
 				<div class="field full-width">

@@ -119,6 +119,20 @@ export class UsuariosComponent implements OnInit {
 		return null;
 	});
 
+	correoApoderadoError = computed(() => {
+		const correo = this.formData().correoApoderado || '';
+		if (!correo) return null;
+		const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+		if (!emailRegex.test(correo)) return 'Ingrese un correo valido';
+		return null;
+	});
+
+	// Computed - Helper para mostrar campos de estudiante
+	isEstudiante = computed(() => {
+		const rol = this.formData().rol;
+		return rol === 'Estudiante';
+	});
+
 	// Computed - Filtered data
 	filteredUsuarios = computed(() => {
 		let data = this.usuarios();
@@ -262,6 +276,7 @@ export class UsuariosComponent implements OnInit {
 						fechaNacimiento: detalle.fechaNacimiento,
 						grado: detalle.grado,
 						seccion: detalle.seccion,
+						correoApoderado: detalle.correoApoderado,
 					});
 					this.isEditing.set(true);
 					this.dialogVisible.set(true);
@@ -301,6 +316,7 @@ export class UsuariosComponent implements OnInit {
 						fechaNacimiento: data.fechaNacimiento,
 						grado: data.grado,
 						seccion: data.seccion,
+						correoApoderado: data.correoApoderado,
 					};
 					return this.usuariosService.actualizarUsuario(usuario.rol, usuario.id, request);
 				})()
@@ -318,6 +334,7 @@ export class UsuariosComponent implements OnInit {
 						fechaNacimiento: data.fechaNacimiento,
 						grado: data.grado,
 						seccion: data.seccion,
+						correoApoderado: data.correoApoderado,
 					};
 					return this.usuariosService.crearUsuario(request);
 				})();
@@ -379,6 +396,7 @@ export class UsuariosComponent implements OnInit {
 		if (!this.isEditing() && (!data.rol || !data.contrasena)) return false;
 		if (this.dniError()) return false;
 		if (this.correoError()) return false;
+		if (this.correoApoderadoError()) return false;
 		return true;
 	}
 

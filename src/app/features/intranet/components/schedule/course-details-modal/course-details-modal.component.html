@@ -12,7 +12,7 @@
 		<app-modal-controls
 			[isExpanded]="isExpanded"
 			(expand)="toggleExpand()"
-			(close)="onVisibleChange(false)"
+			(closeTriggered)="onVisibleChange(false)"
 		/>
 
 		<h2>{{ currentCourseDetails.name }}</h2>
@@ -28,7 +28,7 @@
 					@for (week of filteredWeeks; track week.id) {
 						<app-week-accordion-item
 							[week]="week"
-							(toggle)="toggleWeek(week)"
+							(toggleTriggered)="toggleWeek(week)"
 							(openAttachments)="openAttachments(week)"
 							(openTasks)="openTasks(week)"
 							(openSubmissions)="openSubmissions(week)"
@@ -39,7 +39,7 @@
 				<app-evaluations-accordion
 					[expanded]="evaluationsExpanded"
 					[evaluations]="currentCourseDetails.evaluations"
-					(toggle)="toggleEvaluations()"
+					(toggleTriggered)="toggleEvaluations()"
 				/>
 			</div>
 
@@ -66,9 +66,9 @@
 					[results]="courseSearchResults"
 					[showDropdown]="showCourseDropdown"
 					(searchTermChange)="courseSearchTerm = $event"
-					(search)="onCourseSearch()"
-					(blur)="hideCourseDropdown()"
-					(select)="selectCourse($event)"
+					(searchTriggered)="onCourseSearch()"
+					(blurTriggered)="hideCourseDropdown()"
+					(selectTriggered)="selectCourse($event)"
 				/>
 
 				<app-sidebar-links [links]="courseSearchLinks" (linkClick)="onLinkClick($event)" />

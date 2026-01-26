@@ -6,7 +6,7 @@ import { Component, input } from '@angular/core';
 	templateUrl: './welcome-section.html',
 	styleUrl: './welcome-section.scss',
 })
-export class WelcomeSection {
+export class WelcomeSectionComponent {
 	/** Icono de PrimeNG a mostrar */
 	icon = input<string>('pi-graduation-cap');
 

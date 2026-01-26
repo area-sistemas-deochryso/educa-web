@@ -7,7 +7,6 @@ import { provideHttpClientTesting } from '@angular/common/http/testing';
 
 // Mock IntersectionObserver for jsdom environment
 class MockIntersectionObserver implements IntersectionObserver {
-	// eslint-disable-next-line unicorn/no-null
 	readonly root: Element | Document | null = null;
 	readonly rootMargin: string = '';
 	readonly thresholds: readonly number[] = [];

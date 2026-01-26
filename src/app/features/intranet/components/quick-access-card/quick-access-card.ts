@@ -7,7 +7,7 @@ import { RouterLink } from '@angular/router';
 	templateUrl: './quick-access-card.html',
 	styleUrl: './quick-access-card.scss',
 })
-export class QuickAccessCard {
+export class QuickAccessCardComponent {
 	/** Texto visible en la tarjeta */
 	label = input.required<string>();
 

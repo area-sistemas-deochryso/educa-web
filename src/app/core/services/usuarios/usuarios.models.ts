@@ -17,6 +17,7 @@ export interface UsuarioDetalle extends UsuarioLista {
 	fechaNacimiento?: string;
 	grado?: string;
 	seccion?: string;
+	correoApoderado?: string;
 	usuarioRegistro?: string;
 	usuarioModificacion?: string;
 	fechaModificacion?: string;
@@ -34,6 +35,7 @@ export interface CrearUsuarioRequest {
 	fechaNacimiento?: string;
 	grado?: string;
 	seccion?: string;
+	correoApoderado?: string;
 }
 
 export interface ActualizarUsuarioRequest {
@@ -48,6 +50,7 @@ export interface ActualizarUsuarioRequest {
 	fechaNacimiento?: string;
 	grado?: string;
 	seccion?: string;
+	correoApoderado?: string;
 }
 
 export interface UsuariosEstadisticas {
