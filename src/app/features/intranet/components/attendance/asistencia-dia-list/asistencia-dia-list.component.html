@@ -1,4 +1,4 @@
-<p-card styleClass="asistencia-dia-card">
+<p-card class="asistencia-dia-card">
 	<ng-template #header>
 		<div class="card-header">
 			<h3><i class="pi pi-calendar-clock"></i> Asistencia del día</h3>
@@ -8,7 +8,7 @@
 				[maxDate]="today"
 				dateFormat="dd/mm/yy"
 				(onSelect)="onFechaSelect($event)"
-				styleClass="fecha-picker"
+				class="fecha-picker"
 			/>
 		</div>
 	</ng-template>
@@ -16,7 +16,7 @@
 	@if (loading()) {
 		<div class="skeleton-container">
 			@for (_ of skeletonRows; track $index) {
-				<p-skeleton height="3rem" styleClass="skeleton-row" />
+				<p-skeleton height="3rem" class="skeleton-row" />
 			}
 		</div>
 	} @else if (estudiantesDelDia().length === 0) {
@@ -25,7 +25,7 @@
 			<p>No hay registros de asistencia para esta fecha</p>
 		</div>
 	} @else {
-		<p-table [value]="estudiantesDelDia()" styleClass="p-datatable-sm asistencia-table">
+		<p-table [value]="estudiantesDelDia()" class="p-datatable-sm asistencia-table">
 			<ng-template #header>
 				<tr>
 					<th style="width: 50px">#</th>
@@ -71,34 +71,48 @@
 
 		<div class="resumen-footer">
 			<div class="stat-badge total">
-				<i class="pi pi-users"></i>
-				<span class="value">{{ estadisticas().total }}</span>
-				<span class="label">Total</span>
+				<div class="badge-icon">
+					<i class="pi pi-users"></i>
+				</div>
+				<div class="badge-content">
+					<span class="value">{{ estadisticas().total }}</span>
+					<span class="label">Total</span>
+				</div>
 			</div>
 			<div class="stat-badge temprano">
 				<span class="status-indicator status-temprano">T</span>
-				<span class="value">{{ estadisticas().temprano }}</span>
-				<span class="label">Temprano</span>
+				<div class="badge-content">
+					<span class="value">{{ estadisticas().temprano }}</span>
+					<span class="label">Temprano</span>
+				</div>
 			</div>
 			<div class="stat-badge atiempo">
 				<span class="status-indicator status-atiempo">A</span>
-				<span class="value">{{ estadisticas().aTiempo }}</span>
-				<span class="label">A tiempo</span>
+				<div class="badge-content">
+					<span class="value">{{ estadisticas().aTiempo }}</span>
+					<span class="label">A tiempo</span>
+				</div>
 			</div>
 			<div class="stat-badge fuera">
 				<span class="status-indicator status-fuera">F</span>
-				<span class="value">{{ estadisticas().fueraHora }}</span>
-				<span class="label">Fuera hora</span>
+				<div class="badge-content">
+					<span class="value">{{ estadisticas().fueraHora }}</span>
+					<span class="label">Fuera hora</span>
+				</div>
 			</div>
 			<div class="stat-badge no-asistio">
 				<span class="status-indicator status-no">N</span>
-				<span class="value">{{ estadisticas().noAsistio }}</span>
-				<span class="label">No asistió</span>
+				<div class="badge-content">
+					<span class="value">{{ estadisticas().noAsistio }}</span>
+					<span class="label">No asistió</span>
+				</div>
 			</div>
 			<div class="stat-badge pendiente">
 				<span class="status-indicator status-pendiente">-</span>
-				<span class="value">{{ estadisticas().pendiente }}</span>
-				<span class="label">Pendiente</span>
+				<div class="badge-content">
+					<span class="value">{{ estadisticas().pendiente }}</span>
+					<span class="label">Pendiente</span>
+				</div>
 			</div>
 		</div>
 	}
