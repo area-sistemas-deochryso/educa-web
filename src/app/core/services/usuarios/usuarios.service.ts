@@ -33,7 +33,7 @@ export class UsuariosService {
 
 	obtenerUsuario(rol: string, id: number): Observable<UsuarioDetalle | null> {
 		return this.http
-			.get<UsuarioDetalle>(`${this.apiUrl}/${rol}/${id}`)
+			.get<UsuarioDetalle>(`${this.apiUrl}/${encodeURIComponent(rol)}/${id}`)
 			.pipe(catchError(() => of(null)));
 	}
 
@@ -46,15 +46,18 @@ export class UsuariosService {
 		id: number,
 		request: ActualizarUsuarioRequest,
 	): Observable<ApiResponse> {
-		return this.http.put<ApiResponse>(`${this.apiUrl}/${rol}/${id}`, request);
+		return this.http.put<ApiResponse>(`${this.apiUrl}/${encodeURIComponent(rol)}/${id}`, request);
 	}
 
 	eliminarUsuario(rol: string, id: number): Observable<ApiResponse> {
-		return this.http.delete<ApiResponse>(`${this.apiUrl}/${rol}/${id}`);
+		return this.http.delete<ApiResponse>(`${this.apiUrl}/${encodeURIComponent(rol)}/${id}`);
 	}
 
 	cambiarEstado(rol: string, id: number, estado: boolean): Observable<ApiResponse> {
-		return this.http.patch<ApiResponse>(`${this.apiUrl}/${rol}/${id}/estado`, { estado });
+		return this.http.patch<ApiResponse>(
+			`${this.apiUrl}/${encodeURIComponent(rol)}/${id}/estado`,
+			{ estado },
+		);
 	}
 
 	obtenerEstadisticas(): Observable<UsuariosEstadisticas | null> {
@@ -68,7 +71,10 @@ export class UsuariosService {
 		if (exceptoId) params['exceptoId'] = exceptoId.toString();
 
 		return this.http
-			.get<{ existe: boolean }>(`${this.apiUrl}/verificar-dni/${rol}/${dni}`, { params })
+			.get<{ existe: boolean }>(
+				`${this.apiUrl}/verificar-dni/${encodeURIComponent(rol)}/${dni}`,
+				{ params },
+			)
 			.pipe(catchError(() => of({ existe: false })));
 	}
 }

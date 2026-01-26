@@ -3,7 +3,12 @@
  */
 
 // Roles disponibles en el sistema
-export type UserRole = 'Estudiante' | 'Apoderado' | 'Profesor' | 'Director';
+export type UserRole =
+	| 'Estudiante'
+	| 'Apoderado'
+	| 'Profesor'
+	| 'Director'
+	| 'Asistente Administrativo';
 
 // Request para el endpoint POST /api/Auth/login
 export interface LoginRequest {

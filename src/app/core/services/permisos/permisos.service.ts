@@ -67,7 +67,7 @@ export class PermisosService {
 
 	getPermisoRolPorTabla(rol: string): Observable<PermisoRol | null> {
 		return this.http
-			.get<PermisoRol>(`${this.apiUrl}/rol/por-rol/${rol}`)
+			.get<PermisoRol>(`${this.apiUrl}/rol/por-rol/${encodeURIComponent(rol)}`)
 			.pipe(catchError(() => of(null)));
 	}
 
@@ -102,7 +102,7 @@ export class PermisosService {
 
 	getPermisosUsuarioPorRol(rol: string): Observable<PermisoUsuario[]> {
 		return this.http
-			.get<PermisoUsuario[]>(`${this.apiUrl}/usuario/por-rol/${rol}`)
+			.get<PermisoUsuario[]>(`${this.apiUrl}/usuario/por-rol/${encodeURIComponent(rol)}`)
 			.pipe(catchError(() => of([])));
 	}
 
@@ -128,7 +128,9 @@ export class PermisosService {
 		rol: string,
 	): Observable<PermisosUsuarioResultado | null> {
 		return this.http
-			.get<PermisosUsuarioResultado>(`${this.apiUrl}/usuario/consultar/${usuarioId}/${rol}`)
+			.get<PermisosUsuarioResultado>(
+				`${this.apiUrl}/usuario/consultar/${usuarioId}/${encodeURIComponent(rol)}`,
+			)
 			.pipe(catchError(() => of(null)));
 	}
 
@@ -157,7 +159,9 @@ export class PermisosService {
 
 	listarUsuariosPorRol(rol: string): Observable<UsuarioBusquedaResultado> {
 		return this.http
-			.get<UsuarioBusquedaResultado>(`${this.apiUrl}/usuario/usuarios-por-rol/${rol}`)
+			.get<UsuarioBusquedaResultado>(
+				`${this.apiUrl}/usuario/usuarios-por-rol/${encodeURIComponent(rol)}`,
+			)
 			.pipe(catchError(() => of({ usuarios: [], total: 0 })));
 	}
 }

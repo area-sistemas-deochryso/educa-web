@@ -19,10 +19,12 @@ export class AdminUtilsService {
 	/**
 	 * Retorna el severity de PrimeNG según el rol
 	 */
-	getRolSeverity(rol: string): 'success' | 'info' | 'warn' | 'danger' | 'secondary' {
+	getRolSeverity(rol: string): 'success' | 'info' | 'warn' | 'danger' | 'secondary' | 'contrast' {
 		switch (rol) {
 			case 'Director':
 				return 'danger';
+			case 'Asistente Administrativo':
+				return 'contrast';
 			case 'Profesor':
 				return 'warn';
 			case 'Apoderado':

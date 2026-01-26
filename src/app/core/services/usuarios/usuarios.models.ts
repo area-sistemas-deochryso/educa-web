@@ -53,6 +53,7 @@ export interface ActualizarUsuarioRequest {
 export interface UsuariosEstadisticas {
 	totalUsuarios: number;
 	totalDirectores: number;
+	totalAsistentesAdministrativos: number;
 	totalProfesores: number;
 	totalApoderados: number;
 	totalEstudiantes: number;
@@ -60,11 +61,22 @@ export interface UsuariosEstadisticas {
 	usuariosInactivos: number;
 }
 
-export type RolUsuario = 'Director' | 'Profesor' | 'Apoderado' | 'Estudiante';
+export type RolUsuario = 'Director' | 'Profesor' | 'Apoderado' | 'Estudiante' | 'Asistente Administrativo';
 
-export const ROLES_USUARIOS: RolUsuario[] = ['Director', 'Profesor', 'Apoderado', 'Estudiante'];
+export const ROLES_USUARIOS: RolUsuario[] = [
+	'Director',
+	'Profesor',
+	'Apoderado',
+	'Estudiante',
+	'Asistente Administrativo',
+];
 
 // Roles disponibles para gestión en admin (sin Apoderado)
-export type RolUsuarioAdmin = 'Director' | 'Profesor' | 'Estudiante';
+export type RolUsuarioAdmin = 'Director' | 'Profesor' | 'Estudiante' | 'Asistente Administrativo';
 
-export const ROLES_USUARIOS_ADMIN: RolUsuarioAdmin[] = ['Director', 'Profesor', 'Estudiante'];
+export const ROLES_USUARIOS_ADMIN: RolUsuarioAdmin[] = [
+	'Director',
+	'Profesor',
+	'Estudiante',
+	'Asistente Administrativo',
+];

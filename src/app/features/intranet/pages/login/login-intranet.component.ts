@@ -74,6 +74,7 @@ export class LoginIntranetComponent implements OnInit, OnDestroy {
 		{ label: 'Estudiante', value: 'Estudiante' },
 		{ label: 'Profesor', value: 'Profesor' },
 		{ label: 'Director', value: 'Director' },
+		{ label: 'Asistente Administrativo', value: 'Asistente Administrativo' },
 	];
 
 	ngOnInit(): void {

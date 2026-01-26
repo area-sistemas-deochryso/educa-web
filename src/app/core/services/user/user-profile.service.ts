@@ -2,7 +2,13 @@ import { Injectable, inject, signal, computed, effect } from '@angular/core';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { AuthService } from '../auth';
 
-export type AppUserRole = 'Estudiante' | 'Apoderado' | 'Profesor' | 'Director' | '';
+export type AppUserRole =
+	| 'Estudiante'
+	| 'Apoderado'
+	| 'Profesor'
+	| 'Director'
+	| 'Asistente Administrativo'
+	| '';
 
 @Injectable({
 	providedIn: 'root',
@@ -31,6 +37,7 @@ export class UserProfileService {
 	readonly isApoderado = computed(() => this._userRole() === 'Apoderado');
 	readonly isProfesor = computed(() => this._userRole() === 'Profesor');
 	readonly isDirector = computed(() => this._userRole() === 'Director');
+	readonly isAsistenteAdministrativo = computed(() => this._userRole() === 'Asistente Administrativo');
 
 	readonly displayName = computed(() => {
 		const name = this._userName();

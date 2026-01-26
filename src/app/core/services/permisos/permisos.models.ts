@@ -61,14 +61,25 @@ export interface PermisosUsuarioResultado {
 }
 
 // Tipos de roles disponibles
-export type RolTipo = 'Director' | 'Profesor' | 'Apoderado' | 'Estudiante';
+export type RolTipo = 'Director' | 'Profesor' | 'Apoderado' | 'Estudiante' | 'Asistente Administrativo';
 
-export const ROLES_DISPONIBLES: RolTipo[] = ['Director', 'Profesor', 'Apoderado', 'Estudiante'];
+export const ROLES_DISPONIBLES: RolTipo[] = [
+	'Director',
+	'Profesor',
+	'Apoderado',
+	'Estudiante',
+	'Asistente Administrativo',
+];
 
 // Roles disponibles para gestión en admin (sin Apoderado)
-export type RolTipoAdmin = 'Director' | 'Profesor' | 'Estudiante';
+export type RolTipoAdmin = 'Director' | 'Profesor' | 'Estudiante' | 'Asistente Administrativo';
 
-export const ROLES_DISPONIBLES_ADMIN: RolTipoAdmin[] = ['Director', 'Profesor', 'Estudiante'];
+export const ROLES_DISPONIBLES_ADMIN: RolTipoAdmin[] = [
+	'Director',
+	'Profesor',
+	'Estudiante',
+	'Asistente Administrativo',
+];
 
 // Response genérico del API
 export interface ApiResponse {
