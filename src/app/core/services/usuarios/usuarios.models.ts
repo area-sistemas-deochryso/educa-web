@@ -63,3 +63,8 @@ export interface UsuariosEstadisticas {
 export type RolUsuario = 'Director' | 'Profesor' | 'Apoderado' | 'Estudiante';
 
 export const ROLES_USUARIOS: RolUsuario[] = ['Director', 'Profesor', 'Apoderado', 'Estudiante'];
+
+// Roles disponibles para gestión en admin (sin Apoderado)
+export type RolUsuarioAdmin = 'Director' | 'Profesor' | 'Estudiante';
+
+export const ROLES_USUARIOS_ADMIN: RolUsuarioAdmin[] = ['Director', 'Profesor', 'Estudiante'];

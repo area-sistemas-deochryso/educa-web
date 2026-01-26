@@ -28,22 +28,23 @@ export const INTRANET_ROUTES: Routes = [
 					),
 				title: 'Intranet - Asistencia',
 			},
-			{
-				path: 'horarios',
-				loadComponent: () =>
-					import('./pages/schedule-component/schedule.component').then(
-						(m) => m.ScheduleComponent,
-					),
-				title: 'Intranet - Horarios',
-			},
-			{
-				path: 'calendario',
-				loadComponent: () =>
-					import('./pages/calendary-component/calendary.component').then(
-						(m) => m.CalendaryComponent,
-					),
-				title: 'Intranet - Calendario',
-			},
+			// TODO: Temporalmente oculto - Horarios y Calendario
+			// {
+			// 	path: 'horarios',
+			// 	loadComponent: () =>
+			// 		import('./pages/schedule-component/schedule.component').then(
+			// 			(m) => m.ScheduleComponent,
+			// 		),
+			// 	title: 'Intranet - Horarios',
+			// },
+			// {
+			// 	path: 'calendario',
+			// 	loadComponent: () =>
+			// 		import('./pages/calendary-component/calendary.component').then(
+			// 			(m) => m.CalendaryComponent,
+			// 		),
+			// 	title: 'Intranet - Calendario',
+			// },
 			{
 				path: 'admin/permisos/roles',
 				loadComponent: () =>

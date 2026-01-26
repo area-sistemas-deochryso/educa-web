@@ -65,6 +65,11 @@ export type RolTipo = 'Director' | 'Profesor' | 'Apoderado' | 'Estudiante';
 
 export const ROLES_DISPONIBLES: RolTipo[] = ['Director', 'Profesor', 'Apoderado', 'Estudiante'];
 
+// Roles disponibles para gestión en admin (sin Apoderado)
+export type RolTipoAdmin = 'Director' | 'Profesor' | 'Estudiante';
+
+export const ROLES_DISPONIBLES_ADMIN: RolTipoAdmin[] = ['Director', 'Profesor', 'Estudiante'];
+
 // Response genérico del API
 export interface ApiResponse {
 	mensaje: string;

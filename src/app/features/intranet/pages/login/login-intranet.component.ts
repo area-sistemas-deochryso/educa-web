@@ -72,7 +72,6 @@ export class LoginIntranetComponent implements OnInit, OnDestroy {
 
 	roles: RolOption[] = [
 		{ label: 'Estudiante', value: 'Estudiante' },
-		{ label: 'Apoderado', value: 'Apoderado' },
 		{ label: 'Profesor', value: 'Profesor' },
 		{ label: 'Director', value: 'Director' },
 	];
