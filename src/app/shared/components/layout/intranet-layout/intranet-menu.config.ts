@@ -24,18 +24,19 @@ export const INTRANET_MENU: NavItemWithPermiso[] = [
 		icon: 'pi pi-check-square',
 		permiso: 'intranet/asistencia',
 	},
-	{
-		route: '/intranet/horarios',
-		label: 'Horarios',
-		icon: 'pi pi-clock',
-		permiso: 'intranet/horarios',
-	},
-	{
-		route: '/intranet/calendario',
-		label: 'Calendario',
-		icon: 'pi pi-calendar',
-		permiso: 'intranet/calendario',
-	},
+	// TODO: Temporalmente oculto - Horarios y Calendario
+	// {
+	// 	route: '/intranet/horarios',
+	// 	label: 'Horarios',
+	// 	icon: 'pi pi-clock',
+	// 	permiso: 'intranet/horarios',
+	// },
+	// {
+	// 	route: '/intranet/calendario',
+	// 	label: 'Calendario',
+	// 	icon: 'pi pi-calendar',
+	// 	permiso: 'intranet/calendario',
+	// },
 	{
 		label: 'Admin',
 		icon: 'pi pi-cog',

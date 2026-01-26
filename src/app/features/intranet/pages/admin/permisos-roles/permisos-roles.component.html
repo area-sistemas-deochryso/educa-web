@@ -135,9 +135,6 @@
 									@case ('Profesor') {
 										Gestion de clases, asistencia y calificaciones
 									}
-									@case ('Apoderado') {
-										Consulta de informacion de estudiantes a cargo
-									}
 									@case ('Estudiante') {
 										Acceso a informacion academica personal
 									}
@@ -154,6 +151,7 @@
 									icon="pi pi-eye"
 									class="p-button-rounded p-button-text p-button-secondary"
 									pTooltip="Ver detalles"
+									aria-label="Ver detalles"
 									(click)="openDetail(permiso)"
 								></button>
 								<button
@@ -161,6 +159,7 @@
 									icon="pi pi-pencil"
 									class="p-button-rounded p-button-text p-button-info"
 									pTooltip="Editar"
+									aria-label="Editar"
 									(click)="editPermiso(permiso)"
 								></button>
 								<button
@@ -168,6 +167,7 @@
 									icon="pi pi-trash"
 									class="p-button-rounded p-button-text p-button-danger"
 									pTooltip="Eliminar"
+									aria-label="Eliminar"
 									(click)="deletePermiso(permiso)"
 								></button>
 							</div>

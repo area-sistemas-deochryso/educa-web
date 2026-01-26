@@ -175,6 +175,7 @@
 									icon="pi pi-pencil"
 									class="p-button-rounded p-button-text p-button-info"
 									pTooltip="Editar"
+									aria-label="Editar"
 									(click)="editVista(vista)"
 								></button>
 								<button
@@ -184,6 +185,7 @@
 									[class.p-button-warning]="vista.estado === 1"
 									[class.p-button-success]="vista.estado !== 1"
 									[pTooltip]="vista.estado === 1 ? 'Desactivar' : 'Activar'"
+									[attr.aria-label]="vista.estado === 1 ? 'Desactivar' : 'Activar'"
 									(click)="toggleEstado(vista)"
 								></button>
 								<button
@@ -191,6 +193,7 @@
 									icon="pi pi-trash"
 									class="p-button-rounded p-button-text p-button-danger"
 									pTooltip="Eliminar"
+									aria-label="Eliminar"
 									(click)="deleteVista(vista)"
 								></button>
 							</div>

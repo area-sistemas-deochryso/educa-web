@@ -193,6 +193,7 @@
 									icon="pi pi-eye"
 									class="p-button-rounded p-button-text p-button-secondary"
 									pTooltip="Ver detalles"
+									aria-label="Ver detalles"
 									(click)="openDetail(usuario)"
 								></button>
 								<button
@@ -200,6 +201,7 @@
 									icon="pi pi-pencil"
 									class="p-button-rounded p-button-text p-button-info"
 									pTooltip="Editar"
+									aria-label="Editar"
 									(click)="editUsuario(usuario)"
 								></button>
 								<button
@@ -209,6 +211,7 @@
 									[class.p-button-warning]="usuario.estado"
 									[class.p-button-success]="!usuario.estado"
 									[pTooltip]="usuario.estado ? 'Desactivar' : 'Activar'"
+									[attr.aria-label]="usuario.estado ? 'Desactivar' : 'Activar'"
 									(click)="toggleEstado(usuario)"
 								></button>
 							</div>

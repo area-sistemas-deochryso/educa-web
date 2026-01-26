@@ -37,8 +37,8 @@ import {
 	PermisoUsuario,
 	PermisoRol,
 	Vista,
-	ROLES_DISPONIBLES,
-	RolTipo,
+	ROLES_DISPONIBLES_ADMIN,
+	RolTipoAdmin,
 	UsuarioBusqueda,
 	ErrorHandlerService,
 } from '@core/services';
@@ -96,7 +96,7 @@ export class PermisosUsuariosComponent implements OnInit {
 	// Form
 	selectedPermiso = signal<PermisoUsuario | null>(null);
 	selectedUsuarioId = signal<number | null>(null);
-	selectedRol = signal<RolTipo | null>(null);
+	selectedRol = signal<RolTipoAdmin | null>(null);
 	selectedVistas = signal<string[]>([]);
 
 	// Autocomplete usuarios
@@ -105,19 +105,19 @@ export class PermisosUsuariosComponent implements OnInit {
 
 	// Filters
 	searchTerm = signal('');
-	filterRol = signal<RolTipo | null>(null);
+	filterRol = signal<RolTipoAdmin | null>(null);
 
 	// Edit modal - module tabs
 	modulosVistas = signal<ModuloVistas[]>([]);
 	activeModuloIndex = signal(0);
 	vistasBusqueda = signal('');
 
-	// Options
-	rolesDisponibles = ROLES_DISPONIBLES;
-	rolesOptions = [{ label: 'Todos los roles', value: null as RolTipo | null }].concat(
-		ROLES_DISPONIBLES.map((r) => ({ label: r, value: r as RolTipo | null })),
+	// Options (sin Apoderado para admin)
+	rolesDisponibles = ROLES_DISPONIBLES_ADMIN;
+	rolesOptions = [{ label: 'Todos los roles', value: null as RolTipoAdmin | null }].concat(
+		ROLES_DISPONIBLES_ADMIN.map((r) => ({ label: r, value: r as RolTipoAdmin | null })),
 	);
-	rolesSelectOptions = ROLES_DISPONIBLES.map((r) => ({ label: r, value: r }));
+	rolesSelectOptions = ROLES_DISPONIBLES_ADMIN.map((r) => ({ label: r, value: r }));
 
 	// Computed - Statistics
 	totalUsuarios = computed(() => this.permisosUsuario().length);
@@ -186,8 +186,9 @@ export class PermisosUsuariosComponent implements OnInit {
 			.subscribe({
 				next: ({ vistas, permisosRol, permisosUsuario }) => {
 					this.vistas.set(vistas.filter((v) => v.estado === 1));
-					this.permisosRol.set(permisosRol);
-					this.permisosUsuario.set(permisosUsuario);
+					// Filtrar apoderados para no mostrarlos en admin
+					this.permisosRol.set(permisosRol.filter((p) => p.rol !== 'Apoderado'));
+					this.permisosUsuario.set(permisosUsuario.filter((p) => p.rol !== 'Apoderado'));
 					this.loading.set(false);
 				},
 				error: (err) => {
@@ -233,7 +234,7 @@ export class PermisosUsuariosComponent implements OnInit {
 	editPermiso(permiso: PermisoUsuario): void {
 		this.selectedPermiso.set(permiso);
 		this.selectedUsuarioId.set(permiso.usuarioId);
-		this.selectedRol.set(permiso.rol as RolTipo);
+		this.selectedRol.set(permiso.rol as RolTipoAdmin);
 		this.selectedVistas.set([...permiso.vistas]);
 		this.isEditing.set(true);
 		this.buildModulosVistas(permiso.vistas);

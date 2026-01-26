@@ -11,7 +11,7 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { forkJoin } from 'rxjs';
-import { filter, debounceTime } from 'rxjs/operators';
+import { filter } from 'rxjs/operators';
 
 import { TableModule } from 'primeng/table';
 import { ButtonModule } from 'primeng/button';
@@ -34,8 +34,8 @@ import {
 	CrearUsuarioRequest,
 	ActualizarUsuarioRequest,
 	UsuariosEstadisticas,
-	ROLES_USUARIOS,
-	RolUsuario,
+	ROLES_USUARIOS_ADMIN,
+	RolUsuarioAdmin,
 	ErrorHandlerService,
 	SwService,
 } from '@core/services';
@@ -87,15 +87,15 @@ export class UsuariosComponent implements OnInit {
 
 	// Filters
 	searchTerm = signal('');
-	filterRol = signal<RolUsuario | null>(null);
+	filterRol = signal<RolUsuarioAdmin | null>(null);
 	filterEstado = signal<boolean | null>(null);
 
-	// Options
-	rolesDisponibles = ROLES_USUARIOS;
-	rolesOptions = [{ label: 'Todos los roles', value: null as RolUsuario | null }].concat(
-		ROLES_USUARIOS.map((r) => ({ label: r, value: r as RolUsuario | null })),
+	// Options (sin Apoderado para admin)
+	rolesDisponibles = ROLES_USUARIOS_ADMIN;
+	rolesOptions = [{ label: 'Todos los roles', value: null as RolUsuarioAdmin | null }].concat(
+		ROLES_USUARIOS_ADMIN.map((r) => ({ label: r, value: r as RolUsuarioAdmin | null })),
 	);
-	rolesSelectOptions = ROLES_USUARIOS.map((r) => ({ label: r, value: r }));
+	rolesSelectOptions = ROLES_USUARIOS_ADMIN.map((r) => ({ label: r, value: r }));
 	estadoOptions = [
 		{ label: 'Todos', value: null },
 		{ label: 'Activos', value: true },
@@ -161,7 +161,8 @@ export class UsuariosComponent implements OnInit {
 			)
 			.subscribe((event) => {
 				logger.log('[UsuariosComponent] Lista usuarios actualizada desde SW');
-				this.usuarios.set(event.data as UsuarioLista[]);
+				const usuarios = (event.data as UsuarioLista[]).filter((u) => u.rol !== 'Apoderado');
+				this.usuarios.set(usuarios);
 			});
 
 		// Actualizar estadísticas directamente desde el evento
@@ -186,7 +187,8 @@ export class UsuariosComponent implements OnInit {
 			.pipe(takeUntilDestroyed(this.destroyRef))
 			.subscribe({
 				next: ({ usuarios, estadisticas }) => {
-					this.usuarios.set(usuarios);
+					// Filtrar apoderados para no mostrarlos en admin
+					this.usuarios.set(usuarios.filter((u) => u.rol !== 'Apoderado'));
 					this.estadisticas.set(estadisticas);
 					this.loading.set(false);
 				},
@@ -252,7 +254,7 @@ export class UsuariosComponent implements OnInit {
 						nombres: detalle.nombres,
 						apellidos: detalle.apellidos,
 						contrasena: '',
-						rol: detalle.rol as RolUsuario,
+						rol: detalle.rol as RolUsuarioAdmin,
 						estado: detalle.estado,
 						telefono: detalle.telefono,
 						correo: detalle.correo,

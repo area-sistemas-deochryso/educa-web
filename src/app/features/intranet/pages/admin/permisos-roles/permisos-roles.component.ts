@@ -29,8 +29,8 @@ import {
 	PermisosService,
 	PermisoRol,
 	Vista,
-	ROLES_DISPONIBLES,
-	RolTipo,
+	ROLES_DISPONIBLES_ADMIN,
+	RolTipoAdmin,
 	ErrorHandlerService,
 } from '@core/services';
 import { AdminUtilsService } from '@shared/services';
@@ -82,7 +82,7 @@ export class PermisosRolesComponent implements OnInit {
 
 	// Form
 	selectedPermiso = signal<PermisoRol | null>(null);
-	selectedRol = signal<RolTipo | null>(null);
+	selectedRol = signal<RolTipoAdmin | null>(null);
 	selectedVistas = signal<string[]>([]);
 
 	// Edit modal - module tabs
@@ -90,9 +90,9 @@ export class PermisosRolesComponent implements OnInit {
 	activeModuloIndex = signal(0);
 	vistasBusqueda = signal('');
 
-	// Options
-	rolesDisponibles = ROLES_DISPONIBLES;
-	rolesSelectOptions: { label: string; value: RolTipo }[] = [];
+	// Options (sin Apoderado para admin)
+	rolesDisponibles = ROLES_DISPONIBLES_ADMIN;
+	rolesSelectOptions: { label: string; value: RolTipoAdmin }[] = [];
 
 	// Computed - Statistics
 	totalRoles = computed(() => this.permisosRol().length);
@@ -143,7 +143,8 @@ export class PermisosRolesComponent implements OnInit {
 			.subscribe({
 				next: ({ vistas, permisosRol }) => {
 					this.vistas.set(vistas.filter((v) => v.estado === 1));
-					this.permisosRol.set(permisosRol);
+					// Filtrar apoderados para no mostrarlos en admin
+					this.permisosRol.set(permisosRol.filter((p) => p.rol !== 'Apoderado'));
 					this.updateRolesSelectOptions();
 					this.loading.set(false);
 				},
@@ -188,7 +189,7 @@ export class PermisosRolesComponent implements OnInit {
 
 	editPermiso(permiso: PermisoRol): void {
 		this.selectedPermiso.set(permiso);
-		this.selectedRol.set(permiso.rol as RolTipo);
+		this.selectedRol.set(permiso.rol as RolTipoAdmin);
 		this.selectedVistas.set([...permiso.vistas]);
 		this.isEditing.set(true);
 		this.buildModulosVistas(permiso.vistas);
@@ -382,7 +383,7 @@ export class PermisosRolesComponent implements OnInit {
 			}));
 	}
 
-	getRolesNoConfigurados(): RolTipo[] {
+	getRolesNoConfigurados(): RolTipoAdmin[] {
 		const rolesConfigurados = this.permisosRol().map((p) => p.rol);
 		return this.rolesDisponibles.filter((r) => !rolesConfigurados.includes(r));
 	}
