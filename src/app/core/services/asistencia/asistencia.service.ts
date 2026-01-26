@@ -183,6 +183,26 @@ export class AsistenciaService {
 	}
 
 	/**
+	 * Director: Obtener asistencia de un grado/sección en un día específico
+	 * GET /api/ConsultaAsistencia/director/asistencia-dia?grado={grado}&seccion={seccion}&fecha={fecha}
+	 */
+	getAsistenciaDiaDirector(
+		grado: string,
+		seccion: string,
+		fecha: Date,
+	): Observable<EstudianteAsistencia[]> {
+		const params: Record<string, string> = {
+			grado,
+			seccion,
+			fecha: this.formatDateLocal(fecha),
+		};
+
+		return this.http
+			.get<EstudianteAsistencia[]>(`${this.apiUrl}/director/asistencia-dia`, { params })
+			.pipe(catchError(() => of([])));
+	}
+
+	/**
 	 * Director: Descargar PDF de asistencia del día
 	 * GET /api/ConsultaAsistencia/director/asistencia-dia/pdf?grado={grado}&seccion={seccion}&fecha={fecha}
 	 */

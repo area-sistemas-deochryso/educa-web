@@ -116,6 +116,11 @@ export class AttendanceFacade {
 	});
 	readonly downloadingPdf = signal(false);
 
+	// Modo día/mes para director
+	readonly viewModeDirector = signal<ViewMode>('mes');
+	readonly fechaDiaDirector = signal<Date>(new Date());
+	readonly estudiantesDiaDirector = signal<EstudianteAsistencia[]>([]);
+
 	/**
 	 * Inicializa el facade con el usuario actual
 	 */
@@ -887,6 +892,60 @@ export class AttendanceFacade {
 					this.error.set('Error al descargar PDF');
 				},
 			});
+	}
+
+	// === DIRECTOR: MODO DÍA ===
+
+	setViewModeDirector(mode: ViewMode, destroyRef: DestroyRef): void {
+		if (this.viewModeDirector() === mode) return;
+		this.viewModeDirector.set(mode);
+
+		if (mode === 'dia') {
+			this.loadAsistenciaDiaDirector(destroyRef);
+		} else {
+			this.loadEstudiantesDirector(destroyRef);
+		}
+	}
+
+	setFechaDiaDirector(fecha: Date, destroyRef: DestroyRef): void {
+		this.fechaDiaDirector.set(fecha);
+		this.loadAsistenciaDiaDirector(destroyRef);
+	}
+
+	loadAsistenciaDiaDirector(destroyRef: DestroyRef): void {
+		const gs = this.selectedGradoSeccion();
+		if (!gs) {
+			this.loading.set(false);
+			return;
+		}
+
+		this.loading.set(true);
+		this.error.set(null);
+
+		this.asistenciaService
+			.getAsistenciaDiaDirector(gs.grado, gs.seccion, this.fechaDiaDirector())
+			.pipe(
+				takeUntilDestroyed(destroyRef),
+				finalize(() => this.loading.set(false)),
+			)
+			.subscribe({
+				next: (estudiantes) => {
+					this.estudiantesDiaDirector.set(estudiantes);
+				},
+				error: () => {
+					this.error.set('Error al cargar asistencias del día');
+				},
+			});
+	}
+
+	selectGradoSeccionDia(gradoSeccion: GradoSeccion, destroyRef: DestroyRef): void {
+		const current = this.selectedGradoSeccion();
+		if (current?.grado === gradoSeccion.grado && current?.seccion === gradoSeccion.seccion)
+			return;
+
+		this.selectedGradoSeccion.set(gradoSeccion);
+		this.saveSelectedGradoSeccion();
+		this.loadAsistenciaDiaDirector(destroyRef);
 	}
 
 	// === MÉTODOS PÚBLICOS DE RECARGA ===
