@@ -6,16 +6,23 @@ import { QuickAccessCardComponent } from '../../components/quick-access-card/qui
 import { QuickAccessCardMenuComponent } from '../../components/quick-access-card-menu/quick-access-card-menu';
 import { StorageService } from '@core/services';
 import { WelcomeSectionComponent } from '../../components/welcome-section/welcome-section';
+import { environment } from '@config/environment';
 
 @Component({
 	selector: 'app-home.component',
-	imports: [QuickAccessCardComponent, QuickAccessCardMenuComponent, WelcomeSectionComponent, NotificationQuickAccessComponent],
+	imports: [
+		QuickAccessCardComponent,
+		QuickAccessCardMenuComponent,
+		WelcomeSectionComponent,
+		NotificationQuickAccessComponent,
+	],
 	templateUrl: './home.component.html',
 	styleUrl: './home.component.scss',
 })
 export class HomeComponent {
 	private storage = inject(StorageService);
 
+	readonly showQuickAccess = environment.features.quickAccess;
 	availableCourses = COURSE_NAMES;
 
 	get welcomeTitle(): string {

@@ -1,6 +1,37 @@
-import { Routes } from '@angular/router';
+import { Route, Routes } from '@angular/router';
 import { authGuard, permisosGuard } from '@core/guards';
 import { IntranetLayoutComponent } from '@shared/components/layout';
+import { environment } from '@config/environment';
+
+/**
+ * Rutas de features en desarrollo (controladas por environment.features)
+ */
+const developmentRoutes: Route[] = [
+	...(environment.features.horarios
+		? [
+				{
+					path: 'horarios',
+					loadComponent: () =>
+						import('./pages/schedule-component/schedule.component').then(
+							(m) => m.ScheduleComponent,
+						),
+					title: 'Intranet - Horarios',
+				},
+			]
+		: []),
+	...(environment.features.calendario
+		? [
+				{
+					path: 'calendario',
+					loadComponent: () =>
+						import('./pages/calendary-component/calendary.component').then(
+							(m) => m.CalendaryComponent,
+						),
+					title: 'Intranet - Calendario',
+				},
+			]
+		: []),
+];
 
 export const INTRANET_ROUTES: Routes = [
 	{
@@ -28,23 +59,7 @@ export const INTRANET_ROUTES: Routes = [
 					),
 				title: 'Intranet - Asistencia',
 			},
-			// TODO: Temporalmente oculto - Horarios y Calendario
-			// {
-			// 	path: 'horarios',
-			// 	loadComponent: () =>
-			// 		import('./pages/schedule-component/schedule.component').then(
-			// 			(m) => m.ScheduleComponent,
-			// 		),
-			// 	title: 'Intranet - Horarios',
-			// },
-			// {
-			// 	path: 'calendario',
-			// 	loadComponent: () =>
-			// 		import('./pages/calendary-component/calendary.component').then(
-			// 			(m) => m.CalendaryComponent,
-			// 		),
-			// 	title: 'Intranet - Calendario',
-			// },
+			...developmentRoutes,
 			{
 				path: 'admin/permisos/roles',
 				loadComponent: () =>

@@ -53,6 +53,9 @@
 	<router-outlet />
 </main>
 
-<!-- TODO: Temporalmente oculto - Notificaciones y micrófono -->
-<!-- <app-floating-notification-bell /> -->
-<!-- <app-voice-button /> -->
+@if (showNotifications) {
+	<app-floating-notification-bell />
+}
+@if (showVoiceRecognition) {
+	<app-voice-button />
+}

@@ -126,6 +126,17 @@ export class AttendanceComponent implements OnInit, OnDestroy {
 		return this.facade.downloadingPdf;
 	}
 
+	// Modo día/mes para director
+	get viewModeDirector() {
+		return this.facade.viewModeDirector;
+	}
+	get fechaDiaDirector() {
+		return this.facade.fechaDiaDirector;
+	}
+	get estudiantesDiaDirector() {
+		return this.facade.estudiantesDiaDirector;
+	}
+
 	ngOnInit(): void {
 		this.facade.initialize(this.destroyRef);
 		this.setupVoiceCommands();
@@ -203,6 +214,19 @@ export class AttendanceComponent implements OnInit, OnDestroy {
 
 	descargarPdfAsistenciaDia(): void {
 		this.facade.descargarPdfAsistenciaDia(this.destroyRef);
+	}
+
+	// Director: modo día/mes
+	onViewModeDirectorChange(mode: ViewMode): void {
+		this.facade.setViewModeDirector(mode, this.destroyRef);
+	}
+
+	onFechaDiaDirectorChange(fecha: Date): void {
+		this.facade.setFechaDiaDirector(fecha, this.destroyRef);
+	}
+
+	selectGradoSeccionDia(gs: GradoSeccion): void {
+		this.facade.selectGradoSeccionDia(gs, this.destroyRef);
 	}
 
 	reloadAll(): void {

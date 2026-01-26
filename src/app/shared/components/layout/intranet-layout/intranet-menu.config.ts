@@ -1,9 +1,36 @@
 import { NavMenuItem } from './components';
+import { environment } from '@config/environment';
 
 export interface NavItemWithPermiso extends NavMenuItem {
 	permiso?: string;
 	children?: NavItemWithPermiso[];
 }
+
+/**
+ * Items de menú para features en desarrollo (controlados por environment.features)
+ */
+const developmentMenuItems: NavItemWithPermiso[] = [
+	...(environment.features.horarios
+		? [
+				{
+					route: '/intranet/horarios',
+					label: 'Horarios',
+					icon: 'pi pi-clock',
+					permiso: 'intranet/horarios',
+				},
+			]
+		: []),
+	...(environment.features.calendario
+		? [
+				{
+					route: '/intranet/calendario',
+					label: 'Calendario',
+					icon: 'pi pi-calendar',
+					permiso: 'intranet/calendario',
+				},
+			]
+		: []),
+];
 
 /**
  * Configuración jerárquica del menú de la intranet.
@@ -24,19 +51,7 @@ export const INTRANET_MENU: NavItemWithPermiso[] = [
 		icon: 'pi pi-check-square',
 		permiso: 'intranet/asistencia',
 	},
-	// TODO: Temporalmente oculto - Horarios y Calendario
-	// {
-	// 	route: '/intranet/horarios',
-	// 	label: 'Horarios',
-	// 	icon: 'pi pi-clock',
-	// 	permiso: 'intranet/horarios',
-	// },
-	// {
-	// 	route: '/intranet/calendario',
-	// 	label: 'Calendario',
-	// 	icon: 'pi pi-calendar',
-	// 	permiso: 'intranet/calendario',
-	// },
+	...developmentMenuItems,
 	{
 		label: 'Admin',
 		icon: 'pi pi-cog',

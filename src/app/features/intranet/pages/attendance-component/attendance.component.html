@@ -1,9 +1,9 @@
 <div class="attendance-container">
 	<app-attendance-header
 		[loading]="loading()"
-		[showModeSelector]="userRole === 'Profesor'"
-		[selectedMode]="viewMode()"
-		(modeChange)="onViewModeChange($event)"
+		[showModeSelector]="userRole === 'Profesor' || userRole === 'Director'"
+		[selectedMode]="userRole === 'Director' ? viewModeDirector() : viewMode()"
+		(modeChange)="userRole === 'Director' ? onViewModeDirectorChange($event) : onViewModeChange($event)"
 		(reload)="reloadAll()"
 	/>
 
@@ -81,26 +81,35 @@
 				<app-grado-seccion-selector
 					[gradosSecciones]="gradosSecciones()"
 					[selectedGradoSeccion]="selectedGradoSeccion()"
-					(gradoSeccionChange)="selectGradoSeccion($event)"
+					(gradoSeccionChange)="viewModeDirector() === 'dia' ? selectGradoSeccionDia($event) : selectGradoSeccion($event)"
 				/>
 
-				@if (estudiantesDirector().length > 0) {
-					<app-attendance-table
-						[table]="ingresos()"
-						[hijos]="estudiantesDirectorAsHijos()"
-						[selectedHijoId]="selectedEstudianteDirectorId()"
-						(monthChange)="onIngresosMonthChange($event)"
-						(hijoChange)="selectEstudianteDirector($event)"
+				@if (viewModeDirector() === 'mes') {
+					@if (estudiantesDirector().length > 0) {
+						<app-attendance-table
+							[table]="ingresos()"
+							[hijos]="estudiantesDirectorAsHijos()"
+							[selectedHijoId]="selectedEstudianteDirectorId()"
+							(monthChange)="onIngresosMonthChange($event)"
+							(hijoChange)="selectEstudianteDirector($event)"
+						/>
+						<app-attendance-table
+							[table]="salidas()"
+							[hijos]="estudiantesDirectorAsHijos()"
+							[selectedHijoId]="selectedEstudianteDirectorId()"
+							(monthChange)="onSalidasMonthChange($event)"
+							(hijoChange)="selectEstudianteDirector($event)"
+						/>
+					} @else if (!loading()) {
+						<app-empty-state message="No se encontraron estudiantes en este grado/sección." />
+					}
+				} @else {
+					<app-asistencia-dia-list
+						[estudiantes]="estudiantesDiaDirector()"
+						[fecha]="fechaDiaDirector()"
+						[loading]="loading()"
+						(fechaChange)="onFechaDiaDirectorChange($event)"
 					/>
-					<app-attendance-table
-						[table]="salidas()"
-						[hijos]="estudiantesDirectorAsHijos()"
-						[selectedHijoId]="selectedEstudianteDirectorId()"
-						(monthChange)="onSalidasMonthChange($event)"
-						(hijoChange)="selectEstudianteDirector($event)"
-					/>
-				} @else if (!loading()) {
-					<app-empty-state message="No se encontraron estudiantes en este grado/sección." />
 				}
 			} @else if (!loading()) {
 				<app-empty-state message="No hay grados/secciones disponibles." />

@@ -10,6 +10,7 @@ import {
 	NavMenuItem,
 } from './components';
 import { INTRANET_MENU, NavItemWithPermiso } from './intranet-menu.config';
+import { environment } from '@config/environment';
 
 @Component({
 	selector: 'app-intranet-layout',
@@ -34,6 +35,9 @@ export class IntranetLayoutComponent implements OnInit {
 
 	private readonly _navItems = signal<NavMenuItem[]>([]);
 	readonly navItems = this._navItems.asReadonly();
+
+	readonly showNotifications = environment.features.notifications;
+	readonly showVoiceRecognition = environment.features.voiceRecognition;
 
 	constructor() {
 		effect(() => {

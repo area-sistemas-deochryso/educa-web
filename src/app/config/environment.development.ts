@@ -10,6 +10,15 @@ export const environment = {
 
 	// Feature flags
 	showIntranetLink: true,
+
+	// Features en desarrollo (visibles solo en development)
+	features: {
+		horarios: true,
+		calendario: true,
+		quickAccess: true,
+		notifications: true,
+		voiceRecognition: true,
+	},
 };
 
 export type Environment = typeof environment;
