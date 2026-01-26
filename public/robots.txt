@@ -4,8 +4,11 @@
 User-agent: *
 Allow: /
 
-# Block private/authenticated areas
+# Intranet - Only login is public
+Allow: /intranet/login
 Disallow: /intranet/
+
+# Block API
 Disallow: /api/
 
 # Block common non-content paths
