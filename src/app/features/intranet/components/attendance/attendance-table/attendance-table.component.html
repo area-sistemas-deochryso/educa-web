@@ -68,13 +68,26 @@
 				@for (day of week.days; track $index) {
 					<td class="day-col">
 						@if (isDayValid(day)) {
-							<div class="day-cell" [class]="getStatusClass(day.status)">
-								<span class="day-number">{{ day.date | date: 'd' }}</span>
-								<span class="day-status">{{ day.status }}</span>
-								@if (day.hora) {
-									<span class="day-hora">{{ day.hora }}</span>
-								}
-							</div>
+							@if (day.status === 'X') {
+								<!-- Día antes del inicio del registro (26/01/2026) - sin código, apagado -->
+								<div class="day-cell day-no-registro">
+									<span class="day-number">{{ day.date | date: 'd' }}</span>
+								</div>
+							} @else if (day.status === '-') {
+								<!-- Día pendiente (futuro o de hoy sin hora) - con código -->
+								<div class="day-cell status-pendiente">
+									<span class="day-number">{{ day.date | date: 'd' }}</span>
+									<span class="day-status">-</span>
+								</div>
+							} @else {
+								<div class="day-cell" [class]="getStatusClass(day.status)">
+									<span class="day-number">{{ day.date | date: 'd' }}</span>
+									<span class="day-status">{{ day.status }}</span>
+									@if (day.hora) {
+										<span class="day-hora">{{ day.hora }}</span>
+									}
+								</div>
+							}
 						} @else {
 							<div class="day-cell day-empty"></div>
 						}

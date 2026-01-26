@@ -1,4 +1,6 @@
-export type AttendanceStatus = 'T' | 'A' | 'F' | 'N';
+// T = Temprano, A = A tiempo, F = Fuera de hora, N = No asistió
+// '-' = Pendiente (día futuro o de hoy sin hora aún), 'X' = Sin registro (antes del 26/01/2026)
+export type AttendanceStatus = 'T' | 'A' | 'F' | 'N' | '-' | 'X';
 
 export interface AttendanceDay {
 	day: string;
@@ -18,6 +20,8 @@ export interface StatusCounts {
 	A: number;
 	F: number;
 	N: number;
+	'-': number;
+	X: number;
 }
 
 export interface AttendanceTable {

@@ -65,6 +65,10 @@ $color-no: #f44336;
 	background-color: $color-no;
 }
 
+.status-pendiente {
+	background-color: #9e9e9e;
+}
+
 // Responsive
 @media screen and (max-width: 768px) {
 	.legend-content {

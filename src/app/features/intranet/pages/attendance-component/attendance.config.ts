@@ -3,6 +3,12 @@ import { AttendanceStatus, LegendItem, MonthOption } from './attendance.types';
 export const ATTENDANCE_STORAGE_KEY = 'attendance_selected_month';
 
 /**
+ * Fecha de inicio del registro de asistencias.
+ * Fechas anteriores a esta no se cuentan como falta.
+ */
+export const ATTENDANCE_START_DATE = new Date(2026, 0, 26); // 26 de enero de 2026
+
+/**
  * Configuración de horas límite para determinar el estado de asistencia.
  * Las horas se expresan en formato 24h como { hour, minute }.
  */
@@ -145,6 +151,7 @@ export const LEGEND_ITEMS: LegendItem[] = [
 	{ code: 'A', label: 'A tiempo', status: 'A' },
 	{ code: 'F', label: 'Fuera de hora', status: 'F' },
 	{ code: 'N', label: 'No asistió', status: 'N' },
+	{ code: '-', label: 'Pendiente', status: '-' },
 ];
 
 export const STATUS_CLASSES: Record<AttendanceStatus, string> = {
@@ -152,8 +159,82 @@ export const STATUS_CLASSES: Record<AttendanceStatus, string> = {
 	A: 'status-atiempo',
 	F: 'status-fuera',
 	N: 'status-no',
+	'-': 'status-pendiente',
+	X: 'status-sin-registro',
 };
 
 export function getStatusClass(status: AttendanceStatus): string {
 	return STATUS_CLASSES[status];
+}
+
+/**
+ * Normaliza una fecha a medianoche (00:00:00) para comparaciones de solo fecha.
+ */
+function normalizeDate(date: Date): Date {
+	return new Date(date.getFullYear(), date.getMonth(), date.getDate());
+}
+
+/**
+ * Determina si una fecha es anterior a la fecha de inicio del registro.
+ */
+export function isBeforeRegistrationStart(date: Date): boolean {
+	return normalizeDate(date) < normalizeDate(ATTENDANCE_START_DATE);
+}
+
+/**
+ * Determina si una fecha es futura (posterior a hoy).
+ */
+export function isFutureDate(date: Date): boolean {
+	const today = normalizeDate(new Date());
+	return normalizeDate(date) > today;
+}
+
+/**
+ * Determina si una fecha es hoy.
+ */
+export function isToday(date: Date): boolean {
+	const today = normalizeDate(new Date());
+	return normalizeDate(date).getTime() === today.getTime();
+}
+
+/**
+ * Determina si ya pasó la hora límite de ingreso para hoy.
+ * Usa la hora de "a tiempo" del config correspondiente al mes.
+ */
+export function hasIngresoTimePassed(month: number): boolean {
+	const now = new Date();
+	const config = isHorarioVerano(month) ? INGRESO_TIME_CONFIG_VERANO : INGRESO_TIME_CONFIG;
+	return compareTime(now.getHours(), now.getMinutes(), config.aTiempo) > 0;
+}
+
+/**
+ * Determina si ya pasó la hora límite de salida para hoy.
+ * Usa la hora de "a tiempo" del config correspondiente al mes.
+ */
+export function hasSalidaTimePassed(month: number): boolean {
+	const now = new Date();
+	const config = isHorarioVerano(month) ? SALIDA_TIME_CONFIG_VERANO : SALIDA_TIME_CONFIG;
+	return compareTime(now.getHours(), now.getMinutes(), config.aTiempo) >= 0;
+}
+
+/**
+ * Determina si un día debe marcarse como pendiente ('-') para INGRESOS.
+ * Solo aplica a días futuros o de hoy donde aún no pasó la hora límite.
+ * NO incluye días anteriores al inicio del registro (esos usan 'X').
+ */
+export function shouldMarkIngresoAsPending(date: Date, month: number): boolean {
+	if (isFutureDate(date)) return true;
+	if (isToday(date) && !hasIngresoTimePassed(month)) return true;
+	return false;
+}
+
+/**
+ * Determina si un día debe marcarse como pendiente ('-') para SALIDAS.
+ * Solo aplica a días futuros o de hoy donde aún no pasó la hora límite.
+ * NO incluye días anteriores al inicio del registro (esos usan 'X').
+ */
+export function shouldMarkSalidaAsPending(date: Date, month: number): boolean {
+	if (isFutureDate(date)) return true;
+	if (isToday(date) && !hasSalidaTimePassed(month)) return true;
+	return false;
 }

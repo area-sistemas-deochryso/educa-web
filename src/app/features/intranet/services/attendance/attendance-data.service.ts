@@ -11,6 +11,9 @@ import {
 	DAY_HEADERS,
 	getIngresoStatusFromTime,
 	getSalidaStatusFromTime,
+	shouldMarkIngresoAsPending,
+	shouldMarkSalidaAsPending,
+	isBeforeRegistrationStart,
 } from '../../pages/attendance-component/attendance.config';
 import { CalendarUtilsService } from '../calendar/calendar-utils.service';
 
@@ -27,7 +30,7 @@ export class AttendanceDataService {
 			selectedMonth: now.getMonth() + 1,
 			selectedYear: now.getFullYear(),
 			weeks: [],
-			counts: { T: 0, A: 0, F: 0, N: 0 },
+			counts: { T: 0, A: 0, F: 0, N: 0, '-': 0, X: 0 },
 			columnTotals: [],
 			grandTotal: '0/0',
 		};
@@ -81,7 +84,8 @@ export class AttendanceDataService {
 			const salidasDays: AttendanceDay[] = [];
 			let ingresosAttendedCount = 0;
 			let salidasAttendedCount = 0;
-			let validDaysCount = 0;
+			let ingresosValidDaysCount = 0;
+			let salidasValidDaysCount = 0;
 
 			weekDates.forEach((date, dayIndex) => {
 				if (date === null) {
@@ -100,15 +104,25 @@ export class AttendanceDataService {
 					return;
 				}
 
-				validDaysCount++;
 				const dateKey = this.calendarUtils.formatDateKey(date);
 				const asistencia = asistenciaMap.get(dateKey);
 
-				const ingresoStatus = this.getIngresoStatus(asistencia, mes);
-				const salidaStatus = this.getSalidaStatus(asistencia, mes);
+				const ingresoStatus = this.getIngresoStatus(asistencia, mes, date);
+				const salidaStatus = this.getSalidaStatus(asistencia, mes, date);
 
-				if (ingresoStatus !== 'N') ingresosAttendedCount++;
-				if (salidaStatus !== 'N') salidasAttendedCount++;
+				// Contar días válidos separadamente para ingresos y salidas
+				// Excluir '-' (pendiente) y 'X' (sin registro) del conteo
+				if (ingresoStatus !== '-' && ingresoStatus !== 'X') {
+					ingresosValidDaysCount++;
+					// Solo contar como asistido si tiene registro (T, A, F)
+					if (ingresoStatus !== 'N') ingresosAttendedCount++;
+				}
+
+				if (salidaStatus !== '-' && salidaStatus !== 'X') {
+					salidasValidDaysCount++;
+					// Solo contar como asistido si tiene registro (T, A, F)
+					if (salidaStatus !== 'N') salidasAttendedCount++;
+				}
 
 				ingresosDays.push({
 					day: DAY_HEADERS[dayIndex],
@@ -128,13 +142,13 @@ export class AttendanceDataService {
 			ingresosWeeks.push({
 				week: `Semana ${weekIndex + 1}`,
 				days: ingresosDays,
-				total: `${ingresosAttendedCount}/${validDaysCount}`,
+				total: `${ingresosAttendedCount}/${ingresosValidDaysCount}`,
 			});
 
 			salidasWeeks.push({
 				week: `Semana ${weekIndex + 1}`,
 				days: salidasDays,
-				total: `${salidasAttendedCount}/${validDaysCount}`,
+				total: `${salidasAttendedCount}/${salidasValidDaysCount}`,
 			});
 		});
 
@@ -146,8 +160,17 @@ export class AttendanceDataService {
 		return date.toLocaleTimeString('es-PE', { hour: '2-digit', minute: '2-digit' });
 	}
 
-	private getIngresoStatus(asistencia: AsistenciaDetalle | undefined, month: number): AttendanceStatus {
+	private getIngresoStatus(
+		asistencia: AsistenciaDetalle | undefined,
+		month: number,
+		date: Date,
+	): AttendanceStatus {
 		if (!asistencia || !asistencia.horaEntrada) {
+			// Días antes del inicio del registro (26/01/2026) → 'X' (sin registro)
+			if (isBeforeRegistrationStart(date)) return 'X';
+			// Días futuros o de hoy sin hora aún → '-' (pendiente)
+			if (shouldMarkIngresoAsPending(date, month)) return '-';
+			// Día pasado sin registro → 'N' (falta)
 			return 'N';
 		}
 
@@ -155,8 +178,17 @@ export class AttendanceDataService {
 		return getIngresoStatusFromTime(horaEntrada.getHours(), horaEntrada.getMinutes(), month);
 	}
 
-	private getSalidaStatus(asistencia: AsistenciaDetalle | undefined, month: number): AttendanceStatus {
+	private getSalidaStatus(
+		asistencia: AsistenciaDetalle | undefined,
+		month: number,
+		date: Date,
+	): AttendanceStatus {
 		if (!asistencia || !asistencia.horaSalida) {
+			// Días antes del inicio del registro (26/01/2026) → 'X' (sin registro)
+			if (isBeforeRegistrationStart(date)) return 'X';
+			// Días futuros o de hoy sin hora aún → '-' (pendiente)
+			if (shouldMarkSalidaAsPending(date, month)) return '-';
+			// Día pasado sin registro → 'N' (falta)
 			return 'N';
 		}
 
@@ -165,7 +197,7 @@ export class AttendanceDataService {
 	}
 
 	private calculateCounts(weeks: AttendanceWeek[]): StatusCounts {
-		const counts: StatusCounts = { T: 0, A: 0, F: 0, N: 0 };
+		const counts: StatusCounts = { T: 0, A: 0, F: 0, N: 0, '-': 0, X: 0 };
 
 		weeks.forEach((week) => {
 			week.days.forEach((day) => {
@@ -185,9 +217,11 @@ export class AttendanceDataService {
 			let attended = 0;
 			let total = 0;
 			weeks.forEach((week) => {
-				if (week.days[dayIndex]?.date !== null) {
+				const day = week.days[dayIndex];
+				// Excluir días sin fecha, pendientes ('-') y sin registro ('X') del total
+				if (day?.date !== null && day?.status !== '-' && day?.status !== 'X') {
 					total++;
-					if (week.days[dayIndex]?.status !== 'N') {
+					if (day?.status !== 'N') {
 						attended++;
 					}
 				}
@@ -204,7 +238,8 @@ export class AttendanceDataService {
 
 		weeks.forEach((week) => {
 			week.days.forEach((day) => {
-				if (day.date !== null) {
+				// Excluir días sin fecha, pendientes ('-') y sin registro ('X') del total
+				if (day.date !== null && day.status !== '-' && day.status !== 'X') {
 					totalPossible++;
 					if (day.status !== 'N') {
 						totalAttended++;
