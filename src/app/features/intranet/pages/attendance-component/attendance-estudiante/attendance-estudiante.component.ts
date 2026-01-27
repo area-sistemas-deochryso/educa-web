@@ -22,7 +22,7 @@ export class AttendanceEstudianteComponent implements OnInit {
 	private authStore = inject(AuthStore);
 	private destroyRef = inject(DestroyRef);
 
-	private readonly userName = computed(() => this.authStore.user()?.nombre ?? 'Estudiante');
+	private readonly userName = computed(() => this.authStore.user()?.nombreCompleto ?? 'Estudiante');
 
 	readonly ingresos = signal<AttendanceTable>(
 		this.attendanceDataService.createEmptyTable('Mis Ingresos'),
