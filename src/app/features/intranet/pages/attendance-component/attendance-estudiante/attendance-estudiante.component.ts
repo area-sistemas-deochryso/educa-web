@@ -1,8 +1,9 @@
-import { Component, OnInit, signal, inject, DestroyRef } from '@angular/core';
+import { Component, OnInit, signal, inject, DestroyRef, computed } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { finalize } from 'rxjs';
 
 import { AsistenciaService, StorageService } from '@core/services';
+import { AuthStore } from '@core/store';
 import { AttendanceDataService } from '../../../services/attendance/attendance-data.service';
 import { AttendanceTable } from '../models/attendance.types';
 import { AttendanceTableComponent } from '../../../components/attendance/attendance-table/attendance-table.component';
@@ -18,10 +19,17 @@ export class AttendanceEstudianteComponent implements OnInit {
 	private asistenciaService = inject(AsistenciaService);
 	private storageService = inject(StorageService);
 	private attendanceDataService = inject(AttendanceDataService);
+	private authStore = inject(AuthStore);
 	private destroyRef = inject(DestroyRef);
 
-	readonly ingresos = signal<AttendanceTable>(this.attendanceDataService.createEmptyTable());
-	readonly salidas = signal<AttendanceTable>(this.attendanceDataService.createEmptyTable());
+	private readonly userName = computed(() => this.authStore.user()?.nombre ?? 'Estudiante');
+
+	readonly ingresos = signal<AttendanceTable>(
+		this.attendanceDataService.createEmptyTable('Mis Ingresos'),
+	);
+	readonly salidas = signal<AttendanceTable>(
+		this.attendanceDataService.createEmptyTable('Mis Salidas'),
+	);
 	readonly loading = signal(false);
 	readonly hasData = signal(false);
 
@@ -31,10 +39,10 @@ export class AttendanceEstudianteComponent implements OnInit {
 
 	private loadAsistencias(): void {
 		// Restaurar mes guardado o usar mes actual
-		const savedMonth = this.storageService.getAttendanceMonth();
+		const savedMonthData = this.storageService.getAttendanceMonth();
 		const now = new Date();
-		const currentMonth = savedMonth ?? now.getMonth() + 1;
-		const currentYear = now.getFullYear();
+		const currentMonth = savedMonthData?.month ?? now.getMonth() + 1;
+		const currentYear = savedMonthData?.year ?? now.getFullYear();
 
 		this.loading.set(true);
 
@@ -51,13 +59,14 @@ export class AttendanceEstudianteComponent implements OnInit {
 						resumen.detalle,
 						currentMonth,
 						currentYear,
+						this.userName(),
 					);
 					this.ingresos.set(ingresos);
 					this.salidas.set(salidas);
 				} else {
 					this.hasData.set(false);
-					this.ingresos.set(this.attendanceDataService.createEmptyTable());
-					this.salidas.set(this.attendanceDataService.createEmptyTable());
+					this.ingresos.set(this.attendanceDataService.createEmptyTable('Mis Ingresos'));
+					this.salidas.set(this.attendanceDataService.createEmptyTable('Mis Salidas'));
 				}
 			});
 	}
@@ -66,7 +75,7 @@ export class AttendanceEstudianteComponent implements OnInit {
 		const currentYear = this.ingresos().selectedYear;
 
 		// Guardar mes seleccionado
-		this.storageService.setAttendanceMonth(month);
+		this.storageService.setAttendanceMonth({ month, year: currentYear });
 
 		this.loading.set(true);
 
@@ -83,6 +92,7 @@ export class AttendanceEstudianteComponent implements OnInit {
 						resumen.detalle,
 						month,
 						currentYear,
+						this.userName(),
 					);
 					this.ingresos.set(ingresos);
 					// Salidas mantienen su mes actual
@@ -92,7 +102,7 @@ export class AttendanceEstudianteComponent implements OnInit {
 					}
 				} else {
 					this.hasData.set(false);
-					this.ingresos.set(this.attendanceDataService.createEmptyTable());
+					this.ingresos.set(this.attendanceDataService.createEmptyTable('Mis Ingresos'));
 				}
 			});
 	}
@@ -101,7 +111,7 @@ export class AttendanceEstudianteComponent implements OnInit {
 		const currentYear = this.salidas().selectedYear;
 
 		// Guardar mes seleccionado
-		this.storageService.setAttendanceMonth(month);
+		this.storageService.setAttendanceMonth({ month, year: currentYear });
 
 		this.loading.set(true);
 
@@ -118,6 +128,7 @@ export class AttendanceEstudianteComponent implements OnInit {
 						resumen.detalle,
 						month,
 						currentYear,
+						this.userName(),
 					);
 					this.salidas.set(salidas);
 					// Ingresos mantienen su mes actual
@@ -127,7 +138,7 @@ export class AttendanceEstudianteComponent implements OnInit {
 					}
 				} else {
 					this.hasData.set(false);
-					this.salidas.set(this.attendanceDataService.createEmptyTable());
+					this.salidas.set(this.attendanceDataService.createEmptyTable('Mis Salidas'));
 				}
 			});
 	}
