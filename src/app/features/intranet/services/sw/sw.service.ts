@@ -1,6 +1,7 @@
-import { Injectable, inject, PLATFORM_ID } from '@angular/core';
-import { isPlatformBrowser } from '@angular/common';
 import { BehaviorSubject, Subject } from 'rxjs';
+import { Injectable, PLATFORM_ID, inject } from '@angular/core';
+
+import { isPlatformBrowser } from '@angular/common';
 import { logger } from '@core/helpers';
 
 export interface CacheUpdateEvent {
@@ -62,9 +63,11 @@ export class SwService {
 			return;
 		}
 
+		if (!location.pathname.startsWith('/intranet/')) return;
+
 		try {
-			this.registration = await navigator.serviceWorker.register('/sw.js', {
-				scope: '/',
+			this.registration = await navigator.serviceWorker.register('/intranet/sw.js', {
+				scope: '/intranet/',
 			});
 
 			logger.log('[SwService] Service Worker registrado:', this.registration.scope);

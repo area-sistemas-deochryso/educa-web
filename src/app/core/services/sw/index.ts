@@ -1,1 +1,1 @@
-export * from './sw.service';
+export * from '@features/intranet/services/sw/sw.service';
