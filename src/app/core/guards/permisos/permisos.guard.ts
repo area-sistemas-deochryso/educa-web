@@ -1,8 +1,8 @@
-import { inject } from '@angular/core';
-import { CanActivateFn, Router, ActivatedRouteSnapshot } from '@angular/router';
+import { ActivatedRouteSnapshot, CanActivateFn, Router } from '@angular/router';
+import { AuthService, ErrorHandlerService, UserPermisosService } from '@core/services';
 
+import { inject } from '@angular/core';
 import { logger } from '@core/helpers';
-import { AuthService, UserPermisosService, ErrorHandlerService } from '@core/services';
 
 /**
  * Guard que verifica si el usuario tiene permiso para acceder a una ruta
@@ -37,7 +37,9 @@ export const permisosGuard: CanActivateFn = async (route: ActivatedRouteSnapshot
 	if (!permisosLoaded) {
 		logger.tagged('PermisosGuard', 'log', 'Fallo al cargar permisos, redirigiendo a login');
 		authService.logout();
-		router.navigate(['/intranet/login']);
+		router.createUrlTree(['/intranet/login']);
+
+		//router.navigate(['/intranet/login']);
 		return false;
 	}
 
@@ -56,7 +58,9 @@ export const permisosGuard: CanActivateFn = async (route: ActivatedRouteSnapshot
 			'Acceso denegado',
 			'No cuenta con los permisos suficientes para acceder a esta vista.',
 		);
-		router.navigate(['/intranet']);
+		router.createUrlTree(['/intranet/login']);
+
+		//router.navigate(['/intranet']);
 		return false;
 	}
 

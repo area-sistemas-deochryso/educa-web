@@ -1,7 +1,7 @@
-import { inject } from '@angular/core';
 import { CanActivateFn, Router } from '@angular/router';
 
 import { AuthService } from '@app/core/services';
+import { inject } from '@angular/core';
 
 export const authGuard: CanActivateFn = () => {
 	const authService = inject(AuthService);
@@ -13,6 +13,8 @@ export const authGuard: CanActivateFn = () => {
 	}
 
 	// No autenticado, redirigir al login
-	router.navigate(['/intranet/login']);
+	return router.createUrlTree(['/intranet/login']);
+
+	//router.navigate(['/intranet/login']);
 	return false;
 };
