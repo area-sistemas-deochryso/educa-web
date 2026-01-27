@@ -1,0 +1,46 @@
+<div class="week-item" [class.expanded]="week.expanded">
+	<div class="week-header" (click)="toggleTriggered.emit()">
+		<span>{{ week.name }}</span>
+		<i
+			class="pi"
+			[class.pi-chevron-down]="!week.expanded"
+			[class.pi-chevron-up]="week.expanded"
+		></i>
+	</div>
+	@if (week.expanded) {
+		<div class="week-content">
+			<p class="teacher-message">{{ week.teacherMessage }}</p>
+			<app-week-content-row
+				icon="pi-paperclip"
+				[title]="week.attachments.count + ' Archivos Adjuntos'"
+				[subtitle]="
+					week.attachments.unread +
+					' sin leer · ' +
+					week.attachments.reviewed +
+					' revisado'
+				"
+				actionLabel="Ver archivos"
+				(action)="openAttachments.emit()"
+			/>
+			<app-week-content-row
+				icon="pi-file-edit"
+				[title]="week.pendingTasks.count + ' Tareas Pendientes'"
+				[subtitle]="week.pendingTasks.unread + ' sin leer'"
+				actionLabel="Ver Tareas"
+				(action)="openTasks.emit()"
+			/>
+			<app-week-content-row
+				icon="pi-check-circle"
+				[title]="week.submittedTasks.count + ' Tarea Enviada'"
+				[subtitle]="
+					week.submittedTasks.unread +
+					' sin leer · ' +
+					week.submittedTasks.reviewed +
+					' revisadas'
+				"
+				actionLabel="Ver Entregas"
+				(action)="openSubmissions.emit()"
+			/>
+		</div>
+	}
+</div>

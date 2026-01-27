@@ -1,10 +1,12 @@
-import { Component, input } from '@angular/core';
+import { ChangeDetectionStrategy, Component, input } from '@angular/core';
 
 @Component({
 	selector: 'app-welcome-section',
+	standalone: true,
 	imports: [],
 	templateUrl: './welcome-section.html',
 	styleUrl: './welcome-section.scss',
+	changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class WelcomeSectionComponent {
 	/** Icono de PrimeNG a mostrar */

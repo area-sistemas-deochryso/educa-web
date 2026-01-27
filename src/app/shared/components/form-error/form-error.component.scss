@@ -1,0 +1,10 @@
+.form-error {
+	display: flex;
+	flex-direction: column;
+	gap: 0.25rem;
+	margin-top: 0.25rem;
+}
+.p-error {
+	font-size: 0.75rem;
+	color: var(--red-500);
+}

@@ -12,8 +12,36 @@
 		<h2>Archivos Adjuntos</h2>
 		<p class="week-label">{{ weekName }}</p>
 
+		<!-- Upload Section -->
+		<div class="upload-section">
+			<p-fileUpload
+				#fileUpload
+				mode="basic"
+				[multiple]="true"
+				[maxFileSize]="50000000"
+				[auto]="true"
+				[customUpload]="true"
+				(uploadHandler)="onFileSelect($event)"
+				chooseLabel="Subir Archivos"
+				chooseIcon="pi pi-upload"
+				[disabled]="vm().uploading"
+			></p-fileUpload>
+
+			@if (vm().uploading) {
+				<div class="upload-progress">
+					<p-progressSpinner
+						styleClass="w-4rem h-4rem"
+						strokeWidth="4"
+						fill="var(--surface-ground)"
+						animationDuration=".5s"
+					></p-progressSpinner>
+					<span>Subiendo archivo...</span>
+				</div>
+			}
+		</div>
+
 		<div class="attachments-list">
-			@for (attachment of attachments; track attachment.id) {
+			@for (attachment of vm().attachments; track attachment.id) {
 				<div class="attachment-item" [class.unread]="!attachment.isRead">
 					<div class="attachment-icon">
 						<i class="pi" [ngClass]="getIcon(attachment.type)"></i>
@@ -30,7 +58,7 @@
 						}
 						<button
 							class="action-btn"
-							(click)="downloadAttachment(attachment)"
+							(click)="onDownloadAttachment(attachment)"
 							title="Descargar"
 						>
 							<i class="pi pi-download"></i>
@@ -41,7 +69,7 @@
 		</div>
 
 		<div class="modal-footer">
-			<span class="count-info">{{ attachments.length }} archivos</span>
+			<span class="count-info">{{ vm().totalCount }} archivos</span>
 		</div>
 	</div>
 </p-dialog>

@@ -1,12 +1,13 @@
-import { Injectable } from '@angular/core';
-import { Observable, catchError, of } from 'rxjs';
-import { BaseRepository, QueryParams } from './base.repository';
+import { BaseRepository, QueryParams } from '../base/base.repository';
 import {
-	ResumenAsistencia,
-	HijoApoderado,
 	EstudianteAsistencia,
+	HijoApoderado,
+	ResumenAsistencia,
 	SalonProfesor,
 } from '@core/services/asistencia';
+import { Observable, catchError, of } from 'rxjs';
+
+import { Injectable } from '@angular/core';
 import { logger } from '@core/helpers';
 
 export interface AsistenciaQueryParams extends QueryParams {

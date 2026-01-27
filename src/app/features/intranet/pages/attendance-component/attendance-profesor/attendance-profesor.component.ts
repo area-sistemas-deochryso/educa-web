@@ -1,21 +1,23 @@
-import { Component, DestroyRef, OnInit, inject, signal, computed } from '@angular/core';
-import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import { finalize } from 'rxjs';
 import {
 	AsistenciaService,
-	SalonProfesor,
 	EstudianteAsistencia,
 	HijoApoderado,
+	SalonProfesor,
 	StorageService,
 	UserProfileService,
 } from '@core/services';
-import { AttendanceDataService } from '../../../services/attendance/attendance-data.service';
-import { AttendanceTable } from '../models/attendance.types';
-import { ViewMode } from '../../../components/attendance/attendance-header/attendance-header.component';
-import { AttendanceTableComponent } from '../../../components/attendance/attendance-table/attendance-table.component';
-import { SalonSelectorComponent } from '../../../components/attendance/salon-selector/salon-selector.component';
+import { Component, DestroyRef, OnInit, computed, inject, signal } from '@angular/core';
+
 import { AsistenciaDiaListComponent } from '../../../components/attendance/asistencia-dia-list/asistencia-dia-list.component';
+import { AttendanceDataService } from '../../../services/attendance/attendance-data.service';
+import { AttendanceLegendComponent } from '@app/features/intranet/components/attendance/attendance-legend/attendance-legend.component';
+import { AttendanceTable } from '../models/attendance.types';
+import { AttendanceTableComponent } from '../../../components/attendance/attendance-table/attendance-table.component';
 import { EmptyStateComponent } from '../../../components/attendance/empty-state/empty-state.component';
+import { SalonSelectorComponent } from '../../../components/attendance/salon-selector/salon-selector.component';
+import { ViewMode } from '../../../components/attendance/attendance-header/attendance-header.component';
+import { finalize } from 'rxjs';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
 /**
  * Componente Container para vista de asistencias de Profesores.
@@ -29,6 +31,7 @@ import { EmptyStateComponent } from '../../../components/attendance/empty-state/
 		SalonSelectorComponent,
 		AsistenciaDiaListComponent,
 		EmptyStateComponent,
+		AttendanceLegendComponent,
 	],
 	templateUrl: './attendance-profesor.component.html',
 })

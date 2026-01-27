@@ -1,15 +1,16 @@
-import { Component, inject, effect } from '@angular/core';
+import { Component, effect, inject } from '@angular/core';
+
 import { CommonModule } from '@angular/common';
-import { ToastModule } from 'primeng/toast';
-import { MessageService } from 'primeng/api';
 import { ErrorHandlerService } from '@core/services/error';
+import { MessageService } from 'primeng/api';
+import { ToastModule } from 'primeng/toast';
 
 @Component({
 	selector: 'app-toast-container',
 	standalone: true,
 	imports: [CommonModule, ToastModule],
 	providers: [MessageService],
-	template: `<p-toast position="top-right" [life]="5000"></p-toast>`,
+	templateUrl: './toast-container.component.html',
 })
 export class ToastContainerComponent {
 	private messageService = inject(MessageService);

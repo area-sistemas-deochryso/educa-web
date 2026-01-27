@@ -1,0 +1,10 @@
+<div class="week-item-row">
+	<div class="item-icon">
+		<i class="pi" [ngClass]="icon"></i>
+	</div>
+	<div class="item-info">
+		<strong>{{ title }}</strong>
+		<span>{{ subtitle }}</span>
+		<a class="item-link" (click)="action.emit()">{{ actionLabel }}</a>
+	</div>
+</div>

@@ -1,0 +1,15 @@
+<div class="salon-selector">
+	<label>Salón:</label>
+	<select (change)="onSalonChange($event)">
+		@for (salon of salones(); track salon.salonId) {
+			<option [value]="salon.salonId" [selected]="salon.salonId === selectedSalonId()">
+				{{ salon.nombreSalon }}
+				@if (salon.esTutor) {
+					(Tutor {{ nombreProfesor() }})
+				} @else {
+					(Profesor {{ nombreProfesor() }})
+				}
+			</option>
+		}
+	</select>
+</div>

@@ -3,3 +3,4 @@
 
 export * from './toast-container';
 export * from './form-error';
+export * from './form-field-error/form-field-error.component';

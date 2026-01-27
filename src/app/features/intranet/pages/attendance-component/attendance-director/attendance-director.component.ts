@@ -1,22 +1,24 @@
-import { Component, DestroyRef, OnInit, inject, signal, computed } from '@angular/core';
-import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import { finalize } from 'rxjs';
 import {
 	AsistenciaService,
-	GradoSeccion,
-	EstudianteAsistencia,
-	HijoApoderado,
 	EstadisticasDia,
+	EstudianteAsistencia,
+	GradoSeccion,
+	HijoApoderado,
 	StorageService,
 } from '@core/services';
-import { AttendanceDataService } from '../../../services/attendance/attendance-data.service';
-import { AttendanceTable } from '../models/attendance.types';
-import { ViewMode } from '../../../components/attendance/attendance-header/attendance-header.component';
-import { AttendanceTableComponent } from '../../../components/attendance/attendance-table/attendance-table.component';
-import { GradoSeccionSelectorComponent } from '../../../components/attendance/grado-seccion-selector/grado-seccion-selector.component';
-import { EstadisticasDiaComponent } from '../../../components/attendance/estadisticas-dia/estadisticas-dia.component';
+import { Component, DestroyRef, OnInit, computed, inject, signal } from '@angular/core';
+
 import { AsistenciaDiaListComponent } from '../../../components/attendance/asistencia-dia-list/asistencia-dia-list.component';
+import { AttendanceDataService } from '../../../services/attendance/attendance-data.service';
+import { AttendanceLegendComponent } from '@app/features/intranet/components/attendance/attendance-legend/attendance-legend.component';
+import { AttendanceTable } from '../models/attendance.types';
+import { AttendanceTableComponent } from '../../../components/attendance/attendance-table/attendance-table.component';
 import { EmptyStateComponent } from '../../../components/attendance/empty-state/empty-state.component';
+import { EstadisticasDiaComponent } from '../../../components/attendance/estadisticas-dia/estadisticas-dia.component';
+import { GradoSeccionSelectorComponent } from '../../../components/attendance/grado-seccion-selector/grado-seccion-selector.component';
+import { ViewMode } from '../../../components/attendance/attendance-header/attendance-header.component';
+import { finalize } from 'rxjs';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
 /**
  * Componente Container para vista de asistencias de Directores.
@@ -31,6 +33,7 @@ import { EmptyStateComponent } from '../../../components/attendance/empty-state/
 		EstadisticasDiaComponent,
 		AsistenciaDiaListComponent,
 		EmptyStateComponent,
+		AttendanceLegendComponent,
 	],
 	templateUrl: './attendance-director.component.html',
 })

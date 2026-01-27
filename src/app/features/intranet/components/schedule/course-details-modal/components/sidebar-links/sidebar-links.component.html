@@ -1,0 +1,10 @@
+<div class="sidebar-links-section">
+	@if (title) {
+		<p>
+			<strong>{{ title }}</strong>
+		</p>
+	}
+	@for (link of links; track link.action) {
+		<p class="link" (click)="linkClick.emit(link.action)">{{ link.label }}</p>
+	}
+</div>

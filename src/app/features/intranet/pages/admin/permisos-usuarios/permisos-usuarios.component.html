@@ -12,9 +12,11 @@
 		</div>
 		<button
 			pButton
+			type="button"
 			label="Refrescar"
 			icon="pi pi-refresh"
 			class="p-button-outlined"
+			aria-label="Refrescar datos"
 			(click)="refresh()"
 		></button>
 	</header>
@@ -27,24 +29,28 @@
 				type="text"
 				pInputText
 				placeholder="Buscar por usuario..."
+				aria-label="Buscar usuario"
 				[ngModel]="searchTerm()"
-				(ngModelChange)="searchTerm.set($event)"
+				(ngModelChange)="onSearchTermChange($event)"
 			/>
 		</div>
 
 		<p-select
 			[options]="rolesOptions"
 			[ngModel]="filterRol()"
-			(ngModelChange)="filterRol.set($event)"
+			(ngModelChange)="onFilterRolChange($event)"
 			placeholder="Todos los roles"
+			aria-label="Filtrar por rol"
 			[style]="{ minWidth: '180px' }"
 		/>
 
 		<button
 			pButton
+			type="button"
 			label="Limpiar filtros"
 			icon="pi pi-filter-slash"
 			class="p-button-text"
+			aria-label="Limpiar filtros"
 			(click)="clearFilters()"
 		></button>
 
@@ -52,9 +58,11 @@
 
 		<button
 			pButton
+			type="button"
 			label="Nuevo Permiso"
 			icon="pi pi-plus"
 			class="p-button-success"
+			aria-label="Crear nuevo permiso"
 			(click)="openNew()"
 		></button>
 	</section>
@@ -176,6 +184,7 @@
 							<div class="actions">
 								<button
 									pButton
+									type="button"
 									icon="pi pi-eye"
 									class="p-button-rounded p-button-text p-button-secondary"
 									pTooltip="Ver detalles"
@@ -184,6 +193,7 @@
 								></button>
 								<button
 									pButton
+									type="button"
 									icon="pi pi-pencil"
 									class="p-button-rounded p-button-text p-button-info"
 									pTooltip="Editar"
@@ -192,6 +202,7 @@
 								></button>
 								<button
 									pButton
+									type="button"
 									icon="pi pi-trash"
 									class="p-button-rounded p-button-text p-button-danger"
 									pTooltip="Eliminar"
@@ -221,7 +232,8 @@
 
 <!-- Detail Drawer -->
 <p-drawer
-	[(visible)]="detailDrawerVisible"
+	[visible]="detailDrawerVisible()"
+	(visibleChange)="closeDetail()"
 	position="right"
 	[style]="{ width: '500px' }"
 	[modal]="true"
@@ -265,7 +277,7 @@
 			<!-- Modules and Views -->
 			<div class="detail-modules">
 				<h3>Modulos y Vistas</h3>
-				@for (modulo of getModuloVistasForDetail(); track modulo.nombre) {
+				@for (modulo of moduloVistasForDetail(); track modulo.nombre) {
 					<div class="module-group">
 						<div class="module-header">
 							<i class="pi pi-folder"></i>
@@ -291,16 +303,20 @@
 		<div class="drawer-footer">
 			<button
 				pButton
+				type="button"
 				label="Cerrar"
 				icon="pi pi-times"
 				class="p-button-text"
+				aria-label="Cerrar detalle"
 				(click)="closeDetail()"
 			></button>
 			<button
 				pButton
+				type="button"
 				label="Editar Permisos"
 				icon="pi pi-pencil"
 				class="p-button-primary"
+				aria-label="Editar permisos"
 				(click)="editFromDetail()"
 			></button>
 		</div>
@@ -309,7 +325,8 @@
 
 <!-- Edit Dialog -->
 <p-dialog
-	[(visible)]="dialogVisible"
+	[visible]="dialogVisible()"
+	(visibleChange)="hideDialog()"
 	[header]="
 		isEditing()
 			? 'Editar Permisos - ' + (selectedPermiso()?.nombreUsuario || 'Usuario')
@@ -336,7 +353,7 @@
 					/>
 				</div>
 				<div class="vistas-count">
-					<i class="pi pi-check"></i> {{ getVistasCountLabel() }}
+					<i class="pi pi-check"></i> {{ vistasCountLabel() }}
 				</div>
 			</div>
 		} @else {
@@ -348,8 +365,9 @@
 							id="rol"
 							[options]="rolesSelectOptions"
 							[ngModel]="selectedRol()"
-							(ngModelChange)="selectedRol.set($event)"
+							(ngModelChange)="onSelectedRolChange($event)"
 							placeholder="Seleccione el rol"
+							aria-label="Rol del usuario"
 							[style]="{ width: '100%' }"
 							(onChange)="loadVistasFromRol()"
 						/>
@@ -358,8 +376,8 @@
 						<label for="usuario">Usuario</label>
 						<p-autoComplete
 							id="usuario"
-							[ngModel]="selectedUsuario()"
-							[suggestions]="usuariosSugeridos()"
+							[(ngModel)]="selectedUsuario"
+							[suggestions]="usuariosSugeridos"
 							(completeMethod)="buscarUsuarios($event)"
 							(onSelect)="onUsuarioSeleccionado($event)"
 							(onClear)="onUsuarioClear()"
@@ -376,6 +394,7 @@
 							[showClear]="true"
 							[dropdown]="true"
 							[minLength]="0"
+							aria-label="Buscar usuario"
 						>
 							<ng-template let-usuario pTemplate="item">
 								<div class="autocomplete-item">
@@ -402,9 +421,11 @@
 				<div class="modules-tabs">
 					@for (modulo of modulosVistas(); track modulo.nombre; let i = $index) {
 						<button
+							type="button"
 							class="module-tab"
 							[class.active]="activeModuloIndex() === i"
-							(click)="activeModuloIndex.set(i)"
+							[attr.aria-label]="'Módulo ' + modulo.nombre"
+							(click)="onActiveModuloIndexChange(i)"
 						>
 							<i class="pi pi-folder"></i>
 							{{ modulo.nombre }}
@@ -425,6 +446,7 @@
 								[ngModel]="isAllModuloSelected()"
 								(ngModelChange)="toggleAllVistasModulo()"
 								[binary]="true"
+								inputId="select-all-vistas"
 							/>
 							<span>Seleccionar todas las vistas</span>
 						</label>
@@ -440,8 +462,9 @@
 							type="text"
 							pInputText
 							placeholder="Buscar por ruta..."
+							aria-label="Buscar vista"
 							[ngModel]="vistasBusqueda()"
-							(ngModelChange)="vistasBusqueda.set($event)"
+							(ngModelChange)="onVistasBusquedaChange($event)"
 						/>
 					</div>
 
@@ -455,8 +478,17 @@
 									[ngModel]="isVistaSelected(vista.ruta)"
 									(ngModelChange)="toggleVista(vista.ruta)"
 									[binary]="true"
+									[inputId]="'vista-' + vista.id"
 								/>
-								<div class="vista-details" (click)="toggleVista(vista.ruta)">
+								<div
+									class="vista-details"
+									(click)="toggleVista(vista.ruta)"
+									role="button"
+									tabindex="0"
+									[attr.aria-label]="'Vista ' + vista.nombre"
+									(keydown.enter)="toggleVista(vista.ruta)"
+									(keydown.space)="toggleVista(vista.ruta)"
+								>
 									<span class="vista-name">{{ vista.nombre }}</span>
 									<span class="vista-path">{{ vista.ruta }}</span>
 								</div>
@@ -477,16 +509,20 @@
 		<div class="dialog-footer">
 			<button
 				pButton
+				type="button"
 				label="Cancelar"
 				icon="pi pi-times"
 				class="p-button-text"
+				aria-label="Cancelar"
 				(click)="hideDialog()"
 			></button>
 			<button
 				pButton
+				type="button"
 				label="Guardar Cambios"
 				icon="pi pi-check"
 				class="p-button-success"
+				aria-label="Guardar cambios"
 				(click)="savePermiso()"
 				[disabled]="
 					(!isEditing() && (!selectedUsuarioId() || !selectedRol())) ||
@@ -496,3 +532,6 @@
 		</div>
 	</ng-template>
 </p-dialog>
+
+<!-- Confirm Dialog -->
+<p-confirmDialog />

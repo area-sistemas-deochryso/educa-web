@@ -1,11 +1,13 @@
-import { Component, DestroyRef, OnInit, inject, signal, computed } from '@angular/core';
-import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import { finalize } from 'rxjs';
 import { AsistenciaService, HijoApoderado, StorageService } from '@core/services';
+import { Component, DestroyRef, OnInit, computed, inject, signal } from '@angular/core';
+
 import { AttendanceDataService } from '../../../services/attendance/attendance-data.service';
+import { AttendanceLegendComponent } from '@app/features/intranet/components/attendance/attendance-legend/attendance-legend.component';
 import { AttendanceTable } from '../models/attendance.types';
 import { AttendanceTableComponent } from '../../../components/attendance/attendance-table/attendance-table.component';
 import { EmptyStateComponent } from '../../../components/attendance/empty-state/empty-state.component';
+import { finalize } from 'rxjs';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
 /**
  * Componente Container para vista de asistencias de Apoderados.
@@ -14,7 +16,7 @@ import { EmptyStateComponent } from '../../../components/attendance/empty-state/
 @Component({
 	selector: 'app-attendance-apoderado',
 	standalone: true,
-	imports: [AttendanceTableComponent, EmptyStateComponent],
+	imports: [AttendanceTableComponent, EmptyStateComponent, AttendanceLegendComponent],
 	templateUrl: './attendance-apoderado.component.html',
 })
 export class AttendanceApoderadoComponent implements OnInit {

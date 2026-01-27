@@ -1,4 +1,5 @@
-import { describe, it, expect } from 'vitest';
+import { beforeEach, describe, expect, it } from 'vitest';
+
 import { TruncatePipe } from './truncate.pipe';
 
 describe('TruncatePipe', () => {

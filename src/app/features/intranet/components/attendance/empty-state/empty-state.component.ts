@@ -8,30 +8,8 @@ import { ChangeDetectionStrategy, Component, input } from '@angular/core';
 	selector: 'app-empty-state',
 	standalone: true,
 	changeDetection: ChangeDetectionStrategy.OnPush,
-	template: `
-		<div class="no-data">
-			<p>{{ message() }}</p>
-		</div>
-	`,
-	styles: [
-		`
-			.no-data {
-				display: flex;
-				justify-content: center;
-				align-items: center;
-				padding: 2rem;
-				background: var(--surface-card);
-				border-radius: var(--border-radius);
-				margin: 1rem 0;
-
-				p {
-					color: var(--text-color-secondary);
-					font-size: 1rem;
-					margin: 0;
-				}
-			}
-		`,
-	],
+	templateUrl: './empty-state.component.html',
+	styleUrl: './empty-state.component.scss',
 })
 export class EmptyStateComponent {
 	message = input.required<string>();

@@ -1,0 +1,42 @@
+.modal-controls {
+	display: flex;
+	justify-content: flex-end;
+	gap: 0.5rem;
+	margin-bottom: 0.5rem;
+}
+
+.control-btn {
+	width: 32px;
+	height: 32px;
+	border: 1px solid #ddd;
+	border-radius: 4px;
+	background: #fff;
+	cursor: pointer;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	transition: all 0.2s ease;
+
+	i {
+		font-size: 0.9rem;
+		color: var(--intranet-soft-text-color);
+	}
+
+	&:hover {
+		background-color: rgba(0, 0, 0, 0.05);
+		border-color: var(--intranet-accent-color-blue);
+
+		i {
+			color: var(--intranet-accent-color-blue);
+		}
+	}
+
+	&.close-btn:hover {
+		background-color: #fee2e2;
+		border-color: #ef4444;
+
+		i {
+			color: #ef4444;
+		}
+	}
+}

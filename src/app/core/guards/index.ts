@@ -1,2 +1,2 @@
-export * from './auth.guard';
-export * from './permisos.guard';
+export * from './auth/auth.guard';
+export * from './permisos/permisos.guard';

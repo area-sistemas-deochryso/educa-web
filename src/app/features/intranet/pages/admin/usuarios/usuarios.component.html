@@ -20,12 +20,12 @@
 	</header>
 
 	<!-- Stats Cards -->
-	@if (estadisticas()) {
+	@if (vm().hasEstadisticas) {
 		<section class="stats-section">
 			<div class="stat-card">
 				<div class="stat-content">
 					<span class="stat-label">Total Usuarios</span>
-					<span class="stat-value">{{ estadisticas()?.totalUsuarios }}</span>
+					<span class="stat-value">{{ vm().estadisticas!.totalUsuarios }}</span>
 					<span class="stat-sublabel">usuarios registrados</span>
 				</div>
 				<div class="stat-icon">
@@ -36,7 +36,7 @@
 			<div class="stat-card">
 				<div class="stat-content">
 					<span class="stat-label">Directores</span>
-					<span class="stat-value">{{ estadisticas()?.totalDirectores }}</span>
+					<span class="stat-value">{{ vm().estadisticas!.totalDirectores }}</span>
 					<span class="stat-sublabel">administradores</span>
 				</div>
 				<div class="stat-icon">
@@ -47,7 +47,7 @@
 			<div class="stat-card">
 				<div class="stat-content">
 					<span class="stat-label">Asistentes Admin.</span>
-					<span class="stat-value">{{ estadisticas()?.totalAsistentesAdministrativos }}</span>
+					<span class="stat-value">{{ vm().estadisticas!.totalAsistentesAdministrativos }}</span>
 					<span class="stat-sublabel">apoyo administrativo</span>
 				</div>
 				<div class="stat-icon">
@@ -58,7 +58,7 @@
 			<div class="stat-card">
 				<div class="stat-content">
 					<span class="stat-label">Profesores</span>
-					<span class="stat-value">{{ estadisticas()?.totalProfesores }}</span>
+					<span class="stat-value">{{ vm().estadisticas!.totalProfesores }}</span>
 					<span class="stat-sublabel">docentes</span>
 				</div>
 				<div class="stat-icon">
@@ -69,7 +69,7 @@
 			<div class="stat-card">
 				<div class="stat-content">
 					<span class="stat-label">Estudiantes</span>
-					<span class="stat-value">{{ estadisticas()?.totalEstudiantes }}</span>
+					<span class="stat-value">{{ vm().estadisticas!.totalEstudiantes }}</span>
 					<span class="stat-sublabel">alumnos</span>
 				</div>
 				<div class="stat-icon">
@@ -87,23 +87,23 @@
 				type="text"
 				pInputText
 				placeholder="Buscar por nombre, DNI o correo..."
-				[ngModel]="searchTerm()"
-				(ngModelChange)="searchTerm.set($event)"
+				[ngModel]="vm().searchTerm"
+				(ngModelChange)="onSearchChange($event)"
 			/>
 		</div>
 
 		<p-select
 			[options]="rolesOptions"
-			[ngModel]="filterRol()"
-			(ngModelChange)="filterRol.set($event)"
+			[ngModel]="vm().filterRol"
+			(ngModelChange)="onFilterRolChange($event)"
 			placeholder="Todos los roles"
 			[style]="{ minWidth: '160px' }"
 		/>
 
 		<p-select
 			[options]="estadoOptions"
-			[ngModel]="filterEstado()"
-			(ngModelChange)="filterEstado.set($event)"
+			[ngModel]="vm().filterEstado"
+			(ngModelChange)="onFilterEstadoChange($event)"
 			placeholder="Estado"
 			[style]="{ minWidth: '140px' }"
 		/>
@@ -128,14 +128,14 @@
 	</section>
 
 	<!-- Table -->
-	@if (loading()) {
+	@if (vm().loading) {
 		<div class="loading-container">
 			<p-progressSpinner strokeWidth="4" />
 		</div>
 	} @else {
 		<section class="table-section">
 			<p-table
-				[value]="filteredUsuarios()"
+				[value]="vm().filteredUsuarios"
 				[paginator]="true"
 				[rows]="10"
 				[rowsPerPageOptions]="[5, 10, 25, 50]"
@@ -248,7 +248,7 @@
 
 <!-- Detail Drawer -->
 <p-drawer
-	[(visible)]="detailDrawerVisible"
+	[(visible)]="vm().detailDrawerVisible"
 	position="right"
 	[style]="{ width: '450px' }"
 	[modal]="true"
@@ -259,73 +259,71 @@
 		</div>
 	</ng-template>
 
-	@if (selectedUsuario()) {
+	@if (vm().selectedUsuario) {
 		<div class="detail-content">
 			<div class="detail-avatar">
 				<i class="pi pi-user"></i>
 			</div>
 
-			<div class="detail-name">{{ selectedUsuario()?.nombreCompleto }}</div>
+			<div class="detail-name">{{ vm().selectedUsuario!.nombreCompleto }}</div>
 
 			<p-tag
-				[value]="selectedUsuario()?.rol || ''"
-				[severity]="adminUtils.getRolSeverity(selectedUsuario()?.rol || '')"
+				[value]="vm().selectedUsuario!.rol"
+				[severity]="adminUtils.getRolSeverity(vm().selectedUsuario!.rol)"
 			/>
 
 			<div class="detail-info">
 				<div class="info-item">
 					<span class="info-label">DNI</span>
-					<span class="info-value">{{ selectedUsuario()?.dni }}</span>
+					<span class="info-value">{{ vm().selectedUsuario!.dni }}</span>
 				</div>
 				<div class="info-item">
 					<span class="info-label">Estado</span>
 					<p-tag
-						[value]="selectedUsuario()?.estado ? 'Activo' : 'Inactivo'"
-						[severity]="
-							adminUtils.getEstadoSeverity(selectedUsuario()?.estado || false)
-						"
+						[value]="vm().selectedUsuario!.estado ? 'Activo' : 'Inactivo'"
+						[severity]="adminUtils.getEstadoSeverity(vm().selectedUsuario!.estado)"
 					/>
 				</div>
-				@if (selectedUsuario()?.correo) {
+				@if (vm().selectedUsuario!.correo) {
 					<div class="info-item">
 						<span class="info-label">Correo</span>
-						<span class="info-value">{{ selectedUsuario()?.correo }}</span>
+						<span class="info-value">{{ vm().selectedUsuario!.correo }}</span>
 					</div>
 				}
-				@if (selectedUsuario()?.telefono) {
+				@if (vm().selectedUsuario!.telefono) {
 					<div class="info-item">
 						<span class="info-label">Telefono</span>
-						<span class="info-value">{{ selectedUsuario()?.telefono }}</span>
+						<span class="info-value">{{ vm().selectedUsuario!.telefono }}</span>
 					</div>
 				}
-				@if (selectedUsuario()?.sedeNombre) {
+				@if (vm().selectedUsuario!.sedeNombre) {
 					<div class="info-item">
 						<span class="info-label">Sede</span>
-						<span class="info-value">{{ selectedUsuario()?.sedeNombre }}</span>
+						<span class="info-value">{{ vm().selectedUsuario!.sedeNombre }}</span>
 					</div>
 				}
-				@if (selectedUsuario()?.grado) {
+				@if (vm().selectedUsuario!.grado) {
 					<div class="info-item">
 						<span class="info-label">Grado</span>
-						<span class="info-value">{{ selectedUsuario()?.grado }}</span>
+						<span class="info-value">{{ vm().selectedUsuario!.grado }}</span>
 					</div>
 				}
-				@if (selectedUsuario()?.seccion) {
+				@if (vm().selectedUsuario!.seccion) {
 					<div class="info-item">
 						<span class="info-label">Seccion</span>
-						<span class="info-value">{{ selectedUsuario()?.seccion }}</span>
+						<span class="info-value">{{ vm().selectedUsuario!.seccion }}</span>
 					</div>
 				}
-				@if (selectedUsuario()?.correoApoderado) {
+				@if (vm().selectedUsuario!.correoApoderado) {
 					<div class="info-item">
 						<span class="info-label">Correo del Apoderado</span>
-						<span class="info-value">{{ selectedUsuario()?.correoApoderado }}</span>
+						<span class="info-value">{{ vm().selectedUsuario!.correoApoderado }}</span>
 					</div>
 				}
 				<div class="info-item">
 					<span class="info-label">Fecha de Registro</span>
 					<span class="info-value">{{
-						selectedUsuario()?.fechaRegistro | date: 'dd/MM/yyyy'
+						vm().selectedUsuario!.fechaRegistro | date: 'dd/MM/yyyy'
 					}}</span>
 				</div>
 			</div>
@@ -352,8 +350,8 @@
 
 <!-- Edit/Create Dialog -->
 <p-dialog
-	[(visible)]="dialogVisible"
-	[header]="isEditing() ? 'Editar Usuario' : 'Nuevo Usuario'"
+	[(visible)]="vm().dialogVisible"
+	[header]="vm().isEditing ? 'Editar Usuario' : 'Nuevo Usuario'"
 	[modal]="true"
 	[style]="{ width: '600px' }"
 	[draggable]="false"
@@ -362,14 +360,14 @@
 >
 	<div class="dialog-content">
 		<div class="form-grid">
-			@if (!isEditing()) {
+			@if (!vm().isEditing) {
 				<div class="field full-width">
 					<label for="rol">Rol *</label>
 					<p-select
 						id="rol"
 						[options]="rolesSelectOptions"
-						[ngModel]="formData().rol"
-						(ngModelChange)="updateFormField('rol', $event)"
+						[ngModel]="vm().formData.rol"
+						(ngModelChange)="onFieldChange('rol', $event)"
 						placeholder="Seleccione el rol"
 						[style]="{ width: '100%' }"
 					/>
@@ -382,27 +380,25 @@
 					id="dni"
 					type="text"
 					pInputText
-					[ngModel]="formData().dni"
-					(ngModelChange)="updateFormField('dni', $event)"
+					[ngModel]="vm().formData.dni"
+					(ngModelChange)="onFieldChange('dni', $event)"
 					placeholder="12345678"
 					maxlength="8"
-					[class.ng-invalid]="dniError()"
-					[class.ng-dirty]="formData().dni"
+					[class.ng-invalid]="vm().dniError"
+					[class.ng-dirty]="vm().formData.dni"
 				/>
-				@if (dniError()) {
-					<small class="p-error">{{ dniError() }}</small>
-				}
+				<app-form-field-error [error]="vm().dniError" />
 			</div>
 
 			<div class="field">
 				<label for="contrasena">{{
-					isEditing() ? 'Nueva Contraseña' : 'Contraseña *'
+					vm().isEditing ? 'Nueva Contraseña' : 'Contraseña *'
 				}}</label>
 				<p-password
 					id="contrasena"
-					[ngModel]="formData().contrasena"
-					(ngModelChange)="updateFormField('contrasena', $event)"
-					[placeholder]="isEditing() ? 'Dejar vacío para mantener' : 'Ingrese contrasena'"
+					[ngModel]="vm().formData.contrasena"
+					(ngModelChange)="onFieldChange('contrasena', $event)"
+					[placeholder]="vm().isEditing ? 'Dejar vacío para mantener' : 'Ingrese contrasena'"
 					[toggleMask]="true"
 					[feedback]="false"
 					[style]="{ width: '100%' }"
@@ -416,8 +412,8 @@
 					id="nombres"
 					type="text"
 					pInputText
-					[ngModel]="formData().nombres"
-					(ngModelChange)="updateFormField('nombres', $event)"
+					[ngModel]="vm().formData.nombres"
+					(ngModelChange)="onFieldChange('nombres', $event)"
 					placeholder="Nombres del usuario"
 				/>
 			</div>
@@ -428,8 +424,8 @@
 					id="apellidos"
 					type="text"
 					pInputText
-					[ngModel]="formData().apellidos"
-					(ngModelChange)="updateFormField('apellidos', $event)"
+					[ngModel]="vm().formData.apellidos"
+					(ngModelChange)="onFieldChange('apellidos', $event)"
 					placeholder="Apellidos del usuario"
 				/>
 			</div>
@@ -440,15 +436,13 @@
 					id="correo"
 					type="email"
 					pInputText
-					[ngModel]="formData().correo"
-					(ngModelChange)="updateFormField('correo', $event)"
+					[ngModel]="vm().formData.correo"
+					(ngModelChange)="onFieldChange('correo', $event)"
 					placeholder="correo@ejemplo.com"
-					[class.ng-invalid]="correoError()"
-					[class.ng-dirty]="formData().correo"
+					[class.ng-invalid]="vm().correoError"
+					[class.ng-dirty]="vm().formData.correo"
 				/>
-				@if (correoError()) {
-					<small class="p-error">{{ correoError() }}</small>
-				}
+				<app-form-field-error [error]="vm().correoError" />
 			</div>
 
 			<div class="field">
@@ -457,41 +451,39 @@
 					id="telefono"
 					type="text"
 					pInputText
-					[ngModel]="formData().telefono"
-					(ngModelChange)="updateFormField('telefono', $event)"
+					[ngModel]="vm().formData.telefono"
+					(ngModelChange)="onFieldChange('telefono', $event)"
 					placeholder="999999999"
 				/>
 			</div>
 
-			@if (isEstudiante()) {
+			@if (vm().isEstudiante) {
 				<div class="field">
 					<label for="correoApoderado">Correo del Apoderado</label>
 					<input
 						id="correoApoderado"
 						type="email"
 						pInputText
-						[ngModel]="formData().correoApoderado"
-						(ngModelChange)="updateFormField('correoApoderado', $event)"
+						[ngModel]="vm().formData.correoApoderado"
+						(ngModelChange)="onFieldChange('correoApoderado', $event)"
 						placeholder="correo@ejemplo.com"
-						[class.ng-invalid]="correoApoderadoError()"
-						[class.ng-dirty]="formData().correoApoderado"
+						[class.ng-invalid]="vm().correoApoderadoError"
+						[class.ng-dirty]="vm().formData.correoApoderado"
 					/>
-					@if (correoApoderadoError()) {
-						<small class="p-error">{{ correoApoderadoError() }}</small>
-					}
+					<app-form-field-error [error]="vm().correoApoderadoError" />
 				</div>
 			}
 
-			@if (isEditing()) {
+			@if (vm().isEditing) {
 				<div class="field full-width">
 					<label for="estado">Estado</label>
 					<div class="estado-switch">
 						<p-toggleswitch
 							id="estado"
-							[ngModel]="formData().estado"
-							(ngModelChange)="updateFormField('estado', $event)"
+							[ngModel]="vm().formData.estado"
+							(ngModelChange)="onFieldChange('estado', $event)"
 						/>
-						<span>{{ formData().estado ? 'Activo' : 'Inactivo' }}</span>
+						<span>{{ vm().formData.estado ? 'Activo' : 'Inactivo' }}</span>
 					</div>
 				</div>
 			}
@@ -513,8 +505,11 @@
 				icon="pi pi-check"
 				class="p-button-success"
 				(click)="saveUsuario()"
-				[disabled]="!isFormValid()"
+				[disabled]="!vm().isFormValid"
 			></button>
 		</div>
 	</ng-template>
 </p-dialog>
+
+<!-- Confirm Dialog -->
+<p-confirmDialog />

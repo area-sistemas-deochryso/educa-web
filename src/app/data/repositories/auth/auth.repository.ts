@@ -1,7 +1,8 @@
-import { Injectable } from '@angular/core';
-import { Observable, catchError, of } from 'rxjs';
-import { BaseRepository } from './base.repository';
 import { LoginRequest, LoginResponse, UserProfile, VerifyTokenResponse } from '@core/services/auth';
+import { Observable, catchError, of } from 'rxjs';
+
+import { BaseRepository } from '../base/base.repository';
+import { Injectable } from '@angular/core';
 import { logger } from '@core/helpers';
 
 @Injectable({

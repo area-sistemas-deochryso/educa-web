@@ -1,0 +1,43 @@
+.week-item {
+	border-bottom: 1px solid #ddd;
+
+	&:last-child {
+		border-bottom: none;
+	}
+
+	&.expanded .week-header {
+		background-color: rgba(0, 0, 0, 0.03);
+	}
+}
+
+.week-header {
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+	padding: 0.5rem 1rem;
+	font-size: 0.8rem;
+	color: var(--intranet-default-text-color);
+	cursor: pointer;
+
+	&:hover {
+		background-color: rgba(0, 0, 0, 0.02);
+	}
+
+	i {
+		font-size: 0.7rem;
+		color: var(--intranet-soft-text-color);
+	}
+}
+
+.week-content {
+	padding: 1rem;
+	background-color: rgba(0, 0, 0, 0.01);
+	border-top: 1px solid #eee;
+
+	.teacher-message {
+		font-size: 0.75rem;
+		color: var(--intranet-soft-text-color);
+		margin: 0 0 1rem 0;
+		font-style: italic;
+	}
+}

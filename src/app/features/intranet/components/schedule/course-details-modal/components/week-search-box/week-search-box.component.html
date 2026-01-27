@@ -1,0 +1,9 @@
+<div class="search-box">
+	<i class="pi pi-search"></i>
+	<input
+		type="text"
+		[placeholder]="placeholder"
+		[ngModel]="searchTerm"
+		(ngModelChange)="searchTermChange.emit($event)"
+	/>
+</div>

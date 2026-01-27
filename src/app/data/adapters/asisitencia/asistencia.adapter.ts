@@ -1,6 +1,7 @@
-import { Injectable } from '@angular/core';
-import { BaseAdapter } from './base.adapter';
 import { AsistenciaDetalle, HijoApoderado, ResumenAsistencia } from '@core/services';
+
+import { BaseAdapter } from '../base/base.adapter';
+import { Injectable } from '@angular/core';
 
 /**
  * Modelo de vista para una asistencia

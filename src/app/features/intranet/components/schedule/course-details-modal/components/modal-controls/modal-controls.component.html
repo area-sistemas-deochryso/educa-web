@@ -1,0 +1,22 @@
+<div class="modal-controls">
+	<button
+		class="control-btn"
+		(click)="expand.emit()"
+		[pTooltip]="isExpanded ? 'Contraer' : 'Maximizar'"
+		tooltipPosition="bottom"
+	>
+		<i
+			class="pi"
+			[class.pi-window-maximize]="!isExpanded"
+			[class.pi-window-minimize]="isExpanded"
+		></i>
+	</button>
+	<button
+		class="control-btn close-btn"
+		(click)="closeTriggered.emit()"
+		pTooltip="Cerrar"
+		tooltipPosition="bottom"
+	>
+		<i class="pi pi-times"></i>
+	</button>
+</div>

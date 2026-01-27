@@ -1,0 +1,11 @@
+<div class="member-list-section">
+	<p>
+		<strong>{{ title }}</strong>
+	</p>
+	@for (member of members; track member) {
+		<div class="group-member">
+			<i class="pi pi-user"></i>
+			<span>{{ member }}</span>
+		</div>
+	}
+</div>

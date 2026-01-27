@@ -1,0 +1,7 @@
+@if (shouldShowErrors) {
+	<div class="form-error">
+		@for (message of errorMessages; track message) {
+			<small class="p-error">{{ message }}</small>
+		}
+	</div>
+}

@@ -1,17 +1,16 @@
-import { Component, ViewChild, inject, signal } from '@angular/core';
-import { Router } from '@angular/router';
-
-import { UserProfileService } from '@core/services';
-import { logger } from '@core/helpers';
 import {
 	AttendanceHeaderComponent,
 	ViewMode,
 } from '../../components/attendance/attendance-header/attendance-header.component';
-import { AttendanceLegendComponent } from '../../components/attendance/attendance-legend/attendance-legend.component';
+import { Component, ViewChild, inject, signal } from '@angular/core';
+
 import { AttendanceApoderadoComponent } from './attendance-apoderado/attendance-apoderado.component';
-import { AttendanceProfesorComponent } from './attendance-profesor/attendance-profesor.component';
 import { AttendanceDirectorComponent } from './attendance-director/attendance-director.component';
 import { AttendanceEstudianteComponent } from './attendance-estudiante/attendance-estudiante.component';
+import { AttendanceProfesorComponent } from './attendance-profesor/attendance-profesor.component';
+import { Router } from '@angular/router';
+import { UserProfileService } from '@core/services';
+import { logger } from '@core/helpers';
 
 /**
  * Componente Page/Route para asistencias.
@@ -28,7 +27,6 @@ import { AttendanceEstudianteComponent } from './attendance-estudiante/attendanc
 	standalone: true,
 	imports: [
 		AttendanceHeaderComponent,
-		AttendanceLegendComponent,
 		AttendanceApoderadoComponent,
 		AttendanceProfesorComponent,
 		AttendanceDirectorComponent,

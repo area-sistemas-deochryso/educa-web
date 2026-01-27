@@ -1,6 +1,7 @@
+import { BaseRepository, QueryParams } from '../base/base.repository';
+import { Observable, catchError, map, of } from 'rxjs';
+
 import { Injectable } from '@angular/core';
-import { Observable, catchError, of, map } from 'rxjs';
-import { BaseRepository, QueryParams } from './base.repository';
 import { logger } from '@core/helpers';
 
 export interface Notification {

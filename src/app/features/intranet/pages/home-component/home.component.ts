@@ -1,4 +1,4 @@
-import { Component, inject } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, inject } from '@angular/core';
 
 import { COURSE_NAMES } from '@features/intranet/pages/schedule-component/courses.config';
 import { NotificationQuickAccessComponent } from '@features/intranet/components/notification-quick-access/notification-quick-access';
@@ -10,6 +10,7 @@ import { environment } from '@config/environment';
 
 @Component({
 	selector: 'app-home.component',
+	standalone: true,
 	imports: [
 		QuickAccessCardComponent,
 		QuickAccessCardMenuComponent,
@@ -18,19 +19,19 @@ import { environment } from '@config/environment';
 	],
 	templateUrl: './home.component.html',
 	styleUrl: './home.component.scss',
+	changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class HomeComponent {
 	private storage = inject(StorageService);
 
 	readonly showQuickAccess = environment.features.quickAccess;
-	availableCourses = COURSE_NAMES;
+	readonly availableCourses = COURSE_NAMES;
 
-	get welcomeTitle(): string {
+	readonly welcomeTitle = computed(() => {
 		const user = this.storage.getUser();
 		if (user?.nombreCompleto) {
-			const firstName = user.nombreCompleto;
-			return `Bienvenido, ${firstName}`;
+			return `Bienvenido, ${user.nombreCompleto}`;
 		}
 		return 'Bienvenido a tu Intranet';
-	}
+	});
 }

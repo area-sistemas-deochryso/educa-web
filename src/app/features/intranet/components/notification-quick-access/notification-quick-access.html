@@ -2,13 +2,13 @@
 	class="quick-access-card"
 	[class.notification-quick-access]="unreadCount() > 0"
 	[class.no-notifications]="unreadCount() === 0"
-	[ngClass]="unreadCount() > 0 ? getBadgePriorityClass() : ''"
+	[ngClass]="unreadCount() > 0 ? badgePriorityClass() : ''"
 	(click)="togglePanel()"
 >
-	<div class="card-icon" [ngClass]="unreadCount() > 0 ? getBadgePriorityClass() : ''">
+	<div class="card-icon" [ngClass]="unreadCount() > 0 ? badgePriorityClass() : ''">
 		<i class="pi pi-bell"></i>
 		@if (unreadCount() > 0) {
-			<span class="quick-badge" [class]="getBadgePriorityClass()">{{ unreadCount() }}</span>
+			<span class="quick-badge" [class]="badgePriorityClass()">{{ unreadCount() }}</span>
 		}
 	</div>
 	<span>Notificaciones</span>

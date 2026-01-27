@@ -1,0 +1,26 @@
+.search-box {
+	display: flex;
+	align-items: center;
+	gap: 0.5rem;
+	padding: 0.5rem 1rem;
+	border: 1px solid #ddd;
+	border-radius: 4px;
+	margin-bottom: 1rem;
+
+	i {
+		color: var(--intranet-soft-text-color);
+		font-size: 0.85rem;
+	}
+
+	input {
+		border: none;
+		outline: none;
+		font-size: 0.75rem;
+		color: var(--intranet-soft-text-color);
+		width: 100%;
+
+		&::placeholder {
+			color: var(--intranet-soft-text-color);
+		}
+	}
+}

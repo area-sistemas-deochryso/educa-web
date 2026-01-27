@@ -1,0 +1,22 @@
+<div class="course-search-section">
+	<p><strong>Cursos:</strong></p>
+	<div class="course-search-box">
+		<input
+			type="text"
+			[placeholder]="placeholder"
+			[ngModel]="searchTerm"
+			(ngModelChange)="searchTermChange.emit($event)"
+			(input)="searchTriggered.emit()"
+			(blur)="blurTriggered.emit()"
+		/>
+		@if (showDropdown && results.length > 0) {
+			<div class="course-dropdown">
+				@for (course of results; track course) {
+					<div class="course-option" (mousedown)="selectTriggered.emit(course)">
+						{{ course }}
+					</div>
+				}
+			</div>
+		}
+	</div>
+</div>

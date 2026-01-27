@@ -1,2 +1,2 @@
-export * from './highlight.directive';
-export * from './uppercase-input.directive';
+export * from './highlight/highlight.directive';
+export * from './uppercase-input/uppercase-input.directive';

@@ -1,55 +1,34 @@
-import {
-	ChangeDetectionStrategy,
-	Component,
-	DestroyRef,
-	inject,
-	OnInit,
-	signal,
-	computed,
-} from '@angular/core';
+import { ChangeDetectionStrategy, Component, DestroyRef, inject, OnInit } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
-import { forkJoin } from 'rxjs';
 
 import { TableModule } from 'primeng/table';
 import { ButtonModule } from 'primeng/button';
 import { DialogModule } from 'primeng/dialog';
-import { MultiSelectModule } from 'primeng/multiselect';
 import { TooltipModule } from 'primeng/tooltip';
 import { TagModule } from 'primeng/tag';
 import { ProgressSpinnerModule } from 'primeng/progressspinner';
-import { InputNumberModule } from 'primeng/inputnumber';
 import { SelectModule } from 'primeng/select';
 import { InputTextModule } from 'primeng/inputtext';
 import { CheckboxModule } from 'primeng/checkbox';
-import { TabsModule } from 'primeng/tabs';
 import { DrawerModule } from 'primeng/drawer';
 import {
 	AutoCompleteModule,
 	AutoCompleteCompleteEvent,
 	AutoCompleteSelectEvent,
 } from 'primeng/autocomplete';
+import { ConfirmationService } from 'primeng/api';
+import { ConfirmDialogModule } from 'primeng/confirmdialog';
 
-import { logger } from '@core/helpers';
 import {
 	PermisosService,
 	PermisoUsuario,
-	PermisoRol,
-	Vista,
 	ROLES_DISPONIBLES_ADMIN,
 	RolTipoAdmin,
 	UsuarioBusqueda,
-	ErrorHandlerService,
 } from '@core/services';
-import { AdminUtilsService } from '@shared/services';
-
-interface ModuloVistas {
-	nombre: string;
-	vistas: Vista[];
-	seleccionadas: number;
-	total: number;
-}
+import { PermisosUsuariosFacade } from './permisos-usuarios.facade';
 
 @Component({
 	selector: 'app-permisos-usuarios',
@@ -60,57 +39,57 @@ interface ModuloVistas {
 		TableModule,
 		ButtonModule,
 		DialogModule,
-		MultiSelectModule,
 		TooltipModule,
 		TagModule,
 		ProgressSpinnerModule,
-		InputNumberModule,
 		SelectModule,
 		InputTextModule,
 		CheckboxModule,
-		TabsModule,
 		DrawerModule,
 		AutoCompleteModule,
+		ConfirmDialogModule,
 	],
+	providers: [ConfirmationService],
 	templateUrl: './permisos-usuarios.component.html',
 	styleUrl: './permisos-usuarios.component.scss',
 	changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class PermisosUsuariosComponent implements OnInit {
+	private facade = inject(PermisosUsuariosFacade);
 	private permisosService = inject(PermisosService);
+	private confirmationService = inject(ConfirmationService);
 	private destroyRef = inject(DestroyRef);
-	private errorHandler = inject(ErrorHandlerService);
-	readonly adminUtils = inject(AdminUtilsService);
 
-	// State
-	permisosUsuario = signal<PermisoUsuario[]>([]);
-	permisosRol = signal<PermisoRol[]>([]);
-	vistas = signal<Vista[]>([]);
-	loading = signal(false);
+	// Facade state
+	readonly permisosUsuario = this.facade.permisosUsuario;
+	readonly vistas = this.facade.vistas;
+	readonly loading = this.facade.loading;
+	readonly dialogVisible = this.facade.dialogVisible;
+	readonly detailDrawerVisible = this.facade.detailDrawerVisible;
+	readonly isEditing = this.facade.isEditing;
+	readonly selectedPermiso = this.facade.selectedPermiso;
+	readonly selectedUsuarioId = this.facade.selectedUsuarioId;
+	readonly selectedRol = this.facade.selectedRol;
+	readonly selectedVistas = this.facade.selectedVistas;
+	readonly searchTerm = this.facade.searchTerm;
+	readonly filterRol = this.facade.filterRol;
+	readonly modulosVistas = this.facade.modulosVistas;
+	readonly activeModuloIndex = this.facade.activeModuloIndex;
+	readonly vistasBusqueda = this.facade.vistasBusqueda;
+	readonly adminUtils = this.facade.adminUtils;
 
-	// Dialogs
-	dialogVisible = signal(false);
-	detailDrawerVisible = signal(false);
-	isEditing = signal(false);
+	// Computed from facade
+	readonly totalUsuarios = this.facade.totalUsuarios;
+	readonly totalModulos = this.facade.totalModulos;
+	readonly filteredPermisos = this.facade.filteredPermisos;
+	readonly vistasFiltradas = this.facade.vistasFiltradas;
+	readonly vistasCountLabel = this.facade.vistasCountLabel;
+	readonly moduloVistasForDetail = this.facade.moduloVistasForDetail;
+	readonly isAllModuloSelected = this.facade.isAllModuloSelected;
 
-	// Form
-	selectedPermiso = signal<PermisoUsuario | null>(null);
-	selectedUsuarioId = signal<number | null>(null);
-	selectedRol = signal<RolTipoAdmin | null>(null);
-	selectedVistas = signal<string[]>([]);
-
-	// Autocomplete usuarios
-	selectedUsuario = signal<UsuarioBusqueda | null>(null);
-	usuariosSugeridos = signal<UsuarioBusqueda[]>([]);
-
-	// Filters
-	searchTerm = signal('');
-	filterRol = signal<RolTipoAdmin | null>(null);
-
-	// Edit modal - module tabs
-	modulosVistas = signal<ModuloVistas[]>([]);
-	activeModuloIndex = signal(0);
-	vistasBusqueda = signal('');
+	// Autocomplete local state (ephemeral)
+	selectedUsuario: UsuarioBusqueda | null = null;
+	usuariosSugeridos: UsuarioBusqueda[] = [];
 
 	// Options (sin Apoderado para admin)
 	rolesDisponibles = ROLES_DISPONIBLES_ADMIN;
@@ -119,371 +98,148 @@ export class PermisosUsuariosComponent implements OnInit {
 	);
 	rolesSelectOptions = ROLES_DISPONIBLES_ADMIN.map((r) => ({ label: r, value: r }));
 
-	// Computed - Statistics
-	totalUsuarios = computed(() => this.permisosUsuario().length);
-
-	totalModulos = computed(() => {
-		const modulos = new Set<string>();
-		this.vistas().forEach((v) => {
-			const modulo = this.adminUtils.getModuloFromRuta(v.ruta);
-			modulos.add(modulo);
-		});
-		return modulos.size;
-	});
-
-	// Computed - Filtered data
-	filteredPermisos = computed(() => {
-		let permisos = this.permisosUsuario();
-		const search = this.searchTerm().toLowerCase();
-		const filtroRol = this.filterRol();
-
-		if (search) {
-			permisos = permisos.filter(
-				(p) =>
-					p.nombreUsuario?.toLowerCase().includes(search) ||
-					p.usuarioId.toString().includes(search),
-			);
-		}
-
-		if (filtroRol) {
-			permisos = permisos.filter((p) => p.rol === filtroRol);
-		}
-
-		return permisos;
-	});
-
-	// Computed - Vistas filtradas por búsqueda en modal de edición
-	vistasFiltradas = computed(() => {
-		const modulos = this.modulosVistas();
-		const busqueda = this.vistasBusqueda().toLowerCase();
-		const activeIndex = this.activeModuloIndex();
-
-		if (activeIndex >= modulos.length) return [];
-
-		const modulo = modulos[activeIndex];
-		if (!busqueda) return modulo.vistas;
-
-		return modulo.vistas.filter(
-			(v) =>
-				v.nombre.toLowerCase().includes(busqueda) ||
-				v.ruta.toLowerCase().includes(busqueda),
-		);
-	});
-
 	ngOnInit(): void {
-		this.loadData();
+		this.facade.loadData();
 	}
 
-	loadData(): void {
-		this.loading.set(true);
-
-		forkJoin({
-			vistas: this.permisosService.getVistas(),
-			permisosRol: this.permisosService.getPermisosRol(),
-			permisosUsuario: this.permisosService.getPermisosUsuario(),
-		})
-			.pipe(takeUntilDestroyed(this.destroyRef))
-			.subscribe({
-				next: ({ vistas, permisosRol, permisosUsuario }) => {
-					this.vistas.set(vistas.filter((v) => v.estado === 1));
-					// Filtrar apoderados para no mostrarlos en admin
-					this.permisosRol.set(permisosRol.filter((p) => p.rol !== 'Apoderado'));
-					this.permisosUsuario.set(permisosUsuario.filter((p) => p.rol !== 'Apoderado'));
-					this.loading.set(false);
-				},
-				error: (err) => {
-					logger.error('Error al cargar datos:', err);
-					this.errorHandler.showError('Error', 'No se pudieron cargar los permisos');
-					this.loading.set(false);
-				},
-			});
-	}
-
+	// === Actions ===
 	refresh(): void {
-		this.loadData();
+		this.facade.refresh();
 	}
 
 	clearFilters(): void {
-		this.searchTerm.set('');
-		this.filterRol.set(null);
+		this.facade.clearFilters();
 	}
 
 	// === Detail Drawer ===
 	openDetail(permiso: PermisoUsuario): void {
-		this.selectedPermiso.set(permiso);
-		this.detailDrawerVisible.set(true);
+		this.facade.openDetail(permiso);
 	}
 
 	closeDetail(): void {
-		this.detailDrawerVisible.set(false);
+		this.facade.closeDetail();
 	}
 
 	// === Edit Dialog ===
 	openNew(): void {
-		this.selectedPermiso.set(null);
-		this.selectedUsuarioId.set(null);
-		this.selectedUsuario.set(null);
-		this.selectedRol.set(null);
-		this.selectedVistas.set([]);
-		this.usuariosSugeridos.set([]);
-		this.isEditing.set(false);
-		this.buildModulosVistas([]);
-		this.dialogVisible.set(true);
+		this.selectedUsuario = null;
+		this.usuariosSugeridos = [];
+		this.facade.openNew();
 	}
 
 	editPermiso(permiso: PermisoUsuario): void {
-		this.selectedPermiso.set(permiso);
-		this.selectedUsuarioId.set(permiso.usuarioId);
-		this.selectedRol.set(permiso.rol as RolTipoAdmin);
-		this.selectedVistas.set([...permiso.vistas]);
-		this.isEditing.set(true);
-		this.buildModulosVistas(permiso.vistas);
-		this.dialogVisible.set(true);
+		this.facade.editPermiso(permiso);
 	}
 
 	editFromDetail(): void {
-		const permiso = this.selectedPermiso();
-		if (permiso) {
-			this.closeDetail();
-			this.editPermiso(permiso);
-		}
+		this.facade.editFromDetail();
 	}
 
 	hideDialog(): void {
-		this.dialogVisible.set(false);
-		this.vistasBusqueda.set('');
-		this.activeModuloIndex.set(0);
+		this.facade.hideDialog();
 	}
 
 	savePermiso(): void {
-		const vistas = this.selectedVistas();
-		this.loading.set(true);
-
-		const operation$ = this.isEditing()
-			? (() => {
-					const permiso = this.selectedPermiso();
-					if (!permiso) return null;
-					return this.permisosService.actualizarPermisoUsuario(permiso.id, { vistas });
-				})()
-			: (() => {
-					const usuarioId = this.selectedUsuarioId();
-					const rol = this.selectedRol();
-					if (!usuarioId || !rol) return null;
-					return this.permisosService.crearPermisoUsuario({ usuarioId, rol, vistas });
-				})();
-
-		if (!operation$) {
-			this.loading.set(false);
-			return;
-		}
-
-		operation$.pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
-			next: () => {
-				this.hideDialog();
-				this.loadData();
-			},
-			error: (err) => {
-				logger.error('Error:', err);
-				this.errorHandler.showError('Error', 'No se pudo guardar el permiso');
-				this.loading.set(false);
-			},
-		});
+		this.facade.savePermiso();
 	}
 
 	deletePermiso(permiso: PermisoUsuario): void {
 		const nombre = permiso.nombreUsuario || `ID: ${permiso.usuarioId}`;
 		const mensaje = `¿Está seguro de eliminar los permisos personalizados de "${nombre}"?\n\nEl usuario seguirá teniendo los permisos de su rol "${permiso.rol}".`;
-		if (confirm(mensaje)) {
-			this.loading.set(true);
-			this.permisosService
-				.eliminarPermisoUsuario(permiso.id)
-				.pipe(takeUntilDestroyed(this.destroyRef))
-				.subscribe({
-					next: () => this.loadData(),
-					error: (err) => {
-						logger.error('Error al eliminar:', err);
-						this.errorHandler.showError('Error', 'No se pudo eliminar el permiso');
-						this.loading.set(false);
-					},
-				});
-		}
-	}
 
-	// === Module/Vista helpers ===
-	private buildModulosVistas(vistasSeleccionadas: string[]): void {
-		const vistasActivas = this.vistas();
-		const modulosMap = new Map<string, Vista[]>();
-
-		// Agrupar vistas por módulo
-		vistasActivas.forEach((vista) => {
-			const modulo = this.adminUtils.getModuloFromRuta(vista.ruta);
-			const moduloCapitalized = modulo.charAt(0).toUpperCase() + modulo.slice(1);
-
-			if (!modulosMap.has(moduloCapitalized)) {
-				modulosMap.set(moduloCapitalized, []);
-			}
-			modulosMap.get(moduloCapitalized)!.push(vista);
+		this.confirmationService.confirm({
+			message: mensaje,
+			header: 'Confirmar Eliminación',
+			icon: 'pi pi-exclamation-triangle',
+			acceptLabel: 'Sí, eliminar',
+			rejectLabel: 'Cancelar',
+			acceptButtonStyleClass: 'p-button-danger',
+			accept: () => {
+				this.facade.deletePermiso(permiso.id);
+			},
 		});
-
-		// Convertir a array ordenado
-		const modulos: ModuloVistas[] = Array.from(modulosMap.entries())
-			.sort((a, b) => a[0].localeCompare(b[0]))
-			.map(([nombre, vistas]) => ({
-				nombre,
-				vistas: vistas.sort((a, b) => a.nombre.localeCompare(b.nombre)),
-				seleccionadas: vistas.filter((v) => vistasSeleccionadas.includes(v.ruta)).length,
-				total: vistas.length,
-			}));
-
-		this.modulosVistas.set(modulos);
 	}
 
+	// === Rol & Vistas ===
 	loadVistasFromRol(): void {
-		const rol = this.selectedRol();
-		if (!rol) return;
-
 		// Limpiar usuario seleccionado cuando cambia el rol
-		this.selectedUsuario.set(null);
-		this.selectedUsuarioId.set(null);
+		this.selectedUsuario = null;
+		this.facade.setSelectedUsuarioId(null);
 
 		// Cargar usuarios del rol seleccionado para el autocomplete
-		this.permisosService
-			.listarUsuariosPorRol(rol)
-			.pipe(takeUntilDestroyed(this.destroyRef))
-			.subscribe((resultado) => {
-				this.usuariosSugeridos.set(resultado.usuarios);
-			});
-
-		const permisoRol = this.permisosRol().find((p) => p.rol === rol);
-		if (permisoRol) {
-			this.selectedVistas.set([...permisoRol.vistas]);
-			this.buildModulosVistas(permisoRol.vistas);
-		} else {
-			this.selectedVistas.set([]);
-			this.buildModulosVistas([]);
+		const rol = this.selectedRol();
+		if (rol) {
+			this.permisosService
+				.listarUsuariosPorRol(rol)
+				.pipe(takeUntilDestroyed(this.destroyRef))
+				.subscribe((resultado) => {
+					this.usuariosSugeridos = resultado.usuarios;
+				});
 		}
+
+		this.facade.loadVistasFromRol();
 	}
 
 	// === Autocomplete Usuarios ===
 	buscarUsuarios(event: AutoCompleteCompleteEvent): void {
 		const rol = this.selectedRol();
 		if (!rol) {
-			this.usuariosSugeridos.set([]);
+			this.usuariosSugeridos = [];
 			return;
 		}
 
-		// Si no hay query, listar todos los usuarios del rol
 		const termino = event.query?.trim() || '';
 
 		this.permisosService
 			.buscarUsuarios(termino || undefined, rol)
 			.pipe(takeUntilDestroyed(this.destroyRef))
 			.subscribe((resultado) => {
-				this.usuariosSugeridos.set(resultado.usuarios);
+				this.usuariosSugeridos = resultado.usuarios;
 			});
 	}
 
 	onUsuarioSeleccionado(event: AutoCompleteSelectEvent): void {
 		const usuario = event.value as UsuarioBusqueda;
-		this.selectedUsuario.set(usuario);
-		this.selectedUsuarioId.set(usuario.id);
+		this.selectedUsuario = usuario;
+		this.facade.setSelectedUsuarioId(usuario.id);
 	}
 
 	onUsuarioClear(): void {
-		this.selectedUsuario.set(null);
-		this.selectedUsuarioId.set(null);
+		this.selectedUsuario = null;
+		this.facade.setSelectedUsuarioId(null);
 	}
 
+	// === Vista Selection ===
 	isVistaSelected(ruta: string): boolean {
-		return this.selectedVistas().includes(ruta);
+		return this.facade.isVistaSelected(ruta);
 	}
 
 	toggleVista(ruta: string): void {
-		const current = this.selectedVistas();
-		if (current.includes(ruta)) {
-			this.selectedVistas.set(current.filter((v) => v !== ruta));
-		} else {
-			this.selectedVistas.set([...current, ruta]);
-		}
-		this.updateModuloCount();
+		this.facade.toggleVista(ruta);
 	}
 
 	toggleAllVistasModulo(): void {
-		const modulos = this.modulosVistas();
-		const activeIndex = this.activeModuloIndex();
-		if (activeIndex >= modulos.length) return;
-
-		const modulo = modulos[activeIndex];
-		const moduloRutas = modulo.vistas.map((v) => v.ruta);
-		const current = this.selectedVistas();
-
-		const allSelected = moduloRutas.every((r) => current.includes(r));
-
-		if (allSelected) {
-			// Deseleccionar todas
-			this.selectedVistas.set(current.filter((r) => !moduloRutas.includes(r)));
-		} else {
-			// Seleccionar todas
-			const nuevas = moduloRutas.filter((r) => !current.includes(r));
-			this.selectedVistas.set([...current, ...nuevas]);
-		}
-		this.updateModuloCount();
+		this.facade.toggleAllVistasModulo();
 	}
 
-	isAllModuloSelected(): boolean {
-		const modulos = this.modulosVistas();
-		const activeIndex = this.activeModuloIndex();
-		if (activeIndex >= modulos.length) return false;
-
-		const modulo = modulos[activeIndex];
-		const current = this.selectedVistas();
-		return modulo.vistas.every((v) => current.includes(v.ruta));
+	// === UI Helpers (bindings bidireccionales) ===
+	onSearchTermChange(term: string): void {
+		this.facade.setSearchTerm(term);
 	}
 
-	private updateModuloCount(): void {
-		const modulos = this.modulosVistas();
-		const selected = this.selectedVistas();
-
-		const updated = modulos.map((m) => ({
-			...m,
-			seleccionadas: m.vistas.filter((v) => selected.includes(v.ruta)).length,
-		}));
-
-		this.modulosVistas.set(updated);
+	onFilterRolChange(rol: RolTipoAdmin | null): void {
+		this.facade.setFilterRol(rol);
 	}
 
-	// === UI Helpers ===
-	getVistasCountLabel(): string {
-		return this.adminUtils.getVistasCountLabel(this.selectedVistas().length);
+	onSelectedRolChange(rol: RolTipoAdmin | null): void {
+		this.facade.setSelectedRol(rol);
 	}
 
-	getModuloVistasForDetail(): ModuloVistas[] {
-		const permiso = this.selectedPermiso();
-		if (!permiso) return [];
+	onActiveModuloIndexChange(index: number): void {
+		this.facade.setActiveModuloIndex(index);
+	}
 
-		const modulosMap = new Map<string, Vista[]>();
-		const vistasActivas = this.vistas();
-
-		permiso.vistas.forEach((ruta) => {
-			const modulo = this.adminUtils.getModuloFromRuta(ruta);
-			const moduloCapitalized = modulo.charAt(0).toUpperCase() + modulo.slice(1);
-			const vista = vistasActivas.find((v) => v.ruta === ruta);
-
-			if (!modulosMap.has(moduloCapitalized)) {
-				modulosMap.set(moduloCapitalized, []);
-			}
-			if (vista) {
-				modulosMap.get(moduloCapitalized)!.push(vista);
-			}
-		});
-
-		return Array.from(modulosMap.entries())
-			.sort((a, b) => a[0].localeCompare(b[0]))
-			.map(([nombre, vistas]) => ({
-				nombre,
-				vistas,
-				seleccionadas: vistas.length,
-				total: vistas.length,
-			}));
+	onVistasBusquedaChange(term: string): void {
+		this.facade.setVistasBusqueda(term);
 	}
 }

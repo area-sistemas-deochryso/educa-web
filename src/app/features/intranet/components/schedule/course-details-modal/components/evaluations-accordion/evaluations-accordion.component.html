@@ -1,0 +1,22 @@
+<div class="evaluations-section" [class.expanded]="expanded">
+	<div class="eval-header" (click)="toggleTriggered.emit()">
+		<span>EVALUACIONES</span>
+		<i
+			class="pi"
+			[class.pi-chevron-down]="!expanded"
+			[class.pi-chevron-up]="expanded"
+		></i>
+	</div>
+	@if (expanded) {
+		<div class="eval-content">
+			<div class="eval-icon">
+				<i class="pi pi-file"></i>
+			</div>
+			<div class="eval-list">
+				@for (evaluation of evaluations; track evaluation.name) {
+					<span>{{ evaluation.name }}</span>
+				}
+			</div>
+		</div>
+	}
+</div>

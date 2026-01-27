@@ -1,3 +1,5 @@
+<app-attendance-legend />
+
 @if (hasData()) {
 	<app-attendance-table [table]="ingresos()" (monthChange)="onIngresosMonthChange($event)" />
 	<app-attendance-table [table]="salidas()" (monthChange)="onSalidasMonthChange($event)" />

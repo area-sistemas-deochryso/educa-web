@@ -1,0 +1,42 @@
+@if (estadisticas()) {
+	<div class="estadisticas-container">
+		<div class="header-row">
+			<p-button
+				icon="pi pi-file-pdf"
+				[loading]="downloadingPdf()"
+				severity="danger"
+				[text]="true"
+				[rounded]="true"
+				(onClick)="onDescargarPdf()"
+				pTooltip="Descargar PDF de asistencia del día"
+				tooltipPosition="top"
+				aria-label="Descargar PDF de asistencia del día"
+			/>
+			<h3>Estadísticas del día - {{ estadisticas()!.fecha | date: 'EEEE d MMMM yyyy' }}</h3>
+		</div>
+		<div class="stats-grid">
+			<div class="stat-card">
+				<span class="stat-value">{{ estadisticas()!.totalEstudiantes }}</span>
+				<span class="stat-label">Total estudiantes</span>
+			</div>
+			<div class="stat-card present">
+				<span class="stat-value">{{ estadisticas()!.conEntrada }}</span>
+				<span class="stat-label">Con entrada</span>
+			</div>
+			<div class="stat-card complete">
+				<span class="stat-value">{{ estadisticas()!.asistenciasCompletas }}</span>
+				<span class="stat-label">Asistencias completas</span>
+			</div>
+			<div class="stat-card absent">
+				<span class="stat-value">{{ estadisticas()!.faltas }}</span>
+				<span class="stat-label">Faltas</span>
+			</div>
+			<div class="stat-card percentage">
+				<span class="stat-value"
+					>{{ estadisticas()!.porcentajeAsistencia | number: '1.1-1' }}%</span
+				>
+				<span class="stat-label">Asistencia</span>
+			</div>
+		</div>
+	</div>
+}

@@ -1,18 +1,19 @@
-import { Component, OnInit, signal, inject, DestroyRef, computed } from '@angular/core';
-import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import { finalize } from 'rxjs';
-
 import { AsistenciaService, StorageService } from '@core/services';
-import { AuthStore } from '@core/store';
+import { Component, DestroyRef, OnInit, computed, inject, signal } from '@angular/core';
+
 import { AttendanceDataService } from '../../../services/attendance/attendance-data.service';
+import { AttendanceLegendComponent } from '@app/features/intranet/components/attendance/attendance-legend/attendance-legend.component';
 import { AttendanceTable } from '../models/attendance.types';
 import { AttendanceTableComponent } from '../../../components/attendance/attendance-table/attendance-table.component';
+import { AuthStore } from '@core/store';
 import { EmptyStateComponent } from '../../../components/attendance/empty-state/empty-state.component';
+import { finalize } from 'rxjs';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
 @Component({
 	selector: 'app-attendance-estudiante',
 	standalone: true,
-	imports: [AttendanceTableComponent, EmptyStateComponent],
+	imports: [AttendanceTableComponent, EmptyStateComponent, AttendanceLegendComponent],
 	templateUrl: './attendance-estudiante.component.html',
 })
 export class AttendanceEstudianteComponent implements OnInit {
@@ -22,7 +23,9 @@ export class AttendanceEstudianteComponent implements OnInit {
 	private authStore = inject(AuthStore);
 	private destroyRef = inject(DestroyRef);
 
-	private readonly userName = computed(() => this.authStore.user()?.nombreCompleto ?? 'Estudiante');
+	private readonly userName = computed(
+		() => this.authStore.user()?.nombreCompleto ?? 'Estudiante',
+	);
 
 	readonly ingresos = signal<AttendanceTable>(
 		this.attendanceDataService.createEmptyTable('Mis Ingresos'),

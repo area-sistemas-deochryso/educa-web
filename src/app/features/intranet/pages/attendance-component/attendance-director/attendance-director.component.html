@@ -4,11 +4,15 @@
 	(descargarPdf)="descargarPdfAsistenciaDia()"
 />
 
+<app-attendance-legend />
+
 @if (gradosSecciones().length > 0) {
 	<app-grado-seccion-selector
 		[gradosSecciones]="gradosSecciones()"
 		[selectedGradoSeccion]="selectedGradoSeccion()"
-		(gradoSeccionChange)="viewMode() === 'dia' ? selectGradoSeccionDia($event) : selectGradoSeccion($event)"
+		(gradoSeccionChange)="
+			viewMode() === 'dia' ? selectGradoSeccionDia($event) : selectGradoSeccion($event)
+		"
 	/>
 
 	@if (viewMode() === 'mes') {

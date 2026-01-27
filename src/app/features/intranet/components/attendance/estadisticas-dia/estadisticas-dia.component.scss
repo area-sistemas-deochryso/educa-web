@@ -1,0 +1,77 @@
+.estadisticas-container {
+	margin-bottom: 1rem;
+	padding: 1rem;
+	background: var(--surface-card);
+	border-radius: var(--border-radius);
+
+	.header-row {
+		display: flex;
+		align-items: center;
+		gap: 0.5rem;
+		margin-bottom: 1rem;
+	}
+
+	h3 {
+		margin: 0;
+		font-size: 1rem;
+		font-weight: 600;
+		color: var(--text-color);
+		text-transform: capitalize;
+	}
+}
+
+.stats-grid {
+	display: grid;
+	grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+	gap: 0.75rem;
+}
+
+.stat-card {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	padding: 0.75rem;
+	background: var(--surface-ground);
+	border-radius: var(--border-radius);
+	border-left: 3px solid var(--surface-border);
+
+	.stat-value {
+		font-size: 1.5rem;
+		font-weight: 700;
+		color: var(--text-color);
+	}
+
+	.stat-label {
+		font-size: 0.75rem;
+		color: var(--text-color-secondary);
+		text-align: center;
+	}
+
+	&.present {
+		border-left-color: var(--blue-500);
+		.stat-value {
+			color: var(--blue-500);
+		}
+	}
+
+	&.complete {
+		border-left-color: var(--green-500);
+		.stat-value {
+			color: var(--green-500);
+		}
+	}
+
+	&.absent {
+		border-left-color: var(--red-500);
+		.stat-value {
+			color: var(--red-500);
+		}
+	}
+
+	&.percentage {
+		border-left-color: var(--purple-500);
+		.stat-value {
+			color: var(--purple-500);
+		}
+	}
+}
