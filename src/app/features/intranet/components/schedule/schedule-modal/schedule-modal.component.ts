@@ -6,7 +6,7 @@ import { MenuItem } from 'primeng/api';
 import {
 	CourseSchedule,
 	getCourseSchedules,
-} from '../../../pages/schedule-component/courses.config';
+} from '@features/intranet/pages/schedule-component/courses.config';
 
 @Component({
 	selector: 'app-schedule-modal',

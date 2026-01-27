@@ -2,11 +2,11 @@ import { Component, OnInit, OnDestroy, inject, DestroyRef } from '@angular/core'
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute } from '@angular/router';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import { ScheduleCalendarComponent } from '../../components/schedule/schedule-calendar/schedule-calendar.component';
-import { ScheduleModalComponent } from '../../components/schedule/schedule-modal/schedule-modal.component';
-import { SummaryModalComponent } from '../../components/schedule/summary-modal/summary-modal.component';
-import { CourseDetailsModalComponent } from '../../components/schedule/course-details-modal/course-details-modal.component';
-import { GradesModalComponent } from '../../components/schedule/grades-modal/grades-modal.component';
+import { ScheduleCalendarComponent } from '@features/intranet/components/schedule/schedule-calendar/schedule-calendar.component';
+import { ScheduleModalComponent } from '@features/intranet/components/schedule/schedule-modal/schedule-modal.component';
+import { SummaryModalComponent } from '@features/intranet/components/schedule/summary-modal/summary-modal.component';
+import { CourseDetailsModalComponent } from '@features/intranet/components/schedule/course-details-modal/course-details-modal.component';
+import { GradesModalComponent } from '@features/intranet/components/schedule/grades-modal/grades-modal.component';
 import { VoiceRecognitionService, StorageService } from '@core/services';
 import { ScheduleModalsState } from '@core/services/storage';
 

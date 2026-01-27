@@ -23,9 +23,59 @@ export interface RegisteredModal {
 	close: () => void;
 }
 
+interface SpeechRecognitionErrorEvent extends Event {
+	error:
+		| 'no-speech'
+		| 'aborted'
+		| 'audio-capture'
+		| 'network'
+		| 'not-allowed'
+		| 'service-not-allowed'
+		| 'bad-grammar'
+		| 'language-not-supported';
+	message?: string;
+}
+
+interface SpeechRecognitionAlternative {
+	transcript: string;
+	confidence: number;
+}
+
+interface SpeechRecognitionResult {
+	[index: number]: SpeechRecognitionAlternative;
+	isFinal: boolean;
+	length: number;
+}
+
+interface SpeechRecognitionResultList {
+	[index: number]: SpeechRecognitionResult;
+	length: number;
+}
+
+interface SpeechRecognitionEvent extends Event {
+	resultIndex: number;
+	results: SpeechRecognitionResultList;
+}
+
+interface SpeechRecognitionInstance extends EventTarget {
+	continuous: boolean;
+	interimResults: boolean;
+	lang: string;
+	onresult: ((event: SpeechRecognitionEvent) => void) | null;
+	onerror: ((event: SpeechRecognitionErrorEvent) => void) | null;
+	onend: (() => void) | null;
+	start(): void;
+	stop(): void;
+}
+
+interface SpeechRecognitionConstructor {
+	new (): SpeechRecognitionInstance;
+	prototype: SpeechRecognitionInstance;
+}
+
 interface IWindow extends Window {
-	SpeechRecognition: any;
-	webkitSpeechRecognition: any;
+	SpeechRecognition?: SpeechRecognitionConstructor;
+	webkitSpeechRecognition?: SpeechRecognitionConstructor;
 }
 
 @Injectable({
@@ -34,7 +84,7 @@ interface IWindow extends Window {
 export class VoiceRecognitionService {
 	private platformId = inject(PLATFORM_ID);
 	private router = inject(Router);
-	private recognition: any = null;
+	private recognition: SpeechRecognitionInstance | null = null;
 
 	readonly isListening = signal(false);
 	readonly isLocked = signal(false);
@@ -116,7 +166,7 @@ export class VoiceRecognitionService {
 		this.recognition.interimResults = true;
 		this.recognition.lang = 'es-PE';
 
-		this.recognition.onresult = (event: any) => {
+		this.recognition.onresult = (event: SpeechRecognitionEvent) => {
 			let interim = '';
 			let final = '';
 
@@ -141,7 +191,7 @@ export class VoiceRecognitionService {
 			}
 		};
 
-		this.recognition.onerror = (event: any) => {
+		this.recognition.onerror = (event: SpeechRecognitionErrorEvent) => {
 			logger.error('[VoiceRecognition] Error:', event.error);
 
 			switch (event.error) {

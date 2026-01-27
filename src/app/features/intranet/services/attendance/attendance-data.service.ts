@@ -6,7 +6,7 @@ import {
 	AttendanceWeek,
 	AttendanceTable,
 	StatusCounts,
-} from '../../pages/attendance-component/attendance.types';
+} from '@features/intranet/pages/attendance-component/attendance.types';
 import {
 	DAY_HEADERS,
 	getIngresoStatusFromTime,
@@ -14,7 +14,7 @@ import {
 	shouldMarkIngresoAsPending,
 	shouldMarkSalidaAsPending,
 	isBeforeRegistrationStart,
-} from '../../pages/attendance-component/attendance.config';
+} from '@features/intranet/pages/attendance-component/attendance.config';
 import { CalendarUtilsService } from '../calendar/calendar-utils.service';
 
 @Injectable({

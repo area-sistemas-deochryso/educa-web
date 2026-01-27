@@ -1,11 +1,11 @@
 import { Component, inject } from '@angular/core';
 
-import { COURSE_NAMES } from '../schedule-component/courses.config';
-import { NotificationQuickAccessComponent } from '../../components/notification-quick-access/notification-quick-access';
-import { QuickAccessCardComponent } from '../../components/quick-access-card/quick-access-card';
-import { QuickAccessCardMenuComponent } from '../../components/quick-access-card-menu/quick-access-card-menu';
+import { COURSE_NAMES } from '@features/intranet/pages/schedule-component/courses.config';
+import { NotificationQuickAccessComponent } from '@features/intranet/components/notification-quick-access/notification-quick-access';
+import { QuickAccessCardComponent } from '@features/intranet/components/quick-access-card/quick-access-card';
+import { QuickAccessCardMenuComponent } from '@features/intranet/components/quick-access-card-menu/quick-access-card-menu';
 import { StorageService } from '@core/services';
-import { WelcomeSectionComponent } from '../../components/welcome-section/welcome-section';
+import { WelcomeSectionComponent } from '@features/intranet/components/welcome-section/welcome-section';
 import { environment } from '@config/environment';
 
 @Component({

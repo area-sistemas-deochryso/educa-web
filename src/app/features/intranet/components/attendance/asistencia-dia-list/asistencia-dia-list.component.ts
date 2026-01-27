@@ -11,8 +11,8 @@ import {
 	getIngresoStatusFromTime,
 	shouldMarkIngresoAsPending,
 	isBeforeRegistrationStart,
-} from '../../../pages/attendance-component/attendance.config';
-import { AttendanceStatus } from '../../../pages/attendance-component/attendance.types';
+} from '@features/intranet/pages/attendance-component/attendance.config';
+import { AttendanceStatus } from '@features/intranet/pages/attendance-component/attendance.types';
 
 export interface EstudianteAsistenciaDia {
 	estudianteId: number;

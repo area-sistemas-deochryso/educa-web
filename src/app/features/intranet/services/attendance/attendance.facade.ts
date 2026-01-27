@@ -13,7 +13,7 @@ import {
 	UserProfileService,
 } from '@core/services';
 import { AttendanceDataService } from './attendance-data.service';
-import { AttendanceTable } from '../../pages/attendance-component/attendance.types';
+import { AttendanceTable } from '@features/intranet/pages/attendance-component/attendance.types';
 
 export type ViewMode = 'mes' | 'dia';
 

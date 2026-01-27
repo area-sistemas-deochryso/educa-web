@@ -5,7 +5,7 @@ import { TooltipModule } from 'primeng/tooltip';
 import { AttachmentsModalComponent } from './attachments-modal/attachments-modal.component';
 import { TasksModalComponent } from './tasks-modal/tasks-modal.component';
 import { SubmissionsModalComponent } from './submissions-modal/submissions-modal.component';
-import { COURSE_NAMES } from '../../../pages/schedule-component/courses.config';
+import { COURSE_NAMES } from '@features/intranet/pages/schedule-component/courses.config';
 import {
 	ModalControlsComponent,
 	WeekSearchBoxComponent,

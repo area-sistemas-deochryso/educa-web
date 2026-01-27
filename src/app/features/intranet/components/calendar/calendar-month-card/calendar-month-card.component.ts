@@ -1,6 +1,6 @@
 import { Component, input, output, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { CalendarDay, CalendarMonth } from '../../../pages/calendary-component/calendar.types';
+import { CalendarDay, CalendarMonth } from '@features/intranet/pages/calendary-component/calendar.types';
 
 @Component({
 	selector: 'app-calendar-month-card',

@@ -121,7 +121,7 @@ export class UserPermisosService {
 	/**
 	 * Carga los permisos del usuario actual
 	 */
-	loadPermisos(destroyRef?: DestroyRef): void {
+	loadPermisos(destroyRef: DestroyRef): void {
 		if (!this.authService.isAuthenticated) {
 			this.clear();
 			return;
@@ -134,28 +134,26 @@ export class UserPermisosService {
 
 		this._loading.set(true);
 
-		const request$ = this.permisosService.getMisPermisos().pipe(
-			tap((permisos) => {
-				this._permisos.set(permisos);
-				this._loaded.set(true);
-				this._loading.set(false);
-				// Guardar en storage para persistencia
-				if (permisos) {
-					this.saveToStorage(permisos);
-				}
-			}),
-			catchError(() => {
-				this._loading.set(false);
-				this._loaded.set(true);
-				return of(null);
-			}),
-		);
-
-		if (destroyRef) {
-			request$.pipe(takeUntilDestroyed(destroyRef)).subscribe();
-		} else {
-			request$.subscribe();
-		}
+		this.permisosService
+			.getMisPermisos()
+			.pipe(
+				tap((permisos) => {
+					this._permisos.set(permisos);
+					this._loaded.set(true);
+					this._loading.set(false);
+					// Guardar en storage para persistencia
+					if (permisos) {
+						this.saveToStorage(permisos);
+					}
+				}),
+				catchError(() => {
+					this._loading.set(false);
+					this._loaded.set(true);
+					return of(null);
+				}),
+				takeUntilDestroyed(destroyRef),
+			)
+			.subscribe();
 	}
 
 	/**
@@ -379,7 +377,7 @@ export class UserPermisosService {
 	/**
 	 * Recarga los permisos del servidor
 	 */
-	reloadPermisos(destroyRef?: DestroyRef): void {
+	reloadPermisos(destroyRef: DestroyRef): void {
 		this._loaded.set(false);
 		this._loading.set(false);
 		this.loadPermisos(destroyRef);

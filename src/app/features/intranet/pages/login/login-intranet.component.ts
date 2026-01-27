@@ -1,8 +1,9 @@
-import { Component, OnInit, OnDestroy, inject, signal } from '@angular/core';
+import { Component, OnInit, inject, signal, DestroyRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule, FormBuilder, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
-import { Subject, takeUntil, debounceTime, distinctUntilChanged } from 'rxjs';
+import { debounceTime, distinctUntilChanged } from 'rxjs';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { InputTextModule } from 'primeng/inputtext';
 import { ToggleSwitch } from 'primeng/toggleswitch';
 import { Select } from 'primeng/select';
@@ -45,13 +46,13 @@ import {
 	templateUrl: './login-intranet.component.html',
 	styleUrl: './login-intranet.component.scss',
 })
-export class LoginIntranetComponent implements OnInit, OnDestroy {
+export class LoginIntranetComponent implements OnInit {
 	private fb = inject(FormBuilder);
 	private router = inject(Router);
 	private authService = inject(AuthService);
 	private userPermisosService = inject(UserPermisosService);
 	private swService = inject(SwService);
-	private destroy$ = new Subject<void>();
+	private destroyRef = inject(DestroyRef);
 
 	// Form tipado
 	loginForm: LoginFormGroup = this.fb.group({
@@ -87,13 +88,11 @@ export class LoginIntranetComponent implements OnInit, OnDestroy {
 		this.setupDniAutocomplete();
 	}
 
-	ngOnDestroy(): void {
-		this.destroy$.next();
-		this.destroy$.complete();
-	}
-
 	private loadRememberedUsers(): void {
-		this.authService.verifyAllStoredTokens().subscribe({
+		this.authService
+			.verifyAllStoredTokens()
+			.pipe(takeUntilDestroyed(this.destroyRef))
+			.subscribe({
 			next: (users) => {
 				this.rememberedUsers = users;
 				// Si hay usuarios, autocompletar con el primero
@@ -106,7 +105,7 @@ export class LoginIntranetComponent implements OnInit, OnDestroy {
 
 	private setupDniAutocomplete(): void {
 		this.loginForm.controls.dni.valueChanges
-			.pipe(takeUntil(this.destroy$), debounceTime(300), distinctUntilChanged())
+			.pipe(takeUntilDestroyed(this.destroyRef), debounceTime(300), distinctUntilChanged())
 			.subscribe((dni) => {
 				this.tryAutocompleteFromDni(dni);
 			});
@@ -169,7 +168,10 @@ export class LoginIntranetComponent implements OnInit, OnDestroy {
 		this.isLoading.set(true);
 		const { dni, password, rol, rememberMe } = this.loginForm.getRawValue();
 
-		this.authService.login(dni, password, rol, rememberMe).subscribe({
+		this.authService
+			.login(dni, password, rol, rememberMe)
+			.pipe(takeUntilDestroyed(this.destroyRef))
+			.subscribe({
 			next: (response) => {
 				this.isLoading.set(false);
 

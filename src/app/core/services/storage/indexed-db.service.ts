@@ -35,9 +35,9 @@ interface NotificationRecord {
 	createdAt: number;
 }
 
-interface CacheRecord {
+interface CacheRecord<T = unknown> {
 	key: string;
-	value: any;
+	value: T;
 	expiresAt: number | null;
 	createdAt: number;
 }
@@ -311,14 +311,14 @@ export class IndexedDBService {
 				const request = store.get(key);
 
 				request.onsuccess = () => {
-					const record = request.result as CacheRecord | undefined;
+					const record = request.result as CacheRecord<T> | undefined;
 					if (record) {
 						// Verificar expiración
 						if (record.expiresAt && record.expiresAt < Date.now()) {
 							this.removeCache(key);
 							resolve(null);
 						} else {
-							resolve(record.value as T);
+							resolve(record.value);
 						}
 					} else {
 						resolve(null);
@@ -341,7 +341,7 @@ export class IndexedDBService {
 				const transaction = db.transaction(STORES.CACHE, 'readwrite');
 				const store = transaction.objectStore(STORES.CACHE);
 
-				const record: CacheRecord = {
+				const record: CacheRecord<T> = {
 					key,
 					value,
 					expiresAt: ttlMs ? Date.now() + ttlMs : null,
@@ -392,7 +392,7 @@ export class IndexedDBService {
 				request.onsuccess = (event) => {
 					const cursor = (event.target as IDBRequest<IDBCursorWithValue>).result;
 					if (cursor) {
-						const record = cursor.value as CacheRecord;
+						const record = cursor.value as CacheRecord<unknown>;
 						if (record.expiresAt && record.expiresAt < now) {
 							cursor.delete();
 						}

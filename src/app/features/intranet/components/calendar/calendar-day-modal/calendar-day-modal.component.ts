@@ -1,6 +1,6 @@
 import { Component, input, output } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { ModalData } from '../../../pages/calendary-component/calendar.types';
+import { ModalData } from '@features/intranet/pages/calendary-component/calendar.types';
 
 @Component({
 	selector: 'app-calendar-day-modal',
