@@ -1,0 +1,43 @@
+<app-estadisticas-dia
+	[estadisticas]="estadisticasDia()"
+	[downloadingPdf]="downloadingPdf()"
+	(descargarPdf)="descargarPdfAsistenciaDia()"
+/>
+
+@if (gradosSecciones().length > 0) {
+	<app-grado-seccion-selector
+		[gradosSecciones]="gradosSecciones()"
+		[selectedGradoSeccion]="selectedGradoSeccion()"
+		(gradoSeccionChange)="viewMode() === 'dia' ? selectGradoSeccionDia($event) : selectGradoSeccion($event)"
+	/>
+
+	@if (viewMode() === 'mes') {
+		@if (estudiantes().length > 0) {
+			<app-attendance-table
+				[table]="ingresos()"
+				[hijos]="estudiantesAsHijos()"
+				[selectedHijoId]="selectedEstudianteId()"
+				(monthChange)="onIngresosMonthChange($event)"
+				(hijoChange)="selectEstudiante($event)"
+			/>
+			<app-attendance-table
+				[table]="salidas()"
+				[hijos]="estudiantesAsHijos()"
+				[selectedHijoId]="selectedEstudianteId()"
+				(monthChange)="onSalidasMonthChange($event)"
+				(hijoChange)="selectEstudiante($event)"
+			/>
+		} @else if (!loading()) {
+			<app-empty-state message="No se encontraron estudiantes en este grado/sección." />
+		}
+	} @else {
+		<app-asistencia-dia-list
+			[estudiantes]="estudiantesDia()"
+			[fecha]="fechaDia()"
+			[loading]="loading()"
+			(fechaChange)="onFechaDiaChange($event)"
+		/>
+	}
+} @else if (!loading()) {
+	<app-empty-state message="No hay grados/secciones disponibles." />
+}

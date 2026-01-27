@@ -1,0 +1,431 @@
+import { Component, DestroyRef, OnInit, inject, signal, computed } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { finalize } from 'rxjs';
+import {
+	AsistenciaService,
+	GradoSeccion,
+	EstudianteAsistencia,
+	HijoApoderado,
+	EstadisticasDia,
+	StorageService,
+} from '@core/services';
+import { AttendanceDataService } from '../../../services/attendance/attendance-data.service';
+import { AttendanceTable } from '../attendance.types';
+import { ViewMode } from '../../../components/attendance/attendance-header/attendance-header.component';
+import { AttendanceTableComponent } from '../../../components/attendance/attendance-table/attendance-table.component';
+import { GradoSeccionSelectorComponent } from '../../../components/attendance/grado-seccion-selector/grado-seccion-selector.component';
+import { EstadisticasDiaComponent } from '../../../components/attendance/estadisticas-dia/estadisticas-dia.component';
+import { AsistenciaDiaListComponent } from '../../../components/attendance/asistencia-dia-list/asistencia-dia-list.component';
+import { EmptyStateComponent } from '../../../components/attendance/empty-state/empty-state.component';
+
+/**
+ * Componente Container para vista de asistencias de Directores.
+ * Maneja grados/secciones, estadísticas del día, descarga de PDF y modo día/mes.
+ */
+@Component({
+	selector: 'app-attendance-director',
+	standalone: true,
+	imports: [
+		AttendanceTableComponent,
+		GradoSeccionSelectorComponent,
+		EstadisticasDiaComponent,
+		AsistenciaDiaListComponent,
+		EmptyStateComponent,
+	],
+	templateUrl: './attendance-director.component.html',
+})
+export class AttendanceDirectorComponent implements OnInit {
+	private asistenciaService = inject(AsistenciaService);
+	private storage = inject(StorageService);
+	private attendanceDataService = inject(AttendanceDataService);
+	private destroyRef = inject(DestroyRef);
+
+	// Estado
+	readonly loading = signal(false);
+	readonly downloadingPdf = signal(false);
+
+	// Grados y secciones
+	readonly gradosSecciones = signal<GradoSeccion[]>([]);
+	readonly selectedGradoSeccion = signal<GradoSeccion | null>(null);
+
+	// Estadísticas del día
+	readonly estadisticasDia = signal<EstadisticasDia | null>(null);
+
+	// Estudiantes (modo mes)
+	readonly estudiantes = signal<EstudianteAsistencia[]>([]);
+	readonly selectedEstudianteId = signal<number | null>(null);
+	readonly selectedEstudiante = computed(() => {
+		const id = this.selectedEstudianteId();
+		return this.estudiantes().find((e) => e.estudianteId === id) || null;
+	});
+
+	// Transformar estudiantes a HijoApoderado para reusar selector
+	readonly estudiantesAsHijos = computed<HijoApoderado[]>(() => {
+		return this.estudiantes().map((e) => ({
+			estudianteId: e.estudianteId,
+			dni: e.dni,
+			nombreCompleto: e.nombreCompleto,
+			grado: e.grado,
+			seccion: e.seccion,
+			relacion: 'Estudiante',
+		}));
+	});
+
+	// Modo día/mes
+	readonly viewMode = signal<ViewMode>('mes');
+	readonly fechaDia = signal<Date>(new Date());
+	readonly estudiantesDia = signal<EstudianteAsistencia[]>([]);
+
+	// Tablas de asistencia
+	readonly ingresos = signal<AttendanceTable>(
+		this.attendanceDataService.createEmptyTable('Ingresos'),
+	);
+	readonly salidas = signal<AttendanceTable>(
+		this.attendanceDataService.createEmptyTable('Salidas'),
+	);
+
+	ngOnInit(): void {
+		this.restoreSelectedMonth();
+		this.loadGradosSecciones();
+	}
+
+	private restoreSelectedMonth(): void {
+		const data = this.storage.getAttendanceMonth();
+		if (data) {
+			this.ingresos.update((table) => ({
+				...table,
+				selectedMonth: data.month,
+				selectedYear: data.year,
+			}));
+			this.salidas.update((table) => ({
+				...table,
+				selectedMonth: data.month,
+				selectedYear: data.year,
+			}));
+		}
+	}
+
+	private saveSelectedMonth(): void {
+		this.storage.setAttendanceMonth({
+			month: this.ingresos().selectedMonth,
+			year: this.ingresos().selectedYear,
+		});
+	}
+
+	// === GRADOS Y SECCIONES ===
+
+	private loadGradosSecciones(): void {
+		this.loading.set(true);
+
+		this.asistenciaService
+			.getGradosSeccionesDisponibles()
+			.pipe(
+				takeUntilDestroyed(this.destroyRef),
+				finalize(() => {
+					if (this.gradosSecciones().length === 0) {
+						this.loading.set(false);
+					}
+				}),
+			)
+			.subscribe({
+				next: (grados) => {
+					this.gradosSecciones.set(grados);
+					if (grados.length > 0) {
+						this.restoreSelectedGradoSeccion();
+						this.loadEstudiantes();
+						this.loadEstadisticas();
+					}
+				},
+				error: () => {
+					this.loading.set(false);
+				},
+			});
+	}
+
+	selectGradoSeccion(gradoSeccion: GradoSeccion): void {
+		const current = this.selectedGradoSeccion();
+		if (current?.grado === gradoSeccion.grado && current?.seccion === gradoSeccion.seccion)
+			return;
+
+		this.selectedGradoSeccion.set(gradoSeccion);
+		this.saveSelectedGradoSeccion();
+		this.loadEstudiantes();
+	}
+
+	private restoreSelectedGradoSeccion(): void {
+		const saved = this.storage.getSelectedGradoSeccionDirector();
+		if (
+			saved &&
+			this.gradosSecciones().some(
+				(gs) => gs.grado === saved.grado && gs.seccion === saved.seccion,
+			)
+		) {
+			this.selectedGradoSeccion.set(saved);
+			return;
+		}
+		const first = this.gradosSecciones()[0];
+		if (first) {
+			this.selectedGradoSeccion.set(first);
+		}
+	}
+
+	private saveSelectedGradoSeccion(): void {
+		const gs = this.selectedGradoSeccion();
+		if (gs) {
+			this.storage.setSelectedGradoSeccionDirector(gs);
+		}
+	}
+
+	// === ESTADÍSTICAS ===
+
+	private loadEstadisticas(): void {
+		this.asistenciaService
+			.getEstadisticasDirector()
+			.pipe(takeUntilDestroyed(this.destroyRef))
+			.subscribe({
+				next: (estadisticas) => {
+					this.estadisticasDia.set(estadisticas);
+				},
+			});
+	}
+
+	// === ESTUDIANTES (MODO MES) ===
+
+	private loadEstudiantes(): void {
+		const gs = this.selectedGradoSeccion();
+		if (!gs) {
+			this.loading.set(false);
+			return;
+		}
+
+		this.loading.set(true);
+
+		this.asistenciaService
+			.getReporteDirector(undefined, gs.grado, gs.seccion)
+			.pipe(
+				takeUntilDestroyed(this.destroyRef),
+				finalize(() => {
+					if (this.estudiantes().length === 0) {
+						this.loading.set(false);
+					}
+				}),
+			)
+			.subscribe({
+				next: (estudiantes) => {
+					this.estudiantes.set(estudiantes);
+					if (estudiantes.length > 0) {
+						this.restoreSelectedEstudiante();
+						this.loadEstudianteAsistencias();
+					}
+				},
+				error: () => {
+					this.loading.set(false);
+				},
+			});
+	}
+
+	selectEstudiante(estudianteId: number): void {
+		if (this.selectedEstudianteId() === estudianteId) return;
+
+		this.selectedEstudianteId.set(estudianteId);
+		this.saveSelectedEstudiante();
+		this.loadEstudianteAsistencias();
+	}
+
+	private restoreSelectedEstudiante(): void {
+		const estudianteId = this.storage.getSelectedEstudianteDirectorId();
+		if (
+			estudianteId !== null &&
+			this.estudiantes().some((e) => e.estudianteId === estudianteId)
+		) {
+			this.selectedEstudianteId.set(estudianteId);
+			return;
+		}
+		const first = this.estudiantes()[0];
+		if (first) {
+			this.selectedEstudianteId.set(first.estudianteId);
+		}
+	}
+
+	private saveSelectedEstudiante(): void {
+		const id = this.selectedEstudianteId();
+		if (id) {
+			this.storage.setSelectedEstudianteDirectorId(id);
+		}
+	}
+
+	private loadEstudianteAsistencias(): void {
+		const estudiante = this.selectedEstudiante();
+		if (!estudiante) {
+			this.loading.set(false);
+			return;
+		}
+
+		const { selectedMonth, selectedYear } = this.ingresos();
+
+		const tables = this.attendanceDataService.processAsistencias(
+			estudiante.asistencias,
+			selectedMonth,
+			selectedYear,
+			estudiante.nombreCompleto,
+		);
+		this.ingresos.set(tables.ingresos);
+		this.salidas.set(tables.salidas);
+		this.loading.set(false);
+	}
+
+	onIngresosMonthChange(month: number): void {
+		this.ingresos.update((table) => ({ ...table, selectedMonth: month }));
+		this.saveSelectedMonth();
+		this.reloadEstudianteIngresos();
+	}
+
+	onSalidasMonthChange(month: number): void {
+		this.salidas.update((table) => ({ ...table, selectedMonth: month }));
+		this.saveSelectedMonth();
+		this.reloadEstudianteSalidas();
+	}
+
+	private reloadEstudianteIngresos(): void {
+		const gs = this.selectedGradoSeccion();
+		if (!gs) return;
+
+		const { selectedMonth, selectedYear } = this.ingresos();
+
+		this.asistenciaService
+			.getReporteDirector(undefined, gs.grado, gs.seccion)
+			.pipe(takeUntilDestroyed(this.destroyRef))
+			.subscribe({
+				next: (estudiantes) => {
+					this.estudiantes.set(estudiantes);
+					const estudiante = estudiantes.find(
+						(e) => e.estudianteId === this.selectedEstudianteId(),
+					);
+					if (estudiante) {
+						const tables = this.attendanceDataService.processAsistencias(
+							estudiante.asistencias,
+							selectedMonth,
+							selectedYear,
+							estudiante.nombreCompleto,
+						);
+						this.ingresos.set(tables.ingresos);
+					}
+				},
+			});
+	}
+
+	private reloadEstudianteSalidas(): void {
+		const gs = this.selectedGradoSeccion();
+		if (!gs) return;
+
+		const { selectedMonth, selectedYear } = this.salidas();
+
+		this.asistenciaService
+			.getReporteDirector(undefined, gs.grado, gs.seccion)
+			.pipe(takeUntilDestroyed(this.destroyRef))
+			.subscribe({
+				next: (estudiantes) => {
+					const estudiante = estudiantes.find(
+						(e) => e.estudianteId === this.selectedEstudianteId(),
+					);
+					if (estudiante) {
+						const tables = this.attendanceDataService.processAsistencias(
+							estudiante.asistencias,
+							selectedMonth,
+							selectedYear,
+							estudiante.nombreCompleto,
+						);
+						this.salidas.set(tables.salidas);
+					}
+				},
+			});
+	}
+
+	// === MODO DÍA ===
+
+	setViewMode(mode: ViewMode): void {
+		if (this.viewMode() === mode) return;
+		this.viewMode.set(mode);
+
+		if (mode === 'dia') {
+			this.loadAsistenciaDia();
+		} else {
+			this.loadEstudiantes();
+		}
+	}
+
+	onFechaDiaChange(fecha: Date): void {
+		this.fechaDia.set(fecha);
+		this.loadAsistenciaDia();
+	}
+
+	private loadAsistenciaDia(): void {
+		const gs = this.selectedGradoSeccion();
+		if (!gs) {
+			this.loading.set(false);
+			return;
+		}
+
+		this.loading.set(true);
+
+		this.asistenciaService
+			.getAsistenciaDiaDirector(gs.grado, gs.seccion, this.fechaDia())
+			.pipe(
+				takeUntilDestroyed(this.destroyRef),
+				finalize(() => this.loading.set(false)),
+			)
+			.subscribe({
+				next: (estudiantes) => {
+					this.estudiantesDia.set(estudiantes);
+				},
+			});
+	}
+
+	selectGradoSeccionDia(gradoSeccion: GradoSeccion): void {
+		const current = this.selectedGradoSeccion();
+		if (current?.grado === gradoSeccion.grado && current?.seccion === gradoSeccion.seccion)
+			return;
+
+		this.selectedGradoSeccion.set(gradoSeccion);
+		this.saveSelectedGradoSeccion();
+		this.loadAsistenciaDia();
+	}
+
+	// === DESCARGAR PDF ===
+
+	descargarPdfAsistenciaDia(): void {
+		const gs = this.selectedGradoSeccion();
+		if (!gs) return;
+
+		this.downloadingPdf.set(true);
+
+		this.asistenciaService
+			.descargarPdfAsistenciaDia(gs.grado, gs.seccion)
+			.pipe(
+				takeUntilDestroyed(this.destroyRef),
+				finalize(() => this.downloadingPdf.set(false)),
+			)
+			.subscribe({
+				next: (blob) => {
+					const url = window.URL.createObjectURL(blob);
+					const a = document.createElement('a');
+					a.href = url;
+					const today = new Date().toISOString().split('T')[0];
+					a.download = `Asistencia_${gs.grado}_${gs.seccion}_${today}.pdf`;
+					a.click();
+					window.URL.revokeObjectURL(url);
+				},
+			});
+	}
+
+	// === RELOAD ===
+
+	reload(): void {
+		if (this.viewMode() === 'dia') {
+			this.loadAsistenciaDia();
+		} else {
+			this.loadEstudiantes();
+		}
+		this.loadEstadisticas();
+	}
+}

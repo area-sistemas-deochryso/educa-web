@@ -1,0 +1,6 @@
+@if (hasData()) {
+	<app-attendance-table [table]="ingresos()" (monthChange)="onIngresosMonthChange($event)" />
+	<app-attendance-table [table]="salidas()" (monthChange)="onSalidasMonthChange($event)" />
+} @else if (!loading()) {
+	<app-empty-state message="No se encontraron registros de asistencia." />
+}

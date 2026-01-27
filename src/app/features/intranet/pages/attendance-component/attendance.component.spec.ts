@@ -1,126 +1,94 @@
-import { TestBed } from '@angular/core/testing';
+import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
-import { signal, computed } from '@angular/core';
+import { signal } from '@angular/core';
 import { testProviders } from '@test';
-
 import { AttendanceComponent } from './attendance.component';
-import { AttendanceFacade } from './services/attendance.facade';
-import { AttendanceDataService } from './services/attendance-data.service';
-import {
-	VoiceRecognitionService,
-	AsistenciaService,
-	AuthService,
-	StorageService,
-} from '@core/services';
+import { UserProfileService } from '@core/services';
 
 describe('AttendanceComponent', () => {
-	let facadeMock: Partial<AttendanceFacade>;
-	let voiceServiceMock: Partial<VoiceRecognitionService>;
-	let asistenciaServiceMock: Partial<AsistenciaService>;
-	let authServiceMock: Partial<AuthService>;
-	let storageServiceMock: Partial<StorageService>;
-	let attendanceDataServiceMock: Partial<AttendanceDataService>;
+	let component: AttendanceComponent;
+	let fixture: ComponentFixture<AttendanceComponent>;
+	let userProfileMock: Partial<UserProfileService>;
 
 	beforeEach(async () => {
-		const emptyTable = {
-			title: 'Test',
-			rows: [],
-			selectedMonth: new Date().getMonth() + 1,
-			selectedYear: new Date().getFullYear(),
-		};
-
-		facadeMock = {
-			loading: signal(false),
-			error: signal<string | null>(null),
-			resumen: signal(null),
-			userRole: signal<'Estudiante' | 'Apoderado' | 'Profesor' | ''>('Estudiante'),
-			studentName: signal('Test Student'),
-			ingresos: signal(emptyTable),
-			salidas: signal(emptyTable),
-			hijos: signal([]),
-			selectedHijoId: signal<number | null>(null),
-			selectedHijo: computed(() => null),
-			nombreProfesor: signal<string | null>(null),
-			salones: signal([]),
-			selectedSalonId: signal<number | null>(null),
-			selectedSalon: computed(() => null),
-			estudiantes: signal([]),
-			selectedEstudianteId: signal<number | null>(null),
-			selectedEstudiante: computed(() => null),
-			estudiantesAsHijos: computed(() => []),
-			initialize: vi.fn(),
-			updateSelectedMonth: vi.fn(),
-			updateSelectedYear: vi.fn(),
-			reloadCurrentData: vi.fn(),
-			reloadIngresosData: vi.fn(),
-			reloadSalidasData: vi.fn(),
-			selectHijo: vi.fn(),
-			selectSalon: vi.fn(),
-			selectEstudiante: vi.fn(),
-		};
-
-		voiceServiceMock = {
-			onCommand: vi.fn().mockReturnValue(() => {}),
-		};
-
-		asistenciaServiceMock = {};
-		authServiceMock = {
-			currentUser: null,
-		};
-		storageServiceMock = {
-			getUser: vi.fn().mockReturnValue(null),
-			getAttendanceMonth: vi.fn().mockReturnValue(null),
-			setAttendanceMonth: vi.fn(),
-			getSelectedHijoId: vi.fn().mockReturnValue(null),
-			setSelectedHijoId: vi.fn(),
-			getSelectedSalonId: vi.fn().mockReturnValue(null),
-			setSelectedSalonId: vi.fn(),
-			getSelectedEstudianteId: vi.fn().mockReturnValue(null),
-			setSelectedEstudianteId: vi.fn(),
-		};
-		attendanceDataServiceMock = {
-			createEmptyTable: vi.fn().mockReturnValue(emptyTable),
-			processAsistencias: vi
-				.fn()
-				.mockReturnValue({ ingresos: emptyTable, salidas: emptyTable }),
+		userProfileMock = {
+			userRole: signal<'Estudiante' | 'Apoderado' | 'Profesor' | 'Director' | ''>('Apoderado'),
+			userName: signal('Test User'),
 		};
 
 		await TestBed.configureTestingModule({
 			imports: [AttendanceComponent],
-			providers: [
-				...testProviders,
-				{ provide: VoiceRecognitionService, useValue: voiceServiceMock },
-				{ provide: AsistenciaService, useValue: asistenciaServiceMock },
-				{ provide: AuthService, useValue: authServiceMock },
-				{ provide: StorageService, useValue: storageServiceMock },
-				{ provide: AttendanceDataService, useValue: attendanceDataServiceMock },
-			],
-		})
-			.overrideComponent(AttendanceComponent, {
-				set: {
-					providers: [{ provide: AttendanceFacade, useValue: facadeMock }],
-				},
-			})
-			.compileComponents();
+			providers: [...testProviders, { provide: UserProfileService, useValue: userProfileMock }],
+		}).compileComponents();
+
+		fixture = TestBed.createComponent(AttendanceComponent);
+		component = fixture.componentInstance;
+		fixture.detectChanges();
 	});
 
-	it('should create the facade mock', () => {
-		expect(facadeMock).toBeTruthy();
-		expect(facadeMock.userRole!()).toBe('Estudiante');
-		expect(facadeMock.studentName!()).toBe('Test Student');
-		expect(facadeMock.loading!()).toBe(false);
+	it('should create', () => {
+		expect(component).toBeTruthy();
 	});
 
-	it('should have correct initial values in facade', () => {
-		expect(facadeMock.hijos!().length).toBe(0);
-		expect(facadeMock.salones!().length).toBe(0);
-		expect(facadeMock.estudiantes!().length).toBe(0);
+	it('should expose userRole from UserProfileService', () => {
+		expect(component.userRole()).toBe('Apoderado');
 	});
 
-	it('should have facade methods available', () => {
-		expect(facadeMock.initialize).toBeDefined();
-		expect(facadeMock.reloadCurrentData).toBeDefined();
-		expect(facadeMock.selectHijo).toBeDefined();
-		expect(facadeMock.selectSalon).toBeDefined();
+	it('should have loading signal initialized to false', () => {
+		expect(component.loading()).toBe(false);
+	});
+
+	it('should call appropriate component reload method based on role', () => {
+		// Mock apoderado component
+		component.apoderadoComponent = {
+			reload: vi.fn(),
+		} as any;
+
+		component.onReload();
+
+		expect(component.apoderadoComponent.reload).toHaveBeenCalled();
+	});
+
+	it('should have onModeChange method', () => {
+		expect(component.onModeChange).toBeDefined();
+		expect(typeof component.onModeChange).toBe('function');
+
+		// Should not throw when called
+		expect(() => component.onModeChange('dia')).not.toThrow();
+		expect(() => component.onModeChange('mes')).not.toThrow();
+	});
+
+	it('should have onReload method that delegates to appropriate component', () => {
+		// Mock apoderado component (current role)
+		const mockApoderado = { reload: vi.fn() };
+		component.apoderadoComponent = mockApoderado as any;
+
+		component.onReload();
+
+		expect(mockApoderado.reload).toHaveBeenCalled();
+	});
+
+	it('should delegate reload to estudiante component when role is Estudiante', () => {
+		userProfileMock.userRole = signal('Estudiante');
+
+		const newFixture = TestBed.createComponent(AttendanceComponent);
+		const newComponent = newFixture.componentInstance;
+
+		const mockEstudiante = { reload: vi.fn() };
+		newComponent.estudianteComponent = mockEstudiante as any;
+
+		newComponent.onReload();
+
+		expect(mockEstudiante.reload).toHaveBeenCalled();
+	});
+
+	it('should handle unexpected role in constructor', () => {
+		// This test verifies the component doesn't crash with unexpected roles
+		userProfileMock.userRole = signal('UnknownRole' as any);
+
+		// Component should still create without errors
+		expect(() => {
+			TestBed.createComponent(AttendanceComponent);
+		}).not.toThrow();
 	});
 });

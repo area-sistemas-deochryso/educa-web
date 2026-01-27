@@ -1,0 +1,18 @@
+@if (hijos().length > 0) {
+	<app-attendance-table
+		[table]="ingresos()"
+		[hijos]="hijos()"
+		[selectedHijoId]="selectedHijoId()"
+		(monthChange)="onIngresosMonthChange($event)"
+		(hijoChange)="selectHijo($event)"
+	/>
+	<app-attendance-table
+		[table]="salidas()"
+		[hijos]="hijos()"
+		[selectedHijoId]="selectedHijoId()"
+		(monthChange)="onSalidasMonthChange($event)"
+		(hijoChange)="selectHijo($event)"
+	/>
+} @else if (!loading()) {
+	<app-empty-state message="No se encontraron hijos registrados." />
+}

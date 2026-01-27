@@ -14,6 +14,7 @@ import {
 	shouldMarkIngresoAsPending,
 	shouldMarkSalidaAsPending,
 	isBeforeRegistrationStart,
+	shouldCountInasistencia,
 } from '@features/intranet/pages/attendance-component/attendance.config';
 import { CalendarUtilsService } from '../calendar/calendar-utils.service';
 
@@ -170,7 +171,9 @@ export class AttendanceDataService {
 			if (isBeforeRegistrationStart(date)) return 'X';
 			// Días futuros o de hoy sin hora aún → '-' (pendiente)
 			if (shouldMarkIngresoAsPending(date, month)) return '-';
-			// Día pasado sin registro → 'N' (falta)
+			// Durante períodos vacacionales (enero, febrero, julio) → 'X' (no se cuenta)
+			if (!shouldCountInasistencia(date)) return 'X';
+			// Día pasado sin registro en período académico → 'N' (falta)
 			return 'N';
 		}
 
@@ -188,7 +191,9 @@ export class AttendanceDataService {
 			if (isBeforeRegistrationStart(date)) return 'X';
 			// Días futuros o de hoy sin hora aún → '-' (pendiente)
 			if (shouldMarkSalidaAsPending(date, month)) return '-';
-			// Día pasado sin registro → 'N' (falta)
+			// Durante períodos vacacionales (enero, febrero, julio) → 'X' (no se cuenta)
+			if (!shouldCountInasistencia(date)) return 'X';
+			// Día pasado sin registro en período académico → 'N' (falta)
 			return 'N';
 		}
 

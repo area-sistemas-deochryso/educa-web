@@ -1,235 +1,85 @@
-import { VoiceRecognitionService } from '@core/services';
-import { Component, DestroyRef, OnDestroy, OnInit, inject } from '@angular/core';
+import { Component, ViewChild, inject, signal } from '@angular/core';
+import { Router } from '@angular/router';
 
-import { GradoSeccion } from '@core/services';
-import { AttendanceFacade } from '../../services/attendance/attendance.facade';
+import { UserProfileService } from '@core/services';
+import { logger } from '@core/helpers';
 import {
 	AttendanceHeaderComponent,
 	ViewMode,
 } from '../../components/attendance/attendance-header/attendance-header.component';
 import { AttendanceLegendComponent } from '../../components/attendance/attendance-legend/attendance-legend.component';
-import { AttendanceTableComponent } from '../../components/attendance/attendance-table/attendance-table.component';
-import { SalonSelectorComponent } from '../../components/attendance/salon-selector/salon-selector.component';
-import { EmptyStateComponent } from '../../components/attendance/empty-state/empty-state.component';
-import { GradoSeccionSelectorComponent } from '../../components/attendance/grado-seccion-selector/grado-seccion-selector.component';
-import { EstadisticasDiaComponent } from '../../components/attendance/estadisticas-dia/estadisticas-dia.component';
-import { AsistenciaDiaListComponent } from '../../components/attendance/asistencia-dia-list/asistencia-dia-list.component';
+import { AttendanceApoderadoComponent } from './attendance-apoderado/attendance-apoderado.component';
+import { AttendanceProfesorComponent } from './attendance-profesor/attendance-profesor.component';
+import { AttendanceDirectorComponent } from './attendance-director/attendance-director.component';
+import { AttendanceEstudianteComponent } from './attendance-estudiante/attendance-estudiante.component';
 
+/**
+ * Componente Page/Route para asistencias.
+ *
+ * Este componente actúa como un router/shell que:
+ * 1. Determina el rol del usuario
+ * 2. Muestra el header y leyenda compartidos
+ * 3. Delega la lógica específica a componentes especializados por rol
+ *
+ * Taxonomía: Page/Route - Coordina subcomponentes según el contexto (rol del usuario)
+ */
 @Component({
 	selector: 'app-attendance',
+	standalone: true,
 	imports: [
 		AttendanceHeaderComponent,
 		AttendanceLegendComponent,
-		AttendanceTableComponent,
-		SalonSelectorComponent,
-		EmptyStateComponent,
-		GradoSeccionSelectorComponent,
-		EstadisticasDiaComponent,
-		AsistenciaDiaListComponent,
+		AttendanceApoderadoComponent,
+		AttendanceProfesorComponent,
+		AttendanceDirectorComponent,
+		AttendanceEstudianteComponent,
 	],
-	providers: [AttendanceFacade],
 	templateUrl: './attendance.component.html',
 	styleUrl: './attendance.component.scss',
 })
-export class AttendanceComponent implements OnInit, OnDestroy {
-	private voiceService = inject(VoiceRecognitionService);
-	private destroyRef = inject(DestroyRef);
-	private voiceUnsubscribe: (() => void) | null = null;
+export class AttendanceComponent {
+	private userProfile = inject(UserProfileService);
+	private router = inject(Router);
 
-	// Facade expone todo el estado y la lógica
-	readonly facade = inject(AttendanceFacade);
+	@ViewChild(AttendanceApoderadoComponent) apoderadoComponent?: AttendanceApoderadoComponent;
+	@ViewChild(AttendanceProfesorComponent) profesorComponent?: AttendanceProfesorComponent;
+	@ViewChild(AttendanceDirectorComponent) directorComponent?: AttendanceDirectorComponent;
+	@ViewChild(AttendanceEstudianteComponent) estudianteComponent?: AttendanceEstudianteComponent;
 
-	// Aliases para el template (mantener compatibilidad)
-	get userRole() {
-		return this.facade.userRole();
-	}
-	get studentName() {
-		return this.facade.studentName();
-	}
-	get loading() {
-		return this.facade.loading;
-	}
-	get resumen() {
-		return this.facade.resumen();
-	}
-	get ingresos() {
-		return this.facade.ingresos;
-	}
-	get salidas() {
-		return this.facade.salidas;
-	}
-	get hijos() {
-		return this.facade.hijos;
-	}
-	get selectedHijoId() {
-		return this.facade.selectedHijoId;
-	}
-	get selectedHijo() {
-		return this.facade.selectedHijo;
-	}
-	get nombreProfesor() {
-		return this.facade.nombreProfesor();
-	}
-	get salones() {
-		return this.facade.salones;
-	}
-	get selectedSalonId() {
-		return this.facade.selectedSalonId;
-	}
-	get selectedSalon() {
-		return this.facade.selectedSalon();
-	}
-	get estudiantes() {
-		return this.facade.estudiantes;
-	}
-	get selectedEstudianteId() {
-		return this.facade.selectedEstudianteId;
-	}
-	get selectedEstudiante() {
-		return this.facade.selectedEstudiante;
-	}
-	get estudiantesAsHijos() {
-		return this.facade.estudiantesAsHijos;
-	}
+	readonly userRole = this.userProfile.userRole;
+	readonly loading = signal(false);
 
-	// Modo día/mes para profesor
-	get viewMode() {
-		return this.facade.viewMode;
-	}
-	get fechaDia() {
-		return this.facade.fechaDia;
-	}
-	get estudiantesDia() {
-		return this.facade.estudiantesDia;
-	}
+	// Verificar rol válido y redirigir si es inesperado
+	constructor() {
+		const validRoles = ['Apoderado', 'Profesor', 'Director', 'Estudiante'];
+		const currentRole = this.userRole();
 
-	// Para director
-	get gradosSecciones() {
-		return this.facade.gradosSecciones;
-	}
-	get selectedGradoSeccion() {
-		return this.facade.selectedGradoSeccion;
-	}
-	get estadisticasDia() {
-		return this.facade.estadisticasDia;
-	}
-	get estudiantesDirector() {
-		return this.facade.estudiantesDirector;
-	}
-	get selectedEstudianteDirectorId() {
-		return this.facade.selectedEstudianteDirectorId;
-	}
-	get estudiantesDirectorAsHijos() {
-		return this.facade.estudiantesDirectorAsHijos;
-	}
-	get downloadingPdf() {
-		return this.facade.downloadingPdf;
-	}
-
-	// Modo día/mes para director
-	get viewModeDirector() {
-		return this.facade.viewModeDirector;
-	}
-	get fechaDiaDirector() {
-		return this.facade.fechaDiaDirector;
-	}
-	get estudiantesDiaDirector() {
-		return this.facade.estudiantesDiaDirector;
-	}
-
-	ngOnInit(): void {
-		this.facade.initialize(this.destroyRef);
-		this.setupVoiceCommands();
-	}
-
-	ngOnDestroy(): void {
-		if (this.voiceUnsubscribe) {
-			this.voiceUnsubscribe();
+		if (currentRole && !validRoles.includes(currentRole)) {
+			logger.warn(`Rol inesperado en asistencias: ${currentRole}. Redirigiendo a /intranet`);
+			this.router.navigate(['/intranet']);
 		}
 	}
 
-	private setupVoiceCommands(): void {
-		this.voiceUnsubscribe = this.voiceService.onCommand((command, params) => {
-			if (command === 'change-month' && params) {
-				const month = parseInt(params, 10);
-				if (month >= 1 && month <= 12) {
-					this.facade.updateSelectedMonth(month);
-					this.facade.reloadCurrentData(this.destroyRef);
-				}
-			} else if (command === 'change-year' && params) {
-				const year = parseInt(params, 10);
-				if (year >= 2000 && year <= 2100) {
-					this.facade.updateSelectedYear(year);
-					this.facade.reloadCurrentData(this.destroyRef);
-				}
-			}
-		});
+	// Header común
+	onModeChange(mode: ViewMode): void {
+		const role = this.userRole();
+		if (role === 'Profesor') {
+			this.profesorComponent?.setViewMode(mode);
+		} else if (role === 'Director') {
+			this.directorComponent?.setViewMode(mode);
+		}
 	}
 
-	// === MÉTODOS DELEGADOS AL FACADE ===
-
-	onIngresosMonthChange(month: number): void {
-		this.facade.ingresos.update((table) => ({ ...table, selectedMonth: month }));
-		this.facade.reloadIngresosData(this.destroyRef);
-	}
-
-	onSalidasMonthChange(month: number): void {
-		this.facade.salidas.update((table) => ({ ...table, selectedMonth: month }));
-		this.facade.reloadSalidasData(this.destroyRef);
-	}
-
-	selectHijo(estudianteId: number): void {
-		this.facade.selectHijo(estudianteId, this.destroyRef);
-	}
-
-	selectSalon(salonId: number): void {
-		this.facade.selectSalon(salonId, this.destroyRef);
-	}
-
-	selectEstudiante(estudianteId: number): void {
-		this.facade.selectEstudiante(estudianteId);
-	}
-
-	// Modo día/mes
-	onViewModeChange(mode: ViewMode): void {
-		this.facade.setViewMode(mode, this.destroyRef);
-	}
-
-	onFechaDiaChange(fecha: Date): void {
-		this.facade.setFechaDia(fecha, this.destroyRef);
-	}
-
-	selectSalonDia(salonId: number): void {
-		this.facade.selectSalonDia(salonId, this.destroyRef);
-	}
-
-	// Director
-	selectGradoSeccion(gs: GradoSeccion): void {
-		this.facade.selectGradoSeccion(gs, this.destroyRef);
-	}
-
-	selectEstudianteDirector(estudianteId: number): void {
-		this.facade.selectEstudianteDirector(estudianteId);
-	}
-
-	descargarPdfAsistenciaDia(): void {
-		this.facade.descargarPdfAsistenciaDia(this.destroyRef);
-	}
-
-	// Director: modo día/mes
-	onViewModeDirectorChange(mode: ViewMode): void {
-		this.facade.setViewModeDirector(mode, this.destroyRef);
-	}
-
-	onFechaDiaDirectorChange(fecha: Date): void {
-		this.facade.setFechaDiaDirector(fecha, this.destroyRef);
-	}
-
-	selectGradoSeccionDia(gs: GradoSeccion): void {
-		this.facade.selectGradoSeccionDia(gs, this.destroyRef);
-	}
-
-	reloadAll(): void {
-		this.facade.reloadCurrentData(this.destroyRef);
+	onReload(): void {
+		const role = this.userRole();
+		if (role === 'Apoderado') {
+			this.apoderadoComponent?.reload();
+		} else if (role === 'Profesor') {
+			this.profesorComponent?.reload();
+		} else if (role === 'Director') {
+			this.directorComponent?.reload();
+		} else if (role === 'Estudiante') {
+			this.estudianteComponent?.reload();
+		}
 	}
 }

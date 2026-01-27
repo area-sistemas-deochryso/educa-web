@@ -1,129 +1,33 @@
 <div class="attendance-container">
+	<!-- Header y leyenda compartidos por todos los roles -->
 	<app-attendance-header
 		[loading]="loading()"
-		[showModeSelector]="userRole === 'Profesor' || userRole === 'Director'"
-		[selectedMode]="userRole === 'Director' ? viewModeDirector() : viewMode()"
-		(modeChange)="userRole === 'Director' ? onViewModeDirectorChange($event) : onViewModeChange($event)"
-		(reload)="reloadAll()"
+		[showModeSelector]="userRole() === 'Profesor' || userRole() === 'Director'"
+		[selectedMode]="'mes'"
+		(modeChange)="onModeChange($event)"
+		(reload)="onReload()"
 	/>
 
 	<app-attendance-legend />
 
-	@switch (userRole) {
+	<!-- Componentes especializados por rol -->
+	@switch (userRole()) {
 		@case ('Apoderado') {
-			@if (hijos().length > 0) {
-				<app-attendance-table
-					[table]="ingresos()"
-					[hijos]="hijos()"
-					[selectedHijoId]="selectedHijoId()"
-					(monthChange)="onIngresosMonthChange($event)"
-					(hijoChange)="selectHijo($event)"
-				/>
-				<app-attendance-table
-					[table]="salidas()"
-					[hijos]="hijos()"
-					[selectedHijoId]="selectedHijoId()"
-					(monthChange)="onSalidasMonthChange($event)"
-					(hijoChange)="selectHijo($event)"
-				/>
-			} @else if (!loading()) {
-				<app-empty-state message="No se encontraron hijos registrados." />
-			}
+			<app-attendance-apoderado />
 		}
 		@case ('Profesor') {
-			@if (salones().length > 0) {
-				<app-salon-selector
-					[salones]="salones()"
-					[selectedSalonId]="selectedSalonId()"
-					[nombreProfesor]="nombreProfesor"
-					(salonChange)="viewMode() === 'dia' ? selectSalonDia($event) : selectSalon($event)"
-				/>
-
-				@if (viewMode() === 'mes') {
-					@if (estudiantes().length > 0) {
-						<app-attendance-table
-							[table]="ingresos()"
-							[hijos]="estudiantesAsHijos()"
-							[selectedHijoId]="selectedEstudianteId()"
-							(monthChange)="onIngresosMonthChange($event)"
-							(hijoChange)="selectEstudiante($event)"
-						/>
-						<app-attendance-table
-							[table]="salidas()"
-							[hijos]="estudiantesAsHijos()"
-							[selectedHijoId]="selectedEstudianteId()"
-							(monthChange)="onSalidasMonthChange($event)"
-							(hijoChange)="selectEstudiante($event)"
-						/>
-					} @else if (!loading()) {
-						<app-empty-state message="No se encontraron estudiantes en este salón." />
-					}
-				} @else {
-					<app-asistencia-dia-list
-						[estudiantes]="estudiantesDia()"
-						[fecha]="fechaDia()"
-						[loading]="loading()"
-						(fechaChange)="onFechaDiaChange($event)"
-					/>
-				}
-			} @else if (!loading()) {
-				<app-empty-state message="No tiene salones asignados." />
-			}
+			<app-attendance-profesor />
 		}
 		@case ('Director') {
-			<app-estadisticas-dia
-				[estadisticas]="estadisticasDia()"
-				[downloadingPdf]="downloadingPdf()"
-				(descargarPdf)="descargarPdfAsistenciaDia()"
-			/>
-
-			@if (gradosSecciones().length > 0) {
-				<app-grado-seccion-selector
-					[gradosSecciones]="gradosSecciones()"
-					[selectedGradoSeccion]="selectedGradoSeccion()"
-					(gradoSeccionChange)="viewModeDirector() === 'dia' ? selectGradoSeccionDia($event) : selectGradoSeccion($event)"
-				/>
-
-				@if (viewModeDirector() === 'mes') {
-					@if (estudiantesDirector().length > 0) {
-						<app-attendance-table
-							[table]="ingresos()"
-							[hijos]="estudiantesDirectorAsHijos()"
-							[selectedHijoId]="selectedEstudianteDirectorId()"
-							(monthChange)="onIngresosMonthChange($event)"
-							(hijoChange)="selectEstudianteDirector($event)"
-						/>
-						<app-attendance-table
-							[table]="salidas()"
-							[hijos]="estudiantesDirectorAsHijos()"
-							[selectedHijoId]="selectedEstudianteDirectorId()"
-							(monthChange)="onSalidasMonthChange($event)"
-							(hijoChange)="selectEstudianteDirector($event)"
-						/>
-					} @else if (!loading()) {
-						<app-empty-state message="No se encontraron estudiantes en este grado/sección." />
-					}
-				} @else {
-					<app-asistencia-dia-list
-						[estudiantes]="estudiantesDiaDirector()"
-						[fecha]="fechaDiaDirector()"
-						[loading]="loading()"
-						(fechaChange)="onFechaDiaDirectorChange($event)"
-					/>
-				}
-			} @else if (!loading()) {
-				<app-empty-state message="No hay grados/secciones disponibles." />
-			}
+			<app-attendance-director />
+		}
+		@case ('Estudiante') {
+			<app-attendance-estudiante />
 		}
 		@default {
-			<app-attendance-table
-				[table]="ingresos()"
-				(monthChange)="onIngresosMonthChange($event)"
-			/>
-			<app-attendance-table
-				[table]="salidas()"
-				(monthChange)="onSalidasMonthChange($event)"
-			/>
+			<div class="error-state">
+				<p>Rol no reconocido. Redirigiendo...</p>
+			</div>
 		}
 	}
 </div>

@@ -1,5 +1,6 @@
 // T = Temprano, A = A tiempo, F = Fuera de hora, N = No asistió
-// '-' = Pendiente (día futuro o de hoy sin hora aún), 'X' = Sin registro (antes del 26/01/2026)
+// '-' = Pendiente (día futuro o de hoy sin hora aún)
+// 'X' = No contabilizado (antes del 26/01/2026 o período vacacional)
 export type AttendanceStatus = 'T' | 'A' | 'F' | 'N' | '-' | 'X';
 
 export interface AttendanceDay {
