@@ -1,4 +1,4 @@
-import type { AttendanceStatus } from './attendance.types';
+import type { AttendanceStatus } from '../models/attendance.types';
 
 /**
  * Configuración de horas límite para determinar el estado de asistencia.

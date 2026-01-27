@@ -3,7 +3,7 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { finalize } from 'rxjs';
 import { AsistenciaService, HijoApoderado, StorageService } from '@core/services';
 import { AttendanceDataService } from '../../../services/attendance/attendance-data.service';
-import { AttendanceTable } from '../attendance.types';
+import { AttendanceTable } from '../models/attendance.types';
 import { AttendanceTableComponent } from '../../../components/attendance/attendance-table/attendance-table.component';
 import { EmptyStateComponent } from '../../../components/attendance/empty-state/empty-state.component';
 

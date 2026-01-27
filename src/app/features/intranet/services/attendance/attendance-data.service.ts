@@ -6,18 +6,18 @@ import {
 	AttendanceWeek,
 	AttendanceTable,
 	StatusCounts,
-} from '@features/intranet/pages/attendance-component/attendance.types';
-import { DAY_HEADERS } from '@features/intranet/pages/attendance-component/attendance.constants';
+} from '@features/intranet/pages/attendance-component/models/attendance.types';
+import { DAY_HEADERS } from '@features/intranet/pages/attendance-component/config/attendance.constants';
 import {
 	getIngresoStatusFromTime,
 	getSalidaStatusFromTime,
-} from '@features/intranet/pages/attendance-component/attendance-time.config';
+} from '@features/intranet/pages/attendance-component/config/attendance-time.config';
 import {
 	shouldMarkIngresoAsPending,
 	shouldMarkSalidaAsPending,
 	isBeforeRegistrationStart,
-} from '@features/intranet/pages/attendance-component/attendance.utils';
-import { shouldCountInasistencia } from '@features/intranet/pages/attendance-component/attendance-periods.config';
+} from '@features/intranet/pages/attendance-component/config/attendance.utils';
+import { shouldCountInasistencia } from '@features/intranet/pages/attendance-component/config/attendance-periods.config';
 import { CalendarUtilsService } from '../calendar/calendar-utils.service';
 
 @Injectable({

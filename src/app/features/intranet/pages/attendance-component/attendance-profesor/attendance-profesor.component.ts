@@ -10,7 +10,7 @@ import {
 	UserProfileService,
 } from '@core/services';
 import { AttendanceDataService } from '../../../services/attendance/attendance-data.service';
-import { AttendanceTable } from '../attendance.types';
+import { AttendanceTable } from '../models/attendance.types';
 import { ViewMode } from '../../../components/attendance/attendance-header/attendance-header.component';
 import { AttendanceTableComponent } from '../../../components/attendance/attendance-table/attendance-table.component';
 import { SalonSelectorComponent } from '../../../components/attendance/salon-selector/salon-selector.component';

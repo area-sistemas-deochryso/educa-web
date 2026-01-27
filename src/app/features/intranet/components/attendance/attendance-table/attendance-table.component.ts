@@ -8,12 +8,12 @@ import {
 	AttendanceTable,
 	AttendanceDay,
 	MonthOption,
-} from '@features/intranet/pages/attendance-component/attendance.types';
+} from '@features/intranet/pages/attendance-component/models/attendance.types';
 import {
 	MONTH_OPTIONS,
 	DAY_HEADERS,
 	getStatusClass,
-} from '@features/intranet/pages/attendance-component/attendance.constants';
+} from '@features/intranet/pages/attendance-component/config/attendance.constants';
 
 export interface HijoOption {
 	label: string;

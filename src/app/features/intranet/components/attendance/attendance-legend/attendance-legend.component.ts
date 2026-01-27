@@ -2,7 +2,7 @@ import { ChangeDetectionStrategy, Component } from '@angular/core';
 import {
 	LEGEND_ITEMS,
 	getStatusClass,
-} from '@features/intranet/pages/attendance-component/attendance.constants';
+} from '@features/intranet/pages/attendance-component/config/attendance.constants';
 
 @Component({
 	selector: 'app-attendance-legend',

@@ -1,4 +1,4 @@
-import type { AttendanceStatus, LegendItem, MonthOption } from './attendance.types';
+import type { AttendanceStatus, LegendItem, MonthOption } from '../models/attendance.types';
 
 /**
  * Clave para almacenar el mes seleccionado en localStorage.
