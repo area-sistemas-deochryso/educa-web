@@ -7,15 +7,17 @@ import {
 	AttendanceTable,
 	StatusCounts,
 } from '@features/intranet/pages/attendance-component/attendance.types';
+import { DAY_HEADERS } from '@features/intranet/pages/attendance-component/attendance.constants';
 import {
-	DAY_HEADERS,
 	getIngresoStatusFromTime,
 	getSalidaStatusFromTime,
+} from '@features/intranet/pages/attendance-component/attendance-time.config';
+import {
 	shouldMarkIngresoAsPending,
 	shouldMarkSalidaAsPending,
 	isBeforeRegistrationStart,
-	shouldCountInasistencia,
-} from '@features/intranet/pages/attendance-component/attendance.config';
+} from '@features/intranet/pages/attendance-component/attendance.utils';
+import { shouldCountInasistencia } from '@features/intranet/pages/attendance-component/attendance-periods.config';
 import { CalendarUtilsService } from '../calendar/calendar-utils.service';
 
 @Injectable({

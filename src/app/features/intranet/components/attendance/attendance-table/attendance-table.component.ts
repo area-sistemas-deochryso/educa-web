@@ -13,7 +13,7 @@ import {
 	MONTH_OPTIONS,
 	DAY_HEADERS,
 	getStatusClass,
-} from '@features/intranet/pages/attendance-component/attendance.config';
+} from '@features/intranet/pages/attendance-component/attendance.constants';
 
 export interface HijoOption {
 	label: string;

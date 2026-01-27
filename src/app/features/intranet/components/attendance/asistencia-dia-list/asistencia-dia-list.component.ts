@@ -6,12 +6,12 @@ import { DatePickerModule } from 'primeng/datepicker';
 import { CardModule } from 'primeng/card';
 import { SkeletonModule } from 'primeng/skeleton';
 import { EstudianteAsistencia, AsistenciaDetalle } from '@core/services';
+import { getStatusClass } from '@features/intranet/pages/attendance-component/attendance.constants';
+import { getIngresoStatusFromTime } from '@features/intranet/pages/attendance-component/attendance-time.config';
 import {
-	getStatusClass,
-	getIngresoStatusFromTime,
 	shouldMarkIngresoAsPending,
 	isBeforeRegistrationStart,
-} from '@features/intranet/pages/attendance-component/attendance.config';
+} from '@features/intranet/pages/attendance-component/attendance.utils';
 import { AttendanceStatus } from '@features/intranet/pages/attendance-component/attendance.types';
 
 export interface EstudianteAsistenciaDia {
