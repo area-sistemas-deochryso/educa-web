@@ -66,7 +66,8 @@ export class SwService {
 		if (!location.pathname.startsWith('/intranet/')) return;
 
 		try {
-			this.registration = await navigator.serviceWorker.register('/intranet/sw.js', {
+			//? Indica el path y el scope del sw en la build
+			this.registration = await navigator.serviceWorker.register('/sw.js', {
 				scope: '/intranet/',
 			});
 
