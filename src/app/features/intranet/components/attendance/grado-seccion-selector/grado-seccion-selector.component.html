@@ -1,0 +1,16 @@
+<div class="grado-seccion-selector">
+	<label>Grado y Sección:</label>
+	<select (change)="onGradoSeccionChange($event)">
+		@for (gs of gradosSecciones(); track gs.grado + '|' + gs.seccion) {
+			<option
+				[value]="gs.grado + '|' + gs.seccion"
+				[selected]="
+					selectedGradoSeccion()?.grado === gs.grado &&
+					selectedGradoSeccion()?.seccion === gs.seccion
+				"
+			>
+				{{ gs.grado }} - Sección {{ gs.seccion }}
+			</option>
+		}
+	</select>
+</div>

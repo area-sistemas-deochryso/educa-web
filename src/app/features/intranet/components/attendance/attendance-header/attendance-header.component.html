@@ -4,12 +4,21 @@
 		<h1>Asistencias</h1>
 		@if (showModeSelector()) {
 			<span class="separator">/</span>
-			<div class="mode-selector">
+			<div class="mode-selector" role="group" aria-label="Selector de vista de asistencias">
+				<!-- Slider que se desliza -->
+				<div
+					class="mode-slider"
+					[style.transform]="selectedMode() === 'dia' ? 'translateX(62px)' : 'translateX(0)'"
+				></div>
+
+				<!-- Botones -->
 				<button
 					type="button"
 					class="mode-btn"
 					[class.active]="selectedMode() === 'mes'"
 					(click)="onModeSelect('mes')"
+					[attr.aria-pressed]="selectedMode() === 'mes'"
+					aria-label="Vista mensual"
 				>
 					Mes
 				</button>
@@ -18,6 +27,8 @@
 					class="mode-btn"
 					[class.active]="selectedMode() === 'dia'"
 					(click)="onModeSelect('dia')"
+					[attr.aria-pressed]="selectedMode() === 'dia'"
+					aria-label="Vista diaria"
 				>
 					Día
 				</button>

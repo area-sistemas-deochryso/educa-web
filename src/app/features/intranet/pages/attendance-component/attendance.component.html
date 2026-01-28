@@ -3,7 +3,7 @@
 	<app-attendance-header
 		[loading]="loading()"
 		[showModeSelector]="userRole() === 'Profesor' || userRole() === 'Director'"
-		[selectedMode]="'mes'"
+		[selectedMode]="selectedMode()"
 		(modeChange)="onModeChange($event)"
 		(reload)="onReload()"
 	/>

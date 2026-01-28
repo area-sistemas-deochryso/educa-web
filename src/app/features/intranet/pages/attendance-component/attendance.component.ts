@@ -46,6 +46,7 @@ export class AttendanceComponent {
 
 	readonly userRole = this.userProfile.userRole;
 	readonly loading = signal(false);
+	readonly selectedMode = signal<ViewMode>('mes');
 
 	// Verificar rol válido y redirigir si es inesperado
 	constructor() {
@@ -60,6 +61,7 @@ export class AttendanceComponent {
 
 	// Header común
 	onModeChange(mode: ViewMode): void {
+		this.selectedMode.set(mode); // ✅ Actualizar el signal
 		const role = this.userRole();
 		if (role === 'Profesor') {
 			this.profesorComponent?.setViewMode(mode);
