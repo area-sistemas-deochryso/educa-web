@@ -1,21 +1,21 @@
-import { Injectable, inject, DestroyRef } from '@angular/core';
-import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import { forkJoin, of } from 'rxjs';
-import { catchError, filter } from 'rxjs/operators';
-
-import { logger } from '@core/helpers';
 import {
-	UsuariosService,
-	UsuarioLista,
-	UsuarioDetalle,
-	CrearUsuarioRequest,
 	ActualizarUsuarioRequest,
-	RolUsuarioAdmin,
+	CrearUsuarioRequest,
 	ErrorHandlerService,
+	RolUsuarioAdmin,
 	SwService,
+	UsuarioDetalle,
+	UsuarioLista,
 	UsuariosEstadisticas,
+	UsuariosService,
 } from '@core/services';
+import { DestroyRef, Injectable, inject } from '@angular/core';
+import { catchError, filter } from 'rxjs/operators';
+import { of } from 'rxjs';
+
 import { UsuariosStore } from './usuarios.store';
+import { logger } from '@core/helpers';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
 /**
  * Facade para gestión de usuarios
@@ -39,37 +39,56 @@ export class UsuariosFacade {
 	// ============ Data Loading ============
 
 	loadData(): void {
+		// Inicializar estados de skeleton
+		this.store.setShowSkeletons(true);
+		this.store.setStatsReady(false);
+		this.store.setTableReady(false);
 		this.store.setLoading(true);
 
-		forkJoin({
-			usuarios: this.usuariosService.listarUsuarios().pipe(
-				catchError((err) => {
-					logger.error('Error cargando usuarios:', err);
-					return of([] as UsuarioLista[]);
-				}),
-			),
-			estadisticas: this.usuariosService.obtenerEstadisticas().pipe(
+		// Renderizado progresivo:
+		// 1. Cargar estadísticas primero (más pequeñas, más rápidas)
+		// 2. Luego cargar usuarios (más grandes)
+
+		// Paso 1: Cargar estadísticas
+		this.usuariosService
+			.obtenerEstadisticas()
+			.pipe(
 				catchError((err) => {
 					logger.error('Error cargando estadísticas:', err);
 					return of(null);
 				}),
-			),
-		})
-			.pipe(takeUntilDestroyed(this.destroyRef))
-			.subscribe({
-				next: ({ usuarios, estadisticas }) => {
-					// Filtrar apoderados para no mostrarlos en admin
-					this.store.setUsuarios(usuarios.filter((u) => u.rol !== 'Apoderado'));
-					if (estadisticas) {
-						this.store.setEstadisticas(estadisticas);
-					}
-					this.store.setLoading(false);
-				},
-				error: (err) => {
-					logger.error('Error al cargar datos:', err);
-					this.errorHandler.showError('Error', 'No se pudieron cargar los usuarios');
-					this.store.setLoading(false);
-				},
+				takeUntilDestroyed(this.destroyRef),
+			)
+			.subscribe((estadisticas) => {
+				if (estadisticas) {
+					this.store.setEstadisticas(estadisticas);
+				}
+				// Marcar stats como listas y ocultar su skeleton
+				this.store.setStatsReady(true);
+
+				// Paso 2: Cargar usuarios (renderizado progresivo)
+				this.usuariosService
+					.listarUsuarios()
+					.pipe(
+						catchError((err) => {
+							logger.error('Error cargando usuarios:', err);
+							this.errorHandler.showError('Error', 'No se pudieron cargar los usuarios');
+							return of([] as UsuarioLista[]);
+						}),
+						takeUntilDestroyed(this.destroyRef),
+					)
+					.subscribe((usuarios) => {
+						// Filtrar apoderados para no mostrarlos en admin
+						this.store.setUsuarios(usuarios.filter((u) => u.rol !== 'Apoderado'));
+						this.store.setTableReady(true);
+						this.store.setLoading(false);
+
+						// Ocultar todos los skeletons después de un pequeño delay
+						// para asegurar que el contenido está renderizado
+						setTimeout(() => {
+							this.store.setShowSkeletons(false);
+						}, 50);
+					});
 			});
 	}
 
@@ -110,6 +129,16 @@ export class UsuariosFacade {
 
 	closeDetail(): void {
 		this.store.closeDetailDrawer();
+	}
+
+	// ============ Confirm Dialog ===============
+
+	openConfirmDialog(): void {
+		this.store.openConfirmDialogVisible();
+	}
+
+	closeConfirmDialog(): void {
+		this.store.closeConfirmDialogVisible();
 	}
 
 	// ============ Dialog Management ============
@@ -260,12 +289,17 @@ export class UsuariosFacade {
 		// Actualizar lista de usuarios directamente desde el evento (sin nuevo fetch)
 		this.swService.cacheUpdated$
 			.pipe(
-				filter((event) => event.url.includes('/usuarios') && !event.url.includes('estadisticas')),
+				filter(
+					(event) =>
+						event.url.includes('/usuarios') && !event.url.includes('estadisticas'),
+				),
 				takeUntilDestroyed(this.destroyRef),
 			)
 			.subscribe((event) => {
 				logger.log('[UsuariosFacade] Lista usuarios actualizada desde SW');
-				const usuarios = (event.data as UsuarioLista[]).filter((u) => u.rol !== 'Apoderado');
+				const usuarios = (event.data as UsuarioLista[]).filter(
+					(u) => u.rol !== 'Apoderado',
+				);
 				this.store.setUsuarios(usuarios);
 			});
 

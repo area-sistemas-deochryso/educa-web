@@ -4,3 +4,5 @@
 export * from './toast-container';
 export * from './form-error';
 export * from './form-field-error/form-field-error.component';
+export * from './skeleton-loader/skeleton-loader.component';
+export * from './lazy-content/lazy-content.component';

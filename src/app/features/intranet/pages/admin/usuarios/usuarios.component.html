@@ -24,8 +24,12 @@
 		></button>
 	</header>
 
-	<!-- Stats Cards -->
-	@if (vm().hasEstadisticas) {
+	<!-- Stats Cards - Progressive Rendering -->
+	@if (vm().showSkeletons && !vm().statsReady) {
+		<!-- Skeleton mostrado inmediatamente -->
+		<app-usuarios-stats-skeleton />
+	} @else if (vm().hasEstadisticas) {
+		<!-- Contenido real -->
 		<section class="stats-section">
 			<div class="stat-card">
 				<div class="stat-content">
@@ -85,6 +89,7 @@
 			</div>
 		</section>
 	} @else {
+		<!-- Fallback sin datos -->
 		<section class="stats-section">
 			<div class="stat-card">
 				<div class="stat-content">
@@ -201,24 +206,31 @@
 		></button>
 	</section>
 
-	<!-- Table -->
-	<section
-		class="table-section"
-		appTableLoading
-		[loading]="vm().loading"
-		[freezeHeight]="true"
-		[minHeightPx]="420"
-		[blurPx]="2"
-	>
-		<p-table
-			[value]="vm().filteredUsuarios"
-			[paginator]="true"
-			[rows]="10"
-			[rowsPerPageOptions]="[5, 10, 25, 50]"
-			[showCurrentPageReport]="true"
-			currentPageReportTemplate="Mostrando {first} a {last} de {totalRecords} usuarios"
-			class="p-datatable-sm"
+	<!-- Table - Progressive Rendering -->
+	@if (vm().showSkeletons && !vm().tableReady) {
+		<!-- Skeleton mostrado inmediatamente con espacio reservado -->
+		<section class="table-section" style="min-height: 420px;">
+			<app-usuarios-table-skeleton />
+		</section>
+	} @else {
+		<!-- Tabla real -->
+		<section
+			class="table-section"
+			appTableLoading
+			[loading]="vm().loading"
+			[freezeHeight]="true"
+			[minHeightPx]="420"
+			[blurPx]="2"
 		>
+			<p-table
+				[value]="vm().filteredUsuarios"
+				[paginator]="true"
+				[rows]="10"
+				[rowsPerPageOptions]="[5, 10, 25, 50]"
+				[showCurrentPageReport]="true"
+				currentPageReportTemplate="Mostrando {first} a {last} de {totalRecords} usuarios"
+				class="p-datatable-sm"
+			>
 			<ng-template #header>
 				<tr>
 					<th style="width: 80px" pSortableColumn="id">ID <p-sortIcon field="id" /></th>
@@ -331,13 +343,15 @@
 					</td>
 				</tr>
 			</ng-template>
-		</p-table>
-	</section>
+			</p-table>
+		</section>
+	}
 </div>
 
 <!-- Detail Drawer -->
 <p-drawer
-	[(visible)]="vm().detailDrawerVisible"
+	[visible]="vm().detailDrawerVisible"
+	(visibleChange)="onDrawerVisibleChange($event)"
 	position="right"
 	[style]="{ width: '450px' }"
 	[modal]="true"
@@ -446,182 +460,183 @@
 		</div>
 	}
 </p-drawer>
+@if (vm().dialogVisible) {
+	<!-- Edit/Create Dialog -->
+	<p-dialog
+		[visible]="vm().dialogVisible"
+		(visibleChange)="onDialogVisibleChange($event)"
+		[header]="vm().isEditing ? 'Editar Usuario' : 'Nuevo Usuario'"
+		[modal]="true"
+		[style]="{ width: '600px' }"
+		[draggable]="false"
+		[resizable]="false"
+		class="edit-usuario-dialog"
+	>
+		<div class="dialog-content">
+			<div class="form-grid">
+				@if (!vm().isEditing) {
+					<div class="field full-width">
+						<label for="rol">Rol *</label>
+						<p-select
+							id="rol"
+							[options]="rolesSelectOptions"
+							[ngModel]="vm().formData.rol"
+							(ngModelChange)="onFieldChange('rol', $event)"
+							placeholder="Seleccione el rol"
+							[style]="{ width: '100%' }"
+						/>
+					</div>
+				}
 
-<!-- Edit/Create Dialog -->
-<p-dialog
-	[(visible)]="vm().dialogVisible"
-	[header]="vm().isEditing ? 'Editar Usuario' : 'Nuevo Usuario'"
-	[modal]="true"
-	[style]="{ width: '600px' }"
-	[draggable]="false"
-	[resizable]="false"
-	[header]="vm().isEditing ? 'Editar Usuario' : 'Nuevo Usuario'"
-	class="edit-usuario-dialog"
->
-	<div class="dialog-content">
-		<div class="form-grid">
-			@if (!vm().isEditing) {
-				<div class="field full-width">
-					<label for="rol">Rol *</label>
-					<p-select
-						id="rol"
-						[options]="rolesSelectOptions"
-						[ngModel]="vm().formData.rol"
-						(ngModelChange)="onFieldChange('rol', $event)"
-						placeholder="Seleccione el rol"
+				<div class="field">
+					<label for="dni">DNI *</label>
+					<input
+						id="dni"
+						type="text"
+						pInputText
+						[ngModel]="vm().formData.dni"
+						(ngModelChange)="onFieldChange('dni', $event)"
+						placeholder="12345678"
+						maxlength="8"
+						[class.ng-invalid]="vm().dniError"
+						[class.ng-dirty]="vm().formData.dni"
+					/>
+					<app-form-field-error [error]="vm().dniError" />
+				</div>
+
+				<div class="field">
+					<label for="contrasena">{{
+						vm().isEditing ? 'Nueva Contraseña' : 'Contraseña *'
+					}}</label>
+					<p-password
+						id="contrasena"
+						[ngModel]="vm().formData.contrasena"
+						(ngModelChange)="onFieldChange('contrasena', $event)"
+						[placeholder]="
+							vm().isEditing ? 'Dejar vacío para mantener' : 'Ingrese contrasena'
+						"
+						[toggleMask]="true"
+						[feedback]="false"
 						[style]="{ width: '100%' }"
+						[inputStyle]="{ width: '100%' }"
 					/>
 				</div>
-			}
 
-			<div class="field">
-				<label for="dni">DNI *</label>
-				<input
-					id="dni"
-					type="text"
-					pInputText
-					[ngModel]="vm().formData.dni"
-					(ngModelChange)="onFieldChange('dni', $event)"
-					placeholder="12345678"
-					maxlength="8"
-					[class.ng-invalid]="vm().dniError"
-					[class.ng-dirty]="vm().formData.dni"
-				/>
-				<app-form-field-error [error]="vm().dniError" />
-			</div>
-
-			<div class="field">
-				<label for="contrasena">{{
-					vm().isEditing ? 'Nueva Contraseña' : 'Contraseña *'
-				}}</label>
-				<p-password
-					id="contrasena"
-					[ngModel]="vm().formData.contrasena"
-					(ngModelChange)="onFieldChange('contrasena', $event)"
-					[placeholder]="
-						vm().isEditing ? 'Dejar vacío para mantener' : 'Ingrese contrasena'
-					"
-					[toggleMask]="true"
-					[feedback]="false"
-					[style]="{ width: '100%' }"
-					[inputStyle]="{ width: '100%' }"
-				/>
-			</div>
-
-			<div class="field">
-				<label for="nombres">Nombres *</label>
-				<input
-					id="nombres"
-					type="text"
-					pInputText
-					[ngModel]="vm().formData.nombres"
-					(ngModelChange)="onFieldChange('nombres', $event)"
-					placeholder="Nombres del usuario"
-				/>
-			</div>
-
-			<div class="field">
-				<label for="apellidos">Apellidos *</label>
-				<input
-					id="apellidos"
-					type="text"
-					pInputText
-					[ngModel]="vm().formData.apellidos"
-					(ngModelChange)="onFieldChange('apellidos', $event)"
-					placeholder="Apellidos del usuario"
-				/>
-			</div>
-
-			<div class="field">
-				<label for="correo">Correo</label>
-				<input
-					id="correo"
-					type="email"
-					pInputText
-					[ngModel]="vm().formData.correo"
-					(ngModelChange)="onFieldChange('correo', $event)"
-					placeholder="correo@ejemplo.com"
-					[class.ng-invalid]="vm().correoError"
-					[class.ng-dirty]="vm().formData.correo"
-				/>
-				<app-form-field-error [error]="vm().correoError" />
-			</div>
-
-			<div class="field">
-				<label for="telefono">Telefono</label>
-				<input
-					id="telefono"
-					type="text"
-					pInputText
-					[ngModel]="vm().formData.telefono"
-					(ngModelChange)="onFieldChange('telefono', $event)"
-					placeholder="999999999"
-				/>
-			</div>
-
-			@if (vm().isEstudiante) {
 				<div class="field">
-					<label for="correoApoderado">Correo del Apoderado</label>
+					<label for="nombres">Nombres *</label>
 					<input
-						id="correoApoderado"
+						id="nombres"
+						type="text"
+						pInputText
+						[ngModel]="vm().formData.nombres"
+						(ngModelChange)="onFieldChange('nombres', $event)"
+						placeholder="Nombres del usuario"
+					/>
+				</div>
+
+				<div class="field">
+					<label for="apellidos">Apellidos *</label>
+					<input
+						id="apellidos"
+						type="text"
+						pInputText
+						[ngModel]="vm().formData.apellidos"
+						(ngModelChange)="onFieldChange('apellidos', $event)"
+						placeholder="Apellidos del usuario"
+					/>
+				</div>
+
+				<div class="field">
+					<label for="correo">Correo</label>
+					<input
+						id="correo"
 						type="email"
 						pInputText
-						[ngModel]="vm().formData.correoApoderado"
-						(ngModelChange)="onFieldChange('correoApoderado', $event)"
+						[ngModel]="vm().formData.correo"
+						(ngModelChange)="onFieldChange('correo', $event)"
 						placeholder="correo@ejemplo.com"
-						[class.ng-invalid]="vm().correoApoderadoError"
-						[class.ng-dirty]="vm().formData.correoApoderado"
+						[class.ng-invalid]="vm().correoError"
+						[class.ng-dirty]="vm().formData.correo"
 					/>
-					<app-form-field-error [error]="vm().correoApoderadoError" />
+					<app-form-field-error [error]="vm().correoError" />
 				</div>
-			}
 
-			@if (vm().isEditing) {
-				<div class="field full-width">
-					<label for="estado">Estado</label>
-					<div class="estado-switch">
-						<p-toggleswitch
-							id="estado"
-							[ngModel]="vm().formData.estado"
-							(ngModelChange)="onFieldChange('estado', $event)"
+				<div class="field">
+					<label for="telefono">Telefono</label>
+					<input
+						id="telefono"
+						type="text"
+						pInputText
+						[ngModel]="vm().formData.telefono"
+						(ngModelChange)="onFieldChange('telefono', $event)"
+						placeholder="999999999"
+					/>
+				</div>
+
+				@if (vm().isEstudiante) {
+					<div class="field">
+						<label for="correoApoderado">Correo del Apoderado</label>
+						<input
+							id="correoApoderado"
+							type="email"
+							pInputText
+							[ngModel]="vm().formData.correoApoderado"
+							(ngModelChange)="onFieldChange('correoApoderado', $event)"
+							placeholder="correo@ejemplo.com"
+							[class.ng-invalid]="vm().correoApoderadoError"
+							[class.ng-dirty]="vm().formData.correoApoderado"
 						/>
-						<span>{{ vm().formData.estado ? 'Activo' : 'Inactivo' }}</span>
+						<app-form-field-error [error]="vm().correoApoderadoError" />
 					</div>
-				</div>
-			}
-		</div>
-	</div>
+				}
 
-	<ng-template #footer>
-		<div class="dialog-footer">
-			<button
-				pButton
-				label="Cancelar"
-				icon="pi pi-times"
-				class="p-button-text"
-				(click)="hideDialog()"
-				[pt]="{
-					root: {
-						'aria-label': 'Cancelar',
-					},
-				}"
-			></button>
-			<button
-				pButton
-				label="Guardar"
-				icon="pi pi-check"
-				class="p-button-success"
-				(click)="saveUsuario()"
-				[disabled]="!vm().isFormValid"
-				[pt]="{
-					root: {
-						'aria-label': 'Guardar',
-					},
-				}"
-			></button>
+				@if (vm().isEditing) {
+					<div class="field full-width">
+						<label for="estado">Estado</label>
+						<div class="estado-switch">
+							<p-toggleswitch
+								id="estado"
+								[ngModel]="vm().formData.estado"
+								(ngModelChange)="onFieldChange('estado', $event)"
+							/>
+							<span>{{ vm().formData.estado ? 'Activo' : 'Inactivo' }}</span>
+						</div>
+					</div>
+				}
+			</div>
 		</div>
-	</ng-template>
-</p-dialog>
 
-<!-- Confirm Dialog -->
-<p-confirmDialog />
+		<ng-template #footer>
+			<div class="dialog-footer">
+				<button
+					pButton
+					label="Cancelar"
+					icon="pi pi-times"
+					class="p-button-text"
+					(click)="hideDialog()"
+					[pt]="{
+						root: {
+							'aria-label': 'Cancelar',
+						},
+					}"
+				></button>
+				<button
+					pButton
+					label="Guardar"
+					icon="pi pi-check"
+					class="p-button-success"
+					(click)="saveUsuario()"
+					[disabled]="!vm().isFormValid"
+					[pt]="{
+						root: {
+							'aria-label': 'Guardar',
+						},
+					}"
+				></button>
+			</div>
+		</ng-template>
+	</p-dialog>
+}
+
+<!-- Confirm Dialog - SIEMPRE en el DOM (no usar @if para evitar timing issues) -->
+<p-confirmDialog (onHide)="onConfirmDialogHide()" />

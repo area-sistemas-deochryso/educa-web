@@ -21,6 +21,8 @@ import { TagModule } from 'primeng/tag';
 import { ToggleSwitch } from 'primeng/toggleswitch';
 import { TooltipModule } from 'primeng/tooltip';
 import { UsuariosFacade } from './usuarios.facade';
+import { UsuariosStatsSkeletonComponent } from './components/usuarios-stats-skeleton/usuarios-stats-skeleton.component';
+import { UsuariosTableSkeletonComponent } from './components/usuarios-table-skeleton/usuarios-table-skeleton.component';
 
 /**
  * Componente Page para administración de usuarios
@@ -47,6 +49,8 @@ import { UsuariosFacade } from './usuarios.facade';
 		ConfirmDialogModule,
 		FormFieldErrorComponent,
 		TableLoadingDirective,
+		UsuariosStatsSkeletonComponent,
+		UsuariosTableSkeletonComponent,
 	],
 	providers: [ConfirmationService],
 	templateUrl: './usuarios.component.html',
@@ -119,6 +123,16 @@ export class UsuariosComponent implements OnInit, AfterViewInit {
 		this.facade.editFromDetail();
 	}
 
+	/**
+	 * Handler para sincronizar estado del drawer
+	 * Se dispara cuando se cierra por cualquier medio
+	 */
+	onDrawerVisibleChange(visible: boolean): void {
+		if (!visible) {
+			this.facade.closeDetail();
+		}
+	}
+
 	// ============ Edit Dialog ============
 
 	openNew(): void {
@@ -137,6 +151,20 @@ export class UsuariosComponent implements OnInit, AfterViewInit {
 		this.facade.saveUsuario();
 	}
 
+	/**
+	 * Handler para sincronizar estado del dialog
+	 * Se dispara cuando el dialog se cierra por cualquier medio:
+	 * - Clic en X
+	 * - Clic fuera (backdrop)
+	 * - ESC
+	 * - Botón cancelar
+	 */
+	onDialogVisibleChange(visible: boolean): void {
+		if (!visible) {
+			this.facade.hideDialog();
+		}
+	}
+
 	// ============ Form Field Updates ============
 
 	onFieldChange(field: string, value: unknown): void {
@@ -147,6 +175,10 @@ export class UsuariosComponent implements OnInit, AfterViewInit {
 
 	deleteUsuario(usuario: UsuarioLista): void {
 		const header = 'Confirmar Eliminación';
+
+		// ✅ Abrir estado ANTES de mostrar el diálogo
+		this.facade.openConfirmDialog();
+
 		this.confirmationService.confirm({
 			message: `¿Está seguro de eliminar al usuario "${usuario.nombreCompleto}"?`,
 			header,
@@ -156,13 +188,23 @@ export class UsuariosComponent implements OnInit, AfterViewInit {
 			acceptButtonStyleClass: 'p-button-danger',
 			accept: () => {
 				this.facade.deleteUsuario(usuario);
+				// No cerrar aquí, se cierra en onConfirmDialogHide
+			},
+			reject: () => {
+				// No cerrar aquí, se cierra en onConfirmDialogHide
 			},
 		});
+
+		// Fix aria después de que el diálogo se haya renderizado
 		this.fixConfirmDialogAria(header);
 	}
 
 	toggleEstado(usuario: UsuarioLista): void {
 		const header = usuario.estado ? 'Desactivar Usuario' : 'Activar Usuario';
+
+		// ✅ Abrir estado ANTES de mostrar el diálogo
+		this.facade.openConfirmDialog();
+
 		this.confirmationService.confirm({
 			message: `¿Está seguro de ${usuario.estado ? 'desactivar' : 'activar'} al usuario "${usuario.nombreCompleto}"?`,
 			header,
@@ -172,8 +214,14 @@ export class UsuariosComponent implements OnInit, AfterViewInit {
 			acceptButtonStyleClass: usuario.estado ? 'p-button-warning' : 'p-button-success',
 			accept: () => {
 				this.facade.toggleEstado(usuario);
+				// No cerrar aquí, se cierra en onConfirmDialogHide
+			},
+			reject: () => {
+				// No cerrar aquí, se cierra en onConfirmDialogHide
 			},
 		});
+
+		// Fix aria después de que el diálogo se haya renderizado
 		this.fixConfirmDialogAria(header);
 	}
 
@@ -185,5 +233,13 @@ export class UsuariosComponent implements OnInit, AfterViewInit {
 				dialog.setAttribute('aria-label', header);
 			}
 		});
+	}
+
+	/**
+	 * Handler para sincronizar estado del confirm dialog
+	 * Se dispara cuando se cierra por cualquier medio
+	 */
+	onConfirmDialogHide(): void {
+		this.facade.closeConfirmDialog();
 	}
 }

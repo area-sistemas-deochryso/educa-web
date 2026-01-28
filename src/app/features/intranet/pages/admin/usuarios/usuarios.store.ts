@@ -1,12 +1,12 @@
-import { Injectable, computed, signal } from '@angular/core';
 import {
-	UsuarioLista,
-	UsuarioDetalle,
-	UsuariosEstadisticas,
-	RolUsuarioAdmin,
-	CrearUsuarioRequest,
 	ActualizarUsuarioRequest,
+	CrearUsuarioRequest,
+	RolUsuarioAdmin,
+	UsuarioDetalle,
+	UsuarioLista,
+	UsuariosEstadisticas,
 } from '@core/services';
+import { Injectable, computed, signal } from '@angular/core';
 
 /**
  * Store para gestión de usuarios
@@ -20,14 +20,22 @@ export class UsuariosStore {
 	private readonly _loading = signal(false);
 	private readonly _error = signal<string | null>(null);
 
+	// Performance optimization - Skeleton screens
+	private readonly _showSkeletons = signal(true);
+	private readonly _statsReady = signal(false);
+	private readonly _tableReady = signal(false);
+
 	// UI State
 	private readonly _dialogVisible = signal(false);
 	private readonly _detailDrawerVisible = signal(false);
+	private readonly _confirmDialogVisible = signal(false);
 	private readonly _isEditing = signal(false);
 
 	// Form State
 	private readonly _selectedUsuario = signal<UsuarioDetalle | null>(null);
-	private readonly _formData = signal<Partial<CrearUsuarioRequest & ActualizarUsuarioRequest>>({});
+	private readonly _formData = signal<Partial<CrearUsuarioRequest & ActualizarUsuarioRequest>>(
+		{},
+	);
 
 	// Filters
 	private readonly _searchTerm = signal('');
@@ -39,6 +47,10 @@ export class UsuariosStore {
 	readonly estadisticas = this._estadisticas.asReadonly();
 	readonly loading = this._loading.asReadonly();
 	readonly error = this._error.asReadonly();
+
+	readonly showSkeletons = this._showSkeletons.asReadonly();
+	readonly statsReady = this._statsReady.asReadonly();
+	readonly tableReady = this._tableReady.asReadonly();
 
 	readonly dialogVisible = this._dialogVisible.asReadonly();
 	readonly detailDrawerVisible = this._detailDrawerVisible.asReadonly();
@@ -140,6 +152,10 @@ export class UsuariosStore {
 		searchTerm: this._searchTerm(),
 		filterRol: this._filterRol(),
 		filterEstado: this._filterEstado(),
+		confirmDialogVisible: this._confirmDialogVisible(),
+		showSkeletons: this._showSkeletons(),
+		statsReady: this._statsReady(),
+		tableReady: this._tableReady(),
 	}));
 
 	// ============ Comandos de mutación ============
@@ -161,9 +177,25 @@ export class UsuariosStore {
 		this._error.set(error);
 	}
 
+	setShowSkeletons(show: boolean): void {
+		this._showSkeletons.set(show);
+	}
+
+	setStatsReady(ready: boolean): void {
+		this._statsReady.set(ready);
+	}
+
+	setTableReady(ready: boolean): void {
+		this._tableReady.set(ready);
+	}
+
 	// UI mutations
 	setDialogVisible(visible: boolean): void {
 		this._dialogVisible.set(visible);
+	}
+
+	setConfirmDialogVisible(visible: boolean): void {
+		this._confirmDialogVisible.set(visible);
 	}
 
 	setDetailDrawerVisible(visible: boolean): void {
@@ -254,5 +286,13 @@ export class UsuariosStore {
 
 	closeDetailDrawer(): void {
 		this._detailDrawerVisible.set(false);
+	}
+
+	openConfirmDialogVisible(): void {
+		this._confirmDialogVisible.set(true);
+	}
+
+	closeConfirmDialogVisible(): void {
+		this._confirmDialogVisible.set(false);
 	}
 }

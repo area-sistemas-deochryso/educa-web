@@ -788,3 +788,9 @@
 		grid-template-columns: 1fr;
 	}
 }
+
+:host ::ng-deep {
+	.p-paginator-current {
+		color: var(--intranet-soft-text-color);
+	}
+}
