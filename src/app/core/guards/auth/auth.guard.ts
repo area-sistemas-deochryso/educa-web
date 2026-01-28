@@ -14,7 +14,4 @@ export const authGuard: CanActivateFn = () => {
 
 	// No autenticado, redirigir al login
 	return router.createUrlTree(['/intranet/login']);
-
-	//router.navigate(['/intranet/login']);
-	return false;
 };

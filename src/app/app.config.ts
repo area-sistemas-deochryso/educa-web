@@ -4,7 +4,11 @@ import {
 	LOCALE_ID,
 	provideBrowserGlobalErrorListeners,
 } from '@angular/core';
-import { PreloadAllModules, withPreloading } from '@angular/router';
+import {
+	PreloadAllModules,
+	withEnabledBlockingInitialNavigation,
+	withPreloading,
+} from '@angular/router';
 import { authInterceptor, errorInterceptor } from '@core/interceptors';
 import { provideClientHydration, withEventReplay } from '@angular/platform-browser';
 import { provideHttpClient, withFetch, withInterceptors } from '@angular/common/http';
@@ -24,7 +28,11 @@ registerLocaleData(localeEs, 'es-PE');
 export const appConfig: ApplicationConfig = {
 	providers: [
 		provideBrowserGlobalErrorListeners(),
-		provideRouter(routes, withPreloading(PreloadAllModules)),
+		provideRouter(
+			routes,
+			withPreloading(PreloadAllModules),
+			withEnabledBlockingInitialNavigation(),
+		),
 		provideHttpClient(withFetch(), withInterceptors([authInterceptor, errorInterceptor])),
 		provideAnimationsAsync(),
 		providePrimeNG({

@@ -37,10 +37,7 @@ export const permisosGuard: CanActivateFn = async (route: ActivatedRouteSnapshot
 	if (!permisosLoaded) {
 		logger.tagged('PermisosGuard', 'log', 'Fallo al cargar permisos, redirigiendo a login');
 		authService.logout();
-		router.createUrlTree(['/intranet/login']);
-
-		//router.navigate(['/intranet/login']);
-		return false;
+		return router.createUrlTree(['/intranet/login']);
 	}
 
 	// Verificar si tiene permiso
@@ -58,10 +55,7 @@ export const permisosGuard: CanActivateFn = async (route: ActivatedRouteSnapshot
 			'Acceso denegado',
 			'No cuenta con los permisos suficientes para acceder a esta vista.',
 		);
-		router.createUrlTree(['/intranet/login']);
-
-		//router.navigate(['/intranet']);
-		return false;
+		return router.createUrlTree(['/intranet']);
 	}
 
 	logger.tagged('PermisosGuard', 'log', 'Acceso permitido a:', fullPath);
