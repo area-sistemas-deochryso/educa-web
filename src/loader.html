@@ -4,7 +4,42 @@
 		<meta charset="utf-8" />
 		<title>EducaWeb</title>
 		<meta name="viewport" content="width=device-width, initial-scale=1" />
+		<title>Intranet</title>
+		<base href="/" />
+		<!-- Preload critical fonts (self-hosted for faster loading) -->
+		<link
+			rel="preload"
+			href="/fonts/inter-latin.woff2"
+			as="font"
+			type="font/woff2"
+			crossorigin
+		/>
+		<link
+			rel="preload"
+			href="/fonts/league-spartan-latin.woff2"
+			as="font"
+			type="font/woff2"
+			crossorigin
+		/>
+		<link
+			rel="preload"
+			href="primeicons/fonts/primeicons.woff2"
+			as="font"
+			type="font/woff2"
+			crossorigin
+		/>
 
+		<!-- Preload critical image -->
+		<link
+			rel="preload"
+			href="/images/logo.avif"
+			as="image"
+			type="image/avif"
+			fetchpriority="high"
+		/>
+
+		<!-- Favicon -->
+		<link rel="icon" type="image/png" href="images/common/icono.png" />
 		<style>
 			/* Reset mínimo */
 			html,
@@ -61,10 +96,7 @@
 	<body>
 		<!-- Angular se montará aquí cuando cargue -->
 		<app-root>
-			<div class="loader">
-				<div class="spinner"></div>
-				<div class="text" aria-live="polite">Cargando…</div>
-			</div>
+			<div id="boot-loader" class="loader">Cargando…</div>
 		</app-root>
 
 		<!-- Carga normal de tu bundle Angular -->
