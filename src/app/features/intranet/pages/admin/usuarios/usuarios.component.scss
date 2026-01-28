@@ -527,6 +527,11 @@
 		color: var(--text-color) !important;
 	}
 
+	.p-button-success,
+	.p-button-success:hover {
+		color: black;
+	}
+
 	.p-button-text {
 		color: var(--text-color);
 
@@ -599,5 +604,15 @@
 @media (max-width: 480px) {
 	.stats-section {
 		grid-template-columns: 1fr;
+	}
+}
+
+/*? */
+:host ::ng-deep {
+	.p-select-label.p-placeholder {
+		color: var(--intranet-soft-text-color);
+	}
+	.p-paginator-current {
+		color: var(--intranet-soft-text-color);
 	}
 }

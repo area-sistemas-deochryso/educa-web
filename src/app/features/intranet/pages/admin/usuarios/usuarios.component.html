@@ -16,6 +16,11 @@
 			icon="pi pi-refresh"
 			class="p-button-outlined"
 			(click)="refresh()"
+			[pt]="{
+				root: {
+					'aria-label': 'Refrescar',
+				},
+			}"
 		></button>
 	</header>
 
@@ -173,6 +178,11 @@
 			icon="pi pi-filter-slash"
 			class="p-button-text"
 			(click)="clearFilters()"
+			[pt]="{
+				root: {
+					'aria-label': 'Limpiar',
+				},
+			}"
 		></button>
 
 		<div class="filter-spacer"></div>
@@ -183,6 +193,11 @@
 			icon="pi pi-plus"
 			class="p-button-success"
 			(click)="openNew()"
+			[pt]="{
+				root: {
+					'aria-label': 'Nuevo Usuario',
+				},
+			}"
 		></button>
 	</section>
 
@@ -265,6 +280,11 @@
 								pTooltip="Ver detalles"
 								aria-label="Ver detalles"
 								(click)="openDetail(usuario)"
+								[pt]="{
+									root: {
+										'aria-label': 'Ver detalles',
+									},
+								}"
 							></button>
 							<button
 								pButton
@@ -273,6 +293,11 @@
 								pTooltip="Editar"
 								aria-label="Editar"
 								(click)="editUsuario(usuario)"
+								[pt]="{
+									root: {
+										'aria-label': 'Editar',
+									},
+								}"
 							></button>
 							<button
 								pButton
@@ -281,8 +306,14 @@
 								[class.p-button-warning]="usuario.estado"
 								[class.p-button-success]="!usuario.estado"
 								[pTooltip]="usuario.estado ? 'Desactivar' : 'Activar'"
+								tooltipPosition="left"
 								[attr.aria-label]="usuario.estado ? 'Desactivar' : 'Activar'"
 								(click)="toggleEstado(usuario)"
+								[pt]="{
+									root: {
+										'aria-label': `${usuario.estado ? 'Desactivar' : 'Activar'}`,
+									},
+								}"
 							></button>
 						</div>
 					</td>
@@ -394,12 +425,22 @@
 				icon="pi pi-times"
 				class="p-button-text"
 				(click)="closeDetail()"
+				[pt]="{
+					root: {
+						'aria-label': 'Cerrar',
+					},
+				}"
 			></button>
 			<button
 				pButton
 				label="Editar"
 				icon="pi pi-pencil"
 				class="p-button-primary"
+				[pt]="{
+					root: {
+						'aria-label': 'Editar',
+					},
+				}"
 				(click)="editFromDetail()"
 			></button>
 		</div>
@@ -414,6 +455,7 @@
 	[style]="{ width: '600px' }"
 	[draggable]="false"
 	[resizable]="false"
+	[header]="vm().isEditing ? 'Editar Usuario' : 'Nuevo Usuario'"
 	class="edit-usuario-dialog"
 >
 	<div class="dialog-content">
@@ -558,6 +600,11 @@
 				icon="pi pi-times"
 				class="p-button-text"
 				(click)="hideDialog()"
+				[pt]="{
+					root: {
+						'aria-label': 'Cancelar',
+					},
+				}"
 			></button>
 			<button
 				pButton
@@ -566,6 +613,11 @@
 				class="p-button-success"
 				(click)="saveUsuario()"
 				[disabled]="!vm().isFormValid"
+				[pt]="{
+					root: {
+						'aria-label': 'Guardar',
+					},
+				}"
 			></button>
 		</div>
 	</ng-template>

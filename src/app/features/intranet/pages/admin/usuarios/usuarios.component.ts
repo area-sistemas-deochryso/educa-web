@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, OnInit, inject } from '@angular/core';
+import { AfterViewInit, ChangeDetectionStrategy, Component, OnInit, inject } from '@angular/core';
 import { ROLES_USUARIOS_ADMIN, RolUsuarioAdmin, UsuarioLista } from '@core/services';
 
 import { AdminUtilsService } from '@shared/services';
@@ -53,7 +53,7 @@ import { UsuariosFacade } from './usuarios.facade';
 	styleUrl: './usuarios.component.scss',
 	changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class UsuariosComponent implements OnInit {
+export class UsuariosComponent implements OnInit, AfterViewInit {
 	private facade = inject(UsuariosFacade);
 	private confirmationService = inject(ConfirmationService);
 	readonly adminUtils = inject(AdminUtilsService);
@@ -75,6 +75,10 @@ export class UsuariosComponent implements OnInit {
 
 	ngOnInit(): void {
 		this.facade.loadData();
+	}
+
+	ngAfterViewInit(): void {
+		this.fixConfirmDialogAria('Confirmación');
 	}
 
 	// ============ Data Loading ============
@@ -142,9 +146,10 @@ export class UsuariosComponent implements OnInit {
 	// ============ CRUD Operations ============
 
 	deleteUsuario(usuario: UsuarioLista): void {
+		const header = 'Confirmar Eliminación';
 		this.confirmationService.confirm({
 			message: `¿Está seguro de eliminar al usuario "${usuario.nombreCompleto}"?`,
-			header: 'Confirmar Eliminación',
+			header,
 			icon: 'pi pi-exclamation-triangle',
 			acceptLabel: 'Sí, eliminar',
 			rejectLabel: 'Cancelar',
@@ -153,12 +158,14 @@ export class UsuariosComponent implements OnInit {
 				this.facade.deleteUsuario(usuario);
 			},
 		});
+		this.fixConfirmDialogAria(header);
 	}
 
 	toggleEstado(usuario: UsuarioLista): void {
+		const header = usuario.estado ? 'Desactivar Usuario' : 'Activar Usuario';
 		this.confirmationService.confirm({
 			message: `¿Está seguro de ${usuario.estado ? 'desactivar' : 'activar'} al usuario "${usuario.nombreCompleto}"?`,
-			header: usuario.estado ? 'Desactivar Usuario' : 'Activar Usuario',
+			header,
 			icon: 'pi pi-question-circle',
 			acceptLabel: 'Sí',
 			rejectLabel: 'Cancelar',
@@ -166,6 +173,17 @@ export class UsuariosComponent implements OnInit {
 			accept: () => {
 				this.facade.toggleEstado(usuario);
 			},
+		});
+		this.fixConfirmDialogAria(header);
+	}
+
+	private fixConfirmDialogAria(header: string) {
+		setTimeout(() => {
+			const dialog = document.querySelector('p-dialog[role="alertdialog"]');
+
+			if (dialog) {
+				dialog.setAttribute('aria-label', header);
+			}
 		});
 	}
 }
