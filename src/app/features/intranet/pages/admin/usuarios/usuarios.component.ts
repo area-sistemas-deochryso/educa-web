@@ -1,25 +1,25 @@
-import { ChangeDetectionStrategy, Component, inject, OnInit } from '@angular/core';
-import { FormsModule } from '@angular/forms';
-import { CommonModule } from '@angular/common';
+import { ChangeDetectionStrategy, Component, OnInit, inject } from '@angular/core';
+import { ROLES_USUARIOS_ADMIN, RolUsuarioAdmin, UsuarioLista } from '@core/services';
 
-import { TableModule } from 'primeng/table';
+import { AdminUtilsService } from '@shared/services';
 import { ButtonModule } from 'primeng/button';
-import { DialogModule } from 'primeng/dialog';
-import { TooltipModule } from 'primeng/tooltip';
-import { TagModule } from 'primeng/tag';
-import { ProgressSpinnerModule } from 'primeng/progressspinner';
-import { InputTextModule } from 'primeng/inputtext';
-import { SelectModule } from 'primeng/select';
-import { DrawerModule } from 'primeng/drawer';
-import { ToggleSwitch } from 'primeng/toggleswitch';
-import { PasswordModule } from 'primeng/password';
-import { DatePickerModule } from 'primeng/datepicker';
+import { CommonModule } from '@angular/common';
 import { ConfirmDialogModule } from 'primeng/confirmdialog';
 import { ConfirmationService } from 'primeng/api';
-
-import { UsuarioLista, ROLES_USUARIOS_ADMIN, RolUsuarioAdmin } from '@core/services';
-import { AdminUtilsService } from '@shared/services';
+import { DatePickerModule } from 'primeng/datepicker';
+import { DialogModule } from 'primeng/dialog';
+import { DrawerModule } from 'primeng/drawer';
 import { FormFieldErrorComponent } from '@shared/components';
+import { FormsModule } from '@angular/forms';
+import { InputTextModule } from 'primeng/inputtext';
+import { PasswordModule } from 'primeng/password';
+import { ProgressSpinnerModule } from 'primeng/progressspinner';
+import { SelectModule } from 'primeng/select';
+import { TableLoadingDirective } from '@app/shared';
+import { TableModule } from 'primeng/table';
+import { TagModule } from 'primeng/tag';
+import { ToggleSwitch } from 'primeng/toggleswitch';
+import { TooltipModule } from 'primeng/tooltip';
 import { UsuariosFacade } from './usuarios.facade';
 
 /**
@@ -46,6 +46,7 @@ import { UsuariosFacade } from './usuarios.facade';
 		DatePickerModule,
 		ConfirmDialogModule,
 		FormFieldErrorComponent,
+		TableLoadingDirective,
 	],
 	providers: [ConfirmationService],
 	templateUrl: './usuarios.component.html',
@@ -62,9 +63,9 @@ export class UsuariosComponent implements OnInit {
 
 	// Options para dropdowns (sin Apoderado para admin)
 	readonly rolesDisponibles = ROLES_USUARIOS_ADMIN;
-	readonly rolesOptions = [{ label: 'Todos los roles', value: null as RolUsuarioAdmin | null }].concat(
-		ROLES_USUARIOS_ADMIN.map((r) => ({ label: r, value: r as RolUsuarioAdmin | null })),
-	);
+	readonly rolesOptions = [
+		{ label: 'Todos los roles', value: null as RolUsuarioAdmin | null },
+	].concat(ROLES_USUARIOS_ADMIN.map((r) => ({ label: r, value: r as RolUsuarioAdmin | null })));
 	readonly rolesSelectOptions = ROLES_USUARIOS_ADMIN.map((r) => ({ label: r, value: r }));
 	readonly estadoOptions = [
 		{ label: 'Todos', value: null },
