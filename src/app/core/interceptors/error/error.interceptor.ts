@@ -1,7 +1,8 @@
-import { HttpInterceptorFn, HttpErrorResponse } from '@angular/common/http';
-import { inject } from '@angular/core';
+import { HttpErrorResponse, HttpInterceptorFn } from '@angular/common/http';
 import { catchError, throwError } from 'rxjs';
+
 import { ErrorHandlerService } from '@core/services/error';
+import { inject } from '@angular/core';
 import { logger } from '@core/helpers';
 
 export const errorInterceptor: HttpInterceptorFn = (req, next) => {
@@ -9,12 +10,11 @@ export const errorInterceptor: HttpInterceptorFn = (req, next) => {
 
 	return next(req).pipe(
 		catchError((error: HttpErrorResponse) => {
-			logger.error('[ErrorInterceptor] HTTP Error:', error.status, req.url);
-
 			// No procesar errores de login (se manejan localmente)
 			if (req.url.includes('/login') || req.url.includes('/verificar')) {
 				return throwError(() => error);
 			}
+			logger.error('[ErrorInterceptor] HTTP Error:', error.status, req.url);
 
 			// Manejar error centralizado
 			errorHandler.handleHttpError(error, {
