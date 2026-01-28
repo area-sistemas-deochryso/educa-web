@@ -10,7 +10,12 @@
 				(onClick)="onDescargarPdf()"
 				pTooltip="Descargar PDF de asistencia del día"
 				tooltipPosition="top"
-				aria-label="Descargar PDF de asistencia del día"
+				[aria-label]="'Descargar PDF de asistencia del día'"
+				[pt]="{
+					root: {
+						'aria-label': 'Descargar PDF de asistencia del día',
+					},
+				}"
 			/>
 			<h3>Estadísticas del día - {{ estadisticas()!.fecha | date: 'EEEE d MMMM yyyy' }}</h3>
 		</div>
