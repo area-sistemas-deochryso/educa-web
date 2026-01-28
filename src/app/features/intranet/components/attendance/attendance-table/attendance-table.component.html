@@ -10,7 +10,7 @@
 						(ngModelChange)="onHijoChange($event)"
 						optionLabel="label"
 						optionValue="value"
-						styleClass="hijo-select"
+						class="hijo-select"
 						[style]="{ minWidth: '200px' }"
 						[filter]="true"
 						filterBy="label"
@@ -45,14 +45,14 @@
 			(ngModelChange)="onMonthChange($event)"
 			optionLabel="label"
 			optionValue="value"
-			styleClass="month-select"
+			class="month-select"
 			[filter]="true"
 			filterBy="label"
 			filterPlaceholder="Buscar mes..."
 		/>
 	</div>
 
-	<p-table [value]="table().weeks" styleClass="attendance-table double-entry">
+	<p-table [value]="table().weeks" class="attendance-table double-entry">
 		<ng-template pTemplate="header">
 			<tr>
 				<th class="week-col header-cell"></th>

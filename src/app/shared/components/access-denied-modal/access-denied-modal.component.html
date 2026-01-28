@@ -5,7 +5,7 @@
 	[dismissableMask]="false"
 	[draggable]="false"
 	[resizable]="false"
-	styleClass="access-denied-dialog"
+	class="access-denied-dialog"
 	[style]="{ width: '400px' }"
 >
 	<ng-template #header>
@@ -27,11 +27,6 @@
 	</div>
 
 	<ng-template #footer>
-		<p-button
-			label="Entendido"
-			icon="pi pi-check"
-			(onClick)="close()"
-			styleClass="p-button-sm"
-		/>
+		<p-button label="Entendido" icon="pi pi-check" (onClick)="close()" class="p-button-sm" />
 	</ng-template>
 </p-dialog>

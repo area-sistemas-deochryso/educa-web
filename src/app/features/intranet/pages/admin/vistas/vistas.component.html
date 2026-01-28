@@ -128,7 +128,7 @@
 				[rowsPerPageOptions]="[5, 10, 25, 50]"
 				[showCurrentPageReport]="true"
 				currentPageReportTemplate="Mostrando {first} a {last} de {totalRecords} vistas"
-				styleClass="p-datatable-sm"
+				class="p-datatable-sm"
 			>
 				<ng-template #header>
 					<tr>
@@ -185,7 +185,9 @@
 									[class.p-button-warning]="vista.estado === 1"
 									[class.p-button-success]="vista.estado !== 1"
 									[pTooltip]="vista.estado === 1 ? 'Desactivar' : 'Activar'"
-									[attr.aria-label]="vista.estado === 1 ? 'Desactivar' : 'Activar'"
+									[attr.aria-label]="
+										vista.estado === 1 ? 'Desactivar' : 'Activar'
+									"
 									(click)="toggleEstado(vista)"
 								></button>
 								<button
@@ -225,7 +227,7 @@
 	[style]="{ width: '500px' }"
 	[draggable]="false"
 	[resizable]="false"
-	styleClass="edit-vista-dialog"
+	class="edit-vista-dialog"
 >
 	<div class="dialog-content">
 		<div class="form-fields">

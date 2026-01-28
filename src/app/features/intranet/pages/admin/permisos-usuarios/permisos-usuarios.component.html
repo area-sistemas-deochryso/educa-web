@@ -128,7 +128,7 @@
 				[rowsPerPageOptions]="[5, 10, 25, 50]"
 				[showCurrentPageReport]="true"
 				currentPageReportTemplate="Mostrando {first} a {last} de {totalRecords} usuarios"
-				styleClass="p-datatable-sm"
+				class="p-datatable-sm"
 			>
 				<ng-template #header>
 					<tr>
@@ -336,7 +336,7 @@
 	[style]="{ width: '900px', maxHeight: '90vh' }"
 	[draggable]="false"
 	[resizable]="false"
-	styleClass="edit-permisos-dialog"
+	class="edit-permisos-dialog"
 >
 	<div class="dialog-content">
 		<!-- User Info Header -->
@@ -352,9 +352,7 @@
 						[severity]="adminUtils.getRolSeverity(selectedRol() || '')"
 					/>
 				</div>
-				<div class="vistas-count">
-					<i class="pi pi-check"></i> {{ vistasCountLabel() }}
-				</div>
+				<div class="vistas-count"><i class="pi pi-check"></i> {{ vistasCountLabel() }}</div>
 			</div>
 		} @else {
 			<div class="new-user-form">
