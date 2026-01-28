@@ -1,2 +1,2 @@
-/intranet/*   /app/features/intranet/index.html   200
-/*            /index.html                          200
+/intranet/*   /intranet/login/index.html   200
+/*            /index.html                  200
