@@ -51,6 +51,11 @@
 								"glob": "**/*",
 								"input": "public"
 							},
+							{
+								"glob": "loader.html",
+								"input": "src",
+								"output": "/"
+							},
 							"src/_redirects"
 						],
 						"styles": [
