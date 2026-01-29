@@ -1,0 +1,170 @@
+<p-dialog
+	[visible]="visible()"
+	(visibleChange)="onVisibleChange($event)"
+	[header]="isEditing() ? 'Editar Usuario' : 'Nuevo Usuario'"
+	[modal]="true"
+	[style]="{ width: '600px' }"
+	[draggable]="false"
+	[resizable]="false"
+	class="edit-usuario-dialog"
+>
+	<div class="dialog-content">
+		<div class="form-grid">
+			@if (!isEditing()) {
+				<div class="field full-width">
+					<label for="rol">Rol *</label>
+					<p-select
+						id="rol"
+						[options]="rolesSelectOptions"
+						[ngModel]="rolValue"
+						(ngModelChange)="onFieldChange('rol', $event)"
+						placeholder="Seleccione el rol"
+						[style]="{ width: '100%' }"
+					/>
+				</div>
+			}
+
+			<div class="field">
+				<label for="dni">DNI *</label>
+				<input
+					id="dni"
+					type="text"
+					pInputText
+					[ngModel]="formData().dni"
+					(ngModelChange)="onFieldChange('dni', $event)"
+					placeholder="12345678"
+					maxlength="8"
+					[class.ng-invalid]="errors().dniError"
+					[class.ng-dirty]="formData().dni"
+				/>
+				<app-form-field-error [error]="errors().dniError" />
+			</div>
+
+			<div class="field">
+				<label for="contrasena">{{ isEditing() ? 'Nueva Contraseña' : 'Contraseña *' }}</label>
+				<p-password
+					id="contrasena"
+					[ngModel]="formData().contrasena"
+					(ngModelChange)="onFieldChange('contrasena', $event)"
+					[placeholder]="isEditing() ? 'Dejar vacío para mantener' : 'Ingrese contrasena'"
+					[toggleMask]="true"
+					[feedback]="false"
+					[style]="{ width: '100%' }"
+					[inputStyle]="{ width: '100%' }"
+				/>
+			</div>
+
+			<div class="field">
+				<label for="nombres">Nombres *</label>
+				<input
+					id="nombres"
+					type="text"
+					pInputText
+					[ngModel]="formData().nombres"
+					(ngModelChange)="onFieldChange('nombres', $event)"
+					placeholder="Nombres del usuario"
+				/>
+			</div>
+
+			<div class="field">
+				<label for="apellidos">Apellidos *</label>
+				<input
+					id="apellidos"
+					type="text"
+					pInputText
+					[ngModel]="formData().apellidos"
+					(ngModelChange)="onFieldChange('apellidos', $event)"
+					placeholder="Apellidos del usuario"
+				/>
+			</div>
+
+			<div class="field">
+				<label for="correo">Correo</label>
+				<input
+					id="correo"
+					type="email"
+					pInputText
+					[ngModel]="formData().correo"
+					(ngModelChange)="onFieldChange('correo', $event)"
+					placeholder="correo@ejemplo.com"
+					[class.ng-invalid]="errors().correoError"
+					[class.ng-dirty]="formData().correo"
+				/>
+				<app-form-field-error [error]="errors().correoError" />
+			</div>
+
+			<div class="field">
+				<label for="telefono">Telefono</label>
+				<input
+					id="telefono"
+					type="text"
+					pInputText
+					[ngModel]="formData().telefono"
+					(ngModelChange)="onFieldChange('telefono', $event)"
+					placeholder="999999999"
+				/>
+			</div>
+
+			@if (isEstudiante) {
+				<div class="field">
+					<label for="correoApoderado">Correo del Apoderado</label>
+					<input
+						id="correoApoderado"
+						type="email"
+						pInputText
+						[ngModel]="formData().correoApoderado"
+						(ngModelChange)="onFieldChange('correoApoderado', $event)"
+						placeholder="correo@ejemplo.com"
+						[class.ng-invalid]="errors().correoApoderadoError"
+						[class.ng-dirty]="formData().correoApoderado"
+					/>
+					<app-form-field-error [error]="errors().correoApoderadoError" />
+				</div>
+			}
+
+			@if (isEditing()) {
+				<div class="field full-width">
+					<label for="estado">Estado</label>
+					<div class="estado-switch">
+						<p-toggleswitch
+							id="estado"
+							[ngModel]="formData().estado"
+							(ngModelChange)="onFieldChange('estado', $event)"
+						/>
+						<span>{{ formData().estado ? 'Activo' : 'Inactivo' }}</span>
+					</div>
+				</div>
+			}
+		</div>
+	</div>
+
+	<ng-template #footer>
+		<div class="dialog-footer">
+			<button
+				pButton
+				label="Cancelar"
+				icon="pi pi-times"
+				class="p-button-text"
+				(click)="onCancel()"
+				[pt]="{
+					root: {
+						'aria-label': 'Cancelar',
+					},
+				}"
+			></button>
+			<button
+				pButton
+				label="Guardar"
+				icon="pi pi-check"
+				class="p-button-success"
+				(click)="onSave()"
+				[disabled]="!isFormValid()"
+				[pt]="{
+					root: {
+						'aria-label': 'Guardar',
+					},
+				}"
+			></button>
+		</div>
+	</ng-template>
+</p-dialog>

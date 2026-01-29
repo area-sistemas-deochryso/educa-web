@@ -1,0 +1,124 @@
+<section
+	class="table-section"
+	appTableLoading
+	[loading]="loading()"
+	[freezeHeight]="true"
+	[minHeightPx]="420"
+	[blurPx]="2"
+>
+	<p-table
+		[value]="usuarios()"
+		[paginator]="true"
+		[rows]="10"
+		[rowsPerPageOptions]="[5, 10, 25, 50]"
+		[showCurrentPageReport]="true"
+		currentPageReportTemplate="Mostrando {first} a {last} de {totalRecords} usuarios"
+		class="p-datatable-sm"
+	>
+		<ng-template #header>
+			<tr>
+				<th style="width: 80px" pSortableColumn="id">ID <p-sortIcon field="id" /></th>
+				<th style="width: 100px" pSortableColumn="dni">DNI <p-sortIcon field="dni" /></th>
+				<th pSortableColumn="nombreCompleto">
+					NOMBRE <p-sortIcon field="nombreCompleto" />
+				</th>
+				<th style="width: 120px" pSortableColumn="rol">ROL <p-sortIcon field="rol" /></th>
+				<th style="width: 100px" pSortableColumn="estado">
+					ESTADO <p-sortIcon field="estado" />
+				</th>
+				<th style="width: 140px">ACCIONES</th>
+			</tr>
+		</ng-template>
+
+		<ng-template #body let-usuario>
+			<tr [class.row-inactive]="!usuario.estado">
+				<td class="text-center">
+					<span class="id-badge">{{ usuario.id }}</span>
+				</td>
+				<td>
+					<span class="dni-text">{{ usuario.dni }}</span>
+				</td>
+				<td>
+					<div class="user-cell">
+						<div class="user-avatar">
+							<i class="pi pi-user"></i>
+						</div>
+						<div class="user-info">
+							<span class="user-name">{{ usuario.nombreCompleto }}</span>
+							@if (usuario.correo) {
+								<span class="user-email">{{ usuario.correo }}</span>
+							}
+						</div>
+					</div>
+				</td>
+				<td>
+					<p-tag [value]="usuario.rol" [severity]="adminUtils.getRolSeverity(usuario.rol)" />
+				</td>
+				<td class="text-center">
+					<p-tag
+						[value]="usuario.estado ? 'Activo' : 'Inactivo'"
+						[severity]="adminUtils.getEstadoSeverity(usuario.estado)"
+					/>
+				</td>
+				<td>
+					<div class="actions">
+						<button
+							pButton
+							icon="pi pi-eye"
+							class="p-button-rounded p-button-text p-button-secondary"
+							pTooltip="Ver detalles"
+							aria-label="Ver detalles"
+							(click)="onViewDetail(usuario)"
+							[pt]="{
+								root: {
+									'aria-label': 'Ver detalles',
+								},
+							}"
+						></button>
+						<button
+							pButton
+							icon="pi pi-pencil"
+							class="p-button-rounded p-button-text p-button-info"
+							pTooltip="Editar"
+							aria-label="Editar"
+							(click)="onEdit(usuario)"
+							[pt]="{
+								root: {
+									'aria-label': 'Editar',
+								},
+							}"
+						></button>
+						<button
+							pButton
+							[icon]="usuario.estado ? 'pi pi-ban' : 'pi pi-check'"
+							class="p-button-rounded p-button-text"
+							[class.p-button-warning]="usuario.estado"
+							[class.p-button-success]="!usuario.estado"
+							[pTooltip]="usuario.estado ? 'Desactivar' : 'Activar'"
+							tooltipPosition="left"
+							[attr.aria-label]="usuario.estado ? 'Desactivar' : 'Activar'"
+							(click)="onToggleEstado(usuario)"
+							[pt]="{
+								root: {
+									'aria-label': `${usuario.estado ? 'Desactivar' : 'Activar'}`,
+								},
+							}"
+						></button>
+					</div>
+				</td>
+			</tr>
+		</ng-template>
+
+		<ng-template #emptymessage>
+			<tr>
+				<td colspan="6" class="empty-message">
+					<div class="empty-state">
+						<i class="pi pi-users"></i>
+						<p>No se encontraron usuarios</p>
+						<span>Intenta ajustar los filtros de busqueda</span>
+					</div>
+				</td>
+			</tr>
+		</ng-template>
+	</p-table>
+</section>

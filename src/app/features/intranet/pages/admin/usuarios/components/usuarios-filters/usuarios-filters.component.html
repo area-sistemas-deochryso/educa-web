@@ -1,0 +1,56 @@
+<section class="filters-section">
+	<div class="search-box">
+		<i class="pi pi-search"></i>
+		<input
+			type="text"
+			pInputText
+			placeholder="Buscar por nombre, DNI o correo..."
+			[ngModel]="searchTerm()"
+			(ngModelChange)="onSearchChange($event)"
+		/>
+	</div>
+
+	<p-select
+		[options]="options().rolesOptions"
+		[ngModel]="filterRol()"
+		(ngModelChange)="onFilterRolChange($event)"
+		placeholder="Todos los roles"
+		[style]="{ minWidth: '160px' }"
+	/>
+
+	<p-select
+		[options]="options().estadoOptions"
+		[ngModel]="filterEstado()"
+		(ngModelChange)="onFilterEstadoChange($event)"
+		placeholder="Estado"
+		[style]="{ minWidth: '140px' }"
+	/>
+
+	<button
+		pButton
+		label="Limpiar"
+		icon="pi pi-filter-slash"
+		class="p-button-text"
+		(click)="onClearFilters()"
+		[pt]="{
+			root: {
+				'aria-label': 'Limpiar',
+			},
+		}"
+	></button>
+
+	<div class="filter-spacer"></div>
+
+	<button
+		pButton
+		label="Nuevo Usuario"
+		icon="pi pi-plus"
+		class="p-button-success"
+		(click)="onNewUsuario()"
+		[pt]="{
+			root: {
+				'aria-label': 'Nuevo Usuario',
+			},
+		}"
+	></button>
+</section>

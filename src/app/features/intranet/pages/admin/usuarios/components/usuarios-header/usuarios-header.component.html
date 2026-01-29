@@ -1,0 +1,23 @@
+<header class="page-header">
+	<div class="header-left">
+		<div class="header-icon">
+			<i class="pi pi-users"></i>
+		</div>
+		<div class="header-text">
+			<h1>Administracion de Usuarios</h1>
+			<p>Gestiona todos los usuarios del sistema</p>
+		</div>
+	</div>
+	<button
+		pButton
+		label="Refrescar"
+		icon="pi pi-refresh"
+		class="p-button-outlined"
+		(click)="onRefresh()"
+		[pt]="{
+			root: {
+				'aria-label': 'Refrescar',
+			},
+		}"
+	></button>
+</header>

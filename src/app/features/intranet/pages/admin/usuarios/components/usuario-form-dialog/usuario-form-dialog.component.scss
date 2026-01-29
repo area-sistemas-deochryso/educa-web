@@ -1,0 +1,100 @@
+.dialog-content {
+	.form-grid {
+		display: grid;
+		grid-template-columns: 1fr 1fr;
+		gap: 1rem;
+
+		.field {
+			&.full-width {
+				grid-column: 1 / -1;
+			}
+
+			label {
+				display: block;
+				margin-bottom: 0.5rem;
+				font-weight: 500;
+				color: var(--text-color);
+			}
+
+			input,
+			:host ::ng-deep .p-inputtext {
+				width: 100%;
+			}
+
+			.p-error {
+				display: block;
+				margin-top: 0.35rem;
+				font-size: 0.8rem;
+				color: #e24c4c;
+			}
+
+			input.ng-invalid.ng-dirty {
+				border-color: #e24c4c;
+
+				&:focus {
+					border-color: #e24c4c;
+					box-shadow: 0 0 0 1px #e24c4c;
+				}
+			}
+
+			.estado-switch {
+				display: flex;
+				align-items: center;
+				gap: 0.75rem;
+
+				span {
+					font-weight: 500;
+				}
+			}
+		}
+	}
+}
+
+.dialog-footer {
+	display: flex;
+	justify-content: flex-end;
+	gap: 0.5rem;
+}
+
+:host ::ng-deep {
+	.edit-usuario-dialog {
+		.p-dialog-header {
+			background: var(--surface-ground);
+			color: var(--text-color);
+			border-bottom: 1px solid var(--surface-300);
+		}
+
+		.p-dialog-content {
+			padding: 1.5rem;
+			background: var(--surface-ground);
+		}
+
+		.p-dialog-footer {
+			background: var(--surface-ground);
+			border-top: 1px solid var(--surface-300);
+		}
+	}
+
+	.p-password {
+		width: 100%;
+
+		.p-password-input {
+			width: 100%;
+			background: transparent;
+			color: var(--text-color);
+			border-color: var(--surface-300);
+		}
+	}
+
+	.p-inputswitch.p-inputswitch-checked {
+		.p-inputswitch-slider {
+			background: var(--primary-color);
+		}
+	}
+}
+
+@media (max-width: 768px) {
+	.dialog-content .form-grid {
+		grid-template-columns: 1fr;
+	}
+}

@@ -1,0 +1,109 @@
+<p-drawer
+	[visible]="visible()"
+	(visibleChange)="onVisibleChange($event)"
+	position="right"
+	[style]="{ width: '450px' }"
+	[modal]="true"
+>
+	<ng-template pTemplate="header">
+		<div class="drawer-header">
+			<span>Detalles del Usuario</span>
+		</div>
+	</ng-template>
+
+	@if (usuario()) {
+		<div class="detail-content">
+			<div class="detail-avatar">
+				<i class="pi pi-user"></i>
+			</div>
+
+			<div class="detail-name">{{ usuario()!.nombreCompleto }}</div>
+
+			<p-tag
+				[value]="usuario()!.rol"
+				[severity]="adminUtils.getRolSeverity(usuario()!.rol)"
+			/>
+
+			<div class="detail-info">
+				<div class="info-item">
+					<span class="info-label">DNI</span>
+					<span class="info-value">{{ usuario()!.dni }}</span>
+				</div>
+				<div class="info-item">
+					<span class="info-label">Estado</span>
+					<p-tag
+						[value]="usuario()!.estado ? 'Activo' : 'Inactivo'"
+						[severity]="adminUtils.getEstadoSeverity(usuario()!.estado)"
+					/>
+				</div>
+				@if (usuario()!.correo) {
+					<div class="info-item">
+						<span class="info-label">Correo</span>
+						<span class="info-value">{{ usuario()!.correo }}</span>
+					</div>
+				}
+				@if (usuario()!.telefono) {
+					<div class="info-item">
+						<span class="info-label">Telefono</span>
+						<span class="info-value">{{ usuario()!.telefono }}</span>
+					</div>
+				}
+				@if (usuario()!.sedeNombre) {
+					<div class="info-item">
+						<span class="info-label">Sede</span>
+						<span class="info-value">{{ usuario()!.sedeNombre }}</span>
+					</div>
+				}
+				@if (usuario()!.grado) {
+					<div class="info-item">
+						<span class="info-label">Grado</span>
+						<span class="info-value">{{ usuario()!.grado }}</span>
+					</div>
+				}
+				@if (usuario()!.seccion) {
+					<div class="info-item">
+						<span class="info-label">Seccion</span>
+						<span class="info-value">{{ usuario()!.seccion }}</span>
+					</div>
+				}
+				@if (usuario()!.correoApoderado) {
+					<div class="info-item">
+						<span class="info-label">Correo del Apoderado</span>
+						<span class="info-value">{{ usuario()!.correoApoderado }}</span>
+					</div>
+				}
+				<div class="info-item">
+					<span class="info-label">Fecha de Registro</span>
+					<span class="info-value">{{ usuario()!.fechaRegistro | date: 'dd/MM/yyyy' }}</span>
+				</div>
+			</div>
+		</div>
+
+		<div class="drawer-footer">
+			<button
+				pButton
+				label="Cerrar"
+				icon="pi pi-times"
+				class="p-button-text"
+				(click)="onClose()"
+				[pt]="{
+					root: {
+						'aria-label': 'Cerrar',
+					},
+				}"
+			></button>
+			<button
+				pButton
+				label="Editar"
+				icon="pi pi-pencil"
+				class="p-button-primary"
+				[pt]="{
+					root: {
+						'aria-label': 'Editar',
+					},
+				}"
+				(click)="onEdit()"
+			></button>
+		</div>
+	}
+</p-drawer>
