@@ -13,6 +13,7 @@ import { AttendanceDataService } from '../../../services/attendance/attendance-d
 import { AttendanceLegendComponent } from '@app/features/intranet/components/attendance/attendance-legend/attendance-legend.component';
 import { AttendanceTable } from '../models/attendance.types';
 import { AttendanceTableComponent } from '../../../components/attendance/attendance-table/attendance-table.component';
+import { AttendanceTableSkeletonComponent } from '../../../components/attendance/attendance-table-skeleton/attendance-table-skeleton.component';
 import { EmptyStateComponent } from '../../../components/attendance/empty-state/empty-state.component';
 import { EstadisticasDiaComponent } from '../../../components/attendance/estadisticas-dia/estadisticas-dia.component';
 import { GradoSeccionSelectorComponent } from '../../../components/attendance/grado-seccion-selector/grado-seccion-selector.component';
@@ -29,6 +30,7 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 	standalone: true,
 	imports: [
 		AttendanceTableComponent,
+		AttendanceTableSkeletonComponent,
 		GradoSeccionSelectorComponent,
 		EstadisticasDiaComponent,
 		AsistenciaDiaListComponent,
@@ -46,6 +48,10 @@ export class AttendanceDirectorComponent implements OnInit {
 	// Estado
 	readonly loading = signal(false);
 	readonly downloadingPdf = signal(false);
+
+	// Progressive Rendering flags
+	readonly showSkeletons = signal(true);
+	readonly tableReady = signal(false);
 
 	// Grados y secciones
 	private readonly allGradosSecciones = signal<GradoSeccion[]>([]);
@@ -289,6 +295,7 @@ export class AttendanceDirectorComponent implements OnInit {
 		const estudiante = this.selectedEstudiante();
 		if (!estudiante) {
 			this.loading.set(false);
+			this.tableReady.set(true);
 			return;
 		}
 
@@ -303,6 +310,7 @@ export class AttendanceDirectorComponent implements OnInit {
 		this.ingresos.set(tables.ingresos);
 		this.salidas.set(tables.salidas);
 		this.loading.set(false);
+		this.tableReady.set(true);
 	}
 
 	onIngresosMonthChange(month: number): void {

@@ -16,7 +16,11 @@
 	/>
 
 	@if (viewMode() === 'mes') {
-		@if (estudiantes().length > 0) {
+		@if (showSkeletons() && !tableReady()) {
+			<!-- Skeleton mostrado inmediatamente con espacio reservado -->
+			<app-attendance-table-skeleton />
+			<app-attendance-table-skeleton />
+		} @else if (estudiantes().length > 0) {
 			<app-attendance-table
 				[table]="ingresos()"
 				[hijos]="estudiantesAsHijos()"

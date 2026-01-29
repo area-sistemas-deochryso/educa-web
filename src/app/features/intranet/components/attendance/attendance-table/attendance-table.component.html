@@ -15,6 +15,11 @@
 						[filter]="true"
 						filterBy="label"
 						filterPlaceholder="Buscar..."
+						[pt]="{
+							root: {
+								'aria-label': 'Seleccionar estudiante',
+							},
+						}"
 					/>
 				} @else {
 					{{ table().title }}
@@ -49,6 +54,11 @@
 			[filter]="true"
 			filterBy="label"
 			filterPlaceholder="Buscar mes..."
+			[pt]="{
+				root: {
+					'aria-label': 'Seleccionar mes',
+				},
+			}"
 		/>
 	</div>
 

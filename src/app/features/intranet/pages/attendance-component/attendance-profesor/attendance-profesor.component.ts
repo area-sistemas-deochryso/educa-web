@@ -13,6 +13,7 @@ import { AttendanceDataService } from '../../../services/attendance/attendance-d
 import { AttendanceLegendComponent } from '@app/features/intranet/components/attendance/attendance-legend/attendance-legend.component';
 import { AttendanceTable } from '../models/attendance.types';
 import { AttendanceTableComponent } from '../../../components/attendance/attendance-table/attendance-table.component';
+import { AttendanceTableSkeletonComponent } from '../../../components/attendance/attendance-table-skeleton/attendance-table-skeleton.component';
 import { EmptyStateComponent } from '../../../components/attendance/empty-state/empty-state.component';
 import { SalonSelectorComponent } from '../../../components/attendance/salon-selector/salon-selector.component';
 import { ViewMode } from '../../../components/attendance/attendance-header/attendance-header.component';
@@ -28,6 +29,7 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 	standalone: true,
 	imports: [
 		AttendanceTableComponent,
+		AttendanceTableSkeletonComponent,
 		SalonSelectorComponent,
 		AsistenciaDiaListComponent,
 		EmptyStateComponent,
@@ -45,6 +47,10 @@ export class AttendanceProfesorComponent implements OnInit {
 	// Estado
 	readonly loading = signal(false);
 	readonly nombreProfesor = this.userProfile.userName;
+
+	// Progressive Rendering flags
+	readonly showSkeletons = signal(true);
+	readonly tableReady = signal(false);
 
 	// Salones
 	private readonly allSalones = signal<SalonProfesor[]>([]);
@@ -264,6 +270,7 @@ export class AttendanceProfesorComponent implements OnInit {
 		const estudiante = this.selectedEstudiante();
 		if (!estudiante) {
 			this.loading.set(false);
+			this.tableReady.set(true);
 			return;
 		}
 
@@ -278,6 +285,7 @@ export class AttendanceProfesorComponent implements OnInit {
 		this.ingresos.set(tables.ingresos);
 		this.salidas.set(tables.salidas);
 		this.loading.set(false);
+		this.tableReady.set(true);
 	}
 
 	onIngresosMonthChange(month: number): void {

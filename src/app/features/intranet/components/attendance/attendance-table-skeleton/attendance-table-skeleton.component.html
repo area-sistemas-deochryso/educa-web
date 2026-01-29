@@ -1,0 +1,68 @@
+<div class="attendance-table-skeleton" style="min-height: 420px">
+	<!-- Header skeleton -->
+	<div class="table-skeleton__header">
+		<div class="header-section">
+			<app-skeleton-loader variant="text" width="200px" height="24px" />
+			<div class="status-summary-skeleton">
+				@for (_ of [1, 2, 3, 4]; track $index) {
+					<div class="summary-item-skeleton">
+						<app-skeleton-loader variant="rect" width="20px" height="20px" />
+						<app-skeleton-loader variant="text" width="30px" height="16px" />
+					</div>
+				}
+			</div>
+		</div>
+		<app-skeleton-loader variant="rect" width="150px" height="36px" />
+	</div>
+
+	<!-- Table header -->
+	<div class="table-skeleton__table-header">
+		<div class="week-col-skeleton">
+			<app-skeleton-loader variant="text" width="60px" height="16px" />
+		</div>
+		@for (_ of [1, 2, 3, 4, 5, 6, 7]; track $index) {
+			<div class="day-col-skeleton">
+				<app-skeleton-loader variant="text" width="24px" height="16px" />
+			</div>
+		}
+		<div class="total-col-skeleton">
+			<app-skeleton-loader variant="text" width="40px" height="16px" />
+		</div>
+	</div>
+
+	<!-- Table rows -->
+	@for (_ of [1, 2, 3, 4, 5]; track $index) {
+		<div class="table-skeleton__row">
+			<div class="week-col-skeleton">
+				<app-skeleton-loader variant="text" width="80px" height="16px" />
+			</div>
+			@for (__ of [1, 2, 3, 4, 5, 6, 7]; track $index) {
+				<div class="day-col-skeleton">
+					<div class="day-cell-skeleton">
+						<app-skeleton-loader variant="text" width="16px" height="12px" />
+						<app-skeleton-loader variant="text" width="16px" height="14px" />
+						<app-skeleton-loader variant="text" width="40px" height="10px" />
+					</div>
+				</div>
+			}
+			<div class="total-col-skeleton">
+				<app-skeleton-loader variant="text" width="20px" height="16px" />
+			</div>
+		</div>
+	}
+
+	<!-- Table footer -->
+	<div class="table-skeleton__footer">
+		<div class="week-col-skeleton">
+			<app-skeleton-loader variant="text" width="40px" height="16px" />
+		</div>
+		@for (_ of [1, 2, 3, 4, 5, 6, 7]; track $index) {
+			<div class="day-col-skeleton">
+				<app-skeleton-loader variant="text" width="20px" height="16px" />
+			</div>
+		}
+		<div class="total-col-skeleton">
+			<app-skeleton-loader variant="text" width="20px" height="16px" />
+		</div>
+	</div>
+</div>
