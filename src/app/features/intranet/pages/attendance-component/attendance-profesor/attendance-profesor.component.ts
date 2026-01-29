@@ -91,7 +91,7 @@ export class AttendanceProfesorComponent implements OnInit {
 	});
 
 	// Modo día/mes
-	readonly viewMode = signal<ViewMode>('mes');
+	readonly viewMode = signal<ViewMode>('dia');
 	readonly fechaDia = signal<Date>(new Date());
 	readonly estudiantesDia = signal<EstudianteAsistencia[]>([]);
 

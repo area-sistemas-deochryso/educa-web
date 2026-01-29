@@ -7,16 +7,16 @@
 				severity="danger"
 				[text]="true"
 				[rounded]="true"
-				(onClick)="onDescargarPdf()"
-				pTooltip="Descargar PDF de asistencia del día"
+				(onClick)="toggleMenu($event)"
+				pTooltip="Opciones de PDF"
 				tooltipPosition="top"
-				[aria-label]="'Descargar PDF de asistencia del día'"
 				[pt]="{
 					root: {
-						'aria-label': 'Descargar PDF de asistencia del día',
+						'aria-label': 'Opciones de PDF',
 					},
 				}"
 			/>
+			<p-menu #pdfMenu [model]="menuItems" [popup]="true" appendTo="body" />
 			<h2>Estadísticas del día - {{ estadisticas()!.fecha | date: 'EEEE d MMMM yyyy' }}</h2>
 		</div>
 		<div class="stats-grid">

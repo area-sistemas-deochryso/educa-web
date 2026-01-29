@@ -91,7 +91,7 @@ export class AttendanceDirectorComponent implements OnInit {
 	});
 
 	// Modo día/mes
-	readonly viewMode = signal<ViewMode>('mes');
+	readonly viewMode = signal<ViewMode>('dia');
 	readonly fechaDia = signal<Date>(new Date());
 	readonly estudiantesDia = signal<EstudianteAsistencia[]>([]);
 
@@ -432,8 +432,43 @@ export class AttendanceDirectorComponent implements OnInit {
 		this.loadAsistenciaDia();
 	}
 
-	// === DESCARGAR PDF ===
+	// === PDF ===
 
+	/**
+	 * Ver PDF en nueva ventana
+	 * - Abre el PDF en una nueva pestaña para visualización
+	 * - El usuario puede navegar por el PDF con los controles del navegador
+	 * - Nota: El nombre al descargar desde el visor será un hash (limitación del navegador)
+	 */
+	verPdfAsistenciaDia(): void {
+		const gs = this.selectedGradoSeccion();
+		if (!gs) return;
+
+		this.downloadingPdf.set(true);
+
+		this.asistenciaService
+			.descargarPdfAsistenciaDia(gs.grado, gs.seccion, this.fechaDia())
+			.pipe(
+				takeUntilDestroyed(this.destroyRef),
+				finalize(() => this.downloadingPdf.set(false)),
+			)
+			.subscribe({
+				next: (blob) => {
+					// Crear URL del blob y abrir en nueva pestaña para visualización
+					const url = window.URL.createObjectURL(blob);
+					window.open(url, '_blank');
+
+					// Cleanup después de que la ventana se abra
+					setTimeout(() => window.URL.revokeObjectURL(url), 100);
+				},
+			});
+	}
+
+	/**
+	 * Descargar PDF directamente
+	 * - Descarga el archivo con el nombre correcto
+	 * - No abre nueva ventana, solo descarga
+	 */
 	descargarPdfAsistenciaDia(): void {
 		const gs = this.selectedGradoSeccion();
 		if (!gs) return;
@@ -441,19 +476,28 @@ export class AttendanceDirectorComponent implements OnInit {
 		this.downloadingPdf.set(true);
 
 		this.asistenciaService
-			.descargarPdfAsistenciaDia(gs.grado, gs.seccion)
+			.descargarPdfAsistenciaDia(gs.grado, gs.seccion, this.fechaDia())
 			.pipe(
 				takeUntilDestroyed(this.destroyRef),
 				finalize(() => this.downloadingPdf.set(false)),
 			)
 			.subscribe({
 				next: (blob) => {
+					// Crear URL del blob
 					const url = window.URL.createObjectURL(blob);
+
+					// Crear elemento <a> para forzar descarga con nombre correcto
 					const a = document.createElement('a');
 					a.href = url;
-					const today = new Date().toISOString().split('T')[0];
-					a.download = `Asistencia_${gs.grado}_${gs.seccion}_${today}.pdf`;
+					const fechaStr = this.fechaDia().toISOString().split('T')[0];
+					a.download = `Asistencia_${gs.grado}_${gs.seccion}_${fechaStr}.pdf`;
+
+					// Trigger descarga
+					document.body.appendChild(a);
 					a.click();
+
+					// Cleanup
+					document.body.removeChild(a);
 					window.URL.revokeObjectURL(url);
 				},
 			});

@@ -46,7 +46,7 @@ export class AttendanceComponent {
 
 	readonly userRole = this.userProfile.userRole;
 	readonly loading = signal(false);
-	readonly selectedMode = signal<ViewMode>('mes');
+	readonly selectedMode = signal<ViewMode>('dia');
 
 	// Verificar rol válido y redirigir si es inesperado
 	constructor() {

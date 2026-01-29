@@ -14,7 +14,7 @@ export type ViewMode = 'mes' | 'dia';
 export class AttendanceHeaderComponent {
 	loading = input<boolean>(false);
 	showModeSelector = input<boolean>(false);
-	selectedMode = input<ViewMode>('mes');
+	selectedMode = input<ViewMode>('dia');
 	modeChange = output<ViewMode>();
 	reload = output<void>();
 

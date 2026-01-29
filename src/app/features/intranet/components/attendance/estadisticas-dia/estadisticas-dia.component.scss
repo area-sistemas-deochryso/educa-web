@@ -75,3 +75,38 @@
 		}
 	}
 }
+
+// Personalización del menú PDF
+::ng-deep .p-menu {
+	background: var(--intranet-background-color) !important;
+	border: 1px solid #ddd !important;
+	box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1) !important;
+
+	a:hover {
+		color: initial !important;
+	}
+
+	.p-menuitem-icon,
+	.p-menuitem-text,
+	.p-menu-item-icon,
+	a {
+		color: var(--intranet-accent-color-blue) !important;
+	}
+	.p-menuitem-link {
+		color: var(--intranet-default-text-color) !important;
+		padding: 0.75rem 1rem !important;
+		transition: all 0.3s ease !important;
+
+		.p-menuitem-icon {
+			color: var(--intranet-default-text-color) !important;
+		}
+
+		.p-menuitem-text {
+			color: var(--intranet-default-text-color) !important;
+		}
+
+		&:focus {
+			box-shadow: none !important;
+		}
+	}
+}
