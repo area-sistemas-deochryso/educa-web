@@ -460,9 +460,9 @@
 		</div>
 	}
 </p-drawer>
-@if (vm().dialogVisible) {
-	<!-- Edit/Create Dialog -->
-	<p-dialog
+
+<!-- Edit/Create Dialog - SIEMPRE en el DOM para evitar problemas con scroll -->
+<p-dialog
 		[visible]="vm().dialogVisible"
 		(visibleChange)="onDialogVisibleChange($event)"
 		[header]="vm().isEditing ? 'Editar Usuario' : 'Nuevo Usuario'"
@@ -635,8 +635,7 @@
 				></button>
 			</div>
 		</ng-template>
-	</p-dialog>
-}
+</p-dialog>
 
 <!-- Confirm Dialog - SIEMPRE en el DOM (no usar @if para evitar timing issues) -->
 <p-confirmDialog (onHide)="onConfirmDialogHide()" />

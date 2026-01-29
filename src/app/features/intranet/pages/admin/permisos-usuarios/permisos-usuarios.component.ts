@@ -116,6 +116,16 @@ export class PermisosUsuariosComponent implements OnInit {
 		this.facade.openDetail(permiso);
 	}
 
+	/**
+	 * Handler para sincronizar estado del drawer
+	 * Se dispara cuando se cierra por cualquier medio: X, ESC, backdrop
+	 */
+	onDrawerVisibleChange(visible: boolean): void {
+		if (!visible) {
+			this.facade.closeDetail();
+		}
+	}
+
 	closeDetail(): void {
 		this.facade.closeDetail();
 	}

@@ -233,7 +233,7 @@
 <!-- Detail Drawer -->
 <p-drawer
 	[visible]="detailDrawerVisible()"
-	(visibleChange)="closeDetail()"
+	(visibleChange)="onDrawerVisibleChange($event)"
 	position="right"
 	[style]="{ width: '500px' }"
 	[modal]="true"
