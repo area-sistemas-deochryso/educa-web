@@ -1,31 +1,32 @@
-import { Component, OnInit, inject, signal, DestroyRef } from '@angular/core';
-import { CommonModule } from '@angular/common';
-import { ReactiveFormsModule, FormBuilder, Validators } from '@angular/forms';
-import { Router } from '@angular/router';
-import { debounceTime, distinctUntilChanged } from 'rxjs';
-import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import { InputTextModule } from 'primeng/inputtext';
-import { ToggleSwitch } from 'primeng/toggleswitch';
-import { Select } from 'primeng/select';
-
+import { AppValidators, LoginFormGroup } from '@shared/validators';
 import {
 	AuthService,
+	SwService,
+	UserPermisosService,
 	UserRole,
 	VerifyTokenResponse,
-	UserPermisosService,
-	SwService,
 } from '@core/services';
-import { AppValidators, LoginFormGroup } from '@shared/validators';
-import { FormErrorComponent } from '@shared/components/form-error';
+import { Component, DestroyRef, OnInit, inject, signal } from '@angular/core';
+import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import {
-	LoginHeaderComponent,
+	LoginButtonComponent,
 	LoginErrorMessageComponent,
+	LoginHeaderComponent,
 	LoginInputComponent,
+	LoginOptionsComponent,
 	LoginRoleSelectorComponent,
 	RolOption,
-	LoginOptionsComponent,
-	LoginButtonComponent,
 } from '@shared/components/login';
+import { debounceTime, distinctUntilChanged } from 'rxjs';
+
+import { CommonModule } from '@angular/common';
+import { FormErrorComponent } from '@shared/components/form-error';
+import { InputTextModule } from 'primeng/inputtext';
+import { Router } from '@angular/router';
+import { Select } from 'primeng/select';
+import { ToggleSwitch } from 'primeng/toggleswitch';
+import { UppercaseInputDirective } from '@app/shared';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
 @Component({
 	selector: 'app-login-intranet',
@@ -42,6 +43,7 @@ import {
 		LoginRoleSelectorComponent,
 		LoginOptionsComponent,
 		LoginButtonComponent,
+		UppercaseInputDirective,
 	],
 	templateUrl: './login-intranet.component.html',
 	styleUrl: './login-intranet.component.scss',
@@ -93,14 +95,14 @@ export class LoginIntranetComponent implements OnInit {
 			.verifyAllStoredTokens()
 			.pipe(takeUntilDestroyed(this.destroyRef))
 			.subscribe({
-			next: (users) => {
-				this.rememberedUsers = users;
-				// Si hay usuarios, autocompletar con el primero
-				if (users.length > 0) {
-					this.autofillFromUser(users[0]);
-				}
-			},
-		});
+				next: (users) => {
+					this.rememberedUsers = users;
+					// Si hay usuarios, autocompletar con el primero
+					if (users.length > 0) {
+						this.autofillFromUser(users[0]);
+					}
+				},
+			});
 	}
 
 	private setupDniAutocomplete(): void {
@@ -172,36 +174,36 @@ export class LoginIntranetComponent implements OnInit {
 			.login(dni, password, rol, rememberMe)
 			.pipe(takeUntilDestroyed(this.destroyRef))
 			.subscribe({
-			next: (response) => {
-				this.isLoading.set(false);
+				next: (response) => {
+					this.isLoading.set(false);
 
-				if (response.token) {
-					// Limpiar cache del SW y permisos de sesión anterior para forzar recarga
-					this.swService.clearCache();
-					this.userPermisosService.clear();
-					this.router.navigate(['/intranet']);
-				} else {
-					if (this.authService.isBlocked) {
-						this.errorMessage.set(
-							'Ha excedido el numero maximo de intentos. Sera redirigido...',
-						);
-						this.showError.set(true);
-						setTimeout(() => this.goBack(), 2000);
+					if (response.token) {
+						// Limpiar cache del SW y permisos de sesión anterior para forzar recarga
+						this.swService.clearCache();
+						this.userPermisosService.clear();
+						this.router.navigate(['/intranet']);
 					} else {
-						this.errorMessage.set(
-							response.mensaje ||
-								`Credenciales incorrectas. Intentos restantes: ${this.remainingAttempts}`,
-						);
-						this.showError.set(true);
+						if (this.authService.isBlocked) {
+							this.errorMessage.set(
+								'Ha excedido el numero maximo de intentos. Sera redirigido...',
+							);
+							this.showError.set(true);
+							setTimeout(() => this.goBack(), 2000);
+						} else {
+							this.errorMessage.set(
+								response.mensaje ||
+									`Credenciales incorrectas. Intentos restantes: ${this.remainingAttempts}`,
+							);
+							this.showError.set(true);
+						}
 					}
-				}
-			},
-			error: () => {
-				this.isLoading.set(false);
-				this.errorMessage.set('Error de conexion. Intente nuevamente.');
-				this.showError.set(true);
-			},
-		});
+				},
+				error: () => {
+					this.isLoading.set(false);
+					this.errorMessage.set('Error de conexion. Intente nuevamente.');
+					this.showError.set(true);
+				},
+			});
 	}
 
 	onForgotPassword(event: Event): void {

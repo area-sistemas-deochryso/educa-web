@@ -47,7 +47,17 @@ export class AttendanceProfesorComponent implements OnInit {
 	readonly nombreProfesor = this.userProfile.userName;
 
 	// Salones
-	readonly salones = signal<SalonProfesor[]>([]);
+	private readonly allSalones = signal<SalonProfesor[]>([]);
+	readonly salones = computed(() => {
+		const all = this.allSalones();
+		const month = this.ingresos().selectedMonth;
+		const isVerano = month === 1 || month === 2;
+		return all.filter((s) =>
+			isVerano
+				? s.seccion.toUpperCase() === 'V'
+				: s.seccion.toUpperCase() !== 'V',
+		);
+	});
 	readonly selectedSalonId = signal<number | null>(null);
 	readonly selectedSalon = computed(() => {
 		const id = this.selectedSalonId();
@@ -132,8 +142,8 @@ export class AttendanceProfesorComponent implements OnInit {
 			)
 			.subscribe({
 				next: (salones) => {
-					this.salones.set(salones);
-					if (salones.length > 0) {
+					this.allSalones.set(salones);
+					if (this.salones().length > 0) {
 						this.restoreSelectedSalon();
 						this.loadEstudiantesSalon();
 					}
@@ -168,6 +178,19 @@ export class AttendanceProfesorComponent implements OnInit {
 		const id = this.selectedSalonId();
 		if (id) {
 			this.storage.setSelectedSalonId(id);
+		}
+	}
+
+	private reselectSalonIfNeeded(): void {
+		const currentId = this.selectedSalonId();
+		const filtered = this.salones();
+		if (currentId && filtered.some((s) => s.salonId === currentId)) {
+			return;
+		}
+		const first = filtered[0] ?? null;
+		this.selectedSalonId.set(first?.salonId ?? null);
+		if (first) {
+			this.saveSelectedSalon();
 		}
 	}
 
@@ -260,12 +283,14 @@ export class AttendanceProfesorComponent implements OnInit {
 	onIngresosMonthChange(month: number): void {
 		this.ingresos.update((table) => ({ ...table, selectedMonth: month }));
 		this.saveSelectedMonth();
+		this.reselectSalonIfNeeded();
 		this.reloadEstudianteIngresos();
 	}
 
 	onSalidasMonthChange(month: number): void {
 		this.salidas.update((table) => ({ ...table, selectedMonth: month }));
 		this.saveSelectedMonth();
+		this.reselectSalonIfNeeded();
 		this.reloadEstudianteSalidas();
 	}
 

@@ -2,11 +2,12 @@ import {
 	ChangeDetectionStrategy,
 	Component,
 	ContentChild,
+	TemplateRef,
+	effect,
 	input,
 	signal,
-	effect,
-	TemplateRef,
 } from '@angular/core';
+
 import { CommonModule } from '@angular/common';
 
 /**
@@ -30,74 +31,8 @@ import { CommonModule } from '@angular/common';
 	standalone: true,
 	imports: [CommonModule],
 	changeDetection: ChangeDetectionStrategy.OnPush,
-	template: `
-		<div class="lazy-content" [style.min-height.px]="minHeight()">
-			@if (showSkeleton()) {
-				<!-- Skeleton phase -->
-				<ng-container *ngTemplateOutlet="skeleton || defaultSkeleton" />
-			} @else {
-				<!-- Content phase -->
-				<ng-container *ngTemplateOutlet="content || emptyContent" />
-			}
-		</div>
-
-		<!-- Default skeleton si no se provee uno personalizado -->
-		<ng-template #defaultSkeleton>
-			<div class="lazy-content__default-skeleton">
-				<div class="pulse"></div>
-			</div>
-		</ng-template>
-
-		<!-- Empty content fallback -->
-		<ng-template #emptyContent>
-			<div class="lazy-content__empty">Sin contenido</div>
-		</ng-template>
-	`,
-	styles: [
-		`
-			.lazy-content {
-				position: relative;
-				width: 100%;
-			}
-
-			.lazy-content__default-skeleton {
-				width: 100%;
-				height: 100%;
-				min-height: inherit;
-				background: var(--surface-100);
-				border-radius: var(--border-radius);
-				overflow: hidden;
-			}
-
-			.pulse {
-				width: 100%;
-				height: 100%;
-				background: linear-gradient(
-					90deg,
-					transparent 0%,
-					var(--surface-200) 50%,
-					transparent 100%
-				);
-				animation: pulse 1.5s infinite;
-				will-change: transform;
-			}
-
-			@keyframes pulse {
-				0% {
-					transform: translateX(-100%);
-				}
-				100% {
-					transform: translateX(100%);
-				}
-			}
-
-			.lazy-content__empty {
-				padding: 2rem;
-				text-align: center;
-				color: var(--text-color-secondary);
-			}
-		`,
-	],
+	templateUrl: './lazy-content.component.html',
+	styleUrls: ['./lazy-content.component.scss'],
 })
 export class LazyContentComponent {
 	/** Estado de carga - controla cuándo mostrar skeleton vs contenido */

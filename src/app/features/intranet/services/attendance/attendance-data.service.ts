@@ -173,7 +173,15 @@ export class AttendanceDataService {
 			if (isBeforeRegistrationStart(date)) return 'X';
 			// Días futuros o de hoy sin hora aún → '-' (pendiente)
 			if (shouldMarkIngresoAsPending(date, month)) return '-';
-			// Durante períodos vacacionales (enero, febrero, julio) → 'X' (no se cuenta)
+
+			// REGLA ESPECIAL: Enero y febrero (después del 26/01/2026)
+			// Los días sin asistencia se marcan como '-' (pendiente) en lugar de 'X'
+			// Esto permite que los días CON asistencia se muestren correctamente
+			if (month === 1 || month === 2) {
+				return '-';
+			}
+
+			// Durante otros períodos vacacionales (julio) → 'X' (no se cuenta)
 			if (!shouldCountInasistencia(date)) return 'X';
 			// Día pasado sin registro en período académico → 'N' (falta)
 			return 'N';
@@ -193,7 +201,15 @@ export class AttendanceDataService {
 			if (isBeforeRegistrationStart(date)) return 'X';
 			// Días futuros o de hoy sin hora aún → '-' (pendiente)
 			if (shouldMarkSalidaAsPending(date, month)) return '-';
-			// Durante períodos vacacionales (enero, febrero, julio) → 'X' (no se cuenta)
+
+			// REGLA ESPECIAL: Enero y febrero (después del 26/01/2026)
+			// Los días sin asistencia se marcan como '-' (pendiente) en lugar de 'X'
+			// Esto permite que los días CON asistencia se muestren correctamente
+			if (month === 1 || month === 2) {
+				return '-';
+			}
+
+			// Durante otros períodos vacacionales (julio) → 'X' (no se cuenta)
 			if (!shouldCountInasistencia(date)) return 'X';
 			// Día pasado sin registro en período académico → 'N' (falta)
 			return 'N';

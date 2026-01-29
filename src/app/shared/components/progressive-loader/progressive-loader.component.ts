@@ -8,6 +8,7 @@ import {
 	computed,
 	signal,
 	effect,
+	inject,
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
 
@@ -15,7 +16,7 @@ import { CommonModule } from '@angular/common';
  * Directiva para marcar fases de carga progresiva
  */
 export class ProgressivePhaseDirective {
-	constructor(public template: TemplateRef<unknown>) {}
+	public template = inject(TemplateRef<unknown>);
 }
 
 /**
@@ -52,32 +53,8 @@ export class ProgressivePhaseDirective {
 	standalone: true,
 	imports: [CommonModule],
 	changeDetection: ChangeDetectionStrategy.OnPush,
-	template: `
-		<div class="progressive-loader">
-			@for (phase of phases(); track phase) {
-				<div class="progressive-loader__phase" [attr.data-phase]="phase">
-					@if (isPhaseLoading(phase)) {
-						<!-- Skeleton para esta fase -->
-						<ng-container *ngTemplateOutlet="getSkeletonTemplate(phase)" />
-					} @else {
-						<!-- Contenido real para esta fase -->
-						<ng-container *ngTemplateOutlet="getContentTemplate(phase)" />
-					}
-				</div>
-			}
-		</div>
-	`,
-	styles: [
-		`
-			.progressive-loader {
-				display: contents;
-			}
-
-			.progressive-loader__phase {
-				width: 100%;
-			}
-		`,
-	],
+	templateUrl: './progressive-loader.component.html',
+	styleUrls: ['./progressive-loader.component.scss'],
 })
 export class ProgressiveLoaderComponent {
 	/** Lista de fases en orden de carga */

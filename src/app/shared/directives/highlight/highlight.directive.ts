@@ -1,4 +1,4 @@
-import { Directive, ElementRef, HostListener, input } from '@angular/core';
+import { Directive, ElementRef, HostListener, inject, input } from '@angular/core';
 
 @Directive({
 	selector: '[appHighlight]',
@@ -7,7 +7,7 @@ import { Directive, ElementRef, HostListener, input } from '@angular/core';
 export class HighlightDirective {
 	appHighlight = input<string>('#ffeb3b');
 
-	constructor(private el: ElementRef) {}
+	private el = inject(ElementRef);
 
 	@HostListener('mouseenter') onMouseEnter() {
 		this.highlight(this.appHighlight() || '#ffeb3b');

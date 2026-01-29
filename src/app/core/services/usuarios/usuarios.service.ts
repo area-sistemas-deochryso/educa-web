@@ -1,25 +1,23 @@
-import { HttpClient } from '@angular/common/http';
-import { Injectable } from '@angular/core';
-import { Observable, catchError, of } from 'rxjs';
-
-import { environment } from '@env/environment';
-
 import {
-	UsuarioLista,
-	UsuarioDetalle,
-	CrearUsuarioRequest,
 	ActualizarUsuarioRequest,
+	CrearUsuarioRequest,
+	UsuarioDetalle,
+	UsuarioLista,
 	UsuariosEstadisticas,
 } from './usuarios.models';
+import { Injectable, inject } from '@angular/core';
+import { Observable, catchError, of } from 'rxjs';
+
 import { ApiResponse } from '../permisos';
+import { HttpClient } from '@angular/common/http';
+import { environment } from '@env/environment';
 
 @Injectable({
 	providedIn: 'root',
 })
 export class UsuariosService {
 	private readonly apiUrl = `${environment.apiUrl}/api/sistema/usuarios`;
-
-	constructor(private http: HttpClient) {}
+	private http = inject(HttpClient);
 
 	listarUsuarios(rol?: string, estado?: boolean): Observable<UsuarioLista[]> {
 		const params: Record<string, string> = {};
@@ -46,7 +44,10 @@ export class UsuariosService {
 		id: number,
 		request: ActualizarUsuarioRequest,
 	): Observable<ApiResponse> {
-		return this.http.put<ApiResponse>(`${this.apiUrl}/${encodeURIComponent(rol)}/${id}`, request);
+		return this.http.put<ApiResponse>(
+			`${this.apiUrl}/${encodeURIComponent(rol)}/${id}`,
+			request,
+		);
 	}
 
 	eliminarUsuario(rol: string, id: number): Observable<ApiResponse> {
@@ -71,10 +72,9 @@ export class UsuariosService {
 		if (exceptoId) params['exceptoId'] = exceptoId.toString();
 
 		return this.http
-			.get<{ existe: boolean }>(
-				`${this.apiUrl}/verificar-dni/${encodeURIComponent(rol)}/${dni}`,
-				{ params },
-			)
+			.get<{
+				existe: boolean;
+			}>(`${this.apiUrl}/verificar-dni/${encodeURIComponent(rol)}/${dni}`, { params })
 			.pipe(catchError(() => of({ existe: false })));
 	}
 }

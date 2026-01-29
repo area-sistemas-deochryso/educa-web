@@ -1,25 +1,24 @@
-import { HttpClient } from '@angular/common/http';
-import { Injectable } from '@angular/core';
-import { Observable, catchError, of, map } from 'rxjs';
-
-import { environment } from '@env/environment';
-
 import {
-	ResumenAsistencia,
-	HijoApoderado,
-	EstudianteAsistencia,
-	SalonProfesor,
 	EstadisticasDia,
+	EstudianteAsistencia,
 	GradoSeccion,
+	HijoApoderado,
+	ProfesorSede,
+	ResumenAsistencia,
+	SalonProfesor,
 } from './asistencia.models';
+import { Injectable, inject } from '@angular/core';
+import { Observable, catchError, map, of } from 'rxjs';
+
+import { HttpClient } from '@angular/common/http';
+import { environment } from '@env/environment';
 
 @Injectable({
 	providedIn: 'root',
 })
 export class AsistenciaService {
 	private readonly apiUrl = `${environment.apiUrl}/api/ConsultaAsistencia`;
-
-	constructor(private http: HttpClient) {}
+	private http = inject(HttpClient);
 
 	/**
 	 * Formatea una fecha a YYYY-MM-DD usando zona horaria local (evita desfase UTC)
@@ -126,7 +125,11 @@ export class AsistenciaService {
 	 * Profesor: Obtener asistencia de un grado/sección en un día específico
 	 * GET /api/ConsultaAsistencia/profesor/asistencia-dia?grado={grado}&seccion={seccion}&fecha={fecha}
 	 */
-	getAsistenciaDia(grado: string, seccion: string, fecha: Date): Observable<EstudianteAsistencia[]> {
+	getAsistenciaDia(
+		grado: string,
+		seccion: string,
+		fecha: Date,
+	): Observable<EstudianteAsistencia[]> {
 		const params: Record<string, string> = {
 			grado,
 			seccion,
@@ -220,18 +223,64 @@ export class AsistenciaService {
 	}
 
 	/**
+	 * Director: Obtener salones de la sede
+	 * GET /api/ConsultaAsistencia/director/salones
+	 */
+	getSalonesDirector(): Observable<SalonProfesor[]> {
+		return this.http
+			.get<SalonProfesor[]>(`${this.apiUrl}/director/salones`)
+			.pipe(catchError(() => of([])));
+	}
+
+	/**
+	 * Director: Obtener profesores de la sede
+	 * GET /api/ConsultaAsistencia/director/profesores
+	 */
+	getProfesoresDirector(): Observable<ProfesorSede[]> {
+		return this.http
+			.get<ProfesorSede[]>(`${this.apiUrl}/director/profesores`)
+			.pipe(catchError(() => of([])));
+	}
+
+	/**
+	 * Director: Obtener asistencias de estudiantes por grado/sección
+	 * GET /api/ConsultaAsistencia/director/grado?grado={grado}&seccion={seccion}&mes={mes}&anio={anio}
+	 */
+	getAsistenciasGradoDirector(
+		grado: string,
+		seccion: string,
+		mes?: number,
+		anio?: number,
+	): Observable<EstudianteAsistencia[]> {
+		const params: Record<string, string> = {
+			grado,
+			seccion,
+		};
+
+		if (mes !== undefined) {
+			params['mes'] = mes.toString();
+		}
+		if (anio !== undefined) {
+			params['anio'] = anio.toString();
+		}
+
+		return this.http
+			.get<EstudianteAsistencia[]>(`${this.apiUrl}/director/grado`, { params })
+			.pipe(catchError(() => of([])));
+	}
+
+	/**
 	 * Director: Obtener grados/secciones disponibles de la sede
-	 * Extrae los grados únicos del reporte
+	 * Usa el endpoint de salones y extrae grados/secciones únicos
 	 */
 	getGradosSeccionesDisponibles(): Observable<GradoSeccion[]> {
-		return this.getReporteDirector().pipe(
-			catchError(() => of([] as EstudianteAsistencia[])),
-			map((estudiantes) => {
+		return this.getSalonesDirector().pipe(
+			map((salones) => {
 				const unique = new Map<string, GradoSeccion>();
-				estudiantes.forEach((e) => {
-					const key = `${e.grado}-${e.seccion}`;
+				salones.forEach((s) => {
+					const key = `${s.grado}-${s.seccion}`;
 					if (!unique.has(key)) {
-						unique.set(key, { grado: e.grado, seccion: e.seccion });
+						unique.set(key, { grado: s.grado, seccion: s.seccion });
 					}
 				});
 				return Array.from(unique.values()).sort((a, b) => {

@@ -1,6 +1,5 @@
 import { BaseAdapter, BaseBidirectionalAdapter } from '../base/base.adapter';
-
-import { Injectable } from '@angular/core';
+import { Injectable, inject } from '@angular/core';
 
 /**
  * Adapter para transformar fechas ISO a Date de JavaScript
@@ -115,10 +114,9 @@ export class DateFormatAdapter extends BaseAdapter<Date, FormattedDate> {
 	providedIn: 'root',
 })
 export class IsoToFormattedDateAdapter extends BaseAdapter<string, FormattedDate> {
-	constructor(
-		private isoAdapter: IsoDateAdapter,
-		private formatAdapter: DateFormatAdapter,
-	) {
+	private isoAdapter = inject(IsoDateAdapter);
+	private formatAdapter = inject(DateFormatAdapter);
+	constructor() {
 		super();
 	}
 

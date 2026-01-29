@@ -1,0 +1,13 @@
+<div class="progressive-loader">
+	@for (phase of phases(); track phase) {
+		<div class="progressive-loader__phase" [attr.data-phase]="phase">
+			@if (isPhaseLoading(phase)) {
+				<!-- Skeleton para esta fase -->
+				<ng-container *ngTemplateOutlet="getSkeletonTemplate(phase)" />
+			} @else {
+				<!-- Contenido real para esta fase -->
+				<ng-container *ngTemplateOutlet="getContentTemplate(phase)" />
+			}
+		</div>
+	}
+</div>

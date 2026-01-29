@@ -82,3 +82,11 @@ export interface GradoSeccion {
 	grado: string;
 	seccion: string;
 }
+
+// Director: Profesor de la sede
+export interface ProfesorSede {
+	profesorId: number;
+	dni: string;
+	nombreCompleto: string;
+	salones: string[];
+}

@@ -1,0 +1,21 @@
+<div class="lazy-content" [style.min-height.px]="minHeight()">
+	@if (showSkeleton()) {
+		<!-- Skeleton phase -->
+		<ng-container *ngTemplateOutlet="skeleton || defaultSkeleton" />
+	} @else {
+		<!-- Content phase -->
+		<ng-container *ngTemplateOutlet="content || emptyContent" />
+	}
+</div>
+
+<!-- Default skeleton si no se provee uno personalizado -->
+<ng-template #defaultSkeleton>
+	<div class="lazy-content__default-skeleton">
+		<div class="pulse"></div>
+	</div>
+</ng-template>
+
+<!-- Empty content fallback -->
+<ng-template #emptyContent>
+	<div class="lazy-content__empty">Sin contenido</div>
+</ng-template>

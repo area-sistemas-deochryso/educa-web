@@ -1,31 +1,29 @@
-import { HttpClient } from '@angular/common/http';
-import { Injectable } from '@angular/core';
+import {
+	ActualizarPermisoRolRequest,
+	ActualizarPermisoUsuarioRequest,
+	ActualizarVistaRequest,
+	ApiResponse,
+	CrearPermisoRolRequest,
+	CrearPermisoUsuarioRequest,
+	CrearVistaRequest,
+	PermisoRol,
+	PermisoUsuario,
+	PermisosUsuarioResultado,
+	UsuarioBusquedaResultado,
+	Vista,
+} from './permisos.models';
+import { Injectable, inject } from '@angular/core';
 import { Observable, catchError, of } from 'rxjs';
 
+import { HttpClient } from '@angular/common/http';
 import { environment } from '@env/environment';
-
-import {
-	Vista,
-	CrearVistaRequest,
-	ActualizarVistaRequest,
-	PermisoRol,
-	CrearPermisoRolRequest,
-	ActualizarPermisoRolRequest,
-	PermisoUsuario,
-	CrearPermisoUsuarioRequest,
-	ActualizarPermisoUsuarioRequest,
-	PermisosUsuarioResultado,
-	ApiResponse,
-	UsuarioBusquedaResultado,
-} from './permisos.models';
 
 @Injectable({
 	providedIn: 'root',
 })
 export class PermisosService {
 	private readonly apiUrl = `${environment.apiUrl}/api/sistema/permisos`;
-
-	constructor(private http: HttpClient) {}
+	private http = inject(HttpClient);
 
 	// ========== VISTAS ==========
 

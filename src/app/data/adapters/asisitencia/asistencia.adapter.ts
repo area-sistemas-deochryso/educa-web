@@ -1,7 +1,7 @@
 import { AsistenciaDetalle, HijoApoderado, ResumenAsistencia } from '@core/services';
+import { Injectable, inject } from '@angular/core';
 
 import { BaseAdapter } from '../base/base.adapter';
-import { Injectable } from '@angular/core';
 
 /**
  * Modelo de vista para una asistencia
@@ -108,7 +108,8 @@ export class AsistenciaAdapter extends BaseAdapter<AsistenciaDetalle, Asistencia
 	providedIn: 'root',
 })
 export class ResumenAsistenciaAdapter extends BaseAdapter<ResumenAsistencia, ResumenView> {
-	constructor(private asistenciaAdapter: AsistenciaAdapter) {
+	private asistenciaAdapter = inject(AsistenciaAdapter);
+	constructor() {
 		super();
 	}
 

@@ -1,4 +1,5 @@
-import { Directive, ElementRef, HostListener } from '@angular/core';
+import { Directive, ElementRef, HostListener, inject } from '@angular/core';
+
 import { NgControl } from '@angular/forms';
 
 @Directive({
@@ -6,10 +7,8 @@ import { NgControl } from '@angular/forms';
 	standalone: true,
 })
 export class UppercaseInputDirective {
-	constructor(
-		private el: ElementRef,
-		private control: NgControl,
-	) {}
+	private el = inject(ElementRef);
+	private control = inject(NgControl);
 
 	@HostListener('input')
 	onInput(): void {

@@ -48,7 +48,17 @@ export class AttendanceDirectorComponent implements OnInit {
 	readonly downloadingPdf = signal(false);
 
 	// Grados y secciones
-	readonly gradosSecciones = signal<GradoSeccion[]>([]);
+	private readonly allGradosSecciones = signal<GradoSeccion[]>([]);
+	readonly gradosSecciones = computed(() => {
+		const all = this.allGradosSecciones();
+		const month = this.ingresos().selectedMonth;
+		const isVerano = month === 1 || month === 2;
+		return all.filter((gs) =>
+			isVerano
+				? gs.seccion.toUpperCase() === 'V'
+				: gs.seccion.toUpperCase() !== 'V',
+		);
+	});
 	readonly selectedGradoSeccion = signal<GradoSeccion | null>(null);
 
 	// Estadísticas del día
@@ -132,8 +142,8 @@ export class AttendanceDirectorComponent implements OnInit {
 			)
 			.subscribe({
 				next: (grados) => {
-					this.gradosSecciones.set(grados);
-					if (grados.length > 0) {
+					this.allGradosSecciones.set(grados);
+					if (this.gradosSecciones().length > 0) {
 						this.restoreSelectedGradoSeccion();
 						this.loadEstudiantes();
 						this.loadEstadisticas();
@@ -179,6 +189,22 @@ export class AttendanceDirectorComponent implements OnInit {
 		}
 	}
 
+	private reselectGradoSeccionIfNeeded(): void {
+		const current = this.selectedGradoSeccion();
+		const filtered = this.gradosSecciones();
+		if (
+			current &&
+			filtered.some((gs) => gs.grado === current.grado && gs.seccion === current.seccion)
+		) {
+			return;
+		}
+		const first = filtered[0] ?? null;
+		this.selectedGradoSeccion.set(first);
+		if (first) {
+			this.saveSelectedGradoSeccion();
+		}
+	}
+
 	// === ESTADÍSTICAS ===
 
 	private loadEstadisticas(): void {
@@ -203,8 +229,10 @@ export class AttendanceDirectorComponent implements OnInit {
 
 		this.loading.set(true);
 
+		const { selectedMonth, selectedYear } = this.ingresos();
+
 		this.asistenciaService
-			.getReporteDirector(undefined, gs.grado, gs.seccion)
+			.getAsistenciasGradoDirector(gs.grado, gs.seccion, selectedMonth, selectedYear)
 			.pipe(
 				takeUntilDestroyed(this.destroyRef),
 				finalize(() => {
@@ -280,12 +308,14 @@ export class AttendanceDirectorComponent implements OnInit {
 	onIngresosMonthChange(month: number): void {
 		this.ingresos.update((table) => ({ ...table, selectedMonth: month }));
 		this.saveSelectedMonth();
+		this.reselectGradoSeccionIfNeeded();
 		this.reloadEstudianteIngresos();
 	}
 
 	onSalidasMonthChange(month: number): void {
 		this.salidas.update((table) => ({ ...table, selectedMonth: month }));
 		this.saveSelectedMonth();
+		this.reselectGradoSeccionIfNeeded();
 		this.reloadEstudianteSalidas();
 	}
 
@@ -296,7 +326,7 @@ export class AttendanceDirectorComponent implements OnInit {
 		const { selectedMonth, selectedYear } = this.ingresos();
 
 		this.asistenciaService
-			.getReporteDirector(undefined, gs.grado, gs.seccion)
+			.getAsistenciasGradoDirector(gs.grado, gs.seccion, selectedMonth, selectedYear)
 			.pipe(takeUntilDestroyed(this.destroyRef))
 			.subscribe({
 				next: (estudiantes) => {
@@ -324,7 +354,7 @@ export class AttendanceDirectorComponent implements OnInit {
 		const { selectedMonth, selectedYear } = this.salidas();
 
 		this.asistenciaService
-			.getReporteDirector(undefined, gs.grado, gs.seccion)
+			.getAsistenciasGradoDirector(gs.grado, gs.seccion, selectedMonth, selectedYear)
 			.pipe(takeUntilDestroyed(this.destroyRef))
 			.subscribe({
 				next: (estudiantes) => {

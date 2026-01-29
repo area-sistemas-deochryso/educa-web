@@ -1,6 +1,7 @@
-import { Component, EventEmitter, Input, OnInit, Output, ViewChild } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import { Component, EventEmitter, OnInit, Output, ViewChild } from '@angular/core';
 import { Menu, MenuModule } from 'primeng/menu';
+
+import { CommonModule } from '@angular/common';
 import { MenuItem } from 'primeng/api';
 import { TooltipModule } from 'primeng/tooltip';
 

@@ -1,15 +1,17 @@
-import { TestBed } from '@angular/core/testing';
 import { BrowserTestingModule, platformBrowserTesting } from '@angular/platform-browser/testing';
-import { provideZonelessChangeDetection } from '@angular/core';
-import { provideRouter } from '@angular/router';
+
+import { TestBed } from '@angular/core/testing';
 import { provideHttpClient } from '@angular/common/http';
 import { provideHttpClientTesting } from '@angular/common/http/testing';
+import { provideRouter } from '@angular/router';
+import { provideZonelessChangeDetection } from '@angular/core';
 
 // Mock IntersectionObserver for jsdom environment
 class MockIntersectionObserver implements IntersectionObserver {
 	readonly root: Element | Document | null = null;
 	readonly rootMargin: string = '';
 	readonly thresholds: readonly number[] = [];
+	readonly scrollMargin: string = '';
 
 	constructor(private callback: IntersectionObserverCallback) {}
 
