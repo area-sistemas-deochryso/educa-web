@@ -235,22 +235,27 @@ $color-pendiente: #9e9e9e;
 
 	// Datepicker estilo integrado
 	.fecha-picker {
+		border: 1px solid var(--intranet-default-text-color);
+		border-radius: 4px;
+		transition: border-color 0.15s ease;
+
+		&:focus-within {
+			border-color: var(--intranet-accent-color-green);
+		}
+
 		&.p-datepicker {
 			.p-datepicker-input {
 				background: transparent;
 				border: none;
-				border-bottom: 1px solid var(--intranet-soft-text-color);
-				border-radius: 0;
-				padding: 0.5rem 0.75rem;
+				padding: 0.5rem 0.25rem 0.5rem 0.75rem;
 				font-size: 0.9rem;
 				font-weight: 500;
 				color: var(--intranet-default-text-color);
-				width: 130px;
-				transition: border-color 0.15s ease;
+				width: 100px;
 
 				&:focus {
 					box-shadow: none;
-					border-bottom-color: var(--intranet-accent-color-green);
+					outline: none;
 				}
 			}
 
@@ -258,9 +263,10 @@ $color-pendiente: #9e9e9e;
 				background: transparent;
 				border: none;
 				color: var(--intranet-soft-text-color);
+				padding: 0 0.5rem;
 
 				&:hover {
-					background: transparent;
+					background: rgba(0, 0, 0, 0.05);
 					color: var(--intranet-accent-color-green);
 				}
 			}
@@ -314,7 +320,6 @@ $color-pendiente: #9e9e9e;
 			}
 		}
 	}
-
 }
 
 // Responsive
@@ -358,16 +363,6 @@ $color-pendiente: #9e9e9e;
 
 			.label {
 				font-size: 0.6rem;
-			}
-		}
-	}
-
-	:host ::ng-deep {
-		.fecha-picker {
-			&.p-datepicker {
-				.p-datepicker-input {
-					width: 100%;
-				}
 			}
 		}
 	}

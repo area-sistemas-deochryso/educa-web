@@ -112,6 +112,12 @@ export class AsistenciaDiaListComponent {
 		this.fechaChange.emit(fecha);
 	}
 
+	onFechaChange(fecha: Date | null): void {
+		if (fecha) {
+			this.fechaChange.emit(fecha);
+		}
+	}
+
 	formatTime(isoString: string | null): string {
 		if (!isoString) return '-';
 		// Handle ISO format: "2026-01-26T09:04:35" -> "09:04"
