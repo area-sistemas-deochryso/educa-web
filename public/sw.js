@@ -32,21 +32,19 @@ function openDB() {
 	});
 }
 
-// Normalizar URL para usar como clave (sin query params de cache-busting)
+// Parámetros de cache-busting que se eliminan al normalizar la URL
+// Todos los demás parámetros se conservan como parte de la cache key
+const PARAMS_TO_STRIP = ['_', 't', 'timestamp', 'cacheBust', 'nocache', 'cb', 'v'];
+
+// Normalizar URL para usar como clave (elimina solo params de cache-busting)
 function normalizeUrl(url) {
 	try {
 		const urlObj = new URL(url);
-		// Remover parámetros que cambian frecuentemente pero mantener los importantes
-		const paramsToKeep = ['mes', 'anio', 'month', 'year', 'id', 'page', 'limit', 'grado', 'seccion'];
-		const newParams = new URLSearchParams();
-
-		for (const [key, value] of urlObj.searchParams) {
-			if (paramsToKeep.includes(key.toLowerCase())) {
-				newParams.set(key, value);
-			}
+		for (const param of PARAMS_TO_STRIP) {
+			urlObj.searchParams.delete(param);
 		}
-
-		urlObj.search = newParams.toString();
+		// Ordenar params para cache key determinística
+		urlObj.searchParams.sort();
 		return urlObj.toString();
 	} catch (e) {
 		return url;
@@ -243,51 +241,66 @@ function hasDataChanged(oldData, newData) {
 	return JSON.stringify(oldData) !== JSON.stringify(newData);
 }
 
-// Estrategia Stale-While-Revalidate: devolver cache inmediatamente, actualizar y notificar
+// URLs ya servidas en esta sesión del SW.
+// Primera visita a una URL → SWR (cache inmediato + revalidar en background)
+// Visitas posteriores → Network-first (red primero, cache como fallback)
+const servedUrls = new Set();
+
+// Timeout para network-first antes de caer a cache (ms)
+const NETWORK_TIMEOUT = 5000;
+
+// Estrategia híbrida: SWR en carga inicial, Network-first en navegación posterior
 async function handleFetch(request) {
 	const url = request.url;
+	const normalizedUrl = normalizeUrl(url);
+
 	console.log('[SW] Interceptando:', url);
 
-	// Buscar en cache primero
 	const cachedData = await getFromCache(url);
+	const alreadyServed = servedUrls.has(normalizedUrl);
 
-	if (cachedData) {
-		console.log('[SW] Cache HIT - devolviendo datos inmediatamente');
+	// Marcar como servida para futuras peticiones
+	servedUrls.add(normalizedUrl);
 
-		// Actualizar cache en segundo plano si hay conexión
+	// --- PRIMERA VISITA: Stale-While-Revalidate ---
+	// Devolver cache inmediato y revalidar en background
+	if (cachedData && !alreadyServed) {
+		console.log('[SW] SWR (primera visita) - devolviendo cache y revalidando');
+
 		if (isOnline()) {
-			fetch(request.clone())
-				.then(response => {
-					if (response.ok) {
-						response.json().then(async data => {
-							// Solo notificar si los datos realmente cambiaron
-							if (hasDataChanged(cachedData, data)) {
-								await saveToCache(url, data);
-								console.log('[SW] Cache actualizado - notificando a la app');
-								// Notificar a la app que hay datos nuevos
-								notifyClients({
-									type: 'CACHE_UPDATED',
-									payload: {
-										url: normalizeUrl(url),
-										originalUrl: url,
-										data: data,
-									},
-								});
-							} else {
-								console.log('[SW] Datos sin cambios, no se notifica');
-							}
-						});
-					}
-				})
-				.catch(() => {
-					console.log('[SW] No se pudo actualizar en segundo plano');
-				});
+			revalidateInBackground(request, url, cachedData);
 		}
 
-		return createCacheResponse(cachedData, 'HIT');
+		return createCacheResponse(cachedData, 'SWR');
 	}
 
-	// Si no hay cache, ir a la red
+	// --- VISITAS POSTERIORES: Network-first ---
+	// El usuario navega activamente, necesita data fresca
+	if (alreadyServed && isOnline()) {
+		console.log('[SW] Network-first (navegación activa)');
+
+		try {
+			const networkResponse = await fetchWithTimeout(request.clone(), NETWORK_TIMEOUT);
+
+			if (networkResponse.ok) {
+				const responseClone = networkResponse.clone();
+				responseClone.json().then(data => {
+					saveToCache(url, data);
+				});
+			}
+
+			return networkResponse;
+		} catch (error) {
+			// Network falló → fallback a cache
+			console.log('[SW] Network falló, usando cache como fallback');
+			if (cachedData) {
+				return createCacheResponse(cachedData, 'FALLBACK');
+			}
+			return createOfflineResponse();
+		}
+	}
+
+	// --- SIN CACHE, SIN SERVIR ANTES: ir a la red ---
 	console.log('[SW] Cache MISS - obteniendo de red');
 
 	try {
@@ -297,18 +310,70 @@ async function handleFetch(request) {
 			const responseClone = networkResponse.clone();
 			responseClone.json().then(data => {
 				saveToCache(url, data);
-				console.log('[SW] Datos guardados en cache');
 			});
 		}
 
 		return networkResponse;
 	} catch (error) {
+		// Offline sin cache
 		console.log('[SW] Error de red y sin cache');
-		return new Response(JSON.stringify({ error: 'Sin conexión y sin datos en cache' }), {
-			status: 503,
-			headers: { 'Content-Type': 'application/json' },
-		});
+		return createOfflineResponse();
 	}
+}
+
+// Fetch con timeout para network-first
+function fetchWithTimeout(request, timeoutMs) {
+	return new Promise((resolve, reject) => {
+		const controller = new AbortController();
+		const timeoutId = setTimeout(() => {
+			controller.abort();
+			reject(new Error('Network timeout'));
+		}, timeoutMs);
+
+		fetch(request, { signal: controller.signal })
+			.then(response => {
+				clearTimeout(timeoutId);
+				resolve(response);
+			})
+			.catch(error => {
+				clearTimeout(timeoutId);
+				reject(error);
+			});
+	});
+}
+
+// Revalidar en background (SWR) y notificar si hay cambios
+function revalidateInBackground(request, url, cachedData) {
+	fetch(request.clone())
+		.then(response => {
+			if (response.ok) {
+				response.json().then(async data => {
+					if (hasDataChanged(cachedData, data)) {
+						await saveToCache(url, data);
+						console.log('[SW] Cache actualizado - notificando a la app');
+						notifyClients({
+							type: 'CACHE_UPDATED',
+							payload: {
+								url: normalizeUrl(url),
+								originalUrl: url,
+								data: data,
+							},
+						});
+					}
+				});
+			}
+		})
+		.catch(() => {
+			console.log('[SW] No se pudo revalidar en segundo plano');
+		});
+}
+
+// Respuesta de error offline
+function createOfflineResponse() {
+	return new Response(JSON.stringify({ error: 'Sin conexión y sin datos en cache' }), {
+		status: 503,
+		headers: { 'Content-Type': 'application/json' },
+	});
 }
 
 // Escuchar mensajes desde la aplicación
