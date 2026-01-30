@@ -70,10 +70,16 @@
 			<div class="field">
 				<label for="contrasena" class="password-label">
 					@if (!isEditing() || !canEditPassword()) {
-						<i class="pi pi-lock" style="color: var(--red-500); margin-right: 0.5rem"></i>
+						<i
+							class="pi pi-lock"
+							style="color: var(--red-500); margin-right: 0.5rem"
+						></i>
 					}
 					@if (isEditing() && canEditPassword()) {
-						<i class="pi pi-lock-open" style="color: var(--green-500); margin-right: 0.5rem"></i>
+						<i
+							class="pi pi-lock-open"
+							style="color: var(--green-500); margin-right: 0.5rem"
+						></i>
 					}
 					Contraseña
 					@if (!isEditing() || !canEditPassword()) {
@@ -96,13 +102,13 @@
 				@if (!isEditing() || !canEditPassword()) {
 					<small class="text-muted">
 						<i class="pi pi-info-circle" style="margin-right: 0.25rem"></i>
-						La contraseña se genera automáticamente: 2 primeras letras del apellido (mayúsculas) + últimos 4 dígitos del DNI
+						La contraseña se genera automáticamente
 					</small>
 				}
 				@if (isEditing() && canEditPassword()) {
 					<small class="text-muted">
 						<i class="pi pi-info-circle" style="margin-right: 0.25rem"></i>
-						Puede editar la contraseña manualmente o dejarla como está (autogenerada)
+						Puede editar la contraseña
 					</small>
 				}
 			</div>
