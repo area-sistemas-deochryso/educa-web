@@ -6,7 +6,7 @@ import {
 	StorageService,
 	UserProfileService,
 } from '@core/services';
-import { Component, DestroyRef, OnInit, computed, inject, signal } from '@angular/core';
+import { Component, DestroyRef, OnInit, ViewChild, computed, inject, signal } from '@angular/core';
 
 import { AsistenciaDiaListComponent } from '../../../components/attendance/asistencia-dia-list/asistencia-dia-list.component';
 import { AttendanceDataService } from '../../../services/attendance/attendance-data.service';
@@ -14,8 +14,13 @@ import { AttendanceLegendComponent } from '@app/features/intranet/components/att
 import { AttendanceTable } from '../models/attendance.types';
 import { AttendanceTableComponent } from '../../../components/attendance/attendance-table/attendance-table.component';
 import { AttendanceTableSkeletonComponent } from '../../../components/attendance/attendance-table-skeleton/attendance-table-skeleton.component';
+import { ButtonModule } from 'primeng/button';
+import { DatePipe } from '@angular/common';
 import { EmptyStateComponent } from '../../../components/attendance/empty-state/empty-state.component';
+import { Menu, MenuModule } from 'primeng/menu';
+import { MenuItem } from 'primeng/api';
 import { SalonSelectorComponent } from '../../../components/attendance/salon-selector/salon-selector.component';
+import { TooltipModule } from 'primeng/tooltip';
 import { ViewMode } from '../../../components/attendance/attendance-header/attendance-header.component';
 import { finalize } from 'rxjs';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
@@ -34,10 +39,17 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 		AsistenciaDiaListComponent,
 		EmptyStateComponent,
 		AttendanceLegendComponent,
+		ButtonModule,
+		TooltipModule,
+		MenuModule,
+		DatePipe,
 	],
 	templateUrl: './attendance-profesor.component.html',
+	styleUrl: './attendance-profesor.component.scss',
 })
 export class AttendanceProfesorComponent implements OnInit {
+	@ViewChild('pdfMenu') pdfMenu!: Menu;
+
 	private asistenciaService = inject(AsistenciaService);
 	private storage = inject(StorageService);
 	private attendanceDataService = inject(AttendanceDataService);
@@ -47,6 +59,7 @@ export class AttendanceProfesorComponent implements OnInit {
 	// Estado
 	readonly loading = signal(false);
 	readonly nombreProfesor = this.userProfile.userName;
+	readonly downloadingPdf = signal(false);
 
 	// Progressive Rendering flags
 	readonly showSkeletons = signal(true);
@@ -94,6 +107,24 @@ export class AttendanceProfesorComponent implements OnInit {
 	readonly viewMode = signal<ViewMode>('dia');
 	readonly fechaDia = signal<Date>(new Date());
 	readonly estudiantesDia = signal<EstudianteAsistencia[]>([]);
+
+	// PDF - fecha calculada dinámicamente según el modo y fecha seleccionada
+	readonly pdfFecha = computed(() => {
+		return this.viewMode() === 'dia' ? this.fechaDia() : new Date();
+	});
+
+	readonly pdfMenuItems: MenuItem[] = [
+		{
+			label: 'Ver PDF',
+			icon: 'pi pi-eye',
+			command: () => this.verPdfAsistenciaDia(),
+		},
+		{
+			label: 'Descargar PDF',
+			icon: 'pi pi-download',
+			command: () => this.descargarPdfAsistenciaDia(),
+		},
+	];
 
 	// Tablas de asistencia
 	readonly ingresos = signal<AttendanceTable>(
@@ -413,6 +444,81 @@ export class AttendanceProfesorComponent implements OnInit {
 		this.selectedSalonId.set(salonId);
 		this.saveSelectedSalon();
 		this.loadAsistenciaDia();
+	}
+
+	// === PDF ===
+
+	togglePdfMenu(event: Event): void {
+		this.pdfMenu.toggle(event);
+	}
+
+	/**
+	 * Ver PDF en nueva pestaña
+	 * - Abre el PDF en el visor del navegador
+	 * - El usuario puede navegar por el PDF con los controles del navegador
+	 * - Nota: El nombre al descargar desde el visor será un hash (limitación del navegador)
+	 */
+	verPdfAsistenciaDia(): void {
+		const salon = this.selectedSalon();
+		if (!salon) return;
+
+		this.downloadingPdf.set(true);
+
+		this.asistenciaService
+			.descargarPdfAsistenciaDia(salon.gradoCodigo, salon.seccion, this.pdfFecha())
+			.pipe(
+				takeUntilDestroyed(this.destroyRef),
+				finalize(() => this.downloadingPdf.set(false)),
+			)
+			.subscribe({
+				next: (blob) => {
+					// Crear URL del blob y abrir en nueva pestaña para visualización
+					const url = window.URL.createObjectURL(blob);
+					window.open(url, '_blank');
+
+					// Cleanup después de que la ventana se abra
+					setTimeout(() => window.URL.revokeObjectURL(url), 100);
+				},
+			});
+	}
+
+	/**
+	 * Descargar PDF directamente
+	 * - Descarga el archivo con el nombre correcto
+	 * - No abre nueva ventana, solo descarga
+	 */
+	descargarPdfAsistenciaDia(): void {
+		const salon = this.selectedSalon();
+		if (!salon) return;
+
+		this.downloadingPdf.set(true);
+
+		this.asistenciaService
+			.descargarPdfAsistenciaDia(salon.gradoCodigo, salon.seccion, this.pdfFecha())
+			.pipe(
+				takeUntilDestroyed(this.destroyRef),
+				finalize(() => this.downloadingPdf.set(false)),
+			)
+			.subscribe({
+				next: (blob) => {
+					// Crear URL del blob
+					const url = window.URL.createObjectURL(blob);
+
+					// Crear elemento <a> para forzar descarga con nombre correcto
+					const a = document.createElement('a');
+					a.href = url;
+					const fechaStr = this.pdfFecha().toISOString().split('T')[0];
+					a.download = `Asistencia_${salon.grado}_${salon.seccion}_${fechaStr}.pdf`;
+
+					// Trigger descarga
+					document.body.appendChild(a);
+					a.click();
+
+					// Cleanup
+					document.body.removeChild(a);
+					window.URL.revokeObjectURL(url);
+				},
+			});
 	}
 
 	// === RELOAD ===

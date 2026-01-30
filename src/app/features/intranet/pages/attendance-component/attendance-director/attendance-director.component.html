@@ -1,20 +1,37 @@
-<app-estadisticas-dia
-	[estadisticas]="estadisticasDia()"
-	[downloadingPdf]="downloadingPdf()"
-	(verPdf)="verPdfAsistenciaDia()"
-	(descargarPdf)="descargarPdfAsistenciaDia()"
-/>
-
 <app-attendance-legend />
 
 @if (gradosSecciones().length > 0) {
-	<app-grado-seccion-selector
-		[gradosSecciones]="gradosSecciones()"
-		[selectedGradoSeccion]="selectedGradoSeccion()"
-		(gradoSeccionChange)="
-			viewMode() === 'dia' ? selectGradoSeccionDia($event) : selectGradoSeccion($event)
-		"
-	/>
+	<div class="selector-row">
+		<app-grado-seccion-selector
+			[gradosSecciones]="gradosSecciones()"
+			[selectedGradoSeccion]="selectedGradoSeccion()"
+			(gradoSeccionChange)="
+				viewMode() === 'dia' ? selectGradoSeccionDia($event) : selectGradoSeccion($event)
+			"
+		/>
+
+		@if (selectedGradoSeccion() && viewMode() === 'mes') {
+			<div class="pdf-section">
+				<span class="pdf-label">Reporte del día: {{ pdfFecha() | date: 'dd/MM/yyyy' }}</span>
+				<p-button
+					icon="pi pi-file-pdf"
+					[loading]="downloadingPdf()"
+					severity="danger"
+					[text]="true"
+					[rounded]="true"
+					(onClick)="togglePdfMenu($event)"
+					pTooltip="Opciones de PDF"
+					tooltipPosition="top"
+					[pt]="{
+						root: {
+							'aria-label': 'Opciones de PDF',
+						},
+					}"
+				/>
+				<p-menu #pdfMenu [model]="pdfMenuItems" [popup]="true" appendTo="body" />
+			</div>
+		}
+	</div>
 
 	@if (viewMode() === 'mes') {
 		@if (showSkeletons() && !tableReady()) {
@@ -44,6 +61,9 @@
 			[estudiantes]="estudiantesDia()"
 			[fecha]="fechaDia()"
 			[loading]="loading()"
+			[showPdfButton]="selectedGradoSeccion() !== null"
+			[downloadingPdf]="downloadingPdf()"
+			[pdfMenuItems]="pdfMenuItems"
 			(fechaChange)="onFechaDiaChange($event)"
 		/>
 	}

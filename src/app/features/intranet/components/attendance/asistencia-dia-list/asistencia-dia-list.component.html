@@ -2,15 +2,40 @@
 	<ng-template #header>
 		<div class="card-header">
 			<h2><i class="pi pi-calendar-clock"></i> Asistencia del día</h2>
-			<p-datepicker
-				[(ngModel)]="fechaValue"
-				[showIcon]="true"
-				[maxDate]="today"
-				dateFormat="dd/mm/yy"
-				(onSelect)="onFechaSelect($event)"
-				(ngModelChange)="onFechaChange($event)"
-				class="fecha-picker"
-			/>
+			<div class="header-actions">
+				@if (showPdfButton()) {
+					<!-- Button PDF -->
+					<p-button
+						icon="pi pi-file-pdf"
+						[loading]="downloadingPdf()"
+						severity="danger"
+						[text]="true"
+						[rounded]="true"
+						(onClick)="togglePdfMenu($event)"
+						pTooltip="Opciones de PDF"
+						tooltipPosition="top"
+						class="pdf-button"
+						[pt]="{
+							root: {
+								'aria-label': 'Opciones de PDF',
+							},
+						}"
+					/>
+					<p-menu #pdfMenu [model]="pdfMenuItems()" [popup]="true" appendTo="body" />
+					<!-- Label Reporte -->
+					<span class="pdf-label"> Reporte de la fecha</span>
+				}
+				<!-- DateTimePicker -->
+				<p-datepicker
+					[(ngModel)]="fechaValue"
+					[showIcon]="true"
+					[maxDate]="today"
+					dateFormat="dd/mm/yy"
+					(onSelect)="onFechaSelect($event)"
+					(ngModelChange)="onFechaChange($event)"
+					class="fecha-picker"
+				/>
+			</div>
 		</div>
 	</ng-template>
 

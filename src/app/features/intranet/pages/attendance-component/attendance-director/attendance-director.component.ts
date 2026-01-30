@@ -1,12 +1,11 @@
 import {
 	AsistenciaService,
-	EstadisticasDia,
 	EstudianteAsistencia,
 	GradoSeccion,
 	HijoApoderado,
 	StorageService,
 } from '@core/services';
-import { Component, DestroyRef, OnInit, computed, inject, signal } from '@angular/core';
+import { Component, DestroyRef, OnInit, ViewChild, computed, inject, signal } from '@angular/core';
 
 import { AsistenciaDiaListComponent } from '../../../components/attendance/asistencia-dia-list/asistencia-dia-list.component';
 import { AttendanceDataService } from '../../../services/attendance/attendance-data.service';
@@ -14,9 +13,13 @@ import { AttendanceLegendComponent } from '@app/features/intranet/components/att
 import { AttendanceTable } from '../models/attendance.types';
 import { AttendanceTableComponent } from '../../../components/attendance/attendance-table/attendance-table.component';
 import { AttendanceTableSkeletonComponent } from '../../../components/attendance/attendance-table-skeleton/attendance-table-skeleton.component';
+import { ButtonModule } from 'primeng/button';
+import { DatePipe } from '@angular/common';
 import { EmptyStateComponent } from '../../../components/attendance/empty-state/empty-state.component';
-import { EstadisticasDiaComponent } from '../../../components/attendance/estadisticas-dia/estadisticas-dia.component';
 import { GradoSeccionSelectorComponent } from '../../../components/attendance/grado-seccion-selector/grado-seccion-selector.component';
+import { Menu, MenuModule } from 'primeng/menu';
+import { MenuItem } from 'primeng/api';
+import { TooltipModule } from 'primeng/tooltip';
 import { ViewMode } from '../../../components/attendance/attendance-header/attendance-header.component';
 import { finalize } from 'rxjs';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
@@ -32,14 +35,20 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 		AttendanceTableComponent,
 		AttendanceTableSkeletonComponent,
 		GradoSeccionSelectorComponent,
-		EstadisticasDiaComponent,
 		AsistenciaDiaListComponent,
 		EmptyStateComponent,
 		AttendanceLegendComponent,
+		ButtonModule,
+		TooltipModule,
+		MenuModule,
+		DatePipe,
 	],
 	templateUrl: './attendance-director.component.html',
+	styleUrl: './attendance-director.component.scss',
 })
 export class AttendanceDirectorComponent implements OnInit {
+	@ViewChild('pdfMenu') pdfMenu!: Menu;
+
 	private asistenciaService = inject(AsistenciaService);
 	private storage = inject(StorageService);
 	private attendanceDataService = inject(AttendanceDataService);
@@ -67,9 +76,6 @@ export class AttendanceDirectorComponent implements OnInit {
 	});
 	readonly selectedGradoSeccion = signal<GradoSeccion | null>(null);
 
-	// Estadísticas del día
-	readonly estadisticasDia = signal<EstadisticasDia | null>(null);
-
 	// Estudiantes (modo mes)
 	readonly estudiantes = signal<EstudianteAsistencia[]>([]);
 	readonly selectedEstudianteId = signal<number | null>(null);
@@ -94,6 +100,24 @@ export class AttendanceDirectorComponent implements OnInit {
 	readonly viewMode = signal<ViewMode>('dia');
 	readonly fechaDia = signal<Date>(new Date());
 	readonly estudiantesDia = signal<EstudianteAsistencia[]>([]);
+
+	// PDF - fecha calculada dinámicamente según el modo y fecha seleccionada
+	readonly pdfFecha = computed(() => {
+		return this.viewMode() === 'dia' ? this.fechaDia() : new Date();
+	});
+
+	readonly pdfMenuItems: MenuItem[] = [
+		{
+			label: 'Ver PDF',
+			icon: 'pi pi-eye',
+			command: () => this.verPdfAsistenciaDia(),
+		},
+		{
+			label: 'Descargar PDF',
+			icon: 'pi pi-download',
+			command: () => this.descargarPdfAsistenciaDia(),
+		},
+	];
 
 	// Tablas de asistencia
 	readonly ingresos = signal<AttendanceTable>(
@@ -157,7 +181,6 @@ export class AttendanceDirectorComponent implements OnInit {
 						} else {
 							this.loadEstudiantes();
 						}
-						this.loadEstadisticas();
 					}
 				},
 				error: () => {
@@ -222,17 +245,6 @@ export class AttendanceDirectorComponent implements OnInit {
 	}
 
 	// === ESTADÍSTICAS ===
-
-	private loadEstadisticas(): void {
-		this.asistenciaService
-			.getEstadisticasDirector()
-			.pipe(takeUntilDestroyed(this.destroyRef))
-			.subscribe({
-				next: (estadisticas) => {
-					this.estadisticasDia.set(estadisticas);
-				},
-			});
-	}
 
 	// === ESTUDIANTES (MODO MES) ===
 
@@ -444,6 +456,10 @@ export class AttendanceDirectorComponent implements OnInit {
 
 	// === PDF ===
 
+	togglePdfMenu(event: Event): void {
+		this.pdfMenu.toggle(event);
+	}
+
 	/**
 	 * Ver PDF en nueva ventana
 	 * - Abre el PDF en una nueva pestaña para visualización
@@ -521,6 +537,5 @@ export class AttendanceDirectorComponent implements OnInit {
 		} else {
 			this.loadEstudiantes();
 		}
-		this.loadEstadisticas();
 	}
 }

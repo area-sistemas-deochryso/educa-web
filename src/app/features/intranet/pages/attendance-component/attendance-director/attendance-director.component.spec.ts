@@ -8,7 +8,6 @@ import {
 	StorageService,
 	GradoSeccion,
 	EstudianteAsistencia,
-	EstadisticasDia,
 } from '@core/services';
 import { AttendanceDataService } from '../../../services/attendance/attendance-data.service';
 
@@ -36,15 +35,6 @@ describe('AttendanceDirectorComponent', () => {
 		},
 	];
 
-	const mockEstadisticas: EstadisticasDia = {
-		fecha: new Date(),
-		totalEstudiantes: 100,
-		presentes: 95,
-		ausentes: 5,
-		tardanzas: 0,
-		porcentajeAsistencia: 95,
-	};
-
 	const emptyTable = {
 		title: 'Test',
 		selectedMonth: 1,
@@ -59,7 +49,6 @@ describe('AttendanceDirectorComponent', () => {
 		asistenciaServiceMock = {
 			getGradosSeccionesDisponibles: vi.fn().mockReturnValue(of(mockGradosSecciones)),
 			getReporteDirector: vi.fn().mockReturnValue(of(mockEstudiantes)),
-			getEstadisticasDirector: vi.fn().mockReturnValue(of(mockEstadisticas)),
 			getAsistenciaDiaDirector: vi.fn().mockReturnValue(of(mockEstudiantes)),
 			descargarPdfAsistenciaDia: vi.fn().mockReturnValue(of(new Blob())),
 		};
@@ -109,11 +98,6 @@ describe('AttendanceDirectorComponent', () => {
 		expect(component.selectedGradoSeccion()).toEqual({ grado: 1, seccion: 'A' });
 	});
 
-	it('should load estadisticas on init', () => {
-		fixture.detectChanges();
-		expect(asistenciaServiceMock.getEstadisticasDirector).toHaveBeenCalled();
-		expect(component.estadisticasDia()).toEqual(mockEstadisticas);
-	});
 
 	it('should load estudiantes when grado/seccion is selected', () => {
 		fixture.detectChanges();
@@ -192,12 +176,10 @@ describe('AttendanceDirectorComponent', () => {
 		fixture.detectChanges();
 
 		const spyEstudiantes = vi.spyOn(asistenciaServiceMock, 'getReporteDirector');
-		const spyEstadisticas = vi.spyOn(asistenciaServiceMock, 'getEstadisticasDirector');
 
 		component.reload();
 
 		expect(spyEstudiantes).toHaveBeenCalled();
-		expect(spyEstadisticas).toHaveBeenCalled();
 	});
 
 	it('should reload data when reload method is called in dia mode', () => {
@@ -205,11 +187,9 @@ describe('AttendanceDirectorComponent', () => {
 		component.setViewMode('dia');
 
 		const spyDia = vi.spyOn(asistenciaServiceMock, 'getAsistenciaDiaDirector');
-		const spyEstadisticas = vi.spyOn(asistenciaServiceMock, 'getEstadisticasDirector');
 
 		component.reload();
 
 		expect(spyDia).toHaveBeenCalled();
-		expect(spyEstadisticas).toHaveBeenCalled();
 	});
 });

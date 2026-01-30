@@ -1,0 +1,31 @@
+// ============ Selector row con PDF ============
+.selector-row {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	gap: 1.5rem;
+	margin: 0 1rem 1rem 1rem;
+	padding-left: 1.5rem;
+
+	// Remover margin-bottom del selector dentro del row
+	::ng-deep app-grado-seccion-selector .grado-seccion-selector {
+		margin: 0;
+	}
+}
+
+// ============ PDF section ============
+.pdf-section {
+	display: flex;
+	align-items: center;
+	gap: 0.75rem;
+	padding: 0.75rem 1.25rem;
+	background: var(--surface-card);
+	border-radius: var(--border-radius);
+
+	.pdf-label {
+		font-size: 0.95rem;
+		font-weight: 500;
+		color: var(--text-color);
+		white-space: nowrap;
+	}
+}

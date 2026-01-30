@@ -1,12 +1,36 @@
 <app-attendance-legend />
 
 @if (salones().length > 0) {
-	<app-salon-selector
-		[salones]="salones()"
-		[selectedSalonId]="selectedSalonId()"
-		[nombreProfesor]="nombreProfesor()"
-		(salonChange)="viewMode() === 'dia' ? selectSalonDia($event) : selectSalon($event)"
-	/>
+	<div class="selector-row">
+		<app-salon-selector
+			[salones]="salones()"
+			[selectedSalonId]="selectedSalonId()"
+			[nombreProfesor]="nombreProfesor()"
+			(salonChange)="viewMode() === 'dia' ? selectSalonDia($event) : selectSalon($event)"
+		/>
+
+		@if (selectedSalon() && viewMode() === 'mes') {
+			<div class="pdf-section">
+				<span class="pdf-label">Reporte del día: {{ pdfFecha() | date: 'dd/MM/yyyy' }}</span>
+				<p-button
+					icon="pi pi-file-pdf"
+					[loading]="downloadingPdf()"
+					severity="danger"
+					[text]="true"
+					[rounded]="true"
+					(onClick)="togglePdfMenu($event)"
+					pTooltip="Opciones de PDF"
+					tooltipPosition="top"
+					[pt]="{
+						root: {
+							'aria-label': 'Opciones de PDF',
+						},
+					}"
+				/>
+				<p-menu #pdfMenu [model]="pdfMenuItems" [popup]="true" appendTo="body" />
+			</div>
+		}
+	</div>
 
 	@if (viewMode() === 'mes') {
 		@if (showSkeletons() && !tableReady()) {
@@ -36,6 +60,9 @@
 			[estudiantes]="estudiantesDia()"
 			[fecha]="fechaDia()"
 			[loading]="loading()"
+			[showPdfButton]="selectedSalon() !== null"
+			[downloadingPdf]="downloadingPdf()"
+			[pdfMenuItems]="pdfMenuItems"
 			(fechaChange)="onFechaDiaChange($event)"
 		/>
 	}

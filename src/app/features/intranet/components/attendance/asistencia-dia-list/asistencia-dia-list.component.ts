@@ -1,10 +1,14 @@
-import { ChangeDetectionStrategy, Component, computed, effect, input, output } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, effect, input, output, ViewChild } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { TableModule } from 'primeng/table';
 import { DatePickerModule } from 'primeng/datepicker';
 import { CardModule } from 'primeng/card';
 import { SkeletonModule } from 'primeng/skeleton';
+import { ButtonModule } from 'primeng/button';
+import { Menu, MenuModule } from 'primeng/menu';
+import { TooltipModule } from 'primeng/tooltip';
+import { MenuItem } from 'primeng/api';
 import { EstudianteAsistencia, AsistenciaDetalle } from '@core/services';
 import { getStatusClass } from '@features/intranet/pages/attendance-component/config/attendance.constants';
 import {
@@ -47,6 +51,9 @@ export interface EstadisticasAsistencia {
 		DatePickerModule,
 		CardModule,
 		SkeletonModule,
+		ButtonModule,
+		MenuModule,
+		TooltipModule,
 	],
 	templateUrl: './asistencia-dia-list.component.html',
 	styleUrl: './asistencia-dia-list.component.scss',
@@ -57,9 +64,15 @@ export class AsistenciaDiaListComponent {
 	readonly estudiantes = input.required<EstudianteAsistencia[]>();
 	readonly fecha = input.required<Date>();
 	readonly loading = input<boolean>(false);
+	readonly showPdfButton = input<boolean>(false);
+	readonly downloadingPdf = input<boolean>(false);
+	readonly pdfMenuItems = input<MenuItem[]>([]);
 
 	// Outputs
 	readonly fechaChange = output<Date>();
+
+	// ViewChild
+	@ViewChild('pdfMenu') pdfMenu!: Menu;
 
 	// Constants
 	readonly today = new Date();
@@ -121,6 +134,10 @@ export class AsistenciaDiaListComponent {
 		if (fecha) {
 			this.fechaChange.emit(fecha);
 		}
+	}
+
+	togglePdfMenu(event: Event): void {
+		this.pdfMenu.toggle(event);
 	}
 
 	formatTime(isoString: string | null): string {
