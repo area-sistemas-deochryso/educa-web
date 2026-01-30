@@ -276,17 +276,19 @@ export class AsistenciaService {
 	getGradosSeccionesDisponibles(): Observable<GradoSeccion[]> {
 		return this.getSalonesDirector().pipe(
 			map((salones) => {
-				const unique = new Map<string, GradoSeccion>();
+				// Mantener el orden del backend (ya ordenado por GRA_Orden)
+				const seen = new Set<string>();
+				const result: GradoSeccion[] = [];
+
 				salones.forEach((s) => {
 					const key = `${s.grado}-${s.seccion}`;
-					if (!unique.has(key)) {
-						unique.set(key, { grado: s.grado, seccion: s.seccion });
+					if (!seen.has(key)) {
+						seen.add(key);
+						result.push({ grado: s.grado, seccion: s.seccion });
 					}
 				});
-				return Array.from(unique.values()).sort((a, b) => {
-					const gradoComp = a.grado.localeCompare(b.grado);
-					return gradoComp !== 0 ? gradoComp : a.seccion.localeCompare(b.seccion);
-				});
+
+				return result;
 			}),
 		);
 	}
