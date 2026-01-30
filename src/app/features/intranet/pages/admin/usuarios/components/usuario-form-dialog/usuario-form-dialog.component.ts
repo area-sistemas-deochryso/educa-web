@@ -71,7 +71,7 @@ export class UsuarioFormDialogComponent {
 
 	readonly allowEditPasswordRoles = ['Director', 'Asistente Administrativo'];
 
-	// Computed - Solo Director puede editar contraseñas
+	// Computed - Solo roles permitidos pueden editar contraseñas
 	readonly canEditPassword = computed(() =>
 		this.allowEditPasswordRoles.includes(this.userProfile.userRole()),
 	);
