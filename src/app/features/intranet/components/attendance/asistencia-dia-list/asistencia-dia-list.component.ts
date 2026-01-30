@@ -7,10 +7,15 @@ import { CardModule } from 'primeng/card';
 import { SkeletonModule } from 'primeng/skeleton';
 import { EstudianteAsistencia, AsistenciaDetalle } from '@core/services';
 import { getStatusClass } from '@features/intranet/pages/attendance-component/config/attendance.constants';
-import { getIngresoStatusFromTime } from '@features/intranet/pages/attendance-component/config/attendance-time.config';
+import {
+	getIngresoStatusFromTime,
+	getSalidaStatusFromTime,
+	hasSalidaTimePassed,
+} from '@features/intranet/pages/attendance-component/config/attendance-time.config';
 import {
 	shouldMarkIngresoAsPending,
 	isBeforeRegistrationStart,
+	isToday,
 } from '@features/intranet/pages/attendance-component/config/attendance.utils';
 import { AttendanceStatus } from '@features/intranet/pages/attendance-component/models/attendance.types';
 
@@ -146,25 +151,71 @@ export class AsistenciaDiaListComponent {
 			return 'X';
 		}
 
-		// Si es pendiente (futuro o hoy sin pasar hora límite)
-		if (shouldMarkIngresoAsPending(fecha, month)) {
-			return '-';
-		}
+		const tieneIngreso = asistencia?.horaEntrada;
+		const tieneSalida = asistencia?.horaSalida;
 
-		// Sin asistencia o sin hora de entrada = No asistió
-		if (!asistencia || !asistencia.horaEntrada) {
+		// CASO 1: Sin hora de ingreso
+		if (!tieneIngreso) {
+			// CASO 1a: Hay salida sin ingreso → Fuera de hora
+			if (tieneSalida) {
+				return 'F';
+			}
+
+			// CASO 1b: Día actual sin ingreso
+			if (isToday(fecha)) {
+				// Si ya pasó la hora de salida → No asistió
+				if (hasSalidaTimePassed(month)) {
+					return 'N';
+				}
+				// Si aún no pasa la hora de salida → Pendiente
+				return '-';
+			}
+
+			// CASO 1c: Día pasado sin ingreso → No asistió
 			return 'N';
 		}
 
-		// Calcular estado basado en hora de entrada
-		const [hourStr, minuteStr] = asistencia.horaEntrada.split('T')[1]?.split(':') || [];
-		const hour = parseInt(hourStr, 10);
-		const minute = parseInt(minuteStr, 10);
+		// CASO 2: Hay hora de ingreso
+		const [hourIngresoStr, minuteIngresoStr] =
+			asistencia!.horaEntrada!.split('T')[1]?.split(':') || [];
+		const hourIngreso = parseInt(hourIngresoStr, 10);
+		const minuteIngreso = parseInt(minuteIngresoStr, 10);
 
-		if (isNaN(hour) || isNaN(minute)) {
+		if (isNaN(hourIngreso) || isNaN(minuteIngreso)) {
 			return 'N';
 		}
 
-		return getIngresoStatusFromTime(hour, minute, month);
+		const estadoIngreso = getIngresoStatusFromTime(hourIngreso, minuteIngreso, month);
+
+		// CASO 2a: Hay ingreso pero NO hay salida → Usar estado de ingreso
+		if (!tieneSalida) {
+			return estadoIngreso;
+		}
+
+		// CASO 2b: Hay ingreso Y salida → Tomar el peor estado de ambos
+		const [hourSalidaStr, minuteSalidaStr] =
+			asistencia!.horaSalida!.split('T')[1]?.split(':') || [];
+		const hourSalida = parseInt(hourSalidaStr, 10);
+		const minuteSalida = parseInt(minuteSalidaStr, 10);
+
+		if (isNaN(hourSalida) || isNaN(minuteSalida)) {
+			return estadoIngreso;
+		}
+
+		const estadoSalida = getSalidaStatusFromTime(hourSalida, minuteSalida, month);
+
+		// Peor estado: F > N > T > A
+		const estadoPrioridad: Record<AttendanceStatus, number> = {
+			F: 4,
+			N: 3,
+			T: 2,
+			A: 1,
+			'-': 0,
+			X: 0,
+		};
+
+		return estadoPrioridad[estadoIngreso] >= estadoPrioridad[estadoSalida]
+			? estadoIngreso
+			: estadoSalida;
 	}
 }

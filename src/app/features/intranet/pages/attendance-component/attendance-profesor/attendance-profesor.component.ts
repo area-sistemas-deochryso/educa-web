@@ -151,7 +151,12 @@ export class AttendanceProfesorComponent implements OnInit {
 					this.allSalones.set(salones);
 					if (this.salones().length > 0) {
 						this.restoreSelectedSalon();
-						this.loadEstudiantesSalon();
+						// Cargar datos según el modo actual
+						if (this.viewMode() === 'dia') {
+							this.loadAsistenciaDia();
+						} else {
+							this.loadEstudiantesSalon();
+						}
 					}
 				},
 				error: () => {
@@ -165,7 +170,12 @@ export class AttendanceProfesorComponent implements OnInit {
 
 		this.selectedSalonId.set(salonId);
 		this.saveSelectedSalon();
-		this.loadEstudiantesSalon();
+		// Cargar datos según el modo actual
+		if (this.viewMode() === 'dia') {
+			this.loadAsistenciaDia();
+		} else {
+			this.loadEstudiantesSalon();
+		}
 	}
 
 	private restoreSelectedSalon(): void {

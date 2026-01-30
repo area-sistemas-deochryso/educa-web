@@ -5,6 +5,7 @@
 > **"Comentarios mínimos pero útiles que permitan ubicar fácilmente qué se hace."**
 
 Los comentarios deben:
+
 - ✅ Facilitar la navegación rápida del código
 - ✅ Explicar el "por qué", no el "qué" (cuando el código no es obvio)
 - ✅ Marcar secciones lógicas
@@ -74,6 +75,7 @@ updateUser(id: number, updates: Partial<User>): void {
 ```
 
 **Reglas para servicios/stores**:
+
 - ✅ Separadores de sección con `// ============`
 - ✅ Documentar mutaciones quirúrgicas con `/** */`
 - ✅ Comentar validaciones no obvias
@@ -124,6 +126,7 @@ export class UserFormComponent {
 ```
 
 **Reglas para componentes**:
+
 - ✅ Separar secciones: Signals, Estado local, Computed, Lifecycle, Handlers, Helpers
 - ✅ Comentar computed complejos
 - ❌ NO comentar cada método event handler obvio
@@ -195,6 +198,7 @@ export class UsersFacade {
 ```
 
 **Reglas para facades**:
+
 - ✅ Documentar estrategia de cada operación CRUD (refetch vs mutación)
 - ✅ Separar secciones: Estado expuesto, Comandos, Helpers
 - ✅ Explicar por qué se hace refetch o mutación local
@@ -287,6 +291,7 @@ export class UsersFacade {
 ```
 
 **Reglas para templates**:
+
 - ✅ Separar secciones visuales grandes: Header, Stats, Filtros, Tabla, Dialogs
 - ✅ Comentar grupos de filtros o botones relacionados
 - ✅ Comentar botones con solo iconos (además del aria-label)
@@ -364,8 +369,9 @@ export class UsersFacade {
 ```
 
 **Reglas para SCSS**:
+
 - ✅ Separar secciones por componente visual
-- ✅ Comentar overrides de PrimeNG (::ng-deep)
+- ✅ Comentar overrides de PrimeNG (:host ::ng-deep)
 - ✅ Comentar casos especiales (full-width, hacks necesarios)
 - ❌ NO comentar cada propiedad CSS obvia
 
@@ -380,6 +386,7 @@ export class UsersFacade {
 ```
 
 **Usar para**:
+
 - Agrupar bloques lógicos grandes
 - Separar responsabilidades distintas
 - Facilitar navegación rápida
@@ -392,6 +399,7 @@ const result = complexCalculation(); // Explicación si no es obvio
 ```
 
 **Usar para**:
+
 - Decisiones no obvias
 - Workarounds necesarios
 - Validaciones de negocio
@@ -413,6 +421,7 @@ updateUser(id: number, updates: Partial<User>): void {
 ```
 
 **Usar para**:
+
 - APIs públicas (métodos públicos de servicios)
 - Métodos con lógica compleja
 - Explicar estrategias de implementación

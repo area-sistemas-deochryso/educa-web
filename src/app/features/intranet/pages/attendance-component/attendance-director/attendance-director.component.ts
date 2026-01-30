@@ -151,7 +151,12 @@ export class AttendanceDirectorComponent implements OnInit {
 					this.allGradosSecciones.set(grados);
 					if (this.gradosSecciones().length > 0) {
 						this.restoreSelectedGradoSeccion();
-						this.loadEstudiantes();
+						// Cargar datos según el modo actual
+						if (this.viewMode() === 'dia') {
+							this.loadAsistenciaDia();
+						} else {
+							this.loadEstudiantes();
+						}
 						this.loadEstadisticas();
 					}
 				},
@@ -168,7 +173,12 @@ export class AttendanceDirectorComponent implements OnInit {
 
 		this.selectedGradoSeccion.set(gradoSeccion);
 		this.saveSelectedGradoSeccion();
-		this.loadEstudiantes();
+		// Cargar datos según el modo actual
+		if (this.viewMode() === 'dia') {
+			this.loadAsistenciaDia();
+		} else {
+			this.loadEstudiantes();
+		}
 	}
 
 	private restoreSelectedGradoSeccion(): void {
