@@ -14,7 +14,7 @@ import { catchError, filter } from 'rxjs/operators';
 import { of } from 'rxjs';
 
 import { UsuariosStore } from './usuarios.store';
-import { logger } from '@core/helpers';
+import { DebugService, logger } from '@core/helpers';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
 /**
@@ -28,6 +28,8 @@ export class UsuariosFacade {
 	private errorHandler = inject(ErrorHandlerService);
 	private swService = inject(SwService);
 	private destroyRef = inject(DestroyRef);
+	private debug = inject(DebugService);
+	private log = this.debug.dbg('FACADE:Usuarios');
 
 	// Expone ViewModel del store
 	readonly vm = this.store.vm;
@@ -94,6 +96,29 @@ export class UsuariosFacade {
 
 	refresh(): void {
 		this.loadData();
+	}
+
+	/**
+	 * Refresh solo la lista de usuarios (sin resetear skeletons ni estadísticas)
+	 * Útil para cuando se crea un usuario y necesitamos el ID del servidor
+	 */
+	private refreshUsuariosOnly(): void {
+		this.store.setLoading(true);
+		this.usuariosService
+			.listarUsuarios()
+			.pipe(
+				catchError((err) => {
+					logger.error('Error cargando usuarios:', err);
+					this.errorHandler.showError('Error', 'No se pudieron cargar los usuarios');
+					return of([] as UsuarioLista[]);
+				}),
+				takeUntilDestroyed(this.destroyRef),
+			)
+			.subscribe((usuarios) => {
+				// Filtrar apoderados
+				this.store.setUsuarios(usuarios.filter((u) => u.rol !== 'Apoderado'));
+				this.store.setLoading(false);
+			});
 	}
 
 	// ============ Filters ============
@@ -185,26 +210,72 @@ export class UsuariosFacade {
 
 		this.store.setLoading(true);
 
-		const operation$ = isEditing
-			? this.buildUpdateRequest(data, selectedUsuario)
-			: this.buildCreateRequest(data);
-
-		if (!operation$) {
-			this.store.setLoading(false);
-			return;
-		}
-
-		operation$.pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
-			next: () => {
-				this.store.closeDialog();
-				this.loadData();
-			},
-			error: (err) => {
-				logger.error('Error:', err);
-				this.errorHandler.showError('Error', 'No se pudo guardar el usuario');
+		if (isEditing) {
+			// EDITAR: Actualización quirúrgica (no refetch)
+			const operation$ = this.buildUpdateRequest(data, selectedUsuario);
+			if (!operation$) {
 				this.store.setLoading(false);
-			},
-		});
+				return;
+			}
+
+			operation$.pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
+				next: () => {
+					// Mutación quirúrgica: actualizar solo el usuario editado
+					if (selectedUsuario) {
+						this.store.updateUsuario(selectedUsuario.id, {
+							dni: data.dni!,
+							nombreCompleto: `${data.nombres!} ${data.apellidos!}`,
+							nombres: data.nombres!,
+							apellidos: data.apellidos!,
+							correo: data.correo || undefined,
+							telefono: data.telefono || undefined,
+							estado: data.estado ?? true,
+						});
+					}
+					this.store.closeDialog();
+					this.store.setLoading(false);
+				},
+				error: (err) => {
+					logger.error('Error:', err);
+					this.errorHandler.showError('Error', 'No se pudo actualizar el usuario');
+					this.store.setLoading(false);
+				},
+			});
+		} else {
+			// CREAR: Necesitamos refetch para obtener el ID del servidor
+			const operation$ = this.buildCreateRequest(data);
+			if (!operation$) {
+				this.store.setLoading(false);
+				return;
+			}
+
+			operation$.pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
+				next: () => {
+					this.store.closeDialog();
+					// Refetch solo usuarios (mantiene estadísticas y sin resetear skeletons)
+					this.refreshUsuariosOnly();
+					// Incrementar estadísticas localmente
+					this.store.incrementarEstadistica('totalUsuarios', 1);
+					// Usuario nuevo siempre está activo
+					this.store.incrementarEstadistica('usuariosActivos', 1);
+
+					if (data.rol === 'Director') {
+						this.store.incrementarEstadistica('totalDirectores', 1);
+					} else if (data.rol === 'Profesor') {
+						this.store.incrementarEstadistica('totalProfesores', 1);
+					} else if (data.rol === 'Estudiante') {
+						this.store.incrementarEstadistica('totalEstudiantes', 1);
+					} else if (data.rol === 'Asistente Administrativo') {
+						this.store.incrementarEstadistica('totalAsistentesAdministrativos', 1);
+					}
+				},
+				error: (err) => {
+					logger.error('Error:', err);
+					this.errorHandler.showError('Error', 'No se pudo crear el usuario');
+					this.store.setLoading(false);
+				},
+			});
+		}
 	}
 
 	deleteUsuario(usuario: UsuarioLista): void {
@@ -213,7 +284,30 @@ export class UsuariosFacade {
 			.eliminarUsuario(usuario.rol, usuario.id)
 			.pipe(takeUntilDestroyed(this.destroyRef))
 			.subscribe({
-				next: () => this.loadData(),
+				next: () => {
+					// Mutación quirúrgica: eliminar solo el usuario del array
+					this.store.removeUsuario(usuario.id);
+
+					// Actualizar estadísticas incrementalmente
+					this.store.incrementarEstadistica('totalUsuarios', -1);
+					if (usuario.estado) {
+						this.store.incrementarEstadistica('usuariosActivos', -1);
+						this.store.incrementarEstadistica('usuariosInactivos', 1);
+					} else {
+						this.store.incrementarEstadistica('usuariosInactivos', -1);
+					}
+					if (usuario.rol === 'Director') {
+						this.store.incrementarEstadistica('totalDirectores', -1);
+					} else if (usuario.rol === 'Profesor') {
+						this.store.incrementarEstadistica('totalProfesores', -1);
+					} else if (usuario.rol === 'Estudiante') {
+						this.store.incrementarEstadistica('totalEstudiantes', -1);
+					} else if (usuario.rol === 'Asistente Administrativo') {
+						this.store.incrementarEstadistica('totalAsistentesAdministrativos', -1);
+					}
+
+					this.store.setLoading(false);
+				},
 				error: (err) => {
 					logger.error('Error al eliminar:', err);
 					this.errorHandler.showError('Error', 'No se pudo eliminar el usuario');
@@ -224,11 +318,29 @@ export class UsuariosFacade {
 
 	toggleEstado(usuario: UsuarioLista): void {
 		this.store.setLoading(true);
+		const nuevoEstado = !usuario.estado;
+
 		this.usuariosService
-			.cambiarEstado(usuario.rol, usuario.id, !usuario.estado)
+			.cambiarEstado(usuario.rol, usuario.id, nuevoEstado)
 			.pipe(takeUntilDestroyed(this.destroyRef))
 			.subscribe({
-				next: () => this.loadData(),
+				next: () => {
+					// Mutación quirúrgica: toggle solo el estado del usuario
+					this.store.toggleEstadoUsuario(usuario.id);
+
+					// Actualizar estadísticas incrementalmente
+					if (nuevoEstado) {
+						// Se activó: +1 activo, -1 inactivo
+						this.store.incrementarEstadistica('usuariosActivos', 1);
+						this.store.incrementarEstadistica('usuariosInactivos', -1);
+					} else {
+						// Se desactivó: -1 activo, +1 inactivo
+						this.store.incrementarEstadistica('usuariosActivos', -1);
+						this.store.incrementarEstadistica('usuariosInactivos', 1);
+					}
+
+					this.store.setLoading(false);
+				},
 				error: (err) => {
 					logger.error('Error al cambiar estado:', err);
 					this.errorHandler.showError('Error', 'No se pudo cambiar el estado');
@@ -240,7 +352,15 @@ export class UsuariosFacade {
 	// ============ Private Helpers ============
 
 	private buildCreateRequest(data: Partial<CrearUsuarioRequest & ActualizarUsuarioRequest>) {
-		if (!data.rol || !data.contrasena) return null;
+		this.log.info('buildCreateRequest - data recibida', { data });
+
+		if (!data.rol || !data.contrasena) {
+			this.log.warn('buildCreateRequest - falta rol o contraseña', {
+				rol: data.rol,
+				contrasena: data.contrasena,
+			});
+			return null;
+		}
 
 		const request: CrearUsuarioRequest = {
 			dni: data.dni!,
@@ -257,6 +377,7 @@ export class UsuariosFacade {
 			correoApoderado: data.correoApoderado,
 		};
 
+		this.log.info('buildCreateRequest - request a enviar', { request });
 		return this.usuariosService.crearUsuario(request);
 	}
 

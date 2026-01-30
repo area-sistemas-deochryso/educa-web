@@ -6,7 +6,8 @@ import {
 	UsuarioLista,
 	UsuariosEstadisticas,
 } from '@core/services';
-import { Injectable, computed, signal } from '@angular/core';
+import { Injectable, computed, signal, inject } from '@angular/core';
+import { DebugService } from '@core/helpers';
 
 /**
  * Store para gestión de usuarios
@@ -14,6 +15,8 @@ import { Injectable, computed, signal } from '@angular/core';
  */
 @Injectable({ providedIn: 'root' })
 export class UsuariosStore {
+	private debug = inject(DebugService);
+	private log = this.debug.dbg('STORE:Usuarios');
 	// ============ Estado privado ============
 	private readonly _usuarios = signal<UsuarioLista[]>([]);
 	private readonly _estadisticas = signal<UsuariosEstadisticas | null>(null);
@@ -165,6 +168,52 @@ export class UsuariosStore {
 		this._usuarios.set(usuarios);
 	}
 
+	/**
+	 * Mutación quirúrgica: Agregar un usuario al inicio del array
+	 */
+	addUsuario(usuario: UsuarioLista): void {
+		this._usuarios.update((usuarios) => [usuario, ...usuarios]);
+		this.log.info('Usuario agregado', { usuario });
+	}
+
+	/**
+	 * Mutación quirúrgica: Actualizar un usuario existente
+	 */
+	updateUsuario(id: number, updates: Partial<UsuarioLista>): void {
+		this._usuarios.update((usuarios) =>
+			usuarios.map((u) => (u.id === id ? { ...u, ...updates } : u)),
+		);
+		this.log.info('Usuario actualizado', { id, updates });
+	}
+
+	/**
+	 * Mutación quirúrgica: Toggle del estado de un usuario
+	 */
+	toggleEstadoUsuario(id: number): void {
+		this._usuarios.update((usuarios) =>
+			usuarios.map((u) => (u.id === id ? { ...u, estado: !u.estado } : u)),
+		);
+		this.log.info('Estado de usuario toggleado', { id });
+	}
+
+	/**
+	 * Mutación quirúrgica: Eliminar un usuario del array
+	 */
+	removeUsuario(id: number): void {
+		this._usuarios.update((usuarios) => usuarios.filter((u) => u.id !== id));
+		this.log.info('Usuario eliminado', { id });
+	}
+
+	/**
+	 * Actualización incremental de estadísticas (sin refetch)
+	 */
+	incrementarEstadistica(campo: keyof UsuariosEstadisticas, delta: number): void {
+		this._estadisticas.update((stats) => {
+			if (!stats) return stats;
+			return { ...stats, [campo]: stats[campo] + delta };
+		});
+	}
+
 	setEstadisticas(estadisticas: UsuariosEstadisticas): void {
 		this._estadisticas.set(estadisticas);
 	}
@@ -216,7 +265,45 @@ export class UsuariosStore {
 	}
 
 	updateFormData(updates: Partial<CrearUsuarioRequest & ActualizarUsuarioRequest>): void {
-		this._formData.update((current) => ({ ...current, ...updates }));
+		this._formData.update((current) => {
+			const newData = { ...current, ...updates };
+
+			// Auto-generar contraseña cuando cambian apellidos o DNI (creación y edición)
+			if (updates.apellidos !== undefined || updates.dni !== undefined) {
+				const apellido = (newData.apellidos ?? '').trim();
+				const dniRaw = (newData.dni ?? '').trim();
+
+				// 2 primeras letras del primer apellido en mayúsculas
+				const pref = apellido.slice(0, 2).toUpperCase();
+
+				// Solo dígitos del DNI y últimos 4
+				const digits = dniRaw.replace(/\D/g, '');
+				const suf = digits.slice(-4);
+
+				// Si hay suficientes caracteres, generar contraseña
+				if (pref.length >= 2 && suf.length >= 4) {
+					newData.contrasena = `${pref}${suf}`;
+					this.log.info('Contraseña autogenerada', {
+						modo: this._isEditing() ? 'edición' : 'creación',
+						apellido,
+						dni: dniRaw,
+						contrasena: newData.contrasena,
+					});
+				} else {
+					// Si no hay suficientes datos, limpiar contraseña
+					newData.contrasena = undefined;
+					this.log.trace('Contraseña no generada (datos insuficientes)', {
+						pref,
+						suf,
+						prefLen: pref.length,
+						sufLen: suf.length,
+					});
+				}
+			}
+
+			this.log.trace('updateFormData', { updates, newData });
+			return newData;
+		});
 	}
 
 	// Filter mutations
@@ -255,12 +342,26 @@ export class UsuariosStore {
 	}
 
 	openEditDialog(usuario: UsuarioDetalle): void {
+		// Calcular contraseña autogenerada basada en datos actuales del usuario
+		const apellido = usuario.apellidos.trim();
+		const dniRaw = usuario.dni.trim();
+		const pref = apellido.slice(0, 2).toUpperCase();
+		const digits = dniRaw.replace(/\D/g, '');
+		const suf = digits.slice(-4);
+		const contrasenaAutogenerada = pref.length >= 2 && suf.length >= 4 ? `${pref}${suf}` : '';
+
+		this.log.info('openEditDialog - contraseña inicial calculada', {
+			apellido,
+			dni: dniRaw,
+			contrasena: contrasenaAutogenerada,
+		});
+
 		this._selectedUsuario.set(usuario);
 		this._formData.set({
 			dni: usuario.dni,
 			nombres: usuario.nombres,
 			apellidos: usuario.apellidos,
-			contrasena: '',
+			contrasena: contrasenaAutogenerada,
 			rol: usuario.rol as RolUsuarioAdmin,
 			estado: usuario.estado,
 			telefono: usuario.telefono,

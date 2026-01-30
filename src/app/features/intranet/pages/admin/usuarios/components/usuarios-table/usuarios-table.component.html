@@ -13,6 +13,8 @@
 		[rowsPerPageOptions]="[5, 10, 25, 50]"
 		[showCurrentPageReport]="true"
 		currentPageReportTemplate="Mostrando {first} a {last} de {totalRecords} usuarios"
+		stateStorage="session"
+		stateKey="usuarios-table-state"
 		class="p-datatable-sm"
 	>
 		<ng-template #header>
