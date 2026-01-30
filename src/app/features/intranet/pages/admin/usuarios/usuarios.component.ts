@@ -66,6 +66,8 @@ export class UsuariosComponent implements OnInit, AfterViewInit {
 			dniError: this.vm().dniError,
 			correoError: this.vm().correoError,
 			correoApoderadoError: this.vm().correoApoderadoError,
+			nombreApoderadoError: this.vm().nombreApoderadoError,
+			telefonoApoderadoError: this.vm().telefonoApoderadoError,
 		};
 	}
 

@@ -1,0 +1,564 @@
+<div class="cursos-container">
+	<!-- Header -->
+	<header class="page-header">
+		<div class="header-left">
+			<div class="header-icon">
+				<i class="pi pi-book"></i>
+			</div>
+			<div class="header-text">
+				<h1>Administracion de Cursos</h1>
+				<p>Gestiona los cursos del sistema</p>
+			</div>
+		</div>
+		<button
+			pButton
+			label="Refrescar"
+			icon="pi pi-refresh"
+			class="p-button-outlined"
+			(click)="refresh()"
+			[pt]="{
+				root: {
+					'aria-label': 'Refrescar',
+				},
+			}"
+		></button>
+	</header>
+
+	<!-- Stats Cards -->
+	<section class="stats-section">
+		<div class="stat-card">
+			<div class="stat-content">
+				<span class="stat-label">Total Cursos</span>
+				<span class="stat-value">{{ totalCursos() }}</span>
+				<span class="stat-sublabel">registrados</span>
+			</div>
+			<div class="stat-icon">
+				<i class="pi pi-book"></i>
+			</div>
+		</div>
+
+		<div class="stat-card">
+			<div class="stat-content">
+				<span class="stat-label">Cursos Activos</span>
+				<span class="stat-value">{{ cursosActivos() }}</span>
+				<span class="stat-sublabel">disponibles</span>
+			</div>
+			<div class="stat-icon">
+				<i class="pi pi-check-circle"></i>
+			</div>
+		</div>
+
+		<div class="stat-card">
+			<div class="stat-content">
+				<span class="stat-label">Cursos Inactivos</span>
+				<span class="stat-value">{{ cursosInactivos() }}</span>
+				<span class="stat-sublabel">deshabilitados</span>
+			</div>
+			<div class="stat-icon">
+				<i class="pi pi-ban"></i>
+			</div>
+		</div>
+	</section>
+
+	<!-- Filters -->
+	<section class="filters-section">
+		<div class="search-box">
+			<i class="pi pi-search"></i>
+			<input
+				type="text"
+				pInputText
+				placeholder="Buscar por nombre..."
+				[ngModel]="searchTerm()"
+				(ngModelChange)="searchTerm.set($event)"
+			/>
+		</div>
+
+		<p-select
+			[options]="estadoOptions"
+			[ngModel]="filterEstado()"
+			(ngModelChange)="filterEstado.set($event)"
+			placeholder="Estado"
+			[style]="{ minWidth: '140px' }"
+		/>
+
+		<button
+			pButton
+			label="Limpiar"
+			icon="pi pi-filter-slash"
+			class="p-button-text"
+			(click)="clearFilters()"
+			[pt]="{
+				root: {
+					'aria-label': 'Limpiar filtros',
+				},
+			}"
+		></button>
+
+		<div class="filter-spacer"></div>
+
+		<button
+			pButton
+			label="Nuevo Curso"
+			icon="pi pi-plus"
+			class="p-button-success"
+			(click)="openNew()"
+		></button>
+	</section>
+
+	<!-- Table -->
+	@if (loading()) {
+		<div class="loading-container">
+			<p-progressSpinner strokeWidth="4" />
+		</div>
+	} @else {
+		<section class="table-section">
+			<p-table
+				[value]="filteredCursos()"
+				[paginator]="true"
+				[rows]="10"
+				[rowsPerPageOptions]="[5, 10, 25, 50]"
+				[showCurrentPageReport]="true"
+				currentPageReportTemplate="Mostrando {first} a {last} de {totalRecords} cursos"
+				class="p-datatable-sm"
+				stateStorage="session"
+				stateKey="cursos-table-state"
+			>
+				<ng-template #header>
+					<tr>
+						<th style="width: 70px" pSortableColumn="id">
+							ID <p-sortIcon field="id" />
+						</th>
+						<th pSortableColumn="nombre">NOMBRE <p-sortIcon field="nombre" /></th>
+						<th style="width: 250px">GRADOS</th>
+						<th style="width: 100px" pSortableColumn="estado">
+							ESTADO <p-sortIcon field="estado" />
+						</th>
+						<th style="width: 140px">ACCIONES</th>
+					</tr>
+				</ng-template>
+
+				<ng-template #body let-curso>
+					<tr [class.row-inactive]="!curso.estado">
+						<td class="text-center">
+							<span class="id-badge">{{ curso.id }}</span>
+						</td>
+						<td>
+							<span class="nombre-text">{{ curso.nombre }}</span>
+						</td>
+						<td class="text-left">
+							@if (curso.grados && curso.grados.length > 0) {
+								<button
+									pButton
+									[label]="
+										curso.grados.length +
+										' grado' +
+										(curso.grados.length > 1 ? 's' : '')
+									"
+									icon="pi pi-eye"
+									class="p-button-sm grados-button"
+									(click)="showGrados(curso)"
+									pTooltip="Ver grados asignados"
+									[pt]="{
+										root: {
+											'aria-label': 'Ver grados',
+										},
+									}"
+								></button>
+							} @else {
+								<span class="text-muted">Sin grados</span>
+							}
+						</td>
+						<td class="text-left">
+							<p-tag
+								[value]="curso.estado ? 'Activo' : 'Inactivo'"
+								[severity]="curso.estado ? 'success' : 'danger'"
+							/>
+						</td>
+						<td>
+							<div class="actions">
+								<!-- Editar -->
+								<button
+									pButton
+									icon="pi pi-pencil"
+									class="p-button-rounded p-button-text p-button-info"
+									pTooltip="Editar"
+									(click)="editCurso(curso)"
+									[pt]="{
+										root: {
+											'aria-label': 'Editar',
+										},
+									}"
+								></button>
+
+								<!-- Toggle Estado -->
+								<button
+									pButton
+									[icon]="curso.estado ? 'pi pi-ban' : 'pi pi-check'"
+									class="p-button-rounded p-button-text"
+									[class.p-button-warning]="curso.estado"
+									[class.p-button-success]="!curso.estado"
+									[pTooltip]="curso.estado ? 'Desactivar' : 'Activar'"
+									(click)="toggleEstado(curso)"
+									[pt]="{
+										root: {
+											'aria-label': curso.estado ? 'Desactivar' : 'Activar',
+										},
+									}"
+								></button>
+
+								<!-- Eliminar -->
+								<button
+									pButton
+									icon="pi pi-trash"
+									class="p-button-rounded p-button-text p-button-danger"
+									pTooltip="Eliminar"
+									(click)="deleteCurso(curso)"
+									[pt]="{
+										root: {
+											'aria-label': 'Eliminar',
+										},
+									}"
+								></button>
+							</div>
+						</td>
+					</tr>
+				</ng-template>
+
+				<ng-template #emptymessage>
+					<tr>
+						<td colspan="5" class="empty-message">
+							<div class="empty-state">
+								<i class="pi pi-inbox"></i>
+								<p>No se encontraron cursos</p>
+								<span>Intenta ajustar los filtros de busqueda</span>
+							</div>
+						</td>
+					</tr>
+				</ng-template>
+			</p-table>
+		</section>
+	}
+</div>
+
+<!-- Edit/Create Dialog -->
+<p-dialog
+	[visible]="dialogVisible()"
+	(visibleChange)="dialogVisible.set($event)"
+	[header]="isEditing() ? 'Editar Curso' : 'Nuevo Curso'"
+	[modal]="true"
+	[style]="{ width: '600px' }"
+	[draggable]="false"
+	[resizable]="false"
+	class="edit-curso-dialog"
+>
+	<div class="dialog-content">
+		<div class="form-fields">
+			<!-- Nombre del curso -->
+			<div class="field">
+				<label for="nombre">Nombre del curso *</label>
+				<input
+					id="nombre"
+					type="text"
+					pInputText
+					[ngModel]="formData().nombre"
+					(ngModelChange)="updateFormField('nombre', $event)"
+					placeholder="Ejemplo: Matemática, Comunicación, etc."
+				/>
+			</div>
+
+			<!-- Grados seleccionados -->
+			<div class="field">
+				<div class="grados-form-content">
+					<!-- Inicial -->
+					@if (gradosInicial().length > 0) {
+						<div class="grados-form-section">
+							<h4 class="form-section-title">
+								<i class="pi pi-star"></i>
+								Inicial
+							</h4>
+							<div class="selected-grados">
+								@if (selectedGradosInicial().length > 0) {
+									@for (grado of selectedGradosInicial(); track grado.id) {
+										<span class="custom-tag tag-info">
+											<span class="tag-text">{{ grado.nombre }}</span>
+											<button
+												type="button"
+												class="tag-remove"
+												(click)="removeGrado(grado.id)"
+												[attr.aria-label]="'Remover ' + grado.nombre"
+											>
+												<i class="pi pi-times"></i>
+											</button>
+										</span>
+									}
+								} @else {
+									<span class="no-selection">Sin grados seleccionados</span>
+								}
+							</div>
+						</div>
+					}
+
+					<!-- Primaria -->
+					@if (gradosPrimaria().length > 0) {
+						<div class="grados-form-section">
+							<h4 class="form-section-title">
+								<i class="pi pi-book"></i>
+								Primaria
+							</h4>
+							<div class="selected-grados">
+								@if (selectedGradosPrimaria().length > 0) {
+									@for (grado of selectedGradosPrimaria(); track grado.id) {
+										<span class="custom-tag tag-success">
+											<span class="tag-text">{{ grado.nombre }}</span>
+											<button
+												type="button"
+												class="tag-remove"
+												(click)="removeGrado(grado.id)"
+												[attr.aria-label]="'Remover ' + grado.nombre"
+											>
+												<i class="pi pi-times"></i>
+											</button>
+										</span>
+									}
+								} @else {
+									<span class="no-selection">Sin grados seleccionados</span>
+								}
+							</div>
+						</div>
+					}
+
+					<!-- Secundaria -->
+					@if (gradosSecundaria().length > 0) {
+						<div class="grados-form-section">
+							<h4 class="form-section-title">
+								<i class="pi pi-graduation-cap"></i>
+								Secundaria
+							</h4>
+							<div class="selected-grados">
+								@if (selectedGradosSecundaria().length > 0) {
+									@for (grado of selectedGradosSecundaria(); track grado.id) {
+										<span class="custom-tag tag-warn">
+											<span class="tag-text">{{ grado.nombre }}</span>
+											<button
+												type="button"
+												class="tag-remove"
+												(click)="removeGrado(grado.id)"
+												[attr.aria-label]="'Remover ' + grado.nombre"
+											>
+												<i class="pi pi-times"></i>
+											</button>
+										</span>
+									}
+								} @else {
+									<span class="no-selection">Sin grados seleccionados</span>
+								}
+							</div>
+						</div>
+					}
+				</div>
+			</div>
+
+			<!-- Grados disponibles -->
+			<div class="field">
+				<label>Grados disponibles</label>
+				<div class="available-grados-grid">
+					<!-- Inicial -->
+					@if (gradosInicial().length > 0) {
+						<div class="available-column">
+							<h5 class="column-title">
+								<i class="pi pi-star"></i>
+								Inicial
+							</h5>
+							<div class="available-items">
+								@if (availableInicial().length > 0) {
+									@for (grado of availableInicial(); track grado.id) {
+										<button
+											class="available-item"
+											(click)="addGrado(grado.id)"
+											[attr.aria-label]="'Agregar ' + grado.nombre"
+										>
+											<i class="pi pi-plus"></i>
+											<span>{{ grado.nombre }}</span>
+										</button>
+									}
+								} @else {
+									<span class="no-available">Todos seleccionados</span>
+								}
+							</div>
+						</div>
+					}
+
+					<!-- Primaria -->
+					@if (gradosPrimaria().length > 0) {
+						<div class="available-column">
+							<h5 class="column-title">
+								<i class="pi pi-book"></i>
+								Primaria
+							</h5>
+							<div class="available-items">
+								@if (availablePrimaria().length > 0) {
+									@for (grado of availablePrimaria(); track grado.id) {
+										<button
+											class="available-item"
+											(click)="addGrado(grado.id)"
+											[attr.aria-label]="'Agregar ' + grado.nombre"
+										>
+											<i class="pi pi-plus"></i>
+											<span>{{ grado.nombre }}</span>
+										</button>
+									}
+								} @else {
+									<span class="no-available">Todos seleccionados</span>
+								}
+							</div>
+						</div>
+					}
+
+					<!-- Secundaria -->
+					@if (gradosSecundaria().length > 0) {
+						<div class="available-column">
+							<h5 class="column-title">
+								<i class="pi pi-graduation-cap"></i>
+								Secundaria
+							</h5>
+							<div class="available-items">
+								@if (availableSecundaria().length > 0) {
+									@for (grado of availableSecundaria(); track grado.id) {
+										<button
+											class="available-item"
+											(click)="addGrado(grado.id)"
+											[attr.aria-label]="'Agregar ' + grado.nombre"
+										>
+											<i class="pi pi-plus"></i>
+											<span>{{ grado.nombre }}</span>
+										</button>
+									}
+								} @else {
+									<span class="no-available">Todos seleccionados</span>
+								}
+							</div>
+						</div>
+					}
+				</div>
+				<small class="field-hint">Haz clic en un grado para agregarlo o usa la X para removerlo</small>
+			</div>
+
+			<!-- Estado (solo en edición) -->
+			@if (isEditing()) {
+				<div class="field">
+					<label for="estado">Estado</label>
+					<div class="estado-switch">
+						<p-toggleswitch
+							id="estado"
+							[ngModel]="formData().estado"
+							(ngModelChange)="updateFormField('estado', $event)"
+						/>
+						<span>{{ formData().estado ? 'Activo' : 'Inactivo' }}</span>
+					</div>
+				</div>
+			}
+		</div>
+	</div>
+
+	<ng-template #footer>
+		<div class="dialog-footer">
+			<button
+				pButton
+				label="Cancelar"
+				icon="pi pi-times"
+				class="p-button-text"
+				(click)="hideDialog()"
+			></button>
+			<button
+				pButton
+				label="Guardar"
+				icon="pi pi-check"
+				class="p-button-success"
+				(click)="saveCurso()"
+				[disabled]="!isFormValid()"
+			></button>
+		</div>
+	</ng-template>
+</p-dialog>
+
+<!-- Grados Dialog -->
+<p-dialog
+	[visible]="gradosDialogVisible()"
+	(visibleChange)="gradosDialogVisible.set($event)"
+	[header]="'Grados de ' + (selectedCursoForGrados()?.nombre || '')"
+	[modal]="true"
+	[style]="{ width: '600px' }"
+	[draggable]="false"
+	[resizable]="false"
+	class="grados-dialog"
+>
+	<div class="grados-content">
+		<!-- Inicial -->
+		@if (cursoGradosInicial().length > 0) {
+			<div class="grados-section">
+				<h3 class="section-title">
+					<i class="pi pi-star"></i>
+					Inicial
+				</h3>
+				<div class="grados-grid">
+					@for (grado of cursoGradosInicial(); track grado.id) {
+						<p-tag [value]="grado.nombre" severity="info" />
+					}
+				</div>
+			</div>
+		}
+
+		<!-- Primaria -->
+		@if (cursoGradosPrimaria().length > 0) {
+			<div class="grados-section">
+				<h3 class="section-title">
+					<i class="pi pi-book"></i>
+					Primaria
+				</h3>
+				<div class="grados-grid">
+					@for (grado of cursoGradosPrimaria(); track grado.id) {
+						<p-tag [value]="grado.nombre" severity="success" />
+					}
+				</div>
+			</div>
+		}
+
+		<!-- Secundaria -->
+		@if (cursoGradosSecundaria().length > 0) {
+			<div class="grados-section">
+				<h3 class="section-title">
+					<i class="pi pi-graduation-cap"></i>
+					Secundaria
+				</h3>
+				<div class="grados-grid">
+					@for (grado of cursoGradosSecundaria(); track grado.id) {
+						<p-tag [value]="grado.nombre" severity="warn" />
+					}
+				</div>
+			</div>
+		}
+
+		@if (
+			cursoGradosInicial().length === 0 &&
+			cursoGradosPrimaria().length === 0 &&
+			cursoGradosSecundaria().length === 0
+		) {
+			<div class="empty-grados">
+				<i class="pi pi-inbox"></i>
+				<p>Este curso no tiene grados asignados</p>
+			</div>
+		}
+	</div>
+
+	<ng-template #footer>
+		<div class="dialog-footer">
+			<button
+				pButton
+				label="Cerrar"
+				icon="pi pi-times"
+				class="p-button-text"
+				(click)="hideGradosDialog()"
+			></button>
+		</div>
+	</ng-template>
+</p-dialog>

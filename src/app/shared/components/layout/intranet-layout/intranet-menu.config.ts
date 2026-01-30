@@ -86,6 +86,12 @@ export const INTRANET_MENU: NavItemWithPermiso[] = [
 				icon: 'pi pi-eye',
 				permiso: 'intranet/admin/vistas',
 			},
+			{
+				route: '/intranet/admin/cursos',
+				label: 'Cursos',
+				icon: 'pi pi-book',
+				permiso: 'intranet/admin/cursos',
+			},
 		],
 	},
 ];

@@ -1,5 +1,6 @@
 import {
 	ActualizarUsuarioRequest,
+	AsistenciaService,
 	CrearUsuarioRequest,
 	ErrorHandlerService,
 	RolUsuarioAdmin,
@@ -24,6 +25,7 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 @Injectable({ providedIn: 'root' })
 export class UsuariosFacade {
 	private usuariosService = inject(UsuariosService);
+	private asistenciaService = inject(AsistenciaService);
 	private store = inject(UsuariosStore);
 	private errorHandler = inject(ErrorHandlerService);
 	private swService = inject(SwService);
@@ -49,7 +51,8 @@ export class UsuariosFacade {
 
 		// Renderizado progresivo:
 		// 1. Cargar estadísticas primero (más pequeñas, más rápidas)
-		// 2. Luego cargar usuarios (más grandes)
+		// 2. Cargar salones (para formulario de profesor)
+		// 3. Luego cargar usuarios (más grandes)
 
 		// Paso 1: Cargar estadísticas
 		this.usuariosService
@@ -68,28 +71,42 @@ export class UsuariosFacade {
 				// Marcar stats como listas y ocultar su skeleton
 				this.store.setStatsReady(true);
 
-				// Paso 2: Cargar usuarios (renderizado progresivo)
-				this.usuariosService
-					.listarUsuarios()
+				// Paso 2: Cargar salones (para selector de profesor)
+				this.asistenciaService
+					.getSalonesDirector()
 					.pipe(
 						catchError((err) => {
-							logger.error('Error cargando usuarios:', err);
-							this.errorHandler.showError('Error', 'No se pudieron cargar los usuarios');
-							return of([] as UsuarioLista[]);
+							logger.error('Error cargando salones:', err);
+							return of([]);
 						}),
 						takeUntilDestroyed(this.destroyRef),
 					)
-					.subscribe((usuarios) => {
-						// Filtrar apoderados para no mostrarlos en admin
-						this.store.setUsuarios(usuarios.filter((u) => u.rol !== 'Apoderado'));
-						this.store.setTableReady(true);
-						this.store.setLoading(false);
+					.subscribe((salones) => {
+						this.store.setSalones(salones);
 
-						// Ocultar todos los skeletons después de un pequeño delay
-						// para asegurar que el contenido está renderizado
-						setTimeout(() => {
-							this.store.setShowSkeletons(false);
-						}, 50);
+						// Paso 3: Cargar usuarios (renderizado progresivo)
+						this.usuariosService
+							.listarUsuarios()
+							.pipe(
+								catchError((err) => {
+									logger.error('Error cargando usuarios:', err);
+									this.errorHandler.showError('Error', 'No se pudieron cargar los usuarios');
+									return of([] as UsuarioLista[]);
+								}),
+								takeUntilDestroyed(this.destroyRef),
+							)
+							.subscribe((usuarios) => {
+								// Filtrar apoderados para no mostrarlos en admin
+								this.store.setUsuarios(usuarios.filter((u) => u.rol !== 'Apoderado'));
+								this.store.setTableReady(true);
+								this.store.setLoading(false);
+
+								// Ocultar todos los skeletons después de un pequeño delay
+								// para asegurar que el contenido está renderizado
+								setTimeout(() => {
+									this.store.setShowSkeletons(false);
+								}, 50);
+							});
 					});
 			});
 	}
@@ -374,7 +391,13 @@ export class UsuariosFacade {
 			fechaNacimiento: data.fechaNacimiento,
 			grado: data.grado,
 			seccion: data.seccion,
+			// Campos para Estudiante (apoderado)
+			nombreApoderado: data.nombreApoderado,
+			telefonoApoderado: data.telefonoApoderado,
 			correoApoderado: data.correoApoderado,
+			// Campos para Profesor
+			salonId: data.salonId,
+			esTutor: data.esTutor,
 		};
 
 		this.log.info('buildCreateRequest - request a enviar', { request });
@@ -399,7 +422,13 @@ export class UsuariosFacade {
 			fechaNacimiento: data.fechaNacimiento,
 			grado: data.grado,
 			seccion: data.seccion,
+			// Campos para Estudiante (apoderado)
+			nombreApoderado: data.nombreApoderado,
+			telefonoApoderado: data.telefonoApoderado,
 			correoApoderado: data.correoApoderado,
+			// Campos para Profesor
+			salonId: data.salonId,
+			esTutor: data.esTutor,
 		};
 
 		return this.usuariosService.actualizarUsuario(usuario.rol, usuario.id, request);

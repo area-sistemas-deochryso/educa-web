@@ -11,6 +11,9 @@ export interface UsuarioLista {
 	correo?: string;
 	sedeId?: number;
 	sedeNombre?: string;
+	// Campos de apoderado para estudiante
+	nombreApoderado?: string;
+	telefonoApoderado?: string;
 }
 
 export interface UsuarioDetalle extends UsuarioLista {
@@ -21,6 +24,10 @@ export interface UsuarioDetalle extends UsuarioLista {
 	usuarioRegistro?: string;
 	usuarioModificacion?: string;
 	fechaModificacion?: string;
+	// Campos para Profesor
+	salonId?: number;
+	salonNombre?: string;
+	esTutor?: boolean;
 }
 
 export interface CrearUsuarioRequest {
@@ -35,7 +42,13 @@ export interface CrearUsuarioRequest {
 	fechaNacimiento?: string;
 	grado?: string;
 	seccion?: string;
+	// Campos para Estudiante (apoderado)
+	nombreApoderado?: string;
+	telefonoApoderado?: string;
 	correoApoderado?: string;
+	// Campos para Profesor
+	salonId?: number;
+	esTutor?: boolean;
 }
 
 export interface ActualizarUsuarioRequest {
@@ -50,7 +63,13 @@ export interface ActualizarUsuarioRequest {
 	fechaNacimiento?: string;
 	grado?: string;
 	seccion?: string;
+	// Campos para Estudiante (apoderado)
+	nombreApoderado?: string;
+	telefonoApoderado?: string;
 	correoApoderado?: string;
+	// Campos para Profesor
+	salonId?: number;
+	esTutor?: boolean;
 }
 
 export interface UsuariosEstadisticas {

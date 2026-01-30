@@ -3,11 +3,22 @@ import {
 	CrearUsuarioRequest,
 	ROLES_USUARIOS_ADMIN,
 	RolUsuarioAdmin,
+	SalonProfesor,
 	UserProfileService,
 } from '@core/services';
-import { ChangeDetectionStrategy, Component, computed, inject, input, output } from '@angular/core';
+import {
+	ChangeDetectionStrategy,
+	Component,
+	OnInit,
+	computed,
+	inject,
+	input,
+	output,
+	signal,
+} from '@angular/core';
 
 import { ButtonModule } from 'primeng/button';
+import { Checkbox } from 'primeng/checkbox';
 import { CommonModule } from '@angular/common';
 import { DatePickerModule } from 'primeng/datepicker';
 import { DialogModule } from 'primeng/dialog';
@@ -26,6 +37,8 @@ export interface FormValidationErrors {
 	dniError: string | null;
 	correoError: string | null;
 	correoApoderadoError: string | null;
+	nombreApoderadoError: string | null;
+	telefonoApoderadoError: string | null;
 }
 
 /**
@@ -48,12 +61,13 @@ export interface FormValidationErrors {
 		FormFieldErrorComponent,
 		TableModule,
 		UppercaseInputDirective,
+		Checkbox,
 	],
 	templateUrl: './usuario-form-dialog.component.html',
 	styleUrl: './usuario-form-dialog.component.scss',
 	changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class UsuarioFormDialogComponent {
+export class UsuarioFormDialogComponent implements OnInit {
 	private userProfile = inject(UserProfileService);
 
 	readonly visible = input.required<boolean>();
@@ -61,6 +75,7 @@ export class UsuarioFormDialogComponent {
 	readonly formData = input.required<UsuarioFormData>();
 	readonly errors = input.required<FormValidationErrors>();
 	readonly isFormValid = input.required<boolean>();
+	readonly salones = input<SalonProfesor[]>([]);
 
 	readonly visibleChange = output<boolean>();
 	readonly fieldChange = output<{ field: string; value: unknown }>();
@@ -70,6 +85,10 @@ export class UsuarioFormDialogComponent {
 	readonly rolesSelectOptions = ROLES_USUARIOS_ADMIN.map((r) => ({ label: r, value: r }));
 
 	readonly allowEditPasswordRoles = ['Director', 'Asistente Administrativo'];
+
+	// Estado local para selector de salón en dos pasos
+	readonly _gradoSeleccionado = signal<string | null>(null);
+	readonly _seccionSeleccionada = signal<string | null>(null);
 
 	// Computed - Solo roles permitidos pueden editar contraseñas
 	readonly canEditPassword = computed(() =>
@@ -97,10 +116,62 @@ export class UsuarioFormDialogComponent {
 		return this.formData().rol === 'Estudiante';
 	}
 
+	// Computed - Es profesor si rol es Profesor
+	get isProfesor(): boolean {
+		return this.formData().rol === 'Profesor';
+	}
+
 	// Helper para tipar correctamente el rol
 	get rolValue(): RolUsuarioAdmin | undefined {
 		return this.formData().rol as RolUsuarioAdmin | undefined;
 	}
+
+	// Computed - Formatear sección (V → Verano)
+	private formatSeccion(seccion: string): string {
+		return seccion === 'V' ? 'Verano' : seccion;
+	}
+
+	// Computed - Opciones de grados (agrupados, únicos)
+	readonly gradosOptions = computed(() => {
+		const salones = this.salones();
+		const gradosUnicos = new Set<string>();
+		const result: { label: string; value: string }[] = [];
+
+		salones.forEach((s) => {
+			if (!gradosUnicos.has(s.grado)) {
+				gradosUnicos.add(s.grado);
+				result.push({ label: s.grado, value: s.grado });
+			}
+		});
+
+		return result;
+	});
+
+	// Computed - Opciones de secciones (filtradas por grado seleccionado)
+	readonly seccionesOptions = computed(() => {
+		const grado = this._gradoSeleccionado();
+		if (!grado) return [];
+
+		const salones = this.salones();
+		const seccionesDelGrado = salones
+			.filter((s) => s.grado === grado)
+			.map((s) => ({
+				label: this.formatSeccion(s.seccion),
+				value: s.seccion,
+			}));
+
+		return seccionesDelGrado;
+	});
+
+	// Computed - Salón seleccionado actual (para mapear grado+sección a salonId)
+	readonly salonSeleccionado = computed(() => {
+		const grado = this._gradoSeleccionado();
+		const seccion = this._seccionSeleccionada();
+		if (!grado || !seccion) return null;
+
+		const salones = this.salones();
+		return salones.find((s) => s.grado === grado && s.seccion === seccion) || null;
+	});
 
 	onVisibleChange(visible: boolean): void {
 		this.visibleChange.emit(visible);
@@ -108,6 +179,39 @@ export class UsuarioFormDialogComponent {
 
 	onFieldChange(field: string, value: unknown): void {
 		this.fieldChange.emit({ field, value });
+	}
+
+	onGradoChange(grado: string | null): void {
+		this._gradoSeleccionado.set(grado);
+		// Limpiar sección cuando cambia el grado
+		this._seccionSeleccionada.set(null);
+		// Limpiar salonId en el formData
+		this.fieldChange.emit({ field: 'salonId', value: undefined });
+	}
+
+	onSeccionChange(seccion: string | null): void {
+		this._seccionSeleccionada.set(seccion);
+
+		// Mapear grado+sección a salonId
+		const salon = this.salonSeleccionado();
+		if (salon) {
+			this.fieldChange.emit({ field: 'salonId', value: salon.salonId });
+		} else {
+			this.fieldChange.emit({ field: 'salonId', value: undefined });
+		}
+	}
+
+	// Sincronizar grado y sección cuando se carga el formulario en edición
+	ngOnInit(): void {
+		// Efecto para sincronizar grado/sección cuando cambia formData.salonId
+		const salonId = this.formData().salonId;
+		if (salonId) {
+			const salon = this.salones().find((s) => s.salonId === salonId);
+			if (salon) {
+				this._gradoSeleccionado.set(salon.grado);
+				this._seccionSeleccionada.set(salon.seccion);
+			}
+		}
 	}
 
 	onSave(): void {

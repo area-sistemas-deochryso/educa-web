@@ -5,6 +5,7 @@ import {
 	UsuarioDetalle,
 	UsuarioLista,
 	UsuariosEstadisticas,
+	SalonProfesor,
 } from '@core/services';
 import { Injectable, computed, signal, inject } from '@angular/core';
 import { DebugService } from '@core/helpers';
@@ -20,6 +21,7 @@ export class UsuariosStore {
 	// ============ Estado privado ============
 	private readonly _usuarios = signal<UsuarioLista[]>([]);
 	private readonly _estadisticas = signal<UsuariosEstadisticas | null>(null);
+	private readonly _salones = signal<SalonProfesor[]>([]);
 	private readonly _loading = signal(false);
 	private readonly _error = signal<string | null>(null);
 
@@ -48,6 +50,7 @@ export class UsuariosStore {
 	// ============ Lecturas públicas (readonly) ============
 	readonly usuarios = this._usuarios.asReadonly();
 	readonly estadisticas = this._estadisticas.asReadonly();
+	readonly salones = this._salones.asReadonly();
 	readonly loading = this._loading.asReadonly();
 	readonly error = this._error.asReadonly();
 
@@ -98,9 +101,38 @@ export class UsuariosStore {
 		return null;
 	});
 
+	readonly nombreApoderadoError = computed(() => {
+		const nombre = this._formData().nombreApoderado || '';
+		const rol = this._formData().rol;
+
+		// Requerido para Estudiante
+		if (rol === 'Estudiante' && !nombre.trim()) {
+			return 'El nombre del apoderado es obligatorio para estudiantes';
+		}
+
+		return null;
+	});
+
+	readonly telefonoApoderadoError = computed(() => {
+		const telefono = this._formData().telefonoApoderado || '';
+		const rol = this._formData().rol;
+
+		// Requerido para Estudiante
+		if (rol === 'Estudiante' && !telefono.trim()) {
+			return 'El telefono del apoderado es obligatorio para estudiantes';
+		}
+
+		return null;
+	});
+
 	readonly isEstudiante = computed(() => {
 		const rol = this._formData().rol;
 		return rol === 'Estudiante';
+	});
+
+	readonly isProfesor = computed(() => {
+		const rol = this._formData().rol;
+		return rol === 'Profesor';
 	});
 
 	readonly isFormValid = computed(() => {
@@ -110,6 +142,10 @@ export class UsuariosStore {
 		if (this.dniError()) return false;
 		if (this.correoError()) return false;
 		if (this.correoApoderadoError()) return false;
+		if (this.nombreApoderadoError()) return false;
+		if (this.telefonoApoderadoError()) return false;
+		// Si es profesor y tiene salón seleccionado, esTutor debe estar definido
+		if (this.isProfesor() && data.salonId !== undefined && data.esTutor === undefined) return false;
 		return true;
 	});
 
@@ -145,6 +181,7 @@ export class UsuariosStore {
 		usuarios: this._usuarios(),
 		filteredUsuarios: this.filteredUsuarios(),
 		estadisticas: this._estadisticas(),
+		salones: this._salones(),
 		loading: this._loading(),
 		error: this._error(),
 		isEmpty: this._usuarios().length === 0,
@@ -156,9 +193,12 @@ export class UsuariosStore {
 		formData: this._formData(),
 		isFormValid: this.isFormValid(),
 		isEstudiante: this.isEstudiante(),
+		isProfesor: this.isProfesor(),
 		dniError: this.dniError(),
 		correoError: this.correoError(),
 		correoApoderadoError: this.correoApoderadoError(),
+		nombreApoderadoError: this.nombreApoderadoError(),
+		telefonoApoderadoError: this.telefonoApoderadoError(),
 		searchTerm: this._searchTerm(),
 		filterRol: this._filterRol(),
 		filterEstado: this._filterEstado(),
@@ -223,6 +263,10 @@ export class UsuariosStore {
 
 	setEstadisticas(estadisticas: UsuariosEstadisticas): void {
 		this._estadisticas.set(estadisticas);
+	}
+
+	setSalones(salones: SalonProfesor[]): void {
+		this._salones.set(salones);
 	}
 
 	setLoading(loading: boolean): void {
@@ -308,6 +352,22 @@ export class UsuariosStore {
 				}
 			}
 
+			// Limpiar campos de salón si el rol cambia y no es Profesor
+			if (updates.rol !== undefined && newData.rol !== 'Profesor') {
+				newData.salonId = undefined;
+				newData.esTutor = undefined;
+			}
+
+			// Si se deselecciona el salón, limpiar esTutor
+			if (updates.salonId !== undefined && !newData.salonId) {
+				newData.esTutor = undefined;
+			}
+
+			// Si se selecciona un salón y esTutor no está definido, inicializar en false
+			if (updates.salonId !== undefined && newData.salonId && newData.esTutor === undefined) {
+				newData.esTutor = false;
+			}
+
 			this.log.trace('updateFormData', { updates, newData });
 			return newData;
 		});
@@ -343,6 +403,8 @@ export class UsuariosStore {
 			contrasena: '',
 			rol: undefined,
 			estado: true,
+			salonId: undefined,
+			esTutor: undefined,
 		});
 		this._isEditing.set(false);
 		this._dialogVisible.set(true);
@@ -378,6 +440,8 @@ export class UsuariosStore {
 			grado: usuario.grado,
 			seccion: usuario.seccion,
 			correoApoderado: usuario.correoApoderado,
+			salonId: usuario.salonId,
+			esTutor: usuario.esTutor,
 		});
 		this._isEditing.set(true);
 		this._dialogVisible.set(true);

@@ -1,5 +1,6 @@
 import { Route, Routes } from '@angular/router';
 import { authGuard, permisosGuard } from '@core/guards';
+
 import { IntranetLayoutComponent } from '@shared/components/layout';
 import { environment } from '@config/environment';
 
@@ -84,6 +85,11 @@ export const INTRANET_ROUTES: Routes = [
 				path: 'admin/vistas',
 				loadComponent: () => import('./pages/admin/vistas').then((m) => m.VistasComponent),
 				title: 'Intranet - Gestión de Vistas',
+			},
+			{
+				path: 'admin/cursos',
+				loadComponent: () => import('./pages/admin/cursos').then((m) => m.CursosComponent),
+				title: 'Intranet - Gestión de Cursos',
 			},
 		],
 	},

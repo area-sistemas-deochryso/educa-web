@@ -113,18 +113,55 @@
 				}
 			</div>
 
+			<!-- NOMBRE DEL APODERADO PARA ESTUDIANTE -->
+			@if (isEstudiante) {
+				<div class="field">
+					<label for="nombreApoderado">
+						Nombre del Apoderado
+						<span style="color: var(--red-500)">*</span>
+					</label>
+					<input
+						id="nombreApoderado"
+						type="text"
+						pInputText
+						appUppercaseInput
+						[ngModel]="formData().nombreApoderado"
+						(ngModelChange)="onFieldChange('nombreApoderado', $event)"
+						placeholder="Nombre completo del apoderado"
+					/>
+				</div>
+			}
 			<!-- TELEFONO -->
-			<div class="field">
-				<label for="telefono">Telefono</label>
-				<input
-					id="telefono"
-					type="text"
-					pInputText
-					[ngModel]="formData().telefono"
-					(ngModelChange)="onFieldChange('telefono', $event)"
-					placeholder="999999999"
-				/>
-			</div>
+			@if (!isEstudiante) {
+				<div class="field">
+					<label for="telefono">Telefono</label>
+					<input
+						id="telefono"
+						type="text"
+						pInputText
+						[ngModel]="formData().telefono"
+						(ngModelChange)="onFieldChange('telefono', $event)"
+						placeholder="999999999"
+					/>
+				</div>
+			}
+			<!-- TELEFONO DEL APODERADO PARA ESTUDIANTE -->
+			@if (isEstudiante) {
+				<div class="field">
+					<label for="telefonoApoderado">
+						Telefono del Apoderado
+						<span style="color: var(--red-500)">*</span>
+					</label>
+					<input
+						id="telefonoApoderado"
+						type="text"
+						pInputText
+						[ngModel]="formData().telefonoApoderado"
+						(ngModelChange)="onFieldChange('telefonoApoderado', $event)"
+						placeholder="999999999 (obligatorio)"
+					/>
+				</div>
+			}
 			<!-- CORREO -->
 			@if (!isEstudiante) {
 				<div class="field">
@@ -160,6 +197,62 @@
 						[class.ng-dirty]="formData().correoApoderado"
 					/>
 					<app-form-field-error [error]="errors().correoApoderadoError" />
+				</div>
+			}
+			<!-- SALÓN PARA PROFESOR (Grado) -->
+			@if (isProfesor) {
+				<div class="field">
+					<label for="grado">Grado</label>
+					<p-select
+						id="grado"
+						[options]="gradosOptions()"
+						[ngModel]="_gradoSeleccionado()"
+						(ngModelChange)="onGradoChange($event)"
+						placeholder="Seleccione el grado"
+						[style]="{ width: '100%' }"
+						[showClear]="true"
+						appendTo="body"
+					/>
+				</div>
+			}
+			<!-- SALÓN PARA PROFESOR (Sección) -->
+			@if (isProfesor && _gradoSeleccionado()) {
+				<div class="field">
+					<label for="seccion">Sección</label>
+					<p-select
+						id="seccion"
+						[options]="seccionesOptions()"
+						[ngModel]="_seccionSeleccionada()"
+						(ngModelChange)="onSeccionChange($event)"
+						placeholder="Seleccione la sección"
+						[style]="{ width: '100%' }"
+						[showClear]="true"
+						appendTo="body"
+					/>
+					<small class="text-muted">
+						<i class="pi pi-info-circle" style="margin-right: 0.25rem"></i>
+						Opcional: Asigne un salón al profesor
+					</small>
+				</div>
+			}
+			<!-- ES TUTOR PARA PROFESOR -->
+			@if (isProfesor && formData().salonId) {
+				<div class="field full-width">
+					<div class="checkbox-container">
+						<p-checkbox
+							inputId="esTutor"
+							[binary]="true"
+							[ngModel]="formData().esTutor ?? false"
+							(ngModelChange)="onFieldChange('esTutor', $event)"
+						/>
+						<label for="esTutor" class="checkbox-label">
+							Es tutor de este salón
+						</label>
+					</div>
+					<small class="text-muted">
+						<i class="pi pi-info-circle" style="margin-right: 0.25rem"></i>
+						Marque si el profesor será tutor del salón seleccionado
+					</small>
 				</div>
 			}
 			<!-- ESTADO -->
