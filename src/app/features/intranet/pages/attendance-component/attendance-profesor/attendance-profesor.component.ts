@@ -223,7 +223,7 @@ export class AttendanceProfesorComponent implements OnInit {
 		const { selectedMonth, selectedYear } = this.ingresos();
 
 		this.asistenciaService
-			.getAsistenciasGrado(salon.grado, salon.seccion, selectedMonth, selectedYear)
+			.getAsistenciasGrado(salon.gradoCodigo, salon.seccion, selectedMonth, selectedYear)
 			.pipe(
 				takeUntilDestroyed(this.destroyRef),
 				finalize(() => {
@@ -319,7 +319,7 @@ export class AttendanceProfesorComponent implements OnInit {
 		const { selectedMonth, selectedYear } = this.ingresos();
 
 		this.asistenciaService
-			.getAsistenciasGrado(salon.grado, salon.seccion, selectedMonth, selectedYear)
+			.getAsistenciasGrado(salon.gradoCodigo, salon.seccion, selectedMonth, selectedYear)
 			.pipe(takeUntilDestroyed(this.destroyRef))
 			.subscribe({
 				next: (estudiantes) => {
@@ -347,7 +347,7 @@ export class AttendanceProfesorComponent implements OnInit {
 		const { selectedMonth, selectedYear } = this.salidas();
 
 		this.asistenciaService
-			.getAsistenciasGrado(salon.grado, salon.seccion, selectedMonth, selectedYear)
+			.getAsistenciasGrado(salon.gradoCodigo, salon.seccion, selectedMonth, selectedYear)
 			.pipe(takeUntilDestroyed(this.destroyRef))
 			.subscribe({
 				next: (estudiantes) => {
@@ -395,7 +395,7 @@ export class AttendanceProfesorComponent implements OnInit {
 		this.loading.set(true);
 
 		this.asistenciaService
-			.getAsistenciaDia(salon.grado, salon.seccion, this.fechaDia())
+			.getAsistenciaDia(salon.gradoCodigo, salon.seccion, this.fechaDia())
 			.pipe(
 				takeUntilDestroyed(this.destroyRef),
 				finalize(() => this.loading.set(false)),

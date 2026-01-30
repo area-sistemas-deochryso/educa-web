@@ -284,7 +284,11 @@ export class AsistenciaService {
 					const key = `${s.grado}-${s.seccion}`;
 					if (!seen.has(key)) {
 						seen.add(key);
-						result.push({ grado: s.grado, seccion: s.seccion });
+						result.push({
+							grado: s.grado,
+							gradoCodigo: s.gradoCodigo,
+							seccion: s.seccion,
+						});
 					}
 				});
 

@@ -183,14 +183,14 @@ export class AttendanceDirectorComponent implements OnInit {
 
 	private restoreSelectedGradoSeccion(): void {
 		const saved = this.storage.getSelectedGradoSeccionDirector();
-		if (
-			saved &&
-			this.gradosSecciones().some(
+		if (saved) {
+			const found = this.gradosSecciones().find(
 				(gs) => gs.grado === saved.grado && gs.seccion === saved.seccion,
-			)
-		) {
-			this.selectedGradoSeccion.set(saved);
-			return;
+			);
+			if (found) {
+				this.selectedGradoSeccion.set(found);
+				return;
+			}
 		}
 		const first = this.gradosSecciones()[0];
 		if (first) {
@@ -248,7 +248,7 @@ export class AttendanceDirectorComponent implements OnInit {
 		const { selectedMonth, selectedYear } = this.ingresos();
 
 		this.asistenciaService
-			.getAsistenciasGradoDirector(gs.grado, gs.seccion, selectedMonth, selectedYear)
+			.getAsistenciasGradoDirector(gs.gradoCodigo, gs.seccion, selectedMonth, selectedYear)
 			.pipe(
 				takeUntilDestroyed(this.destroyRef),
 				finalize(() => {
@@ -344,7 +344,7 @@ export class AttendanceDirectorComponent implements OnInit {
 		const { selectedMonth, selectedYear } = this.ingresos();
 
 		this.asistenciaService
-			.getAsistenciasGradoDirector(gs.grado, gs.seccion, selectedMonth, selectedYear)
+			.getAsistenciasGradoDirector(gs.gradoCodigo, gs.seccion, selectedMonth, selectedYear)
 			.pipe(takeUntilDestroyed(this.destroyRef))
 			.subscribe({
 				next: (estudiantes) => {
@@ -372,7 +372,7 @@ export class AttendanceDirectorComponent implements OnInit {
 		const { selectedMonth, selectedYear } = this.salidas();
 
 		this.asistenciaService
-			.getAsistenciasGradoDirector(gs.grado, gs.seccion, selectedMonth, selectedYear)
+			.getAsistenciasGradoDirector(gs.gradoCodigo, gs.seccion, selectedMonth, selectedYear)
 			.pipe(takeUntilDestroyed(this.destroyRef))
 			.subscribe({
 				next: (estudiantes) => {
@@ -420,7 +420,7 @@ export class AttendanceDirectorComponent implements OnInit {
 		this.loading.set(true);
 
 		this.asistenciaService
-			.getAsistenciaDiaDirector(gs.grado, gs.seccion, this.fechaDia())
+			.getAsistenciaDiaDirector(gs.gradoCodigo, gs.seccion, this.fechaDia())
 			.pipe(
 				takeUntilDestroyed(this.destroyRef),
 				finalize(() => this.loading.set(false)),
@@ -457,7 +457,7 @@ export class AttendanceDirectorComponent implements OnInit {
 		this.downloadingPdf.set(true);
 
 		this.asistenciaService
-			.descargarPdfAsistenciaDia(gs.grado, gs.seccion, this.fechaDia())
+			.descargarPdfAsistenciaDia(gs.gradoCodigo, gs.seccion, this.fechaDia())
 			.pipe(
 				takeUntilDestroyed(this.destroyRef),
 				finalize(() => this.downloadingPdf.set(false)),
@@ -486,7 +486,7 @@ export class AttendanceDirectorComponent implements OnInit {
 		this.downloadingPdf.set(true);
 
 		this.asistenciaService
-			.descargarPdfAsistenciaDia(gs.grado, gs.seccion, this.fechaDia())
+			.descargarPdfAsistenciaDia(gs.gradoCodigo, gs.seccion, this.fechaDia())
 			.pipe(
 				takeUntilDestroyed(this.destroyRef),
 				finalize(() => this.downloadingPdf.set(false)),

@@ -56,6 +56,7 @@ export interface EstudianteSalon {
 export interface SalonProfesor {
 	salonId: number;
 	grado: string;
+	gradoCodigo: string;
 	seccion: string;
 	nombreSalon: string;
 	anio: number;
@@ -80,6 +81,7 @@ export interface EstadisticasDia {
 // Director: Grado disponible para filtro
 export interface GradoSeccion {
 	grado: string;
+	gradoCodigo: string;
 	seccion: string;
 }
 

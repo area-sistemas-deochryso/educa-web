@@ -24,6 +24,11 @@ export class GradoSeccionSelectorComponent {
 	onGradoSeccionChange(event: Event): void {
 		const select = event.target as HTMLSelectElement;
 		const [grado, seccion] = select.value.split('|');
-		this.gradoSeccionChange.emit({ grado, seccion });
+		const gradoSeccion = this.gradosSecciones().find(
+			(gs) => gs.grado === grado && gs.seccion === seccion
+		);
+		if (gradoSeccion) {
+			this.gradoSeccionChange.emit(gradoSeccion);
+		}
 	}
 }
