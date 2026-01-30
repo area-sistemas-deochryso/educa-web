@@ -85,6 +85,13 @@ export class UsuariosStore {
 
 	readonly correoApoderadoError = computed(() => {
 		const correo = this._formData().correoApoderado || '';
+		const rol = this._formData().rol;
+
+		// Requerido para Estudiante
+		if (rol === 'Estudiante' && !correo) {
+			return 'El correo del apoderado es obligatorio para estudiantes';
+		}
+
 		if (!correo) return null;
 		const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 		if (!emailRegex.test(correo)) return 'Ingrese un correo valido';

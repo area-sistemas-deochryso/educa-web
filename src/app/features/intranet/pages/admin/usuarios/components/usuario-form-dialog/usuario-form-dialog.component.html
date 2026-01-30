@@ -68,7 +68,13 @@
 			</div>
 			<!-- CONTRASEÑA (readonly/autogenerada) -->
 			<div class="field">
-				<label for="contrasena">
+				<label for="contrasena" class="password-label">
+					@if (!isEditing() || !canEditPassword()) {
+						<i class="pi pi-lock" style="color: var(--red-500); margin-right: 0.5rem"></i>
+					}
+					@if (isEditing() && canEditPassword()) {
+						<i class="pi pi-lock-open" style="color: var(--green-500); margin-right: 0.5rem"></i>
+					}
 					Contraseña
 					@if (!isEditing() || !canEditPassword()) {
 						<span>(autogenerada)</span>
@@ -89,11 +95,13 @@
 
 				@if (!isEditing() || !canEditPassword()) {
 					<small class="text-muted">
+						<i class="pi pi-info-circle" style="margin-right: 0.25rem"></i>
 						La contraseña se genera automáticamente: 2 primeras letras del apellido (mayúsculas) + últimos 4 dígitos del DNI
 					</small>
 				}
 				@if (isEditing() && canEditPassword()) {
 					<small class="text-muted">
+						<i class="pi pi-info-circle" style="margin-right: 0.25rem"></i>
 						Puede editar la contraseña manualmente o dejarla como está (autogenerada)
 					</small>
 				}
@@ -131,14 +139,17 @@
 			<!-- CORREO APODERADO PARA ESTUDIANTE -->
 			@if (isEstudiante) {
 				<div class="field">
-					<label for="correoApoderado">Correo del Apoderado</label>
+					<label for="correoApoderado">
+						Correo del Apoderado
+						<span style="color: var(--red-500)">*</span>
+					</label>
 					<input
 						id="correoApoderado"
 						type="email"
 						pInputText
 						[ngModel]="formData().correoApoderado"
 						(ngModelChange)="onFieldChange('correoApoderado', $event)"
-						placeholder="correo@ejemplo.com"
+						placeholder="correo@ejemplo.com (obligatorio)"
 						[class.ng-invalid]="errors().correoApoderadoError"
 						[class.ng-dirty]="formData().correoApoderado"
 					/>
