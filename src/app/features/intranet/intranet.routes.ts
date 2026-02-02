@@ -91,6 +91,12 @@ export const INTRANET_ROUTES: Routes = [
 				loadComponent: () => import('./pages/admin/cursos').then((m) => m.CursosComponent),
 				title: 'Intranet - Gestión de Cursos',
 			},
+			{
+				path: 'admin/horarios',
+				loadComponent: () =>
+					import('./pages/admin/horarios').then((m) => m.HorariosComponent),
+				title: 'Intranet - Gestión de Horarios',
+			},
 		],
 	},
 ];

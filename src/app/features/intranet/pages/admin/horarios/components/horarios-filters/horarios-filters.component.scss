@@ -1,0 +1,50 @@
+// ============ Filtros ============
+.filters-section {
+  background: transparent;
+  border-radius: 8px;
+  padding: 1.5rem;
+  margin-bottom: 1.5rem;
+  box-shadow: none;
+
+  .filters-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1rem;
+    margin-bottom: 1rem;
+
+    .filter-field {
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+
+      label {
+        font-weight: 500;
+        font-size: 0.9rem;
+        color: var(--text-color);
+      }
+
+      input {
+        padding: 0.625rem;
+        border: 1px solid var(--surface-border);
+        border-radius: 6px;
+        font-size: 0.9rem;
+        transition: border-color 0.2s;
+
+        &:focus {
+          outline: none;
+          border-color: var(--intranet-accent-color-blue);
+        }
+      }
+
+      .disabled-hint {
+        font-size: 0.75rem;
+        margin-top: 0.25rem;
+      }
+    }
+  }
+
+  .filters-actions {
+    display: flex;
+    justify-content: flex-end;
+  }
+}

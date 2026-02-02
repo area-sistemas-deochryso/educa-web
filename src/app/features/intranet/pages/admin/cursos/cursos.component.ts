@@ -165,12 +165,20 @@ export class CursosComponent implements OnInit {
 	// ============ Filters ============
 	searchTerm = signal('');
 	filterEstado = signal<boolean | null>(null);
+	filterNivel = signal<string | null>(null);
 
 	// ============ Options ============
 	estadoOptions = [
 		{ label: 'Todos', value: null },
 		{ label: 'Activos', value: true },
 		{ label: 'Inactivos', value: false },
+	];
+
+	nivelOptions = [
+		{ label: 'Todos los niveles', value: null },
+		{ label: 'Inicial', value: 'INICIAL' },
+		{ label: 'Primaria', value: 'PRIMARIA' },
+		{ label: 'Secundaria', value: 'SECUNDARIA' },
 	];
 
 	// ============ Computed - Statistics ============
@@ -183,6 +191,7 @@ export class CursosComponent implements OnInit {
 		let data = this.cursos();
 		const search = this.searchTerm().toLowerCase();
 		const filtroEstado = this.filterEstado();
+		const filtroNivel = this.filterNivel();
 
 		if (search) {
 			data = data.filter((c) => c.nombre.toLowerCase().includes(search));
@@ -190,6 +199,12 @@ export class CursosComponent implements OnInit {
 
 		if (filtroEstado !== null) {
 			data = data.filter((c) => c.estado === filtroEstado);
+		}
+
+		if (filtroNivel !== null) {
+			data = data.filter((c) =>
+				c.grados?.some((g) => g.nombre.toUpperCase().includes(filtroNivel))
+			);
 		}
 
 		return data;
@@ -241,6 +256,7 @@ export class CursosComponent implements OnInit {
 	clearFilters(): void {
 		this.searchTerm.set('');
 		this.filterEstado.set(null);
+		this.filterNivel.set(null);
 	}
 
 	// ============ Edit Dialog ============

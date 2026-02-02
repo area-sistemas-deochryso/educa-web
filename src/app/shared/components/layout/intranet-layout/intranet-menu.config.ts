@@ -92,6 +92,12 @@ export const INTRANET_MENU: NavItemWithPermiso[] = [
 				icon: 'pi pi-book',
 				permiso: 'intranet/admin/cursos',
 			},
+			{
+				route: '/intranet/admin/horarios',
+				label: 'Horarios',
+				icon: 'pi pi-calendar',
+				permiso: 'intranet/admin/horarios',
+			},
 		],
 	},
 ];

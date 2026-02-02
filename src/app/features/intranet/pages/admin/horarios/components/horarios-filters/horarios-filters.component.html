@@ -1,0 +1,80 @@
+<div class="filters-section">
+	<div class="filters-grid">
+		<!-- Filtro por Salón -->
+		<div class="filter-field">
+			<label for="filtroSalon">Salón</label>
+			<p-select
+				id="filtroSalon"
+				[options]="salonesOptions()"
+				[ngModel]="filtroSalonId()"
+				(ngModelChange)="onSalonChange($event)"
+				placeholder="Todos los salones"
+				optionLabel="label"
+				optionValue="value"
+				appendTo="body"
+				[filter]="true"
+				filterPlaceholder="Buscar salón..."
+				[showClear]="true"
+			/>
+		</div>
+
+		<!-- Filtro por Profesor (pendiente - requiere API de profesores) -->
+		<div class="filter-field">
+			<label for="filtroProfesor">Profesor</label>
+			<input id="filtroProfesor" type="text" pInputText placeholder="Próximamente..." disabled />
+		</div>
+
+		<!-- Filtro por Día de la Semana -->
+		<div class="filter-field">
+			<label for="filtroDia">Día</label>
+			<p-select
+				id="filtroDia"
+				[options]="diasOptions"
+				[ngModel]="filtroDiaSemana()"
+				(ngModelChange)="onDiaChange($event)"
+				placeholder="Todos los días"
+				optionLabel="label"
+				optionValue="value"
+				appendTo="body"
+				[showClear]="true"
+				[disabled]="!filtroDiaSemanaHabilitado()"
+			/>
+			@if (!filtroDiaSemanaHabilitado()) {
+				<small class="text-color-secondary disabled-hint">
+					<i class="pi pi-info-circle"></i>
+					Deshabilitado en vista semanal
+				</small>
+			}
+		</div>
+
+		<!-- Filtro por Estado -->
+		<div class="filter-field">
+			<label for="filtroEstado">Estado</label>
+			<p-select
+				id="filtroEstado"
+				[options]="estadoOptions"
+				[ngModel]="filtroEstadoActivo()"
+				(ngModelChange)="onEstadoChange($event)"
+				placeholder="Todos"
+				optionLabel="label"
+				optionValue="value"
+				appendTo="body"
+				[showClear]="true"
+			/>
+		</div>
+	</div>
+
+	@if (hasFilters()) {
+		<div class="filters-actions">
+			<button
+				pButton
+				label="Limpiar Filtros"
+				icon="pi pi-filter-slash"
+				class="p-button-text p-button-sm"
+				(click)="onClearFilters()"
+				pTooltip="Remover todos los filtros aplicados"
+				tooltipPosition="top"
+			></button>
+		</div>
+	}
+</div>

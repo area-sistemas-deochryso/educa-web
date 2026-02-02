@@ -81,6 +81,15 @@
 			[style]="{ minWidth: '140px' }"
 		/>
 
+		<p-select
+			[options]="nivelOptions"
+			[ngModel]="filterNivel()"
+			(ngModelChange)="filterNivel.set($event)"
+			placeholder="Nivel educativo"
+			[style]="{ minWidth: '180px' }"
+			appendTo="body"
+		/>
+
 		<button
 			pButton
 			label="Limpiar"

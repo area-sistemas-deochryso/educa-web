@@ -1,0 +1,530 @@
+<!-- ============ Header ============ -->
+<div class="horarios-header">
+	<div class="title-section">
+		<h1>Gestión de Horarios</h1>
+		<p class="subtitle">Administra los horarios de clases por salón</p>
+	</div>
+
+	<div class="actions">
+		<button
+			pButton
+			label="Refrescar"
+			icon="pi pi-refresh"
+			class="p-button-outlined"
+			(click)="refresh()"
+			[loading]="vm().loading"
+			pTooltip="Actualizar lista de horarios"
+			tooltipPosition="bottom"
+			[pt]="{ root: { 'aria-label': 'Refrescar horarios' } }"
+		></button>
+
+		<button
+			pButton
+			label="Nuevo Horario"
+			icon="pi pi-plus"
+			(click)="onNew()"
+			pTooltip="Crear un nuevo horario de clase"
+			tooltipPosition="bottom"
+			[pt]="{ root: { 'aria-label': 'Crear nuevo horario' } }"
+		></button>
+	</div>
+</div>
+
+<!-- ============ Estadísticas ============ -->
+@if (vm().estadisticas) {
+	<div class="stats-grid">
+		<div class="stat-card">
+			<div
+				class="stat-icon"
+				style="
+					background: rgba(59, 130, 246, 0.1);
+					color: var(--intranet-accent-color-blue);
+				"
+			>
+				<i class="pi pi-calendar"></i>
+			</div>
+			<div class="stat-content">
+				<span class="stat-label">Total Horarios</span>
+				<span class="stat-value">{{ vm().estadisticas!.totalHorarios }}</span>
+			</div>
+		</div>
+
+		<div class="stat-card">
+			<div
+				class="stat-icon"
+				style="
+					background: rgba(34, 197, 94, 0.1);
+					color: var(--intranet-accent-color-green);
+				"
+			>
+				<i class="pi pi-check-circle"></i>
+			</div>
+			<div class="stat-content">
+				<span class="stat-label">Activos</span>
+				<span class="stat-value">{{ vm().estadisticas!.horariosActivos }}</span>
+			</div>
+		</div>
+
+		<div class="stat-card">
+			<div class="stat-icon" style="background: var(--orange-100); color: var(--orange-600)">
+				<i class="pi pi-times-circle"></i>
+			</div>
+			<div class="stat-content">
+				<span class="stat-label">Inactivos</span>
+				<span class="stat-value">{{ vm().estadisticas!.horariosInactivos }}</span>
+			</div>
+		</div>
+
+		<div class="stat-card">
+			<div class="stat-icon" style="background: var(--red-100); color: var(--red-600)">
+				<i class="pi pi-user-minus"></i>
+			</div>
+			<div class="stat-content">
+				<span class="stat-label">Sin Profesor</span>
+				<span class="stat-value">{{ vm().estadisticas!.horariosSinProfesor }}</span>
+			</div>
+		</div>
+	</div>
+}
+
+<!-- ============ Filtros ============ -->
+<app-horarios-filters
+	[salonesOptions]="vm().salonesOptions"
+	[filtroSalonId]="vm().filtroSalonId"
+	[filtroDiaSemana]="vm().filtroDiaSemana"
+	[filtroEstadoActivo]="vm().filtroEstadoActivo"
+	[filtroDiaSemanaHabilitado]="vm().filtroDiaSemanaHabilitado"
+	[hasFilters]="vm().hasFilters"
+	(filtroSalonChange)="onFiltroSalonChange($event)"
+	(filtroDiaSemanaChange)="onFiltroDiaSemanaChange($event)"
+	(filtroEstadoChange)="onFiltroEstadoChange($event)"
+	(clearFiltros)="onClearFiltros()"
+/>
+
+<!-- ============ Tabs: Vista Semanal / Vista Lista ============ -->
+<div class="view-tabs">
+	<button
+		pButton
+		label="Vista Lista"
+		icon="pi pi-list"
+		class="p-button-text tab-button"
+		[class.active]="vm().vistaActual === 'lista'"
+		(click)="onCambiarVista('lista')"
+		pTooltip="Ver horarios en formato de tabla"
+		tooltipPosition="top"
+	></button>
+	<button
+		pButton
+		label="Vista Semanal"
+		icon="pi pi-table"
+		class="p-button-text tab-button"
+		[class.active]="vm().vistaActual === 'semanal'"
+		[disabled]="!vm().vistaSemanalHabilitada"
+		[pTooltip]="
+			!vm().vistaSemanalHabilitada
+				? 'Selecciona un salón o profesor para ver la vista semanal'
+				: 'Ver horarios en formato de calendario semanal'
+		"
+		tooltipPosition="top"
+		(click)="onCambiarVista('semanal')"
+	></button>
+</div>
+
+<!-- ============ Vista Semanal ============ -->
+@if (vm().vistaActual === 'semanal') {
+	<div class="weekly-view">
+		<app-horarios-weekly-view
+			[blocks]="vm().horariosSemanales"
+			[loading]="vm().loading"
+			(blockClick)="onViewDetail($event)"
+			(editClick)="onEdit($event)"
+			(viewDetailClick)="onViewDetail($event)"
+		/>
+	</div>
+}
+
+<!-- ============ Vista Lista ============ -->
+@if (vm().vistaActual === 'lista') {
+	<app-horarios-list-view
+		[horarios]="vm().horariosFiltrados"
+		[loading]="vm().loading"
+		(viewDetail)="onViewDetail($event)"
+		(edit)="onEdit($event)"
+		(toggleEstado)="onToggleEstado($event.id, $event.estadoActual)"
+		(delete)="onDelete($event)"
+	/>
+	<!--  -->
+}
+
+<!-- ============ Dialog: Crear/Editar Horario ============ -->
+<p-dialog
+	[visible]="vm().dialogVisible"
+	(visibleChange)="!$event && onCancelDialog()"
+	[header]="vm().editingId ? 'Editar Horario' : 'Crear Horario'"
+	[modal]="true"
+	[style]="{ width: '600px' }"
+	[draggable]="false"
+	[resizable]="false"
+>
+	<div class="dialog-content">
+		<div class="form-grid">
+			<!-- Día de la semana -->
+			<div class="form-field">
+				<label for="diaSemana">Día de la semana *</label>
+				<p-select
+					id="diaSemana"
+					[(ngModel)]="vm().formData.diaSemana"
+					[options]="[
+						{ label: 'Lunes', value: 1 },
+						{ label: 'Martes', value: 2 },
+						{ label: 'Miércoles', value: 3 },
+						{ label: 'Jueves', value: 4 },
+						{ label: 'Viernes', value: 5 },
+					]"
+					placeholder="Seleccionar día"
+					optionLabel="label"
+					optionValue="value"
+					appendTo="body"
+					class="w-full"
+				/>
+			</div>
+
+			<!-- Hora inicio -->
+			<div class="form-field">
+				<label for="horaInicio">Hora inicio *</label>
+				<input
+					id="horaInicio"
+					type="time"
+					pInputText
+					[(ngModel)]="vm().formData.horaInicio"
+					class="w-full"
+				/>
+			</div>
+
+			<!-- Hora fin -->
+			<div class="form-field">
+				<label for="horaFin">Hora fin *</label>
+				<input
+					id="horaFin"
+					type="time"
+					pInputText
+					[(ngModel)]="vm().formData.horaFin"
+					class="w-full"
+				/>
+			</div>
+
+			<!-- Salón -->
+			<div class="form-field full-width">
+				<label for="salon">Salón *</label>
+				<p-select
+					id="salon"
+					[(ngModel)]="vm().formData.salonId"
+					[options]="vm().salonesOptions"
+					placeholder="Seleccionar salón disponible"
+					optionLabel="label"
+					optionValue="value"
+					appendTo="body"
+					class="w-full"
+					[filter]="true"
+					filterPlaceholder="Buscar salón..."
+					[loading]="vm().optionsLoading"
+					[disabled]="vm().optionsLoading"
+				>
+					<ng-template pTemplate="selectedItem" let-option>
+						@if (option) {
+							<div class="flex align-items-center gap-2">
+								<i class="pi pi-home"></i>
+								<span>{{ option.label }}</span>
+							</div>
+						}
+					</ng-template>
+					<ng-template pTemplate="item" let-option>
+						<div class="flex flex-column" style="gap: 0.75rem; padding: 0.5rem 0">
+							<div class="flex align-items-center gap-2">
+								<i class="pi pi-home" style="font-size: 1.1rem"></i>
+								<span class="font-semibold" style="font-size: 1rem">{{
+									option.label
+								}}</span>
+							</div>
+							<div
+								class="flex flex-column"
+								style="gap: 0.5rem; padding-left: 0.25rem"
+							>
+								<small
+									class="text-color-secondary"
+									style="display: flex; align-items: center; gap: 0.5rem"
+								>
+									<i class="pi pi-tag" style="font-size: 0.8rem"></i>
+									<span>{{ option.grado }} {{ option.seccion }}</span>
+								</small>
+								<small
+									class="text-color-secondary"
+									style="display: flex; align-items: center; gap: 0.5rem"
+								>
+									<i class="pi pi-building" style="font-size: 0.8rem"></i>
+									<span>{{ option.sede }}</span>
+								</small>
+								<small
+									class="text-color-secondary"
+									style="display: flex; align-items: center; gap: 0.5rem"
+								>
+									<i class="pi pi-users" style="font-size: 0.8rem"></i>
+									<span>{{ option.totalEstudiantes }} estudiantes</span>
+								</small>
+							</div>
+						</div>
+					</ng-template>
+				</p-select>
+				@if (vm().formData.diaSemana && vm().formData.horaInicio && vm().formData.horaFin) {
+					<small class="text-muted">
+						<i class="pi pi-info-circle"></i>
+						Mostrando solo salones disponibles para el día y horario seleccionado
+					</small>
+				}
+			</div>
+
+			<!-- Curso - Botón para abrir modal de selección -->
+			<div class="form-field full-width">
+				<label for="curso">Curso *</label>
+				<div class="flex gap-2">
+					<button
+						pButton
+						type="button"
+						[label]="getCursoSeleccionadoLabel()"
+						icon="pi pi-book"
+						class="p-button-outlined w-full justify-content-start"
+						(click)="onOpenCursoDialog()"
+						[disabled]="vm().optionsLoading"
+						pTooltip="Seleccionar curso organizados por nivel educativo"
+						tooltipPosition="top"
+					></button>
+					@if (vm().formData.cursoId) {
+						<button
+							pButton
+							type="button"
+							icon="pi pi-times"
+							class="p-button-text p-button-danger"
+							(click)="onSelectCurso(null!)"
+							pTooltip="Limpiar selección de curso"
+							tooltipPosition="top"
+							[pt]="{
+								root: {
+									'aria-label': 'Limpiar selección',
+								},
+							}"
+						></button>
+					}
+				</div>
+				@if (vm().formData.cursoId) {
+					<small class="text-color-secondary mt-1">
+						<i class="pi pi-tag"></i>
+						{{ getCursoSeleccionadoNiveles() }}
+					</small>
+				}
+			</div>
+		</div>
+	</div>
+
+	<ng-template pTemplate="footer">
+		<button
+			pButton
+			label="Cancelar"
+			icon="pi pi-times"
+			class="p-button-text"
+			(click)="onCancelDialog()"
+			pTooltip="Cerrar sin guardar cambios"
+			tooltipPosition="top"
+		></button>
+		<button
+			pButton
+			[label]="vm().editingId ? 'Actualizar' : 'Crear'"
+			icon="pi pi-check"
+			(click)="onSaveHorario()"
+			[disabled]="!vm().formValid"
+			[pTooltip]="vm().editingId ? 'Guardar cambios del horario' : 'Crear nuevo horario'"
+			tooltipPosition="top"
+		></button>
+	</ng-template>
+</p-dialog>
+
+<!-- ============ ConfirmDialog ============ -->
+<p-confirmDialog />
+
+<!-- ============ Modal de Selección de Cursos por Nivel ============ -->
+<p-dialog
+	[visible]="vm().cursoDialogVisible"
+	(visibleChange)="!$event && onCloseCursoDialog()"
+	[modal]="true"
+	[closable]="true"
+	[draggable]="false"
+	[resizable]="false"
+	styleClass="curso-selection-dialog"
+	[style]="{ width: '90vw', 'max-width': '800px' }"
+>
+	<ng-template pTemplate="header">
+		<div class="flex align-items-center gap-2">
+			<i class="pi pi-book text-primary" style="font-size: 1.5rem"></i>
+			<span class="text-xl font-semibold">Seleccionar Curso por Nivel Educativo</span>
+		</div>
+	</ng-template>
+
+	<div class="curso-selection-content">
+		@if (vm().optionsLoading) {
+			<div class="flex justify-content-center align-items-center p-5">
+				<p-progressSpinner />
+			</div>
+		} @else {
+			<p-tabs value="inicial">
+				<p-tablist>
+					<p-tab value="inicial">
+						<i class="pi pi-sun"></i>
+						<span>Inicial</span>
+						<p-badge [value]="vm().cursosPorNivel.inicial.length.toString()" />
+					</p-tab>
+					<p-tab value="primaria">
+						<i class="pi pi-pencil"></i>
+						<span>Primaria</span>
+						<p-badge [value]="vm().cursosPorNivel.primaria.length.toString()" />
+					</p-tab>
+					<p-tab value="secundaria">
+						<i class="pi pi-graduation-cap"></i>
+						<span>Secundaria</span>
+						<p-badge [value]="vm().cursosPorNivel.secundaria.length.toString()" />
+					</p-tab>
+				</p-tablist>
+
+				<!-- Panel: Inicial -->
+				<p-tabpanel value="inicial">
+					@if (vm().cursosPorNivel.inicial.length === 0) {
+						<div class="text-center p-4 text-color-secondary">
+							<i class="pi pi-info-circle" style="font-size: 2rem"></i>
+							<p class="mt-2">No hay cursos disponibles para Inicial</p>
+						</div>
+					} @else {
+						<div class="curso-grid">
+							@for (
+								curso of vm().cursosPorNivel.inicial;
+								track trackByCursoId($index, curso)
+							) {
+								<div
+									class="curso-card"
+									[class.selected]="vm().formData.cursoId === curso.value"
+									(click)="onSelectCurso(curso.value)"
+								>
+									<div class="curso-card-content">
+										<i class="pi pi-book curso-icon"></i>
+										<h4 class="curso-nombre">{{ curso.label }}</h4>
+										<p class="curso-grados">{{ curso.grados.join(', ') }}</p>
+									</div>
+									@if (vm().formData.cursoId === curso.value) {
+										<i class="pi pi-check-circle curso-selected-icon"></i>
+									}
+								</div>
+							}
+						</div>
+					}
+				</p-tabpanel>
+
+				<!-- Panel: Primaria -->
+				<p-tabpanel value="primaria">
+					@if (vm().cursosPorNivel.primaria.length === 0) {
+						<div class="text-center p-4 text-color-secondary">
+							<i class="pi pi-info-circle" style="font-size: 2rem"></i>
+							<p class="mt-2">No hay cursos disponibles para Primaria</p>
+						</div>
+					} @else {
+						<div class="curso-grid">
+							@for (
+								curso of vm().cursosPorNivel.primaria;
+								track trackByCursoId($index, curso)
+							) {
+								<div
+									class="curso-card"
+									[class.selected]="vm().formData.cursoId === curso.value"
+									(click)="onSelectCurso(curso.value)"
+								>
+									<div class="curso-card-content">
+										<i class="pi pi-book curso-icon"></i>
+										<h4 class="curso-nombre">{{ curso.label }}</h4>
+										<p class="curso-grados">{{ curso.grados.join(', ') }}</p>
+									</div>
+									@if (vm().formData.cursoId === curso.value) {
+										<i class="pi pi-check-circle curso-selected-icon"></i>
+									}
+								</div>
+							}
+						</div>
+					}
+				</p-tabpanel>
+
+				<!-- Panel: Secundaria -->
+				<p-tabpanel value="secundaria">
+					@if (vm().cursosPorNivel.secundaria.length === 0) {
+						<div class="text-center p-4 text-color-secondary">
+							<i class="pi pi-info-circle" style="font-size: 2rem"></i>
+							<p class="mt-2">No hay cursos disponibles para Secundaria</p>
+						</div>
+					} @else {
+						<div class="curso-grid">
+							@for (
+								curso of vm().cursosPorNivel.secundaria;
+								track trackByCursoId($index, curso)
+							) {
+								<div
+									class="curso-card"
+									[class.selected]="vm().formData.cursoId === curso.value"
+									(click)="onSelectCurso(curso.value)"
+								>
+									<div class="curso-card-content">
+										<i class="pi pi-book curso-icon"></i>
+										<h4 class="curso-nombre">{{ curso.label }}</h4>
+										<p class="curso-grados">{{ curso.grados.join(', ') }}</p>
+									</div>
+									@if (vm().formData.cursoId === curso.value) {
+										<i class="pi pi-check-circle curso-selected-icon"></i>
+									}
+								</div>
+							}
+						</div>
+					}
+				</p-tabpanel>
+			</p-tabs>
+		}
+	</div>
+
+	<ng-template pTemplate="footer">
+		<button
+			pButton
+			label="Cancelar"
+			icon="pi pi-times"
+			class="p-button-text"
+			(click)="onCloseCursoDialog()"
+			pTooltip="Cerrar sin seleccionar curso"
+			tooltipPosition="top"
+		></button>
+		<button
+			pButton
+			label="Confirmar"
+			icon="pi pi-check"
+			[disabled]="!vm().formData.cursoId"
+			(click)="onCloseCursoDialog()"
+			pTooltip="Confirmar selección de curso"
+			tooltipPosition="top"
+		></button>
+	</ng-template>
+</p-dialog>
+
+<!-- ============ Detail Drawer - Asignaciones ============ -->
+<app-horario-detail-drawer
+	[visible]="vm().detailDrawerVisible"
+	[detalle]="vm().horarioDetalle"
+	[loading]="vm().detailLoading"
+	[profesoresOptions]="vm().profesoresOptions"
+	(visibleChange)="vm().detailDrawerVisible && !$event && onCloseDetailDrawer()"
+	(close)="onCloseDetailDrawer()"
+	(edit)="onEdit($event)"
+	(delete)="onDelete($event)"
+	(toggleEstado)="onToggleEstado($event.id, $event.estadoActual)"
+	(asignarProfesor)="onAsignarProfesor($event.horarioId, $event.profesorId)"
+	(asignarTodosEstudiantes)="onAsignarTodosEstudiantes($event)"
+/>

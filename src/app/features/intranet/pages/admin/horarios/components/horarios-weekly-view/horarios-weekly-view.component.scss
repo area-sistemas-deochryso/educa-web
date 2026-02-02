@@ -1,0 +1,276 @@
+:host {
+  display: block;
+  width: 100%;
+}
+
+.weekly-container {
+  position: relative;
+  min-height: 500px;
+}
+
+// ============ Grid principal ============
+.weekly-grid-container {
+  display: grid;
+  grid-template-columns: 80px repeat(5, 1fr);
+  gap: 0;
+  overflow-x: auto;
+
+  @media (max-width: 1024px) {
+    min-width: 800px;
+  }
+}
+
+// ============ Columna de tiempo ============
+.time-column {
+  background: var(--surface-100);
+  border-right: 2px solid var(--surface-border);
+
+  .time-header {
+    height: 50px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 600;
+    font-size: 0.9rem;
+    border-bottom: 2px solid var(--surface-border);
+    background: var(--surface-50);
+  }
+
+  .time-slot {
+    height: 60px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.85rem;
+    color: var(--text-color-secondary);
+    border-bottom: 1px solid var(--surface-border);
+    font-weight: 500;
+  }
+}
+
+// ============ Columnas de días ============
+.day-column {
+  position: relative;
+  border-right: 1px solid var(--surface-border);
+
+  &:last-child {
+    border-right: none;
+  }
+
+  .day-header {
+    height: 50px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 600;
+    font-size: 0.9rem;
+    border-bottom: 2px solid var(--surface-border);
+    background: var(--surface-50);
+    color: var(--intranet-accent-color-blue);
+  }
+
+  .day-grid {
+    position: relative;
+    min-height: 660px; // 11 horas * 60px
+
+    .hour-line {
+      height: 60px;
+      border-bottom: 1px solid var(--surface-border);
+    }
+
+    .blocks-container {
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      padding: 0 4px;
+    }
+  }
+}
+
+// ============ Bloques de horario ============
+.horario-block {
+  position: absolute;
+  width: calc(100% - 8px);
+  border-radius: 6px;
+  padding: 0.5rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  overflow: hidden;
+  color: #ffffff;
+  font-size: 0.8rem;
+
+  &:hover {
+    transform: translateX(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+    z-index: 10;
+
+    .block-actions {
+      opacity: 1;
+      pointer-events: all;
+    }
+  }
+
+  &.inactive {
+    opacity: 0.5;
+    filter: grayscale(50%);
+
+    &::after {
+      content: 'INACTIVO';
+      position: absolute;
+      top: 4px;
+      right: 4px;
+      background: rgba(0, 0, 0, 0.4);
+      color: #fff;
+      padding: 2px 6px;
+      border-radius: 3px;
+      font-size: 0.65rem;
+      font-weight: 700;
+    }
+  }
+
+  .block-content {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+    height: 100%;
+    position: relative;
+
+    > div {
+      display: flex;
+      align-items: center;
+      gap: 0.25rem;
+
+      i {
+        font-size: 0.75rem;
+        opacity: 0.9;
+      }
+    }
+
+    .curso-nombre {
+      font-weight: 700;
+      font-size: 0.85rem;
+      margin-bottom: 0.25rem;
+      text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+    }
+
+    .horario-tiempo,
+    .salon-info,
+    .profesor-info,
+    .estudiantes-count {
+      font-size: 0.75rem;
+      font-weight: 500;
+      opacity: 0.95;
+    }
+
+    .sin-profesor {
+      opacity: 0.7;
+      font-style: italic;
+    }
+  }
+
+  // Acciones (visibles al hover)
+  .block-actions {
+    position: absolute;
+    top: 4px;
+    right: 4px;
+    display: flex;
+    gap: 0.25rem;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.2s;
+
+    .action-btn {
+      width: 28px;
+      height: 28px;
+      background: rgba(255, 255, 255, 0.95);
+      color: var(--primary-color);
+      backdrop-filter: blur(4px);
+
+      &:hover {
+        background: #ffffff;
+        transform: scale(1.1);
+      }
+    }
+  }
+}
+
+// ============ Overlays ============
+.loading-overlay,
+.empty-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
+  background: rgba(255, 255, 255, 0.95);
+  z-index: 100;
+  backdrop-filter: blur(2px);
+
+  p {
+    margin: 0;
+    color: var(--text-color-secondary);
+    font-size: 1rem;
+  }
+
+  .empty-hint {
+    font-size: 0.85rem;
+    opacity: 0.7;
+  }
+}
+
+// ============ Responsive ============
+@media (max-width: 768px) {
+  .horario-block {
+    font-size: 0.7rem;
+
+    .block-content {
+      gap: 0.15rem;
+
+      .curso-nombre {
+        font-size: 0.75rem;
+      }
+
+      .horario-tiempo,
+      .salon-info,
+      .profesor-info,
+      .estudiantes-count {
+        font-size: 0.65rem;
+      }
+
+      i {
+        font-size: 0.65rem;
+      }
+    }
+
+    .block-actions {
+      .action-btn {
+        width: 24px;
+        height: 24px;
+      }
+    }
+  }
+}
+
+// ============ Dark Mode Support ============
+:host-context(.dark-mode) {
+  .horario-block {
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+
+    &:hover {
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
+    }
+  }
+
+  .loading-overlay,
+  .empty-overlay {
+    background: rgba(0, 0, 0, 0.8);
+  }
+}

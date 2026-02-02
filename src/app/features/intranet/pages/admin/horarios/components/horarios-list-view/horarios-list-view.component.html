@@ -1,0 +1,121 @@
+<div class="list-view">
+	<p-table
+		[value]="horarios()"
+		[loading]="loading()"
+		[paginator]="true"
+		[rows]="10"
+		[showCurrentPageReport]="true"
+		currentPageReportTemplate="Mostrando {first} a {last} de {totalRecords} horarios"
+		[rowsPerPageOptions]="[10, 25, 50]"
+		responsiveLayout="scroll"
+		stateStorage="session"
+		stateKey="horarios-table-state"
+	>
+		<ng-template pTemplate="header">
+			<tr>
+				<th pSortableColumn="diaSemanaDescripcion">
+					Día <p-sortIcon field="diaSemanaDescripcion" />
+				</th>
+				<th pSortableColumn="horaInicio">
+					Horario <p-sortIcon field="horaInicio" />
+				</th>
+				<th pSortableColumn="salonDescripcion">
+					Salón <p-sortIcon field="salonDescripcion" />
+				</th>
+				<th pSortableColumn="cursoNombre">
+					Curso <p-sortIcon field="cursoNombre" />
+				</th>
+				<th pSortableColumn="profesorNombreCompleto">
+					Profesor <p-sortIcon field="profesorNombreCompleto" />
+				</th>
+				<th pSortableColumn="cantidadEstudiantes">
+					Estudiantes <p-sortIcon field="cantidadEstudiantes" />
+				</th>
+				<th pSortableColumn="estado">
+					Estado <p-sortIcon field="estado" />
+				</th>
+				<th>Acciones</th>
+			</tr>
+		</ng-template>
+
+		<ng-template pTemplate="body" let-horario>
+			<tr>
+				<td>{{ horario.diaSemanaDescripcion }}</td>
+				<td>{{ horario.horaInicio }} - {{ horario.horaFin }}</td>
+				<td>{{ horario.salonDescripcion }}</td>
+				<td>{{ horario.cursoNombre }}</td>
+				<td>
+					@if (horario.profesorNombreCompleto) {
+						{{ horario.profesorNombreCompleto }}
+					} @else {
+						<span class="text-color-secondary">Sin asignar</span>
+					}
+				</td>
+				<td>
+					<p-tag [value]="horario.cantidadEstudiantes.toString()" severity="info" />
+				</td>
+				<td>
+					<p-tag [value]="horario.estado ? 'Activo' : 'Inactivo'" [severity]="horario.estado ? 'success' : 'secondary'" />
+				</td>
+				<td>
+					<div class="action-buttons">
+						<button
+							pButton
+							icon="pi pi-eye"
+							class="p-button-rounded p-button-text p-button-info"
+							(click)="onViewDetail(horario.id)"
+							pTooltip="Ver detalles del horario"
+							tooltipPosition="top"
+							[pt]="{ root: { 'aria-label': 'Ver detalles' } }"
+						></button>
+						<button
+							pButton
+							icon="pi pi-pencil"
+							class="p-button-rounded p-button-text"
+							(click)="onEdit(horario.id)"
+							pTooltip="Editar horario"
+							tooltipPosition="top"
+							[pt]="{ root: { 'aria-label': 'Editar' } }"
+						></button>
+						<button
+							pButton
+							[icon]="horario.estado ? 'pi pi-ban' : 'pi pi-check'"
+							class="p-button-rounded p-button-text"
+							[class.p-button-warning]="horario.estado"
+							[class.p-button-success]="!horario.estado"
+							(click)="onToggleEstado(horario.id, horario.estado)"
+							[pTooltip]="horario.estado ? 'Desactivar horario' : 'Activar horario'"
+							tooltipPosition="top"
+							[pt]="{
+								root: {
+									'aria-label': horario.estado ? 'Desactivar' : 'Activar',
+								},
+							}"
+						></button>
+						<button
+							pButton
+							icon="pi pi-trash"
+							class="p-button-rounded p-button-text p-button-danger"
+							(click)="onDelete(horario.id)"
+							pTooltip="Eliminar horario"
+							tooltipPosition="top"
+							[pt]="{ root: { 'aria-label': 'Eliminar' } }"
+						></button>
+					</div>
+				</td>
+			</tr>
+		</ng-template>
+
+		<ng-template pTemplate="emptymessage">
+			<tr>
+				<td colspan="8" class="text-center">
+					<div class="empty-state">
+						<i class="pi pi-calendar" style="font-size: 3rem; color: var(--text-color-secondary)"></i>
+						<p>No hay horarios para mostrar</p>
+						<small class="text-color-secondary">Usa los filtros para buscar o crea un nuevo horario</small>
+					</div>
+				</td>
+			</tr>
+		</ng-template>
+	</p-table>
+</div>
