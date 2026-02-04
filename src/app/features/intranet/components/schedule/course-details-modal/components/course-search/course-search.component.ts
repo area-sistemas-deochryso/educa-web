@@ -11,10 +11,12 @@ import { FormsModule } from '@angular/forms';
 	styleUrls: ['./course-search.component.scss'],
 })
 export class CourseSearchComponent {
+	// * Inputs for search state + dropdown results.
 	@Input() searchTerm = '';
 	@Input() placeholder = 'Ingrese nombre curso';
 	@Input() results: string[] = [];
 	@Input() showDropdown = false;
+	// * Outputs for search interactions.
 	@Output() searchTermChange = new EventEmitter<string>();
 	@Output() searchTriggered = new EventEmitter<void>();
 	@Output() blurTriggered = new EventEmitter<void>();

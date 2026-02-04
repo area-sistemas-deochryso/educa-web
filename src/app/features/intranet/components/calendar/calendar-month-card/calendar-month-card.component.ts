@@ -12,12 +12,15 @@ import { CalendarDay, CalendarMonth } from '@features/intranet/pages/calendary-c
 	},
 })
 export class CalendarMonthCardComponent {
+	// * Month data + day click output.
 	month = input.required<CalendarMonth>();
 
 	dayClick = output<CalendarDay>();
 
+	// * Hovered event title for tooltip styling.
 	hoveredEvent = signal<string | null>(null);
 
+	// * Weekday labels for header row.
 	weekDays = ['Dom', 'Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb'];
 
 	onDayClick(day: CalendarDay): void {
@@ -25,6 +28,7 @@ export class CalendarMonthCardComponent {
 	}
 
 	onDayHover(day: CalendarDay, isHovering: boolean): void {
+		// * Only show tooltip for ranged events.
 		if (!isHovering) {
 			this.hoveredEvent.set(null);
 			return;

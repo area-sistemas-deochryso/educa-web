@@ -27,6 +27,7 @@ import { IndexedDBService } from './indexed-db.service';
 	providedIn: 'root',
 })
 export class StorageService {
+	// * Facade for session, preferences, and IndexedDB storage.
 	private session = inject(SessionStorageService);
 	private preferences = inject(PreferencesStorageService);
 	private idb = inject(IndexedDBService);

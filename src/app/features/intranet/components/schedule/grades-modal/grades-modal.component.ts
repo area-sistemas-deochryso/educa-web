@@ -22,15 +22,18 @@ export interface CourseGrades {
 	styleUrl: './grades-modal.component.scss',
 })
 export class GradesModalComponent implements OnChanges {
+	// * Inputs/outputs for dialog state and selected course.
 	@Input() visible = false;
 	@Input() courseName: string | null = null;
 	@Output() visibleChange = new EventEmitter<boolean>();
 
+	// * Simulation mode enables temporary grade edits.
 	simulationMode = false;
 
 	currentCourseGrades: CourseGrades = this.getDefaultCourseGrades('');
 
 	ngOnChanges(changes: SimpleChanges): void {
+		// * Reset grades when course changes.
 		if (changes['courseName'] && this.courseName) {
 			this.currentCourseGrades = this.getDefaultCourseGrades(this.courseName);
 			this.simulationMode = false;
@@ -56,6 +59,7 @@ export class GradesModalComponent implements OnChanges {
 	}
 
 	toggleSimulation(): void {
+		// * Enable temp grades to calculate "what-if" average.
 		this.simulationMode = !this.simulationMode;
 		if (this.simulationMode) {
 			this.currentCourseGrades.evaluations.forEach((eval_) => {

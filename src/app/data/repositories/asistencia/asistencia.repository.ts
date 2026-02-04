@@ -24,6 +24,7 @@ export interface AsistenciaGradoParams extends AsistenciaQueryParams {
 	providedIn: 'root',
 })
 export class AsistenciaRepository extends BaseRepository<ResumenAsistencia> {
+	// * Repository wrapper for asistencia endpoints.
 	protected endpoint = '/api/ConsultaAsistencia';
 	protected entityName = 'Asistencia';
 

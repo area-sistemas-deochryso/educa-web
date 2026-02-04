@@ -6,12 +6,14 @@
 	[modal]="true"
 >
 	<ng-template pTemplate="header">
+		<!-- * Drawer header -->
 		<div class="drawer-header">
 			<span>Detalles del Usuario</span>
 		</div>
 	</ng-template>
 
 	@if (usuario()) {
+		<!-- * User snapshot -->
 		<div class="detail-content">
 			<div class="detail-avatar">
 				<i class="pi pi-user"></i>
@@ -24,6 +26,7 @@
 				[severity]="adminUtils.getRolSeverity(usuario()!.rol)"
 			/>
 
+			<!-- * Basic info list -->
 			<div class="detail-info">
 				<div class="info-item">
 					<span class="info-label">DNI</span>
@@ -79,6 +82,7 @@
 			</div>
 		</div>
 
+		<!-- * Footer actions -->
 		<div class="drawer-footer">
 			<button
 				pButton

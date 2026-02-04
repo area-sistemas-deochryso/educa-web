@@ -1,3 +1,4 @@
+<!-- * Mobile hamburger + slide-out nav. -->
 <button class="hamburger-btn" (click)="toggle()" [class.open]="isOpen()" aria-label="Menú">
 	<span class="hamburger-line"></span>
 	<span class="hamburger-line"></span>
@@ -24,7 +25,7 @@
 		<div class="nav-items">
 			@for (item of items; track item.label) {
 				@if (item.children && item.children.length > 0) {
-					<!-- Parent item with children -->
+					<!-- * Parent item with children. -->
 					<div class="nav-group" [class.expanded]="isExpanded(item.label)">
 						<button class="mobile-nav-item parent" (click)="toggleSubmenu(item.label)">
 							<i [class]="item.icon"></i>
@@ -35,7 +36,7 @@
 							<div class="submenu">
 								@for (child of item.children; track child.label) {
 									@if (child.children && child.children.length > 0) {
-										<!-- Nested parent -->
+										<!-- * Nested parent group. -->
 										<div
 											class="nav-group nested"
 											[class.expanded]="isExpanded(child.label)"
@@ -71,7 +72,7 @@
 											}
 										</div>
 									} @else {
-										<!-- Leaf child -->
+										<!-- * Leaf child link. -->
 										<a
 											[routerLink]="child.route"
 											routerLinkActive="active"
@@ -90,7 +91,7 @@
 						}
 					</div>
 				} @else {
-					<!-- Simple leaf item -->
+					<!-- * Simple leaf item. -->
 					<a
 						[routerLink]="item.route"
 						routerLinkActive="active"

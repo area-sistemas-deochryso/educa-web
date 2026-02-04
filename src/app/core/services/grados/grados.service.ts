@@ -10,6 +10,7 @@ export interface Grado {
 
 @Injectable({ providedIn: 'root' })
 export class GradosService {
+	// * Fetches grados catalog from API.
 	private http = inject(HttpClient);
 	private apiUrl = `${environment.apiUrl}/api/sistema/grados`;
 

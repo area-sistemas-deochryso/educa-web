@@ -28,13 +28,13 @@ import type { ProfesorOption } from '../../models/profesor.interface';
 	changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class HorarioDetailDrawerComponent {
-	// ============ Inputs ============
+	// * Inputs for drawer state + detail payload.
 	readonly visible = input<boolean>(false);
 	readonly detalle = input<HorarioDetalleResponseDto | null>(null);
 	readonly loading = input<boolean>(false);
 	readonly profesoresOptions = input<ProfesorOption[]>([]);
 
-	// ============ Outputs ============
+	// * Outputs for actions in the drawer.
 	readonly visibleChange = output<boolean>();
 	readonly close = output<void>();
 	readonly edit = output<number>();
@@ -43,10 +43,10 @@ export class HorarioDetailDrawerComponent {
 	readonly asignarProfesor = output<{ horarioId: number; profesorId: number }>();
 	readonly asignarTodosEstudiantes = output<number>();
 
-	// ============ Estado local para dropdown de profesor ============
+	// * Local state for profesor assignment dropdown.
 	selectedProfesorId: number | null = null;
 
-	// ============ Event handlers ============
+	// * Event handlers
 	onVisibleChange(visible: boolean): void {
 		if (!visible) {
 			this.visibleChange.emit(false);
@@ -101,7 +101,7 @@ export class HorarioDetailDrawerComponent {
 		}
 	}
 
-	// ============ Helpers ============
+	// * Helpers
 	getEstadoSeverity(estado: boolean): 'success' | 'danger' {
 		return estado ? 'success' : 'danger';
 	}

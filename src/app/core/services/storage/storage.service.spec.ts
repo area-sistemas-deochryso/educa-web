@@ -1,3 +1,4 @@
+// * Tests for StorageService delegation logic.
 import { TestBed } from '@angular/core/testing';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 

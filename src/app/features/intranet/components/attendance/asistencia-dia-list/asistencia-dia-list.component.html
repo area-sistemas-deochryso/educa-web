@@ -4,7 +4,7 @@
 			<h2><i class="pi pi-calendar-clock"></i> Asistencia del día</h2>
 			<div class="header-actions">
 				@if (showPdfButton()) {
-					<!-- Button PDF -->
+					<!-- * PDF actions -->
 					<p-button
 						icon="pi pi-file-pdf"
 						[loading]="downloadingPdf()"
@@ -22,10 +22,10 @@
 						}"
 					/>
 					<p-menu #pdfMenu [model]="pdfMenuItems()" [popup]="true" appendTo="body" />
-					<!-- Label Reporte -->
+					<!-- * Report label -->
 					<span class="pdf-label"> Reporte de la fecha</span>
 				}
-				<!-- DateTimePicker -->
+				<!-- * Date picker (max = today) -->
 				<p-datepicker
 					[(ngModel)]="fechaValue"
 					[showIcon]="true"
@@ -40,17 +40,20 @@
 	</ng-template>
 
 	@if (loading()) {
+		<!-- * Skeleton rows while loading -->
 		<div class="skeleton-container">
 			@for (_ of skeletonRows; track $index) {
 				<p-skeleton height="3rem" class="skeleton-row" />
 			}
 		</div>
 	} @else if (estudiantesDelDia().length === 0) {
+		<!-- ! Empty state when there is no data -->
 		<div class="empty-state">
 			<i class="pi pi-users"></i>
 			<p>No hay registros de asistencia para esta fecha</p>
 		</div>
 	} @else {
+		<!-- * Day list table -->
 		<p-table [value]="estudiantesDelDia()" class="p-datatable-sm asistencia-table">
 			<ng-template #header>
 				<tr>
@@ -65,12 +68,14 @@
 				<tr>
 					<td class="row-number">{{ i + 1 }}</td>
 					<td>
+						<!-- * Name + DNI -->
 						<div class="estudiante-info">
 							<span class="nombre">{{ estudiante.nombreCompleto }}</span>
 							<span class="dni">DNI: {{ estudiante.dni }}</span>
 						</div>
 					</td>
 					<td class="text-center">
+						<!-- * Entry time -->
 						<span class="hora" [class.hora-empty]="!estudiante.horaEntrada">
 							@if (estudiante.horaEntrada) {
 								<i class="pi pi-sign-in"></i>
@@ -79,6 +84,7 @@
 						</span>
 					</td>
 					<td class="text-center">
+						<!-- * Exit time -->
 						<span class="hora" [class.hora-empty]="!estudiante.horaSalida">
 							@if (estudiante.horaSalida) {
 								<i class="pi pi-sign-out"></i>
@@ -87,6 +93,7 @@
 						</span>
 					</td>
 					<td class="text-center">
+						<!-- * Status code -->
 						<span class="estado-box" [class]="getStatusClass(estudiante.estadoCodigo)">
 							{{ estudiante.estadoCodigo }}
 						</span>
@@ -95,6 +102,7 @@
 			</ng-template>
 		</p-table>
 
+		<!-- * Footer stats summary -->
 		<div class="resumen-footer">
 			<div class="stat-badge total">
 				<div class="badge-icon">

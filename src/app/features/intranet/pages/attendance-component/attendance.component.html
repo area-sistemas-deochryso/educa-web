@@ -1,5 +1,5 @@
 <div class="attendance-container">
-	<!-- Header compartido por todos los roles -->
+	<!-- * Header compartido por todos los roles -->
 	<app-attendance-header
 		[loading]="loading()"
 		[showModeSelector]="userRole() === 'Profesor' || userRole() === 'Director' || userRole() === 'Asistente Administrativo'"
@@ -8,7 +8,7 @@
 		(reload)="onReload()"
 	/>
 
-	<!-- Componentes especializados por rol -->
+	<!-- * Componentes especializados por rol -->
 	@switch (userRole()) {
 		@case ('Apoderado') {
 			<app-attendance-apoderado />
@@ -26,6 +26,7 @@
 			<app-attendance-estudiante />
 		}
 		@default {
+			<!-- ! Fallback defensivo: si llega un rol no reconocido se muestra este estado. -->
 			<div class="error-state">
 				<p>Rol no reconocido. Redirigiendo...</p>
 			</div>

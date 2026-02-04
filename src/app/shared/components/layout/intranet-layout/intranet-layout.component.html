@@ -1,3 +1,4 @@
+<!-- * Intranet shell with desktop + mobile navigation. -->
 <header class="intranet-header">
 	<div class="header-container desktop-header">
 		<a routerLink="/" class="logo-link">
@@ -49,10 +50,12 @@
 	</div>
 </header>
 
+<!-- * Routed intranet content. -->
 <main class="intranet-content">
 	<router-outlet />
 </main>
 
+<!-- * Optional floating widgets. -->
 @if (showNotifications) {
 	<app-floating-notification-bell />
 }

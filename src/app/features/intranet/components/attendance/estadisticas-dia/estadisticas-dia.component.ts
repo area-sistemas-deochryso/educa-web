@@ -22,9 +22,11 @@ import { TooltipModule } from 'primeng/tooltip';
 export class EstadisticasDiaComponent {
 	@ViewChild('pdfMenu') pdfMenu!: Menu;
 
+	// * Inputs
 	estadisticas = input.required<EstadisticasDia | null>();
 	downloadingPdf = input<boolean>(false);
 
+	// * Outputs for PDF actions
 	verPdf = output<void>();
 	descargarPdf = output<void>();
 

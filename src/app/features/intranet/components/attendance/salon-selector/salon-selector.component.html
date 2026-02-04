@@ -1,10 +1,12 @@
 <div class="salon-selector">
+	<!-- * Simple native select for salon -->
 	<label for="salon-select">Salón:</label>
 	<select id="salon-select" (change)="onSalonChange($event)">
 		@for (salon of salones(); track salon.salonId) {
 			<option [value]="salon.salonId" [selected]="salon.salonId === selectedSalonId()">
 				{{ salon.grado }} - {{ salon.seccion === 'V' ? 'Verano' : salon.seccion.toUpperCase() }}
 				@if (salon.esTutor) {
+					<!-- * Tag tutor assignments -->
 					(Tutor {{ nombreProfesor() }})
 				} @else {
 					(Profesor {{ nombreProfesor() }})

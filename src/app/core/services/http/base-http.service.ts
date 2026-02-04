@@ -12,7 +12,9 @@ export interface RequestOptions {
 	providedIn: 'root',
 })
 export class BaseHttpService {
+	// * Shared base class for API services.
 	protected http = inject(HttpClient);
+	// Base URL stays centralized here to keep derived services consistent.
 	protected baseUrl = environment.apiUrl;
 
 	protected get<T>(endpoint: string, options?: RequestOptions): Observable<T> {
@@ -39,6 +41,7 @@ export class BaseHttpService {
 		let httpParams = new HttpParams();
 
 		Object.entries(params).forEach(([key, value]) => {
+			// Ignore nullish values to avoid sending "param=null" or "param=undefined".
 			if (value !== undefined && value !== null) {
 				httpParams = httpParams.set(key, String(value));
 			}

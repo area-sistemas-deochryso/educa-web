@@ -77,6 +77,7 @@ export interface ModalResult<T = unknown> {
 	providedIn: 'root',
 })
 export class ModalManagerService {
+	// * Central registry for modal state and actions.
 	/** Stack de modales abiertos (para manejar modales anidados) */
 	private readonly _modals = signal<Map<string, ModalState>>(new Map());
 

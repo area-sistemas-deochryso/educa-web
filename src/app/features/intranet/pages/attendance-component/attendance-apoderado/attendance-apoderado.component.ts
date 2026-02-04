@@ -25,7 +25,7 @@ export class AttendanceApoderadoComponent implements OnInit {
 	private attendanceDataService = inject(AttendanceDataService);
 	private destroyRef = inject(DestroyRef);
 
-	// Estado
+	// * Local state for child list + selection.
 	readonly loading = signal(false);
 	readonly hijos = signal<HijoApoderado[]>([]);
 	readonly selectedHijoId = signal<number | null>(null);
@@ -34,7 +34,7 @@ export class AttendanceApoderadoComponent implements OnInit {
 		return this.hijos().find((h) => h.estudianteId === id) || null;
 	});
 
-	// Tablas de asistencia
+	// * Attendance tables update from the selected child and month.
 	readonly ingresos = signal<AttendanceTable>(
 		this.attendanceDataService.createEmptyTable('Ingresos'),
 	);
@@ -43,6 +43,7 @@ export class AttendanceApoderadoComponent implements OnInit {
 	);
 
 	ngOnInit(): void {
+		// * Initial load fetches children and restores last selection.
 		this.loadHijos();
 	}
 
@@ -82,6 +83,7 @@ export class AttendanceApoderadoComponent implements OnInit {
 	}
 
 	private restoreSelectedHijo(): void {
+		// * Try persisted selection, otherwise default to first child.
 		const hijoId = this.storage.getSelectedHijoId();
 		if (hijoId !== null && this.hijos().some((h) => h.estudianteId === hijoId)) {
 			this.selectedHijoId.set(hijoId);
@@ -108,6 +110,7 @@ export class AttendanceApoderadoComponent implements OnInit {
 			return;
 		}
 
+		// * Fetch month summary for the selected child and map to tables.
 		this.loading.set(true);
 		const { selectedMonth, selectedYear } = this.ingresos();
 
@@ -137,11 +140,13 @@ export class AttendanceApoderadoComponent implements OnInit {
 	}
 
 	onIngresosMonthChange(month: number): void {
+		// * Month selector updates only the ingresos table.
 		this.ingresos.update((table) => ({ ...table, selectedMonth: month }));
 		this.reloadHijoIngresos();
 	}
 
 	onSalidasMonthChange(month: number): void {
+		// * Month selector updates only the salidas table.
 		this.salidas.update((table) => ({ ...table, selectedMonth: month }));
 		this.reloadHijoSalidas();
 	}

@@ -62,31 +62,31 @@ export class VistasComponent implements OnInit {
 	private errorHandler = inject(ErrorHandlerService);
 	readonly adminUtils = inject(AdminUtilsService);
 
-	// State
+	// * State
 	vistas = signal<Vista[]>([]);
 	loading = signal(false);
 
-	// Dialogs
+	// * Dialogs
 	dialogVisible = signal(false);
 	isEditing = signal(false);
 
-	// Form
+	// * Form
 	selectedVista = signal<Vista | null>(null);
 	formData = signal<VistaForm>({ ruta: '', nombre: '', estado: 1 });
 
-	// Filters
+	// * Filters
 	searchTerm = signal('');
 	filterModulo = signal<string | null>(null);
 	filterEstado = signal<number | null>(null);
 
-	// Options
+	// * Options
 	estadoOptions = [
 		{ label: 'Todos', value: null },
 		{ label: 'Activas', value: 1 },
 		{ label: 'Inactivas', value: 0 },
 	];
 
-	// Computed - Modules
+	// * Computed - modules
 	modulos = computed(() => {
 		const modulosSet = new Set<string>();
 		this.vistas().forEach((v) => {
@@ -104,13 +104,13 @@ export class VistasComponent implements OnInit {
 		);
 	});
 
-	// Computed - Statistics
+	// * Computed - stats
 	totalVistas = computed(() => this.vistas().length);
 	vistasActivas = computed(() => this.vistas().filter((v) => v.estado === 1).length);
 	vistasInactivas = computed(() => this.vistas().filter((v) => v.estado === 0).length);
 	totalModulos = computed(() => this.modulos().length);
 
-	// Computed - Filtered data
+	// * Computed - filtered data
 	filteredVistas = computed(() => {
 		let data = this.vistas();
 		const search = this.searchTerm().toLowerCase();
@@ -137,10 +137,12 @@ export class VistasComponent implements OnInit {
 	});
 
 	ngOnInit(): void {
+		// * Initial load
 		this.loadData();
 	}
 
 	loadData(): void {
+		// * Fetch views list from API.
 		this.loading.set(true);
 
 		this.permisosService
@@ -167,6 +169,7 @@ export class VistasComponent implements OnInit {
 	}
 
 	clearFilters(): void {
+		// * Reset all filters.
 		this.searchTerm.set('');
 		this.filterModulo.set(null);
 		this.filterEstado.set(null);
@@ -174,6 +177,7 @@ export class VistasComponent implements OnInit {
 
 	// === Edit Dialog ===
 	openNew(): void {
+		// * Create new view flow.
 		this.selectedVista.set(null);
 		this.formData.set({ ruta: '', nombre: '', estado: 1 });
 		this.isEditing.set(false);
@@ -196,6 +200,7 @@ export class VistasComponent implements OnInit {
 	}
 
 	saveVista(): void {
+		// ! Persist form data (create or update).
 		const data = this.formData();
 		this.loading.set(true);
 
@@ -236,6 +241,7 @@ export class VistasComponent implements OnInit {
 	}
 
 	deleteVista(vista: Vista): void {
+		// ! Confirm before delete.
 		if (confirm(buildDeleteVistaMessage(vista.nombre))) {
 			this.loading.set(true);
 			this.permisosService

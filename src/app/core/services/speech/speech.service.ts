@@ -4,6 +4,7 @@ import { Injectable, signal } from '@angular/core';
 	providedIn: 'root',
 })
 export class SpeechService {
+	// * Wrapper for browser speech synthesis.
 	private synthesis = window.speechSynthesis;
 	readonly isSpeaking = signal(false);
 

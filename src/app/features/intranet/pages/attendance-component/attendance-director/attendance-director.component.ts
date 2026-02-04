@@ -10,11 +10,23 @@ import { ViewMode } from '../../../components/attendance/attendance-header/atten
 import { ButtonModule } from 'primeng/button';
 import { DatePipe } from '@angular/common';
 import { EmptyStateComponent } from '../../../components/attendance/empty-state/empty-state.component';
+import { FormsModule } from '@angular/forms';
 import { GradoSeccionSelectorComponent } from '../../../components/attendance/grado-seccion-selector/grado-seccion-selector.component';
 import { Menu, MenuModule } from 'primeng/menu';
+import { MenuItem } from 'primeng/api';
+import { Select } from 'primeng/select';
 import { TooltipModule } from 'primeng/tooltip';
-import { finalize } from 'rxjs';
+import { Observable, finalize } from 'rxjs';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+
+// ============ Tipos de reporte ============
+
+type TipoReporte = 'salon' | 'consolidado-dia' | 'consolidado-semana' | 'consolidado-mes' | 'consolidado-anio';
+
+interface TipoReporteOption {
+	label: string;
+	value: TipoReporte;
+}
 
 /**
  * Componente Container para vista de asistencias de Directores.
@@ -34,6 +46,8 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 		ButtonModule,
 		TooltipModule,
 		MenuModule,
+		Select,
+		FormsModule,
 		DatePipe,
 	],
 	providers: [AttendanceViewController],
@@ -46,7 +60,20 @@ export class AttendanceDirectorComponent implements OnInit {
 	private asistenciaService = inject(AsistenciaService);
 	private storage = inject(StorageService);
 	private destroyRef = inject(DestroyRef);
+	// * Shared controller handles month/day, tables, and PDF actions.
 	readonly view = inject(AttendanceViewController);
+
+	// ============ Tipo de reporte ============
+
+	readonly tipoReporteOptions: TipoReporteOption[] = [
+		{ label: 'Reporte por Salón', value: 'salon' },
+		{ label: 'Consolidado - Día', value: 'consolidado-dia' },
+		{ label: 'Consolidado - Semana', value: 'consolidado-semana' },
+		{ label: 'Consolidado - Mes', value: 'consolidado-mes' },
+		{ label: 'Consolidado - Año', value: 'consolidado-anio' },
+	];
+	readonly tipoReporte = signal<TipoReporte>('salon');
+	readonly downloadingPdfConsolidado = signal(false);
 
 	// ============ Grados y secciones ============
 
@@ -55,6 +82,7 @@ export class AttendanceDirectorComponent implements OnInit {
 		const all = this.allGradosSecciones();
 		const month = this.view.ingresos().selectedMonth;
 		const isVerano = month === 1 || month === 2;
+		// * Summer months only show "V" sections.
 		return all.filter((gs) =>
 			isVerano
 				? gs.seccion.toUpperCase() === 'V'
@@ -64,6 +92,7 @@ export class AttendanceDirectorComponent implements OnInit {
 	readonly selectedGradoSeccion = signal<GradoSeccion | null>(null);
 
 	ngOnInit(): void {
+		// * Configure shared controller callbacks for director endpoints + storage.
 		this.view.init({
 			loadEstudiantes: (gradoCodigo, seccion, mes, anio) =>
 				this.asistenciaService.getAsistenciasGradoDirector(gradoCodigo, seccion, mes, anio),
@@ -80,6 +109,7 @@ export class AttendanceDirectorComponent implements OnInit {
 	// ============ Carga y selección de grado/sección ============
 
 	private loadGradosSecciones(): void {
+		// * Fetch available groups, then restore selection and load data.
 		this.view.loading.set(true);
 
 		this.asistenciaService
@@ -108,6 +138,7 @@ export class AttendanceDirectorComponent implements OnInit {
 
 	selectGradoSeccion(gradoSeccion: GradoSeccion): void {
 		const current = this.selectedGradoSeccion();
+		// * Avoid reload if the same grade/section is re-selected.
 		if (current?.grado === gradoSeccion.grado && current?.seccion === gradoSeccion.seccion)
 			return;
 
@@ -117,6 +148,7 @@ export class AttendanceDirectorComponent implements OnInit {
 	}
 
 	private restoreSelectedGradoSeccion(): void {
+		// * Persisted selection keeps context between visits.
 		const saved = this.storage.getSelectedGradoSeccionDirector();
 		if (saved) {
 			const found = this.gradosSecciones().find(
@@ -141,6 +173,7 @@ export class AttendanceDirectorComponent implements OnInit {
 	}
 
 	private reselectGradoSeccionIfNeeded(): void {
+		// * When month changes (verano filter), ensure selection is still valid.
 		const current = this.selectedGradoSeccion();
 		const filtered = this.gradosSecciones();
 		if (
@@ -158,6 +191,7 @@ export class AttendanceDirectorComponent implements OnInit {
 
 	// ============ Delegados al servicio (llamados por el padre via @ViewChild) ============
 
+	// * Parent component calls these via ViewChild.
 	setViewMode(mode: ViewMode): void {
 		this.view.setViewMode(mode);
 	}
@@ -168,8 +202,161 @@ export class AttendanceDirectorComponent implements OnInit {
 
 	// ============ PDF menu ============
 
+	readonly pdfMenuItems = computed<MenuItem[]>(() => {
+		const tipo = this.tipoReporte();
+
+		if (tipo === 'salon') {
+			// Reporte específico de un salón
+			return [
+				{
+					label: 'Ver PDF',
+					icon: 'pi pi-eye',
+					command: () => this.view.verPdfAsistenciaDia(),
+				},
+				{
+					label: 'Descargar PDF',
+					icon: 'pi pi-download',
+					command: () => this.view.descargarPdfAsistenciaDia(),
+				},
+			];
+		} else {
+			// Reportes consolidados
+			return [
+				{
+					label: 'Ver PDF',
+					icon: 'pi pi-eye',
+					command: () => this.verPdfConsolidado(),
+				},
+				{
+					label: 'Descargar PDF',
+					icon: 'pi pi-download',
+					command: () => this.descargarPdfConsolidado(),
+				},
+			];
+		}
+	});
+
 	togglePdfMenu(event: Event): void {
 		this.pdfMenu.toggle(event);
+	}
+
+	// ============ PDF Consolidados ============
+
+	private verPdfConsolidado(): void {
+		const tipo = this.tipoReporte();
+		this.downloadingPdfConsolidado.set(true);
+
+		const obs$ = this.getPdfObservable(tipo);
+		if (!obs$) {
+			this.downloadingPdfConsolidado.set(false);
+			return;
+		}
+
+		obs$
+			.pipe(
+				takeUntilDestroyed(this.destroyRef),
+				finalize(() => this.downloadingPdfConsolidado.set(false)),
+			)
+			.subscribe({
+				next: (blob) => {
+					const url = window.URL.createObjectURL(blob);
+					window.open(url, '_blank');
+					setTimeout(() => window.URL.revokeObjectURL(url), 100);
+				},
+			});
+	}
+
+	private descargarPdfConsolidado(): void {
+		const tipo = this.tipoReporte();
+		this.downloadingPdfConsolidado.set(true);
+
+		const obs$ = this.getPdfObservable(tipo);
+		if (!obs$) {
+			this.downloadingPdfConsolidado.set(false);
+			return;
+		}
+
+		obs$
+			.pipe(
+				takeUntilDestroyed(this.destroyRef),
+				finalize(() => this.downloadingPdfConsolidado.set(false)),
+			)
+			.subscribe({
+				next: (blob) => {
+					const url = window.URL.createObjectURL(blob);
+					const a = document.createElement('a');
+					a.href = url;
+					a.download = this.getConsolidadoFileName(tipo);
+					document.body.appendChild(a);
+					a.click();
+					document.body.removeChild(a);
+					window.URL.revokeObjectURL(url);
+				},
+			});
+	}
+
+	private getPdfObservable(tipo: TipoReporte): Observable<Blob> | null {
+		const fecha = this.view.pdfFecha();
+		const { selectedMonth, selectedYear } = this.view.ingresos();
+
+		switch (tipo) {
+			case 'consolidado-dia':
+				return this.asistenciaService.descargarPdfTodosSalonesDia(fecha);
+			case 'consolidado-semana':
+				// Calcular inicio de la semana actual del mes/año seleccionado
+				const inicioSemana = this.getInicioSemanaActual(selectedMonth, selectedYear);
+				return this.asistenciaService.descargarPdfTodosSalonesSemana(inicioSemana);
+			case 'consolidado-mes':
+				return this.asistenciaService.descargarPdfTodosSalonesMes(selectedMonth, selectedYear);
+			case 'consolidado-anio':
+				return this.asistenciaService.descargarPdfTodosSalonesAnio(selectedYear);
+			default:
+				return null;
+		}
+	}
+
+	/**
+	 * Obtiene el inicio de la semana actual (lunes) dentro del mes/año especificado
+	 */
+	private getInicioSemanaActual(mes: number, anio: number): Date {
+		const hoy = new Date();
+		const fechaMesSeleccionado = new Date(anio, mes - 1, 1);
+
+		// Si el mes/año seleccionado es diferente al actual, usar la primera semana de ese mes
+		if (hoy.getMonth() + 1 !== mes || hoy.getFullYear() !== anio) {
+			// Primera semana del mes: encontrar el primer lunes
+			const primerDia = fechaMesSeleccionado.getDay(); // 0 = domingo, 1 = lunes, ...
+			const diasHastaLunes = primerDia === 0 ? 1 : primerDia === 1 ? 0 : 8 - primerDia;
+			return new Date(anio, mes - 1, 1 + diasHastaLunes);
+		}
+
+		// Si es el mes/año actual, calcular el lunes de la semana actual
+		const diaSemana = hoy.getDay();
+		const diff = diaSemana === 0 ? -6 : 1 - diaSemana; // Si es domingo, retroceder 6 días
+		const lunes = new Date(hoy);
+		lunes.setDate(hoy.getDate() + diff);
+		return lunes;
+	}
+
+	private getConsolidadoFileName(tipo: TipoReporte): string {
+		const fecha = this.view.pdfFecha();
+		const { selectedMonth, selectedYear } = this.view.ingresos();
+		const fechaStr = fecha.toISOString().split('T')[0];
+
+		switch (tipo) {
+			case 'consolidado-dia':
+				return `Reporte_TodosSalones_${fechaStr}.pdf`;
+			case 'consolidado-semana':
+				const inicioSemana = this.getInicioSemanaActual(selectedMonth, selectedYear);
+				const semanaStr = inicioSemana.toISOString().split('T')[0];
+				return `Reporte_TodosSalones_Semana_${semanaStr}.pdf`;
+			case 'consolidado-mes':
+				return `Reporte_TodosSalones_${selectedYear}-${selectedMonth.toString().padStart(2, '0')}.pdf`;
+			case 'consolidado-anio':
+				return `Reporte_TodosSalones_${selectedYear}.pdf`;
+			default:
+				return 'Reporte_TodosSalones.pdf';
+		}
 	}
 
 	// ============ Helpers privados ============

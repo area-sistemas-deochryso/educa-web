@@ -8,4 +8,6 @@ import { RouterLink } from '@angular/router';
 	templateUrl: './primaria.html',
 	styleUrl: './primaria.scss',
 })
-export class PrimariaComponent {}
+export class PrimariaComponent {
+	// * Primaria level page content.
+}

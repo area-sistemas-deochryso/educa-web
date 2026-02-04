@@ -16,6 +16,7 @@ import { environment } from '@env/environment';
 	providedIn: 'root',
 })
 export class UsuariosService {
+	// * CRUD wrapper for usuarios endpoints.
 	private readonly apiUrl = `${environment.apiUrl}/api/sistema/usuarios`;
 	private http = inject(HttpClient);
 

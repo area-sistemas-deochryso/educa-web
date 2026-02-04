@@ -37,6 +37,7 @@ export interface NotificationQueryParams extends QueryParams {
 	providedIn: 'root',
 })
 export class NotificationRepository extends BaseRepository<Notification, CreateNotificationDto> {
+	// * Repository wrapper for notifications endpoints.
 	protected endpoint = '/api/Notifications';
 	protected entityName = 'Notification';
 

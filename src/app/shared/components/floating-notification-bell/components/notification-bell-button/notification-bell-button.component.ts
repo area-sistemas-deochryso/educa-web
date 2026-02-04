@@ -13,17 +13,19 @@ import { NotificationsPanelContext } from '../../notifications-panel.context';
 	styleUrl: './notification-bell-button.component.scss',
 })
 export class NotificationBellButtonComponent {
+	// * Shared context for unread count + badge styling.
 	private context = inject(NotificationsPanelContext);
 
-	// From context
+	// * From context.
 	unreadCount = this.context.unreadCount;
 	badgePriorityClass = this.context.badgePriorityClass;
 
-	// Local state from parent (context menu is managed at floating-notification-bell level)
+	// * Local state from parent (context menu is managed at floating-notification-bell level).
 	@Input() showContextMenu = false;
 	@Input() contextMenuPosition = { x: 0, y: 0 };
 	@Input({ required: true }) priorityLegend!: PriorityInfo[];
 
+	// * UI events forwarded to the container.
 	@Output() togglePanel = new EventEmitter<void>();
 	@Output() contextMenu = new EventEmitter<MouseEvent>();
 	@Output() closeContextMenu = new EventEmitter<void>();

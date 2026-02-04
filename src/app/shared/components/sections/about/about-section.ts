@@ -10,6 +10,7 @@ import { Tooltip } from 'primeng/tooltip';
 })
 export class AboutSectionComponent {
 	scrollToSection(event: Event, sectionId: string): void {
+		// * Smooth scroll with navbar offset.
 		event.preventDefault();
 		const element = document.getElementById(sectionId);
 		if (element) {

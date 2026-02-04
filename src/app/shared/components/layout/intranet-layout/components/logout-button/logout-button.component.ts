@@ -9,9 +9,11 @@ import { Tooltip } from 'primeng/tooltip';
 	styleUrl: './logout-button.component.scss',
 })
 export class LogoutButtonComponent {
+	// * Emits when user clicks logout.
 	@Output() logoutClick = new EventEmitter<void>();
 
 	onLogout(): void {
+		// * Bubble logout action to parent.
 		this.logoutClick.emit();
 	}
 }

@@ -15,16 +15,16 @@ import type { HorarioWeeklyBlock } from '../../models/horario.interface';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class HorariosWeeklyViewComponent {
-  // ============ Inputs ============
+  // * Inputs for weekly blocks + loading state.
   readonly blocks = input.required<HorarioWeeklyBlock[]>();
   readonly loading = input<boolean>(false);
 
-  // ============ Outputs ============
+  // * Outputs for block actions.
   readonly blockClick = output<number>();
   readonly editClick = output<number>();
   readonly viewDetailClick = output<number>();
 
-  // ============ Constantes ============
+  // * Constants for grid layout.
   readonly DIAS = [
     { label: 'Lunes', value: 1 },
     { label: 'Martes', value: 2 },
@@ -47,7 +47,7 @@ export class HorariosWeeklyViewComponent {
     '17:00',
   ];
 
-  // ============ Helpers ============
+  // * Helpers
   getBlocksForDay(dia: number): HorarioWeeklyBlock[] {
     return this.blocks().filter((b) => b.dia === dia);
   }
@@ -96,7 +96,7 @@ export class HorariosWeeklyViewComponent {
     return block.horario.id;
   }
 
-  // ============ Helpers privados ============
+  // * Private helpers
   private darkenColor(hex: string): string {
     // Oscurecer el color para el borde
     const num = parseInt(hex.replace('#', ''), 16);

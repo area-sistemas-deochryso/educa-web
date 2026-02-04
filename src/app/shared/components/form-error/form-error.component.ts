@@ -13,15 +13,20 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 	styleUrls: ['./form-error.component.scss'],
 })
 export class FormErrorComponent implements OnInit {
+	// * Reactive form control to inspect for errors.
 	@Input({ required: true }) control!: AbstractControl;
+	// * Optional override map for validation messages.
 	@Input() customMessages?: ValidationMessageConfig;
+	// * Gate showing errors until user interacts.
 	@Input() showOnTouched = true;
 
 	private destroyRef = inject(DestroyRef);
 
+	// * Current list of translated messages for the template.
 	errorMessages: string[] = [];
 
 	ngOnInit(): void {
+		// * Keep errors in sync with status changes.
 		this.control.statusChanges
 			.pipe(takeUntilDestroyed(this.destroyRef))
 			.subscribe(() => this.updateErrors());
@@ -30,6 +35,7 @@ export class FormErrorComponent implements OnInit {
 	}
 
 	get shouldShowErrors(): boolean {
+		// * Avoid rendering when there is no errors object.
 		if (!this.control.errors) return false;
 
 		if (this.showOnTouched) {
@@ -40,6 +46,7 @@ export class FormErrorComponent implements OnInit {
 	}
 
 	private updateErrors(): void {
+		// * Map validation keys to displayable messages.
 		if (!this.control.errors) {
 			this.errorMessages = [];
 			return;

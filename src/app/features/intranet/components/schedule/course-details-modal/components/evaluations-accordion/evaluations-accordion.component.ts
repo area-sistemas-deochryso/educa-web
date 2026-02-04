@@ -15,6 +15,7 @@ export interface Evaluation {
 	styleUrls: ['./evaluations-accordion.component.scss'],
 })
 export class EvaluationsAccordionComponent {
+	// * Expanded state + list of evaluations.
 	@Input() expanded = false;
 	@Input() evaluations: Evaluation[] = [];
 	@Output() toggleTriggered = new EventEmitter<void>();

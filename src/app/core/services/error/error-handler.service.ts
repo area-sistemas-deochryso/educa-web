@@ -21,6 +21,7 @@ import {
 	providedIn: 'root',
 })
 export class ErrorHandlerService {
+	// * Centralized error handling + notification state.
 	private router = inject(Router);
 
 	// Estado con Signals

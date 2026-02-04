@@ -9,10 +9,12 @@ import { CommonModule } from '@angular/common';
 	styleUrl: './student-card.component.scss',
 })
 export class StudentCardComponent {
+	// * Name parts used for display formatting.
 	@Input() lastName = '';
 	@Input() firstName = '';
 
 	get formattedName(): string {
+		// * Insert line break between last and first names.
 		return `${this.lastName}<br />${this.firstName}`;
 	}
 }

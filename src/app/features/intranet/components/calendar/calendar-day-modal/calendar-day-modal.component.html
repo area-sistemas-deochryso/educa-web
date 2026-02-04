@@ -1,15 +1,18 @@
 @if (visible()) {
+	<!-- * Overlay click closes the modal -->
 	<div class="modal-overlay" (click)="onOverlayClick($event)">
 		<div
 			class="modal-content"
 			[class.holiday-modal]="data()?.type === 'holiday'"
 			[class.event-modal]="data()?.type === 'event'"
 		>
+			<!-- * Close action -->
 			<button class="modal-close" (click)="onClose()">
 				<i class="pi pi-times"></i>
 			</button>
 
 			@if (data(); as modalData) {
+				<!-- * Header with icon + badge -->
 				<div class="modal-header">
 					<div
 						class="modal-icon"
@@ -48,6 +51,7 @@
 				</div>
 
 				<div class="modal-body">
+					<!-- * Date + optional time/location -->
 					<div class="modal-date">
 						<i class="pi pi-calendar"></i>
 						<span>{{ formatDate(modalData.date) }}</span>

@@ -58,6 +58,7 @@ const initialState: AuthState = {
  * this.authStore.logout()
  * ```
  */
+// * Signal store for auth state and actions.
 export const AuthStore = signalStore(
 	{ providedIn: 'root' },
 	withState(initialState),

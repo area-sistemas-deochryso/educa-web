@@ -11,6 +11,7 @@ import { TooltipModule } from 'primeng/tooltip';
 	styleUrls: ['./modal-controls.component.scss'],
 })
 export class ModalControlsComponent {
+	// * Controls for expand/close actions.
 	@Input() isExpanded = false;
 	@Output() expand = new EventEmitter<void>();
 	@Output() closeTriggered = new EventEmitter<void>();

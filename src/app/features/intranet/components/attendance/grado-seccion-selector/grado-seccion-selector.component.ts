@@ -16,12 +16,15 @@ import { GradoSeccion } from '@core/services';
 	styleUrls: ['./grado-seccion-selector.component.scss'],
 })
 export class GradoSeccionSelectorComponent {
+	// * Inputs drive the select options + current selection.
 	gradosSecciones = input.required<GradoSeccion[]>();
 	selectedGradoSeccion = input.required<GradoSeccion | null>();
 
+	// * Emits the selected grade/section object.
 	gradoSeccionChange = output<GradoSeccion>();
 
 	onGradoSeccionChange(event: Event): void {
+		// * Select value is "grado|seccion" for quick lookup.
 		const select = event.target as HTMLSelectElement;
 		const [grado, seccion] = select.value.split('|');
 		const gradoSeccion = this.gradosSecciones().find(

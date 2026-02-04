@@ -13,16 +13,19 @@ import { NotificationsService } from '@core/services';
 export class NotificationQuickAccessComponent {
 	private notificationsService = inject(NotificationsService);
 
+	// * Signals from notifications service.
 	readonly unreadCount = this.notificationsService.unreadCount;
 	readonly highestPriority = this.notificationsService.highestPriority;
 
 	readonly badgePriorityClass = computed(() => {
+		// * Map priority to badge class.
 		const priority = this.highestPriority();
 		if (!priority) return '';
 		return `badge-${priority}`;
 	});
 
 	togglePanel(): void {
+		// * Toggle notifications panel visibility.
 		this.notificationsService.togglePanel();
 	}
 }

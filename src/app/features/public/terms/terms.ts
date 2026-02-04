@@ -7,4 +7,6 @@ import { Component } from '@angular/core';
 	templateUrl: './terms.html',
 	styleUrl: './terms.scss',
 })
-export class TermsComponent {}
+export class TermsComponent {
+	// * Terms and conditions static content.
+}

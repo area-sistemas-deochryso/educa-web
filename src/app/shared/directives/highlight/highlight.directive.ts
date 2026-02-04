@@ -10,10 +10,12 @@ export class HighlightDirective {
 	private el = inject(ElementRef);
 
 	@HostListener('mouseenter') onMouseEnter() {
+		// Falls back to default color if the binding is empty.
 		this.highlight(this.appHighlight() || '#ffeb3b');
 	}
 
 	@HostListener('mouseleave') onMouseLeave() {
+		// Reset to inherited background.
 		this.highlight('');
 	}
 

@@ -22,12 +22,14 @@ export class ScheduleCalendarComponent implements OnInit {
 	@Output() openSchedule = new EventEmitter<void>();
 	@Output() openSummary = new EventEmitter<void>();
 
+	// * Current calendar view state.
 	currentDate = new Date();
 	currentMonth: number;
 	currentYear: number;
 	calendarDays: CalendarDay[] = [];
 	selectedDay: number | null = null;
 
+	// * Header labels.
 	dayHeaders = ['Lun', 'Mar', 'Mie', 'Jue', 'Vie', 'Sáb', 'Dom'];
 
 	monthNames = [
@@ -46,6 +48,7 @@ export class ScheduleCalendarComponent implements OnInit {
 	];
 
 	menuItems: MenuItem[] = [
+		// * Context actions for a day.
 		{ label: 'Ver Horarios', command: () => this.openSchedule.emit() },
 		{ label: 'Ver Notas / Asistencias', command: () => this.openSummary.emit() },
 	];
@@ -60,6 +63,7 @@ export class ScheduleCalendarComponent implements OnInit {
 	}
 
 	generateCalendar(): void {
+		// * Build a 6x7 grid (42 cells) with leading/trailing days.
 		this.calendarDays = [];
 		const firstDay = new Date(this.currentYear, this.currentMonth, 1);
 		const lastDay = new Date(this.currentYear, this.currentMonth + 1, 0);
@@ -114,11 +118,13 @@ export class ScheduleCalendarComponent implements OnInit {
 	}
 
 	onDayClick(event: Event, calDay: CalendarDay): void {
+		// * Select a day and open the context menu.
 		this.selectedDay = calDay.day;
 		this.dayMenu.toggle(event);
 	}
 
 	goToToday(): void {
+		// * Jump to current month/year.
 		const today = new Date();
 		this.currentMonth = today.getMonth();
 		this.currentYear = today.getFullYear();

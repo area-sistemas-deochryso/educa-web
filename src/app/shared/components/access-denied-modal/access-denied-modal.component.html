@@ -1,3 +1,4 @@
+<!-- ! Blocking dialog shown when guard rejects navigation. -->
 <p-dialog
 	[visible]="visible()"
 	[modal]="true"
@@ -15,6 +16,7 @@
 		</div>
 	</ng-template>
 
+	<!-- * Messaging + optional rejected route context. -->
 	<div class="dialog-content">
 		<p class="message">No tienes los permisos necesarios para acceder a esta vista.</p>
 		@if (rutaDenegada()) {
@@ -26,6 +28,7 @@
 		<p class="suggestion">Contacta al administrador si crees que deberias tener acceso.</p>
 	</div>
 
+	<!-- * Single action to close and return. -->
 	<ng-template #footer>
 		<p-button label="Entendido" icon="pi pi-check" (onClick)="close()" class="p-button-sm" />
 	</ng-template>

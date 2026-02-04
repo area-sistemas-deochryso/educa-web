@@ -11,6 +11,7 @@ import { FormsModule } from '@angular/forms';
 	styleUrls: ['./week-search-box.component.scss'],
 })
 export class WeekSearchBoxComponent {
+	// * Two-way bound search term + placeholder override.
 	@Input() searchTerm = '';
 	@Input() placeholder = 'BUSCAR ARCHIVO, SEMANA O TEMA...';
 	@Output() searchTermChange = new EventEmitter<string>();

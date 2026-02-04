@@ -30,20 +30,24 @@ export class ScheduleComponent implements OnInit, OnDestroy {
 	private destroyRef = inject(DestroyRef);
 	private voiceUnsubscribers: (() => void)[] = [];
 
+	// * Modal visibility flags (kept in sync with storage).
 	showScheduleModal = false;
 	showSummaryModal = false;
 	showDetailsModal = false;
 	showGradesModal = false;
 
+	// * Course context for details/grades modals.
 	selectedCourse: string | null = null;
 
 	ngOnInit(): void {
+		// * Restore persisted modal state and wire voice/query listeners.
 		this.restoreModalsState();
 		this.registerVoiceModals();
 		this.handleQueryParams();
 	}
 
 	private handleQueryParams(): void {
+		// * URL query params can deep-link to a specific modal.
 		this.route.queryParams.pipe(takeUntilDestroyed(this.destroyRef)).subscribe((params) => {
 			const modal = params['modal'];
 			if (modal) {
@@ -66,11 +70,12 @@ export class ScheduleComponent implements OnInit, OnDestroy {
 	}
 
 	ngOnDestroy(): void {
+		// * Clean up voice listeners to avoid leaks.
 		this.voiceUnsubscribers.forEach((unsub) => unsub());
 	}
 
 	private registerVoiceModals(): void {
-		// Registrar modal de horario
+		// * Register voice shortcuts for each modal.
 		this.voiceUnsubscribers.push(
 			this.voiceService.registerModal({
 				name: 'horario',
@@ -80,7 +85,7 @@ export class ScheduleComponent implements OnInit, OnDestroy {
 			}),
 		);
 
-		// Registrar modal de resumen
+		// * Summary modal
 		this.voiceUnsubscribers.push(
 			this.voiceService.registerModal({
 				name: 'resumen',
@@ -90,7 +95,7 @@ export class ScheduleComponent implements OnInit, OnDestroy {
 			}),
 		);
 
-		// Registrar modal de notas
+		// * Grades modal (requires selectedCourse)
 		this.voiceUnsubscribers.push(
 			this.voiceService.registerModal({
 				name: 'notas',
@@ -104,7 +109,7 @@ export class ScheduleComponent implements OnInit, OnDestroy {
 			}),
 		);
 
-		// Registrar modal de detalles
+		// * Details modal (requires selectedCourse)
 		this.voiceUnsubscribers.push(
 			this.voiceService.registerModal({
 				name: 'detalles',
@@ -118,7 +123,7 @@ export class ScheduleComponent implements OnInit, OnDestroy {
 			}),
 		);
 
-		// Listener para comandos genéricos de cerrar modal
+		// * Global "close modal" command.
 		this.voiceUnsubscribers.push(
 			this.voiceService.onCommand((command) => {
 				if (command === 'close-modal') {
@@ -129,7 +134,7 @@ export class ScheduleComponent implements OnInit, OnDestroy {
 	}
 
 	private closeActiveModal(): void {
-		// Cerrar el modal activo (prioridad al más reciente)
+		// * Close the active modal (priority order).
 		if (this.showGradesModal) {
 			this.onGradesModalClose();
 		} else if (this.showDetailsModal) {
@@ -153,6 +158,7 @@ export class ScheduleComponent implements OnInit, OnDestroy {
 	}
 
 	private restoreModalsState(): void {
+		// * Restore from storage to keep modal state between visits.
 		const state = this.getModalsState();
 
 		if (state.schedule) {
@@ -192,6 +198,7 @@ export class ScheduleComponent implements OnInit, OnDestroy {
 	}
 
 	openDetailsModal(courseName: string): void {
+		// * Switching to details closes other modals and persists state.
 		this.selectedCourse = courseName;
 		this.showScheduleModal = false;
 		this.showSummaryModal = false;
@@ -207,6 +214,7 @@ export class ScheduleComponent implements OnInit, OnDestroy {
 	}
 
 	openGradesModal(courseName: string): void {
+		// * Switching to grades closes other modals and persists state.
 		this.selectedCourse = courseName;
 		this.showScheduleModal = false;
 		this.showSummaryModal = false;

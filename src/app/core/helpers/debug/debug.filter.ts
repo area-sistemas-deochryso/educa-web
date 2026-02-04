@@ -1,4 +1,5 @@
 // debug.filter.ts
+// * Helper to compile include/exclude debug tag filters.
 export function compileDebugFilter(pattern: string | undefined | null) {
 	const raw = (pattern ?? '').trim();
 	if (!raw) return () => true;

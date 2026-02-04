@@ -14,6 +14,7 @@ import { ButtonModule } from 'primeng/button';
 	changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class UsuariosHeaderComponent {
+	// * Emits when user requests a refresh.
 	readonly refresh = output<void>();
 
 	onRefresh(): void {

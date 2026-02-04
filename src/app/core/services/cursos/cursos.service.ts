@@ -9,6 +9,7 @@ import { Curso, CrearCursoRequest, ActualizarCursoRequest, ApiResponse } from '.
 	providedIn: 'root',
 })
 export class CursosService {
+	// * CRUD wrapper for cursos endpoints.
 	private readonly apiUrl = `${environment.apiUrl}/api/sistema/cursos`;
 	private http = inject(HttpClient);
 

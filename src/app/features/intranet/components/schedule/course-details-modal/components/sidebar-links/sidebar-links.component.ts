@@ -14,6 +14,7 @@ export interface SidebarLink {
 	styleUrl: './sidebar-links.component.scss',
 })
 export class SidebarLinksComponent {
+	// * Optional title + list of actions.
 	@Input() title = '';
 	@Input() links: SidebarLink[] = [];
 	@Output() linkClick = new EventEmitter<string>();

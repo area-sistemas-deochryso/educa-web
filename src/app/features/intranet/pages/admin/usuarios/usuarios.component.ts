@@ -49,8 +49,10 @@ export class UsuariosComponent implements OnInit, AfterViewInit {
 	private facade = inject(UsuariosFacade);
 	private confirmationService = inject(ConfirmationService);
 
+	// * View-model snapshot from facade (signals).
 	readonly vm = this.facade.vm;
 
+	// * Static filter options for roles/estado.
 	readonly filterOptions: FilterOptions = {
 		rolesOptions: [{ label: 'Todos los roles', value: null as RolUsuarioAdmin | null }].concat(
 			ROLES_USUARIOS_ADMIN.map((r) => ({ label: r, value: r as RolUsuarioAdmin | null })),
@@ -63,10 +65,12 @@ export class UsuariosComponent implements OnInit, AfterViewInit {
 	};
 
 	get formData(): UsuarioFormData {
+		// * Form dialog reads from vm in a single place.
 		return this.vm().formData as UsuarioFormData;
 	}
 
 	get formErrors(): FormValidationErrors {
+		// * Map validation errors for the form dialog.
 		return {
 			dniError: this.vm().dniError,
 			correoError: this.vm().correoError,
@@ -77,10 +81,12 @@ export class UsuariosComponent implements OnInit, AfterViewInit {
 	}
 
 	ngOnInit(): void {
+		// * Initial data fetch for list + stats + filters.
 		this.facade.loadData();
 	}
 
 	ngAfterViewInit(): void {
+		// * Fix aria label after confirm dialog renders.
 		this.fixConfirmDialogAria('Confirmación');
 	}
 
@@ -117,6 +123,7 @@ export class UsuariosComponent implements OnInit, AfterViewInit {
 	}
 
 	onToggleEstado(usuario: UsuarioLista): void {
+		// ! Confirmation dialog before enabling/disabling a user.
 		const header = usuario.estado
 			? UI_CONFIRM_HEADERS.deactivateUser
 			: UI_CONFIRM_HEADERS.activateUser;
@@ -175,6 +182,7 @@ export class UsuariosComponent implements OnInit, AfterViewInit {
 	}
 
 	private fixConfirmDialogAria(header: string): void {
+		// * PrimeNG dialog renders async; patch aria-label for a11y.
 		setTimeout(() => {
 			const dialog = document.querySelector('p-dialog[role="alertdialog"]');
 			if (dialog) {

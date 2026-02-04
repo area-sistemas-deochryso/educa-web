@@ -1,10 +1,13 @@
 <div class="home-container">
+	<!-- * Welcome banner -->
 	<app-welcome-section [title]="welcomeTitle()" />
 
 	@if (showQuickAccess) {
+		<!-- * Feature-flagged quick access cards -->
 		<section class="quick-access">
 			<h2>Accesos Rápidos</h2>
 			<div class="quick-access-grid">
+				<!-- * Course content picker -->
 				<app-quick-access-card-menu
 					label="Contenido del curso"
 					path="/intranet/horarios"
@@ -18,6 +21,7 @@
 					modal="schedule"
 					icon="pi-calendar"
 				/>
+				<!-- * Grade-related shortcuts -->
 				<app-quick-access-card
 					label="Notas"
 					path="/intranet/horarios"

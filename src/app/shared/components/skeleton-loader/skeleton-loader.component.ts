@@ -15,6 +15,7 @@ import { CommonModule } from '@angular/common';
 	styleUrls: ['./skeleton-loader.component.scss'],
 })
 export class SkeletonLoaderComponent {
+	// * Visual variant + sizing for the skeleton block.
 	readonly variant = input<'text' | 'circle' | 'rect' | 'card'>('rect');
 	readonly width = input<string>('100%');
 	readonly height = input<string>('100%');

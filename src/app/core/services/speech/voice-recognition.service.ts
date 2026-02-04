@@ -86,6 +86,7 @@ interface IWindow extends Window {
 	providedIn: 'root',
 })
 export class VoiceRecognitionService {
+	// * Speech recognition engine with command routing.
 	private platformId = inject(PLATFORM_ID);
 	private router = inject(Router);
 	private recognition: SpeechRecognitionInstance | null = null;

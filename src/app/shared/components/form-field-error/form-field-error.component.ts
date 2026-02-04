@@ -12,6 +12,7 @@ import { ChangeDetectionStrategy, Component, input } from '@angular/core';
 	styleUrls: ['./form-field-error.component.scss'],
 })
 export class FormFieldErrorComponent {
+	// * Single field error message (null hides the element).
 	/** Mensaje de error a mostrar (null si no hay error) */
 	readonly error = input<string | null>(null);
 }

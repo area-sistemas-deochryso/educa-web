@@ -51,6 +51,7 @@ export interface HijoView {
 	providedIn: 'root',
 })
 export class AsistenciaAdapter extends BaseAdapter<AsistenciaDetalle, AsistenciaView> {
+	// * Converts API asistencia details into UI-friendly view models.
 	adapt(source: AsistenciaDetalle): AsistenciaView {
 		return {
 			id: source.asistenciaId,

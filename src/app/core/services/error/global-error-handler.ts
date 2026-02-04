@@ -5,6 +5,7 @@ import { UI_GENERIC_MESSAGES } from '@app/shared/constants';
 
 @Injectable()
 export class GlobalErrorHandler implements ErrorHandler {
+	// * Catches uncaught errors and forwards to ErrorHandlerService.
 	private errorService = inject(ErrorHandlerService);
 	private zone = inject(NgZone);
 

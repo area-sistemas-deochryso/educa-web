@@ -1,13 +1,14 @@
+<!-- * Voice UI renders only when supported, visible, and secure. -->
 @if (voiceService.isSupported && isVisible() && isSecureContext()) {
 	<div class="voice-container">
-		<!-- Indicador de bloqueo -->
+		<!-- ! Lock indicator while dragging past threshold. -->
 		@if (showLockIndicator || voiceService.isLocked()) {
 			<div class="lock-indicator" [class.active]="voiceService.isLocked()">
 				<i class="pi pi-lock"></i>
 			</div>
 		}
 
-		<!-- Panel de transcripción cuando está bloqueado -->
+		<!-- * Transcript panel stays open when locked. -->
 		@if (voiceService.isLocked()) {
 			<div class="transcript-panel">
 				<div class="transcript-header">
@@ -45,7 +46,7 @@
 			</div>
 		}
 
-		<!-- Botón principal de voz -->
+		<!-- * Main mic button with drag-to-lock behavior. -->
 		<button
 			#voiceButton
 			class="voice-button"
@@ -80,7 +81,7 @@
 			}
 		</button>
 
-		<!-- Mensaje de error -->
+		<!-- ! Error banner from the voice service. -->
 		@if (voiceService.error()) {
 			<div class="error-panel">
 				<i class="pi pi-exclamation-triangle"></i>
@@ -95,7 +96,7 @@
 			</div>
 		}
 
-		<!-- Tooltip de instrucciones -->
+		<!-- ? Tooltip shown only when idle. -->
 		@if (!voiceService.isListening() && !voiceService.isLocked() && !voiceService.error()) {
 			<div class="voice-tooltip">
 				Mantén presionado para hablar
@@ -104,7 +105,7 @@
 			</div>
 		}
 
-		<!-- Context menu de comandos -->
+		<!-- * Right-click command reference menu. -->
 		@if (showContextMenu) {
 			<div
 				class="voice-context-menu"

@@ -3,6 +3,7 @@
 		<div class="section-title-row">
 			<h2>
 				@if (hasHijos()) {
+					<!-- * Inline selector when multiple children are available -->
 					{{ table().title.split(' de ')[0] }} de
 					<p-select
 						[options]="hijosOptions()"
@@ -25,6 +26,7 @@
 					{{ table().title }}
 				}
 			</h2>
+			<!-- * Status summary badges -->
 			<div class="status-summary">
 				<div class="summary-item">
 					<span class="summary-color status-temprano"></span>
@@ -44,6 +46,7 @@
 				</div>
 			</div>
 		</div>
+		<!-- * Month selector for the current table -->
 		<p-select
 			[options]="monthOptions"
 			[ngModel]="table().selectedMonth"
@@ -62,6 +65,7 @@
 		/>
 	</div>
 
+	<!-- * Double-entry attendance grid -->
 	<p-table [value]="table().weeks" class="attendance-table double-entry">
 		<ng-template pTemplate="header">
 			<tr>
@@ -79,17 +83,18 @@
 					<td class="day-col">
 						@if (isDayValid(day)) {
 							@if (day.status === 'X') {
-								<!-- Día antes del inicio del registro (26/01/2026) - sin código, apagado -->
+								<!-- ! Before registration start: show disabled day -->
 								<div class="day-cell day-no-registro">
 									<span class="day-number">{{ day.date | date: 'd' }}</span>
 								</div>
 							} @else if (day.status === '-') {
-								<!-- Día pendiente (futuro o de hoy sin hora) - con código -->
+								<!-- * Pending day (future or today without time) -->
 								<div class="day-cell status-pendiente">
 									<span class="day-number">{{ day.date | date: 'd' }}</span>
 									<span class="day-status">-</span>
 								</div>
 							} @else {
+								<!-- * Normal day with status code -->
 								<div class="day-cell" [class]="getStatusClass(day.status)">
 									<span class="day-number">{{ day.date | date: 'd' }}</span>
 									<span class="day-status">{{ day.status }}</span>
@@ -99,6 +104,7 @@
 								</div>
 							}
 						} @else {
+							<!-- * Empty cells keep grid alignment -->
 							<div class="day-cell day-empty"></div>
 						}
 					</td>

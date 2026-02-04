@@ -62,11 +62,12 @@ export class HorariosComponent implements OnInit {
 	private facade = inject(HorariosFacade);
 	private confirmationService = inject(ConfirmationService);
 
-	// ============ Signals del store ============
+	// * Store signals snapshot
 	readonly vm = this.facade.vm;
 
 	// ============ Lifecycle ============
 	ngOnInit(): void {
+		// * Initial load
 		this.loadData();
 	}
 
@@ -76,6 +77,7 @@ export class HorariosComponent implements OnInit {
 	}
 
 	refresh(): void {
+		// * Manual refresh
 		logger.log('Refrescando horarios...');
 		this.loadData();
 	}
@@ -94,6 +96,7 @@ export class HorariosComponent implements OnInit {
 	}
 
 	onToggleEstado(id: number, estadoActual: boolean): void {
+		// ! Confirm before toggling active state.
 		const accion = estadoActual ? 'desactivar' : 'activar';
 		const header = estadoActual
 			? UI_CONFIRM_HEADERS.deactivateHorario
@@ -112,6 +115,7 @@ export class HorariosComponent implements OnInit {
 	}
 
 	onDelete(id: number): void {
+		// ! Confirm before delete.
 		const horario = this.vm().horarios.find((h) => h.id === id);
 		if (!horario) return;
 
@@ -164,6 +168,7 @@ export class HorariosComponent implements OnInit {
 	}
 
 	onSaveHorario(): void {
+		// ! Create/update schedule from wizard form.
 		const formData = this.vm().formData;
 		const editingId = this.vm().editingId;
 		const currentUser = this.vm().currentUser;

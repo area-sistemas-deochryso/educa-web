@@ -12,9 +12,11 @@ import { logger } from '@core/helpers';
 	styleUrl: './footer.scss',
 })
 export class FooterComponent {
+	// * Local form state for newsletter input.
 	newsletterEmail = '';
 
 	onNewsletterSubmit(): void {
+		// * Placeholder submit handler (logs and clears).
 		if (this.newsletterEmail) {
 			logger.log('Newsletter subscription:', this.newsletterEmail);
 			this.newsletterEmail = '';
@@ -22,6 +24,7 @@ export class FooterComponent {
 	}
 
 	scrollToTop(): void {
+		// * Smooth scroll back to the top of the page.
 		window.scrollTo({ top: 0, behavior: 'smooth' });
 	}
 }

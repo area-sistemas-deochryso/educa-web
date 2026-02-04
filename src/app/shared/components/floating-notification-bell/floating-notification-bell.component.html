@@ -1,7 +1,7 @@
-<!-- Toast de PrimeNG para notificaciones impactantes -->
+<!-- * PrimeNG toast host for urgent/high notifications. -->
 <p-toast position="top-right"></p-toast>
 
-<!-- Campana de Notificaciones Flotante (Alt+B para abrir/cerrar panel) -->
+<!-- * Floating bell button (Alt+B opens panel). -->
 @if (notificationCount() > 0) {
 	<app-notification-bell-button
 		[showContextMenu]="showContextMenu"
@@ -13,7 +13,7 @@
 	/>
 }
 
-<!-- Panel de Notificaciones (Alt+B para abrir/cerrar) -->
+<!-- * Notifications panel (Alt+B toggles). -->
 @if (isPanelOpen()) {
 	<app-notifications-panel />
 }

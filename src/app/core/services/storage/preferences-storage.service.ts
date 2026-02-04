@@ -44,6 +44,7 @@ export interface GradoSeccionPref {
 	providedIn: 'root',
 })
 export class PreferencesStorageService {
+	// * LocalStorage-backed user preferences.
 	private platformId = inject(PLATFORM_ID);
 
 	private get isBrowser(): boolean {

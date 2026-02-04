@@ -83,4 +83,5 @@ class Logger {
 /**
  * Instancia singleton del logger
  */
+// * Shared singleton logger instance.
 export const logger = new Logger();

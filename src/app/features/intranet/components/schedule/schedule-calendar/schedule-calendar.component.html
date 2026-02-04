@@ -1,4 +1,5 @@
 <div class="calendar-card">
+	<!-- * Calendar header + today shortcut -->
 	<div class="calendar-header">
 		<div class="header-left">
 			<i class="pi pi-calendar"></i>
@@ -14,12 +15,14 @@
 		</button>
 	</div>
 
+	<!-- * Month navigation -->
 	<div class="calendar-navigation">
 		<button class="nav-btn" (click)="previousMonth()">&lt;</button>
 		<span class="month-year">{{ monthYearDisplay }}</span>
 		<button class="nav-btn" (click)="nextMonth()">&gt;</button>
 	</div>
 
+	<!-- * Day grid -->
 	<div class="calendar-grid">
 		@for (day of dayHeaders; track day) {
 			<div class="day-header">{{ day }}</div>

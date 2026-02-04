@@ -1,7 +1,7 @@
 <div class="weekly-container">
-  <!-- ============ Grid de horarios ============ -->
+  <!-- * Grid de horarios -->
   <div class="weekly-grid-container">
-    <!-- Columna de tiempo -->
+    <!-- * Columna de tiempo -->
     <div class="time-column">
       <div class="time-header">Hora</div>
       @for (hora of HORAS; track hora) {
@@ -9,20 +9,20 @@
       }
     </div>
 
-    <!-- Columnas por día -->
+    <!-- * Columnas por día -->
     @for (dia of DIAS; track dia.value) {
       <div class="day-column">
-        <!-- Header del día -->
+        <!-- * Header del día -->
         <div class="day-header">{{ dia.label }}</div>
 
-        <!-- Grid de horas del día -->
+        <!-- * Grid de horas del día -->
         <div class="day-grid">
-          <!-- Líneas de fondo para las horas -->
+          <!-- * Líneas de fondo para las horas -->
           @for (hora of HORAS; track hora) {
             <div class="hour-line"></div>
           }
 
-          <!-- Bloques de horarios -->
+          <!-- * Bloques de horarios -->
           <div class="blocks-container">
             @for (block of getBlocksForDay(dia.value); track trackByBlockId($index, block)) {
               <div
@@ -68,7 +68,7 @@
                     {{ block.horario.cantidadEstudiantes }}
                   </div>
 
-                  <!-- Acciones (aparecen al hover) -->
+                  <!-- * Acciones (aparecen al hover) -->
                   <div class="block-actions">
                     <button
                       pButton
@@ -95,7 +95,7 @@
     }
   </div>
 
-  <!-- ============ Estado de carga ============ -->
+  <!-- * Estado de carga -->
   @if (loading()) {
     <div class="loading-overlay">
       <i class="pi pi-spin pi-spinner" style="font-size: 2rem"></i>
@@ -103,7 +103,7 @@
     </div>
   }
 
-  <!-- ============ Estado vacío ============ -->
+  <!-- * Estado vacío -->
   @if (!loading() && blocks().length === 0) {
     <div class="empty-overlay">
       <i class="pi pi-calendar" style="font-size: 3rem; opacity: 0.3"></i>

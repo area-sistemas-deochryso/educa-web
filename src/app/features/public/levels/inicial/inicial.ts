@@ -8,4 +8,6 @@ import { RouterLink } from '@angular/router';
 	templateUrl: './inicial.html',
 	styleUrl: './inicial.scss',
 })
-export class InicialComponent {}
+export class InicialComponent {
+	// * Inicial level page content.
+}

@@ -1,19 +1,41 @@
+<!-- * Shared legend for attendance codes -->
 <app-attendance-legend />
 
 @if (gradosSecciones().length > 0) {
 	<div class="selector-row">
+		<!-- * Grade/section selector drives which group is loaded -->
 		<app-grado-seccion-selector
 			[gradosSecciones]="gradosSecciones()"
 			[selectedGradoSeccion]="selectedGradoSeccion()"
 			(gradoSeccionChange)="selectGradoSeccion($event)"
 		/>
 
-		@if (selectedGradoSeccion() && view.viewMode() === 'mes') {
+		@if (view.viewMode() === 'mes') {
+			<!-- * PDF actions only in month mode -->
 			<div class="pdf-section">
-				<span class="pdf-label">Reporte del día: {{ view.pdfFecha() | date: 'dd/MM/yyyy' }}</span>
+				<!-- Selector de tipo de reporte -->
+				<p-select
+					[options]="tipoReporteOptions"
+					[(ngModel)]="tipoReporte"
+					optionLabel="label"
+					optionValue="value"
+					placeholder="Tipo de reporte"
+					appendTo="body"
+					class="tipo-reporte-selector"
+				/>
+
+				<span class="pdf-label">
+					@if (tipoReporte() === 'salon') {
+						Reporte del día: {{ view.pdfFecha() | date: 'dd/MM/yyyy' }}
+					} @else {
+						Reporte consolidado
+					}
+				</span>
+
 				<p-button
 					icon="pi pi-file-pdf"
-					[loading]="view.downloadingPdf()"
+					[loading]="tipoReporte() === 'salon' ? view.downloadingPdf() : downloadingPdfConsolidado()"
+					[disabled]="tipoReporte() === 'salon' && !selectedGradoSeccion()"
 					severity="danger"
 					[text]="true"
 					[rounded]="true"
@@ -26,17 +48,18 @@
 						},
 					}"
 				/>
-				<p-menu #pdfMenu [model]="view.pdfMenuItems" [popup]="true" appendTo="body" />
+				<p-menu #pdfMenu [model]="pdfMenuItems()" [popup]="true" appendTo="body" />
 			</div>
 		}
 	</div>
 
 	@if (view.viewMode() === 'mes') {
 		@if (view.showSkeletons() && !view.tableReady()) {
-			<!-- Skeleton mostrado inmediatamente con espacio reservado -->
+			<!-- * Skeleton: reserve space while data loads -->
 			<app-attendance-table-skeleton />
 			<app-attendance-table-skeleton />
 		} @else if (view.estudiantes().length > 0) {
+			<!-- * Month tables: ingresos and salidas -->
 			<app-attendance-table
 				[table]="view.ingresos()"
 				[hijos]="view.estudiantesAsHijos()"
@@ -52,19 +75,37 @@
 				(hijoChange)="view.selectEstudiante($event)"
 			/>
 		} @else if (!view.loading()) {
+			<!-- ! Empty state after load -->
 			<app-empty-state message="No se encontraron estudiantes en este grado/sección." />
 		}
 	} @else {
-		<app-asistencia-dia-list
-			[estudiantes]="view.estudiantesDia()"
-			[fecha]="view.fechaDia()"
-			[loading]="view.loading()"
-			[showPdfButton]="selectedGradoSeccion() !== null"
-			[downloadingPdf]="view.downloadingPdf()"
-			[pdfMenuItems]="view.pdfMenuItems"
-			(fechaChange)="view.onFechaDiaChange($event)"
-		/>
+		<!-- * Day mode list with date picker + PDF options -->
+		<div class="day-mode-container">
+			<!-- Selector de tipo de reporte para modo día -->
+			<div class="pdf-section pdf-section-day">
+				<p-select
+					[options]="tipoReporteOptions"
+					[(ngModel)]="tipoReporte"
+					optionLabel="label"
+					optionValue="value"
+					placeholder="Tipo de reporte"
+					appendTo="body"
+					class="tipo-reporte-selector"
+				/>
+			</div>
+
+			<app-asistencia-dia-list
+				[estudiantes]="view.estudiantesDia()"
+				[fecha]="view.fechaDia()"
+				[loading]="view.loading()"
+				[showPdfButton]="true"
+				[downloadingPdf]="tipoReporte() === 'salon' ? view.downloadingPdf() : downloadingPdfConsolidado()"
+				[pdfMenuItems]="pdfMenuItems()"
+				(fechaChange)="view.onFechaDiaChange($event)"
+			/>
+		</div>
 	}
 } @else if (!view.loading()) {
+	<!-- ! No available grade/section data -->
 	<app-empty-state message="No hay grados/secciones disponibles." />
 }

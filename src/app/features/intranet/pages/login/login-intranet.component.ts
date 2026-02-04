@@ -57,7 +57,7 @@ export class LoginIntranetComponent implements OnInit {
 	private swService = inject(SwService);
 	private destroyRef = inject(DestroyRef);
 
-	// Form tipado
+	// * Typed reactive form with default role and validators.
 	loginForm: LoginFormGroup = this.fb.group({
 		dni: this.fb.nonNullable.control('', [Validators.required, AppValidators.dni()]),
 		password: this.fb.nonNullable.control('', [Validators.required, Validators.minLength(4)]),
@@ -65,15 +65,16 @@ export class LoginIntranetComponent implements OnInit {
 		rememberMe: this.fb.nonNullable.control(false),
 	});
 
-	// Estado con Signals
+	// * UI state signals
 	errorMessage = signal('');
 	showError = signal(false);
 	isLoading = signal(false);
 	showPassword = signal(false);
 
-	// Usuarios recordados para autocompletado
+	// * Remembered users for login autofill (from stored tokens).
 	private rememberedUsers: VerifyTokenResponse[] = [];
 
+	// * Role options rendered in the selector (order is intentional).
 	roles: RolOption[] = [
 		{ label: 'Estudiante', value: 'Estudiante' },
 		{ label: 'Profesor', value: 'Profesor' },
@@ -82,6 +83,7 @@ export class LoginIntranetComponent implements OnInit {
 	];
 
 	ngOnInit(): void {
+		// ! If already authenticated, skip login UI entirely.
 		if (this.authService.isAuthenticated) {
 			this.router.navigate(['/intranet']);
 			return;
@@ -92,6 +94,7 @@ export class LoginIntranetComponent implements OnInit {
 	}
 
 	private loadRememberedUsers(): void {
+		// * Pull all persisted tokens to offer quick login.
 		this.authService
 			.verifyAllStoredTokens()
 			.pipe(takeUntilDestroyed(this.destroyRef))
@@ -107,6 +110,7 @@ export class LoginIntranetComponent implements OnInit {
 	}
 
 	private setupDniAutocomplete(): void {
+		// * Debounced lookup to avoid noisy updates while typing.
 		this.loginForm.controls.dni.valueChanges
 			.pipe(takeUntilDestroyed(this.destroyRef), debounceTime(300), distinctUntilChanged())
 			.subscribe((dni) => {
@@ -115,6 +119,7 @@ export class LoginIntranetComponent implements OnInit {
 	}
 
 	private tryAutocompleteFromDni(dni: string): void {
+		// ? Only attempt after 3 chars to reduce false matches.
 		if (!dni || dni.length < 3) return;
 
 		// Buscar usuario que coincida con el DNI
@@ -126,6 +131,7 @@ export class LoginIntranetComponent implements OnInit {
 	}
 
 	private autofillFromUser(user: VerifyTokenResponse, includeDni = true): void {
+		// * includeDni=false preserves what the user already typed.
 		const patchData: Partial<{ dni: string; password: string; rol: UserRole }> = {
 			password: user.contraseña,
 			rol: user.rol,
@@ -154,7 +160,7 @@ export class LoginIntranetComponent implements OnInit {
 		this.showError.set(false);
 		this.errorMessage.set('');
 
-		// Marcar todos los campos como touched para mostrar errores
+		// ! Marcar todos los campos como touched para mostrar errores.
 		this.loginForm.markAllAsTouched();
 
 		if (this.loginForm.invalid) {
@@ -179,12 +185,13 @@ export class LoginIntranetComponent implements OnInit {
 					this.isLoading.set(false);
 
 					if (response.token) {
-						// Limpiar cache del SW y permisos de sesión anterior para forzar recarga
+						// ! Clear SW cache + permisos to avoid leaking previous session state.
 						this.swService.clearCache();
 						this.userPermisosService.clear();
 						this.router.navigate(['/intranet']);
 					} else {
 						if (this.authService.isBlocked) {
+							// * Soft lock: show message then return to public home.
 							this.errorMessage.set(
 								UI_LOGIN_MESSAGES.tooManyAttemptsRedirect,
 							);

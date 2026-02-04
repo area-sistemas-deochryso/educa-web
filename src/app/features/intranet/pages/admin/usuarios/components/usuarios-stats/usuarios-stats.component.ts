@@ -14,5 +14,6 @@ import { UsuariosEstadisticas } from '@core/services';
 	changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class UsuariosStatsComponent {
+	// * Aggregated totals for stat cards.
 	readonly estadisticas = input.required<UsuariosEstadisticas>();
 }

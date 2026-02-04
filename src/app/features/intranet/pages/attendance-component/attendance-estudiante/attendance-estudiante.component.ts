@@ -22,10 +22,12 @@ export class AttendanceEstudianteComponent implements OnInit {
 	private authStore = inject(AuthStore);
 	private destroyRef = inject(DestroyRef);
 
+	// * Prefer full name; fallback keeps UI stable if profile is missing.
 	private readonly userName = computed(
 		() => this.authStore.user()?.nombreCompleto ?? 'Estudiante',
 	);
 
+	// * Student view uses personalized table titles.
 	readonly ingresos = signal<AttendanceTable>(
 		this.attendanceDataService.createEmptyTable('Mis Ingresos'),
 	);
@@ -36,10 +38,12 @@ export class AttendanceEstudianteComponent implements OnInit {
 	readonly hasData = signal(false);
 
 	ngOnInit(): void {
+		// * Initial load uses the current month.
 		this.loadAsistencias();
 	}
 
 	private loadAsistencias(): void {
+		// * Default to current month/year on first render.
 		const now = new Date();
 		const currentMonth = now.getMonth() + 1;
 		const currentYear = now.getFullYear();
@@ -55,6 +59,7 @@ export class AttendanceEstudianteComponent implements OnInit {
 			.subscribe((resumen) => {
 				if (resumen && resumen.detalle && resumen.detalle.length > 0) {
 					this.hasData.set(true);
+					// * Map raw asistencia rows into table-friendly structures.
 					const { ingresos, salidas } = this.attendanceDataService.processAsistencias(
 						resumen.detalle,
 						currentMonth,
@@ -65,6 +70,7 @@ export class AttendanceEstudianteComponent implements OnInit {
 					this.salidas.set(salidas);
 				} else {
 					this.hasData.set(false);
+					// * Reset tables when no data is returned.
 					this.ingresos.set(this.attendanceDataService.createEmptyTable('Mis Ingresos'));
 					this.salidas.set(this.attendanceDataService.createEmptyTable('Mis Salidas'));
 				}
@@ -74,6 +80,7 @@ export class AttendanceEstudianteComponent implements OnInit {
 	onIngresosMonthChange(month: number): void {
 		const currentYear = this.ingresos().selectedYear;
 
+		// * Fetch only the requested month; keep salidas unless same month.
 		this.loading.set(true);
 
 		this.asistenciaService
@@ -99,6 +106,7 @@ export class AttendanceEstudianteComponent implements OnInit {
 					}
 				} else {
 					this.hasData.set(false);
+					// * Clear only ingresos table on empty response.
 					this.ingresos.set(this.attendanceDataService.createEmptyTable('Mis Ingresos'));
 				}
 			});
@@ -107,6 +115,7 @@ export class AttendanceEstudianteComponent implements OnInit {
 	onSalidasMonthChange(month: number): void {
 		const currentYear = this.salidas().selectedYear;
 
+		// * Fetch only the requested month; keep ingresos unless same month.
 		this.loading.set(true);
 
 		this.asistenciaService
@@ -132,6 +141,7 @@ export class AttendanceEstudianteComponent implements OnInit {
 					}
 				} else {
 					this.hasData.set(false);
+					// * Clear only salidas table on empty response.
 					this.salidas.set(this.attendanceDataService.createEmptyTable('Mis Salidas'));
 				}
 			});

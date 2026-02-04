@@ -15,5 +15,6 @@ export interface UnreadByPriority {
 	styleUrl: './priority-summary.component.scss',
 })
 export class PrioritySummaryComponent {
+	// * Counts by priority for the header summary pills.
 	@Input({ required: true }) unreadByPriority!: UnreadByPriority;
 }

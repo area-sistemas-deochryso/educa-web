@@ -1,4 +1,5 @@
 <div class="week-item" [class.expanded]="week.expanded">
+	<!-- * Accordion header -->
 	<div class="week-header" (click)="toggleTriggered.emit()">
 		<span>{{ week.name }}</span>
 		<i
@@ -8,6 +9,7 @@
 		></i>
 	</div>
 	@if (week.expanded) {
+		<!-- * Expanded content rows -->
 		<div class="week-content">
 			<p class="teacher-message">{{ week.teacherMessage }}</p>
 			<app-week-content-row

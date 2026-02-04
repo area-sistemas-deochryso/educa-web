@@ -2,6 +2,7 @@
  * Asistencia Models - Interfaces que coinciden con el backend educa.API
  * Basado en DTOs/AsistenciaConsultaDto.cs
  */
+// * Attendance DTOs used by asistencia services.
 
 // Response de una asistencia individual (AsistenciaDetalleDto)
 export interface AsistenciaDetalle {

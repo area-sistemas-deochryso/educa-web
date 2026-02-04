@@ -10,6 +10,7 @@ import { CommonModule } from '@angular/common';
 	styleUrls: ['./week-content-row.component.scss'],
 })
 export class WeekContentRowComponent {
+	// * Simple row with icon, text, and action link.
 	@Input() icon = 'pi-file';
 	@Input() title = '';
 	@Input() subtitle = '';

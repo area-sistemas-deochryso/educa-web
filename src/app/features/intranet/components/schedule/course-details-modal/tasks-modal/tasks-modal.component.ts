@@ -19,10 +19,12 @@ export interface Task {
 	styleUrl: './tasks-modal.component.scss',
 })
 export class TasksModalComponent {
+	// * Inputs/outputs for dialog state and week label.
 	@Input() visible = false;
 	@Input() weekName = '';
 	@Output() visibleChange = new EventEmitter<boolean>();
 
+	// * Static sample tasks (replace with API when available).
 	tasks: Task[] = [
 		{
 			id: 1,
@@ -61,6 +63,7 @@ export class TasksModalComponent {
 	}
 
 	getDaysRemaining(dueDate: string): string {
+		// * Human-friendly remaining time label.
 		const [day, month, year] = dueDate.split('/').map(Number);
 		const due = new Date(year, month - 1, day);
 		const today = new Date();
@@ -80,6 +83,7 @@ export class TasksModalComponent {
 	}
 
 	openTask(task: Task): void {
+		// * Mark as read and open (placeholder behavior).
 		this.markAsRead(task);
 		logger.log('Abriendo tarea:', task.title);
 	}

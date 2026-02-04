@@ -23,11 +23,13 @@ export interface FilterOptions {
 	changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class UsuariosFiltersComponent {
+	// * Inputs reflect current filters in the parent store.
 	readonly searchTerm = input.required<string>();
 	readonly filterRol = input.required<RolUsuarioAdmin | null>();
 	readonly filterEstado = input.required<boolean | null>();
 	readonly options = input.required<FilterOptions>();
 
+	// * Outputs bubble user interactions.
 	readonly searchChange = output<string>();
 	readonly filterRolChange = output<RolUsuarioAdmin | null>();
 	readonly filterEstadoChange = output<boolean | null>();

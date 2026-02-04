@@ -11,6 +11,7 @@ import { UI_ACCESS_DENIED_MESSAGE, UI_SUMMARIES } from '@app/shared/constants';
  * Si no tiene permiso, redirige a /intranet
  * Si falla la carga de permisos, redirige al login (credenciales inválidas)
  */
+// * Guard: verifies permisos and redirects when access is denied.
 export const permisosGuard: CanActivateFn = async (route: ActivatedRouteSnapshot) => {
 	const authService = inject(AuthService);
 	const userPermisosService = inject(UserPermisosService);
@@ -29,6 +30,7 @@ export const permisosGuard: CanActivateFn = async (route: ActivatedRouteSnapshot
 
 	// Construir la ruta completa desde la raíz
 	const fullPath = getFullPath(route);
+	// Nota: no incluye query params, solo segmentos de la ruta.
 	logger.tagged('PermisosGuard', 'log', 'Verificando permisos para:', fullPath);
 
 	// Esperar a que los permisos estén cargados
@@ -71,6 +73,7 @@ function getFullPath(route: ActivatedRouteSnapshot): string {
 	let current: ActivatedRouteSnapshot | null = route;
 
 	while (current) {
+		// Recorre la jerarquía padre para construir la ruta desde la raíz.
 		if (current.url.length > 0) {
 			segments.unshift(...current.url.map((s) => s.path));
 		}

@@ -18,6 +18,7 @@ interface Course {
 	styleUrl: './courses-section.scss',
 })
 export class CoursesSectionComponent {
+	// * Static list of featured courses/links.
 	courses: Course[] = [
 		{
 			id: 1,
@@ -65,6 +66,7 @@ export class CoursesSectionComponent {
 	pages = [1, 2, 3, 4, 5];
 
 	onPageChange(event: Event, page: number): void {
+		// * Client-side pagination state.
 		event.preventDefault();
 		if (page >= 1 && page <= this.pages.length) {
 			this.currentPage = page;

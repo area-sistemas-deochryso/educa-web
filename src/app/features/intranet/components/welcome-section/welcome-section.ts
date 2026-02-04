@@ -9,13 +9,13 @@ import { ChangeDetectionStrategy, Component, input } from '@angular/core';
 	changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class WelcomeSectionComponent {
-	/** Icono de PrimeNG a mostrar */
+	// * PrimeNG icon to display.
 	icon = input<string>('pi-graduation-cap');
 
-	/** Título de bienvenida */
+	// * Main welcome title.
 	title = input<string>('Bienvenido a tu Intranet');
 
-	/** Subtítulo descriptivo */
+	// * Supporting subtitle copy.
 	subtitle = input<string>(
 		'Aquí encontrarás toda la información relevante para tu día a día académico.',
 	);

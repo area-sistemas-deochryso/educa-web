@@ -21,6 +21,7 @@ export interface WeekData {
 	styleUrls: ['./week-accordion-item.component.scss'],
 })
 export class WeekAccordionItemComponent {
+	// * Inputs/outputs for accordion behavior and actions.
 	@Input({ required: true }) week!: WeekData;
 	@Output() toggleTriggered = new EventEmitter<void>();
 	@Output() openAttachments = new EventEmitter<void>();

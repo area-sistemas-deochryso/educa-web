@@ -1,8 +1,11 @@
+<!-- * Shared legend for attendance codes -->
 <app-attendance-legend />
 
 @if (hasData()) {
+	<!-- * Student tables: ingresos and salidas -->
 	<app-attendance-table [table]="ingresos()" (monthChange)="onIngresosMonthChange($event)" />
 	<app-attendance-table [table]="salidas()" (monthChange)="onSalidasMonthChange($event)" />
 } @else if (!loading()) {
+	<!-- ! Empty state after load -->
 	<app-empty-state message="No se encontraron registros de asistencia." />
 }

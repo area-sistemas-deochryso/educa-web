@@ -12,4 +12,5 @@ export interface RolOption {
 	templateUrl: './login-role-selector.component.html',
 	styleUrl: './login-role-selector.component.scss',
 })
+// * Content wrapper for the role selector row.
 export class LoginRoleSelectorComponent {}

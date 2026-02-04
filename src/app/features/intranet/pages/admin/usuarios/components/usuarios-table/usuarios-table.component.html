@@ -6,6 +6,7 @@
 	[minHeightPx]="420"
 	[blurPx]="2"
 >
+	<!-- * Users table with pagination + state storage -->
 	<p-table
 		[value]="usuarios()"
 		[paginator]="true"
@@ -34,6 +35,7 @@
 
 		<ng-template #body let-usuario>
 			<tr [class.row-inactive]="!usuario.estado">
+				<!-- * Basic user info -->
 				<td class="text-center">
 					<span class="id-badge">{{ usuario.id }}</span>
 				</td>
@@ -54,15 +56,18 @@
 					</div>
 				</td>
 				<td>
+					<!-- * Role tag uses severity mapping -->
 					<p-tag [value]="usuario.rol" [severity]="adminUtils.getRolSeverity(usuario.rol)" />
 				</td>
 				<td class="text-center">
+					<!-- * Active/inactive status tag -->
 					<p-tag
 						[value]="usuario.estado ? 'Activo' : 'Inactivo'"
 						[severity]="adminUtils.getEstadoSeverity(usuario.estado)"
 					/>
 				</td>
 				<td>
+					<!-- * Row actions -->
 					<div class="actions">
 						<button
 							pButton
@@ -114,6 +119,7 @@
 		<ng-template #emptymessage>
 			<tr>
 				<td colspan="6" class="empty-message">
+					<!-- ! Empty state when no results -->
 					<div class="empty-state">
 						<i class="pi pi-users"></i>
 						<p>No se encontraron usuarios</p>

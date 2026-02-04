@@ -3,6 +3,7 @@ import { AuthUser } from '../auth/auth.models';
 /**
  * Storage Models - Interfaces para los datos almacenados en localStorage
  */
+// * Local storage data shapes.
 
 /** Estado de los modales del schedule */
 export interface ScheduleModalsState {
@@ -30,6 +31,8 @@ export interface PermisosStorageData {
 	rol: string;
 	vistasPermitidas: string[];
 	tienePermisosPersonalizados: boolean;
+	/** JWT con exp de 4h que indica cuándo vencen estos permisos */
+	permisosToken?: string;
 }
 
 /** Re-exportar AuthUser para conveniencia */

@@ -67,12 +67,12 @@ export class CursosComponent implements OnInit {
 	private errorHandler = inject(ErrorHandlerService);
 	readonly adminUtils = inject(AdminUtilsService);
 
-	// ============ Estado ============
+	// * State
 	cursos = signal<Curso[]>([]);
 	grados = signal<Grado[]>([]);
 	loading = signal(false);
 
-	// ============ Computed - Grados por nivel ============
+	// * Computed - grades by level
 	readonly gradosInicial = computed(() =>
 		this.grados()
 			.filter((g) => g.nombre.toUpperCase().includes('INICIAL'))
@@ -100,19 +100,19 @@ export class CursosComponent implements OnInit {
 			})),
 	);
 
-	// ============ Selecciones por nivel ============
+	// * Selected grades by level
 	readonly selectedInicial = signal<number[]>([]);
 	readonly selectedPrimaria = signal<number[]>([]);
 	readonly selectedSecundaria = signal<number[]>([]);
 
-	// Computed que combina todas las selecciones
+	// * Combined selected grade ids
 	readonly allGradosIds = computed(() => [
 		...this.selectedInicial(),
 		...this.selectedPrimaria(),
 		...this.selectedSecundaria(),
 	]);
 
-	// ============ Computed - Grados disponibles (no seleccionados) por nivel ============
+	// * Computed - available grades (not selected)
 	readonly availableInicial = computed(() =>
 		this.gradosInicial().filter((g) => !this.selectedInicial().includes(g.id)),
 	);
@@ -125,7 +125,7 @@ export class CursosComponent implements OnInit {
 		this.gradosSecundaria().filter((g) => !this.selectedSecundaria().includes(g.id)),
 	);
 
-	// ============ Computed - Grados seleccionados con nombres formateados ============
+	// * Computed - selected grades with formatted labels
 	readonly selectedGradosInicial = computed(() =>
 		this.gradosInicial().filter((g) => this.selectedInicial().includes(g.id)),
 	);
@@ -138,7 +138,7 @@ export class CursosComponent implements OnInit {
 		this.gradosSecundaria().filter((g) => this.selectedSecundaria().includes(g.id)),
 	);
 
-	// ============ Computed - Grados del curso seleccionado para visualización ============
+	// * Computed - selected course grades for display
 	readonly cursoGradosInicial = computed(() => {
 		const curso = this.selectedCursoForGrados();
 		if (!curso?.grados) return [];
@@ -157,22 +157,22 @@ export class CursosComponent implements OnInit {
 		return curso.grados.filter((g) => g.nombre.toUpperCase().includes('SECUNDARIA'));
 	});
 
-	// ============ Dialogs ============
+	// * Dialogs
 	dialogVisible = signal(false);
 	isEditing = signal(false);
 	gradosDialogVisible = signal(false);
 	selectedCursoForGrados = signal<Curso | null>(null);
 
-	// ============ Form ============
+	// * Form
 	selectedCurso = signal<Curso | null>(null);
 	formData = signal<CursoForm>({ nombre: '', estado: true, gradosIds: [] });
 
-	// ============ Filters ============
+	// * Filters
 	searchTerm = signal('');
 	filterEstado = signal<boolean | null>(null);
 	filterNivel = signal<string | null>(null);
 
-	// ============ Options ============
+	// * Options
 	estadoOptions = [
 		{ label: 'Todos', value: null },
 		{ label: 'Activos', value: true },
@@ -186,12 +186,12 @@ export class CursosComponent implements OnInit {
 		{ label: 'Secundaria', value: 'SECUNDARIA' },
 	];
 
-	// ============ Computed - Statistics ============
+	// * Computed - stats
 	totalCursos = computed(() => this.cursos().length);
 	cursosActivos = computed(() => this.cursos().filter((c) => c.estado).length);
 	cursosInactivos = computed(() => this.cursos().filter((c) => !c.estado).length);
 
-	// ============ Computed - Filtered data ============
+	// * Computed - filtered list
 	filteredCursos = computed(() => {
 		let data = this.cursos();
 		const search = this.searchTerm().toLowerCase();
@@ -216,11 +216,13 @@ export class CursosComponent implements OnInit {
 	});
 
 	ngOnInit(): void {
+		// * Load courses and grades.
 		this.loadData();
 		this.loadGrados();
 	}
 
 	loadData(): void {
+		// * Fetch courses list.
 		this.loading.set(true);
 
 		this.cursosService
@@ -243,6 +245,7 @@ export class CursosComponent implements OnInit {
 	}
 
 	loadGrados(): void {
+		// * Fetch grades list for selectors.
 		this.gradosService
 			.getGrados()
 			.pipe(takeUntilDestroyed(this.destroyRef))
@@ -265,6 +268,7 @@ export class CursosComponent implements OnInit {
 	}
 
 	clearFilters(): void {
+		// * Reset all filters.
 		this.searchTerm.set('');
 		this.filterEstado.set(null);
 		this.filterNivel.set(null);
@@ -272,6 +276,7 @@ export class CursosComponent implements OnInit {
 
 	// ============ Edit Dialog ============
 	openNew(): void {
+		// * Create flow starts with clean form + selections.
 		this.selectedCurso.set(null);
 		this.formData.set({ nombre: '', estado: true, gradosIds: [] });
 		this.selectedInicial.set([]);
@@ -282,6 +287,7 @@ export class CursosComponent implements OnInit {
 	}
 
 	editCurso(curso: Curso): void {
+		// * Populate form + selection lists from existing course.
 		this.selectedCurso.set(curso);
 		this.formData.set({
 			nombre: curso.nombre,
@@ -346,6 +352,7 @@ export class CursosComponent implements OnInit {
 	}
 
 	saveCurso(): void {
+		// ! Persist course changes (create/update).
 		const data = this.formData();
 		const gradosIds = this.allGradosIds();
 
@@ -388,6 +395,7 @@ export class CursosComponent implements OnInit {
 	}
 
 	deleteCurso(curso: Curso): void {
+		// ! Confirm before delete.
 		if (confirm(buildDeleteCursoMessage(curso.nombre))) {
 			this.loading.set(true);
 			this.cursosService

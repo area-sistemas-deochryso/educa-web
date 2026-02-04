@@ -65,7 +65,7 @@ export class PermisosUsuariosComponent implements OnInit {
 	private confirmationService = inject(ConfirmationService);
 	private destroyRef = inject(DestroyRef);
 
-	// Facade state
+	// * Facade state (signals)
 	readonly permisosUsuario = this.facade.permisosUsuario;
 	readonly vistas = this.facade.vistas;
 	readonly loading = this.facade.loading;
@@ -83,7 +83,7 @@ export class PermisosUsuariosComponent implements OnInit {
 	readonly vistasBusqueda = this.facade.vistasBusqueda;
 	readonly adminUtils = this.facade.adminUtils;
 
-	// Computed from facade
+	// * Computed from facade
 	readonly totalUsuarios = this.facade.totalUsuarios;
 	readonly totalModulos = this.facade.totalModulos;
 	readonly filteredPermisos = this.facade.filteredPermisos;
@@ -92,7 +92,7 @@ export class PermisosUsuariosComponent implements OnInit {
 	readonly moduloVistasForDetail = this.facade.moduloVistasForDetail;
 	readonly isAllModuloSelected = this.facade.isAllModuloSelected;
 
-	// Autocomplete local state (ephemeral)
+	// * Autocomplete local state (ephemeral)
 	selectedUsuario: UsuarioBusqueda | null = null;
 	usuariosSugeridos: UsuarioBusqueda[] = [];
 
@@ -104,6 +104,7 @@ export class PermisosUsuariosComponent implements OnInit {
 	rolesSelectOptions = ROLES_DISPONIBLES_ADMIN.map((r) => ({ label: r, value: r }));
 
 	ngOnInit(): void {
+		// * Initial load
 		this.facade.loadData();
 	}
 
@@ -159,6 +160,7 @@ export class PermisosUsuariosComponent implements OnInit {
 	}
 
 	deletePermiso(permiso: PermisoUsuario): void {
+		// ! Confirm delete with explicit user/role context.
 		const nombre = permiso.nombreUsuario || `ID: ${permiso.usuarioId}`;
 		const mensaje = buildDeletePermisosUsuarioMessage(nombre, permiso.rol);
 
@@ -177,6 +179,7 @@ export class PermisosUsuariosComponent implements OnInit {
 
 	// === Rol & Vistas ===
 	loadVistasFromRol(): void {
+		// * Reset selected user when role changes.
 		// Limpiar usuario seleccionado cuando cambia el rol
 		this.selectedUsuario = null;
 		this.facade.setSelectedUsuarioId(null);
@@ -197,6 +200,7 @@ export class PermisosUsuariosComponent implements OnInit {
 
 	// === Autocomplete Usuarios ===
 	buscarUsuarios(event: AutoCompleteCompleteEvent): void {
+		// * Autocomplete: role-specific search.
 		const rol = this.selectedRol();
 		if (!rol) {
 			this.usuariosSugeridos = [];

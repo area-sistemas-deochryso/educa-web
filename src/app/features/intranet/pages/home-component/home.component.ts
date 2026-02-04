@@ -24,10 +24,13 @@ import { environment } from '@config/environment';
 export class HomeComponent {
 	private storage = inject(StorageService);
 
+	// * Feature flag controls quick access section visibility.
 	readonly showQuickAccess = environment.features.quickAccess;
+	// * Course list is reused by quick-access menu.
 	readonly availableCourses = COURSE_NAMES;
 
 	readonly welcomeTitle = computed(() => {
+		// * Personalize welcome header if user is stored.
 		const user = this.storage.getUser();
 		if (user?.nombreCompleto) {
 			return `Bienvenido, ${user.nombreCompleto}`;

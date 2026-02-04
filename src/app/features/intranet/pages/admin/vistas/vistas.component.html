@@ -1,5 +1,5 @@
 <div class="vistas-container">
-	<!-- Header -->
+	<!-- * Header -->
 	<header class="page-header">
 		<div class="header-left">
 			<div class="header-icon">
@@ -19,7 +19,7 @@
 		></button>
 	</header>
 
-	<!-- Stats Cards -->
+	<!-- * Stats cards -->
 	<section class="stats-section">
 		<div class="stat-card">
 			<div class="stat-content">
@@ -66,7 +66,7 @@
 		</div>
 	</section>
 
-	<!-- Filters -->
+	<!-- * Filters -->
 	<section class="filters-section">
 		<div class="search-box">
 			<i class="pi pi-search"></i>
@@ -114,8 +114,9 @@
 		></button>
 	</section>
 
-	<!-- Table -->
+	<!-- * Table -->
 	@if (loading()) {
+		<!-- * Loading spinner -->
 		<div class="loading-container">
 			<p-progressSpinner strokeWidth="4" />
 		</div>
@@ -219,7 +220,7 @@
 	}
 </div>
 
-<!-- Edit/Create Dialog -->
+<!-- * Edit/Create dialog -->
 <p-dialog
 	[(visible)]="dialogVisible"
 	[header]="isEditing() ? 'Editar Vista' : 'Nueva Vista'"

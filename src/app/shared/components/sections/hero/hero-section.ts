@@ -15,14 +15,17 @@ interface ContactForm {
 	styleUrl: './hero-section.scss',
 })
 export class HeroSectionComponent {
+	// * Simple contact form state.
 	formData: ContactForm = {
 		name: '',
 		phone: '',
 	};
 
+	// * Prevent double submit.
 	isSubmitting = false;
 
 	onSubmit(): void {
+		// * Post to Formspree and reset on success.
 		if (this.formData.name && this.formData.phone) {
 			this.isSubmitting = true;
 
@@ -50,6 +53,7 @@ export class HeroSectionComponent {
 	}
 
 	scrollToSection(event: Event, sectionId: string): void {
+		// * Smooth scroll with navbar offset.
 		event.preventDefault();
 		const element = document.getElementById(sectionId);
 		if (element) {

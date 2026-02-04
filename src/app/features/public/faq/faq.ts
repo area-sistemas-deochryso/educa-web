@@ -8,4 +8,6 @@ import { RouterLink } from '@angular/router';
 	templateUrl: './faq.html',
 	styleUrl: './faq.scss',
 })
-export class FaqComponent {}
+export class FaqComponent {
+	// * FAQ page static content.
+}

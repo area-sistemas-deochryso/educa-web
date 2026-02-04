@@ -46,7 +46,9 @@ export class AttendanceProfesorComponent implements OnInit {
 	private asistenciaService = inject(AsistenciaService);
 	private storage = inject(StorageService);
 	private destroyRef = inject(DestroyRef);
+	// * Shared controller handles month/day, tables, and PDF actions.
 	readonly view = inject(AttendanceViewController);
+	// * Used by the selector and PDF header.
 	readonly nombreProfesor = inject(UserProfileService).userName;
 
 	// ============ Salones ============
@@ -56,6 +58,7 @@ export class AttendanceProfesorComponent implements OnInit {
 		const all = this.allSalones();
 		const month = this.view.ingresos().selectedMonth;
 		const isVerano = month === 1 || month === 2;
+		// * Summer months only show "V" sections.
 		return all.filter((s) =>
 			isVerano
 				? s.seccion.toUpperCase() === 'V'
@@ -69,6 +72,7 @@ export class AttendanceProfesorComponent implements OnInit {
 	});
 
 	ngOnInit(): void {
+		// * Configure shared controller callbacks for profesor endpoints + storage.
 		this.view.init({
 			loadEstudiantes: (gradoCodigo, seccion, mes, anio) =>
 				this.asistenciaService.getAsistenciasGrado(gradoCodigo, seccion, mes, anio),
@@ -85,6 +89,7 @@ export class AttendanceProfesorComponent implements OnInit {
 	// ============ Carga y selección de salón ============
 
 	private loadSalones(): void {
+		// * Fetch salon list, then restore selection and load data.
 		this.view.loading.set(true);
 
 		this.asistenciaService
@@ -112,6 +117,7 @@ export class AttendanceProfesorComponent implements OnInit {
 	}
 
 	selectSalon(salonId: number): void {
+		// * Avoid reload if the same salon is re-selected.
 		if (this.selectedSalonId() === salonId) return;
 
 		this.selectedSalonId.set(salonId);
@@ -120,6 +126,7 @@ export class AttendanceProfesorComponent implements OnInit {
 	}
 
 	private restoreSelectedSalon(): void {
+		// * Persisted selection helps keep context between navigations.
 		const salonId = this.storage.getSelectedSalonId();
 		if (salonId !== null && this.salones().some((s) => s.salonId === salonId)) {
 			this.selectedSalonId.set(salonId);
@@ -139,6 +146,7 @@ export class AttendanceProfesorComponent implements OnInit {
 	}
 
 	private reselectSalonIfNeeded(): void {
+		// * When month changes (verano filter), ensure selection is still valid.
 		const currentId = this.selectedSalonId();
 		const filtered = this.salones();
 		if (currentId && filtered.some((s) => s.salonId === currentId)) {
@@ -153,6 +161,7 @@ export class AttendanceProfesorComponent implements OnInit {
 
 	// ============ Delegados al servicio (llamados por el padre via @ViewChild) ============
 
+	// * Parent component calls these via ViewChild.
 	setViewMode(mode: ViewMode): void {
 		this.view.setViewMode(mode);
 	}

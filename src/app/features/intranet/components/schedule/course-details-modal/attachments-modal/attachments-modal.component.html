@@ -8,11 +8,12 @@
 	class="attachments-modal"
 	[showHeader]="false"
 >
+	<!-- * Attachments list + upload -->
 	<div class="modal-content">
 		<h2>Archivos Adjuntos</h2>
 		<p class="week-label">{{ weekName }}</p>
 
-		<!-- Upload Section -->
+		<!-- * Upload section -->
 		<div class="upload-section">
 			<p-fileUpload
 				#fileUpload
@@ -40,6 +41,7 @@
 			}
 		</div>
 
+		<!-- * Files list -->
 		<div class="attachments-list">
 			@for (attachment of vm().attachments; track attachment.id) {
 				<div class="attachment-item" [class.unread]="!attachment.isRead">

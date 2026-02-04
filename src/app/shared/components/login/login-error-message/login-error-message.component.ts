@@ -8,6 +8,7 @@ import { Component, Input } from '@angular/core';
 	styleUrl: './login-error-message.component.scss',
 })
 export class LoginErrorMessageComponent {
+	// * Toggleable validation/message banner.
 	@Input() message = '';
 	@Input() show = false;
 }

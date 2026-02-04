@@ -1,3 +1,4 @@
+// * Error types + friendly HTTP messages.
 import { UI_HTTP_ERROR_MESSAGES } from '@app/shared/constants';
 
 export type ErrorSeverity = 'info' | 'warn' | 'error' | 'success';

@@ -21,9 +21,11 @@ import { AdminUtilsService } from '@shared/services';
 export class UsuarioDetailDrawerComponent {
 	readonly adminUtils = inject(AdminUtilsService);
 
+	// * Inputs for visibility and selected user.
 	readonly visible = input.required<boolean>();
 	readonly usuario = input.required<UsuarioDetalle | null>();
 
+	// * Outputs for dialog actions.
 	readonly visibleChange = output<boolean>();
 	readonly closeDrawer = output<void>();
 	readonly edit = output<void>();

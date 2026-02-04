@@ -50,6 +50,7 @@ export interface CourseDetails {
 	styleUrl: './course-details-modal.component.scss',
 })
 export class CourseDetailsModalComponent implements OnChanges {
+	// * Inputs/outputs for dialog state and navigation actions.
 	@Input() visible = false;
 	@Input() courseName: string | null = null;
 	@Output() visibleChange = new EventEmitter<boolean>();
@@ -57,6 +58,7 @@ export class CourseDetailsModalComponent implements OnChanges {
 	@Output() openSummary = new EventEmitter<void>();
 	@Output() openGrades = new EventEmitter<string>();
 
+	// * UI state
 	weekSearchTerm = '';
 	courseSearchTerm = '';
 	courseSearchResults: string[] = [];
@@ -87,6 +89,7 @@ export class CourseDetailsModalComponent implements OnChanges {
 	];
 
 	ngOnChanges(changes: SimpleChanges): void {
+		// * Reset local state when course changes.
 		if (changes['courseName'] && this.courseName) {
 			this.currentCourseDetails = this.getDefaultCourseDetails(this.courseName);
 			this.courseSearchTerm = this.courseName;
@@ -157,6 +160,7 @@ export class CourseDetailsModalComponent implements OnChanges {
 	}
 
 	onCourseSearch(): void {
+		// * Filter course list for dropdown.
 		if (this.courseSearchTerm.trim()) {
 			const term = this.courseSearchTerm.toLowerCase();
 			this.courseSearchResults = this.validCourses.filter((course) =>
@@ -184,6 +188,7 @@ export class CourseDetailsModalComponent implements OnChanges {
 	}
 
 	onLinkClick(action: string): void {
+		// * Sidebar shortcuts.
 		switch (action) {
 			case 'schedule':
 				this.onOpenSchedule();

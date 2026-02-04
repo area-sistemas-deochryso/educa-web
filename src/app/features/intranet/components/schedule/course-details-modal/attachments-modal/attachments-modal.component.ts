@@ -19,11 +19,12 @@ import { AttachmentsModalFacade } from './attachments-modal.facade';
 export class AttachmentsModalComponent {
 	private readonly facade = inject(AttachmentsModalFacade);
 
+	// * Inputs/outputs for dialog state and week label.
 	@Input() visible = false;
 	@Input() weekName = '';
 	@Output() visibleChange = new EventEmitter<boolean>();
 
-	// ViewModel del facade
+	// * ViewModel from facade.
 	readonly vm = this.facade.vm;
 
 	onVisibleChange(value: boolean): void {
@@ -32,6 +33,7 @@ export class AttachmentsModalComponent {
 	}
 
 	getIcon(type: string): string {
+		// * Map attachment type to icon.
 		const icons: Record<string, string> = {
 			pdf: 'pi-file-pdf',
 			doc: 'pi-file-word',
@@ -43,6 +45,7 @@ export class AttachmentsModalComponent {
 	}
 
 	onFileSelect(event: { files: File[] }): void {
+		// * Delegate upload to facade.
 		const files = event.files;
 		if (files && files.length > 0) {
 			this.facade.uploadMultipleFiles(files);

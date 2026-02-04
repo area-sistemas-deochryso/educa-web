@@ -16,9 +16,11 @@ import { isPlatformBrowser } from '@angular/common';
 	styleUrl: './counter-section.scss',
 })
 export class CounterSectionComponent implements AfterViewInit, OnDestroy {
+	// * Detect changes during animation updates.
 	private cdr = inject(ChangeDetectorRef);
 	private platformId = inject(PLATFORM_ID);
 
+	// * Counter target + displayed state.
 	targetCount = 500;
 	displayedCount = 0;
 	private animationFrameId: number | null = null;
@@ -26,6 +28,7 @@ export class CounterSectionComponent implements AfterViewInit, OnDestroy {
 	private hasAnimated = false;
 
 	ngAfterViewInit(): void {
+		// * Only run observers in the browser.
 		if (isPlatformBrowser(this.platformId)) {
 			this.setupIntersectionObserver();
 		}
@@ -41,6 +44,7 @@ export class CounterSectionComponent implements AfterViewInit, OnDestroy {
 	}
 
 	private setupIntersectionObserver(): void {
+		// * Start animation when counter enters viewport.
 		const element = document.querySelector('.counter-thumb');
 		if (!element) return;
 

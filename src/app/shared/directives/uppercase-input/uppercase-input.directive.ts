@@ -14,6 +14,7 @@ export class UppercaseInputDirective {
 	onInput(): void {
 		const input = this.el.nativeElement as HTMLInputElement;
 		const uppercased = input.value.toUpperCase();
+		// Keep DOM value and form control in sync without re-triggering input events.
 		input.value = uppercased;
 		this.control.control?.setValue(uppercased, { emitEvent: false });
 	}

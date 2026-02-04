@@ -60,7 +60,7 @@ export interface EstadisticasAsistencia {
 	changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class AsistenciaDiaListComponent {
-	// Inputs
+	// * Inputs
 	readonly estudiantes = input.required<EstudianteAsistencia[]>();
 	readonly fecha = input.required<Date>();
 	readonly loading = input<boolean>(false);
@@ -68,28 +68,28 @@ export class AsistenciaDiaListComponent {
 	readonly downloadingPdf = input<boolean>(false);
 	readonly pdfMenuItems = input<MenuItem[]>([]);
 
-	// Outputs
+	// * Outputs
 	readonly fechaChange = output<Date>();
 
-	// ViewChild
+	// * ViewChild
 	@ViewChild('pdfMenu') pdfMenu!: Menu;
 
-	// Constants
+	// * Constants
 	readonly today = new Date();
 	readonly skeletonRows = Array(5);
 
-	// State
+	// * Local state for the datepicker model
 	fechaValue: Date = new Date();
 
-	// Expose getStatusClass for template
+	// * Expose getStatusClass for template
 	readonly getStatusClass = getStatusClass;
 
-	// Computed: estudiantes mapeados con estado calculado
+	// * Computed: map raw students to daily status rows
 	readonly estudiantesDelDia = computed<EstudianteAsistenciaDia[]>(() =>
 		this.estudiantes().map((e) => this.mapEstudianteAsistencia(e)),
 	);
 
-	// Computed: estadísticas calculadas en un solo pase
+	// * Computed: stats in a single pass for footer badges
 	readonly estadisticas = computed<EstadisticasAsistencia>(() => {
 		const estudiantes = this.estudiantesDelDia();
 		return estudiantes.reduce(
@@ -120,7 +120,7 @@ export class AsistenciaDiaListComponent {
 	});
 
 	constructor() {
-		// Sync fechaValue when fecha input changes
+		// * Sync datepicker model when input changes (OnPush friendly).
 		effect(() => {
 			this.fechaValue = this.fecha();
 		});
@@ -142,7 +142,7 @@ export class AsistenciaDiaListComponent {
 
 	formatTime(isoString: string | null): string {
 		if (!isoString) return '-';
-		// Handle ISO format: "2026-01-26T09:04:35" -> "09:04"
+		// * Handle ISO format: "2026-01-26T09:04:35" -> "09:04"
 		const match = isoString.match(/T(\d{2}:\d{2})/);
 		return match ? match[1] : isoString;
 	}
@@ -163,7 +163,7 @@ export class AsistenciaDiaListComponent {
 		const fecha = this.fecha();
 		const month = fecha.getMonth() + 1;
 
-		// Si es antes del inicio del registro
+		// ! Before registration start, mark as "X" and skip other rules.
 		if (isBeforeRegistrationStart(fecha)) {
 			return 'X';
 		}
@@ -171,28 +171,28 @@ export class AsistenciaDiaListComponent {
 		const tieneIngreso = asistencia?.horaEntrada;
 		const tieneSalida = asistencia?.horaSalida;
 
-		// CASO 1: Sin hora de ingreso
+		// * CASE 1: no entry time
 		if (!tieneIngreso) {
-			// CASO 1a: Hay salida sin ingreso → Fuera de hora
+			// * CASE 1a: exit without entry -> out of schedule
 			if (tieneSalida) {
 				return 'F';
 			}
 
-			// CASO 1b: Día actual sin ingreso
+			// * CASE 1b: today without entry
 			if (isToday(fecha)) {
-				// Si ya pasó la hora de salida → No asistió
+				// * After exit time -> absent
 				if (hasSalidaTimePassed(month)) {
 					return 'N';
 				}
-				// Si aún no pasa la hora de salida → Pendiente
+				// * Before exit time -> pending
 				return '-';
 			}
 
-			// CASO 1c: Día pasado sin ingreso → No asistió
+			// * CASE 1c: past day without entry -> absent
 			return 'N';
 		}
 
-		// CASO 2: Hay hora de ingreso
+		// * CASE 2: has entry time
 		const [hourIngresoStr, minuteIngresoStr] =
 			asistencia!.horaEntrada!.split('T')[1]?.split(':') || [];
 		const hourIngreso = parseInt(hourIngresoStr, 10);
@@ -204,12 +204,12 @@ export class AsistenciaDiaListComponent {
 
 		const estadoIngreso = getIngresoStatusFromTime(hourIngreso, minuteIngreso, month);
 
-		// CASO 2a: Hay ingreso pero NO hay salida → Usar estado de ingreso
+		// * CASE 2a: entry without exit -> use entry status
 		if (!tieneSalida) {
 			return estadoIngreso;
 		}
 
-		// CASO 2b: Hay ingreso Y salida → Tomar el peor estado de ambos
+		// * CASE 2b: entry + exit -> take worse status
 		const [hourSalidaStr, minuteSalidaStr] =
 			asistencia!.horaSalida!.split('T')[1]?.split(':') || [];
 		const hourSalida = parseInt(hourSalidaStr, 10);
@@ -221,7 +221,7 @@ export class AsistenciaDiaListComponent {
 
 		const estadoSalida = getSalidaStatusFromTime(hourSalida, minuteSalida, month);
 
-		// Peor estado: F > N > T > A
+		// * Priority: F > N > T > A
 		const estadoPrioridad: Record<AttendanceStatus, number> = {
 			F: 4,
 			N: 3,

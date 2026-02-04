@@ -50,18 +50,19 @@ const PRIORITY_LEGEND: PriorityInfo[] = [
 	styleUrl: './floating-notification-bell.component.scss',
 })
 export class FloatingNotificationBellComponent implements OnInit, OnDestroy {
+	// * Shared context for notifications + shortcut toggles.
 	private context = inject(NotificationsPanelContext);
 	private keyboardService = inject(KeyboardShortcutsService);
 	private messageService = inject(MessageService);
 
-	// Expose context signals for template
+	// * Expose context signals for template bindings.
 	notificationCount = this.context.notificationCount;
 	unreadCount = this.context.unreadCount;
 	isPanelOpen = this.context.isPanelOpen;
 	highestPriority = this.context.highestPriority;
 	badgePriorityClass = this.context.badgePriorityClass;
 
-	// Context menu state (local to this component)
+	// * Context menu state (local to this component).
 	showContextMenu = false;
 	contextMenuPosition = { x: 0, y: 0 };
 	priorityLegend = PRIORITY_LEGEND;
@@ -69,12 +70,12 @@ export class FloatingNotificationBellComponent implements OnInit, OnDestroy {
 	private hasShownToast = false;
 
 	ngOnInit(): void {
-		// Registrar atajo de teclado para abrir/cerrar panel de notificaciones
+		// * Keyboard shortcut to open/close the panel.
 		this.keyboardService.register('toggle-notification-bell', () => {
 			this.context.togglePanel();
 		});
 
-		// Mostrar toast de PrimeNG si hay notificaciones urgentes o importantes
+		// * Toast hint when there are unread notifications.
 		setTimeout(() => {
 			if (this.unreadCount() > 0 && !this.hasShownToast) {
 				this.showNotificationToast();
@@ -92,6 +93,7 @@ export class FloatingNotificationBellComponent implements OnInit, OnDestroy {
 	 * Muestra un toast de PrimeNG para notificaciones importantes
 	 */
 	private showNotificationToast(): void {
+		// * Map priority to toast visuals and play sound.
 		const priority = this.highestPriority();
 		const count = this.unreadCount();
 

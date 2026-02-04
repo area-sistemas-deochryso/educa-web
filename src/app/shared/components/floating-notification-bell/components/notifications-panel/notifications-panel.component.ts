@@ -20,9 +20,10 @@ import { NotificationsPanelContext } from '../../notifications-panel.context';
 	styleUrl: './notifications-panel.component.scss',
 })
 export class NotificationsPanelComponent {
+	// * Shared context for notifications list and panel actions.
 	private context = inject(NotificationsPanelContext);
 
-	// Expose context signals for template
+	// * Expose context signals for template bindings.
 	notifications = this.context.notifications;
 	dismissedNotifications = this.context.dismissedNotifications;
 	notificationCount = this.context.notificationCount;
@@ -37,10 +38,12 @@ export class NotificationsPanelComponent {
 	}
 
 	onOverlayClick(): void {
+		// * Close panel when clicking the overlay.
 		this.context.closePanel();
 	}
 
 	onFooterLinkClick(): void {
+		// * Close panel after navigating away.
 		this.context.closePanel();
 	}
 }

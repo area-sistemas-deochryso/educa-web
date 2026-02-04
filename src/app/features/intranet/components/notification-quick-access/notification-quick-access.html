@@ -5,6 +5,7 @@
 	[ngClass]="unreadCount() > 0 ? badgePriorityClass() : ''"
 	(click)="togglePanel()"
 >
+	<!-- * Bell + badge -->
 	<div class="card-icon" [ngClass]="unreadCount() > 0 ? badgePriorityClass() : ''">
 		<i class="pi pi-bell"></i>
 		@if (unreadCount() > 0) {

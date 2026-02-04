@@ -1,12 +1,15 @@
 <div class="usuarios-container">
+	<!-- * Header actions -->
 	<app-usuarios-header (refresh)="onRefresh()" />
 
 	@if (vm().showSkeletons && !vm().statsReady) {
+		<!-- * Stats skeleton while loading -->
 		<app-usuarios-stats-skeleton />
 	} @else if (vm().hasEstadisticas) {
 		<app-usuarios-stats [estadisticas]="vm().estadisticas!" />
 	}
 
+	<!-- * Filters + search -->
 	<app-usuarios-filters
 		[searchTerm]="vm().searchTerm"
 		[filterRol]="vm().filterRol"
@@ -20,10 +23,12 @@
 	/>
 
 	@if (vm().showSkeletons && !vm().tableReady) {
+		<!-- * Table skeleton while loading -->
 		<section class="table-section" style="min-height: 420px;">
 			<app-usuarios-table-skeleton />
 		</section>
 	} @else {
+		<!-- * Users table -->
 		<app-usuarios-table
 			[usuarios]="vm().filteredUsuarios"
 			[loading]="vm().loading"
@@ -34,6 +39,7 @@
 	}
 </div>
 
+<!-- * Detail drawer -->
 <app-usuario-detail-drawer
 	[visible]="vm().detailDrawerVisible"
 	[usuario]="vm().selectedUsuario"
@@ -42,6 +48,7 @@
 	(edit)="onEditFromDetail()"
 />
 
+<!-- * Create/Edit form dialog -->
 <app-usuario-form-dialog
 	[visible]="vm().dialogVisible"
 	[isEditing]="vm().isEditing"
@@ -55,4 +62,5 @@
 	(cancelDialog)="onCancelDialog()"
 />
 
+<!-- * Confirmation dialog host -->
 <p-confirmDialog (onHide)="onConfirmDialogHide()" />

@@ -1,3 +1,4 @@
+// * Tests for SessionStorageService read/write behavior.
 import { TestBed } from '@angular/core/testing';
 import { PLATFORM_ID } from '@angular/core';
 import { describe, it, expect, beforeEach, vi, afterEach } from 'vitest';

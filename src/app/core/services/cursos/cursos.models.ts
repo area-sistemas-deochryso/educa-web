@@ -1,3 +1,4 @@
+// * Curso DTOs and request shapes.
 export interface Grado {
 	id: number;
 	nombre: string;

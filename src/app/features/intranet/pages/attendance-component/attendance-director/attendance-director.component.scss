@@ -28,6 +28,22 @@
 		color: var(--text-color);
 		white-space: nowrap;
 	}
+
+	.tipo-reporte-selector {
+		min-width: 250px;
+	}
+
+	&.pdf-section-day {
+		margin: 1rem 1.5rem;
+		justify-content: flex-start;
+	}
+}
+
+// ============ Day mode container ============
+.day-mode-container {
+	display: flex;
+	flex-direction: column;
+	gap: 1rem;
 }
 
 // ============ Personalización del menú PDF ============

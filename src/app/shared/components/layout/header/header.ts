@@ -10,14 +10,16 @@ import { environment } from '@config/environment';
 	styleUrl: './header.scss',
 })
 export class HeaderComponent {
+	// * Feature flag for intranet shortcut.
 	showIntranetLink = environment.showIntranetLink;
 
-	// Estado del menú móvil
+	// * Mobile menu open state.
 	isMenuOpen = signal(false);
-	// Estado del dropdown de niveles
+	// * Dropdown for education levels.
 	isDropdownOpen = signal(false);
 
 	toggleMenu() {
+		// * Toggle menu and collapse dropdown if closing.
 		this.isMenuOpen.update((v) => !v);
 		// Cerrar dropdown cuando se cierra el menú
 		if (!this.isMenuOpen()) {
@@ -26,12 +28,14 @@ export class HeaderComponent {
 	}
 
 	toggleDropdown(event: Event) {
+		// * Prevent navigation and open/close the dropdown.
 		event.preventDefault();
 		event.stopPropagation();
 		this.isDropdownOpen.update((v) => !v);
 	}
 
 	closeMenu() {
+		// * Close both menu and dropdown.
 		this.isMenuOpen.set(false);
 		this.isDropdownOpen.set(false);
 	}

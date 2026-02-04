@@ -1,12 +1,15 @@
 <div class="calendar-container">
+	<!-- * Year header with navigation -->
 	<app-calendar-header
 		[currentYear]="currentYear()"
 		(goToToday)="onGoToToday()"
 		(goToYear)="onGoToYear($event)"
 	/>
 
+	<!-- * Legend for events/holidays -->
 	<app-calendar-legend />
 
+	<!-- * Month cards grid -->
 	<div class="months-grid">
 		@for (month of calendar(); track trackByMonth($index, month)) {
 			<app-calendar-month-card [month]="month" (dayClick)="onDayClick($event)" />
@@ -14,4 +17,5 @@
 	</div>
 </div>
 
+<!-- * Modal for holiday/event details -->
 <app-calendar-day-modal [visible]="showModal()" [data]="modalData()" (closeModal)="onCloseModal()" />

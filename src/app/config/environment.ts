@@ -2,6 +2,7 @@
  * Environment configuration for PRODUCTION
  * This file is used by default when building for production
  */
+// * Production environment flags + API base URL.
 export const environment = {
 	production: true,
 

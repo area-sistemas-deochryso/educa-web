@@ -9,8 +9,10 @@ import { SeasonalNotification } from '@core/services';
 	styleUrl: './dismissed-card.component.scss',
 })
 export class DismissedCardComponent {
+	// * Dismissed notification snapshot to render.
 	@Input({ required: true }) notification!: SeasonalNotification;
 
+	// * Restore event bubbles up to the panel.
 	@Output() restore = new EventEmitter<string>();
 
 	get priorityClass(): string {
@@ -18,6 +20,7 @@ export class DismissedCardComponent {
 	}
 
 	getTypeIcon(type: string): string {
+		// * Map backend types to Prime icons.
 		const icons: Record<string, string> = {
 			matricula: 'pi-user-plus',
 			pago: 'pi-wallet',
@@ -29,6 +32,7 @@ export class DismissedCardComponent {
 	}
 
 	getTypeLabel(type: string): string {
+		// * Map backend types to display labels.
 		const labels: Record<string, string> = {
 			matricula: 'Matrícula',
 			pago: 'Pago',
@@ -40,6 +44,7 @@ export class DismissedCardComponent {
 	}
 
 	onRestore(): void {
+		// * Emit restore action for this notification.
 		this.restore.emit(this.notification.id);
 	}
 }

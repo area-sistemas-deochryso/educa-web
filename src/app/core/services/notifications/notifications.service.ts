@@ -22,6 +22,7 @@ export interface PriorityCount {
 	providedIn: 'root',
 })
 export class NotificationsService {
+	// * Manages seasonal notifications, read/dismiss state, and browser alerts.
 	private platformId = inject(PLATFORM_ID);
 	private storage = inject(StorageService);
 

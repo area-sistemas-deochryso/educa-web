@@ -1,3 +1,4 @@
+// * Tests for NotificationsService state changes.
 import { TestBed } from '@angular/core/testing';
 import { PLATFORM_ID } from '@angular/core';
 import { beforeEach, describe, expect, it, vi } from 'vitest';

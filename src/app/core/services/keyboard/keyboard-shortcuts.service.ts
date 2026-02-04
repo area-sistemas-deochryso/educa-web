@@ -15,6 +15,7 @@ type ShortcutHandler = () => void;
 	providedIn: 'root',
 })
 export class KeyboardShortcutsService implements OnDestroy {
+	// * Central registry for keyboard shortcut handlers.
 	private platformId = inject(PLATFORM_ID);
 	private handlers = new Map<string, ShortcutHandler>();
 	private boundKeydownHandler: ((event: KeyboardEvent) => void) | null = null;
@@ -35,6 +36,7 @@ export class KeyboardShortcutsService implements OnDestroy {
 	}
 
 	private init(): void {
+		// Bind once so we can remove the exact same handler on destroy.
 		this.boundKeydownHandler = this.handleKeydown.bind(this);
 		document.addEventListener('keydown', this.boundKeydownHandler);
 		this.isActive.set(true);
@@ -42,6 +44,7 @@ export class KeyboardShortcutsService implements OnDestroy {
 	}
 
 	private handleKeydown(event: KeyboardEvent): void {
+		// First match wins to avoid firing multiple handlers for the same key combo.
 		for (const shortcut of this.shortcuts) {
 			if (this.matchesShortcut(event, shortcut)) {
 				const handler = this.handlers.get(shortcut.id);
@@ -60,6 +63,7 @@ export class KeyboardShortcutsService implements OnDestroy {
 		if (shortcut.shift !== event.shiftKey) return false;
 		if (shortcut.alt !== event.altKey) return false;
 
+		// useCode -> layout-agnostic (e.g. physical key), key -> localized character.
 		const eventKey = shortcut.useCode ? event.code : event.key;
 		return eventKey === shortcut.key;
 	}
@@ -68,6 +72,7 @@ export class KeyboardShortcutsService implements OnDestroy {
 	 * Registra un handler para un atajo específico
 	 */
 	register(shortcutId: string, handler: ShortcutHandler): void {
+		// Only stores the handler; the keyboard listener is global to this service.
 		const shortcut = this.shortcuts.find((s) => s.id === shortcutId);
 		if (!shortcut) {
 			logger.warn(`[Keyboard] Atajo no encontrado: ${shortcutId}`);
@@ -119,6 +124,7 @@ export class KeyboardShortcutsService implements OnDestroy {
 		if (this.boundKeydownHandler) {
 			document.removeEventListener('keydown', this.boundKeydownHandler);
 		}
+		// Clear handlers to avoid accidental reuse if the service is recreated.
 		this.handlers.clear();
 		this.isActive.set(false);
 	}

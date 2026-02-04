@@ -1,9 +1,11 @@
 <div class="schedule-container">
+	<!-- * Calendar drives which modal to open -->
 	<app-schedule-calendar
 		(openSchedule)="openScheduleModal()"
 		(openSummary)="openSummaryModal()"
 	/>
 
+	<!-- * Schedule modal -->
 	<app-schedule-modal
 		[visible]="showScheduleModal"
 		(visibleChange)="$event ? null : onScheduleModalClose()"
@@ -11,6 +13,7 @@
 		(openGrades)="openGradesModal($event)"
 	/>
 
+	<!-- * Summary modal -->
 	<app-summary-modal
 		[visible]="showSummaryModal"
 		(visibleChange)="$event ? null : onSummaryModalClose()"
@@ -18,6 +21,7 @@
 		(openGrades)="openGradesModal($event)"
 	/>
 
+	<!-- * Course details modal -->
 	<app-course-details-modal
 		[visible]="showDetailsModal"
 		(visibleChange)="$event ? null : onDetailsModalClose()"
@@ -27,6 +31,7 @@
 		(openGrades)="openGradesModal($event)"
 	/>
 
+	<!-- * Grades modal -->
 	<app-grades-modal
 		[visible]="showGradesModal"
 		(visibleChange)="$event ? null : onGradesModalClose()"

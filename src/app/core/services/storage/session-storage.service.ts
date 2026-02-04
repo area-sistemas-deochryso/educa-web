@@ -48,6 +48,7 @@ const LOCAL_KEYS = {
 	providedIn: 'root',
 })
 export class SessionStorageService {
+	// * Session/local storage handling for auth and UI state.
 	private platformId = inject(PLATFORM_ID);
 
 	private get isBrowser(): boolean {

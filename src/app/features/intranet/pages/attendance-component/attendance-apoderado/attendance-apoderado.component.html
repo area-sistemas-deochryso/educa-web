@@ -1,6 +1,8 @@
+<!-- * Shared legend for attendance codes -->
 <app-attendance-legend />
 
 @if (hijos().length > 0) {
+	<!-- * Two tables: ingresos and salidas for the selected child -->
 	<app-attendance-table
 		[table]="ingresos()"
 		[hijos]="hijos()"
@@ -16,5 +18,6 @@
 		(hijoChange)="selectHijo($event)"
 	/>
 } @else if (!loading()) {
+	<!-- ! Empty state only after loading ends -->
 	<app-empty-state message="No se encontraron hijos registrados." />
 }

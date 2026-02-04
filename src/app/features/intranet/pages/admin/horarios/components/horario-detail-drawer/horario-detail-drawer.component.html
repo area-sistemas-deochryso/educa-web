@@ -7,6 +7,7 @@
 	[style]="{ width: '600px' }"
 >
 	<ng-template pTemplate="header">
+		<!-- * Drawer header -->
 		<div class="drawer-header">
 			<div class="header-icon">
 				<i class="pi pi-calendar"></i>
@@ -19,13 +20,14 @@
 	</ng-template>
 
 	@if (loading()) {
+		<!-- * Loading state -->
 		<div class="loading-state">
 			<i class="pi pi-spin pi-spinner"></i>
 			<p>Cargando detalles...</p>
 		</div>
 	} @else if (detalle()) {
 		<div class="detail-content">
-			<!-- Estado y Acciones Rápidas -->
+			<!-- * Estado y acciones rápidas -->
 			<div class="status-section">
 				<p-tag
 					[value]="getEstadoLabel(detalle()!.estado)"
@@ -79,7 +81,7 @@
 				</div>
 			</div>
 
-			<!-- Información Básica -->
+			<!-- * Información básica -->
 			<div class="info-section">
 				<h3 class="section-title">
 					<i class="pi pi-info-circle"></i>

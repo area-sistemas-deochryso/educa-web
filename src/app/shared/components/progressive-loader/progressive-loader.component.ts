@@ -16,6 +16,7 @@ import { CommonModule } from '@angular/common';
  * Directiva para marcar fases de carga progresiva
  */
 export class ProgressivePhaseDirective {
+	// * Capture the projected template for a phase.
 	public template = inject(TemplateRef<unknown>);
 }
 
@@ -57,12 +58,14 @@ export class ProgressivePhaseDirective {
 	styleUrls: ['./progressive-loader.component.scss'],
 })
 export class ProgressiveLoaderComponent {
+	// * Ordered list of phases to render.
 	/** Lista de fases en orden de carga */
 	readonly phases = input.required<string[]>();
 
 	/** Fase actual (índice o nombre de fase) */
 	readonly currentPhase = input<string | number>(0);
 
+	// * Ready flags for each phase name.
 	/** Estados de cada fase { phaseName: isReady } */
 	readonly phaseStates = input<Record<string, boolean>>({});
 
@@ -74,11 +77,13 @@ export class ProgressiveLoaderComponent {
 	}
 
 	protected getSkeletonTemplate(phase: string): TemplateRef<unknown> | null {
+		// ! Placeholder: resolve skeleton template for phase.
 		// Lógica para encontrar el template de skeleton correspondiente
 		return null; // Implementar según necesidad
 	}
 
 	protected getContentTemplate(phase: string): TemplateRef<unknown> | null {
+		// ! Placeholder: resolve content template for phase.
 		// Lógica para encontrar el template de contenido correspondiente
 		return null; // Implementar según necesidad
 	}

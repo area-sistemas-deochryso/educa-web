@@ -26,19 +26,23 @@ export class CalendaryComponent implements OnInit, AfterViewInit {
 	private route = inject(ActivatedRoute);
 	private calendarUtils = inject(CalendarUtilsService);
 
+	// * Calendar state for the selected year.
 	calendar = signal<CalendarMonth[]>([]);
 	currentYear = signal(new Date().getFullYear());
 	today = new Date();
 
+	// * Modal state for holiday/event details.
 	showModal = signal(false);
 	modalData = signal<ModalData | null>(null);
 
 	ngOnInit(): void {
+		// * Build the full year calendar on init.
 		this.generateYearCalendar();
 	}
 
 	ngAfterViewInit(): void {
 		if (isPlatformBrowser(this.platformId)) {
+			// * Scroll to anchor or today after view renders.
 			setTimeout(() => {
 				const fragment = this.route.snapshot.fragment;
 				if (fragment) {
@@ -51,6 +55,7 @@ export class CalendaryComponent implements OnInit, AfterViewInit {
 	}
 
 	private generateYearCalendar(): void {
+		// * Regenerate all months for the current year.
 		const year = this.currentYear();
 		const months: CalendarMonth[] = [];
 
@@ -64,6 +69,7 @@ export class CalendaryComponent implements OnInit, AfterViewInit {
 	private generateMonth(year: number, month: number): CalendarMonth {
 		const baseDays = this.calendarUtils.generateMonthDays(year, month);
 
+		// * Enrich base day info with holidays/events.
 		const days: CalendarDay[] = baseDays.map((dayInfo) =>
 			this.createCalendarDay(
 				dayInfo.date,
@@ -88,6 +94,7 @@ export class CalendaryComponent implements OnInit, AfterViewInit {
 		isCurrentMonth: boolean,
 		isToday = false,
 	): CalendarDay {
+		// * Resolve holiday + event metadata for the date.
 		const holiday = isHoliday(fullDate);
 		const event = getEvent(fullDate);
 		const rangeEvent = isDateInEventRange(fullDate);
@@ -112,6 +119,7 @@ export class CalendaryComponent implements OnInit, AfterViewInit {
 	scrollToToday(): void {
 		const todayElement = document.getElementById('today');
 		if (todayElement) {
+			// * Focus the current day if present in DOM.
 			todayElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
 		} else {
 			const currentMonth = this.today.getMonth();
@@ -127,6 +135,7 @@ export class CalendaryComponent implements OnInit, AfterViewInit {
 	}
 
 	onGoToToday(): void {
+		// * Jump to current year and scroll into view.
 		const todayYear = new Date().getFullYear();
 		if (this.currentYear() !== todayYear) {
 			this.currentYear.set(todayYear);
@@ -141,8 +150,10 @@ export class CalendaryComponent implements OnInit, AfterViewInit {
 	}
 
 	onDayClick(day: CalendarDay): void {
+		// ! Ignore clicks on days outside the current month.
 		if (!day.isCurrentMonth) return;
 
+		// * Open modal for holiday/event metadata.
 		if (day.isHoliday && day.holiday) {
 			this.modalData.set({
 				type: 'holiday',

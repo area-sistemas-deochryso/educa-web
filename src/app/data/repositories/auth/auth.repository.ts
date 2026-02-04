@@ -10,6 +10,7 @@ import { UI_AUTH_MESSAGES } from '@app/shared/constants';
 	providedIn: 'root',
 })
 export class AuthRepository extends BaseRepository<UserProfile> {
+	// * Repository wrapper for auth endpoints.
 	protected endpoint = '/api/Auth';
 	protected entityName = 'Auth';
 

@@ -46,6 +46,7 @@ interface CacheRecord<T = unknown> {
 	providedIn: 'root',
 })
 export class IndexedDBService {
+	// * IndexedDB wrapper for notifications and cache.
 	private platformId = inject(PLATFORM_ID);
 	private db: IDBDatabase | null = null;
 	private dbReady: Promise<boolean> | null = null;

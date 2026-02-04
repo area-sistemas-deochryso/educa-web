@@ -32,6 +32,7 @@ export interface BidirectionalAdapter<TSource, TTarget> extends Adapter<TSource,
  * Clase base abstracta para adaptadores con funcionalidad común
  */
 export abstract class BaseAdapter<TSource, TTarget> implements Adapter<TSource, TTarget> {
+	// * Base helpers for one-way adapters.
 	abstract adapt(source: TSource): TTarget;
 
 	/**

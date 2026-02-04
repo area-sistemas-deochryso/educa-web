@@ -1,19 +1,13 @@
 import { Injectable, inject, signal, computed, effect } from '@angular/core';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { AuthService } from '../auth';
-
-export type AppUserRole =
-	| 'Estudiante'
-	| 'Apoderado'
-	| 'Profesor'
-	| 'Director'
-	| 'Asistente Administrativo'
-	| '';
+import { APP_USER_ROLES, AppUserRole } from '@app/shared/constants';
 
 @Injectable({
 	providedIn: 'root',
 })
 export class UserProfileService {
+	// * Derives user identity details from AuthService.
 	private authService = inject(AuthService);
 
 	private readonly _userRole = signal<AppUserRole>('');
@@ -33,11 +27,13 @@ export class UserProfileService {
 	// Signal del usuario actual - debe crearse en contexto de inyección
 	private readonly currentUser = toSignal(this.authService.currentUser$, { initialValue: null });
 
-	readonly isEstudiante = computed(() => this._userRole() === 'Estudiante');
-	readonly isApoderado = computed(() => this._userRole() === 'Apoderado');
-	readonly isProfesor = computed(() => this._userRole() === 'Profesor');
-	readonly isDirector = computed(() => this._userRole() === 'Director');
-	readonly isAsistenteAdministrativo = computed(() => this._userRole() === 'Asistente Administrativo');
+	readonly isEstudiante = computed(() => this._userRole() === APP_USER_ROLES.Estudiante);
+	readonly isApoderado = computed(() => this._userRole() === APP_USER_ROLES.Apoderado);
+	readonly isProfesor = computed(() => this._userRole() === APP_USER_ROLES.Profesor);
+	readonly isDirector = computed(() => this._userRole() === APP_USER_ROLES.Director);
+	readonly isAsistenteAdministrativo = computed(
+		() => this._userRole() === APP_USER_ROLES.AsistenteAdministrativo,
+	);
 
 	readonly displayName = computed(() => {
 		const name = this._userName();

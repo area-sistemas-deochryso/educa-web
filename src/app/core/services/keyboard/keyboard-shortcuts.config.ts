@@ -1,6 +1,7 @@
 /**
  * Configuración centralizada de atajos de teclado
  */
+// * Default shortcut definitions for the app.
 
 export type ShortcutCategory = 'visibility' | 'navigation' | 'actions';
 

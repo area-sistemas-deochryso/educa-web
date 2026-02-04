@@ -12,6 +12,7 @@ import {
 	changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class AttendanceLegendComponent {
+	// * Legend items and status class mapping used by the template.
 	legendItems = LEGEND_ITEMS;
 
 	getStatusClass = getStatusClass;

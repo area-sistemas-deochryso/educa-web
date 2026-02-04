@@ -8,4 +8,6 @@ import { Tooltip } from 'primeng/tooltip';
 	templateUrl: './cta-section.html',
 	styleUrl: './cta-section.scss',
 })
-export class CtaSectionComponent {}
+export class CtaSectionComponent {
+	// * Simple CTA section (static content).
+}

@@ -17,17 +17,17 @@ import type { HorarioResponseDto } from '../../models/horario.interface';
 	changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class HorariosListViewComponent {
-	// ============ Inputs ============
+	// * Inputs for list data + loading state.
 	readonly horarios = input.required<HorarioResponseDto[]>();
 	readonly loading = input<boolean>(false);
 
-	// ============ Outputs ============
+	// * Row action outputs.
 	readonly viewDetail = output<number>();
 	readonly edit = output<number>();
 	readonly toggleEstado = output<{ id: number; estadoActual: boolean }>();
 	readonly delete = output<number>();
 
-	// ============ Event handlers ============
+	// * Event handlers
 	onViewDetail(id: number): void {
 		this.viewDetail.emit(id);
 	}
@@ -44,7 +44,7 @@ export class HorariosListViewComponent {
 		this.delete.emit(id);
 	}
 
-	// ============ TrackBy ============
+	// * TrackBy
 	trackByHorarioId(_index: number, horario: HorarioResponseDto): number {
 		return horario.id;
 	}

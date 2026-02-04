@@ -22,6 +22,7 @@ import { environment } from '@env/environment';
 	providedIn: 'root',
 })
 export class PermisosService {
+	// * CRUD + queries for permisos, vistas, and roles.
 	private readonly apiUrl = `${environment.apiUrl}/api/sistema/permisos`;
 	private http = inject(HttpClient);
 

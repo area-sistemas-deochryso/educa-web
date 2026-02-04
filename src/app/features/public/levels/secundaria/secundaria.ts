@@ -8,4 +8,6 @@ import { RouterLink } from '@angular/router';
 	templateUrl: './secundaria.html',
 	styleUrl: './secundaria.scss',
 })
-export class SecundariaComponent {}
+export class SecundariaComponent {
+	// * Secundaria level page content.
+}

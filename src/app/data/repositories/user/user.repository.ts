@@ -35,6 +35,7 @@ export interface UpdateUserDto {
 	providedIn: 'root',
 })
 export class UserRepository extends BaseRepository<User, CreateUserDto, UpdateUserDto> {
+	// * Repository wrapper for user endpoints.
 	protected endpoint = '/api/Users';
 	protected entityName = 'User';
 

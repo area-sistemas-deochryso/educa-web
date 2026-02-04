@@ -1,4 +1,5 @@
 <div class="list-view">
+	<!-- * List view table -->
 	<p-table
 		[value]="horarios()"
 		[loading]="loading()"
@@ -40,6 +41,7 @@
 
 		<ng-template pTemplate="body" let-horario>
 			<tr>
+				<!-- * Basic schedule info -->
 				<td>{{ horario.diaSemanaDescripcion }}</td>
 				<td>{{ horario.horaInicio }} - {{ horario.horaFin }}</td>
 				<td>{{ horario.salonDescripcion }}</td>
@@ -58,6 +60,7 @@
 					<p-tag [value]="horario.estado ? 'Activo' : 'Inactivo'" [severity]="horario.estado ? 'success' : 'secondary'" />
 				</td>
 				<td>
+					<!-- * Row actions -->
 					<div class="action-buttons">
 						<button
 							pButton

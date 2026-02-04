@@ -33,6 +33,7 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
  */
 @Injectable()
 export class DestroyService implements OnDestroy {
+	// * Subject-based cleanup helper for RxJS subscriptions.
 	private readonly destroy$ = new Subject<void>();
 
 	/**

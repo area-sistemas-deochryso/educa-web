@@ -16,6 +16,7 @@ interface Testimonial {
 	styleUrl: './testimonials-section.scss',
 })
 export class TestimonialsSectionComponent implements OnInit, OnDestroy {
+	// * Static testimonials data for the carousel.
 	testimonials: Testimonial[] = [
 		{
 			id: 1,
@@ -58,10 +59,12 @@ export class TestimonialsSectionComponent implements OnInit, OnDestroy {
 	private autoplayInterval: ReturnType<typeof setInterval> | null = null;
 
 	ngOnInit(): void {
+		// * Start autoplay on mount.
 		this.startAutoplay();
 	}
 
 	ngOnDestroy(): void {
+		// * Cleanup timer on destroy.
 		this.stopAutoplay();
 	}
 
@@ -70,6 +73,7 @@ export class TestimonialsSectionComponent implements OnInit, OnDestroy {
 	}
 
 	goToSlide(index: number): void {
+		// * Manual navigation resets autoplay.
 		this.currentSlide = index;
 		this.restartAutoplay();
 	}

@@ -6,6 +6,7 @@
  * 2. Define las fechas de inicio y fin (o usa el helper para fechas recurrentes)
  * 3. El sistema verificará automáticamente si debe mostrar la notificación
  */
+// * Seasonal notification definitions + helpers.
 
 export type NotificationType = 'matricula' | 'pago' | 'academico' | 'festividad' | 'evento';
 export type NotificationPriority = 'low' | 'medium' | 'high' | 'urgent';

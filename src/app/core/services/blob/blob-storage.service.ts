@@ -13,6 +13,7 @@ export interface BlobUploadResponse {
 
 @Injectable({ providedIn: 'root' })
 export class BlobStorageService {
+	// * Upload helper for Azure Blob Storage and file metadata utilities.
 	private readonly http = inject(HttpClient);
 	private readonly apiUrl = `${environment.apiUrl}/api/BlobStorage`;
 

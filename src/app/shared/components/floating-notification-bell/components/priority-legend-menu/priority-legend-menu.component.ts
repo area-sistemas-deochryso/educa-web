@@ -16,10 +16,12 @@ export interface PriorityInfo {
 	styleUrl: './priority-legend-menu.component.scss',
 })
 export class PriorityLegendMenuComponent {
+	// * Visibility + placement for the menu.
 	@Input() show = false;
 	@Input() position = { x: 0, y: 0 };
 	@Input({ required: true }) priorityLegend!: PriorityInfo[];
 
+	// * Close event for parent.
 	@Output() closeMenu = new EventEmitter<void>();
 
 	onClose(): void {
@@ -27,6 +29,7 @@ export class PriorityLegendMenuComponent {
 	}
 
 	onMenuClick(event: Event): void {
+		// * Prevent click from closing the menu.
 		event.stopPropagation();
 	}
 }

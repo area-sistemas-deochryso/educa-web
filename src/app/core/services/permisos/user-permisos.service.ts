@@ -1,6 +1,6 @@
 import { Injectable, inject, signal, computed, DestroyRef, effect } from '@angular/core';
 import { takeUntilDestroyed, toSignal } from '@angular/core/rxjs-interop';
-import { tap, catchError, of, firstValueFrom } from 'rxjs';
+import { tap, catchError, of, firstValueFrom, timer, Subject, takeUntil } from 'rxjs';
 
 import { logger } from '@core/helpers';
 import { AuthService } from '../auth';
@@ -8,13 +8,21 @@ import { StorageService } from '../storage';
 import { PermisosService } from './permisos.service';
 import { PermisosUsuarioResultado } from './permisos.models';
 
+/** Intervalo en ms entre cada verificación de expiración del token de permisos (5 min) */
+const PERMISOS_CHECK_INTERVAL_MS = 5 * 60 * 1000;
+
 @Injectable({
 	providedIn: 'root',
 })
 export class UserPermisosService {
+	// * Manages current user permissions with refresh + storage.
 	private authService = inject(AuthService);
 	private permisosService = inject(PermisosService);
 	private storageService = inject(StorageService);
+	private destroyRef = inject(DestroyRef);
+
+	/** Cancela el intervalo de refresh al logout */
+	private readonly stopRefresh$ = new Subject<void>();
 
 	private readonly _permisos = signal<PermisosUsuarioResultado | null>(null);
 	private readonly _loading = signal(false);
@@ -62,6 +70,7 @@ export class UserPermisosService {
 				this._loading.set(false);
 				this._loadFailed.set(false);
 				this.wasAuthenticated = false;
+				this.stopPermisosRefresh();
 			} else if (!this.wasAuthenticated) {
 				// Usuario acaba de iniciar sesión (transición de no autenticado a autenticado)
 				// Forzar reset de flags para permitir nueva carga
@@ -77,6 +86,7 @@ export class UserPermisosService {
 				this.wasAuthenticated = true;
 				// Intentar cargar desde storage (que ahora tendrá el nuevo sessionKey)
 				this.loadFromStorage();
+				this.startPermisosRefresh();
 			}
 		});
 	}
@@ -94,6 +104,14 @@ export class UserPermisosService {
 			storedPermisos,
 		);
 		if (storedPermisos) {
+			// Si tiene token y está expirado, cargar como stale — startPermisosRefresh refrescará inmediatamente
+			if (storedPermisos.permisosToken && this.isTokenExpired(storedPermisos.permisosToken)) {
+				logger.tagged(
+					'UserPermisosService',
+					'log',
+					'loadFromStorage() - token de permisos expirado, se cargará cache como stale',
+				);
+			}
 			this._permisos.set(storedPermisos);
 			this._loaded.set(true);
 			logger.tagged(
@@ -366,6 +384,7 @@ export class UserPermisosService {
 	 * Limpia los permisos (para logout)
 	 */
 	clear(): void {
+		this.stopPermisosRefresh();
 		this._permisos.set(null);
 		this._loaded.set(false);
 		this._loading.set(false);
@@ -381,5 +400,63 @@ export class UserPermisosService {
 		this._loaded.set(false);
 		this._loading.set(false);
 		this.loadPermisos(destroyRef);
+	}
+
+	// ============ Refresh periódico por expiración de token ============
+
+	/**
+	 * Decodifica el claim 'exp' de un JWT y verifica si ya expiró.
+	 * Solo lee el payload (parte central) sin verificar la firma.
+	 */
+	private isTokenExpired(token: string): boolean {
+		try {
+			const payload = JSON.parse(atob(token.split('.')[1]));
+			// exp es un timestamp Unix en segundos
+			return Date.now() / 1000 > payload.exp;
+		} catch {
+			return true; // Si no se puede decodificar, tratarlo como expirado
+		}
+	}
+
+	/**
+	 * Inicia el intervalo periódico que verifica la expiración del token de permisos.
+	 * Si detecta expiración hace un GET automático para refrescar los permisos.
+	 */
+	private startPermisosRefresh(): void {
+		this.stopPermisosRefresh();
+
+		timer(0, PERMISOS_CHECK_INTERVAL_MS).pipe(
+			takeUntil(this.stopRefresh$),
+			takeUntilDestroyed(this.destroyRef),
+		).subscribe(() => {
+			const storedPermisos = this.storageService.getPermisos();
+			if (storedPermisos?.permisosToken && this.isTokenExpired(storedPermisos.permisosToken)) {
+				logger.tagged(
+					'UserPermisosService',
+					'log',
+					'Token de permisos expirado - refrescando desde API...',
+				);
+				this.fetchPermisosFromApi();
+			}
+		});
+	}
+
+	/** Detiene el intervalo de refresh (se usa en logout y clear) */
+	private stopPermisosRefresh(): void {
+		this.stopRefresh$.next();
+	}
+
+	/** Hace un GET a la API para refrescar permisos y los guarda en storage */
+	private fetchPermisosFromApi(): void {
+		this.permisosService.getMisPermisos().pipe(
+			takeUntil(this.stopRefresh$),
+		).subscribe((permisos) => {
+			if (permisos) {
+				this._permisos.set(permisos);
+				this._loaded.set(true);
+				this.saveToStorage(permisos);
+				logger.tagged('UserPermisosService', 'log', 'Permisos refrescados exitosamente');
+			}
+		});
 	}
 }

@@ -17,6 +17,7 @@ import { environment } from '@env/environment';
 	providedIn: 'root',
 })
 export class AsistenciaService {
+	// * Attendance API service for estudiante, apoderado, profesor, director flows.
 	private readonly apiUrl = `${environment.apiUrl}/api/ConsultaAsistencia`;
 	private http = inject(HttpClient);
 
@@ -217,6 +218,122 @@ export class AsistenciaService {
 		}
 
 		return this.http.get(`${this.apiUrl}/director/asistencia-dia/pdf`, {
+			params,
+			responseType: 'blob',
+		});
+	}
+
+	/**
+	 * Director: Descargar PDF consolidado de todos los salones - Día
+	 *
+	 * Genera un reporte PDF con asistencias de todos los grados/secciones de la sede
+	 * en un día específico. Muestra para cada salón:
+	 * - Total de estudiantes
+	 * - Quiénes asistieron (puntuales y tardanzas)
+	 * - Quiénes no asistieron
+	 * - Porcentaje de asistencia
+	 *
+	 * GET /api/ConsultaAsistencia/director/reporte/todos-salones/dia/pdf?fecha={fecha}
+	 *
+	 * @param fecha - Fecha del reporte (opcional, por defecto: hoy)
+	 * @returns Observable<Blob> - PDF listo para descargar/visualizar
+	 */
+	descargarPdfTodosSalonesDia(fecha?: Date): Observable<Blob> {
+		const params: Record<string, string> = {};
+
+		if (fecha) {
+			params['fecha'] = this.formatDateLocal(fecha);
+		}
+
+		return this.http.get(`${this.apiUrl}/director/reporte/todos-salones/dia/pdf`, {
+			params,
+			responseType: 'blob',
+		});
+	}
+
+	/**
+	 * Director: Descargar PDF consolidado de todos los salones - Semana
+	 *
+	 * Genera un reporte PDF con estadísticas de asistencia de todos los salones
+	 * en una semana (7 días). Muestra tabla resumen con:
+	 * - Grado y sección
+	 * - Total de estudiantes
+	 * - Total de asistencias registradas en la semana
+	 * - Porcentaje de asistencia (basado en 5 días laborales)
+	 *
+	 * GET /api/ConsultaAsistencia/director/reporte/todos-salones/semana/pdf?fechaInicio={fechaInicio}
+	 *
+	 * @param fechaInicio - Fecha de inicio de la semana (opcional, por defecto: inicio de semana actual)
+	 * @returns Observable<Blob> - PDF listo para descargar/visualizar
+	 */
+	descargarPdfTodosSalonesSemana(fechaInicio?: Date): Observable<Blob> {
+		const params: Record<string, string> = {};
+
+		if (fechaInicio) {
+			params['fechaInicio'] = this.formatDateLocal(fechaInicio);
+		}
+
+		return this.http.get(`${this.apiUrl}/director/reporte/todos-salones/semana/pdf`, {
+			params,
+			responseType: 'blob',
+		});
+	}
+
+	/**
+	 * Director: Descargar PDF consolidado de todos los salones - Mes
+	 *
+	 * Genera un reporte PDF con estadísticas de asistencia de todos los salones
+	 * en un mes completo. Muestra tabla resumen con:
+	 * - Grado y sección
+	 * - Total de estudiantes
+	 * - Total de asistencias registradas en el mes
+	 * - Porcentaje de asistencia (basado en ~22 días hábiles)
+	 *
+	 * GET /api/ConsultaAsistencia/director/reporte/todos-salones/mes/pdf?mes={mes}&anio={anio}
+	 *
+	 * @param mes - Mes del reporte (1-12, opcional, por defecto: mes actual)
+	 * @param anio - Año del reporte (opcional, por defecto: año actual)
+	 * @returns Observable<Blob> - PDF listo para descargar/visualizar
+	 */
+	descargarPdfTodosSalonesMes(mes?: number, anio?: number): Observable<Blob> {
+		const params: Record<string, string> = {};
+
+		if (mes !== undefined) {
+			params['mes'] = mes.toString();
+		}
+		if (anio !== undefined) {
+			params['anio'] = anio.toString();
+		}
+
+		return this.http.get(`${this.apiUrl}/director/reporte/todos-salones/mes/pdf`, {
+			params,
+			responseType: 'blob',
+		});
+	}
+
+	/**
+	 * Director: Descargar PDF consolidado de todos los salones - Año
+	 *
+	 * Genera un reporte PDF con estadísticas de asistencia de todos los salones
+	 * en un año escolar completo. Muestra tabla resumen con:
+	 * - Grado y sección
+	 * - Total de estudiantes
+	 * - Total de asistencias registradas en el año
+	 * - Porcentaje de asistencia (basado en ~200 días hábiles)
+	 *
+	 * GET /api/ConsultaAsistencia/director/reporte/todos-salones/anio/pdf?anio={anio}
+	 *
+	 * @param anio - Año del reporte (opcional, por defecto: año actual)
+	 * @returns Observable<Blob> - PDF listo para descargar/visualizar
+	 */
+	descargarPdfTodosSalonesAnio(anio?: number): Observable<Blob> {
+		const params: Record<string, string> = {};
+
+		if (anio !== undefined) {
+			params['anio'] = anio.toString();
+		}
+
+		return this.http.get(`${this.apiUrl}/director/reporte/todos-salones/anio/pdf`, {
 			params,
 			responseType: 'blob',
 		});

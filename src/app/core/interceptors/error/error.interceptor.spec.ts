@@ -1,3 +1,4 @@
+// * Tests for error interceptor handling behavior.
 import { TestBed } from '@angular/core/testing';
 import {
 	HttpClient,

@@ -20,10 +20,12 @@ export interface Submission {
 	styleUrl: './submissions-modal.component.scss',
 })
 export class SubmissionsModalComponent {
+	// * Inputs/outputs for dialog state and week label.
 	@Input() visible = false;
 	@Input() weekName = '';
 	@Output() visibleChange = new EventEmitter<boolean>();
 
+	// * Static sample submissions (replace with API when available).
 	submissions: Submission[] = [
 		{
 			id: 1,
@@ -68,6 +70,7 @@ export class SubmissionsModalComponent {
 	}
 
 	viewSubmission(submission: Submission): void {
+		// * Mark as read and open (placeholder behavior).
 		this.markAsRead(submission);
 		logger.log('Viendo entrega:', submission.taskTitle);
 	}

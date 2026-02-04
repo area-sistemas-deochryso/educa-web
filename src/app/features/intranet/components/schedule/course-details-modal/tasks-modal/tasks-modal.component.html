@@ -8,10 +8,12 @@
 	class="tasks-modal"
 	[showHeader]="false"
 >
+	<!-- * Task list for the selected week -->
 	<div class="modal-content">
 		<h2>Tareas Pendientes</h2>
 		<p class="week-label">{{ weekName }}</p>
 
+		<!-- * Task items -->
 		<div class="tasks-list">
 			@for (task of tasks; track task.id) {
 				<div class="task-item" [class.unread]="!task.isRead" (click)="openTask(task)">
@@ -52,6 +54,7 @@
 		</div>
 
 		@if (tasks.length === 0) {
+			<!-- * Empty state -->
 			<div class="empty-state">
 				<i class="pi pi-check-circle"></i>
 				<p>No hay tareas pendientes</p>

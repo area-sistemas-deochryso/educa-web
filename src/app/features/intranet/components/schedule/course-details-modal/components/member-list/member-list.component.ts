@@ -9,6 +9,7 @@ import { CommonModule } from '@angular/common';
 	styleUrl: './member-list.component.scss',
 })
 export class MemberListComponent {
+	// * Title + list of member names.
 	@Input() title = '';
 	@Input() members: string[] = [];
 }

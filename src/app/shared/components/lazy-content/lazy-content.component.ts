@@ -35,6 +35,7 @@ import { CommonModule } from '@angular/common';
 	styleUrls: ['./lazy-content.component.scss'],
 })
 export class LazyContentComponent {
+	// * Inputs that control when skeleton vs content is shown.
 	/** Estado de carga - controla cuándo mostrar skeleton vs contenido */
 	readonly loading = input<boolean>(false);
 
@@ -50,7 +51,7 @@ export class LazyContentComponent {
 	/** Template del contenido real */
 	@ContentChild('content', { read: TemplateRef }) content?: TemplateRef<unknown>;
 
-	// Estado interno
+	// * Internal state for the skeleton visibility.
 	protected readonly showSkeleton = signal(true);
 
 	constructor() {

@@ -20,4 +20,6 @@ import { CtaSectionComponent } from '@shared/components/sections/cta';
 	templateUrl: './home.html',
 	styleUrl: './home.scss',
 })
-export class HomeComponent {}
+export class HomeComponent {
+	// * Composes the public landing page sections.
+}

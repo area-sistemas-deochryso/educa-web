@@ -21,9 +21,11 @@ import { NavMenuItem } from '../mobile-menu';
 	styleUrl: './nav-item.component.scss',
 })
 export class NavItemComponent {
+	// * DOM access for click-outside and debug helpers.
 	private elementRef = inject(ElementRef);
 	private router = inject(Router);
 
+	// * Menu item inputs (route or child menu).
 	@Input() route?: string;
 	@Input({ required: true }) label!: string;
 	@Input({ required: true }) icon!: string;
@@ -33,6 +35,7 @@ export class NavItemComponent {
 	isOpen = signal(false);
 
 	constructor() {
+		// * Close dropdown on navigation change.
 		this.router.events
 			.pipe(filter((event) => event instanceof NavigationEnd))
 			.subscribe(() => this.isOpen.set(false));
@@ -40,12 +43,14 @@ export class NavItemComponent {
 
 	@HostListener('document:click', ['$event'])
 	onDocumentClick(event: MouseEvent): void {
+		// * Close menu when clicking outside.
 		if (!this.elementRef.nativeElement.contains(event.target)) {
 			this.isOpen.set(false);
 		}
 	}
 
 	toggle(): void {
+		// * Toggle dropdown and optionally log style diagnostics.
 		this.isOpen.update((v) => !v);
 
 		// Debug: Log dropdown styles after DOM update

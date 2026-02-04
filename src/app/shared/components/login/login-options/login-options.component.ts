@@ -6,4 +6,5 @@ import { Component } from '@angular/core';
 	templateUrl: './login-options.component.html',
 	styleUrl: './login-options.component.scss',
 })
+// * Wrapper for login options (remember me, links).
 export class LoginOptionsComponent {}

@@ -6,7 +6,16 @@ import { MenuItem } from 'primeng/api';
 import { AsistenciaService, EstudianteAsistencia, HijoApoderado } from '@core/services';
 import { AttendanceDataService } from './attendance-data.service';
 import { AttendanceTable } from '@features/intranet/pages/attendance-component/models/attendance.types';
-import { ViewMode } from '@app/features/intranet/components/attendance/attendance-header/attendance-header.component';
+import {
+	VIEW_MODE,
+	ViewMode,
+} from '@app/features/intranet/components/attendance/attendance-header/attendance-header.component';
+import { APP_USER_ROLES } from '@app/shared/constants';
+
+const ATTENDANCE_TABLE_LABELS = {
+	Ingresos: 'Ingresos',
+	Salidas: 'Salidas',
+} as const;
 
 // ============ Interfaces de configuración ============
 
@@ -50,6 +59,11 @@ export class AttendanceViewController {
 	private destroyRef = inject(DestroyRef);
 	private config!: AttendanceViewConfig;
 
+	// Flow summary:
+	// - Month mode: loadEstudiantes -> restoreSelectedEstudiante -> loadEstudianteAsistencias.
+	// - Day mode: loadAsistenciaDia uses the selected date.
+	// - Reload delegates to the active viewMode.
+
 	// ============ Estado general ============
 
 	readonly loading = signal(false);
@@ -74,26 +88,35 @@ export class AttendanceViewController {
 			nombreCompleto: e.nombreCompleto,
 			grado: e.grado,
 			seccion: e.seccion,
-			relacion: 'Estudiante',
+			relacion: APP_USER_ROLES.Estudiante,
 		}));
 	});
 
 	// ============ Modo día/mes ============
 
-	readonly viewMode = signal<ViewMode>('dia');
+	readonly viewMode = signal<ViewMode>(VIEW_MODE.Dia);
 	readonly fechaDia = signal<Date>(new Date());
 	readonly estudiantesDia = signal<EstudianteAsistencia[]>([]);
 
 	// ============ Tablas de asistencia ============
 
-	readonly ingresos = signal<AttendanceTable>(this.attendanceDataService.createEmptyTable('Ingresos'));
-	readonly salidas = signal<AttendanceTable>(this.attendanceDataService.createEmptyTable('Salidas'));
+	readonly ingresos = signal<AttendanceTable>(
+		this.attendanceDataService.createEmptyTable(ATTENDANCE_TABLE_LABELS.Ingresos),
+	);
+	readonly salidas = signal<AttendanceTable>(
+		this.attendanceDataService.createEmptyTable(ATTENDANCE_TABLE_LABELS.Salidas),
+	);
 
 	// ============ PDF ============
 
-	// En mes mode la fecha del reporte es hoy; en día mode es la fecha seleccionada
+	// En mes mode usa el mes/año seleccionado; en día mode es la fecha seleccionada
 	readonly pdfFecha = computed(() => {
-		return this.viewMode() === 'dia' ? this.fechaDia() : new Date();
+		if (this.viewMode() === VIEW_MODE.Dia) {
+			return this.fechaDia();
+		}
+		// Usar el primer día del mes/año seleccionado para reportes consolidados
+		const { selectedMonth, selectedYear } = this.ingresos();
+		return new Date(selectedYear, selectedMonth - 1, 1);
 	});
 
 	readonly pdfMenuItems: MenuItem[] = [
@@ -286,7 +309,7 @@ export class AttendanceViewController {
 		if (this.viewMode() === mode) return;
 		this.viewMode.set(mode);
 
-		if (mode === 'dia') {
+		if (mode === VIEW_MODE.Dia) {
 			this.loadAsistenciaDia();
 		} else {
 			this.loadEstudiantes();
@@ -381,7 +404,7 @@ export class AttendanceViewController {
 	// ============ Reload ============
 
 	reload(): void {
-		if (this.viewMode() === 'dia') {
+		if (this.viewMode() === VIEW_MODE.Dia) {
 			this.loadAsistenciaDia();
 		} else {
 			this.loadEstudiantes();

@@ -1,4 +1,5 @@
 <section class="month-card" [id]="month().id">
+	<!-- * Month title + weekday header -->
 	<h2 class="month-title">{{ month().name }}</h2>
 	<div class="weekdays-header">
 		@for (day of weekDays; track day) {
@@ -6,6 +7,7 @@
 		}
 	</div>
 	<div class="days-grid">
+		<!-- * Day cells with state-based classes -->
 		@for (day of month().days; track trackByDay($index, day)) {
 			<div
 				class="day-cell"

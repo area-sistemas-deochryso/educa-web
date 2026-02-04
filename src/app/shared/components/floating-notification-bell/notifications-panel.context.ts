@@ -9,9 +9,10 @@ import { UnreadByPriority } from './components';
  */
 @Injectable()
 export class NotificationsPanelContext {
+	// * Bridge to notifications service for shared panel state/actions.
 	private notificationsService = inject(NotificationsService);
 
-	// Signals - State
+	// * Signals - state.
 	readonly notifications: Signal<SeasonalNotification[]> =
 		this.notificationsService.activeNotifications;
 	readonly dismissedNotifications: Signal<SeasonalNotification[]> =
@@ -26,13 +27,13 @@ export class NotificationsPanelContext {
 	readonly isPanelOpen: Signal<boolean> = this.notificationsService.isPanelOpen;
 	readonly showDismissedHistory: Signal<boolean> = this.notificationsService.showDismissedHistory;
 
-	// Computed signals
+	// * Computed signals.
 	readonly badgePriorityClass: Signal<string> = computed(() => {
 		const priority = this.highestPriority();
 		return priority ? `badge-${priority}` : '';
 	});
 
-	// Methods
+	// * Methods.
 	togglePanel(): void {
 		this.notificationsService.togglePanel();
 	}

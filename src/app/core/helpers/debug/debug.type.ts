@@ -1,4 +1,5 @@
 // debug.types.ts
+// * Types + DI token for the debug logger configuration.
 
 import { InjectionToken } from '@angular/core';
 

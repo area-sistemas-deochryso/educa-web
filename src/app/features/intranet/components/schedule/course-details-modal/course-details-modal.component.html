@@ -8,6 +8,7 @@
 	[styleClass]="'details-modal' + (isExpanded ? ' expanded' : '')"
 	[showHeader]="false"
 >
+	<!-- * Course details layout -->
 	<div class="modal-content details-content">
 		<app-modal-controls
 			[isExpanded]="isExpanded"
@@ -18,6 +19,7 @@
 		<h2>{{ currentCourseDetails.name }}</h2>
 
 		<div class="details-layout" [class.left-side]="isLeftSide">
+			<!-- * Left: weeks + evaluations -->
 			<div class="details-left">
 				<app-week-search-box
 					[searchTerm]="weekSearchTerm"
@@ -44,6 +46,7 @@
 			</div>
 
 			<div class="details-right">
+				<!-- * Right: controls + sidebar content -->
 				<button
 					class="side-toggle-btn"
 					(click)="toggleSide()"
@@ -90,6 +93,7 @@
 	</div>
 </p-dialog>
 
+<!-- * Sub-modals for week content -->
 <app-attachments-modal [(visible)]="showAttachmentsModal" [weekName]="selectedWeekName" />
 
 <app-tasks-modal [(visible)]="showTasksModal" [weekName]="selectedWeekName" />

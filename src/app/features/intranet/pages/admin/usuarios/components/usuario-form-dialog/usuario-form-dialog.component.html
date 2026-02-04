@@ -9,6 +9,7 @@
 	class="edit-usuario-dialog"
 >
 	<div class="dialog-content">
+		<!-- * Form grid with base fields + role-specific sections -->
 		<div class="form-grid">
 			<!-- ROL -->
 			@if (!isEditing()) {
@@ -66,7 +67,7 @@
 				/>
 				<app-form-field-error [error]="errors().dniError" />
 			</div>
-			<!-- CONTRASEÑA (readonly/autogenerada) -->
+			<!-- ! Contraseña puede ser autogenerada o editable según rol -->
 			<div class="field">
 				<label for="contrasena" class="password-label">
 					@if (!isEditing() || !canEditPassword()) {

@@ -16,13 +16,16 @@ import {
 })
 export class ScheduleModalComponent {
 	@ViewChild('courseMenu') courseMenu!: Menu;
+	// * Inputs/outputs for dialog state and actions.
 	@Input() visible = false;
 	@Output() visibleChange = new EventEmitter<boolean>();
 	@Output() openDetails = new EventEmitter<string>();
 	@Output() openGrades = new EventEmitter<string>();
 
+	// * Currently selected course for context menu.
 	selectedCourse: string | null = null;
 
+	// * Static schedule data.
 	courseSchedules: CourseSchedule[] = getCourseSchedules();
 
 	courseMenuItems: MenuItem[] = [
@@ -36,6 +39,7 @@ export class ScheduleModalComponent {
 	}
 
 	onCourseClick(event: Event, courseName: string): void {
+		// * Open menu anchored to the clicked course.
 		this.selectedCourse = courseName;
 		this.courseMenu.toggle(event);
 	}

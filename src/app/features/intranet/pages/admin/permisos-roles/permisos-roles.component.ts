@@ -75,22 +75,22 @@ export class PermisosRolesComponent implements OnInit {
 	private errorHandler = inject(ErrorHandlerService);
 	readonly adminUtils = inject(AdminUtilsService);
 
-	// State
+	// * State
 	permisosRol = signal<PermisoRol[]>([]);
 	vistas = signal<Vista[]>([]);
 	loading = signal(false);
 
-	// Dialogs
+	// * Dialogs
 	dialogVisible = signal(false);
 	detailDrawerVisible = signal(false);
 	isEditing = signal(false);
 
-	// Form
+	// * Form
 	selectedPermiso = signal<PermisoRol | null>(null);
 	selectedRol = signal<RolTipoAdmin | null>(null);
 	selectedVistas = signal<string[]>([]);
 
-	// Edit modal - module tabs
+	// * Edit modal - module tabs
 	modulosVistas = signal<ModuloVistas[]>([]);
 	activeModuloIndex = signal(0);
 	vistasBusqueda = signal('');
@@ -99,7 +99,7 @@ export class PermisosRolesComponent implements OnInit {
 	rolesDisponibles = ROLES_DISPONIBLES_ADMIN;
 	rolesSelectOptions: { label: string; value: RolTipoAdmin }[] = [];
 
-	// Computed - Statistics
+	// * Computed - stats
 	totalRoles = computed(() => this.permisosRol().length);
 
 	totalVistas = computed(() => this.vistas().length);
@@ -115,7 +115,7 @@ export class PermisosRolesComponent implements OnInit {
 
 	rolesConfigurados = computed(() => this.permisosRol().length);
 
-	// Computed - Vistas filtradas por búsqueda en modal de edición
+	// * Computed - filtered views for the edit modal search
 	vistasFiltradas = computed(() => {
 		const modulos = this.modulosVistas();
 		const busqueda = this.vistasBusqueda().toLowerCase();
@@ -134,10 +134,12 @@ export class PermisosRolesComponent implements OnInit {
 	});
 
 	ngOnInit(): void {
+		// * Initial load
 		this.loadData();
 	}
 
 	loadData(): void {
+		// * Load views + role permissions in parallel.
 		this.loading.set(true);
 
 		forkJoin({
@@ -177,6 +179,7 @@ export class PermisosRolesComponent implements OnInit {
 
 	// === Detail Drawer ===
 	openDetail(permiso: PermisoRol): void {
+		// * Open detail drawer for selected role.
 		this.selectedPermiso.set(permiso);
 		this.detailDrawerVisible.set(true);
 	}
@@ -187,6 +190,7 @@ export class PermisosRolesComponent implements OnInit {
 
 	// === Edit Dialog ===
 	openNew(): void {
+		// * Start a new role permission config.
 		this.selectedPermiso.set(null);
 		this.selectedRol.set(null);
 		this.selectedVistas.set([]);
@@ -219,6 +223,7 @@ export class PermisosRolesComponent implements OnInit {
 	}
 
 	savePermiso(): void {
+		// ! Persist role permissions (create/update).
 		const vistas = this.selectedVistas();
 		this.loading.set(true);
 
@@ -256,6 +261,7 @@ export class PermisosRolesComponent implements OnInit {
 	}
 
 	deletePermiso(permiso: PermisoRol): void {
+		// ! Confirm before delete.
 		if (confirm(buildDeletePermisoRolMessage(permiso.rol))) {
 			this.loading.set(true);
 			this.permisosService

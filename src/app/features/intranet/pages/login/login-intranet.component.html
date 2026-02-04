@@ -1,10 +1,14 @@
 <div class="login-overlay">
 	<div class="login-modal">
+		<!-- * Branding header -->
 		<app-login-header title="INICIAR SESIÓN" logoSrc="images/logo.png" />
 
+		<!-- * Form wrapper with reactive bindings -->
 		<form class="login-form" [formGroup]="loginForm" (ngSubmit)="onLogin()" autocomplete="on">
+			<!-- ! Error summary is driven by signals to avoid stale messages -->
 			<app-login-error-message [message]="errorMessage()" [show]="showError()" />
 
+			<!-- * DNI input -->
 			<app-login-input>
 				<i class="pi pi-id-card"></i>
 				<input
@@ -20,6 +24,7 @@
 			</app-login-input>
 			<app-form-error [control]="loginForm.controls.dni" />
 
+			<!-- * Password input with toggle -->
 			<app-login-input>
 				<i
 					class="pi password-toggle"
@@ -39,6 +44,7 @@
 			</app-login-input>
 			<app-form-error [control]="loginForm.controls.password" />
 
+			<!-- * Role selector drives API auth flow -->
 			<app-login-role-selector>
 				<i class="pi pi-users"></i>
 				<p-select
@@ -52,16 +58,19 @@
 				/>
 			</app-login-role-selector>
 
+			<!-- * Remember me / extras -->
 			<app-login-options>
 				<label class="remember-toggle">
 					<span>Recordar sesión</span>
 					<p-toggleSwitch formControlName="rememberMe" />
 				</label>
+				<!-- ? Password recovery link intentionally hidden for now -->
 				<!-- <a href="#" class="forgot-link" (click)="onForgotPassword($event)">
 					¿Ha olvidado la contraseña?
 				</a> -->
 			</app-login-options>
 
+			<!-- * Submit action -->
 			<app-login-button [isLoading]="isLoading()" [disabled]="isDisabled" />
 		</form>
 	</div>

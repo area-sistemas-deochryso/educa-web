@@ -1,6 +1,7 @@
 /**
  * Auth Models - Interfaces que coinciden con el backend educa.API
  */
+// * Auth DTOs used across services and storage.
 
 // Roles disponibles en el sistema
 export type UserRole =

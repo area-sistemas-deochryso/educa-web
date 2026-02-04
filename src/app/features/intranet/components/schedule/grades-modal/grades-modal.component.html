@@ -8,6 +8,7 @@
 	class="grades-modal"
 	[showHeader]="false"
 >
+	<!-- * Grades table + simulation UI -->
 	<div class="modal-content grades-content">
 		<h2>{{ currentCourseGrades.name }}</h2>
 		<div class="grades-table">
@@ -39,6 +40,7 @@
 			}
 			<div class="grades-row grades-total">
 				<span class="col-eval">
+					<!-- * Toggle simulation -->
 					<button
 						class="simulate-btn"
 						[class.active]="simulationMode"
@@ -54,6 +56,7 @@
 			</div>
 		</div>
 		@if (simulationMode) {
+			<!-- * Simulation disclaimer -->
 			<p class="simulation-note">
 				Modifica las notas para simular tu promedio. Los cambios no se guardarán.
 			</p>

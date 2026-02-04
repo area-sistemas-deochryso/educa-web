@@ -23,9 +23,11 @@ import { TableLoadingDirective } from '@app/shared';
 export class UsuariosTableComponent {
 	readonly adminUtils = inject(AdminUtilsService);
 
+	// * Inputs for table rows + loading overlay.
 	readonly usuarios = input.required<UsuarioLista[]>();
 	readonly loading = input.required<boolean>();
 
+	// * Outputs for row actions.
 	readonly viewDetail = output<UsuarioLista>();
 	readonly edit = output<UsuarioLista>();
 	readonly toggleEstado = output<UsuarioLista>();

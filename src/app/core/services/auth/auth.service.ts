@@ -18,10 +18,13 @@ import { UI_AUTH_MESSAGES } from '@app/shared/constants';
 	providedIn: 'root',
 })
 export class AuthService {
+	// * Auth API + session state bridge for login/logout/profile.
+	// In-memory throttle for a single app session (resets on refresh/logout).
 	private readonly MAX_LOGIN_ATTEMPTS = 3;
 	private http = inject(HttpClient);
 	private storage = inject(StorageService);
 
+	// Subjects bootstrap from storage so UI can render immediately on app load.
 	private isAuthenticatedSubject = new BehaviorSubject<boolean>(this.hasValidToken());
 	private currentUserSubject = new BehaviorSubject<AuthUser | null>(this.getStoredUser());
 	private loginAttemptsSubject = new BehaviorSubject<number>(0);

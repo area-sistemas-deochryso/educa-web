@@ -23,11 +23,14 @@ import { logger } from '@core/helpers';
 	styleUrl: './voice-button.component.scss',
 })
 export class VoiceButtonComponent implements OnInit, AfterViewInit, OnDestroy {
+	// * Floating button reference for drag interactions.
 	@ViewChild('voiceButton') voiceButton!: ElementRef<HTMLButtonElement>;
 
+	// * Voice recognition state + keyboard shortcut toggle.
 	voiceService = inject(VoiceRecognitionService);
 	private keyboardService = inject(KeyboardShortcutsService);
 
+	// * Drag/lock state while holding the mic button.
 	isDragging = false;
 	dragStartY = 0;
 	currentDragY = 0;
@@ -35,6 +38,7 @@ export class VoiceButtonComponent implements OnInit, AfterViewInit, OnDestroy {
 	showLockIndicator = false;
 	isVisible = signal(true);
 
+	// * Context menu for browsing available voice commands.
 	showContextMenu = false;
 	contextMenuPosition = { x: 0, y: 0 };
 	voiceCommands = VOICE_COMMANDS;
@@ -68,7 +72,7 @@ export class VoiceButtonComponent implements OnInit, AfterViewInit, OnDestroy {
 	}
 
 	ngOnInit(): void {
-		// Registrar atajo de teclado
+		// * Keyboard shortcut to show/hide the button.
 		this.keyboardService.register('toggle-voice-button', () => {
 			this.isVisible.update((v) => !v);
 		});
@@ -113,6 +117,7 @@ export class VoiceButtonComponent implements OnInit, AfterViewInit, OnDestroy {
 	}
 
 	private startRecording(startY: number): void {
+		// * Start listening and allow upward drag to lock.
 		if (this.voiceService.isLocked()) return;
 		this.isDragging = true;
 		this.dragStartY = startY;
@@ -121,6 +126,7 @@ export class VoiceButtonComponent implements OnInit, AfterViewInit, OnDestroy {
 	}
 
 	private handleDrag(currentY: number): void {
+		// * Track drag distance and lock when past threshold.
 		this.currentDragY = this.dragStartY - currentY;
 		this.showLockIndicator = this.currentDragY > this.lockThreshold * 0.5;
 
@@ -132,6 +138,7 @@ export class VoiceButtonComponent implements OnInit, AfterViewInit, OnDestroy {
 	}
 
 	private endRecording(): void {
+		// * Stop recording unless already locked.
 		this.isDragging = false;
 		this.showLockIndicator = false;
 		this.currentDragY = 0;
@@ -154,7 +161,7 @@ export class VoiceButtonComponent implements OnInit, AfterViewInit, OnDestroy {
 		return Math.min(this.currentDragY, this.lockThreshold + 20);
 	}
 
-	// Context menu methods
+	// * Context menu methods.
 	onContextMenu(event: MouseEvent): void {
 		event.preventDefault();
 		this.contextMenuPosition = { x: event.clientX, y: event.clientY };

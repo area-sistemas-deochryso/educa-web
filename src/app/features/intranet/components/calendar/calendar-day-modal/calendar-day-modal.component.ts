@@ -9,9 +9,11 @@ import { ModalData } from '@features/intranet/pages/calendary-component/calendar
 	styleUrl: './calendar-day-modal.component.scss',
 })
 export class CalendarDayModalComponent {
+	// * Inputs control visibility and content.
 	visible = input.required<boolean>();
 	data = input.required<ModalData | null>();
 
+	// * Close output for parent control.
 	closeModal = output<void>();
 
 	onClose(): void {
@@ -19,12 +21,14 @@ export class CalendarDayModalComponent {
 	}
 
 	onOverlayClick(event: MouseEvent): void {
+		// * Only close when clicking the overlay, not the content.
 		if ((event.target as HTMLElement).classList.contains('modal-overlay')) {
 			this.onClose();
 		}
 	}
 
 	formatDate(date: Date): string {
+		// * Locale-friendly date for modal header.
 		return date.toLocaleDateString('es-PE', {
 			weekday: 'long',
 			year: 'numeric',

@@ -21,11 +21,14 @@ import { UserProfileService } from '@core/services';
 	changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class UserProfileMenuComponent {
+	// * User profile info for the menu display.
 	private userProfile = inject(UserProfileService);
 
+	// * Popover styling + logout event.
 	popoverStyleClass = input<string>('');
 	logoutClick = output<void>();
 
+	// * ViewChild for PrimeNG popover control.
 	readonly popover = viewChild.required<Popover>('profilePopover');
 	readonly isOpen = signal(false);
 
@@ -34,18 +37,22 @@ export class UserProfileMenuComponent {
 	readonly initials = this.userProfile.initials;
 
 	toggleMenu(event: Event): void {
+		// * Toggle popover from click.
 		this.popover().toggle(event);
 	}
 
 	onPopoverShow(): void {
+		// * Track open state for styling.
 		this.isOpen.set(true);
 	}
 
 	onPopoverHide(): void {
+		// * Track closed state for styling.
 		this.isOpen.set(false);
 	}
 
 	onLogout(): void {
+		// * Hide popover before emitting logout.
 		this.popover().hide();
 		this.logoutClick.emit();
 	}

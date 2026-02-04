@@ -19,6 +19,7 @@ export interface PaginatedResponse<T> {
  * U = Tipo para actualizar (opcional, por defecto Partial<T>)
  */
 export abstract class BaseRepository<T, C = Partial<T>, U = Partial<T>> {
+	// * Base CRUD repository helpers.
 	protected httpService = inject(BaseHttpService);
 
 	protected abstract endpoint: string;

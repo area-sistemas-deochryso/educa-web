@@ -10,19 +10,20 @@ import { RouterLink } from '@angular/router';
 	changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class QuickAccessCardComponent {
-	/** Texto visible en la tarjeta */
+	// * Visible label on the card.
 	label = input.required<string>();
 
-	/** Ruta de redirección */
+	// * Target route.
 	path = input.required<string>();
 
-	/** Modal a abrir en la página destino (opcional) */
+	// * Optional modal query param for the target page.
 	modal = input<string>();
 
-	/** Icono de PrimeNG a mostrar */
+	// * PrimeNG icon class.
 	icon = input<string>('pi-link');
 
 	readonly queryParams = computed(() => {
+		// * Only include modal param when defined.
 		const modalValue = this.modal();
 		return modalValue ? { modal: modalValue } : null;
 	});

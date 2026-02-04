@@ -13,10 +13,12 @@ import { ToastModule } from 'primeng/toast';
 	templateUrl: './toast-container.component.html',
 })
 export class ToastContainerComponent {
+	// * PrimeNG message service + app error handler bridge.
 	private messageService = inject(MessageService);
 	private errorHandler = inject(ErrorHandlerService);
 
 	constructor() {
+		// * Listen for error notifications and render a toast.
 		effect(() => {
 			const notification = this.errorHandler.currentNotification();
 			if (notification) {

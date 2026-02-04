@@ -1,7 +1,9 @@
+<!-- * Shared legend for attendance codes -->
 <app-attendance-legend />
 
 @if (salones().length > 0) {
 	<div class="selector-row">
+		<!-- * Salon selector drives which group is loaded -->
 		<app-salon-selector
 			[salones]="salones()"
 			[selectedSalonId]="selectedSalonId()"
@@ -10,6 +12,7 @@
 		/>
 
 		@if (selectedSalon() && view.viewMode() === 'mes') {
+			<!-- * PDF actions only in month mode -->
 			<div class="pdf-section">
 				<span class="pdf-label">Reporte del día: {{ view.pdfFecha() | date: 'dd/MM/yyyy' }}</span>
 				<p-button
@@ -34,10 +37,11 @@
 
 	@if (view.viewMode() === 'mes') {
 		@if (view.showSkeletons() && !view.tableReady()) {
-			<!-- Skeleton mostrado inmediatamente con espacio reservado -->
+			<!-- * Skeleton: reserve space while data loads -->
 			<app-attendance-table-skeleton />
 			<app-attendance-table-skeleton />
 		} @else if (view.estudiantes().length > 0) {
+			<!-- * Month tables: ingresos and salidas -->
 			<app-attendance-table
 				[table]="view.ingresos()"
 				[hijos]="view.estudiantesAsHijos()"
@@ -53,9 +57,11 @@
 				(hijoChange)="view.selectEstudiante($event)"
 			/>
 		} @else if (!view.loading()) {
+			<!-- ! Empty state after load -->
 			<app-empty-state message="No se encontraron estudiantes en este salón." />
 		}
 	} @else {
+		<!-- * Day mode list with date picker + PDF options -->
 		<app-asistencia-dia-list
 			[estudiantes]="view.estudiantesDia()"
 			[fecha]="view.fechaDia()"
@@ -67,5 +73,6 @@
 		/>
 	}
 } @else if (!view.loading()) {
+	<!-- ! No assigned salons -->
 	<app-empty-state message="No tiene salones asignados." />
 }

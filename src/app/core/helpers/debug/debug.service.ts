@@ -22,6 +22,7 @@ const LEVEL_WEIGHT: Record<DbgLevel, number> = {
 
 @Injectable({ providedIn: 'root' })
 export class DebugService {
+	// * Tagged debug logger with filtering + RxJS helpers.
 	private readonly cfg: Required<DebugConfig>;
 	private readonly filterFn: (tag: string) => boolean;
 

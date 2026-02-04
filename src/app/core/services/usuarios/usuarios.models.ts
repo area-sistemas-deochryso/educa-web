@@ -1,3 +1,11 @@
+// * Usuario DTOs and role helpers.
+import {
+	APP_USER_ROLE_ADMIN_LIST,
+	APP_USER_ROLE_LIST,
+	AppUserRoleAdmin,
+	AppUserRoleValue,
+} from '@app/shared/constants';
+
 export interface UsuarioLista {
 	id: number;
 	dni: string;
@@ -83,22 +91,11 @@ export interface UsuariosEstadisticas {
 	usuariosInactivos: number;
 }
 
-export type RolUsuario = 'Director' | 'Profesor' | 'Apoderado' | 'Estudiante' | 'Asistente Administrativo';
+export type RolUsuario = AppUserRoleValue;
 
-export const ROLES_USUARIOS: RolUsuario[] = [
-	'Director',
-	'Profesor',
-	'Apoderado',
-	'Estudiante',
-	'Asistente Administrativo',
-];
+export const ROLES_USUARIOS: RolUsuario[] = APP_USER_ROLE_LIST;
 
 // Roles disponibles para gestión en admin (sin Apoderado)
-export type RolUsuarioAdmin = 'Director' | 'Profesor' | 'Estudiante' | 'Asistente Administrativo';
+export type RolUsuarioAdmin = AppUserRoleAdmin;
 
-export const ROLES_USUARIOS_ADMIN: RolUsuarioAdmin[] = [
-	'Director',
-	'Profesor',
-	'Estudiante',
-	'Asistente Administrativo',
-];
+export const ROLES_USUARIOS_ADMIN: RolUsuarioAdmin[] = APP_USER_ROLE_ADMIN_LIST;

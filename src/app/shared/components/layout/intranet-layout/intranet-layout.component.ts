@@ -27,6 +27,7 @@ import { environment } from '@config/environment';
 	styleUrl: './intranet-layout.component.scss',
 })
 export class IntranetLayoutComponent implements OnInit {
+	// * Core services for auth, permisos, SW cleanup, and routing.
 	private authService = inject(AuthService);
 	private userPermisosService = inject(UserPermisosService);
 	private swService = inject(SwService);
@@ -36,10 +37,12 @@ export class IntranetLayoutComponent implements OnInit {
 	private readonly _navItems = signal<NavMenuItem[]>([]);
 	readonly navItems = this._navItems.asReadonly();
 
+	// * Feature flags for optional widgets.
 	readonly showNotifications = environment.features.notifications;
 	readonly showVoiceRecognition = environment.features.voiceRecognition;
 
 	constructor() {
+		// * Keep nav items in sync with permisos changes.
 		effect(() => {
 			const loaded = this.userPermisosService.loaded();
 			const vistasPermitidas = this.userPermisosService.vistasPermitidas();
@@ -59,6 +62,7 @@ export class IntranetLayoutComponent implements OnInit {
 	}
 
 	private updateNavItems(vistasPermitidas: string[]): void {
+		// * Build nav based on permitted routes (fallback to full menu).
 		if (vistasPermitidas.length === 0) {
 			this._navItems.set(INTRANET_MENU as NavMenuItem[]);
 			return;
@@ -72,6 +76,7 @@ export class IntranetLayoutComponent implements OnInit {
 		items: NavItemWithPermiso[],
 		vistasPermitidas: string[],
 	): NavMenuItem[] {
+		// * Recursively filter menu tree by permisos.
 		const result: NavMenuItem[] = [];
 
 		for (const item of items) {
@@ -103,6 +108,7 @@ export class IntranetLayoutComponent implements OnInit {
 	}
 
 	private tienePermisoParaRuta(ruta: string, vistasPermitidas: string[]): boolean {
+		// * Normalize and compare rutas.
 		const rutaNormalizada = (ruta.startsWith('/') ? ruta.substring(1) : ruta).toLowerCase();
 		return vistasPermitidas.some((vista) => {
 			const vistaNormalizada = (
@@ -113,6 +119,7 @@ export class IntranetLayoutComponent implements OnInit {
 	}
 
 	logout(): void {
+		// * Clear user/session state and return to login.
 		this.userPermisosService.clear();
 		this.swService.clearCache();
 		this.authService.logout();

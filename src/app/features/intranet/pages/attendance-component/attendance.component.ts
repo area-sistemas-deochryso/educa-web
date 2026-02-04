@@ -1,5 +1,6 @@
 import {
 	AttendanceHeaderComponent,
+	VIEW_MODE,
 	ViewMode,
 } from '../../components/attendance/attendance-header/attendance-header.component';
 import { Component, ViewChild, inject, signal } from '@angular/core';
@@ -8,9 +9,8 @@ import { AttendanceApoderadoComponent } from './attendance-apoderado/attendance-
 import { AttendanceDirectorComponent } from './attendance-director/attendance-director.component';
 import { AttendanceEstudianteComponent } from './attendance-estudiante/attendance-estudiante.component';
 import { AttendanceProfesorComponent } from './attendance-profesor/attendance-profesor.component';
-import { Router } from '@angular/router';
 import { UserProfileService } from '@core/services';
-import { logger } from '@core/helpers';
+import { APP_USER_ROLES } from '@app/shared/constants';
 
 /**
  * Componente Page/Route para asistencias.
@@ -37,48 +37,45 @@ import { logger } from '@core/helpers';
 })
 export class AttendanceComponent {
 	private userProfile = inject(UserProfileService);
-	private router = inject(Router);
 
+	// * ViewChild refs are used to delegate reload/mode actions by role.
 	@ViewChild(AttendanceApoderadoComponent) apoderadoComponent?: AttendanceApoderadoComponent;
 	@ViewChild(AttendanceProfesorComponent) profesorComponent?: AttendanceProfesorComponent;
 	@ViewChild(AttendanceDirectorComponent) directorComponent?: AttendanceDirectorComponent;
 	@ViewChild(AttendanceEstudianteComponent) estudianteComponent?: AttendanceEstudianteComponent;
 
+	// * Local state mirrors the profile signal to drive header + role switch.
 	readonly userRole = this.userProfile.userRole;
 	readonly loading = signal(false);
-	readonly selectedMode = signal<ViewMode>('dia');
+	readonly selectedMode = signal<ViewMode>(VIEW_MODE.Dia);
 
-	// Verificar rol válido y redirigir si es inesperado
-	constructor() {
-		const validRoles = ['Apoderado', 'Profesor', 'Director', 'Asistente Administrativo', 'Estudiante'];
-		const currentRole = this.userRole();
-
-		if (currentRole && !validRoles.includes(currentRole)) {
-			logger.warn(`Rol inesperado en asistencias: ${currentRole}. Redirigiendo a /intranet`);
-			this.router.navigate(['/intranet']);
-		}
-	}
-
-	// Header común
+	// * Header comun: solo algunos roles soportan cambio de modo.
 	onModeChange(mode: ViewMode): void {
 		this.selectedMode.set(mode);
 		const role = this.userRole();
-		if (role === 'Profesor') {
+		if (role === APP_USER_ROLES.Profesor) {
 			this.profesorComponent?.setViewMode(mode);
-		} else if (role === 'Director' || role === 'Asistente Administrativo') {
+		} else if (
+			role === APP_USER_ROLES.Director ||
+			role === APP_USER_ROLES.AsistenteAdministrativo
+		) {
 			this.directorComponent?.setViewMode(mode);
 		}
 	}
 
+	// * Delegar reload al componente activo segun rol.
 	onReload(): void {
 		const role = this.userRole();
-		if (role === 'Apoderado') {
+		if (role === APP_USER_ROLES.Apoderado) {
 			this.apoderadoComponent?.reload();
-		} else if (role === 'Profesor') {
+		} else if (role === APP_USER_ROLES.Profesor) {
 			this.profesorComponent?.reload();
-		} else if (role === 'Director' || role === 'Asistente Administrativo') {
+		} else if (
+			role === APP_USER_ROLES.Director ||
+			role === APP_USER_ROLES.AsistenteAdministrativo
+		) {
 			this.directorComponent?.reload();
-		} else if (role === 'Estudiante') {
+		} else if (role === APP_USER_ROLES.Estudiante) {
 			this.estudianteComponent?.reload();
 		}
 	}

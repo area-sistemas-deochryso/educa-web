@@ -36,9 +36,11 @@ const SECCIONES: SeccionOption[] = [
 	styleUrl: './attendance-filter.component.scss',
 })
 export class AttendanceFilterComponent implements OnInit {
+	// * Initial filter values (optional).
 	grado = input<string>('');
 	seccion = input<string>('');
 
+	// * Emits when either select changes.
 	filterChange = output<{ grado: string; seccion: string }>();
 
 	gradoOptions = GRADOS;
@@ -48,16 +50,19 @@ export class AttendanceFilterComponent implements OnInit {
 	selectedSeccion = '';
 
 	ngOnInit(): void {
+		// * Initialize local state from inputs for ngModel bindings.
 		this.selectedGrado = this.grado();
 		this.selectedSeccion = this.seccion();
 	}
 
 	onGradoChange(grado: string): void {
+		// * Update local state then emit combined filter.
 		this.selectedGrado = grado;
 		this.emitFilter();
 	}
 
 	onSeccionChange(seccion: string): void {
+		// * Update local state then emit combined filter.
 		this.selectedSeccion = seccion;
 		this.emitFilter();
 	}

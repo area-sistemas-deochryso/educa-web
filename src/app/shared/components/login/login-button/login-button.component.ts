@@ -9,6 +9,7 @@ import { CommonModule } from '@angular/common';
 	styleUrl: './login-button.component.scss',
 })
 export class LoginButtonComponent {
+	// * Button state + labels.
 	@Input() isLoading = false;
 	@Input() disabled = false;
 	@Input() label = 'Ingresar';

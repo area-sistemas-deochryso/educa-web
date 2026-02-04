@@ -16,22 +16,23 @@ export class QuickAccessCardMenuComponent {
 
 	@ViewChild('coursesMenu') coursesMenu!: Menu;
 
-	/** Texto visible en la tarjeta */
+	// * Visible label on the card.
 	label = input.required<string>();
 
-	/** Ruta de redirección */
+	// * Target route.
 	path = input.required<string>();
 
-	/** Modal a abrir en la página destino */
+	// * Modal name to open on target page.
 	modal = input.required<string>();
 
-	/** Icono de PrimeNG a mostrar */
+	// * PrimeNG icon class.
 	icon = input<string>('pi-link');
 
-	/** Lista de cursos disponibles */
+	// * Course list to populate the menu.
 	courses = input.required<string[]>();
 
 	readonly menuItems = computed<MenuItem[]>(() =>
+		// * Map courses to menu items.
 		this.courses().map((course) => ({
 			label: course,
 			command: () => this.navigateToCourse(course),
@@ -39,6 +40,7 @@ export class QuickAccessCardMenuComponent {
 	);
 
 	onCardClick(event: Event): void {
+		// * Toggle the dropdown menu.
 		this.coursesMenu.toggle(event);
 	}
 

@@ -8,4 +8,6 @@ import { RouterLink } from '@angular/router';
 	templateUrl: './contact.html',
 	styleUrl: './contact.scss',
 })
-export class ContactComponent {}
+export class ContactComponent {
+	// * Contact page static content.
+}

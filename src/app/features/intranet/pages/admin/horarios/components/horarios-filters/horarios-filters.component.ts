@@ -18,7 +18,7 @@ import type { SalonOption } from '../../models/salon.interface';
 	changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class HorariosFiltersComponent {
-	// ============ Inputs ============
+	// * Inputs reflect current filter state.
 	readonly salonesOptions = input.required<SalonOption[]>();
 	readonly filtroSalonId = input<number | null>(null);
 	readonly filtroDiaSemana = input<number | null>(null);
@@ -26,13 +26,13 @@ export class HorariosFiltersComponent {
 	readonly filtroDiaSemanaHabilitado = input<boolean>(true);
 	readonly hasFilters = input<boolean>(false);
 
-	// ============ Outputs ============
+	// * Outputs bubble filter changes.
 	readonly filtroSalonChange = output<number | null>();
 	readonly filtroDiaSemanaChange = output<number | null>();
 	readonly filtroEstadoChange = output<boolean | null>();
 	readonly clearFiltros = output<void>();
 
-	// ============ Opciones estáticas ============
+	// * Static options for selects.
 	readonly diasOptions = [
 		{ label: 'Lunes', value: 1 },
 		{ label: 'Martes', value: 2 },
@@ -46,7 +46,7 @@ export class HorariosFiltersComponent {
 		{ label: 'Inactivos', value: false },
 	];
 
-	// ============ Event handlers ============
+	// * Event handlers
 	onSalonChange(salonId: number | null): void {
 		this.filtroSalonChange.emit(salonId);
 	}

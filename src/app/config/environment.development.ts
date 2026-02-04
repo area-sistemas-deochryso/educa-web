@@ -2,6 +2,7 @@
  * Environment configuration for DEVELOPMENT
  * This file replaces environment.ts during development builds
  */
+// * Development environment flags + API base URL.
 export const environment = {
 	production: false,
 

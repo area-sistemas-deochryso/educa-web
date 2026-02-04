@@ -8,6 +8,7 @@ import { Injectable, inject } from '@angular/core';
 	providedIn: 'root',
 })
 export class IsoDateAdapter extends BaseBidirectionalAdapter<string, Date> {
+	// * Bidirectional ISO string <-> Date adapter.
 	adapt(source: string): Date {
 		return new Date(source);
 	}

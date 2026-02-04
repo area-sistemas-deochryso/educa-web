@@ -29,12 +29,14 @@ export interface HijoOption {
 	changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class AttendanceTableComponent {
+	// * Table data (weeks + totals) is required.
 	table = input.required<AttendanceTable>();
 
-	// Opcional: para selector de hijos integrado
+	// * Optional child selector (used by apoderado/profesor/director views).
 	hijos = input<HijoApoderado[]>([]);
 	selectedHijoId = input<number | null>(null);
 
+	// * Outputs to notify parent of selector changes.
 	monthChange = output<number>();
 	hijoChange = output<number>();
 
@@ -43,7 +45,7 @@ export class AttendanceTableComponent {
 
 	getStatusClass = getStatusClass;
 
-	// Computed signals para reactividad con OnPush
+	// * Computed signals to keep OnPush template reactive.
 	readonly hijosOptions = computed<HijoOption[]>(() =>
 		this.hijos().map((h) => ({
 			label: `${h.nombreCompleto} (${h.grado} - ${h.seccion})`,

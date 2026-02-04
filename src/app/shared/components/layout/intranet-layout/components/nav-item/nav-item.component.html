@@ -1,5 +1,5 @@
 @if (hasChildren()) {
-	<!-- Parent with dropdown -->
+	<!-- * Parent item with dropdown. -->
 	<div class="nav-dropdown" [class.open]="isOpen()" [class.active]="isActive()">
 		<button class="nav-item parent" (click)="toggle()">
 			<i [class]="icon"></i>
@@ -11,7 +11,7 @@
 			<div class="dropdown-menu">
 				@for (child of children; track child.label) {
 					@if (child.children && child.children.length > 0) {
-						<!-- Nested submenu -->
+						<!-- * Nested submenu group. -->
 						<div class="submenu-item">
 							<app-nav-item
 								[label]="child.label"
@@ -20,7 +20,7 @@
 							/>
 						</div>
 					} @else {
-						<!-- Leaf item -->
+						<!-- * Leaf link inside dropdown. -->
 						<a
 							[routerLink]="child.route"
 							routerLinkActive="active"
@@ -36,7 +36,7 @@
 		}
 	</div>
 } @else {
-	<!-- Simple link -->
+	<!-- * Simple single-level link. -->
 	<a
 		[routerLink]="route"
 		routerLinkActive="active"

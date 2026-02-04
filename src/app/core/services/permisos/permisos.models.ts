@@ -1,3 +1,11 @@
+// * DTOs and role helpers for permisos APIs.
+import {
+	APP_USER_ROLE_ADMIN_LIST,
+	APP_USER_ROLE_LIST,
+	AppUserRoleAdmin,
+	AppUserRoleValue,
+} from '@app/shared/constants';
+
 // Vista DTOs
 export interface Vista {
 	id: number;
@@ -58,28 +66,19 @@ export interface PermisosUsuarioResultado {
 	rol: string;
 	vistasPermitidas: string[];
 	tienePermisosPersonalizados: boolean;
+	/** JWT con exp de 4h que indica cuándo vencen estos permisos */
+	permisosToken?: string;
 }
 
 // Tipos de roles disponibles
-export type RolTipo = 'Director' | 'Profesor' | 'Apoderado' | 'Estudiante' | 'Asistente Administrativo';
+export type RolTipo = AppUserRoleValue;
 
-export const ROLES_DISPONIBLES: RolTipo[] = [
-	'Director',
-	'Profesor',
-	'Apoderado',
-	'Estudiante',
-	'Asistente Administrativo',
-];
+export const ROLES_DISPONIBLES: RolTipo[] = APP_USER_ROLE_LIST;
 
 // Roles disponibles para gestión en admin (sin Apoderado)
-export type RolTipoAdmin = 'Director' | 'Profesor' | 'Estudiante' | 'Asistente Administrativo';
+export type RolTipoAdmin = AppUserRoleAdmin;
 
-export const ROLES_DISPONIBLES_ADMIN: RolTipoAdmin[] = [
-	'Director',
-	'Profesor',
-	'Estudiante',
-	'Asistente Administrativo',
-];
+export const ROLES_DISPONIBLES_ADMIN: RolTipoAdmin[] = APP_USER_ROLE_ADMIN_LIST;
 
 // Response genérico del API
 export interface ApiResponse {

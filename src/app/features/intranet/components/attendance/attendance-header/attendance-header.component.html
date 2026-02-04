@@ -1,17 +1,19 @@
 <div class="page-header">
+	<!-- * Icon + title -->
 	<i class="pi pi-clipboard"></i>
 	<div class="title-container">
 		<h1>Asistencias</h1>
 		@if (showModeSelector()) {
 			<span class="separator">/</span>
+			<!-- * Day/Month toggle -->
 			<div class="mode-selector" role="group" aria-label="Selector de vista de asistencias">
-				<!-- Slider que se desliza -->
+				<!-- * Slider highlights the active mode -->
 				<div
 					class="mode-slider"
 					[style.transform]="selectedMode() === 'mes' ? 'translateX(62px)' : 'translateX(0)'"
 				></div>
 
-				<!-- Botones -->
+				<!-- * Toggle buttons -->
 				<button
 					type="button"
 					class="mode-btn"
@@ -36,6 +38,7 @@
 		}
 	</div>
 	@if (loading()) {
+		<!-- * Inline spinner while data loads -->
 		<i class="pi pi-spin pi-spinner loading-spinner"></i>
 	}
 	<button
@@ -46,6 +49,7 @@
 		tooltipPosition="bottom"
 		aria-label="Recargar datos de asistencia"
 	>
+		<!-- * Refresh icon spins with loading -->
 		<i class="pi pi-refresh" [class.pi-spin]="loading()"></i>
 	</button>
 </div>

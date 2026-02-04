@@ -12,5 +12,6 @@ import { ChangeDetectionStrategy, Component, input } from '@angular/core';
 	styleUrl: './empty-state.component.scss',
 })
 export class EmptyStateComponent {
+	// * Message to render when no data is available.
 	message = input.required<string>();
 }
