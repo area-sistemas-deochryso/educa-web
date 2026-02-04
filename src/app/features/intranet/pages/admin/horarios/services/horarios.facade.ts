@@ -10,6 +10,14 @@ import {
   type HorarioCreateDto,
   type HorarioUpdateDto,
 } from '../models/horario.interface';
+import {
+  UI_ADMIN_ERROR_DETAILS,
+  UI_ADMIN_ERROR_DETAILS_DYNAMIC,
+  UI_GENERIC_MESSAGES,
+  UI_HORARIOS_SUCCESS_MESSAGES,
+  UI_HORARIOS_SUCCESS_MESSAGES_DYNAMIC,
+  UI_SUMMARIES,
+} from '@app/shared/constants';
 import { CursosApiService } from './cursos-api.service';
 import { HorariosApiService } from './horarios-api.service';
 import { HorariosStore } from './horarios.store';
@@ -58,7 +66,10 @@ export class HorariosFacade {
         },
         error: (err) => {
           logger.error('Error al cargar datos:', err);
-          this.errorHandler.showError('Error', 'No se pudieron cargar los datos');
+          this.errorHandler.showError(
+            UI_SUMMARIES.error,
+            UI_ADMIN_ERROR_DETAILS.loadHorariosData
+          );
           this.store.setLoading(false);
           this.store.setOptionsLoading(false);
         },
@@ -83,7 +94,10 @@ export class HorariosFacade {
         },
         error: (err) => {
           logger.error('Error al cargar horarios por salón:', err);
-          this.errorHandler.showError('Error', 'No se pudieron cargar los horarios del salón');
+          this.errorHandler.showError(
+            UI_SUMMARIES.error,
+            UI_ADMIN_ERROR_DETAILS.loadHorariosSalon
+          );
           this.store.setLoading(false);
         },
       });
@@ -107,7 +121,10 @@ export class HorariosFacade {
         },
         error: (err) => {
           logger.error('Error al cargar horarios por profesor:', err);
-          this.errorHandler.showError('Error', 'No se pudieron cargar los horarios del profesor');
+          this.errorHandler.showError(
+            UI_SUMMARIES.error,
+            UI_ADMIN_ERROR_DETAILS.loadHorariosProfesor
+          );
           this.store.setLoading(false);
         },
       });
@@ -128,14 +145,20 @@ export class HorariosFacade {
           if (detalle) {
             this.store.setHorarioDetalle(detalle);
           } else {
-            this.errorHandler.showError('Error', 'No se encontró el horario');
+            this.errorHandler.showError(
+              UI_SUMMARIES.error,
+              UI_ADMIN_ERROR_DETAILS.horarioNotFound
+            );
             this.store.closeDetailDrawer();
           }
           this.store.setDetailLoading(false);
         },
         error: (err) => {
           logger.error('Error al cargar detalle de horario:', err);
-          this.errorHandler.showError('Error', 'No se pudo cargar el detalle del horario');
+          this.errorHandler.showError(
+            UI_SUMMARIES.error,
+            UI_ADMIN_ERROR_DETAILS.horarioDetailLoad
+          );
           this.store.setDetailLoading(false);
           this.store.closeDetailDrawer();
         },
@@ -160,7 +183,10 @@ export class HorariosFacade {
           this.store.incrementarEstadistica('horariosActivos', 1);
           // Note: profesor se asigna después con asignarProfesor()
           this.store.closeDialog();
-          this.errorHandler.showSuccess('Éxito', 'Horario creado correctamente');
+          this.errorHandler.showSuccess(
+            UI_SUMMARIES.success,
+            UI_HORARIOS_SUCCESS_MESSAGES.created
+          );
         },
         error: (err) => {
           logger.error('Error al crear horario:', err);
@@ -209,7 +235,10 @@ export class HorariosFacade {
 
           this.store.setLoading(false);
           this.store.closeDialog();
-          this.errorHandler.showSuccess('Éxito', 'Horario actualizado correctamente');
+          this.errorHandler.showSuccess(
+            UI_SUMMARIES.success,
+            UI_HORARIOS_SUCCESS_MESSAGES.updated
+          );
         },
         error: (err) => {
           logger.error('Error al actualizar horario:', err);
@@ -245,13 +274,16 @@ export class HorariosFacade {
 
           this.store.setLoading(false);
           this.errorHandler.showSuccess(
-            'Éxito',
-            `Horario ${nuevoEstado ? 'activado' : 'desactivado'} correctamente`
+            UI_SUMMARIES.success,
+            UI_HORARIOS_SUCCESS_MESSAGES_DYNAMIC.toggleEstado(nuevoEstado)
           );
         },
         error: (err) => {
           logger.error('Error al cambiar estado de horario:', err);
-          this.errorHandler.showError('Error', 'No se pudo cambiar el estado del horario');
+          this.errorHandler.showError(
+            UI_SUMMARIES.error,
+            UI_ADMIN_ERROR_DETAILS.horarioEstadoChange
+          );
           this.store.setLoading(false);
         },
       });
@@ -288,7 +320,10 @@ export class HorariosFacade {
           }
 
           this.store.setLoading(false);
-          this.errorHandler.showSuccess('Éxito', 'Horario eliminado correctamente');
+          this.errorHandler.showSuccess(
+            UI_SUMMARIES.success,
+            UI_HORARIOS_SUCCESS_MESSAGES.deleted
+          );
         },
         error: (err) => {
           logger.error('Error al eliminar horario:', err);
@@ -319,7 +354,10 @@ export class HorariosFacade {
             this.loadDetalle(data.horarioId);
           }
 
-          this.errorHandler.showSuccess('Éxito', 'Profesor asignado correctamente');
+          this.errorHandler.showSuccess(
+            UI_SUMMARIES.success,
+            UI_HORARIOS_SUCCESS_MESSAGES.profesorAssigned
+          );
         },
         error: (err) => {
           logger.error('Error al asignar profesor:', err);
@@ -342,7 +380,10 @@ export class HorariosFacade {
         next: () => {
           // Refetch para obtener datos actualizados
           this.refreshItemsOnly();
-          this.errorHandler.showSuccess('Éxito', 'Estudiantes asignados correctamente');
+          this.errorHandler.showSuccess(
+            UI_SUMMARIES.success,
+            UI_HORARIOS_SUCCESS_MESSAGES.estudiantesAssigned
+          );
         },
         error: (err) => {
           logger.error('Error al asignar estudiantes:', err);
@@ -372,8 +413,8 @@ export class HorariosFacade {
           }
 
           this.errorHandler.showSuccess(
-            'Éxito',
-            'Todos los estudiantes del salón fueron asignados'
+            UI_SUMMARIES.success,
+            UI_HORARIOS_SUCCESS_MESSAGES.todosEstudiantesAssigned
           );
         },
         error: (err) => {
@@ -403,7 +444,7 @@ export class HorariosFacade {
   openEditDialog(id: number): void {
     const horario = this.store.horarios().find((h) => h.id === id);
     if (!horario) {
-      this.errorHandler.showError('Error', 'No se encontró el horario');
+      this.errorHandler.showError(UI_SUMMARIES.error, UI_ADMIN_ERROR_DETAILS.horarioNotFound);
       return;
     }
 
@@ -542,20 +583,29 @@ export class HorariosFacade {
    * Manejo centralizado de errores de API con mensajes específicos
    */
   private handleApiError(err: any, accion: string): void {
-    const mensaje = err?.error?.message || err?.message || 'Error desconocido';
+    const mensaje = err?.error?.message || err?.message || UI_GENERIC_MESSAGES.unknownError;
 
     // Detectar errores comunes
     if (mensaje.includes('conflicto') || mensaje.includes('overlap')) {
       this.errorHandler.showError(
-        'Conflicto de horario',
-        'Ya existe un horario que se superpone en el mismo salón'
+        UI_SUMMARIES.scheduleConflict,
+        UI_ADMIN_ERROR_DETAILS.horarioConflict
       );
     } else if (mensaje.includes('no encontrado') || mensaje.includes('not found')) {
-      this.errorHandler.showError('Error', `No se pudo ${accion}: registro no encontrado`);
+      this.errorHandler.showError(
+        UI_SUMMARIES.error,
+        UI_ADMIN_ERROR_DETAILS_DYNAMIC.horarioActionNotFound(accion)
+      );
     } else if (mensaje.includes('validación') || mensaje.includes('validation')) {
-      this.errorHandler.showError('Error de validación', `Datos inválidos: ${mensaje}`);
+      this.errorHandler.showError(
+        UI_SUMMARIES.validationError,
+        UI_ADMIN_ERROR_DETAILS_DYNAMIC.horarioValidation(mensaje)
+      );
     } else {
-      this.errorHandler.showError('Error', `No se pudo ${accion} el horario`);
+      this.errorHandler.showError(
+        UI_SUMMARIES.error,
+        UI_ADMIN_ERROR_DETAILS_DYNAMIC.horarioActionFailed(accion)
+      );
     }
   }
 }

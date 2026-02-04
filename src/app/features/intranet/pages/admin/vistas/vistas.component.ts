@@ -24,6 +24,11 @@ import { ToggleSwitch } from 'primeng/toggleswitch';
 import { logger } from '@core/helpers';
 import { ErrorHandlerService, PermisosService, Vista } from '@core/services';
 import { AdminUtilsService } from '@shared/services';
+import {
+	UI_ADMIN_ERROR_DETAILS,
+	UI_SUMMARIES,
+	buildDeleteVistaMessage,
+} from '@app/shared/constants';
 
 interface VistaForm {
 	ruta: string;
@@ -148,7 +153,10 @@ export class VistasComponent implements OnInit {
 				},
 				error: (err) => {
 					logger.error('Error al cargar vistas:', err);
-					this.errorHandler.showError('Error', 'No se pudieron cargar las vistas');
+					this.errorHandler.showError(
+						UI_SUMMARIES.error,
+						UI_ADMIN_ERROR_DETAILS.loadVistas,
+					);
 					this.loading.set(false);
 				},
 			});
@@ -218,14 +226,17 @@ export class VistasComponent implements OnInit {
 			},
 			error: (err) => {
 				logger.error('Error:', err);
-				this.errorHandler.showError('Error', 'No se pudo guardar la vista');
+				this.errorHandler.showError(
+					UI_SUMMARIES.error,
+					UI_ADMIN_ERROR_DETAILS.saveVista,
+				);
 				this.loading.set(false);
 			},
 		});
 	}
 
 	deleteVista(vista: Vista): void {
-		if (confirm(`¿Está seguro de eliminar la vista "${vista.nombre}"?`)) {
+		if (confirm(buildDeleteVistaMessage(vista.nombre))) {
 			this.loading.set(true);
 			this.permisosService
 				.eliminarVista(vista.id)
@@ -234,7 +245,10 @@ export class VistasComponent implements OnInit {
 					next: () => this.loadData(),
 					error: (err) => {
 						logger.error('Error al eliminar:', err);
-						this.errorHandler.showError('Error', 'No se pudo eliminar la vista');
+						this.errorHandler.showError(
+							UI_SUMMARIES.error,
+							UI_ADMIN_ERROR_DETAILS.deleteVista,
+						);
 						this.loading.set(false);
 					},
 				});
@@ -253,12 +267,15 @@ export class VistasComponent implements OnInit {
 			.pipe(takeUntilDestroyed(this.destroyRef))
 			.subscribe({
 				next: () => this.loadData(),
-				error: (err) => {
-					logger.error('Error al cambiar estado:', err);
-					this.errorHandler.showError('Error', 'No se pudo cambiar el estado');
-					this.loading.set(false);
-				},
-			});
+			error: (err) => {
+				logger.error('Error al cambiar estado:', err);
+				this.errorHandler.showError(
+					UI_SUMMARIES.error,
+					UI_ADMIN_ERROR_DETAILS.changeEstado,
+				);
+				this.loading.set(false);
+			},
+		});
 	}
 
 	// === UI Helpers ===

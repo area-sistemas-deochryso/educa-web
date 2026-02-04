@@ -50,7 +50,7 @@ export class AttendanceComponent {
 
 	// Verificar rol válido y redirigir si es inesperado
 	constructor() {
-		const validRoles = ['Apoderado', 'Profesor', 'Director', 'Estudiante'];
+		const validRoles = ['Apoderado', 'Profesor', 'Director', 'Asistente Administrativo', 'Estudiante'];
 		const currentRole = this.userRole();
 
 		if (currentRole && !validRoles.includes(currentRole)) {
@@ -61,11 +61,11 @@ export class AttendanceComponent {
 
 	// Header común
 	onModeChange(mode: ViewMode): void {
-		this.selectedMode.set(mode); // ✅ Actualizar el signal
+		this.selectedMode.set(mode);
 		const role = this.userRole();
 		if (role === 'Profesor') {
 			this.profesorComponent?.setViewMode(mode);
-		} else if (role === 'Director') {
+		} else if (role === 'Director' || role === 'Asistente Administrativo') {
 			this.directorComponent?.setViewMode(mode);
 		}
 	}
@@ -76,7 +76,7 @@ export class AttendanceComponent {
 			this.apoderadoComponent?.reload();
 		} else if (role === 'Profesor') {
 			this.profesorComponent?.reload();
-		} else if (role === 'Director') {
+		} else if (role === 'Director' || role === 'Asistente Administrativo') {
 			this.directorComponent?.reload();
 		} else if (role === 'Estudiante') {
 			this.estudianteComponent?.reload();

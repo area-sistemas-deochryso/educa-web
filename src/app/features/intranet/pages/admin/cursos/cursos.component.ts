@@ -27,6 +27,11 @@ import { ErrorHandlerService } from '@core/services';
 import { CursosService, Curso } from '@core/services/cursos';
 import { GradosService, Grado } from '@core/services/grados/grados.service';
 import { AdminUtilsService } from '@shared/services';
+import {
+	UI_ADMIN_ERROR_DETAILS,
+	UI_SUMMARIES,
+	buildDeleteCursoMessage,
+} from '@app/shared/constants';
 
 interface CursoForm {
 	nombre: string;
@@ -228,7 +233,10 @@ export class CursosComponent implements OnInit {
 				},
 				error: (err) => {
 					logger.error('Error al cargar cursos:', err);
-					this.errorHandler.showError('Error', 'No se pudieron cargar los cursos');
+					this.errorHandler.showError(
+						UI_SUMMARIES.error,
+						UI_ADMIN_ERROR_DETAILS.loadCursos,
+					);
 					this.loading.set(false);
 				},
 			});
@@ -244,7 +252,10 @@ export class CursosComponent implements OnInit {
 				},
 				error: (err) => {
 					logger.error('Error al cargar grados:', err);
-					this.errorHandler.showError('Error', 'No se pudieron cargar los grados');
+					this.errorHandler.showError(
+						UI_SUMMARIES.error,
+						UI_ADMIN_ERROR_DETAILS.loadGrados,
+					);
 				},
 			});
 	}
@@ -367,14 +378,17 @@ export class CursosComponent implements OnInit {
 			},
 			error: (err) => {
 				logger.error('Error:', err);
-				this.errorHandler.showError('Error', 'No se pudo guardar el curso');
+				this.errorHandler.showError(
+					UI_SUMMARIES.error,
+					UI_ADMIN_ERROR_DETAILS.saveCurso,
+				);
 				this.loading.set(false);
 			},
 		});
 	}
 
 	deleteCurso(curso: Curso): void {
-		if (confirm(`¿Está seguro de eliminar el curso "${curso.nombre}"?`)) {
+		if (confirm(buildDeleteCursoMessage(curso.nombre))) {
 			this.loading.set(true);
 			this.cursosService
 				.eliminarCurso(curso.id)
@@ -383,7 +397,10 @@ export class CursosComponent implements OnInit {
 					next: () => this.loadData(),
 					error: (err) => {
 						logger.error('Error al eliminar:', err);
-						this.errorHandler.showError('Error', 'No se pudo eliminar el curso');
+						this.errorHandler.showError(
+							UI_SUMMARIES.error,
+							UI_ADMIN_ERROR_DETAILS.deleteCurso,
+						);
 						this.loading.set(false);
 					},
 				});
@@ -402,12 +419,15 @@ export class CursosComponent implements OnInit {
 			.pipe(takeUntilDestroyed(this.destroyRef))
 			.subscribe({
 				next: () => this.loadData(),
-				error: (err) => {
-					logger.error('Error al cambiar estado:', err);
-					this.errorHandler.showError('Error', 'No se pudo cambiar el estado');
-					this.loading.set(false);
-				},
-			});
+			error: (err) => {
+				logger.error('Error al cambiar estado:', err);
+				this.errorHandler.showError(
+					UI_SUMMARIES.error,
+					UI_ADMIN_ERROR_DETAILS.changeEstado,
+				);
+				this.loading.set(false);
+			},
+		});
 	}
 
 	// ============ UI Helpers ============

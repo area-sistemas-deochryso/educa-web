@@ -1,9 +1,3 @@
-import { HttpClient, HttpErrorResponse } from '@angular/common/http';
-import { inject, Injectable } from '@angular/core';
-import { BehaviorSubject, Observable, catchError, forkJoin, map, of, tap } from 'rxjs';
-
-import { environment } from '@env/environment';
-
 import {
 	AuthUser,
 	LoginRequest,
@@ -12,7 +6,13 @@ import {
 	UserRole,
 	VerifyTokenResponse,
 } from './auth.models';
+import { BehaviorSubject, Observable, catchError, forkJoin, map, of, tap } from 'rxjs';
+import { HttpClient, HttpErrorResponse } from '@angular/common/http';
+import { Injectable, inject } from '@angular/core';
+
 import { StorageService } from '../storage';
+import { environment } from '@env/environment';
+import { UI_AUTH_MESSAGES } from '@app/shared/constants';
 
 @Injectable({
 	providedIn: 'root',
@@ -81,7 +81,7 @@ export class AuthService {
 				nombreCompleto: '',
 				entityId: 0,
 				sedeId: 0,
-				mensaje: 'Demasiados intentos fallidos. Intente más tarde.',
+				mensaje: UI_AUTH_MESSAGES.loginTooManyAttempts,
 			});
 		}
 
@@ -107,7 +107,7 @@ export class AuthService {
 					nombreCompleto: '',
 					entityId: 0,
 					sedeId: 0,
-					mensaje: error.error?.mensaje || 'Error al iniciar sesión',
+					mensaje: error.error?.mensaje || UI_AUTH_MESSAGES.loginError,
 				});
 			}),
 		);
@@ -207,7 +207,7 @@ export class AuthService {
 	}
 
 	/**
-	 * Verifica TODOS los tokens persistentes guardados para autocompletado
+	 * Verifica los tokens persistentes guardados para autocompletado
 	 * Retorna un array con la información de cada usuario verificado
 	 */
 	verifyAllStoredTokens(): Observable<VerifyTokenResponse[]> {

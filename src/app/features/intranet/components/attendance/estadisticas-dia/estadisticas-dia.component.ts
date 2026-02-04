@@ -1,9 +1,9 @@
-import { ChangeDetectionStrategy, Component, input, output, ViewChild } from '@angular/core';
+import { ChangeDetectionStrategy, Component, ViewChild, input, output } from '@angular/core';
 import { DatePipe, DecimalPipe } from '@angular/common';
+import { Menu, MenuModule } from 'primeng/menu';
 
 import { ButtonModule } from 'primeng/button';
 import { EstadisticasDia } from '@core/services';
-import { Menu, MenuModule } from 'primeng/menu';
 import { MenuItem } from 'primeng/api';
 import { TooltipModule } from 'primeng/tooltip';
 
@@ -16,7 +16,7 @@ import { TooltipModule } from 'primeng/tooltip';
 	standalone: true,
 	imports: [DatePipe, DecimalPipe, ButtonModule, TooltipModule, MenuModule],
 	changeDetection: ChangeDetectionStrategy.OnPush,
-	templateUrl: './estadisticas-dia.componente.html',
+	templateUrl: './estadisticas-dia.component.html',
 	styleUrls: ['./estadisticas-dia.component.scss'],
 })
 export class EstadisticasDiaComponent {

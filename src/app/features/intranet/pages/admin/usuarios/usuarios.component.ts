@@ -19,6 +19,11 @@ import {
 	UsuarioFormData,
 	UsuarioFormDialogComponent,
 } from './components/usuario-form-dialog/usuario-form-dialog.component';
+import {
+	UI_CONFIRM_HEADERS,
+	UI_CONFIRM_LABELS,
+	buildToggleUsuarioMessage,
+} from '@app/shared/constants';
 
 @Component({
 	selector: 'app-usuarios',
@@ -112,15 +117,17 @@ export class UsuariosComponent implements OnInit, AfterViewInit {
 	}
 
 	onToggleEstado(usuario: UsuarioLista): void {
-		const header = usuario.estado ? 'Desactivar Usuario' : 'Activar Usuario';
+		const header = usuario.estado
+			? UI_CONFIRM_HEADERS.deactivateUser
+			: UI_CONFIRM_HEADERS.activateUser;
 		this.facade.openConfirmDialog();
 
 		this.confirmationService.confirm({
-			message: `¿Está seguro de ${usuario.estado ? 'desactivar' : 'activar'} al usuario "${usuario.nombreCompleto}"?`,
+			message: buildToggleUsuarioMessage(usuario.nombreCompleto, usuario.estado),
 			header,
 			icon: 'pi pi-question-circle',
-			acceptLabel: 'Sí',
-			rejectLabel: 'Cancelar',
+			acceptLabel: UI_CONFIRM_LABELS.yes,
+			rejectLabel: UI_CONFIRM_LABELS.cancel,
 			acceptButtonStyleClass: usuario.estado ? 'p-button-warning' : 'p-button-success',
 			accept: () => {
 				this.facade.toggleEstado(usuario);

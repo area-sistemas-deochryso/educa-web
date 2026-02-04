@@ -3,6 +3,7 @@ import { AuthService, ErrorHandlerService, UserPermisosService } from '@core/ser
 
 import { inject } from '@angular/core';
 import { logger } from '@core/helpers';
+import { UI_ACCESS_DENIED_MESSAGE, UI_SUMMARIES } from '@app/shared/constants';
 
 /**
  * Guard que verifica si el usuario tiene permiso para acceder a una ruta
@@ -52,8 +53,8 @@ export const permisosGuard: CanActivateFn = async (route: ActivatedRouteSnapshot
 			'- Redirigiendo a /intranet',
 		);
 		errorHandler.showWarning(
-			'Acceso denegado',
-			'No cuenta con los permisos suficientes para acceder a esta vista.',
+			UI_SUMMARIES.accessDenied,
+			UI_ACCESS_DENIED_MESSAGE,
 		);
 		return router.createUrlTree(['/intranet']);
 	}

@@ -10,6 +10,7 @@ import {
 	UsuarioBusqueda,
 	ErrorHandlerService,
 } from '@core/services';
+import { UI_ADMIN_ERROR_DETAILS, UI_SUMMARIES } from '@app/shared/constants';
 import { AdminUtilsService } from '@shared/services';
 import { PermisosUsuariosStore } from './permisos-usuarios.store';
 import { PermisosUsuariosHelperService } from './permisos-usuarios-helper.service';
@@ -91,7 +92,10 @@ export class PermisosUsuariosFacade {
 				},
 				error: (err) => {
 					logger.error('Error al cargar datos:', err);
-					this.errorHandler.showError('Error', 'No se pudieron cargar los permisos');
+					this.errorHandler.showError(
+						UI_SUMMARIES.error,
+						UI_ADMIN_ERROR_DETAILS.loadPermisos,
+					);
 					this.store.setLoading(false);
 				},
 			});
@@ -187,7 +191,10 @@ export class PermisosUsuariosFacade {
 			},
 			error: (err) => {
 				logger.error('Error:', err);
-				this.errorHandler.showError('Error', 'No se pudo guardar el permiso');
+				this.errorHandler.showError(
+					UI_SUMMARIES.error,
+					UI_ADMIN_ERROR_DETAILS.savePermiso,
+				);
 				this.store.setLoading(false);
 			},
 		});
@@ -200,12 +207,15 @@ export class PermisosUsuariosFacade {
 			.pipe(takeUntilDestroyed(this.destroyRef))
 			.subscribe({
 				next: () => this.loadData(),
-				error: (err) => {
-					logger.error('Error al eliminar:', err);
-					this.errorHandler.showError('Error', 'No se pudo eliminar el permiso');
-					this.store.setLoading(false);
-				},
-			});
+			error: (err) => {
+				logger.error('Error al eliminar:', err);
+				this.errorHandler.showError(
+					UI_SUMMARIES.error,
+					UI_ADMIN_ERROR_DETAILS.deletePermiso,
+				);
+				this.store.setLoading(false);
+			},
+		});
 	}
 
 	// === Rol & Vistas Loading ===

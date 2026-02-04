@@ -21,6 +21,13 @@ import { Tab, TabList, TabPanel, Tabs } from 'primeng/tabs';
 import { TagModule } from 'primeng/tag';
 import { TooltipModule } from 'primeng/tooltip';
 import { logger } from '@core/helpers';
+import {
+	UI_CONFIRM_HEADERS,
+	UI_CONFIRM_LABELS,
+	UI_HORARIOS_CONFIRM_MESSAGES,
+	buildDeleteHorarioMessage,
+	buildToggleHorarioMessage,
+} from '@app/shared/constants';
 
 @Component({
 	selector: 'app-horarios',
@@ -88,14 +95,16 @@ export class HorariosComponent implements OnInit {
 
 	onToggleEstado(id: number, estadoActual: boolean): void {
 		const accion = estadoActual ? 'desactivar' : 'activar';
-		const header = estadoActual ? 'Desactivar Horario' : 'Activar Horario';
+		const header = estadoActual
+			? UI_CONFIRM_HEADERS.deactivateHorario
+			: UI_CONFIRM_HEADERS.activateHorario;
 
 		this.confirmationService.confirm({
-			message: `¿Está seguro de ${accion} este horario?`,
+			message: buildToggleHorarioMessage(accion),
 			header,
 			icon: 'pi pi-exclamation-triangle',
-			acceptLabel: 'Sí',
-			rejectLabel: 'No',
+			acceptLabel: UI_CONFIRM_LABELS.yes,
+			rejectLabel: UI_CONFIRM_LABELS.no,
 			accept: () => {
 				this.facade.toggleEstado(id, estadoActual);
 			},
@@ -107,11 +116,16 @@ export class HorariosComponent implements OnInit {
 		if (!horario) return;
 
 		this.confirmationService.confirm({
-			message: `¿Está seguro de eliminar el horario de ${horario.cursoNombre} (${horario.diaSemanaDescripcion} ${horario.horaInicio}-${horario.horaFin})?`,
-			header: 'Confirmar Eliminación',
+			message: buildDeleteHorarioMessage(
+				horario.cursoNombre,
+				horario.diaSemanaDescripcion,
+				horario.horaInicio,
+				horario.horaFin,
+			),
+			header: UI_CONFIRM_HEADERS.delete,
 			icon: 'pi pi-exclamation-triangle',
-			acceptLabel: 'Sí, eliminar',
-			rejectLabel: 'Cancelar',
+			acceptLabel: UI_CONFIRM_LABELS.yesDelete,
+			rejectLabel: UI_CONFIRM_LABELS.cancel,
 			acceptButtonStyleClass: 'p-button-danger',
 			accept: () => {
 				this.facade.delete(id);
@@ -209,11 +223,11 @@ export class HorariosComponent implements OnInit {
 		if (!currentUser) return;
 
 		this.confirmationService.confirm({
-			message: '¿Asignar todos los estudiantes del salón a este horario?',
-			header: 'Confirmar Asignación',
+			message: UI_HORARIOS_CONFIRM_MESSAGES.assignAllEstudiantes,
+			header: UI_CONFIRM_HEADERS.assign,
 			icon: 'pi pi-question-circle',
-			acceptLabel: 'Sí, asignar todos',
-			rejectLabel: 'Cancelar',
+			acceptLabel: UI_CONFIRM_LABELS.yesAssignAll,
+			rejectLabel: UI_CONFIRM_LABELS.cancel,
 			accept: () => {
 				this.facade.asignarTodosEstudiantes(
 					horarioId,

@@ -1,11 +1,12 @@
-import { Injectable, inject, PLATFORM_ID, OnDestroy, signal } from '@angular/core';
-import { isPlatformBrowser } from '@angular/common';
 import {
-	KEYBOARD_SHORTCUTS,
 	CATEGORY_LABELS,
+	KEYBOARD_SHORTCUTS,
 	KeyboardShortcut,
 	ShortcutCategory,
 } from './keyboard-shortcuts.config';
+import { Injectable, OnDestroy, PLATFORM_ID, inject, signal } from '@angular/core';
+
+import { isPlatformBrowser } from '@angular/common';
 import { logger } from '@core/helpers';
 
 type ShortcutHandler = () => void;
@@ -18,7 +19,7 @@ export class KeyboardShortcutsService implements OnDestroy {
 	private handlers = new Map<string, ShortcutHandler>();
 	private boundKeydownHandler: ((event: KeyboardEvent) => void) | null = null;
 
-	/** Todos los atajos registrados */
+	/** Atajos registrados */
 	readonly shortcuts = KEYBOARD_SHORTCUTS;
 
 	/** Etiquetas de categorías */

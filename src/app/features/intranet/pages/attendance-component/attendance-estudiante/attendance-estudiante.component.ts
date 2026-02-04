@@ -1,4 +1,4 @@
-import { AsistenciaService, StorageService } from '@core/services';
+import { AsistenciaService } from '@core/services';
 import { Component, DestroyRef, OnInit, computed, inject, signal } from '@angular/core';
 
 import { AttendanceDataService } from '../../../services/attendance/attendance-data.service';
@@ -18,7 +18,6 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 })
 export class AttendanceEstudianteComponent implements OnInit {
 	private asistenciaService = inject(AsistenciaService);
-	private storageService = inject(StorageService);
 	private attendanceDataService = inject(AttendanceDataService);
 	private authStore = inject(AuthStore);
 	private destroyRef = inject(DestroyRef);
@@ -41,11 +40,9 @@ export class AttendanceEstudianteComponent implements OnInit {
 	}
 
 	private loadAsistencias(): void {
-		// Restaurar mes guardado o usar mes actual
-		const savedMonthData = this.storageService.getAttendanceMonth();
 		const now = new Date();
-		const currentMonth = savedMonthData?.month ?? now.getMonth() + 1;
-		const currentYear = savedMonthData?.year ?? now.getFullYear();
+		const currentMonth = now.getMonth() + 1;
+		const currentYear = now.getFullYear();
 
 		this.loading.set(true);
 
@@ -76,9 +73,6 @@ export class AttendanceEstudianteComponent implements OnInit {
 
 	onIngresosMonthChange(month: number): void {
 		const currentYear = this.ingresos().selectedYear;
-
-		// Guardar mes seleccionado
-		this.storageService.setAttendanceMonth({ month, year: currentYear });
 
 		this.loading.set(true);
 
@@ -112,9 +106,6 @@ export class AttendanceEstudianteComponent implements OnInit {
 
 	onSalidasMonthChange(month: number): void {
 		const currentYear = this.salidas().selectedYear;
-
-		// Guardar mes seleccionado
-		this.storageService.setAttendanceMonth({ month, year: currentYear });
 
 		this.loading.set(true);
 

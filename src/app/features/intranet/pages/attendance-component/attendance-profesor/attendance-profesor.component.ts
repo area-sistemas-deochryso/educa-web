@@ -1,33 +1,25 @@
-import {
-	AsistenciaService,
-	EstudianteAsistencia,
-	HijoApoderado,
-	SalonProfesor,
-	StorageService,
-	UserProfileService,
-} from '@core/services';
+import { AsistenciaService, SalonProfesor, StorageService, UserProfileService } from '@core/services';
 import { Component, DestroyRef, OnInit, ViewChild, computed, inject, signal } from '@angular/core';
 
 import { AsistenciaDiaListComponent } from '../../../components/attendance/asistencia-dia-list/asistencia-dia-list.component';
-import { AttendanceDataService } from '../../../services/attendance/attendance-data.service';
 import { AttendanceLegendComponent } from '@app/features/intranet/components/attendance/attendance-legend/attendance-legend.component';
-import { AttendanceTable } from '../models/attendance.types';
 import { AttendanceTableComponent } from '../../../components/attendance/attendance-table/attendance-table.component';
 import { AttendanceTableSkeletonComponent } from '../../../components/attendance/attendance-table-skeleton/attendance-table-skeleton.component';
+import { AttendanceViewController, SelectorContext } from '../../../services/attendance/attendance-view.service';
+import { ViewMode } from '../../../components/attendance/attendance-header/attendance-header.component';
 import { ButtonModule } from 'primeng/button';
 import { DatePipe } from '@angular/common';
 import { EmptyStateComponent } from '../../../components/attendance/empty-state/empty-state.component';
 import { Menu, MenuModule } from 'primeng/menu';
-import { MenuItem } from 'primeng/api';
 import { SalonSelectorComponent } from '../../../components/attendance/salon-selector/salon-selector.component';
 import { TooltipModule } from 'primeng/tooltip';
-import { ViewMode } from '../../../components/attendance/attendance-header/attendance-header.component';
 import { finalize } from 'rxjs';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
 /**
  * Componente Container para vista de asistencias de Profesores.
- * Maneja salones, estudiantes y modo día/mes.
+ * Maneja la selección de salón; la lógica compartida (estudiantes,
+ * modo día/mes, tablas y PDF) vive en AttendanceViewController.
  */
 @Component({
 	selector: 'app-attendance-profesor',
@@ -44,6 +36,7 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 		MenuModule,
 		DatePipe,
 	],
+	providers: [AttendanceViewController],
 	templateUrl: './attendance-profesor.component.html',
 	styleUrl: './attendance-profesor.component.scss',
 })
@@ -52,24 +45,16 @@ export class AttendanceProfesorComponent implements OnInit {
 
 	private asistenciaService = inject(AsistenciaService);
 	private storage = inject(StorageService);
-	private attendanceDataService = inject(AttendanceDataService);
-	private userProfile = inject(UserProfileService);
 	private destroyRef = inject(DestroyRef);
+	readonly view = inject(AttendanceViewController);
+	readonly nombreProfesor = inject(UserProfileService).userName;
 
-	// Estado
-	readonly loading = signal(false);
-	readonly nombreProfesor = this.userProfile.userName;
-	readonly downloadingPdf = signal(false);
+	// ============ Salones ============
 
-	// Progressive Rendering flags
-	readonly showSkeletons = signal(true);
-	readonly tableReady = signal(false);
-
-	// Salones
 	private readonly allSalones = signal<SalonProfesor[]>([]);
 	readonly salones = computed(() => {
 		const all = this.allSalones();
-		const month = this.ingresos().selectedMonth;
+		const month = this.view.ingresos().selectedMonth;
 		const isVerano = month === 1 || month === 2;
 		return all.filter((s) =>
 			isVerano
@@ -83,89 +68,24 @@ export class AttendanceProfesorComponent implements OnInit {
 		return this.salones().find((s) => s.salonId === id) || null;
 	});
 
-	// Estudiantes (modo mes)
-	readonly estudiantes = signal<EstudianteAsistencia[]>([]);
-	readonly selectedEstudianteId = signal<number | null>(null);
-	readonly selectedEstudiante = computed(() => {
-		const id = this.selectedEstudianteId();
-		return this.estudiantes().find((e) => e.estudianteId === id) || null;
-	});
-
-	// Transformar estudiantes a HijoApoderado para reusar selector
-	readonly estudiantesAsHijos = computed<HijoApoderado[]>(() => {
-		return this.estudiantes().map((e) => ({
-			estudianteId: e.estudianteId,
-			dni: e.dni,
-			nombreCompleto: e.nombreCompleto,
-			grado: e.grado,
-			seccion: e.seccion,
-			relacion: 'Estudiante',
-		}));
-	});
-
-	// Modo día/mes
-	readonly viewMode = signal<ViewMode>('dia');
-	readonly fechaDia = signal<Date>(new Date());
-	readonly estudiantesDia = signal<EstudianteAsistencia[]>([]);
-
-	// PDF - fecha calculada dinámicamente según el modo y fecha seleccionada
-	readonly pdfFecha = computed(() => {
-		return this.viewMode() === 'dia' ? this.fechaDia() : new Date();
-	});
-
-	readonly pdfMenuItems: MenuItem[] = [
-		{
-			label: 'Ver PDF',
-			icon: 'pi pi-eye',
-			command: () => this.verPdfAsistenciaDia(),
-		},
-		{
-			label: 'Descargar PDF',
-			icon: 'pi pi-download',
-			command: () => this.descargarPdfAsistenciaDia(),
-		},
-	];
-
-	// Tablas de asistencia
-	readonly ingresos = signal<AttendanceTable>(
-		this.attendanceDataService.createEmptyTable('Ingresos'),
-	);
-	readonly salidas = signal<AttendanceTable>(
-		this.attendanceDataService.createEmptyTable('Salidas'),
-	);
-
 	ngOnInit(): void {
-		this.restoreSelectedMonth();
+		this.view.init({
+			loadEstudiantes: (gradoCodigo, seccion, mes, anio) =>
+				this.asistenciaService.getAsistenciasGrado(gradoCodigo, seccion, mes, anio),
+			loadDia: (gradoCodigo, seccion, fecha) =>
+				this.asistenciaService.getAsistenciaDia(gradoCodigo, seccion, fecha),
+			getSelectorContext: () => this.getSelectorContext(),
+			onMonthChange: () => this.reselectSalonIfNeeded(),
+			getStoredEstudianteId: () => this.storage.getSelectedEstudianteId(),
+			setStoredEstudianteId: (id) => this.storage.setSelectedEstudianteId(id),
+		});
 		this.loadSalones();
 	}
 
-	private restoreSelectedMonth(): void {
-		const data = this.storage.getAttendanceMonth();
-		if (data) {
-			this.ingresos.update((table) => ({
-				...table,
-				selectedMonth: data.month,
-				selectedYear: data.year,
-			}));
-			this.salidas.update((table) => ({
-				...table,
-				selectedMonth: data.month,
-				selectedYear: data.year,
-			}));
-		}
-	}
-
-	private saveSelectedMonth(): void {
-		this.storage.setAttendanceMonth({
-			month: this.ingresos().selectedMonth,
-			year: this.ingresos().selectedYear,
-		});
-	}
-
-	// === SALONES ===
+	// ============ Carga y selección de salón ============
 
 	private loadSalones(): void {
-		this.loading.set(true);
+		this.view.loading.set(true);
 
 		this.asistenciaService
 			.getSalonesProfesor()
@@ -173,7 +93,7 @@ export class AttendanceProfesorComponent implements OnInit {
 				takeUntilDestroyed(this.destroyRef),
 				finalize(() => {
 					if (this.salones().length === 0) {
-						this.loading.set(false);
+						this.view.loading.set(false);
 					}
 				}),
 			)
@@ -182,16 +102,11 @@ export class AttendanceProfesorComponent implements OnInit {
 					this.allSalones.set(salones);
 					if (this.salones().length > 0) {
 						this.restoreSelectedSalon();
-						// Cargar datos según el modo actual
-						if (this.viewMode() === 'dia') {
-							this.loadAsistenciaDia();
-						} else {
-							this.loadEstudiantesSalon();
-						}
+						this.view.reload();
 					}
 				},
 				error: () => {
-					this.loading.set(false);
+					this.view.loading.set(false);
 				},
 			});
 	}
@@ -201,12 +116,7 @@ export class AttendanceProfesorComponent implements OnInit {
 
 		this.selectedSalonId.set(salonId);
 		this.saveSelectedSalon();
-		// Cargar datos según el modo actual
-		if (this.viewMode() === 'dia') {
-			this.loadAsistenciaDia();
-		} else {
-			this.loadEstudiantesSalon();
-		}
+		this.view.reload();
 	}
 
 	private restoreSelectedSalon(): void {
@@ -241,293 +151,27 @@ export class AttendanceProfesorComponent implements OnInit {
 		}
 	}
 
-	// === ESTUDIANTES (MODO MES) ===
-
-	private loadEstudiantesSalon(): void {
-		const salon = this.selectedSalon();
-		if (!salon) {
-			this.loading.set(false);
-			return;
-		}
-
-		this.loading.set(true);
-		const { selectedMonth, selectedYear } = this.ingresos();
-
-		this.asistenciaService
-			.getAsistenciasGrado(salon.gradoCodigo, salon.seccion, selectedMonth, selectedYear)
-			.pipe(
-				takeUntilDestroyed(this.destroyRef),
-				finalize(() => {
-					if (this.estudiantes().length === 0) {
-						this.loading.set(false);
-					}
-				}),
-			)
-			.subscribe({
-				next: (estudiantes) => {
-					this.estudiantes.set(estudiantes);
-					if (estudiantes.length > 0) {
-						this.restoreSelectedEstudiante();
-						this.loadEstudianteAsistencias();
-					}
-				},
-				error: () => {
-					this.loading.set(false);
-				},
-			});
-	}
-
-	selectEstudiante(estudianteId: number): void {
-		if (this.selectedEstudianteId() === estudianteId) return;
-
-		this.selectedEstudianteId.set(estudianteId);
-		this.saveSelectedEstudiante();
-		this.loadEstudianteAsistencias();
-	}
-
-	private restoreSelectedEstudiante(): void {
-		const estudianteId = this.storage.getSelectedEstudianteId();
-		if (
-			estudianteId !== null &&
-			this.estudiantes().some((e) => e.estudianteId === estudianteId)
-		) {
-			this.selectedEstudianteId.set(estudianteId);
-			return;
-		}
-		const firstEstudiante = this.estudiantes()[0];
-		if (firstEstudiante) {
-			this.selectedEstudianteId.set(firstEstudiante.estudianteId);
-		}
-	}
-
-	private saveSelectedEstudiante(): void {
-		const id = this.selectedEstudianteId();
-		if (id) {
-			this.storage.setSelectedEstudianteId(id);
-		}
-	}
-
-	private loadEstudianteAsistencias(): void {
-		const estudiante = this.selectedEstudiante();
-		if (!estudiante) {
-			this.loading.set(false);
-			this.tableReady.set(true);
-			return;
-		}
-
-		const { selectedMonth, selectedYear } = this.ingresos();
-
-		const tables = this.attendanceDataService.processAsistencias(
-			estudiante.asistencias,
-			selectedMonth,
-			selectedYear,
-			estudiante.nombreCompleto,
-		);
-		this.ingresos.set(tables.ingresos);
-		this.salidas.set(tables.salidas);
-		this.loading.set(false);
-		this.tableReady.set(true);
-	}
-
-	onIngresosMonthChange(month: number): void {
-		this.ingresos.update((table) => ({ ...table, selectedMonth: month }));
-		this.saveSelectedMonth();
-		this.reselectSalonIfNeeded();
-		this.reloadEstudianteIngresos();
-	}
-
-	onSalidasMonthChange(month: number): void {
-		this.salidas.update((table) => ({ ...table, selectedMonth: month }));
-		this.saveSelectedMonth();
-		this.reselectSalonIfNeeded();
-		this.reloadEstudianteSalidas();
-	}
-
-	private reloadEstudianteIngresos(): void {
-		const salon = this.selectedSalon();
-		if (!salon) return;
-
-		const { selectedMonth, selectedYear } = this.ingresos();
-
-		this.asistenciaService
-			.getAsistenciasGrado(salon.gradoCodigo, salon.seccion, selectedMonth, selectedYear)
-			.pipe(takeUntilDestroyed(this.destroyRef))
-			.subscribe({
-				next: (estudiantes) => {
-					this.estudiantes.set(estudiantes);
-					const estudiante = estudiantes.find(
-						(e) => e.estudianteId === this.selectedEstudianteId(),
-					);
-					if (estudiante) {
-						const tables = this.attendanceDataService.processAsistencias(
-							estudiante.asistencias,
-							selectedMonth,
-							selectedYear,
-							estudiante.nombreCompleto,
-						);
-						this.ingresos.set(tables.ingresos);
-					}
-				},
-			});
-	}
-
-	private reloadEstudianteSalidas(): void {
-		const salon = this.selectedSalon();
-		if (!salon) return;
-
-		const { selectedMonth, selectedYear } = this.salidas();
-
-		this.asistenciaService
-			.getAsistenciasGrado(salon.gradoCodigo, salon.seccion, selectedMonth, selectedYear)
-			.pipe(takeUntilDestroyed(this.destroyRef))
-			.subscribe({
-				next: (estudiantes) => {
-					const estudiante = estudiantes.find(
-						(e) => e.estudianteId === this.selectedEstudianteId(),
-					);
-					if (estudiante) {
-						const tables = this.attendanceDataService.processAsistencias(
-							estudiante.asistencias,
-							selectedMonth,
-							selectedYear,
-							estudiante.nombreCompleto,
-						);
-						this.salidas.set(tables.salidas);
-					}
-				},
-			});
-	}
-
-	// === MODO DÍA ===
+	// ============ Delegados al servicio (llamados por el padre via @ViewChild) ============
 
 	setViewMode(mode: ViewMode): void {
-		if (this.viewMode() === mode) return;
-		this.viewMode.set(mode);
-
-		if (mode === 'dia') {
-			this.loadAsistenciaDia();
-		} else {
-			this.loadEstudiantesSalon();
-		}
+		this.view.setViewMode(mode);
 	}
 
-	onFechaDiaChange(fecha: Date): void {
-		this.fechaDia.set(fecha);
-		this.loadAsistenciaDia();
+	reload(): void {
+		this.view.reload();
 	}
 
-	private loadAsistenciaDia(): void {
-		const salon = this.selectedSalon();
-		if (!salon) {
-			this.loading.set(false);
-			return;
-		}
-
-		this.loading.set(true);
-
-		this.asistenciaService
-			.getAsistenciaDia(salon.gradoCodigo, salon.seccion, this.fechaDia())
-			.pipe(
-				takeUntilDestroyed(this.destroyRef),
-				finalize(() => this.loading.set(false)),
-			)
-			.subscribe({
-				next: (estudiantes) => {
-					this.estudiantesDia.set(estudiantes);
-				},
-			});
-	}
-
-	selectSalonDia(salonId: number): void {
-		if (this.selectedSalonId() === salonId) return;
-
-		this.selectedSalonId.set(salonId);
-		this.saveSelectedSalon();
-		this.loadAsistenciaDia();
-	}
-
-	// === PDF ===
+	// ============ PDF menu ============
 
 	togglePdfMenu(event: Event): void {
 		this.pdfMenu.toggle(event);
 	}
 
-	/**
-	 * Ver PDF en nueva pestaña
-	 * - Abre el PDF en el visor del navegador
-	 * - El usuario puede navegar por el PDF con los controles del navegador
-	 * - Nota: El nombre al descargar desde el visor será un hash (limitación del navegador)
-	 */
-	verPdfAsistenciaDia(): void {
+	// ============ Helpers privados ============
+
+	private getSelectorContext(): SelectorContext | null {
 		const salon = this.selectedSalon();
-		if (!salon) return;
-
-		this.downloadingPdf.set(true);
-
-		this.asistenciaService
-			.descargarPdfAsistenciaDia(salon.gradoCodigo, salon.seccion, this.pdfFecha())
-			.pipe(
-				takeUntilDestroyed(this.destroyRef),
-				finalize(() => this.downloadingPdf.set(false)),
-			)
-			.subscribe({
-				next: (blob) => {
-					// Crear URL del blob y abrir en nueva pestaña para visualización
-					const url = window.URL.createObjectURL(blob);
-					window.open(url, '_blank');
-
-					// Cleanup después de que la ventana se abra
-					setTimeout(() => window.URL.revokeObjectURL(url), 100);
-				},
-			});
-	}
-
-	/**
-	 * Descargar PDF directamente
-	 * - Descarga el archivo con el nombre correcto
-	 * - No abre nueva ventana, solo descarga
-	 */
-	descargarPdfAsistenciaDia(): void {
-		const salon = this.selectedSalon();
-		if (!salon) return;
-
-		this.downloadingPdf.set(true);
-
-		this.asistenciaService
-			.descargarPdfAsistenciaDia(salon.gradoCodigo, salon.seccion, this.pdfFecha())
-			.pipe(
-				takeUntilDestroyed(this.destroyRef),
-				finalize(() => this.downloadingPdf.set(false)),
-			)
-			.subscribe({
-				next: (blob) => {
-					// Crear URL del blob
-					const url = window.URL.createObjectURL(blob);
-
-					// Crear elemento <a> para forzar descarga con nombre correcto
-					const a = document.createElement('a');
-					a.href = url;
-					const fechaStr = this.pdfFecha().toISOString().split('T')[0];
-					a.download = `Asistencia_${salon.grado}_${salon.seccion}_${fechaStr}.pdf`;
-
-					// Trigger descarga
-					document.body.appendChild(a);
-					a.click();
-
-					// Cleanup
-					document.body.removeChild(a);
-					window.URL.revokeObjectURL(url);
-				},
-			});
-	}
-
-	// === RELOAD ===
-
-	reload(): void {
-		if (this.viewMode() === 'dia') {
-			this.loadAsistenciaDia();
-		} else {
-			this.loadEstudiantesSalon();
-		}
+		if (!salon) return null;
+		return { grado: salon.grado, gradoCodigo: salon.gradoCodigo, seccion: salon.seccion };
 	}
 }

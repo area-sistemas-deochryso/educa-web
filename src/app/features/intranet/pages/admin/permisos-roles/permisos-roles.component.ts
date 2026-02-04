@@ -33,6 +33,11 @@ import {
 	RolTipoAdmin,
 	ErrorHandlerService,
 } from '@core/services';
+import {
+	UI_ADMIN_ERROR_DETAILS,
+	UI_SUMMARIES,
+	buildDeletePermisoRolMessage,
+} from '@app/shared/constants';
 import { AdminUtilsService } from '@shared/services';
 
 interface ModuloVistas {
@@ -150,7 +155,10 @@ export class PermisosRolesComponent implements OnInit {
 				},
 				error: (err) => {
 					logger.error('Error al cargar datos:', err);
-					this.errorHandler.showError('Error', 'No se pudieron cargar los permisos');
+					this.errorHandler.showError(
+						UI_SUMMARIES.error,
+						UI_ADMIN_ERROR_DETAILS.loadPermisos,
+					);
 					this.loading.set(false);
 				},
 			});
@@ -238,14 +246,17 @@ export class PermisosRolesComponent implements OnInit {
 			},
 			error: (err) => {
 				logger.error('Error:', err);
-				this.errorHandler.showError('Error', 'No se pudo guardar el permiso');
+				this.errorHandler.showError(
+					UI_SUMMARIES.error,
+					UI_ADMIN_ERROR_DETAILS.savePermiso,
+				);
 				this.loading.set(false);
 			},
 		});
 	}
 
 	deletePermiso(permiso: PermisoRol): void {
-		if (confirm(`¿Está seguro de eliminar los permisos del rol "${permiso.rol}"?`)) {
+		if (confirm(buildDeletePermisoRolMessage(permiso.rol))) {
 			this.loading.set(true);
 			this.permisosService
 				.eliminarPermisoRol(permiso.id)
@@ -254,7 +265,10 @@ export class PermisosRolesComponent implements OnInit {
 					next: () => this.loadData(),
 					error: (err) => {
 						logger.error('Error al eliminar:', err);
-						this.errorHandler.showError('Error', 'No se pudo eliminar el permiso');
+						this.errorHandler.showError(
+							UI_SUMMARIES.error,
+							UI_ADMIN_ERROR_DETAILS.deletePermiso,
+						);
 						this.loading.set(false);
 					},
 				});

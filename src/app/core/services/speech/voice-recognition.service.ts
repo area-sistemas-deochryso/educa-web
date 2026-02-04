@@ -9,6 +9,10 @@ import {
 	ScrollDirection,
 } from './voice-commands.config';
 import { logger } from '@core/helpers';
+import {
+	UI_VOICE_MESSAGES,
+	UI_VOICE_MESSAGES_DYNAMIC,
+} from '@app/shared/constants';
 
 export interface VoiceCommand {
 	patterns: string[];
@@ -196,23 +200,19 @@ export class VoiceRecognitionService {
 
 			switch (event.error) {
 				case 'network':
-					this.error.set(
-						'Error de red. Verifica tu conexión a internet y que uses HTTPS.',
-					);
+					this.error.set(UI_VOICE_MESSAGES.networkError);
 					this.stop();
 					break;
 				case 'not-allowed':
 				case 'service-not-allowed':
-					this.error.set(
-						'Permiso de micrófono denegado. Habilítalo en la configuración del navegador.',
-					);
+					this.error.set(UI_VOICE_MESSAGES.micPermissionDenied);
 					this.stop();
 					break;
 				case 'no-speech':
 				case 'aborted':
 					break;
 				default:
-					this.error.set(`Error: ${event.error}`);
+					this.error.set(UI_VOICE_MESSAGES_DYNAMIC.genericError(event.error));
 					this.stop();
 			}
 		};
@@ -466,7 +466,7 @@ export class VoiceRecognitionService {
 			this.playStartSound();
 		} catch (e) {
 			logger.error('[VoiceRecognition] Error al iniciar:', e);
-			this.error.set('No se pudo iniciar el reconocimiento de voz.');
+			this.error.set(UI_VOICE_MESSAGES.startFailed);
 		}
 	}
 

@@ -4,6 +4,7 @@ import { Observable, catchError, of } from 'rxjs';
 import { BaseRepository } from '../base/base.repository';
 import { Injectable } from '@angular/core';
 import { logger } from '@core/helpers';
+import { UI_AUTH_MESSAGES } from '@app/shared/constants';
 
 @Injectable({
 	providedIn: 'root',
@@ -25,7 +26,7 @@ export class AuthRepository extends BaseRepository<UserProfile> {
 					nombreCompleto: '',
 					entityId: 0,
 					sedeId: 0,
-					mensaje: error.error?.mensaje || 'Error al iniciar sesion',
+					mensaje: error.error?.mensaje || UI_AUTH_MESSAGES.loginError,
 				});
 			}),
 		);

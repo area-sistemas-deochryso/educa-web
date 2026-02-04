@@ -28,6 +28,11 @@ import {
 	RolTipoAdmin,
 	UsuarioBusqueda,
 } from '@core/services';
+import {
+	UI_CONFIRM_HEADERS,
+	UI_CONFIRM_LABELS,
+	buildDeletePermisosUsuarioMessage,
+} from '@app/shared/constants';
 import { PermisosUsuariosFacade } from './permisos-usuarios.facade';
 
 @Component({
@@ -155,14 +160,14 @@ export class PermisosUsuariosComponent implements OnInit {
 
 	deletePermiso(permiso: PermisoUsuario): void {
 		const nombre = permiso.nombreUsuario || `ID: ${permiso.usuarioId}`;
-		const mensaje = `¿Está seguro de eliminar los permisos personalizados de "${nombre}"?\n\nEl usuario seguirá teniendo los permisos de su rol "${permiso.rol}".`;
+		const mensaje = buildDeletePermisosUsuarioMessage(nombre, permiso.rol);
 
 		this.confirmationService.confirm({
 			message: mensaje,
-			header: 'Confirmar Eliminación',
+			header: UI_CONFIRM_HEADERS.delete,
 			icon: 'pi pi-exclamation-triangle',
-			acceptLabel: 'Sí, eliminar',
-			rejectLabel: 'Cancelar',
+			acceptLabel: UI_CONFIRM_LABELS.yesDelete,
+			rejectLabel: UI_CONFIRM_LABELS.cancel,
 			acceptButtonStyleClass: 'p-button-danger',
 			accept: () => {
 				this.facade.deletePermiso(permiso.id);

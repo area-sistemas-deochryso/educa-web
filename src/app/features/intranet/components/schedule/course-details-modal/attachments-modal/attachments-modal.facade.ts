@@ -4,6 +4,12 @@ import { BlobStorageService } from '@core/services';
 import { ErrorHandlerService } from '@core/services';
 import { logger } from '@core/helpers';
 import { AttachmentsModalStore, type Attachment } from './attachments-modal.store';
+import {
+	UI_ADMIN_ERROR_DETAILS_DYNAMIC,
+	UI_ATTACHMENT_MESSAGES,
+	UI_GENERIC_MESSAGES,
+	UI_SUMMARIES,
+} from '@app/shared/constants';
 
 const MAX_FILE_SIZE = 50000000; // 50MB
 const CONTAINER_NAME = 'course-attachments';
@@ -24,7 +30,7 @@ export class AttachmentsModalFacade {
 		const validationError = this.validateFile(file);
 		if (validationError) {
 			logger.error(validationError);
-			this.errorHandler.showError('Error', validationError);
+			this.errorHandler.showError(UI_SUMMARIES.error, validationError);
 			return;
 		}
 
@@ -55,16 +61,23 @@ export class AttachmentsModalFacade {
 					this.store.setUploadProgress(100);
 
 					// Notificar éxito
-					this.errorHandler.showSuccess('Éxito', 'Archivo subido correctamente');
+					this.errorHandler.showSuccess(
+						UI_SUMMARIES.success,
+						UI_ATTACHMENT_MESSAGES.uploadSuccess,
+					);
 				},
 				error: (error) => {
 					logger.error('Error al subir archivo:', error);
 					this.store.setUploading(false);
 					this.store.setUploadProgress(0);
 
-					const errorMsg = error?.error?.message || error?.message || 'Error desconocido';
+					const errorMsg =
+						error?.error?.message || error?.message || UI_GENERIC_MESSAGES.unknownError;
 					this.store.setError(errorMsg);
-					this.errorHandler.showError('Error', `No se pudo subir el archivo: ${errorMsg}`);
+					this.errorHandler.showError(
+						UI_SUMMARIES.error,
+						UI_ADMIN_ERROR_DETAILS_DYNAMIC.uploadFileFailed(errorMsg),
+					);
 				},
 			});
 	}
@@ -91,15 +104,15 @@ export class AttachmentsModalFacade {
 	// Validación privada
 	private validateFile(file: File): string | null {
 		if (!file) {
-			return 'No se seleccionó ningún archivo';
+			return UI_ATTACHMENT_MESSAGES.fileMissing;
 		}
 
 		if (file.size === 0) {
-			return 'El archivo está vacío';
+			return UI_ATTACHMENT_MESSAGES.fileEmpty;
 		}
 
 		if (file.size > MAX_FILE_SIZE) {
-			return `El archivo es demasiado grande (máximo ${MAX_FILE_SIZE / 1000000}MB)`;
+			return UI_ATTACHMENT_MESSAGES.fileTooLarge(MAX_FILE_SIZE / 1000000);
 		}
 
 		return null;

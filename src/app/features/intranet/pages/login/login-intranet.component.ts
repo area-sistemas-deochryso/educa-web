@@ -27,6 +27,7 @@ import { Select } from 'primeng/select';
 import { ToggleSwitch } from 'primeng/toggleswitch';
 import { UppercaseInputDirective } from '@app/shared';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { UI_LOGIN_MESSAGES } from '@app/shared/constants';
 
 @Component({
 	selector: 'app-login-intranet',
@@ -157,7 +158,7 @@ export class LoginIntranetComponent implements OnInit {
 		this.loginForm.markAllAsTouched();
 
 		if (this.loginForm.invalid) {
-			this.errorMessage.set('Por favor, corrija los errores en el formulario');
+			this.errorMessage.set(UI_LOGIN_MESSAGES.formInvalid);
 			this.showError.set(true);
 			return;
 		}
@@ -185,14 +186,14 @@ export class LoginIntranetComponent implements OnInit {
 					} else {
 						if (this.authService.isBlocked) {
 							this.errorMessage.set(
-								'Ha excedido el numero maximo de intentos. Sera redirigido...',
+								UI_LOGIN_MESSAGES.tooManyAttemptsRedirect,
 							);
 							this.showError.set(true);
 							setTimeout(() => this.goBack(), 2000);
 						} else {
 							this.errorMessage.set(
 								response.mensaje ||
-									`Credenciales incorrectas. Intentos restantes: ${this.remainingAttempts}`,
+									UI_LOGIN_MESSAGES.invalidCredentials(this.remainingAttempts),
 							);
 							this.showError.set(true);
 						}
@@ -200,7 +201,7 @@ export class LoginIntranetComponent implements OnInit {
 				},
 				error: () => {
 					this.isLoading.set(false);
-					this.errorMessage.set('Error de conexion. Intente nuevamente.');
+					this.errorMessage.set(UI_LOGIN_MESSAGES.connectionError);
 					this.showError.set(true);
 				},
 			});

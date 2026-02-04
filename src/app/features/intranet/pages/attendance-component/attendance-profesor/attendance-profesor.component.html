@@ -6,15 +6,15 @@
 			[salones]="salones()"
 			[selectedSalonId]="selectedSalonId()"
 			[nombreProfesor]="nombreProfesor()"
-			(salonChange)="viewMode() === 'dia' ? selectSalonDia($event) : selectSalon($event)"
+			(salonChange)="selectSalon($event)"
 		/>
 
-		@if (selectedSalon() && viewMode() === 'mes') {
+		@if (selectedSalon() && view.viewMode() === 'mes') {
 			<div class="pdf-section">
-				<span class="pdf-label">Reporte del día: {{ pdfFecha() | date: 'dd/MM/yyyy' }}</span>
+				<span class="pdf-label">Reporte del día: {{ view.pdfFecha() | date: 'dd/MM/yyyy' }}</span>
 				<p-button
 					icon="pi pi-file-pdf"
-					[loading]="downloadingPdf()"
+					[loading]="view.downloadingPdf()"
 					severity="danger"
 					[text]="true"
 					[rounded]="true"
@@ -27,45 +27,45 @@
 						},
 					}"
 				/>
-				<p-menu #pdfMenu [model]="pdfMenuItems" [popup]="true" appendTo="body" />
+				<p-menu #pdfMenu [model]="view.pdfMenuItems" [popup]="true" appendTo="body" />
 			</div>
 		}
 	</div>
 
-	@if (viewMode() === 'mes') {
-		@if (showSkeletons() && !tableReady()) {
+	@if (view.viewMode() === 'mes') {
+		@if (view.showSkeletons() && !view.tableReady()) {
 			<!-- Skeleton mostrado inmediatamente con espacio reservado -->
 			<app-attendance-table-skeleton />
 			<app-attendance-table-skeleton />
-		} @else if (estudiantes().length > 0) {
+		} @else if (view.estudiantes().length > 0) {
 			<app-attendance-table
-				[table]="ingresos()"
-				[hijos]="estudiantesAsHijos()"
-				[selectedHijoId]="selectedEstudianteId()"
-				(monthChange)="onIngresosMonthChange($event)"
-				(hijoChange)="selectEstudiante($event)"
+				[table]="view.ingresos()"
+				[hijos]="view.estudiantesAsHijos()"
+				[selectedHijoId]="view.selectedEstudianteId()"
+				(monthChange)="view.onIngresosMonthChange($event)"
+				(hijoChange)="view.selectEstudiante($event)"
 			/>
 			<app-attendance-table
-				[table]="salidas()"
-				[hijos]="estudiantesAsHijos()"
-				[selectedHijoId]="selectedEstudianteId()"
-				(monthChange)="onSalidasMonthChange($event)"
-				(hijoChange)="selectEstudiante($event)"
+				[table]="view.salidas()"
+				[hijos]="view.estudiantesAsHijos()"
+				[selectedHijoId]="view.selectedEstudianteId()"
+				(monthChange)="view.onSalidasMonthChange($event)"
+				(hijoChange)="view.selectEstudiante($event)"
 			/>
-		} @else if (!loading()) {
+		} @else if (!view.loading()) {
 			<app-empty-state message="No se encontraron estudiantes en este salón." />
 		}
 	} @else {
 		<app-asistencia-dia-list
-			[estudiantes]="estudiantesDia()"
-			[fecha]="fechaDia()"
-			[loading]="loading()"
+			[estudiantes]="view.estudiantesDia()"
+			[fecha]="view.fechaDia()"
+			[loading]="view.loading()"
 			[showPdfButton]="selectedSalon() !== null"
-			[downloadingPdf]="downloadingPdf()"
-			[pdfMenuItems]="pdfMenuItems"
-			(fechaChange)="onFechaDiaChange($event)"
+			[downloadingPdf]="view.downloadingPdf()"
+			[pdfMenuItems]="view.pdfMenuItems"
+			(fechaChange)="view.onFechaDiaChange($event)"
 		/>
 	}
-} @else if (!loading()) {
+} @else if (!view.loading()) {
 	<app-empty-state message="No tiene salones asignados." />
 }

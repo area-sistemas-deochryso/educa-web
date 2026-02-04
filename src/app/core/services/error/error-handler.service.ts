@@ -1,15 +1,21 @@
-import { Injectable, signal, computed, inject } from '@angular/core';
-import { HttpErrorResponse } from '@angular/common/http';
-import { Router } from '@angular/router';
 import {
 	AppError,
+	ErrorNotification,
 	ErrorSeverity,
 	ErrorSource,
-	ErrorNotification,
-	HttpErrorDetails,
 	HTTP_ERROR_MESSAGES,
+	HttpErrorDetails,
 } from './error.models';
+import { Injectable, computed, inject, signal } from '@angular/core';
+
+import { HttpErrorResponse } from '@angular/common/http';
+import { Router } from '@angular/router';
 import { logger } from '@core/helpers';
+import {
+	UI_CLIENT_ERROR_MESSAGE,
+	UI_ERROR_SUMMARIES,
+	UI_GENERIC_MESSAGES,
+} from '@app/shared/constants';
 
 @Injectable({
 	providedIn: 'root',
@@ -52,7 +58,7 @@ export class ErrorHandlerService {
 
 		this.showNotification({
 			severity: 'error',
-			summary: 'Error de conexion',
+			summary: UI_ERROR_SUMMARIES.connection,
 			detail: message,
 			life: error.status === 401 ? 3000 : 5000,
 		});
@@ -72,7 +78,7 @@ export class ErrorHandlerService {
 		logger.error('[ErrorHandler] Client error:', error);
 
 		const appError = this.createError(
-			'Ha ocurrido un error inesperado. Por favor, recargue la pagina.',
+			UI_CLIENT_ERROR_MESSAGE,
 			'error',
 			'client',
 			{ originalError: error, context },
@@ -80,7 +86,7 @@ export class ErrorHandlerService {
 
 		this.showNotification({
 			severity: 'error',
-			summary: 'Error de aplicacion',
+			summary: UI_ERROR_SUMMARIES.application,
 			detail: appError.message,
 			life: 5000,
 		});
@@ -96,7 +102,7 @@ export class ErrorHandlerService {
 
 		this.showNotification({
 			severity: 'warn',
-			summary: 'Error de validacion',
+			summary: UI_ERROR_SUMMARIES.validation,
 			detail: message,
 			life: 4000,
 		});
@@ -140,7 +146,7 @@ export class ErrorHandlerService {
 	}
 
 	/**
-	 * Limpia todos los errores
+	 * Limpia los errores
 	 */
 	clearErrors(): void {
 		this._errors.set([]);
@@ -195,7 +201,7 @@ export class ErrorHandlerService {
 		// Usar mensaje predefinido por codigo
 		return (
 			HTTP_ERROR_MESSAGES[error.status] ??
-			`Error ${error.status}: ${error.statusText || 'Error desconocido'}`
+			`Error ${error.status}: ${error.statusText || UI_GENERIC_MESSAGES.unknownError}`
 		);
 	}
 }

@@ -1,6 +1,7 @@
 import { ErrorHandler, Injectable, inject, NgZone } from '@angular/core';
 import { ErrorHandlerService } from './error-handler.service';
 import { logger } from '@core/helpers';
+import { UI_GENERIC_MESSAGES } from '@app/shared/constants';
 
 @Injectable()
 export class GlobalErrorHandler implements ErrorHandler {
@@ -28,7 +29,7 @@ export class GlobalErrorHandler implements ErrorHandler {
 			} else {
 				logger.error('[GlobalErrorHandler] Unknown error type:', error);
 				this.errorService.handleClientError(
-					new Error('Error desconocido: ' + String(error)),
+					new Error(`${UI_GENERIC_MESSAGES.unknownError}: ${String(error)}`),
 				);
 			}
 		});

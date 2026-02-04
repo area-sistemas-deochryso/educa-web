@@ -43,31 +43,7 @@ export class AttendanceApoderadoComponent implements OnInit {
 	);
 
 	ngOnInit(): void {
-		this.restoreSelectedMonth();
 		this.loadHijos();
-	}
-
-	private restoreSelectedMonth(): void {
-		const data = this.storage.getAttendanceMonth();
-		if (data) {
-			this.ingresos.update((table) => ({
-				...table,
-				selectedMonth: data.month,
-				selectedYear: data.year,
-			}));
-			this.salidas.update((table) => ({
-				...table,
-				selectedMonth: data.month,
-				selectedYear: data.year,
-			}));
-		}
-	}
-
-	private saveSelectedMonth(): void {
-		this.storage.setAttendanceMonth({
-			month: this.ingresos().selectedMonth,
-			year: this.ingresos().selectedYear,
-		});
 	}
 
 	private loadHijos(): void {
@@ -162,13 +138,11 @@ export class AttendanceApoderadoComponent implements OnInit {
 
 	onIngresosMonthChange(month: number): void {
 		this.ingresos.update((table) => ({ ...table, selectedMonth: month }));
-		this.saveSelectedMonth();
 		this.reloadHijoIngresos();
 	}
 
 	onSalidasMonthChange(month: number): void {
 		this.salidas.update((table) => ({ ...table, selectedMonth: month }));
-		this.saveSelectedMonth();
 		this.reloadHijoSalidas();
 	}
 

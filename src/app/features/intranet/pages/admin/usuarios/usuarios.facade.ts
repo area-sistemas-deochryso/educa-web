@@ -17,6 +17,7 @@ import { of } from 'rxjs';
 import { UsuariosStore } from './usuarios.store';
 import { DebugService, logger } from '@core/helpers';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { UI_ADMIN_ERROR_DETAILS, UI_SUMMARIES } from '@app/shared/constants';
 
 /**
  * Facade para gestión de usuarios
@@ -90,7 +91,10 @@ export class UsuariosFacade {
 							.pipe(
 								catchError((err) => {
 									logger.error('Error cargando usuarios:', err);
-									this.errorHandler.showError('Error', 'No se pudieron cargar los usuarios');
+									this.errorHandler.showError(
+										UI_SUMMARIES.error,
+										UI_ADMIN_ERROR_DETAILS.loadUsuarios,
+									);
 									return of([] as UsuarioLista[]);
 								}),
 								takeUntilDestroyed(this.destroyRef),
@@ -126,7 +130,10 @@ export class UsuariosFacade {
 			.pipe(
 				catchError((err) => {
 					logger.error('Error cargando usuarios:', err);
-					this.errorHandler.showError('Error', 'No se pudieron cargar los usuarios');
+					this.errorHandler.showError(
+						UI_SUMMARIES.error,
+						UI_ADMIN_ERROR_DETAILS.loadUsuarios,
+					);
 					return of([] as UsuarioLista[]);
 				}),
 				takeUntilDestroyed(this.destroyRef),
@@ -254,7 +261,10 @@ export class UsuariosFacade {
 				},
 				error: (err) => {
 					logger.error('Error:', err);
-					this.errorHandler.showError('Error', 'No se pudo actualizar el usuario');
+					this.errorHandler.showError(
+						UI_SUMMARIES.error,
+						UI_ADMIN_ERROR_DETAILS.updateUsuario,
+					);
 					this.store.setLoading(false);
 				},
 			});
@@ -288,7 +298,10 @@ export class UsuariosFacade {
 				},
 				error: (err) => {
 					logger.error('Error:', err);
-					this.errorHandler.showError('Error', 'No se pudo crear el usuario');
+					this.errorHandler.showError(
+						UI_SUMMARIES.error,
+						UI_ADMIN_ERROR_DETAILS.createUsuario,
+					);
 					this.store.setLoading(false);
 				},
 			});
@@ -327,7 +340,10 @@ export class UsuariosFacade {
 				},
 				error: (err) => {
 					logger.error('Error al eliminar:', err);
-					this.errorHandler.showError('Error', 'No se pudo eliminar el usuario');
+					this.errorHandler.showError(
+						UI_SUMMARIES.error,
+						UI_ADMIN_ERROR_DETAILS.deleteUsuario,
+					);
 					this.store.setLoading(false);
 				},
 			});
@@ -360,7 +376,10 @@ export class UsuariosFacade {
 				},
 				error: (err) => {
 					logger.error('Error al cambiar estado:', err);
-					this.errorHandler.showError('Error', 'No se pudo cambiar el estado');
+					this.errorHandler.showError(
+						UI_SUMMARIES.error,
+						UI_ADMIN_ERROR_DETAILS.changeEstado,
+					);
 					this.store.setLoading(false);
 				},
 			});
