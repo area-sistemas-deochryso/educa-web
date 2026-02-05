@@ -3,6 +3,7 @@ $color-temprano: #506ad0;
 $color-atiempo: #77a02d;
 $color-fuera: #ffcc0c;
 $color-no: #f44336;
+$color-justificado: #9c27b0;
 $color-pendiente: #9e9e9e;
 
 .card-header {
@@ -152,6 +153,10 @@ $color-pendiente: #9e9e9e;
 
 .status-no {
 	background-color: $color-no;
+}
+
+.status-justificado {
+	background-color: $color-justificado;
 }
 
 .status-pendiente {
@@ -415,6 +420,143 @@ $color-pendiente: #9e9e9e;
 				font-size: 0.55rem;
 			}
 		}
+	}
+}
+
+// ============ Filas clickeables para justificación ============
+.row-clickable {
+	cursor: pointer;
+	transition: background-color 0.15s ease;
+
+	&:hover {
+		background: rgba(156, 39, 176, 0.08) !important;
+	}
+}
+
+// ============ Observación en la celda de estudiante ============
+.observacion {
+	display: block;
+	font-size: 0.75rem;
+	color: $color-justificado;
+	font-style: italic;
+	margin-top: 0.25rem;
+	max-width: 200px;
+	white-space: nowrap;
+	overflow: hidden;
+	text-overflow: ellipsis;
+}
+
+// ============ Diálogo de justificación ============
+:host ::ng-deep {
+	// Centrar el mask completo
+	.p-dialog-mask {
+		display: flex !important;
+		align-items: center !important;
+		justify-content: center !important;
+	}
+
+	.justificacion-dialog {
+		// Resetear posicionamiento predeterminado
+		position: static !important;
+		top: auto !important;
+		left: auto !important;
+		transform: none !important;
+		margin: 0 !important;
+
+		.p-dialog-header {
+			padding: 1rem 1.25rem;
+			border-bottom: 1px solid var(--intranet-alternative-text-color);
+
+			.p-dialog-title {
+				font-size: 1.1rem;
+				font-weight: 600;
+				color: var(--intranet-default-text-color);
+			}
+		}
+
+		.p-dialog-content {
+			padding: 1.25rem;
+		}
+
+		.p-dialog-footer {
+			padding: 0.75rem 1.25rem;
+			border-top: 1px solid var(--intranet-alternative-text-color);
+		}
+	}
+}
+
+.dialog-content {
+	display: flex;
+	flex-direction: column;
+	gap: 1.25rem;
+
+	.estudiante-header {
+		display: flex;
+		align-items: center;
+		gap: 1rem;
+		padding: 0.75rem;
+		background: var(--surface-50);
+		border-radius: 6px;
+
+		.avatar {
+			width: 48px;
+			height: 48px;
+			border-radius: 50%;
+			background: $color-justificado;
+			color: #fff;
+			display: flex;
+			align-items: center;
+			justify-content: center;
+			font-size: 1.25rem;
+			flex-shrink: 0;
+		}
+
+		.info {
+			display: flex;
+			flex-direction: column;
+			gap: 0.125rem;
+
+			.nombre {
+				font-weight: 600;
+				color: var(--intranet-default-text-color);
+				text-transform: capitalize;
+			}
+
+			.dni {
+				font-size: 0.8rem;
+				color: var(--intranet-soft-text-color);
+				font-family: monospace;
+			}
+		}
+	}
+
+	.field {
+		display: flex;
+		flex-direction: column;
+		gap: 0.5rem;
+
+		label {
+			font-weight: 500;
+			font-size: 0.9rem;
+			color: var(--intranet-default-text-color);
+
+			.required {
+				color: var(--red-500);
+			}
+		}
+
+		textarea {
+			width: 100%;
+			min-height: 100px;
+			resize: vertical;
+		}
+	}
+
+	.dialog-footer {
+		display: flex;
+		justify-content: flex-end;
+		gap: 0.5rem;
+		padding-top: 0.5rem;
 	}
 }
 

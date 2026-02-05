@@ -69,7 +69,10 @@
 			[showPdfButton]="selectedSalon() !== null"
 			[downloadingPdf]="view.downloadingPdf()"
 			[pdfMenuItems]="view.pdfMenuItems"
+			[allowJustify]="true"
+			[savingJustificacion]="savingJustificacion()"
 			(fechaChange)="view.onFechaDiaChange($event)"
+			(justificar)="onJustificar($event)"
 		/>
 	}
 } @else if (!view.loading()) {

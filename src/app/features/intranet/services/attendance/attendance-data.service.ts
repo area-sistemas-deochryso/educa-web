@@ -33,7 +33,7 @@ export class AttendanceDataService {
 			selectedMonth: now.getMonth() + 1,
 			selectedYear: now.getFullYear(),
 			weeks: [],
-			counts: { T: 0, A: 0, F: 0, N: 0, '-': 0, X: 0 },
+			counts: { T: 0, A: 0, F: 0, N: 0, J: 0, '-': 0, X: 0 },
 			columnTotals: [],
 			grandTotal: '0/0',
 		};
@@ -220,7 +220,7 @@ export class AttendanceDataService {
 	}
 
 	private calculateCounts(weeks: AttendanceWeek[]): StatusCounts {
-		const counts: StatusCounts = { T: 0, A: 0, F: 0, N: 0, '-': 0, X: 0 };
+		const counts: StatusCounts = { T: 0, A: 0, F: 0, N: 0, J: 0, '-': 0, X: 0 };
 
 		weeks.forEach((week) => {
 			week.days.forEach((day) => {

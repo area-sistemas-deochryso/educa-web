@@ -1,4 +1,5 @@
 import { AsistenciaService, SalonProfesor, StorageService, UserProfileService } from '@core/services';
+import { JustificacionEvent } from '../../../components/attendance/asistencia-dia-list/asistencia-dia-list.component';
 import { Component, DestroyRef, OnInit, ViewChild, computed, inject, signal } from '@angular/core';
 
 import { AsistenciaDiaListComponent } from '../../../components/attendance/asistencia-dia-list/asistencia-dia-list.component';
@@ -70,6 +71,9 @@ export class AttendanceProfesorComponent implements OnInit {
 		const id = this.selectedSalonId();
 		return this.salones().find((s) => s.salonId === id) || null;
 	});
+
+	// ============ Justificación ============
+	readonly savingJustificacion = signal(false);
 
 	ngOnInit(): void {
 		// * Configure shared controller callbacks for profesor endpoints + storage.
@@ -174,6 +178,28 @@ export class AttendanceProfesorComponent implements OnInit {
 
 	togglePdfMenu(event: Event): void {
 		this.pdfMenu.toggle(event);
+	}
+
+	// ============ Justificación ============
+
+	onJustificar(event: JustificacionEvent): void {
+		const fecha = this.view.fechaDia();
+		this.savingJustificacion.set(true);
+
+		this.asistenciaService
+			.justificarAsistencia(event.estudianteId, fecha, event.observacion, event.quitar)
+			.pipe(
+				takeUntilDestroyed(this.destroyRef),
+				finalize(() => this.savingJustificacion.set(false)),
+			)
+			.subscribe({
+				next: (response) => {
+					if (response.success) {
+						// Recargar datos del día para reflejar el cambio
+						this.view.reload();
+					}
+				},
+			});
 	}
 
 	// ============ Helpers privados ============

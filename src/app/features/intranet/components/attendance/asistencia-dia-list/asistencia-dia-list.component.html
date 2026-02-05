@@ -65,13 +65,37 @@
 				</tr>
 			</ng-template>
 			<ng-template #body let-estudiante let-i="rowIndex">
-				<tr>
+				<tr
+					[class.row-clickable]="allowJustify() && estudiante.puedeJustificar"
+					[pTooltip]="
+						allowJustify() && estudiante.puedeJustificar
+							? estudiante.esJustificado
+								? 'Clic para editar/quitar justificación'
+								: 'Clic para justificar'
+							: ''
+					"
+					tooltipPosition="top"
+					[appendTo]="'body'"
+					[tooltipOptions]="{ showDelay: 300 }"
+					(click)="onEstudianteClick(estudiante)"
+				>
 					<td class="row-number">{{ i + 1 }}</td>
 					<td>
-						<!-- * Name + DNI -->
+						<!-- * Name + DNI + Observación -->
 						<div class="estudiante-info">
 							<span class="nombre">{{ estudiante.nombreCompleto }}</span>
 							<span class="dni">DNI: {{ estudiante.dni }}</span>
+							@if (estudiante.observacion) {
+								<span
+									class="observacion"
+									pTooltip="{{ estudiante.observacion }}"
+									tooltipPosition="top"
+								>
+									<i class="pi pi-info-circle"></i>
+									{{ estudiante.observacion | slice: 0 : 30
+									}}{{ estudiante.observacion.length > 30 ? '...' : '' }}
+								</span>
+							}
 						</div>
 					</td>
 					<td class="text-center">
@@ -141,6 +165,13 @@
 					<span class="label">No asistió</span>
 				</div>
 			</div>
+			<div class="stat-badge justificado">
+				<span class="status-indicator status-justificado">J</span>
+				<div class="badge-content">
+					<span class="value">{{ estadisticas().justificado }}</span>
+					<span class="label">Justificado</span>
+				</div>
+			</div>
 			<div class="stat-badge pendiente">
 				<span class="status-indicator status-pendiente">-</span>
 				<div class="badge-content">
@@ -151,3 +182,74 @@
 		</div>
 	}
 </p-card>
+
+<!-- ============ Diálogo de Justificación ============ -->
+<p-dialog
+	[visible]="dialogVisible()"
+	(visibleChange)="onDialogVisibleChange($event)"
+	[modal]="true"
+	[draggable]="false"
+	[resizable]="false"
+	[closable]="true"
+	[header]="
+		selectedEstudiante()?.esJustificado ? 'Editar Justificación' : 'Justificar Asistencia'
+	"
+	styleClass="justificacion-dialog"
+	[style]="{ width: '450px' }"
+	appendTo="body"
+>
+	@if (selectedEstudiante(); as estudiante) {
+		<div class="dialog-content">
+			<div class="estudiante-header">
+				<div class="avatar">
+					<i class="pi pi-user"></i>
+				</div>
+				<div class="info">
+					<span class="nombre">{{ estudiante.nombreCompleto }}</span>
+					<span class="dni">DNI: {{ estudiante.dni }}</span>
+				</div>
+			</div>
+
+			<div class="field">
+				<label for="observacion"
+					>Motivo de la justificación <span class="required">*</span></label
+				>
+				<textarea
+					pTextarea
+					id="observacion"
+					rows="4"
+					[ngModel]="observacionText()"
+					(ngModelChange)="observacionText.set($event)"
+					placeholder="Ingrese el motivo de la justificación (ej: Cita médica, motivo familiar, etc.)"
+					class="w-full"
+				></textarea>
+			</div>
+
+			<div class="dialog-footer">
+				@if (estudiante.esJustificado) {
+					<p-button
+						label="Quitar justificación"
+						severity="danger"
+						[text]="true"
+						icon="pi pi-trash"
+						[loading]="savingJustificacion()"
+						(onClick)="quitarJustificacion()"
+					/>
+				}
+				<p-button
+					label="Cancelar"
+					severity="secondary"
+					[text]="true"
+					(onClick)="closeDialog()"
+				/>
+				<p-button
+					label="Guardar"
+					icon="pi pi-check"
+					[loading]="savingJustificacion()"
+					[disabled]="!observacionText().trim()"
+					(onClick)="guardarJustificacion()"
+				/>
+			</div>
+		</div>
+	}
+</p-dialog>

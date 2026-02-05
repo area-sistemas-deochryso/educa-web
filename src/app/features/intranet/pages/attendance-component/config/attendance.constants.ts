@@ -42,6 +42,7 @@ export const LEGEND_ITEMS: LegendItem[] = [
 	{ code: 'A', label: 'A tiempo', status: 'A' },
 	{ code: 'F', label: 'Fuera de hora', status: 'F' },
 	{ code: 'N', label: 'No asistió', status: 'N' },
+	{ code: 'J', label: 'Justificado', status: 'J' },
 	{ code: '-', label: 'Pendiente', status: '-' },
 ];
 
@@ -53,6 +54,7 @@ export const STATUS_CLASSES: Record<AttendanceStatus, string> = {
 	A: 'status-atiempo',
 	F: 'status-fuera',
 	N: 'status-no',
+	J: 'status-justificado',
 	'-': 'status-pendiente',
 	X: 'status-sin-registro',
 };

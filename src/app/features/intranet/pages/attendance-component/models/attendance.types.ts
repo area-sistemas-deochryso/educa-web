@@ -1,7 +1,8 @@
 // T = Temprano, A = A tiempo, F = Fuera de hora, N = No asistió
+// J = Justificado (falta con justificación registrada)
 // '-' = Pendiente (día futuro o de hoy sin hora aún)
 // 'X' = No contabilizado (antes del 26/01/2026 o período vacacional)
-export type AttendanceStatus = 'T' | 'A' | 'F' | 'N' | '-' | 'X';
+export type AttendanceStatus = 'T' | 'A' | 'F' | 'N' | 'J' | '-' | 'X';
 
 export interface AttendanceDay {
 	day: string;
@@ -21,6 +22,7 @@ export interface StatusCounts {
 	A: number;
 	F: number;
 	N: number;
+	J: number;
 	'-': number;
 	X: number;
 }

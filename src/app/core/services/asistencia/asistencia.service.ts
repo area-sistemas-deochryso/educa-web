@@ -413,4 +413,40 @@ export class AsistenciaService {
 			}),
 		);
 	}
+
+	// === JUSTIFICACIONES ===
+
+	/**
+	 * Justificar o quitar justificación de asistencia de un estudiante.
+	 * Crea o actualiza un registro de asistencia con observación de justificación.
+	 *
+	 * POST /api/ConsultaAsistencia/justificar
+	 *
+	 * @param estudianteId - ID del estudiante
+	 * @param fecha - Fecha de la asistencia a justificar
+	 * @param observacion - Motivo/justificación de la falta
+	 * @param quitar - Si es true, quita la justificación
+	 * @returns Observable con el resultado de la operación
+	 */
+	justificarAsistencia(
+		estudianteId: number,
+		fecha: Date,
+		observacion: string,
+		quitar: boolean = false,
+	): Observable<{ success: boolean; message: string }> {
+		const body = {
+			estudianteId,
+			fecha: this.formatDateLocal(fecha),
+			observacion,
+			quitar,
+		};
+
+		return this.http
+			.post<{ success: boolean; message: string }>(`${this.apiUrl}/justificar`, body)
+			.pipe(
+				catchError(() =>
+					of({ success: false, message: 'Error al guardar la justificación' }),
+				),
+			);
+	}
 }

@@ -101,7 +101,10 @@
 				[showPdfButton]="true"
 				[downloadingPdf]="tipoReporte() === 'salon' ? view.downloadingPdf() : downloadingPdfConsolidado()"
 				[pdfMenuItems]="pdfMenuItems()"
+				[allowJustify]="true"
+				[savingJustificacion]="savingJustificacion()"
 				(fechaChange)="view.onFechaDiaChange($event)"
+				(justificar)="onJustificar($event)"
 			/>
 		</div>
 	}

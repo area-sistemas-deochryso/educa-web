@@ -1,4 +1,5 @@
 import { AsistenciaService, GradoSeccion, StorageService } from '@core/services';
+import { JustificacionEvent } from '../../../components/attendance/asistencia-dia-list/asistencia-dia-list.component';
 import { Component, DestroyRef, OnInit, ViewChild, computed, inject, signal } from '@angular/core';
 
 import { AsistenciaDiaListComponent } from '../../../components/attendance/asistencia-dia-list/asistencia-dia-list.component';
@@ -74,6 +75,7 @@ export class AttendanceDirectorComponent implements OnInit {
 	];
 	readonly tipoReporte = signal<TipoReporte>('salon');
 	readonly downloadingPdfConsolidado = signal(false);
+	readonly savingJustificacion = signal(false);
 
 	// ============ Grados y secciones ============
 
@@ -238,6 +240,28 @@ export class AttendanceDirectorComponent implements OnInit {
 
 	togglePdfMenu(event: Event): void {
 		this.pdfMenu.toggle(event);
+	}
+
+	// ============ Justificación ============
+
+	onJustificar(event: JustificacionEvent): void {
+		const fecha = this.view.fechaDia();
+		this.savingJustificacion.set(true);
+
+		this.asistenciaService
+			.justificarAsistencia(event.estudianteId, fecha, event.observacion, event.quitar)
+			.pipe(
+				takeUntilDestroyed(this.destroyRef),
+				finalize(() => this.savingJustificacion.set(false)),
+			)
+			.subscribe({
+				next: (response) => {
+					if (response.success) {
+						// Recargar datos del día para reflejar el cambio
+						this.view.reload();
+					}
+				},
+			});
 	}
 
 	// ============ PDF Consolidados ============
