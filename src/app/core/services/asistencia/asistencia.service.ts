@@ -1,5 +1,8 @@
 import {
+	AsistenciaDiaConEstadisticas,
 	EstadisticasDia,
+	EstadisticasAsistenciaDia,
+	EstadoAsistencia,
 	EstudianteAsistencia,
 	GradoSeccion,
 	HijoApoderado,
@@ -123,14 +126,14 @@ export class AsistenciaService {
 	}
 
 	/**
-	 * Profesor: Obtener asistencia de un grado/sección en un día específico
+	 * Profesor: Obtener asistencia de un grado/sección en un día específico con estadísticas
 	 * GET /api/ConsultaAsistencia/profesor/asistencia-dia?grado={grado}&seccion={seccion}&fecha={fecha}
 	 */
 	getAsistenciaDia(
 		grado: string,
 		seccion: string,
 		fecha: Date,
-	): Observable<EstudianteAsistencia[]> {
+	): Observable<AsistenciaDiaConEstadisticas> {
 		const params: Record<string, string> = {
 			grado,
 			seccion,
@@ -138,8 +141,12 @@ export class AsistenciaService {
 		};
 
 		return this.http
-			.get<EstudianteAsistencia[]>(`${this.apiUrl}/profesor/asistencia-dia`, { params })
-			.pipe(catchError(() => of([])));
+			.get<AsistenciaDiaConEstadisticas>(`${this.apiUrl}/profesor/asistencia-dia`, { params })
+			.pipe(
+				catchError(() =>
+					of({ estudiantes: [], estadisticas: this.getEstadisticasVacias() }),
+				),
+			);
 	}
 
 	// === DIRECTOR ===
@@ -187,14 +194,14 @@ export class AsistenciaService {
 	}
 
 	/**
-	 * Director: Obtener asistencia de un grado/sección en un día específico
+	 * Director: Obtener asistencia de un grado/sección en un día específico con estadísticas
 	 * GET /api/ConsultaAsistencia/director/asistencia-dia?grado={grado}&seccion={seccion}&fecha={fecha}
 	 */
 	getAsistenciaDiaDirector(
 		grado: string,
 		seccion: string,
 		fecha: Date,
-	): Observable<EstudianteAsistencia[]> {
+	): Observable<AsistenciaDiaConEstadisticas> {
 		const params: Record<string, string> = {
 			grado,
 			seccion,
@@ -202,8 +209,12 @@ export class AsistenciaService {
 		};
 
 		return this.http
-			.get<EstudianteAsistencia[]>(`${this.apiUrl}/director/asistencia-dia`, { params })
-			.pipe(catchError(() => of([])));
+			.get<AsistenciaDiaConEstadisticas>(`${this.apiUrl}/director/asistencia-dia`, { params })
+			.pipe(
+				catchError(() =>
+					of({ estudiantes: [], estadisticas: this.getEstadisticasVacias() }),
+				),
+			);
 	}
 
 	/**
@@ -448,5 +459,38 @@ export class AsistenciaService {
 					of({ success: false, message: 'Error al guardar la justificación' }),
 				),
 			);
+	}
+
+	// === ESTADOS VÁLIDOS ===
+
+	/**
+	 * Obtener estados de asistencia válidos para mostrar en leyenda
+	 * ✅ NUEVO: Obtenido desde el backend para garantizar consistencia
+	 *
+	 * GET /api/ConsultaAsistencia/estados-validos
+	 *
+	 * @returns Observable<EstadoAsistencia[]> - Lista de estados válidos con código y descripción
+	 */
+	getEstadosValidos(): Observable<EstadoAsistencia[]> {
+		return this.http
+			.get<EstadoAsistencia[]>(`${this.apiUrl}/estados-validos`)
+			.pipe(catchError(() => of([])));
+	}
+
+	// ============ Helpers privados ============
+
+	/**
+	 * Retorna estadísticas vacías como fallback en caso de error
+	 */
+	private getEstadisticasVacias(): EstadisticasAsistenciaDia {
+		return {
+			total: 0,
+			temprano: 0,
+			aTiempo: 0,
+			fueraHora: 0,
+			noAsistio: 0,
+			justificado: 0,
+			pendiente: 0,
+		};
 	}
 }

@@ -97,6 +97,7 @@
 			<app-asistencia-dia-list
 				[estudiantes]="view.estudiantesDia()"
 				[fecha]="view.fechaDia()"
+				[estadisticas]="view.estadisticasDia()"
 				[loading]="view.loading()"
 				[showPdfButton]="true"
 				[downloadingPdf]="tipoReporte() === 'salon' ? view.downloadingPdf() : downloadingPdfConsolidado()"

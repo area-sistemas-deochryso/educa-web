@@ -8,16 +8,6 @@ import {
 	StatusCounts,
 } from '@features/intranet/pages/attendance-component/models/attendance.types';
 import { DAY_HEADERS } from '@features/intranet/pages/attendance-component/config/attendance.constants';
-import {
-	getIngresoStatusFromTime,
-	getSalidaStatusFromTime,
-} from '@features/intranet/pages/attendance-component/config/attendance-time.config';
-import {
-	shouldMarkIngresoAsPending,
-	shouldMarkSalidaAsPending,
-	isBeforeRegistrationStart,
-} from '@features/intranet/pages/attendance-component/config/attendance.utils';
-import { shouldCountInasistencia } from '@features/intranet/pages/attendance-component/config/attendance-periods.config';
 import { CalendarUtilsService } from '../calendar/calendar-utils.service';
 
 @Injectable({
@@ -110,8 +100,9 @@ export class AttendanceDataService {
 				const dateKey = this.calendarUtils.formatDateKey(date);
 				const asistencia = asistenciaMap.get(dateKey);
 
-				const ingresoStatus = this.getIngresoStatus(asistencia, mes, date);
-				const salidaStatus = this.getSalidaStatus(asistencia, mes, date);
+				// ✅ NUEVO: Usar estados calculados desde el backend
+				const ingresoStatus = asistencia?.estadoIngreso || 'X';
+				const salidaStatus = asistencia?.estadoSalida || 'X';
 
 				// Contar días válidos separadamente para ingresos y salidas
 				// Excluir '-' (pendiente) y 'X' (sin registro) del conteo
@@ -161,62 +152,6 @@ export class AttendanceDataService {
 	private formatHora(fechaHora: string): string {
 		const date = new Date(fechaHora);
 		return date.toLocaleTimeString('es-PE', { hour: '2-digit', minute: '2-digit' });
-	}
-
-	private getIngresoStatus(
-		asistencia: AsistenciaDetalle | undefined,
-		month: number,
-		date: Date,
-	): AttendanceStatus {
-		if (!asistencia || !asistencia.horaEntrada) {
-			// Días antes del inicio del registro (26/01/2026) → 'X' (sin registro)
-			if (isBeforeRegistrationStart(date)) return 'X';
-			// Días futuros o de hoy sin hora aún → '-' (pendiente)
-			if (shouldMarkIngresoAsPending(date, month)) return '-';
-
-			// REGLA ESPECIAL: Enero y febrero (después del 26/01/2026)
-			// Los días sin asistencia se marcan como '-' (pendiente) en lugar de 'X'
-			// Esto permite que los días CON asistencia se muestren correctamente
-			if (month === 1 || month === 2) {
-				return '-';
-			}
-
-			// Durante otros períodos vacacionales (julio) → 'X' (no se cuenta)
-			if (!shouldCountInasistencia(date)) return 'X';
-			// Día pasado sin registro en período académico → 'N' (falta)
-			return 'N';
-		}
-
-		const horaEntrada = new Date(asistencia.horaEntrada);
-		return getIngresoStatusFromTime(horaEntrada.getHours(), horaEntrada.getMinutes(), month);
-	}
-
-	private getSalidaStatus(
-		asistencia: AsistenciaDetalle | undefined,
-		month: number,
-		date: Date,
-	): AttendanceStatus {
-		if (!asistencia || !asistencia.horaSalida) {
-			// Días antes del inicio del registro (26/01/2026) → 'X' (sin registro)
-			if (isBeforeRegistrationStart(date)) return 'X';
-			// Días futuros o de hoy sin hora aún → '-' (pendiente)
-			if (shouldMarkSalidaAsPending(date, month)) return '-';
-
-			// REGLA ESPECIAL: Enero y febrero (después del 26/01/2026)
-			// Los días sin asistencia se marcan como '-' (pendiente) en lugar de 'X'
-			// Esto permite que los días CON asistencia se muestren correctamente
-			if (month === 1 || month === 2) {
-				return '-';
-			}
-
-			// Durante otros períodos vacacionales (julio) → 'X' (no se cuenta)
-			if (!shouldCountInasistencia(date)) return 'X';
-			// Día pasado sin registro en período académico → 'N' (falta)
-			return 'N';
-		}
-
-		const horaSalida = new Date(asistencia.horaSalida);
-		return getSalidaStatusFromTime(horaSalida.getHours(), horaSalida.getMinutes(), month);
 	}
 
 	private calculateCounts(weeks: AttendanceWeek[]): StatusCounts {

@@ -1,8 +1,6 @@
-import { ChangeDetectionStrategy, Component } from '@angular/core';
-import {
-	LEGEND_ITEMS,
-	getStatusClass,
-} from '@features/intranet/pages/attendance-component/config/attendance.constants';
+import { ChangeDetectionStrategy, Component, inject, signal } from '@angular/core';
+import { getStatusClass } from '@features/intranet/pages/attendance-component/config/attendance.constants';
+import { AsistenciaService, EstadoAsistencia } from '@core/services';
 
 @Component({
 	selector: 'app-attendance-legend',
@@ -12,8 +10,20 @@ import {
 	changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class AttendanceLegendComponent {
-	// * Legend items and status class mapping used by the template.
-	legendItems = LEGEND_ITEMS;
+	private asistenciaService = inject(AsistenciaService);
+
+	// ✅ NUEVO: Cargar estados desde el backend
+	readonly legendItems = signal<EstadoAsistencia[]>([]);
 
 	getStatusClass = getStatusClass;
+
+	constructor() {
+		this.loadEstadosValidos();
+	}
+
+	private loadEstadosValidos(): void {
+		this.asistenciaService.getEstadosValidos().subscribe((estados) => {
+			this.legendItems.set(estados);
+		});
+	}
 }

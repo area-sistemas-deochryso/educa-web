@@ -41,9 +41,3 @@ export interface MonthOption {
 	label: string;
 	value: number;
 }
-
-export interface LegendItem {
-	code: string;
-	label: string;
-	status: AttendanceStatus;
-}

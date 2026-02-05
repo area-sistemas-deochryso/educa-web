@@ -1,5 +1,29 @@
 const DB_NAME = 'educa-cache-db';
-const DB_VERSION = 1;
+
+// ============================================================================
+// VERSIONADO DE CACHE - Prevención de errores por cambios backend
+// ============================================================================
+//
+// PROPÓSITO: Invalidar automáticamente el cache cuando hay cambios breaking
+//
+// PROBLEMA QUE RESUELVE:
+// Cuando el backend cambia la estructura de DTOs (agregar/quitar campos, cambiar tipos),
+// el cache guarda datos con estructura antigua. La app intenta deserializar datos
+// incompatibles → error en el frontend la primera vez → segunda vez funciona porque
+// el cache ya se actualizó. Esto genera errores intermitentes en producción.
+//
+// SOLUCIÓN:
+// Incrementar DB_VERSION fuerza la recreación de IndexedDB al hacer deploy.
+// Esto limpia automáticamente TODO el cache de todos los usuarios.
+//
+// CUÁNDO INCREMENTAR:
+// ✅ Cambiar estructura de DTOs (agregar/quitar/renombrar campos)
+// ✅ Cambiar tipos de datos (string → number, null → object)
+// ✅ Cambiar códigos de estado (A/T/F → nuevos códigos)
+// ❌ Agregar campos opcionales al final (no es breaking)
+// ❌ Cambios solo de backend que no afectan JSON de respuesta
+//
+const DB_VERSION = 2; // ← Incrementado por cambios en estructura de asistencia
 const STORE_NAME = 'api-cache';
 const CACHE_EXPIRY = 24 * 60 * 60 * 1000; // 24 horas
 
@@ -176,6 +200,104 @@ async function cleanExpiredCache() {
 		transaction.oncomplete = () => db.close();
 	} catch (error) {
 		console.error('[SW] Error cleaning cache:', error);
+	}
+}
+
+// ============================================================================
+// INVALIDACIÓN QUIRÚRGICA - Limpieza selectiva sin afectar todo el cache
+// ============================================================================
+
+/**
+ * PROPÓSITO: Invalidar un endpoint específico sin tocar el resto del cache
+ *
+ * PROBLEMA QUE RESUELVE:
+ * clearCache() es muy agresivo - borra TODO, incluso datos de módulos que no cambiaron.
+ * Esto causa refetch innecesario de datos estables, desperdiciando ancho de banda.
+ *
+ * SOLUCIÓN:
+ * Eliminar solo la entrada específica del cache. El resto permanece intacto.
+ * La próxima petición a esta URL irá al servidor y obtendrá la nueva estructura.
+ *
+ * @param {string} url - URL exacta a invalidar (se normalizará automáticamente)
+ */
+async function invalidateCacheByUrl(url) {
+	try {
+		const normalizedUrl = normalizeUrl(url);
+		const db = await openDB();
+		const transaction = db.transaction(STORE_NAME, 'readwrite');
+		const store = transaction.objectStore(STORE_NAME);
+
+		await store.delete(normalizedUrl);
+
+		return new Promise((resolve) => {
+			transaction.oncomplete = () => {
+				db.close();
+				console.log('[SW] Cache invalidado para:', normalizedUrl);
+				resolve();
+			};
+			transaction.onerror = () => {
+				db.close();
+				console.error('[SW] Error invalidando cache:', transaction.error);
+				resolve(); // No fallar si hay error
+			};
+		});
+	} catch (error) {
+		console.error('[SW] Error en invalidateCacheByUrl:', error);
+	}
+}
+
+/**
+ * PROPÓSITO: Invalidar todos los endpoints de un módulo cuando cambia su estructura
+ *
+ * PROBLEMA QUE RESUELVE:
+ * Los cambios backend suelen afectar múltiples endpoints relacionados de un módulo.
+ * Invalidar uno por uno es tedioso y propenso a olvidar alguno.
+ *
+ * SOLUCIÓN:
+ * Buscar todas las URLs que contengan el patrón y eliminarlas del cache.
+ * Ejemplo: pattern="/api/ConsultaAsistencia" invalida:
+ *   - /api/ConsultaAsistencia/profesor/asistencia-dia
+ *   - /api/ConsultaAsistencia/director/asistencia-dia
+ *   - /api/ConsultaAsistencia/director/reporte/todos-salones/mes
+ *
+ * @param {string} pattern - Texto a buscar en las URLs (case-sensitive)
+ * @returns {Promise<number>} Número de entradas eliminadas
+ */
+async function invalidateCacheByPattern(pattern) {
+	try {
+		const db = await openDB();
+		const transaction = db.transaction(STORE_NAME, 'readwrite');
+		const store = transaction.objectStore(STORE_NAME);
+		const request = store.getAllKeys();
+
+		return new Promise((resolve) => {
+			request.onsuccess = () => {
+				const keys = request.result;
+				let deletedCount = 0;
+
+				keys.forEach(key => {
+					if (key.includes(pattern)) {
+						store.delete(key);
+						deletedCount++;
+					}
+				});
+
+				transaction.oncomplete = () => {
+					db.close();
+					console.log(`[SW] Cache invalidado: ${deletedCount} entradas con patrón "${pattern}"`);
+					resolve(deletedCount);
+				};
+			};
+
+			request.onerror = () => {
+				db.close();
+				console.error('[SW] Error obteniendo keys para invalidación:', request.error);
+				resolve(0);
+			};
+		});
+	} catch (error) {
+		console.error('[SW] Error en invalidateCacheByPattern:', error);
+		return 0;
 	}
 }
 
@@ -376,8 +498,23 @@ function createOfflineResponse() {
 	});
 }
 
-// Escuchar mensajes desde la aplicación
+// ============================================================================
+// MENSAJES DESDE LA APLICACIÓN - Comandos para control del cache
+// ============================================================================
+//
+// PROPÓSITO: Permitir que el frontend controle el cache de forma programática
+//
+// FLUJO:
+// 1. Frontend detecta que el backend cambió (ej: nueva versión, error de deserialización)
+// 2. Frontend llama a SwService.clearCache() / invalidateCacheByUrl() / invalidateCacheByPattern()
+// 3. SwService envía mensaje al Service Worker
+// 4. Service Worker ejecuta la invalidación correspondiente
+// 5. Service Worker responde al frontend (vía MessageChannel)
+//
 self.addEventListener('message', event => {
+	// CLEAR_CACHE: Limpiar TODO el cache
+	// Uso: Logout, cambios breaking globales, reset completo
+	// Llamado desde: SwService.clearCache()
 	if (event.data && event.data.type === 'CLEAR_CACHE') {
 		event.waitUntil(
 			openDB().then(db => {
@@ -387,7 +524,8 @@ self.addEventListener('message', event => {
 				return new Promise(resolve => {
 					transaction.oncomplete = () => {
 						db.close();
-						console.log('[SW] Cache limpiado');
+						console.log('[SW] Cache limpiado completamente');
+						servedUrls.clear(); // Reset estrategia SWR vs Network-first
 						resolve();
 					};
 				});
@@ -395,10 +533,51 @@ self.addEventListener('message', event => {
 		);
 	}
 
+	// INVALIDATE_BY_URL: Invalidar endpoint específico
+	// Uso: Un solo endpoint cambió su estructura
+	// Llamado desde: SwService.invalidateCacheByUrl(url)
+	if (event.data && event.data.type === 'INVALIDATE_BY_URL') {
+		const url = event.data.payload?.url;
+		if (url) {
+			event.waitUntil(
+				invalidateCacheByUrl(url).then(() => {
+					// Forzar SWR en próxima visita (cache + revalidación en background)
+					const normalized = normalizeUrl(url);
+					servedUrls.delete(normalized);
+					event.ports[0]?.postMessage({ success: true });
+				})
+			);
+		}
+	}
+
+	// INVALIDATE_BY_PATTERN: Invalidar módulo completo
+	// Uso: Múltiples endpoints de un módulo cambiaron (ej: /api/ConsultaAsistencia/*)
+	// Llamado desde: SwService.invalidateCacheByPattern(pattern)
+	if (event.data && event.data.type === 'INVALIDATE_BY_PATTERN') {
+		const pattern = event.data.payload?.pattern;
+		if (pattern) {
+			event.waitUntil(
+				invalidateCacheByPattern(pattern).then(count => {
+					// Forzar SWR para todas las URLs invalidadas
+					for (const url of servedUrls) {
+						if (url.includes(pattern)) {
+							servedUrls.delete(url);
+						}
+					}
+					event.ports[0]?.postMessage({ success: true, count });
+				})
+			);
+		}
+	}
+
+	// SKIP_WAITING: Actualizar Service Worker inmediatamente
+	// Uso: Nueva versión del SW disponible
 	if (event.data && event.data.type === 'SKIP_WAITING') {
 		self.skipWaiting();
 	}
 
+	// LIST_CACHE: Debug - listar URLs en cache
+	// Uso: Desarrollo, troubleshooting
 	if (event.data && event.data.type === 'LIST_CACHE') {
 		listCachedUrls();
 	}

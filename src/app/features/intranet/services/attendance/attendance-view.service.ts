@@ -3,7 +3,13 @@ import { Observable, finalize } from 'rxjs';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { MenuItem } from 'primeng/api';
 
-import { AsistenciaService, EstudianteAsistencia, HijoApoderado } from '@core/services';
+import {
+	AsistenciaService,
+	AsistenciaDiaConEstadisticas,
+	EstadisticasAsistenciaDia,
+	EstudianteAsistencia,
+	HijoApoderado,
+} from '@core/services';
 import { AttendanceDataService } from './attendance-data.service';
 import { AttendanceTable } from '@features/intranet/pages/attendance-component/models/attendance.types';
 import {
@@ -33,8 +39,12 @@ export interface SelectorContext {
 export interface AttendanceViewConfig {
 	/** Cargar estudiantes con asistencias mensuales */
 	loadEstudiantes(gradoCodigo: string, seccion: string, mes: number, anio: number): Observable<EstudianteAsistencia[]>;
-	/** Cargar asistencias de un día específico */
-	loadDia(gradoCodigo: string, seccion: string, fecha: Date): Observable<EstudianteAsistencia[]>;
+	/** Cargar asistencias de un día específico con estadísticas */
+	loadDia(
+		gradoCodigo: string,
+		seccion: string,
+		fecha: Date,
+	): Observable<AsistenciaDiaConEstadisticas>;
 	/** Obtener contexto del selector actualmente seleccionado, o null si no hay selección */
 	getSelectorContext(): SelectorContext | null;
 	/** Callback al cambiar de mes — permite al componente re-seleccionar si el selector actual no aplica (filtro Verano) */
@@ -97,6 +107,15 @@ export class AttendanceViewController {
 	readonly viewMode = signal<ViewMode>(VIEW_MODE.Dia);
 	readonly fechaDia = signal<Date>(new Date());
 	readonly estudiantesDia = signal<EstudianteAsistencia[]>([]);
+	readonly estadisticasDia = signal<EstadisticasAsistenciaDia>({
+		total: 0,
+		temprano: 0,
+		aTiempo: 0,
+		fueraHora: 0,
+		noAsistio: 0,
+		justificado: 0,
+		pendiente: 0,
+	});
 
 	// ============ Tablas de asistencia ============
 
@@ -337,8 +356,10 @@ export class AttendanceViewController {
 				finalize(() => this.loading.set(false)),
 			)
 			.subscribe({
-				next: (estudiantes) => {
-					this.estudiantesDia.set(estudiantes);
+				next: (response) => {
+					// ✅ Extraer estudiantes y estadísticas del response del backend
+					this.estudiantesDia.set(response.estudiantes);
+					this.estadisticasDia.set(response.estadisticas);
 				},
 			});
 	}

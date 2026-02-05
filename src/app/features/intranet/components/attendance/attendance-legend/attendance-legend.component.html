@@ -1,11 +1,12 @@
 <section class="legend-section">
 	<!-- * Legend codes used across attendance tables -->
+	<!-- ✅ NUEVO: Estados cargados desde backend -->
 	<h2>Leyenda</h2>
 	<div class="legend-content">
-		@for (item of legendItems; track item.code) {
+		@for (item of legendItems(); track item.codigo) {
 			<div class="legend-item">
-				<span class="legend-color" [class]="getStatusClass(item.status)"></span>
-				<span class="legend-text">{{ item.code }} = {{ item.label }}</span>
+				<span class="legend-color" [class]="getStatusClass(item.codigo)"></span>
+				<span class="legend-text">{{ item.codigo }} = {{ item.descripcion }}</span>
 			</div>
 		}
 	</div>

@@ -61,10 +61,11 @@
 			<app-empty-state message="No se encontraron estudiantes en este salón." />
 		}
 	} @else {
-		<!-- * Day mode list with date picker + PDF options -->
+		<!-- * Day mode list with date picker + PDF options + estadísticas desde backend -->
 		<app-asistencia-dia-list
 			[estudiantes]="view.estudiantesDia()"
 			[fecha]="view.fechaDia()"
+			[estadisticas]="view.estadisticasDia()"
 			[loading]="view.loading()"
 			[showPdfButton]="selectedSalon() !== null"
 			[downloadingPdf]="view.downloadingPdf()"

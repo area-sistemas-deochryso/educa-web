@@ -1,4 +1,4 @@
-import type { AttendanceStatus, LegendItem, MonthOption } from '../models/attendance.types';
+import type { AttendanceStatus, MonthOption } from '../models/attendance.types';
 
 /**
  * Clave para almacenar el mes seleccionado en localStorage.
@@ -33,18 +33,6 @@ export const MONTH_OPTIONS: MonthOption[] = [
  * Encabezados de días de la semana (lunes a viernes).
  */
 export const DAY_HEADERS = ['Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes'];
-
-/**
- * Items de la leyenda de asistencia.
- */
-export const LEGEND_ITEMS: LegendItem[] = [
-	{ code: 'T', label: 'Temprano', status: 'T' },
-	{ code: 'A', label: 'A tiempo', status: 'A' },
-	{ code: 'F', label: 'Fuera de hora', status: 'F' },
-	{ code: 'N', label: 'No asistió', status: 'N' },
-	{ code: 'J', label: 'Justificado', status: 'J' },
-	{ code: '-', label: 'Pendiente', status: '-' },
-];
 
 /**
  * Mapeo de estados de asistencia a clases CSS.

@@ -20,17 +20,8 @@ import { TooltipModule } from 'primeng/tooltip';
 import { DialogModule } from 'primeng/dialog';
 import { Textarea } from 'primeng/textarea';
 import { MenuItem } from 'primeng/api';
-import { EstudianteAsistencia, AsistenciaDetalle } from '@core/services';
+import { EstudianteAsistencia, EstadisticasAsistenciaDia } from '@core/services';
 import { getStatusClass } from '@features/intranet/pages/attendance-component/config/attendance.constants';
-import {
-	getIngresoStatusFromTime,
-	getSalidaStatusFromTime,
-	hasSalidaTimePassed,
-} from '@features/intranet/pages/attendance-component/config/attendance-time.config';
-import {
-	isBeforeRegistrationStart,
-	isToday,
-} from '@features/intranet/pages/attendance-component/config/attendance.utils';
 import { AttendanceStatus } from '@features/intranet/pages/attendance-component/models/attendance.types';
 
 export interface EstudianteAsistenciaDia {
@@ -43,16 +34,6 @@ export interface EstudianteAsistenciaDia {
 	observacion: string | null;
 	puedeJustificar: boolean;
 	esJustificado: boolean;
-}
-
-export interface EstadisticasAsistencia {
-	total: number;
-	temprano: number;
-	aTiempo: number;
-	fueraHora: number;
-	noAsistio: number;
-	justificado: number;
-	pendiente: number;
 }
 
 export interface JustificacionEvent {
@@ -85,6 +66,7 @@ export class AsistenciaDiaListComponent {
 	// * Inputs
 	readonly estudiantes = input.required<EstudianteAsistencia[]>();
 	readonly fecha = input.required<Date>();
+	readonly estadisticas = input.required<EstadisticasAsistenciaDia>(); // ✅ NUEVO: Estadísticas desde el backend
 	readonly loading = input<boolean>(false);
 	readonly showPdfButton = input<boolean>(false);
 	readonly downloadingPdf = input<boolean>(false);
@@ -120,38 +102,7 @@ export class AsistenciaDiaListComponent {
 		this.estudiantes().map((e) => this.mapEstudianteAsistencia(e)),
 	);
 
-	// * Computed: stats in a single pass for footer badges
-	readonly estadisticas = computed<EstadisticasAsistencia>(() => {
-		const estudiantes = this.estudiantesDelDia();
-		return estudiantes.reduce(
-			(stats, e) => {
-				stats.total++;
-				switch (e.estadoCodigo) {
-					case 'T':
-						stats.temprano++;
-						break;
-					case 'A':
-						stats.aTiempo++;
-						break;
-					case 'F':
-						stats.fueraHora++;
-						break;
-					case 'N':
-						stats.noAsistio++;
-						break;
-					case 'J':
-						stats.justificado++;
-						break;
-					case '-':
-					case 'X':
-						stats.pendiente++;
-						break;
-				}
-				return stats;
-			},
-			{ total: 0, temprano: 0, aTiempo: 0, fueraHora: 0, noAsistio: 0, justificado: 0, pendiente: 0 },
-		);
-	});
+	// ✅ NUEVO: Estadísticas ya no se calculan localmente, vienen del backend como input
 
 	constructor() {
 		// * Sync datepicker model when input changes (OnPush friendly).
@@ -238,17 +189,12 @@ export class AsistenciaDiaListComponent {
 		this.closeDialog();
 	}
 
+	/**
+	 * Mapea un estudiante con sus asistencias a un registro de asistencia del día.
+	 * ✅ NUEVO: Usa estados calculados desde el backend en lugar de calcularlos localmente.
+	 */
 	private mapEstudianteAsistencia(estudiante: EstudianteAsistencia): EstudianteAsistenciaDia {
 		const asistencia = estudiante.asistencias[0];
-		const observacion = asistencia?.observacion || null;
-		const estadoBase = this.calcularEstadoBase(asistencia);
-
-		// Si no hay asistencia o es incompleta, y tiene observación con "Justificado:" → Justificado
-		const esJustificado = this.esJustificado(asistencia, observacion);
-		const estadoCodigo = esJustificado ? 'J' : estadoBase;
-
-		// Puede justificar si: sin asistencia O estado incompleta O ya justificado (para poder quitar)
-		const puedeJustificar = !asistencia || asistencia.estado === 'Incompleta' || esJustificado;
 
 		return {
 			estudianteId: estudiante.estudianteId,
@@ -256,107 +202,11 @@ export class AsistenciaDiaListComponent {
 			dni: estudiante.dni,
 			horaEntrada: asistencia?.horaEntrada || null,
 			horaSalida: asistencia?.horaSalida || null,
-			estadoCodigo,
-			observacion,
-			puedeJustificar,
-			esJustificado,
+			// ✅ Estados calculados desde el backend
+			estadoCodigo: asistencia?.estadoCodigo || 'X',
+			observacion: asistencia?.observacion || null,
+			puedeJustificar: asistencia?.puedeJustificar ?? true,
+			esJustificado: asistencia?.esJustificado ?? false,
 		};
-	}
-
-	/**
-	 * Determina si una asistencia debe marcarse como Justificada.
-	 * Es justificado cuando: (sin asistencia O incompleta) Y tiene observación que inicia con "Justificado:".
-	 */
-	private esJustificado(
-		asistencia: AsistenciaDetalle | undefined,
-		observacion: string | null,
-	): boolean {
-		if (!observacion || !observacion.trim().startsWith(this.PREFIJO_JUSTIFICACION)) return false;
-
-		// Sin asistencia con observación de justificación → justificado
-		if (!asistencia) return true;
-
-		// Asistencia incompleta con observación de justificación → justificado
-		if (asistencia.estado === 'Incompleta') return true;
-
-		return false;
-	}
-
-	private calcularEstadoBase(asistencia: AsistenciaDetalle | undefined): AttendanceStatus {
-		const fecha = this.fecha();
-		const month = fecha.getMonth() + 1;
-
-		// ! Before registration start, mark as "X" and skip other rules.
-		if (isBeforeRegistrationStart(fecha)) {
-			return 'X';
-		}
-
-		const tieneIngreso = asistencia?.horaEntrada;
-		const tieneSalida = asistencia?.horaSalida;
-
-		// * CASE 1: no entry time
-		if (!tieneIngreso) {
-			// * CASE 1a: exit without entry -> out of schedule
-			if (tieneSalida) {
-				return 'F';
-			}
-
-			// * CASE 1b: today without entry
-			if (isToday(fecha)) {
-				// * After exit time -> absent
-				if (hasSalidaTimePassed(month)) {
-					return 'N';
-				}
-				// * Before exit time -> pending
-				return '-';
-			}
-
-			// * CASE 1c: past day without entry -> absent
-			return 'N';
-		}
-
-		// * CASE 2: has entry time
-		const [hourIngresoStr, minuteIngresoStr] =
-			asistencia!.horaEntrada!.split('T')[1]?.split(':') || [];
-		const hourIngreso = parseInt(hourIngresoStr, 10);
-		const minuteIngreso = parseInt(minuteIngresoStr, 10);
-
-		if (isNaN(hourIngreso) || isNaN(minuteIngreso)) {
-			return 'N';
-		}
-
-		const estadoIngreso = getIngresoStatusFromTime(hourIngreso, minuteIngreso, month);
-
-		// * CASE 2a: entry without exit -> use entry status
-		if (!tieneSalida) {
-			return estadoIngreso;
-		}
-
-		// * CASE 2b: entry + exit -> take worse status
-		const [hourSalidaStr, minuteSalidaStr] =
-			asistencia!.horaSalida!.split('T')[1]?.split(':') || [];
-		const hourSalida = parseInt(hourSalidaStr, 10);
-		const minuteSalida = parseInt(minuteSalidaStr, 10);
-
-		if (isNaN(hourSalida) || isNaN(minuteSalida)) {
-			return estadoIngreso;
-		}
-
-		const estadoSalida = getSalidaStatusFromTime(hourSalida, minuteSalida, month);
-
-		// * Priority: F > N > J > T > A
-		const estadoPrioridad: Record<AttendanceStatus, number> = {
-			F: 5,
-			N: 4,
-			J: 3,
-			T: 2,
-			A: 1,
-			'-': 0,
-			X: 0,
-		};
-
-		return estadoPrioridad[estadoIngreso] >= estadoPrioridad[estadoSalida]
-			? estadoIngreso
-			: estadoSalida;
 	}
 }
