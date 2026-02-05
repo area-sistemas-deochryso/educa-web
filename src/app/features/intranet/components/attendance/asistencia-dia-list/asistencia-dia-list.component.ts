@@ -102,6 +102,7 @@ export class AsistenciaDiaListComponent {
 	// * Constants
 	readonly today = new Date();
 	readonly skeletonRows = Array(5);
+	private readonly PREFIJO_JUSTIFICACION = 'Justificado: ';
 
 	// * Local state for the datepicker model
 	fechaValue: Date = new Date();
@@ -159,10 +160,6 @@ export class AsistenciaDiaListComponent {
 		});
 	}
 
-	onFechaSelect(fecha: Date): void {
-		this.fechaChange.emit(fecha);
-	}
-
 	onFechaChange(fecha: Date | null): void {
 		if (fecha) {
 			this.fechaChange.emit(fecha);
@@ -192,8 +189,8 @@ export class AsistenciaDiaListComponent {
 		this.selectedEstudiante.set(estudiante);
 		// Si ya está justificado, extraer el motivo sin el prefijo "Justificado: "
 		const observacion = estudiante.observacion || '';
-		const sinPrefijo = observacion.startsWith('Justificado: ')
-			? observacion.replace('Justificado: ', '')
+		const sinPrefijo = observacion.startsWith(this.PREFIJO_JUSTIFICACION)
+			? observacion.replace(this.PREFIJO_JUSTIFICACION, '')
 			: observacion;
 		this.observacionText.set(sinPrefijo);
 		this.dialogVisible.set(true);
@@ -274,7 +271,7 @@ export class AsistenciaDiaListComponent {
 		asistencia: AsistenciaDetalle | undefined,
 		observacion: string | null,
 	): boolean {
-		if (!observacion || !observacion.trim().startsWith('Justificado:')) return false;
+		if (!observacion || !observacion.trim().startsWith(this.PREFIJO_JUSTIFICACION)) return false;
 
 		// Sin asistencia con observación de justificación → justificado
 		if (!asistencia) return true;
