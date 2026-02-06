@@ -200,8 +200,8 @@
 					<app-form-field-error [error]="errors().correoApoderadoError" />
 				</div>
 			}
-			<!-- SALÓN PARA PROFESOR (Grado) -->
-			@if (isProfesor) {
+			<!-- SALÓN (Grado) - Profesor y Estudiante -->
+			@if (needsSalon) {
 				<div class="field">
 					<label for="grado">Grado</label>
 					<p-select
@@ -216,8 +216,8 @@
 					/>
 				</div>
 			}
-			<!-- SALÓN PARA PROFESOR (Sección) -->
-			@if (isProfesor && _gradoSeleccionado()) {
+			<!-- SALÓN (Sección) - Profesor y Estudiante -->
+			@if (needsSalon && _gradoSeleccionado()) {
 				<div class="field">
 					<label for="seccion">Sección</label>
 					<p-select
@@ -232,7 +232,7 @@
 					/>
 					<small class="text-muted">
 						<i class="pi pi-info-circle" style="margin-right: 0.25rem"></i>
-						Opcional: Asigne un salón al profesor
+						Opcional: Asigne un salón al {{ isProfesor ? 'profesor' : 'estudiante' }}
 					</small>
 				</div>
 			}

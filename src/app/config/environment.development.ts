@@ -15,9 +15,9 @@ export const environment = {
 	// Features en desarrollo (visibles solo en development)
 	features: {
 		horarios: true,
-		calendario: true,
-		quickAccess: true,
-		notifications: true,
+		calendario: false,
+		quickAccess: false,
+		notifications: false,
 		voiceRecognition: true,
 		profesor: true,
 	},

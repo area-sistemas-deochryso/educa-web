@@ -193,6 +193,10 @@ export class UsuarioFormDialogComponent {
 		return this.formData().rol === 'Profesor';
 	}
 
+	get needsSalon(): boolean {
+		return this.isProfesor || this.isEstudiante;
+	}
+
 	// Helper para tipar correctamente el rol
 	get rolValue(): RolUsuarioAdmin | undefined {
 		return this.formData().rol as RolUsuarioAdmin | undefined;
@@ -254,23 +258,27 @@ export class UsuarioFormDialogComponent {
 	}
 
 	onGradoChange(grado: string | null): void {
-		// * Clear section and salonId when grade changes.
+		// * Clear section, salonId, and text fields when grade changes.
 		this._gradoSeleccionado.set(grado);
-		// Limpiar sección cuando cambia el grado
 		this._seccionSeleccionada.set(null);
-		// Limpiar salonId en el formData
 		this.fieldChange.emit({ field: 'salonId', value: undefined });
+		this.fieldChange.emit({ field: 'grado', value: undefined });
+		this.fieldChange.emit({ field: 'seccion', value: undefined });
 	}
 
 	onSeccionChange(seccion: string | null): void {
 		this._seccionSeleccionada.set(seccion);
 
-		// * Map grado + seccion to salonId in the form.
+		// * Map grado + seccion to salonId and text fields in the form.
 		const salon = this.salonSeleccionado();
 		if (salon) {
 			this.fieldChange.emit({ field: 'salonId', value: salon.salonId });
+			this.fieldChange.emit({ field: 'grado', value: salon.grado });
+			this.fieldChange.emit({ field: 'seccion', value: salon.seccion });
 		} else {
 			this.fieldChange.emit({ field: 'salonId', value: undefined });
+			this.fieldChange.emit({ field: 'grado', value: undefined });
+			this.fieldChange.emit({ field: 'seccion', value: undefined });
 		}
 	}
 

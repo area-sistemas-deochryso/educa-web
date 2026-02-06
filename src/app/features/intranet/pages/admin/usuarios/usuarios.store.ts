@@ -357,8 +357,8 @@ export class UsuariosStore {
 				}
 			}
 
-			// Limpiar campos de salón si el rol cambia y no es Profesor
-			if (updates.rol !== undefined && newData.rol !== 'Profesor') {
+			// Limpiar campos de salón si el rol cambia y no es Profesor ni Estudiante
+			if (updates.rol !== undefined && newData.rol !== 'Profesor' && newData.rol !== 'Estudiante') {
 				newData.salonId = undefined;
 				newData.esTutor = undefined;
 			}
@@ -368,8 +368,8 @@ export class UsuariosStore {
 				newData.esTutor = undefined;
 			}
 
-			// Si se selecciona un salón y esTutor no está definido, inicializar en false
-			if (updates.salonId !== undefined && newData.salonId && newData.esTutor === undefined) {
+			// Si se selecciona un salón y esTutor no está definido, inicializar en false (solo Profesor)
+			if (updates.salonId !== undefined && newData.salonId && newData.esTutor === undefined && newData.rol === 'Profesor') {
 				newData.esTutor = false;
 			}
 
