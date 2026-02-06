@@ -16,8 +16,16 @@ const developmentRoutes: Route[] = [
 						import('./pages/schedule-component/schedule.component').then(
 							(m) => m.ScheduleComponent,
 						),
-					title: 'Intranet - Horarios',
+					title: 'Intranet - ScheduleComponent',
 				},
+				// {
+				// 	path: 'navegacion-campus-salones',
+				// 	loadComponent: () =>
+				// 		import('./pages/campus-navigation/campus-navigation.component').then(
+				// 			(m) => m.CampusNavigationComponent,
+				// 		),
+				// 	title: 'Intranet - Navegación Campus Salonese',
+				// },
 			]
 		: []),
 	...(environment.features.calendario

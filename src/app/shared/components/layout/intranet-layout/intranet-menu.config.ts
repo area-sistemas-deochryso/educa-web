@@ -14,8 +14,8 @@ const developmentMenuItems: NavItemWithPermiso[] = [
 		? [
 				{
 					route: '/intranet/horarios',
-					label: 'Horarios',
-					icon: 'pi pi-clock',
+					label: 'Navegación',
+					icon: 'pi pi-map',
 					permiso: 'intranet/horarios',
 				},
 			]

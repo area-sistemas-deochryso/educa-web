@@ -1,0 +1,50 @@
+<!-- ============ Campus Navigation Layout ============ -->
+<div class="campus-navigation">
+	<!-- ============ Panel lateral: Horario del día ============ -->
+	<aside class="schedule-sidebar">
+		<app-schedule-panel
+			[items]="vm().scheduleItems"
+			[scheduleReady]="vm().scheduleReady"
+			[currentSalonId]="vm().currentOrNextClass?.salonId ?? null"
+			(navigate)="onNavigateToSalon($event)"
+		/>
+	</aside>
+
+	<!-- ============ Área principal: Mapa + controles ============ -->
+	<main class="map-area">
+		<!-- Controles superiores -->
+		<div class="controls-row">
+			<app-floor-selector
+				[floors]="vm().floors"
+				[selectedFloor]="vm().selectedFloor"
+				(floorChange)="onFloorChange($event)"
+			/>
+
+			<app-location-selector
+				[startOptions]="vm().startNodeOptions"
+				[destinationOptions]="vm().destinationNodeOptions"
+				[startNodeId]="vm().startNodeId"
+				[destinationNodeId]="vm().destinationNodeId"
+				[hasPath]="vm().hasPath"
+				(startChange)="onStartChange($event)"
+				(destinationChange)="onDestinationChange($event)"
+				(clear)="onClearPath()"
+			/>
+		</div>
+
+		<!-- Mapa SVG -->
+		<app-campus-map
+			[nodes]="vm().currentFloorNodes"
+			[selectedFloor]="vm().selectedFloor"
+			[pathPoints]="vm().currentFloorPathPoints"
+			[startNodeId]="vm().startNodeId"
+			[destinationNodeId]="vm().destinationNodeId"
+			(nodeClick)="onMapNodeClick($event)"
+		/>
+
+		<!-- Pasos de navegación -->
+		@if (vm().hasPath) {
+			<app-navigation-steps [pathResult]="vm().pathResult" />
+		}
+	</main>
+</div>
