@@ -2,7 +2,7 @@
 	"name": "Educa.com.pe",
 	"short_name": "Educa",
 	"description": "Asociación educativa y cultural comprometida con la educación integral",
-	"start_url": "/",
+	"start_url": "/intranet/login",
 	"scope": "/",
 	"display": "standalone",
 	"background_color": "#ffffff",
