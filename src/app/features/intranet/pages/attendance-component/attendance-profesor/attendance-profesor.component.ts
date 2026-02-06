@@ -14,7 +14,7 @@ import { EmptyStateComponent } from '../../../components/attendance/empty-state/
 import { Menu, MenuModule } from 'primeng/menu';
 import { SalonSelectorComponent } from '../../../components/attendance/salon-selector/salon-selector.component';
 import { TooltipModule } from 'primeng/tooltip';
-import { finalize } from 'rxjs';
+import { finalize, forkJoin } from 'rxjs';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
 /**
@@ -54,6 +54,8 @@ export class AttendanceProfesorComponent implements OnInit {
 
 	// ============ Salones ============
 
+	/** Salón pendiente de selección (viene de query param antes de que carguen los salones) */
+	private _pendingSalonId: number | null = null;
 	private readonly allSalones = signal<SalonProfesor[]>([]);
 	readonly salones = computed(() => {
 		const all = this.allSalones();
@@ -69,7 +71,10 @@ export class AttendanceProfesorComponent implements OnInit {
 	readonly selectedSalonId = signal<number | null>(null);
 	readonly selectedSalon = computed(() => {
 		const id = this.selectedSalonId();
-		return this.salones().find((s) => s.salonId === id) || null;
+		// Buscar primero en salones filtrados, luego en todos (para query param que bypass verano filter)
+		return this.salones().find((s) => s.salonId === id)
+			|| this.allSalones().find((s) => s.salonId === id)
+			|| null;
 	});
 
 	// ============ Justificación ============
@@ -93,11 +98,13 @@ export class AttendanceProfesorComponent implements OnInit {
 	// ============ Carga y selección de salón ============
 
 	private loadSalones(): void {
-		// * Fetch salon list, then restore selection and load data.
+		// * Fetch from both ProfesorSalon (tutor) and Horarios (teaching), then merge.
 		this.view.loading.set(true);
 
-		this.asistenciaService
-			.getSalonesProfesor()
+		forkJoin({
+			tutoria: this.asistenciaService.getSalonesProfesor(),
+			horario: this.asistenciaService.getSalonesProfesorPorHorario(),
+		})
 			.pipe(
 				takeUntilDestroyed(this.destroyRef),
 				finalize(() => {
@@ -107,8 +114,30 @@ export class AttendanceProfesorComponent implements OnInit {
 				}),
 			)
 			.subscribe({
-				next: (salones) => {
-					this.allSalones.set(salones);
+				next: ({ tutoria, horario }) => {
+					// Merge: tutoria takes priority (has EsTutor=true), add horario salons not already present
+					const merged = [...tutoria];
+					const existingIds = new Set(tutoria.map((s) => s.salonId));
+					for (const salon of horario) {
+						if (!existingIds.has(salon.salonId)) {
+							merged.push(salon);
+						}
+					}
+					this.allSalones.set(merged);
+
+					// Si hay un salón pendiente de query param, buscarlo en TODOS los salones
+					if (this._pendingSalonId !== null) {
+						const pending = this._pendingSalonId;
+						this._pendingSalonId = null;
+						const found = merged.some((s) => s.salonId === pending);
+						if (found) {
+							this.selectedSalonId.set(pending);
+							this.saveSelectedSalon();
+							this.view.reload();
+							return;
+						}
+					}
+
 					if (this.salones().length > 0) {
 						this.restoreSelectedSalon();
 						this.view.reload();
@@ -160,6 +189,19 @@ export class AttendanceProfesorComponent implements OnInit {
 		this.selectedSalonId.set(first?.salonId ?? null);
 		if (first) {
 			this.saveSelectedSalon();
+		}
+	}
+
+	/**
+	 * Pre-selecciona un salón desde query param (ej: navegación desde horarios).
+	 * Si los salones ya están cargados, selecciona inmediatamente.
+	 * Si no, guarda como pendiente para aplicar cuando loadSalones complete.
+	 */
+	selectSalonFromQueryParam(salonId: number): void {
+		if (this.salones().length > 0) {
+			this.selectSalon(salonId);
+		} else {
+			this._pendingSalonId = salonId;
 		}
 	}
 

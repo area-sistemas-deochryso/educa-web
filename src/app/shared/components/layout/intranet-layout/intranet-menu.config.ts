@@ -14,8 +14,8 @@ const developmentMenuItems: NavItemWithPermiso[] = [
 		? [
 				{
 					route: '/intranet/horarios',
-					label: 'Navegación',
-					icon: 'pi pi-map',
+					label: 'Horarios',
+					icon: 'pi pi-clock',
 					permiso: 'intranet/horarios',
 				},
 			]
@@ -28,6 +28,34 @@ const developmentMenuItems: NavItemWithPermiso[] = [
 					icon: 'pi pi-calendar',
 					permiso: 'intranet/calendario',
 				},
+			]
+		: []),
+	...(environment.features.profesor
+		? [
+				{
+					label: 'Mi Aula',
+					icon: 'pi pi-building',
+					children: [
+						{
+							route: '/intranet/profesor/cursos',
+							label: 'Cursos',
+							icon: 'pi pi-book',
+							permiso: 'intranet/profesor/cursos',
+						},
+						{
+							route: '/intranet/profesor/salones',
+							label: 'Salones',
+							icon: 'pi pi-building',
+							permiso: 'intranet/profesor/salones',
+						},
+						{
+							route: '/intranet/profesor/horarios',
+							label: 'Horarios',
+							icon: 'pi pi-clock',
+							permiso: 'intranet/profesor/horarios',
+						},
+					],
+				} as NavItemWithPermiso,
 			]
 		: []),
 ];

@@ -12,13 +12,14 @@ export const environment = {
 	// Feature flags
 	showIntranetLink: true,
 
-	// Features en desarrollo (ocultos en producción)
+	// Features en desarrollo (ocultos en producción los que estén en false)
 	features: {
 		horarios: false,
 		calendario: false,
 		quickAccess: false,
 		notifications: false,
 		voiceRecognition: false,
+		profesor: true, //? provisional de momento
 	},
 };
 

@@ -3,7 +3,8 @@ import {
 	VIEW_MODE,
 	ViewMode,
 } from '../../components/attendance/attendance-header/attendance-header.component';
-import { Component, ViewChild, inject, signal } from '@angular/core';
+import { Component, ViewChild, AfterViewInit, inject, signal } from '@angular/core';
+import { ActivatedRoute } from '@angular/router';
 
 import { AttendanceApoderadoComponent } from './attendance-apoderado/attendance-apoderado.component';
 import { AttendanceDirectorComponent } from './attendance-director/attendance-director.component';
@@ -35,8 +36,9 @@ import { APP_USER_ROLES } from '@app/shared/constants';
 	templateUrl: './attendance.component.html',
 	styleUrl: './attendance.component.scss',
 })
-export class AttendanceComponent {
+export class AttendanceComponent implements AfterViewInit {
 	private userProfile = inject(UserProfileService);
+	private route = inject(ActivatedRoute);
 
 	// * ViewChild refs are used to delegate reload/mode actions by role.
 	@ViewChild(AttendanceApoderadoComponent) apoderadoComponent?: AttendanceApoderadoComponent;
@@ -48,6 +50,17 @@ export class AttendanceComponent {
 	readonly userRole = this.userProfile.userRole;
 	readonly loading = signal(false);
 	readonly selectedMode = signal<ViewMode>(VIEW_MODE.Dia);
+
+	ngAfterViewInit(): void {
+		// Leer salonId de query params (viene desde horarios del profesor)
+		const salonIdParam = this.route.snapshot.queryParamMap.get('salonId');
+		if (salonIdParam && this.profesorComponent) {
+			const salonId = Number(salonIdParam);
+			if (!isNaN(salonId)) {
+				this.profesorComponent.selectSalonFromQueryParam(salonId);
+			}
+		}
+	}
 
 	// * Header comun: solo algunos roles soportan cambio de modo.
 	onModeChange(mode: ViewMode): void {

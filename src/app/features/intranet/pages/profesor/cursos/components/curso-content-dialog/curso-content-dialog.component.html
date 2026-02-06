@@ -1,0 +1,273 @@
+<!-- ============ Dialog principal de contenido ============ -->
+<p-dialog
+	[visible]="vm().contentDialogVisible"
+	(visibleChange)="onVisibleChange($event)"
+	[modal]="true"
+	[dismissableMask]="true"
+	[header]="vm().contenido ? vm().contenido!.cursoNombre : 'Contenido del Curso'"
+	[style]="{ width: '900px', maxWidth: '95vw' }"
+	[contentStyle]="{ overflow: 'visible' }"
+>
+	@if (vm().contenido; as contenido) {
+		<div class="modal-body">
+			<div class="content-layout">
+				<!-- ============ Columna izquierda: Semanas ============ -->
+				<div class="semanas-column">
+					<!-- Search box (estilo schedule) -->
+					<div class="search-box">
+						<i class="pi pi-search"></i>
+						<input
+							type="text"
+							placeholder="Buscar semana..."
+							[ngModel]="searchQuery()"
+							(ngModelChange)="searchQuery.set($event)"
+						/>
+					</div>
+
+					<!-- Accordion de semanas -->
+					@if (filteredSemanas().length === 0) {
+						<div class="section-empty" style="text-align: center; padding: 2rem 0">
+							No se encontraron semanas
+						</div>
+					} @else {
+						<div class="weeks-accordion">
+							<p-accordion [multiple]="true">
+								@for (semana of filteredSemanas(); track semana.id) {
+									<p-accordionpanel>
+										<p-accordionheader>
+											<div class="flex align-items-center w-full">
+												<div class="semana-label">
+													<span class="semana-number">Semana {{ semana.numeroSemana }}</span>
+													@if (semana.titulo) {
+														<span class="semana-titulo">— {{ semana.titulo }}</span>
+													}
+												</div>
+												<div class="semana-badges">
+													@if (semana.archivos.length > 0) {
+														<span class="mini-badge">
+															<i class="pi pi-paperclip"></i>
+															{{ semana.archivos.length }}
+														</span>
+													}
+													@if (semana.tareas.length > 0) {
+														<span class="mini-badge">
+															<i class="pi pi-file-edit"></i>
+															{{ semana.tareas.length }}
+														</span>
+													}
+												</div>
+											</div>
+										</p-accordionheader>
+										<p-accordioncontent>
+											<div class="semana-body">
+												<!-- Descripción -->
+												@if (semana.descripcion) {
+													<p class="semana-desc">{{ semana.descripcion }}</p>
+												}
+
+												<!-- Mensaje docente -->
+												@if (semana.mensajeDocente) {
+													<div class="teacher-message">
+														<i class="pi pi-comment"></i>
+														<span>{{ semana.mensajeDocente }}</span>
+													</div>
+												}
+
+												<!-- Editar semana link -->
+												<button
+													class="edit-semana-link"
+													(click)="onEditSemana(semana); $event.stopPropagation()"
+												>
+													<i class="pi pi-pencil"></i>
+													Editar semana
+												</button>
+
+												<!-- ============ Archivos ============ -->
+												<div class="section-title-row">
+													<div class="section-label">
+														<i class="pi pi-paperclip"></i>
+														Archivos
+													</div>
+													<p-fileUpload
+														mode="basic"
+														[auto]="true"
+														chooseLabel="Subir"
+														chooseIcon="pi pi-upload"
+														[maxFileSize]="52428800"
+														(onSelect)="onFileSelect($event, semana.id)"
+														[customUpload]="true"
+														styleClass="p-button-sm p-button-text"
+														[pt]="{
+															root: {
+																'aria-label': 'Subir archivo',
+															},
+														}"
+													/>
+												</div>
+
+												@if (semana.archivos.length === 0) {
+													<div class="section-empty">Sin archivos adjuntos</div>
+												} @else {
+													@for (archivo of semana.archivos; track archivo.id) {
+														<div class="content-row">
+															<div [class]="'row-icon ' + getFileIconClass(archivo.tipoArchivo)">
+																<i [class]="getFileIcon(archivo.tipoArchivo)"></i>
+															</div>
+															<div class="row-info" style="cursor: pointer" (click)="openArchivo(archivo.urlArchivo)">
+																<strong>{{ archivo.nombreArchivo }}</strong>
+																@if (archivo.tamanoBytes) {
+																	<span>{{ formatFileSize(archivo.tamanoBytes) }}</span>
+																}
+															</div>
+															<div class="row-actions">
+																<button
+																	pButton
+																	icon="pi pi-trash"
+																	class="p-button-text p-button-danger p-button-sm p-button-rounded"
+																	pTooltip="Eliminar"
+																	tooltipPosition="top"
+																	(click)="onDeleteArchivo(semana.id, archivo.id, archivo.nombreArchivo)"
+																	[pt]="{
+																		root: {
+																			'aria-label': 'Eliminar archivo',
+																		},
+																	}"
+																></button>
+															</div>
+														</div>
+													}
+												}
+
+												<!-- ============ Tareas ============ -->
+												<div class="section-title-row" style="margin-top: 0.5rem">
+													<div class="section-label">
+														<i class="pi pi-file-edit"></i>
+														Tareas
+													</div>
+													<button
+														pButton
+														icon="pi pi-plus"
+														label="Tarea"
+														class="p-button-sm p-button-text"
+														(click)="setActiveSemanaForTarea(semana); onAddTarea()"
+													></button>
+												</div>
+
+												@if (semana.tareas.length === 0) {
+													<div class="section-empty">Sin tareas asignadas</div>
+												} @else {
+													@for (tarea of semana.tareas; track tarea.id) {
+														<div class="content-row">
+															<div class="row-icon tarea">
+																<i class="pi pi-file-edit"></i>
+															</div>
+															<div class="row-info">
+																<strong>{{ tarea.titulo }}</strong>
+																@if (tarea.fechaLimite) {
+																	<span>
+																		<i class="pi pi-calendar" style="font-size: 0.6rem"></i>
+																		{{ tarea.fechaLimite | date: 'dd/MM/yyyy' }}
+																	</span>
+																}
+															</div>
+															<div class="row-actions">
+																<button
+																	pButton
+																	icon="pi pi-pencil"
+																	class="p-button-text p-button-sm p-button-rounded"
+																	pTooltip="Editar"
+																	tooltipPosition="top"
+																	(click)="setActiveSemanaForTarea(semana); onEditTarea(tarea)"
+																	[pt]="{
+																		root: {
+																			'aria-label': 'Editar tarea',
+																		},
+																	}"
+																></button>
+																<button
+																	pButton
+																	icon="pi pi-trash"
+																	class="p-button-text p-button-danger p-button-sm p-button-rounded"
+																	pTooltip="Eliminar"
+																	tooltipPosition="top"
+																	(click)="onDeleteTarea(semana.id, tarea.id, tarea.titulo)"
+																	[pt]="{
+																		root: {
+																			'aria-label': 'Eliminar tarea',
+																		},
+																	}"
+																></button>
+															</div>
+														</div>
+													}
+												}
+											</div>
+										</p-accordioncontent>
+									</p-accordionpanel>
+								}
+							</p-accordion>
+						</div>
+					}
+				</div>
+
+				<!-- ============ Columna derecha: Info sidebar ============ -->
+				<div class="info-column">
+					<p class="info-section-title">Información</p>
+
+					<div class="info-field">
+						<p class="info-field-label">Curso</p>
+						<p class="info-field-value">{{ contenido.cursoNombre }}</p>
+					</div>
+					<div class="info-field">
+						<p class="info-field-label">Salón</p>
+						<p class="info-field-value">{{ contenido.salonDescripcion }}</p>
+					</div>
+					<div class="info-field">
+						<p class="info-field-label">Semanas</p>
+						<p class="info-field-value">{{ contenido.numeroSemanas }}</p>
+					</div>
+
+					<div class="info-divider"></div>
+
+					<div class="info-stats">
+						<div class="stat-box">
+							<div class="stat-number">{{ vm().totalArchivos }}</div>
+							<div class="stat-label">Archivos</div>
+						</div>
+						<div class="stat-box">
+							<div class="stat-number">{{ vm().totalTareas }}</div>
+							<div class="stat-label">Tareas</div>
+						</div>
+					</div>
+
+					<div class="info-divider"></div>
+
+					<button class="danger-link" (click)="onDeleteContenido()">
+						<i class="pi pi-trash"></i>
+						Eliminar contenido
+					</button>
+				</div>
+			</div>
+		</div>
+	}
+</p-dialog>
+
+<!-- ============ Sub-dialogs ============ -->
+<app-semana-edit-dialog
+	[visible]="vm().semanaEditDialogVisible"
+	[semana]="vm().selectedSemana"
+	[saving]="vm().saving"
+	(visibleChange)="onSemanaEditVisibleChange($event)"
+	(save)="onSaveSemana($event)"
+/>
+
+<app-tarea-dialog
+	[visible]="vm().tareaDialogVisible"
+	[tarea]="vm().selectedTarea"
+	[saving]="vm().saving"
+	(visibleChange)="onTareaVisibleChange($event)"
+	(createTarea)="onCreateTarea($event)"
+	(updateTarea)="onUpdateTarea($event)"
+/>
+
+<p-confirmDialog />

@@ -99,6 +99,16 @@ export class AsistenciaService {
 	}
 
 	/**
+	 * Profesor: Obtener salones donde tiene horarios activos
+	 * GET /api/ConsultaAsistencia/profesor/salones-horario
+	 */
+	getSalonesProfesorPorHorario(): Observable<SalonProfesor[]> {
+		return this.http
+			.get<SalonProfesor[]>(`${this.apiUrl}/profesor/salones-horario`)
+			.pipe(catchError(() => of([])));
+	}
+
+	/**
 	 * Profesor: Obtener asistencias de estudiantes por grado/sección
 	 * GET /api/ConsultaAsistencia/profesor/grado?grado={grado}&seccion={seccion}&mes={mes}&anio={anio}
 	 */

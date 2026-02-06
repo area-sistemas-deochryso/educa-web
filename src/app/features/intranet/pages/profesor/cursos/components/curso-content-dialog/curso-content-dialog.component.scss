@@ -1,0 +1,434 @@
+// ============ Dialog overrides ============
+:host ::ng-deep {
+	.p-dialog {
+		border-radius: 10px;
+		overflow: hidden;
+	}
+
+	.p-dialog-content {
+		padding: 0 !important;
+	}
+
+	.p-dialog-header {
+		padding: 1.25rem 2rem 0;
+		border-bottom: none;
+
+		.p-dialog-title {
+			font-size: 1.25rem;
+			font-weight: 600;
+		}
+	}
+
+	// Accordion - estilo limpio como schedule modal
+	.p-accordionpanel {
+		border-bottom: 1px solid #eee;
+
+		&:last-child {
+			border-bottom: none;
+		}
+	}
+
+	.p-accordionheader {
+		background: transparent !important;
+		border: none !important;
+		padding: 0.6rem 0 !important;
+
+		&:hover {
+			background: rgba(0, 0, 0, 0.02) !important;
+		}
+	}
+
+	.p-accordionheader-toggle-icon {
+		font-size: 0.7rem;
+		color: var(--text-color-secondary);
+	}
+
+	.p-accordioncontent-content {
+		padding: 0 0 0.75rem !important;
+		border-top: none !important;
+	}
+}
+
+// ============ Modal content wrapper ============
+.modal-body {
+	padding: 1.5rem 2rem 2rem;
+}
+
+// ============ Layout 2 columnas ============
+.content-layout {
+	display: flex;
+	gap: 2rem;
+}
+
+.semanas-column {
+	flex: 1;
+	min-width: 0;
+	overflow-y: auto;
+	max-height: 68vh;
+}
+
+// ============ Sidebar derecha ============
+.info-column {
+	width: 220px;
+	border-left: 1px solid #ddd;
+	padding-left: 1.5rem;
+	flex-shrink: 0;
+	position: sticky;
+	top: 0;
+	align-self: flex-start;
+}
+
+.info-section-title {
+	font-size: 0.7rem;
+	font-weight: 600;
+	text-transform: uppercase;
+	letter-spacing: 0.05em;
+	color: var(--text-color-secondary);
+	margin: 0 0 0.75rem;
+}
+
+.info-field {
+	margin-bottom: 0.75rem;
+
+	&-label {
+		font-size: 0.7rem;
+		color: var(--text-color-secondary);
+		margin: 0;
+	}
+
+	&-value {
+		font-size: 0.8rem;
+		font-weight: 500;
+		color: var(--text-color);
+		margin: 0.1rem 0 0;
+	}
+}
+
+.info-divider {
+	height: 1px;
+	background: #eee;
+	margin: 1rem 0;
+	border: none;
+}
+
+// ============ Stats pills ============
+.info-stats {
+	display: flex;
+	gap: 0.75rem;
+}
+
+.stat-box {
+	flex: 1;
+	text-align: center;
+	padding: 0.5rem 0.25rem;
+	border: 1px solid #ddd;
+	border-radius: 4px;
+
+	.stat-number {
+		font-size: 1.1rem;
+		font-weight: 700;
+		color: var(--text-color);
+		line-height: 1;
+	}
+
+	.stat-label {
+		font-size: 0.65rem;
+		color: var(--text-color-secondary);
+		margin-top: 0.15rem;
+	}
+}
+
+// ============ Danger action ============
+.danger-link {
+	display: flex;
+	align-items: center;
+	gap: 0.35rem;
+	font-size: 0.75rem;
+	color: #ef4444;
+	cursor: pointer;
+	background: none;
+	border: none;
+	padding: 0;
+	margin-top: 0.25rem;
+
+	i {
+		font-size: 0.75rem;
+	}
+
+	&:hover {
+		color: #dc2626;
+		text-decoration: underline;
+	}
+}
+
+// ============ Search box (estilo schedule) ============
+.search-box {
+	display: flex;
+	align-items: center;
+	gap: 0.5rem;
+	padding: 0.5rem 1rem;
+	border: 1px solid #ddd;
+	border-radius: 4px;
+	margin-bottom: 1rem;
+
+	i {
+		color: var(--text-color-secondary);
+		font-size: 0.85rem;
+	}
+
+	input {
+		border: none;
+		outline: none;
+		font-size: 0.8rem;
+		color: var(--text-color);
+		width: 100%;
+		background: transparent;
+
+		&::placeholder {
+			color: var(--text-color-secondary);
+		}
+	}
+}
+
+// ============ Weeks accordion container ============
+.weeks-accordion {
+	border: 1px solid #ddd;
+	border-radius: 4px;
+}
+
+// ============ Semana header en accordion ============
+.semana-label {
+	display: flex;
+	align-items: center;
+	gap: 0.5rem;
+	font-size: 0.8rem;
+	color: var(--text-color);
+
+	.semana-number {
+		font-weight: 600;
+	}
+
+	.semana-titulo {
+		color: var(--text-color-secondary);
+		font-weight: 400;
+	}
+}
+
+.semana-badges {
+	display: flex;
+	align-items: center;
+	gap: 0.35rem;
+	margin-left: auto;
+	margin-right: 0.5rem;
+}
+
+.mini-badge {
+	display: inline-flex;
+	align-items: center;
+	gap: 0.2rem;
+	font-size: 0.65rem;
+	color: var(--text-color-secondary);
+	background: rgba(0, 0, 0, 0.04);
+	padding: 0.15rem 0.4rem;
+	border-radius: 3px;
+
+	i {
+		font-size: 0.6rem;
+	}
+}
+
+// ============ Semana content (expanded) ============
+.semana-body {
+	padding: 0 0.5rem;
+}
+
+.semana-desc {
+	font-size: 0.75rem;
+	color: var(--text-color-secondary);
+	margin: 0 0 0.5rem;
+	font-style: italic;
+}
+
+.teacher-message {
+	display: flex;
+	align-items: flex-start;
+	gap: 0.4rem;
+	font-size: 0.72rem;
+	color: var(--text-color-secondary);
+	margin: 0 0 0.75rem;
+	padding: 0.4rem 0.6rem;
+	background: rgba(0, 0, 0, 0.02);
+	border-left: 2px solid #ddd;
+	border-radius: 0 4px 4px 0;
+
+	i {
+		font-size: 0.7rem;
+		margin-top: 0.1rem;
+		flex-shrink: 0;
+	}
+}
+
+.edit-semana-link {
+	display: inline-flex;
+	align-items: center;
+	gap: 0.25rem;
+	font-size: 0.72rem;
+	color: var(--primary-color);
+	cursor: pointer;
+	background: none;
+	border: none;
+	padding: 0;
+	margin-bottom: 0.75rem;
+
+	i {
+		font-size: 0.7rem;
+	}
+
+	&:hover {
+		text-decoration: underline;
+	}
+}
+
+// ============ Content rows (archivos / tareas) ============
+.content-row {
+	display: flex;
+	gap: 0.75rem;
+	padding: 0.5rem 0;
+	border-bottom: 1px solid #eee;
+
+	&:last-child {
+		border-bottom: none;
+	}
+}
+
+.row-icon {
+	width: 36px;
+	height: 36px;
+	border: 1px solid #ddd;
+	border-radius: 4px;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	flex-shrink: 0;
+
+	i {
+		font-size: 1rem;
+		color: var(--text-color-secondary);
+	}
+
+	// Colores por tipo de archivo
+	&.pdf {
+		border-color: #fca5a5;
+		i { color: #ef4444; }
+	}
+
+	&.word {
+		border-color: #93c5fd;
+		i { color: #3b82f6; }
+	}
+
+	&.excel {
+		border-color: #86efac;
+		i { color: #22c55e; }
+	}
+
+	&.image {
+		border-color: #c4b5fd;
+		i { color: #8b5cf6; }
+	}
+
+	&.video {
+		border-color: #fdba74;
+		i { color: #f97316; }
+	}
+
+	&.tarea {
+		border-color: #fde68a;
+		i { color: #f59e0b; }
+	}
+}
+
+.row-info {
+	display: flex;
+	flex-direction: column;
+	gap: 0.1rem;
+	flex: 1;
+	min-width: 0;
+	justify-content: center;
+
+	strong {
+		font-size: 0.75rem;
+		font-weight: 500;
+		color: var(--text-color);
+		white-space: nowrap;
+		text-overflow: ellipsis;
+		overflow: hidden;
+	}
+
+	span {
+		font-size: 0.68rem;
+		color: var(--text-color-secondary);
+	}
+}
+
+.row-actions {
+	display: flex;
+	align-items: center;
+	gap: 0;
+	flex-shrink: 0;
+}
+
+// ============ Section title (ARCHIVOS / TAREAS) ============
+.section-title-row {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	padding: 0.5rem 0;
+	margin-bottom: 0.25rem;
+
+	.section-label {
+		display: flex;
+		align-items: center;
+		gap: 0.35rem;
+		font-size: 0.7rem;
+		font-weight: 600;
+		text-transform: uppercase;
+		letter-spacing: 0.03em;
+		color: var(--text-color-secondary);
+
+		i {
+			font-size: 0.75rem;
+		}
+	}
+}
+
+.section-empty {
+	font-size: 0.72rem;
+	color: var(--text-color-secondary);
+	padding: 0.25rem 0 0.5rem;
+	font-style: italic;
+}
+
+// ============ Responsive ============
+@media (max-width: 768px) {
+	.content-layout {
+		flex-direction: column;
+	}
+
+	.info-column {
+		width: 100%;
+		border-left: none;
+		border-top: 1px solid #ddd;
+		padding-left: 0;
+		padding-top: 1.5rem;
+		position: static;
+	}
+
+	.semanas-column {
+		max-height: none;
+	}
+
+	.modal-body {
+		padding: 1.25rem;
+	}
+}

@@ -25,6 +25,7 @@ export interface UsuarioLista {
 }
 
 export interface UsuarioDetalle extends UsuarioLista {
+	contrasena?: string;
 	fechaNacimiento?: string;
 	grado?: string;
 	seccion?: string;

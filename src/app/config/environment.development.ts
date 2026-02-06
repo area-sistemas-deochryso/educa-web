@@ -19,6 +19,7 @@ export const environment = {
 		quickAccess: true,
 		notifications: true,
 		voiceRecognition: true,
+		profesor: true,
 	},
 };
 

@@ -2,12 +2,13 @@ import {
 	ActualizarUsuarioRequest,
 	CrearUsuarioRequest,
 	RolUsuarioAdmin,
+	SalonProfesor,
 	UsuarioDetalle,
 	UsuarioLista,
 	UsuariosEstadisticas,
-	SalonProfesor,
 } from '@core/services';
-import { Injectable, computed, signal, inject } from '@angular/core';
+import { Injectable, computed, inject, signal } from '@angular/core';
+
 import { DebugService } from '@core/helpers';
 
 /**
@@ -145,7 +146,8 @@ export class UsuariosStore {
 		if (this.nombreApoderadoError()) return false;
 		if (this.telefonoApoderadoError()) return false;
 		// Si es profesor y tiene salón seleccionado, esTutor debe estar definido
-		if (this.isProfesor() && data.salonId !== undefined && data.esTutor === undefined) return false;
+		if (this.isProfesor() && data.salonId !== undefined && data.esTutor === undefined)
+			return false;
 		return true;
 	});
 
@@ -319,8 +321,11 @@ export class UsuariosStore {
 		this._formData.update((current) => {
 			const newData = { ...current, ...updates };
 
-			// Auto-generar contraseña cuando cambian apellidos o DNI (creación y edición)
-			if (updates.apellidos !== undefined || updates.dni !== undefined) {
+			// Auto-generar contraseña solo en creación (en edición se usa la del backend)
+			if (
+				!this._isEditing() &&
+				(updates.apellidos !== undefined || updates.dni !== undefined)
+			) {
 				const apellido = (newData.apellidos ?? '').trim();
 				const dniRaw = (newData.dni ?? '').trim();
 
@@ -411,26 +416,12 @@ export class UsuariosStore {
 	}
 
 	openEditDialog(usuario: UsuarioDetalle): void {
-		// Calcular contraseña autogenerada basada en datos actuales del usuario
-		const apellido = usuario.apellidos.trim();
-		const dniRaw = usuario.dni.trim();
-		const pref = apellido.slice(0, 2).toUpperCase();
-		const digits = dniRaw.replace(/\D/g, '');
-		const suf = digits.slice(-4);
-		const contrasenaAutogenerada = pref.length >= 2 && suf.length >= 4 ? `${pref}${suf}` : '';
-
-		this.log.info('openEditDialog - contraseña inicial calculada', {
-			apellido,
-			dni: dniRaw,
-			contrasena: contrasenaAutogenerada,
-		});
-
 		this._selectedUsuario.set(usuario);
 		this._formData.set({
 			dni: usuario.dni,
 			nombres: usuario.nombres,
 			apellidos: usuario.apellidos,
-			contrasena: contrasenaAutogenerada,
+			contrasena: usuario.contrasena ?? '',
 			rol: usuario.rol as RolUsuarioAdmin,
 			estado: usuario.estado,
 			telefono: usuario.telefono,
@@ -439,6 +430,8 @@ export class UsuariosStore {
 			fechaNacimiento: usuario.fechaNacimiento,
 			grado: usuario.grado,
 			seccion: usuario.seccion,
+			nombreApoderado: usuario.nombreApoderado,
+			telefonoApoderado: usuario.telefonoApoderado,
 			correoApoderado: usuario.correoApoderado,
 			salonId: usuario.salonId,
 			esTutor: usuario.esTutor,

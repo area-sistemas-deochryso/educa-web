@@ -40,6 +40,28 @@ const developmentRoutes: Route[] = [
 				},
 			]
 		: []),
+	...(environment.features.profesor
+		? [
+				{
+					path: 'profesor/cursos',
+					loadComponent: () =>
+						import('./pages/profesor').then((m) => m.ProfesorCursosComponent),
+					title: 'Intranet - Mis Cursos',
+				},
+				{
+					path: 'profesor/salones',
+					loadComponent: () =>
+						import('./pages/profesor').then((m) => m.ProfesorSalonesComponent),
+					title: 'Intranet - Mis Salones',
+				},
+				{
+					path: 'profesor/horarios',
+					loadComponent: () =>
+						import('./pages/profesor').then((m) => m.ProfesorHorariosComponent),
+					title: 'Intranet - Mi Horario',
+				},
+			]
+		: []),
 ];
 
 export const INTRANET_ROUTES: Routes = [
