@@ -1,4 +1,5 @@
 {
+	"id": "/intranet/login",
 	"name": "Educa.com.pe",
 	"short_name": "Educa",
 	"description": "Asociación educativa y cultural comprometida con la educación integral",
@@ -8,6 +9,8 @@
 	"background_color": "#ffffff",
 	"theme_color": "#4f46e5",
 	"orientation": "portrait-primary",
+	"lang": "es",
+	"dir": "ltr",
 	"categories": ["education"],
 	"icons": [
 		{
@@ -33,6 +36,19 @@
 			"sizes": "512x512",
 			"type": "image/png",
 			"purpose": "maskable"
+		}
+	],
+	"shortcuts": [
+		{
+			"name": "Asistencias",
+			"short_name": "Asistencias",
+			"url": "/intranet/asistencias",
+			"icons": [
+				{
+					"src": "/images/icons/icon-192x192.png",
+					"sizes": "192x192"
+				}
+			]
 		}
 	]
 }
