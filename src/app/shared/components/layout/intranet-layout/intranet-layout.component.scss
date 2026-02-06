@@ -10,11 +10,6 @@
 	padding: 0 2rem;
 	border-bottom: 1px solid #c0c0c0;
 	overflow: visible;
-
-	// PWA standalone: padding-top para no solapar con la barra de estado de iOS
-	@media (display-mode: standalone) {
-		padding-top: env(safe-area-inset-top, 20px);
-	}
 }
 
 .header-container {
