@@ -9,7 +9,7 @@
 /* PWA safe areas - solo aplica cuando está instalada como app */
 @media (display-mode: standalone) {
 	body {
-		padding-top: env(safe-area-inset-top, 20px);
+		padding-top: env(safe-area-inset-top, 100px);
 		padding-bottom: env(safe-area-inset-bottom);
 		padding-left: env(safe-area-inset-left);
 		padding-right: env(safe-area-inset-right);
@@ -19,7 +19,7 @@
 /* iOS standalone fallback (Safari no soporta display-mode media query en versiones viejas) */
 @media (standalone: standalone) {
 	body {
-		padding-top: env(safe-area-inset-top, 20px);
+		padding-top: env(safe-area-inset-top, 100px);
 		padding-bottom: env(safe-area-inset-bottom);
 	}
 }
