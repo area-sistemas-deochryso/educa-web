@@ -7,7 +7,7 @@ export const environment = {
 	production: true,
 
 	// API Configuration
-	apiUrl: 'https://educacom.azurewebsites.net',
+	apiUrl: 'https://educa1.azurewebsites.net',
 
 	// Feature flags
 	showIntranetLink: true,
