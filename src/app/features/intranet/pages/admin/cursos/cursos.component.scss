@@ -4,7 +4,7 @@
 	margin: 0 auto;
 }
 
-// ============ HEADER ============
+// #region HEADER
 .page-header {
 	display: flex;
 	justify-content: space-between;
@@ -54,7 +54,8 @@
 	}
 }
 
-// ============ STATS CARDS ============
+// #endregion
+// #region STATS CARDS
 .stats-section {
 	display: grid;
 	grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
@@ -113,7 +114,8 @@
 	}
 }
 
-// ============ FILTERS ============
+// #endregion
+// #region FILTERS
 .filters-section {
 	display: flex;
 	align-items: center;
@@ -151,7 +153,8 @@
 	}
 }
 
-// ============ LOADING ============
+// #endregion
+// #region LOADING
 .loading-container {
 	display: flex;
 	justify-content: center;
@@ -161,7 +164,8 @@
 	border-radius: 12px;
 }
 
-// ============ TABLE ============
+// #endregion
+// #region TABLE
 .table-section {
 	background: transparent;
 	border-radius: 12px;
@@ -230,7 +234,8 @@
 	}
 }
 
-// ============ EDIT DIALOG ============
+// #endregion
+// #region EDIT DIALOG
 .dialog-content {
 	.form-fields {
 		display: flex;
@@ -402,7 +407,8 @@
 	gap: 0.5rem;
 }
 
-// ============ CUSTOM TAGS ============
+// #endregion
+// #region CUSTOM TAGS
 .custom-tag {
 	display: inline-flex;
 	align-items: center;
@@ -461,7 +467,8 @@
 	}
 }
 
-// ============ NG-DEEP OVERRIDES ============
+// #endregion
+// #region NG-DEEP OVERRIDES
 :host ::ng-deep {
 	.p-datatable {
 		background: transparent;
@@ -602,7 +609,7 @@
 		font-size: 0.9rem;
 	}
 
-	// Botón de grados - transparente con borde
+	// BotÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â³n de grados - transparente con borde
 	.grados-button {
 		background: transparent !important;
 		color: #000000 !important;
@@ -622,7 +629,7 @@
 		}
 	}
 
-	// Botón success - verde con texto negro
+	// BotÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â³n success - verde con texto negro
 	.p-button-success {
 		background: #22c55e !important;
 		color: #000000 !important;
@@ -661,7 +668,8 @@
 		}
 	}
 
-	// ============ GRADOS DIALOG ============
+// #endregion
+	// #region GRADOS DIALOG
 	.grados-dialog {
 		.p-dialog-header {
 			background: var(--surface-ground);
@@ -681,7 +689,8 @@
 	}
 }
 
-// ============ GRADOS CONTENT ============
+	// #endregion
+// #region GRADOS CONTENT
 .grados-content {
 	.grados-section {
 		margin-bottom: 1.5rem;
@@ -737,7 +746,8 @@
 	}
 }
 
-// ============ RESPONSIVE ============
+// #endregion
+// #region RESPONSIVE
 @media (max-width: 768px) {
 	.cursos-container {
 		padding: 1rem;
@@ -778,3 +788,4 @@
 		grid-template-columns: 1fr;
 	}
 }
+// #endregion

@@ -1,7 +1,10 @@
+// #region Imports
 import { Component, input, output } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ModalData } from '@features/intranet/pages/calendary-component/calendar.types';
 
+// #endregion
+// #region Implementation
 @Component({
 	selector: 'app-calendar-day-modal',
 	imports: [CommonModule],
@@ -41,19 +44,20 @@ export class CalendarDayModalComponent {
 		const labels: Record<string, string> = {
 			national: 'Feriado Nacional',
 			regional: 'Feriado Regional',
-			special: 'Día Especial',
+			special: 'DÃƒÆ’Ã‚Â­a Especial',
 		};
 		return labels[type] || type;
 	}
 
 	getEventTypeLabel(type: string): string {
 		const labels: Record<string, string> = {
-			academic: 'Evento Académico',
+			academic: 'Evento AcadÃƒÆ’Ã‚Â©mico',
 			cultural: 'Evento Cultural',
 			sports: 'Evento Deportivo',
-			meeting: 'Reunión',
+			meeting: 'ReuniÃƒÆ’Ã‚Â³n',
 			other: 'Otro',
 		};
 		return labels[type] || type;
 	}
 }
+// #endregion

@@ -65,13 +65,14 @@ export class HorariosComponent implements OnInit {
 	// * Store signals snapshot
 	readonly vm = this.facade.vm;
 
-	// ============ Lifecycle ============
+	// #region Lifecycle
 	ngOnInit(): void {
 		// * Initial load
 		this.loadData();
 	}
 
-	// ============ Métodos de carga ============
+	// #endregion
+	// #region MÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Â ÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â©todos de carga
 	loadData(): void {
 		this.facade.loadAll();
 	}
@@ -82,7 +83,8 @@ export class HorariosComponent implements OnInit {
 		this.loadData();
 	}
 
-	// ============ Event handlers - CRUD ============
+	// #endregion
+	// #region Event handlers - CRUD
 	onNew(): void {
 		this.facade.openNewDialog();
 	}
@@ -137,7 +139,8 @@ export class HorariosComponent implements OnInit {
 		});
 	}
 
-	// ============ Event handlers - Filtros ============
+	// #endregion
+	// #region Event handlers - Filtros
 	onFiltroSalonChange(salonId: number | null): void {
 		this.facade.setFiltroSalon(salonId);
 	}
@@ -158,7 +161,8 @@ export class HorariosComponent implements OnInit {
 		this.facade.clearFiltros();
 	}
 
-	// ============ Event handlers - Wizard Dialog ============
+	// #endregion
+	// #region Event handlers - Wizard Dialog
 	onNextStep(): void {
 		this.facade.nextWizardStep();
 	}
@@ -179,7 +183,7 @@ export class HorariosComponent implements OnInit {
 		}
 
 		if (editingId === null) {
-			// CREAR - Solo datos básicos, profesor y estudiantes se asignan después
+			// CREAR - Solo datos bÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Â ÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¡sicos, profesor y estudiantes se asignan despuÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Â ÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â©s
 			this.facade.create({
 				diaSemana: formData.diaSemana!,
 				horaInicio: formData.horaInicio,
@@ -206,12 +210,14 @@ export class HorariosComponent implements OnInit {
 		this.facade.closeDialog();
 	}
 
-	// ============ Event handlers - Detail Drawer ============
+	// #endregion
+	// #region Event handlers - Detail Drawer
 	onCloseDetailDrawer(): void {
 		this.facade.closeDetailDrawer();
 	}
 
-	// ============ Event handlers - Asignaciones ============
+	// #endregion
+	// #region Event handlers - Asignaciones
 	onAsignarProfesor(horarioId: number, profesorId: number): void {
 		const currentUser = this.vm().currentUser;
 		if (!currentUser) return;
@@ -242,12 +248,14 @@ export class HorariosComponent implements OnInit {
 		});
 	}
 
-	// ============ Event handlers - Vista ============
+	// #endregion
+	// #region Event handlers - Vista
 	onCambiarVista(vista: 'semanal' | 'lista'): void {
 		this.facade.setVistaActual(vista);
 	}
 
-	// ============ Event handlers - Modal de Cursos ============
+	// #endregion
+	// #region Event handlers - Modal de Cursos
 	onOpenCursoDialog(): void {
 		this.facade.openCursoDialog();
 	}
@@ -260,7 +268,8 @@ export class HorariosComponent implements OnInit {
 		this.facade.selectCurso(cursoId);
 	}
 
-	// ============ Helpers para template ============
+	// #endregion
+	// #region Helpers para template
 	trackByHorarioId(_index: number, horario: HorarioResponseDto): number {
 		return horario.id;
 	}
@@ -269,7 +278,8 @@ export class HorariosComponent implements OnInit {
 		return curso.value;
 	}
 
-	// ============ Helpers para curso seleccionado ============
+	// #endregion
+	// #region Helpers para curso seleccionado
 	getCursoSeleccionadoLabel(): string {
 		const cursoId = this.vm().formData.cursoId;
 		if (!cursoId) return 'Seleccionar curso por nivel';
@@ -285,4 +295,5 @@ export class HorariosComponent implements OnInit {
 		const curso = this.vm().cursosOptions.find((c) => c.value === cursoId);
 		return curso?.niveles.join(', ') || '';
 	}
+	// #endregion
 }

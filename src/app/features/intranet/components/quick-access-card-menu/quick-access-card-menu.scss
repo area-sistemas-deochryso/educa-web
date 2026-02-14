@@ -1,3 +1,4 @@
+// #region Styles
 :host {
 	display: block;
 	width: 100%;
@@ -80,7 +81,7 @@
 	}
 }
 
-// Estilos globales para el menú popup
+// Estilos globales para el menÃº popup
 :host ::ng-deep .courses-quick-menu {
 	min-width: 220px;
 	border-radius: 12px;
@@ -124,3 +125,4 @@
 		}
 	}
 }
+// #endregion

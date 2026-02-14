@@ -6,9 +6,7 @@
 	font-family: var(--intranet-font-family, 'Inter', sans-serif);
 }
 
-// =============================================================================
-// ACCESOS RÁPIDOS
-// =============================================================================
+// #region ACCESOS RÃƒÆ’Ã†â€™Ãƒâ€šÃ‚ÂPIDOS
 
 .quick-access {
 	margin-bottom: 2.5rem;
@@ -27,9 +25,8 @@
 	gap: 1.5rem;
 }
 
-// =============================================================================
-// RESPONSIVE
-// =============================================================================
+// #endregion
+// #region RESPONSIVE
 
 @media (max-width: 768px) {
 	.home-container {
@@ -51,3 +48,4 @@
 		grid-template-columns: repeat(1, 1fr);
 	}
 }
+// #endregion

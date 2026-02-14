@@ -1,4 +1,5 @@
 // * DTOs and role helpers for permisos APIs.
+// #region Imports
 import {
 	APP_USER_ROLE_ADMIN_LIST,
 	APP_USER_ROLE_LIST,
@@ -7,6 +8,8 @@ import {
 } from '@app/shared/constants';
 
 // Vista DTOs
+// #endregion
+// #region Implementation
 export interface Vista {
 	id: number;
 	ruta: string;
@@ -66,7 +69,7 @@ export interface PermisosUsuarioResultado {
 	rol: string;
 	vistasPermitidas: string[];
 	tienePermisosPersonalizados: boolean;
-	/** JWT con exp de 4h que indica cuándo vencen estos permisos */
+	/** JWT con exp de 4h que indica cuÃƒÆ’Ã‚Â¡ndo vencen estos permisos */
 	permisosToken?: string;
 }
 
@@ -75,17 +78,17 @@ export type RolTipo = AppUserRoleValue;
 
 export const ROLES_DISPONIBLES: RolTipo[] = APP_USER_ROLE_LIST;
 
-// Roles disponibles para gestión en admin (sin Apoderado)
+// Roles disponibles para gestiÃƒÆ’Ã‚Â³n en admin (sin Apoderado)
 export type RolTipoAdmin = AppUserRoleAdmin;
 
 export const ROLES_DISPONIBLES_ADMIN: RolTipoAdmin[] = APP_USER_ROLE_ADMIN_LIST;
 
-// Response genérico del API
+// Response genÃƒÆ’Ã‚Â©rico del API
 export interface ApiResponse {
 	mensaje: string;
 }
 
-// Búsqueda de usuarios
+// BÃƒÆ’Ã‚Âºsqueda de usuarios
 export interface UsuarioBusqueda {
 	id: number;
 	nombreCompleto: string;
@@ -97,3 +100,4 @@ export interface UsuarioBusquedaResultado {
 	usuarios: UsuarioBusqueda[];
 	total: number;
 }
+// #endregion

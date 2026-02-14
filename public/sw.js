@@ -1,36 +1,34 @@
 const DB_NAME = 'educa-cache-db';
 
-// ============================================================================
-// VERSIONADO DE CACHE - Prevención de errores por cambios backend
-// ============================================================================
+// #region VERSIONADO DE CACHE - PrevenciÃƒÆ’Ã‚Â³n de errores por cambios backend
 //
-// PROPÓSITO: Invalidar automáticamente el cache cuando hay cambios breaking
+// PROPÃƒÆ’Ã¢â‚¬Å“SITO: Invalidar automÃƒÆ’Ã‚Â¡ticamente el cache cuando hay cambios breaking
 //
 // PROBLEMA QUE RESUELVE:
 // Cuando el backend cambia la estructura de DTOs (agregar/quitar campos, cambiar tipos),
 // el cache guarda datos con estructura antigua. La app intenta deserializar datos
-// incompatibles → error en el frontend la primera vez → segunda vez funciona porque
-// el cache ya se actualizó. Esto genera errores intermitentes en producción.
+// incompatibles ÃƒÂ¢Ã¢â‚¬Â Ã¢â‚¬â„¢ error en el frontend la primera vez ÃƒÂ¢Ã¢â‚¬Â Ã¢â‚¬â„¢ segunda vez funciona porque
+// el cache ya se actualizÃƒÆ’Ã‚Â³. Esto genera errores intermitentes en producciÃƒÆ’Ã‚Â³n.
 //
-// SOLUCIÓN:
-// Incrementar DB_VERSION fuerza la recreación de IndexedDB al hacer deploy.
-// Esto limpia automáticamente TODO el cache de todos los usuarios.
+// SOLUCIÃƒÆ’Ã¢â‚¬Å“N:
+// Incrementar DB_VERSION fuerza la recreaciÃƒÆ’Ã‚Â³n de IndexedDB al hacer deploy.
+// Esto limpia automÃƒÆ’Ã‚Â¡ticamente TODO el cache de todos los usuarios.
 //
-// CUÁNDO INCREMENTAR:
-// ✅ Cambiar estructura de DTOs (agregar/quitar/renombrar campos)
-// ✅ Cambiar tipos de datos (string → number, null → object)
-// ✅ Cambiar códigos de estado (A/T/F → nuevos códigos)
-// ❌ Agregar campos opcionales al final (no es breaking)
-// ❌ Cambios solo de backend que no afectan JSON de respuesta
+// CUÃƒÆ’Ã‚ÂNDO INCREMENTAR:
+// ÃƒÂ¢Ã…â€œÃ¢â‚¬Â¦ Cambiar estructura de DTOs (agregar/quitar/renombrar campos)
+// ÃƒÂ¢Ã…â€œÃ¢â‚¬Â¦ Cambiar tipos de datos (string ÃƒÂ¢Ã¢â‚¬Â Ã¢â‚¬â„¢ number, null ÃƒÂ¢Ã¢â‚¬Â Ã¢â‚¬â„¢ object)
+// ÃƒÂ¢Ã…â€œÃ¢â‚¬Â¦ Cambiar cÃƒÆ’Ã‚Â³digos de estado (A/T/F ÃƒÂ¢Ã¢â‚¬Â Ã¢â‚¬â„¢ nuevos cÃƒÆ’Ã‚Â³digos)
+// ÃƒÂ¢Ã‚ÂÃ…â€™ Agregar campos opcionales al final (no es breaking)
+// ÃƒÂ¢Ã‚ÂÃ…â€™ Cambios solo de backend que no afectan JSON de respuesta
 //
-const DB_VERSION = 2; // ← Incrementado por cambios en estructura de asistencia
+const DB_VERSION = 2; // ÃƒÂ¢Ã¢â‚¬Â Ã‚Â Incrementado por cambios en estructura de asistencia
 const STORE_NAME = 'api-cache';
 const CACHE_EXPIRY = 24 * 60 * 60 * 1000; // 24 horas
 
 // URLs de API que queremos cachear (solo GET)
 const API_URL_PATTERNS = ['/api/'];
 
-// URLs que NUNCA deben cachearse (datos específicos por usuario/sesión)
+// URLs que NUNCA deben cachearse (datos especÃƒÆ’Ã‚Â­ficos por usuario/sesiÃƒÆ’Ã‚Â³n)
 const NO_CACHE_PATTERNS = [
 	'/api/sistema/permisos',
 	'/api/Auth/perfil',
@@ -56,8 +54,8 @@ function openDB() {
 	});
 }
 
-// Parámetros de cache-busting que se eliminan al normalizar la URL
-// Todos los demás parámetros se conservan como parte de la cache key
+// ParÃƒÆ’Ã‚Â¡metros de cache-busting que se eliminan al normalizar la URL
+// Todos los demÃƒÆ’Ã‚Â¡s parÃƒÆ’Ã‚Â¡metros se conservan como parte de la cache key
 const PARAMS_TO_STRIP = ['_', 't', 'timestamp', 'cacheBust', 'nocache', 'cb', 'v'];
 
 // Normalizar URL para usar como clave (elimina solo params de cache-busting)
@@ -67,7 +65,7 @@ function normalizeUrl(url) {
 		for (const param of PARAMS_TO_STRIP) {
 			urlObj.searchParams.delete(param);
 		}
-		// Ordenar params para cache key determinística
+		// Ordenar params para cache key determinÃƒÆ’Ã‚Â­stica
 		urlObj.searchParams.sort();
 		return urlObj.toString();
 	} catch (e) {
@@ -129,7 +127,7 @@ async function getFromCache(url) {
 					// Verificar si el cache ha expirado
 					const isExpired = Date.now() - result.timestamp > CACHE_EXPIRY;
 					if (!isExpired) {
-						console.log('[SW] Cache válido, devolviendo datos');
+						console.log('[SW] Cache vÃƒÆ’Ã‚Â¡lido, devolviendo datos');
 						resolve(result.data);
 					} else {
 						console.log('[SW] Cache expirado');
@@ -203,22 +201,22 @@ async function cleanExpiredCache() {
 	}
 }
 
-// ============================================================================
-// INVALIDACIÓN QUIRÚRGICA - Limpieza selectiva sin afectar todo el cache
-// ============================================================================
+
+// #endregion
+// #region INVALIDACIÃƒÆ’Ã¢â‚¬Å“N QUIRÃƒÆ’Ã…Â¡RGICA - Limpieza selectiva sin afectar todo el cache
 
 /**
- * PROPÓSITO: Invalidar un endpoint específico sin tocar el resto del cache
+ * PROPÃƒÆ’Ã¢â‚¬Å“SITO: Invalidar un endpoint especÃƒÆ’Ã‚Â­fico sin tocar el resto del cache
  *
  * PROBLEMA QUE RESUELVE:
- * clearCache() es muy agresivo - borra TODO, incluso datos de módulos que no cambiaron.
+ * clearCache() es muy agresivo - borra TODO, incluso datos de mÃƒÆ’Ã‚Â³dulos que no cambiaron.
  * Esto causa refetch innecesario de datos estables, desperdiciando ancho de banda.
  *
- * SOLUCIÓN:
- * Eliminar solo la entrada específica del cache. El resto permanece intacto.
- * La próxima petición a esta URL irá al servidor y obtendrá la nueva estructura.
+ * SOLUCIÃƒÆ’Ã¢â‚¬Å“N:
+ * Eliminar solo la entrada especÃƒÆ’Ã‚Â­fica del cache. El resto permanece intacto.
+ * La prÃƒÆ’Ã‚Â³xima peticiÃƒÆ’Ã‚Â³n a esta URL irÃƒÆ’Ã‚Â¡ al servidor y obtendrÃƒÆ’Ã‚Â¡ la nueva estructura.
  *
- * @param {string} url - URL exacta a invalidar (se normalizará automáticamente)
+ * @param {string} url - URL exacta a invalidar (se normalizarÃƒÆ’Ã‚Â¡ automÃƒÆ’Ã‚Â¡ticamente)
  */
 async function invalidateCacheByUrl(url) {
 	try {
@@ -247,21 +245,21 @@ async function invalidateCacheByUrl(url) {
 }
 
 /**
- * PROPÓSITO: Invalidar todos los endpoints de un módulo cuando cambia su estructura
+ * PROPÃƒÆ’Ã¢â‚¬Å“SITO: Invalidar todos los endpoints de un mÃƒÆ’Ã‚Â³dulo cuando cambia su estructura
  *
  * PROBLEMA QUE RESUELVE:
- * Los cambios backend suelen afectar múltiples endpoints relacionados de un módulo.
+ * Los cambios backend suelen afectar mÃƒÆ’Ã‚Âºltiples endpoints relacionados de un mÃƒÆ’Ã‚Â³dulo.
  * Invalidar uno por uno es tedioso y propenso a olvidar alguno.
  *
- * SOLUCIÓN:
- * Buscar todas las URLs que contengan el patrón y eliminarlas del cache.
+ * SOLUCIÃƒÆ’Ã¢â‚¬Å“N:
+ * Buscar todas las URLs que contengan el patrÃƒÆ’Ã‚Â³n y eliminarlas del cache.
  * Ejemplo: pattern="/api/ConsultaAsistencia" invalida:
  *   - /api/ConsultaAsistencia/profesor/asistencia-dia
  *   - /api/ConsultaAsistencia/director/asistencia-dia
  *   - /api/ConsultaAsistencia/director/reporte/todos-salones/mes
  *
  * @param {string} pattern - Texto a buscar en las URLs (case-sensitive)
- * @returns {Promise<number>} Número de entradas eliminadas
+ * @returns {Promise<number>} NÃƒÆ’Ã‚Âºmero de entradas eliminadas
  */
 async function invalidateCacheByPattern(pattern) {
 	try {
@@ -284,14 +282,14 @@ async function invalidateCacheByPattern(pattern) {
 
 				transaction.oncomplete = () => {
 					db.close();
-					console.log(`[SW] Cache invalidado: ${deletedCount} entradas con patrón "${pattern}"`);
+					console.log(`[SW] Cache invalidado: ${deletedCount} entradas con patrÃƒÆ’Ã‚Â³n "${pattern}"`);
 					resolve(deletedCount);
 				};
 			};
 
 			request.onerror = () => {
 				db.close();
-				console.error('[SW] Error obteniendo keys para invalidación:', request.error);
+				console.error('[SW] Error obteniendo keys para invalidaciÃƒÆ’Ã‚Â³n:', request.error);
 				resolve(0);
 			};
 		});
@@ -303,7 +301,7 @@ async function invalidateCacheByPattern(pattern) {
 
 // Verificar si la URL debe ser cacheada
 function shouldCache(url) {
-	// Primero verificar si está en la lista de exclusión
+	// Primero verificar si estÃƒÆ’Ã‚Â¡ en la lista de exclusiÃƒÆ’Ã‚Â³n
 	if (NO_CACHE_PATTERNS.some(pattern => url.includes(pattern))) {
 		console.log('[SW] URL excluida del cache:', url);
 		return false;
@@ -311,18 +309,18 @@ function shouldCache(url) {
 	return API_URL_PATTERNS.some(pattern => url.includes(pattern));
 }
 
-// Verificar si hay conexión a internet
+// Verificar si hay conexiÃƒÆ’Ã‚Â³n a internet
 function isOnline() {
 	return navigator.onLine;
 }
 
-// Instalación del Service Worker
+// InstalaciÃƒÆ’Ã‚Â³n del Service Worker
 self.addEventListener('install', event => {
 	console.log('[SW] Service Worker instalado');
 	self.skipWaiting();
 });
 
-// Activación del Service Worker
+// ActivaciÃƒÆ’Ã‚Â³n del Service Worker
 self.addEventListener('activate', event => {
 	console.log('[SW] Service Worker activado');
 	event.waitUntil(
@@ -363,15 +361,15 @@ function hasDataChanged(oldData, newData) {
 	return JSON.stringify(oldData) !== JSON.stringify(newData);
 }
 
-// URLs ya servidas en esta sesión del SW.
-// Primera visita a una URL → SWR (cache inmediato + revalidar en background)
-// Visitas posteriores → Network-first (red primero, cache como fallback)
+// URLs ya servidas en esta sesiÃƒÆ’Ã‚Â³n del SW.
+// Primera visita a una URL ÃƒÂ¢Ã¢â‚¬Â Ã¢â‚¬â„¢ SWR (cache inmediato + revalidar en background)
+// Visitas posteriores ÃƒÂ¢Ã¢â‚¬Â Ã¢â‚¬â„¢ Network-first (red primero, cache como fallback)
 const servedUrls = new Set();
 
 // Timeout para network-first antes de caer a cache (ms)
 const NETWORK_TIMEOUT = 5000;
 
-// Estrategia híbrida: SWR en carga inicial, Network-first en navegación posterior
+// Estrategia hÃƒÆ’Ã‚Â­brida: SWR en carga inicial, Network-first en navegaciÃƒÆ’Ã‚Â³n posterior
 async function handleFetch(request) {
 	const url = request.url;
 	const normalizedUrl = normalizeUrl(url);
@@ -399,7 +397,7 @@ async function handleFetch(request) {
 	// --- VISITAS POSTERIORES: Network-first ---
 	// El usuario navega activamente, necesita data fresca
 	if (alreadyServed && isOnline()) {
-		console.log('[SW] Network-first (navegación activa)');
+		console.log('[SW] Network-first (navegaciÃƒÆ’Ã‚Â³n activa)');
 
 		try {
 			const networkResponse = await fetchWithTimeout(request.clone(), NETWORK_TIMEOUT);
@@ -413,8 +411,8 @@ async function handleFetch(request) {
 
 			return networkResponse;
 		} catch (error) {
-			// Network falló → fallback a cache
-			console.log('[SW] Network falló, usando cache como fallback');
+			// Network fallÃƒÆ’Ã‚Â³ ÃƒÂ¢Ã¢â‚¬Â Ã¢â‚¬â„¢ fallback a cache
+			console.log('[SW] Network fallÃƒÆ’Ã‚Â³, usando cache como fallback');
 			if (cachedData) {
 				return createCacheResponse(cachedData, 'FALLBACK');
 			}
@@ -492,24 +490,24 @@ function revalidateInBackground(request, url, cachedData) {
 
 // Respuesta de error offline
 function createOfflineResponse() {
-	return new Response(JSON.stringify({ error: 'Sin conexión y sin datos en cache' }), {
+	return new Response(JSON.stringify({ error: 'Sin conexiÃƒÆ’Ã‚Â³n y sin datos en cache' }), {
 		status: 503,
 		headers: { 'Content-Type': 'application/json' },
 	});
 }
 
-// ============================================================================
-// MENSAJES DESDE LA APLICACIÓN - Comandos para control del cache
-// ============================================================================
+
+// #endregion
+// #region MENSAJES DESDE LA APLICACIÃƒÆ’Ã¢â‚¬Å“N - Comandos para control del cache
 //
-// PROPÓSITO: Permitir que el frontend controle el cache de forma programática
+// PROPÃƒÆ’Ã¢â‚¬Å“SITO: Permitir que el frontend controle el cache de forma programÃƒÆ’Ã‚Â¡tica
 //
 // FLUJO:
-// 1. Frontend detecta que el backend cambió (ej: nueva versión, error de deserialización)
+// 1. Frontend detecta que el backend cambiÃƒÆ’Ã‚Â³ (ej: nueva versiÃƒÆ’Ã‚Â³n, error de deserializaciÃƒÆ’Ã‚Â³n)
 // 2. Frontend llama a SwService.clearCache() / invalidateCacheByUrl() / invalidateCacheByPattern()
-// 3. SwService envía mensaje al Service Worker
-// 4. Service Worker ejecuta la invalidación correspondiente
-// 5. Service Worker responde al frontend (vía MessageChannel)
+// 3. SwService envÃƒÆ’Ã‚Â­a mensaje al Service Worker
+// 4. Service Worker ejecuta la invalidaciÃƒÆ’Ã‚Â³n correspondiente
+// 5. Service Worker responde al frontend (vÃƒÆ’Ã‚Â­a MessageChannel)
 //
 self.addEventListener('message', event => {
 	// CLEAR_CACHE: Limpiar TODO el cache
@@ -533,15 +531,15 @@ self.addEventListener('message', event => {
 		);
 	}
 
-	// INVALIDATE_BY_URL: Invalidar endpoint específico
-	// Uso: Un solo endpoint cambió su estructura
+	// INVALIDATE_BY_URL: Invalidar endpoint especÃƒÆ’Ã‚Â­fico
+	// Uso: Un solo endpoint cambiÃƒÆ’Ã‚Â³ su estructura
 	// Llamado desde: SwService.invalidateCacheByUrl(url)
 	if (event.data && event.data.type === 'INVALIDATE_BY_URL') {
 		const url = event.data.payload?.url;
 		if (url) {
 			event.waitUntil(
 				invalidateCacheByUrl(url).then(() => {
-					// Forzar SWR en próxima visita (cache + revalidación en background)
+					// Forzar SWR en prÃƒÆ’Ã‚Â³xima visita (cache + revalidaciÃƒÆ’Ã‚Â³n en background)
 					const normalized = normalizeUrl(url);
 					servedUrls.delete(normalized);
 					event.ports[0]?.postMessage({ success: true });
@@ -550,8 +548,8 @@ self.addEventListener('message', event => {
 		}
 	}
 
-	// INVALIDATE_BY_PATTERN: Invalidar módulo completo
-	// Uso: Múltiples endpoints de un módulo cambiaron (ej: /api/ConsultaAsistencia/*)
+	// INVALIDATE_BY_PATTERN: Invalidar mÃƒÆ’Ã‚Â³dulo completo
+	// Uso: MÃƒÆ’Ã‚Âºltiples endpoints de un mÃƒÆ’Ã‚Â³dulo cambiaron (ej: /api/ConsultaAsistencia/*)
 	// Llamado desde: SwService.invalidateCacheByPattern(pattern)
 	if (event.data && event.data.type === 'INVALIDATE_BY_PATTERN') {
 		const pattern = event.data.payload?.pattern;
@@ -571,7 +569,7 @@ self.addEventListener('message', event => {
 	}
 
 	// SKIP_WAITING: Actualizar Service Worker inmediatamente
-	// Uso: Nueva versión del SW disponible
+	// Uso: Nueva versiÃƒÆ’Ã‚Â³n del SW disponible
 	if (event.data && event.data.type === 'SKIP_WAITING') {
 		self.skipWaiting();
 	}
@@ -583,11 +581,11 @@ self.addEventListener('message', event => {
 	}
 });
 
-// =============================================================================
-// PUSH NOTIFICATIONS
+
+// #endregion
+// #region PUSH NOTIFICATIONS
 // Push es el wake-up call, no el mensaje completo.
-// El SW recibe el push, muestra notificación nativa y avisa a la app.
-// =============================================================================
+// El SW recibe el push, muestra notificaciÃƒÆ’Ã‚Â³n nativa y avisa a la app.
 
 // Recibir Push del servidor
 self.addEventListener('push', event => {
@@ -595,7 +593,7 @@ self.addEventListener('push', event => {
 
 	let data = {
 		title: 'EducaWeb',
-		body: 'Tienes una nueva notificación',
+		body: 'Tienes una nueva notificaciÃƒÆ’Ã‚Â³n',
 		icon: '/images/common/icono.png',
 		url: '/',
 		tag: 'educa-notification',
@@ -615,7 +613,7 @@ self.addEventListener('push', event => {
 
 	console.log('[SW] Push data:', data);
 
-	// Opciones de la notificación nativa
+	// Opciones de la notificaciÃƒÆ’Ã‚Â³n nativa
 	const options = {
 		body: data.body,
 		icon: data.icon || '/images/common/icono.png',
@@ -631,7 +629,7 @@ self.addEventListener('push', event => {
 		actions: data.actions || []
 	};
 
-	// Mostrar notificación nativa Y notificar a la app
+	// Mostrar notificaciÃƒÆ’Ã‚Â³n nativa Y notificar a la app
 	event.waitUntil(
 		Promise.all([
 			self.registration.showNotification(data.title, options),
@@ -643,7 +641,7 @@ self.addEventListener('push', event => {
 	);
 });
 
-// Click en notificación nativa
+// Click en notificaciÃƒÆ’Ã‚Â³n nativa
 self.addEventListener('notificationclick', event => {
 	console.log('[SW] Notification click:', event.notification.tag);
 
@@ -673,13 +671,13 @@ self.addEventListener('notificationclick', event => {
 	);
 });
 
-// Notificación cerrada sin click
+// NotificaciÃƒÆ’Ã‚Â³n cerrada sin click
 self.addEventListener('notificationclose', event => {
 	console.log('[SW] Notification closed:', event.notification.tag);
 
 	const notificationId = event.notification.data?.id;
 
-	// Notificar a la app que se cerró
+	// Notificar a la app que se cerrÃƒÆ’Ã‚Â³
 	notifyClients({
 		type: 'NOTIFICATION_CLOSED',
 		payload: { id: notificationId }
@@ -693,3 +691,4 @@ async function notifyClients(message) {
 		client.postMessage(message);
 	}
 }
+// #endregion

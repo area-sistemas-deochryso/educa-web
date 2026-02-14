@@ -1,8 +1,11 @@
+// #region Imports
 import { describe, it, expect, beforeEach } from 'vitest';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { testProviders } from '@test';
 import { HomeComponent } from './home';
 
+// #endregion
+// #region Implementation
 describe('HomeComponent', () => {
 	let component: HomeComponent;
 	let fixture: ComponentFixture<HomeComponent>;
@@ -22,3 +25,4 @@ describe('HomeComponent', () => {
 		expect(component).toBeTruthy();
 	});
 });
+// #endregion

@@ -1,23 +1,23 @@
 import { CampusEdge } from '../models';
 
 /**
- * Configuración de conexiones entre nodos.
+ * ConfiguraciÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â³n de conexiones entre nodos.
  * distance = tiempo estimado de caminata en segundos.
  *
  * Para configurar:
- * 1. Conecta nodos adyacentes (salones con pasillos, pasillos entre sí)
+ * 1. Conecta nodos adyacentes (salones con pasillos, pasillos entre sÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â­)
  * 2. Conecta escaleras entre pisos (mayor distancia por subir/bajar)
- * 3. Ajusta distancias según la realidad física del colegio
+ * 3. Ajusta distancias segÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Âºn la realidad fÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â­sica del colegio
  *
  * IMPORTANTE: El patio solo conecta con corridor-center (vertical)
- * para evitar que las líneas de ruta crucen visualmente los salones.
+ * para evitar que las lÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â­neas de ruta crucen visualmente los salones.
  */
 export const CAMPUS_EDGES: CampusEdge[] = [
-	// ============ Piso 0 - Conexiones ============
+	// #region Piso 0 - Conexiones
 	{ from: 'entrance-main', to: 'patio-central', distance: 10, bidirectional: true },
 	{ from: 'patio-central', to: 'corridor-0-center', distance: 15, bidirectional: true },
 
-	// Pasillos entre sí (banda horizontal)
+	// Pasillos entre sÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â­ (banda horizontal)
 	{ from: 'corridor-0-left', to: 'corridor-0-center', distance: 10, bidirectional: true },
 	{ from: 'corridor-0-center', to: 'corridor-0-right', distance: 10, bidirectional: true },
 
@@ -33,15 +33,17 @@ export const CAMPUS_EDGES: CampusEdge[] = [
 	{ from: 'stairs-1', to: 'bathroom-0', distance: 6, bidirectional: true },
 	{ from: 'stairs-2', to: 'office-dir', distance: 6, bidirectional: true },
 
-	// ============ Escaleras (conexión entre pisos) ============
+	// #endregion
+	// #region Escaleras (conexiÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â³n entre pisos)
 	{ from: 'stairs-1', to: 'stairs-1-f1', distance: 25, bidirectional: true },
 	{ from: 'stairs-2', to: 'stairs-2-f1', distance: 25, bidirectional: true },
 
-	// ============ Piso 1 - Conexiones ============
+	// #endregion
+	// #region Piso 1 - Conexiones
 	{ from: 'stairs-1-f1', to: 'corridor-1-left', distance: 8, bidirectional: true },
 	{ from: 'stairs-2-f1', to: 'corridor-1-right', distance: 8, bidirectional: true },
 
-	// Pasillos entre sí
+	// Pasillos entre sÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â­
 	{ from: 'corridor-1-left', to: 'corridor-1-center', distance: 10, bidirectional: true },
 	{ from: 'corridor-1-center', to: 'corridor-1-right', distance: 10, bidirectional: true },
 
@@ -56,3 +58,4 @@ export const CAMPUS_EDGES: CampusEdge[] = [
 	{ from: 'corridor-1-left', to: 'salon-3c', distance: 8, bidirectional: true },
 	{ from: 'stairs-2-f1', to: 'bathroom-1', distance: 6, bidirectional: true },
 ];
+	// #endregion

@@ -1,3 +1,4 @@
+// #region Imports
 import { CommonModule } from '@angular/common';
 import { ChangeDetectionStrategy, Component, input, output } from '@angular/core';
 
@@ -6,6 +7,8 @@ import { TooltipModule } from 'primeng/tooltip';
 
 import type { HorarioWeeklyBlock } from '../../models/horario.interface';
 
+// #endregion
+// #region Implementation
 @Component({
   selector: 'app-horarios-weekly-view',
   standalone: true,
@@ -28,7 +31,7 @@ export class HorariosWeeklyViewComponent {
   readonly DIAS = [
     { label: 'Lunes', value: 1 },
     { label: 'Martes', value: 2 },
-    { label: 'Miércoles', value: 3 },
+    { label: 'MiÃƒÆ’Ã‚Â©rcoles', value: 3 },
     { label: 'Jueves', value: 4 },
     { label: 'Viernes', value: 5 },
   ];
@@ -53,10 +56,10 @@ export class HorariosWeeklyViewComponent {
   }
 
   getBlockStyle(block: HorarioWeeklyBlock): Record<string, string> {
-    // Calcular altura basada en duración (1 hora = 60px)
+    // Calcular altura basada en duraciÃƒÆ’Ã‚Â³n (1 hora = 60px)
     const heightPx = (block.duracionMinutos / 60) * 60;
 
-    // Calcular posición top basada en offset desde las 07:00
+    // Calcular posiciÃƒÆ’Ã‚Â³n top basada en offset desde las 07:00
     const topPx = (block.posicionVertical / 60) * 60;
 
     return {
@@ -72,7 +75,7 @@ export class HorariosWeeklyViewComponent {
     return `
       ${h.cursoNombre}
       ${h.horaInicio} - ${h.horaFin}
-      Salón: ${h.salonDescripcion}
+      SalÃƒÆ’Ã‚Â³n: ${h.salonDescripcion}
       ${h.profesorNombreCompleto ? `Profesor: ${h.profesorNombreCompleto}` : 'Sin profesor asignado'}
       ${h.cantidadEstudiantes} estudiantes
     `.trim();
@@ -106,3 +109,4 @@ export class HorariosWeeklyViewComponent {
     return `#${((r << 16) | (g << 8) | b).toString(16).padStart(6, '0')}`;
   }
 }
+// #endregion

@@ -1,7 +1,10 @@
+// #region Imports
 import { Component, Input, output, signal } from '@angular/core';
 import { RouterLink, RouterLinkActive } from '@angular/router';
 import { UserProfileMenuComponent } from '../user-profile-menu';
 
+// #endregion
+// #region Implementation
 export interface NavMenuItem {
 	route?: string;
 	label: string;
@@ -60,3 +63,4 @@ export class MobileMenuComponent {
 		this.logoutClick.emit();
 	}
 }
+// #endregion

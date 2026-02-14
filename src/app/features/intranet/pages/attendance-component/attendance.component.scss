@@ -1,9 +1,10 @@
+// #region Styles
 .attendance-container {
 	padding: 1.5rem;
 	font-family: var(--intranet-font-family);
 	background-color: var(--intranet-background-color);
 	min-height: 100%;
-	// Reservar espacio mínimo para evitar CLS
+	// Reservar espacio mÃ­nimo para evitar CLS
 	contain: layout style;
 }
 
@@ -61,3 +62,4 @@
 		padding: 1rem;
 	}
 }
+// #endregion

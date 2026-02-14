@@ -1,7 +1,10 @@
+// #region Imports
 import { beforeEach, describe, expect, it } from 'vitest';
 
 import { TruncatePipe } from './truncate.pipe';
 
+// #endregion
+// #region Implementation
 describe('TruncatePipe', () => {
 	let pipe: TruncatePipe;
 
@@ -68,3 +71,4 @@ describe('TruncatePipe', () => {
 		});
 	});
 });
+// #endregion

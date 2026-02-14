@@ -1,3 +1,4 @@
+// #region Imports
 import {
 	Directive,
 	ElementRef,
@@ -8,6 +9,8 @@ import {
 	inject,
 } from '@angular/core';
 
+// #endregion
+// #region Implementation
 @Directive({
 	selector: '[appTableLoading]',
 	standalone: true,
@@ -84,7 +87,7 @@ export class TableLoadingDirective implements OnChanges {
 			this.r2.setStyle(el, 'minHeight', `${minH}px`);
 		}
 
-		// Blur + bloquear interacción sin afectar layout
+		// Blur + bloquear interacciÃƒÂ³n sin afectar layout
 		this.r2.addClass(el, 'table-loading--active');
 		this.r2.setStyle(el, '--table-loading-blur', `${this.blurPx}px`);
 		el.setAttribute('aria-busy', 'true');
@@ -111,3 +114,4 @@ export class TableLoadingDirective implements OnChanges {
 		}
 	}
 }
+// #endregion

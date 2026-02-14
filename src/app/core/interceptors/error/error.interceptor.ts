@@ -1,3 +1,4 @@
+// #region Imports
 import { HttpErrorResponse, HttpInterceptorFn } from '@angular/common/http';
 import { catchError, throwError } from 'rxjs';
 
@@ -6,8 +7,11 @@ import { inject } from '@angular/core';
 import { logger } from '@core/helpers';
 
 // * Centralizes HTTP error handling and reporting.
+// #endregion
+// #region Implementation
 export const errorInterceptor: HttpInterceptorFn = (req, next) => {
 	const errorHandler = inject(ErrorHandlerService);
+	const requestId = req.headers.get('X-Request-Id') ?? undefined;
 
 	return next(req).pipe(
 		catchError((error: HttpErrorResponse) => {
@@ -22,6 +26,7 @@ export const errorInterceptor: HttpInterceptorFn = (req, next) => {
 				url: req.url,
 				method: req.method,
 				body: req.body,
+				requestId,
 			});
 
 			// Re-lanzar para que los callers puedan reaccionar si lo necesitan.
@@ -29,3 +34,4 @@ export const errorInterceptor: HttpInterceptorFn = (req, next) => {
 		}),
 	);
 };
+// #endregion

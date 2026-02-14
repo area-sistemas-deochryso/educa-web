@@ -1,6 +1,9 @@
+// #region Imports
 import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { CommonModule } from '@angular/common';
 
+// #endregion
+// #region Implementation
 export interface SidebarLink {
 	label: string;
 	action: string;
@@ -19,3 +22,4 @@ export class SidebarLinksComponent {
 	@Input() links: SidebarLink[] = [];
 	@Output() linkClick = new EventEmitter<string>();
 }
+// #endregion

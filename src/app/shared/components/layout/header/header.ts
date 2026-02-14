@@ -1,7 +1,10 @@
+// #region Imports
 import { RouterLink, RouterLinkActive } from '@angular/router';
 import { Component, signal } from '@angular/core';
 import { environment } from '@config/environment';
 
+// #endregion
+// #region Implementation
 @Component({
 	selector: 'app-header',
 	standalone: true,
@@ -21,7 +24,7 @@ export class HeaderComponent {
 	toggleMenu() {
 		// * Toggle menu and collapse dropdown if closing.
 		this.isMenuOpen.update((v) => !v);
-		// Cerrar dropdown cuando se cierra el menú
+		// Cerrar dropdown cuando se cierra el menÃƒÂº
 		if (!this.isMenuOpen()) {
 			this.isDropdownOpen.set(false);
 		}
@@ -40,3 +43,4 @@ export class HeaderComponent {
 		this.isDropdownOpen.set(false);
 	}
 }
+// #endregion

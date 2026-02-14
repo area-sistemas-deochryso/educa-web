@@ -1,3 +1,4 @@
+// #region Imports
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { beforeEach, describe, expect, it } from 'vitest';
 
@@ -5,6 +6,8 @@ import { By } from '@angular/platform-browser';
 import { Component } from '@angular/core';
 import { TableLoadingDirective } from './table-loading.directive';
 
+// #endregion
+// #region Implementation
 @Component({
 	standalone: true,
 	imports: [TableLoadingDirective],
@@ -110,7 +113,7 @@ describe('TableLoadingDirective', () => {
 
 		const host = fixture.debugElement.query(By.css('#table-section'))
 			.nativeElement as HTMLElement;
-		// We can’t rely on layout measurement in JSDOM, but we can assert it sets the style.
+		// We canÃ¢â‚¬â„¢t rely on layout measurement in JSDOM, but we can assert it sets the style.
 		expect(host.style.minHeight).toBe('420px');
 	});
 
@@ -125,3 +128,4 @@ describe('TableLoadingDirective', () => {
 		expect(host.style.minHeight).toBe('');
 	});
 });
+// #endregion

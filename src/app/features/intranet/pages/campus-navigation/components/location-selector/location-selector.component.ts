@@ -1,9 +1,12 @@
+// #region Imports
 import { ChangeDetectionStrategy, Component, input, output } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 
 import { ButtonModule } from 'primeng/button';
 import { Select } from 'primeng/select';
 
+// #endregion
+// #region Implementation
 interface SelectOption {
 	label: string;
 	value: string;
@@ -25,7 +28,7 @@ interface SelectOption {
 					(ngModelChange)="startChange.emit($event)"
 					optionLabel="label"
 					optionValue="value"
-					placeholder="Selecciona tu ubicación"
+					placeholder="Selecciona tu ubicaciÃƒÂ³n"
 					appendTo="body"
 					[filter]="true"
 					filterPlaceholder="Buscar..."
@@ -103,3 +106,4 @@ export class LocationSelectorComponent {
 	readonly destinationChange = output<string>();
 	readonly clear = output<void>();
 }
+// #endregion

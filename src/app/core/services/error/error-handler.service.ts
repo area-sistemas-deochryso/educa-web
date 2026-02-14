@@ -1,3 +1,4 @@
+// #region Imports
 import {
 	AppError,
 	ErrorNotification,
@@ -17,6 +18,8 @@ import {
 	UI_GENERIC_MESSAGES,
 } from '@app/shared/constants';
 
+// #endregion
+// #region Implementation
 @Injectable({
 	providedIn: 'root',
 })
@@ -48,7 +51,9 @@ export class ErrorHandlerService {
 	 * Maneja errores HTTP del interceptor
 	 */
 	handleHttpError(error: HttpErrorResponse, context?: Record<string, unknown>): AppError {
-		const details = this.extractHttpDetails(error);
+		const method =
+			context && typeof context['method'] === 'string' ? context['method'] : undefined;
+		const details = this.extractHttpDetails(error, method);
 		const message = this.getHttpErrorMessage(error);
 
 		const appError = this.createError(message, 'error', 'http', {
@@ -179,10 +184,10 @@ export class ErrorHandlerService {
 		this._currentNotification.set(notification);
 	}
 
-	private extractHttpDetails(error: HttpErrorResponse): HttpErrorDetails {
+	private extractHttpDetails(error: HttpErrorResponse, method?: string): HttpErrorDetails {
 		return {
 			url: error.url ?? 'unknown',
-			method: 'unknown',
+			method: method ?? 'unknown',
 			statusCode: error.status,
 			statusText: error.statusText,
 			message: error.message,
@@ -206,3 +211,4 @@ export class ErrorHandlerService {
 		);
 	}
 }
+// #endregion

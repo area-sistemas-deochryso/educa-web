@@ -1,5 +1,8 @@
+// #region Imports
 import { Directive, ElementRef, HostListener, inject, input } from '@angular/core';
 
+// #endregion
+// #region Implementation
 @Directive({
 	selector: '[appHighlight]',
 	standalone: true,
@@ -23,3 +26,4 @@ export class HighlightDirective {
 		this.el.nativeElement.style.backgroundColor = color;
 	}
 }
+// #endregion

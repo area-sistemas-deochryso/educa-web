@@ -1,3 +1,4 @@
+// #region Implementation
 export type ValidationMessageConfig = Record<
 	string,
 	string | ((params: Record<string, unknown>) => string)
@@ -77,3 +78,4 @@ export function getControlErrors(
 		getValidationMessage(key, params as Record<string, unknown>, customMessages),
 	);
 }
+// #endregion

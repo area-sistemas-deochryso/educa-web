@@ -1,7 +1,5 @@
-// =============================================================================
-// SISTEMA DE UTILIDADES SCSS - Entry Point
+// #region SISTEMA DE UTILIDADES SCSS - Entry Point
 // Reemplaza Bootstrap CSS con utilidades custom
-// =============================================================================
 
 // Reset (normaliza user agent styles)
 @use 'reset';
@@ -19,3 +17,4 @@
 @use 'components/forms';
 @use 'components/pagination';
 @use 'components/tables';
+// #endregion

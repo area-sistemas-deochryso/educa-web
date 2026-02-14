@@ -1,3 +1,4 @@
+// #region Imports
 import { Component, DebugElement } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { By } from '@angular/platform-browser';
@@ -5,6 +6,8 @@ import { describe, it, expect, beforeEach } from 'vitest';
 
 import { HighlightDirective } from './highlight.directive';
 
+// #endregion
+// #region Implementation
 @Component({
 	standalone: true,
 	imports: [HighlightDirective],
@@ -83,3 +86,4 @@ describe('HighlightDirective', () => {
 		});
 	});
 });
+// #endregion

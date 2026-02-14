@@ -1,13 +1,16 @@
+// #region Imports
 import { NavMenuItem } from './components';
 import { environment } from '@config/environment';
 
+// #endregion
+// #region Implementation
 export interface NavItemWithPermiso extends NavMenuItem {
 	permiso?: string;
 	children?: NavItemWithPermiso[];
 }
 
 /**
- * Items de menú para features en desarrollo (controlados por environment.features)
+ * Items de menÃƒÂº para features en desarrollo (controlados por environment.features)
  */
 const developmentMenuItems: NavItemWithPermiso[] = [
 	...(environment.features.horarios
@@ -61,7 +64,7 @@ const developmentMenuItems: NavItemWithPermiso[] = [
 ];
 
 /**
- * Configuración jerárquica del menú de la intranet.
+ * ConfiguraciÃƒÂ³n jerÃƒÂ¡rquica del menÃƒÂº de la intranet.
  * - Los items con `permiso` son hojas que requieren ese permiso exacto
  * - Los items con `children` son padres que se muestran si al menos un hijo tiene permiso
  */
@@ -129,3 +132,4 @@ export const INTRANET_MENU: NavItemWithPermiso[] = [
 		],
 	},
 ];
+// #endregion

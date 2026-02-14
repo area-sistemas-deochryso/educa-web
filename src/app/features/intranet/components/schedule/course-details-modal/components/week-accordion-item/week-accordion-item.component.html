@@ -1,3 +1,4 @@
+<!-- #region Template -->
 <div class="week-item" [class.expanded]="week.expanded">
 	<!-- * Accordion header -->
 	<div class="week-header" (click)="toggleTriggered.emit()">
@@ -17,7 +18,7 @@
 				[title]="week.attachments.count + ' Archivos Adjuntos'"
 				[subtitle]="
 					week.attachments.unread +
-					' sin leer · ' +
+					' sin leer Ã‚Â· ' +
 					week.attachments.reviewed +
 					' revisado'
 				"
@@ -36,7 +37,7 @@
 				[title]="week.submittedTasks.count + ' Tarea Enviada'"
 				[subtitle]="
 					week.submittedTasks.unread +
-					' sin leer · ' +
+					' sin leer Ã‚Â· ' +
 					week.submittedTasks.reviewed +
 					' revisadas'
 				"
@@ -46,3 +47,4 @@
 		</div>
 	}
 </div>
+<!-- #endregion -->

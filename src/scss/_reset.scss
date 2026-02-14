@@ -1,7 +1,5 @@
-// =============================================================================
-// CSS RESET - Normaliza estilos del user agent stylesheet
+// #region CSS RESET - Normaliza estilos del user agent stylesheet
 // Basado en Bootstrap Reboot (simplificado)
-// =============================================================================
 
 *,
 *::before,
@@ -233,3 +231,4 @@ progress {
 [hidden] {
 	display: none !important;
 }
+// #endregion

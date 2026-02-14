@@ -1,8 +1,11 @@
+// #region Imports
 import { Component } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
 import { HeaderComponent } from '../header';
 import { FooterComponent } from '../footer';
 
+// #endregion
+// #region Implementation
 @Component({
 	selector: 'app-main-layout',
 	imports: [RouterOutlet, HeaderComponent, FooterComponent],
@@ -12,3 +15,4 @@ import { FooterComponent } from '../footer';
 export class MainLayoutComponent {
 	// * Shell layout for public pages (header + footer + routed content).
 }
+// #endregion

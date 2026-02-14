@@ -14,7 +14,7 @@ import { CAMPUS_EDGES } from '../../config';
 				xmlns="http://www.w3.org/2000/svg"
 				class="campus-svg"
 			>
-				<!-- ============ Edges (conexiones entre nodos) ============ -->
+				<!-- #region Edges (conexiones entre nodos) -->
 				@for (edge of floorEdges(); track edge.from + edge.to) {
 					<line
 						[attr.x1]="getNodeX(edge.from)"
@@ -25,7 +25,8 @@ import { CAMPUS_EDGES } from '../../config';
 					/>
 				}
 
-				<!-- ============ Path animado ============ -->
+				<!-- #endregion -->
+				<!-- #region Path animado -->
 				@if (pathPoints()) {
 					<polyline
 						[attr.points]="pathPoints()"
@@ -33,7 +34,8 @@ import { CAMPUS_EDGES } from '../../config';
 					/>
 				}
 
-				<!-- ============ Nodos ============ -->
+				<!-- #endregion -->
+				<!-- #region Nodos -->
 				@for (node of nodes(); track node.id) {
 					<g
 						class="node-group"
@@ -43,7 +45,7 @@ import { CAMPUS_EDGES } from '../../config';
 						(click)="onNodeClick(node)"
 					>
 						@if (node.type === 'corridor') {
-							<!-- Corredor: círculo pequeño -->
+							<!-- Corredor: cÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â­rculo pequeÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â±o -->
 							<circle
 								[attr.cx]="node.x"
 								[attr.cy]="node.y"
@@ -51,7 +53,7 @@ import { CAMPUS_EDGES } from '../../config';
 								class="corridor-dot"
 							/>
 						} @else {
-							<!-- Room/lugar: rectángulo con label -->
+							<!-- Room/lugar: rectÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¡ngulo con label -->
 							<rect
 								[attr.x]="node.x - (node.width || 80) / 2"
 								[attr.y]="node.y - (node.height || 50) / 2"
@@ -73,7 +75,8 @@ import { CAMPUS_EDGES } from '../../config';
 					</g>
 				}
 
-				<!-- ============ Marcadores de inicio/destino ============ -->
+				<!-- #endregion -->
+				<!-- #region Marcadores de inicio/destino -->
 				@if (startNode(); as sn) {
 					<circle
 						[attr.cx]="sn.x"
@@ -107,14 +110,15 @@ import { CAMPUS_EDGES } from '../../config';
 			display: block;
 		}
 
-		// ============ Edges ============
+		// #region Edges
 		.edge-line {
 			stroke: var(--surface-300);
 			stroke-width: 1.5;
 			stroke-dasharray: 4, 4;
 		}
 
-		// ============ Path animado ============
+		// #endregion
+		// #region Path animado
 		.path-line {
 			fill: none;
 			stroke: var(--primary-color);
@@ -131,7 +135,8 @@ import { CAMPUS_EDGES } from '../../config';
 			}
 		}
 
-		// ============ Nodos ============
+		// #endregion
+		// #region Nodos
 		.node-group {
 			&.clickable {
 				cursor: pointer;
@@ -202,7 +207,8 @@ import { CAMPUS_EDGES } from '../../config';
 			stroke-width: 1;
 		}
 
-		// ============ Marcadores ============
+		// #endregion
+		// #region Marcadores
 		.marker-start {
 			fill: #22c55e;
 			stroke: #ffffff;
@@ -236,7 +242,8 @@ export class CampusMapComponent {
 
 	readonly nodeClick = output<string>();
 
-	// ============ Computed ============
+		// #endregion
+	// #region Computed
 
 	private readonly nodeMap = computed(() => new Map(this.nodes().map((n) => [n.id, n])));
 
@@ -268,7 +275,8 @@ export class CampusMapComponent {
 		});
 	});
 
-	// ============ Helpers para template ============
+	// #endregion
+	// #region Helpers para template
 
 	getNodeX(nodeId: string): number {
 		return this.nodeMap().get(nodeId)?.x ?? 0;
@@ -283,4 +291,6 @@ export class CampusMapComponent {
 			this.nodeClick.emit(node.id);
 		}
 	}
+	// #endregion
 }
+				<!-- #endregion -->

@@ -274,7 +274,7 @@ export class CursosComponent implements OnInit {
 		this.filterNivel.set(null);
 	}
 
-	// ============ Edit Dialog ============
+	// #region Edit Dialog
 	openNew(): void {
 		// * Create flow starts with clean form + selections.
 		this.selectedCurso.set(null);
@@ -313,7 +313,8 @@ export class CursosComponent implements OnInit {
 		this.dialogVisible.set(false);
 	}
 
-	// ============ Grados Dialog ============
+	// #endregion
+	// #region Grados Dialog
 	showGrados(curso: Curso): void {
 		this.selectedCursoForGrados.set(curso);
 		this.gradosDialogVisible.set(true);
@@ -324,9 +325,10 @@ export class CursosComponent implements OnInit {
 		this.selectedCursoForGrados.set(null);
 	}
 
-	// ============ Grado Selection Management ============
+	// #endregion
+	// #region Grado Selection Management
 	addGrado(gradoId: number): void {
-		// Determinar a qué nivel pertenece el grado
+		// Determinar a quÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Â ÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â© nivel pertenece el grado
 		const isInicial = this.gradosInicial().some((g) => g.id === gradoId);
 		const isPrimaria = this.gradosPrimaria().some((g) => g.id === gradoId);
 		const isSecundaria = this.gradosSecundaria().some((g) => g.id === gradoId);
@@ -341,7 +343,7 @@ export class CursosComponent implements OnInit {
 	}
 
 	removeGrado(gradoId: number): void {
-		// Buscar en qué nivel está el grado y removerlo
+		// Buscar en quÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Â ÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â© nivel estÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Â ÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¡ el grado y removerlo
 		if (this.selectedInicial().includes(gradoId)) {
 			this.selectedInicial.update((ids) => ids.filter((id) => id !== gradoId));
 		} else if (this.selectedPrimaria().includes(gradoId)) {
@@ -438,7 +440,8 @@ export class CursosComponent implements OnInit {
 		});
 	}
 
-	// ============ UI Helpers ============
+	// #endregion
+	// #region UI Helpers
 	isFormValid(): boolean {
 		const data = this.formData();
 		return !!data.nombre?.trim();
@@ -447,4 +450,5 @@ export class CursosComponent implements OnInit {
 	updateFormField(field: keyof CursoForm, value: unknown): void {
 		this.formData.update((current) => ({ ...current, [field]: value }));
 	}
+	// #endregion
 }

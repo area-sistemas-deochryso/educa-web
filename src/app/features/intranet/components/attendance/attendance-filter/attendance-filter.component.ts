@@ -1,8 +1,11 @@
+// #region Imports
 import { Component, input, output, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Select } from 'primeng/select';
 
+// #endregion
+// #region Implementation
 export interface GradoOption {
 	label: string;
 	value: string;
@@ -74,3 +77,4 @@ export class AttendanceFilterComponent implements OnInit {
 		});
 	}
 }
+// #endregion

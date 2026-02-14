@@ -1,8 +1,11 @@
+// #region Imports
 import { Component, EventEmitter, Input, Output, OnChanges, SimpleChanges } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { DialogModule } from 'primeng/dialog';
 
+// #endregion
+// #region Implementation
 export interface Evaluation {
 	name: string;
 	grade: number;
@@ -105,3 +108,4 @@ export class GradesModalComponent implements OnChanges {
 		return 'grade-green';
 	}
 }
+// #endregion

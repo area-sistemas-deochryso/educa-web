@@ -1,9 +1,12 @@
+// #region Imports
 import { Component, Input, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterLink } from '@angular/router';
 import { SeasonalNotification } from '@core/services';
 import { NotificationsPanelContext } from '../../notifications-panel.context';
 
+// #endregion
+// #region Implementation
 @Component({
 	selector: 'app-notification-card',
 	imports: [CommonModule, RouterLink],
@@ -38,9 +41,9 @@ export class NotificationCardComponent {
 	getTypeLabel(type: string): string {
 		// * Map backend types to display labels.
 		const labels: Record<string, string> = {
-			matricula: 'Matrícula',
+			matricula: 'MatrÃƒÂ­cula',
 			pago: 'Pago',
-			academico: 'Académico',
+			academico: 'AcadÃƒÂ©mico',
 			festividad: 'Festividad',
 			evento: 'Evento',
 		};
@@ -87,3 +90,4 @@ export class NotificationCardComponent {
 		event.stopPropagation();
 	}
 }
+// #endregion

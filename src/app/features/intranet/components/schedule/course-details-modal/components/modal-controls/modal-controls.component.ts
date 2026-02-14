@@ -1,8 +1,11 @@
+// #region Imports
 import { Component, EventEmitter, Input, Output } from '@angular/core';
 
 import { CommonModule } from '@angular/common';
 import { TooltipModule } from 'primeng/tooltip';
 
+// #endregion
+// #region Implementation
 @Component({
 	selector: 'app-modal-controls',
 	standalone: true,
@@ -16,3 +19,4 @@ export class ModalControlsComponent {
 	@Output() expand = new EventEmitter<void>();
 	@Output() closeTriggered = new EventEmitter<void>();
 }
+// #endregion

@@ -1,9 +1,21 @@
 <p-card class="asistencia-dia-card">
 	<ng-template #header>
 		<div class="card-header">
-			<h2><i class="pi pi-calendar-clock"></i> Asistencia del día</h2>
+			<h2><i class="pi pi-calendar-clock"></i> Asistencia del dÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â­a</h2>
 			<div class="header-actions">
 				@if (showPdfButton()) {
+					<!-- * Tipo de reporte selector -->
+					@if (tipoReporteOptions().length > 0) {
+						<p-select
+							[options]="tipoReporteOptions()"
+							[ngModel]="tipoReporte()"
+							(ngModelChange)="tipoReporteChange.emit($event)"
+							optionLabel="label"
+							optionValue="value"
+							appendTo="body"
+							class="tipo-reporte-selector"
+						/>
+					}
 					<!-- * PDF actions -->
 					<p-button
 						icon="pi pi-file-pdf"
@@ -69,7 +81,7 @@
 					[pTooltip]="
 						allowJustify() && estudiante.puedeJustificar
 							? estudiante.esJustificado
-								? 'Clic para editar/quitar justificación'
+								? 'Clic para editar/quitar justificaciÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â³n'
 								: 'Clic para justificar'
 							: ''
 					"
@@ -80,7 +92,7 @@
 				>
 					<td class="row-number">{{ i + 1 }}</td>
 					<td>
-						<!-- * Name + DNI + Observación -->
+						<!-- * Name + DNI + ObservaciÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â³n -->
 						<div class="estudiante-info">
 							<span class="nombre">{{ estudiante.nombreCompleto }}</span>
 							<span class="dni">DNI: {{ estudiante.dni }}</span>
@@ -161,7 +173,7 @@
 				<span class="status-indicator status-no">N</span>
 				<div class="badge-content">
 					<span class="value">{{ estadisticas().noAsistio }}</span>
-					<span class="label">No asistió</span>
+					<span class="label">No asistiÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â³</span>
 				</div>
 			</div>
 			<div class="stat-badge justificado">
@@ -182,7 +194,7 @@
 	}
 </p-card>
 
-<!-- ============ Diálogo de Justificación ============ -->
+<!-- #region DiÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â¡logo de JustificaciÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â³n -->
 <p-dialog
 	[visible]="dialogVisible()"
 	(visibleChange)="onDialogVisibleChange($event)"
@@ -191,7 +203,7 @@
 	[resizable]="false"
 	[closable]="true"
 	[header]="
-		selectedEstudiante()?.esJustificado ? 'Editar Justificación' : 'Justificar Asistencia'
+		selectedEstudiante()?.esJustificado ? 'Editar JustificaciÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â³n' : 'Justificar Asistencia'
 	"
 	styleClass="justificacion-dialog"
 	[style]="{ width: '450px' }"
@@ -211,7 +223,7 @@
 
 			<div class="field">
 				<label for="observacion"
-					>Motivo de la justificación <span class="required">*</span></label
+					>Motivo de la justificaciÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â³n <span class="required">*</span></label
 				>
 				<textarea
 					pTextarea
@@ -219,7 +231,7 @@
 					rows="4"
 					[ngModel]="observacionText()"
 					(ngModelChange)="observacionText.set($event)"
-					placeholder="Ingrese el motivo de la justificación (ej: Cita médica, motivo familiar, etc.)"
+					placeholder="Ingrese el motivo de la justificaciÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â³n (ej: Cita mÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â©dica, motivo familiar, etc.)"
 					class="w-full"
 				></textarea>
 			</div>
@@ -227,7 +239,7 @@
 			<div class="dialog-footer">
 				@if (estudiante.esJustificado) {
 					<p-button
-						label="Quitar justificación"
+						label="Quitar justificaciÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â³n"
 						severity="danger"
 						[text]="true"
 						icon="pi pi-trash"
@@ -252,3 +264,4 @@
 		</div>
 	}
 </p-dialog>
+<!-- #endregion -->

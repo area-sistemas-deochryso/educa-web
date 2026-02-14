@@ -1,4 +1,4 @@
-// ============ DTOs del backend ============
+// #region DTOs del backend
 
 export interface HorarioProfesorDto {
 	id: number;
@@ -32,7 +32,8 @@ export interface SalonTutoriaDto {
 	estado: boolean;
 }
 
-// ============ DTOs de mis-estudiantes ============
+// #endregion
+// #region DTOs de mis-estudiantes
 
 export interface ProfesorMisSalonesConEstudiantesDto {
 	salones: ProfesorSalonConEstudiantesDto[];
@@ -57,7 +58,8 @@ export interface ProfesorEstudianteSalonDto {
 	nombreCompleto: string;
 }
 
-// ============ DTOs de curso-contenido ============
+// #endregion
+// #region DTOs de curso-contenido
 
 export interface CursoContenidoDetalleDto {
 	id: number;
@@ -126,7 +128,8 @@ export interface ActualizarTareaRequest {
 	fechaLimite: string | null;
 }
 
-// ============ Modelos derivados para la UI ============
+// #endregion
+// #region Modelos derivados para la UI
 
 export interface ProfesorCurso {
 	cursoId: number;
@@ -140,3 +143,4 @@ export interface ProfesorSalon {
 	cursos: string[];
 	esTutor: boolean;
 }
+// #endregion

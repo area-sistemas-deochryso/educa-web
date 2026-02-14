@@ -21,10 +21,11 @@ export class CursoContenidoFacade {
 	private readonly errorHandler = inject(ErrorHandlerService);
 	private readonly destroyRef = inject(DestroyRef);
 
-	// ============ Estado expuesto ============
+	// #region Estado expuesto
 	readonly vm = this.store.vm;
 
-	// ============ Comandos de carga ============
+	// #endregion
+	// #region Comandos de carga
 
 	loadContenido(horarioId: number): void {
 		this.store.setSelectedHorarioId(horarioId);
@@ -41,7 +42,7 @@ export class CursoContenidoFacade {
 					if (response.data) {
 						this.store.openContentDialog();
 					} else {
-						// No existe contenido → abrir builder
+						// No existe contenido ÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬Ãƒâ€šÃ‚Â ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÂ¢Ã¢â‚¬Å¾Ã‚Â¢ abrir builder
 						this.store.openBuilderDialog();
 					}
 				},
@@ -53,7 +54,8 @@ export class CursoContenidoFacade {
 			});
 	}
 
-	// ============ CRUD Contenido ============
+	// #endregion
+	// #region CRUD Contenido
 
 	crearContenido(request: CrearCursoContenidoRequest): void {
 		this.store.setSaving(true);
@@ -95,7 +97,8 @@ export class CursoContenidoFacade {
 			});
 	}
 
-	// ============ Semanas ============
+	// #endregion
+	// #region Semanas
 
 	actualizarSemana(semanaId: number, request: ActualizarSemanaRequest): void {
 		this.store.setSaving(true);
@@ -105,7 +108,7 @@ export class CursoContenidoFacade {
 			.pipe(takeUntilDestroyed(this.destroyRef))
 			.subscribe({
 				next: (response) => {
-					// Mutación quirúrgica
+					// MutaciÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â³n quirÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Âºrgica
 					this.store.updateSemana(semanaId, response.data);
 					this.store.setSaving(false);
 					this.store.closeSemanaEditDialog();
@@ -118,10 +121,11 @@ export class CursoContenidoFacade {
 			});
 	}
 
-	// ============ Archivos ============
+	// #endregion
+	// #region Archivos
 
 	/**
-	 * Flujo de 2 pasos: upload a blob → registrar metadata
+	 * Flujo de 2 pasos: upload a blob ÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬Ãƒâ€šÃ‚Â ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÂ¢Ã¢â‚¬Å¾Ã‚Â¢ registrar metadata
 	 */
 	uploadArchivo(semanaId: number, file: File): void {
 		this.store.setSaving(true);
@@ -145,7 +149,7 @@ export class CursoContenidoFacade {
 						.pipe(takeUntilDestroyed(this.destroyRef))
 						.subscribe({
 							next: (response) => {
-								// Mutación quirúrgica
+								// MutaciÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â³n quirÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Âºrgica
 								this.store.addArchivoToSemana(semanaId, response.data);
 								this.store.setSaving(false);
 							},
@@ -172,7 +176,7 @@ export class CursoContenidoFacade {
 			.pipe(takeUntilDestroyed(this.destroyRef))
 			.subscribe({
 				next: () => {
-					// Mutación quirúrgica
+					// MutaciÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â³n quirÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Âºrgica
 					this.store.removeArchivoFromSemana(semanaId, archivoId);
 					this.store.setSaving(false);
 				},
@@ -184,7 +188,8 @@ export class CursoContenidoFacade {
 			});
 	}
 
-	// ============ Tareas ============
+	// #endregion
+	// #region Tareas
 
 	crearTarea(semanaId: number, request: CrearTareaRequest): void {
 		this.store.setSaving(true);
@@ -194,7 +199,7 @@ export class CursoContenidoFacade {
 			.pipe(takeUntilDestroyed(this.destroyRef))
 			.subscribe({
 				next: (response) => {
-					// Mutación quirúrgica
+					// MutaciÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â³n quirÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Âºrgica
 					this.store.addTareaToSemana(semanaId, response.data);
 					this.store.setSaving(false);
 					this.store.closeTareaDialog();
@@ -215,7 +220,7 @@ export class CursoContenidoFacade {
 			.pipe(takeUntilDestroyed(this.destroyRef))
 			.subscribe({
 				next: (response) => {
-					// Mutación quirúrgica
+					// MutaciÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â³n quirÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Âºrgica
 					this.store.updateTareaInSemana(semanaId, tareaId, response.data);
 					this.store.setSaving(false);
 					this.store.closeTareaDialog();
@@ -236,7 +241,7 @@ export class CursoContenidoFacade {
 			.pipe(takeUntilDestroyed(this.destroyRef))
 			.subscribe({
 				next: () => {
-					// Mutación quirúrgica
+					// MutaciÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â³n quirÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Âºrgica
 					this.store.removeTareaFromSemana(semanaId, tareaId);
 					this.store.setSaving(false);
 				},
@@ -248,7 +253,8 @@ export class CursoContenidoFacade {
 			});
 	}
 
-	// ============ Dialog commands ============
+	// #endregion
+	// #region Dialog commands
 	openSemanaEditDialog(semana: CursoContenidoSemanaDto): void {
 		this.store.openSemanaEditDialog(semana);
 	}
@@ -272,4 +278,5 @@ export class CursoContenidoFacade {
 	closeBuilderDialog(): void {
 		this.store.closeBuilderDialog();
 	}
+	// #endregion
 }

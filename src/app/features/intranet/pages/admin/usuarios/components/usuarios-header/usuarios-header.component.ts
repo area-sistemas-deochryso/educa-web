@@ -1,10 +1,13 @@
+// #region Imports
 import { ChangeDetectionStrategy, Component, output } from '@angular/core';
 import { ButtonModule } from 'primeng/button';
 
 /**
  * Componente presentacional para el header de usuarios
- * Muestra título y botón de refrescar
+ * Muestra tÃƒÆ’Ã‚Â­tulo y botÃƒÆ’Ã‚Â³n de refrescar
  */
+// #endregion
+// #region Implementation
 @Component({
 	selector: 'app-usuarios-header',
 	standalone: true,
@@ -21,3 +24,4 @@ export class UsuariosHeaderComponent {
 		this.refresh.emit();
 	}
 }
+// #endregion

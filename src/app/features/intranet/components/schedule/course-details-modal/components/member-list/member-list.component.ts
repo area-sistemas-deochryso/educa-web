@@ -1,6 +1,9 @@
+// #region Imports
 import { Component, Input } from '@angular/core';
 import { CommonModule } from '@angular/common';
 
+// #endregion
+// #region Implementation
 @Component({
 	selector: 'app-member-list',
 	standalone: true,
@@ -13,3 +16,4 @@ export class MemberListComponent {
 	@Input() title = '';
 	@Input() members: string[] = [];
 }
+// #endregion

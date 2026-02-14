@@ -1,5 +1,8 @@
+// #region Imports
 import { Pipe, PipeTransform } from '@angular/core';
 
+// #endregion
+// #region Implementation
 @Pipe({
 	name: 'truncate',
 	standalone: true,
@@ -12,3 +15,4 @@ export class TruncatePipe implements PipeTransform {
 		return value.substring(0, limit) + trail;
 	}
 }
+// #endregion

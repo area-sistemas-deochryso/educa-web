@@ -1,3 +1,4 @@
+// #region Implementation
 /**
  * Environment exports
  * Import from this file to use environment configuration throughout the app
@@ -11,3 +12,4 @@
 // * Centralized environment re-exports.
 export { environment } from './environment';
 export type { Environment } from './environment';
+// #endregion

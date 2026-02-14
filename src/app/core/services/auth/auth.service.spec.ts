@@ -1,4 +1,5 @@
 // * Tests for AuthService login/logout behavior.
+// #region Imports
 import { TestBed } from '@angular/core/testing';
 import { HttpTestingController, provideHttpClientTesting } from '@angular/common/http/testing';
 import { provideHttpClient } from '@angular/common/http';
@@ -8,6 +9,8 @@ import { AuthService } from './auth.service';
 import { StorageService } from '../storage';
 import { AuthUser, LoginResponse, UserRole } from './auth.models';
 
+// #endregion
+// #region Implementation
 describe('AuthService', () => {
 	let service: AuthService;
 	let httpMock: HttpTestingController;
@@ -100,7 +103,7 @@ describe('AuthService', () => {
 
 			const req = httpMock.expectOne((r) => r.url.includes('/api/Auth/login'));
 			req.flush(
-				{ mensaje: 'Credenciales inválidas' },
+				{ mensaje: 'Credenciales invÃƒÂ¡lidas' },
 				{ status: 401, statusText: 'Unauthorized' },
 			);
 		});
@@ -115,7 +118,7 @@ describe('AuthService', () => {
 
 			expect(service.isBlocked).toBe(true);
 
-			// El siguiente intento debería ser bloqueado sin hacer request
+			// El siguiente intento deberÃƒÂ­a ser bloqueado sin hacer request
 			service.login('12345678', 'password', 'Estudiante').subscribe((response) => {
 				expect(response.mensaje).toContain('Demasiados intentos');
 			});
@@ -169,3 +172,4 @@ describe('AuthService', () => {
 		});
 	});
 });
+// #endregion

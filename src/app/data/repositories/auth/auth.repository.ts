@@ -1,3 +1,4 @@
+// #region Imports
 import { LoginRequest, LoginResponse, UserProfile, VerifyTokenResponse } from '@core/services/auth';
 import { Observable, catchError, of } from 'rxjs';
 
@@ -6,6 +7,8 @@ import { Injectable } from '@angular/core';
 import { logger } from '@core/helpers';
 import { UI_AUTH_MESSAGES } from '@app/shared/constants';
 
+// #endregion
+// #region Implementation
 @Injectable({
 	providedIn: 'root',
 })
@@ -61,3 +64,4 @@ export class AuthRepository extends BaseRepository<UserProfile> {
 		);
 	}
 }
+// #endregion

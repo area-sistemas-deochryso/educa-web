@@ -1,3 +1,4 @@
+// #region Imports
 import { Injectable, inject } from '@angular/core';
 import { AsistenciaDetalle } from '@core/services';
 import {
@@ -10,6 +11,8 @@ import {
 import { DAY_HEADERS } from '@features/intranet/pages/attendance-component/config/attendance.constants';
 import { CalendarUtilsService } from '../calendar/calendar-utils.service';
 
+// #endregion
+// #region Implementation
 @Injectable({
 	providedIn: 'root',
 })
@@ -100,11 +103,11 @@ export class AttendanceDataService {
 				const dateKey = this.calendarUtils.formatDateKey(date);
 				const asistencia = asistenciaMap.get(dateKey);
 
-				// ✅ NUEVO: Usar estados calculados desde el backend
+				// Ã¢Å“â€¦ NUEVO: Usar estados calculados desde el backend
 				const ingresoStatus = asistencia?.estadoIngreso || 'X';
 				const salidaStatus = asistencia?.estadoSalida || 'X';
 
-				// Contar días válidos separadamente para ingresos y salidas
+				// Contar dÃƒÂ­as vÃƒÂ¡lidos separadamente para ingresos y salidas
 				// Excluir '-' (pendiente) y 'X' (sin registro) del conteo
 				if (ingresoStatus !== '-' && ingresoStatus !== 'X') {
 					ingresosValidDaysCount++;
@@ -176,7 +179,7 @@ export class AttendanceDataService {
 			let total = 0;
 			weeks.forEach((week) => {
 				const day = week.days[dayIndex];
-				// Excluir días sin fecha, pendientes ('-') y sin registro ('X') del total
+				// Excluir dÃƒÂ­as sin fecha, pendientes ('-') y sin registro ('X') del total
 				if (day?.date !== null && day?.status !== '-' && day?.status !== 'X') {
 					total++;
 					if (day?.status !== 'N') {
@@ -196,7 +199,7 @@ export class AttendanceDataService {
 
 		weeks.forEach((week) => {
 			week.days.forEach((day) => {
-				// Excluir días sin fecha, pendientes ('-') y sin registro ('X') del total
+				// Excluir dÃƒÂ­as sin fecha, pendientes ('-') y sin registro ('X') del total
 				if (day.date !== null && day.status !== '-' && day.status !== 'X') {
 					totalPossible++;
 					if (day.status !== 'N') {
@@ -209,3 +212,4 @@ export class AttendanceDataService {
 		return `${totalAttended}/${totalPossible}`;
 	}
 }
+// #endregion

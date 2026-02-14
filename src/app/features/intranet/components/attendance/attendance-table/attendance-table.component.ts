@@ -1,3 +1,4 @@
+// #region Imports
 import { ChangeDetectionStrategy, Component, computed, input, output } from '@angular/core';
 import { DatePipe } from '@angular/common';
 import { FormsModule } from '@angular/forms';
@@ -15,6 +16,8 @@ import {
 	getStatusClass,
 } from '@features/intranet/pages/attendance-component/config/attendance.constants';
 
+// #endregion
+// #region Implementation
 export interface HijoOption {
 	label: string;
 	value: number;
@@ -67,3 +70,4 @@ export class AttendanceTableComponent {
 		this.hijoChange.emit(hijoId);
 	}
 }
+// #endregion

@@ -1,8 +1,11 @@
+// #region Imports
 import { ErrorHandler, Injectable, inject, NgZone } from '@angular/core';
 import { ErrorHandlerService } from './error-handler.service';
 import { logger } from '@core/helpers';
 import { UI_GENERIC_MESSAGES } from '@app/shared/constants';
 
+// #endregion
+// #region Implementation
 @Injectable()
 export class GlobalErrorHandler implements ErrorHandler {
 	// * Catches uncaught errors and forwards to ErrorHandlerService.
@@ -36,3 +39,4 @@ export class GlobalErrorHandler implements ErrorHandler {
 		});
 	}
 }
+// #endregion

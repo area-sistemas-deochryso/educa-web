@@ -1,3 +1,4 @@
+// #region Imports
 import { AuthUser } from '../auth/auth.models';
 
 /**
@@ -6,6 +7,8 @@ import { AuthUser } from '../auth/auth.models';
 // * Local storage data shapes.
 
 /** Estado de los modales del schedule */
+// #endregion
+// #region Implementation
 export interface ScheduleModalsState {
 	schedule?: boolean;
 	summary?: boolean;
@@ -19,7 +22,7 @@ export interface NotificationStorageData {
 	date: string;
 }
 
-/** Mes y año seleccionado para asistencia */
+/** Mes y aÃƒÂ±o seleccionado para asistencia */
 export interface AttendanceMonthData {
 	month: number;
 	year: number;
@@ -31,9 +34,10 @@ export interface PermisosStorageData {
 	rol: string;
 	vistasPermitidas: string[];
 	tienePermisosPersonalizados: boolean;
-	/** JWT con exp de 4h que indica cuándo vencen estos permisos */
+	/** JWT con exp de 4h que indica cuÃƒÂ¡ndo vencen estos permisos */
 	permisosToken?: string;
 }
 
 /** Re-exportar AuthUser para conveniencia */
 export type { AuthUser };
+// #endregion

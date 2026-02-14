@@ -1,3 +1,4 @@
+// #region Imports
 import {
 	Component,
 	Input,
@@ -13,6 +14,8 @@ import { filter } from 'rxjs';
 import { logger } from '@core/helpers';
 import { NavMenuItem } from '../mobile-menu';
 
+// #endregion
+// #region Implementation
 @Component({
 	selector: 'app-nav-item',
 	standalone: true,
@@ -138,3 +141,4 @@ export class NavItemComponent {
 		return false;
 	}
 }
+// #endregion

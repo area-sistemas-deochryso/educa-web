@@ -8,7 +8,7 @@
   min-height: 500px;
 }
 
-// ============ Grid principal ============
+// #region Grid principal
 .weekly-grid-container {
   display: grid;
   grid-template-columns: 80px repeat(5, 1fr);
@@ -20,7 +20,8 @@
   }
 }
 
-// ============ Columna de tiempo ============
+// #endregion
+// #region Columna de tiempo
 .time-column {
   background: var(--surface-100);
   border-right: 2px solid var(--surface-border);
@@ -48,7 +49,8 @@
   }
 }
 
-// ============ Columnas de días ============
+// #endregion
+// #region Columnas de dÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â­as
 .day-column {
   position: relative;
   border-right: 1px solid var(--surface-border);
@@ -89,7 +91,8 @@
   }
 }
 
-// ============ Bloques de horario ============
+// #endregion
+// #region Bloques de horario
 .horario-block {
   position: absolute;
   width: calc(100% - 8px);
@@ -197,7 +200,8 @@
   }
 }
 
-// ============ Overlays ============
+// #endregion
+// #region Overlays
 .loading-overlay,
 .empty-overlay {
   position: absolute;
@@ -226,7 +230,8 @@
   }
 }
 
-// ============ Responsive ============
+// #endregion
+// #region Responsive
 @media (max-width: 768px) {
   .horario-block {
     font-size: 0.7rem;
@@ -259,7 +264,8 @@
   }
 }
 
-// ============ Dark Mode Support ============
+// #endregion
+// #region Dark Mode Support
 :host-context(.dark-mode) {
   .horario-block {
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
@@ -274,3 +280,4 @@
     background: rgba(0, 0, 0, 0.8);
   }
 }
+// #endregion

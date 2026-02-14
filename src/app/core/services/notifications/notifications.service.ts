@@ -1,5 +1,7 @@
+// #region Imports
 import { Injectable, signal, inject, PLATFORM_ID, computed } from '@angular/core';
 import { isPlatformBrowser } from '@angular/common';
+import { Router } from '@angular/router';
 import {
 	SeasonalNotification,
 	NotificationType,
@@ -11,6 +13,8 @@ import { StorageService } from '@app/core/services/storage';
 import { TimerManager } from '@app/core/services/destroy';
 
 /** Conteo por prioridad */
+// #endregion
+// #region Implementation
 export interface PriorityCount {
 	urgent: number;
 	high: number;
@@ -25,6 +29,7 @@ export class NotificationsService {
 	// * Manages seasonal notifications, read/dismiss state, and browser alerts.
 	private platformId = inject(PLATFORM_ID);
 	private storage = inject(StorageService);
+	private router = inject(Router);
 
 	/** Timer manager para gestionar intervalos y timeouts */
 	private timerManager = new TimerManager();
@@ -41,13 +46,13 @@ export class NotificationsService {
 	/** Contador de notificaciones */
 	readonly count = signal(0);
 
-	/** Contador de no leídas */
+	/** Contador de no leÃƒÂ­das */
 	readonly unreadCount = signal(0);
 
 	/** Panel de notificaciones abierto */
 	readonly isPanelOpen = signal(false);
 
-	/** Notificaciones descartadas del día */
+	/** Notificaciones descartadas del dÃƒÂ­a */
 	readonly dismissedNotifications = signal<SeasonalNotification[]>([]);
 
 	/** Contador de descartadas */
@@ -56,10 +61,10 @@ export class NotificationsService {
 	/** Mostrar historial de descartadas */
 	readonly showDismissedHistory = signal(false);
 
-	/** Conteo por prioridad de notificaciones no leídas */
+	/** Conteo por prioridad de notificaciones no leÃƒÂ­das */
 	readonly unreadByPriority = signal<PriorityCount>({ urgent: 0, high: 0, medium: 0, low: 0 });
 
-	/** Prioridad más alta de las no leídas */
+	/** Prioridad mÃƒÂ¡s alta de las no leÃƒÂ­das */
 	readonly highestPriority = computed<NotificationPriority | null>(() => {
 		const counts = this.unreadByPriority();
 		if (counts.urgent > 0) return 'urgent';
@@ -69,7 +74,7 @@ export class NotificationsService {
 		return null;
 	});
 
-	/** Audio para sonido de notificación */
+	/** Audio para sonido de notificaciÃƒÂ³n */
 	private notificationSound: HTMLAudioElement | null = null;
 
 	private dismissedIds = new Set<string>();
@@ -88,7 +93,7 @@ export class NotificationsService {
 	}
 
 	/**
-	 * Inicializa el sonido de notificación
+	 * Inicializa el sonido de notificaciÃƒÂ³n
 	 */
 	private initSound(): void {
 		this.notificationSound = new Audio();
@@ -107,7 +112,7 @@ export class NotificationsService {
 			return;
 		}
 
-		// Guardar referencia al handler para poder removerlo después
+		// Guardar referencia al handler para poder removerlo despuÃƒÂ©s
 		this.swMessageHandler = (event: MessageEvent) => {
 			const { type, payload } = event.data || {};
 
@@ -131,16 +136,16 @@ export class NotificationsService {
 	}
 
 	/**
-	 * Maneja la recepción de un Push
+	 * Maneja la recepciÃƒÂ³n de un Push
 	 * Reproduce sonido y actualiza estado
 	 */
 	private handlePushReceived(payload: unknown): void {
 		logger.log('[Notifications] Push recibido:', payload);
 
-		// Reproducir sonido de notificación
+		// Reproducir sonido de notificaciÃƒÂ³n
 		this.playSound();
 
-		// Incrementar contador de no leídas
+		// Incrementar contador de no leÃƒÂ­das
 		this.unreadCount.update((count) => count + 1);
 		this.hasUnread.set(true);
 
@@ -154,31 +159,31 @@ export class NotificationsService {
 			}));
 		}
 
-		// Re-verificar notificaciones locales también
+		// Re-verificar notificaciones locales tambiÃƒÂ©n
 		this.checkNotifications();
 	}
 
 	/**
-	 * Maneja click en notificación nativa
+	 * Maneja click en notificaciÃƒÂ³n nativa
 	 */
 	private handleNotificationClicked(payload: unknown): void {
 		logger.log('[Notifications] Notification clicked:', payload);
 
-		// Marcar como leída si tiene ID
+		// Marcar como leÃƒÂ­da si tiene ID
 		const typedPayload = payload as { id?: string } | null;
 		if (typedPayload?.id) {
 			this.markAsRead(typedPayload.id);
 		}
 
-		// Navegar a la URL si se especificó (la navegación la maneja el SW)
+		// Navegar a la URL si se especificÃƒÂ³ (la navegaciÃƒÂ³n la maneja el SW)
 	}
 
 	/**
-	 * Maneja cierre de notificación sin click
+	 * Maneja cierre de notificaciÃƒÂ³n sin click
 	 */
 	private handleNotificationClosed(payload: unknown): void {
 		logger.log('[Notifications] Notification closed:', payload);
-		// Opcional: marcar como leída o dejar sin leer
+		// Opcional: marcar como leÃƒÂ­da o dejar sin leer
 	}
 
 	/**
@@ -188,14 +193,14 @@ export class NotificationsService {
 		try {
 			const data = this.storage.getDismissedNotifications();
 			if (data) {
-				// Limpiar descartados del día anterior
+				// Limpiar descartados del dÃƒÂ­a anterior
 				const storedDate = new Date(data.date).toDateString();
 				const today = new Date().toDateString();
 
 				if (storedDate === today) {
 					this.dismissedIds = new Set(data.ids);
 				} else {
-					// Nuevo día, limpiar descartados
+					// Nuevo dÃƒÂ­a, limpiar descartados
 					this.clearDismissed();
 				}
 			}
@@ -228,7 +233,7 @@ export class NotificationsService {
 	}
 
 	/**
-	 * Carga las notificaciones leídas del localStorage
+	 * Carga las notificaciones leÃƒÂ­das del localStorage
 	 */
 	private loadReadNotifications(): void {
 		try {
@@ -250,7 +255,7 @@ export class NotificationsService {
 	}
 
 	/**
-	 * Guarda las notificaciones leídas
+	 * Guarda las notificaciones leÃƒÂ­das
 	 */
 	private saveReadNotifications(): void {
 		try {
@@ -264,7 +269,7 @@ export class NotificationsService {
 	}
 
 	/**
-	 * Limpia las notificaciones leídas
+	 * Limpia las notificaciones leÃƒÂ­das
 	 */
 	private clearRead(): void {
 		this.readIds.clear();
@@ -272,7 +277,7 @@ export class NotificationsService {
 	}
 
 	/**
-	 * Verifica las notificaciones del día
+	 * Verifica las notificaciones del dÃƒÂ­a
 	 */
 	checkNotifications(): void {
 		const today = new Date();
@@ -289,7 +294,7 @@ export class NotificationsService {
 		const priorityOrder = { urgent: 0, high: 1, medium: 2, low: 3 };
 		active.sort((a, b) => priorityOrder[a.priority] - priorityOrder[b.priority]);
 
-		// Contar no leídas
+		// Contar no leÃƒÂ­das
 		const unread = active.filter((n) => !this.readIds.has(n.id));
 
 		// Calcular conteo por prioridad
@@ -309,10 +314,10 @@ export class NotificationsService {
 			priorityCounts,
 		);
 
-		// Guardar última verificación
+		// Guardar ÃƒÂºltima verificaciÃƒÂ³n
 		this.storage.setLastNotificationCheck(today.toISOString());
 
-		// Reproducir sonido si hay no leídas y no se ha reproducido aún
+		// Reproducir sonido si hay no leÃƒÂ­das y no se ha reproducido aÃƒÂºn
 		if (unread.length > 0 && !this.hasPlayedSound) {
 			this.playSound();
 			this.hasPlayedSound = true;
@@ -325,7 +330,7 @@ export class NotificationsService {
 	}
 
 	/**
-	 * Inicia verificación periódica (cada hora)
+	 * Inicia verificaciÃƒÂ³n periÃƒÂ³dica (cada hora)
 	 */
 	private startPeriodicCheck(): void {
 		// Verificar cada hora usando TimerManager
@@ -338,7 +343,7 @@ export class NotificationsService {
 	}
 
 	/**
-	 * Reproduce el sonido de notificación
+	 * Reproduce el sonido de notificaciÃƒÂ³n
 	 */
 	playSound(): void {
 		if (this.notificationSound) {
@@ -350,7 +355,7 @@ export class NotificationsService {
 	}
 
 	/**
-	 * Actualiza el conteo por prioridad basado en notificaciones no leídas
+	 * Actualiza el conteo por prioridad basado en notificaciones no leÃƒÂ­das
 	 */
 	private updatePriorityCounts(): void {
 		const unread = this.activeNotifications().filter((n) => !this.readIds.has(n.id));
@@ -362,7 +367,7 @@ export class NotificationsService {
 	}
 
 	/**
-	 * Marca una notificación como leída
+	 * Marca una notificaciÃƒÂ³n como leÃƒÂ­da
 	 */
 	markAsRead(notificationId: string): void {
 		if (!this.readIds.has(notificationId)) {
@@ -374,12 +379,12 @@ export class NotificationsService {
 			this.hasUnread.set(unread.length > 0);
 			this.updatePriorityCounts();
 
-			logger.log(`[Notifications] Leída: ${notificationId}`);
+			logger.log(`[Notifications] LeÃƒÂ­da: ${notificationId}`);
 		}
 	}
 
 	/**
-	 * Marca una notificación como no leída
+	 * Marca una notificaciÃƒÂ³n como no leÃƒÂ­da
 	 */
 	markAsUnread(notificationId: string): void {
 		if (this.readIds.has(notificationId)) {
@@ -391,12 +396,12 @@ export class NotificationsService {
 			this.hasUnread.set(unread.length > 0);
 			this.updatePriorityCounts();
 
-			logger.log(`[Notifications] No leída: ${notificationId}`);
+			logger.log(`[Notifications] No leÃƒÂ­da: ${notificationId}`);
 		}
 	}
 
 	/**
-	 * Marca todas como leídas
+	 * Marca todas como leÃƒÂ­das
 	 */
 	markAllAsRead(): void {
 		this.activeNotifications().forEach((n) => this.readIds.add(n.id));
@@ -404,11 +409,11 @@ export class NotificationsService {
 		this.unreadCount.set(0);
 		this.hasUnread.set(false);
 		this.unreadByPriority.set({ urgent: 0, high: 0, medium: 0, low: 0 });
-		logger.log('[Notifications] Todas marcadas como leídas');
+		logger.log('[Notifications] Todas marcadas como leÃƒÂ­das');
 	}
 
 	/**
-	 * Marca todas como no leídas
+	 * Marca todas como no leÃƒÂ­das
 	 */
 	markAllAsUnread(): void {
 		this.readIds.clear();
@@ -417,11 +422,11 @@ export class NotificationsService {
 		this.unreadCount.set(active.length);
 		this.hasUnread.set(active.length > 0);
 		this.updatePriorityCounts();
-		logger.log('[Notifications] Todas marcadas como no leídas');
+		logger.log('[Notifications] Todas marcadas como no leÃƒÂ­das');
 	}
 
 	/**
-	 * Verifica si una notificación está leída
+	 * Verifica si una notificaciÃƒÂ³n estÃƒÂ¡ leÃƒÂ­da
 	 */
 	isRead(notificationId: string): boolean {
 		return this.readIds.has(notificationId);
@@ -445,7 +450,7 @@ export class NotificationsService {
 	}
 
 	/**
-	 * Descarta una notificación
+	 * Descarta una notificaciÃƒÂ³n
 	 */
 	dismiss(notificationId: string): void {
 		const notification = this.activeNotifications().find((n) => n.id === notificationId);
@@ -463,7 +468,7 @@ export class NotificationsService {
 			// Actualizar lista de descartadas
 			this.dismissedNotifications.update((dismissed) => [...dismissed, notification]);
 
-			// Actualizar no leídas
+			// Actualizar no leÃƒÂ­das
 			const unread = updated.filter((n) => !this.readIds.has(n.id));
 			this.unreadCount.set(unread.length);
 			this.hasUnread.set(unread.length > 0);
@@ -496,7 +501,7 @@ export class NotificationsService {
 		// Actualizar lista de descartadas
 		this.dismissedNotifications.update((dismissed) => [...dismissed, ...newlyDismissed]);
 
-		// Actualizar no leídas
+		// Actualizar no leÃƒÂ­das
 		const unread = remaining.filter((n) => !this.readIds.has(n.id));
 		this.unreadCount.set(unread.length);
 		this.hasUnread.set(unread.length > 0);
@@ -513,7 +518,7 @@ export class NotificationsService {
 	}
 
 	/**
-	 * Restaura una notificación descartada
+	 * Restaura una notificaciÃƒÂ³n descartada
 	 */
 	restore(notificationId: string): void {
 		if (this.dismissedIds.has(notificationId)) {
@@ -557,7 +562,7 @@ export class NotificationsService {
 	}
 
 	/**
-	 * Muestra una notificación nativa del navegador
+	 * Muestra una notificaciÃƒÂ³n nativa del navegador
 	 */
 	async showBrowserNotification(notification: SeasonalNotification): Promise<void> {
 		if (!('Notification' in window) || Notification.permission !== 'granted') {
@@ -575,7 +580,8 @@ export class NotificationsService {
 			browserNotif.onclick = () => {
 				window.focus();
 				if (notification.actionUrl) {
-					window.location.href = notification.actionUrl;
+					// Navegar con Router para evitar open redirect
+					this.router.navigateByUrl(notification.actionUrl);
 				}
 				browserNotif.close();
 			};
@@ -594,7 +600,7 @@ export class NotificationsService {
 
 	/**
 	 * Limpia recursos al destruir (aunque los servicios singleton raramente se destruyen)
-	 * Este método se puede llamar manualmente para cleanup
+	 * Este mÃƒÂ©todo se puede llamar manualmente para cleanup
 	 */
 	cleanup(): void {
 		// Limpiar todos los timers
@@ -609,3 +615,4 @@ export class NotificationsService {
 		logger.log('[Notifications] Cleanup completado');
 	}
 }
+// #endregion

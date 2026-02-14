@@ -1,3 +1,4 @@
+// #region Imports
 import {
 	ApplicationConfig,
 	ErrorHandler,
@@ -9,7 +10,7 @@ import {
 	withEnabledBlockingInitialNavigation,
 	withPreloading,
 } from '@angular/router';
-import { authInterceptor, errorInterceptor } from '@core/interceptors';
+import { authInterceptor, errorInterceptor, requestTraceInterceptor } from '@core/interceptors';
 import { provideClientHydration, withEventReplay } from '@angular/platform-browser';
 import { provideHttpClient, withFetch, withInterceptors } from '@angular/common/http';
 
@@ -23,6 +24,8 @@ import { provideRouter } from '@angular/router';
 import { registerLocaleData } from '@angular/common';
 import { routes } from './app.routes';
 
+// #endregion
+// #region Implementation
 registerLocaleData(localeEs, 'es-PE');
 
 export const appConfig: ApplicationConfig = {
@@ -33,7 +36,10 @@ export const appConfig: ApplicationConfig = {
 			withPreloading(PreloadAllModules),
 			withEnabledBlockingInitialNavigation(),
 		),
-		provideHttpClient(withFetch(), withInterceptors([authInterceptor, errorInterceptor])),
+		provideHttpClient(
+			withFetch(),
+			withInterceptors([authInterceptor, requestTraceInterceptor, errorInterceptor]),
+		),
 		provideAnimationsAsync(),
 		providePrimeNG({
 			theme: {
@@ -58,3 +64,4 @@ export const appConfig: ApplicationConfig = {
 		},
 	],
 };
+// #endregion

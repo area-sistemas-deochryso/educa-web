@@ -1,6 +1,9 @@
+// #region Imports
 import { Injectable } from '@angular/core';
 import { APP_USER_ROLES } from '@app/shared/constants';
 
+// #endregion
+// #region Implementation
 type Severity = 'success' | 'info' | 'warn' | 'danger' | 'secondary' | 'contrast';
 
 const ROLE_SEVERITY_BY_ROLE: Record<string, Severity> = {
@@ -13,13 +16,13 @@ const ROLE_SEVERITY_BY_ROLE: Record<string, Severity> = {
 
 /**
  * Servicio con utilidades compartidas para componentes admin
- * Centraliza helpers comunes para evitar código duplicado
+ * Centraliza helpers comunes para evitar cÃƒÆ’Ã‚Â³digo duplicado
  */
 @Injectable({ providedIn: 'root' })
 export class AdminUtilsService {
 	/**
-	 * Extrae el nombre del módulo desde una ruta
-	 * @example '/intranet/admin/usuarios' → 'intranet'
+	 * Extrae el nombre del mÃƒÆ’Ã‚Â³dulo desde una ruta
+	 * @example '/intranet/admin/usuarios' ÃƒÂ¢Ã¢â‚¬Â Ã¢â‚¬â„¢ 'intranet'
 	 */
 	getModuloFromRuta(ruta: string): string {
 		const cleanRuta = ruta.startsWith('/') ? ruta.substring(1) : ruta;
@@ -28,14 +31,14 @@ export class AdminUtilsService {
 	}
 
 	/**
-	 * Retorna el severity de PrimeNG según el rol
+	 * Retorna el severity de PrimeNG segÃƒÆ’Ã‚Âºn el rol
 	 */
 	getRolSeverity(rol: string): Severity {
 		return ROLE_SEVERITY_BY_ROLE[rol] ?? 'secondary';
 	}
 
 	/**
-	 * Retorna el severity de PrimeNG según el estado
+	 * Retorna el severity de PrimeNG segÃƒÆ’Ã‚Âºn el estado
 	 * Soporta tanto boolean como number (1/0)
 	 */
 	getEstadoSeverity(estado: boolean | number): 'success' | 'danger' {
@@ -46,7 +49,7 @@ export class AdminUtilsService {
 	}
 
 	/**
-	 * Cuenta los módulos únicos en un array de rutas
+	 * Cuenta los mÃƒÆ’Ã‚Â³dulos ÃƒÆ’Ã‚Âºnicos en un array de rutas
 	 */
 	getModulosCount(vistas: string[]): number {
 		const modulos = new Set<string>();
@@ -61,3 +64,4 @@ export class AdminUtilsService {
 		return count === 1 ? '1 vista seleccionada' : `${count} vistas seleccionadas`;
 	}
 }
+// #endregion

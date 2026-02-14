@@ -1,3 +1,4 @@
+// #region Imports
 import { Component, EventEmitter, Input, Output, OnChanges, SimpleChanges } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { DialogModule } from 'primeng/dialog';
@@ -20,6 +21,8 @@ import {
 	MemberListComponent,
 } from './components';
 
+// #endregion
+// #region Implementation
 export interface CourseDetails {
 	name: string;
 	weeks: WeekData[];
@@ -119,12 +122,12 @@ export class CourseDetailsModalComponent implements OnChanges {
 				{ name: 'Examen Calificado 5', grade: 0 },
 			],
 			workGroup: [
-				'Tupac Yupanqui María José',
-				'García López Pedro',
-				'Rodríguez Silva Ana',
+				'Tupac Yupanqui MarÃƒÂ­a JosÃƒÂ©',
+				'GarcÃƒÂ­a LÃƒÂ³pez Pedro',
+				'RodrÃƒÂ­guez Silva Ana',
 				'Mendoza Quispe Carlos',
 			],
-			teacher: 'Sifuentes García Diana Isabella',
+			teacher: 'Sifuentes GarcÃƒÂ­a Diana Isabella',
 		};
 	}
 
@@ -232,3 +235,4 @@ export class CourseDetailsModalComponent implements OnChanges {
 		this.showSubmissionsModal = true;
 	}
 }
+// #endregion

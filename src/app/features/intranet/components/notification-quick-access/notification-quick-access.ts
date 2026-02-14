@@ -1,7 +1,10 @@
+// #region Imports
 import { ChangeDetectionStrategy, Component, computed, inject } from '@angular/core';
 import { NgClass } from '@angular/common';
 import { NotificationsService } from '@core/services';
 
+// #endregion
+// #region Implementation
 @Component({
 	selector: 'app-notification-quick-access',
 	standalone: true,
@@ -29,3 +32,4 @@ export class NotificationQuickAccessComponent {
 		this.notificationsService.togglePanel();
 	}
 }
+// #endregion

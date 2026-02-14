@@ -1,7 +1,10 @@
+// #region Imports
 import { Component, EventEmitter, Input, Output } from '@angular/core';
 
 import { CommonModule } from '@angular/common';
 
+// #endregion
+// #region Implementation
 export interface Evaluation {
 	name: string;
 	grade: number;
@@ -20,3 +23,4 @@ export class EvaluationsAccordionComponent {
 	@Input() evaluations: Evaluation[] = [];
 	@Output() toggleTriggered = new EventEmitter<void>();
 }
+// #endregion

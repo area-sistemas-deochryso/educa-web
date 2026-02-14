@@ -1,3 +1,4 @@
+// #region Imports
 import { FormControl, FormGroup } from '@angular/forms';
 import { UserRole } from '@core/services/auth';
 
@@ -6,6 +7,8 @@ import { UserRole } from '@core/services/auth';
  */
 
 // Login Form
+// #endregion
+// #region Implementation
 export interface LoginFormValue {
 	dni: string;
 	password: string;
@@ -79,3 +82,4 @@ export type PasswordResetFormGroup = FormGroup<{
 	newPassword: FormControl<string>;
 	confirmPassword: FormControl<string>;
 }>;
+// #endregion

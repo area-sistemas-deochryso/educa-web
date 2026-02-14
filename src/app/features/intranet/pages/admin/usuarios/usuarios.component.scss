@@ -4,7 +4,7 @@
 	margin: 0 auto;
 }
 
-// ============ GLOBAL NG-DEEP OVERRIDES ============
+// #region GLOBAL NG-DEEP OVERRIDES
 :host ::ng-deep {
 	.p-inputtext,
 	.p-select {
@@ -59,9 +59,11 @@
 	}
 }
 
-// ============ RESPONSIVE ============
+// #endregion
+// #region RESPONSIVE
 @media (max-width: 768px) {
 	.usuarios-container {
 		padding: 1rem;
 	}
 }
+// #endregion

@@ -1,8 +1,11 @@
+// #region Imports
 import { Component, EventEmitter, Input, Output } from '@angular/core';
 
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 
+// #endregion
+// #region Implementation
 @Component({
 	selector: 'app-week-search-box',
 	standalone: true,
@@ -16,3 +19,4 @@ export class WeekSearchBoxComponent {
 	@Input() placeholder = 'BUSCAR ARCHIVO, SEMANA O TEMA...';
 	@Output() searchTermChange = new EventEmitter<string>();
 }
+// #endregion

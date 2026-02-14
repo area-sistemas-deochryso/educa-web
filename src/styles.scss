@@ -1,3 +1,4 @@
+// #region Styles
 /*
   EDUCA.COM.PE - Angular Version
   Estilos Globales
@@ -497,6 +498,28 @@ strong {
 }
 
 /*---------------------------------------
+  PRIMENG - TRANSPARENT BACKGROUNDS
+  Por defecto PrimeNG usa fondo blanco en
+  form elements; la app usa fondo #eee.
+-----------------------------------------*/
+.p-select,
+.p-multiselect,
+.p-inputtext,
+.p-textarea,
+.p-datepicker,
+.p-autocomplete,
+.p-inputnumber,
+.p-password,
+.p-cascadeselect,
+.p-treeselect,
+.p-listbox,
+.p-inputgroup,
+.p-card,
+.p-datatable {
+	background: transparent !important;
+}
+
+/*---------------------------------------
   PRIMENG SELECT FILTER - INTRANET
 -----------------------------------------*/
 .p-select-overlay {
@@ -552,7 +575,7 @@ strong {
 		}
 	}
 
-	// Toast de información
+	// Toast de informaciÃ³n
 	.p-toast-message-info {
 		background: #e0f2fe !important;
 		border-left: 4px solid #0284c7 !important;
@@ -563,7 +586,7 @@ strong {
 		}
 	}
 
-	// Toast de éxito
+	// Toast de Ã©xito
 	.p-toast-message-success {
 		background: #dcfce7 !important;
 		border-left: 4px solid #16a34a !important;
@@ -634,7 +657,7 @@ strong {
   Table loader directive styles
 -----------------------------------------*/
 
-/* El host (section.table-section) NO cambia de tamaño; el overlay es absoluto */
+/* El host (section.table-section) NO cambia de tamaÃ±o; el overlay es absoluto */
 .table-loading__overlay {
 	position: absolute;
 	inset: 0;
@@ -645,7 +668,7 @@ strong {
 	backdrop-filter: blur(0px); /* el blur real lo aplicamos al contenido */
 }
 
-/* Blur + bloqueo de interacción del contenido “real” */
+/* Blur + bloqueo de interacciÃ³n del contenido â€œrealâ€ */
 .table-loading--active > *:not(.table-loading__overlay) {
 	filter: blur(var(--table-loading-blur, 2px));
 	pointer-events: none;
@@ -667,3 +690,4 @@ strong {
 		transform: rotate(360deg);
 	}
 }
+// #endregion

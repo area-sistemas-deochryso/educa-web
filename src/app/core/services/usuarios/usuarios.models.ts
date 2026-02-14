@@ -1,4 +1,5 @@
 // * Usuario DTOs and role helpers.
+// #region Imports
 import {
 	APP_USER_ROLE_ADMIN_LIST,
 	APP_USER_ROLE_LIST,
@@ -6,6 +7,8 @@ import {
 	AppUserRoleValue,
 } from '@app/shared/constants';
 
+// #endregion
+// #region Implementation
 export interface UsuarioLista {
 	id: number;
 	dni: string;
@@ -96,7 +99,8 @@ export type RolUsuario = AppUserRoleValue;
 
 export const ROLES_USUARIOS: RolUsuario[] = APP_USER_ROLE_LIST;
 
-// Roles disponibles para gestión en admin (sin Apoderado)
+// Roles disponibles para gestiÃƒÂ³n en admin (sin Apoderado)
 export type RolUsuarioAdmin = AppUserRoleAdmin;
 
 export const ROLES_USUARIOS_ADMIN: RolUsuarioAdmin[] = APP_USER_ROLE_ADMIN_LIST;
+// #endregion

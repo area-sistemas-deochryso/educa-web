@@ -1,3 +1,4 @@
+// #region Imports
 import { Component, effect, inject } from '@angular/core';
 
 import { CommonModule } from '@angular/common';
@@ -5,6 +6,8 @@ import { ErrorHandlerService } from '@core/services/error';
 import { MessageService } from 'primeng/api';
 import { ToastModule } from 'primeng/toast';
 
+// #endregion
+// #region Implementation
 @Component({
 	selector: 'app-toast-container',
 	standalone: true,
@@ -34,3 +37,4 @@ export class ToastContainerComponent {
 		});
 	}
 }
+// #endregion

@@ -1,3 +1,4 @@
+// #region Imports
 import { ChangeDetectionStrategy, Component, input, output } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { ButtonModule } from 'primeng/button';
@@ -5,6 +6,8 @@ import { InputTextModule } from 'primeng/inputtext';
 import { SelectModule } from 'primeng/select';
 import { RolUsuarioAdmin } from '@core/services';
 
+// #endregion
+// #region Implementation
 export interface FilterOptions {
 	rolesOptions: { label: string; value: RolUsuarioAdmin | null }[];
 	estadoOptions: { label: string; value: boolean | null }[];
@@ -12,7 +15,7 @@ export interface FilterOptions {
 
 /**
  * Componente presentacional para los filtros de usuarios
- * Búsqueda, filtro por rol y estado
+ * BÃƒÆ’Ã‚Âºsqueda, filtro por rol y estado
  */
 @Component({
 	selector: 'app-usuarios-filters',
@@ -56,3 +59,4 @@ export class UsuariosFiltersComponent {
 		this.newUsuario.emit();
 	}
 }
+// #endregion

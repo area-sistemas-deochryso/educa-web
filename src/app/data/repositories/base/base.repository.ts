@@ -1,8 +1,11 @@
+// #region Imports
 import { inject } from '@angular/core';
 import { Observable, catchError, of, map } from 'rxjs';
 import { BaseHttpService } from '@core/services/http';
 import { logger } from '@core/helpers';
 
+// #endregion
+// #region Implementation
 export type QueryParams = Record<string, string | number | boolean | undefined>;
 
 export interface PaginatedResponse<T> {
@@ -127,3 +130,4 @@ export abstract class BaseRepository<T, C = Partial<T>, U = Partial<T>> {
 		);
 	}
 }
+// #endregion

@@ -1,6 +1,9 @@
+// #region Imports
 import { ChangeDetectionStrategy, Component, input, output } from '@angular/core';
 import { TooltipModule } from 'primeng/tooltip';
 
+// #endregion
+// #region Implementation
 export const VIEW_MODE = {
 	Mes: 'mes',
 	Dia: 'dia',
@@ -35,3 +38,4 @@ export class AttendanceHeaderComponent {
 		this.modeChange.emit(mode);
 	}
 }
+// #endregion

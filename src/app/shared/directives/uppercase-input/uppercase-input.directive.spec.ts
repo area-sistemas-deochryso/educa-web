@@ -1,3 +1,4 @@
+// #region Imports
 import { Component } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { FormControl, ReactiveFormsModule } from '@angular/forms';
@@ -6,6 +7,8 @@ import { describe, it, expect, beforeEach } from 'vitest';
 
 import { UppercaseInputDirective } from './uppercase-input.directive';
 
+// #endregion
+// #region Implementation
 @Component({
 	standalone: true,
 	imports: [UppercaseInputDirective, ReactiveFormsModule],
@@ -134,3 +137,4 @@ describe('UppercaseInputDirective', () => {
 		});
 	});
 });
+// #endregion

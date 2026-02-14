@@ -20,7 +20,7 @@ import { TooltipModule } from 'primeng/tooltip';
 import { Observable, finalize } from 'rxjs';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
-// ============ Tipos de reporte ============
+// #region Tipos de reporte
 
 type TipoReporte = 'salon' | 'consolidado-dia' | 'consolidado-semana' | 'consolidado-mes' | 'consolidado-anio';
 
@@ -31,8 +31,8 @@ interface TipoReporteOption {
 
 /**
  * Componente Container para vista de asistencias de Directores.
- * Maneja la selección de grado/sección; la lógica compartida (estudiantes,
- * modo día/mes, tablas y PDF) vive en AttendanceViewController.
+ * Maneja la selecciÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Â ÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â³n de grado/secciÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Â ÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â³n; la lÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Â ÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â³gica compartida (estudiantes,
+ * modo dÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Â ÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â­a/mes, tablas y PDF) vive en AttendanceViewController.
  */
 @Component({
 	selector: 'app-attendance-director',
@@ -64,20 +64,22 @@ export class AttendanceDirectorComponent implements OnInit {
 	// * Shared controller handles month/day, tables, and PDF actions.
 	readonly view = inject(AttendanceViewController);
 
-	// ============ Tipo de reporte ============
+// #endregion
+	// #region Tipo de reporte
 
 	readonly tipoReporteOptions: TipoReporteOption[] = [
-		{ label: 'Reporte por Salón', value: 'salon' },
-		{ label: 'Consolidado - Día', value: 'consolidado-dia' },
+		{ label: 'Reporte por SalÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Â ÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â³n', value: 'salon' },
+		{ label: 'Consolidado - DÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Â ÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â­a', value: 'consolidado-dia' },
 		{ label: 'Consolidado - Semana', value: 'consolidado-semana' },
 		{ label: 'Consolidado - Mes', value: 'consolidado-mes' },
-		{ label: 'Consolidado - Año', value: 'consolidado-anio' },
+		{ label: 'Consolidado - AÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Â ÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â±o', value: 'consolidado-anio' },
 	];
 	readonly tipoReporte = signal<TipoReporte>('salon');
 	readonly downloadingPdfConsolidado = signal(false);
 	readonly savingJustificacion = signal(false);
 
-	// ============ Grados y secciones ============
+	// #endregion
+	// #region Grados y secciones
 
 	private readonly allGradosSecciones = signal<GradoSeccion[]>([]);
 	readonly gradosSecciones = computed(() => {
@@ -108,7 +110,8 @@ export class AttendanceDirectorComponent implements OnInit {
 		this.loadGradosSecciones();
 	}
 
-	// ============ Carga y selección de grado/sección ============
+	// #endregion
+	// #region Carga y selecciÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Â ÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â³n de grado/secciÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Â ÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â³n
 
 	private loadGradosSecciones(): void {
 		// * Fetch available groups, then restore selection and load data.
@@ -191,7 +194,8 @@ export class AttendanceDirectorComponent implements OnInit {
 		}
 	}
 
-	// ============ Delegados al servicio (llamados por el padre via @ViewChild) ============
+	// #endregion
+	// #region Delegados al servicio (llamados por el padre via @ViewChild)
 
 	// * Parent component calls these via ViewChild.
 	setViewMode(mode: ViewMode): void {
@@ -202,13 +206,14 @@ export class AttendanceDirectorComponent implements OnInit {
 		this.view.reload();
 	}
 
-	// ============ PDF menu ============
+	// #endregion
+	// #region PDF menu
 
 	readonly pdfMenuItems = computed<MenuItem[]>(() => {
 		const tipo = this.tipoReporte();
 
 		if (tipo === 'salon') {
-			// Reporte específico de un salón
+			// Reporte especÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Â ÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â­fico de un salÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Â ÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â³n
 			return [
 				{
 					label: 'Ver PDF',
@@ -242,7 +247,8 @@ export class AttendanceDirectorComponent implements OnInit {
 		this.pdfMenu.toggle(event);
 	}
 
-	// ============ Justificación ============
+	// #endregion
+	// #region JustificaciÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Â ÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â³n
 
 	onJustificar(event: JustificacionEvent): void {
 		const fecha = this.view.fechaDia();
@@ -257,14 +263,15 @@ export class AttendanceDirectorComponent implements OnInit {
 			.subscribe({
 				next: (response) => {
 					if (response.success) {
-						// Recargar datos del día para reflejar el cambio
+						// Recargar datos del dÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Â ÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â­a para reflejar el cambio
 						this.view.reload();
 					}
 				},
 			});
 	}
 
-	// ============ PDF Consolidados ============
+	// #endregion
+	// #region PDF Consolidados
 
 	private verPdfConsolidado(): void {
 		const tipo = this.tipoReporte();
@@ -327,7 +334,7 @@ export class AttendanceDirectorComponent implements OnInit {
 			case 'consolidado-dia':
 				return this.asistenciaService.descargarPdfTodosSalonesDia(fecha);
 			case 'consolidado-semana':
-				// Calcular inicio de la semana actual del mes/año seleccionado
+				// Calcular inicio de la semana actual del mes/aÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Â ÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â±o seleccionado
 				const inicioSemana = this.getInicioSemanaActual(selectedMonth, selectedYear);
 				return this.asistenciaService.descargarPdfTodosSalonesSemana(inicioSemana);
 			case 'consolidado-mes':
@@ -340,13 +347,13 @@ export class AttendanceDirectorComponent implements OnInit {
 	}
 
 	/**
-	 * Obtiene el inicio de la semana actual (lunes) dentro del mes/año especificado
+	 * Obtiene el inicio de la semana actual (lunes) dentro del mes/aÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Â ÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â±o especificado
 	 */
 	private getInicioSemanaActual(mes: number, anio: number): Date {
 		const hoy = new Date();
 		const fechaMesSeleccionado = new Date(anio, mes - 1, 1);
 
-		// Si el mes/año seleccionado es diferente al actual, usar la primera semana de ese mes
+		// Si el mes/aÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Â ÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â±o seleccionado es diferente al actual, usar la primera semana de ese mes
 		if (hoy.getMonth() + 1 !== mes || hoy.getFullYear() !== anio) {
 			// Primera semana del mes: encontrar el primer lunes
 			const primerDia = fechaMesSeleccionado.getDay(); // 0 = domingo, 1 = lunes, ...
@@ -354,9 +361,9 @@ export class AttendanceDirectorComponent implements OnInit {
 			return new Date(anio, mes - 1, 1 + diasHastaLunes);
 		}
 
-		// Si es el mes/año actual, calcular el lunes de la semana actual
+		// Si es el mes/aÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Â ÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â±o actual, calcular el lunes de la semana actual
 		const diaSemana = hoy.getDay();
-		const diff = diaSemana === 0 ? -6 : 1 - diaSemana; // Si es domingo, retroceder 6 días
+		const diff = diaSemana === 0 ? -6 : 1 - diaSemana; // Si es domingo, retroceder 6 dÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Â ÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â­as
 		const lunes = new Date(hoy);
 		lunes.setDate(hoy.getDate() + diff);
 		return lunes;
@@ -383,11 +390,13 @@ export class AttendanceDirectorComponent implements OnInit {
 		}
 	}
 
-	// ============ Helpers privados ============
+	// #endregion
+	// #region Helpers privados
 
 	private getSelectorContext(): SelectorContext | null {
 		const gs = this.selectedGradoSeccion();
 		if (!gs) return null;
 		return { grado: gs.grado, gradoCodigo: gs.gradoCodigo, seccion: gs.seccion };
 	}
+	// #endregion
 }

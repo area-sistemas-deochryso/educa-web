@@ -1,9 +1,12 @@
+// #region Imports
 import { ChangeDetectionStrategy, Component, input, output } from '@angular/core';
 
 import { ButtonModule } from 'primeng/button';
 
 import { MiHorarioHoyItem } from '../../models';
 
+// #endregion
+// #region Implementation
 @Component({
 	selector: 'app-schedule-panel',
 	standalone: true,
@@ -192,3 +195,4 @@ export class SchedulePanelComponent {
 	readonly currentSalonId = input<number | null>(null);
 	readonly navigate = output<number>();
 }
+// #endregion

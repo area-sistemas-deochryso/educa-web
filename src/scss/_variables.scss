@@ -1,7 +1,5 @@
-// =============================================================================
-// VARIABLES - Sistema de utilidades SCSS
-// Breakpoints y valores compatibles con Bootstrap para migración sin cambios
-// =============================================================================
+// #region VARIABLES - Sistema de utilidades SCSS
+// Breakpoints y valores compatibles con Bootstrap para migraciÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â³n sin cambios
 
 @use 'sass:map';
 
@@ -52,3 +50,4 @@ $container-max-widths: (
 		}
 	}
 }
+// #endregion

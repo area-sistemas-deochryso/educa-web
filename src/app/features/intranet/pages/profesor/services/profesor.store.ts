@@ -9,7 +9,7 @@ import {
 	ProfesorEstudianteSalonDto,
 } from '../models';
 
-/** Salón enriquecido con datos de estudiantes */
+/** SalÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â³n enriquecido con datos de estudiantes */
 export interface ProfesorSalonConEstudiantes extends ProfesorSalon {
 	cantidadEstudiantes: number;
 	estudiantes: ProfesorEstudianteSalonDto[];
@@ -20,10 +20,11 @@ interface ProfesorStoreState {
 	salonTutoria: SalonTutoriaDto | null;
 	misEstudiantes: ProfesorMisSalonesConEstudiantesDto | null;
 	loading: boolean;
-	// ============ Dialog state ============
+	// #region Dialog state
 	salonDialogVisible: boolean;
 	salonDialogLoading: boolean;
 	selectedSalon: ProfesorSalonConEstudiantes | null;
+	// #endregion
 }
 
 const initialState: ProfesorStoreState = {
@@ -38,10 +39,11 @@ const initialState: ProfesorStoreState = {
 
 @Injectable({ providedIn: 'root' })
 export class ProfesorStore {
-	// ============ Estado privado ============
+	// #region Estado privado
 	private readonly _state = signal<ProfesorStoreState>(initialState);
 
-	// ============ Lecturas públicas ============
+	// #endregion
+	// #region Lecturas pÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Âºblicas
 	readonly horarios = computed(() => this._state().horarios);
 	readonly salonTutoria = computed(() => this._state().salonTutoria);
 	readonly misEstudiantes = computed(() => this._state().misEstudiantes);
@@ -50,7 +52,8 @@ export class ProfesorStore {
 	readonly salonDialogLoading = computed(() => this._state().salonDialogLoading);
 	readonly selectedSalon = computed(() => this._state().selectedSalon);
 
-	// ============ Computed - Cursos únicos ============
+	// #endregion
+	// #region Computed - Cursos ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Âºnicos
 	readonly cursos = computed<ProfesorCurso[]>(() => {
 		const horarios = this.horarios();
 		const cursosMap = new Map<number, ProfesorCurso>();
@@ -73,13 +76,14 @@ export class ProfesorStore {
 		return Array.from(cursosMap.values());
 	});
 
-	// ============ Computed - Salones únicos (tutoría primero, sin duplicados) ============
+	// #endregion
+	// #region Computed - Salones ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Âºnicos (tutorÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â­a primero, sin duplicados)
 	readonly salones = computed<ProfesorSalon[]>(() => {
 		const horarios = this.horarios();
 		const tutoria = this.salonTutoria();
 		const salonesMap = new Map<number, ProfesorSalon>();
 
-		// Agregar salón de tutoría primero (si existe)
+		// Agregar salÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â³n de tutorÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â­a primero (si existe)
 		if (tutoria) {
 			salonesMap.set(tutoria.salonId, {
 				salonId: tutoria.salonId,
@@ -106,12 +110,13 @@ export class ProfesorStore {
 			}
 		}
 
-		// Tutoría primero, luego el resto
+		// TutorÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â­a primero, luego el resto
 		const all = Array.from(salonesMap.values());
 		return all.sort((a, b) => (a.esTutor === b.esTutor ? 0 : a.esTutor ? -1 : 1));
 	});
 
-	// ============ Computed - Salones con estudiantes (merge) ============
+	// #endregion
+	// #region Computed - Salones con estudiantes (merge)
 	readonly salonesConEstudiantes = computed<ProfesorSalonConEstudiantes[]>(() => {
 		const salones = this.salones();
 		const misEst = this.misEstudiantes();
@@ -132,7 +137,8 @@ export class ProfesorStore {
 		});
 	});
 
-	// ============ Computed - Horarios agrupados por día ============
+	// #endregion
+	// #region Computed - Horarios agrupados por dÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â­a
 	readonly horariosPorDia = computed(() => {
 		const horarios = this.horarios();
 		const grouped = new Map<string, HorarioProfesorDto[]>();
@@ -144,7 +150,7 @@ export class ProfesorStore {
 			grouped.set(dia, list);
 		}
 
-		// Ordenar por horaInicio dentro de cada día
+		// Ordenar por horaInicio dentro de cada dÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â­a
 		for (const [, items] of grouped) {
 			items.sort((a, b) => a.horaInicio.localeCompare(b.horaInicio));
 		}
@@ -152,7 +158,8 @@ export class ProfesorStore {
 		return grouped;
 	});
 
-	// ============ ViewModel ============
+	// #endregion
+	// #region ViewModel
 	readonly vm = computed(() => ({
 		horarios: this.horarios(),
 		horariosPorDia: this.horariosPorDia(),
@@ -167,7 +174,8 @@ export class ProfesorStore {
 		selectedSalon: this.selectedSalon(),
 	}));
 
-	// ============ Comandos de mutación ============
+	// #endregion
+	// #region Comandos de mutaciÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â³n
 	setHorarios(horarios: HorarioProfesorDto[]): void {
 		this._state.update((s) => ({ ...s, horarios }));
 	}
@@ -184,7 +192,8 @@ export class ProfesorStore {
 		this._state.update((s) => ({ ...s, loading }));
 	}
 
-	// ============ Dialog commands ============
+	// #endregion
+	// #region Dialog commands
 	openSalonDialog(salon: ProfesorSalonConEstudiantes): void {
 		this._state.update((s) => ({ ...s, salonDialogVisible: true, salonDialogLoading: true, selectedSalon: salon }));
 	}
@@ -204,4 +213,5 @@ export class ProfesorStore {
 	reset(): void {
 		this._state.set(initialState);
 	}
+	// #endregion
 }

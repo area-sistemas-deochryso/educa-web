@@ -1,7 +1,10 @@
+// #region Imports
 import { defineConfig } from 'vitest/config';
 import angular from '@analogjs/vite-plugin-angular';
 import { resolve } from 'path';
 
+// #endregion
+// #region Implementation
 export default defineConfig({
 	plugins: [angular()],
 	resolve: {
@@ -20,7 +23,7 @@ export default defineConfig({
 		globals: true,
 		environment: 'jsdom',
 		include: ['src/**/*.spec.ts'],
-		exclude: ['dist/**', 'node_modules/**'],
+		exclude: ['**/dist/**', 'node_modules/**'],
 		setupFiles: ['src/test-setup.ts'],
 		server: {
 			deps: {
@@ -29,3 +32,4 @@ export default defineConfig({
 		},
 	},
 });
+// #endregion

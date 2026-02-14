@@ -1,6 +1,7 @@
+// #region Implementation
 /**
  * Interfaz base para adaptadores.
- * Los adaptadores transforman datos entre diferentes capas de la aplicación:
+ * Los adaptadores transforman datos entre diferentes capas de la aplicaciÃ³n:
  * - API Response -> Domain Model
  * - Domain Model -> View Model
  * - Form Data -> API Request
@@ -29,7 +30,7 @@ export interface BidirectionalAdapter<TSource, TTarget> extends Adapter<TSource,
 }
 
 /**
- * Clase base abstracta para adaptadores con funcionalidad común
+ * Clase base abstracta para adaptadores con funcionalidad comÃºn
  */
 export abstract class BaseAdapter<TSource, TTarget> implements Adapter<TSource, TTarget> {
 	// * Base helpers for one-way adapters.
@@ -66,3 +67,4 @@ export abstract class BaseBidirectionalAdapter<TSource, TTarget>
 		return targets.map((target) => this.reverse(target));
 	}
 }
+// #endregion

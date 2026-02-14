@@ -1,3 +1,4 @@
+<!-- #region Template -->
 <!-- * Intranet shell with desktop + mobile navigation. -->
 <header class="intranet-header">
 	<div class="header-container desktop-header">
@@ -56,9 +57,10 @@
 </main>
 
 <!-- * Optional floating widgets. -->
-@if (showNotifications) {
+@if (showNotifications()) {
 	<app-floating-notification-bell />
 }
-@if (showVoiceRecognition) {
+@if (showVoiceRecognition()) {
 	<app-voice-button />
 }
+<!-- #endregion -->

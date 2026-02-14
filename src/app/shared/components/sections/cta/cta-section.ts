@@ -1,6 +1,9 @@
+// #region Imports
 import { Component } from '@angular/core';
 import { Tooltip } from 'primeng/tooltip';
 
+// #endregion
+// #region Implementation
 @Component({
 	selector: 'app-cta-section',
 	standalone: true,
@@ -11,3 +14,4 @@ import { Tooltip } from 'primeng/tooltip';
 export class CtaSectionComponent {
 	// * Simple CTA section (static content).
 }
+// #endregion

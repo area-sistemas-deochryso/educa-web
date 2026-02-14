@@ -1,3 +1,4 @@
+// #region Imports
 import {
 	ActualizarUsuarioRequest,
 	CrearUsuarioRequest,
@@ -12,6 +13,8 @@ import { ApiResponse } from '../permisos';
 import { HttpClient } from '@angular/common/http';
 import { environment } from '@env/environment';
 
+// #endregion
+// #region Implementation
 @Injectable({
 	providedIn: 'root',
 })
@@ -79,3 +82,4 @@ export class UsuariosService {
 			.pipe(catchError(() => of({ existe: false })));
 	}
 }
+// #endregion

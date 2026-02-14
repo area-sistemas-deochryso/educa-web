@@ -1,6 +1,9 @@
+// #region Imports
 import { ChangeDetectionStrategy, Component, computed, input } from '@angular/core';
 import { RouterLink } from '@angular/router';
 
+// #endregion
+// #region Implementation
 @Component({
 	selector: 'app-quick-access-card',
 	standalone: true,
@@ -28,3 +31,4 @@ export class QuickAccessCardComponent {
 		return modalValue ? { modal: modalValue } : null;
 	});
 }
+// #endregion

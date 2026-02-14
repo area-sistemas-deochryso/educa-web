@@ -1,3 +1,4 @@
+// #region Imports
 import {
 	Component,
 	OnDestroy,
@@ -8,6 +9,8 @@ import {
 } from '@angular/core';
 import { isPlatformBrowser } from '@angular/common';
 
+// #endregion
+// #region Implementation
 @Component({
 	selector: 'app-counter-section',
 	standalone: true,
@@ -88,3 +91,4 @@ export class CounterSectionComponent implements AfterViewInit, OnDestroy {
 		this.animationFrameId = requestAnimationFrame(animate);
 	}
 }
+// #endregion

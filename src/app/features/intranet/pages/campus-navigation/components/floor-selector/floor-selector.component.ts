@@ -1,7 +1,10 @@
+// #region Imports
 import { ChangeDetectionStrategy, Component, input, output } from '@angular/core';
 
 import { ButtonModule } from 'primeng/button';
 
+// #endregion
+// #region Implementation
 @Component({
 	selector: 'app-floor-selector',
 	standalone: true,
@@ -37,3 +40,4 @@ export class FloorSelectorComponent {
 	readonly selectedFloor = input.required<number>();
 	readonly floorChange = output<number>();
 }
+// #endregion

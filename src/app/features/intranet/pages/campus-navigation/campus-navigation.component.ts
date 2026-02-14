@@ -26,13 +26,14 @@ export class CampusNavigationComponent implements OnInit {
 
 	readonly vm = this.facade.vm;
 
-	// ============ Lifecycle ============
+	// #region Lifecycle
 
 	ngOnInit(): void {
 		this.facade.loadSchedule();
 	}
 
-	// ============ Event handlers ============
+	// #endregion
+	// #region Event handlers
 
 	onFloorChange(floor: number): void {
 		this.facade.selectFloor(floor);
@@ -57,4 +58,5 @@ export class CampusNavigationComponent implements OnInit {
 	onClearPath(): void {
 		this.facade.clearPath();
 	}
+	// #endregion
 }

@@ -1,10 +1,13 @@
 // * Tests for SessionStorageService read/write behavior.
+// #region Imports
 import { TestBed } from '@angular/core/testing';
 import { PLATFORM_ID } from '@angular/core';
 import { describe, it, expect, beforeEach, vi, afterEach } from 'vitest';
 
 import { SessionStorageService } from './session-storage.service';
 
+// #endregion
+// #region Implementation
 describe('SessionStorageService', () => {
 	let service: SessionStorageService;
 
@@ -77,21 +80,21 @@ describe('SessionStorageService', () => {
 		});
 
 		it('should set and get token in sessionStorage (rememberMe=false)', () => {
-			service.setToken('test-token', false, 'Juan Pérez', 'Estudiante');
+			service.setToken('test-token', false, 'Juan PÃƒÂ©rez', 'Estudiante');
 
 			expect(service.getToken()).toBe('test-token');
 			expect(service.hasToken()).toBe(true);
 		});
 
 		it('should set and get token in localStorage (rememberMe=true)', () => {
-			service.setToken('persistent-token', true, 'María García', 'Profesor');
+			service.setToken('persistent-token', true, 'MarÃƒÂ­a GarcÃƒÂ­a', 'Profesor');
 
 			expect(service.getToken()).toBe('persistent-token');
 			expect(service.hasToken()).toBe(true);
 		});
 
 		it('should remove token', () => {
-			service.setToken('test-token', false, 'Juan Pérez', 'Estudiante');
+			service.setToken('test-token', false, 'Juan PÃƒÂ©rez', 'Estudiante');
 			expect(service.hasToken()).toBe(true);
 
 			service.removeToken();
@@ -304,3 +307,4 @@ describe('SessionStorageService', () => {
 		});
 	});
 });
+// #endregion

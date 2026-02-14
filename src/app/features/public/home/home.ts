@@ -1,3 +1,4 @@
+// #region Imports
 import { Component } from '@angular/core';
 import { HeroSectionComponent } from '@shared/components/sections/hero';
 import { AboutSectionComponent } from '@shared/components/sections/about';
@@ -6,6 +7,8 @@ import { CounterSectionComponent } from '@shared/components/sections/counter';
 import { TestimonialsSectionComponent } from '@shared/components/sections/testimonials';
 import { CtaSectionComponent } from '@shared/components/sections/cta';
 
+// #endregion
+// #region Implementation
 @Component({
 	selector: 'app-home',
 	standalone: true,
@@ -23,3 +26,4 @@ import { CtaSectionComponent } from '@shared/components/sections/cta';
 export class HomeComponent {
 	// * Composes the public landing page sections.
 }
+// #endregion

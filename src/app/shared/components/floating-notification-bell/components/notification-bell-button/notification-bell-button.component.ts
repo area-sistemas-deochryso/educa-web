@@ -1,3 +1,4 @@
+// #region Imports
 import { Component, EventEmitter, Input, Output, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import {
@@ -6,6 +7,8 @@ import {
 } from '../priority-legend-menu/priority-legend-menu.component';
 import { NotificationsPanelContext } from '../../notifications-panel.context';
 
+// #endregion
+// #region Implementation
 @Component({
 	selector: 'app-notification-bell-button',
 	imports: [CommonModule, PriorityLegendMenuComponent],
@@ -42,3 +45,4 @@ export class NotificationBellButtonComponent {
 		this.closeContextMenu.emit();
 	}
 }
+// #endregion

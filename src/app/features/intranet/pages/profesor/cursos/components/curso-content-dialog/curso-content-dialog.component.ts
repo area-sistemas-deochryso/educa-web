@@ -39,11 +39,12 @@ export class CursoContentDialogComponent {
 
 	readonly vm = this.facade.vm;
 
-	// ============ Estado local ============
+	// #region Estado local
 	readonly searchQuery = signal('');
 	private activeSemanaId = signal<number | null>(null);
 
-	// ============ Computed ============
+	// #endregion
+	// #region Computed
 	readonly filteredSemanas = computed(() => {
 		const semanas = this.vm().semanas;
 		const query = this.searchQuery().toLowerCase().trim();
@@ -56,7 +57,8 @@ export class CursoContentDialogComponent {
 		);
 	});
 
-	// ============ Dialog handlers ============
+	// #endregion
+	// #region Dialog handlers
 	onVisibleChange(visible: boolean): void {
 		if (!visible) {
 			this.facade.closeContentDialog();
@@ -64,7 +66,8 @@ export class CursoContentDialogComponent {
 		}
 	}
 
-	// ============ Semana actions ============
+	// #endregion
+	// #region Semana actions
 	onEditSemana(semana: CursoContenidoSemanaDto): void {
 		this.facade.openSemanaEditDialog(semana);
 	}
@@ -82,7 +85,8 @@ export class CursoContentDialogComponent {
 		}
 	}
 
-	// ============ Archivo actions ============
+	// #endregion
+	// #region Archivo actions
 	onFileSelect(event: { files: File[] }, semanaId: number): void {
 		const file = event.files[0];
 		if (file) {
@@ -93,8 +97,8 @@ export class CursoContentDialogComponent {
 
 	onDeleteArchivo(semanaId: number, archivoId: number, nombreArchivo: string): void {
 		this.confirmationService.confirm({
-			message: `¿Eliminar el archivo "${nombreArchivo}"?`,
-			header: 'Confirmar Eliminación',
+			message: `ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¿Eliminar el archivo "${nombreArchivo}"?`,
+			header: 'Confirmar EliminaciÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â³n',
 			icon: 'pi pi-exclamation-triangle',
 			acceptLabel: 'Eliminar',
 			rejectLabel: 'Cancelar',
@@ -109,7 +113,8 @@ export class CursoContentDialogComponent {
 		window.open(url, '_blank');
 	}
 
-	// ============ Tarea actions ============
+	// #endregion
+	// #region Tarea actions
 	onAddTarea(): void {
 		this.facade.openTareaDialog(null);
 	}
@@ -141,8 +146,8 @@ export class CursoContentDialogComponent {
 
 	onDeleteTarea(semanaId: number, tareaId: number, titulo: string): void {
 		this.confirmationService.confirm({
-			message: `¿Eliminar la tarea "${titulo}"?`,
-			header: 'Confirmar Eliminación',
+			message: `ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¿Eliminar la tarea "${titulo}"?`,
+			header: 'Confirmar EliminaciÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â³n',
 			icon: 'pi pi-exclamation-triangle',
 			acceptLabel: 'Eliminar',
 			rejectLabel: 'Cancelar',
@@ -153,13 +158,14 @@ export class CursoContentDialogComponent {
 		});
 	}
 
-	// ============ Contenido actions ============
+	// #endregion
+	// #region Contenido actions
 	onDeleteContenido(): void {
 		const contenido = this.vm().contenido;
 		if (!contenido) return;
 
 		this.confirmationService.confirm({
-			message: '¿Eliminar todo el contenido de este curso? Esta acción no se puede deshacer.',
+			message: 'ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¿Eliminar todo el contenido de este curso? Esta acciÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â³n no se puede deshacer.',
 			header: 'Eliminar Contenido',
 			icon: 'pi pi-exclamation-triangle',
 			acceptLabel: 'Eliminar',
@@ -171,7 +177,8 @@ export class CursoContentDialogComponent {
 		});
 	}
 
-	// ============ Helpers ============
+	// #endregion
+	// #region Helpers
 	getFileIcon(tipoArchivo: string | null): string {
 		if (!tipoArchivo) return 'pi pi-file';
 		if (tipoArchivo.includes('pdf')) return 'pi pi-file-pdf';
@@ -209,4 +216,5 @@ export class CursoContentDialogComponent {
 		if (!id) return null;
 		return this.vm().semanas.find((s) => s.id === id) ?? null;
 	}
+	// #endregion
 }

@@ -1,7 +1,10 @@
+// #region Imports
 import { Directive, ElementRef, HostListener, inject } from '@angular/core';
 
 import { NgControl } from '@angular/forms';
 
+// #endregion
+// #region Implementation
 @Directive({
 	selector: '[appUppercaseInput]',
 	standalone: true,
@@ -19,3 +22,4 @@ export class UppercaseInputDirective {
 		this.control.control?.setValue(uppercased, { emitEvent: false });
 	}
 }
+// #endregion

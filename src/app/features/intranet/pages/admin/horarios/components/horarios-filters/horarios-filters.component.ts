@@ -1,3 +1,4 @@
+// #region Imports
 import { ChangeDetectionStrategy, Component, input, output } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
@@ -9,6 +10,8 @@ import { TooltipModule } from 'primeng/tooltip';
 
 import type { SalonOption } from '../../models/salon.interface';
 
+// #endregion
+// #region Implementation
 @Component({
 	selector: 'app-horarios-filters',
 	standalone: true,
@@ -36,7 +39,7 @@ export class HorariosFiltersComponent {
 	readonly diasOptions = [
 		{ label: 'Lunes', value: 1 },
 		{ label: 'Martes', value: 2 },
-		{ label: 'Miércoles', value: 3 },
+		{ label: 'MiÃƒÆ’Ã‚Â©rcoles', value: 3 },
 		{ label: 'Jueves', value: 4 },
 		{ label: 'Viernes', value: 5 },
 	];
@@ -63,3 +66,4 @@ export class HorariosFiltersComponent {
 		this.clearFiltros.emit();
 	}
 }
+// #endregion

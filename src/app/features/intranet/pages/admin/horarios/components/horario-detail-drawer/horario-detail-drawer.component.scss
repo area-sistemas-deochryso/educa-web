@@ -1,4 +1,4 @@
-// ============ Drawer Header ============
+// #region Drawer Header
 .drawer-header {
   display: flex;
   align-items: center;
@@ -37,7 +37,8 @@
   }
 }
 
-// ============ Loading State ============
+// #endregion
+// #region Loading State
 .loading-state {
   display: flex;
   flex-direction: column;
@@ -57,7 +58,8 @@
   }
 }
 
-// ============ Empty State ============
+// #endregion
+// #region Empty State
 .empty-state {
   display: flex;
   flex-direction: column;
@@ -77,14 +79,16 @@
   }
 }
 
-// ============ Detail Content ============
+// #endregion
+// #region Detail Content
 .detail-content {
   display: flex;
   flex-direction: column;
   gap: 1.5rem;
 }
 
-// ============ Status Section ============
+// #endregion
+// #region Status Section
 .status-section {
   display: flex;
   justify-content: space-between;
@@ -99,7 +103,8 @@
   }
 }
 
-// ============ Section Title ============
+// #endregion
+// #region Section Title
 .section-title {
   display: flex;
   align-items: center;
@@ -114,7 +119,8 @@
   }
 }
 
-// ============ Info Section ============
+// #endregion
+// #region Info Section
 .info-section {
   padding: 1rem;
   background: var(--surface-card);
@@ -156,7 +162,8 @@
   }
 }
 
-// ============ Assignment Section ============
+// #endregion
+// #region Assignment Section
 .assignment-section {
   padding: 1rem;
   background: var(--surface-card);
@@ -295,7 +302,8 @@
   }
 }
 
-// ============ Audit Section ============
+// #endregion
+// #region Audit Section
 .audit-section {
   padding: 1rem;
   background: var(--surface-50);
@@ -332,7 +340,8 @@
   }
 }
 
-// ============ Responsive ============
+// #endregion
+// #region Responsive
 @media (max-width: 768px) {
   ::ng-deep {
     p-drawer {
@@ -349,7 +358,8 @@
   }
 }
 
-// ============ Dark Mode ============
+// #endregion
+// #region Dark Mode
 :host-context(.dark-mode) {
   .status-section {
     background: var(--surface-100);
@@ -382,3 +392,4 @@
     }
   }
 }
+// #endregion

@@ -1,4 +1,4 @@
-// ============ DTOs de Response (Backend → Frontend) ============
+// #region DTOs de Response (Backend ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â ÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢ Frontend)
 
 export interface HorarioResponseDto {
   id: number;
@@ -49,7 +49,8 @@ export interface EstudianteHorarioDto {
   nombreCompleto: string;
 }
 
-// ============ DTOs de Request (Frontend → Backend) ============
+// #endregion
+// #region DTOs de Request (Frontend ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â ÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢ Backend)
 
 export interface HorarioCreateDto {
   diaSemana: number;
@@ -78,14 +79,15 @@ export interface HorarioAsignarProfesorDto {
 
 export interface HorarioAsignarEstudiantesDto {
   horarioId: number;
-  estudianteIds: number[] | null; // null = todos del salón
+  estudianteIds: number[] | null; // null = todos del salÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â³n
   usuarioReg: string;
 }
 
-// ============ Modelos Locales (Frontend) ============
+// #endregion
+// #region Modelos Locales (Frontend)
 
 export interface HorarioFormData {
-  // Paso 1: Datos básicos
+  // Paso 1: Datos bÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â¡sicos
   diaSemana: number | null;
   horaInicio: string;
   horaFin: string;
@@ -115,7 +117,8 @@ export interface HorariosEstadisticas {
   promedioEstudiantesPorHorario?: number;
 }
 
-// ============ Opciones para Filtros y Selectores ============
+// #endregion
+// #region Opciones para Filtros y Selectores
 
 export interface DiaSemanaOption {
   label: string;
@@ -136,12 +139,13 @@ export interface HorarioWeeklyData {
   };
 }
 
-// ============ Constantes ============
+// #endregion
+// #region Constantes
 
 export const DIAS_SEMANA: DiaSemanaOption[] = [
   { label: 'Lunes', value: 1 },
   { label: 'Martes', value: 2 },
-  { label: 'Miércoles', value: 3 },
+  { label: 'MiÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â©rcoles', value: 3 },
   { label: 'Jueves', value: 4 },
   { label: 'Viernes', value: 5 },
 ];
@@ -171,3 +175,4 @@ export const CURSO_COLORS = [
   '#14B8A6', // teal
   '#F97316', // orange
 ];
+// #endregion

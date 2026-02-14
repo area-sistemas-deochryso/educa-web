@@ -1,4 +1,5 @@
 // * Tests for NotificationsService state changes.
+// #region Imports
 import { TestBed } from '@angular/core/testing';
 import { PLATFORM_ID } from '@angular/core';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
@@ -7,6 +8,8 @@ import { NotificationsService } from './notifications.service';
 import { StorageService } from '@app/core/services/storage';
 
 // Mock Audio
+// #endregion
+// #region Implementation
 class MockAudio {
 	src = '';
 	volume = 1;
@@ -96,3 +99,4 @@ describe('NotificationsService', () => {
 		});
 	});
 });
+// #endregion

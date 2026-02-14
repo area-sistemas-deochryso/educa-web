@@ -1,3 +1,4 @@
+// #region Imports
 import { Component, ChangeDetectionStrategy, input, output } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
@@ -5,6 +6,8 @@ import { DialogModule } from 'primeng/dialog';
 import { ButtonModule } from 'primeng/button';
 import { InputNumberModule } from 'primeng/inputnumber';
 
+// #endregion
+// #region Implementation
 @Component({
 	selector: 'app-curso-builder-dialog',
 	standalone: true,
@@ -20,12 +23,12 @@ import { InputNumberModule } from 'primeng/inputnumber';
 		>
 			<div class="flex flex-column gap-3 pt-2">
 				<p class="text-color-secondary m-0">
-					Define cuántas semanas tendrá el contenido de este curso. Podrás agregar archivos y
-					tareas a cada semana después.
+					Define cuÃƒÂ¡ntas semanas tendrÃƒÂ¡ el contenido de este curso. PodrÃƒÂ¡s agregar archivos y
+					tareas a cada semana despuÃƒÂ©s.
 				</p>
 
 				<div class="flex flex-column gap-2">
-					<label for="numSemanas" class="font-semibold">Número de semanas</label>
+					<label for="numSemanas" class="font-semibold">NÃƒÂºmero de semanas</label>
 					<p-inputNumber
 						id="numSemanas"
 						[(ngModel)]="numeroSemanas"
@@ -82,3 +85,4 @@ export class CursoBuilderDialogComponent {
 		}
 	}
 }
+// #endregion

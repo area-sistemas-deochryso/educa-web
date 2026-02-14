@@ -1,8 +1,11 @@
+// #region Imports
 import { Injectable, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { environment } from '@config/environment';
 
+// #endregion
+// #region Implementation
 export interface Grado {
 	id: number;
 	nombre: string;
@@ -18,3 +21,4 @@ export class GradosService {
 		return this.http.get<Grado[]>(this.apiUrl);
 	}
 }
+// #endregion

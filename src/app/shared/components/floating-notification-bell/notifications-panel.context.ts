@@ -1,3 +1,4 @@
+// #region Imports
 import { Injectable, Signal, inject, computed } from '@angular/core';
 import { NotificationsService, SeasonalNotification, NotificationPriority } from '@core/services';
 import { UnreadByPriority } from './components';
@@ -7,6 +8,8 @@ import { UnreadByPriority } from './components';
  * This eliminates prop drilling by providing direct access to notification state and methods.
  * Must be provided at the floating-notification-bell component level.
  */
+// #endregion
+// #region Implementation
 @Injectable()
 export class NotificationsPanelContext {
 	// * Bridge to notifications service for shared panel state/actions.
@@ -86,3 +89,4 @@ export class NotificationsPanelContext {
 		this.notificationsService.playSound();
 	}
 }
+// #endregion

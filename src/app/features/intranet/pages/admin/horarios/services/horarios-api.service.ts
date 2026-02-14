@@ -19,7 +19,7 @@ export class HorariosApiService {
   private readonly apiUrl = `${environment.apiUrl}/api/horario`;
   private http = inject(HttpClient);
 
-  // ============ CRUD Básico ============
+  // #region CRUD BÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¡sico
 
   getAll(): Observable<HorarioResponseDto[]> {
     return this.http
@@ -49,7 +49,8 @@ export class HorariosApiService {
     return this.http.put<boolean>(`${this.apiUrl}/${id}/toggle-estado`, {});
   }
 
-  // ============ Consultas Especializadas ============
+  // #endregion
+  // #region Consultas Especializadas
 
   getBySalon(salonId: number): Observable<HorarioResponseDto[]> {
     return this.http
@@ -69,7 +70,8 @@ export class HorariosApiService {
       .pipe(catchError(() => of([])));
   }
 
-  // ============ Asignaciones ============
+  // #endregion
+  // #region Asignaciones
 
   asignarProfesor(data: HorarioAsignarProfesorDto): Observable<boolean> {
     return this.http.post<boolean>(`${this.apiUrl}/asignar-profesor`, data);
@@ -89,11 +91,13 @@ export class HorariosApiService {
     );
   }
 
-  // ============ Estadísticas ============
+  // #endregion
+  // #region EstadÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â­sticas
 
   getEstadisticas(): Observable<HorariosEstadisticas | null> {
-    // TODO: Implementar endpoint de estadísticas en el backend
-    // Por ahora, calcular estadísticas en frontend
+    // TODO: Implementar endpoint de estadÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â­sticas en el backend
+    // Por ahora, calcular estadÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â­sticas en frontend
     return of(null);
   }
+  // #endregion
 }

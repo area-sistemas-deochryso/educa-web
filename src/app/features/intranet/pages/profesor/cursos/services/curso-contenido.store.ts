@@ -10,7 +10,7 @@ interface CursoContenidoState {
 	contenido: CursoContenidoDetalleDto | null;
 	loading: boolean;
 	saving: boolean;
-	// ============ Dialog state ============
+	// #region Dialog state
 	contentDialogVisible: boolean;
 	builderDialogVisible: boolean;
 	semanaEditDialogVisible: boolean;
@@ -19,6 +19,7 @@ interface CursoContenidoState {
 	selectedTarea: CursoContenidoTareaDto | null;
 	// Horario seleccionado para crear contenido
 	selectedHorarioId: number | null;
+	// #endregion
 }
 
 const initialState: CursoContenidoState = {
@@ -36,10 +37,11 @@ const initialState: CursoContenidoState = {
 
 @Injectable({ providedIn: 'root' })
 export class CursoContenidoStore {
-	// ============ Estado privado ============
+	// #region Estado privado
 	private readonly _state = signal<CursoContenidoState>(initialState);
 
-	// ============ Lecturas públicas ============
+	// #endregion
+	// #region Lecturas pÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Âºblicas
 	readonly contenido = computed(() => this._state().contenido);
 	readonly loading = computed(() => this._state().loading);
 	readonly saving = computed(() => this._state().saving);
@@ -51,7 +53,8 @@ export class CursoContenidoStore {
 	readonly selectedTarea = computed(() => this._state().selectedTarea);
 	readonly selectedHorarioId = computed(() => this._state().selectedHorarioId);
 
-	// ============ Computed derivados ============
+	// #endregion
+	// #region Computed derivados
 	readonly semanas = computed(() => this.contenido()?.semanas ?? []);
 
 	readonly totalArchivos = computed(() =>
@@ -62,7 +65,8 @@ export class CursoContenidoStore {
 		this.semanas().reduce((sum, s) => sum + s.tareas.length, 0),
 	);
 
-	// ============ ViewModel ============
+	// #endregion
+	// #region ViewModel
 	readonly vm = computed(() => ({
 		contenido: this.contenido(),
 		semanas: this.semanas(),
@@ -79,7 +83,8 @@ export class CursoContenidoStore {
 		selectedHorarioId: this.selectedHorarioId(),
 	}));
 
-	// ============ Comandos de mutación ============
+	// #endregion
+	// #region Comandos de mutaciÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â³n
 	setContenido(contenido: CursoContenidoDetalleDto | null): void {
 		this._state.update((s) => ({ ...s, contenido }));
 	}
@@ -96,7 +101,8 @@ export class CursoContenidoStore {
 		this._state.update((s) => ({ ...s, selectedHorarioId: id }));
 	}
 
-	// ============ Mutaciones quirúrgicas ============
+	// #endregion
+	// #region Mutaciones quirÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Âºrgicas
 
 	/** Actualizar una semana sin refetch */
 	updateSemana(semanaId: number, updates: Partial<CursoContenidoSemanaDto>): void {
@@ -203,7 +209,8 @@ export class CursoContenidoStore {
 		});
 	}
 
-	// ============ Dialog commands ============
+	// #endregion
+	// #region Dialog commands
 	openContentDialog(): void {
 		this._state.update((s) => ({ ...s, contentDialogVisible: true }));
 	}
@@ -244,4 +251,5 @@ export class CursoContenidoStore {
 	reset(): void {
 		this._state.set(initialState);
 	}
+	// #endregion
 }

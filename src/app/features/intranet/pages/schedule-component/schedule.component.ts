@@ -1,3 +1,4 @@
+// #region Imports
 import { Component, OnInit, OnDestroy, inject, DestroyRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute } from '@angular/router';
@@ -10,6 +11,8 @@ import { GradesModalComponent } from '@features/intranet/components/schedule/gra
 import { VoiceRecognitionService, StorageService } from '@core/services';
 import { ScheduleModalsState } from '@core/services/storage';
 
+// #endregion
+// #region Implementation
 @Component({
 	selector: 'app-schedule',
 	imports: [
@@ -89,7 +92,7 @@ export class ScheduleComponent implements OnInit, OnDestroy {
 		this.voiceUnsubscribers.push(
 			this.voiceService.registerModal({
 				name: 'resumen',
-				aliases: ['resumen académico', 'el resumen', 'summary', 'resumen de cursos'],
+				aliases: ['resumen acadÃƒÂ©mico', 'el resumen', 'summary', 'resumen de cursos'],
 				open: () => this.openSummaryModal(),
 				close: () => this.onSummaryModalClose(),
 			}),
@@ -113,7 +116,7 @@ export class ScheduleComponent implements OnInit, OnDestroy {
 		this.voiceUnsubscribers.push(
 			this.voiceService.registerModal({
 				name: 'detalles',
-				aliases: ['detalles del curso', 'detalle', 'información del curso'],
+				aliases: ['detalles del curso', 'detalle', 'informaciÃƒÂ³n del curso'],
 				open: () => {
 					if (this.selectedCourse) {
 						this.openDetailsModal(this.selectedCourse);
@@ -231,3 +234,4 @@ export class ScheduleComponent implements OnInit, OnDestroy {
 		this.saveModalState('grades', { visible: false, course: '' });
 	}
 }
+// #endregion

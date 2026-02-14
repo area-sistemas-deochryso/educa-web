@@ -5,7 +5,7 @@
   min-height: 100vh;
 }
 
-// ============ Header ============
+// #region Header
 .horarios-header {
   display: flex;
   justify-content: space-between;
@@ -48,7 +48,8 @@
   }
 }
 
-// ============ Stats Grid ============
+// #endregion
+// #region Stats Grid
 .stats-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
@@ -100,7 +101,8 @@
   }
 }
 
-// ============ View Tabs ============
+// #endregion
+// #region View Tabs
 .view-tabs {
   display: flex;
   gap: 0.5rem;
@@ -126,7 +128,8 @@
   }
 }
 
-// ============ Vista Semanal ============
+// #endregion
+// #region Vista Semanal
 .weekly-view {
   background: transparent;
   border-radius: 8px;
@@ -186,7 +189,8 @@
   }
 }
 
-// ============ Responsive ============
+// #endregion
+// #region Responsive
 @media (max-width: 1024px) {
   :host {
     padding: 1rem;
@@ -229,7 +233,8 @@
   }
 }
 
-// ============ Dialog ============
+// #endregion
+// #region Dialog
 .dialog-content {
   padding: 1rem 0;
 
@@ -321,7 +326,8 @@
   }
 }
 
-// ============ Modal de Selección de Cursos ============
+// #endregion
+// #region Modal de SelecciÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â³n de Cursos
 ::ng-deep {
   .curso-selection-dialog {
     .p-dialog-header {
@@ -516,7 +522,8 @@
   }
 }
 
-// ============ Dark Mode Support ============
+// #endregion
+// #region Dark Mode Support
 :host-context(.dark-mode) {
   .stat-card {
     box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
@@ -538,3 +545,4 @@
     }
   }
 }
+// #endregion

@@ -1,6 +1,4 @@
-// =============================================================================
-// SPACING UTILITIES - m-*, p-*, mx-auto, responsive variants
-// =============================================================================
+// #region SPACING UTILITIES - m-*, p-*, mx-auto, responsive variants
 
 @use 'sass:map';
 @use '../variables' as *;
@@ -166,3 +164,4 @@
 		}
 	}
 }
+// #endregion

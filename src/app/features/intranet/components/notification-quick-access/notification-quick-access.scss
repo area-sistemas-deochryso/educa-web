@@ -1,3 +1,4 @@
+// #region Styles
 /* ===========================
    Modern Sass Modules
 =========================== */
@@ -27,7 +28,7 @@ $shadow-soft: 0 4px 12px rgba(0, 0, 0, 0.05);
 
 /* ===========================
    Priority Colors (ONLY real colors)
-   ⚠️ Sass cannot compute CSS vars
+   âš ï¸ Sass cannot compute CSS vars
 =========================== */
 
 $priority-map: (
@@ -171,7 +172,7 @@ $priority-map: (
 
 	/* ===========================
      Disabled State (WCAG Fix)
-     ✅ Lighthouse Contrast Pass
+     âœ… Lighthouse Contrast Pass
   =========================== */
 
 	&.no-notifications {
@@ -280,3 +281,4 @@ $priority-map: (
 		}
 	}
 }
+// #endregion

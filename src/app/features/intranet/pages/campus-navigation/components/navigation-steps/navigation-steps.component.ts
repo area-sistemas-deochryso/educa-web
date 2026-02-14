@@ -1,7 +1,10 @@
+// #region Imports
 import { ChangeDetectionStrategy, Component, computed, input } from '@angular/core';
 
 import { PathResult } from '../../models';
 
+// #endregion
+// #region Implementation
 @Component({
 	selector: 'app-navigation-steps',
 	standalone: true,
@@ -122,3 +125,4 @@ export class NavigationStepsComponent {
 		return Math.max(1, Math.round(result.totalDistance / 60));
 	});
 }
+// #endregion

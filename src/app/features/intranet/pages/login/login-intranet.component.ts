@@ -1,3 +1,4 @@
+// #region Imports
 import { AppValidators, LoginFormGroup } from '@shared/validators';
 import {
 	AuthService,
@@ -29,6 +30,8 @@ import { UppercaseInputDirective } from '@app/shared';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { UI_LOGIN_MESSAGES } from '@app/shared/constants';
 
+// #endregion
+// #region Implementation
 @Component({
 	selector: 'app-login-intranet',
 	imports: [
@@ -133,7 +136,7 @@ export class LoginIntranetComponent implements OnInit {
 	private autofillFromUser(user: VerifyTokenResponse, includeDni = true): void {
 		// * includeDni=false preserves what the user already typed.
 		const patchData: Partial<{ dni: string; password: string; rol: UserRole }> = {
-			password: user.contraseña,
+			password: user.contraseÃƒÆ’Ã‚Â±a,
 			rol: user.rol,
 		};
 
@@ -227,3 +230,4 @@ export class LoginIntranetComponent implements OnInit {
 		this.router.navigate(['/']);
 	}
 }
+// #endregion

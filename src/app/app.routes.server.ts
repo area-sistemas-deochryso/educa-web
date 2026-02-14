@@ -1,5 +1,8 @@
+// #region Imports
 import { RenderMode, ServerRoute } from '@angular/ssr';
 
+// #endregion
+// #region Implementation
 export const serverRoutes: ServerRoute[] = [
 	// Public routes - can be prerendered
 	{
@@ -54,3 +57,4 @@ export const serverRoutes: ServerRoute[] = [
 		renderMode: RenderMode.Client,
 	},
 ];
+// #endregion

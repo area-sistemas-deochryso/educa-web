@@ -1,8 +1,11 @@
+// #region Imports
 import { Component, EventEmitter, Input, Output } from '@angular/core';
 
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 
+// #endregion
+// #region Implementation
 @Component({
 	selector: 'app-course-search',
 	standalone: true,
@@ -22,3 +25,4 @@ export class CourseSearchComponent {
 	@Output() blurTriggered = new EventEmitter<void>();
 	@Output() selectTriggered = new EventEmitter<string>();
 }
+// #endregion

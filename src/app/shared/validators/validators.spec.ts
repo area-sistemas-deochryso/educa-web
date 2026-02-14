@@ -1,7 +1,10 @@
+// #region Imports
 import { FormControl, FormGroup } from '@angular/forms';
 import { describe, it, expect } from 'vitest';
 import { AppValidators } from './validators';
 
+// #endregion
+// #region Implementation
 describe('AppValidators', () => {
 	describe('dni', () => {
 		const validator = AppValidators.dni();
@@ -256,12 +259,12 @@ describe('AppValidators', () => {
 		});
 
 		it('should return null for letters with spaces', () => {
-			const control = new FormControl('Juan Pérez');
+			const control = new FormControl('Juan PÃƒÂ©rez');
 			expect(validator(control)).toBeNull();
 		});
 
 		it('should return null for letters with accents', () => {
-			const control = new FormControl('José María Ñoño');
+			const control = new FormControl('JosÃƒÂ© MarÃƒÂ­a Ãƒâ€˜oÃƒÂ±o');
 			expect(validator(control)).toBeNull();
 		});
 
@@ -305,3 +308,4 @@ describe('AppValidators', () => {
 		});
 	});
 });
+// #endregion

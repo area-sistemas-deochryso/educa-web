@@ -1,7 +1,8 @@
-// T = Temprano, A = A tiempo, F = Fuera de hora, N = No asistió
-// J = Justificado (falta con justificación registrada)
-// '-' = Pendiente (día futuro o de hoy sin hora aún)
-// 'X' = No contabilizado (antes del 26/01/2026 o período vacacional)
+// #region Implementation
+// T = Temprano, A = A tiempo, F = Fuera de hora, N = No asistiÃ³
+// J = Justificado (falta con justificaciÃ³n registrada)
+// '-' = Pendiente (dÃ­a futuro o de hoy sin hora aÃºn)
+// 'X' = No contabilizado (antes del 26/01/2026 o perÃ­odo vacacional)
 export type AttendanceStatus = 'T' | 'A' | 'F' | 'N' | 'J' | '-' | 'X';
 
 export interface AttendanceDay {
@@ -41,3 +42,4 @@ export interface MonthOption {
 	label: string;
 	value: number;
 }
+// #endregion

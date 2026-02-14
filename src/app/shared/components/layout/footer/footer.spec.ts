@@ -1,9 +1,12 @@
+// #region Imports
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { beforeEach, describe, expect, it } from 'vitest';
 
 import { FooterComponent } from './footer';
 import { testProviders } from '@test';
 
+// #endregion
+// #region Implementation
 describe('FooterComponent', () => {
 	let component: FooterComponent;
 	let fixture: ComponentFixture<FooterComponent>;
@@ -23,3 +26,4 @@ describe('FooterComponent', () => {
 		expect(component).toBeTruthy();
 	});
 });
+// #endregion

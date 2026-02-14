@@ -1,3 +1,4 @@
+// #region Imports
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { of } from 'rxjs';
@@ -11,6 +12,8 @@ import {
 } from '@core/services';
 import { AttendanceDataService } from '../../../services/attendance/attendance-data.service';
 
+// #endregion
+// #region Implementation
 describe('AttendanceDirectorComponent', () => {
 	let component: AttendanceDirectorComponent;
 	let fixture: ComponentFixture<AttendanceDirectorComponent>;
@@ -28,7 +31,7 @@ describe('AttendanceDirectorComponent', () => {
 		{
 			estudianteId: 1,
 			dni: '12345678',
-			nombreCompleto: 'Juan Pérez',
+			nombreCompleto: 'Juan PÃƒÂ©rez',
 			grado: 1,
 			seccion: 'A',
 			asistencias: [],
@@ -155,7 +158,7 @@ describe('AttendanceDirectorComponent', () => {
 		const hijos = component.estudiantesAsHijos();
 
 		expect(hijos.length).toBe(1);
-		expect(hijos[0].nombreCompleto).toBe('Juan Pérez');
+		expect(hijos[0].nombreCompleto).toBe('Juan PÃƒÂ©rez');
 		expect(hijos[0].relacion).toBe('Estudiante');
 	});
 
@@ -193,3 +196,4 @@ describe('AttendanceDirectorComponent', () => {
 		expect(spyDia).toHaveBeenCalled();
 	});
 });
+// #endregion

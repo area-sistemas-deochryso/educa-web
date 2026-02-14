@@ -1,5 +1,8 @@
+// #region Imports
 import { Component, Input } from '@angular/core';
 
+// #endregion
+// #region Implementation
 @Component({
 	selector: 'app-login-error-message',
 	standalone: true,
@@ -12,3 +15,4 @@ export class LoginErrorMessageComponent {
 	@Input() message = '';
 	@Input() show = false;
 }
+// #endregion

@@ -1,5 +1,8 @@
+// #region Imports
 import { Component } from '@angular/core';
 
+// #endregion
+// #region Implementation
 @Component({
 	selector: 'app-terms',
 	standalone: true,
@@ -10,3 +13,4 @@ import { Component } from '@angular/core';
 export class TermsComponent {
 	// * Terms and conditions static content.
 }
+// #endregion

@@ -1,9 +1,12 @@
+// #region Imports
 import { Component, inject, computed } from '@angular/core';
 import { DialogModule } from 'primeng/dialog';
 import { ButtonModule } from 'primeng/button';
 
 import { ModalManagerService } from '@core/services';
 
+// #endregion
+// #region Implementation
 export const ACCESS_DENIED_MODAL_ID = 'access-denied-modal';
 
 @Component({
@@ -31,3 +34,4 @@ export class AccessDeniedModalComponent {
 		this.modalManager.close(ACCESS_DENIED_MODAL_ID);
 	}
 }
+// #endregion

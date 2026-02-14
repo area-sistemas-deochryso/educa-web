@@ -1,6 +1,9 @@
+// #region Imports
 import { Component } from '@angular/core';
 import { RouterLink } from '@angular/router';
 
+// #endregion
+// #region Implementation
 @Component({
 	selector: 'app-primaria',
 	standalone: true,
@@ -11,3 +14,4 @@ import { RouterLink } from '@angular/router';
 export class PrimariaComponent {
 	// * Primaria level page content.
 }
+// #endregion

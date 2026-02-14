@@ -18,11 +18,12 @@ export class CampusNavigationFacade {
 	private errorHandler = inject(ErrorHandlerService);
 	private destroyRef = inject(DestroyRef);
 
-	// ============ Exponer estado del store ============
+	// #region Exponer estado del store
 
 	readonly vm = this.store.vm;
 
-	// ============ Comandos ============
+	// #endregion
+	// #region Comandos
 
 	loadSchedule(): void {
 		this.store.setLoading(true);
@@ -31,7 +32,7 @@ export class CampusNavigationFacade {
 			.getMiHorarioHoy()
 			.pipe(
 				catchError((err) => {
-					logger.error('Error cargando horario del día:', err);
+					logger.error('Error cargando horario del dÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â­a:', err);
 					this.store.setScheduleItems([]);
 					this.store.setLoading(false);
 					this.store.setScheduleReady(true);
@@ -44,7 +45,7 @@ export class CampusNavigationFacade {
 				this.store.setLoading(false);
 				this.store.setScheduleReady(true);
 
-				// Auto-seleccionar destino si hay clase actual/próxima
+				// Auto-seleccionar destino si hay clase actual/prÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â³xima
 				const current = this.store.currentOrNextClass();
 				if (current) {
 					this.navigateToSalon(current.salonId);
@@ -67,7 +68,7 @@ export class CampusNavigationFacade {
 	}
 
 	/**
-	 * Desde el panel de horario: buscar nodo por salonId y navegar a él
+	 * Desde el panel de horario: buscar nodo por salonId y navegar a ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â©l
 	 */
 	navigateToSalon(salonId: number): void {
 		const salonMap = this.store.salonToNodeMap();
@@ -86,7 +87,7 @@ export class CampusNavigationFacade {
 	}
 
 	/**
-	 * Click en un nodo del mapa → establecer como destino
+	 * Click en un nodo del mapa ÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬Ãƒâ€šÃ‚Â ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÂ¢Ã¢â‚¬Å¾Ã‚Â¢ establecer como destino
 	 */
 	onMapNodeClick(nodeId: string): void {
 		const node = CAMPUS_NODES.find((n) => n.id === nodeId);
@@ -100,7 +101,8 @@ export class CampusNavigationFacade {
 		this.store.clearPath();
 	}
 
-	// ============ Pathfinding ============
+	// #endregion
+	// #region Pathfinding
 
 	private recalculatePath(): void {
 		const startId = this.store.startNodeId();
@@ -121,4 +123,5 @@ export class CampusNavigationFacade {
 
 		this.store.setPathResult(result);
 	}
+	// #endregion
 }

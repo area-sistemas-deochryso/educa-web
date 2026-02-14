@@ -1,3 +1,4 @@
+// #region Styles
 .page-header {
 	display: flex;
 	align-items: center;
@@ -38,7 +39,7 @@
 			gap: 4px;
 			isolation: isolate;
 
-			// Slider que se desliza detrás
+			// Slider que se desliza detrÃ¡s
 			.mode-slider {
 				position: absolute;
 				top: 4px;
@@ -118,3 +119,4 @@
 	}
 }
 
+// #endregion

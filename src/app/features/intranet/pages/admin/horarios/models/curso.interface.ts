@@ -1,4 +1,4 @@
-// ============ DTOs de Response (Backend → Frontend) ============
+// #region DTOs de Response (Backend ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â ÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢ Frontend)
 
 export interface CursoListaDto {
   id: number;
@@ -16,19 +16,22 @@ export interface GradoSimpleDto {
   nombre: string;
 }
 
-// ============ Opciones para dropdowns ============
+// #endregion
+// #region Opciones para dropdowns
 
 export interface CursoOption {
   value: number; // cursoId
-  label: string; // "Matemática"
-  grados: string[]; // ["1°", "2°", "3°"]
+  label: string; // "MatemÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â¡tica"
+  grados: string[]; // ["1ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â°", "2ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â°", "3ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â°"]
   niveles: string[]; // ["Inicial", "Primaria", "Secundaria"]
 }
 
-// ============ Agrupación por nivel educativo ============
+// #endregion
+// #region AgrupaciÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â³n por nivel educativo
 
 export interface CursosPorNivel {
   inicial: CursoOption[];
   primaria: CursoOption[];
   secundaria: CursoOption[];
 }
+// #endregion

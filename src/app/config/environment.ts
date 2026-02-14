@@ -1,3 +1,4 @@
+// #region Implementation
 /**
  * Environment configuration for PRODUCTION
  * This file is used by default when building for production
@@ -7,12 +8,12 @@ export const environment = {
 	production: true,
 
 	// API Configuration
-	apiUrl: 'https://educacom.azurewebsites.net',
+	apiUrl: 'https://educa1.azurewebsites.net',
 
 	// Feature flags
 	showIntranetLink: true,
 
-	// Features en desarrollo (ocultos en producción los que estén en false)
+	// Features en desarrollo (ocultos en producciÃ³n los que estÃ©n en false)
 	features: {
 		horarios: false,
 		calendario: false,
@@ -24,3 +25,4 @@ export const environment = {
 };
 
 export type Environment = typeof environment;
+// #endregion

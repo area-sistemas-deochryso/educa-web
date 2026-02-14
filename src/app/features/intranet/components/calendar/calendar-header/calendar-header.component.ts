@@ -1,6 +1,9 @@
+// #region Imports
 import { Component, input, output } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 
+// #endregion
+// #region Implementation
 @Component({
 	selector: 'app-calendar-header',
 	imports: [FormsModule],
@@ -36,3 +39,4 @@ export class CalendarHeaderComponent {
 		}
 	}
 }
+// #endregion

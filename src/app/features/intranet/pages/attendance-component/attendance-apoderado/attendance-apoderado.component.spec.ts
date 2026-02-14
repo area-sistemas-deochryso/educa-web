@@ -1,3 +1,4 @@
+// #region Imports
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { of } from 'rxjs';
@@ -6,6 +7,8 @@ import { AttendanceApoderadoComponent } from './attendance-apoderado.component';
 import { AsistenciaService, StorageService, HijoApoderado } from '@core/services';
 import { AttendanceDataService } from '../../../services/attendance/attendance-data.service';
 
+// #endregion
+// #region Implementation
 describe('AttendanceApoderadoComponent', () => {
 	let component: AttendanceApoderadoComponent;
 	let fixture: ComponentFixture<AttendanceApoderadoComponent>;
@@ -17,7 +20,7 @@ describe('AttendanceApoderadoComponent', () => {
 		{
 			estudianteId: 1,
 			dni: '12345678',
-			nombreCompleto: 'Juan Pérez',
+			nombreCompleto: 'Juan PÃƒÂ©rez',
 			grado: 1,
 			seccion: 'A',
 			relacion: 'Hijo',
@@ -25,7 +28,7 @@ describe('AttendanceApoderadoComponent', () => {
 		{
 			estudianteId: 2,
 			dni: '87654321',
-			nombreCompleto: 'María Pérez',
+			nombreCompleto: 'MarÃƒÂ­a PÃƒÂ©rez',
 			grado: 2,
 			seccion: 'B',
 			relacion: 'Hija',
@@ -98,7 +101,7 @@ describe('AttendanceApoderadoComponent', () => {
 
 	it('should compute selectedHijo correctly', () => {
 		fixture.detectChanges();
-		expect(component.selectedHijo()?.nombreCompleto).toBe('Juan Pérez');
+		expect(component.selectedHijo()?.nombreCompleto).toBe('Juan PÃƒÂ©rez');
 	});
 
 	it('should call selectHijo and load asistencias', () => {
@@ -144,3 +147,4 @@ describe('AttendanceApoderadoComponent', () => {
 		expect(spy).toHaveBeenCalled();
 	});
 });
+// #endregion

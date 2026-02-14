@@ -1,9 +1,12 @@
+// #region Imports
 import { describe, it, expect, beforeEach, vi } from 'vitest';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { testProviders } from '@test';
 import { HomeComponent } from './home.component';
 import { StorageService, NotificationsService } from '@core/services';
 
+// #endregion
+// #region Implementation
 describe('HomeComponent (Intranet)', () => {
 	let component: HomeComponent;
 	let fixture: ComponentFixture<HomeComponent>;
@@ -52,10 +55,10 @@ describe('HomeComponent (Intranet)', () => {
 
 	it('should return personalized welcome message when user exists', () => {
 		(storageServiceMock.getUser as ReturnType<typeof vi.fn>).mockReturnValue({
-			nombreCompleto: 'Juan Pérez',
+			nombreCompleto: 'Juan PÃƒÂ©rez',
 			rol: 'Estudiante',
 		});
-		expect(component.welcomeTitle).toBe('Bienvenido, Juan Pérez');
+		expect(component.welcomeTitle).toBe('Bienvenido, Juan PÃƒÂ©rez');
 	});
 
 	it('should have available courses', () => {
@@ -63,3 +66,4 @@ describe('HomeComponent (Intranet)', () => {
 		expect(Array.isArray(component.availableCourses)).toBe(true);
 	});
 });
+// #endregion

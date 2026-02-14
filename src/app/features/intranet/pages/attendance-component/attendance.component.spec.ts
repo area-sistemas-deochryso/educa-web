@@ -1,3 +1,4 @@
+// #region Imports
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { signal } from '@angular/core';
@@ -5,6 +6,8 @@ import { testProviders } from '@test';
 import { AttendanceComponent } from './attendance.component';
 import { UserProfileService } from '@core/services';
 
+// #endregion
+// #region Implementation
 describe('AttendanceComponent', () => {
 	let component: AttendanceComponent;
 	let fixture: ComponentFixture<AttendanceComponent>;
@@ -92,3 +95,4 @@ describe('AttendanceComponent', () => {
 		}).not.toThrow();
 	});
 });
+// #endregion

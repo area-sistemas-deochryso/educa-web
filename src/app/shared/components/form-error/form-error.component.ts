@@ -1,3 +1,4 @@
+// #region Imports
 import { Component, DestroyRef, Input, OnInit, inject } from '@angular/core';
 import { ValidationMessageConfig, getValidationMessage } from '@shared/validators';
 
@@ -5,6 +6,8 @@ import { AbstractControl } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
+// #endregion
+// #region Implementation
 @Component({
 	selector: 'app-form-error',
 	standalone: true,
@@ -57,3 +60,4 @@ export class FormErrorComponent implements OnInit {
 		);
 	}
 }
+// #endregion

@@ -1,3 +1,4 @@
+// #region Implementation
 export const APP_USER_ROLES = {
 	Director: 'Director',
 	Profesor: 'Profesor',
@@ -29,3 +30,4 @@ export const APP_USER_ROLE_ADMIN_LIST: AppUserRoleAdmin[] = [
 	APP_USER_ROLES.Estudiante,
 	APP_USER_ROLES.AsistenteAdministrativo,
 ];
+// #endregion

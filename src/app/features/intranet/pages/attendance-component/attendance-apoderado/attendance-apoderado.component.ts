@@ -1,3 +1,4 @@
+// #region Imports
 import { AsistenciaService, HijoApoderado, StorageService } from '@core/services';
 import { Component, DestroyRef, OnInit, computed, inject, signal } from '@angular/core';
 
@@ -11,8 +12,10 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
 /**
  * Componente Container para vista de asistencias de Apoderados.
- * Maneja la selección de hijos y muestra sus ingresos/salidas.
+ * Maneja la selecciÃƒÆ’Ã‚Â³n de hijos y muestra sus ingresos/salidas.
  */
+// #endregion
+// #region Implementation
 @Component({
 	selector: 'app-attendance-apoderado',
 	standalone: true,
@@ -205,3 +208,4 @@ export class AttendanceApoderadoComponent implements OnInit {
 		this.loadHijoAsistencias();
 	}
 }
+// #endregion

@@ -1,3 +1,4 @@
+// #region Imports
 import { Component, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { SeasonalNotification } from '@core/services';
@@ -7,6 +8,8 @@ import { DismissedSectionComponent } from '../dismissed-section/dismissed-sectio
 import { NotificationsFooterComponent } from '../notifications-footer/notifications-footer.component';
 import { NotificationsPanelContext } from '../../notifications-panel.context';
 
+// #endregion
+// #region Implementation
 @Component({
 	selector: 'app-notifications-panel',
 	imports: [
@@ -47,3 +50,4 @@ export class NotificationsPanelComponent {
 		this.context.closePanel();
 	}
 }
+// #endregion

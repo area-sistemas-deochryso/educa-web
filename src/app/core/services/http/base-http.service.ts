@@ -1,8 +1,11 @@
+// #region Imports
 import { HttpClient, HttpParams, HttpHeaders } from '@angular/common/http';
 import { inject, Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { environment } from '@env/environment';
 
+// #endregion
+// #region Implementation
 export interface RequestOptions {
 	headers?: HttpHeaders | Record<string, string>;
 	params?: HttpParams | Record<string, string | string[]>;
@@ -50,3 +53,4 @@ export class BaseHttpService {
 		return httpParams;
 	}
 }
+// #endregion

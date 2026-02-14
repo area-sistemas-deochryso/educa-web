@@ -12,14 +12,14 @@ import { Injectable, computed, inject, signal } from '@angular/core';
 import { DebugService } from '@core/helpers';
 
 /**
- * Store para gestión de usuarios
- * Maneja el estado de la lista de usuarios, estadísticas, filtros y formularios
+ * Store para gestiÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â³n de usuarios
+ * Maneja el estado de la lista de usuarios, estadÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â­sticas, filtros y formularios
  */
 @Injectable({ providedIn: 'root' })
 export class UsuariosStore {
 	private debug = inject(DebugService);
 	private log = this.debug.dbg('STORE:Usuarios');
-	// ============ Estado privado ============
+	// #region Estado privado
 	private readonly _usuarios = signal<UsuarioLista[]>([]);
 	private readonly _estadisticas = signal<UsuariosEstadisticas | null>(null);
 	private readonly _salones = signal<SalonProfesor[]>([]);
@@ -48,7 +48,8 @@ export class UsuariosStore {
 	private readonly _filterRol = signal<RolUsuarioAdmin | null>(null);
 	private readonly _filterEstado = signal<boolean | null>(null);
 
-	// ============ Lecturas públicas (readonly) ============
+	// #endregion
+	// #region Lecturas pÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Âºblicas (readonly)
 	readonly usuarios = this._usuarios.asReadonly();
 	readonly estadisticas = this._estadisticas.asReadonly();
 	readonly salones = this._salones.asReadonly();
@@ -70,7 +71,8 @@ export class UsuariosStore {
 	readonly filterRol = this._filterRol.asReadonly();
 	readonly filterEstado = this._filterEstado.asReadonly();
 
-	// ============ Computed - Validaciones ============
+	// #endregion
+	// #region Computed - Validaciones
 	readonly dniError = computed(() => {
 		const dni = this._formData().dni || '';
 		if (!dni) return null;
@@ -145,13 +147,14 @@ export class UsuariosStore {
 		if (this.correoApoderadoError()) return false;
 		if (this.nombreApoderadoError()) return false;
 		if (this.telefonoApoderadoError()) return false;
-		// Si es profesor y tiene salón seleccionado, esTutor debe estar definido
+		// Si es profesor y tiene salÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â³n seleccionado, esTutor debe estar definido
 		if (this.isProfesor() && data.salonId !== undefined && data.esTutor === undefined)
 			return false;
 		return true;
 	});
 
-	// ============ Computed - Filtered data ============
+	// #endregion
+	// #region Computed - Filtered data
 	readonly filteredUsuarios = computed(() => {
 		let data = this._usuarios();
 		const search = this._searchTerm().toLowerCase();
@@ -178,7 +181,8 @@ export class UsuariosStore {
 		return data;
 	});
 
-	// ============ ViewModel consolidado ============
+	// #endregion
+	// #region ViewModel consolidado
 	readonly vm = computed(() => ({
 		usuarios: this._usuarios(),
 		filteredUsuarios: this.filteredUsuarios(),
@@ -210,7 +214,8 @@ export class UsuariosStore {
 		tableReady: this._tableReady(),
 	}));
 
-	// ============ Comandos de mutación ============
+	// #endregion
+	// #region Comandos de mutaciÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â³n
 
 	// Data mutations
 	setUsuarios(usuarios: UsuarioLista[]): void {
@@ -218,7 +223,7 @@ export class UsuariosStore {
 	}
 
 	/**
-	 * Mutación quirúrgica: Agregar un usuario al inicio del array
+	 * MutaciÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â³n quirÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Âºrgica: Agregar un usuario al inicio del array
 	 */
 	addUsuario(usuario: UsuarioLista): void {
 		this._usuarios.update((usuarios) => [usuario, ...usuarios]);
@@ -226,7 +231,7 @@ export class UsuariosStore {
 	}
 
 	/**
-	 * Mutación quirúrgica: Actualizar un usuario existente
+	 * MutaciÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â³n quirÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Âºrgica: Actualizar un usuario existente
 	 */
 	updateUsuario(id: number, updates: Partial<UsuarioLista>): void {
 		this._usuarios.update((usuarios) =>
@@ -236,7 +241,7 @@ export class UsuariosStore {
 	}
 
 	/**
-	 * Mutación quirúrgica: Toggle del estado de un usuario
+	 * MutaciÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â³n quirÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Âºrgica: Toggle del estado de un usuario
 	 */
 	toggleEstadoUsuario(id: number): void {
 		this._usuarios.update((usuarios) =>
@@ -246,7 +251,7 @@ export class UsuariosStore {
 	}
 
 	/**
-	 * Mutación quirúrgica: Eliminar un usuario del array
+	 * MutaciÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â³n quirÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Âºrgica: Eliminar un usuario del array
 	 */
 	removeUsuario(id: number): void {
 		this._usuarios.update((usuarios) => usuarios.filter((u) => u.id !== id));
@@ -254,7 +259,7 @@ export class UsuariosStore {
 	}
 
 	/**
-	 * Actualización incremental de estadísticas (sin refetch)
+	 * ActualizaciÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â³n incremental de estadÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â­sticas (sin refetch)
 	 */
 	incrementarEstadistica(campo: keyof UsuariosEstadisticas, delta: number): void {
 		this._estadisticas.update((stats) => {
@@ -321,7 +326,7 @@ export class UsuariosStore {
 		this._formData.update((current) => {
 			const newData = { ...current, ...updates };
 
-			// Auto-generar contraseña solo en creación (en edición se usa la del backend)
+			// Auto-generar contraseÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â±a solo en creaciÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â³n (en ediciÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â³n se usa la del backend)
 			if (
 				!this._isEditing() &&
 				(updates.apellidos !== undefined || updates.dni !== undefined)
@@ -329,26 +334,26 @@ export class UsuariosStore {
 				const apellido = (newData.apellidos ?? '').trim();
 				const dniRaw = (newData.dni ?? '').trim();
 
-				// 2 primeras letras del primer apellido en mayúsculas
+				// 2 primeras letras del primer apellido en mayÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Âºsculas
 				const pref = apellido.slice(0, 2).toUpperCase();
 
-				// Solo dígitos del DNI y últimos 4
+				// Solo dÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â­gitos del DNI y ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Âºltimos 4
 				const digits = dniRaw.replace(/\D/g, '');
 				const suf = digits.slice(-4);
 
-				// Si hay suficientes caracteres, generar contraseña
+				// Si hay suficientes caracteres, generar contraseÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â±a
 				if (pref.length >= 2 && suf.length >= 4) {
 					newData.contrasena = `${pref}${suf}`;
-					this.log.info('Contraseña autogenerada', {
-						modo: this._isEditing() ? 'edición' : 'creación',
+					this.log.info('ContraseÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â±a autogenerada', {
+						modo: this._isEditing() ? 'ediciÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â³n' : 'creaciÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â³n',
 						apellido,
 						dni: dniRaw,
 						contrasena: newData.contrasena,
 					});
 				} else {
-					// Si no hay suficientes datos, limpiar contraseña
+					// Si no hay suficientes datos, limpiar contraseÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â±a
 					newData.contrasena = undefined;
-					this.log.trace('Contraseña no generada (datos insuficientes)', {
+					this.log.trace('ContraseÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â±a no generada (datos insuficientes)', {
 						pref,
 						suf,
 						prefLen: pref.length,
@@ -357,18 +362,18 @@ export class UsuariosStore {
 				}
 			}
 
-			// Limpiar campos de salón si el rol cambia y no es Profesor ni Estudiante
+			// Limpiar campos de salÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â³n si el rol cambia y no es Profesor ni Estudiante
 			if (updates.rol !== undefined && newData.rol !== 'Profesor' && newData.rol !== 'Estudiante') {
 				newData.salonId = undefined;
 				newData.esTutor = undefined;
 			}
 
-			// Si se deselecciona el salón, limpiar esTutor
+			// Si se deselecciona el salÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â³n, limpiar esTutor
 			if (updates.salonId !== undefined && !newData.salonId) {
 				newData.esTutor = undefined;
 			}
 
-			// Si se selecciona un salón y esTutor no está definido, inicializar en false (solo Profesor)
+			// Si se selecciona un salÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â³n y esTutor no estÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¡ definido, inicializar en false (solo Profesor)
 			if (updates.salonId !== undefined && newData.salonId && newData.esTutor === undefined && newData.rol === 'Profesor') {
 				newData.esTutor = false;
 			}
@@ -397,7 +402,8 @@ export class UsuariosStore {
 		this._filterEstado.set(null);
 	}
 
-	// ============ Comandos de alto nivel ============
+	// #endregion
+	// #region Comandos de alto nivel
 
 	openNewDialog(): void {
 		this._selectedUsuario.set(null);
@@ -460,4 +466,5 @@ export class UsuariosStore {
 	closeConfirmDialogVisible(): void {
 		this._confirmDialogVisible.set(false);
 	}
+	// #endregion
 }

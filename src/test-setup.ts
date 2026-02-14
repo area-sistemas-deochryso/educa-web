@@ -1,3 +1,4 @@
+// #region Imports
 import { BrowserTestingModule, platformBrowserTesting } from '@angular/platform-browser/testing';
 
 import { TestBed } from '@angular/core/testing';
@@ -7,6 +8,8 @@ import { provideRouter } from '@angular/router';
 import { provideZonelessChangeDetection } from '@angular/core';
 
 // Mock IntersectionObserver for jsdom environment
+// #endregion
+// #region Implementation
 class MockIntersectionObserver implements IntersectionObserver {
 	readonly root: Element | Document | null = null;
 	readonly rootMargin: string = '';
@@ -70,3 +73,4 @@ export const testProviders = [
 	provideHttpClient(),
 	provideHttpClientTesting(),
 ];
+// #endregion

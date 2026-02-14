@@ -1,9 +1,12 @@
+// #region Imports
 import { Component, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { SeasonalNotification } from '@core/services';
 import { DismissedCardComponent } from '../dismissed-card/dismissed-card.component';
 import { NotificationsPanelContext } from '../../notifications-panel.context';
 
+// #endregion
+// #region Implementation
 @Component({
 	selector: 'app-dismissed-section',
 	imports: [CommonModule, DismissedCardComponent],
@@ -38,3 +41,4 @@ export class DismissedSectionComponent {
 		return notification.id;
 	}
 }
+// #endregion

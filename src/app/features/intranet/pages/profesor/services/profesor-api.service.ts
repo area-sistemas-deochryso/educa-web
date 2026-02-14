@@ -56,7 +56,7 @@ export class ProfesorApiService {
 			.pipe(catchError(() => of(null)));
 	}
 
-	// ============ Curso Contenido ============
+	// #region Curso Contenido
 
 	getContenido(horarioId: number): Observable<ApiResponse<CursoContenidoDetalleDto | null>> {
 		return this.http.get<ApiResponse<CursoContenidoDetalleDto | null>>(
@@ -108,7 +108,8 @@ export class ProfesorApiService {
 		return this.http.delete<{ mensaje: string }>(`${this.contenidoUrl}/tarea/${tareaId}`);
 	}
 
-	// ============ Blob Storage (file upload) ============
+	// #endregion
+	// #region Blob Storage (file upload)
 
 	uploadFile(file: File): Observable<{ url: string; fileName: string }> {
 		const formData = new FormData();
@@ -117,4 +118,5 @@ export class ProfesorApiService {
 		formData.append('appendTimestamp', 'true');
 		return this.http.post<{ url: string; fileName: string }>(`${this.blobUrl}/upload`, formData);
 	}
+	// #endregion
 }

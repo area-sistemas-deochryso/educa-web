@@ -1,3 +1,4 @@
+// #region Styles
 // Colores de estado
 // $color-temprano: #253470;
 $color-temprano: #506ad0;
@@ -9,7 +10,7 @@ $color-no: #f44336;
 	border-radius: 10px;
 	padding: 1.5rem;
 	margin-bottom: 1.5rem;
-	// Reservar espacio mínimo para evitar CLS
+	// Reservar espacio mÃ­nimo para evitar CLS
 	min-height: 350px;
 	contain: layout style;
 }
@@ -62,7 +63,7 @@ $color-no: #f44336;
 	color: var(--intranet-soft-text-color);
 }
 
-// PrimeNG Select - selector de hijo integrado en título
+// PrimeNG Select - selector de hijo integrado en tÃ­tulo
 :host ::ng-deep .hijo-select {
 	&.p-select {
 		background: transparent;
@@ -127,7 +128,7 @@ $color-no: #f44336;
 	}
 }
 
-// PrimeNG Select Panel/Overlay - fondo igual que la página
+// PrimeNG Select Panel/Overlay - fondo igual que la pÃ¡gina
 :host ::ng-deep .p-select-overlay {
 	background: var(--intranet-background-color) !important;
 	border: 1px solid var(--intranet-soft-text-color);
@@ -536,3 +537,4 @@ $color-no: #f44336;
 		}
 	}
 }
+// #endregion

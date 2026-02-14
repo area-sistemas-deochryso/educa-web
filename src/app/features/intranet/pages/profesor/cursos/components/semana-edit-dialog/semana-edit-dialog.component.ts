@@ -1,3 +1,4 @@
+// #region Imports
 import { Component, ChangeDetectionStrategy, input, output, OnChanges, SimpleChanges } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
@@ -7,6 +8,8 @@ import { InputTextModule } from 'primeng/inputtext';
 import { TextareaModule } from 'primeng/textarea';
 import { CursoContenidoSemanaDto, ActualizarSemanaRequest } from '../../../models';
 
+// #endregion
+// #region Implementation
 @Component({
 	selector: 'app-semana-edit-dialog',
 	standalone: true,
@@ -22,25 +25,25 @@ import { CursoContenidoSemanaDto, ActualizarSemanaRequest } from '../../../model
 		>
 			<div class="flex flex-column gap-3 pt-2">
 				<div class="flex flex-column gap-2">
-					<label for="titulo" class="font-semibold">Título</label>
+					<label for="titulo" class="font-semibold">TÃƒÂ­tulo</label>
 					<input
 						pInputText
 						id="titulo"
 						[(ngModel)]="titulo"
-						placeholder="Ej: Introducción al tema"
+						placeholder="Ej: IntroducciÃƒÂ³n al tema"
 						[maxlength]="200"
 					/>
 				</div>
 
 				<div class="flex flex-column gap-2">
-					<label for="descripcion" class="font-semibold">Descripción</label>
+					<label for="descripcion" class="font-semibold">DescripciÃƒÂ³n</label>
 					<textarea
 						pTextarea
 						id="descripcion"
 						[(ngModel)]="descripcion"
 						[rows]="3"
 						[maxlength]="2000"
-						placeholder="Descripción de los temas de la semana..."
+						placeholder="DescripciÃƒÂ³n de los temas de la semana..."
 						[autoResize]="true"
 					></textarea>
 				</div>
@@ -115,3 +118,4 @@ export class SemanaEditDialogComponent implements OnChanges {
 		});
 	}
 }
+// #endregion

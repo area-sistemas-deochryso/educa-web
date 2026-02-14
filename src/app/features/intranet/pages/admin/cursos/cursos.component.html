@@ -1,3 +1,4 @@
+<!-- #region Template -->
 <div class="cursos-container">
 	<!-- * Header -->
 	<header class="page-header">
@@ -271,7 +272,7 @@
 					pInputText
 					[ngModel]="formData().nombre"
 					(ngModelChange)="updateFormField('nombre', $event)"
-					placeholder="Ejemplo: Matemática, Comunicación, etc."
+					placeholder="Ejemplo: MatemÃƒÂ¡tica, ComunicaciÃƒÂ³n, etc."
 				/>
 			</div>
 
@@ -452,7 +453,7 @@
 				<small class="field-hint">Haz clic en un grado para agregarlo o usa la X para removerlo</small>
 			</div>
 
-			<!-- Estado (solo en edición) -->
+			<!-- Estado (solo en ediciÃƒÂ³n) -->
 			@if (isEditing()) {
 				<div class="field">
 					<label for="estado">Estado</label>
@@ -571,3 +572,4 @@
 		</div>
 	</ng-template>
 </p-dialog>
+<!-- #endregion -->

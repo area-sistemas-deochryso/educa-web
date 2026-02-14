@@ -1,9 +1,12 @@
+// #region Imports
 import { BaseRepository, QueryParams } from '../base/base.repository';
 import { Observable, catchError, map, of } from 'rxjs';
 
 import { Injectable } from '@angular/core';
 import { logger } from '@core/helpers';
 
+// #endregion
+// #region Implementation
 export interface Notification {
 	id: number;
 	titulo: string;
@@ -82,3 +85,4 @@ export class NotificationRepository extends BaseRepository<Notification, CreateN
 		return this.getAll({ prioridad } as NotificationQueryParams);
 	}
 }
+// #endregion

@@ -1,8 +1,11 @@
+// #region Imports
 import { Component, EventEmitter, Input, Output } from '@angular/core';
 
 import { CommonModule } from '@angular/common';
 import { WeekContentRowComponent } from '../week-content-row/week-content-row.component';
 
+// #endregion
+// #region Implementation
 export interface WeekData {
 	id: number;
 	name: string;
@@ -28,3 +31,4 @@ export class WeekAccordionItemComponent {
 	@Output() openTasks = new EventEmitter<void>();
 	@Output() openSubmissions = new EventEmitter<void>();
 }
+// #endregion

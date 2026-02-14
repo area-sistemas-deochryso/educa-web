@@ -1,4 +1,5 @@
 // * Tests for auth interceptor header injection.
+// #region Imports
 import { TestBed } from '@angular/core/testing';
 import { HttpClient, provideHttpClient, withInterceptors } from '@angular/common/http';
 import { HttpTestingController, provideHttpClientTesting } from '@angular/common/http/testing';
@@ -7,6 +8,8 @@ import { describe, it, expect, beforeEach, vi } from 'vitest';
 import { authInterceptor } from './auth.interceptor';
 import { StorageService } from '@app/core/services';
 
+// #endregion
+// #region Implementation
 describe('authInterceptor', () => {
 	let httpClient: HttpClient;
 	let httpMock: HttpTestingController;
@@ -88,3 +91,4 @@ describe('authInterceptor', () => {
 		req.flush({});
 	});
 });
+// #endregion

@@ -1,3 +1,4 @@
+// #region Imports
 import { ChangeDetectionStrategy, Component, input, output } from '@angular/core';
 import { CommonModule } from '@angular/common';
 
@@ -8,6 +9,8 @@ import { TooltipModule } from 'primeng/tooltip';
 
 import type { HorarioResponseDto } from '../../models/horario.interface';
 
+// #endregion
+// #region Implementation
 @Component({
 	selector: 'app-horarios-list-view',
 	standalone: true,
@@ -49,3 +52,4 @@ export class HorariosListViewComponent {
 		return horario.id;
 	}
 }
+// #endregion

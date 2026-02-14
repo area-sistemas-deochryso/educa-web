@@ -1,3 +1,4 @@
+// #region Imports
 import { Injectable, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable, catchError, of } from 'rxjs';
@@ -5,6 +6,8 @@ import { Observable, catchError, of } from 'rxjs';
 import { environment } from '@config/environment';
 import { Curso, CrearCursoRequest, ActualizarCursoRequest, ApiResponse } from './cursos.models';
 
+// #endregion
+// #region Implementation
 @Injectable({
 	providedIn: 'root',
 })
@@ -33,3 +36,4 @@ export class CursosService {
 		return this.http.delete<ApiResponse>(`${this.apiUrl}/${id}/eliminar`);
 	}
 }
+// #endregion

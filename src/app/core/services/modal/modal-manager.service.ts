@@ -1,20 +1,23 @@
+// #region Imports
 import { Injectable, signal, computed, Type } from '@angular/core';
 
 /**
- * Configuración de un modal
+ * ConfiguraciÃƒÂ³n de un modal
  */
+// #endregion
+// #region Implementation
 export interface ModalConfig<T = unknown> {
-	/** Identificador único del modal */
+	/** Identificador ÃƒÂºnico del modal */
 	id: string;
-	/** Título del modal */
+	/** TÃƒÂ­tulo del modal */
 	title?: string;
 	/** Datos a pasar al modal */
 	data?: T;
 	/** Si el modal se puede cerrar haciendo clic fuera */
 	dismissible?: boolean;
-	/** Si el modal tiene botón de cerrar */
+	/** Si el modal tiene botÃƒÂ³n de cerrar */
 	closable?: boolean;
-	/** Tamaño del modal */
+	/** TamaÃƒÂ±o del modal */
 	size?: 'sm' | 'md' | 'lg' | 'xl' | 'fullscreen';
 	/** Clase CSS adicional */
 	styleClass?: string;
@@ -26,9 +29,9 @@ export interface ModalConfig<T = unknown> {
  * Estado de un modal
  */
 export interface ModalState<T = unknown> extends ModalConfig<T> {
-	/** Si el modal está visible */
+	/** Si el modal estÃƒÂ¡ visible */
 	visible: boolean;
-	/** Componente a renderizar (opcional, para modales dinámicos) */
+	/** Componente a renderizar (opcional, para modales dinÃƒÂ¡micos) */
 	component?: Type<unknown>;
 }
 
@@ -45,8 +48,8 @@ export interface ModalResult<T = unknown> {
 /**
  * Modal Manager Service
  *
- * Gestiona el estado de múltiples modales en la aplicación de forma centralizada.
- * Soporta modales anidados, persistencia de estado y navegación por teclado.
+ * Gestiona el estado de mÃƒÂºltiples modales en la aplicaciÃƒÂ³n de forma centralizada.
+ * Soporta modales anidados, persistencia de estado y navegaciÃƒÂ³n por teclado.
  *
  * @example
  * ```typescript
@@ -66,7 +69,7 @@ export interface ModalResult<T = unknown> {
  * // Cerrar un modal
  * this.modalManager.close('course-details')
  *
- * // Verificar si está abierto
+ * // Verificar si estÃƒÂ¡ abierto
  * if (this.modalManager.isOpen('course-details')()) { ... }
  *
  * // Obtener datos del modal
@@ -81,7 +84,7 @@ export class ModalManagerService {
 	/** Stack de modales abiertos (para manejar modales anidados) */
 	private readonly _modals = signal<Map<string, ModalState>>(new Map());
 
-	/** Historial de modales para navegación hacia atrás */
+	/** Historial de modales para navegaciÃƒÂ³n hacia atrÃƒÂ¡s */
 	private readonly _history = signal<string[]>([]);
 
 	/** Lista de IDs de modales abiertos */
@@ -91,10 +94,10 @@ export class ModalManagerService {
 			.map(([id]) => id);
 	});
 
-	/** Si hay algún modal abierto */
+	/** Si hay algÃƒÂºn modal abierto */
 	readonly hasOpenModals = computed(() => this.openModals().length > 0);
 
-	/** El modal actualmente activo (el más reciente) */
+	/** El modal actualmente activo (el mÃƒÂ¡s reciente) */
 	readonly activeModal = computed(() => {
 		const open = this.openModals();
 		return open.length > 0 ? open[open.length - 1] : null;
@@ -151,7 +154,7 @@ export class ModalManagerService {
 	}
 
 	/**
-	 * Cierra el modal activo (el más reciente)
+	 * Cierra el modal activo (el mÃƒÂ¡s reciente)
 	 */
 	closeActive<T = unknown>(result?: ModalResult<T>): void {
 		const active = this.activeModal();
@@ -187,7 +190,7 @@ export class ModalManagerService {
 	}
 
 	/**
-	 * Verifica si un modal está abierto
+	 * Verifica si un modal estÃƒÂ¡ abierto
 	 */
 	isOpen(id: string) {
 		return computed(() => {
@@ -285,3 +288,4 @@ export class ModalManagerService {
 		this.closeActive({ confirmed: false });
 	}
 }
+// #endregion

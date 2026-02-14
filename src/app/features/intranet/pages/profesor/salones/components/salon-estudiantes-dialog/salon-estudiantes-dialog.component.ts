@@ -24,7 +24,7 @@ import { ProfesorSalonConEstudiantes } from '../../../services/profesor.store';
 			(visibleChange)="onVisibleChange($event)"
 			[modal]="true"
 			[style]="{ width: '600px', maxWidth: '95vw' }"
-			[header]="salon()?.salonDescripcion ?? 'Salón'"
+			[header]="salon()?.salonDescripcion ?? 'SalÃƒÆ’Ã‚Â³n'"
 		>
 			@if (salon(); as s) {
 				<p-tabs value="0">
@@ -46,7 +46,7 @@ import { ProfesorSalonConEstudiantes } from '../../../services/profesor.store';
 					</p-tablist>
 
 					<p-tabpanels>
-						<!-- ============ Tab Estudiantes ============ -->
+						<!-- #region Tab Estudiantes -->
 						<p-tabpanel value="0">
 							@if (dialogLoading()) {
 								<div class="flex flex-column gap-2 p-2">
@@ -59,7 +59,7 @@ import { ProfesorSalonConEstudiantes } from '../../../services/profesor.store';
 									class="flex flex-column align-items-center p-4 text-color-secondary"
 								>
 									<i class="pi pi-users text-3xl mb-2"></i>
-									<p>No hay estudiantes en este salón</p>
+									<p>No hay estudiantes en este salÃƒÆ’Ã‚Â³n</p>
 								</div>
 							} @else {
 								<p-table
@@ -86,7 +86,8 @@ import { ProfesorSalonConEstudiantes } from '../../../services/profesor.store';
 							}
 						</p-tabpanel>
 
-						<!-- ============ Tab Notas (placeholder) ============ -->
+						<!-- #endregion -->
+						<!-- #region Tab Notas (placeholder) -->
 						<p-tabpanel value="1">
 							<div
 								class="flex flex-column align-items-center p-5 text-color-secondary"
@@ -94,7 +95,7 @@ import { ProfesorSalonConEstudiantes } from '../../../services/profesor.store';
 								<i class="pi pi-clock text-4xl mb-3"></i>
 								<p class="text-lg font-semibold">Proximamente</p>
 								<p class="text-sm">
-									El sistema de notas estará disponible pronto
+									El sistema de notas estarÃƒÆ’Ã‚Â¡ disponible pronto
 								</p>
 							</div>
 						</p-tabpanel>
@@ -119,3 +120,4 @@ export class SalonEstudiantesDialogComponent {
 		}
 	}
 }
+						<!-- #endregion -->

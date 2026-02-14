@@ -103,9 +103,9 @@ export class VoiceRecognitionService {
 	private registeredModals = new Map<string, RegisteredModal>();
 	private commandListeners: ((command: string, params?: string) => void)[] = [];
 
-	/** Audio para sonido de inicio de grabación (estilo WhatsApp) */
+	/** Audio para sonido de inicio de grabaciÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â³n (estilo WhatsApp) */
 	private startSound: HTMLAudioElement | null = null;
-	/** Audio para sonido de fin de grabación */
+	/** Audio para sonido de fin de grabaciÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â³n */
 	private stopSound: HTMLAudioElement | null = null;
 
 	constructor() {
@@ -117,11 +117,11 @@ export class VoiceRecognitionService {
 	}
 
 	/**
-	 * Inicializa los sonidos del micrófono (estilo WhatsApp)
+	 * Inicializa los sonidos del micrÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â³fono (estilo WhatsApp)
 	 * Usa sonidos de Mixkit - https://mixkit.co/free-sound-effects/
 	 */
 	private initSounds(): void {
-		// Sonido de inicio: tono de confirmación suave
+		// Sonido de inicio: tono de confirmaciÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â³n suave
 		this.startSound = new Audio();
 		this.startSound.src = 'sounds/mic-start.mp3';
 		this.startSound.volume = 0.4;
@@ -133,7 +133,7 @@ export class VoiceRecognitionService {
 	}
 
 	/**
-	 * Reproduce el sonido de inicio de grabación
+	 * Reproduce el sonido de inicio de grabaciÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â³n
 	 */
 	private playStartSound(): void {
 		if (this.startSound) {
@@ -145,7 +145,7 @@ export class VoiceRecognitionService {
 	}
 
 	/**
-	 * Reproduce el sonido de fin de grabación
+	 * Reproduce el sonido de fin de grabaciÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â³n
 	 */
 	private playStopSound(): void {
 		if (this.stopSound) {
@@ -228,14 +228,14 @@ export class VoiceRecognitionService {
 	}
 
 	/**
-	 * Carga los comandos desde la configuración centralizada
+	 * Carga los comandos desde la configuraciÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â³n centralizada
 	 */
 	private loadCommandsFromConfig(): void {
 		this.commands = VOICE_COMMANDS.map((config) => this.configToCommand(config));
 	}
 
 	/**
-	 * Convierte una configuración de comando a un VoiceCommand ejecutable
+	 * Convierte una configuraciÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â³n de comando a un VoiceCommand ejecutable
 	 */
 	private configToCommand(config: VoiceCommandConfig): VoiceCommand {
 		return {
@@ -246,7 +246,7 @@ export class VoiceRecognitionService {
 	}
 
 	/**
-	 * Ejecuta un comando según su tipo de acción
+	 * Ejecuta un comando segÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Âºn su tipo de acciÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â³n
 	 */
 	private executeCommand(config: VoiceCommandConfig, params?: string): void {
 		const context: VoiceCommandContext = {
@@ -335,10 +335,10 @@ export class VoiceRecognitionService {
 			return true;
 		}
 
-		// Luego comandos de año
+		// Luego comandos de aÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â±o
 		const yearMatch = normalizedText.match(/(20\d{2})/);
 		if (yearMatch) {
-			this.lastCommand.set(`Cambiar a año ${yearMatch[1]}`);
+			this.lastCommand.set(`Cambiar a aÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â±o ${yearMatch[1]}`);
 			this.emitCommand('change-year', yearMatch[1]);
 			setTimeout(() => this.lastCommand.set(null), 2000);
 			return true;
@@ -435,9 +435,7 @@ export class VoiceRecognitionService {
 		return undefined;
 	}
 
-	// =========================================================================
-	// API PÚBLICA
-	// =========================================================================
+	// #region API PÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Â¦Ãƒâ€šÃ‚Â¡BLICA
 
 	/**
 	 * Suscribirse a eventos de comandos
@@ -489,14 +487,14 @@ export class VoiceRecognitionService {
 	}
 
 	/**
-	 * Bloquea el micrófono para grabación continua
+	 * Bloquea el micrÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â³fono para grabaciÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â³n continua
 	 */
 	lock(): void {
 		this.isLocked.set(true);
 	}
 
 	/**
-	 * Desbloquea el micrófono y detiene la grabación
+	 * Desbloquea el micrÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â³fono y detiene la grabaciÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â³n
 	 */
 	unlock(): void {
 		this.isLocked.set(false);
@@ -559,7 +557,7 @@ export class VoiceRecognitionService {
 	}
 
 	/**
-	 * Añade un comando dinámicamente en tiempo de ejecución
+	 * AÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â±ade un comando dinÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¡micamente en tiempo de ejecuciÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â³n
 	 */
 	addCommand(command: VoiceCommand): () => void {
 		this.commands.push(command);
@@ -570,11 +568,12 @@ export class VoiceRecognitionService {
 	}
 
 	/**
-	 * Obtiene todos los comandos registrados (para debug/documentación)
+	 * Obtiene todos los comandos registrados (para debug/documentaciÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â³n)
 	 */
 	getRegisteredCommands(): { pattern: string; description: string }[] {
 		return this.commands.flatMap((cmd) =>
 			cmd.patterns.map((p) => ({ pattern: p, description: cmd.description })),
 		);
 	}
+	// #endregion
 }

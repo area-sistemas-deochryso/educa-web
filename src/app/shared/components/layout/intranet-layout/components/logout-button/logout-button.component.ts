@@ -1,6 +1,9 @@
+// #region Imports
 import { Component, Output, EventEmitter } from '@angular/core';
 import { Tooltip } from 'primeng/tooltip';
 
+// #endregion
+// #region Implementation
 @Component({
 	selector: 'app-logout-button',
 	standalone: true,
@@ -17,3 +20,4 @@ export class LogoutButtonComponent {
 		this.logoutClick.emit();
 	}
 }
+// #endregion

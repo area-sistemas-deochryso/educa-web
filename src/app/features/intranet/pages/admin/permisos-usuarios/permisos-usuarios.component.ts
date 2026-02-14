@@ -108,7 +108,7 @@ export class PermisosUsuariosComponent implements OnInit {
 		this.facade.loadData();
 	}
 
-	// === Actions ===
+	// #region Actions
 	refresh(): void {
 		this.facade.refresh();
 	}
@@ -117,7 +117,8 @@ export class PermisosUsuariosComponent implements OnInit {
 		this.facade.clearFilters();
 	}
 
-	// === Detail Drawer ===
+	// #endregion
+	// #region Detail Drawer
 	openDetail(permiso: PermisoUsuario): void {
 		this.facade.openDetail(permiso);
 	}
@@ -136,7 +137,8 @@ export class PermisosUsuariosComponent implements OnInit {
 		this.facade.closeDetail();
 	}
 
-	// === Edit Dialog ===
+	// #endregion
+	// #region Edit Dialog
 	openNew(): void {
 		this.selectedUsuario = null;
 		this.usuariosSugeridos = [];
@@ -177,7 +179,8 @@ export class PermisosUsuariosComponent implements OnInit {
 		});
 	}
 
-	// === Rol & Vistas ===
+	// #endregion
+	// #region Rol & Vistas
 	loadVistasFromRol(): void {
 		// * Reset selected user when role changes.
 		// Limpiar usuario seleccionado cuando cambia el rol
@@ -198,7 +201,8 @@ export class PermisosUsuariosComponent implements OnInit {
 		this.facade.loadVistasFromRol();
 	}
 
-	// === Autocomplete Usuarios ===
+	// #endregion
+	// #region Autocomplete Usuarios
 	buscarUsuarios(event: AutoCompleteCompleteEvent): void {
 		// * Autocomplete: role-specific search.
 		const rol = this.selectedRol();
@@ -228,7 +232,8 @@ export class PermisosUsuariosComponent implements OnInit {
 		this.facade.setSelectedUsuarioId(null);
 	}
 
-	// === Vista Selection ===
+	// #endregion
+	// #region Vista Selection
 	isVistaSelected(ruta: string): boolean {
 		return this.facade.isVistaSelected(ruta);
 	}
@@ -241,7 +246,8 @@ export class PermisosUsuariosComponent implements OnInit {
 		this.facade.toggleAllVistasModulo();
 	}
 
-	// === UI Helpers (bindings bidireccionales) ===
+	// #endregion
+	// #region UI Helpers (bindings bidireccionales)
 	onSearchTermChange(term: string): void {
 		this.facade.setSearchTerm(term);
 	}
@@ -261,4 +267,5 @@ export class PermisosUsuariosComponent implements OnInit {
 	onVistasBusquedaChange(term: string): void {
 		this.facade.setVistasBusqueda(term);
 	}
+	// #endregion
 }

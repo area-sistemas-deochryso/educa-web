@@ -1,4 +1,4 @@
-// ============ Selector row con PDF ============
+// #region Selector row con PDF
 .selector-row {
 	display: flex;
 	align-items: center;
@@ -13,7 +13,8 @@
 	}
 }
 
-// ============ PDF section ============
+// #endregion
+// #region PDF section
 .pdf-section {
 	display: flex;
 	align-items: center;
@@ -30,7 +31,8 @@
 	}
 }
 
-// ============ Personalización del menú PDF ============
+// #endregion
+// #region PersonalizaciÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â³n del menÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Âº PDF
 ::ng-deep .p-menu {
 	background: var(--intranet-background-color) !important;
 	border: 1px solid #ddd !important;
@@ -64,3 +66,4 @@
 		}
 	}
 }
+// #endregion

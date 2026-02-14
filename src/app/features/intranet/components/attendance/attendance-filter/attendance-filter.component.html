@@ -1,3 +1,4 @@
+<!-- #region Template -->
 <div class="filter-container">
 	<div class="filter-group">
 		<!-- * Grade filter -->
@@ -14,15 +15,16 @@
 	</div>
 	<div class="filter-group">
 		<!-- * Section filter -->
-		<label>Sección</label>
+		<label>SecciÃ³n</label>
 		<p-select
 			[options]="seccionOptions"
 			[ngModel]="selectedSeccion"
 			(ngModelChange)="onSeccionChange($event)"
 			optionLabel="label"
 			optionValue="value"
-			placeholder="Seleccionar sección"
+			placeholder="Seleccionar secciÃ³n"
 			class="filter-select"
 		/>
 	</div>
 </div>
+<!-- #endregion -->

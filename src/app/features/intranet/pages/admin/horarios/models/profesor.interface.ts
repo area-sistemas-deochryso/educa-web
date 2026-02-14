@@ -1,3 +1,4 @@
+// #region Implementation
 /**
  * DTO para lista de profesores (similar a SalonListDto)
  */
@@ -19,10 +20,11 @@ export interface ProfesorOption {
 }
 
 /**
- * Interfaz para información básica del profesor
+ * Interfaz para informaciÃ³n bÃ¡sica del profesor
  */
 export interface ProfesorInfo {
 	id: number;
 	nombre: string;
 	dni: string;
 }
+// #endregion

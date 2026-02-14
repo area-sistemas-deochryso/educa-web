@@ -175,7 +175,7 @@ export class VistasComponent implements OnInit {
 		this.filterEstado.set(null);
 	}
 
-	// === Edit Dialog ===
+	// #region Edit Dialog
 	openNew(): void {
 		// * Create new view flow.
 		this.selectedVista.set(null);
@@ -284,7 +284,8 @@ export class VistasComponent implements OnInit {
 		});
 	}
 
-	// === UI Helpers ===
+	// #endregion
+	// #region UI Helpers
 	isFormValid(): boolean {
 		const data = this.formData();
 		return !!(data.ruta && data.nombre);
@@ -293,4 +294,5 @@ export class VistasComponent implements OnInit {
 	updateFormField(field: keyof VistaForm, value: unknown): void {
 		this.formData.update((current) => ({ ...current, [field]: value }));
 	}
+	// #endregion
 }

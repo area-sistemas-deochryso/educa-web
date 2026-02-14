@@ -1,3 +1,4 @@
+<!-- #region Template -->
 <!-- * Header summary with bulk actions. -->
 <div class="notifications-header">
 	<div class="header-left">
@@ -12,7 +13,7 @@
 			<h2>Notificaciones</h2>
 			@if (notificationCount() > 0) {
 				<span class="notification-subtitle">
-					{{ notificationCount() }} notificación{{ notificationCount() > 1 ? 'es' : '' }}
+					{{ notificationCount() }} notificaciÃ³n{{ notificationCount() > 1 ? 'es' : '' }}
 					@if (unreadCount() > 0) {
 						<span class="unread-indicator" [class]="badgePriorityClass()">
 							({{ unreadCount() }} sin leer)
@@ -32,20 +33,20 @@
 			<button
 				class="action-btn mark-read-btn"
 				(click)="onMarkAllAsRead()"
-				title="Marcar todas como leídas"
+				title="Marcar todas como leÃ­das"
 			>
 				<i class="pi pi-check-circle"></i>
-				<span class="btn-text">Marcar leídas</span>
+				<span class="btn-text">Marcar leÃ­das</span>
 			</button>
 		}
 		@if (hasReadNotifications()) {
 			<button
 				class="action-btn mark-unread-btn"
 				(click)="onMarkAllAsUnread()"
-				title="Marcar todas como no leídas"
+				title="Marcar todas como no leÃ­das"
 			>
 				<i class="pi pi-circle"></i>
-				<span class="btn-text">Marcar no leídas</span>
+				<span class="btn-text">Marcar no leÃ­das</span>
 			</button>
 		}
 		@if (notificationCount() > 1) {
@@ -60,3 +61,4 @@
 		}
 	</div>
 </div>
+<!-- #endregion -->

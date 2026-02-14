@@ -1,8 +1,11 @@
+// #region Imports
 import type { AttendanceStatus, MonthOption } from '../models/attendance.types';
 
 /**
  * Clave para almacenar el mes seleccionado en localStorage.
  */
+// #endregion
+// #region Implementation
 export const ATTENDANCE_STORAGE_KEY = 'attendance_selected_month';
 
 /**
@@ -30,9 +33,9 @@ export const MONTH_OPTIONS: MonthOption[] = [
 ];
 
 /**
- * Encabezados de días de la semana (lunes a viernes).
+ * Encabezados de dÃƒÂ­as de la semana (lunes a viernes).
  */
-export const DAY_HEADERS = ['Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes'];
+export const DAY_HEADERS = ['Lunes', 'Martes', 'MiÃƒÂ©rcoles', 'Jueves', 'Viernes'];
 
 /**
  * Mapeo de estados de asistencia a clases CSS.
@@ -53,3 +56,4 @@ export const STATUS_CLASSES: Record<AttendanceStatus, string> = {
 export function getStatusClass(status: AttendanceStatus): string {
 	return STATUS_CLASSES[status];
 }
+// #endregion

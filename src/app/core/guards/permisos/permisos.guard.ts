@@ -1,3 +1,4 @@
+// #region Imports
 import { ActivatedRouteSnapshot, CanActivateFn, Router } from '@angular/router';
 import { AuthService, ErrorHandlerService, UserPermisosService } from '@core/services';
 
@@ -7,18 +8,20 @@ import { UI_ACCESS_DENIED_MESSAGE, UI_SUMMARIES } from '@app/shared/constants';
 
 /**
  * Guard que verifica si el usuario tiene permiso para acceder a una ruta
- * El acceso se controla dinámicamente por los permisos configurados en la BD
+ * El acceso se controla dinÃƒÂ¡micamente por los permisos configurados en la BD
  * Si no tiene permiso, redirige a /intranet
- * Si falla la carga de permisos, redirige al login (credenciales inválidas)
+ * Si falla la carga de permisos, redirige al login (credenciales invÃƒÂ¡lidas)
  */
 // * Guard: verifies permisos and redirects when access is denied.
+// #endregion
+// #region Implementation
 export const permisosGuard: CanActivateFn = async (route: ActivatedRouteSnapshot) => {
 	const authService = inject(AuthService);
 	const userPermisosService = inject(UserPermisosService);
 	const router = inject(Router);
 	const errorHandler = inject(ErrorHandlerService);
 
-	// Si no está autenticado, no verificar permisos (el authGuard se encarga)
+	// Si no estÃƒÂ¡ autenticado, no verificar permisos (el authGuard se encarga)
 	if (!authService.isAuthenticated) {
 		logger.tagged(
 			'PermisosGuard',
@@ -28,15 +31,15 @@ export const permisosGuard: CanActivateFn = async (route: ActivatedRouteSnapshot
 		return true;
 	}
 
-	// Construir la ruta completa desde la raíz
+	// Construir la ruta completa desde la raÃƒÂ­z
 	const fullPath = getFullPath(route);
 	// Nota: no incluye query params, solo segmentos de la ruta.
 	logger.tagged('PermisosGuard', 'log', 'Verificando permisos para:', fullPath);
 
-	// Esperar a que los permisos estén cargados
+	// Esperar a que los permisos estÃƒÂ©n cargados
 	const permisosLoaded = await userPermisosService.ensurePermisosLoaded();
 
-	// Si falló la carga de permisos, redirigir al login
+	// Si fallÃƒÂ³ la carga de permisos, redirigir al login
 	if (!permisosLoaded) {
 		logger.tagged('PermisosGuard', 'log', 'Fallo al cargar permisos, redirigiendo a login');
 		authService.logout();
@@ -73,7 +76,7 @@ function getFullPath(route: ActivatedRouteSnapshot): string {
 	let current: ActivatedRouteSnapshot | null = route;
 
 	while (current) {
-		// Recorre la jerarquía padre para construir la ruta desde la raíz.
+		// Recorre la jerarquÃƒÂ­a padre para construir la ruta desde la raÃƒÂ­z.
 		if (current.url.length > 0) {
 			segments.unshift(...current.url.map((s) => s.path));
 		}
@@ -82,3 +85,4 @@ function getFullPath(route: ActivatedRouteSnapshot): string {
 
 	return segments.join('/');
 }
+// #endregion

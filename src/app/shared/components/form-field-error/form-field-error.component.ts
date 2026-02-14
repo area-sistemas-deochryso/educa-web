@@ -1,9 +1,12 @@
+// #region Imports
 import { ChangeDetectionStrategy, Component, input } from '@angular/core';
 
 /**
- * Componente presentacional para mostrar errores de validación de formularios
+ * Componente presentacional para mostrar errores de validaciÃƒÆ’Ã‚Â³n de formularios
  * Uso: <app-form-field-error [error]="errorSignal()" />
  */
+// #endregion
+// #region Implementation
 @Component({
 	selector: 'app-form-field-error',
 	standalone: true,
@@ -16,3 +19,4 @@ export class FormFieldErrorComponent {
 	/** Mensaje de error a mostrar (null si no hay error) */
 	readonly error = input<string | null>(null);
 }
+// #endregion

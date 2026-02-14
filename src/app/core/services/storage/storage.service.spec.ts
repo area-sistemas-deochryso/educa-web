@@ -1,4 +1,5 @@
 // * Tests for StorageService delegation logic.
+// #region Imports
 import { TestBed } from '@angular/core/testing';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
@@ -8,6 +9,8 @@ import { PreferencesStorageService } from './preferences-storage.service';
 import { IndexedDBService } from './indexed-db.service';
 import { AuthUser } from './storage.models';
 
+// #endregion
+// #region Implementation
 describe('StorageService', () => {
 	let service: StorageService;
 	let sessionMock: Partial<SessionStorageService>;
@@ -153,3 +156,4 @@ describe('StorageService', () => {
 		});
 	});
 });
+// #endregion

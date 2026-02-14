@@ -1,3 +1,4 @@
+// #region Implementation
 /**
  * Environment configuration for DEVELOPMENT
  * This file replaces environment.ts during development builds
@@ -24,3 +25,4 @@ export const environment = {
 };
 
 export type Environment = typeof environment;
+// #endregion

@@ -1,6 +1,4 @@
-// =============================================================================
-// TEXT UTILITIES - text-center, text-white, fw-*, display-*
-// =============================================================================
+// #region TEXT UTILITIES - text-center, text-white, fw-*, display-*
 
 @use 'sass:map';
 @use '../variables' as *;
@@ -120,3 +118,4 @@
 		}
 	}
 }
+// #endregion

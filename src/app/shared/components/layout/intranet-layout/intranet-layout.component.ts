@@ -1,4 +1,5 @@
-import { Component, inject, OnInit, DestroyRef, signal, effect } from '@angular/core';
+// #region Imports
+import { Component, inject, OnInit, DestroyRef, signal, effect, computed } from '@angular/core';
 import { Router, RouterLink, RouterOutlet } from '@angular/router';
 import { VoiceButtonComponent } from '@shared/components/voice-button';
 import { FloatingNotificationBellComponent } from '@shared/components/floating-notification-bell';
@@ -10,8 +11,10 @@ import {
 	NavMenuItem,
 } from './components';
 import { INTRANET_MENU, NavItemWithPermiso } from './intranet-menu.config';
-import { environment } from '@config/environment';
+import { FeatureFlagsFacade } from '@core/services/feature-flags';
 
+// #endregion
+// #region Implementation
 @Component({
 	selector: 'app-intranet-layout',
 	imports: [
@@ -33,13 +36,14 @@ export class IntranetLayoutComponent implements OnInit {
 	private swService = inject(SwService);
 	private router = inject(Router);
 	private destroyRef = inject(DestroyRef);
+	private flags = inject(FeatureFlagsFacade);
 
 	private readonly _navItems = signal<NavMenuItem[]>([]);
 	readonly navItems = this._navItems.asReadonly();
 
 	// * Feature flags for optional widgets.
-	readonly showNotifications = environment.features.notifications;
-	readonly showVoiceRecognition = environment.features.voiceRecognition;
+	readonly showNotifications = computed(() => this.flags.isEnabled('notifications'));
+	readonly showVoiceRecognition = computed(() => this.flags.isEnabled('voiceRecognition'));
 
 	constructor() {
 		// * Keep nav items in sync with permisos changes.
@@ -126,3 +130,4 @@ export class IntranetLayoutComponent implements OnInit {
 		this.router.navigate(['/intranet/login']);
 	}
 }
+// #endregion

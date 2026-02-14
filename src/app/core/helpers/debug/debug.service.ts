@@ -1,4 +1,5 @@
 // debug.service.ts
+// #region Imports
 import {
 	Inject,
 	Injectable,
@@ -11,8 +12,15 @@ import {
 import { Observable, OperatorFunction, defer, finalize, tap } from 'rxjs';
 import { logger } from '../logs/logger'; // <-- tu logger existente
 import { DEBUG_CONFIG, DebugConfig, DbgLevel } from './debug.type';
-import { compileDebugFilter, safeGetLocalStorage } from './debug.filter';
+import {
+	compileDebugFilter,
+	safeGetLocalStorage,
+	safeRemoveLocalStorage,
+	safeSetLocalStorage,
+} from './debug.filter';
 
+// #endregion
+// #region Implementation
 const LEVEL_WEIGHT: Record<DbgLevel, number> = {
 	ERROR: 0,
 	WARN: 1,
@@ -23,8 +31,10 @@ const LEVEL_WEIGHT: Record<DbgLevel, number> = {
 @Injectable({ providedIn: 'root' })
 export class DebugService {
 	// * Tagged debug logger with filtering + RxJS helpers.
-	private readonly cfg: Required<DebugConfig>;
-	private readonly filterFn: (tag: string) => boolean;
+	private cfg: Required<DebugConfig>;
+	private filterFn: (tag: string) => boolean = () => true;
+	private activePattern = '';
+	private minLevel: DbgLevel;
 
 	constructor(@Optional() @Inject(DEBUG_CONFIG) cfg?: DebugConfig) {
 		const defaults: Required<DebugConfig> = {
@@ -32,14 +42,13 @@ export class DebugService {
 			minLevel: 'INFO',
 			defaultPattern: '',
 			storageKey: 'DEBUG',
+			storageLevelKey: 'DEBUG_LEVEL',
 			enableStackInTrace: false,
 		};
 
 		this.cfg = { ...defaults, ...(cfg ?? {}) };
-
-		const storagePattern = safeGetLocalStorage(this.cfg.storageKey);
-		const activePattern = storagePattern ?? this.cfg.defaultPattern;
-		this.filterFn = compileDebugFilter(activePattern);
+		this.minLevel = this.cfg.minLevel;
+		this.refreshFromStorage();
 	}
 
 	/** Gate indispensable */
@@ -49,6 +58,53 @@ export class DebugService {
 
 	isTagEnabled(tag: string): boolean {
 		return this.enabled && this.filterFn(tag);
+	}
+
+	getConfig(): Readonly<Required<DebugConfig> & { activePattern: string; activeMinLevel: DbgLevel }> {
+		return {
+			...this.cfg,
+			activePattern: this.activePattern,
+			activeMinLevel: this.minLevel,
+		};
+	}
+
+	setFilter(pattern: string, persist = true): void {
+		this.activePattern = (pattern ?? '').trim();
+		this.filterFn = compileDebugFilter(this.activePattern);
+		if (persist) {
+			if (!this.activePattern) {
+				safeRemoveLocalStorage(this.cfg.storageKey);
+			} else {
+				safeSetLocalStorage(this.cfg.storageKey, this.activePattern);
+			}
+		}
+	}
+
+	setMinLevel(level: DbgLevel, persist = true): void {
+		this.minLevel = level;
+		if (persist) {
+			safeSetLocalStorage(this.cfg.storageLevelKey, level);
+		}
+	}
+
+	setEnabled(enabled: boolean): void {
+		this.cfg.enabled = enabled;
+	}
+
+	refreshFromStorage(): void {
+		const storagePattern = safeGetLocalStorage(this.cfg.storageKey);
+		this.activePattern = (storagePattern ?? this.cfg.defaultPattern).trim();
+		this.filterFn = compileDebugFilter(this.activePattern);
+
+		const storageLevel = safeGetLocalStorage(this.cfg.storageLevelKey);
+		const parsedLevel = parseDbgLevel(storageLevel);
+		this.minLevel = parsedLevel ?? this.cfg.minLevel;
+	}
+
+	clearOverrides(): void {
+		safeRemoveLocalStorage(this.cfg.storageKey);
+		safeRemoveLocalStorage(this.cfg.storageLevelKey);
+		this.refreshFromStorage();
 	}
 
 	dbg(tag: string, scope?: string) {
@@ -100,12 +156,12 @@ export class DebugService {
 		// Filtrado por tag
 		if (!this.filterFn(tag)) return;
 
-		// Nivel mínimo
-		if (LEVEL_WEIGHT[level] > LEVEL_WEIGHT[this.cfg.minLevel]) return;
+		// Nivel mÃƒÆ’Ã‚Â­nimo
+		if (LEVEL_WEIGHT[level] > LEVEL_WEIGHT[this.minLevel]) return;
 
 		const payload = data === undefined ? [msg] : [msg, data];
 
-		// Stack solo en TRACE si está habilitado
+		// Stack solo en TRACE si estÃƒÆ’Ã‚Â¡ habilitado
 		if (level === 'TRACE' && this.cfg.enableStackInTrace) {
 			const source = captureSource();
 			logger.tagged(tag, 'debug', ...payload, source);
@@ -231,3 +287,13 @@ function captureSource() {
 		return '';
 	}
 }
+
+function parseDbgLevel(value: string | null): DbgLevel | null {
+	if (!value) return null;
+	const normalized = value.trim().toUpperCase();
+	if (normalized === 'ERROR' || normalized === 'WARN' || normalized === 'INFO' || normalized === 'TRACE') {
+		return normalized as DbgLevel;
+	}
+	return null;
+}
+// #endregion

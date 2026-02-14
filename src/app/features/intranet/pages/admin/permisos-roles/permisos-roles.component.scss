@@ -4,7 +4,7 @@
 	margin: 0 auto;
 }
 
-// ============ HEADER ============
+// #region HEADER
 .page-header {
 	display: flex;
 	justify-content: space-between;
@@ -57,7 +57,8 @@
 	}
 }
 
-// ============ STATS CARDS ============
+// #endregion
+// #region STATS CARDS
 .stats-section {
 	display: grid;
 	grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
@@ -113,7 +114,8 @@
 	}
 }
 
-// ============ LOADING ============
+// #endregion
+// #region LOADING
 .loading-container {
 	display: flex;
 	justify-content: center;
@@ -123,7 +125,8 @@
 	border-radius: 12px;
 }
 
-// ============ TABLE ============
+// #endregion
+// #region TABLE
 .table-section {
 	background: transparent;
 	border-radius: 12px;
@@ -209,7 +212,8 @@
 	}
 }
 
-// ============ DETAIL DRAWER ============
+// #endregion
+// #region DETAIL DRAWER
 .drawer-header {
 	font-weight: 600;
 	font-size: 1.1rem;
@@ -331,7 +335,8 @@
 	margin-top: 1.5rem;
 }
 
-// ============ EDIT DIALOG ============
+// #endregion
+// #region EDIT DIALOG
 .dialog-content {
 	.dialog-role-header {
 		display: flex;
@@ -564,9 +569,10 @@
 	gap: 0.5rem;
 }
 
-// ============ NG-DEEP OVERRIDES ============
+// #endregion
+// #region NG-DEEP OVERRIDES
 :host ::ng-deep {
-	// Unificar fondo de la página
+	// Unificar fondo de la pÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â¡gina
 	.p-datatable {
 		background: transparent;
 
@@ -684,7 +690,7 @@
 		}
 	}
 
-	// Drawer con fondo similar al de la página
+	// Drawer con fondo similar al de la pÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â¡gina
 	.p-drawer {
 		.p-drawer-content {
 			padding: 1.5rem;
@@ -698,7 +704,7 @@
 		}
 	}
 
-	// Dialog con fondo similar al de la página
+	// Dialog con fondo similar al de la pÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â¡gina
 	.edit-permisos-dialog {
 		.p-dialog-header {
 			background: var(--surface-ground);
@@ -751,7 +757,8 @@
 	}
 }
 
-// ============ RESPONSIVE ============
+// #endregion
+// #region RESPONSIVE
 @media (max-width: 768px) {
 	.permisos-container {
 		padding: 1rem;
@@ -794,3 +801,4 @@
 		color: var(--intranet-soft-text-color);
 	}
 }
+// #endregion

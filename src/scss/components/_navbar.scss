@@ -1,6 +1,4 @@
-// =============================================================================
-// NAVBAR COMPONENT - Custom navbar sin Bootstrap JS
-// =============================================================================
+// #region NAVBAR COMPONENT - Custom navbar sin Bootstrap JS
 
 @use 'sass:map';
 @use '../variables' as *;
@@ -216,7 +214,7 @@
 			display: block;
 		}
 
-		// En móvil, dropdown se abre con click (manejado por Angular)
+		// En mÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â³vil, dropdown se abre con click (manejado por Angular)
 		.dropdown:hover > .dropdown-menu {
 			display: none;
 		}
@@ -229,3 +227,4 @@
 		}
 	}
 }
+// #endregion

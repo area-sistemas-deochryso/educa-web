@@ -1,3 +1,4 @@
+// #region Imports
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { Router } from '@angular/router';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
@@ -7,6 +8,8 @@ import { LoginIntranetComponent } from './login-intranet.component';
 import { AuthService } from '@core/services';
 import { testProviders } from '@test';
 
+// #endregion
+// #region Implementation
 describe('LoginIntranetComponent', () => {
 	let component: LoginIntranetComponent;
 	let fixture: ComponentFixture<LoginIntranetComponent>;
@@ -136,7 +139,7 @@ describe('LoginIntranetComponent', () => {
 					nombreCompleto: '',
 					entityId: 0,
 					sedeId: 0,
-					mensaje: 'Credenciales inválidas',
+					mensaje: 'Credenciales invÃƒÂ¡lidas',
 				}),
 			);
 
@@ -204,3 +207,4 @@ describe('LoginIntranetComponent', () => {
 		});
 	});
 });
+// #endregion

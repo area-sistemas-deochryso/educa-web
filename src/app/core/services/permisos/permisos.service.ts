@@ -26,7 +26,7 @@ export class PermisosService {
 	private readonly apiUrl = `${environment.apiUrl}/api/sistema/permisos`;
 	private http = inject(HttpClient);
 
-	// ========== VISTAS ==========
+	// #region VISTAS
 
 	getVistas(): Observable<Vista[]> {
 		return this.http
@@ -50,7 +50,8 @@ export class PermisosService {
 		return this.http.delete<ApiResponse>(`${this.apiUrl}/vistas/${id}/eliminar`);
 	}
 
-	// ========== PERMISOS POR ROL ==========
+	// #endregion
+	// #region PERMISOS POR ROL
 
 	getPermisosRol(): Observable<PermisoRol[]> {
 		return this.http
@@ -85,7 +86,8 @@ export class PermisosService {
 		return this.http.delete<ApiResponse>(`${this.apiUrl}/rol/${id}/eliminar`);
 	}
 
-	// ========== PERMISOS POR USUARIO ==========
+	// #endregion
+	// #region PERMISOS POR USUARIO
 
 	getPermisosUsuario(): Observable<PermisoUsuario[]> {
 		return this.http
@@ -120,7 +122,8 @@ export class PermisosService {
 		return this.http.delete<ApiResponse>(`${this.apiUrl}/usuario/${id}/eliminar`);
 	}
 
-	// ========== CONSULTA DE PERMISOS ==========
+	// #endregion
+	// #region CONSULTA DE PERMISOS
 
 	consultarPermisosDeUsuario(
 		usuarioId: number,
@@ -136,7 +139,7 @@ export class PermisosService {
 	/**
 	 * Obtiene los permisos del usuario autenticado actual
 	 * Usa el token JWT para identificar al usuario
-	 * Nota: Este endpoint está en un controller separado sin restricción de rol
+	 * Nota: Este endpoint estÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Â ÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¡ en un controller separado sin restricciÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Â ÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â³n de rol
 	 */
 	getMisPermisos(): Observable<PermisosUsuarioResultado | null> {
 		return this.http
@@ -144,7 +147,8 @@ export class PermisosService {
 			.pipe(catchError(() => of(null)));
 	}
 
-	// ========== BÚSQUEDA DE USUARIOS ==========
+	// #endregion
+	// #region BÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Â ÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â¦ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¡SQUEDA DE USUARIOS
 
 	buscarUsuarios(termino?: string, rol?: string): Observable<UsuarioBusquedaResultado> {
 		const params: Record<string, string> = {};
@@ -163,4 +167,5 @@ export class PermisosService {
 			)
 			.pipe(catchError(() => of({ usuarios: [], total: 0 })));
 	}
+	// #endregion
 }

@@ -1,3 +1,4 @@
+// #region Imports
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { of } from 'rxjs';
@@ -13,6 +14,8 @@ import {
 } from '@core/services';
 import { AttendanceDataService } from '../../../services/attendance/attendance-data.service';
 
+// #endregion
+// #region Implementation
 describe('AttendanceProfesorComponent', () => {
 	let component: AttendanceProfesorComponent;
 	let fixture: ComponentFixture<AttendanceProfesorComponent>;
@@ -40,7 +43,7 @@ describe('AttendanceProfesorComponent', () => {
 		{
 			estudianteId: 1,
 			dni: '12345678',
-			nombreCompleto: 'Juan Pérez',
+			nombreCompleto: 'Juan PÃƒÂ©rez',
 			grado: 1,
 			seccion: 'A',
 			asistencias: [],
@@ -74,7 +77,7 @@ describe('AttendanceProfesorComponent', () => {
 		};
 
 		userProfileMock = {
-			userName: signal('Prof. García'),
+			userName: signal('Prof. GarcÃƒÂ­a'),
 		};
 
 		attendanceDataServiceMock = {
@@ -169,7 +172,7 @@ describe('AttendanceProfesorComponent', () => {
 		const hijos = component.estudiantesAsHijos();
 
 		expect(hijos.length).toBe(1);
-		expect(hijos[0].nombreCompleto).toBe('Juan Pérez');
+		expect(hijos[0].nombreCompleto).toBe('Juan PÃƒÂ©rez');
 		expect(hijos[0].relacion).toBe('Estudiante');
 	});
 
@@ -192,3 +195,4 @@ describe('AttendanceProfesorComponent', () => {
 		expect(spy).toHaveBeenCalled();
 	});
 });
+// #endregion

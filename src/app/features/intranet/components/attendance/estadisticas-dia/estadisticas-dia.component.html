@@ -1,3 +1,4 @@
+<!-- #region Template -->
 @if (estadisticas()) {
 	<div class="estadisticas-container">
 		<div class="header-row">
@@ -19,7 +20,7 @@
 			/>
 			<p-menu #pdfMenu [model]="menuItems" [popup]="true" appendTo="body" />
 			<!-- * Date headline -->
-			<h2>Estadísticas del día - {{ estadisticas()!.fecha | date: 'EEEE d MMMM yyyy' }}</h2>
+			<h2>EstadÃƒÂ­sticas del dÃƒÂ­a - {{ estadisticas()!.fecha | date: 'EEEE d MMMM yyyy' }}</h2>
 		</div>
 		<!-- * Stat cards -->
 		<div class="stats-grid">
@@ -48,3 +49,4 @@
 		</div>
 	</div>
 }
+<!-- #endregion -->

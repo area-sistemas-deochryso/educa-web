@@ -1,3 +1,4 @@
+// #region Imports
 import { Route, Routes } from '@angular/router';
 import { authGuard, permisosGuard } from '@core/guards';
 
@@ -7,6 +8,8 @@ import { environment } from '@config/environment';
 /**
  * Rutas de features en desarrollo (controladas por environment.features)
  */
+// #endregion
+// #region Implementation
 const developmentRoutes: Route[] = [
 	...(environment.features.horarios
 		? [
@@ -24,7 +27,7 @@ const developmentRoutes: Route[] = [
 				// 		import('./pages/campus-navigation/campus-navigation.component').then(
 				// 			(m) => m.CampusNavigationComponent,
 				// 		),
-				// 	title: 'Intranet - Navegación Campus Salonese',
+				// 	title: 'Intranet - NavegaciÃƒÂ³n Campus Salonese',
 				// },
 			]
 		: []),
@@ -68,7 +71,7 @@ export const INTRANET_ROUTES: Routes = [
 	{
 		path: 'login',
 		loadComponent: () => import('./pages/login').then((m) => m.LoginIntranetComponent),
-		title: 'Intranet - Iniciar Sesión',
+		title: 'Intranet - Iniciar SesiÃƒÂ³n',
 	},
 	{
 		path: '',
@@ -109,24 +112,25 @@ export const INTRANET_ROUTES: Routes = [
 				path: 'admin/usuarios',
 				loadComponent: () =>
 					import('./pages/admin/usuarios').then((m) => m.UsuariosComponent),
-				title: 'Intranet - Gestión de Usuarios',
+				title: 'Intranet - GestiÃƒÂ³n de Usuarios',
 			},
 			{
 				path: 'admin/vistas',
 				loadComponent: () => import('./pages/admin/vistas').then((m) => m.VistasComponent),
-				title: 'Intranet - Gestión de Vistas',
+				title: 'Intranet - GestiÃƒÂ³n de Vistas',
 			},
 			{
 				path: 'admin/cursos',
 				loadComponent: () => import('./pages/admin/cursos').then((m) => m.CursosComponent),
-				title: 'Intranet - Gestión de Cursos',
+				title: 'Intranet - GestiÃƒÂ³n de Cursos',
 			},
 			{
 				path: 'admin/horarios',
 				loadComponent: () =>
 					import('./pages/admin/horarios').then((m) => m.HorariosComponent),
-				title: 'Intranet - Gestión de Horarios',
+				title: 'Intranet - GestiÃƒÂ³n de Horarios',
 			},
 		],
 	},
 ];
+// #endregion

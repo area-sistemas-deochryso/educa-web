@@ -1,7 +1,10 @@
+// #region Imports
 import { Component } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { Tooltip } from 'primeng/tooltip';
 
+// #endregion
+// #region Implementation
 interface ContactForm {
 	name: string;
 	phone: string;
@@ -29,7 +32,7 @@ export class HeroSectionComponent {
 		if (this.formData.name && this.formData.phone) {
 			this.isSubmitting = true;
 
-			// Simular envío a Formspree o backend
+			// Simular envÃƒÂ­o a Formspree o backend
 			const formspreeUrl = 'https://formspree.io/f/mzzprebk';
 
 			fetch(formspreeUrl, {
@@ -40,7 +43,7 @@ export class HeroSectionComponent {
 				body: JSON.stringify(this.formData),
 			})
 				.then(() => {
-					alert('¡Gracias por contactarnos! Nos comunicaremos contigo pronto.');
+					alert('Ã‚Â¡Gracias por contactarnos! Nos comunicaremos contigo pronto.');
 					this.formData = { name: '', phone: '' };
 				})
 				.catch(() => {
@@ -63,3 +66,4 @@ export class HeroSectionComponent {
 		}
 	}
 }
+// #endregion

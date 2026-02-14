@@ -1,8 +1,11 @@
+// #region Imports
 import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { DialogModule } from 'primeng/dialog';
 import { logger } from '@core/helpers';
 
+// #endregion
+// #region Implementation
 export interface Submission {
 	id: number;
 	taskTitle: string;
@@ -29,7 +32,7 @@ export class SubmissionsModalComponent {
 	submissions: Submission[] = [
 		{
 			id: 1,
-			taskTitle: 'Ejercicios del capítulo 2',
+			taskTitle: 'Ejercicios del capÃƒÂ­tulo 2',
 			submittedDate: '10/01/2026',
 			status: 'pending_review',
 			grade: null,
@@ -49,7 +52,7 @@ export class SubmissionsModalComponent {
 
 	getStatusLabel(status: string): string {
 		const labels: Record<string, string> = {
-			pending_review: 'En revisión',
+			pending_review: 'En revisiÃƒÂ³n',
 			reviewed: 'Calificado',
 			returned: 'Devuelto',
 		};
@@ -81,3 +84,4 @@ export class SubmissionsModalComponent {
 		return 'grade-green';
 	}
 }
+// #endregion

@@ -1,3 +1,4 @@
+<!-- #region Template -->
 <p-dialog
 	[visible]="visible"
 	(visibleChange)="onVisibleChange($event)"
@@ -62,7 +63,7 @@
 					></i>
 				</button>
 
-				<app-student-card lastName="Tupac Yupanqui" firstName="María José" />
+				<app-student-card lastName="Tupac Yupanqui" firstName="MarÃ­a JosÃ©" />
 
 				<app-course-search
 					[searchTerm]="courseSearchTerm"
@@ -99,3 +100,4 @@
 <app-tasks-modal [(visible)]="showTasksModal" [weekName]="selectedWeekName" />
 
 <app-submissions-modal [(visible)]="showSubmissionsModal" [weekName]="selectedWeekName" />
+<!-- #endregion -->

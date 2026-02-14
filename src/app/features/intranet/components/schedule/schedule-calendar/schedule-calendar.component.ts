@@ -1,3 +1,4 @@
+// #region Imports
 import { Component, EventEmitter, OnInit, Output, ViewChild } from '@angular/core';
 import { Menu, MenuModule } from 'primeng/menu';
 
@@ -5,6 +6,8 @@ import { CommonModule } from '@angular/common';
 import { MenuItem } from 'primeng/api';
 import { TooltipModule } from 'primeng/tooltip';
 
+// #endregion
+// #region Implementation
 export interface CalendarDay {
 	day: number | null;
 	isCurrentMonth: boolean;
@@ -30,7 +33,7 @@ export class ScheduleCalendarComponent implements OnInit {
 	selectedDay: number | null = null;
 
 	// * Header labels.
-	dayHeaders = ['Lun', 'Mar', 'Mie', 'Jue', 'Vie', 'Sáb', 'Dom'];
+	dayHeaders = ['Lun', 'Mar', 'Mie', 'Jue', 'Vie', 'SÃƒÂ¡b', 'Dom'];
 
 	monthNames = [
 		'ENERO',
@@ -131,3 +134,4 @@ export class ScheduleCalendarComponent implements OnInit {
 		this.generateCalendar();
 	}
 }
+// #endregion

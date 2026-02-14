@@ -1,3 +1,4 @@
+// #region Imports
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { of } from 'rxjs';
@@ -6,6 +7,8 @@ import { AttendanceEstudianteComponent } from './attendance-estudiante.component
 import { AsistenciaService, StorageService } from '@core/services';
 import { AttendanceDataService } from '../../../services/attendance/attendance-data.service';
 
+// #endregion
+// #region Implementation
 describe('AttendanceEstudianteComponent', () => {
 	let component: AttendanceEstudianteComponent;
 	let fixture: ComponentFixture<AttendanceEstudianteComponent>;
@@ -160,3 +163,4 @@ describe('AttendanceEstudianteComponent', () => {
 		);
 	});
 });
+// #endregion

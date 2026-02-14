@@ -1,3 +1,4 @@
+<!-- #region Template -->
 <p-dialog
 	[visible]="visible"
 	(visibleChange)="onVisibleChange($event)"
@@ -51,7 +52,7 @@
 					<div class="attachment-info">
 						<span class="attachment-name">{{ attachment.name }}</span>
 						<span class="attachment-meta"
-							>{{ attachment.size }} · {{ attachment.date }}</span
+							>{{ attachment.size }} Â· {{ attachment.date }}</span
 						>
 					</div>
 					<div class="attachment-actions">
@@ -75,3 +76,4 @@
 		</div>
 	</div>
 </p-dialog>
+<!-- #endregion -->

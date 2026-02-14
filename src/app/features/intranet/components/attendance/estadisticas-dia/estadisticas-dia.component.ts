@@ -1,3 +1,4 @@
+// #region Imports
 import { ChangeDetectionStrategy, Component, ViewChild, input, output } from '@angular/core';
 import { DatePipe, DecimalPipe } from '@angular/common';
 import { Menu, MenuModule } from 'primeng/menu';
@@ -8,9 +9,11 @@ import { MenuItem } from 'primeng/api';
 import { TooltipModule } from 'primeng/tooltip';
 
 /**
- * Componente presentacional para mostrar las estadísticas del día.
- * Usado por el Director para ver un resumen rápido.
+ * Componente presentacional para mostrar las estadÃƒÆ’Ã‚Â­sticas del dÃƒÆ’Ã‚Â­a.
+ * Usado por el Director para ver un resumen rÃƒÆ’Ã‚Â¡pido.
  */
+// #endregion
+// #region Implementation
 @Component({
 	selector: 'app-estadisticas-dia',
 	standalone: true,
@@ -55,3 +58,4 @@ export class EstadisticasDiaComponent {
 		this.descargarPdf.emit();
 	}
 }
+// #endregion

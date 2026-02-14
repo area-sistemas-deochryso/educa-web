@@ -1,5 +1,8 @@
+// #region Imports
 import { Component } from '@angular/core';
 
+// #endregion
+// #region Implementation
 @Component({
 	selector: 'app-calendar-legend',
 	imports: [],
@@ -7,3 +10,4 @@ import { Component } from '@angular/core';
 	styleUrl: './calendar-legend.component.scss',
 })
 export class CalendarLegendComponent {}
+// #endregion

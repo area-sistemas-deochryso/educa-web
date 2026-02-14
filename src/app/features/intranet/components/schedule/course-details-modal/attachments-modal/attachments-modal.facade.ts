@@ -1,3 +1,4 @@
+// #region Imports
 import { Injectable, inject, DestroyRef } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { BlobStorageService } from '@core/services';
@@ -11,6 +12,8 @@ import {
 	UI_SUMMARIES,
 } from '@app/shared/constants';
 
+// #endregion
+// #region Implementation
 const MAX_FILE_SIZE = 50000000; // 50MB
 const CONTAINER_NAME = 'course-attachments';
 
@@ -26,7 +29,7 @@ export class AttachmentsModalFacade {
 
 	// Comandos
 	uploadFile(file: File): void {
-		// Validación del archivo
+		// ValidaciÃƒÆ’Ã‚Â³n del archivo
 		const validationError = this.validateFile(file);
 		if (validationError) {
 			logger.error(validationError);
@@ -60,7 +63,7 @@ export class AttachmentsModalFacade {
 					this.store.setUploading(false);
 					this.store.setUploadProgress(100);
 
-					// Notificar éxito
+					// Notificar ÃƒÆ’Ã‚Â©xito
 					this.errorHandler.showSuccess(
 						UI_SUMMARIES.success,
 						UI_ATTACHMENT_MESSAGES.uploadSuccess,
@@ -101,7 +104,7 @@ export class AttachmentsModalFacade {
 		}
 	}
 
-	// Validación privada
+	// ValidaciÃƒÆ’Ã‚Â³n privada
 	private validateFile(file: File): string | null {
 		if (!file) {
 			return UI_ATTACHMENT_MESSAGES.fileMissing;
@@ -118,3 +121,4 @@ export class AttachmentsModalFacade {
 		return null;
 	}
 }
+// #endregion

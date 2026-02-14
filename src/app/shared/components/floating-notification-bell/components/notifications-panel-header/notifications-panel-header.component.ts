@@ -1,8 +1,11 @@
+// #region Imports
 import { Component, inject, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { PrioritySummaryComponent } from '../priority-summary/priority-summary.component';
 import { NotificationsPanelContext } from '../../notifications-panel.context';
 
+// #endregion
+// #region Implementation
 @Component({
 	selector: 'app-notifications-panel-header',
 	imports: [CommonModule, PrioritySummaryComponent],
@@ -40,3 +43,4 @@ export class NotificationsPanelHeaderComponent {
 		this.context.dismissAll();
 	}
 }
+// #endregion

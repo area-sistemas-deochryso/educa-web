@@ -1,3 +1,4 @@
+// #region Imports
 import { ChangeDetectionStrategy, Component, input } from '@angular/core';
 
 import { CommonModule } from '@angular/common';
@@ -6,6 +7,8 @@ import { CommonModule } from '@angular/common';
  * Componente presentacional para skeleton screens
  * Optimizado para Lighthouse Speed Index
  */
+// #endregion
+// #region Implementation
 @Component({
 	selector: 'app-skeleton-loader',
 	standalone: true,
@@ -20,3 +23,4 @@ export class SkeletonLoaderComponent {
 	readonly width = input<string>('100%');
 	readonly height = input<string>('100%');
 }
+// #endregion

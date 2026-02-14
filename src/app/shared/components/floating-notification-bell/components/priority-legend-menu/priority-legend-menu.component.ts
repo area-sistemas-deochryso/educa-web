@@ -1,7 +1,10 @@
+// #region Imports
 import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { NotificationPriority } from '@core/services';
 
+// #endregion
+// #region Implementation
 export interface PriorityInfo {
 	priority: NotificationPriority;
 	label: string;
@@ -33,3 +36,4 @@ export class PriorityLegendMenuComponent {
 		event.stopPropagation();
 	}
 }
+// #endregion

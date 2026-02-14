@@ -1,6 +1,9 @@
+// #region Imports
 import { Injectable, computed, signal } from '@angular/core';
 import { PermisoUsuario, PermisoRol, Vista, RolTipoAdmin } from '@core/services';
 
+// #endregion
+// #region Implementation
 export interface ModuloVistas {
 	nombre: string;
 	vistas: Vista[];
@@ -36,28 +39,28 @@ export class PermisosUsuariosStore {
 	private readonly _activeModuloIndex = signal(0);
 	private readonly _vistasBusqueda = signal('');
 
-	// Estado público readonly - Data
+	// Estado pÃƒÂºblico readonly - Data
 	readonly permisosUsuario = this._permisosUsuario.asReadonly();
 	readonly permisosRol = this._permisosRol.asReadonly();
 	readonly vistas = this._vistas.asReadonly();
 
-	// Estado público readonly - UI
+	// Estado pÃƒÂºblico readonly - UI
 	readonly loading = this._loading.asReadonly();
 	readonly searchTerm = this._searchTerm.asReadonly();
 	readonly filterRol = this._filterRol.asReadonly();
 
-	// Estado público readonly - Dialogs
+	// Estado pÃƒÂºblico readonly - Dialogs
 	readonly dialogVisible = this._dialogVisible.asReadonly();
 	readonly detailDrawerVisible = this._detailDrawerVisible.asReadonly();
 	readonly isEditing = this._isEditing.asReadonly();
 
-	// Estado público readonly - Form
+	// Estado pÃƒÂºblico readonly - Form
 	readonly selectedPermiso = this._selectedPermiso.asReadonly();
 	readonly selectedUsuarioId = this._selectedUsuarioId.asReadonly();
 	readonly selectedRol = this._selectedRol.asReadonly();
 	readonly selectedVistas = this._selectedVistas.asReadonly();
 
-	// Estado público readonly - Module tabs
+	// Estado pÃƒÂºblico readonly - Module tabs
 	readonly modulosVistas = this._modulosVistas.asReadonly();
 	readonly activeModuloIndex = this._activeModuloIndex.asReadonly();
 	readonly vistasBusqueda = this._vistasBusqueda.asReadonly();
@@ -83,7 +86,7 @@ export class PermisosUsuariosStore {
 		return permisos;
 	});
 
-	// Computed - Vistas filtradas por búsqueda en modal de edición
+	// Computed - Vistas filtradas por bÃƒÂºsqueda en modal de ediciÃƒÂ³n
 	readonly vistasFiltradas = computed(() => {
 		const modulos = this._modulosVistas();
 		const busqueda = this._vistasBusqueda().toLowerCase();
@@ -228,7 +231,7 @@ export class PermisosUsuariosStore {
 		this._vistasBusqueda.set(term);
 	}
 
-	// Resetear estado de diálogos
+	// Resetear estado de diÃƒÂ¡logos
 	resetDialogState(): void {
 		this._selectedPermiso.set(null);
 		this._selectedUsuarioId.set(null);
@@ -240,3 +243,4 @@ export class PermisosUsuariosStore {
 		this._isEditing.set(false);
 	}
 }
+// #endregion

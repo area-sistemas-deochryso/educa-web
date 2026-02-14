@@ -1,3 +1,4 @@
+// #region Imports
 import { AuthUser, LoginResponse } from '@core/services/auth/auth.models';
 import { computed, inject } from '@angular/core';
 import {
@@ -12,8 +13,10 @@ import {
 import { StorageService } from '@core/services/storage';
 
 /**
- * Estado de autenticación
+ * Estado de autenticaciÃƒÂ³n
  */
+// #endregion
+// #region Implementation
 export interface AuthState {
 	user: AuthUser | null;
 	isAuthenticated: boolean;
@@ -36,7 +39,7 @@ const initialState: AuthState = {
 };
 
 /**
- * NgRx Signals Store para autenticación.
+ * NgRx Signals Store para autenticaciÃƒÂ³n.
  * Proporciona manejo de estado reactivo con Angular Signals.
  *
  * @example
@@ -52,7 +55,7 @@ const initialState: AuthState = {
  * remainingAttempts = this.authStore.remainingAttempts
  * isBlocked = this.authStore.isBlocked
  *
- * // Métodos
+ * // MÃƒÂ©todos
  * this.authStore.setUser(user)
  * this.authStore.setLoading(true)
  * this.authStore.logout()
@@ -70,7 +73,7 @@ export const AuthStore = signalStore(
 		remainingAttempts: computed(() => MAX_LOGIN_ATTEMPTS - store.loginAttempts()),
 
 		/**
-		 * Si el usuario está bloqueado por muchos intentos
+		 * Si el usuario estÃƒÂ¡ bloqueado por muchos intentos
 		 */
 		isBlocked: computed(() => store.loginAttempts() >= MAX_LOGIN_ATTEMPTS),
 
@@ -194,7 +197,7 @@ export const AuthStore = signalStore(
 		},
 
 		/**
-		 * Cierra la sesión del usuario
+		 * Cierra la sesiÃƒÂ³n del usuario
 		 */
 		logout(): void {
 			storage.clearAuth();
@@ -229,6 +232,7 @@ export const AuthStore = signalStore(
 );
 
 /**
- * Tipo del AuthStore para inyección
+ * Tipo del AuthStore para inyecciÃƒÂ³n
  */
 export type AuthStoreType = InstanceType<typeof AuthStore>;
+// #endregion

@@ -1,6 +1,9 @@
+// #region Imports
 import { Holiday } from './holidays.config';
 import { CalendarEvent } from './events.config';
 
+// #endregion
+// #region Implementation
 export interface CalendarDay {
 	date: number;
 	isCurrentMonth: boolean;
@@ -30,3 +33,4 @@ export interface ModalData {
 	holiday?: Holiday;
 	event?: CalendarEvent;
 }
+// #endregion

@@ -1,3 +1,4 @@
+// #region Imports
 import { Component, OnInit, AfterViewInit, signal, inject, PLATFORM_ID } from '@angular/core';
 import { isPlatformBrowser } from '@angular/common';
 import { ActivatedRoute } from '@angular/router';
@@ -10,6 +11,8 @@ import { isHoliday } from './holidays.config';
 import { getEvent, isDateInEventRange, isDateEventEnd } from './events.config';
 import { CalendarUtilsService } from '@features/intranet/services/calendar/calendar-utils.service';
 
+// #endregion
+// #region Implementation
 @Component({
 	selector: 'app-calendary.component',
 	imports: [
@@ -187,3 +190,4 @@ export class CalendaryComponent implements OnInit, AfterViewInit {
 		return month.id;
 	}
 }
+// #endregion

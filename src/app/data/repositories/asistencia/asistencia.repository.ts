@@ -1,3 +1,4 @@
+// #region Imports
 import { BaseRepository, QueryParams } from '../base/base.repository';
 import {
 	EstudianteAsistencia,
@@ -10,6 +11,8 @@ import { Observable, catchError, of } from 'rxjs';
 import { Injectable } from '@angular/core';
 import { logger } from '@core/helpers';
 
+// #endregion
+// #region Implementation
 export interface AsistenciaQueryParams extends QueryParams {
 	mes?: number;
 	anio?: number;
@@ -103,3 +106,4 @@ export class AsistenciaRepository extends BaseRepository<ResumenAsistencia> {
 		);
 	}
 }
+// #endregion

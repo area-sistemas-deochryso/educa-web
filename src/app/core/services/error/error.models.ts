@@ -1,6 +1,9 @@
 // * Error types + friendly HTTP messages.
+// #region Imports
 import { UI_HTTP_ERROR_MESSAGES } from '@app/shared/constants';
 
+// #endregion
+// #region Implementation
 export type ErrorSeverity = 'info' | 'warn' | 'error' | 'success';
 export type ErrorSource = 'http' | 'client' | 'validation' | 'unknown';
 
@@ -38,3 +41,4 @@ export interface ErrorNotification {
 export const HTTP_ERROR_MESSAGES: Record<number, string> = {
 	...UI_HTTP_ERROR_MESSAGES,
 };
+// #endregion

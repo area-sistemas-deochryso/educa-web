@@ -1,3 +1,4 @@
+// #region Imports
 import { ChangeDetectionStrategy, Component, input, output } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
@@ -10,6 +11,8 @@ import { TooltipModule } from 'primeng/tooltip';
 import type { HorarioDetalleResponseDto } from '../../models/horario.interface';
 import type { ProfesorOption } from '../../models/profesor.interface';
 
+// #endregion
+// #region Implementation
 @Component({
 	selector: 'app-horario-detail-drawer',
 	standalone: true,
@@ -119,3 +122,4 @@ export class HorarioDetailDrawerComponent {
 		return estudiante.id;
 	}
 }
+// #endregion

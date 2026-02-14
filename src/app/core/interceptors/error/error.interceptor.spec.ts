@@ -1,4 +1,5 @@
 // * Tests for error interceptor handling behavior.
+// #region Imports
 import { TestBed } from '@angular/core/testing';
 import {
 	HttpClient,
@@ -12,6 +13,8 @@ import { describe, it, expect, beforeEach, vi } from 'vitest';
 import { errorInterceptor } from './error.interceptor';
 import { ErrorHandlerService } from '@core/services/error';
 
+// #endregion
+// #region Implementation
 describe('errorInterceptor', () => {
 	let httpClient: HttpClient;
 	let httpMock: HttpTestingController;
@@ -140,3 +143,4 @@ describe('errorInterceptor', () => {
 		);
 	});
 });
+// #endregion

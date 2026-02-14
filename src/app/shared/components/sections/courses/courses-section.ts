@@ -1,6 +1,9 @@
+// #region Imports
 import { Component } from '@angular/core';
 import { Tooltip } from 'primeng/tooltip';
 
+// #endregion
+// #region Implementation
 interface Course {
 	id: number;
 	title: string;
@@ -24,7 +27,7 @@ export class CoursesSectionComponent {
 			id: 1,
 			title: 'Tema 01',
 			duration: '30 minutos',
-			subject: 'Matemáticas',
+			subject: 'MatemÃƒÂ¡ticas',
 			logo: 'images/logos/google.webp',
 			link: 'https://www.tiktok.com/@educa.com/video/7301428896308759814',
 		},
@@ -32,7 +35,7 @@ export class CoursesSectionComponent {
 			id: 2,
 			title: 'Tema 02',
 			duration: '30 minutos',
-			subject: 'Comunicación',
+			subject: 'ComunicaciÃƒÂ³n',
 			logo: 'images/logos/apple.webp',
 			link: 'https://www.tiktok.com/@educa.com/video/7385670015594302725',
 		},
@@ -73,3 +76,4 @@ export class CoursesSectionComponent {
 		}
 	}
 }
+// #endregion

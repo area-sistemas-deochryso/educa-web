@@ -1,3 +1,4 @@
+// #region Styles
 .estadisticas-container {
 	margin-bottom: 1rem;
 	padding: 1rem;
@@ -76,7 +77,7 @@
 	}
 }
 
-// Personalización del menú PDF
+// PersonalizaciÃ³n del menÃº PDF
 ::ng-deep .p-menu {
 	background: var(--intranet-background-color) !important;
 	border: 1px solid #ddd !important;
@@ -110,3 +111,4 @@
 		}
 	}
 }
+// #endregion

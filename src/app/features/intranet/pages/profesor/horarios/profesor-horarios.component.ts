@@ -1,3 +1,4 @@
+// #region Imports
 import { Component, ChangeDetectionStrategy, inject, OnInit, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
@@ -9,6 +10,8 @@ import { ProgressSpinnerModule } from 'primeng/progressspinner';
 import { ProfesorFacade } from '../services/profesor.facade';
 import { HorarioProfesorDto } from '../models';
 
+// #endregion
+// #region Implementation
 interface DiaHorarios {
 	dia: string;
 	horarios: HorarioProfesorDto[];
@@ -52,7 +55,7 @@ interface DiaHorarios {
 							<tr>
 								<th style="width: 150px">Hora</th>
 								<th>Curso</th>
-								<th>Salón</th>
+								<th>SalÃƒÂ³n</th>
 								<th style="width: 100px" class="text-center">Estudiantes</th>
 								<th style="width: 80px" class="text-center">Acciones</th>
 							</tr>
@@ -119,3 +122,4 @@ export class ProfesorHorariosComponent implements OnInit {
 		});
 	}
 }
+// #endregion

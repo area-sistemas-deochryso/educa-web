@@ -1,3 +1,4 @@
+// #region Styles
 .month-card {
 	background: var(--intranet-background-color, white);
 	border-radius: 20px;
@@ -162,7 +163,7 @@
 	}
 }
 
-// Hover azul grupal para días del mismo evento
+// Hover azul grupal para dÃ­as del mismo evento
 :host([data-hovered-event]) {
 	.day-cell[data-event] {
 		background: rgba(37, 52, 112, 0.15);
@@ -180,3 +181,4 @@
 		}
 	}
 }
+// #endregion

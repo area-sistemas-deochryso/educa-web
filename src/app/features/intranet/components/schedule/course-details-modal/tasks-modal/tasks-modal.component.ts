@@ -1,8 +1,11 @@
+// #region Imports
 import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { DialogModule } from 'primeng/dialog';
 import { logger } from '@core/helpers';
 
+// #endregion
+// #region Implementation
 export interface Task {
 	id: number;
 	title: string;
@@ -28,7 +31,7 @@ export class TasksModalComponent {
 	tasks: Task[] = [
 		{
 			id: 1,
-			title: 'Ejercicios del capítulo 3',
+			title: 'Ejercicios del capÃƒÂ­tulo 3',
 			description: 'Resolver los ejercicios 1 al 15 del libro de texto',
 			dueDate: '25/01/2026',
 			status: 'pending',
@@ -37,7 +40,7 @@ export class TasksModalComponent {
 		{
 			id: 2,
 			title: 'Ensayo sobre el tema principal',
-			description: 'Redactar un ensayo de 500 palabras mínimo',
+			description: 'Redactar un ensayo de 500 palabras mÃƒÂ­nimo',
 			dueDate: '28/01/2026',
 			status: 'pending',
 			isRead: false,
@@ -74,8 +77,8 @@ export class TasksModalComponent {
 
 		if (diffDays < 0) return 'Vencido';
 		if (diffDays === 0) return 'Hoy';
-		if (diffDays === 1) return 'Mañana';
-		return `${diffDays} días`;
+		if (diffDays === 1) return 'MaÃƒÂ±ana';
+		return `${diffDays} dÃƒÂ­as`;
 	}
 
 	markAsRead(task: Task): void {
@@ -88,3 +91,4 @@ export class TasksModalComponent {
 		logger.log('Abriendo tarea:', task.title);
 	}
 }
+// #endregion

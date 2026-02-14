@@ -1,3 +1,4 @@
+// #region Imports
 import {
 	ChangeDetectionStrategy,
 	Component,
@@ -12,6 +13,8 @@ import { ButtonModule } from 'primeng/button';
 import { AvatarModule } from 'primeng/avatar';
 import { UserProfileService } from '@core/services';
 
+// #endregion
+// #region Implementation
 @Component({
 	selector: 'app-user-profile-menu',
 	standalone: true,
@@ -57,3 +60,4 @@ export class UserProfileMenuComponent {
 		this.logoutClick.emit();
 	}
 }
+// #endregion

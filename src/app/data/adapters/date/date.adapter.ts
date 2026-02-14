@@ -1,9 +1,12 @@
+// #region Imports
 import { BaseAdapter, BaseBidirectionalAdapter } from '../base/base.adapter';
 import { Injectable, inject } from '@angular/core';
 
 /**
  * Adapter para transformar fechas ISO a Date de JavaScript
  */
+// #endregion
+// #region Implementation
 @Injectable({
 	providedIn: 'root',
 })
@@ -26,14 +29,14 @@ export interface FormattedDate {
 	iso: string;
 	short: string; // 22/01/2026
 	long: string; // 22 de enero de 2026
-	relative: string; // hace 2 días, mañana, etc.
-	dayName: string; // Miércoles
+	relative: string; // hace 2 dÃƒÂ­as, maÃƒÂ±ana, etc.
+	dayName: string; // MiÃƒÂ©rcoles
 	monthName: string; // Enero
 	time: string; // 14:30
 }
 
 /**
- * Adapter para transformar Date a FormattedDate con múltiples formatos
+ * Adapter para transformar Date a FormattedDate con mÃƒÂºltiples formatos
  */
 @Injectable({
 	providedIn: 'root',
@@ -93,13 +96,13 @@ export class DateFormatAdapter extends BaseAdapter<Date, FormattedDate> {
 		if (diffDays === 0) {
 			return 'Hoy';
 		} else if (diffDays === 1) {
-			return 'Mañana';
+			return 'MaÃƒÂ±ana';
 		} else if (diffDays === -1) {
 			return 'Ayer';
 		} else if (diffDays > 1 && diffDays <= 7) {
-			return `En ${diffDays} días`;
+			return `En ${diffDays} dÃƒÂ­as`;
 		} else if (diffDays < -1 && diffDays >= -7) {
-			return `Hace ${Math.abs(diffDays)} días`;
+			return `Hace ${Math.abs(diffDays)} dÃƒÂ­as`;
 		} else if (diffDays > 7) {
 			return `En ${Math.floor(diffDays / 7)} semanas`;
 		} else {
@@ -126,3 +129,4 @@ export class IsoToFormattedDateAdapter extends BaseAdapter<string, FormattedDate
 		return this.formatAdapter.adapt(date);
 	}
 }
+// #endregion

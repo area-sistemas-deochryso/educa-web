@@ -9,11 +9,11 @@ import { AttendanceMonthData } from './storage.models';
  * Ideal para:
  * - Preferencias de usuario (tema, idioma, configuraciones)
  * - Selecciones que deben recordarse entre sesiones
- * - Datos pequeños que no son sensibles
+ * - Datos pequeÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â±os que no son sensibles
  *
  * Usa localStorage porque:
  * - Las preferencias deben persistir al cerrar el navegador
- * - Se comparten entre pestañas (consistencia de preferencias)
+ * - Se comparten entre pestaÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â±as (consistencia de preferencias)
  * - Son datos no sensibles
  */
 
@@ -51,9 +51,7 @@ export class PreferencesStorageService {
 		return isPlatformBrowser(this.platformId);
 	}
 
-	// ============================================
-	// Métodos genéricos privados
-	// ============================================
+	// #region MÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â©todos genÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â©ricos privados
 
 	private getItem(key: string): string | null {
 		if (!this.isBrowser) return null;
@@ -88,9 +86,8 @@ export class PreferencesStorageService {
 		}
 	}
 
-	// ============================================
-	// ATTENDANCE - Preferencias de asistencia
-	// ============================================
+	// #endregion
+	// #region ATTENDANCE - Preferencias de asistencia
 
 	getAttendanceMonth(): AttendanceMonthData | null {
 		return this.getJSON<AttendanceMonthData>(PREFERENCES_KEYS.ATTENDANCE_MONTH);
@@ -178,9 +175,8 @@ export class PreferencesStorageService {
 		this.clearSelectedEstudianteDirectorId();
 	}
 
-	// ============================================
-	// UI PREFERENCES - Preferencias de interfaz
-	// ============================================
+	// #endregion
+	// #region UI PREFERENCES - Preferencias de interfaz
 
 	getTheme(): ThemePreference {
 		return (this.getItem(PREFERENCES_KEYS.THEME) as ThemePreference) || 'system';
@@ -207,9 +203,8 @@ export class PreferencesStorageService {
 		this.setItem(PREFERENCES_KEYS.NOTIFICATIONS_SOUND, enabled.toString());
 	}
 
-	// ============================================
-	// UTILIDADES
-	// ============================================
+	// #endregion
+	// #region UTILIDADES
 
 	clearAll(): void {
 		this.clearAttendancePreferences();
@@ -217,4 +212,5 @@ export class PreferencesStorageService {
 		this.removeItem(PREFERENCES_KEYS.SIDEBAR_COLLAPSED);
 		this.removeItem(PREFERENCES_KEYS.NOTIFICATIONS_SOUND);
 	}
+	// #endregion
 }

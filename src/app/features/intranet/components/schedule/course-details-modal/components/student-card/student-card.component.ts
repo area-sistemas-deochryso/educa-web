@@ -1,6 +1,9 @@
+// #region Imports
 import { Component, Input } from '@angular/core';
 import { CommonModule } from '@angular/common';
 
+// #endregion
+// #region Implementation
 @Component({
 	selector: 'app-student-card',
 	standalone: true,
@@ -13,8 +16,5 @@ export class StudentCardComponent {
 	@Input() lastName = '';
 	@Input() firstName = '';
 
-	get formattedName(): string {
-		// * Insert line break between last and first names.
-		return `${this.lastName}<br />${this.firstName}`;
-	}
 }
+// #endregion

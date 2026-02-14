@@ -1,4 +1,5 @@
-// !!!!! NO BORRAR ESTE ARCHIVO JAMÁS
+// #region Implementation
+// !!!!! NO BORRAR ESTE ARCHIVO JAMÃS
 
 const fs = require('fs');
 const path = require('path');
@@ -74,7 +75,7 @@ const loaderMarkup = `
 
   <div id="boot-loader" class="boot-loader">
     <div class="spinner"></div>
-    <div class="text" aria-live="polite">Cargando…</div>
+    <div class="text" aria-live="polite">Cargandoâ€¦</div>
   </div>
 
   <script>
@@ -104,3 +105,4 @@ const out = html.replace(/<app-root[\s\S]*?<\/app-root>/, loaderMarkup);
 
 fs.writeFileSync(loaderPath, out, 'utf8');
 console.log('[make-loader] Generado:', loaderPath);
+// #endregion

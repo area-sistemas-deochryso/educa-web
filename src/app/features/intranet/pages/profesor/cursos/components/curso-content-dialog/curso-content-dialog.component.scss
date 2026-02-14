@@ -1,4 +1,4 @@
-// ============ Dialog overrides ============
+// #region Dialog overrides
 :host ::ng-deep {
 	.p-dialog {
 		border-radius: 10px;
@@ -49,12 +49,14 @@
 	}
 }
 
-// ============ Modal content wrapper ============
+// #endregion
+// #region Modal content wrapper
 .modal-body {
 	padding: 1.5rem 2rem 2rem;
 }
 
-// ============ Layout 2 columnas ============
+// #endregion
+// #region Layout 2 columnas
 .content-layout {
 	display: flex;
 	gap: 2rem;
@@ -67,7 +69,8 @@
 	max-height: 68vh;
 }
 
-// ============ Sidebar derecha ============
+// #endregion
+// #region Sidebar derecha
 .info-column {
 	width: 220px;
 	border-left: 1px solid #ddd;
@@ -111,7 +114,8 @@
 	border: none;
 }
 
-// ============ Stats pills ============
+// #endregion
+// #region Stats pills
 .info-stats {
 	display: flex;
 	gap: 0.75rem;
@@ -138,7 +142,8 @@
 	}
 }
 
-// ============ Danger action ============
+// #endregion
+// #region Danger action
 .danger-link {
 	display: flex;
 	align-items: center;
@@ -161,7 +166,8 @@
 	}
 }
 
-// ============ Search box (estilo schedule) ============
+// #endregion
+// #region Search box (estilo schedule)
 .search-box {
 	display: flex;
 	align-items: center;
@@ -190,13 +196,15 @@
 	}
 }
 
-// ============ Weeks accordion container ============
+// #endregion
+// #region Weeks accordion container
 .weeks-accordion {
 	border: 1px solid #ddd;
 	border-radius: 4px;
 }
 
-// ============ Semana header en accordion ============
+// #endregion
+// #region Semana header en accordion
 .semana-label {
 	display: flex;
 	align-items: center;
@@ -237,7 +245,8 @@
 	}
 }
 
-// ============ Semana content (expanded) ============
+// #endregion
+// #region Semana content (expanded)
 .semana-body {
 	padding: 0 0.5rem;
 }
@@ -289,7 +298,8 @@
 	}
 }
 
-// ============ Content rows (archivos / tareas) ============
+// #endregion
+// #region Content rows (archivos / tareas)
 .content-row {
 	display: flex;
 	gap: 0.75rem;
@@ -378,7 +388,8 @@
 	flex-shrink: 0;
 }
 
-// ============ Section title (ARCHIVOS / TAREAS) ============
+// #endregion
+// #region Section title (ARCHIVOS / TAREAS)
 .section-title-row {
 	display: flex;
 	align-items: center;
@@ -409,7 +420,8 @@
 	font-style: italic;
 }
 
-// ============ Responsive ============
+// #endregion
+// #region Responsive
 @media (max-width: 768px) {
 	.content-layout {
 		flex-direction: column;
@@ -432,3 +444,4 @@
 		padding: 1.25rem;
 	}
 }
+// #endregion

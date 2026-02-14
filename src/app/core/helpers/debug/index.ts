@@ -1,7 +1,23 @@
 // * Debug helper exports.
-import { compileDebugFilter, safeGetLocalStorage } from './debug.filter';
+// #region Imports
+import {
+	compileDebugFilter,
+	safeGetLocalStorage,
+	safeRemoveLocalStorage,
+	safeSetLocalStorage,
+} from './debug.filter';
 import { DbgLevel, DebugConfig, DEBUG_CONFIG } from './debug.type';
 import { DebugService } from './debug.service';
 
-export { compileDebugFilter, safeGetLocalStorage, DEBUG_CONFIG, DebugService };
+// #endregion
+// #region Implementation
+export {
+	compileDebugFilter,
+	safeGetLocalStorage,
+	safeSetLocalStorage,
+	safeRemoveLocalStorage,
+	DEBUG_CONFIG,
+	DebugService,
+};
 export type { DbgLevel, DebugConfig };
+// #endregion

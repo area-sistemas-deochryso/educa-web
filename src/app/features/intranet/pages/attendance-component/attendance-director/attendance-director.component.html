@@ -1,3 +1,4 @@
+<!-- #region Template -->
 <!-- * Shared legend for attendance codes -->
 <app-attendance-legend />
 
@@ -26,7 +27,7 @@
 
 				<span class="pdf-label">
 					@if (tipoReporte() === 'salon') {
-						Reporte del día: {{ view.pdfFecha() | date: 'dd/MM/yyyy' }}
+						Reporte del dÃ­a: {{ view.pdfFecha() | date: 'dd/MM/yyyy' }}
 					} @else {
 						Reporte consolidado
 					}
@@ -76,40 +77,29 @@
 			/>
 		} @else if (!view.loading()) {
 			<!-- ! Empty state after load -->
-			<app-empty-state message="No se encontraron estudiantes en este grado/sección." />
+			<app-empty-state message="No se encontraron estudiantes en este grado/secciÃ³n." />
 		}
 	} @else {
 		<!-- * Day mode list with date picker + PDF options -->
-		<div class="day-mode-container">
-			<!-- Selector de tipo de reporte para modo día -->
-			<div class="pdf-section pdf-section-day">
-				<p-select
-					[options]="tipoReporteOptions"
-					[(ngModel)]="tipoReporte"
-					optionLabel="label"
-					optionValue="value"
-					placeholder="Tipo de reporte"
-					appendTo="body"
-					class="tipo-reporte-selector"
-				/>
-			</div>
-
-			<app-asistencia-dia-list
-				[estudiantes]="view.estudiantesDia()"
-				[fecha]="view.fechaDia()"
-				[estadisticas]="view.estadisticasDia()"
-				[loading]="view.loading()"
-				[showPdfButton]="true"
-				[downloadingPdf]="tipoReporte() === 'salon' ? view.downloadingPdf() : downloadingPdfConsolidado()"
-				[pdfMenuItems]="pdfMenuItems()"
-				[allowJustify]="true"
-				[savingJustificacion]="savingJustificacion()"
-				(fechaChange)="view.onFechaDiaChange($event)"
-				(justificar)="onJustificar($event)"
-			/>
-		</div>
+		<app-asistencia-dia-list
+			[estudiantes]="view.estudiantesDia()"
+			[fecha]="view.fechaDia()"
+			[estadisticas]="view.estadisticasDia()"
+			[loading]="view.loading()"
+			[showPdfButton]="true"
+			[downloadingPdf]="tipoReporte() === 'salon' ? view.downloadingPdf() : downloadingPdfConsolidado()"
+			[pdfMenuItems]="pdfMenuItems()"
+			[tipoReporteOptions]="tipoReporteOptions"
+			[tipoReporte]="tipoReporte()"
+			(tipoReporteChange)="tipoReporte.set($any($event))"
+			[allowJustify]="true"
+			[savingJustificacion]="savingJustificacion()"
+			(fechaChange)="view.onFechaDiaChange($event)"
+			(justificar)="onJustificar($event)"
+		/>
 	}
 } @else if (!view.loading()) {
 	<!-- ! No available grade/section data -->
 	<app-empty-state message="No hay grados/secciones disponibles." />
 }
+<!-- #endregion -->

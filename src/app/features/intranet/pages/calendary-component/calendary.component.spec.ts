@@ -1,8 +1,11 @@
+// #region Imports
 import { describe, it, expect, beforeEach } from 'vitest';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { testProviders } from '@test';
 import { CalendaryComponent } from './calendary.component';
 
+// #endregion
+// #region Implementation
 describe('CalendaryComponent', () => {
 	let component: CalendaryComponent;
 	let fixture: ComponentFixture<CalendaryComponent>;
@@ -53,3 +56,4 @@ describe('CalendaryComponent', () => {
 		expect(component.modalData()).toBeNull();
 	});
 });
+// #endregion

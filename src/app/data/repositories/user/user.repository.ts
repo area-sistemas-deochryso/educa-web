@@ -1,9 +1,12 @@
+// #region Imports
 import { Observable, catchError, map, of } from 'rxjs';
 
 import { BaseRepository } from '../base/base.repository';
 import { Injectable } from '@angular/core';
 import { logger } from '@core/helpers';
 
+// #endregion
+// #region Implementation
 export interface User {
 	id: number;
 	dni: string;
@@ -79,3 +82,4 @@ export class UserRepository extends BaseRepository<User, CreateUserDto, UpdateUs
 		);
 	}
 }
+// #endregion

@@ -1,3 +1,4 @@
+// #region Imports
 import {
 	AfterViewInit,
 	Component,
@@ -15,6 +16,8 @@ import { CommonModule } from '@angular/common';
 import { VoiceRecognitionService, KeyboardShortcutsService } from '@core/services';
 import { logger } from '@core/helpers';
 
+// #endregion
+// #region Implementation
 @Component({
 	selector: 'app-voice-button',
 	standalone: true,
@@ -51,9 +54,9 @@ export class VoiceButtonComponent implements OnInit, AfterViewInit, OnDestroy {
 		'control',
 	];
 	categoryLabels: Record<VoiceCommandCategory, string> = {
-		navigation: 'Navegación',
+		navigation: 'NavegaciÃƒÂ³n',
 		scroll: 'Scroll',
-		pagination: 'Paginación',
+		pagination: 'PaginaciÃƒÂ³n',
 		modal: 'Modales',
 		date: 'Fechas',
 		control: 'Control',
@@ -182,7 +185,8 @@ export class VoiceButtonComponent implements OnInit, AfterViewInit, OnDestroy {
 	}
 
 	getCommandPatterns(patterns: string[]): string {
-		// Mostrar solo el primer patrón de forma legible
+		// Mostrar solo el primer patrÃƒÂ³n de forma legible
 		return patterns[0].replace(/\(.*?\)/g, '...').replace(/\\/g, '');
 	}
 }
+// #endregion

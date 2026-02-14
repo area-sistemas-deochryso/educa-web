@@ -1,4 +1,4 @@
-<!-- ============ Dialog principal de contenido ============ -->
+<!-- #region Dialog principal de contenido -->
 <p-dialog
 	[visible]="vm().contentDialogVisible"
 	(visibleChange)="onVisibleChange($event)"
@@ -11,7 +11,8 @@
 	@if (vm().contenido; as contenido) {
 		<div class="modal-body">
 			<div class="content-layout">
-				<!-- ============ Columna izquierda: Semanas ============ -->
+<!-- #endregion -->
+				<!-- #region Columna izquierda: Semanas -->
 				<div class="semanas-column">
 					<!-- Search box (estilo schedule) -->
 					<div class="search-box">
@@ -39,7 +40,7 @@
 												<div class="semana-label">
 													<span class="semana-number">Semana {{ semana.numeroSemana }}</span>
 													@if (semana.titulo) {
-														<span class="semana-titulo">— {{ semana.titulo }}</span>
+														<span class="semana-titulo">ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â {{ semana.titulo }}</span>
 													}
 												</div>
 												<div class="semana-badges">
@@ -60,7 +61,7 @@
 										</p-accordionheader>
 										<p-accordioncontent>
 											<div class="semana-body">
-												<!-- Descripción -->
+												<!-- DescripciÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â³n -->
 												@if (semana.descripcion) {
 													<p class="semana-desc">{{ semana.descripcion }}</p>
 												}
@@ -82,7 +83,8 @@
 													Editar semana
 												</button>
 
-												<!-- ============ Archivos ============ -->
+				<!-- #endregion -->
+												<!-- #region Archivos -->
 												<div class="section-title-row">
 													<div class="section-label">
 														<i class="pi pi-paperclip"></i>
@@ -138,7 +140,8 @@
 													}
 												}
 
-												<!-- ============ Tareas ============ -->
+												<!-- #endregion -->
+												<!-- #region Tareas -->
 												<div class="section-title-row" style="margin-top: 0.5rem">
 													<div class="section-label">
 														<i class="pi pi-file-edit"></i>
@@ -210,16 +213,17 @@
 					}
 				</div>
 
-				<!-- ============ Columna derecha: Info sidebar ============ -->
+												<!-- #endregion -->
+				<!-- #region Columna derecha: Info sidebar -->
 				<div class="info-column">
-					<p class="info-section-title">Información</p>
+					<p class="info-section-title">InformaciÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â³n</p>
 
 					<div class="info-field">
 						<p class="info-field-label">Curso</p>
 						<p class="info-field-value">{{ contenido.cursoNombre }}</p>
 					</div>
 					<div class="info-field">
-						<p class="info-field-label">Salón</p>
+						<p class="info-field-label">SalÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â³n</p>
 						<p class="info-field-value">{{ contenido.salonDescripcion }}</p>
 					</div>
 					<div class="info-field">
@@ -252,7 +256,8 @@
 	}
 </p-dialog>
 
-<!-- ============ Sub-dialogs ============ -->
+				<!-- #endregion -->
+<!-- #region Sub-dialogs -->
 <app-semana-edit-dialog
 	[visible]="vm().semanaEditDialogVisible"
 	[semana]="vm().selectedSemana"
@@ -271,3 +276,4 @@
 />
 
 <p-confirmDialog />
+<!-- #endregion -->

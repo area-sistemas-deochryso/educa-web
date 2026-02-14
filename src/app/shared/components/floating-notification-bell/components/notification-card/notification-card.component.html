@@ -1,3 +1,4 @@
+<!-- #region Template -->
 <!-- * Notification card with read/unread actions and optional CTA. -->
 <div
 	class="notification-card"
@@ -33,7 +34,7 @@
 				class="notification-action"
 				(click)="onActionClick($event)"
 			>
-				<span>{{ notification.actionText || 'Ver más' }}</span>
+				<span>{{ notification.actionText || 'Ver mÃ¡s' }}</span>
 				<i class="pi pi-arrow-right"></i>
 			</a>
 		}
@@ -44,7 +45,7 @@
 			<button
 				class="notification-mark-read"
 				(click)="onMarkAsRead($event)"
-				title="Marcar como leída"
+				title="Marcar como leÃ­da"
 			>
 				<i class="pi pi-eye"></i>
 			</button>
@@ -52,7 +53,7 @@
 			<button
 				class="notification-mark-unread"
 				(click)="onMarkAsUnread($event)"
-				title="Marcar como no leída"
+				title="Marcar como no leÃ­da"
 			>
 				<i class="pi pi-eye-slash"></i>
 			</button>
@@ -64,3 +65,4 @@
 		}
 	</div>
 </div>
+<!-- #endregion -->

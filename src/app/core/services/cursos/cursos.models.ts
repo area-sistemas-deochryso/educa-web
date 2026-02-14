@@ -1,3 +1,4 @@
+// #region Implementation
 // * Curso DTOs and request shapes.
 export interface Grado {
 	id: number;
@@ -29,3 +30,4 @@ export interface ActualizarCursoRequest {
 export interface ApiResponse {
 	mensaje: string;
 }
+// #endregion

@@ -1,3 +1,4 @@
+<!-- #region Template -->
 <!-- * Voice UI renders only when supported, visible, and secure. -->
 @if (voiceService.isSupported && isVisible() && isSecureContext()) {
 	<div class="voice-container">
@@ -20,7 +21,7 @@
 						class="clear-btn"
 						(click)="clearTranscript()"
 						title="Borrar"
-						aria-label="Borrar transcripción"
+						aria-label="Borrar transcripciÃ³n"
 					>
 						<i class="pi pi-trash"></i>
 					</button>
@@ -56,7 +57,7 @@
 			[style.transform]="isDragging ? 'translateY(-' + dragOffset + 'px)' : ''"
 			[attr.aria-label]="
 				voiceService.isLocked()
-					? 'Micrófono bloqueado, grabando'
+					? 'MicrÃ³fono bloqueado, grabando'
 					: voiceService.isListening()
 						? 'Escuchando comando de voz'
 						: 'Activar comando de voz'
@@ -99,7 +100,7 @@
 		<!-- ? Tooltip shown only when idle. -->
 		@if (!voiceService.isListening() && !voiceService.isLocked() && !voiceService.error()) {
 			<div class="voice-tooltip">
-				Mantén presionado para hablar
+				MantÃ©n presionado para hablar
 				<br />
 				<small>Desliza hacia arriba para bloquear</small>
 			</div>
@@ -119,7 +120,7 @@
 					<button
 						class="close-menu-btn"
 						(click)="closeContextMenu()"
-						aria-label="Cerrar menú de comandos"
+						aria-label="Cerrar menÃº de comandos"
 					>
 						<i class="pi pi-times"></i>
 					</button>
@@ -152,3 +153,4 @@
 		}
 	</div>
 }
+<!-- #endregion -->

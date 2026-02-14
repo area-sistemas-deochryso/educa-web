@@ -1,18 +1,19 @@
+// #region Implementation
 /**
- * Configuración centralizada de atajos de teclado
+ * ConfiguraciÃ³n centralizada de atajos de teclado
  */
 // * Default shortcut definitions for the app.
 
 export type ShortcutCategory = 'visibility' | 'navigation' | 'actions';
 
 export interface KeyboardShortcut {
-	/** Identificador único del atajo */
+	/** Identificador Ãºnico del atajo */
 	id: string;
 	/** Teclas del atajo (ej: 'Ctrl+Shift+N') */
 	keys: string;
-	/** Descripción del atajo */
+	/** DescripciÃ³n del atajo */
 	description: string;
-	/** Categoría del atajo */
+	/** CategorÃ­a del atajo */
 	category: ShortcutCategory;
 	/** Si requiere Ctrl */
 	ctrl: boolean;
@@ -20,7 +21,7 @@ export interface KeyboardShortcut {
 	shift: boolean;
 	/** Si requiere Alt */
 	alt: boolean;
-	/** Código de tecla (event.key o event.code) */
+	/** CÃ³digo de tecla (event.key o event.code) */
 	key: string;
 	/** Usar event.code en lugar de event.key */
 	useCode?: boolean;
@@ -30,7 +31,7 @@ export const KEYBOARD_SHORTCUTS: KeyboardShortcut[] = [
 	{
 		id: 'toggle-voice-button',
 		keys: 'Alt+V',
-		description: 'Mostrar/ocultar botón de voz',
+		description: 'Mostrar/ocultar botÃ³n de voz',
 		category: 'visibility',
 		ctrl: false,
 		shift: false,
@@ -53,6 +54,7 @@ export const KEYBOARD_SHORTCUTS: KeyboardShortcut[] = [
 
 export const CATEGORY_LABELS: Record<ShortcutCategory, string> = {
 	visibility: 'Visibilidad',
-	navigation: 'Navegación',
+	navigation: 'NavegaciÃ³n',
 	actions: 'Acciones',
 };
+// #endregion

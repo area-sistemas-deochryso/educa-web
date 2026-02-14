@@ -1,7 +1,10 @@
+// #region Imports
 import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterLink } from '@angular/router';
 
+// #endregion
+// #region Implementation
 @Component({
 	selector: 'app-notifications-footer',
 	imports: [CommonModule, RouterLink],
@@ -21,3 +24,4 @@ export class NotificationsFooterComponent {
 		this.linkClick.emit();
 	}
 }
+// #endregion

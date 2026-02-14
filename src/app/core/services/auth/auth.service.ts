@@ -1,3 +1,4 @@
+// #region Imports
 import {
 	AuthUser,
 	LoginRequest,
@@ -14,6 +15,8 @@ import { StorageService } from '../storage';
 import { environment } from '@env/environment';
 import { UI_AUTH_MESSAGES } from '@app/shared/constants';
 
+// #endregion
+// #region Implementation
 @Injectable({
 	providedIn: 'root',
 })
@@ -69,7 +72,7 @@ export class AuthService {
 
 	/**
 	 * Login usando el endpoint POST /api/Auth/login
-	 * @param rememberMe Si es true, la sesión persiste al cerrar el navegador
+	 * @param rememberMe Si es true, la sesiÃƒÂ³n persiste al cerrar el navegador
 	 */
 	login(
 		dni: string,
@@ -90,7 +93,7 @@ export class AuthService {
 
 		const request: LoginRequest = {
 			dni: dni,
-			contraseña: password,
+			contraseÃƒÂ±a: password,
 			rol: rol,
 		};
 
@@ -125,8 +128,8 @@ export class AuthService {
 			sedeId: response.sedeId,
 		};
 
-		// Guardar según la preferencia de "recordar sesión"
-		// Pasar nombreCompleto y rol para generar la clave de sesión única
+		// Guardar segÃƒÂºn la preferencia de "recordar sesiÃƒÂ³n"
+		// Pasar nombreCompleto y rol para generar la clave de sesiÃƒÂ³n ÃƒÂºnica
 		this.storage.setToken(response.token, rememberMe, response.nombreCompleto, response.rol);
 		this.storage.setUser(user, rememberMe);
 
@@ -158,7 +161,7 @@ export class AuthService {
 	}
 
 	/**
-	 * Verificar si el token es válido obteniendo el perfil
+	 * Verificar si el token es vÃƒÂ¡lido obteniendo el perfil
 	 */
 	verifyToken(): Observable<boolean> {
 		if (!this.token) {
@@ -202,7 +205,7 @@ export class AuthService {
 			})
 			.pipe(
 				catchError(() => {
-					// Si el token es inválido, limpiarlo
+					// Si el token es invÃƒÂ¡lido, limpiarlo
 					this.storage.clearRememberToken();
 					return of(null);
 				}),
@@ -211,7 +214,7 @@ export class AuthService {
 
 	/**
 	 * Verifica los tokens persistentes guardados para autocompletado
-	 * Retorna un array con la información de cada usuario verificado
+	 * Retorna un array con la informaciÃƒÂ³n de cada usuario verificado
 	 */
 	verifyAllStoredTokens(): Observable<VerifyTokenResponse[]> {
 		const persistentTokens = this.storage.getAllPersistentTokens();
@@ -233,3 +236,4 @@ export class AuthService {
 		);
 	}
 }
+// #endregion

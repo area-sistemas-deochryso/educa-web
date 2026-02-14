@@ -1,3 +1,4 @@
+<!-- #region Template -->
 <p-dialog
 	[visible]="visible()"
 	(visibleChange)="onVisibleChange($event)"
@@ -67,7 +68,7 @@
 				/>
 				<app-form-field-error [error]="errors().dniError" />
 			</div>
-			<!-- ! Contraseña puede ser autogenerada o editable según rol -->
+			<!-- ! ContraseÃ±a puede ser autogenerada o editable segÃºn rol -->
 			<div class="field">
 				<label for="contrasena" class="password-label">
 					@if (!isEditing() || !canEditPassword()) {
@@ -82,7 +83,7 @@
 							style="color: var(--green-500); margin-right: 0.5rem"
 						></i>
 					}
-					Contraseña
+					ContraseÃ±a
 					@if (!isEditing() || !canEditPassword()) {
 						<span>(autogenerada)</span>
 					}
@@ -97,19 +98,19 @@
 					[feedback]="false"
 					[style]="{ width: '100%' }"
 					[inputStyle]="{ width: '100%' }"
-					placeholder="Se generará automáticamente"
+					placeholder="Se generarÃ¡ automÃ¡ticamente"
 				></p-password>
 
 				@if (!isEditing() || !canEditPassword()) {
 					<small class="text-muted">
 						<i class="pi pi-info-circle" style="margin-right: 0.25rem"></i>
-						La contraseña se genera automáticamente
+						La contraseÃ±a se genera automÃ¡ticamente
 					</small>
 				}
 				@if (isEditing() && canEditPassword()) {
 					<small class="text-muted">
 						<i class="pi pi-info-circle" style="margin-right: 0.25rem"></i>
-						Puede editar la contraseña
+						Puede editar la contraseÃ±a
 					</small>
 				}
 			</div>
@@ -200,7 +201,7 @@
 					<app-form-field-error [error]="errors().correoApoderadoError" />
 				</div>
 			}
-			<!-- SALÓN (Grado) - Profesor y Estudiante -->
+			<!-- SALÃ“N (Grado) - Profesor y Estudiante -->
 			@if (needsSalon) {
 				<div class="field">
 					<label for="grado">Grado</label>
@@ -216,23 +217,23 @@
 					/>
 				</div>
 			}
-			<!-- SALÓN (Sección) - Profesor y Estudiante -->
+			<!-- SALÃ“N (SecciÃ³n) - Profesor y Estudiante -->
 			@if (needsSalon && _gradoSeleccionado()) {
 				<div class="field">
-					<label for="seccion">Sección</label>
+					<label for="seccion">SecciÃ³n</label>
 					<p-select
 						id="seccion"
 						[options]="seccionesOptions()"
 						[ngModel]="_seccionSeleccionada()"
 						(ngModelChange)="onSeccionChange($event)"
-						placeholder="Seleccione la sección"
+						placeholder="Seleccione la secciÃ³n"
 						[style]="{ width: '100%' }"
 						[showClear]="true"
 						appendTo="body"
 					/>
 					<small class="text-muted">
 						<i class="pi pi-info-circle" style="margin-right: 0.25rem"></i>
-						Opcional: Asigne un salón al {{ isProfesor ? 'profesor' : 'estudiante' }}
+						Opcional: Asigne un salÃ³n al {{ isProfesor ? 'profesor' : 'estudiante' }}
 					</small>
 				</div>
 			}
@@ -247,12 +248,12 @@
 							(ngModelChange)="onFieldChange('esTutor', $event)"
 						/>
 						<label for="esTutor" class="checkbox-label">
-							Es tutor de este salón
+							Es tutor de este salÃ³n
 						</label>
 					</div>
 					<small class="text-muted">
 						<i class="pi pi-info-circle" style="margin-right: 0.25rem"></i>
-						Marque si el profesor será tutor del salón seleccionado
+						Marque si el profesor serÃ¡ tutor del salÃ³n seleccionado
 					</small>
 				</div>
 			}
@@ -305,3 +306,4 @@
 		</div>
 	</ng-template>
 </p-dialog>
+<!-- #endregion -->

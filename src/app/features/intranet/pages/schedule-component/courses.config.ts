@@ -1,6 +1,7 @@
+// #region Implementation
 /**
- * Configuración centralizada de cursos para el módulo de horarios.
- * Contiene toda la información relevante de cada curso.
+ * ConfiguraciÃ³n centralizada de cursos para el mÃ³dulo de horarios.
+ * Contiene toda la informaciÃ³n relevante de cada curso.
  */
 
 export interface CourseSchedule {
@@ -25,21 +26,21 @@ export interface CourseInfo {
  * Lista de nombres de cursos disponibles
  */
 export const COURSE_NAMES: string[] = [
-	'Matemáticas Avanzadas',
-	'Física General',
-	'Química Orgánica',
-	'Historia del Perú',
+	'MatemÃ¡ticas Avanzadas',
+	'FÃ­sica General',
+	'QuÃ­mica OrgÃ¡nica',
+	'Historia del PerÃº',
 	'Literatura Universal',
 ];
 
 /**
- * Información completa de cada curso
+ * InformaciÃ³n completa de cada curso
  */
 export const COURSES_CONFIG: CourseInfo[] = [
-	{ name: 'Matemáticas Avanzadas', schedule: '8:00 a.m. - 9:45 a.m.', attendance: 0, grade: 0 },
-	{ name: 'Física General', schedule: '10:00 a.m. - 11:45 a.m.', attendance: 20, grade: 20 },
-	{ name: 'Química Orgánica', schedule: '12:00 p.m. - 12:45 p.m.', attendance: 0, grade: 4 },
-	{ name: 'Historia del Perú', schedule: '1:00 p.m. - 2:45 p.m.', attendance: 20, grade: 20 },
+	{ name: 'MatemÃ¡ticas Avanzadas', schedule: '8:00 a.m. - 9:45 a.m.', attendance: 0, grade: 0 },
+	{ name: 'FÃ­sica General', schedule: '10:00 a.m. - 11:45 a.m.', attendance: 20, grade: 20 },
+	{ name: 'QuÃ­mica OrgÃ¡nica', schedule: '12:00 p.m. - 12:45 p.m.', attendance: 0, grade: 4 },
+	{ name: 'Historia del PerÃº', schedule: '1:00 p.m. - 2:45 p.m.', attendance: 20, grade: 20 },
 	{ name: 'Literatura Universal', schedule: '3:00 p.m. - 5:00 p.m.', attendance: 0, grade: 16 },
 ];
 
@@ -63,3 +64,4 @@ export function getCourseSummaries(): CourseSummary[] {
 		grade: course.grade,
 	}));
 }
+// #endregion

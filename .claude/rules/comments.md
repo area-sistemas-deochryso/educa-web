@@ -381,15 +381,19 @@ export class UsersFacade {
 
 ### Separadores de sección
 
+**PREFERIR `// #region`** en lugar de `// ============`. Ver `@.claude/rules/regions.md` para regiones colapsables.
+
 ```typescript
-// ============ Nombre de la sección ============
+// #region Nombre de la sección
+// ... código ...
+// #endregion
 ```
 
 **Usar para**:
 
 - Agrupar bloques lógicos grandes
 - Separar responsabilidades distintas
-- Facilitar navegación rápida
+- Facilitar navegación rápida (colapsable en VS Code)
 
 ### Comentarios inline
 
@@ -590,7 +594,7 @@ Antes de commitear, verifica:
 
 | Tipo | Cuándo usar |
 |------|-------------|
-| `// ============` | Separadores de sección |
+| `// #region` | Separadores de sección colapsables (preferido) |
 | `// Comentario` | Explicar "por qué" inline |
 | `/** JSDoc */` | Documentar APIs públicas |
 | ❌ Nada | Código auto-explicativo |

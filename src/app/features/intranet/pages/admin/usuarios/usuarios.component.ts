@@ -1,3 +1,4 @@
+// #region Imports
 import { AfterViewInit, ChangeDetectionStrategy, Component, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ConfirmDialogModule } from 'primeng/confirmdialog';
@@ -25,6 +26,8 @@ import {
 	buildToggleUsuarioMessage,
 } from '@app/shared/constants';
 
+// #endregion
+// #region Implementation
 @Component({
 	selector: 'app-usuarios',
 	standalone: true,
@@ -87,7 +90,7 @@ export class UsuariosComponent implements OnInit, AfterViewInit {
 
 	ngAfterViewInit(): void {
 		// * Fix aria label after confirm dialog renders.
-		this.fixConfirmDialogAria('Confirmación');
+		this.fixConfirmDialogAria('ConfirmaciÃƒÆ’Ã‚Â³n');
 	}
 
 	onRefresh(): void {
@@ -191,3 +194,4 @@ export class UsuariosComponent implements OnInit, AfterViewInit {
 		});
 	}
 }
+// #endregion

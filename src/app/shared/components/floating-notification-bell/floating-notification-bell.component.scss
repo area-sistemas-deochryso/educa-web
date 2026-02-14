@@ -1,6 +1,4 @@
-// =============================================================================
-// VARIABLES DE COLORES DE INTRANET
-// =============================================================================
+// #region VARIABLES DE COLORES DE INTRANET
 
 // Colores por prioridad usando variables de intranet
 $priority-urgent: #dc2626; // Rojo urgente
@@ -8,9 +6,8 @@ $priority-high: var(--intranet-accent-color-yellow, #ffcc0c); // Amarillo import
 $priority-medium: var(--intranet-accent-color-blue, #253470); // Azul normal
 $priority-low: var(--intranet-accent-color-green, #77a02d); // Verde info
 
-// =============================================================================
-// ANIMACIONES
-// =============================================================================
+// #endregion
+// #region ANIMACIONES
 
 @keyframes bell-ring {
 	0% {
@@ -139,9 +136,8 @@ $priority-low: var(--intranet-accent-color-green, #77a02d); // Verde info
 	}
 }
 
-// =============================================================================
-// OVERLAY PARA CERRAR EL PANEL
-// =============================================================================
+// #endregion
+// #region OVERLAY PARA CERRAR EL PANEL
 
 .notifications-overlay {
 	position: fixed;
@@ -154,9 +150,8 @@ $priority-low: var(--intranet-accent-color-green, #77a02d); // Verde info
 	backdrop-filter: blur(2px);
 }
 
-// =============================================================================
-// CAMPANA FLOTANTE
-// =============================================================================
+// #endregion
+// #region CAMPANA FLOTANTE
 
 .notification-bell-container {
 	position: fixed;
@@ -313,9 +308,8 @@ $priority-low: var(--intranet-accent-color-green, #77a02d); // Verde info
 	}
 }
 
-// =============================================================================
-// NOTIFICACIONES SECTION
-// =============================================================================
+// #endregion
+// #region NOTIFICACIONES SECTION
 
 .notifications-section {
 	position: fixed;
@@ -390,9 +384,8 @@ $priority-low: var(--intranet-accent-color-green, #77a02d); // Verde info
 	}
 }
 
-// =============================================================================
-// RESUMEN DE PRIORIDADES
-// =============================================================================
+// #endregion
+// #region RESUMEN DE PRIORIDADES
 
 .priority-summary {
 	display: flex;
@@ -519,9 +512,8 @@ $priority-low: var(--intranet-accent-color-green, #77a02d); // Verde info
 	}
 }
 
-// =============================================================================
-// LISTA DE NOTIFICACIONES
-// =============================================================================
+// #endregion
+// #region LISTA DE NOTIFICACIONES
 
 .notifications-list {
 	display: flex;
@@ -547,7 +539,7 @@ $priority-low: var(--intranet-accent-color-green, #77a02d); // Verde info
 		box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
 	}
 
-	// Estado leído
+	// Estado leÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â­do
 	&.is-read {
 		opacity: 0.7;
 		background: var(--intranet-background-color, #f5f5f5);
@@ -557,7 +549,7 @@ $priority-low: var(--intranet-accent-color-green, #77a02d); // Verde info
 		}
 	}
 
-	// Estado no leído
+	// Estado no leÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â­do
 	&.is-unread {
 		background: white;
 		box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
@@ -626,7 +618,7 @@ $priority-low: var(--intranet-accent-color-green, #77a02d); // Verde info
 	}
 }
 
-// Punto de no leído con colores por prioridad
+// Punto de no leÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â­do con colores por prioridad
 .unread-dot {
 	position: absolute;
 	top: 1rem;
@@ -867,9 +859,8 @@ $priority-low: var(--intranet-accent-color-green, #77a02d); // Verde info
 	}
 }
 
-// =============================================================================
-// SECCIÓN DE DESCARTADAS
-// =============================================================================
+// #endregion
+// #region SECCIÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã…â€œN DE DESCARTADAS
 
 .dismissed-section {
 	margin-top: 1.5rem;
@@ -1044,9 +1035,8 @@ $priority-low: var(--intranet-accent-color-green, #77a02d); // Verde info
 	}
 }
 
-// =============================================================================
-// ESTADO VACÍO
-// =============================================================================
+// #endregion
+// #region ESTADO VACÃƒÆ’Ã†â€™Ãƒâ€šÃ‚ÂO
 
 .notifications-empty {
 	display: flex;
@@ -1069,9 +1059,8 @@ $priority-low: var(--intranet-accent-color-green, #77a02d); // Verde info
 	}
 }
 
-// =============================================================================
-// FOOTER CON LINK A INTRANET
-// =============================================================================
+// #endregion
+// #region FOOTER CON LINK A INTRANET
 
 .notifications-footer {
 	margin-top: 1.5rem;
@@ -1105,9 +1094,8 @@ $priority-low: var(--intranet-accent-color-green, #77a02d); // Verde info
 	}
 }
 
-// =============================================================================
-// CONTEXT MENU DE COLORES
-// =============================================================================
+// #endregion
+// #region CONTEXT MENU DE COLORES
 
 .bell-context-menu {
 	position: fixed;
@@ -1232,9 +1220,8 @@ $priority-low: var(--intranet-accent-color-green, #77a02d); // Verde info
 	line-height: 1.4;
 }
 
-// =============================================================================
-// RESPONSIVE
-// =============================================================================
+// #endregion
+// #region RESPONSIVE
 
 @media (max-width: 768px) {
 	.notification-bell-container {
@@ -1315,3 +1302,4 @@ $priority-low: var(--intranet-accent-color-green, #77a02d); // Verde info
 		gap: 1rem;
 	}
 }
+// #endregion

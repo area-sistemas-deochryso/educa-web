@@ -177,7 +177,7 @@ export class PermisosRolesComponent implements OnInit {
 			.map((r) => ({ label: r, value: r }));
 	}
 
-	// === Detail Drawer ===
+	// #region Detail Drawer
 	openDetail(permiso: PermisoRol): void {
 		// * Open detail drawer for selected role.
 		this.selectedPermiso.set(permiso);
@@ -188,7 +188,8 @@ export class PermisosRolesComponent implements OnInit {
 		this.detailDrawerVisible.set(false);
 	}
 
-	// === Edit Dialog ===
+	// #endregion
+	// #region Edit Dialog
 	openNew(): void {
 		// * Start a new role permission config.
 		this.selectedPermiso.set(null);
@@ -281,12 +282,13 @@ export class PermisosRolesComponent implements OnInit {
 		}
 	}
 
-	// === Module/Vista helpers ===
+	// #endregion
+	// #region Module/Vista helpers
 	private buildModulosVistas(vistasSeleccionadas: string[]): void {
 		const vistasActivas = this.vistas();
 		const modulosMap = new Map<string, Vista[]>();
 
-		// Agrupar vistas por módulo
+		// Agrupar vistas por mÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Â ÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â³dulo
 		vistasActivas.forEach((vista) => {
 			const modulo = this.adminUtils.getModuloFromRuta(vista.ruta);
 			const moduloCapitalized = modulo.charAt(0).toUpperCase() + modulo.slice(1);
@@ -368,7 +370,8 @@ export class PermisosRolesComponent implements OnInit {
 		this.modulosVistas.set(updated);
 	}
 
-	// === UI Helpers ===
+	// #endregion
+	// #region UI Helpers
 	getVistasCountLabel(): string {
 		return this.adminUtils.getVistasCountLabel(this.selectedVistas().length);
 	}
@@ -407,4 +410,5 @@ export class PermisosRolesComponent implements OnInit {
 		const rolesConfigurados = this.permisosRol().map((p) => p.rol);
 		return this.rolesDisponibles.filter((r) => !rolesConfigurados.includes(r));
 	}
+	// #endregion
 }

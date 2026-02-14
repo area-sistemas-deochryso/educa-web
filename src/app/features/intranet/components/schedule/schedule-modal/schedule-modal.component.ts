@@ -1,3 +1,4 @@
+// #region Imports
 import { Component, EventEmitter, Input, Output, ViewChild } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { DialogModule } from 'primeng/dialog';
@@ -8,6 +9,8 @@ import {
 	getCourseSchedules,
 } from '@features/intranet/pages/schedule-component/courses.config';
 
+// #endregion
+// #region Implementation
 @Component({
 	selector: 'app-schedule-modal',
 	imports: [CommonModule, DialogModule, MenuModule],
@@ -56,3 +59,4 @@ export class ScheduleModalComponent {
 		}
 	}
 }
+// #endregion

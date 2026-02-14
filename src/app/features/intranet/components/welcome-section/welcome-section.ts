@@ -1,5 +1,8 @@
+// #region Imports
 import { ChangeDetectionStrategy, Component, input } from '@angular/core';
 
+// #endregion
+// #region Implementation
 @Component({
 	selector: 'app-welcome-section',
 	standalone: true,
@@ -17,6 +20,7 @@ export class WelcomeSectionComponent {
 
 	// * Supporting subtitle copy.
 	subtitle = input<string>(
-		'Aquí encontrarás toda la información relevante para tu día a día académico.',
+		'AquÃƒÂ­ encontrarÃƒÂ¡s toda la informaciÃƒÂ³n relevante para tu dÃƒÂ­a a dÃƒÂ­a acadÃƒÂ©mico.',
 	);
 }
+// #endregion

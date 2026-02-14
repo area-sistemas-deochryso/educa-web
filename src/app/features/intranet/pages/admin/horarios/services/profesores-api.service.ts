@@ -1,3 +1,4 @@
+// #region Imports
 import { HttpClient } from '@angular/common/http';
 import { inject, Injectable } from '@angular/core';
 import { Observable, of } from 'rxjs';
@@ -6,6 +7,8 @@ import { catchError } from 'rxjs/operators';
 import { environment } from '@config/environment';
 import { ProfesorListDto } from '../models/profesor.interface';
 
+// #endregion
+// #region Implementation
 @Injectable({ providedIn: 'root' })
 export class ProfesoresApiService {
 	private readonly apiUrl = `${environment.apiUrl}/api/profesor`;
@@ -30,3 +33,4 @@ export class ProfesoresApiService {
 			.pipe(catchError(() => of([])));
 	}
 }
+// #endregion

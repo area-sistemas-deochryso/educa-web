@@ -1,3 +1,4 @@
+// #region Imports
 import { AsistenciaDetalle, HijoApoderado, ResumenAsistencia } from '@core/services';
 import { Injectable, inject } from '@angular/core';
 
@@ -6,6 +7,8 @@ import { BaseAdapter } from '../base/base.adapter';
 /**
  * Modelo de vista para una asistencia
  */
+// #endregion
+// #region Implementation
 export interface AsistenciaView {
 	id: number;
 	fecha: Date;
@@ -146,3 +149,4 @@ export class HijoAdapter extends BaseAdapter<HijoApoderado, HijoView> {
 		};
 	}
 }
+// #endregion

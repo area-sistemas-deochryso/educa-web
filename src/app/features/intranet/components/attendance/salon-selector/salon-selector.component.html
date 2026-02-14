@@ -1,6 +1,7 @@
+<!-- #region Template -->
 <div class="salon-selector">
 	<!-- * Simple native select for salon -->
-	<label for="salon-select">Salón:</label>
+	<label for="salon-select">SalÃ³n:</label>
 	<select id="salon-select" (change)="onSalonChange($event)">
 		@for (salon of salones(); track salon.salonId) {
 			<option [value]="salon.salonId" [selected]="salon.salonId === selectedSalonId()">
@@ -15,3 +16,4 @@
 		}
 	</select>
 </div>
+<!-- #endregion -->

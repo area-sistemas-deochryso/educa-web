@@ -9,7 +9,7 @@
 	min-height: calc(100vh - 120px);
 }
 
-// ============ Panel lateral ============
+// #region Panel lateral
 .schedule-sidebar {
 	width: 280px;
 	flex-shrink: 0;
@@ -21,7 +21,8 @@
 	max-height: calc(100vh - 140px);
 }
 
-// ============ Área del mapa ============
+// #endregion
+// #region ÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Ârea del mapa
 .map-area {
 	flex: 1;
 	display: flex;
@@ -37,7 +38,8 @@
 	flex-wrap: wrap;
 }
 
-// ============ Responsive ============
+// #endregion
+// #region Responsive
 @media (max-width: 768px) {
 	.campus-navigation {
 		flex-direction: column;
@@ -54,3 +56,4 @@
 		align-items: stretch;
 	}
 }
+// #endregion

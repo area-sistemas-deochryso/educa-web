@@ -1,9 +1,12 @@
+// #region Imports
 import { describe, it, expect, beforeEach, vi } from 'vitest';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { testProviders } from '@test';
 import { ScheduleComponent } from './schedule.component';
 import { VoiceRecognitionService, StorageService } from '@core/services';
 
+// #endregion
+// #region Implementation
 describe('ScheduleComponent', () => {
 	let component: ScheduleComponent;
 	let fixture: ComponentFixture<ScheduleComponent>;
@@ -73,15 +76,15 @@ describe('ScheduleComponent', () => {
 	});
 
 	it('should open details modal with course', () => {
-		component.openDetailsModal('Matemáticas');
+		component.openDetailsModal('MatemÃƒÂ¡ticas');
 		expect(component.showDetailsModal).toBe(true);
-		expect(component.selectedCourse).toBe('Matemáticas');
+		expect(component.selectedCourse).toBe('MatemÃƒÂ¡ticas');
 	});
 
 	it('should open grades modal with course', () => {
-		component.openGradesModal('Comunicación');
+		component.openGradesModal('ComunicaciÃƒÂ³n');
 		expect(component.showGradesModal).toBe(true);
-		expect(component.selectedCourse).toBe('Comunicación');
+		expect(component.selectedCourse).toBe('ComunicaciÃƒÂ³n');
 	});
 
 	it('should register voice modals on init', () => {
@@ -89,3 +92,4 @@ describe('ScheduleComponent', () => {
 		expect(voiceServiceMock.onCommand).toHaveBeenCalled();
 	});
 });
+// #endregion

@@ -1,6 +1,4 @@
-// =============================================================================
-// FLEXBOX UTILITIES - d-flex, align-items-*, justify-content-*
-// =============================================================================
+// #region FLEXBOX UTILITIES - d-flex, align-items-*, justify-content-*
 
 @use 'sass:map';
 @use '../variables' as *;
@@ -177,3 +175,4 @@
 		}
 	}
 }
+// #endregion

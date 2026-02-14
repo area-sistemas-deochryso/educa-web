@@ -1,19 +1,22 @@
+// #region Imports
 import { Injectable, inject } from '@angular/core';
 import { Vista } from '@core/services';
 import { AdminUtilsService } from '@shared/services';
 import { ModuloVistas } from './permisos-usuarios.store';
 
+// #endregion
+// #region Implementation
 @Injectable({ providedIn: 'root' })
 export class PermisosUsuariosHelperService {
 	private adminUtils = inject(AdminUtilsService);
 
 	/**
-	 * Construye la estructura de módulos agrupando vistas y calculando selecciones
+	 * Construye la estructura de mÃƒÂ³dulos agrupando vistas y calculando selecciones
 	 */
 	buildModulosVistas(vistasActivas: Vista[], vistasSeleccionadas: string[]): ModuloVistas[] {
 		const modulosMap = new Map<string, Vista[]>();
 
-		// Agrupar vistas por módulo
+		// Agrupar vistas por mÃƒÂ³dulo
 		vistasActivas.forEach((vista) => {
 			const modulo = this.adminUtils.getModuloFromRuta(vista.ruta);
 			const moduloCapitalized = modulo.charAt(0).toUpperCase() + modulo.slice(1);
@@ -36,7 +39,7 @@ export class PermisosUsuariosHelperService {
 	}
 
 	/**
-	 * Construye módulos solo con las vistas que el usuario tiene asignadas (para detail drawer)
+	 * Construye mÃƒÂ³dulos solo con las vistas que el usuario tiene asignadas (para detail drawer)
 	 */
 	buildModulosVistasForDetail(
 		vistasActivas: Vista[],
@@ -74,3 +77,4 @@ export class PermisosUsuariosHelperService {
 		return this.adminUtils.getVistasCountLabel(count);
 	}
 }
+// #endregion

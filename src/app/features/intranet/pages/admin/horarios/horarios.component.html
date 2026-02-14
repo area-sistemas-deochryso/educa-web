@@ -1,8 +1,8 @@
 <!-- * Header -->
 <div class="horarios-header">
 	<div class="title-section">
-		<h1>Gestión de Horarios</h1>
-		<p class="subtitle">Administra los horarios de clases por salón</p>
+		<h1>GestiÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â³n de Horarios</h1>
+		<p class="subtitle">Administra los horarios de clases por salÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â³n</p>
 	</div>
 
 	<div class="actions">
@@ -87,7 +87,7 @@
 	</div>
 }
 
-<!-- ============ Filtros ============ -->
+<!-- #region Filtros -->
 <app-horarios-filters
 	[salonesOptions]="vm().salonesOptions"
 	[filtroSalonId]="vm().filtroSalonId"
@@ -101,7 +101,8 @@
 	(clearFiltros)="onClearFiltros()"
 />
 
-<!-- ============ Tabs: Vista Semanal / Vista Lista ============ -->
+<!-- #endregion -->
+<!-- #region Tabs: Vista Semanal / Vista Lista -->
 <div class="view-tabs">
 	<button
 		pButton
@@ -122,7 +123,7 @@
 		[disabled]="!vm().vistaSemanalHabilitada"
 		[pTooltip]="
 			!vm().vistaSemanalHabilitada
-				? 'Selecciona un salón o profesor para ver la vista semanal'
+				? 'Selecciona un salÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â³n o profesor para ver la vista semanal'
 				: 'Ver horarios en formato de calendario semanal'
 		"
 		tooltipPosition="top"
@@ -130,7 +131,8 @@
 	></button>
 </div>
 
-<!-- ============ Vista Semanal ============ -->
+<!-- #endregion -->
+<!-- #region Vista Semanal -->
 @if (vm().vistaActual === 'semanal') {
 	<div class="weekly-view">
 		<app-horarios-weekly-view
@@ -143,7 +145,8 @@
 	</div>
 }
 
-<!-- ============ Vista Lista ============ -->
+<!-- #endregion -->
+<!-- #region Vista Lista -->
 @if (vm().vistaActual === 'lista') {
 	<app-horarios-list-view
 		[horarios]="vm().horariosFiltrados"
@@ -156,7 +159,8 @@
 	<!--  -->
 }
 
-<!-- ============ Dialog: Crear/Editar Horario ============ -->
+<!-- #endregion -->
+<!-- #region Dialog: Crear/Editar Horario -->
 <p-dialog
 	[visible]="vm().dialogVisible"
 	(visibleChange)="!$event && onCancelDialog()"
@@ -168,20 +172,20 @@
 >
 	<div class="dialog-content">
 		<div class="form-grid">
-			<!-- Día de la semana -->
+			<!-- DÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â­a de la semana -->
 			<div class="form-field">
-				<label for="diaSemana">Día de la semana *</label>
+				<label for="diaSemana">DÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â­a de la semana *</label>
 				<p-select
 					id="diaSemana"
 					[(ngModel)]="vm().formData.diaSemana"
 					[options]="[
 						{ label: 'Lunes', value: 1 },
 						{ label: 'Martes', value: 2 },
-						{ label: 'Miércoles', value: 3 },
+						{ label: 'MiÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â©rcoles', value: 3 },
 						{ label: 'Jueves', value: 4 },
 						{ label: 'Viernes', value: 5 },
 					]"
-					placeholder="Seleccionar día"
+					placeholder="Seleccionar dÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â­a"
 					optionLabel="label"
 					optionValue="value"
 					appendTo="body"
@@ -213,20 +217,20 @@
 				/>
 			</div>
 
-			<!-- Salón -->
+			<!-- SalÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â³n -->
 			<div class="form-field full-width">
-				<label for="salon">Salón *</label>
+				<label for="salon">SalÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â³n *</label>
 				<p-select
 					id="salon"
 					[(ngModel)]="vm().formData.salonId"
 					[options]="vm().salonesOptions"
-					placeholder="Seleccionar salón disponible"
+					placeholder="Seleccionar salÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â³n disponible"
 					optionLabel="label"
 					optionValue="value"
 					appendTo="body"
 					class="w-full"
 					[filter]="true"
-					filterPlaceholder="Buscar salón..."
+					filterPlaceholder="Buscar salÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â³n..."
 					[loading]="vm().optionsLoading"
 					[disabled]="vm().optionsLoading"
 				>
@@ -278,12 +282,12 @@
 				@if (vm().formData.diaSemana && vm().formData.horaInicio && vm().formData.horaFin) {
 					<small class="text-muted">
 						<i class="pi pi-info-circle"></i>
-						Mostrando solo salones disponibles para el día y horario seleccionado
+						Mostrando solo salones disponibles para el dÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â­a y horario seleccionado
 					</small>
 				}
 			</div>
 
-			<!-- Curso - Botón para abrir modal de selección -->
+			<!-- Curso - BotÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â³n para abrir modal de selecciÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â³n -->
 			<div class="form-field full-width">
 				<label for="curso">Curso *</label>
 				<div class="flex gap-2">
@@ -305,11 +309,11 @@
 							icon="pi pi-times"
 							class="p-button-text p-button-danger"
 							(click)="onSelectCurso(null!)"
-							pTooltip="Limpiar selección de curso"
+							pTooltip="Limpiar selecciÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â³n de curso"
 							tooltipPosition="top"
 							[pt]="{
 								root: {
-									'aria-label': 'Limpiar selección',
+									'aria-label': 'Limpiar selecciÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â³n',
 								},
 							}"
 						></button>
@@ -347,10 +351,12 @@
 	</ng-template>
 </p-dialog>
 
-<!-- ============ ConfirmDialog ============ -->
+<!-- #endregion -->
+<!-- #region ConfirmDialog -->
 <p-confirmDialog />
 
-<!-- ============ Modal de Selección de Cursos por Nivel ============ -->
+<!-- #endregion -->
+<!-- #region Modal de SelecciÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â³n de Cursos por Nivel -->
 <p-dialog
 	[visible]="vm().cursoDialogVisible"
 	(visibleChange)="!$event && onCloseCursoDialog()"
@@ -508,13 +514,14 @@
 			icon="pi pi-check"
 			[disabled]="!vm().formData.cursoId"
 			(click)="onCloseCursoDialog()"
-			pTooltip="Confirmar selección de curso"
+			pTooltip="Confirmar selecciÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â³n de curso"
 			tooltipPosition="top"
 		></button>
 	</ng-template>
 </p-dialog>
 
-<!-- ============ Detail Drawer - Asignaciones ============ -->
+<!-- #endregion -->
+<!-- #region Detail Drawer - Asignaciones -->
 <app-horario-detail-drawer
 	[visible]="vm().detailDrawerVisible"
 	[detalle]="vm().horarioDetalle"
@@ -528,3 +535,4 @@
 	(asignarProfesor)="onAsignarProfesor($event.horarioId, $event.profesorId)"
 	(asignarTodosEstudiantes)="onAsignarTodosEstudiantes($event)"
 />
+<!-- #endregion -->

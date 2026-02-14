@@ -42,6 +42,10 @@ $color-pendiente: #9e9e9e;
 }
 
 :host ::ng-deep {
+	.header-actions .tipo-reporte-selector {
+		min-width: 200px;
+	}
+
 	.header-actions .pdf-button {
 		margin-right: -1.8rem;
 	}
@@ -125,7 +129,7 @@ $color-pendiente: #9e9e9e;
 	}
 }
 
-// Estado box con letra y color - mismo tamaño que footer
+// Estado box con letra y color - mismo tamaÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â±o que footer
 .estado-box {
 	display: inline-flex;
 	align-items: center;
@@ -423,7 +427,7 @@ $color-pendiente: #9e9e9e;
 	}
 }
 
-// ============ Filas clickeables para justificación ============
+// #region Filas clickeables para justificaciÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â³n
 .row-clickable {
 	cursor: pointer;
 	transition: background-color 0.15s ease;
@@ -433,7 +437,8 @@ $color-pendiente: #9e9e9e;
 	}
 }
 
-// ============ Observación en la celda de estudiante ============
+// #endregion
+// #region ObservaciÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â³n en la celda de estudiante
 .observacion {
 	display: block;
 	font-size: 0.75rem;
@@ -446,7 +451,8 @@ $color-pendiente: #9e9e9e;
 	text-overflow: ellipsis;
 }
 
-// ============ Diálogo de justificación ============
+// #endregion
+// #region DiÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â¡logo de justificaciÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â³n
 :host ::ng-deep {
 	// Centrar el mask completo
 	.p-dialog-mask {
@@ -560,7 +566,8 @@ $color-pendiente: #9e9e9e;
 	}
 }
 
-// ============ Personalización del menú PDF ============
+// #endregion
+// #region PersonalizaciÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â³n del menÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Âº PDF
 :host ::ng-deep .p-menu {
 	background: var(--intranet-background-color) !important;
 	border: 1px solid #ddd !important;
@@ -594,3 +601,4 @@ $color-pendiente: #9e9e9e;
 		}
 	}
 }
+// #endregion

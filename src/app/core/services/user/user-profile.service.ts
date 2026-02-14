@@ -1,8 +1,11 @@
+// #region Imports
 import { Injectable, inject, signal, computed, effect } from '@angular/core';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { AuthService } from '../auth';
 import { APP_USER_ROLES, AppUserRole } from '@app/shared/constants';
 
+// #endregion
+// #region Implementation
 @Injectable({
 	providedIn: 'root',
 })
@@ -24,7 +27,7 @@ export class UserProfileService {
 
 	readonly isAuthenticated = toSignal(this.authService.isAuthenticated$, { initialValue: false });
 
-	// Signal del usuario actual - debe crearse en contexto de inyección
+	// Signal del usuario actual - debe crearse en contexto de inyecciÃƒÆ’Ã‚Â³n
 	private readonly currentUser = toSignal(this.authService.currentUser$, { initialValue: null });
 
 	readonly isEstudiante = computed(() => this._userRole() === APP_USER_ROLES.Estudiante);
@@ -93,3 +96,4 @@ export class UserProfileService {
 		this._dni.set(null);
 	}
 }
+// #endregion

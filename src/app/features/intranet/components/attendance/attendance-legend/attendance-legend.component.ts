@@ -1,7 +1,10 @@
+// #region Imports
 import { ChangeDetectionStrategy, Component, inject, signal } from '@angular/core';
 import { getStatusClass } from '@features/intranet/pages/attendance-component/config/attendance.constants';
 import { AsistenciaService, EstadoAsistencia } from '@core/services';
 
+// #endregion
+// #region Implementation
 @Component({
 	selector: 'app-attendance-legend',
 	standalone: true,
@@ -12,7 +15,7 @@ import { AsistenciaService, EstadoAsistencia } from '@core/services';
 export class AttendanceLegendComponent {
 	private asistenciaService = inject(AsistenciaService);
 
-	// ✅ NUEVO: Cargar estados desde el backend
+	// Ã¢Å“â€¦ NUEVO: Cargar estados desde el backend
 	readonly legendItems = signal<EstadoAsistencia[]>([]);
 
 	getStatusClass = getStatusClass;
@@ -27,3 +30,4 @@ export class AttendanceLegendComponent {
 		});
 	}
 }
+// #endregion

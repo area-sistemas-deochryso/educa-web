@@ -1,3 +1,4 @@
+// #region Imports
 import { Component, EventEmitter, Input, Output, inject, ChangeDetectionStrategy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { DialogModule } from 'primeng/dialog';
@@ -7,6 +8,8 @@ import { FileUploadModule } from 'primeng/fileupload';
 import { AttachmentsModalStore, type Attachment } from './attachments-modal.store';
 import { AttachmentsModalFacade } from './attachments-modal.facade';
 
+// #endregion
+// #region Implementation
 @Component({
 	selector: 'app-attachments-modal',
 	standalone: true,
@@ -56,3 +59,4 @@ export class AttachmentsModalComponent {
 		this.facade.downloadAttachment(attachment);
 	}
 }
+// #endregion

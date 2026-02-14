@@ -1,6 +1,9 @@
+// #region Imports
 import { Component } from '@angular/core';
 import { Tooltip } from 'primeng/tooltip';
 
+// #endregion
+// #region Implementation
 @Component({
 	selector: 'app-about-section',
 	standalone: true,
@@ -20,3 +23,4 @@ export class AboutSectionComponent {
 		}
 	}
 }
+// #endregion

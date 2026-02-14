@@ -1,3 +1,4 @@
+// #region Imports
 import { ChangeDetectionStrategy, Component, inject, input, output } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ButtonModule } from 'primeng/button';
@@ -8,8 +9,10 @@ import { AdminUtilsService } from '@shared/services';
 
 /**
  * Componente presentacional para el drawer de detalles de usuario
- * Muestra información de solo lectura con opción de editar
+ * Muestra informaciÃƒÆ’Ã‚Â³n de solo lectura con opciÃƒÆ’Ã‚Â³n de editar
  */
+// #endregion
+// #region Implementation
 @Component({
 	selector: 'app-usuario-detail-drawer',
 	standalone: true,
@@ -42,3 +45,4 @@ export class UsuarioDetailDrawerComponent {
 		this.edit.emit();
 	}
 }
+// #endregion

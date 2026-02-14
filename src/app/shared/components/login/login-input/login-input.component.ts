@@ -1,5 +1,8 @@
+// #region Imports
 import { Component } from '@angular/core';
 
+// #endregion
+// #region Implementation
 @Component({
 	selector: 'app-login-input',
 	standalone: true,
@@ -8,3 +11,4 @@ import { Component } from '@angular/core';
 })
 // * Content wrapper to align icon + input styles.
 export class LoginInputComponent {}
+// #endregion

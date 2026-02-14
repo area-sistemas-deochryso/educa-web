@@ -1,3 +1,4 @@
+<!-- #region Template -->
 <p-drawer
 	[visible]="visible()"
 	(visibleChange)="onVisibleChange($event)"
@@ -14,7 +15,7 @@
 			</div>
 			<div class="header-content">
 				<h2>Detalles del Horario</h2>
-				<p class="header-subtitle">Información completa y asignaciones</p>
+				<p class="header-subtitle">InformaciÃƒÂ³n completa y asignaciones</p>
 			</div>
 		</div>
 	</ng-template>
@@ -27,7 +28,7 @@
 		</div>
 	} @else if (detalle()) {
 		<div class="detail-content">
-			<!-- * Estado y acciones rápidas -->
+			<!-- * Estado y acciones rÃƒÂ¡pidas -->
 			<div class="status-section">
 				<p-tag
 					[value]="getEstadoLabel(detalle()!.estado)"
@@ -81,16 +82,16 @@
 				</div>
 			</div>
 
-			<!-- * Información básica -->
+			<!-- * InformaciÃƒÂ³n bÃƒÂ¡sica -->
 			<div class="info-section">
 				<h3 class="section-title">
 					<i class="pi pi-info-circle"></i>
-					Información General
+					InformaciÃƒÂ³n General
 				</h3>
 
 				<div class="info-grid">
 					<div class="info-item">
-						<label>Día</label>
+						<label>DÃƒÂ­a</label>
 						<div class="info-value">
 							<i class="pi pi-calendar"></i>
 							<span>{{ detalle()!.diaSemanaDescripcion }}</span>
@@ -106,7 +107,7 @@
 					</div>
 
 					<div class="info-item">
-						<label>Salón</label>
+						<label>SalÃƒÂ³n</label>
 						<div class="info-value">
 							<i class="pi pi-building"></i>
 							<span>{{ detalle()!.salonDescripcion }}</span>
@@ -123,7 +124,7 @@
 				</div>
 			</div>
 
-			<!-- Asignación de Profesor -->
+			<!-- AsignaciÃƒÂ³n de Profesor -->
 			<div class="assignment-section">
 				<h3 class="section-title">
 					<i class="pi pi-user"></i>
@@ -176,7 +177,7 @@
 				}
 			</div>
 
-			<!-- Asignación de Estudiantes -->
+			<!-- AsignaciÃƒÂ³n de Estudiantes -->
 			<div class="assignment-section">
 				<h3 class="section-title">
 					<i class="pi pi-users"></i>
@@ -205,22 +206,22 @@
 
 						<button
 							pButton
-							label="Asignar Todos los Estudiantes del Salón"
+							label="Asignar Todos los Estudiantes del SalÃƒÂ³n"
 							icon="pi pi-user-plus"
 							class="p-button-sm p-button-outlined w-full"
 							(click)="onAsignarTodosEstudiantes()"
-							pTooltip="Asignar automáticamente todos los estudiantes del salón a este horario"
+							pTooltip="Asignar automÃƒÂ¡ticamente todos los estudiantes del salÃƒÂ³n a este horario"
 							tooltipPosition="top"
 						></button>
 					</div>
 				}
 			</div>
 
-			<!-- Información de Auditoría -->
+			<!-- InformaciÃƒÂ³n de AuditorÃƒÂ­a -->
 			<div class="audit-section">
 				<h3 class="section-title">
 					<i class="pi pi-history"></i>
-					Auditoría
+					AuditorÃƒÂ­a
 				</h3>
 
 				<div class="audit-info">
@@ -259,3 +260,4 @@
 		></button>
 	</ng-template>
 </p-drawer>
+<!-- #endregion -->

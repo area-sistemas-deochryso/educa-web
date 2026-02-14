@@ -1,3 +1,4 @@
+// #region Imports
 import { ChangeDetectionStrategy, Component, inject, input, output } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ButtonModule } from 'primeng/button';
@@ -12,6 +13,8 @@ import { TableLoadingDirective } from '@app/shared';
  * Componente presentacional para la tabla de usuarios
  * Muestra listado con acciones
  */
+// #endregion
+// #region Implementation
 @Component({
 	selector: 'app-usuarios-table',
 	standalone: true,
@@ -44,3 +47,4 @@ export class UsuariosTableComponent {
 		this.toggleEstado.emit(usuario);
 	}
 }
+// #endregion

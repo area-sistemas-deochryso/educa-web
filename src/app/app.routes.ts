@@ -1,5 +1,8 @@
+// #region Imports
 import { Routes } from '@angular/router';
 
+// #endregion
+// #region Implementation
 export const routes: Routes = [
 	{
 		path: 'intranet',
@@ -61,13 +64,13 @@ export const routes: Routes = [
 				path: 'privacidad',
 				loadComponent: () =>
 					import('@features/public/privacy/privacy').then((m) => m.PrivacyComponent),
-				title: 'Educa.com.pe - Política de Privacidad',
+				title: 'Educa.com.pe - PolÃƒÂ­tica de Privacidad',
 			},
 			{
 				path: 'terminos',
 				loadComponent: () =>
 					import('@features/public/terms/terms').then((m) => m.TermsComponent),
-				title: 'Educa.com.pe - Términos y Condiciones',
+				title: 'Educa.com.pe - TÃƒÂ©rminos y Condiciones',
 			},
 			{
 				path: '**',
@@ -77,3 +80,4 @@ export const routes: Routes = [
 		],
 	},
 ];
+// #endregion

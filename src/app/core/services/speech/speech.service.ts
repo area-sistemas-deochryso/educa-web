@@ -1,5 +1,8 @@
+// #region Imports
 import { Injectable, signal } from '@angular/core';
 
+// #endregion
+// #region Implementation
 @Injectable({
 	providedIn: 'root',
 })
@@ -45,3 +48,4 @@ export class SpeechService {
 		return 'speechSynthesis' in window;
 	}
 }
+// #endregion

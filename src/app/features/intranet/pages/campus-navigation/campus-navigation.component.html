@@ -1,6 +1,5 @@
-<!-- ============ Campus Navigation Layout ============ -->
 <div class="campus-navigation">
-	<!-- ============ Panel lateral: Horario del día ============ -->
+	<!-- #region Panel lateral: Horario del dÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â­a -->
 	<aside class="schedule-sidebar">
 		<app-schedule-panel
 			[items]="vm().scheduleItems"
@@ -10,7 +9,8 @@
 		/>
 	</aside>
 
-	<!-- ============ Área principal: Mapa + controles ============ -->
+	<!-- #endregion -->
+	<!-- #region ÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Ârea principal: Mapa + controles -->
 	<main class="map-area">
 		<!-- Controles superiores -->
 		<div class="controls-row">
@@ -42,9 +42,10 @@
 			(nodeClick)="onMapNodeClick($event)"
 		/>
 
-		<!-- Pasos de navegación -->
+		<!-- Pasos de navegaciÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â³n -->
 		@if (vm().hasPath) {
 			<app-navigation-steps [pathResult]="vm().pathResult" />
 		}
 	</main>
 </div>
+	<!-- #endregion -->

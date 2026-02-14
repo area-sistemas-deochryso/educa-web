@@ -1,8 +1,11 @@
+// #region Imports
 import { ChangeDetectionStrategy, Component, computed, inject, input, ViewChild } from '@angular/core';
 import { Router } from '@angular/router';
 import { Menu, MenuModule } from 'primeng/menu';
 import { MenuItem } from 'primeng/api';
 
+// #endregion
+// #region Implementation
 @Component({
 	selector: 'app-quick-access-card-menu',
 	standalone: true,
@@ -53,3 +56,4 @@ export class QuickAccessCardMenuComponent {
 		});
 	}
 }
+// #endregion

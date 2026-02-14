@@ -1,9 +1,12 @@
+// #region Imports
 import { ChangeDetectionStrategy, Component, input } from '@angular/core';
 
 /**
- * Componente presentacional (Dumb) para estados vacíos.
+ * Componente presentacional (Dumb) para estados vacÃƒÂ­os.
  * Muestra un mensaje cuando no hay datos disponibles.
  */
+// #endregion
+// #region Implementation
 @Component({
 	selector: 'app-empty-state',
 	standalone: true,
@@ -15,3 +18,4 @@ export class EmptyStateComponent {
 	// * Message to render when no data is available.
 	message = input.required<string>();
 }
+// #endregion

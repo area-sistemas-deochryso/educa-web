@@ -1,7 +1,10 @@
+// #region Imports
 import { Component, EventEmitter, Input, Output } from '@angular/core';
 
 import { CommonModule } from '@angular/common';
 
+// #endregion
+// #region Implementation
 @Component({
 	selector: 'app-week-content-row',
 	standalone: true,
@@ -17,3 +20,4 @@ export class WeekContentRowComponent {
 	@Input() actionLabel = 'Ver';
 	@Output() action = new EventEmitter<void>();
 }
+// #endregion

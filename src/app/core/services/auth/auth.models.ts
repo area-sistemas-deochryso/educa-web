@@ -1,3 +1,4 @@
+// #region Implementation
 /**
  * Auth Models - Interfaces que coinciden con el backend educa.API
  */
@@ -14,7 +15,7 @@ export type UserRole =
 // Request para el endpoint POST /api/Auth/login
 export interface LoginRequest {
 	dni: string;
-	contraseña: string;
+	contraseÃƒÂ±a: string;
 	rol: UserRole;
 }
 
@@ -50,9 +51,10 @@ export interface AuthUser {
 // Response del endpoint POST /api/Auth/verificar
 export interface VerifyTokenResponse {
 	dni: string;
-	contraseña: string;
+	contraseÃƒÂ±a: string;
 	rol: UserRole;
 	nombreCompleto: string;
 	entityId: number;
 	sedeId: number;
 }
+// #endregion

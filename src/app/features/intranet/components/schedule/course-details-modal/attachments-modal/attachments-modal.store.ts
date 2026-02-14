@@ -1,5 +1,8 @@
+// #region Imports
 import { Injectable, signal, computed } from '@angular/core';
 
+// #endregion
+// #region Implementation
 export interface Attachment {
 	id: number;
 	name: string;
@@ -21,7 +24,7 @@ const initialState: AttachmentsState = {
 	attachments: [
 		{
 			id: 1,
-			name: 'Clase 1 - Introducción al tema.pdf',
+			name: 'Clase 1 - IntroducciÃƒÂ³n al tema.pdf',
 			type: 'pdf',
 			size: '2.4 MB',
 			date: '15/01/2026',
@@ -37,7 +40,7 @@ const initialState: AttachmentsState = {
 		},
 		{
 			id: 3,
-			name: 'Video explicativo - Conceptos básicos',
+			name: 'Video explicativo - Conceptos bÃƒÂ¡sicos',
 			type: 'video',
 			size: '45 MB',
 			date: '16/01/2026',
@@ -91,7 +94,7 @@ export class AttachmentsModalStore {
 		hasAttachments: this.attachments().length > 0,
 	}));
 
-	// Comandos de mutación
+	// Comandos de mutaciÃƒÂ³n
 	setUploading(uploading: boolean): void {
 		this._state.update((s) => ({ ...s, uploading }));
 	}
@@ -126,3 +129,4 @@ export class AttachmentsModalStore {
 		this._state.set(initialState);
 	}
 }
+// #endregion

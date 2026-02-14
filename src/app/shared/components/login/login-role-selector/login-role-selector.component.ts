@@ -1,6 +1,9 @@
+// #region Imports
 import { Component } from '@angular/core';
 import { UserRole } from '@core/services';
 
+// #endregion
+// #region Implementation
 export interface RolOption {
 	label: string;
 	value: UserRole;
@@ -14,3 +17,4 @@ export interface RolOption {
 })
 // * Content wrapper for the role selector row.
 export class LoginRoleSelectorComponent {}
+// #endregion

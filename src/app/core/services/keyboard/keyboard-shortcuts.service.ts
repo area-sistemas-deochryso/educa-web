@@ -1,3 +1,4 @@
+// #region Imports
 import {
 	CATEGORY_LABELS,
 	KEYBOARD_SHORTCUTS,
@@ -9,6 +10,8 @@ import { Injectable, OnDestroy, PLATFORM_ID, inject, signal } from '@angular/cor
 import { isPlatformBrowser } from '@angular/common';
 import { logger } from '@core/helpers';
 
+// #endregion
+// #region Implementation
 type ShortcutHandler = () => void;
 
 @Injectable({
@@ -23,10 +26,10 @@ export class KeyboardShortcutsService implements OnDestroy {
 	/** Atajos registrados */
 	readonly shortcuts = KEYBOARD_SHORTCUTS;
 
-	/** Etiquetas de categorías */
+	/** Etiquetas de categorÃƒÂ­as */
 	readonly categoryLabels = CATEGORY_LABELS;
 
-	/** Indica si el servicio está activo */
+	/** Indica si el servicio estÃƒÂ¡ activo */
 	readonly isActive = signal(false);
 
 	constructor() {
@@ -69,7 +72,7 @@ export class KeyboardShortcutsService implements OnDestroy {
 	}
 
 	/**
-	 * Registra un handler para un atajo específico
+	 * Registra un handler para un atajo especÃƒÂ­fico
 	 */
 	register(shortcutId: string, handler: ShortcutHandler): void {
 		// Only stores the handler; the keyboard listener is global to this service.
@@ -99,14 +102,14 @@ export class KeyboardShortcutsService implements OnDestroy {
 	}
 
 	/**
-	 * Obtiene atajos por categoría
+	 * Obtiene atajos por categorÃƒÂ­a
 	 */
 	getByCategory(category: ShortcutCategory): KeyboardShortcut[] {
 		return this.shortcuts.filter((s) => s.category === category);
 	}
 
 	/**
-	 * Obtiene todas las categorías disponibles
+	 * Obtiene todas las categorÃƒÂ­as disponibles
 	 */
 	getCategories(): ShortcutCategory[] {
 		const categories = new Set(this.shortcuts.map((s) => s.category));
@@ -129,3 +132,4 @@ export class KeyboardShortcutsService implements OnDestroy {
 		this.isActive.set(false);
 	}
 }
+// #endregion

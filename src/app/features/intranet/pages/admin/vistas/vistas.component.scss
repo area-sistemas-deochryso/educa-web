@@ -4,7 +4,7 @@
 	margin: 0 auto;
 }
 
-// ============ HEADER ============
+// #region HEADER
 .page-header {
 	display: flex;
 	justify-content: space-between;
@@ -52,7 +52,8 @@
 	}
 }
 
-// ============ STATS CARDS ============
+// #endregion
+// #region STATS CARDS
 .stats-section {
 	display: grid;
 	grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
@@ -108,7 +109,8 @@
 	}
 }
 
-// ============ FILTERS ============
+// #endregion
+// #region FILTERS
 .filters-section {
 	display: flex;
 	align-items: center;
@@ -145,7 +147,8 @@
 	}
 }
 
-// ============ LOADING ============
+// #endregion
+// #region LOADING
 .loading-container {
 	display: flex;
 	justify-content: center;
@@ -155,7 +158,8 @@
 	border-radius: 12px;
 }
 
-// ============ TABLE ============
+// #endregion
+// #region TABLE
 .table-section {
 	background: transparent;
 	border-radius: 12px;
@@ -238,7 +242,8 @@
 	}
 }
 
-// ============ EDIT DIALOG ============
+// #endregion
+// #region EDIT DIALOG
 .dialog-content {
 	.form-fields {
 		display: flex;
@@ -283,7 +288,8 @@
 	gap: 0.5rem;
 }
 
-// ============ NG-DEEP OVERRIDES ============
+// #endregion
+// #region NG-DEEP OVERRIDES
 :host ::ng-deep {
 	.p-datatable {
 		background: transparent;
@@ -439,7 +445,8 @@
 	}
 }
 
-// ============ RESPONSIVE ============
+// #endregion
+// #region RESPONSIVE
 @media (max-width: 768px) {
 	.vistas-container {
 		padding: 1rem;
@@ -474,3 +481,4 @@
 		grid-template-columns: 1fr;
 	}
 }
+// #endregion

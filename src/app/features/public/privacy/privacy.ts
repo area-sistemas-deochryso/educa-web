@@ -1,5 +1,8 @@
+// #region Imports
 import { Component } from '@angular/core';
 
+// #endregion
+// #region Implementation
 @Component({
 	selector: 'app-privacy',
 	standalone: true,
@@ -10,3 +13,4 @@ import { Component } from '@angular/core';
 export class PrivacyComponent {
 	// * Privacy policy static content.
 }
+// #endregion

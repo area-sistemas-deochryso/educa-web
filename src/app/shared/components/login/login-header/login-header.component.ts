@@ -1,5 +1,8 @@
+// #region Imports
 import { Component, Input } from '@angular/core';
 
+// #endregion
+// #region Implementation
 @Component({
 	selector: 'app-login-header',
 	standalone: true,
@@ -9,6 +12,7 @@ import { Component, Input } from '@angular/core';
 })
 export class LoginHeaderComponent {
 	// * Title + logo source used by the login header.
-	@Input() title = 'INICIAR SESIÓN';
+	@Input() title = 'INICIAR SESIÃƒâ€œN';
 	@Input() logoSrc = 'images/logo.png';
 }
+// #endregion

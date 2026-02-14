@@ -1,7 +1,10 @@
+// #region Imports
 import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { SeasonalNotification } from '@core/services';
 
+// #endregion
+// #region Implementation
 @Component({
 	selector: 'app-dismissed-card',
 	imports: [CommonModule],
@@ -34,9 +37,9 @@ export class DismissedCardComponent {
 	getTypeLabel(type: string): string {
 		// * Map backend types to display labels.
 		const labels: Record<string, string> = {
-			matricula: 'Matrícula',
+			matricula: 'MatrÃƒÂ­cula',
 			pago: 'Pago',
-			academico: 'Académico',
+			academico: 'AcadÃƒÂ©mico',
 			festividad: 'Festividad',
 			evento: 'Evento',
 		};
@@ -48,3 +51,4 @@ export class DismissedCardComponent {
 		this.restore.emit(this.notification.id);
 	}
 }
+// #endregion

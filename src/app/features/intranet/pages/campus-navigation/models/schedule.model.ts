@@ -1,3 +1,4 @@
+// #region Implementation
 export interface MiHorarioHoyItem {
 	horarioId: number;
 	horaInicio: string;
@@ -7,3 +8,4 @@ export interface MiHorarioHoyItem {
 	salonDescripcion: string;
 	profesorNombre: string | null;
 }
+// #endregion

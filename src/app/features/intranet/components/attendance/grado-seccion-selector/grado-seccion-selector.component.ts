@@ -1,12 +1,15 @@
+// #region Imports
 import { ChangeDetectionStrategy, Component, input, output } from '@angular/core';
 
 import { FormsModule } from '@angular/forms';
 import { GradoSeccion } from '@core/services';
 
 /**
- * Componente presentacional para la selección de grado/sección.
+ * Componente presentacional para la selecciÃƒÆ’Ã‚Â³n de grado/secciÃƒÆ’Ã‚Â³n.
  * Usado por el Director para filtrar estudiantes.
  */
+// #endregion
+// #region Implementation
 @Component({
 	selector: 'app-grado-seccion-selector',
 	standalone: true,
@@ -35,3 +38,4 @@ export class GradoSeccionSelectorComponent {
 		}
 	}
 }
+// #endregion

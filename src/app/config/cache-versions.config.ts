@@ -1,75 +1,76 @@
+// #region Implementation
 /**
  * ============================================================================
- * CONFIGURACIÓN DE VERSIONES DE CACHE POR MÓDULO
+ * CONFIGURACIÃ“N DE VERSIONES DE CACHE POR MÃ“DULO
  * ============================================================================
  *
- * PROPÓSITO:
- * Invalidación automática de cache cuando el backend cambia la estructura de datos.
+ * PROPÃ“SITO:
+ * InvalidaciÃ³n automÃ¡tica de cache cuando el backend cambia la estructura de datos.
  *
- * CÓMO FUNCIONA:
+ * CÃ“MO FUNCIONA:
  * 1. Al iniciar la app, el sistema compara estas versiones con las guardadas en localStorage
- * 2. Si una versión cambió → invalida automáticamente el cache de ese módulo
- * 3. Guarda la nueva versión en localStorage
- * 4. El usuario nunca ve errores de deserialización
+ * 2. Si una versiÃ³n cambiÃ³ â†’ invalida automÃ¡ticamente el cache de ese mÃ³dulo
+ * 3. Guarda la nueva versiÃ³n en localStorage
+ * 4. El usuario nunca ve errores de deserializaciÃ³n
  *
- * CUÁNDO INCREMENTAR LA VERSIÓN:
- * ✅ Cambias estructura de DTOs del módulo (agregar/quitar/renombrar campos)
- * ✅ Cambias tipos de datos (string → number, null → object)
- * ✅ Cambias códigos de estado o enums
- * ❌ Cambios que no afectan el JSON de respuesta (solo backend)
- * ❌ Cambios no-breaking (agregar campos opcionales al final)
+ * CUÃNDO INCREMENTAR LA VERSIÃ“N:
+ * âœ… Cambias estructura de DTOs del mÃ³dulo (agregar/quitar/renombrar campos)
+ * âœ… Cambias tipos de datos (string â†’ number, null â†’ object)
+ * âœ… Cambias cÃ³digos de estado o enums
+ * âŒ Cambios que no afectan el JSON de respuesta (solo backend)
+ * âŒ Cambios no-breaking (agregar campos opcionales al final)
  *
  * EJEMPLO DE USO:
  * ```
  * // Hiciste cambios en los DTOs de asistencias
- * asistencias: '2024-02-05-v2',  // ← Cambiar de v1 a v2
+ * asistencias: '2024-02-05-v2',  // â† Cambiar de v1 a v2
  *
  * // Al recargar la app:
- * // - Sistema detecta que asistencias cambió de v1 a v2
- * // - Invalida automáticamente cache de /api/ConsultaAsistencia/*
+ * // - Sistema detecta que asistencias cambiÃ³ de v1 a v2
+ * // - Invalida automÃ¡ticamente cache de /api/ConsultaAsistencia/*
  * // - Usuario recibe datos frescos sin errores
  * ```
  *
- * FORMATO DE VERSIÓN RECOMENDADO:
- * YYYY-MM-DD-vN  (fecha del cambio + número de versión)
+ * FORMATO DE VERSIÃ“N RECOMENDADO:
+ * YYYY-MM-DD-vN  (fecha del cambio + nÃºmero de versiÃ³n)
  * Ejemplo: '2024-02-05-v1'
  *
- * ALTERNATIVA: Cualquier string único (git commit hash, timestamp, etc.)
+ * ALTERNATIVA: Cualquier string Ãºnico (git commit hash, timestamp, etc.)
  */
 export const CACHE_VERSIONS = {
 	/**
-	 * Módulo de asistencias (ConsultaAsistencia, reportes)
-	 * Patrón invalidado: /api/ConsultaAsistencia
+	 * MÃ³dulo de asistencias (ConsultaAsistencia, reportes)
+	 * PatrÃ³n invalidado: /api/ConsultaAsistencia
 	 */
-	asistencias: '2024-02-05-v2', // ← Cambiar cuando modifiques DTOs de asistencias
+	asistencias: '2024-02-05-v2', // â† Cambiar cuando modifiques DTOs de asistencias
 
 	/**
-	 * Módulo de usuarios (CRUD usuarios)
-	 * Patrón invalidado: /api/usuarios
+	 * MÃ³dulo de usuarios (CRUD usuarios)
+	 * PatrÃ³n invalidado: /api/usuarios
 	 */
 	usuarios: '2024-01-15-v1',
 
 	/**
-	 * Módulo de salones (CRUD salones)
-	 * Patrón invalidado: /api/salones
+	 * MÃ³dulo de salones (CRUD salones)
+	 * PatrÃ³n invalidado: /api/salones
 	 */
 	salones: '2024-01-15-v1',
 
 	/**
-	 * Módulo de cursos (CRUD cursos)
-	 * Patrón invalidado: /api/cursos
+	 * MÃ³dulo de cursos (CRUD cursos)
+	 * PatrÃ³n invalidado: /api/cursos
 	 */
 	cursos: '2024-01-15-v1',
 
 	/**
-	 * Módulo de reportes (PDFs, estadísticas)
-	 * Patrón invalidado: /api/reportes
+	 * MÃ³dulo de reportes (PDFs, estadÃ­sticas)
+	 * PatrÃ³n invalidado: /api/reportes
 	 */
 	reportes: '2024-01-15-v1',
 
 	/**
-	 * Sistema general (permisos, configuración)
-	 * Patrón invalidado: /api/sistema
+	 * Sistema general (permisos, configuraciÃ³n)
+	 * PatrÃ³n invalidado: /api/sistema
 	 */
 	sistema: '2024-01-15-v1',
 } as const;
@@ -80,7 +81,7 @@ export const CACHE_VERSIONS = {
 export type CacheModule = keyof typeof CACHE_VERSIONS;
 
 /**
- * Mapeo de módulos a patrones de URL
+ * Mapeo de mÃ³dulos a patrones de URL
  * IMPORTANTE: Estos patrones se usan para invalidar el cache
  */
 export const MODULE_URL_PATTERNS: Record<CacheModule, string> = {
@@ -91,3 +92,4 @@ export const MODULE_URL_PATTERNS: Record<CacheModule, string> = {
 	reportes: '/api/reportes',
 	sistema: '/api/sistema',
 };
+// #endregion

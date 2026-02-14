@@ -1,11 +1,12 @@
+<!-- #region Template -->
 <div class="home-container">
 	<!-- * Welcome banner -->
 	<app-welcome-section [title]="welcomeTitle()" />
 
-	@if (showQuickAccess) {
+	@if (showQuickAccess()) {
 		<!-- * Feature-flagged quick access cards -->
 		<section class="quick-access">
-			<h2>Accesos Rápidos</h2>
+			<h2>Accesos RÃƒÂ¡pidos</h2>
 			<div class="quick-access-grid">
 				<!-- * Course content picker -->
 				<app-quick-access-card-menu
@@ -39,3 +40,4 @@
 		</section>
 	}
 </div>
+<!-- #endregion -->

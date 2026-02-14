@@ -1,3 +1,4 @@
+<!-- #region Template -->
 <p-dialog
 	[visible]="visible"
 	(visibleChange)="onVisibleChange($event)"
@@ -31,13 +32,13 @@
 						<div class="task-meta">
 							<span class="due-date">
 								<i class="pi pi-calendar"></i>
-								Fecha límite: {{ task.dueDate }}
+								Fecha lÃ­mite: {{ task.dueDate }}
 							</span>
 							<span
 								class="days-remaining"
 								[class.urgent]="
 									getDaysRemaining(task.dueDate) === 'Hoy' ||
-									getDaysRemaining(task.dueDate) === 'Mañana'
+									getDaysRemaining(task.dueDate) === 'MaÃ±ana'
 								"
 							>
 								{{ getDaysRemaining(task.dueDate) }}
@@ -66,3 +67,4 @@
 		</div>
 	</div>
 </p-dialog>
+<!-- #endregion -->

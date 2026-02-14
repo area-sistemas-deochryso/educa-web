@@ -1,3 +1,4 @@
+// #region Imports
 import { AsistenciaService } from '@core/services';
 import { Component, DestroyRef, OnInit, computed, inject, signal } from '@angular/core';
 
@@ -10,6 +11,8 @@ import { EmptyStateComponent } from '../../../components/attendance/empty-state/
 import { finalize } from 'rxjs';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
+// #endregion
+// #region Implementation
 @Component({
 	selector: 'app-attendance-estudiante',
 	standalone: true,
@@ -151,3 +154,4 @@ export class AttendanceEstudianteComponent implements OnInit {
 		this.loadAsistencias();
 	}
 }
+// #endregion

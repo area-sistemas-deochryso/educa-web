@@ -1,4 +1,5 @@
 // * Tests for auth guard routing behavior.
+// #region Imports
 import { TestBed } from '@angular/core/testing';
 import { Router } from '@angular/router';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
@@ -6,6 +7,8 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { authGuard } from './auth.guard';
 import { AuthService } from '@app/core/services';
 
+// #endregion
+// #region Implementation
 describe('authGuard', () => {
 	let authServiceMock: Partial<AuthService>;
 	let routerMock: Partial<Router>;
@@ -46,3 +49,4 @@ describe('authGuard', () => {
 		});
 	});
 });
+// #endregion

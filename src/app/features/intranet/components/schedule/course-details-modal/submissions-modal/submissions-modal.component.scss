@@ -1,3 +1,4 @@
+// #region Styles
 :host ::ng-deep {
 	.submissions-modal.p-dialog {
 		border-radius: 10px;
@@ -235,3 +236,4 @@
 	font-size: 0.75rem;
 	color: var(--intranet-soft-text-color);
 }
+// #endregion

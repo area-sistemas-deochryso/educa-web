@@ -1,3 +1,4 @@
+// #region Imports
 import { Component, ChangeDetectionStrategy, input, output, OnChanges, SimpleChanges } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
@@ -8,6 +9,8 @@ import { TextareaModule } from 'primeng/textarea';
 import { DatePickerModule } from 'primeng/datepicker';
 import { CursoContenidoTareaDto, CrearTareaRequest, ActualizarTareaRequest } from '../../../models';
 
+// #endregion
+// #region Implementation
 @Component({
 	selector: 'app-tarea-dialog',
 	standalone: true,
@@ -23,31 +26,31 @@ import { CursoContenidoTareaDto, CrearTareaRequest, ActualizarTareaRequest } fro
 		>
 			<div class="flex flex-column gap-3 pt-2">
 				<div class="flex flex-column gap-2">
-					<label for="tareaTitle" class="font-semibold">Título *</label>
+					<label for="tareaTitle" class="font-semibold">TÃƒÂ­tulo *</label>
 					<input
 						pInputText
 						id="tareaTitle"
 						[(ngModel)]="titulo"
-						placeholder="Título de la tarea"
+						placeholder="TÃƒÂ­tulo de la tarea"
 						[maxlength]="200"
 					/>
 				</div>
 
 				<div class="flex flex-column gap-2">
-					<label for="tareaDesc" class="font-semibold">Descripción</label>
+					<label for="tareaDesc" class="font-semibold">DescripciÃƒÂ³n</label>
 					<textarea
 						pTextarea
 						id="tareaDesc"
 						[(ngModel)]="descripcion"
 						[rows]="3"
 						[maxlength]="2000"
-						placeholder="Descripción e instrucciones de la tarea..."
+						placeholder="DescripciÃƒÂ³n e instrucciones de la tarea..."
 						[autoResize]="true"
 					></textarea>
 				</div>
 
 				<div class="flex flex-column gap-2">
-					<label for="tareaFecha" class="font-semibold">Fecha límite</label>
+					<label for="tareaFecha" class="font-semibold">Fecha lÃƒÂ­mite</label>
 					<p-datepicker
 						id="tareaFecha"
 						[(ngModel)]="fechaLimite"
@@ -136,3 +139,4 @@ export class TareaDialogComponent implements OnChanges {
 		}
 	}
 }
+// #endregion

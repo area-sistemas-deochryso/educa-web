@@ -1,7 +1,10 @@
+// #region Imports
 import { Component, input, output, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { CalendarDay, CalendarMonth } from '@features/intranet/pages/calendary-component/calendar.types';
 
+// #endregion
+// #region Implementation
 @Component({
 	selector: 'app-calendar-month-card',
 	imports: [CommonModule],
@@ -21,7 +24,7 @@ export class CalendarMonthCardComponent {
 	hoveredEvent = signal<string | null>(null);
 
 	// * Weekday labels for header row.
-	weekDays = ['Dom', 'Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb'];
+	weekDays = ['Dom', 'Lun', 'Mar', 'MiÃƒÂ©', 'Jue', 'Vie', 'SÃƒÂ¡b'];
 
 	onDayClick(day: CalendarDay): void {
 		this.dayClick.emit(day);
@@ -44,3 +47,4 @@ export class CalendarMonthCardComponent {
 		return index;
 	}
 }
+// #endregion

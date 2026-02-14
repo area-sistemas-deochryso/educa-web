@@ -1,9 +1,12 @@
+// #region Imports
 import { Injectable, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { environment } from '@config/environment';
 import { logger } from '@core/helpers';
 
+// #endregion
+// #region Implementation
 export interface BlobUploadResponse {
 	message: string;
 	url: string;
@@ -29,7 +32,7 @@ export class BlobStorageService {
 		containerName: string,
 		appendTimestamp = false,
 	): Observable<BlobUploadResponse> {
-		// Validación
+		// ValidaciÃƒÆ’Ã‚Â³n
 		if (!file) {
 			logger.error('[BlobStorageService] File is null or undefined');
 			throw new Error('File is required');
@@ -50,9 +53,9 @@ export class BlobStorageService {
 	}
 
 	/**
-	 * Formatea el tamaño del archivo en formato legible
-	 * @param bytes - Tamaño en bytes
-	 * @returns Tamaño formateado (ej: "2.4 MB")
+	 * Formatea el tamaÃƒÆ’Ã‚Â±o del archivo en formato legible
+	 * @param bytes - TamaÃƒÆ’Ã‚Â±o en bytes
+	 * @returns TamaÃƒÆ’Ã‚Â±o formateado (ej: "2.4 MB")
 	 */
 	formatFileSize(bytes: number): string {
 		if (bytes === 0) return '0 Bytes';
@@ -63,7 +66,7 @@ export class BlobStorageService {
 	}
 
 	/**
-	 * Obtiene el tipo de archivo basándose en la extensión
+	 * Obtiene el tipo de archivo basÃƒÆ’Ã‚Â¡ndose en la extensiÃƒÆ’Ã‚Â³n
 	 * @param fileName - Nombre del archivo
 	 * @returns Tipo de archivo ('pdf', 'doc', 'image', 'video', 'link')
 	 */
@@ -86,3 +89,4 @@ export class BlobStorageService {
 		return typeMap[extension || ''] || 'link';
 	}
 }
+// #endregion

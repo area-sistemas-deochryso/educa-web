@@ -1,6 +1,9 @@
+// #region Imports
 import { Component, Input } from '@angular/core';
 import { CommonModule } from '@angular/common';
 
+// #endregion
+// #region Implementation
 @Component({
 	selector: 'app-login-button',
 	standalone: true,
@@ -16,3 +19,4 @@ export class LoginButtonComponent {
 	@Input() loadingLabel = 'Ingresando...';
 	@Input() type: 'submit' | 'button' = 'submit';
 }
+// #endregion

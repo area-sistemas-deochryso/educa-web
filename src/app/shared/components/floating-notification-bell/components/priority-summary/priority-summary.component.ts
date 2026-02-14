@@ -1,6 +1,9 @@
+// #region Imports
 import { Component, Input } from '@angular/core';
 import { CommonModule } from '@angular/common';
 
+// #endregion
+// #region Implementation
 export interface UnreadByPriority {
 	urgent: number;
 	high: number;
@@ -18,3 +21,4 @@ export class PrioritySummaryComponent {
 	// * Counts by priority for the header summary pills.
 	@Input({ required: true }) unreadByPriority!: UnreadByPriority;
 }
+// #endregion

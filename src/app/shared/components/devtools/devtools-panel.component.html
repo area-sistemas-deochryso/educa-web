@@ -1,0 +1,161 @@
+<!-- #region Template -->
+@if (isDev()) {
+	<aside class="devtools">
+		<button class="devtools-toggle" type="button" (click)="toggleOpen()">
+			DevTools
+		</button>
+
+		<div class="devtools-panel" [class.open]="open()">
+			<header class="devtools-header">
+				<div class="title">DevTools</div>
+				<button
+					class="close"
+					type="button"
+					aria-label="Cerrar DevTools"
+					(click)="toggleOpen()"
+				>
+					&#10005;
+				</button>
+			</header>
+
+			<!-- #region Feature Flags -->
+			<section class="devtools-section">
+				<div class="section-title">Feature Flags</div>
+				<div class="section-actions">
+					<button type="button" (click)="clearFlagOverrides()">
+						Reset overrides
+					</button>
+				</div>
+				<div class="flags">
+					@for (item of flagsVm().items; track item.key) {
+						<div class="flag-row">
+							<label class="flag-label">
+								<input
+									type="checkbox"
+									[checked]="item.effective"
+									(change)="setFlag(item.key, $any($event.target).checked)"
+								/>
+								<span class="flag-key">{{ item.key }}</span>
+							</label>
+							<div class="flag-meta">
+								<span>base: {{ item.base }}</span>
+								<span>override: {{ item.override ?? '-' }}</span>
+							</div>
+						</div>
+					}
+				</div>
+			</section>
+			<!-- #endregion -->
+
+			<!-- #region Logging -->
+			<section class="devtools-section">
+				<div class="section-title">Logging</div>
+				<div class="row">
+					<label>
+						<input
+							type="checkbox"
+							[checked]="loggingVm().log.enabled"
+							(change)="setLogEnabled($any($event.target).checked)"
+						/>
+						Logger enabled
+					</label>
+				</div>
+				<div class="row">
+					<label>Log level</label>
+					<select
+						[value]="loggingVm().log.minLevel"
+						(change)="setLogMinLevel($any($event.target).value)"
+					>
+						@for (level of logLevels; track level) {
+							<option [value]="level">{{ level }}</option>
+						}
+					</select>
+				</div>
+				<div class="row">
+					<label>Log filter</label>
+					<input
+						type="text"
+						[value]="loggingVm().log.filter"
+						(change)="setLogFilter($any($event.target).value)"
+						placeholder="Auth*,UI:*,-UI:Noisy*"
+					/>
+				</div>
+
+				<div class="row">
+					<label>
+						<input
+							type="checkbox"
+							[checked]="loggingVm().debug.enabled"
+							(change)="setDebugEnabled($any($event.target).checked)"
+						/>
+						Debug enabled
+					</label>
+				</div>
+				<div class="row">
+					<label>Debug level</label>
+					<select
+						[value]="loggingVm().debug.minLevel"
+						(change)="setDebugMinLevel($any($event.target).value)"
+					>
+						@for (level of debugLevels; track level) {
+							<option [value]="level">{{ level }}</option>
+						}
+					</select>
+				</div>
+				<div class="row">
+					<label>Debug filter</label>
+					<input
+						type="text"
+						[value]="loggingVm().debug.filter"
+						(change)="setDebugFilter($any($event.target).value)"
+						placeholder="STORE:*,API:*"
+					/>
+				</div>
+			</section>
+			<!-- #endregion -->
+
+			<!-- #region HTTP Trace -->
+			<section class="devtools-section">
+				<div class="section-title">HTTP Trace</div>
+				<div class="row">
+					<label>
+						<input
+							type="checkbox"
+							[checked]="traceVm().enabled"
+							(change)="setTraceEnabled($any($event.target).checked)"
+						/>
+						Trace enabled
+					</label>
+				</div>
+				<div class="row">
+					<label>Trace filter</label>
+					<input
+						type="text"
+						[value]="traceVm().filter"
+						(change)="setTraceFilter($any($event.target).value)"
+						placeholder="GET *api/*"
+					/>
+				</div>
+				<div class="row">
+					<label>Max entries</label>
+					<input
+						type="number"
+						min="1"
+						[value]="traceVm().maxEntries"
+						(change)="setTraceMaxEntries($any($event.target).value)"
+					/>
+				</div>
+				<div class="row stats">
+					<span>Total: {{ traceVm().stats.total }}</span>
+					<span>Failed: {{ traceVm().stats.failed }}</span>
+					<span>Avg: {{ traceVm().stats.avgMs }} ms</span>
+				</div>
+				<div class="row">
+					<button type="button" (click)="clearTrace()">Clear trace</button>
+				</div>
+			</section>
+			<!-- #endregion -->
+		</div>
+	</aside>
+}
+<!-- #endregion -->

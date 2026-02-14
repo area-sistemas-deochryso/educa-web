@@ -1,10 +1,13 @@
+// #region Imports
 import { ChangeDetectionStrategy, Component, input } from '@angular/core';
 import { UsuariosEstadisticas } from '@core/services';
 
 /**
- * Componente presentacional para las estadísticas de usuarios
+ * Componente presentacional para las estadÃƒÆ’Ã‚Â­sticas de usuarios
  * Muestra cards con totales por rol
  */
+// #endregion
+// #region Implementation
 @Component({
 	selector: 'app-usuarios-stats',
 	standalone: true,
@@ -17,3 +20,4 @@ export class UsuariosStatsComponent {
 	// * Aggregated totals for stat cards.
 	readonly estadisticas = input.required<UsuariosEstadisticas>();
 }
+// #endregion

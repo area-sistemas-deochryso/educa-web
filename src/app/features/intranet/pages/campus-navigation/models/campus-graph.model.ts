@@ -1,4 +1,4 @@
-// ============ Node Types ============
+// #region Node Types
 
 export type CampusNodeType =
 	| 'classroom'
@@ -35,7 +35,8 @@ export interface BlockedPath {
 	temporary: boolean;
 }
 
-// ============ Pathfinding Results ============
+// #endregion
+// #region Pathfinding Results
 
 export interface PathResult {
 	path: string[];
@@ -52,3 +53,4 @@ export interface NavigationStep {
 	instruction: string;
 	floorChange: boolean;
 }
+// #endregion

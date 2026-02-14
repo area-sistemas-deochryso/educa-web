@@ -1,5 +1,8 @@
+// #region Imports
 import { Component } from '@angular/core';
 
+// #endregion
+// #region Implementation
 @Component({
 	selector: 'app-login-options',
 	standalone: true,
@@ -8,3 +11,4 @@ import { Component } from '@angular/core';
 })
 // * Wrapper for login options (remember me, links).
 export class LoginOptionsComponent {}
+// #endregion

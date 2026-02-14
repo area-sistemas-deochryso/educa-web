@@ -24,7 +24,7 @@ export class PermisosUsuariosFacade {
 	readonly adminUtils = inject(AdminUtilsService);
 	private destroyRef = inject(DestroyRef);
 
-	// Estado público readonly desde el store
+	// Estado pÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Â ÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Âºblico readonly desde el store
 	readonly permisosUsuario = this.store.permisosUsuario;
 	readonly permisosRol = this.store.permisosRol;
 	readonly vistas = this.store.vistas;
@@ -62,7 +62,7 @@ export class PermisosUsuariosFacade {
 		this.helperService.getVistasCountLabel(this.selectedVistas().length),
 	);
 
-	// Computed - Módulos para detail drawer
+	// Computed - MÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Â ÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â³dulos para detail drawer
 	readonly moduloVistasForDetail = computed(() => {
 		const permiso = this.selectedPermiso();
 		if (!permiso) return [];
@@ -70,7 +70,7 @@ export class PermisosUsuariosFacade {
 		return this.helperService.buildModulosVistasForDetail(this.vistas(), permiso.vistas);
 	});
 
-	// === Data Loading ===
+	// #region Data Loading
 	loadData(): void {
 		this.store.setLoading(true);
 
@@ -105,7 +105,8 @@ export class PermisosUsuariosFacade {
 		this.loadData();
 	}
 
-	// === Filters ===
+	// #endregion
+	// #region Filters
 	setSearchTerm(term: string): void {
 		this.store.setSearchTerm(term);
 	}
@@ -118,7 +119,8 @@ export class PermisosUsuariosFacade {
 		this.store.clearFilters();
 	}
 
-	// === Detail Drawer ===
+	// #endregion
+	// #region Detail Drawer
 	openDetail(permiso: PermisoUsuario): void {
 		this.store.setSelectedPermiso(permiso);
 		this.store.setDetailDrawerVisible(true);
@@ -128,7 +130,8 @@ export class PermisosUsuariosFacade {
 		this.store.setDetailDrawerVisible(false);
 	}
 
-	// === Edit Dialog ===
+	// #endregion
+	// #region Edit Dialog
 	openNew(): void {
 		this.store.resetDialogState();
 		const modulos = this.helperService.buildModulosVistas(this.vistas(), []);
@@ -218,7 +221,8 @@ export class PermisosUsuariosFacade {
 		});
 	}
 
-	// === Rol & Vistas Loading ===
+	// #endregion
+	// #region Rol & Vistas Loading
 	loadVistasFromRol(): void {
 		const rol = this.selectedRol();
 		if (!rol) return;
@@ -241,7 +245,8 @@ export class PermisosUsuariosFacade {
 		}
 	}
 
-	// === Vista Selection ===
+	// #endregion
+	// #region Vista Selection
 	isVistaSelected(ruta: string): boolean {
 		return this.selectedVistas().includes(ruta);
 	}
@@ -256,7 +261,8 @@ export class PermisosUsuariosFacade {
 		this.store.updateModuloCount();
 	}
 
-	// === UI Setters ===
+	// #endregion
+	// #region UI Setters
 	setSelectedRol(rol: RolTipoAdmin | null): void {
 		this.store.setSelectedRol(rol);
 	}
@@ -272,4 +278,5 @@ export class PermisosUsuariosFacade {
 	setVistasBusqueda(term: string): void {
 		this.store.setVistasBusqueda(term);
 	}
+	// #endregion
 }

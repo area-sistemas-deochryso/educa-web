@@ -1,3 +1,4 @@
+// #region Implementation
 // debug.filter.ts
 // * Helper to compile include/exclude debug tag filters.
 export function compileDebugFilter(pattern: string | undefined | null) {
@@ -40,3 +41,20 @@ export function safeGetLocalStorage(key: string): string | null {
 		return null;
 	}
 }
+
+export function safeSetLocalStorage(key: string, value: string): void {
+	try {
+		localStorage.setItem(key, value);
+	} catch {
+		// noop
+	}
+}
+
+export function safeRemoveLocalStorage(key: string): void {
+	try {
+		localStorage.removeItem(key);
+	} catch {
+		// noop
+	}
+}
+// #endregion
