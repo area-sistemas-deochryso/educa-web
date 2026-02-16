@@ -1,10 +1,24 @@
 ---
 name: commit
 description: Create semantic commit messages following educa-web conventions
-allowed-tools: Bash(git:*)
+user-invokable: true
 ---
 
 Create a semantic commit for the staged changes in educa-web.
+
+## Pre-commit: Production Build
+
+**BEFORE staging files**, clean the old build output and rebuild:
+
+```bash
+# 1. Delete old build contents (keep dist/ folder itself)
+rm -rf dist/*
+
+# 2. Build fresh
+npx ng build --configuration production
+```
+
+If the build fails, fix the errors before proceeding. Do NOT commit with a broken build.
 
 ## Commit Format
 
@@ -41,13 +55,17 @@ type(scope): description
 
 ## Steps
 
-1. Run `git status` to see staged changes
-2. Run `git diff --cached` to understand what changed
-3. Analyze the changes and determine:
+1. Run `rm -rf dist/*` to delete old build contents
+2. Run `npx ng build --configuration production` to build fresh
+3. If build fails, fix the errors and rebuild
+3. Run `git status` to see all changes (including updated dist)
+4. Run `git diff --cached` or `git diff` to understand what changed
+5. Stage all relevant files with `git add`
+6. Analyze the changes and determine:
    - Type (feat, fix, refactor, etc.)
    - Scope (if applicable)
    - Clear description of WHY, not WHAT
-4. Create the commit with proper format
+7. Create the commit with proper format
 
 ## Examples
 
