@@ -13,17 +13,17 @@
  * 3. Guarda la nueva versión en localStorage
  * 4. El usuario nunca ve errores de deserialización
  *
- * CUÃNDO INCREMENTAR LA VERSIÃ“N:
+ * CUÁNDO INCREMENTAR LA VERSIÓN:
  * ✅ Cambias estructura de DTOs del módulo (agregar/quitar/renombrar campos)
  * ✅ Cambias tipos de datos (string → number, null → object)
  * ✅ Cambias códigos de estado o enums
- * âŒ Cambios que no afectan el JSON de respuesta (solo backend)
- * âŒ Cambios no-breaking (agregar campos opcionales al final)
+ * ❌ Cambios que no afectan el JSON de respuesta (solo backend)
+ * ❌ Cambios no-breaking (agregar campos opcionales al final)
  *
  * EJEMPLO DE USO:
  * ```
  * // Hiciste cambios en los DTOs de asistencias
- * asistencias: '2024-02-05-v2',  // â† Cambiar de v1 a v2
+ * asistencias: '2024-02-05-v2',  // ← Cambiar de v1 a v2
  *
  * // Al recargar la app:
  * // - Sistema detecta que asistencias cambió de v1 a v2
@@ -42,7 +42,7 @@ export const CACHE_VERSIONS = {
 	 * Módulo de asistencias (ConsultaAsistencia, reportes)
 	 * Patrón invalidado: /api/ConsultaAsistencia
 	 */
-	asistencias: '2024-02-05-v2', // â† Cambiar cuando modifiques DTOs de asistencias
+	asistencias: '2024-02-05-v2', // ← Cambiar cuando modifiques DTOs de asistencias
 
 	/**
 	 * Módulo de usuarios (CRUD usuarios)

@@ -668,7 +668,7 @@ strong {
 	backdrop-filter: blur(0px); /* el blur real lo aplicamos al contenido */
 }
 
-/* Blur + bloqueo de interacciÃ³n del contenido â€œrealâ€ */
+/* Blur + bloqueo de interacción del contenido "real" */
 .table-loading--active > *:not(.table-loading__overlay) {
 	filter: blur(var(--table-loading-blur, 2px));
 	pointer-events: none;
