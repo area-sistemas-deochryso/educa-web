@@ -24,7 +24,7 @@ export class HeaderComponent {
 	toggleMenu() {
 		// * Toggle menu and collapse dropdown if closing.
 		this.isMenuOpen.update((v) => !v);
-		// Cerrar dropdown cuando se cierra el menÃƒÂº
+		// Cerrar dropdown cuando se cierra el menú
 		if (!this.isMenuOpen()) {
 			this.isDropdownOpen.set(false);
 		}

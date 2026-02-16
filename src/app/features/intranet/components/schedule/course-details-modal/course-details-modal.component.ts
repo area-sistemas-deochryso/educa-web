@@ -122,12 +122,12 @@ export class CourseDetailsModalComponent implements OnChanges {
 				{ name: 'Examen Calificado 5', grade: 0 },
 			],
 			workGroup: [
-				'Tupac Yupanqui MarÃƒÂ­a JosÃƒÂ©',
-				'GarcÃƒÂ­a LÃƒÂ³pez Pedro',
-				'RodrÃƒÂ­guez Silva Ana',
+				'Tupac Yupanqui María José',
+				'García López Pedro',
+				'Rodríguez Silva Ana',
 				'Mendoza Quispe Carlos',
 			],
-			teacher: 'Sifuentes GarcÃƒÂ­a Diana Isabella',
+			teacher: 'Sifuentes García Diana Isabella',
 		};
 	}
 

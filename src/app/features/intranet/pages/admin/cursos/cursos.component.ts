@@ -328,7 +328,7 @@ export class CursosComponent implements OnInit {
 	// #endregion
 	// #region Grado Selection Management
 	addGrado(gradoId: number): void {
-		// Determinar a quÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Â ÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â© nivel pertenece el grado
+		// Determinar a qué nivel pertenece el grado
 		const isInicial = this.gradosInicial().some((g) => g.id === gradoId);
 		const isPrimaria = this.gradosPrimaria().some((g) => g.id === gradoId);
 		const isSecundaria = this.gradosSecundaria().some((g) => g.id === gradoId);
@@ -343,7 +343,7 @@ export class CursosComponent implements OnInit {
 	}
 
 	removeGrado(gradoId: number): void {
-		// Buscar en quÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Â ÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â© nivel estÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Â ÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¡ el grado y removerlo
+		// Buscar en qué nivel está el grado y removerlo
 		if (this.selectedInicial().includes(gradoId)) {
 			this.selectedInicial.update((ids) => ids.filter((id) => id !== gradoId));
 		} else if (this.selectedPrimaria().includes(gradoId)) {

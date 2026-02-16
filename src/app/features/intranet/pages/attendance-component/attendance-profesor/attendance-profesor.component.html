@@ -15,7 +15,7 @@
 		@if (selectedSalon() && view.viewMode() === 'mes') {
 			<!-- * PDF actions only in month mode -->
 			<div class="pdf-section">
-				<span class="pdf-label">Reporte del dÃ­a: {{ view.pdfFecha() | date: 'dd/MM/yyyy' }}</span>
+				<span class="pdf-label">Reporte del día: {{ view.pdfFecha() | date: 'dd/MM/yyyy' }}</span>
 				<p-button
 					icon="pi pi-file-pdf"
 					[loading]="view.downloadingPdf()"
@@ -59,10 +59,10 @@
 			/>
 		} @else if (!view.loading()) {
 			<!-- ! Empty state after load -->
-			<app-empty-state message="No se encontraron estudiantes en este salÃ³n." />
+			<app-empty-state message="No se encontraron estudiantes en este salón." />
 		}
 	} @else {
-		<!-- * Day mode list with date picker + PDF options + estadÃ­sticas desde backend -->
+		<!-- * Day mode list with date picker + PDF options + estadísticas desde backend -->
 		<app-asistencia-dia-list
 			[estudiantes]="view.estudiantesDia()"
 			[fecha]="view.fechaDia()"

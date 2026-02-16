@@ -28,7 +28,7 @@ interface SelectOption {
 					(ngModelChange)="startChange.emit($event)"
 					optionLabel="label"
 					optionValue="value"
-					placeholder="Selecciona tu ubicaciÃƒÂ³n"
+					placeholder="Selecciona tu ubicación"
 					appendTo="body"
 					[filter]="true"
 					filterPlaceholder="Buscar..."

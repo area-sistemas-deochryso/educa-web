@@ -49,8 +49,8 @@ import { HorarioProfesorDto, CrearCursoContenidoRequest } from '../models';
 					<ng-template #header>
 						<tr>
 							<th>Curso</th>
-							<th>SalÃƒÆ’Ã‚Â³n</th>
-							<th>DÃƒÆ’Ã‚Â­a</th>
+							<th>Salón</th>
+							<th>Día</th>
 							<th>Horario</th>
 							<th style="width: 100px">Acciones</th>
 						</tr>
@@ -84,7 +84,7 @@ import { HorarioProfesorDto, CrearCursoContenidoRequest } from '../models';
 			</div>
 		}
 
-		<!-- #region Dialogs de contenido -->
+		<!-- Dialogs de contenido -->
 		<app-curso-content-dialog />
 
 		<app-curso-builder-dialog
@@ -124,4 +124,4 @@ export class ProfesorCursosComponent implements OnInit {
 		this.contenidoFacade.crearContenido(request);
 	}
 }
-		<!-- #endregion -->
+

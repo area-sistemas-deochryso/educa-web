@@ -8,13 +8,13 @@ import { NotificationStorageData } from './storage.models';
  *
  * Ideal para:
  * - Datos que necesitan consultas complejas
- * - Grandes volÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Â ÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Âºmenes de datos estructurados
+ * - Grandes volúmenes de datos estructurados
  * - Aplicaciones offline-first
  * - Datos que pueden crecer con el tiempo
  *
  * Ventajas:
- * - Almacenamiento asÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Â ÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â­ncrono (no bloquea UI)
- * - Soporta ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Â ÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â­ndices y consultas
+ * - Almacenamiento asíncrono (no bloquea UI)
+ * - Soporta índices y consultas
  * - Mayor capacidad que localStorage
  * - Transacciones ACID
  */
@@ -61,7 +61,7 @@ export class IndexedDBService {
 		}
 	}
 
-	// #region INICIALIZACIÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Â ÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢ÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡Ãƒâ€šÃ‚Â¬ÃƒÆ’Ã¢â‚¬Â¦ÃƒÂ¢Ã¢â€šÂ¬Ã…â€œN
+	// #region INICIALIZACIÓN
 
 	private initDB(): Promise<boolean> {
 		return new Promise((resolve) => {
@@ -310,7 +310,7 @@ export class IndexedDBService {
 				request.onsuccess = () => {
 					const record = request.result as CacheRecord<T> | undefined;
 					if (record) {
-						// Verificar expiraciÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Â ÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â³n
+						// Verificar expiración
 						if (record.expiresAt && record.expiresAt < Date.now()) {
 							this.removeCache(key);
 							resolve(null);

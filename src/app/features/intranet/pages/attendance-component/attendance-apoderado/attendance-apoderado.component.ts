@@ -12,7 +12,7 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
 /**
  * Componente Container para vista de asistencias de Apoderados.
- * Maneja la selecciÃƒÆ’Ã‚Â³n de hijos y muestra sus ingresos/salidas.
+ * Maneja la selección de hijos y muestra sus ingresos/salidas.
  */
 // #endregion
 // #region Implementation

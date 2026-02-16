@@ -32,7 +32,7 @@ export class HeroSectionComponent {
 		if (this.formData.name && this.formData.phone) {
 			this.isSubmitting = true;
 
-			// Simular envÃƒÂ­o a Formspree o backend
+			// Simular envío a Formspree o backend
 			const formspreeUrl = 'https://formspree.io/f/mzzprebk';
 
 			fetch(formspreeUrl, {
@@ -43,7 +43,7 @@ export class HeroSectionComponent {
 				body: JSON.stringify(this.formData),
 			})
 				.then(() => {
-					alert('Ã‚Â¡Gracias por contactarnos! Nos comunicaremos contigo pronto.');
+					alert('¡Gracias por contactarnos! Nos comunicaremos contigo pronto.');
 					this.formData = { name: '', phone: '' };
 				})
 				.catch(() => {

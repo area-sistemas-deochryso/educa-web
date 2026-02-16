@@ -8,7 +8,7 @@ import { StorageService } from '../storage';
 import { PermisosService } from './permisos.service';
 import { PermisosUsuarioResultado } from './permisos.models';
 
-/** Intervalo en ms entre cada verificaciÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Â ÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â³n de expiraciÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Â ÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â³n del token de permisos (5 min) */
+/** Intervalo en ms entre cada verificación de expiración del token de permisos (5 min) */
 const PERMISOS_CHECK_INTERVAL_MS = 5 * 60 * 1000;
 
 @Injectable({
@@ -42,7 +42,7 @@ export class UserPermisosService {
 		() => this._permisos()?.tienePermisosPersonalizados ?? false,
 	);
 
-	// Guarda el estado anterior de autenticaciÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Â ÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â³n para detectar cambios
+	// Guarda el estado anterior de autenticación para detectar cambios
 	private wasAuthenticated = false;
 
 	constructor() {
@@ -54,12 +54,12 @@ export class UserPermisosService {
 		// Intentar cargar permisos desde storage al iniciar
 		this.loadFromStorage();
 
-		// Effect que maneja cambios de autenticaciÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Â ÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â³n
+		// Effect que maneja cambios de autenticación
 		effect(() => {
 			const authenticated = this.isAuthenticated();
 
 			if (!authenticated) {
-				// Usuario cerrÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Â ÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â³ sesiÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Â ÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â³n - limpiar todo
+				// Usuario cerró sesión - limpiar todo
 				logger.tagged(
 					'UserPermisosService',
 					'log',
@@ -72,7 +72,7 @@ export class UserPermisosService {
 				this.wasAuthenticated = false;
 				this.stopPermisosRefresh();
 			} else if (!this.wasAuthenticated) {
-				// Usuario acaba de iniciar sesiÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Â ÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â³n (transiciÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Â ÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â³n de no autenticado a autenticado)
+				// Usuario acaba de iniciar sesión (transición de no autenticado a autenticado)
 				// Forzar reset de flags para permitir nueva carga
 				logger.tagged(
 					'UserPermisosService',
@@ -84,7 +84,7 @@ export class UserPermisosService {
 				this._loading.set(false);
 				this._loadFailed.set(false);
 				this.wasAuthenticated = true;
-				// Intentar cargar desde storage (que ahora tendrÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Â ÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¡ el nuevo sessionKey)
+				// Intentar cargar desde storage (que ahora tendrá el nuevo sessionKey)
 				this.loadFromStorage();
 				this.startPermisosRefresh();
 			}
@@ -104,12 +104,12 @@ export class UserPermisosService {
 			storedPermisos,
 		);
 		if (storedPermisos) {
-			// Si tiene token y estÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Â ÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¡ expirado, cargar como stale ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬Ãƒâ€¦Ã‚Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¬ÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡Ãƒâ€šÃ‚Â¬ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â startPermisosRefresh refrescarÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Â ÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¡ inmediatamente
+			// Si tiene token y está expirado, cargar como stale — startPermisosRefresh refrescará inmediatamente
 			if (storedPermisos.permisosToken && this.isTokenExpired(storedPermisos.permisosToken)) {
 				logger.tagged(
 					'UserPermisosService',
 					'log',
-					'loadFromStorage() - token de permisos expirado, se cargarÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Â ÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¡ cache como stale',
+					'loadFromStorage() - token de permisos expirado, se cargará cache como stale',
 				);
 			}
 			this._permisos.set(storedPermisos);
@@ -145,7 +145,7 @@ export class UserPermisosService {
 			return;
 		}
 
-		// Si ya estÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Â ÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¡n cargados o cargando, no hacer nada
+		// Si ya están cargados o cargando, no hacer nada
 		if (this._loaded() || this._loading()) {
 			return;
 		}
@@ -176,8 +176,8 @@ export class UserPermisosService {
 
 	/**
 	 * Carga los permisos y retorna una Promise que indica si se cargaron correctamente
-	 * ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Â ÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â¦ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¡til para guards que necesitan esperar
-	 * @returns true si los permisos se cargaron correctamente, false si fallÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Â ÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â³
+	 * Útil para guards que necesitan esperar
+	 * @returns true si los permisos se cargaron correctamente, false si falló
 	 */
 	async ensurePermisosLoaded(): Promise<boolean> {
 		logger.tagged('UserPermisosService', 'log', 'ensurePermisosLoaded() - INICIO');
@@ -198,7 +198,7 @@ export class UserPermisosService {
 			return false;
 		}
 
-		// Si ya estÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Â ÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¡n cargados y tenemos permisos, retornar ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Â ÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â©xito
+		// Si ya están cargados y tenemos permisos, retornar éxito
 		if (this._loaded() && this._permisos() !== null) {
 			logger.tagged(
 				'UserPermisosService',
@@ -208,17 +208,17 @@ export class UserPermisosService {
 			return true;
 		}
 
-		// Si ya intentamos y fallÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Â ÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â³, retornar false sin reintentar
+		// Si ya intentamos y falló, retornar false sin reintentar
 		if (this._loadFailed()) {
 			logger.tagged(
 				'UserPermisosService',
 				'log',
-				'ensurePermisosLoaded() - Ya fallÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Â ÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â³ anteriormente, retornando false',
+				'ensurePermisosLoaded() - Ya falló anteriormente, retornando false',
 			);
 			return false;
 		}
 
-		// Si no estÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Â ÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¡n cargando, iniciar la carga
+		// Si no están cargando, iniciar la carga
 		if (!this._loading()) {
 			logger.tagged(
 				'UserPermisosService',
@@ -268,11 +268,11 @@ export class UserPermisosService {
 			}
 		}
 
-		// Si estÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Â ÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¡ cargando, esperar a que termine y verificar resultado
+		// Si está cargando, esperar a que termine y verificar resultado
 		logger.tagged(
 			'UserPermisosService',
 			'log',
-			'ensurePermisosLoaded() - Ya estÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Â ÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¡ cargando, esperando...',
+			'ensurePermisosLoaded() - Ya está cargando, esperando...',
 		);
 		await this.waitForLoaded();
 		const result = !this._loadFailed() && this._permisos() !== null;
@@ -286,7 +286,7 @@ export class UserPermisosService {
 	}
 
 	/**
-	 * Espera hasta que los permisos estÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Â ÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â©n cargados o haya fallado la carga
+	 * Espera hasta que los permisos estén cargados o haya fallado la carga
 	 */
 	private waitForLoaded(): Promise<void> {
 		return new Promise((resolve) => {
@@ -318,7 +318,7 @@ export class UserPermisosService {
 			vistas,
 		);
 
-		// Si los permisos estÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Â ÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¡n cargados pero el array estÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Â ÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¡ vacÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Â ÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â­o,
+		// Si los permisos están cargados pero el array está vacío,
 		// significa que no hay permisos configurados -> permitir todo
 		if (this._loaded() && vistas.length === 0) {
 			logger.tagged(
@@ -329,7 +329,7 @@ export class UserPermisosService {
 			return true;
 		}
 
-		// Si no hay permisos cargados aÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Â ÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Âºn, denegar por defecto
+		// Si no hay permisos cargados aún, denegar por defecto
 		if (!this._loaded()) {
 			logger.tagged(
 				'UserPermisosService',
@@ -339,10 +339,10 @@ export class UserPermisosService {
 			return false;
 		}
 
-		// Normalizar la ruta (quitar / inicial si existe y convertir a minÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Â ÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Âºsculas)
+		// Normalizar la ruta (quitar / inicial si existe y convertir a minúsculas)
 		const rutaNormalizada = (ruta.startsWith('/') ? ruta.substring(1) : ruta).toLowerCase();
 
-		// Verificar si la ruta estÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Â ÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¡ permitida - SOLO coincidencia exacta
+		// Verificar si la ruta está permitida - SOLO coincidencia exacta
 		const resultado = vistas.some((vista) => {
 			const vistaNormalizada = (
 				vista.startsWith('/') ? vista.substring(1) : vista
@@ -367,7 +367,7 @@ export class UserPermisosService {
 	}
 
 	/**
-	 * Filtra un array de rutas segÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Â ÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Âºn los permisos del usuario
+	 * Filtra un array de rutas según los permisos del usuario
 	 */
 	filtrarRutasPermitidas<T extends { route: string }>(items: T[]): T[] {
 		const vistas = this.vistasPermitidas();
@@ -402,10 +402,10 @@ export class UserPermisosService {
 		this.loadPermisos(destroyRef);
 	}
 
-	// #region Refresh periÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Â ÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â³dico por expiraciÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Â ÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â³n de token
+	// #region Refresh periódico por expiración de token
 
 	/**
-	 * Decodifica el claim 'exp' de un JWT y verifica si ya expirÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Â ÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â³.
+	 * Decodifica el claim 'exp' de un JWT y verifica si ya expiró.
 	 * Solo lee el payload (parte central) sin verificar la firma.
 	 */
 	private isTokenExpired(token: string): boolean {
@@ -419,8 +419,8 @@ export class UserPermisosService {
 	}
 
 	/**
-	 * Inicia el intervalo periÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Â ÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â³dico que verifica la expiraciÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Â ÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â³n del token de permisos.
-	 * Si detecta expiraciÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Â ÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â³n hace un GET automÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Â ÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¡tico para refrescar los permisos.
+	 * Inicia el intervalo periódico que verifica la expiración del token de permisos.
+	 * Si detecta expiración hace un GET automático para refrescar los permisos.
 	 */
 	private startPermisosRefresh(): void {
 		this.stopPermisosRefresh();

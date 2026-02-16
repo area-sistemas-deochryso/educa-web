@@ -4,7 +4,7 @@ import { ChangeDetectionStrategy, Component } from '@angular/core';
 import { SkeletonLoaderComponent } from '@shared/components';
 
 /**
- * Skeleton screen para las tarjetas de estadÃƒÂ­sticas
+ * Skeleton screen para las tarjetas de estadísticas
  * Se muestra inmediatamente para mejorar Speed Index
  */
 // #endregion

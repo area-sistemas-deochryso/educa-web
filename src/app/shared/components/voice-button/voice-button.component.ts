@@ -54,9 +54,9 @@ export class VoiceButtonComponent implements OnInit, AfterViewInit, OnDestroy {
 		'control',
 	];
 	categoryLabels: Record<VoiceCommandCategory, string> = {
-		navigation: 'NavegaciÃƒÂ³n',
+		navigation: 'Navegación',
 		scroll: 'Scroll',
-		pagination: 'PaginaciÃƒÂ³n',
+		pagination: 'Paginación',
 		modal: 'Modales',
 		date: 'Fechas',
 		control: 'Control',
@@ -185,7 +185,7 @@ export class VoiceButtonComponent implements OnInit, AfterViewInit, OnDestroy {
 	}
 
 	getCommandPatterns(patterns: string[]): string {
-		// Mostrar solo el primer patrÃƒÂ³n de forma legible
+		// Mostrar solo el primer patrón de forma legible
 		return patterns[0].replace(/\(.*?\)/g, '...').replace(/\\/g, '');
 	}
 }

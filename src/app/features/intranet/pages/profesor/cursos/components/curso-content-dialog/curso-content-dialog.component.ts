@@ -97,8 +97,8 @@ export class CursoContentDialogComponent {
 
 	onDeleteArchivo(semanaId: number, archivoId: number, nombreArchivo: string): void {
 		this.confirmationService.confirm({
-			message: `ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¿Eliminar el archivo "${nombreArchivo}"?`,
-			header: 'Confirmar EliminaciÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â³n',
+			message: `¿Eliminar el archivo "${nombreArchivo}"?`,
+			header: 'Confirmar Eliminación',
 			icon: 'pi pi-exclamation-triangle',
 			acceptLabel: 'Eliminar',
 			rejectLabel: 'Cancelar',
@@ -146,8 +146,8 @@ export class CursoContentDialogComponent {
 
 	onDeleteTarea(semanaId: number, tareaId: number, titulo: string): void {
 		this.confirmationService.confirm({
-			message: `ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¿Eliminar la tarea "${titulo}"?`,
-			header: 'Confirmar EliminaciÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â³n',
+			message: `¿Eliminar la tarea "${titulo}"?`,
+			header: 'Confirmar Eliminación',
 			icon: 'pi pi-exclamation-triangle',
 			acceptLabel: 'Eliminar',
 			rejectLabel: 'Cancelar',
@@ -165,7 +165,7 @@ export class CursoContentDialogComponent {
 		if (!contenido) return;
 
 		this.confirmationService.confirm({
-			message: 'ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¿Eliminar todo el contenido de este curso? Esta acciÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â³n no se puede deshacer.',
+			message: '¿Eliminar todo el contenido de este curso? Esta acción no se puede deshacer.',
 			header: 'Eliminar Contenido',
 			icon: 'pi pi-exclamation-triangle',
 			acceptLabel: 'Eliminar',

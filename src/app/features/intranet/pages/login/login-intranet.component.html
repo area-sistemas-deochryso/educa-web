@@ -2,7 +2,7 @@
 <div class="login-overlay">
 	<div class="login-modal">
 		<!-- * Branding header -->
-		<app-login-header title="INICIAR SESIÃ“N" logoSrc="images/logo.png" />
+		<app-login-header title="INICIAR SESIÓN" logoSrc="images/logo.png" />
 
 		<!-- * Form wrapper with reactive bindings -->
 		<form class="login-form" [formGroup]="loginForm" (ngSubmit)="onLogin()" autocomplete="on">
@@ -36,7 +36,7 @@
 				<input
 					[type]="showPassword() ? 'text' : 'password'"
 					pInputText
-					placeholder="ContraseÃ±a"
+					placeholder="Contraseña"
 					formControlName="password"
 					autocomplete="current-password"
 					appUppercaseInput
@@ -62,12 +62,12 @@
 			<!-- * Remember me / extras -->
 			<app-login-options>
 				<label class="remember-toggle">
-					<span>Recordar sesiÃ³n</span>
+					<span>Recordar sesión</span>
 					<p-toggleSwitch formControlName="rememberMe" />
 				</label>
 				<!-- ? Password recovery link intentionally hidden for now -->
 				<!-- <a href="#" class="forgot-link" (click)="onForgotPassword($event)">
-					Â¿Ha olvidado la contraseÃ±a?
+					¿Ha olvidado la contraseña?
 				</a> -->
 			</app-login-options>
 

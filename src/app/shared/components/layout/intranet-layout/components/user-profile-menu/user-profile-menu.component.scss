@@ -48,7 +48,7 @@
 }
 
 :host ::ng-deep .profile-avatar {
-	// Colores con contraste WCAG AA (4.5:1 mÃ­nimo)
+	// Colores con contraste WCAG AA (4.5:1 mínimo)
 	background: linear-gradient(135deg, #4f46e5 0%, #4338ca 100%); // indigo-600 a indigo-700
 	color: #ffffff;
 	font-weight: 600;
@@ -125,7 +125,7 @@
 }
 
 :host ::ng-deep .popover-avatar {
-	// Colores con contraste WCAG AA (4.5:1 mÃ­nimo)
+	// Colores con contraste WCAG AA (4.5:1 mínimo)
 	background: linear-gradient(135deg, #4f46e5 0%, #4338ca 100%); // indigo-600 a indigo-700
 	color: #ffffff;
 	font-weight: 600;

@@ -156,12 +156,12 @@ export class DebugService {
 		// Filtrado por tag
 		if (!this.filterFn(tag)) return;
 
-		// Nivel mÃƒÆ’Ã‚Â­nimo
+		// Nivel mínimo
 		if (LEVEL_WEIGHT[level] > LEVEL_WEIGHT[this.minLevel]) return;
 
 		const payload = data === undefined ? [msg] : [msg, data];
 
-		// Stack solo en TRACE si estÃƒÆ’Ã‚Â¡ habilitado
+		// Stack solo en TRACE si está habilitado
 		if (level === 'TRACE' && this.cfg.enableStackInTrace) {
 			const source = captureSource();
 			logger.tagged(tag, 'debug', ...payload, source);

@@ -11,7 +11,7 @@ export const authGuard: CanActivateFn = () => {
 	const authService = inject(AuthService);
 	const router = inject(Router);
 
-	// VerificaciÃƒÂ³n del token local
+	// Verificación del token local
 	// Nota: no hace roundtrip al servidor; solo valida el estado en memoria.
 	if (authService.isAuthenticated) {
 		return true;

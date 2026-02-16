@@ -5,27 +5,27 @@ import { SwService } from '@features/intranet/services/sw/sw.service';
 
 /**
  * ============================================================================
- * SERVICIO DE INVALIDACIÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬Ãƒâ€¦Ã¢â‚¬Å“N DE CACHE
+ * SERVICIO DE INVALIDACIÓN DE CACHE
  * ============================================================================
  *
- * RESPONSABILIDAD ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Â¦Ãƒâ€šÃ‚Â¡NICA:
- * Gestionar la invalidaciÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â³n del cache offline cuando el backend cambia su estructura.
+ * RESPONSABILIDAD ÚNICA:
+ * Gestionar la invalidación del cache offline cuando el backend cambia su estructura.
  *
  * PROBLEMA QUE RESUELVE:
  * Cuando el backend modifica DTOs (agregar/quitar campos, cambiar tipos), el cache
- * offline guarda datos con la estructura antigua. La primera peticiÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â³n del usuario
+ * offline guarda datos con la estructura antigua. La primera petición del usuario
  * falla porque el frontend intenta deserializar datos incompatibles.
  *
- * SOLUCIÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬Ãƒâ€¦Ã¢â‚¬Å“N:
- * Provee una API semÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¡ntica para invalidar cache de forma quirÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Âºrgica segÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Âºn el contexto:
+ * SOLUCIÓN:
+ * Provee una API semántica para invalidar cache de forma quirúrgica según el contexto:
  * - Todo el cache (logout, cambios globales)
- * - MÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â³dulo completo (asistencias, usuarios, reportes)
- * - Endpoint especÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â­fico (un solo DTO cambiÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â³)
+ * - Módulo completo (asistencias, usuarios, reportes)
+ * - Endpoint específico (un solo DTO cambió)
  *
  * USO:
- * 1. En guards de mÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â³dulos cuando hay cambios breaking
+ * 1. En guards de módulos cuando hay cambios breaking
  * 2. En servicios antes de llamar endpoints modificados
- * 3. En logout para limpiar datos de sesiÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â³n
+ * 3. En logout para limpiar datos de sesión
  */
 @Injectable({
 	providedIn: 'root',
@@ -33,12 +33,12 @@ import { SwService } from '@features/intranet/services/sw/sw.service';
 export class CacheInvalidationService {
 	private swService = inject(SwService);
 
-	// #region InvalidaciÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â³n total
+	// #region Invalidación total
 
 	/**
-	 * CUÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚ÂNDO USAR: Logout, cambios breaking globales en la API
+	 * CUÁNDO USAR: Logout, cambios breaking globales en la API
 	 *
-	 * EFECTO: Limpia TODO el cache. Todas las prÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â³ximas peticiones irÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¡n al servidor.
+	 * EFECTO: Limpia TODO el cache. Todas las próximas peticiones irán al servidor.
 	 *
 	 * EJEMPLO:
 	 * ```typescript
@@ -55,79 +55,79 @@ export class CacheInvalidationService {
 	}
 
 	// #endregion
-	// #region InvalidaciÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â³n por mÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â³dulo
+	// #region Invalidación por módulo
 
 	/**
-	 * CUÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚ÂNDO USAR: Cuando un mÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â³dulo completo del backend cambiÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â³ su estructura
+	 * CUÁNDO USAR: Cuando un módulo completo del backend cambió su estructura
 	 *
-	 * EFECTO: Invalida todos los endpoints que contengan el patrÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â³n.
+	 * EFECTO: Invalida todos los endpoints que contengan el patrón.
 	 *
 	 * EJEMPLO:
 	 * ```typescript
-	 * // En un guard de mÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â³dulo despuÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â©s de deploy con cambios breaking
+	 * // En un guard de módulo después de deploy con cambios breaking
 	 * async canActivate(): Promise<boolean> {
 	 *   await this.cacheInvalidation.invalidateAsistenciasModule();
 	 *   return true;
 	 * }
 	 * ```
 	 *
-	 * @returns NÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Âºmero de entradas invalidadas
+	 * @returns Número de entradas invalidadas
 	 */
 	async invalidateAsistenciasModule(): Promise<number> {
-		logger.log('[CacheInvalidation] Invalidando mÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â³dulo de asistencias');
+		logger.log('[CacheInvalidation] Invalidando módulo de asistencias');
 		return await this.swService.invalidateCacheByPattern('/api/ConsultaAsistencia');
 	}
 
 	/**
-	 * CUÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚ÂNDO USAR: Cuando el mÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â³dulo de usuarios cambiÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â³ (DTOs, estructura)
+	 * CUÁNDO USAR: Cuando el módulo de usuarios cambió (DTOs, estructura)
 	 *
-	 * @returns NÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Âºmero de entradas invalidadas
+	 * @returns Número de entradas invalidadas
 	 */
 	async invalidateUsuariosModule(): Promise<number> {
-		logger.log('[CacheInvalidation] Invalidando mÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â³dulo de usuarios');
+		logger.log('[CacheInvalidation] Invalidando módulo de usuarios');
 		return await this.swService.invalidateCacheByPattern('/api/usuarios');
 	}
 
 	/**
-	 * CUÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚ÂNDO USAR: Cuando el mÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â³dulo de salones cambiÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â³
+	 * CUÁNDO USAR: Cuando el módulo de salones cambió
 	 *
-	 * @returns NÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Âºmero de entradas invalidadas
+	 * @returns Número de entradas invalidadas
 	 */
 	async invalidateSalonesModule(): Promise<number> {
-		logger.log('[CacheInvalidation] Invalidando mÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â³dulo de salones');
+		logger.log('[CacheInvalidation] Invalidando módulo de salones');
 		return await this.swService.invalidateCacheByPattern('/api/salones');
 	}
 
 	/**
-	 * CUÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚ÂNDO USAR: Cuando el mÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â³dulo de cursos cambiÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â³
+	 * CUÁNDO USAR: Cuando el módulo de cursos cambió
 	 *
-	 * @returns NÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Âºmero de entradas invalidadas
+	 * @returns Número de entradas invalidadas
 	 */
 	async invalidateCursosModule(): Promise<number> {
-		logger.log('[CacheInvalidation] Invalidando mÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â³dulo de cursos');
+		logger.log('[CacheInvalidation] Invalidando módulo de cursos');
 		return await this.swService.invalidateCacheByPattern('/api/cursos');
 	}
 
 	/**
-	 * CUÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚ÂNDO USAR: Cuando el mÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â³dulo de reportes cambiÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â³
+	 * CUÁNDO USAR: Cuando el módulo de reportes cambió
 	 *
-	 * @returns NÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Âºmero de entradas invalidadas
+	 * @returns Número de entradas invalidadas
 	 */
 	async invalidateReportesModule(): Promise<number> {
-		logger.log('[CacheInvalidation] Invalidando mÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â³dulo de reportes');
+		logger.log('[CacheInvalidation] Invalidando módulo de reportes');
 		return await this.swService.invalidateCacheByPattern('/api/reportes');
 	}
 
 	// #endregion
-	// #region InvalidaciÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â³n personalizada
+	// #region Invalidación personalizada
 
 	/**
-	 * CUÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚ÂNDO USAR: Cuando necesitas invalidar un patrÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â³n personalizado no cubierto
-	 * por los mÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â©todos de mÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â³dulos especÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â­ficos.
+	 * CUÁNDO USAR: Cuando necesitas invalidar un patrón personalizado no cubierto
+	 * por los métodos de módulos específicos.
 	 *
 	 * EJEMPLO:
 	 * ```typescript
-	 * // Invalidar todos los endpoints de un controller especÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â­fico
+	 * // Invalidar todos los endpoints de un controller específico
 	 * await this.cacheInvalidation.invalidateByPattern('/api/Sistema');
 	 *
 	 * // Invalidar todos los endpoints que contengan "estadisticas"
@@ -135,31 +135,31 @@ export class CacheInvalidationService {
 	 * ```
 	 *
 	 * @param pattern - Texto a buscar en las URLs (case-sensitive)
-	 * @returns NÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Âºmero de entradas invalidadas
+	 * @returns Número de entradas invalidadas
 	 */
 	async invalidateByPattern(pattern: string): Promise<number> {
-		logger.log('[CacheInvalidation] Invalidando patrÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â³n personalizado:', pattern);
+		logger.log('[CacheInvalidation] Invalidando patrón personalizado:', pattern);
 		return await this.swService.invalidateCacheByPattern(pattern);
 	}
 
 	/**
-	 * CUÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚ÂNDO USAR: Cuando un solo endpoint especÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â­fico cambiÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â³ su estructura.
+	 * CUÁNDO USAR: Cuando un solo endpoint específico cambió su estructura.
 	 *
 	 * VENTAJA: Preserva el cache de otros endpoints, mejor performance.
 	 *
 	 * EJEMPLO:
 	 * ```typescript
-	 * // Antes de llamar un endpoint que sabemos que cambiÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â³
+	 * // Antes de llamar un endpoint que sabemos que cambió
 	 * await this.cacheInvalidation.invalidateEndpoint(
 	 *   'https://api.example.com/api/usuarios/123'
 	 * );
 	 * const user = await this.api.getUser(123); // Obtiene estructura nueva
 	 * ```
 	 *
-	 * @param url - URL exacta del endpoint (serÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¡ normalizada automÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¡ticamente)
+	 * @param url - URL exacta del endpoint (será normalizada automáticamente)
 	 */
 	async invalidateEndpoint(url: string): Promise<void> {
-		logger.log('[CacheInvalidation] Invalidando endpoint especÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â­fico:', url);
+		logger.log('[CacheInvalidation] Invalidando endpoint específico:', url);
 		await this.swService.invalidateCacheByUrl(url);
 	}
 
@@ -167,11 +167,11 @@ export class CacheInvalidationService {
 	// #region Helpers para casos comunes
 
 	/**
-	 * CUÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚ÂNDO USAR: DespuÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â©s de hacer deploy con cambios en mÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Âºltiples mÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â³dulos.
+	 * CUÁNDO USAR: Después de hacer deploy con cambios en múltiples módulos.
 	 *
 	 * EJEMPLO:
 	 * ```typescript
-	 * // En AppComponent despuÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â©s de detectar nueva versiÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â³n
+	 * // En AppComponent después de detectar nueva versión
 	 * async ngOnInit(): Promise<void> {
 	 *   const version = await this.api.getVersion();
 	 *   if (version !== this.localVersion) {
@@ -185,13 +185,13 @@ export class CacheInvalidationService {
 	 * }
 	 * ```
 	 *
-	 * @param modules - Array de nombres de mÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â³dulos a invalidar
+	 * @param modules - Array de nombres de módulos a invalidar
 	 * @returns Total de entradas invalidadas
 	 */
 	async invalidateMultipleModules(
 		modules: Array<'asistencias' | 'usuarios' | 'salones' | 'cursos' | 'reportes'>
 	): Promise<number> {
-		logger.log('[CacheInvalidation] Invalidando mÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Âºltiples mÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â³dulos:', modules);
+		logger.log('[CacheInvalidation] Invalidando múltiples módulos:', modules);
 		let totalInvalidated = 0;
 
 		for (const module of modules) {
@@ -219,11 +219,11 @@ export class CacheInvalidationService {
 	}
 
 	/**
-	 * CUÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚ÂNDO USAR: Para validar si el Service Worker estÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¡ activo antes de operar.
+	 * CUÁNDO USAR: Para validar si el Service Worker está activo antes de operar.
 	 *
-	 * VENTAJA: Evita errores en ambientes donde SW no estÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¡ disponible (dev sin HTTPS).
+	 * VENTAJA: Evita errores en ambientes donde SW no está disponible (dev sin HTTPS).
 	 *
-	 * @returns true si el SW estÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¡ registrado y activo
+	 * @returns true si el SW está registrado y activo
 	 */
 	isServiceWorkerActive(): boolean {
 		return this.swService.isRegistered;

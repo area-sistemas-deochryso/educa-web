@@ -10,15 +10,15 @@
       }
     </div>
 
-    <!-- * Columnas por dÃƒÂ­a -->
+    <!-- * Columnas por día -->
     @for (dia of DIAS; track dia.value) {
       <div class="day-column">
-        <!-- * Header del dÃƒÂ­a -->
+        <!-- * Header del día -->
         <div class="day-header">{{ dia.label }}</div>
 
-        <!-- * Grid de horas del dÃƒÂ­a -->
+        <!-- * Grid de horas del día -->
         <div class="day-grid">
-          <!-- * LÃƒÂ­neas de fondo para las horas -->
+          <!-- * Líneas de fondo para las horas -->
           @for (hora of HORAS; track hora) {
             <div class="hour-line"></div>
           }
@@ -44,7 +44,7 @@
                     {{ block.horario.horaInicio }} - {{ block.horario.horaFin }}
                   </div>
 
-                  <!-- SalÃƒÂ³n -->
+                  <!-- Salón -->
                   <div class="salon-info">
                     <i class="pi pi-building"></i>
                     {{ block.horario.salonDescripcion }}
@@ -104,7 +104,7 @@
     </div>
   }
 
-  <!-- * Estado vacÃƒÂ­o -->
+  <!-- * Estado vacío -->
   @if (!loading() && blocks().length === 0) {
     <div class="empty-overlay">
       <i class="pi pi-calendar" style="font-size: 3rem; opacity: 0.3"></i>

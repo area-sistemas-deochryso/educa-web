@@ -2,7 +2,7 @@
 import { ChangeDetectionStrategy, Component, input } from '@angular/core';
 
 /**
- * Componente presentacional (Dumb) para estados vacÃƒÂ­os.
+ * Componente presentacional (Dumb) para estados vacíos.
  * Muestra un mensaje cuando no hay datos disponibles.
  */
 // #endregion

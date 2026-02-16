@@ -27,7 +27,7 @@ export class UserProfileService {
 
 	readonly isAuthenticated = toSignal(this.authService.isAuthenticated$, { initialValue: false });
 
-	// Signal del usuario actual - debe crearse en contexto de inyecciÃƒÆ’Ã‚Â³n
+	// Signal del usuario actual - debe crearse en contexto de inyección
 	private readonly currentUser = toSignal(this.authService.currentUser$, { initialValue: null });
 
 	readonly isEstudiante = computed(() => this._userRole() === APP_USER_ROLES.Estudiante);

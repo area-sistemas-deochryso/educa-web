@@ -14,7 +14,7 @@ export interface AsistenciaDetalle {
 	estado: 'Completa' | 'Incompleta';
 	observacion: string | null;
 
-	// Estados calculados (agregados para mover lÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â³gica al backend)
+	// Estados calculados (agregados para mover lógica al backend)
 	estadoCodigo: AttendanceStatus;
 	estadoDescripcion: string;
 	puedeJustificar: boolean;
@@ -56,14 +56,14 @@ export interface EstudianteAsistencia {
 	asistencias: AsistenciaDetalle[];
 }
 
-// Estudiante del salÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â³n (EstudianteSalonDto)
+// Estudiante del salón (EstudianteSalonDto)
 export interface EstudianteSalon {
 	estudianteId: number;
 	dni: string;
 	nombreCompleto: string;
 }
 
-// SalÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â³n del profesor (SalonProfesorDto)
+// Salón del profesor (SalonProfesorDto)
 export interface SalonProfesor {
 	salonId: number;
 	grado: string;
@@ -77,11 +77,11 @@ export interface SalonProfesor {
 }
 
 // Estados de asistencia para la UI
-// T = Temprano, A = A tiempo, F = Fuera de hora, N = No asistiÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â³
+// T = Temprano, A = A tiempo, F = Fuera de hora, N = No asistió
 // J = Justificado, - = Pendiente, X = Antes del registro
 export type AttendanceStatus = 'T' | 'A' | 'F' | 'N' | 'J' | '-' | 'X';
 
-// Director: EstadÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â­sticas del dÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â­a
+// Director: Estadísticas del día
 export interface EstadisticasDia {
 	fecha: string;
 	totalEstudiantes: number;
@@ -106,16 +106,16 @@ export interface ProfesorSede {
 	salones: string[];
 }
 
-// Estados vÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â¡lidos de asistencia para leyenda
+// Estados válidos de asistencia para leyenda
 export interface EstadoAsistencia {
 	codigo: AttendanceStatus;
 	descripcion: string;
 }
 
-// #region EstadÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â­sticas de asistencia del dÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â­a
+// #region Estadísticas de asistencia del día
 
 /**
- * EstadÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â­sticas de asistencia calculadas en el backend
+ * Estadísticas de asistencia calculadas en el backend
  * Contiene los contadores de cada estado de asistencia
  */
 export interface EstadisticasAsistenciaDia {
@@ -129,7 +129,7 @@ export interface EstadisticasAsistenciaDia {
 }
 
 /**
- * Respuesta del endpoint de asistencia del dÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â­a con estadÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â­sticas incluidas
+ * Respuesta del endpoint de asistencia del día con estadísticas incluidas
  * GET /api/ConsultaAsistencia/profesor/asistencia-dia
  * GET /api/ConsultaAsistencia/director/asistencia-dia
  */

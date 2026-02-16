@@ -113,7 +113,7 @@ describe('TableLoadingDirective', () => {
 
 		const host = fixture.debugElement.query(By.css('#table-section'))
 			.nativeElement as HTMLElement;
-		// We canÃ¢â‚¬â„¢t rely on layout measurement in JSDOM, but we can assert it sets the style.
+		// We can’t rely on layout measurement in JSDOM, but we can assert it sets the style.
 		expect(host.style.minHeight).toBe('420px');
 	});
 

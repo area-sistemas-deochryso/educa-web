@@ -15,7 +15,7 @@ export class SalonesApiService {
 
   /**
    * GET /api/sistema/salones/listar
-   * Lista todos los salones activos con informaciÃƒÂ³n completa
+   * Lista todos los salones activos con información completa
    */
   listar(): Observable<SalonListDto[]> {
     return this.http.get<SalonListDto[]>(`${this.apiUrl}/listar`);
@@ -23,7 +23,7 @@ export class SalonesApiService {
 
   /**
    * GET /api/sistema/salones/{id}
-   * Obtiene un salÃƒÂ³n por ID
+   * Obtiene un salón por ID
    */
   obtenerPorId(id: number): Observable<SalonListDto> {
     return this.http.get<SalonListDto>(`${this.apiUrl}/${id}`);

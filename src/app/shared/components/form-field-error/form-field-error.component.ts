@@ -2,7 +2,7 @@
 import { ChangeDetectionStrategy, Component, input } from '@angular/core';
 
 /**
- * Componente presentacional para mostrar errores de validaciÃƒÆ’Ã‚Â³n de formularios
+ * Componente presentacional para mostrar errores de validación de formularios
  * Uso: <app-form-field-error [error]="errorSignal()" />
  */
 // #endregion

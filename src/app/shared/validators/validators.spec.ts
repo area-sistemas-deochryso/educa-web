@@ -259,12 +259,12 @@ describe('AppValidators', () => {
 		});
 
 		it('should return null for letters with spaces', () => {
-			const control = new FormControl('Juan PÃƒÂ©rez');
+			const control = new FormControl('Juan Pérez');
 			expect(validator(control)).toBeNull();
 		});
 
 		it('should return null for letters with accents', () => {
-			const control = new FormControl('JosÃƒÂ© MarÃƒÂ­a Ãƒâ€˜oÃƒÂ±o');
+			const control = new FormControl('José María Ñoño');
 			expect(validator(control)).toBeNull();
 		});
 

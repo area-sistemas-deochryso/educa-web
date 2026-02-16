@@ -45,7 +45,7 @@ import { CAMPUS_EDGES } from '../../config';
 						(click)="onNodeClick(node)"
 					>
 						@if (node.type === 'corridor') {
-							<!-- Corredor: cÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â­rculo pequeÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â±o -->
+							<!-- Corredor: círculo pequeño -->
 							<circle
 								[attr.cx]="node.x"
 								[attr.cy]="node.y"
@@ -53,7 +53,7 @@ import { CAMPUS_EDGES } from '../../config';
 								class="corridor-dot"
 							/>
 						} @else {
-							<!-- Room/lugar: rectÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¡ngulo con label -->
+							<!-- Room/lugar: rectángulo con label -->
 							<rect
 								[attr.x]="node.x - (node.width || 80) / 2"
 								[attr.y]="node.y - (node.height || 50) / 2"
@@ -293,4 +293,3 @@ export class CampusMapComponent {
 	}
 	// #endregion
 }
-				<!-- #endregion -->

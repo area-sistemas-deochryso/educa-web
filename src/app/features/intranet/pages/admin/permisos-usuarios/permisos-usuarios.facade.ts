@@ -24,7 +24,7 @@ export class PermisosUsuariosFacade {
 	readonly adminUtils = inject(AdminUtilsService);
 	private destroyRef = inject(DestroyRef);
 
-	// Estado pÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Â ÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Âºblico readonly desde el store
+	// Estado público readonly desde el store
 	readonly permisosUsuario = this.store.permisosUsuario;
 	readonly permisosRol = this.store.permisosRol;
 	readonly vistas = this.store.vistas;
@@ -62,7 +62,7 @@ export class PermisosUsuariosFacade {
 		this.helperService.getVistasCountLabel(this.selectedVistas().length),
 	);
 
-	// Computed - MÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Â ÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â³dulos para detail drawer
+	// Computed - Módulos para detail drawer
 	readonly moduloVistasForDetail = computed(() => {
 		const permiso = this.selectedPermiso();
 		if (!permiso) return [];

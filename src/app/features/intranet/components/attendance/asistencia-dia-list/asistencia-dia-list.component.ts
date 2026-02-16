@@ -68,7 +68,7 @@ export class AsistenciaDiaListComponent {
 	// * Inputs
 	readonly estudiantes = input.required<EstudianteAsistencia[]>();
 	readonly fecha = input.required<Date>();
-	readonly estadisticas = input.required<EstadisticasAsistenciaDia>(); // ÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã¢â‚¬Â¦ÃƒÂ¢Ã¢â€šÂ¬Ã…â€œÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬Ãƒâ€šÃ‚Â¦ NUEVO: EstadÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â­sticas desde el backend
+	readonly estadisticas = input.required<EstadisticasAsistenciaDia>(); // ✅ NUEVO: Estadísticas desde el backend
 	readonly loading = input<boolean>(false);
 	readonly showPdfButton = input<boolean>(false);
 	readonly downloadingPdf = input<boolean>(false);
@@ -94,7 +94,7 @@ export class AsistenciaDiaListComponent {
 	// * Local state for the datepicker model
 	fechaValue: Date = new Date();
 
-	// #region Estado del diÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¡logo de justificaciÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â³n
+	// #region Estado del diálogo de justificación
 	readonly dialogVisible = signal(false);
 	readonly selectedEstudiante = signal<EstudianteAsistenciaDia | null>(null);
 	readonly observacionText = signal('');
@@ -107,7 +107,7 @@ export class AsistenciaDiaListComponent {
 		this.estudiantes().map((e) => this.mapEstudianteAsistencia(e)),
 	);
 
-	// ÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã¢â‚¬Â¦ÃƒÂ¢Ã¢â€šÂ¬Ã…â€œÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬Ãƒâ€šÃ‚Â¦ NUEVO: EstadÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â­sticas ya no se calculan localmente, vienen del backend como input
+	// ✅ NUEVO: Estadísticas ya no se calculan localmente, vienen del backend como input
 
 	constructor() {
 		// * Sync datepicker model when input changes (OnPush friendly).
@@ -134,17 +134,17 @@ export class AsistenciaDiaListComponent {
 	}
 
 	// #endregion
-	// #region JustificaciÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â³n
+	// #region Justificación
 
 	/**
-	 * Abre el diÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¡logo de justificaciÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â³n para un estudiante.
-	 * Solo se puede justificar si allowJustify estÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¡ habilitado y el estudiante puede ser justificado.
+	 * Abre el diálogo de justificación para un estudiante.
+	 * Solo se puede justificar si allowJustify está habilitado y el estudiante puede ser justificado.
 	 */
 	onEstudianteClick(estudiante: EstudianteAsistenciaDia): void {
 		if (!this.allowJustify() || !estudiante.puedeJustificar) return;
 
 		this.selectedEstudiante.set(estudiante);
-		// Si ya estÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¡ justificado, extraer el motivo sin el prefijo "Justificado: "
+		// Si ya está justificado, extraer el motivo sin el prefijo "Justificado: "
 		const observacion = estudiante.observacion || '';
 		const sinPrefijo = observacion.startsWith(this.PREFIJO_JUSTIFICACION)
 			? observacion.replace(this.PREFIJO_JUSTIFICACION, '')
@@ -177,7 +177,7 @@ export class AsistenciaDiaListComponent {
 			quitar: false,
 		});
 
-		// Cerrar diÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¡logo despuÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â©s de emitir - el padre recargarÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¡ los datos
+		// Cerrar diálogo después de emitir - el padre recargará los datos
 		this.closeDialog();
 	}
 
@@ -191,13 +191,13 @@ export class AsistenciaDiaListComponent {
 			quitar: true,
 		});
 
-		// Cerrar diÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¡logo despuÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â©s de emitir - el padre recargarÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¡ los datos
+		// Cerrar diálogo después de emitir - el padre recargará los datos
 		this.closeDialog();
 	}
 
 	/**
-	 * Mapea un estudiante con sus asistencias a un registro de asistencia del dÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â­a.
-	 * ÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã¢â‚¬Â¦ÃƒÂ¢Ã¢â€šÂ¬Ã…â€œÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬Ãƒâ€šÃ‚Â¦ NUEVO: Usa estados calculados desde el backend en lugar de calcularlos localmente.
+	 * Mapea un estudiante con sus asistencias a un registro de asistencia del día.
+	 * ✅ NUEVO: Usa estados calculados desde el backend en lugar de calcularlos localmente.
 	 */
 	private mapEstudianteAsistencia(estudiante: EstudianteAsistencia): EstudianteAsistenciaDia {
 		const asistencia = estudiante.asistencias[0];
@@ -208,7 +208,7 @@ export class AsistenciaDiaListComponent {
 			dni: estudiante.dni,
 			horaEntrada: asistencia?.horaEntrada || null,
 			horaSalida: asistencia?.horaSalida || null,
-			// ÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã¢â‚¬Â¦ÃƒÂ¢Ã¢â€šÂ¬Ã…â€œÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬Ãƒâ€šÃ‚Â¦ Estados calculados desde el backend
+			// ✅ Estados calculados desde el backend
 			estadoCodigo: asistencia?.estadoCodigo || 'X',
 			observacion: asistencia?.observacion || null,
 			puedeJustificar: asistencia?.puedeJustificar ?? true,

@@ -55,10 +55,10 @@ describe('HomeComponent (Intranet)', () => {
 
 	it('should return personalized welcome message when user exists', () => {
 		(storageServiceMock.getUser as ReturnType<typeof vi.fn>).mockReturnValue({
-			nombreCompleto: 'Juan PÃƒÂ©rez',
+			nombreCompleto: 'Juan Pérez',
 			rol: 'Estudiante',
 		});
-		expect(component.welcomeTitle).toBe('Bienvenido, Juan PÃƒÂ©rez');
+		expect(component.welcomeTitle).toBe('Bienvenido, Juan Pérez');
 	});
 
 	it('should have available courses', () => {

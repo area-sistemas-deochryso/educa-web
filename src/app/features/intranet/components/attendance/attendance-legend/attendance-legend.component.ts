@@ -15,7 +15,7 @@ import { AsistenciaService, EstadoAsistencia } from '@core/services';
 export class AttendanceLegendComponent {
 	private asistenciaService = inject(AsistenciaService);
 
-	// Ã¢Å“â€¦ NUEVO: Cargar estados desde el backend
+	// ✅ NUEVO: Cargar estados desde el backend
 	readonly legendItems = signal<EstadoAsistencia[]>([]);
 
 	getStatusClass = getStatusClass;

@@ -17,19 +17,19 @@ const PRIORITY_LEGEND: PriorityInfo[] = [
 	{
 		priority: 'urgent',
 		label: 'Urgente',
-		description: 'Requiere atenciÃƒÂ³n inmediata. Fechas lÃƒÂ­mite prÃƒÂ³ximas o vencidas.',
+		description: 'Requiere atención inmediata. Fechas límite próximas o vencidas.',
 		color: '#dc2626',
 	},
 	{
 		priority: 'high',
 		label: 'Importante',
-		description: 'Alta prioridad. Acciones pendientes que requieren atenciÃƒÂ³n pronto.',
+		description: 'Alta prioridad. Acciones pendientes que requieren atención pronto.',
 		color: '#ffcc0c',
 	},
 	{
 		priority: 'medium',
 		label: 'Normal',
-		description: 'Prioridad estÃƒÂ¡ndar. InformaciÃƒÂ³n relevante para tu dÃƒÂ­a a dÃƒÂ­a.',
+		description: 'Prioridad estándar. Información relevante para tu día a día.',
 		color: '#253470',
 	},
 	{
@@ -113,16 +113,16 @@ export class FloatingNotificationBellComponent implements OnInit, OnDestroy {
 		};
 
 		const titleMap: Record<NotificationPriority, string> = {
-			urgent: 'NotificaciÃƒÂ³n Urgente',
-			high: 'NotificaciÃƒÂ³n Importante',
-			medium: 'Nueva NotificaciÃƒÂ³n',
-			low: 'InformaciÃƒÂ³n',
+			urgent: 'Notificación Urgente',
+			high: 'Notificación Importante',
+			medium: 'Nueva Notificación',
+			low: 'Información',
 		};
 
 		this.messageService.add({
 			severity: severityMap[priority],
 			summary: titleMap[priority],
-			detail: `Tienes ${count} notificaciÃƒÂ³n${count > 1 ? 'es' : ''} sin leer. Haz clic en la campana para verlas.`,
+			detail: `Tienes ${count} notificación${count > 1 ? 'es' : ''} sin leer. Haz clic en la campana para verlas.`,
 			life: 6000,
 			sticky: priority === 'urgent',
 		});

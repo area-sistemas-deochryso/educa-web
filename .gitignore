@@ -39,7 +39,7 @@ tokens
 .vscode/
 .idea/
 *.swp
-.claude
+
 
 # ======================
 # OS
@@ -50,3 +50,6 @@ Thumbs.db
 
 # Local Netlify folder
 .netlify
+
+# Claude
+#.claude

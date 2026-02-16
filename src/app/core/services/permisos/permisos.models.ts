@@ -69,7 +69,7 @@ export interface PermisosUsuarioResultado {
 	rol: string;
 	vistasPermitidas: string[];
 	tienePermisosPersonalizados: boolean;
-	/** JWT con exp de 4h que indica cuÃƒÆ’Ã‚Â¡ndo vencen estos permisos */
+	/** JWT con exp de 4h que indica cuándo vencen estos permisos */
 	permisosToken?: string;
 }
 
@@ -78,17 +78,17 @@ export type RolTipo = AppUserRoleValue;
 
 export const ROLES_DISPONIBLES: RolTipo[] = APP_USER_ROLE_LIST;
 
-// Roles disponibles para gestiÃƒÆ’Ã‚Â³n en admin (sin Apoderado)
+// Roles disponibles para gestión en admin (sin Apoderado)
 export type RolTipoAdmin = AppUserRoleAdmin;
 
 export const ROLES_DISPONIBLES_ADMIN: RolTipoAdmin[] = APP_USER_ROLE_ADMIN_LIST;
 
-// Response genÃƒÆ’Ã‚Â©rico del API
+// Response genérico del API
 export interface ApiResponse {
 	mensaje: string;
 }
 
-// BÃƒÆ’Ã‚Âºsqueda de usuarios
+// Búsqueda de usuarios
 export interface UsuarioBusqueda {
 	id: number;
 	nombreCompleto: string;

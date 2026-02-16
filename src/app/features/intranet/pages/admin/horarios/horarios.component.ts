@@ -72,7 +72,7 @@ export class HorariosComponent implements OnInit {
 	}
 
 	// #endregion
-	// #region MÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Â ÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â©todos de carga
+	// #region Métodos de carga
 	loadData(): void {
 		this.facade.loadAll();
 	}
@@ -183,7 +183,7 @@ export class HorariosComponent implements OnInit {
 		}
 
 		if (editingId === null) {
-			// CREAR - Solo datos bÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Â ÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¡sicos, profesor y estudiantes se asignan despuÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Â ÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â©s
+			// CREAR - Solo datos básicos, profesor y estudiantes se asignan después
 			this.facade.create({
 				diaSemana: formData.diaSemana!,
 				horaInicio: formData.horaInicio,

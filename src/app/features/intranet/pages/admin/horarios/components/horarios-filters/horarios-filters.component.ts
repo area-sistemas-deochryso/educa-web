@@ -39,7 +39,7 @@ export class HorariosFiltersComponent {
 	readonly diasOptions = [
 		{ label: 'Lunes', value: 1 },
 		{ label: 'Martes', value: 2 },
-		{ label: 'MiÃƒÆ’Ã‚Â©rcoles', value: 3 },
+		{ label: 'Miércoles', value: 3 },
 		{ label: 'Jueves', value: 4 },
 		{ label: 'Viernes', value: 5 },
 	];

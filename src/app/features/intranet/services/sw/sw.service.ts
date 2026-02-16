@@ -25,7 +25,7 @@ export class SwService {
 	isOnline$ = this._isOnline.asObservable();
 	isRegistered$ = this._isRegistered.asObservable();
 	updateAvailable$ = this._updateAvailable.asObservable();
-	/** Emite cuando el SW actualiza el cachÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â© en background con datos nuevos */
+	/** Emite cuando el SW actualiza el caché en background con datos nuevos */
 	cacheUpdated$ = this._cacheUpdated.asObservable();
 
 	get isOnline(): boolean {
@@ -47,12 +47,12 @@ export class SwService {
 		this._isOnline.next(navigator.onLine);
 
 		window.addEventListener('online', () => {
-			logger.log('[SwService] ConexiÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â³n restaurada');
+			logger.log('[SwService] Conexión restaurada');
 			this._isOnline.next(true);
 		});
 
 		window.addEventListener('offline', () => {
-			logger.log('[SwService] Sin conexiÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â³n - usando cache');
+			logger.log('[SwService] Sin conexión - usando cache');
 			this._isOnline.next(false);
 		});
 	}
@@ -80,7 +80,7 @@ export class SwService {
 				if (newWorker) {
 					newWorker.addEventListener('statechange', () => {
 						if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
-							logger.log('[SwService] Nueva versiÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â³n disponible');
+							logger.log('[SwService] Nueva versión disponible');
 							this._updateAvailable.next(true);
 						}
 					});
@@ -104,7 +104,7 @@ export class SwService {
 			case 'CACHE_UPDATED': {
 				const payload = data.payload as CacheUpdateEvent;
 				if (payload) {
-					logger.log('[SwService] CachÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â© actualizado para:', payload.url);
+					logger.log('[SwService] Caché actualizado para:', payload.url);
 					this._cacheUpdated.next(payload);
 				}
 				break;
@@ -112,21 +112,21 @@ export class SwService {
 		}
 	}
 
-	// #region InvalidaciÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â³n de cache
+	// #region Invalidación de cache
 
 	/**
-	 * PROPÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬Ãƒâ€¦Ã¢â‚¬Å“SITO: Prevenir errores cuando el backend cambia la estructura de datos
+	 * PROPÓSITO: Prevenir errores cuando el backend cambia la estructura de datos
 	 *
 	 * PROBLEMA QUE RESUELVE:
 	 * Cuando el backend modifica la estructura de un DTO (agregar/quitar campos, cambiar tipos),
-	 * el cache offline guarda datos con la estructura antigua. La primera peticiÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â³n falla porque
+	 * el cache offline guarda datos con la estructura antigua. La primera petición falla porque
 	 * el frontend intenta deserializar datos incompatibles con los nuevos tipos.
 	 *
-	 * SOLUCIÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬Ãƒâ€¦Ã¢â‚¬Å“N:
+	 * SOLUCIÓN:
 	 * Limpiar TODO el cache para forzar refetch completo con la nueva estructura.
 	 * Usar en logout o cuando hay cambios breaking globales en la API.
 	 *
-	 * EJEMPLO: Cambios en DTOs de autenticaciÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â³n, permisos, o estructura base de la app.
+	 * EJEMPLO: Cambios en DTOs de autenticación, permisos, o estructura base de la app.
 	 */
 	async clearCache(): Promise<void> {
 		if (this.registration?.active) {
@@ -136,20 +136,20 @@ export class SwService {
 	}
 
 	/**
-	 * PROPÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬Ãƒâ€¦Ã¢â‚¬Å“SITO: InvalidaciÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â³n quirÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Âºrgica cuando un endpoint especÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â­fico cambiÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â³
+	 * PROPÓSITO: Invalidación quirúrgica cuando un endpoint específico cambió
 	 *
 	 * PROBLEMA QUE RESUELVE:
-	 * Evitar limpiar todo el cache cuando solo un endpoint cambiÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â³ su estructura.
+	 * Evitar limpiar todo el cache cuando solo un endpoint cambió su estructura.
 	 * Mantiene el cache de otros endpoints intacto para mejor performance.
 	 *
-	 * SOLUCIÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬Ãƒâ€¦Ã¢â‚¬Å“N:
-	 * Invalidar solo la URL exacta que cambiÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â³, preservando el resto del cache.
-	 * El prÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â³ximo fetch a esa URL irÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¡ directo al servidor y obtendrÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¡ la nueva estructura.
+	 * SOLUCIÓN:
+	 * Invalidar solo la URL exacta que cambió, preservando el resto del cache.
+	 * El próximo fetch a esa URL irá directo al servidor y obtendrá la nueva estructura.
 	 *
-	 * EJEMPLO: El endpoint /api/usuarios/123 cambiÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â³ su estructura de respuesta,
+	 * EJEMPLO: El endpoint /api/usuarios/123 cambió su estructura de respuesta,
 	 * pero /api/asistencias sigue igual.
 	 *
-	 * @param url - URL exacta a invalidar (serÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¡ normalizada por el SW)
+	 * @param url - URL exacta a invalidar (será normalizada por el SW)
 	 */
 	async invalidateCacheByUrl(url: string): Promise<void> {
 		if (!this.registration?.active) {
@@ -180,16 +180,16 @@ export class SwService {
 	}
 
 	/**
-	 * PROPÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬Ãƒâ€¦Ã¢â‚¬Å“SITO: InvalidaciÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â³n por mÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â³dulo cuando un conjunto de endpoints relacionados cambiÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â³
+	 * PROPÓSITO: Invalidación por módulo cuando un conjunto de endpoints relacionados cambió
 	 *
 	 * PROBLEMA QUE RESUELVE:
-	 * Cuando se modifica la lÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â³gica de un mÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â³dulo completo (ej: asistencias, reportes),
-	 * mÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Âºltiples endpoints cambian su estructura simultÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¡neamente. Invalidar uno por uno
+	 * Cuando se modifica la lógica de un módulo completo (ej: asistencias, reportes),
+	 * múltiples endpoints cambian su estructura simultáneamente. Invalidar uno por uno
 	 * es tedioso y propenso a errores (olvidar alguno).
 	 *
-	 * SOLUCIÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬Ãƒâ€¦Ã¢â‚¬Å“N:
-	 * Invalidar todas las URLs que contengan un patrÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â³n comÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Âºn (ej: "/api/ConsultaAsistencia").
-	 * Esto limpia todo el cache del mÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â³dulo afectado en una sola operaciÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â³n.
+	 * SOLUCIÓN:
+	 * Invalidar todas las URLs que contengan un patrón común (ej: "/api/ConsultaAsistencia").
+	 * Esto limpia todo el cache del módulo afectado en una sola operación.
 	 *
 	 * EJEMPLO: Cambios en estructura de asistencias:
 	 * - /api/ConsultaAsistencia/profesor/asistencia-dia
@@ -197,8 +197,8 @@ export class SwService {
 	 * - /api/ConsultaAsistencia/director/reporte/todos-salones/mes
 	 * Todas se invalidan con pattern: "/api/ConsultaAsistencia"
 	 *
-	 * @param pattern - PatrÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â³n a buscar en las URLs (ej: "/api/ConsultaAsistencia")
-	 * @returns NÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Âºmero de entradas invalidadas (ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Âºtil para logging/debug)
+	 * @param pattern - Patrón a buscar en las URLs (ej: "/api/ConsultaAsistencia")
+	 * @returns Número de entradas invalidadas (útil para logging/debug)
 	 */
 	async invalidateCacheByPattern(pattern: string): Promise<number> {
 		if (!this.registration?.active) {
@@ -211,7 +211,7 @@ export class SwService {
 			messageChannel.port1.onmessage = (event) => {
 				const count = event.data.count || 0;
 				if (event.data.success) {
-					logger.log(`[SwService] Cache invalidado: ${count} entradas con patrÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â³n "${pattern}"`);
+					logger.log(`[SwService] Cache invalidado: ${count} entradas con patrón "${pattern}"`);
 				}
 				resolve(count);
 			};

@@ -39,13 +39,13 @@ import { CommonModule } from '@angular/common';
 })
 export class LazyContentComponent {
 	// * Inputs that control when skeleton vs content is shown.
-	/** Estado de carga - controla cuÃƒÆ’Ã‚Â¡ndo mostrar skeleton vs contenido */
+	/** Estado de carga - controla cuándo mostrar skeleton vs contenido */
 	readonly loading = input<boolean>(false);
 
-	/** Altura mÃƒÆ’Ã‚Â­nima para reservar espacio y evitar CLS */
+	/** Altura mínima para reservar espacio y evitar CLS */
 	readonly minHeight = input<number | undefined>(undefined);
 
-	/** Delay antes de ocultar skeleton (asegura que el contenido estÃƒÆ’Ã‚Â© renderizado) */
+	/** Delay antes de ocultar skeleton (asegura que el contenido esté renderizado) */
 	readonly hideDelay = input<number>(50);
 
 	/** Template del skeleton personalizado */

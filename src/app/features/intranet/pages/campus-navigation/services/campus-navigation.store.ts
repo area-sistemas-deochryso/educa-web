@@ -24,7 +24,7 @@ export class CampusNavigationStore {
 	private readonly _scheduleReady = signal(false);
 
 	// #endregion
-	// #region Lecturas pÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Âºblicas (readonly)
+	// #region Lecturas públicas (readonly)
 
 	readonly scheduleItems = this._scheduleItems.asReadonly();
 	readonly selectedFloor = this._selectedFloor.asReadonly();
@@ -47,7 +47,7 @@ export class CampusNavigationStore {
 	);
 
 	/**
-	 * Mapa salonId ÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬Ãƒâ€šÃ‚Â ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÂ¢Ã¢â‚¬Å¾Ã‚Â¢ nodeId para vincular horario con nodos del mapa
+	 * Mapa salonId → nodeId para vincular horario con nodos del mapa
 	 */
 	readonly salonToNodeMap = computed(() => {
 		const map = new Map<number, string>();
@@ -70,7 +70,7 @@ export class CampusNavigationStore {
 	);
 
 	/**
-	 * Opciones de dropdown para destino (salones, oficinas, baÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â±os)
+	 * Opciones de dropdown para destino (salones, oficinas, baños)
 	 */
 	readonly destinationNodeOptions = computed((): SelectOption[] =>
 		CAMPUS_NODES.filter((n) => ['classroom', 'office', 'bathroom'].includes(n.type)).map(
@@ -82,7 +82,7 @@ export class CampusNavigationStore {
 	);
 
 	/**
-	 * Clase actual o prÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â³xima segÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Âºn la hora
+	 * Clase actual o próxima según la hora
 	 */
 	readonly currentOrNextClass = computed((): MiHorarioHoyItem | null => {
 		const items = this._scheduleItems();
@@ -95,13 +95,13 @@ export class CampusNavigationStore {
 		const current = items.find((i) => i.horaInicio <= currentTime && i.horaFin > currentTime);
 		if (current) return current;
 
-		// Buscar prÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â³xima clase
+		// Buscar próxima clase
 		const next = items.find((i) => i.horaInicio > currentTime);
 		return next ?? null;
 	});
 
 	/**
-	 * Nodos del path que estÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¡n en el piso actual (para renderizar la ruta)
+	 * Nodos del path que están en el piso actual (para renderizar la ruta)
 	 */
 	readonly currentFloorPathNodes = computed((): CampusNode[] => {
 		const result = this._pathResult();
@@ -115,8 +115,8 @@ export class CampusNavigationStore {
 
 	/**
 	 * Puntos SVG del path en el piso actual.
-	 * Usa detecciÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â³n de colisiÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â³n: si una lÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â­nea directa entre nodos cruzarÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â­a un salÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â³n,
-	 * se redirige automÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¡ticamente por la banda de pasillos mÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¡s cercana (L-route).
+	 * Usa detección de colisión: si una línea directa entre nodos cruzaría un salón,
+	 * se redirige automáticamente por la banda de pasillos más cercana (L-route).
 	 */
 	readonly currentFloorPathPoints = computed((): string => {
 		const pathNodes = this.currentFloorPathNodes();
@@ -151,7 +151,7 @@ export class CampusNavigationStore {
 	}));
 
 	// #endregion
-	// #region Comandos de mutaciÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â³n
+	// #region Comandos de mutación
 
 	setScheduleItems(items: MiHorarioHoyItem[]): void {
 		this._scheduleItems.set(items);

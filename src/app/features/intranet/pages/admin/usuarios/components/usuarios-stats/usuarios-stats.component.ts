@@ -3,7 +3,7 @@ import { ChangeDetectionStrategy, Component, input } from '@angular/core';
 import { UsuariosEstadisticas } from '@core/services';
 
 /**
- * Componente presentacional para las estadÃƒÆ’Ã‚Â­sticas de usuarios
+ * Componente presentacional para las estadísticas de usuarios
  * Muestra cards con totales por rol
  */
 // #endregion

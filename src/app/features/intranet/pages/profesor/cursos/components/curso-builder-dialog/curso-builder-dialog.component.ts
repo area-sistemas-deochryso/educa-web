@@ -23,12 +23,12 @@ import { InputNumberModule } from 'primeng/inputnumber';
 		>
 			<div class="flex flex-column gap-3 pt-2">
 				<p class="text-color-secondary m-0">
-					Define cuÃƒÂ¡ntas semanas tendrÃƒÂ¡ el contenido de este curso. PodrÃƒÂ¡s agregar archivos y
-					tareas a cada semana despuÃƒÂ©s.
+					Define cuántas semanas tendrá el contenido de este curso. Podrás agregar archivos y
+					tareas a cada semana después.
 				</p>
 
 				<div class="flex flex-column gap-2">
-					<label for="numSemanas" class="font-semibold">NÃƒÂºmero de semanas</label>
+					<label for="numSemanas" class="font-semibold">Número de semanas</label>
 					<p-inputNumber
 						id="numSemanas"
 						[(ngModel)]="numeroSemanas"

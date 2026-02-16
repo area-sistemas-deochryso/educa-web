@@ -139,7 +139,7 @@ describe('LoginIntranetComponent', () => {
 					nombreCompleto: '',
 					entityId: 0,
 					sedeId: 0,
-					mensaje: 'Credenciales invÃƒÂ¡lidas',
+					mensaje: 'Credenciales inválidas',
 				}),
 			);
 

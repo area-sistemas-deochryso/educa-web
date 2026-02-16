@@ -52,7 +52,7 @@ import { SalonEstudiantesDialogComponent } from './components/salon-estudiantes-
 				>
 					<ng-template #header>
 						<tr>
-							<th>SalÃƒÆ’Ã‚Â³n</th>
+							<th>Salón</th>
 							<th>Cursos que dicta</th>
 							<th style="width: 120px" class="text-center">Estudiantes</th>
 							<th style="width: 80px" class="text-center">Acciones</th>
@@ -106,7 +106,7 @@ import { SalonEstudiantesDialogComponent } from './components/salon-estudiantes-
 			</div>
 		}
 
-		<!-- #region Dialog de estudiantes -->
+		<!-- Dialog de estudiantes -->
 		<app-salon-estudiantes-dialog
 			[visible]="vm().salonDialogVisible"
 			[salon]="vm().selectedSalon"
@@ -133,4 +133,4 @@ export class ProfesorSalonesComponent implements OnInit {
 		}
 	}
 }
-		<!-- #endregion -->
+

@@ -1,8 +1,8 @@
 // #region Implementation
 export const buildDeletePermisosUsuarioMessage = (nombre: string, rol: string): string => {
 	return [
-		`Â¿EstÃ¡ seguro de eliminar los permisos personalizados de "${nombre}"?`,
-		`El usuario seguirÃ¡ teniendo los permisos de su rol "${rol}".`,
+		`¿Está seguro de eliminar los permisos personalizados de "${nombre}"?`,
+		`El usuario seguirá teniendo los permisos de su rol "${rol}".`,
 	].join('\n\n');
 };
 
@@ -12,32 +12,32 @@ export const buildDeleteHorarioMessage = (
 	horaInicio: string,
 	horaFin: string,
 ): string => {
-	return `Â¿EstÃ¡ seguro de eliminar el horario de ${cursoNombre} (${diaSemanaDescripcion} ${horaInicio}-${horaFin})?`;
+	return `¿Está seguro de eliminar el horario de ${cursoNombre} (${diaSemanaDescripcion} ${horaInicio}-${horaFin})?`;
 };
 
 export const buildDeletePermisoRolMessage = (rol: string): string => {
-	return `Â¿EstÃ¡ seguro de eliminar los permisos del rol "${rol}"?`;
+	return `¿Está seguro de eliminar los permisos del rol "${rol}"?`;
 };
 
 export const buildDeleteVistaMessage = (nombre: string): string => {
-	return `Â¿EstÃ¡ seguro de eliminar la vista "${nombre}"?`;
+	return `¿Está seguro de eliminar la vista "${nombre}"?`;
 };
 
 export const buildDeleteCursoMessage = (nombre: string): string => {
-	return `Â¿EstÃ¡ seguro de eliminar el curso "${nombre}"?`;
+	return `¿Está seguro de eliminar el curso "${nombre}"?`;
 };
 
 export const buildToggleUsuarioMessage = (nombre: string, estadoActual: boolean): string => {
-	return `Â¿EstÃ¡ seguro de ${estadoActual ? 'desactivar' : 'activar'} al usuario "${nombre}"?`;
+	return `¿Está seguro de ${estadoActual ? 'desactivar' : 'activar'} al usuario "${nombre}"?`;
 };
 
 export const buildToggleHorarioMessage = (accion: string): string => {
-	return `Â¿EstÃ¡ seguro de ${accion} este horario?`;
+	return `¿Está seguro de ${accion} este horario?`;
 };
 
 export const UI_CONFIRM_HEADERS = {
-	delete: 'Confirmar EliminaciÃ³n',
-	assign: 'Confirmar AsignaciÃ³n',
+	delete: 'Confirmar Eliminación',
+	assign: 'Confirmar Asignación',
 	activateUser: 'Activar Usuario',
 	deactivateUser: 'Desactivar Usuario',
 	activateHorario: 'Activar Horario',
@@ -45,19 +45,19 @@ export const UI_CONFIRM_HEADERS = {
 } as const;
 
 export const UI_CONFIRM_LABELS = {
-	yes: 'SÃ­',
+	yes: 'Sí',
 	no: 'No',
 	cancel: 'Cancelar',
-	yesDelete: 'SÃ­, eliminar',
-	yesAssignAll: 'SÃ­, asignar todos',
+	yesDelete: 'Sí, eliminar',
+	yesAssignAll: 'Sí, asignar todos',
 } as const;
 
 export const UI_SUMMARIES = {
 	error: 'Error',
-	success: 'Ã‰xito',
+	success: 'Éxito',
 	accessDenied: 'Acceso denegado',
 	scheduleConflict: 'Conflicto de horario',
-	validationError: 'Error de validaciÃ³n',
+	validationError: 'Error de validación',
 } as const;
 
 export const UI_ACCESS_DENIED_MESSAGE =
@@ -80,18 +80,18 @@ export const UI_ADMIN_ERROR_DETAILS = {
 	saveCurso: 'No se pudo guardar el curso',
 	deleteCurso: 'No se pudo eliminar el curso',
 	loadHorariosData: 'No se pudieron cargar los datos',
-	loadHorariosSalon: 'No se pudieron cargar los horarios del salÃ³n',
+	loadHorariosSalon: 'No se pudieron cargar los horarios del salón',
 	loadHorariosProfesor: 'No se pudieron cargar los horarios del profesor',
-	horarioNotFound: 'No se encontrÃ³ el horario',
+	horarioNotFound: 'No se encontró el horario',
 	horarioDetailLoad: 'No se pudo cargar el detalle del horario',
 	horarioEstadoChange: 'No se pudo cambiar el estado del horario',
-	horarioConflict: 'Ya existe un horario que se superpone en el mismo salÃ³n',
+	horarioConflict: 'Ya existe un horario que se superpone en el mismo salón',
 } as const;
 
 export const UI_ADMIN_ERROR_DETAILS_DYNAMIC = {
 	horarioActionNotFound: (accion: string): string =>
 		`No se pudo ${accion}: registro no encontrado`,
-	horarioValidation: (mensaje: string): string => `Datos invÃ¡lidos: ${mensaje}`,
+	horarioValidation: (mensaje: string): string => `Datos inválidos: ${mensaje}`,
 	horarioActionFailed: (accion: string): string => `No se pudo ${accion} el horario`,
 	uploadFileFailed: (errorMsg: string): string => `No se pudo subir el archivo: ${errorMsg}`,
 } as const;
@@ -102,7 +102,7 @@ export const UI_HORARIOS_SUCCESS_MESSAGES = {
 	deleted: 'Horario eliminado correctamente',
 	profesorAssigned: 'Profesor asignado correctamente',
 	estudiantesAssigned: 'Estudiantes asignados correctamente',
-	todosEstudiantesAssigned: 'Todos los estudiantes del salÃ³n fueron asignados',
+	todosEstudiantesAssigned: 'Todos los estudiantes del salón fueron asignados',
 } as const;
 
 export const UI_HORARIOS_SUCCESS_MESSAGES_DYNAMIC = {
@@ -111,15 +111,15 @@ export const UI_HORARIOS_SUCCESS_MESSAGES_DYNAMIC = {
 } as const;
 
 export const UI_HORARIOS_CONFIRM_MESSAGES = {
-	assignAllEstudiantes: 'Â¿Asignar todos los estudiantes del salÃ³n a este horario?',
+	assignAllEstudiantes: '¿Asignar todos los estudiantes del salón a este horario?',
 } as const;
 
 export const UI_ATTACHMENT_MESSAGES = {
 	uploadSuccess: 'Archivo subido correctamente',
-	fileMissing: 'No se seleccionÃ³ ningÃºn archivo',
-	fileEmpty: 'El archivo estÃ¡ vacÃ­o',
+	fileMissing: 'No se seleccionó ningún archivo',
+	fileEmpty: 'El archivo está vacío',
 	fileTooLarge: (maxMb: number): string =>
-		`El archivo es demasiado grande (mÃ¡ximo ${maxMb}MB)`,
+		`El archivo es demasiado grande (máximo ${maxMb}MB)`,
 } as const;
 
 export const UI_ERROR_SUMMARIES = {
@@ -133,8 +133,8 @@ export const UI_CLIENT_ERROR_MESSAGE =
 	'Ha ocurrido un error inesperado. Por favor, recargue la pagina.';
 
 export const UI_AUTH_MESSAGES = {
-	loginTooManyAttempts: 'Demasiados intentos fallidos. Intente mÃ¡s tarde.',
-	loginError: 'Error al iniciar sesiÃ³n',
+	loginTooManyAttempts: 'Demasiados intentos fallidos. Intente más tarde.',
+	loginError: 'Error al iniciar sesión',
 } as const;
 
 export const UI_GENERIC_MESSAGES = {
@@ -152,9 +152,9 @@ export const UI_LOGIN_MESSAGES = {
 
 export const UI_VOICE_MESSAGES = {
 	networkError:
-		'Error de red. Verifica tu conexiÃ³n a internet y que uses HTTPS.',
+		'Error de red. Verifica tu conexión a internet y que uses HTTPS.',
 	micPermissionDenied:
-		'Permiso de micrÃ³fono denegado. HabilÃ­talo en la configuraciÃ³n del navegador.',
+		'Permiso de micrófono denegado. Habilítalo en la configuración del navegador.',
 	startFailed: 'No se pudo iniciar el reconocimiento de voz.',
 } as const;
 

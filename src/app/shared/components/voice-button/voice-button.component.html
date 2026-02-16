@@ -21,7 +21,7 @@
 						class="clear-btn"
 						(click)="clearTranscript()"
 						title="Borrar"
-						aria-label="Borrar transcripciÃ³n"
+						aria-label="Borrar transcripción"
 					>
 						<i class="pi pi-trash"></i>
 					</button>
@@ -57,7 +57,7 @@
 			[style.transform]="isDragging ? 'translateY(-' + dragOffset + 'px)' : ''"
 			[attr.aria-label]="
 				voiceService.isLocked()
-					? 'MicrÃ³fono bloqueado, grabando'
+					? 'Micrófono bloqueado, grabando'
 					: voiceService.isListening()
 						? 'Escuchando comando de voz'
 						: 'Activar comando de voz'
@@ -100,7 +100,7 @@
 		<!-- ? Tooltip shown only when idle. -->
 		@if (!voiceService.isListening() && !voiceService.isLocked() && !voiceService.error()) {
 			<div class="voice-tooltip">
-				MantÃ©n presionado para hablar
+				Mantén presionado para hablar
 				<br />
 				<small>Desliza hacia arriba para bloquear</small>
 			</div>
@@ -120,7 +120,7 @@
 					<button
 						class="close-menu-btn"
 						(click)="closeContextMenu()"
-						aria-label="Cerrar menÃº de comandos"
+						aria-label="Cerrar menú de comandos"
 					>
 						<i class="pi pi-times"></i>
 					</button>

@@ -29,14 +29,14 @@ export interface FormattedDate {
 	iso: string;
 	short: string; // 22/01/2026
 	long: string; // 22 de enero de 2026
-	relative: string; // hace 2 dÃƒÂ­as, maÃƒÂ±ana, etc.
-	dayName: string; // MiÃƒÂ©rcoles
+	relative: string; // hace 2 días, mañana, etc.
+	dayName: string; // Miércoles
 	monthName: string; // Enero
 	time: string; // 14:30
 }
 
 /**
- * Adapter para transformar Date a FormattedDate con mÃƒÂºltiples formatos
+ * Adapter para transformar Date a FormattedDate con múltiples formatos
  */
 @Injectable({
 	providedIn: 'root',
@@ -96,13 +96,13 @@ export class DateFormatAdapter extends BaseAdapter<Date, FormattedDate> {
 		if (diffDays === 0) {
 			return 'Hoy';
 		} else if (diffDays === 1) {
-			return 'MaÃƒÂ±ana';
+			return 'Mañana';
 		} else if (diffDays === -1) {
 			return 'Ayer';
 		} else if (diffDays > 1 && diffDays <= 7) {
-			return `En ${diffDays} dÃƒÂ­as`;
+			return `En ${diffDays} días`;
 		} else if (diffDays < -1 && diffDays >= -7) {
-			return `Hace ${Math.abs(diffDays)} dÃƒÂ­as`;
+			return `Hace ${Math.abs(diffDays)} días`;
 		} else if (diffDays > 7) {
 			return `En ${Math.floor(diffDays / 7)} semanas`;
 		} else {

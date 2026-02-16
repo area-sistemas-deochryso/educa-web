@@ -1,9 +1,9 @@
 <!-- #region Template -->
 <div class="filters-section">
 	<div class="filters-grid">
-		<!-- * Filtro por salÃƒÂ³n -->
+		<!-- * Filtro por salón -->
 		<div class="filter-field">
-			<label for="filtroSalon">SalÃƒÂ³n</label>
+			<label for="filtroSalon">Salón</label>
 			<p-select
 				id="filtroSalon"
 				[options]="salonesOptions()"
@@ -14,7 +14,7 @@
 				optionValue="value"
 				appendTo="body"
 				[filter]="true"
-				filterPlaceholder="Buscar salÃƒÂ³n..."
+				filterPlaceholder="Buscar salón..."
 				[showClear]="true"
 			/>
 		</div>
@@ -22,18 +22,18 @@
 		<!-- ? Filtro por profesor (pendiente - requiere API de profesores) -->
 		<div class="filter-field">
 			<label for="filtroProfesor">Profesor</label>
-			<input id="filtroProfesor" type="text" pInputText placeholder="PrÃƒÂ³ximamente..." disabled />
+			<input id="filtroProfesor" type="text" pInputText placeholder="Próximamente..." disabled />
 		</div>
 
-		<!-- * Filtro por dÃƒÂ­a de la semana -->
+		<!-- * Filtro por día de la semana -->
 		<div class="filter-field">
-			<label for="filtroDia">DÃƒÂ­a</label>
+			<label for="filtroDia">Día</label>
 			<p-select
 				id="filtroDia"
 				[options]="diasOptions"
 				[ngModel]="filtroDiaSemana()"
 				(ngModelChange)="onDiaChange($event)"
-				placeholder="Todos los dÃƒÂ­as"
+				placeholder="Todos los días"
 				optionLabel="label"
 				optionValue="value"
 				appendTo="body"

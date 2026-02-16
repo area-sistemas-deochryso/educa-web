@@ -6,7 +6,7 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
 /**
  * Servicio para manejar el ciclo de vida de subscripciones.
- * Proporciona mÃƒÆ’Ã‚Âºltiples estrategias para evitar memory leaks.
+ * Proporciona múltiples estrategias para evitar memory leaks.
  *
  * USO RECOMENDADO (Angular 16+):
  * ```typescript
@@ -45,7 +45,7 @@ export class DestroyService implements OnDestroy {
 	readonly onDestroy$ = this.destroy$.asObservable();
 
 	/**
-	 * Operador para cancelar subscripciones automÃƒÆ’Ã‚Â¡ticamente
+	 * Operador para cancelar subscripciones automáticamente
 	 */
 	takeUntil<T>(): MonoTypeOperatorFunction<T> {
 		return takeUntil<T>(this.destroy$);
@@ -59,7 +59,7 @@ export class DestroyService implements OnDestroy {
 
 /**
  * Helper function para usar takeUntilDestroyed en contextos donde
- * DestroyRef no estÃƒÆ’Ã‚Â¡ disponible automÃƒÆ’Ã‚Â¡ticamente.
+ * DestroyRef no está disponible automáticamente.
  *
  * @example
  * ```typescript
@@ -109,7 +109,7 @@ export abstract class DestroyableComponent implements OnDestroy {
 }
 
 /**
- * Utilidad para manejar intervalos y timeouts con cleanup automÃƒÆ’Ã‚Â¡tico
+ * Utilidad para manejar intervalos y timeouts con cleanup automático
  */
 export class TimerManager {
 	private intervals: ReturnType<typeof setInterval>[] = [];

@@ -9,8 +9,8 @@ import { MenuItem } from 'primeng/api';
 import { TooltipModule } from 'primeng/tooltip';
 
 /**
- * Componente presentacional para mostrar las estadÃƒÆ’Ã‚Â­sticas del dÃƒÆ’Ã‚Â­a.
- * Usado por el Director para ver un resumen rÃƒÆ’Ã‚Â¡pido.
+ * Componente presentacional para mostrar las estadísticas del día.
+ * Usado por el Director para ver un resumen rápido.
  */
 // #endregion
 // #region Implementation

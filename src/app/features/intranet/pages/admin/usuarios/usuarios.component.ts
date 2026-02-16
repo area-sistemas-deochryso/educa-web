@@ -90,7 +90,7 @@ export class UsuariosComponent implements OnInit, AfterViewInit {
 
 	ngAfterViewInit(): void {
 		// * Fix aria label after confirm dialog renders.
-		this.fixConfirmDialogAria('ConfirmaciÃƒÆ’Ã‚Â³n');
+		this.fixConfirmDialogAria('Confirmación');
 	}
 
 	onRefresh(): void {

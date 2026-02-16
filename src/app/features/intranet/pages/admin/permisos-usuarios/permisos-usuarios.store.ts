@@ -39,28 +39,28 @@ export class PermisosUsuariosStore {
 	private readonly _activeModuloIndex = signal(0);
 	private readonly _vistasBusqueda = signal('');
 
-	// Estado pÃƒÂºblico readonly - Data
+	// Estado público readonly - Data
 	readonly permisosUsuario = this._permisosUsuario.asReadonly();
 	readonly permisosRol = this._permisosRol.asReadonly();
 	readonly vistas = this._vistas.asReadonly();
 
-	// Estado pÃƒÂºblico readonly - UI
+	// Estado público readonly - UI
 	readonly loading = this._loading.asReadonly();
 	readonly searchTerm = this._searchTerm.asReadonly();
 	readonly filterRol = this._filterRol.asReadonly();
 
-	// Estado pÃƒÂºblico readonly - Dialogs
+	// Estado público readonly - Dialogs
 	readonly dialogVisible = this._dialogVisible.asReadonly();
 	readonly detailDrawerVisible = this._detailDrawerVisible.asReadonly();
 	readonly isEditing = this._isEditing.asReadonly();
 
-	// Estado pÃƒÂºblico readonly - Form
+	// Estado público readonly - Form
 	readonly selectedPermiso = this._selectedPermiso.asReadonly();
 	readonly selectedUsuarioId = this._selectedUsuarioId.asReadonly();
 	readonly selectedRol = this._selectedRol.asReadonly();
 	readonly selectedVistas = this._selectedVistas.asReadonly();
 
-	// Estado pÃƒÂºblico readonly - Module tabs
+	// Estado público readonly - Module tabs
 	readonly modulosVistas = this._modulosVistas.asReadonly();
 	readonly activeModuloIndex = this._activeModuloIndex.asReadonly();
 	readonly vistasBusqueda = this._vistasBusqueda.asReadonly();
@@ -86,7 +86,7 @@ export class PermisosUsuariosStore {
 		return permisos;
 	});
 
-	// Computed - Vistas filtradas por bÃƒÂºsqueda en modal de ediciÃƒÂ³n
+	// Computed - Vistas filtradas por búsqueda en modal de edición
 	readonly vistasFiltradas = computed(() => {
 		const modulos = this._modulosVistas();
 		const busqueda = this._vistasBusqueda().toLowerCase();
@@ -231,7 +231,7 @@ export class PermisosUsuariosStore {
 		this._vistasBusqueda.set(term);
 	}
 
-	// Resetear estado de diÃƒÂ¡logos
+	// Resetear estado de diálogos
 	resetDialogState(): void {
 		this._selectedPermiso.set(null);
 		this._selectedUsuarioId.set(null);

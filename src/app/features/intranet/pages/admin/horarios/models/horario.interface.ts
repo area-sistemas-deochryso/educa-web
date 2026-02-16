@@ -1,4 +1,4 @@
-// #region DTOs de Response (Backend ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â ÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢ Frontend)
+// #region DTOs de Response (Backend → Frontend)
 
 export interface HorarioResponseDto {
   id: number;
@@ -50,7 +50,7 @@ export interface EstudianteHorarioDto {
 }
 
 // #endregion
-// #region DTOs de Request (Frontend ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â ÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢ Backend)
+// #region DTOs de Request (Frontend → Backend)
 
 export interface HorarioCreateDto {
   diaSemana: number;
@@ -79,7 +79,7 @@ export interface HorarioAsignarProfesorDto {
 
 export interface HorarioAsignarEstudiantesDto {
   horarioId: number;
-  estudianteIds: number[] | null; // null = todos del salÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â³n
+  estudianteIds: number[] | null; // null = todos del salón
   usuarioReg: string;
 }
 
@@ -87,7 +87,7 @@ export interface HorarioAsignarEstudiantesDto {
 // #region Modelos Locales (Frontend)
 
 export interface HorarioFormData {
-  // Paso 1: Datos bÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â¡sicos
+  // Paso 1: Datos básicos
   diaSemana: number | null;
   horaInicio: string;
   horaFin: string;
@@ -145,7 +145,7 @@ export interface HorarioWeeklyData {
 export const DIAS_SEMANA: DiaSemanaOption[] = [
   { label: 'Lunes', value: 1 },
   { label: 'Martes', value: 2 },
-  { label: 'MiÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â©rcoles', value: 3 },
+  { label: 'Miércoles', value: 3 },
   { label: 'Jueves', value: 4 },
   { label: 'Viernes', value: 5 },
 ];

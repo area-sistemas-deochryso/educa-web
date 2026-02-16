@@ -31,7 +31,7 @@ describe('AttendanceDirectorComponent', () => {
 		{
 			estudianteId: 1,
 			dni: '12345678',
-			nombreCompleto: 'Juan PÃƒÂ©rez',
+			nombreCompleto: 'Juan Pérez',
 			grado: 1,
 			seccion: 'A',
 			asistencias: [],
@@ -158,7 +158,7 @@ describe('AttendanceDirectorComponent', () => {
 		const hijos = component.estudiantesAsHijos();
 
 		expect(hijos.length).toBe(1);
-		expect(hijos[0].nombreCompleto).toBe('Juan PÃƒÂ©rez');
+		expect(hijos[0].nombreCompleto).toBe('Juan Pérez');
 		expect(hijos[0].relacion).toBe('Estudiante');
 	});
 

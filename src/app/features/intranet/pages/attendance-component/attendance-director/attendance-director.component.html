@@ -27,7 +27,7 @@
 
 				<span class="pdf-label">
 					@if (tipoReporte() === 'salon') {
-						Reporte del dÃ­a: {{ view.pdfFecha() | date: 'dd/MM/yyyy' }}
+						Reporte del día: {{ view.pdfFecha() | date: 'dd/MM/yyyy' }}
 					} @else {
 						Reporte consolidado
 					}
@@ -77,7 +77,7 @@
 			/>
 		} @else if (!view.loading()) {
 			<!-- ! Empty state after load -->
-			<app-empty-state message="No se encontraron estudiantes en este grado/secciÃ³n." />
+			<app-empty-state message="No se encontraron estudiantes en este grado/sección." />
 		}
 	} @else {
 		<!-- * Day mode list with date picker + PDF options -->

@@ -92,7 +92,7 @@ export class ScheduleComponent implements OnInit, OnDestroy {
 		this.voiceUnsubscribers.push(
 			this.voiceService.registerModal({
 				name: 'resumen',
-				aliases: ['resumen acadÃƒÂ©mico', 'el resumen', 'summary', 'resumen de cursos'],
+				aliases: ['resumen académico', 'el resumen', 'summary', 'resumen de cursos'],
 				open: () => this.openSummaryModal(),
 				close: () => this.onSummaryModalClose(),
 			}),
@@ -116,7 +116,7 @@ export class ScheduleComponent implements OnInit, OnDestroy {
 		this.voiceUnsubscribers.push(
 			this.voiceService.registerModal({
 				name: 'detalles',
-				aliases: ['detalles del curso', 'detalle', 'informaciÃƒÂ³n del curso'],
+				aliases: ['detalles del curso', 'detalle', 'información del curso'],
 				open: () => {
 					if (this.selectedCourse) {
 						this.openDetailsModal(this.selectedCourse);

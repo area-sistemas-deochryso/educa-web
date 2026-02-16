@@ -40,7 +40,7 @@
 												<div class="semana-label">
 													<span class="semana-number">Semana {{ semana.numeroSemana }}</span>
 													@if (semana.titulo) {
-														<span class="semana-titulo">ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â {{ semana.titulo }}</span>
+														<span class="semana-titulo">— {{ semana.titulo }}</span>
 													}
 												</div>
 												<div class="semana-badges">
@@ -61,7 +61,7 @@
 										</p-accordionheader>
 										<p-accordioncontent>
 											<div class="semana-body">
-												<!-- DescripciÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â³n -->
+												<!-- Descripción -->
 												@if (semana.descripcion) {
 													<p class="semana-desc">{{ semana.descripcion }}</p>
 												}
@@ -216,14 +216,14 @@
 												<!-- #endregion -->
 				<!-- #region Columna derecha: Info sidebar -->
 				<div class="info-column">
-					<p class="info-section-title">InformaciÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â³n</p>
+					<p class="info-section-title">Información</p>
 
 					<div class="info-field">
 						<p class="info-field-label">Curso</p>
 						<p class="info-field-value">{{ contenido.cursoNombre }}</p>
 					</div>
 					<div class="info-field">
-						<p class="info-field-label">SalÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â³n</p>
+						<p class="info-field-label">Salón</p>
 						<p class="info-field-value">{{ contenido.salonDescripcion }}</p>
 					</div>
 					<div class="info-field">

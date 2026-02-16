@@ -4,7 +4,7 @@ import { ButtonModule } from 'primeng/button';
 
 /**
  * Componente presentacional para el header de usuarios
- * Muestra tÃƒÆ’Ã‚Â­tulo y botÃƒÆ’Ã‚Â³n de refrescar
+ * Muestra título y botón de refrescar
  */
 // #endregion
 // #region Implementation

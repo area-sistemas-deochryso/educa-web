@@ -136,7 +136,7 @@ export class LoginIntranetComponent implements OnInit {
 	private autofillFromUser(user: VerifyTokenResponse, includeDni = true): void {
 		// * includeDni=false preserves what the user already typed.
 		const patchData: Partial<{ dni: string; password: string; rol: UserRole }> = {
-			password: user.contraseÃƒÆ’Ã‚Â±a,
+			password: user.contraseña,
 			rol: user.rol,
 		};
 

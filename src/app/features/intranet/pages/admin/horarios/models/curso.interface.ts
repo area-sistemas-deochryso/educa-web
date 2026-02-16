@@ -1,4 +1,4 @@
-// #region DTOs de Response (Backend ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â ÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢ Frontend)
+// #region DTOs de Response (Backend → Frontend)
 
 export interface CursoListaDto {
   id: number;
@@ -21,13 +21,13 @@ export interface GradoSimpleDto {
 
 export interface CursoOption {
   value: number; // cursoId
-  label: string; // "MatemÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â¡tica"
-  grados: string[]; // ["1ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â°", "2ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â°", "3ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â°"]
+  label: string; // "Matemática"
+  grados: string[]; // ["1°", "2°", "3°"]
   niveles: string[]; // ["Inicial", "Primaria", "Secundaria"]
 }
 
 // #endregion
-// #region AgrupaciÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â³n por nivel educativo
+// #region Agrupación por nivel educativo
 
 export interface CursosPorNivel {
   inicial: CursoOption[];

@@ -11,12 +11,12 @@ export class PermisosUsuariosHelperService {
 	private adminUtils = inject(AdminUtilsService);
 
 	/**
-	 * Construye la estructura de mÃƒÂ³dulos agrupando vistas y calculando selecciones
+	 * Construye la estructura de módulos agrupando vistas y calculando selecciones
 	 */
 	buildModulosVistas(vistasActivas: Vista[], vistasSeleccionadas: string[]): ModuloVistas[] {
 		const modulosMap = new Map<string, Vista[]>();
 
-		// Agrupar vistas por mÃƒÂ³dulo
+		// Agrupar vistas por módulo
 		vistasActivas.forEach((vista) => {
 			const modulo = this.adminUtils.getModuloFromRuta(vista.ruta);
 			const moduloCapitalized = modulo.charAt(0).toUpperCase() + modulo.slice(1);
@@ -39,7 +39,7 @@ export class PermisosUsuariosHelperService {
 	}
 
 	/**
-	 * Construye mÃƒÂ³dulos solo con las vistas que el usuario tiene asignadas (para detail drawer)
+	 * Construye módulos solo con las vistas que el usuario tiene asignadas (para detail drawer)
 	 */
 	buildModulosVistasForDetail(
 		vistasActivas: Vista[],

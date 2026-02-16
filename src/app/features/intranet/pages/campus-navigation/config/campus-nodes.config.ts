@@ -1,19 +1,19 @@
 import { CampusNode } from '../models';
 
 /**
- * ConfiguraciÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â³n de nodos del campus.
- * Cada nodo representa un punto fÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â­sico: salÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â³n, pasillo, escaleras, entrada, etc.
+ * Configuración de nodos del campus.
+ * Cada nodo representa un punto físico: salón, pasillo, escaleras, entrada, etc.
  *
  * Coordenadas: Sistema relativo 0-1000 (mapeado al viewBox del SVG)
  * salonId: Debe coincidir con Salon.SAL_CodID del backend
  *
- * Layout por bandas horizontales (evita que las lÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â­neas de ruta crucen salones):
- * - yÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â°Ãƒâ€¹Ã¢â‚¬Â 200: Facilidades superiores (baÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â±os, oficinas)
- * - yÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â°Ãƒâ€¹Ã¢â‚¬Â 320: Escaleras
- * - yÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â°Ãƒâ€¹Ã¢â‚¬Â 420: Banda de pasillos (conexiÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â³n horizontal principal)
- * - yÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â°Ãƒâ€¹Ã¢â‚¬Â 560: Fila de salones
- * - yÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â°Ãƒâ€¹Ã¢â‚¬Â 650: Patio central
- * - yÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â°Ãƒâ€¹Ã¢â‚¬Â 755: Entrada principal
+ * Layout por bandas horizontales (evita que las líneas de ruta crucen salones):
+ * - y≈200: Facilidades superiores (baños, oficinas)
+ * - y≈320: Escaleras
+ * - y≈420: Banda de pasillos (conexión horizontal principal)
+ * - y≈560: Fila de salones
+ * - y≈650: Patio central
+ * - y≈755: Entrada principal
  */
 export const CAMPUS_NODES: CampusNode[] = [
 	// #region Piso 0 (Planta Baja)
@@ -65,7 +65,7 @@ export const CAMPUS_NODES: CampusNode[] = [
 	{
 		id: 'salon-1a',
 		type: 'classroom',
-		label: '1ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â° A',
+		label: '1° A',
 		floor: 0,
 		x: 150,
 		y: 560,
@@ -76,7 +76,7 @@ export const CAMPUS_NODES: CampusNode[] = [
 	{
 		id: 'salon-1b',
 		type: 'classroom',
-		label: '1ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â° B',
+		label: '1° B',
 		floor: 0,
 		x: 350,
 		y: 560,
@@ -87,7 +87,7 @@ export const CAMPUS_NODES: CampusNode[] = [
 	{
 		id: 'salon-1c',
 		type: 'classroom',
-		label: '1ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â° C',
+		label: '1° C',
 		floor: 0,
 		x: 650,
 		y: 560,
@@ -98,7 +98,7 @@ export const CAMPUS_NODES: CampusNode[] = [
 	{
 		id: 'salon-1d',
 		type: 'classroom',
-		label: '1ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â° D',
+		label: '1° D',
 		floor: 0,
 		x: 850,
 		y: 560,
@@ -109,7 +109,7 @@ export const CAMPUS_NODES: CampusNode[] = [
 	{
 		id: 'office-dir',
 		type: 'office',
-		label: 'DirecciÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â³n',
+		label: 'Dirección',
 		floor: 0,
 		x: 850,
 		y: 200,
@@ -119,7 +119,7 @@ export const CAMPUS_NODES: CampusNode[] = [
 	{
 		id: 'bathroom-0',
 		type: 'bathroom',
-		label: 'BaÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â±os P0',
+		label: 'Baños P0',
 		floor: 0,
 		x: 150,
 		y: 200,
@@ -157,7 +157,7 @@ export const CAMPUS_NODES: CampusNode[] = [
 	{
 		id: 'salon-2a',
 		type: 'classroom',
-		label: '2ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â° A',
+		label: '2° A',
 		floor: 1,
 		x: 150,
 		y: 560,
@@ -168,7 +168,7 @@ export const CAMPUS_NODES: CampusNode[] = [
 	{
 		id: 'salon-2b',
 		type: 'classroom',
-		label: '2ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â° B',
+		label: '2° B',
 		floor: 1,
 		x: 350,
 		y: 560,
@@ -179,7 +179,7 @@ export const CAMPUS_NODES: CampusNode[] = [
 	{
 		id: 'salon-3a',
 		type: 'classroom',
-		label: '3ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â° A',
+		label: '3° A',
 		floor: 1,
 		x: 650,
 		y: 560,
@@ -190,7 +190,7 @@ export const CAMPUS_NODES: CampusNode[] = [
 	{
 		id: 'salon-3b',
 		type: 'classroom',
-		label: '3ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â° B',
+		label: '3° B',
 		floor: 1,
 		x: 850,
 		y: 560,
@@ -201,7 +201,7 @@ export const CAMPUS_NODES: CampusNode[] = [
 	{
 		id: 'salon-2c',
 		type: 'classroom',
-		label: '2ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â° C',
+		label: '2° C',
 		floor: 1,
 		x: 150,
 		y: 200,
@@ -212,7 +212,7 @@ export const CAMPUS_NODES: CampusNode[] = [
 	{
 		id: 'salon-3c',
 		type: 'classroom',
-		label: '3ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â° C',
+		label: '3° C',
 		floor: 1,
 		x: 350,
 		y: 200,
@@ -223,7 +223,7 @@ export const CAMPUS_NODES: CampusNode[] = [
 	{
 		id: 'bathroom-1',
 		type: 'bathroom',
-		label: 'BaÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â±os P1',
+		label: 'Baños P1',
 		floor: 1,
 		x: 850,
 		y: 200,

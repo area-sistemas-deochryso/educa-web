@@ -22,7 +22,7 @@ export interface NotificationStorageData {
 	date: string;
 }
 
-/** Mes y aÃƒÂ±o seleccionado para asistencia */
+/** Mes y año seleccionado para asistencia */
 export interface AttendanceMonthData {
 	month: number;
 	year: number;
@@ -34,7 +34,7 @@ export interface PermisosStorageData {
 	rol: string;
 	vistasPermitidas: string[];
 	tienePermisosPersonalizados: boolean;
-	/** JWT con exp de 4h que indica cuÃƒÂ¡ndo vencen estos permisos */
+	/** JWT con exp de 4h que indica cuándo vencen estos permisos */
 	permisosToken?: string;
 }
 

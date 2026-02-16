@@ -29,7 +29,7 @@ export class AttachmentsModalFacade {
 
 	// Comandos
 	uploadFile(file: File): void {
-		// ValidaciÃƒÆ’Ã‚Â³n del archivo
+		// Validación del archivo
 		const validationError = this.validateFile(file);
 		if (validationError) {
 			logger.error(validationError);
@@ -63,7 +63,7 @@ export class AttachmentsModalFacade {
 					this.store.setUploading(false);
 					this.store.setUploadProgress(100);
 
-					// Notificar ÃƒÆ’Ã‚Â©xito
+					// Notificar éxito
 					this.errorHandler.showSuccess(
 						UI_SUMMARIES.success,
 						UI_ATTACHMENT_MESSAGES.uploadSuccess,
@@ -104,7 +104,7 @@ export class AttachmentsModalFacade {
 		}
 	}
 
-	// ValidaciÃƒÆ’Ã‚Â³n privada
+	// Validación privada
 	private validateFile(file: File): string | null {
 		if (!file) {
 			return UI_ATTACHMENT_MESSAGES.fileMissing;

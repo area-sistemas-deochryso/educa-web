@@ -37,9 +37,9 @@ export class DismissedCardComponent {
 	getTypeLabel(type: string): string {
 		// * Map backend types to display labels.
 		const labels: Record<string, string> = {
-			matricula: 'MatrÃƒÂ­cula',
+			matricula: 'Matrícula',
 			pago: 'Pago',
-			academico: 'AcadÃƒÂ©mico',
+			academico: 'Académico',
 			festividad: 'Festividad',
 			evento: 'Evento',
 		};

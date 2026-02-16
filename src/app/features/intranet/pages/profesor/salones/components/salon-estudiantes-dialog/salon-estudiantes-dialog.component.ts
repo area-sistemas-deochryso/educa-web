@@ -24,7 +24,7 @@ import { ProfesorSalonConEstudiantes } from '../../../services/profesor.store';
 			(visibleChange)="onVisibleChange($event)"
 			[modal]="true"
 			[style]="{ width: '600px', maxWidth: '95vw' }"
-			[header]="salon()?.salonDescripcion ?? 'SalÃƒÆ’Ã‚Â³n'"
+			[header]="salon()?.salonDescripcion ?? 'Salón'"
 		>
 			@if (salon(); as s) {
 				<p-tabs value="0">
@@ -59,7 +59,7 @@ import { ProfesorSalonConEstudiantes } from '../../../services/profesor.store';
 									class="flex flex-column align-items-center p-4 text-color-secondary"
 								>
 									<i class="pi pi-users text-3xl mb-2"></i>
-									<p>No hay estudiantes en este salÃƒÆ’Ã‚Â³n</p>
+									<p>No hay estudiantes en este salón</p>
 								</div>
 							} @else {
 								<p-table
@@ -95,7 +95,7 @@ import { ProfesorSalonConEstudiantes } from '../../../services/profesor.store';
 								<i class="pi pi-clock text-4xl mb-3"></i>
 								<p class="text-lg font-semibold">Proximamente</p>
 								<p class="text-sm">
-									El sistema de notas estarÃƒÆ’Ã‚Â¡ disponible pronto
+									El sistema de notas estará disponible pronto
 								</p>
 							</div>
 						</p-tabpanel>
@@ -120,4 +120,3 @@ export class SalonEstudiantesDialogComponent {
 		}
 	}
 }
-						<!-- #endregion -->

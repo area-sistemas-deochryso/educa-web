@@ -1,7 +1,7 @@
 // #region Implementation
 /**
- * ConfiguraciÃ³n de eventos del calendario
- * Los dÃ­as con eventos se mostrarÃ¡n con el nÃºmero en verde
+ * Configuración de eventos del calendario
+ * Los días con eventos se mostrarán con el número en verde
  */
 
 export interface CalendarEvent {
@@ -16,43 +16,43 @@ export interface CalendarEvent {
 }
 
 export const CALENDAR_EVENTS: CalendarEvent[] = [
-	// PerÃ­odo de matrÃ­cula
+	// Período de matrícula
 	{
 		date: '2026-01-02',
 		endDate: '2026-01-15',
-		title: 'MatrÃ­cula Anticipada',
+		title: 'Matrícula Anticipada',
 		description:
-			'PerÃ­odo de matrÃ­cula anticipada con descuento especial. VÃ¡lido del 2 al 15 de enero.',
+			'Período de matrícula anticipada con descuento especial. Válido del 2 al 15 de enero.',
 		type: 'academic',
 		icon: 'pi-calendar-plus',
 		time: '8:00 AM - 5:00 PM',
-		location: 'SecretarÃ­a',
+		location: 'Secretaría',
 	},
 	{
 		date: '2026-01-16',
 		endDate: '2026-01-31',
-		title: 'MatrÃ­cula Regular',
-		description: 'PerÃ­odo de matrÃ­cula regular. Asegura tu cupo para el aÃ±o escolar 2026.',
+		title: 'Matrícula Regular',
+		description: 'Período de matrícula regular. Asegura tu cupo para el año escolar 2026.',
 		type: 'academic',
 		icon: 'pi-calendar',
 		time: '8:00 AM - 5:00 PM',
-		location: 'SecretarÃ­a',
+		location: 'Secretaría',
 	},
 	{
 		date: '2026-02-01',
 		endDate: '2026-02-15',
-		title: 'MatrÃ­cula ExtemporÃ¡nea',
-		description: 'Ãšltimo perÃ­odo para matricularse. Se aplica recargo por matrÃ­cula tardÃ­a.',
+		title: 'Matrícula Extemporánea',
+		description: 'Último período para matricularse. Se aplica recargo por matrícula tardía.',
 		type: 'academic',
 		icon: 'pi-exclamation-triangle',
 		time: '8:00 AM - 5:00 PM',
-		location: 'SecretarÃ­a',
+		location: 'Secretaría',
 	},
 	{
 		date: '2026-03-01',
 		title: 'Inicio de clases',
 		description:
-			'Primer dÃ­a del aÃ±o escolar 2026. Bienvenida a todos los estudiantes y apertura oficial de las actividades acadÃ©micas.',
+			'Primer día del año escolar 2026. Bienvenida a todos los estudiantes y apertura oficial de las actividades académicas.',
 		type: 'academic',
 		icon: 'pi-book',
 		time: '8:00 AM',
@@ -60,9 +60,9 @@ export const CALENDAR_EVENTS: CalendarEvent[] = [
 	},
 	{
 		date: '2026-03-08',
-		title: 'DÃ­a Internacional de la Mujer',
+		title: 'Día Internacional de la Mujer',
 		description:
-			'Celebramos a todas las mujeres que hacen posible la educaciÃ³n. Actividades conmemorativas.',
+			'Celebramos a todas las mujeres que hacen posible la educación. Actividades conmemorativas.',
 		type: 'cultural',
 		icon: 'pi-heart',
 		time: '10:00 AM',
@@ -70,9 +70,9 @@ export const CALENDAR_EVENTS: CalendarEvent[] = [
 	},
 	{
 		date: '2026-03-15',
-		title: 'ReuniÃ³n de padres',
+		title: 'Reunión de padres',
 		description:
-			'Primera reuniÃ³n general de padres de familia. Se presentarÃ¡ el plan curricular y las normas del aÃ±o escolar.',
+			'Primera reunión general de padres de familia. Se presentará el plan curricular y las normas del año escolar.',
 		type: 'meeting',
 		icon: 'pi-users',
 		time: '6:00 PM',
@@ -80,9 +80,9 @@ export const CALENDAR_EVENTS: CalendarEvent[] = [
 	},
 	{
 		date: '2026-04-20',
-		title: 'DÃ­a del libro',
+		title: 'Día del libro',
 		description:
-			'CelebraciÃ³n del DÃ­a Mundial del Libro. Actividades de lectura, intercambio de libros y presentaciones literarias.',
+			'Celebración del Día Mundial del Libro. Actividades de lectura, intercambio de libros y presentaciones literarias.',
 		type: 'cultural',
 		icon: 'pi-book',
 		time: '10:00 AM',
@@ -90,8 +90,8 @@ export const CALENDAR_EVENTS: CalendarEvent[] = [
 	},
 	{
 		date: '2026-05-10',
-		title: 'DÃ­a de la Madre',
-		description: 'CelebraciÃ³n especial para todas las mamÃ¡s. Actuaciones y homenajes.',
+		title: 'Día de la Madre',
+		description: 'Celebración especial para todas las mamás. Actuaciones y homenajes.',
 		type: 'cultural',
 		icon: 'pi-heart',
 		time: '10:00 AM',
@@ -100,9 +100,9 @@ export const CALENDAR_EVENTS: CalendarEvent[] = [
 	{
 		date: '2026-05-15',
 		endDate: '2026-05-22',
-		title: 'ExÃ¡menes parciales',
+		title: 'Exámenes parciales',
 		description:
-			'PerÃ­odo de evaluaciones parciales del primer bimestre. Revisar el cronograma de exÃ¡menes por grado.',
+			'Período de evaluaciones parciales del primer bimestre. Revisar el cronograma de exámenes por grado.',
 		type: 'academic',
 		icon: 'pi-file-edit',
 		time: '8:00 AM',
@@ -110,9 +110,9 @@ export const CALENDAR_EVENTS: CalendarEvent[] = [
 	},
 	{
 		date: '2026-06-07',
-		title: 'DÃ­a de la bandera',
+		title: 'Día de la bandera',
 		description:
-			'Ceremonia cÃ­vica en honor al DÃ­a de la Bandera. Desfile escolar y actividades patriÃ³ticas.',
+			'Ceremonia cívica en honor al Día de la Bandera. Desfile escolar y actividades patrióticas.',
 		type: 'cultural',
 		icon: 'pi-flag',
 		time: '9:00 AM',
@@ -120,8 +120,8 @@ export const CALENDAR_EVENTS: CalendarEvent[] = [
 	},
 	{
 		date: '2026-06-21',
-		title: 'DÃ­a del Padre',
-		description: 'CelebraciÃ³n especial para todos los papÃ¡s. Actuaciones y homenajes.',
+		title: 'Día del Padre',
+		description: 'Celebración especial para todos los papás. Actuaciones y homenajes.',
 		type: 'cultural',
 		icon: 'pi-heart',
 		time: '10:00 AM',
@@ -129,9 +129,9 @@ export const CALENDAR_EVENTS: CalendarEvent[] = [
 	},
 	{
 		date: '2026-07-06',
-		title: 'DÃ­a del maestro',
+		title: 'Día del maestro',
 		description:
-			'Homenaje a todos los docentes de la instituciÃ³n. Actuaciones especiales y reconocimientos.',
+			'Homenaje a todos los docentes de la institución. Actuaciones especiales y reconocimientos.',
 		type: 'cultural',
 		icon: 'pi-heart',
 		time: '10:00 AM',
@@ -139,8 +139,8 @@ export const CALENDAR_EVENTS: CalendarEvent[] = [
 	},
 	{
 		date: '2026-07-12',
-		title: 'ReuniÃ³n de padres - Segundo Bimestre',
-		description: 'ReuniÃ³n de padres de familia para revisar el avance del segundo bimestre.',
+		title: 'Reunión de padres - Segundo Bimestre',
+		description: 'Reunión de padres de familia para revisar el avance del segundo bimestre.',
 		type: 'meeting',
 		icon: 'pi-users',
 		time: '6:00 PM',
@@ -151,7 +151,7 @@ export const CALENDAR_EVENTS: CalendarEvent[] = [
 		endDate: '2026-08-22',
 		title: 'Olimpiadas deportivas',
 		description:
-			'Olimpiadas deportivas interescolares. Competencias de fÃºtbol, vÃ³ley, bÃ¡squet y atletismo.',
+			'Olimpiadas deportivas interescolares. Competencias de fútbol, vóley, básquet y atletismo.',
 		type: 'sports',
 		icon: 'pi-trophy',
 		time: '8:00 AM',
@@ -159,8 +159,8 @@ export const CALENDAR_EVENTS: CalendarEvent[] = [
 	},
 	{
 		date: '2026-09-22',
-		title: 'ReuniÃ³n de padres - Tercer Bimestre',
-		description: 'ReuniÃ³n de padres de familia para revisar el avance del tercer bimestre.',
+		title: 'Reunión de padres - Tercer Bimestre',
+		description: 'Reunión de padres de familia para revisar el avance del tercer bimestre.',
 		type: 'meeting',
 		icon: 'pi-users',
 		time: '6:00 PM',
@@ -168,9 +168,9 @@ export const CALENDAR_EVENTS: CalendarEvent[] = [
 	},
 	{
 		date: '2026-09-23',
-		title: 'DÃ­a de la Primavera y del Estudiante',
+		title: 'Día de la Primavera y del Estudiante',
 		description:
-			'CelebraciÃ³n del DÃ­a de la Primavera y la Juventud. Festival de mÃºsica, baile y elecciÃ³n de reinas.',
+			'Celebración del Día de la Primavera y la Juventud. Festival de música, baile y elección de reinas.',
 		type: 'cultural',
 		icon: 'pi-sun',
 		time: '10:00 AM',
@@ -180,7 +180,7 @@ export const CALENDAR_EVENTS: CalendarEvent[] = [
 		date: '2026-10-31',
 		title: 'Festival de disfraces',
 		description:
-			'Festival de Halloween con concurso de disfraces, decoraciÃ³n de aulas y actividades recreativas.',
+			'Festival de Halloween con concurso de disfraces, decoración de aulas y actividades recreativas.',
 		type: 'cultural',
 		icon: 'pi-star',
 		time: '9:00 AM',
@@ -189,9 +189,9 @@ export const CALENDAR_EVENTS: CalendarEvent[] = [
 	{
 		date: '2026-11-15',
 		endDate: '2026-11-28',
-		title: 'ExÃ¡menes finales',
+		title: 'Exámenes finales',
 		description:
-			'PerÃ­odo de evaluaciones finales. Prepararse con anticipaciÃ³n revisando el material del aÃ±o.',
+			'Período de evaluaciones finales. Prepararse con anticipación revisando el material del año.',
 		type: 'academic',
 		icon: 'pi-file-edit',
 		time: '8:00 AM',
@@ -199,9 +199,9 @@ export const CALENDAR_EVENTS: CalendarEvent[] = [
 	},
 	{
 		date: '2026-12-15',
-		title: 'Clausura del aÃ±o escolar',
+		title: 'Clausura del año escolar',
 		description:
-			'Ceremonia de clausura y entrega de libretas. PremiaciÃ³n a los mejores estudiantes del aÃ±o.',
+			'Ceremonia de clausura y entrega de libretas. Premiación a los mejores estudiantes del año.',
 		type: 'academic',
 		icon: 'pi-graduation-cap',
 		time: '10:00 AM',
@@ -220,7 +220,7 @@ function dateToString(date: Date): string {
 }
 
 /**
- * Obtiene el evento para una fecha especÃ­fica (inicio de evento)
+ * Obtiene el evento para una fecha específica (inicio de evento)
  */
 export function getEvent(date: Date): CalendarEvent | null {
 	const dateString = dateToString(date);
@@ -228,7 +228,7 @@ export function getEvent(date: Date): CalendarEvent | null {
 }
 
 /**
- * Verifica si una fecha estÃ¡ dentro de un rango de evento (entre inicio y fin, excluyendo inicio y fin)
+ * Verifica si una fecha está dentro de un rango de evento (entre inicio y fin, excluyendo inicio y fin)
  */
 export function isDateInEventRange(date: Date): CalendarEvent | null {
 	const dateString = dateToString(date);
@@ -253,7 +253,7 @@ export function isDateEventEnd(date: Date): CalendarEvent | null {
 }
 
 /**
- * Obtiene todos los eventos para un aÃ±o especÃ­fico
+ * Obtiene todos los eventos para un año específico
  */
 export function getEventsForYear(year: number): CalendarEvent[] {
 	return CALENDAR_EVENTS.filter((event) => event.date.startsWith(`${year}-`));

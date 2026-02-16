@@ -1,6 +1,6 @@
 // #region Implementation
 // Los componentes compartidos se mantienen temporalmente en components/shared
-// y se migrarÃ¡n gradualmente a esta ubicaciÃ³n
+// y se migrarán gradualmente a esta ubicación
 
 export * from './toast-container';
 export * from './form-error';

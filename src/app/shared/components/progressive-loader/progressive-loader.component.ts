@@ -25,7 +25,7 @@ export class ProgressivePhaseDirective {
 
 /**
  * Componente para renderizado progresivo multi-fase
- * ÃƒÆ’Ã…Â¡til cuando hay mÃƒÆ’Ã‚Âºltiples secciones que cargan en secuencia
+ * Útil cuando hay múltiples secciones que cargan en secuencia
  *
  * @example
  * ```html
@@ -65,7 +65,7 @@ export class ProgressiveLoaderComponent {
 	/** Lista de fases en orden de carga */
 	readonly phases = input.required<string[]>();
 
-	/** Fase actual (ÃƒÆ’Ã‚Â­ndice o nombre de fase) */
+	/** Fase actual (índice o nombre de fase) */
 	readonly currentPhase = input<string | number>(0);
 
 	// * Ready flags for each phase name.
@@ -81,14 +81,14 @@ export class ProgressiveLoaderComponent {
 
 	protected getSkeletonTemplate(phase: string): TemplateRef<unknown> | null {
 		// ! Placeholder: resolve skeleton template for phase.
-		// LÃƒÆ’Ã‚Â³gica para encontrar el template de skeleton correspondiente
-		return null; // Implementar segÃƒÆ’Ã‚Âºn necesidad
+		// Lógica para encontrar el template de skeleton correspondiente
+		return null; // Implementar según necesidad
 	}
 
 	protected getContentTemplate(phase: string): TemplateRef<unknown> | null {
 		// ! Placeholder: resolve content template for phase.
-		// LÃƒÆ’Ã‚Â³gica para encontrar el template de contenido correspondiente
-		return null; // Implementar segÃƒÆ’Ã‚Âºn necesidad
+		// Lógica para encontrar el template de contenido correspondiente
+		return null; // Implementar según necesidad
 	}
 }
 // #endregion

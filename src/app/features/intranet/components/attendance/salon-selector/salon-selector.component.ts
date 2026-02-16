@@ -5,8 +5,8 @@ import { FormsModule } from '@angular/forms';
 import { SalonProfesor } from '@core/services';
 
 /**
- * Componente presentacional (Dumb) para la selecciÃƒÂ³n de salÃƒÂ³n.
- * No tiene lÃƒÂ³gica de negocio, solo recibe datos y emite eventos.
+ * Componente presentacional (Dumb) para la selección de salón.
+ * No tiene lógica de negocio, solo recibe datos y emite eventos.
  */
 // #endregion
 // #region Implementation

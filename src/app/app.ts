@@ -20,7 +20,7 @@ export class AppComponent {
 	title = 'Educa.com.pe';
 
 	constructor() {
-		// InvalidaciÃƒÆ’Ã‚Â³n automÃƒÆ’Ã‚Â¡tica de cache cuando el backend cambia
+		// Invalidación automática de cache cuando el backend cambia
 		// El desarrollador solo necesita cambiar versiones en cache-versions.config.ts
 		this.cacheVersionManager.initialize();
 	}

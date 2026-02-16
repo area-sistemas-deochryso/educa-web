@@ -31,7 +31,7 @@ export class TasksModalComponent {
 	tasks: Task[] = [
 		{
 			id: 1,
-			title: 'Ejercicios del capÃƒÂ­tulo 3',
+			title: 'Ejercicios del capítulo 3',
 			description: 'Resolver los ejercicios 1 al 15 del libro de texto',
 			dueDate: '25/01/2026',
 			status: 'pending',
@@ -40,7 +40,7 @@ export class TasksModalComponent {
 		{
 			id: 2,
 			title: 'Ensayo sobre el tema principal',
-			description: 'Redactar un ensayo de 500 palabras mÃƒÂ­nimo',
+			description: 'Redactar un ensayo de 500 palabras mínimo',
 			dueDate: '28/01/2026',
 			status: 'pending',
 			isRead: false,
@@ -77,8 +77,8 @@ export class TasksModalComponent {
 
 		if (diffDays < 0) return 'Vencido';
 		if (diffDays === 0) return 'Hoy';
-		if (diffDays === 1) return 'MaÃƒÂ±ana';
-		return `${diffDays} dÃƒÂ­as`;
+		if (diffDays === 1) return 'Mañana';
+		return `${diffDays} días`;
 	}
 
 	markAsRead(task: Task): void {

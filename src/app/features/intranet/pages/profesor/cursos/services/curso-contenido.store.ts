@@ -41,7 +41,7 @@ export class CursoContenidoStore {
 	private readonly _state = signal<CursoContenidoState>(initialState);
 
 	// #endregion
-	// #region Lecturas pÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Âºblicas
+	// #region Lecturas públicas
 	readonly contenido = computed(() => this._state().contenido);
 	readonly loading = computed(() => this._state().loading);
 	readonly saving = computed(() => this._state().saving);
@@ -84,7 +84,7 @@ export class CursoContenidoStore {
 	}));
 
 	// #endregion
-	// #region Comandos de mutaciÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â³n
+	// #region Comandos de mutación
 	setContenido(contenido: CursoContenidoDetalleDto | null): void {
 		this._state.update((s) => ({ ...s, contenido }));
 	}
@@ -102,7 +102,7 @@ export class CursoContenidoStore {
 	}
 
 	// #endregion
-	// #region Mutaciones quirÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Âºrgicas
+	// #region Mutaciones quirúrgicas
 
 	/** Actualizar una semana sin refetch */
 	updateSemana(semanaId: number, updates: Partial<CursoContenidoSemanaDto>): void {

@@ -55,7 +55,7 @@ interface DiaHorarios {
 							<tr>
 								<th style="width: 150px">Hora</th>
 								<th>Curso</th>
-								<th>SalÃƒÂ³n</th>
+								<th>Salón</th>
 								<th style="width: 100px" class="text-center">Estudiantes</th>
 								<th style="width: 80px" class="text-center">Acciones</th>
 							</tr>

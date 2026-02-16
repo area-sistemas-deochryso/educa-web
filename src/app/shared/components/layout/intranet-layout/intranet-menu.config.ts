@@ -10,7 +10,7 @@ export interface NavItemWithPermiso extends NavMenuItem {
 }
 
 /**
- * Items de menÃƒÂº para features en desarrollo (controlados por environment.features)
+ * Items de menú para features en desarrollo (controlados por environment.features)
  */
 const developmentMenuItems: NavItemWithPermiso[] = [
 	...(environment.features.horarios
@@ -64,7 +64,7 @@ const developmentMenuItems: NavItemWithPermiso[] = [
 ];
 
 /**
- * ConfiguraciÃƒÂ³n jerÃƒÂ¡rquica del menÃƒÂº de la intranet.
+ * Configuración jerárquica del menú de la intranet.
  * - Los items con `permiso` son hojas que requieren ese permiso exacto
  * - Los items con `children` son padres que se muestran si al menos un hijo tiene permiso
  */

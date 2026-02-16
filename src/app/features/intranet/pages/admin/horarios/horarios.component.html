@@ -1,8 +1,8 @@
 <!-- * Header -->
 <div class="horarios-header">
 	<div class="title-section">
-		<h1>GestiÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â³n de Horarios</h1>
-		<p class="subtitle">Administra los horarios de clases por salÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â³n</p>
+		<h1>Gestión de Horarios</h1>
+		<p class="subtitle">Administra los horarios de clases por salón</p>
 	</div>
 
 	<div class="actions">
@@ -123,7 +123,7 @@
 		[disabled]="!vm().vistaSemanalHabilitada"
 		[pTooltip]="
 			!vm().vistaSemanalHabilitada
-				? 'Selecciona un salÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â³n o profesor para ver la vista semanal'
+				? 'Selecciona un salón o profesor para ver la vista semanal'
 				: 'Ver horarios en formato de calendario semanal'
 		"
 		tooltipPosition="top"
@@ -172,20 +172,20 @@
 >
 	<div class="dialog-content">
 		<div class="form-grid">
-			<!-- DÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â­a de la semana -->
+			<!-- Día de la semana -->
 			<div class="form-field">
-				<label for="diaSemana">DÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â­a de la semana *</label>
+				<label for="diaSemana">Día de la semana *</label>
 				<p-select
 					id="diaSemana"
 					[(ngModel)]="vm().formData.diaSemana"
 					[options]="[
 						{ label: 'Lunes', value: 1 },
 						{ label: 'Martes', value: 2 },
-						{ label: 'MiÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â©rcoles', value: 3 },
+						{ label: 'Miércoles', value: 3 },
 						{ label: 'Jueves', value: 4 },
 						{ label: 'Viernes', value: 5 },
 					]"
-					placeholder="Seleccionar dÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â­a"
+					placeholder="Seleccionar día"
 					optionLabel="label"
 					optionValue="value"
 					appendTo="body"
@@ -217,20 +217,20 @@
 				/>
 			</div>
 
-			<!-- SalÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â³n -->
+			<!-- Salón -->
 			<div class="form-field full-width">
-				<label for="salon">SalÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â³n *</label>
+				<label for="salon">Salón *</label>
 				<p-select
 					id="salon"
 					[(ngModel)]="vm().formData.salonId"
 					[options]="vm().salonesOptions"
-					placeholder="Seleccionar salÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â³n disponible"
+					placeholder="Seleccionar salón disponible"
 					optionLabel="label"
 					optionValue="value"
 					appendTo="body"
 					class="w-full"
 					[filter]="true"
-					filterPlaceholder="Buscar salÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â³n..."
+					filterPlaceholder="Buscar salón..."
 					[loading]="vm().optionsLoading"
 					[disabled]="vm().optionsLoading"
 				>
@@ -282,12 +282,12 @@
 				@if (vm().formData.diaSemana && vm().formData.horaInicio && vm().formData.horaFin) {
 					<small class="text-muted">
 						<i class="pi pi-info-circle"></i>
-						Mostrando solo salones disponibles para el dÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â­a y horario seleccionado
+						Mostrando solo salones disponibles para el día y horario seleccionado
 					</small>
 				}
 			</div>
 
-			<!-- Curso - BotÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â³n para abrir modal de selecciÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â³n -->
+			<!-- Curso - Botón para abrir modal de selección -->
 			<div class="form-field full-width">
 				<label for="curso">Curso *</label>
 				<div class="flex gap-2">
@@ -309,11 +309,11 @@
 							icon="pi pi-times"
 							class="p-button-text p-button-danger"
 							(click)="onSelectCurso(null!)"
-							pTooltip="Limpiar selecciÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â³n de curso"
+							pTooltip="Limpiar selección de curso"
 							tooltipPosition="top"
 							[pt]="{
 								root: {
-									'aria-label': 'Limpiar selecciÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â³n',
+									'aria-label': 'Limpiar selección',
 								},
 							}"
 						></button>
@@ -356,7 +356,7 @@
 <p-confirmDialog />
 
 <!-- #endregion -->
-<!-- #region Modal de SelecciÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â³n de Cursos por Nivel -->
+<!-- #region Modal de Selección de Cursos por Nivel -->
 <p-dialog
 	[visible]="vm().cursoDialogVisible"
 	(visibleChange)="!$event && onCloseCursoDialog()"
@@ -514,7 +514,7 @@
 			icon="pi pi-check"
 			[disabled]="!vm().formData.cursoId"
 			(click)="onCloseCursoDialog()"
-			pTooltip="Confirmar selecciÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â³n de curso"
+			pTooltip="Confirmar selección de curso"
 			tooltipPosition="top"
 		></button>
 	</ng-template>

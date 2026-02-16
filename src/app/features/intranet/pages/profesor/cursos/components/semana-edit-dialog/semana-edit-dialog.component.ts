@@ -25,25 +25,25 @@ import { CursoContenidoSemanaDto, ActualizarSemanaRequest } from '../../../model
 		>
 			<div class="flex flex-column gap-3 pt-2">
 				<div class="flex flex-column gap-2">
-					<label for="titulo" class="font-semibold">TÃƒÂ­tulo</label>
+					<label for="titulo" class="font-semibold">Título</label>
 					<input
 						pInputText
 						id="titulo"
 						[(ngModel)]="titulo"
-						placeholder="Ej: IntroducciÃƒÂ³n al tema"
+						placeholder="Ej: Introducción al tema"
 						[maxlength]="200"
 					/>
 				</div>
 
 				<div class="flex flex-column gap-2">
-					<label for="descripcion" class="font-semibold">DescripciÃƒÂ³n</label>
+					<label for="descripcion" class="font-semibold">Descripción</label>
 					<textarea
 						pTextarea
 						id="descripcion"
 						[(ngModel)]="descripcion"
 						[rows]="3"
 						[maxlength]="2000"
-						placeholder="DescripciÃƒÂ³n de los temas de la semana..."
+						placeholder="Descripción de los temas de la semana..."
 						[autoResize]="true"
 					></textarea>
 				</div>

@@ -36,7 +36,7 @@ export class AsistenciaService {
 
 	/**
 	 * Estudiante: Obtener mis asistencias
-	 * GET /api/ConsultaAsistencia/estudiante/mis-asistencias?mes={mes}&aÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â±o={aÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â±o}
+	 * GET /api/ConsultaAsistencia/estudiante/mis-asistencias?mes={mes}&año={año}
 	 */
 	getMisAsistencias(mes?: number, anio?: number): Observable<ResumenAsistencia | null> {
 		const params: Record<string, string> = {};
@@ -65,7 +65,7 @@ export class AsistenciaService {
 
 	/**
 	 * Apoderado: Obtener asistencia de un hijo
-	 * GET /api/ConsultaAsistencia/apoderado/hijo/{estudianteId}/asistencias?mes={mes}&aÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â±o={aÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â±o}
+	 * GET /api/ConsultaAsistencia/apoderado/hijo/{estudianteId}/asistencias?mes={mes}&año={año}
 	 */
 	getAsistenciaHijo(
 		estudianteId: number,
@@ -109,7 +109,7 @@ export class AsistenciaService {
 	}
 
 	/**
-	 * Profesor: Obtener asistencias de estudiantes por grado/secciÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â³n
+	 * Profesor: Obtener asistencias de estudiantes por grado/sección
 	 * GET /api/ConsultaAsistencia/profesor/grado?grado={grado}&seccion={seccion}&mes={mes}&anio={anio}
 	 */
 	getAsistenciasGrado(
@@ -136,7 +136,7 @@ export class AsistenciaService {
 	}
 
 	/**
-	 * Profesor: Obtener asistencia de un grado/secciÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â³n en un dÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â­a especÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â­fico con estadÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â­sticas
+	 * Profesor: Obtener asistencia de un grado/sección en un día específico con estadísticas
 	 * GET /api/ConsultaAsistencia/profesor/asistencia-dia?grado={grado}&seccion={seccion}&fecha={fecha}
 	 */
 	getAsistenciaDia(
@@ -188,7 +188,7 @@ export class AsistenciaService {
 	}
 
 	/**
-	 * Director: Obtener estadÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â­sticas del dÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â­a
+	 * Director: Obtener estadísticas del día
 	 * GET /api/ConsultaAsistencia/director/estadisticas?fecha={fecha}
 	 */
 	getEstadisticasDirector(fecha?: Date): Observable<EstadisticasDia | null> {
@@ -204,7 +204,7 @@ export class AsistenciaService {
 	}
 
 	/**
-	 * Director: Obtener asistencia de un grado/secciÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â³n en un dÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â­a especÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â­fico con estadÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â­sticas
+	 * Director: Obtener asistencia de un grado/sección en un día específico con estadísticas
 	 * GET /api/ConsultaAsistencia/director/asistencia-dia?grado={grado}&seccion={seccion}&fecha={fecha}
 	 */
 	getAsistenciaDiaDirector(
@@ -228,7 +228,7 @@ export class AsistenciaService {
 	}
 
 	/**
-	 * Director: Descargar PDF de asistencia del dÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â­a
+	 * Director: Descargar PDF de asistencia del día
 	 * GET /api/ConsultaAsistencia/director/asistencia-dia/pdf?grado={grado}&seccion={seccion}&fecha={fecha}
 	 */
 	descargarPdfAsistenciaDia(grado: string, seccion: string, fecha?: Date): Observable<Blob> {
@@ -245,13 +245,13 @@ export class AsistenciaService {
 	}
 
 	/**
-	 * Director: Descargar PDF consolidado de todos los salones - DÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â­a
+	 * Director: Descargar PDF consolidado de todos los salones - Día
 	 *
 	 * Genera un reporte PDF con asistencias de todos los grados/secciones de la sede
-	 * en un dÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â­a especÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â­fico. Muestra para cada salÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â³n:
+	 * en un día específico. Muestra para cada salón:
 	 * - Total de estudiantes
-	 * - QuiÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â©nes asistieron (puntuales y tardanzas)
-	 * - QuiÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â©nes no asistieron
+	 * - Quiénes asistieron (puntuales y tardanzas)
+	 * - Quiénes no asistieron
 	 * - Porcentaje de asistencia
 	 *
 	 * GET /api/ConsultaAsistencia/director/reporte/todos-salones/dia/pdf?fecha={fecha}
@@ -275,12 +275,12 @@ export class AsistenciaService {
 	/**
 	 * Director: Descargar PDF consolidado de todos los salones - Semana
 	 *
-	 * Genera un reporte PDF con estadÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â­sticas de asistencia de todos los salones
-	 * en una semana (7 dÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â­as). Muestra tabla resumen con:
-	 * - Grado y secciÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â³n
+	 * Genera un reporte PDF con estadísticas de asistencia de todos los salones
+	 * en una semana (7 días). Muestra tabla resumen con:
+	 * - Grado y sección
 	 * - Total de estudiantes
 	 * - Total de asistencias registradas en la semana
-	 * - Porcentaje de asistencia (basado en 5 dÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â­as laborales)
+	 * - Porcentaje de asistencia (basado en 5 días laborales)
 	 *
 	 * GET /api/ConsultaAsistencia/director/reporte/todos-salones/semana/pdf?fechaInicio={fechaInicio}
 	 *
@@ -303,17 +303,17 @@ export class AsistenciaService {
 	/**
 	 * Director: Descargar PDF consolidado de todos los salones - Mes
 	 *
-	 * Genera un reporte PDF con estadÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â­sticas de asistencia de todos los salones
+	 * Genera un reporte PDF con estadísticas de asistencia de todos los salones
 	 * en un mes completo. Muestra tabla resumen con:
-	 * - Grado y secciÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â³n
+	 * - Grado y sección
 	 * - Total de estudiantes
 	 * - Total de asistencias registradas en el mes
-	 * - Porcentaje de asistencia (basado en ~22 dÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â­as hÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¡biles)
+	 * - Porcentaje de asistencia (basado en ~22 días hábiles)
 	 *
 	 * GET /api/ConsultaAsistencia/director/reporte/todos-salones/mes/pdf?mes={mes}&anio={anio}
 	 *
 	 * @param mes - Mes del reporte (1-12, opcional, por defecto: mes actual)
-	 * @param anio - AÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â±o del reporte (opcional, por defecto: aÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â±o actual)
+	 * @param anio - Año del reporte (opcional, por defecto: año actual)
 	 * @returns Observable<Blob> - PDF listo para descargar/visualizar
 	 */
 	descargarPdfTodosSalonesMes(mes?: number, anio?: number): Observable<Blob> {
@@ -333,18 +333,18 @@ export class AsistenciaService {
 	}
 
 	/**
-	 * Director: Descargar PDF consolidado de todos los salones - AÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â±o
+	 * Director: Descargar PDF consolidado de todos los salones - Año
 	 *
-	 * Genera un reporte PDF con estadÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â­sticas de asistencia de todos los salones
-	 * en un aÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â±o escolar completo. Muestra tabla resumen con:
-	 * - Grado y secciÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â³n
+	 * Genera un reporte PDF con estadísticas de asistencia de todos los salones
+	 * en un año escolar completo. Muestra tabla resumen con:
+	 * - Grado y sección
 	 * - Total de estudiantes
-	 * - Total de asistencias registradas en el aÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â±o
-	 * - Porcentaje de asistencia (basado en ~200 dÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â­as hÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¡biles)
+	 * - Total de asistencias registradas en el año
+	 * - Porcentaje de asistencia (basado en ~200 días hábiles)
 	 *
 	 * GET /api/ConsultaAsistencia/director/reporte/todos-salones/anio/pdf?anio={anio}
 	 *
-	 * @param anio - AÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â±o del reporte (opcional, por defecto: aÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â±o actual)
+	 * @param anio - Año del reporte (opcional, por defecto: año actual)
 	 * @returns Observable<Blob> - PDF listo para descargar/visualizar
 	 */
 	descargarPdfTodosSalonesAnio(anio?: number): Observable<Blob> {
@@ -381,7 +381,7 @@ export class AsistenciaService {
 	}
 
 	/**
-	 * Director: Obtener asistencias de estudiantes por grado/secciÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â³n
+	 * Director: Obtener asistencias de estudiantes por grado/sección
 	 * GET /api/ConsultaAsistencia/director/grado?grado={grado}&seccion={seccion}&mes={mes}&anio={anio}
 	 */
 	getAsistenciasGradoDirector(
@@ -409,7 +409,7 @@ export class AsistenciaService {
 
 	/**
 	 * Director: Obtener grados/secciones disponibles de la sede
-	 * Usa el endpoint de salones y extrae grados/secciones ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Âºnicos
+	 * Usa el endpoint de salones y extrae grados/secciones únicos
 	 */
 	getGradosSeccionesDisponibles(): Observable<GradoSeccion[]> {
 		return this.getSalonesDirector().pipe(
@@ -439,16 +439,16 @@ export class AsistenciaService {
 	// #region JUSTIFICACIONES
 
 	/**
-	 * Justificar o quitar justificaciÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â³n de asistencia de un estudiante.
-	 * Crea o actualiza un registro de asistencia con observaciÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â³n de justificaciÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â³n.
+	 * Justificar o quitar justificación de asistencia de un estudiante.
+	 * Crea o actualiza un registro de asistencia con observación de justificación.
 	 *
 	 * POST /api/ConsultaAsistencia/justificar
 	 *
 	 * @param estudianteId - ID del estudiante
 	 * @param fecha - Fecha de la asistencia a justificar
-	 * @param observacion - Motivo/justificaciÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â³n de la falta
-	 * @param quitar - Si es true, quita la justificaciÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â³n
-	 * @returns Observable con el resultado de la operaciÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â³n
+	 * @param observacion - Motivo/justificación de la falta
+	 * @param quitar - Si es true, quita la justificación
+	 * @returns Observable con el resultado de la operación
 	 */
 	justificarAsistencia(
 		estudianteId: number,
@@ -467,21 +467,21 @@ export class AsistenciaService {
 			.post<{ success: boolean; message: string }>(`${this.apiUrl}/justificar`, body)
 			.pipe(
 				catchError(() =>
-					of({ success: false, message: 'Error al guardar la justificaciÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â³n' }),
+					of({ success: false, message: 'Error al guardar la justificación' }),
 				),
 			);
 	}
 
 	// #endregion
-	// #region ESTADOS VÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚ÂLIDOS
+	// #region ESTADOS VÁLIDOS
 
 	/**
-	 * Obtener estados de asistencia vÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¡lidos para mostrar en leyenda
-	 * ÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã¢â‚¬Â¦ÃƒÂ¢Ã¢â€šÂ¬Ã…â€œÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬Ãƒâ€šÃ‚Â¦ NUEVO: Obtenido desde el backend para garantizar consistencia
+	 * Obtener estados de asistencia válidos para mostrar en leyenda
+	 * ✅ NUEVO: Obtenido desde el backend para garantizar consistencia
 	 *
 	 * GET /api/ConsultaAsistencia/estados-validos
 	 *
-	 * @returns Observable<EstadoAsistencia[]> - Lista de estados vÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¡lidos con cÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â³digo y descripciÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â³n
+	 * @returns Observable<EstadoAsistencia[]> - Lista de estados válidos con código y descripción
 	 */
 	getEstadosValidos(): Observable<EstadoAsistencia[]> {
 		return this.http
@@ -493,7 +493,7 @@ export class AsistenciaService {
 	// #region Helpers privados
 
 	/**
-	 * Retorna estadÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â­sticas vacÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â­as como fallback en caso de error
+	 * Retorna estadísticas vacías como fallback en caso de error
 	 */
 	private getEstadisticasVacias(): EstadisticasAsistenciaDia {
 		return {

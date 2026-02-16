@@ -1,4 +1,4 @@
-// #region DTOs de Response (Backend ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â ÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢ Frontend)
+// #region DTOs de Response (Backend → Frontend)
 
 export interface SalonListDto {
   salonId: number;
@@ -8,7 +8,7 @@ export interface SalonListDto {
   seccion: string;
   sedeId: number;
   sede: string;
-  nombreSalon: string; // ej: "3ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â° A - Sede Principal"
+  nombreSalon: string; // ej: "3° A - Sede Principal"
   anio: number;
   estado: boolean;
   totalProfesores: number;
@@ -21,7 +21,7 @@ export interface SalonListDto {
 
 export interface SalonOption {
   value: number; // salonId
-  label: string; // "3ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â° A - Sede Principal"
+  label: string; // "3° A - Sede Principal"
   grado: string;
   seccion: string;
   sede: string;

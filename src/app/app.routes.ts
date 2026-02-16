@@ -64,13 +64,13 @@ export const routes: Routes = [
 				path: 'privacidad',
 				loadComponent: () =>
 					import('@features/public/privacy/privacy').then((m) => m.PrivacyComponent),
-				title: 'Educa.com.pe - PolÃƒÂ­tica de Privacidad',
+				title: 'Educa.com.pe - Política de Privacidad',
 			},
 			{
 				path: 'terminos',
 				loadComponent: () =>
 					import('@features/public/terms/terms').then((m) => m.TermsComponent),
-				title: 'Educa.com.pe - TÃƒÂ©rminos y Condiciones',
+				title: 'Educa.com.pe - Términos y Condiciones',
 			},
 			{
 				path: '**',

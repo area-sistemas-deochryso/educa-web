@@ -32,7 +32,7 @@ export class CampusNavigationFacade {
 			.getMiHorarioHoy()
 			.pipe(
 				catchError((err) => {
-					logger.error('Error cargando horario del dÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â­a:', err);
+					logger.error('Error cargando horario del día:', err);
 					this.store.setScheduleItems([]);
 					this.store.setLoading(false);
 					this.store.setScheduleReady(true);
@@ -45,7 +45,7 @@ export class CampusNavigationFacade {
 				this.store.setLoading(false);
 				this.store.setScheduleReady(true);
 
-				// Auto-seleccionar destino si hay clase actual/prÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â³xima
+				// Auto-seleccionar destino si hay clase actual/próxima
 				const current = this.store.currentOrNextClass();
 				if (current) {
 					this.navigateToSalon(current.salonId);
@@ -68,7 +68,7 @@ export class CampusNavigationFacade {
 	}
 
 	/**
-	 * Desde el panel de horario: buscar nodo por salonId y navegar a ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â©l
+	 * Desde el panel de horario: buscar nodo por salonId y navegar a él
 	 */
 	navigateToSalon(salonId: number): void {
 		const salonMap = this.store.salonToNodeMap();
@@ -87,7 +87,7 @@ export class CampusNavigationFacade {
 	}
 
 	/**
-	 * Click en un nodo del mapa ÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬Ãƒâ€šÃ‚Â ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÂ¢Ã¢â‚¬Å¾Ã‚Â¢ establecer como destino
+	 * Click en un nodo del mapa → establecer como destino
 	 */
 	onMapNodeClick(nodeId: string): void {
 		const node = CAMPUS_NODES.find((n) => n.id === nodeId);

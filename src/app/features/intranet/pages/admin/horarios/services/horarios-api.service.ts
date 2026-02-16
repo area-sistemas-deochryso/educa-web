@@ -19,7 +19,7 @@ export class HorariosApiService {
   private readonly apiUrl = `${environment.apiUrl}/api/horario`;
   private http = inject(HttpClient);
 
-  // #region CRUD BÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¡sico
+  // #region CRUD Básico
 
   getAll(): Observable<HorarioResponseDto[]> {
     return this.http
@@ -92,11 +92,11 @@ export class HorariosApiService {
   }
 
   // #endregion
-  // #region EstadÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â­sticas
+  // #region Estadísticas
 
   getEstadisticas(): Observable<HorariosEstadisticas | null> {
-    // TODO: Implementar endpoint de estadÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â­sticas en el backend
-    // Por ahora, calcular estadÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â­sticas en frontend
+    // TODO: Implementar endpoint de estadísticas en el backend
+    // Por ahora, calcular estadísticas en frontend
     return of(null);
   }
   // #endregion

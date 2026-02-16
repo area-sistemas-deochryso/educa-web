@@ -674,7 +674,7 @@
 // #endregion
 // #region NG-DEEP OVERRIDES
 :host ::ng-deep {
-	// Unificar fondo de la pÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â¡gina
+	// Unificar fondo de la página
 	.p-datatable {
 		background: transparent;
 
@@ -792,7 +792,7 @@
 		}
 	}
 
-	// Drawer con fondo similar al de la pÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â¡gina
+	// Drawer con fondo similar al de la página
 	.p-drawer {
 		.p-drawer-content {
 			padding: 1.5rem;
@@ -806,7 +806,7 @@
 		}
 	}
 
-	// Dialog con fondo similar al de la pÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â¡gina
+	// Dialog con fondo similar al de la página
 	.edit-permisos-dialog {
 		.p-dialog-header {
 			background: var(--surface-ground);

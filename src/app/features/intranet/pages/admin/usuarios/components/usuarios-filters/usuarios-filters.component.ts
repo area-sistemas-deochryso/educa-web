@@ -15,7 +15,7 @@ export interface FilterOptions {
 
 /**
  * Componente presentacional para los filtros de usuarios
- * BÃƒÆ’Ã‚Âºsqueda, filtro por rol y estado
+ * Búsqueda, filtro por rol y estado
  */
 @Component({
 	selector: 'app-usuarios-filters',

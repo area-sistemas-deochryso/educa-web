@@ -26,10 +26,10 @@ export class KeyboardShortcutsService implements OnDestroy {
 	/** Atajos registrados */
 	readonly shortcuts = KEYBOARD_SHORTCUTS;
 
-	/** Etiquetas de categorÃƒÂ­as */
+	/** Etiquetas de categorías */
 	readonly categoryLabels = CATEGORY_LABELS;
 
-	/** Indica si el servicio estÃƒÂ¡ activo */
+	/** Indica si el servicio está activo */
 	readonly isActive = signal(false);
 
 	constructor() {
@@ -72,7 +72,7 @@ export class KeyboardShortcutsService implements OnDestroy {
 	}
 
 	/**
-	 * Registra un handler para un atajo especÃƒÂ­fico
+	 * Registra un handler para un atajo específico
 	 */
 	register(shortcutId: string, handler: ShortcutHandler): void {
 		// Only stores the handler; the keyboard listener is global to this service.
@@ -102,14 +102,14 @@ export class KeyboardShortcutsService implements OnDestroy {
 	}
 
 	/**
-	 * Obtiene atajos por categorÃƒÂ­a
+	 * Obtiene atajos por categoría
 	 */
 	getByCategory(category: ShortcutCategory): KeyboardShortcut[] {
 		return this.shortcuts.filter((s) => s.category === category);
 	}
 
 	/**
-	 * Obtiene todas las categorÃƒÂ­as disponibles
+	 * Obtiene todas las categorías disponibles
 	 */
 	getCategories(): ShortcutCategory[] {
 		const categories = new Set(this.shortcuts.map((s) => s.category));

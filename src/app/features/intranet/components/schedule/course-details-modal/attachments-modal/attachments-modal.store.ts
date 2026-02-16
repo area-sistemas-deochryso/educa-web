@@ -24,7 +24,7 @@ const initialState: AttachmentsState = {
 	attachments: [
 		{
 			id: 1,
-			name: 'Clase 1 - IntroducciÃƒÂ³n al tema.pdf',
+			name: 'Clase 1 - Introducción al tema.pdf',
 			type: 'pdf',
 			size: '2.4 MB',
 			date: '15/01/2026',
@@ -40,7 +40,7 @@ const initialState: AttachmentsState = {
 		},
 		{
 			id: 3,
-			name: 'Video explicativo - Conceptos bÃƒÂ¡sicos',
+			name: 'Video explicativo - Conceptos básicos',
 			type: 'video',
 			size: '45 MB',
 			date: '16/01/2026',
@@ -94,7 +94,7 @@ export class AttachmentsModalStore {
 		hasAttachments: this.attachments().length > 0,
 	}));
 
-	// Comandos de mutaciÃƒÂ³n
+	// Comandos de mutación
 	setUploading(uploading: boolean): void {
 		this._state.update((s) => ({ ...s, uploading }));
 	}

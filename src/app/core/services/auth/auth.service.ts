@@ -72,7 +72,7 @@ export class AuthService {
 
 	/**
 	 * Login usando el endpoint POST /api/Auth/login
-	 * @param rememberMe Si es true, la sesiÃƒÂ³n persiste al cerrar el navegador
+	 * @param rememberMe Si es true, la sesión persiste al cerrar el navegador
 	 */
 	login(
 		dni: string,
@@ -93,7 +93,7 @@ export class AuthService {
 
 		const request: LoginRequest = {
 			dni: dni,
-			contraseÃƒÂ±a: password,
+			contraseña: password,
 			rol: rol,
 		};
 
@@ -128,8 +128,8 @@ export class AuthService {
 			sedeId: response.sedeId,
 		};
 
-		// Guardar segÃƒÂºn la preferencia de "recordar sesiÃƒÂ³n"
-		// Pasar nombreCompleto y rol para generar la clave de sesiÃƒÂ³n ÃƒÂºnica
+		// Guardar según la preferencia de "recordar sesión"
+		// Pasar nombreCompleto y rol para generar la clave de sesión única
 		this.storage.setToken(response.token, rememberMe, response.nombreCompleto, response.rol);
 		this.storage.setUser(user, rememberMe);
 
@@ -161,7 +161,7 @@ export class AuthService {
 	}
 
 	/**
-	 * Verificar si el token es vÃƒÂ¡lido obteniendo el perfil
+	 * Verificar si el token es válido obteniendo el perfil
 	 */
 	verifyToken(): Observable<boolean> {
 		if (!this.token) {
@@ -205,7 +205,7 @@ export class AuthService {
 			})
 			.pipe(
 				catchError(() => {
-					// Si el token es invÃƒÂ¡lido, limpiarlo
+					// Si el token es inválido, limpiarlo
 					this.storage.clearRememberToken();
 					return of(null);
 				}),
@@ -214,7 +214,7 @@ export class AuthService {
 
 	/**
 	 * Verifica los tokens persistentes guardados para autocompletado
-	 * Retorna un array con la informaciÃƒÂ³n de cada usuario verificado
+	 * Retorna un array con la información de cada usuario verificado
 	 */
 	verifyAllStoredTokens(): Observable<VerifyTokenResponse[]> {
 		const persistentTokens = this.storage.getAllPersistentTokens();

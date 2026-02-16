@@ -12,7 +12,7 @@ import { Component, Input } from '@angular/core';
 })
 export class LoginHeaderComponent {
 	// * Title + logo source used by the login header.
-	@Input() title = 'INICIAR SESIÃƒâ€œN';
+	@Input() title = 'INICIAR SESIÓN';
 	@Input() logoSrc = 'images/logo.png';
 }
 // #endregion

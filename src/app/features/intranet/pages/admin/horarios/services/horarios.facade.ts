@@ -42,7 +42,7 @@ export class HorariosFacade {
 
   /**
    * Cargar todos los horarios y opciones de filtros
-   * Estrategia: Refetch completo (incluye estadÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Â ÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â­sticas + opciones para filtros)
+   * Estrategia: Refetch completo (incluye estadísticas + opciones para filtros)
    */
   loadAll(): void {
     this.store.setLoading(true);
@@ -78,7 +78,7 @@ export class HorariosFacade {
   }
 
   /**
-   * Cargar horarios por salÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Â ÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â³n
+   * Cargar horarios por salón
    */
   loadBySalon(salonId: number): void {
     this.store.setLoading(true);
@@ -94,7 +94,7 @@ export class HorariosFacade {
           this.store.setLoading(false);
         },
         error: (err) => {
-          logger.error('Error al cargar horarios por salÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Â ÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â³n:', err);
+          logger.error('Error al cargar horarios por salón:', err);
           this.errorHandler.showError(
             UI_SUMMARIES.error,
             UI_ADMIN_ERROR_DETAILS.loadHorariosSalon
@@ -183,7 +183,7 @@ export class HorariosFacade {
           this.refreshItemsOnly();
           this.store.incrementarEstadistica('totalHorarios', 1);
           this.store.incrementarEstadistica('horariosActivos', 1);
-          // Note: profesor se asigna despuÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Â ÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â©s con asignarProfesor()
+          // Note: profesor se asigna después con asignarProfesor()
           this.store.closeDialog();
           this.errorHandler.showSuccess(
             UI_SUMMARIES.success,
@@ -199,7 +199,7 @@ export class HorariosFacade {
   }
 
   /**
-   * EDITAR: MutaciÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Â ÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â³n quirÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Â ÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Âºrgica (no refetch)
+   * EDITAR: Mutación quirúrgica (no refetch)
    */
   update(id: number, data: HorarioUpdateDto): void {
     this.store.setLoading(true);
@@ -212,7 +212,7 @@ export class HorariosFacade {
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
         next: (updated) => {
-          // MutaciÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Â ÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â³n quirÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Â ÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Âºrgica: actualizar solo este item
+          // Mutación quirúrgica: actualizar solo este item
           this.store.updateHorario(id, {
             diaSemana: updated.diaSemana,
             diaSemanaDescripcion: updated.diaSemanaDescripcion,
@@ -226,7 +226,7 @@ export class HorariosFacade {
             profesorNombreCompleto: updated.profesorNombreCompleto,
           });
 
-          // Actualizar stats incrementalmente si cambiÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Â ÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â³ el profesor
+          // Actualizar stats incrementalmente si cambió el profesor
           if (horarioActual) {
             if (horarioActual.profesorId === null && updated.profesorId !== null) {
               this.store.incrementarEstadistica('horariosSinProfesor', -1);
@@ -251,7 +251,7 @@ export class HorariosFacade {
   }
 
   /**
-   * TOGGLE: MutaciÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Â ÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â³n quirÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Â ÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Âºrgica local (no refetch)
+   * TOGGLE: Mutación quirúrgica local (no refetch)
    */
   toggleEstado(id: number, estadoActual: boolean): void {
     this.store.setLoading(true);
@@ -262,7 +262,7 @@ export class HorariosFacade {
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
         next: () => {
-          // MutaciÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Â ÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â³n quirÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Â ÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Âºrgica: toggle solo este item
+          // Mutación quirúrgica: toggle solo este item
           this.store.toggleHorarioEstado(id);
 
           // Actualizar stats incrementalmente
@@ -292,7 +292,7 @@ export class HorariosFacade {
   }
 
   /**
-   * ELIMINAR: MutaciÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Â ÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â³n quirÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Â ÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Âºrgica + stats incrementales
+   * ELIMINAR: Mutación quirúrgica + stats incrementales
    */
   delete(id: number): void {
     this.store.setLoading(true);
@@ -305,7 +305,7 @@ export class HorariosFacade {
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
         next: () => {
-          // MutaciÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Â ÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â³n quirÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Â ÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Âºrgica: eliminar solo este item
+          // Mutación quirúrgica: eliminar solo este item
           this.store.removeHorario(id);
 
           // Actualizar stats incrementalmente
@@ -336,7 +336,7 @@ export class HorariosFacade {
   }
 
   // #endregion
-  // #region Comandos de asignaciÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Â ÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â³n
+  // #region Comandos de asignación
 
   /**
    * Asignar profesor a un horario
@@ -352,7 +352,7 @@ export class HorariosFacade {
           // Refetch para obtener datos actualizados
           this.refreshItemsOnly();
 
-          // Si el drawer estÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Â ÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¡ abierto, recargar el detalle
+          // Si el drawer está abierto, recargar el detalle
           if (this.store.detailDrawerVisible()) {
             this.loadDetalle(data.horarioId);
           }
@@ -397,7 +397,7 @@ export class HorariosFacade {
   }
 
   /**
-   * Asignar todos los estudiantes del salÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Â ÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â³n al horario
+   * Asignar todos los estudiantes del salón al horario
    */
   asignarTodosEstudiantes(horarioId: number, usuarioReg: string): void {
     this.store.setLoading(true);
@@ -410,7 +410,7 @@ export class HorariosFacade {
           // Refetch para obtener datos actualizados
           this.refreshItemsOnly();
 
-          // Si el drawer estÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Â ÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¡ abierto, recargar el detalle
+          // Si el drawer está abierto, recargar el detalle
           if (this.store.detailDrawerVisible()) {
             this.loadDetalle(horarioId);
           }
@@ -460,7 +460,7 @@ export class HorariosFacade {
       salonId: horario.salonId,
       cursoId: horario.cursoId,
       profesorId: horario.profesorId,
-      estudianteIds: null, // No se editan desde aquÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Â ÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â­
+      estudianteIds: null, // No se editan desde aquí
     });
     this.store.setEditingId(id);
     this.store.resetWizard();
@@ -469,14 +469,14 @@ export class HorariosFacade {
   }
 
   /**
-   * Abrir modal de selecciÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Â ÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â³n de cursos por nivel
+   * Abrir modal de selección de cursos por nivel
    */
   openCursoDialog(): void {
     this.store.openCursoDialog();
   }
 
   /**
-   * Cerrar modal de selecciÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Â ÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â³n de cursos
+   * Cerrar modal de selección de cursos
    */
   closeCursoDialog(): void {
     this.store.closeCursoDialog();
@@ -550,7 +550,7 @@ export class HorariosFacade {
   // #region Helpers privados
 
   /**
-   * Refetch solo items (sin resetear skeletons ni estadÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Â ÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â­sticas)
+   * Refetch solo items (sin resetear skeletons ni estadísticas)
    */
   private refreshItemsOnly(): void {
     this.store.setLoading(true);
@@ -572,7 +572,7 @@ export class HorariosFacade {
   }
 
   /**
-   * Calcular estadÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Â ÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â­sticas desde los datos
+   * Calcular estadísticas desde los datos
    */
   private calculateEstadisticas(horarios: any[]): void {
     const stats = {
@@ -586,7 +586,7 @@ export class HorariosFacade {
   }
 
   /**
-   * Manejo centralizado de errores de API con mensajes especÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Â ÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â­ficos
+   * Manejo centralizado de errores de API con mensajes específicos
    */
   private handleApiError(err: any, accion: string): void {
     const mensaje = err?.error?.message || err?.message || UI_GENERIC_MESSAGES.unknownError;
@@ -602,7 +602,7 @@ export class HorariosFacade {
         UI_SUMMARIES.error,
         UI_ADMIN_ERROR_DETAILS_DYNAMIC.horarioActionNotFound(accion)
       );
-    } else if (mensaje.includes('validaciÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Â ÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â³n') || mensaje.includes('validation')) {
+    } else if (mensaje.includes('validación') || mensaje.includes('validation')) {
       this.errorHandler.showError(
         UI_SUMMARIES.validationError,
         UI_ADMIN_ERROR_DETAILS_DYNAMIC.horarioValidation(mensaje)

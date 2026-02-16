@@ -103,11 +103,11 @@ export class AttendanceDataService {
 				const dateKey = this.calendarUtils.formatDateKey(date);
 				const asistencia = asistenciaMap.get(dateKey);
 
-				// Ã¢Å“â€¦ NUEVO: Usar estados calculados desde el backend
+				// ✅ NUEVO: Usar estados calculados desde el backend
 				const ingresoStatus = asistencia?.estadoIngreso || 'X';
 				const salidaStatus = asistencia?.estadoSalida || 'X';
 
-				// Contar dÃƒÂ­as vÃƒÂ¡lidos separadamente para ingresos y salidas
+				// Contar días válidos separadamente para ingresos y salidas
 				// Excluir '-' (pendiente) y 'X' (sin registro) del conteo
 				if (ingresoStatus !== '-' && ingresoStatus !== 'X') {
 					ingresosValidDaysCount++;
@@ -179,7 +179,7 @@ export class AttendanceDataService {
 			let total = 0;
 			weeks.forEach((week) => {
 				const day = week.days[dayIndex];
-				// Excluir dÃƒÂ­as sin fecha, pendientes ('-') y sin registro ('X') del total
+				// Excluir días sin fecha, pendientes ('-') y sin registro ('X') del total
 				if (day?.date !== null && day?.status !== '-' && day?.status !== 'X') {
 					total++;
 					if (day?.status !== 'N') {
@@ -199,7 +199,7 @@ export class AttendanceDataService {
 
 		weeks.forEach((week) => {
 			week.days.forEach((day) => {
-				// Excluir dÃƒÂ­as sin fecha, pendientes ('-') y sin registro ('X') del total
+				// Excluir días sin fecha, pendientes ('-') y sin registro ('X') del total
 				if (day.date !== null && day.status !== '-' && day.status !== 'X') {
 					totalPossible++;
 					if (day.status !== 'N') {

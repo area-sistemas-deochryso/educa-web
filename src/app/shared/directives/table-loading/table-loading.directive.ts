@@ -87,7 +87,7 @@ export class TableLoadingDirective implements OnChanges {
 			this.r2.setStyle(el, 'minHeight', `${minH}px`);
 		}
 
-		// Blur + bloquear interacciÃƒÂ³n sin afectar layout
+		// Blur + bloquear interacción sin afectar layout
 		this.r2.addClass(el, 'table-loading--active');
 		this.r2.setStyle(el, '--table-loading-blur', `${this.blurPx}px`);
 		el.setAttribute('aria-busy', 'true');

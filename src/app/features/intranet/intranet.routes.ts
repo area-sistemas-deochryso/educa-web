@@ -27,7 +27,7 @@ const developmentRoutes: Route[] = [
 				// 		import('./pages/campus-navigation/campus-navigation.component').then(
 				// 			(m) => m.CampusNavigationComponent,
 				// 		),
-				// 	title: 'Intranet - NavegaciÃƒÂ³n Campus Salonese',
+				// 	title: 'Intranet - Navegación Campus Salonese',
 				// },
 			]
 		: []),
@@ -71,7 +71,7 @@ export const INTRANET_ROUTES: Routes = [
 	{
 		path: 'login',
 		loadComponent: () => import('./pages/login').then((m) => m.LoginIntranetComponent),
-		title: 'Intranet - Iniciar SesiÃƒÂ³n',
+		title: 'Intranet - Iniciar Sesión',
 	},
 	{
 		path: '',
@@ -112,23 +112,23 @@ export const INTRANET_ROUTES: Routes = [
 				path: 'admin/usuarios',
 				loadComponent: () =>
 					import('./pages/admin/usuarios').then((m) => m.UsuariosComponent),
-				title: 'Intranet - GestiÃƒÂ³n de Usuarios',
+				title: 'Intranet - Gestión de Usuarios',
 			},
 			{
 				path: 'admin/vistas',
 				loadComponent: () => import('./pages/admin/vistas').then((m) => m.VistasComponent),
-				title: 'Intranet - GestiÃƒÂ³n de Vistas',
+				title: 'Intranet - Gestión de Vistas',
 			},
 			{
 				path: 'admin/cursos',
 				loadComponent: () => import('./pages/admin/cursos').then((m) => m.CursosComponent),
-				title: 'Intranet - GestiÃƒÂ³n de Cursos',
+				title: 'Intranet - Gestión de Cursos',
 			},
 			{
 				path: 'admin/horarios',
 				loadComponent: () =>
 					import('./pages/admin/horarios').then((m) => m.HorariosComponent),
-				title: 'Intranet - GestiÃƒÂ³n de Horarios',
+				title: 'Intranet - Gestión de Horarios',
 			},
 		],
 	},

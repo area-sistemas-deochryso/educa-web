@@ -76,15 +76,15 @@ describe('ScheduleComponent', () => {
 	});
 
 	it('should open details modal with course', () => {
-		component.openDetailsModal('MatemÃƒÂ¡ticas');
+		component.openDetailsModal('Matemáticas');
 		expect(component.showDetailsModal).toBe(true);
-		expect(component.selectedCourse).toBe('MatemÃƒÂ¡ticas');
+		expect(component.selectedCourse).toBe('Matemáticas');
 	});
 
 	it('should open grades modal with course', () => {
-		component.openGradesModal('ComunicaciÃƒÂ³n');
+		component.openGradesModal('Comunicación');
 		expect(component.showGradesModal).toBe(true);
-		expect(component.selectedCourse).toBe('ComunicaciÃƒÂ³n');
+		expect(component.selectedCourse).toBe('Comunicación');
 	});
 
 	it('should register voice modals on init', () => {

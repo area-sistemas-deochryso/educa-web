@@ -139,7 +139,7 @@ export class PermisosService {
 	/**
 	 * Obtiene los permisos del usuario autenticado actual
 	 * Usa el token JWT para identificar al usuario
-	 * Nota: Este endpoint estÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Â ÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¡ en un controller separado sin restricciÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Â ÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â³n de rol
+	 * Nota: Este endpoint está en un controller separado sin restricción de rol
 	 */
 	getMisPermisos(): Observable<PermisosUsuarioResultado | null> {
 		return this.http
@@ -148,7 +148,7 @@ export class PermisosService {
 	}
 
 	// #endregion
-	// #region BÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Â ÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â¦ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¡SQUEDA DE USUARIOS
+	// #region BÚSQUEDA DE USUARIOS
 
 	buscarUsuarios(termino?: string, rol?: string): Observable<UsuarioBusquedaResultado> {
 		const params: Record<string, string> = {};

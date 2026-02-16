@@ -8,9 +8,9 @@ import { UI_ACCESS_DENIED_MESSAGE, UI_SUMMARIES } from '@app/shared/constants';
 
 /**
  * Guard que verifica si el usuario tiene permiso para acceder a una ruta
- * El acceso se controla dinÃƒÂ¡micamente por los permisos configurados en la BD
+ * El acceso se controla dinámicamente por los permisos configurados en la BD
  * Si no tiene permiso, redirige a /intranet
- * Si falla la carga de permisos, redirige al login (credenciales invÃƒÂ¡lidas)
+ * Si falla la carga de permisos, redirige al login (credenciales inválidas)
  */
 // * Guard: verifies permisos and redirects when access is denied.
 // #endregion
@@ -21,7 +21,7 @@ export const permisosGuard: CanActivateFn = async (route: ActivatedRouteSnapshot
 	const router = inject(Router);
 	const errorHandler = inject(ErrorHandlerService);
 
-	// Si no estÃƒÂ¡ autenticado, no verificar permisos (el authGuard se encarga)
+	// Si no está autenticado, no verificar permisos (el authGuard se encarga)
 	if (!authService.isAuthenticated) {
 		logger.tagged(
 			'PermisosGuard',
@@ -31,15 +31,15 @@ export const permisosGuard: CanActivateFn = async (route: ActivatedRouteSnapshot
 		return true;
 	}
 
-	// Construir la ruta completa desde la raÃƒÂ­z
+	// Construir la ruta completa desde la raíz
 	const fullPath = getFullPath(route);
 	// Nota: no incluye query params, solo segmentos de la ruta.
 	logger.tagged('PermisosGuard', 'log', 'Verificando permisos para:', fullPath);
 
-	// Esperar a que los permisos estÃƒÂ©n cargados
+	// Esperar a que los permisos estén cargados
 	const permisosLoaded = await userPermisosService.ensurePermisosLoaded();
 
-	// Si fallÃƒÂ³ la carga de permisos, redirigir al login
+	// Si falló la carga de permisos, redirigir al login
 	if (!permisosLoaded) {
 		logger.tagged('PermisosGuard', 'log', 'Fallo al cargar permisos, redirigiendo a login');
 		authService.logout();
@@ -76,7 +76,7 @@ function getFullPath(route: ActivatedRouteSnapshot): string {
 	let current: ActivatedRouteSnapshot | null = route;
 
 	while (current) {
-		// Recorre la jerarquÃƒÂ­a padre para construir la ruta desde la raÃƒÂ­z.
+		// Recorre la jerarquía padre para construir la ruta desde la raíz.
 		if (current.url.length > 0) {
 			segments.unshift(...current.url.map((s) => s.path));
 		}

@@ -19,8 +19,8 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
 /**
  * Componente Container para vista de asistencias de Profesores.
- * Maneja la selecciÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â³n de salÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â³n; la lÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â³gica compartida (estudiantes,
- * modo dÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â­a/mes, tablas y PDF) vive en AttendanceViewController.
+ * Maneja la selección de salón; la lógica compartida (estudiantes,
+ * modo día/mes, tablas y PDF) vive en AttendanceViewController.
  */
 @Component({
 	selector: 'app-attendance-profesor',
@@ -54,7 +54,7 @@ export class AttendanceProfesorComponent implements OnInit {
 
 	// #region Salones
 
-	/** SalÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â³n pendiente de selecciÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â³n (viene de query param antes de que carguen los salones) */
+	/** Salón pendiente de selección (viene de query param antes de que carguen los salones) */
 	private _pendingSalonId: number | null = null;
 	private readonly allSalones = signal<SalonProfesor[]>([]);
 	readonly salones = computed(() => {
@@ -78,7 +78,7 @@ export class AttendanceProfesorComponent implements OnInit {
 	});
 
 	// #endregion
-	// #region JustificaciÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â³n
+	// #region Justificación
 	readonly savingJustificacion = signal(false);
 
 	ngOnInit(): void {
@@ -97,7 +97,7 @@ export class AttendanceProfesorComponent implements OnInit {
 	}
 
 	// #endregion
-	// #region Carga y selecciÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â³n de salÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â³n
+	// #region Carga y selección de salón
 
 	private loadSalones(): void {
 		// * Fetch from both ProfesorSalon (tutor) and Horarios (teaching), then merge.
@@ -127,7 +127,7 @@ export class AttendanceProfesorComponent implements OnInit {
 					}
 					this.allSalones.set(merged);
 
-					// Si hay un salÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â³n pendiente de query param, buscarlo en TODOS los salones
+					// Si hay un salón pendiente de query param, buscarlo en TODOS los salones
 					if (this._pendingSalonId !== null) {
 						const pending = this._pendingSalonId;
 						this._pendingSalonId = null;
@@ -195,8 +195,8 @@ export class AttendanceProfesorComponent implements OnInit {
 	}
 
 	/**
-	 * Pre-selecciona un salÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â³n desde query param (ej: navegaciÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â³n desde horarios).
-	 * Si los salones ya estÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¡n cargados, selecciona inmediatamente.
+	 * Pre-selecciona un salón desde query param (ej: navegación desde horarios).
+	 * Si los salones ya están cargados, selecciona inmediatamente.
 	 * Si no, guarda como pendiente para aplicar cuando loadSalones complete.
 	 */
 	selectSalonFromQueryParam(salonId: number): void {
@@ -227,7 +227,7 @@ export class AttendanceProfesorComponent implements OnInit {
 	}
 
 	// #endregion
-	// #region JustificaciÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â³n
+	// #region Justificación
 
 	onJustificar(event: JustificacionEvent): void {
 		const fecha = this.view.fechaDia();
@@ -242,7 +242,7 @@ export class AttendanceProfesorComponent implements OnInit {
 			.subscribe({
 				next: (response) => {
 					if (response.success) {
-						// Recargar datos del dÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â­a para reflejar el cambio
+						// Recargar datos del día para reflejar el cambio
 						this.view.reload();
 					}
 				},

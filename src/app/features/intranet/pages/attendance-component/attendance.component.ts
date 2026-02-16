@@ -17,12 +17,12 @@ import { APP_USER_ROLES } from '@app/shared/constants';
 /**
  * Componente Page/Route para asistencias.
  *
- * Este componente actÃƒÂºa como un router/shell que:
+ * Este componente actúa como un router/shell que:
  * 1. Determina el rol del usuario
  * 2. Muestra el header y leyenda compartidos
- * 3. Delega la lÃƒÂ³gica especÃƒÂ­fica a componentes especializados por rol
+ * 3. Delega la lógica específica a componentes especializados por rol
  *
- * TaxonomÃƒÂ­a: Page/Route - Coordina subcomponentes segÃƒÂºn el contexto (rol del usuario)
+ * Taxonomía: Page/Route - Coordina subcomponentes según el contexto (rol del usuario)
  */
 // #endregion
 // #region Implementation

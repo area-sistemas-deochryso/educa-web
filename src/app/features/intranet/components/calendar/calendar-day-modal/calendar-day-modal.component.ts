@@ -44,17 +44,17 @@ export class CalendarDayModalComponent {
 		const labels: Record<string, string> = {
 			national: 'Feriado Nacional',
 			regional: 'Feriado Regional',
-			special: 'DÃƒÆ’Ã‚Â­a Especial',
+			special: 'Día Especial',
 		};
 		return labels[type] || type;
 	}
 
 	getEventTypeLabel(type: string): string {
 		const labels: Record<string, string> = {
-			academic: 'Evento AcadÃƒÆ’Ã‚Â©mico',
+			academic: 'Evento Académico',
 			cultural: 'Evento Cultural',
 			sports: 'Evento Deportivo',
-			meeting: 'ReuniÃƒÆ’Ã‚Â³n',
+			meeting: 'Reunión',
 			other: 'Otro',
 		};
 		return labels[type] || type;

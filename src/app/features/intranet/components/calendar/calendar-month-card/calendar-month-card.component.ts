@@ -24,7 +24,7 @@ export class CalendarMonthCardComponent {
 	hoveredEvent = signal<string | null>(null);
 
 	// * Weekday labels for header row.
-	weekDays = ['Dom', 'Lun', 'Mar', 'MiÃƒÂ©', 'Jue', 'Vie', 'SÃƒÂ¡b'];
+	weekDays = ['Dom', 'Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb'];
 
 	onDayClick(day: CalendarDay): void {
 		this.dayClick.emit(day);

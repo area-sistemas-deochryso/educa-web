@@ -7,26 +7,26 @@ import { Router } from '@angular/router';
 export interface VoiceCommandConfig {
 	/** Patrones que activan el comando (pueden incluir regex) */
 	patterns: string[];
-	/** DescripciÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â³n mostrada como feedback al usuario */
+	/** Descripción mostrada como feedback al usuario */
 	description: string;
-	/** CategorÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â­a del comando para organizaciÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â³n */
+	/** Categoría del comando para organización */
 	category: VoiceCommandCategory;
-	/** Tipo de acciÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â³n a ejecutar */
+	/** Tipo de acción a ejecutar */
 	actionType: 'navigate' | 'emit' | 'scroll' | 'custom';
-	/** Ruta de navegaciÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â³n (solo para actionType: 'navigate') */
+	/** Ruta de navegación (solo para actionType: 'navigate') */
 	route?: string;
 	/** Comando a emitir (solo para actionType: 'emit') */
 	emitCommand?: string;
-	/** DirecciÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â³n de scroll (solo para actionType: 'scroll') */
+	/** Dirección de scroll (solo para actionType: 'scroll') */
 	scrollDirection?: ScrollDirection;
-	/** FunciÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â³n personalizada (solo para actionType: 'custom') */
+	/** Función personalizada (solo para actionType: 'custom') */
 	customAction?: (context: VoiceCommandContext) => void;
 }
 
 export type VoiceCommandCategory =
-	| 'navigation' // NavegaciÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â³n entre pÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¡ginas
-	| 'scroll' // Scroll en la pÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¡gina
-	| 'pagination' // PaginaciÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â³n de tablas
+	| 'navigation' // Navegación entre páginas
+	| 'scroll' // Scroll en la página
+	| 'pagination' // Paginación de tablas
 	| 'modal' // Control de modales
 	| 'date' // Cambio de fechas
 	| 'control'; // Control general (borrar, etc.)
@@ -44,7 +44,7 @@ export interface VoiceCommandContext {
 }
 
 /**
- * ConfiguraciÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â³n de meses para comandos de fecha
+ * Configuración de meses para comandos de fecha
  */
 export const MONTH_NAMES: Record<string, number> = {
 	enero: 1,
@@ -64,23 +64,23 @@ export const MONTH_NAMES: Record<string, number> = {
 
 /**
  * =============================================================================
- * DEFINICIÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬Ãƒâ€¦Ã¢â‚¬Å“N CENTRALIZADA DE TODOS LOS COMANDOS DE VOZ
+ * DEFINICIÓN CENTRALIZADA DE TODOS LOS COMANDOS DE VOZ
  * =============================================================================
  *
- * Para aÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â±adir un nuevo comando:
- * 1. AÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â±ade un objeto VoiceCommandConfig a VOICE_COMMANDS
- * 2. Elige la categorÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â­a apropiada
+ * Para añadir un nuevo comando:
+ * 1. Añade un objeto VoiceCommandConfig a VOICE_COMMANDS
+ * 2. Elige la categoría apropiada
  * 3. Define los patterns (frases que activan el comando)
- * 4. Elige el actionType y configura segÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Âºn corresponda
+ * 4. Elige el actionType y configura según corresponda
  *
- * Tipos de acciÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â³n:
+ * Tipos de acción:
  * - 'navigate': Navega a una ruta (requiere: route)
  * - 'emit': Emite un evento (requiere: emitCommand)
- * - 'scroll': Hace scroll en la pÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¡gina (requiere: scrollDirection)
- * - 'custom': Ejecuta una funciÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â³n personalizada (requiere: customAction)
+ * - 'scroll': Hace scroll en la página (requiere: scrollDirection)
+ * - 'custom': Ejecuta una función personalizada (requiere: customAction)
  */
 export const VOICE_COMMANDS: VoiceCommandConfig[] = [
-	// #region NAVEGACIÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬Ãƒâ€¦Ã¢â‚¬Å“N ENTRE PÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚ÂGINAS
+	// #region NAVEGACIÓN ENTRE PÁGINAS
 	{
 		patterns: ['ir a inicio', 've a inicio', 'inicio'],
 		description: 'Navegar a inicio',
@@ -111,17 +111,17 @@ export const VOICE_COMMANDS: VoiceCommandConfig[] = [
 	},
 
 	// #endregion
-	// #region SCROLL / NAVEGACIÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬Ãƒâ€¦Ã¢â‚¬Å“N EN PÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚ÂGINA
+	// #region SCROLL / NAVEGACIÓN EN PÁGINA
 	{
 		patterns: ['baja', 'bajar', 'abajo', 'scroll abajo'],
-		description: 'Bajar en la pÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¡gina',
+		description: 'Bajar en la página',
 		category: 'scroll',
 		actionType: 'scroll',
 		scrollDirection: 'down',
 	},
 	{
 		patterns: ['sube', 'subir', 'arriba', 'scroll arriba'],
-		description: 'Subir en la pÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¡gina',
+		description: 'Subir en la página',
 		category: 'scroll',
 		actionType: 'scroll',
 		scrollDirection: 'up',
@@ -142,38 +142,38 @@ export const VOICE_COMMANDS: VoiceCommandConfig[] = [
 	},
 	{
 		patterns: ['al inicio', 'ir al inicio', 'principio'],
-		description: 'Ir al inicio de la pÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¡gina',
+		description: 'Ir al inicio de la página',
 		category: 'scroll',
 		actionType: 'scroll',
 		scrollDirection: 'top',
 	},
 	{
 		patterns: ['al final', 'ir al final', 'fin'],
-		description: 'Ir al final de la pÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¡gina',
+		description: 'Ir al final de la página',
 		category: 'scroll',
 		actionType: 'scroll',
 		scrollDirection: 'bottom',
 	},
 
 	// #endregion
-	// #region PAGINACIÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬Ãƒâ€¦Ã¢â‚¬Å“N DE TABLAS
+	// #region PAGINACIÓN DE TABLAS
 	{
-		patterns: ['siguiente pÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¡gina', 'pÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¡gina siguiente', 'siguiente'],
-		description: 'Ir a la siguiente pÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¡gina',
+		patterns: ['siguiente página', 'página siguiente', 'siguiente'],
+		description: 'Ir a la siguiente página',
 		category: 'pagination',
 		actionType: 'emit',
 		emitCommand: 'next-page',
 	},
 	{
-		patterns: ['pÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¡gina anterior', 'anterior'],
-		description: 'Ir a la pÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¡gina anterior',
+		patterns: ['página anterior', 'anterior'],
+		description: 'Ir a la página anterior',
 		category: 'pagination',
 		actionType: 'emit',
 		emitCommand: 'prev-page',
 	},
 	{
-		patterns: ['pÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¡gina (\\d+)', 'ir a pÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¡gina (\\d+)'],
-		description: 'Ir a una pÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¡gina especÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â­fica',
+		patterns: ['página (\\d+)', 'ir a página (\\d+)'],
+		description: 'Ir a una página específica',
 		category: 'pagination',
 		actionType: 'emit',
 		emitCommand: 'goto-page',
@@ -192,8 +192,8 @@ export const VOICE_COMMANDS: VoiceCommandConfig[] = [
 	// #endregion
 	// #region COMANDOS DE FECHA
 	{
-		patterns: ['ir a (20\\d{2})', 'aÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â±o (20\\d{2})', '(20\\d{2})'],
-		description: 'Cambiar aÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â±o',
+		patterns: ['ir a (20\\d{2})', 'año (20\\d{2})', '(20\\d{2})'],
+		description: 'Cambiar año',
 		category: 'date',
 		actionType: 'emit',
 		emitCommand: 'change-year',
@@ -211,7 +211,7 @@ export const VOICE_COMMANDS: VoiceCommandConfig[] = [
 ];
 
 /**
- * Obtiene comandos filtrados por categorÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â­a
+ * Obtiene comandos filtrados por categoría
  */
 export function getCommandsByCategory(category: VoiceCommandCategory): VoiceCommandConfig[] {
 	return VOICE_COMMANDS.filter((cmd) => cmd.category === category);
@@ -219,7 +219,7 @@ export function getCommandsByCategory(category: VoiceCommandCategory): VoiceComm
 }
 
 /**
- * Obtiene todos los patterns de una categorÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â­a
+ * Obtiene todos los patterns de una categoría
  */
 export function getPatternsByCategory(category: VoiceCommandCategory): string[] {
 	return getCommandsByCategory(category).flatMap((cmd) => cmd.patterns);

@@ -15,7 +15,7 @@ export class CampusNavigationApiService {
 
 	/**
 	 * GET /api/horario/mi-horario-hoy
-	 * Retorna el horario del dÃƒÂ­a para el usuario autenticado (Profesor o Estudiante)
+	 * Retorna el horario del día para el usuario autenticado (Profesor o Estudiante)
 	 */
 	getMiHorarioHoy(): Observable<MiHorarioHoyItem[]> {
 		return this.http.get<MiHorarioHoyItem[]>(`${this.apiUrl}/mi-horario-hoy`);

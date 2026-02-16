@@ -36,8 +36,8 @@ interface HorariosStoreState {
   // #region UI State
   dialogVisible: boolean;
   detailDrawerVisible: boolean;
-  cursoDialogVisible: boolean; // Modal de selecciÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â³n de cursos
-  wizardStep: number; // 0: Datos bÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¡sicos, 1: Asignar profesor, 2: Asignar estudiantes
+  cursoDialogVisible: boolean; // Modal de selección de cursos
+  wizardStep: number; // 0: Datos básicos, 1: Asignar profesor, 2: Asignar estudiantes
   vistaActual: 'semanal' | 'lista'; // Vista activa
 
   // #endregion
@@ -96,7 +96,7 @@ export class HorariosStore {
   private readonly _state = signal<HorariosStoreState>(initialState);
 
   // #endregion
-  // #region Lecturas pÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Âºblicas (readonly)
+  // #region Lecturas públicas (readonly)
   readonly horarios = computed(() => this._state().horarios);
   readonly horarioDetalle = computed(() => this._state().horarioDetalle);
   readonly estadisticas = computed(() => this._state().estadisticas);
@@ -120,7 +120,7 @@ export class HorariosStore {
 
   /**
    * Opciones de salones disponibles (sin conflicto de horario)
-   * Si estÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¡ editando, excluye el horario actual de la validaciÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â³n
+   * Si está editando, excluye el horario actual de la validación
    */
   readonly salonesOptions = computed<SalonOption[]>(() => {
     const salones = this._state().salonesDisponibles;
@@ -128,7 +128,7 @@ export class HorariosStore {
     const formData = this.formData();
     const editingId = this.editingId();
 
-    // Si no hay dÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â­a/hora seleccionados, mostrar todos los salones
+    // Si no hay día/hora seleccionados, mostrar todos los salones
     if (!formData.diaSemana || !formData.horaInicio || !formData.horaFin) {
       return salones
         .filter((s) => s.estado)
@@ -146,12 +146,12 @@ export class HorariosStore {
     const salonesDisponibles = salones.filter((salon) => {
       if (!salon.estado) return false;
 
-      // Verificar si el salÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â³n tiene conflicto de horario
+      // Verificar si el salón tiene conflicto de horario
       const tieneConflicto = horarios.some((h) => {
-        // Si estÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¡ editando, excluir el horario actual
+        // Si está editando, excluir el horario actual
         if (editingId !== null && h.id === editingId) return false;
 
-        // Mismo salÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â³n y mismo dÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â­a
+        // Mismo salón y mismo día
         if (h.salonId === salon.salonId && h.diaSemana === formData.diaSemana) {
           // Verificar solapamiento de horarios
           const inicioForm = formData.horaInicio;
@@ -245,7 +245,7 @@ export class HorariosStore {
     return horarios.filter((h) => {
       if (salonId !== null && h.salonId !== salonId) return false;
       if (profesorId !== null && h.profesorId !== profesorId) return false;
-      // Si estÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¡ en vista semanal, no filtrar por dÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â­a
+      // Si está en vista semanal, no filtrar por día
       if (vistaActual !== 'semanal' && diaSemana !== null && h.diaSemana !== diaSemana) return false;
       if (estadoActivo !== null && h.estado !== estadoActivo) return false;
       return true;
@@ -253,7 +253,7 @@ export class HorariosStore {
   });
 
   /**
-   * La vista semanal solo estÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¡ disponible cuando hay un salÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â³n o profesor seleccionado
+   * La vista semanal solo está disponible cuando hay un salón o profesor seleccionado
    */
   readonly vistaSemanalHabilitada = computed(() => {
     const salonId = this._state().filtroSalonId;
@@ -278,10 +278,10 @@ export class HorariosStore {
         colorIndex++;
       }
 
-      // Calcular duraciÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â³n en minutos
+      // Calcular duración en minutos
       const duracion = this.calcularDuracionMinutos(horario.horaInicio, horario.horaFin);
 
-      // Calcular posiciÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â³n vertical (asumiendo horario desde 07:00)
+      // Calcular posición vertical (asumiendo horario desde 07:00)
       const posicion = this.calcularPosicionVertical(horario.horaInicio);
 
       blocks.push({
@@ -297,7 +297,7 @@ export class HorariosStore {
   });
 
   // #endregion
-  // #region Computed - EstadÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â­sticas derivadas
+  // #region Computed - Estadísticas derivadas
   readonly totalHorarios = computed(() => this.horarios().length);
   readonly horariosActivos = computed(() => this.horarios().filter((h) => h.estado).length);
   readonly horariosInactivos = computed(() => this.horarios().filter((h) => !h.estado).length);
@@ -310,7 +310,7 @@ export class HorariosStore {
   readonly formValid = computed(() => {
     const data = this.formData();
 
-    // ValidaciÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â³n paso 0 (datos bÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¡sicos)
+    // Validación paso 0 (datos básicos)
     if (this.wizardStep() === 0) {
       return (
         data.diaSemana !== null &&
@@ -358,7 +358,7 @@ export class HorariosStore {
   readonly isLastStep = computed(() => this.wizardStep() === 2);
 
   /**
-   * El filtro de dÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â­a estÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¡ habilitado solo en vista lista
+   * El filtro de día está habilitado solo en vista lista
    */
   readonly filtroDiaSemanaHabilitado = computed(() => this.vistaActual() === 'lista');
 
@@ -414,13 +414,13 @@ export class HorariosStore {
   }));
 
   // #endregion
-  // #region Comandos de mutaciÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â³n - Lista
+  // #region Comandos de mutación - Lista
   setHorarios(horarios: HorarioResponseDto[]): void {
     this._state.update((s) => ({ ...s, horarios }));
   }
 
   // #endregion
-  // #region Comandos de mutaciÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â³n - Opciones
+  // #region Comandos de mutación - Opciones
   setSalonesDisponibles(salones: SalonListDto[]): void {
     this._state.update((s) => ({ ...s, salonesDisponibles: salones }));
   }
@@ -438,7 +438,7 @@ export class HorariosStore {
   }
 
   /**
-   * MutaciÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â³n quirÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Âºrgica: Actualizar un horario especÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â­fico sin refetch
+   * Mutación quirúrgica: Actualizar un horario específico sin refetch
    */
   updateHorario(id: number, updates: Partial<HorarioResponseDto>): void {
     this._state.update((s) => ({
@@ -448,7 +448,7 @@ export class HorariosStore {
   }
 
   /**
-   * MutaciÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â³n quirÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Âºrgica: Toggle estado de un horario
+   * Mutación quirúrgica: Toggle estado de un horario
    */
   toggleHorarioEstado(id: number): void {
     this._state.update((s) => ({
@@ -458,7 +458,7 @@ export class HorariosStore {
   }
 
   /**
-   * MutaciÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â³n quirÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Âºrgica: Eliminar un horario
+   * Mutación quirúrgica: Eliminar un horario
    */
   removeHorario(id: number): void {
     this._state.update((s) => ({
@@ -468,13 +468,13 @@ export class HorariosStore {
   }
 
   // #endregion
-  // #region Comandos de mutaciÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â³n - Detalle
+  // #region Comandos de mutación - Detalle
   setHorarioDetalle(detalle: HorarioDetalleResponseDto | null): void {
     this._state.update((s) => ({ ...s, horarioDetalle: detalle }));
   }
 
   // #endregion
-  // #region Comandos de mutaciÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â³n - EstadÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â­sticas
+  // #region Comandos de mutación - Estadísticas
   setEstadisticas(estadisticas: HorariosEstadisticas | null): void {
     this._state.update((s) => ({ ...s, estadisticas }));
   }
@@ -493,7 +493,7 @@ export class HorariosStore {
   }
 
   // #endregion
-  // #region Comandos de mutaciÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â³n - Loading
+  // #region Comandos de mutación - Loading
   setLoading(loading: boolean): void {
     this._state.update((s) => ({ ...s, loading }));
   }
@@ -507,7 +507,7 @@ export class HorariosStore {
   }
 
   // #endregion
-  // #region Comandos de mutaciÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â³n - UI State
+  // #region Comandos de mutación - UI State
   openDialog(): void {
     this._state.update((s) => ({ ...s, dialogVisible: true }));
   }
@@ -546,13 +546,13 @@ export class HorariosStore {
     this._state.update((s) => ({
       ...s,
       vistaActual: vista,
-      // Si cambia a vista semanal, limpiar filtro de dÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â­a
+      // Si cambia a vista semanal, limpiar filtro de día
       filtroDiaSemana: vista === 'semanal' ? null : s.filtroDiaSemana,
     }));
   }
 
   // #endregion
-  // #region Comandos de mutaciÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â³n - Wizard
+  // #region Comandos de mutación - Wizard
   nextStep(): void {
     this._state.update((s) => ({
       ...s,
@@ -575,7 +575,7 @@ export class HorariosStore {
   }
 
   // #endregion
-  // #region Comandos de mutaciÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â³n - Formulario
+  // #region Comandos de mutación - Formulario
   setFormData(data: Partial<HorarioFormData>): void {
     this._state.update((s) => ({
       ...s,
@@ -596,7 +596,7 @@ export class HorariosStore {
   }
 
   // #endregion
-  // #region Comandos de mutaciÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â³n - Filtros
+  // #region Comandos de mutación - Filtros
   setFiltroSalon(salonId: number | null): void {
     this._state.update((s) => ({ ...s, filtroSalonId: salonId }));
   }
@@ -642,7 +642,7 @@ export class HorariosStore {
   }
 
   /**
-   * Determina los niveles educativos basÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¡ndose en los nombres de grados
+   * Determina los niveles educativos basándose en los nombres de grados
    */
   private determinarNiveles(grados: string[]): string[] {
     const niveles = new Set<string>();
@@ -651,7 +651,7 @@ export class HorariosStore {
       const gradoLower = grado.toLowerCase();
 
       // Detectar Inicial
-      if (gradoLower.includes('inicial') || gradoLower.includes('aÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â±os')) {
+      if (gradoLower.includes('inicial') || gradoLower.includes('años')) {
         niveles.add('Inicial');
       }
 
@@ -666,7 +666,7 @@ export class HorariosStore {
       }
     });
 
-    // Retornar en orden lÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â³gico
+    // Retornar en orden lógico
     const orden = ['Inicial', 'Primaria', 'Secundaria'];
     return orden.filter((nivel) => niveles.has(nivel));
   }

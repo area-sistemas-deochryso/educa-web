@@ -163,7 +163,7 @@
 	}
 }
 
-// Hover azul grupal para dÃ­as del mismo evento
+// Hover azul grupal para días del mismo evento
 :host([data-hovered-event]) {
 	.day-cell[data-event] {
 		background: rgba(37, 52, 112, 0.15);

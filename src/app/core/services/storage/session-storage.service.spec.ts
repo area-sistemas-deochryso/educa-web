@@ -80,21 +80,21 @@ describe('SessionStorageService', () => {
 		});
 
 		it('should set and get token in sessionStorage (rememberMe=false)', () => {
-			service.setToken('test-token', false, 'Juan PÃƒÂ©rez', 'Estudiante');
+			service.setToken('test-token', false, 'Juan Pérez', 'Estudiante');
 
 			expect(service.getToken()).toBe('test-token');
 			expect(service.hasToken()).toBe(true);
 		});
 
 		it('should set and get token in localStorage (rememberMe=true)', () => {
-			service.setToken('persistent-token', true, 'MarÃƒÂ­a GarcÃƒÂ­a', 'Profesor');
+			service.setToken('persistent-token', true, 'María García', 'Profesor');
 
 			expect(service.getToken()).toBe('persistent-token');
 			expect(service.hasToken()).toBe(true);
 		});
 
 		it('should remove token', () => {
-			service.setToken('test-token', false, 'Juan PÃƒÂ©rez', 'Estudiante');
+			service.setToken('test-token', false, 'Juan Pérez', 'Estudiante');
 			expect(service.hasToken()).toBe(true);
 
 			service.removeToken();

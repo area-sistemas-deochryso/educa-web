@@ -11,26 +11,26 @@ import { SwService } from '@features/intranet/services/sw/sw.service';
 
 /**
  * ============================================================================
- * GESTOR AUTOMÃƒÂTICO DE VERSIONES DE CACHE
+ * GESTOR AUTOMÁTICO DE VERSIONES DE CACHE
  * ============================================================================
  *
- * RESPONSABILIDAD ÃƒÅ¡NICA:
- * Detectar automÃƒÂ¡ticamente cambios de versiÃƒÂ³n y invalidar cache sin intervenciÃƒÂ³n manual.
+ * RESPONSABILIDAD ÚNICA:
+ * Detectar automáticamente cambios de versión y invalidar cache sin intervención manual.
  *
  * PROBLEMA QUE RESUELVE:
  * Los desarrolladores olvidan invalidar cache manualmente cuando cambian el backend.
- * Esto causa errores de deserializaciÃƒÂ³n intermitentes en producciÃƒÂ³n.
+ * Esto causa errores de deserialización intermitentes en producción.
  *
- * SOLUCIÃƒâ€œN:
- * Sistema automÃƒÂ¡tico que:
+ * SOLUCIÓN:
+ * Sistema automático que:
  * 1. Al iniciar la app, compara versiones configuradas vs guardadas en localStorage
- * 2. Si una versiÃƒÂ³n cambiÃƒÂ³ Ã¢â€ â€™ invalida automÃƒÂ¡ticamente el cache de ese mÃƒÂ³dulo
+ * 2. Si una versión cambió → invalida automáticamente el cache de ese módulo
  * 3. Guarda las nuevas versiones
  * 4. Todo es invisible para el usuario final
  *
  * PARA EL DESARROLLADOR:
- * Solo cambiar el nÃƒÂºmero de versiÃƒÂ³n en cache-versions.config.ts cuando hay cambios breaking.
- * El resto es automÃƒÂ¡tico.
+ * Solo cambiar el número de versión en cache-versions.config.ts cuando hay cambios breaking.
+ * El resto es automático.
  */
 // #endregion
 // #region Implementation
@@ -43,10 +43,10 @@ export class CacheVersionManagerService {
 	private initialized = false;
 
 	/**
-	 * Inicializa el sistema de versionado automÃƒÂ¡tico.
-	 * Se llama automÃƒÂ¡ticamente desde AppComponent.
+	 * Inicializa el sistema de versionado automático.
+	 * Se llama automáticamente desde AppComponent.
 	 *
-	 * IMPORTANTE: No requiere intervenciÃƒÂ³n del desarrollador.
+	 * IMPORTANTE: No requiere intervención del desarrollador.
 	 * Solo se ejecuta una vez al cargar la app.
 	 */
 	async initialize(): Promise<void> {
@@ -54,28 +54,28 @@ export class CacheVersionManagerService {
 			return;
 		}
 
-		// Solo funciona si el Service Worker estÃƒÂ¡ activo
+		// Solo funciona si el Service Worker está activo
 		if (!this.swService.isRegistered) {
 			logger.log('[CacheVersionManager] SW no activo, skip version check');
 			this.initialized = true;
 			return;
 		}
 
-		logger.log('[CacheVersionManager] Iniciando verificaciÃƒÂ³n de versiones...');
+		logger.log('[CacheVersionManager] Iniciando verificación de versiones...');
 
 		const storedVersions = this.getStoredVersions();
 		const modulesInvalidated: string[] = [];
 		let totalEntriesInvalidated = 0;
 
-		// Comparar cada mÃƒÂ³dulo
+		// Comparar cada módulo
 		for (const [module, currentVersion] of Object.entries(CACHE_VERSIONS)) {
 			const moduleKey = module as CacheModule;
 			const storedVersion = storedVersions[moduleKey];
 
-			// Si la versiÃƒÂ³n cambiÃƒÂ³ Ã¢â€ â€™ invalidar cache de ese mÃƒÂ³dulo
+			// Si la versión cambió → invalidar cache de ese módulo
 			if (storedVersion && storedVersion !== currentVersion) {
 				logger.log(
-					`[CacheVersionManager] MÃƒÂ³dulo "${module}" cambiÃƒÂ³: ${storedVersion} Ã¢â€ â€™ ${currentVersion}`
+					`[CacheVersionManager] Módulo "${module}" cambió: ${storedVersion} → ${currentVersion}`
 				);
 
 				const pattern = MODULE_URL_PATTERNS[moduleKey];
@@ -84,23 +84,23 @@ export class CacheVersionManagerService {
 				totalEntriesInvalidated += count;
 				modulesInvalidated.push(module);
 			} else if (!storedVersion) {
-				// Primera vez que se ejecuta Ã¢â€ â€™ solo guardar versiÃƒÂ³n sin invalidar
-				logger.log(`[CacheVersionManager] MÃƒÂ³dulo "${module}" inicializado en v${currentVersion}`);
+				// Primera vez que se ejecuta → solo guardar versión sin invalidar
+				logger.log(`[CacheVersionManager] Módulo "${module}" inicializado en v${currentVersion}`);
 			}
 		}
 
 		// Guardar las nuevas versiones
 		this.saveVersions(CACHE_VERSIONS);
 
-		// Resumen de la operaciÃƒÂ³n
+		// Resumen de la operación
 		if (modulesInvalidated.length > 0) {
 			logger.log(
-				`[CacheVersionManager] Ã¢Å“â€¦ Cache invalidado automÃƒÂ¡ticamente:
-				- MÃƒÂ³dulos: ${modulesInvalidated.join(', ')}
+				`[CacheVersionManager] ✅ Cache invalidado automáticamente:
+				- Módulos: ${modulesInvalidated.join(', ')}
 				- Total entradas eliminadas: ${totalEntriesInvalidated}`
 			);
 		} else {
-			logger.log('[CacheVersionManager] Ã¢Å“â€¦ Todas las versiones estÃƒÂ¡n actualizadas');
+			logger.log('[CacheVersionManager] ✅ Todas las versiones están actualizadas');
 		}
 
 		this.initialized = true;
@@ -132,7 +132,7 @@ export class CacheVersionManagerService {
 
 	/**
 	 * SOLO PARA DEBUG/DESARROLLO
-	 * Resetea todas las versiones guardadas para forzar una verificaciÃƒÂ³n completa.
+	 * Resetea todas las versiones guardadas para forzar una verificación completa.
 	 *
 	 * USO:
 	 * ```typescript

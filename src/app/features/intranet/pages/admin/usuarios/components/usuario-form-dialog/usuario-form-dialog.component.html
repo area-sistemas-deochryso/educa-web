@@ -68,7 +68,7 @@
 				/>
 				<app-form-field-error [error]="errors().dniError" />
 			</div>
-			<!-- ! ContraseÃ±a puede ser autogenerada o editable segÃºn rol -->
+			<!-- ! Contraseña puede ser autogenerada o editable según rol -->
 			<div class="field">
 				<label for="contrasena" class="password-label">
 					@if (!isEditing() || !canEditPassword()) {
@@ -83,7 +83,7 @@
 							style="color: var(--green-500); margin-right: 0.5rem"
 						></i>
 					}
-					ContraseÃ±a
+					Contraseña
 					@if (!isEditing() || !canEditPassword()) {
 						<span>(autogenerada)</span>
 					}
@@ -98,19 +98,19 @@
 					[feedback]="false"
 					[style]="{ width: '100%' }"
 					[inputStyle]="{ width: '100%' }"
-					placeholder="Se generarÃ¡ automÃ¡ticamente"
+					placeholder="Se generará automáticamente"
 				></p-password>
 
 				@if (!isEditing() || !canEditPassword()) {
 					<small class="text-muted">
 						<i class="pi pi-info-circle" style="margin-right: 0.25rem"></i>
-						La contraseÃ±a se genera automÃ¡ticamente
+						La contraseña se genera automáticamente
 					</small>
 				}
 				@if (isEditing() && canEditPassword()) {
 					<small class="text-muted">
 						<i class="pi pi-info-circle" style="margin-right: 0.25rem"></i>
-						Puede editar la contraseÃ±a
+						Puede editar la contraseña
 					</small>
 				}
 			</div>
@@ -201,7 +201,7 @@
 					<app-form-field-error [error]="errors().correoApoderadoError" />
 				</div>
 			}
-			<!-- SALÃ“N (Grado) - Profesor y Estudiante -->
+			<!-- SALÓN (Grado) - Profesor y Estudiante -->
 			@if (needsSalon) {
 				<div class="field">
 					<label for="grado">Grado</label>
@@ -217,23 +217,23 @@
 					/>
 				</div>
 			}
-			<!-- SALÃ“N (SecciÃ³n) - Profesor y Estudiante -->
+			<!-- SALÓN (Sección) - Profesor y Estudiante -->
 			@if (needsSalon && _gradoSeleccionado()) {
 				<div class="field">
-					<label for="seccion">SecciÃ³n</label>
+					<label for="seccion">Sección</label>
 					<p-select
 						id="seccion"
 						[options]="seccionesOptions()"
 						[ngModel]="_seccionSeleccionada()"
 						(ngModelChange)="onSeccionChange($event)"
-						placeholder="Seleccione la secciÃ³n"
+						placeholder="Seleccione la sección"
 						[style]="{ width: '100%' }"
 						[showClear]="true"
 						appendTo="body"
 					/>
 					<small class="text-muted">
 						<i class="pi pi-info-circle" style="margin-right: 0.25rem"></i>
-						Opcional: Asigne un salÃ³n al {{ isProfesor ? 'profesor' : 'estudiante' }}
+						Opcional: Asigne un salón al {{ isProfesor ? 'profesor' : 'estudiante' }}
 					</small>
 				</div>
 			}
@@ -248,12 +248,12 @@
 							(ngModelChange)="onFieldChange('esTutor', $event)"
 						/>
 						<label for="esTutor" class="checkbox-label">
-							Es tutor de este salÃ³n
+							Es tutor de este salón
 						</label>
 					</div>
 					<small class="text-muted">
 						<i class="pi pi-info-circle" style="margin-right: 0.25rem"></i>
-						Marque si el profesor serÃ¡ tutor del salÃ³n seleccionado
+						Marque si el profesor será tutor del salón seleccionado
 					</small>
 				</div>
 			}

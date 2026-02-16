@@ -32,7 +32,7 @@ export class SubmissionsModalComponent {
 	submissions: Submission[] = [
 		{
 			id: 1,
-			taskTitle: 'Ejercicios del capÃƒÂ­tulo 2',
+			taskTitle: 'Ejercicios del capítulo 2',
 			submittedDate: '10/01/2026',
 			status: 'pending_review',
 			grade: null,
@@ -52,7 +52,7 @@ export class SubmissionsModalComponent {
 
 	getStatusLabel(status: string): string {
 		const labels: Record<string, string> = {
-			pending_review: 'En revisiÃƒÂ³n',
+			pending_review: 'En revisión',
 			reviewed: 'Calificado',
 			returned: 'Devuelto',
 		};

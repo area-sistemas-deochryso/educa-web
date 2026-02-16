@@ -103,7 +103,7 @@ describe('AuthService', () => {
 
 			const req = httpMock.expectOne((r) => r.url.includes('/api/Auth/login'));
 			req.flush(
-				{ mensaje: 'Credenciales invÃƒÂ¡lidas' },
+				{ mensaje: 'Credenciales inválidas' },
 				{ status: 401, statusText: 'Unauthorized' },
 			);
 		});
@@ -118,7 +118,7 @@ describe('AuthService', () => {
 
 			expect(service.isBlocked).toBe(true);
 
-			// El siguiente intento deberÃƒÂ­a ser bloqueado sin hacer request
+			// El siguiente intento debería ser bloqueado sin hacer request
 			service.login('12345678', 'password', 'Estudiante').subscribe((response) => {
 				expect(response.mensaje).toContain('Demasiados intentos');
 			});

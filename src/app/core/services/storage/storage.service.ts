@@ -14,8 +14,8 @@ import { IndexedDBService } from './indexed-db.service';
 /**
  * StorageService - Facade que coordina los diferentes tipos de almacenamiento
  *
- * Este servicio actÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Âºa como punto de entrada ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Âºnico para el almacenamiento,
- * delegando a los servicios especializados segÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Âºn el tipo de dato:
+ * Este servicio actúa como punto de entrada único para el almacenamiento,
+ * delegando a los servicios especializados según el tipo de dato:
  *
  * - SessionStorageService: Auth, estado de UI temporal
  * - PreferencesStorageService: Preferencias de usuario persistentes
@@ -33,7 +33,7 @@ export class StorageService {
 	private idb = inject(IndexedDBService);
 
 	// #region AUTH - Delegado a SessionStorage
-	// (mÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¡s seguro que localStorage para tokens)
+	// (más seguro que localStorage para tokens)
 
 	getToken(): string | null {
 		return this.session.getToken();
@@ -81,7 +81,7 @@ export class StorageService {
 
 	// #endregion
 	// #region PERMISOS - Delegado a SessionStorage
-	// (permisos del usuario por sesiÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â³n)
+	// (permisos del usuario por sesión)
 
 	getPermisos(): PermisosStorageData | null {
 		return this.session.getPermisos();
@@ -97,13 +97,13 @@ export class StorageService {
 
 	// #endregion
 	// #region NOTIFICATIONS - Delegado a IndexedDB (async)
-	// Con fallback sÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â­ncrono para compatibilidad
+	// Con fallback síncrono para compatibilidad
 
 	/**
 	 * @deprecated Usar getDismissedNotificationsAsync para mejor rendimiento
 	 */
 	getDismissedNotifications(): NotificationStorageData | null {
-		// Fallback sÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â­ncrono para compatibilidad
+		// Fallback síncrono para compatibilidad
 		return this._getSyncFallback<NotificationStorageData>('educa_dismissed_notifications');
 	}
 
@@ -118,7 +118,7 @@ export class StorageService {
 	 * @deprecated Usar setDismissedNotificationsAsync para mejor rendimiento
 	 */
 	setDismissedNotifications(data: NotificationStorageData): void {
-		// Guardar en ambos para migraciÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â³n gradual
+		// Guardar en ambos para migración gradual
 		this._setSyncFallback('educa_dismissed_notifications', data);
 		this.idb.setDismissedNotifications(data);
 	}
@@ -178,7 +178,7 @@ export class StorageService {
 
 	// #endregion
 	// #region SCHEDULE - Delegado a SessionStorage
-	// (estado temporal de UI por pestaÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â±a)
+	// (estado temporal de UI por pestaña)
 
 	getScheduleModalsState(): ScheduleModalsState {
 		return this.session.getScheduleModalsState();
@@ -319,7 +319,7 @@ export class StorageService {
 	}
 
 	// #endregion
-	// #region Fallbacks sÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â­ncronos para compatibilidad
+	// #region Fallbacks síncronos para compatibilidad
 
 	private _getSyncFallback<T>(key: string): T | null {
 		try {

@@ -12,11 +12,11 @@ export interface DebugConfig {
 	/** Aun con true, igual se exige isDevMode() */
 	enabled?: boolean;
 
-	/** Nivel mÃƒÆ’Ã‚Â­nimo a imprimir. Default: 'INFO' */
+	/** Nivel mínimo a imprimir. Default: 'INFO' */
 	minLevel?: DbgLevel;
 
 	/**
-	 * PatrÃƒÆ’Ã‚Â³n por defecto si no hay localStorage.DEBUG.
+	 * Patrón por defecto si no hay localStorage.DEBUG.
 	 * Ej: "KARDEX*,UI:*,-UI:Noisy*"
 	 */
 	defaultPattern?: string;
@@ -24,10 +24,10 @@ export interface DebugConfig {
 	/** Key de localStorage (default "DEBUG") */
 	storageKey?: string;
 
-	/** Key de localStorage para el nivel mÃƒÆ’Ã‚Â­nimo (default "DEBUG_LEVEL") */
+	/** Key de localStorage para el nivel mínimo (default "DEBUG_LEVEL") */
 	storageLevelKey?: string;
 
-	/** Si true, agrega stack en TRACE (mÃƒÆ’Ã‚Â¡s costo) */
+	/** Si true, agrega stack en TRACE (más costo) */
 	enableStackInTrace?: boolean;
 }
 

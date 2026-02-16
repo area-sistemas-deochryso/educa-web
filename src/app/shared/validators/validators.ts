@@ -151,7 +151,7 @@ export class AppValidators {
 		return (control: AbstractControl): ValidationErrors | null => {
 			if (!control.value) return null;
 
-			const isValid = /^[a-zA-ZÃƒÂ¡ÃƒÂ©ÃƒÂ­ÃƒÂ³ÃƒÂºÃƒÂÃƒâ€°ÃƒÂÃƒâ€œÃƒÅ¡ÃƒÂ±Ãƒâ€˜ÃƒÂ¼ÃƒÅ“\s]+$/.test(control.value);
+			const isValid = /^[a-zA-ZáéíóúÁÉÍÓÚñÑüÜ\s]+$/.test(control.value);
 			return isValid ? null : { onlyLetters: true };
 		};
 	}

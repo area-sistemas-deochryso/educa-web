@@ -20,7 +20,7 @@ export class WelcomeSectionComponent {
 
 	// * Supporting subtitle copy.
 	subtitle = input<string>(
-		'AquÃƒÂ­ encontrarÃƒÂ¡s toda la informaciÃƒÂ³n relevante para tu dÃƒÂ­a a dÃƒÂ­a acadÃƒÂ©mico.',
+		'Aquí encontrarás toda la información relevante para tu día a día académico.',
 	);
 }
 // #endregion

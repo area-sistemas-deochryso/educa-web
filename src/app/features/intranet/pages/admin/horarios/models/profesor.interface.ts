@@ -20,7 +20,7 @@ export interface ProfesorOption {
 }
 
 /**
- * Interfaz para informaciÃ³n bÃ¡sica del profesor
+ * Interfaz para información básica del profesor
  */
 export interface ProfesorInfo {
 	id: number;

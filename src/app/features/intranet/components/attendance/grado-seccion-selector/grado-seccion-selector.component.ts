@@ -5,7 +5,7 @@ import { FormsModule } from '@angular/forms';
 import { GradoSeccion } from '@core/services';
 
 /**
- * Componente presentacional para la selecciÃƒÆ’Ã‚Â³n de grado/secciÃƒÆ’Ã‚Â³n.
+ * Componente presentacional para la selección de grado/sección.
  * Usado por el Director para filtrar estudiantes.
  */
 // #endregion

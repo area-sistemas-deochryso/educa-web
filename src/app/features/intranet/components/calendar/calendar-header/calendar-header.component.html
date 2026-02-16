@@ -6,8 +6,8 @@
 			<i class="pi pi-calendar"></i>
 		</div>
 		<div class="header-text">
-			<h1>Calendario AcadÃ©mico</h1>
-			<p>AÃ±o escolar {{ currentYear() }}</p>
+			<h1>Calendario Académico</h1>
+			<p>Año escolar {{ currentYear() }}</p>
 		</div>
 	</div>
 	<!-- * Actions: today + year search -->
@@ -21,12 +21,12 @@
 				type="number"
 				[(ngModel)]="searchYear"
 				(keydown)="onSearchKeydown($event)"
-				placeholder="Buscar aÃ±o"
+				placeholder="Buscar año"
 				min="1900"
 				max="2100"
 				class="year-input"
 			/>
-			<button class="search-btn" (click)="onGoToYear()" title="Buscar aÃ±o">
+			<button class="search-btn" (click)="onGoToYear()" title="Buscar año">
 				<i class="pi pi-search"></i>
 			</button>
 		</div>

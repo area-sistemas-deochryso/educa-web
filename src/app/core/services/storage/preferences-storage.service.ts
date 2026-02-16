@@ -9,11 +9,11 @@ import { AttendanceMonthData } from './storage.models';
  * Ideal para:
  * - Preferencias de usuario (tema, idioma, configuraciones)
  * - Selecciones que deben recordarse entre sesiones
- * - Datos pequeÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â±os que no son sensibles
+ * - Datos pequeños que no son sensibles
  *
  * Usa localStorage porque:
  * - Las preferencias deben persistir al cerrar el navegador
- * - Se comparten entre pestaÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â±as (consistencia de preferencias)
+ * - Se comparten entre pestañas (consistencia de preferencias)
  * - Son datos no sensibles
  */
 
@@ -51,7 +51,7 @@ export class PreferencesStorageService {
 		return isPlatformBrowser(this.platformId);
 	}
 
-	// #region MÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â©todos genÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â©ricos privados
+	// #region Métodos genéricos privados
 
 	private getItem(key: string): string | null {
 		if (!this.isBrowser) return null;

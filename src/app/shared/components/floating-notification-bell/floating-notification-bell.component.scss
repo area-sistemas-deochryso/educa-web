@@ -539,7 +539,7 @@ $priority-low: var(--intranet-accent-color-green, #77a02d); // Verde info
 		box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
 	}
 
-	// Estado leÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â­do
+	// Estado leído
 	&.is-read {
 		opacity: 0.7;
 		background: var(--intranet-background-color, #f5f5f5);
@@ -549,7 +549,7 @@ $priority-low: var(--intranet-accent-color-green, #77a02d); // Verde info
 		}
 	}
 
-	// Estado no leÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â­do
+	// Estado no leído
 	&.is-unread {
 		background: white;
 		box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
@@ -618,7 +618,7 @@ $priority-low: var(--intranet-accent-color-green, #77a02d); // Verde info
 	}
 }
 
-// Punto de no leÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â­do con colores por prioridad
+// Punto de no leído con colores por prioridad
 .unread-dot {
 	position: absolute;
 	top: 1rem;
@@ -860,7 +860,7 @@ $priority-low: var(--intranet-accent-color-green, #77a02d); // Verde info
 }
 
 // #endregion
-// #region SECCIÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã…â€œN DE DESCARTADAS
+// #region SECCIÓN DE DESCARTADAS
 
 .dismissed-section {
 	margin-top: 1.5rem;
@@ -1036,7 +1036,7 @@ $priority-low: var(--intranet-accent-color-green, #77a02d); // Verde info
 }
 
 // #endregion
-// #region ESTADO VACÃƒÆ’Ã†â€™Ãƒâ€šÃ‚ÂO
+// #region ESTADO VACÍO
 
 .notifications-empty {
 	display: flex;

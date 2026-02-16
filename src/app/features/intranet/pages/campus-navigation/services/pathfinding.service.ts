@@ -32,16 +32,16 @@ interface ObstacleRect {
 	h: number;
 }
 
-/** Padding alrededor de cada rectÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¡ngulo para evitar que la lÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â­nea roce los bordes */
+/** Padding alrededor de cada rectángulo para evitar que la línea roce los bordes */
 const COLLISION_PADDING = 8;
 
 /**
- * Servicio de pathfinding A* para navegaciÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â³n en campus.
+ * Servicio de pathfinding A* para navegación en campus.
  * Pure utility: no guarda estado, solo calcula rutas.
  */
 @Injectable({ providedIn: 'root' })
 export class PathfindingService {
-	// #region API PÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Âºblica
+	// #region API Pública
 
 	findPath(
 		startId: string,
@@ -129,8 +129,8 @@ export class PathfindingService {
 	}
 
 	/**
-	 * HeurÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â­stica: Distancia euclidiana + penalizaciÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â³n por cambio de piso.
-	 * La penalizaciÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â³n simula el tiempo extra de subir/bajar escaleras.
+	 * Heurística: Distancia euclidiana + penalización por cambio de piso.
+	 * La penalización simula el tiempo extra de subir/bajar escaleras.
 	 */
 	private heuristic(a: CampusNode, b: CampusNode): number {
 		const dx = a.x - b.x;
@@ -160,19 +160,19 @@ export class PathfindingService {
 		blockedPaths: BlockedPath[],
 	): Map<string, AdjacencyEntry[]> {
 		const blocked = new Set(
-			blockedPaths.flatMap((bp) => [`${bp.from}ÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬Ãƒâ€šÃ‚Â ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÂ¢Ã¢â‚¬Å¾Ã‚Â¢${bp.to}`, `${bp.to}ÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬Ãƒâ€šÃ‚Â ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÂ¢Ã¢â‚¬Å¾Ã‚Â¢${bp.from}`]),
+			blockedPaths.flatMap((bp) => [`${bp.from}→${bp.to}`, `${bp.to}→${bp.from}`]),
 		);
 
 		const adjacency = new Map<string, AdjacencyEntry[]>();
 
 		for (const edge of edges) {
-			if (!blocked.has(`${edge.from}ÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬Ãƒâ€šÃ‚Â ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÂ¢Ã¢â‚¬Å¾Ã‚Â¢${edge.to}`)) {
+			if (!blocked.has(`${edge.from}→${edge.to}`)) {
 				const fromList = adjacency.get(edge.from) || [];
 				fromList.push({ nodeId: edge.to, distance: edge.distance });
 				adjacency.set(edge.from, fromList);
 			}
 
-			if (edge.bidirectional && !blocked.has(`${edge.to}ÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬Ãƒâ€šÃ‚Â ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÂ¢Ã¢â‚¬Å¾Ã‚Â¢${edge.from}`)) {
+			if (edge.bidirectional && !blocked.has(`${edge.to}→${edge.from}`)) {
 				const toList = adjacency.get(edge.to) || [];
 				toList.push({ nodeId: edge.from, distance: edge.distance });
 				adjacency.set(edge.to, toList);
@@ -235,15 +235,15 @@ export class PathfindingService {
 	}
 
 	// #endregion
-	// #region Collision Avoidance (auto-correcciÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â³n visual)
+	// #region Collision Avoidance (auto-corrección visual)
 
 	/**
-	 * Genera puntos de polyline SVG que evitan cruzar rectÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¡ngulos de nodos.
-	 * Cuando una lÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â­nea directa entre dos nodos del path cruzarÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â­a un salÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â³n/oficina/baÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â±o,
-	 * se redirige automÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¡ticamente por la banda horizontal de pasillos mÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¡s cercana.
+	 * Genera puntos de polyline SVG que evitan cruzar rectángulos de nodos.
+	 * Cuando una línea directa entre dos nodos del path cruzaría un salón/oficina/baño,
+	 * se redirige automáticamente por la banda horizontal de pasillos más cercana.
 	 *
 	 * Esto garantiza que incluso con posiciones mal configuradas, la ruta
-	 * nunca atraviesa visualmente un rectÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¡ngulo de salÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â³n.
+	 * nunca atraviesa visualmente un rectángulo de salón.
 	 */
 	generateSafePathPoints(pathNodes: CampusNode[], allFloorNodes: CampusNode[]): string {
 		if (pathNodes.length < 2) return '';
@@ -259,7 +259,7 @@ export class PathfindingService {
 
 			const safeRoute = this.findSafeRoute(from, to, obstacles, corridorYs);
 
-			// Skip el primer punto (ya estÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¡ en la lista como 'from')
+			// Skip el primer punto (ya está en la lista como 'from')
 			for (let j = 1; j < safeRoute.length; j++) {
 				points.push(safeRoute[j]);
 			}
@@ -269,7 +269,7 @@ export class PathfindingService {
 	}
 
 	/**
-	 * Construye rectÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¡ngulos de obstÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¡culo a partir de nodos con dimensiones.
+	 * Construye rectángulos de obstáculo a partir de nodos con dimensiones.
 	 * Excluye corredores (son puntos) y nodos que forman parte del path actual.
 	 */
 	private buildObstacleRects(pathNodes: CampusNode[], allFloorNodes: CampusNode[]): ObstacleRect[] {
@@ -292,7 +292,7 @@ export class PathfindingService {
 
 	/**
 	 * Encuentra una ruta segura entre dos puntos.
-	 * Si la lÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â­nea directa no cruza obstÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¡culos, retorna la lÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â­nea directa.
+	 * Si la línea directa no cruza obstáculos, retorna la línea directa.
 	 * Si cruza, intenta enrutar por la banda horizontal de pasillos (L-route).
 	 */
 	private findSafeRoute(
@@ -305,7 +305,7 @@ export class PathfindingService {
 			return [from, to];
 		}
 
-		// Intentar L-route por cada Y de pasillo, ordenado por cercanÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â­a al punto medio
+		// Intentar L-route por cada Y de pasillo, ordenado por cercanía al punto medio
 		const midY = (from.y + to.y) / 2;
 		const sortedYs = [...corridorYs].sort((a, b) => Math.abs(a - midY) - Math.abs(b - midY));
 
@@ -327,21 +327,21 @@ export class PathfindingService {
 			}
 		}
 
-		// Fallback: lÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â­nea directa (no deberÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â­a pasar con layout bien diseÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â±ado)
+		// Fallback: línea directa (no debería pasar con layout bien diseñado)
 		return [from, to];
 	}
 
 	// #endregion
-	// #region GeometrÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â­a: detecciÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â³n de intersecciÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â³n lÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â­nea-rectÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¡ngulo
+	// #region Geometría: detección de intersección línea-rectángulo
 
 	private lineHitsAnyObstacle(from: Point, to: Point, obstacles: ObstacleRect[]): boolean {
 		return obstacles.some((r) => this.lineIntersectsRect(from, to, r));
 	}
 
 	/**
-	 * Detecta si un segmento de lÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â­nea cruza un rectÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¡ngulo (centrado en cx,cy).
-	 * Usa test de intersecciÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â³n segmento-segmento contra los 4 bordes del rectÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¡ngulo,
-	 * mÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¡s verificaciÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â³n de puntos interiores.
+	 * Detecta si un segmento de línea cruza un rectángulo (centrado en cx,cy).
+	 * Usa test de intersección segmento-segmento contra los 4 bordes del rectángulo,
+	 * más verificación de puntos interiores.
 	 */
 	private lineIntersectsRect(p1: Point, p2: Point, rect: ObstacleRect): boolean {
 		const left = rect.cx - rect.w / 2;
@@ -371,7 +371,7 @@ export class PathfindingService {
 	}
 
 	/**
-	 * Test de intersecciÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â³n de dos segmentos usando productos cruz.
+	 * Test de intersección de dos segmentos usando productos cruz.
 	 */
 	private segmentsCross(a: Point, b: Point, c: Point, d: Point): boolean {
 		const d1 = this.crossProduct(c, d, a);

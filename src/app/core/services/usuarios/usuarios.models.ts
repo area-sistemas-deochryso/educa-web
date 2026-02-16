@@ -99,7 +99,7 @@ export type RolUsuario = AppUserRoleValue;
 
 export const ROLES_USUARIOS: RolUsuario[] = APP_USER_ROLE_LIST;
 
-// Roles disponibles para gestiÃƒÂ³n en admin (sin Apoderado)
+// Roles disponibles para gestión en admin (sin Apoderado)
 export type RolUsuarioAdmin = AppUserRoleAdmin;
 
 export const ROLES_USUARIOS_ADMIN: RolUsuarioAdmin[] = APP_USER_ROLE_ADMIN_LIST;

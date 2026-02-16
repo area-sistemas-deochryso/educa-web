@@ -5,14 +5,14 @@ import { BlockedPath } from '../models';
  * Caminos bloqueados del campus.
  *
  * Editar este archivo para bloquear pasillos por:
- * - ConstrucciÃƒÂ³n o remodelaciÃƒÂ³n
+ * - Construcción o remodelación
  * - Puertas cerradas con llave
  * - Mantenimiento temporal
  *
- * El algoritmo A* calcularÃƒÂ¡ rutas alternativas automÃƒÂ¡ticamente.
+ * El algoritmo A* calculará rutas alternativas automáticamente.
  *
  * Ejemplo:
- * { from: 'corridor-0-left', to: 'salon-1a', reason: 'RemodelaciÃƒÂ³n', temporary: true }
+ * { from: 'corridor-0-left', to: 'salon-1a', reason: 'Remodelación', temporary: true }
  */
 // #endregion
 // #region Implementation

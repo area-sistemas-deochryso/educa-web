@@ -9,7 +9,7 @@ import { AdminUtilsService } from '@shared/services';
 
 /**
  * Componente presentacional para el drawer de detalles de usuario
- * Muestra informaciÃƒÆ’Ã‚Â³n de solo lectura con opciÃƒÆ’Ã‚Â³n de editar
+ * Muestra información de solo lectura con opción de editar
  */
 // #endregion
 // #region Implementation

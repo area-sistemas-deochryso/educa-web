@@ -33,9 +33,9 @@ export const MONTH_OPTIONS: MonthOption[] = [
 ];
 
 /**
- * Encabezados de dÃƒÂ­as de la semana (lunes a viernes).
+ * Encabezados de días de la semana (lunes a viernes).
  */
-export const DAY_HEADERS = ['Lunes', 'Martes', 'MiÃƒÂ©rcoles', 'Jueves', 'Viernes'];
+export const DAY_HEADERS = ['Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes'];
 
 /**
  * Mapeo de estados de asistencia a clases CSS.

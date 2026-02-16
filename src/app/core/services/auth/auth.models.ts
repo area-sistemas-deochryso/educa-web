@@ -15,7 +15,7 @@ export type UserRole =
 // Request para el endpoint POST /api/Auth/login
 export interface LoginRequest {
 	dni: string;
-	contraseÃƒÂ±a: string;
+	contraseña: string;
 	rol: UserRole;
 }
 
@@ -51,7 +51,7 @@ export interface AuthUser {
 // Response del endpoint POST /api/Auth/verificar
 export interface VerifyTokenResponse {
 	dni: string;
-	contraseÃƒÂ±a: string;
+	contraseña: string;
 	rol: UserRole;
 	nombreCompleto: string;
 	entityId: number;

@@ -13,7 +13,7 @@ export const environment = {
 	// Feature flags
 	showIntranetLink: true,
 
-	// Features en desarrollo (ocultos en producciÃ³n los que estÃ©n en false)
+	// Features en desarrollo (ocultos en producción los que estén en false)
 	features: {
 		horarios: false,
 		calendario: false,

@@ -33,7 +33,7 @@ export class ScheduleCalendarComponent implements OnInit {
 	selectedDay: number | null = null;
 
 	// * Header labels.
-	dayHeaders = ['Lun', 'Mar', 'Mie', 'Jue', 'Vie', 'SÃƒÂ¡b', 'Dom'];
+	dayHeaders = ['Lun', 'Mar', 'Mie', 'Jue', 'Vie', 'Sáb', 'Dom'];
 
 	monthNames = [
 		'ENERO',

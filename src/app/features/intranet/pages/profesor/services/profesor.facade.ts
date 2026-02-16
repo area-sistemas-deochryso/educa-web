@@ -21,7 +21,7 @@ export class ProfesorFacade {
 	loadData(): void {
 		const profesorId = this.userProfile.entityId();
 		if (!profesorId) {
-			logger.warn('ProfesorFacade: No se encontrÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â³ entityId del profesor');
+			logger.warn('ProfesorFacade: No se encontró entityId del profesor');
 			return;
 		}
 
@@ -52,7 +52,7 @@ export class ProfesorFacade {
 
 	/**
 	 * Abre el dialog y carga estudiantes on-demand via estudiantes-salon/{salonId}.
-	 * Muestra loading mientras se obtienen los datos reales del salÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â³n.
+	 * Muestra loading mientras se obtienen los datos reales del salón.
 	 */
 	openSalonDialog(salon: ProfesorSalonConEstudiantes): void {
 		this.store.openSalonDialog(salon);
@@ -73,7 +73,7 @@ export class ProfesorFacade {
 					}
 				},
 				error: () => {
-					logger.error('ProfesorFacade: Error al cargar estudiantes del salÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â³n');
+					logger.error('ProfesorFacade: Error al cargar estudiantes del salón');
 					this.store.setSalonDialogLoading(false);
 				},
 			});

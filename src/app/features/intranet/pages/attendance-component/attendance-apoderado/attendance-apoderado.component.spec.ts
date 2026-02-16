@@ -20,7 +20,7 @@ describe('AttendanceApoderadoComponent', () => {
 		{
 			estudianteId: 1,
 			dni: '12345678',
-			nombreCompleto: 'Juan PÃƒÂ©rez',
+			nombreCompleto: 'Juan Pérez',
 			grado: 1,
 			seccion: 'A',
 			relacion: 'Hijo',
@@ -28,7 +28,7 @@ describe('AttendanceApoderadoComponent', () => {
 		{
 			estudianteId: 2,
 			dni: '87654321',
-			nombreCompleto: 'MarÃƒÂ­a PÃƒÂ©rez',
+			nombreCompleto: 'María Pérez',
 			grado: 2,
 			seccion: 'B',
 			relacion: 'Hija',
@@ -101,7 +101,7 @@ describe('AttendanceApoderadoComponent', () => {
 
 	it('should compute selectedHijo correctly', () => {
 		fixture.detectChanges();
-		expect(component.selectedHijo()?.nombreCompleto).toBe('Juan PÃƒÂ©rez');
+		expect(component.selectedHijo()?.nombreCompleto).toBe('Juan Pérez');
 	});
 
 	it('should call selectHijo and load asistencias', () => {

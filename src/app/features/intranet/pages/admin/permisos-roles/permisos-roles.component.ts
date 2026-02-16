@@ -288,7 +288,7 @@ export class PermisosRolesComponent implements OnInit {
 		const vistasActivas = this.vistas();
 		const modulosMap = new Map<string, Vista[]>();
 
-		// Agrupar vistas por mÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Â ÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â³dulo
+		// Agrupar vistas por módulo
 		vistasActivas.forEach((vista) => {
 			const modulo = this.adminUtils.getModuloFromRuta(vista.ruta);
 			const moduloCapitalized = modulo.charAt(0).toUpperCase() + modulo.slice(1);
