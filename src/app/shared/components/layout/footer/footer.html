@@ -123,6 +123,7 @@
 							class="form-control"
 							pTooltip="Suscríbete a nuestras novedades"
 							tooltipPosition="top"
+							aria-label="Suscríbete a nuestras novedades"
 						>
 							<i class="bi-send"></i>
 						</button>
@@ -200,13 +201,14 @@
 					</ul>
 				</div>
 
-				<a
+				<button
+					type="button"
 					class="back-top-icon bi-arrow-up smoothscroll d-flex justify-content-center align-items-center"
 					(click)="scrollToTop()"
 					pTooltip="Volver arriba"
 					tooltipPosition="left"
 					aria-label="Volver arriba"
-				></a>
+				></button>
 			</div>
 		</div>
 	</div>

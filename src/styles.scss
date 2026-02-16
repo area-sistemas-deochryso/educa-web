@@ -381,6 +381,9 @@ strong {
 -----------------------------------------*/
 .back-top-icon {
 	background: var(--secondary-color);
+	border: none;
+	cursor: pointer;
+	padding: 0;
 	width: 65px;
 	color: var(--white-color);
 	font-size: var(--h4-font-size);
