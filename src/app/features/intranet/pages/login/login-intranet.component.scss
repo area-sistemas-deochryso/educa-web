@@ -13,6 +13,8 @@
 	align-items: center;
 	z-index: 1000;
 	font-family: var(--intranet-font-family);
+	overflow: auto;
+	padding: 1rem;
 }
 
 .login-modal {

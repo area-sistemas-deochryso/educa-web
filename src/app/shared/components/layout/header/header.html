@@ -29,7 +29,7 @@
 		</button>
 
 		<div class="navbar-collapse" [class.show]="isMenuOpen()" id="navbarNav">
-			<ul class="navbar-nav align-items-center ms-lg-5">
+			<ul class="navbar-nav align-items-lg-center ms-lg-5">
 				<li class="nav-item">
 					<a
 						class="nav-link"
@@ -115,11 +115,27 @@
 						Preguntas Frecuentes
 					</a>
 				</li>
+
+				<!-- Mobile-only Intranet link -->
+				@if (showIntranetLink) {
+					<li class="nav-item mobile-intranet d-lg-none">
+						<a
+							class="nav-link"
+							routerLink="/intranet"
+							routerLinkActive="active"
+							[routerLinkActiveOptions]="{ exact: true }"
+							(click)="closeMenu()"
+						>
+							Intranet
+						</a>
+					</li>
+				}
 			</ul>
 		</div>
 
+		<!-- Desktop-only Intranet link -->
 		@if (showIntranetLink) {
-			<div>
+			<div class="d-none d-lg-block">
 				<a
 					class="nav-link"
 					routerLink="/intranet"

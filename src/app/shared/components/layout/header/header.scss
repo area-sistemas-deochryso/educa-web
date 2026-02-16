@@ -6,6 +6,9 @@
 	background: var(--white-color);
 	padding-top: 15px;
 	padding-bottom: 15px;
+	position: sticky;
+	top: 0;
+	z-index: 1030;
 }
 
 .navbar-brand {
@@ -105,6 +108,7 @@
 	}
 }
 
+// #region Hamburger toggle
 .navbar-toggler {
 	border: 0;
 	padding: 0;
@@ -170,32 +174,105 @@
 .navbar-toggler .navbar-toggler-icon::after {
 	top: 8px;
 }
+// #endregion
 
+// #region Mobile menu
 @media screen and (max-width: 991px) {
+	// Smooth slide-down animation
 	.navbar-collapse {
-		padding-bottom: 20px;
+		display: block !important;
+		max-height: 0;
+		overflow: hidden;
+		transition: max-height 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+		padding-bottom: 0;
+
+		&.show {
+			max-height: 600px;
+		}
 	}
 
+	// Nav list layout
+	.navbar-nav {
+		padding: 12px 0 4px;
+	}
+
+	// Individual nav items with dividers
+	.navbar-nav .nav-item {
+		border-bottom: 1px solid var(--border-color);
+
+		&:last-child {
+			border-bottom: none;
+		}
+	}
+
+	// Nav links with better touch targets
 	:host ::ng-deep .navbar-expand-lg .navbar-nav .nav-link {
-		padding: 10px;
+		padding: 14px 12px;
+		border-radius: 8px;
+		margin: 2px 0;
+		transition: background-color 0.15s ease;
+		display: block;
+	}
+
+	// Active state with left accent
+	.navbar-nav .nav-link.active {
+		font-weight: var(--font-weight-semibold);
+		border-left: 3px solid var(--custom-btn-bg-color);
+		padding-left: 9px;
+		border-radius: 0 8px 8px 0;
+	}
+
+	// Dropdown toggle arrow rotation
+	.dropdown-toggle::after {
+		transition: transform 0.3s ease;
+		float: right;
+		margin-top: 6px;
+	}
+
+	.dropdown.show .dropdown-toggle::after {
+		transform: rotate(180deg);
+	}
+
+	// Dropdown sub-menu
+	.dropdown-menu {
+		box-shadow: none;
+		border: 0;
+		margin-top: 0;
+		padding: 0 0 4px 12px;
+		background: transparent;
+		max-height: 0;
+		overflow: hidden;
+		transition: max-height 0.3s ease, padding 0.3s ease;
+	}
+
+	.dropdown.show .dropdown-menu {
+		display: block;
+		max-height: 200px;
+		padding: 4px 0 8px 12px;
+	}
+
+	.dropdown-item {
+		border-bottom: 0;
+		padding: 10px 12px;
+		border-radius: 6px;
+		display: block;
+		transition: background-color 0.15s ease;
+
+		&.active {
+			font-weight: var(--font-weight-semibold);
+		}
 	}
 
 	:host ::ng-deep .navbar-expand-lg .navbar-nav .nav-link.custom-btn {
 		margin-top: 10px;
 	}
 
-	/* Mobile dropdown improvements */
-	.dropdown-menu {
-		box-shadow: none;
-		border: 0;
-		margin-top: 0;
-		padding-left: 15px;
-		background: transparent;
-	}
-
-	.dropdown-item {
-		border-bottom: 0;
-		padding: 8px 10px;
+	// Intranet link separator
+	.mobile-intranet {
+		margin-top: 4px;
+		padding-top: 4px;
+		border-bottom: none !important;
 	}
 }
+// #endregion
 // #endregion

@@ -143,6 +143,27 @@
 
 	.site-footer-bottom {
 		margin-top: 50px;
+		text-align: center;
+
+		// Stack copyright + privacy links vertically
+		.col-12 {
+			flex-direction: column;
+		}
+
+		.copyright-text {
+			margin-right: 0;
+			margin-bottom: 10px;
+		}
+
+		.footer-menu {
+			justify-content: center;
+		}
+
+		.social-icon {
+			display: flex;
+			justify-content: center;
+			gap: 4px;
+		}
 	}
 }
 
