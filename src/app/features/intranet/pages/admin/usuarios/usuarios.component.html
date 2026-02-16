@@ -3,7 +3,7 @@
 	<!-- * Header actions -->
 	<app-usuarios-header (refresh)="onRefresh()" />
 
-	@if (vm().showSkeletons && !vm().statsReady) {
+	@if (!vm().statsReady) {
 		<!-- * Stats skeleton while loading -->
 		<app-usuarios-stats-skeleton />
 	} @else if (vm().hasEstadisticas) {
@@ -23,11 +23,9 @@
 		(newUsuario)="onNewUsuario()"
 	/>
 
-	@if (vm().showSkeletons && !vm().tableReady) {
+	@if (!vm().tableReady) {
 		<!-- * Table skeleton while loading -->
-		<section class="table-section" style="min-height: 420px;">
-			<app-usuarios-table-skeleton />
-		</section>
+		<app-usuarios-table-skeleton />
 	} @else {
 		<!-- * Users table -->
 		<app-usuarios-table

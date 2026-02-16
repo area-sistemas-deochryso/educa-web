@@ -22,6 +22,8 @@ import { Textarea } from 'primeng/textarea';
 import { Select } from 'primeng/select';
 import { MenuItem } from 'primeng/api';
 import { EstudianteAsistencia, EstadisticasAsistenciaDia } from '@core/services';
+import { SkeletonLoaderComponent, TableSkeletonComponent } from '@shared/components';
+import type { SkeletonColumnDef } from '@shared/components';
 import { getStatusClass } from '@features/intranet/pages/attendance-component/config/attendance.constants';
 import { AttendanceStatus } from '@features/intranet/pages/attendance-component/models/attendance.types';
 
@@ -53,6 +55,8 @@ export interface JustificacionEvent {
 		DatePickerModule,
 		CardModule,
 		SkeletonModule,
+		SkeletonLoaderComponent,
+		TableSkeletonComponent,
 		ButtonModule,
 		MenuModule,
 		TooltipModule,
@@ -88,7 +92,14 @@ export class AsistenciaDiaListComponent {
 
 	// * Constants
 	readonly today = new Date();
-	readonly skeletonRows = Array(5);
+	readonly skeletonBadges = Array(7);
+	readonly diaColumns: SkeletonColumnDef[] = [
+		{ width: '50px', cellType: 'text' },
+		{ width: 'flex', cellType: 'text-subtitle' },
+		{ width: '100px', cellType: 'text' },
+		{ width: '100px', cellType: 'text' },
+		{ width: '80px', cellType: 'badge' },
+	];
 	private readonly PREFIJO_JUSTIFICACION = 'Justificado: ';
 
 	// * Local state for the datepicker model

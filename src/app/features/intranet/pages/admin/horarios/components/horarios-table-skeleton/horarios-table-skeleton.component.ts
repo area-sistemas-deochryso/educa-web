@@ -7,21 +7,23 @@ import type { SkeletonColumnDef } from '@shared/components';
 
 // #region Implementation
 @Component({
-	selector: 'app-usuarios-table-skeleton',
+	selector: 'app-horarios-table-skeleton',
 	standalone: true,
 	imports: [TableSkeletonComponent],
 	changeDetection: ChangeDetectionStrategy.OnPush,
-	templateUrl: './usuarios-table-skeleton.component.html',
-	styleUrls: ['./usuarios-table-skeleton.scss'],
+	templateUrl: './horarios-table-skeleton.component.html',
+	styleUrls: ['./horarios-table-skeleton.component.scss'],
 })
-export class UsuariosTableSkeletonComponent {
+export class HorariosTableSkeletonComponent {
 	readonly columns: SkeletonColumnDef[] = [
 		{ width: '80px', cellType: 'text' },
 		{ width: '100px', cellType: 'text' },
-		{ width: 'flex', cellType: 'avatar-text' },
-		{ width: '120px', cellType: 'badge' },
+		{ width: '110px', cellType: 'text' },
 		{ width: '100px', cellType: 'badge' },
-		{ width: '140px', cellType: 'actions' },
+		{ width: 'flex', cellType: 'avatar-text' },
+		{ width: '90px', cellType: 'text' },
+		{ width: '90px', cellType: 'badge' },
+		{ width: '120px', cellType: 'actions' },
 	];
 }
 // #endregion

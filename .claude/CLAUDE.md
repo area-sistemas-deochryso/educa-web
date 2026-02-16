@@ -233,6 +233,7 @@ Cuando se registra una asistencia (entrada/salida):
 @.claude/rules/a11y.md
 @.claude/rules/primeng.md
 @.claude/rules/lazy-rendering.md
+@.claude/rules/skeletons.md
 @.claude/rules/dialogs-sync.md
 @.claude/rules/crud-optimization.md
 @.claude/rules/enforcement.md

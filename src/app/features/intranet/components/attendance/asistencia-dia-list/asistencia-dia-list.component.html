@@ -51,10 +51,19 @@
 	</ng-template>
 
 	@if (loading()) {
-		<!-- * Skeleton rows while loading -->
-		<div class="skeleton-container">
-			@for (_ of skeletonRows; track $index) {
-				<p-skeleton height="3rem" class="skeleton-row" />
+		<!-- * Skeleton: table + stats footer -->
+		<app-table-skeleton [columns]="diaColumns" [rows]="6" minHeight="300px" />
+
+		<!-- * Skeleton stats footer -->
+		<div class="skeleton-footer">
+			@for (_ of skeletonBadges; track $index) {
+				<div class="skeleton-badge">
+					<app-skeleton-loader variant="rect" width="52px" height="52px" />
+					<div class="skeleton-badge-content">
+						<app-skeleton-loader variant="text" width="28px" height="18px" />
+						<app-skeleton-loader variant="text" width="52px" height="10px" />
+					</div>
+				</div>
 			}
 		</div>
 	} @else if (estudiantesDelDia().length === 0) {

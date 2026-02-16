@@ -1,0 +1,20 @@
+<!-- #region Template -->
+<section class="stats-section" [style.grid-template-columns]="'repeat(auto-fit, minmax(' + minColumnWidth() + ', 1fr))'">
+	@for (_ of cardArray(); track $index) {
+		<div class="stat-card" [class.stat-card--icon-right]="iconPosition() === 'right'">
+			<!-- * Icon -->
+			<div class="stat-icon">
+				<app-skeleton-loader variant="circle" width="48px" height="48px" />
+			</div>
+			<!-- * Content -->
+			<div class="stat-content">
+				<app-skeleton-loader variant="text" width="80px" height="14px" />
+				<app-skeleton-loader variant="text" width="60px" height="32px" />
+				@if (showDescription()) {
+					<app-skeleton-loader variant="text" width="120px" height="12px" />
+				}
+			</div>
+		</div>
+	}
+</section>
+<!-- #endregion -->

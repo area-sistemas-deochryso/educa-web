@@ -31,7 +31,7 @@
 </div>
 
 <!-- * Estadisticas -->
-@if (vm().estadisticas) {
+@if (vm().statsReady) {
 	<div class="stats-grid">
 		<div class="stat-card">
 			<div
@@ -85,6 +85,8 @@
 			</div>
 		</div>
 	</div>
+} @else {
+	<app-horarios-stats-skeleton />
 }
 
 <!-- #region Filtros -->
@@ -148,15 +150,18 @@
 <!-- #endregion -->
 <!-- #region Vista Lista -->
 @if (vm().vistaActual === 'lista') {
-	<app-horarios-list-view
-		[horarios]="vm().horariosFiltrados"
-		[loading]="vm().loading"
-		(viewDetail)="onViewDetail($event)"
-		(edit)="onEdit($event)"
-		(toggleEstado)="onToggleEstado($event.id, $event.estadoActual)"
-		(delete)="onDelete($event)"
-	/>
-	<!--  -->
+	@if (vm().tableReady) {
+		<app-horarios-list-view
+			[horarios]="vm().horariosFiltrados"
+			[loading]="vm().loading"
+			(viewDetail)="onViewDetail($event)"
+			(edit)="onEdit($event)"
+			(toggleEstado)="onToggleEstado($event.id, $event.estadoActual)"
+			(delete)="onDelete($event)"
+		/>
+	} @else {
+		<app-horarios-table-skeleton />
+	}
 }
 
 <!-- #endregion -->

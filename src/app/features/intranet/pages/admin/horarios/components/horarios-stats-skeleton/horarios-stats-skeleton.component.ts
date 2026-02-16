@@ -6,12 +6,12 @@ import { StatsSkeletonComponent } from '@shared/components';
 
 // #region Implementation
 @Component({
-	selector: 'app-usuarios-stats-skeleton',
+	selector: 'app-horarios-stats-skeleton',
 	standalone: true,
 	imports: [StatsSkeletonComponent],
 	changeDetection: ChangeDetectionStrategy.OnPush,
-	templateUrl: './usuarios-stats-skeleton.component.html',
-	styleUrls: ['./usuarios-stats-skeleton.component.scss'],
+	templateUrl: './horarios-stats-skeleton.component.html',
+	styleUrls: ['./horarios-stats-skeleton.component.scss'],
 })
-export class UsuariosStatsSkeletonComponent {}
+export class HorariosStatsSkeletonComponent {}
 // #endregion

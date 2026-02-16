@@ -64,6 +64,8 @@ export class HorariosFacade {
           this.calculateEstadisticas(horarios);
           this.store.setLoading(false);
           this.store.setOptionsLoading(false);
+          this.store.setStatsReady(true);
+          this.store.setTableReady(true);
         },
         error: (err) => {
           logger.error('Error al cargar datos:', err);

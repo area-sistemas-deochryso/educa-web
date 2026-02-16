@@ -1,0 +1,62 @@
+<!-- #region Template -->
+<div class="table-skeleton" [style.min-height]="minHeight()">
+	<!-- * Header row -->
+	@if (showHeader()) {
+		<div class="table-skeleton__header">
+			@for (col of columns(); track $index) {
+				<div
+					class="header-cell"
+					[style.width]="col.width !== 'flex' ? col.width : null"
+					[style.flex]="col.width === 'flex' ? '1' : null"
+				>
+					<app-skeleton-loader variant="text" [width]="col.headerWidth ?? '80%'" height="16px" />
+				</div>
+			}
+		</div>
+	}
+
+	<!-- * Body rows -->
+	@for (_ of rowArray(); track $index) {
+		<div class="table-skeleton__row">
+			@for (col of columns(); track $index) {
+				<div
+					class="row-cell"
+					[style.width]="col.width !== 'flex' ? col.width : null"
+					[style.flex]="col.width === 'flex' ? '1' : null"
+				>
+					@switch (col.cellType) {
+						@case ('text') {
+							<app-skeleton-loader variant="text" width="70%" height="16px" />
+						}
+						@case ('text-subtitle') {
+							<div class="cell-stack">
+								<app-skeleton-loader variant="text" width="80%" height="16px" />
+								<app-skeleton-loader variant="text" width="60%" height="12px" />
+							</div>
+						}
+						@case ('avatar-text') {
+							<div class="cell-avatar">
+								<app-skeleton-loader variant="circle" width="40px" height="40px" />
+								<div class="cell-stack">
+									<app-skeleton-loader variant="text" width="80%" height="16px" />
+									<app-skeleton-loader variant="text" width="60%" height="12px" />
+								</div>
+							</div>
+						}
+						@case ('badge') {
+							<app-skeleton-loader variant="rect" width="80px" height="24px" />
+						}
+						@case ('actions') {
+							<div class="cell-actions">
+								<app-skeleton-loader variant="circle" width="32px" height="32px" />
+								<app-skeleton-loader variant="circle" width="32px" height="32px" />
+								<app-skeleton-loader variant="circle" width="32px" height="32px" />
+							</div>
+						}
+					}
+				</div>
+			}
+		</div>
+	}
+</div>
+<!-- #endregion -->

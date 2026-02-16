@@ -13,6 +13,8 @@ import { HorarioResponseDto } from './models/horario.interface';
 import { HorariosFacade } from './services/horarios.facade';
 import { HorariosFiltersComponent } from './components/horarios-filters/horarios-filters.component';
 import { HorariosListViewComponent } from './components/horarios-list-view/horarios-list-view.component';
+import { HorariosStatsSkeletonComponent } from './components/horarios-stats-skeleton/horarios-stats-skeleton.component';
+import { HorariosTableSkeletonComponent } from './components/horarios-table-skeleton/horarios-table-skeleton.component';
 import { HorariosWeeklyViewComponent } from './components/horarios-weekly-view/horarios-weekly-view.component';
 import { InputTextModule } from 'primeng/inputtext';
 import { ProgressSpinnerModule } from 'primeng/progressspinner';
@@ -51,6 +53,8 @@ import {
 		HorarioDetailDrawerComponent,
 		HorariosFiltersComponent,
 		HorariosListViewComponent,
+		HorariosStatsSkeletonComponent,
+		HorariosTableSkeletonComponent,
 		HorariosWeeklyViewComponent,
 	],
 	templateUrl: './horarios.component.html',

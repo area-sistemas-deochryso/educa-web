@@ -1,5 +1,5 @@
 // #region Imports
-import { AfterViewInit, ChangeDetectionStrategy, Component, OnInit, inject } from '@angular/core';
+import { AfterViewInit, ChangeDetectionStrategy, Component, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ConfirmDialogModule } from 'primeng/confirmdialog';
 import { ConfirmationService } from 'primeng/api';
@@ -48,7 +48,7 @@ import {
 	styleUrl: './usuarios.component.scss',
 	changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class UsuariosComponent implements OnInit, AfterViewInit {
+export class UsuariosComponent implements AfterViewInit {
 	private facade = inject(UsuariosFacade);
 	private confirmationService = inject(ConfirmationService);
 
@@ -83,8 +83,9 @@ export class UsuariosComponent implements OnInit, AfterViewInit {
 		};
 	}
 
-	ngOnInit(): void {
-		// * Initial data fetch for list + stats + filters.
+	constructor() {
+		// Disparar carga en constructor para que los skeletons se muestren
+		// desde el primer frame sin esperar a ngOnInit
 		this.facade.loadData();
 	}
 

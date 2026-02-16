@@ -1,6 +1,14 @@
 <!-- #region Template -->
 <!-- * Single skeleton block with shimmer animation. -->
-<div class="skeleton" [class]="variant()" [style.width]="width()" [style.height]="height()">
+<div
+	class="skeleton"
+	[class.skeleton--text]="variant() === 'text'"
+	[class.skeleton--circle]="variant() === 'circle'"
+	[class.skeleton--rect]="variant() === 'rect'"
+	[class.skeleton--card]="variant() === 'card'"
+	[style.width]="width()"
+	[style.height]="height()"
+>
 	<div class="skeleton__shimmer"></div>
 </div>
 <!-- #endregion -->

@@ -32,6 +32,10 @@ interface HorariosStoreState {
   detailLoading: boolean;
   optionsLoading: boolean; // Carga de salones/cursos
 
+  // Performance optimization - Skeleton screens
+  statsReady: boolean;
+  tableReady: boolean;
+
   // #endregion
   // #region UI State
   dialogVisible: boolean;
@@ -75,6 +79,8 @@ const initialState: HorariosStoreState = {
   statsLoading: false,
   detailLoading: false,
   optionsLoading: false,
+  statsReady: false,
+  tableReady: false,
   dialogVisible: false,
   detailDrawerVisible: false,
   cursoDialogVisible: false,
@@ -110,6 +116,8 @@ export class HorariosStore {
   readonly editingId = computed(() => this._state().editingId);
   readonly vistaActual = computed(() => this._state().vistaActual);
   readonly optionsLoading = computed(() => this._state().optionsLoading);
+  readonly statsReady = computed(() => this._state().statsReady);
+  readonly tableReady = computed(() => this._state().tableReady);
 
   // #endregion
   // #region Usuario actual
@@ -411,6 +419,8 @@ export class HorariosStore {
     profesoresOptions: this.profesoresOptions(),
     cursoDialogVisible: this._state().cursoDialogVisible,
     optionsLoading: this.optionsLoading(),
+    statsReady: this.statsReady(),
+    tableReady: this.tableReady(),
   }));
 
   // #endregion
@@ -504,6 +514,14 @@ export class HorariosStore {
 
   setDetailLoading(loading: boolean): void {
     this._state.update((s) => ({ ...s, detailLoading: loading }));
+  }
+
+  setStatsReady(ready: boolean): void {
+    this._state.update((s) => ({ ...s, statsReady: ready }));
+  }
+
+  setTableReady(ready: boolean): void {
+    this._state.update((s) => ({ ...s, tableReady: ready }));
   }
 
   // #endregion

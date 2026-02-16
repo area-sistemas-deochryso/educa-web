@@ -6,6 +6,8 @@ export * from './toast-container';
 export * from './form-error';
 export * from './form-field-error/form-field-error.component';
 export * from './skeleton-loader/skeleton-loader.component';
+export * from './table-skeleton';
+export * from './stats-skeleton';
 export * from './lazy-content/lazy-content.component';
 export * from './devtools';
 // #endregion

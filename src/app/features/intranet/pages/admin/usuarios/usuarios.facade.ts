@@ -12,7 +12,7 @@ import {
 } from '@core/services';
 import { DestroyRef, Injectable, inject } from '@angular/core';
 import { catchError, filter } from 'rxjs/operators';
-import { of } from 'rxjs';
+import { forkJoin, of } from 'rxjs';
 
 import { UsuariosStore } from './usuarios.store';
 import { DebugService, logger } from '@core/helpers';
@@ -44,74 +44,52 @@ export class UsuariosFacade {
 	// #region Data Loading
 
 	loadData(): void {
-		// Inicializar estados de skeleton
 		this.store.setShowSkeletons(true);
 		this.store.setStatsReady(false);
 		this.store.setTableReady(false);
 		this.store.setLoading(true);
 
-		// Renderizado progresivo:
-		// 1. Cargar estadísticas primero (más pequeñas, más rápidas)
-		// 2. Cargar salones (para formulario de profesor)
-		// 3. Luego cargar usuarios (más grandes)
-
-		// Paso 1: Cargar estadísticas
-		this.usuariosService
-			.obtenerEstadisticas()
-			.pipe(
+		// Ejecutar las 3 llamadas en paralelo para evitar carga en 3 tiempos
+		forkJoin({
+			estadisticas: this.usuariosService.obtenerEstadisticas().pipe(
 				catchError((err) => {
 					logger.error('Error cargando estadísticas:', err);
 					return of(null);
 				}),
-				takeUntilDestroyed(this.destroyRef),
-			)
-			.subscribe((estadisticas) => {
+			),
+			salones: this.asistenciaService.getSalonesDirector().pipe(
+				catchError((err) => {
+					logger.error('Error cargando salones:', err);
+					return of([]);
+				}),
+			),
+			usuarios: this.usuariosService.listarUsuarios().pipe(
+				catchError((err) => {
+					logger.error('Error cargando usuarios:', err);
+					this.errorHandler.showError(
+						UI_SUMMARIES.error,
+						UI_ADMIN_ERROR_DETAILS.loadUsuarios,
+					);
+					return of([] as UsuarioLista[]);
+				}),
+			),
+		})
+			.pipe(takeUntilDestroyed(this.destroyRef))
+			.subscribe(({ estadisticas, salones, usuarios }) => {
 				if (estadisticas) {
 					this.store.setEstadisticas(estadisticas);
 				}
-				// Marcar stats como listas y ocultar su skeleton
 				this.store.setStatsReady(true);
 
-				// Paso 2: Cargar salones (para selector de profesor)
-				this.asistenciaService
-					.getSalonesDirector()
-					.pipe(
-						catchError((err) => {
-							logger.error('Error cargando salones:', err);
-							return of([]);
-						}),
-						takeUntilDestroyed(this.destroyRef),
-					)
-					.subscribe((salones) => {
-						this.store.setSalones(salones);
+				this.store.setSalones(salones);
 
-						// Paso 3: Cargar usuarios (renderizado progresivo)
-						this.usuariosService
-							.listarUsuarios()
-							.pipe(
-								catchError((err) => {
-									logger.error('Error cargando usuarios:', err);
-									this.errorHandler.showError(
-										UI_SUMMARIES.error,
-										UI_ADMIN_ERROR_DETAILS.loadUsuarios,
-									);
-									return of([] as UsuarioLista[]);
-								}),
-								takeUntilDestroyed(this.destroyRef),
-							)
-							.subscribe((usuarios) => {
-								// Filtrar apoderados para no mostrarlos en admin
-								this.store.setUsuarios(usuarios.filter((u) => u.rol !== 'Apoderado'));
-								this.store.setTableReady(true);
-								this.store.setLoading(false);
+				this.store.setUsuarios(usuarios.filter((u) => u.rol !== 'Apoderado'));
+				this.store.setTableReady(true);
+				this.store.setLoading(false);
 
-								// Ocultar todos los skeletons después de un pequeño delay
-								// para asegurar que el contenido está renderizado
-								setTimeout(() => {
-									this.store.setShowSkeletons(false);
-								}, 50);
-							});
-					});
+				setTimeout(() => {
+					this.store.setShowSkeletons(false);
+				}, 50);
 			});
 	}
 
