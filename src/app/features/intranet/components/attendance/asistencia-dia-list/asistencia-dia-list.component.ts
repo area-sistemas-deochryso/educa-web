@@ -22,7 +22,11 @@ import { Textarea } from 'primeng/textarea';
 import { Select } from 'primeng/select';
 import { MenuItem } from 'primeng/api';
 import { EstudianteAsistencia, EstadisticasAsistenciaDia } from '@core/services';
-import { SkeletonLoaderComponent, TableSkeletonComponent } from '@shared/components';
+import {
+	ResponsiveTableComponent,
+	SkeletonLoaderComponent,
+	TableSkeletonComponent,
+} from '@shared/components';
 import type { SkeletonColumnDef } from '@shared/components';
 import { getStatusClass } from '@features/intranet/pages/attendance-component/config/attendance.constants';
 import { AttendanceStatus } from '@features/intranet/pages/attendance-component/models/attendance.types';
@@ -57,6 +61,7 @@ export interface JustificacionEvent {
 		SkeletonModule,
 		SkeletonLoaderComponent,
 		TableSkeletonComponent,
+		ResponsiveTableComponent,
 		ButtonModule,
 		MenuModule,
 		TooltipModule,

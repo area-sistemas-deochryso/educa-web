@@ -73,78 +73,131 @@
 			<p>No hay registros de asistencia para esta fecha</p>
 		</div>
 	} @else {
-		<!-- * Day list table -->
-		<p-table [value]="estudiantesDelDia()" class="p-datatable-sm asistencia-table">
-			<ng-template #header>
-				<tr>
-					<th style="width: 50px">#</th>
-					<th>Estudiante</th>
-					<th style="width: 100px" class="text-center">Entrada</th>
-					<th style="width: 100px" class="text-center">Salida</th>
-					<th style="width: 80px" class="text-center">Estado</th>
-				</tr>
+		<!-- * Day list table + mobile cards -->
+		<app-responsive-table
+			[value]="estudiantesDelDia()"
+			[paginator]="false"
+			emptyMessage="No hay registros de asistencia"
+			emptyIcon="pi pi-users"
+			ariaLabel="Lista de asistencia del día"
+		>
+			<!-- #region Desktop: tabla estándar -->
+			<ng-template #desktopView>
+				<p-table [value]="estudiantesDelDia()" class="p-datatable-sm asistencia-table">
+					<ng-template #header>
+						<tr>
+							<th style="width: 50px">#</th>
+							<th>Estudiante</th>
+							<th style="width: 100px" class="text-center">Entrada</th>
+							<th style="width: 100px" class="text-center">Salida</th>
+							<th style="width: 80px" class="text-center">Estado</th>
+						</tr>
+					</ng-template>
+					<ng-template #body let-estudiante let-i="rowIndex">
+						<tr
+							[class.row-clickable]="allowJustify() && estudiante.puedeJustificar"
+							[pTooltip]="
+								allowJustify() && estudiante.puedeJustificar
+									? estudiante.esJustificado
+										? 'Clic para editar/quitar justificación'
+										: 'Clic para justificar'
+									: ''
+							"
+							tooltipPosition="top"
+							[appendTo]="'body'"
+							[tooltipOptions]="{ showDelay: 300 }"
+							(click)="onEstudianteClick(estudiante)"
+						>
+							<td class="row-number">{{ i + 1 }}</td>
+							<td>
+								<div class="estudiante-info">
+									<span class="nombre">{{ estudiante.nombreCompleto }}</span>
+									<span class="dni">DNI: {{ estudiante.dni }}</span>
+									@if (estudiante.observacion) {
+										<span
+											class="observacion"
+											pTooltip="{{ estudiante.observacion }}"
+											tooltipPosition="top"
+										>
+											<i class="pi pi-info-circle"></i>
+											{{ estudiante.observacion | slice: 0 : 30
+											}}{{ estudiante.observacion.length > 30 ? '...' : '' }}
+										</span>
+									}
+								</div>
+							</td>
+							<td class="text-center">
+								<span class="hora" [class.hora-empty]="!estudiante.horaEntrada">
+									@if (estudiante.horaEntrada) {
+										<i class="pi pi-sign-in"></i>
+									}
+									{{ formatTime(estudiante.horaEntrada) }}
+								</span>
+							</td>
+							<td class="text-center">
+								<span class="hora" [class.hora-empty]="!estudiante.horaSalida">
+									@if (estudiante.horaSalida) {
+										<i class="pi pi-sign-out"></i>
+									}
+									{{ formatTime(estudiante.horaSalida) }}
+								</span>
+							</td>
+							<td class="text-center">
+								<span class="estado-box" [class]="getStatusClass(estudiante.estadoCodigo)">
+									{{ estudiante.estadoCodigo }}
+								</span>
+							</td>
+						</tr>
+					</ng-template>
+				</p-table>
 			</ng-template>
-			<ng-template #body let-estudiante let-i="rowIndex">
-				<tr
+			<!-- #endregion -->
+
+			<!-- #region Mobile: card por estudiante -->
+			<ng-template #mobileCard let-estudiante>
+				<div
+					class="mobile-card-inner"
 					[class.row-clickable]="allowJustify() && estudiante.puedeJustificar"
-					[pTooltip]="
-						allowJustify() && estudiante.puedeJustificar
-							? estudiante.esJustificado
-								? 'Clic para editar/quitar justificación'
-								: 'Clic para justificar'
-							: ''
-					"
-					tooltipPosition="top"
-					[appendTo]="'body'"
-					[tooltipOptions]="{ showDelay: 300 }"
 					(click)="onEstudianteClick(estudiante)"
 				>
-					<td class="row-number">{{ i + 1 }}</td>
-					<td>
-						<!-- * Name + DNI + Observación -->
+					<!-- Titulo: nombre + estado -->
+					<div class="rt-card__title mobile-card-title">
 						<div class="estudiante-info">
 							<span class="nombre">{{ estudiante.nombreCompleto }}</span>
 							<span class="dni">DNI: {{ estudiante.dni }}</span>
-							@if (estudiante.observacion) {
-								<span
-									class="observacion"
-									pTooltip="{{ estudiante.observacion }}"
-									tooltipPosition="top"
-								>
-									<i class="pi pi-info-circle"></i>
-									{{ estudiante.observacion | slice: 0 : 30
-									}}{{ estudiante.observacion.length > 30 ? '...' : '' }}
-								</span>
-							}
 						</div>
-					</td>
-					<td class="text-center">
-						<!-- * Entry time -->
-						<span class="hora" [class.hora-empty]="!estudiante.horaEntrada">
-							@if (estudiante.horaEntrada) {
-								<i class="pi pi-sign-in"></i>
-							}
-							{{ formatTime(estudiante.horaEntrada) }}
-						</span>
-					</td>
-					<td class="text-center">
-						<!-- * Exit time -->
-						<span class="hora" [class.hora-empty]="!estudiante.horaSalida">
-							@if (estudiante.horaSalida) {
-								<i class="pi pi-sign-out"></i>
-							}
-							{{ formatTime(estudiante.horaSalida) }}
-						</span>
-					</td>
-					<td class="text-center">
-						<!-- * Status code -->
 						<span class="estado-box" [class]="getStatusClass(estudiante.estadoCodigo)">
 							{{ estudiante.estadoCodigo }}
 						</span>
-					</td>
-				</tr>
+					</div>
+
+					<!-- Horarios -->
+					<div class="rt-card__field">
+						<span class="rt-card__label"><i class="pi pi-sign-in"></i> Entrada</span>
+						<span class="hora" [class.hora-empty]="!estudiante.horaEntrada">
+							{{ formatTime(estudiante.horaEntrada) }}
+						</span>
+					</div>
+					<div class="rt-card__field">
+						<span class="rt-card__label"><i class="pi pi-sign-out"></i> Salida</span>
+						<span class="hora" [class.hora-empty]="!estudiante.horaSalida">
+							{{ formatTime(estudiante.horaSalida) }}
+						</span>
+					</div>
+
+					<!-- Observación (si existe) -->
+					@if (estudiante.observacion) {
+						<div class="rt-card__field mobile-card-observacion">
+							<span class="observacion">
+								<i class="pi pi-info-circle"></i>
+								{{ estudiante.observacion }}
+							</span>
+						</div>
+					}
+				</div>
 			</ng-template>
-		</p-table>
+			<!-- #endregion -->
+		</app-responsive-table>
 
 		<!-- * Footer stats summary -->
 		<div class="resumen-footer">

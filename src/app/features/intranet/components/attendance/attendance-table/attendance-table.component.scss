@@ -19,6 +19,8 @@ $color-no: #f44336;
 	display: flex;
 	justify-content: space-between;
 	align-items: center;
+	flex-wrap: wrap;
+	gap: 0.75rem;
 	margin-bottom: 1.2rem;
 
 	h2 {
@@ -36,7 +38,9 @@ $color-no: #f44336;
 .section-title-row {
 	display: flex;
 	align-items: center;
-	gap: 1.5rem;
+	flex-wrap: wrap;
+	gap: 1rem;
+	min-width: 0;
 }
 
 .status-summary {

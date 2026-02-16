@@ -1,6 +1,6 @@
 <!-- #region Template -->
 <!-- * Public site header with nav + levels dropdown. -->
-<nav class="navbar navbar-expand-lg">
+<nav [class]="'navbar navbar-expand-lg navbar--' + headerState()">
 	<div class="container">
 		<a class="navbar-brand d-flex align-items-center" routerLink="/" (click)="closeMenu()">
 			<picture>
@@ -148,4 +148,17 @@
 		}
 	</div>
 </nav>
+
+<!-- Floating expand/collapse button (visible when scrolled) -->
+@if (headerState() !== 'normal') {
+	<button
+		type="button"
+		class="header-expand-btn"
+		[class.header-expand-btn--up]="isExpanded()"
+		(click)="toggleHeaderExpand()"
+		[attr.aria-label]="isExpanded() ? 'Ocultar menú' : 'Mostrar menú'"
+	>
+		<i [class]="isExpanded() ? 'bi-chevron-up' : 'bi-chevron-down'"></i>
+	</button>
+}
 <!-- #endregion -->

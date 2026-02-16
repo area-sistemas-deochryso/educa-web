@@ -22,7 +22,21 @@
 								'aria-label': 'Seleccionar estudiante',
 							},
 						}"
-					/>
+					>
+						<!-- * Selected: show only name, grade as tooltip -->
+						<ng-template #selectedItem let-selectedOption>
+							<span
+								[pTooltip]="selectedOption.gradeInfo"
+								tooltipPosition="top"
+							>
+								{{ selectedOption.shortLabel }}
+							</span>
+						</ng-template>
+						<!-- * Dropdown list: show full label for clarity -->
+						<ng-template #item let-option>
+							{{ option.label }}
+						</ng-template>
+					</p-select>
 				} @else {
 					{{ table().title }}
 				}

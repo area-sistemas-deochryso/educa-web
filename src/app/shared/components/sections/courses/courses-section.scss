@@ -84,4 +84,53 @@
 		margin-top: 5px;
 	}
 }
+
+@media screen and (max-width: 600px) {
+	.job-thumb {
+		position: relative;
+		padding-bottom: 60px;
+		flex-direction: column;
+		align-items: flex-start;
+	}
+
+	.job-image-wrap {
+		width: 60px;
+		min-width: 60px;
+		height: 60px;
+		margin-bottom: 12px;
+	}
+
+	.job-image {
+		padding: 14px;
+	}
+
+	.job-body {
+		margin-left: 0 !important;
+		width: 100%;
+	}
+
+	.job-body > .mb-3 {
+		width: 100%;
+	}
+
+	.job-location {
+		min-width: auto;
+	}
+
+	.job-date {
+		min-width: auto;
+		margin-right: 10px;
+	}
+
+	.job-date + .d-flex {
+		margin-left: auto;
+	}
+
+	.job-section-btn-wrap {
+		position: absolute;
+		right: 25px;
+		bottom: 2rem;
+		margin-left: 0;
+	}
+}
 // #endregion

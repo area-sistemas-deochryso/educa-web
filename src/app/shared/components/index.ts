@@ -9,5 +9,6 @@ export * from './skeleton-loader/skeleton-loader.component';
 export * from './table-skeleton';
 export * from './stats-skeleton';
 export * from './lazy-content/lazy-content.component';
+export * from './responsive-table';
 export * from './devtools';
 // #endregion

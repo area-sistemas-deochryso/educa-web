@@ -2,11 +2,13 @@
 .grado-seccion-selector {
 	display: inline-flex;
 	align-items: center;
+	flex-wrap: wrap;
 	gap: 0.75rem;
 	margin: 0 1rem 1rem 1rem;
 	padding: 0.75rem 1.25rem;
 	background: var(--surface-card);
 	border-radius: var(--border-radius);
+	max-width: 100%;
 
 	label {
 		font-weight: 600;
@@ -16,6 +18,8 @@
 
 	select {
 		width: auto;
+		min-width: 0;
+		max-width: 100%;
 		padding: 0.5rem 0.75rem;
 		border: 1px solid var(--surface-border);
 		border-radius: var(--border-radius);

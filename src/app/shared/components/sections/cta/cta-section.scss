@@ -31,4 +31,18 @@
 		padding-bottom: 50px;
 	}
 }
+
+@media screen and (max-width: 600px) {
+	.custom-border-btn-wrap {
+		flex-wrap: wrap;
+		gap: 12px;
+		width: 100%;
+		justify-content: space-between;
+		margin-bottom: 1rem;
+	}
+
+	.custom-border-btn-wrap .custom-btn {
+		margin-right: 0 !important;
+	}
+}
 // #endregion

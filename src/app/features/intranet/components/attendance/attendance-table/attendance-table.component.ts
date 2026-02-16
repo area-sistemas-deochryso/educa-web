@@ -4,6 +4,7 @@ import { DatePipe } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { TableModule } from 'primeng/table';
 import { Select } from 'primeng/select';
+import { Tooltip } from 'primeng/tooltip';
 import { HijoApoderado } from '@core/services';
 import {
 	AttendanceTable,
@@ -20,13 +21,15 @@ import {
 // #region Implementation
 export interface HijoOption {
 	label: string;
+	shortLabel: string;
+	gradeInfo: string;
 	value: number;
 }
 
 @Component({
 	selector: 'app-attendance-table',
 	standalone: true,
-	imports: [DatePipe, FormsModule, TableModule, Select],
+	imports: [DatePipe, FormsModule, TableModule, Select, Tooltip],
 	templateUrl: './attendance-table.component.html',
 	styleUrl: './attendance-table.component.scss',
 	changeDetection: ChangeDetectionStrategy.OnPush,
@@ -52,6 +55,8 @@ export class AttendanceTableComponent {
 	readonly hijosOptions = computed<HijoOption[]>(() =>
 		this.hijos().map((h) => ({
 			label: `${h.nombreCompleto} (${h.grado} - ${h.seccion})`,
+			shortLabel: h.nombreCompleto,
+			gradeInfo: `${h.grado} - ${h.seccion}`,
 			value: h.estudianteId,
 		})),
 	);

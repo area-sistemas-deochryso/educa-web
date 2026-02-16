@@ -3,13 +3,20 @@
 	display: flex;
 	align-items: center;
 	justify-content: space-between;
-	gap: 1.5rem;
+	flex-wrap: wrap;
+	gap: 1rem;
 	margin: 0 1rem 1rem 1rem;
 	padding-left: 1.5rem;
 
 	// Remover margin-bottom del selector dentro del row
 	::ng-deep app-grado-seccion-selector .grado-seccion-selector {
 		margin: 0;
+	}
+}
+
+@media (max-width: 768px) {
+	.selector-row {
+		padding-left: 0;
 	}
 }
 
@@ -22,6 +29,7 @@
 	padding: 0.75rem 1.25rem;
 	background: var(--surface-card);
 	border-radius: var(--border-radius);
+	flex-wrap: wrap;
 
 	.pdf-label {
 		font-size: 0.95rem;
@@ -34,6 +42,14 @@
 		min-width: 250px;
 	}
 
+}
+
+@media (max-width: 480px) {
+	.pdf-section {
+		.tipo-reporte-selector {
+			min-width: 180px;
+		}
+	}
 }
 
 // #endregion

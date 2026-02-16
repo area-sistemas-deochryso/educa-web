@@ -1,0 +1,40 @@
+<!-- #region Desktop view -->
+<div class="rt-desktop">
+	@if (desktopView()) {
+		<ng-container *ngTemplateOutlet="desktopView()" />
+	}
+</div>
+<!-- #endregion -->
+
+<!-- #region Mobile view -->
+<div class="rt-mobile" role="region" [attr.aria-label]="ariaLabel()">
+	@if (isEmpty()) {
+		<div class="rt-empty">
+			<i [class]="emptyIcon()"></i>
+			<p>{{ emptyMessage() }}</p>
+		</div>
+	} @else {
+		<div class="rt-card-list">
+			@for (item of paginatedItems(); track $index) {
+				<div class="rt-card">
+					@if (mobileCard()) {
+						<ng-container
+							*ngTemplateOutlet="mobileCard(); context: { $implicit: item }"
+						/>
+					}
+				</div>
+			}
+		</div>
+
+		@if (paginator() && totalRecords() > rows()) {
+			<p-paginator
+				[rows]="rows()"
+				[totalRecords]="totalRecords()"
+				[rowsPerPageOptions]="rowsPerPageOptions()"
+				[first]="cardFirst()"
+				(onPageChange)="onCardPageChange($event)"
+			/>
+		}
+	}
+</div>
+<!-- #endregion -->
