@@ -1,5 +1,5 @@
 // #region Imports
-import { Component, inject, computed } from '@angular/core';
+import { ChangeDetectionStrategy, Component, inject, computed } from '@angular/core';
 import { DialogModule } from 'primeng/dialog';
 import { ButtonModule } from 'primeng/button';
 
@@ -11,6 +11,7 @@ export const ACCESS_DENIED_MODAL_ID = 'access-denied-modal';
 
 @Component({
 	selector: 'app-access-denied-modal',
+	changeDetection: ChangeDetectionStrategy.OnPush,
 	imports: [DialogModule, ButtonModule],
 	templateUrl: './access-denied-modal.component.html',
 	styleUrl: './access-denied-modal.component.scss',

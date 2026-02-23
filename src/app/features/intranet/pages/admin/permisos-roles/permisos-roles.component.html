@@ -1,6 +1,6 @@
 <!-- #region Template -->
 <div class="permisos-container">
-	<!-- * Header -->
+	<!-- #region Header -->
 	<header class="page-header">
 		<div class="header-left">
 			<div class="header-icon">
@@ -25,19 +25,20 @@
 				icon="pi pi-plus"
 				class="p-button-success"
 				(click)="openNew()"
-				[disabled]="getRolesNoConfigurados().length === 0"
+				[disabled]="vm().rolesNoConfigurados.length === 0"
 				pTooltip="Todos los roles ya tienen permisos configurados"
-				[tooltipDisabled]="getRolesNoConfigurados().length > 0"
+				[tooltipDisabled]="vm().rolesNoConfigurados.length > 0"
 			></button>
 		</div>
 	</header>
+	<!-- #endregion -->
 
-	<!-- * Stats cards -->
+	<!-- #region Stats cards -->
 	<section class="stats-section">
 		<div class="stat-card">
 			<div class="stat-content">
 				<span class="stat-label">Roles Configurados</span>
-				<span class="stat-value">{{ totalRoles() }}</span>
+				<span class="stat-value">{{ vm().estadisticas.totalRoles }}</span>
 				<span class="stat-sublabel">de {{ rolesDisponibles.length }} disponibles</span>
 			</div>
 			<div class="stat-icon roles">
@@ -48,7 +49,7 @@
 		<div class="stat-card">
 			<div class="stat-content">
 				<span class="stat-label">Roles Pendientes</span>
-				<span class="stat-value">{{ getRolesNoConfigurados().length }}</span>
+				<span class="stat-value">{{ vm().rolesNoConfigurados.length }}</span>
 				<span class="stat-sublabel">sin configurar</span>
 			</div>
 			<div class="stat-icon pending">
@@ -59,7 +60,7 @@
 		<div class="stat-card">
 			<div class="stat-content">
 				<span class="stat-label">Modulos</span>
-				<span class="stat-value">{{ totalModulos() }}</span>
+				<span class="stat-value">{{ vm().estadisticas.totalModulos }}</span>
 				<span class="stat-sublabel">modulos del sistema</span>
 			</div>
 			<div class="stat-icon modules">
@@ -70,7 +71,7 @@
 		<div class="stat-card">
 			<div class="stat-content">
 				<span class="stat-label">Vistas Totales</span>
-				<span class="stat-value">{{ totalVistas() }}</span>
+				<span class="stat-value">{{ vm().estadisticas.totalVistas }}</span>
 				<span class="stat-sublabel">vistas disponibles</span>
 			</div>
 			<div class="stat-icon views">
@@ -78,23 +79,23 @@
 			</div>
 		</div>
 	</section>
+	<!-- #endregion -->
 
-	<!-- Table -->
-	@if (loading()) {
-		<div class="loading-container">
-			<p-progressSpinner strokeWidth="4" />
-		</div>
-	} @else {
-		<section class="table-section">
-			<p-table
-				[value]="permisosRol()"
-				[paginator]="true"
-				[rows]="10"
-				[rowsPerPageOptions]="[5, 10, 25]"
-				[showCurrentPageReport]="true"
-				currentPageReportTemplate="Mostrando {first} a {last} de {totalRecords} roles"
-				class="p-datatable-sm"
-			>
+	<!-- #region Table -->
+	<section class="table-section">
+		<p-table
+			[value]="vm().permisosRol"
+			[lazy]="true"
+			(onLazyLoad)="onLazyLoad($any($event))"
+			[paginator]="true"
+			[rows]="vm().pageSize"
+			[totalRecords]="vm().totalRecords"
+			[rowsPerPageOptions]="[5, 10, 25]"
+			[showCurrentPageReport]="true"
+			[loading]="vm().loading"
+			currentPageReportTemplate="Mostrando {first} a {last} de {totalRecords} roles"
+			class="p-datatable-sm"
+		>
 				<ng-template #header>
 					<tr>
 						<th style="width: 120px" pSortableColumn="rol">
@@ -195,41 +196,42 @@
 				</ng-template>
 			</p-table>
 		</section>
-	}
+	<!-- #endregion -->
 </div>
 
-<!-- Detail Drawer -->
+<!-- #region Detail Drawer -->
 <p-drawer
-	[(visible)]="detailDrawerVisible"
+	[visible]="vm().detailDrawerVisible"
+	(visibleChange)="onDrawerVisibleChange($event)"
 	position="right"
 	[style]="{ width: '500px' }"
 	[modal]="true"
 >
 	<ng-template pTemplate="header">
 		<div class="drawer-header">
-			<span>Permisos del Rol: {{ selectedPermiso()?.rol }}</span>
+			<span>Permisos del Rol: {{ vm().selectedPermiso?.rol }}</span>
 		</div>
 	</ng-template>
 
-	@if (selectedPermiso()) {
+	@if (vm().selectedPermiso) {
 		<div class="detail-content">
 			<!-- Info Summary -->
 			<div class="detail-summary">
 				<div class="summary-item">
 					<span class="summary-label">Rol</span>
 					<p-tag
-						[value]="selectedPermiso()?.rol || ''"
-						[severity]="adminUtils.getRolSeverity(selectedPermiso()?.rol || '')"
+						[value]="vm().selectedPermiso?.rol || ''"
+						[severity]="adminUtils.getRolSeverity(vm().selectedPermiso?.rol || '')"
 					/>
 				</div>
 				<div class="summary-item">
 					<span class="summary-label">Vistas Permitidas</span>
-					<span class="summary-value">{{ selectedPermiso()?.vistas?.length }}</span>
+					<span class="summary-value">{{ vm().selectedPermiso?.vistas?.length }}</span>
 				</div>
 				<div class="summary-item">
 					<span class="summary-label">Modulos</span>
 					<span class="summary-value">{{
-						adminUtils.getModulosCount(selectedPermiso()?.vistas || [])
+						adminUtils.getModulosCount(vm().selectedPermiso?.vistas || [])
 					}}</span>
 				</div>
 			</div>
@@ -237,7 +239,7 @@
 			<!-- Modules and Views -->
 			<div class="detail-modules">
 				<h3>Modulos y Vistas</h3>
-				@for (modulo of getModuloVistasForDetail(); track modulo.nombre) {
+				@for (modulo of vm().moduloVistasForDetail; track modulo.nombre) {
 					<div class="module-group">
 						<div class="module-header">
 							<i class="pi pi-folder"></i>
@@ -278,11 +280,13 @@
 		</div>
 	}
 </p-drawer>
+<!-- #endregion -->
 
-<!-- Edit Dialog -->
+<!-- #region Edit Dialog -->
 <p-dialog
-	[(visible)]="dialogVisible"
-	[header]="isEditing() ? 'Editar Permisos - ' + selectedRol() : 'Nuevo Permiso por Rol'"
+	[visible]="vm().dialogVisible"
+	(visibleChange)="onDialogVisibleChange($event)"
+	[header]="vm().isEditing ? 'Editar Permisos - ' + vm().selectedRol : 'Nuevo Permiso por Rol'"
 	[modal]="true"
 	[style]="{ width: '900px', maxHeight: '90vh' }"
 	[draggable]="false"
@@ -291,17 +295,17 @@
 >
 	<div class="dialog-content">
 		<!-- Role Info Header -->
-		@if (isEditing()) {
+		@if (vm().isEditing) {
 			<div class="dialog-role-header">
 				<div class="role-info">
 					<i class="pi pi-id-card"></i>
 					<p-tag
-						[value]="selectedRol() || ''"
-						[severity]="adminUtils.getRolSeverity(selectedRol() || '')"
+						[value]="vm().selectedRol || ''"
+						[severity]="adminUtils.getRolSeverity(vm().selectedRol || '')"
 					/>
 				</div>
 				<div class="vistas-count">
-					<i class="pi pi-check"></i> {{ getVistasCountLabel() }}
+					<i class="pi pi-check"></i> {{ vm().vistasCountLabel }}
 				</div>
 			</div>
 		} @else {
@@ -310,25 +314,26 @@
 					<label for="rol">Seleccione el Rol</label>
 					<p-select
 						id="rol"
-						[options]="rolesSelectOptions"
-						[ngModel]="selectedRol()"
-						(ngModelChange)="selectedRol.set($event)"
+						[options]="vm().rolesSelectOptions"
+						[ngModel]="vm().selectedRol"
+						(ngModelChange)="onSelectedRolChange($event)"
 						placeholder="Seleccione un rol"
 						[style]="{ width: '100%' }"
+						appendTo="body"
 					/>
 				</div>
 			</div>
 		}
 
 		<!-- Module Tabs -->
-		@if (modulosVistas().length > 0) {
+		@if (vm().modulosVistas.length > 0) {
 			<div class="modules-tabs-container">
 				<div class="modules-tabs">
-					@for (modulo of modulosVistas(); track modulo.nombre; let i = $index) {
+					@for (modulo of vm().modulosVistas; track modulo.nombre; let i = $index) {
 						<button
 							class="module-tab"
-							[class.active]="activeModuloIndex() === i"
-							(click)="activeModuloIndex.set(i)"
+							[class.active]="vm().activeModuloIndex === i"
+							(click)="onActiveModuloIndexChange(i)"
 						>
 							<i class="pi pi-folder"></i>
 							{{ modulo.nombre }}
@@ -346,15 +351,15 @@
 					<div class="vistas-header">
 						<label class="select-all">
 							<p-checkbox
-								[ngModel]="isAllModuloSelected()"
+								[ngModel]="vm().isAllModuloSelected"
 								(ngModelChange)="toggleAllVistasModulo()"
 								[binary]="true"
 							/>
 							<span>Seleccionar todas las vistas</span>
 						</label>
 						<span class="selection-count">
-							{{ modulosVistas()[activeModuloIndex()]?.seleccionadas }} de
-							{{ modulosVistas()[activeModuloIndex()]?.total }} seleccionadas
+							{{ vm().modulosVistas[vm().activeModuloIndex]?.seleccionadas }} de
+							{{ vm().modulosVistas[vm().activeModuloIndex]?.total }} seleccionadas
 						</span>
 					</div>
 
@@ -364,19 +369,19 @@
 							type="text"
 							pInputText
 							placeholder="Buscar por ruta..."
-							[ngModel]="vistasBusqueda()"
-							(ngModelChange)="vistasBusqueda.set($event)"
+							[ngModel]="vm().vistasBusqueda"
+							(ngModelChange)="onVistasBusquedaChange($event)"
 						/>
 					</div>
 
 					<div class="vistas-grid">
-						@for (vista of vistasFiltradas(); track vista.id) {
+						@for (vista of vm().vistasFiltradas; track vista.id) {
 							<div
 								class="vista-checkbox"
-								[class.selected]="isVistaSelected(vista.ruta)"
+								[class.selected]="vm().selectedVistas.includes(vista.ruta)"
 							>
 								<p-checkbox
-									[ngModel]="isVistaSelected(vista.ruta)"
+									[ngModel]="vm().selectedVistas.includes(vista.ruta)"
 									(ngModelChange)="toggleVista(vista.ruta)"
 									[binary]="true"
 								/>
@@ -404,7 +409,7 @@
 				label="Cancelar"
 				icon="pi pi-times"
 				class="p-button-text"
-				(click)="hideDialog()"
+				(click)="onDialogVisibleChange(false)"
 			></button>
 			<button
 				pButton
@@ -412,9 +417,13 @@
 				icon="pi pi-check"
 				class="p-button-success"
 				(click)="savePermiso()"
-				[disabled]="(!isEditing() && !selectedRol()) || selectedVistas().length === 0"
+				[disabled]="(!vm().isEditing && !vm().selectedRol) || vm().selectedVistas.length === 0"
 			></button>
 		</div>
 	</ng-template>
 </p-dialog>
+<!-- #endregion -->
+
+<!-- ConfirmDialog -->
+<p-confirmDialog (onHide)="onConfirmDialogHide()" />
 <!-- #endregion -->

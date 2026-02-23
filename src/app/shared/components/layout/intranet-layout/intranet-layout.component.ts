@@ -1,5 +1,5 @@
 // #region Imports
-import { Component, inject, OnInit, DestroyRef, signal, effect, computed } from '@angular/core';
+import { ChangeDetectionStrategy, Component, inject, OnInit, DestroyRef, signal, effect, computed } from '@angular/core';
 import { Router, RouterLink, RouterOutlet } from '@angular/router';
 import { VoiceButtonComponent } from '@shared/components/voice-button';
 import { FloatingNotificationBellComponent } from '@shared/components/floating-notification-bell';
@@ -17,6 +17,7 @@ import { FeatureFlagsFacade } from '@core/services/feature-flags';
 // #region Implementation
 @Component({
 	selector: 'app-intranet-layout',
+	changeDetection: ChangeDetectionStrategy.OnPush,
 	imports: [
 		RouterOutlet,
 		RouterLink,

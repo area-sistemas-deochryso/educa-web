@@ -11,14 +11,54 @@
 			[nombreProfesor]="nombreProfesor()"
 			(salonChange)="selectSalon($event)"
 		/>
+	</div>
 
-		@if (selectedSalon() && view.viewMode() === 'mes') {
-			<!-- * PDF actions only in month mode -->
-			<div class="pdf-section">
-				<span class="pdf-label">Reporte del día: {{ view.pdfFecha() | date: 'dd/MM/yyyy' }}</span>
+	@if (selectedSalon() && view.viewMode() === 'mes') {
+		<!-- * PDF actions below selector -->
+		<div class="pdf-section">
+			<!-- Toggle mes/periodo -->
+			<p-selectButton
+				[options]="view.monthSubModeOptions"
+				[ngModel]="view.monthSubMode()"
+				(ngModelChange)="view.setMonthSubMode($event)"
+				optionLabel="label"
+				optionValue="value"
+				[allowEmpty]="false"
+				styleClass="pdf-mode-toggle"
+			/>
+
+			<!-- Grouped: label/selectors + PDF button wrap together -->
+			<div class="pdf-report-info">
+				@if (view.monthSubMode() === 'periodo') {
+					<span class="pdf-label">Periodo:</span>
+					<p-select
+						[options]="view.mesOptionsInicio()"
+						[ngModel]="view.periodoInicio()"
+						(ngModelChange)="view.setPeriodoInicio($event)"
+						optionLabel="label"
+						optionValue="value"
+						appendTo="body"
+						styleClass="periodo-select"
+					/>
+					<span class="periodo-separator">–</span>
+					<p-select
+						[options]="view.mesOptionsFin()"
+						[ngModel]="view.periodoFin()"
+						(ngModelChange)="view.setPeriodoFin($event)"
+						optionLabel="label"
+						optionValue="value"
+						appendTo="body"
+						styleClass="periodo-select"
+					/>
+					<span class="pdf-label">{{ view.periodoYear() }}</span>
+				} @else {
+					<span class="pdf-label">Reporte mensual: {{ view.pdfFecha() | date: 'MMMM yyyy' }}</span>
+				}
+
 				<p-button
 					icon="pi pi-file-pdf"
 					[loading]="view.downloadingPdf()"
+					[disabled]="view.monthSubMode() === 'periodo' && !view.isPeriodoValid()"
 					severity="danger"
 					[text]="true"
 					[rounded]="true"
@@ -31,10 +71,10 @@
 						},
 					}"
 				/>
-				<p-menu #pdfMenu [model]="view.pdfMenuItems" [popup]="true" appendTo="body" />
+				<p-menu #pdfMenu [model]="view.pdfMenuItems()" [popup]="true" appendTo="body" />
 			</div>
-		}
-	</div>
+		</div>
+	}
 
 	@if (view.viewMode() === 'mes') {
 		@if (view.showSkeletons() && !view.tableReady()) {
@@ -70,7 +110,7 @@
 			[loading]="view.loading()"
 			[showPdfButton]="selectedSalon() !== null"
 			[downloadingPdf]="view.downloadingPdf()"
-			[pdfMenuItems]="view.pdfMenuItems"
+			[pdfMenuItems]="view.pdfMenuItems()"
 			[allowJustify]="true"
 			[savingJustificacion]="savingJustificacion()"
 			(fechaChange)="view.onFechaDiaChange($event)"

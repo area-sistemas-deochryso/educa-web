@@ -1,5 +1,5 @@
 // #region Imports
-import { Component, Input } from '@angular/core';
+import { ChangeDetectionStrategy, Component, Input } from '@angular/core';
 import { CommonModule } from '@angular/common';
 
 // #endregion
@@ -7,6 +7,7 @@ import { CommonModule } from '@angular/common';
 @Component({
 	selector: 'app-member-list',
 	standalone: true,
+	changeDetection: ChangeDetectionStrategy.OnPush,
 	imports: [CommonModule],
 	templateUrl: './member-list.component.html',
 	styleUrl: './member-list.component.scss',

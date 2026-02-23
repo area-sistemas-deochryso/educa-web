@@ -16,6 +16,7 @@ import {
 	output,
 	signal,
 } from '@angular/core';
+import { generatePassword } from '@core/helpers';
 
 import { ButtonModule } from 'primeng/button';
 import { Checkbox } from 'primeng/checkbox';
@@ -173,15 +174,7 @@ export class UsuarioFormDialogComponent {
 		}
 
 		// En creación, auto-generar desde apellido + DNI
-		const apellido = (this.formData().apellidos ?? '').trim();
-		const dniRaw = (this.formData().dni ?? '').trim();
-		const pref = apellido.slice(0, 2).toUpperCase();
-		const digits = dniRaw.replace(/\D/g, '');
-		const suf = digits.slice(-4);
-
-		if (pref.length < 2 || suf.length < 4) return '';
-
-		return `${pref}${suf}`;
+		return generatePassword(this.formData().apellidos ?? '', this.formData().dni ?? '');
 	});
 
 	// * Role helpers for conditional sections.

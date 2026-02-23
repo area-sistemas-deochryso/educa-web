@@ -1,5 +1,5 @@
 // #region Imports
-import { Component, input, output } from '@angular/core';
+import { ChangeDetectionStrategy, Component, input, output } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 
 // #endregion
@@ -9,6 +9,7 @@ import { FormsModule } from '@angular/forms';
 	imports: [FormsModule],
 	templateUrl: './calendar-header.component.html',
 	styleUrl: './calendar-header.component.scss',
+	changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class CalendarHeaderComponent {
 	// * Inputs/outputs for calendar navigation.

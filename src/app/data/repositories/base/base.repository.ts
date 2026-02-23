@@ -13,6 +13,9 @@ export interface PaginatedResponse<T> {
 	total: number;
 	page: number;
 	pageSize: number;
+	totalPages: number;
+	hasNextPage: boolean;
+	hasPreviousPage: boolean;
 }
 
 /**
@@ -125,7 +128,15 @@ export abstract class BaseRepository<T, C = Partial<T>, U = Partial<T>> {
 		}).pipe(
 			catchError((error) => {
 				logger.error(`[${this.entityName}Repository] Error getPaginated:`, error);
-				return of({ data: [], total: 0, page, pageSize });
+				return of({
+					data: [] as T[],
+					total: 0,
+					page,
+					pageSize,
+					totalPages: 0,
+					hasNextPage: false,
+					hasPreviousPage: false,
+				});
 			}),
 		);
 	}

@@ -1,5 +1,5 @@
 // #region Imports
-import { Component, inject } from '@angular/core';
+import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { SeasonalNotification } from '@core/services';
 import { NotificationsPanelHeaderComponent } from '../notifications-panel-header/notifications-panel-header.component';
@@ -12,6 +12,7 @@ import { NotificationsPanelContext } from '../../notifications-panel.context';
 // #region Implementation
 @Component({
 	selector: 'app-notifications-panel',
+	changeDetection: ChangeDetectionStrategy.OnPush,
 	imports: [
 		CommonModule,
 		NotificationsPanelHeaderComponent,

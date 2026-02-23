@@ -1,6 +1,6 @@
 // #region Imports
 import { AsistenciaService } from '@core/services';
-import { Component, DestroyRef, OnInit, computed, inject, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, DestroyRef, OnInit, computed, inject, signal } from '@angular/core';
 
 import { AttendanceDataService } from '../../../services/attendance/attendance-data.service';
 import { AttendanceLegendComponent } from '@app/features/intranet/components/attendance/attendance-legend/attendance-legend.component';
@@ -18,6 +18,7 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 	standalone: true,
 	imports: [AttendanceTableComponent, EmptyStateComponent, AttendanceLegendComponent],
 	templateUrl: './attendance-estudiante.component.html',
+	changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class AttendanceEstudianteComponent implements OnInit {
 	private asistenciaService = inject(AsistenciaService);
@@ -68,6 +69,7 @@ export class AttendanceEstudianteComponent implements OnInit {
 						currentMonth,
 						currentYear,
 						this.userName(),
+						resumen.conteoEstados,
 					);
 					this.ingresos.set(ingresos);
 					this.salidas.set(salidas);
@@ -100,6 +102,7 @@ export class AttendanceEstudianteComponent implements OnInit {
 						month,
 						currentYear,
 						this.userName(),
+						resumen.conteoEstados,
 					);
 					this.ingresos.set(ingresos);
 					// Salidas mantienen su mes actual
@@ -135,6 +138,7 @@ export class AttendanceEstudianteComponent implements OnInit {
 						month,
 						currentYear,
 						this.userName(),
+						resumen.conteoEstados,
 					);
 					this.salidas.set(salidas);
 					// Ingresos mantienen su mes actual

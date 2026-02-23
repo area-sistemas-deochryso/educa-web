@@ -49,6 +49,11 @@ export class UsuariosFacade {
 		this.store.setTableReady(false);
 		this.store.setLoading(true);
 
+		const page = this.store.page();
+		const pageSize = this.store.pageSize();
+		const rol = this.store.filterRol() ?? undefined;
+		const estado = this.store.filterEstado() ?? undefined;
+
 		// Ejecutar las 3 llamadas en paralelo para evitar carga en 3 tiempos
 		forkJoin({
 			estadisticas: this.usuariosService.obtenerEstadisticas().pipe(
@@ -63,14 +68,22 @@ export class UsuariosFacade {
 					return of([]);
 				}),
 			),
-			usuarios: this.usuariosService.listarUsuarios().pipe(
+			usuarios: this.usuariosService.listarUsuariosPaginado(page, pageSize, rol, estado).pipe(
 				catchError((err) => {
 					logger.error('Error cargando usuarios:', err);
 					this.errorHandler.showError(
 						UI_SUMMARIES.error,
 						UI_ADMIN_ERROR_DETAILS.loadUsuarios,
 					);
-					return of([] as UsuarioLista[]);
+					return of({
+						data: [] as UsuarioLista[],
+						total: 0,
+						page,
+						pageSize,
+						totalPages: 0,
+						hasNextPage: false,
+						hasPreviousPage: false,
+					});
 				}),
 			),
 		})
@@ -83,7 +96,8 @@ export class UsuariosFacade {
 
 				this.store.setSalones(salones);
 
-				this.store.setUsuarios(usuarios.filter((u) => u.rol !== 'Apoderado'));
+				this.store.setUsuarios(usuarios.data);
+				this.store.setPaginationData(usuarios.page, usuarios.pageSize, usuarios.total);
 				this.store.setTableReady(true);
 				this.store.setLoading(false);
 
@@ -98,13 +112,28 @@ export class UsuariosFacade {
 	}
 
 	/**
-	 * Refresh solo la lista de usuarios (sin resetear skeletons ni estadísticas)
+	 * Cargar una página específica (llamado desde onLazyLoad de p-table)
+	 */
+	loadPage(page: number, pageSize: number): void {
+		this.store.setPage(page);
+		this.store.setPageSize(pageSize);
+		this.refreshUsuariosOnly();
+	}
+
+	/**
+	 * Refresh solo la lista de usuarios paginada (sin resetear skeletons ni estadísticas)
 	 * Útil para cuando se crea un usuario y necesitamos el ID del servidor
 	 */
 	private refreshUsuariosOnly(): void {
 		this.store.setLoading(true);
+
+		const page = this.store.page();
+		const pageSize = this.store.pageSize();
+		const rol = this.store.filterRol() ?? undefined;
+		const estado = this.store.filterEstado() ?? undefined;
+
 		this.usuariosService
-			.listarUsuarios()
+			.listarUsuariosPaginado(page, pageSize, rol, estado)
 			.pipe(
 				catchError((err) => {
 					logger.error('Error cargando usuarios:', err);
@@ -112,13 +141,21 @@ export class UsuariosFacade {
 						UI_SUMMARIES.error,
 						UI_ADMIN_ERROR_DETAILS.loadUsuarios,
 					);
-					return of([] as UsuarioLista[]);
+					return of({
+						data: [] as UsuarioLista[],
+						total: 0,
+						page,
+						pageSize,
+						totalPages: 0,
+						hasNextPage: false,
+						hasPreviousPage: false,
+					});
 				}),
 				takeUntilDestroyed(this.destroyRef),
 			)
-			.subscribe((usuarios) => {
-				// Filtrar apoderados
-				this.store.setUsuarios(usuarios.filter((u) => u.rol !== 'Apoderado'));
+			.subscribe((result) => {
+				this.store.setUsuarios(result.data);
+				this.store.setPaginationData(result.page, result.pageSize, result.total);
 				this.store.setLoading(false);
 			});
 	}
@@ -132,14 +169,19 @@ export class UsuariosFacade {
 
 	setFilterRol(rol: string | null): void {
 		this.store.setFilterRol(rol as RolUsuarioAdmin | null);
+		this.store.setPage(1);
+		this.refreshUsuariosOnly();
 	}
 
 	setFilterEstado(estado: boolean | null): void {
 		this.store.setFilterEstado(estado);
+		this.store.setPage(1);
+		this.refreshUsuariosOnly();
 	}
 
 	clearFilters(): void {
 		this.store.clearFilters();
+		this.refreshUsuariosOnly();
 	}
 
 	// #endregion
@@ -301,6 +343,7 @@ export class UsuariosFacade {
 				next: () => {
 					// Mutación quirúrgica: eliminar solo el usuario del array
 					this.store.removeUsuario(usuario.id);
+					this.store.setTotalRecords(this.store.totalRecords() - 1);
 
 					// Actualizar estadísticas incrementalmente
 					this.store.incrementarEstadistica('totalUsuarios', -1);
@@ -451,10 +494,16 @@ export class UsuariosFacade {
 			)
 			.subscribe((event) => {
 				logger.log('[UsuariosFacade] Lista usuarios actualizada desde SW');
-				const usuarios = (event.data as UsuarioLista[]).filter(
-					(u) => u.rol !== 'Apoderado',
-				);
-				this.store.setUsuarios(usuarios);
+				const data = event.data;
+
+				// Handle both paginated and non-paginated responses from SW cache
+				if (data && typeof data === 'object' && 'data' in data && 'total' in data) {
+					const paginated = data as { data: UsuarioLista[]; total: number; page: number; pageSize: number };
+					this.store.setUsuarios(paginated.data);
+					this.store.setPaginationData(paginated.page, paginated.pageSize, paginated.total);
+				} else {
+					this.store.setUsuarios(data as UsuarioLista[]);
+				}
 			});
 
 		// Actualizar estadísticas directamente desde el evento

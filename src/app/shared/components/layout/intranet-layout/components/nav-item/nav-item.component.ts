@@ -1,5 +1,6 @@
 // #region Imports
 import {
+	ChangeDetectionStrategy,
 	Component,
 	Input,
 	booleanAttribute,
@@ -19,6 +20,7 @@ import { NavMenuItem } from '../mobile-menu';
 @Component({
 	selector: 'app-nav-item',
 	standalone: true,
+	changeDetection: ChangeDetectionStrategy.OnPush,
 	imports: [RouterLink, RouterLinkActive],
 	templateUrl: './nav-item.component.html',
 	styleUrl: './nav-item.component.scss',

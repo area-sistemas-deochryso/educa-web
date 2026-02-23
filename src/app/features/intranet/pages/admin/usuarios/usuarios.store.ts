@@ -9,7 +9,7 @@ import {
 } from '@core/services';
 import { Injectable, computed, inject, signal } from '@angular/core';
 
-import { DebugService } from '@core/helpers';
+import { DebugService, generatePassword } from '@core/helpers';
 
 /**
  * Store para gestión de usuarios
@@ -43,6 +43,11 @@ export class UsuariosStore {
 		{},
 	);
 
+	// Pagination
+	private readonly _page = signal(1);
+	private readonly _pageSize = signal(10);
+	private readonly _totalRecords = signal(0);
+
 	// Filters
 	private readonly _searchTerm = signal('');
 	private readonly _filterRol = signal<RolUsuarioAdmin | null>(null);
@@ -66,6 +71,10 @@ export class UsuariosStore {
 
 	readonly selectedUsuario = this._selectedUsuario.asReadonly();
 	readonly formData = this._formData.asReadonly();
+
+	readonly page = this._page.asReadonly();
+	readonly pageSize = this._pageSize.asReadonly();
+	readonly totalRecords = this._totalRecords.asReadonly();
 
 	readonly searchTerm = this._searchTerm.asReadonly();
 	readonly filterRol = this._filterRol.asReadonly();
@@ -212,6 +221,9 @@ export class UsuariosStore {
 		showSkeletons: this._showSkeletons(),
 		statsReady: this._statsReady(),
 		tableReady: this._tableReady(),
+		page: this._page(),
+		pageSize: this._pageSize(),
+		totalRecords: this._totalRecords(),
 	}));
 
 	// #endregion
@@ -331,34 +343,13 @@ export class UsuariosStore {
 				!this._isEditing() &&
 				(updates.apellidos !== undefined || updates.dni !== undefined)
 			) {
-				const apellido = (newData.apellidos ?? '').trim();
-				const dniRaw = (newData.dni ?? '').trim();
-
-				// 2 primeras letras del primer apellido en mayúsculas
-				const pref = apellido.slice(0, 2).toUpperCase();
-
-				// Solo dígitos del DNI y últimos 4
-				const digits = dniRaw.replace(/\D/g, '');
-				const suf = digits.slice(-4);
-
-				// Si hay suficientes caracteres, generar contraseña
-				if (pref.length >= 2 && suf.length >= 4) {
-					newData.contrasena = `${pref}${suf}`;
-					this.log.info('Contraseña autogenerada', {
-						modo: this._isEditing() ? 'edición' : 'creación',
-						apellido,
-						dni: dniRaw,
-						contrasena: newData.contrasena,
-					});
+				const password = generatePassword(newData.apellidos ?? '', newData.dni ?? '');
+				if (password) {
+					newData.contrasena = password;
+					this.log.info('Contraseña autogenerada', { contrasena: password });
 				} else {
-					// Si no hay suficientes datos, limpiar contraseña
 					newData.contrasena = undefined;
-					this.log.trace('Contraseña no generada (datos insuficientes)', {
-						pref,
-						suf,
-						prefLen: pref.length,
-						sufLen: suf.length,
-					});
+					this.log.trace('Contraseña no generada (datos insuficientes)');
 				}
 			}
 
@@ -383,6 +374,25 @@ export class UsuariosStore {
 		});
 	}
 
+	// Pagination mutations
+	setPage(page: number): void {
+		this._page.set(page);
+	}
+
+	setPageSize(pageSize: number): void {
+		this._pageSize.set(pageSize);
+	}
+
+	setTotalRecords(total: number): void {
+		this._totalRecords.set(total);
+	}
+
+	setPaginationData(page: number, pageSize: number, total: number): void {
+		this._page.set(page);
+		this._pageSize.set(pageSize);
+		this._totalRecords.set(total);
+	}
+
 	// Filter mutations
 	setSearchTerm(term: string): void {
 		this._searchTerm.set(term);
@@ -400,6 +410,7 @@ export class UsuariosStore {
 		this._searchTerm.set('');
 		this._filterRol.set(null);
 		this._filterEstado.set(null);
+		this._page.set(1);
 	}
 
 	// #endregion

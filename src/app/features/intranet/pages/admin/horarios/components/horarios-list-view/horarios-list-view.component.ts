@@ -1,9 +1,9 @@
 // #region Imports
-import { ChangeDetectionStrategy, Component, input, output } from '@angular/core';
+import { ChangeDetectionStrategy, Component, input, output, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 
 import { ButtonModule } from 'primeng/button';
-import { TableModule } from 'primeng/table';
+import { TableLazyLoadEvent, TableModule } from 'primeng/table';
 import { TagModule } from 'primeng/tag';
 import { TooltipModule } from 'primeng/tooltip';
 
@@ -23,12 +23,18 @@ export class HorariosListViewComponent {
 	// * Inputs for list data + loading state.
 	readonly horarios = input.required<HorarioResponseDto[]>();
 	readonly loading = input<boolean>(false);
+	readonly totalRecords = input(0);
+	readonly rows = input(10);
 
 	// * Row action outputs.
 	readonly viewDetail = output<number>();
 	readonly edit = output<number>();
 	readonly toggleEstado = output<{ id: number; estadoActual: boolean }>();
 	readonly delete = output<number>();
+	readonly lazyLoad = output<{ page: number; pageSize: number }>();
+
+	// * Skip first p-table onLazyLoad (fires on init before data loads)
+	private initialLoadDone = signal(false);
 
 	// * Event handlers
 	onViewDetail(id: number): void {
@@ -45,6 +51,17 @@ export class HorariosListViewComponent {
 
 	onDelete(id: number): void {
 		this.delete.emit(id);
+	}
+
+	onLazyLoad(event: TableLazyLoadEvent): void {
+		if (!this.initialLoadDone()) {
+			this.initialLoadDone.set(true);
+			return;
+		}
+		const first = event.first ?? 0;
+		const rows = event.rows ?? 10;
+		const page = Math.floor(first / rows) + 1;
+		this.lazyLoad.emit({ page, pageSize: rows });
 	}
 
 	// * TrackBy

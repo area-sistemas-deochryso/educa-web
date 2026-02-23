@@ -1,5 +1,5 @@
 // #region Imports
-import { Component, EventEmitter, Input, Output } from '@angular/core';
+import { ChangeDetectionStrategy, Component, EventEmitter, Input, Output } from '@angular/core';
 
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
@@ -9,6 +9,7 @@ import { FormsModule } from '@angular/forms';
 @Component({
 	selector: 'app-week-search-box',
 	standalone: true,
+	changeDetection: ChangeDetectionStrategy.OnPush,
 	imports: [CommonModule, FormsModule],
 	templateUrl: './week-search-box.component.html',
 	styleUrls: ['./week-search-box.component.scss'],

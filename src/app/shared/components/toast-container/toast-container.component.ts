@@ -1,5 +1,5 @@
 // #region Imports
-import { Component, effect, inject } from '@angular/core';
+import { ChangeDetectionStrategy, Component, effect, inject } from '@angular/core';
 
 import { CommonModule } from '@angular/common';
 import { ErrorHandlerService } from '@core/services/error';
@@ -11,6 +11,7 @@ import { ToastModule } from 'primeng/toast';
 @Component({
 	selector: 'app-toast-container',
 	standalone: true,
+	changeDetection: ChangeDetectionStrategy.OnPush,
 	imports: [CommonModule, ToastModule],
 	providers: [MessageService],
 	templateUrl: './toast-container.component.html',

@@ -149,6 +149,10 @@ export class UsuariosComponent implements AfterViewInit {
 		this.fixConfirmDialogAria(header);
 	}
 
+	onLazyLoad(event: { page: number; pageSize: number }): void {
+		this.facade.loadPage(event.page, event.pageSize);
+	}
+
 	onDrawerVisibleChange(visible: boolean): void {
 		if (!visible) {
 			this.facade.closeDetail();

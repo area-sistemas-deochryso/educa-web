@@ -1,5 +1,5 @@
 // #region Imports
-import { Component, EventEmitter, Input, Output } from '@angular/core';
+import { ChangeDetectionStrategy, Component, EventEmitter, Input, Output } from '@angular/core';
 
 import { CommonModule } from '@angular/common';
 import { TooltipModule } from 'primeng/tooltip';
@@ -9,6 +9,7 @@ import { TooltipModule } from 'primeng/tooltip';
 @Component({
 	selector: 'app-modal-controls',
 	standalone: true,
+	changeDetection: ChangeDetectionStrategy.OnPush,
 	imports: [CommonModule, TooltipModule],
 	templateUrl: './modal-controls.component.html',
 	styleUrls: ['./modal-controls.component.scss'],

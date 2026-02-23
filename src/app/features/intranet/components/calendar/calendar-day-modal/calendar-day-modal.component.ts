@@ -1,5 +1,5 @@
 // #region Imports
-import { Component, input, output } from '@angular/core';
+import { ChangeDetectionStrategy, Component, input, output } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ModalData } from '@features/intranet/pages/calendary-component/calendar.types';
 
@@ -10,6 +10,7 @@ import { ModalData } from '@features/intranet/pages/calendary-component/calendar
 	imports: [CommonModule],
 	templateUrl: './calendar-day-modal.component.html',
 	styleUrl: './calendar-day-modal.component.scss',
+	changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class CalendarDayModalComponent {
 	// * Inputs control visibility and content.

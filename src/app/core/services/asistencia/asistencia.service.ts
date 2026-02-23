@@ -15,6 +15,7 @@ import { Observable, catchError, map, of } from 'rxjs';
 
 import { HttpClient } from '@angular/common/http';
 import { environment } from '@env/environment';
+import { PaginatedResponse } from '@data/repositories';
 
 @Injectable({
 	providedIn: 'root',
@@ -245,6 +246,56 @@ export class AsistenciaService {
 	}
 
 	/**
+	 * Descargar PDF mensual de asistencia de un salón específico.
+	 * GET /api/ConsultaAsistencia/director/asistencia-mes/pdf?grado={grado}&seccion={seccion}&mes={mes}&anio={anio}
+	 */
+	descargarPdfAsistenciaMes(
+		grado: string,
+		seccion: string,
+		mes: number,
+		anio: number,
+	): Observable<Blob> {
+		const params: Record<string, string> = {
+			grado,
+			seccion,
+			mes: mes.toString(),
+			anio: anio.toString(),
+		};
+
+		return this.http.get(`${this.apiUrl}/director/asistencia-mes/pdf`, {
+			params,
+			responseType: 'blob',
+		});
+	}
+
+	/**
+	 * Descargar PDF de asistencia por periodo (rango de meses) de un salón.
+	 * GET /api/ConsultaAsistencia/director/asistencia-periodo/pdf
+	 */
+	descargarPdfAsistenciaPeriodo(
+		grado: string,
+		seccion: string,
+		mesInicio: number,
+		anioInicio: number,
+		mesFin: number,
+		anioFin: number,
+	): Observable<Blob> {
+		const params: Record<string, string> = {
+			grado,
+			seccion,
+			mesInicio: mesInicio.toString(),
+			anioInicio: anioInicio.toString(),
+			mesFin: mesFin.toString(),
+			anioFin: anioFin.toString(),
+		};
+
+		return this.http.get(`${this.apiUrl}/director/asistencia-periodo/pdf`, {
+			params,
+			responseType: 'blob',
+		});
+	}
+
+	/**
 	 * Director: Descargar PDF consolidado de todos los salones - Día
 	 *
 	 * Genera un reporte PDF con asistencias de todos los grados/secciones de la sede
@@ -405,6 +456,38 @@ export class AsistenciaService {
 		return this.http
 			.get<EstudianteAsistencia[]>(`${this.apiUrl}/director/grado`, { params })
 			.pipe(catchError(() => of([])));
+	}
+
+	/**
+	 * Director: Obtener asistencias paginadas (infraestructura para datasets grandes)
+	 * GET /api/ConsultaAsistencia/director/grado?grado={grado}&seccion={seccion}&mes={mes}&anio={anio}&page={page}&pageSize={pageSize}
+	 */
+	getAsistenciasGradoDirectorPaginated(
+		grado: string,
+		seccion: string,
+		page: number,
+		pageSize: number,
+		mes?: number,
+		anio?: number,
+	): Observable<PaginatedResponse<EstudianteAsistencia>> {
+		const params: Record<string, string> = {
+			grado,
+			seccion,
+			page: page.toString(),
+			pageSize: pageSize.toString(),
+		};
+
+		if (mes !== undefined) {
+			params['mes'] = mes.toString();
+		}
+		if (anio !== undefined) {
+			params['anio'] = anio.toString();
+		}
+
+		return this.http.get<PaginatedResponse<EstudianteAsistencia>>(
+			`${this.apiUrl}/director/grado`,
+			{ params },
+		);
 	}
 
 	/**

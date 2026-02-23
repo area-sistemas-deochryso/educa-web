@@ -1,6 +1,6 @@
 import { AsistenciaService, SalonProfesor, StorageService, UserProfileService } from '@core/services';
 import { JustificacionEvent } from '../../../components/attendance/asistencia-dia-list/asistencia-dia-list.component';
-import { Component, DestroyRef, OnInit, ViewChild, computed, inject, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, DestroyRef, OnInit, ViewChild, computed, inject, signal } from '@angular/core';
 
 import { AsistenciaDiaListComponent } from '../../../components/attendance/asistencia-dia-list/asistencia-dia-list.component';
 import { AttendanceLegendComponent } from '@app/features/intranet/components/attendance/attendance-legend/attendance-legend.component';
@@ -11,8 +11,11 @@ import { ViewMode } from '../../../components/attendance/attendance-header/atten
 import { ButtonModule } from 'primeng/button';
 import { DatePipe } from '@angular/common';
 import { EmptyStateComponent } from '../../../components/attendance/empty-state/empty-state.component';
+import { FormsModule } from '@angular/forms';
 import { Menu, MenuModule } from 'primeng/menu';
 import { SalonSelectorComponent } from '../../../components/attendance/salon-selector/salon-selector.component';
+import { Select } from 'primeng/select';
+import { SelectButton } from 'primeng/selectbutton';
 import { TooltipModule } from 'primeng/tooltip';
 import { finalize, forkJoin } from 'rxjs';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
@@ -36,10 +39,14 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 		TooltipModule,
 		MenuModule,
 		DatePipe,
+		FormsModule,
+		Select,
+		SelectButton,
 	],
 	providers: [AttendanceViewController],
 	templateUrl: './attendance-profesor.component.html',
 	styleUrl: './attendance-profesor.component.scss',
+	changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class AttendanceProfesorComponent implements OnInit {
 	@ViewChild('pdfMenu') pdfMenu!: Menu;

@@ -30,4 +30,10 @@ export interface ActualizarCursoRequest {
 export interface ApiResponse {
 	mensaje: string;
 }
+
+export interface CursosEstadisticas {
+	totalCursos: number;
+	cursosActivos: number;
+	cursosInactivos: number;
+}
 // #endregion

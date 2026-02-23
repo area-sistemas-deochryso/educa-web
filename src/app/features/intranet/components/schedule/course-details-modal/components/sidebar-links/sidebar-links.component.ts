@@ -1,5 +1,5 @@
 // #region Imports
-import { Component, EventEmitter, Input, Output } from '@angular/core';
+import { ChangeDetectionStrategy, Component, EventEmitter, Input, Output } from '@angular/core';
 import { CommonModule } from '@angular/common';
 
 // #endregion
@@ -12,6 +12,7 @@ export interface SidebarLink {
 @Component({
 	selector: 'app-sidebar-links',
 	standalone: true,
+	changeDetection: ChangeDetectionStrategy.OnPush,
 	imports: [CommonModule],
 	templateUrl: './sidebar-links.component.html',
 	styleUrl: './sidebar-links.component.scss',

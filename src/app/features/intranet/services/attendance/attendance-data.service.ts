@@ -1,6 +1,6 @@
 // #region Imports
 import { Injectable, inject } from '@angular/core';
-import { AsistenciaDetalle } from '@core/services';
+import { AsistenciaDetalle, ConteoEstados, ConteoEstadosMensual } from '@core/services';
 import {
 	AttendanceStatus,
 	AttendanceDay,
@@ -37,6 +37,7 @@ export class AttendanceDataService {
 		month: number,
 		year: number,
 		studentName: string,
+		conteoEstados?: ConteoEstadosMensual,
 	): { ingresos: AttendanceTable; salidas: AttendanceTable } {
 		const { ingresos, salidas } = this.buildWeeksFromAsistencias(asistencias, month, year);
 
@@ -44,7 +45,9 @@ export class AttendanceDataService {
 		ingresosTable.selectedMonth = month;
 		ingresosTable.selectedYear = year;
 		ingresosTable.weeks = ingresos;
-		ingresosTable.counts = this.calculateCounts(ingresos);
+		ingresosTable.counts = conteoEstados
+			? this.mapConteoToStatusCounts(conteoEstados.ingresos)
+			: this.calculateCounts(ingresos);
 		ingresosTable.columnTotals = this.calculateColumnTotals(ingresos);
 		ingresosTable.grandTotal = this.calculateGrandTotal(ingresos);
 
@@ -52,7 +55,9 @@ export class AttendanceDataService {
 		salidasTable.selectedMonth = month;
 		salidasTable.selectedYear = year;
 		salidasTable.weeks = salidas;
-		salidasTable.counts = this.calculateCounts(salidas);
+		salidasTable.counts = conteoEstados
+			? this.mapConteoToStatusCounts(conteoEstados.salidas)
+			: this.calculateCounts(salidas);
 		salidasTable.columnTotals = this.calculateColumnTotals(salidas);
 		salidasTable.grandTotal = this.calculateGrandTotal(salidas);
 
@@ -155,6 +160,19 @@ export class AttendanceDataService {
 	private formatHora(fechaHora: string): string {
 		const date = new Date(fechaHora);
 		return date.toLocaleTimeString('es-PE', { hour: '2-digit', minute: '2-digit' });
+	}
+
+	// * Mapea conteo del backend (campos nombrados) a StatusCounts (keyed por código).
+	private mapConteoToStatusCounts(conteo: ConteoEstados): StatusCounts {
+		return {
+			T: conteo.temprano,
+			A: conteo.aTiempo,
+			F: conteo.fueraHora,
+			N: conteo.noAsistio,
+			J: conteo.justificado,
+			'-': conteo.pendiente,
+			X: 0,
+		};
 	}
 
 	private calculateCounts(weeks: AttendanceWeek[]): StatusCounts {

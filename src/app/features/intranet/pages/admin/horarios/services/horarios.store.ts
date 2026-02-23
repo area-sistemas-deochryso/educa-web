@@ -1,6 +1,7 @@
 import { computed, inject, Injectable, signal } from '@angular/core';
 
 import { AuthStore } from '@core/store';
+import { determinarNiveles } from '@core/helpers';
 import { CursoListaDto, CursoOption, CursosPorNivel } from '../models/curso.interface';
 import {
   CURSO_COLORS,
@@ -55,6 +56,12 @@ interface HorariosStoreState {
   filtroProfesorId: number | null;
   filtroDiaSemana: number | null;
   filtroEstadoActivo: boolean | null;
+
+  // #endregion
+  // #region Paginación
+  page: number;
+  pageSize: number;
+  totalRecords: number;
   // #endregion
 }
 
@@ -92,6 +99,9 @@ const initialState: HorariosStoreState = {
   filtroProfesorId: null,
   filtroDiaSemana: null,
   filtroEstadoActivo: null,
+  page: 1,
+  pageSize: 10,
+  totalRecords: 0,
 };
 
 @Injectable({ providedIn: 'root' })
@@ -118,6 +128,9 @@ export class HorariosStore {
   readonly optionsLoading = computed(() => this._state().optionsLoading);
   readonly statsReady = computed(() => this._state().statsReady);
   readonly tableReady = computed(() => this._state().tableReady);
+  readonly page = computed(() => this._state().page);
+  readonly pageSize = computed(() => this._state().pageSize);
+  readonly totalRecords = computed(() => this._state().totalRecords);
 
   // #endregion
   // #region Usuario actual
@@ -201,7 +214,7 @@ export class HorariosStore {
       .filter((c) => c.estado)
       .map((c) => {
         const grados = c.grados.map((g) => g.nombre);
-        const niveles = this.determinarNiveles(grados);
+        const niveles = determinarNiveles(grados);
 
         return {
           value: c.id,
@@ -421,6 +434,9 @@ export class HorariosStore {
     optionsLoading: this.optionsLoading(),
     statsReady: this.statsReady(),
     tableReady: this.tableReady(),
+    page: this.page(),
+    pageSize: this.pageSize(),
+    totalRecords: this.totalRecords(),
   }));
 
   // #endregion
@@ -638,7 +654,12 @@ export class HorariosStore {
       filtroProfesorId: null,
       filtroDiaSemana: null,
       filtroEstadoActivo: null,
+      page: 1,
     }));
+  }
+
+  setPaginationData(page: number, pageSize: number, totalRecords: number): void {
+    this._state.update((s) => ({ ...s, page, pageSize, totalRecords }));
   }
 
   // #endregion
@@ -659,34 +680,5 @@ export class HorariosStore {
     return minutosDesdeInicio - HORA_INICIO_DIA;
   }
 
-  /**
-   * Determina los niveles educativos basándose en los nombres de grados
-   */
-  private determinarNiveles(grados: string[]): string[] {
-    const niveles = new Set<string>();
-
-    grados.forEach((grado) => {
-      const gradoLower = grado.toLowerCase();
-
-      // Detectar Inicial
-      if (gradoLower.includes('inicial') || gradoLower.includes('años')) {
-        niveles.add('Inicial');
-      }
-
-      // Detectar Primaria
-      if (gradoLower.includes('primaria')) {
-        niveles.add('Primaria');
-      }
-
-      // Detectar Secundaria
-      if (gradoLower.includes('secundaria')) {
-        niveles.add('Secundaria');
-      }
-    });
-
-    // Retornar en orden lógico
-    const orden = ['Inicial', 'Primaria', 'Secundaria'];
-    return orden.filter((nivel) => niveles.has(nivel));
-  }
   // #endregion
 }

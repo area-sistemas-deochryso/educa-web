@@ -10,6 +10,7 @@ import {
 	EstudianteAsistencia,
 	HijoApoderado,
 } from '@core/services';
+import { viewBlobInNewTab, downloadBlob } from '@core/helpers';
 import { AttendanceDataService } from './attendance-data.service';
 import { AttendanceTable } from '@features/intranet/pages/attendance-component/models/attendance.types';
 import {
@@ -22,6 +23,20 @@ const ATTENDANCE_TABLE_LABELS = {
 	Ingresos: 'Ingresos',
 	Salidas: 'Salidas',
 } as const;
+
+type MonthSubMode = 'mes' | 'periodo';
+
+const MONTH_NAMES = [
+	'Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio',
+	'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre',
+];
+
+const MONTH_SUB_MODE_OPTIONS = [
+	{ label: 'Mes', value: 'mes' as MonthSubMode },
+	{ label: 'Periodo', value: 'periodo' as MonthSubMode },
+];
+
+const MONTH_OPTIONS = MONTH_NAMES.map((label, i) => ({ label, value: i + 1 }));
 
 // #region Interfaces de configuración
 
@@ -81,6 +96,66 @@ export class AttendanceViewController {
 	readonly downloadingPdf = signal(false);
 	readonly showSkeletons = signal(true);
 	readonly tableReady = signal(false);
+
+	// #endregion
+	// #region Periodo (sub-modo dentro de mes)
+
+	readonly monthSubMode = signal<MonthSubMode>('mes');
+	readonly periodoInicio = signal(1);
+	readonly periodoFin = signal(new Date().getMonth() + 1);
+
+	/** Opciones estáticas para el toggle mes/periodo */
+	readonly monthSubModeOptions = MONTH_SUB_MODE_OPTIONS;
+
+	/** Año del periodo — siempre el año seleccionado en la tabla */
+	readonly periodoYear = computed(() => this.ingresos().selectedYear);
+
+	/** Mes máximo disponible: si es el año actual, hasta el mes actual; si es año pasado, todos */
+	readonly maxPeriodoMonth = computed(() => {
+		const selectedYear = this.ingresos().selectedYear;
+		const now = new Date();
+		return selectedYear >= now.getFullYear() ? now.getMonth() + 1 : 12;
+	});
+
+	/** Opciones de mes para INICIO: 1 hasta maxPeriodoMonth */
+	readonly mesOptionsInicio = computed(() => {
+		const max = this.maxPeriodoMonth();
+		return MONTH_OPTIONS.filter((m) => m.value <= max);
+	});
+
+	/** Opciones de mes para FIN: desde periodoInicio hasta maxPeriodoMonth */
+	readonly mesOptionsFin = computed(() => {
+		const start = this.periodoInicio();
+		const max = this.maxPeriodoMonth();
+		return MONTH_OPTIONS.filter((m) => m.value >= start && m.value <= max);
+	});
+
+	/** Valida que el rango de periodo sea correcto */
+	readonly isPeriodoValid = computed(() => this.periodoInicio() <= this.periodoFin());
+
+	/** Label descriptivo para la sección PDF en modo periodo */
+	readonly pdfLabel = computed(() => {
+		const inicio = this.periodoInicio();
+		const fin = this.periodoFin();
+		const year = this.ingresos().selectedYear;
+		return `Periodo: ${MONTH_NAMES[inicio - 1]} – ${MONTH_NAMES[fin - 1]} ${year}`;
+	});
+
+	setMonthSubMode(mode: MonthSubMode): void {
+		this.monthSubMode.set(mode);
+	}
+
+	setPeriodoInicio(mes: number): void {
+		this.periodoInicio.set(mes);
+		// Auto-ajustar fin si queda por debajo del inicio
+		if (this.periodoFin() < mes) {
+			this.periodoFin.set(mes);
+		}
+	}
+
+	setPeriodoFin(mes: number): void {
+		this.periodoFin.set(mes);
+	}
 
 	// #endregion
 	// #region Estudiantes (modo mes)
@@ -143,18 +218,31 @@ export class AttendanceViewController {
 		return new Date(selectedYear, selectedMonth - 1, 1);
 	});
 
-	readonly pdfMenuItems: MenuItem[] = [
-		{
-			label: 'Ver PDF',
-			icon: 'pi pi-eye',
-			command: () => this.verPdfAsistenciaDia(),
-		},
-		{
-			label: 'Descargar PDF',
-			icon: 'pi pi-download',
-			command: () => this.descargarPdfAsistenciaDia(),
-		},
-	];
+	readonly pdfMenuItems = computed<MenuItem[]>(() => {
+		const isMonthMode = this.viewMode() === VIEW_MODE.Mes;
+		const isPeriodo = this.monthSubMode() === 'periodo';
+
+		return [
+			{
+				label: 'Ver PDF',
+				icon: 'pi pi-eye',
+				command: () => {
+					if (!isMonthMode) return this.verPdfAsistenciaDia();
+					return isPeriodo ? this.verPdfAsistenciaPeriodo() : this.verPdfAsistenciaMes();
+				},
+			},
+			{
+				label: 'Descargar PDF',
+				icon: 'pi pi-download',
+				command: () => {
+					if (!isMonthMode) return this.descargarPdfAsistenciaDia();
+					return isPeriodo
+						? this.descargarPdfAsistenciaPeriodo()
+						: this.descargarPdfAsistenciaMes();
+				},
+			},
+		];
+	});
 
 	// #endregion
 	// #region Inicialización
@@ -390,13 +478,7 @@ export class AttendanceViewController {
 				finalize(() => this.downloadingPdf.set(false)),
 			)
 			.subscribe({
-				next: (blob) => {
-					const url = window.URL.createObjectURL(blob);
-					window.open(url, '_blank');
-
-					// Cleanup después de que la ventana se abra
-					setTimeout(() => window.URL.revokeObjectURL(url), 100);
-				},
+				next: (blob) => viewBlobInNewTab(blob),
 			});
 	}
 
@@ -415,19 +497,101 @@ export class AttendanceViewController {
 			)
 			.subscribe({
 				next: (blob) => {
-					const url = window.URL.createObjectURL(blob);
-
-					const a = document.createElement('a');
-					a.href = url;
 					const fechaStr = this.pdfFecha().toISOString().split('T')[0];
-					a.download = `Asistencia_${ctx.grado}_${ctx.seccion}_${fechaStr}.pdf`;
+					downloadBlob(blob, `Asistencia_${ctx.grado}_${ctx.seccion}_${fechaStr}.pdf`);
+				},
+			});
+	}
 
-					document.body.appendChild(a);
-					a.click();
+	/** Ver PDF mensual de un salón en nueva pestaña */
+	verPdfAsistenciaMes(): void {
+		const ctx = this.config.getSelectorContext();
+		if (!ctx) return;
 
-					// Cleanup
-					document.body.removeChild(a);
-					window.URL.revokeObjectURL(url);
+		this.downloadingPdf.set(true);
+		const { selectedMonth, selectedYear } = this.ingresos();
+
+		this.asistenciaService
+			.descargarPdfAsistenciaMes(ctx.gradoCodigo, ctx.seccion, selectedMonth, selectedYear)
+			.pipe(
+				takeUntilDestroyed(this.destroyRef),
+				finalize(() => this.downloadingPdf.set(false)),
+			)
+			.subscribe({
+				next: (blob) => viewBlobInNewTab(blob),
+			});
+	}
+
+	/** Descargar PDF mensual de un salón con nombre descriptivo */
+	descargarPdfAsistenciaMes(): void {
+		const ctx = this.config.getSelectorContext();
+		if (!ctx) return;
+
+		this.downloadingPdf.set(true);
+		const { selectedMonth, selectedYear } = this.ingresos();
+
+		this.asistenciaService
+			.descargarPdfAsistenciaMes(ctx.gradoCodigo, ctx.seccion, selectedMonth, selectedYear)
+			.pipe(
+				takeUntilDestroyed(this.destroyRef),
+				finalize(() => this.downloadingPdf.set(false)),
+			)
+			.subscribe({
+				next: (blob) => {
+					const mes = selectedMonth.toString().padStart(2, '0');
+					downloadBlob(
+						blob,
+						`Asistencia_${ctx.grado}_${ctx.seccion}_${selectedYear}-${mes}.pdf`,
+					);
+				},
+			});
+	}
+
+	/** Ver PDF por periodo (rango de meses) en nueva pestaña */
+	verPdfAsistenciaPeriodo(): void {
+		const ctx = this.config.getSelectorContext();
+		if (!ctx || !this.isPeriodoValid()) return;
+
+		this.downloadingPdf.set(true);
+		const mesI = this.periodoInicio();
+		const mesF = this.periodoFin();
+		const anio = this.ingresos().selectedYear;
+
+		this.asistenciaService
+			.descargarPdfAsistenciaPeriodo(ctx.gradoCodigo, ctx.seccion, mesI, anio, mesF, anio)
+			.pipe(
+				takeUntilDestroyed(this.destroyRef),
+				finalize(() => this.downloadingPdf.set(false)),
+			)
+			.subscribe({
+				next: (blob) => viewBlobInNewTab(blob),
+			});
+	}
+
+	/** Descargar PDF por periodo (rango de meses) con nombre descriptivo */
+	descargarPdfAsistenciaPeriodo(): void {
+		const ctx = this.config.getSelectorContext();
+		if (!ctx || !this.isPeriodoValid()) return;
+
+		this.downloadingPdf.set(true);
+		const mesI = this.periodoInicio();
+		const mesF = this.periodoFin();
+		const anio = this.ingresos().selectedYear;
+
+		this.asistenciaService
+			.descargarPdfAsistenciaPeriodo(ctx.gradoCodigo, ctx.seccion, mesI, anio, mesF, anio)
+			.pipe(
+				takeUntilDestroyed(this.destroyRef),
+				finalize(() => this.downloadingPdf.set(false)),
+			)
+			.subscribe({
+				next: (blob) => {
+					const inicio = `${anio}-${mesI.toString().padStart(2, '0')}`;
+					const fin = `${anio}-${mesF.toString().padStart(2, '0')}`;
+					downloadBlob(
+						blob,
+						`Asistencia_${ctx.grado}_${ctx.seccion}_Periodo_${inicio}_a_${fin}.pdf`,
+					);
 				},
 			});
 	}

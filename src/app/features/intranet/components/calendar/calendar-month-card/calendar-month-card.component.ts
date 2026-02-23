@@ -1,5 +1,5 @@
 // #region Imports
-import { Component, input, output, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, input, output, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { CalendarDay, CalendarMonth } from '@features/intranet/pages/calendary-component/calendar.types';
 
@@ -10,6 +10,7 @@ import { CalendarDay, CalendarMonth } from '@features/intranet/pages/calendary-c
 	imports: [CommonModule],
 	templateUrl: './calendar-month-card.component.html',
 	styleUrl: './calendar-month-card.component.scss',
+	changeDetection: ChangeDetectionStrategy.OnPush,
 	host: {
 		'[attr.data-hovered-event]': 'hoveredEvent()',
 	},

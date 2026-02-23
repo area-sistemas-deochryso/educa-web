@@ -1,5 +1,5 @@
 // #region Imports
-import { Component, input, output, OnInit } from '@angular/core';
+import { ChangeDetectionStrategy, Component, input, output, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Select } from 'primeng/select';
@@ -37,6 +37,7 @@ const SECCIONES: SeccionOption[] = [
 	imports: [CommonModule, FormsModule, Select],
 	templateUrl: './attendance-filter.component.html',
 	styleUrl: './attendance-filter.component.scss',
+	changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class AttendanceFilterComponent implements OnInit {
 	// * Initial filter values (optional).

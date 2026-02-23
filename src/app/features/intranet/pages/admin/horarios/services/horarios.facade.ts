@@ -48,8 +48,11 @@ export class HorariosFacade {
     this.store.setLoading(true);
     this.store.setOptionsLoading(true);
 
+    const page = this.store.page();
+    const pageSize = this.store.pageSize();
+
     forkJoin({
-      horarios: this.api.getAll(),
+      horarios: this.api.getAllPaginated(page, pageSize),
       salones: this.salonesApi.listar(),
       cursos: this.cursosApi.listar(),
       profesores: this.profesoresApi.listar(),
@@ -57,11 +60,12 @@ export class HorariosFacade {
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
         next: ({ horarios, salones, cursos, profesores }) => {
-          this.store.setHorarios(horarios);
+          this.store.setHorarios(horarios.data);
+          this.store.setPaginationData(horarios.page, horarios.pageSize, horarios.total);
           this.store.setSalonesDisponibles(salones);
           this.store.setCursosDisponibles(cursos);
           this.store.setProfesoresDisponibles(profesores);
-          this.calculateEstadisticas(horarios);
+          this.calculateEstadisticas(horarios.data);
           this.store.setLoading(false);
           this.store.setOptionsLoading(false);
           this.store.setStatsReady(true);
@@ -182,7 +186,7 @@ export class HorariosFacade {
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
         next: () => {
-          this.refreshItemsOnly();
+          this.refreshHorariosOnly();
           this.store.incrementarEstadistica('totalHorarios', 1);
           this.store.incrementarEstadistica('horariosActivos', 1);
           // Note: profesor se asigna después con asignarProfesor()
@@ -352,7 +356,7 @@ export class HorariosFacade {
       .subscribe({
         next: () => {
           // Refetch para obtener datos actualizados
-          this.refreshItemsOnly();
+          this.refreshHorariosOnly();
 
           // Si el drawer está abierto, recargar el detalle
           if (this.store.detailDrawerVisible()) {
@@ -384,7 +388,7 @@ export class HorariosFacade {
       .subscribe({
         next: () => {
           // Refetch para obtener datos actualizados
-          this.refreshItemsOnly();
+          this.refreshHorariosOnly();
           this.errorHandler.showSuccess(
             UI_SUMMARIES.success,
             UI_HORARIOS_SUCCESS_MESSAGES.estudiantesAssigned
@@ -410,7 +414,7 @@ export class HorariosFacade {
       .subscribe({
         next: () => {
           // Refetch para obtener datos actualizados
-          this.refreshItemsOnly();
+          this.refreshHorariosOnly();
 
           // Si el drawer está abierto, recargar el detalle
           if (this.store.detailDrawerVisible()) {
@@ -520,6 +524,14 @@ export class HorariosFacade {
     this.store.prevStep();
   }
 
+  /**
+   * Cargar página específica (llamado desde onLazyLoad del p-table)
+   */
+  loadPage(page: number, pageSize: number): void {
+    this.store.setPaginationData(page, pageSize, this.store.totalRecords());
+    this.refreshHorariosOnly();
+  }
+
   // #endregion
   // #region Comandos de filtros
 
@@ -552,18 +564,21 @@ export class HorariosFacade {
   // #region Helpers privados
 
   /**
-   * Refetch solo items (sin resetear skeletons ni estadísticas)
+   * Refetch solo items paginados (sin resetear skeletons ni opciones)
    */
-  private refreshItemsOnly(): void {
+  private refreshHorariosOnly(): void {
     this.store.setLoading(true);
+    const page = this.store.page();
+    const pageSize = this.store.pageSize();
 
     this.api
-      .getAll()
+      .getAllPaginated(page, pageSize)
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
-        next: (horarios) => {
-          this.store.setHorarios(horarios);
-          this.calculateEstadisticas(horarios);
+        next: (response) => {
+          this.store.setHorarios(response.data);
+          this.store.setPaginationData(response.page, response.pageSize, response.total);
+          this.calculateEstadisticas(response.data);
           this.store.setLoading(false);
         },
         error: (err) => {

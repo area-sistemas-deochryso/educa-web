@@ -1,5 +1,5 @@
 // #region Imports
-import { Component, OnInit, AfterViewInit, signal, inject, PLATFORM_ID } from '@angular/core';
+import { ChangeDetectionStrategy, Component, OnInit, AfterViewInit, signal, inject, PLATFORM_ID } from '@angular/core';
 import { isPlatformBrowser } from '@angular/common';
 import { ActivatedRoute } from '@angular/router';
 import { CalendarHeaderComponent } from '@features/intranet/components/calendar/calendar-header/calendar-header.component';
@@ -15,6 +15,7 @@ import { CalendarUtilsService } from '@features/intranet/services/calendar/calen
 // #region Implementation
 @Component({
 	selector: 'app-calendary.component',
+	changeDetection: ChangeDetectionStrategy.OnPush,
 	imports: [
 		CalendarHeaderComponent,
 		CalendarLegendComponent,

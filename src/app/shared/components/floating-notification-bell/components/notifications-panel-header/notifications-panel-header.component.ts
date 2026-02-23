@@ -1,5 +1,5 @@
 // #region Imports
-import { Component, inject, computed } from '@angular/core';
+import { ChangeDetectionStrategy, Component, inject, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { PrioritySummaryComponent } from '../priority-summary/priority-summary.component';
 import { NotificationsPanelContext } from '../../notifications-panel.context';
@@ -8,6 +8,7 @@ import { NotificationsPanelContext } from '../../notifications-panel.context';
 // #region Implementation
 @Component({
 	selector: 'app-notifications-panel-header',
+	changeDetection: ChangeDetectionStrategy.OnPush,
 	imports: [CommonModule, PrioritySummaryComponent],
 	templateUrl: './notifications-panel-header.component.html',
 	styleUrl: './notifications-panel-header.component.scss',

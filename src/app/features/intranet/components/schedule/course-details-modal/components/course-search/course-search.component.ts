@@ -1,5 +1,5 @@
 // #region Imports
-import { Component, EventEmitter, Input, Output } from '@angular/core';
+import { ChangeDetectionStrategy, Component, EventEmitter, Input, Output } from '@angular/core';
 
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
@@ -9,6 +9,7 @@ import { FormsModule } from '@angular/forms';
 @Component({
 	selector: 'app-course-search',
 	standalone: true,
+	changeDetection: ChangeDetectionStrategy.OnPush,
 	imports: [CommonModule, FormsModule],
 	templateUrl: './course-search.component.html',
 	styleUrls: ['./course-search.component.scss'],

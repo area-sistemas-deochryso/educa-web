@@ -1,5 +1,5 @@
 // #region Imports
-import { Component, EventEmitter, Input, Output } from '@angular/core';
+import { ChangeDetectionStrategy, Component, EventEmitter, Input, Output } from '@angular/core';
 
 import { CommonModule } from '@angular/common';
 
@@ -8,6 +8,7 @@ import { CommonModule } from '@angular/common';
 @Component({
 	selector: 'app-week-content-row',
 	standalone: true,
+	changeDetection: ChangeDetectionStrategy.OnPush,
 	imports: [CommonModule],
 	templateUrl: './week-content-row.component.html',
 	styleUrls: ['./week-content-row.component.scss'],

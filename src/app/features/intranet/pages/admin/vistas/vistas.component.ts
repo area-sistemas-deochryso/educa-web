@@ -1,13 +1,4 @@
-import {
-	ChangeDetectionStrategy,
-	Component,
-	DestroyRef,
-	inject,
-	OnInit,
-	signal,
-	computed,
-} from '@angular/core';
-import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { ChangeDetectionStrategy, Component, inject, OnInit, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 
@@ -16,25 +7,18 @@ import { ButtonModule } from 'primeng/button';
 import { DialogModule } from 'primeng/dialog';
 import { TooltipModule } from 'primeng/tooltip';
 import { TagModule } from 'primeng/tag';
-import { ProgressSpinnerModule } from 'primeng/progressspinner';
+
 import { InputTextModule } from 'primeng/inputtext';
 import { SelectModule } from 'primeng/select';
 import { ToggleSwitch } from 'primeng/toggleswitch';
+import { ConfirmDialogModule } from 'primeng/confirmdialog';
+import { ConfirmationService } from 'primeng/api';
 
-import { logger } from '@core/helpers';
-import { ErrorHandlerService, PermisosService, Vista } from '@core/services';
 import { AdminUtilsService } from '@shared/services';
-import {
-	UI_ADMIN_ERROR_DETAILS,
-	UI_SUMMARIES,
-	buildDeleteVistaMessage,
-} from '@app/shared/constants';
+import { buildDeleteVistaMessage } from '@app/shared/constants';
 
-interface VistaForm {
-	ruta: string;
-	nombre: string;
-	estado: number;
-}
+import { VistasFacade } from './services/vistas.facade';
+import type { Vista } from '@core/services';
 
 @Component({
 	selector: 'app-vistas',
@@ -47,252 +31,121 @@ interface VistaForm {
 		DialogModule,
 		TooltipModule,
 		TagModule,
-		ProgressSpinnerModule,
 		InputTextModule,
 		SelectModule,
 		ToggleSwitch,
+		ConfirmDialogModule,
 	],
+	providers: [ConfirmationService],
 	templateUrl: './vistas.component.html',
 	styleUrl: './vistas.component.scss',
 	changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class VistasComponent implements OnInit {
-	private permisosService = inject(PermisosService);
-	private destroyRef = inject(DestroyRef);
-	private errorHandler = inject(ErrorHandlerService);
+	// #region Dependencias
+	private facade = inject(VistasFacade);
+	private confirmationService = inject(ConfirmationService);
 	readonly adminUtils = inject(AdminUtilsService);
+	// #endregion
 
-	// * State
-	vistas = signal<Vista[]>([]);
-	loading = signal(false);
+	// #region Estado del facade
+	readonly vm = this.facade.vm;
+	// #endregion
 
-	// * Dialogs
-	dialogVisible = signal(false);
-	isEditing = signal(false);
+	// #region Estado local
+	/** Guard para ignorar el onLazyLoad inicial (ngOnInit ya carga los datos) */
+	private initialLoadDone = signal(false);
+	// #endregion
 
-	// * Form
-	selectedVista = signal<Vista | null>(null);
-	formData = signal<VistaForm>({ ruta: '', nombre: '', estado: 1 });
-
-	// * Filters
-	searchTerm = signal('');
-	filterModulo = signal<string | null>(null);
-	filterEstado = signal<number | null>(null);
-
-	// * Options
-	estadoOptions = [
+	// #region Opciones estáticas
+	readonly estadoOptions = [
 		{ label: 'Todos', value: null },
 		{ label: 'Activas', value: 1 },
 		{ label: 'Inactivas', value: 0 },
 	];
+	// #endregion
 
-	// * Computed - modules
-	modulos = computed(() => {
-		const modulosSet = new Set<string>();
-		this.vistas().forEach((v) => {
-			modulosSet.add(this.adminUtils.getModuloFromRuta(v.ruta));
-		});
-		return Array.from(modulosSet).sort();
-	});
-
-	modulosOptions = computed(() => {
-		return [{ label: 'Todos los modulos', value: null as string | null }].concat(
-			this.modulos().map((m) => ({
-				label: m.charAt(0).toUpperCase() + m.slice(1),
-				value: m as string | null,
-			})),
-		);
-	});
-
-	// * Computed - stats
-	totalVistas = computed(() => this.vistas().length);
-	vistasActivas = computed(() => this.vistas().filter((v) => v.estado === 1).length);
-	vistasInactivas = computed(() => this.vistas().filter((v) => v.estado === 0).length);
-	totalModulos = computed(() => this.modulos().length);
-
-	// * Computed - filtered data
-	filteredVistas = computed(() => {
-		let data = this.vistas();
-		const search = this.searchTerm().toLowerCase();
-		const filtroModulo = this.filterModulo();
-		const filtroEstado = this.filterEstado();
-
-		if (search) {
-			data = data.filter(
-				(v) =>
-					v.nombre.toLowerCase().includes(search) ||
-					v.ruta.toLowerCase().includes(search),
-			);
-		}
-
-		if (filtroModulo) {
-			data = data.filter((v) => this.adminUtils.getModuloFromRuta(v.ruta) === filtroModulo);
-		}
-
-		if (filtroEstado !== null) {
-			data = data.filter((v) => v.estado === filtroEstado);
-		}
-
-		return data;
-	});
-
+	// #region Lifecycle
 	ngOnInit(): void {
-		// * Initial load
-		this.loadData();
+		this.facade.loadAll();
 	}
+	// #endregion
 
-	loadData(): void {
-		// * Fetch views list from API.
-		this.loading.set(true);
-
-		this.permisosService
-			.getVistas()
-			.pipe(takeUntilDestroyed(this.destroyRef))
-			.subscribe({
-				next: (vistas) => {
-					this.vistas.set(vistas);
-					this.loading.set(false);
-				},
-				error: (err) => {
-					logger.error('Error al cargar vistas:', err);
-					this.errorHandler.showError(
-						UI_SUMMARIES.error,
-						UI_ADMIN_ERROR_DETAILS.loadVistas,
-					);
-					this.loading.set(false);
-				},
-			});
-	}
-
-	refresh(): void {
-		this.loadData();
-	}
-
-	clearFilters(): void {
-		// * Reset all filters.
-		this.searchTerm.set('');
-		this.filterModulo.set(null);
-		this.filterEstado.set(null);
-	}
-
-	// #region Edit Dialog
-	openNew(): void {
-		// * Create new view flow.
-		this.selectedVista.set(null);
-		this.formData.set({ ruta: '', nombre: '', estado: 1 });
-		this.isEditing.set(false);
-		this.dialogVisible.set(true);
-	}
-
-	editVista(vista: Vista): void {
-		this.selectedVista.set(vista);
-		this.formData.set({
-			ruta: vista.ruta,
-			nombre: vista.nombre,
-			estado: vista.estado ?? 1,
-		});
-		this.isEditing.set(true);
-		this.dialogVisible.set(true);
-	}
-
-	hideDialog(): void {
-		this.dialogVisible.set(false);
-	}
-
-	saveVista(): void {
-		// ! Persist form data (create or update).
-		const data = this.formData();
-		this.loading.set(true);
-
-		const operation$ = this.isEditing()
-			? (() => {
-					const vista = this.selectedVista();
-					if (!vista) return null;
-					return this.permisosService.actualizarVista(vista.id, {
-						ruta: data.ruta,
-						nombre: data.nombre,
-						estado: data.estado,
-					});
-				})()
-			: this.permisosService.crearVista({
-					ruta: data.ruta,
-					nombre: data.nombre,
-				});
-
-		if (!operation$) {
-			this.loading.set(false);
+	// #region Event handlers
+	onLazyLoad(event: { first?: number; rows?: number }): void {
+		// Ignorar el primer onLazyLoad automático: ngOnInit ya cargó los datos
+		if (!this.initialLoadDone()) {
+			this.initialLoadDone.set(true);
 			return;
 		}
 
-		operation$.pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
-			next: () => {
-				this.hideDialog();
-				this.loadData();
-			},
-			error: (err) => {
-				logger.error('Error:', err);
-				this.errorHandler.showError(
-					UI_SUMMARIES.error,
-					UI_ADMIN_ERROR_DETAILS.saveVista,
-				);
-				this.loading.set(false);
-			},
-		});
+		const first = event.first ?? 0;
+		const rows = event.rows ?? 10;
+		const page = Math.floor(first / rows) + 1;
+		this.facade.loadPage(page, rows);
 	}
 
-	deleteVista(vista: Vista): void {
-		// ! Confirm before delete.
-		if (confirm(buildDeleteVistaMessage(vista.nombre))) {
-			this.loading.set(true);
-			this.permisosService
-				.eliminarVista(vista.id)
-				.pipe(takeUntilDestroyed(this.destroyRef))
-				.subscribe({
-					next: () => this.loadData(),
-					error: (err) => {
-						logger.error('Error al eliminar:', err);
-						this.errorHandler.showError(
-							UI_SUMMARIES.error,
-							UI_ADMIN_ERROR_DETAILS.deleteVista,
-						);
-						this.loading.set(false);
-					},
-				});
-		}
+	refresh(): void {
+		this.facade.loadAll();
+	}
+
+	openNew(): void {
+		this.facade.openNewDialog();
+	}
+
+	editVista(vista: Vista): void {
+		this.facade.openEditDialog(vista);
+	}
+
+	saveVista(): void {
+		this.facade.saveVista();
 	}
 
 	toggleEstado(vista: Vista): void {
-		const nuevoEstado = vista.estado === 1 ? 0 : 1;
-		this.loading.set(true);
-		this.permisosService
-			.actualizarVista(vista.id, {
-				ruta: vista.ruta,
-				nombre: vista.nombre,
-				estado: nuevoEstado,
-			})
-			.pipe(takeUntilDestroyed(this.destroyRef))
-			.subscribe({
-				next: () => this.loadData(),
-			error: (err) => {
-				logger.error('Error al cambiar estado:', err);
-				this.errorHandler.showError(
-					UI_SUMMARIES.error,
-					UI_ADMIN_ERROR_DETAILS.changeEstado,
-				);
-				this.loading.set(false);
-			},
+		this.facade.toggleEstado(vista);
+	}
+
+	deleteVista(vista: Vista): void {
+		this.facade.openConfirmDialog();
+
+		this.confirmationService.confirm({
+			message: buildDeleteVistaMessage(vista.nombre),
+			header: 'Confirmar Eliminación',
+			icon: 'pi pi-exclamation-triangle',
+			accept: () => this.facade.delete(vista),
 		});
 	}
 
-	// #endregion
-	// #region UI Helpers
-	isFormValid(): boolean {
-		const data = this.formData();
-		return !!(data.ruta && data.nombre);
+	updateFormField(field: 'ruta' | 'nombre' | 'estado', value: unknown): void {
+		this.facade.updateFormField(field, value);
 	}
 
-	updateFormField(field: keyof VistaForm, value: unknown): void {
-		this.formData.update((current) => ({ ...current, [field]: value }));
+	clearFilters(): void {
+		this.facade.clearFilters();
+	}
+
+	onSearchTermChange(term: string): void {
+		this.facade.setSearchTerm(term);
+	}
+
+	onFilterModuloChange(modulo: string | null): void {
+		this.facade.setFilterModulo(modulo);
+	}
+
+	onFilterEstadoChange(estado: number | null): void {
+		this.facade.setFilterEstado(estado);
+	}
+	// #endregion
+
+	// #region Dialog sync handlers
+	onDialogVisibleChange(visible: boolean): void {
+		if (!visible) {
+			this.facade.closeDialog();
+		}
+	}
+
+	onConfirmDialogHide(): void {
+		this.facade.closeConfirmDialog();
 	}
 	// #endregion
 }

@@ -1,5 +1,5 @@
 // #region Imports
-import { Component, Input, output, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, Input, output, signal } from '@angular/core';
 import { RouterLink, RouterLinkActive } from '@angular/router';
 import { UserProfileMenuComponent } from '../user-profile-menu';
 
@@ -16,6 +16,7 @@ export interface NavMenuItem {
 @Component({
 	selector: 'app-mobile-menu',
 	standalone: true,
+	changeDetection: ChangeDetectionStrategy.OnPush,
 	imports: [RouterLink, RouterLinkActive, UserProfileMenuComponent],
 	templateUrl: './mobile-menu.component.html',
 	styleUrl: './mobile-menu.component.scss',

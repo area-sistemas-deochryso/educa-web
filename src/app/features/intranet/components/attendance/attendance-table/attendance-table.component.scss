@@ -5,6 +5,7 @@ $color-temprano: #506ad0;
 $color-atiempo: #77a02d;
 $color-fuera: #ffcc0c;
 $color-no: #f44336;
+$color-justificado: #9c27b0;
 
 .attendance-section {
 	border-radius: 10px;
@@ -414,6 +415,10 @@ $color-no: #f44336;
 
 .status-no {
 	background-color: $color-no;
+}
+
+.status-justificado {
+	background-color: $color-justificado;
 }
 
 .status-pendiente {

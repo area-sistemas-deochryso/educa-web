@@ -1,6 +1,6 @@
 // #region Imports
 import { AsistenciaService, HijoApoderado, StorageService } from '@core/services';
-import { Component, DestroyRef, OnInit, computed, inject, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, DestroyRef, OnInit, computed, inject, signal } from '@angular/core';
 
 import { AttendanceDataService } from '../../../services/attendance/attendance-data.service';
 import { AttendanceLegendComponent } from '@app/features/intranet/components/attendance/attendance-legend/attendance-legend.component';
@@ -21,6 +21,7 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 	standalone: true,
 	imports: [AttendanceTableComponent, EmptyStateComponent, AttendanceLegendComponent],
 	templateUrl: './attendance-apoderado.component.html',
+	changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class AttendanceApoderadoComponent implements OnInit {
 	private asistenciaService = inject(AsistenciaService);
@@ -131,6 +132,7 @@ export class AttendanceApoderadoComponent implements OnInit {
 							selectedMonth,
 							selectedYear,
 							hijo.nombreCompleto,
+							response.conteoEstados,
 						);
 						this.ingresos.set(tables.ingresos);
 						this.salidas.set(tables.salidas);
@@ -172,6 +174,7 @@ export class AttendanceApoderadoComponent implements OnInit {
 							selectedMonth,
 							selectedYear,
 							hijo.nombreCompleto,
+							response.conteoEstados,
 						);
 						this.ingresos.set(tables.ingresos);
 					}
@@ -197,6 +200,7 @@ export class AttendanceApoderadoComponent implements OnInit {
 							selectedMonth,
 							selectedYear,
 							hijo.nombreCompleto,
+							response.conteoEstados,
 						);
 						this.salidas.set(tables.salidas);
 					}

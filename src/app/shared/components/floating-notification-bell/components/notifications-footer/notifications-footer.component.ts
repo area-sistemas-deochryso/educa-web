@@ -1,5 +1,5 @@
 // #region Imports
-import { Component, EventEmitter, Input, Output } from '@angular/core';
+import { ChangeDetectionStrategy, Component, EventEmitter, Input, Output } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterLink } from '@angular/router';
 
@@ -7,6 +7,7 @@ import { RouterLink } from '@angular/router';
 // #region Implementation
 @Component({
 	selector: 'app-notifications-footer',
+	changeDetection: ChangeDetectionStrategy.OnPush,
 	imports: [CommonModule, RouterLink],
 	templateUrl: './notifications-footer.component.html',
 	styleUrl: './notifications-footer.component.scss',

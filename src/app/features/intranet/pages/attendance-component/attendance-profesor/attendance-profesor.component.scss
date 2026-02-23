@@ -27,8 +27,6 @@
 	align-items: center;
 	gap: 0.75rem;
 	padding: 0.75rem 1.25rem;
-	background: var(--surface-card);
-	border-radius: var(--border-radius);
 	flex-wrap: wrap;
 
 	.pdf-label {
@@ -36,6 +34,33 @@
 		font-weight: 500;
 		color: var(--text-color);
 		white-space: nowrap;
+	}
+}
+
+// #endregion
+// #region Report info group
+.pdf-report-info {
+	display: flex;
+	align-items: center;
+	gap: 0.5rem;
+	flex-wrap: wrap;
+}
+
+.periodo-separator {
+	font-size: 0.9rem;
+	color: var(--text-color-secondary);
+}
+
+::ng-deep .periodo-select {
+	min-width: 120px;
+	max-width: 160px;
+}
+
+::ng-deep .pdf-mode-toggle {
+	.p-togglebutton {
+		padding: 0.4rem 0.75rem;
+		font-size: 0.85rem;
+		background: transparent;
 	}
 }
 

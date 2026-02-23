@@ -10,7 +10,7 @@ import {
 	withEnabledBlockingInitialNavigation,
 	withPreloading,
 } from '@angular/router';
-import { authInterceptor, errorInterceptor, requestTraceInterceptor } from '@core/interceptors';
+import { apiResponseInterceptor, authInterceptor, errorInterceptor, requestTraceInterceptor } from '@core/interceptors';
 import { provideClientHydration, withEventReplay } from '@angular/platform-browser';
 import { provideHttpClient, withFetch, withInterceptors } from '@angular/common/http';
 
@@ -38,7 +38,7 @@ export const appConfig: ApplicationConfig = {
 		),
 		provideHttpClient(
 			withFetch(),
-			withInterceptors([authInterceptor, requestTraceInterceptor, errorInterceptor]),
+			withInterceptors([authInterceptor, requestTraceInterceptor, apiResponseInterceptor, errorInterceptor]),
 		),
 		provideAnimationsAsync(),
 		providePrimeNG({

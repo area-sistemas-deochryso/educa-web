@@ -2,7 +2,7 @@
 <!-- * Render stacked validation messages when the field is invalid. -->
 @if (shouldShowErrors) {
 	<div class="form-error">
-		@for (message of errorMessages; track message) {
+		@for (message of errorMessages(); track message) {
 			<small class="p-error">{{ message }}</small>
 		}
 	</div>

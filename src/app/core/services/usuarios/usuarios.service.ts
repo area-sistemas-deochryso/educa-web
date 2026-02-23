@@ -11,6 +11,7 @@ import { Observable, catchError, of } from 'rxjs';
 
 import { ApiResponse } from '../permisos';
 import { HttpClient } from '@angular/common/http';
+import { PaginatedResponse } from '@data/repositories/base/base.repository';
 import { environment } from '@env/environment';
 
 // #endregion
@@ -31,6 +32,36 @@ export class UsuariosService {
 		return this.http
 			.get<UsuarioLista[]>(`${this.apiUrl}/listar`, { params })
 			.pipe(catchError(() => of([])));
+	}
+
+	listarUsuariosPaginado(
+		page: number,
+		pageSize: number,
+		rol?: string,
+		estado?: boolean,
+	): Observable<PaginatedResponse<UsuarioLista>> {
+		const params: Record<string, string> = {
+			page: page.toString(),
+			pageSize: pageSize.toString(),
+		};
+		if (rol) params['rol'] = rol;
+		if (estado !== undefined) params['estado'] = estado.toString();
+
+		return this.http
+			.get<PaginatedResponse<UsuarioLista>>(`${this.apiUrl}/listar`, { params })
+			.pipe(
+				catchError(() =>
+					of({
+						data: [],
+						total: 0,
+						page,
+						pageSize,
+						totalPages: 0,
+						hasNextPage: false,
+						hasPreviousPage: false,
+					}),
+				),
+			);
 	}
 
 	obtenerUsuario(rol: string, id: number): Observable<UsuarioDetalle | null> {

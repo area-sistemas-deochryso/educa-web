@@ -1,5 +1,5 @@
 // #region Imports
-import { Component } from '@angular/core';
+import { ChangeDetectionStrategy, Component } from '@angular/core';
 
 // #endregion
 // #region Implementation
@@ -8,6 +8,7 @@ import { Component } from '@angular/core';
 	imports: [],
 	templateUrl: './calendar-legend.component.html',
 	styleUrl: './calendar-legend.component.scss',
+	changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class CalendarLegendComponent {}
 // #endregion

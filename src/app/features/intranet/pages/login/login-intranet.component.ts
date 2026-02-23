@@ -7,7 +7,7 @@ import {
 	UserRole,
 	VerifyTokenResponse,
 } from '@core/services';
-import { Component, DestroyRef, OnInit, inject, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, DestroyRef, OnInit, inject, signal } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import {
 	LoginButtonComponent,
@@ -34,6 +34,7 @@ import { UI_LOGIN_MESSAGES } from '@app/shared/constants';
 // #region Implementation
 @Component({
 	selector: 'app-login-intranet',
+	changeDetection: ChangeDetectionStrategy.OnPush,
 	imports: [
 		CommonModule,
 		ReactiveFormsModule,

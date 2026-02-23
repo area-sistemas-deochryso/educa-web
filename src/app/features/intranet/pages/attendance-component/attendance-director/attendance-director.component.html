@@ -10,33 +10,54 @@
 			[selectedGradoSeccion]="selectedGradoSeccion()"
 			(gradoSeccionChange)="selectGradoSeccion($event)"
 		/>
+	</div>
 
-		@if (view.viewMode() === 'mes') {
-			<!-- * PDF actions only in month mode -->
-			<div class="pdf-section">
-				<!-- Selector de tipo de reporte -->
-				<p-select
-					[options]="tipoReporteOptions"
-					[(ngModel)]="tipoReporte"
-					optionLabel="label"
-					optionValue="value"
-					placeholder="Tipo de reporte"
-					appendTo="body"
-					class="tipo-reporte-selector"
-				/>
+	@if (view.viewMode() === 'mes') {
+		<!-- * PDF actions below selector (always "Reporte por Salón") -->
+		<div class="pdf-section">
+			<!-- Toggle mes/periodo -->
+			<p-selectButton
+				[options]="view.monthSubModeOptions"
+				[ngModel]="view.monthSubMode()"
+				(ngModelChange)="view.setMonthSubMode($event)"
+				optionLabel="label"
+				optionValue="value"
+				[allowEmpty]="false"
+				styleClass="pdf-mode-toggle"
+			/>
 
-				<span class="pdf-label">
-					@if (tipoReporte() === 'salon') {
-						Reporte del día: {{ view.pdfFecha() | date: 'dd/MM/yyyy' }}
-					} @else {
-						Reporte consolidado
-					}
-				</span>
+			<!-- Grouped: label/selectors + PDF button wrap together -->
+			<div class="pdf-report-info">
+				@if (view.monthSubMode() === 'periodo') {
+					<span class="pdf-label">Periodo:</span>
+					<p-select
+						[options]="view.mesOptionsInicio()"
+						[ngModel]="view.periodoInicio()"
+						(ngModelChange)="view.setPeriodoInicio($event)"
+						optionLabel="label"
+						optionValue="value"
+						appendTo="body"
+						styleClass="periodo-select"
+					/>
+					<span class="periodo-separator">–</span>
+					<p-select
+						[options]="view.mesOptionsFin()"
+						[ngModel]="view.periodoFin()"
+						(ngModelChange)="view.setPeriodoFin($event)"
+						optionLabel="label"
+						optionValue="value"
+						appendTo="body"
+						styleClass="periodo-select"
+					/>
+					<span class="pdf-label">{{ view.periodoYear() }}</span>
+				} @else {
+					<span class="pdf-label">Reporte mensual: {{ view.pdfFecha() | date: 'MMMM yyyy' }}</span>
+				}
 
 				<p-button
 					icon="pi pi-file-pdf"
-					[loading]="tipoReporte() === 'salon' ? view.downloadingPdf() : downloadingPdfConsolidado()"
-					[disabled]="tipoReporte() === 'salon' && !selectedGradoSeccion()"
+					[loading]="view.downloadingPdf()"
+					[disabled]="!selectedGradoSeccion() || (view.monthSubMode() === 'periodo' && !view.isPeriodoValid())"
 					severity="danger"
 					[text]="true"
 					[rounded]="true"
@@ -51,8 +72,8 @@
 				/>
 				<p-menu #pdfMenu [model]="pdfMenuItems()" [popup]="true" appendTo="body" />
 			</div>
-		}
-	</div>
+		</div>
+	}
 
 	@if (view.viewMode() === 'mes') {
 		@if (view.showSkeletons() && !view.tableReady()) {
@@ -80,7 +101,7 @@
 			<app-empty-state message="No se encontraron estudiantes en este grado/sección." />
 		}
 	} @else {
-		<!-- * Day mode list with date picker + PDF options -->
+		<!-- * Day mode list with date picker + PDF options + tipo de reporte selector -->
 		<app-asistencia-dia-list
 			[estudiantes]="view.estudiantesDia()"
 			[fecha]="view.fechaDia()"

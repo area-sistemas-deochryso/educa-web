@@ -1,6 +1,6 @@
 <!-- #region Template -->
 <div class="vistas-container">
-	<!-- * Header -->
+	<!-- #region Header -->
 	<header class="page-header">
 		<div class="header-left">
 			<div class="header-icon">
@@ -19,13 +19,14 @@
 			(click)="refresh()"
 		></button>
 	</header>
+	<!-- #endregion -->
 
-	<!-- * Stats cards -->
+	<!-- #region Stats cards -->
 	<section class="stats-section">
 		<div class="stat-card">
 			<div class="stat-content">
 				<span class="stat-label">Total Vistas</span>
-				<span class="stat-value">{{ totalVistas() }}</span>
+				<span class="stat-value">{{ vm().estadisticas.totalVistas }}</span>
 				<span class="stat-sublabel">rutas registradas</span>
 			</div>
 			<div class="stat-icon">
@@ -36,7 +37,7 @@
 		<div class="stat-card">
 			<div class="stat-content">
 				<span class="stat-label">Vistas Activas</span>
-				<span class="stat-value">{{ vistasActivas() }}</span>
+				<span class="stat-value">{{ vm().estadisticas.vistasActivas }}</span>
 				<span class="stat-sublabel">disponibles</span>
 			</div>
 			<div class="stat-icon">
@@ -47,7 +48,7 @@
 		<div class="stat-card">
 			<div class="stat-content">
 				<span class="stat-label">Vistas Inactivas</span>
-				<span class="stat-value">{{ vistasInactivas() }}</span>
+				<span class="stat-value">{{ vm().estadisticas.vistasInactivas }}</span>
 				<span class="stat-sublabel">deshabilitadas</span>
 			</div>
 			<div class="stat-icon">
@@ -58,7 +59,7 @@
 		<div class="stat-card">
 			<div class="stat-content">
 				<span class="stat-label">Modulos</span>
-				<span class="stat-value">{{ totalModulos() }}</span>
+				<span class="stat-value">{{ vm().estadisticas.totalModulos }}</span>
 				<span class="stat-sublabel">categorias</span>
 			</div>
 			<div class="stat-icon">
@@ -66,8 +67,9 @@
 			</div>
 		</div>
 	</section>
+	<!-- #endregion -->
 
-	<!-- * Filters -->
+	<!-- #region Filters -->
 	<section class="filters-section">
 		<div class="search-box">
 			<i class="pi pi-search"></i>
@@ -75,25 +77,27 @@
 				type="text"
 				pInputText
 				placeholder="Buscar por nombre o ruta..."
-				[ngModel]="searchTerm()"
-				(ngModelChange)="searchTerm.set($event)"
+				[ngModel]="vm().searchTerm"
+				(ngModelChange)="onSearchTermChange($event)"
 			/>
 		</div>
 
 		<p-select
-			[options]="modulosOptions()"
-			[ngModel]="filterModulo()"
-			(ngModelChange)="filterModulo.set($event)"
+			[options]="vm().modulosOptions"
+			[ngModel]="vm().filterModulo"
+			(ngModelChange)="onFilterModuloChange($event)"
 			placeholder="Todos los modulos"
 			[style]="{ minWidth: '180px' }"
+			appendTo="body"
 		/>
 
 		<p-select
 			[options]="estadoOptions"
-			[ngModel]="filterEstado()"
-			(ngModelChange)="filterEstado.set($event)"
+			[ngModel]="vm().filterEstado"
+			(ngModelChange)="onFilterEstadoChange($event)"
 			placeholder="Estado"
 			[style]="{ minWidth: '140px' }"
+			appendTo="body"
 		/>
 
 		<button
@@ -114,24 +118,23 @@
 			(click)="openNew()"
 		></button>
 	</section>
+	<!-- #endregion -->
 
-	<!-- * Table -->
-	@if (loading()) {
-		<!-- * Loading spinner -->
-		<div class="loading-container">
-			<p-progressSpinner strokeWidth="4" />
-		</div>
-	} @else {
-		<section class="table-section">
-			<p-table
-				[value]="filteredVistas()"
-				[paginator]="true"
-				[rows]="10"
-				[rowsPerPageOptions]="[5, 10, 25, 50]"
-				[showCurrentPageReport]="true"
-				currentPageReportTemplate="Mostrando {first} a {last} de {totalRecords} vistas"
-				class="p-datatable-sm"
-			>
+	<!-- #region Table -->
+	<section class="table-section">
+		<p-table
+			[value]="vm().vistas"
+			[lazy]="true"
+			(onLazyLoad)="onLazyLoad($any($event))"
+			[paginator]="true"
+			[rows]="vm().pageSize"
+			[totalRecords]="vm().totalRecords"
+			[rowsPerPageOptions]="[5, 10, 25, 50]"
+			[showCurrentPageReport]="true"
+			[loading]="vm().loading"
+			currentPageReportTemplate="Mostrando {first} a {last} de {totalRecords} vistas"
+			class="p-datatable-sm"
+		>
 				<ng-template #header>
 					<tr>
 						<th style="width: 70px" pSortableColumn="id">
@@ -217,14 +220,15 @@
 					</tr>
 				</ng-template>
 			</p-table>
-		</section>
-	}
+	</section>
+	<!-- #endregion -->
 </div>
 
-<!-- * Edit/Create dialog -->
+<!-- #region Edit/Create dialog -->
 <p-dialog
-	[(visible)]="dialogVisible"
-	[header]="isEditing() ? 'Editar Vista' : 'Nueva Vista'"
+	[visible]="vm().dialogVisible"
+	(visibleChange)="onDialogVisibleChange($event)"
+	[header]="vm().isEditing ? 'Editar Vista' : 'Nueva Vista'"
 	[modal]="true"
 	[style]="{ width: '500px' }"
 	[draggable]="false"
@@ -239,7 +243,7 @@
 					id="ruta"
 					type="text"
 					pInputText
-					[ngModel]="formData().ruta"
+					[ngModel]="vm().formData.ruta"
 					(ngModelChange)="updateFormField('ruta', $event)"
 					placeholder="/intranet/modulo/vista"
 				/>
@@ -252,22 +256,22 @@
 					id="nombre"
 					type="text"
 					pInputText
-					[ngModel]="formData().nombre"
+					[ngModel]="vm().formData.nombre"
 					(ngModelChange)="updateFormField('nombre', $event)"
 					placeholder="Nombre descriptivo de la vista"
 				/>
 			</div>
 
-			@if (isEditing()) {
+			@if (vm().isEditing) {
 				<div class="field">
 					<label for="estado">Estado</label>
 					<div class="estado-switch">
 						<p-toggleswitch
 							id="estado"
-							[ngModel]="formData().estado === 1"
+							[ngModel]="vm().formData.estado === 1"
 							(ngModelChange)="updateFormField('estado', $event ? 1 : 0)"
 						/>
-						<span>{{ formData().estado === 1 ? 'Activa' : 'Inactiva' }}</span>
+						<span>{{ vm().formData.estado === 1 ? 'Activa' : 'Inactiva' }}</span>
 					</div>
 				</div>
 			}
@@ -281,7 +285,7 @@
 				label="Cancelar"
 				icon="pi pi-times"
 				class="p-button-text"
-				(click)="hideDialog()"
+				(click)="onDialogVisibleChange(false)"
 			></button>
 			<button
 				pButton
@@ -289,9 +293,13 @@
 				icon="pi pi-check"
 				class="p-button-success"
 				(click)="saveVista()"
-				[disabled]="!isFormValid()"
+				[disabled]="!vm().isFormValid"
 			></button>
 		</div>
 	</ng-template>
 </p-dialog>
+<!-- #endregion -->
+
+<!-- ConfirmDialog -->
+<p-confirmDialog (onHide)="onConfirmDialogHide()" />
 <!-- #endregion -->

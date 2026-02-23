@@ -10,7 +10,6 @@ import {
 import { Injectable, computed, inject, signal } from '@angular/core';
 
 import { HttpErrorResponse } from '@angular/common/http';
-import { Router } from '@angular/router';
 import { logger } from '@core/helpers';
 import {
 	UI_CLIENT_ERROR_MESSAGE,
@@ -25,7 +24,6 @@ import {
 })
 export class ErrorHandlerService {
 	// * Centralized error handling + notification state.
-	private router = inject(Router);
 
 	// Estado con Signals
 	private readonly _errors = signal<AppError[]>([]);
@@ -56,7 +54,14 @@ export class ErrorHandlerService {
 		const details = this.extractHttpDetails(error, method);
 		const message = this.getHttpErrorMessage(error);
 
-		const appError = this.createError(message, 'error', 'http', {
+		// For 500+ errors, append short trace reference for support correlation
+		const traceId = context?.['traceId'] as string | undefined;
+		const displayMessage =
+			error.status >= 500 && traceId
+				? `${message} (Ref: ${traceId.substring(0, 8)})`
+				: message;
+
+		const appError = this.createError(displayMessage, 'error', 'http', {
 			statusCode: error.status,
 			originalError: error,
 			context: { ...context, httpDetails: details },
@@ -65,14 +70,9 @@ export class ErrorHandlerService {
 		this.showNotification({
 			severity: 'error',
 			summary: UI_ERROR_SUMMARIES.connection,
-			detail: message,
+			detail: displayMessage,
 			life: error.status === 401 ? 3000 : 5000,
 		});
-
-		// Redirigir al login si es 401
-		if (error.status === 401) {
-			setTimeout(() => this.router.navigate(['/intranet/login']), 2000);
-		}
 
 		return appError;
 	}

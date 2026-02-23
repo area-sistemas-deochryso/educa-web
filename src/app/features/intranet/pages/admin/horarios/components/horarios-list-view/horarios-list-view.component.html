@@ -5,13 +5,14 @@
 		[value]="horarios()"
 		[loading]="loading()"
 		[paginator]="true"
-		[rows]="10"
+		[rows]="rows()"
+		[totalRecords]="totalRecords()"
+		[lazy]="true"
+		(onLazyLoad)="onLazyLoad($event)"
 		[showCurrentPageReport]="true"
 		currentPageReportTemplate="Mostrando {first} a {last} de {totalRecords} horarios"
 		[rowsPerPageOptions]="[10, 25, 50]"
 		responsiveLayout="scroll"
-		stateStorage="session"
-		stateKey="horarios-table-state"
 	>
 		<ng-template pTemplate="header">
 			<tr>

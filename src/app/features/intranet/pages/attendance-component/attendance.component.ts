@@ -4,7 +4,7 @@ import {
 	VIEW_MODE,
 	ViewMode,
 } from '../../components/attendance/attendance-header/attendance-header.component';
-import { Component, ViewChild, AfterViewInit, inject, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, ViewChild, AfterViewInit, inject, signal } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 
 import { AttendanceApoderadoComponent } from './attendance-apoderado/attendance-apoderado.component';
@@ -29,6 +29,7 @@ import { APP_USER_ROLES } from '@app/shared/constants';
 @Component({
 	selector: 'app-attendance',
 	standalone: true,
+	changeDetection: ChangeDetectionStrategy.OnPush,
 	imports: [
 		AttendanceHeaderComponent,
 		AttendanceApoderadoComponent,

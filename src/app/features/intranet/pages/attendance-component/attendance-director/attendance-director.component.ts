@@ -1,6 +1,7 @@
 import { AsistenciaService, GradoSeccion, StorageService } from '@core/services';
+import { viewBlobInNewTab, downloadBlob } from '@core/helpers';
 import { JustificacionEvent } from '../../../components/attendance/asistencia-dia-list/asistencia-dia-list.component';
-import { Component, DestroyRef, OnInit, ViewChild, computed, inject, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, DestroyRef, OnInit, ViewChild, computed, inject, signal } from '@angular/core';
 
 import { AsistenciaDiaListComponent } from '../../../components/attendance/asistencia-dia-list/asistencia-dia-list.component';
 import { AttendanceLegendComponent } from '@app/features/intranet/components/attendance/attendance-legend/attendance-legend.component';
@@ -16,6 +17,7 @@ import { GradoSeccionSelectorComponent } from '../../../components/attendance/gr
 import { Menu, MenuModule } from 'primeng/menu';
 import { MenuItem } from 'primeng/api';
 import { Select } from 'primeng/select';
+import { SelectButton } from 'primeng/selectbutton';
 import { TooltipModule } from 'primeng/tooltip';
 import { Observable, finalize } from 'rxjs';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
@@ -48,12 +50,14 @@ interface TipoReporteOption {
 		TooltipModule,
 		MenuModule,
 		Select,
+		SelectButton,
 		FormsModule,
 		DatePipe,
 	],
 	providers: [AttendanceViewController],
 	templateUrl: './attendance-director.component.html',
 	styleUrl: './attendance-director.component.scss',
+	changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class AttendanceDirectorComponent implements OnInit {
 	@ViewChild('pdfMenu') pdfMenu!: Menu;
@@ -210,10 +214,34 @@ export class AttendanceDirectorComponent implements OnInit {
 	// #region PDF menu
 
 	readonly pdfMenuItems = computed<MenuItem[]>(() => {
-		const tipo = this.tipoReporte();
+		const isMonthMode = this.view.viewMode() === 'mes';
 
+		if (isMonthMode) {
+			// Month mode: always salon (periodo or mensual)
+			const isPeriodo = this.view.monthSubMode() === 'periodo';
+			return [
+				{
+					label: 'Ver PDF',
+					icon: 'pi pi-eye',
+					command: () =>
+						isPeriodo
+							? this.view.verPdfAsistenciaPeriodo()
+							: this.view.verPdfAsistenciaMes(),
+				},
+				{
+					label: 'Descargar PDF',
+					icon: 'pi pi-download',
+					command: () =>
+						isPeriodo
+							? this.view.descargarPdfAsistenciaPeriodo()
+							: this.view.descargarPdfAsistenciaMes(),
+				},
+			];
+		}
+
+		// Day mode: depends on tipoReporte
+		const tipo = this.tipoReporte();
 		if (tipo === 'salon') {
-			// Reporte específico de un salón
 			return [
 				{
 					label: 'Ver PDF',
@@ -226,21 +254,21 @@ export class AttendanceDirectorComponent implements OnInit {
 					command: () => this.view.descargarPdfAsistenciaDia(),
 				},
 			];
-		} else {
-			// Reportes consolidados
-			return [
-				{
-					label: 'Ver PDF',
-					icon: 'pi pi-eye',
-					command: () => this.verPdfConsolidado(),
-				},
-				{
-					label: 'Descargar PDF',
-					icon: 'pi pi-download',
-					command: () => this.descargarPdfConsolidado(),
-				},
-			];
 		}
+
+		// Consolidados (day mode only)
+		return [
+			{
+				label: 'Ver PDF',
+				icon: 'pi pi-eye',
+				command: () => this.verPdfConsolidado(),
+			},
+			{
+				label: 'Descargar PDF',
+				icon: 'pi pi-download',
+				command: () => this.descargarPdfConsolidado(),
+			},
+		];
 	});
 
 	togglePdfMenu(event: Event): void {
@@ -289,11 +317,7 @@ export class AttendanceDirectorComponent implements OnInit {
 				finalize(() => this.downloadingPdfConsolidado.set(false)),
 			)
 			.subscribe({
-				next: (blob) => {
-					const url = window.URL.createObjectURL(blob);
-					window.open(url, '_blank');
-					setTimeout(() => window.URL.revokeObjectURL(url), 100);
-				},
+				next: (blob) => viewBlobInNewTab(blob),
 			});
 	}
 
@@ -313,16 +337,7 @@ export class AttendanceDirectorComponent implements OnInit {
 				finalize(() => this.downloadingPdfConsolidado.set(false)),
 			)
 			.subscribe({
-				next: (blob) => {
-					const url = window.URL.createObjectURL(blob);
-					const a = document.createElement('a');
-					a.href = url;
-					a.download = this.getConsolidadoFileName(tipo);
-					document.body.appendChild(a);
-					a.click();
-					document.body.removeChild(a);
-					window.URL.revokeObjectURL(url);
-				},
+				next: (blob) => downloadBlob(blob, this.getConsolidadoFileName(tipo)),
 			});
 	}
 

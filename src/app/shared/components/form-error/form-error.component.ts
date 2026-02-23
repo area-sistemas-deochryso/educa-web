@@ -1,5 +1,5 @@
 // #region Imports
-import { Component, DestroyRef, Input, OnInit, inject } from '@angular/core';
+import { ChangeDetectionStrategy, Component, DestroyRef, Input, OnInit, computed, inject, signal } from '@angular/core';
 import { ValidationMessageConfig, getValidationMessage } from '@shared/validators';
 
 import { AbstractControl } from '@angular/forms';
@@ -14,6 +14,7 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 	imports: [CommonModule],
 	templateUrl: './form-error.component.html',
 	styleUrls: ['./form-error.component.scss'],
+	changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class FormErrorComponent implements OnInit {
 	// * Reactive form control to inspect for errors.
@@ -26,7 +27,7 @@ export class FormErrorComponent implements OnInit {
 	private destroyRef = inject(DestroyRef);
 
 	// * Current list of translated messages for the template.
-	errorMessages: string[] = [];
+	readonly errorMessages = signal<string[]>([]);
 
 	ngOnInit(): void {
 		// * Keep errors in sync with status changes.
@@ -51,12 +52,14 @@ export class FormErrorComponent implements OnInit {
 	private updateErrors(): void {
 		// * Map validation keys to displayable messages.
 		if (!this.control.errors) {
-			this.errorMessages = [];
+			this.errorMessages.set([]);
 			return;
 		}
 
-		this.errorMessages = Object.entries(this.control.errors).map(([key, params]) =>
-			getValidationMessage(key, params as Record<string, unknown>, this.customMessages),
+		this.errorMessages.set(
+			Object.entries(this.control.errors).map(([key, params]) =>
+				getValidationMessage(key, params as Record<string, unknown>, this.customMessages),
+			),
 		);
 	}
 }

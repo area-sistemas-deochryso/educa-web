@@ -1,5 +1,5 @@
 // #region Imports
-import { Component, EventEmitter, Input, Output, ViewChild } from '@angular/core';
+import { ChangeDetectionStrategy, Component, EventEmitter, Input, Output, ViewChild } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { DialogModule } from 'primeng/dialog';
 import { Menu, MenuModule } from 'primeng/menu';
@@ -16,6 +16,7 @@ import {
 	imports: [CommonModule, DialogModule, MenuModule],
 	templateUrl: './schedule-modal.component.html',
 	styleUrl: './schedule-modal.component.scss',
+	changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ScheduleModalComponent {
 	@ViewChild('courseMenu') courseMenu!: Menu;

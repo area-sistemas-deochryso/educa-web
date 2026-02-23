@@ -27,13 +27,16 @@
 		<!-- * Table skeleton while loading -->
 		<app-usuarios-table-skeleton />
 	} @else {
-		<!-- * Users table -->
+		<!-- * Users table with server-side pagination -->
 		<app-usuarios-table
 			[usuarios]="vm().filteredUsuarios"
 			[loading]="vm().loading"
+			[totalRecords]="vm().totalRecords"
+			[rows]="vm().pageSize"
 			(viewDetail)="onViewDetail($event)"
 			(edit)="onEditUsuario($event)"
 			(toggleEstado)="onToggleEstado($event)"
+			(lazyLoad)="onLazyLoad($event)"
 		/>
 	}
 </div>

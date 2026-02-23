@@ -11,11 +11,13 @@ import {
 	PermisosUsuarioResultado,
 	UsuarioBusquedaResultado,
 	Vista,
+	VistasEstadisticas,
 } from './permisos.models';
 import { Injectable, inject } from '@angular/core';
 import { Observable, catchError, of } from 'rxjs';
 
 import { HttpClient } from '@angular/common/http';
+import { PaginatedResponse } from '@data/repositories';
 import { environment } from '@env/environment';
 
 @Injectable({
@@ -32,6 +34,25 @@ export class PermisosService {
 		return this.http
 			.get<Vista[]>(`${this.apiUrl}/vistas/listar`)
 			.pipe(catchError(() => of([])));
+	}
+
+	getVistasPaginated(
+		page: number,
+		pageSize: number,
+		search?: string,
+		modulo?: string | null,
+		estado?: number | null,
+	): Observable<PaginatedResponse<Vista>> {
+		const params: Record<string, string | number> = { page, pageSize };
+		if (search) params['search'] = search;
+		if (modulo) params['modulo'] = modulo;
+		if (estado !== undefined && estado !== null) params['estado'] = estado;
+
+		return this.http.get<PaginatedResponse<Vista>>(`${this.apiUrl}/vistas/listar`, { params });
+	}
+
+	getVistasEstadisticas(): Observable<VistasEstadisticas> {
+		return this.http.get<VistasEstadisticas>(`${this.apiUrl}/vistas/estadisticas`);
 	}
 
 	getVista(id: number): Observable<Vista | null> {
@@ -57,6 +78,17 @@ export class PermisosService {
 		return this.http
 			.get<PermisoRol[]>(`${this.apiUrl}/rol/listar`)
 			.pipe(catchError(() => of([])));
+	}
+
+	getPermisosRolPaginated(
+		page: number,
+		pageSize: number,
+		excludeRol?: string,
+	): Observable<PaginatedResponse<PermisoRol>> {
+		const params: Record<string, string | number> = { page, pageSize };
+		if (excludeRol) params['excludeRol'] = excludeRol;
+
+		return this.http.get<PaginatedResponse<PermisoRol>>(`${this.apiUrl}/rol/listar`, { params });
 	}
 
 	getPermisoRol(id: number): Observable<PermisoRol | null> {

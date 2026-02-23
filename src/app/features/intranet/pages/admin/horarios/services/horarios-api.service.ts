@@ -4,6 +4,7 @@ import { Observable, of } from 'rxjs';
 import { catchError } from 'rxjs/operators';
 
 import { environment } from '@config/environment';
+import { PaginatedResponse } from '@data/repositories';
 import {
   HorarioAsignarEstudiantesDto,
   HorarioAsignarProfesorDto,
@@ -25,6 +26,16 @@ export class HorariosApiService {
     return this.http
       .get<HorarioResponseDto[]>(`${this.apiUrl}`)
       .pipe(catchError(() => of([])));
+  }
+
+  getAllPaginated(
+    page: number,
+    pageSize: number
+  ): Observable<PaginatedResponse<HorarioResponseDto>> {
+    return this.http.get<PaginatedResponse<HorarioResponseDto>>(
+      `${this.apiUrl}`,
+      { params: { page, pageSize } }
+    );
   }
 
   getById(id: number): Observable<HorarioDetalleResponseDto | null> {

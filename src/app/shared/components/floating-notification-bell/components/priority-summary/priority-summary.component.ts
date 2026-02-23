@@ -1,5 +1,5 @@
 // #region Imports
-import { Component, Input } from '@angular/core';
+import { ChangeDetectionStrategy, Component, Input } from '@angular/core';
 import { CommonModule } from '@angular/common';
 
 // #endregion
@@ -13,6 +13,7 @@ export interface UnreadByPriority {
 
 @Component({
 	selector: 'app-priority-summary',
+	changeDetection: ChangeDetectionStrategy.OnPush,
 	imports: [CommonModule],
 	templateUrl: './priority-summary.component.html',
 	styleUrl: './priority-summary.component.scss',

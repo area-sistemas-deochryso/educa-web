@@ -1,5 +1,5 @@
 // #region Imports
-import { Component, Input, inject } from '@angular/core';
+import { ChangeDetectionStrategy, Component, Input, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterLink } from '@angular/router';
 import { SeasonalNotification } from '@core/services';
@@ -9,6 +9,7 @@ import { NotificationsPanelContext } from '../../notifications-panel.context';
 // #region Implementation
 @Component({
 	selector: 'app-notification-card',
+	changeDetection: ChangeDetectionStrategy.OnPush,
 	imports: [CommonModule, RouterLink],
 	templateUrl: './notification-card.component.html',
 	styleUrl: './notification-card.component.scss',

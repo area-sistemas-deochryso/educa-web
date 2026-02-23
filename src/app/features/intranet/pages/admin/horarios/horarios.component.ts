@@ -87,6 +87,10 @@ export class HorariosComponent implements OnInit {
 		this.loadData();
 	}
 
+	onLazyLoad(event: { page: number; pageSize: number }): void {
+		this.facade.loadPage(event.page, event.pageSize);
+	}
+
 	// #endregion
 	// #region Event handlers - CRUD
 	onNew(): void {

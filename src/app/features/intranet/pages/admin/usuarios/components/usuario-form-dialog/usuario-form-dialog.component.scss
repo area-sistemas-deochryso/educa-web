@@ -75,6 +75,10 @@
 	display: flex;
 	justify-content: flex-end;
 	gap: 0.5rem;
+
+	.p-button-success {
+		color: #ffffff;
+	}
 }
 
 :host ::ng-deep {

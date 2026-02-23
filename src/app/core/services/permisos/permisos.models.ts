@@ -88,6 +88,15 @@ export interface ApiResponse {
 	mensaje: string;
 }
 
+// Estadísticas de vistas
+export interface VistasEstadisticas {
+	totalVistas: number;
+	vistasActivas: number;
+	vistasInactivas: number;
+	totalModulos: number;
+	modulos: string[];
+}
+
 // Búsqueda de usuarios
 export interface UsuarioBusqueda {
 	id: number;

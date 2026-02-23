@@ -1,5 +1,5 @@
 // #region Imports
-import { Component, EventEmitter, Input, Output } from '@angular/core';
+import { ChangeDetectionStrategy, Component, EventEmitter, Input, Output } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { NotificationPriority } from '@core/services';
 
@@ -14,6 +14,7 @@ export interface PriorityInfo {
 
 @Component({
 	selector: 'app-priority-legend-menu',
+	changeDetection: ChangeDetectionStrategy.OnPush,
 	imports: [CommonModule],
 	templateUrl: './priority-legend-menu.component.html',
 	styleUrl: './priority-legend-menu.component.scss',

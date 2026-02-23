@@ -81,7 +81,17 @@
       "Bash(del:*)",
       "Bash(xxd:*)",
       "Bash(npm start)",
-      "Bash(python:*)"
+      "Bash(python:*)",
+      "Bash(for f in Controllers/Auth/*.cs)",
+      "Bash(do sed -i 's/namespace Educa\\\\.API\\\\.Controllers$/namespace Educa.API.Controllers.Auth/' \"$f\")",
+      "Bash(for f in Controllers/Administracion/*.cs)",
+      "Bash(do sed -i 's/namespace Educa\\\\.API\\\\.Controllers$/namespace Educa.API.Controllers.Administracion/' \"$f\")",
+      "Bash(for f in Controllers/Academico/*.cs)",
+      "Bash(do sed -i 's/namespace Educa\\\\.API\\\\.Controllers$/namespace Educa.API.Controllers.Academico/' \"$f\")",
+      "Bash(for f in Controllers/Asistencias/*.cs)",
+      "Bash(do sed -i 's/namespace Educa\\\\.API\\\\.Controllers$/namespace Educa.API.Controllers.Asistencias/' \"$f\")",
+      "Bash(for f in Controllers/Integraciones/*.cs)",
+      "Bash(do sed -i 's/namespace Educa\\\\.API\\\\.Controllers$/namespace Educa.API.Controllers.Integraciones/' \"$f\")"
     ],
     "additionalDirectories": [
       "c:\\Users\\Asus Ryzen 9\\EducaWeb\\Educa.API\\Educa.API\\Controllers\\Sistema",

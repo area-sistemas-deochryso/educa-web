@@ -1,5 +1,5 @@
 // #region Imports
-import { Component, EventEmitter, Input, Output } from '@angular/core';
+import { ChangeDetectionStrategy, Component, EventEmitter, Input, Output } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { SeasonalNotification } from '@core/services';
 
@@ -7,6 +7,7 @@ import { SeasonalNotification } from '@core/services';
 // #region Implementation
 @Component({
 	selector: 'app-dismissed-card',
+	changeDetection: ChangeDetectionStrategy.OnPush,
 	imports: [CommonModule],
 	templateUrl: './dismissed-card.component.html',
 	styleUrl: './dismissed-card.component.scss',

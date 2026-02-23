@@ -2,7 +2,7 @@
 
 El backend está en **Educa.API** (ASP.NET Core):
 - **Ubicación**: `../Educa.API/Educa.API/`
-- **Tecnología**: ASP.NET Core 8 con Entity Framework Core
+- **Tecnología**: ASP.NET Core 9 con Entity Framework Core 9
 - **Base de datos**: SQL Server (Azure)
 - **Rama git**: `master` → `origin/master`
 

@@ -1,5 +1,5 @@
 // #region Imports
-import { Component } from '@angular/core';
+import { ChangeDetectionStrategy, Component } from '@angular/core';
 import { UserRole } from '@core/services';
 
 // #endregion
@@ -12,6 +12,7 @@ export interface RolOption {
 @Component({
 	selector: 'app-login-role-selector',
 	standalone: true,
+	changeDetection: ChangeDetectionStrategy.OnPush,
 	templateUrl: './login-role-selector.component.html',
 	styleUrl: './login-role-selector.component.scss',
 })

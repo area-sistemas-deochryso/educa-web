@@ -1,5 +1,5 @@
 // #region Imports
-import { Component, OnInit, OnDestroy, inject, DestroyRef } from '@angular/core';
+import { ChangeDetectionStrategy, Component, OnInit, OnDestroy, inject, DestroyRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute } from '@angular/router';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
@@ -15,6 +15,7 @@ import { ScheduleModalsState } from '@core/services/storage';
 // #region Implementation
 @Component({
 	selector: 'app-schedule',
+	changeDetection: ChangeDetectionStrategy.OnPush,
 	imports: [
 		CommonModule,
 		ScheduleCalendarComponent,

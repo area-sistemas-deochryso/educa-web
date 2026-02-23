@@ -1,5 +1,5 @@
 // #region Imports
-import { Component, EventEmitter, Input, Output, inject } from '@angular/core';
+import { ChangeDetectionStrategy, Component, EventEmitter, Input, Output, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import {
 	PriorityLegendMenuComponent,
@@ -11,6 +11,7 @@ import { NotificationsPanelContext } from '../../notifications-panel.context';
 // #region Implementation
 @Component({
 	selector: 'app-notification-bell-button',
+	changeDetection: ChangeDetectionStrategy.OnPush,
 	imports: [CommonModule, PriorityLegendMenuComponent],
 	templateUrl: './notification-bell-button.component.html',
 	styleUrl: './notification-bell-button.component.scss',

@@ -25,6 +25,22 @@ export interface AsistenciaDetalle {
 	estadoSalida: AttendanceStatus;
 }
 
+// Conteo de estados por tipo (ingreso o salida) para un mes (ConteoEstadosDto)
+export interface ConteoEstados {
+	temprano: number;
+	aTiempo: number;
+	fueraHora: number;
+	noAsistio: number;
+	justificado: number;
+	pendiente: number;
+}
+
+// Conteos mensuales separados por ingreso y salida (ConteoEstadosMensualDto)
+export interface ConteoEstadosMensual {
+	ingresos: ConteoEstados;
+	salidas: ConteoEstados;
+}
+
 // Resumen de asistencias (ResumenAsistenciaDto)
 // Response del endpoint GET /api/ConsultaAsistencia/estudiante/mis-asistencias
 export interface ResumenAsistencia {
@@ -34,6 +50,7 @@ export interface ResumenAsistencia {
 	tardanzas: number;
 	porcentajeAsistencia: number;
 	detalle: AsistenciaDetalle[];
+	conteoEstados: ConteoEstadosMensual;
 }
 
 // Hijo del apoderado (HijoApoderadoDto)

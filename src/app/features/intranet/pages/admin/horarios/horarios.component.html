@@ -154,10 +154,13 @@
 		<app-horarios-list-view
 			[horarios]="vm().horariosFiltrados"
 			[loading]="vm().loading"
+			[totalRecords]="vm().totalRecords"
+			[rows]="vm().pageSize"
 			(viewDetail)="onViewDetail($event)"
 			(edit)="onEdit($event)"
 			(toggleEstado)="onToggleEstado($event.id, $event.estadoActual)"
 			(delete)="onDelete($event)"
+			(lazyLoad)="onLazyLoad($event)"
 		/>
 	} @else {
 		<app-horarios-table-skeleton />

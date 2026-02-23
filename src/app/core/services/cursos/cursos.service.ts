@@ -1,10 +1,11 @@
 // #region Imports
 import { Injectable, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { Observable, catchError, of } from 'rxjs';
+import { Observable } from 'rxjs';
 
 import { environment } from '@config/environment';
-import { Curso, CrearCursoRequest, ActualizarCursoRequest, ApiResponse } from './cursos.models';
+import { PaginatedResponse } from '@data/repositories';
+import { Curso, CrearCursoRequest, ActualizarCursoRequest, ApiResponse, CursosEstadisticas } from './cursos.models';
 
 // #endregion
 // #region Implementation
@@ -17,11 +18,30 @@ export class CursosService {
 	private http = inject(HttpClient);
 
 	getCursos(): Observable<Curso[]> {
-		return this.http.get<Curso[]>(`${this.apiUrl}/listar`).pipe(catchError(() => of([])));
+		return this.http.get<Curso[]>(`${this.apiUrl}/listar`);
 	}
 
-	getCurso(id: number): Observable<Curso | null> {
-		return this.http.get<Curso>(`${this.apiUrl}/${id}`).pipe(catchError(() => of(null)));
+	getCursosPaginated(
+		page: number,
+		pageSize: number,
+		search?: string,
+		estado?: boolean | null,
+		nivel?: string | null,
+	): Observable<PaginatedResponse<Curso>> {
+		const params: Record<string, string | number | boolean> = { page, pageSize };
+		if (search) params['search'] = search;
+		if (estado !== undefined && estado !== null) params['estado'] = estado;
+		if (nivel) params['nivel'] = nivel;
+
+		return this.http.get<PaginatedResponse<Curso>>(`${this.apiUrl}/listar`, { params });
+	}
+
+	getEstadisticas(): Observable<CursosEstadisticas> {
+		return this.http.get<CursosEstadisticas>(`${this.apiUrl}/estadisticas`);
+	}
+
+	getCurso(id: number): Observable<Curso> {
+		return this.http.get<Curso>(`${this.apiUrl}/${id}`);
 	}
 
 	crearCurso(request: CrearCursoRequest): Observable<ApiResponse> {

@@ -1,11 +1,12 @@
 // #region Imports
-import { Component, Input } from '@angular/core';
+import { ChangeDetectionStrategy, Component, Input } from '@angular/core';
 
 // #endregion
 // #region Implementation
 @Component({
 	selector: 'app-login-header',
 	standalone: true,
+	changeDetection: ChangeDetectionStrategy.OnPush,
 	imports: [],
 	templateUrl: './login-header.component.html',
 	styleUrl: './login-header.component.scss',

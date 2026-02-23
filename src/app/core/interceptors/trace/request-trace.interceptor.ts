@@ -10,24 +10,35 @@ import { RequestTraceFacade } from '@core/services/trace';
 import { inject } from '@angular/core';
 
 /**
- * Adds X-Request-Id and records timing for HTTP requests (dev only).
+ * Adds X-Request-Id to ALL requests (prod + dev) for backend correlation.
+ * Records timing and details only in dev mode.
  */
 // #endregion
 // #region Implementation
+
+function generateRequestId(): string {
+	if (typeof crypto !== 'undefined' && 'randomUUID' in crypto) {
+		return crypto.randomUUID();
+	}
+	return `req_${Date.now()}_${Math.floor(Math.random() * 1e6)}`;
+}
+
 export const requestTraceInterceptor: HttpInterceptorFn = (req, next) => {
 	const trace = inject(RequestTraceFacade);
 
-	if (!trace.isEnabled) {
-		return next(req);
-	}
-
-	const requestId = trace.newRequestId();
-	const startedAtPerf = performance.now();
-	const startedAt = new Date();
-
+	// Always send X-Request-Id for backend correlation (prod + dev)
+	const requestId = generateRequestId();
 	const tracedReq = req.clone({
 		setHeaders: { 'X-Request-Id': requestId },
 	});
+
+	// Recording/timing only in dev mode
+	if (!trace.isEnabled) {
+		return next(tracedReq);
+	}
+
+	const startedAtPerf = performance.now();
+	const startedAt = new Date();
 
 	let status: number | null = null;
 	let ok = false;

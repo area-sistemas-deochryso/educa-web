@@ -7,16 +7,17 @@
 	[minHeightPx]="420"
 	[blurPx]="2"
 >
-	<!-- * Users table with pagination + state storage -->
+	<!-- * Users table with server-side pagination -->
 	<p-table
 		[value]="usuarios()"
+		[lazy]="true"
 		[paginator]="true"
-		[rows]="10"
+		[rows]="rows()"
+		[totalRecords]="totalRecords()"
 		[rowsPerPageOptions]="[5, 10, 25, 50]"
 		[showCurrentPageReport]="true"
 		currentPageReportTemplate="Mostrando {first} a {last} de {totalRecords} usuarios"
-		stateStorage="session"
-		stateKey="usuarios-table-state"
+		(onLazyLoad)="onLazyLoad($event)"
 		class="p-datatable-sm"
 	>
 		<ng-template #header>
