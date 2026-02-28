@@ -12,9 +12,15 @@ import { CommonModule } from '@angular/common';
 	templateUrl: './member-list.component.html',
 	styleUrl: './member-list.component.scss',
 })
+/**
+ * Simple list of member names with an optional title.
+ */
 export class MemberListComponent {
-	// * Title + list of member names.
+	// #region Inputs
+	/** Title shown above the list. */
 	@Input() title = '';
+	/** List of member names. */
 	@Input() members: string[] = [];
+	// #endregion
 }
 // #endregion

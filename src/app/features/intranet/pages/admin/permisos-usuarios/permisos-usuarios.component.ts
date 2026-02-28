@@ -1,5 +1,4 @@
-import { ChangeDetectionStrategy, Component, DestroyRef, inject, OnInit } from '@angular/core';
-import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { ChangeDetectionStrategy, Component, inject, OnInit } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 
@@ -22,7 +21,6 @@ import { ConfirmationService } from 'primeng/api';
 import { ConfirmDialogModule } from 'primeng/confirmdialog';
 
 import {
-	PermisosService,
 	PermisoUsuario,
 	ROLES_DISPONIBLES_ADMIN,
 	RolTipoAdmin,
@@ -61,9 +59,7 @@ import { PermisosUsuariosFacade } from './permisos-usuarios.facade';
 })
 export class PermisosUsuariosComponent implements OnInit {
 	private facade = inject(PermisosUsuariosFacade);
-	private permisosService = inject(PermisosService);
 	private confirmationService = inject(ConfirmationService);
-	private destroyRef = inject(DestroyRef);
 
 	// * Facade state (signals)
 	readonly permisosUsuario = this.facade.permisosUsuario;
@@ -92,9 +88,9 @@ export class PermisosUsuariosComponent implements OnInit {
 	readonly moduloVistasForDetail = this.facade.moduloVistasForDetail;
 	readonly isAllModuloSelected = this.facade.isAllModuloSelected;
 
-	// * Autocomplete local state (ephemeral)
+	// * Autocomplete
+	readonly usuariosSugeridos = this.facade.usuariosSugeridos;
 	selectedUsuario: UsuarioBusqueda | null = null;
-	usuariosSugeridos: UsuarioBusqueda[] = [];
 
 	// Options (sin Apoderado para admin)
 	rolesDisponibles = ROLES_DISPONIBLES_ADMIN;
@@ -141,7 +137,6 @@ export class PermisosUsuariosComponent implements OnInit {
 	// #region Edit Dialog
 	openNew(): void {
 		this.selectedUsuario = null;
-		this.usuariosSugeridos = [];
 		this.facade.openNew();
 	}
 
@@ -182,43 +177,15 @@ export class PermisosUsuariosComponent implements OnInit {
 	// #endregion
 	// #region Rol & Vistas
 	loadVistasFromRol(): void {
-		// * Reset selected user when role changes.
-		// Limpiar usuario seleccionado cuando cambia el rol
 		this.selectedUsuario = null;
-		this.facade.setSelectedUsuarioId(null);
-
-		// Cargar usuarios del rol seleccionado para el autocomplete
-		const rol = this.selectedRol();
-		if (rol) {
-			this.permisosService
-				.listarUsuariosPorRol(rol)
-				.pipe(takeUntilDestroyed(this.destroyRef))
-				.subscribe((resultado) => {
-					this.usuariosSugeridos = resultado.usuarios;
-				});
-		}
-
 		this.facade.loadVistasFromRol();
 	}
 
 	// #endregion
 	// #region Autocomplete Usuarios
 	buscarUsuarios(event: AutoCompleteCompleteEvent): void {
-		// * Autocomplete: role-specific search.
-		const rol = this.selectedRol();
-		if (!rol) {
-			this.usuariosSugeridos = [];
-			return;
-		}
-
 		const termino = event.query?.trim() || '';
-
-		this.permisosService
-			.buscarUsuarios(termino || undefined, rol)
-			.pipe(takeUntilDestroyed(this.destroyRef))
-			.subscribe((resultado) => {
-				this.usuariosSugeridos = resultado.usuarios;
-			});
+		this.facade.searchUsuarios(termino);
 	}
 
 	onUsuarioSeleccionado(event: AutoCompleteSelectEvent): void {

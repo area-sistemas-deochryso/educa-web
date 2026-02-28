@@ -63,8 +63,19 @@
 							class="action-btn"
 							(click)="onDownloadAttachment(attachment)"
 							title="Descargar"
+							type="button"
+							aria-label="Descargar archivo"
 						>
 							<i class="pi pi-download"></i>
+						</button>
+						<button
+							class="action-btn delete-btn"
+							(click)="onDeleteAttachment(attachment)"
+							title="Eliminar"
+							type="button"
+							aria-label="Eliminar archivo"
+						>
+							<i class="pi pi-trash"></i>
 						</button>
 					</div>
 				</div>

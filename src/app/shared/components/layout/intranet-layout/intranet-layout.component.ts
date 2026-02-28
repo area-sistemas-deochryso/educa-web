@@ -3,6 +3,7 @@ import { ChangeDetectionStrategy, Component, inject, OnInit, DestroyRef, signal,
 import { Router, RouterLink, RouterOutlet } from '@angular/router';
 import { VoiceButtonComponent } from '@shared/components/voice-button';
 import { FloatingNotificationBellComponent } from '@shared/components/floating-notification-bell';
+import { SyncStatusComponent } from '@shared/components/sync-status';
 import { AuthService, UserPermisosService, SwService } from '@core/services';
 import {
 	NavItemComponent,
@@ -23,6 +24,7 @@ import { FeatureFlagsFacade } from '@core/services/feature-flags';
 		RouterLink,
 		VoiceButtonComponent,
 		FloatingNotificationBellComponent,
+		SyncStatusComponent,
 		NavItemComponent,
 		UserProfileMenuComponent,
 		MobileMenuComponent,

@@ -15,6 +15,7 @@ export class VistasStore {
 	// #region Estado privado
 	private readonly _vistas = signal<Vista[]>([]);
 	private readonly _loading = signal(false);
+	private readonly _error = signal<string | null>(null);
 
 	private readonly _dialogVisible = signal(false);
 	private readonly _isEditing = signal(false);
@@ -45,6 +46,7 @@ export class VistasStore {
 	// #region Lecturas públicas (readonly)
 	readonly vistas = this._vistas.asReadonly();
 	readonly loading = this._loading.asReadonly();
+	readonly error = this._error.asReadonly();
 
 	readonly dialogVisible = this._dialogVisible.asReadonly();
 	readonly isEditing = this._isEditing.asReadonly();
@@ -87,6 +89,7 @@ export class VistasStore {
 	readonly vm = computed(() => ({
 		vistas: this._vistas(),
 		loading: this.loading(),
+		error: this.error(),
 		estadisticas: this._estadisticas(),
 
 		// Pagination
@@ -117,6 +120,14 @@ export class VistasStore {
 		this._loading.set(loading);
 	}
 
+	setError(error: string | null): void {
+		this._error.set(error);
+	}
+
+	clearError(): void {
+		this._error.set(null);
+	}
+
 	/** Mutación quirúrgica: actualizar 1 vista */
 	updateVista(id: number, updates: Partial<Vista>): void {
 		this._vistas.update((list) =>
@@ -134,6 +145,11 @@ export class VistasStore {
 	/** Mutación quirúrgica: eliminar 1 vista */
 	removeVista(id: number): void {
 		this._vistas.update((list) => list.filter((v) => v.id !== id));
+	}
+
+	/** Mutación quirúrgica: re-agregar 1 vista (rollback de delete) */
+	addVista(vista: Vista): void {
+		this._vistas.update((list) => [vista, ...list]);
 	}
 
 	setEstadisticas(stats: VistasEstadisticas): void {

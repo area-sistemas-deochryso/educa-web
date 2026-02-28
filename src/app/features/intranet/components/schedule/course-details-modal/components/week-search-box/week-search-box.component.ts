@@ -14,10 +14,17 @@ import { FormsModule } from '@angular/forms';
 	templateUrl: './week-search-box.component.html',
 	styleUrls: ['./week-search-box.component.scss'],
 })
+/**
+ * Search box used to filter weeks or content.
+ */
 export class WeekSearchBoxComponent {
-	// * Two-way bound search term + placeholder override.
+	// #region Inputs/Outputs
+	/** Current search term value. */
 	@Input() searchTerm = '';
+	/** Placeholder text shown in the input. */
 	@Input() placeholder = 'BUSCAR ARCHIVO, SEMANA O TEMA...';
+	/** Emits when the search term changes. */
 	@Output() searchTermChange = new EventEmitter<string>();
+	// #endregion
 }
 // #endregion

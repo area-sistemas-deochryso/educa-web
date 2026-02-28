@@ -2,8 +2,9 @@ import { Injectable, inject, DestroyRef } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { forkJoin } from 'rxjs';
 
-import { logger } from '@core/helpers';
-import { ErrorHandlerService, PermisosService, Vista } from '@core/services';
+import { logger, withRetry } from '@core/helpers';
+import { ErrorHandlerService, PermisosService, Vista, WalFacadeHelper } from '@core/services';
+import { environment } from '@config';
 import { UI_ADMIN_ERROR_DETAILS, UI_SUMMARIES } from '@app/shared/constants';
 
 import { VistasStore } from './vistas.store';
@@ -14,7 +15,9 @@ export class VistasFacade {
 	private api = inject(PermisosService);
 	private store = inject(VistasStore);
 	private errorHandler = inject(ErrorHandlerService);
+	private wal = inject(WalFacadeHelper);
 	private destroyRef = inject(DestroyRef);
+	private readonly apiUrl = `${environment.apiUrl}/api/sistema/permisos`;
 	// #endregion
 
 	// #region Estado expuesto
@@ -26,12 +29,16 @@ export class VistasFacade {
 	/** Carga inicial: estadísticas + primera página en paralelo */
 	loadAll(): void {
 		this.store.setLoading(true);
+		this.store.clearError();
 
 		forkJoin({
 			vistas: this.api.getVistasPaginated(1, this.store.pageSize()),
 			stats: this.api.getVistasEstadisticas(),
 		})
-			.pipe(takeUntilDestroyed(this.destroyRef))
+			.pipe(
+				withRetry({ tag: 'VistasFacade:loadAll' }),
+				takeUntilDestroyed(this.destroyRef),
+			)
 			.subscribe({
 				next: ({ vistas, stats }) => {
 					this.store.setVistas(vistas.data);
@@ -42,6 +49,7 @@ export class VistasFacade {
 				error: (err) => {
 					logger.error('Error al cargar vistas:', err);
 					this.errorHandler.showError(UI_SUMMARIES.error, UI_ADMIN_ERROR_DETAILS.loadVistas);
+					this.store.setError(UI_ADMIN_ERROR_DETAILS.loadVistas);
 					this.store.setLoading(false);
 				},
 			});
@@ -55,69 +63,77 @@ export class VistasFacade {
 	}
 
 	/**
-	 * CREAR: Refetch items only (necesita ID del servidor) + refetch stats
+	 * CREAR: WAL → optimistic close dialog → refetch on commit
 	 */
 	create(ruta: string, nombre: string): void {
-		this.store.setLoading(true);
+		const payload = { ruta, nombre };
 
-		this.api
-			.crearVista({ ruta, nombre })
-			.pipe(takeUntilDestroyed(this.destroyRef))
-			.subscribe({
-				next: () => {
-					this.store.closeDialog();
-					this.refreshVistasOnly();
-					this.refreshEstadisticas();
-				},
-				error: (err) => {
-					logger.error('Error al crear vista:', err);
-					this.errorHandler.showError(UI_SUMMARIES.error, UI_ADMIN_ERROR_DETAILS.saveVista);
-					this.store.setLoading(false);
-				},
-			});
+		this.wal.execute({
+			operation: 'CREATE',
+			resourceType: 'Vista',
+			endpoint: `${this.apiUrl}/vistas/crear`,
+			method: 'POST',
+			payload,
+			http$: () => this.api.crearVista(payload),
+			optimistic: {
+				apply: () => this.store.closeDialog(),
+				rollback: () => {},
+			},
+			onCommit: () => {
+				this.refreshVistasOnly();
+				this.refreshEstadisticas();
+			},
+			onError: () => this.handleApiError(UI_ADMIN_ERROR_DETAILS.saveVista),
+		});
 	}
 
 	/**
-	 * EDITAR: Mutación quirúrgica (no refetch)
+	 * EDITAR: WAL → optimistic update → rollback to snapshot
 	 */
 	update(id: number, ruta: string, nombre: string, estado: number): void {
-		this.store.setLoading(true);
+		const snapshot = this.store.vistas().find((v) => v.id === id);
+		const payload = { ruta, nombre, estado, rowVersion: snapshot?.rowVersion };
 
-		this.api
-			.actualizarVista(id, { ruta, nombre, estado })
-			.pipe(takeUntilDestroyed(this.destroyRef))
-			.subscribe({
-				next: () => {
+		this.wal.execute({
+			operation: 'UPDATE',
+			resourceType: 'Vista',
+			resourceId: id,
+			endpoint: `${this.apiUrl}/vistas/${id}/actualizar`,
+			method: 'PUT',
+			payload,
+			http$: () => this.api.actualizarVista(id, payload),
+			optimistic: {
+				apply: () => {
 					this.store.updateVista(id, { ruta, nombre, estado });
 					this.store.closeDialog();
-					this.store.setLoading(false);
 				},
-				error: (err) => {
-					logger.error('Error al actualizar vista:', err);
-					this.errorHandler.showError(UI_SUMMARIES.error, UI_ADMIN_ERROR_DETAILS.saveVista);
-					this.store.setLoading(false);
+				rollback: () => {
+					if (snapshot) this.store.updateVista(id, snapshot);
 				},
-			});
+			},
+			onCommit: () => this.store.setLoading(false),
+			onError: () => this.handleApiError(UI_ADMIN_ERROR_DETAILS.saveVista),
+		});
 	}
 
 	/**
-	 * TOGGLE: Mutación quirúrgica + stats incrementales
+	 * TOGGLE: WAL → optimistic toggle + stats → rollback reverses
 	 */
 	toggleEstado(vista: Vista): void {
-		this.store.setLoading(true);
 		const nuevoEstado = vista.estado === 1 ? 0 : 1;
+		const payload = { ruta: vista.ruta, nombre: vista.nombre, estado: nuevoEstado, rowVersion: vista.rowVersion };
 
-		this.api
-			.actualizarVista(vista.id, {
-				ruta: vista.ruta,
-				nombre: vista.nombre,
-				estado: nuevoEstado,
-			})
-			.pipe(takeUntilDestroyed(this.destroyRef))
-			.subscribe({
-				next: () => {
+		this.wal.execute({
+			operation: 'UPDATE',
+			resourceType: 'Vista',
+			resourceId: vista.id,
+			endpoint: `${this.apiUrl}/vistas/${vista.id}/actualizar`,
+			method: 'PUT',
+			payload,
+			http$: () => this.api.actualizarVista(vista.id, payload),
+			optimistic: {
+				apply: () => {
 					this.store.toggleVistaEstado(vista.id);
-
 					if (vista.estado === 1) {
 						this.store.incrementarEstadistica('vistasActivas', -1);
 						this.store.incrementarEstadistica('vistasInactivas', 1);
@@ -125,45 +141,58 @@ export class VistasFacade {
 						this.store.incrementarEstadistica('vistasActivas', 1);
 						this.store.incrementarEstadistica('vistasInactivas', -1);
 					}
-
-					this.store.setLoading(false);
 				},
-				error: (err) => {
-					logger.error('Error al cambiar estado:', err);
-					this.errorHandler.showError(UI_SUMMARIES.error, UI_ADMIN_ERROR_DETAILS.changeEstado);
-					this.store.setLoading(false);
+				rollback: () => {
+					this.store.toggleVistaEstado(vista.id);
+					if (vista.estado === 1) {
+						this.store.incrementarEstadistica('vistasActivas', 1);
+						this.store.incrementarEstadistica('vistasInactivas', -1);
+					} else {
+						this.store.incrementarEstadistica('vistasActivas', -1);
+						this.store.incrementarEstadistica('vistasInactivas', 1);
+					}
 				},
-			});
+			},
+			onCommit: () => this.store.setLoading(false),
+			onError: () => this.handleApiError(UI_ADMIN_ERROR_DETAILS.changeEstado),
+		});
 	}
 
 	/**
-	 * ELIMINAR: Mutación quirúrgica + stats incrementales
+	 * ELIMINAR: WAL → optimistic remove + stats → rollback re-adds
 	 */
 	delete(vista: Vista): void {
-		this.store.setLoading(true);
-
-		this.api
-			.eliminarVista(vista.id)
-			.pipe(takeUntilDestroyed(this.destroyRef))
-			.subscribe({
-				next: () => {
+		this.wal.execute({
+			operation: 'DELETE',
+			resourceType: 'Vista',
+			resourceId: vista.id,
+			endpoint: `${this.apiUrl}/vistas/${vista.id}/eliminar`,
+			method: 'DELETE',
+			payload: null,
+			http$: () => this.api.eliminarVista(vista.id),
+			optimistic: {
+				apply: () => {
 					this.store.removeVista(vista.id);
 					this.store.incrementarEstadistica('totalVistas', -1);
-
 					if (vista.estado === 1) {
 						this.store.incrementarEstadistica('vistasActivas', -1);
 					} else {
 						this.store.incrementarEstadistica('vistasInactivas', -1);
 					}
-
-					this.store.setLoading(false);
 				},
-				error: (err) => {
-					logger.error('Error al eliminar vista:', err);
-					this.errorHandler.showError(UI_SUMMARIES.error, UI_ADMIN_ERROR_DETAILS.deleteVista);
-					this.store.setLoading(false);
+				rollback: () => {
+					this.store.addVista(vista);
+					this.store.incrementarEstadistica('totalVistas', 1);
+					if (vista.estado === 1) {
+						this.store.incrementarEstadistica('vistasActivas', 1);
+					} else {
+						this.store.incrementarEstadistica('vistasInactivas', 1);
+					}
 				},
-			});
+			},
+			onCommit: () => this.store.setLoading(false),
+			onError: () => this.handleApiError(UI_ADMIN_ERROR_DETAILS.deleteVista),
+		});
 	}
 
 	// #endregion
@@ -246,6 +275,11 @@ export class VistasFacade {
 
 	// #region Helpers privados
 
+	private handleApiError(detail: string): void {
+		this.errorHandler.showError(UI_SUMMARIES.error, detail);
+		this.store.setLoading(false);
+	}
+
 	/** Refetch solo la lista paginada con filtros actuales del store */
 	private refreshVistasOnly(): void {
 		this.store.setLoading(true);
@@ -258,7 +292,10 @@ export class VistasFacade {
 
 		this.api
 			.getVistasPaginated(page, pageSize, search, modulo, estado)
-			.pipe(takeUntilDestroyed(this.destroyRef))
+			.pipe(
+				withRetry({ tag: 'VistasFacade:refreshVistasOnly' }),
+				takeUntilDestroyed(this.destroyRef),
+			)
 			.subscribe({
 				next: (result) => {
 					this.store.setVistas(result.data);
@@ -267,6 +304,7 @@ export class VistasFacade {
 				},
 				error: (err) => {
 					logger.error('Error al refrescar vistas:', err);
+					this.errorHandler.showError(UI_SUMMARIES.error, UI_ADMIN_ERROR_DETAILS.refreshData);
 					this.store.setLoading(false);
 				},
 			});
@@ -276,10 +314,16 @@ export class VistasFacade {
 	private refreshEstadisticas(): void {
 		this.api
 			.getVistasEstadisticas()
-			.pipe(takeUntilDestroyed(this.destroyRef))
+			.pipe(
+				withRetry({ tag: 'VistasFacade:refreshEstadisticas' }),
+				takeUntilDestroyed(this.destroyRef),
+			)
 			.subscribe({
 				next: (stats) => this.store.setEstadisticas(stats),
-				error: (err) => logger.error('Error al refrescar estadísticas:', err),
+				error: (err) => {
+					logger.error('Error al refrescar estadísticas:', err);
+					this.errorHandler.showError(UI_SUMMARIES.error, UI_ADMIN_ERROR_DETAILS.refreshData);
+				},
 			});
 	}
 	// #endregion

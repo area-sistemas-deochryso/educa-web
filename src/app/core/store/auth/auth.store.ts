@@ -1,5 +1,5 @@
 // #region Imports
-import { AuthUser, LoginResponse } from '@core/services/auth/auth.models';
+import { AuthUser } from '@core/services/auth/auth.models';
 import { computed, inject } from '@angular/core';
 import {
 	patchState,
@@ -39,29 +39,23 @@ const initialState: AuthState = {
 };
 
 /**
- * NgRx Signals Store para autenticación.
- * Proporciona manejo de estado reactivo con Angular Signals.
+ * NgRx Signals Store para autenticación (solo estado puro).
+ * I/O (storage, HTTP) vive en AuthService.
  *
  * @example
  * ```typescript
- * // En un componente
  * readonly authStore = inject(AuthStore)
  *
- * // Acceso a estado
- * isAuthenticated = this.authStore.isAuthenticated
- * user = this.authStore.user
+ * // Lectura
+ * authStore.user()
+ * authStore.isAuthenticated()
+ * authStore.remainingAttempts()
  *
- * // Computados
- * remainingAttempts = this.authStore.remainingAttempts
- * isBlocked = this.authStore.isBlocked
- *
- * // Métodos
- * this.authStore.setUser(user)
- * this.authStore.setLoading(true)
- * this.authStore.logout()
+ * // Mutación
+ * authStore.setUser(user)
+ * authStore.setLoading(true)
  * ```
  */
-// * Signal store for auth state and actions.
 export const AuthStore = signalStore(
 	{ providedIn: 'root' },
 	withState(initialState),
@@ -86,32 +80,10 @@ export const AuthStore = signalStore(
 		 * Rol del usuario actual
 		 */
 		userRole: computed(() => store.user()?.rol ?? ''),
-
-		/**
-		 * Token actual
-		 */
-		token: computed(() => store.user()?.token ?? null),
 	})),
 
-	withMethods((store, storage = inject(StorageService)) => ({
-		/**
-		 * Inicializa el store con datos del storage
-		 */
-		initialize(): void {
-			const storedUser = storage.getUser();
-			const hasToken = storage.hasToken();
-
-			if (storedUser && hasToken) {
-				patchState(store, {
-					user: storedUser,
-					isAuthenticated: true,
-				});
-			}
-		},
-
-		/**
-		 * Establece el usuario autenticado
-		 */
+	withMethods((store) => ({
+		/** Establece el usuario autenticado */
 		setUser(user: AuthUser): void {
 			patchState(store, {
 				user,
@@ -121,16 +93,12 @@ export const AuthStore = signalStore(
 			});
 		},
 
-		/**
-		 * Actualiza el estado de carga
-		 */
+		/** Actualiza el estado de carga */
 		setLoading(isLoading: boolean): void {
 			patchState(store, { isLoading });
 		},
 
-		/**
-		 * Establece un error
-		 */
+		/** Establece un error */
 		setError(error: string): void {
 			patchState(store, {
 				error,
@@ -138,95 +106,41 @@ export const AuthStore = signalStore(
 			});
 		},
 
-		/**
-		 * Limpia el error
-		 */
+		/** Limpia el error */
 		clearError(): void {
 			patchState(store, { error: null });
 		},
 
-		/**
-		 * Incrementa los intentos de login
-		 */
+		/** Incrementa los intentos de login */
 		incrementAttempts(): void {
 			patchState(store, {
 				loginAttempts: store.loginAttempts() + 1,
 			});
 		},
 
-		/**
-		 * Resetea los intentos de login
-		 */
+		/** Resetea los intentos de login */
 		resetAttempts(): void {
 			patchState(store, { loginAttempts: 0 });
 		},
 
-		/**
-		 * Maneja un login exitoso
-		 */
-		handleLoginSuccess(response: LoginResponse, rememberMe: boolean): void {
-			const user: AuthUser = {
-				token: response.token,
-				rol: response.rol,
-				nombreCompleto: response.nombreCompleto,
-				entityId: response.entityId,
-				sedeId: response.sedeId,
-			};
-
-			storage.setToken(response.token, rememberMe);
-			storage.setUser(user, rememberMe);
-
-			patchState(store, {
-				user,
-				isAuthenticated: true,
-				isLoading: false,
-				error: null,
-				loginAttempts: 0,
-			});
-		},
-
-		/**
-		 * Maneja un error de login
-		 */
-		handleLoginError(message: string): void {
-			patchState(store, {
-				error: message,
-				isLoading: false,
-				loginAttempts: store.loginAttempts() + 1,
-			});
-		},
-
-		/**
-		 * Cierra la sesión del usuario
-		 */
-		logout(): void {
-			storage.clearAuth();
-
-			patchState(store, {
-				user: null,
-				isAuthenticated: false,
-				error: null,
-				loginAttempts: 0,
-			});
-		},
-
-		/**
-		 * Actualiza datos parciales del usuario
-		 */
-		updateUser(updates: Partial<AuthUser>): void {
-			const currentUser = store.user();
-			if (currentUser) {
-				const updatedUser = { ...currentUser, ...updates };
-				patchState(store, { user: updatedUser });
-				storage.setUser(updatedUser);
-			}
+		/** Resetea todo el estado (para logout) */
+		reset(): void {
+			patchState(store, initialState);
 		},
 	})),
 
 	withHooks({
 		onInit(store) {
-			// Inicializar con datos del storage al crear el store
-			store.initialize();
+			const storage = inject(StorageService);
+			const storedUser = storage.getUser();
+			const hasUserInfo = storage.hasUserInfo();
+
+			if (storedUser && hasUserInfo) {
+				patchState(store, {
+					user: storedUser,
+					isAuthenticated: true,
+				});
+			}
 		},
 	}),
 );

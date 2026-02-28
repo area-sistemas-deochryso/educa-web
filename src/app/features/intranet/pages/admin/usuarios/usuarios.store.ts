@@ -10,6 +10,14 @@ import {
 import { Injectable, computed, inject, signal } from '@angular/core';
 
 import { DebugService, generatePassword } from '@core/helpers';
+import {
+	isUsuarioFormValid,
+	validateCorreo,
+	validateCorreoApoderado,
+	validateDni,
+	validateNombreApoderado,
+	validateTelefonoApoderado,
+} from './helpers/usuario-validation.utils';
 
 /**
  * Store para gestión de usuarios
@@ -82,85 +90,30 @@ export class UsuariosStore {
 
 	// #endregion
 	// #region Computed - Validaciones
-	readonly dniError = computed(() => {
-		const dni = this._formData().dni || '';
-		if (!dni) return null;
-		if (!/^\d+$/.test(dni)) return 'El DNI solo debe contener numeros';
-		if (dni.length !== 8) return 'El DNI debe tener exactamente 8 digitos';
-		return null;
-	});
+	readonly dniError = computed(() => validateDni(this._formData().dni));
+	readonly correoError = computed(() => validateCorreo(this._formData().correo));
+	readonly correoApoderadoError = computed(() =>
+		validateCorreoApoderado(this._formData().correoApoderado, this._formData().rol),
+	);
+	readonly nombreApoderadoError = computed(() =>
+		validateNombreApoderado(this._formData().nombreApoderado, this._formData().rol),
+	);
+	readonly telefonoApoderadoError = computed(() =>
+		validateTelefonoApoderado(this._formData().telefonoApoderado, this._formData().rol),
+	);
 
-	readonly correoError = computed(() => {
-		const correo = this._formData().correo || '';
-		if (!correo) return null;
-		const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-		if (!emailRegex.test(correo)) return 'Ingrese un correo valido';
-		return null;
-	});
+	readonly isEstudiante = computed(() => this._formData().rol === 'Estudiante');
+	readonly isProfesor = computed(() => this._formData().rol === 'Profesor');
 
-	readonly correoApoderadoError = computed(() => {
-		const correo = this._formData().correoApoderado || '';
-		const rol = this._formData().rol;
-
-		// Requerido para Estudiante
-		if (rol === 'Estudiante' && !correo) {
-			return 'El correo del apoderado es obligatorio para estudiantes';
-		}
-
-		if (!correo) return null;
-		const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-		if (!emailRegex.test(correo)) return 'Ingrese un correo valido';
-		return null;
-	});
-
-	readonly nombreApoderadoError = computed(() => {
-		const nombre = this._formData().nombreApoderado || '';
-		const rol = this._formData().rol;
-
-		// Requerido para Estudiante
-		if (rol === 'Estudiante' && !nombre.trim()) {
-			return 'El nombre del apoderado es obligatorio para estudiantes';
-		}
-
-		return null;
-	});
-
-	readonly telefonoApoderadoError = computed(() => {
-		const telefono = this._formData().telefonoApoderado || '';
-		const rol = this._formData().rol;
-
-		// Requerido para Estudiante
-		if (rol === 'Estudiante' && !telefono.trim()) {
-			return 'El telefono del apoderado es obligatorio para estudiantes';
-		}
-
-		return null;
-	});
-
-	readonly isEstudiante = computed(() => {
-		const rol = this._formData().rol;
-		return rol === 'Estudiante';
-	});
-
-	readonly isProfesor = computed(() => {
-		const rol = this._formData().rol;
-		return rol === 'Profesor';
-	});
-
-	readonly isFormValid = computed(() => {
-		const data = this._formData();
-		if (!data.dni || !data.nombres || !data.apellidos) return false;
-		if (!this._isEditing() && (!data.rol || !data.contrasena)) return false;
-		if (this.dniError()) return false;
-		if (this.correoError()) return false;
-		if (this.correoApoderadoError()) return false;
-		if (this.nombreApoderadoError()) return false;
-		if (this.telefonoApoderadoError()) return false;
-		// Si es profesor y tiene salón seleccionado, esTutor debe estar definido
-		if (this.isProfesor() && data.salonId !== undefined && data.esTutor === undefined)
-			return false;
-		return true;
-	});
+	readonly isFormValid = computed(() =>
+		isUsuarioFormValid(this._formData(), this._isEditing(), {
+			dniError: this.dniError(),
+			correoError: this.correoError(),
+			correoApoderadoError: this.correoApoderadoError(),
+			nombreApoderadoError: this.nombreApoderadoError(),
+			telefonoApoderadoError: this.telefonoApoderadoError(),
+		}),
+	);
 
 	// #endregion
 	// #region Computed - Filtered data
@@ -294,6 +247,10 @@ export class UsuariosStore {
 
 	setError(error: string | null): void {
 		this._error.set(error);
+	}
+
+	clearError(): void {
+		this._error.set(null);
 	}
 
 	setShowSkeletons(show: boolean): void {

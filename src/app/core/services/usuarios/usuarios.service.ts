@@ -16,14 +16,21 @@ import { environment } from '@env/environment';
 
 // #endregion
 // #region Implementation
+
+/**
+ * Usuarios API gateway for list, details, and CRUD.
+ */
 @Injectable({
 	providedIn: 'root',
 })
 export class UsuariosService {
-	// * CRUD wrapper for usuarios endpoints.
+	// CRUD wrapper for usuarios endpoints.
 	private readonly apiUrl = `${environment.apiUrl}/api/sistema/usuarios`;
 	private http = inject(HttpClient);
 
+	/**
+	 * List users with optional role and state filters.
+	 */
 	listarUsuarios(rol?: string, estado?: boolean): Observable<UsuarioLista[]> {
 		const params: Record<string, string> = {};
 		if (rol) params['rol'] = rol;
@@ -34,6 +41,9 @@ export class UsuariosService {
 			.pipe(catchError(() => of([])));
 	}
 
+	/**
+	 * List users with pagination and optional filters.
+	 */
 	listarUsuariosPaginado(
 		page: number,
 		pageSize: number,
@@ -64,16 +74,25 @@ export class UsuariosService {
 			);
 	}
 
+	/**
+	 * Get a user by role and id.
+	 */
 	obtenerUsuario(rol: string, id: number): Observable<UsuarioDetalle | null> {
 		return this.http
 			.get<UsuarioDetalle>(`${this.apiUrl}/${encodeURIComponent(rol)}/${id}`)
 			.pipe(catchError(() => of(null)));
 	}
 
+	/**
+	 * Create a user.
+	 */
 	crearUsuario(request: CrearUsuarioRequest): Observable<ApiResponse> {
 		return this.http.post<ApiResponse>(`${this.apiUrl}/crear`, request);
 	}
 
+	/**
+	 * Update a user by role and id.
+	 */
 	actualizarUsuario(
 		rol: string,
 		id: number,
@@ -85,10 +104,16 @@ export class UsuariosService {
 		);
 	}
 
+	/**
+	 * Delete a user by role and id.
+	 */
 	eliminarUsuario(rol: string, id: number): Observable<ApiResponse> {
 		return this.http.delete<ApiResponse>(`${this.apiUrl}/${encodeURIComponent(rol)}/${id}`);
 	}
 
+	/**
+	 * Change user active state.
+	 */
 	cambiarEstado(rol: string, id: number, estado: boolean): Observable<ApiResponse> {
 		return this.http.patch<ApiResponse>(
 			`${this.apiUrl}/${encodeURIComponent(rol)}/${id}/estado`,
@@ -96,12 +121,18 @@ export class UsuariosService {
 		);
 	}
 
+	/**
+	 * Get user statistics.
+	 */
 	obtenerEstadisticas(): Observable<UsuariosEstadisticas | null> {
 		return this.http
 			.get<UsuariosEstadisticas>(`${this.apiUrl}/estadisticas`)
 			.pipe(catchError(() => of(null)));
 	}
 
+	/**
+	 * Verify if a DNI already exists for a role.
+	 */
 	verificarDni(rol: string, dni: string, exceptoId?: number): Observable<{ existe: boolean }> {
 		const params: Record<string, string> = {};
 		if (exceptoId) params['exceptoId'] = exceptoId.toString();

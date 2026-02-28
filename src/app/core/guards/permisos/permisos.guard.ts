@@ -7,12 +7,16 @@ import { logger } from '@core/helpers';
 import { UI_ACCESS_DENIED_MESSAGE, UI_SUMMARIES } from '@app/shared/constants';
 
 /**
- * Guard que verifica si el usuario tiene permiso para acceder a una ruta
- * El acceso se controla dinámicamente por los permisos configurados en la BD
- * Si no tiene permiso, redirige a /intranet
- * Si falla la carga de permisos, redirige al login (credenciales inválidas)
+ * Route guard that verifies user access based on permissions.
+ *
+ * Behavior:
+ * - If not authenticated, allow and let the auth guard handle it.
+ * - If permissions fail to load, logout and redirect to login.
+ * - If permission is missing, show a warning and redirect to /intranet.
+ *
+ * @example
+ * canActivate: [permisosGuard]
  */
-// * Guard: verifies permisos and redirects when access is denied.
 // #endregion
 // #region Implementation
 export const permisosGuard: CanActivateFn = async (route: ActivatedRouteSnapshot) => {
@@ -21,7 +25,7 @@ export const permisosGuard: CanActivateFn = async (route: ActivatedRouteSnapshot
 	const router = inject(Router);
 	const errorHandler = inject(ErrorHandlerService);
 
-	// Si no está autenticado, no verificar permisos (el authGuard se encarga)
+	// If not authenticated, do not verify permissions here.
 	if (!authService.isAuthenticated) {
 		logger.tagged(
 			'PermisosGuard',
@@ -31,22 +35,22 @@ export const permisosGuard: CanActivateFn = async (route: ActivatedRouteSnapshot
 		return true;
 	}
 
-	// Construir la ruta completa desde la raíz
+	// Build the full path from the root.
 	const fullPath = getFullPath(route);
-	// Nota: no incluye query params, solo segmentos de la ruta.
+	// Note: excludes query params.
 	logger.tagged('PermisosGuard', 'log', 'Verificando permisos para:', fullPath);
 
-	// Esperar a que los permisos estén cargados
+	// Wait for permissions to be loaded.
 	const permisosLoaded = await userPermisosService.ensurePermisosLoaded();
 
-	// Si falló la carga de permisos, redirigir al login
+	// If permissions failed to load, redirect to login.
 	if (!permisosLoaded) {
 		logger.tagged('PermisosGuard', 'log', 'Fallo al cargar permisos, redirigiendo a login');
 		authService.logout();
 		return router.createUrlTree(['/intranet/login']);
 	}
 
-	// Verificar si tiene permiso
+	// Check permission for this route.
 	const tienePermiso = userPermisosService.tienePermiso(fullPath);
 
 	if (!tienePermiso) {
@@ -57,10 +61,7 @@ export const permisosGuard: CanActivateFn = async (route: ActivatedRouteSnapshot
 			fullPath,
 			'- Redirigiendo a /intranet',
 		);
-		errorHandler.showWarning(
-			UI_SUMMARIES.accessDenied,
-			UI_ACCESS_DENIED_MESSAGE,
-		);
+		errorHandler.showWarning(UI_SUMMARIES.accessDenied, UI_ACCESS_DENIED_MESSAGE);
 		return router.createUrlTree(['/intranet']);
 	}
 
@@ -69,14 +70,19 @@ export const permisosGuard: CanActivateFn = async (route: ActivatedRouteSnapshot
 };
 
 /**
- * Construye la ruta completa desde el snapshot
+ * Build the full route path from an ActivatedRouteSnapshot.
+ *
+ * @param route Current route snapshot.
+ * @returns Full path without query params.
+ * @example
+ * const path = getFullPath(route);
  */
 function getFullPath(route: ActivatedRouteSnapshot): string {
 	const segments: string[] = [];
 	let current: ActivatedRouteSnapshot | null = route;
 
 	while (current) {
-		// Recorre la jerarquía padre para construir la ruta desde la raíz.
+		// Walk parent hierarchy to build the root path.
 		if (current.url.length > 0) {
 			segments.unshift(...current.url.map((s) => s.path));
 		}

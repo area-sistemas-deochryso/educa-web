@@ -22,7 +22,7 @@ core/
 ├── guards/
 │   ├── auth/                    # authGuard (sesión activa)
 │   └── permisos/                # permisosGuard (ruta autorizada)
-├── helpers/                     # logger, DebugService
+├── helpers/                     # logger, DebugService, rxjs utils (with-retry)
 ├── initializers/                # Hooks de inicialización de app
 ├── interceptors/
 │   ├── api-response/            # Normalización de respuestas API
@@ -31,7 +31,7 @@ core/
 │   └── trace/                   # Request tracing (correlationId)
 ├── services/                    # ~20 carpetas, organizadas por DOMINIO
 │   ├── asistencia/              # Servicio de asistencia
-│   ├── auth/                    # Autenticación (models, service)
+│   ├── auth/                    # Autenticación (models, service, auth-api)
 │   ├── blob/                    # Blob storage
 │   ├── cache/                   # Invalidación de cache + versionado
 │   ├── cursos/                  # Gestión de cursos
@@ -52,6 +52,14 @@ core/
 │   │   └── storage.service      #   Facade unificado
 │   ├── sw/                      # Service Worker management
 │   ├── trace/                   # Request tracing (Facade + Store)
+│   ├── wal/                     # Write-Ahead Log (offline sync)
+│   │   ├── models/              #   WalEntry, WalOperation types
+│   │   ├── wal-db.service       #   IndexedDB persistence
+│   │   ├── wal.service          #   Lifecycle (append → commit/fail)
+│   │   ├── wal-sync-engine      #   Online/offline sync + FIFO
+│   │   ├── wal-status.store     #   Signals (pending, failed, syncing)
+│   │   └── wal-facade-helper    #   execute() helper for facades
+│   ├── cache/                   # Cache invalidation + versioning
 │   ├── user/                    # Perfil de usuario
 │   └── usuarios/                # Gestión de usuarios
 ├── store/                       # AuthStore global (NgRx Signals)
@@ -106,6 +114,8 @@ shared/
 │   ├── access-denied-modal/     # Modal de permiso denegado
 │   ├── login/                   # Componente de login reutilizable
 │   ├── voice-button/            # Botón de reconocimiento de voz
+│   ├── sync-status/             # Indicador WAL sync en header
+│   ├── pending-operations/      # Drawer con operaciones pendientes WAL
 │   ├── sections/                # Helpers de layout por secciones
 │   └── devtools/                # Herramientas de desarrollo
 ├── services/

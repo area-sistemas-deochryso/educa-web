@@ -10,7 +10,7 @@ import {
 	EffectRef,
 } from '@angular/core';
 import { Observable, OperatorFunction, defer, finalize, tap } from 'rxjs';
-import { logger } from '../logs/logger'; // <-- tu logger existente
+import { logger } from '../logs/logger';
 import { DEBUG_CONFIG, DebugConfig, DbgLevel } from './debug.type';
 import {
 	compileDebugFilter,
@@ -28,9 +28,12 @@ const LEVEL_WEIGHT: Record<DbgLevel, number> = {
 	TRACE: 3,
 };
 
+/**
+ * Tagged debug logger with filtering and RxJS helpers.
+ */
 @Injectable({ providedIn: 'root' })
 export class DebugService {
-	// * Tagged debug logger with filtering + RxJS helpers.
+	// Tagged debug logger with filtering and helpers.
 	private cfg: Required<DebugConfig>;
 	private filterFn: (tag: string) => boolean = () => true;
 	private activePattern = '';
@@ -51,15 +54,25 @@ export class DebugService {
 		this.refreshFromStorage();
 	}
 
-	/** Gate indispensable */
+	/**
+	 * True when logging is enabled and dev mode is active.
+	 */
 	get enabled(): boolean {
 		return isDevMode() && !!this.cfg.enabled;
 	}
 
+	/**
+	 * Check if a tag is enabled by the current filter.
+	 *
+	 * @param tag Tag name.
+	 */
 	isTagEnabled(tag: string): boolean {
 		return this.enabled && this.filterFn(tag);
 	}
 
+	/**
+	 * Get the current debug configuration and active overrides.
+	 */
 	getConfig(): Readonly<Required<DebugConfig> & { activePattern: string; activeMinLevel: DbgLevel }> {
 		return {
 			...this.cfg,
@@ -68,6 +81,12 @@ export class DebugService {
 		};
 	}
 
+	/**
+	 * Set the filter pattern and optionally persist it in localStorage.
+	 *
+	 * @param pattern Filter pattern.
+	 * @param persist Persist to storage when true.
+	 */
 	setFilter(pattern: string, persist = true): void {
 		this.activePattern = (pattern ?? '').trim();
 		this.filterFn = compileDebugFilter(this.activePattern);
@@ -80,6 +99,12 @@ export class DebugService {
 		}
 	}
 
+	/**
+	 * Set the minimum debug level and optionally persist it.
+	 *
+	 * @param level Minimum level.
+	 * @param persist Persist to storage when true.
+	 */
 	setMinLevel(level: DbgLevel, persist = true): void {
 		this.minLevel = level;
 		if (persist) {
@@ -87,10 +112,16 @@ export class DebugService {
 		}
 	}
 
+	/**
+	 * Enable or disable debug output at runtime.
+	 */
 	setEnabled(enabled: boolean): void {
 		this.cfg.enabled = enabled;
 	}
 
+	/**
+	 * Refresh filters and levels from storage overrides.
+	 */
 	refreshFromStorage(): void {
 		const storagePattern = safeGetLocalStorage(this.cfg.storageKey);
 		this.activePattern = (storagePattern ?? this.cfg.defaultPattern).trim();
@@ -101,15 +132,23 @@ export class DebugService {
 		this.minLevel = parsedLevel ?? this.cfg.minLevel;
 	}
 
+	/**
+	 * Clear stored overrides and reload defaults.
+	 */
 	clearOverrides(): void {
 		safeRemoveLocalStorage(this.cfg.storageKey);
 		safeRemoveLocalStorage(this.cfg.storageLevelKey);
 		this.refreshFromStorage();
 	}
 
+	/**
+	 * Build a tagged logger helper with common methods.
+	 *
+	 * @param tag Log tag.
+	 * @param scope Optional scope suffix.
+	 */
 	dbg(tag: string, scope?: string) {
-		const fullTag = scope ? `${tag}::${scope}` : tag;
-
+		const fullTag = scope ? `${tag}:${scope}` : tag;
 		return {
 			error: (msg: string, data?: unknown) => this.emit(fullTag, 'ERROR', msg, data),
 			warn: (msg: string, data?: unknown) => this.emit(fullTag, 'WARN', msg, data),
@@ -150,18 +189,12 @@ export class DebugService {
 	}
 
 	private emit(tag: string, level: DbgLevel, msg: string, data?: unknown) {
-		// Si no es devMode, apagado total
 		if (!this.enabled) return;
-
-		// Filtrado por tag
 		if (!this.filterFn(tag)) return;
-
-		// Nivel mínimo
 		if (LEVEL_WEIGHT[level] > LEVEL_WEIGHT[this.minLevel]) return;
 
-		const payload = data === undefined ? [msg] : [msg, data];
+		const payload = data ? [msg, data] : [msg];
 
-		// Stack solo en TRACE si está habilitado
 		if (level === 'TRACE' && this.cfg.enableStackInTrace) {
 			const source = captureSource();
 			logger.tagged(tag, 'debug', ...payload, source);
@@ -184,7 +217,9 @@ export class DebugService {
 		}
 	}
 
-	// ---------------- RxJS ----------------
+	/**
+	 * RxJS tap helper that logs next, error, and complete.
+	 */
 	tapDbg<T>(tag: string, label?: string): OperatorFunction<T, T> {
 		const log = this.dbg(tag);
 		return tap({
@@ -194,46 +229,50 @@ export class DebugService {
 		});
 	}
 
+	/**
+	 * Subscribe helper that logs next, error, and complete.
+	 */
 	dbgSub<T>(
 		tag: string,
-		observer: Partial<{
-			next: (v: T) => void;
-			error: (e: unknown) => void;
-			complete: () => void;
-		}>,
 		label?: string,
-	) {
+		observer?: {
+			next?: (v: T) => void;
+			error?: (e: unknown) => void;
+			complete?: () => void;
+		},
+	): OperatorFunction<T, T> {
 		const log = this.dbg(tag);
-		return {
+		return tap({
 			next: (v: T) => {
 				log.trace(label ? `sub:next:${label}` : 'sub:next', v);
-				observer.next?.(v);
+				observer?.next?.(v);
 			},
 			error: (e: unknown) => {
 				log.error(label ? `sub:error:${label}` : 'sub:error', e);
-				observer.error?.(e);
+				observer?.error?.(e);
 			},
 			complete: () => {
 				log.trace(label ? `sub:complete:${label}` : 'sub:complete');
-				observer.complete?.();
+				observer?.complete?.();
 			},
-		};
+		});
 	}
 
+	/**
+	 * Track a stream lifecycle with timing metrics.
+	 */
 	track$<T>(tag: string, label: string): OperatorFunction<T, T> {
 		return (source: Observable<T>) =>
 			defer(() => {
 				const log = this.dbg(tag);
 				const t0 = performance.now();
 				let first = true;
-				let n = 0;
 
 				log.info(`track:start:${label}`);
 
 				return source.pipe(
 					tap({
 						next: () => {
-							n++;
 							if (first) {
 								first = false;
 								log.info(`track:ttf:${label}`, {
@@ -245,7 +284,6 @@ export class DebugService {
 					}),
 					finalize(() => {
 						log.info(`track:end:${label}`, {
-							count: n,
 							ms: round2(performance.now() - t0),
 						});
 					}),
@@ -253,7 +291,9 @@ export class DebugService {
 			});
 	}
 
-	// ---------------- Signals ----------------
+	/**
+	 * Debug wrapper for Angular effect with run and cleanup logs.
+	 */
 	effectDbg(
 		tag: string,
 		label: string,
@@ -263,11 +303,9 @@ export class DebugService {
 		let run = 0;
 
 		return effect((onCleanup) => {
-			run++;
+			run += 1;
 			log.trace(`effect:run:${label}`, { run });
-
 			fn(onCleanup);
-
 			onCleanup(() => {
 				log.trace(`effect:cleanup:${label}`, { run });
 			});
@@ -282,9 +320,9 @@ function round2(n: number) {
 function captureSource() {
 	try {
 		const err = new Error();
-		return err.stack?.split('\n').slice(2, 6).join('\n'); // 4 frames
+		return err.stack?.split('\n').slice(2, 6).join('\n');
 	} catch {
-		return '';
+		return undefined;
 	}
 }
 

@@ -8,136 +8,118 @@ import { StorageService } from '../storage';
 import { PermisosService } from './permisos.service';
 import { PermisosUsuarioResultado } from './permisos.models';
 
-/** Intervalo en ms entre cada verificación de expiración del token de permisos (5 min) */
+/**
+ * Interval in ms to check for expired permissions token.
+ */
 const PERMISOS_CHECK_INTERVAL_MS = 5 * 60 * 1000;
 
+/**
+ * Decode JWT exp and check if it is expired.
+ *
+ * @param token JWT token.
+ * @returns True if expired or invalid.
+ */
+function isJwtExpired(token: string): boolean {
+	try {
+		const payload = JSON.parse(atob(token.split('.')[1]));
+		return Date.now() / 1000 > payload.exp;
+	} catch {
+		return true;
+	}
+}
+
+/**
+ * User permissions service.
+ *
+ * Responsibilities:
+ * - Reactive permissions state (signals)
+ * - Load from storage and API
+ * - Periodic refresh when token expires
+ * - Authorization check via tienePermiso
+ */
 @Injectable({
 	providedIn: 'root',
 })
 export class UserPermisosService {
-	// * Manages current user permissions with refresh + storage.
+	// #region Dependencies
 	private authService = inject(AuthService);
 	private permisosService = inject(PermisosService);
 	private storageService = inject(StorageService);
 	private destroyRef = inject(DestroyRef);
+	// #endregion
 
-	/** Cancela el intervalo de refresh al logout */
+	// #region Private state
 	private readonly stopRefresh$ = new Subject<void>();
-
 	private readonly _permisos = signal<PermisosUsuarioResultado | null>(null);
 	private readonly _loading = signal(false);
 	private readonly _loaded = signal(false);
 	private readonly _loadFailed = signal(false);
+	private wasAuthenticated = false;
+	// #endregion
 
+	// #region Public readonly state
 	readonly permisos = this._permisos.asReadonly();
 	readonly loading = this._loading.asReadonly();
 	readonly loaded = this._loaded.asReadonly();
 	readonly loadFailed = this._loadFailed.asReadonly();
-
 	readonly isAuthenticated = toSignal(this.authService.isAuthenticated$, { initialValue: false });
-
 	readonly vistasPermitidas = computed(() => this._permisos()?.vistasPermitidas ?? []);
-
 	readonly tienePermisosPersonalizados = computed(
 		() => this._permisos()?.tienePermisosPersonalizados ?? false,
 	);
-
-	// Guarda el estado anterior de autenticación para detectar cambios
-	private wasAuthenticated = false;
+	// #endregion
 
 	constructor() {
-		logger.tagged(
-			'UserPermisosService',
-			'log',
-			'Constructor - intentando cargar desde storage',
-		);
-		// Intentar cargar permisos desde storage al iniciar
 		this.loadFromStorage();
 
-		// Effect que maneja cambios de autenticación
+		// React to auth state changes.
 		effect(() => {
 			const authenticated = this.isAuthenticated();
 
 			if (!authenticated) {
-				// Usuario cerró sesión - limpiar todo
-				logger.tagged(
-					'UserPermisosService',
-					'log',
-					'Usuario no autenticado - limpiando permisos',
-				);
-				this._permisos.set(null);
-				this._loaded.set(false);
-				this._loading.set(false);
-				this._loadFailed.set(false);
+				this.resetState();
 				this.wasAuthenticated = false;
 				this.stopPermisosRefresh();
 			} else if (!this.wasAuthenticated) {
-				// Usuario acaba de iniciar sesión (transición de no autenticado a autenticado)
-				// Forzar reset de flags para permitir nueva carga
-				logger.tagged(
-					'UserPermisosService',
-					'log',
-					'Nuevo login detectado - reseteando estado para nueva carga',
-				);
-				this._permisos.set(null);
-				this._loaded.set(false);
-				this._loading.set(false);
-				this._loadFailed.set(false);
+				// New login: reset to allow a fresh load.
+				this.resetState();
 				this.wasAuthenticated = true;
-				// Intentar cargar desde storage (que ahora tendrá el nuevo sessionKey)
 				this.loadFromStorage();
 				this.startPermisosRefresh();
 			}
 		});
 	}
 
+	// #region Storage I/O
+
 	/**
-	 * Carga los permisos desde el storage si existen
+	 * Load permissions from storage into signals.
 	 */
 	private loadFromStorage(): void {
-		logger.tagged('UserPermisosService', 'log', 'loadFromStorage() - buscando en storage...');
-		const storedPermisos = this.storageService.getPermisos();
-		logger.tagged(
-			'UserPermisosService',
-			'log',
-			'loadFromStorage() - resultado:',
-			storedPermisos,
-		);
-		if (storedPermisos) {
-			// Si tiene token y está expirado, cargar como stale — startPermisosRefresh refrescará inmediatamente
-			if (storedPermisos.permisosToken && this.isTokenExpired(storedPermisos.permisosToken)) {
-				logger.tagged(
-					'UserPermisosService',
-					'log',
-					'loadFromStorage() - token de permisos expirado, se cargará cache como stale',
-				);
-			}
-			this._permisos.set(storedPermisos);
+		const stored = this.storageService.getPermisos();
+		if (stored) {
+			this._permisos.set(stored);
 			this._loaded.set(true);
-			logger.tagged(
-				'UserPermisosService',
-				'log',
-				'loadFromStorage() - permisos cargados desde storage exitosamente',
-			);
-		} else {
-			logger.tagged(
-				'UserPermisosService',
-				'log',
-				'loadFromStorage() - no hay permisos en storage',
-			);
 		}
 	}
 
 	/**
-	 * Guarda los permisos en storage
+	 * Persist permissions into storage.
+	 *
+	 * @param permisos Permissions payload.
 	 */
 	private saveToStorage(permisos: PermisosUsuarioResultado): void {
-		logger.tagged('UserPermisosService', 'log', 'saveToStorage() - guardando:', permisos);
 		this.storageService.setPermisos(permisos);
 	}
 
+	// #endregion
+
+	// #region Load permissions
+
 	/**
-	 * Carga los permisos del usuario actual
+	 * Load permissions for the current user using an observable flow.
+	 *
+	 * @param destroyRef DestroyRef for auto cleanup.
 	 */
 	loadPermisos(destroyRef: DestroyRef): void {
 		if (!this.authService.isAuthenticated) {
@@ -145,10 +127,7 @@ export class UserPermisosService {
 			return;
 		}
 
-		// Si ya están cargados o cargando, no hacer nada
-		if (this._loaded() || this._loading()) {
-			return;
-		}
+		if (this._loaded() || this._loading()) return;
 
 		this._loading.set(true);
 
@@ -159,10 +138,7 @@ export class UserPermisosService {
 					this._permisos.set(permisos);
 					this._loaded.set(true);
 					this._loading.set(false);
-					// Guardar en storage para persistencia
-					if (permisos) {
-						this.saveToStorage(permisos);
-					}
+					if (permisos) this.saveToStorage(permisos);
 				}),
 				catchError(() => {
 					this._loading.set(false);
@@ -175,92 +151,32 @@ export class UserPermisosService {
 	}
 
 	/**
-	 * Carga los permisos y retorna una Promise que indica si se cargaron correctamente
-	 * Útil para guards que necesitan esperar
-	 * @returns true si los permisos se cargaron correctamente, false si falló
+	 * Load permissions and return a Promise for guards.
+	 *
+	 * @returns True when permissions were loaded.
 	 */
 	async ensurePermisosLoaded(): Promise<boolean> {
-		logger.tagged('UserPermisosService', 'log', 'ensurePermisosLoaded() - INICIO');
-		logger.tagged(
-			'UserPermisosService',
-			'log',
-			'ensurePermisosLoaded() - isAuthenticated:',
-			this.authService.isAuthenticated,
-		);
-
 		if (!this.authService.isAuthenticated) {
-			logger.tagged(
-				'UserPermisosService',
-				'log',
-				'ensurePermisosLoaded() - No autenticado, limpiando y retornando false',
-			);
 			this.clear();
 			return false;
 		}
 
-		// Si ya están cargados y tenemos permisos, retornar éxito
-		if (this._loaded() && this._permisos() !== null) {
-			logger.tagged(
-				'UserPermisosService',
-				'log',
-				'ensurePermisosLoaded() - Ya cargados, retornando true',
-			);
-			return true;
-		}
+		if (this._loaded() && this._permisos() !== null) return true;
+		if (this._loadFailed()) return false;
 
-		// Si ya intentamos y falló, retornar false sin reintentar
-		if (this._loadFailed()) {
-			logger.tagged(
-				'UserPermisosService',
-				'log',
-				'ensurePermisosLoaded() - Ya falló anteriormente, retornando false',
-			);
-			return false;
-		}
-
-		// Si no están cargando, iniciar la carga
 		if (!this._loading()) {
-			logger.tagged(
-				'UserPermisosService',
-				'log',
-				'ensurePermisosLoaded() - Iniciando carga desde API...',
-			);
 			this._loading.set(true);
 			this._loadFailed.set(false);
 
 			try {
-				logger.tagged(
-					'UserPermisosService',
-					'log',
-					'ensurePermisosLoaded() - Llamando getMisPermisos()...',
-				);
 				const permisos = await firstValueFrom(this.permisosService.getMisPermisos());
-				logger.tagged(
-					'UserPermisosService',
-					'log',
-					'ensurePermisosLoaded() - Respuesta del API:',
-					permisos,
-				);
 				this._permisos.set(permisos);
 				this._loaded.set(true);
 				this._loading.set(false);
-				// Guardar en storage para persistencia
-				if (permisos) {
-					this.saveToStorage(permisos);
-				}
-				logger.tagged(
-					'UserPermisosService',
-					'log',
-					'ensurePermisosLoaded() - Carga exitosa, retornando true',
-				);
+				if (permisos) this.saveToStorage(permisos);
 				return true;
 			} catch (error) {
-				logger.tagged(
-					'UserPermisosService',
-					'error',
-					'ensurePermisosLoaded() - ERROR en la carga:',
-					error,
-				);
+				logger.error('[UserPermisos] Error cargando permisos:', error);
 				this._loading.set(false);
 				this._loaded.set(false);
 				this._loadFailed.set(true);
@@ -268,133 +184,70 @@ export class UserPermisosService {
 			}
 		}
 
-		// Si está cargando, esperar a que termine y verificar resultado
-		logger.tagged(
-			'UserPermisosService',
-			'log',
-			'ensurePermisosLoaded() - Ya está cargando, esperando...',
-		);
+		// Already loading, wait for completion.
 		await this.waitForLoaded();
-		const result = !this._loadFailed() && this._permisos() !== null;
-		logger.tagged(
-			'UserPermisosService',
-			'log',
-			'ensurePermisosLoaded() - Espera terminada, resultado:',
-			result,
-		);
-		return result;
+		return !this._loadFailed() && this._permisos() !== null;
 	}
 
 	/**
-	 * Espera hasta que los permisos estén cargados o haya fallado la carga
+	 * Wait until loading completes or fails.
 	 */
 	private waitForLoaded(): Promise<void> {
 		return new Promise((resolve) => {
-			const checkLoaded = () => {
-				if (this._loaded() || this._loadFailed()) {
-					resolve();
-				} else {
-					setTimeout(checkLoaded, 50);
-				}
+			const check = (): void => {
+				if (this._loaded() || this._loadFailed()) resolve();
+				else setTimeout(check, 50);
 			};
-			checkLoaded();
+			check();
 		});
 	}
 
+	// #endregion
+
+	// #region Authorization
+
 	/**
-	 * Verifica si el usuario tiene permiso para acceder a una ruta
-	 * IMPORTANTE: Solo coincidencia exacta - tener permiso a "intranet" NO da acceso a "intranet/admin"
+	 * Check if the user has permission for a route.
+	 *
+	 * Exact match only. Having "intranet" does not grant "intranet/admin".
+	 *
+	 * @param ruta Route path.
+	 * @returns True if allowed.
 	 */
 	tienePermiso(ruta: string): boolean {
 		const vistas = this.vistasPermitidas();
 
-		logger.tagged('UserPermisosService', 'log', 'tienePermiso("' + ruta + '")');
-		logger.tagged(
-			'UserPermisosService',
-			'log',
-			'tienePermiso - loaded:',
-			this._loaded(),
-			'vistas:',
-			vistas,
-		);
+		// No permissions configured, allow all.
+		if (this._loaded() && vistas.length === 0) return true;
 
-		// Si los permisos están cargados pero el array está vacío,
-		// significa que no hay permisos configurados -> permitir todo
-		if (this._loaded() && vistas.length === 0) {
-			logger.tagged(
-				'UserPermisosService',
-				'log',
-				'tienePermiso - No hay permisos configurados, permitiendo todo',
-			);
-			return true;
-		}
+		// Permissions not loaded, deny by default.
+		if (!this._loaded()) return false;
 
-		// Si no hay permisos cargados aún, denegar por defecto
-		if (!this._loaded()) {
-			logger.tagged(
-				'UserPermisosService',
-				'log',
-				'tienePermiso - Permisos no cargados, denegando',
-			);
-			return false;
-		}
+		const rutaNorm = (ruta.startsWith('/') ? ruta.substring(1) : ruta).toLowerCase();
 
-		// Normalizar la ruta (quitar / inicial si existe y convertir a minúsculas)
-		const rutaNormalizada = (ruta.startsWith('/') ? ruta.substring(1) : ruta).toLowerCase();
-
-		// Verificar si la ruta está permitida - SOLO coincidencia exacta
-		const resultado = vistas.some((vista) => {
-			const vistaNormalizada = (
-				vista.startsWith('/') ? vista.substring(1) : vista
-			).toLowerCase();
-			// Solo coincidencia exacta - NO permitir acceso a rutas hijas
-			const match = rutaNormalizada === vistaNormalizada;
-			if (match) {
-				logger.tagged(
-					'UserPermisosService',
-					'log',
-					'tienePermiso - Match exacto encontrado:',
-					vista,
-					'===',
-					ruta,
-				);
-			}
-			return match;
+		return vistas.some((vista) => {
+			const vistaNorm = (vista.startsWith('/') ? vista.substring(1) : vista).toLowerCase();
+			return rutaNorm === vistaNorm;
 		});
-
-		logger.tagged('UserPermisosService', 'log', 'tienePermiso("' + ruta + '") =', resultado);
-		return resultado;
 	}
 
-	/**
-	 * Filtra un array de rutas según los permisos del usuario
-	 */
-	filtrarRutasPermitidas<T extends { route: string }>(items: T[]): T[] {
-		const vistas = this.vistasPermitidas();
+	// #endregion
 
-		// Si no hay permisos configurados, devolver todos los items
-		if (this._loaded() && vistas.length === 0) {
-			return items;
-		}
-
-		return items.filter((item) => this.tienePermiso(item.route));
-	}
+	// #region Commands
 
 	/**
-	 * Limpia los permisos (para logout)
+	 * Clear permissions for logout.
 	 */
 	clear(): void {
 		this.stopPermisosRefresh();
-		this._permisos.set(null);
-		this._loaded.set(false);
-		this._loading.set(false);
-		this._loadFailed.set(false);
-		// Limpiar del storage
+		this.resetState();
 		this.storageService.clearPermisos();
 	}
 
 	/**
-	 * Recarga los permisos del servidor
+	 * Reload permissions from the server.
+	 *
+	 * @param destroyRef DestroyRef for auto cleanup.
 	 */
 	reloadPermisos(destroyRef: DestroyRef): void {
 		this._loaded.set(false);
@@ -402,62 +255,62 @@ export class UserPermisosService {
 		this.loadPermisos(destroyRef);
 	}
 
-	// #region Refresh periódico por expiración de token
+	// #endregion
+
+	// #region Private helpers
 
 	/**
-	 * Decodifica el claim 'exp' de un JWT y verifica si ya expiró.
-	 * Solo lee el payload (parte central) sin verificar la firma.
+	 * Reset all internal signals.
 	 */
-	private isTokenExpired(token: string): boolean {
-		try {
-			const payload = JSON.parse(atob(token.split('.')[1]));
-			// exp es un timestamp Unix en segundos
-			return Date.now() / 1000 > payload.exp;
-		} catch {
-			return true; // Si no se puede decodificar, tratarlo como expirado
-		}
+	private resetState(): void {
+		this._permisos.set(null);
+		this._loaded.set(false);
+		this._loading.set(false);
+		this._loadFailed.set(false);
 	}
 
+	// #endregion
+
+	// #region Periodic refresh
+
 	/**
-	 * Inicia el intervalo periódico que verifica la expiración del token de permisos.
-	 * Si detecta expiración hace un GET automático para refrescar los permisos.
+	 * Periodically check for expired permissions token and refresh from API.
 	 */
 	private startPermisosRefresh(): void {
 		this.stopPermisosRefresh();
 
-		timer(0, PERMISOS_CHECK_INTERVAL_MS).pipe(
-			takeUntil(this.stopRefresh$),
-			takeUntilDestroyed(this.destroyRef),
-		).subscribe(() => {
-			const storedPermisos = this.storageService.getPermisos();
-			if (storedPermisos?.permisosToken && this.isTokenExpired(storedPermisos.permisosToken)) {
-				logger.tagged(
-					'UserPermisosService',
-					'log',
-					'Token de permisos expirado - refrescando desde API...',
-				);
-				this.fetchPermisosFromApi();
-			}
-		});
+		timer(0, PERMISOS_CHECK_INTERVAL_MS)
+			.pipe(takeUntil(this.stopRefresh$), takeUntilDestroyed(this.destroyRef))
+			.subscribe(() => {
+				const stored = this.storageService.getPermisos();
+				if (stored?.permisosToken && isJwtExpired(stored.permisosToken)) {
+					this.fetchPermisosFromApi();
+				}
+			});
 	}
 
-	/** Detiene el intervalo de refresh (se usa en logout y clear) */
+	/**
+	 * Stop the periodic refresh.
+	 */
 	private stopPermisosRefresh(): void {
 		this.stopRefresh$.next();
 	}
 
-	/** Hace un GET a la API para refrescar permisos y los guarda en storage */
+	/**
+	 * Fetch permissions from API and update state.
+	 */
 	private fetchPermisosFromApi(): void {
-		this.permisosService.getMisPermisos().pipe(
-			takeUntil(this.stopRefresh$),
-		).subscribe((permisos) => {
-			if (permisos) {
-				this._permisos.set(permisos);
-				this._loaded.set(true);
-				this.saveToStorage(permisos);
-				logger.tagged('UserPermisosService', 'log', 'Permisos refrescados exitosamente');
-			}
-		});
+		this.permisosService
+			.getMisPermisos()
+			.pipe(takeUntil(this.stopRefresh$))
+			.subscribe((permisos) => {
+				if (permisos) {
+					this._permisos.set(permisos);
+					this._loaded.set(true);
+					this.saveToStorage(permisos);
+				}
+			});
 	}
+
 	// #endregion
 }

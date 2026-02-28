@@ -1,4 +1,4 @@
-// #region Styles
+// #region Base Layout
 .login-overlay {
 	position: fixed;
 	top: 0;
@@ -42,7 +42,170 @@
 	flex-direction: column;
 	gap: 0;
 }
+// #endregion
 
+// #region Stored Sessions
+.stored-sessions {
+	display: flex;
+	flex-direction: column;
+	gap: 0.5rem;
+	margin-top: 0.5rem;
+}
+
+.sessions-label {
+	font-size: 0.85rem;
+	color: var(--text-color-secondary);
+	margin: 0 0 0.25rem;
+	text-transform: uppercase;
+	letter-spacing: 0.05em;
+	font-weight: 600;
+}
+
+.session-card-wrapper {
+	position: relative;
+	display: flex;
+	align-items: stretch;
+}
+
+.session-card {
+	display: flex;
+	align-items: center;
+	gap: 0.75rem;
+	padding: 0.75rem 1rem;
+	border: 1px solid var(--surface-border);
+	border-radius: 8px 0 0 8px;
+	background: var(--surface-card);
+	cursor: pointer;
+	transition: border-color 0.15s, box-shadow 0.15s;
+	text-align: left;
+	flex: 1;
+	min-width: 0;
+
+	&:hover:not(:disabled) {
+		border-color: var(--primary-color);
+		box-shadow: 0 0 0 1px var(--primary-color);
+	}
+
+	&:disabled {
+		opacity: 0.6;
+		cursor: not-allowed;
+	}
+}
+
+.session-remove {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	width: 36px;
+	border: 1px solid var(--surface-border);
+	border-left: none;
+	border-radius: 0 8px 8px 0;
+	background: var(--surface-card);
+	color: var(--text-color-secondary);
+	cursor: pointer;
+	transition: background-color 0.15s, color 0.15s;
+	font-size: 0.8rem;
+	flex-shrink: 0;
+
+	&:hover:not(:disabled) {
+		background: #dc2626;
+		color: #ffffff;
+	}
+
+	&:disabled {
+		opacity: 0.6;
+		cursor: not-allowed;
+	}
+}
+
+.session-avatar {
+	flex-shrink: 0;
+	width: 40px;
+	height: 40px;
+	border-radius: 50%;
+	background: #4f46e5;
+	color: #ffffff;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	font-weight: 700;
+	font-size: 0.85rem;
+}
+
+.session-info {
+	flex: 1;
+	display: flex;
+	flex-direction: column;
+	min-width: 0;
+}
+
+.session-name {
+	font-weight: 600;
+	font-size: 0.95rem;
+	color: var(--text-color);
+	white-space: nowrap;
+	overflow: hidden;
+	text-overflow: ellipsis;
+}
+
+.session-role {
+	font-size: 0.8rem;
+	color: var(--text-color-secondary);
+}
+
+.session-arrow {
+	flex-shrink: 0;
+	font-size: 1.1rem;
+	color: var(--text-color-secondary);
+	transition: color 0.15s;
+
+	.session-card:hover:not(:disabled) & {
+		color: var(--primary-color);
+	}
+}
+
+.use-other-account {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	gap: 0.5rem;
+	padding: 0.6rem;
+	margin-top: 0.25rem;
+	border: 1px dashed var(--surface-border);
+	border-radius: 8px;
+	background: transparent;
+	color: var(--text-color-secondary);
+	cursor: pointer;
+	font-size: 0.85rem;
+	transition: color 0.15s, border-color 0.15s;
+
+	&:hover {
+		color: var(--primary-color);
+		border-color: var(--primary-color);
+	}
+}
+// #endregion
+
+// #region Back Link
+.back-to-sessions {
+	display: inline-flex;
+	align-items: center;
+	gap: 0.4rem;
+	padding: 0;
+	margin-bottom: 0.75rem;
+	border: none;
+	background: transparent;
+	color: var(--primary-color);
+	cursor: pointer;
+	font-size: 0.85rem;
+
+	&:hover {
+		text-decoration: underline;
+	}
+}
+// #endregion
+
+// #region Responsive
 @media screen and (max-width: 576px) {
 	.login-modal {
 		padding: 2rem 1.5rem;

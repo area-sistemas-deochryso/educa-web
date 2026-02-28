@@ -1,50 +1,34 @@
 // #region Imports
-import {
-	AuthUser,
-	LoginRequest,
-	LoginResponse,
-	UserProfile,
-	UserRole,
-	VerifyTokenResponse,
-} from './auth.models';
-import { BehaviorSubject, Observable, catchError, forkJoin, map, of, tap } from 'rxjs';
-import { HttpClient, HttpErrorResponse } from '@angular/common/http';
+import { AuthUser, LoginResponse, StoredSession, UserRole } from './auth.models';
+import { BehaviorSubject, Observable, catchError, map, of, tap } from 'rxjs';
 import { Injectable, inject } from '@angular/core';
 
+import { AuthApiService } from './auth-api.service';
 import { StorageService } from '../storage';
-import { environment } from '@env/environment';
 import { UI_AUTH_MESSAGES } from '@app/shared/constants';
 
 // #endregion
 // #region Implementation
-@Injectable({
-	providedIn: 'root',
-})
+
+/**
+ * Authentication facade that orchestrates API, storage, and reactive state.
+ * Token is managed server-side via HttpOnly cookie — never visible to JS.
+ */
+@Injectable({ providedIn: 'root' })
 export class AuthService {
-	// * Auth API + session state bridge for login/logout/profile.
-	// In-memory throttle for a single app session (resets on refresh/logout).
 	private readonly MAX_LOGIN_ATTEMPTS = 3;
-	private http = inject(HttpClient);
+	private api = inject(AuthApiService);
 	private storage = inject(StorageService);
 
+	// #region Reactive state
 	// Subjects bootstrap from storage so UI can render immediately on app load.
-	private isAuthenticatedSubject = new BehaviorSubject<boolean>(this.hasValidToken());
-	private currentUserSubject = new BehaviorSubject<AuthUser | null>(this.getStoredUser());
+	private isAuthenticatedSubject = new BehaviorSubject<boolean>(this.storage.hasUserInfo());
+	private currentUserSubject = new BehaviorSubject<AuthUser | null>(this.storage.getUser());
 	private loginAttemptsSubject = new BehaviorSubject<number>(0);
 
 	isAuthenticated$: Observable<boolean> = this.isAuthenticatedSubject.asObservable();
 	currentUser$: Observable<AuthUser | null> = this.currentUserSubject.asObservable();
 	loginAttempts$: Observable<number> = this.loginAttemptsSubject.asObservable();
-
-	private readonly apiUrl = `${environment.apiUrl}/api/Auth`;
-
-	private hasValidToken(): boolean {
-		return this.storage.hasToken();
-	}
-
-	private getStoredUser(): AuthUser | null {
-		return this.storage.getUser();
-	}
 
 	get isAuthenticated(): boolean {
 		return this.isAuthenticatedSubject.value;
@@ -52,10 +36,6 @@ export class AuthService {
 
 	get currentUser(): AuthUser | null {
 		return this.currentUserSubject.value;
-	}
-
-	get token(): string | null {
-		return this.storage.getToken();
 	}
 
 	get loginAttempts(): number {
@@ -69,10 +49,12 @@ export class AuthService {
 	get isBlocked(): boolean {
 		return this.loginAttempts >= this.MAX_LOGIN_ATTEMPTS;
 	}
+	// #endregion
+
+	// #region Commands
 
 	/**
-	 * Login usando el endpoint POST /api/Auth/login
-	 * @param rememberMe Si es true, la sesión persiste al cerrar el navegador
+	 * Log in. The server sets the HttpOnly cookie — we never see the token.
 	 */
 	login(
 		dni: string,
@@ -82,6 +64,7 @@ export class AuthService {
 	): Observable<LoginResponse> {
 		if (this.isBlocked) {
 			return of({
+				success: false,
 				token: '',
 				rol: rol,
 				nombreCompleto: '',
@@ -91,23 +74,18 @@ export class AuthService {
 			});
 		}
 
-		const request: LoginRequest = {
-			dni: dni,
-			contraseña: password,
-			rol: rol,
-		};
-
-		return this.http.post<LoginResponse>(`${this.apiUrl}/login`, request).pipe(
+		return this.api.login({ dni, contraseña: password, rol, rememberMe }).pipe(
 			tap((response) => {
-				if (response.token) {
-					this.handleSuccessfulLogin(response, rememberMe);
+				if (response.success) {
+					this.handleSuccessfulLogin(response);
 				} else {
 					this.incrementAttempts();
 				}
 			}),
-			catchError((error: HttpErrorResponse) => {
+			catchError((error) => {
 				this.incrementAttempts();
 				return of({
+					success: false,
 					token: '',
 					rol: rol,
 					nombreCompleto: '',
@@ -119,32 +97,13 @@ export class AuthService {
 		);
 	}
 
-	private handleSuccessfulLogin(response: LoginResponse, rememberMe: boolean): void {
-		const user: AuthUser = {
-			token: response.token,
-			rol: response.rol,
-			nombreCompleto: response.nombreCompleto,
-			entityId: response.entityId,
-			sedeId: response.sedeId,
-		};
-
-		// Guardar según la preferencia de "recordar sesión"
-		// Pasar nombreCompleto y rol para generar la clave de sesión única
-		this.storage.setToken(response.token, rememberMe, response.nombreCompleto, response.rol);
-		this.storage.setUser(user, rememberMe);
-
-		this.isAuthenticatedSubject.next(true);
-		this.currentUserSubject.next(user);
-		this.resetAttempts();
-	}
-
 	/**
-	 * Obtener perfil del usuario autenticado usando GET /api/Auth/perfil
+	 * Fetch the authenticated user profile and update local storage.
+	 * The HttpOnly cookie is sent automatically by the browser.
 	 */
-	getProfile(): Observable<UserProfile | null> {
-		return this.http.get<UserProfile>(`${this.apiUrl}/perfil`).pipe(
+	getProfile() {
+		return this.api.getProfile().pipe(
 			tap((profile) => {
-				// Actualizar usuario con datos del perfil
 				const currentUser = this.currentUser;
 				if (currentUser && profile) {
 					const updatedUser: AuthUser = {
@@ -156,23 +115,25 @@ export class AuthService {
 					this.storage.setUser(updatedUser);
 				}
 			}),
-			catchError(() => of(null)),
 		);
 	}
 
 	/**
-	 * Verificar si el token es válido obteniendo el perfil
+	 * Verify the current session by requesting the profile.
+	 * The HttpOnly cookie is sent automatically.
 	 */
 	verifyToken(): Observable<boolean> {
-		if (!this.token) {
-			return of(false);
-		}
-
 		return this.getProfile().pipe(map((profile) => !!profile));
 	}
 
+	/**
+	 * Log out: tell the server to clear the cookie, then clean up local state.
+	 */
 	logout(): void {
-		// Limpiar permisos ANTES de clearAuth, porque clearAuth borra el sessionKey
+		// Fire-and-forget server logout (clears HttpOnly cookie)
+		this.api.logout().subscribe();
+
+		// Clean local state immediately
 		this.storage.clearPermisos();
 		this.storage.clearAuth();
 
@@ -181,59 +142,84 @@ export class AuthService {
 		this.resetAttempts();
 	}
 
-	private incrementAttempts(): void {
-		this.loginAttemptsSubject.next(this.loginAttempts + 1);
-	}
-
 	resetAttempts(): void {
 		this.loginAttemptsSubject.next(0);
 	}
 
-	/**
-	 * Verifica un token guardado para autocompletar el formulario de login
-	 * Usa el endpoint POST /api/Auth/verificar
-	 */
-	verifyTokenForAutofill(): Observable<VerifyTokenResponse | null> {
-		const rememberToken = this.storage.getRememberToken();
-		if (!rememberToken) {
-			return of(null);
-		}
+	// #endregion
 
-		return this.http
-			.post<VerifyTokenResponse>(`${this.apiUrl}/verificar`, JSON.stringify(rememberToken), {
-				headers: { 'Content-Type': 'application/json' },
-			})
-			.pipe(
-				catchError(() => {
-					// Si el token es inválido, limpiarlo
-					this.storage.clearRememberToken();
-					return of(null);
-				}),
-			);
+	// #region Sessions (Multi-User)
+
+	/**
+	 * Get stored sessions for the current device (for user switcher UI).
+	 */
+	getSessions(): Observable<StoredSession[]> {
+		return this.api.getSessions();
 	}
 
 	/**
-	 * Verifica los tokens persistentes guardados para autocompletado
-	 * Retorna un array con la información de cada usuario verificado
+	 * Switch to a different stored session.
+	 * The server sets the new auth cookie.
 	 */
-	verifyAllStoredTokens(): Observable<VerifyTokenResponse[]> {
-		const persistentTokens = this.storage.getAllPersistentTokens();
-
-		if (persistentTokens.length === 0) {
-			return of([]);
-		}
-
-		const verifyRequests = persistentTokens.map(({ token }) =>
-			this.http
-				.post<VerifyTokenResponse>(`${this.apiUrl}/verificar`, JSON.stringify(token), {
-					headers: { 'Content-Type': 'application/json' },
-				})
-				.pipe(catchError(() => of(null))),
-		);
-
-		return forkJoin(verifyRequests).pipe(
-			map((responses) => responses.filter((r): r is VerifyTokenResponse => r !== null)),
+	switchSession(sessionId: string): Observable<StoredSession> {
+		return this.api.switchSession(sessionId).pipe(
+			tap((session) => {
+				const user: AuthUser = {
+					rol: session.rol as UserRole,
+					nombreCompleto: session.nombreCompleto,
+					entityId: session.entityId,
+					sedeId: session.sedeId,
+				};
+				this.currentUserSubject.next(user);
+				this.storage.setUser(user);
+				this.isAuthenticatedSubject.next(true);
+			}),
 		);
 	}
+
+	/**
+	 * Remove a stored session from the server.
+	 */
+	removeSession(sessionId: string): Observable<void> {
+		return this.api.deleteSession(sessionId);
+	}
+
+	// #endregion
+
+	// #region Deprecated (disabled — remove after cookie migration verified)
+
+	// [COOKIE_MIGRATION] Token-based session methods disabled.
+	// Sessions are now managed server-side via /api/Auth/sessions.
+	// verifyAllStoredTokens(): Observable<VerifyTokenResponse[]> { ... }
+	// verifyTokenForAutofill(): Observable<VerifyTokenResponse | null> { ... }
+
+	// #endregion
+
+	// #region Private helpers
+
+	/**
+	 * Persist user info (without token) and update reactive state.
+	 */
+	private handleSuccessfulLogin(response: LoginResponse): void {
+		const user: AuthUser = {
+			rol: response.rol,
+			nombreCompleto: response.nombreCompleto,
+			entityId: response.entityId,
+			sedeId: response.sedeId,
+		};
+
+		// Only store user info — token is in HttpOnly cookie
+		this.storage.setUser(user);
+
+		this.isAuthenticatedSubject.next(true);
+		this.currentUserSubject.next(user);
+		this.resetAttempts();
+	}
+
+	private incrementAttempts(): void {
+		this.loginAttemptsSubject.next(this.loginAttempts + 1);
+	}
+
+	// #endregion
 }
 // #endregion

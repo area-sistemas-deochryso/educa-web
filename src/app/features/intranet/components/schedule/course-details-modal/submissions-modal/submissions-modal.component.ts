@@ -6,13 +6,23 @@ import { logger } from '@core/helpers';
 
 // #endregion
 // #region Implementation
+/**
+ * Submission item shown in the submissions modal.
+ */
 export interface Submission {
+	/** Submission id. */
 	id: number;
+	/** Title of the related task. */
 	taskTitle: string;
+	/** Submission date in DD/MM/YYYY format. */
 	submittedDate: string;
+	/** Review status key. */
 	status: 'pending_review' | 'reviewed' | 'returned';
+	/** Grade value or null when not graded. */
 	grade: number | null;
+	/** Feedback text or null when not provided. */
 	feedback: string | null;
+	/** True when the submission has been opened. */
 	isRead: boolean;
 }
 
@@ -22,17 +32,25 @@ export interface Submission {
 	templateUrl: './submissions-modal.component.html',
 	styleUrl: './submissions-modal.component.scss',
 })
+/**
+ * Submissions modal for a selected week.
+ */
 export class SubmissionsModalComponent {
-	// * Inputs/outputs for dialog state and week label.
+	// #region Inputs/Outputs
+	/** Whether the modal is visible. */
 	@Input() visible = false;
+	/** Week label shown in the header. */
 	@Input() weekName = '';
+	/** Two way binding for visibility. */
 	@Output() visibleChange = new EventEmitter<boolean>();
+	// #endregion
 
-	// * Static sample submissions (replace with API when available).
+	// #region Placeholder data
+	/** Static sample submissions (replace with API when available). */
 	submissions: Submission[] = [
 		{
 			id: 1,
-			taskTitle: 'Ejercicios del capítulo 2',
+			taskTitle: 'Ejercicios del capitulo 2',
 			submittedDate: '10/01/2026',
 			status: 'pending_review',
 			grade: null,
@@ -40,25 +58,49 @@ export class SubmissionsModalComponent {
 			isRead: false,
 		},
 	];
+	// #endregion
 
+	/**
+	 * Sync visibility and emit the two way binding event.
+	 *
+	 * @param value New visibility state.
+	 */
 	onVisibleChange(value: boolean): void {
 		this.visible = value;
 		this.visibleChange.emit(value);
 	}
 
+	/**
+	 * Resolve the status class name for the UI.
+	 *
+	 * @param status Review status.
+	 * @returns CSS class name.
+	 */
 	getStatusClass(status: string): string {
 		return `status-${status.replace('_', '-')}`;
 	}
 
+	/**
+	 * Resolve a display label for a status key.
+	 *
+	 * @param status Review status.
+	 * @returns Label for UI.
+	 */
 	getStatusLabel(status: string): string {
 		const labels: Record<string, string> = {
-			pending_review: 'En revisión',
+			pending_review: 'En revision',
 			reviewed: 'Calificado',
 			returned: 'Devuelto',
 		};
 		return labels[status] || status;
 	}
 
+	/**
+	 * Resolve the PrimeIcons class for a status key.
+	 *
+	 * @param status Review status.
+	 * @returns Icon class name.
+	 */
 	getStatusIcon(status: string): string {
 		const icons: Record<string, string> = {
 			pending_review: 'pi-clock',
@@ -68,16 +110,31 @@ export class SubmissionsModalComponent {
 		return icons[status] || 'pi-file';
 	}
 
+	/**
+	 * Mark a submission as read in local state.
+	 *
+	 * @param submission Submission to update.
+	 */
 	markAsRead(submission: Submission): void {
 		submission.isRead = true;
 	}
 
+	/**
+	 * Mark a submission as read and open it.
+	 *
+	 * @param submission Submission to open.
+	 */
 	viewSubmission(submission: Submission): void {
-		// * Mark as read and open (placeholder behavior).
 		this.markAsRead(submission);
-		logger.log('Viendo entrega:', submission.taskTitle);
+		logger.log('Opening submission:', submission.taskTitle);
 	}
 
+	/**
+	 * Resolve a grade class based on the numeric value.
+	 *
+	 * @param grade Grade value or null.
+	 * @returns CSS class name.
+	 */
 	getGradeClass(grade: number | null): string {
 		if (grade === null) return '';
 		if (grade < 11) return 'grade-red';

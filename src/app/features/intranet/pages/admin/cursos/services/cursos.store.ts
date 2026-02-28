@@ -21,6 +21,7 @@ export class CursosStore {
 	private readonly _cursos = signal<Curso[]>([]);
 	private readonly _grados = signal<Grado[]>([]);
 	private readonly _loading = signal(false);
+	private readonly _error = signal<string | null>(null);
 
 	private readonly _dialogVisible = signal(false);
 	private readonly _isEditing = signal(false);
@@ -56,6 +57,7 @@ export class CursosStore {
 	readonly cursos = this._cursos.asReadonly();
 	readonly grados = this._grados.asReadonly();
 	readonly loading = this._loading.asReadonly();
+	readonly error = this._error.asReadonly();
 
 	readonly dialogVisible = this._dialogVisible.asReadonly();
 	readonly isEditing = this._isEditing.asReadonly();
@@ -166,6 +168,7 @@ export class CursosStore {
 	readonly vm = computed(() => ({
 		cursos: this._cursos(),
 		loading: this.loading(),
+		error: this.error(),
 		estadisticas: this._estadisticas(),
 
 		// Pagination
@@ -217,6 +220,14 @@ export class CursosStore {
 		this._loading.set(loading);
 	}
 
+	setError(error: string | null): void {
+		this._error.set(error);
+	}
+
+	clearError(): void {
+		this._error.set(null);
+	}
+
 	/** Mutación quirúrgica: actualizar 1 curso */
 	updateCurso(id: number, updates: Partial<Curso>): void {
 		this._cursos.update((list) =>
@@ -234,6 +245,11 @@ export class CursosStore {
 	/** Mutación quirúrgica: eliminar 1 curso */
 	removeCurso(id: number): void {
 		this._cursos.update((list) => list.filter((c) => c.id !== id));
+	}
+
+	/** Mutación quirúrgica: re-agregar 1 curso (rollback de delete) */
+	addCurso(curso: Curso): void {
+		this._cursos.update((list) => [curso, ...list]);
 	}
 
 	setEstadisticas(stats: CursosEstadisticas): void {

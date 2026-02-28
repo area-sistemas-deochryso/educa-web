@@ -12,10 +12,15 @@ import { CommonModule } from '@angular/common';
 	templateUrl: './student-card.component.html',
 	styleUrl: './student-card.component.scss',
 })
+/**
+ * Small card for a student name display.
+ */
 export class StudentCardComponent {
-	// * Name parts used for display formatting.
+	// #region Inputs
+	/** Last name or family name. */
 	@Input() lastName = '';
+	/** First name or given name. */
 	@Input() firstName = '';
-
+	// #endregion
 }
 // #endregion

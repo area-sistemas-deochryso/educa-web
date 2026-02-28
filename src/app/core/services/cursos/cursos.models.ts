@@ -14,6 +14,7 @@ export interface Curso {
 	usuarioMod?: string;
 	fechaMod?: Date;
 	grados: Grado[];
+	rowVersion?: string;
 }
 
 export interface CrearCursoRequest {
@@ -25,6 +26,7 @@ export interface ActualizarCursoRequest {
 	nombre: string;
 	estado: boolean;
 	gradosIds: number[];
+	rowVersion?: string;
 }
 
 export interface ApiResponse {

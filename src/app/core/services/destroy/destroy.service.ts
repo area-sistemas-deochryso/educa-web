@@ -5,30 +5,27 @@ import { takeUntil } from 'rxjs/operators';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
 /**
- * Servicio para manejar el ciclo de vida de subscripciones.
- * Proporciona múltiples estrategias para evitar memory leaks.
+ * Service to manage subscription lifecycles and avoid memory leaks.
  *
- * USO RECOMENDADO (Angular 16+):
+ * Recommended usage (Angular 16+):
  * ```typescript
- * // En componentes, usar takeUntilDestroyed directamente:
- * private destroyRef = inject(DestroyRef)
+ * private destroyRef = inject(DestroyRef);
  *
  * ngOnInit() {
  *   this.myService.getData()
  *     .pipe(takeUntilDestroyed(this.destroyRef))
- *     .subscribe(data => {...})
+ *     .subscribe(data => {...});
  * }
  * ```
  *
- * USO ALTERNATIVO (para servicios o casos especiales):
+ * Alternative usage (services or special cases):
  * ```typescript
- * // Inyectar el servicio
- * private destroy = inject(DestroyService)
+ * private destroy = inject(DestroyService);
  *
  * ngOnInit() {
  *   this.myService.getData()
  *     .pipe(this.destroy.takeUntil())
- *     .subscribe(data => {...})
+ *     .subscribe(data => {...});
  * }
  * ```
  */
@@ -36,21 +33,28 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 // #region Implementation
 @Injectable()
 export class DestroyService implements OnDestroy {
-	// * Subject-based cleanup helper for RxJS subscriptions.
+	// Subject based cleanup helper for RxJS subscriptions.
 	private readonly destroy$ = new Subject<void>();
 
 	/**
-	 * Observable que emite cuando el servicio/componente se destruye
+	 * Observable that emits when the service is destroyed.
 	 */
 	readonly onDestroy$ = this.destroy$.asObservable();
 
 	/**
-	 * Operador para cancelar subscripciones automáticamente
+	 * RxJS operator to auto unsubscribe on destroy.
+	 *
+	 * @returns Operator function.
+	 * @example
+	 * this.http.get(url).pipe(this.destroy.takeUntil()).subscribe();
 	 */
 	takeUntil<T>(): MonoTypeOperatorFunction<T> {
 		return takeUntil<T>(this.destroy$);
 	}
 
+	/**
+	 * Trigger cleanup and complete the subject.
+	 */
 	ngOnDestroy(): void {
 		this.destroy$.next();
 		this.destroy$.complete();
@@ -58,50 +62,43 @@ export class DestroyService implements OnDestroy {
 }
 
 /**
- * Helper function para usar takeUntilDestroyed en contextos donde
- * DestroyRef no está disponible automáticamente.
+ * Helper to use takeUntilDestroyed where DestroyRef is not injected by default.
  *
+ * @param destroyRef DestroyRef instance.
+ * @returns Operator function.
  * @example
- * ```typescript
- * // En un servicio con inject context
- * export class MyService {
- *   private destroyRef = inject(DestroyRef)
- *
- *   loadData() {
- *     return this.http.get('/api/data').pipe(
- *       untilDestroyed(this.destroyRef)
- *     )
- *   }
- * }
- * ```
+ * return this.http.get('/api/data').pipe(untilDestroyed(this.destroyRef));
  */
 export function untilDestroyed<T>(destroyRef: DestroyRef): MonoTypeOperatorFunction<T> {
 	return takeUntilDestroyed<T>(destroyRef);
 }
 
 /**
- * Clase base para componentes que necesitan manejar subscripciones.
- * Alternativa a inyectar DestroyService.
+ * Base class for components that need subscription cleanup.
  *
  * @example
- * ```typescript
  * export class MyComponent extends DestroyableComponent {
  *   ngOnInit() {
  *     this.myService.getData()
  *       .pipe(this.untilDestroyed())
- *       .subscribe(...)
+ *       .subscribe();
  *   }
  * }
- * ```
  */
 @Directive()
 export abstract class DestroyableComponent implements OnDestroy {
 	protected readonly destroy$ = new Subject<void>();
 
+	/**
+	 * Operator to auto unsubscribe on destroy.
+	 */
 	protected untilDestroyed<T>(): MonoTypeOperatorFunction<T> {
 		return takeUntil<T>(this.destroy$);
 	}
 
+	/**
+	 * Trigger cleanup and complete the subject.
+	 */
 	ngOnDestroy(): void {
 		this.destroy$.next();
 		this.destroy$.complete();
@@ -109,34 +106,61 @@ export abstract class DestroyableComponent implements OnDestroy {
 }
 
 /**
- * Utilidad para manejar intervalos y timeouts con cleanup automático
+ * Utility to manage intervals and timeouts with centralized cleanup.
  */
 export class TimerManager {
 	private intervals: ReturnType<typeof setInterval>[] = [];
 	private timeouts: ReturnType<typeof setTimeout>[] = [];
 
+	/**
+	 * Create and track an interval.
+	 *
+	 * @param callback Callback to run.
+	 * @param ms Interval delay in ms.
+	 * @returns Interval id.
+	 */
 	setInterval(callback: () => void, ms: number): ReturnType<typeof setInterval> {
 		const id = setInterval(callback, ms);
 		this.intervals.push(id);
 		return id;
 	}
 
+	/**
+	 * Create and track a timeout.
+	 *
+	 * @param callback Callback to run.
+	 * @param ms Timeout delay in ms.
+	 * @returns Timeout id.
+	 */
 	setTimeout(callback: () => void, ms: number): ReturnType<typeof setTimeout> {
 		const id = setTimeout(callback, ms);
 		this.timeouts.push(id);
 		return id;
 	}
 
+	/**
+	 * Clear a tracked interval.
+	 *
+	 * @param id Interval id.
+	 */
 	clearInterval(id: ReturnType<typeof setInterval>): void {
 		clearInterval(id);
 		this.intervals = this.intervals.filter((i) => i !== id);
 	}
 
+	/**
+	 * Clear a tracked timeout.
+	 *
+	 * @param id Timeout id.
+	 */
 	clearTimeout(id: ReturnType<typeof setTimeout>): void {
 		clearTimeout(id);
 		this.timeouts = this.timeouts.filter((t) => t !== id);
 	}
 
+	/**
+	 * Clear all tracked intervals and timeouts.
+	 */
 	clearAll(): void {
 		this.intervals.forEach((id) => clearInterval(id));
 		this.timeouts.forEach((id) => clearTimeout(id));

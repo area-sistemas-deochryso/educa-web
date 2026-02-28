@@ -9,6 +9,10 @@ import {
 
 // #endregion
 // #region Implementation
+
+/**
+ * User list DTO for table views.
+ */
 export interface UsuarioLista {
 	id: number;
 	dni: string;
@@ -22,11 +26,16 @@ export interface UsuarioLista {
 	correo?: string;
 	sedeId?: number;
 	sedeNombre?: string;
-	// Campos de apoderado para estudiante
+	// Guardian fields for student
 	nombreApoderado?: string;
 	telefonoApoderado?: string;
+	// Optimistic concurrency
+	rowVersion?: string;
 }
 
+/**
+ * User detail DTO with additional fields.
+ */
 export interface UsuarioDetalle extends UsuarioLista {
 	contrasena?: string;
 	fechaNacimiento?: string;
@@ -36,12 +45,15 @@ export interface UsuarioDetalle extends UsuarioLista {
 	usuarioRegistro?: string;
 	usuarioModificacion?: string;
 	fechaModificacion?: string;
-	// Campos para Profesor
+	// Teacher fields
 	salonId?: number;
 	salonNombre?: string;
 	esTutor?: boolean;
 }
 
+/**
+ * Create user request payload.
+ */
 export interface CrearUsuarioRequest {
 	dni: string;
 	nombres: string;
@@ -54,15 +66,18 @@ export interface CrearUsuarioRequest {
 	fechaNacimiento?: string;
 	grado?: string;
 	seccion?: string;
-	// Campos para Estudiante (apoderado)
+	// Student guardian fields
 	nombreApoderado?: string;
 	telefonoApoderado?: string;
 	correoApoderado?: string;
-	// Campos para Profesor
+	// Teacher fields
 	salonId?: number;
 	esTutor?: boolean;
 }
 
+/**
+ * Update user request payload.
+ */
 export interface ActualizarUsuarioRequest {
 	dni: string;
 	nombres: string;
@@ -75,15 +90,20 @@ export interface ActualizarUsuarioRequest {
 	fechaNacimiento?: string;
 	grado?: string;
 	seccion?: string;
-	// Campos para Estudiante (apoderado)
+	// Student guardian fields
 	nombreApoderado?: string;
 	telefonoApoderado?: string;
 	correoApoderado?: string;
-	// Campos para Profesor
+	// Teacher fields
 	salonId?: number;
 	esTutor?: boolean;
+	// Optimistic concurrency
+	rowVersion?: string;
 }
 
+/**
+ * User statistics DTO.
+ */
 export interface UsuariosEstadisticas {
 	totalUsuarios: number;
 	totalDirectores: number;
@@ -95,11 +115,16 @@ export interface UsuariosEstadisticas {
 	usuariosInactivos: number;
 }
 
+/**
+ * User role type values.
+ */
 export type RolUsuario = AppUserRoleValue;
 
 export const ROLES_USUARIOS: RolUsuario[] = APP_USER_ROLE_LIST;
 
-// Roles disponibles para gestión en admin (sin Apoderado)
+/**
+ * User role type values for admin management.
+ */
 export type RolUsuarioAdmin = AppUserRoleAdmin;
 
 export const ROLES_USUARIOS_ADMIN: RolUsuarioAdmin[] = APP_USER_ROLE_ADMIN_LIST;

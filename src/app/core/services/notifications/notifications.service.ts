@@ -1,4 +1,3 @@
-// #region Imports
 import { Injectable, signal, inject, PLATFORM_ID, computed } from '@angular/core';
 import { isPlatformBrowser } from '@angular/common';
 import { Router } from '@angular/router';
@@ -12,9 +11,9 @@ import { logger } from '@app/core/helpers';
 import { StorageService } from '@app/core/services/storage';
 import { TimerManager } from '@app/core/services/destroy';
 
-/** Conteo por prioridad */
-// #endregion
-// #region Implementation
+/**
+ * Count of notifications by priority.
+ */
 export interface PriorityCount {
 	urgent: number;
 	high: number;
@@ -22,49 +21,66 @@ export interface PriorityCount {
 	low: number;
 }
 
+/**
+ * Notifications service for seasonal and local notifications.
+ *
+ * Responsibilities:
+ * - Reactive notification state via signals and computed values
+ * - Persist read and dismissed notifications with daily reset
+ * - Periodic checks for new notifications
+ * - Audio feedback and Browser Notification API
+ * - Service Worker message handling for push events
+ */
 @Injectable({
 	providedIn: 'root',
 })
 export class NotificationsService {
-	// * Manages seasonal notifications, read/dismiss state, and browser alerts.
+	// #region Dependencies
 	private platformId = inject(PLATFORM_ID);
 	private storage = inject(StorageService);
 	private router = inject(Router);
-
-	/** Timer manager para gestionar intervalos y timeouts */
 	private timerManager = new TimerManager();
+	// #endregion
 
-	/** Listener del Service Worker para cleanup */
+	// #region Private state
+	private readonly _activeNotifications = signal<SeasonalNotification[]>([]);
+	private readonly _dismissedNotifications = signal<SeasonalNotification[]>([]);
+	private readonly _readIds = signal<Set<string>>(new Set());
+	private readonly _dismissedIds = signal<Set<string>>(new Set());
+	private readonly _isPanelOpen = signal(false);
+	private readonly _showDismissedHistory = signal(false);
+
+	private notificationSound: HTMLAudioElement | null = null;
 	private swMessageHandler: ((event: MessageEvent) => void) | null = null;
+	private hasPlayedSound = false;
+	// #endregion
 
-	/** Notificaciones activas para mostrar */
-	readonly activeNotifications = signal<SeasonalNotification[]>([]);
+	// #region Public readonly state
+	readonly activeNotifications = this._activeNotifications.asReadonly();
+	readonly dismissedNotifications = this._dismissedNotifications.asReadonly();
+	readonly isPanelOpen = this._isPanelOpen.asReadonly();
+	readonly showDismissedHistory = this._showDismissedHistory.asReadonly();
+	// #endregion
 
-	/** Indica si hay notificaciones sin leer */
-	readonly hasUnread = signal(false);
+	// #region Computed
+	readonly count = computed(() => this._activeNotifications().length);
+	readonly dismissedCount = computed(() => this._dismissedNotifications().length);
 
-	/** Contador de notificaciones */
-	readonly count = signal(0);
+	readonly unreadCount = computed(() => {
+		const readIds = this._readIds();
+		return this._activeNotifications().filter((n) => !readIds.has(n.id)).length;
+	});
 
-	/** Contador de no leídas */
-	readonly unreadCount = signal(0);
+	readonly hasUnread = computed(() => this.unreadCount() > 0);
 
-	/** Panel de notificaciones abierto */
-	readonly isPanelOpen = signal(false);
+	readonly unreadByPriority = computed<PriorityCount>(() => {
+		const readIds = this._readIds();
+		const unread = this._activeNotifications().filter((n) => !readIds.has(n.id));
+		const counts: PriorityCount = { urgent: 0, high: 0, medium: 0, low: 0 };
+		unread.forEach((n) => counts[n.priority]++);
+		return counts;
+	});
 
-	/** Notificaciones descartadas del día */
-	readonly dismissedNotifications = signal<SeasonalNotification[]>([]);
-
-	/** Contador de descartadas */
-	readonly dismissedCount = computed(() => this.dismissedNotifications().length);
-
-	/** Mostrar historial de descartadas */
-	readonly showDismissedHistory = signal(false);
-
-	/** Conteo por prioridad de notificaciones no leídas */
-	readonly unreadByPriority = signal<PriorityCount>({ urgent: 0, high: 0, medium: 0, low: 0 });
-
-	/** Prioridad más alta de las no leídas */
 	readonly highestPriority = computed<NotificationPriority | null>(() => {
 		const counts = this.unreadByPriority();
 		if (counts.urgent > 0) return 'urgent';
@@ -73,19 +89,14 @@ export class NotificationsService {
 		if (counts.low > 0) return 'low';
 		return null;
 	});
+	// #endregion
 
-	/** Audio para sonido de notificación */
-	private notificationSound: HTMLAudioElement | null = null;
-
-	private dismissedIds = new Set<string>();
-	private readIds = new Set<string>();
-	private hasPlayedSound = false;
-
+	// #region Initialization
 	constructor() {
 		if (isPlatformBrowser(this.platformId)) {
 			this.initSound();
-			this.loadDismissedNotifications();
-			this.loadReadNotifications();
+			this.loadDismissedFromStorage();
+			this.loadReadFromStorage();
 			this.checkNotifications();
 			this.startPeriodicCheck();
 			this.listenToServiceWorker();
@@ -93,481 +104,220 @@ export class NotificationsService {
 	}
 
 	/**
-	 * Inicializa el sonido de notificación
+	 * Initialize audio for notification sound.
 	 */
 	private initSound(): void {
 		this.notificationSound = new Audio();
-		// Usar archivo MP3 de sonido de campana
 		this.notificationSound.src = 'sounds/notification-bell.mp3';
 		this.notificationSound.volume = 0.5;
 	}
 
 	/**
-	 * Escucha mensajes del Service Worker (Push notifications)
-	 * Push es el wake-up call - el SW nos notifica cuando llega algo
+	 * Start periodic checks for notifications.
 	 */
-	private listenToServiceWorker(): void {
-		if (!('serviceWorker' in navigator)) {
-			logger.warn('[Notifications] Service Worker no soportado');
-			return;
-		}
-
-		// Guardar referencia al handler para poder removerlo después
-		this.swMessageHandler = (event: MessageEvent) => {
-			const { type, payload } = event.data || {};
-
-			switch (type) {
-				case 'PUSH_RECEIVED':
-					this.handlePushReceived(payload);
-					break;
-				case 'NOTIFICATION_CLICKED':
-					this.handleNotificationClicked(payload);
-					break;
-				case 'NOTIFICATION_CLOSED':
-					this.handleNotificationClosed(payload);
-					break;
-				default:
-					logger.log('[Notifications] SW message:', event.data);
-			}
-		};
-
-		navigator.serviceWorker.addEventListener('message', this.swMessageHandler);
-		logger.log('[Notifications] Escuchando mensajes del Service Worker');
+	private startPeriodicCheck(): void {
+		this.timerManager.setInterval(() => this.checkNotifications(), 60 * 60 * 1000);
 	}
+	// #endregion
+
+	// #region Notification checks
 
 	/**
-	 * Maneja la recepción de un Push
-	 * Reproduce sonido y actualiza estado
-	 */
-	private handlePushReceived(payload: unknown): void {
-		logger.log('[Notifications] Push recibido:', payload);
-
-		// Reproducir sonido de notificación
-		this.playSound();
-
-		// Incrementar contador de no leídas
-		this.unreadCount.update((count) => count + 1);
-		this.hasUnread.set(true);
-
-		// Actualizar conteo por prioridad si viene en el payload
-		const typedPayload = payload as { priority?: NotificationPriority } | null;
-		if (typedPayload?.priority) {
-			this.unreadByPriority.update((counts) => ({
-				...counts,
-				[typedPayload.priority!]:
-					(counts[typedPayload.priority as keyof PriorityCount] || 0) + 1,
-			}));
-		}
-
-		// Re-verificar notificaciones locales también
-		this.checkNotifications();
-	}
-
-	/**
-	 * Maneja click en notificación nativa
-	 */
-	private handleNotificationClicked(payload: unknown): void {
-		logger.log('[Notifications] Notification clicked:', payload);
-
-		// Marcar como leída si tiene ID
-		const typedPayload = payload as { id?: string } | null;
-		if (typedPayload?.id) {
-			this.markAsRead(typedPayload.id);
-		}
-
-		// Navegar a la URL si se especificó (la navegación la maneja el SW)
-	}
-
-	/**
-	 * Maneja cierre de notificación sin click
-	 */
-	private handleNotificationClosed(payload: unknown): void {
-		logger.log('[Notifications] Notification closed:', payload);
-		// Opcional: marcar como leída o dejar sin leer
-	}
-
-	/**
-	 * Carga las notificaciones descartadas del localStorage
-	 */
-	private loadDismissedNotifications(): void {
-		try {
-			const data = this.storage.getDismissedNotifications();
-			if (data) {
-				// Limpiar descartados del día anterior
-				const storedDate = new Date(data.date).toDateString();
-				const today = new Date().toDateString();
-
-				if (storedDate === today) {
-					this.dismissedIds = new Set(data.ids);
-				} else {
-					// Nuevo día, limpiar descartados
-					this.clearDismissed();
-				}
-			}
-		} catch (e) {
-			logger.error('[Notifications] Error loading dismissed:', e);
-			this.clearDismissed();
-		}
-	}
-
-	/**
-	 * Guarda las notificaciones descartadas
-	 */
-	private saveDismissedNotifications(): void {
-		try {
-			this.storage.setDismissedNotifications({
-				ids: Array.from(this.dismissedIds),
-				date: new Date().toISOString(),
-			});
-		} catch (e) {
-			logger.error('[Notifications] Error saving dismissed:', e);
-		}
-	}
-
-	/**
-	 * Limpia las notificaciones descartadas
-	 */
-	private clearDismissed(): void {
-		this.dismissedIds.clear();
-		this.storage.removeDismissedNotifications();
-	}
-
-	/**
-	 * Carga las notificaciones leídas del localStorage
-	 */
-	private loadReadNotifications(): void {
-		try {
-			const data = this.storage.getReadNotifications();
-			if (data) {
-				const storedDate = new Date(data.date).toDateString();
-				const today = new Date().toDateString();
-
-				if (storedDate === today) {
-					this.readIds = new Set(data.ids);
-				} else {
-					this.clearRead();
-				}
-			}
-		} catch (e) {
-			logger.error('[Notifications] Error loading read:', e);
-			this.clearRead();
-		}
-	}
-
-	/**
-	 * Guarda las notificaciones leídas
-	 */
-	private saveReadNotifications(): void {
-		try {
-			this.storage.setReadNotifications({
-				ids: Array.from(this.readIds),
-				date: new Date().toISOString(),
-			});
-		} catch (e) {
-			logger.error('[Notifications] Error saving read:', e);
-		}
-	}
-
-	/**
-	 * Limpia las notificaciones leídas
-	 */
-	private clearRead(): void {
-		this.readIds.clear();
-		this.storage.removeReadNotifications();
-	}
-
-	/**
-	 * Verifica las notificaciones del día
+	 * Check daily notifications, filter dismissed, and sort by priority.
 	 */
 	checkNotifications(): void {
 		const today = new Date();
 		const todayNotifications = getTodayNotifications(today);
+		const dismissedIds = this._dismissedIds();
 
-		// Filtrar las que ya fueron descartadas
-		const active = todayNotifications.filter((n) => !this.dismissedIds.has(n.id));
-
-		// Obtener las descartadas
-		const dismissed = todayNotifications.filter((n) => this.dismissedIds.has(n.id));
-		this.dismissedNotifications.set(dismissed);
-
-		// Ordenar por prioridad
 		const priorityOrder = { urgent: 0, high: 1, medium: 2, low: 3 };
-		active.sort((a, b) => priorityOrder[a.priority] - priorityOrder[b.priority]);
+		const active = todayNotifications
+			.filter((n) => !dismissedIds.has(n.id))
+			.sort((a, b) => priorityOrder[a.priority] - priorityOrder[b.priority]);
+		const dismissed = todayNotifications.filter((n) => dismissedIds.has(n.id));
 
-		// Contar no leídas
-		const unread = active.filter((n) => !this.readIds.has(n.id));
+		this._activeNotifications.set(active);
+		this._dismissedNotifications.set(dismissed);
 
-		// Calcular conteo por prioridad
-		const priorityCounts: PriorityCount = { urgent: 0, high: 0, medium: 0, low: 0 };
-		unread.forEach((n) => {
-			priorityCounts[n.priority]++;
-		});
-
-		this.activeNotifications.set(active);
-		this.count.set(active.length);
-		this.unreadCount.set(unread.length);
-		this.hasUnread.set(unread.length > 0);
-		this.unreadByPriority.set(priorityCounts);
-
-		logger.log(
-			`[Notifications] ${active.length} activas, ${unread.length} sin leer`,
-			priorityCounts,
-		);
-
-		// Guardar última verificación
+		// Save last check time.
 		this.storage.setLastNotificationCheck(today.toISOString());
 
-		// Reproducir sonido si hay no leídas y no se ha reproducido aún
-		if (unread.length > 0 && !this.hasPlayedSound) {
+		// Play sound if there are unread notifications and it has not played yet.
+		if (this.unreadCount() > 0 && !this.hasPlayedSound) {
 			this.playSound();
 			this.hasPlayedSound = true;
 		}
 
-		// Solicitar permiso para notificaciones del navegador si hay urgentes
+		// Request browser notification permission if there are urgent items.
 		if (active.some((n) => n.priority === 'urgent')) {
 			this.requestBrowserNotificationPermission();
 		}
 	}
+	// #endregion
+
+	// #region Commands - read
 
 	/**
-	 * Inicia verificación periódica (cada hora)
+	 * Mark a notification as read.
 	 */
-	private startPeriodicCheck(): void {
-		// Verificar cada hora usando TimerManager
-		this.timerManager.setInterval(
-			() => {
-				this.checkNotifications();
-			},
-			60 * 60 * 1000,
-		);
+	markAsRead(notificationId: string): void {
+		if (this._readIds().has(notificationId)) return;
+		this._readIds.update((ids) => new Set([...ids, notificationId]));
+		this.saveReadToStorage();
 	}
 
 	/**
-	 * Reproduce el sonido de notificación
+	 * Mark a notification as unread.
+	 */
+	markAsUnread(notificationId: string): void {
+		if (!this._readIds().has(notificationId)) return;
+		this._readIds.update((ids) => {
+			const next = new Set(ids);
+			next.delete(notificationId);
+			return next;
+		});
+		this.saveReadToStorage();
+	}
+
+	/**
+	 * Mark all active notifications as read.
+	 */
+	markAllAsRead(): void {
+		const allIds = this._activeNotifications().map((n) => n.id);
+		this._readIds.update((ids) => new Set([...ids, ...allIds]));
+		this.saveReadToStorage();
+	}
+
+	/**
+	 * Mark all notifications as unread.
+	 */
+	markAllAsUnread(): void {
+		this._readIds.set(new Set());
+		this.saveReadToStorage();
+	}
+
+	/**
+	 * Check if a notification is read.
+	 */
+	isRead(notificationId: string): boolean {
+		return this._readIds().has(notificationId);
+	}
+	// #endregion
+
+	// #region Commands - dismiss
+
+	/**
+	 * Dismiss a notification by id.
+	 */
+	dismiss(notificationId: string): void {
+		const notification = this._activeNotifications().find((n) => n.id === notificationId);
+		if (!notification || notification.dismissible === false) return;
+
+		this._dismissedIds.update((ids) => new Set([...ids, notificationId]));
+		this._activeNotifications.update((list) => list.filter((n) => n.id !== notificationId));
+		this._dismissedNotifications.update((list) => [...list, notification]);
+		this.saveDismissedToStorage();
+	}
+
+	/**
+	 * Dismiss all dismissible notifications.
+	 */
+	dismissAll(): void {
+		const active = this._activeNotifications();
+		const dismissible = active.filter((n) => n.dismissible !== false);
+		const remaining = active.filter((n) => n.dismissible === false);
+
+		this._dismissedIds.update((ids) => new Set([...ids, ...dismissible.map((n) => n.id)]));
+		this._activeNotifications.set(remaining);
+		this._dismissedNotifications.update((list) => [...list, ...dismissible]);
+		this.saveDismissedToStorage();
+	}
+
+	/**
+	 * Restore a dismissed notification.
+	 */
+	restore(notificationId: string): void {
+		if (!this._dismissedIds().has(notificationId)) return;
+		this._dismissedIds.update((ids) => {
+			const next = new Set(ids);
+			next.delete(notificationId);
+			return next;
+		});
+		this.saveDismissedToStorage();
+		this.checkNotifications();
+	}
+
+	/**
+	 * Restore all dismissed notifications.
+	 */
+	restoreAll(): void {
+		this._dismissedIds.set(new Set());
+		this.saveDismissedToStorage();
+		this.checkNotifications();
+	}
+	// #endregion
+
+	// #region Commands - UI
+
+	/**
+	 * Toggle the notification panel.
+	 */
+	togglePanel(): void {
+		this._isPanelOpen.update((v) => !v);
+		if (this._isPanelOpen() && this.unreadCount() > 0) {
+			this.playSound();
+		}
+	}
+
+	/**
+	 * Close the notification panel.
+	 */
+	closePanel(): void {
+		this._isPanelOpen.set(false);
+	}
+
+	/**
+	 * Toggle dismissed history visibility.
+	 */
+	toggleDismissedHistory(): void {
+		this._showDismissedHistory.update((v) => !v);
+	}
+
+	/**
+	 * Get active notifications by type.
+	 */
+	getByType(type: NotificationType): SeasonalNotification[] {
+		return this._activeNotifications().filter((n) => n.type === type);
+	}
+	// #endregion
+
+	// #region Audio and browser notifications
+
+	/**
+	 * Play notification sound if available.
 	 */
 	playSound(): void {
 		if (this.notificationSound) {
 			this.notificationSound.currentTime = 0;
-			this.notificationSound.play().catch((e) => {
-				logger.warn('[Notifications] No se pudo reproducir sonido:', e);
+			this.notificationSound.play().catch(() => {
+				// Autoplay may be blocked before user interaction.
 			});
 		}
 	}
 
 	/**
-	 * Actualiza el conteo por prioridad basado en notificaciones no leídas
-	 */
-	private updatePriorityCounts(): void {
-		const unread = this.activeNotifications().filter((n) => !this.readIds.has(n.id));
-		const priorityCounts: PriorityCount = { urgent: 0, high: 0, medium: 0, low: 0 };
-		unread.forEach((n) => {
-			priorityCounts[n.priority]++;
-		});
-		this.unreadByPriority.set(priorityCounts);
-	}
-
-	/**
-	 * Marca una notificación como leída
-	 */
-	markAsRead(notificationId: string): void {
-		if (!this.readIds.has(notificationId)) {
-			this.readIds.add(notificationId);
-			this.saveReadNotifications();
-
-			const unread = this.activeNotifications().filter((n) => !this.readIds.has(n.id));
-			this.unreadCount.set(unread.length);
-			this.hasUnread.set(unread.length > 0);
-			this.updatePriorityCounts();
-
-			logger.log(`[Notifications] Leída: ${notificationId}`);
-		}
-	}
-
-	/**
-	 * Marca una notificación como no leída
-	 */
-	markAsUnread(notificationId: string): void {
-		if (this.readIds.has(notificationId)) {
-			this.readIds.delete(notificationId);
-			this.saveReadNotifications();
-
-			const unread = this.activeNotifications().filter((n) => !this.readIds.has(n.id));
-			this.unreadCount.set(unread.length);
-			this.hasUnread.set(unread.length > 0);
-			this.updatePriorityCounts();
-
-			logger.log(`[Notifications] No leída: ${notificationId}`);
-		}
-	}
-
-	/**
-	 * Marca todas como leídas
-	 */
-	markAllAsRead(): void {
-		this.activeNotifications().forEach((n) => this.readIds.add(n.id));
-		this.saveReadNotifications();
-		this.unreadCount.set(0);
-		this.hasUnread.set(false);
-		this.unreadByPriority.set({ urgent: 0, high: 0, medium: 0, low: 0 });
-		logger.log('[Notifications] Todas marcadas como leídas');
-	}
-
-	/**
-	 * Marca todas como no leídas
-	 */
-	markAllAsUnread(): void {
-		this.readIds.clear();
-		this.saveReadNotifications();
-		const active = this.activeNotifications();
-		this.unreadCount.set(active.length);
-		this.hasUnread.set(active.length > 0);
-		this.updatePriorityCounts();
-		logger.log('[Notifications] Todas marcadas como no leídas');
-	}
-
-	/**
-	 * Verifica si una notificación está leída
-	 */
-	isRead(notificationId: string): boolean {
-		return this.readIds.has(notificationId);
-	}
-
-	/**
-	 * Abre/cierra el panel de notificaciones
-	 */
-	togglePanel(): void {
-		this.isPanelOpen.update((v) => !v);
-		if (this.isPanelOpen() && this.unreadCount() > 0) {
-			this.playSound();
-		}
-	}
-
-	/**
-	 * Cierra el panel
-	 */
-	closePanel(): void {
-		this.isPanelOpen.set(false);
-	}
-
-	/**
-	 * Descarta una notificación
-	 */
-	dismiss(notificationId: string): void {
-		const notification = this.activeNotifications().find((n) => n.id === notificationId);
-
-		// Solo descartar si es dismissible
-		if (notification?.dismissible !== false && notification) {
-			this.dismissedIds.add(notificationId);
-			this.saveDismissedNotifications();
-
-			// Actualizar lista activa
-			const updated = this.activeNotifications().filter((n) => n.id !== notificationId);
-			this.activeNotifications.set(updated);
-			this.count.set(updated.length);
-
-			// Actualizar lista de descartadas
-			this.dismissedNotifications.update((dismissed) => [...dismissed, notification]);
-
-			// Actualizar no leídas
-			const unread = updated.filter((n) => !this.readIds.has(n.id));
-			this.unreadCount.set(unread.length);
-			this.hasUnread.set(unread.length > 0);
-			this.updatePriorityCounts();
-
-			logger.log(`[Notifications] Descartada: ${notificationId}`);
-		}
-	}
-
-	/**
-	 * Descarta todas las notificaciones (excepto las no dismissible)
-	 */
-	dismissAll(): void {
-		const active = this.activeNotifications();
-		const newlyDismissed: SeasonalNotification[] = [];
-
-		active.forEach((n) => {
-			if (n.dismissible !== false) {
-				this.dismissedIds.add(n.id);
-				newlyDismissed.push(n);
-			}
-		});
-		this.saveDismissedNotifications();
-
-		// Mantener solo las no dismissible
-		const remaining = active.filter((n) => n.dismissible === false);
-		this.activeNotifications.set(remaining);
-		this.count.set(remaining.length);
-
-		// Actualizar lista de descartadas
-		this.dismissedNotifications.update((dismissed) => [...dismissed, ...newlyDismissed]);
-
-		// Actualizar no leídas
-		const unread = remaining.filter((n) => !this.readIds.has(n.id));
-		this.unreadCount.set(unread.length);
-		this.hasUnread.set(unread.length > 0);
-		this.updatePriorityCounts();
-
-		logger.log('[Notifications] Todas descartadas');
-	}
-
-	/**
-	 * Obtiene notificaciones por tipo
-	 */
-	getByType(type: NotificationType): SeasonalNotification[] {
-		return this.activeNotifications().filter((n) => n.type === type);
-	}
-
-	/**
-	 * Restaura una notificación descartada
-	 */
-	restore(notificationId: string): void {
-		if (this.dismissedIds.has(notificationId)) {
-			this.dismissedIds.delete(notificationId);
-			this.saveDismissedNotifications();
-			this.checkNotifications();
-			logger.log(`[Notifications] Restaurada: ${notificationId}`);
-		}
-	}
-
-	/**
-	 * Restaura todas las notificaciones descartadas
-	 */
-	restoreAll(): void {
-		this.dismissedIds.clear();
-		this.saveDismissedNotifications();
-		this.checkNotifications();
-		logger.log('[Notifications] Todas restauradas');
-	}
-
-	/**
-	 * Alterna la vista del historial de descartadas
-	 */
-	toggleDismissedHistory(): void {
-		this.showDismissedHistory.update((v) => !v);
-	}
-
-	/**
-	 * Solicita permiso para notificaciones del navegador
+	 * Request browser notification permission.
 	 */
 	private async requestBrowserNotificationPermission(): Promise<void> {
-		if (!('Notification' in window)) {
-			logger.warn('[Notifications] Browser notifications not supported');
-			return;
-		}
-
-		if (Notification.permission === 'default') {
-			const permission = await Notification.requestPermission();
-			logger.log(`[Notifications] Permission: ${permission}`);
-		}
+		if (!('Notification' in window) || Notification.permission !== 'default') return;
+		await Notification.requestPermission();
 	}
 
 	/**
-	 * Muestra una notificación nativa del navegador
+	 * Show a browser notification for a seasonal notification.
 	 */
 	async showBrowserNotification(notification: SeasonalNotification): Promise<void> {
-		if (!('Notification' in window) || Notification.permission !== 'granted') {
-			return;
-		}
+		if (!('Notification' in window) || Notification.permission !== 'granted') return;
 
 		try {
 			const browserNotif = new Notification(notification.title, {
@@ -580,7 +330,6 @@ export class NotificationsService {
 			browserNotif.onclick = () => {
 				window.focus();
 				if (notification.actionUrl) {
-					// Navegar con Router para evitar open redirect
 					this.router.navigateByUrl(notification.actionUrl);
 				}
 				browserNotif.close();
@@ -591,28 +340,142 @@ export class NotificationsService {
 	}
 
 	/**
-	 * Muestra notificaciones urgentes como notificaciones del navegador
+	 * Show urgent notifications as browser notifications.
 	 */
 	showUrgentAsBrowserNotifications(): void {
-		const urgent = this.activeNotifications().filter((n) => n.priority === 'urgent');
+		const urgent = this._activeNotifications().filter((n) => n.priority === 'urgent');
 		urgent.forEach((n) => this.showBrowserNotification(n));
+	}
+	// #endregion
+
+	// #region Service Worker
+
+	/**
+	 * Listen to Service Worker messages.
+	 */
+	private listenToServiceWorker(): void {
+		if (!('serviceWorker' in navigator)) return;
+
+		this.swMessageHandler = (event: MessageEvent) => {
+			const { type, payload } = event.data || {};
+
+			switch (type) {
+				case 'PUSH_RECEIVED':
+					this.handlePushReceived(payload);
+					break;
+				case 'NOTIFICATION_CLICKED':
+					this.handleNotificationClicked(payload);
+					break;
+				case 'NOTIFICATION_CLOSED':
+					break;
+			}
+		};
+
+		navigator.serviceWorker.addEventListener('message', this.swMessageHandler);
 	}
 
 	/**
-	 * Limpia recursos al destruir (aunque los servicios singleton raramente se destruyen)
-	 * Este método se puede llamar manualmente para cleanup
+	 * Handle push received message.
+	 */
+	private handlePushReceived(_payload: unknown): void {
+		this.playSound();
+		this.checkNotifications();
+	}
+
+	/**
+	 * Handle notification clicked message.
+	 */
+	private handleNotificationClicked(payload: unknown): void {
+		const typedPayload = payload as { id?: string } | null;
+		if (typedPayload?.id) {
+			this.markAsRead(typedPayload.id);
+		}
+	}
+	// #endregion
+
+	// #region Storage I/O
+
+	/**
+	 * Load dismissed notifications from storage.
+	 */
+	private loadDismissedFromStorage(): void {
+		try {
+			const data = this.storage.getDismissedNotifications();
+			if (data) {
+				const isToday = new Date(data.date).toDateString() === new Date().toDateString();
+				if (isToday) {
+					this._dismissedIds.set(new Set(data.ids));
+				} else {
+					this.storage.removeDismissedNotifications();
+				}
+			}
+		} catch (e) {
+			logger.error('[Notifications] Error loading dismissed:', e);
+			this.storage.removeDismissedNotifications();
+		}
+	}
+
+	/**
+	 * Save dismissed notifications to storage.
+	 */
+	private saveDismissedToStorage(): void {
+		try {
+			this.storage.setDismissedNotifications({
+				ids: [...this._dismissedIds()],
+				date: new Date().toISOString(),
+			});
+		} catch (e) {
+			logger.error('[Notifications] Error saving dismissed:', e);
+		}
+	}
+
+	/**
+	 * Load read notifications from storage.
+	 */
+	private loadReadFromStorage(): void {
+		try {
+			const data = this.storage.getReadNotifications();
+			if (data) {
+				const isToday = new Date(data.date).toDateString() === new Date().toDateString();
+				if (isToday) {
+					this._readIds.set(new Set(data.ids));
+				} else {
+					this.storage.removeReadNotifications();
+				}
+			}
+		} catch (e) {
+			logger.error('[Notifications] Error loading read:', e);
+			this.storage.removeReadNotifications();
+		}
+	}
+
+	/**
+	 * Save read notifications to storage.
+	 */
+	private saveReadToStorage(): void {
+		try {
+			this.storage.setReadNotifications({
+				ids: [...this._readIds()],
+				date: new Date().toISOString(),
+			});
+		} catch (e) {
+			logger.error('[Notifications] Error saving read:', e);
+		}
+	}
+	// #endregion
+
+	// #region Cleanup
+
+	/**
+	 * Cleanup timers and Service Worker listeners.
 	 */
 	cleanup(): void {
-		// Limpiar todos los timers
 		this.timerManager.clearAll();
 
-		// Remover listener del Service Worker
 		if (this.swMessageHandler && 'serviceWorker' in navigator) {
 			navigator.serviceWorker.removeEventListener('message', this.swMessageHandler);
 			this.swMessageHandler = null;
 		}
-
-		logger.log('[Notifications] Cleanup completado');
 	}
+	// #endregion
 }
-// #endregion

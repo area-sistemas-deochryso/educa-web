@@ -1,6 +1,6 @@
 # educa-web
 
-Aplicación Angular 21 para gestión educativa con portal público e intranet privada.
+Aplicacion Angular 21 para gestion educativa con portal publico e intranet privada.
 
 **Stack**: Angular 21, TypeScript 5.9, NgRx Signals, PrimeNG 21, Vitest | ASP.NET Core 9, EF Core 9, SQL Server (Azure) | PWA (SWR + Network-first)
 
@@ -21,7 +21,7 @@ Aplicación Angular 21 para gestión educativa con portal público e intranet pr
 @.claude/project-structure/config-files.md
 @.claude/project-structure/urls-and-repos.md
 
-## Reglas de código
+## Reglas de codigo
 
 @.claude/rules/reading-optimization.md
 @.claude/rules/code-style.md
@@ -51,10 +51,25 @@ Aplicación Angular 21 para gestión educativa con portal público e intranet pr
 @.claude/rules/quality-gate.md
 @.claude/rules/pwa-ios.md
 
+## Skills
+
+@.claude/skills/commit/SKILL.md
+@.claude/skills/pr-ready/SKILL.md
+@.claude/skills/validate-code/SKILL.md
+
+## Agents
+
+@.claude/agents/code-reviewer.md
+
 ## Debug y troubleshooting
 
 @.claude/debug/README.md
 
 ## Tareas activas
 
-@.claude/tasks/correction-plan.md
+@.claude/tasks/cookie-auth-migration.md
+@.claude/tasks/wal-event-sourcing.md
+
+## Historial
+
+@.claude/history/README.md

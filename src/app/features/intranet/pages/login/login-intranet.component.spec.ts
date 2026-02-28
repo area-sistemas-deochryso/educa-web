@@ -25,7 +25,8 @@ describe('LoginIntranetComponent', () => {
 			resetAttempts: vi.fn(),
 			login: vi.fn().mockReturnValue(
 				of({
-					token: 'test-token',
+					success: true,
+					token: '',
 					rol: 'Estudiante',
 					nombreCompleto: 'Test User',
 					entityId: 1,
@@ -33,7 +34,7 @@ describe('LoginIntranetComponent', () => {
 					mensaje: 'Login exitoso',
 				}),
 			),
-			verifyAllStoredTokens: vi.fn().mockReturnValue(of([])),
+			getSessions: vi.fn().mockReturnValue(of([])),
 		};
 
 		routerMock = {
@@ -134,6 +135,7 @@ describe('LoginIntranetComponent', () => {
 		it('should show error on failed login', () => {
 			authServiceMock.login = vi.fn().mockReturnValue(
 				of({
+					success: false,
 					token: '',
 					rol: 'Estudiante',
 					nombreCompleto: '',

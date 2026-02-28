@@ -8,106 +8,81 @@ import {
 	VoiceCommandContext,
 	ScrollDirection,
 } from './voice-commands.config';
+import {
+	SpeechRecognitionInstance,
+	SpeechRecognitionEvent,
+	SpeechRecognitionErrorEvent,
+	IWindow,
+} from './speech-recognition.types';
 import { logger } from '@core/helpers';
 import {
 	UI_VOICE_MESSAGES,
 	UI_VOICE_MESSAGES_DYNAMIC,
 } from '@app/shared/constants';
 
+/**
+ * Runtime voice command definition.
+ */
 export interface VoiceCommand {
+	/** Patterns used to match the command. */
 	patterns: string[];
+	/** Action executed when the command matches. */
 	action: (params?: string) => void;
+	/** Display description for the command. */
 	description: string;
 }
 
+/**
+ * Modal registration for voice open and close commands.
+ */
 export interface RegisteredModal {
+	/** Modal name. */
 	name: string;
+	/** Alternate names for matching. */
 	aliases: string[];
+	/** Open handler. */
 	open: () => void;
+	/** Close handler. */
 	close: () => void;
-}
-
-interface SpeechRecognitionErrorEvent extends Event {
-	error:
-		| 'no-speech'
-		| 'aborted'
-		| 'audio-capture'
-		| 'network'
-		| 'not-allowed'
-		| 'service-not-allowed'
-		| 'bad-grammar'
-		| 'language-not-supported';
-	message?: string;
-}
-
-interface SpeechRecognitionAlternative {
-	transcript: string;
-	confidence: number;
-}
-
-interface SpeechRecognitionResult {
-	[index: number]: SpeechRecognitionAlternative;
-	isFinal: boolean;
-	length: number;
-}
-
-interface SpeechRecognitionResultList {
-	[index: number]: SpeechRecognitionResult;
-	length: number;
-}
-
-interface SpeechRecognitionEvent extends Event {
-	resultIndex: number;
-	results: SpeechRecognitionResultList;
-}
-
-interface SpeechRecognitionInstance extends EventTarget {
-	continuous: boolean;
-	interimResults: boolean;
-	lang: string;
-	onresult: ((event: SpeechRecognitionEvent) => void) | null;
-	onerror: ((event: SpeechRecognitionErrorEvent) => void) | null;
-	onend: (() => void) | null;
-	start(): void;
-	stop(): void;
-}
-
-interface SpeechRecognitionConstructor {
-	new (): SpeechRecognitionInstance;
-	prototype: SpeechRecognitionInstance;
-}
-
-interface IWindow extends Window {
-	SpeechRecognition?: SpeechRecognitionConstructor;
-	webkitSpeechRecognition?: SpeechRecognitionConstructor;
 }
 
 @Injectable({
 	providedIn: 'root',
 })
 export class VoiceRecognitionService {
-	// * Speech recognition engine with command routing.
+	// #region Dependencies
 	private platformId = inject(PLATFORM_ID);
 	private router = inject(Router);
 	private recognition: SpeechRecognitionInstance | null = null;
+	// #endregion
 
-	readonly isListening = signal(false);
-	readonly isLocked = signal(false);
-	readonly transcript = signal('');
-	readonly interimTranscript = signal('');
-	readonly lastCommand = signal<string | null>(null);
-	readonly error = signal<string | null>(null);
+	// #region Private state
+	private readonly _isListening = signal(false);
+	private readonly _isLocked = signal(false);
+	private readonly _transcript = signal('');
+	private readonly _interimTranscript = signal('');
+	private readonly _lastCommand = signal<string | null>(null);
+	private readonly _error = signal<string | null>(null);
 
 	private activeInput: HTMLInputElement | HTMLTextAreaElement | null = null;
 	private commands: VoiceCommand[] = [];
 	private registeredModals = new Map<string, RegisteredModal>();
 	private commandListeners: ((command: string, params?: string) => void)[] = [];
 
-	/** Audio para sonido de inicio de grabación (estilo WhatsApp) */
 	private startSound: HTMLAudioElement | null = null;
-	/** Audio para sonido de fin de grabación */
 	private stopSound: HTMLAudioElement | null = null;
+	// #endregion
 
+	// #region Public readonly state
+	readonly isListening = this._isListening.asReadonly();
+	readonly isLocked = this._isLocked.asReadonly();
+	readonly transcript = this._transcript.asReadonly();
+	readonly interimTranscript = this._interimTranscript.asReadonly();
+	readonly lastCommand = this._lastCommand.asReadonly();
+	readonly error = this._error.asReadonly();
+	// #endregion
+
+	// #region Initialization
 	constructor() {
 		if (isPlatformBrowser(this.platformId)) {
 			this.initSounds();
@@ -117,23 +92,20 @@ export class VoiceRecognitionService {
 	}
 
 	/**
-	 * Inicializa los sonidos del micrófono (estilo WhatsApp)
-	 * Usa sonidos de Mixkit - https://mixkit.co/free-sound-effects/
+	 * Initialize audio assets for start and stop sounds.
 	 */
 	private initSounds(): void {
-		// Sonido de inicio: tono de confirmación suave
 		this.startSound = new Audio();
 		this.startSound.src = 'sounds/mic-start.mp3';
 		this.startSound.volume = 0.4;
 
-		// Sonido de fin: pop suave
 		this.stopSound = new Audio();
 		this.stopSound.src = 'sounds/mic-stop.mp3';
 		this.stopSound.volume = 0.4;
 	}
 
 	/**
-	 * Reproduce el sonido de inicio de grabación
+	 * Play the start listening sound.
 	 */
 	private playStartSound(): void {
 		if (this.startSound) {
@@ -145,7 +117,7 @@ export class VoiceRecognitionService {
 	}
 
 	/**
-	 * Reproduce el sonido de fin de grabación
+	 * Play the stop listening sound.
 	 */
 	private playStopSound(): void {
 		if (this.stopSound) {
@@ -155,7 +127,12 @@ export class VoiceRecognitionService {
 			});
 		}
 	}
+	// #endregion
 
+	// #region SpeechRecognition API
+	/**
+	 * Initialize the browser SpeechRecognition API.
+	 */
 	private initRecognition(): void {
 		const windowRef = window as unknown as IWindow;
 		const SpeechRecognitionAPI =
@@ -184,13 +161,13 @@ export class VoiceRecognitionService {
 				}
 			}
 
-			this.interimTranscript.set(interim);
+			this._interimTranscript.set(interim);
 
 			if (final) {
 				const processed = this.processTranscript(final);
 				if (!processed) {
-					const current = this.transcript();
-					this.transcript.set(current ? `${current} ${final}` : final);
+					const current = this._transcript();
+					this._transcript.set(current ? `${current} ${final}` : final);
 					this.updateActiveInput();
 				}
 			}
@@ -201,41 +178,54 @@ export class VoiceRecognitionService {
 
 			switch (event.error) {
 				case 'network':
-					this.error.set(UI_VOICE_MESSAGES.networkError);
+					this._error.set(UI_VOICE_MESSAGES.networkError);
 					this.stop();
 					break;
 				case 'not-allowed':
 				case 'service-not-allowed':
-					this.error.set(UI_VOICE_MESSAGES.micPermissionDenied);
+					this._error.set(UI_VOICE_MESSAGES.micPermissionDenied);
 					this.stop();
 					break;
 				case 'no-speech':
 				case 'aborted':
 					break;
 				default:
-					this.error.set(UI_VOICE_MESSAGES_DYNAMIC.genericError(event.error));
+					this._error.set(UI_VOICE_MESSAGES_DYNAMIC.genericError(event.error));
 					this.stop();
 			}
 		};
 
 		this.recognition.onend = () => {
-			if (this.isLocked() && this.isListening()) {
+			if (this._isLocked() && this._isListening()) {
 				this.recognition?.start();
 			} else {
-				this.isListening.set(false);
+				this._isListening.set(false);
 			}
 		};
 	}
+	// #endregion
 
+	// #region Command parsing
 	/**
-	 * Carga los comandos desde la configuración centralizada
+	 * Load commands from the static configuration.
 	 */
 	private loadCommandsFromConfig(): void {
 		this.commands = VOICE_COMMANDS.map((config) => this.configToCommand(config));
 	}
 
 	/**
-	 * Convierte una configuración de comando a un VoiceCommand ejecutable
+	 * Normalize text for accent-insensitive matching.
+	 */
+	private normalizeText(text: string): string {
+		return text
+			.toLowerCase()
+			.normalize('NFD')
+			.replace(/[\u0300-\u036f]/g, '')
+			.trim();
+	}
+
+	/**
+	 * Convert a config object into a runtime command.
 	 */
 	private configToCommand(config: VoiceCommandConfig): VoiceCommand {
 		return {
@@ -246,14 +236,147 @@ export class VoiceRecognitionService {
 	}
 
 	/**
-	 * Ejecuta un comando según su tipo de acción
+	 * Process a transcript and dispatch commands if matched.
+	 *
+	 * @param text Raw recognized text.
+	 * @returns True when a command was processed.
+	 */
+	private processTranscript(text: string): boolean {
+		const normalizedText = this.normalizeText(text);
+
+		// Month commands have priority.
+		if (this.processMonthCommand(normalizedText)) {
+			return true;
+		}
+
+		// Year command.
+		const yearMatch = normalizedText.match(/(20\d{2})/);
+		if (yearMatch) {
+			this.showLastCommand(`Cambiar a anio ${yearMatch[1]}`);
+			this.emitCommand('change-year', yearMatch[1]);
+			return true;
+		}
+
+		// Modal commands.
+		if (this.processModalCommand(normalizedText)) {
+			return true;
+		}
+
+		// Registered commands.
+		for (const command of this.commands) {
+			for (const pattern of command.patterns) {
+				const regex = new RegExp(`^${pattern}$`, 'i');
+				const match = normalizedText.match(regex);
+
+				if (match) {
+					this.showLastCommand(command.description);
+					command.action(match[1]);
+					return true;
+				}
+			}
+		}
+
+		return false;
+	}
+
+	/**
+	 * Process month commands using month name matching.
+	 */
+	private processMonthCommand(text: string): boolean {
+		const normalizedText = this.normalizeText(text);
+
+		for (const [monthName, monthNumber] of Object.entries(MONTH_NAMES)) {
+			if (normalizedText.includes(monthName)) {
+				this.showLastCommand(`Cambiar a ${monthName}`);
+				this.emitCommand('change-month', monthNumber.toString());
+				return true;
+			}
+		}
+
+		return false;
+	}
+
+	/**
+	 * Process modal open and close commands.
+	 */
+	private processModalCommand(text: string): boolean {
+		const openMatch = text.match(/^abrir\s+(.+)$/i);
+		const closeMatch = text.match(/^cerrar\s+(.+)$/i);
+
+		if (openMatch) {
+			const modalName = openMatch[1].trim();
+			const modal = this.findModal(modalName);
+			if (modal) {
+				this.showLastCommand(`Abrir ${modal.name}`);
+				modal.open();
+				return true;
+			}
+			this.showLastCommand(`Abrir ${modalName}`);
+			this.emitCommand('open-modal', modalName);
+			return true;
+		}
+
+		if (closeMatch) {
+			const modalName = closeMatch[1].trim();
+			const modal = this.findModal(modalName);
+			if (modal) {
+				this.showLastCommand(`Cerrar ${modal.name}`);
+				modal.close();
+				return true;
+			}
+			this.showLastCommand(`Cerrar ${modalName}`);
+			this.emitCommand('close-modal', modalName);
+			return true;
+		}
+
+		return false;
+	}
+
+	/**
+	 * Find a registered modal by name or alias.
+	 */
+	private findModal(name: string): RegisteredModal | undefined {
+		const normalizedName = this.normalizeText(name);
+
+		if (this.registeredModals.has(normalizedName)) {
+			return this.registeredModals.get(normalizedName);
+		}
+
+		for (const modal of this.registeredModals.values()) {
+			if (modal.aliases.some((alias) => this.normalizeText(alias) === normalizedName)) {
+				return modal;
+			}
+			if (
+				this.normalizeText(modal.name).includes(normalizedName) ||
+				normalizedName.includes(this.normalizeText(modal.name))
+			) {
+				return modal;
+			}
+			if (
+				modal.aliases.some(
+					(alias) =>
+						this.normalizeText(alias).includes(normalizedName) ||
+						normalizedName.includes(this.normalizeText(alias)),
+				)
+			) {
+				return modal;
+			}
+		}
+
+		return undefined;
+	}
+	// #endregion
+
+	// #region Command execution
+	/**
+	 * Execute a configured command using the provided config.
 	 */
 	private executeCommand(config: VoiceCommandConfig, params?: string): void {
 		const context: VoiceCommandContext = {
 			router: this.router,
 			emitCommand: (cmd, p) => this.emitCommand(cmd, p),
 			clearTranscript: () => {
-				this.transcript.set('');
+				this._transcript.set('');
 				this.updateActiveInput();
 			},
 			params,
@@ -286,6 +409,9 @@ export class VoiceRecognitionService {
 		}
 	}
 
+	/**
+	 * Scroll the page based on a direction command.
+	 */
 	private scrollPage(direction: ScrollDirection): void {
 		const scrollAmount = 300;
 		const scrollOptions: ScrollToOptions = { behavior: 'smooth' };
@@ -311,134 +437,14 @@ export class VoiceRecognitionService {
 				break;
 		}
 	}
+	// #endregion
 
-	private processMonthCommand(text: string): boolean {
-		const normalizedText = text.toLowerCase().trim();
-
-		for (const [monthName, monthNumber] of Object.entries(MONTH_NAMES)) {
-			if (normalizedText.includes(monthName)) {
-				this.lastCommand.set(`Cambiar a ${monthName}`);
-				this.emitCommand('change-month', monthNumber.toString());
-				setTimeout(() => this.lastCommand.set(null), 2000);
-				return true;
-			}
-		}
-
-		return false;
-	}
-
-	private processTranscript(text: string): boolean {
-		const normalizedText = text.toLowerCase().trim();
-
-		// Primero intentar comandos de mes (tienen prioridad)
-		if (this.processMonthCommand(normalizedText)) {
-			return true;
-		}
-
-		// Luego comandos de año
-		const yearMatch = normalizedText.match(/(20\d{2})/);
-		if (yearMatch) {
-			this.lastCommand.set(`Cambiar a año ${yearMatch[1]}`);
-			this.emitCommand('change-year', yearMatch[1]);
-			setTimeout(() => this.lastCommand.set(null), 2000);
-			return true;
-		}
-
-		// Comandos de modal (abrir/cerrar + nombre)
-		if (this.processModalCommand(normalizedText)) {
-			return true;
-		}
-
-		// Buscar en comandos registrados
-		for (const command of this.commands) {
-			for (const pattern of command.patterns) {
-				const regex = new RegExp(`^${pattern}$`, 'i');
-				const match = normalizedText.match(regex);
-
-				if (match) {
-					this.lastCommand.set(command.description);
-					command.action(match[1]);
-					setTimeout(() => this.lastCommand.set(null), 2000);
-					return true;
-				}
-			}
-		}
-
-		return false;
-	}
-
-	private processModalCommand(text: string): boolean {
-		const openMatch = text.match(/^abrir\s+(.+)$/i);
-		const closeMatch = text.match(/^cerrar\s+(.+)$/i);
-
-		if (openMatch) {
-			const modalName = openMatch[1].trim();
-			const modal = this.findModal(modalName);
-			if (modal) {
-				this.lastCommand.set(`Abrir ${modal.name}`);
-				modal.open();
-				setTimeout(() => this.lastCommand.set(null), 2000);
-				return true;
-			}
-			this.lastCommand.set(`Abrir ${modalName}`);
-			this.emitCommand('open-modal', modalName);
-			setTimeout(() => this.lastCommand.set(null), 2000);
-			return true;
-		}
-
-		if (closeMatch) {
-			const modalName = closeMatch[1].trim();
-			const modal = this.findModal(modalName);
-			if (modal) {
-				this.lastCommand.set(`Cerrar ${modal.name}`);
-				modal.close();
-				setTimeout(() => this.lastCommand.set(null), 2000);
-				return true;
-			}
-			this.lastCommand.set(`Cerrar ${modalName}`);
-			this.emitCommand('close-modal', modalName);
-			setTimeout(() => this.lastCommand.set(null), 2000);
-			return true;
-		}
-
-		return false;
-	}
-
-	private findModal(name: string): RegisteredModal | undefined {
-		const normalizedName = name.toLowerCase().trim();
-
-		if (this.registeredModals.has(normalizedName)) {
-			return this.registeredModals.get(normalizedName);
-		}
-
-		for (const modal of this.registeredModals.values()) {
-			if (modal.aliases.some((alias) => alias.toLowerCase() === normalizedName)) {
-				return modal;
-			}
-			if (
-				modal.name.toLowerCase().includes(normalizedName) ||
-				normalizedName.includes(modal.name.toLowerCase())
-			) {
-				return modal;
-			}
-			if (
-				modal.aliases.some(
-					(alias) =>
-						alias.toLowerCase().includes(normalizedName) ||
-						normalizedName.includes(alias.toLowerCase()),
-				)
-			) {
-				return modal;
-			}
-		}
-
-		return undefined;
-	}
-
-	// #region API PÚBLICA
-
+	// #region Command pub sub
 	/**
-	 * Suscribirse a eventos de comandos
+	 * Subscribe to command events.
+	 *
+	 * @param callback Callback for command and params.
+	 * @returns Unsubscribe function.
 	 */
 	onCommand(callback: (command: string, params?: string) => void): () => void {
 		this.commandListeners.push(callback);
@@ -448,91 +454,112 @@ export class VoiceRecognitionService {
 		};
 	}
 
+	/**
+	 * Emit a command to registered listeners.
+	 */
 	private emitCommand(command: string, params?: string): void {
 		this.commandListeners.forEach((cb) => cb(command, params));
 	}
+	// #endregion
 
+	// #region Public commands
 	/**
-	 * Inicia el reconocimiento de voz
+	 * Start listening for speech.
 	 */
 	start(): void {
-		if (!this.recognition || this.isListening()) return;
+		if (!this.recognition || this._isListening()) return;
 
 		try {
-			this.error.set(null);
+			this._error.set(null);
 			this.recognition.start();
-			this.isListening.set(true);
+			this._isListening.set(true);
 			this.playStartSound();
 		} catch (e) {
 			logger.error('[VoiceRecognition] Error al iniciar:', e);
-			this.error.set(UI_VOICE_MESSAGES.startFailed);
+			this._error.set(UI_VOICE_MESSAGES.startFailed);
 		}
 	}
 
 	/**
-	 * Detiene el reconocimiento de voz
+	 * Stop listening for speech and unlock the session.
 	 */
 	stop(): void {
 		if (!this.recognition) return;
 
-		const wasListening = this.isListening();
-		this.isLocked.set(false);
-		this.isListening.set(false);
+		const wasListening = this._isListening();
+		this._isLocked.set(false);
+		this._isListening.set(false);
 		this.recognition.stop();
 
-		// Solo reproducir sonido si estaba escuchando activamente
 		if (wasListening) {
 			this.playStopSound();
 		}
 	}
 
 	/**
-	 * Bloquea el micrófono para grabación continua
+	 * Keep listening active after onend.
 	 */
 	lock(): void {
-		this.isLocked.set(true);
+		this._isLocked.set(true);
 	}
 
 	/**
-	 * Desbloquea el micrófono y detiene la grabación
+	 * Unlock and stop listening.
 	 */
 	unlock(): void {
-		this.isLocked.set(false);
+		this._isLocked.set(false);
 		this.stop();
 	}
 
 	/**
-	 * Limpia el transcript actual
+	 * Clear transcript and interim transcript.
 	 */
 	clear(): void {
-		this.transcript.set('');
-		this.interimTranscript.set('');
+		this._transcript.set('');
+		this._interimTranscript.set('');
 		this.updateActiveInput();
 	}
 
 	/**
-	 * Establece el input activo para dictado
+	 * Clear the current error message.
+	 */
+	dismissError(): void {
+		this._error.set(null);
+	}
+
+	/**
+	 * True when SpeechRecognition API is supported.
+	 */
+	get isSupported(): boolean {
+		return 'SpeechRecognition' in window || 'webkitSpeechRecognition' in window;
+	}
+	// #endregion
+
+	// #region Active input
+	/**
+	 * Set the active input to update with transcripts.
 	 */
 	setActiveInput(input: HTMLInputElement | HTMLTextAreaElement | null): void {
 		this.activeInput = input;
 	}
 
+	/**
+	 * Update the active input value with the current transcript.
+	 */
 	private updateActiveInput(): void {
 		if (this.activeInput) {
-			this.activeInput.value = this.transcript();
+			this.activeInput.value = this._transcript();
 			this.activeInput.dispatchEvent(new Event('input', { bubbles: true }));
 		}
 	}
+	// #endregion
 
+	// #region Modal registration
 	/**
-	 * Indica si el navegador soporta reconocimiento de voz
-	 */
-	get isSupported(): boolean {
-		return 'SpeechRecognition' in window || 'webkitSpeechRecognition' in window;
-	}
-
-	/**
-	 * Registra un modal para control por voz
+	 * Register a modal for voice open and close commands.
+	 *
+	 * @param modal Modal config.
+	 * @returns Unregister function.
 	 */
 	registerModal(modal: RegisteredModal): () => void {
 		const key = modal.name.toLowerCase();
@@ -543,21 +570,26 @@ export class VoiceRecognitionService {
 	}
 
 	/**
-	 * Desregistra un modal por nombre
+	 * Unregister a modal by name.
 	 */
 	unregisterModal(name: string): void {
 		this.registeredModals.delete(name.toLowerCase());
 	}
 
 	/**
-	 * Obtiene la lista de modales registrados
+	 * Get registered modal keys.
 	 */
 	getRegisteredModals(): string[] {
 		return Array.from(this.registeredModals.keys());
 	}
+	// #endregion
 
+	// #region Dynamic commands
 	/**
-	 * Añade un comando dinámicamente en tiempo de ejecución
+	 * Add a dynamic voice command.
+	 *
+	 * @param command Command definition.
+	 * @returns Unregister function.
 	 */
 	addCommand(command: VoiceCommand): () => void {
 		this.commands.push(command);
@@ -568,12 +600,23 @@ export class VoiceRecognitionService {
 	}
 
 	/**
-	 * Obtiene todos los comandos registrados (para debug/documentación)
+	 * Get registered command patterns and descriptions.
 	 */
 	getRegisteredCommands(): { pattern: string; description: string }[] {
 		return this.commands.flatMap((cmd) =>
 			cmd.patterns.map((p) => ({ pattern: p, description: cmd.description })),
 		);
+	}
+	// #endregion
+
+	// #region Private helpers
+
+	/**
+	 * Show the last recognized command for 2 seconds.
+	 */
+	private showLastCommand(description: string): void {
+		this._lastCommand.set(description);
+		setTimeout(() => this._lastCommand.set(null), 2000);
 	}
 	// #endregion
 }

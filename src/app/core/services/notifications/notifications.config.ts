@@ -1,43 +1,43 @@
 /**
- * Configuración centralizada de notificaciones por temporada
+ * Centralized seasonal notification configuration.
  *
- * Para añadir una nueva notificación:
- * 1. Añade un objeto SeasonalNotification al array correspondiente
- * 2. Define las fechas de inicio y fin (o usa el helper para fechas recurrentes)
- * 3. El sistema verificará automáticamente si debe mostrar la notificación
+ * To add a new notification:
+ * 1. Add a SeasonalNotification object to the proper array
+ * 2. Define start and end dates (or use helper functions)
+ * 3. The system will decide when to show the notification
  */
-// * Seasonal notification definitions + helpers.
+// * Seasonal notification definitions and helpers.
 
 export type NotificationType = 'matricula' | 'pago' | 'academico' | 'festividad' | 'evento';
 export type NotificationPriority = 'low' | 'medium' | 'high' | 'urgent';
 
 export interface SeasonalNotification {
-	/** Identificador único */
+	/** Unique identifier. */
 	id: string;
-	/** Tipo de notificación */
+	/** Notification type. */
 	type: NotificationType;
-	/** Título de la notificación */
+	/** Title text. */
 	title: string;
-	/** Mensaje/descripción */
+	/** Message or description. */
 	message: string;
-	/** Icono (clase de PrimeIcons) */
+	/** Icon class (PrimeIcons). */
 	icon: string;
-	/** Prioridad */
+	/** Priority level. */
 	priority: NotificationPriority;
-	/** Función que determina si debe mostrarse hoy */
+	/** Function that decides if it should show today. */
 	shouldShow: (date: Date) => boolean;
-	/** URL de acción (opcional) */
+	/** Action URL (optional). */
 	actionUrl?: string;
-	/** Texto del botón de acción (opcional) */
+	/** Action button text (optional). */
 	actionText?: string;
-	/** Si se puede descartar */
+	/** Whether it can be dismissed. */
 	dismissible?: boolean;
 }
 
-// #region HELPERS PARA FECHAS
+// #region DATE HELPERS
 
 /**
- * Verifica si la fecha está dentro de un rango de días del mes
+ * Check if date is within a day range in the current month.
  */
 export function isWithinMonthDays(date: Date, startDay: number, endDay: number): boolean {
 	const day = date.getDate();
@@ -45,14 +45,14 @@ export function isWithinMonthDays(date: Date, startDay: number, endDay: number):
 }
 
 /**
- * Verifica si es un mes específico
+ * Check if date is within a specific month (1 to 12).
  */
 export function isMonth(date: Date, month: number): boolean {
 	return date.getMonth() + 1 === month;
 }
 
 /**
- * Verifica si está dentro de un rango de fechas específicas
+ * Check if date is within a specific date range across months.
  */
 export function isWithinDateRange(
 	date: Date,
@@ -74,14 +74,14 @@ export function isWithinDateRange(
 }
 
 /**
- * Verifica si es una fecha exacta (mes y día)
+ * Check if date is an exact month and day.
  */
 export function isExactDate(date: Date, month: number, day: number): boolean {
 	return date.getMonth() + 1 === month && date.getDate() === day;
 }
 
 /**
- * Verifica si está en los últimos N días del mes
+ * Check if date is in the last N days of the month.
  */
 export function isLastDaysOfMonth(date: Date, days: number): boolean {
 	const lastDay = new Date(date.getFullYear(), date.getMonth() + 1, 0).getDate();
@@ -89,7 +89,7 @@ export function isLastDaysOfMonth(date: Date, days: number): boolean {
 }
 
 /**
- * Verifica si es fin de semana
+ * Check if date is a weekend.
  */
 export function isWeekend(date: Date): boolean {
 	const day = date.getDay();
@@ -97,14 +97,14 @@ export function isWeekend(date: Date): boolean {
 }
 
 // #endregion
-// #region NOTIFICACIONES DE MATRÍCULA (Inicio de año)
+// #region MATRICULA NOTIFICATIONS (start of year)
 
 export const MATRICULA_NOTIFICATIONS: SeasonalNotification[] = [
 	{
 		id: 'matricula-anticipada',
 		type: 'matricula',
-		title: 'Matrícula Anticipada',
-		message: 'Aprovecha el descuento por matrícula anticipada. ¡Solo hasta el 15 de enero!',
+		title: 'Matricula Anticipada',
+		message: 'Aprovecha el descuento por matricula anticipada. Solo hasta el 15 de enero.',
 		icon: 'pi-calendar-plus',
 		priority: 'high',
 		shouldShow: (date) => isMonth(date, 1) && isWithinMonthDays(date, 1, 15),
@@ -115,8 +115,8 @@ export const MATRICULA_NOTIFICATIONS: SeasonalNotification[] = [
 	{
 		id: 'matricula-regular',
 		type: 'matricula',
-		title: 'Período de Matrícula Regular',
-		message: 'El período de matrícula regular está abierto. Asegura tu cupo para este año.',
+		title: 'Periodo de Matricula Regular',
+		message: 'El periodo de matricula regular esta abierto. Asegura tu cupo para este ano.',
 		icon: 'pi-calendar',
 		priority: 'medium',
 		shouldShow: (date) => isMonth(date, 1) && isWithinMonthDays(date, 16, 31),
@@ -127,8 +127,8 @@ export const MATRICULA_NOTIFICATIONS: SeasonalNotification[] = [
 	{
 		id: 'matricula-extemporanea',
 		type: 'matricula',
-		title: 'Matrícula Extemporánea',
-		message: 'Último período para matricularse. Se aplica recargo por matrícula tardía.',
+		title: 'Matricula Extemporanea',
+		message: 'Ultimo periodo para matricularse. Se aplica recargo por matricula tardia.',
 		icon: 'pi-exclamation-triangle',
 		priority: 'urgent',
 		shouldShow: (date) => isMonth(date, 2) && isWithinMonthDays(date, 1, 15),
@@ -140,7 +140,7 @@ export const MATRICULA_NOTIFICATIONS: SeasonalNotification[] = [
 		id: 'inicio-clases',
 		type: 'matricula',
 		title: 'Inicio de Clases',
-		message: '¡Las clases comienzan mañana! Revisa tu horario y prepara tus materiales.',
+		message: 'Las clases comienzan manana. Revisa tu horario y prepara tus materiales.',
 		icon: 'pi-book',
 		priority: 'high',
 		shouldShow: (date) => isMonth(date, 3) && isWithinMonthDays(date, 1, 3),
@@ -151,17 +151,17 @@ export const MATRICULA_NOTIFICATIONS: SeasonalNotification[] = [
 ];
 
 // #endregion
-// #region NOTIFICACIONES DE PAGO (Fin de cada mes)
+// #region PAGO NOTIFICATIONS (end of month)
 
 export const PAGO_NOTIFICATIONS: SeasonalNotification[] = [
 	{
 		id: 'pago-recordatorio',
 		type: 'pago',
 		title: 'Recordatorio de Pago',
-		message: 'Tu cuota mensual vence en los próximos días. Evita recargos pagando a tiempo.',
+		message: 'Tu cuota mensual vence en los proximos dias. Evita recargos pagando a tiempo.',
 		icon: 'pi-wallet',
 		priority: 'medium',
-		// Últimos 7 días de cada mes (excepto diciembre que tiene vacaciones)
+		// Last 7 days of each month (except Dec, Jan, Feb).
 		shouldShow: (date) => {
 			const month = date.getMonth() + 1;
 			return month !== 12 && month !== 1 && month !== 2 && isLastDaysOfMonth(date, 7);
@@ -174,10 +174,10 @@ export const PAGO_NOTIFICATIONS: SeasonalNotification[] = [
 		id: 'pago-urgente',
 		type: 'pago',
 		title: 'Pago Pendiente',
-		message: '¡Tu cuota vence mañana! Realiza tu pago para evitar recargos y suspensión.',
+		message: 'Tu cuota vence manana. Realiza tu pago para evitar recargos y suspension.',
 		icon: 'pi-exclamation-circle',
 		priority: 'urgent',
-		// Últimos 2 días del mes
+		// Last 2 days of the month.
 		shouldShow: (date) => {
 			const month = date.getMonth() + 1;
 			return month !== 12 && month !== 1 && month !== 2 && isLastDaysOfMonth(date, 2);
@@ -189,15 +189,14 @@ export const PAGO_NOTIFICATIONS: SeasonalNotification[] = [
 ];
 
 // #endregion
-// #region NOTIFICACIONES ACADÉMICAS (Resumen de promedios)
+// #region ACADEMICO NOTIFICATIONS (grades summary)
 
 export const ACADEMICO_NOTIFICATIONS: SeasonalNotification[] = [
 	{
 		id: 'notas-primer-bimestre',
 		type: 'academico',
 		title: 'Notas del Primer Bimestre',
-		message:
-			'Ya están disponibles las notas del primer bimestre. Revisa tu rendimiento académico.',
+		message: 'Ya estan disponibles las notas del primer bimestre. Revisa tu rendimiento academico.',
 		icon: 'pi-chart-bar',
 		priority: 'high',
 		shouldShow: (date) => isMonth(date, 5) && isWithinMonthDays(date, 1, 7),
@@ -209,7 +208,7 @@ export const ACADEMICO_NOTIFICATIONS: SeasonalNotification[] = [
 		id: 'notas-segundo-bimestre',
 		type: 'academico',
 		title: 'Notas del Segundo Bimestre',
-		message: 'Ya están disponibles las notas del segundo bimestre. ¡Revisa tu progreso!',
+		message: 'Ya estan disponibles las notas del segundo bimestre. Revisa tu progreso.',
 		icon: 'pi-chart-bar',
 		priority: 'high',
 		shouldShow: (date) => isMonth(date, 7) && isWithinMonthDays(date, 15, 22),
@@ -221,7 +220,7 @@ export const ACADEMICO_NOTIFICATIONS: SeasonalNotification[] = [
 		id: 'notas-tercer-bimestre',
 		type: 'academico',
 		title: 'Notas del Tercer Bimestre',
-		message: 'Ya están disponibles las notas del tercer bimestre. Consulta tu rendimiento.',
+		message: 'Ya estan disponibles las notas del tercer bimestre. Consulta tu rendimiento.',
 		icon: 'pi-chart-bar',
 		priority: 'high',
 		shouldShow: (date) => isMonth(date, 10) && isWithinMonthDays(date, 1, 7),
@@ -233,7 +232,7 @@ export const ACADEMICO_NOTIFICATIONS: SeasonalNotification[] = [
 		id: 'notas-cuarto-bimestre',
 		type: 'academico',
 		title: 'Notas Finales Disponibles',
-		message: '¡Las notas finales del año están disponibles! Revisa tu promedio anual.',
+		message: 'Las notas finales del ano estan disponibles. Revisa tu promedio anual.',
 		icon: 'pi-star',
 		priority: 'high',
 		shouldShow: (date) => isMonth(date, 12) && isWithinMonthDays(date, 15, 22),
@@ -244,8 +243,8 @@ export const ACADEMICO_NOTIFICATIONS: SeasonalNotification[] = [
 	{
 		id: 'recuperacion-disponible',
 		type: 'academico',
-		title: 'Período de Recuperación',
-		message: 'El período de recuperación está abierto. Consulta tus cursos pendientes.',
+		title: 'Periodo de Recuperacion',
+		message: 'El periodo de recuperacion esta abierto. Consulta tus cursos pendientes.',
 		icon: 'pi-refresh',
 		priority: 'medium',
 		shouldShow: (date) => isMonth(date, 12) && isWithinMonthDays(date, 23, 31),
@@ -256,42 +255,41 @@ export const ACADEMICO_NOTIFICATIONS: SeasonalNotification[] = [
 ];
 
 // #endregion
-// #region NOTIFICACIONES DE FESTIVIDADES Y EVENTOS
+// #region FESTIVIDAD AND EVENT NOTIFICATIONS
 
 export const FESTIVIDAD_NOTIFICATIONS: SeasonalNotification[] = [
-	// Año Nuevo
+	// Ano Nuevo
 	{
-		id: 'feliz-año-nuevo',
+		id: 'feliz-ano-nuevo',
 		type: 'festividad',
-		title: '¡Feliz Año Nuevo! 🎉',
-		message: 'El equipo de EducaWeb te desea un excelente año lleno de logros académicos.',
+		title: 'Feliz Ano Nuevo',
+		message: 'El equipo de EducaWeb te desea un excelente ano lleno de logros academicos.',
 		icon: 'pi-star-fill',
 		priority: 'low',
 		shouldShow: (date) => isExactDate(date, 1, 1),
 		dismissible: true,
 	},
-	// Día de la Mujer
+	// Dia de la Mujer
 	{
 		id: 'dia-mujer',
 		type: 'festividad',
-		title: 'Día Internacional de la Mujer',
-		message: 'Celebramos a todas las mujeres que hacen posible la educación. ¡Feliz día!',
+		title: 'Dia Internacional de la Mujer',
+		message: 'Celebramos a todas las mujeres que hacen posible la educacion. Feliz dia.',
 		icon: 'pi-heart-fill',
 		priority: 'low',
 		shouldShow: (date) => isExactDate(date, 3, 8),
 		dismissible: true,
 	},
-	// Semana Santa (aproximado - última semana de marzo o primera de abril)
+	// Semana Santa (approx)
 	{
 		id: 'semana-santa',
 		type: 'festividad',
 		title: 'Vacaciones de Semana Santa',
-		message:
-			'Disfruta de las vacaciones de Semana Santa. Las clases se reanudan el lunes siguiente.',
+		message: 'Disfruta de las vacaciones de Semana Santa. Las clases se reanudan el lunes siguiente.',
 		icon: 'pi-sun',
 		priority: 'medium',
 		shouldShow: (date) => {
-			// Semana Santa generalmente entre 20 marzo - 20 abril
+			// Between late March and early April.
 			const month = date.getMonth() + 1;
 			const day = date.getDate();
 			return (
@@ -300,37 +298,37 @@ export const FESTIVIDAD_NOTIFICATIONS: SeasonalNotification[] = [
 		},
 		dismissible: true,
 	},
-	// Día del Trabajo
+	// Dia del Trabajo
 	{
 		id: 'dia-trabajo',
 		type: 'festividad',
-		title: 'Día del Trabajo',
-		message: 'Mañana es feriado por el Día del Trabajo. No hay clases.',
+		title: 'Dia del Trabajo',
+		message: 'Manana es feriado por el Dia del Trabajo. No hay clases.',
 		icon: 'pi-briefcase',
 		priority: 'low',
 		shouldShow: (date) => isExactDate(date, 4, 30) || isExactDate(date, 5, 1),
 		dismissible: true,
 	},
-	// Día de la Madre
+	// Dia de la Madre
 	{
 		id: 'dia-madre',
 		type: 'festividad',
-		title: '¡Feliz Día de la Madre! 💐',
-		message: 'Celebramos a todas las mamás. ¡Gracias por su dedicación!',
+		title: 'Feliz Dia de la Madre',
+		message: 'Celebramos a todas las mamas. Gracias por su dedicacion.',
 		icon: 'pi-heart-fill',
 		priority: 'low',
-		shouldShow: (date) => isMonth(date, 5) && isWithinMonthDays(date, 8, 12), // Segundo domingo de mayo aprox
+		shouldShow: (date) => isMonth(date, 5) && isWithinMonthDays(date, 8, 12),
 		dismissible: true,
 	},
-	// Día del Padre
+	// Dia del Padre
 	{
 		id: 'dia-padre',
 		type: 'festividad',
-		title: '¡Feliz Día del Padre! 👔',
-		message: 'Celebramos a todos los papás. ¡Gracias por su apoyo!',
+		title: 'Feliz Dia del Padre',
+		message: 'Celebramos a todos los papas. Gracias por su apoyo.',
 		icon: 'pi-heart-fill',
 		priority: 'low',
-		shouldShow: (date) => isMonth(date, 6) && isWithinMonthDays(date, 15, 19), // Tercer domingo de junio aprox
+		shouldShow: (date) => isMonth(date, 6) && isWithinMonthDays(date, 15, 19),
 		dismissible: true,
 	},
 	// San Pedro y San Pablo
@@ -338,73 +336,73 @@ export const FESTIVIDAD_NOTIFICATIONS: SeasonalNotification[] = [
 		id: 'san-pedro-pablo',
 		type: 'festividad',
 		title: 'San Pedro y San Pablo',
-		message: 'Feriado nacional. Festividad religiosa en honor a los apóstoles.',
+		message: 'Feriado nacional. Festividad religiosa en honor a los apostoles.',
 		icon: 'pi-sun',
 		priority: 'low',
 		shouldShow: (date) => isExactDate(date, 6, 28) || isExactDate(date, 6, 29),
 		dismissible: true,
 	},
-	// Día de la Fuerza Aérea del Perú
+	// Dia de la Fuerza Aerea del Peru
 	{
 		id: 'dia-fuerza-aerea',
 		type: 'festividad',
-		title: 'Día de la Fuerza Aérea del Perú',
-		message: 'Se conmemora la creación de la Fuerza Aérea del Perú.',
+		title: 'Dia de la Fuerza Aerea del Peru',
+		message: 'Se conmemora la creacion de la Fuerza Aerea del Peru.',
 		icon: 'pi-send',
 		priority: 'low',
 		shouldShow: (date) => isExactDate(date, 7, 23),
 		dismissible: true,
 	},
-	// Fiestas Patrias Perú
+	// Fiestas Patrias Peru
 	{
 		id: 'fiestas-patrias',
 		type: 'festividad',
-		title: '¡Felices Fiestas Patrias! 🇵🇪',
-		message: 'Celebremos juntos el aniversario de nuestra independencia. ¡Viva el Perú!',
+		title: 'Felices Fiestas Patrias',
+		message: 'Celebremos juntos el aniversario de nuestra independencia. Viva el Peru.',
 		icon: 'pi-flag-fill',
 		priority: 'medium',
 		shouldShow: (date) => isMonth(date, 7) && isWithinMonthDays(date, 27, 29),
 		dismissible: true,
 	},
-	// Vacaciones de Medio Año
+	// Vacaciones de Medio Ano
 	{
 		id: 'vacaciones-julio',
 		type: 'festividad',
-		title: 'Vacaciones de Medio Año',
+		title: 'Vacaciones de Medio Ano',
 		message: 'Disfruta tus vacaciones. Las clases se reanudan en agosto.',
 		icon: 'pi-sun',
 		priority: 'medium',
 		shouldShow: (date) => isMonth(date, 7) && isWithinMonthDays(date, 24, 31),
 		dismissible: true,
 	},
-	// Día del Maestro
+	// Dia del Maestro
 	{
 		id: 'dia-maestro',
 		type: 'festividad',
-		title: 'Día del Maestro',
-		message: '¡Felicitamos a todos los docentes en su día! Gracias por su dedicación.',
+		title: 'Dia del Maestro',
+		message: 'Felicitamos a todos los docentes en su dia. Gracias por su dedicacion.',
 		icon: 'pi-users',
 		priority: 'low',
 		shouldShow: (date) => isExactDate(date, 7, 6),
 		dismissible: true,
 	},
-	// Día del Maestro
+	// Dia del Maestro (duplicate kept)
 	{
 		id: 'dia-maestro',
 		type: 'festividad',
-		title: 'Día del Maestro',
-		message: '¡Felicitamos a todos los docentes en su día! Gracias por su dedicación.',
+		title: 'Dia del Maestro',
+		message: 'Felicitamos a todos los docentes en su dia. Gracias por su dedicacion.',
 		icon: 'pi-users',
 		priority: 'low',
 		shouldShow: (date) => isExactDate(date, 7, 6),
 		dismissible: true,
 	},
-	// Batalla de Junín
+	// Batalla de Junin
 	{
 		id: 'batalla-junin',
 		type: 'festividad',
-		title: 'Batalla de Junín',
-		message: 'Conmemoración de la victoria patriota en la Batalla de Junín (1824).',
+		title: 'Batalla de Junin',
+		message: 'Conmemoracion de la victoria patriota en la Batalla de Junin (1824).',
 		icon: 'pi-star',
 		priority: 'low',
 		shouldShow: (date) => isExactDate(date, 8, 6),
@@ -415,18 +413,18 @@ export const FESTIVIDAD_NOTIFICATIONS: SeasonalNotification[] = [
 		id: 'santa-rosa',
 		type: 'festividad',
 		title: 'Feriado - Santa Rosa de Lima',
-		message: 'Mañana es feriado nacional. No hay clases.',
+		message: 'Manana es feriado nacional. No hay clases.',
 		icon: 'pi-heart',
 		priority: 'low',
 		shouldShow: (date) => isExactDate(date, 8, 29) || isExactDate(date, 8, 30),
 		dismissible: true,
 	},
-	// Día del Estudiante
+	// Dia del Estudiante
 	{
 		id: 'dia-estudiante',
 		type: 'festividad',
-		title: '¡Feliz Día del Estudiante! 📚',
-		message: 'Celebramos a todos nuestros estudiantes. ¡Sigan adelante con sus metas!',
+		title: 'Feliz Dia del Estudiante',
+		message: 'Celebramos a todos nuestros estudiantes. Sigan adelante con sus metas.',
 		icon: 'pi-star-fill',
 		priority: 'medium',
 		shouldShow: (date) => isExactDate(date, 9, 23),
@@ -437,7 +435,7 @@ export const FESTIVIDAD_NOTIFICATIONS: SeasonalNotification[] = [
 		id: 'combate-angamos',
 		type: 'festividad',
 		title: 'Combate de Angamos',
-		message: 'Feriado nacional. Recordamos a nuestros héroes.',
+		message: 'Feriado nacional. Recordamos a nuestros heroes.',
 		icon: 'pi-flag',
 		priority: 'low',
 		shouldShow: (date) => isExactDate(date, 10, 7) || isExactDate(date, 10, 8),
@@ -447,30 +445,30 @@ export const FESTIVIDAD_NOTIFICATIONS: SeasonalNotification[] = [
 	{
 		id: 'halloween',
 		type: 'festividad',
-		title: '¡Feliz Halloween! 🎃',
-		message: '¡Que disfrutes de un día espeluznantemente divertido!',
+		title: 'Feliz Halloween',
+		message: 'Que disfrutes de un dia divertido.',
 		icon: 'pi-moon',
 		priority: 'low',
 		shouldShow: (date) => isExactDate(date, 10, 31),
 		dismissible: true,
 	},
-	// Día de Todos los Santos
+	// Dia de Todos los Santos
 	{
 		id: 'todos-santos',
 		type: 'festividad',
-		title: 'Día de Todos los Santos',
-		message: 'Feriado nacional. Tiempo de reflexión y recuerdo.',
+		title: 'Dia de Todos los Santos',
+		message: 'Feriado nacional. Tiempo de reflexion y recuerdo.',
 		icon: 'pi-heart',
 		priority: 'low',
 		shouldShow: (date) => isExactDate(date, 11, 1),
 		dismissible: true,
 	},
-	// Inmaculada Concepción
+	// Inmaculada Concepcion
 	{
 		id: 'inmaculada-concepcion',
 		type: 'festividad',
-		title: 'Inmaculada Concepción',
-		message: 'Feriado nacional. Festividad católica de la Virgen María.',
+		title: 'Inmaculada Concepcion',
+		message: 'Feriado nacional. Festividad catolica de la Virgen Maria.',
 		icon: 'pi-sun',
 		priority: 'low',
 		shouldShow: (date) => isExactDate(date, 12, 8),
@@ -481,8 +479,7 @@ export const FESTIVIDAD_NOTIFICATIONS: SeasonalNotification[] = [
 		id: 'batalla-ayacucho',
 		type: 'festividad',
 		title: 'Batalla de Ayacucho',
-		message:
-			'Conmemoración de la Batalla de Ayacucho (1824), victoria que selló la independencia.',
+		message: 'Conmemoracion de la Batalla de Ayacucho (1824), victoria que sello la independencia.',
 		icon: 'pi-star',
 		priority: 'low',
 		shouldShow: (date) => isExactDate(date, 12, 9),
@@ -492,19 +489,19 @@ export const FESTIVIDAD_NOTIFICATIONS: SeasonalNotification[] = [
 	{
 		id: 'navidad',
 		type: 'festividad',
-		title: '¡Feliz Navidad! 🎄',
+		title: 'Feliz Navidad',
 		message: 'El equipo de EducaWeb te desea una feliz Navidad junto a tus seres queridos.',
 		icon: 'pi-gift',
 		priority: 'medium',
 		shouldShow: (date) => isMonth(date, 12) && isWithinMonthDays(date, 24, 25),
 		dismissible: true,
 	},
-	// Vacaciones de Fin de Año
+	// Vacaciones de Fin de Ano
 	{
 		id: 'vacaciones-diciembre',
 		type: 'festividad',
-		title: 'Vacaciones de Fin de Año',
-		message: '¡Disfruta tus vacaciones! Nos vemos el próximo año con energías renovadas.',
+		title: 'Vacaciones de Fin de Ano',
+		message: 'Disfruta tus vacaciones. Nos vemos el proximo ano con energias renovadas.',
 		icon: 'pi-sun',
 		priority: 'medium',
 		shouldShow: (date) => isMonth(date, 12) && isWithinMonthDays(date, 20, 31),
@@ -513,7 +510,7 @@ export const FESTIVIDAD_NOTIFICATIONS: SeasonalNotification[] = [
 ];
 
 // #endregion
-// #region NOTIFICACIONES DE EVENTOS ESCOLARES
+// #region EVENTO NOTIFICATIONS
 
 export const EVENTO_NOTIFICATIONS: SeasonalNotification[] = [
 	// Inicio de clases
@@ -521,7 +518,7 @@ export const EVENTO_NOTIFICATIONS: SeasonalNotification[] = [
 		id: 'inicio-clases-evento',
 		type: 'evento',
 		title: 'Inicio de Clases',
-		message: '¡Comienza un nuevo año escolar! Bienvenidos a todos los estudiantes.',
+		message: 'Comienza un nuevo ano escolar. Bienvenidos a todos los estudiantes.',
 		icon: 'pi-book',
 		priority: 'high',
 		shouldShow: (date) => isMonth(date, 3) && isWithinMonthDays(date, 1, 3),
@@ -529,12 +526,12 @@ export const EVENTO_NOTIFICATIONS: SeasonalNotification[] = [
 		actionText: 'Ver calendario',
 		dismissible: true,
 	},
-	// Reunión de padres inicial
+	// Reunion de padres inicial
 	{
 		id: 'reunion-padres-inicial',
 		type: 'evento',
-		title: 'Reunión General de Padres',
-		message: 'Primera reunión del año escolar. Se presentará el plan curricular.',
+		title: 'Reunion General de Padres',
+		message: 'Primera reunion del ano escolar. Se presentara el plan curricular.',
 		icon: 'pi-users',
 		priority: 'high',
 		shouldShow: (date) => isMonth(date, 3) && isWithinMonthDays(date, 14, 16),
@@ -542,12 +539,12 @@ export const EVENTO_NOTIFICATIONS: SeasonalNotification[] = [
 		actionText: 'Ver calendario',
 		dismissible: true,
 	},
-	// Día del libro
+	// Dia del libro
 	{
 		id: 'dia-libro',
 		type: 'evento',
-		title: 'Día Mundial del Libro',
-		message: 'Celebración del Día del Libro. Actividades de lectura e intercambio.',
+		title: 'Dia Mundial del Libro',
+		message: 'Celebracion del Dia del Libro. Actividades de lectura e intercambio.',
 		icon: 'pi-book',
 		priority: 'medium',
 		shouldShow: (date) => isMonth(date, 4) && isWithinMonthDays(date, 19, 23),
@@ -558,8 +555,8 @@ export const EVENTO_NOTIFICATIONS: SeasonalNotification[] = [
 	{
 		id: 'reunion-padres-1',
 		type: 'evento',
-		title: 'Reunión de Padres - Primer Bimestre',
-		message: 'Próxima reunión de padres de familia. Revisa la fecha en el calendario.',
+		title: 'Reunion de Padres - Primer Bimestre',
+		message: 'Proxima reunion de padres de familia. Revisa la fecha en el calendario.',
 		icon: 'pi-users',
 		priority: 'high',
 		shouldShow: (date) => isMonth(date, 4) && isWithinMonthDays(date, 20, 25),
@@ -567,12 +564,12 @@ export const EVENTO_NOTIFICATIONS: SeasonalNotification[] = [
 		actionText: 'Ver calendario',
 		dismissible: true,
 	},
-	// Exámenes parciales
+	// Examenes parciales
 	{
 		id: 'examenes-parciales',
 		type: 'evento',
-		title: 'Período de Exámenes Parciales',
-		message: 'Inicio del período de evaluaciones parciales. Revisa el cronograma.',
+		title: 'Periodo de Examenes Parciales',
+		message: 'Inicio del periodo de evaluaciones parciales. Revisa el cronograma.',
 		icon: 'pi-file-edit',
 		priority: 'high',
 		shouldShow: (date) => isMonth(date, 5) && isWithinMonthDays(date, 13, 17),
@@ -580,12 +577,12 @@ export const EVENTO_NOTIFICATIONS: SeasonalNotification[] = [
 		actionText: 'Ver cronograma',
 		dismissible: true,
 	},
-	// Día de la bandera
+	// Dia de la bandera
 	{
 		id: 'dia-bandera',
 		type: 'evento',
-		title: 'Día de la Bandera',
-		message: 'Ceremonia cívica en honor al Día de la Bandera. Desfile escolar.',
+		title: 'Dia de la Bandera',
+		message: 'Ceremonia civica en honor al Dia de la Bandera. Desfile escolar.',
 		icon: 'pi-flag',
 		priority: 'medium',
 		shouldShow: (date) => isMonth(date, 6) && isWithinMonthDays(date, 6, 7),
@@ -596,8 +593,8 @@ export const EVENTO_NOTIFICATIONS: SeasonalNotification[] = [
 	{
 		id: 'reunion-padres-2',
 		type: 'evento',
-		title: 'Reunión de Padres - Segundo Bimestre',
-		message: 'Próxima reunión de padres de familia. Revisa la fecha en el calendario.',
+		title: 'Reunion de Padres - Segundo Bimestre',
+		message: 'Proxima reunion de padres de familia. Revisa la fecha en el calendario.',
 		icon: 'pi-users',
 		priority: 'high',
 		shouldShow: (date) => isMonth(date, 7) && isWithinMonthDays(date, 10, 15),
@@ -615,14 +612,14 @@ export const EVENTO_NOTIFICATIONS: SeasonalNotification[] = [
 		priority: 'medium',
 		shouldShow: (date) => isMonth(date, 8) && isWithinMonthDays(date, 14, 16),
 		actionUrl: '/intranet/calendario',
-		actionText: 'Ver programación',
+		actionText: 'Ver programacion',
 		dismissible: true,
 	},
 	{
 		id: 'reunion-padres-3',
 		type: 'evento',
-		title: 'Reunión de Padres - Tercer Bimestre',
-		message: 'Próxima reunión de padres de familia. Revisa la fecha en el calendario.',
+		title: 'Reunion de Padres - Tercer Bimestre',
+		message: 'Proxima reunion de padres de familia. Revisa la fecha en el calendario.',
 		icon: 'pi-users',
 		priority: 'high',
 		shouldShow: (date) => isMonth(date, 9) && isWithinMonthDays(date, 20, 25),
@@ -634,19 +631,19 @@ export const EVENTO_NOTIFICATIONS: SeasonalNotification[] = [
 		id: 'aniversario-colegio',
 		type: 'evento',
 		title: 'Aniversario del Colegio',
-		message: '¡Celebremos juntos el aniversario de nuestra institución!',
+		message: 'Celebremos juntos el aniversario de nuestra institucion.',
 		icon: 'pi-star',
 		priority: 'medium',
-		// Ajustar la fecha según el aniversario real del colegio
+		// Adjust this date for the real anniversary.
 		shouldShow: (date) => isMonth(date, 5) && isWithinMonthDays(date, 15, 17),
 		dismissible: true,
 	},
-	// Exámenes finales
+	// Examenes finales
 	{
 		id: 'examenes-finales',
 		type: 'evento',
-		title: 'Período de Exámenes Finales',
-		message: 'Inicio del período de evaluaciones finales. Prepararse con anticipación.',
+		title: 'Periodo de Examenes Finales',
+		message: 'Inicio del periodo de evaluaciones finales. Prepararse con anticipacion.',
 		icon: 'pi-file-edit',
 		priority: 'high',
 		shouldShow: (date) => isMonth(date, 11) && isWithinMonthDays(date, 13, 17),
@@ -658,7 +655,7 @@ export const EVENTO_NOTIFICATIONS: SeasonalNotification[] = [
 		id: 'clausura',
 		type: 'evento',
 		title: 'Ceremonia de Clausura',
-		message: 'Se acerca la ceremonia de clausura del año escolar. ¡No faltes!',
+		message: 'Se acerca la ceremonia de clausura del ano escolar. No faltes.',
 		icon: 'pi-star-fill',
 		priority: 'high',
 		shouldShow: (date) => isMonth(date, 12) && isWithinMonthDays(date, 12, 18),
@@ -669,7 +666,7 @@ export const EVENTO_NOTIFICATIONS: SeasonalNotification[] = [
 ];
 
 // #endregion
-// #region TODAS LAS NOTIFICACIONES COMBINADAS
+// #region ALL NOTIFICATIONS COMBINED
 
 export const ALL_NOTIFICATIONS: SeasonalNotification[] = [
 	...MATRICULA_NOTIFICATIONS,
@@ -680,21 +677,21 @@ export const ALL_NOTIFICATIONS: SeasonalNotification[] = [
 ];
 
 /**
- * Obtiene las notificaciones que deben mostrarse hoy
+ * Get notifications that should be shown today.
  */
 export function getTodayNotifications(date: Date = new Date()): SeasonalNotification[] {
 	return ALL_NOTIFICATIONS.filter((notification) => notification.shouldShow(date));
 }
 
 /**
- * Obtiene notificaciones por tipo
+ * Get notifications by type.
  */
 export function getNotificationsByType(type: NotificationType): SeasonalNotification[] {
 	return ALL_NOTIFICATIONS.filter((n) => n.type === type);
 }
 
 /**
- * Obtiene notificaciones por prioridad
+ * Get notifications by priority.
  */
 export function getNotificationsByPriority(priority: NotificationPriority): SeasonalNotification[] {
 	return ALL_NOTIFICATIONS.filter((n) => n.priority === priority);

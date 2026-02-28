@@ -21,6 +21,7 @@ export class CampusNavigationStore {
 	private readonly _destinationNodeId = signal<string | null>(null);
 	private readonly _pathResult = signal<PathResult | null>(null);
 	private readonly _loading = signal(false);
+	private readonly _error = signal<string | null>(null);
 	private readonly _scheduleReady = signal(false);
 
 	// #endregion
@@ -32,6 +33,7 @@ export class CampusNavigationStore {
 	readonly destinationNodeId = this._destinationNodeId.asReadonly();
 	readonly pathResult = this._pathResult.asReadonly();
 	readonly loading = this._loading.asReadonly();
+	readonly error = this._error.asReadonly();
 	readonly scheduleReady = this._scheduleReady.asReadonly();
 
 	// #endregion
@@ -136,6 +138,7 @@ export class CampusNavigationStore {
 		destinationNodeId: this._destinationNodeId(),
 		pathResult: this._pathResult(),
 		loading: this._loading(),
+		error: this._error(),
 		scheduleReady: this._scheduleReady(),
 
 		floors: this.floors(),
@@ -175,6 +178,14 @@ export class CampusNavigationStore {
 
 	setLoading(loading: boolean): void {
 		this._loading.set(loading);
+	}
+
+	setError(error: string | null): void {
+		this._error.set(error);
+	}
+
+	clearError(): void {
+		this._error.set(null);
 	}
 
 	setScheduleReady(ready: boolean): void {

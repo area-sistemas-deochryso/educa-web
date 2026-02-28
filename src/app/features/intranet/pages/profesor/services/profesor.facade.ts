@@ -1,7 +1,9 @@
 import { Injectable, inject, DestroyRef } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { forkJoin } from 'rxjs';
-import { logger } from '@core/helpers';
+import { logger, withRetry } from '@core/helpers';
+import { ErrorHandlerService } from '@core/services';
+import { UI_ADMIN_ERROR_DETAILS, UI_SUMMARIES } from '@app/shared/constants';
 import { UserProfileService } from '@core/services/user/user-profile.service';
 import { ProfesorApiService } from './profesor-api.service';
 import { ProfesorStore, ProfesorSalonConEstudiantes } from './profesor.store';
@@ -11,6 +13,7 @@ export class ProfesorFacade {
 	private readonly api = inject(ProfesorApiService);
 	private readonly store = inject(ProfesorStore);
 	private readonly userProfile = inject(UserProfileService);
+	private readonly errorHandler = inject(ErrorHandlerService);
 	private readonly destroyRef = inject(DestroyRef);
 
 	// #region Estado expuesto
@@ -26,13 +29,17 @@ export class ProfesorFacade {
 		}
 
 		this.store.setLoading(true);
+		this.store.clearError();
 
 		forkJoin({
 			horarios: this.api.getHorarios(profesorId),
 			salonTutoria: this.api.getSalonTutoria(profesorId),
 			misEstudiantes: this.api.getMisEstudiantes(),
 		})
-			.pipe(takeUntilDestroyed(this.destroyRef))
+			.pipe(
+				withRetry({ tag: 'ProfesorFacade:loadData' }),
+				takeUntilDestroyed(this.destroyRef),
+			)
 			.subscribe({
 				next: ({ horarios, salonTutoria, misEstudiantes }) => {
 					this.store.setHorarios(horarios);
@@ -42,6 +49,11 @@ export class ProfesorFacade {
 				},
 				error: (err) => {
 					logger.error('ProfesorFacade: Error al cargar datos', err);
+					this.errorHandler.showError(
+						UI_SUMMARIES.error,
+						UI_ADMIN_ERROR_DETAILS.loadProfesorData,
+					);
+					this.store.setError(UI_ADMIN_ERROR_DETAILS.loadProfesorData);
 					this.store.setLoading(false);
 				},
 			});
@@ -59,7 +71,10 @@ export class ProfesorFacade {
 
 		this.api
 			.getEstudiantesSalon(salon.salonId)
-			.pipe(takeUntilDestroyed(this.destroyRef))
+			.pipe(
+				withRetry({ tag: 'ProfesorFacade:openSalonDialog' }),
+				takeUntilDestroyed(this.destroyRef),
+			)
 			.subscribe({
 				next: (result) => {
 					if (result) {
@@ -72,8 +87,12 @@ export class ProfesorFacade {
 						this.store.setSalonDialogLoading(false);
 					}
 				},
-				error: () => {
-					logger.error('ProfesorFacade: Error al cargar estudiantes del salón');
+				error: (err) => {
+					logger.error('ProfesorFacade: Error al cargar estudiantes del salón', err);
+					this.errorHandler.showError(
+						UI_SUMMARIES.error,
+						UI_ADMIN_ERROR_DETAILS.loadEstudiantesSalon,
+					);
 					this.store.setSalonDialogLoading(false);
 				},
 			});

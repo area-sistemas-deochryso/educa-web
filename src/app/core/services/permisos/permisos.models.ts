@@ -7,88 +7,134 @@ import {
 	AppUserRoleValue,
 } from '@app/shared/constants';
 
-// Vista DTOs
 // #endregion
 // #region Implementation
+
+/**
+ * Vista DTO.
+ */
 export interface Vista {
+	/** Vista id. */
 	id: number;
+	/** Route path. */
 	ruta: string;
+	/** Display name. */
 	nombre: string;
+	/** State flag or null. */
 	estado: number | null;
+	/** Concurrencia optimista. */
+	rowVersion?: string;
 }
 
+/**
+ * Create vista request.
+ */
 export interface CrearVistaRequest {
 	ruta: string;
 	nombre: string;
 }
 
+/**
+ * Update vista request.
+ */
 export interface ActualizarVistaRequest {
 	ruta: string;
 	nombre: string;
 	estado: number;
+	rowVersion?: string;
 }
 
-// Permisos por Rol DTOs
+/**
+ * Role permissions DTO.
+ */
 export interface PermisoRol {
 	id: number;
 	rol: string;
 	vistas: string[];
+	rowVersion?: string;
 }
 
+/**
+ * Create role permissions request.
+ */
 export interface CrearPermisoRolRequest {
 	rol: string;
 	vistas: string[];
 }
 
+/**
+ * Update role permissions request.
+ */
 export interface ActualizarPermisoRolRequest {
 	vistas: string[];
+	rowVersion?: string;
 }
 
-// Permisos por Usuario DTOs
+/**
+ * User permissions DTO.
+ */
 export interface PermisoUsuario {
 	id: number;
 	usuarioId: number;
 	rol: string;
 	vistas: string[];
 	nombreUsuario?: string;
+	rowVersion?: string;
 }
 
+/**
+ * Create user permissions request.
+ */
 export interface CrearPermisoUsuarioRequest {
 	usuarioId: number;
 	rol: string;
 	vistas: string[];
 }
 
+/**
+ * Update user permissions request.
+ */
 export interface ActualizarPermisoUsuarioRequest {
 	vistas: string[];
+	rowVersion?: string;
 }
 
-// Consulta de permisos
+/**
+ * Result of permissions query for a user.
+ */
 export interface PermisosUsuarioResultado {
 	usuarioId: number;
 	rol: string;
 	vistasPermitidas: string[];
 	tienePermisosPersonalizados: boolean;
-	/** JWT con exp de 4h que indica cuándo vencen estos permisos */
+	/** JWT with exp that indicates when permissions expire. */
 	permisosToken?: string;
 }
 
-// Tipos de roles disponibles
+/**
+ * Role type values.
+ */
 export type RolTipo = AppUserRoleValue;
 
 export const ROLES_DISPONIBLES: RolTipo[] = APP_USER_ROLE_LIST;
 
-// Roles disponibles para gestión en admin (sin Apoderado)
+/**
+ * Role type values for admin management.
+ */
 export type RolTipoAdmin = AppUserRoleAdmin;
 
 export const ROLES_DISPONIBLES_ADMIN: RolTipoAdmin[] = APP_USER_ROLE_ADMIN_LIST;
 
-// Response genérico del API
+/**
+ * Generic API response DTO.
+ */
 export interface ApiResponse {
 	mensaje: string;
 }
 
-// Estadísticas de vistas
+/**
+ * Vistas stats DTO.
+ */
 export interface VistasEstadisticas {
 	totalVistas: number;
 	vistasActivas: number;
@@ -97,7 +143,9 @@ export interface VistasEstadisticas {
 	modulos: string[];
 }
 
-// Búsqueda de usuarios
+/**
+ * User search result item.
+ */
 export interface UsuarioBusqueda {
 	id: number;
 	nombreCompleto: string;
@@ -105,6 +153,9 @@ export interface UsuarioBusqueda {
 	dni?: string;
 }
 
+/**
+ * User search result container.
+ */
 export interface UsuarioBusquedaResultado {
 	usuarios: UsuarioBusqueda[];
 	total: number;

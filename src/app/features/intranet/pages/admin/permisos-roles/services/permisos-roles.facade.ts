@@ -2,16 +2,19 @@ import { Injectable, inject, DestroyRef } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { forkJoin } from 'rxjs';
 
-import { logger } from '@core/helpers';
+import { logger, withRetry } from '@core/helpers';
 import {
 	ErrorHandlerService,
 	PermisosService,
 	PermisoRol,
 	RolTipoAdmin,
 	ROLES_DISPONIBLES_ADMIN,
+	WalFacadeHelper,
 } from '@core/services';
+import { environment } from '@config';
 import { AdminUtilsService } from '@shared/services';
 import { UI_ADMIN_ERROR_DETAILS, UI_SUMMARIES } from '@app/shared/constants';
+import { buildModulosVistas } from '../helpers/permisos-modulos.utils';
 
 import { PermisosRolesStore } from './permisos-roles.store';
 
@@ -20,9 +23,11 @@ export class PermisosRolesFacade {
 	// #region Dependencias
 	private api = inject(PermisosService);
 	private store = inject(PermisosRolesStore);
+	private wal = inject(WalFacadeHelper);
 	private errorHandler = inject(ErrorHandlerService);
 	private destroyRef = inject(DestroyRef);
 	readonly adminUtils = inject(AdminUtilsService);
+	private readonly apiUrl = `${environment.apiUrl}/api/sistema/permisos`;
 	// #endregion
 
 	// #region Estado expuesto
@@ -35,12 +40,16 @@ export class PermisosRolesFacade {
 	/** Carga inicial: vistas + permisos por rol (paginado) en paralelo */
 	loadAll(): void {
 		this.store.setLoading(true);
+		this.store.clearError();
 
 		forkJoin({
 			vistas: this.api.getVistas(),
 			permisosRol: this.api.getPermisosRolPaginated(1, this.store.pageSize(), 'Apoderado'),
 		})
-			.pipe(takeUntilDestroyed(this.destroyRef))
+			.pipe(
+				withRetry({ tag: 'PermisosRolesFacade:loadAll' }),
+				takeUntilDestroyed(this.destroyRef),
+			)
 			.subscribe({
 				next: ({ vistas, permisosRol }) => {
 					this.store.setVistas(vistas.filter((v) => v.estado === 1));
@@ -58,6 +67,7 @@ export class PermisosRolesFacade {
 						UI_SUMMARIES.error,
 						UI_ADMIN_ERROR_DETAILS.loadPermisos,
 					);
+					this.store.setError(UI_ADMIN_ERROR_DETAILS.loadPermisos);
 					this.store.setLoading(false);
 				},
 			});
@@ -70,64 +80,97 @@ export class PermisosRolesFacade {
 		this.refreshPermisosRolOnly();
 	}
 
-	/** CREAR/EDITAR: Refetch (estructura de vistas compleja) */
+	/**
+	 * CREAR/EDITAR: WAL-protegido + refetch (estructura de vistas compleja)
+	 */
 	savePermiso(): void {
 		const vistas = this.store.selectedVistas();
-		this.store.setLoading(true);
+		const isEditing = this.store.isEditing();
 
-		const operation$ = this.store.isEditing()
-			? (() => {
-					const permiso = this.store.selectedPermiso();
-					if (!permiso) return null;
-					return this.api.actualizarPermisoRol(permiso.id, { vistas });
-				})()
-			: (() => {
-					const rol = this.store.selectedRol();
-					if (!rol) return null;
-					return this.api.crearPermisoRol({ rol, vistas });
-				})();
+		if (isEditing) {
+			const permiso = this.store.selectedPermiso();
+			if (!permiso) return;
 
-		if (!operation$) {
-			this.store.setLoading(false);
-			return;
+			this.wal.execute({
+				operation: 'UPDATE',
+				resourceType: 'permisos-rol',
+				resourceId: permiso.id,
+				endpoint: `${this.apiUrl}/rol/${permiso.id}/actualizar`,
+				method: 'PUT',
+				payload: { vistas, rowVersion: permiso.rowVersion },
+				http$: () => this.api.actualizarPermisoRol(permiso.id, { vistas, rowVersion: permiso.rowVersion }),
+				onCommit: () => {
+					this.refreshPermisosRolOnly();
+					this.errorHandler.showSuccess(UI_SUMMARIES.success, 'Permisos actualizados');
+				},
+				onError: (err) => this.handleApiError(err, 'actualizar'),
+				optimistic: {
+					apply: () => {
+						this.store.closeDialog();
+						this.store.setLoading(false);
+					},
+					rollback: () => {},
+				},
+			});
+		} else {
+			const rol = this.store.selectedRol();
+			if (!rol) return;
+
+			this.wal.execute({
+				operation: 'CREATE',
+				resourceType: 'permisos-rol',
+				endpoint: `${this.apiUrl}/rol/crear`,
+				method: 'POST',
+				payload: { rol, vistas },
+				http$: () => this.api.crearPermisoRol({ rol, vistas }),
+				onCommit: () => {
+					this.refreshPermisosRolOnly();
+					this.errorHandler.showSuccess(UI_SUMMARIES.success, 'Permisos creados');
+				},
+				onError: (err) => this.handleApiError(err, 'crear'),
+				optimistic: {
+					apply: () => {
+						this.store.closeDialog();
+						this.store.setLoading(false);
+					},
+					rollback: () => {},
+				},
+			});
 		}
+	}
 
-		operation$.pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
-			next: () => {
-				this.store.closeDialog();
-				this.refreshPermisosRolOnly();
+	/**
+	 * ELIMINAR: WAL-protegido + mutación quirúrgica con rollback
+	 */
+	delete(permiso: PermisoRol): void {
+		this.wal.execute({
+			operation: 'DELETE',
+			resourceType: 'permisos-rol',
+			resourceId: permiso.id,
+			endpoint: `${this.apiUrl}/rol/${permiso.id}/eliminar`,
+			method: 'DELETE',
+			payload: null,
+			http$: () => this.api.eliminarPermisoRol(permiso.id),
+			onCommit: () => {
+				this.errorHandler.showSuccess(UI_SUMMARIES.success, 'Permiso eliminado');
 			},
-			error: (err) => {
-				logger.error('Error:', err);
-				this.errorHandler.showError(UI_SUMMARIES.error, UI_ADMIN_ERROR_DETAILS.savePermiso);
-				this.store.setLoading(false);
+			onError: (err) => this.handleApiError(err, 'eliminar'),
+			optimistic: {
+				apply: () => {
+					this.store.removePermiso(permiso.id);
+					this.store.setLoading(false);
+				},
+				rollback: () => {
+					this.store.addPermiso(permiso);
+				},
 			},
 		});
 	}
 
-	/**
-	 * ELIMINAR: Mutación quirúrgica
-	 */
-	delete(permiso: PermisoRol): void {
-		this.store.setLoading(true);
-
-		this.api
-			.eliminarPermisoRol(permiso.id)
-			.pipe(takeUntilDestroyed(this.destroyRef))
-			.subscribe({
-				next: () => {
-					this.store.removePermiso(permiso.id);
-					this.store.setLoading(false);
-				},
-				error: (err) => {
-					logger.error('Error al eliminar:', err);
-					this.errorHandler.showError(
-						UI_SUMMARIES.error,
-						UI_ADMIN_ERROR_DETAILS.deletePermiso,
-					);
-					this.store.setLoading(false);
-				},
-			});
+	private handleApiError(err: unknown, accion: string): void {
+		logger.error(`Error al ${accion} permiso:`, err);
+		this.errorHandler.showError(UI_SUMMARIES.error, UI_ADMIN_ERROR_DETAILS.savePermiso);
+		this.store.setLoading(false);
 	}
 
 	/** Refetch solo permisos por rol (sin recargar vistas) */
@@ -138,7 +181,10 @@ export class PermisosRolesFacade {
 
 		this.api
 			.getPermisosRolPaginated(page, pageSize, 'Apoderado')
-			.pipe(takeUntilDestroyed(this.destroyRef))
+			.pipe(
+				withRetry({ tag: 'PermisosRolesFacade:refreshPermisosRolOnly' }),
+				takeUntilDestroyed(this.destroyRef),
+			)
 			.subscribe({
 				next: (result) => {
 					this.store.setPermisosRol(result.data);
@@ -147,6 +193,7 @@ export class PermisosRolesFacade {
 				},
 				error: (err) => {
 					logger.error('Error al refrescar permisos:', err);
+					this.errorHandler.showError(UI_SUMMARIES.error, UI_ADMIN_ERROR_DETAILS.refreshData);
 					this.store.setLoading(false);
 				},
 			});
@@ -161,7 +208,12 @@ export class PermisosRolesFacade {
 		this.store.setSelectedRol(null);
 		this.store.setSelectedVistas([]);
 		this.store.setIsEditing(false);
-		this.store.buildModulosVistas([]);
+		const modulos = buildModulosVistas(
+			this.store.vistas(),
+			[],
+			(ruta) => this.adminUtils.getModuloFromRuta(ruta),
+		);
+		this.store.setModulosVistas(modulos);
 		this.store.openDialog();
 	}
 
@@ -170,7 +222,12 @@ export class PermisosRolesFacade {
 		this.store.setSelectedRol(permiso.rol as RolTipoAdmin);
 		this.store.setSelectedVistas([...permiso.vistas]);
 		this.store.setIsEditing(true);
-		this.store.buildModulosVistas(permiso.vistas);
+		const modulos = buildModulosVistas(
+			this.store.vistas(),
+			permiso.vistas,
+			(ruta) => this.adminUtils.getModuloFromRuta(ruta),
+		);
+		this.store.setModulosVistas(modulos);
 		this.store.openDialog();
 	}
 

@@ -1,40 +1,40 @@
-// * Voice command definitions + helper filters.
+// * Voice command definitions and helper filters.
 import { Router } from '@angular/router';
 
 /**
- * Interfaz para definir un comando de voz
+ * Interface to define a voice command.
  */
 export interface VoiceCommandConfig {
-	/** Patrones que activan el comando (pueden incluir regex) */
+	/** Patterns that trigger the command (regex supported). */
 	patterns: string[];
-	/** Descripción mostrada como feedback al usuario */
+	/** Description shown as feedback to the user. */
 	description: string;
-	/** Categoría del comando para organización */
+	/** Command category used for grouping. */
 	category: VoiceCommandCategory;
-	/** Tipo de acción a ejecutar */
+	/** Action type to execute. */
 	actionType: 'navigate' | 'emit' | 'scroll' | 'custom';
-	/** Ruta de navegación (solo para actionType: 'navigate') */
+	/** Navigation route (only for actionType: 'navigate'). */
 	route?: string;
-	/** Comando a emitir (solo para actionType: 'emit') */
+	/** Command to emit (only for actionType: 'emit'). */
 	emitCommand?: string;
-	/** Dirección de scroll (solo para actionType: 'scroll') */
+	/** Scroll direction (only for actionType: 'scroll'). */
 	scrollDirection?: ScrollDirection;
-	/** Función personalizada (solo para actionType: 'custom') */
+	/** Custom function (only for actionType: 'custom'). */
 	customAction?: (context: VoiceCommandContext) => void;
 }
 
 export type VoiceCommandCategory =
-	| 'navigation' // Navegación entre páginas
-	| 'scroll' // Scroll en la página
-	| 'pagination' // Paginación de tablas
-	| 'modal' // Control de modales
-	| 'date' // Cambio de fechas
-	| 'control'; // Control general (borrar, etc.)
+	| 'navigation' // Navigation between pages
+	| 'scroll' // Scroll on the page
+	| 'pagination' // Table pagination
+	| 'modal' // Modal control
+	| 'date' // Date changes
+	| 'control'; // General control (clear, etc.)
 
 export type ScrollDirection = 'up' | 'down' | 'left' | 'right' | 'top' | 'bottom';
 
 /**
- * Contexto disponible para acciones personalizadas
+ * Context available for custom actions.
  */
 export interface VoiceCommandContext {
 	router: Router;
@@ -44,7 +44,7 @@ export interface VoiceCommandContext {
 }
 
 /**
- * Configuración de meses para comandos de fecha
+ * Month names for date commands.
  */
 export const MONTH_NAMES: Record<string, number> = {
 	enero: 1,
@@ -64,23 +64,23 @@ export const MONTH_NAMES: Record<string, number> = {
 
 /**
  * =============================================================================
- * DEFINICIÓN CENTRALIZADA DE TODOS LOS COMANDOS DE VOZ
+ * CENTRALIZED DEFINITION OF ALL VOICE COMMANDS
  * =============================================================================
  *
- * Para añadir un nuevo comando:
- * 1. Añade un objeto VoiceCommandConfig a VOICE_COMMANDS
- * 2. Elige la categoría apropiada
- * 3. Define los patterns (frases que activan el comando)
- * 4. Elige el actionType y configura según corresponda
+ * To add a new command:
+ * 1. Add a VoiceCommandConfig object to VOICE_COMMANDS
+ * 2. Choose the proper category
+ * 3. Define patterns that trigger the command
+ * 4. Choose actionType and configure required fields
  *
- * Tipos de acción:
- * - 'navigate': Navega a una ruta (requiere: route)
- * - 'emit': Emite un evento (requiere: emitCommand)
- * - 'scroll': Hace scroll en la página (requiere: scrollDirection)
- * - 'custom': Ejecuta una función personalizada (requiere: customAction)
+ * Action types:
+ * - 'navigate': Navigate to a route (requires: route)
+ * - 'emit': Emit an event (requires: emitCommand)
+ * - 'scroll': Scroll the page (requires: scrollDirection)
+ * - 'custom': Run a custom function (requires: customAction)
  */
 export const VOICE_COMMANDS: VoiceCommandConfig[] = [
-	// #region NAVEGACIÓN ENTRE PÁGINAS
+	// #region NAVIGATION BETWEEN PAGES
 	{
 		patterns: ['ir a inicio', 've a inicio', 'inicio'],
 		description: 'Navegar a inicio',
@@ -111,17 +111,17 @@ export const VOICE_COMMANDS: VoiceCommandConfig[] = [
 	},
 
 	// #endregion
-	// #region SCROLL / NAVEGACIÓN EN PÁGINA
+	// #region SCROLL AND PAGE NAVIGATION
 	{
 		patterns: ['baja', 'bajar', 'abajo', 'scroll abajo'],
-		description: 'Bajar en la página',
+		description: 'Bajar en la pagina',
 		category: 'scroll',
 		actionType: 'scroll',
 		scrollDirection: 'down',
 	},
 	{
 		patterns: ['sube', 'subir', 'arriba', 'scroll arriba'],
-		description: 'Subir en la página',
+		description: 'Subir en la pagina',
 		category: 'scroll',
 		actionType: 'scroll',
 		scrollDirection: 'up',
@@ -142,45 +142,45 @@ export const VOICE_COMMANDS: VoiceCommandConfig[] = [
 	},
 	{
 		patterns: ['al inicio', 'ir al inicio', 'principio'],
-		description: 'Ir al inicio de la página',
+		description: 'Ir al inicio de la pagina',
 		category: 'scroll',
 		actionType: 'scroll',
 		scrollDirection: 'top',
 	},
 	{
 		patterns: ['al final', 'ir al final', 'fin'],
-		description: 'Ir al final de la página',
+		description: 'Ir al final de la pagina',
 		category: 'scroll',
 		actionType: 'scroll',
 		scrollDirection: 'bottom',
 	},
 
 	// #endregion
-	// #region PAGINACIÓN DE TABLAS
+	// #region TABLE PAGINATION
 	{
-		patterns: ['siguiente página', 'página siguiente', 'siguiente'],
-		description: 'Ir a la siguiente página',
+		patterns: ['siguiente pagina', 'pagina siguiente', 'siguiente'],
+		description: 'Ir a la siguiente pagina',
 		category: 'pagination',
 		actionType: 'emit',
 		emitCommand: 'next-page',
 	},
 	{
-		patterns: ['página anterior', 'anterior'],
-		description: 'Ir a la página anterior',
+		patterns: ['pagina anterior', 'anterior'],
+		description: 'Ir a la pagina anterior',
 		category: 'pagination',
 		actionType: 'emit',
 		emitCommand: 'prev-page',
 	},
 	{
-		patterns: ['página (\\d+)', 'ir a página (\\d+)'],
-		description: 'Ir a una página específica',
+		patterns: ['pagina (\\d+)', 'ir a pagina (\\d+)'],
+		description: 'Ir a una pagina especifica',
 		category: 'pagination',
 		actionType: 'emit',
 		emitCommand: 'goto-page',
 	},
 
 	// #endregion
-	// #region CONTROL DE MODALES
+	// #region MODAL CONTROL
 	{
 		patterns: ['cerrar', 'cerrar modal', 'cerrar ventana'],
 		description: 'Cerrar modal activo',
@@ -190,17 +190,17 @@ export const VOICE_COMMANDS: VoiceCommandConfig[] = [
 	},
 
 	// #endregion
-	// #region COMANDOS DE FECHA
+	// #region DATE COMMANDS
 	{
-		patterns: ['ir a (20\\d{2})', 'año (20\\d{2})', '(20\\d{2})'],
-		description: 'Cambiar año',
+		patterns: ['ir a (20\\d{2})', 'anio (20\\d{2})', '(20\\d{2})'],
+		description: 'Cambiar anio',
 		category: 'date',
 		actionType: 'emit',
 		emitCommand: 'change-year',
 	},
 
 	// #endregion
-	// #region CONTROL GENERAL
+	// #region GENERAL CONTROL
 	{
 		patterns: ['borrar', 'limpiar', 'borrar texto'],
 		description: 'Borrar el texto dictado',
@@ -211,7 +211,7 @@ export const VOICE_COMMANDS: VoiceCommandConfig[] = [
 ];
 
 /**
- * Obtiene comandos filtrados por categoría
+ * Get commands filtered by category.
  */
 export function getCommandsByCategory(category: VoiceCommandCategory): VoiceCommandConfig[] {
 	return VOICE_COMMANDS.filter((cmd) => cmd.category === category);
@@ -219,8 +219,9 @@ export function getCommandsByCategory(category: VoiceCommandCategory): VoiceComm
 }
 
 /**
- * Obtiene todos los patterns de una categoría
+ * Get all patterns for a category.
  */
 export function getPatternsByCategory(category: VoiceCommandCategory): string[] {
 	return getCommandsByCategory(category).flatMap((cmd) => cmd.patterns);
 }
+

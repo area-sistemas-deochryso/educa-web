@@ -15,6 +15,7 @@ export interface HorarioResponseDto {
   profesorNombreCompleto: string | null;
   cantidadEstudiantes: number;
   estudiantes: null;
+  rowVersion?: string;
 }
 
 export interface HorarioDetalleResponseDto {
@@ -41,6 +42,7 @@ export interface HorarioDetalleResponseDto {
   fechaReg: string;
   usuarioMod: string | null;
   fechaMod: string | null;
+  rowVersion?: string;
 }
 
 export interface EstudianteHorarioDto {
@@ -69,6 +71,7 @@ export interface HorarioUpdateDto {
   salonId: number;
   cursoId: number;
   usuarioMod: string;
+  rowVersion?: string;
 }
 
 export interface HorarioAsignarProfesorDto {

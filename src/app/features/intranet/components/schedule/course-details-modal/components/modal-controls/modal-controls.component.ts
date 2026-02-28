@@ -14,10 +14,17 @@ import { TooltipModule } from 'primeng/tooltip';
 	templateUrl: './modal-controls.component.html',
 	styleUrls: ['./modal-controls.component.scss'],
 })
+/**
+ * Control buttons for expanding and closing the modal.
+ */
 export class ModalControlsComponent {
-	// * Controls for expand/close actions.
+	// #region Inputs/Outputs
+	/** True when the modal is in expanded mode. */
 	@Input() isExpanded = false;
+	/** Emits when the expand toggle is clicked. */
 	@Output() expand = new EventEmitter<void>();
+	/** Emits when the close action is clicked. */
 	@Output() closeTriggered = new EventEmitter<void>();
+	// #endregion
 }
 // #endregion

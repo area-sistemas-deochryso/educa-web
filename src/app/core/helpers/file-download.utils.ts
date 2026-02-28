@@ -1,6 +1,9 @@
 /**
- * Abre un Blob PDF en una nueva pestaña del navegador.
- * Limpia el Object URL automáticamente.
+ * Open a Blob in a new browser tab and revoke its object URL.
+ *
+ * @param blob File data to view.
+ * @example
+ * viewBlobInNewTab(pdfBlob);
  */
 export function viewBlobInNewTab(blob: Blob): void {
 	const url = window.URL.createObjectURL(blob);
@@ -9,8 +12,12 @@ export function viewBlobInNewTab(blob: Blob): void {
 }
 
 /**
- * Descarga un Blob como archivo con el nombre dado.
- * Crea un enlace temporal, lo activa y limpia el Object URL.
+ * Download a Blob as a file and revoke its object URL.
+ *
+ * @param blob File data to download.
+ * @param fileName File name to save as.
+ * @example
+ * downloadBlob(pdfBlob, 'report.pdf');
  */
 export function downloadBlob(blob: Blob, fileName: string): void {
 	const url = window.URL.createObjectURL(blob);

@@ -20,6 +20,7 @@ interface ProfesorStoreState {
 	salonTutoria: SalonTutoriaDto | null;
 	misEstudiantes: ProfesorMisSalonesConEstudiantesDto | null;
 	loading: boolean;
+	error: string | null;
 	// #region Dialog state
 	salonDialogVisible: boolean;
 	salonDialogLoading: boolean;
@@ -32,6 +33,7 @@ const initialState: ProfesorStoreState = {
 	salonTutoria: null,
 	misEstudiantes: null,
 	loading: false,
+	error: null,
 	salonDialogVisible: false,
 	salonDialogLoading: false,
 	selectedSalon: null,
@@ -48,6 +50,7 @@ export class ProfesorStore {
 	readonly salonTutoria = computed(() => this._state().salonTutoria);
 	readonly misEstudiantes = computed(() => this._state().misEstudiantes);
 	readonly loading = computed(() => this._state().loading);
+	readonly error = computed(() => this._state().error);
 	readonly salonDialogVisible = computed(() => this._state().salonDialogVisible);
 	readonly salonDialogLoading = computed(() => this._state().salonDialogLoading);
 	readonly selectedSalon = computed(() => this._state().selectedSalon);
@@ -168,6 +171,7 @@ export class ProfesorStore {
 		salones: this.salones(),
 		salonesConEstudiantes: this.salonesConEstudiantes(),
 		loading: this.loading(),
+		error: this.error(),
 		isEmpty: this.horarios().length === 0,
 		salonDialogVisible: this.salonDialogVisible(),
 		salonDialogLoading: this.salonDialogLoading(),
@@ -190,6 +194,14 @@ export class ProfesorStore {
 
 	setLoading(loading: boolean): void {
 		this._state.update((s) => ({ ...s, loading }));
+	}
+
+	setError(error: string | null): void {
+		this._state.update((s) => ({ ...s, error }));
+	}
+
+	clearError(): void {
+		this._state.update((s) => ({ ...s, error: null }));
 	}
 
 	// #endregion

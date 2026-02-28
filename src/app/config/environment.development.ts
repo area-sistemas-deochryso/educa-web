@@ -7,8 +7,8 @@
 export const environment = {
 	production: false,
 
-	// API Configuration - usar HTTPS para evitar redirect que pierde headers
-	apiUrl: 'https://localhost:7102',
+	// API Configuration - same-origin via proxy (proxy.conf.json redirige /api → localhost:7102)
+	apiUrl: '',
 
 	// Feature flags
 	showIntranetLink: true,

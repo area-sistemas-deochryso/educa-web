@@ -1,43 +1,62 @@
-// #region Imports
+﻿// #region Imports
 import { AuthUser } from '../auth/auth.models';
 
 /**
- * Storage Models - Interfaces para los datos almacenados en localStorage
+ * Storage models for local and session persisted data.
  */
-// * Local storage data shapes.
-
-/** Estado de los modales del schedule */
 // #endregion
 // #region Implementation
+
+/**
+ * UI modal state for schedule screens.
+ */
 export interface ScheduleModalsState {
+	/** Schedule modal visibility. */
 	schedule?: boolean;
+	/** Summary modal visibility. */
 	summary?: boolean;
+	/** Details modal state. */
 	details?: { visible: boolean; course: string };
+	/** Grades modal state. */
 	grades?: { visible: boolean; course: string };
 }
 
-/** Datos de notificaciones con fecha */
+/**
+ * Notification ids with a stored date.
+ */
 export interface NotificationStorageData {
+	/** Notification id list. */
 	ids: string[];
+	/** ISO date string. */
 	date: string;
 }
 
-/** Mes y año seleccionado para asistencia */
+/**
+ * Selected attendance month and year.
+ */
 export interface AttendanceMonthData {
+	/** Month number (1-12). */
 	month: number;
+	/** Year number. */
 	year: number;
 }
 
-/** Datos de permisos del usuario */
+/**
+ * Permissions data stored for a user.
+ */
 export interface PermisosStorageData {
+	/** User id. */
 	usuarioId: number;
+	/** Role name. */
 	rol: string;
+	/** Allowed view keys. */
 	vistasPermitidas: string[];
+	/** True when permissions are customized. */
 	tienePermisosPersonalizados: boolean;
-	/** JWT con exp de 4h que indica cuándo vencen estos permisos */
+	/** JWT token that encodes permissions expiration. */
 	permisosToken?: string;
 }
 
-/** Re-exportar AuthUser para conveniencia */
+/** Re-export AuthUser for convenience. */
 export type { AuthUser };
 // #endregion

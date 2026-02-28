@@ -7,8 +7,8 @@
 export const environment = {
 	production: true,
 
-	// API Configuration
-	apiUrl: 'https://educa1.azurewebsites.net',
+	// API Configuration - same-origin via proxy (producción: hosting proxy redirige /api → backend)
+	apiUrl: '',
 
 	// Feature flags
 	showIntranetLink: true,

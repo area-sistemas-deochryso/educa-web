@@ -2,14 +2,16 @@ import { Injectable, DestroyRef, inject, computed } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { forkJoin } from 'rxjs';
 
-import { logger } from '@core/helpers';
+import { logger, withRetry } from '@core/helpers';
 import {
 	PermisosService,
 	PermisoUsuario,
 	RolTipoAdmin,
 	UsuarioBusqueda,
 	ErrorHandlerService,
+	WalFacadeHelper,
 } from '@core/services';
+import { environment } from '@config';
 import { UI_ADMIN_ERROR_DETAILS, UI_SUMMARIES } from '@app/shared/constants';
 import { AdminUtilsService } from '@shared/services';
 import { PermisosUsuariosStore } from './permisos-usuarios.store';
@@ -21,8 +23,10 @@ export class PermisosUsuariosFacade {
 	private permisosService = inject(PermisosService);
 	private helperService = inject(PermisosUsuariosHelperService);
 	private errorHandler = inject(ErrorHandlerService);
+	private wal = inject(WalFacadeHelper);
 	readonly adminUtils = inject(AdminUtilsService);
 	private destroyRef = inject(DestroyRef);
+	private readonly apiUrl = `${environment.apiUrl}/api/sistema/permisos`;
 
 	// Estado público readonly desde el store
 	readonly permisosUsuario = this.store.permisosUsuario;
@@ -42,6 +46,7 @@ export class PermisosUsuariosFacade {
 	readonly activeModuloIndex = this.store.activeModuloIndex;
 	readonly vistasBusqueda = this.store.vistasBusqueda;
 	readonly filteredPermisos = this.store.filteredPermisos;
+	readonly usuariosSugeridos = this.store.usuariosSugeridos;
 	readonly vistasFiltradas = this.store.vistasFiltradas;
 	readonly isAllModuloSelected = this.store.isAllModuloSelected;
 
@@ -73,13 +78,17 @@ export class PermisosUsuariosFacade {
 	// #region Data Loading
 	loadData(): void {
 		this.store.setLoading(true);
+		this.store.clearError();
 
 		forkJoin({
 			vistas: this.permisosService.getVistas(),
 			permisosRol: this.permisosService.getPermisosRol(),
 			permisosUsuario: this.permisosService.getPermisosUsuario(),
 		})
-			.pipe(takeUntilDestroyed(this.destroyRef))
+			.pipe(
+				withRetry({ tag: 'PermisosUsuariosFacade:loadData' }),
+				takeUntilDestroyed(this.destroyRef),
+			)
 			.subscribe({
 				next: ({ vistas, permisosRol, permisosUsuario }) => {
 					this.store.setVistas(vistas.filter((v) => v.estado === 1));
@@ -96,6 +105,7 @@ export class PermisosUsuariosFacade {
 						UI_SUMMARIES.error,
 						UI_ADMIN_ERROR_DETAILS.loadPermisos,
 					);
+					this.store.setError(UI_ADMIN_ERROR_DETAILS.loadPermisos);
 					this.store.setLoading(false);
 				},
 			});
@@ -167,58 +177,77 @@ export class PermisosUsuariosFacade {
 
 	savePermiso(): void {
 		const vistas = this.selectedVistas();
-		this.store.setLoading(true);
 
-		const operation$ = this.isEditing()
-			? (() => {
-					const permiso = this.selectedPermiso();
-					if (!permiso) return null;
-					return this.permisosService.actualizarPermisoUsuario(permiso.id, { vistas });
-				})()
-			: (() => {
-					const usuarioId = this.selectedUsuarioId();
-					const rol = this.selectedRol();
-					if (!usuarioId || !rol) return null;
-					return this.permisosService.crearPermisoUsuario({ usuarioId, rol, vistas });
-				})();
+		if (this.isEditing()) {
+			const permiso = this.selectedPermiso();
+			if (!permiso) return;
 
-		if (!operation$) {
-			this.store.setLoading(false);
-			return;
+			const payload = { vistas, rowVersion: permiso.rowVersion };
+
+			this.wal.execute({
+				operation: 'UPDATE',
+				resourceType: 'PermisoUsuario',
+				resourceId: permiso.id,
+				endpoint: `${this.apiUrl}/usuario/${permiso.id}/actualizar`,
+				method: 'PUT',
+				payload,
+				http$: () => this.permisosService.actualizarPermisoUsuario(permiso.id, payload),
+				optimistic: {
+					apply: () => this.hideDialog(),
+					rollback: () => {},
+				},
+				onCommit: () => this.loadData(),
+				onError: () => this.handleApiError(UI_ADMIN_ERROR_DETAILS.savePermiso),
+			});
+		} else {
+			const usuarioId = this.selectedUsuarioId();
+			const rol = this.selectedRol();
+			if (!usuarioId || !rol) return;
+
+			const payload = { usuarioId, rol, vistas };
+
+			this.wal.execute({
+				operation: 'CREATE',
+				resourceType: 'PermisoUsuario',
+				endpoint: `${this.apiUrl}/usuario/crear`,
+				method: 'POST',
+				payload,
+				http$: () => this.permisosService.crearPermisoUsuario(payload),
+				optimistic: {
+					apply: () => this.hideDialog(),
+					rollback: () => {},
+				},
+				onCommit: () => this.loadData(),
+				onError: () => this.handleApiError(UI_ADMIN_ERROR_DETAILS.savePermiso),
+			});
 		}
-
-		operation$.pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
-			next: () => {
-				this.hideDialog();
-				this.loadData();
-			},
-			error: (err) => {
-				logger.error('Error:', err);
-				this.errorHandler.showError(
-					UI_SUMMARIES.error,
-					UI_ADMIN_ERROR_DETAILS.savePermiso,
-				);
-				this.store.setLoading(false);
-			},
-		});
 	}
 
 	deletePermiso(id: number): void {
-		this.store.setLoading(true);
-		this.permisosService
-			.eliminarPermisoUsuario(id)
-			.pipe(takeUntilDestroyed(this.destroyRef))
-			.subscribe({
-				next: () => this.loadData(),
-			error: (err) => {
-				logger.error('Error al eliminar:', err);
-				this.errorHandler.showError(
-					UI_SUMMARIES.error,
-					UI_ADMIN_ERROR_DETAILS.deletePermiso,
-				);
-				this.store.setLoading(false);
+		const snapshot = this.permisosUsuario().find((p) => p.id === id);
+
+		this.wal.execute({
+			operation: 'DELETE',
+			resourceType: 'PermisoUsuario',
+			resourceId: id,
+			endpoint: `${this.apiUrl}/usuario/${id}/eliminar`,
+			method: 'DELETE',
+			payload: null,
+			http$: () => this.permisosService.eliminarPermisoUsuario(id),
+			optimistic: {
+				apply: () => this.store.removePermisoUsuario(id),
+				rollback: () => {
+					if (snapshot) this.store.addPermisoUsuario(snapshot);
+				},
 			},
+			onCommit: () => this.store.setLoading(false),
+			onError: () => this.handleApiError(UI_ADMIN_ERROR_DETAILS.deletePermiso),
 		});
+	}
+
+	private handleApiError(detail: string): void {
+		this.errorHandler.showError(UI_SUMMARIES.error, detail);
+		this.store.setLoading(false);
 	}
 
 	// #endregion
@@ -229,6 +258,27 @@ export class PermisosUsuariosFacade {
 
 		// Limpiar usuario seleccionado cuando cambia el rol
 		this.store.setSelectedUsuarioId(null);
+		this.store.setUsuariosSugeridos([]);
+
+		// Cargar usuarios del rol seleccionado para el autocomplete
+		this.permisosService
+			.listarUsuariosPorRol(rol)
+			.pipe(
+				withRetry({ tag: 'PermisosUsuariosFacade:loadVistasFromRol' }),
+				takeUntilDestroyed(this.destroyRef),
+			)
+			.subscribe({
+				next: (resultado) => {
+					this.store.setUsuariosSugeridos(resultado.usuarios);
+				},
+				error: (err) => {
+					logger.error('Error al cargar usuarios por rol:', err);
+					this.errorHandler.showError(
+						UI_SUMMARIES.error,
+						UI_ADMIN_ERROR_DETAILS.loadVistasRol,
+					);
+				},
+			});
 
 		const permisoRol = this.permisosRol().find((p) => p.rol === rol);
 		if (permisoRol) {
@@ -243,6 +293,33 @@ export class PermisosUsuariosFacade {
 			const modulos = this.helperService.buildModulosVistas(this.vistas(), []);
 			this.store.setModulosVistas(modulos);
 		}
+	}
+
+	searchUsuarios(termino: string): void {
+		const rol = this.selectedRol();
+		if (!rol) {
+			this.store.setUsuariosSugeridos([]);
+			return;
+		}
+
+		this.permisosService
+			.buscarUsuarios(termino || undefined, rol)
+			.pipe(
+				withRetry({ tag: 'PermisosUsuariosFacade:searchUsuarios' }),
+				takeUntilDestroyed(this.destroyRef),
+			)
+			.subscribe({
+				next: (resultado) => {
+					this.store.setUsuariosSugeridos(resultado.usuarios);
+				},
+				error: (err) => {
+					logger.error('Error al buscar usuarios:', err);
+					this.errorHandler.showError(
+						UI_SUMMARIES.error,
+						UI_ADMIN_ERROR_DETAILS.searchUsuarios,
+					);
+				},
+			});
 	}
 
 	// #endregion

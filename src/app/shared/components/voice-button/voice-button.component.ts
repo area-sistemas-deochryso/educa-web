@@ -157,7 +157,7 @@ export class VoiceButtonComponent implements OnInit, AfterViewInit, OnDestroy {
 	}
 
 	dismissError(): void {
-		this.voiceService.error.set(null);
+		this.voiceService.dismissError();
 	}
 
 	get dragOffset(): number {

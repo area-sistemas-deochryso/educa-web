@@ -1,77 +1,102 @@
 import { Injectable, inject, PLATFORM_ID } from '@angular/core';
 import { isPlatformBrowser } from '@angular/common';
 import { logger } from '@app/core/helpers';
-import { AuthUser, ScheduleModalsState, PermisosStorageData } from './storage.models';
+import { AuthUser, PermisosStorageData } from './storage.models';
 
 /**
- * SessionStorageService - Para datos que deben existir solo durante la sesión del navegador
+ * Session storage service for auth and permissions with dual storage.
  *
- * Ideal para:
- * - Estado de UI temporal (modales abiertos, tabs activos)
- * - Datos de sesión que no necesitan persistir al cerrar el navegador
- * - Datos por pestaña (cada pestaña tiene su propio sessionStorage)
+ * This service uses sessionStorage and localStorage based on rememberMe.
+ * It also maintains session keys derived from full name and role so
+ * multiple remembered sessions can coexist.
  *
- * Ventajas sobre localStorage:
- * - Se limpia automáticamente al cerrar la pestaña/navegador
- * - Aislado por pestaña (no se comparte entre pestañas)
- * - Reduce superficie de ataque XSS (datos no persisten)
+ * @example
+ * session.setToken(token, true, 'Juan Perez', 'Student');
  */
-
 const SESSION_KEYS = {
-	// Auth (más seguro que localStorage para tokens) - Ahora con prefijos base para múltiples sesiones
 	TOKEN_PREFIX: 'educa_session_token',
 	USER_PREFIX: 'educa_session_user',
 	REMEMBER_ME_PREFIX: 'educa_remember_me',
-	CURRENT_SESSION_KEY: 'educa_current_session', // Guarda la clave de la sesión activa
-
-	// Permisos de usuario (se guarda por sesión)
+	CURRENT_SESSION_KEY: 'educa_current_session',
 	PERMISOS_PREFIX: 'educa_session_permisos',
-
-	// UI State
-	SCHEDULE_MODALS_STATE: 'educa_schedule_modals',
-	LAST_NOTIFICATION_CHECK: 'educa_last_notif_check',
-
-	// Navigation state
-	LAST_ROUTE: 'educa_last_route',
 } as const;
 
+/**
+ * Local storage keys for persistent sessions.
+ */
 const LOCAL_KEYS = {
 	TOKEN_PREFIX: 'educa_persistent_token',
 	USER_PREFIX: 'educa_persistent_user',
 	REMEMBER_ME_PREFIX: 'educa_remember_me',
-	REMEMBER_TOKEN: 'educa_remember_token', // Token para autocompletar login (no se borra con logout)
-	CURRENT_SESSION_KEY: 'educa_current_persistent_session', // Guarda la clave de la sesión persistente activa
-	PERMISOS_PREFIX: 'educa_persistent_permisos', // Permisos persistentes para "remember me"
+	REMEMBER_TOKEN: 'educa_remember_token',
+	CURRENT_SESSION_KEY: 'educa_current_persistent_session',
+	PERMISOS_PREFIX: 'educa_persistent_permisos',
 } as const;
 
 @Injectable({
 	providedIn: 'root',
 })
 export class SessionStorageService {
-	// * Session/local storage handling for auth and UI state.
 	private platformId = inject(PLATFORM_ID);
 
+	/**
+	 * True when running in the browser.
+	 *
+	 * @example
+	 * if (!this.isBrowser) return;
+	 */
 	private get isBrowser(): boolean {
 		return isPlatformBrowser(this.platformId);
 	}
 
-	// #region Métodos genéricos privados
+	// #region PRIVATE GENERIC HELPERS
 
+	/**
+	 * Read a sessionStorage value by key.
+	 *
+	 * @param key Storage key.
+	 * @returns String value or null.
+	 * @example
+	 * const raw = this.getItem('educa_session_token_x');
+	 */
 	private getItem(key: string): string | null {
 		if (!this.isBrowser) return null;
 		return sessionStorage.getItem(key);
 	}
 
+	/**
+	 * Write a sessionStorage value by key.
+	 *
+	 * @param key Storage key.
+	 * @param value String value.
+	 * @example
+	 * this.setItem('educa_session_token_x', token);
+	 */
 	private setItem(key: string, value: string): void {
 		if (!this.isBrowser) return;
 		sessionStorage.setItem(key, value);
 	}
 
+	/**
+	 * Remove a sessionStorage value by key.
+	 *
+	 * @param key Storage key.
+	 * @example
+	 * this.removeItem('educa_session_token_x');
+	 */
 	private removeItem(key: string): void {
 		if (!this.isBrowser) return;
 		sessionStorage.removeItem(key);
 	}
 
+	/**
+	 * Read and parse JSON from sessionStorage.
+	 *
+	 * @param key Storage key.
+	 * @returns Parsed value or null.
+	 * @example
+	 * const user = this.getJSON<AuthUser>('educa_session_user_x');
+	 */
 	private getJSON<T>(key: string): T | null {
 		try {
 			const value = this.getItem(key);
@@ -82,6 +107,14 @@ export class SessionStorageService {
 		}
 	}
 
+	/**
+	 * Stringify and store JSON into sessionStorage.
+	 *
+	 * @param key Storage key.
+	 * @param value Value to store.
+	 * @example
+	 * this.setJSON('educa_session_user_x', user);
+	 */
 	private setJSON<T>(key: string, value: T): void {
 		try {
 			this.setItem(key, JSON.stringify(value));
@@ -91,32 +124,41 @@ export class SessionStorageService {
 	}
 
 	// #endregion
-	// #region UTILIDADES PARA MÚLTIPLES SESIONES
+	// #region MULTI SESSION UTILITIES
 
 	/**
-	 * Genera un identificador único para una sesión basado en nombreCompleto y rol
-	 * Ej: "Juan Pérez" + "Estudiante" -> "juan_perez_estudiante"
+	 * Build a session key from full name and role.
+	 * Example: "Juan Perez" + "Student" -> "juan_perez_student".
+	 *
+	 * @param nombreCompleto Full name.
+	 * @param rol Role name.
+	 * @returns Normalized session key.
+	 * @example
+	 * const key = this.generateSessionKey('Juan Perez', 'Student');
 	 */
 	private generateSessionKey(nombreCompleto: string, rol: string): string {
 		const sanitized = nombreCompleto
 			.toLowerCase()
 			.normalize('NFD')
-			.replace(/[\u0300-\u036f]/g, '') // Remover acentos
-			.replace(/[^a-z0-9]+/g, '_') // Reemplazar caracteres especiales con _
-			.replace(/^_+|_+$/g, ''); // Remover _ al inicio/final
+			.replace(/[\u0300-\u036f]/g, '')
+			.replace(/[^a-z0-9]+/g, '_')
+			.replace(/^_+|_+$/g, '');
 
 		const sanitizedRol = rol.toLowerCase();
 		return `${sanitized}_${sanitizedRol}`;
 	}
 
 	/**
-	 * Limpia cualquier sesión previa del mismo usuario en ambos storages
-	 * Mantiene solo la sesión en el storage correspondiente al valor de rememberMe
+	 * Remove any previous session for the same user in both storages.
+	 *
+	 * @param nombreCompleto Full name.
+	 * @param rol Role name.
+	 * @example
+	 * this.cleanPreviousUserSessions('Juan Perez', 'Student');
 	 */
 	private cleanPreviousUserSessions(nombreCompleto: string, rol: string): void {
 		const sessionKey = this.generateSessionKey(nombreCompleto, rol);
 
-		// Construir las claves completas
 		const sessionTokenKey = `${SESSION_KEYS.TOKEN_PREFIX}_${sessionKey}`;
 		const sessionUserKey = `${SESSION_KEYS.USER_PREFIX}_${sessionKey}`;
 		const sessionRememberMeKey = `${SESSION_KEYS.REMEMBER_ME_PREFIX}_${sessionKey}`;
@@ -124,19 +166,17 @@ export class SessionStorageService {
 		const localUserKey = `${LOCAL_KEYS.USER_PREFIX}_${sessionKey}`;
 		const localRememberMeKey = `${LOCAL_KEYS.REMEMBER_ME_PREFIX}_${sessionKey}`;
 
-		// Limpiar de sessionStorage
 		this.removeItem(sessionTokenKey);
 		this.removeItem(sessionUserKey);
 		this.removeItem(sessionRememberMeKey);
 
-		// Limpiar de localStorage
 		this.removeLocalItem(localTokenKey);
 		this.removeLocalItem(localUserKey);
 		this.removeLocalItem(localRememberMeKey);
 	}
 
 	// #endregion
-	// #region AUTH - Token y Usuario (sesión o persistente)
+	// #region AUTH - localStorage helpers (used by user and permisos too)
 
 	private getLocalItem(key: string): string | null {
 		if (!this.isBrowser) return null;
@@ -174,167 +214,61 @@ export class SessionStorageService {
 		}
 	}
 
-	getToken(): string | null {
-		// Obtener la clave de sesión activa
-		const sessionKey =
-			this.getLocalItem(LOCAL_KEYS.CURRENT_SESSION_KEY) ||
-			this.getItem(SESSION_KEYS.CURRENT_SESSION_KEY);
-		logger.log('[SessionStorage] getToken - sessionKey:', sessionKey);
+	// [COOKIE_MIGRATION] Token methods disabled — auth token lives in HttpOnly cookie.
+	// getToken(): string | null { ... }
+	// setToken(token: string, rememberMe = false, nombreCompleto?: string, rol?: string): void { ... }
+	// removeToken(): void { ... }
+	// hasToken(): boolean { return !!this.getToken(); }
 
-		if (!sessionKey) {
-			logger.warn('[SessionStorage] No session key found');
-			return null;
-		}
-
-		// Primero verificar localStorage (sesión persistente)
-		const localTokenKey = `${LOCAL_KEYS.TOKEN_PREFIX}_${sessionKey}`;
-		const persistentToken = this.getLocalItem(localTokenKey);
-		logger.log(
-			'[SessionStorage] getToken - persistentToken from',
-			localTokenKey,
-			':',
-			!!persistentToken,
-		);
-
-		if (persistentToken) return persistentToken;
-
-		// Luego sessionStorage (sesión temporal)
-		const sessionTokenKey = `${SESSION_KEYS.TOKEN_PREFIX}_${sessionKey}`;
-		const sessionToken = this.getItem(sessionTokenKey);
-		logger.log(
-			'[SessionStorage] getToken - sessionToken from',
-			sessionTokenKey,
-			':',
-			!!sessionToken,
-		);
-
-		return sessionToken;
-	}
-
-	setToken(token: string, rememberMe = false, nombreCompleto?: string, rol?: string): void {
-		logger.log('[SessionStorage] setToken called with:', {
-			rememberMe,
-			nombreCompleto,
-			rol,
-			hasToken: !!token,
-		});
-
-		// Si no se proporciona información del usuario, intentar obtenerla del usuario actual
-		if (!nombreCompleto || !rol) {
-			logger.warn('[SessionStorage] Missing user info, trying to get from current user');
-			const currentUser = this.getUser();
-			if (currentUser) {
-				nombreCompleto = currentUser.nombreCompleto;
-				rol = currentUser.rol;
-				logger.log('[SessionStorage] Got user from storage:', { nombreCompleto, rol });
-			} else {
-				// Fallback: no se puede generar clave de sesión sin información del usuario
-				logger.error('[SessionStorage] Cannot set token without user information');
-				return;
-			}
-		}
-
-		// Limpiar sesiones previas del mismo usuario en ambos storages
-		this.cleanPreviousUserSessions(nombreCompleto, rol);
-
-		// Generar clave de sesión
-		const sessionKey = this.generateSessionKey(nombreCompleto, rol);
-		logger.log('[SessionStorage] Generated sessionKey:', sessionKey);
-
-		if (rememberMe) {
-			// Guardar en localStorage para persistir
-			const localTokenKey = `${LOCAL_KEYS.TOKEN_PREFIX}_${sessionKey}`;
-			const localRememberMeKey = `${LOCAL_KEYS.REMEMBER_ME_PREFIX}_${sessionKey}`;
-			logger.log('[SessionStorage] Saving to localStorage with keys:', {
-				localTokenKey,
-				localRememberMeKey,
-			});
-
-			this.setLocalItem(localTokenKey, token);
-			this.setLocalItem(LOCAL_KEYS.CURRENT_SESSION_KEY, sessionKey);
-			this.setLocalItem(localRememberMeKey, 'true');
-			// Guardar token para autocompletar (no se borra con logout)
-			this.setLocalItem(LOCAL_KEYS.REMEMBER_TOKEN, token);
-			// Limpiar sessionStorage
-			this.removeItem(SESSION_KEYS.CURRENT_SESSION_KEY);
-
-			logger.log('[SessionStorage] Token saved to localStorage successfully');
-		} else {
-			// Guardar solo en sessionStorage
-			const sessionTokenKey = `${SESSION_KEYS.TOKEN_PREFIX}_${sessionKey}`;
-			logger.log('[SessionStorage] Saving to sessionStorage with key:', sessionTokenKey);
-
-			this.setItem(sessionTokenKey, token);
-			this.setItem(SESSION_KEYS.CURRENT_SESSION_KEY, sessionKey);
-			// Limpiar localStorage Y remember token si no quiere recordar sesión
-			this.removeLocalItem(LOCAL_KEYS.CURRENT_SESSION_KEY);
-			this.removeLocalItem(LOCAL_KEYS.REMEMBER_TOKEN);
-
-			logger.log('[SessionStorage] Token saved to sessionStorage successfully');
-		}
-	}
-
-	removeToken(): void {
-		const sessionKey =
-			this.getLocalItem(LOCAL_KEYS.CURRENT_SESSION_KEY) ||
-			this.getItem(SESSION_KEYS.CURRENT_SESSION_KEY);
-		if (!sessionKey) return;
-
-		const sessionTokenKey = `${SESSION_KEYS.TOKEN_PREFIX}_${sessionKey}`;
-		const localTokenKey = `${LOCAL_KEYS.TOKEN_PREFIX}_${sessionKey}`;
-
-		this.removeItem(sessionTokenKey);
-		this.removeLocalItem(localTokenKey);
-	}
-
-	hasToken(): boolean {
-		return !!this.getToken();
-	}
-
+	/**
+	 * Get current user from storage.
+	 *
+	 * @returns Current user or null.
+	 * @example
+	 * const user = session.getUser();
+	 */
 	getUser(): AuthUser | null {
-		// Obtener la clave de sesión activa
 		const sessionKey =
 			this.getLocalItem(LOCAL_KEYS.CURRENT_SESSION_KEY) ||
 			this.getItem(SESSION_KEYS.CURRENT_SESSION_KEY);
 		if (!sessionKey) return null;
 
-		// Primero verificar localStorage (sesión persistente)
 		const localUserKey = `${LOCAL_KEYS.USER_PREFIX}_${sessionKey}`;
 		const persistentUser = this.getLocalJSON<AuthUser>(localUserKey);
 		if (persistentUser) return persistentUser;
 
-		// Luego sessionStorage (sesión temporal)
 		const sessionUserKey = `${SESSION_KEYS.USER_PREFIX}_${sessionKey}`;
 		return this.getJSON<AuthUser>(sessionUserKey);
 	}
 
+	/**
+	 * Store current user.
+	 *
+	 * @param user User object.
+	 * @param rememberMe Persist user in localStorage when true.
+	 * @example
+	 * session.setUser(user, true);
+	 */
 	setUser(user: AuthUser, rememberMe = false): void {
-		// NOTA: No llamar a cleanPreviousUserSessions aquí porque ya se llamó en setToken
-		// y borraría el token que acabamos de guardar
-
-		// Generar clave de sesión
 		const sessionKey = this.generateSessionKey(user.nombreCompleto, user.rol);
-		logger.log('[SessionStorage] setUser with sessionKey:', sessionKey);
 
 		if (rememberMe) {
-			// Guardar en localStorage para persistir
-			const localUserKey = `${LOCAL_KEYS.USER_PREFIX}_${sessionKey}`;
-			this.setLocalJSON(localUserKey, user);
+			this.setLocalJSON(`${LOCAL_KEYS.USER_PREFIX}_${sessionKey}`, user);
 			this.setLocalItem(LOCAL_KEYS.CURRENT_SESSION_KEY, sessionKey);
-			// Limpiar sessionStorage
 			this.removeItem(SESSION_KEYS.CURRENT_SESSION_KEY);
-			logger.log('[SessionStorage] User saved to localStorage');
 		} else {
-			// Guardar solo en sessionStorage
-			const sessionUserKey = `${SESSION_KEYS.USER_PREFIX}_${sessionKey}`;
-			this.setJSON(sessionUserKey, user);
+			this.setJSON(`${SESSION_KEYS.USER_PREFIX}_${sessionKey}`, user);
 			this.setItem(SESSION_KEYS.CURRENT_SESSION_KEY, sessionKey);
-			// Limpiar localStorage
 			this.removeLocalItem(LOCAL_KEYS.CURRENT_SESSION_KEY);
-			logger.log('[SessionStorage] User saved to sessionStorage');
 		}
 	}
 
+	/**
+	 * Remove current user from storage.
+	 *
+	 * @example
+	 * session.removeUser();
+	 */
 	removeUser(): void {
 		const sessionKey =
 			this.getLocalItem(LOCAL_KEYS.CURRENT_SESSION_KEY) ||
@@ -348,14 +282,20 @@ export class SessionStorageService {
 		this.removeLocalItem(localUserKey);
 	}
 
+	/**
+	 * Clear auth data for the active session.
+	 *
+	 * This removes session tokens and users but keeps persistent tokens
+	 * for remember-me login flows.
+	 *
+	 * @example
+	 * session.clearAuth();
+	 */
 	clearAuth(): void {
-		// Obtener la clave de sesión activa antes de limpiar
 		const sessionKey =
 			this.getLocalItem(LOCAL_KEYS.CURRENT_SESSION_KEY) ||
 			this.getItem(SESSION_KEYS.CURRENT_SESSION_KEY);
 
-		// Solo limpiar tokens de sessionStorage (NO los persistentes de localStorage)
-		// Los tokens persistentes se mantienen para autocompletado
 		if (sessionKey) {
 			const sessionTokenKey = `${SESSION_KEYS.TOKEN_PREFIX}_${sessionKey}`;
 			const sessionUserKey = `${SESSION_KEYS.USER_PREFIX}_${sessionKey}`;
@@ -370,165 +310,75 @@ export class SessionStorageService {
 			this.removeLocalItem(localPermisosKey);
 		}
 
-		// Limpiar claves de sesión activa (pero NO los tokens/users persistentes)
 		this.removeItem(SESSION_KEYS.CURRENT_SESSION_KEY);
 		this.removeLocalItem(LOCAL_KEYS.CURRENT_SESSION_KEY);
-
-		// Nota: Los tokens persistentes (educa_persistent_token_*) NO se borran
-		// Se mantienen para el autocompletado del login
-		logger.log('[SessionStorage] Auth cleared, persistent tokens preserved');
 	}
 
 	// #endregion
-	// #region REMEMBER TOKEN - Para autocompletar login
+	// #region REMEMBER TOKEN
 
-	getRememberToken(): string | null {
-		return this.getLocalItem(LOCAL_KEYS.REMEMBER_TOKEN);
-	}
+	// [COOKIE_MIGRATION] Remember/persistent token methods disabled — sessions managed server-side now.
+	// getRememberToken(): string | null { return this.getLocalItem(LOCAL_KEYS.REMEMBER_TOKEN); }
+	// clearRememberToken(): void { this.removeLocalItem(LOCAL_KEYS.REMEMBER_TOKEN); }
+	// getAllPersistentTokens(): { token: string; sessionKey: string }[] { ... }
 
-	clearRememberToken(): void {
-		this.removeLocalItem(LOCAL_KEYS.REMEMBER_TOKEN);
+	// #endregion
+	// #region PERMISSIONS - Session scoped permissions
+
+	/**
+	 * Get permissions data for the active session.
+	 *
+	 * @returns Permissions data or null.
+	 * @example
+	 * const permisos = session.getPermisos();
+	 */
+	getPermisos(): PermisosStorageData | null {
+		const sessionKey =
+			this.getLocalItem(LOCAL_KEYS.CURRENT_SESSION_KEY) ||
+			this.getItem(SESSION_KEYS.CURRENT_SESSION_KEY);
+		if (!sessionKey) return null;
+
+		const persistentPermisos = this.getLocalJSON<PermisosStorageData>(
+			`${LOCAL_KEYS.PERMISOS_PREFIX}_${sessionKey}`,
+		);
+		if (persistentPermisos) return persistentPermisos;
+
+		return this.getJSON<PermisosStorageData>(
+			`${SESSION_KEYS.PERMISOS_PREFIX}_${sessionKey}`,
+		);
 	}
 
 	/**
-	 * Obtiene todos los tokens persistentes guardados de sesiones recordadas
-	 * @returns Array de objetos con token y sessionKey
+	 * Store permissions data for the active session.
+	 *
+	 * @param permisos Permissions data.
+	 * @example
+	 * session.setPermisos(permisos);
 	 */
-	getAllPersistentTokens(): { token: string; sessionKey: string }[] {
-		if (!this.isBrowser) return [];
-
-		const tokens: { token: string; sessionKey: string }[] = [];
-		const prefix = LOCAL_KEYS.TOKEN_PREFIX + '_';
-
-		for (let i = 0; i < localStorage.length; i++) {
-			const key = localStorage.key(i);
-			if (key && key.startsWith(prefix)) {
-				const token = localStorage.getItem(key);
-				if (token) {
-					const sessionKey = key.substring(prefix.length);
-					tokens.push({ token, sessionKey });
-				}
-			}
-		}
-
-		logger.log('[SessionStorage] Found persistent tokens:', tokens.length);
-		return tokens;
-	}
-
-	// #endregion
-	// #region UI STATE - Estado temporal de la interfaz
-
-	getScheduleModalsState(): ScheduleModalsState {
-		return this.getJSON<ScheduleModalsState>(SESSION_KEYS.SCHEDULE_MODALS_STATE) || {};
-	}
-
-	setScheduleModalsState(state: ScheduleModalsState): void {
-		this.setJSON(SESSION_KEYS.SCHEDULE_MODALS_STATE, state);
-	}
-
-	updateScheduleModalState(
-		modal: keyof ScheduleModalsState,
-		value: boolean | { visible: boolean; course: string },
-	): void {
-		const state = this.getScheduleModalsState();
-		if (value === false || (typeof value === 'object' && !value.visible)) {
-			delete state[modal];
-		} else {
-			(state as any)[modal] = value;
-		}
-		this.setScheduleModalsState(state);
-	}
-
-	clearScheduleModalsState(): void {
-		this.removeItem(SESSION_KEYS.SCHEDULE_MODALS_STATE);
-	}
-
-	// #endregion
-	// #region NOTIFICATIONS - Check temporal
-
-	getLastNotificationCheck(): string | null {
-		return this.getItem(SESSION_KEYS.LAST_NOTIFICATION_CHECK);
-	}
-
-	setLastNotificationCheck(date: string): void {
-		this.setItem(SESSION_KEYS.LAST_NOTIFICATION_CHECK, date);
-	}
-
-	// #endregion
-	// #region NAVIGATION - Estado de navegación
-
-	getLastRoute(): string | null {
-		return this.getItem(SESSION_KEYS.LAST_ROUTE);
-	}
-
-	setLastRoute(route: string): void {
-		this.setItem(SESSION_KEYS.LAST_ROUTE, route);
-	}
-
-	// #endregion
-	// #region PERMISOS - Permisos del usuario por sesión
-
-	getPermisos(): PermisosStorageData | null {
-		// Obtener la clave de sesión activa
-		const sessionKey =
-			this.getLocalItem(LOCAL_KEYS.CURRENT_SESSION_KEY) ||
-			this.getItem(SESSION_KEYS.CURRENT_SESSION_KEY);
-
-		if (!sessionKey) {
-			logger.warn('[SessionStorage] getPermisos - No session key found');
-			return null;
-		}
-
-		// Primero verificar localStorage (sesión persistente)
-		const localPermisosKey = `${LOCAL_KEYS.PERMISOS_PREFIX}_${sessionKey}`;
-		const persistentPermisos = this.getLocalJSON<PermisosStorageData>(localPermisosKey);
-		if (persistentPermisos) {
-			logger.log('[SessionStorage] getPermisos - Found in localStorage');
-			return persistentPermisos;
-		}
-
-		// Luego sessionStorage (sesión temporal)
-		const sessionPermisosKey = `${SESSION_KEYS.PERMISOS_PREFIX}_${sessionKey}`;
-		const sessionPermisos = this.getJSON<PermisosStorageData>(sessionPermisosKey);
-		if (sessionPermisos) {
-			logger.log('[SessionStorage] getPermisos - Found in sessionStorage');
-		}
-		return sessionPermisos;
-	}
-
 	setPermisos(permisos: PermisosStorageData): void {
-		// Obtener la clave de sesión activa
 		const sessionKey =
 			this.getLocalItem(LOCAL_KEYS.CURRENT_SESSION_KEY) ||
 			this.getItem(SESSION_KEYS.CURRENT_SESSION_KEY);
+		if (!sessionKey) return;
 
-		if (!sessionKey) {
-			logger.warn(
-				'[SessionStorage] setPermisos - No session key found, cannot save permisos',
-			);
-			return;
-		}
-
-		// Determinar si es sesión persistente (rememberMe) o temporal
 		const isPersistent = !!this.getLocalItem(LOCAL_KEYS.CURRENT_SESSION_KEY);
 
 		if (isPersistent) {
-			// Guardar en localStorage para persistir
-			const localPermisosKey = `${LOCAL_KEYS.PERMISOS_PREFIX}_${sessionKey}`;
-			this.setLocalJSON(localPermisosKey, permisos);
-			logger.log('[SessionStorage] setPermisos - Saved to localStorage');
+			this.setLocalJSON(`${LOCAL_KEYS.PERMISOS_PREFIX}_${sessionKey}`, permisos);
 		} else {
-			// Guardar solo en sessionStorage
-			const sessionPermisosKey = `${SESSION_KEYS.PERMISOS_PREFIX}_${sessionKey}`;
-			this.setJSON(sessionPermisosKey, permisos);
-			logger.log('[SessionStorage] setPermisos - Saved to sessionStorage');
+			this.setJSON(`${SESSION_KEYS.PERMISOS_PREFIX}_${sessionKey}`, permisos);
 		}
 	}
 
+	/**
+	 * Clear all permissions from session and local storage.
+	 *
+	 * @example
+	 * session.clearPermisos();
+	 */
 	clearPermisos(): void {
 		if (!this.isBrowser) return;
 
-		// Limpiar TODOS los permisos de sessionStorage (todas las claves que empiecen con el prefijo)
 		const sessionPermisosPrefix = SESSION_KEYS.PERMISOS_PREFIX + '_';
 		const sessionKeysToRemove: string[] = [];
 
@@ -539,12 +389,8 @@ export class SessionStorageService {
 			}
 		}
 
-		sessionKeysToRemove.forEach((key) => {
-			sessionStorage.removeItem(key);
-			logger.log('[SessionStorage] clearPermisos - Removed from sessionStorage:', key);
-		});
+		sessionKeysToRemove.forEach((key) => sessionStorage.removeItem(key));
 
-		// Limpiar TODOS los permisos de localStorage (todas las claves que empiecen con el prefijo)
 		const localPermisosPrefix = LOCAL_KEYS.PERMISOS_PREFIX + '_';
 		const localKeysToRemove: string[] = [];
 
@@ -555,23 +401,21 @@ export class SessionStorageService {
 			}
 		}
 
-		localKeysToRemove.forEach((key) => {
-			localStorage.removeItem(key);
-			logger.log('[SessionStorage] clearPermisos - Removed from localStorage:', key);
-		});
-
-		logger.log('[SessionStorage] clearPermisos - All permisos cleared from both storages');
+		localKeysToRemove.forEach((key) => localStorage.removeItem(key));
 	}
 
 	// #endregion
-	// #region UTILIDADES
+	// #region UTILITIES
 
+	/**
+	 * Clear auth and permissions data for the active session.
+	 *
+	 * @example
+	 * session.clearAll();
+	 */
 	clearAll(): void {
 		this.clearAuth();
 		this.clearPermisos();
-		this.clearScheduleModalsState();
-		this.removeItem(SESSION_KEYS.LAST_NOTIFICATION_CHECK);
-		this.removeItem(SESSION_KEYS.LAST_ROUTE);
 	}
 	// #endregion
 }

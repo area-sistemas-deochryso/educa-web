@@ -3,12 +3,11 @@ import { computed, inject, Injectable, signal } from '@angular/core';
 import { AuthStore } from '@core/store';
 import { determinarNiveles } from '@core/helpers';
 import { CursoListaDto, CursoOption, CursosPorNivel } from '../models/curso.interface';
+import { buildWeeklyBlocks, hasOverlap } from '../helpers/horario-time.utils';
 import {
-  CURSO_COLORS,
   type HorarioDetalleResponseDto,
   type HorarioFormData,
   type HorarioResponseDto,
-  type HorarioWeeklyBlock,
   type HorariosEstadisticas,
 } from '../models/horario.interface';
 import { ProfesorListDto, ProfesorOption } from '../models/profesor.interface';
@@ -27,7 +26,8 @@ interface HorariosStoreState {
   profesoresDisponibles: ProfesorListDto[];
 
   // #endregion
-  // #region Estados de carga
+  // #region Estados de carga y error
+  error: string | null;
   loading: boolean;
   statsLoading: boolean;
   detailLoading: boolean;
@@ -82,6 +82,7 @@ const initialState: HorariosStoreState = {
   salonesDisponibles: [],
   cursosDisponibles: [],
   profesoresDisponibles: [],
+  error: null,
   loading: false,
   statsLoading: false,
   detailLoading: false,
@@ -116,6 +117,7 @@ export class HorariosStore {
   readonly horarios = computed(() => this._state().horarios);
   readonly horarioDetalle = computed(() => this._state().horarioDetalle);
   readonly estadisticas = computed(() => this._state().estadisticas);
+  readonly error = computed(() => this._state().error);
   readonly loading = computed(() => this._state().loading);
   readonly statsLoading = computed(() => this._state().statsLoading);
   readonly detailLoading = computed(() => this._state().detailLoading);
@@ -169,26 +171,9 @@ export class HorariosStore {
 
       // Verificar si el salón tiene conflicto de horario
       const tieneConflicto = horarios.some((h) => {
-        // Si está editando, excluir el horario actual
         if (editingId !== null && h.id === editingId) return false;
-
-        // Mismo salón y mismo día
-        if (h.salonId === salon.salonId && h.diaSemana === formData.diaSemana) {
-          // Verificar solapamiento de horarios
-          const inicioForm = formData.horaInicio;
-          const finForm = formData.horaFin;
-          const inicioExistente = h.horaInicio;
-          const finExistente = h.horaFin;
-
-          // Hay conflicto si los rangos se solapan
-          return (
-            (inicioForm >= inicioExistente && inicioForm < finExistente) ||
-            (finForm > inicioExistente && finForm <= finExistente) ||
-            (inicioForm <= inicioExistente && finForm >= finExistente)
-          );
-        }
-
-        return false;
+        if (h.salonId !== salon.salonId || h.diaSemana !== formData.diaSemana) return false;
+        return hasOverlap(formData.horaInicio, formData.horaFin, h.horaInicio, h.horaFin);
       });
 
       return !tieneConflicto;
@@ -284,38 +269,7 @@ export class HorariosStore {
 
   // #endregion
   // #region Computed - Vista Semanal
-  readonly horariosSemanales = computed(() => {
-    const horarios = this.horariosFiltrados();
-    const blocks: HorarioWeeklyBlock[] = [];
-
-    // Asignar colores por curso
-    const cursoColorMap = new Map<number, string>();
-    let colorIndex = 0;
-
-    horarios.forEach((horario) => {
-      // Asignar color si no existe
-      if (!cursoColorMap.has(horario.cursoId)) {
-        cursoColorMap.set(horario.cursoId, CURSO_COLORS[colorIndex % CURSO_COLORS.length]);
-        colorIndex++;
-      }
-
-      // Calcular duración en minutos
-      const duracion = this.calcularDuracionMinutos(horario.horaInicio, horario.horaFin);
-
-      // Calcular posición vertical (asumiendo horario desde 07:00)
-      const posicion = this.calcularPosicionVertical(horario.horaInicio);
-
-      blocks.push({
-        horario,
-        dia: horario.diaSemana,
-        color: cursoColorMap.get(horario.cursoId) || CURSO_COLORS[0],
-        duracionMinutos: duracion,
-        posicionVertical: posicion,
-      });
-    });
-
-    return blocks;
-  });
+  readonly horariosSemanales = computed(() => buildWeeklyBlocks(this.horariosFiltrados()));
 
   // #endregion
   // #region Computed - Estadísticas derivadas
@@ -392,6 +346,7 @@ export class HorariosStore {
     horarioDetalle: this.horarioDetalle(),
     estadisticas: this.estadisticas(),
     loading: this.loading(),
+    error: this.error(),
     statsLoading: this.statsLoading(),
     detailLoading: this.detailLoading(),
     dialogVisible: this.dialogVisible(),
@@ -493,6 +448,16 @@ export class HorariosStore {
     }));
   }
 
+  /**
+   * Mutación quirúrgica: Re-agregar un horario (rollback de delete)
+   */
+  addHorario(horario: HorarioResponseDto): void {
+    this._state.update((s) => ({
+      ...s,
+      horarios: [horario, ...s.horarios],
+    }));
+  }
+
   // #endregion
   // #region Comandos de mutación - Detalle
   setHorarioDetalle(detalle: HorarioDetalleResponseDto | null): void {
@@ -516,6 +481,16 @@ export class HorariosStore {
         },
       };
     });
+  }
+
+  // #endregion
+  // #region Comandos de mutación - Error
+  setError(error: string | null): void {
+    this._state.update((s) => ({ ...s, error }));
+  }
+
+  clearError(): void {
+    this._state.update((s) => ({ ...s, error: null }));
   }
 
   // #endregion
@@ -660,24 +635,6 @@ export class HorariosStore {
 
   setPaginationData(page: number, pageSize: number, totalRecords: number): void {
     this._state.update((s) => ({ ...s, page, pageSize, totalRecords }));
-  }
-
-  // #endregion
-  // #region Helpers privados
-  private calcularDuracionMinutos(horaInicio: string, horaFin: string): number {
-    const [hi, mi] = horaInicio.split(':').map(Number);
-    const [hf, mf] = horaFin.split(':').map(Number);
-    const minutosInicio = hi * 60 + mi;
-    const minutosFin = hf * 60 + mf;
-    return minutosFin - minutosInicio;
-  }
-
-  private calcularPosicionVertical(horaInicio: string): number {
-    // Asumiendo que el horario empieza a las 07:00
-    const HORA_INICIO_DIA = 7 * 60; // 7:00 AM en minutos
-    const [h, m] = horaInicio.split(':').map(Number);
-    const minutosDesdeInicio = h * 60 + m;
-    return minutosDesdeInicio - HORA_INICIO_DIA;
   }
 
   // #endregion

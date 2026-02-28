@@ -4,29 +4,28 @@ import { logger } from '@app/core/helpers';
 import { NotificationStorageData } from './storage.models';
 
 /**
- * IndexedDBService - Para datos complejos que requieren persistencia offline
+ * IndexedDB service for async persistence of larger or structured data.
  *
- * Ideal para:
- * - Datos que necesitan consultas complejas
- * - Grandes volúmenes de datos estructurados
- * - Aplicaciones offline-first
- * - Datos que pueden crecer con el tiempo
+ * This service is used for notifications and cache data that can grow
+ * over time and should not block the UI thread.
  *
- * Ventajas:
- * - Almacenamiento asíncrono (no bloquea UI)
- * - Soporta índices y consultas
- * - Mayor capacidad que localStorage
- * - Transacciones ACID
+ * @example
+ * const data = await idb.getDismissedNotifications();
  */
-
 const DB_NAME = 'EducaWebDB';
 const DB_VERSION = 1;
 
+/**
+ * Object store names used by this database.
+ */
 const STORES = {
 	NOTIFICATIONS: 'notifications',
 	CACHE: 'cache',
 } as const;
 
+/**
+ * Stored notification record shape in IndexedDB.
+ */
 interface NotificationRecord {
 	id: string;
 	type: 'dismissed' | 'read';
@@ -35,6 +34,9 @@ interface NotificationRecord {
 	createdAt: number;
 }
 
+/**
+ * Generic cache record shape in IndexedDB.
+ */
 interface CacheRecord<T = unknown> {
 	key: string;
 	value: T;
@@ -46,11 +48,16 @@ interface CacheRecord<T = unknown> {
 	providedIn: 'root',
 })
 export class IndexedDBService {
-	// * IndexedDB wrapper for notifications and cache.
 	private platformId = inject(PLATFORM_ID);
 	private db: IDBDatabase | null = null;
 	private dbReady: Promise<boolean> | null = null;
 
+	/**
+	 * True when running in the browser.
+	 *
+	 * @example
+	 * if (!this.isBrowser) return;
+	 */
 	private get isBrowser(): boolean {
 		return isPlatformBrowser(this.platformId);
 	}
@@ -61,8 +68,15 @@ export class IndexedDBService {
 		}
 	}
 
-	// #region INICIALIZACIÓN
+	// #region INIT
 
+	/**
+	 * Initialize the IndexedDB database and object stores.
+	 *
+	 * @returns True if the database is available.
+	 * @example
+	 * const ok = await this.initDB();
+	 */
 	private initDB(): Promise<boolean> {
 		return new Promise((resolve) => {
 			if (!this.isBrowser || !('indexedDB' in window)) {
@@ -87,7 +101,6 @@ export class IndexedDBService {
 			request.onupgradeneeded = (event) => {
 				const db = (event.target as IDBOpenDBRequest).result;
 
-				// Store para notificaciones
 				if (!db.objectStoreNames.contains(STORES.NOTIFICATIONS)) {
 					const notifStore = db.createObjectStore(STORES.NOTIFICATIONS, {
 						keyPath: 'id',
@@ -96,7 +109,6 @@ export class IndexedDBService {
 					notifStore.createIndex('date', 'date', { unique: false });
 				}
 
-				// Store para cache general
 				if (!db.objectStoreNames.contains(STORES.CACHE)) {
 					const cacheStore = db.createObjectStore(STORES.CACHE, { keyPath: 'key' });
 					cacheStore.createIndex('expiresAt', 'expiresAt', { unique: false });
@@ -107,6 +119,13 @@ export class IndexedDBService {
 		});
 	}
 
+	/**
+	 * Ensure the database is ready and return the instance.
+	 *
+	 * @returns Database instance or null.
+	 * @example
+	 * const db = await this.ensureDB();
+	 */
 	private async ensureDB(): Promise<IDBDatabase | null> {
 		if (this.dbReady) {
 			await this.dbReady;
@@ -117,6 +136,13 @@ export class IndexedDBService {
 	// #endregion
 	// #region NOTIFICATIONS
 
+	/**
+	 * Get dismissed notification ids.
+	 *
+	 * @returns Notification storage data or null.
+	 * @example
+	 * const data = await idb.getDismissedNotifications();
+	 */
 	async getDismissedNotifications(): Promise<NotificationStorageData | null> {
 		const db = await this.ensureDB();
 		if (!db) return null;
@@ -150,6 +176,13 @@ export class IndexedDBService {
 		});
 	}
 
+	/**
+	 * Store dismissed notification ids.
+	 *
+	 * @param data Notification storage data.
+	 * @example
+	 * await idb.setDismissedNotifications({ ids: [1], date: '2025-01-01' });
+	 */
 	async setDismissedNotifications(data: NotificationStorageData): Promise<void> {
 		const db = await this.ensureDB();
 		if (!db) return;
@@ -184,6 +217,12 @@ export class IndexedDBService {
 		});
 	}
 
+	/**
+	 * Remove dismissed notification ids.
+	 *
+	 * @example
+	 * await idb.removeDismissedNotifications();
+	 */
 	async removeDismissedNotifications(): Promise<void> {
 		const db = await this.ensureDB();
 		if (!db) return;
@@ -202,6 +241,13 @@ export class IndexedDBService {
 		});
 	}
 
+	/**
+	 * Get read notification ids.
+	 *
+	 * @returns Notification storage data or null.
+	 * @example
+	 * const data = await idb.getReadNotifications();
+	 */
 	async getReadNotifications(): Promise<NotificationStorageData | null> {
 		const db = await this.ensureDB();
 		if (!db) return null;
@@ -231,6 +277,13 @@ export class IndexedDBService {
 		});
 	}
 
+	/**
+	 * Store read notification ids.
+	 *
+	 * @param data Notification storage data.
+	 * @example
+	 * await idb.setReadNotifications({ ids: [1], date: '2025-01-01' });
+	 */
 	async setReadNotifications(data: NotificationStorageData): Promise<void> {
 		const db = await this.ensureDB();
 		if (!db) return;
@@ -258,6 +311,12 @@ export class IndexedDBService {
 		});
 	}
 
+	/**
+	 * Remove read notification ids.
+	 *
+	 * @example
+	 * await idb.removeReadNotifications();
+	 */
 	async removeReadNotifications(): Promise<void> {
 		const db = await this.ensureDB();
 		if (!db) return;
@@ -276,6 +335,12 @@ export class IndexedDBService {
 		});
 	}
 
+	/**
+	 * Clear all notification records.
+	 *
+	 * @example
+	 * await idb.clearNotifications();
+	 */
 	async clearNotifications(): Promise<void> {
 		const db = await this.ensureDB();
 		if (!db) return;
@@ -295,8 +360,16 @@ export class IndexedDBService {
 	}
 
 	// #endregion
-	// #region CACHE GENERAL (para datos que expiran)
+	// #region CACHE
 
+	/**
+	 * Get cached value by key.
+	 *
+	 * @param key Cache key.
+	 * @returns Cached value or null.
+	 * @example
+	 * const value = await idb.getCache<string>('app_config');
+	 */
 	async getCache<T>(key: string): Promise<T | null> {
 		const db = await this.ensureDB();
 		if (!db) return null;
@@ -310,7 +383,6 @@ export class IndexedDBService {
 				request.onsuccess = () => {
 					const record = request.result as CacheRecord<T> | undefined;
 					if (record) {
-						// Verificar expiración
 						if (record.expiresAt && record.expiresAt < Date.now()) {
 							this.removeCache(key);
 							resolve(null);
@@ -329,6 +401,15 @@ export class IndexedDBService {
 		});
 	}
 
+	/**
+	 * Store cached value with optional TTL.
+	 *
+	 * @param key Cache key.
+	 * @param value Value to store.
+	 * @param ttlMs Optional time to live in ms.
+	 * @example
+	 * await idb.setCache('app_config', config, 60000);
+	 */
 	async setCache<T>(key: string, value: T, ttlMs?: number): Promise<void> {
 		const db = await this.ensureDB();
 		if (!db) return;
@@ -355,6 +436,13 @@ export class IndexedDBService {
 		});
 	}
 
+	/**
+	 * Remove cached value by key.
+	 *
+	 * @param key Cache key.
+	 * @example
+	 * await idb.removeCache('app_config');
+	 */
 	async removeCache(key: string): Promise<void> {
 		const db = await this.ensureDB();
 		if (!db) return;
@@ -373,6 +461,12 @@ export class IndexedDBService {
 		});
 	}
 
+	/**
+	 * Clear expired cache entries using the expiresAt index.
+	 *
+	 * @example
+	 * await idb.clearExpiredCache();
+	 */
 	async clearExpiredCache(): Promise<void> {
 		const db = await this.ensureDB();
 		if (!db) return;
@@ -406,12 +500,25 @@ export class IndexedDBService {
 	}
 
 	// #endregion
-	// #region UTILIDADES
+	// #region UTILITIES
 
+	/**
+	 * Clear notifications and expired cache entries.
+	 *
+	 * @example
+	 * await idb.clearAll();
+	 */
 	async clearAll(): Promise<void> {
 		await Promise.all([this.clearNotifications(), this.clearExpiredCache()]);
 	}
 
+	/**
+	 * Check whether the database is available.
+	 *
+	 * @returns True if ready.
+	 * @example
+	 * const ok = await idb.isAvailable();
+	 */
 	async isAvailable(): Promise<boolean> {
 		if (this.dbReady) {
 			return await this.dbReady;

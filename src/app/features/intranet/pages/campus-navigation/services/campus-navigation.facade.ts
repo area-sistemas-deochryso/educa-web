@@ -2,8 +2,9 @@ import { DestroyRef, inject, Injectable } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { catchError, EMPTY } from 'rxjs';
 
-import { logger } from '@core/helpers';
+import { logger, withRetry } from '@core/helpers';
 import { ErrorHandlerService } from '@core/services';
+import { UI_ADMIN_ERROR_DETAILS, UI_SUMMARIES } from '@app/shared/constants';
 
 import { CAMPUS_BLOCKED_PATHS, CAMPUS_EDGES, CAMPUS_NODES } from '../config';
 import { CampusNavigationApiService } from './campus-navigation-api.service';
@@ -27,12 +28,16 @@ export class CampusNavigationFacade {
 
 	loadSchedule(): void {
 		this.store.setLoading(true);
+		this.store.clearError();
 
 		this.api
 			.getMiHorarioHoy()
 			.pipe(
+				withRetry({ tag: 'CampusNavigationFacade:loadSchedule' }),
 				catchError((err) => {
 					logger.error('Error cargando horario del día:', err);
+					this.errorHandler.showError(UI_SUMMARIES.error, UI_ADMIN_ERROR_DETAILS.loadSchedule);
+					this.store.setError(UI_ADMIN_ERROR_DETAILS.loadSchedule);
 					this.store.setScheduleItems([]);
 					this.store.setLoading(false);
 					this.store.setScheduleReady(true);

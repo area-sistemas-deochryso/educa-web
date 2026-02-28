@@ -13,12 +13,21 @@ import { CommonModule } from '@angular/common';
 	templateUrl: './week-content-row.component.html',
 	styleUrls: ['./week-content-row.component.scss'],
 })
+/**
+ * Simple row with icon, text, and a single action trigger.
+ */
 export class WeekContentRowComponent {
-	// * Simple row with icon, text, and action link.
+	// #region Inputs/Outputs
+	/** PrimeIcons class for the leading icon. */
 	@Input() icon = 'pi-file';
+	/** Main label text. */
 	@Input() title = '';
+	/** Secondary label text. */
 	@Input() subtitle = '';
+	/** Action button label. */
 	@Input() actionLabel = 'Ver';
+	/** Emits when the action is clicked. */
 	@Output() action = new EventEmitter<void>();
+	// #endregion
 }
 // #endregion

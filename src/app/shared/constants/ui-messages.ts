@@ -86,6 +86,13 @@ export const UI_ADMIN_ERROR_DETAILS = {
 	horarioDetailLoad: 'No se pudo cargar el detalle del horario',
 	horarioEstadoChange: 'No se pudo cambiar el estado del horario',
 	horarioConflict: 'Ya existe un horario que se superpone en el mismo salón',
+	loadProfesorData: 'No se pudieron cargar los datos del profesor',
+	loadEstudiantesSalon: 'No se pudieron cargar los estudiantes del salón',
+	loadSchedule: 'No se pudo cargar el horario del día',
+	loadContenido: 'No se pudo cargar el contenido del curso',
+	loadVistasRol: 'No se pudieron cargar las vistas del rol',
+	searchUsuarios: 'No se pudieron buscar los usuarios',
+	refreshData: 'No se pudieron actualizar los datos',
 } as const;
 
 export const UI_ADMIN_ERROR_DETAILS_DYNAMIC = {
@@ -170,6 +177,7 @@ export const UI_HTTP_ERROR_MESSAGES: Record<number, string> = {
 	404: 'El recurso solicitado no fue encontrado.',
 	408: 'La solicitud ha tardado demasiado. Intente nuevamente.',
 	422: 'Los datos enviados no pudieron ser procesados.',
+	409: 'Los datos fueron modificados por otro usuario. Recargue e intente nuevamente.',
 	429: 'Demasiadas solicitudes. Espere un momento e intente nuevamente.',
 	500: 'Error interno del servidor. Intente mas tarde.',
 	502: 'El servidor no esta disponible temporalmente.',

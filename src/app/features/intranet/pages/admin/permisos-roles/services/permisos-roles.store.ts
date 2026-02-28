@@ -2,15 +2,11 @@ import { Injectable, signal, computed, inject } from '@angular/core';
 
 import { PermisoRol, Vista, ROLES_DISPONIBLES_ADMIN, RolTipoAdmin } from '@core/services';
 import { AdminUtilsService } from '@shared/services';
+import { buildModulosVistasForDetail, type ModuloVistas } from '../helpers/permisos-modulos.utils';
+
+export type { ModuloVistas } from '../helpers/permisos-modulos.utils';
 
 // #region Interfaces
-export interface ModuloVistas {
-	nombre: string;
-	vistas: Vista[];
-	seleccionadas: number;
-	total: number;
-}
-
 interface PermisosRolesEstadisticas {
 	totalRoles: number;
 	totalVistas: number;
@@ -27,6 +23,7 @@ export class PermisosRolesStore {
 	private readonly _permisosRol = signal<PermisoRol[]>([]);
 	private readonly _vistas = signal<Vista[]>([]);
 	private readonly _loading = signal(false);
+	private readonly _error = signal<string | null>(null);
 
 	private readonly _dialogVisible = signal(false);
 	private readonly _detailDrawerVisible = signal(false);
@@ -50,6 +47,7 @@ export class PermisosRolesStore {
 	readonly permisosRol = this._permisosRol.asReadonly();
 	readonly vistas = this._vistas.asReadonly();
 	readonly loading = this._loading.asReadonly();
+	readonly error = this._error.asReadonly();
 
 	readonly dialogVisible = this._dialogVisible.asReadonly();
 	readonly detailDrawerVisible = this._detailDrawerVisible.asReadonly();
@@ -131,30 +129,11 @@ export class PermisosRolesStore {
 		const permiso = this._selectedPermiso();
 		if (!permiso) return [];
 
-		const vistasActivas = this._vistas();
-		const modulosMap = new Map<string, Vista[]>();
-
-		permiso.vistas.forEach((ruta) => {
-			const modulo = this.adminUtils.getModuloFromRuta(ruta);
-			const moduloCapitalized = modulo.charAt(0).toUpperCase() + modulo.slice(1);
-			const vista = vistasActivas.find((v) => v.ruta === ruta);
-
-			if (!modulosMap.has(moduloCapitalized)) {
-				modulosMap.set(moduloCapitalized, []);
-			}
-			if (vista) {
-				modulosMap.get(moduloCapitalized)!.push(vista);
-			}
-		});
-
-		return Array.from(modulosMap.entries())
-			.sort((a, b) => a[0].localeCompare(b[0]))
-			.map(([nombre, vistas]) => ({
-				nombre,
-				vistas,
-				seleccionadas: vistas.length,
-				total: vistas.length,
-			}));
+		return buildModulosVistasForDetail(
+			permiso.vistas,
+			this._vistas(),
+			(ruta) => this.adminUtils.getModuloFromRuta(ruta),
+		);
 	});
 	// #endregion
 
@@ -162,6 +141,7 @@ export class PermisosRolesStore {
 	readonly vm = computed(() => ({
 		permisosRol: this.permisosRol(),
 		loading: this.loading(),
+		error: this.error(),
 		estadisticas: this.estadisticas(),
 
 		dialogVisible: this.dialogVisible(),
@@ -203,10 +183,24 @@ export class PermisosRolesStore {
 		this._loading.set(loading);
 	}
 
+	setError(error: string | null): void {
+		this._error.set(error);
+	}
+
+	clearError(): void {
+		this._error.set(null);
+	}
+
 	/** Mutación quirúrgica: eliminar 1 permiso */
 	removePermiso(id: number): void {
 		this._permisosRol.update((list) => list.filter((p) => p.id !== id));
 		this._totalRecords.update((t) => Math.max(0, t - 1));
+	}
+
+	/** Mutación quirúrgica: re-agregar 1 permiso (rollback de delete) */
+	addPermiso(permiso: PermisoRol): void {
+		this._permisosRol.update((list) => [permiso, ...list]);
+		this._totalRecords.update((t) => t + 1);
 	}
 
 	setPaginationData(page: number, pageSize: number, total: number): void {
@@ -322,34 +316,6 @@ export class PermisosRolesStore {
 		}));
 
 		this._modulosVistas.set(updated);
-	}
-	// #endregion
-
-	// #region Helpers — construir módulos de vistas
-	buildModulosVistas(vistasSeleccionadas: string[]): void {
-		const vistasActivas = this._vistas();
-		const modulosMap = new Map<string, Vista[]>();
-
-		vistasActivas.forEach((vista) => {
-			const modulo = this.adminUtils.getModuloFromRuta(vista.ruta);
-			const moduloCapitalized = modulo.charAt(0).toUpperCase() + modulo.slice(1);
-
-			if (!modulosMap.has(moduloCapitalized)) {
-				modulosMap.set(moduloCapitalized, []);
-			}
-			modulosMap.get(moduloCapitalized)!.push(vista);
-		});
-
-		const modulos: ModuloVistas[] = Array.from(modulosMap.entries())
-			.sort((a, b) => a[0].localeCompare(b[0]))
-			.map(([nombre, vistas]) => ({
-				nombre,
-				vistas: vistas.sort((a, b) => a.nombre.localeCompare(b.nombre)),
-				seleccionadas: vistas.filter((v) => vistasSeleccionadas.includes(v.ruta)).length,
-				total: vistas.length,
-			}));
-
-		this._modulosVistas.set(modulos);
 	}
 	// #endregion
 }

@@ -6,12 +6,21 @@ import { logger } from '@core/helpers';
 
 // #endregion
 // #region Implementation
+/**
+ * Task item shown in the tasks modal.
+ */
 export interface Task {
+	/** Task id. */
 	id: number;
+	/** Title shown in the list. */
 	title: string;
+	/** Detailed description. */
 	description: string;
+	/** Due date in DD/MM/YYYY format. */
 	dueDate: string;
+	/** Current task status. */
 	status: 'pending' | 'late' | 'submitted';
+	/** True when the task has been opened. */
 	isRead: boolean;
 }
 
@@ -21,17 +30,25 @@ export interface Task {
 	templateUrl: './tasks-modal.component.html',
 	styleUrl: './tasks-modal.component.scss',
 })
+/**
+ * Tasks modal for a selected week.
+ */
 export class TasksModalComponent {
-	// * Inputs/outputs for dialog state and week label.
+	// #region Inputs/Outputs
+	/** Whether the modal is visible. */
 	@Input() visible = false;
+	/** Week label shown in the header. */
 	@Input() weekName = '';
+	/** Two way binding for visibility. */
 	@Output() visibleChange = new EventEmitter<boolean>();
+	// #endregion
 
-	// * Static sample tasks (replace with API when available).
+	// #region Placeholder data
+	/** Static sample tasks (replace with API when available). */
 	tasks: Task[] = [
 		{
 			id: 1,
-			title: 'Ejercicios del capítulo 3',
+			title: 'Ejercicios del capitulo 3',
 			description: 'Resolver los ejercicios 1 al 15 del libro de texto',
 			dueDate: '25/01/2026',
 			status: 'pending',
@@ -40,22 +57,40 @@ export class TasksModalComponent {
 		{
 			id: 2,
 			title: 'Ensayo sobre el tema principal',
-			description: 'Redactar un ensayo de 500 palabras mínimo',
+			description: 'Redactar un ensayo de 500 palabras minimo',
 			dueDate: '28/01/2026',
 			status: 'pending',
 			isRead: false,
 		},
 	];
+	// #endregion
 
+	/**
+	 * Sync visibility and emit the two way binding event.
+	 *
+	 * @param value New visibility state.
+	 */
 	onVisibleChange(value: boolean): void {
 		this.visible = value;
 		this.visibleChange.emit(value);
 	}
 
+	/**
+	 * Resolve the status class name for the UI.
+	 *
+	 * @param status Task status.
+	 * @returns CSS class name.
+	 */
 	getStatusClass(status: string): string {
 		return `status-${status}`;
 	}
 
+	/**
+	 * Resolve a display label for a status key.
+	 *
+	 * @param status Task status.
+	 * @returns Label for UI.
+	 */
 	getStatusLabel(status: string): string {
 		const labels: Record<string, string> = {
 			pending: 'Pendiente',
@@ -65,8 +100,13 @@ export class TasksModalComponent {
 		return labels[status] || status;
 	}
 
+	/**
+	 * Get a human friendly remaining time label.
+	 *
+	 * @param dueDate Due date in DD/MM/YYYY.
+	 * @returns Label for remaining time.
+	 */
 	getDaysRemaining(dueDate: string): string {
-		// * Human-friendly remaining time label.
 		const [day, month, year] = dueDate.split('/').map(Number);
 		const due = new Date(year, month - 1, day);
 		const today = new Date();
@@ -77,18 +117,27 @@ export class TasksModalComponent {
 
 		if (diffDays < 0) return 'Vencido';
 		if (diffDays === 0) return 'Hoy';
-		if (diffDays === 1) return 'Mañana';
-		return `${diffDays} días`;
+		if (diffDays === 1) return 'Manana';
+		return `${diffDays} dias`;
 	}
 
+	/**
+	 * Mark a task as read in local state.
+	 *
+	 * @param task Task to update.
+	 */
 	markAsRead(task: Task): void {
 		task.isRead = true;
 	}
 
+	/**
+	 * Mark a task as read and open it.
+	 *
+	 * @param task Task to open.
+	 */
 	openTask(task: Task): void {
-		// * Mark as read and open (placeholder behavior).
 		this.markAsRead(task);
-		logger.log('Abriendo tarea:', task.title);
+		logger.log('Opening task:', task.title);
 	}
 }
 // #endregion

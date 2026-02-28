@@ -5,8 +5,13 @@ import { CommonModule } from '@angular/common';
 
 // #endregion
 // #region Implementation
+/**
+ * Evaluation summary item.
+ */
 export interface Evaluation {
+	/** Evaluation name. */
 	name: string;
+	/** Numeric grade value. */
 	grade: number;
 }
 
@@ -18,10 +23,17 @@ export interface Evaluation {
 	templateUrl: './evaluations-accordion.component.html',
 	styleUrls: ['./evaluations-accordion.component.scss'],
 })
+/**
+ * Accordion list of evaluations for a course.
+ */
 export class EvaluationsAccordionComponent {
-	// * Expanded state + list of evaluations.
+	// #region Inputs/Outputs
+	/** True when the accordion is expanded. */
 	@Input() expanded = false;
+	/** List of evaluation items. */
 	@Input() evaluations: Evaluation[] = [];
+	/** Emits when the accordion header is clicked. */
 	@Output() toggleTriggered = new EventEmitter<void>();
+	// #endregion
 }
 // #endregion

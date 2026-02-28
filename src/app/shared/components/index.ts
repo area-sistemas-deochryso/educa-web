@@ -11,4 +11,5 @@ export * from './stats-skeleton';
 export * from './lazy-content/lazy-content.component';
 export * from './responsive-table';
 export * from './devtools';
+export * from './sync-status';
 // #endregion

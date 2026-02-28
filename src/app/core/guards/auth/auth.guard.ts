@@ -4,20 +4,26 @@ import { CanActivateFn, Router } from '@angular/router';
 import { AuthService } from '@app/core/services';
 import { inject } from '@angular/core';
 
-// * Blocks intranet routes when there is no authenticated session.
+/**
+ * Guard that blocks intranet routes when there is no authenticated session.
+ *
+ * This guard checks local auth state only and does not call the server.
+ *
+ * @example
+ * canActivate: [authGuard]
+ */
 // #endregion
 // #region Implementation
 export const authGuard: CanActivateFn = () => {
 	const authService = inject(AuthService);
 	const router = inject(Router);
 
-	// Verificación del token local
-	// Nota: no hace roundtrip al servidor; solo valida el estado en memoria.
+	// Verify local auth state only.
 	if (authService.isAuthenticated) {
 		return true;
 	}
 
-	// No autenticado, redirigir al login
+	// Not authenticated, redirect to login.
 	return router.createUrlTree(['/intranet/login']);
 };
 // #endregion

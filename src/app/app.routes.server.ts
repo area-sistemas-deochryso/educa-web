@@ -41,10 +41,10 @@ export const serverRoutes: ServerRoute[] = [
 		path: 'terminos',
 		renderMode: RenderMode.Prerender,
 	},
-	// Intranet login - can be prerendered
+	// Intranet login - client-only (depends on cookies for session detection)
 	{
 		path: 'intranet/login',
-		renderMode: RenderMode.Prerender,
+		renderMode: RenderMode.Client,
 	},
 	// Intranet authenticated routes - client-side only
 	{

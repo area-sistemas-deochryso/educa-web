@@ -25,6 +25,7 @@ export class AuthRepository extends BaseRepository<UserProfile> {
 			catchError((error) => {
 				logger.error('[AuthRepository] Login error:', error);
 				return of({
+					success: false,
 					token: '',
 					rol: credentials.rol,
 					nombreCompleto: '',

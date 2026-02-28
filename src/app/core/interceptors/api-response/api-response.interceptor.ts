@@ -6,11 +6,15 @@ import { map } from 'rxjs';
 // #region Implementation
 
 /**
- * Desenvuelve respuestas ApiResponse<T> del backend transparentemente.
+ * Unwrap backend ApiResponse<T> envelopes transparently.
  *
- * - Si body tiene { success: true, data: T } → retorna T
- * - Si data es null pero message existe → retorna { mensaje: message } (backward compat)
- * - Si no es ApiResponse (file downloads, etc.) → pass through sin cambios
+ * Behavior:
+ * - If body has { success: true, data: T } return T.
+ * - If data is null and message exists, return { mensaje: message }.
+ * - If body is not ApiResponse, pass through unchanged.
+ *
+ * @example
+ * providers: [{ provide: HTTP_INTERCEPTORS, useValue: apiResponseInterceptor, multi: true }]
  */
 export const apiResponseInterceptor: HttpInterceptorFn = (req, next) => {
 	return next(req).pipe(

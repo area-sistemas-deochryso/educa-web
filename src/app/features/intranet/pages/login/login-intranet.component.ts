@@ -2,10 +2,10 @@
 import { AppValidators, LoginFormGroup } from '@shared/validators';
 import {
 	AuthService,
+	StoredSession,
 	SwService,
 	UserPermisosService,
 	UserRole,
-	VerifyTokenResponse,
 } from '@core/services';
 import { ChangeDetectionStrategy, Component, DestroyRef, OnInit, inject, signal } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
@@ -18,8 +18,6 @@ import {
 	LoginRoleSelectorComponent,
 	RolOption,
 } from '@shared/components/login';
-import { debounceTime, distinctUntilChanged } from 'rxjs';
-
 import { CommonModule } from '@angular/common';
 import { FormErrorComponent } from '@shared/components/form-error';
 import { InputTextModule } from 'primeng/inputtext';
@@ -74,9 +72,10 @@ export class LoginIntranetComponent implements OnInit {
 	showError = signal(false);
 	isLoading = signal(false);
 	showPassword = signal(false);
+	showLoginForm = signal(false);
 
-	// * Remembered users for login autofill (from stored tokens).
-	private rememberedUsers: VerifyTokenResponse[] = [];
+	// * Stored sessions for quick-login (server-side, no passwords exposed).
+	storedSessions = signal<StoredSession[]>([]);
 
 	// * Role options rendered in the selector (order is intentional).
 	roles: RolOption[] = [
@@ -93,59 +92,52 @@ export class LoginIntranetComponent implements OnInit {
 			return;
 		}
 		this.authService.resetAttempts();
-		this.loadRememberedUsers();
-		this.setupDniAutocomplete();
+		this.loadStoredSessions();
 	}
 
-	private loadRememberedUsers(): void {
-		// * Pull all persisted tokens to offer quick login.
+	private loadStoredSessions(): void {
 		this.authService
-			.verifyAllStoredTokens()
+			.getSessions()
 			.pipe(takeUntilDestroyed(this.destroyRef))
 			.subscribe({
-				next: (users) => {
-					this.rememberedUsers = users;
-					// Si hay usuarios, autocompletar con el primero
-					if (users.length > 0) {
-						this.autofillFromUser(users[0]);
+				next: (sessions) => {
+					this.storedSessions.set(sessions);
+					if (sessions.length > 0) {
+						this.loginForm.patchValue({ rol: sessions[0].rol as UserRole });
+					} else {
+						// No stored sessions → show form directly
+						this.showLoginForm.set(true);
 					}
+				},
+				error: () => {
+					// API error → show form as fallback
+					this.showLoginForm.set(true);
 				},
 			});
 	}
 
-	private setupDniAutocomplete(): void {
-		// * Debounced lookup to avoid noisy updates while typing.
-		this.loginForm.controls.dni.valueChanges
-			.pipe(takeUntilDestroyed(this.destroyRef), debounceTime(300), distinctUntilChanged())
-			.subscribe((dni) => {
-				this.tryAutocompleteFromDni(dni);
+	/**
+	 * Quick-login using a stored server session.
+	 * No password needed — the server already has the JWT.
+	 */
+	quickLogin(session: StoredSession): void {
+		this.isLoading.set(true);
+		this.authService
+			.switchSession(session.sessionId)
+			.pipe(takeUntilDestroyed(this.destroyRef))
+			.subscribe({
+				next: () => {
+					this.isLoading.set(false);
+					this.swService.clearCache();
+					this.userPermisosService.clear();
+					this.router.navigate(['/intranet']);
+				},
+				error: () => {
+					this.isLoading.set(false);
+					this.errorMessage.set('Error al cambiar de sesión');
+					this.showError.set(true);
+				},
 			});
-	}
-
-	private tryAutocompleteFromDni(dni: string): void {
-		// ? Only attempt after 3 chars to reduce false matches.
-		if (!dni || dni.length < 3) return;
-
-		// Buscar usuario que coincida con el DNI
-		const matchingUser = this.rememberedUsers.find((user) => user.dni === dni);
-
-		if (matchingUser) {
-			this.autofillFromUser(matchingUser, false); // false = no sobrescribir DNI
-		}
-	}
-
-	private autofillFromUser(user: VerifyTokenResponse, includeDni = true): void {
-		// * includeDni=false preserves what the user already typed.
-		const patchData: Partial<{ dni: string; password: string; rol: UserRole }> = {
-			password: user.contraseña,
-			rol: user.rol,
-		};
-
-		if (includeDni) {
-			patchData.dni = user.dni;
-		}
-
-		this.loginForm.patchValue(patchData);
 	}
 
 	get remainingAttempts(): number {
@@ -188,7 +180,7 @@ export class LoginIntranetComponent implements OnInit {
 				next: (response) => {
 					this.isLoading.set(false);
 
-					if (response.token) {
+					if (response.success) {
 						// ! Clear SW cache + permisos to avoid leaking previous session state.
 						this.swService.clearCache();
 						this.userPermisosService.clear();
@@ -221,6 +213,47 @@ export class LoginIntranetComponent implements OnInit {
 	onForgotPassword(event: Event): void {
 		event.preventDefault();
 		// TODO: Implementar recuperacion de contrasena
+	}
+
+	showForm(): void {
+		this.showLoginForm.set(true);
+	}
+
+	backToSessions(): void {
+		this.showLoginForm.set(false);
+		this.showError.set(false);
+		this.errorMessage.set('');
+	}
+
+	removeSession(event: Event, session: StoredSession): void {
+		event.stopPropagation();
+		this.authService
+			.removeSession(session.sessionId)
+			.pipe(takeUntilDestroyed(this.destroyRef))
+			.subscribe({
+				next: () => {
+					this.storedSessions.update((sessions) =>
+						sessions.filter((s) => s.sessionId !== session.sessionId),
+					);
+					// If no sessions left, show the login form
+					if (this.storedSessions().length === 0) {
+						this.showLoginForm.set(true);
+					}
+				},
+				error: () => {
+					this.errorMessage.set('Error al eliminar la sesión');
+					this.showError.set(true);
+				},
+			});
+	}
+
+	getInitials(name: string): string {
+		return name
+			.split(' ')
+			.slice(0, 2)
+			.map((w) => w[0])
+			.join('')
+			.toUpperCase();
 	}
 
 	togglePasswordVisibility(): void {

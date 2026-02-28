@@ -1,6 +1,6 @@
 // #region Imports
 import { Injectable, computed, signal } from '@angular/core';
-import { PermisoUsuario, PermisoRol, Vista, RolTipoAdmin } from '@core/services';
+import { PermisoUsuario, PermisoRol, Vista, RolTipoAdmin, UsuarioBusqueda } from '@core/services';
 
 // #endregion
 // #region Implementation
@@ -20,6 +20,7 @@ export class PermisosUsuariosStore {
 
 	// Estado privado - UI
 	private readonly _loading = signal(false);
+	private readonly _error = signal<string | null>(null);
 	private readonly _searchTerm = signal('');
 	private readonly _filterRol = signal<RolTipoAdmin | null>(null);
 
@@ -34,6 +35,9 @@ export class PermisosUsuariosStore {
 	private readonly _selectedRol = signal<RolTipoAdmin | null>(null);
 	private readonly _selectedVistas = signal<string[]>([]);
 
+	// Estado privado - Autocomplete
+	private readonly _usuariosSugeridos = signal<UsuarioBusqueda[]>([]);
+
 	// Estado privado - Module tabs
 	private readonly _modulosVistas = signal<ModuloVistas[]>([]);
 	private readonly _activeModuloIndex = signal(0);
@@ -46,6 +50,7 @@ export class PermisosUsuariosStore {
 
 	// Estado público readonly - UI
 	readonly loading = this._loading.asReadonly();
+	readonly error = this._error.asReadonly();
 	readonly searchTerm = this._searchTerm.asReadonly();
 	readonly filterRol = this._filterRol.asReadonly();
 
@@ -59,6 +64,9 @@ export class PermisosUsuariosStore {
 	readonly selectedUsuarioId = this._selectedUsuarioId.asReadonly();
 	readonly selectedRol = this._selectedRol.asReadonly();
 	readonly selectedVistas = this._selectedVistas.asReadonly();
+
+	// Estado público readonly - Autocomplete
+	readonly usuariosSugeridos = this._usuariosSugeridos.asReadonly();
 
 	// Estado público readonly - Module tabs
 	readonly modulosVistas = this._modulosVistas.asReadonly();
@@ -120,6 +128,16 @@ export class PermisosUsuariosStore {
 		this._permisosUsuario.set(permisos);
 	}
 
+	/** Mutación quirúrgica: eliminar 1 permiso usuario */
+	removePermisoUsuario(id: number): void {
+		this._permisosUsuario.update((list) => list.filter((p) => p.id !== id));
+	}
+
+	/** Mutación quirúrgica: re-agregar 1 permiso usuario (rollback de delete) */
+	addPermisoUsuario(permiso: PermisoUsuario): void {
+		this._permisosUsuario.update((list) => [permiso, ...list]);
+	}
+
 	setPermisosRol(permisos: PermisoRol[]): void {
 		this._permisosRol.set(permisos);
 	}
@@ -131,6 +149,14 @@ export class PermisosUsuariosStore {
 	// Comandos - UI
 	setLoading(loading: boolean): void {
 		this._loading.set(loading);
+	}
+
+	setError(error: string | null): void {
+		this._error.set(error);
+	}
+
+	clearError(): void {
+		this._error.set(null);
 	}
 
 	setSearchTerm(term: string): void {
@@ -206,6 +232,11 @@ export class PermisosUsuariosStore {
 		}
 	}
 
+	// Comandos - Autocomplete
+	setUsuariosSugeridos(usuarios: UsuarioBusqueda[]): void {
+		this._usuariosSugeridos.set(usuarios);
+	}
+
 	// Comandos - Module tabs
 	setModulosVistas(modulos: ModuloVistas[]): void {
 		this._modulosVistas.set(modulos);
@@ -237,6 +268,7 @@ export class PermisosUsuariosStore {
 		this._selectedUsuarioId.set(null);
 		this._selectedRol.set(null);
 		this._selectedVistas.set([]);
+		this._usuariosSugeridos.set([]);
 		this._modulosVistas.set([]);
 		this._activeModuloIndex.set(0);
 		this._vistasBusqueda.set('');

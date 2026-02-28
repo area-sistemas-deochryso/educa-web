@@ -376,7 +376,7 @@
 						<p-autoComplete
 							id="usuario"
 							[(ngModel)]="selectedUsuario"
-							[suggestions]="usuariosSugeridos"
+							[suggestions]="usuariosSugeridos()"
 							(completeMethod)="buscarUsuarios($event)"
 							(onSelect)="onUsuarioSeleccionado($event)"
 							(onClear)="onUsuarioClear()"

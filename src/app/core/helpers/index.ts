@@ -6,4 +6,5 @@ export * from './logging';
 export * from './nivel-educativo.utils';
 export * from './password.utils';
 export * from './file-download.utils';
+export * from './rxjs';
 // #endregion

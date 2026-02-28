@@ -10,9 +10,15 @@ import {
 	withEnabledBlockingInitialNavigation,
 	withPreloading,
 } from '@angular/router';
-import { apiResponseInterceptor, authInterceptor, errorInterceptor, requestTraceInterceptor } from '@core/interceptors';
+import {
+	apiResponseInterceptor,
+	authInterceptor,
+	credentialsInterceptor,
+	errorInterceptor,
+	requestTraceInterceptor,
+} from '@core/interceptors';
 import { provideClientHydration, withEventReplay } from '@angular/platform-browser';
-import { provideHttpClient, withFetch, withInterceptors } from '@angular/common/http';
+import { provideHttpClient, withFetch, withInterceptors, withXsrfConfiguration } from '@angular/common/http';
 
 import Aura from '@primeng/themes/aura';
 import { DEBUG_CONFIG } from './core/helpers/debug/debug.type';
@@ -38,7 +44,17 @@ export const appConfig: ApplicationConfig = {
 		),
 		provideHttpClient(
 			withFetch(),
-			withInterceptors([authInterceptor, requestTraceInterceptor, apiResponseInterceptor, errorInterceptor]),
+			withInterceptors([
+				credentialsInterceptor, // FIRST: ensure cookies are sent
+				authInterceptor, // Will be simplified (no-op) after full migration
+				requestTraceInterceptor,
+				apiResponseInterceptor,
+				errorInterceptor,
+			]),
+			withXsrfConfiguration({
+				cookieName: 'XSRF-TOKEN',
+				headerName: 'X-XSRF-TOKEN',
+			}),
 		),
 		provideAnimationsAsync(),
 		providePrimeNG({

@@ -1,0 +1,120 @@
+<!-- #region Floating indicator -->
+@if (isVisible()) {
+	<button
+		type="button"
+		class="sync-indicator"
+		[class]="indicatorClass()"
+		[pTooltip]="tooltipText()"
+		tooltipPosition="left"
+		(click)="openDrawer()"
+		[attr.aria-label]="tooltipText()"
+	>
+		<i [class]="indicatorIcon()"></i>
+		@if (badgeCount() > 0) {
+			<p-badge [value]="'' + badgeCount()" severity="danger" />
+		}
+	</button>
+}
+<!-- #endregion -->
+
+<!-- #region Drawer -->
+<p-drawer
+	[visible]="drawerVisible()"
+	(visibleChange)="onDrawerVisibleChange($event)"
+	position="right"
+	[modal]="true"
+	styleClass="sync-drawer"
+>
+	<ng-template #header>
+		<div class="drawer-header">
+			<h3>Operaciones pendientes</h3>
+		</div>
+	</ng-template>
+
+	<!-- Batch actions -->
+	@if (vm().failedCount > 0) {
+		<div class="batch-actions">
+			<span class="batch-label">
+				{{ vm().failedCount }} operacion(es) fallida(s)
+			</span>
+			<div class="batch-buttons">
+				<button
+					pButton
+					icon="pi pi-refresh"
+					label="Reintentar todo"
+					class="p-button-sm p-button-outlined"
+					(click)="retryAll()"
+				></button>
+				<button
+					pButton
+					icon="pi pi-trash"
+					label="Descartar todo"
+					class="p-button-sm p-button-outlined p-button-danger"
+					(click)="discardAll()"
+				></button>
+			</div>
+		</div>
+	}
+
+	<!-- Failed entries list -->
+	@if (vm().failedEntries.length > 0) {
+		<div class="entries-list">
+			@for (entry of vm().failedEntries; track entry.id) {
+				<div class="entry-card entry-card--failed">
+					<div class="entry-info">
+						<span class="entry-description">
+							{{ getEntryDescription(entry) }}
+						</span>
+						<span class="entry-time">
+							{{ entry.timestamp | date: 'short' }}
+						</span>
+						@if (entry.error) {
+							<span class="entry-error">{{ entry.error }}</span>
+						}
+					</div>
+					<div class="entry-actions">
+						<button
+							pButton
+							icon="pi pi-refresh"
+							class="p-button-sm p-button-rounded p-button-text"
+							(click)="retryEntry(entry.id)"
+							[pt]="{
+								root: {
+									'aria-label': 'Reintentar',
+								},
+							}"
+						></button>
+						<button
+							pButton
+							icon="pi pi-times"
+							class="p-button-sm p-button-rounded p-button-text p-button-danger"
+							(click)="discardEntry(entry.id)"
+							[pt]="{
+								root: {
+									'aria-label': 'Descartar',
+								},
+							}"
+						></button>
+					</div>
+				</div>
+			}
+		</div>
+	} @else {
+		<!-- Syncing / pending state -->
+		@if (vm().hasPending || vm().hasActivity) {
+			<div class="empty-state">
+				<i class="pi pi-sync sync-spinning"></i>
+				<p>Sincronizando operaciones...</p>
+				<span class="pending-count">
+					{{ vm().pendingCount + vm().inFlightCount }} pendiente(s)
+				</span>
+			</div>
+		} @else {
+			<div class="empty-state">
+				<i class="pi pi-check-circle"></i>
+				<p>Todo sincronizado</p>
+			</div>
+		}
+	}
+</p-drawer>
+<!-- #endregion -->

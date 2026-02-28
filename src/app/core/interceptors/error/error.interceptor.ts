@@ -29,6 +29,16 @@ export const errorInterceptor: HttpInterceptorFn = (req, next) => {
 				(error.error as Record<string, unknown> | null)?.['traceId'] ??
 				undefined;
 
+			// * 409 Conflict: datos modificados por otro usuario (concurrencia optimista).
+			if (error.status === 409) {
+				errorHandler.showWarning(
+					'Datos desactualizados',
+					'Otro usuario modificó este registro. Recargue los datos e intente nuevamente.',
+					6000,
+				);
+				return throwError(() => error);
+			}
+
 			errorHandler.handleHttpError(error, {
 				url: req.url,
 				method: req.method,

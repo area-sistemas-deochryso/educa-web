@@ -7,15 +7,20 @@ const NIVEL_ORDER: NivelEducativo[] = ['Inicial', 'Primaria', 'Secundaria'];
 // #region Classification
 
 /**
- * Detecta el nivel educativo de un nombre de grado.
- * @example detectarNivel('INICIAL 3 AÑOS') → 'Inicial'
- * @example detectarNivel('PRIMARIA 1') → 'Primaria'
- * @example detectarNivel('SECUNDARIA IV') → 'Secundaria'
+ * Detect the education level from a grade name.
+ *
+ * @param gradoNombre Grade name string.
+ * @returns Level or null if not detected.
+ * @example
+ * detectarNivel('INICIAL 3 ANOS');
  */
 export function detectarNivel(gradoNombre: string): NivelEducativo | null {
-	const lower = gradoNombre.toLowerCase();
+	const lower = gradoNombre
+		.toLowerCase()
+		.normalize('NFD')
+		.replace(/[\u0300-\u036f]/g, '');
 
-	if (lower.includes('inicial') || lower.includes('años')) return 'Inicial';
+	if (lower.includes('inicial') || lower.includes('anos')) return 'Inicial';
 	if (lower.includes('primaria')) return 'Primaria';
 	if (lower.includes('secundaria')) return 'Secundaria';
 
@@ -23,8 +28,12 @@ export function detectarNivel(gradoNombre: string): NivelEducativo | null {
 }
 
 /**
- * Determina los niveles educativos presentes en un array de nombres de grado.
- * Retorna en orden lógico: Inicial → Primaria → Secundaria.
+ * Determine which education levels are present in a list of grade names.
+ *
+ * @param grados Grade names.
+ * @returns Levels in logical order.
+ * @example
+ * const niveles = determinarNiveles(['INICIAL 3 ANOS', 'PRIMARIA 1']);
  */
 export function determinarNiveles(grados: string[]): NivelEducativo[] {
 	const niveles = new Set<NivelEducativo>();
@@ -38,7 +47,13 @@ export function determinarNiveles(grados: string[]): NivelEducativo[] {
 }
 
 /**
- * Filtra un array de items con propiedad `nombre` por nivel educativo.
+ * Filter items by education level using their nombre property.
+ *
+ * @param items Items with nombre.
+ * @param nivel Target level.
+ * @returns Filtered items.
+ * @example
+ * const prim = filtrarPorNivel(items, 'Primaria');
  */
 export function filtrarPorNivel<T extends { nombre: string }>(
 	items: T[],
@@ -48,7 +63,13 @@ export function filtrarPorNivel<T extends { nombre: string }>(
 }
 
 /**
- * Verifica si un nombre de grado pertenece a un nivel dado.
+ * Check if a grade name belongs to a specific level.
+ *
+ * @param gradoNombre Grade name.
+ * @param nivel Target level.
+ * @returns True if it matches.
+ * @example
+ * const ok = esNivel('PRIMARIA 1', 'Primaria');
  */
 export function esNivel(gradoNombre: string, nivel: NivelEducativo): boolean {
 	return detectarNivel(gradoNombre) === nivel;
@@ -65,9 +86,12 @@ const NIVEL_PREFIXES: Record<NivelEducativo, RegExp> = {
 };
 
 /**
- * Remueve el prefijo de nivel de un nombre de grado.
- * @example removeNivelPrefix('INICIAL 3 AÑOS') → '3 AÑOS'
- * @example removeNivelPrefix('PRIMARIA 1') → '1'
+ * Remove the level prefix from a grade name.
+ *
+ * @param gradoNombre Grade name.
+ * @returns Grade name without the level prefix.
+ * @example
+ * removeNivelPrefix('INICIAL 3 ANOS');
  */
 export function removeNivelPrefix(gradoNombre: string): string {
 	const nivel = detectarNivel(gradoNombre);
