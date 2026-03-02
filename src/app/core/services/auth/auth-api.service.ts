@@ -1,4 +1,4 @@
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Injectable, inject } from '@angular/core';
 import { Observable, catchError, of } from 'rxjs';
 
@@ -14,6 +14,8 @@ import { LoginRequest, LoginResponse, StoredSession, UserProfile, VerifyTokenRes
 export class AuthApiService {
 	private http = inject(HttpClient);
 	private readonly apiUrl = `${environment.apiUrl}/api/Auth`;
+	/** Suppresses the global error toast for optional calls with local catchError. */
+	private readonly silentHeaders = new HttpHeaders({ 'X-Skip-Error-Toast': 'true' });
 
 	// #region Auth
 
@@ -37,7 +39,7 @@ export class AuthApiService {
 	 */
 	getProfile(): Observable<UserProfile | null> {
 		return this.http
-			.get<UserProfile>(`${this.apiUrl}/perfil`)
+			.get<UserProfile>(`${this.apiUrl}/perfil`, { headers: this.silentHeaders })
 			.pipe(catchError(() => of(null)));
 	}
 
@@ -62,7 +64,7 @@ export class AuthApiService {
 	 */
 	getSessions(): Observable<StoredSession[]> {
 		return this.http
-			.get<StoredSession[]>(`${this.apiUrl}/sessions`)
+			.get<StoredSession[]>(`${this.apiUrl}/sessions`, { headers: this.silentHeaders })
 			.pipe(catchError(() => of([])));
 	}
 

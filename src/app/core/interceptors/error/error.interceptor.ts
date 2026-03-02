@@ -17,8 +17,13 @@ export const errorInterceptor: HttpInterceptorFn = (req, next) => {
 
 	return next(req).pipe(
 		catchError((error: HttpErrorResponse) => {
-			// No procesar errores de login/verificar (se manejan localmente en el formulario).
+			// Skip URLs handled locally (login form, token verification).
 			if (req.url.includes('/login') || req.url.includes('/verificar')) {
+				return throwError(() => error);
+			}
+
+			// Skip requests that handle their own errors (e.g. optional API calls with catchError).
+			if (req.headers.has('X-Skip-Error-Toast')) {
 				return throwError(() => error);
 			}
 			logger.error('[ErrorInterceptor] HTTP Error:', error.status, req.url);

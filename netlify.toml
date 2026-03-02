@@ -38,6 +38,13 @@
   [headers.values]
     Cache-Control = "public, max-age=31536000, immutable"
 
+# Proxy API requests to Azure backend (must be BEFORE the SPA fallback)
+[[redirects]]
+  from = "/api/*"
+  to = "https://educa1.azurewebsites.net/api/:splat"
+  status = 200
+  force = true
+
 # Redirección SPA - fallback para rutas de Angular
 [[redirects]]
   from = "/*"
