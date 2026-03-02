@@ -27,31 +27,45 @@ import { ScheduleModalsState } from '@core/services/storage';
 	templateUrl: './schedule.component.html',
 	styleUrl: './schedule.component.scss',
 })
+/**
+ * Schedule page with calendar and modal shortcuts.
+ */
 export class ScheduleComponent implements OnInit, OnDestroy {
+	// #region Dependencies
 	private voiceService = inject(VoiceRecognitionService);
 	private route = inject(ActivatedRoute);
 	private storage = inject(StorageService);
 	private destroyRef = inject(DestroyRef);
 	private voiceUnsubscribers: (() => void)[] = [];
+	// #endregion
 
-	// * Modal visibility flags (kept in sync with storage).
+	// #region Modal state
+	/** True when the schedule modal is open. */
 	showScheduleModal = false;
+	/** True when the summary modal is open. */
 	showSummaryModal = false;
+	/** True when the course details modal is open. */
 	showDetailsModal = false;
+	/** True when the grades modal is open. */
 	showGradesModal = false;
 
-	// * Course context for details/grades modals.
+	/** Selected course for details and grades modals. */
 	selectedCourse: string | null = null;
+	// #endregion
 
+	/**
+	 * Restore modal state and register listeners.
+	 */
 	ngOnInit(): void {
-		// * Restore persisted modal state and wire voice/query listeners.
 		this.restoreModalsState();
 		this.registerVoiceModals();
 		this.handleQueryParams();
 	}
 
+	/**
+	 * Handle modal deep links from URL query params.
+	 */
 	private handleQueryParams(): void {
-		// * URL query params can deep-link to a specific modal.
 		this.route.queryParams.pipe(takeUntilDestroyed(this.destroyRef)).subscribe((params) => {
 			const modal = params['modal'];
 			if (modal) {
@@ -73,13 +87,17 @@ export class ScheduleComponent implements OnInit, OnDestroy {
 		});
 	}
 
+	/**
+	 * Clean up voice listeners to avoid leaks.
+	 */
 	ngOnDestroy(): void {
-		// * Clean up voice listeners to avoid leaks.
 		this.voiceUnsubscribers.forEach((unsub) => unsub());
 	}
 
+	/**
+	 * Register voice commands for each modal.
+	 */
 	private registerVoiceModals(): void {
-		// * Register voice shortcuts for each modal.
 		this.voiceUnsubscribers.push(
 			this.voiceService.registerModal({
 				name: 'horario',
@@ -89,17 +107,17 @@ export class ScheduleComponent implements OnInit, OnDestroy {
 			}),
 		);
 
-		// * Summary modal
+		// Summary modal
 		this.voiceUnsubscribers.push(
 			this.voiceService.registerModal({
 				name: 'resumen',
-				aliases: ['resumen académico', 'el resumen', 'summary', 'resumen de cursos'],
+				aliases: ['resumen academico', 'el resumen', 'summary', 'resumen de cursos'],
 				open: () => this.openSummaryModal(),
 				close: () => this.onSummaryModalClose(),
 			}),
 		);
 
-		// * Grades modal (requires selectedCourse)
+		// Grades modal (requires selectedCourse)
 		this.voiceUnsubscribers.push(
 			this.voiceService.registerModal({
 				name: 'notas',
@@ -113,11 +131,11 @@ export class ScheduleComponent implements OnInit, OnDestroy {
 			}),
 		);
 
-		// * Details modal (requires selectedCourse)
+		// Details modal (requires selectedCourse)
 		this.voiceUnsubscribers.push(
 			this.voiceService.registerModal({
 				name: 'detalles',
-				aliases: ['detalles del curso', 'detalle', 'información del curso'],
+				aliases: ['detalles del curso', 'detalle', 'informacion del curso'],
 				open: () => {
 					if (this.selectedCourse) {
 						this.openDetailsModal(this.selectedCourse);
@@ -127,7 +145,7 @@ export class ScheduleComponent implements OnInit, OnDestroy {
 			}),
 		);
 
-		// * Global "close modal" command.
+		// Global "close modal" command.
 		this.voiceUnsubscribers.push(
 			this.voiceService.onCommand((command) => {
 				if (command === 'close-modal') {
@@ -137,8 +155,10 @@ export class ScheduleComponent implements OnInit, OnDestroy {
 		);
 	}
 
+	/**
+	 * Close the active modal using a priority order.
+	 */
 	private closeActiveModal(): void {
-		// * Close the active modal (priority order).
 		if (this.showGradesModal) {
 			this.onGradesModalClose();
 		} else if (this.showDetailsModal) {
@@ -150,10 +170,19 @@ export class ScheduleComponent implements OnInit, OnDestroy {
 		}
 	}
 
+	/**
+	 * Read modal state from storage.
+	 */
 	private getModalsState(): ScheduleModalsState {
 		return this.storage.getScheduleModalsState();
 	}
 
+	/**
+	 * Persist a modal state change in storage.
+	 *
+	 * @param modal Modal key to update.
+	 * @param value New state value.
+	 */
 	private saveModalState(
 		modal: keyof ScheduleModalsState,
 		value: boolean | { visible: boolean; course: string },
@@ -161,8 +190,10 @@ export class ScheduleComponent implements OnInit, OnDestroy {
 		this.storage.updateScheduleModalState(modal, value);
 	}
 
+	/**
+	 * Restore modals state from storage.
+	 */
 	private restoreModalsState(): void {
-		// * Restore from storage to keep modal state between visits.
 		const state = this.getModalsState();
 
 		if (state.schedule) {
@@ -181,28 +212,36 @@ export class ScheduleComponent implements OnInit, OnDestroy {
 		}
 	}
 
+	/** Open schedule modal and persist state. */
 	openScheduleModal(): void {
 		this.showScheduleModal = true;
 		this.saveModalState('schedule', true);
 	}
 
+	/** Close schedule modal and persist state. */
 	onScheduleModalClose(): void {
 		this.showScheduleModal = false;
 		this.saveModalState('schedule', false);
 	}
 
+	/** Open summary modal and persist state. */
 	openSummaryModal(): void {
 		this.showSummaryModal = true;
 		this.saveModalState('summary', true);
 	}
 
+	/** Close summary modal and persist state. */
 	onSummaryModalClose(): void {
 		this.showSummaryModal = false;
 		this.saveModalState('summary', false);
 	}
 
+	/**
+	 * Open details modal and close other modals.
+	 *
+	 * @param courseName Selected course name.
+	 */
 	openDetailsModal(courseName: string): void {
-		// * Switching to details closes other modals and persists state.
 		this.selectedCourse = courseName;
 		this.showScheduleModal = false;
 		this.showSummaryModal = false;
@@ -212,13 +251,18 @@ export class ScheduleComponent implements OnInit, OnDestroy {
 		this.saveModalState('details', { visible: true, course: courseName });
 	}
 
+	/** Close details modal and persist state. */
 	onDetailsModalClose(): void {
 		this.showDetailsModal = false;
 		this.saveModalState('details', { visible: false, course: '' });
 	}
 
+	/**
+	 * Open grades modal and close other modals.
+	 *
+	 * @param courseName Selected course name.
+	 */
 	openGradesModal(courseName: string): void {
-		// * Switching to grades closes other modals and persists state.
 		this.selectedCourse = courseName;
 		this.showScheduleModal = false;
 		this.showSummaryModal = false;
@@ -230,6 +274,7 @@ export class ScheduleComponent implements OnInit, OnDestroy {
 		this.saveModalState('grades', { visible: true, course: courseName });
 	}
 
+	/** Close grades modal and persist state. */
 	onGradesModalClose(): void {
 		this.showGradesModal = false;
 		this.saveModalState('grades', { visible: false, course: '' });

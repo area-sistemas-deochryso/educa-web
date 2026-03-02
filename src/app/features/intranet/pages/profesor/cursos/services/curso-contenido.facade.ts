@@ -61,11 +61,11 @@ export class CursoContenidoFacade {
 				takeUntilDestroyed(this.destroyRef),
 			)
 			.subscribe({
-				next: (response) => {
-					this.store.setContenido(response.data);
+				next: (contenido) => {
+					this.store.setContenido(contenido);
 					this.store.setLoading(false);
 
-					if (response.data) {
+					if (contenido) {
 						this.store.openContentDialog();
 					} else {
 						this.store.openBuilderDialog();
@@ -108,8 +108,8 @@ export class CursoContenidoFacade {
 					this.store.openBuilderDialog();
 				},
 			},
-			onCommit: (response) => {
-				this.store.setContenido(response.data);
+			onCommit: (contenido) => {
+				this.store.setContenido(contenido);
 				this.store.openContentDialog();
 			},
 			onError: (err) => this.handleApiError(err, 'crear contenido'),
@@ -187,9 +187,9 @@ export class CursoContenidoFacade {
 					if (snapshot) this.store.updateSemana(semanaId, snapshot);
 				},
 			},
-			onCommit: (response) => {
+			onCommit: (semana) => {
 				// Server-confirmed data replaces optimistic
-				this.store.updateSemana(semanaId, response.data);
+				this.store.updateSemana(semanaId, semana);
 			},
 			onError: (err) => this.handleApiError(err, 'actualizar semana'),
 		});
@@ -235,8 +235,8 @@ export class CursoContenidoFacade {
 							apply: () => this.store.setSaving(false),
 							rollback: () => {},
 						},
-						onCommit: (response) => {
-							this.store.addArchivoToSemana(semanaId, response.data);
+						onCommit: (archivo) => {
+							this.store.addArchivoToSemana(semanaId, archivo);
 						},
 						onError: (err) => this.handleApiError(err, 'registrar archivo'),
 					});
@@ -315,8 +315,8 @@ export class CursoContenidoFacade {
 					this.store.openTareaDialog(null);
 				},
 			},
-			onCommit: (response) => {
-				this.store.addTareaToSemana(semanaId, response.data);
+			onCommit: (tarea) => {
+				this.store.addTareaToSemana(semanaId, tarea);
 			},
 			onError: (err) => this.handleApiError(err, 'crear tarea'),
 		});
@@ -360,8 +360,8 @@ export class CursoContenidoFacade {
 					if (snapshot) this.store.updateTareaInSemana(semanaId, tareaId, snapshot);
 				},
 			},
-			onCommit: (response) => {
-				this.store.updateTareaInSemana(semanaId, tareaId, response.data);
+			onCommit: (tarea) => {
+				this.store.updateTareaInSemana(semanaId, tareaId, tarea);
 			},
 			onError: (err) => this.handleApiError(err, 'actualizar tarea'),
 		});

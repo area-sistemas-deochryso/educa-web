@@ -19,16 +19,26 @@ import { InputNumberModule } from 'primeng/inputnumber';
 			(visibleChange)="onVisibleChange($event)"
 			[modal]="true"
 			header="Crear Contenido del Curso"
-			[style]="{ width: '420px', maxWidth: '95vw' }"
+			[style]="{ width: '460px', maxWidth: '95vw' }"
 		>
-			<div class="flex flex-column gap-3 pt-2">
-				<p class="text-color-secondary m-0">
-					Define cuántas semanas tendrá el contenido de este curso. Podrás agregar archivos y
-					tareas a cada semana después.
-				</p>
+			<div class="flex flex-column gap-4 py-2">
+				<!-- Intro -->
+				<div class="flex align-items-start gap-3">
+					<div
+						class="flex align-items-center justify-content-center border-circle flex-shrink-0"
+						style="width: 2.75rem; height: 2.75rem; background: var(--primary-100); color: var(--primary-600)"
+					>
+						<i class="pi pi-book text-xl"></i>
+					</div>
+					<p class="text-color-secondary m-0 line-height-3">
+						Define cuántas semanas tendrá el contenido de este curso. Podrás agregar archivos y
+						tareas a cada semana después.
+					</p>
+				</div>
 
-				<div class="flex flex-column gap-2">
-					<label for="numSemanas" class="font-semibold">Número de semanas</label>
+				<!-- Input -->
+				<div class="flex flex-column gap-2 px-2">
+					<label for="numSemanas" class="font-semibold text-sm">Número de semanas</label>
 					<p-inputNumber
 						id="numSemanas"
 						[(ngModel)]="numeroSemanas"
@@ -38,18 +48,19 @@ import { InputNumberModule } from 'primeng/inputnumber';
 						buttonLayout="horizontal"
 						incrementButtonIcon="pi pi-plus"
 						decrementButtonIcon="pi pi-minus"
-						inputStyleClass="w-full text-center"
+						inputStyleClass="w-full text-center font-semibold text-lg"
 						styleClass="w-full"
 					/>
+					<small class="text-color-secondary">Mínimo 1, máximo 52 semanas</small>
 				</div>
 			</div>
 
 			<ng-template #footer>
-				<div class="flex justify-content-end gap-2">
+				<div class="flex justify-content-end gap-2 pt-2">
 					<button pButton label="Cancelar" class="p-button-text" (click)="onCancel()"></button>
 					<button
 						pButton
-						label="Crear"
+						label="Crear contenido"
 						icon="pi pi-check"
 						(click)="onCreate()"
 						[loading]="saving()"

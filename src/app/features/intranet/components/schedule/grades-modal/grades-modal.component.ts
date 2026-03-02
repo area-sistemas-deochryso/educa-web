@@ -6,15 +6,27 @@ import { DialogModule } from 'primeng/dialog';
 
 // #endregion
 // #region Implementation
+/**
+ * Evaluation item shown in the grades modal.
+ */
 export interface Evaluation {
+	/** Evaluation name. */
 	name: string;
+	/** Base grade value. */
 	grade: number;
+	/** True when the grade can be edited in simulation mode. */
 	editable?: boolean;
+	/** Temporary grade value used for simulation. */
 	tempGrade?: number;
 }
 
+/**
+ * Grades summary for a course.
+ */
 export interface CourseGrades {
+	/** Course name. */
 	name: string;
+	/** List of evaluations for the course. */
 	evaluations: Evaluation[];
 }
 
@@ -24,25 +36,45 @@ export interface CourseGrades {
 	templateUrl: './grades-modal.component.html',
 	styleUrl: './grades-modal.component.scss',
 })
+/**
+ * Grades modal with optional simulation mode.
+ */
 export class GradesModalComponent implements OnChanges {
-	// * Inputs/outputs for dialog state and selected course.
+	// #region Inputs/Outputs
+	/** Whether the modal is visible. */
 	@Input() visible = false;
+	/** Selected course name or null. */
 	@Input() courseName: string | null = null;
+	/** Two way binding for visibility. */
 	@Output() visibleChange = new EventEmitter<boolean>();
+	// #endregion
 
-	// * Simulation mode enables temporary grade edits.
+	// #region State
+	/** Simulation mode enables temporary grade edits. */
 	simulationMode = false;
 
 	currentCourseGrades: CourseGrades = this.getDefaultCourseGrades('');
+	// #endregion
 
+	/**
+	 * Reset grades when course changes.
+	 *
+	 * @param changes Angular change map.
+	 */
 	ngOnChanges(changes: SimpleChanges): void {
-		// * Reset grades when course changes.
 		if (changes['courseName'] && this.courseName) {
 			this.currentCourseGrades = this.getDefaultCourseGrades(this.courseName);
 			this.simulationMode = false;
 		}
 	}
 
+	/**
+	 * Build default static grades for the modal.
+	 * This is placeholder data until the API is wired.
+	 *
+	 * @param courseName Course name to show in the header.
+	 * @returns Default course grades.
+	 */
 	getDefaultCourseGrades(courseName: string): CourseGrades {
 		return {
 			name: courseName,
@@ -56,13 +88,20 @@ export class GradesModalComponent implements OnChanges {
 		};
 	}
 
+	/**
+	 * Sync visibility and emit the two way binding event.
+	 *
+	 * @param value New visibility state.
+	 */
 	onVisibleChange(value: boolean): void {
 		this.visible = value;
 		this.visibleChange.emit(value);
 	}
 
+	/**
+	 * Toggle simulation mode and prepare temporary grades.
+	 */
 	toggleSimulation(): void {
-		// * Enable temp grades to calculate "what-if" average.
 		this.simulationMode = !this.simulationMode;
 		if (this.simulationMode) {
 			this.currentCourseGrades.evaluations.forEach((eval_) => {
@@ -74,6 +113,9 @@ export class GradesModalComponent implements OnChanges {
 		}
 	}
 
+	/**
+	 * Clear temporary grades and editing flags.
+	 */
 	resetTempGrades(): void {
 		this.currentCourseGrades.evaluations.forEach((eval_) => {
 			eval_.tempGrade = undefined;
@@ -81,12 +123,24 @@ export class GradesModalComponent implements OnChanges {
 		});
 	}
 
+	/**
+	 * Resolve the grade shown in the UI for an evaluation.
+	 *
+	 * @param evaluation Evaluation item.
+	 * @returns Display grade value.
+	 */
 	getDisplayGrade(evaluation: Evaluation): number {
 		return this.simulationMode && evaluation.tempGrade !== undefined
 			? evaluation.tempGrade
 			: evaluation.grade;
 	}
 
+	/**
+	 * Update temporary grade if the value is within range.
+	 *
+	 * @param evaluation Evaluation to update.
+	 * @param value Input value as string.
+	 */
 	updateTempGrade(evaluation: Evaluation, value: string): void {
 		const numValue = parseInt(value, 10);
 		if (!isNaN(numValue) && numValue >= 0 && numValue <= 20) {
@@ -94,6 +148,9 @@ export class GradesModalComponent implements OnChanges {
 		}
 	}
 
+	/**
+	 * Average grade for display, using temp grades when in simulation mode.
+	 */
 	get currentAverage(): number {
 		const grades = this.currentCourseGrades.evaluations.map((e) =>
 			this.simulationMode && e.tempGrade !== undefined ? e.tempGrade : e.grade,
@@ -102,6 +159,11 @@ export class GradesModalComponent implements OnChanges {
 		return Math.round((sum / grades.length) * 10) / 10;
 	}
 
+	/**
+	 * Resolve a grade class based on the numeric value.
+	 *
+	 * @param grade Grade value.
+	 */
 	getGradeClass(grade: number): string {
 		if (grade === 0) return 'grade-red';
 		if (grade < 11) return 'grade-red';

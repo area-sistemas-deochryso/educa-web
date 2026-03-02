@@ -8,9 +8,15 @@ import { TooltipModule } from 'primeng/tooltip';
 
 // #endregion
 // #region Implementation
+/**
+ * Calendar cell state for the month grid.
+ */
 export interface CalendarDay {
+	/** Day number or null for empty cells. */
 	day: number | null;
+	/** True when the day belongs to the current month. */
 	isCurrentMonth: boolean;
+	/** True when the day is today. */
 	isToday: boolean;
 }
 
@@ -20,20 +26,27 @@ export interface CalendarDay {
 	templateUrl: './schedule-calendar.component.html',
 	styleUrl: './schedule-calendar.component.scss',
 })
+/**
+ * Calendar view with month navigation and day actions.
+ */
 export class ScheduleCalendarComponent implements OnInit {
+	/** Context menu reference for a day. */
 	@ViewChild('dayMenu') dayMenu!: Menu;
+	/** Emits when user opens the schedule modal. */
 	@Output() openSchedule = new EventEmitter<void>();
+	/** Emits when user opens the summary modal. */
 	@Output() openSummary = new EventEmitter<void>();
 
-	// * Current calendar view state.
+	// #region Calendar state
 	currentDate = new Date();
 	currentMonth: number;
 	currentYear: number;
 	calendarDays: CalendarDay[] = [];
 	selectedDay: number | null = null;
+	// #endregion
 
-	// * Header labels.
-	dayHeaders = ['Lun', 'Mar', 'Mie', 'Jue', 'Vie', 'Sáb', 'Dom'];
+	// #region Labels
+	dayHeaders = ['Lun', 'Mar', 'Mie', 'Jue', 'Vie', 'Sab', 'Dom'];
 
 	monthNames = [
 		'ENERO',
@@ -49,9 +62,9 @@ export class ScheduleCalendarComponent implements OnInit {
 		'NOVIEMBRE',
 		'DICIEMBRE',
 	];
+	// #endregion
 
 	menuItems: MenuItem[] = [
-		// * Context actions for a day.
 		{ label: 'Ver Horarios', command: () => this.openSchedule.emit() },
 		{ label: 'Ver Notas / Asistencias', command: () => this.openSummary.emit() },
 	];
@@ -61,12 +74,17 @@ export class ScheduleCalendarComponent implements OnInit {
 		this.currentYear = this.currentDate.getFullYear();
 	}
 
+	/**
+	 * Build the initial calendar grid.
+	 */
 	ngOnInit(): void {
 		this.generateCalendar();
 	}
 
+	/**
+	 * Build a 6x7 grid (42 cells) with leading and trailing days.
+	 */
 	generateCalendar(): void {
-		// * Build a 6x7 grid (42 cells) with leading/trailing days.
 		this.calendarDays = [];
 		const firstDay = new Date(this.currentYear, this.currentMonth, 1);
 		const lastDay = new Date(this.currentYear, this.currentMonth + 1, 0);
@@ -98,6 +116,7 @@ export class ScheduleCalendarComponent implements OnInit {
 		}
 	}
 
+	/** Move to the previous month. */
 	previousMonth(): void {
 		this.currentMonth--;
 		if (this.currentMonth < 0) {
@@ -107,6 +126,7 @@ export class ScheduleCalendarComponent implements OnInit {
 		this.generateCalendar();
 	}
 
+	/** Move to the next month. */
 	nextMonth(): void {
 		this.currentMonth++;
 		if (this.currentMonth > 11) {
@@ -116,18 +136,28 @@ export class ScheduleCalendarComponent implements OnInit {
 		this.generateCalendar();
 	}
 
+	/**
+	 * Display label for the current month and year.
+	 */
 	get monthYearDisplay(): string {
 		return `${this.monthNames[this.currentMonth]} ${this.currentYear}`;
 	}
 
+	/**
+	 * Select a day and open the context menu.
+	 *
+	 * @param event Click event.
+	 * @param calDay Selected calendar cell.
+	 */
 	onDayClick(event: Event, calDay: CalendarDay): void {
-		// * Select a day and open the context menu.
 		this.selectedDay = calDay.day;
 		this.dayMenu.toggle(event);
 	}
 
+	/**
+	 * Jump to the current month and year.
+	 */
 	goToToday(): void {
-		// * Jump to current month/year.
 		const today = new Date();
 		this.currentMonth = today.getMonth();
 		this.currentYear = today.getFullYear();

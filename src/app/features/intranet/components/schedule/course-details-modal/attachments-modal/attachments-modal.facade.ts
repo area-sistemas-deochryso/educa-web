@@ -114,8 +114,8 @@ export class AttachmentsModalFacade {
 								this.store.setUploading(false);
 							},
 						},
-						onCommit: (response) => {
-							this.store.addAttachment(this.mapToAttachment(response.data));
+						onCommit: (archivo) => {
+							this.store.addAttachment(this.mapToAttachment(archivo));
 						},
 						onError: (err) => this.handleApiError(err, 'registrar archivo'),
 					});

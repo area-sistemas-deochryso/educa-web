@@ -50,11 +50,29 @@ export class CursoContentDialogComponent {
 		const query = this.searchQuery().toLowerCase().trim();
 		if (!query) return semanas;
 
-		return semanas.filter(
-			(s) =>
-				`Semana ${s.numeroSemana}`.toLowerCase().includes(query) ||
-				(s.titulo && s.titulo.toLowerCase().includes(query)),
-		);
+		return semanas.filter((s) => {
+			// Week number or title
+			if (`Semana ${s.numeroSemana}`.toLowerCase().includes(query)) return true;
+			if (s.titulo?.toLowerCase().includes(query)) return true;
+
+			// File names
+			if (s.archivos.some((a) => a.nombreArchivo.toLowerCase().includes(query))) return true;
+
+			// Task titles
+			if (s.tareas.some((t) => t.titulo.toLowerCase().includes(query))) return true;
+
+			// Task dates (dd/MM/yyyy format)
+			if (
+				s.tareas.some((t) => {
+					if (!t.fechaLimite) return false;
+					const formatted = new Date(t.fechaLimite).toLocaleDateString('es-PE');
+					return formatted.includes(query);
+				})
+			)
+				return true;
+
+			return false;
+		});
 	});
 
 	// #endregion

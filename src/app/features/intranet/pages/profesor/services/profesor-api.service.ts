@@ -19,13 +19,11 @@ import {
 	CursoContenidoTareaDto,
 } from '../models';
 
-/** Response wrapper used by the API. */
-interface ApiResponse<T> {
-	data: T;
-}
-
 /**
  * API client for professor endpoints.
+ *
+ * NOTE: The apiResponseInterceptor already unwraps { success, data } envelopes,
+ * so return types here reflect the unwrapped payload (T, not ApiResponse<T>).
  */
 @Injectable({ providedIn: 'root' })
 export class ProfesorApiService {
@@ -94,8 +92,8 @@ export class ProfesorApiService {
 	 * @param horarioId Schedule id.
 	 * @returns Observable with content detail or null.
 	 */
-	getContenido(horarioId: number): Observable<ApiResponse<CursoContenidoDetalleDto | null>> {
-		return this.http.get<ApiResponse<CursoContenidoDetalleDto | null>>(
+	getContenido(horarioId: number): Observable<CursoContenidoDetalleDto | null> {
+		return this.http.get<CursoContenidoDetalleDto | null>(
 			`${this.contenidoUrl}/horario/${horarioId}`,
 		);
 	}
@@ -105,8 +103,8 @@ export class ProfesorApiService {
 	 * @param request Creation payload.
 	 * @returns Observable with created content detail.
 	 */
-	crearContenido(request: CrearCursoContenidoRequest): Observable<ApiResponse<CursoContenidoDetalleDto>> {
-		return this.http.post<ApiResponse<CursoContenidoDetalleDto>>(this.contenidoUrl, request);
+	crearContenido(request: CrearCursoContenidoRequest): Observable<CursoContenidoDetalleDto> {
+		return this.http.post<CursoContenidoDetalleDto>(this.contenidoUrl, request);
 	}
 	/**
 	 * Delete course content by id.
@@ -124,8 +122,8 @@ export class ProfesorApiService {
 	 * @param request Update payload.
 	 * @returns Observable with updated week detail.
 	 */
-	actualizarSemana(semanaId: number, request: ActualizarSemanaRequest): Observable<ApiResponse<CursoContenidoSemanaDto>> {
-		return this.http.put<ApiResponse<CursoContenidoSemanaDto>>(
+	actualizarSemana(semanaId: number, request: ActualizarSemanaRequest): Observable<CursoContenidoSemanaDto> {
+		return this.http.put<CursoContenidoSemanaDto>(
 			`${this.contenidoUrl}/semana/${semanaId}`,
 			request,
 		);
@@ -137,8 +135,8 @@ export class ProfesorApiService {
 	 * @param request Attachment metadata payload.
 	 * @returns Observable with created attachment detail.
 	 */
-	registrarArchivo(semanaId: number, request: RegistrarArchivoRequest): Observable<ApiResponse<CursoContenidoArchivoDto>> {
-		return this.http.post<ApiResponse<CursoContenidoArchivoDto>>(
+	registrarArchivo(semanaId: number, request: RegistrarArchivoRequest): Observable<CursoContenidoArchivoDto> {
+		return this.http.post<CursoContenidoArchivoDto>(
 			`${this.contenidoUrl}/semana/${semanaId}/archivo`,
 			request,
 		);
@@ -159,8 +157,8 @@ export class ProfesorApiService {
 	 * @param request Task creation payload.
 	 * @returns Observable with created task detail.
 	 */
-	crearTarea(semanaId: number, request: CrearTareaRequest): Observable<ApiResponse<CursoContenidoTareaDto>> {
-		return this.http.post<ApiResponse<CursoContenidoTareaDto>>(
+	crearTarea(semanaId: number, request: CrearTareaRequest): Observable<CursoContenidoTareaDto> {
+		return this.http.post<CursoContenidoTareaDto>(
 			`${this.contenidoUrl}/semana/${semanaId}/tarea`,
 			request,
 		);
@@ -172,8 +170,8 @@ export class ProfesorApiService {
 	 * @param request Task update payload.
 	 * @returns Observable with updated task detail.
 	 */
-	actualizarTarea(tareaId: number, request: ActualizarTareaRequest): Observable<ApiResponse<CursoContenidoTareaDto>> {
-		return this.http.put<ApiResponse<CursoContenidoTareaDto>>(
+	actualizarTarea(tareaId: number, request: ActualizarTareaRequest): Observable<CursoContenidoTareaDto> {
+		return this.http.put<CursoContenidoTareaDto>(
 			`${this.contenidoUrl}/tarea/${tareaId}`,
 			request,
 		);
