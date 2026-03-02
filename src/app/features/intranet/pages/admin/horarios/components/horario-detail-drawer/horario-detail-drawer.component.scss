@@ -262,11 +262,6 @@
       border: 1px solid var(--surface-border);
       transition: all 0.2s;
 
-      &:hover {
-        background: var(--surface-100);
-        transform: translateX(4px);
-      }
-
       .student-avatar {
         width: 36px;
         height: 36px;
@@ -385,10 +380,6 @@
     .student-item {
       background: var(--surface-100);
       border-color: var(--surface-border);
-
-      &:hover {
-        background: var(--surface-200);
-      }
     }
   }
 }

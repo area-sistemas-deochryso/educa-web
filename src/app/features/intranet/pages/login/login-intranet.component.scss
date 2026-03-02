@@ -82,8 +82,8 @@
 	min-width: 0;
 
 	&:hover:not(:disabled) {
-		border-color: var(--primary-color);
-		box-shadow: 0 0 0 1px var(--primary-color);
+		border-color: #16a34a;
+		box-shadow: 0 0 0 1px #16a34a;
 	}
 
 	&:disabled {
@@ -160,7 +160,7 @@
 	transition: color 0.15s;
 
 	.session-card:hover:not(:disabled) & {
-		color: var(--primary-color);
+		color: #16a34a;
 	}
 }
 
