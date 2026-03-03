@@ -68,12 +68,26 @@ export class WalSyncEngine {
 	// #region Lifecycle
 
 	constructor() {
-		this.start();
+		this.init();
 	}
+
+	/**
+	 * Async initialization: recovery MUST complete before processing starts.
+	 * Prevents race condition where isOnline$ triggers processAllPending()
+	 * before IN_FLIGHT entries from previous session are recovered.
+	 */
+	private async init(): Promise<void> {
+		// Phase 1: Recover stale entries and cleanup
+		await this.initRecovery();
+
+		// Phase 2: Start listeners (only after recovery completes)
+		this.startListeners();
+	}
+
 	/**
 	 * Start sync engine timers and online listeners.
 	 */
-	start(): void {
+	private startListeners(): void {
 		if (this._isRunning) return;
 		this._isRunning = true;
 
@@ -94,9 +108,6 @@ export class WalSyncEngine {
 				takeUntilDestroyed(this.destroyRef),
 			)
 			.subscribe();
-
-		// On startup: recover IN_FLIGHT entries and cleanup old COMMITTED
-		this.initRecovery();
 
 		logger.log('[WAL-Sync] Engine started');
 	}
@@ -154,24 +165,30 @@ export class WalSyncEngine {
 	}
 
 	/**
-	 * Process all PENDING entries (typically on reconnect).
+	 * Process all PENDING entries serially (typically on reconnect).
+	 * Drain loop: re-checks for new entries added during processing
+	 * so rapid-fire mutations are serialized without waiting for the timer.
 	 */
 	async processAllPending(): Promise<void> {
 		if (this._isProcessing || !this.sw.isOnline) return;
 
 		this._isProcessing = true;
 		try {
-			const entries = await this.wal.getPendingEntries();
-			if (entries.length === 0) return;
+			let entries = await this.wal.getPendingEntries();
 
-			logger.log(`[WAL-Sync] Processing ${entries.length} pending entries`);
+			while (entries.length > 0 && this.sw.isOnline) {
+				logger.log(`[WAL-Sync] Processing ${entries.length} pending entries`);
 
-			for (const entry of entries) {
-				if (!this.sw.isOnline) {
-					logger.log('[WAL-Sync] Went offline, stopping processing');
-					break;
+				for (const entry of entries) {
+					if (!this.sw.isOnline) {
+						logger.log('[WAL-Sync] Went offline, stopping processing');
+						return;
+					}
+					await this.processEntry(entry);
 				}
-				await this.processEntry(entry);
+
+				// Drain: pick up entries added while we were processing
+				entries = await this.wal.getPendingEntries();
 			}
 		} finally {
 			this._isProcessing = false;
@@ -180,12 +197,17 @@ export class WalSyncEngine {
 
 	/**
 	 * Process retryable entries based on nextRetryAt.
+	 * Also recovers stale IN_FLIGHT entries as a safety net:
+	 * if _isProcessing is false, no entries should be legitimately IN_FLIGHT.
 	 */
 	async processRetryable(): Promise<void> {
 		if (this._isProcessing || !this.sw.isOnline) return;
 
 		this._isProcessing = true;
 		try {
+			// Safety net: if we're not processing, any IN_FLIGHT entries are stale
+			await this.wal.recoverInFlight();
+
 			const entries = await this.wal.getRetryableEntries();
 			if (entries.length === 0) return;
 
@@ -202,30 +224,54 @@ export class WalSyncEngine {
 
 	/**
 	 * Process a single WAL entry and return the result.
+	 * Outer try/catch ensures entry never stays stuck IN_FLIGHT
+	 * even if an unexpected error occurs (IndexedDB failure, etc.).
 	 *
 	 * @param entry WAL entry.
 	 */
 	async processEntry(entry: WalEntry): Promise<WalProcessResult> {
-		await this.wal.markInFlight(entry.id);
-
-		const cb = this.callbacks.get(entry.id);
-
 		try {
-			const result = await this.sendRequest(entry, cb);
+			await this.wal.markInFlight(entry.id);
 
-			// Success: COMMITTED
-			await this.wal.markCommitted(entry.id);
-			cb?.onCommit(result);
-			this.callbacks.delete(entry.id);
+			const cb = this.callbacks.get(entry.id);
 
-			const processResult: WalProcessResult = {
-				status: 'COMMITTED',
+			try {
+				const result = await this.sendRequest(entry, cb);
+
+				// Success: commit and immediately clean up from IndexedDB
+				await this.wal.commitAndClean(entry.id);
+				cb?.onCommit(result);
+				this.callbacks.delete(entry.id);
+
+				const processResult: WalProcessResult = {
+					status: 'COMMITTED',
+					entryId: entry.id,
+				};
+				this._entryProcessed$.next(processResult);
+				return processResult;
+			} catch (error) {
+				return this.handleError(entry, error, cb);
+			}
+		} catch (unexpected) {
+			// Safety net: entry stuck IN_FLIGHT due to unexpected error
+			// Reset to PENDING so the periodic timer can retry it
+			logger.error('[WAL-Sync] Unexpected error, resetting entry to PENDING:', unexpected);
+			try {
+				const current = await this.wal.getEntry(entry.id);
+				if (current && current.status === 'IN_FLIGHT') {
+					await this.wal.retryEntry(entry.id);
+				}
+			} catch {
+				// DB unavailable — safety net in processRetryable will catch it
+			}
+
+			const result: WalProcessResult = {
+				status: 'FAILED',
 				entryId: entry.id,
+				error: 'Unexpected processing error',
 			};
-			this._entryProcessed$.next(processResult);
-			return processResult;
-		} catch (error) {
-			return this.handleError(entry, error, cb);
+			this._entryProcessed$.next(result);
+			return result;
 		}
 	}
 

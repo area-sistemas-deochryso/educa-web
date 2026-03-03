@@ -1,0 +1,97 @@
+<!-- #region Loading / Empty -->
+@if (vm().loading) {
+	<div class="loading-overlay">
+		<i class="pi pi-spin pi-spinner" style="font-size: 2rem"></i>
+		<p>Cargando horario...</p>
+	</div>
+} @else if (vm().isEmpty) {
+	<div class="empty-state">
+		<i class="pi pi-calendar" style="font-size: 3rem; opacity: 0.3"></i>
+		<p>No tienes horarios asignados</p>
+	</div>
+} @else {
+	<!-- #endregion -->
+	<!-- #region Header -->
+	<div class="horario-page">
+		<h2 class="page-title">
+			<i class="pi pi-calendar mr-2"></i>Mi Horario
+		</h2>
+
+		<!-- #endregion -->
+		<!-- #region Weekly Grid -->
+		<div class="weekly-scroll-wrapper">
+			<div class="weekly-grid">
+				<!-- Columna de tiempo -->
+				<div class="time-column">
+					<div class="time-header">Hora</div>
+					@for (hora of HORAS; track hora) {
+						<div class="time-slot">{{ hora }}</div>
+					}
+				</div>
+
+				<!-- Columnas por día -->
+				@for (dia of DIAS; track dia.value) {
+					<div class="day-column">
+						<div class="day-header">
+							<span class="day-full">{{ dia.label }}</span>
+							<span class="day-short">{{ dia.short }}</span>
+						</div>
+
+						<div class="day-grid">
+							<!-- Líneas de fondo para las horas -->
+							@for (hora of HORAS; track hora) {
+								<div class="hour-line"></div>
+							}
+
+							<!-- Bloques de horario -->
+							<div class="blocks-container">
+								@for (block of getBlocksForDay(dia.value); track block.id) {
+									<div
+										class="horario-block"
+										[ngStyle]="getBlockStyle(block)"
+										[pTooltip]="getTooltipContent(block)"
+										tooltipPosition="top"
+									>
+										<div class="block-content">
+											<div class="curso-nombre">{{ block.cursoNombre }}</div>
+											<div class="block-detail">
+												<i class="pi pi-clock"></i>
+												{{ block.horaInicio }} - {{ block.horaFin }}
+											</div>
+											<div class="block-detail">
+												<i class="pi pi-building"></i>
+												{{ block.salonDescripcion }}
+											</div>
+											<div class="block-detail">
+												<i class="pi pi-users"></i>
+												{{ block.cantidadEstudiantes }} estudiantes
+											</div>
+										</div>
+
+										<!-- Acción hover -->
+										<div class="block-action">
+											<button
+												pButton
+												icon="pi pi-eye"
+												class="p-button-rounded p-button-sm action-btn"
+												pTooltip="Ver asistencia"
+												tooltipPosition="top"
+												(click)="verAsistencia(block)"
+												[pt]="{
+													root: {
+														'aria-label': 'Ver asistencia de ' + block.cursoNombre,
+													},
+												}"
+											></button>
+										</div>
+									</div>
+								}
+							</div>
+						</div>
+					</div>
+				}
+			</div>
+		</div>
+	</div>
+	<!-- #endregion -->
+}

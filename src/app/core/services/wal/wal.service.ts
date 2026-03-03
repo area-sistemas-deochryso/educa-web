@@ -77,6 +77,23 @@ export class WalService {
 			id,
 		);
 	}
+
+	/**
+	 * Commit and immediately delete an entry.
+	 * Avoids accumulating COMMITTED entries in IndexedDB.
+	 *
+	 * @param id Entry id.
+	 */
+	async commitAndClean(id: string): Promise<void> {
+		const entry = await this.db.get(id);
+		if (!entry) return;
+
+		logger.log(
+			`[WAL] Committed: ${entry.operation} ${entry.resourceType}`,
+			id,
+		);
+		await this.db.delete(id);
+	}
 	/**
 	 * Mark an entry as FAILED and store the error.
 	 *

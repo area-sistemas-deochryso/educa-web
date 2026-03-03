@@ -69,8 +69,9 @@ export class WalFacadeHelper {
 
 			// Step 4: Send or queue
 			if (this.sw.isOnline) {
-				// Online: attempt immediate send
-				this.syncEngine.sendNow(entry).then(() => {
+				// Online: serialize via processAllPending (drain loop picks up new entries)
+				// Prevents concurrent requests to the same DB row on rapid clicks
+				this.syncEngine.processAllPending().finally(() => {
 					this.statusStore.refresh();
 				});
 			} else {
