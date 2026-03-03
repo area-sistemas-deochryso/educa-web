@@ -21,22 +21,29 @@ import { CursoContenidoSemanaDto, ActualizarSemanaRequest } from '../../../model
 			(visibleChange)="onVisibleChange($event)"
 			[modal]="true"
 			[header]="semana() ? 'Editar Semana ' + semana()!.numeroSemana : 'Editar Semana'"
-			[style]="{ width: '500px', maxWidth: '95vw' }"
+			[style]="{ width: '520px', maxWidth: '95vw' }"
 		>
-			<div class="flex flex-column gap-3 pt-2">
-				<div class="flex flex-column gap-2">
-					<label for="titulo" class="font-semibold">Título</label>
+			<div class="edit-form">
+				<div class="form-field">
+					<label for="titulo" class="form-label">
+						<i class="pi pi-bookmark" style="font-size: 0.78rem"></i>
+						Título
+					</label>
 					<input
 						pInputText
 						id="titulo"
 						[(ngModel)]="titulo"
 						placeholder="Ej: Introducción al tema"
 						[maxlength]="200"
+						class="w-full"
 					/>
 				</div>
 
-				<div class="flex flex-column gap-2">
-					<label for="descripcion" class="font-semibold">Descripción</label>
+				<div class="form-field">
+					<label for="descripcion" class="form-label">
+						<i class="pi pi-align-left" style="font-size: 0.78rem"></i>
+						Descripción
+					</label>
 					<textarea
 						pTextarea
 						id="descripcion"
@@ -45,11 +52,15 @@ import { CursoContenidoSemanaDto, ActualizarSemanaRequest } from '../../../model
 						[maxlength]="2000"
 						placeholder="Descripción de los temas de la semana..."
 						[autoResize]="true"
+						class="w-full"
 					></textarea>
 				</div>
 
-				<div class="flex flex-column gap-2">
-					<label for="mensaje" class="font-semibold">Mensaje para estudiantes</label>
+				<div class="form-field">
+					<label for="mensaje" class="form-label">
+						<i class="pi pi-comment" style="font-size: 0.78rem"></i>
+						Mensaje para estudiantes
+					</label>
 					<textarea
 						pTextarea
 						id="mensaje"
@@ -58,6 +69,7 @@ import { CursoContenidoSemanaDto, ActualizarSemanaRequest } from '../../../model
 						[maxlength]="2000"
 						placeholder="Mensaje o indicaciones para los estudiantes..."
 						[autoResize]="true"
+						class="w-full"
 					></textarea>
 				</div>
 			</div>
@@ -75,6 +87,30 @@ import { CursoContenidoSemanaDto, ActualizarSemanaRequest } from '../../../model
 				</div>
 			</ng-template>
 		</p-dialog>
+	`,
+	styles: `
+		.edit-form {
+			display: flex;
+			flex-direction: column;
+			gap: 1.25rem;
+			padding: 0.5rem 1rem;
+		}
+		.form-field {
+			display: flex;
+			flex-direction: column;
+			gap: 0.5rem;
+		}
+		.form-label {
+			font-size: 0.82rem;
+			font-weight: 600;
+			color: var(--text-color);
+			display: flex;
+			align-items: center;
+			gap: 0.4rem;
+			i {
+				color: var(--text-color-secondary);
+			}
+		}
 	`,
 })
 export class SemanaEditDialogComponent implements OnChanges {

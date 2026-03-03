@@ -22,22 +22,29 @@ import { CursoContenidoTareaDto, CrearTareaRequest, ActualizarTareaRequest } fro
 			(visibleChange)="onVisibleChange($event)"
 			[modal]="true"
 			[header]="tarea() ? 'Editar Tarea' : 'Nueva Tarea'"
-			[style]="{ width: '480px', maxWidth: '95vw' }"
+			[style]="{ width: '520px', maxWidth: '95vw' }"
 		>
-			<div class="flex flex-column gap-3 pt-2">
-				<div class="flex flex-column gap-2">
-					<label for="tareaTitle" class="font-semibold">Título *</label>
+			<div class="edit-form">
+				<div class="form-field">
+					<label for="tareaTitle" class="form-label">
+						<i class="pi pi-file-edit" style="font-size: 0.78rem"></i>
+						Título *
+					</label>
 					<input
 						pInputText
 						id="tareaTitle"
 						[(ngModel)]="titulo"
 						placeholder="Título de la tarea"
 						[maxlength]="200"
+						class="w-full"
 					/>
 				</div>
 
-				<div class="flex flex-column gap-2">
-					<label for="tareaDesc" class="font-semibold">Descripción</label>
+				<div class="form-field">
+					<label for="tareaDesc" class="form-label">
+						<i class="pi pi-align-left" style="font-size: 0.78rem"></i>
+						Descripción
+					</label>
 					<textarea
 						pTextarea
 						id="tareaDesc"
@@ -46,11 +53,15 @@ import { CursoContenidoTareaDto, CrearTareaRequest, ActualizarTareaRequest } fro
 						[maxlength]="2000"
 						placeholder="Descripción e instrucciones de la tarea..."
 						[autoResize]="true"
+						class="w-full"
 					></textarea>
 				</div>
 
-				<div class="flex flex-column gap-2">
-					<label for="tareaFecha" class="font-semibold">Fecha límite</label>
+				<div class="form-field">
+					<label for="tareaFecha" class="form-label">
+						<i class="pi pi-calendar" style="font-size: 0.78rem"></i>
+						Fecha límite
+					</label>
 					<p-datepicker
 						id="tareaFecha"
 						[(ngModel)]="fechaLimite"
@@ -59,12 +70,13 @@ import { CursoContenidoTareaDto, CrearTareaRequest, ActualizarTareaRequest } fro
 						dateFormat="dd/mm/yy"
 						placeholder="Seleccionar fecha"
 						appendTo="body"
+						styleClass="w-full"
 					/>
 				</div>
 			</div>
 
 			<ng-template #footer>
-				<div class="flex justify-content-end gap-2">
+				<div class="dialog-footer">
 					<button pButton label="Cancelar" class="p-button-text" (click)="onCancel()"></button>
 					<button
 						pButton
@@ -77,6 +89,35 @@ import { CursoContenidoTareaDto, CrearTareaRequest, ActualizarTareaRequest } fro
 				</div>
 			</ng-template>
 		</p-dialog>
+	`,
+	styles: `
+		.edit-form {
+			display: flex;
+			flex-direction: column;
+			gap: 1.25rem;
+			padding: 0.5rem 1rem;
+		}
+		.form-field {
+			display: flex;
+			flex-direction: column;
+			gap: 0.5rem;
+		}
+		.form-label {
+			font-size: 0.82rem;
+			font-weight: 600;
+			color: var(--text-color);
+			display: flex;
+			align-items: center;
+			gap: 0.4rem;
+			i {
+				color: var(--text-color-secondary);
+			}
+		}
+		.dialog-footer {
+			display: flex;
+			justify-content: flex-end;
+			gap: 0.5rem;
+		}
 	`,
 })
 export class TareaDialogComponent implements OnChanges {

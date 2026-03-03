@@ -9,6 +9,7 @@ import {
 	CrearCursoContenidoRequest,
 	ActualizarSemanaRequest,
 	RegistrarArchivoRequest,
+	RegistrarTareaArchivoRequest,
 	CrearTareaRequest,
 	ActualizarTareaRequest,
 	CursoContenidoSemanaDto,
@@ -287,6 +288,82 @@ export class CursoContenidoFacade {
 	}
 
 	// #endregion
+	// #region Tarea archivos
+
+	/**
+	 * Upload a blob then register teacher attachment metadata for a task with WAL.
+	 */
+	uploadTareaArchivo(semanaId: number, tareaId: number, file: File): void {
+		this.store.setSaving(true);
+
+		this.api
+			.uploadFile(file)
+			.pipe(takeUntilDestroyed(this.destroyRef))
+			.subscribe({
+				next: (blobResponse) => {
+					const request: RegistrarTareaArchivoRequest = {
+						nombreArchivo: file.name,
+						urlArchivo: blobResponse.url,
+						tipoArchivo: file.type || null,
+						tamanoBytes: file.size,
+					};
+
+					this.wal.execute({
+						operation: 'CREATE',
+						resourceType: 'TareaArchivo',
+						endpoint: `${this.contenidoUrl}/tarea/${tareaId}/archivo`,
+						method: 'POST',
+						payload: request,
+						http$: () => this.api.registrarTareaArchivo(tareaId, request),
+						optimistic: {
+							apply: () => this.store.setSaving(false),
+							rollback: () => {},
+						},
+						onCommit: (archivo) => {
+							this.store.addArchivoToTarea(semanaId, tareaId, archivo);
+						},
+						onError: (err) => this.handleApiError(err, 'registrar archivo de tarea'),
+					});
+				},
+				error: (err) => {
+					logger.error('CursoContenidoFacade: Error al subir archivo de tarea', err);
+					this.errorHandler.showError('Error', 'No se pudo subir el archivo');
+					this.store.setSaving(false);
+				},
+			});
+	}
+
+	/**
+	 * Delete a teacher attachment from a task with WAL and rollback.
+	 */
+	eliminarTareaArchivo(semanaId: number, tareaId: number, archivoId: number): void {
+		const semana = this.store.vm().contenido?.semanas?.find((s) => s.id === semanaId);
+		const tarea = semana?.tareas?.find((t) => t.id === tareaId);
+		const snapshot = tarea?.archivos?.find((a) => a.id === archivoId);
+
+		this.wal.execute({
+			operation: 'DELETE',
+			resourceType: 'TareaArchivo',
+			resourceId: archivoId,
+			endpoint: `${this.contenidoUrl}/tarea-archivo/${archivoId}`,
+			method: 'DELETE',
+			payload: null,
+			http$: () => this.api.eliminarTareaArchivo(archivoId),
+			optimistic: {
+				apply: () => {
+					this.store.removeArchivoFromTarea(semanaId, tareaId, archivoId);
+					this.store.setSaving(false);
+				},
+				rollback: () => {
+					if (snapshot) this.store.addArchivoToTarea(semanaId, tareaId, snapshot);
+				},
+			},
+			onCommit: () => {},
+			onError: (err) => this.handleApiError(err, 'eliminar archivo de tarea'),
+		});
+	}
+
+	// #endregion
 	// #region Tareas
 
 	/**
@@ -445,6 +522,63 @@ export class CursoContenidoFacade {
 	 */
 	closeBuilderDialog(): void {
 		this.store.closeBuilderDialog();
+	}
+	/**
+	 * Open archivos summary sub-modal.
+	 */
+	openArchivosSummaryDialog(): void {
+		this.store.openArchivosSummaryDialog();
+	}
+	/**
+	 * Close archivos summary sub-modal.
+	 */
+	closeArchivosSummaryDialog(): void {
+		this.store.closeArchivosSummaryDialog();
+	}
+	/**
+	 * Open tareas summary sub-modal.
+	 */
+	openTareasSummaryDialog(): void {
+		this.store.openTareasSummaryDialog();
+	}
+	/**
+	 * Close tareas summary sub-modal.
+	 */
+	closeTareasSummaryDialog(): void {
+		this.store.closeTareasSummaryDialog();
+	}
+	/**
+	 * Load student files and open the sub-modal.
+	 *
+	 * @param contenidoId Content id.
+	 */
+	openStudentFilesDialog(contenidoId: number): void {
+		this.store.openStudentFilesDialog();
+		this.store.setStudentFilesLoading(true);
+
+		this.api
+			.getArchivosEstudiantes(contenidoId)
+			.pipe(
+				withRetry({ tag: 'CursoContenidoFacade:loadStudentFiles' }),
+				takeUntilDestroyed(this.destroyRef),
+			)
+			.subscribe({
+				next: (data) => {
+					this.store.setStudentFilesData(data);
+					this.store.setStudentFilesLoading(false);
+				},
+				error: (err) => {
+					logger.error('CursoContenidoFacade: Error al cargar archivos de estudiantes', err);
+					this.errorHandler.showError('Error', 'No se pudo cargar los archivos de estudiantes');
+					this.store.setStudentFilesLoading(false);
+				},
+			});
+	}
+	/**
+	 * Close student files sub-modal.
+	 */
+	closeStudentFilesDialog(): void {
+		this.store.closeStudentFilesDialog();
 	}
 	// #endregion
 

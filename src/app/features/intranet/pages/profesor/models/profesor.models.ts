@@ -190,8 +190,22 @@ export interface CursoContenidoTareaDto {
 	fechaLimite: string | null;
 	/** Registration date string. */
 	fechaReg: string;
+	/** Teacher attachments for the task. */
+	archivos: TareaArchivoDto[];
 	/** Concurrencia optimista. */
 	rowVersion?: string;
+}
+
+/**
+ * Teacher attachment metadata for a task.
+ */
+export interface TareaArchivoDto {
+	id: number;
+	nombreArchivo: string;
+	urlArchivo: string;
+	tipoArchivo: string | null;
+	tamanoBytes: number | null;
+	fechaReg: string;
 }
 
 /**
@@ -216,6 +230,39 @@ export interface ActualizarSemanaRequest {
 	mensajeDocente: string | null;
 	/** Concurrencia optimista. */
 	rowVersion?: string;
+}
+
+/**
+ * Request to register teacher attachment for a task.
+ */
+export interface RegistrarTareaArchivoRequest {
+	nombreArchivo: string;
+	urlArchivo: string;
+	tipoArchivo: string | null;
+	tamanoBytes: number | null;
+}
+
+/**
+ * Student-uploaded file metadata for a task.
+ */
+export interface EstudianteTareaArchivoDto {
+	id: number;
+	estudianteId: number;
+	estudianteNombre: string;
+	nombreArchivo: string;
+	urlArchivo: string;
+	tipoArchivo: string | null;
+	tamanoBytes: number | null;
+	fechaReg: string;
+}
+
+/**
+ * Student task files grouped by student for professor view.
+ */
+export interface EstudianteTareaArchivosGroupDto {
+	estudianteId: number;
+	estudianteNombre: string;
+	archivos: EstudianteTareaArchivoDto[];
 }
 
 /**
@@ -256,6 +303,39 @@ export interface ActualizarTareaRequest {
 	fechaLimite: string | null;
 	/** Concurrencia optimista. */
 	rowVersion?: string;
+}
+
+/**
+ * Student-uploaded file metadata.
+ */
+export interface EstudianteArchivoDto {
+	id: number;
+	estudianteId: number;
+	estudianteNombre: string;
+	nombreArchivo: string;
+	urlArchivo: string;
+	tipoArchivo: string | null;
+	tamanoBytes: number | null;
+	fechaReg: string;
+}
+
+/**
+ * Student files grouped by student.
+ */
+export interface EstudianteArchivosGroupDto {
+	estudianteId: number;
+	estudianteNombre: string;
+	archivos: EstudianteArchivoDto[];
+}
+
+/**
+ * Student files grouped by week then student.
+ */
+export interface SemanaEstudianteArchivosDto {
+	semanaId: number;
+	numeroSemana: number;
+	titulo: string | null;
+	estudiantes: EstudianteArchivosGroupDto[];
 }
 
 // #endregion

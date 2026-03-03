@@ -1,0 +1,53 @@
+<p-dialog
+	[visible]="visible()"
+	(visibleChange)="onVisibleChange($event)"
+	[modal]="true"
+	[dismissableMask]="true"
+	header="Todos los Archivos"
+	[style]="{ width: '540px', maxWidth: '95vw' }"
+>
+	<div class="summary-body">
+		@for (semana of semanas(); track semana.id) {
+			@if (semana.archivos.length > 0) {
+				<div class="week-group">
+					<div class="week-group-header">
+						<span class="week-badge">{{ semana.numeroSemana }}</span>
+						<span class="week-group-title">
+							Semana {{ semana.numeroSemana }}
+							@if (semana.titulo) {
+								— {{ semana.titulo }}
+							}
+						</span>
+						<span class="week-count">{{ semana.archivos.length }}</span>
+					</div>
+					<div class="file-list">
+						@for (archivo of semana.archivos; track archivo.id) {
+							<div
+								class="file-row clickable"
+								(click)="openArchivo(archivo.urlArchivo)"
+							>
+								<div [class]="'file-icon ' + getFileIconClass(archivo.tipoArchivo)">
+									<i [class]="getFileIcon(archivo.tipoArchivo)"></i>
+								</div>
+								<div class="file-info">
+									<span class="file-name">{{ archivo.nombreArchivo }}</span>
+									@if (archivo.tamanoBytes) {
+										<span class="file-size">{{ formatFileSize(archivo.tamanoBytes) }}</span>
+									}
+								</div>
+								<i class="pi pi-external-link file-open-icon"></i>
+							</div>
+						}
+					</div>
+				</div>
+			}
+		}
+
+		@if (isEmpty()) {
+			<div class="empty-state">
+				<i class="pi pi-paperclip"></i>
+				<p>No hay archivos adjuntos</p>
+			</div>
+		}
+	</div>
+</p-dialog>

@@ -34,6 +34,17 @@ export class AuthApiService {
 	}
 
 	/**
+	 * Refresh the access token using the HttpOnly refresh cookie.
+	 * Returns the new session context on success.
+	 */
+	refresh(): Observable<{ rol: string; nombreCompleto: string; entityId: number; sedeId: number }> {
+		return this.http.post<{ rol: string; nombreCompleto: string; entityId: number; sedeId: number }>(
+			`${this.apiUrl}/refresh`,
+			{},
+		);
+	}
+
+	/**
 	 * Fetch the current user profile.
 	 * Auth cookie is sent automatically by the browser.
 	 */

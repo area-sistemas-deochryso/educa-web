@@ -24,11 +24,16 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
 // #region Tipos de reporte
 
-type TipoReporte = 'salon' | 'consolidado-dia' | 'consolidado-semana' | 'consolidado-mes' | 'consolidado-anio';
+type TipoReporte = 'salon-dia' | 'salon-mes' | 'salon-anio' | 'todos-dia' | 'todos-semana' | 'todos-mes' | 'todos-anio';
 
 interface TipoReporteOption {
 	label: string;
 	value: TipoReporte;
+}
+
+interface TipoReporteGroup {
+	label: string;
+	items: TipoReporteOption[];
 }
 
 /**
@@ -71,14 +76,26 @@ export class AttendanceDirectorComponent implements OnInit {
 // #endregion
 	// #region Tipo de reporte
 
-	readonly tipoReporteOptions: TipoReporteOption[] = [
-		{ label: 'Reporte por Salón', value: 'salon' },
-		{ label: 'Consolidado - Día', value: 'consolidado-dia' },
-		{ label: 'Consolidado - Semana', value: 'consolidado-semana' },
-		{ label: 'Consolidado - Mes', value: 'consolidado-mes' },
-		{ label: 'Consolidado - Año', value: 'consolidado-anio' },
+	readonly tipoReporteOptions: TipoReporteGroup[] = [
+		{
+			label: 'Este salón',
+			items: [
+				{ label: 'Día', value: 'salon-dia' },
+				{ label: 'Mes', value: 'salon-mes' },
+				{ label: 'Año', value: 'salon-anio' },
+			],
+		},
+		{
+			label: 'Todos los salones',
+			items: [
+				{ label: 'Día', value: 'todos-dia' },
+				{ label: 'Semana', value: 'todos-semana' },
+				{ label: 'Mes', value: 'todos-mes' },
+				{ label: 'Año', value: 'todos-anio' },
+			],
+		},
 	];
-	readonly tipoReporte = signal<TipoReporte>('salon');
+	readonly tipoReporte = signal<TipoReporte>('salon-dia');
 	readonly downloadingPdfConsolidado = signal(false);
 	readonly savingJustificacion = signal(false);
 
@@ -241,32 +258,16 @@ export class AttendanceDirectorComponent implements OnInit {
 
 		// Day mode: depends on tipoReporte
 		const tipo = this.tipoReporte();
-		if (tipo === 'salon') {
-			return [
-				{
-					label: 'Ver PDF',
-					icon: 'pi pi-eye',
-					command: () => this.view.verPdfAsistenciaDia(),
-				},
-				{
-					label: 'Descargar PDF',
-					icon: 'pi pi-download',
-					command: () => this.view.descargarPdfAsistenciaDia(),
-				},
-			];
-		}
-
-		// Consolidados (day mode only)
 		return [
 			{
 				label: 'Ver PDF',
 				icon: 'pi pi-eye',
-				command: () => this.verPdfConsolidado(),
+				command: () => this.verPdf(tipo),
 			},
 			{
 				label: 'Descargar PDF',
 				icon: 'pi pi-download',
-				command: () => this.descargarPdfConsolidado(),
+				command: () => this.descargarPdf(tipo),
 			},
 		];
 	});
@@ -299,13 +300,41 @@ export class AttendanceDirectorComponent implements OnInit {
 	}
 
 	// #endregion
-	// #region PDF Consolidados
+	// #region PDF dispatch (día mode)
+
+	private verPdf(tipo: TipoReporte): void {
+		switch (tipo) {
+			case 'salon-dia':
+				return this.view.verPdfAsistenciaDia();
+			case 'salon-mes':
+				return this.view.verPdfSalonMes();
+			case 'salon-anio':
+				return this.view.verPdfSalonAnio();
+			default:
+				return this.verPdfConsolidado();
+		}
+	}
+
+	private descargarPdf(tipo: TipoReporte): void {
+		switch (tipo) {
+			case 'salon-dia':
+				return this.view.descargarPdfAsistenciaDia();
+			case 'salon-mes':
+				return this.view.descargarPdfSalonMes();
+			case 'salon-anio':
+				return this.view.descargarPdfSalonAnio();
+			default:
+				return this.descargarPdfConsolidado();
+		}
+	}
+
+	// #endregion
+	// #region PDF Consolidados (todos los salones)
 
 	private verPdfConsolidado(): void {
-		const tipo = this.tipoReporte();
 		this.downloadingPdfConsolidado.set(true);
 
-		const obs$ = this.getPdfObservable(tipo);
+		const obs$ = this.getTodosSalonesObservable();
 		if (!obs$) {
 			this.downloadingPdfConsolidado.set(false);
 			return;
@@ -322,10 +351,9 @@ export class AttendanceDirectorComponent implements OnInit {
 	}
 
 	private descargarPdfConsolidado(): void {
-		const tipo = this.tipoReporte();
 		this.downloadingPdfConsolidado.set(true);
 
-		const obs$ = this.getPdfObservable(tipo);
+		const obs$ = this.getTodosSalonesObservable();
 		if (!obs$) {
 			this.downloadingPdfConsolidado.set(false);
 			return;
@@ -337,69 +365,58 @@ export class AttendanceDirectorComponent implements OnInit {
 				finalize(() => this.downloadingPdfConsolidado.set(false)),
 			)
 			.subscribe({
-				next: (blob) => downloadBlob(blob, this.getConsolidadoFileName(tipo)),
+				next: (blob) => downloadBlob(blob, this.getConsolidadoFileName()),
 			});
 	}
 
-	private getPdfObservable(tipo: TipoReporte): Observable<Blob> | null {
-		const fecha = this.view.pdfFecha();
-		const { selectedMonth, selectedYear } = this.view.ingresos();
+	/** Obtiene el Observable para reportes de todos los salones usando fechaDia como contexto */
+	private getTodosSalonesObservable(): Observable<Blob> | null {
+		const fecha = this.view.fechaDia();
+		const mes = fecha.getMonth() + 1;
+		const anio = fecha.getFullYear();
 
-		switch (tipo) {
-			case 'consolidado-dia':
+		switch (this.tipoReporte()) {
+			case 'todos-dia':
 				return this.asistenciaService.descargarPdfTodosSalonesDia(fecha);
-			case 'consolidado-semana':
-				// Calcular inicio de la semana actual del mes/año seleccionado
-				const inicioSemana = this.getInicioSemanaActual(selectedMonth, selectedYear);
-				return this.asistenciaService.descargarPdfTodosSalonesSemana(inicioSemana);
-			case 'consolidado-mes':
-				return this.asistenciaService.descargarPdfTodosSalonesMes(selectedMonth, selectedYear);
-			case 'consolidado-anio':
-				return this.asistenciaService.descargarPdfTodosSalonesAnio(selectedYear);
+			case 'todos-semana':
+				return this.asistenciaService.descargarPdfTodosSalonesSemana(
+					this.getInicioSemana(fecha),
+				);
+			case 'todos-mes':
+				return this.asistenciaService.descargarPdfTodosSalonesMes(mes, anio);
+			case 'todos-anio':
+				return this.asistenciaService.descargarPdfTodosSalonesAnio(anio);
 			default:
 				return null;
 		}
 	}
 
-	/**
-	 * Obtiene el inicio de la semana actual (lunes) dentro del mes/año especificado
-	 */
-	private getInicioSemanaActual(mes: number, anio: number): Date {
-		const hoy = new Date();
-		const fechaMesSeleccionado = new Date(anio, mes - 1, 1);
-
-		// Si el mes/año seleccionado es diferente al actual, usar la primera semana de ese mes
-		if (hoy.getMonth() + 1 !== mes || hoy.getFullYear() !== anio) {
-			// Primera semana del mes: encontrar el primer lunes
-			const primerDia = fechaMesSeleccionado.getDay(); // 0 = domingo, 1 = lunes, ...
-			const diasHastaLunes = primerDia === 0 ? 1 : primerDia === 1 ? 0 : 8 - primerDia;
-			return new Date(anio, mes - 1, 1 + diasHastaLunes);
-		}
-
-		// Si es el mes/año actual, calcular el lunes de la semana actual
-		const diaSemana = hoy.getDay();
-		const diff = diaSemana === 0 ? -6 : 1 - diaSemana; // Si es domingo, retroceder 6 días
-		const lunes = new Date(hoy);
-		lunes.setDate(hoy.getDate() + diff);
+	/** Calcula el lunes de la semana de una fecha dada */
+	private getInicioSemana(fecha: Date): Date {
+		const dia = fecha.getDay();
+		const diff = dia === 0 ? -6 : 1 - dia;
+		const lunes = new Date(fecha);
+		lunes.setDate(fecha.getDate() + diff);
 		return lunes;
 	}
 
-	private getConsolidadoFileName(tipo: TipoReporte): string {
-		const fecha = this.view.pdfFecha();
-		const { selectedMonth, selectedYear } = this.view.ingresos();
+	private getConsolidadoFileName(): string {
+		const fecha = this.view.fechaDia();
+		const mes = fecha.getMonth() + 1;
+		const anio = fecha.getFullYear();
 		const fechaStr = fecha.toISOString().split('T')[0];
 
-		switch (tipo) {
-			case 'consolidado-dia':
+		switch (this.tipoReporte()) {
+			case 'todos-dia':
 				return `Reporte_TodosSalones_${fechaStr}.pdf`;
-			case 'consolidado-semana':
-				const inicioSemana = this.getInicioSemanaActual(selectedMonth, selectedYear);
-				const semanaStr = inicioSemana.toISOString().split('T')[0];
+			case 'todos-semana': {
+				const semanaStr = this.getInicioSemana(fecha).toISOString().split('T')[0];
 				return `Reporte_TodosSalones_Semana_${semanaStr}.pdf`;
-			case 'consolidado-mes':
-				return `Reporte_TodosSalones_${selectedYear}-${selectedMonth.toString().padStart(2, '0')}.pdf`;
-			case 'consolidado-anio':
-				return `Reporte_TodosSalones_${selectedYear}.pdf`;
+			}
+			case 'todos-mes':
+				return `Reporte_TodosSalones_${anio}-${mes.toString().padStart(2, '0')}.pdf`;
+			case 'todos-anio':
+				return `Reporte_TodosSalones_${anio}.pdf`;
 			default:
 				return 'Reporte_TodosSalones.pdf';
 		}

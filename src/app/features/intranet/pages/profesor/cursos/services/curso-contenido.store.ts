@@ -4,6 +4,8 @@ import {
 	CursoContenidoSemanaDto,
 	CursoContenidoArchivoDto,
 	CursoContenidoTareaDto,
+	TareaArchivoDto,
+	SemanaEstudianteArchivosDto,
 } from '../../models';
 
 /**
@@ -33,6 +35,16 @@ interface CursoContenidoState {
 	selectedTarea: CursoContenidoTareaDto | null;
 	/** Selected schedule id for content builder. */
 	selectedHorarioId: number | null;
+	/** Archivos summary sub-modal visibility. */
+	archivosSummaryDialogVisible: boolean;
+	/** Tareas summary sub-modal visibility. */
+	tareasSummaryDialogVisible: boolean;
+	/** Student files sub-modal visibility. */
+	studentFilesDialogVisible: boolean;
+	/** Student files data for professor view. */
+	studentFilesData: SemanaEstudianteArchivosDto[];
+	/** True while student files are loading. */
+	studentFilesLoading: boolean;
 	// #endregion
 }
 
@@ -48,6 +60,11 @@ const initialState: CursoContenidoState = {
 	selectedSemana: null,
 	selectedTarea: null,
 	selectedHorarioId: null,
+	archivosSummaryDialogVisible: false,
+	tareasSummaryDialogVisible: false,
+	studentFilesDialogVisible: false,
+	studentFilesData: [],
+	studentFilesLoading: false,
 };
 
 /**
@@ -87,6 +104,16 @@ export class CursoContenidoStore {
 	readonly selectedTarea = computed(() => this._state().selectedTarea);
 	/** Selected schedule id for content builder. */
 	readonly selectedHorarioId = computed(() => this._state().selectedHorarioId);
+	/** Archivos summary sub-modal visibility. */
+	readonly archivosSummaryDialogVisible = computed(() => this._state().archivosSummaryDialogVisible);
+	/** Tareas summary sub-modal visibility. */
+	readonly tareasSummaryDialogVisible = computed(() => this._state().tareasSummaryDialogVisible);
+	/** Student files sub-modal visibility. */
+	readonly studentFilesDialogVisible = computed(() => this._state().studentFilesDialogVisible);
+	/** Student files data for professor view. */
+	readonly studentFilesData = computed(() => this._state().studentFilesData);
+	/** True while student files are loading. */
+	readonly studentFilesLoading = computed(() => this._state().studentFilesLoading);
 
 	// #endregion
 	// #region Computed derivados
@@ -99,6 +126,13 @@ export class CursoContenidoStore {
 	/** Total tasks across all weeks. */
 	readonly totalTareas = computed(() =>
 		this.semanas().reduce((sum, s) => sum + s.tareas.length, 0),
+	);
+	/** Total student files across all weeks. */
+	readonly totalArchivosEstudiantes = computed(() =>
+		this.studentFilesData().reduce(
+			(sum, s) => sum + s.estudiantes.reduce((acc, e) => acc + e.archivos.length, 0),
+			0,
+		),
 	);
 
 	// #endregion
@@ -119,6 +153,12 @@ export class CursoContenidoStore {
 		selectedSemana: this.selectedSemana(),
 		selectedTarea: this.selectedTarea(),
 		selectedHorarioId: this.selectedHorarioId(),
+		archivosSummaryDialogVisible: this.archivosSummaryDialogVisible(),
+		tareasSummaryDialogVisible: this.tareasSummaryDialogVisible(),
+		studentFilesDialogVisible: this.studentFilesDialogVisible(),
+		studentFilesData: this.studentFilesData(),
+		studentFilesLoading: this.studentFilesLoading(),
+		totalArchivosEstudiantes: this.totalArchivosEstudiantes(),
 	}));
 
 	// #endregion
@@ -327,6 +367,58 @@ export class CursoContenidoStore {
 		});
 	}
 
+	/**
+	 * Add a teacher attachment to a task inside a week.
+	 */
+	addArchivoToTarea(semanaId: number, tareaId: number, archivo: TareaArchivoDto): void {
+		this._state.update((s) => {
+			if (!s.contenido) return s;
+			return {
+				...s,
+				contenido: {
+					...s.contenido,
+					semanas: s.contenido.semanas.map((sem) =>
+						sem.id === semanaId
+							? {
+									...sem,
+									tareas: sem.tareas.map((t) =>
+										t.id === tareaId ? { ...t, archivos: [...t.archivos, archivo] } : t,
+									),
+								}
+							: sem,
+					),
+				},
+			};
+		});
+	}
+
+	/**
+	 * Remove a teacher attachment from a task inside a week.
+	 */
+	removeArchivoFromTarea(semanaId: number, tareaId: number, archivoId: number): void {
+		this._state.update((s) => {
+			if (!s.contenido) return s;
+			return {
+				...s,
+				contenido: {
+					...s.contenido,
+					semanas: s.contenido.semanas.map((sem) =>
+						sem.id === semanaId
+							? {
+									...sem,
+									tareas: sem.tareas.map((t) =>
+										t.id === tareaId
+											? { ...t, archivos: t.archivos.filter((a) => a.id !== archivoId) }
+											: t,
+									),
+								}
+							: sem,
+					),
+				},
+			};
+		});
+	}
+
 	// #endregion
 	// #region Dialog commands
 	/**
@@ -385,6 +477,54 @@ export class CursoContenidoStore {
 	 */
 	closeTareaDialog(): void {
 		this._state.update((s) => ({ ...s, tareaDialogVisible: false, selectedTarea: null }));
+	}
+	/**
+	 * Open archivos summary sub-modal.
+	 */
+	openArchivosSummaryDialog(): void {
+		this._state.update((s) => ({ ...s, archivosSummaryDialogVisible: true }));
+	}
+	/**
+	 * Close archivos summary sub-modal.
+	 */
+	closeArchivosSummaryDialog(): void {
+		this._state.update((s) => ({ ...s, archivosSummaryDialogVisible: false }));
+	}
+	/**
+	 * Open tareas summary sub-modal.
+	 */
+	openTareasSummaryDialog(): void {
+		this._state.update((s) => ({ ...s, tareasSummaryDialogVisible: true }));
+	}
+	/**
+	 * Close tareas summary sub-modal.
+	 */
+	closeTareasSummaryDialog(): void {
+		this._state.update((s) => ({ ...s, tareasSummaryDialogVisible: false }));
+	}
+	/**
+	 * Open student files sub-modal.
+	 */
+	openStudentFilesDialog(): void {
+		this._state.update((s) => ({ ...s, studentFilesDialogVisible: true }));
+	}
+	/**
+	 * Close student files sub-modal and clear data.
+	 */
+	closeStudentFilesDialog(): void {
+		this._state.update((s) => ({ ...s, studentFilesDialogVisible: false }));
+	}
+	/**
+	 * Set student files data.
+	 */
+	setStudentFilesData(data: SemanaEstudianteArchivosDto[]): void {
+		this._state.update((s) => ({ ...s, studentFilesData: data }));
+	}
+	/**
+	 * Set student files loading flag.
+	 */
+	setStudentFilesLoading(loading: boolean): void {
+		this._state.update((s) => ({ ...s, studentFilesLoading: loading }));
 	}
 	/**
 	 * Reset state to initial values.

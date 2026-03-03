@@ -17,6 +17,10 @@ import {
 	CrearTareaRequest,
 	ActualizarTareaRequest,
 	CursoContenidoTareaDto,
+	SemanaEstudianteArchivosDto,
+	TareaArchivoDto,
+	RegistrarTareaArchivoRequest,
+	EstudianteTareaArchivosGroupDto,
 } from '../models';
 
 /**
@@ -186,6 +190,38 @@ export class ProfesorApiService {
 		return this.http.delete<{ mensaje: string }>(`${this.contenidoUrl}/tarea/${tareaId}`);
 	}
 
+	/**
+	 * Get all student-uploaded files for a content (professor view).
+	 */
+	getArchivosEstudiantes(contenidoId: number): Observable<SemanaEstudianteArchivosDto[]> {
+		return this.http.get<SemanaEstudianteArchivosDto[]>(
+			`${this.contenidoUrl}/${contenidoId}/archivos-estudiantes`,
+		);
+	}
+
+	/**
+	 * Register teacher attachment metadata for a task.
+	 */
+	registrarTareaArchivo(tareaId: number, request: RegistrarTareaArchivoRequest): Observable<TareaArchivoDto> {
+		return this.http.post<TareaArchivoDto>(
+			`${this.contenidoUrl}/tarea/${tareaId}/archivo`,
+			request,
+		);
+	}
+	/**
+	 * Delete a teacher attachment from a task.
+	 */
+	eliminarTareaArchivo(archivoId: number): Observable<{ mensaje: string }> {
+		return this.http.delete<{ mensaje: string }>(`${this.contenidoUrl}/tarea-archivo/${archivoId}`);
+	}
+	/**
+	 * Get all student-uploaded files for a task (professor view).
+	 */
+	getArchivosTareaEstudiantes(tareaId: number): Observable<EstudianteTareaArchivosGroupDto[]> {
+		return this.http.get<EstudianteTareaArchivosGroupDto[]>(
+			`${this.contenidoUrl}/tarea/${tareaId}/archivos-estudiantes`,
+		);
+	}
 	// #endregion
 	// #region Blob Storage (file upload)
 	/**

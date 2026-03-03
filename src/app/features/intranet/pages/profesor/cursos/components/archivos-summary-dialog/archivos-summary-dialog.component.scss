@@ -1,0 +1,199 @@
+// #region Dialog overrides
+:host ::ng-deep {
+	.p-dialog-content {
+		padding: 0 !important;
+	}
+}
+
+// #endregion
+// #region Body
+.summary-body {
+	padding: 0.5rem 1.5rem 1.5rem;
+	max-height: 60vh;
+	overflow-y: auto;
+}
+
+// #endregion
+// #region Week groups
+.week-group {
+	margin-bottom: 1.25rem;
+
+	&:last-child {
+		margin-bottom: 0;
+	}
+}
+
+.week-group-header {
+	display: flex;
+	align-items: center;
+	gap: 0.5rem;
+	padding-bottom: 0.5rem;
+	margin-bottom: 0.25rem;
+	border-bottom: 1px solid var(--surface-border, #f0f0f0);
+}
+
+.week-badge {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	width: 1.5rem;
+	height: 1.5rem;
+	border-radius: 5px;
+	background: var(--primary-100, #ede9fe);
+	color: var(--primary-600, #4f46e5);
+	font-size: 0.65rem;
+	font-weight: 700;
+	flex-shrink: 0;
+}
+
+.week-group-title {
+	font-size: 0.78rem;
+	font-weight: 600;
+	color: var(--text-color);
+	flex: 1;
+	min-width: 0;
+	white-space: nowrap;
+	text-overflow: ellipsis;
+	overflow: hidden;
+}
+
+.week-count {
+	font-size: 0.68rem;
+	font-weight: 500;
+	color: var(--text-color-secondary);
+	background: var(--surface-ground, #f3f4f6);
+	padding: 0.15rem 0.5rem;
+	border-radius: 10px;
+	flex-shrink: 0;
+}
+
+// #endregion
+// #region File rows
+.file-list {
+	display: flex;
+	flex-direction: column;
+}
+
+.file-row {
+	display: flex;
+	align-items: center;
+	gap: 0.6rem;
+	padding: 0.5rem 0.25rem;
+	border-radius: 6px;
+	transition: background 0.15s;
+
+	& + & {
+		border-top: 1px solid var(--surface-border, #f3f4f6);
+	}
+
+	&.clickable {
+		cursor: pointer;
+
+		&:hover {
+			background: var(--surface-hover, rgba(0, 0, 0, 0.015));
+		}
+	}
+}
+
+.file-icon {
+	width: 32px;
+	height: 32px;
+	border-radius: 6px;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	flex-shrink: 0;
+	background: var(--surface-ground, #f9fafb);
+	border: 1px solid var(--surface-border, #e5e7eb);
+
+	i {
+		font-size: 0.85rem;
+		color: var(--text-color-secondary);
+	}
+
+	&.pdf {
+		background: #fef2f2;
+		border-color: #fecaca;
+		i { color: #ef4444; }
+	}
+
+	&.word {
+		background: #eff6ff;
+		border-color: #bfdbfe;
+		i { color: #3b82f6; }
+	}
+
+	&.excel {
+		background: #f0fdf4;
+		border-color: #bbf7d0;
+		i { color: #22c55e; }
+	}
+
+	&.image {
+		background: #f5f3ff;
+		border-color: #ddd6fe;
+		i { color: #8b5cf6; }
+	}
+
+	&.video {
+		background: #fff7ed;
+		border-color: #fed7aa;
+		i { color: #f97316; }
+	}
+}
+
+.file-info {
+	display: flex;
+	flex-direction: column;
+	gap: 0.1rem;
+	flex: 1;
+	min-width: 0;
+}
+
+.file-name {
+	font-size: 0.8rem;
+	font-weight: 500;
+	color: var(--primary-color);
+	white-space: nowrap;
+	text-overflow: ellipsis;
+	overflow: hidden;
+}
+
+.file-size {
+	font-size: 0.7rem;
+	color: var(--text-color-secondary);
+}
+
+.file-open-icon {
+	font-size: 0.7rem;
+	color: var(--text-color-secondary);
+	opacity: 0;
+	transition: opacity 0.15s;
+	flex-shrink: 0;
+
+	.file-row:hover & {
+		opacity: 1;
+	}
+}
+
+// #endregion
+// #region Empty state
+.empty-state {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	gap: 0.5rem;
+	padding: 2.5rem 1rem;
+	color: var(--text-color-secondary);
+
+	i {
+		font-size: 1.5rem;
+		opacity: 0.4;
+	}
+
+	p {
+		margin: 0;
+		font-size: 0.85rem;
+	}
+}
+// #endregion

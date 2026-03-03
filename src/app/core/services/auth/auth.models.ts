@@ -98,8 +98,6 @@ export interface StoredSession {
 export interface VerifyTokenResponse {
 	/** User DNI. */
 	dni: string;
-	/** User password (if included by backend). */
-	contraseña: string;
 	/** User role. */
 	rol: UserRole;
 	/** Full name. */

@@ -1,4 +1,4 @@
-<!-- #region Dialog principal de contenido -->
+<!-- #region Dialog principal de contenido (read-only) -->
 <p-dialog
 	[visible]="vm().contentDialogVisible"
 	(visibleChange)="onVisibleChange($event)"
@@ -45,7 +45,7 @@
 							<p-accordion [multiple]="true">
 								@for (semana of filteredSemanas(); track semana.id) {
 									<p-accordionpanel>
-										<p-accordionheader>
+										<p-accordionheader (click)="onAccordionTabOpen(semana)">
 											<div class="week-header">
 												<span class="week-number">{{ semana.numeroSemana }}</span>
 												<div class="week-title-group">
@@ -87,34 +87,13 @@
 													</div>
 												}
 
-												<!-- Editar semana -->
-												<button
-													class="edit-semana-link"
-													(click)="onEditSemana(semana); $event.stopPropagation()"
-												>
-													<i class="pi pi-pencil"></i>
-													Editar semana
-												</button>
-
-												<!-- #region Archivos -->
+												<!-- #region Archivos del profesor -->
 												<div class="section-block">
 													<div class="section-header">
-														<button
-															class="section-label section-action"
-															type="button"
-															(click)="fileInput.click()"
-															aria-label="Subir archivo"
-														>
+														<div class="section-label">
 															<i class="pi pi-paperclip"></i>
 															Archivos
-															<i class="pi pi-plus action-hint"></i>
-														</button>
-														<input
-															#fileInput
-															type="file"
-															hidden
-															(change)="onNativeFileSelect($event, semana.id)"
-														/>
+														</div>
 													</div>
 
 													@if (semana.archivos.length === 0) {
@@ -139,6 +118,56 @@
 																			}}</span>
 																		}
 																	</div>
+																</div>
+															}
+														</div>
+													}
+												</div>
+												<!-- #endregion -->
+
+												<!-- #region Mis Archivos (estudiante) -->
+												<div class="section-block">
+													<div class="section-header">
+														<button
+															class="section-label section-action"
+															type="button"
+															(click)="studentFileInput.click()"
+															aria-label="Subir mi archivo"
+														>
+															<i class="pi pi-upload"></i>
+															Mis Archivos
+															<i class="pi pi-plus action-hint"></i>
+														</button>
+														<input
+															#studentFileInput
+															type="file"
+															hidden
+															(change)="onNativeFileSelect($event, semana.id)"
+														/>
+													</div>
+
+													@if (getMisArchivosSemana(semana.id).length === 0) {
+														<div class="section-empty">No has subido archivos</div>
+													} @else {
+														<div class="content-list">
+															@for (archivo of getMisArchivosSemana(semana.id); track archivo.id) {
+																<div class="content-row">
+																	<div
+																		[class]="'row-icon student-file ' + getFileIconClass(archivo.tipoArchivo)"
+																	>
+																		<i [class]="getFileIcon(archivo.tipoArchivo)"></i>
+																	</div>
+																	<div
+																		class="row-info clickable"
+																		(click)="openArchivo(archivo.urlArchivo)"
+																	>
+																		<strong>{{ archivo.nombreArchivo }}</strong>
+																		@if (archivo.tamanoBytes) {
+																			<span>{{
+																				formatFileSize(archivo.tamanoBytes)
+																			}}</span>
+																		}
+																	</div>
 																	<div class="row-actions">
 																		<button
 																			pButton
@@ -146,13 +175,7 @@
 																			class="p-button-text p-button-danger p-button-sm p-button-rounded"
 																			pTooltip="Eliminar"
 																			tooltipPosition="top"
-																			(click)="
-																				onDeleteArchivo(
-																					semana.id,
-																					archivo.id,
-																					archivo.nombreArchivo
-																				)
-																			"
+																			(click)="onDeleteMiArchivo(semana.id, archivo)"
 																			[pt]="{
 																				root: {
 																					'aria-label': 'Eliminar archivo',
@@ -170,16 +193,10 @@
 												<!-- #region Tareas -->
 												<div class="section-block">
 													<div class="section-header">
-														<button
-															class="section-label section-action"
-															type="button"
-															(click)="setActiveSemanaForTarea(semana); onAddTarea()"
-															aria-label="Agregar tarea"
-														>
+														<div class="section-label">
 															<i class="pi pi-file-edit"></i>
 															Tareas
-															<i class="pi pi-plus action-hint"></i>
-														</button>
+														</div>
 													</div>
 
 													@if (semana.tareas.length === 0) {
@@ -193,6 +210,9 @@
 																	</div>
 																	<div class="row-info">
 																		<strong>{{ tarea.titulo }}</strong>
+																		@if (tarea.descripcion) {
+																			<span class="tarea-desc">{{ tarea.descripcion }}</span>
+																		}
 																		@if (tarea.fechaLimite) {
 																			<span>
 																				<i
@@ -203,62 +223,15 @@
 																			</span>
 																		}
 																	</div>
-																	<div class="row-actions">
-																		<button
-																			pButton
-																			icon="pi pi-pencil"
-																			class="p-button-text p-button-sm p-button-rounded"
-																			pTooltip="Editar"
-																			tooltipPosition="top"
-																			(click)="
-																				setActiveSemanaForTarea(semana);
-																				onEditTarea(tarea)
-																			"
-																			[pt]="{
-																				root: {
-																					'aria-label': 'Editar tarea',
-																				},
-																			}"
-																		></button>
-																		<button
-																			pButton
-																			icon="pi pi-trash"
-																			class="p-button-text p-button-danger p-button-sm p-button-rounded"
-																			pTooltip="Eliminar"
-																			tooltipPosition="top"
-																			(click)="
-																				onDeleteTarea(
-																					semana.id,
-																					tarea.id,
-																					tarea.titulo
-																				)
-																			"
-																			[pt]="{
-																				root: {
-																					'aria-label': 'Eliminar tarea',
-																				},
-																			}"
-																		></button>
-																	</div>
 																</div>
-																<!-- Archivos adjuntos de la tarea -->
-																<div class="tarea-archivos-section">
-																	<button
-																		class="tarea-attach-link"
-																		type="button"
-																		(click)="tareaFileInput.click()"
-																		aria-label="Adjuntar archivo a tarea"
-																	>
-																		<i class="pi pi-paperclip"></i>
-																		Adjuntar archivo
-																	</button>
-																	<input
-																		#tareaFileInput
-																		type="file"
-																		hidden
-																		(change)="onNativeTareaFileSelect($event, semana.id, tarea.id)"
-																	/>
-																	@if (tarea.archivos.length > 0) {
+
+																<!-- Archivos del profesor en la tarea (read-only) -->
+																@if (tarea.archivos && tarea.archivos.length > 0) {
+																	<div class="tarea-archivos-section">
+																		<div class="tarea-section-label">
+																			<i class="pi pi-paperclip"></i>
+																			Material adjunto
+																		</div>
 																		<div class="tarea-archivos-list">
 																			@for (archivo of tarea.archivos; track archivo.id) {
 																				<div class="tarea-archivo-row">
@@ -276,19 +249,67 @@
 																							<span>{{ formatFileSize(archivo.tamanoBytes) }}</span>
 																						}
 																					</div>
-																					<button
-																						pButton
-																						icon="pi pi-trash"
-																						class="p-button-text p-button-danger p-button-sm p-button-rounded"
-																						pTooltip="Eliminar"
-																						tooltipPosition="top"
-																						(click)="onDeleteTareaArchivo(semana.id, tarea.id, archivo.id, archivo.nombreArchivo)"
-																						[pt]="{
-																							root: {
-																								'aria-label': 'Eliminar archivo de tarea',
-																							},
-																						}"
-																					></button>
+																				</div>
+																			}
+																		</div>
+																	</div>
+																}
+
+																<!-- Mi entrega (archivos del estudiante en la tarea) -->
+																<div class="tarea-archivos-section student-section">
+																	<div class="tarea-section-label">
+																		<button
+																			class="tarea-attach-link"
+																			type="button"
+																			(click)="tareaFileInput.click()"
+																			aria-label="Subir mi archivo de tarea"
+																		>
+																			<i class="pi pi-upload"></i>
+																			Mi entrega
+																			<i class="pi pi-plus action-hint"></i>
+																		</button>
+																		<input
+																			#tareaFileInput
+																			type="file"
+																			hidden
+																			(change)="onNativeTareaFileSelect($event, tarea.id)"
+																		/>
+																	</div>
+																	@if (getMisTareaArchivos(tarea.id).length === 0) {
+																		<div class="section-empty">No has subido archivos</div>
+																	} @else {
+																		<div class="tarea-archivos-list">
+																			@for (archivo of getMisTareaArchivos(tarea.id); track archivo.id) {
+																				<div class="tarea-archivo-row">
+																					<div
+																						[class]="'row-icon small student-file ' + getFileIconClass(archivo.tipoArchivo)"
+																					>
+																						<i [class]="getFileIcon(archivo.tipoArchivo)"></i>
+																					</div>
+																					<div
+																						class="row-info clickable"
+																						(click)="openArchivo(archivo.urlArchivo)"
+																					>
+																						<strong>{{ archivo.nombreArchivo }}</strong>
+																						@if (archivo.tamanoBytes) {
+																							<span>{{ formatFileSize(archivo.tamanoBytes) }}</span>
+																						}
+																					</div>
+																					<div class="row-actions">
+																						<button
+																							pButton
+																							icon="pi pi-trash"
+																							class="p-button-text p-button-danger p-button-sm p-button-rounded"
+																							pTooltip="Eliminar"
+																							tooltipPosition="top"
+																							(click)="onDeleteMiTareaArchivo(tarea.id, archivo)"
+																							[pt]="{
+																								root: {
+																									'aria-label': 'Eliminar archivo de tarea',
+																								},
+																							}"
+																						></button>
+																					</div>
 																				</div>
 																			}
 																		</div>
@@ -358,47 +379,16 @@
 							<div class="stat-number">{{ vm().totalTareas }}</div>
 							<div class="stat-label">Tareas</div>
 						</button>
-						<button
-							class="stat-box students clickable"
-							type="button"
-							(click)="onOpenStudentFiles()"
-							aria-label="Ver archivos de estudiantes"
-						>
-							<i class="pi pi-users"></i>
-							<div class="stat-number">{{ vm().totalArchivosEstudiantes }}</div>
-							<div class="stat-label">Adjuntos Est.</div>
-						</button>
 					</div>
-
-					<button class="danger-link" (click)="onDeleteContenido()">
-						<i class="pi pi-trash"></i>
-						Eliminar todo el contenido
-					</button>
 				</div>
 				<!-- #endregion -->
 			</div>
 		</div>
 	}
 </p-dialog>
+<!-- #endregion -->
 
 <!-- #region Sub-dialogs -->
-<app-semana-edit-dialog
-	[visible]="vm().semanaEditDialogVisible"
-	[semana]="vm().selectedSemana"
-	[saving]="vm().saving"
-	(visibleChange)="onSemanaEditVisibleChange($event)"
-	(save)="onSaveSemana($event)"
-/>
-
-<app-tarea-dialog
-	[visible]="vm().tareaDialogVisible"
-	[tarea]="vm().selectedTarea"
-	[saving]="vm().saving"
-	(visibleChange)="onTareaVisibleChange($event)"
-	(createTarea)="onCreateTarea($event)"
-	(updateTarea)="onUpdateTarea($event)"
-/>
-
 <app-archivos-summary-dialog
 	[visible]="vm().archivosSummaryDialogVisible"
 	[semanas]="vm().semanas"
@@ -409,13 +399,6 @@
 	[visible]="vm().tareasSummaryDialogVisible"
 	[semanas]="vm().semanas"
 	(visibleChange)="onTareasSummaryVisibleChange($event)"
-/>
-
-<app-student-files-dialog
-	[visible]="vm().studentFilesDialogVisible"
-	[data]="vm().studentFilesData"
-	[loading]="vm().studentFilesLoading"
-	(visibleChange)="onStudentFilesVisibleChange($event)"
 />
 
 <p-confirmDialog />

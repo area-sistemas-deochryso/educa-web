@@ -21,6 +21,7 @@ export const environment = {
 		notifications: false,
 		voiceRecognition: true,
 		profesor: true,
+		estudiante: true,
 	},
 };
 

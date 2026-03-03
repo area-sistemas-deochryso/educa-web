@@ -17,8 +17,13 @@ export const errorInterceptor: HttpInterceptorFn = (req, next) => {
 
 	return next(req).pipe(
 		catchError((error: HttpErrorResponse) => {
-			// Skip URLs handled locally (login form, token verification).
-			if (req.url.includes('/login') || req.url.includes('/verificar')) {
+			// Skip URLs handled locally (login form, token verification, refresh).
+			if (
+				req.url.includes('/login') ||
+				req.url.includes('/verificar') ||
+				req.url.includes('/refresh') ||
+				req.url.includes('/logout')
+			) {
 				return throwError(() => error);
 			}
 

@@ -596,6 +596,97 @@ export class AttendanceViewController {
 			});
 	}
 
+	/** Ver PDF mensual de un salón usando mes/año derivados de fechaDia (modo día) */
+	verPdfSalonMes(): void {
+		const ctx = this.config.getSelectorContext();
+		if (!ctx) return;
+
+		this.downloadingPdf.set(true);
+		const fecha = this.fechaDia();
+		const mes = fecha.getMonth() + 1;
+		const anio = fecha.getFullYear();
+
+		this.asistenciaService
+			.descargarPdfAsistenciaMes(ctx.gradoCodigo, ctx.seccion, mes, anio)
+			.pipe(
+				takeUntilDestroyed(this.destroyRef),
+				finalize(() => this.downloadingPdf.set(false)),
+			)
+			.subscribe({
+				next: (blob) => viewBlobInNewTab(blob),
+			});
+	}
+
+	/** Descargar PDF mensual de un salón usando mes/año derivados de fechaDia (modo día) */
+	descargarPdfSalonMes(): void {
+		const ctx = this.config.getSelectorContext();
+		if (!ctx) return;
+
+		this.downloadingPdf.set(true);
+		const fecha = this.fechaDia();
+		const mes = fecha.getMonth() + 1;
+		const anio = fecha.getFullYear();
+
+		this.asistenciaService
+			.descargarPdfAsistenciaMes(ctx.gradoCodigo, ctx.seccion, mes, anio)
+			.pipe(
+				takeUntilDestroyed(this.destroyRef),
+				finalize(() => this.downloadingPdf.set(false)),
+			)
+			.subscribe({
+				next: (blob) => {
+					const mesStr = mes.toString().padStart(2, '0');
+					downloadBlob(
+						blob,
+						`Asistencia_${ctx.grado}_${ctx.seccion}_${anio}-${mesStr}.pdf`,
+					);
+				},
+			});
+	}
+
+	/** Ver PDF anual de un salón usando periodo ene-dic del año de fechaDia */
+	verPdfSalonAnio(): void {
+		const ctx = this.config.getSelectorContext();
+		if (!ctx) return;
+
+		this.downloadingPdf.set(true);
+		const anio = this.fechaDia().getFullYear();
+
+		this.asistenciaService
+			.descargarPdfAsistenciaPeriodo(ctx.gradoCodigo, ctx.seccion, 1, anio, 12, anio)
+			.pipe(
+				takeUntilDestroyed(this.destroyRef),
+				finalize(() => this.downloadingPdf.set(false)),
+			)
+			.subscribe({
+				next: (blob) => viewBlobInNewTab(blob),
+			});
+	}
+
+	/** Descargar PDF anual de un salón usando periodo ene-dic del año de fechaDia */
+	descargarPdfSalonAnio(): void {
+		const ctx = this.config.getSelectorContext();
+		if (!ctx) return;
+
+		this.downloadingPdf.set(true);
+		const anio = this.fechaDia().getFullYear();
+
+		this.asistenciaService
+			.descargarPdfAsistenciaPeriodo(ctx.gradoCodigo, ctx.seccion, 1, anio, 12, anio)
+			.pipe(
+				takeUntilDestroyed(this.destroyRef),
+				finalize(() => this.downloadingPdf.set(false)),
+			)
+			.subscribe({
+				next: (blob) => {
+					downloadBlob(
+						blob,
+						`Asistencia_${ctx.grado}_${ctx.seccion}_Anio_${anio}.pdf`,
+					);
+				},
+			});
+	}
+
 	// #endregion
 	// #region Reload
 

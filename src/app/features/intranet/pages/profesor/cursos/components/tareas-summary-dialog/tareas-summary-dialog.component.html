@@ -1,0 +1,61 @@
+<p-dialog
+	[visible]="visible()"
+	(visibleChange)="onVisibleChange($event)"
+	[modal]="true"
+	[dismissableMask]="true"
+	header="Todas las Tareas"
+	[style]="{ width: '540px', maxWidth: '95vw' }"
+>
+	<div class="summary-body">
+		@for (semana of semanas(); track semana.id) {
+			@if (semana.tareas.length > 0) {
+				<div class="week-group">
+					<div class="week-group-header">
+						<span class="week-badge">{{ semana.numeroSemana }}</span>
+						<span class="week-group-title">
+							Semana {{ semana.numeroSemana }}
+							@if (semana.titulo) {
+								— {{ semana.titulo }}
+							}
+						</span>
+						<span class="week-count">{{ semana.tareas.length }}</span>
+					</div>
+					<div class="task-list">
+						@for (tarea of semana.tareas; track tarea.id) {
+							<div class="task-row">
+								<div class="task-icon">
+									<i class="pi pi-file-edit"></i>
+								</div>
+								<div class="task-info">
+									<span class="task-name">{{ tarea.titulo }}</span>
+									@if (tarea.descripcion) {
+										<span class="task-desc">{{ tarea.descripcion }}</span>
+									}
+									@if (tarea.fechaLimite) {
+										<span
+											class="task-date"
+											[class.overdue]="isOverdue(tarea.fechaLimite)"
+										>
+											<i class="pi pi-calendar"></i>
+											{{ tarea.fechaLimite | date: 'dd/MM/yyyy' }}
+											@if (isOverdue(tarea.fechaLimite)) {
+												<span class="overdue-badge">Vencida</span>
+											}
+										</span>
+									}
+								</div>
+							</div>
+						}
+					</div>
+				</div>
+			}
+		}
+
+		@if (isEmpty()) {
+			<div class="empty-state">
+				<i class="pi pi-file-edit"></i>
+				<p>No hay tareas asignadas</p>
+			</div>
+		}
+	</div>
+</p-dialog>

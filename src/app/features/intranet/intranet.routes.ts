@@ -65,6 +65,16 @@ const developmentRoutes: Route[] = [
 				},
 			]
 		: []),
+	...(environment.features.estudiante
+		? [
+				{
+					path: 'estudiante/cursos',
+					loadComponent: () =>
+						import('./pages/estudiante').then((m) => m.EstudianteCursosComponent),
+					title: 'Intranet - Mis Cursos',
+				},
+			]
+		: []),
 ];
 
 export const INTRANET_ROUTES: Routes = [

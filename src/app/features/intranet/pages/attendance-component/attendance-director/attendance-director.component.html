@@ -108,7 +108,7 @@
 			[estadisticas]="view.estadisticasDia()"
 			[loading]="view.loading()"
 			[showPdfButton]="true"
-			[downloadingPdf]="tipoReporte() === 'salon' ? view.downloadingPdf() : downloadingPdfConsolidado()"
+			[downloadingPdf]="tipoReporte().startsWith('salon-') ? view.downloadingPdf() : downloadingPdfConsolidado()"
 			[pdfMenuItems]="pdfMenuItems()"
 			[tipoReporteOptions]="tipoReporteOptions"
 			[tipoReporte]="tipoReporte()"

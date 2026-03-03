@@ -1,0 +1,75 @@
+<p-dialog
+	[visible]="visible()"
+	(visibleChange)="onVisibleChange($event)"
+	[modal]="true"
+	[dismissableMask]="true"
+	header="Archivos Adjuntos de Estudiantes"
+	[style]="{ width: '600px', maxWidth: '95vw' }"
+>
+	@if (loading()) {
+		<div class="loading-state">
+			<p-progressSpinner
+				[style]="{ width: '40px', height: '40px' }"
+				strokeWidth="4"
+			/>
+			<p>Cargando archivos...</p>
+		</div>
+	} @else if (!hasAnyFiles()) {
+		<div class="empty-state">
+			<i class="pi pi-users"></i>
+			<p>Ningún estudiante ha subido archivos</p>
+		</div>
+	} @else {
+		<div class="summary-body">
+			@for (semana of data(); track semana.semanaId) {
+				@if (semana.estudiantes.length > 0) {
+					<div class="week-group">
+						<div class="week-group-header">
+							<span class="week-badge">{{ semana.numeroSemana }}</span>
+							<span class="week-group-title">
+								Semana {{ semana.numeroSemana }}
+								@if (semana.titulo) {
+									— {{ semana.titulo }}
+								}
+							</span>
+						</div>
+
+						@for (estudiante of semana.estudiantes; track estudiante.estudianteId) {
+							<div class="student-group">
+								<div class="student-header">
+									<div class="student-avatar">
+										<i class="pi pi-user"></i>
+									</div>
+									<span class="student-name">{{ estudiante.estudianteNombre }}</span>
+									<span class="student-count">{{ estudiante.archivos.length }} archivo{{ estudiante.archivos.length !== 1 ? 's' : '' }}</span>
+								</div>
+								<div class="student-files">
+									@for (archivo of estudiante.archivos; track archivo.id) {
+										<div
+											class="file-row clickable"
+											(click)="openArchivo(archivo.urlArchivo)"
+										>
+											<div class="file-icon">
+												<i class="pi pi-file"></i>
+											</div>
+											<div class="file-info">
+												<span class="file-name">{{ archivo.nombreArchivo }}</span>
+												<span class="file-meta">
+													@if (archivo.tamanoBytes) {
+														{{ formatFileSize(archivo.tamanoBytes) }} ·
+													}
+													{{ archivo.fechaReg | date: 'dd/MM/yyyy HH:mm' }}
+												</span>
+											</div>
+											<i class="pi pi-external-link file-open-icon"></i>
+										</div>
+									}
+								</div>
+							</div>
+						}
+					</div>
+				}
+			}
+		</div>
+	}
+</p-dialog>

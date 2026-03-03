@@ -61,6 +61,22 @@ const developmentMenuItems: NavItemWithPermiso[] = [
 				} as NavItemWithPermiso,
 			]
 		: []),
+	...(environment.features.estudiante
+		? [
+				{
+					label: 'Mi Aula',
+					icon: 'pi pi-graduation-cap',
+					children: [
+						{
+							route: '/intranet/estudiante/cursos',
+							label: 'Mis Cursos',
+							icon: 'pi pi-book',
+							permiso: 'intranet/estudiante/cursos',
+						},
+					],
+				} as NavItemWithPermiso,
+			]
+		: []),
 ];
 
 /**

@@ -84,7 +84,7 @@ export class AsistenciaDiaListComponent {
 	readonly pdfMenuItems = input<MenuItem[]>([]);
 	readonly allowJustify = input<boolean>(false);
 	readonly savingJustificacion = input<boolean>(false);
-	readonly tipoReporteOptions = input<{ label: string; value: string }[]>([]);
+	readonly tipoReporteOptions = input<{ label: string; items: { label: string; value: string }[] }[]>([]);
 	readonly tipoReporte = input<string>('salon');
 
 	// * Outputs

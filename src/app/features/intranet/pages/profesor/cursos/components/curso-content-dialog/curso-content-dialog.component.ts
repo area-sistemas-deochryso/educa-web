@@ -5,13 +5,16 @@ import { DialogModule } from 'primeng/dialog';
 import { ButtonModule } from 'primeng/button';
 import { AccordionModule } from 'primeng/accordion';
 import { TooltipModule } from 'primeng/tooltip';
-import { FileUploadModule } from 'primeng/fileupload';
+
 import { ConfirmDialogModule } from 'primeng/confirmdialog';
 import { ConfirmationService } from 'primeng/api';
 import { CursoContenidoFacade } from '../../services/curso-contenido.facade';
 import { CursoContenidoSemanaDto, CursoContenidoTareaDto, ActualizarTareaRequest, CrearTareaRequest } from '../../../models';
 import { SemanaEditDialogComponent } from '../semana-edit-dialog/semana-edit-dialog.component';
 import { TareaDialogComponent } from '../tarea-dialog/tarea-dialog.component';
+import { ArchivosSummaryDialogComponent } from '../archivos-summary-dialog/archivos-summary-dialog.component';
+import { TareasSummaryDialogComponent } from '../tareas-summary-dialog/tareas-summary-dialog.component';
+import { StudentFilesDialogComponent } from '../student-files-dialog/student-files-dialog.component';
 
 @Component({
 	selector: 'app-curso-content-dialog',
@@ -23,10 +26,12 @@ import { TareaDialogComponent } from '../tarea-dialog/tarea-dialog.component';
 		ButtonModule,
 		AccordionModule,
 		TooltipModule,
-		FileUploadModule,
 		ConfirmDialogModule,
 		SemanaEditDialogComponent,
 		TareaDialogComponent,
+		ArchivosSummaryDialogComponent,
+		TareasSummaryDialogComponent,
+		StudentFilesDialogComponent,
 	],
 	providers: [ConfirmationService],
 	changeDetection: ChangeDetectionStrategy.OnPush,
@@ -105,12 +110,14 @@ export class CursoContentDialogComponent {
 
 	// #endregion
 	// #region Archivo actions
-	onFileSelect(event: { files: File[] }, semanaId: number): void {
-		const file = event.files[0];
+	onNativeFileSelect(event: Event, semanaId: number): void {
+		const input = event.target as HTMLInputElement;
+		const file = input.files?.[0];
 		if (file) {
 			this.activeSemanaId.set(semanaId);
 			this.facade.uploadArchivo(semanaId, file);
 		}
+		input.value = '';
 	}
 
 	onDeleteArchivo(semanaId: number, archivoId: number, nombreArchivo: string): void {
@@ -129,6 +136,31 @@ export class CursoContentDialogComponent {
 
 	openArchivo(url: string): void {
 		window.open(url, '_blank');
+	}
+
+	// #endregion
+	// #region Tarea archivo actions
+	onNativeTareaFileSelect(event: Event, semanaId: number, tareaId: number): void {
+		const input = event.target as HTMLInputElement;
+		const file = input.files?.[0];
+		if (file) {
+			this.facade.uploadTareaArchivo(semanaId, tareaId, file);
+		}
+		input.value = '';
+	}
+
+	onDeleteTareaArchivo(semanaId: number, tareaId: number, archivoId: number, nombreArchivo: string): void {
+		this.confirmationService.confirm({
+			message: `¿Eliminar el archivo "${nombreArchivo}"?`,
+			header: 'Confirmar Eliminación',
+			icon: 'pi pi-exclamation-triangle',
+			acceptLabel: 'Eliminar',
+			rejectLabel: 'Cancelar',
+			acceptButtonStyleClass: 'p-button-danger',
+			accept: () => {
+				this.facade.eliminarTareaArchivo(semanaId, tareaId, archivoId);
+			},
+		});
 	}
 
 	// #endregion
@@ -174,6 +206,41 @@ export class CursoContentDialogComponent {
 				this.facade.eliminarTarea(semanaId, tareaId);
 			},
 		});
+	}
+
+	// #endregion
+	// #region Sub-modal handlers
+	onOpenArchivosSummary(): void {
+		this.facade.openArchivosSummaryDialog();
+	}
+
+	onArchivosSummaryVisibleChange(visible: boolean): void {
+		if (!visible) {
+			this.facade.closeArchivosSummaryDialog();
+		}
+	}
+
+	onOpenTareasSummary(): void {
+		this.facade.openTareasSummaryDialog();
+	}
+
+	onTareasSummaryVisibleChange(visible: boolean): void {
+		if (!visible) {
+			this.facade.closeTareasSummaryDialog();
+		}
+	}
+
+	onOpenStudentFiles(): void {
+		const contenido = this.vm().contenido;
+		if (contenido) {
+			this.facade.openStudentFilesDialog(contenido.id);
+		}
+	}
+
+	onStudentFilesVisibleChange(visible: boolean): void {
+		if (!visible) {
+			this.facade.closeStudentFilesDialog();
+		}
 	}
 
 	// #endregion
