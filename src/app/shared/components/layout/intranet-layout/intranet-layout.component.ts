@@ -1,10 +1,10 @@
 // #region Imports
 import { ChangeDetectionStrategy, Component, inject, OnInit, DestroyRef, signal, effect, computed } from '@angular/core';
-import { Router, RouterLink, RouterOutlet } from '@angular/router';
+import { RouterLink, RouterOutlet } from '@angular/router';
 import { VoiceButtonComponent } from '@shared/components/voice-button';
 import { FloatingNotificationBellComponent } from '@shared/components/floating-notification-bell';
 import { SyncStatusComponent } from '@shared/components/sync-status';
-import { AuthService, UserPermisosService, SwService } from '@core/services';
+import { UserPermisosService, SessionActivityService } from '@core/services';
 import {
 	NavItemComponent,
 	UserProfileMenuComponent,
@@ -33,13 +33,10 @@ import { FeatureFlagsFacade } from '@core/services/feature-flags';
 	styleUrl: './intranet-layout.component.scss',
 })
 export class IntranetLayoutComponent implements OnInit {
-	// * Core services for auth, permisos, SW cleanup, and routing.
-	private authService = inject(AuthService);
 	private userPermisosService = inject(UserPermisosService);
-	private swService = inject(SwService);
-	private router = inject(Router);
 	private destroyRef = inject(DestroyRef);
 	private flags = inject(FeatureFlagsFacade);
+	private sessionActivity = inject(SessionActivityService);
 
 	private readonly _navItems = signal<NavMenuItem[]>([]);
 	readonly navItems = this._navItems.asReadonly();
@@ -61,6 +58,8 @@ export class IntranetLayoutComponent implements OnInit {
 	}
 
 	ngOnInit(): void {
+		this.sessionActivity.start();
+
 		if (!this.userPermisosService.loaded()) {
 			this.userPermisosService.loadPermisos(this.destroyRef);
 		} else {
@@ -126,11 +125,7 @@ export class IntranetLayoutComponent implements OnInit {
 	}
 
 	logout(): void {
-		// * Clear user/session state and return to login.
-		this.userPermisosService.clear();
-		this.swService.clearCache();
-		this.authService.logout();
-		this.router.navigate(['/intranet/login']);
+		this.sessionActivity.forceLogout();
 	}
 }
 // #endregion
