@@ -83,16 +83,16 @@ import { DialogModule } from 'primeng/dialog';
 - **Overflow hidden**: Contenedores con `overflow: hidden` cortan el dropdown
 - **Scroll containers**: El dropdown no sigue correctamente el scroll del contenedor padre
 
-## AdminUtilsService - Helpers compartidos
+## UiMappingService - Helpers compartidos
 
 ```typescript
-import { AdminUtilsService } from '@shared/services';
+import { UiMappingService } from '@shared/services';
 
-readonly adminUtils = inject(AdminUtilsService);
+readonly uiMapping = inject(UiMappingService);
 
 // En template
-{{ adminUtils.getModuloFromRuta(ruta) }}
-{{ adminUtils.getRolSeverity(rol) }}
-{{ adminUtils.getEstadoSeverity(estado) }}
-{{ adminUtils.getModulosCount(vistas) }}
+{{ uiMapping.getModuloFromRuta(ruta) }}
+{{ uiMapping.getRolSeverity(rol) }}
+{{ uiMapping.getEstadoSeverity(estado) }}
+{{ uiMapping.getModulosCount(vistas) }}
 ```

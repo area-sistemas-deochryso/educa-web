@@ -22,6 +22,12 @@ export const environment = {
 		voiceRecognition: false,
 		profesor: true, //? provisional de momento
 		estudiante: true,
+		ctestK6: false,
+	},
+
+	// Debug panels (siempre false en producción)
+	debug: {
+		horarioSync: false,
 	},
 };
 

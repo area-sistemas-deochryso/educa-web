@@ -1,5 +1,12 @@
 import { Injectable, computed, signal } from '@angular/core';
-import { HorarioProfesorDto, CursoContenidoDetalleDto, EstudianteArchivoDto, EstudianteTareaArchivoDto } from '../models';
+import {
+	HorarioProfesorDto,
+	CursoContenidoDetalleDto,
+	EstudianteArchivoDto,
+	EstudianteTareaArchivoDto,
+	EstudianteMisNotasDto,
+	MiAsistenciaCursoResumenDto,
+} from '../models';
 
 interface EstudianteCursosState {
 	horarios: HorarioProfesorDto[];
@@ -21,6 +28,12 @@ interface EstudianteCursosState {
 	archivosSummaryDialogVisible: boolean;
 	tareasSummaryDialogVisible: boolean;
 	// #endregion
+	// #region Grades & attendance (tab data)
+	misNotasCurso: EstudianteMisNotasDto | null;
+	misNotasLoading: boolean;
+	miAsistencia: MiAsistenciaCursoResumenDto | null;
+	miAsistenciaLoading: boolean;
+	// #endregion
 }
 
 const initialState: EstudianteCursosState = {
@@ -37,6 +50,10 @@ const initialState: EstudianteCursosState = {
 	loadedTareas: [],
 	archivosSummaryDialogVisible: false,
 	tareasSummaryDialogVisible: false,
+	misNotasCurso: null,
+	misNotasLoading: false,
+	miAsistencia: null,
+	miAsistenciaLoading: false,
 };
 
 @Injectable({ providedIn: 'root' })
@@ -59,6 +76,10 @@ export class EstudianteCursosStore {
 	readonly loadedTareas = computed(() => this._state().loadedTareas);
 	readonly archivosSummaryDialogVisible = computed(() => this._state().archivosSummaryDialogVisible);
 	readonly tareasSummaryDialogVisible = computed(() => this._state().tareasSummaryDialogVisible);
+	readonly misNotasCurso = computed(() => this._state().misNotasCurso);
+	readonly misNotasLoading = computed(() => this._state().misNotasLoading);
+	readonly miAsistencia = computed(() => this._state().miAsistencia);
+	readonly miAsistenciaLoading = computed(() => this._state().miAsistenciaLoading);
 
 	// #endregion
 	// #region Computed derivados
@@ -87,6 +108,10 @@ export class EstudianteCursosStore {
 		misTareaArchivos: this.misTareaArchivos(),
 		archivosSummaryDialogVisible: this.archivosSummaryDialogVisible(),
 		tareasSummaryDialogVisible: this.tareasSummaryDialogVisible(),
+		misNotasCurso: this.misNotasCurso(),
+		misNotasLoading: this.misNotasLoading(),
+		miAsistencia: this.miAsistencia(),
+		miAsistenciaLoading: this.miAsistenciaLoading(),
 	}));
 
 	// #endregion
@@ -113,6 +138,22 @@ export class EstudianteCursosStore {
 
 	setError(error: string | null): void {
 		this._state.update((s) => ({ ...s, error }));
+	}
+
+	setMisNotasCurso(misNotasCurso: EstudianteMisNotasDto | null): void {
+		this._state.update((s) => ({ ...s, misNotasCurso }));
+	}
+
+	setMisNotasLoading(misNotasLoading: boolean): void {
+		this._state.update((s) => ({ ...s, misNotasLoading }));
+	}
+
+	setMiAsistencia(miAsistencia: MiAsistenciaCursoResumenDto | null): void {
+		this._state.update((s) => ({ ...s, miAsistencia }));
+	}
+
+	setMiAsistenciaLoading(miAsistenciaLoading: boolean): void {
+		this._state.update((s) => ({ ...s, miAsistenciaLoading }));
 	}
 
 	// #endregion
@@ -195,6 +236,10 @@ export class EstudianteCursosStore {
 			loadedSemanas: [],
 			misTareaArchivos: {},
 			loadedTareas: [],
+			misNotasCurso: null,
+			misNotasLoading: false,
+			miAsistencia: null,
+			miAsistenciaLoading: false,
 		}));
 	}
 
@@ -212,6 +257,17 @@ export class EstudianteCursosStore {
 
 	closeTareasSummaryDialog(): void {
 		this._state.update((s) => ({ ...s, tareasSummaryDialogVisible: false }));
+	}
+
+	/** Clear loaded caches so content can be re-fetched on refresh. */
+	clearLoadedCaches(): void {
+		this._state.update((s) => ({
+			...s,
+			misArchivos: {},
+			loadedSemanas: [],
+			misTareaArchivos: {},
+			loadedTareas: [],
+		}));
 	}
 	// #endregion
 }

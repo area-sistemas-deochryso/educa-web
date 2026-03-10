@@ -7,10 +7,20 @@
 	padding: 1rem 0.5rem;
 	margin: 0 auto 0.25rem auto;
 	width: calc(100% - 5rem);
+	transition: border-color 0.2s;
+
+	&:focus-within {
+		border-bottom-color: var(--intranet-accent-color-blue);
+	}
 
 	i {
 		color: #707070;
 		font-size: 1.1rem;
+		transition: color 0.2s;
+	}
+
+	&:focus-within i {
+		color: var(--intranet-accent-color-blue);
 	}
 }
 
@@ -39,9 +49,9 @@
 			color: var(--intranet-soft-text-color) !important;
 		}
 
+		&:hover,
 		&.p-focus,
-		&:focus,
-		&:hover {
+		&:focus {
 			box-shadow: none !important;
 			border: none !important;
 			outline: none !important;

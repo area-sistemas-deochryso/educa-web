@@ -1,0 +1,151 @@
+// #region Host & Layout
+:host {
+	display: block;
+}
+
+.notas-filters {
+	display: flex;
+	align-items: center;
+	gap: 0.75rem;
+	padding: 0.5rem 0;
+	flex-wrap: wrap;
+
+	.curso-select {
+		min-width: 200px;
+	}
+}
+// #endregion
+
+// #region Empty state
+.empty-state {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	justify-content: center;
+	padding: 2rem 1rem;
+	text-align: center;
+	color: var(--text-color-secondary);
+
+	p {
+		margin: 0.5rem 0 0.25rem;
+		font-weight: 600;
+		color: var(--text-color);
+	}
+}
+// #endregion
+
+// #region Eval header
+.eval-header {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	gap: 0.25rem;
+
+	span {
+		overflow: hidden;
+		text-overflow: ellipsis;
+		max-width: 60px;
+	}
+}
+// #endregion
+
+// #region Period grouped headers
+.periodo-header {
+	text-align: center !important;
+	font-weight: 700 !important;
+	font-size: 0.8rem;
+	background: var(--p-primary-50, rgba(79, 70, 229, 0.05)) !important;
+	border-bottom: 2px solid var(--p-primary-200, rgba(79, 70, 229, 0.2)) !important;
+	color: var(--p-primary-700, #4338ca);
+}
+
+.periodo-header-single {
+	text-align: center !important;
+	font-weight: 700 !important;
+	font-size: 0.8rem;
+	min-width: 100px;
+	color: var(--p-primary-700, #4338ca);
+}
+
+.promedio-col-header {
+	text-align: center !important;
+	font-weight: 700 !important;
+	font-size: 0.75rem;
+	min-width: 60px;
+	color: var(--p-primary-600, #4f46e5);
+	background: var(--surface-50, #fafafa) !important;
+}
+
+.promedio-col {
+	background: var(--surface-50, #fafafa);
+}
+
+.general-header {
+	text-align: center !important;
+	font-weight: 700 !important;
+	min-width: 75px;
+	color: var(--p-primary-800, #3730a3);
+}
+
+.general-col {
+	background: var(--surface-50, #fafafa);
+}
+// #endregion
+
+// #region Promedio values
+.promedio-value {
+	font-weight: 600;
+}
+
+.general-value {
+	font-weight: 700;
+	font-size: 0.9rem;
+}
+// #endregion
+
+// #region Promedio colors
+.promedio-success {
+	color: var(--green-600, #16a34a);
+}
+
+.promedio-warn {
+	color: var(--yellow-700, #a16207);
+}
+
+.promedio-danger {
+	color: var(--red-600, #dc2626);
+}
+
+.promedio-secondary {
+	color: var(--text-color-secondary);
+}
+// #endregion
+
+// #region Table overrides
+:host ::ng-deep {
+	.p-datatable {
+		margin-top: 0.5rem;
+	}
+
+	.p-datatable .p-datatable-thead > tr > th {
+		padding: 0.5rem;
+		font-size: 0.8rem;
+		white-space: nowrap;
+	}
+
+	.p-datatable .p-datatable-tbody > tr > td {
+		padding: 0.4rem 0.5rem;
+		font-size: 0.85rem;
+	}
+
+	// Visual separator after each period's promedio column
+	.notas-salon-table .p-datatable-tbody > tr > td.promedio-col {
+		border-right: 2px solid var(--p-primary-100, rgba(79, 70, 229, 0.1));
+	}
+}
+
+.font-mono {
+	font-family: 'Courier New', monospace;
+	font-size: 0.8rem;
+}
+// #endregion

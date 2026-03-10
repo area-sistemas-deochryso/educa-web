@@ -1,0 +1,124 @@
+<!-- #region Curso selector -->
+@if (showCursoSelector()) {
+	<div class="foro-curso-selector">
+		<label class="foro-curso-label">Curso:</label>
+		<p-select
+			[options]="cursoOptions()"
+			[ngModel]="selectedHorarioId()"
+			(ngModelChange)="onCursoChange($event)"
+			placeholder="Seleccionar curso"
+			appendTo="body"
+			[style]="{ width: '100%', maxWidth: '300px' }"
+		/>
+	</div>
+} @else if (singleCursoLabel(); as label) {
+	<div class="foro-curso-selector">
+		<p-tag [value]="label" severity="info" icon="pi pi-book" />
+	</div>
+}
+<!-- #endregion -->
+
+@if (!initialized()) {
+	<div class="empty-state">
+		<i class="pi pi-book"></i>
+		<p class="empty-title">Selecciona un curso</p>
+		<p class="empty-subtitle">Elige un curso para ver su foro</p>
+	</div>
+} @else {
+	<!-- #region Header -->
+	<div class="foro-header">
+		<div class="foro-header-info">
+			<i class="pi pi-megaphone"></i>
+			<span>Mensajes visibles para todos los estudiantes del curso</span>
+		</div>
+		<button
+			pButton
+			icon="pi pi-refresh"
+			class="p-button-rounded p-button-text p-button-sm"
+			(click)="onRefresh()"
+			[disabled]="vm().loading"
+			[pt]="{ root: { 'aria-label': 'Refrescar mensajes' } }"
+		></button>
+	</div>
+	<!-- #endregion -->
+
+	<!-- #region Loading -->
+	@if (vm().loading) {
+		<div class="loading-wrapper">
+			<p-progressSpinner strokeWidth="4" [style]="{ width: '40px', height: '40px' }" />
+		</div>
+	} @else {
+		<!-- #region Messages list -->
+		<div class="mensajes-container">
+			@if (vm().mensajes.length === 0) {
+				<div class="empty-state">
+					<i class="pi pi-comments"></i>
+					<p class="empty-title">No hay mensajes aún</p>
+					<p class="empty-subtitle">Escribe el primer mensaje del foro</p>
+				</div>
+			} @else {
+				<div class="mensajes-list">
+					@for (msg of vm().mensajes; track msg.id) {
+						<div class="mensaje" [class.mensaje--mio]="msg.esMio">
+							<div class="mensaje-bubble">
+								<div class="mensaje-header">
+									<span class="mensaje-autor">{{ msg.remitenteNombre }}</span>
+									<span class="mensaje-fecha">{{ msg.fechaEnvio | date: 'd/MM/yy, h:mm a' }}</span>
+								</div>
+								<div class="mensaje-contenido">{{ msg.contenido }}</div>
+							</div>
+						</div>
+					}
+				</div>
+			}
+		</div>
+		<!-- #endregion -->
+
+		<!-- #region Destinatarios selector -->
+		@if (destinatarioOptions().length > 0) {
+			<div class="foro-destinatarios">
+				<p-multiselect
+					[options]="destinatarioOptions()"
+					[ngModel]="selectedDestinatarios()"
+					(ngModelChange)="selectedDestinatarios.set($event)"
+					[placeholder]="'Todos (foro general)'"
+					appendTo="body"
+					[group]="hasGrupos()"
+					[style]="{ width: '100%' }"
+					[maxSelectedLabels]="3"
+					selectedItemsLabel="{0} destinatarios"
+				/>
+				@if (isDirectedMessage()) {
+					<small class="foro-destinatarios-hint">
+						<i class="pi pi-info-circle"></i>
+						Se creará una conversación separada con los seleccionados
+					</small>
+				}
+			</div>
+		}
+		<!-- #endregion -->
+
+		<!-- #region Input -->
+		<div class="foro-input">
+			<input
+				pInputText
+				[ngModel]="nuevoMensaje()"
+				(ngModelChange)="nuevoMensaje.set($event)"
+				[placeholder]="isDirectedMessage() ? 'Mensaje dirigido...' : 'Escribe un mensaje...'"
+				class="foro-input-field"
+				(keydown.enter)="onEnviar()"
+				[disabled]="vm().sending"
+			/>
+			<button
+				pButton
+				[icon]="isDirectedMessage() ? 'pi pi-envelope' : 'pi pi-send'"
+				class="p-button-rounded"
+				(click)="onEnviar()"
+				[disabled]="!nuevoMensaje().trim() || vm().sending"
+				[loading]="vm().sending"
+				[pt]="{ root: { 'aria-label': isDirectedMessage() ? 'Enviar mensaje dirigido' : 'Enviar mensaje' } }"
+			></button>
+		</div>
+		<!-- #endregion -->
+	}
+}

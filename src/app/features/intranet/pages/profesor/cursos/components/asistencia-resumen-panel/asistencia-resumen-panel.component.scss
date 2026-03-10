@@ -1,0 +1,103 @@
+// #region Header
+.resumen-header {
+	display: flex;
+	flex-direction: column;
+	gap: 0.75rem;
+	margin-bottom: 1rem;
+}
+
+.date-range {
+	display: flex;
+	flex-wrap: wrap;
+	align-items: flex-end;
+	gap: 0.75rem;
+}
+
+.date-field {
+	display: flex;
+	flex-direction: column;
+	gap: 0.25rem;
+
+	label {
+		font-weight: 600;
+		font-size: 0.85rem;
+	}
+
+	:host ::ng-deep .p-calendar {
+		max-width: 180px;
+	}
+}
+
+.global-stats {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 0.5rem;
+}
+// #endregion
+
+// #region Loading
+.loading-state {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	gap: 0.5rem;
+	padding: 3rem 1rem;
+	color: var(--text-color-secondary);
+
+	i {
+		font-size: 1.25rem;
+	}
+}
+// #endregion
+
+// #region Table
+.count-present {
+	color: var(--green-600);
+	font-weight: 600;
+}
+
+.count-tarde {
+	color: var(--yellow-600);
+	font-weight: 600;
+}
+
+.count-falta {
+	color: var(--red-600);
+	font-weight: 600;
+}
+// #endregion
+
+// #region Empty state
+.empty-state {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	justify-content: center;
+	padding: 3rem 1rem;
+	color: var(--text-color-secondary);
+	text-align: center;
+
+	i {
+		font-size: 2.5rem;
+		margin-bottom: 0.75rem;
+		opacity: 0.5;
+	}
+
+	p {
+		margin: 0;
+	}
+}
+// #endregion
+
+// #region Responsive
+@media (max-width: 640px) {
+	.date-range {
+		flex-direction: column;
+		align-items: stretch;
+	}
+
+	.date-field :host ::ng-deep .p-calendar {
+		max-width: 100%;
+	}
+}
+// #endregion

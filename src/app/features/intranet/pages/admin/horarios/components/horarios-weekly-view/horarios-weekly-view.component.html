@@ -79,13 +79,15 @@
                       [pt]="{ root: { 'aria-label': 'Ver detalles' } }"
                     ></button>
 
-                    <button
-                      pButton
-                      icon="pi pi-pencil"
-                      class="p-button-rounded p-button-text p-button-sm action-btn"
-                      (click)="onEditClick($event, block)"
-                      [pt]="{ root: { 'aria-label': 'Editar' } }"
-                    ></button>
+                    @if (isAdmin()) {
+                      <button
+                        pButton
+                        icon="pi pi-pencil"
+                        class="p-button-rounded p-button-text p-button-sm action-btn"
+                        (click)="onEditClick($event, block)"
+                        [pt]="{ root: { 'aria-label': 'Editar' } }"
+                      ></button>
+                    }
                   </div>
                 </div>
               </div>
@@ -109,7 +111,13 @@
     <div class="empty-overlay">
       <i class="pi pi-calendar" style="font-size: 3rem; opacity: 0.3"></i>
       <p>No hay horarios para mostrar</p>
-      <p class="empty-hint">Aplica filtros diferentes o crea un nuevo horario</p>
+      <p class="empty-hint">
+        @if (isAdmin()) {
+          Aplica filtros diferentes o crea un nuevo horario
+        } @else {
+          No tienes horarios asignados actualmente
+        }
+      </p>
     </div>
   }
 </div>

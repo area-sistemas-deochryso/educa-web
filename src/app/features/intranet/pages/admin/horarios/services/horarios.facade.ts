@@ -44,14 +44,25 @@ export class HorariosFacade {
   // #region Comandos de carga
 
   /**
-   * Cargar todos los horarios y opciones de filtros
-   * Estrategia: Refetch completo (incluye estadísticas + opciones para filtros)
+   * Cargar todos los horarios y opciones de filtros.
+   * Profesores: carga solo sus horarios (sin paginación server-side).
+   * Admins: carga paginado con todas las opciones de filtros.
    */
   loadAll(): void {
     this.store.setLoading(true);
     this.store.setOptionsLoading(true);
     this.store.clearError();
 
+    const profesorId = this.store.currentProfesorId();
+
+    if (profesorId !== null) {
+      this.loadAllForProfesor(profesorId);
+    } else {
+      this.loadAllForAdmin();
+    }
+  }
+
+  private loadAllForAdmin(): void {
     const page = this.store.page();
     const pageSize = this.store.pageSize();
 
@@ -80,6 +91,41 @@ export class HorariosFacade {
         },
         error: (err) => {
           logger.error('Error al cargar datos:', err);
+          this.errorHandler.showError(
+            UI_SUMMARIES.error,
+            UI_ADMIN_ERROR_DETAILS.loadHorariosData
+          );
+          this.store.setError(UI_ADMIN_ERROR_DETAILS.loadHorariosData);
+          this.store.setLoading(false);
+          this.store.setOptionsLoading(false);
+        },
+      });
+  }
+
+  private loadAllForProfesor(profesorId: number): void {
+    forkJoin({
+      horarios: this.api.getByProfesor(profesorId),
+      salones: this.salonesApi.listar(),
+      cursos: this.cursosApi.listar(),
+    })
+      .pipe(
+        withRetry({ tag: 'HorariosFacade:loadAllProfesor' }),
+        takeUntilDestroyed(this.destroyRef),
+      )
+      .subscribe({
+        next: ({ horarios, salones, cursos }) => {
+          this.store.setHorarios(horarios);
+          this.store.setPaginationData(1, horarios.length, horarios.length);
+          this.store.setSalonesDisponibles(salones);
+          this.store.setCursosDisponibles(cursos);
+          this.calculateEstadisticas(horarios);
+          this.store.setLoading(false);
+          this.store.setOptionsLoading(false);
+          this.store.setStatsReady(true);
+          this.store.setTableReady(true);
+        },
+        error: (err) => {
+          logger.error('Error al cargar horarios del profesor:', err);
           this.errorHandler.showError(
             UI_SUMMARIES.error,
             UI_ADMIN_ERROR_DETAILS.loadHorariosData
@@ -562,6 +608,92 @@ export class HorariosFacade {
     });
   }
 
+  /**
+   * Desasignar profesor de un horario — WAL con mutación quirúrgica
+   */
+  desasignarProfesor(horarioId: number, usuarioMod: string): void {
+    const endpoint = `${this.apiUrl}/${horarioId}/desasignar-profesor`;
+
+    this.wal.execute({
+      operation: 'CUSTOM',
+      resourceType: 'horarios',
+      resourceId: horarioId,
+      endpoint,
+      method: 'PUT',
+      payload: { horarioId, usuarioMod },
+      http$: () => this.api.desasignarProfesor(horarioId, usuarioMod),
+      onCommit: () => {
+        this.refreshHorariosOnly();
+        this.store.incrementarEstadistica('horariosSinProfesor', 1);
+        this.errorHandler.showSuccess(
+          UI_SUMMARIES.success,
+          UI_HORARIOS_SUCCESS_MESSAGES.profesorUnassigned
+        );
+      },
+      onError: (err) => {
+        logger.error('Error al desasignar profesor:', err);
+        this.handleApiError(err, 'desasignar el profesor');
+        this.store.setLoading(false);
+      },
+      optimistic: {
+        apply: () => {
+          this.store.clearDetalleProfesor();
+          this.store.updateHorario(horarioId, {
+            profesorId: null,
+            profesorNombreCompleto: null,
+          });
+          this.store.setLoading(true);
+        },
+        rollback: () => {
+          this.refreshHorariosOnly();
+          if (this.store.detailDrawerVisible()) {
+            this.loadDetalle(horarioId);
+          }
+        },
+      },
+    });
+  }
+
+  /**
+   * Desasignar un estudiante de un horario — WAL con mutación quirúrgica
+   */
+  desasignarEstudiante(horarioId: number, estudianteId: number): void {
+    const endpoint = `${this.apiUrl}/${horarioId}/estudiante/${estudianteId}`;
+
+    this.wal.execute({
+      operation: 'DELETE',
+      resourceType: 'horarios',
+      resourceId: horarioId,
+      endpoint,
+      method: 'DELETE',
+      payload: { horarioId, estudianteId },
+      http$: () => this.api.desasignarEstudiante(horarioId, estudianteId),
+      onCommit: () => {
+        this.refreshHorariosOnly();
+        this.errorHandler.showSuccess(
+          UI_SUMMARIES.success,
+          UI_HORARIOS_SUCCESS_MESSAGES.estudianteUnassigned
+        );
+      },
+      onError: (err) => {
+        logger.error('Error al desasignar estudiante:', err);
+        this.handleApiError(err, 'desasignar el estudiante');
+        this.store.setLoading(false);
+      },
+      optimistic: {
+        apply: () => {
+          this.store.removeEstudianteFromDetalle(estudianteId);
+          this.store.setLoading(true);
+        },
+        rollback: () => {
+          if (this.store.detailDrawerVisible()) {
+            this.loadDetalle(horarioId);
+          }
+        },
+      },
+    });
+  }
+
   // #endregion
   // #region Comandos de UI
 
@@ -692,32 +824,53 @@ export class HorariosFacade {
   // #region Helpers privados
 
   /**
-   * Refetch solo items paginados (sin resetear skeletons ni opciones)
+   * Refetch solo items (sin resetear skeletons ni opciones).
+   * Profesores: refetch por su profesorId.
+   * Admins: refetch paginado.
    */
   private refreshHorariosOnly(): void {
     this.store.setLoading(true);
-    const page = this.store.page();
-    const pageSize = this.store.pageSize();
+    const profesorId = this.store.currentProfesorId();
 
-    this.api
-      .getAllPaginated(page, pageSize)
-      .pipe(
-        withRetry({ tag: 'HorariosFacade:refreshHorariosOnly' }),
-        takeUntilDestroyed(this.destroyRef),
-      )
-      .subscribe({
-        next: (response) => {
-          this.store.setHorarios(response.data);
-          this.store.setPaginationData(response.page, response.pageSize, response.total);
-          this.calculateEstadisticas(response.data);
-          this.store.setLoading(false);
-        },
-        error: (err) => {
-          logger.error('Error al refrescar horarios:', err);
-          this.errorHandler.showError(UI_SUMMARIES.error, UI_ADMIN_ERROR_DETAILS.refreshData);
-          this.store.setLoading(false);
-        },
-      });
+    if (profesorId !== null) {
+      this.api
+        .getByProfesor(profesorId)
+        .pipe(
+          withRetry({ tag: 'HorariosFacade:refreshHorariosOnly' }),
+          takeUntilDestroyed(this.destroyRef),
+        )
+        .subscribe({
+          next: (horarios) => {
+            this.store.setHorarios(horarios);
+            this.store.setPaginationData(1, horarios.length, horarios.length);
+            this.calculateEstadisticas(horarios);
+            this.store.setLoading(false);
+          },
+          error: (err) => this.handleRefreshError(err),
+        });
+    } else {
+      this.api
+        .getAllPaginated(this.store.page(), this.store.pageSize())
+        .pipe(
+          withRetry({ tag: 'HorariosFacade:refreshHorariosOnly' }),
+          takeUntilDestroyed(this.destroyRef),
+        )
+        .subscribe({
+          next: (response) => {
+            this.store.setHorarios(response.data);
+            this.store.setPaginationData(response.page, response.pageSize, response.total);
+            this.calculateEstadisticas(response.data);
+            this.store.setLoading(false);
+          },
+          error: (err) => this.handleRefreshError(err),
+        });
+    }
+  }
+
+  private handleRefreshError(err: unknown): void {
+    logger.error('Error al refrescar horarios:', err);
+    this.errorHandler.showError(UI_SUMMARIES.error, UI_ADMIN_ERROR_DETAILS.refreshData);
+    this.store.setLoading(false);
   }
 
   /**

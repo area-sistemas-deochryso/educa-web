@@ -1,10 +1,13 @@
-import { Component, ChangeDetectionStrategy, inject, OnInit } from '@angular/core';
+import { Component, ChangeDetectionStrategy, inject, OnInit, DestroyRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { ActivatedRoute, Router, RouterLink } from '@angular/router';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { TableModule } from 'primeng/table';
 import { TagModule } from 'primeng/tag';
 import { ButtonModule } from 'primeng/button';
 import { TooltipModule } from 'primeng/tooltip';
 import { ProgressSpinnerModule } from 'primeng/progressspinner';
+import { filter, take } from 'rxjs';
 import { ProfesorFacade } from '../services/profesor.facade';
 import { CursoContenidoFacade } from './services/curso-contenido.facade';
 import { CursoContentDialogComponent } from './components/curso-content-dialog/curso-content-dialog.component';
@@ -21,6 +24,7 @@ import { HorarioProfesorDto, CrearCursoContenidoRequest } from '../models';
 		ButtonModule,
 		TooltipModule,
 		ProgressSpinnerModule,
+		RouterLink,
 		CursoContentDialogComponent,
 		CursoBuilderDialogComponent,
 	],
@@ -59,10 +63,20 @@ import { HorarioProfesorDto, CrearCursoContenidoRequest } from '../models';
 						<tr>
 							<td class="font-semibold">{{ horario.cursoNombre }}</td>
 							<td>
-								<p-tag [value]="horario.salonDescripcion" severity="info" />
+								<a routerLink="/intranet/profesor/salones" class="no-underline">
+									<p-tag [value]="horario.salonDescripcion" severity="info" />
+								</a>
 							</td>
-							<td>{{ horario.diaSemanaDescripcion }}</td>
-							<td>{{ horario.horaInicio }} - {{ horario.horaFin }}</td>
+							<td>
+								<a routerLink="/intranet/profesor/horarios" class="text-color hover:text-primary no-underline">
+									{{ horario.diaSemanaDescripcion }}
+								</a>
+							</td>
+							<td>
+								<a routerLink="/intranet/profesor/horarios" class="text-color hover:text-primary no-underline">
+									{{ horario.horaInicio }} - {{ horario.horaFin }}
+								</a>
+							</td>
 							<td>
 								<button
 									pButton
@@ -98,12 +112,35 @@ import { HorarioProfesorDto, CrearCursoContenidoRequest } from '../models';
 export class ProfesorCursosComponent implements OnInit {
 	private readonly facade = inject(ProfesorFacade);
 	private readonly contenidoFacade = inject(CursoContenidoFacade);
+	private readonly route = inject(ActivatedRoute);
+	private readonly router = inject(Router);
+	private readonly destroyRef = inject(DestroyRef);
 
 	readonly vm = this.facade.vm;
 	readonly contenidoVm = this.contenidoFacade.vm;
 
 	ngOnInit(): void {
 		this.facade.loadData();
+		this.handleHorarioQueryParam();
+	}
+
+	/** Auto-open content dialog when navigating from salones/horarios with horarioId (and optional tab) params */
+	private handleHorarioQueryParam(): void {
+		this.route.queryParams
+			.pipe(
+				filter((params) => !!params['horarioId']),
+				take(1),
+				takeUntilDestroyed(this.destroyRef),
+			)
+			.subscribe((params) => {
+				const horarioId = Number(params['horarioId']);
+				if (horarioId) {
+					const tab = params['tab'] || undefined;
+					this.contenidoFacade.loadContenido(horarioId, tab);
+					// Clean query params from URL without navigation
+					this.router.navigate([], { queryParams: {}, replaceUrl: true });
+				}
+			});
 	}
 
 	onVerContenido(horario: HorarioProfesorDto): void {

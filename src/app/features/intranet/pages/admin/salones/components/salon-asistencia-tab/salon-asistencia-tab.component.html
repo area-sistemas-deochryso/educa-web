@@ -1,0 +1,89 @@
+<!-- #region Filtro de mes -->
+<div class="filtro-row">
+	<p-select
+		[options]="mesesOptions"
+		[ngModel]="selectedMes()"
+		(ngModelChange)="onMesChange($event)"
+		optionLabel="label"
+		optionValue="value"
+		appendTo="body"
+		placeholder="Mes"
+		[style]="{ width: '160px' }"
+	/>
+</div>
+<!-- #endregion -->
+
+<!-- #region Stats -->
+<div class="stats-row">
+	<div class="stat-mini">
+		<span class="stat-mini-value">{{ stats().total }}</span>
+		<span class="stat-mini-label">Estudiantes</span>
+	</div>
+	<div class="stat-mini">
+		<span class="stat-mini-value text-green-500">{{ stats().presentes }}</span>
+		<span class="stat-mini-label">Presentes</span>
+	</div>
+	<div class="stat-mini">
+		<span class="stat-mini-value text-orange-500">{{ stats().tardanzas }}</span>
+		<span class="stat-mini-label">Tardanzas</span>
+	</div>
+	<div class="stat-mini">
+		<span class="stat-mini-value text-red-500">{{ stats().faltas }}</span>
+		<span class="stat-mini-label">Faltas</span>
+	</div>
+</div>
+<!-- #endregion -->
+
+<!-- #region Tabla de asistencia -->
+<p-table
+	[value]="asistenciaData()"
+	[loading]="loading()"
+	[scrollable]="true"
+	scrollHeight="350px"
+	styleClass="p-datatable-sm"
+>
+	<ng-template #header>
+		<tr>
+			<th style="width: 50px; position: sticky; left: 0; z-index: 1">#</th>
+			<th style="min-width: 180px; position: sticky; left: 50px; z-index: 1">Estudiante</th>
+			@for (dia of diasArray(); track dia) {
+				<th class="text-center dia-header">{{ dia }}</th>
+			}
+		</tr>
+	</ng-template>
+	<ng-template #body let-estudiante let-rowIndex="rowIndex">
+		<tr>
+			<td style="position: sticky; left: 0; z-index: 1; background: var(--surface-card)">{{ rowIndex + 1 }}</td>
+			<td style="position: sticky; left: 50px; z-index: 1; background: var(--surface-card)">
+				<div class="text-sm font-medium">{{ estudiante.nombreCompleto }}</div>
+				<div class="text-xs text-color-secondary">{{ estudiante.dni }}</div>
+			</td>
+			@for (dia of diasArray(); track dia) {
+				<td class="text-center">
+					@if (getEstadoDia(estudiante, dia); as estado) {
+						<span class="estado-badge" [ngClass]="getEstadoClass(estado)">
+							{{ getEstadoLabel(estado) }}
+						</span>
+					}
+				</td>
+			}
+		</tr>
+	</ng-template>
+	<ng-template #emptymessage>
+		<tr>
+			<td [attr.colspan]="diasArray().length + 2" class="text-center p-4">
+				Seleccione un mes para ver la asistencia del salón.
+			</td>
+		</tr>
+	</ng-template>
+</p-table>
+<!-- #endregion -->
+
+<!-- #region Leyenda -->
+<div class="leyenda">
+	<span class="leyenda-item"><span class="estado-badge estado-presente">A</span> Presente</span>
+	<span class="leyenda-item"><span class="estado-badge estado-tardanza">F</span> Fuera de hora</span>
+	<span class="leyenda-item"><span class="estado-badge estado-falta">N</span> No asistió</span>
+	<span class="leyenda-item"><span class="estado-badge estado-justificado">J</span> Justificado</span>
+</div>
+<!-- #endregion -->

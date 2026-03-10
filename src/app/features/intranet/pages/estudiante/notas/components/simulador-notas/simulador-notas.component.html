@@ -1,0 +1,80 @@
+<p-drawer
+	[visible]="visible()"
+	(visibleChange)="onVisibleChange($event)"
+	header="Simulador de Notas"
+	position="right"
+	[style]="{ width: '380px', maxWidth: '95vw' }"
+>
+	<!-- #region Header info -->
+	<div class="sim-header">
+		<span class="text-sm text-color-secondary">{{ curso().cursoNombre }}</span>
+		<div class="sim-promedio">
+			<span class="text-sm">Promedio simulado:</span>
+			<p-tag
+				[value]="formatNota(promedioSimulado())"
+				[severity]="getNotaSeverity(promedioSimulado())"
+				[rounded]="true"
+				class="promedio-tag"
+			/>
+		</div>
+		<div class="sim-actions">
+			<button
+				pButton
+				label="Restaurar"
+				icon="pi pi-undo"
+				class="p-button-outlined p-button-sm"
+				(click)="resetSimulacion.emit()"
+			></button>
+		</div>
+	</div>
+	<!-- #endregion -->
+
+	<!-- #region Evaluaciones -->
+	<div class="sim-list">
+		@for (sim of simulaciones(); track sim.calificacionId) {
+			<div class="sim-item">
+				<div class="sim-info">
+					<span class="sim-titulo">{{ getEvalTitulo(sim.calificacionId) }}</span>
+					<div class="sim-meta">
+						<p-tag [value]="getEvalTipo(sim.calificacionId)" severity="info" [rounded]="true" />
+						<span class="text-xs text-color-secondary">Peso: {{ (sim.peso * 100).toFixed(0) }}%</span>
+					</div>
+				</div>
+				<div class="sim-nota-input">
+					<span class="text-xs text-color-secondary mb-1">
+						Original: {{ formatNota(sim.notaOriginal) }}
+					</span>
+					<p-inputNumber
+						[ngModel]="sim.notaSimulada"
+						(ngModelChange)="notaChange.emit({ calificacionId: sim.calificacionId, nota: $event })"
+						[min]="notaMin"
+						[max]="notaMax"
+						[minFractionDigits]="1"
+						[maxFractionDigits]="1"
+						[step]="0.5"
+						[showButtons]="true"
+						buttonLayout="horizontal"
+						incrementButtonIcon="pi pi-plus"
+						decrementButtonIcon="pi pi-minus"
+						inputStyleClass="sim-input"
+					/>
+				</div>
+			</div>
+		} @empty {
+			<div class="text-color-secondary text-center p-3">
+				<i class="pi pi-info-circle mr-1"></i>
+				No hay evaluaciones para simular
+			</div>
+		}
+	</div>
+	<!-- #endregion -->
+
+	<!-- #region Footer info -->
+	<div class="sim-footer">
+		<i class="pi pi-info-circle text-color-secondary"></i>
+		<span class="text-xs text-color-secondary">
+			Los cambios son solo simulación. No se guardan ni afectan tus notas reales.
+		</span>
+	</div>
+	<!-- #endregion -->
+</p-drawer>

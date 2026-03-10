@@ -59,13 +59,13 @@
 				</td>
 				<td>
 					<!-- * Role tag uses severity mapping -->
-					<p-tag [value]="usuario.rol" [severity]="adminUtils.getRolSeverity(usuario.rol)" />
+					<p-tag [value]="usuario.rol" [severity]="uiMapping.getRolSeverity(usuario.rol)" />
 				</td>
 				<td class="text-center">
 					<!-- * Active/inactive status tag -->
 					<p-tag
 						[value]="usuario.estado ? 'Activo' : 'Inactivo'"
-						[severity]="adminUtils.getEstadoSeverity(usuario.estado)"
+						[severity]="uiMapping.getEstadoSeverity(usuario.estado)"
 					/>
 				</td>
 				<td>

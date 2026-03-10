@@ -21,6 +21,7 @@ export class HorariosWeeklyViewComponent {
   // * Inputs for weekly blocks + loading state.
   readonly blocks = input.required<HorarioWeeklyBlock[]>();
   readonly loading = input<boolean>(false);
+  readonly isAdmin = input<boolean>(true);
 
   // * Outputs for block actions.
   readonly blockClick = output<number>();

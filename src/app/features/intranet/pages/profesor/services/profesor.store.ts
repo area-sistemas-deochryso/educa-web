@@ -4,9 +4,13 @@ import {
 	SalonTutoriaDto,
 	ProfesorCurso,
 	ProfesorSalon,
+	SalonCursoInfo,
 	ProfesorMisSalonesConEstudiantesDto,
 	ProfesorSalonConEstudiantesDto,
 	ProfesorEstudianteSalonDto,
+	SalonNotasResumenDto,
+	VistaPromedio,
+	recalcularPromedios,
 } from '../models';
 
 /** Salón enriquecido con datos de estudiantes */
@@ -26,6 +30,12 @@ interface ProfesorStoreState {
 	salonDialogLoading: boolean;
 	selectedSalon: ProfesorSalonConEstudiantes | null;
 	// #endregion
+	// #region Notas salón state
+	notasSalon: SalonNotasResumenDto | null;
+	notasSalonLoading: boolean;
+	notasCursoId: number | null;
+	notasVistaActual: VistaPromedio;
+	// #endregion
 }
 
 const initialState: ProfesorStoreState = {
@@ -37,6 +47,10 @@ const initialState: ProfesorStoreState = {
 	salonDialogVisible: false,
 	salonDialogLoading: false,
 	selectedSalon: null,
+	notasSalon: null,
+	notasSalonLoading: false,
+	notasCursoId: null,
+	notasVistaActual: 'semana',
 };
 
 @Injectable({ providedIn: 'root' })
@@ -54,6 +68,10 @@ export class ProfesorStore {
 	readonly salonDialogVisible = computed(() => this._state().salonDialogVisible);
 	readonly salonDialogLoading = computed(() => this._state().salonDialogLoading);
 	readonly selectedSalon = computed(() => this._state().selectedSalon);
+	readonly notasSalon = computed(() => this._state().notasSalon);
+	readonly notasSalonLoading = computed(() => this._state().notasSalonLoading);
+	readonly notasCursoId = computed(() => this._state().notasCursoId);
+	readonly notasVistaActual = computed(() => this._state().notasVistaActual);
 
 	// #endregion
 	// #region Computed - Cursos únicos
@@ -96,18 +114,20 @@ export class ProfesorStore {
 			});
 		}
 
-		// Agregar salones de horarios (sin duplicar)
+		// Agregar salones de horarios (sin duplicar cursos)
 		for (const h of horarios) {
 			const existing = salonesMap.get(h.salonId);
+			const cursoInfo: SalonCursoInfo = { nombre: h.cursoNombre, horarioId: h.id };
+
 			if (existing) {
-				if (!existing.cursos.includes(h.cursoNombre)) {
-					existing.cursos.push(h.cursoNombre);
+				if (!existing.cursos.some((c) => c.nombre === h.cursoNombre)) {
+					existing.cursos.push(cursoInfo);
 				}
 			} else {
 				salonesMap.set(h.salonId, {
 					salonId: h.salonId,
 					salonDescripcion: h.salonDescripcion,
-					cursos: [h.cursoNombre],
+					cursos: [cursoInfo],
 					esTutor: false,
 				});
 			}
@@ -162,6 +182,21 @@ export class ProfesorStore {
 	});
 
 	// #endregion
+	// #region Computed - Cursos por salón seleccionado (con IDs)
+	readonly cursosForSelectedSalon = computed<{ label: string; value: number }[]>(() => {
+		const salon = this.selectedSalon();
+		if (!salon) return [];
+		const horarios = this.horarios();
+		const map = new Map<number, string>();
+		for (const h of horarios) {
+			if (h.salonId === salon.salonId && !map.has(h.cursoId)) {
+				map.set(h.cursoId, h.cursoNombre);
+			}
+		}
+		return Array.from(map.entries()).map(([value, label]) => ({ label, value }));
+	});
+
+	// #endregion
 	// #region ViewModel
 	readonly vm = computed(() => ({
 		horarios: this.horarios(),
@@ -176,6 +211,11 @@ export class ProfesorStore {
 		salonDialogVisible: this.salonDialogVisible(),
 		salonDialogLoading: this.salonDialogLoading(),
 		selectedSalon: this.selectedSalon(),
+		notasSalon: this.notasSalon(),
+		notasSalonLoading: this.notasSalonLoading(),
+		notasCursoId: this.notasCursoId(),
+		notasVistaActual: this.notasVistaActual(),
+		cursosForSelectedSalon: this.cursosForSelectedSalon(),
 	}));
 
 	// #endregion
@@ -219,7 +259,68 @@ export class ProfesorStore {
 	}
 
 	closeSalonDialog(): void {
-		this._state.update((s) => ({ ...s, salonDialogVisible: false, salonDialogLoading: false, selectedSalon: null }));
+		this._state.update((s) => ({
+			...s,
+			salonDialogVisible: false,
+			salonDialogLoading: false,
+			selectedSalon: null,
+			notasSalon: null,
+			notasSalonLoading: false,
+			notasCursoId: null,
+		}));
+	}
+
+	// #endregion
+	// #region Notas salón commands
+	setNotasSalon(data: SalonNotasResumenDto | null): void {
+		this._state.update((s) => ({ ...s, notasSalon: data }));
+	}
+
+	setNotasSalonLoading(loading: boolean): void {
+		this._state.update((s) => ({ ...s, notasSalonLoading: loading }));
+	}
+
+	setNotasCursoId(cursoId: number | null): void {
+		this._state.update((s) => ({ ...s, notasCursoId: cursoId }));
+	}
+
+	setNotasVistaActual(vista: VistaPromedio): void {
+		this._state.update((s) => ({ ...s, notasVistaActual: vista }));
+	}
+
+	/** Quirurgical update: update/delete a single nota and recalculate promedios */
+	updateNotaEstudiante(estudianteId: number, calificacionId: number, nota: number | null): void {
+		this._state.update((s) => {
+			if (!s.notasSalon) return s;
+			const { evaluaciones, periodos } = s.notasSalon;
+
+			return {
+				...s,
+				notasSalon: {
+					...s.notasSalon,
+					estudiantes: s.notasSalon.estudiantes.map((est) => {
+						if (est.estudianteId !== estudianteId) return est;
+
+						// Update notas array
+						let updatedNotas;
+						if (nota === null) {
+							updatedNotas = est.notas.filter((n) => n.calificacionId !== calificacionId);
+						} else {
+							const exists = est.notas.some((n) => n.calificacionId === calificacionId);
+							updatedNotas = exists
+								? est.notas.map((n) => (n.calificacionId === calificacionId ? { ...n, nota } : n))
+								: [...est.notas, { calificacionId, nota }];
+						}
+
+						return {
+							...est,
+							notas: updatedNotas,
+							promedios: recalcularPromedios(updatedNotas, evaluaciones, periodos),
+						};
+					}),
+				},
+			};
+		});
 	}
 
 	reset(): void {

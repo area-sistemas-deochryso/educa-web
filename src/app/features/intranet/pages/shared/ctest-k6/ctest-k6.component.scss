@@ -1,0 +1,742 @@
+:host {
+	display: block;
+	padding: 1.5rem;
+}
+
+// #region Page Header
+.page-header {
+	display: flex;
+	align-items: flex-start;
+	justify-content: space-between;
+	margin-bottom: 1.5rem;
+
+	.header-content {
+		h2 {
+			margin: 0 0 0.25rem;
+			display: flex;
+			align-items: center;
+			gap: 0.5rem;
+			color: var(--text-color);
+		}
+
+		p {
+			margin: 0;
+			color: var(--text-color-secondary);
+			font-size: 0.9rem;
+		}
+	}
+
+	.header-badges {
+		display: flex;
+		gap: 0.5rem;
+	}
+}
+// #endregion
+
+// #region Stepper Wizard
+::ng-deep .p-step-list {
+	overflow-x: auto;
+	-webkit-overflow-scrolling: touch;
+	scrollbar-width: none;
+
+	&::-webkit-scrollbar {
+		display: none;
+	}
+}
+
+.wizard-step-content {
+	padding: 1.25rem 0;
+}
+
+.step-footer {
+	display: flex;
+	align-items: center;
+	gap: 0.75rem;
+	padding-top: 1rem;
+	margin-top: 1.5rem;
+	border-top: 1px solid var(--surface-border);
+}
+
+.step-spacer {
+	flex: 1;
+}
+
+.generate-btn {
+	font-weight: 600;
+}
+// #endregion
+
+// #region Config Section
+.config-section {
+	background: var(--surface-card);
+	border: 1px solid var(--surface-border);
+	border-radius: 12px;
+	padding: 1.25rem;
+	margin-bottom: 1rem;
+
+	h3 {
+		margin: 0 0 1rem;
+		font-size: 1rem;
+		display: flex;
+		align-items: center;
+		gap: 0.5rem;
+		color: var(--text-color);
+	}
+}
+
+.section-header {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	margin-bottom: 1rem;
+
+	h3 {
+		margin: 0 !important;
+	}
+}
+
+.section-toggle {
+	display: flex;
+	align-items: center;
+	gap: 0.5rem;
+
+	.toggle-label {
+		font-size: 0.85rem;
+		color: var(--text-color-secondary);
+		cursor: pointer;
+	}
+}
+// #endregion
+
+// #region Form Grids
+.form-grid-2col {
+	display: grid;
+	grid-template-columns: 1fr 1fr;
+	gap: 1rem;
+	margin-bottom: 1rem;
+}
+
+.form-grid-3col {
+	display: grid;
+	grid-template-columns: 1fr 1fr 1fr;
+	gap: 1rem;
+	margin-bottom: 1rem;
+}
+
+.field {
+	display: flex;
+	flex-direction: column;
+	gap: 0.375rem;
+
+	label {
+		font-size: 0.8rem;
+		font-weight: 500;
+		color: var(--text-color-secondary);
+	}
+}
+// #endregion
+
+// #region Test Type Option (dropdown template)
+.type-option {
+	display: flex;
+	align-items: flex-start;
+	gap: 0.625rem;
+	padding: 0.25rem 0;
+
+	i {
+		margin-top: 2px;
+		font-size: 1rem;
+	}
+
+	.type-label {
+		display: block;
+		font-weight: 500;
+	}
+
+	.type-tooltip {
+		display: block;
+		font-size: 0.75rem;
+		color: var(--text-color-secondary);
+		line-height: 1.3;
+		max-width: 280px;
+	}
+}
+// #endregion
+
+// #region Stages
+.stages-list {
+	display: flex;
+	flex-direction: column;
+	gap: 0.5rem;
+}
+
+.stage-row {
+	display: flex;
+	align-items: flex-end;
+	gap: 0.625rem;
+
+	.stage-index {
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		width: 28px;
+		height: 28px;
+		border-radius: 50%;
+		background: var(--surface-ground);
+		color: var(--text-color-secondary);
+		font-size: 0.75rem;
+		font-weight: 600;
+		flex-shrink: 0;
+		margin-bottom: 4px;
+	}
+
+	.stage-field {
+		flex: 1;
+	}
+}
+
+.stages-preview {
+	display: flex;
+	align-items: center;
+	flex-wrap: wrap;
+	gap: 0.375rem;
+	margin-top: 0.75rem;
+	padding: 0.625rem 0.75rem;
+	background: var(--surface-ground);
+	border-radius: 8px;
+
+	.preview-label {
+		font-size: 0.8rem;
+		color: var(--text-color-secondary);
+		font-weight: 500;
+		margin-right: 0.25rem;
+	}
+
+	.preview-stage {
+		font-size: 0.8rem;
+		font-family: 'Cascadia Code', 'Consolas', monospace;
+		color: var(--text-color);
+	}
+
+	.preview-arrow {
+		font-size: 0.65rem;
+		color: var(--text-color-secondary);
+	}
+}
+
+.stages-disabled-info {
+	display: flex;
+	align-items: center;
+	gap: 0.5rem;
+	padding: 0.75rem;
+	color: var(--text-color-secondary);
+	font-size: 0.85rem;
+	background: var(--surface-ground);
+	border-radius: 8px;
+}
+
+.stage-row-wrapper {
+	background: var(--surface-ground);
+	border-radius: 8px;
+	padding: 0.5rem 0.625rem;
+}
+
+.stage-endpoints-panel {
+	display: flex;
+	flex-direction: column;
+	gap: 0.375rem;
+	margin-top: 0.5rem;
+	padding: 0.5rem 0.625rem;
+	background: var(--surface-card);
+	border-radius: 6px;
+	border: 1px dashed var(--surface-border);
+
+	.stage-endpoints-hint {
+		font-size: 0.75rem;
+		color: var(--text-color-secondary);
+		display: flex;
+		align-items: center;
+		gap: 0.375rem;
+		margin-bottom: 0.125rem;
+	}
+
+	.stage-endpoint-item {
+		display: flex;
+		align-items: center;
+		gap: 0.5rem;
+		font-size: 0.8rem;
+		cursor: pointer;
+		padding: 0.125rem 0;
+
+		.stage-ep-method {
+			font-family: 'Cascadia Code', 'Consolas', monospace;
+			font-size: 0.7rem;
+			font-weight: 600;
+			padding: 0.125rem 0.375rem;
+			border-radius: 4px;
+			color: #fff;
+
+			&.method-get {
+				background: #3b82f6;
+			}
+
+			&.method-post {
+				background: #22c55e;
+			}
+
+			&.method-put {
+				background: #f59e0b;
+			}
+
+			&.method-delete {
+				background: #ef4444;
+			}
+		}
+
+		.stage-ep-path {
+			font-family: 'Cascadia Code', 'Consolas', monospace;
+			color: var(--text-color-secondary);
+		}
+	}
+}
+// #endregion
+
+// #region Endpoints
+.endpoint-actions {
+	display: flex;
+	gap: 0.5rem;
+}
+
+.toggle-all {
+	display: flex;
+	gap: 0.25rem;
+	margin-bottom: 0.5rem;
+}
+
+.endpoints-list {
+	display: flex;
+	flex-direction: column;
+	gap: 0.5rem;
+}
+
+.endpoint-card {
+	background: var(--surface-ground);
+	border-radius: 8px;
+	padding: 0.75rem;
+	transition: opacity 0.2s;
+	overflow: hidden;
+
+	&.disabled {
+		opacity: 0.5;
+	}
+}
+
+.endpoint-header {
+	display: flex;
+	align-items: center;
+	gap: 0.5rem;
+	min-width: 0;
+
+	> p-checkbox {
+		flex-shrink: 0;
+	}
+
+	> p-select {
+		flex-shrink: 0;
+		width: 110px;
+	}
+
+	.endpoint-path-input {
+		flex: 1.5;
+		min-width: 0;
+	}
+
+	.endpoint-name-input {
+		flex: 0.8;
+		min-width: 0;
+	}
+
+	> button {
+		flex-shrink: 0;
+	}
+}
+
+.endpoint-body {
+	margin-top: 0.5rem;
+	padding-left: 2.5rem;
+
+	.body-textarea {
+		width: 100%;
+		font-family: 'Cascadia Code', 'Consolas', monospace;
+		font-size: 0.8rem;
+	}
+}
+
+.empty-endpoints {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	justify-content: center;
+	padding: 2rem;
+	color: var(--text-color-secondary);
+	text-align: center;
+
+	p {
+		margin: 0.75rem 0 0.25rem;
+		font-weight: 500;
+	}
+
+	span {
+		font-size: 0.85rem;
+	}
+}
+// #endregion
+
+// #region Drag and Drop
+.drag-handle {
+	cursor: grab;
+	color: var(--text-color-secondary);
+	font-size: 0.85rem;
+	opacity: 0.5;
+	transition: opacity 0.2s;
+	flex-shrink: 0;
+
+	&:hover {
+		opacity: 1;
+	}
+
+	&:active {
+		cursor: grabbing;
+	}
+}
+
+.cdk-drag-preview {
+	box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+	border-radius: 8px;
+	opacity: 0.9;
+}
+
+.cdk-drag-placeholder {
+	opacity: 0.3;
+}
+
+.cdk-drag-animating {
+	transition: transform 200ms ease;
+}
+
+.cdk-drop-list-dragging .cdk-drag {
+	transition: transform 200ms ease;
+}
+// #endregion
+
+// #region How to Run
+.how-to-run {
+	margin-top: 1.5rem;
+	padding: 1.25rem;
+	background: var(--surface-ground);
+	border-radius: 12px;
+
+	h4 {
+		margin: 0 0 1rem;
+		font-size: 1rem;
+		display: flex;
+		align-items: center;
+		gap: 0.5rem;
+		color: var(--text-color);
+	}
+}
+
+.run-steps {
+	margin: 0;
+	padding-left: 1.25rem;
+	display: flex;
+	flex-direction: column;
+	gap: 0.75rem;
+
+	li {
+		font-size: 0.9rem;
+		color: var(--text-color);
+		line-height: 1.5;
+
+		strong {
+			display: block;
+			margin-bottom: 0.25rem;
+		}
+
+		code {
+			display: inline-block;
+			font-family: 'Cascadia Code', 'Consolas', monospace;
+			font-size: 0.8rem;
+			padding: 0.2rem 0.5rem;
+			background: var(--surface-card);
+			border: 1px solid var(--surface-border);
+			border-radius: 4px;
+			color: var(--primary-text-color);
+			text-shadow: var(--primary-text-shadow);
+		}
+	}
+}
+// #endregion
+
+// #region Responsive
+@media (max-width: 1024px) {
+	.form-grid-3col {
+		grid-template-columns: 1fr 1fr;
+	}
+}
+
+@media (max-width: 768px) {
+	:host {
+		padding: 1rem 1.25rem;
+	}
+
+	.page-header {
+		flex-direction: column;
+		gap: 0.75rem;
+
+		.header-badges {
+			flex-wrap: wrap;
+		}
+	}
+
+	.form-grid-2col {
+		grid-template-columns: 1fr;
+	}
+
+	.form-grid-3col {
+		grid-template-columns: 1fr;
+	}
+
+	.section-header {
+		flex-direction: column;
+		align-items: flex-start;
+		gap: 0.75rem;
+	}
+
+	.endpoint-actions {
+		width: 100%;
+
+		button {
+			flex: 1;
+		}
+	}
+
+	.endpoint-header {
+		flex-wrap: wrap;
+		gap: 0.5rem;
+
+		.endpoint-path-input,
+		.endpoint-name-input {
+			flex: 1 1 100%;
+		}
+
+		p-select {
+			flex: 1;
+		}
+	}
+
+	.endpoint-body {
+		padding-left: 0;
+	}
+
+	.stage-row {
+		flex-wrap: wrap;
+		align-items: center;
+		gap: 0.375rem;
+
+		.stage-index {
+			margin-bottom: 0;
+			margin-right: auto;
+		}
+
+		.stage-field {
+			order: 1;
+			flex: 1 1 calc(50% - 0.5rem);
+			min-width: 0;
+		}
+	}
+
+	.stages-preview {
+		flex-direction: column;
+		align-items: flex-start;
+		gap: 0.25rem;
+	}
+
+	.step-footer {
+		button {
+			flex: 1;
+		}
+	}
+
+	.how-to-run {
+		padding: 1rem;
+
+		h4 {
+			font-size: 0.9rem;
+		}
+	}
+
+	.run-steps {
+		padding-left: 1rem;
+
+		li {
+			font-size: 0.85rem;
+
+			code {
+				font-size: 0.75rem;
+			}
+		}
+	}
+}
+
+@media (max-width: 600px) {
+	.step-footer {
+		flex-direction: column;
+
+		button {
+			width: 100%;
+		}
+	}
+
+	.how-to-run {
+		padding: 0.875rem;
+
+		li {
+			code {
+				display: inline-block;
+				word-break: break-all;
+			}
+		}
+	}
+}
+
+@media (max-width: 480px) {
+	:host {
+		padding: 0.75rem 1rem;
+	}
+
+	.page-header {
+		margin-bottom: 1rem;
+
+		.header-content {
+			h2 {
+				font-size: 1.1rem;
+			}
+
+			p {
+				font-size: 0.8rem;
+			}
+		}
+	}
+
+	.wizard-step-content {
+		padding: 1rem 0;
+
+		> h3 {
+			font-size: 1rem;
+		}
+	}
+
+	.config-section {
+		padding: 0.75rem;
+		border-radius: 8px;
+		margin-bottom: 0.75rem;
+
+		h3 {
+			font-size: 0.9rem;
+			margin-bottom: 0.75rem;
+		}
+	}
+
+	.endpoint-header {
+		flex-direction: column;
+		align-items: stretch;
+
+		> p-checkbox {
+			align-self: flex-start;
+		}
+
+		> p-select {
+			width: 100%;
+		}
+
+		.endpoint-path-input,
+		.endpoint-name-input {
+			flex: 1 1 100%;
+		}
+
+		> button {
+			align-self: flex-end;
+		}
+	}
+
+	.endpoint-body {
+		padding-left: 0;
+	}
+
+	.stage-row .stage-field label {
+		font-size: 0.75rem;
+	}
+
+	.toggle-all {
+		flex-wrap: wrap;
+	}
+
+	.empty-endpoints {
+		padding: 1.25rem 0.75rem;
+
+		i {
+			font-size: 1.5rem !important;
+		}
+
+		p {
+			font-size: 0.875rem;
+		}
+
+		span {
+			font-size: 0.8rem;
+		}
+	}
+
+	.stages-disabled-info {
+		font-size: 0.8rem;
+		padding: 0.625rem;
+	}
+
+	.step-footer {
+		flex-wrap: wrap;
+		gap: 0.5rem;
+
+		button {
+			flex: 1;
+			min-width: 0;
+		}
+	}
+
+	.how-to-run {
+		padding: 0.75rem;
+		border-radius: 8px;
+		margin-top: 1rem;
+
+		h4 {
+			font-size: 0.85rem;
+			margin-bottom: 0.75rem;
+		}
+	}
+
+	.run-steps {
+		gap: 0.5rem;
+		padding-left: 0.75rem;
+
+		li {
+			font-size: 0.8rem;
+
+			code {
+				font-size: 0.7rem;
+				padding: 0.15rem 0.375rem;
+				word-break: break-all;
+			}
+		}
+	}
+}
+// #endregion

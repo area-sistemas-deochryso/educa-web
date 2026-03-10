@@ -10,10 +10,11 @@ import {
 	UsuariosEstadisticas,
 	UsuariosService,
 	WalFacadeHelper,
+	WalService,
 } from '@core/services';
 import { DestroyRef, Injectable, inject } from '@angular/core';
-import { catchError, filter } from 'rxjs/operators';
-import { forkJoin, of } from 'rxjs';
+import { catchError, filter, switchMap } from 'rxjs/operators';
+import { forkJoin, from, of } from 'rxjs';
 
 import { environment } from '@config';
 import { UsuariosStore } from './usuarios.store';
@@ -36,6 +37,7 @@ export class UsuariosFacade {
 	private debug = inject(DebugService);
 	private log = this.debug.dbg('FACADE:Usuarios');
 	private wal = inject(WalFacadeHelper);
+	private walService = inject(WalService);
 	private readonly apiUrl = `${environment.apiUrl}/api/sistema/usuarios`;
 
 	// Expone ViewModel del store
@@ -581,7 +583,10 @@ export class UsuariosFacade {
 		}
 	}
 
-	/** Auto-refresh cuando el SW detecta datos nuevos del servidor */
+	/**
+	 * Auto-refresh cuando el SW detecta datos nuevos del servidor (SWR).
+	 * Skips update if WAL has pending mutations to avoid overwriting optimistic state.
+	 */
 	private setupCacheRefresh(): void {
 		// Actualizar lista de usuarios directamente desde el evento (sin nuevo fetch)
 		this.swService.cacheUpdated$
@@ -589,6 +594,13 @@ export class UsuariosFacade {
 				filter(
 					(event) =>
 						event.url.includes('/usuarios') && !event.url.includes('estadisticas'),
+				),
+				// Skip if WAL has pending mutations for usuarios
+				switchMap((event) =>
+					from(this.walService.hasPendingForResource('usuarios')).pipe(
+						filter((hasPending) => !hasPending),
+						switchMap(() => of(event)),
+					),
 				),
 				takeUntilDestroyed(this.destroyRef),
 			)
@@ -610,6 +622,12 @@ export class UsuariosFacade {
 		this.swService.cacheUpdated$
 			.pipe(
 				filter((event) => event.url.includes('/usuarios/estadisticas')),
+				switchMap((event) =>
+					from(this.walService.hasPendingForResource('usuarios')).pipe(
+						filter((hasPending) => !hasPending),
+						switchMap(() => of(event)),
+					),
+				),
 				takeUntilDestroyed(this.destroyRef),
 			)
 			.subscribe((event) => {

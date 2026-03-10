@@ -1,0 +1,353 @@
+<!-- #region Selector de curso -->
+@if (cursoOptions().length > 1) {
+	<div class="flex align-items-center gap-2 mb-3">
+		<label class="font-semibold text-sm">Curso:</label>
+		<p-select
+			[options]="cursoOptions()"
+			[ngModel]="selectedCurso()"
+			(ngModelChange)="onCursoChange($event)"
+			optionLabel="label"
+			optionValue="value"
+			placeholder="Seleccionar curso"
+			appendTo="body"
+			class="w-full"
+			styleClass="w-full"
+		/>
+	</div>
+} @else if (cursoOptions().length === 1) {
+	<div class="mb-3">
+		<span class="font-semibold text-sm text-color-secondary">
+			Curso: {{ cursoOptions()[0].label }}
+		</span>
+	</div>
+}
+<!-- #endregion -->
+
+<!-- #region Loading -->
+@if (loading()) {
+	<div class="flex flex-column gap-3 p-2">
+		@for (_ of [1, 2, 3]; track $index) {
+			<p-skeleton height="4rem" />
+		}
+	</div>
+}
+<!-- #endregion -->
+
+<!-- #region No contenido -->
+@else if (noContenido()) {
+	<div class="empty-state">
+		<i class="pi pi-info-circle"></i>
+		<p>
+			No se ha creado contenido para este curso.<br />
+			Primero crea el contenido del curso para poder gestionar grupos.
+		</p>
+	</div>
+}
+<!-- #endregion -->
+
+<!-- #region Sin curso seleccionado -->
+@else if (!selectedCurso()) {
+	<div class="empty-state">
+		<i class="pi pi-users"></i>
+		<p>Selecciona un curso para gestionar grupos</p>
+	</div>
+}
+<!-- #endregion -->
+
+<!-- #region Contenido de grupos -->
+@else {
+	<!-- #region Config bar -->
+	<div class="config-bar mb-3">
+		<div class="config-max">
+			<label>
+				<i class="pi pi-sliders-h mr-1"></i>
+				Máx. por grupo:
+			</label>
+			<input
+				pInputText
+				type="number"
+				[ngModel]="maxInputValue()"
+				(ngModelChange)="onMaxInputChange($event)"
+				min="1"
+				max="50"
+				placeholder="—"
+				class="p-inputtext-sm"
+				[disabled]="saving()"
+				aria-label="Máximo de estudiantes por grupo"
+			/>
+			@if (maxInputDirty()) {
+				<button
+					pButton
+					icon="pi pi-check"
+					class="p-button-sm p-button-success p-button-rounded"
+					(click)="onSaveMax()"
+					[disabled]="saving()"
+					pTooltip="Guardar límite"
+					tooltipPosition="top"
+					[pt]="{ root: { 'aria-label': 'Guardar máximo' } }"
+				></button>
+			}
+		</div>
+		<div class="flex align-items-center gap-2">
+			<p-tag
+				[value]="grupos().length + ' grupo' + (grupos().length !== 1 ? 's' : '')"
+				severity="secondary"
+				icon="pi pi-th-large"
+			/>
+			<p-tag
+				[value]="totalEstudiantesEnGrupos() + ' asignados'"
+				severity="info"
+				icon="pi pi-users"
+			/>
+		</div>
+	</div>
+	<!-- #endregion -->
+
+	<!-- #region Lista de grupos -->
+	@if (grupos().length > 0) {
+		<div class="grupos-list mb-3">
+			@for (grupo of grupos(); track grupo.id) {
+				<div class="grupo-card">
+					<!-- Header -->
+					<div class="grupo-header">
+						@if (editingGrupoId() === grupo.id) {
+							<div class="flex align-items-center gap-2 flex-1">
+								<input
+									pInputText
+									[(ngModel)]="editingGrupoNombre"
+									class="p-inputtext-sm flex-1"
+									(keydown.enter)="onSaveEditing(grupo.id)"
+									(keydown.escape)="onCancelEditing()"
+								/>
+								<button
+									pButton
+									icon="pi pi-check"
+									class="p-button-rounded p-button-text p-button-success p-button-sm"
+									(click)="onSaveEditing(grupo.id)"
+									[disabled]="saving()"
+									[pt]="{ root: { 'aria-label': 'Guardar nombre' } }"
+								></button>
+								<button
+									pButton
+									icon="pi pi-times"
+									class="p-button-rounded p-button-text p-button-secondary p-button-sm"
+									(click)="onCancelEditing()"
+									[pt]="{ root: { 'aria-label': 'Cancelar edición' } }"
+								></button>
+							</div>
+						} @else {
+							<div class="grupo-title">
+								<i class="pi pi-users grupo-icon"></i>
+								<span class="grupo-nombre">{{ grupo.nombre }}</span>
+								<p-tag
+									[value]="grupoCountLabel(grupo)"
+									[severity]="maxEstudiantesPorGrupo() && grupo.estudiantes.length >= maxEstudiantesPorGrupo()! ? 'warn' : 'secondary'"
+									[rounded]="true"
+								/>
+							</div>
+							<div class="grupo-actions">
+								<button
+									pButton
+									icon="pi pi-user-plus"
+									class="p-button-rounded p-button-text p-button-sm"
+									(click)="onOpenAsignar(grupo.id)"
+									[disabled]="saving() || estudiantesSinGrupo().length === 0"
+									pTooltip="Asignar estudiantes"
+									tooltipPosition="top"
+									[pt]="{ root: { 'aria-label': 'Asignar estudiantes al grupo' } }"
+								></button>
+								<button
+									pButton
+									icon="pi pi-pencil"
+									class="p-button-rounded p-button-text p-button-sm"
+									(click)="onStartEditing(grupo)"
+									[disabled]="saving()"
+									pTooltip="Renombrar"
+									tooltipPosition="top"
+									[pt]="{ root: { 'aria-label': 'Renombrar grupo' } }"
+								></button>
+								<button
+									pButton
+									icon="pi pi-trash"
+									class="p-button-rounded p-button-text p-button-danger p-button-sm"
+									(click)="onEliminarGrupo(grupo)"
+									[disabled]="saving()"
+									pTooltip="Eliminar grupo"
+									tooltipPosition="top"
+									[pt]="{ root: { 'aria-label': 'Eliminar grupo' } }"
+								></button>
+							</div>
+						}
+					</div>
+
+					<!-- Body: miembros -->
+					<div
+						class="grupo-body"
+						cdkDropList
+						[id]="'grupo-' + grupo.id"
+						[cdkDropListData]="{ grupoId: grupo.id }"
+						[cdkDropListConnectedTo]="dropListIds()"
+						(cdkDropListDropped)="onDrop($any($event))"
+					>
+						@if (grupo.estudiantes.length === 0) {
+							<div class="grupo-empty">
+								<i class="pi pi-inbox mr-1"></i>
+								Arrastra estudiantes aquí
+							</div>
+						} @else {
+							@for (est of grupo.estudiantes; track est.id; let i = $index) {
+								<div
+									class="miembro-row"
+									cdkDrag
+									[cdkDragData]="{ estudianteId: est.estudianteId, grupoId: grupo.id }"
+									[cdkDragDisabled]="saving()"
+								>
+									<div class="miembro-info">
+										<i class="pi pi-bars drag-handle" cdkDragHandle></i>
+										<span class="miembro-index">{{ i + 1 }}</span>
+										<span class="miembro-dni">{{ est.estudianteDni }}</span>
+										<span class="miembro-nombre">{{ est.estudianteNombre }}</span>
+									</div>
+									<button
+										pButton
+										icon="pi pi-times"
+										class="p-button-rounded p-button-text p-button-danger p-button-sm"
+										(click)="onRemoverEstudiante(grupo.id, est)"
+										[disabled]="saving()"
+										[pt]="{ root: { 'aria-label': 'Remover ' + est.estudianteNombre } }"
+									></button>
+								</div>
+							}
+						}
+					</div>
+				</div>
+			}
+		</div>
+	}
+	<!-- #endregion -->
+
+	<!-- #region Crear nuevo grupo -->
+	<div class="crear-grupo-bar mb-3">
+		<i class="pi pi-plus-circle text-color-secondary"></i>
+		<input
+			pInputText
+			[(ngModel)]="nuevoGrupoNombre"
+			placeholder="Nombre del nuevo grupo"
+			class="p-inputtext-sm flex-1"
+			(keydown.enter)="onCrearGrupo()"
+			[disabled]="saving()"
+		/>
+		<button
+			pButton
+			label="Crear"
+			icon="pi pi-plus"
+			class="p-button-sm"
+			(click)="onCrearGrupo()"
+			[disabled]="saving() || !nuevoGrupoNombre.trim()"
+		></button>
+	</div>
+	<!-- #endregion -->
+
+	<!-- #region Estudiantes sin grupo -->
+	<div
+		class="sin-grupo-section"
+		cdkDropList
+		id="sin-grupo"
+		[cdkDropListData]="{ grupoId: null }"
+		[cdkDropListConnectedTo]="dropListIds()"
+		(cdkDropListDropped)="onDrop($any($event))"
+	>
+		<div class="sin-grupo-header">
+			<i class="pi pi-user-minus"></i>
+			Sin grupo ({{ estudiantesSinGrupo().length }})
+		</div>
+		@if (estudiantesSinGrupo().length === 0) {
+			<div class="sin-grupo-empty">
+				<i class="pi pi-arrow-down mr-1"></i>
+				Arrastra aquí para quitar del grupo
+			</div>
+		} @else {
+			<div class="sin-grupo-list">
+				@for (est of estudiantesSinGrupo(); track est.estudianteId) {
+					<div
+						class="sin-grupo-item"
+						cdkDrag
+						[cdkDragData]="{ estudianteId: est.estudianteId, grupoId: null }"
+						[cdkDragDisabled]="saving()"
+					>
+						<i class="pi pi-bars drag-handle" cdkDragHandle></i>
+						<span class="sin-grupo-nombre">{{ est.estudianteNombre }}</span>
+						<span class="sin-grupo-dni">{{ est.estudianteDni }}</span>
+					</div>
+				}
+			</div>
+		}
+	</div>
+	<!-- #endregion -->
+}
+<!-- #endregion -->
+
+<!-- #region Asignar estudiantes dialog -->
+<p-dialog
+	[visible]="asignarDialogVisible()"
+	(visibleChange)="onAsignarDialogVisibleChange($event)"
+	[modal]="true"
+	[style]="{ width: '420px', maxWidth: '95vw' }"
+	header="Asignar estudiantes"
+>
+	@if (asignarGrupo(); as grupo) {
+		<p class="mt-0 mb-3 text-color-secondary text-sm">
+			Grupo: <strong>{{ grupo.nombre }}</strong>
+			@if (maxEstudiantesPorGrupo(); as max) {
+				<span class="ml-2">({{ grupo.estudiantes.length }}/{{ max }})</span>
+			}
+		</p>
+
+		@if (estudiantesSinGrupo().length === 0) {
+			<p class="text-color-secondary text-center py-3">
+				Todos los estudiantes ya están asignados a un grupo.
+			</p>
+		} @else {
+			<div class="flex flex-column gap-1" style="max-height: 300px; overflow-y: auto">
+				@for (est of estudiantesSinGrupo(); track est.estudianteId) {
+					<div
+						class="flex align-items-center gap-2 p-2 border-round cursor-pointer hover:surface-hover"
+						(click)="toggleEstudiante(est.estudianteId)"
+					>
+						<p-checkbox
+							[binary]="true"
+							[ngModel]="selectedEstudianteIds().includes(est.estudianteId)"
+							(click)="$event.stopPropagation()"
+							(ngModelChange)="toggleEstudiante(est.estudianteId)"
+						/>
+						<div class="flex flex-column">
+							<span class="text-sm font-semibold">{{ est.estudianteNombre }}</span>
+							<span class="text-xs text-color-secondary font-mono">{{ est.estudianteDni }}</span>
+						</div>
+					</div>
+				}
+			</div>
+			<div class="flex justify-content-end gap-2 mt-3 pt-2 border-top-1 surface-border">
+				<button
+					pButton
+					label="Cancelar"
+					class="p-button-text p-button-sm"
+					(click)="onCloseAsignar()"
+				></button>
+				<button
+					pButton
+					[label]="'Asignar (' + selectedEstudianteIds().length + ')'"
+					icon="pi pi-check"
+					class="p-button-sm"
+					(click)="onAsignarEstudiantes()"
+					[disabled]="selectedEstudianteIds().length === 0 || saving()"
+					[loading]="saving()"
+				></button>
+			</div>
+		}
+	}
+</p-dialog>
+<!-- #endregion -->
+
+<!-- Confirm dialog -->
+<p-confirmDialog (onHide)="onConfirmDialogHide()" />

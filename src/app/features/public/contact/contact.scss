@@ -51,7 +51,7 @@
 			margin-bottom: 0;
 
 			a {
-				color: var(--primary-color);
+				color: var(--primary-text-color);
 				text-decoration: none;
 
 				&:hover {
@@ -79,7 +79,7 @@
 
 				.custom-icon {
 					font-size: 2rem;
-					color: var(--primary-color);
+					color: var(--primary-text-color);
 					margin-right: 20px;
 					min-width: 40px;
 				}
@@ -92,7 +92,7 @@
 				}
 
 				a {
-					color: var(--primary-color);
+					color: var(--primary-text-color);
 					text-decoration: none;
 
 					&:hover {
@@ -109,7 +109,7 @@
 			margin-top: 50px;
 
 			h2 {
-				color: var(--primary-color);
+				color: var(--primary-text-color);
 				font-weight: 700;
 			}
 

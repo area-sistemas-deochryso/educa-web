@@ -102,6 +102,19 @@ export class HorariosApiService {
     );
   }
 
+  desasignarProfesor(horarioId: number, usuarioMod: string): Observable<boolean> {
+    return this.http.put<boolean>(
+      `${this.apiUrl}/${horarioId}/desasignar-profesor?usuarioMod=${usuarioMod}`,
+      {}
+    );
+  }
+
+  desasignarEstudiante(horarioId: number, estudianteId: number): Observable<boolean> {
+    return this.http.delete<boolean>(
+      `${this.apiUrl}/${horarioId}/estudiante/${estudianteId}`
+    );
+  }
+
   // #endregion
   // #region Estadísticas
 

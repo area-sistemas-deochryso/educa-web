@@ -4,7 +4,7 @@
 	[modal]="true"
 	[dismissableMask]="true"
 	header="Archivos Adjuntos de Estudiantes"
-	[style]="{ width: '600px', maxWidth: '95vw' }"
+	[style]="{ width: '620px', maxWidth: '95vw' }"
 >
 	@if (loading()) {
 		<div class="loading-state">
@@ -21,6 +21,20 @@
 		</div>
 	} @else {
 		<div class="summary-body">
+			<!-- #region Actions bar -->
+			<div class="actions-bar">
+				<button
+					pButton
+					label="Ir a Calificaciones"
+					icon="pi pi-chart-bar"
+					class="p-button-text p-button-sm"
+					(click)="onIrACalificaciones()"
+					pTooltip="Navegar al tab de calificaciones"
+					tooltipPosition="top"
+				></button>
+			</div>
+			<!-- #endregion -->
+
 			@for (semana of data(); track semana.semanaId) {
 				@if (semana.estudiantes.length > 0) {
 					<div class="week-group">
@@ -41,6 +55,16 @@
 										<i class="pi pi-user"></i>
 									</div>
 									<span class="student-name">{{ estudiante.estudianteNombre }}</span>
+									<!-- Notas del estudiante para esta semana -->
+									@for (nota of getNotasEstudiante(semana.numeroSemana, estudiante.estudianteId); track nota.titulo) {
+										<p-tag
+											[value]="nota.titulo + ': ' + nota.nota"
+											[severity]="nota.severity"
+											class="nota-tag"
+											[pTooltip]="'Nota: ' + nota.nota + '/20'"
+											tooltipPosition="top"
+										/>
+									}
 									<span class="student-count">{{ estudiante.archivos.length }} archivo{{ estudiante.archivos.length !== 1 ? 's' : '' }}</span>
 								</div>
 								<div class="student-files">

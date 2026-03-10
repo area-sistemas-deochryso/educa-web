@@ -1,0 +1,121 @@
+// #region Host
+:host {
+	display: block;
+}
+// #endregion
+
+// #region Filtro
+.filtro-row {
+	display: flex;
+	align-items: center;
+	gap: 0.75rem;
+	margin-bottom: 1rem;
+}
+// #endregion
+
+// #region Stats
+.stats-row {
+	display: flex;
+	gap: 1rem;
+	margin-bottom: 1rem;
+}
+
+.stat-mini {
+	display: flex;
+	align-items: center;
+	gap: 0.4rem;
+}
+
+.stat-mini-value {
+	font-weight: 700;
+	font-size: 1rem;
+}
+
+.stat-mini-label {
+	font-size: 0.8rem;
+	color: var(--text-color-secondary);
+}
+// #endregion
+
+// #region Tabla
+.dia-header {
+	width: 32px;
+	min-width: 32px;
+	font-size: 0.75rem;
+	padding: 0.4rem 0.2rem !important;
+}
+
+:host ::ng-deep .p-datatable {
+	--p-datatable-header-cell-background: transparent;
+	--p-datatable-row-background: transparent;
+}
+// #endregion
+
+// #region Estados badge
+.estado-badge {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	width: 22px;
+	height: 22px;
+	border-radius: 4px;
+	font-size: 0.7rem;
+	font-weight: 600;
+}
+
+.estado-presente {
+	background: rgba(34, 197, 94, 0.15);
+	color: #16a34a;
+}
+
+.estado-tardanza {
+	background: rgba(249, 115, 22, 0.15);
+	color: #ea580c;
+}
+
+.estado-falta {
+	background: rgba(239, 68, 68, 0.15);
+	color: #dc2626;
+}
+
+.estado-justificado {
+	background: rgba(59, 130, 246, 0.15);
+	color: #2563eb;
+}
+
+.estado-vacio {
+	background: transparent;
+	color: var(--text-color-secondary);
+}
+// #endregion
+
+// #region Leyenda
+.leyenda {
+	display: flex;
+	gap: 1rem;
+	margin-top: 0.75rem;
+	padding-top: 0.75rem;
+	border-top: 1px solid var(--surface-border);
+}
+
+.leyenda-item {
+	display: flex;
+	align-items: center;
+	gap: 0.3rem;
+	font-size: 0.75rem;
+	color: var(--text-color-secondary);
+}
+// #endregion
+
+// #region Responsive
+@media (max-width: 768px) {
+	.stats-row {
+		flex-wrap: wrap;
+	}
+
+	.leyenda {
+		flex-wrap: wrap;
+		gap: 0.5rem;
+	}
+}
+// #endregion

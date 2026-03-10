@@ -14,7 +14,7 @@ import { ToggleSwitch } from 'primeng/toggleswitch';
 import { ConfirmDialogModule } from 'primeng/confirmdialog';
 import { ConfirmationService } from 'primeng/api';
 
-import { AdminUtilsService } from '@shared/services';
+import { UiMappingService } from '@shared/services';
 import { buildDeleteCursoMessage } from '@app/shared/constants';
 
 import { CursosFacade } from './services/cursos.facade';
@@ -45,7 +45,7 @@ export class CursosComponent implements OnInit {
 	// #region Dependencias
 	private facade = inject(CursosFacade);
 	private confirmationService = inject(ConfirmationService);
-	readonly adminUtils = inject(AdminUtilsService);
+	readonly uiMapping = inject(UiMappingService);
 	// #endregion
 
 	// #region Estado del facade

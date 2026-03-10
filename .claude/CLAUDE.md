@@ -50,6 +50,7 @@ Aplicacion Angular 21 para gestion educativa con portal publico e intranet priva
 @.claude/rules/enforcement.md
 @.claude/rules/quality-gate.md
 @.claude/rules/pwa-ios.md
+@.claude/rules/rate-limiting.md
 
 ## Skills
 
@@ -67,8 +68,8 @@ Aplicacion Angular 21 para gestion educativa con portal publico e intranet priva
 
 ## Tareas activas
 
-@.claude/tasks/cookie-auth-migration.md
-@.claude/tasks/wal-event-sourcing.md
+@.claude/tasks/cache-wal-sync.md
+@.claude/tasks/robustness-improvements.md
 
 ## Historial
 

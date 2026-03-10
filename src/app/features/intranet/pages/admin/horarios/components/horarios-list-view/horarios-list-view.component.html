@@ -73,39 +73,41 @@
 							tooltipPosition="top"
 							[pt]="{ root: { 'aria-label': 'Ver detalles' } }"
 						></button>
-						<button
-							pButton
-							icon="pi pi-pencil"
-							class="p-button-rounded p-button-text"
-							(click)="onEdit(horario.id)"
-							pTooltip="Editar horario"
-							tooltipPosition="top"
-							[pt]="{ root: { 'aria-label': 'Editar' } }"
-						></button>
-						<button
-							pButton
-							[icon]="horario.estado ? 'pi pi-ban' : 'pi pi-check'"
-							class="p-button-rounded p-button-text"
-							[class.p-button-warning]="horario.estado"
-							[class.p-button-success]="!horario.estado"
-							(click)="onToggleEstado(horario.id, horario.estado)"
-							[pTooltip]="horario.estado ? 'Desactivar horario' : 'Activar horario'"
-							tooltipPosition="top"
-							[pt]="{
-								root: {
-									'aria-label': horario.estado ? 'Desactivar' : 'Activar',
-								},
-							}"
-						></button>
-						<button
-							pButton
-							icon="pi pi-trash"
-							class="p-button-rounded p-button-text p-button-danger"
-							(click)="onDelete(horario.id)"
-							pTooltip="Eliminar horario"
-							tooltipPosition="top"
-							[pt]="{ root: { 'aria-label': 'Eliminar' } }"
-						></button>
+						@if (isAdmin()) {
+							<button
+								pButton
+								icon="pi pi-pencil"
+								class="p-button-rounded p-button-text"
+								(click)="onEdit(horario.id)"
+								pTooltip="Editar horario"
+								tooltipPosition="top"
+								[pt]="{ root: { 'aria-label': 'Editar' } }"
+							></button>
+							<button
+								pButton
+								[icon]="horario.estado ? 'pi pi-ban' : 'pi pi-check'"
+								class="p-button-rounded p-button-text"
+								[class.p-button-warning]="horario.estado"
+								[class.p-button-success]="!horario.estado"
+								(click)="onToggleEstado(horario.id, horario.estado)"
+								[pTooltip]="horario.estado ? 'Desactivar horario' : 'Activar horario'"
+								tooltipPosition="top"
+								[pt]="{
+									root: {
+										'aria-label': horario.estado ? 'Desactivar' : 'Activar',
+									},
+								}"
+							></button>
+							<button
+								pButton
+								icon="pi pi-trash"
+								class="p-button-rounded p-button-text p-button-danger"
+								(click)="onDelete(horario.id)"
+								pTooltip="Eliminar horario"
+								tooltipPosition="top"
+								[pt]="{ root: { 'aria-label': 'Eliminar' } }"
+							></button>
+						}
 					</div>
 				</td>
 			</tr>

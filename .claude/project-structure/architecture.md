@@ -119,7 +119,7 @@ shared/
 │   ├── sections/                # Helpers de layout por secciones
 │   └── devtools/                # Herramientas de desarrollo
 ├── services/
-│   └── admin/                   # AdminUtilsService (helpers para vistas admin)
+│   └── ui-mapping/              # UiMappingService (helpers de mapeo UI: severity, labels)
 ├── directives/                  # highlight, table-loading, uppercase-input
 ├── pipes/                       # truncate
 ├── validators/                  # Validadores custom de formularios
@@ -157,17 +157,22 @@ features/public/pages/
 ```text
 features/intranet/pages/
 ├── login/                       # Login de intranet
-├── home-component/              # Dashboard principal
-├── attendance-component/        # Asistencia (por rol)
-│   ├── attendance-profesor/
-│   ├── attendance-estudiante/
-│   ├── attendance-apoderado/
-│   ├── attendance-director/
-│   ├── models/, config/
-├── calendar-component/          # Calendario
-├── schedule-component/          # Horarios (vista usuario)
-├── campus-navigation/           # Navegación entre sedes
-│   ├── components/, models/, config/, services/
+├── shared/                      # Componentes compartidos cross-rol
+│   ├── home-component/          #   Dashboard principal
+│   ├── attendance-component/    #   Asistencia (por rol)
+│   │   ├── attendance-profesor/
+│   │   ├── attendance-estudiante/
+│   │   ├── attendance-apoderado/
+│   │   ├── attendance-director/
+│   │   ├── models/, config/
+│   ├── calendary-component/     #   Calendario
+│   ├── schedule-component/      #   Horarios (vista usuario)
+│   ├── campus-navigation/       #   Navegación entre sedes
+│   │   ├── components/, models/, config/, services/
+│   └── ctest-k6/                #   Testing de carga
+├── estudiante/                  # Sección del estudiante
+│   ├── cursos/, horarios/, notas/, salones/
+│   ├── models/, services/
 ├── profesor/                    # Sección del profesor
 │   ├── cursos/, horarios/, salones/
 │   ├── models/, services/
@@ -175,6 +180,7 @@ features/intranet/pages/
     ├── usuarios/                # CRUD usuarios (patrón completo)
     ├── horarios/                # CRUD horarios
     ├── cursos/                  # CRUD cursos
+    ├── salones/                 # CRUD salones
     ├── permisos-roles/          # Permisos por rol
     ├── permisos-usuarios/       # Permisos por usuario
     └── vistas/                  # Gestión de rutas/vistas

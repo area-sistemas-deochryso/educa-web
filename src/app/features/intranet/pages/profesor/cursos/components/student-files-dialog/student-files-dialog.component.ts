@@ -1,23 +1,31 @@
 import { Component, ChangeDetectionStrategy, input, output } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { DialogModule } from 'primeng/dialog';
+import { ButtonModule } from 'primeng/button';
+import { TooltipModule } from 'primeng/tooltip';
+import { TagModule } from 'primeng/tag';
 import { ProgressSpinnerModule } from 'primeng/progressspinner';
-import { SemanaEstudianteArchivosDto } from '../../../models';
+import { SemanaEstudianteArchivosDto, CalificacionConNotasDto } from '../../../models';
 
 @Component({
 	selector: 'app-student-files-dialog',
 	standalone: true,
-	imports: [CommonModule, DialogModule, ProgressSpinnerModule],
+	imports: [CommonModule, DialogModule, ButtonModule, TooltipModule, TagModule, ProgressSpinnerModule],
 	changeDetection: ChangeDetectionStrategy.OnPush,
 	templateUrl: './student-files-dialog.component.html',
 	styleUrl: './student-files-dialog.component.scss',
 })
 export class StudentFilesDialogComponent {
+	// #region Inputs/Outputs
 	readonly visible = input<boolean>(false);
 	readonly data = input<SemanaEstudianteArchivosDto[]>([]);
 	readonly loading = input<boolean>(false);
+	readonly calificaciones = input<CalificacionConNotasDto[]>([]);
 	readonly visibleChange = output<boolean>();
+	readonly irACalificaciones = output<void>();
+	// #endregion
 
+	// #region Handlers
 	onVisibleChange(value: boolean): void {
 		if (!value) {
 			this.visibleChange.emit(false);
@@ -28,6 +36,12 @@ export class StudentFilesDialogComponent {
 		window.open(url, '_blank');
 	}
 
+	onIrACalificaciones(): void {
+		this.irACalificaciones.emit();
+	}
+	// #endregion
+
+	// #region Helpers
 	formatFileSize(bytes: number | null): string {
 		if (!bytes) return '';
 		if (bytes < 1024) return `${bytes} B`;
@@ -36,8 +50,30 @@ export class StudentFilesDialogComponent {
 	}
 
 	hasAnyFiles(): boolean {
-		return this.data().some((s) =>
-			s.estudiantes.some((e) => e.archivos.length > 0),
-		);
+		return this.data().some((s) => s.estudiantes.some((e) => e.archivos.length > 0));
 	}
+
+	getNotasEstudiante(semanaNumero: number, estudianteId: number): { titulo: string; nota: number; severity: 'success' | 'warn' | 'danger' }[] {
+		const cals = this.calificaciones();
+		const result: { titulo: string; nota: number; severity: 'success' | 'warn' | 'danger' }[] = [];
+		for (const cal of cals) {
+			if (cal.numeroSemana !== semanaNumero) continue;
+			const notaEntry = cal.notas.find((n) => n.estudianteId === estudianteId);
+			if (notaEntry) {
+				result.push({
+					titulo: cal.titulo,
+					nota: notaEntry.nota,
+					severity: this.getNotaSeverity(notaEntry.nota),
+				});
+			}
+		}
+		return result;
+	}
+
+	getNotaSeverity(nota: number): 'success' | 'warn' | 'danger' {
+		if (nota >= 14) return 'success';
+		if (nota >= 11) return 'warn';
+		return 'danger';
+	}
+	// #endregion
 }

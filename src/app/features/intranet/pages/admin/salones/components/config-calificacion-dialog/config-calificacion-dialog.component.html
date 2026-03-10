@@ -1,0 +1,112 @@
+<p-dialog
+	header="Configuración de Calificaciones — {{ nivel() }}"
+	[visible]="visible()"
+	(visibleChange)="onVisibleChange($event)"
+	[modal]="true"
+	[style]="{ width: '600px' }"
+	[closable]="true"
+>
+	<!-- #region Tipo de calificación -->
+	<div class="mb-4">
+		<label class="block mb-2 font-medium">Tipo de Calificación</label>
+		<p-select
+			[options]="tipoOptions"
+			[ngModel]="tipoCalificacion()"
+			(ngModelChange)="tipoCalificacion.set($event)"
+			optionLabel="label"
+			optionValue="value"
+			appendTo="body"
+			styleClass="w-full"
+		/>
+	</div>
+	<!-- #endregion -->
+
+	<!-- #region Configuración numérica -->
+	@if (tipoCalificacion() === 'NUMERICO') {
+		<div class="mb-4">
+			<label class="block mb-2 font-medium">Nota Mínima Aprobatoria</label>
+			<p-inputNumber
+				[ngModel]="notaMinAprobatoria()"
+				(ngModelChange)="notaMinAprobatoria.set($event)"
+				[min]="0"
+				[max]="20"
+				[minFractionDigits]="0"
+				[maxFractionDigits]="2"
+				mode="decimal"
+				styleClass="w-full"
+			/>
+		</div>
+	}
+	<!-- #endregion -->
+
+	<!-- #region Configuración literal -->
+	@if (tipoCalificacion() === 'LITERAL') {
+		<p-divider />
+		<div class="flex justify-between items-center mb-3">
+			<span class="font-medium">Literales</span>
+			<button
+				pButton
+				icon="pi pi-plus"
+				label="Agregar"
+				class="p-button-sm p-button-outlined"
+				(click)="addLiteral()"
+			></button>
+		</div>
+
+		@for (literal of literales(); track literal.orden; let i = $index) {
+			<div class="literal-row">
+				<input
+					pInputText
+					[ngModel]="literal.letra"
+					(ngModelChange)="updateLiteral(i, 'letra', $event)"
+					placeholder="AD"
+					class="literal-letra"
+				/>
+				<input
+					pInputText
+					[ngModel]="literal.descripcion"
+					(ngModelChange)="updateLiteral(i, 'descripcion', $event)"
+					placeholder="Descripción"
+					class="literal-desc"
+				/>
+				<p-checkbox
+					[ngModel]="literal.esAprobatoria"
+					(ngModelChange)="updateLiteral(i, 'esAprobatoria', $event)"
+					[binary]="true"
+				/>
+				<span class="literal-orden">{{ literal.orden }}</span>
+				<button
+					pButton
+					icon="pi pi-trash"
+					class="p-button-rounded p-button-text p-button-danger p-button-sm"
+					(click)="removeLiteral(i)"
+					[pt]="{
+						root: {
+							'aria-label': 'Eliminar literal',
+						},
+					}"
+				></button>
+			</div>
+		}
+	}
+	<!-- #endregion -->
+
+	<!-- #region Footer -->
+	<ng-template #footer>
+		<button
+			pButton
+			label="Cancelar"
+			class="p-button-text"
+			(click)="onVisibleChange(false)"
+		></button>
+		<button
+			pButton
+			label="Guardar"
+			icon="pi pi-check"
+			[loading]="loading()"
+			[disabled]="!isFormValid()"
+			(click)="onSave()"
+		></button>
+	</ng-template>
+	<!-- #endregion -->
+</p-dialog>

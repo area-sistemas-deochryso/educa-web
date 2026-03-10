@@ -1,0 +1,122 @@
+// #region Host
+:host {
+	display: block;
+	padding: 1.5rem;
+}
+// #endregion
+
+// #region Header
+.page-header {
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+	margin-bottom: 1.5rem;
+	flex-wrap: wrap;
+	gap: 0.75rem;
+
+	.header-actions {
+		flex-shrink: 0;
+	}
+}
+// #endregion
+
+// #region PrimeNG overrides
+:host ::ng-deep {
+	.p-tabs,
+	.p-tablist,
+	.p-tabpanels,
+	.p-paginator {
+		background: transparent;
+	}
+
+	.p-datatable-scrollable > .p-datatable-table-container > .p-datatable-scrollable-table > .p-datatable-thead,
+	.p-datatable-scrollable > .p-datatable-table > .p-datatable-thead {
+		background: transparent;
+	}
+
+	.p-inputnumber,
+	.p-inputnumber .p-inputnumber-input {
+		max-width: 100px;
+	}
+}
+// #endregion
+
+// #region Stats
+.stats-row {
+	display: flex;
+	gap: 0.75rem;
+	margin-bottom: 1.5rem;
+}
+
+.stat-card {
+	flex: 1;
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	gap: 0.25rem;
+	padding: 1rem 0.75rem;
+}
+
+.stat-icon {
+	font-size: 1.25rem;
+	opacity: 0.7;
+}
+
+.stat-value {
+	font-size: 1.75rem;
+	font-weight: 700;
+	line-height: 1;
+}
+
+.stat-label {
+	font-size: 0.8rem;
+	color: var(--text-color-secondary);
+}
+// #endregion
+
+// #region Toolbar
+.nivel-toolbar {
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+	gap: 0.75rem;
+	margin: 0.75rem 0;
+}
+// #endregion
+
+// #region Empty state
+.empty-state {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	gap: 0.5rem;
+	padding: 3rem 1rem;
+	text-align: center;
+
+	.empty-icon {
+		font-size: 3rem;
+		color: var(--text-color-secondary);
+		opacity: 0.5;
+	}
+}
+// #endregion
+
+// #region Responsive
+@media (max-width: 768px) {
+	.stats-row {
+		flex-wrap: wrap;
+	}
+
+	.stat-card {
+		flex: 1 1 calc(50% - 0.75rem);
+		min-width: 120px;
+	}
+
+	.page-header,
+	.nivel-toolbar {
+		flex-direction: column;
+		align-items: flex-start;
+		gap: 0.75rem;
+	}
+}
+// #endregion

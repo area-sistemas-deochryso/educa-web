@@ -13,6 +13,7 @@ import { HttpErrorResponse } from '@angular/common/http';
 import { logger } from '@core/helpers';
 import {
 	UI_CLIENT_ERROR_MESSAGE,
+	UI_ERROR_CODES,
 	UI_ERROR_SUMMARIES,
 	UI_GENERIC_MESSAGES,
 } from '@app/shared/constants';
@@ -158,7 +159,12 @@ export class ErrorHandlerService {
 		this._errors.set([]);
 	}
 
-	// Metodos privados
+	// #region Metodos privados
+
+	/** Recent notifications for dedup (key → timestamp). */
+	private readonly _recentNotifications = new Map<string, number>();
+	private static readonly NOTIFICATION_DEDUP_MS = 5_000;
+
 	private createError(
 		message: string,
 		severity: ErrorSeverity,
@@ -181,7 +187,25 @@ export class ErrorHandlerService {
 	}
 
 	private showNotification(notification: ErrorNotification): void {
+		const key = `${notification.severity}:${notification.detail}`;
+		const now = Date.now();
+		const last = this._recentNotifications.get(key);
+
+		if (last && now - last < ErrorHandlerService.NOTIFICATION_DEDUP_MS) {
+			return;
+		}
+
+		this._recentNotifications.set(key, now);
 		this._currentNotification.set(notification);
+
+		// Cleanup old entries to prevent memory leak
+		if (this._recentNotifications.size > 20) {
+			for (const [k, ts] of this._recentNotifications) {
+				if (now - ts > ErrorHandlerService.NOTIFICATION_DEDUP_MS) {
+					this._recentNotifications.delete(k);
+				}
+			}
+		}
 	}
 
 	private extractHttpDetails(error: HttpErrorResponse, method?: string): HttpErrorDetails {
@@ -196,15 +220,18 @@ export class ErrorHandlerService {
 	}
 
 	private getHttpErrorMessage(error: HttpErrorResponse): string {
-		// Primero intentar obtener mensaje del backend
-		if (error.error?.mensaje) {
-			return error.error.mensaje;
+		// 1. Resolver por errorCode del backend (contrato estable)
+		const errorCode = error.error?.errorCode as string | undefined;
+		if (errorCode && UI_ERROR_CODES[errorCode]) {
+			return UI_ERROR_CODES[errorCode];
 		}
+
+		// 2. Fallback: mensaje directo del backend
 		if (error.error?.message) {
 			return error.error.message;
 		}
 
-		// Usar mensaje predefinido por codigo
+		// 3. Fallback: mensaje predefinido por HTTP status
 		return (
 			HTTP_ERROR_MESSAGES[error.status] ??
 			`Error ${error.status}: ${error.statusText || UI_GENERIC_MESSAGES.unknownError}`

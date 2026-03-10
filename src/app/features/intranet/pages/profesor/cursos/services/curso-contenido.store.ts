@@ -45,6 +45,8 @@ interface CursoContenidoState {
 	studentFilesData: SemanaEstudianteArchivosDto[];
 	/** True while student files are loading. */
 	studentFilesLoading: boolean;
+	/** Initial tab to open when dialog becomes visible. */
+	initialTab: string | null;
 	// #endregion
 }
 
@@ -65,6 +67,7 @@ const initialState: CursoContenidoState = {
 	studentFilesDialogVisible: false,
 	studentFilesData: [],
 	studentFilesLoading: false,
+	initialTab: null,
 };
 
 /**
@@ -114,6 +117,8 @@ export class CursoContenidoStore {
 	readonly studentFilesData = computed(() => this._state().studentFilesData);
 	/** True while student files are loading. */
 	readonly studentFilesLoading = computed(() => this._state().studentFilesLoading);
+	/** Initial tab to open when dialog becomes visible. */
+	readonly initialTab = computed(() => this._state().initialTab);
 
 	// #endregion
 	// #region Computed derivados
@@ -159,6 +164,7 @@ export class CursoContenidoStore {
 		studentFilesData: this.studentFilesData(),
 		studentFilesLoading: this.studentFilesLoading(),
 		totalArchivosEstudiantes: this.totalArchivosEstudiantes(),
+		initialTab: this.initialTab(),
 	}));
 
 	// #endregion
@@ -226,6 +232,10 @@ export class CursoContenidoStore {
 	 */
 	setSelectedHorarioId(id: number | null): void {
 		this._state.update((s) => ({ ...s, selectedHorarioId: id }));
+	}
+
+	setInitialTab(tab: string | null): void {
+		this._state.update((s) => ({ ...s, initialTab: tab }));
 	}
 
 	// #endregion

@@ -28,7 +28,7 @@ src/app/
 │   ├── components/  # layout, form-error, toast-container
 │   ├── directives/
 │   ├── pipes/
-│   ├── services/    # AdminUtilsService (helpers para componentes admin)
+│   ├── services/    # UiMappingService (helpers de mapeo UI)
 │   └── validators/
 └── features/        # Modulos lazy-loaded
     ├── public/      # home, about, contact, levels

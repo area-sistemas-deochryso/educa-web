@@ -1,0 +1,104 @@
+<!-- #region Header -->
+<div class="output-header">
+	<h3><i class="pi pi-code"></i> Script Generado</h3>
+	<div class="output-actions">
+		<button
+			pButton
+			[label]="copied() ? 'Copiado!' : 'Copiar'"
+			[icon]="copied() ? 'pi pi-check' : 'pi pi-copy'"
+			[class]="copied() ? 'p-button-success p-button-sm' : 'p-button-outlined p-button-sm'"
+			(click)="onCopy()"
+			pTooltip="Copiar script al portapapeles"
+			tooltipPosition="top"
+			[pt]="{ root: { 'aria-label': 'Copiar script al portapapeles' } }"
+		></button>
+		<button
+			pButton
+			label="Descargar .js"
+			icon="pi pi-download"
+			class="p-button-outlined p-button-sm"
+			(click)="onDownload()"
+			pTooltip="Descargar como archivo JavaScript"
+			tooltipPosition="top"
+			[pt]="{ root: { 'aria-label': 'Descargar script como archivo JavaScript' } }"
+		></button>
+	</div>
+</div>
+<!-- #endregion -->
+
+<!-- #region Code Block -->
+<div class="code-container">
+	<pre class="code-block"><code>{{ script() }}</code></pre>
+</div>
+<!-- #endregion -->
+
+<!-- #region Footer — Execution Guide -->
+<div class="execution-guide">
+	<div class="guide-header" (click)="guideExpanded.set(!guideExpanded())">
+		<h4><i class="pi pi-terminal"></i> Cómo ejecutar</h4>
+		<i [class]="guideExpanded() ? 'pi pi-chevron-up' : 'pi pi-chevron-down'"></i>
+	</div>
+
+	<!-- Siempre visible: comando principal -->
+	<div class="guide-main">
+		<div class="command-block">
+			<code>k6 run script.js</code>
+		</div>
+	</div>
+
+	<!-- Expandible: guía completa -->
+	@if (guideExpanded()) {
+		<div class="guide-details">
+			<div class="guide-section">
+				<span class="guide-label">1. Instalar k6</span>
+				<div class="command-options">
+					<div class="command-option">
+						<span class="os-badge">Windows</span>
+						<code>winget install k6</code>
+					</div>
+					<div class="command-option">
+						<span class="os-badge">macOS</span>
+						<code>brew install k6</code>
+					</div>
+					<div class="command-option">
+						<span class="os-badge">Linux</span>
+						<code>sudo snap install k6</code>
+					</div>
+				</div>
+			</div>
+
+			<div class="guide-section">
+				<span class="guide-label">2. Ejecutar el test</span>
+				<div class="command-options">
+					<div class="command-option">
+						<span class="use-badge">Básico</span>
+						<code>k6 run script.js</code>
+					</div>
+					<div class="command-option">
+						<span class="use-badge">Con reporte</span>
+						<code>k6 run --out json=results.json script.js</code>
+					</div>
+					<div class="command-option">
+						<span class="use-badge">Dashboard</span>
+						<code>K6_WEB_DASHBOARD=true k6 run script.js</code>
+					</div>
+				</div>
+			</div>
+
+			<div class="guide-section">
+				<span class="guide-label">3. Opciones útiles</span>
+				<div class="command-options">
+					<div class="command-option">
+						<span class="use-badge">Override VUs</span>
+						<code>k6 run --vus 50 --duration 30s script.js</code>
+					</div>
+					<div class="command-option">
+						<span class="use-badge">Verbose</span>
+						<code>k6 run --verbose script.js</code>
+					</div>
+				</div>
+			</div>
+		</div>
+	}
+</div>
+<!-- #endregion -->

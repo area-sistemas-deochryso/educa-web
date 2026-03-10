@@ -4,312 +4,360 @@
 	(visibleChange)="onVisibleChange($event)"
 	[modal]="true"
 	[dismissableMask]="true"
-	[header]="vm().contenido ? vm().contenido!.cursoNombre : 'Contenido del Curso'"
-	[style]="{ width: '960px', maxWidth: '95vw' }"
-	[contentStyle]="{ overflow: 'visible' }"
+	[style]="dialogStyle()"
+	[contentStyle]="contentStyle()"
+	[styleClass]="isFullscreen() ? 'fullscreen-dialog' : ''"
 >
+	<ng-template #header>
+		<div class="dialog-header-custom">
+			<span class="p-dialog-title">{{ vm().contenido ? vm().contenido!.cursoNombre : 'Contenido del Curso' }}</span>
+			<button
+				class="fullscreen-toggle-btn"
+				type="button"
+				(click)="toggleFullscreen()"
+				[attr.aria-label]="isFullscreen() ? 'Salir de pantalla completa' : 'Expandir a pantalla completa'"
+			>
+				<i [class]="isFullscreen() ? 'pi pi-window-minimize' : 'pi pi-window-maximize'"></i>
+			</button>
+		</div>
+	</ng-template>
 	@if (vm().contenido; as contenido) {
 		<div class="modal-body">
-			<div class="content-layout">
-				<!-- #region Columna izquierda: Semanas -->
-				<div class="semanas-column">
-					<!-- Search bar -->
-					<div class="search-box">
-						<i class="pi pi-search"></i>
-						<input
-							type="text"
-							placeholder="Buscar por semana, archivo, tarea o fecha..."
-							[ngModel]="searchQuery()"
-							(ngModelChange)="searchQuery.set($event)"
-						/>
-						@if (searchQuery()) {
-							<button
-								class="search-clear"
-								(click)="searchQuery.set('')"
-								type="button"
-								aria-label="Limpiar búsqueda"
-							>
-								<i class="pi pi-times"></i>
-							</button>
-						}
-					</div>
+			<p-tabs [value]="activeTab()" (valueChange)="onTabChange($any($event))">
+				<p-tablist>
+					<p-tab value="0">
+						<i class="pi pi-book tab-icon"></i>
+						Contenido
+					</p-tab>
+					<p-tab value="1">
+						<i class="pi pi-chart-bar tab-icon"></i>
+						Mis Calificaciones
+					</p-tab>
+					<p-tab value="2">
+						<i class="pi pi-info-circle tab-icon"></i>
+						Información
+					</p-tab>
+					<p-tab value="3">
+						<i class="pi pi-chart-line tab-icon"></i>
+						Mi Asistencia
+					</p-tab>
+				</p-tablist>
 
-					<!-- Accordion de semanas -->
-					@if (filteredSemanas().length === 0) {
-						<div class="empty-state">
-							<i class="pi pi-search"></i>
-							<p>No se encontraron semanas</p>
-						</div>
-					} @else {
-						<div class="weeks-accordion">
-							<p-accordion [multiple]="true">
-								@for (semana of filteredSemanas(); track semana.id) {
-									<p-accordionpanel>
-										<p-accordionheader (click)="onAccordionTabOpen(semana)">
-											<div class="week-header">
-												<span class="week-number">{{ semana.numeroSemana }}</span>
-												<div class="week-title-group">
-													<span class="week-label">Semana {{ semana.numeroSemana }}</span>
-													@if (semana.titulo) {
-														<span class="week-subtitle">{{ semana.titulo }}</span>
-													}
-												</div>
-												<div class="week-badges">
-													@if (semana.archivos.length > 0) {
-														<span class="mini-badge files">
-															<i class="pi pi-paperclip"></i>
-															{{ semana.archivos.length }}
-														</span>
-													}
-													@if (semana.tareas.length > 0) {
-														<span class="mini-badge tasks">
-															<i class="pi pi-file-edit"></i>
-															{{ semana.tareas.length }}
-														</span>
-													}
-												</div>
-											</div>
-										</p-accordionheader>
-										<p-accordioncontent>
-											<div class="semana-body">
-												<!-- Descripción y mensaje -->
-												@if (semana.descripcion || semana.mensajeDocente) {
-													<div class="semana-meta">
-														@if (semana.descripcion) {
-															<p class="semana-desc">{{ semana.descripcion }}</p>
-														}
-														@if (semana.mensajeDocente) {
-															<div class="teacher-message">
-																<i class="pi pi-comment"></i>
-																<span>{{ semana.mensajeDocente }}</span>
-															</div>
-														}
-													</div>
-												}
+				<p-tabpanels>
+					<!-- #region Tab Contenido -->
+					<p-tabpanel value="0">
+						<div class="tab-panel-body">
+							<div style="display: flex; justify-content: flex-end; margin-bottom: 0.5rem">
+								<button
+									pButton
+									icon="pi pi-refresh"
+									class="p-button-rounded p-button-text p-button-sm"
+									(click)="onRefreshContenido()"
+									[disabled]="vm().contentLoading"
+									pTooltip="Refrescar"
+									tooltipPosition="top"
+									[pt]="{ root: { 'aria-label': 'Refrescar contenido' } }"
+								></button>
+							</div>
+							<!-- Search bar -->
+							<div class="search-box">
+								<i class="pi pi-search"></i>
+								<input
+									type="text"
+									placeholder="Buscar por semana, archivo, tarea o fecha..."
+									[ngModel]="searchQuery()"
+									(ngModelChange)="searchQuery.set($event)"
+								/>
+								@if (searchQuery()) {
+									<button
+										class="search-clear"
+										(click)="searchQuery.set('')"
+										type="button"
+										aria-label="Limpiar búsqueda"
+									>
+										<i class="pi pi-times"></i>
+									</button>
+								}
+							</div>
 
-												<!-- #region Archivos del profesor -->
-												<div class="section-block">
-													<div class="section-header">
-														<div class="section-label">
-															<i class="pi pi-paperclip"></i>
-															Archivos
-														</div>
-													</div>
-
-													@if (semana.archivos.length === 0) {
-														<div class="section-empty">Sin archivos adjuntos</div>
-													} @else {
-														<div class="content-list">
-															@for (archivo of semana.archivos; track archivo.id) {
-																<div class="content-row">
-																	<div
-																		[class]="'row-icon ' + getFileIconClass(archivo.tipoArchivo)"
-																	>
-																		<i [class]="getFileIcon(archivo.tipoArchivo)"></i>
-																	</div>
-																	<div
-																		class="row-info clickable"
-																		(click)="openArchivo(archivo.urlArchivo)"
-																	>
-																		<strong>{{ archivo.nombreArchivo }}</strong>
-																		@if (archivo.tamanoBytes) {
-																			<span>{{
-																				formatFileSize(archivo.tamanoBytes)
-																			}}</span>
-																		}
-																	</div>
-																</div>
+							<!-- Accordion de semanas -->
+							@if (filteredSemanas().length === 0) {
+								<div class="empty-state">
+									<i class="pi pi-search"></i>
+									<p>No se encontraron semanas</p>
+								</div>
+							} @else {
+								<div class="weeks-accordion">
+									<p-accordion [multiple]="true" [value]="openPanels()" (valueChange)="onAccordionChange($any($event))">
+										@for (semana of filteredSemanas(); track semana.id) {
+											<p-accordionpanel [value]="semana.id">
+												<p-accordionheader>
+													<div class="week-header">
+														<span class="week-number">{{ semana.numeroSemana }}</span>
+														<div class="week-title-group">
+															<span class="week-label">Semana {{ semana.numeroSemana }}</span>
+															@if (semana.titulo) {
+																<span class="week-subtitle">{{ semana.titulo }}</span>
 															}
 														</div>
-													}
-												</div>
-												<!-- #endregion -->
-
-												<!-- #region Mis Archivos (estudiante) -->
-												<div class="section-block">
-													<div class="section-header">
-														<button
-															class="section-label section-action"
-															type="button"
-															(click)="studentFileInput.click()"
-															aria-label="Subir mi archivo"
-														>
-															<i class="pi pi-upload"></i>
-															Mis Archivos
-															<i class="pi pi-plus action-hint"></i>
-														</button>
-														<input
-															#studentFileInput
-															type="file"
-															hidden
-															(change)="onNativeFileSelect($event, semana.id)"
-														/>
-													</div>
-
-													@if (getMisArchivosSemana(semana.id).length === 0) {
-														<div class="section-empty">No has subido archivos</div>
-													} @else {
-														<div class="content-list">
-															@for (archivo of getMisArchivosSemana(semana.id); track archivo.id) {
-																<div class="content-row">
-																	<div
-																		[class]="'row-icon student-file ' + getFileIconClass(archivo.tipoArchivo)"
-																	>
-																		<i [class]="getFileIcon(archivo.tipoArchivo)"></i>
-																	</div>
-																	<div
-																		class="row-info clickable"
-																		(click)="openArchivo(archivo.urlArchivo)"
-																	>
-																		<strong>{{ archivo.nombreArchivo }}</strong>
-																		@if (archivo.tamanoBytes) {
-																			<span>{{
-																				formatFileSize(archivo.tamanoBytes)
-																			}}</span>
-																		}
-																	</div>
-																	<div class="row-actions">
-																		<button
-																			pButton
-																			icon="pi pi-trash"
-																			class="p-button-text p-button-danger p-button-sm p-button-rounded"
-																			pTooltip="Eliminar"
-																			tooltipPosition="top"
-																			(click)="onDeleteMiArchivo(semana.id, archivo)"
-																			[pt]="{
-																				root: {
-																					'aria-label': 'Eliminar archivo',
-																				},
-																			}"
-																		></button>
-																	</div>
-																</div>
+														<div class="week-badges">
+															@if (semana.archivos.length > 0) {
+																<span class="mini-badge files">
+																	<i class="pi pi-paperclip"></i>
+																	{{ semana.archivos.length }}
+																</span>
+															}
+															@if (semana.tareas.length > 0) {
+																<span class="mini-badge tasks">
+																	<i class="pi pi-file-edit"></i>
+																	{{ semana.tareas.length }}
+																</span>
 															}
 														</div>
-													}
-												</div>
-												<!-- #endregion -->
-
-												<!-- #region Tareas -->
-												<div class="section-block">
-													<div class="section-header">
-														<div class="section-label">
-															<i class="pi pi-file-edit"></i>
-															Tareas
-														</div>
 													</div>
-
-													@if (semana.tareas.length === 0) {
-														<div class="section-empty">Sin tareas asignadas</div>
-													} @else {
-														<div class="content-list">
-															@for (tarea of semana.tareas; track tarea.id) {
-																<div class="content-row">
-																	<div class="row-icon tarea">
-																		<i class="pi pi-file-edit"></i>
-																	</div>
-																	<div class="row-info">
-																		<strong>{{ tarea.titulo }}</strong>
-																		@if (tarea.descripcion) {
-																			<span class="tarea-desc">{{ tarea.descripcion }}</span>
-																		}
-																		@if (tarea.fechaLimite) {
-																			<span>
-																				<i
-																					class="pi pi-calendar"
-																					style="font-size: 0.65rem"
-																				></i>
-																				{{ tarea.fechaLimite | date: 'dd/MM/yyyy' }}
-																			</span>
-																		}
-																	</div>
-																</div>
-
-																<!-- Archivos del profesor en la tarea (read-only) -->
-																@if (tarea.archivos && tarea.archivos.length > 0) {
-																	<div class="tarea-archivos-section">
-																		<div class="tarea-section-label">
-																			<i class="pi pi-paperclip"></i>
-																			Material adjunto
-																		</div>
-																		<div class="tarea-archivos-list">
-																			@for (archivo of tarea.archivos; track archivo.id) {
-																				<div class="tarea-archivo-row">
-																					<div
-																						[class]="'row-icon small ' + getFileIconClass(archivo.tipoArchivo)"
-																					>
-																						<i [class]="getFileIcon(archivo.tipoArchivo)"></i>
-																					</div>
-																					<div
-																						class="row-info clickable"
-																						(click)="openArchivo(archivo.urlArchivo)"
-																					>
-																						<strong>{{ archivo.nombreArchivo }}</strong>
-																						@if (archivo.tamanoBytes) {
-																							<span>{{ formatFileSize(archivo.tamanoBytes) }}</span>
-																						}
-																					</div>
-																				</div>
-																			}
-																		</div>
+												</p-accordionheader>
+												<p-accordioncontent>
+													<div class="semana-body">
+														<!-- Descripción y mensaje -->
+														@if (semana.descripcion || semana.mensajeDocente) {
+															<div class="semana-meta">
+																@if (semana.descripcion) {
+																	<p class="semana-desc">{{ semana.descripcion }}</p>
+																}
+																@if (semana.mensajeDocente) {
+																	<div class="teacher-message">
+																		<i class="pi pi-comment"></i>
+																		<span>{{ semana.mensajeDocente }}</span>
 																	</div>
 																}
+															</div>
+														}
 
-																<!-- Mi entrega (archivos del estudiante en la tarea) -->
-																<div class="tarea-archivos-section student-section">
-																	<div class="tarea-section-label">
-																		<button
-																			class="tarea-attach-link"
-																			type="button"
-																			(click)="tareaFileInput.click()"
-																			aria-label="Subir mi archivo de tarea"
-																		>
-																			<i class="pi pi-upload"></i>
-																			Mi entrega
-																			<i class="pi pi-plus action-hint"></i>
-																		</button>
-																		<input
-																			#tareaFileInput
-																			type="file"
-																			hidden
-																			(change)="onNativeTareaFileSelect($event, tarea.id)"
-																		/>
-																	</div>
-																	@if (getMisTareaArchivos(tarea.id).length === 0) {
-																		<div class="section-empty">No has subido archivos</div>
-																	} @else {
-																		<div class="tarea-archivos-list">
-																			@for (archivo of getMisTareaArchivos(tarea.id); track archivo.id) {
-																				<div class="tarea-archivo-row">
-																					<div
-																						[class]="'row-icon small student-file ' + getFileIconClass(archivo.tipoArchivo)"
-																					>
-																						<i [class]="getFileIcon(archivo.tipoArchivo)"></i>
-																					</div>
-																					<div
-																						class="row-info clickable"
-																						(click)="openArchivo(archivo.urlArchivo)"
-																					>
-																						<strong>{{ archivo.nombreArchivo }}</strong>
-																						@if (archivo.tamanoBytes) {
-																							<span>{{ formatFileSize(archivo.tamanoBytes) }}</span>
-																						}
-																					</div>
-																					<div class="row-actions">
-																						<button
-																							pButton
-																							icon="pi pi-trash"
-																							class="p-button-text p-button-danger p-button-sm p-button-rounded"
-																							pTooltip="Eliminar"
-																							tooltipPosition="top"
-																							(click)="onDeleteMiTareaArchivo(tarea.id, archivo)"
-																							[pt]="{
-																								root: {
-																									'aria-label': 'Eliminar archivo de tarea',
-																								},
-																							}"
-																						></button>
-																					</div>
+														<!-- #region Archivos del profesor -->
+														<div class="section-block">
+															<div class="section-header">
+																<div class="section-label">
+																	<i class="pi pi-paperclip"></i>
+																	Archivos
+																</div>
+															</div>
+
+															@if (semana.archivos.length === 0) {
+																<div class="section-empty">Sin archivos adjuntos</div>
+															} @else {
+																<div class="content-list">
+																	@for (archivo of semana.archivos; track archivo.id) {
+																		<div class="content-row">
+																			<div
+																				[class]="'row-icon ' + getFileIconClass(archivo.tipoArchivo)"
+																			>
+																				<i [class]="getFileIcon(archivo.tipoArchivo)"></i>
+																			</div>
+																			<div
+																				class="row-info clickable"
+																				(click)="openArchivo(archivo.urlArchivo)"
+																			>
+																				<strong>{{ archivo.nombreArchivo }}</strong>
+																				@if (archivo.tamanoBytes) {
+																					<span>{{
+																						formatFileSize(archivo.tamanoBytes)
+																					}}</span>
+																				}
+																			</div>
+																		</div>
+																	}
+																</div>
+															}
+														</div>
+														<!-- #endregion -->
+
+														<!-- #region Mis Archivos (estudiante) -->
+														<div class="section-block">
+															<div class="section-header">
+																<button
+																	class="section-label section-action"
+																	type="button"
+																	(click)="studentFileInput.click()"
+																	aria-label="Subir mi archivo"
+																>
+																	<i class="pi pi-upload"></i>
+																	Mis Archivos
+																	<i class="pi pi-plus action-hint"></i>
+																</button>
+																<input
+																	#studentFileInput
+																	type="file"
+																	hidden
+																	(change)="onNativeFileSelect($event, semana.id)"
+																/>
+															</div>
+
+															@if (getMisArchivosSemana(semana.id).length === 0) {
+																<div class="section-empty">No has subido archivos</div>
+															} @else {
+																<div class="content-list">
+																	@for (archivo of getMisArchivosSemana(semana.id); track archivo.id) {
+																		<div class="content-row">
+																			<div
+																				[class]="'row-icon student-file ' + getFileIconClass(archivo.tipoArchivo)"
+																			>
+																				<i [class]="getFileIcon(archivo.tipoArchivo)"></i>
+																			</div>
+																			<div
+																				class="row-info clickable"
+																				(click)="openArchivo(archivo.urlArchivo)"
+																			>
+																				<strong>{{ archivo.nombreArchivo }}</strong>
+																				@if (archivo.tamanoBytes) {
+																					<span>{{
+																						formatFileSize(archivo.tamanoBytes)
+																					}}</span>
+																				}
+																			</div>
+																			<div class="row-actions">
+																				<button
+																					pButton
+																					icon="pi pi-trash"
+																					class="p-button-text p-button-danger p-button-sm p-button-rounded"
+																					pTooltip="Eliminar"
+																					tooltipPosition="top"
+																					(click)="onDeleteMiArchivo(semana.id, archivo)"
+																					[pt]="{
+																						root: {
+																							'aria-label': 'Eliminar archivo',
+																						},
+																					}"
+																				></button>
+																			</div>
+																		</div>
+																	}
+																</div>
+															}
+														</div>
+														<!-- #endregion -->
+
+														<!-- #region Tareas -->
+														<div class="section-block">
+															<div class="section-header">
+																<div class="section-label">
+																	<i class="pi pi-file-edit"></i>
+																	Tareas
+																</div>
+															</div>
+
+															@if (semana.tareas.length === 0) {
+																<div class="section-empty">Sin tareas asignadas</div>
+															} @else {
+																<div class="content-list">
+																	@for (tarea of semana.tareas; track tarea.id) {
+																		<div class="content-row">
+																			<div class="row-icon tarea">
+																				<i class="pi pi-file-edit"></i>
+																			</div>
+																			<div class="row-info">
+																				<strong>{{ tarea.titulo }}</strong>
+																				@if (tarea.descripcion) {
+																					<span class="tarea-desc">{{ tarea.descripcion }}</span>
+																				}
+																				@if (tarea.fechaLimite) {
+																					<span>
+																						<i
+																							class="pi pi-calendar"
+																							style="font-size: 0.65rem"
+																						></i>
+																						{{ tarea.fechaLimite | date: 'dd/MM/yyyy' }}
+																					</span>
+																				}
+																			</div>
+																		</div>
+
+																		<!-- Archivos del profesor en la tarea (read-only) -->
+																		@if (tarea.archivos && tarea.archivos.length > 0) {
+																			<div class="tarea-archivos-section">
+																				<div class="tarea-section-label">
+																					<i class="pi pi-paperclip"></i>
+																					Material adjunto
+																				</div>
+																				<div class="tarea-archivos-list">
+																					@for (archivo of tarea.archivos; track archivo.id) {
+																						<div class="tarea-archivo-row">
+																							<div
+																								[class]="'row-icon small ' + getFileIconClass(archivo.tipoArchivo)"
+																							>
+																								<i [class]="getFileIcon(archivo.tipoArchivo)"></i>
+																							</div>
+																							<div
+																								class="row-info clickable"
+																								(click)="openArchivo(archivo.urlArchivo)"
+																							>
+																								<strong>{{ archivo.nombreArchivo }}</strong>
+																								@if (archivo.tamanoBytes) {
+																									<span>{{ formatFileSize(archivo.tamanoBytes) }}</span>
+																								}
+																							</div>
+																						</div>
+																					}
+																				</div>
+																			</div>
+																		}
+
+																		<!-- Mi entrega (archivos del estudiante en la tarea) -->
+																		<div class="tarea-archivos-section student-section">
+																			<div class="tarea-section-label">
+																				<button
+																					class="tarea-attach-link"
+																					type="button"
+																					(click)="tareaFileInput.click()"
+																					aria-label="Subir mi archivo de tarea"
+																				>
+																					<i class="pi pi-upload"></i>
+																					Mi entrega
+																					<i class="pi pi-plus action-hint"></i>
+																				</button>
+																				<input
+																					#tareaFileInput
+																					type="file"
+																					hidden
+																					(change)="onNativeTareaFileSelect($event, tarea.id)"
+																				/>
+																			</div>
+																			@if (getMisTareaArchivos(tarea.id).length === 0) {
+																				<div class="section-empty">No has subido archivos</div>
+																			} @else {
+																				<div class="tarea-archivos-list">
+																					@for (archivo of getMisTareaArchivos(tarea.id); track archivo.id) {
+																						<div class="tarea-archivo-row">
+																							<div
+																								[class]="'row-icon small student-file ' + getFileIconClass(archivo.tipoArchivo)"
+																							>
+																								<i [class]="getFileIcon(archivo.tipoArchivo)"></i>
+																							</div>
+																							<div
+																								class="row-info clickable"
+																								(click)="openArchivo(archivo.urlArchivo)"
+																							>
+																								<strong>{{ archivo.nombreArchivo }}</strong>
+																								@if (archivo.tamanoBytes) {
+																									<span>{{ formatFileSize(archivo.tamanoBytes) }}</span>
+																								}
+																							</div>
+																							<div class="row-actions">
+																								<button
+																									pButton
+																									icon="pi pi-trash"
+																									class="p-button-text p-button-danger p-button-sm p-button-rounded"
+																									pTooltip="Eliminar"
+																									tooltipPosition="top"
+																									(click)="onDeleteMiTareaArchivo(tarea.id, archivo)"
+																									[pt]="{
+																										root: {
+																											'aria-label': 'Eliminar archivo de tarea',
+																										},
+																									}"
+																								></button>
+																							</div>
+																						</div>
+																					}
 																				</div>
 																			}
 																		</div>
@@ -317,72 +365,199 @@
 																</div>
 															}
 														</div>
-													}
-												</div>
-												<!-- #endregion -->
+														<!-- #endregion -->
+													</div>
+												</p-accordioncontent>
+											</p-accordionpanel>
+										}
+									</p-accordion>
+								</div>
+							}
+						</div>
+					</p-tabpanel>
+					<!-- #endregion -->
+
+					<!-- #region Tab Mis Calificaciones -->
+					<p-tabpanel value="1">
+						<div class="tab-panel-body">
+							<div style="display: flex; justify-content: flex-end; margin-bottom: 0.5rem">
+								<button
+									pButton
+									icon="pi pi-refresh"
+									class="p-button-rounded p-button-text p-button-sm"
+									(click)="onRefreshNotas()"
+									[disabled]="vm().misNotasLoading"
+									pTooltip="Refrescar"
+									tooltipPosition="top"
+									[pt]="{ root: { 'aria-label': 'Refrescar calificaciones' } }"
+								></button>
+							</div>
+							@if (vm().misNotasLoading) {
+								<div class="empty-state">
+									<i class="pi pi-spin pi-spinner"></i>
+									<p>Cargando calificaciones...</p>
+								</div>
+							} @else if (vm().misNotasCurso; as notas) {
+								<app-notas-curso-card [curso]="notas" />
+							} @else {
+								<div class="empty-state">
+									<i class="pi pi-chart-bar"></i>
+									<p>No hay calificaciones registradas para este curso</p>
+								</div>
+							}
+						</div>
+					</p-tabpanel>
+					<!-- #endregion -->
+
+					<!-- #region Tab Información -->
+					<p-tabpanel value="2">
+						<div class="tab-panel-body">
+							<div class="info-grid">
+								<div class="info-card">
+									<p class="info-section-title">Información del curso</p>
+
+									<div class="info-fields-row">
+										<div class="info-field">
+											<i class="pi pi-book"></i>
+											<div>
+												<p class="info-field-label">Curso</p>
+												<p class="info-field-value">{{ contenido.cursoNombre }}</p>
 											</div>
-										</p-accordioncontent>
-									</p-accordionpanel>
+										</div>
+										<div class="info-field">
+											<i class="pi pi-building"></i>
+											<div>
+												<p class="info-field-label">Salón</p>
+												<p class="info-field-value">{{ contenido.salonDescripcion }}</p>
+											</div>
+										</div>
+										<div class="info-field">
+											<i class="pi pi-calendar"></i>
+											<div>
+												<p class="info-field-label">Semanas</p>
+												<p class="info-field-value">{{ contenido.numeroSemanas }} semanas</p>
+											</div>
+										</div>
+									</div>
+								</div>
+
+								<div class="info-stats">
+									<button
+										class="stat-box files clickable"
+										type="button"
+										(click)="onOpenArchivosSummary()"
+										aria-label="Ver todos los archivos"
+									>
+										<i class="pi pi-paperclip"></i>
+										<div class="stat-number">{{ vm().totalArchivos }}</div>
+										<div class="stat-label">Archivos</div>
+									</button>
+									<button
+										class="stat-box tasks clickable"
+										type="button"
+										(click)="onOpenTareasSummary()"
+										aria-label="Ver todas las tareas"
+									>
+										<i class="pi pi-file-edit"></i>
+										<div class="stat-number">{{ vm().totalTareas }}</div>
+										<div class="stat-label">Tareas</div>
+									</button>
+								</div>
+							</div>
+						</div>
+					</p-tabpanel>
+					<!-- #endregion -->
+
+					<!-- #region Tab Mi Asistencia -->
+					<p-tabpanel value="3">
+						<div class="tab-panel-body">
+							<div style="display: flex; justify-content: flex-end; margin-bottom: 0.5rem">
+								<button
+									pButton
+									icon="pi pi-refresh"
+									class="p-button-rounded p-button-text p-button-sm"
+									(click)="onRefreshAsistencia()"
+									[disabled]="vm().miAsistenciaLoading"
+									pTooltip="Refrescar"
+									tooltipPosition="top"
+									[pt]="{ root: { 'aria-label': 'Refrescar asistencia' } }"
+								></button>
+							</div>
+							@if (vm().miAsistenciaLoading) {
+								<div class="empty-state">
+									<i class="pi pi-spin pi-spinner"></i>
+									<p>Cargando asistencia...</p>
+								</div>
+							} @else if (vm().miAsistencia; as asistencia) {
+								<!-- Stats resumen -->
+								<div class="asistencia-stats-row">
+									<div class="asistencia-stat-card presente">
+										<i class="pi pi-check-circle"></i>
+										<div class="stat-number">{{ asistencia.totalPresente }}</div>
+										<div class="stat-label">Presente</div>
+									</div>
+									<div class="asistencia-stat-card tarde">
+										<i class="pi pi-clock"></i>
+										<div class="stat-number">{{ asistencia.totalTarde }}</div>
+										<div class="stat-label">Tarde</div>
+									</div>
+									<div class="asistencia-stat-card falto">
+										<i class="pi pi-times-circle"></i>
+										<div class="stat-number">{{ asistencia.totalFalto }}</div>
+										<div class="stat-label">Faltó</div>
+									</div>
+									<div class="asistencia-stat-card total">
+										<i class="pi pi-percentage"></i>
+										<div class="stat-number">{{ asistenciaPorcentaje() }}%</div>
+										<div class="stat-label">Asistencia</div>
+									</div>
+								</div>
+
+								<!-- Tabla detalle -->
+								@if (asistencia.detalle.length > 0) {
+									<p-table
+										[value]="asistencia.detalle"
+										[paginator]="asistencia.detalle.length > 10"
+										[rows]="10"
+										styleClass="p-datatable-sm p-datatable-striped"
+									>
+										<ng-template #header>
+											<tr>
+												<th>Fecha</th>
+												<th>Estado</th>
+												<th>Justificación</th>
+											</tr>
+										</ng-template>
+										<ng-template #body let-item>
+											<tr>
+												<td>{{ item.fecha | date: 'dd/MM/yyyy' }}</td>
+												<td>
+													<p-tag
+														[value]="getEstadoLabel(item.estado)"
+														[severity]="$any(getEstadoSeverity(item.estado))"
+													/>
+												</td>
+												<td>{{ item.justificacion || '—' }}</td>
+											</tr>
+										</ng-template>
+									</p-table>
+								} @else {
+									<div class="empty-state">
+										<i class="pi pi-list"></i>
+										<p>No hay registros de asistencia detallados</p>
+									</div>
 								}
-							</p-accordion>
+							} @else {
+								<div class="empty-state">
+									<i class="pi pi-chart-line"></i>
+									<p>No hay registros de asistencia para este curso</p>
+								</div>
+							}
 						</div>
-					}
-				</div>
-				<!-- #endregion -->
-
-				<!-- #region Columna derecha: Info sidebar -->
-				<div class="info-column">
-					<div class="info-card">
-						<p class="info-section-title">Información del curso</p>
-
-						<div class="info-field">
-							<i class="pi pi-book"></i>
-							<div>
-								<p class="info-field-label">Curso</p>
-								<p class="info-field-value">{{ contenido.cursoNombre }}</p>
-							</div>
-						</div>
-						<div class="info-field">
-							<i class="pi pi-building"></i>
-							<div>
-								<p class="info-field-label">Salón</p>
-								<p class="info-field-value">{{ contenido.salonDescripcion }}</p>
-							</div>
-						</div>
-						<div class="info-field">
-							<i class="pi pi-calendar"></i>
-							<div>
-								<p class="info-field-label">Semanas</p>
-								<p class="info-field-value">{{ contenido.numeroSemanas }} semanas</p>
-							</div>
-						</div>
-					</div>
-
-					<div class="info-stats">
-						<button
-							class="stat-box files clickable"
-							type="button"
-							(click)="onOpenArchivosSummary()"
-							aria-label="Ver todos los archivos"
-						>
-							<i class="pi pi-paperclip"></i>
-							<div class="stat-number">{{ vm().totalArchivos }}</div>
-							<div class="stat-label">Archivos</div>
-						</button>
-						<button
-							class="stat-box tasks clickable"
-							type="button"
-							(click)="onOpenTareasSummary()"
-							aria-label="Ver todas las tareas"
-						>
-							<i class="pi pi-file-edit"></i>
-							<div class="stat-number">{{ vm().totalTareas }}</div>
-							<div class="stat-label">Tareas</div>
-						</button>
-					</div>
-				</div>
-				<!-- #endregion -->
-			</div>
+					</p-tabpanel>
+					<!-- #endregion -->
+				</p-tabpanels>
+			</p-tabs>
 		</div>
 	}
 </p-dialog>

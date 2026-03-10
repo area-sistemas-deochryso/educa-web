@@ -1,7 +1,7 @@
 import { Injectable, signal, computed, inject } from '@angular/core';
 
 import { PermisoRol, Vista, ROLES_DISPONIBLES_ADMIN, RolTipoAdmin } from '@core/services';
-import { AdminUtilsService } from '@shared/services';
+import { UiMappingService } from '@shared/services';
 import { buildModulosVistasForDetail, type ModuloVistas } from '../helpers/permisos-modulos.utils';
 
 export type { ModuloVistas } from '../helpers/permisos-modulos.utils';
@@ -17,7 +17,7 @@ interface PermisosRolesEstadisticas {
 
 @Injectable({ providedIn: 'root' })
 export class PermisosRolesStore {
-	private adminUtils = inject(AdminUtilsService);
+	private uiMapping = inject(UiMappingService);
 
 	// #region Estado privado
 	private readonly _permisosRol = signal<PermisoRol[]>([]);
@@ -71,7 +71,7 @@ export class PermisosRolesStore {
 	readonly estadisticas = computed<PermisosRolesEstadisticas>(() => {
 		const vistas = this._vistas();
 		const modulos = new Set<string>();
-		vistas.forEach((v) => modulos.add(this.adminUtils.getModuloFromRuta(v.ruta)));
+		vistas.forEach((v) => modulos.add(this.uiMapping.getModuloFromRuta(v.ruta)));
 
 		return {
 			totalRoles: this._totalRecords(),
@@ -121,7 +121,7 @@ export class PermisosRolesStore {
 
 	readonly vistasCountLabel = computed(() => {
 		const count = this._selectedVistas().length;
-		return this.adminUtils.getVistasCountLabel(count);
+		return this.uiMapping.getVistasCountLabel(count);
 	});
 
 	/** Detalle del drawer: agrupar vistas del permiso por módulo */
@@ -132,7 +132,7 @@ export class PermisosRolesStore {
 		return buildModulosVistasForDetail(
 			permiso.vistas,
 			this._vistas(),
-			(ruta) => this.adminUtils.getModuloFromRuta(ruta),
+			(ruta) => this.uiMapping.getModuloFromRuta(ruta),
 		);
 	});
 	// #endregion

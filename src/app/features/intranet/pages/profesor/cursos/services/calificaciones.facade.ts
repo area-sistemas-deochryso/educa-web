@@ -1,0 +1,384 @@
+import { Injectable, inject, DestroyRef } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { forkJoin } from 'rxjs';
+import { logger, withRetry } from '@core/helpers';
+import { ErrorHandlerService, WalFacadeHelper } from '@core/services';
+import { environment } from '@config';
+import { ProfesorApiService } from '../../services/profesor-api.service';
+import { ProfesorStore } from '../../services/profesor.store';
+import { CursoContenidoStore } from './curso-contenido.store';
+import { CalificacionesStore } from './calificaciones.store';
+import {
+	CrearCalificacionDto,
+	CalificarLoteDto,
+	ActualizarNotaDto,
+	CrearPeriodoDto,
+	CalificacionConNotasDto,
+	CalificacionDto,
+	CalificarGruposLoteDto,
+	CambiarTipoCalificacionDto,
+} from '../../models';
+
+@Injectable({ providedIn: 'root' })
+export class CalificacionesFacade {
+	// #region Dependencias
+	private readonly api = inject(ProfesorApiService);
+	private readonly store = inject(CalificacionesStore);
+	private readonly contenidoStore = inject(CursoContenidoStore);
+	private readonly profesorStore = inject(ProfesorStore);
+	private readonly errorHandler = inject(ErrorHandlerService);
+	private readonly wal = inject(WalFacadeHelper);
+	private readonly destroyRef = inject(DestroyRef);
+	private readonly calificacionUrl = `${environment.apiUrl}/api/Calificacion`;
+	private readonly grupoUrl = `${environment.apiUrl}/api/GrupoContenido`;
+	// #endregion
+
+	// #region Estado expuesto
+	readonly vm = this.store.vm;
+	// #endregion
+
+	// #region Comandos de carga
+
+	loadCalificaciones(contenidoId: number): void {
+		this.store.setLoading(true);
+
+		// Derive salonId from horarioId to load all salon students
+		const contenido = this.contenidoStore.contenido();
+		const horario = contenido
+			? this.profesorStore.horarios().find((h) => h.id === contenido.horarioId)
+			: null;
+		const salonId = horario?.salonId ?? null;
+
+		forkJoin({
+			calificaciones: this.api.getCalificaciones(contenidoId).pipe(
+				withRetry({ tag: 'CalificacionesFacade:loadCalificaciones' }),
+			),
+			periodos: this.api.getPeriodos(contenidoId).pipe(
+				withRetry({ tag: 'CalificacionesFacade:loadPeriodos' }),
+			),
+			...(salonId
+				? { salon: this.api.getEstudiantesSalon(salonId) }
+				: {}),
+		})
+			.pipe(takeUntilDestroyed(this.destroyRef))
+			.subscribe({
+				next: (result) => {
+					this.store.setCalificaciones(result.calificaciones);
+					this.store.setPeriodos(result.periodos);
+					if ('salon' in result && result.salon) {
+						this.store.setSalonEstudiantes(result.salon.estudiantes);
+					}
+					this.store.setLoading(false);
+				},
+				error: (err) => {
+					this.handleError(err, 'cargar calificaciones');
+					this.store.setLoading(false);
+				},
+			});
+	}
+
+	// #endregion
+
+	// #region CRUD Calificaciones
+
+	/** Create evaluation with WAL → quirurgical add on commit. */
+	crearCalificacion(dto: CrearCalificacionDto): void {
+		this.store.setSaving(true);
+
+		this.wal.execute<CalificacionConNotasDto>({
+			operation: 'CREATE',
+			resourceType: 'Calificacion',
+			endpoint: this.calificacionUrl,
+			method: 'POST',
+			payload: dto,
+			http$: () => this.api.crearCalificacion(dto),
+			onCommit: (cal) => {
+				this.store.addCalificacion(cal);
+				this.store.setSaving(false);
+				this.store.closeCalificacionDialog();
+			},
+			onError: (err) => {
+				this.handleError(err, 'crear evaluación');
+				this.store.setSaving(false);
+			},
+			optimistic: {
+				apply: () => {
+					// Close dialog immediately for better UX
+					this.store.closeCalificacionDialog();
+				},
+				rollback: () => {
+					// Re-open dialog on failure
+					this.store.openCalificacionDialog(null);
+				},
+			},
+		});
+	}
+
+	/** Batch-grade students with WAL → refetch on commit to get updated notas. */
+	calificarLote(calificacionId: number, dto: CalificarLoteDto, contenidoId: number): void {
+		this.store.setSaving(true);
+
+		this.wal.execute({
+			operation: 'UPDATE',
+			resourceType: 'Calificacion',
+			resourceId: calificacionId,
+			endpoint: `${this.calificacionUrl}/${calificacionId}/calificar`,
+			method: 'POST',
+			payload: dto,
+			http$: () => this.api.calificarLote(calificacionId, dto),
+			onCommit: () => {
+				this.refreshCalificaciones(contenidoId);
+				this.store.closeCalificarDialog();
+			},
+			onError: (err) => {
+				this.handleError(err, 'calificar estudiantes');
+				this.store.setSaving(false);
+			},
+			optimistic: {
+				apply: () => {},
+				rollback: () => {},
+			},
+		});
+	}
+
+	/** Batch-grade by groups with WAL → refetch on commit. */
+	calificarGruposLote(calificacionId: number, dto: CalificarGruposLoteDto, contenidoId: number): void {
+		this.store.setSaving(true);
+
+		this.wal.execute({
+			operation: 'UPDATE',
+			resourceType: 'Calificacion',
+			resourceId: calificacionId,
+			endpoint: `${this.grupoUrl}/${calificacionId}/calificar-grupos`,
+			method: 'POST',
+			payload: dto,
+			http$: () => this.api.calificarGruposLote(calificacionId, dto),
+			onCommit: () => {
+				this.refreshCalificaciones(contenidoId);
+				this.store.closeCalificarDialog();
+			},
+			onError: (err) => {
+				this.handleError(err, 'calificar grupos');
+				this.store.setSaving(false);
+			},
+			optimistic: {
+				apply: () => {},
+				rollback: () => {},
+			},
+		});
+	}
+
+	/** Update individual grade with WAL (2-month rule enforced by backend). */
+	actualizarNota(notaId: number, dto: ActualizarNotaDto, contenidoId: number): void {
+		this.store.setSaving(true);
+
+		this.wal.execute({
+			operation: 'UPDATE',
+			resourceType: 'Calificacion',
+			resourceId: notaId,
+			endpoint: `${this.calificacionUrl}/nota/${notaId}`,
+			method: 'PUT',
+			payload: dto,
+			http$: () => this.api.actualizarNota(notaId, dto),
+			onCommit: () => {
+				this.refreshCalificaciones(contenidoId);
+			},
+			onError: (err) => {
+				this.handleError(err, 'actualizar nota');
+				this.store.setSaving(false);
+			},
+			optimistic: {
+				apply: () => {},
+				rollback: () => {},
+			},
+		});
+	}
+
+	/** Delete evaluation with WAL → quirurgical removal. */
+	eliminarCalificacion(calificacionId: number): void {
+		const snapshot = this.store.calificaciones().find((c) => c.id === calificacionId);
+		this.store.setSaving(true);
+
+		this.wal.execute({
+			operation: 'DELETE',
+			resourceType: 'Calificacion',
+			resourceId: calificacionId,
+			endpoint: `${this.calificacionUrl}/${calificacionId}`,
+			method: 'DELETE',
+			payload: null,
+			http$: () => this.api.eliminarCalificacion(calificacionId),
+			onCommit: () => {
+				this.store.setSaving(false);
+			},
+			onError: (err) => {
+				this.handleError(err, 'eliminar evaluación');
+				this.store.setSaving(false);
+			},
+			optimistic: {
+				apply: () => {
+					this.store.removeCalificacion(calificacionId);
+				},
+				rollback: () => {
+					if (snapshot) this.store.addCalificacion(snapshot);
+				},
+			},
+		});
+	}
+
+	/** Change evaluation type (individual ↔ grupal) with WAL. */
+	cambiarTipo(calificacionId: number, dto: CambiarTipoCalificacionDto): void {
+		const snapshot = this.store.calificaciones().find((c) => c.id === calificacionId);
+		this.store.setSaving(true);
+
+		this.wal.execute<CalificacionConNotasDto>({
+			operation: 'UPDATE',
+			resourceType: 'Calificacion',
+			resourceId: calificacionId,
+			endpoint: `${this.calificacionUrl}/${calificacionId}/tipo`,
+			method: 'PUT',
+			payload: dto,
+			http$: () => this.api.cambiarTipoCalificacion(calificacionId, dto),
+			onCommit: (cal) => {
+				this.store.replaceCalificacion(cal);
+				this.store.setSaving(false);
+			},
+			onError: (err) => {
+				this.handleError(err, 'cambiar tipo de evaluación');
+				this.store.setSaving(false);
+			},
+			optimistic: {
+				apply: () => {},
+				rollback: () => {
+					if (snapshot) this.store.replaceCalificacion(snapshot);
+				},
+			},
+		});
+	}
+
+	// #endregion
+
+	// #region Periodos
+
+	crearPeriodo(dto: CrearPeriodoDto): void {
+		this.store.setSaving(true);
+
+		this.wal.execute({
+			operation: 'CREATE',
+			resourceType: 'Calificacion',
+			endpoint: `${this.calificacionUrl}/periodo`,
+			method: 'POST',
+			payload: dto,
+			http$: () => this.api.crearPeriodo(dto),
+			onCommit: (periodo) => {
+				this.store.addPeriodo(periodo);
+				this.store.setSaving(false);
+			},
+			onError: (err) => {
+				this.handleError(err, 'crear periodo');
+				this.store.setSaving(false);
+			},
+			optimistic: {
+				apply: () => {},
+				rollback: () => {},
+			},
+		});
+	}
+
+	eliminarPeriodo(periodoId: number): void {
+		const snapshot = this.store.periodos().find((p) => p.id === periodoId);
+		this.store.setSaving(true);
+
+		this.wal.execute({
+			operation: 'DELETE',
+			resourceType: 'Calificacion',
+			resourceId: periodoId,
+			endpoint: `${this.calificacionUrl}/periodo/${periodoId}`,
+			method: 'DELETE',
+			payload: null,
+			http$: () => this.api.eliminarPeriodo(periodoId),
+			onCommit: () => {
+				this.store.setSaving(false);
+			},
+			onError: (err) => {
+				this.handleError(err, 'eliminar periodo');
+				this.store.setSaving(false);
+			},
+			optimistic: {
+				apply: () => {
+					this.store.removePeriodo(periodoId);
+				},
+				rollback: () => {
+					if (snapshot) this.store.addPeriodo(snapshot);
+				},
+			},
+		});
+	}
+
+	// #endregion
+
+	// #region Comandos de UI
+	openCalificacionDialog(editing: CalificacionDto | null = null): void {
+		this.store.openCalificacionDialog(editing);
+	}
+
+	closeCalificacionDialog(): void {
+		this.store.closeCalificacionDialog();
+	}
+
+	openCalificarDialog(cal: CalificacionConNotasDto): void {
+		this.store.openCalificarDialog(cal);
+
+		// Load groups if grupal evaluation
+		if (cal.esGrupal) {
+			const contenido = this.contenidoStore.contenido();
+			if (contenido) {
+				this.api
+					.getGrupos(contenido.id)
+					.pipe(takeUntilDestroyed(this.destroyRef))
+					.subscribe({
+						next: (resumen) => this.store.setGruposForCalificar(resumen.grupos),
+						error: (err) => this.handleError(err, 'cargar grupos'),
+					});
+			}
+		}
+	}
+
+	closeCalificarDialog(): void {
+		this.store.closeCalificarDialog();
+	}
+
+	openPeriodosDialog(): void {
+		this.store.openPeriodosDialog();
+	}
+
+	closePeriodosDialog(): void {
+		this.store.closePeriodosDialog();
+	}
+
+	resetCalificaciones(): void {
+		this.store.reset();
+	}
+	// #endregion
+
+	// #region Helpers privados
+
+	/** Refetch calificaciones after mutation (needed for nested notas). */
+	private refreshCalificaciones(contenidoId: number): void {
+		this.api
+			.getCalificaciones(contenidoId)
+			.pipe(takeUntilDestroyed(this.destroyRef))
+			.subscribe({
+				next: (cals) => {
+					this.store.setCalificaciones(cals);
+					this.store.setSaving(false);
+				},
+				error: () => this.store.setSaving(false),
+			});
+	}
+
+	private handleError(err: unknown, accion: string): void {
+		logger.error(`CalificacionesFacade: Error al ${accion}`, err);
+		this.errorHandler.showError('Error', `No se pudo ${accion}`);
+	}
+	// #endregion
+}

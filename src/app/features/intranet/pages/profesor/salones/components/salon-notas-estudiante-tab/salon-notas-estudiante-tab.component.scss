@@ -1,0 +1,214 @@
+// #region Filters
+.notas-filters {
+	display: flex;
+	gap: 0.75rem;
+	margin-bottom: 1rem;
+	flex-wrap: wrap;
+
+	.curso-select,
+	.estudiante-select {
+		min-width: 180px;
+		flex: 1;
+	}
+}
+// #endregion
+
+// #region Section headers
+.section-header {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	margin-bottom: 0.5rem;
+}
+
+.section-title {
+	font-size: 0.95rem;
+	font-weight: 700;
+	color: var(--text-color);
+}
+// #endregion
+
+// #region Tipo cell
+.tipo-cell {
+	display: flex;
+	align-items: center;
+	gap: 0.35rem;
+}
+// #endregion
+
+// #region Simulator
+.sim-input {
+	width: 60px;
+	text-align: center;
+	font-weight: 600;
+	border: 1.5px dashed var(--primary-color);
+	border-radius: var(--border-radius);
+	background: var(--primary-50, rgba(79, 70, 229, 0.04));
+	transition: border-color 0.2s, background 0.2s;
+
+	&:focus {
+		border-style: solid;
+		background: var(--surface-card);
+	}
+
+	// Hide spinner arrows
+	&::-webkit-inner-spin-button,
+	&::-webkit-outer-spin-button {
+		-webkit-appearance: none;
+		margin: 0;
+	}
+	-moz-appearance: textfield;
+}
+
+.sim-hint {
+	display: flex;
+	justify-content: flex-end;
+	margin-top: 0.35rem;
+}
+// #endregion
+
+// #region Editable nota
+.nota-tag-editable {
+	cursor: pointer;
+	transition: transform 0.15s, box-shadow 0.15s;
+
+	&:hover {
+		transform: scale(1.1);
+		box-shadow: 0 0 0 2px var(--primary-100, rgba(79, 70, 229, 0.15));
+	}
+}
+
+.edit-nota-cell {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	gap: 0.15rem;
+}
+
+.edit-nota-input {
+	width: 60px;
+	text-align: center;
+	font-weight: 600;
+	border: 1.5px solid var(--primary-color);
+	border-radius: var(--border-radius);
+
+	// Hide spinner arrows
+	&::-webkit-inner-spin-button,
+	&::-webkit-outer-spin-button {
+		-webkit-appearance: none;
+		margin: 0;
+	}
+	-moz-appearance: textfield;
+}
+// #endregion
+
+// #region Empty state
+.empty-state {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	padding: 2rem 1rem;
+	color: var(--text-color-secondary);
+
+	i {
+		font-size: 2rem;
+		margin-bottom: 0.5rem;
+		opacity: 0.4;
+	}
+
+	p {
+		margin: 0 0 0.25rem;
+		font-weight: 500;
+		color: var(--text-color);
+		font-size: 0.9rem;
+	}
+}
+// #endregion
+
+// #region Promedios
+.promedios-section {
+	margin-top: 1rem;
+	border-top: 1px solid var(--surface-border);
+	padding-top: 0.75rem;
+}
+
+.promedios-grouped {
+	display: flex;
+	flex-direction: column;
+	gap: 0.75rem;
+}
+
+.promedio-group {
+	display: flex;
+	flex-direction: column;
+	gap: 0.35rem;
+}
+
+.promedio-group-label {
+	font-size: 0.7rem;
+	font-weight: 600;
+	color: var(--text-color-secondary);
+	text-transform: uppercase;
+	letter-spacing: 0.03em;
+}
+
+.promedio-group-items {
+	display: flex;
+	gap: 0.5rem;
+	flex-wrap: wrap;
+}
+
+.promedio-item {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	gap: 0.2rem;
+	padding: 0.4rem 0.65rem;
+	border: 1px solid var(--surface-border);
+	border-radius: var(--border-radius);
+	min-width: 70px;
+	transition: border-color 0.2s, background 0.2s, box-shadow 0.2s;
+
+	&.promedio-simulated {
+		border: 1.5px dashed var(--primary-color);
+		background: var(--primary-50, rgba(79, 70, 229, 0.05));
+		box-shadow: 0 0 0 1px rgba(79, 70, 229, 0.08);
+	}
+}
+
+.promedio-label {
+	font-size: 0.65rem;
+	color: var(--text-color-secondary);
+	font-weight: 500;
+	white-space: nowrap;
+	display: flex;
+	align-items: center;
+	gap: 0.2rem;
+
+	.sim-icon {
+		font-size: 0.55rem;
+		color: var(--primary-color);
+	}
+}
+
+.promedio-value {
+	font-size: 1rem;
+	font-weight: 700;
+
+	&.promedio-success {
+		color: var(--green-600, #16a34a);
+	}
+
+	&.promedio-warn {
+		color: var(--yellow-600, #ca8a04);
+	}
+
+	&.promedio-danger {
+		color: var(--red-600, #dc2626);
+	}
+
+	&.promedio-secondary {
+		color: var(--text-color-secondary);
+	}
+}
+// #endregion

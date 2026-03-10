@@ -50,8 +50,10 @@ export class CursoContenidoFacade {
 	 * @example
 	 * facade.loadContenido(120);
 	 */
-	loadContenido(horarioId: number): void {
+	loadContenido(horarioId: number, initialTab?: string): void {
+		if (this.store.loading()) return;
 		this.store.setSelectedHorarioId(horarioId);
+		this.store.setInitialTab(initialTab ?? null);
 		this.store.setLoading(true);
 		this.store.clearError();
 
@@ -76,6 +78,31 @@ export class CursoContenidoFacade {
 					logger.error('CursoContenidoFacade: Error al cargar contenido', err);
 					this.errorHandler.showError('Error', 'No se pudo cargar el contenido del curso');
 					this.store.setError('No se pudo cargar el contenido del curso');
+					this.store.setLoading(false);
+				},
+			});
+	}
+
+	/** Refresh content tab using the currently selected horarioId. */
+	refreshContenido(): void {
+		const horarioId = this.store.selectedHorarioId();
+		if (!horarioId) return;
+		this.store.setLoading(true);
+		this.store.clearError();
+
+		this.api
+			.getContenido(horarioId)
+			.pipe(
+				withRetry({ tag: 'CursoContenidoFacade:refreshContenido' }),
+				takeUntilDestroyed(this.destroyRef),
+			)
+			.subscribe({
+				next: (contenido) => {
+					this.store.setContenido(contenido);
+					this.store.setLoading(false);
+				},
+				error: (err) => {
+					logger.error('CursoContenidoFacade: Error al refrescar contenido', err);
 					this.store.setLoading(false);
 				},
 			});
@@ -553,6 +580,7 @@ export class CursoContenidoFacade {
 	 * @param contenidoId Content id.
 	 */
 	openStudentFilesDialog(contenidoId: number): void {
+		if (this.store.studentFilesLoading()) return;
 		this.store.openStudentFilesDialog();
 		this.store.setStudentFilesLoading(true);
 
@@ -579,6 +607,10 @@ export class CursoContenidoFacade {
 	 */
 	closeStudentFilesDialog(): void {
 		this.store.closeStudentFilesDialog();
+	}
+	/** Clear the initial tab override after it has been consumed. */
+	clearInitialTab(): void {
+		this.store.setInitialTab(null);
 	}
 	// #endregion
 

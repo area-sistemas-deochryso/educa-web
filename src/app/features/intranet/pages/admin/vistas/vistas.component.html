@@ -158,7 +158,7 @@
 						<td>
 							<span class="modulo-badge">
 								<i class="pi pi-folder"></i>
-								{{ adminUtils.getModuloFromRuta(vista.ruta) }}
+								{{ uiMapping.getModuloFromRuta(vista.ruta) }}
 							</span>
 						</td>
 						<td>
@@ -170,7 +170,7 @@
 						<td class="text-center">
 							<p-tag
 								[value]="vista.estado === 1 ? 'Activa' : 'Inactiva'"
-								[severity]="adminUtils.getEstadoSeverity(vista.estado)"
+								[severity]="uiMapping.getEstadoSeverity(vista.estado)"
 							/>
 						</td>
 						<td>

@@ -1,0 +1,12 @@
+:host {
+	display: block;
+
+	::ng-deep .p-datatable {
+		.p-datatable-header,
+		.p-datatable-thead > tr > th,
+		.p-datatable-tbody > tr,
+		.p-datatable-tbody > tr > td {
+			background: transparent;
+		}
+	}
+}

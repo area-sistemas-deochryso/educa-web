@@ -53,11 +53,13 @@
 
 	&:hover,
 	&:focus {
-		color: var(--primary-color);
+		color: var(--primary-text-color);
+		text-shadow: var(--primary-text-shadow);
 	}
 
 	&.active {
-		color: var(--primary-color);
+		color: var(--primary-text-color);
+		text-shadow: var(--primary-text-shadow);
 	}
 }
 

@@ -1,0 +1,177 @@
+<!-- #region Filters -->
+<div class="notas-filters">
+	@if (cursoOptions().length > 1) {
+		<p-select
+			[options]="cursoOptions()"
+			[ngModel]="selectedCurso()"
+			(ngModelChange)="cursoChange.emit($event)"
+			optionLabel="label"
+			optionValue="value"
+			placeholder="Seleccionar curso"
+			appendTo="body"
+			class="curso-select"
+		/>
+	}
+	<p-selectButton
+		[options]="vistaOptions"
+		[ngModel]="vistaActual()"
+		(ngModelChange)="vistaChange.emit($event)"
+		optionLabel="label"
+		optionValue="value"
+	/>
+</div>
+<!-- #endregion -->
+
+<!-- #region Content -->
+@if (loading()) {
+	<div class="flex flex-column gap-2 p-2">
+		@for (_ of [1, 2, 3, 4, 5]; track $index) {
+			<p-skeleton height="2rem" />
+		}
+	</div>
+} @else if (!hasData()) {
+	<div class="empty-state">
+		<i class="pi pi-chart-bar text-3xl mb-2"></i>
+		<p>No hay notas disponibles</p>
+		<span class="text-sm text-color-secondary">Selecciona un curso o espera a que se registren evaluaciones</span>
+	</div>
+} @else if (notasData(); as data) {
+	<p-table
+		[value]="data.estudiantes"
+		[scrollable]="true"
+		scrollHeight="350px"
+		styleClass="p-datatable-sm notas-salon-table"
+	>
+		<!-- #region Header -->
+		<ng-template #header>
+			<!-- Vista Semana: evaluaciones agrupadas por semana real -->
+			@if (vistaActual() === 'semana') {
+				<tr>
+					<th rowspan="2" style="min-width: 40px">#</th>
+					<th rowspan="2" style="min-width: 100px">DNI</th>
+					<th rowspan="2" style="min-width: 160px">Estudiante</th>
+					@for (group of evaluacionesPorSemana(); track group.semana) {
+						<th [attr.colspan]="group.colspan" class="periodo-header">
+							Sem {{ group.semana }}
+						</th>
+					}
+					<th rowspan="2" class="general-header">General</th>
+				</tr>
+				<tr>
+					@for (group of evaluacionesPorSemana(); track group.semana) {
+						@for (eval of group.evaluaciones; track eval.id) {
+							<th style="min-width: 65px; text-align: center">
+								<div class="eval-header">
+									@if (eval.esGrupal) {
+										<i class="pi pi-users text-xs" title="Evaluación grupal"></i>
+									}
+									<span [title]="eval.titulo">{{ eval.titulo | slice : 0 : 8 }}</span>
+								</div>
+							</th>
+						}
+					}
+				</tr>
+			}
+
+			<!-- Vista Periodo: evaluaciones agrupadas por periodo + promedios -->
+			@if (vistaActual() === 'periodo') {
+				<tr>
+					<th rowspan="2" style="min-width: 40px">#</th>
+					<th rowspan="2" style="min-width: 100px">DNI</th>
+					<th rowspan="2" style="min-width: 160px">Estudiante</th>
+					@for (group of evaluacionesPorPeriodo(); track group.periodo.id) {
+						<th [attr.colspan]="group.colspan" class="periodo-header">
+							{{ group.periodo.nombre }}
+						</th>
+					}
+					<th rowspan="2" class="general-header">General</th>
+				</tr>
+				<tr>
+					@for (group of evaluacionesPorPeriodo(); track group.periodo.id) {
+						@for (eval of group.evaluaciones; track eval.id) {
+							<th style="min-width: 65px; text-align: center">
+								<div class="eval-header">
+									@if (eval.esGrupal) {
+										<i class="pi pi-users text-xs" title="Evaluación grupal"></i>
+									}
+									<span [title]="eval.titulo">{{ eval.titulo | slice : 0 : 8 }}</span>
+								</div>
+							</th>
+						}
+						<th class="promedio-col-header">Prom.</th>
+					}
+				</tr>
+			}
+
+			<!-- Vista Año: solo General -->
+			@if (vistaActual() === 'anual') {
+				<tr>
+					<th style="min-width: 40px">#</th>
+					<th style="min-width: 100px">DNI</th>
+					<th style="min-width: 160px">Estudiante</th>
+					<th class="general-header">General</th>
+				</tr>
+			}
+		</ng-template>
+		<!-- #endregion -->
+
+		<!-- #region Body -->
+		<ng-template #body let-est let-i="rowIndex">
+			<tr>
+				<td class="text-color-secondary">{{ i + 1 }}</td>
+				<td class="font-mono">{{ est.dni }}</td>
+				<td class="font-semibold">{{ est.nombreCompleto }}</td>
+
+				<!-- Vista Semana: notas individuales agrupadas por semana -->
+				@if (vistaActual() === 'semana') {
+					@for (group of evaluacionesPorSemana(); track group.semana) {
+						@for (eval of group.evaluaciones; track eval.id) {
+							<td class="text-center">
+								<p-tag
+									[value]="formatNota(getNota(est.estudianteId, eval.id))"
+									[severity]="getNotaSeverity(getNota(est.estudianteId, eval.id))"
+									[rounded]="true"
+								/>
+							</td>
+						}
+					}
+				}
+
+				<!-- Vista Periodo: notas individuales + promedio por periodo -->
+				@if (vistaActual() === 'periodo') {
+					@for (group of evaluacionesPorPeriodo(); track group.periodo.id) {
+						@for (eval of group.evaluaciones; track eval.id) {
+							<td class="text-center">
+								<p-tag
+									[value]="formatNota(getNota(est.estudianteId, eval.id))"
+									[severity]="getNotaSeverity(getNota(est.estudianteId, eval.id))"
+									[rounded]="true"
+								/>
+							</td>
+						}
+						<td class="text-center promedio-col">
+							<span
+								class="promedio-value"
+								[class]="'promedio-' + getNotaSeverity(getPromedio(est.estudianteId, group.periodo.nombre))"
+							>
+								{{ formatNota(getPromedio(est.estudianteId, group.periodo.nombre)) }}
+							</span>
+						</td>
+					}
+				}
+
+				<!-- General (todas las vistas) -->
+				<td class="text-center general-col">
+					<span
+						class="promedio-value general-value"
+						[class]="'promedio-' + getNotaSeverity(getPromedio(est.estudianteId, 'General'))"
+					>
+						{{ formatNota(getPromedio(est.estudianteId, 'General')) }}
+					</span>
+				</td>
+			</tr>
+		</ng-template>
+		<!-- #endregion -->
+	</p-table>
+}
+<!-- #endregion -->

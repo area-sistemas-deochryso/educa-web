@@ -38,6 +38,7 @@ export interface HorarioDetalleResponseDto {
   profesorDni: string | null;
   cantidadEstudiantes: number;
   estudiantes: EstudianteHorarioDto[];
+  tutorNombre: string | null;
   usuarioReg: string;
   fechaReg: string;
   usuarioMod: string | null;

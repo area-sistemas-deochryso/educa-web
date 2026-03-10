@@ -1,0 +1,323 @@
+// #region Config bar
+.config-bar {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	gap: 0.75rem;
+	padding: 0.6rem 0.75rem;
+	background: var(--surface-ground);
+	border-radius: var(--border-radius);
+	flex-wrap: wrap;
+}
+
+.config-max {
+	display: flex;
+	align-items: center;
+	gap: 0.5rem;
+
+	label {
+		font-size: 0.8rem;
+		font-weight: 500;
+		color: var(--text-color-secondary);
+		white-space: nowrap;
+	}
+
+	input[type='number'] {
+		width: 60px;
+		text-align: center;
+
+		// Hide spinner arrows
+		&::-webkit-inner-spin-button,
+		&::-webkit-outer-spin-button {
+			-webkit-appearance: none;
+			margin: 0;
+		}
+		-moz-appearance: textfield;
+	}
+}
+// #endregion
+
+// #region Grupos list
+.grupos-list {
+	display: flex;
+	flex-direction: column;
+	gap: 0.5rem;
+}
+// #endregion
+
+// #region Grupo card
+.grupo-card {
+	border: 1px solid var(--surface-border);
+	border-radius: var(--border-radius);
+	overflow: hidden;
+	transition: box-shadow 0.2s;
+
+	&:hover {
+		box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+	}
+}
+
+.grupo-header {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	padding: 0.5rem 0.75rem;
+	background: var(--surface-ground);
+	border-bottom: 1px solid var(--surface-border);
+	min-height: 40px;
+}
+
+.grupo-title {
+	display: flex;
+	align-items: center;
+	gap: 0.5rem;
+
+	.grupo-icon {
+		color: var(--primary-color);
+		font-size: 0.9rem;
+	}
+
+	.grupo-nombre {
+		font-weight: 600;
+		font-size: 0.9rem;
+	}
+}
+
+.grupo-actions {
+	display: flex;
+	align-items: center;
+	gap: 0.15rem;
+}
+
+.grupo-body {
+	padding: 0.5rem 0.75rem;
+	min-height: 2.5rem;
+	transition: background 0.2s;
+}
+
+.miembro-row {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	padding: 0.25rem 0.35rem;
+	border-radius: var(--border-radius);
+	transition: background 0.15s;
+
+	&:hover {
+		background: var(--surface-hover);
+	}
+}
+
+.miembro-info {
+	display: flex;
+	align-items: center;
+	gap: 0.5rem;
+
+	.miembro-index {
+		color: var(--text-color-secondary);
+		font-size: 0.7rem;
+		width: 1.2rem;
+		text-align: center;
+	}
+
+	.miembro-dni {
+		font-family: 'Courier New', monospace;
+		font-size: 0.75rem;
+		color: var(--text-color-secondary);
+	}
+
+	.miembro-nombre {
+		font-size: 0.85rem;
+	}
+}
+
+.grupo-empty {
+	padding: 0.5rem 0;
+	text-align: center;
+	color: var(--text-color-secondary);
+	font-size: 0.8rem;
+	font-style: italic;
+}
+// #endregion
+
+// #region Crear grupo
+.crear-grupo-bar {
+	display: flex;
+	align-items: center;
+	gap: 0.5rem;
+	padding: 0.75rem;
+	border: 2px dashed var(--surface-border);
+	border-radius: var(--border-radius);
+	background: var(--surface-ground);
+	transition: border-color 0.2s;
+
+	&:focus-within {
+		border-color: var(--primary-color);
+	}
+}
+// #endregion
+
+// #region Drag & Drop
+.drag-handle {
+	cursor: grab;
+	color: var(--text-color-secondary);
+	font-size: 0.7rem;
+	opacity: 0.3;
+	transition: opacity 0.2s, color 0.2s;
+
+	&:hover {
+		opacity: 1;
+		color: var(--primary-color);
+	}
+
+	&:active {
+		cursor: grabbing;
+		opacity: 1;
+		color: var(--primary-color);
+	}
+}
+
+// Draggable items - base interactive state
+.miembro-row,
+.sin-grupo-item {
+	cursor: grab;
+	transition: transform 0.15s, box-shadow 0.15s, background 0.15s;
+
+	&:active {
+		cursor: grabbing;
+	}
+}
+
+.cdk-drag-preview {
+	display: flex;
+	align-items: center;
+	gap: 0.5rem;
+	background: var(--surface-card);
+	border: 2px solid var(--primary-color);
+	border-radius: var(--border-radius);
+	padding: 0.4rem 0.85rem;
+	box-shadow:
+		0 8px 25px rgba(79, 70, 229, 0.2),
+		0 4px 10px rgba(0, 0, 0, 0.12);
+	font-size: 0.85rem;
+	transform: scale(1.04) rotate(-1deg);
+	cursor: grabbing;
+	z-index: 1000;
+
+	.drag-handle {
+		opacity: 1;
+		color: var(--primary-color);
+	}
+}
+
+.cdk-drag-placeholder {
+	background: rgba(79, 70, 229, 0.06);
+	border: 2px dashed var(--primary-color);
+	border-radius: var(--border-radius);
+	min-height: 2rem;
+	opacity: 0.6;
+	transition: opacity 0.2s;
+}
+
+.cdk-drag-animating {
+	transition: transform 250ms cubic-bezier(0, 0, 0.2, 1);
+}
+
+.grupo-body.cdk-drop-list-dragging .miembro-row:not(.cdk-drag-placeholder) {
+	transition: transform 250ms cubic-bezier(0, 0, 0.2, 1);
+}
+
+.sin-grupo-section.cdk-drop-list-dragging .sin-grupo-item:not(.cdk-drag-placeholder) {
+	transition: transform 250ms cubic-bezier(0, 0, 0.2, 1);
+}
+
+.grupo-body.cdk-drop-list-receiving,
+.sin-grupo-section.cdk-drop-list-receiving {
+	background: rgba(79, 70, 229, 0.06);
+	box-shadow: inset 0 0 0 2px rgba(79, 70, 229, 0.15);
+	border-radius: var(--border-radius);
+	transition: background 0.2s, box-shadow 0.2s;
+}
+// #endregion
+
+// #region Sin grupo
+.sin-grupo-section {
+	padding: 0.75rem;
+	background: var(--surface-ground);
+	border-radius: var(--border-radius);
+	border: 1px solid var(--surface-border);
+	min-height: 3rem;
+	transition: background 0.2s, border-color 0.2s;
+}
+
+.sin-grupo-header {
+	display: flex;
+	align-items: center;
+	gap: 0.5rem;
+	margin-bottom: 0.5rem;
+	font-size: 0.8rem;
+	font-weight: 600;
+	color: var(--text-color-secondary);
+}
+
+.sin-grupo-empty {
+	padding: 0.5rem 0;
+	text-align: center;
+	color: var(--text-color-secondary);
+	font-size: 0.75rem;
+	font-style: italic;
+	opacity: 0.6;
+}
+
+.sin-grupo-list {
+	display: flex;
+	flex-direction: column;
+	gap: 0.25rem;
+}
+
+.sin-grupo-item {
+	display: flex;
+	align-items: center;
+	gap: 0.5rem;
+	padding: 0.3rem 0.5rem;
+	border-radius: var(--border-radius);
+	transition: background 0.15s;
+
+	&:hover {
+		background: var(--surface-hover);
+	}
+
+	.sin-grupo-nombre {
+		font-size: 0.85rem;
+	}
+
+	.sin-grupo-dni {
+		font-family: 'Courier New', monospace;
+		font-size: 0.75rem;
+		color: var(--text-color-secondary);
+	}
+}
+// #endregion
+
+// #region Empty state
+.empty-state {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	padding: 2rem 1rem;
+	color: var(--text-color-secondary);
+	text-align: center;
+
+	i {
+		font-size: 2.5rem;
+		margin-bottom: 0.5rem;
+		opacity: 0.35;
+	}
+
+	p {
+		margin: 0;
+		font-size: 0.85rem;
+		line-height: 1.5;
+	}
+}
+// #endregion

@@ -1,0 +1,147 @@
+<p-dialog
+	[header]="dialogTitle()"
+	[visible]="visible()"
+	(visibleChange)="onVisibleChange($event)"
+	[modal]="true"
+	[style]="{ width: '520px', maxWidth: '95vw' }"
+	[closable]="true"
+>
+	<div class="form-grid">
+		<!-- #region Titulo -->
+		<div class="form-field">
+			<label for="eval-titulo">Título *</label>
+			<input
+				pInputText
+				id="eval-titulo"
+				[ngModel]="formData().titulo"
+				(ngModelChange)="updateField('titulo', $event)"
+				placeholder="Ej: Examen parcial, Exposición grupal..."
+				class="w-full"
+			/>
+		</div>
+		<!-- #endregion -->
+
+		<!-- #region Tipo y Peso -->
+		<div class="form-row">
+			<div class="form-field flex-1">
+				<div class="label-with-tooltip">
+					<label for="eval-tipo">Tipo *</label>
+					<i
+						class="pi pi-question-circle help-icon"
+						pTooltip="Categoría de la evaluación: Examen, Tarea, Exposición, Participación u Otro"
+						tooltipPosition="top"
+					></i>
+				</div>
+				<p-select
+					id="eval-tipo"
+					[options]="tiposOptions"
+					[ngModel]="formData().tipo"
+					(ngModelChange)="updateField('tipo', $event)"
+					optionLabel="label"
+					optionValue="value"
+					appendTo="body"
+					class="w-full"
+				/>
+			</div>
+			<div class="form-field" style="width: 140px">
+				<div class="label-with-tooltip">
+					<label for="eval-peso">Peso *</label>
+					<i
+						class="pi pi-question-circle help-icon"
+						pTooltip="Porcentaje del peso total. Ej: 0.20 = 20%. La suma de pesos de todas las evaluaciones debería ser 1.0"
+						tooltipPosition="top"
+					></i>
+				</div>
+				<p-inputNumber
+					id="eval-peso"
+					[ngModel]="formData().peso"
+					(ngModelChange)="updateField('peso', $event)"
+					[min]="PESO_MINIMO"
+					[max]="PESO_MAXIMO"
+					[minFractionDigits]="2"
+					[maxFractionDigits]="2"
+					[step]="0.05"
+					mode="decimal"
+					class="w-full"
+				/>
+				<small class="field-hint">Valor entre {{ PESO_MINIMO }} y {{ PESO_MAXIMO }}</small>
+			</div>
+		</div>
+		<!-- #endregion -->
+
+		<!-- #region Semana y Fecha -->
+		<div class="form-row">
+			<div class="form-field flex-1">
+				<div class="label-with-tooltip">
+					<label for="eval-semana">Semana *</label>
+					<i
+						class="pi pi-question-circle help-icon"
+						pTooltip="Semana del curso en la que se realiza esta evaluación"
+						tooltipPosition="top"
+					></i>
+				</div>
+				<p-select
+					id="eval-semana"
+					[options]="semanaOptions()"
+					[ngModel]="formData().semanaId"
+					(ngModelChange)="updateField('semanaId', $event)"
+					optionLabel="label"
+					optionValue="value"
+					placeholder="Seleccionar semana"
+					appendTo="body"
+					class="w-full"
+				/>
+			</div>
+			<div class="form-field flex-1">
+				<label for="eval-fecha">Fecha *</label>
+				<p-datepicker
+					id="eval-fecha"
+					[ngModel]="formData().fechaEvaluacion"
+					(ngModelChange)="updateField('fechaEvaluacion', $event)"
+					dateFormat="dd/mm/yy"
+					appendTo="body"
+					class="w-full"
+				/>
+			</div>
+		</div>
+		<!-- #endregion -->
+
+		<!-- #region Evaluación grupal -->
+		<div class="form-field">
+			<div class="flex align-items-center gap-2">
+				<p-toggleSwitch
+					[ngModel]="formData().esGrupal"
+					(ngModelChange)="updateField('esGrupal', $event)"
+				/>
+				<label class="cursor-pointer" (click)="updateField('esGrupal', !formData().esGrupal)">
+					Evaluación grupal
+				</label>
+				<i
+					class="pi pi-question-circle help-icon"
+					pTooltip="Si está activo, la calificación se ingresa por grupo y todos los miembros reciben la misma nota"
+					tooltipPosition="top"
+				></i>
+			</div>
+		</div>
+		<!-- #endregion -->
+	</div>
+
+	<ng-template #footer>
+		<div class="dialog-footer">
+			<button
+				pButton
+				label="Cancelar"
+				class="p-button-text"
+				(click)="onVisibleChange(false)"
+			></button>
+			<button
+				pButton
+				[label]="isEditing() ? 'Guardar' : 'Crear'"
+				icon="pi pi-check"
+				[loading]="saving()"
+				[disabled]="!isFormValid()"
+				(click)="onSave()"
+			></button>
+		</div>
+	</ng-template>
+</p-dialog>

@@ -1,0 +1,59 @@
+// #region Dialog header
+.dialog-header {
+	display: flex;
+	align-items: center;
+	gap: 0.75rem;
+	width: 100%;
+}
+
+.fullscreen-btn {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	width: 2rem;
+	height: 2rem;
+	border-radius: 50%;
+	border: none;
+	background: transparent;
+	color: var(--text-color-secondary);
+	cursor: pointer;
+	transition: background 0.15s ease, color 0.15s ease;
+	flex-shrink: 0;
+	margin-left: auto;
+
+	i {
+		font-size: 0.85rem;
+	}
+
+	&:hover {
+		background: var(--surface-hover, rgba(0, 0, 0, 0.04));
+		color: var(--text-color);
+	}
+}
+// #endregion
+
+// #region Tab icons
+.tab-icon {
+	margin-right: 0.4rem;
+	font-size: 0.85rem;
+}
+// #endregion
+
+// #region Fullscreen
+:host ::ng-deep .fullscreen-dialog {
+	border-radius: 0 !important;
+	margin: 0 !important;
+	max-height: 100vh !important;
+}
+
+:host ::ng-deep .fullscreen-dialog .p-dialog-content {
+	flex: 1;
+	max-height: none !important;
+}
+// #endregion
+
+// #region Dialog overrides
+:host ::ng-deep .p-dialog {
+	transition: all 0.25s ease;
+}
+// #endregion

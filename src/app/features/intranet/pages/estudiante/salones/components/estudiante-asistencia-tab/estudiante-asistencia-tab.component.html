@@ -1,0 +1,88 @@
+<!-- #region Curso selector -->
+<div class="tab-header">
+	<p-select
+		[options]="cursoOptions()"
+		[(ngModel)]="selectedCursoLocal"
+		(ngModelChange)="onCursoChange($event)"
+		optionLabel="label"
+		optionValue="value"
+		placeholder="Seleccionar curso"
+		appendTo="body"
+		styleClass="w-full md:w-20rem"
+	/>
+</div>
+<!-- #endregion -->
+
+<!-- #region Content -->
+@if (loading()) {
+	<div class="loading-state">
+		<i class="pi pi-spin pi-spinner" style="font-size: 1.5rem"></i>
+		<p>Cargando asistencia...</p>
+	</div>
+} @else if (!asistenciaData()) {
+	<div class="empty-state">
+		<i class="pi pi-check-square" style="font-size: 2rem; opacity: 0.3"></i>
+		<p>Selecciona un curso para ver tu asistencia</p>
+	</div>
+} @else {
+	<!-- #region Stats cards -->
+	@if (stats(); as s) {
+		<div class="stats-grid">
+			<div class="stat-card stat-success">
+				<div class="stat-value">{{ s.totalPresente }}</div>
+				<div class="stat-label">Presente</div>
+			</div>
+			<div class="stat-card stat-warn">
+				<div class="stat-value">{{ s.totalTarde }}</div>
+				<div class="stat-label">Tarde</div>
+			</div>
+			<div class="stat-card stat-danger">
+				<div class="stat-value">{{ s.totalFalto }}</div>
+				<div class="stat-label">Falto</div>
+			</div>
+			<div class="stat-card stat-info">
+				<div class="stat-value">{{ s.porcentajeAsistencia }}%</div>
+				<div class="stat-label">Asistencia</div>
+			</div>
+		</div>
+	}
+	<!-- #endregion -->
+
+	<!-- #region Detail table -->
+	<p-table
+		[value]="asistenciaData()!.detalle"
+		[paginator]="true"
+		[rows]="10"
+		styleClass="p-datatable-sm p-datatable-striped"
+		[rowsPerPageOptions]="[10, 25, 50]"
+	>
+		<ng-template #header>
+			<tr>
+				<th pSortableColumn="fecha">Fecha <p-sortIcon field="fecha" /></th>
+				<th style="width: 120px; text-align: center">Estado</th>
+				<th>Justificacion</th>
+			</tr>
+		</ng-template>
+		<ng-template #body let-item>
+			<tr>
+				<td>{{ item.fecha | date:'dd/MM/yyyy' }}</td>
+				<td style="text-align: center">
+					<p-tag
+						[value]="getEstadoLabel(item.estado)"
+						[severity]="getEstadoSeverity(item.estado)"
+					/>
+				</td>
+				<td>{{ item.justificacion || '—' }}</td>
+			</tr>
+		</ng-template>
+		<ng-template #emptymessage>
+			<tr>
+				<td colspan="3" style="text-align: center; padding: 2rem; color: var(--text-color-secondary)">
+					No hay registros de asistencia
+				</td>
+			</tr>
+		</ng-template>
+	</p-table>
+	<!-- #endregion -->
+}
+<!-- #endregion -->

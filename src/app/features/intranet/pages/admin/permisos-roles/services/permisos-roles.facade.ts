@@ -12,7 +12,7 @@ import {
 	WalFacadeHelper,
 } from '@core/services';
 import { environment } from '@config';
-import { AdminUtilsService } from '@shared/services';
+import { UiMappingService } from '@shared/services';
 import { UI_ADMIN_ERROR_DETAILS, UI_SUMMARIES } from '@app/shared/constants';
 import { buildModulosVistas } from '../helpers/permisos-modulos.utils';
 
@@ -26,7 +26,7 @@ export class PermisosRolesFacade {
 	private wal = inject(WalFacadeHelper);
 	private errorHandler = inject(ErrorHandlerService);
 	private destroyRef = inject(DestroyRef);
-	readonly adminUtils = inject(AdminUtilsService);
+	readonly uiMapping = inject(UiMappingService);
 	private readonly apiUrl = `${environment.apiUrl}/api/sistema/permisos`;
 	// #endregion
 
@@ -211,7 +211,7 @@ export class PermisosRolesFacade {
 		const modulos = buildModulosVistas(
 			this.store.vistas(),
 			[],
-			(ruta) => this.adminUtils.getModuloFromRuta(ruta),
+			(ruta) => this.uiMapping.getModuloFromRuta(ruta),
 		);
 		this.store.setModulosVistas(modulos);
 		this.store.openDialog();
@@ -225,7 +225,7 @@ export class PermisosRolesFacade {
 		const modulos = buildModulosVistas(
 			this.store.vistas(),
 			permiso.vistas,
-			(ruta) => this.adminUtils.getModuloFromRuta(ruta),
+			(ruta) => this.uiMapping.getModuloFromRuta(ruta),
 		);
 		this.store.setModulosVistas(modulos);
 		this.store.openDialog();

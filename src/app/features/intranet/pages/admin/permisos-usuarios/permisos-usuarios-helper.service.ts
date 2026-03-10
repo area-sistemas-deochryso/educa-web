@@ -1,14 +1,14 @@
 // #region Imports
 import { Injectable, inject } from '@angular/core';
 import { Vista } from '@core/services';
-import { AdminUtilsService } from '@shared/services';
+import { UiMappingService } from '@shared/services';
 import { ModuloVistas } from './permisos-usuarios.store';
 
 // #endregion
 // #region Implementation
 @Injectable({ providedIn: 'root' })
 export class PermisosUsuariosHelperService {
-	private adminUtils = inject(AdminUtilsService);
+	private uiMapping = inject(UiMappingService);
 
 	/**
 	 * Construye la estructura de módulos agrupando vistas y calculando selecciones
@@ -18,7 +18,7 @@ export class PermisosUsuariosHelperService {
 
 		// Agrupar vistas por módulo
 		vistasActivas.forEach((vista) => {
-			const modulo = this.adminUtils.getModuloFromRuta(vista.ruta);
+			const modulo = this.uiMapping.getModuloFromRuta(vista.ruta);
 			const moduloCapitalized = modulo.charAt(0).toUpperCase() + modulo.slice(1);
 
 			if (!modulosMap.has(moduloCapitalized)) {
@@ -48,7 +48,7 @@ export class PermisosUsuariosHelperService {
 		const modulosMap = new Map<string, Vista[]>();
 
 		vistasUsuario.forEach((ruta) => {
-			const modulo = this.adminUtils.getModuloFromRuta(ruta);
+			const modulo = this.uiMapping.getModuloFromRuta(ruta);
 			const moduloCapitalized = modulo.charAt(0).toUpperCase() + modulo.slice(1);
 			const vista = vistasActivas.find((v) => v.ruta === ruta);
 
@@ -74,7 +74,7 @@ export class PermisosUsuariosHelperService {
 	 * Obtiene el label de conteo de vistas seleccionadas
 	 */
 	getVistasCountLabel(count: number): string {
-		return this.adminUtils.getVistasCountLabel(count);
+		return this.uiMapping.getVistasCountLabel(count);
 	}
 }
 // #endregion

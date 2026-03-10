@@ -1,4 +1,5 @@
 import { Injectable, inject } from '@angular/core';
+import { Observable, filter, map } from 'rxjs';
 import { logger } from '@core/helpers';
 import { ErrorHandlerService } from '@core/services/error/error-handler.service';
 import { SwService } from '@features/intranet/services/sw/sw.service';
@@ -42,6 +43,15 @@ export class WalFacadeHelper {
 	 * });
 	 */
 	async execute<T>(config: WalMutationConfig<T>): Promise<void> {
+		const consistency = config.consistencyLevel ?? 'optimistic';
+
+		// server-confirmed and serialized: skip optimistic, execute directly and wait
+		if (consistency === 'server-confirmed' || consistency === 'serialized') {
+			this.executeServerConfirmed(config);
+			return;
+		}
+
+		// optimistic / optimistic-confirm: standard WAL flow
 		// Step 1: Optimistic UI update (immediate)
 		if (config.optimistic) {
 			config.optimistic.apply();
@@ -57,6 +67,7 @@ export class WalFacadeHelper {
 				method: config.method,
 				payload: config.payload,
 				maxRetries: config.maxRetries,
+				consistencyLevel: consistency,
 			});
 
 			// Step 3: Register callbacks for this session
@@ -83,11 +94,73 @@ export class WalFacadeHelper {
 				this.statusStore.refresh();
 			}
 		} catch (e) {
-			// WAL append failed (IndexedDB unavailable?)
-			// Fall back to direct execution without WAL
-			logger.error('[WAL-Helper] Failed to append to WAL, executing directly', e);
+			// WAL append failed (IndexedDB unavailable or quota exceeded)
+			// Fall back to direct execution without WAL protection
+			const isQuota = e instanceof DOMException && e.name === 'QuotaExceededError';
+			logger.error('[WAL-Helper] WAL append failed, executing directly', isQuota ? '(QuotaExceeded)' : '', e);
+
+			if (isQuota) {
+				this.errorHandler.showWarning(
+					'Almacenamiento lleno',
+					'No se pudo guardar offline. La operación se enviará directamente al servidor.',
+				);
+			}
+
 			this.executeFallback(config);
 		}
+	}
+
+	// #endregion
+
+	// #endregion
+
+	// #region Post-reload Reconciliation
+
+	/**
+	 * Observable that emits when a WAL entry for `resourceType` was committed
+	 * after a page reload (no onCommit callback available).
+	 * Facades should subscribe to this to trigger a refetch of their data.
+	 *
+	 * @example
+	 * this.walHelper.postReloadCommit$('horarios')
+	 *   .pipe(takeUntilDestroyed(this.destroyRef))
+	 *   .subscribe(() => this.loadData());
+	 */
+	postReloadCommit$(resourceType: string): Observable<string> {
+		return this.syncEngine.entryProcessed$.pipe(
+			filter(
+				(r) =>
+					r.status === 'COMMITTED' &&
+					r.resourceType === resourceType &&
+					r.hadCallback === false,
+			),
+			map((r) => r.entryId),
+		);
+	}
+
+	// #endregion
+
+	// #region Server-Confirmed Execution
+
+	/**
+	 * Execute mutation directly without optimistic UI.
+	 * Waits for server confirmation before calling onCommit.
+	 * Used for 'server-confirmed' and 'serialized' consistency levels.
+	 * Does NOT use WAL — if offline, shows error immediately.
+	 */
+	private executeServerConfirmed<T>(config: WalMutationConfig<T>): void {
+		if (!this.sw.isOnline) {
+			this.errorHandler.showWarning(
+				'Sin conexion',
+				'Esta operacion requiere confirmacion del servidor. Intente cuando tenga conexion.',
+			);
+			return;
+		}
+
+		config.http$().subscribe({
+			next: (result) => config.onCommit(result),
+			error: (err) => config.onError(err),
+		});
 	}
 
 	// #endregion

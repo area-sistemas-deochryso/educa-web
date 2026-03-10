@@ -1,0 +1,89 @@
+// #region Host
+:host {
+	display: block;
+}
+// #endregion
+
+// #region Resumen
+.resumen-row {
+	display: flex;
+	gap: 0.75rem;
+	margin-bottom: 1rem;
+}
+
+.resumen-card {
+	flex: 1;
+	text-align: center;
+	padding: 0.75rem;
+	border-radius: var(--border-radius);
+	background: var(--surface-card);
+}
+
+.resumen-value {
+	font-size: 1.5rem;
+	font-weight: 700;
+	line-height: 1;
+}
+
+.resumen-label {
+	font-size: 0.8rem;
+	color: var(--text-color-secondary);
+	margin-top: 0.25rem;
+}
+// #endregion
+
+// #region Info periodo
+.periodo-info {
+	display: flex;
+	align-items: center;
+	gap: 0.5rem;
+	padding: 0.625rem 0.875rem;
+	margin-bottom: 0.75rem;
+	border-radius: var(--border-radius);
+	background: rgba(234, 179, 8, 0.08);
+	color: var(--text-color-secondary);
+	font-size: 0.8rem;
+
+	.pi-info-circle {
+		color: #eab308;
+		font-size: 0.9rem;
+	}
+}
+// #endregion
+
+// #region Toolbar
+.actions-toolbar {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	margin-bottom: 0.75rem;
+	min-height: 2.25rem;
+}
+// #endregion
+
+// #region Estudiante info
+.estudiante-nombre {
+	font-size: 0.85rem;
+	font-weight: 500;
+	line-height: 1.25;
+}
+
+.estudiante-dni {
+	font-size: 0.75rem;
+	color: var(--text-color-secondary);
+	line-height: 1.25;
+}
+// #endregion
+
+// #region Row selection
+.row-selected {
+	background: rgba(59, 130, 246, 0.06) !important;
+}
+// #endregion
+
+// #region Table overrides
+:host ::ng-deep .p-datatable {
+	--p-datatable-header-cell-background: transparent;
+	--p-datatable-row-background: transparent;
+}
+// #endregion

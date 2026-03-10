@@ -1,0 +1,93 @@
+<!-- #region Tabla de salones -->
+<p-table
+	[value]="salones()"
+	[loading]="loading()"
+	[paginator]="salones().length > 10"
+	[rows]="10"
+	[rowsPerPageOptions]="[10, 25, 50]"
+	stateStorage="session"
+	stateKey="admin-salones-table"
+	[scrollable]="true"
+	scrollHeight="flex"
+	styleClass="p-datatable-sm"
+>
+	<ng-template #header>
+		<tr>
+			<th style="width: 50px">#</th>
+			<th pSortableColumn="grado" style="min-width: 120px">
+				Grado <p-sortIcon field="grado" />
+			</th>
+			<th style="width: 80px">Sección</th>
+			<th style="min-width: 100px">Sede</th>
+			<th style="min-width: 180px">Tutor</th>
+			<th style="width: 80px" class="text-center">Estudiantes</th>
+			<th style="width: 100px" class="text-center">Aprobados</th>
+			<th style="width: 110px" class="text-center">Desaprobados</th>
+			<th style="width: 100px" class="text-center">Pendientes</th>
+			<th style="width: 100px" class="text-center">Periodo</th>
+			<th style="width: 80px" class="text-center">Acciones</th>
+		</tr>
+	</ng-template>
+	<ng-template #body let-salon let-rowIndex="rowIndex">
+		<tr>
+			<td>{{ rowIndex + 1 }}</td>
+			<td>{{ salon.grado }}</td>
+			<td>{{ salon.seccion }}</td>
+			<td>{{ salon.sede }}</td>
+			<td>{{ salon.tutorNombre || '—' }}</td>
+			<td class="text-center">
+				<span class="font-semibold">{{ salon.totalEstudiantes }}</span>
+			</td>
+			<td class="text-center">
+				@if (salon.aprobados > 0) {
+					<p-tag [value]="'' + salon.aprobados" severity="success" />
+				} @else {
+					<span class="text-color-secondary">0</span>
+				}
+			</td>
+			<td class="text-center">
+				@if (salon.desaprobados > 0) {
+					<p-tag [value]="'' + salon.desaprobados" severity="danger" />
+				} @else {
+					<span class="text-color-secondary">0</span>
+				}
+			</td>
+			<td class="text-center">
+				@if (salon.pendientes > 0) {
+					<p-tag [value]="'' + salon.pendientes" severity="warn" />
+				} @else {
+					<span class="text-color-secondary">0</span>
+				}
+			</td>
+			<td class="text-center">
+				<p-tag
+					[value]="getEstadoPeriodoLabel(salon.estadoPeriodo)"
+					[severity]="getEstadoPeriodoSeverity(salon.estadoPeriodo)"
+				/>
+			</td>
+			<td class="text-center">
+				<button
+					pButton
+					icon="pi pi-eye"
+					class="p-button-rounded p-button-text p-button-sm"
+					pTooltip="Ver salón"
+					tooltipPosition="top"
+					(click)="selectSalon.emit(salon.id)"
+					[pt]="{
+						root: {
+							'aria-label': 'Ver salón',
+						},
+					}"
+				></button>
+			</td>
+		</tr>
+	</ng-template>
+	<ng-template #emptymessage>
+		<tr>
+			<td colspan="11" class="text-center p-4">
+				No hay salones para este nivel y año.
+			</td>
+		</tr>
+	</ng-template>
+</p-table>
+<!-- #endregion -->

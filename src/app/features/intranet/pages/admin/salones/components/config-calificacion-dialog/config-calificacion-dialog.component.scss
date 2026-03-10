@@ -1,0 +1,33 @@
+:host {
+	display: block;
+}
+
+// #region Literal rows
+.literal-row {
+	display: flex;
+	align-items: center;
+	gap: 0.5rem;
+	margin-bottom: 0.5rem;
+	padding: 0.5rem;
+	border-radius: var(--border-radius);
+	background: var(--surface-ground);
+}
+
+.literal-letra {
+	width: 60px;
+	flex-shrink: 0;
+}
+
+.literal-desc {
+	flex: 1;
+	min-width: 0;
+}
+
+.literal-orden {
+	font-size: 0.8rem;
+	color: var(--text-color-secondary);
+	width: 20px;
+	text-align: center;
+	flex-shrink: 0;
+}
+// #endregion

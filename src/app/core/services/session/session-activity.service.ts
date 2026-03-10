@@ -32,8 +32,18 @@ const IDLE_THRESHOLD_MS = 5 * 60 * 1000;
 /** Re-check when user is idle (60s). */
 const RECHECK_INTERVAL_MS = 60 * 1000;
 
+/** Cooldown after another tab refreshed — skip our own refresh (2 min). */
+const CROSS_TAB_REFRESH_COOLDOWN_MS = 2 * 60 * 1000;
+
+/** BroadcastChannel name for multi-tab coordination. */
+const CHANNEL_NAME = 'educa-session';
+
 /** DOM events that count as user activity. */
 const ACTIVITY_EVENTS: (keyof DocumentEventMap)[] = ['mousedown', 'keydown', 'touchstart', 'scroll'];
+
+type SessionMessage =
+	| { type: 'refresh-done'; timestamp: number }
+	| { type: 'logout' };
 
 // #endregion
 
@@ -69,6 +79,7 @@ export class SessionActivityService {
 	private activityDebounceTimer: ReturnType<typeof setTimeout> | null = null;
 	private boundActivityHandler: (() => void) | null = null;
 	private boundVisibilityHandler: (() => void) | null = null;
+	private channel: BroadcastChannel | null = null;
 	// #endregion
 
 	// #region Public API
@@ -86,9 +97,13 @@ export class SessionActivityService {
 
 		this.registerActivityListeners();
 		this.registerVisibilityListener();
-		this.scheduleRefresh();
+		this.setupBroadcastChannel();
 
-		logger.log('[SessionActivity] Started — token refresh at', REFRESH_TIMER_MS / 60_000, 'min');
+		// Verify session with server before trusting local storage.
+		// If the cookie expired while the browser was closed, redirect to login immediately.
+		this.verifySession();
+
+		logger.log('[SessionActivity] Started — verifying session with server');
 	}
 
 	/**
@@ -99,6 +114,7 @@ export class SessionActivityService {
 
 		this.removeActivityListeners();
 		this.removeVisibilityListener();
+		this.teardownBroadcastChannel();
 		this.timerManager.clearAll();
 
 		if (this.activityDebounceTimer) {
@@ -168,6 +184,55 @@ export class SessionActivityService {
 
 	// #endregion
 
+	// #region Multi-tab coordination (BroadcastChannel)
+
+	private setupBroadcastChannel(): void {
+		try {
+			this.channel = new BroadcastChannel(CHANNEL_NAME);
+			this.channel.onmessage = (event: MessageEvent<SessionMessage>) => {
+				this.onChannelMessage(event.data);
+			};
+		} catch {
+			// BroadcastChannel not supported (e.g. older Safari) — degrade gracefully
+			logger.warn('[SessionActivity] BroadcastChannel not available — multi-tab coordination disabled');
+		}
+	}
+
+	private teardownBroadcastChannel(): void {
+		this.channel?.close();
+		this.channel = null;
+	}
+
+	private broadcastMessage(msg: SessionMessage): void {
+		try {
+			this.channel?.postMessage(msg);
+		} catch {
+			// Channel closed or errored — ignore
+		}
+	}
+
+	private onChannelMessage(msg: SessionMessage): void {
+		if (msg.type === 'refresh-done') {
+			// Another tab refreshed — update our timer so we don't duplicate
+			this._lastRefreshTime.set(msg.timestamp);
+			this.scheduleRefresh();
+			logger.log('[SessionActivity] Another tab refreshed — rescheduled');
+		} else if (msg.type === 'logout') {
+			// Another tab logged out — follow suit
+			if (!this._isLoggingOut) {
+				logger.warn('[SessionActivity] Another tab logged out — following');
+				this.forceLogout();
+			}
+		}
+	}
+
+	/** Returns true if another tab refreshed recently enough that we can skip. */
+	private wasRecentlyRefreshedByOtherTab(): boolean {
+		return (Date.now() - this._lastRefreshTime()) < CROSS_TAB_REFRESH_COOLDOWN_MS;
+	}
+
+	// #endregion
+
 	// #region Refresh scheduling
 
 	private scheduleRefresh(): void {
@@ -191,13 +256,19 @@ export class SessionActivityService {
 			return;
 		}
 
+		// Another tab refreshed recently — skip and reschedule
+		if (this.wasRecentlyRefreshedByOtherTab()) {
+			this.scheduleRefresh();
+			return;
+		}
+
 		const isActive = this.isUserActive();
 		const isVisible = this._isTabVisible();
 
-		if (isVisible || isActive) {
+		if (isVisible && isActive) {
 			this.doRefresh();
 		} else {
-			// Tab hidden AND idle — re-check later
+			// Tab hidden OR idle — re-check later (don't keep session alive without real usage)
 			this.scheduleRecheck();
 		}
 	}
@@ -205,13 +276,54 @@ export class SessionActivityService {
 	private doRefresh(): void {
 		this.authApi.refresh().subscribe({
 			next: () => {
-				this._lastRefreshTime.set(Date.now());
+				const now = Date.now();
+				this._lastRefreshTime.set(now);
+				this.broadcastMessage({ type: 'refresh-done', timestamp: now });
 				this.scheduleRefresh();
 				logger.log('[SessionActivity] Token refreshed — next in', REFRESH_TIMER_MS / 60_000, 'min');
 			},
 			error: () => {
 				logger.warn('[SessionActivity] Refresh failed — session expired');
 				this.handleSessionExpired();
+			},
+		});
+	}
+
+	/**
+	 * Verify the session is still valid by calling the profile endpoint.
+	 * getProfile() uses X-Skip-Error-Toast + catchError(→ null), so 401 is handled
+	 * gracefully without triggering the error interceptor's forceLogout.
+	 */
+	private verifySession(): void {
+		this.authApi.getProfile().subscribe({
+			next: (profile) => {
+				if (profile) {
+					this.scheduleRefresh();
+					logger.log('[SessionActivity] Session verified — refresh in', REFRESH_TIMER_MS / 60_000, 'min');
+				} else {
+					this.attemptRefreshOrLogout();
+				}
+			},
+			error: () => {
+				this.attemptRefreshOrLogout();
+			},
+		});
+	}
+
+	/**
+	 * Try a token refresh. If it succeeds, the cookie was still valid and we
+	 * can resume normal scheduling. If it fails, the session is truly dead.
+	 */
+	private attemptRefreshOrLogout(): void {
+		this.authApi.refresh().subscribe({
+			next: () => {
+				this._lastRefreshTime.set(Date.now());
+				this.scheduleRefresh();
+				logger.log('[SessionActivity] Session recovered via refresh');
+			},
+			error: () => {
+				logger.warn('[SessionActivity] Session verification failed — redirecting to login');
+				this.forceLogout();
 			},
 		});
 	}
@@ -230,10 +342,12 @@ export class SessionActivityService {
 
 	/**
 	 * When the tab becomes visible again, check if the token expired while away.
+	 * Instead of immediate logout, attempt refresh — the refresh cookie may still be valid.
 	 */
 	private checkTokenValidity(): void {
 		if (this.isTokenExpired()) {
-			this.handleSessionExpired();
+			logger.log('[SessionActivity] Token expired while tab was hidden — attempting refresh');
+			this.attemptRefreshOrLogout();
 		}
 	}
 
@@ -256,6 +370,7 @@ export class SessionActivityService {
 		if (this._isLoggingOut) return;
 		this._isLoggingOut = true;
 
+		this.broadcastMessage({ type: 'logout' });
 		this.stop();
 		this.userPermisosService.clear();
 		this.swService.clearCache();

@@ -6,7 +6,7 @@ import { TableLazyLoadEvent, TableModule } from 'primeng/table';
 import { TagModule } from 'primeng/tag';
 import { TooltipModule } from 'primeng/tooltip';
 import { UsuarioLista } from '@core/services';
-import { AdminUtilsService } from '@shared/services';
+import { UiMappingService } from '@shared/services';
 import { TableLoadingDirective } from '@app/shared';
 
 /**
@@ -24,7 +24,7 @@ import { TableLoadingDirective } from '@app/shared';
 	changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class UsuariosTableComponent {
-	readonly adminUtils = inject(AdminUtilsService);
+	readonly uiMapping = inject(UiMappingService);
 
 	// * Inputs for table rows + loading overlay + pagination.
 	readonly usuarios = input.required<UsuarioLista[]>();

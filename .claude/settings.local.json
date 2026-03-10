@@ -91,7 +91,22 @@
       "Bash(for f in Controllers/Asistencias/*.cs)",
       "Bash(do sed -i 's/namespace Educa\\\\.API\\\\.Controllers$/namespace Educa.API.Controllers.Asistencias/' \"$f\")",
       "Bash(for f in Controllers/Integraciones/*.cs)",
-      "Bash(do sed -i 's/namespace Educa\\\\.API\\\\.Controllers$/namespace Educa.API.Controllers.Integraciones/' \"$f\")"
+      "Bash(do sed -i 's/namespace Educa\\\\.API\\\\.Controllers$/namespace Educa.API.Controllers.Integraciones/' \"$f\")",
+      "Bash(for dir:*)",
+      "Bash(do echo:*)",
+      "Read(//c/Users/Asus Ryzen 9/EducaWeb/educa-web/**)",
+      "Bash(while read:*)",
+      "Bash(do sed:*)",
+      "Bash(mkdir -p shared)",
+      "Bash(mv home-component:*)",
+      "Bash(mv attendance-component:*)",
+      "Bash(mv calendary-component:*)",
+      "Bash(mv schedule-component:*)",
+      "Bash(mv campus-navigation:*)",
+      "Bash(mv ctest-k6:*)",
+      "Bash(grep -rn \"from ''''\\\\.\\\\./\\\\.\\\\./components/\\\\|from ''''\\\\.\\\\./\\\\.\\\\./services/\\\\|from ''''\\\\.\\\\./\\\\.\\\\./\\\\.\\\\./components/\\\\|from ''''\\\\.\\\\./\\\\.\\\\./\\\\.\\\\./services/\" src/app/features/intranet/pages/shared/)",
+      "Bash(sed -i 's/Alta \\(UX\\) | \\\\*\\\\*Esfuerzo\\\\*\\\\*: Medio | \\\\*\\\\*Estado\\\\*\\\\*: ⬜ Pendiente/Alta \\(UX\\) | **Esfuerzo**: Medio | **Estado**: ✅ Completado/' .claude/tasks/cache-wal-sync.md)",
+      "Bash(sed -i 's/Media-Alta | \\\\*\\\\*Esfuerzo\\\\*\\\\*: Alto | \\\\*\\\\*Estado\\\\*\\\\*: ⬜ Pendiente/Media-Alta | **Esfuerzo**: Alto | **Estado**: ✅ Completado \\(Calificaciones\\)/' .claude/tasks/cache-wal-sync.md)"
     ],
     "additionalDirectories": [
       "c:\\Users\\Asus Ryzen 9\\EducaWeb\\Educa.API\\Educa.API\\Controllers\\Sistema",

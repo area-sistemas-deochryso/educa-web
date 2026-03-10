@@ -167,7 +167,7 @@
 						<td>
 							<p-tag
 								[value]="permiso.rol"
-								[severity]="adminUtils.getRolSeverity(permiso.rol)"
+								[severity]="uiMapping.getRolSeverity(permiso.rol)"
 							/>
 						</td>
 						<td class="text-center">
@@ -175,7 +175,7 @@
 						</td>
 						<td class="text-center">
 							<span class="count-badge secondary">{{
-								adminUtils.getModulosCount(permiso.vistas)
+								uiMapping.getModulosCount(permiso.vistas)
 							}}</span>
 						</td>
 						<td class="text-center">
@@ -262,14 +262,14 @@
 					<span class="summary-label">Rol</span>
 					<p-tag
 						[value]="selectedPermiso()?.rol || ''"
-						[severity]="adminUtils.getRolSeverity(selectedPermiso()?.rol || '')"
+						[severity]="uiMapping.getRolSeverity(selectedPermiso()?.rol || '')"
 					/>
 				</div>
 				<div class="summary-item">
 					<span class="summary-label">Permisos</span>
 					<span class="summary-value"
 						>{{ selectedPermiso()?.vistas?.length }} vistas en
-						{{ adminUtils.getModulosCount(selectedPermiso()?.vistas || []) }}
+						{{ uiMapping.getModulosCount(selectedPermiso()?.vistas || []) }}
 						modulos</span
 					>
 				</div>
@@ -350,7 +350,7 @@
 					}}</span>
 					<p-tag
 						[value]="selectedRol() || ''"
-						[severity]="adminUtils.getRolSeverity(selectedRol() || '')"
+						[severity]="uiMapping.getRolSeverity(selectedRol() || '')"
 					/>
 				</div>
 				<div class="vistas-count"><i class="pi pi-check"></i> {{ vistasCountLabel() }}</div>

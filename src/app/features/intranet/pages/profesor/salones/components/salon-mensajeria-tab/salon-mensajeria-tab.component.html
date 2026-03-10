@@ -1,0 +1,255 @@
+<!-- #region Curso selector -->
+@if (showCursoSelector()) {
+	<div class="mensajeria-curso-selector">
+		<label class="mensajeria-curso-label">Curso:</label>
+		<p-select
+			[options]="cursoOptions()"
+			[ngModel]="selectedHorarioId()"
+			(ngModelChange)="onCursoChange($event)"
+			placeholder="Seleccionar curso"
+			appendTo="body"
+			[style]="{ width: '100%', maxWidth: '300px' }"
+		/>
+	</div>
+} @else if (singleCursoLabel(); as label) {
+	<div class="mensajeria-curso-selector">
+		<p-tag [value]="label" severity="info" icon="pi pi-book" />
+	</div>
+}
+<!-- #endregion -->
+
+@if (!initialized()) {
+	<div class="empty-state">
+		<i class="pi pi-book"></i>
+		<p class="empty-title">Selecciona un curso</p>
+		<p class="empty-subtitle">Elige un curso para ver sus conversaciones</p>
+	</div>
+} @else {
+<div class="mensajeria-container" [class.mensajeria--fullscreen]="isFullscreen()">
+	<!-- #region Sidebar: Conversation list -->
+	<div class="mensajeria-sidebar" [class.mensajeria-sidebar--hidden]="!isFullscreen() && vm().vistaDetalle">
+		<!-- Header -->
+		<div class="sidebar-header">
+			<span class="sidebar-title">Mensajes</span>
+			<div style="display: flex; gap: 0.25rem">
+				<button
+					pButton
+					icon="pi pi-refresh"
+					class="p-button-rounded p-button-text p-button-sm"
+					(click)="onRefreshLista()"
+					[disabled]="vm().loading"
+					[pt]="{ root: { 'aria-label': 'Refrescar' } }"
+				></button>
+				<button
+					pButton
+					icon="pi pi-plus"
+					class="p-button-rounded p-button-sm"
+					(click)="onNuevoMensaje()"
+					[pt]="{ root: { 'aria-label': 'Nuevo mensaje' } }"
+				></button>
+			</div>
+		</div>
+
+		<!-- List content -->
+		@if (vm().loading) {
+			<div class="loading-wrapper">
+				<p-progressSpinner strokeWidth="4" [style]="{ width: '36px', height: '36px' }" />
+			</div>
+		} @else if (vm().conversaciones.length === 0) {
+			<div class="empty-state">
+				<i class="pi pi-inbox"></i>
+				<p class="empty-title">No hay conversaciones</p>
+				<p class="empty-subtitle">Inicia una nueva conversación</p>
+			</div>
+		} @else {
+			<div class="conversaciones-list">
+				@for (conv of conversacionesView(); track conv.id) {
+					<div
+						class="conversacion-item"
+						[class.conversacion-item--active]="vm().detalle?.id === conv.id"
+						[class.conversacion-item--unread]="conv.mensajesNoLeidos > 0"
+						(click)="onSelectConversacion(conv.id)"
+					>
+						<div class="conversacion-avatar" [style.background]="conv.avatarColor">
+							{{ conv.inicial }}
+						</div>
+						<div class="conversacion-info">
+							<div class="conversacion-top">
+								<span class="conversacion-asunto">{{ conv.asunto }}</span>
+								@if (conv.ultimoMensajeFecha) {
+									<span class="conversacion-fecha">{{
+										conv.ultimoMensajeFecha | date: 'shortDate'
+									}}</span>
+								}
+							</div>
+							<div class="conversacion-bottom">
+								<span class="conversacion-preview">{{
+									conv.ultimoMensajePreview ?? 'Sin mensajes'
+								}}</span>
+								@if (conv.mensajesNoLeidos > 0) {
+									<p-tag
+										[value]="conv.mensajesNoLeidos.toString()"
+										severity="danger"
+										[rounded]="true"
+									/>
+								}
+							</div>
+						</div>
+					</div>
+				}
+			</div>
+		}
+	</div>
+	<!-- #endregion -->
+
+	<!-- #region Chat panel -->
+	<div
+		class="mensajeria-chat"
+		[class.mensajeria-chat--hidden]="!isFullscreen() && !vm().vistaDetalle"
+		[class.mensajeria-chat--empty]="isFullscreen() && !vm().vistaDetalle && !vm().detalle"
+	>
+		@if (isFullscreen() && !vm().vistaDetalle && !vm().detalle) {
+			<!-- Fullscreen empty placeholder -->
+			<i class="pi pi-comments"></i>
+			<p>Selecciona una conversación</p>
+		} @else {
+			<!-- Chat header -->
+			<div class="chat-header">
+				@if (!isFullscreen()) {
+					<button
+						pButton
+						icon="pi pi-arrow-left"
+						class="p-button-rounded p-button-text p-button-sm"
+						(click)="onBack()"
+						[pt]="{ root: { 'aria-label': 'Volver a lista' } }"
+					></button>
+				}
+				<div class="chat-header-info">
+					<div class="chat-header-name">{{ vm().detalle?.asunto }}</div>
+					@if (vm().detalle; as detalle) {
+						<div class="chat-header-participants">
+							{{ detalle.participantes.length }} participantes
+						</div>
+					}
+				</div>
+				<button
+					pButton
+					icon="pi pi-refresh"
+					class="p-button-rounded p-button-text p-button-sm"
+					(click)="onRefreshDetalle()"
+					[disabled]="vm().detalleLoading"
+					[pt]="{ root: { 'aria-label': 'Refrescar' } }"
+				></button>
+			</div>
+
+			<!-- Messages -->
+			@if (vm().detalleLoading) {
+				<div class="loading-wrapper">
+					<p-progressSpinner strokeWidth="4" [style]="{ width: '36px', height: '36px' }" />
+				</div>
+			} @else if (vm().detalle; as detalle) {
+				<div class="mensajes-list">
+					@for (msg of detalle.mensajes; track msg.id) {
+						<div class="mensaje" [class.mensaje--mio]="msg.esMio">
+							<div class="mensaje-bubble">
+								<div class="mensaje-header">
+									<span class="mensaje-autor">{{ msg.remitenteNombre }}</span>
+									<span class="mensaje-fecha">{{
+										msg.fechaEnvio | date: 'd/MM/yy, h:mm a'
+									}}</span>
+								</div>
+								<div class="mensaje-contenido">{{ msg.contenido }}</div>
+							</div>
+						</div>
+					}
+				</div>
+
+				<!-- Input -->
+				<div class="chat-input">
+					<input
+						pInputText
+						[ngModel]="nuevoMensaje()"
+						(ngModelChange)="nuevoMensaje.set($event)"
+						placeholder="Escribe un mensaje..."
+						class="chat-input-field"
+						(keydown.enter)="onEnviar()"
+						[disabled]="vm().sending"
+					/>
+					<button
+						pButton
+						icon="pi pi-send"
+						class="p-button-rounded"
+						(click)="onEnviar()"
+						[disabled]="!nuevoMensaje().trim() || vm().sending"
+						[loading]="vm().sending"
+						[pt]="{ root: { 'aria-label': 'Enviar mensaje' } }"
+					></button>
+				</div>
+			}
+		}
+	</div>
+	<!-- #endregion -->
+</div>
+}
+
+<!-- #region New conversation dialog -->
+<p-dialog
+	[visible]="nuevaConversacionVisible()"
+	(visibleChange)="onNuevoDialogVisibleChange($event)"
+	[modal]="true"
+	header="Nuevo mensaje"
+	[style]="{ width: '400px', maxWidth: '90vw' }"
+>
+	<div class="nuevo-form">
+		<div class="nuevo-field">
+			<label class="nuevo-label" for="dest-select">Destinatario</label>
+			<p-select
+				id="dest-select"
+				[options]="resolvedEstudiantes()"
+				[ngModel]="selectedEstudianteDni()"
+				(ngModelChange)="selectedEstudianteDni.set($event)"
+				placeholder="Seleccionar destinatario"
+				appendTo="body"
+				[filter]="true"
+				filterPlaceholder="Buscar..."
+				[style]="{ width: '100%' }"
+			/>
+		</div>
+		<div class="nuevo-field">
+			<label class="nuevo-label" for="asunto-input">Asunto</label>
+			<input
+				pInputText
+				id="asunto-input"
+				[ngModel]="nuevoAsunto()"
+				(ngModelChange)="nuevoAsunto.set($event)"
+				class="w-full"
+				placeholder="Asunto del mensaje"
+			/>
+		</div>
+		<div class="nuevo-field">
+			<label class="nuevo-label" for="contenido-textarea">Mensaje</label>
+			<textarea
+				pInputText
+				id="contenido-textarea"
+				[ngModel]="nuevoContenido()"
+				(ngModelChange)="nuevoContenido.set($event)"
+				rows="3"
+				class="w-full"
+				placeholder="Escribe tu mensaje..."
+			></textarea>
+		</div>
+	</div>
+
+	<ng-template #footer>
+		<button pButton label="Cancelar" class="p-button-text" (click)="onCancelarNuevo()"></button>
+		<button
+			pButton
+			label="Enviar"
+			icon="pi pi-send"
+			(click)="onCrearConversacion()"
+			[disabled]="!canCreate()"
+			[loading]="vm().sending"
+		></button>
+	</ng-template>
+</p-dialog>
+<!-- #endregion -->

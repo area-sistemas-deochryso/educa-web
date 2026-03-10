@@ -22,7 +22,8 @@
 	color: var(--dark-color);
 }
 .text-primary {
-	color: var(--primary-color);
+	color: var(--primary-text-color);
+	text-shadow: var(--primary-text-shadow);
 }
 .text-secondary {
 	color: var(--secondary-color);

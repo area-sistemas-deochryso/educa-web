@@ -114,7 +114,7 @@
 						<td>
 							<p-tag
 								[value]="permiso.rol"
-								[severity]="adminUtils.getRolSeverity(permiso.rol)"
+								[severity]="uiMapping.getRolSeverity(permiso.rol)"
 							/>
 						</td>
 						<td class="text-center">
@@ -122,7 +122,7 @@
 						</td>
 						<td class="text-center">
 							<span class="count-badge secondary">{{
-								adminUtils.getModulosCount(permiso.vistas)
+								uiMapping.getModulosCount(permiso.vistas)
 							}}</span>
 						</td>
 						<td class="text-center">
@@ -221,7 +221,7 @@
 					<span class="summary-label">Rol</span>
 					<p-tag
 						[value]="vm().selectedPermiso?.rol || ''"
-						[severity]="adminUtils.getRolSeverity(vm().selectedPermiso?.rol || '')"
+						[severity]="uiMapping.getRolSeverity(vm().selectedPermiso?.rol || '')"
 					/>
 				</div>
 				<div class="summary-item">
@@ -231,7 +231,7 @@
 				<div class="summary-item">
 					<span class="summary-label">Modulos</span>
 					<span class="summary-value">{{
-						adminUtils.getModulosCount(vm().selectedPermiso?.vistas || [])
+						uiMapping.getModulosCount(vm().selectedPermiso?.vistas || [])
 					}}</span>
 				</div>
 			</div>
@@ -301,7 +301,7 @@
 					<i class="pi pi-id-card"></i>
 					<p-tag
 						[value]="vm().selectedRol || ''"
-						[severity]="adminUtils.getRolSeverity(vm().selectedRol || '')"
+						[severity]="uiMapping.getRolSeverity(vm().selectedRol || '')"
 					/>
 				</div>
 				<div class="vistas-count">

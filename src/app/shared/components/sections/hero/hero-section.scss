@@ -62,7 +62,8 @@
 
 .hero-section .badge:hover {
 	background: var(--white-color);
-	color: var(--primary-color);
+	color: var(--primary-text-color);
+	text-shadow: var(--primary-text-shadow);
 }
 
 .hero-title {

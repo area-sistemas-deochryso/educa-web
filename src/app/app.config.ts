@@ -13,8 +13,10 @@ import {
 import {
 	apiResponseInterceptor,
 	authInterceptor,
+	clockSyncInterceptor,
 	credentialsInterceptor,
 	errorInterceptor,
+	rateLimitInterceptor,
 	requestTraceInterceptor,
 } from '@core/interceptors';
 import { provideClientHydration, withEventReplay } from '@angular/platform-browser';
@@ -47,6 +49,8 @@ export const appConfig: ApplicationConfig = {
 			withInterceptors([
 				credentialsInterceptor, // FIRST: ensure cookies are sent
 				authInterceptor, // Will be simplified (no-op) after full migration
+				rateLimitInterceptor, // Throttle concurrent API requests + 429 backoff
+				clockSyncInterceptor, // Detect clock skew from server Date headers
 				requestTraceInterceptor,
 				apiResponseInterceptor,
 				errorInterceptor,

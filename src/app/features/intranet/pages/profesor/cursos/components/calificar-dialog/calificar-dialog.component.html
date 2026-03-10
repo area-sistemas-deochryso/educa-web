@@ -1,0 +1,303 @@
+<p-dialog
+	[header]="dialogTitle()"
+	[visible]="visible()"
+	(visibleChange)="onVisibleChange($event)"
+	[modal]="true"
+	[style]="{ width: '650px', maxWidth: '95vw' }"
+	[closable]="true"
+>
+	<!-- #region Header metadata -->
+	@if (calificacion(); as cal) {
+		<div class="calificar-metadata">
+			<p-tag [value]="cal.tipo" severity="info" />
+			@if (cal.esGrupal) {
+				<p-tag value="Grupal" severity="warn" icon="pi pi-users" />
+			}
+			<span class="metadata-item">
+				<i class="pi pi-percentage"></i>
+				Peso: {{ (cal.peso * 100).toFixed(0) }}%
+			</span>
+			<span class="metadata-item">
+				<i class="pi pi-calendar"></i>
+				{{ cal.fechaEvaluacion | date: 'dd/MM/yyyy' }}
+			</span>
+			<span class="metadata-item">
+				<i class="pi pi-bookmark"></i>
+				Semana {{ cal.numeroSemana }}
+			</span>
+		</div>
+	}
+	<!-- #endregion -->
+
+	<!-- #region Search -->
+	<div class="search-container">
+		<span class="p-input-icon-left w-full">
+			<i class="pi pi-search"></i>
+			<input
+				pInputText
+				[ngModel]="searchQuery()"
+				(ngModelChange)="searchQuery.set($event)"
+				[placeholder]="isGrupal() ? 'Buscar grupo o miembro...' : 'Buscar por nombre...'"
+				class="w-full"
+			/>
+		</span>
+	</div>
+	<!-- #endregion -->
+
+	<!-- #region Stats -->
+	<div class="calificar-stats">
+		<span class="stat-item">
+			@if (isGrupal()) {
+				<i class="pi pi-users"></i>
+				{{ stats().total }} grupos
+			} @else {
+				<i class="pi pi-users"></i>
+				{{ stats().total }} estudiantes
+			}
+		</span>
+		<span class="stat-item">
+			<i class="pi pi-check-circle"></i>
+			{{ stats().conNota }} calificados
+		</span>
+		@if (stats().conNota > 0) {
+			<span class="stat-item">
+				<i class="pi pi-chart-line"></i>
+				Prom: {{ stats().promedio.toFixed(1) }}
+			</span>
+			<p-tag
+				[value]="stats().aprobados + ' aprobados'"
+				severity="success"
+				[rounded]="true"
+			/>
+			<p-tag
+				[value]="stats().desaprobados + ' desaprobados'"
+				severity="danger"
+				[rounded]="true"
+			/>
+		}
+		@if (stats().sinCalificar > 0) {
+			<p-tag
+				[value]="stats().sinCalificar + ' sin nota'"
+				severity="secondary"
+				[rounded]="true"
+			/>
+		}
+	</div>
+	<!-- #endregion -->
+
+	<!-- #region Individual mode table -->
+	@if (!isGrupal()) {
+		@if (filteredRows().length > 0) {
+			<p-table
+				[value]="filteredRows()"
+				[scrollable]="true"
+				scrollHeight="350px"
+				styleClass="p-datatable-sm"
+			>
+				<ng-template #header>
+					<tr>
+						<th style="width: 50px">#</th>
+						<th style="min-width: 200px">Estudiante</th>
+						<th style="width: 140px">Nota (0-20)</th>
+						<th style="min-width: 180px">Observación</th>
+					</tr>
+				</ng-template>
+				<ng-template #body let-row let-rowIndex="rowIndex">
+					<tr>
+						<td class="text-center text-color-secondary">{{ rowIndex + 1 }}</td>
+						<td>{{ row.estudianteNombre }}</td>
+						<td>
+							@if (row.esEditable) {
+								<div class="nota-cell">
+									<p-inputNumber
+										[ngModel]="row.nota"
+										(ngModelChange)="updateNota(row.estudianteId, $event)"
+										[min]="NOTA_MINIMA"
+										[max]="NOTA_MAXIMA"
+										[minFractionDigits]="1"
+										[maxFractionDigits]="1"
+										[step]="0.5"
+										mode="decimal"
+										[inputStyle]="{ width: '70px' }"
+									/>
+									@if (row.nota !== null && row.nota !== undefined) {
+										<p-tag
+											[value]="row.nota.toFixed(1)"
+											[severity]="getNotaSeverity(row.nota)"
+											styleClass="nota-severity-tag"
+										/>
+									}
+								</div>
+							} @else {
+								<div class="nota-cell">
+									<p-tag
+										[value]="row.nota !== null ? row.nota.toFixed(1) : '-'"
+										[severity]="getNotaSeverity(row.nota)"
+									/>
+									<i
+										class="pi pi-lock text-xs text-color-secondary"
+										pTooltip="No editable (+2 meses)"
+										tooltipPosition="top"
+									></i>
+								</div>
+							}
+						</td>
+						<td>
+							@if (row.esEditable) {
+								<input
+									pInputText
+									[ngModel]="row.observacion"
+									(ngModelChange)="updateObservacion(row.estudianteId, $event)"
+									placeholder="Opcional"
+									class="w-full"
+								/>
+							} @else {
+								<span class="text-sm text-color-secondary">{{ row.observacion || '-' }}</span>
+							}
+						</td>
+					</tr>
+				</ng-template>
+			</p-table>
+		} @else {
+			<div class="empty-state">
+				<i class="pi pi-search text-4xl text-color-secondary"></i>
+				<p class="text-color-secondary mt-2">No se encontraron estudiantes</p>
+			</div>
+		}
+	}
+	<!-- #endregion -->
+
+	<!-- #region Group mode -->
+	@if (isGrupal()) {
+		@if (filteredGrupoRows().length > 0) {
+			<div class="grupos-calificar-list">
+				@for (grupo of filteredGrupoRows(); track grupo.grupoId) {
+					<div class="grupo-calificar-card">
+						<!-- Group header with nota input -->
+						<div class="grupo-calificar-header">
+							<div class="grupo-info">
+								<span class="grupo-nombre font-semibold">
+									<i class="pi pi-users mr-1"></i>
+									{{ grupo.grupoNombre }}
+								</span>
+								<span class="text-sm text-color-secondary">
+									{{ grupo.miembros.length }} miembros
+								</span>
+							</div>
+							<div class="grupo-nota-input">
+								<p-inputNumber
+									[ngModel]="grupo.nota"
+									(ngModelChange)="updateGrupoNota(grupo.grupoId, $event)"
+									[min]="NOTA_MINIMA"
+									[max]="NOTA_MAXIMA"
+									[minFractionDigits]="1"
+									[maxFractionDigits]="1"
+									[step]="0.5"
+									mode="decimal"
+									[inputStyle]="{ width: '70px' }"
+									placeholder="Nota"
+								/>
+								@if (grupo.nota !== null && grupo.nota !== undefined) {
+									<p-tag
+										[value]="grupo.nota.toFixed(1)"
+										[severity]="getNotaSeverity(grupo.nota)"
+										styleClass="nota-severity-tag"
+									/>
+								}
+							</div>
+						</div>
+
+						<!-- Observacion -->
+						<div class="grupo-observacion">
+							<input
+								pInputText
+								[ngModel]="grupo.observacion"
+								(ngModelChange)="updateGrupoObservacion(grupo.grupoId, $event)"
+								placeholder="Observación (opcional)"
+								class="w-full"
+							/>
+						</div>
+
+						<!-- Members list with override editing -->
+						<div class="grupo-miembros">
+							@for (miembro of grupo.miembros; track miembro.estudianteId) {
+								<div
+									class="miembro-row"
+									[class.miembro-override]="miembro.esOverride"
+								>
+									<span class="miembro-nombre text-sm">{{ miembro.nombre }}</span>
+									<div class="miembro-actions">
+										@if (miembro.esOverride) {
+											<p-inputNumber
+												[ngModel]="miembro.overrideNota"
+												(ngModelChange)="updateMiembroOverride(grupo.grupoId, miembro.estudianteId, $event)"
+												[min]="NOTA_MINIMA"
+												[max]="NOTA_MAXIMA"
+												[minFractionDigits]="1"
+												[maxFractionDigits]="1"
+												[step]="0.5"
+												mode="decimal"
+												[inputStyle]="{ width: '60px', fontSize: '0.85rem' }"
+											/>
+											@if (miembro.overrideNota !== null) {
+												<p-tag
+													[value]="miembro.overrideNota!.toFixed(1)"
+													[severity]="getNotaSeverity(miembro.overrideNota)"
+													styleClass="nota-severity-tag"
+												/>
+											}
+										} @else if (miembro.notaActual !== null) {
+											<p-tag
+												[value]="miembro.notaActual!.toFixed(1)"
+												[severity]="getNotaSeverity(miembro.notaActual)"
+												styleClass="nota-severity-tag"
+											/>
+										}
+										<button
+											pButton
+											[icon]="miembro.esOverride ? 'pi pi-times' : 'pi pi-pencil'"
+											[class]="miembro.esOverride ? 'p-button-rounded p-button-text p-button-sm p-button-danger' : 'p-button-rounded p-button-text p-button-sm'"
+											(click)="toggleMiembroOverride(grupo.grupoId, miembro.estudianteId)"
+											[pt]="{
+												root: {
+													'aria-label': miembro.esOverride ? 'Quitar nota individual' : 'Nota individual',
+												},
+											}"
+											[pTooltip]="miembro.esOverride ? 'Quitar nota individual' : 'Asignar nota individual'"
+											tooltipPosition="top"
+										></button>
+									</div>
+								</div>
+							}
+						</div>
+					</div>
+				}
+			</div>
+		} @else {
+			<div class="empty-state">
+				<i class="pi pi-users text-4xl text-color-secondary"></i>
+				<p class="text-color-secondary mt-2">No se encontraron grupos</p>
+			</div>
+		}
+	}
+	<!-- #endregion -->
+
+	<ng-template #footer>
+		<div class="dialog-footer">
+			<button
+				pButton
+				label="Cancelar"
+				class="p-button-text"
+				(click)="onVisibleChange(false)"
+			></button>
+			<button
+				pButton
+				[label]="isGrupal() ? 'Guardar Notas Grupales' : 'Guardar Notas'"
+				icon="pi pi-check"
+				[loading]="saving()"
+				[disabled]="!hasChanges()"
+				(click)="onSave()"
+			></button>
+		</div>
+	</ng-template>
+</p-dialog>

@@ -7,7 +7,7 @@ import { MenuItem } from 'primeng/api';
 import {
 	CourseSummary,
 	getCourseSummaries,
-} from '@features/intranet/pages/schedule-component/courses.config';
+} from '@features/intranet/pages/shared/schedule-component/courses.config';
 
 // #endregion
 // #region Implementation

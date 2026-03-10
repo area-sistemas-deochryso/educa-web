@@ -22,6 +22,12 @@ export const environment = {
 		voiceRecognition: true,
 		profesor: true,
 		estudiante: true,
+		ctestK6: true,
+	},
+
+	// Debug panels (solo development)
+	debug: {
+		horarioSync: true,
 	},
 };
 

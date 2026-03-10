@@ -1,7 +1,7 @@
 // #region Imports
 import { ChangeDetectionStrategy, Component, input, output } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { ModalData } from '@features/intranet/pages/calendary-component/calendar.types';
+import { ModalData } from '@features/intranet/pages/shared/calendary-component/calendar.types';
 
 // #endregion
 // #region Implementation

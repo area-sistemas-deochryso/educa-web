@@ -1,0 +1,68 @@
+<!-- #region Header -->
+<div class="curso-card">
+	<div class="card-header">
+		<div class="card-title">
+			<h3>{{ curso().cursoNombre }}</h3>
+			<span class="text-sm text-color-secondary">{{ curso().salonDescripcion }}</span>
+		</div>
+		<div class="card-promedio">
+			<span class="text-sm text-color-secondary">Promedio General</span>
+			<p-tag
+				[value]="formatNota(promedioGeneral())"
+				[severity]="promedioSeverity()"
+				[rounded]="true"
+				class="promedio-tag"
+			/>
+		</div>
+	</div>
+	<!-- #endregion -->
+
+	<!-- #region Promedios por vista -->
+	@if (promedios().length > 0) {
+		<div class="promedios-grid">
+			@for (p of promedios(); track p.label) {
+				<div class="promedio-item">
+					<span class="promedio-label">{{ p.label }}</span>
+					<p-tag
+						[value]="formatNota(p.value)"
+						[severity]="getNotaSeverity(p.value)"
+						[rounded]="true"
+					/>
+				</div>
+			}
+		</div>
+	}
+	<!-- #endregion -->
+
+	<p-divider />
+
+	<!-- #region Evaluaciones -->
+	<div class="evaluaciones-list">
+		<h4 class="mt-0 mb-2">Evaluaciones</h4>
+		@for (eval of curso().evaluaciones; track eval.id) {
+			<div class="eval-row">
+				<div class="eval-info">
+					<span class="eval-titulo">{{ eval.titulo }}</span>
+					<div class="eval-meta">
+						<p-tag [value]="getTipoLabel(eval.tipo)" severity="info" [rounded]="true" />
+						<span class="text-xs text-color-secondary">Peso: {{ (eval.peso * 100).toFixed(0) }}%</span>
+					</div>
+				</div>
+				<div class="eval-nota">
+					<p-tag
+						[value]="formatNota(eval.nota)"
+						[severity]="getNotaSeverity(eval.nota)"
+						[rounded]="true"
+						class="nota-tag"
+					/>
+				</div>
+			</div>
+		} @empty {
+			<div class="text-color-secondary text-sm p-2">
+				<i class="pi pi-info-circle mr-1"></i>
+				No hay evaluaciones registradas aún
+			</div>
+		}
+	</div>
+	<!-- #endregion -->
+</div>

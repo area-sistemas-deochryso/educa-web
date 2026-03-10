@@ -16,7 +16,7 @@ const developmentRoutes: Route[] = [
 				{
 					path: 'horarios',
 					loadComponent: () =>
-						import('./pages/schedule-component/schedule.component').then(
+						import('./pages/shared/schedule-component/schedule.component').then(
 							(m) => m.ScheduleComponent,
 						),
 					title: 'Intranet - ScheduleComponent',
@@ -24,7 +24,7 @@ const developmentRoutes: Route[] = [
 				// {
 				// 	path: 'navegacion-campus-salones',
 				// 	loadComponent: () =>
-				// 		import('./pages/campus-navigation/campus-navigation.component').then(
+				// 		import('./pages/shared/campus-navigation/campus-navigation.component').then(
 				// 			(m) => m.CampusNavigationComponent,
 				// 		),
 				// 	title: 'Intranet - Navegación Campus Salonese',
@@ -36,7 +36,7 @@ const developmentRoutes: Route[] = [
 				{
 					path: 'calendario',
 					loadComponent: () =>
-						import('./pages/calendary-component/calendary.component').then(
+						import('./pages/shared/calendary-component/calendary.component').then(
 							(m) => m.CalendaryComponent,
 						),
 					title: 'Intranet - Calendario',
@@ -46,16 +46,34 @@ const developmentRoutes: Route[] = [
 	...(environment.features.profesor
 		? [
 				{
+					path: 'profesor/asistencia',
+					loadComponent: () =>
+						import('./pages/profesor').then((m) => m.ProfesorAsistenciaComponent),
+					title: 'Intranet - Asistencia',
+				},
+				{
+					path: 'profesor/calificaciones',
+					loadComponent: () =>
+						import('./pages/profesor').then((m) => m.ProfesorCalificacionesComponent),
+					title: 'Intranet - Calificaciones',
+				},
+				{
 					path: 'profesor/cursos',
 					loadComponent: () =>
 						import('./pages/profesor').then((m) => m.ProfesorCursosComponent),
 					title: 'Intranet - Mis Cursos',
 				},
 				{
-					path: 'profesor/salones',
+					path: 'profesor/final-salones',
 					loadComponent: () =>
-						import('./pages/profesor').then((m) => m.ProfesorSalonesComponent),
-					title: 'Intranet - Mis Salones',
+						import('./pages/profesor').then((m) => m.ProfesorFinalSalonesComponent),
+					title: 'Intranet - Gestión de Salones',
+				},
+				{
+					path: 'profesor/foro',
+					loadComponent: () =>
+						import('./pages/profesor').then((m) => m.ProfesorForoComponent),
+					title: 'Intranet - Foro',
 				},
 				{
 					path: 'profesor/horarios',
@@ -63,15 +81,67 @@ const developmentRoutes: Route[] = [
 						import('./pages/profesor').then((m) => m.ProfesorHorariosComponent),
 					title: 'Intranet - Mi Horario',
 				},
+				{
+					path: 'profesor/mensajeria',
+					loadComponent: () =>
+						import('./pages/profesor').then((m) => m.ProfesorMensajeriaComponent),
+					title: 'Intranet - Mensajería',
+				},
+				{
+					path: 'profesor/salones',
+					loadComponent: () =>
+						import('./pages/profesor').then((m) => m.ProfesorSalonesComponent),
+					title: 'Intranet - Mis Salones',
+				},
 			]
 		: []),
 	...(environment.features.estudiante
 		? [
 				{
+					path: 'estudiante/asistencia',
+					loadComponent: () =>
+						import('./pages/estudiante').then((m) => m.EstudianteAsistenciaComponent),
+					title: 'Intranet - Mi Asistencia',
+				},
+				{
 					path: 'estudiante/cursos',
 					loadComponent: () =>
 						import('./pages/estudiante').then((m) => m.EstudianteCursosComponent),
 					title: 'Intranet - Mis Cursos',
+				},
+				{
+					path: 'estudiante/horarios',
+					loadComponent: () =>
+						import('./pages/estudiante').then((m) => m.EstudianteHorariosComponent),
+					title: 'Intranet - Mi Horario',
+				},
+				{
+					path: 'estudiante/mensajeria',
+					loadComponent: () =>
+						import('./pages/estudiante').then((m) => m.EstudianteMensajeriaComponent),
+					title: 'Intranet - Mensajería',
+				},
+				{
+					path: 'estudiante/notas',
+					loadComponent: () =>
+						import('./pages/estudiante').then((m) => m.EstudianteNotasComponent),
+					title: 'Intranet - Mis Notas',
+				},
+				{
+					path: 'estudiante/salones',
+					loadComponent: () =>
+						import('./pages/estudiante').then((m) => m.EstudianteSalonesComponent),
+					title: 'Intranet - Mis Salones',
+				},
+			]
+		: []),
+	...(environment.features.ctestK6
+		? [
+				{
+					path: 'ctest-k6',
+					loadComponent: () =>
+						import('./pages/shared/ctest-k6').then((m) => m.CTestK6Component),
+					title: 'Intranet - Test k6',
 				},
 			]
 		: []),
@@ -92,13 +162,13 @@ export const INTRANET_ROUTES: Routes = [
 			{
 				path: '',
 				loadComponent: () =>
-					import('./pages/home-component/home.component').then((m) => m.HomeComponent),
+					import('./pages/shared/home-component/home.component').then((m) => m.HomeComponent),
 				title: 'Intranet - Inicio',
 			},
 			{
 				path: 'asistencia',
 				loadComponent: () =>
-					import('./pages/attendance-component/attendance.component').then(
+					import('./pages/shared/attendance-component/attendance.component').then(
 						(m) => m.AttendanceComponent,
 					),
 				title: 'Intranet - Asistencia',
@@ -139,6 +209,12 @@ export const INTRANET_ROUTES: Routes = [
 				loadComponent: () =>
 					import('./pages/admin/horarios').then((m) => m.HorariosComponent),
 				title: 'Intranet - Gestión de Horarios',
+			},
+			{
+				path: 'admin/salones',
+				loadComponent: () =>
+					import('./pages/admin/salones').then((m) => m.SalonesAdminComponent),
+				title: 'Intranet - Gestión de Salones',
 			},
 		],
 	},

@@ -5,6 +5,7 @@ import { logger, withRetry } from '@core/helpers';
 import { ErrorHandlerService } from '@core/services';
 import { UI_ADMIN_ERROR_DETAILS, UI_SUMMARIES } from '@app/shared/constants';
 import { UserProfileService } from '@core/services/user/user-profile.service';
+import { VistaPromedio } from '../models';
 import { ProfesorApiService } from './profesor-api.service';
 import { ProfesorStore, ProfesorSalonConEstudiantes } from './profesor.store';
 
@@ -67,6 +68,7 @@ export class ProfesorFacade {
 	 * Muestra loading mientras se obtienen los datos reales del salón.
 	 */
 	openSalonDialog(salon: ProfesorSalonConEstudiantes): void {
+		if (this.store.salonDialogLoading()) return;
 		this.store.openSalonDialog(salon);
 
 		this.api
@@ -100,6 +102,65 @@ export class ProfesorFacade {
 
 	closeSalonDialog(): void {
 		this.store.closeSalonDialog();
+	}
+
+	// #endregion
+	// #region Notas salón commands
+	loadNotasSalon(salonId: number, cursoId: number): void {
+		if (this.store.notasSalonLoading()) return;
+		this.store.setNotasSalonLoading(true);
+		this.store.setNotasCursoId(cursoId);
+
+		this.api
+			.getNotasSalon(salonId, cursoId)
+			.pipe(
+				withRetry({ tag: 'ProfesorFacade:loadNotasSalon' }),
+				takeUntilDestroyed(this.destroyRef),
+			)
+			.subscribe({
+				next: (data) => {
+					this.store.setNotasSalon(data);
+					this.store.setNotasSalonLoading(false);
+				},
+				error: (err) => {
+					logger.error('ProfesorFacade: Error al cargar notas del salón', err);
+					this.store.setNotasSalonLoading(false);
+				},
+			});
+	}
+
+	setNotasVista(vista: VistaPromedio): void {
+		this.store.setNotasVistaActual(vista);
+	}
+
+	/**
+	 * Save or delete an individual nota.
+	 * null = delete the nota, number = save/update via calificarLote.
+	 */
+	saveNotaSalon(calificacionId: number, estudianteId: number, nota: number | null): void {
+		const salonId = this.store.selectedSalon()?.salonId;
+		const cursoId = this.store.notasCursoId();
+		if (!salonId || !cursoId) return;
+
+		const apiCall =
+			nota === null
+				? this.api.eliminarNotaEstudiante(calificacionId, estudianteId)
+				: this.api.calificarLote(calificacionId, {
+						notas: [{ estudianteId, nota, observacion: null }],
+					});
+
+		apiCall.pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
+			next: () => {
+				this.store.updateNotaEstudiante(estudianteId, calificacionId, nota);
+			},
+			error: (err) => {
+				logger.error('ProfesorFacade: Error al guardar/eliminar nota', err);
+				this.errorHandler.showError(
+					UI_SUMMARIES.error,
+					nota === null ? 'No se pudo eliminar la nota' : 'No se pudo guardar la nota',
+				);
+			},
+		});
 	}
 	// #endregion
 }

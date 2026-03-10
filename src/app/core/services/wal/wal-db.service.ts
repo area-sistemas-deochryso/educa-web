@@ -84,6 +84,7 @@ export class WalDbService {
 	// #region Write Operations
 	/**
 	 * Persist or update a WAL entry.
+	 * Rejects on QuotaExceededError so callers can fall back to direct HTTP.
 	 *
 	 * @param entry WAL entry.
 	 */
@@ -91,16 +92,27 @@ export class WalDbService {
 		const db = await this.ensureDB();
 		if (!db) return;
 
-		return new Promise((resolve) => {
+		return new Promise((resolve, reject) => {
 			try {
 				const tx = db.transaction(STORE_NAME, 'readwrite');
 				tx.objectStore(STORE_NAME).put(entry);
 				tx.oncomplete = () => resolve();
 				tx.onerror = () => {
-					logger.error('[WAL-DB] Error writing entry:', tx.error);
+					const error = tx.error;
+					if (error?.name === 'QuotaExceededError') {
+						logger.error('[WAL-DB] Storage quota exceeded — entry will use direct HTTP fallback');
+						reject(error);
+						return;
+					}
+					logger.error('[WAL-DB] Error writing entry:', error);
 					resolve();
 				};
 			} catch (e) {
+				if (e instanceof DOMException && e.name === 'QuotaExceededError') {
+					logger.error('[WAL-DB] Storage quota exceeded — entry will use direct HTTP fallback');
+					reject(e);
+					return;
+				}
 				logger.error('[WAL-DB] Transaction error:', e);
 				resolve();
 			}
@@ -283,6 +295,33 @@ export class WalDbService {
 			}
 		});
 	}
+	/**
+	 * Check if there are PENDING or IN_FLIGHT entries for a resourceType.
+	 * Uses the resourceType index for efficient lookup.
+	 */
+	async hasActiveByResourceType(resourceType: string): Promise<boolean> {
+		const db = await this.ensureDB();
+		if (!db) return false;
+
+		return new Promise((resolve) => {
+			try {
+				const tx = db.transaction(STORE_NAME, 'readonly');
+				const index = tx.objectStore(STORE_NAME).index('resourceType');
+				const request = index.getAll(IDBKeyRange.only(resourceType));
+				request.onsuccess = () => {
+					const entries = (request.result as WalEntry[]) ?? [];
+					const hasActive = entries.some(
+						(e) => e.status === 'PENDING' || e.status === 'IN_FLIGHT',
+					);
+					resolve(hasActive);
+				};
+				request.onerror = () => resolve(false);
+			} catch {
+				resolve(false);
+			}
+		});
+	}
+
 	/**
 	 * Get all WAL entries.
 	 */

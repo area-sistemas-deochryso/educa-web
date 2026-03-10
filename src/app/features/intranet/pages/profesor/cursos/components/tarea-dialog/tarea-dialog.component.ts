@@ -7,6 +7,7 @@ import { ButtonModule } from 'primeng/button';
 import { InputTextModule } from 'primeng/inputtext';
 import { TextareaModule } from 'primeng/textarea';
 import { DatePickerModule } from 'primeng/datepicker';
+import { ToggleSwitch } from 'primeng/toggleswitch';
 import { CursoContenidoTareaDto, CrearTareaRequest, ActualizarTareaRequest } from '../../../models';
 
 // #endregion
@@ -14,7 +15,16 @@ import { CursoContenidoTareaDto, CrearTareaRequest, ActualizarTareaRequest } fro
 @Component({
 	selector: 'app-tarea-dialog',
 	standalone: true,
-	imports: [CommonModule, FormsModule, DialogModule, ButtonModule, InputTextModule, TextareaModule, DatePickerModule],
+	imports: [
+		CommonModule,
+		FormsModule,
+		DialogModule,
+		ButtonModule,
+		InputTextModule,
+		TextareaModule,
+		DatePickerModule,
+		ToggleSwitch,
+	],
 	changeDetection: ChangeDetectionStrategy.OnPush,
 	template: `
 		<p-dialog
@@ -57,21 +67,37 @@ import { CursoContenidoTareaDto, CrearTareaRequest, ActualizarTareaRequest } fro
 					></textarea>
 				</div>
 
-				<div class="form-field">
-					<label for="tareaFecha" class="form-label">
-						<i class="pi pi-calendar" style="font-size: 0.78rem"></i>
-						Fecha límite
-					</label>
-					<p-datepicker
-						id="tareaFecha"
-						[(ngModel)]="fechaLimite"
-						[showIcon]="true"
-						[showButtonBar]="true"
-						dateFormat="dd/mm/yy"
-						placeholder="Seleccionar fecha"
-						appendTo="body"
-						styleClass="w-full"
-					/>
+				<div class="form-row">
+					<div class="form-field" style="flex: 1">
+						<label for="tareaFecha" class="form-label">
+							<i class="pi pi-calendar" style="font-size: 0.78rem"></i>
+							Fecha límite
+						</label>
+						<p-datepicker
+							id="tareaFecha"
+							[(ngModel)]="fechaLimite"
+							[showIcon]="true"
+							[showButtonBar]="true"
+							dateFormat="dd/mm/yy"
+							placeholder="Seleccionar fecha"
+							appendTo="body"
+							styleClass="w-full"
+						/>
+					</div>
+
+					<div class="form-field grupal-field">
+						<label class="form-label">
+							<i class="pi pi-users" style="font-size: 0.78rem"></i>
+							Tarea grupal
+						</label>
+						<div class="grupal-toggle">
+							<p-toggleswitch [(ngModel)]="esGrupal" />
+							<span class="grupal-label">{{ esGrupal ? 'Grupal' : 'Individual' }}</span>
+						</div>
+						<span class="field-hint">
+							{{ esGrupal ? 'La nota aplica a todo el grupo' : 'Cada estudiante entrega individualmente' }}
+						</span>
+					</div>
 				</div>
 			</div>
 
@@ -97,6 +123,11 @@ import { CursoContenidoTareaDto, CrearTareaRequest, ActualizarTareaRequest } fro
 			gap: 1.25rem;
 			padding: 0.5rem 1rem;
 		}
+		.form-row {
+			display: flex;
+			gap: 1rem;
+			align-items: flex-start;
+		}
 		.form-field {
 			display: flex;
 			flex-direction: column;
@@ -113,10 +144,32 @@ import { CursoContenidoTareaDto, CrearTareaRequest, ActualizarTareaRequest } fro
 				color: var(--text-color-secondary);
 			}
 		}
+		.grupal-field {
+			min-width: 140px;
+		}
+		.grupal-toggle {
+			display: flex;
+			align-items: center;
+			gap: 0.5rem;
+		}
+		.grupal-label {
+			font-size: 0.82rem;
+			font-weight: 500;
+			color: var(--text-color);
+		}
+		.field-hint {
+			font-size: 0.72rem;
+			color: var(--text-color-secondary);
+		}
 		.dialog-footer {
 			display: flex;
 			justify-content: flex-end;
 			gap: 0.5rem;
+		}
+		@media (max-width: 640px) {
+			.form-row {
+				flex-direction: column;
+			}
 		}
 	`,
 })
@@ -132,6 +185,7 @@ export class TareaDialogComponent implements OnChanges {
 	titulo = '';
 	descripcion = '';
 	fechaLimite: Date | null = null;
+	esGrupal = false;
 
 	ngOnChanges(changes: SimpleChanges): void {
 		if (changes['tarea'] || changes['visible']) {
@@ -141,10 +195,12 @@ export class TareaDialogComponent implements OnChanges {
 					this.titulo = t.titulo;
 					this.descripcion = t.descripcion ?? '';
 					this.fechaLimite = t.fechaLimite ? new Date(t.fechaLimite) : null;
+					this.esGrupal = t.esGrupal;
 				} else {
 					this.titulo = '';
 					this.descripcion = '';
 					this.fechaLimite = null;
+					this.esGrupal = false;
 				}
 			}
 		}
@@ -170,12 +226,14 @@ export class TareaDialogComponent implements OnChanges {
 				titulo: this.titulo.trim(),
 				descripcion: this.descripcion.trim() || null,
 				fechaLimite: fechaStr,
+				esGrupal: this.esGrupal,
 			});
 		} else {
 			this.createTarea.emit({
 				titulo: this.titulo.trim(),
 				descripcion: this.descripcion.trim() || null,
 				fechaLimite: fechaStr,
+				esGrupal: this.esGrupal,
 			});
 		}
 	}

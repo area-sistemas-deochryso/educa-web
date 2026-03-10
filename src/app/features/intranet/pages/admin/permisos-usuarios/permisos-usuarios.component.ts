@@ -77,7 +77,7 @@ export class PermisosUsuariosComponent implements OnInit {
 	readonly modulosVistas = this.facade.modulosVistas;
 	readonly activeModuloIndex = this.facade.activeModuloIndex;
 	readonly vistasBusqueda = this.facade.vistasBusqueda;
-	readonly adminUtils = this.facade.adminUtils;
+	readonly uiMapping = this.facade.uiMapping;
 
 	// * Computed from facade
 	readonly totalUsuarios = this.facade.totalUsuarios;

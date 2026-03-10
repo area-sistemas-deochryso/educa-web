@@ -13,7 +13,7 @@ import {
 } from '@core/services';
 import { environment } from '@config';
 import { UI_ADMIN_ERROR_DETAILS, UI_SUMMARIES } from '@app/shared/constants';
-import { AdminUtilsService } from '@shared/services';
+import { UiMappingService } from '@shared/services';
 import { PermisosUsuariosStore } from './permisos-usuarios.store';
 import { PermisosUsuariosHelperService } from './permisos-usuarios-helper.service';
 
@@ -24,7 +24,7 @@ export class PermisosUsuariosFacade {
 	private helperService = inject(PermisosUsuariosHelperService);
 	private errorHandler = inject(ErrorHandlerService);
 	private wal = inject(WalFacadeHelper);
-	readonly adminUtils = inject(AdminUtilsService);
+	readonly uiMapping = inject(UiMappingService);
 	private destroyRef = inject(DestroyRef);
 	private readonly apiUrl = `${environment.apiUrl}/api/sistema/permisos`;
 
@@ -56,7 +56,7 @@ export class PermisosUsuariosFacade {
 	readonly totalModulos = computed(() => {
 		const modulos = new Set<string>();
 		this.vistas().forEach((v) => {
-			const modulo = this.adminUtils.getModuloFromRuta(v.ruta);
+			const modulo = this.uiMapping.getModuloFromRuta(v.ruta);
 			modulos.add(modulo);
 		});
 		return modulos.size;

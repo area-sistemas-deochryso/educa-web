@@ -1,0 +1,80 @@
+<!-- #region Curso selector -->
+<div class="tab-header">
+	<p-select
+		[options]="cursoOptions()"
+		[(ngModel)]="selectedCursoLocal"
+		(ngModelChange)="onCursoChange($event)"
+		optionLabel="label"
+		optionValue="value"
+		placeholder="Seleccionar curso"
+		appendTo="body"
+		styleClass="w-full md:w-20rem"
+	/>
+</div>
+<!-- #endregion -->
+
+<!-- #region Content -->
+@if (loading()) {
+	<div class="loading-state">
+		<i class="pi pi-spin pi-spinner" style="font-size: 1.5rem"></i>
+		<p>Cargando grupos...</p>
+	</div>
+} @else if (!hasData()) {
+	<div class="empty-state">
+		<i class="pi pi-users" style="font-size: 2rem; opacity: 0.3"></i>
+		<p>Selecciona un curso para ver los grupos</p>
+	</div>
+} @else {
+	<!-- #region Grupos -->
+	<div class="grupos-container">
+		@for (grupo of grupos(); track grupo.id) {
+			<div class="grupo-card">
+				<div class="grupo-header">
+					<h4>
+						<i class="pi pi-users mr-2"></i>{{ grupo.nombre }}
+					</h4>
+					<p-tag [value]="grupo.estudiantes.length + ' integrantes'" severity="info" />
+				</div>
+				<div class="grupo-members">
+					@for (est of grupo.estudiantes; track est.estudianteId) {
+						<div class="member-item">
+							<i class="pi pi-user"></i>
+							<span>{{ est.estudianteNombre }}</span>
+						</div>
+					}
+					@if (grupo.estudiantes.length === 0) {
+						<div class="member-empty">Sin integrantes</div>
+					}
+				</div>
+			</div>
+		}
+
+		@if (sinGrupo().length > 0) {
+			<div class="grupo-card sin-grupo">
+				<div class="grupo-header">
+					<h4>
+						<i class="pi pi-user-minus mr-2"></i>Sin grupo
+					</h4>
+					<p-tag [value]="sinGrupo().length + ' estudiantes'" severity="warn" />
+				</div>
+				<div class="grupo-members">
+					@for (est of sinGrupo(); track est.estudianteId) {
+						<div class="member-item">
+							<i class="pi pi-user"></i>
+							<span>{{ est.estudianteNombre }}</span>
+						</div>
+					}
+				</div>
+			</div>
+		}
+	</div>
+	<!-- #endregion -->
+
+	@if (grupos().length === 0 && sinGrupo().length === 0) {
+		<div class="empty-state">
+			<i class="pi pi-users" style="font-size: 2rem; opacity: 0.3"></i>
+			<p>No hay grupos configurados para este curso</p>
+		</div>
+	}
+}
+<!-- #endregion -->

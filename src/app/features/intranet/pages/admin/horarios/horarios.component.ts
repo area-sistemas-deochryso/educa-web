@@ -256,6 +256,40 @@ export class HorariosComponent implements OnInit {
 		});
 	}
 
+	onDesasignarProfesor(horarioId: number): void {
+		const currentUser = this.vm().currentUser;
+		if (!currentUser) return;
+
+		this.confirmationService.confirm({
+			message: UI_HORARIOS_CONFIRM_MESSAGES.unassignProfesor,
+			header: UI_CONFIRM_HEADERS.assign,
+			icon: 'pi pi-exclamation-triangle',
+			acceptLabel: UI_CONFIRM_LABELS.yes,
+			rejectLabel: UI_CONFIRM_LABELS.cancel,
+			acceptButtonStyleClass: 'p-button-danger',
+			accept: () => {
+				this.facade.desasignarProfesor(
+					horarioId,
+					currentUser.dni || currentUser.nombreCompleto,
+				);
+			},
+		});
+	}
+
+	onDesasignarEstudiante(horarioId: number, estudianteId: number): void {
+		this.confirmationService.confirm({
+			message: UI_HORARIOS_CONFIRM_MESSAGES.unassignEstudiante,
+			header: UI_CONFIRM_HEADERS.assign,
+			icon: 'pi pi-exclamation-triangle',
+			acceptLabel: UI_CONFIRM_LABELS.yes,
+			rejectLabel: UI_CONFIRM_LABELS.cancel,
+			acceptButtonStyleClass: 'p-button-danger',
+			accept: () => {
+				this.facade.desasignarEstudiante(horarioId, estudianteId);
+			},
+		});
+	}
+
 	// #endregion
 	// #region Event handlers - Vista
 	onCambiarVista(vista: 'semanal' | 'lista'): void {

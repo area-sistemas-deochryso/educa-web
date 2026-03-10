@@ -15,7 +15,7 @@ import { SelectModule } from 'primeng/select';
 import { ConfirmDialogModule } from 'primeng/confirmdialog';
 import { ConfirmationService } from 'primeng/api';
 
-import { AdminUtilsService } from '@shared/services';
+import { UiMappingService } from '@shared/services';
 import { buildDeletePermisoRolMessage } from '@app/shared/constants';
 
 import { PermisosRolesFacade } from './services/permisos-roles.facade';
@@ -47,7 +47,7 @@ export class PermisosRolesComponent implements OnInit {
 	// #region Dependencias
 	private facade = inject(PermisosRolesFacade);
 	private confirmationService = inject(ConfirmationService);
-	readonly adminUtils = inject(AdminUtilsService);
+	readonly uiMapping = inject(UiMappingService);
 	// #endregion
 
 	// #region Estado del facade

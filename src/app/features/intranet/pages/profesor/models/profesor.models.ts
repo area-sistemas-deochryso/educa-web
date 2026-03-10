@@ -188,6 +188,8 @@ export interface CursoContenidoTareaDto {
 	descripcion: string | null;
 	/** Due date string or null. */
 	fechaLimite: string | null;
+	/** Whether this task is group-based. */
+	esGrupal: boolean;
 	/** Registration date string. */
 	fechaReg: string;
 	/** Teacher attachments for the task. */
@@ -289,6 +291,8 @@ export interface CrearTareaRequest {
 	descripcion: string | null;
 	/** Due date string or null. */
 	fechaLimite: string | null;
+	/** Whether this task is group-based. */
+	esGrupal: boolean;
 }
 
 /**
@@ -301,6 +305,8 @@ export interface ActualizarTareaRequest {
 	descripcion: string | null;
 	/** Due date string or null. */
 	fechaLimite: string | null;
+	/** Whether this task is group-based. */
+	esGrupal: boolean;
 	/** Concurrencia optimista. */
 	rowVersion?: string;
 }
@@ -354,6 +360,16 @@ export interface ProfesorCurso {
 }
 
 /**
+ * Course info inside a salon grouping.
+ */
+export interface SalonCursoInfo {
+	/** Course name. */
+	nombre: string;
+	/** First horario id for this course-salon pair (used for navigation). */
+	horarioId: number;
+}
+
+/**
  * Derived classroom grouping for UI.
  */
 export interface ProfesorSalon {
@@ -361,8 +377,8 @@ export interface ProfesorSalon {
 	salonId: number;
 	/** Classroom label. */
 	salonDescripcion: string;
-	/** Course labels. */
-	cursos: string[];
+	/** Courses with navigation info. */
+	cursos: SalonCursoInfo[];
 	/** True when professor is tutor. */
 	esTutor: boolean;
 }

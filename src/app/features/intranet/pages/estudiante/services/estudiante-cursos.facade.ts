@@ -46,6 +46,7 @@ export class EstudianteCursosFacade {
 	}
 
 	loadContenido(horarioId: number): void {
+		if (this.store.contentLoading()) return;
 		this.store.setContentLoading(true);
 
 		this.api
@@ -60,11 +61,7 @@ export class EstudianteCursosFacade {
 					this.store.setContentLoading(false);
 					if (contenido) {
 						this.store.openContentDialog();
-						// Pre-load student files for all weeks and tasks
-						contenido.semanas.forEach((s) => {
-							this.loadMisArchivos(s.id);
-							s.tareas.forEach((t) => this.loadMisTareaArchivos(t.id));
-						});
+						// Files load lazily via onAccordionTabOpen in the dialog
 					}
 				},
 				error: (err) => {
@@ -88,6 +85,132 @@ export class EstudianteCursosFacade {
 			.subscribe({
 				next: (archivos) => this.store.setMisArchivos(semanaId, archivos),
 				error: () => this.store.setMisArchivos(semanaId, []),
+			});
+	}
+
+	/**
+	 * Load grades for the current course by matching cursoNombre + salonDescripcion.
+	 */
+	loadMisNotasCurso(): void {
+		const contenido = this.store.contenido();
+		if (!contenido) return;
+		if (this.store.misNotasLoading()) return;
+
+		this.store.setMisNotasLoading(true);
+
+		this.api
+			.getMisNotas()
+			.pipe(takeUntilDestroyed(this.destroyRef))
+			.subscribe({
+				next: (allNotas) => {
+					const match = allNotas.find(
+						(n) => n.cursoNombre === contenido.cursoNombre && n.salonDescripcion === contenido.salonDescripcion,
+					);
+					this.store.setMisNotasCurso(match ?? null);
+					this.store.setMisNotasLoading(false);
+				},
+				error: (err) => {
+					logger.error('EstudianteCursosFacade: Error al cargar notas del curso', err);
+					this.store.setMisNotasCurso(null);
+					this.store.setMisNotasLoading(false);
+				},
+			});
+	}
+
+	/**
+	 * Load attendance summary for the current course.
+	 */
+	loadMiAsistencia(): void {
+		const contenido = this.store.contenido();
+		if (!contenido) return;
+		if (this.store.miAsistenciaLoading()) return;
+
+		this.store.setMiAsistenciaLoading(true);
+
+		this.api
+			.getMiAsistencia(contenido.horarioId)
+			.pipe(takeUntilDestroyed(this.destroyRef))
+			.subscribe({
+				next: (resumen) => {
+					this.store.setMiAsistencia(resumen);
+					this.store.setMiAsistenciaLoading(false);
+				},
+				error: (err) => {
+					logger.error('EstudianteCursosFacade: Error al cargar asistencia', err);
+					this.store.setMiAsistencia(null);
+					this.store.setMiAsistenciaLoading(false);
+				},
+			});
+	}
+
+	/** Refresh content tab: clear caches and re-fetch contenido + files. */
+	refreshContenido(): void {
+		const contenido = this.store.contenido();
+		if (!contenido) return;
+		this.store.clearLoadedCaches();
+		this.store.setContentLoading(true);
+
+		this.api
+			.getContenido(contenido.horarioId)
+			.pipe(
+				withRetry({ tag: 'EstudianteCursosFacade:refreshContenido' }),
+				takeUntilDestroyed(this.destroyRef),
+			)
+			.subscribe({
+				next: (data) => {
+					this.store.setContenido(data);
+					this.store.setContentLoading(false);
+					// Caches cleared above; files reload lazily via accordion
+				},
+				error: (err) => {
+					logger.error('EstudianteCursosFacade: Error al refrescar contenido', err);
+					this.store.setContentLoading(false);
+				},
+			});
+	}
+
+	/** Refresh notas for the current course (bypasses loaded flag). */
+	refreshMisNotasCurso(): void {
+		const contenido = this.store.contenido();
+		if (!contenido) return;
+		this.store.setMisNotasLoading(true);
+
+		this.api
+			.getMisNotas()
+			.pipe(takeUntilDestroyed(this.destroyRef))
+			.subscribe({
+				next: (allNotas) => {
+					const match = allNotas.find(
+						(n) => n.cursoNombre === contenido.cursoNombre && n.salonDescripcion === contenido.salonDescripcion,
+					);
+					this.store.setMisNotasCurso(match ?? null);
+					this.store.setMisNotasLoading(false);
+				},
+				error: (err) => {
+					logger.error('EstudianteCursosFacade: Error al refrescar notas', err);
+					this.store.setMisNotasLoading(false);
+				},
+			});
+	}
+
+	/** Refresh attendance for the current course (bypasses loaded flag). */
+	refreshMiAsistencia(): void {
+		const contenido = this.store.contenido();
+		if (!contenido) return;
+		this.store.setMiAsistenciaLoading(true);
+
+		this.api
+			.getMiAsistencia(contenido.horarioId)
+			.pipe(takeUntilDestroyed(this.destroyRef))
+			.subscribe({
+				next: (resumen) => {
+					this.store.setMiAsistencia(resumen);
+					this.store.setMiAsistenciaLoading(false);
+				},
+				error: (err) => {
+					logger.error('EstudianteCursosFacade: Error al refrescar asistencia', err);
+					this.store.setMiAsistenciaLoading(false);
+				},
 			});
 	}
 

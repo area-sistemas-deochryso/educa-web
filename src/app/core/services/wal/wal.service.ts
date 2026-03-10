@@ -4,8 +4,10 @@ import { WalDbService } from './wal-db.service';
 import {
 	WalEntry,
 	WalEntryStatus,
+	WalConsistencyLevel,
 	WalStats,
 	WAL_DEFAULTS,
+	CURRENT_WAL_SCHEMA_VERSION,
 } from './models';
 
 /**
@@ -27,8 +29,9 @@ export class WalService {
 	 * @returns Persisted WAL entry.
 	 */
 	async append(
-		config: Omit<WalEntry, 'id' | 'timestamp' | 'status' | 'retries' | 'maxRetries'> & {
+		config: Omit<WalEntry, 'id' | 'timestamp' | 'status' | 'retries' | 'maxRetries' | 'schemaVersion'> & {
 			maxRetries?: number;
+			consistencyLevel?: WalConsistencyLevel;
 		},
 	): Promise<WalEntry> {
 		const entry: WalEntry = {
@@ -38,6 +41,8 @@ export class WalService {
 			status: 'PENDING',
 			retries: 0,
 			maxRetries: config.maxRetries ?? WAL_DEFAULTS.MAX_RETRIES,
+			schemaVersion: CURRENT_WAL_SCHEMA_VERSION,
+			consistencyLevel: config.consistencyLevel ?? 'optimistic',
 		};
 
 		await this.db.put(entry);
@@ -201,6 +206,20 @@ export class WalService {
 		logger.log(`[WAL] Discarded entry ${id}`);
 	}
 
+	/**
+	 * Update the payload of an existing entry (used by coalescence).
+	 *
+	 * @param id Entry id.
+	 * @param payload New merged payload.
+	 */
+	async updateEntryPayload(id: string, payload: unknown): Promise<void> {
+		const entry = await this.db.get(id);
+		if (!entry) return;
+
+		entry.payload = payload;
+		await this.db.put(entry);
+	}
+
 	// #endregion
 
 	// #region Queries
@@ -232,6 +251,14 @@ export class WalService {
 		return this.db.get(id);
 	}
 	/**
+	 * Check if there are active (PENDING/IN_FLIGHT) entries for a resource type.
+	 * Used by facades to skip cache updates that would overwrite optimistic state.
+	 */
+	async hasPendingForResource(resourceType: string): Promise<boolean> {
+		return this.db.hasActiveByResourceType(resourceType);
+	}
+
+	/**
 	 * Get current WAL counts by status.
 	 */
 	async getStats(): Promise<WalStats> {
@@ -243,6 +270,59 @@ export class WalService {
 			this.db.count('CONFLICT'),
 		]);
 		return { pending, inFlight, failed, committed, conflict };
+	}
+
+	// #endregion
+
+	// #region Schema Migration
+
+	/**
+	 * Check pending entries for schema version mismatch.
+	 * Entries from older versions are marked REQUIRES_MIGRATION.
+	 *
+	 * @returns Number of entries that require migration.
+	 */
+	async checkSchemaMigrations(): Promise<number> {
+		const pending = await this.db.getPending();
+		let migrationNeeded = 0;
+
+		for (const entry of pending) {
+			const entryVersion = entry.schemaVersion ?? 0;
+			if (entryVersion < CURRENT_WAL_SCHEMA_VERSION) {
+				entry.status = 'REQUIRES_MIGRATION';
+				entry.error = `Schema v${entryVersion} < current v${CURRENT_WAL_SCHEMA_VERSION}`;
+				await this.db.put(entry);
+				migrationNeeded++;
+			}
+		}
+
+		if (migrationNeeded > 0) {
+			logger.warn(`[WAL] ${migrationNeeded} entries require schema migration`);
+		}
+		return migrationNeeded;
+	}
+
+	/**
+	 * Get entries that need schema migration.
+	 */
+	async getMigrationEntries(): Promise<WalEntry[]> {
+		return this.db.getByStatus('REQUIRES_MIGRATION');
+	}
+
+	/**
+	 * Discard all entries that require migration.
+	 *
+	 * @returns Number of entries discarded.
+	 */
+	async discardMigrationEntries(): Promise<number> {
+		const entries = await this.getMigrationEntries();
+		for (const entry of entries) {
+			await this.db.delete(entry.id);
+		}
+		if (entries.length > 0) {
+			logger.log(`[WAL] Discarded ${entries.length} entries requiring migration`);
+		}
+		return entries.length;
 	}
 
 	// #endregion

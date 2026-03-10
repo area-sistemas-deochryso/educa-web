@@ -45,6 +45,19 @@
   status = 200
   force = true
 
+# Proxy SignalR hub (SSE/Long Polling — Netlify does not support WebSocket upgrade)
+[[redirects]]
+  from = "/chathub"
+  to = "https://educa1.azurewebsites.net/chathub"
+  status = 200
+  force = true
+
+[[redirects]]
+  from = "/chathub/*"
+  to = "https://educa1.azurewebsites.net/chathub/:splat"
+  status = 200
+  force = true
+
 # Redirección SPA - fallback para rutas de Angular
 [[redirects]]
   from = "/*"

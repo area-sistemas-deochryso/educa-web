@@ -1,0 +1,116 @@
+<!-- #region Date picker + stats -->
+<div class="registro-header">
+	<div class="date-picker">
+		<label for="asist-fecha">Fecha</label>
+		<p-datepicker
+			[(ngModel)]="selectedDate"
+			(ngModelChange)="onDateSelect()"
+			[showIcon]="true"
+			dateFormat="dd/mm/yy"
+			inputId="asist-fecha"
+			appendTo="body"
+		/>
+		<button
+			pButton
+			icon="pi pi-search"
+			class="p-button-outlined"
+			(click)="onDateSelect()"
+			[pt]="{
+				root: {
+					'aria-label': 'Buscar asistencia',
+				},
+			}"
+		></button>
+	</div>
+
+	@if (hasEstudiantes()) {
+		<div class="stats-row">
+			<p-tag [value]="'Total: ' + stats().total" severity="secondary" />
+			<p-tag [value]="'Presentes: ' + stats().presentes" severity="success" />
+			<p-tag [value]="'Tardes: ' + stats().tardes" severity="warn" />
+			<p-tag [value]="'Faltas: ' + stats().faltas" severity="danger" />
+		</div>
+	}
+</div>
+<!-- #endregion -->
+
+<!-- #region Loading -->
+@if (loading()) {
+	<div class="loading-state">
+		<i class="pi pi-spinner pi-spin"></i>
+		<span>Cargando asistencia...</span>
+	</div>
+}
+<!-- #endregion -->
+
+<!-- #region Student list -->
+@if (!loading() && hasEstudiantes()) {
+	<div class="estudiantes-list">
+		@for (est of estudiantes(); track est.estudianteId; let i = $index) {
+			<div class="estudiante-row">
+				<div class="estudiante-info">
+					<span class="estudiante-index">{{ i + 1 }}</span>
+					<div class="estudiante-data">
+						<span class="estudiante-nombre">{{ est.nombreCompleto }}</span>
+						<span class="estudiante-dni">{{ est.dni }}</span>
+					</div>
+				</div>
+
+				<div class="estado-buttons">
+					@for (estado of estados; track estado) {
+						<button
+							pButton
+							[class]="'estado-btn estado-btn--' + estado"
+							[class.active]="est.estado === estado"
+							(click)="onEstadoChange(est.estudianteId, estado)"
+							[pTooltip]="labels[estado]"
+							tooltipPosition="top"
+							[pt]="{
+								root: {
+									'aria-label': labels[estado],
+								},
+							}"
+						>
+							<i [class]="icons[estado]"></i>
+							<span class="estado-letter">{{ estado }}</span>
+						</button>
+					}
+				</div>
+
+				@if (est.estado === 'T' || est.estado === 'F') {
+					<div class="justificacion-row">
+						<input
+							pInputText
+							type="text"
+							placeholder="Justificación (opcional)"
+							[value]="est.justificacion ?? ''"
+							(input)="onJustificacionChange(est.estudianteId, $any($event.target).value)"
+							class="justificacion-input"
+						/>
+					</div>
+				}
+			</div>
+		}
+	</div>
+
+	<div class="actions-footer">
+		<button
+			pButton
+			label="Guardar Asistencia"
+			icon="pi pi-save"
+			(click)="onSave()"
+			[loading]="saving()"
+			[disabled]="saving()"
+		></button>
+	</div>
+}
+<!-- #endregion -->
+
+<!-- #region Empty state -->
+@if (!loading() && !hasEstudiantes()) {
+	<div class="empty-state">
+		<i class="pi pi-calendar"></i>
+		<p>Seleccione una fecha para cargar la lista de estudiantes</p>
+	</div>
+}
+<!-- #endregion -->

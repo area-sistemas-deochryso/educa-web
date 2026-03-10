@@ -17,6 +17,41 @@
 			<i class="pi pi-calendar mr-2"></i>Mi Horario
 		</h2>
 
+		<!-- #region Debug panel (environment.debug.horarioSync) -->
+		@if (debugInfo(); as dbg) {
+			<div class="debug-panel">
+				<strong>DEBUG: Server Time Sync</strong>
+				<div class="debug-grid">
+					<span>Hora local (dispositivo):</span>
+					<span>{{ dbg.localTime }} ({{ dbg.localTimezone }})</span>
+
+					<span>Hora corregida (con offset):</span>
+					<span style="font-weight: bold; color: #10b981">{{ dbg.correctedTime }}</span>
+
+					<span>Offset:</span>
+					<span>{{ dbg.offsetFormatted }} ({{ dbg.offsetMs }}ms)</span>
+
+					<span>JS Day (corregido):</span>
+					<span>{{ dbg.jsDay }} (0=Dom, 1=Lun..5=Vie, 6=Sab) — {{ dbg.correctedHours }}:{{ dbg.correctedMinutes }}</span>
+
+					<span>Drift actual:</span>
+					<span [style.color]="dbg.driftOver20min ? '#ef4444' : '#10b981'">
+						{{ dbg.driftMs }}ms — Over 20min: {{ dbg.driftOver20min }}
+					</span>
+
+					<span>Sync source:</span>
+					<span>{{ dbg.syncSource }}</span>
+
+					<span>Raw server response:</span>
+					<span style="word-break: break-all">{{ dbg.rawServerResponse }}</span>
+
+					<span>Sync error:</span>
+					<span style="color: #ef4444">{{ dbg.syncError || '(none)' }}</span>
+				</div>
+			</div>
+		}
+		<!-- #endregion -->
+
 		<!-- #endregion -->
 		<!-- #region Weekly Grid -->
 		<div class="weekly-scroll-wrapper">
@@ -51,38 +86,22 @@
 										[ngStyle]="getBlockStyle(block)"
 										[pTooltip]="getTooltipContent(block)"
 										tooltipPosition="top"
+										(click)="verAsistencia(block)"
 									>
 										<div class="block-content">
 											<div class="curso-nombre">{{ block.cursoNombre }}</div>
-											<div class="block-detail">
-												<i class="pi pi-clock"></i>
-												{{ block.horaInicio }} - {{ block.horaFin }}
+											<div class="block-footer">
+												<div class="block-students">
+													<i class="pi pi-users"></i>
+													{{ block.cantidadEstudiantes }}
+												</div>
+												@if (countdownMap().get(block.id); as cd) {
+													<div class="countdown-badge" [ngClass]="'countdown-' + cd.urgency">
+														<i class="pi pi-clock"></i>
+														{{ cd.label }}
+													</div>
+												}
 											</div>
-											<div class="block-detail">
-												<i class="pi pi-building"></i>
-												{{ block.salonDescripcion }}
-											</div>
-											<div class="block-detail">
-												<i class="pi pi-users"></i>
-												{{ block.cantidadEstudiantes }} estudiantes
-											</div>
-										</div>
-
-										<!-- Acción hover -->
-										<div class="block-action">
-											<button
-												pButton
-												icon="pi pi-eye"
-												class="p-button-rounded p-button-sm action-btn"
-												pTooltip="Ver asistencia"
-												tooltipPosition="top"
-												(click)="verAsistencia(block)"
-												[pt]="{
-													root: {
-														'aria-label': 'Ver asistencia de ' + block.cursoNombre,
-													},
-												}"
-											></button>
 										</div>
 									</div>
 								}

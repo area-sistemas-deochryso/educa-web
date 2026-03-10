@@ -1,8 +1,10 @@
 <!-- * Header -->
 <div class="horarios-header">
 	<div class="title-section">
-		<h1>Gestión de Horarios</h1>
-		<p class="subtitle">Administra los horarios de clases por salón</p>
+		<h1>{{ vm().isAdmin ? 'Gestión de Horarios' : 'Mis Horarios' }}</h1>
+		<p class="subtitle">
+			{{ vm().isAdmin ? 'Administra los horarios de clases por salón' : 'Consulta tus horarios de clases asignados' }}
+		</p>
 	</div>
 
 	<div class="actions">
@@ -18,15 +20,17 @@
 			[pt]="{ root: { 'aria-label': 'Refrescar horarios' } }"
 		></button>
 
-		<button
-			pButton
-			label="Nuevo Horario"
-			icon="pi pi-plus"
-			(click)="onNew()"
-			pTooltip="Crear un nuevo horario de clase"
-			tooltipPosition="bottom"
-			[pt]="{ root: { 'aria-label': 'Crear nuevo horario' } }"
-		></button>
+		@if (vm().isAdmin) {
+			<button
+				pButton
+				label="Nuevo Horario"
+				icon="pi pi-plus"
+				(click)="onNew()"
+				pTooltip="Crear un nuevo horario de clase"
+				tooltipPosition="bottom"
+				[pt]="{ root: { 'aria-label': 'Crear nuevo horario' } }"
+			></button>
+		}
 	</div>
 </div>
 
@@ -140,6 +144,7 @@
 		<app-horarios-weekly-view
 			[blocks]="vm().horariosSemanales"
 			[loading]="vm().loading"
+			[isAdmin]="vm().isAdmin"
 			(blockClick)="onViewDetail($event)"
 			(editClick)="onEdit($event)"
 			(viewDetailClick)="onViewDetail($event)"
@@ -156,6 +161,7 @@
 			[loading]="vm().loading"
 			[totalRecords]="vm().totalRecords"
 			[rows]="vm().pageSize"
+			[isAdmin]="vm().isAdmin"
 			(viewDetail)="onViewDetail($event)"
 			(edit)="onEdit($event)"
 			(toggleEstado)="onToggleEstado($event.id, $event.estadoActual)"
@@ -535,6 +541,7 @@
 	[detalle]="vm().horarioDetalle"
 	[loading]="vm().detailLoading"
 	[profesoresOptions]="vm().profesoresOptions"
+	[isAdmin]="vm().isAdmin"
 	(visibleChange)="vm().detailDrawerVisible && !$event && onCloseDetailDrawer()"
 	(close)="onCloseDetailDrawer()"
 	(edit)="onEdit($event)"
@@ -542,5 +549,7 @@
 	(toggleEstado)="onToggleEstado($event.id, $event.estadoActual)"
 	(asignarProfesor)="onAsignarProfesor($event.horarioId, $event.profesorId)"
 	(asignarTodosEstudiantes)="onAsignarTodosEstudiantes($event)"
+	(desasignarProfesor)="onDesasignarProfesor($event)"
+	(desasignarEstudiante)="onDesasignarEstudiante($event.horarioId, $event.estudianteId)"
 />
 <!-- #endregion -->

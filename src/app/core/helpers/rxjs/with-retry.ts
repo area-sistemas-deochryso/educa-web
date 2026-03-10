@@ -23,7 +23,7 @@ const BASE_DELAY_MS = 1_000;
  * RxJS operator: timeout + retry with exponential backoff.
  *
  * Does NOT catchError. The caller decides what to do with the error.
- * Skips retry for 4xx client errors except 408 and 429.
+ * Skips retry for 4xx client errors except 408 (Request Timeout).
  *
  * @param config Optional retry configuration.
  * @returns Operator function.
@@ -60,7 +60,8 @@ function isNonRetryableError(error: unknown): boolean {
   if (!status) return false;
 
   const isClientError = status >= 400 && status < 500;
-  const isRetryableClientError = status === 408 || status === 429;
+  // 408 Request Timeout is retryable; 429 is NOT (retrying worsens rate limiting)
+  const isRetryableClientError = status === 408;
 
   return isClientError && !isRetryableClientError;
 }

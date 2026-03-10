@@ -14,7 +14,7 @@ import { ToggleSwitch } from 'primeng/toggleswitch';
 import { ConfirmDialogModule } from 'primeng/confirmdialog';
 import { ConfirmationService } from 'primeng/api';
 
-import { AdminUtilsService } from '@shared/services';
+import { UiMappingService } from '@shared/services';
 import { buildDeleteVistaMessage } from '@app/shared/constants';
 
 import { VistasFacade } from './services/vistas.facade';
@@ -45,7 +45,7 @@ export class VistasComponent implements OnInit {
 	// #region Dependencias
 	private facade = inject(VistasFacade);
 	private confirmationService = inject(ConfirmationService);
-	readonly adminUtils = inject(AdminUtilsService);
+	readonly uiMapping = inject(UiMappingService);
 	// #endregion
 
 	// #region Estado del facade

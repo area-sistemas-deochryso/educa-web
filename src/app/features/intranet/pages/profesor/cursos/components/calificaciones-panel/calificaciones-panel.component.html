@@ -1,0 +1,121 @@
+<!-- #region Header -->
+<div class="calificaciones-header">
+	<div class="header-left">
+		<h4><i class="pi pi-chart-bar"></i> Calificaciones</h4>
+		<span class="text-sm text-color-secondary">{{ totalEvaluaciones() }} evaluaciones</span>
+	</div>
+	<div class="header-actions">
+		<button
+			pButton
+			icon="pi pi-cog"
+			class="p-button-outlined p-button-sm"
+			label="Periodos"
+			(click)="configurarPeriodos.emit()"
+			[pt]="{ root: { 'aria-label': 'Configurar periodos' } }"
+		></button>
+		<button
+			pButton
+			icon="pi pi-plus"
+			class="p-button-sm"
+			label="Nueva Evaluación"
+			(click)="crearEvaluacion.emit()"
+			[pt]="{ root: { 'aria-label': 'Crear nueva evaluación' } }"
+		></button>
+	</div>
+</div>
+<!-- #endregion -->
+
+<!-- #region Content -->
+@if (loading()) {
+	<div class="loading-container">
+		<i class="pi pi-spin pi-spinner"></i>
+		<span>Cargando calificaciones...</span>
+	</div>
+} @else if (semanaKeys().length === 0) {
+	<div class="empty-state">
+		<i class="pi pi-chart-bar"></i>
+		<p>No hay evaluaciones configuradas</p>
+		<span class="text-sm text-color-secondary">Crea una evaluación para comenzar a calificar</span>
+	</div>
+} @else {
+	<div class="semanas-list">
+		@for (semanaNum of semanaKeys(); track semanaNum) {
+			<div class="semana-group">
+				<div class="semana-header">
+					<span class="semana-label">Semana {{ semanaNum }}</span>
+				</div>
+				<div class="evaluaciones-list">
+					@for (cal of calificacionesPorSemana().get(semanaNum) ?? []; track cal.id) {
+						<div class="evaluacion-card">
+							<div class="eval-info">
+								<div class="eval-title-row">
+									<p-tag [value]="cal.tipo" [severity]="getTipoSeverity(cal.tipo)" />
+									@if (cal.esGrupal) {
+										<p-tag value="Grupal" severity="warn" icon="pi pi-users" />
+									}
+									<span class="eval-title">{{ cal.titulo }}</span>
+									<span class="eval-peso">{{ getPesoPercent(cal.peso) }}</span>
+								</div>
+								<div class="eval-meta">
+									<span class="text-sm text-color-secondary">
+										<i class="pi pi-calendar"></i>
+										{{ cal.fechaEvaluacion | date : 'dd/MM/yyyy' }}
+									</span>
+									<span class="text-sm text-color-secondary">
+										<i class="pi pi-users"></i>
+										{{ getNotasCount(cal) }} calificados
+									</span>
+									@if (getNotasCount(cal) > 0) {
+										<span class="text-sm text-color-secondary">
+											<i class="pi pi-chart-line"></i>
+											Prom: {{ getPromedio(cal) }}
+										</span>
+									}
+								</div>
+							</div>
+							<div class="eval-actions">
+								<button
+									pButton
+									icon="pi pi-pencil"
+									class="p-button-rounded p-button-text p-button-sm"
+									pTooltip="Calificar estudiantes"
+									tooltipPosition="top"
+									(click)="calificarEstudiantes.emit(cal)"
+									[pt]="{ root: { 'aria-label': 'Calificar estudiantes' } }"
+								></button>
+								<button
+									pButton
+									[icon]="cal.esGrupal ? 'pi pi-user' : 'pi pi-users'"
+									class="p-button-rounded p-button-text p-button-sm"
+									[pTooltip]="cal.esGrupal ? 'Cambiar a individual' : 'Cambiar a grupal'"
+									tooltipPosition="top"
+									(click)="cambiarTipo.emit(cal)"
+									[pt]="{ root: { 'aria-label': cal.esGrupal ? 'Cambiar a individual' : 'Cambiar a grupal' } }"
+								></button>
+								<button
+									pButton
+									icon="pi pi-file-edit"
+									class="p-button-rounded p-button-text p-button-sm"
+									pTooltip="Editar evaluación"
+									tooltipPosition="top"
+									(click)="editarEvaluacion.emit(cal)"
+									[pt]="{ root: { 'aria-label': 'Editar evaluación' } }"
+								></button>
+								<button
+									pButton
+									icon="pi pi-trash"
+									class="p-button-rounded p-button-text p-button-danger p-button-sm"
+									pTooltip="Eliminar evaluación"
+									tooltipPosition="top"
+									(click)="eliminarEvaluacion.emit(cal)"
+									[pt]="{ root: { 'aria-label': 'Eliminar evaluación' } }"
+								></button>
+							</div>
+						</div>
+					}
+				</div>
+			</div>
+		}
+	</div>
+}
+<!-- #endregion -->

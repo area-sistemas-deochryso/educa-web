@@ -1,0 +1,121 @@
+// #region Card layout
+.curso-card {
+	background: var(--surface-card);
+	border: 1px solid var(--surface-border);
+	border-radius: 12px;
+	padding: 1.25rem;
+}
+
+.card-header {
+	display: flex;
+	align-items: flex-start;
+	justify-content: space-between;
+	gap: 1rem;
+	margin-bottom: 1rem;
+}
+
+.card-title {
+	h3 {
+		margin: 0 0 0.25rem;
+		font-size: 1.1rem;
+	}
+}
+
+.card-promedio {
+	display: flex;
+	flex-direction: column;
+	align-items: flex-end;
+	gap: 0.25rem;
+
+	.promedio-tag {
+		font-size: 1.1rem;
+	}
+}
+// #endregion
+
+// #region Promedios grid
+.promedios-grid {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 0.5rem;
+	margin-bottom: 0.5rem;
+}
+
+.promedio-item {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	gap: 0.25rem;
+	min-width: 50px;
+	padding: 0.5rem;
+	background: var(--surface-ground);
+	border-radius: 8px;
+}
+
+.promedio-label {
+	font-size: 0.75rem;
+	font-weight: 600;
+	color: var(--text-color-secondary);
+}
+// #endregion
+
+// #region Evaluaciones
+.evaluaciones-list {
+	display: flex;
+	flex-direction: column;
+	gap: 0.5rem;
+}
+
+.eval-row {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	padding: 0.5rem 0.75rem;
+	background: var(--surface-ground);
+	border-radius: 8px;
+	gap: 0.75rem;
+}
+
+.eval-info {
+	flex: 1;
+	min-width: 0;
+}
+
+.eval-titulo {
+	font-weight: 500;
+	font-size: 0.9rem;
+	display: block;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+}
+
+.eval-meta {
+	display: flex;
+	align-items: center;
+	gap: 0.5rem;
+	margin-top: 0.25rem;
+}
+
+.eval-nota {
+	flex-shrink: 0;
+
+	.nota-tag {
+		font-size: 0.95rem;
+		font-weight: 600;
+	}
+}
+// #endregion
+
+// #region Responsive
+@media (max-width: 576px) {
+	.card-header {
+		flex-direction: column;
+	}
+
+	.card-promedio {
+		flex-direction: row;
+		align-items: center;
+	}
+}
+// #endregion

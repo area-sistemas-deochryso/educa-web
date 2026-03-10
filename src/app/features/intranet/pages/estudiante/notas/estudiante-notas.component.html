@@ -1,0 +1,84 @@
+<!-- #region Loading -->
+@if (vm().loading) {
+	<div class="flex justify-content-center p-5">
+		<p-progressSpinner strokeWidth="4" />
+	</div>
+} @else if (vm().error) {
+	<div class="flex flex-column align-items-center p-5 text-color-secondary">
+		<i class="pi pi-exclamation-triangle text-4xl mb-3 text-yellow-600"></i>
+		<p class="font-semibold">{{ vm().error }}</p>
+		<button pButton label="Reintentar" icon="pi pi-refresh" class="p-button-outlined mt-2" (click)="onRetry()"></button>
+	</div>
+} @else if (vm().isEmpty) {
+	<div class="flex flex-column align-items-center p-5 text-color-secondary">
+		<i class="pi pi-book text-4xl mb-3"></i>
+		<p class="font-semibold">No tienes notas registradas</p>
+		<span class="text-sm">Las notas aparecerán aquí cuando tus profesores las registren</span>
+	</div>
+} @else {
+	<!-- #endregion -->
+
+	<!-- #region Header -->
+	<div class="notas-page p-4">
+		<div class="notas-header">
+			<h2 class="mt-0 mb-0">Mis Notas</h2>
+			<div class="notas-actions">
+				<button
+					pButton
+					label="Simular"
+					icon="pi pi-calculator"
+					class="p-button-outlined p-button-help"
+					(click)="onOpenSimulador()"
+					[disabled]="!vm().selectedCurso"
+				></button>
+			</div>
+		</div>
+
+		<!-- #region Filters -->
+		<div class="notas-filters">
+			@if (vm().cursoOptions.length > 1) {
+				<p-select
+					[options]="vm().cursoOptions"
+					[ngModel]="vm().selectedCursoIndex"
+					(ngModelChange)="onCursoChange($event)"
+					optionLabel="label"
+					optionValue="value"
+					placeholder="Seleccionar curso"
+					appendTo="body"
+					class="curso-select"
+				/>
+			}
+			<p-selectButton
+				[options]="vistaOptions"
+				[ngModel]="vm().vistaActual"
+				(ngModelChange)="onVistaChange($event)"
+				optionLabel="label"
+				optionValue="value"
+			/>
+		</div>
+		<!-- #endregion -->
+
+		<!-- #region Course content -->
+		@if (vm().selectedCurso; as curso) {
+			<app-notas-curso-card
+				[curso]="curso"
+				[vistaActual]="vm().vistaActual"
+			/>
+		}
+		<!-- #endregion -->
+	</div>
+
+	<!-- #region Simulador -->
+	@if (vm().selectedCurso; as curso) {
+		<app-simulador-notas
+			[visible]="vm().simuladorVisible"
+			[curso]="curso"
+			[simulaciones]="vm().simulaciones[curso.cursoNombre]"
+			[promedioSimulado]="vm().promedioSimulado"
+			(visibleChange)="onCloseSimulador()"
+			(notaChange)="onSimulacionChange($event)"
+			(resetSimulacion)="onResetSimulacion()"
+		/>
+	}
+	<!-- #endregion -->
+}

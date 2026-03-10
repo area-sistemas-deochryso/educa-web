@@ -1,5 +1,8 @@
-import { Component, ChangeDetectionStrategy, inject, OnInit } from '@angular/core';
+import { Component, ChangeDetectionStrategy, inject, OnInit, DestroyRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { ActivatedRoute, Router, RouterLink } from '@angular/router';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { filter, take } from 'rxjs';
 import { TableModule } from 'primeng/table';
 import { TagModule } from 'primeng/tag';
 import { ButtonModule } from 'primeng/button';
@@ -19,6 +22,7 @@ import { HorarioProfesorDto } from '../models';
 		ButtonModule,
 		TooltipModule,
 		ProgressSpinnerModule,
+		RouterLink,
 		CursoContentReadonlyDialogComponent,
 	],
 	changeDetection: ChangeDetectionStrategy.OnPush,
@@ -57,10 +61,20 @@ import { HorarioProfesorDto } from '../models';
 						<tr>
 							<td class="font-semibold">{{ horario.cursoNombre }}</td>
 							<td>
-								<p-tag [value]="horario.salonDescripcion" severity="info" />
+								<a routerLink="/intranet/estudiante/salones" class="no-underline">
+									<p-tag [value]="horario.salonDescripcion" severity="info" />
+								</a>
 							</td>
-							<td>{{ horario.diaSemanaDescripcion }}</td>
-							<td>{{ horario.horaInicio }} - {{ horario.horaFin }}</td>
+							<td>
+								<a routerLink="/intranet/estudiante/horarios" class="text-color hover:text-primary no-underline">
+									{{ horario.diaSemanaDescripcion }}
+								</a>
+							</td>
+							<td>
+								<a routerLink="/intranet/estudiante/horarios" class="text-color hover:text-primary no-underline">
+									{{ horario.horaInicio }} - {{ horario.horaFin }}
+								</a>
+							</td>
 							<td>{{ horario.profesorNombreCompleto ?? '-' }}</td>
 							<td>
 								<button
@@ -88,14 +102,34 @@ import { HorarioProfesorDto } from '../models';
 })
 export class EstudianteCursosComponent implements OnInit {
 	private readonly facade = inject(EstudianteCursosFacade);
+	private readonly route = inject(ActivatedRoute);
+	private readonly router = inject(Router);
+	private readonly destroyRef = inject(DestroyRef);
 
 	readonly vm = this.facade.vm;
 
 	ngOnInit(): void {
 		this.facade.loadHorarios();
+		this.handleHorarioQueryParam();
 	}
 
 	onVerContenido(horario: HorarioProfesorDto): void {
 		this.facade.loadContenido(horario.id);
+	}
+
+	private handleHorarioQueryParam(): void {
+		this.route.queryParams
+			.pipe(
+				filter((params) => !!params['horarioId']),
+				take(1),
+				takeUntilDestroyed(this.destroyRef),
+			)
+			.subscribe((params) => {
+				const horarioId = Number(params['horarioId']);
+				if (horarioId) {
+					this.facade.loadContenido(horarioId);
+					this.router.navigate([], { queryParams: {}, replaceUrl: true });
+				}
+			});
 	}
 }

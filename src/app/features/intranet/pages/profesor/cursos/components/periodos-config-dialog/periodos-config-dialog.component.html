@@ -1,0 +1,100 @@
+<p-dialog
+	header="Configurar Periodos"
+	[visible]="visible()"
+	(visibleChange)="onVisibleChange($event)"
+	[modal]="true"
+	[style]="{ width: '520px', maxWidth: '95vw' }"
+	[closable]="true"
+>
+	<!-- #region Existing periods -->
+	@if (periodos().length > 0) {
+		<div class="periodos-list">
+			<h5>Periodos configurados</h5>
+			@for (periodo of periodos(); track periodo.id) {
+				<div class="periodo-item">
+					<span class="periodo-badge">{{ periodo.orden }}</span>
+					<div class="periodo-info">
+						<span class="periodo-nombre">{{ periodo.nombre }}</span>
+						<span class="periodo-semanas">
+							Semana {{ periodo.semanaInicio }} - {{ periodo.semanaFin }}
+						</span>
+					</div>
+					<button
+						pButton
+						icon="pi pi-trash"
+						class="p-button-rounded p-button-text p-button-danger p-button-sm"
+						pTooltip="Eliminar periodo"
+						tooltipPosition="top"
+						(click)="onEliminar(periodo.id)"
+						[loading]="saving()"
+						[pt]="{ root: { 'aria-label': 'Eliminar periodo' } }"
+					></button>
+				</div>
+			}
+		</div>
+	} @else {
+		<div class="empty-state">
+			<i class="pi pi-calendar"></i>
+			<p>Sin periodos configurados</p>
+			<span class="empty-hint">Los promedios se mostrarán solo por semana</span>
+		</div>
+	}
+	<!-- #endregion -->
+
+	<!-- #region New period form -->
+	<div class="new-periodo-form">
+		<div class="section-title-row">
+			<h5>Agregar periodo</h5>
+			<i
+				class="pi pi-question-circle help-icon"
+				pTooltip="Los periodos agrupan semanas para calcular promedios. Ej: Bimestre 1 = Semanas 1-4"
+				tooltipPosition="top"
+			></i>
+		</div>
+		<div class="form-grid">
+			<div class="form-field nombre-field">
+				<label for="per-nombre">Nombre</label>
+				<input
+					pInputText
+					id="per-nombre"
+					[ngModel]="newPeriodo().nombre"
+					(ngModelChange)="updateNewPeriodo('nombre', $event)"
+					placeholder="Ej: Bimestre 1"
+					class="w-full"
+				/>
+			</div>
+			<div class="form-field semana-field">
+				<label for="per-inicio">Semana inicio</label>
+				<p-inputNumber
+					id="per-inicio"
+					[ngModel]="newPeriodo().semanaInicio"
+					(ngModelChange)="updateNewPeriodo('semanaInicio', $event)"
+					[min]="1"
+					[max]="totalSemanas()"
+					class="w-full"
+				/>
+			</div>
+			<div class="form-field semana-field">
+				<label for="per-fin">Semana fin</label>
+				<p-inputNumber
+					id="per-fin"
+					[ngModel]="newPeriodo().semanaFin"
+					(ngModelChange)="updateNewPeriodo('semanaFin', $event)"
+					[min]="1"
+					[max]="totalSemanas()"
+					class="w-full"
+				/>
+			</div>
+		</div>
+		<button
+			pButton
+			label="Agregar periodo"
+			icon="pi pi-plus"
+			class="p-button-sm p-button-success add-periodo-btn"
+			[loading]="saving()"
+			[disabled]="!isFormValid()"
+			(click)="onCrear()"
+		></button>
+	</div>
+	<!-- #endregion -->
+</p-dialog>

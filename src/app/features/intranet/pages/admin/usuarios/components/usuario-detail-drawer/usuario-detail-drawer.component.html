@@ -24,7 +24,7 @@
 
 			<p-tag
 				[value]="usuario()!.rol"
-				[severity]="adminUtils.getRolSeverity(usuario()!.rol)"
+				[severity]="uiMapping.getRolSeverity(usuario()!.rol)"
 			/>
 
 			<!-- * Basic info list -->
@@ -37,7 +37,7 @@
 					<span class="info-label">Estado</span>
 					<p-tag
 						[value]="usuario()!.estado ? 'Activo' : 'Inactivo'"
-						[severity]="adminUtils.getEstadoSeverity(usuario()!.estado)"
+						[severity]="uiMapping.getEstadoSeverity(usuario()!.estado)"
 					/>
 				</div>
 				@if (usuario()!.correo) {

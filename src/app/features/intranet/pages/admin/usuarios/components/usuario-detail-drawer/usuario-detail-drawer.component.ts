@@ -5,7 +5,7 @@ import { ButtonModule } from 'primeng/button';
 import { DrawerModule } from 'primeng/drawer';
 import { TagModule } from 'primeng/tag';
 import { UsuarioDetalle } from '@core/services';
-import { AdminUtilsService } from '@shared/services';
+import { UiMappingService } from '@shared/services';
 
 /**
  * Componente presentacional para el drawer de detalles de usuario
@@ -22,7 +22,7 @@ import { AdminUtilsService } from '@shared/services';
 	changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class UsuarioDetailDrawerComponent {
-	readonly adminUtils = inject(AdminUtilsService);
+	readonly uiMapping = inject(UiMappingService);
 
 	// * Inputs for visibility and selected user.
 	readonly visible = input.required<boolean>();

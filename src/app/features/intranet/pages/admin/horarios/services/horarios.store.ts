@@ -138,6 +138,20 @@ export class HorariosStore {
   // #region Usuario actual
   readonly currentUser = this.authStore.user;
 
+  /** true si el usuario es Director o Asistente Administrativo */
+  readonly isAdmin = computed(() => {
+    const user = this.currentUser();
+    if (!user) return false;
+    return user.rol === 'Director' || user.rol === 'Asistente Administrativo';
+  });
+
+  /** ID del profesor logueado (null si no es profesor) */
+  readonly currentProfesorId = computed(() => {
+    const user = this.currentUser();
+    if (!user || user.rol !== 'Profesor') return null;
+    return user.entityId;
+  });
+
   // #endregion
   // #region Computed - Opciones de dropdowns
 
@@ -378,6 +392,8 @@ export class HorariosStore {
     filtroDiaSemana: this._state().filtroDiaSemana,
     filtroEstadoActivo: this._state().filtroEstadoActivo,
     currentUser: this.currentUser(),
+    isAdmin: this.isAdmin(),
+    currentProfesorId: this.currentProfesorId(),
     vistaActual: this.vistaActual(),
     vistaSemanalHabilitada: this.vistaSemanalHabilitada(),
     filtroDiaSemanaHabilitado: this.filtroDiaSemanaHabilitado(),
@@ -462,6 +478,42 @@ export class HorariosStore {
   // #region Comandos de mutación - Detalle
   setHorarioDetalle(detalle: HorarioDetalleResponseDto | null): void {
     this._state.update((s) => ({ ...s, horarioDetalle: detalle }));
+  }
+
+  /**
+   * Mutación quirúrgica: quitar profesor del detalle local
+   */
+  clearDetalleProfesor(): void {
+    this._state.update((s) => {
+      if (!s.horarioDetalle) return s;
+      return {
+        ...s,
+        horarioDetalle: {
+          ...s.horarioDetalle,
+          profesorId: null,
+          profesorNombreCompleto: null,
+          profesorDni: null,
+        },
+      };
+    });
+  }
+
+  /**
+   * Mutación quirúrgica: quitar un estudiante del detalle local
+   */
+  removeEstudianteFromDetalle(estudianteId: number): void {
+    this._state.update((s) => {
+      if (!s.horarioDetalle) return s;
+      const estudiantes = s.horarioDetalle.estudiantes.filter((e) => e.id !== estudianteId);
+      return {
+        ...s,
+        horarioDetalle: {
+          ...s.horarioDetalle,
+          estudiantes,
+          cantidadEstudiantes: estudiantes.length,
+        },
+      };
+    });
   }
 
   // #endregion

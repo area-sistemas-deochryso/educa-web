@@ -1,0 +1,77 @@
+<p-dialog
+	header="Cerrar Periodo — {{ nivel() }}"
+	[visible]="visible()"
+	(visibleChange)="onVisibleChange($event)"
+	[modal]="true"
+	[style]="{ width: '520px', maxWidth: '95vw' }"
+	[contentStyle]="{ padding: '1.25rem 2rem' }"
+	[closable]="true"
+>
+	<!-- #region Warning -->
+	<p-message
+		severity="warn"
+		text="Esta acción es irreversible. Se crearán los salones del próximo año automáticamente."
+		styleClass="mb-4 w-full"
+	/>
+	<!-- #endregion -->
+
+	<!-- #region Resumen -->
+	@if (periodo(); as periodo) {
+		<div class="mb-4">
+			<h4 class="text-lg font-semibold mb-3">{{ periodo.nombre }}</h4>
+			<div class="info-grid">
+				<div class="info-row">
+					<span class="info-label">Estado actual</span>
+					<p-tag
+						[value]="periodo.estadoCierre === 'CERRADO' ? 'Cerrado' : 'Abierto'"
+						[severity]="periodo.estadoCierre === 'CERRADO' ? 'success' : 'info'"
+					/>
+				</div>
+				<div class="info-row">
+					<span class="info-label">Total salones</span>
+					<span class="info-value">{{ estadisticas().totalSalones }}</span>
+				</div>
+				<div class="info-row">
+					<span class="info-label">Total estudiantes</span>
+					<span class="info-value">{{ estadisticas().totalEstudiantes }}</span>
+				</div>
+				<div class="info-row">
+					<span class="info-label">Pendientes de aprobación</span>
+					<span class="info-value text-orange-500">{{ estadisticas().totalPendientes }}</span>
+				</div>
+			</div>
+		</div>
+	}
+	<!-- #endregion -->
+
+	<!-- #region Al cerrar -->
+	<div class="mb-4 text-sm">
+		<p class="font-medium mb-1">Al cerrar el periodo se:</p>
+		<ul class="pl-3 text-color-secondary consequences-list">
+			<li>Crearán automáticamente los salones del próximo año para este nivel</li>
+			<li>Habilitará la aprobación/desaprobación de estudiantes</li>
+			<li>Bloqueará la edición de calificaciones y asistencia del periodo</li>
+		</ul>
+	</div>
+	<!-- #endregion -->
+
+	<!-- #region Footer -->
+	<ng-template #footer>
+		<button
+			pButton
+			label="Cancelar"
+			class="p-button-text"
+			(click)="onVisibleChange(false)"
+		></button>
+		<button
+			pButton
+			label="Cerrar Periodo"
+			icon="pi pi-lock"
+			class="p-button-danger"
+			[loading]="loading()"
+			[disabled]="!periodo() || periodo()?.estadoCierre === 'CERRADO'"
+			(click)="onConfirmar()"
+		></button>
+	</ng-template>
+	<!-- #endregion -->
+</p-dialog>

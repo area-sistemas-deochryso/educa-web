@@ -10,29 +10,37 @@
 				<p class="sessions-label">Sesiones guardadas</p>
 
 				@for (session of storedSessions(); track session.sessionId) {
-					<div class="session-card-wrapper">
-						<button
-							type="button"
-							class="session-card"
-							[disabled]="isLoading()"
-							(click)="quickLogin(session)"
-						>
-							<span class="session-avatar">{{ getInitials(session.nombreCompleto) }}</span>
-							<span class="session-info">
-								<span class="session-name">{{ session.nombreCompleto }}</span>
-								<span class="session-role">{{ session.rol }}</span>
-							</span>
-							<i class="pi pi-sign-in session-arrow"></i>
-						</button>
-						<button
-							type="button"
-							class="session-remove"
-							aria-label="Eliminar sesión guardada"
-							[disabled]="isLoading()"
-							(click)="removeSession($event, session)"
-						>
-							<i class="pi pi-times"></i>
-						</button>
+					<div class="session-card">
+						<span class="session-avatar">{{ getInitials(session.nombreCompleto) }}</span>
+						<span class="session-info">
+							<span class="session-name">{{ session.nombreCompleto }}</span>
+							<span class="session-role">{{ session.rol }}</span>
+						</span>
+						<!-- Actions: visible on hover -->
+						<div class="session-actions">
+							<button
+								type="button"
+								class="action-btn action-login"
+								aria-label="Iniciar sesión"
+								pTooltip="Iniciar sesión"
+								tooltipPosition="top"
+								[disabled]="isLoading()"
+								(click)="quickLogin(session)"
+							>
+								<i class="pi pi-sign-in"></i>
+							</button>
+							<button
+								type="button"
+								class="action-btn action-remove"
+								aria-label="Cerrar sesión"
+								pTooltip="Cerrar sesión"
+								tooltipPosition="top"
+								[disabled]="isLoading()"
+								(click)="removeSession($event, session)"
+							>
+								<i class="pi pi-times"></i>
+							</button>
+						</div>
 					</div>
 				}
 
@@ -49,14 +57,6 @@
 
 		<!-- #region Login Form -->
 		@if (storedSessions().length === 0 || showLoginForm()) {
-			<!-- Back to sessions if available -->
-			@if (storedSessions().length > 0) {
-				<button type="button" class="back-to-sessions" (click)="backToSessions()">
-					<i class="pi pi-arrow-left"></i>
-					<span>Volver a sesiones guardadas</span>
-				</button>
-			}
-
 			<form class="login-form" [formGroup]="loginForm" (ngSubmit)="onLogin()" autocomplete="on">
 				<!-- ! Error summary -->
 				<app-login-error-message [message]="errorMessage()" [show]="showError()" />
@@ -107,12 +107,19 @@
 						optionValue="value"
 						placeholder="Seleccione rol"
 						[disabled]="isDisabled"
+						[tabindex]="0"
 						class="w-full"
 					/>
 				</app-login-role-selector>
 
-				<!-- * Remember me -->
+				<!-- * Options row: back to sessions (left) + remember me (right) -->
 				<app-login-options>
+					@if (storedSessions().length > 0) {
+						<button type="button" class="back-to-sessions" (click)="backToSessions()">
+							<i class="pi pi-arrow-left"></i>
+							<span>Sesiones guardadas</span>
+						</button>
+					}
 					<label class="remember-toggle">
 						<span>Recordar sesión</span>
 						<p-toggleSwitch formControlName="rememberMe" />

@@ -1,5 +1,3 @@
-// #region Implementation
-export * from './asistencia.models';
-// * Asistencia service exports.
-export * from './asistencia.service';
-// #endregion
+// Re-export from shared — asistencia is a cross-feature domain service, not core infrastructure.
+// Barrel kept here for backwards compatibility with existing @core/services imports.
+export * from '@shared/services/asistencia';

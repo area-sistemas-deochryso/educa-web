@@ -25,6 +25,7 @@ export class HorariosListViewComponent {
 	readonly loading = input<boolean>(false);
 	readonly totalRecords = input(0);
 	readonly rows = input(10);
+	readonly isAdmin = input<boolean>(true);
 
 	// * Row action outputs.
 	readonly viewDetail = output<number>();

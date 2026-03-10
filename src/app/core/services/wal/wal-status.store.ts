@@ -31,6 +31,8 @@ export class WalStatusStore {
 	private readonly _lastSyncTime = signal<number | null>(null);
 	/** Failed entries list. */
 	private readonly _failedEntries = signal<WalEntry[]>([]);
+	/** Entries requiring schema migration. */
+	private readonly _migrationCount = signal(0);
 
 	// #endregion
 
@@ -46,6 +48,8 @@ export class WalStatusStore {
 	readonly lastSyncTime = this._lastSyncTime.asReadonly();
 	/** Failed entries list. */
 	readonly failedEntries = this._failedEntries.asReadonly();
+	/** Migration entries count. */
+	readonly migrationCount = this._migrationCount.asReadonly();
 
 	// #endregion
 
@@ -60,17 +64,22 @@ export class WalStatusStore {
 		() => this._pendingCount() > 0 || this._inFlightCount() > 0,
 	);
 
+	/** True when there are entries requiring migration. */
+	readonly hasMigrations = computed(() => this._migrationCount() > 0);
+
 	/** Aggregated view model for UI binding. */
 	readonly vm = computed(() => ({
 		pendingCount: this._pendingCount(),
 		inFlightCount: this._inFlightCount(),
 		failedCount: this._failedCount(),
+		migrationCount: this._migrationCount(),
 		isSyncing: this._isSyncing(),
 		lastSyncTime: this._lastSyncTime(),
 		failedEntries: this._failedEntries(),
 		hasPending: this.hasPending(),
 		hasFailures: this.hasFailures(),
 		hasActivity: this.hasActivity(),
+		hasMigrations: this.hasMigrations(),
 	}));
 
 	// #endregion
@@ -98,15 +107,17 @@ export class WalStatusStore {
 	 */
 	async refresh(): Promise<void> {
 		try {
-			const [stats, failedEntries] = await Promise.all([
+			const [stats, failedEntries, migrationEntries] = await Promise.all([
 				this.wal.getStats(),
 				this.wal.getFailedEntries(),
+				this.wal.getMigrationEntries(),
 			]);
 
 			this._pendingCount.set(stats.pending);
 			this._inFlightCount.set(stats.inFlight);
 			this._failedCount.set(stats.failed);
 			this._failedEntries.set(failedEntries);
+			this._migrationCount.set(migrationEntries.length);
 			this._isSyncing.set(this.syncEngine.isProcessing);
 		} catch {
 			// Silently handle. WAL might not be available (SSR, no IndexedDB)
@@ -131,6 +142,17 @@ export class WalStatusStore {
 	async discardEntry(id: string): Promise<void> {
 		await this.wal.discardEntry(id);
 		await this.refresh();
+	}
+
+	/**
+	 * Discard all entries requiring schema migration and refresh state.
+	 *
+	 * @returns Number of entries discarded.
+	 */
+	async discardMigrationEntries(): Promise<number> {
+		const count = await this.wal.discardMigrationEntries();
+		await this.refresh();
+		return count;
 	}
 
 	// #endregion

@@ -1,0 +1,335 @@
+<!-- #region Header -->
+<div class="profile-header">
+	<h3><i class="pi pi-chart-bar"></i> Vista Previa del Test</h3>
+	<span class="profile-type">{{ testType() | uppercase }}</span>
+</div>
+<!-- #endregion -->
+
+<!-- #region Chart -->
+<div class="chart-area">
+	<div class="chart-y-axis">
+		<span class="y-label">{{ profile().peakVus }} VUs</span>
+		<span class="y-label y-mid">{{ halfPeakVus() }}</span>
+		<span class="y-label">0</span>
+	</div>
+	<div class="chart-bars">
+		@for (bar of chartBars(); track $index) {
+			<div
+				class="bar-wrapper"
+				[style.width.%]="bar.widthPercent"
+				[pTooltip]="bar.vus + ' VUs durante ' + bar.label"
+				tooltipPosition="top"
+			>
+				<div class="bar" [style.height.%]="bar.heightPercent" [style.--bar-delay]="$index * 0.6 + 's'">
+					<div class="bar-shimmer"></div>
+					@if (bar.vus > 0) {
+						<span class="bar-vus">{{ bar.vus }}</span>
+					}
+				</div>
+				<span class="bar-label">{{ bar.label }}</span>
+			</div>
+		}
+	</div>
+</div>
+<!-- #endregion -->
+
+<!-- #region Timeline -->
+<div class="timeline">
+	<div class="timeline-start">
+		<i class="pi pi-play"></i> Inicio
+	</div>
+	<div class="timeline-line"></div>
+	<div class="timeline-end">
+		{{ profile().totalDuration }} <i class="pi pi-flag"></i>
+	</div>
+</div>
+<!-- #endregion -->
+
+<!-- #region Stats -->
+<div class="profile-stats">
+	<div class="stat" pTooltip="Duración total del test" tooltipPosition="top">
+		<i class="pi pi-clock"></i>
+		<div class="stat-content">
+			<span class="stat-value">{{ profile().totalDuration }}</span>
+			<span class="stat-label">Duración</span>
+		</div>
+	</div>
+	<div class="stat" pTooltip="Máximo de usuarios virtuales simultáneos" tooltipPosition="top">
+		<i class="pi pi-users"></i>
+		<div class="stat-content">
+			<span class="stat-value">{{ profile().peakVus }}</span>
+			<span class="stat-label">Pico VUs</span>
+		</div>
+	</div>
+	<div class="stat" pTooltip="Endpoints habilitados que se testearán" tooltipPosition="top">
+		<i class="pi pi-link"></i>
+		<div class="stat-content">
+			<span class="stat-value">{{ profile().endpointsCount }}</span>
+			<span class="stat-label">Endpoints</span>
+		</div>
+	</div>
+	<div
+		class="stat"
+		pTooltip="Estimación de requests totales (cada VU ejecuta ~1 iteración cada ~2s con N endpoints)"
+		tooltipPosition="top"
+	>
+		<i class="pi pi-send"></i>
+		<div class="stat-content">
+			<span class="stat-value">{{ formattedRequests() }}</span>
+			<span class="stat-label">Requests est.</span>
+		</div>
+	</div>
+</div>
+<!-- #endregion -->
+
+<!-- #region Simulation Flow -->
+@if (endpoints().length > 0) {
+	<div
+		class="simulation-section"
+		[style.--total-steps]="totalFlowSteps()"
+		[style.--cycle-duration]="cycleDuration() + 's'"
+	>
+		<div class="simulation-title">
+			<i class="pi pi-sync"></i> Simulación del flujo
+		</div>
+
+		<!-- Phase activity bar (siempre visible) -->
+		<div class="phase-bar">
+			<div class="phase-bar-label">Fases</div>
+			<div class="phase-bar-track">
+				@for (seg of phaseSegments(); track $index) {
+					<div
+						class="phase-segment"
+						[style.width.%]="seg.widthPercent"
+						[style.--intensity]="seg.intensity"
+						[pTooltip]="seg.label + ' VUs en ' + seg.duration"
+						tooltipPosition="top"
+					>
+						<div class="segment-fill"></div>
+						<span class="segment-label">{{ seg.targetVus }}</span>
+					</div>
+				}
+				<div class="phase-sweep"></div>
+			</div>
+		</div>
+
+		@if (usePhaseTabs()) {
+			<!-- Tabs por fase: cada tab muestra su propio flujo -->
+			<p-tabs [value]="0">
+				<p-tablist>
+					@for (stage of stages(); track $index; let si = $index) {
+						<p-tab [value]="si">
+							Fase {{ si + 1 }}: {{ stage.target }} VUs ({{ stage.duration }})
+						</p-tab>
+					}
+				</p-tablist>
+				<p-tabpanels>
+					@for (stage of stages(); track $index; let si = $index) {
+						<p-tabpanel [value]="si">
+							<div
+								class="simulation-flow phase-flow"
+								[style.--cycle-duration]="phaseCycleDurations()[si] + 's'"
+							>
+								<!-- VU pool for this phase -->
+								<div class="vu-pool">
+									<div class="vu-pool-header">
+										<i class="pi pi-users"></i>
+										<span>{{ stage.target }} VUs en esta fase</span>
+									</div>
+									<div class="vu-dots-grid">
+										@for (dot of phaseVuDots()[si]; track $index) {
+											<span class="vu-dot" [style.--dot-index]="$index"></span>
+										}
+									</div>
+								</div>
+
+								<!-- Request stream -->
+								<div class="request-stream">
+									<div class="stream-line">
+										<span class="stream-particle"></span>
+										<span class="stream-particle"></span>
+										<span class="stream-particle"></span>
+									</div>
+									<span class="stream-label">cada VU ejecuta por iteración</span>
+								</div>
+
+								<!-- Auth step -->
+								@if (hasCredentials()) {
+									<div class="flow-step flow-step-auth" style="--step-index: 0">
+										<div class="step-connector">
+											<div class="step-dot dot-auth"></div>
+											<div class="step-line"></div>
+										</div>
+										<div class="step-content">
+											<span class="step-badge badge-auth">AUTH</span>
+											<span class="step-text">Token aleatorio del pool</span>
+										</div>
+									</div>
+								}
+
+								<!-- Endpoints de esta fase -->
+								@for (ep of phaseEndpoints()[si]; track $index; let i = $index) {
+									<div
+										class="flow-step"
+										[style.--step-index]="hasCredentials() ? i + 1 : i"
+									>
+										<div class="step-connector">
+											<div class="step-dot" [class]="'dot-' + ep.method.toLowerCase()"></div>
+											<div class="step-line"></div>
+										</div>
+										<div class="step-content">
+											<div class="step-main">
+												<span class="step-badge" [class]="methodClass()[ep.method]">{{ ep.method }}</span>
+												<span class="step-path">{{ ep.path || '/api/...' }}</span>
+											</div>
+											@if (hasBody(ep)) {
+												<div class="step-body-hint">
+													<i class="pi pi-file-edit"></i>
+													<code>{{ bodyHint(ep) }}</code>
+												</div>
+											}
+											@if (ep.name) {
+												<div class="step-check">
+													<i class="pi pi-check-circle"></i> check: {{ ep.name }}
+												</div>
+											}
+										</div>
+									</div>
+								}
+
+								<!-- Sleep -->
+								<div class="flow-step flow-step-sleep" [style.--step-index]="phaseEndpoints()[si].length + (hasCredentials() ? 1 : 0)">
+									<div class="step-connector">
+										<div class="step-dot dot-sleep"></div>
+										<div class="step-line step-line-dashed"></div>
+									</div>
+									<div class="step-content">
+										<div class="step-main">
+											<span class="step-badge badge-sleep">SLEEP</span>
+											<span class="step-text">1–3s aleatorio</span>
+										</div>
+									</div>
+								</div>
+
+								<!-- Phase info -->
+								<div class="flow-repeat">
+									<i class="pi pi-replay flow-repeat-icon"></i>
+									<span>Repetir durante {{ stage.duration }}</span>
+								</div>
+
+								@if (stage.endpointIndices.length === 0) {
+									<div class="phase-all-eps-hint">
+										<i class="pi pi-info-circle"></i> Todos los endpoints habilitados
+									</div>
+								}
+							</div>
+						</p-tabpanel>
+					}
+				</p-tabpanels>
+			</p-tabs>
+		} @else {
+			<!-- Vista sin tabs: flujo único (como antes) -->
+			<div class="simulation-flow">
+				<!-- VU pool -->
+				<div class="vu-pool">
+					<div class="vu-pool-header">
+						<i class="pi pi-users"></i>
+						<span>{{ profile().peakVus }} usuarios virtuales simultáneos</span>
+					</div>
+					<div class="vu-dots-grid">
+						@for (dot of vuDots(); track $index) {
+							<span class="vu-dot" [style.--dot-index]="$index"></span>
+						}
+					</div>
+				</div>
+
+				<!-- Request stream indicator -->
+				<div class="request-stream">
+					<div class="stream-line">
+						<span class="stream-particle"></span>
+						<span class="stream-particle"></span>
+						<span class="stream-particle"></span>
+					</div>
+					<span class="stream-label">cada VU ejecuta por iteración</span>
+				</div>
+
+				<!-- Auth step -->
+				@if (hasCredentials()) {
+					<div class="flow-step flow-step-auth" style="--step-index: 0">
+						<div class="step-connector">
+							<div class="step-dot dot-auth"></div>
+							<div class="step-line"></div>
+						</div>
+						<div class="step-content">
+							<span class="step-badge badge-auth">AUTH</span>
+							<span class="step-text">Token aleatorio del pool de credenciales</span>
+						</div>
+					</div>
+				}
+
+				<!-- Endpoint steps -->
+				@for (ep of endpoints(); track $index; let i = $index) {
+					<div
+						class="flow-step"
+						[style.--step-index]="hasCredentials() ? i + 1 : i"
+					>
+						<div class="step-connector">
+							<div class="step-dot" [class]="'dot-' + ep.method.toLowerCase()"></div>
+							<div class="step-line"></div>
+						</div>
+						<div class="step-content">
+							<div class="step-main">
+								<span class="step-badge" [class]="methodClass()[ep.method]">{{ ep.method }}</span>
+								<span class="step-path">{{ ep.path || '/api/...' }}</span>
+							</div>
+							@if (hasBody(ep)) {
+								<div class="step-body-hint">
+									<i class="pi pi-file-edit"></i>
+									<code>{{ bodyHint(ep) }}</code>
+								</div>
+							}
+							@if (ep.name) {
+								<div class="step-check">
+									<i class="pi pi-check-circle"></i> check: {{ ep.name }}
+								</div>
+							}
+						</div>
+					</div>
+				}
+
+				<!-- Sleep step -->
+				<div class="flow-step flow-step-sleep" [style.--step-index]="totalFlowSteps() - 1">
+					<div class="step-connector">
+						<div class="step-dot dot-sleep"></div>
+						<div class="step-line step-line-dashed"></div>
+					</div>
+					<div class="step-content">
+						<div class="step-main">
+							<span class="step-badge badge-sleep">SLEEP</span>
+							<span class="step-text">1–3s aleatorio entre iteraciones</span>
+						</div>
+					</div>
+				</div>
+
+				<!-- Repeat indicator -->
+				<div class="flow-repeat">
+					<i class="pi pi-replay flow-repeat-icon"></i>
+					<span>Repetir hasta fin del test ({{ profile().totalDuration }})</span>
+				</div>
+			</div>
+		}
+	</div>
+}
+<!-- #endregion -->
+
+<!-- #region Thresholds -->
+<div class="thresholds-summary">
+	<span class="thresholds-title">Umbrales de éxito:</span>
+	<span class="threshold-item">
+		<i class="pi pi-stopwatch"></i> p95 &lt; {{ thresholdP95() }}ms
+	</span>
+	<span class="threshold-item">
+		<i class="pi pi-exclamation-circle"></i> errors &lt; {{ thresholdErrorRate() }}%
+	</span>
+</div>
+<!-- #endregion -->

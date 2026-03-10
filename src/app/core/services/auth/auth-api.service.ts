@@ -82,11 +82,13 @@ export class AuthApiService {
 	/**
 	 * Switch to a different stored session.
 	 * The server sets the new auth cookie.
+	 * Silent: errors are handled locally by quickLogin(), not by the global interceptor.
 	 */
 	switchSession(sessionId: string): Observable<StoredSession> {
 		return this.http.post<StoredSession>(
 			`${this.apiUrl}/switch-session/${sessionId}`,
 			{},
+			{ headers: this.silentHeaders },
 		);
 	}
 

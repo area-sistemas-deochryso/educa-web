@@ -7,6 +7,7 @@ import {
 	UserPermisosService,
 	UserRole,
 } from '@core/services';
+import { HttpErrorResponse } from '@angular/common/http';
 import { ChangeDetectionStrategy, Component, DestroyRef, OnInit, inject, signal } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import {
@@ -24,7 +25,9 @@ import { InputTextModule } from 'primeng/inputtext';
 import { Router } from '@angular/router';
 import { Select } from 'primeng/select';
 import { ToggleSwitch } from 'primeng/toggleswitch';
+import { Tooltip } from 'primeng/tooltip';
 import { UppercaseInputDirective } from '@app/shared';
+import { logger } from '@core/helpers';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { UI_LOGIN_MESSAGES } from '@app/shared/constants';
 
@@ -38,6 +41,7 @@ import { UI_LOGIN_MESSAGES } from '@app/shared/constants';
 		ReactiveFormsModule,
 		InputTextModule,
 		ToggleSwitch,
+		Tooltip,
 		Select,
 		FormErrorComponent,
 		LoginHeaderComponent,
@@ -118,10 +122,12 @@ export class LoginIntranetComponent implements OnInit {
 
 	/**
 	 * Quick-login using a stored server session.
-	 * No password needed — the server already has the JWT.
+	 * On error: removes the dead session from UI and reloads from server.
 	 */
 	quickLogin(session: StoredSession): void {
 		this.isLoading.set(true);
+		this.showError.set(false);
+
 		this.authService
 			.switchSession(session.sessionId)
 			.pipe(takeUntilDestroyed(this.destroyRef))
@@ -132,10 +138,49 @@ export class LoginIntranetComponent implements OnInit {
 					this.userPermisosService.clear();
 					this.router.navigate(['/intranet']);
 				},
-				error: () => {
+				error: (err: HttpErrorResponse) => {
 					this.isLoading.set(false);
-					this.errorMessage.set('Error al cambiar de sesión');
-					this.showError.set(true);
+					this.handleQuickLoginError(err, session);
+				},
+			});
+	}
+
+	private handleQuickLoginError(err: HttpErrorResponse, session: StoredSession): void {
+		// Remove the dead session from UI immediately to prevent retry loop
+		this.storedSessions.update((sessions) =>
+			sessions.filter((s) => s.sessionId !== session.sessionId),
+		);
+
+		// Show specific error based on status
+		const isSessionGone = err.status === 404 || err.status === 401;
+		this.errorMessage.set(
+			isSessionGone
+				? 'La sesión expiró o fue eliminada. Inicia sesión nuevamente.'
+				: 'Error al cambiar de sesión. Intenta de nuevo.',
+		);
+		this.showError.set(true);
+
+		logger.warn('[QuickLogin] Session switch failed', err.status, session.sessionId);
+
+		// If no sessions left, show login form
+		if (this.storedSessions().length === 0) {
+			this.showLoginForm.set(true);
+		} else {
+			// Reload sessions from server to sync with current state
+			this.reloadSessions();
+		}
+	}
+
+	private reloadSessions(): void {
+		this.authService
+			.getSessions()
+			.pipe(takeUntilDestroyed(this.destroyRef))
+			.subscribe({
+				next: (sessions) => {
+					this.storedSessions.set(sessions);
+					if (sessions.length === 0) {
+						this.showLoginForm.set(true);
+					}
 				},
 			});
 	}

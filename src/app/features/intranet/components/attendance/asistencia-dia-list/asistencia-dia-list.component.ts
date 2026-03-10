@@ -28,8 +28,8 @@ import {
 	TableSkeletonComponent,
 } from '@shared/components';
 import type { SkeletonColumnDef } from '@shared/components';
-import { getStatusClass } from '@features/intranet/pages/attendance-component/config/attendance.constants';
-import { AttendanceStatus } from '@features/intranet/pages/attendance-component/models/attendance.types';
+import { getStatusClass } from '@features/intranet/pages/shared/attendance-component/config/attendance.constants';
+import { AttendanceStatus } from '@features/intranet/pages/shared/attendance-component/models/attendance.types';
 
 export interface EstudianteAsistenciaDia {
 	estudianteId: number;

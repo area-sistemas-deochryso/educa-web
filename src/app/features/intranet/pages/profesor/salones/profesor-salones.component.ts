@@ -1,13 +1,18 @@
 import { Component, ChangeDetectionStrategy, inject, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { Router } from '@angular/router';
 import { TableModule } from 'primeng/table';
 import { TagModule } from 'primeng/tag';
 import { ButtonModule } from 'primeng/button';
 import { TooltipModule } from 'primeng/tooltip';
 import { ProgressSpinnerModule } from 'primeng/progressspinner';
+import { SalonCursoInfo, VistaPromedio, ActualizarGrupoDto } from '../models';
 import { ProfesorFacade } from '../services/profesor.facade';
 import { ProfesorSalonConEstudiantes } from '../services/profesor.store';
+import { GruposFacade } from './services/grupos.facade';
+import { SalonMensajeriaFacade } from './services/salon-mensajeria.facade';
 import { SalonEstudiantesDialogComponent } from './components/salon-estudiantes-dialog/salon-estudiantes-dialog.component';
+import { NotaSaveEvent } from './components/salon-notas-estudiante-tab/salon-notas-estudiante-tab.component';
 
 @Component({
 	selector: 'app-profesor-salones',
@@ -70,8 +75,15 @@ import { SalonEstudiantesDialogComponent } from './components/salon-estudiantes-
 							</td>
 							<td>
 								<div class="flex flex-wrap gap-1">
-									@for (curso of salon.cursos; track curso) {
-										<p-tag [value]="curso" severity="info" />
+									@for (curso of salon.cursos; track curso.horarioId) {
+										<p-tag
+											[value]="curso.nombre"
+											severity="info"
+											class="cursor-pointer"
+											(click)="onVerCursoContenido(curso)"
+											pTooltip="Ver contenido"
+											tooltipPosition="top"
+										/>
 									}
 									@if (salon.cursos.length === 0) {
 										<span class="text-color-secondary text-sm">Sin cursos asignados</span>
@@ -111,26 +123,175 @@ import { SalonEstudiantesDialogComponent } from './components/salon-estudiantes-
 			[visible]="vm().salonDialogVisible"
 			[salon]="vm().selectedSalon"
 			[dialogLoading]="vm().salonDialogLoading"
+			[cursoOptions]="vm().cursosForSelectedSalon"
+			[notasData]="vm().notasSalon"
+			[notasLoading]="vm().notasSalonLoading"
+			[selectedCurso]="vm().notasCursoId"
+			[vistaActual]="vm().notasVistaActual"
+			[gruposData]="gruposVm().grupos"
+			[gruposEstudiantesSinGrupo]="gruposVm().estudiantesSinGrupo"
+			[gruposMaxEstudiantes]="gruposVm().maxEstudiantesPorGrupo"
+			[gruposLoading]="gruposVm().loading"
+			[gruposSaving]="gruposVm().saving"
+			[gruposNoContenido]="gruposVm().noContenido"
+			[gruposContenidoId]="gruposVm().contenidoId"
+			[gruposCursoId]="gruposCursoId"
+			[gruposAsignarDialogVisible]="gruposVm().asignarDialogVisible"
+			[gruposAsignarGrupo]="gruposVm().asignarGrupo"
 			(visibleChange)="onDialogVisibleChange($event)"
+			(notasTabActivated)="onNotasTabActivated()"
+			(notasCursoChange)="onNotasCursoChange($event)"
+			(notasVistaChange)="onNotasVistaChange($event)"
+			(notaSave)="onNotaSave($event)"
+			(gruposTabActivated)="onGruposTabActivated()"
+			(gruposCursoChange)="onGruposCursoChange($event)"
+			(gruposCrearGrupo)="onGruposCrearGrupo($event)"
+			(gruposEliminarGrupo)="onGruposEliminarGrupo($event)"
+			(gruposRenombrarGrupo)="onGruposRenombrarGrupo($event)"
+			(gruposAsignarEstudiantes)="onGruposAsignarEstudiantes($event)"
+			(gruposRemoverEstudiante)="onGruposRemoverEstudiante($event)"
+			(gruposDropEstudiante)="onGruposDropEstudiante($event)"
+			(gruposConfigurarMax)="onGruposConfigurarMax($event)"
+			(gruposOpenAsignar)="onGruposOpenAsignar($event)"
+			(gruposCloseAsignar)="gruposFacade.closeAsignarDialog()"
+			(gruposConfirmDialogHide)="gruposFacade.closeConfirmDialog()"
+			(gruposRefresh)="onGruposRefresh()"
+			(notasRefresh)="onNotasRefresh()"
 		/>
 	`,
 })
 export class ProfesorSalonesComponent implements OnInit {
+	// #region Dependencias
 	private readonly facade = inject(ProfesorFacade);
+	private readonly router = inject(Router);
+	readonly gruposFacade = inject(GruposFacade);
+	private readonly mensajeriaFacade = inject(SalonMensajeriaFacade);
+	// #endregion
+
+	// #region Estado
 	readonly vm = this.facade.vm;
+	readonly gruposVm = this.gruposFacade.vm;
+	gruposCursoId: number | null = null;
+	// #endregion
 
 	ngOnInit(): void {
 		this.facade.loadData();
 	}
 
+	// #region Salon table handlers
+	onVerCursoContenido(curso: SalonCursoInfo): void {
+		this.router.navigate(['/intranet/profesor/cursos'], {
+			queryParams: { horarioId: curso.horarioId },
+		});
+	}
+
 	openSalonDialog(salon: ProfesorSalonConEstudiantes): void {
 		this.facade.openSalonDialog(salon);
+		this.gruposCursoId = null;
+		this.gruposFacade.resetGrupos();
 	}
 
 	onDialogVisibleChange(visible: boolean): void {
 		if (!visible) {
 			this.facade.closeSalonDialog();
+			this.gruposFacade.resetGrupos();
+			this.mensajeriaFacade.reset();
+			this.gruposCursoId = null;
 		}
 	}
-}
+	// #endregion
 
+	// #region Notas handlers
+	onNotasTabActivated(): void {
+		const salon = this.vm().selectedSalon;
+		const cursos = this.vm().cursosForSelectedSalon;
+		if (!salon || cursos.length === 0) return;
+
+		if (!this.vm().notasCursoId) {
+			this.facade.loadNotasSalon(salon.salonId, cursos[0].value);
+		}
+	}
+
+	onNotasCursoChange(cursoId: number): void {
+		const salon = this.vm().selectedSalon;
+		if (!salon) return;
+		this.facade.loadNotasSalon(salon.salonId, cursoId);
+	}
+
+	onNotasVistaChange(vista: VistaPromedio): void {
+		this.facade.setNotasVista(vista);
+	}
+
+	onNotaSave(event: NotaSaveEvent): void {
+		this.facade.saveNotaSalon(event.calificacionId, event.estudianteId, event.nota);
+	}
+	// #endregion
+
+	// #region Grupos handlers
+	onGruposTabActivated(): void {
+		const salon = this.vm().selectedSalon;
+		const cursos = this.vm().cursosForSelectedSalon;
+		if (!salon || cursos.length === 0) return;
+
+		if (!this.gruposCursoId) {
+			this.gruposCursoId = cursos[0].value;
+			this.gruposFacade.loadGruposForSalonCurso(salon.salonId, cursos[0].value);
+		}
+	}
+
+	onGruposCursoChange(cursoId: number): void {
+		const salon = this.vm().selectedSalon;
+		if (!salon) return;
+		this.gruposCursoId = cursoId;
+		this.gruposFacade.loadGruposForSalonCurso(salon.salonId, cursoId);
+	}
+
+	onGruposCrearGrupo(nombre: string): void {
+		this.gruposFacade.crearGrupo(nombre);
+	}
+
+	onGruposEliminarGrupo(grupoId: number): void {
+		this.gruposFacade.eliminarGrupo(grupoId);
+	}
+
+	onGruposRenombrarGrupo(event: { grupoId: number; nombre: string }): void {
+		const dto: ActualizarGrupoDto = { nombre: event.nombre };
+		this.gruposFacade.actualizarGrupo(event.grupoId, dto);
+	}
+
+	onGruposAsignarEstudiantes(event: { grupoId: number; estudianteIds: number[] }): void {
+		this.gruposFacade.asignarEstudiantes(event.grupoId, { estudianteIds: event.estudianteIds });
+	}
+
+	onGruposRemoverEstudiante(event: { grupoId: number; estudianteId: number }): void {
+		this.gruposFacade.removerEstudiante(event.grupoId, event.estudianteId);
+	}
+
+	onGruposDropEstudiante(event: { estudianteId: number; fromGrupoId: number | null; toGrupoId: number | null }): void {
+		this.gruposFacade.dropEstudiante(event);
+	}
+
+	onGruposOpenAsignar(grupoId: number): void {
+		this.gruposFacade.openAsignarDialog(grupoId);
+	}
+
+	onGruposConfigurarMax(max: number | null): void {
+		this.gruposFacade.configurarMaxEstudiantes(max);
+	}
+
+	onGruposRefresh(): void {
+		const salon = this.vm().selectedSalon;
+		if (!salon || !this.gruposCursoId) return;
+		this.gruposFacade.loadGruposForSalonCurso(salon.salonId, this.gruposCursoId);
+	}
+	// #endregion
+
+	// #region Refresh handlers
+	onNotasRefresh(): void {
+		const salon = this.vm().selectedSalon;
+		const cursoId = this.vm().notasCursoId;
+		if (!salon || !cursoId) return;
+		this.facade.loadNotasSalon(salon.salonId, cursoId);
+	}
+	// #endregion
+}

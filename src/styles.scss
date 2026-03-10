@@ -51,6 +51,8 @@
 :root {
 	--white-color: #ffffff;
 	--primary-color: #86d7f5;
+	--primary-text-color: #0c7da0;
+	--primary-text-shadow: 0 0 10px rgba(134, 215, 245, 0.3);
 	--secondary-color: #ffca2a;
 	--section-bg-color: #f0f8ff;
 	--custom-btn-bg-color: #ffca2a;
@@ -176,7 +178,8 @@ button {
 }
 
 a {
-	color: var(--primary-color);
+	color: var(--primary-text-color);
+	text-shadow: var(--primary-text-shadow);
 	text-decoration: none;
 }
 
@@ -220,7 +223,8 @@ strong {
   CUSTOM ICON
 -----------------------------------------*/
 .custom-icon {
-	color: var(--primary-color);
+	color: var(--primary-text-color);
+	text-shadow: var(--primary-text-shadow);
 }
 
 /*---------------------------------------
@@ -299,7 +303,7 @@ strong {
 }
 
 .custom-link:hover {
-	color: var(--primary-color);
+	color: var(--primary-text-color);
 }
 
 .custom-border-btn-wrap .custom-link {
@@ -357,7 +361,8 @@ strong {
 	background: var(--section-bg-color);
 	border: 1px solid var(--white-color);
 	border-radius: var(--border-radius-medium);
-	color: var(--primary-color);
+	color: var(--primary-text-color);
+	text-shadow: var(--primary-text-shadow);
 	font-weight: var(--font-weight-normal);
 	line-height: normal;
 	margin-right: 5px;

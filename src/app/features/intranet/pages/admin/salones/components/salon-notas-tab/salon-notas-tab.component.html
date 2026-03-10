@@ -1,0 +1,96 @@
+<!-- #region Selector de curso -->
+<div class="filtro-row">
+	<p-select
+		[options]="cursoOptions()"
+		[ngModel]="selectedCursoId()"
+		(ngModelChange)="onCursoChange($event)"
+		optionLabel="label"
+		optionValue="value"
+		appendTo="body"
+		placeholder="Seleccionar curso"
+		[loading]="horariosLoading()"
+		[style]="{ width: '250px' }"
+	/>
+</div>
+<!-- #endregion -->
+
+<!-- #region Tabla de notas -->
+@if (notasData(); as data) {
+	<p-table
+		[value]="data.estudiantes"
+		[loading]="loading()"
+		[scrollable]="true"
+		scrollHeight="400px"
+		styleClass="p-datatable-sm p-datatable-gridlines"
+	>
+		<ng-template #header>
+			<!-- Fila de grupo: Evaluaciones | Periodos -->
+			<tr>
+				<th [attr.colspan]="2" class="sticky-col-header col-num" style="left: 0; z-index: 2"></th>
+				@if (evaluacionColumns().length > 0) {
+					<th [attr.colspan]="evaluacionColumns().length" class="text-center group-header group-eval">
+						<i class="pi pi-file-edit mr-1" style="font-size: 0.75rem"></i>Evaluaciones
+					</th>
+				}
+				@if (periodoColumns().length > 0) {
+					<th [attr.colspan]="periodoColumns().length + 1" class="text-center group-header group-periodo">
+						<i class="pi pi-chart-line mr-1" style="font-size: 0.75rem"></i>Promedios
+					</th>
+				}
+			</tr>
+			<!-- Fila de columnas individuales -->
+			<tr>
+				<th class="sticky-col-header col-num" style="left: 0; z-index: 2">#</th>
+				<th class="sticky-col-header col-nombre" style="left: 50px; z-index: 2">Estudiante</th>
+				@for (eval of evaluacionColumns(); track eval.id) {
+					<th
+						class="text-center eval-header"
+						pTooltip="{{ eval.titulo }} — {{ eval.tipo }} ({{ eval.peso * 100 | number: '1.0-0' }}%)"
+						tooltipPosition="top"
+					>
+						{{ eval.titulo }}
+					</th>
+				}
+				@for (periodo of periodoColumns(); track periodo.nombre) {
+					<th class="text-center periodo-header">{{ periodo.nombre }}</th>
+				}
+				<th class="text-center general-header">General</th>
+			</tr>
+		</ng-template>
+		<ng-template #body let-estudiante let-rowIndex="rowIndex">
+			<tr>
+				<td class="sticky-col col-num" style="left: 0">{{ rowIndex + 1 }}</td>
+				<td class="sticky-col col-nombre" style="left: 50px">
+					<div class="estudiante-nombre">{{ estudiante.nombreCompleto }}</div>
+					<div class="estudiante-dni">{{ estudiante.dni }}</div>
+				</td>
+				@for (eval of evaluacionColumns(); track eval.id) {
+					<td class="text-center nota-cell" [class]="getNotaClass(estudiante.notas, eval.id)">
+						{{ getNotaValue(estudiante.notas, eval.id) }}
+					</td>
+				}
+				@for (periodo of periodoColumns(); track periodo.nombre) {
+					<td class="text-center periodo-cell" [class]="getPromedioClass(estudiante.promedios, periodo.nombre)">
+						{{ getPromedioValue(estudiante.promedios, periodo.nombre) }}
+					</td>
+				}
+				<td class="text-center general-cell" [class]="getGeneralClass(estudiante.promedios)">
+					{{ getGeneralPromedio(estudiante.promedios) }}
+				</td>
+			</tr>
+		</ng-template>
+		<ng-template #emptymessage>
+			<tr>
+				<td [attr.colspan]="evaluacionColumns().length + periodoColumns().length + 3" class="text-center p-4">
+					No hay notas registradas para este curso.
+				</td>
+			</tr>
+		</ng-template>
+	</p-table>
+} @else if (!loading()) {
+	<div class="empty-state">
+		<i class="pi pi-chart-bar" style="font-size: 2rem; opacity: 0.3"></i>
+		<p class="text-color-secondary mt-2">Seleccione un curso para ver las calificaciones.</p>
+	</div>
+}
+<!-- #endregion -->

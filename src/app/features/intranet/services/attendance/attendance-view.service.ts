@@ -12,7 +12,7 @@ import {
 } from '@core/services';
 import { viewBlobInNewTab, downloadBlob } from '@core/helpers';
 import { AttendanceDataService } from './attendance-data.service';
-import { AttendanceTable } from '@features/intranet/pages/attendance-component/models/attendance.types';
+import { AttendanceTable } from '@features/intranet/pages/shared/attendance-component/models/attendance.types';
 import {
 	VIEW_MODE,
 	ViewMode,

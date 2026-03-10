@@ -1,0 +1,156 @@
+// #region Host
+:host {
+	display: block;
+}
+// #endregion
+
+// #region Filtro
+.filtro-row {
+	display: flex;
+	align-items: center;
+	gap: 0.75rem;
+	margin-bottom: 1rem;
+}
+// #endregion
+
+// #region Group headers
+.group-header {
+	font-size: 0.7rem;
+	text-transform: uppercase;
+	letter-spacing: 0.05em;
+	padding: 0.35rem 0.5rem !important;
+	border-bottom: none !important;
+}
+
+.group-eval {
+	color: var(--text-color-secondary);
+	background: rgba(59, 130, 246, 0.06) !important;
+}
+
+.group-periodo {
+	color: var(--text-color-secondary);
+	background: rgba(16, 185, 129, 0.06) !important;
+}
+// #endregion
+
+// #region Sticky columns
+.sticky-col-header,
+.sticky-col {
+	position: sticky;
+	z-index: 1;
+	background: var(--surface-card) !important;
+}
+
+.col-num {
+	width: 50px;
+	min-width: 50px;
+}
+
+.col-nombre {
+	min-width: 180px;
+}
+// #endregion
+
+// #region Eval columns
+.eval-header {
+	min-width: 90px;
+	max-width: 120px;
+	font-size: 0.75rem;
+	white-space: nowrap;
+	overflow: hidden;
+	text-overflow: ellipsis;
+}
+// #endregion
+
+// #region Periodo columns
+.periodo-header {
+	min-width: 90px;
+	font-weight: 700;
+	font-size: 0.8rem;
+	background: rgba(16, 185, 129, 0.06) !important;
+}
+
+.general-header {
+	min-width: 80px;
+	font-weight: 700;
+	font-size: 0.8rem;
+	background: rgba(99, 102, 241, 0.08) !important;
+}
+// #endregion
+
+// #region Nota cells
+.nota-cell {
+	font-size: 0.85rem;
+	font-variant-numeric: tabular-nums;
+}
+
+.periodo-cell {
+	font-weight: 600;
+	font-size: 0.85rem;
+	font-variant-numeric: tabular-nums;
+	background: rgba(16, 185, 129, 0.03);
+}
+
+.general-cell {
+	font-weight: 700;
+	font-size: 0.9rem;
+	font-variant-numeric: tabular-nums;
+	background: rgba(99, 102, 241, 0.05);
+}
+// #endregion
+
+// #region Grade colors
+.nota-alta {
+	color: #16a34a;
+}
+
+.nota-baja {
+	color: #dc2626;
+}
+
+.nota-vacia {
+	color: var(--text-color-secondary);
+	opacity: 0.4;
+}
+// #endregion
+
+// #region Estudiante info
+.estudiante-nombre {
+	font-size: 0.8rem;
+	font-weight: 500;
+	line-height: 1.2;
+}
+
+.estudiante-dni {
+	font-size: 0.7rem;
+	color: var(--text-color-secondary);
+	line-height: 1.2;
+}
+// #endregion
+
+// #region Table overrides
+:host ::ng-deep .p-datatable {
+	--p-datatable-header-cell-background: transparent;
+	--p-datatable-row-background: transparent;
+}
+
+:host ::ng-deep .p-datatable-gridlines .p-datatable-thead > tr > th {
+	border-width: 0 0 1px 0;
+}
+
+:host ::ng-deep .p-datatable-gridlines .p-datatable-tbody > tr > td {
+	border-width: 0 0 1px 0;
+	border-color: var(--surface-border);
+}
+// #endregion
+
+// #region Empty state
+.empty-state {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	justify-content: center;
+	padding: 3rem 1rem;
+	text-align: center;
+}
+// #endregion

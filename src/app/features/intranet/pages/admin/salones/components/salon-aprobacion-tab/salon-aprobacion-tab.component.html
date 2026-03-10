@@ -1,0 +1,149 @@
+<!-- #region Resumen -->
+<div class="resumen-row">
+	<div class="resumen-card">
+		<div class="resumen-value">{{ resumen().total }}</div>
+		<div class="resumen-label">Total</div>
+	</div>
+	<div class="resumen-card">
+		<div class="resumen-value text-green-500">{{ resumen().aprobados }}</div>
+		<div class="resumen-label">Aprobados</div>
+	</div>
+	<div class="resumen-card">
+		<div class="resumen-value text-red-500">{{ resumen().desaprobados }}</div>
+		<div class="resumen-label">Desaprobados</div>
+	</div>
+	<div class="resumen-card">
+		<div class="resumen-value text-orange-500">{{ resumen().pendientes }}</div>
+		<div class="resumen-label">Pendientes</div>
+	</div>
+</div>
+<!-- #endregion -->
+
+<!-- #region Info periodo no cerrado -->
+@if (!periodoCerrado()) {
+	<div class="periodo-info">
+		<i class="pi pi-info-circle"></i>
+		<span>El periodo debe estar cerrado para aprobar o desaprobar estudiantes.</span>
+	</div>
+}
+<!-- #endregion -->
+
+<!-- #region Toolbar acciones masivas -->
+@if (periodoCerrado()) {
+	<div class="actions-toolbar">
+		<div class="flex items-center gap-2">
+			@if (someSelected()) {
+				<span class="text-sm text-color-secondary">{{ selectedCount() }} seleccionado(s)</span>
+			}
+		</div>
+		<div class="flex gap-2">
+			@if (someSelected()) {
+				<button
+					pButton
+					label="Aprobar"
+					icon="pi pi-check"
+					class="p-button-sm p-button-success"
+					[loading]="loading()"
+					(click)="onAprobarSeleccionados('APROBADO')"
+				></button>
+				<button
+					pButton
+					label="Desaprobar"
+					icon="pi pi-times"
+					class="p-button-sm p-button-danger"
+					[loading]="loading()"
+					(click)="onAprobarSeleccionados('DESAPROBADO')"
+				></button>
+			}
+		</div>
+	</div>
+}
+<!-- #endregion -->
+
+<!-- #region Tabla de estudiantes -->
+<p-table
+	[value]="aprobaciones()"
+	[loading]="loading()"
+	[scrollable]="true"
+	scrollHeight="400px"
+	styleClass="p-datatable-sm"
+>
+	<ng-template #header>
+		<tr>
+			@if (periodoCerrado()) {
+				<th style="width: 50px" class="text-center">
+					<p-checkbox
+						[ngModel]="allSelected()"
+						(ngModelChange)="toggleSelectAll()"
+						[binary]="true"
+					/>
+				</th>
+			}
+			<th style="width: 50px">#</th>
+			<th style="min-width: 200px">Estudiante</th>
+			<th style="width: 100px" class="text-center">Promedio</th>
+			<th style="width: 110px" class="text-center">Estado</th>
+			@if (periodoCerrado()) {
+				<th style="width: 130px" class="text-center">Acciones</th>
+			}
+		</tr>
+	</ng-template>
+	<ng-template #body let-aprobacion let-rowIndex="rowIndex">
+		<tr [class.row-selected]="isSelected(aprobacion.estudianteId)">
+			@if (periodoCerrado()) {
+				<td class="text-center">
+					<p-checkbox
+						[ngModel]="isSelected(aprobacion.estudianteId)"
+						(ngModelChange)="toggleStudent(aprobacion.estudianteId)"
+						[binary]="true"
+					/>
+				</td>
+			}
+			<td>{{ rowIndex + 1 }}</td>
+			<td>
+				<div class="estudiante-nombre">{{ aprobacion.estudianteNombre }}</div>
+				<div class="estudiante-dni">{{ aprobacion.estudianteDni }}</div>
+			</td>
+			<td class="text-center font-semibold">
+				{{ aprobacion.promedioFinal !== null ? aprobacion.promedioFinal : '—' }}
+			</td>
+			<td class="text-center">
+				<p-tag [value]="getEstadoLabel(aprobacion.estado)" [severity]="getEstadoSeverity(aprobacion.estado)" />
+			</td>
+			@if (periodoCerrado()) {
+				<td class="text-center">
+					<div class="flex justify-center gap-1">
+						<button
+							pButton
+							icon="pi pi-check"
+							class="p-button-rounded p-button-text p-button-sm p-button-success"
+							pTooltip="Aprobar"
+							tooltipPosition="top"
+							[disabled]="aprobacion.estado === 'APROBADO' || loading()"
+							(click)="onAprobarIndividual(aprobacion, 'APROBADO')"
+							[pt]="{ root: { 'aria-label': 'Aprobar estudiante' } }"
+						></button>
+						<button
+							pButton
+							icon="pi pi-times"
+							class="p-button-rounded p-button-text p-button-sm p-button-danger"
+							pTooltip="Desaprobar"
+							tooltipPosition="top"
+							[disabled]="aprobacion.estado === 'DESAPROBADO' || loading()"
+							(click)="onAprobarIndividual(aprobacion, 'DESAPROBADO')"
+							[pt]="{ root: { 'aria-label': 'Desaprobar estudiante' } }"
+						></button>
+					</div>
+				</td>
+			}
+		</tr>
+	</ng-template>
+	<ng-template #emptymessage>
+		<tr>
+			<td [attr.colspan]="periodoCerrado() ? 6 : 4" class="text-center p-4">
+				No hay estudiantes en este salón.
+			</td>
+		</tr>
+	</ng-template>
+</p-table>
+<!-- #endregion -->

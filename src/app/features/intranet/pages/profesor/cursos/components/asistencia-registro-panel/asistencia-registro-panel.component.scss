@@ -1,0 +1,209 @@
+// #region Header
+.registro-header {
+	display: flex;
+	flex-direction: column;
+	gap: 0.75rem;
+	margin-bottom: 1rem;
+}
+
+.date-picker {
+	display: flex;
+	align-items: center;
+	gap: 0.5rem;
+
+	label {
+		font-weight: 600;
+		white-space: nowrap;
+	}
+
+	:host ::ng-deep .p-calendar {
+		flex: 1;
+		max-width: 220px;
+	}
+}
+
+.stats-row {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 0.5rem;
+}
+// #endregion
+
+// #region Loading
+.loading-state {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	gap: 0.5rem;
+	padding: 3rem 1rem;
+	color: var(--text-color-secondary);
+
+	i {
+		font-size: 1.25rem;
+	}
+}
+// #endregion
+
+// #region Student list
+.estudiantes-list {
+	display: flex;
+	flex-direction: column;
+	gap: 0.5rem;
+	max-height: 50vh;
+	overflow-y: auto;
+	padding-right: 0.25rem;
+}
+
+.estudiante-row {
+	display: flex;
+	flex-wrap: wrap;
+	align-items: center;
+	gap: 0.75rem;
+	padding: 0.625rem 0.75rem;
+	border-radius: 8px;
+	border: 1px solid var(--surface-border);
+	background: var(--surface-card);
+	transition: background 0.15s;
+
+	&:hover {
+		background: var(--surface-hover);
+	}
+}
+
+.estudiante-info {
+	display: flex;
+	align-items: center;
+	gap: 0.5rem;
+	flex: 1;
+	min-width: 200px;
+}
+
+.estudiante-index {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	width: 28px;
+	height: 28px;
+	border-radius: 50%;
+	background: var(--surface-200);
+	color: var(--text-color-secondary);
+	font-size: 0.8rem;
+	font-weight: 600;
+	flex-shrink: 0;
+}
+
+.estudiante-data {
+	display: flex;
+	flex-direction: column;
+}
+
+.estudiante-nombre {
+	font-weight: 500;
+	font-size: 0.9rem;
+}
+
+.estudiante-dni {
+	font-size: 0.78rem;
+	color: var(--text-color-secondary);
+}
+
+.estado-buttons {
+	display: flex;
+	gap: 0.35rem;
+}
+
+.estado-btn {
+	display: flex;
+	align-items: center;
+	gap: 0.25rem;
+	padding: 0.35rem 0.65rem;
+	border-radius: 6px;
+	font-size: 0.8rem;
+	font-weight: 600;
+	cursor: pointer;
+	border: 2px solid transparent;
+	transition:
+		background 0.15s,
+		border-color 0.15s,
+		color 0.15s;
+	background: var(--surface-100);
+	color: var(--text-color-secondary);
+
+	.estado-letter {
+		font-size: 0.78rem;
+	}
+
+	&--P.active {
+		background: var(--green-50);
+		border-color: var(--green-500);
+		color: var(--green-700);
+	}
+
+	&--T.active {
+		background: var(--yellow-50);
+		border-color: var(--yellow-500);
+		color: var(--yellow-700);
+	}
+
+	&--F.active {
+		background: var(--red-50);
+		border-color: var(--red-500);
+		color: var(--red-700);
+	}
+}
+
+.justificacion-row {
+	width: 100%;
+	padding-left: 2.5rem;
+}
+
+.justificacion-input {
+	width: 100%;
+	font-size: 0.85rem;
+}
+// #endregion
+
+// #region Footer
+.actions-footer {
+	display: flex;
+	justify-content: flex-end;
+	margin-top: 1rem;
+	padding-top: 0.75rem;
+	border-top: 1px solid var(--surface-border);
+}
+// #endregion
+
+// #region Empty state
+.empty-state {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	justify-content: center;
+	padding: 3rem 1rem;
+	color: var(--text-color-secondary);
+	text-align: center;
+
+	i {
+		font-size: 2.5rem;
+		margin-bottom: 0.75rem;
+		opacity: 0.5;
+	}
+
+	p {
+		margin: 0;
+	}
+}
+// #endregion
+
+// #region Responsive
+@media (max-width: 640px) {
+	.estudiante-row {
+		flex-direction: column;
+		align-items: flex-start;
+	}
+
+	.justificacion-row {
+		padding-left: 0;
+	}
+}
+// #endregion
