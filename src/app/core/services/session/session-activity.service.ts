@@ -43,7 +43,8 @@ const ACTIVITY_EVENTS: (keyof DocumentEventMap)[] = ['mousedown', 'keydown', 'to
 
 type SessionMessage =
 	| { type: 'refresh-done'; timestamp: number }
-	| { type: 'logout' };
+	| { type: 'logout' }
+	| { type: 'login'; entityId: number; rol: string };
 
 // #endregion
 
@@ -221,6 +222,14 @@ export class SessionActivityService {
 			// Another tab logged out — follow suit
 			if (!this._isLoggingOut) {
 				logger.warn('[SessionActivity] Another tab logged out — following');
+				this.forceLogout();
+			}
+		} else if (msg.type === 'login') {
+			// Another tab logged in — if the user is different, the cookie changed and our
+			// session is now stale. Force logout so the menu/permisos get rebuilt on re-login.
+			const currentUser = this.authService.currentUser;
+			if (currentUser && (currentUser.entityId !== msg.entityId || currentUser.rol !== msg.rol)) {
+				logger.warn('[SessionActivity] Otro tab inició sesión con un usuario diferente — cerrando sesión');
 				this.forceLogout();
 			}
 		}

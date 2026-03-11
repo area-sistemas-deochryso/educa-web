@@ -3,6 +3,9 @@ import { AuthUser, LoginResponse, StoredSession, UserRole } from './auth.models'
 import { BehaviorSubject, Observable, catchError, map, of, tap } from 'rxjs';
 import { Injectable, inject } from '@angular/core';
 
+/** Must match CHANNEL_NAME in session-activity.service.ts */
+const SESSION_CHANNEL_NAME = 'educa-session';
+
 import { AuthApiService } from './auth-api.service';
 import { StorageService } from '../storage';
 import { UI_AUTH_MESSAGES } from '@app/shared/constants';
@@ -173,6 +176,7 @@ export class AuthService {
 				this.currentUserSubject.next(user);
 				this.storage.setUser(user);
 				this.isAuthenticatedSubject.next(true);
+				this.broadcastLoginEvent(user);
 			}),
 		);
 	}
@@ -214,6 +218,24 @@ export class AuthService {
 		this.isAuthenticatedSubject.next(true);
 		this.currentUserSubject.next(user);
 		this.resetAttempts();
+
+		// Notify other tabs: the cookie changed. Tabs with a different active user
+		// will force logout so their stale menu/permisos don't cause 403 errors.
+		this.broadcastLoginEvent(user);
+	}
+
+	/**
+	 * Broadcast a login event to other tabs/windows sharing the same origin.
+	 * Uses a short-lived BroadcastChannel so AuthService has no persistent channel.
+	 */
+	private broadcastLoginEvent(user: AuthUser): void {
+		try {
+			const channel = new BroadcastChannel(SESSION_CHANNEL_NAME);
+			channel.postMessage({ type: 'login', entityId: user.entityId, rol: user.rol });
+			channel.close();
+		} catch {
+			// BroadcastChannel not available (old Safari, SSR) — safe to ignore
+		}
 	}
 
 	private incrementAttempts(): void {
