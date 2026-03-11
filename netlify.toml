@@ -58,6 +58,18 @@
   status = 200
   force = true
 
+[[redirects]]
+  from = "/asistenciahub"
+  to = "https://educa1.azurewebsites.net/asistenciahub"
+  status = 200
+  force = true
+
+[[redirects]]
+  from = "/asistenciahub/*"
+  to = "https://educa1.azurewebsites.net/asistenciahub/:splat"
+  status = 200
+  force = true
+
 # Redirección SPA - fallback para rutas de Angular
 [[redirects]]
   from = "/*"
