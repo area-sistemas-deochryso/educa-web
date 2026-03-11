@@ -11,6 +11,7 @@ import {
 	HijoApoderado,
 	AsistenciaSignalRService,
 } from '@core/services';
+import { SwService } from '@features/intranet/services/sw/sw.service';
 import { viewBlobInNewTab, downloadBlob, logger } from '@core/helpers';
 import { AttendanceDataService } from './attendance-data.service';
 import { AttendanceTable } from '@features/intranet/pages/shared/attendance-component/models/attendance.types';
@@ -83,6 +84,7 @@ export class AttendanceViewController {
 	private asistenciaService = inject(AsistenciaService);
 	private attendanceDataService = inject(AttendanceDataService);
 	private asistenciaSignalR = inject(AsistenciaSignalRService);
+	private swService = inject(SwService);
 	private destroyRef = inject(DestroyRef);
 	private config!: AttendanceViewConfig;
 
@@ -712,20 +714,25 @@ export class AttendanceViewController {
 		this.asistenciaSignalR.asistenciaRegistrada$
 			.pipe(takeUntilDestroyed(this.destroyRef))
 			.subscribe(() => {
-				if (this.viewMode() === VIEW_MODE.Dia) {
-					if (this.isToday(this.fechaDia())) {
-						logger.log('AttendanceView: Asistencia registrada vía SignalR → recargando vista día');
-						this.loadAsistenciaDia();
+				// Invalidar caché antes de recargar para evitar que el SW devuelva datos
+				// stale (anteriores al scan). El SW usa SWR: sin invalidación, devuelve
+				// la caché inmediatamente y el fetch fresco llega tarde via cacheUpdated$.
+				this.swService.invalidateCacheByPattern('/api/ConsultaAsistencia').then(() => {
+					if (this.viewMode() === VIEW_MODE.Dia) {
+						if (this.isToday(this.fechaDia())) {
+							logger.log('AttendanceView: Asistencia registrada vía SignalR → recargando vista día');
+							this.loadAsistenciaDia();
+						}
+					} else {
+						// Recargar mes solo si el mes/año visible es el actual
+						const now = new Date();
+						const { selectedMonth, selectedYear } = this.ingresos();
+						if (selectedMonth === now.getMonth() + 1 && selectedYear === now.getFullYear()) {
+							logger.log('AttendanceView: Asistencia registrada vía SignalR → recargando vista mes');
+							this.loadEstudiantes();
+						}
 					}
-				} else {
-					// Recargar mes solo si el mes/año visible es el actual
-					const now = new Date();
-					const { selectedMonth, selectedYear } = this.ingresos();
-					if (selectedMonth === now.getMonth() + 1 && selectedYear === now.getFullYear()) {
-						logger.log('AttendanceView: Asistencia registrada vía SignalR → recargando vista mes');
-						this.loadEstudiantes();
-					}
-				}
+				});
 			});
 	}
 
