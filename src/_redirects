@@ -1,2 +1,6 @@
-/api/*  https://educa1.azurewebsites.net/api/:splat  200
-/*      /loader.html   200
+/api/*              https://educa1.azurewebsites.net/api/:splat                  200
+/chathub            https://educa1.azurewebsites.net/chathub                   200
+/chathub/*          https://educa1.azurewebsites.net/chathub/:splat            200
+/asistenciahub      https://educa1.azurewebsites.net/asistenciahub             200
+/asistenciahub/*    https://educa1.azurewebsites.net/asistenciahub/:splat      200
+/*                  /loader.html                                                200

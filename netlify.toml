@@ -73,5 +73,5 @@
 # Redirección SPA - fallback para rutas de Angular
 [[redirects]]
   from = "/*"
-  to = "/index.html"
+  to = "/loader.html"
   status = 200
