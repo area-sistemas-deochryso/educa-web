@@ -649,16 +649,18 @@ export class AttendanceViewController {
 			});
 	}
 
-	/** Ver PDF anual de un salón usando periodo ene-dic del año de fechaDia */
+	/** Ver PDF anual de un salón usando periodo ene-mesActual del año de fechaDia */
 	verPdfSalonAnio(): void {
 		const ctx = this.config.getSelectorContext();
 		if (!ctx) return;
 
 		this.downloadingPdf.set(true);
 		const anio = this.fechaDia().getFullYear();
+		const hoy = new Date();
+		const mesFin = anio === hoy.getFullYear() ? hoy.getMonth() + 1 : 12;
 
 		this.asistenciaService
-			.descargarPdfAsistenciaPeriodo(ctx.gradoCodigo, ctx.seccion, 1, anio, 12, anio)
+			.descargarPdfAsistenciaPeriodo(ctx.gradoCodigo, ctx.seccion, 1, anio, mesFin, anio)
 			.pipe(
 				takeUntilDestroyed(this.destroyRef),
 				finalize(() => this.downloadingPdf.set(false)),
@@ -668,16 +670,18 @@ export class AttendanceViewController {
 			});
 	}
 
-	/** Descargar PDF anual de un salón usando periodo ene-dic del año de fechaDia */
+	/** Descargar PDF anual de un salón usando periodo ene-mesActual del año de fechaDia */
 	descargarPdfSalonAnio(): void {
 		const ctx = this.config.getSelectorContext();
 		if (!ctx) return;
 
 		this.downloadingPdf.set(true);
 		const anio = this.fechaDia().getFullYear();
+		const hoy = new Date();
+		const mesFin = anio === hoy.getFullYear() ? hoy.getMonth() + 1 : 12;
 
 		this.asistenciaService
-			.descargarPdfAsistenciaPeriodo(ctx.gradoCodigo, ctx.seccion, 1, anio, 12, anio)
+			.descargarPdfAsistenciaPeriodo(ctx.gradoCodigo, ctx.seccion, 1, anio, mesFin, anio)
 			.pipe(
 				takeUntilDestroyed(this.destroyRef),
 				finalize(() => this.downloadingPdf.set(false)),
