@@ -1,0 +1,193 @@
+// #region Dialog overrides
+:host ::ng-deep .user-info-dialog {
+	.p-dialog-header {
+		padding: 1.25rem 1.5rem 1rem;
+		border-bottom: 1px solid var(--surface-border);
+	}
+
+	.p-dialog-content {
+		padding: 0;
+	}
+}
+// #endregion
+
+// #region Profile header
+.profile-header {
+	display: flex;
+	align-items: center;
+	gap: 1rem;
+	padding: 1.25rem 1.5rem;
+	background: linear-gradient(135deg, var(--surface-50) 0%, var(--surface-100) 100%);
+	border-bottom: 1px solid var(--surface-border);
+}
+
+:host ::ng-deep .dialog-avatar {
+	background: linear-gradient(135deg, #4f46e5 0%, #4338ca 100%);
+	color: #ffffff;
+	font-weight: 700;
+	font-size: 1.25rem;
+	box-shadow: 0 4px 12px rgba(79, 70, 229, 0.4);
+	flex-shrink: 0;
+}
+
+.profile-header-info {
+	display: flex;
+	flex-direction: column;
+	gap: 0.375rem;
+	min-width: 0;
+}
+
+.profile-header-name {
+	font-size: 1.0625rem;
+	font-weight: 600;
+	color: var(--text-color);
+	white-space: nowrap;
+	overflow: hidden;
+	text-overflow: ellipsis;
+}
+
+:host ::ng-deep .role-tag {
+	align-self: flex-start;
+}
+// #endregion
+
+// Icono dentro de los tabs — clase propia para evitar depender de ::ng-deep
+.tab-icon {
+	margin-right: 0.5rem;
+}
+
+// #region Tabs
+:host ::ng-deep .p-tabs {
+	.p-tablist {
+		padding: 0 1.5rem;
+		border-bottom: 1px solid var(--surface-border);
+	}
+
+	.p-tab {
+		display: flex;
+		align-items: center;
+		gap: 0.5rem;
+		padding: 0.875rem 0.25rem;
+		font-size: 0.875rem;
+
+		i {
+			font-size: 0.875rem;
+		}
+	}
+
+	.p-tabpanels {
+		padding: 0;
+	}
+
+	.p-tabpanel {
+		padding: 1.5rem;
+	}
+}
+// #endregion
+
+// #region Info grid (tab Mis Datos)
+.info-grid {
+	display: flex;
+	flex-direction: column;
+	gap: 1rem;
+}
+
+.info-item {
+	display: flex;
+	flex-direction: column;
+	gap: 0.25rem;
+}
+
+.info-label {
+	display: flex;
+	align-items: center;
+	gap: 0.4rem;
+	font-size: 0.75rem;
+	font-weight: 500;
+	color: var(--text-color-secondary);
+	text-transform: uppercase;
+	letter-spacing: 0.04em;
+
+	i {
+		font-size: 0.75rem;
+	}
+}
+
+.info-value {
+	font-size: 0.9375rem;
+	font-weight: 500;
+	color: var(--text-color);
+	padding: 0.625rem 0.875rem;
+	background: var(--surface-50);
+	border: 1px solid var(--surface-border);
+	border-radius: var(--border-radius);
+}
+// #endregion
+
+// #region Password form (tab Contraseña)
+.password-form {
+	display: flex;
+	flex-direction: column;
+	gap: 1.125rem;
+}
+
+.field {
+	display: flex;
+	flex-direction: column;
+	gap: 0.375rem;
+}
+
+.field-label {
+	font-size: 0.8125rem;
+	font-weight: 500;
+	color: var(--text-color);
+}
+
+.input-wrapper {
+	position: relative;
+	display: flex;
+	align-items: center;
+
+	input {
+		padding-right: 2.75rem;
+	}
+}
+
+.toggle-visibility {
+	position: absolute;
+	right: 0.625rem;
+	background: none;
+	border: none;
+	cursor: pointer;
+	color: var(--text-color-secondary);
+	padding: 0.25rem;
+	display: flex;
+	align-items: center;
+	transition: color 0.2s ease;
+
+	&:hover {
+		color: var(--primary-color);
+	}
+
+	i {
+		font-size: 1rem;
+	}
+}
+
+.field-error {
+	color: var(--red-600);
+	font-size: 0.75rem;
+}
+// #endregion
+
+// #region Dark mode
+:host-context(.dark-mode) {
+	.profile-header {
+		background: linear-gradient(135deg, var(--surface-100) 0%, var(--surface-200) 100%);
+	}
+
+	.info-value {
+		background: var(--surface-100);
+	}
+}
+// #endregion

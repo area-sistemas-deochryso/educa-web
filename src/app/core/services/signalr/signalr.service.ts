@@ -45,9 +45,10 @@ export class SignalRService {
 	async connect(): Promise<void> {
 		if (this.connection?.state === signalR.HubConnectionState.Connected) return;
 
-		// Netlify no soporta WebSocket upgrade — usar SSE + Long Polling en producción
+		// Netlify no soporta WebSocket upgrade ni SSE persistente (timeout ~26s).
+		// Long Polling es el único transporte compatible con Netlify.
 		const transport = environment.production
-			? signalR.HttpTransportType.ServerSentEvents | signalR.HttpTransportType.LongPolling
+			? signalR.HttpTransportType.LongPolling
 			: undefined;
 
 		this.connection = new signalR.HubConnectionBuilder()

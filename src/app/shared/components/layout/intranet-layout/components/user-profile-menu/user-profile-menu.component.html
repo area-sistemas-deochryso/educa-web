@@ -32,10 +32,21 @@
 			</div>
 		</div>
 		<div class="popover-divider"></div>
+		<button class="menu-btn" (click)="onInfoClick()" type="button">
+			<i class="pi pi-user-edit"></i>
+			<span>Información</span>
+		</button>
+		<div class="popover-divider"></div>
 		<button class="logout-btn" (click)="onLogout()" type="button">
 			<i class="pi pi-sign-out"></i>
 			<span>Cerrar sesión</span>
 		</button>
 	</div>
 </p-popover>
+
+<!-- Diálogo de información - siempre en el DOM, nunca en @if -->
+<app-user-info-dialog
+	[visible]="infoDialogVisible()"
+	(visibleChange)="onInfoDialogVisibleChange($event)"
+/>
 <!-- #endregion -->

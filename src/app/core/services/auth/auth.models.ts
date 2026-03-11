@@ -92,6 +92,16 @@ export interface StoredSession {
 }
 
 /**
+ * Request payload for PUT /api/Auth/perfil/contrasena.
+ */
+export interface CambiarContrasenaRequest {
+	/** Current password for verification. */
+	contrasenaActual: string;
+	/** New password to set. */
+	nuevaContrasena: string;
+}
+
+/**
  * Response payload for POST /api/Auth/verificar.
  * @deprecated Will be removed after full cookie migration.
  */

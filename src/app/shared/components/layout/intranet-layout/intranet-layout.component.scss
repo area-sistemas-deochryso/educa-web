@@ -59,12 +59,32 @@
 	padding: 2rem;
 }
 
-// Responsive
-@media screen and (max-width: 1200px) {
+// Responsive: compactar spacing para pantallas medianas (DPI-scaled, 125% zoom)
+@media screen and (max-width: 1300px) {
+	.desktop-header {
+		// Eliminar el doble-padding: .intranet-header ya provee 2rem de cada lado
+		padding: 0;
+	}
+
+	.nav-links {
+		gap: 0.75rem;
+	}
+}
+
+// Responsive: reducir padding del header para soportar 125% zoom en DPI-scaled screens
+// A 125% zoom en 1366px/125% DPI: viewport ≈ 874px → header padding pasa de 64px a 32px
+@media screen and (max-width: 1100px) {
 	.intranet-header {
 		padding: 0 1rem;
 	}
 
+	.nav-links {
+		gap: 0.5rem;
+	}
+}
+
+// Responsive: mobile / hamburger
+@media screen and (max-width: 840px) {
 	.desktop-header {
 		display: none;
 	}

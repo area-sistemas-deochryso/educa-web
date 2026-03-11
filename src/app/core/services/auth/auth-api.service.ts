@@ -1,9 +1,9 @@
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Injectable, inject } from '@angular/core';
-import { Observable, catchError, of } from 'rxjs';
+import { EMPTY, Observable, catchError, of } from 'rxjs';
 
 import { environment } from '@env/environment';
-import { LoginRequest, LoginResponse, StoredSession, UserProfile, VerifyTokenResponse } from './auth.models';
+import { CambiarContrasenaRequest, LoginRequest, LoginResponse, StoredSession, UserProfile, VerifyTokenResponse } from './auth.models';
 
 /**
  * Thin HTTP gateway for authentication endpoints.
@@ -14,6 +14,7 @@ import { LoginRequest, LoginResponse, StoredSession, UserProfile, VerifyTokenRes
 export class AuthApiService {
 	private http = inject(HttpClient);
 	private readonly apiUrl = `${environment.apiUrl}/api/Auth`;
+	private readonly sistemaUrl = `${environment.apiUrl}/api/sistema`;
 	/** Suppresses the global error toast for optional calls with local catchError. */
 	private readonly silentHeaders = new HttpHeaders({ 'X-Skip-Error-Toast': 'true' });
 
@@ -55,6 +56,13 @@ export class AuthApiService {
 	}
 
 	/**
+	 * Change the authenticated user's own password.
+	 */
+	cambiarContrasena(dto: CambiarContrasenaRequest): Observable<{ mensaje: string }> {
+		return this.http.put<{ mensaje: string }>(`${this.apiUrl}/perfil/contrasena`, dto);
+	}
+
+	/**
 	 * Verify a token and return its metadata.
 	 * @deprecated Will be removed after full cookie migration.
 	 */
@@ -64,6 +72,20 @@ export class AuthApiService {
 				headers: { 'Content-Type': 'application/json' },
 			})
 			.pipe(catchError(() => of(null)));
+	}
+
+	// #endregion
+
+	// #region Warmup
+
+	/**
+	 * Dispara una query minima contra Azure SQL para despertar el pool de conexiones.
+	 * Llamar fire-and-forget tras login exitoso. Nunca falla hacia el caller.
+	 */
+	warmup(): Observable<void> {
+		return this.http
+			.get<void>(`${this.sistemaUrl}/warmup`, { headers: this.silentHeaders })
+			.pipe(catchError(() => EMPTY));
 	}
 
 	// #endregion

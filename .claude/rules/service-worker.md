@@ -1,14 +1,14 @@
 # Service Worker y Cache Offline
 
-## Estrategia Híbrida: SWR + Network-first
+## Estrategia Única: Stale-While-Revalidate
 
-El SW usa una estrategia híbrida según el contexto:
+El SW usa SWR para **todos** los requests cacheables, sin distinción de visita:
 
-1. **Primera visita** (carga inicial) → **Stale-While-Revalidate**: devuelve cache inmediato, revalida en background y notifica si hay cambios
-2. **Visitas posteriores** (navegación activa) → **Network-first**: va a la red primero (con timeout de 5s), cache solo como fallback si la red falla
-3. **Sin cache** → Siempre va a la red
+1. **Con cache** → Devuelve cache inmediatamente + revalida en background. Cuando llegan datos nuevos, `CACHE_UPDATED` notifica a la app.
+2. **Sin cache (cache MISS)** → Va a la red directamente y guarda el resultado.
+3. **Offline** → Devuelve cache si existe, 503 si no.
 
-Esto garantiza que la carga inicial sea rápida (cache) pero que la navegación activa del usuario siempre muestre data fresca.
+Esto garantiza que el usuario nunca espera más de lo necesario: siempre ve datos de inmediato y recibe datos frescos en ~1-2s vía el mecanismo de `cacheUpdated$`.
 
 ## Configuración
 

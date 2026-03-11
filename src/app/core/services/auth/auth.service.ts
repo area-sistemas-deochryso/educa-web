@@ -1,5 +1,5 @@
 // #region Imports
-import { AuthUser, LoginResponse, StoredSession, UserRole } from './auth.models';
+import { AuthUser, CambiarContrasenaRequest, LoginResponse, StoredSession, UserRole } from './auth.models';
 import { BehaviorSubject, Observable, catchError, map, of, tap } from 'rxjs';
 import { Injectable, inject } from '@angular/core';
 
@@ -149,6 +149,13 @@ export class AuthService {
 		this.loginAttemptsSubject.next(0);
 	}
 
+	/**
+	 * Change the authenticated user's own password.
+	 */
+	cambiarContrasena(dto: CambiarContrasenaRequest): Observable<{ mensaje: string }> {
+		return this.api.cambiarContrasena(dto);
+	}
+
 	// #endregion
 
 	// #region Sessions (Multi-User)
@@ -222,6 +229,10 @@ export class AuthService {
 		// Notify other tabs: the cookie changed. Tabs with a different active user
 		// will force logout so their stale menu/permisos don't cause 403 errors.
 		this.broadcastLoginEvent(user);
+
+		// Fire-and-forget: despierta el pool de conexiones de Azure SQL para que
+		// las primeras paginas de datos no sufran el cold start de ~12s.
+		this.api.warmup().subscribe();
 	}
 
 	/**

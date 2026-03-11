@@ -1,0 +1,176 @@
+<!-- #region Template -->
+<p-dialog
+	[visible]="visible()"
+	(visibleChange)="onVisibleChange($event)"
+	[modal]="true"
+	[draggable]="false"
+	[resizable]="false"
+	[closeOnEscape]="true"
+	[dismissableMask]="true"
+	header="Mi Información"
+	styleClass="user-info-dialog"
+	[style]="{ width: '460px', 'max-width': '95vw' }"
+	appendTo="body"
+>
+	<!-- #region Header del perfil -->
+	<div class="profile-header">
+		<p-avatar [label]="initials()" shape="circle" size="xlarge" class="dialog-avatar" />
+		<div class="profile-header-info">
+			<span class="profile-header-name">{{ displayName() }}</span>
+			<p-tag [value]="userRole()" severity="info" styleClass="role-tag" />
+		</div>
+	</div>
+	<!-- #endregion -->
+
+	<!-- #region Tabs -->
+	<p-tabs>
+		<p-tablist>
+			<p-tab value="0">
+				<i class="pi pi-id-card tab-icon"></i>
+				<span>Mis Datos</span>
+			</p-tab>
+			<p-tab value="1">
+				<i class="pi pi-lock tab-icon"></i>
+				<span>Contraseña</span>
+			</p-tab>
+		</p-tablist>
+
+		<p-tabpanels>
+			<!-- #region Tab: Mis Datos -->
+			<p-tabpanel value="0">
+				<div class="info-grid">
+					<div class="info-item">
+						<span class="info-label">
+							<i class="pi pi-id-card"></i>
+							DNI
+						</span>
+						<span class="info-value">{{ dni() || '—' }}</span>
+					</div>
+					<div class="info-item">
+						<span class="info-label">
+							<i class="pi pi-user"></i>
+							Nombre Completo
+						</span>
+						<span class="info-value">{{ userName() || '—' }}</span>
+					</div>
+					<div class="info-item">
+						<span class="info-label">
+							<i class="pi pi-briefcase"></i>
+							Rol
+						</span>
+						<span class="info-value">{{ userRole() || '—' }}</span>
+					</div>
+				</div>
+			</p-tabpanel>
+			<!-- #endregion -->
+
+			<!-- #region Tab: Cambiar Contraseña -->
+			<p-tabpanel value="1">
+				<form class="password-form" (ngSubmit)="cambiarContrasena()">
+					<!-- Contraseña actual -->
+					<div class="field">
+						<label for="contrasenaActual" class="field-label">Contraseña actual</label>
+						<div class="input-wrapper">
+							<input
+								pInputText
+								id="contrasenaActual"
+								[type]="showContrasenaActual() ? 'text' : 'password'"
+								[ngModel]="contrasenaActual()"
+								(ngModelChange)="contrasenaActual.set($event)"
+								name="contrasenaActual"
+								placeholder="Ingresa tu contraseña actual"
+								class="w-full"
+								[class.ng-invalid]="contrasenaActualError()"
+								autocomplete="current-password"
+							/>
+							<button
+								type="button"
+								class="toggle-visibility"
+								[attr.aria-label]="showContrasenaActual() ? 'Ocultar contraseña' : 'Ver contraseña'"
+								(click)="showContrasenaActual.set(!showContrasenaActual())"
+							>
+								<i [class]="'pi ' + (showContrasenaActual() ? 'pi-eye-slash' : 'pi-eye')"></i>
+							</button>
+						</div>
+						@if (contrasenaActualError()) {
+							<small class="field-error">{{ contrasenaActualError() }}</small>
+						}
+					</div>
+
+					<!-- Nueva contraseña -->
+					<div class="field">
+						<label for="nuevaContrasena" class="field-label">Nueva contraseña</label>
+						<div class="input-wrapper">
+							<input
+								pInputText
+								id="nuevaContrasena"
+								[type]="showNuevaContrasena() ? 'text' : 'password'"
+								[ngModel]="nuevaContrasena()"
+								(ngModelChange)="nuevaContrasena.set($event)"
+								name="nuevaContrasena"
+								placeholder="Mínimo 4 caracteres"
+								class="w-full"
+								[class.ng-invalid]="nuevaContrasenaError()"
+								autocomplete="new-password"
+							/>
+							<button
+								type="button"
+								class="toggle-visibility"
+								[attr.aria-label]="showNuevaContrasena() ? 'Ocultar contraseña' : 'Ver contraseña'"
+								(click)="showNuevaContrasena.set(!showNuevaContrasena())"
+							>
+								<i [class]="'pi ' + (showNuevaContrasena() ? 'pi-eye-slash' : 'pi-eye')"></i>
+							</button>
+						</div>
+						@if (nuevaContrasenaError()) {
+							<small class="field-error">{{ nuevaContrasenaError() }}</small>
+						}
+					</div>
+
+					<!-- Confirmar contraseña -->
+					<div class="field">
+						<label for="confirmarContrasena" class="field-label">Confirmar nueva contraseña</label>
+						<div class="input-wrapper">
+							<input
+								pInputText
+								id="confirmarContrasena"
+								[type]="showConfirmarContrasena() ? 'text' : 'password'"
+								[ngModel]="confirmarContrasena()"
+								(ngModelChange)="confirmarContrasena.set($event)"
+								name="confirmarContrasena"
+								placeholder="Repite la nueva contraseña"
+								class="w-full"
+								[class.ng-invalid]="confirmarContrasenaError()"
+								autocomplete="new-password"
+							/>
+							<button
+								type="button"
+								class="toggle-visibility"
+								[attr.aria-label]="showConfirmarContrasena() ? 'Ocultar contraseña' : 'Ver contraseña'"
+								(click)="showConfirmarContrasena.set(!showConfirmarContrasena())"
+							>
+								<i [class]="'pi ' + (showConfirmarContrasena() ? 'pi-eye-slash' : 'pi-eye')"></i>
+							</button>
+						</div>
+						@if (confirmarContrasenaError()) {
+							<small class="field-error">{{ confirmarContrasenaError() }}</small>
+						}
+					</div>
+
+					<button
+						pButton
+						type="submit"
+						label="Guardar contraseña"
+						icon="pi pi-check"
+						class="p-button-primary w-full"
+						[loading]="saving()"
+						[disabled]="saving()"
+					></button>
+				</form>
+			</p-tabpanel>
+			<!-- #endregion -->
+		</p-tabpanels>
+	</p-tabs>
+	<!-- #endregion -->
+</p-dialog>
+<!-- #endregion -->
