@@ -5,7 +5,7 @@
 <html lang="es">
 	<head>
 		<meta charset="utf-8" />
-		<meta name="viewport" content="width=device-width, initial-scale=1" />
+		<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
 		<title>Intranet</title>
 		<base href="/" />
 		<!-- Preload critical fonts (self-hosted for faster loading) -->
@@ -31,6 +31,14 @@
 			type="image/avif"
 			fetchpriority="high"
 		/>
+
+		<!-- PWA -->
+		<link rel="manifest" href="/manifest.webmanifest" />
+		<meta name="theme-color" content="#4f46e5" />
+		<meta name="apple-mobile-web-app-capable" content="yes" />
+		<meta name="apple-mobile-web-app-status-bar-style" content="default" />
+		<meta name="apple-mobile-web-app-title" content="Educa" />
+		<link rel="apple-touch-icon" href="/images/icons/icon-192x192.png" />
 
 		<!-- Favicon -->
 		<link rel="icon" type="image/png" href="images/common/icono.png" />

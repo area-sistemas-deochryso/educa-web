@@ -1,5 +1,10 @@
 const DB_NAME = 'educa-cache-db';
 
+// Cache del app shell (Cache API, separado del IndexedDB de API)
+// Necesario para que el SW "controle" la start_url (requisito PWA Lighthouse)
+const APP_SHELL_CACHE = 'app-shell-v1';
+const APP_SHELL_URL = '/loader.html';
+
 // #region VERSIONADO DE CACHE - Prevencion de errores por cambios backend
 //
 // PROPOSITO: Invalidar automaticamente el cache cuando hay cambios breaking
@@ -21,6 +26,7 @@ const DB_NAME = 'educa-cache-db';
 // x Agregar campos opcionales al final (no es breaking)
 // x Cambios solo de backend que no afectan JSON de respuesta
 //
+//? no se baja nunca la db_version
 const DB_VERSION = 2; // Incrementado por cambios en estructura de asistencia
 const STORE_NAME = 'api-cache';
 const CACHE_EXPIRY = 24 * 60 * 60 * 1000; // 24 horas
@@ -44,7 +50,7 @@ function openDB() {
 		request.onerror = () => reject(request.error);
 		request.onsuccess = () => resolve(request.result);
 
-		request.onupgradeneeded = event => {
+		request.onupgradeneeded = (event) => {
 			const db = event.target.result;
 			if (!db.objectStoreNames.contains(STORE_NAME)) {
 				const store = db.createObjectStore(STORE_NAME, { keyPath: 'url' });
@@ -123,7 +129,10 @@ async function getFromCache(url) {
 				const result = request.result;
 
 				if (result) {
-					console.log('[SW] Encontrado en cache, timestamp:', new Date(result.timestamp).toISOString());
+					console.log(
+						'[SW] Encontrado en cache, timestamp:',
+						new Date(result.timestamp).toISOString(),
+					);
 					// Verificar si el cache ha expirado
 					const isExpired = Date.now() - result.timestamp > CACHE_EXPIRY;
 					if (!isExpired) {
@@ -186,7 +195,7 @@ async function cleanExpiredCache() {
 		const range = IDBKeyRange.upperBound(expiredTime);
 		const request = index.openCursor(range);
 
-		request.onsuccess = event => {
+		request.onsuccess = (event) => {
 			const cursor = event.target.result;
 			if (cursor) {
 				console.log('[SW] Limpiando cache expirado:', cursor.primaryKey);
@@ -200,7 +209,6 @@ async function cleanExpiredCache() {
 		console.error('[SW] Error cleaning cache:', error);
 	}
 }
-
 
 // #endregion
 // #region INVALIDACION QUIRURGICA - Limpieza selectiva sin afectar todo el cache
@@ -273,7 +281,7 @@ async function invalidateCacheByPattern(pattern) {
 				const keys = request.result;
 				let deletedCount = 0;
 
-				keys.forEach(key => {
+				keys.forEach((key) => {
 					if (key.includes(pattern)) {
 						store.delete(key);
 						deletedCount++;
@@ -282,7 +290,9 @@ async function invalidateCacheByPattern(pattern) {
 
 				transaction.oncomplete = () => {
 					db.close();
-					console.log(`[SW] Cache invalidado: ${deletedCount} entradas con patron "${pattern}"`);
+					console.log(
+						`[SW] Cache invalidado: ${deletedCount} entradas con patron "${pattern}"`,
+					);
 					resolve(deletedCount);
 				};
 			};
@@ -302,11 +312,11 @@ async function invalidateCacheByPattern(pattern) {
 // Verificar si la URL debe ser cacheada
 function shouldCache(url) {
 	// Primero verificar si esta en la lista de exclusion
-	if (NO_CACHE_PATTERNS.some(pattern => url.includes(pattern))) {
+	if (NO_CACHE_PATTERNS.some((pattern) => url.includes(pattern))) {
 		console.log('[SW] URL excluida del cache:', url);
 		return false;
 	}
-	return API_URL_PATTERNS.some(pattern => url.includes(pattern));
+	return API_URL_PATTERNS.some((pattern) => url.includes(pattern));
 }
 
 // Verificar si hay conexion a internet
@@ -315,26 +325,33 @@ function isOnline() {
 }
 
 // Instalacion del Service Worker
-self.addEventListener('install', event => {
+self.addEventListener('install', (event) => {
 	console.log('[SW] Service Worker instalado');
+	// Pre-cachear el app shell para controlar la start_url (/intranet/login → loader.html)
+	event.waitUntil(
+		caches.open(APP_SHELL_CACHE).then((cache) => cache.add(APP_SHELL_URL)),
+	);
 	self.skipWaiting();
 });
 
 // Activacion del Service Worker
-self.addEventListener('activate', event => {
+self.addEventListener('activate', (event) => {
 	console.log('[SW] Service Worker activado');
-	event.waitUntil(
-		Promise.all([
-			clients.claim(),
-			cleanExpiredCache(),
-			listCachedUrls()
-		])
-	);
+	event.waitUntil(Promise.all([clients.claim(), cleanExpiredCache(), listCachedUrls()]));
 });
 
 // Interceptar peticiones fetch
-self.addEventListener('fetch', event => {
+self.addEventListener('fetch', (event) => {
 	const request = event.request;
+
+	// Navegaciones (HTML) → servir app shell cacheado
+	// Necesario para que el SW "controle" la start_url (requisito PWA Lighthouse)
+	if (request.mode === 'navigate') {
+		event.respondWith(
+			caches.match(APP_SHELL_URL).then((cached) => cached || fetch(request)),
+		);
+		return;
+	}
 
 	// Solo interceptar peticiones GET a la API
 	if (request.method !== 'GET' || !shouldCache(request.url)) {
@@ -361,125 +378,64 @@ function hasDataChanged(oldData, newData) {
 	return JSON.stringify(oldData) !== JSON.stringify(newData);
 }
 
-// URLs ya servidas en esta sesion del SW.
-// Primera visita a una URL -> SWR (cache inmediato + revalidar en background)
-// Visitas posteriores -> Network-first (red primero, cache como fallback)
-const servedUrls = new Set();
-
-// Timeout para network-first antes de caer a cache (ms)
-const NETWORK_TIMEOUT = 7500;
-
-// Estrategia hibrida: SWR en carga inicial, Network-first en navegacion posterior
+// Estrategia unica: Stale-While-Revalidate para todos los requests cacheables.
+// Si hay cache -> devolver inmediatamente + revalidar en background.
+// Si no hay cache -> ir a la red y guardar resultado.
+// La app recibe datos frescos via CACHE_UPDATED cuando el background fetch termina.
 async function handleFetch(request) {
 	const url = request.url;
-	const normalizedUrl = normalizeUrl(url);
 
 	console.log('[SW] Interceptando:', url);
-
-	const cachedData = await getFromCache(url);
-	const alreadyServed = servedUrls.has(normalizedUrl);
-
-	// Marcar como servida para futuras peticiones
-	servedUrls.add(normalizedUrl);
-
-	// --- PRIMERA VISITA: Stale-While-Revalidate ---
-	// Devolver cache inmediato y revalidar en background
-	if (cachedData && !alreadyServed) {
-		console.log('[SW] SWR (primera visita) - devolviendo cache y revalidando');
-
-		if (isOnline()) {
-			revalidateInBackground(request, url, cachedData);
-		}
-
-		return createCacheResponse(cachedData, 'SWR');
-	}
 
 	// --- OFFLINE: devolver cache directamente ---
 	if (!isOnline()) {
 		console.log('[SW] Offline - buscando cache');
+		const cachedData = await getFromCache(url);
 		if (cachedData) {
 			return createCacheResponse(cachedData, 'OFFLINE');
 		}
 		return createOfflineResponse();
 	}
 
-	// --- VISITAS POSTERIORES: Network-first ---
-	// El usuario navega activamente, necesita data fresca
-	if (alreadyServed) {
-		console.log('[SW] Network-first (navegacion activa)');
+	const cachedData = await getFromCache(url);
 
-		try {
-			const networkResponse = await fetchWithTimeout(request.clone(), NETWORK_TIMEOUT);
-
-			if (networkResponse.ok) {
-				const responseClone = networkResponse.clone();
-				responseClone.json().then(data => {
-					saveToCache(url, data);
-				});
-			}
-
-			return networkResponse;
-		} catch (error) {
-			// Network fallo -> fallback a cache
-			console.log('[SW] Network fallo, usando cache como fallback');
-			if (cachedData) {
-				return createCacheResponse(cachedData, 'FALLBACK');
-			}
-			return createOfflineResponse();
-		}
+	// --- CACHE HIT: SWR ---
+	// Devolver cache inmediatamente y revalidar en background.
+	// Cuando llegan datos nuevos, CACHE_UPDATED notifica a la app.
+	if (cachedData) {
+		console.log('[SW] SWR - devolviendo cache y revalidando en background');
+		revalidateInBackground(request, url, cachedData);
+		return createCacheResponse(cachedData, 'SWR');
 	}
 
-	// --- SIN CACHE, SIN SERVIR ANTES: ir a la red ---
+	// --- CACHE MISS: ir a la red ---
 	console.log('[SW] Cache MISS - obteniendo de red');
 
 	try {
 		const networkResponse = await fetch(request.clone());
 
 		if (networkResponse.ok) {
-			const responseClone = networkResponse.clone();
-			responseClone.json().then(data => {
-				saveToCache(url, data);
-			});
+			networkResponse
+				.clone()
+				.json()
+				.then((data) => {
+					saveToCache(url, data);
+				});
 		}
 
 		return networkResponse;
 	} catch (error) {
-		// Red fallo sin cache
 		console.log('[SW] Error de red y sin cache');
-		if (cachedData) {
-			return createCacheResponse(cachedData, 'FALLBACK');
-		}
 		return createOfflineResponse();
 	}
-}
-
-// Fetch con timeout para network-first
-function fetchWithTimeout(request, timeoutMs) {
-	return new Promise((resolve, reject) => {
-		const controller = new AbortController();
-		const timeoutId = setTimeout(() => {
-			controller.abort();
-			reject(new Error('Network timeout'));
-		}, timeoutMs);
-
-		fetch(request, { signal: controller.signal })
-			.then(response => {
-				clearTimeout(timeoutId);
-				resolve(response);
-			})
-			.catch(error => {
-				clearTimeout(timeoutId);
-				reject(error);
-			});
-	});
 }
 
 // Revalidar en background (SWR) y notificar si hay cambios
 function revalidateInBackground(request, url, cachedData) {
 	fetch(request.clone())
-		.then(response => {
+		.then((response) => {
 			if (response.ok) {
-				response.json().then(async data => {
+				response.json().then(async (data) => {
 					if (hasDataChanged(cachedData, data)) {
 						await saveToCache(url, data);
 						console.log('[SW] Cache actualizado - notificando a la app');
@@ -508,7 +464,6 @@ function createOfflineResponse() {
 	});
 }
 
-
 // #endregion
 // #region MENSAJES DESDE LA APLICACION - Comandos para control del cache
 //
@@ -521,25 +476,24 @@ function createOfflineResponse() {
 // 4. Service Worker ejecuta la invalidacion correspondiente
 // 5. Service Worker responde al frontend (via MessageChannel)
 //
-self.addEventListener('message', event => {
+self.addEventListener('message', (event) => {
 	// CLEAR_CACHE: Limpiar TODO el cache
 	// Uso: Logout, cambios breaking globales, reset completo
 	// Llamado desde: SwService.clearCache()
 	if (event.data && event.data.type === 'CLEAR_CACHE') {
 		event.waitUntil(
-			openDB().then(db => {
+			openDB().then((db) => {
 				const transaction = db.transaction(STORE_NAME, 'readwrite');
 				const store = transaction.objectStore(STORE_NAME);
 				store.clear();
-				return new Promise(resolve => {
+				return new Promise((resolve) => {
 					transaction.oncomplete = () => {
 						db.close();
 						console.log('[SW] Cache limpiado completamente');
-						servedUrls.clear(); // Reset estrategia SWR vs Network-first
 						resolve();
 					};
 				});
-			})
+			}),
 		);
 	}
 
@@ -551,11 +505,8 @@ self.addEventListener('message', event => {
 		if (url) {
 			event.waitUntil(
 				invalidateCacheByUrl(url).then(() => {
-					// Forzar SWR en proxima visita (cache + revalidacion en background)
-					const normalized = normalizeUrl(url);
-					servedUrls.delete(normalized);
 					event.ports[0]?.postMessage({ success: true });
-				})
+				}),
 			);
 		}
 	}
@@ -567,15 +518,9 @@ self.addEventListener('message', event => {
 		const pattern = event.data.payload?.pattern;
 		if (pattern) {
 			event.waitUntil(
-				invalidateCacheByPattern(pattern).then(count => {
-					// Forzar SWR para todas las URLs invalidadas
-					for (const url of servedUrls) {
-						if (url.includes(pattern)) {
-							servedUrls.delete(url);
-						}
-					}
+				invalidateCacheByPattern(pattern).then((count) => {
 					event.ports[0]?.postMessage({ success: true, count });
-				})
+				}),
 			);
 		}
 	}
@@ -593,14 +538,13 @@ self.addEventListener('message', event => {
 	}
 });
 
-
 // #endregion
 // #region PUSH NOTIFICATIONS
 // Push es el wake-up call, no el mensaje completo.
 // El SW recibe el push, muestra notificacion nativa y avisa a la app.
 
 // Recibir Push del servidor
-self.addEventListener('push', event => {
+self.addEventListener('push', (event) => {
 	console.log('[SW] Push recibido');
 
 	let data = {
@@ -609,7 +553,7 @@ self.addEventListener('push', event => {
 		icon: '/images/common/icono.png',
 		url: '/',
 		tag: 'educa-notification',
-		priority: 'medium'
+		priority: 'medium',
 	};
 
 	// Intentar parsear el payload del push
@@ -634,11 +578,11 @@ self.addEventListener('push', event => {
 		data: {
 			url: data.url || '/',
 			id: data.id,
-			priority: data.priority
+			priority: data.priority,
 		},
 		requireInteraction: data.priority === 'urgent' || data.priority === 'high',
 		vibrate: data.priority === 'urgent' ? [200, 100, 200] : [100, 50, 100],
-		actions: data.actions || []
+		actions: data.actions || [],
 	};
 
 	// Mostrar notificacion nativa Y notificar a la app
@@ -647,14 +591,14 @@ self.addEventListener('push', event => {
 			self.registration.showNotification(data.title, options),
 			notifyClients({
 				type: 'PUSH_RECEIVED',
-				payload: data
-			})
-		])
+				payload: data,
+			}),
+		]),
 	);
 });
 
 // Click en notificacion nativa
-self.addEventListener('notificationclick', event => {
+self.addEventListener('notificationclick', (event) => {
 	console.log('[SW] Notification click:', event.notification.tag);
 
 	event.notification.close();
@@ -663,14 +607,14 @@ self.addEventListener('notificationclick', event => {
 	const notificationId = event.notification.data?.id;
 
 	event.waitUntil(
-		clients.matchAll({ type: 'window', includeUncontrolled: true }).then(clientList => {
+		clients.matchAll({ type: 'window', includeUncontrolled: true }).then((clientList) => {
 			// Buscar si hay una ventana abierta
 			for (const client of clientList) {
 				if (client.url.includes(self.location.origin) && 'focus' in client) {
 					// Notificar a la app que se hizo click
 					client.postMessage({
 						type: 'NOTIFICATION_CLICKED',
-						payload: { id: notificationId, url }
+						payload: { id: notificationId, url },
 					});
 					return client.focus();
 				}
@@ -679,12 +623,12 @@ self.addEventListener('notificationclick', event => {
 			if (clients.openWindow) {
 				return clients.openWindow(url);
 			}
-		})
+		}),
 	);
 });
 
 // Notificacion cerrada sin click
-self.addEventListener('notificationclose', event => {
+self.addEventListener('notificationclose', (event) => {
 	console.log('[SW] Notification closed:', event.notification.tag);
 
 	const notificationId = event.notification.data?.id;
@@ -692,7 +636,7 @@ self.addEventListener('notificationclose', event => {
 	// Notificar a la app que se cerro
 	notifyClients({
 		type: 'NOTIFICATION_CLOSED',
-		payload: { id: notificationId }
+		payload: { id: notificationId },
 	});
 });
 

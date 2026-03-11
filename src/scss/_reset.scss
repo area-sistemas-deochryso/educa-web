@@ -7,6 +7,11 @@
 	box-sizing: border-box;
 }
 
+// Prevenir scroll horizontal en móvil (fix Lighthouse: "Content not sized correctly for viewport")
+html {
+	overflow-x: hidden;
+}
+
 // Body
 body {
 	margin: 0;
@@ -16,6 +21,7 @@ body {
 	line-height: 1.5;
 	-webkit-text-size-adjust: 100%;
 	-webkit-tap-highlight-color: rgba(0, 0, 0, 0);
+	overflow-x: hidden;
 }
 
 // Headings
