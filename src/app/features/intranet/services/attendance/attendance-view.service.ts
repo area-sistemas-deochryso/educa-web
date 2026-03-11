@@ -709,13 +709,22 @@ export class AttendanceViewController {
 			logger.warn('AttendanceView: No se pudo conectar a AsistenciaHub', err);
 		});
 
-		// Solo recargar en modo día y cuando la fecha seleccionada es hoy
 		this.asistenciaSignalR.asistenciaRegistrada$
 			.pipe(takeUntilDestroyed(this.destroyRef))
 			.subscribe(() => {
-				if (this.viewMode() === VIEW_MODE.Dia && this.isToday(this.fechaDia())) {
-					logger.log('AttendanceView: Asistencia registrada vía SignalR → recargando');
-					this.loadAsistenciaDia();
+				if (this.viewMode() === VIEW_MODE.Dia) {
+					if (this.isToday(this.fechaDia())) {
+						logger.log('AttendanceView: Asistencia registrada vía SignalR → recargando vista día');
+						this.loadAsistenciaDia();
+					}
+				} else {
+					// Recargar mes solo si el mes/año visible es el actual
+					const now = new Date();
+					const { selectedMonth, selectedYear } = this.ingresos();
+					if (selectedMonth === now.getMonth() + 1 && selectedYear === now.getFullYear()) {
+						logger.log('AttendanceView: Asistencia registrada vía SignalR → recargando vista mes');
+						this.loadEstudiantes();
+					}
 				}
 			});
 	}
