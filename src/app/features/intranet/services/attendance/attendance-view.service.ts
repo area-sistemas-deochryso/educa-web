@@ -9,8 +9,9 @@ import {
 	EstadisticasAsistenciaDia,
 	EstudianteAsistencia,
 	HijoApoderado,
+	AsistenciaSignalRService,
 } from '@core/services';
-import { viewBlobInNewTab, downloadBlob } from '@core/helpers';
+import { viewBlobInNewTab, downloadBlob, logger } from '@core/helpers';
 import { AttendanceDataService } from './attendance-data.service';
 import { AttendanceTable } from '@features/intranet/pages/shared/attendance-component/models/attendance.types';
 import {
@@ -81,6 +82,7 @@ export interface AttendanceViewConfig {
 export class AttendanceViewController {
 	private asistenciaService = inject(AsistenciaService);
 	private attendanceDataService = inject(AttendanceDataService);
+	private asistenciaSignalR = inject(AsistenciaSignalRService);
 	private destroyRef = inject(DestroyRef);
 	private config!: AttendanceViewConfig;
 
@@ -253,6 +255,7 @@ export class AttendanceViewController {
 	 */
 	init(config: AttendanceViewConfig): void {
 		this.config = config;
+		this.setupSignalR();
 	}
 
 	// #endregion
@@ -697,5 +700,34 @@ export class AttendanceViewController {
 			this.loadEstudiantes();
 		}
 	}
+
+	// #endregion
+	// #region SignalR
+
+	private setupSignalR(): void {
+		this.asistenciaSignalR.connect().catch((err) => {
+			logger.warn('AttendanceView: No se pudo conectar a AsistenciaHub', err);
+		});
+
+		// Solo recargar en modo día y cuando la fecha seleccionada es hoy
+		this.asistenciaSignalR.asistenciaRegistrada$
+			.pipe(takeUntilDestroyed(this.destroyRef))
+			.subscribe(() => {
+				if (this.viewMode() === VIEW_MODE.Dia && this.isToday(this.fechaDia())) {
+					logger.log('AttendanceView: Asistencia registrada vía SignalR → recargando');
+					this.loadAsistenciaDia();
+				}
+			});
+	}
+
+	private isToday(fecha: Date): boolean {
+		const hoy = new Date();
+		return (
+			fecha.getFullYear() === hoy.getFullYear() &&
+			fecha.getMonth() === hoy.getMonth() &&
+			fecha.getDate() === hoy.getDate()
+		);
+	}
+
 	// #endregion
 }
