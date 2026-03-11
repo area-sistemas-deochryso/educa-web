@@ -1,6 +1,7 @@
 // #region Imports
-import { AsistenciaService } from '@core/services';
+import { AsistenciaService, AsistenciaSignalRService } from '@core/services';
 import { ChangeDetectionStrategy, Component, DestroyRef, OnInit, computed, inject, signal } from '@angular/core';
+import { logger } from '@core/helpers';
 
 import { AttendanceDataService } from '../../../../services/attendance/attendance-data.service';
 import { AttendanceLegendComponent } from '@app/features/intranet/components/attendance/attendance-legend/attendance-legend.component';
@@ -25,6 +26,7 @@ export class AttendanceEstudianteComponent implements OnInit {
 	private attendanceDataService = inject(AttendanceDataService);
 	private authStore = inject(AuthStore);
 	private destroyRef = inject(DestroyRef);
+	private asistenciaSignalR = inject(AsistenciaSignalRService);
 
 	// * Prefer full name; fallback keeps UI stable if profile is missing.
 	private readonly userName = computed(
@@ -44,6 +46,33 @@ export class AttendanceEstudianteComponent implements OnInit {
 	ngOnInit(): void {
 		// * Initial load uses the current month.
 		this.loadAsistencias();
+		this.setupSignalR();
+	}
+
+	private setupSignalR(): void {
+		this.asistenciaSignalR.connect().catch((err) => {
+			logger.warn('AttendanceEstudiante: No se pudo conectar a AsistenciaHub', err);
+		});
+
+		// * Reload current month data when a new attendance is registered today.
+		this.asistenciaSignalR.asistenciaRegistrada$
+			.pipe(takeUntilDestroyed(this.destroyRef))
+			.subscribe(() => {
+				const now = new Date();
+				const currentMonth = now.getMonth() + 1;
+				const currentYear = now.getFullYear();
+				const ingresosIsCurrentMonth =
+					this.ingresos().selectedMonth === currentMonth &&
+					this.ingresos().selectedYear === currentYear;
+				const salidasIsCurrentMonth =
+					this.salidas().selectedMonth === currentMonth &&
+					this.salidas().selectedYear === currentYear;
+
+				if (ingresosIsCurrentMonth || salidasIsCurrentMonth) {
+					logger.log('AttendanceEstudiante: Asistencia registrada vía SignalR → recargando');
+					this.loadAsistencias();
+				}
+			});
 	}
 
 	private loadAsistencias(): void {
