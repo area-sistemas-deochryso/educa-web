@@ -125,7 +125,7 @@ const developmentRoutes: Route[] = [
 					path: 'estudiante/notas',
 					loadComponent: () =>
 						import('./pages/estudiante').then((m) => m.EstudianteNotasComponent),
-					title: 'Intranet - Mis Notas',
+					title: 'Intranet - Mis Calificaciones',
 				},
 				{
 					path: 'estudiante/salones',

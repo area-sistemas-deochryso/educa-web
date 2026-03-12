@@ -32,10 +32,10 @@ const devMiAula: NavItemWithPermiso[] = [
 					icon: 'pi pi-graduation-cap',
 					children: [
 						{
-							route: '/intranet/estudiante/asistencia',
-							label: 'Mi Asistencia',
-							icon: 'pi pi-check-square',
-							permiso: 'intranet/estudiante/asistencia',
+							route: '/intranet/estudiante/horarios',
+							label: 'Mi Horario',
+							icon: 'pi pi-clock',
+							permiso: 'intranet/estudiante/horarios',
 						},
 						{
 							route: '/intranet/estudiante/cursos',
@@ -44,22 +44,22 @@ const devMiAula: NavItemWithPermiso[] = [
 							permiso: 'intranet/estudiante/cursos',
 						},
 						{
-							route: '/intranet/estudiante/horarios',
-							label: 'Mi Horario',
-							icon: 'pi pi-clock',
-							permiso: 'intranet/estudiante/horarios',
+							route: '/intranet/estudiante/notas',
+							label: 'Mis Calificaciones',
+							icon: 'pi pi-chart-bar',
+							permiso: 'intranet/estudiante/notas',
+						},
+						{
+							route: '/intranet/estudiante/asistencia',
+							label: 'Mi Asistencia',
+							icon: 'pi pi-check-square',
+							permiso: 'intranet/estudiante/asistencia',
 						},
 						{
 							route: '/intranet/estudiante/mensajeria',
 							label: 'Mi Mensajería',
 							icon: 'pi pi-envelope',
 							permiso: 'intranet/estudiante/mensajeria',
-						},
-						{
-							route: '/intranet/estudiante/notas',
-							label: 'Mis Notas',
-							icon: 'pi pi-chart-bar',
-							permiso: 'intranet/estudiante/notas',
 						},
 						{
 							route: '/intranet/estudiante/salones',
@@ -78,10 +78,10 @@ const devMiAula: NavItemWithPermiso[] = [
 					icon: 'pi pi-building',
 					children: [
 						{
-							route: '/intranet/profesor/asistencia',
-							label: 'Mi Asistencia',
-							icon: 'pi pi-check-square',
-							permiso: 'intranet/profesor/asistencia',
+							route: '/intranet/profesor/horarios',
+							label: 'Mi Horario',
+							icon: 'pi pi-clock',
+							permiso: 'intranet/profesor/horarios',
 						},
 						{
 							route: '/intranet/profesor/cursos',
@@ -90,22 +90,22 @@ const devMiAula: NavItemWithPermiso[] = [
 							permiso: 'intranet/profesor/cursos',
 						},
 						{
+							route: '/intranet/profesor/calificaciones',
+							label: 'Mis Calificaciones',
+							icon: 'pi pi-chart-bar',
+							permiso: 'intranet/profesor/calificaciones',
+						},
+						{
+							route: '/intranet/profesor/asistencia',
+							label: 'Mi Asistencia',
+							icon: 'pi pi-check-square',
+							permiso: 'intranet/profesor/asistencia',
+						},
+						{
 							route: '/intranet/profesor/foro',
 							label: 'Mi Foro',
 							icon: 'pi pi-comments',
 							permiso: 'intranet/profesor/foro',
-						},
-						{
-							route: '/intranet/profesor/final-salones',
-							label: 'Mi Gestión Salones',
-							icon: 'pi pi-th-large',
-							permiso: 'intranet/profesor/final-salones',
-						},
-						{
-							route: '/intranet/profesor/horarios',
-							label: 'Mi Horario',
-							icon: 'pi pi-clock',
-							permiso: 'intranet/profesor/horarios',
 						},
 						{
 							route: '/intranet/profesor/mensajeria',
@@ -114,16 +114,16 @@ const devMiAula: NavItemWithPermiso[] = [
 							permiso: 'intranet/profesor/mensajeria',
 						},
 						{
-							route: '/intranet/profesor/calificaciones',
-							label: 'Mis Calificaciones',
-							icon: 'pi pi-chart-bar',
-							permiso: 'intranet/profesor/calificaciones',
-						},
-						{
 							route: '/intranet/profesor/salones',
 							label: 'Mis Salones',
 							icon: 'pi pi-building',
 							permiso: 'intranet/profesor/salones',
+						},
+						{
+							route: '/intranet/profesor/final-salones',
+							label: 'Administrar Salones',
+							icon: 'pi pi-th-large',
+							permiso: 'intranet/profesor/final-salones',
 						},
 					],
 				} as NavItemWithPermiso,

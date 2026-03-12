@@ -10,8 +10,6 @@ import { ProfesorSalonConEstudiantes } from '../../../services/profesor.store';
 import { SalonNotasTabComponent } from '../salon-notas-tab/salon-notas-tab.component';
 import { SalonNotasEstudianteTabComponent } from '../salon-notas-estudiante-tab/salon-notas-estudiante-tab.component';
 import { SalonGruposTabComponent } from '../salon-grupos-tab/salon-grupos-tab.component';
-import { SalonForoTabComponent } from '../salon-foro-tab/salon-foro-tab.component';
-import { SalonMensajeriaTabComponent } from '../salon-mensajeria-tab/salon-mensajeria-tab.component';
 import {
 	SalonNotasResumenDto,
 	VistaPromedio,
@@ -34,8 +32,6 @@ import { NotaSaveEvent } from '../salon-notas-estudiante-tab/salon-notas-estudia
 		SalonNotasTabComponent,
 		SalonNotasEstudianteTabComponent,
 		SalonGruposTabComponent,
-		SalonForoTabComponent,
-		SalonMensajeriaTabComponent,
 	],
 	changeDetection: ChangeDetectionStrategy.OnPush,
 	styles: `
@@ -118,7 +114,7 @@ import { NotaSaveEvent } from '../salon-notas-estudiante-tab/salon-notas-estudia
 				<p-tabs value="0" (valueChange)="onTabChange($any($event))">
 					<p-tablist>
 						<p-tab value="0">
-							<i class="pi pi-users tab-icon"></i>Grupos del salón
+							<i class="pi pi-users tab-icon"></i>Grupos
 							@if (!dialogLoading()) {
 								<p-tag
 									[value]="s.cantidadEstudiantes.toString()"
@@ -129,21 +125,15 @@ import { NotaSaveEvent } from '../salon-notas-estudiante-tab/salon-notas-estudia
 							}
 						</p-tab>
 						<p-tab value="1">
-							<i class="pi pi-user tab-icon"></i>Notas del estudiante
+							<i class="pi pi-user tab-icon"></i>Notas por Estudiante
 						</p-tab>
 						<p-tab value="2">
-							<i class="pi pi-book tab-icon"></i>Notas del salón
-						</p-tab>
-						<p-tab value="3">
-							<i class="pi pi-megaphone tab-icon"></i>Foro
-						</p-tab>
-						<p-tab value="4">
-							<i class="pi pi-envelope tab-icon"></i>Mensajería
+							<i class="pi pi-book tab-icon"></i>Notas del Salón
 						</p-tab>
 					</p-tablist>
 
 					<p-tabpanels>
-						<!-- #region Tab Grupos del salón -->
+						<!-- #region Tab Grupos -->
 						<p-tabpanel value="0">
 							<div style="display: flex; justify-content: flex-end; margin-bottom: 0.5rem">
 								<button
@@ -184,7 +174,7 @@ import { NotaSaveEvent } from '../salon-notas-estudiante-tab/salon-notas-estudia
 						</p-tabpanel>
 						<!-- #endregion -->
 
-						<!-- #region Tab Notas del estudiante -->
+						<!-- #region Tab Notas por Estudiante -->
 						<p-tabpanel value="1">
 							<div style="display: flex; justify-content: flex-end; margin-bottom: 0.5rem">
 								<button
@@ -210,7 +200,7 @@ import { NotaSaveEvent } from '../salon-notas-estudiante-tab/salon-notas-estudia
 						</p-tabpanel>
 						<!-- #endregion -->
 
-						<!-- #region Tab Notas del salón -->
+						<!-- #region Tab Notas del Salón -->
 						<p-tabpanel value="2">
 							<div style="display: flex; justify-content: flex-end; margin-bottom: 0.5rem">
 								<button
@@ -232,28 +222,6 @@ import { NotaSaveEvent } from '../salon-notas-estudiante-tab/salon-notas-estudia
 								[vistaActual]="vistaActual()"
 								(cursoChange)="notasCursoChange.emit($event)"
 								(vistaChange)="notasVistaChange.emit($event)"
-							/>
-						</p-tabpanel>
-						<!-- #endregion -->
-
-						<!-- #region Tab Foro -->
-						<p-tabpanel value="3">
-							<app-salon-foro-tab
-								[estudiantes]="estudianteOptions()"
-								[grupos]="gruposData()"
-								[cursoOptions]="cursoOptionsHorarioId()"
-								[salonDescripcion]="salon()?.salonDescripcion ?? ''"
-								[estudiantesDni]="estudiantesDni()"
-							/>
-						</p-tabpanel>
-						<!-- #endregion -->
-
-						<!-- #region Tab Mensajería -->
-						<p-tabpanel value="4">
-							<app-salon-mensajeria-tab
-								[estudiantes]="estudianteOptions()"
-								[isFullscreen]="isFullscreen()"
-								[cursoOptions]="cursoOptionsHorarioId()"
 							/>
 						</p-tabpanel>
 						<!-- #endregion -->
@@ -291,8 +259,6 @@ export class SalonEstudiantesDialogComponent {
 	readonly gruposAsignarGrupo = input<GrupoContenidoDto | null>(null);
 	// #endregion
 
-	// #endregion (no mensajería outputs - tabs self-initialize via course selector)
-
 	// #region Fullscreen
 	readonly isFullscreen = signal(false);
 
@@ -310,31 +276,12 @@ export class SalonEstudiantesDialogComponent {
 	}
 	// #endregion
 
-	// #region Computed
-	readonly estudianteOptions = computed(() => {
-		const estudiantes = this.salon()?.estudiantes ?? [];
-		return estudiantes.map((e) => ({ label: e.nombreCompleto, value: e.dni }));
-	});
-
-	/** Curso options with horarioId as value (for messaging scope) */
-	readonly cursoOptionsHorarioId = computed(() => {
-		const salon = this.salon();
-		if (!salon) return [];
-		return salon.cursos.map((c) => ({ label: c.nombre, value: c.horarioId }));
-	});
-
-	readonly estudiantesDni = computed(() => (this.salon()?.estudiantes ?? []).map((e) => e.dni));
-	// #endregion
-
-	// #region Notas outputs
+	// #region Outputs
 	readonly visibleChange = output<boolean>();
 	readonly notasCursoChange = output<number>();
 	readonly notasVistaChange = output<VistaPromedio>();
 	readonly notasTabActivated = output<void>();
 	readonly notaSave = output<NotaSaveEvent>();
-	// #endregion
-
-	// #region Grupos outputs
 	readonly gruposCursoChange = output<number>();
 	readonly gruposCrearGrupo = output<string>();
 	readonly gruposEliminarGrupo = output<number>();

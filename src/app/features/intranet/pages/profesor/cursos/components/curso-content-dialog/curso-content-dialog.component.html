@@ -31,20 +31,8 @@
 						Contenido
 					</p-tab>
 					<p-tab value="1">
-						<i class="pi pi-chart-bar tab-icon"></i>
-						Calificaciones
-					</p-tab>
-					<p-tab value="2">
 						<i class="pi pi-info-circle tab-icon"></i>
 						Información
-					</p-tab>
-					<p-tab value="3">
-						<i class="pi pi-check-square tab-icon"></i>
-						Registrar Asistencias
-					</p-tab>
-					<p-tab value="4">
-						<i class="pi pi-chart-line tab-icon"></i>
-						Visualizar Asistencias
 					</p-tab>
 				</p-tablist>
 
@@ -374,40 +362,8 @@
 					</p-tabpanel>
 					<!-- #endregion -->
 
-					<!-- #region Tab Calificaciones -->
-					<p-tabpanel value="1">
-						<div class="tab-panel-body">
-							<div style="display: flex; justify-content: flex-end; margin-bottom: 0.5rem">
-								<button
-									pButton
-									icon="pi pi-refresh"
-									class="p-button-rounded p-button-text p-button-sm"
-									(click)="onRefreshCalificaciones()"
-									[disabled]="calVm().loading"
-									pTooltip="Refrescar"
-									tooltipPosition="top"
-									[pt]="{ root: { 'aria-label': 'Refrescar calificaciones' } }"
-								></button>
-							</div>
-							<app-calificaciones-panel
-								[calificacionesPorSemana]="calVm().calificacionesPorSemana"
-								[periodos]="calVm().periodos"
-								[loading]="calVm().loading"
-								[saving]="calVm().saving"
-								[totalEvaluaciones]="calVm().totalEvaluaciones"
-								(crearEvaluacion)="onCrearEvaluacion()"
-								(editarEvaluacion)="onEditarEvaluacion($event)"
-								(calificarEstudiantes)="onCalificarEstudiantes($event)"
-								(eliminarEvaluacion)="onEliminarEvaluacion($event)"
-								(cambiarTipo)="onCambiarTipo($event)"
-								(configurarPeriodos)="onConfigurarPeriodos()"
-							/>
-						</div>
-					</p-tabpanel>
-					<!-- #endregion -->
-
 					<!-- #region Tab Información -->
-					<p-tabpanel value="2">
+					<p-tabpanel value="1">
 						<div class="tab-panel-body">
 							<div class="info-grid">
 								<div class="info-card">
@@ -469,16 +425,6 @@
 										<div class="stat-number">{{ vm().totalArchivosEstudiantes }}</div>
 										<div class="stat-label">Adjuntos Est.</div>
 									</button>
-									<button
-										class="stat-box calificaciones clickable"
-										type="button"
-										(click)="onTabChange('1')"
-										aria-label="Ir a calificaciones"
-									>
-										<i class="pi pi-chart-bar"></i>
-										<div class="stat-number">{{ calVm().totalEvaluaciones }}</div>
-										<div class="stat-label">Calificaciones</div>
-									</button>
 								</div>
 							</div>
 
@@ -486,47 +432,6 @@
 								<i class="pi pi-trash"></i>
 								Eliminar todo el contenido
 							</button>
-						</div>
-					</p-tabpanel>
-					<!-- #endregion -->
-
-					<!-- #region Tab Registrar Asistencias -->
-					<p-tabpanel value="3">
-						<div class="tab-panel-body">
-							<div style="display: flex; justify-content: flex-end; margin-bottom: 0.5rem">
-								<button
-									pButton
-									icon="pi pi-refresh"
-									class="p-button-rounded p-button-text p-button-sm"
-									(click)="onRefreshAsistenciaRegistro()"
-									[disabled]="asistVm().registroLoading"
-									pTooltip="Refrescar"
-									tooltipPosition="top"
-									[pt]="{ root: { 'aria-label': 'Refrescar asistencia' } }"
-								></button>
-							</div>
-							<app-asistencia-registro-panel
-								[estudiantes]="asistVm().registroEstudiantes"
-								[loading]="asistVm().registroLoading"
-								[saving]="asistVm().registroSaving"
-								[stats]="asistVm().registroStats"
-								(fechaChange)="onAsistenciaFechaChange($event)"
-								(estadoChange)="onAsistenciaEstadoChange($event)"
-								(justificacionChange)="onAsistenciaJustificacionChange($event)"
-								(save)="onAsistenciaSave()"
-							/>
-						</div>
-					</p-tabpanel>
-					<!-- #endregion -->
-
-					<!-- #region Tab Visualizar Asistencias -->
-					<p-tabpanel value="4">
-						<div class="tab-panel-body">
-							<app-asistencia-resumen-panel
-								[resumen]="asistVm().resumen"
-								[loading]="asistVm().resumenLoading"
-								(buscar)="onAsistenciaResumenBuscar($event)"
-							/>
 						</div>
 					</p-tabpanel>
 					<!-- #endregion -->
@@ -570,9 +475,7 @@
 	[visible]="vm().studentFilesDialogVisible"
 	[data]="vm().studentFilesData"
 	[loading]="vm().studentFilesLoading"
-	[calificaciones]="calVm().calificaciones"
 	(visibleChange)="onStudentFilesVisibleChange($event)"
-	(irACalificaciones)="onStudentFilesIrACalificaciones()"
 />
 
 <app-student-task-submissions-dialog
@@ -581,40 +484,6 @@
 	[tarea]="vm().taskSubmissionsTarea"
 	[loading]="vm().taskSubmissionsLoading"
 	(visibleChange)="onTaskSubmissionsVisibleChange($event)"
-	(irACalificaciones)="onTaskSubmissionsIrACalificaciones()"
-/>
-
-<!-- Calificaciones dialogs -->
-<app-evaluacion-form-dialog
-	[visible]="calVm().calificacionDialogVisible"
-	[saving]="calVm().saving"
-	[editing]="calVm().editingCalificacion"
-	[semanas]="vm().semanas"
-	[contenidoId]="vm().contenido?.id ?? null"
-	(visibleChange)="onCalificacionDialogVisibleChange($event)"
-	(save)="onSaveEvaluacion($event)"
-/>
-
-<app-calificar-dialog
-	[visible]="calVm().calificarDialogVisible"
-	[saving]="calVm().saving"
-	[calificacion]="calVm().selectedCalificacion"
-	[estudiantes]="estudiantesList()"
-	[grupos]="calVm().gruposForCalificar"
-	(visibleChange)="onCalificarDialogVisibleChange($event)"
-	(save)="onSaveCalificaciones($event)"
-	(saveGrupos)="onSaveCalificacionesGrupos($event)"
-/>
-
-<app-periodos-config-dialog
-	[visible]="calVm().periodosDialogVisible"
-	[saving]="calVm().saving"
-	[periodos]="calVm().periodos"
-	[contenidoId]="vm().contenido?.id ?? null"
-	[totalSemanas]="vm().contenido?.numeroSemanas ?? 16"
-	(visibleChange)="onPeriodosDialogVisibleChange($event)"
-	(crearPeriodo)="onCrearPeriodo($event)"
-	(eliminarPeriodo)="onEliminarPeriodo($event)"
 />
 
 <p-confirmDialog />

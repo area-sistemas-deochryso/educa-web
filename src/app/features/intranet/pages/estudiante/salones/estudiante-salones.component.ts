@@ -8,7 +8,6 @@ import { ButtonModule } from 'primeng/button';
 import { TooltipModule } from 'primeng/tooltip';
 import { ProgressSpinnerModule } from 'primeng/progressspinner';
 import { EstudianteSalonesFacade } from './services/estudiante-salones.facade';
-import { SalonMensajeriaFacade } from '../../profesor/salones/services/salon-mensajeria.facade';
 import { EstudianteSalon, EstudianteSalonCurso } from '../models';
 import { EstudianteSalonDialogComponent } from './components/estudiante-salon-dialog/estudiante-salon-dialog.component';
 
@@ -117,18 +116,11 @@ import { EstudianteSalonDialogComponent } from './components/estudiante-salon-di
 			[visible]="vm().dialogVisible"
 			[salon]="vm().selectedSalon"
 			[cursosOptions]="vm().cursosForSelectedSalon"
-			[asistenciaData]="vm().asistenciaData"
-			[asistenciaLoading]="vm().asistenciaLoading"
-			[asistenciaCursoId]="vm().asistenciaCursoId"
 			[gruposData]="vm().gruposData"
 			[gruposLoading]="vm().gruposLoading"
 			[gruposCursoId]="vm().gruposCursoId"
-			[notasData]="vm().notasData"
-			[notasLoading]="vm().notasLoading"
 			(visibleChange)="onDialogVisibleChange($event)"
-			(asistenciaChange)="onAsistenciaChange($event)"
 			(gruposChange)="onGruposChange($event)"
-			(notasRefresh)="onNotasRefresh()"
 		/>
 	`,
 })
@@ -136,7 +128,6 @@ export class EstudianteSalonesComponent implements OnInit {
 	// #region Dependencias
 	private readonly facade = inject(EstudianteSalonesFacade);
 	private readonly router = inject(Router);
-	private readonly mensajeriaFacade = inject(SalonMensajeriaFacade);
 	// #endregion
 
 	// #region Estado
@@ -164,20 +155,11 @@ export class EstudianteSalonesComponent implements OnInit {
 	onDialogVisibleChange(visible: boolean): void {
 		if (!visible) {
 			this.facade.closeDialog();
-			this.mensajeriaFacade.reset();
 		}
-	}
-
-	onAsistenciaChange(horarioId: number): void {
-		this.facade.loadAsistencia(horarioId);
 	}
 
 	onGruposChange(horarioId: number): void {
 		this.facade.loadGrupos(horarioId);
-	}
-
-	onNotasRefresh(): void {
-		this.facade.refreshNotas();
 	}
 	// #endregion
 }
