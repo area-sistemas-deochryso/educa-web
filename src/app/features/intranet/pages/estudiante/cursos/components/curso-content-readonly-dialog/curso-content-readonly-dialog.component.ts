@@ -7,21 +7,11 @@ import { ButtonModule } from 'primeng/button';
 import { TooltipModule } from 'primeng/tooltip';
 import { ConfirmDialogModule } from 'primeng/confirmdialog';
 import { TabsModule } from 'primeng/tabs';
-import { TagModule } from 'primeng/tag';
-import { TableModule } from 'primeng/table';
 import { ConfirmationService } from 'primeng/api';
 import { EstudianteCursosFacade } from '../../../services/estudiante-cursos.facade';
-import {
-	CursoContenidoSemanaDto,
-	EstudianteArchivoDto,
-	EstudianteTareaArchivoDto,
-	EstadoAsistenciaCurso,
-	ESTADO_ASISTENCIA_LABELS,
-	ESTADO_ASISTENCIA_SEVERITIES,
-} from '../../../models';
+import { CursoContenidoSemanaDto, EstudianteArchivoDto, EstudianteTareaArchivoDto } from '../../../models';
 import { ArchivosSummaryDialogComponent } from '../../../../profesor/cursos/components/archivos-summary-dialog/archivos-summary-dialog.component';
 import { TareasSummaryDialogComponent } from '../../../../profesor/cursos/components/tareas-summary-dialog/tareas-summary-dialog.component';
-import { NotasCursoCardComponent } from '../../../notas/components/notas-curso-card/notas-curso-card.component';
 
 @Component({
 	selector: 'app-curso-content-readonly-dialog',
@@ -35,11 +25,8 @@ import { NotasCursoCardComponent } from '../../../notas/components/notas-curso-c
 		TooltipModule,
 		ConfirmDialogModule,
 		TabsModule,
-		TagModule,
-		TableModule,
 		ArchivosSummaryDialogComponent,
 		TareasSummaryDialogComponent,
-		NotasCursoCardComponent,
 	],
 	providers: [ConfirmationService],
 	changeDetection: ChangeDetectionStrategy.OnPush,
@@ -61,8 +48,6 @@ export class CursoContentReadonlyDialogComponent {
 	readonly isFullscreen = signal(false);
 	readonly activeTab = signal('0');
 	readonly openPanels = signal<number[]>([]);
-	private notasLoaded = false;
-	private asistenciaLoaded = false;
 	// #endregion
 
 	// #region Computed
@@ -96,11 +81,6 @@ export class CursoContentReadonlyDialogComponent {
 			return false;
 		});
 	});
-	readonly asistenciaPorcentaje = computed(() => {
-		const asist = this.vm().miAsistencia;
-		if (!asist || asist.totalClases === 0) return 0;
-		return Math.round(((asist.totalPresente + asist.totalTarde) / asist.totalClases) * 100);
-	});
 	// #endregion
 
 	// #region Dialog handlers
@@ -115,35 +95,17 @@ export class CursoContentReadonlyDialogComponent {
 			this.isFullscreen.set(false);
 			this.activeTab.set('0');
 			this.openPanels.set([]);
-			this.notasLoaded = false;
-			this.asistenciaLoaded = false;
 		}
 	}
 
 	onTabChange(value: string): void {
 		this.activeTab.set(value);
-		if (value === '1' && !this.notasLoaded) {
-			this.notasLoaded = true;
-			this.facade.loadMisNotasCurso();
-		}
-		if (value === '3' && !this.asistenciaLoaded) {
-			this.asistenciaLoaded = true;
-			this.facade.loadMiAsistencia();
-		}
 	}
 	// #endregion
 
 	// #region Refresh handlers
 	onRefreshContenido(): void {
 		this.facade.refreshContenido();
-	}
-
-	onRefreshNotas(): void {
-		this.facade.refreshMisNotasCurso();
-	}
-
-	onRefreshAsistencia(): void {
-		this.facade.refreshMiAsistencia();
 	}
 	// #endregion
 
@@ -278,12 +240,5 @@ export class CursoContentReadonlyDialogComponent {
 		return `${(bytes / 1048576).toFixed(1)} MB`;
 	}
 
-	getEstadoLabel(estado: EstadoAsistenciaCurso): string {
-		return ESTADO_ASISTENCIA_LABELS[estado] ?? estado;
-	}
-
-	getEstadoSeverity(estado: EstadoAsistenciaCurso): string {
-		return ESTADO_ASISTENCIA_SEVERITIES[estado] ?? 'info';
-	}
 	// #endregion
 }

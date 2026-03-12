@@ -30,16 +30,8 @@
 						Contenido
 					</p-tab>
 					<p-tab value="1">
-						<i class="pi pi-chart-bar tab-icon"></i>
-						Mis Calificaciones
-					</p-tab>
-					<p-tab value="2">
 						<i class="pi pi-info-circle tab-icon"></i>
 						Información
-					</p-tab>
-					<p-tab value="3">
-						<i class="pi pi-chart-line tab-icon"></i>
-						Mi Asistencia
 					</p-tab>
 				</p-tablist>
 
@@ -377,40 +369,8 @@
 					</p-tabpanel>
 					<!-- #endregion -->
 
-					<!-- #region Tab Mis Calificaciones -->
-					<p-tabpanel value="1">
-						<div class="tab-panel-body">
-							<div style="display: flex; justify-content: flex-end; margin-bottom: 0.5rem">
-								<button
-									pButton
-									icon="pi pi-refresh"
-									class="p-button-rounded p-button-text p-button-sm"
-									(click)="onRefreshNotas()"
-									[disabled]="vm().misNotasLoading"
-									pTooltip="Refrescar"
-									tooltipPosition="top"
-									[pt]="{ root: { 'aria-label': 'Refrescar calificaciones' } }"
-								></button>
-							</div>
-							@if (vm().misNotasLoading) {
-								<div class="empty-state">
-									<i class="pi pi-spin pi-spinner"></i>
-									<p>Cargando calificaciones...</p>
-								</div>
-							} @else if (vm().misNotasCurso; as notas) {
-								<app-notas-curso-card [curso]="notas" />
-							} @else {
-								<div class="empty-state">
-									<i class="pi pi-chart-bar"></i>
-									<p>No hay calificaciones registradas para este curso</p>
-								</div>
-							}
-						</div>
-					</p-tabpanel>
-					<!-- #endregion -->
-
 					<!-- #region Tab Información -->
-					<p-tabpanel value="2">
+					<p-tabpanel value="1">
 						<div class="tab-panel-body">
 							<div class="info-grid">
 								<div class="info-card">
@@ -464,95 +424,6 @@
 									</button>
 								</div>
 							</div>
-						</div>
-					</p-tabpanel>
-					<!-- #endregion -->
-
-					<!-- #region Tab Mi Asistencia -->
-					<p-tabpanel value="3">
-						<div class="tab-panel-body">
-							<div style="display: flex; justify-content: flex-end; margin-bottom: 0.5rem">
-								<button
-									pButton
-									icon="pi pi-refresh"
-									class="p-button-rounded p-button-text p-button-sm"
-									(click)="onRefreshAsistencia()"
-									[disabled]="vm().miAsistenciaLoading"
-									pTooltip="Refrescar"
-									tooltipPosition="top"
-									[pt]="{ root: { 'aria-label': 'Refrescar asistencia' } }"
-								></button>
-							</div>
-							@if (vm().miAsistenciaLoading) {
-								<div class="empty-state">
-									<i class="pi pi-spin pi-spinner"></i>
-									<p>Cargando asistencia...</p>
-								</div>
-							} @else if (vm().miAsistencia; as asistencia) {
-								<!-- Stats resumen -->
-								<div class="asistencia-stats-row">
-									<div class="asistencia-stat-card presente">
-										<i class="pi pi-check-circle"></i>
-										<div class="stat-number">{{ asistencia.totalPresente }}</div>
-										<div class="stat-label">Presente</div>
-									</div>
-									<div class="asistencia-stat-card tarde">
-										<i class="pi pi-clock"></i>
-										<div class="stat-number">{{ asistencia.totalTarde }}</div>
-										<div class="stat-label">Tarde</div>
-									</div>
-									<div class="asistencia-stat-card falto">
-										<i class="pi pi-times-circle"></i>
-										<div class="stat-number">{{ asistencia.totalFalto }}</div>
-										<div class="stat-label">Faltó</div>
-									</div>
-									<div class="asistencia-stat-card total">
-										<i class="pi pi-percentage"></i>
-										<div class="stat-number">{{ asistenciaPorcentaje() }}%</div>
-										<div class="stat-label">Asistencia</div>
-									</div>
-								</div>
-
-								<!-- Tabla detalle -->
-								@if (asistencia.detalle.length > 0) {
-									<p-table
-										[value]="asistencia.detalle"
-										[paginator]="asistencia.detalle.length > 10"
-										[rows]="10"
-										styleClass="p-datatable-sm p-datatable-striped"
-									>
-										<ng-template #header>
-											<tr>
-												<th>Fecha</th>
-												<th>Estado</th>
-												<th>Justificación</th>
-											</tr>
-										</ng-template>
-										<ng-template #body let-item>
-											<tr>
-												<td>{{ item.fecha | date: 'dd/MM/yyyy' }}</td>
-												<td>
-													<p-tag
-														[value]="getEstadoLabel(item.estado)"
-														[severity]="$any(getEstadoSeverity(item.estado))"
-													/>
-												</td>
-												<td>{{ item.justificacion || '—' }}</td>
-											</tr>
-										</ng-template>
-									</p-table>
-								} @else {
-									<div class="empty-state">
-										<i class="pi pi-list"></i>
-										<p>No hay registros de asistencia detallados</p>
-									</div>
-								}
-							} @else {
-								<div class="empty-state">
-									<i class="pi pi-chart-line"></i>
-									<p>No hay registros de asistencia para este curso</p>
-								</div>
-							}
 						</div>
 					</p-tabpanel>
 					<!-- #endregion -->
