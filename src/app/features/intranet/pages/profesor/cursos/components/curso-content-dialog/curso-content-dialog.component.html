@@ -38,14 +38,6 @@
 						<i class="pi pi-info-circle tab-icon"></i>
 						Información
 					</p-tab>
-					<p-tab value="3">
-						<i class="pi pi-check-square tab-icon"></i>
-						Registrar Asistencias
-					</p-tab>
-					<p-tab value="4">
-						<i class="pi pi-chart-line tab-icon"></i>
-						Visualizar Asistencias
-					</p-tab>
 				</p-tablist>
 
 				<p-tabpanels>
@@ -490,47 +482,7 @@
 					</p-tabpanel>
 					<!-- #endregion -->
 
-					<!-- #region Tab Registrar Asistencias -->
-					<p-tabpanel value="3">
-						<div class="tab-panel-body">
-							<div style="display: flex; justify-content: flex-end; margin-bottom: 0.5rem">
-								<button
-									pButton
-									icon="pi pi-refresh"
-									class="p-button-rounded p-button-text p-button-sm"
-									(click)="onRefreshAsistenciaRegistro()"
-									[disabled]="asistVm().registroLoading"
-									pTooltip="Refrescar"
-									tooltipPosition="top"
-									[pt]="{ root: { 'aria-label': 'Refrescar asistencia' } }"
-								></button>
-							</div>
-							<app-asistencia-registro-panel
-								[estudiantes]="asistVm().registroEstudiantes"
-								[loading]="asistVm().registroLoading"
-								[saving]="asistVm().registroSaving"
-								[stats]="asistVm().registroStats"
-								(fechaChange)="onAsistenciaFechaChange($event)"
-								(estadoChange)="onAsistenciaEstadoChange($event)"
-								(justificacionChange)="onAsistenciaJustificacionChange($event)"
-								(save)="onAsistenciaSave()"
-							/>
-						</div>
-					</p-tabpanel>
-					<!-- #endregion -->
-
-					<!-- #region Tab Visualizar Asistencias -->
-					<p-tabpanel value="4">
-						<div class="tab-panel-body">
-							<app-asistencia-resumen-panel
-								[resumen]="asistVm().resumen"
-								[loading]="asistVm().resumenLoading"
-								(buscar)="onAsistenciaResumenBuscar($event)"
-							/>
-						</div>
-					</p-tabpanel>
-					<!-- #endregion -->
-				</p-tabpanels>
+					</p-tabpanels>
 			</p-tabs>
 		</div>
 	}

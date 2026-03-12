@@ -10,7 +10,6 @@ import { ConfirmDialogModule } from 'primeng/confirmdialog';
 import { ConfirmationService } from 'primeng/api';
 import { CursoContenidoFacade } from '../../services/curso-contenido.facade';
 import { CalificacionesFacade } from '../../services/calificaciones.facade';
-import { AsistenciaCursoFacade } from '../../services/asistencia-curso.facade';
 import {
 	CursoContenidoSemanaDto,
 	CursoContenidoTareaDto,
@@ -22,7 +21,6 @@ import {
 	CalificarLoteDto,
 	CalificarGruposLoteDto,
 	CrearPeriodoDto,
-	EstadoAsistenciaCurso,
 } from '../../../models';
 import { SemanaEditDialogComponent } from '../semana-edit-dialog/semana-edit-dialog.component';
 import { TareaDialogComponent } from '../tarea-dialog/tarea-dialog.component';
@@ -34,8 +32,6 @@ import { CalificacionesPanelComponent } from '../calificaciones-panel/calificaci
 import { EvaluacionFormDialogComponent } from '../evaluacion-form-dialog/evaluacion-form-dialog.component';
 import { CalificarDialogComponent } from '../calificar-dialog/calificar-dialog.component';
 import { PeriodosConfigDialogComponent } from '../periodos-config-dialog/periodos-config-dialog.component';
-import { AsistenciaRegistroPanelComponent } from '../asistencia-registro-panel/asistencia-registro-panel.component';
-import { AsistenciaResumenPanelComponent } from '../asistencia-resumen-panel/asistencia-resumen-panel.component';
 
 @Component({
 	selector: 'app-curso-content-dialog',
@@ -59,8 +55,6 @@ import { AsistenciaResumenPanelComponent } from '../asistencia-resumen-panel/asi
 		EvaluacionFormDialogComponent,
 		CalificarDialogComponent,
 		PeriodosConfigDialogComponent,
-		AsistenciaRegistroPanelComponent,
-		AsistenciaResumenPanelComponent,
 	],
 	providers: [ConfirmationService],
 	changeDetection: ChangeDetectionStrategy.OnPush,
@@ -70,12 +64,10 @@ import { AsistenciaResumenPanelComponent } from '../asistencia-resumen-panel/asi
 export class CursoContentDialogComponent {
 	private readonly facade = inject(CursoContenidoFacade);
 	private readonly calFacade = inject(CalificacionesFacade);
-	private readonly asistFacade = inject(AsistenciaCursoFacade);
 	private readonly confirmationService = inject(ConfirmationService);
 
 	readonly vm = this.facade.vm;
 	readonly calVm = this.calFacade.vm;
-	readonly asistVm = this.asistFacade.vm;
 
 	// #region Estado local
 	readonly searchQuery = signal('');
@@ -84,7 +76,6 @@ export class CursoContentDialogComponent {
 	readonly openPanels = signal<number[]>([]);
 	private activeSemanaId = signal<number | null>(null);
 	private calificacionesLoaded = false;
-	private asistenciaRegistroLoaded = false;
 
 	readonly dialogStyle = computed(() =>
 		this.isFullscreen()
@@ -152,13 +143,11 @@ export class CursoContentDialogComponent {
 		if (!visible) {
 			this.facade.closeContentDialog();
 			this.calFacade.resetCalificaciones();
-			this.asistFacade.resetAsistencia();
 			this.searchQuery.set('');
 			this.activeTab.set('0');
 			this.isFullscreen.set(false);
 			this.openPanels.set([]);
 			this.calificacionesLoaded = false;
-			this.asistenciaRegistroLoaded = false;
 		}
 	}
 
@@ -359,11 +348,6 @@ export class CursoContentDialogComponent {
 		}
 	}
 
-	onRefreshAsistenciaRegistro(): void {
-		const today = new Date();
-		const fecha = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`;
-		this.asistFacade.loadRegistro(fecha);
-	}
 	// #endregion
 
 	// #region Tab handlers
@@ -376,35 +360,6 @@ export class CursoContentDialogComponent {
 				this.calificacionesLoaded = true;
 			}
 		}
-		// Lazy-load attendance registration (today's date) on first visit
-		if (value === '3' && !this.asistenciaRegistroLoaded) {
-			const today = new Date();
-			const fecha = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`;
-			this.asistFacade.loadRegistro(fecha);
-			this.asistenciaRegistroLoaded = true;
-		}
-	}
-
-	// #endregion
-	// #region Asistencia handlers
-	onAsistenciaFechaChange(fecha: string): void {
-		this.asistFacade.loadRegistro(fecha);
-	}
-
-	onAsistenciaEstadoChange(event: { estudianteId: number; estado: EstadoAsistenciaCurso }): void {
-		this.asistFacade.setEstudianteEstado(event.estudianteId, event.estado);
-	}
-
-	onAsistenciaJustificacionChange(event: { estudianteId: number; justificacion: string | null }): void {
-		this.asistFacade.setEstudianteJustificacion(event.estudianteId, event.justificacion);
-	}
-
-	onAsistenciaSave(): void {
-		this.asistFacade.registrar();
-	}
-
-	onAsistenciaResumenBuscar(event: { fechaInicio: string; fechaFin: string }): void {
-		this.asistFacade.loadResumen(event.fechaInicio, event.fechaFin);
 	}
 
 	// #endregion
