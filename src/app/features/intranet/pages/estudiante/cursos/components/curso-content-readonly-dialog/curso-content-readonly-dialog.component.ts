@@ -12,6 +12,7 @@ import { EstudianteCursosFacade } from '../../../services/estudiante-cursos.faca
 import { CursoContenidoSemanaDto, EstudianteArchivoDto, EstudianteTareaArchivoDto } from '../../../models';
 import { ArchivosSummaryDialogComponent } from '../../../../profesor/cursos/components/archivos-summary-dialog/archivos-summary-dialog.component';
 import { TareasSummaryDialogComponent } from '../../../../profesor/cursos/components/tareas-summary-dialog/tareas-summary-dialog.component';
+import { NotasCursoCardComponent } from '../../../notas/components/notas-curso-card/notas-curso-card.component';
 
 @Component({
 	selector: 'app-curso-content-readonly-dialog',
@@ -27,6 +28,7 @@ import { TareasSummaryDialogComponent } from '../../../../profesor/cursos/compon
 		TabsModule,
 		ArchivosSummaryDialogComponent,
 		TareasSummaryDialogComponent,
+		NotasCursoCardComponent,
 	],
 	providers: [ConfirmationService],
 	changeDetection: ChangeDetectionStrategy.OnPush,
@@ -48,6 +50,7 @@ export class CursoContentReadonlyDialogComponent {
 	readonly isFullscreen = signal(false);
 	readonly activeTab = signal('0');
 	readonly openPanels = signal<number[]>([]);
+	private notasLoaded = false;
 	// #endregion
 
 	// #region Computed
@@ -95,17 +98,26 @@ export class CursoContentReadonlyDialogComponent {
 			this.isFullscreen.set(false);
 			this.activeTab.set('0');
 			this.openPanels.set([]);
+			this.notasLoaded = false;
 		}
 	}
 
 	onTabChange(value: string): void {
 		this.activeTab.set(value);
+		if (value === '1' && !this.notasLoaded) {
+			this.notasLoaded = true;
+			this.facade.loadMisNotasCurso();
+		}
 	}
 	// #endregion
 
 	// #region Refresh handlers
 	onRefreshContenido(): void {
 		this.facade.refreshContenido();
+	}
+
+	onRefreshNotas(): void {
+		this.facade.refreshMisNotasCurso();
 	}
 	// #endregion
 

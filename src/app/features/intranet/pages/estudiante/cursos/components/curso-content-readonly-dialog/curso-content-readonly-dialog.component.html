@@ -30,6 +30,10 @@
 						Contenido
 					</p-tab>
 					<p-tab value="1">
+						<i class="pi pi-chart-bar tab-icon"></i>
+						Mis Calificaciones
+					</p-tab>
+					<p-tab value="2">
 						<i class="pi pi-info-circle tab-icon"></i>
 						Información
 					</p-tab>
@@ -369,8 +373,40 @@
 					</p-tabpanel>
 					<!-- #endregion -->
 
-					<!-- #region Tab Información -->
+					<!-- #region Tab Mis Calificaciones -->
 					<p-tabpanel value="1">
+						<div class="tab-panel-body">
+							<div style="display: flex; justify-content: flex-end; margin-bottom: 0.5rem">
+								<button
+									pButton
+									icon="pi pi-refresh"
+									class="p-button-rounded p-button-text p-button-sm"
+									(click)="onRefreshNotas()"
+									[disabled]="vm().misNotasLoading"
+									pTooltip="Refrescar"
+									tooltipPosition="top"
+									[pt]="{ root: { 'aria-label': 'Refrescar calificaciones' } }"
+								></button>
+							</div>
+							@if (vm().misNotasLoading) {
+								<div class="empty-state">
+									<i class="pi pi-spin pi-spinner"></i>
+									<p>Cargando calificaciones...</p>
+								</div>
+							} @else if (vm().misNotasCurso; as notas) {
+								<app-notas-curso-card [curso]="notas" />
+							} @else {
+								<div class="empty-state">
+									<i class="pi pi-chart-bar"></i>
+									<p>No hay calificaciones registradas para este curso</p>
+								</div>
+							}
+						</div>
+					</p-tabpanel>
+					<!-- #endregion -->
+
+					<!-- #region Tab Información -->
+					<p-tabpanel value="2">
 						<div class="tab-panel-body">
 							<div class="info-grid">
 								<div class="info-card">
