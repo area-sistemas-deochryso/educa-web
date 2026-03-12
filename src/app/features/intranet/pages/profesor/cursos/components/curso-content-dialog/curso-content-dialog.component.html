@@ -257,6 +257,19 @@
 																			<div class="row-actions">
 																				<button
 																					pButton
+																					icon="pi pi-users"
+																					class="p-button-text p-button-sm p-button-rounded"
+																					pTooltip="Ver entregas de estudiantes"
+																					tooltipPosition="top"
+																					(click)="onViewTaskSubmissions(tarea)"
+																					[pt]="{
+																						root: {
+																							'aria-label': 'Ver entregas de estudiantes',
+																						},
+																					}"
+																				></button>
+																				<button
+																					pButton
 																					icon="pi pi-pencil"
 																					class="p-button-text p-button-sm p-button-rounded"
 																					pTooltip="Editar"
@@ -560,6 +573,15 @@
 	[calificaciones]="calVm().calificaciones"
 	(visibleChange)="onStudentFilesVisibleChange($event)"
 	(irACalificaciones)="onStudentFilesIrACalificaciones()"
+/>
+
+<app-student-task-submissions-dialog
+	[visible]="vm().taskSubmissionsDialogVisible"
+	[data]="vm().taskSubmissionsData"
+	[tarea]="vm().taskSubmissionsTarea"
+	[loading]="vm().taskSubmissionsLoading"
+	(visibleChange)="onTaskSubmissionsVisibleChange($event)"
+	(irACalificaciones)="onTaskSubmissionsIrACalificaciones()"
 />
 
 <!-- Calificaciones dialogs -->

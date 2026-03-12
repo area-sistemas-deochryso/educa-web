@@ -1,0 +1,112 @@
+<p-dialog
+	[visible]="visible()"
+	(visibleChange)="onVisibleChange($event)"
+	[modal]="true"
+	[dismissableMask]="true"
+	[header]="dialogHeader()"
+	[style]="{ width: '660px', maxWidth: '95vw' }"
+>
+	@if (loading()) {
+		<div class="loading-state">
+			<p-progressSpinner
+				[style]="{ width: '40px', height: '40px' }"
+				strokeWidth="4"
+			/>
+			<p>Cargando entregas...</p>
+		</div>
+	} @else {
+		<div class="submissions-body">
+			<!-- #region Task info header -->
+			@if (tarea(); as t) {
+				<div class="task-info">
+					<div class="task-info-row">
+						@if (t.fechaLimite) {
+							<span class="task-deadline" [class.overdue]="isOverdue()">
+								<i class="pi pi-calendar"></i>
+								Fecha límite: {{ t.fechaLimite | date: 'dd/MM/yyyy' }}
+								@if (isOverdue()) {
+									<span class="overdue-label">(Vencida)</span>
+								}
+							</span>
+						}
+						<span class="task-stats">
+							<i class="pi pi-users"></i>
+							{{ totalEntregas() }}/{{ totalEstudiantes() }} entregaron
+						</span>
+					</div>
+					@if (t.descripcion) {
+						<p class="task-description">{{ t.descripcion }}</p>
+					}
+				</div>
+			}
+			<!-- #endregion -->
+
+			<!-- #region Actions bar -->
+			<div class="actions-bar">
+				<button
+					pButton
+					label="Ir a Calificaciones"
+					icon="pi pi-chart-bar"
+					class="p-button-text p-button-sm"
+					(click)="onIrACalificaciones()"
+					pTooltip="Calificar esta tarea en el tab de calificaciones"
+					tooltipPosition="top"
+				></button>
+			</div>
+			<!-- #endregion -->
+
+			<!-- #region Student list -->
+			@if (data().length === 0) {
+				<div class="empty-state">
+					<i class="pi pi-users"></i>
+					<p>No hay estudiantes asignados</p>
+				</div>
+			} @else {
+				<div class="students-list">
+					@for (estudiante of data(); track estudiante.estudianteId) {
+						<div class="student-card" [class.no-submission]="estudiante.archivos.length === 0">
+							<div class="student-header">
+								<div class="student-avatar">
+									<i class="pi pi-user"></i>
+								</div>
+								<span class="student-name">{{ estudiante.estudianteNombre }}</span>
+								@let status = getSubmissionStatus(estudiante);
+								<p-tag
+									[value]="status.label"
+									[severity]="status.severity"
+									[icon]="status.icon"
+								/>
+							</div>
+
+							@if (estudiante.archivos.length > 0) {
+								<div class="student-files">
+									@for (archivo of estudiante.archivos; track archivo.id) {
+										<div
+											class="file-row clickable"
+											(click)="openArchivo(archivo.urlArchivo)"
+										>
+											<div class="file-icon">
+												<i class="pi pi-file"></i>
+											</div>
+											<div class="file-info">
+												<span class="file-name">{{ archivo.nombreArchivo }}</span>
+												<span class="file-meta">
+													@if (archivo.tamanoBytes) {
+														{{ formatFileSize(archivo.tamanoBytes) }} ·
+													}
+													{{ archivo.fechaReg | date: 'dd/MM/yyyy HH:mm' }}
+												</span>
+											</div>
+											<i class="pi pi-external-link file-open-icon"></i>
+										</div>
+									}
+								</div>
+							}
+						</div>
+					}
+				</div>
+			}
+			<!-- #endregion -->
+		</div>
+	}
+</p-dialog>

@@ -608,6 +608,40 @@ export class CursoContenidoFacade {
 	closeStudentFilesDialog(): void {
 		this.store.closeStudentFilesDialog();
 	}
+	/**
+	 * Load student submissions for a task and open the dialog.
+	 *
+	 * @param tarea Task to view submissions for.
+	 */
+	openTaskSubmissionsDialog(tarea: CursoContenidoTareaDto): void {
+		if (this.store.taskSubmissionsLoading()) return;
+		this.store.openTaskSubmissionsDialog(tarea);
+		this.store.setTaskSubmissionsLoading(true);
+
+		this.api
+			.getArchivosTareaEstudiantes(tarea.id)
+			.pipe(
+				withRetry({ tag: 'CursoContenidoFacade:loadTaskSubmissions' }),
+				takeUntilDestroyed(this.destroyRef),
+			)
+			.subscribe({
+				next: (data) => {
+					this.store.setTaskSubmissionsData(data);
+					this.store.setTaskSubmissionsLoading(false);
+				},
+				error: (err) => {
+					logger.error('CursoContenidoFacade: Error al cargar entregas de tarea', err);
+					this.errorHandler.showError('Error', 'No se pudo cargar las entregas de estudiantes');
+					this.store.setTaskSubmissionsLoading(false);
+				},
+			});
+	}
+	/**
+	 * Close student task submissions dialog.
+	 */
+	closeTaskSubmissionsDialog(): void {
+		this.store.closeTaskSubmissionsDialog();
+	}
 	/** Clear the initial tab override after it has been consumed. */
 	clearInitialTab(): void {
 		this.store.setInitialTab(null);

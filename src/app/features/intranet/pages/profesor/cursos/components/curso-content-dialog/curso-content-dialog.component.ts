@@ -29,6 +29,7 @@ import { TareaDialogComponent } from '../tarea-dialog/tarea-dialog.component';
 import { ArchivosSummaryDialogComponent } from '../archivos-summary-dialog/archivos-summary-dialog.component';
 import { TareasSummaryDialogComponent } from '../tareas-summary-dialog/tareas-summary-dialog.component';
 import { StudentFilesDialogComponent } from '../student-files-dialog/student-files-dialog.component';
+import { StudentTaskSubmissionsDialogComponent } from '../student-task-submissions-dialog/student-task-submissions-dialog.component';
 import { CalificacionesPanelComponent } from '../calificaciones-panel/calificaciones-panel.component';
 import { EvaluacionFormDialogComponent } from '../evaluacion-form-dialog/evaluacion-form-dialog.component';
 import { CalificarDialogComponent } from '../calificar-dialog/calificar-dialog.component';
@@ -53,6 +54,7 @@ import { AsistenciaResumenPanelComponent } from '../asistencia-resumen-panel/asi
 		ArchivosSummaryDialogComponent,
 		TareasSummaryDialogComponent,
 		StudentFilesDialogComponent,
+		StudentTaskSubmissionsDialogComponent,
 		CalificacionesPanelComponent,
 		EvaluacionFormDialogComponent,
 		CalificarDialogComponent,
@@ -326,6 +328,21 @@ export class CursoContentDialogComponent {
 
 	onStudentFilesIrACalificaciones(): void {
 		this.facade.closeStudentFilesDialog();
+		this.onTabChange('1');
+	}
+
+	onViewTaskSubmissions(tarea: CursoContenidoTareaDto): void {
+		this.facade.openTaskSubmissionsDialog(tarea);
+	}
+
+	onTaskSubmissionsVisibleChange(visible: boolean): void {
+		if (!visible) {
+			this.facade.closeTaskSubmissionsDialog();
+		}
+	}
+
+	onTaskSubmissionsIrACalificaciones(): void {
+		this.facade.closeTaskSubmissionsDialog();
 		this.onTabChange('1');
 	}
 

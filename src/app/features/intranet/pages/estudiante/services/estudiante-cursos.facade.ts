@@ -104,7 +104,7 @@ export class EstudianteCursosFacade {
 			.subscribe({
 				next: (allNotas) => {
 					const match = allNotas.find(
-						(n) => n.cursoNombre === contenido.cursoNombre && n.salonDescripcion === contenido.salonDescripcion,
+						(n) => n.cursoContenidoId === contenido.id,
 					);
 					this.store.setMisNotasCurso(match ?? null);
 					this.store.setMisNotasLoading(false);
@@ -181,7 +181,7 @@ export class EstudianteCursosFacade {
 			.subscribe({
 				next: (allNotas) => {
 					const match = allNotas.find(
-						(n) => n.cursoNombre === contenido.cursoNombre && n.salonDescripcion === contenido.salonDescripcion,
+						(n) => n.cursoContenidoId === contenido.id,
 					);
 					this.store.setMisNotasCurso(match ?? null);
 					this.store.setMisNotasLoading(false);

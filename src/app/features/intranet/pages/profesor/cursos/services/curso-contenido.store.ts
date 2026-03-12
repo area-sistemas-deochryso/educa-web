@@ -6,6 +6,7 @@ import {
 	CursoContenidoTareaDto,
 	TareaArchivoDto,
 	SemanaEstudianteArchivosDto,
+	EstudianteTareaArchivosGroupDto,
 } from '../../models';
 
 /**
@@ -47,6 +48,14 @@ interface CursoContenidoState {
 	studentFilesLoading: boolean;
 	/** Initial tab to open when dialog becomes visible. */
 	initialTab: string | null;
+	/** Student task submissions dialog visibility. */
+	taskSubmissionsDialogVisible: boolean;
+	/** Student task submissions data for professor view. */
+	taskSubmissionsData: EstudianteTareaArchivosGroupDto[];
+	/** True while student task submissions are loading. */
+	taskSubmissionsLoading: boolean;
+	/** The task being viewed for submissions. */
+	taskSubmissionsTarea: CursoContenidoTareaDto | null;
 	// #endregion
 }
 
@@ -68,6 +77,10 @@ const initialState: CursoContenidoState = {
 	studentFilesData: [],
 	studentFilesLoading: false,
 	initialTab: null,
+	taskSubmissionsDialogVisible: false,
+	taskSubmissionsData: [],
+	taskSubmissionsLoading: false,
+	taskSubmissionsTarea: null,
 };
 
 /**
@@ -119,6 +132,14 @@ export class CursoContenidoStore {
 	readonly studentFilesLoading = computed(() => this._state().studentFilesLoading);
 	/** Initial tab to open when dialog becomes visible. */
 	readonly initialTab = computed(() => this._state().initialTab);
+	/** Student task submissions dialog visibility. */
+	readonly taskSubmissionsDialogVisible = computed(() => this._state().taskSubmissionsDialogVisible);
+	/** Student task submissions data for professor view. */
+	readonly taskSubmissionsData = computed(() => this._state().taskSubmissionsData);
+	/** True while student task submissions are loading. */
+	readonly taskSubmissionsLoading = computed(() => this._state().taskSubmissionsLoading);
+	/** The task being viewed for submissions. */
+	readonly taskSubmissionsTarea = computed(() => this._state().taskSubmissionsTarea);
 
 	// #endregion
 	// #region Computed derivados
@@ -165,6 +186,10 @@ export class CursoContenidoStore {
 		studentFilesLoading: this.studentFilesLoading(),
 		totalArchivosEstudiantes: this.totalArchivosEstudiantes(),
 		initialTab: this.initialTab(),
+		taskSubmissionsDialogVisible: this.taskSubmissionsDialogVisible(),
+		taskSubmissionsData: this.taskSubmissionsData(),
+		taskSubmissionsLoading: this.taskSubmissionsLoading(),
+		taskSubmissionsTarea: this.taskSubmissionsTarea(),
 	}));
 
 	// #endregion
@@ -523,6 +548,34 @@ export class CursoContenidoStore {
 	 */
 	closeStudentFilesDialog(): void {
 		this._state.update((s) => ({ ...s, studentFilesDialogVisible: false }));
+	}
+	/**
+	 * Open student task submissions dialog.
+	 */
+	openTaskSubmissionsDialog(tarea: CursoContenidoTareaDto): void {
+		this._state.update((s) => ({ ...s, taskSubmissionsDialogVisible: true, taskSubmissionsTarea: tarea }));
+	}
+	/**
+	 * Close student task submissions dialog and clear data.
+	 */
+	closeTaskSubmissionsDialog(): void {
+		this._state.update((s) => ({
+			...s,
+			taskSubmissionsDialogVisible: false,
+			taskSubmissionsTarea: null,
+		}));
+	}
+	/**
+	 * Set student task submissions data.
+	 */
+	setTaskSubmissionsData(data: EstudianteTareaArchivosGroupDto[]): void {
+		this._state.update((s) => ({ ...s, taskSubmissionsData: data }));
+	}
+	/**
+	 * Set student task submissions loading flag.
+	 */
+	setTaskSubmissionsLoading(loading: boolean): void {
+		this._state.update((s) => ({ ...s, taskSubmissionsLoading: loading }));
 	}
 	/**
 	 * Set student files data.

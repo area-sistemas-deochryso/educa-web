@@ -153,6 +153,7 @@ export interface EstudiantePromediosDto {
 }
 
 export interface EstudianteMisNotasDto {
+  cursoContenidoId: number;
   cursoNombre: string;
   salonDescripcion: string;
   evaluaciones: CalificacionConMiNotaDto[];
