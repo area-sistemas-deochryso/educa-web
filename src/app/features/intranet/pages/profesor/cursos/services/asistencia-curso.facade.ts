@@ -1,8 +1,7 @@
 import { Injectable, inject, DestroyRef } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { logger, withRetry } from '@core/helpers';
-import { ErrorHandlerService, WalFacadeHelper } from '@core/services';
-import { environment } from '@config';
+import { ErrorHandlerService } from '@core/services';
 import { ProfesorApiService } from '../../services/profesor-api.service';
 import { CursoContenidoStore } from './curso-contenido.store';
 import { AsistenciaCursoStore } from './asistencia-curso.store';
@@ -15,9 +14,7 @@ export class AsistenciaCursoFacade {
 	private readonly store = inject(AsistenciaCursoStore);
 	private readonly contenidoStore = inject(CursoContenidoStore);
 	private readonly errorHandler = inject(ErrorHandlerService);
-	private readonly wal = inject(WalFacadeHelper);
 	private readonly destroyRef = inject(DestroyRef);
-	private readonly asistenciaUrl = `${environment.apiUrl}/api/AsistenciaCurso`;
 	// #endregion
 
 	// #region Estado expuesto
@@ -102,29 +99,14 @@ export class AsistenciaCursoFacade {
 			})),
 		};
 
-		this.wal.execute({
-			operation: 'CREATE',
-			resourceType: 'AsistenciaCurso',
-			endpoint: `${this.asistenciaUrl}/horario/${horarioId}/registrar`,
-			method: 'POST',
-			payload: dto,
-			http$: () => this.api.registrarAsistenciaCurso(horarioId, dto),
-			onCommit: () => {
+		this.api.registrarAsistenciaCurso(horarioId, dto).subscribe({
+			next: () => {
 				this.store.setRegistroSaving(false);
 				this.errorHandler.showSuccess('Éxito', 'Asistencia registrada exitosamente');
 			},
-			onError: (err) => {
+			error: (err) => {
 				this.handleError(err, 'registrar asistencia');
 				this.store.setRegistroSaving(false);
-			},
-			optimistic: {
-				apply: () => {
-					// Optimistic: show success state immediately
-					// The data is already in the store from the form
-				},
-				rollback: () => {
-					// Nothing to rollback — form data stays, user can retry
-				},
 			},
 		});
 	}

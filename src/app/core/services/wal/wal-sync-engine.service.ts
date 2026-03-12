@@ -191,7 +191,7 @@ export class WalSyncEngine {
 
 		this._isProcessing = true;
 		try {
-			let entries = await this.wal.getPendingEntries();
+			let entries = await this.wal.getRetryableEntries();
 
 			while (entries.length > 0 && this.sw.isOnline) {
 				// Coalesce duplicate UPDATEs to the same resource before processing
@@ -207,8 +207,9 @@ export class WalSyncEngine {
 					await this.processEntry(entry);
 				}
 
-				// Drain: pick up entries added while we were processing
-				entries = await this.wal.getPendingEntries();
+				// Drain: pick up new entries added while we were processing
+				// Uses getRetryableEntries to respect nextRetryAt backoff
+				entries = await this.wal.getRetryableEntries();
 			}
 		} finally {
 			this._isProcessing = false;

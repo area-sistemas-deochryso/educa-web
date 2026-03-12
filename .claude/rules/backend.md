@@ -148,6 +148,25 @@ Helpers de claims (`ObtenerDni()`, `ObtenerRol()`) SÍ pertenecen al controller.
 
 ---
 
+## Migraciones y Scripts SQL
+
+> **"NUNCA ejecutar scripts SQL sin mostrarlos al usuario primero."**
+
+Cuando un cambio en el backend requiera crear tablas, columnas, índices o cualquier modificación en la base de datos:
+
+1. **SIEMPRE** mostrar el script SQL completo al usuario antes de cualquier otra acción
+2. **NUNCA** asumir que el usuario puede ejecutar scripts automáticamente — la BD de producción es Azure SQL y requiere ejecución manual
+3. **Listar explícitamente** todos los objetos de BD nuevos que el cambio requiere (tablas, índices, FKs, constraints)
+4. **Advertir** si un deploy de backend va a fallar sin el script SQL previo
+
+Esto aplica a:
+- Nuevas entidades/tablas (`[Table("X")]`)
+- Nuevos índices o constraints (Fluent API en `ApplicationDbContext`)
+- Cambios en columnas existentes (tipo, nullable, longitud)
+- Nuevos `DbSet<T>` en el `ApplicationDbContext`
+
+---
+
 ## Checklist de Code Review
 
 ```
@@ -169,4 +188,8 @@ LOGGING
 SEGURIDAD
 [ ] ¿Endpoints sensibles tienen [Authorize]?
 [ ] ¿Se valida acceso al recurso? ¿No se exponen datos sensibles en errores?
+
+MIGRACIONES
+[ ] ¿Hay tablas/columnas/índices nuevos? → Script SQL mostrado al usuario
+[ ] ¿El deploy va a fallar sin migración previa? → Advertir explícitamente
 ```

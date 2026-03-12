@@ -28,48 +28,7 @@ import {
 	standalone: true,
 	imports: [CommonModule, FormsModule, Select, TagModule, TableModule, ProgressSpinnerModule],
 	changeDetection: ChangeDetectionStrategy.OnPush,
-	styles: `
-		.stat-cards {
-			display: grid;
-			grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
-			gap: 1rem;
-		}
-		.stat-card {
-			padding: 1rem;
-			border-radius: 8px;
-			text-align: center;
-		}
-		.stat-card .stat-value {
-			font-size: 1.5rem;
-			font-weight: 700;
-		}
-		.stat-card .stat-label {
-			font-size: 0.85rem;
-			opacity: 0.8;
-		}
-		.stat-success {
-			background: var(--p-green-50);
-			color: var(--p-green-700);
-		}
-		.stat-warn {
-			background: var(--p-yellow-50);
-			color: var(--p-yellow-700);
-		}
-		.stat-danger {
-			background: var(--p-red-50);
-			color: var(--p-red-700);
-		}
-		.stat-info {
-			background: var(--p-blue-50);
-			color: var(--p-blue-700);
-		}
-		.filters-row {
-			display: flex;
-			align-items: center;
-			gap: 1rem;
-			flex-wrap: wrap;
-		}
-	`,
+	styleUrl: './estudiante-asistencia.component.scss',
 	template: `
 		<div class="p-4">
 			<h2 class="mt-0 mb-3">Mi Asistencia</h2>
