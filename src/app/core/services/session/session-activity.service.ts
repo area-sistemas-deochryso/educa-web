@@ -94,7 +94,8 @@ export class SessionActivityService {
 
 		this._isRunning.set(true);
 		this._lastActivity.set(Date.now());
-		this._lastRefreshTime.set(Date.now());
+		// Don't set _lastRefreshTime here — the actual token age is unknown.
+		// verifySession() will set it after confirming the token is valid.
 
 		this.registerActivityListeners();
 		this.registerVisibilityListener();
@@ -307,6 +308,8 @@ export class SessionActivityService {
 		this.authApi.getProfile().subscribe({
 			next: (profile) => {
 				if (profile) {
+					// Token is valid — mark refresh time so the timer schedules correctly
+					this._lastRefreshTime.set(Date.now());
 					this.scheduleRefresh();
 					logger.log('[SessionActivity] Session verified — refresh in', REFRESH_TIMER_MS / 60_000, 'min');
 				} else {

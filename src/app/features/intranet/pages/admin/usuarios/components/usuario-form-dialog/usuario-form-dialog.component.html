@@ -152,7 +152,6 @@
 				<div class="field">
 					<label for="telefonoApoderado">
 						Telefono del Apoderado
-						<span style="color: var(--red-500)">*</span>
 					</label>
 					<input
 						id="telefonoApoderado"
@@ -160,7 +159,7 @@
 						pInputText
 						[ngModel]="formData().telefonoApoderado"
 						(ngModelChange)="onFieldChange('telefonoApoderado', $event)"
-						placeholder="999999999 (obligatorio)"
+						placeholder="999999999"
 					/>
 				</div>
 			}
@@ -186,7 +185,6 @@
 				<div class="field">
 					<label for="correoApoderado">
 						Correo del Apoderado
-						<span style="color: var(--red-500)">*</span>
 					</label>
 					<input
 						id="correoApoderado"
@@ -194,7 +192,7 @@
 						pInputText
 						[ngModel]="formData().correoApoderado"
 						(ngModelChange)="onFieldChange('correoApoderado', $event)"
-						placeholder="correo@ejemplo.com (obligatorio)"
+						placeholder="correo@ejemplo.com"
 						[class.ng-invalid]="errors().correoApoderadoError"
 						[class.ng-dirty]="formData().correoApoderado"
 					/>

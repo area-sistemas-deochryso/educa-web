@@ -3,12 +3,14 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { EstudianteHorariosStore } from './estudiante-horarios.store';
 import { EstudianteApiService } from '../../services/estudiante-api.service';
 import { logger } from '@core/helpers';
+import { SmartNotificationService } from '@core/services/notifications/smart-notification.service';
 
 @Injectable({ providedIn: 'root' })
 export class EstudianteHorariosFacade {
 	// #region Dependencias
 	private readonly store = inject(EstudianteHorariosStore);
 	private readonly api = inject(EstudianteApiService);
+	private readonly smartNotif = inject(SmartNotificationService);
 	private readonly destroyRef = inject(DestroyRef);
 	// #endregion
 
@@ -27,6 +29,7 @@ export class EstudianteHorariosFacade {
 			next: (horarios) => {
 				this.store.setHorarios(horarios);
 				this.store.setLoading(false);
+				this.smartNotif.saveHorarioSnapshot(horarios);
 			},
 			error: (err) => {
 				logger.error('Error al cargar horarios del estudiante', err);

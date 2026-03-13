@@ -1,6 +1,6 @@
 // #region Imports
 import { AuthUser, CambiarContrasenaRequest, LoginResponse, StoredSession, UserRole } from './auth.models';
-import { BehaviorSubject, Observable, catchError, map, of, tap } from 'rxjs';
+import { BehaviorSubject, EMPTY, Observable, catchError, map, of, tap, timeout } from 'rxjs';
 import { Injectable, inject } from '@angular/core';
 
 /** Must match CHANNEL_NAME in session-activity.service.ts */
@@ -8,6 +8,7 @@ const SESSION_CHANNEL_NAME = 'educa-session';
 
 import { AuthApiService } from './auth-api.service';
 import { StorageService } from '../storage';
+import { logger } from '@core/helpers';
 import { UI_AUTH_MESSAGES } from '@app/shared/constants';
 
 // #endregion
@@ -80,7 +81,7 @@ export class AuthService {
 		return this.api.login({ dni, contraseña: password, rol, rememberMe }).pipe(
 			tap((response) => {
 				if (response.success) {
-					this.handleSuccessfulLogin(response);
+					this.handleSuccessfulLogin(response, rememberMe);
 				} else {
 					this.incrementAttempts();
 				}
@@ -131,12 +132,19 @@ export class AuthService {
 
 	/**
 	 * Log out: tell the server to clear the cookie, then clean up local state.
+	 * The API call has a 5s timeout — if it fails, cookies may persist but
+	 * local state is always cleaned immediately.
 	 */
 	logout(): void {
-		// Fire-and-forget server logout (clears HttpOnly cookie)
-		this.api.logout().subscribe();
+		this.api.logout().pipe(
+			timeout(5000),
+			catchError((err) => {
+				logger.warn('[Auth] Logout API failed — HttpOnly cookies may persist until expiry', err);
+				return EMPTY;
+			}),
+		).subscribe();
 
-		// Clean local state immediately
+		// Clean local state immediately (don't wait for API)
 		this.storage.clearPermisos();
 		this.storage.clearAuth();
 
@@ -211,7 +219,7 @@ export class AuthService {
 	/**
 	 * Persist user info (without token) and update reactive state.
 	 */
-	private handleSuccessfulLogin(response: LoginResponse): void {
+	private handleSuccessfulLogin(response: LoginResponse, rememberMe = false): void {
 		const user: AuthUser = {
 			rol: response.rol,
 			nombreCompleto: response.nombreCompleto,
@@ -220,7 +228,7 @@ export class AuthService {
 		};
 
 		// Only store user info — token is in HttpOnly cookie
-		this.storage.setUser(user);
+		this.storage.setUser(user, rememberMe);
 
 		this.isAuthenticatedSubject.next(true);
 		this.currentUserSubject.next(user);

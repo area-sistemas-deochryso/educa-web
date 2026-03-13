@@ -21,9 +21,6 @@ export function validateCorreoApoderado(
 	correo: string | undefined,
 	rol: string | undefined,
 ): string | null {
-	if (rol === 'Estudiante' && !correo) {
-		return 'El correo del apoderado es obligatorio para estudiantes';
-	}
 	if (!correo) return null;
 	if (!EMAIL_REGEX.test(correo)) return 'Ingrese un correo valido';
 	return null;
@@ -43,9 +40,6 @@ export function validateTelefonoApoderado(
 	telefono: string | undefined,
 	rol: string | undefined,
 ): string | null {
-	if (rol === 'Estudiante' && !(telefono ?? '').trim()) {
-		return 'El telefono del apoderado es obligatorio para estudiantes';
-	}
 	return null;
 }
 

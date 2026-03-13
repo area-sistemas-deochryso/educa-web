@@ -8,7 +8,7 @@
  */
 // * Seasonal notification definitions and helpers.
 
-export type NotificationType = 'matricula' | 'pago' | 'academico' | 'festividad' | 'evento';
+export type NotificationType = 'matricula' | 'pago' | 'academico' | 'festividad' | 'evento' | 'smart';
 export type NotificationPriority = 'low' | 'medium' | 'high' | 'urgent';
 
 export interface SeasonalNotification {

@@ -40,6 +40,7 @@ const NO_CACHE_PATTERNS = [
 	'/api/Auth/perfil',
 	'/api/Auth/login',
 	'/api/Auth/verificar',
+	'/api/Auth/sessions',
 ];
 
 // Abrir/crear la base de datos IndexedDB

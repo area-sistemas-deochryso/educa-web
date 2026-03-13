@@ -2,18 +2,19 @@ import { Injectable, inject, PLATFORM_ID } from '@angular/core';
 import { isPlatformBrowser } from '@angular/common';
 import { logger } from '@app/core/helpers';
 import { NotificationStorageData } from './storage.models';
+import { SmartDataRecord } from '@app/core/services/notifications/smart-notification.models';
 
 /**
  * IndexedDB service for async persistence of larger or structured data.
  *
- * This service is used for notifications and cache data that can grow
- * over time and should not block the UI thread.
+ * This service is used for notifications, smart notification data,
+ * and cache data that can grow over time.
  *
  * @example
  * const data = await idb.getDismissedNotifications();
  */
 const DB_NAME = 'EducaWebDB';
-const DB_VERSION = 1;
+const DB_VERSION = 2;
 
 /**
  * Object store names used by this database.
@@ -21,6 +22,7 @@ const DB_VERSION = 1;
 const STORES = {
 	NOTIFICATIONS: 'notifications',
 	CACHE: 'cache',
+	SMART_DATA: 'smart-data',
 } as const;
 
 /**
@@ -112,6 +114,14 @@ export class IndexedDBService {
 				if (!db.objectStoreNames.contains(STORES.CACHE)) {
 					const cacheStore = db.createObjectStore(STORES.CACHE, { keyPath: 'key' });
 					cacheStore.createIndex('expiresAt', 'expiresAt', { unique: false });
+				}
+
+				if (!db.objectStoreNames.contains(STORES.SMART_DATA)) {
+					const smartStore = db.createObjectStore(STORES.SMART_DATA, {
+						keyPath: 'key',
+					});
+					smartStore.createIndex('entityId', 'entityId', { unique: false });
+					smartStore.createIndex('weekStart', 'weekStart', { unique: false });
 				}
 
 				logger.log('[IndexedDB] Database upgraded to version', DB_VERSION);
@@ -490,6 +500,104 @@ export class IndexedDBService {
 						cursor.continue();
 					}
 				};
+
+				transaction.oncomplete = () => resolve();
+				transaction.onerror = () => resolve();
+			} catch {
+				resolve();
+			}
+		});
+	}
+
+	// #endregion
+	// #region SMART DATA
+
+	/**
+	 * Get smart data record by key.
+	 */
+	async getSmartData(entityId: number, type: SmartDataRecord['type']): Promise<SmartDataRecord | null> {
+		const db = await this.ensureDB();
+		if (!db) return null;
+
+		return new Promise((resolve) => {
+			try {
+				const transaction = db.transaction(STORES.SMART_DATA, 'readonly');
+				const store = transaction.objectStore(STORES.SMART_DATA);
+				const request = store.get(`${entityId}:${type}`);
+
+				request.onsuccess = () => resolve(request.result ?? null);
+				request.onerror = () => resolve(null);
+			} catch {
+				resolve(null);
+			}
+		});
+	}
+
+	/**
+	 * Save smart data record.
+	 */
+	async setSmartData(record: SmartDataRecord): Promise<void> {
+		const db = await this.ensureDB();
+		if (!db) return;
+
+		return new Promise((resolve) => {
+			try {
+				const transaction = db.transaction(STORES.SMART_DATA, 'readwrite');
+				const store = transaction.objectStore(STORES.SMART_DATA);
+				store.put(record);
+
+				transaction.oncomplete = () => resolve();
+				transaction.onerror = () => resolve();
+			} catch {
+				resolve();
+			}
+		});
+	}
+
+	/**
+	 * Delete smart data records older than the given week start.
+	 */
+	async cleanOldSmartData(currentWeekStart: string): Promise<void> {
+		const db = await this.ensureDB();
+		if (!db) return;
+
+		return new Promise((resolve) => {
+			try {
+				const transaction = db.transaction(STORES.SMART_DATA, 'readwrite');
+				const store = transaction.objectStore(STORES.SMART_DATA);
+				const request = store.openCursor();
+
+				request.onsuccess = (event) => {
+					const cursor = (event.target as IDBRequest<IDBCursorWithValue>).result;
+					if (cursor) {
+						const record = cursor.value as SmartDataRecord;
+						if (record.weekStart < currentWeekStart) {
+							cursor.delete();
+						}
+						cursor.continue();
+					}
+				};
+
+				transaction.oncomplete = () => resolve();
+				transaction.onerror = () => resolve();
+			} catch {
+				resolve();
+			}
+		});
+	}
+
+	/**
+	 * Clear all smart data records.
+	 */
+	async clearSmartData(): Promise<void> {
+		const db = await this.ensureDB();
+		if (!db) return;
+
+		return new Promise((resolve) => {
+			try {
+				const transaction = db.transaction(STORES.SMART_DATA, 'readwrite');
+				const store = transaction.objectStore(STORES.SMART_DATA);
+				store.clear();
 
 				transaction.oncomplete = () => resolve();
 				transaction.onerror = () => resolve();

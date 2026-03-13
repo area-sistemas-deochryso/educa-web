@@ -10,6 +10,7 @@ import {
 import { logger } from '@app/core/helpers';
 import { StorageService } from '@app/core/services/storage';
 import { TimerManager } from '@app/core/services/destroy';
+import { SmartNotificationService } from './smart-notification.service';
 
 /**
  * Count of notifications by priority.
@@ -39,6 +40,7 @@ export class NotificationsService {
 	private platformId = inject(PLATFORM_ID);
 	private storage = inject(StorageService);
 	private router = inject(Router);
+	private smartService = inject(SmartNotificationService);
 	private timerManager = new TimerManager();
 	// #endregion
 
@@ -114,27 +116,35 @@ export class NotificationsService {
 
 	/**
 	 * Start periodic checks for notifications.
+	 * Runs every 5 min to keep smart notifications (upcoming classes) fresh.
 	 */
 	private startPeriodicCheck(): void {
-		this.timerManager.setInterval(() => this.checkNotifications(), 60 * 60 * 1000);
+		this.timerManager.setInterval(() => this.checkNotifications(), 5 * 60 * 1000);
 	}
 	// #endregion
 
 	// #region Notification checks
 
 	/**
-	 * Check daily notifications, filter dismissed, and sort by priority.
+	 * Check daily notifications, merge smart notifications, filter dismissed, and sort by priority.
 	 */
 	checkNotifications(): void {
 		const today = new Date();
 		const todayNotifications = getTodayNotifications(today);
 		const dismissedIds = this._dismissedIds();
 
+		// Merge smart notifications as SeasonalNotification shape
+		const smartNotifs: SeasonalNotification[] = this.smartService.smartNotifications().map((sn) => ({
+			...sn,
+			shouldShow: () => true,
+		}));
+		const allNotifications = [...todayNotifications, ...smartNotifs];
+
 		const priorityOrder = { urgent: 0, high: 1, medium: 2, low: 3 };
-		const active = todayNotifications
+		const active = allNotifications
 			.filter((n) => !dismissedIds.has(n.id))
 			.sort((a, b) => priorityOrder[a.priority] - priorityOrder[b.priority]);
-		const dismissed = todayNotifications.filter((n) => dismissedIds.has(n.id));
+		const dismissed = allNotifications.filter((n) => dismissedIds.has(n.id));
 
 		this._activeNotifications.set(active);
 		this._dismissedNotifications.set(dismissed);

@@ -1,5 +1,6 @@
 // #region Implementation
 export * from './notifications.config';
-// * Notifications service exports.
 export * from './notifications.service';
+export * from './smart-notification.models';
+export * from './smart-notification.service';
 // #endregion

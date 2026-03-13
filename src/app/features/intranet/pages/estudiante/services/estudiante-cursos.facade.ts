@@ -2,6 +2,8 @@ import { Injectable, inject, DestroyRef } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { logger, withRetry } from '@core/helpers';
 import { ErrorHandlerService } from '@core/services';
+import { SmartNotificationService } from '@core/services/notifications/smart-notification.service';
+import { ActividadSnapshot } from '@core/services/notifications/smart-notification.models';
 import { EstudianteApiService } from './estudiante-api.service';
 import { EstudianteCursosStore } from './estudiante-cursos.store';
 import { RegistrarEstudianteArchivoRequest, RegistrarEstudianteTareaArchivoRequest } from '../models';
@@ -12,6 +14,7 @@ export class EstudianteCursosFacade {
 	private readonly api = inject(EstudianteApiService);
 	private readonly store = inject(EstudianteCursosStore);
 	private readonly errorHandler = inject(ErrorHandlerService);
+	private readonly smartNotif = inject(SmartNotificationService);
 	private readonly destroyRef = inject(DestroyRef);
 	// #endregion
 
@@ -61,7 +64,7 @@ export class EstudianteCursosFacade {
 					this.store.setContentLoading(false);
 					if (contenido) {
 						this.store.openContentDialog();
-						// Files load lazily via onAccordionTabOpen in the dialog
+						this.saveTareaSnapshots(contenido);
 					}
 				},
 				error: (err) => {
@@ -402,5 +405,28 @@ export class EstudianteCursosFacade {
 		this.store.closeTareasSummaryDialog();
 	}
 
+	// #endregion
+
+	// #region Smart notifications
+	private saveTareaSnapshots(contenido: import('../models').CursoContenidoDetalleDto): void {
+		// Extract tareas with fechaLimite as actividades
+		const horarios = this.store.horarios();
+		const horario = horarios.find((h) => h.id === contenido.horarioId);
+		const cursoNombre = horario?.cursoNombre ?? 'Curso';
+
+		const snapshots: ActividadSnapshot[] = contenido.semanas
+			.flatMap((s) => s.tareas)
+			.filter((t) => t.fechaLimite)
+			.map((t) => ({
+				cursoNombre,
+				titulo: t.titulo,
+				tipo: 'Tarea',
+				fecha: t.fechaLimite!,
+			}));
+
+		if (snapshots.length > 0) {
+			this.smartNotif.saveActividadSnapshot(snapshots);
+		}
+	}
 	// #endregion
 }

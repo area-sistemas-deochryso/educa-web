@@ -3,6 +3,7 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { forkJoin } from 'rxjs';
 import { logger, withRetry } from '@core/helpers';
 import { ErrorHandlerService } from '@core/services';
+import { SmartNotificationService } from '@core/services/notifications/smart-notification.service';
 import { UI_ADMIN_ERROR_DETAILS, UI_SUMMARIES } from '@app/shared/constants';
 import { UserProfileService } from '@core/services/user/user-profile.service';
 import { VistaPromedio } from '../models';
@@ -15,6 +16,7 @@ export class ProfesorFacade {
 	private readonly store = inject(ProfesorStore);
 	private readonly userProfile = inject(UserProfileService);
 	private readonly errorHandler = inject(ErrorHandlerService);
+	private readonly smartNotif = inject(SmartNotificationService);
 	private readonly destroyRef = inject(DestroyRef);
 
 	// #region Estado expuesto
@@ -47,6 +49,7 @@ export class ProfesorFacade {
 					this.store.setSalonTutoria(salonTutoria.data);
 					this.store.setMisEstudiantes(misEstudiantes);
 					this.store.setLoading(false);
+					this.smartNotif.saveHorarioSnapshot(horarios);
 				},
 				error: (err) => {
 					logger.error('ProfesorFacade: Error al cargar datos', err);

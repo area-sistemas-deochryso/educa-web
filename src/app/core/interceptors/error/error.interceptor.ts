@@ -32,14 +32,15 @@ export const errorInterceptor: HttpInterceptorFn = (req, next) => {
 				return throwError(() => error);
 			}
 
-			// Skip requests that handle their own errors (e.g. getProfile with catchError → null).
-			if (req.headers.has('X-Skip-Error-Toast')) {
-				return throwError(() => error);
-			}
-
 			// 401 — access token expired. Attempt refresh before forcing logout.
+			// Must run BEFORE X-Skip-Error-Toast check: silent requests still need token refresh.
 			if (error.status === 401) {
 				return handle401(req, next, authApi, sessionActivity);
+			}
+
+			// Skip error toast for requests that handle their own errors locally.
+			if (req.headers.has('X-Skip-Error-Toast')) {
+				return throwError(() => error);
 			}
 
 			logger.error('[ErrorInterceptor] HTTP Error:', error.status, req.url);

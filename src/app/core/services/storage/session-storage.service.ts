@@ -297,17 +297,17 @@ export class SessionStorageService {
 			this.getItem(SESSION_KEYS.CURRENT_SESSION_KEY);
 
 		if (sessionKey) {
-			const sessionTokenKey = `${SESSION_KEYS.TOKEN_PREFIX}_${sessionKey}`;
-			const sessionUserKey = `${SESSION_KEYS.USER_PREFIX}_${sessionKey}`;
-			const sessionRememberMeKey = `${SESSION_KEYS.REMEMBER_ME_PREFIX}_${sessionKey}`;
-			const sessionPermisosKey = `${SESSION_KEYS.PERMISOS_PREFIX}_${sessionKey}`;
-			const localPermisosKey = `${LOCAL_KEYS.PERMISOS_PREFIX}_${sessionKey}`;
+			// sessionStorage
+			this.removeItem(`${SESSION_KEYS.TOKEN_PREFIX}_${sessionKey}`);
+			this.removeItem(`${SESSION_KEYS.USER_PREFIX}_${sessionKey}`);
+			this.removeItem(`${SESSION_KEYS.REMEMBER_ME_PREFIX}_${sessionKey}`);
+			this.removeItem(`${SESSION_KEYS.PERMISOS_PREFIX}_${sessionKey}`);
 
-			this.removeItem(sessionTokenKey);
-			this.removeItem(sessionUserKey);
-			this.removeItem(sessionRememberMeKey);
-			this.removeItem(sessionPermisosKey);
-			this.removeLocalItem(localPermisosKey);
+			// localStorage (persistent/rememberMe data)
+			this.removeLocalItem(`${LOCAL_KEYS.TOKEN_PREFIX}_${sessionKey}`);
+			this.removeLocalItem(`${LOCAL_KEYS.USER_PREFIX}_${sessionKey}`);
+			this.removeLocalItem(`${LOCAL_KEYS.REMEMBER_ME_PREFIX}_${sessionKey}`);
+			this.removeLocalItem(`${LOCAL_KEYS.PERMISOS_PREFIX}_${sessionKey}`);
 		}
 
 		this.removeItem(SESSION_KEYS.CURRENT_SESSION_KEY);
