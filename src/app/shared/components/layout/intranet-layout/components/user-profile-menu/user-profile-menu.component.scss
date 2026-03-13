@@ -47,6 +47,58 @@
 	transition: transform 0.25s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
+.avatar-notif-badge {
+	position: absolute;
+	top: -4px;
+	right: -4px;
+	min-width: 18px;
+	height: 18px;
+	padding: 0 4px;
+	border-radius: 9px;
+	background: #dc2626;
+	color: #ffffff;
+	font-size: 0.625rem;
+	font-weight: 700;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	border: 2px solid var(--surface-card);
+	line-height: 1;
+	z-index: 1;
+	animation: badge-pulse 2s ease-in-out infinite;
+
+	&::after {
+		content: '';
+		position: absolute;
+		inset: -2px;
+		border-radius: 50%;
+		background: rgba(220, 38, 38, 0.4);
+		animation: badge-ring 2s ease-out infinite;
+		z-index: -1;
+	}
+}
+
+@keyframes badge-pulse {
+	0%,
+	100% {
+		transform: scale(1);
+	}
+	50% {
+		transform: scale(1.15);
+	}
+}
+
+@keyframes badge-ring {
+	0% {
+		transform: scale(1);
+		opacity: 0.6;
+	}
+	100% {
+		transform: scale(2.2);
+		opacity: 0;
+	}
+}
+
 :host ::ng-deep .profile-avatar {
 	// Colores con contraste WCAG AA (4.5:1 mínimo)
 	background: linear-gradient(135deg, #4f46e5 0%, #4338ca 100%); // indigo-600 a indigo-700
@@ -221,6 +273,45 @@
 	span {
 		position: relative;
 		transition: transform 0.2s ease;
+	}
+}
+
+.notif-badge {
+	margin-left: auto;
+}
+
+.bell-shake {
+	display: inline-block;
+	transform-origin: top center;
+	animation: bell-ring 2.5s ease-in-out infinite;
+}
+
+@keyframes bell-ring {
+	0%,
+	20%,
+	100% {
+		transform: rotate(0);
+	}
+	2% {
+		transform: rotate(15deg);
+	}
+	4% {
+		transform: rotate(-13deg);
+	}
+	6% {
+		transform: rotate(10deg);
+	}
+	8% {
+		transform: rotate(-8deg);
+	}
+	10% {
+		transform: rotate(5deg);
+	}
+	12% {
+		transform: rotate(-3deg);
+	}
+	14% {
+		transform: rotate(1deg);
 	}
 }
 

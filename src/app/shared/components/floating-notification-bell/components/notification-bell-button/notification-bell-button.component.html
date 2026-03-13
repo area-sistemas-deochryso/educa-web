@@ -4,14 +4,14 @@
 	<button
 		class="notification-bell"
 		[class.ringing]="unreadCount() > 0"
-		[class]="badgePriorityClass()"
+		[ngClass]="badgePriorityClass()"
 		(click)="onTogglePanel()"
 		(contextmenu)="onContextMenu($event)"
 		title="Notificaciones"
 	>
 		<i class="pi pi-bell"></i>
 		@if (unreadCount() > 0) {
-			<span class="bell-badge pulse" [class]="badgePriorityClass()">{{ unreadCount() }}</span>
+			<span class="bell-badge pulse" [ngClass]="badgePriorityClass()">{{ unreadCount() }}</span>
 		}
 	</button>
 

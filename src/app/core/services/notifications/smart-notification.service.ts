@@ -3,6 +3,7 @@ import { isPlatformBrowser } from '@angular/common';
 import { logger } from '@core/helpers';
 import { IndexedDBService } from '@core/services/storage/indexed-db.service';
 import { StorageService } from '@core/services/storage';
+import { WalClockService } from '@core/services/wal/wal-clock.service';
 import { TimerManager } from '@core/services/destroy';
 import {
 	SmartNotification,
@@ -20,6 +21,7 @@ export class SmartNotificationService {
 	// #region Dependencias
 	private readonly idb = inject(IndexedDBService);
 	private readonly storage = inject(StorageService);
+	private readonly walClock = inject(WalClockService);
 	private readonly platformId = inject(PLATFORM_ID);
 	private readonly timerManager = new TimerManager();
 	// #endregion
@@ -30,12 +32,14 @@ export class SmartNotificationService {
 	private readonly _calificaciones = signal<CalificacionSnapshot[]>([]);
 	private readonly _previousCalificaciones = signal<CalificacionSnapshot[]>([]);
 	private readonly _initialized = signal(false);
+	readonly initialized = this._initialized.asReadonly();
 	// #endregion
 
 	// #region Computed - Notificaciones generadas
 	readonly smartNotifications = computed<SmartNotification[]>(() => {
 		const notifications: SmartNotification[] = [];
-		const now = new Date();
+		// Usar hora del servidor (ajustada por clock skew) en vez de hora local
+		const now = new Date(this.walClock.now());
 
 		this.generateHorarioNotifications(now, notifications);
 		this.generateActividadNotifications(now, notifications);
@@ -185,7 +189,7 @@ export class SmartNotificationService {
 				message,
 				icon: 'pi-clock',
 				priority,
-				actionUrl: '/intranet/horarios',
+				actionUrl: `${this.getRoleBasePath()}/cursos`,
 				dismissible: true,
 			});
 		}
@@ -233,7 +237,7 @@ export class SmartNotificationService {
 				message,
 				icon: this.getTipoIcon(act.tipo),
 				priority,
-				actionUrl: '/intranet/horarios',
+				actionUrl: `${this.getRoleBasePath()}/cursos`,
 				dismissible: true,
 			});
 		}
@@ -257,7 +261,7 @@ export class SmartNotificationService {
 					message: `${cal.cursoNombre}: ${cal.titulo} - Nota: ${cal.nota}`,
 					icon: 'pi-chart-bar',
 					priority: 'medium',
-					actionUrl: '/intranet/horarios',
+					actionUrl: `${this.getRoleBasePath()}/notas`,
 					dismissible: true,
 				});
 			}
@@ -270,6 +274,24 @@ export class SmartNotificationService {
 	private getEntityId(): number | null {
 		const user = this.storage.getUser();
 		return user?.entityId ?? null;
+	}
+
+	/**
+	 * Genera la URL base según el rol del usuario logueado.
+	 * Estudiante → /intranet/estudiante, Profesor → /intranet/profesor, etc.
+	 */
+	private getRoleBasePath(): string {
+		const user = this.storage.getUser();
+		if (!user) return '/intranet';
+
+		const rolPaths: Record<string, string> = {
+			Estudiante: '/intranet/estudiante',
+			Profesor: '/intranet/profesor',
+			Apoderado: '/intranet',
+			Director: '/intranet',
+			'Asistente Administrativo': '/intranet',
+		};
+		return rolPaths[user.rol] ?? '/intranet';
 	}
 
 	private getWeekStart(): string {

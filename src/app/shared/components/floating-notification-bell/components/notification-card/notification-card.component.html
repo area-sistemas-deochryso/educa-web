@@ -2,18 +2,18 @@
 <!-- * Notification card with read/unread actions and optional CTA. -->
 <div
 	class="notification-card"
-	[class]="priorityClass"
+	[ngClass]="priorityClass"
 	[class.is-read]="isRead"
 	[class.is-unread]="!isRead"
 	[style.animation-delay]="animationDelay + 'ms'"
 	(click)="onCardClick()"
 >
 	@if (!isRead) {
-		<div class="unread-dot pulse" [class]="priorityClass"></div>
+		<div class="unread-dot pulse" [ngClass]="priorityClass"></div>
 	}
 
-	<div class="notification-icon" [class]="'icon-' + notification.type">
-		<i class="pi" [class]="notification.icon || getTypeIcon(notification.type)"></i>
+	<div class="notification-icon" [ngClass]="'icon-' + notification.type">
+		<i class="pi" [ngClass]="notification.icon || getTypeIcon(notification.type)"></i>
 	</div>
 
 	<div class="notification-content">

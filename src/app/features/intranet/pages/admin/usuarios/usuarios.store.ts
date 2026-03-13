@@ -116,38 +116,9 @@ export class UsuariosStore {
 	);
 
 	// #endregion
-	// #region Computed - Filtered data
-	readonly filteredUsuarios = computed(() => {
-		let data = this._usuarios();
-		const search = this._searchTerm().toLowerCase();
-		const filtroRol = this._filterRol();
-		const filtroEstado = this._filterEstado();
-
-		if (search) {
-			data = data.filter(
-				(u) =>
-					u.nombreCompleto.toLowerCase().includes(search) ||
-					u.dni.includes(search) ||
-					u.correo?.toLowerCase().includes(search),
-			);
-		}
-
-		if (filtroRol) {
-			data = data.filter((u) => u.rol === filtroRol);
-		}
-
-		if (filtroEstado !== null) {
-			data = data.filter((u) => u.estado === filtroEstado);
-		}
-
-		return data;
-	});
-
-	// #endregion
 	// #region ViewModel consolidado
 	readonly vm = computed(() => ({
 		usuarios: this._usuarios(),
-		filteredUsuarios: this.filteredUsuarios(),
 		estadisticas: this._estadisticas(),
 		salones: this._salones(),
 		loading: this._loading(),

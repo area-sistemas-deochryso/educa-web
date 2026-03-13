@@ -2,6 +2,7 @@
 import {
 	ChangeDetectionStrategy,
 	Component,
+	computed,
 	inject,
 	input,
 	output,
@@ -11,7 +12,8 @@ import {
 import { Popover } from 'primeng/popover';
 import { ButtonModule } from 'primeng/button';
 import { AvatarModule } from 'primeng/avatar';
-import { UserProfileService } from '@core/services';
+import { BadgeModule } from 'primeng/badge';
+import { UserProfileService, NotificationsService } from '@core/services';
 import { UserInfoDialogComponent } from '../user-info-dialog/user-info-dialog.component';
 
 // #endregion
@@ -19,7 +21,7 @@ import { UserInfoDialogComponent } from '../user-info-dialog/user-info-dialog.co
 @Component({
 	selector: 'app-user-profile-menu',
 	standalone: true,
-	imports: [Popover, ButtonModule, AvatarModule, UserInfoDialogComponent],
+	imports: [Popover, ButtonModule, AvatarModule, BadgeModule, UserInfoDialogComponent],
 	templateUrl: './user-profile-menu.component.html',
 	styleUrl: './user-profile-menu.component.scss',
 	changeDetection: ChangeDetectionStrategy.OnPush,
@@ -27,6 +29,7 @@ import { UserInfoDialogComponent } from '../user-info-dialog/user-info-dialog.co
 export class UserProfileMenuComponent {
 	// #region Dependencias
 	private userProfile = inject(UserProfileService);
+	private notificationsService = inject(NotificationsService);
 	// #endregion
 
 	// #region I/O
@@ -42,6 +45,12 @@ export class UserProfileMenuComponent {
 	readonly displayName = this.userProfile.displayName;
 	readonly userRole = this.userProfile.userRole;
 	readonly initials = this.userProfile.initials;
+
+	readonly unreadCount = this.notificationsService.unreadCount;
+	readonly unreadBadge = computed(() => {
+		const count = this.unreadCount();
+		return count > 0 ? String(count) : '';
+	});
 	// #endregion
 
 	// #region Handlers del popover
@@ -59,6 +68,11 @@ export class UserProfileMenuComponent {
 	// #endregion
 
 	// #region Handlers de acciones del menú
+	onNotificationsClick(): void {
+		this.popover().hide();
+		this.notificationsService.togglePanel();
+	}
+
 	onInfoClick(): void {
 		// * Cerrar popover antes de abrir el diálogo.
 		this.popover().hide();

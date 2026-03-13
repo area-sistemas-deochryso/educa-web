@@ -1,4 +1,4 @@
-import { Injectable, signal, inject, PLATFORM_ID, computed } from '@angular/core';
+import { Injectable, signal, inject, PLATFORM_ID, computed, effect } from '@angular/core';
 import { isPlatformBrowser } from '@angular/common';
 import { Router } from '@angular/router';
 import {
@@ -102,6 +102,7 @@ export class NotificationsService {
 			this.checkNotifications();
 			this.startPeriodicCheck();
 			this.listenToServiceWorker();
+			this.watchSmartInit();
 		}
 	}
 
@@ -120,6 +121,16 @@ export class NotificationsService {
 	 */
 	private startPeriodicCheck(): void {
 		this.timerManager.setInterval(() => this.checkNotifications(), 5 * 60 * 1000);
+	}
+	/**
+	 * Re-check notifications once smart data finishes loading from IndexedDB.
+	 */
+	private watchSmartInit(): void {
+		effect(() => {
+			if (this.smartService.initialized()) {
+				this.checkNotifications();
+			}
+		});
 	}
 	// #endregion
 

@@ -2,8 +2,8 @@
 <!-- * PrimeNG toast host for urgent/high notifications. -->
 <p-toast position="top-right"></p-toast>
 
-<!-- * Floating bell button (Alt+B opens panel). -->
-@if (notificationCount() > 0) {
+<!-- * Floating bell button — auto-hides after 3s without interaction. -->
+@if (floatingVisible()) {
 	<app-notification-bell-button
 		[showContextMenu]="showContextMenu"
 		[contextMenuPosition]="contextMenuPosition"

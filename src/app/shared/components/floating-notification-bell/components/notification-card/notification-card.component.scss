@@ -241,6 +241,12 @@ $priority-urgent: #dc2626;
 		background: linear-gradient(135deg, #f97316, #ea580c) !important;
 		color: white !important;
 	}
+
+	&.icon-smart {
+		background: linear-gradient(135deg, #ec4899, #db2777) !important;
+		color: white !important;
+		box-shadow: 0 4px 15px rgba(236, 72, 153, 0.4) !important;
+	}
 }
 
 .notification-content {
@@ -288,6 +294,11 @@ $priority-urgent: #dc2626;
 	&[data-type='evento'] {
 		background: rgba(249, 115, 22, 0.15);
 		color: #f97316;
+	}
+
+	&[data-type='smart'] {
+		background: rgba(236, 72, 153, 0.15);
+		color: #db2777;
 	}
 }
 

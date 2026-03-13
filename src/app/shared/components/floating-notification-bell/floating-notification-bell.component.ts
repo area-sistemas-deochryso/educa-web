@@ -1,5 +1,5 @@
 // #region Imports
-import { Component, inject, OnInit, OnDestroy, HostListener } from '@angular/core';
+import { Component, inject, OnInit, OnDestroy, HostListener, signal, effect } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { NotificationPriority, KeyboardShortcutsService } from '@core/services';
 import { ToastModule } from 'primeng/toast';
@@ -70,7 +70,23 @@ export class FloatingNotificationBellComponent implements OnInit, OnDestroy {
 	contextMenuPosition = { x: 0, y: 0 };
 	priorityLegend = PRIORITY_LEGEND;
 
+	// * Auto-hide: floating bell visible only for 3 seconds, then hides.
+	readonly floatingVisible = signal(true);
+
 	private hasShownToast = false;
+	private autoHideTimer: ReturnType<typeof setTimeout> | null = null;
+
+	constructor() {
+		// Sync floating bell visibility with panel state (handles external toggles from profile menu)
+		effect(() => {
+			if (this.isPanelOpen()) {
+				this.floatingVisible.set(true);
+				this.clearAutoHideTimer();
+			} else {
+				this.startAutoHideTimer();
+			}
+		});
+	}
 
 	ngOnInit(): void {
 		// * Keyboard shortcut to open/close the panel.
@@ -85,11 +101,15 @@ export class FloatingNotificationBellComponent implements OnInit, OnDestroy {
 				this.hasShownToast = true;
 			}
 		}, 500);
+
+		// * Auto-hide floating bell after 3 seconds without interaction.
+		this.startAutoHideTimer();
 	}
 
 	ngOnDestroy(): void {
 		this.keyboardService.unregister('toggle-notification-bell');
 		this.context.closePanel();
+		this.clearAutoHideTimer();
 	}
 
 	/**
@@ -130,7 +150,32 @@ export class FloatingNotificationBellComponent implements OnInit, OnDestroy {
 
 	togglePanel(): void {
 		this.context.togglePanel();
+		// Keep bell visible while panel is open, restart timer when closed
+		if (this.isPanelOpen()) {
+			this.clearAutoHideTimer();
+			this.floatingVisible.set(true);
+		} else {
+			this.startAutoHideTimer();
+		}
 	}
+
+	// #region Auto-hide
+	private startAutoHideTimer(): void {
+		this.clearAutoHideTimer();
+		this.autoHideTimer = setTimeout(() => {
+			if (!this.isPanelOpen()) {
+				this.floatingVisible.set(false);
+			}
+		}, 3000);
+	}
+
+	private clearAutoHideTimer(): void {
+		if (this.autoHideTimer) {
+			clearTimeout(this.autoHideTimer);
+			this.autoHideTimer = null;
+		}
+	}
+	// #endregion
 
 	// Context menu methods
 	onContextMenu(event: MouseEvent): void {

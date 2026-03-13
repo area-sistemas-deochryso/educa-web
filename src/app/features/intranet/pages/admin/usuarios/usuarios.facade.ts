@@ -13,8 +13,8 @@ import {
 	WalService,
 } from '@core/services';
 import { DestroyRef, Injectable, inject } from '@angular/core';
-import { catchError, filter, switchMap } from 'rxjs/operators';
-import { forkJoin, from, of } from 'rxjs';
+import { catchError, debounceTime, distinctUntilChanged, filter, switchMap, tap } from 'rxjs/operators';
+import { forkJoin, from, of, Subject } from 'rxjs';
 
 import { environment } from '@config';
 import { UsuariosStore } from './usuarios.store';
@@ -39,11 +39,13 @@ export class UsuariosFacade {
 	private wal = inject(WalFacadeHelper);
 	private walService = inject(WalService);
 	private readonly apiUrl = `${environment.apiUrl}/api/sistema/usuarios`;
+	private readonly searchTrigger$ = new Subject<string>();
 
 	// Expone ViewModel del store
 	readonly vm = this.store.vm;
 
 	constructor() {
+		this.setupSearchPipeline();
 		this.setupCacheRefresh();
 	}
 
@@ -60,6 +62,7 @@ export class UsuariosFacade {
 		const pageSize = this.store.pageSize();
 		const rol = this.store.filterRol() ?? undefined;
 		const estado = this.store.filterEstado() ?? undefined;
+		const search = this.store.searchTerm() || undefined;
 
 		// Ejecutar las 3 llamadas en paralelo para evitar carga en 3 tiempos
 		forkJoin({
@@ -77,7 +80,7 @@ export class UsuariosFacade {
 					return of([]);
 				}),
 			),
-			usuarios: this.usuariosService.listarUsuariosPaginado(page, pageSize, rol, estado).pipe(
+			usuarios: this.usuariosService.listarUsuariosPaginado(page, pageSize, rol, estado, search).pipe(
 				withRetry({ tag: 'UsuariosFacade:loadUsuarios' }),
 				catchError((err) => {
 					logger.error('Error cargando usuarios:', err);
@@ -142,9 +145,10 @@ export class UsuariosFacade {
 		const pageSize = this.store.pageSize();
 		const rol = this.store.filterRol() ?? undefined;
 		const estado = this.store.filterEstado() ?? undefined;
+		const search = this.store.searchTerm() || undefined;
 
 		this.usuariosService
-			.listarUsuariosPaginado(page, pageSize, rol, estado)
+			.listarUsuariosPaginado(page, pageSize, rol, estado, search)
 			.pipe(
 				withRetry({ tag: 'UsuariosFacade:refreshUsuariosOnly' }),
 				catchError((err) => {
@@ -175,8 +179,13 @@ export class UsuariosFacade {
 	// #endregion
 	// #region Filters
 
+	/**
+	 * Búsqueda server-side con debounce via RxJS Subject.
+	 * El usuario escribe → Subject emite → debounceTime(300) → distinctUntilChanged → switchMap a API.
+	 */
 	setSearchTerm(term: string): void {
 		this.store.setSearchTerm(term);
+		this.searchTrigger$.next(term);
 	}
 
 	setFilterRol(rol: string | null): void {
@@ -581,6 +590,57 @@ export class UsuariosFacade {
 		} else if (rol === 'Asistente Administrativo') {
 			this.store.incrementarEstadistica('totalAsistentesAdministrativos', delta);
 		}
+	}
+
+	/**
+	 * Pipeline de búsqueda server-side:
+	 * searchTrigger$ → debounceTime(300ms) → distinctUntilChanged → switchMap(API)
+	 * switchMap cancela requests previos si el usuario sigue escribiendo.
+	 */
+	private setupSearchPipeline(): void {
+		this.searchTrigger$
+			.pipe(
+				debounceTime(300),
+				distinctUntilChanged(),
+				tap(() => {
+					this.store.setPage(1);
+					this.store.setLoading(true);
+				}),
+				switchMap((search) => {
+					const page = 1;
+					const pageSize = this.store.pageSize();
+					const rol = this.store.filterRol() ?? undefined;
+					const estado = this.store.filterEstado() ?? undefined;
+
+					return this.usuariosService
+						.listarUsuariosPaginado(page, pageSize, rol, estado, search || undefined)
+						.pipe(
+							withRetry({ tag: 'UsuariosFacade:searchUsuarios' }),
+							catchError((err) => {
+								logger.error('Error buscando usuarios:', err);
+								this.errorHandler.showError(
+									UI_SUMMARIES.error,
+									UI_ADMIN_ERROR_DETAILS.loadUsuarios,
+								);
+								return of({
+									data: [] as UsuarioLista[],
+									total: 0,
+									page,
+									pageSize,
+									totalPages: 0,
+									hasNextPage: false,
+									hasPreviousPage: false,
+								});
+							}),
+						);
+				}),
+				takeUntilDestroyed(this.destroyRef),
+			)
+			.subscribe((result) => {
+				this.store.setUsuarios(result.data);
+				this.store.setPaginationData(result.page, result.pageSize, result.total);
+				this.store.setLoading(false);
+			});
 	}
 
 	/**

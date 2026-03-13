@@ -31,6 +31,7 @@ export class DismissedCardComponent {
 			academico: 'pi-chart-bar',
 			festividad: 'pi-star',
 			evento: 'pi-calendar',
+			smart: 'pi-bolt',
 		};
 		return icons[type] || 'pi-bell';
 	}
@@ -43,6 +44,7 @@ export class DismissedCardComponent {
 			academico: 'Académico',
 			festividad: 'Festividad',
 			evento: 'Evento',
+			smart: 'Smart',
 		};
 		return labels[type] || type;
 	}

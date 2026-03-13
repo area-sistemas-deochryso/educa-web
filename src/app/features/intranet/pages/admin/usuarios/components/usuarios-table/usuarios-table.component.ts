@@ -31,6 +31,7 @@ export class UsuariosTableComponent {
 	readonly loading = input.required<boolean>();
 	readonly totalRecords = input.required<number>();
 	readonly rows = input(10);
+	readonly first = input(0);
 
 	// * Outputs for row actions + pagination.
 	readonly viewDetail = output<UsuarioLista>();

@@ -35,6 +35,7 @@ export class NotificationCardComponent {
 			academico: 'pi-chart-bar',
 			festividad: 'pi-star',
 			evento: 'pi-calendar',
+			smart: 'pi-bolt',
 		};
 		return icons[type] || 'pi-bell';
 	}
@@ -47,6 +48,7 @@ export class NotificationCardComponent {
 			academico: 'Académico',
 			festividad: 'Festividad',
 			evento: 'Evento',
+			smart: 'Smart',
 		};
 		return labels[type] || type;
 	}

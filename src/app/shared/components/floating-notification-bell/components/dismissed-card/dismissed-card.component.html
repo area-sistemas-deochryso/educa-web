@@ -1,8 +1,8 @@
 <!-- #region Template -->
 <!-- * Compact card for dismissed notifications with restore CTA. -->
-<div class="dismissed-card" [class]="priorityClass">
+<div class="dismissed-card" [ngClass]="priorityClass">
 	<div class="dismissed-icon">
-		<i class="pi" [class]="notification.icon || getTypeIcon(notification.type)"></i>
+		<i class="pi" [ngClass]="notification.icon || getTypeIcon(notification.type)"></i>
 	</div>
 	<div class="dismissed-content">
 		<span class="dismissed-title">{{ notification.title }}</span>

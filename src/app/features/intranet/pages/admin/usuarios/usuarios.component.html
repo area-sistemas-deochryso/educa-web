@@ -29,10 +29,11 @@
 	} @else {
 		<!-- * Users table with server-side pagination -->
 		<app-usuarios-table
-			[usuarios]="vm().filteredUsuarios"
+			[usuarios]="vm().usuarios"
 			[loading]="vm().loading"
 			[totalRecords]="vm().totalRecords"
 			[rows]="vm().pageSize"
+			[first]="(vm().page - 1) * vm().pageSize"
 			(viewDetail)="onViewDetail($event)"
 			(edit)="onEditUsuario($event)"
 			(toggleEstado)="onToggleEstado($event)"
