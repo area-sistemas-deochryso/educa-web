@@ -30,9 +30,6 @@ export function validateNombreApoderado(
 	nombre: string | undefined,
 	rol: string | undefined,
 ): string | null {
-	if (rol === 'Estudiante' && !(nombre ?? '').trim()) {
-		return 'El nombre del apoderado es obligatorio para estudiantes';
-	}
 	return null;
 }
 
