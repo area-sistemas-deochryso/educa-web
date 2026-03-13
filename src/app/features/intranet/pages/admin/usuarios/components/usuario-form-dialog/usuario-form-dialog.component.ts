@@ -277,14 +277,28 @@ export class UsuarioFormDialogComponent {
 
 	// Sincronizar grado y sección cuando cambia formData.salonId (edición)
 	private readonly _syncGradoSeccion = effect(() => {
-		const salonId = this.formData().salonId;
+		const formData = this.formData();
+		const salonId = formData.salonId;
 		const salones = this.salones();
+
 		if (salonId && salones.length > 0) {
 			const salon = salones.find((s) => s.salonId === salonId);
 			if (salon) {
 				this._gradoSeleccionado.set(salon.grado);
 				this._seccionSeleccionada.set(salon.seccion);
+
+				// Sync grado/seccion to store if they differ (e.g., student has salonId but EST_Grado/EST_Seccion are null)
+				if (formData.grado !== salon.grado) {
+					this.fieldChange.emit({ field: 'grado', value: salon.grado });
+				}
+				if (formData.seccion !== salon.seccion) {
+					this.fieldChange.emit({ field: 'seccion', value: salon.seccion });
+				}
 			}
+		} else if (formData.grado) {
+			// Initialize local signals from formData when no salonId
+			this._gradoSeleccionado.set(formData.grado ?? null);
+			this._seccionSeleccionada.set(formData.seccion ?? null);
 		}
 	});
 

@@ -93,6 +93,10 @@ export class CredentialsDialogComponent {
 	// #endregion
 
 	// #region Event handlers — Bulk import
+	onBulkTextInput(event: Event): void {
+		this.bulkText.set((event.target as HTMLTextAreaElement).value);
+	}
+
 	onImportBulk(): void {
 		const text = this.bulkText().trim();
 		if (!text) return;

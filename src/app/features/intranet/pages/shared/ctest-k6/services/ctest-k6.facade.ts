@@ -148,7 +148,9 @@ export class CTestK6Facade {
 	}
 
 	importBulkCredentials(text: string): void {
+		logger.log(`[CTestK6] Importando bulk: ${text.length} chars, ${text.split('\n').length} lineas`);
 		const { valid, errors } = this.parseBulkCredentials(text);
+		logger.log(`[CTestK6] Parsing result: ${valid.length} validos, ${errors.length} errores`, errors);
 		if (valid.length > 0) {
 			this.store.addCredentialsBulk(valid);
 			const peakVUs = this.getPeakVUs();
