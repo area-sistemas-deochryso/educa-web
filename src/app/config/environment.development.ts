@@ -17,7 +17,7 @@ export const environment = {
 	features: {
 		horarios: true,
 		calendario: true,
-		quickAccess: false,
+		quickAccess: true,
 		notifications: true,
 		voiceRecognition: true,
 		profesor: true,

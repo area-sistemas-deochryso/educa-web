@@ -1,45 +1,52 @@
 // #region Imports
 import { ChangeDetectionStrategy, Component, computed, inject } from '@angular/core';
 
-import { COURSE_NAMES } from '@features/intranet/pages/shared/schedule-component/courses.config';
-import { NotificationQuickAccessComponent } from '@features/intranet/components/notification-quick-access/notification-quick-access';
 import { QuickAccessCardComponent } from '@features/intranet/components/quick-access-card/quick-access-card';
-import { QuickAccessCardMenuComponent } from '@features/intranet/components/quick-access-card-menu/quick-access-card-menu';
 import { FeatureFlagsFacade } from '@core/services/feature-flags';
 import { StorageService } from '@core/services';
+import { UserPermisosService } from '@core/services/permisos/user-permisos.service';
 import { WelcomeSectionComponent } from '@features/intranet/components/welcome-section/welcome-section';
+import { QUICK_ACCESS_BY_ROLE, MAX_QUICK_ACCESS, QuickAccessItem } from './quick-access.config';
 
 // #endregion
 // #region Implementation
 @Component({
 	selector: 'app-home.component',
 	standalone: true,
-	imports: [
-		QuickAccessCardComponent,
-		QuickAccessCardMenuComponent,
-		WelcomeSectionComponent,
-		NotificationQuickAccessComponent,
-	],
+	imports: [QuickAccessCardComponent, WelcomeSectionComponent],
 	templateUrl: './home.component.html',
 	styleUrl: './home.component.scss',
 	changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class HomeComponent {
+	// #region Dependencias
 	private storage = inject(StorageService);
 	private flags = inject(FeatureFlagsFacade);
+	private userPermisos = inject(UserPermisosService);
+	// #endregion
 
-	// * Feature flag controls quick access section visibility.
+	// #region Estado
 	readonly showQuickAccess = computed(() => this.flags.isEnabled('quickAccess'));
-	// * Course list is reused by quick-access menu.
-	readonly availableCourses = COURSE_NAMES;
 
 	readonly welcomeTitle = computed(() => {
-		// * Personalize welcome header if user is stored.
 		const user = this.storage.getUser();
 		if (user?.nombreCompleto) {
 			return `Bienvenido, ${user.nombreCompleto}`;
 		}
 		return 'Bienvenido a tu Intranet';
 	});
+
+	/** First 4 role-based shortcuts that the user has permission for. */
+	readonly quickAccessItems = computed<QuickAccessItem[]>(() => {
+		const user = this.storage.getUser();
+		if (!user?.rol) return [];
+
+		const candidates = QUICK_ACCESS_BY_ROLE[user.rol] ?? [];
+
+		return candidates
+			.filter((item) => this.userPermisos.tienePermiso(item.permiso))
+			.slice(0, MAX_QUICK_ACCESS);
+	});
+	// #endregion
 }
 // #endregion

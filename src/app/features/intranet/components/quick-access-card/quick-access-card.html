@@ -1,9 +1,315 @@
 <!-- #region Template -->
-<a [routerLink]="path()" [queryParams]="queryParams()" class="quick-access-card">
-	<!-- * Icon + label -->
+<a [routerLink]="path()" class="quick-access-card">
 	<div class="card-icon">
 		<i class="pi" [class]="icon()"></i>
 	</div>
-	<span>{{ label() }}</span>
+	<span class="card-label">{{ label() }}</span>
+
+	<!-- Floating preview popup -->
+	<div class="preview-popup">
+		<div class="preview-chrome">
+			<div class="chrome-dots">
+				<span></span><span></span><span></span>
+			</div>
+			<div class="chrome-url">{{ path() }}</div>
+		</div>
+
+		<div class="preview-body">
+			@switch (preview()) {
+				<!-- Stats cards + filter bar + data table -->
+				@case ('admin-table') {
+					<div class="wf-stats-row">
+						@for (_ of [1, 2, 3, 4]; track $index) {
+							<div class="wf-stat-card">
+								<div class="wf-stat-value"></div>
+								<div class="wf-stat-label"></div>
+							</div>
+						}
+					</div>
+					<div class="wf-filter-row">
+						<div class="wf-filter-input"></div>
+						<div class="wf-filter-select"></div>
+						<div class="wf-filter-btn wf-accent-bg"></div>
+					</div>
+					<div class="wf-table">
+						<div class="wf-row wf-header">
+							<div class="wf-cell wf-avatar-cell"></div>
+							<div class="wf-cell" style="width: 28%"></div>
+							<div class="wf-cell" style="width: 18%"></div>
+							<div class="wf-cell wf-badge-cell"></div>
+							<div class="wf-cell wf-actions-cell"></div>
+						</div>
+						@for (_ of [1, 2, 3, 4]; track $index) {
+							<div class="wf-row">
+								<div class="wf-cell wf-avatar-cell"></div>
+								<div class="wf-cell" style="width: 28%"></div>
+								<div class="wf-cell" style="width: 18%"></div>
+								<div class="wf-cell wf-badge-cell"></div>
+								<div class="wf-cell wf-actions-cell"></div>
+							</div>
+						}
+					</div>
+				}
+
+				<!-- Stats + filters + weekly grid with time blocks -->
+				@case ('admin-schedule') {
+					<div class="wf-stats-row">
+						@for (_ of [1, 2, 3, 4]; track $index) {
+							<div class="wf-stat-card">
+								<div class="wf-stat-value"></div>
+								<div class="wf-stat-label"></div>
+							</div>
+						}
+					</div>
+					<div class="wf-filter-row">
+						<div class="wf-filter-select"></div>
+						<div class="wf-tab-bar">
+							<div class="wf-tab"></div>
+							<div class="wf-tab wf-tab-active"></div>
+						</div>
+					</div>
+					<div class="wf-week-grid">
+						<div class="wf-week-header">
+							<div class="wf-time-col"></div>
+							@for (_ of [1, 2, 3, 4, 5]; track $index) {
+								<div class="wf-day-col"></div>
+							}
+						</div>
+						@for (_ of [1, 2, 3]; track $index) {
+							<div class="wf-week-row">
+								<div class="wf-time-col"></div>
+								@for (d of [1, 2, 3, 4, 5]; track d) {
+									<div class="wf-day-col">
+										@if (($index === 0 && d === 1) || ($index === 1 && d === 3) || ($index === 2 && d === 2) || ($index === 0 && d === 4)) {
+											<div class="wf-schedule-block"></div>
+										}
+									</div>
+								}
+							</div>
+						}
+					</div>
+				}
+
+				<!-- Stats + filters + table with tags -->
+				@case ('admin-notif') {
+					<div class="wf-stats-row">
+						@for (_ of [1, 2, 3, 4]; track $index) {
+							<div class="wf-stat-card">
+								<div class="wf-stat-value"></div>
+								<div class="wf-stat-label"></div>
+							</div>
+						}
+					</div>
+					<div class="wf-filter-row">
+						<div class="wf-filter-input"></div>
+						<div class="wf-filter-select"></div>
+						<div class="wf-filter-btn wf-accent-bg"></div>
+					</div>
+					<div class="wf-table">
+						<div class="wf-row wf-header">
+							<div class="wf-cell" style="width: 32%"></div>
+							<div class="wf-cell wf-tag-cell"></div>
+							<div class="wf-cell wf-tag-cell"></div>
+							<div class="wf-cell" style="width: 16%"></div>
+							<div class="wf-cell wf-badge-cell"></div>
+						</div>
+						@for (_ of [1, 2, 3]; track $index) {
+							<div class="wf-row">
+								<div class="wf-cell" style="width: 32%"></div>
+								<div class="wf-cell wf-tag-cell" [class.wf-tag-warning]="$index === 1"></div>
+								<div class="wf-cell wf-tag-cell" [class.wf-tag-danger]="$index === 0"></div>
+								<div class="wf-cell" style="width: 16%"></div>
+								<div class="wf-cell wf-badge-cell"></div>
+							</div>
+						}
+					</div>
+				}
+
+				<!-- Day tabs + weekly calendar with colored course blocks -->
+				@case ('week-schedule') {
+					<div class="wf-title-bar">
+						<div class="wf-title"></div>
+					</div>
+					<div class="wf-week-grid wf-week-full">
+						<div class="wf-week-header">
+							<div class="wf-time-col"></div>
+							@for (_ of [1, 2, 3, 4, 5]; track $index) {
+								<div class="wf-day-col" [class.wf-day-active]="$index === 1"></div>
+							}
+						</div>
+						@for (_ of [1, 2, 3, 4]; track $index) {
+							<div class="wf-week-row">
+								<div class="wf-time-col"></div>
+								@for (d of [1, 2, 3, 4, 5]; track d) {
+									<div class="wf-day-col">
+										@if (($index === 0 && d === 1) || ($index === 1 && d === 2) || ($index === 2 && d === 4) || ($index === 0 && d === 3) || ($index === 3 && d === 1) || ($index === 1 && d === 5) || ($index === 3 && d === 3)) {
+											<div class="wf-course-block" [class.wf-course-alt]="$index % 2 === 0"></div>
+										}
+									</div>
+								}
+							</div>
+						}
+					</div>
+				}
+
+				<!-- Selector + month toggle + attendance grid -->
+				@case ('attendance') {
+					<div class="wf-filter-row">
+						<div class="wf-filter-select" style="width: 40%"></div>
+						<div class="wf-tab-bar">
+							<div class="wf-tab wf-tab-active"></div>
+							<div class="wf-tab"></div>
+						</div>
+					</div>
+					<div class="wf-attendance-grid">
+						<div class="wf-att-header">
+							@for (_ of [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]; track $index) {
+								<div class="wf-att-day-label"></div>
+							}
+						</div>
+						@for (_ of [1, 2, 3, 4]; track $index) {
+							<div class="wf-att-row">
+								<div class="wf-att-name"></div>
+								@for (d of [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]; track d) {
+									<div
+										class="wf-att-cell"
+										[class.wf-att-present]="!(($index === 1 && d === 3) || ($index === 2 && d === 7) || ($index === 0 && d === 5))"
+										[class.wf-att-absent]="($index === 1 && d === 3) || ($index === 2 && d === 7)"
+										[class.wf-att-late]="$index === 0 && d === 5"
+									></div>
+								}
+							</div>
+						}
+					</div>
+				}
+
+				<!-- Course selector + vista toggle + grades card -->
+				@case ('grades') {
+					<div class="wf-filter-row">
+						<div class="wf-filter-select" style="width: 45%"></div>
+						<div class="wf-tab-bar">
+							<div class="wf-tab wf-tab-active"></div>
+							<div class="wf-tab"></div>
+							<div class="wf-tab"></div>
+						</div>
+					</div>
+					<div class="wf-grades-card">
+						<div class="wf-grade-header">
+							<div class="wf-grade-course"></div>
+							<div class="wf-grade-avg wf-accent-bg"></div>
+						</div>
+						@for (_ of [1, 2, 3]; track $index) {
+							<div class="wf-grade-row">
+								<div class="wf-grade-label"></div>
+								<div class="wf-grade-value" [class.wf-grade-high]="$index === 0" [class.wf-grade-mid]="$index === 1" [class.wf-grade-low]="$index === 2"></div>
+							</div>
+						}
+					</div>
+				}
+
+				<!-- Thread list with messages -->
+				@case ('forum') {
+					<div class="wf-title-bar">
+						<div class="wf-title"></div>
+						<div class="wf-action"></div>
+					</div>
+					<div class="wf-forum">
+						@for (_ of [1, 2, 3]; track $index) {
+							<div class="wf-thread">
+								<div class="wf-thread-avatar"></div>
+								<div class="wf-thread-content">
+									<div class="wf-thread-title"></div>
+									<div class="wf-thread-meta"></div>
+								</div>
+								<div class="wf-thread-badge"></div>
+							</div>
+						}
+					</div>
+				}
+
+				<!-- Contact sidebar + chat bubbles -->
+				@case ('messaging') {
+					<div class="wf-messaging">
+						<div class="wf-msg-sidebar">
+							@for (_ of [1, 2, 3]; track $index) {
+								<div class="wf-msg-contact" [class.wf-msg-contact-active]="$index === 0">
+									<div class="wf-msg-contact-avatar"></div>
+									<div class="wf-msg-contact-line"></div>
+								</div>
+							}
+						</div>
+						<div class="wf-msg-chat">
+							<div class="wf-bubble wf-bubble-left">
+								<div class="wf-bubble-avatar"></div>
+								<div class="wf-bubble-text"></div>
+							</div>
+							<div class="wf-bubble wf-bubble-right">
+								<div class="wf-bubble-text"></div>
+							</div>
+							<div class="wf-bubble wf-bubble-left">
+								<div class="wf-bubble-avatar"></div>
+								<div class="wf-bubble-text wf-bubble-short"></div>
+							</div>
+							<div class="wf-msg-input"></div>
+						</div>
+					</div>
+				}
+
+				<!-- Card grid with course info -->
+				@case ('course-cards') {
+					<div class="wf-title-bar">
+						<div class="wf-title"></div>
+					</div>
+					<div class="wf-course-grid">
+						@for (_ of [1, 2, 3, 4]; track $index) {
+							<div class="wf-course-card">
+								<div class="wf-course-card-header" [class.wf-course-alt]="$index % 2 === 0"></div>
+								<div class="wf-course-card-body">
+									<div class="wf-course-card-title"></div>
+									<div class="wf-course-card-sub"></div>
+								</div>
+							</div>
+						}
+					</div>
+				}
+
+				<!-- Tab bar + content sections -->
+				@case ('salon-tabs') {
+					<div class="wf-stats-row">
+						@for (_ of [1, 2, 3]; track $index) {
+							<div class="wf-stat-card">
+								<div class="wf-stat-value"></div>
+								<div class="wf-stat-label"></div>
+							</div>
+						}
+					</div>
+					<div class="wf-tab-bar wf-tab-bar-full">
+						<div class="wf-tab wf-tab-active"></div>
+						<div class="wf-tab"></div>
+						<div class="wf-tab"></div>
+					</div>
+					<div class="wf-table wf-table-compact">
+						<div class="wf-row wf-header">
+							<div class="wf-cell" style="width: 30%"></div>
+							<div class="wf-cell" style="width: 25%"></div>
+							<div class="wf-cell wf-badge-cell"></div>
+						</div>
+						@for (_ of [1, 2, 3]; track $index) {
+							<div class="wf-row">
+								<div class="wf-cell" style="width: 30%"></div>
+								<div class="wf-cell" style="width: 25%"></div>
+								<div class="wf-cell wf-badge-cell"></div>
+							</div>
+						}
+					</div>
+				}
+			}
+		</div>
+
+		<div class="preview-footer">
+			<span class="preview-label">{{ label() }}</span>
+			<span class="preview-desc">{{ description() }}</span>
+		</div>
+	</div>
 </a>
 <!-- #endregion -->

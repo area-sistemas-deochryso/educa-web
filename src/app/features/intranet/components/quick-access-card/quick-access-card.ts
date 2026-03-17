@@ -1,6 +1,8 @@
 // #region Imports
-import { ChangeDetectionStrategy, Component, computed, input } from '@angular/core';
+import { ChangeDetectionStrategy, Component, input } from '@angular/core';
 import { RouterLink } from '@angular/router';
+
+import { PreviewLayout } from '@features/intranet/pages/shared/home-component/quick-access.config';
 
 // #endregion
 // #region Implementation
@@ -13,22 +15,10 @@ import { RouterLink } from '@angular/router';
 	changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class QuickAccessCardComponent {
-	// * Visible label on the card.
 	label = input.required<string>();
-
-	// * Target route.
 	path = input.required<string>();
-
-	// * Optional modal query param for the target page.
-	modal = input<string>();
-
-	// * PrimeNG icon class.
 	icon = input<string>('pi-link');
-
-	readonly queryParams = computed(() => {
-		// * Only include modal param when defined.
-		const modalValue = this.modal();
-		return modalValue ? { modal: modalValue } : null;
-	});
+	description = input<string>('');
+	preview = input<PreviewLayout>('admin-table');
 }
 // #endregion

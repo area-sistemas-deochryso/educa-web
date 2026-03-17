@@ -51,6 +51,8 @@ Aplicacion Angular 21 para gestion educativa con portal publico e intranet priva
 @.claude/rules/quality-gate.md
 @.claude/rules/pwa-ios.md
 @.claude/rules/rate-limiting.md
+@.claude/rules/table-transparency.md
+@.claude/rules/filter-transparency.md
 
 ## Skills
 
