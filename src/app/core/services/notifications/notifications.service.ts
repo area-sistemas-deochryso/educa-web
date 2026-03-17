@@ -1,16 +1,18 @@
 import { Injectable, signal, inject, PLATFORM_ID, computed, effect } from '@angular/core';
 import { isPlatformBrowser } from '@angular/common';
+import { HttpClient } from '@angular/common/http';
 import { Router } from '@angular/router';
 import {
 	SeasonalNotification,
 	NotificationType,
 	NotificationPriority,
-	getTodayNotifications,
 } from './notifications.config';
 import { logger } from '@app/core/helpers';
 import { StorageService } from '@app/core/services/storage';
 import { TimerManager } from '@app/core/services/destroy';
 import { SmartNotificationService } from './smart-notification.service';
+import { environment } from '@config/environment';
+import { NotificacionActiva } from '@core/services/notificaciones-admin';
 
 /**
  * Count of notifications by priority.
@@ -38,10 +40,12 @@ export interface PriorityCount {
 export class NotificationsService {
 	// #region Dependencies
 	private platformId = inject(PLATFORM_ID);
+	private http = inject(HttpClient);
 	private storage = inject(StorageService);
 	private router = inject(Router);
 	private smartService = inject(SmartNotificationService);
 	private timerManager = new TimerManager();
+	private readonly apiUrl = `${environment.apiUrl}/api/sistema/notificaciones`;
 	// #endregion
 
 	// #region Private state
@@ -137,11 +141,40 @@ export class NotificationsService {
 	// #region Notification checks
 
 	/**
-	 * Check daily notifications, merge smart notifications, filter dismissed, and sort by priority.
+	 * Fetch active notifications from API, merge with smart notifications,
+	 * filter dismissed, and sort by priority.
 	 */
 	checkNotifications(): void {
-		const today = new Date();
-		const todayNotifications = getTodayNotifications(today);
+		this.http.get<NotificacionActiva[]>(`${this.apiUrl}/activas`).subscribe({
+			next: (response) => {
+				const apiNotifications = (response ?? []).map((n) => this.mapApiToSeasonal(n));
+				this.applyNotifications(apiNotifications);
+			},
+			error: () => {
+				// Si la API falla, continuar solo con smart notifications
+				this.applyNotifications([]);
+			},
+		});
+	}
+
+	/** Maps API DTO to SeasonalNotification shape used by the UI. */
+	private mapApiToSeasonal(n: NotificacionActiva): SeasonalNotification {
+		return {
+			id: `api-${n.id}`,
+			type: (n.tipo as NotificationType) || 'evento',
+			title: n.titulo,
+			message: n.mensaje,
+			icon: n.icono,
+			priority: (n.prioridad as NotificationPriority) || 'low',
+			shouldShow: () => true,
+			actionUrl: n.actionUrl ?? undefined,
+			actionText: n.actionText ?? undefined,
+			dismissible: n.dismissible,
+		};
+	}
+
+	/** Merges API + smart notifications and updates state. */
+	private applyNotifications(apiNotifications: SeasonalNotification[]): void {
 		const dismissedIds = this._dismissedIds();
 
 		// Merge smart notifications as SeasonalNotification shape
@@ -149,7 +182,7 @@ export class NotificationsService {
 			...sn,
 			shouldShow: () => true,
 		}));
-		const allNotifications = [...todayNotifications, ...smartNotifs];
+		const allNotifications = [...apiNotifications, ...smartNotifs];
 
 		const priorityOrder = { urgent: 0, high: 1, medium: 2, low: 3 };
 		const active = allNotifications
@@ -161,7 +194,7 @@ export class NotificationsService {
 		this._dismissedNotifications.set(dismissed);
 
 		// Save last check time.
-		this.storage.setLastNotificationCheck(today.toISOString());
+		this.storage.setLastNotificationCheck(new Date().toISOString());
 
 		// Play sound if there are unread notifications and it has not played yet.
 		if (this.unreadCount() > 0 && !this.hasPlayedSound) {

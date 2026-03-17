@@ -46,6 +46,20 @@
 
 	<div class="filter-spacer"></div>
 
+	<!-- * Import students action -->
+	<button
+		pButton
+		icon="pi pi-upload"
+		label="Importar"
+		class="p-button-outlined"
+		(click)="onImportUsuarios()"
+		[pt]="{
+			root: {
+				'aria-label': 'Importar estudiantes desde Excel',
+			},
+		}"
+	></button>
+
 	<!-- * New user action -->
 	<button
 		pButton

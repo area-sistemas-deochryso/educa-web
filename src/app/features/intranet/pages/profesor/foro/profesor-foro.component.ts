@@ -25,10 +25,8 @@ import { ProfesorSalonConEstudiantes } from '../services/profesor.store';
 	styles: `
 		:host {
 			display: block;
-			height: calc(100vh - 120px);
 		}
 		.page-container {
-			height: 100%;
 			display: flex;
 			flex-direction: column;
 		}
@@ -37,10 +35,6 @@ import { ProfesorSalonConEstudiantes } from '../services/profesor.store';
 			align-items: center;
 			gap: 1rem;
 			flex-wrap: wrap;
-		}
-		.tab-wrapper {
-			flex: 1;
-			min-height: 0;
 		}
 	`,
 	template: `
@@ -68,15 +62,13 @@ import { ProfesorSalonConEstudiantes } from '../services/profesor.store';
 				</div>
 
 				@if (selectedSalon()) {
-					<div class="tab-wrapper">
-						<app-salon-foro-tab
-							[cursoOptions]="cursoOptions()"
-							[salonDescripcion]="selectedSalon()!.salonDescripcion"
-							[estudiantes]="estudiantesOptions()"
-							[estudiantesDni]="estudiantesDni()"
-							[grupos]="gruposData()"
-						/>
-					</div>
+					<app-salon-foro-tab
+						[cursoOptions]="cursoOptions()"
+						[salonDescripcion]="selectedSalon()!.salonDescripcion"
+						[estudiantes]="estudiantesOptions()"
+						[estudiantesDni]="estudiantesDni()"
+						[grupos]="gruposData()"
+					/>
 				}
 			}
 		</div>

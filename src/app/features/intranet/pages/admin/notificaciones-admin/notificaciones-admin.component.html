@@ -1,0 +1,354 @@
+<!-- #region Header -->
+<div class="page-header">
+	<div class="header-left">
+		<h2><i class="pi pi-bell"></i> Gestión de Notificaciones</h2>
+		<p class="subtitle">Administra las notificaciones que ven los usuarios del sistema</p>
+	</div>
+	<div class="header-right">
+		<p-select
+			[options]="[{ label: '2025', value: 2025 }, { label: '2026', value: 2026 }, { label: '2027', value: 2027 }]"
+			[ngModel]="vm().filterAnio"
+			(ngModelChange)="onChangeAnio($event)"
+			appendTo="body"
+			placeholder="Año"
+		/>
+		<button
+			pButton
+			label="Nueva Notificación"
+			icon="pi pi-plus"
+			(click)="onNew()"
+		></button>
+	</div>
+</div>
+<!-- #endregion -->
+
+<!-- #region Stats -->
+<div class="stats-grid">
+	<div class="stat-card">
+		<div class="stat-icon"><i class="pi pi-list"></i></div>
+		<div class="stat-info">
+			<span class="stat-value">{{ vm().estadisticas.total }}</span>
+			<span class="stat-label">Total</span>
+		</div>
+	</div>
+	<div class="stat-card">
+		<div class="stat-icon active"><i class="pi pi-check-circle"></i></div>
+		<div class="stat-info">
+			<span class="stat-value">{{ vm().estadisticas.activas }}</span>
+			<span class="stat-label">Activas</span>
+		</div>
+	</div>
+	<div class="stat-card">
+		<div class="stat-icon inactive"><i class="pi pi-times-circle"></i></div>
+		<div class="stat-info">
+			<span class="stat-value">{{ vm().estadisticas.inactivas }}</span>
+			<span class="stat-label">Inactivas</span>
+		</div>
+	</div>
+	<div class="stat-card">
+		<div class="stat-icon today"><i class="pi pi-calendar-clock"></i></div>
+		<div class="stat-info">
+			<span class="stat-value">{{ vm().estadisticas.vigentesHoy }}</span>
+			<span class="stat-label">Vigentes hoy</span>
+		</div>
+	</div>
+</div>
+<!-- #endregion -->
+
+<!-- #region Filtros -->
+<div class="filters-bar">
+	<p-iconfield>
+		<p-inputicon styleClass="pi pi-search" />
+		<input
+			pInputText
+			type="text"
+			placeholder="Buscar por título o mensaje..."
+			[ngModel]="vm().searchTerm"
+			(ngModelChange)="onSearch($event)"
+		/>
+	</p-iconfield>
+	<p-select
+		[options]="tipoOptions"
+		[ngModel]="vm().filterTipo"
+		(ngModelChange)="onFilterTipo($event)"
+		appendTo="body"
+		placeholder="Tipo"
+	/>
+	<p-select
+		[options]="estadoOptions"
+		[ngModel]="vm().filterEstado"
+		(ngModelChange)="onFilterEstado($event)"
+		appendTo="body"
+		placeholder="Estado"
+	/>
+	<button
+		pButton
+		icon="pi pi-filter-slash"
+		class="p-button-outlined"
+		(click)="onClearFiltros()"
+		pTooltip="Limpiar filtros"
+		tooltipPosition="top"
+		[pt]="{ root: { 'aria-label': 'Limpiar filtros' } }"
+	></button>
+</div>
+<!-- #endregion -->
+
+<!-- #region Tabla -->
+<p-table
+	[value]="vm().items"
+	[loading]="vm().loading"
+	[paginator]="true"
+	[rows]="10"
+	[rowsPerPageOptions]="[5, 10, 25]"
+	stateStorage="session"
+	stateKey="notificaciones-admin-table"
+	[showCurrentPageReport]="true"
+	currentPageReportTemplate="Mostrando {first} a {last} de {totalRecords}"
+	styleClass="p-datatable-sm"
+>
+	<ng-template #header>
+		<tr>
+			<th pSortableColumn="titulo">Título <p-sortIcon field="titulo" /></th>
+			<th pSortableColumn="tipo" style="width: 110px">Tipo <p-sortIcon field="tipo" /></th>
+			<th pSortableColumn="prioridad" style="width: 100px">Prioridad <p-sortIcon field="prioridad" /></th>
+			<th style="width: 110px">Fecha Inicio</th>
+			<th style="width: 110px">Fecha Fin</th>
+			<th pSortableColumn="estado" style="width: 90px">Estado <p-sortIcon field="estado" /></th>
+			<th style="width: 140px">Acciones</th>
+		</tr>
+	</ng-template>
+
+	<ng-template #body let-item>
+		<tr>
+			<td>
+				<div class="titulo-cell">
+					<i class="pi {{ item.icono }}"></i>
+					<span>{{ item.titulo }}</span>
+				</div>
+			</td>
+			<td>
+				<p-tag [value]="getTipoLabel(item.tipo)" [severity]="getTipoSeverity(item.tipo)" />
+			</td>
+			<td>
+				<p-tag [value]="getPrioridadLabel(item.prioridad)" [severity]="getPrioridadSeverity(item.prioridad)" />
+			</td>
+			<td>{{ item.fechaInicio | date: 'dd/MM/yyyy' }}</td>
+			<td>{{ item.fechaFin | date: 'dd/MM/yyyy' }}</td>
+			<td>
+				<p-tag
+					[value]="item.estado ? 'Activo' : 'Inactivo'"
+					[severity]="item.estado ? 'success' : 'danger'"
+				/>
+			</td>
+			<td>
+				<div class="actions-cell">
+					<button
+						pButton
+						icon="pi pi-pencil"
+						class="p-button-rounded p-button-text"
+						(click)="onEdit(item)"
+						pTooltip="Editar"
+						tooltipPosition="top"
+						[pt]="{ root: { 'aria-label': 'Editar' } }"
+					></button>
+					<button
+						pButton
+						[icon]="item.estado ? 'pi pi-eye-slash' : 'pi pi-eye'"
+						class="p-button-rounded p-button-text"
+						[class.p-button-warning]="item.estado"
+						[class.p-button-success]="!item.estado"
+						(click)="onToggleEstado(item)"
+						[pTooltip]="item.estado ? 'Desactivar' : 'Activar'"
+						tooltipPosition="top"
+						[pt]="{ root: { 'aria-label': item.estado ? 'Desactivar' : 'Activar' } }"
+					></button>
+					<button
+						pButton
+						icon="pi pi-trash"
+						class="p-button-rounded p-button-text p-button-danger"
+						(click)="onDelete(item)"
+						pTooltip="Eliminar"
+						tooltipPosition="top"
+						[pt]="{ root: { 'aria-label': 'Eliminar' } }"
+					></button>
+				</div>
+			</td>
+		</tr>
+	</ng-template>
+
+	<ng-template #emptymessage>
+		<tr>
+			<td colspan="7" class="text-center p-4">
+				<i class="pi pi-inbox" style="font-size: 2rem; color: var(--text-color-secondary)"></i>
+				<p>No se encontraron notificaciones</p>
+			</td>
+		</tr>
+	</ng-template>
+</p-table>
+<!-- #endregion -->
+
+<!-- #region Dialog Crear/Editar -->
+<p-dialog
+	[header]="vm().isEditing ? 'Editar Notificación' : 'Nueva Notificación'"
+	[visible]="vm().dialogVisible"
+	(visibleChange)="onDialogVisibleChange($event)"
+	[modal]="true"
+	[style]="{ width: '650px' }"
+	[closable]="true"
+>
+	<div class="form-grid">
+		<div class="form-field full">
+			<label for="titulo">Título *</label>
+			<input
+				pInputText
+				id="titulo"
+				[ngModel]="vm().formData.titulo"
+				(ngModelChange)="updateField('titulo', $event)"
+				placeholder="Título de la notificación"
+			/>
+		</div>
+
+		<div class="form-field full">
+			<label for="mensaje">Mensaje *</label>
+			<textarea
+				pTextarea
+				id="mensaje"
+				[ngModel]="vm().formData.mensaje"
+				(ngModelChange)="updateField('mensaje', $event)"
+				placeholder="Mensaje de la notificación"
+				[rows]="3"
+				[autoResize]="true"
+			></textarea>
+		</div>
+
+		<div class="form-field">
+			<label for="tipo">Tipo</label>
+			<p-select
+				id="tipo"
+				[options]="tipoOptions.slice(1)"
+				[ngModel]="vm().formData.tipo"
+				(ngModelChange)="updateField('tipo', $event)"
+				appendTo="body"
+			/>
+		</div>
+
+		<div class="form-field">
+			<label for="prioridad">Prioridad</label>
+			<p-select
+				id="prioridad"
+				[options]="prioridadOptions"
+				[ngModel]="vm().formData.prioridad"
+				(ngModelChange)="updateField('prioridad', $event)"
+				appendTo="body"
+			/>
+		</div>
+
+		<div class="form-field">
+			<label for="icono">Ícono</label>
+			<p-select
+				id="icono"
+				[options]="iconoOptions"
+				[ngModel]="vm().formData.icono"
+				(ngModelChange)="updateField('icono', $event)"
+				appendTo="body"
+			>
+				<ng-template let-item #selectedItem>
+					<div class="icon-option">
+						<i class="pi {{ item.value }}"></i>
+						<span>{{ item.label }}</span>
+					</div>
+				</ng-template>
+				<ng-template let-item #item>
+					<div class="icon-option">
+						<i class="pi {{ item.value }}"></i>
+						<span>{{ item.label }}</span>
+					</div>
+				</ng-template>
+			</p-select>
+		</div>
+
+		<div class="form-field">
+			<label>Vista previa</label>
+			<div class="icon-preview">
+				<i class="pi {{ vm().formData.icono }}" style="font-size: 1.5rem"></i>
+			</div>
+		</div>
+
+		<div class="form-field">
+			<label for="fechaInicio">Fecha Inicio *</label>
+			<p-datepicker
+				id="fechaInicio"
+				[ngModel]="vm().formData.fechaInicio"
+				(ngModelChange)="updateField('fechaInicio', $event)"
+				dateFormat="yy-mm-dd"
+				appendTo="body"
+			/>
+		</div>
+
+		<div class="form-field">
+			<label for="fechaFin">Fecha Fin *</label>
+			<p-datepicker
+				id="fechaFin"
+				[ngModel]="vm().formData.fechaFin"
+				(ngModelChange)="updateField('fechaFin', $event)"
+				dateFormat="yy-mm-dd"
+				appendTo="body"
+			/>
+		</div>
+
+		<div class="form-field">
+			<label for="actionUrl">URL de acción</label>
+			<input
+				pInputText
+				id="actionUrl"
+				[ngModel]="vm().formData.actionUrl"
+				(ngModelChange)="updateField('actionUrl', $event)"
+				placeholder="/intranet/..."
+			/>
+		</div>
+
+		<div class="form-field">
+			<label for="actionText">Texto del botón</label>
+			<input
+				pInputText
+				id="actionText"
+				[ngModel]="vm().formData.actionText"
+				(ngModelChange)="updateField('actionText', $event)"
+				placeholder="Ver detalles"
+			/>
+		</div>
+
+		<div class="form-field toggles">
+			<div class="toggle-item">
+				<label>Descartable</label>
+				<p-toggleswitch
+					[ngModel]="vm().formData.dismissible"
+					(ngModelChange)="updateField('dismissible', $event)"
+				/>
+			</div>
+			<div class="toggle-item">
+				<label>Activa</label>
+				<p-toggleswitch
+					[ngModel]="vm().formData.estado"
+					(ngModelChange)="updateField('estado', $event)"
+				/>
+			</div>
+		</div>
+	</div>
+
+	<ng-template #footer>
+		<button pButton label="Cancelar" icon="pi pi-times" class="p-button-text" (click)="onDialogVisibleChange(false)"></button>
+		<button
+			pButton
+			[label]="vm().isEditing ? 'Actualizar' : 'Crear'"
+			icon="pi pi-check"
+			(click)="onSave()"
+			[disabled]="!vm().isFormValid || vm().loading"
+		></button>
+	</ng-template>
+</p-dialog>
+<!-- #endregion -->
+
+<!-- #region Confirm Dialog -->
+<p-confirmDialog (onHide)="onConfirmDialogHide()" />
+<!-- #endregion -->

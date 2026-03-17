@@ -110,6 +110,12 @@ const developmentRoutes: Route[] = [
 					title: 'Intranet - Mis Cursos',
 				},
 				{
+					path: 'estudiante/foro',
+					loadComponent: () =>
+						import('./pages/estudiante').then((m) => m.EstudianteForoComponent),
+					title: 'Intranet - Foro',
+				},
+				{
 					path: 'estudiante/horarios',
 					loadComponent: () =>
 						import('./pages/estudiante').then((m) => m.EstudianteHorariosComponent),
@@ -142,6 +148,18 @@ const developmentRoutes: Route[] = [
 					loadComponent: () =>
 						import('./pages/shared/ctest-k6').then((m) => m.CTestK6Component),
 					title: 'Intranet - Test k6',
+				},
+			]
+		: []),
+	...(environment.features.videoconferencias
+		? [
+				{
+					path: 'videoconferencias',
+					loadComponent: () =>
+						import('./pages/shared/videoconferencias').then(
+							(m) => m.VideoconferenciasComponent,
+						),
+					title: 'Intranet - Videoconferencias',
 				},
 			]
 		: []),
@@ -215,6 +233,22 @@ export const INTRANET_ROUTES: Routes = [
 				loadComponent: () =>
 					import('./pages/admin/salones').then((m) => m.SalonesAdminComponent),
 				title: 'Intranet - Gestión de Salones',
+			},
+			{
+				path: 'admin/eventos-calendario',
+				loadComponent: () =>
+					import('./pages/admin/eventos-calendario/eventos-calendario.component').then(
+						(m) => m.EventosCalendarioComponent,
+					),
+				title: 'Intranet - Gestión de Eventos',
+			},
+			{
+				path: 'admin/notificaciones',
+				loadComponent: () =>
+					import('./pages/admin/notificaciones-admin/notificaciones-admin.component').then(
+						(m) => m.NotificacionesAdminComponent,
+					),
+				title: 'Intranet - Gestión de Notificaciones',
 			},
 		],
 	},

@@ -1,6 +1,7 @@
 import {
 	ActualizarUsuarioRequest,
 	CrearUsuarioRequest,
+	ImportarEstudiantesResponse,
 	RolUsuarioAdmin,
 	SalonProfesor,
 	UsuarioDetalle,
@@ -44,6 +45,9 @@ export class UsuariosStore {
 	private readonly _detailDrawerVisible = signal(false);
 	private readonly _confirmDialogVisible = signal(false);
 	private readonly _isEditing = signal(false);
+	private readonly _importDialogVisible = signal(false);
+	private readonly _importLoading = signal(false);
+	private readonly _importResult = signal<ImportarEstudiantesResponse | null>(null);
 
 	// Form State
 	private readonly _selectedUsuario = signal<UsuarioDetalle | null>(null);
@@ -76,6 +80,9 @@ export class UsuariosStore {
 	readonly dialogVisible = this._dialogVisible.asReadonly();
 	readonly detailDrawerVisible = this._detailDrawerVisible.asReadonly();
 	readonly isEditing = this._isEditing.asReadonly();
+	readonly importDialogVisible = this._importDialogVisible.asReadonly();
+	readonly importLoading = this._importLoading.asReadonly();
+	readonly importResult = this._importResult.asReadonly();
 
 	readonly selectedUsuario = this._selectedUsuario.asReadonly();
 	readonly formData = this._formData.asReadonly();
@@ -142,6 +149,9 @@ export class UsuariosStore {
 		filterRol: this._filterRol(),
 		filterEstado: this._filterEstado(),
 		confirmDialogVisible: this._confirmDialogVisible(),
+		importDialogVisible: this._importDialogVisible(),
+		importLoading: this._importLoading(),
+		importResult: this._importResult(),
 		showSkeletons: this._showSkeletons(),
 		statsReady: this._statsReady(),
 		tableReady: this._tableReady(),
@@ -404,6 +414,23 @@ export class UsuariosStore {
 
 	closeConfirmDialogVisible(): void {
 		this._confirmDialogVisible.set(false);
+	}
+
+	openImportDialog(): void {
+		this._importResult.set(null);
+		this._importDialogVisible.set(true);
+	}
+
+	closeImportDialog(): void {
+		this._importDialogVisible.set(false);
+	}
+
+	setImportLoading(loading: boolean): void {
+		this._importLoading.set(loading);
+	}
+
+	setImportResult(result: ImportarEstudiantesResponse | null): void {
+		this._importResult.set(result);
 	}
 	// #endregion
 }

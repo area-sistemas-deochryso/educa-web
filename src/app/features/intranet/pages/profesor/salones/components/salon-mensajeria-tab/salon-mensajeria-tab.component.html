@@ -25,9 +25,9 @@
 		<p class="empty-subtitle">Elige un curso para ver sus conversaciones</p>
 	</div>
 } @else {
-<div class="mensajeria-container" [class.mensajeria--fullscreen]="isFullscreen()">
+<div class="mensajeria-container">
 	<!-- #region Sidebar: Conversation list -->
-	<div class="mensajeria-sidebar" [class.mensajeria-sidebar--hidden]="!isFullscreen() && vm().vistaDetalle">
+	<div class="mensajeria-sidebar" [class.mensajeria-sidebar--mobile-hidden]="vm().vistaDetalle">
 		<!-- Header -->
 		<div class="sidebar-header">
 			<span class="sidebar-title">Mensajes</span>
@@ -105,25 +105,23 @@
 	<!-- #region Chat panel -->
 	<div
 		class="mensajeria-chat"
-		[class.mensajeria-chat--hidden]="!isFullscreen() && !vm().vistaDetalle"
-		[class.mensajeria-chat--empty]="isFullscreen() && !vm().vistaDetalle && !vm().detalle"
+		[class.mensajeria-chat--hidden]="!vm().vistaDetalle && !vm().detalle"
+		[class.mensajeria-chat--empty]="!vm().vistaDetalle && !vm().detalle"
 	>
-		@if (isFullscreen() && !vm().vistaDetalle && !vm().detalle) {
-			<!-- Fullscreen empty placeholder -->
+		@if (!vm().vistaDetalle && !vm().detalle) {
+			<!-- Desktop empty placeholder -->
 			<i class="pi pi-comments"></i>
 			<p>Selecciona una conversación</p>
 		} @else {
 			<!-- Chat header -->
 			<div class="chat-header">
-				@if (!isFullscreen()) {
-					<button
-						pButton
-						icon="pi pi-arrow-left"
-						class="p-button-rounded p-button-text p-button-sm"
-						(click)="onBack()"
-						[pt]="{ root: { 'aria-label': 'Volver a lista' } }"
-					></button>
-				}
+				<button
+					pButton
+					icon="pi pi-arrow-left"
+					class="p-button-rounded p-button-text p-button-sm back-btn"
+					(click)="onBack()"
+					[pt]="{ root: { 'aria-label': 'Volver a lista' } }"
+				></button>
 				<div class="chat-header-info">
 					<div class="chat-header-name">{{ vm().detalle?.asunto }}</div>
 					@if (vm().detalle; as detalle) {

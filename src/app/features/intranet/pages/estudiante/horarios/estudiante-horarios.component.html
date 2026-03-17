@@ -18,8 +18,57 @@
 		</h2>
 
 		<!-- #endregion -->
-		<!-- #region Weekly Grid -->
-		<div class="weekly-scroll-wrapper">
+		<!-- #region Mobile View -->
+		<div class="mobile-view">
+			<div class="day-selector">
+				@for (dia of DIAS; track dia.value) {
+					<button
+						type="button"
+						class="day-btn"
+						[class.active]="selectedDay() === dia.value"
+						(click)="selectDay(dia.value)"
+					>
+						{{ dia.short }}
+					</button>
+				}
+			</div>
+
+			<div class="mobile-cards">
+				@if (selectedDayBlocks().length === 0) {
+					<div class="mobile-empty">
+						<i class="pi pi-calendar-times"></i>
+						<p>Sin clases este día</p>
+					</div>
+				} @else {
+					@for (block of selectedDayBlocks(); track block.id) {
+						<div
+							class="mobile-card"
+							[style.border-left-color]="block.color"
+							(click)="verCursoContenido(block)"
+						>
+							<div class="mobile-card-header">
+								<span class="mobile-card-curso">{{ block.cursoNombre }}</span>
+								@if (countdownMap().get(block.id); as cd) {
+									<span class="countdown-badge" [ngClass]="'countdown-' + cd.urgency">
+										<i class="pi pi-clock"></i>
+										{{ cd.label }}
+									</span>
+								}
+							</div>
+							<div class="mobile-card-details">
+								<span><i class="pi pi-clock"></i> {{ block.horaInicio }} - {{ block.horaFin }}</span>
+								<span><i class="pi pi-building"></i> {{ block.salonDescripcion }}</span>
+								<span><i class="pi pi-users"></i> {{ block.cantidadEstudiantes }} estudiantes</span>
+							</div>
+						</div>
+					}
+				}
+			</div>
+		</div>
+
+		<!-- #endregion -->
+		<!-- #region Weekly Grid (Desktop) -->
+		<div class="weekly-scroll-wrapper desktop-view">
 			<div class="weekly-grid">
 				<!-- Columna de tiempo -->
 				<div class="time-column">

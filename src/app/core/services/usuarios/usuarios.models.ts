@@ -128,4 +128,39 @@ export const ROLES_USUARIOS: RolUsuario[] = APP_USER_ROLE_LIST;
 export type RolUsuarioAdmin = AppUserRoleAdmin;
 
 export const ROLES_USUARIOS_ADMIN: RolUsuarioAdmin[] = APP_USER_ROLE_ADMIN_LIST;
+
+/**
+ * Payload for a single student in a bulk import request.
+ */
+export interface ImportarEstudianteItem {
+	apellidos: string;
+	nombres: string;
+	dni?: string;
+	grado: string;
+	seccion: string;
+	nombreApoderado?: string;
+	correoApoderado?: string;
+}
+
+/**
+ * Response from bulk student import endpoint.
+ */
+export interface ImportarEstudiantesResponse {
+	creados: number;
+	actualizados: number;
+	rechazados: number;
+	errores: { fila: number; nombre: string; dni: string; razon: string }[];
+}
+
+/**
+ * Result of DNI migration endpoint.
+ * Temporary — remove after migration is complete.
+ */
+export interface MigracionDniResult {
+	total: number;
+	estudiantes: number;
+	apoderados: number;
+	profesores: number;
+	directores: number;
+}
 // #endregion

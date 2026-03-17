@@ -1,0 +1,151 @@
+<!-- #region Header -->
+<div class="sala-header" [class.fullscreen-header]="isFullscreen()">
+	<div class="sala-header-left">
+		@if (!isFullscreen()) {
+			<button
+				pButton
+				icon="pi pi-arrow-left"
+				class="p-button-text p-button-rounded p-button-sm"
+				(click)="onVolver()"
+				[pt]="{
+					root: {
+						'aria-label': 'Volver a la lista de cursos',
+					},
+				}"
+			></button>
+		}
+		<div class="sala-title">
+			<div class="sala-icon">
+				<i class="pi pi-video text-white" style="font-size: 0.875rem"></i>
+			</div>
+			<div>
+				<span class="fw-semibold" style="font-size: 1.0625rem">{{ cursoNombre() }}</span>
+				<div class="live-indicator">
+					<i class="pi pi-circle-fill text-green-500" style="font-size: 0.5rem"></i>
+					<span>En vivo</span>
+				</div>
+			</div>
+		</div>
+	</div>
+
+	<!-- #region Participantes -->
+	@if (!connecting() && !errorMsg()) {
+		<div class="participants-bar">
+			<div class="participant-stat" title="Total en sala">
+				<i class="pi pi-users"></i>
+				<span>{{ totalParticipants() }} en sala</span>
+			</div>
+			<span class="participant-separator">|</span>
+			<div class="participant-stat" title="Estudiantes">
+				<i class="pi pi-graduation-cap"></i>
+				<span>{{ studentCount() }} {{ studentCount() === 1 ? 'estudiante' : 'estudiantes' }}</span>
+			</div>
+			<span class="participant-separator">|</span>
+			<div class="participant-stat" title="Docentes / Administrativos">
+				<i class="pi pi-briefcase"></i>
+				<span>{{ moderatorCount() }} {{ moderatorCount() === 1 ? 'docente' : 'docentes' }}</span>
+			</div>
+			<button
+				pButton
+				icon="pi pi-refresh"
+				class="p-button-text p-button-rounded p-button-xs"
+				[loading]="syncingParticipants()"
+				(click)="onRefreshParticipants()"
+				[pt]="{
+					root: {
+						'aria-label': 'Actualizar participantes',
+					},
+				}"
+			></button>
+		</div>
+	}
+	<!-- #endregion -->
+
+	<!-- #region Acciones -->
+	<div class="sala-header-actions">
+		<button
+			pButton
+			[icon]="isFullscreen() ? 'pi pi-window-minimize' : 'pi pi-window-maximize'"
+			class="p-button-text p-button-rounded p-button-sm"
+			(click)="onToggleFullscreen()"
+			[pt]="{
+				root: {
+					'aria-label': isFullscreen() ? 'Salir de pantalla completa' : 'Pantalla completa',
+				},
+			}"
+		></button>
+		@if (isFullscreen()) {
+			<button
+				pButton
+				label="Salir de sala"
+				icon="pi pi-sign-out"
+				class="p-button-outlined p-button-danger p-button-sm"
+				(click)="onVolver()"
+			></button>
+		} @else {
+			<button
+				pButton
+				label="Salir"
+				icon="pi pi-sign-out"
+				class="p-button-outlined p-button-danger p-button-sm"
+				(click)="onVolver()"
+			></button>
+		}
+	</div>
+	<!-- #endregion -->
+</div>
+<!-- #endregion -->
+
+<!-- #region Jitsi Container -->
+<div class="sala-content">
+	<!-- Overlay se posiciona encima del iframe para que Jitsi cargue por debajo -->
+	<div class="connecting-overlay" [class.overlay-hidden]="!connecting()">
+		<div class="connecting-icon">
+			<i class="pi pi-video text-white" style="font-size: 2rem"></i>
+		</div>
+		<span class="connecting-course-name">{{ cursoNombre() }}</span>
+
+		<!-- #region Pasos de conexión -->
+		<div class="connecting-steps">
+			<div class="connecting-step" [class.active]="connectingStep() === 'auth'" [class.done]="connectingStep() !== 'auth'">
+				<i class="pi" [class.pi-spin]="connectingStep() === 'auth'" [class.pi-spinner]="connectingStep() === 'auth'" [class.pi-check-circle]="connectingStep() !== 'auth'"></i>
+				<span>Verificando acceso</span>
+			</div>
+			<div class="connecting-step" [class.active]="connectingStep() === 'script'" [class.done]="connectingStep() === 'joining'">
+				<i class="pi" [class.pi-spin]="connectingStep() === 'script'" [class.pi-spinner]="connectingStep() === 'script'" [class.pi-check-circle]="connectingStep() === 'joining'" [class.pi-circle]="connectingStep() === 'auth'"></i>
+				<span>Cargando videoconferencia</span>
+			</div>
+			<div class="connecting-step" [class.active]="connectingStep() === 'joining'">
+				<i class="pi" [class.pi-spin]="connectingStep() === 'joining'" [class.pi-spinner]="connectingStep() === 'joining'" [class.pi-circle]="connectingStep() !== 'joining'"></i>
+				<span>Uniéndose a la sala</span>
+			</div>
+		</div>
+		<!-- #endregion -->
+
+		<div class="connecting-progress-bar">
+			<div
+				class="connecting-progress-fill"
+				[class.step-auth]="connectingStep() === 'auth'"
+				[class.step-script]="connectingStep() === 'script'"
+				[class.step-joining]="connectingStep() === 'joining'"
+			></div>
+		</div>
+	</div>
+
+	@if (errorMsg()) {
+		<div class="error-state">
+			<i class="pi pi-exclamation-triangle" style="font-size: 3rem; color: var(--orange-500)"></i>
+			<p class="text-color-secondary fw-semibold" style="font-size: 1.0625rem">{{ errorMsg() }}</p>
+			<button
+				pButton
+				label="Volver a cursos"
+				icon="pi pi-arrow-left"
+				class="p-button-outlined"
+				(click)="onVolver()"
+			></button>
+		</div>
+	}
+
+	<div #jitsiContainer class="jitsi-container"></div>
+</div>
+<!-- #endregion -->

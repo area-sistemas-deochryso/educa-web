@@ -1,0 +1,332 @@
+<!-- #region Header -->
+<div class="page-header">
+	<div class="header-left">
+		<h2><i class="pi pi-calendar"></i> Gestión de Eventos del Calendario</h2>
+		<p class="subtitle">Administra los eventos que aparecen en el calendario escolar</p>
+	</div>
+	<div class="header-right">
+		<p-select
+			[options]="[{ label: '2025', value: 2025 }, { label: '2026', value: 2026 }, { label: '2027', value: 2027 }]"
+			[ngModel]="vm().filterAnio"
+			(ngModelChange)="onChangeAnio($event)"
+			appendTo="body"
+			placeholder="Año"
+		/>
+		<button
+			pButton
+			label="Nuevo Evento"
+			icon="pi pi-plus"
+			(click)="onNew()"
+		></button>
+	</div>
+</div>
+<!-- #endregion -->
+
+<!-- #region Stats -->
+<div class="stats-grid">
+	<div class="stat-card">
+		<div class="stat-icon"><i class="pi pi-list"></i></div>
+		<div class="stat-info">
+			<span class="stat-value">{{ vm().estadisticas.total }}</span>
+			<span class="stat-label">Total</span>
+		</div>
+	</div>
+	<div class="stat-card">
+		<div class="stat-icon active"><i class="pi pi-check-circle"></i></div>
+		<div class="stat-info">
+			<span class="stat-value">{{ vm().estadisticas.activos }}</span>
+			<span class="stat-label">Activos</span>
+		</div>
+	</div>
+	<div class="stat-card">
+		<div class="stat-icon inactive"><i class="pi pi-times-circle"></i></div>
+		<div class="stat-info">
+			<span class="stat-value">{{ vm().estadisticas.inactivos }}</span>
+			<span class="stat-label">Inactivos</span>
+		</div>
+	</div>
+	<div class="stat-card">
+		<div class="stat-icon upcoming"><i class="pi pi-clock"></i></div>
+		<div class="stat-info">
+			<span class="stat-value">{{ vm().estadisticas.proximosMes }}</span>
+			<span class="stat-label">Próximos 30 días</span>
+		</div>
+	</div>
+</div>
+<!-- #endregion -->
+
+<!-- #region Filtros -->
+<div class="filters-bar">
+	<p-iconfield>
+		<p-inputicon styleClass="pi pi-search" />
+		<input
+			pInputText
+			type="text"
+			placeholder="Buscar por título o descripción..."
+			[ngModel]="vm().searchTerm"
+			(ngModelChange)="onSearch($event)"
+		/>
+	</p-iconfield>
+	<p-select
+		[options]="tipoOptions"
+		[ngModel]="vm().filterTipo"
+		(ngModelChange)="onFilterTipo($event)"
+		appendTo="body"
+		placeholder="Tipo"
+	/>
+	<p-select
+		[options]="estadoOptions"
+		[ngModel]="vm().filterEstado"
+		(ngModelChange)="onFilterEstado($event)"
+		appendTo="body"
+		placeholder="Estado"
+	/>
+	<button
+		pButton
+		icon="pi pi-filter-slash"
+		class="p-button-outlined"
+		(click)="onClearFiltros()"
+		pTooltip="Limpiar filtros"
+		tooltipPosition="top"
+		[pt]="{ root: { 'aria-label': 'Limpiar filtros' } }"
+	></button>
+</div>
+<!-- #endregion -->
+
+<!-- #region Tabla -->
+<p-table
+	[value]="vm().items"
+	[loading]="vm().loading"
+	[paginator]="true"
+	[rows]="10"
+	[rowsPerPageOptions]="[5, 10, 25]"
+	stateStorage="session"
+	stateKey="eventos-calendario-table"
+	[showCurrentPageReport]="true"
+	currentPageReportTemplate="Mostrando {first} a {last} de {totalRecords}"
+	styleClass="p-datatable-sm"
+>
+	<ng-template #header>
+		<tr>
+			<th pSortableColumn="titulo">Título <p-sortIcon field="titulo" /></th>
+			<th pSortableColumn="tipo" style="width: 110px">Tipo <p-sortIcon field="tipo" /></th>
+			<th style="width: 110px">Fecha Inicio</th>
+			<th style="width: 110px">Fecha Fin</th>
+			<th style="width: 100px">Hora</th>
+			<th pSortableColumn="estado" style="width: 90px">Estado <p-sortIcon field="estado" /></th>
+			<th style="width: 140px">Acciones</th>
+		</tr>
+	</ng-template>
+
+	<ng-template #body let-item>
+		<tr>
+			<td>
+				<div class="titulo-cell">
+					<i class="pi {{ item.icono }}"></i>
+					<div>
+						<span class="titulo-text">{{ item.titulo }}</span>
+						@if (item.ubicacion) {
+							<span class="ubicacion-text"><i class="pi pi-map-marker"></i> {{ item.ubicacion }}</span>
+						}
+					</div>
+				</div>
+			</td>
+			<td>
+				<p-tag [value]="getTipoLabel(item.tipo)" [severity]="getTipoSeverity(item.tipo)" />
+			</td>
+			<td>{{ item.fechaInicio | date: 'dd/MM/yyyy' }}</td>
+			<td>{{ item.fechaFin ? (item.fechaFin | date: 'dd/MM/yyyy') : '—' }}</td>
+			<td>{{ item.hora || '—' }}</td>
+			<td>
+				<p-tag
+					[value]="item.estado ? 'Activo' : 'Inactivo'"
+					[severity]="item.estado ? 'success' : 'danger'"
+				/>
+			</td>
+			<td>
+				<div class="actions-cell">
+					<button
+						pButton
+						icon="pi pi-pencil"
+						class="p-button-rounded p-button-text"
+						(click)="onEdit(item)"
+						pTooltip="Editar"
+						tooltipPosition="top"
+						[pt]="{ root: { 'aria-label': 'Editar' } }"
+					></button>
+					<button
+						pButton
+						[icon]="item.estado ? 'pi pi-eye-slash' : 'pi pi-eye'"
+						class="p-button-rounded p-button-text"
+						[class.p-button-warning]="item.estado"
+						[class.p-button-success]="!item.estado"
+						(click)="onToggleEstado(item)"
+						[pTooltip]="item.estado ? 'Desactivar' : 'Activar'"
+						tooltipPosition="top"
+						[pt]="{ root: { 'aria-label': item.estado ? 'Desactivar' : 'Activar' } }"
+					></button>
+					<button
+						pButton
+						icon="pi pi-trash"
+						class="p-button-rounded p-button-text p-button-danger"
+						(click)="onDelete(item)"
+						pTooltip="Eliminar"
+						tooltipPosition="top"
+						[pt]="{ root: { 'aria-label': 'Eliminar' } }"
+					></button>
+				</div>
+			</td>
+		</tr>
+	</ng-template>
+
+	<ng-template #emptymessage>
+		<tr>
+			<td colspan="7" class="text-center p-4">
+				<i class="pi pi-inbox" style="font-size: 2rem; color: var(--text-color-secondary)"></i>
+				<p>No se encontraron eventos</p>
+			</td>
+		</tr>
+	</ng-template>
+</p-table>
+<!-- #endregion -->
+
+<!-- #region Dialog Crear/Editar -->
+<p-dialog
+	[header]="vm().isEditing ? 'Editar Evento' : 'Nuevo Evento'"
+	[visible]="vm().dialogVisible"
+	(visibleChange)="onDialogVisibleChange($event)"
+	[modal]="true"
+	[style]="{ width: '650px' }"
+	[closable]="true"
+>
+	<div class="form-grid">
+		<div class="form-field full">
+			<label for="titulo">Título *</label>
+			<input
+				pInputText
+				id="titulo"
+				[ngModel]="vm().formData.titulo"
+				(ngModelChange)="updateField('titulo', $event)"
+				placeholder="Título del evento"
+			/>
+		</div>
+
+		<div class="form-field full">
+			<label for="descripcion">Descripción *</label>
+			<textarea
+				pTextarea
+				id="descripcion"
+				[ngModel]="vm().formData.descripcion"
+				(ngModelChange)="updateField('descripcion', $event)"
+				placeholder="Descripción del evento"
+				[rows]="3"
+				[autoResize]="true"
+			></textarea>
+		</div>
+
+		<div class="form-field">
+			<label for="tipo">Tipo</label>
+			<p-select
+				id="tipo"
+				[options]="tipoOptions.slice(1)"
+				[ngModel]="vm().formData.tipo"
+				(ngModelChange)="updateField('tipo', $event)"
+				appendTo="body"
+			/>
+		</div>
+
+		<div class="form-field">
+			<label for="icono">Ícono</label>
+			<p-select
+				id="icono"
+				[options]="iconoOptions"
+				[ngModel]="vm().formData.icono"
+				(ngModelChange)="updateField('icono', $event)"
+				appendTo="body"
+			>
+				<ng-template let-item #selectedItem>
+					<div class="icon-option">
+						<i class="pi {{ item.value }}"></i>
+						<span>{{ item.label }}</span>
+					</div>
+				</ng-template>
+				<ng-template let-item #item>
+					<div class="icon-option">
+						<i class="pi {{ item.value }}"></i>
+						<span>{{ item.label }}</span>
+					</div>
+				</ng-template>
+			</p-select>
+		</div>
+
+		<div class="form-field">
+			<label for="fechaInicio">Fecha Inicio *</label>
+			<p-datepicker
+				id="fechaInicio"
+				[ngModel]="vm().formData.fechaInicio"
+				(ngModelChange)="updateField('fechaInicio', $event)"
+				dateFormat="yy-mm-dd"
+				appendTo="body"
+			/>
+		</div>
+
+		<div class="form-field">
+			<label for="fechaFin">Fecha Fin (opcional)</label>
+			<p-datepicker
+				id="fechaFin"
+				[ngModel]="vm().formData.fechaFin"
+				(ngModelChange)="updateField('fechaFin', $event)"
+				dateFormat="yy-mm-dd"
+				appendTo="body"
+			/>
+		</div>
+
+		<div class="form-field">
+			<label for="hora">Hora</label>
+			<input
+				pInputText
+				id="hora"
+				[ngModel]="vm().formData.hora"
+				(ngModelChange)="updateField('hora', $event)"
+				placeholder="8:00 AM"
+			/>
+		</div>
+
+		<div class="form-field">
+			<label for="ubicacion">Ubicación</label>
+			<input
+				pInputText
+				id="ubicacion"
+				[ngModel]="vm().formData.ubicacion"
+				(ngModelChange)="updateField('ubicacion', $event)"
+				placeholder="Auditorio principal"
+			/>
+		</div>
+
+		<div class="form-field toggles">
+			<div class="toggle-item">
+				<label>Activo</label>
+				<p-toggleswitch
+					[ngModel]="vm().formData.estado"
+					(ngModelChange)="updateField('estado', $event)"
+				/>
+			</div>
+		</div>
+	</div>
+
+	<ng-template #footer>
+		<button pButton label="Cancelar" icon="pi pi-times" class="p-button-text" (click)="onDialogVisibleChange(false)"></button>
+		<button
+			pButton
+			[label]="vm().isEditing ? 'Actualizar' : 'Crear'"
+			icon="pi pi-check"
+			(click)="onSave()"
+			[disabled]="!vm().isFormValid || vm().loading"
+		></button>
+	</ng-template>
+</p-dialog>
+<!-- #endregion -->
+
+<!-- #region Confirm Dialog -->
+<p-confirmDialog (onHide)="onConfirmDialogHide()" />
+<!-- #endregion -->

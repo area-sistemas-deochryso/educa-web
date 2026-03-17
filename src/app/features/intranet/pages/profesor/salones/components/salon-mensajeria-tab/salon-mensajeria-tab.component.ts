@@ -48,6 +48,7 @@ export class SalonMensajeriaTabComponent {
 
 	// #region Inputs
 	readonly estudiantes = input<{ label: string; value: string }[]>([]);
+	/** @deprecated No longer used — responsive layout handled by CSS media queries */
 	readonly isFullscreen = input<boolean>(false);
 	readonly cursoOptions = input<{ label: string; value: number }[]>([]);
 	// #endregion

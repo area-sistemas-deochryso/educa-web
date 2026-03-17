@@ -108,15 +108,19 @@ export class SalonMensajeriaFacade {
 				next: (conversaciones) => {
 					this.store.setConversaciones(conversaciones);
 
-					const foroAsunto = `${FORO_PREFIX} ${salonDescripcion}`;
-					const foro = conversaciones.find((c) => c.asunto === foroAsunto);
+					// Find foro: exact match if salonDescripcion provided, otherwise any "Foro:" conversation
+					const foro = salonDescripcion
+						? conversaciones.find((c) => c.asunto === `${FORO_PREFIX} ${salonDescripcion}`)
+						: conversaciones.find((c) => c.asunto.startsWith(FORO_PREFIX));
 
 					if (foro) {
 						this.store.setForoConversacionId(foro.id);
 						this.loadConversacionDetalle(foro.id);
-					} else if (estudiantesDni.length > 0) {
+					} else if (salonDescripcion && estudiantesDni.length > 0) {
+						const foroAsunto = `${FORO_PREFIX} ${salonDescripcion}`;
 						this.crearForoConversacion(foroAsunto, estudiantesDni, salonDescripcion, horarioId);
 					} else {
+						// Read-only student or no students — nothing to create
 						this.store.setForoLoading(false);
 					}
 				},

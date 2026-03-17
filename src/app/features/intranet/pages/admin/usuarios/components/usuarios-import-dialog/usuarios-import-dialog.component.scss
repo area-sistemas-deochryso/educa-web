@@ -1,0 +1,181 @@
+// #region Dialog layout
+
+.dialog-title {
+	display: flex;
+	align-items: center;
+	gap: 0.5rem;
+	font-weight: 600;
+	font-size: 1.05rem;
+}
+
+// #endregion
+
+// #region Step: config
+
+.step-config {
+	display: flex;
+	flex-direction: column;
+	gap: 1.25rem;
+	padding: 0.25rem 0;
+}
+
+.step-description {
+	color: var(--text-color-secondary);
+	margin: 0;
+}
+
+.config-row {
+	display: flex;
+	align-items: center;
+	gap: 1rem;
+}
+
+.config-label {
+	font-weight: 500;
+	min-width: 160px;
+}
+
+.upload-area {
+	display: flex;
+	align-items: center;
+	gap: 1rem;
+	flex-wrap: wrap;
+}
+
+.file-input-hidden {
+	display: none;
+}
+
+.file-name {
+	display: flex;
+	align-items: center;
+	gap: 0.4rem;
+	color: var(--text-color-secondary);
+	font-size: 0.9rem;
+}
+
+.parse-error {
+	display: flex;
+	align-items: flex-start;
+	gap: 0.5rem;
+	padding: 0.75rem 1rem;
+	background: rgba(220, 38, 38, 0.08);
+	border: 1px solid rgba(220, 38, 38, 0.3);
+	border-radius: 6px;
+	color: #dc2626;
+	font-size: 0.9rem;
+}
+
+.sheet-mapping-hint {
+	padding: 0.75rem 1rem;
+	background: var(--surface-100);
+	border-radius: 6px;
+}
+
+.hint-title {
+	font-size: 0.85rem;
+	font-weight: 600;
+	margin: 0 0 0.4rem;
+	color: var(--text-color-secondary);
+}
+
+.hint-grid {
+	display: flex;
+	flex-direction: column;
+	gap: 0.2rem;
+	font-size: 0.82rem;
+	color: var(--text-color-secondary);
+}
+
+// #endregion
+
+// #region Step: preview
+
+.step-preview {
+	display: flex;
+	flex-direction: column;
+	gap: 1rem;
+	max-height: 60vh;
+	overflow-y: auto;
+}
+
+.preview-summary {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	flex-wrap: wrap;
+	gap: 0.5rem;
+}
+
+.summary-count {
+	display: flex;
+	align-items: center;
+	gap: 0.4rem;
+	font-size: 0.95rem;
+}
+
+.text-muted {
+	color: var(--text-color-secondary);
+	opacity: 0.6;
+}
+
+// #endregion
+
+// #region Step: result
+
+.step-result {
+	display: flex;
+	flex-direction: column;
+	gap: 1.25rem;
+	min-height: 120px;
+}
+
+.loading-state {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	gap: 1rem;
+	padding: 2rem 0;
+	color: var(--text-color-secondary);
+}
+
+.result-summary {
+	display: flex;
+	gap: 2rem;
+	justify-content: center;
+	padding: 1rem 0;
+}
+
+.result-stat {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	gap: 0.25rem;
+}
+
+.result-number {
+	font-size: 2rem;
+	font-weight: 700;
+	line-height: 1;
+}
+
+.result-label {
+	font-size: 0.85rem;
+	color: var(--text-color-secondary);
+}
+
+.error-table-title {
+	font-size: 0.9rem;
+	font-weight: 600;
+	color: #dc2626;
+	display: flex;
+	align-items: center;
+	gap: 0.4rem;
+}
+
+.error-reason {
+	color: #dc2626;
+	font-size: 0.85rem;
+}
+
+// #endregion

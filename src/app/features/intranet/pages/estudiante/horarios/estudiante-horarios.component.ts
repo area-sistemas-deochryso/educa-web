@@ -192,6 +192,24 @@ export class EstudianteHorariosComponent implements OnInit {
 	);
 
 	// #endregion
+	// #region Mobile view
+	readonly selectedDay = signal(this.getCurrentWeekday());
+	readonly selectedDayBlocks = computed(() =>
+		this.weeklyBlocks()
+			.filter((b) => b.dia === this.selectedDay())
+			.sort((a, b) => a.topPx - b.topPx),
+	);
+
+	private getCurrentWeekday(): number {
+		const jsDay = new Date().getDay();
+		return jsDay >= 1 && jsDay <= 5 ? jsDay : 1;
+	}
+
+	selectDay(day: number): void {
+		this.selectedDay.set(day);
+	}
+
+	// #endregion
 	// #region Constantes
 	readonly DIAS = [
 		{ label: 'Lunes', short: 'Lun', value: 1 },

@@ -1,0 +1,109 @@
+// #region Page Layout
+.page-header {
+	display: flex;
+	align-items: center;
+	gap: 1rem;
+}
+
+.page-icon {
+	width: 48px;
+	height: 48px;
+	background: #1e3a5f;
+	border-radius: 12px;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	flex-shrink: 0;
+	color: #fff;
+}
+// #endregion
+
+// #region Empty/Error States
+.state-container {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	justify-content: center;
+	padding: 4rem 2rem;
+
+	.state-icon {
+		width: 72px;
+		height: 72px;
+		border-radius: 50%;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		margin-bottom: 1.5rem;
+	}
+}
+// #endregion
+
+// #region Curso Cards Grid
+.cursos-grid {
+	display: grid;
+	grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+	gap: 1.25rem;
+}
+
+.curso-card {
+	display: flex;
+	flex-direction: column;
+	border: 1px solid var(--surface-border);
+	border-radius: 12px;
+	padding: 1.5rem;
+	background: var(--surface-card);
+	transition: all 0.2s ease;
+	height: 100%;
+
+	&:hover {
+		box-shadow: var(--shadow-3);
+		border-color: var(--primary-color);
+		transform: translateY(-2px);
+	}
+}
+
+.curso-header {
+	display: flex;
+	align-items: flex-start;
+	gap: 0.75rem;
+	margin-bottom: 1rem;
+}
+
+.curso-icon {
+	width: 44px;
+	height: 44px;
+	background: #1e3a5f;
+	border-radius: 10px;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	flex-shrink: 0;
+	color: #fff;
+}
+
+.curso-details {
+	display: flex;
+	flex-direction: column;
+	gap: 0.5rem;
+	flex: 1;
+	margin-bottom: 1.25rem;
+}
+
+.curso-detail-row {
+	display: flex;
+	align-items: center;
+	gap: 0.5rem;
+	font-size: 0.875rem;
+	color: var(--text-color-secondary);
+
+	i {
+		width: 16px;
+		text-align: center;
+		flex-shrink: 0;
+	}
+}
+
+.curso-footer {
+	margin-top: auto;
+}
+// #endregion

@@ -18,20 +18,42 @@ import { logger, withRetry } from '@core/helpers';
 		:host {
 			display: block;
 			height: calc(100vh - 120px);
+			height: calc(100dvh - 120px);
 		}
 		.page-container {
 			height: 100%;
 			display: flex;
 			flex-direction: column;
+			padding: 0.75rem;
+		}
+		.page-title {
+			margin: 0 0 0.5rem 0.25rem;
+			font-size: 1.25rem;
+			font-weight: 700;
 		}
 		.tab-wrapper {
 			flex: 1;
 			min-height: 0;
+			display: flex;
+			flex-direction: column;
+		}
+		@media (max-width: 767px) {
+			:host {
+				height: calc(100vh - 100px);
+				height: calc(100dvh - 100px);
+			}
+			.page-container {
+				padding: 0.5rem;
+			}
+			.page-title {
+				font-size: 1.1rem;
+				margin-bottom: 0.35rem;
+			}
 		}
 	`,
 	template: `
-		<div class="page-container p-4">
-			<h2 class="mt-0 mb-3">Mensajería</h2>
+		<div class="page-container">
+			<h2 class="page-title">Mensajería</h2>
 
 			@if (loading()) {
 				<div class="flex justify-content-center p-5">

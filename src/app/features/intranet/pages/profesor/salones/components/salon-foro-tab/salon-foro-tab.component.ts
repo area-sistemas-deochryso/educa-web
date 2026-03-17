@@ -27,6 +27,7 @@ export class SalonForoTabComponent {
 	readonly estudiantes = input<{ label: string; value: string }[]>([]);
 	readonly grupos = input<GrupoContenidoDto[]>([]);
 	readonly cursoOptions = input<{ label: string; value: number }[]>([]);
+	readonly readOnly = input<boolean>(false);
 	readonly salonDescripcion = input<string>('');
 	readonly estudiantesDni = input<string[]>([]);
 	// #endregion
@@ -82,6 +83,21 @@ export class SalonForoTabComponent {
 	readonly hasGrupos = computed(() => this.grupos().some((g) => g.estudiantes.length > 0));
 
 	readonly isDirectedMessage = computed(() => this.selectedDestinatarios().length > 0);
+	// #endregion
+
+	// #region Helpers
+	private readonly avatarColors = [
+		'#4f46e5', '#0891b2', '#059669', '#d97706', '#dc2626',
+		'#7c3aed', '#db2777', '#2563eb', '#ca8a04', '#0d9488',
+	];
+
+	getAvatarColor(name: string): string {
+		let hash = 0;
+		for (let i = 0; i < name.length; i++) {
+			hash = name.charCodeAt(i) + ((hash << 5) - hash);
+		}
+		return this.avatarColors[Math.abs(hash) % this.avatarColors.length];
+	}
 	// #endregion
 
 	// #region Handlers

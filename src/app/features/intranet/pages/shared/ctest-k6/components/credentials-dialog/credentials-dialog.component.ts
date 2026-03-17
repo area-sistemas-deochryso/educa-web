@@ -104,6 +104,22 @@ export class CredentialsDialogComponent {
 		this.bulkText.set('');
 	}
 
+	onFileSelected(event: Event): void {
+		const input = event.target as HTMLInputElement;
+		const file = input.files?.[0];
+		if (!file) return;
+
+		const reader = new FileReader();
+		reader.onload = () => {
+			const text = (reader.result as string).trim();
+			if (text) {
+				this.importBulk.emit(text);
+			}
+		};
+		reader.readAsText(file);
+		input.value = '';
+	}
+
 	onClearAll(): void {
 		this.clearAll.emit();
 		this.bulkText.set('');

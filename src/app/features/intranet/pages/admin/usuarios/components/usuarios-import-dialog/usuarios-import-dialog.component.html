@@ -1,0 +1,265 @@
+<!-- #region Dialog -->
+<p-dialog
+	[visible]="visible()"
+	(visibleChange)="onDialogHide()"
+	[modal]="true"
+	[draggable]="false"
+	[resizable]="false"
+	[style]="{ width: '860px', maxWidth: '95vw' }"
+	styleClass="import-dialog"
+>
+	<ng-template pTemplate="header">
+		<span class="dialog-title">
+			<i class="pi pi-upload"></i>
+			Importación masiva de estudiantes
+		</span>
+	</ng-template>
+
+	<!-- #region Paso 1: Configuración -->
+	@if (step() === 'config') {
+		<div class="step-config">
+			<p class="step-description">
+				Selecciona la sección y sube un archivo Excel (.xlsx) con una hoja por grado.
+			</p>
+
+			<div class="config-row">
+				<label for="seccion-select" class="config-label">Sección por defecto</label>
+				<p-select
+					inputId="seccion-select"
+					[options]="seccionesOptions"
+					[(ngModel)]="seccion"
+					optionLabel="label"
+					optionValue="value"
+					appendTo="body"
+					[style]="{ width: '260px' }"
+				/>
+			</div>
+
+			<div class="upload-area">
+				<input
+					#fileInput
+					type="file"
+					accept=".xlsx"
+					class="file-input-hidden"
+					(change)="onSelectFile($event)"
+				/>
+				<button
+					pButton
+					type="button"
+					icon="pi pi-file-excel"
+					label="Seleccionar archivo .xlsx"
+					class="p-button-outlined"
+					(click)="fileInput.click()"
+				></button>
+				@if (fileName()) {
+					<span class="file-name">
+						<i class="pi pi-check-circle text-green-500"></i>
+						{{ fileName() }}
+					</span>
+				}
+			</div>
+
+			@if (parseError()) {
+				<div class="parse-error">
+					<i class="pi pi-exclamation-triangle"></i>
+					{{ parseError() }}
+				</div>
+			}
+
+			<div class="sheet-mapping-hint">
+				<p class="hint-title">Nombres de hojas esperados:</p>
+				<div class="hint-grid">
+					<span>3 AÑOS, 4 AÑOS, 5 AÑOS</span>
+					<span>1ER G, 2DO G, 3ER G, 4TO G, 5TO G, 6TO G</span>
+					<span>1ERO SEC, 2DO SEC, 3ERO SEC, 4TO SEC, 5TO SEC</span>
+				</div>
+			</div>
+		</div>
+	}
+	<!-- #endregion -->
+
+	<!-- #region Paso 2: Vista previa -->
+	@if (step() === 'preview') {
+		<div class="step-preview">
+			<div class="preview-summary">
+				<span class="summary-count">
+					<strong>{{ totalFilas() }}</strong> estudiantes en
+					<strong>{{ gradoGroups().length }}</strong> grados — Sección:
+					<p-tag [value]="seccion()" severity="info" />
+				</span>
+				<button
+					pButton
+					type="button"
+					icon="pi pi-arrow-left"
+					label="Cambiar archivo"
+					class="p-button-text p-button-sm"
+					(click)="onNuevoArchivo()"
+					[pt]="{ root: { 'aria-label': 'Cambiar archivo' } }"
+				></button>
+			</div>
+
+			<p-accordion [multiple]="true">
+				@for (group of gradoGroups(); track group.grado) {
+					<p-accordionpanel [value]="group.grado">
+						<p-accordionheader>
+							{{ group.grado }}
+							<p-tag [value]="group.filas.length + ' estudiantes'" severity="secondary" styleClass="ml-2" />
+						</p-accordionheader>
+						<p-accordioncontent>
+							<p-table
+								[value]="group.filas"
+								[scrollable]="true"
+								scrollHeight="240px"
+								styleClass="p-datatable-sm"
+							>
+								<ng-template pTemplate="header">
+									<tr>
+										<th style="width: 220px">Apellidos</th>
+										<th style="width: 180px">Nombres</th>
+										<th style="width: 100px">DNI</th>
+										<th>Apoderado</th>
+									</tr>
+								</ng-template>
+								<ng-template pTemplate="body" let-fila>
+									<tr>
+										<td>{{ fila.apellidos }}</td>
+										<td>{{ fila.nombres }}</td>
+										<td>
+											@if (fila.dni) {
+												{{ fila.dni }}
+											} @else {
+												<span class="text-muted">—</span>
+											}
+										</td>
+										<td>
+											@if (fila.nombreApoderado) {
+												{{ fila.nombreApoderado }}
+											} @else {
+												<span class="text-muted">—</span>
+											}
+										</td>
+									</tr>
+								</ng-template>
+							</p-table>
+						</p-accordioncontent>
+					</p-accordionpanel>
+				}
+			</p-accordion>
+		</div>
+	}
+	<!-- #endregion -->
+
+	<!-- #region Paso 3: Resultado -->
+	@if (step() === 'result') {
+		<div class="step-result">
+			@if (loading()) {
+				<div class="loading-state">
+					<p-progressspinner
+						strokeWidth="4"
+						animationDuration=".8s"
+						[style]="{ width: '48px', height: '48px' }"
+					/>
+					<p>Importando estudiantes...</p>
+				</div>
+			} @else if (result()) {
+				<div class="result-summary">
+					<div class="result-stat">
+						<i class="pi pi-plus-circle text-green-500"></i>
+						<span class="result-number">{{ result()!.creados }}</span>
+						<span class="result-label">creados</span>
+					</div>
+					<div class="result-stat">
+						<i class="pi pi-pencil text-blue-500"></i>
+						<span class="result-number">{{ result()!.actualizados }}</span>
+						<span class="result-label">actualizados</span>
+					</div>
+					<div class="result-stat">
+						<i class="pi pi-exclamation-triangle text-orange-500"></i>
+						<span class="result-number">{{ result()!.rechazados }}</span>
+						<span class="result-label">rechazados</span>
+					</div>
+				</div>
+
+				@if (resultHasErrors()) {
+					<p-table
+						[value]="result()!.errores"
+						styleClass="p-datatable-sm error-table"
+						[scrollable]="true"
+						scrollHeight="220px"
+					>
+						<ng-template pTemplate="caption">
+							<span class="error-table-title">
+								<i class="pi pi-exclamation-circle"></i> Errores de importación
+							</span>
+						</ng-template>
+						<ng-template pTemplate="header">
+							<tr>
+								<th style="width: 60px">Fila</th>
+								<th style="width: 200px">Nombre</th>
+								<th style="width: 100px">DNI</th>
+								<th>Razón</th>
+							</tr>
+						</ng-template>
+						<ng-template pTemplate="body" let-err>
+							<tr>
+								<td>{{ err.fila }}</td>
+								<td>{{ err.nombre }}</td>
+								<td>{{ err.dni || '—' }}</td>
+								<td class="error-reason">{{ err.razon }}</td>
+							</tr>
+						</ng-template>
+					</p-table>
+				}
+			}
+		</div>
+	}
+	<!-- #endregion -->
+
+	<ng-template pTemplate="footer">
+		@if (step() === 'config') {
+			<button
+				pButton
+				type="button"
+				label="Cancelar"
+				class="p-button-text"
+				(click)="onClose()"
+			></button>
+		}
+		@if (step() === 'preview') {
+			<button
+				pButton
+				type="button"
+				label="Cancelar"
+				class="p-button-text"
+				(click)="onClose()"
+			></button>
+			<button
+				pButton
+				type="button"
+				icon="pi pi-upload"
+				[label]="'Importar ' + totalFilas() + ' estudiantes'"
+				[disabled]="!canImport()"
+				(click)="onImportar()"
+			></button>
+		}
+		@if (step() === 'result') {
+			@if (!loading()) {
+				<button
+					pButton
+					type="button"
+					icon="pi pi-refresh"
+					label="Importar otro archivo"
+					class="p-button-outlined"
+					(click)="onNuevoArchivo()"
+				></button>
+				<button
+					pButton
+					type="button"
+					label="Cerrar"
+					(click)="onClose()"
+				></button>
+			}
+		}
+	</ng-template>
+</p-dialog>
+<!-- #endregion -->

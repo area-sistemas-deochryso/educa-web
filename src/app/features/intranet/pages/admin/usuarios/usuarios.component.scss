@@ -60,6 +60,41 @@
 }
 
 // #endregion
+// #region DEV MIGRATION PANEL
+.dev-migration-panel {
+	margin: 1.5rem 0;
+	padding: 1.5rem;
+	border: 2px dashed var(--yellow-500);
+	border-radius: 8px;
+	background: var(--yellow-50);
+
+	h3 {
+		margin: 0 0 0.5rem;
+		color: var(--yellow-800);
+		font-size: 1rem;
+
+		i {
+			margin-right: 0.5rem;
+		}
+	}
+
+	p {
+		margin: 0 0 1rem;
+		color: var(--yellow-700);
+		font-size: 0.875rem;
+	}
+
+	.migration-result {
+		margin-top: 1rem;
+		padding: 0.75rem;
+		background: var(--green-50);
+		border-radius: 6px;
+		color: var(--green-800);
+		font-size: 0.875rem;
+	}
+}
+
+// #endregion
 // #region RESPONSIVE
 @media (max-width: 768px) {
 	.usuarios-container {

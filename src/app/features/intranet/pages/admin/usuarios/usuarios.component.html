@@ -21,6 +21,7 @@
 		(filterEstadoChange)="onFilterEstadoChange($event)"
 		(clearFilters)="onClearFilters()"
 		(newUsuario)="onNewUsuario()"
+		(importUsuarios)="onImportUsuarios()"
 	/>
 
 	@if (!vm().tableReady) {
@@ -67,4 +68,61 @@
 
 <!-- * Confirmation dialog host -->
 <p-confirmDialog (onHide)="onConfirmDialogHide()" />
+
+<!-- * Import dialog -->
+<app-usuarios-import-dialog
+	[visible]="vm().importDialogVisible"
+	[loading]="vm().importLoading"
+	[result]="vm().importResult"
+	(visibleChange)="onImportDialogVisibleChange($event)"
+	(importar)="onImportar($event)"
+/>
+
+<!-- * DEV ONLY: DNI migration button -->
+@if (showMigracionDni) {
+	<div class="dev-migration-panel">
+		<h3><i class="pi pi-shield"></i> Migración de Seguridad (DEV)</h3>
+		<p>Migra los DNIs existentes a columnas hash + encrypted.</p>
+		<button
+			pButton
+			label="Migrar DNIs"
+			icon="pi pi-lock"
+			class="p-button-warning"
+			[loading]="migracionLoading()"
+			(click)="onMigrarDnis()"
+			[pt]="{ root: { 'aria-label': 'Migrar DNIs existentes' } }"
+		></button>
+		@if (migracionResult()) {
+			<div class="migration-result">
+				<strong>Migrados: {{ migracionResult()!.total }}</strong>
+				({{ migracionResult()!.estudiantes }} estudiantes,
+				{{ migracionResult()!.apoderados }} apoderados,
+				{{ migracionResult()!.profesores }} profesores,
+				{{ migracionResult()!.directores }} directores)
+			</div>
+		}
+
+		<hr style="margin: 1rem 0; border-color: var(--surface-border)" />
+
+		<p>Limpia los campos DNI en texto plano (ya migrados a hash+encrypted).</p>
+		<button
+			pButton
+			label="Limpiar DNIs plano"
+			icon="pi pi-eraser"
+			class="p-button-danger"
+			[loading]="migracion2Loading()"
+			(click)="onLimpiarDnisPlano()"
+			[pt]="{ root: { 'aria-label': 'Limpiar DNIs en texto plano' } }"
+		></button>
+		@if (migracion2Result()) {
+			<div class="migration-result">
+				<strong>Limpiados: {{ migracion2Result()!.total }}</strong>
+				({{ migracion2Result()!.estudiantes }} estudiantes,
+				{{ migracion2Result()!.apoderados }} apoderados,
+				{{ migracion2Result()!.profesores }} profesores,
+				{{ migracion2Result()!.directores }} directores)
+			</div>
+		}
+	</div>
+}
 <!-- #endregion -->

@@ -38,6 +38,7 @@ export class UsuariosFiltersComponent {
 	readonly filterEstadoChange = output<boolean | null>();
 	readonly clearFilters = output<void>();
 	readonly newUsuario = output<void>();
+	readonly importUsuarios = output<void>();
 
 	onSearchChange(value: string): void {
 		this.searchChange.emit(value);
@@ -57,6 +58,10 @@ export class UsuariosFiltersComponent {
 
 	onNewUsuario(): void {
 		this.newUsuario.emit();
+	}
+
+	onImportUsuarios(): void {
+		this.importUsuarios.emit();
 	}
 }
 // #endregion

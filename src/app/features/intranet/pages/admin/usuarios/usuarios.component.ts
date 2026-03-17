@@ -1,9 +1,12 @@
 // #region Imports
-import { AfterViewInit, ChangeDetectionStrategy, Component, inject } from '@angular/core';
+import { AfterViewInit, ChangeDetectionStrategy, Component, inject, signal } from '@angular/core';
+import { ButtonModule } from 'primeng/button';
 import { CommonModule } from '@angular/common';
 import { ConfirmDialogModule } from 'primeng/confirmdialog';
 import { ConfirmationService } from 'primeng/api';
-import { ROLES_USUARIOS_ADMIN, RolUsuarioAdmin, UsuarioLista } from '@core/services';
+import { ROLES_USUARIOS_ADMIN, RolUsuarioAdmin, UsuarioLista, UsuariosService } from '@core/services';
+import type { MigracionDniResult } from '@core/services';
+import { environment } from '@config';
 import { UsuariosFacade } from './usuarios.facade';
 import { UsuariosHeaderComponent } from './components/usuarios-header/usuarios-header.component';
 import { UsuariosStatsComponent } from './components/usuarios-stats/usuarios-stats.component';
@@ -20,11 +23,13 @@ import {
 	UsuarioFormData,
 	UsuarioFormDialogComponent,
 } from './components/usuario-form-dialog/usuario-form-dialog.component';
+import { UsuariosImportDialogComponent } from './components/usuarios-import-dialog/usuarios-import-dialog.component';
 import {
 	UI_CONFIRM_HEADERS,
 	UI_CONFIRM_LABELS,
 	buildToggleUsuarioMessage,
 } from '@app/shared/constants';
+import type { ImportarEstudianteItem } from '@core/services';
 
 // #endregion
 // #region Implementation
@@ -32,6 +37,7 @@ import {
 	selector: 'app-usuarios',
 	standalone: true,
 	imports: [
+		ButtonModule,
 		CommonModule,
 		ConfirmDialogModule,
 		UsuariosHeaderComponent,
@@ -42,6 +48,7 @@ import {
 		UsuariosTableSkeletonComponent,
 		UsuarioDetailDrawerComponent,
 		UsuarioFormDialogComponent,
+		UsuariosImportDialogComponent,
 	],
 	providers: [ConfirmationService],
 	templateUrl: './usuarios.component.html',
@@ -51,9 +58,17 @@ import {
 export class UsuariosComponent implements AfterViewInit {
 	private facade = inject(UsuariosFacade);
 	private confirmationService = inject(ConfirmationService);
+	private usuariosService = inject(UsuariosService);
 
 	// * View-model snapshot from facade (signals).
 	readonly vm = this.facade.vm;
+
+	// * DEV ONLY: DNI migration
+	readonly showMigracionDni = environment.features.migracionDni;
+	readonly migracionLoading = signal(false);
+	readonly migracionResult = signal<MigracionDniResult | null>(null);
+	readonly migracion2Loading = signal(false);
+	readonly migracion2Result = signal<MigracionDniResult | null>(null);
 
 	// * Static filter options for roles/estado.
 	readonly filterOptions: FilterOptions = {
@@ -185,8 +200,50 @@ export class UsuariosComponent implements AfterViewInit {
 		this.facade.hideDialog();
 	}
 
+	onImportUsuarios(): void {
+		this.facade.openImportDialog();
+	}
+
+	onImportDialogVisibleChange(visible: boolean): void {
+		if (!visible) {
+			this.facade.closeImportDialog();
+		}
+	}
+
+	onImportar(filas: ImportarEstudianteItem[]): void {
+		this.facade.importarEstudiantes(filas);
+	}
+
 	onConfirmDialogHide(): void {
 		this.facade.closeConfirmDialog();
+	}
+
+	onMigrarDnis(): void {
+		this.migracionLoading.set(true);
+		this.migracionResult.set(null);
+		this.usuariosService.migrarDnis().subscribe({
+			next: (result) => {
+				this.migracionResult.set(result);
+				this.migracionLoading.set(false);
+			},
+			error: () => {
+				this.migracionLoading.set(false);
+			},
+		});
+	}
+
+	onLimpiarDnisPlano(): void {
+		this.migracion2Loading.set(true);
+		this.migracion2Result.set(null);
+		this.usuariosService.limpiarDnisPlano().subscribe({
+			next: (result) => {
+				this.migracion2Result.set(result);
+				this.migracion2Loading.set(false);
+			},
+			error: () => {
+				this.migracion2Loading.set(false);
+			},
+		});
 	}
 
 	private fixConfirmDialogAria(header: string): void {

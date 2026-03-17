@@ -1,0 +1,107 @@
+@if (vm().inSala && vm().activeSala) {
+	<!-- #region Sala de videoconferencia -->
+	<app-videoconferencia-sala
+		[roomName]="activeRoomName()"
+		[cursoNombre]="vm().activeSala!.cursoNombre"
+	/>
+	<!-- #endregion -->
+} @else {
+	<!-- #region Lista de cursos -->
+	<div class="p-4">
+		<!-- #region Header -->
+		<div class="page-header mb-4">
+			<div class="page-icon">
+				<i class="pi pi-video text-white" style="font-size: 1.25rem"></i>
+			</div>
+			<div>
+				<h2 class="mt-0 mb-1">Videoconferencias</h2>
+				<p class="mt-0 mb-0 text-color-secondary" style="font-size: 0.875rem">
+					Selecciona un curso para unirte a la sala de videoconferencia
+				</p>
+			</div>
+		</div>
+		<!-- #endregion -->
+
+		<!-- #region Loading -->
+		@if (vm().loading) {
+			<div class="state-container">
+				<p-progressSpinner strokeWidth="4" />
+			</div>
+		} @else if (vm().error) {
+			<!-- #region Error -->
+			<div class="state-container">
+				<div class="state-icon" style="background: rgba(249, 115, 22, 0.1)">
+					<i class="pi pi-exclamation-triangle" style="font-size: 1.75rem; color: var(--orange-500)"></i>
+				</div>
+				<p class="text-color-secondary fw-semibold mb-1">{{ vm().error }}</p>
+				<button
+					pButton
+					label="Reintentar"
+					icon="pi pi-refresh"
+					class="p-button-outlined mt-3"
+					(click)="onRetry()"
+				></button>
+			</div>
+			<!-- #endregion -->
+		} @else if (vm().isEmpty) {
+			<!-- #region Empty -->
+			<div class="state-container">
+				<div class="state-icon" style="background: var(--surface-100)">
+					<i class="pi pi-video" style="font-size: 1.75rem; color: var(--text-color-secondary)"></i>
+				</div>
+				<p class="text-color-secondary fw-semibold">No tienes cursos con videoconferencia disponible</p>
+			</div>
+			<!-- #endregion -->
+		} @else {
+			<!-- #region Grid de cursos -->
+			<div class="cursos-grid">
+				@for (item of vm().items; track item.horarioId) {
+					<div class="curso-card">
+						<div class="curso-header">
+							<div class="curso-icon">
+								<i class="pi pi-book text-white" style="font-size: 1.125rem"></i>
+							</div>
+							<div>
+								<h3 class="mt-0 mb-1" style="font-size: 1.0625rem">{{ item.cursoNombre }}</h3>
+								<p-tag [value]="item.salonDescripcion" severity="info" />
+							</div>
+						</div>
+
+						<div class="curso-details">
+							<div class="curso-detail-row">
+								<i class="pi pi-calendar"></i>
+								<span>{{ item.diaSemanaDescripcion }}</span>
+							</div>
+							<div class="curso-detail-row">
+								<i class="pi pi-clock"></i>
+								<span>{{ item.horaInicio }} - {{ item.horaFin }}</span>
+							</div>
+							@if (item.profesorNombreCompleto) {
+								<div class="curso-detail-row">
+									<i class="pi pi-user"></i>
+									<span>{{ item.profesorNombreCompleto }}</span>
+								</div>
+							}
+							<div class="curso-detail-row">
+								<i class="pi pi-users"></i>
+								<span>{{ item.cantidadEstudiantes }} estudiantes inscritos</span>
+							</div>
+						</div>
+
+						<div class="curso-footer">
+							<button
+								pButton
+								label="Unirse a Sala"
+								icon="pi pi-video"
+								class="w-100"
+								(click)="onUnirse(item)"
+							></button>
+						</div>
+					</div>
+				}
+			</div>
+			<!-- #endregion -->
+		}
+	</div>
+	<!-- #endregion -->
+}

@@ -1,5 +1,6 @@
 export { EstudianteAsistenciaComponent } from './asistencia/estudiante-asistencia.component';
 export { EstudianteCursosComponent } from './cursos/estudiante-cursos.component';
+export { EstudianteForoComponent } from './foro/estudiante-foro.component';
 export { EstudianteHorariosComponent } from './horarios/estudiante-horarios.component';
 export { EstudianteMensajeriaComponent } from './mensajeria/estudiante-mensajeria.component';
 export { EstudianteNotasComponent } from './notas/estudiante-notas.component';

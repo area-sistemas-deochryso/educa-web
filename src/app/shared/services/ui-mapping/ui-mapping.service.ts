@@ -21,13 +21,15 @@ const ROLE_SEVERITY_BY_ROLE: Record<string, Severity> = {
 @Injectable({ providedIn: 'root' })
 export class UiMappingService {
 	/**
-	 * Extrae el nombre del módulo desde una ruta
-	 * @example '/intranet/admin/usuarios' → 'intranet'
+	 * Extrae el nombre del módulo desde una ruta (salta el prefijo 'intranet')
+	 * @example '/intranet/admin/usuarios' → 'admin'
 	 */
 	getModuloFromRuta(ruta: string): string {
 		const cleanRuta = ruta.startsWith('/') ? ruta.substring(1) : ruta;
-		const parts = cleanRuta.split('/');
-		return parts[0] || 'general';
+		const parts = cleanRuta.split('/').filter(Boolean);
+		// Todas las rutas tienen prefijo 'intranet/', el módulo real es el segundo segmento
+		const moduleIndex = parts[0] === 'intranet' ? 1 : 0;
+		return parts[moduleIndex] || 'general';
 	}
 
 	/**

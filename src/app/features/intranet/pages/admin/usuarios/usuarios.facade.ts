@@ -3,6 +3,7 @@ import {
 	AsistenciaService,
 	CrearUsuarioRequest,
 	ErrorHandlerService,
+	ImportarEstudianteItem,
 	RolUsuarioAdmin,
 	SwService,
 	UsuarioDetalle,
@@ -244,6 +245,43 @@ export class UsuariosFacade {
 
 	closeConfirmDialog(): void {
 		this.store.closeConfirmDialogVisible();
+	}
+
+	// #endregion
+	// #region Import Dialog
+
+	openImportDialog(): void {
+		this.store.openImportDialog();
+	}
+
+	closeImportDialog(): void {
+		this.store.closeImportDialog();
+	}
+
+	importarEstudiantes(filas: ImportarEstudianteItem[]): void {
+		this.store.setImportLoading(true);
+		this.usuariosService
+			.importarEstudiantes(filas)
+			.pipe(takeUntilDestroyed(this.destroyRef))
+			.subscribe({
+				next: (result) => {
+					this.store.setImportResult(result);
+					this.store.setImportLoading(false);
+					if (result.creados > 0) {
+						this.refreshUsuariosOnly();
+						this.store.incrementarEstadistica('totalEstudiantes', result.creados);
+						this.store.incrementarEstadistica('totalUsuarios', result.creados);
+						this.store.incrementarEstadistica('usuariosActivos', result.creados);
+					} else if (result.actualizados > 0) {
+						this.refreshUsuariosOnly();
+					}
+				},
+				error: (err) => {
+					logger.error('Error importando estudiantes:', err);
+					this.errorHandler.showError(UI_SUMMARIES.error, 'No se pudo completar la importación');
+					this.store.setImportLoading(false);
+				},
+			});
 	}
 
 	// #endregion

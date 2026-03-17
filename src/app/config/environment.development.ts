@@ -16,13 +16,20 @@ export const environment = {
 	// Features en desarrollo (visibles solo en development)
 	features: {
 		horarios: true,
-		calendario: false,
+		calendario: true,
 		quickAccess: false,
 		notifications: true,
 		voiceRecognition: true,
 		profesor: true,
 		estudiante: true,
 		ctestK6: true,
+		videoconferencias: true,
+		migracionDni: true,
+	},
+
+	// JaaS (Jitsi as a Service)
+	jitsi: {
+		appId: 'vpaas-magic-cookie-ab31757bc7ba406d965de2c757d33c01',
 	},
 
 	// Debug panels (solo development)

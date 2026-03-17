@@ -35,28 +35,95 @@ import { EstadoAsistenciaCurso } from '../models';
 		:host {
 			display: block;
 		}
+		.asistencia-container {
+			padding: 1.5rem;
+			max-width: 1200px;
+			margin: 0 auto;
+		}
+		.page-header {
+			display: flex;
+			align-items: center;
+			gap: 0.75rem;
+			margin-bottom: 1.25rem;
+		}
+		.page-header i {
+			font-size: 1.5rem;
+			color: var(--primary-color);
+		}
+		.page-header h2 {
+			margin: 0;
+			font-size: 1.35rem;
+		}
 		.filters-row {
 			display: flex;
 			align-items: center;
 			gap: 1rem;
 			flex-wrap: wrap;
+			margin-bottom: 1rem;
+		}
+		.filters-row label {
+			font-weight: 600;
+			font-size: 0.85rem;
+			color: var(--text-color-secondary);
+		}
+		.empty-page-state {
+			display: flex;
+			flex-direction: column;
+			align-items: center;
+			justify-content: center;
+			padding: 4rem 1rem;
+			text-align: center;
+		}
+		.empty-page-state i {
+			font-size: 3rem;
+			color: var(--text-color-secondary);
+			opacity: 0.4;
+			margin-bottom: 1rem;
+		}
+		.empty-page-state p {
+			margin: 0;
+			color: var(--text-color-secondary);
+			font-size: 0.95rem;
+		}
+		:host ::ng-deep {
+			.p-tabs,
+			.p-tabpanels,
+			.p-tabpanel {
+				background: transparent;
+			}
+			.p-tablist {
+				background: transparent;
+			}
+			.p-inputtext,
+			.p-select {
+				background: transparent;
+			}
+		}
+		@media (max-width: 768px) {
+			.asistencia-container {
+				padding: 1rem;
+			}
 		}
 	`,
 	template: `
-		<div class="p-4">
-			<h2 class="mt-0 mb-3">Asistencia</h2>
+		<div class="asistencia-container">
+			<div class="page-header">
+				<i class="pi pi-check-square"></i>
+				<h2>Asistencia</h2>
+			</div>
 
 			@if (pageLoading()) {
 				<div class="flex justify-content-center p-5">
 					<p-progressSpinner strokeWidth="4" />
 				</div>
 			} @else if (cursoOptions().length === 0) {
-				<div class="flex flex-column align-items-center p-5 text-color-secondary">
-					<i class="pi pi-check-square text-4xl mb-3"></i>
+				<div class="empty-page-state">
+					<i class="pi pi-check-square"></i>
 					<p>No tienes cursos asignados</p>
 				</div>
 			} @else {
-				<div class="filters-row mb-3">
+				<div class="filters-row">
+					<label>Curso</label>
 					<p-select
 						[options]="cursoOptions()"
 						[(ngModel)]="selectedHorarioId"
@@ -98,6 +165,11 @@ import { EstadoAsistenciaCurso } from '../models';
 							</p-tabpanel>
 						</p-tabpanels>
 					</p-tabs>
+				} @else {
+					<div class="empty-page-state">
+						<i class="pi pi-arrow-up"></i>
+						<p>Selecciona un curso para gestionar la asistencia</p>
+					</div>
 				}
 			}
 		</div>

@@ -1,15 +1,19 @@
 // #region Imports
 import { ChangeDetectionStrategy, Component, OnInit, AfterViewInit, signal, inject, PLATFORM_ID } from '@angular/core';
 import { isPlatformBrowser } from '@angular/common';
+import { HttpClient } from '@angular/common/http';
 import { ActivatedRoute } from '@angular/router';
 import { CalendarHeaderComponent } from '@features/intranet/components/calendar/calendar-header/calendar-header.component';
 import { CalendarLegendComponent } from '@features/intranet/components/calendar/calendar-legend/calendar-legend.component';
 import { CalendarMonthCardComponent } from '@features/intranet/components/calendar/calendar-month-card/calendar-month-card.component';
 import { CalendarDayModalComponent } from '@features/intranet/components/calendar/calendar-day-modal/calendar-day-modal.component';
 import { CalendarDay, CalendarMonth, ModalData } from './calendar.types';
+import { CalendarEvent, getEventFromList, isDateInEventRangeFromList, isDateEventEndFromList } from './events.config';
 import { isHoliday } from './holidays.config';
-import { getEvent, isDateInEventRange, isDateEventEnd } from './events.config';
 import { CalendarUtilsService } from '@features/intranet/services/calendar/calendar-utils.service';
+import { environment } from '@config/environment';
+import { EventoCalendarioActivo } from '@core/services/eventos-calendario';
+import { logger } from '@core/helpers';
 
 // #endregion
 // #region Implementation
@@ -27,26 +31,27 @@ import { CalendarUtilsService } from '@features/intranet/services/calendar/calen
 })
 export class CalendaryComponent implements OnInit, AfterViewInit {
 	private platformId = inject(PLATFORM_ID);
+	private http = inject(HttpClient);
 	private route = inject(ActivatedRoute);
 	private calendarUtils = inject(CalendarUtilsService);
+	private readonly apiUrl = `${environment.apiUrl}/api/sistema/eventoscalendario`;
 
-	// * Calendar state for the selected year.
+	// #region State
 	calendar = signal<CalendarMonth[]>([]);
 	currentYear = signal(new Date().getFullYear());
 	today = new Date();
+	private events = signal<CalendarEvent[]>([]);
 
-	// * Modal state for holiday/event details.
 	showModal = signal(false);
 	modalData = signal<ModalData | null>(null);
+	// #endregion
 
 	ngOnInit(): void {
-		// * Build the full year calendar on init.
-		this.generateYearCalendar();
+		this.loadEventsFromApi();
 	}
 
 	ngAfterViewInit(): void {
 		if (isPlatformBrowser(this.platformId)) {
-			// * Scroll to anchor or today after view renders.
 			setTimeout(() => {
 				const fragment = this.route.snapshot.fragment;
 				if (fragment) {
@@ -58,8 +63,45 @@ export class CalendaryComponent implements OnInit, AfterViewInit {
 		}
 	}
 
+	// #region Data loading
+
+	/** Fetches events from backend and generates calendar. */
+	private loadEventsFromApi(): void {
+		const year = this.currentYear();
+		this.http
+			.get<EventoCalendarioActivo[]>(`${this.apiUrl}/activos`, { params: { anio: year } })
+			.subscribe({
+				next: (response) => {
+					const mapped = (response ?? []).map((e) => this.mapApiToCalendarEvent(e));
+					this.events.set(mapped);
+					this.generateYearCalendar();
+				},
+				error: (err) => {
+					logger.error('[Calendar] Error loading events from API:', err);
+					this.events.set([]);
+					this.generateYearCalendar();
+				},
+			});
+	}
+
+	private mapApiToCalendarEvent(e: EventoCalendarioActivo): CalendarEvent {
+		return {
+			date: e.fechaInicio.substring(0, 10),
+			endDate: e.fechaFin ? e.fechaFin.substring(0, 10) : undefined,
+			title: e.titulo,
+			description: e.descripcion,
+			type: e.tipo as CalendarEvent['type'],
+			icon: e.icono,
+			time: e.hora ?? undefined,
+			location: e.ubicacion ?? undefined,
+		};
+	}
+
+	// #endregion
+
+	// #region Calendar generation
+
 	private generateYearCalendar(): void {
-		// * Regenerate all months for the current year.
 		const year = this.currentYear();
 		const months: CalendarMonth[] = [];
 
@@ -72,15 +114,10 @@ export class CalendaryComponent implements OnInit, AfterViewInit {
 
 	private generateMonth(year: number, month: number): CalendarMonth {
 		const baseDays = this.calendarUtils.generateMonthDays(year, month);
+		const eventsList = this.events();
 
-		// * Enrich base day info with holidays/events.
 		const days: CalendarDay[] = baseDays.map((dayInfo) =>
-			this.createCalendarDay(
-				dayInfo.date,
-				dayInfo.fullDate,
-				dayInfo.isCurrentMonth,
-				dayInfo.isToday,
-			),
+			this.createCalendarDay(dayInfo.date, dayInfo.fullDate, dayInfo.isCurrentMonth, dayInfo.isToday, eventsList),
 		);
 
 		return {
@@ -96,13 +133,13 @@ export class CalendaryComponent implements OnInit, AfterViewInit {
 		date: number,
 		fullDate: Date,
 		isCurrentMonth: boolean,
-		isToday = false,
+		isToday: boolean,
+		eventsList: CalendarEvent[],
 	): CalendarDay {
-		// * Resolve holiday + event metadata for the date.
 		const holiday = isHoliday(fullDate);
-		const event = getEvent(fullDate);
-		const rangeEvent = isDateInEventRange(fullDate);
-		const endEvent = isDateEventEnd(fullDate);
+		const event = getEventFromList(fullDate, eventsList);
+		const rangeEvent = isDateInEventRangeFromList(fullDate, eventsList);
+		const endEvent = isDateEventEndFromList(fullDate, eventsList);
 
 		return {
 			date,
@@ -120,10 +157,13 @@ export class CalendaryComponent implements OnInit, AfterViewInit {
 		};
 	}
 
+	// #endregion
+
+	// #region Navigation
+
 	scrollToToday(): void {
 		const todayElement = document.getElementById('today');
 		if (todayElement) {
-			// * Focus the current day if present in DOM.
 			todayElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
 		} else {
 			const currentMonth = this.today.getMonth();
@@ -139,45 +179,34 @@ export class CalendaryComponent implements OnInit, AfterViewInit {
 	}
 
 	onGoToToday(): void {
-		// * Jump to current year and scroll into view.
 		const todayYear = new Date().getFullYear();
 		if (this.currentYear() !== todayYear) {
 			this.currentYear.set(todayYear);
-			this.generateYearCalendar();
+			this.loadEventsFromApi();
 		}
 		setTimeout(() => this.scrollToToday(), 100);
 	}
 
 	onGoToYear(year: number): void {
 		this.currentYear.set(year);
-		this.generateYearCalendar();
+		this.loadEventsFromApi();
 	}
 
+	// #endregion
+
+	// #region Modal handlers
+
 	onDayClick(day: CalendarDay): void {
-		// ! Ignore clicks on days outside the current month.
 		if (!day.isCurrentMonth) return;
 
-		// * Open modal for holiday/event metadata.
 		if (day.isHoliday && day.holiday) {
-			this.modalData.set({
-				type: 'holiday',
-				date: day.fullDate,
-				holiday: day.holiday,
-			});
+			this.modalData.set({ type: 'holiday', date: day.fullDate, holiday: day.holiday });
 			this.showModal.set(true);
 		} else if (day.hasEvent && day.event) {
-			this.modalData.set({
-				type: 'event',
-				date: day.fullDate,
-				event: day.event,
-			});
+			this.modalData.set({ type: 'event', date: day.fullDate, event: day.event });
 			this.showModal.set(true);
 		} else if ((day.isInEventRange || day.isEventEnd) && day.rangeEvent) {
-			this.modalData.set({
-				type: 'event',
-				date: day.fullDate,
-				event: day.rangeEvent,
-			});
+			this.modalData.set({ type: 'event', date: day.fullDate, event: day.rangeEvent });
 			this.showModal.set(true);
 		}
 	}
@@ -190,5 +219,7 @@ export class CalendaryComponent implements OnInit, AfterViewInit {
 	trackByMonth(_index: number, month: CalendarMonth): string {
 		return month.id;
 	}
+
+	// #endregion
 }
 // #endregion
