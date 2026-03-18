@@ -24,7 +24,7 @@ export const environment = {
 		estudiante: true,
 		ctestK6: false,
 		videoconferencias: false,
-		migracionDni: false,
+		campusNavigation: false,
 	},
 
 	// JaaS (Jitsi as a Service)

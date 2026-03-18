@@ -152,15 +152,4 @@ export interface ImportarEstudiantesResponse {
 	errores: { fila: number; nombre: string; dni: string; razon: string }[];
 }
 
-/**
- * Result of DNI migration endpoint.
- * Temporary — remove after migration is complete.
- */
-export interface MigracionDniResult {
-	total: number;
-	estudiantes: number;
-	apoderados: number;
-	profesores: number;
-	directores: number;
-}
 // #endregion

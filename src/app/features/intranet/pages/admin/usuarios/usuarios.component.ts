@@ -1,12 +1,10 @@
 // #region Imports
-import { AfterViewInit, ChangeDetectionStrategy, Component, inject, signal } from '@angular/core';
+import { AfterViewInit, ChangeDetectionStrategy, Component, inject } from '@angular/core';
 import { ButtonModule } from 'primeng/button';
 import { CommonModule } from '@angular/common';
 import { ConfirmDialogModule } from 'primeng/confirmdialog';
 import { ConfirmationService } from 'primeng/api';
-import { ROLES_USUARIOS_ADMIN, RolUsuarioAdmin, UsuarioLista, UsuariosService } from '@core/services';
-import type { MigracionDniResult } from '@core/services';
-import { environment } from '@config';
+import { ROLES_USUARIOS_ADMIN, RolUsuarioAdmin, UsuarioLista } from '@core/services';
 import { UsuariosFacade } from './usuarios.facade';
 import { UsuariosHeaderComponent } from './components/usuarios-header/usuarios-header.component';
 import { UsuariosStatsComponent } from './components/usuarios-stats/usuarios-stats.component';
@@ -58,17 +56,9 @@ import type { ImportarEstudianteItem } from '@core/services';
 export class UsuariosComponent implements AfterViewInit {
 	private facade = inject(UsuariosFacade);
 	private confirmationService = inject(ConfirmationService);
-	private usuariosService = inject(UsuariosService);
 
 	// * View-model snapshot from facade (signals).
 	readonly vm = this.facade.vm;
-
-	// * DEV ONLY: DNI migration
-	readonly showMigracionDni = environment.features.migracionDni;
-	readonly migracionLoading = signal(false);
-	readonly migracionResult = signal<MigracionDniResult | null>(null);
-	readonly migracion2Loading = signal(false);
-	readonly migracion2Result = signal<MigracionDniResult | null>(null);
 
 	// * Static filter options for roles/estado.
 	readonly filterOptions: FilterOptions = {
@@ -216,34 +206,6 @@ export class UsuariosComponent implements AfterViewInit {
 
 	onConfirmDialogHide(): void {
 		this.facade.closeConfirmDialog();
-	}
-
-	onMigrarDnis(): void {
-		this.migracionLoading.set(true);
-		this.migracionResult.set(null);
-		this.usuariosService.migrarDnis().subscribe({
-			next: (result) => {
-				this.migracionResult.set(result);
-				this.migracionLoading.set(false);
-			},
-			error: () => {
-				this.migracionLoading.set(false);
-			},
-		});
-	}
-
-	onLimpiarDnisPlano(): void {
-		this.migracion2Loading.set(true);
-		this.migracion2Result.set(null);
-		this.usuariosService.limpiarDnisPlano().subscribe({
-			next: (result) => {
-				this.migracion2Result.set(result);
-				this.migracion2Loading.set(false);
-			},
-			error: () => {
-				this.migracion2Loading.set(false);
-			},
-		});
 	}
 
 	private fixConfirmDialogAria(header: string): void {

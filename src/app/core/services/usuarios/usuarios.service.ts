@@ -4,7 +4,6 @@ import {
 	CrearUsuarioRequest,
 	ImportarEstudianteItem,
 	ImportarEstudiantesResponse,
-	MigracionDniResult,
 	UsuarioDetalle,
 	UsuarioLista,
 	UsuariosEstadisticas,
@@ -140,28 +139,6 @@ export class UsuariosService {
 		return this.http
 			.get<UsuariosEstadisticas>(`${this.apiUrl}/estadisticas`)
 			.pipe(catchError(() => of(null)));
-	}
-
-	/**
-	 * Migrate existing DNIs to hash + encrypted columns.
-	 * Temporary endpoint — remove after migration is complete.
-	 */
-	migrarDnis(): Observable<MigracionDniResult> {
-		return this.http.post<MigracionDniResult>(
-			`${environment.apiUrl}/api/sistema/migracion/dni`,
-			{},
-		);
-	}
-
-	/**
-	 * Migration 2: Clear remaining plaintext DNI columns.
-	 * Only clears records that already have hash+encrypted populated.
-	 */
-	limpiarDnisPlano(): Observable<MigracionDniResult> {
-		return this.http.post<MigracionDniResult>(
-			`${environment.apiUrl}/api/sistema/migracion/dni-limpiar`,
-			{},
-		);
 	}
 
 	/**
