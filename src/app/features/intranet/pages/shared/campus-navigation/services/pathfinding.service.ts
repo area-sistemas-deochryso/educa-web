@@ -200,22 +200,38 @@ export class PathfindingService {
 		return total;
 	}
 
+	/**
+	 * Genera pasos colapsando corredores consecutivos.
+	 * Un tramo de corridor → corridor → corridor se convierte en un solo paso
+	 * "Camina hacia {siguiente nodo significativo}".
+	 */
 	private generateSteps(path: string[], nodeMap: Map<string, CampusNode>): NavigationStep[] {
 		const steps: NavigationStep[] = [];
+		let i = 0;
 
-		for (let i = 0; i < path.length - 1; i++) {
+		while (i < path.length - 1) {
 			const from = nodeMap.get(path[i])!;
-			const to = nodeMap.get(path[i + 1])!;
+
+			// Avanzar saltando corredores intermedios hasta el próximo nodo significativo
+			// o hasta un cambio de piso
+			let j = i + 1;
+			while (j < path.length - 1) {
+				const next = nodeMap.get(path[j])!;
+				const prev = nodeMap.get(path[j - 1])!;
+				// Detener en cambio de piso o en nodo no-corredor
+				if (next.floor !== prev.floor || next.type !== 'corridor') break;
+				j++;
+			}
+
+			const to = nodeMap.get(path[j])!;
 			const floorChange = from.floor !== to.floor;
 
 			let instruction: string;
 			if (floorChange) {
 				const direction = to.floor > from.floor ? 'Sube' : 'Baja';
 				instruction = `${direction} escaleras al Piso ${to.floor}`;
-			} else if (i === path.length - 2) {
+			} else if (j === path.length - 1) {
 				instruction = `Llega a ${to.label}`;
-			} else if (to.type === 'corridor') {
-				instruction = `Camina por ${to.label}`;
 			} else {
 				instruction = `Camina hacia ${to.label}`;
 			}
@@ -225,10 +241,12 @@ export class PathfindingService {
 				toNodeId: to.id,
 				fromLabel: from.label,
 				toLabel: to.label,
-				floor: floorChange ? to.floor : from.floor,
+				floor: from.floor,
 				instruction,
 				floorChange,
 			});
+
+			i = j;
 		}
 
 		return steps;

@@ -1,0 +1,222 @@
+// #region Host
+:host {
+	display: block;
+	position: relative;
+	flex: 1;
+	overflow: hidden;
+	background: var(--surface-ground);
+}
+// #endregion
+
+// #region SVG Canvas
+.editor-svg {
+	width: 100%;
+	height: 100%;
+	display: block;
+
+	&.cursor-crosshair {
+		cursor: crosshair;
+	}
+	&.cursor-delete {
+		cursor: not-allowed;
+	}
+	&.cursor-edge {
+		cursor: cell;
+	}
+	&.cursor-default {
+		cursor: default;
+	}
+}
+// #endregion
+
+// #region Nodos
+.nodo {
+	cursor: pointer;
+
+	&:hover rect,
+	&:hover circle {
+		filter: brightness(1.1);
+	}
+
+	&.selected rect {
+		stroke-width: 2.5;
+		filter: drop-shadow(0 0 6px rgba(79, 70, 229, 0.4));
+	}
+
+	&.selected circle {
+		stroke-width: 2.5;
+		filter: drop-shadow(0 0 6px rgba(79, 70, 229, 0.4));
+	}
+
+	&.dragging {
+		cursor: grabbing;
+		opacity: 0.7;
+	}
+}
+// #endregion
+
+// #region Aristas
+.arista-hitarea {
+	stroke: transparent;
+	stroke-width: 12;
+	cursor: pointer;
+	fill: none;
+}
+
+.arista {
+	stroke: var(--surface-400, #9ca3af);
+	stroke-width: 1.5;
+	cursor: pointer;
+	transition: stroke 0.15s;
+
+	&:hover {
+		stroke: var(--primary-color);
+		stroke-width: 2.5;
+	}
+
+	&.selected {
+		stroke: var(--primary-color);
+		stroke-width: 2.5;
+	}
+}
+
+.arista-midpoint {
+	fill: var(--surface-400, #9ca3af);
+	transition: fill 0.15s;
+
+	&.selected {
+		fill: var(--primary-color);
+	}
+}
+// #endregion
+
+// #region Bloqueos
+.bloqueo {
+	fill: rgba(220, 38, 38, 0.1);
+	stroke: #dc2626;
+	stroke-width: 1;
+	stroke-dasharray: 6 3;
+	cursor: pointer;
+
+	&:hover {
+		fill: rgba(220, 38, 38, 0.2);
+	}
+
+	&.selected {
+		stroke-width: 2;
+		fill: rgba(220, 38, 38, 0.2);
+		filter: drop-shadow(0 0 4px rgba(220, 38, 38, 0.3));
+	}
+}
+// #endregion
+
+// #region Edge start indicator
+.edge-start-indicator {
+	animation: pulse-ring 1.2s ease-in-out infinite;
+	pointer-events: none;
+}
+
+@keyframes pulse-ring {
+	0%,
+	100% {
+		opacity: 1;
+	}
+	50% {
+		opacity: 0.3;
+	}
+}
+// #endregion
+
+// #region Hover tooltip
+.hover-tooltip {
+	position: absolute;
+	display: flex;
+	align-items: center;
+	gap: 0.5rem;
+	padding: 0.375rem 0.625rem;
+	border-radius: 8px;
+	background: var(--surface-card);
+	box-shadow: 0 2px 12px rgba(0, 0, 0, 0.15);
+	pointer-events: none;
+	white-space: nowrap;
+	z-index: 20;
+	transform: translateY(-100%);
+	animation: htFadeIn 0.1s ease-out;
+}
+
+@keyframes htFadeIn {
+	from {
+		opacity: 0;
+	}
+	to {
+		opacity: 1;
+	}
+}
+
+.ht-dot {
+	width: 8px;
+	height: 8px;
+	border-radius: 50%;
+	flex-shrink: 0;
+}
+
+.ht-content {
+	display: flex;
+	align-items: center;
+	gap: 0.375rem;
+}
+
+.ht-type {
+	font-size: 0.6875rem;
+	font-weight: 700;
+	text-transform: uppercase;
+	letter-spacing: 0.3px;
+}
+
+.ht-label {
+	font-size: 0.75rem;
+	font-weight: 500;
+	color: var(--text-color);
+}
+
+.ht-meta {
+	font-size: 0.6875rem;
+	color: var(--text-color-secondary);
+	font-family: monospace;
+}
+// #endregion
+
+// #region Loading overlay
+.editor-loading {
+	position: absolute;
+	inset: 0;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	background: color-mix(in srgb, var(--surface-ground) 85%, transparent);
+	z-index: 10;
+	backdrop-filter: blur(2px);
+}
+
+.loading-content {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	gap: 0.75rem;
+	padding: 1.5rem 2rem;
+	border-radius: 12px;
+	background: var(--surface-card);
+	box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+
+	i {
+		font-size: 1.5rem;
+		color: var(--primary-color);
+	}
+
+	span {
+		font-size: 0.8125rem;
+		color: var(--text-color-secondary);
+		font-weight: 500;
+	}
+}
+// #endregion

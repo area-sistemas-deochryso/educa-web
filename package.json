@@ -49,6 +49,7 @@
 		"@ngrx/operators": "^21.0.1",
 		"@ngrx/signals": "^21.0.1",
 		"@primeng/themes": "^21.0.4",
+		"@types/three": "^0.183.1",
 		"bootstrap-icons": "^1.13.1",
 		"exceljs": "^4.4.0",
 		"express": "^5.1.0",
@@ -60,6 +61,7 @@
 		"primeicons": "^7.0.0",
 		"primeng": "^21.0.4",
 		"rxjs": "~7.8.0",
+		"three": "^0.183.2",
 		"tslib": "^2.3.0",
 		"xlsx": "^0.18.5"
 	},

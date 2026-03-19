@@ -1,0 +1,241 @@
+<!-- #region Loading overlay -->
+@if (loading()) {
+	<div class="editor-loading">
+		<div class="loading-content">
+			<i class="pi pi-spin pi-spinner"></i>
+			<span>Cargando mapa...</span>
+		</div>
+	</div>
+}
+<!-- #endregion -->
+
+<!-- #region SVG Canvas -->
+<svg
+	#svgEl
+	class="editor-svg"
+	[class]="cursorClass()"
+	[attr.viewBox]="viewBox().x + ' ' + viewBox().y + ' ' + viewBox().w + ' ' + viewBox().h"
+	preserveAspectRatio="xMidYMid meet"
+	(click)="onSvgClick($event)"
+	(wheel)="onWheel($event)"
+	(mousedown)="onPanStart($event)"
+	(mousemove)="onMouseMove($event)"
+	(mouseup)="onMouseUp()"
+	(mouseleave)="onMouseUp()"
+>
+	<!-- #region Grid background -->
+	<defs>
+		<pattern id="smallGrid" width="25" height="25" patternUnits="userSpaceOnUse">
+			<path d="M 25 0 L 0 0 0 25" fill="none" stroke="var(--surface-200)" stroke-width="0.3" opacity="0.6" />
+		</pattern>
+		<pattern id="grid" width="100" height="100" patternUnits="userSpaceOnUse">
+			<rect width="100" height="100" fill="url(#smallGrid)" />
+			<path d="M 100 0 L 0 0 0 100" fill="none" stroke="var(--surface-300)" stroke-width="0.5" />
+		</pattern>
+	</defs>
+	<rect
+		[attr.x]="viewBox().x - 500"
+		[attr.y]="viewBox().y - 500"
+		[attr.width]="viewBox().w + 1000"
+		[attr.height]="viewBox().h + 1000"
+		fill="url(#grid)"
+	/>
+	<!-- Origin marker -->
+	<line x1="-8" y1="0" x2="8" y2="0" stroke="var(--surface-300)" stroke-width="1" opacity="0.5" />
+	<line x1="0" y1="-8" x2="0" y2="8" stroke="var(--surface-300)" stroke-width="1" opacity="0.5" />
+	<!-- #endregion -->
+
+	<!-- #region Bloqueos (rendered first, behind everything) -->
+	@for (bloqueo of bloqueos(); track bloqueo.id) {
+		<rect
+			class="bloqueo"
+			[class.selected]="bloqueo.id === selectedBloqueoId()"
+			[class.dragging]="dragBloqueoOffset()?.id === bloqueo.id"
+			[attr.x]="getBloqueoX(bloqueo)"
+			[attr.y]="getBloqueoY(bloqueo)"
+			[attr.width]="bloqueo.width"
+			[attr.height]="bloqueo.height"
+			rx="2"
+			(click)="onBloqueoClick($event, bloqueo.id)"
+			(dblclick)="onBloqueoDblClick($event, bloqueo.id)"
+			(mousedown)="onBloqueoMouseDown($event, bloqueo.id)"
+			(mouseenter)="onBloqueoMouseEnter(bloqueo.id)"
+			(mouseleave)="onElementMouseLeave()"
+		/>
+	}
+	<!-- #endregion -->
+
+	<!-- #region Aristas (edges) -->
+	@for (arista of aristas(); track arista.id) {
+		@let origen = nodoMap().get(arista.nodoOrigenId);
+		@let destino = nodoMap().get(arista.nodoDestinoId);
+		@if (origen && destino) {
+			<!-- Hit area -->
+			<line
+				class="arista-hitarea"
+				[attr.x1]="getNodeX(origen)"
+				[attr.y1]="getNodeY(origen)"
+				[attr.x2]="getNodeX(destino)"
+				[attr.y2]="getNodeY(destino)"
+				(click)="onAristaClick($event, arista.id)"
+				(mouseenter)="onAristaMouseEnter(arista.id)"
+				(mouseleave)="onElementMouseLeave()"
+			/>
+			<!-- Visible edge -->
+			<line
+				class="arista"
+				[class.selected]="arista.id === selectedAristaId()"
+				[attr.x1]="getNodeX(origen)"
+				[attr.y1]="getNodeY(origen)"
+				[attr.x2]="getNodeX(destino)"
+				[attr.y2]="getNodeY(destino)"
+				(click)="onAristaClick($event, arista.id)"
+			/>
+			@if (arista.bidireccional) {
+				<circle
+					class="arista-midpoint"
+					[class.selected]="arista.id === selectedAristaId()"
+					[attr.cx]="(getNodeX(origen) + getNodeX(destino)) / 2"
+					[attr.cy]="(getNodeY(origen) + getNodeY(destino)) / 2"
+					r="3"
+				/>
+			}
+		}
+	}
+	<!-- #endregion -->
+
+	<!-- #region Edge in progress -->
+	@if (edgeStartNodeId()) {
+		@let startNode = nodoMap().get(edgeStartNodeId()!);
+		@if (startNode) {
+			<circle
+				[attr.cx]="startNode.x"
+				[attr.cy]="startNode.y"
+				r="14"
+				fill="none"
+				stroke="#f59e0b"
+				stroke-width="2.5"
+				stroke-dasharray="4 3"
+				class="edge-start-indicator"
+			/>
+		}
+	}
+	<!-- #endregion -->
+
+	<!-- #region Nodos -->
+	@for (nodo of nodos(); track nodo.id) {
+		<g
+			class="nodo"
+			[class.selected]="nodo.id === selectedNodeId()"
+			[class.dragging]="dragOffset()?.id === nodo.id"
+			(click)="onNodeClick($event, nodo.id)"
+			(dblclick)="onNodeDblClick($event, nodo.id)"
+			(mousedown)="onNodeMouseDown($event, nodo.id)"
+			(mouseenter)="onNodeMouseEnter(nodo.id)"
+			(mouseleave)="onElementMouseLeave()"
+		>
+			@if (nodo.width > 0 && nodo.height > 0) {
+				<!-- Rectangular node -->
+				<rect
+					[attr.x]="getNodeX(nodo) - nodo.width / 2"
+					[attr.y]="getNodeY(nodo) - nodo.height / 2"
+					[attr.width]="nodo.width"
+					[attr.height]="nodo.height"
+					[attr.fill]="getNodeColor(nodo.tipo)"
+					fill-opacity="0.12"
+					[attr.stroke]="getNodeColor(nodo.tipo)"
+					stroke-width="1.5"
+					rx="6"
+					[attr.transform]="nodo.rotation ? 'rotate(' + nodo.rotation + ' ' + getNodeX(nodo) + ' ' + getNodeY(nodo) + ')' : null"
+				/>
+				@if (getNodeLabel(nodo)) {
+					<rect
+						[attr.x]="getNodeX(nodo) - getNodeLabel(nodo).length * 3.2"
+						[attr.y]="getNodeY(nodo) - 6"
+						[attr.width]="getNodeLabel(nodo).length * 6.4"
+						height="12"
+						rx="3"
+						[attr.fill]="getNodeColor(nodo.tipo)"
+						fill-opacity="0.85"
+					/>
+					<text
+						[attr.x]="getNodeX(nodo)"
+						[attr.y]="getNodeY(nodo)"
+						text-anchor="middle"
+						dominant-baseline="central"
+						font-size="9"
+						fill="white"
+						font-weight="600"
+						letter-spacing="0.3"
+					>
+						{{ getNodeLabel(nodo) }}
+					</text>
+				}
+			} @else {
+				<!-- Point node (corridor waypoint) -->
+				<circle
+					[attr.cx]="getNodeX(nodo)"
+					[attr.cy]="getNodeY(nodo)"
+					r="5"
+					[attr.fill]="getNodeColor(nodo.tipo)"
+					fill-opacity="0.25"
+					[attr.stroke]="getNodeColor(nodo.tipo)"
+					stroke-width="1.5"
+				/>
+				<circle
+					[attr.cx]="getNodeX(nodo)"
+					[attr.cy]="getNodeY(nodo)"
+					r="2"
+					[attr.fill]="getNodeColor(nodo.tipo)"
+				/>
+			}
+		</g>
+	}
+	<!-- #endregion -->
+
+	<!-- #region Vertical connection indicators -->
+	@for (nodo of nodos(); track nodo.id) {
+		@if (nodosConConexionVertical().has(nodo.id)) {
+			<g class="vertical-indicator" pointer-events="none">
+				<circle
+					[attr.cx]="getNodeX(nodo) + (nodo.width > 0 ? nodo.width / 2 - 6 : 8)"
+					[attr.cy]="getNodeY(nodo) - (nodo.height > 0 ? nodo.height / 2 - 6 : 8)"
+					r="7"
+					fill="#f59e0b"
+					stroke="white"
+					stroke-width="1.5"
+				/>
+				<text
+					[attr.x]="getNodeX(nodo) + (nodo.width > 0 ? nodo.width / 2 - 6 : 8)"
+					[attr.y]="getNodeY(nodo) - (nodo.height > 0 ? nodo.height / 2 - 6 : 8)"
+					text-anchor="middle"
+					dominant-baseline="central"
+					font-size="8"
+					fill="white"
+					font-weight="700"
+				>&#8597;</text>
+			</g>
+		}
+	}
+	<!-- #endregion -->
+</svg>
+<!-- #endregion -->
+
+<!-- #region Hover tooltip -->
+@if (tooltipData(); as tip) {
+	<div
+		class="hover-tooltip"
+		[style.left.px]="tooltipPos().x"
+		[style.top.px]="tooltipPos().y"
+	>
+		<div class="ht-dot" [style.background]="tip.color"></div>
+		<div class="ht-content">
+			<span class="ht-type" [style.color]="tip.color">{{ tip.type }}</span>
+			@if (tip.label) {
+				<span class="ht-label">{{ tip.label }}</span>
+			}
+			<span class="ht-meta">{{ tip.meta }}</span>
+		</div>
+	</div>
+}
+<!-- #endregion -->

@@ -1,7 +1,8 @@
-import { ChangeDetectionStrategy, Component, inject, OnInit } from '@angular/core';
+import { ChangeDetectionStrategy, Component, inject, input, OnInit, signal, ViewChild } from '@angular/core';
 
 import { CampusNavigationFacade } from './services/campus-navigation.facade';
 import { CampusMapComponent } from './components/campus-map/campus-map.component';
+import { Campus3dViewComponent } from './components/campus-3d-view/campus-3d-view.component';
 import { FloorSelectorComponent } from './components/floor-selector/floor-selector.component';
 import { LocationSelectorComponent } from './components/location-selector/location-selector.component';
 import { NavigationStepsComponent } from './components/navigation-steps/navigation-steps.component';
@@ -12,6 +13,7 @@ import { SchedulePanelComponent } from './components/schedule-panel/schedule-pan
 	standalone: true,
 	imports: [
 		CampusMapComponent,
+		Campus3dViewComponent,
 		FloorSelectorComponent,
 		LocationSelectorComponent,
 		NavigationStepsComponent,
@@ -24,12 +26,21 @@ import { SchedulePanelComponent } from './components/schedule-panel/schedule-pan
 export class CampusNavigationComponent implements OnInit {
 	private facade = inject(CampusNavigationFacade);
 
-	readonly vm = this.facade.vm;
+	@ViewChild('locationSelector') locationSelector!: LocationSelectorComponent;
+
+	/** Oculta sidebar de horario y ajusta layout para embeber en diálogos */
+	readonly embedded = input(false);
+	/** Salón destino al que auto-navegar (solo en modo embedded) */
+	readonly targetSalonId = input<number | null>(null);
+
+	readonly vm      = this.facade.vm;
+	readonly show3d  = signal(false);
 
 	// #region Lifecycle
 
 	ngOnInit(): void {
-		this.facade.loadSchedule();
+		const targetId = this.targetSalonId();
+		this.facade.loadData(targetId ?? undefined);
 	}
 
 	// #endregion
@@ -40,15 +51,29 @@ export class CampusNavigationComponent implements OnInit {
 	}
 
 	onStartChange(nodeId: string): void {
+		if (!nodeId) {
+			this.facade.clearStart();
+			return;
+		}
 		this.facade.setStartNode(nodeId);
 	}
 
 	onDestinationChange(nodeId: string): void {
+		if (!nodeId) {
+			this.facade.clearPath();
+			return;
+		}
 		this.facade.setDestination(nodeId);
 	}
 
 	onMapNodeClick(nodeId: string): void {
-		this.facade.onMapNodeClick(nodeId);
+		const mode = this.locationSelector?.selectionMode() ?? 'start';
+		if (mode === 'start') {
+			this.facade.setStartNode(nodeId);
+			this.locationSelector?.selectionMode.set('destination');
+		} else {
+			this.facade.setDestination(nodeId);
+		}
 	}
 
 	onNavigateToSalon(salonId: number): void {
@@ -58,5 +83,10 @@ export class CampusNavigationComponent implements OnInit {
 	onClearPath(): void {
 		this.facade.clearPath();
 	}
+
+	on3dPositionChange(nodeId: string): void {
+		this.facade.setStartNode(nodeId);
+	}
+
 	// #endregion
 }

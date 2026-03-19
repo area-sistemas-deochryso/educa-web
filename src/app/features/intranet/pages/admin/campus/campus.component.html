@@ -1,0 +1,590 @@
+<!-- #region Main layout -->
+<div class="campus-admin">
+	<!-- #region Pisos sidebar -->
+	<app-campus-pisos-panel
+		[pisos]="vm().pisos"
+		[selectedPisoId]="vm().selectedPisoId"
+		[loading]="vm().loading"
+		(selectPiso)="onSelectPiso($event)"
+		(createPiso)="onCreatePiso()"
+		(editPiso)="onEditPiso($event)"
+		(toggleEstadoPiso)="onToggleEstadoPiso($event)"
+	/>
+	<!-- #endregion -->
+
+	<!-- #region Editor area -->
+	<div class="editor-area">
+		<!-- #region Toolbar -->
+		@if (vm().selectedPisoId) {
+			<div class="editor-toolbar">
+				<div class="toolbar-group">
+					@for (t of tools; track t.tool) {
+						<button
+							pButton
+							[icon]="t.icon"
+							class="p-button-sm p-button-text p-button-rounded toolbar-btn"
+							[class.active]="vm().activeTool === t.tool"
+							(click)="onToolSelect(t.tool)"
+							pTooltip="{{ t.label }}"
+							tooltipPosition="bottom"
+							[pt]="{ root: { 'aria-label': t.label } }"
+						></button>
+					}
+				</div>
+
+				@if (vm().activeTool === 'addVertical' && vm().verticalStartNodeId) {
+					<span class="toolbar-separator"></span>
+					<span class="toolbar-hint">
+						<i class="pi pi-info-circle"></i>
+						Nodo origen seleccionado. Configurando conexión...
+					</span>
+				}
+
+				@if (vm().activeTool === 'addEdge' && vm().edgeStartNodeId) {
+					<span class="toolbar-separator"></span>
+					<span class="toolbar-hint">
+						<i class="pi pi-info-circle"></i>
+						Click en nodo destino para conectar
+					</span>
+				}
+
+				@if (vm().activeTool === 'addNode') {
+					<span class="toolbar-separator"></span>
+					<p-select
+						[options]="nodeTypeOptions"
+						[ngModel]="vm().newNodeType"
+						(ngModelChange)="onNodeTypeChange($event)"
+						optionLabel="label"
+						optionValue="value"
+						appendTo="body"
+						placeholder="Tipo de nodo"
+						class="node-type-select"
+					/>
+				}
+
+				<div class="toolbar-right">
+					@if (vm().selectedPiso; as piso) {
+						<p-tag [value]="piso.nombre" severity="info" [rounded]="true" />
+					}
+					@if (vm().saving) {
+						<i class="pi pi-spin pi-spinner saving-indicator"></i>
+					}
+				</div>
+			</div>
+		}
+		<!-- #endregion -->
+
+		<!-- #region Editor canvas -->
+		@if (vm().selectedPisoId) {
+			<app-campus-editor
+				[nodos]="vm().nodos"
+				[aristas]="vm().aristas"
+				[bloqueos]="vm().bloqueos"
+				[activeTool]="vm().activeTool"
+				[selectedNodeId]="vm().selectedNodeId"
+				[selectedAristaId]="vm().selectedAristaId"
+				[selectedBloqueoId]="vm().selectedBloqueoId"
+				[edgeStartNodeId]="vm().edgeStartNodeId"
+				[nodosConConexionVertical]="vm().nodosConConexionVertical"
+				[loading]="vm().editorLoading"
+				(editorClick)="onEditorClick($event)"
+				(nodeClick)="onNodeClick($event)"
+				(nodeDblClick)="onNodeDblClick($event)"
+				(nodeMoved)="onNodeMoved($event)"
+				(aristaClick)="onAristaClick($event)"
+				(bloqueoClick)="onBloqueoClick($event)"
+				(bloqueoDblClick)="onBloqueoDblClick($event)"
+				(bloqueoMoved)="onBloqueoMoved($event)"
+			/>
+		} @else {
+			<div class="editor-empty">
+				<div class="empty-icon-container">
+					<i class="pi pi-map"></i>
+				</div>
+				<h3>Editor de Campus</h3>
+				<p>Selecciona un piso del panel izquierdo para comenzar a diseñar el mapa</p>
+				<div class="empty-shortcuts">
+					<div class="shortcut-item">
+						<i class="pi pi-mouse"></i>
+						<span>Click para colocar nodos</span>
+					</div>
+					<div class="shortcut-item">
+						<i class="pi pi-arrows-h"></i>
+						<span>Conecta nodos con aristas</span>
+					</div>
+					<div class="shortcut-item">
+						<i class="pi pi-search-plus"></i>
+						<span>Scroll para zoom</span>
+					</div>
+				</div>
+			</div>
+		}
+		<!-- #endregion -->
+
+		<!-- #region Selection tooltip (vertical connections only) -->
+		@if (vm().selectedConexionVertical; as conexion) {
+			<div class="selection-tooltip">
+				<div class="tooltip-color-bar" style="background: #f59e0b"></div>
+				<div class="tooltip-body">
+					<div class="tooltip-header">
+						<span class="tooltip-type" style="color: #f59e0b">Conexión Vertical</span>
+						<p-tag [value]="conexion.tipo" severity="info" [rounded]="true" />
+						<button
+							pButton
+							icon="pi pi-trash"
+							class="p-button-sm p-button-text p-button-rounded p-button-danger tooltip-action"
+							(click)="facade.eliminarConexionVertical(conexion.id)"
+							[pt]="{ root: { 'aria-label': 'Eliminar conexión vertical' } }"
+						></button>
+					</div>
+					<div class="tooltip-meta">
+						<span class="tooltip-meta-item">
+							<i class="pi pi-building"></i>
+							{{ conexion.pisoOrigenNombre }} &rarr; {{ conexion.pisoDestinoNombre }}
+						</span>
+						<span class="tooltip-meta-item">
+							<i class="pi pi-arrow-up"></i>
+							{{ conexion.pesoSubida }}
+						</span>
+						<span class="tooltip-meta-item">
+							<i class="pi pi-arrow-down"></i>
+							{{ conexion.pesoBajada }}
+						</span>
+						<p-tag
+							[value]="conexion.bidireccional ? 'Bidireccional' : 'Unidireccional'"
+							[severity]="conexion.bidireccional ? 'info' : 'warn'"
+							[rounded]="true"
+						/>
+					</div>
+				</div>
+			</div>
+		}
+		<!-- #endregion -->
+	</div>
+	<!-- #endregion -->
+</div>
+<!-- #endregion -->
+
+<!-- #region Piso Dialog -->
+<p-dialog
+	[visible]="vm().pisoDialogVisible"
+	(visibleChange)="onPisoDialogVisibleChange($event)"
+	[modal]="true"
+	[closable]="true"
+	[showHeader]="false"
+	[style]="{ width: '440px' }"
+>
+	<!-- Custom header -->
+	<div class="piso-dialog-header">
+		<div class="piso-dialog-icon" [class.editing]="vm().editingPiso">
+			<i [class]="vm().editingPiso ? 'pi pi-pencil' : 'pi pi-plus'"></i>
+		</div>
+		<div class="piso-dialog-title">
+			<h3>{{ vm().editingPiso ? 'Editar Piso' : 'Nuevo Piso' }}</h3>
+			<p>{{ vm().editingPiso ? 'Modifica los datos del piso seleccionado' : 'Define un nuevo piso para el mapa del campus' }}</p>
+		</div>
+	</div>
+
+	<!-- Form -->
+	<div class="piso-dialog-form">
+		<div class="form-field">
+			<label for="pisoNombre">
+				<i class="pi pi-tag"></i>
+				Nombre del piso
+			</label>
+			<input
+				pInputText
+				id="pisoNombre"
+				[ngModel]="pisoFormNombre()"
+				(ngModelChange)="pisoFormNombre.set($event)"
+				placeholder="Ej: Primer Piso"
+			/>
+		</div>
+		<div class="form-row">
+			<div class="form-field">
+				<label for="pisoOrden">
+					<i class="pi pi-sort-numeric-up"></i>
+					Orden
+				</label>
+				<p-inputNumber
+					id="pisoOrden"
+					[ngModel]="pisoFormOrden()"
+					(ngModelChange)="pisoFormOrden.set($event)"
+					[showButtons]="true"
+					[min]="0"
+					[max]="99"
+				/>
+			</div>
+			<div class="form-field">
+				<label for="pisoAltura">
+					<i class="pi pi-arrows-v"></i>
+					Altura (m)
+				</label>
+				<p-inputNumber
+					id="pisoAltura"
+					[ngModel]="pisoFormAltura()"
+					(ngModelChange)="pisoFormAltura.set($event)"
+					[minFractionDigits]="1"
+					[maxFractionDigits]="1"
+					[min]="0.1"
+					[max]="100"
+				/>
+			</div>
+		</div>
+	</div>
+
+	<!-- Footer -->
+	<div class="piso-dialog-footer">
+		<button
+			pButton
+			label="Cancelar"
+			class="p-button-text p-button-secondary"
+			(click)="facade.closePisoDialog()"
+		></button>
+		<button
+			pButton
+			[label]="vm().editingPiso ? 'Guardar cambios' : 'Crear piso'"
+			[icon]="vm().editingPiso ? 'pi pi-check' : 'pi pi-plus'"
+			(click)="savePiso()"
+			[loading]="vm().saving"
+			[disabled]="!pisoFormNombre().trim()"
+		></button>
+	</div>
+</p-dialog>
+<!-- #endregion -->
+
+<!-- #region Node Edit Dialog -->
+<p-dialog
+	[visible]="vm().nodeDialogVisible"
+	(visibleChange)="onNodeDialogVisibleChange($event)"
+	[modal]="true"
+	[closable]="true"
+	[showHeader]="false"
+	[style]="{ width: '440px' }"
+>
+	<div class="piso-dialog-header">
+		<div class="piso-dialog-icon editing">
+			<i class="pi pi-pencil"></i>
+		</div>
+		<div class="piso-dialog-title">
+			<h3>Editar Nodo</h3>
+			<p>Modifica las propiedades del nodo seleccionado</p>
+		</div>
+	</div>
+
+	<div class="piso-dialog-form">
+		<div class="form-field">
+			<label for="nodeEtiqueta">
+				<i class="pi pi-tag"></i>
+				Nombre / Etiqueta
+			</label>
+			<input
+				pInputText
+				id="nodeEtiqueta"
+				[ngModel]="nodeFormEtiqueta()"
+				(ngModelChange)="nodeFormEtiqueta.set($event)"
+				placeholder="Ej: Aula 101, Baño Varones..."
+			/>
+		</div>
+		<div class="form-field">
+			<label for="nodeTipo">
+				<i class="pi pi-th-large"></i>
+				Tipo
+			</label>
+			<p-select
+				id="nodeTipo"
+				[options]="nodeTypeOptions"
+				[ngModel]="nodeFormTipo()"
+				(ngModelChange)="nodeFormTipo.set($event)"
+				optionLabel="label"
+				optionValue="value"
+				appendTo="body"
+			/>
+		</div>
+		<div class="form-row">
+			<div class="form-field">
+				<label for="nodeWidth">
+					<i class="pi pi-arrows-h"></i>
+					Ancho
+				</label>
+				<p-inputNumber
+					id="nodeWidth"
+					[ngModel]="nodeFormWidth()"
+					(ngModelChange)="nodeFormWidth.set($event)"
+					[min]="0"
+					[max]="500"
+					[showButtons]="true"
+					[step]="10"
+				/>
+			</div>
+			<div class="form-field">
+				<label for="nodeHeight">
+					<i class="pi pi-arrows-v"></i>
+					Alto
+				</label>
+				<p-inputNumber
+					id="nodeHeight"
+					[ngModel]="nodeFormHeight()"
+					(ngModelChange)="nodeFormHeight.set($event)"
+					[min]="0"
+					[max]="500"
+					[showButtons]="true"
+					[step]="10"
+				/>
+			</div>
+		</div>
+	</div>
+
+	<div class="piso-dialog-footer">
+		<button
+			pButton
+			label="Cancelar"
+			class="p-button-text p-button-secondary"
+			(click)="facade.closeNodeDialog()"
+		></button>
+		<button
+			pButton
+			label="Guardar cambios"
+			icon="pi pi-check"
+			(click)="saveNode()"
+			[loading]="vm().saving"
+		></button>
+	</div>
+</p-dialog>
+<!-- #endregion -->
+
+<!-- #region Bloqueo Edit Dialog -->
+<p-dialog
+	[visible]="vm().bloqueoDialogVisible"
+	(visibleChange)="onBloqueoDialogVisibleChange($event)"
+	[modal]="true"
+	[closable]="true"
+	[showHeader]="false"
+	[style]="{ width: '440px' }"
+>
+	<div class="piso-dialog-header">
+		<div class="piso-dialog-icon editing">
+			<i class="pi pi-ban"></i>
+		</div>
+		<div class="piso-dialog-title">
+			<h3>Editar Bloqueo</h3>
+			<p>Modifica las dimensiones y motivo del bloqueo</p>
+		</div>
+	</div>
+
+	<div class="piso-dialog-form">
+		<div class="form-field">
+			<label for="bloqueoMotivo">
+				<i class="pi pi-info-circle"></i>
+				Motivo
+			</label>
+			<input
+				pInputText
+				id="bloqueoMotivo"
+				[ngModel]="bloqueoFormMotivo()"
+				(ngModelChange)="bloqueoFormMotivo.set($event)"
+				placeholder="Ej: En reparación, Zona restringida..."
+			/>
+		</div>
+		<div class="form-row">
+			<div class="form-field">
+				<label for="bloqueoWidth">
+					<i class="pi pi-arrows-h"></i>
+					Ancho
+				</label>
+				<p-inputNumber
+					id="bloqueoWidth"
+					[ngModel]="bloqueoFormWidth()"
+					(ngModelChange)="bloqueoFormWidth.set($event)"
+					[min]="10"
+					[max]="500"
+					[showButtons]="true"
+					[step]="10"
+				/>
+			</div>
+			<div class="form-field">
+				<label for="bloqueoHeight">
+					<i class="pi pi-arrows-v"></i>
+					Alto
+				</label>
+				<p-inputNumber
+					id="bloqueoHeight"
+					[ngModel]="bloqueoFormHeight()"
+					(ngModelChange)="bloqueoFormHeight.set($event)"
+					[min]="10"
+					[max]="500"
+					[showButtons]="true"
+					[step]="10"
+				/>
+			</div>
+		</div>
+	</div>
+
+	<div class="piso-dialog-footer">
+		<button
+			pButton
+			label="Cancelar"
+			class="p-button-text p-button-secondary"
+			(click)="facade.closeBloqueoDialog()"
+		></button>
+		<button
+			pButton
+			label="Guardar cambios"
+			icon="pi pi-check"
+			(click)="saveBloqueo()"
+			[loading]="vm().saving"
+		></button>
+	</div>
+</p-dialog>
+<!-- #endregion -->
+
+<!-- #region Vertical Connection Dialog -->
+<p-dialog
+	[visible]="vm().verticalDialogVisible"
+	(visibleChange)="onVerticalDialogVisibleChange($event)"
+	[modal]="true"
+	[closable]="true"
+	[showHeader]="false"
+	[style]="{ width: '480px' }"
+>
+	<div class="piso-dialog-header">
+		<div class="piso-dialog-icon">
+			<i class="pi pi-arrows-v"></i>
+		</div>
+		<div class="piso-dialog-title">
+			<h3>Nueva Conexión Vertical</h3>
+			<p>Conecta un nodo de este piso con un nodo de otro piso</p>
+		</div>
+	</div>
+
+	<div class="piso-dialog-form">
+		<div class="form-field">
+			<label for="verticalTipo">
+				<i class="pi pi-th-large"></i>
+				Tipo de conexión
+			</label>
+			<p-select
+				id="verticalTipo"
+				[options]="verticalConnectionTypeOptions"
+				[ngModel]="verticalFormTipo()"
+				(ngModelChange)="verticalFormTipo.set($event)"
+				optionLabel="label"
+				optionValue="value"
+				appendTo="body"
+			/>
+		</div>
+
+		<div class="form-field">
+			<label for="verticalDestPiso">
+				<i class="pi pi-building"></i>
+				Piso destino
+			</label>
+			<p-select
+				id="verticalDestPiso"
+				[options]="otherPisos()"
+				[ngModel]="verticalFormDestPisoId()"
+				(ngModelChange)="onDestPisoChange($event)"
+				optionLabel="nombre"
+				optionValue="id"
+				appendTo="body"
+				placeholder="Selecciona un piso"
+			/>
+		</div>
+
+		@if (verticalFormDestPisoId()) {
+			<div class="form-field">
+				<label for="verticalDestNodo">
+					<i class="pi pi-map-marker"></i>
+					Nodo destino
+				</label>
+				@if (vm().destPisoLoading) {
+					<div class="loading-hint">
+						<i class="pi pi-spin pi-spinner"></i>
+						Cargando nodos...
+					</div>
+				} @else {
+					<p-select
+						id="verticalDestNodo"
+						[options]="vm().destPisoNodos"
+						[ngModel]="verticalFormDestNodoId()"
+						(ngModelChange)="verticalFormDestNodoId.set($event)"
+						optionLabel="etiqueta"
+						optionValue="id"
+						appendTo="body"
+						placeholder="Selecciona un nodo"
+					>
+						<ng-template let-node pTemplate="item">
+							<span>{{ node.etiqueta || node.tipo }} ({{ node.x | number: '1.0-0' }}, {{ node.y | number: '1.0-0' }})</span>
+						</ng-template>
+						<ng-template let-node pTemplate="selectedItem">
+							<span>{{ node.etiqueta || node.tipo }}</span>
+						</ng-template>
+					</p-select>
+				}
+			</div>
+		}
+
+		<div class="form-row">
+			<div class="form-field">
+				<label for="verticalPesoSubida">
+					<i class="pi pi-arrow-up"></i>
+					Peso subida
+				</label>
+				<p-inputNumber
+					id="verticalPesoSubida"
+					[ngModel]="verticalFormPesoSubida()"
+					(ngModelChange)="verticalFormPesoSubida.set($event)"
+					[minFractionDigits]="1"
+					[maxFractionDigits]="1"
+					[min]="0.1"
+					[max]="100"
+				/>
+			</div>
+			<div class="form-field">
+				<label for="verticalPesoBajada">
+					<i class="pi pi-arrow-down"></i>
+					Peso bajada
+				</label>
+				<p-inputNumber
+					id="verticalPesoBajada"
+					[ngModel]="verticalFormPesoBajada()"
+					(ngModelChange)="verticalFormPesoBajada.set($event)"
+					[minFractionDigits]="1"
+					[maxFractionDigits]="1"
+					[min]="0.1"
+					[max]="100"
+				/>
+			</div>
+		</div>
+
+		<div class="form-field form-field-inline">
+			<label for="verticalBidireccional">
+				<i class="pi pi-sort-alt"></i>
+				Bidireccional
+			</label>
+			<p-toggleSwitch
+				id="verticalBidireccional"
+				[ngModel]="verticalFormBidireccional()"
+				(ngModelChange)="verticalFormBidireccional.set($event)"
+			/>
+		</div>
+	</div>
+
+	<div class="piso-dialog-footer">
+		<button
+			pButton
+			label="Cancelar"
+			class="p-button-text p-button-secondary"
+			(click)="facade.closeVerticalDialog()"
+		></button>
+		<button
+			pButton
+			label="Crear conexión"
+			icon="pi pi-check"
+			(click)="saveVerticalConnection()"
+			[loading]="vm().saving"
+			[disabled]="!verticalFormDestNodoId()"
+		></button>
+	</div>
+</p-dialog>
+<!-- #endregion -->

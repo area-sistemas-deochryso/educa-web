@@ -6,10 +6,12 @@ import { TagModule } from 'primeng/tag';
 import { SkeletonModule } from 'primeng/skeleton';
 import { ButtonModule } from 'primeng/button';
 import { TooltipModule } from 'primeng/tooltip';
+import { environment } from '@config/environment';
 import { ProfesorSalonConEstudiantes } from '../../../services/profesor.store';
 import { SalonNotasTabComponent } from '../salon-notas-tab/salon-notas-tab.component';
 import { SalonNotasEstudianteTabComponent } from '../salon-notas-estudiante-tab/salon-notas-estudiante-tab.component';
 import { SalonGruposTabComponent } from '../salon-grupos-tab/salon-grupos-tab.component';
+import { CampusNavigationComponent } from '../../../../shared/campus-navigation/campus-navigation.component';
 import {
 	SalonNotasResumenDto,
 	VistaPromedio,
@@ -32,6 +34,7 @@ import { NotaSaveEvent } from '../salon-notas-estudiante-tab/salon-notas-estudia
 		SalonNotasTabComponent,
 		SalonNotasEstudianteTabComponent,
 		SalonGruposTabComponent,
+		CampusNavigationComponent,
 	],
 	changeDetection: ChangeDetectionStrategy.OnPush,
 	styles: `
@@ -130,6 +133,11 @@ import { NotaSaveEvent } from '../salon-notas-estudiante-tab/salon-notas-estudia
 						<p-tab value="2">
 							<i class="pi pi-book tab-icon"></i>Notas del Salón
 						</p-tab>
+						@if (showCampusNav) {
+							<p-tab value="3">
+								<i class="pi pi-map tab-icon"></i>Ubicación
+							</p-tab>
+						}
 					</p-tablist>
 
 					<p-tabpanels>
@@ -225,6 +233,19 @@ import { NotaSaveEvent } from '../salon-notas-estudiante-tab/salon-notas-estudia
 							/>
 						</p-tabpanel>
 						<!-- #endregion -->
+
+						<!-- #region Tab Ubicación -->
+						@if (showCampusNav) {
+							<p-tabpanel value="3">
+								@if (activeTab() === '3') {
+									<app-campus-navigation
+										[embedded]="true"
+										[targetSalonId]="s.salonId"
+									/>
+								}
+							</p-tabpanel>
+						}
+						<!-- #endregion -->
 					</p-tabpanels>
 				</p-tabs>
 			}
@@ -259,7 +280,9 @@ export class SalonEstudiantesDialogComponent {
 	readonly gruposAsignarGrupo = input<GrupoContenidoDto | null>(null);
 	// #endregion
 
-	// #region Fullscreen
+	// #region Estado local
+	readonly showCampusNav = environment.features.campusNavigation;
+	readonly activeTab = signal('0');
 	readonly isFullscreen = signal(false);
 
 	readonly dialogStyle = computed(() =>
@@ -303,11 +326,13 @@ export class SalonEstudiantesDialogComponent {
 	onVisibleChange(value: boolean): void {
 		if (!value) {
 			this.isFullscreen.set(false);
+			this.activeTab.set('0');
 			this.visibleChange.emit(false);
 		}
 	}
 
 	onTabChange(value: string): void {
+		this.activeTab.set(value);
 		if (value === '0') {
 			this.gruposTabActivated.emit();
 		}

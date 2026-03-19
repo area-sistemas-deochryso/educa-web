@@ -1,0 +1,85 @@
+<!-- #region Header -->
+<div class="panel-header">
+	<div class="panel-title">
+		<i class="pi pi-building"></i>
+		<h3>Pisos</h3>
+	</div>
+	<button
+		pButton
+		icon="pi pi-plus"
+		class="p-button-sm p-button-rounded p-button-text"
+		(click)="createPiso.emit()"
+		pTooltip="Nuevo piso"
+		tooltipPosition="right"
+		[pt]="{ root: { 'aria-label': 'Crear piso' } }"
+	></button>
+</div>
+<!-- #endregion -->
+
+<!-- #region Lista de pisos -->
+@if (loading()) {
+	<div class="pisos-loading">
+		@for (_ of [1, 2, 3]; track $index) {
+			<div class="piso-skeleton"></div>
+		}
+	</div>
+} @else if (pisos().length === 0) {
+	<div class="pisos-empty">
+		<div class="empty-icon">
+			<i class="pi pi-th-large"></i>
+		</div>
+		<span class="empty-title">Sin pisos</span>
+		<span class="empty-hint">Crea el primer piso para comenzar a diseñar el mapa del campus</span>
+		<button
+			pButton
+			label="Nuevo piso"
+			icon="pi pi-plus"
+			class="p-button-sm p-button-outlined"
+			(click)="createPiso.emit()"
+		></button>
+	</div>
+} @else {
+	<div class="pisos-list">
+		@for (piso of pisos(); track piso.id) {
+			<div
+				class="piso-item"
+				[class.selected]="piso.id === selectedPisoId()"
+				[class.disabled]="!piso.estado"
+				(click)="selectPiso.emit(piso.id)"
+			>
+				<div class="piso-icon">
+					<i class="pi pi-th-large"></i>
+				</div>
+				<div class="piso-info">
+					<span class="piso-name">{{ piso.nombre }}</span>
+					<span class="piso-stats">
+						@if (!piso.estado) {
+							<i class="pi pi-eye-slash" style="font-size: 0.625rem"></i> Desactivado
+						} @else {
+							{{ piso.cantidadNodos }} nodos &middot; {{ piso.cantidadAristas }} aristas
+						}
+					</span>
+				</div>
+				<div class="piso-actions" (click)="$event.stopPropagation()">
+					<button
+						pButton
+						icon="pi pi-pencil"
+						class="p-button-sm p-button-text p-button-rounded"
+						(click)="editPiso.emit(piso)"
+						[pt]="{ root: { 'aria-label': 'Editar piso' } }"
+					></button>
+					<button
+						pButton
+						[icon]="piso.estado ? 'pi pi-eye-slash' : 'pi pi-eye'"
+						class="p-button-sm p-button-text p-button-rounded"
+						(click)="toggleEstadoPiso.emit(piso.id)"
+						pTooltip="{{ piso.estado ? 'Desactivar' : 'Activar' }}"
+						tooltipPosition="top"
+						[pt]="{ root: { 'aria-label': piso.estado ? 'Desactivar piso' : 'Activar piso' } }"
+					></button>
+				</div>
+			</div>
+		}
+	</div>
+}
+<!-- #endregion -->

@@ -26,6 +26,12 @@ yarn-error.log*
 pnpm-debug.log*
 
 # ======================
+# Bun (local dev only — producción usa npm)
+# ======================
+bun.lockb
+bun.lock
+
+# ======================
 # Environment variables
 # ======================
 .env

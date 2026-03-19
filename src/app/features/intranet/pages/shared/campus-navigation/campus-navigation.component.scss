@@ -39,6 +39,50 @@
 }
 
 // #endregion
+// #region Modo embedded (dentro de diálogos)
+.campus-navigation.embedded {
+	min-height: auto;
+	padding: 0;
+	gap: 1rem;
+}
+
+// #endregion
+// #region Botón 3D
+.btn-3d {
+	display: flex;
+	align-items: center;
+	gap: 6px;
+	padding: 8px 16px;
+	border: 1.5px solid var(--surface-300);
+	border-radius: 8px;
+	background: var(--surface-0);
+	color: var(--text-color);
+	font-size: 13px;
+	font-weight: 600;
+	cursor: pointer;
+	transition: all 0.18s;
+	white-space: nowrap;
+
+	&:hover {
+		border-color: var(--primary-color);
+		background: var(--primary-50, #eef2ff);
+		color: var(--primary-color);
+	}
+
+	&--active {
+		border-color: var(--primary-color);
+		background: var(--primary-color);
+		color: #fff;
+
+		&:hover {
+			background: var(--primary-700, #4338ca);
+			color: #fff;
+		}
+	}
+
+	&__icon { font-size: 16px; }
+}
+// #endregion
 // #region Responsive
 @media (max-width: 768px) {
 	.campus-navigation {

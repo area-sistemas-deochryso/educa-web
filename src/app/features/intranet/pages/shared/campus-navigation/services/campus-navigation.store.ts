@@ -1,12 +1,12 @@
 import { computed, inject, Injectable, signal } from '@angular/core';
 
-import { CampusNode, MiHorarioHoyItem, PathResult } from '../models';
-import { CAMPUS_NODES } from '../config';
+import { BlockedPath, CampusEdge, CampusNode, MiHorarioHoyItem, PathResult } from '../models';
 import { PathfindingService } from './pathfinding.service';
 
 interface SelectOption {
 	label: string;
 	value: string;
+	floor: number;
 }
 
 @Injectable({ providedIn: 'root' })
@@ -14,6 +14,11 @@ export class CampusNavigationStore {
 	private readonly pathfinding = inject(PathfindingService);
 
 	// #region Estado privado
+
+	private readonly _nodes = signal<CampusNode[]>([]);
+	private readonly _edges = signal<CampusEdge[]>([]);
+	private readonly _blockedPaths = signal<BlockedPath[]>([]);
+	private readonly _campusReady = signal(false);
 
 	private readonly _scheduleItems = signal<MiHorarioHoyItem[]>([]);
 	private readonly _selectedFloor = signal(0);
@@ -26,6 +31,11 @@ export class CampusNavigationStore {
 
 	// #endregion
 	// #region Lecturas públicas (readonly)
+
+	readonly nodes = this._nodes.asReadonly();
+	readonly edges = this._edges.asReadonly();
+	readonly blockedPaths = this._blockedPaths.asReadonly();
+	readonly campusReady = this._campusReady.asReadonly();
 
 	readonly scheduleItems = this._scheduleItems.asReadonly();
 	readonly selectedFloor = this._selectedFloor.asReadonly();
@@ -40,20 +50,29 @@ export class CampusNavigationStore {
 	// #region Computed - Datos derivados
 
 	readonly floors = computed(() => {
-		const floorSet = new Set(CAMPUS_NODES.map((n) => n.floor));
+		const floorSet = new Set(this._nodes().map((n) => n.floor));
 		return [...floorSet].sort((a, b) => a - b);
 	});
 
 	readonly currentFloorNodes = computed(() =>
-		CAMPUS_NODES.filter((n) => n.floor === this._selectedFloor()),
+		this._nodes().filter((n) => n.floor === this._selectedFloor()),
 	);
 
-	/**
-	 * Mapa salonId → nodeId para vincular horario con nodos del mapa
-	 */
+	/** Edges del piso actual (ambos nodos deben estar en el mismo piso) */
+	readonly currentFloorEdges = computed((): CampusEdge[] => {
+		const nodeMap = new Map(this._nodes().map((n) => [n.id, n]));
+		const floor = this._selectedFloor();
+		return this._edges().filter((e) => {
+			const from = nodeMap.get(e.from);
+			const to = nodeMap.get(e.to);
+			return from && to && from.floor === floor && to.floor === floor;
+		});
+	});
+
+	/** Mapa salonId → nodeId para vincular horario con nodos del mapa */
 	readonly salonToNodeMap = computed(() => {
 		const map = new Map<number, string>();
-		for (const node of CAMPUS_NODES) {
+		for (const node of this._nodes()) {
 			if (node.salonId != null) {
 				map.set(node.salonId, node.id);
 			}
@@ -61,31 +80,14 @@ export class CampusNavigationStore {
 		return map;
 	});
 
-	/**
-	 * Opciones de dropdown para punto de inicio (todos los nodos navegables)
-	 */
-	readonly startNodeOptions = computed((): SelectOption[] =>
-		CAMPUS_NODES.filter((n) => n.type !== 'corridor').map((n) => ({
-			label: `${n.label} (Piso ${n.floor})`,
-			value: n.id,
-		})),
+	/** Opciones planas de todos los nodos navegables (para buscador) */
+	readonly allNodeOptions = computed((): SelectOption[] =>
+		this._nodes()
+			.filter((n) => n.type !== 'corridor')
+			.map((n) => ({ label: n.label, value: n.id, floor: n.floor })),
 	);
 
-	/**
-	 * Opciones de dropdown para destino (salones, oficinas, baños)
-	 */
-	readonly destinationNodeOptions = computed((): SelectOption[] =>
-		CAMPUS_NODES.filter((n) => ['classroom', 'office', 'bathroom'].includes(n.type)).map(
-			(n) => ({
-				label: `${n.label} (Piso ${n.floor})`,
-				value: n.id,
-			}),
-		),
-	);
-
-	/**
-	 * Clase actual o próxima según la hora
-	 */
+	/** Clase actual o próxima según la hora */
 	readonly currentOrNextClass = computed((): MiHorarioHoyItem | null => {
 		const items = this._scheduleItems();
 		if (items.length === 0) return null;
@@ -93,24 +95,20 @@ export class CampusNavigationStore {
 		const now = new Date();
 		const currentTime = `${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
 
-		// Buscar clase en curso
 		const current = items.find((i) => i.horaInicio <= currentTime && i.horaFin > currentTime);
 		if (current) return current;
 
-		// Buscar próxima clase
 		const next = items.find((i) => i.horaInicio > currentTime);
 		return next ?? null;
 	});
 
-	/**
-	 * Nodos del path que están en el piso actual (para renderizar la ruta)
-	 */
+	/** Nodos del path que están en el piso actual (para renderizar la ruta) */
 	readonly currentFloorPathNodes = computed((): CampusNode[] => {
 		const result = this._pathResult();
 		if (!result) return [];
 
 		const floor = this._selectedFloor();
-		const nodeMap = new Map(CAMPUS_NODES.map((n) => [n.id, n]));
+		const nodeMap = new Map(this._nodes().map((n) => [n.id, n]));
 
 		return result.path.map((id) => nodeMap.get(id)).filter((n): n is CampusNode => n != null && n.floor === floor);
 	});
@@ -140,21 +138,42 @@ export class CampusNavigationStore {
 		loading: this._loading(),
 		error: this._error(),
 		scheduleReady: this._scheduleReady(),
+		campusReady: this._campusReady(),
 
 		floors: this.floors(),
 		currentFloorNodes: this.currentFloorNodes(),
-		startNodeOptions: this.startNodeOptions(),
-		destinationNodeOptions: this.destinationNodeOptions(),
+		currentFloorEdges: this.currentFloorEdges(),
+		allNodeOptions: this.allNodeOptions(),
 		currentOrNextClass: this.currentOrNextClass(),
 		currentFloorPathPoints: this.currentFloorPathPoints(),
 		salonToNodeMap: this.salonToNodeMap(),
 
+		allNodes: this._nodes(),
+		allEdges: this._edges(),
+
 		hasSchedule: this._scheduleItems().length > 0,
 		hasPath: this._pathResult() !== null,
+		hasCampusData: this._nodes().length > 0,
 	}));
 
 	// #endregion
 	// #region Comandos de mutación
+
+	setNodes(nodes: CampusNode[]): void {
+		this._nodes.set(nodes);
+	}
+
+	setEdges(edges: CampusEdge[]): void {
+		this._edges.set(edges);
+	}
+
+	setBlockedPaths(blockedPaths: BlockedPath[]): void {
+		this._blockedPaths.set(blockedPaths);
+	}
+
+	setCampusReady(ready: boolean): void {
+		this._campusReady.set(ready);
+	}
 
 	setScheduleItems(items: MiHorarioHoyItem[]): void {
 		this._scheduleItems.set(items);

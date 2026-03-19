@@ -1,13 +1,15 @@
-<div class="campus-navigation">
+<div class="campus-navigation" [class.embedded]="embedded()">
 	<!-- #region Panel lateral: Horario del día -->
-	<aside class="schedule-sidebar">
-		<app-schedule-panel
-			[items]="vm().scheduleItems"
-			[scheduleReady]="vm().scheduleReady"
-			[currentSalonId]="vm().currentOrNextClass?.salonId ?? null"
-			(navigate)="onNavigateToSalon($event)"
-		/>
-	</aside>
+	@if (!embedded()) {
+		<aside class="schedule-sidebar">
+			<app-schedule-panel
+				[items]="vm().scheduleItems"
+				[scheduleReady]="vm().scheduleReady"
+				[currentSalonId]="vm().currentOrNextClass?.salonId ?? null"
+				(navigate)="onNavigateToSalon($event)"
+			/>
+		</aside>
+	}
 
 	<!-- #endregion -->
 	<!-- #region Área principal: Mapa + controles -->
@@ -21,8 +23,8 @@
 			/>
 
 			<app-location-selector
-				[startOptions]="vm().startNodeOptions"
-				[destinationOptions]="vm().destinationNodeOptions"
+				#locationSelector
+				[allOptions]="vm().allNodeOptions"
 				[startNodeId]="vm().startNodeId"
 				[destinationNodeId]="vm().destinationNodeId"
 				[hasPath]="vm().hasPath"
@@ -30,11 +32,26 @@
 				(destinationChange)="onDestinationChange($event)"
 				(clear)="onClearPath()"
 			/>
+
+			<!-- Botón 3D -->
+			@if (vm().hasCampusData) {
+				<button
+					type="button"
+					class="btn-3d"
+					[class.btn-3d--active]="vm().hasPath"
+					(click)="show3d.set(true)"
+					[title]="vm().hasPath ? 'Practicar ruta en 3D' : 'Explorar campus en 3D'"
+				>
+					<span class="btn-3d__icon">🕹️</span>
+					<span class="btn-3d__label">{{ vm().hasPath ? 'Practicar ruta' : 'Ver en 3D' }}</span>
+				</button>
+			}
 		</div>
 
 		<!-- Mapa SVG -->
 		<app-campus-map
 			[nodes]="vm().currentFloorNodes"
+			[edges]="vm().currentFloorEdges"
 			[selectedFloor]="vm().selectedFloor"
 			[pathPoints]="vm().currentFloorPathPoints"
 			[startNodeId]="vm().startNodeId"
@@ -48,4 +65,18 @@
 		}
 	</main>
 </div>
-	<!-- #endregion -->
+<!-- #endregion -->
+
+<!-- #region Modo 3D (overlay fullscreen) -->
+@if (show3d()) {
+	<app-campus-3d-view
+		[nodes]="vm().allNodes"
+		[edges]="vm().allEdges"
+		[startNodeId]="vm().startNodeId"
+		[destinationNodeId]="vm().destinationNodeId"
+		[pathResult]="vm().pathResult"
+		(closestNodeChange)="on3dPositionChange($event)"
+		(close)="show3d.set(false)"
+	/>
+}
+<!-- #endregion -->

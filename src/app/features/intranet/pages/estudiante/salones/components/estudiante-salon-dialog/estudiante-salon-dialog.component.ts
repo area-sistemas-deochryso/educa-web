@@ -2,16 +2,27 @@
 import { Component, ChangeDetectionStrategy, input, output, computed, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { DialogModule } from 'primeng/dialog';
+import { TabsModule } from 'primeng/tabs';
 import { ButtonModule } from 'primeng/button';
 import { TooltipModule } from 'primeng/tooltip';
+import { environment } from '@config/environment';
 import { EstudianteSalon, GruposResumenDto } from '../../../models';
 import { EstudianteGruposTabComponent } from '../estudiante-grupos-tab/estudiante-grupos-tab.component';
+import { CampusNavigationComponent } from '../../../../shared/campus-navigation/campus-navigation.component';
 
 // #endregion
 @Component({
 	selector: 'app-estudiante-salon-dialog',
 	standalone: true,
-	imports: [CommonModule, DialogModule, ButtonModule, TooltipModule, EstudianteGruposTabComponent],
+	imports: [
+		CommonModule,
+		DialogModule,
+		TabsModule,
+		ButtonModule,
+		TooltipModule,
+		EstudianteGruposTabComponent,
+		CampusNavigationComponent,
+	],
 	changeDetection: ChangeDetectionStrategy.OnPush,
 	styles: `
 		:host ::ng-deep .p-datatable {
@@ -29,6 +40,10 @@ import { EstudianteGruposTabComponent } from '../estudiante-grupos-tab/estudiant
 		:host ::ng-deep .fullscreen-dialog .p-dialog-content {
 			flex: 1;
 			max-height: none !important;
+		}
+		.tab-icon {
+			margin-right: 0.4rem;
+			font-size: 0.85rem;
 		}
 		.dialog-header-custom {
 			display: flex;
@@ -74,7 +89,7 @@ import { EstudianteGruposTabComponent } from '../estudiante-grupos-tab/estudiant
 		>
 			<ng-template #header>
 				<div class="dialog-header-custom">
-					<span class="p-dialog-title">{{ salon()?.salonDescripcion ?? 'Salón' }} — Grupos</span>
+					<span class="p-dialog-title">{{ salon()?.salonDescripcion ?? 'Salón' }}</span>
 					<button
 						class="fullscreen-toggle-btn"
 						type="button"
@@ -86,25 +101,57 @@ import { EstudianteGruposTabComponent } from '../estudiante-grupos-tab/estudiant
 				</div>
 			</ng-template>
 			@if (salon(); as s) {
-				<div style="display: flex; justify-content: flex-end; margin-bottom: 0.5rem">
-					<button
-						pButton
-						icon="pi pi-refresh"
-						class="p-button-rounded p-button-text p-button-sm"
-						(click)="onRefreshGrupos()"
-						[disabled]="gruposLoading()"
-						pTooltip="Refrescar"
-						tooltipPosition="top"
-						[pt]="{ root: { 'aria-label': 'Refrescar grupos' } }"
-					></button>
-				</div>
-				<app-estudiante-grupos-tab
-					[gruposData]="gruposData()"
-					[loading]="gruposLoading()"
-					[cursoOptions]="cursosOptions()"
-					[selectedCurso]="gruposCursoId()"
-					(cursoChange)="onGruposCursoChange($event)"
-				/>
+				<p-tabs value="0" (valueChange)="onTabChange($any($event))">
+					<p-tablist>
+						<p-tab value="0">
+							<i class="pi pi-users tab-icon"></i>Grupos
+						</p-tab>
+						@if (showCampusNav) {
+							<p-tab value="1">
+								<i class="pi pi-map tab-icon"></i>Ubicación
+							</p-tab>
+						}
+					</p-tablist>
+
+					<p-tabpanels>
+						<!-- #region Tab Grupos -->
+						<p-tabpanel value="0">
+							<div style="display: flex; justify-content: flex-end; margin-bottom: 0.5rem">
+								<button
+									pButton
+									icon="pi pi-refresh"
+									class="p-button-rounded p-button-text p-button-sm"
+									(click)="onRefreshGrupos()"
+									[disabled]="gruposLoading()"
+									pTooltip="Refrescar"
+									tooltipPosition="top"
+									[pt]="{ root: { 'aria-label': 'Refrescar grupos' } }"
+								></button>
+							</div>
+							<app-estudiante-grupos-tab
+								[gruposData]="gruposData()"
+								[loading]="gruposLoading()"
+								[cursoOptions]="cursosOptions()"
+								[selectedCurso]="gruposCursoId()"
+								(cursoChange)="onGruposCursoChange($event)"
+							/>
+						</p-tabpanel>
+						<!-- #endregion -->
+
+						<!-- #region Tab Ubicación -->
+						@if (showCampusNav) {
+							<p-tabpanel value="1">
+								@if (activeTab() === '1') {
+									<app-campus-navigation
+										[embedded]="true"
+										[targetSalonId]="s.salonId"
+									/>
+								}
+							</p-tabpanel>
+						}
+						<!-- #endregion -->
+					</p-tabpanels>
+				</p-tabs>
 			}
 		</p-dialog>
 	`,
@@ -124,8 +171,10 @@ export class EstudianteSalonDialogComponent {
 	readonly gruposChange = output<number>();
 	// #endregion
 
-	// #region Fullscreen
+	// #region Estado local
+	readonly showCampusNav = environment.features.campusNavigation;
 	readonly isFullscreen = signal(false);
+	readonly activeTab = signal('0');
 
 	readonly dialogStyle = computed(() =>
 		this.isFullscreen()
@@ -145,8 +194,13 @@ export class EstudianteSalonDialogComponent {
 	onVisibleChange(value: boolean): void {
 		if (!value) {
 			this.isFullscreen.set(false);
+			this.activeTab.set('0');
 			this.visibleChange.emit(false);
 		}
+	}
+
+	onTabChange(value: string): void {
+		this.activeTab.set(value);
 	}
 
 	onGruposCursoChange(horarioId: number): void {

@@ -150,6 +150,17 @@ const devMiAula: NavItemWithPermiso[] =
 			]
 		: [];
 
+const devCampus: NavItemWithPermiso[] = environment.features.campusNavigation
+	? [
+			{
+				route: '/intranet/admin/campus',
+				label: 'Campus',
+				icon: 'pi pi-map',
+				permiso: 'intranet/admin/campus',
+			},
+		]
+	: [];
+
 const devTestK6: NavItemWithPermiso[] = environment.features.ctestK6
 	? [
 			{
@@ -224,6 +235,7 @@ export const INTRANET_MENU: NavItemWithPermiso[] = [
 		icon: 'pi pi-graduation-cap',
 		children: [
 			...devCalendario,
+			...devCampus,
 			{
 				route: '/intranet/admin/cursos',
 				label: 'Cursos',

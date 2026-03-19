@@ -1,0 +1,11 @@
+# bunfig.toml — Bun configuration for local development
+# Production uses npm (Netlify CI). Locally: bun install / bun run start
+
+[install]
+# bun no aplica peer-dep strict como npm@7+, no se necesita legacy-peer-deps
+
+# Usar el mismo registry que npm
+registry = "https://registry.npmjs.org/"
+
+# No instalar devDependencies en producción (se sobreescribe en CI con npm)
+production = false

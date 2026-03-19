@@ -1,0 +1,418 @@
+// #region Host
+:host {
+	display: block;
+	height: calc(100vh - 64px);
+}
+// #endregion
+
+// #region Layout
+.campus-admin {
+	display: flex;
+	height: 100%;
+}
+// #endregion
+
+// #region Editor area
+.editor-area {
+	flex: 1;
+	display: flex;
+	flex-direction: column;
+	overflow: hidden;
+	position: relative;
+	background: var(--surface-ground);
+}
+// #endregion
+
+// #region Toolbar
+.editor-toolbar {
+	display: flex;
+	align-items: center;
+	padding: 0.5rem 0.75rem;
+	border-bottom: 1px solid var(--surface-200);
+	background: var(--surface-card);
+	gap: 0.5rem;
+}
+
+.toolbar-group {
+	display: flex;
+	align-items: center;
+	gap: 0.125rem;
+	padding: 0.125rem;
+	border-radius: 8px;
+	background: var(--surface-100);
+}
+
+.toolbar-btn {
+	&.active {
+		background: color-mix(in srgb, var(--primary-color) 15%, transparent) !important;
+		color: var(--primary-color) !important;
+	}
+}
+
+.toolbar-separator {
+	width: 1px;
+	height: 24px;
+	background: var(--surface-300);
+	margin: 0 0.25rem;
+}
+
+.toolbar-right {
+	display: flex;
+	align-items: center;
+	gap: 0.5rem;
+	margin-left: auto;
+}
+
+.saving-indicator {
+	font-size: 0.875rem;
+	color: var(--primary-color);
+}
+
+.node-type-select {
+	width: 160px;
+}
+
+.toolbar-hint {
+	display: flex;
+	align-items: center;
+	gap: 0.375rem;
+	font-size: 0.75rem;
+	color: var(--text-color-secondary);
+
+	i {
+		color: #f59e0b;
+		font-size: 0.75rem;
+	}
+}
+// #endregion
+
+// #region Empty state
+.editor-empty {
+	flex: 1;
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	justify-content: center;
+	gap: 0.75rem;
+	color: var(--text-color-secondary);
+	padding: 2rem;
+}
+
+.empty-icon-container {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	width: 80px;
+	height: 80px;
+	border-radius: 20px;
+	background: var(--surface-100);
+	margin-bottom: 0.5rem;
+
+	i {
+		font-size: 2rem;
+		color: var(--text-color-secondary);
+		opacity: 0.6;
+	}
+}
+
+.editor-empty {
+	h3 {
+		margin: 0;
+		font-size: 1.125rem;
+		font-weight: 600;
+		color: var(--text-color);
+	}
+
+	p {
+		margin: 0;
+		font-size: 0.875rem;
+		max-width: 320px;
+		text-align: center;
+		line-height: 1.5;
+	}
+}
+
+.empty-shortcuts {
+	display: flex;
+	gap: 1.5rem;
+	margin-top: 1.5rem;
+	padding-top: 1.5rem;
+	border-top: 1px solid var(--surface-200);
+}
+
+.shortcut-item {
+	display: flex;
+	align-items: center;
+	gap: 0.375rem;
+	font-size: 0.75rem;
+	color: var(--text-color-secondary);
+
+	i {
+		font-size: 0.75rem;
+		opacity: 0.7;
+	}
+}
+// #endregion
+
+// #region Selection tooltip
+.selection-tooltip {
+	position: absolute;
+	bottom: 1rem;
+	left: 1rem;
+	display: flex;
+	border-radius: 10px;
+	background: var(--surface-card);
+	box-shadow: 0 4px 24px rgba(0, 0, 0, 0.12), 0 1px 4px rgba(0, 0, 0, 0.08);
+	overflow: hidden;
+	max-width: 320px;
+	animation: tooltipSlideIn 0.15s ease-out;
+	z-index: 10;
+}
+
+@keyframes tooltipSlideIn {
+	from {
+		opacity: 0;
+		transform: translateY(8px);
+	}
+	to {
+		opacity: 1;
+		transform: translateY(0);
+	}
+}
+
+.tooltip-color-bar {
+	width: 4px;
+	flex-shrink: 0;
+}
+
+.tooltip-body {
+	display: flex;
+	flex-direction: column;
+	gap: 0.25rem;
+	padding: 0.5rem 0.75rem;
+	min-width: 0;
+}
+
+.tooltip-header {
+	display: flex;
+	align-items: center;
+	gap: 0.5rem;
+}
+
+.tooltip-type {
+	font-size: 0.6875rem;
+	font-weight: 700;
+	text-transform: uppercase;
+	letter-spacing: 0.5px;
+}
+
+.tooltip-action {
+	margin-left: auto;
+	width: 1.5rem !important;
+	height: 1.5rem !important;
+}
+
+.tooltip-label {
+	font-size: 0.8125rem;
+	font-weight: 600;
+	color: var(--text-color);
+	white-space: nowrap;
+	overflow: hidden;
+	text-overflow: ellipsis;
+}
+
+.tooltip-meta {
+	display: flex;
+	align-items: center;
+	gap: 0.625rem;
+	flex-wrap: wrap;
+}
+
+.tooltip-meta-item {
+	display: inline-flex;
+	align-items: center;
+	gap: 0.25rem;
+	font-size: 0.6875rem;
+	color: var(--text-color-secondary);
+	font-family: monospace;
+
+	i {
+		font-size: 0.5625rem;
+		opacity: 0.6;
+	}
+}
+// #endregion
+
+// #region Piso Dialog
+.piso-dialog-header {
+	display: flex;
+	align-items: flex-start;
+	gap: 0.875rem;
+	margin-bottom: 1.25rem;
+}
+
+.piso-dialog-icon {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	width: 40px;
+	height: 40px;
+	border-radius: 10px;
+	background: color-mix(in srgb, var(--primary-color) 12%, transparent);
+	flex-shrink: 0;
+
+	i {
+		font-size: 1rem;
+		color: var(--primary-color);
+	}
+
+	&.editing {
+		background: color-mix(in srgb, #f59e0b 12%, transparent);
+
+		i {
+			color: #f59e0b;
+		}
+	}
+}
+
+.piso-dialog-title {
+	display: flex;
+	flex-direction: column;
+	gap: 0.125rem;
+	min-width: 0;
+
+	h3 {
+		margin: 0;
+		font-size: 1rem;
+		font-weight: 600;
+		color: var(--text-color);
+	}
+
+	p {
+		margin: 0;
+		font-size: 0.8125rem;
+		color: var(--text-color-secondary);
+		line-height: 1.4;
+	}
+}
+
+.piso-dialog-form {
+	display: flex;
+	flex-direction: column;
+	gap: 1.125rem;
+}
+
+.form-field {
+	display: flex;
+	flex-direction: column;
+	gap: 0.375rem;
+	min-width: 0;
+
+	label {
+		display: flex;
+		align-items: center;
+		gap: 0.375rem;
+		font-size: 0.8125rem;
+		font-weight: 500;
+		color: var(--text-color-secondary);
+
+		i {
+			font-size: 0.75rem;
+			opacity: 0.7;
+		}
+	}
+
+	input,
+	p-inputNumber {
+		width: 100%;
+	}
+}
+
+.form-row {
+	display: flex;
+	gap: 0.75rem;
+
+	.form-field {
+		flex: 1;
+		min-width: 0;
+		overflow: hidden;
+	}
+}
+
+.form-field-inline {
+	flex-direction: row;
+	align-items: center;
+	justify-content: space-between;
+}
+
+.loading-hint {
+	display: flex;
+	align-items: center;
+	gap: 0.5rem;
+	padding: 0.5rem;
+	font-size: 0.8125rem;
+	color: var(--text-color-secondary);
+
+	i {
+		font-size: 0.875rem;
+		color: var(--primary-color);
+	}
+}
+
+.piso-dialog-footer {
+	display: flex;
+	justify-content: flex-end;
+	gap: 0.5rem;
+	margin-top: 1.25rem;
+	padding-top: 0.875rem;
+	border-top: 1px solid var(--surface-200);
+}
+// #endregion
+
+// #region Overrides PrimeNG
+:host ::ng-deep {
+	.p-inputtext,
+	.p-select {
+		background: transparent;
+		color: var(--text-color);
+		border-color: var(--surface-300);
+
+		&::placeholder {
+			color: var(--text-color-secondary);
+		}
+
+		&:enabled:focus {
+			border-color: var(--primary-color);
+			box-shadow: 0 0 0 1px color-mix(in srgb, var(--primary-color) 30%, transparent);
+		}
+	}
+
+	.p-select-label {
+		color: var(--text-color);
+	}
+
+	.p-select-dropdown {
+		color: var(--text-color);
+	}
+
+	// Dialog overrides
+	.p-dialog {
+		overflow: hidden;
+	}
+
+	.p-dialog-content {
+		padding: 1.5rem !important;
+		overflow: hidden !important;
+	}
+
+	// InputNumber must not overflow its container
+	.p-inputnumber {
+		width: 100%;
+	}
+
+	.p-inputnumber-input {
+		width: 100% !important;
+		min-width: 0 !important;
+	}
+}
+// #endregion
