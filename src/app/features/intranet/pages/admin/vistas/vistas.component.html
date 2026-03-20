@@ -1,16 +1,7 @@
 <!-- #region Template -->
 <div class="vistas-container">
 	<!-- #region Header -->
-	<header class="page-header">
-		<div class="header-left">
-			<div class="header-icon">
-				<i class="pi pi-eye"></i>
-			</div>
-			<div class="header-text">
-				<h1>Administracion de Vistas</h1>
-				<p>Gestiona las vistas y rutas del sistema</p>
-			</div>
-		</div>
+	<app-page-header icon="pi pi-eye" title="Administracion de Vistas" subtitle="Gestiona las vistas y rutas del sistema">
 		<button
 			pButton
 			label="Refrescar"
@@ -18,7 +9,7 @@
 			class="p-button-outlined"
 			(click)="refresh()"
 		></button>
-	</header>
+	</app-page-header>
 	<!-- #endregion -->
 
 	<!-- #region Stats cards -->

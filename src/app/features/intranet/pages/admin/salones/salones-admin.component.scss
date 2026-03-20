@@ -5,21 +5,6 @@
 }
 // #endregion
 
-// #region Header
-.page-header {
-	display: flex;
-	justify-content: space-between;
-	align-items: center;
-	margin-bottom: 1.5rem;
-	flex-wrap: wrap;
-	gap: 0.75rem;
-
-	.header-actions {
-		flex-shrink: 0;
-	}
-}
-// #endregion
-
 // #region PrimeNG overrides
 :host ::ng-deep {
 	.p-tabs,
@@ -95,7 +80,6 @@
 		min-width: 120px;
 	}
 
-	.page-header,
 	.nivel-toolbar {
 		flex-direction: column;
 		align-items: flex-start;

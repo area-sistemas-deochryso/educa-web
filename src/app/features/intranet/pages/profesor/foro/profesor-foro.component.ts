@@ -11,16 +11,17 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Select } from 'primeng/select';
 import { ProgressSpinnerModule } from 'primeng/progressspinner';
+import { PageHeaderComponent } from '@shared/components';
 import { ProfesorFacade } from '../services/profesor.facade';
-import { SalonMensajeriaFacade } from '../salones/services/salon-mensajeria.facade';
-import { SalonForoTabComponent } from '../salones/components/salon-foro-tab/salon-foro-tab.component';
+import { SalonMensajeriaFacade } from '@features/intranet/pages/shared/mensajeria/services/mensajeria.facade';
+import { SalonForoTabComponent } from '@features/intranet/pages/shared/mensajeria/components/foro-tab/foro-tab.component';
 import { GruposFacade } from '../salones/services/grupos.facade';
 import { ProfesorSalonConEstudiantes } from '../services/profesor.store';
 
 @Component({
 	selector: 'app-profesor-foro',
 	standalone: true,
-	imports: [CommonModule, FormsModule, Select, ProgressSpinnerModule, SalonForoTabComponent],
+	imports: [CommonModule, FormsModule, Select, ProgressSpinnerModule, PageHeaderComponent, SalonForoTabComponent],
 	changeDetection: ChangeDetectionStrategy.OnPush,
 	styles: `
 		:host {
@@ -38,8 +39,8 @@ import { ProfesorSalonConEstudiantes } from '../services/profesor.store';
 		}
 	`,
 	template: `
-		<div class="page-container p-4">
-			<h2 class="mt-0 mb-3">Foro</h2>
+		<app-page-header icon="pi pi-megaphone" title="Foro" />
+		<div class="page-container p-4 pt-0">
 
 			@if (loading()) {
 				<div class="flex justify-content-center p-5">

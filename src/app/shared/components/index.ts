@@ -12,4 +12,5 @@ export * from './lazy-content/lazy-content.component';
 export * from './responsive-table';
 export * from './devtools';
 export * from './sync-status';
+export * from './page-header';
 // #endregion

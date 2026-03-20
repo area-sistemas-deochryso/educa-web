@@ -6,6 +6,7 @@
 	margin-bottom: 1.5rem;
 	min-height: 40px;
 	contain: layout style;
+	padding: 0 2rem;
 
 	> i:first-child {
 		font-size: 1.5rem;
@@ -17,7 +18,7 @@
 		align-items: center;
 		gap: 0.5rem;
 
-		h1 {
+		h2 {
 			font-size: 1.5rem;
 			font-weight: 600;
 			color: var(--intranet-default-text-color);

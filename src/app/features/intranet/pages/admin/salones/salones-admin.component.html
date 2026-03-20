@@ -1,33 +1,25 @@
 <!-- #region Header -->
-<div class="page-header">
-	<div>
-		<h2 class="text-2xl font-bold m-0">Gestión de Salones</h2>
-		<p class="text-color-secondary mt-1 mb-0">
-			Administración de periodos, calificaciones y promoción de estudiantes
-		</p>
-	</div>
-	<div class="header-actions flex gap-2 items-center">
-		<p-inputNumber
-			[ngModel]="vm().filtroAnio"
-			(ngModelChange)="onAnioChange($event)"
-			[useGrouping]="false"
-			[min]="2020"
-			[max]="2030"
-			[style]="{ width: '100px' }"
-		/>
-		<button
-			pButton
-			icon="pi pi-refresh"
-			class="p-button-outlined"
-			(click)="onRefresh()"
-			[pt]="{
-				root: {
-					'aria-label': 'Refrescar',
-				},
-			}"
-		></button>
-	</div>
-</div>
+<app-page-header icon="pi pi-building" title="Gestión de Salones" subtitle="Administración de periodos, calificaciones y promoción de estudiantes">
+	<p-inputNumber
+		[ngModel]="vm().filtroAnio"
+		(ngModelChange)="onAnioChange($event)"
+		[useGrouping]="false"
+		[min]="2020"
+		[max]="2030"
+		[style]="{ width: '100px' }"
+	/>
+	<button
+		pButton
+		icon="pi pi-refresh"
+		class="p-button-outlined"
+		(click)="onRefresh()"
+		[pt]="{
+			root: {
+				'aria-label': 'Refrescar',
+			},
+		}"
+	></button>
+</app-page-header>
 <!-- #endregion -->
 
 <!-- #region Stats -->

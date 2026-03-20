@@ -3,6 +3,7 @@ import { Component, ChangeDetectionStrategy, inject, OnInit, computed, signal, D
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
 import { TooltipModule } from 'primeng/tooltip';
+import { PageHeaderComponent } from '@shared/components';
 import { environment } from '@config/environment';
 import { ProfesorFacade } from '../services/profesor.facade';
 import { ProfesorApiService } from '../services/profesor-api.service';
@@ -148,6 +149,10 @@ function getNextOccurrence(block: HorarioBlock, now: Date): Date {
 	return fallback;
 }
 
+/**
+ * Calcula countdown para cada bloque horario hacia su próxima ocurrencia.
+ * Urgency se mapea a colores CSS: danger (<10min), danger-low (<30min), warning (<60min), normal (>60min).
+ */
 function buildCountdownMap(blocks: HorarioBlock[], now: Date): Map<number, CountdownInfo> {
 	const map = new Map<number, CountdownInfo>();
 	for (const block of blocks) {
@@ -167,7 +172,7 @@ function buildCountdownMap(blocks: HorarioBlock[], now: Date): Map<number, Count
 @Component({
 	selector: 'app-profesor-horarios',
 	standalone: true,
-	imports: [CommonModule, TooltipModule],
+	imports: [CommonModule, TooltipModule, PageHeaderComponent],
 	changeDetection: ChangeDetectionStrategy.OnPush,
 	templateUrl: './profesor-horarios.component.html',
 	styleUrl: './profesor-horarios.component.scss',
@@ -230,6 +235,12 @@ export class ProfesorHorariosComponent implements OnInit {
 	private readonly _syncSource = signal<string>('none');
 	private readonly _syncError = signal<string>('');
 
+	/**
+	 * Panel de debug para sincronización de reloj.
+	 * Muestra: hora local vs corregida, offset del servidor, y drift del reloj del dispositivo.
+	 * driftOver20min indica que el reloj del dispositivo se desincronizó significativamente
+	 * (posible suspensión del dispositivo o cambio de hora manual).
+	 */
 	readonly debugInfo = computed(() => {
 		if (!this.showDebugSync) return null;
 

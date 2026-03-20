@@ -6,8 +6,7 @@ import { TabsModule } from 'primeng/tabs';
 import { ButtonModule } from 'primeng/button';
 
 import { EstudianteAsistencia } from '@shared/services/asistencia';
-import { HorarioResponseDto } from '@features/intranet/pages/admin/horarios';
-import { SalonNotasResumenDto } from '@features/intranet/pages/profesor/models';
+import { HorarioResponseDto, SalonNotasResumenDto } from '@data/models';
 
 import {
 	SalonAdminListDto,

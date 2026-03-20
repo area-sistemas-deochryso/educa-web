@@ -1,5 +1,5 @@
 .home-container {
-	padding: 2rem;
+	padding: 1.5rem 0;
 	max-width: 1200px;
 	margin: 0 auto;
 	position: relative;
@@ -9,13 +9,14 @@
 // #region ACCESOS RÁPIDOS
 
 .quick-access {
+	padding: 0 2rem;
 	margin-bottom: 2.5rem;
 
 	h2 {
-		font-size: 1.4rem;
+		font-size: 1.5rem;
+		font-weight: 600;
 		color: var(--intranet-default-text-color, #171717);
 		margin: 0 0 1.5rem;
-		font-weight: var(--intranet-font-weight-bold, bold);
 	}
 }
 
@@ -30,7 +31,7 @@
 
 @media (max-width: 768px) {
 	.home-container {
-		padding: 1.25rem;
+		padding: 1rem 0;
 	}
 
 	.quick-access {

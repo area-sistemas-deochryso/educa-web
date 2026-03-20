@@ -4,7 +4,7 @@ import { FormsModule } from '@angular/forms';
 import { ButtonModule } from 'primeng/button';
 import { InputTextModule } from 'primeng/inputtext';
 import { SelectModule } from 'primeng/select';
-import { RolUsuarioAdmin } from '@core/services';
+import { RolUsuarioAdmin } from '../../services';
 
 // #endregion
 // #region Implementation

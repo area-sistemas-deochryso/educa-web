@@ -27,8 +27,8 @@ const DEFAULTS: Required<RequestTraceConfig> = {
 };
 
 /**
- * Facade for request tracing configuration + recording.
- * Only active in dev mode.
+ * Facade para configuración y registro de trazas HTTP.
+ * Solo activo en modo desarrollo.
  */
 @Injectable({ providedIn: 'root' })
 export class RequestTraceFacade {
@@ -54,7 +54,7 @@ export class RequestTraceFacade {
 	}
 
 	/**
-	 * Generates a request id for correlation.
+	 * Genera un ID de request para correlación.
 	 */
 	newRequestId(): string {
 		if (typeof crypto !== 'undefined' && 'randomUUID' in crypto) {
@@ -74,7 +74,7 @@ export class RequestTraceFacade {
 		this.store.addEntry(entry);
 	}
 
-	// ---------------- Config ----------------
+	// #region Configuración
 	setEnabled(enabled: boolean, persist = true): void {
 		this.store.setEnabled(enabled);
 		if (persist) {
@@ -132,5 +132,6 @@ export class RequestTraceFacade {
 		safeRemoveLocalStorage(this.cfg.storageEnabledKey);
 		this.refreshFromStorage();
 	}
+	// #endregion
 }
 // #endregion

@@ -2,17 +2,18 @@ import { Component, ChangeDetectionStrategy, computed, inject, OnInit, OnDestroy
 import { CommonModule } from '@angular/common';
 import { ProgressSpinnerModule } from 'primeng/progressspinner';
 import { EstudianteApiService } from '../services/estudiante-api.service';
-import { SalonMensajeriaFacade } from '../../../pages/profesor/salones/services/salon-mensajeria.facade';
-import { SalonMensajeriaTabComponent } from '../../../pages/profesor/salones/components/salon-mensajeria-tab/salon-mensajeria-tab.component';
+import { SalonMensajeriaFacade } from '@features/intranet/pages/shared/mensajeria/services/mensajeria.facade';
+import { SalonMensajeriaTabComponent } from '@features/intranet/pages/shared/mensajeria/components/mensajeria-tab/mensajeria-tab.component';
 import { EstudianteSalonCurso, HorarioProfesorDto } from '../models/estudiante.models';
 import { signal, DestroyRef } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { logger, withRetry } from '@core/helpers';
+import { PageHeaderComponent } from '@shared/components';
 
 @Component({
 	selector: 'app-estudiante-mensajeria',
 	standalone: true,
-	imports: [CommonModule, ProgressSpinnerModule, SalonMensajeriaTabComponent],
+	imports: [CommonModule, ProgressSpinnerModule, PageHeaderComponent, SalonMensajeriaTabComponent],
 	changeDetection: ChangeDetectionStrategy.OnPush,
 	styles: `
 		:host {
@@ -25,11 +26,6 @@ import { logger, withRetry } from '@core/helpers';
 			display: flex;
 			flex-direction: column;
 			padding: 0.75rem;
-		}
-		.page-title {
-			margin: 0 0 0.5rem 0.25rem;
-			font-size: 1.25rem;
-			font-weight: 700;
 		}
 		.tab-wrapper {
 			flex: 1;
@@ -45,15 +41,11 @@ import { logger, withRetry } from '@core/helpers';
 			.page-container {
 				padding: 0.5rem;
 			}
-			.page-title {
-				font-size: 1.1rem;
-				margin-bottom: 0.35rem;
-			}
 		}
 	`,
 	template: `
+		<app-page-header icon="pi pi-envelope" title="Mensajería" />
 		<div class="page-container">
-			<h2 class="page-title">Mensajería</h2>
 
 			@if (loading()) {
 				<div class="flex justify-content-center p-5">

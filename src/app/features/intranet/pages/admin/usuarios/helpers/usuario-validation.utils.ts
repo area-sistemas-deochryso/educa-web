@@ -1,4 +1,4 @@
-import type { CrearUsuarioRequest, ActualizarUsuarioRequest } from '@core/services';
+import type { CrearUsuarioRequest, ActualizarUsuarioRequest } from '../services';
 
 type UsuarioFormData = Partial<CrearUsuarioRequest & ActualizarUsuarioRequest>;
 
@@ -61,7 +61,8 @@ export function isUsuarioFormValid(
 	if (errors.correoApoderadoError) return false;
 	if (errors.nombreApoderadoError) return false;
 	if (errors.telefonoApoderadoError) return false;
-	// Si es profesor y tiene salón seleccionado, esTutor debe estar definido
+	// Regla de negocio: un profesor asignado a un salón DEBE indicar si es tutor de ese salón,
+	// porque el sistema usa esTutor para determinar responsabilidades adicionales (asistencia, notas, apoderados)
 	if (data.rol === 'Profesor' && data.salonId !== undefined && data.esTutor === undefined)
 		return false;
 	return true;

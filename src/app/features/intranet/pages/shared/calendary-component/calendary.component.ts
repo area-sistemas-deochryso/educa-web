@@ -1,7 +1,6 @@
 // #region Imports
 import { ChangeDetectionStrategy, Component, OnInit, AfterViewInit, signal, inject, PLATFORM_ID } from '@angular/core';
 import { isPlatformBrowser } from '@angular/common';
-import { HttpClient } from '@angular/common/http';
 import { ActivatedRoute } from '@angular/router';
 import { CalendarHeaderComponent } from '@features/intranet/components/calendar/calendar-header/calendar-header.component';
 import { CalendarLegendComponent } from '@features/intranet/components/calendar/calendar-legend/calendar-legend.component';
@@ -11,8 +10,8 @@ import { CalendarDay, CalendarMonth, ModalData } from './calendar.types';
 import { CalendarEvent, getEventFromList, isDateInEventRangeFromList, isDateEventEndFromList } from './events.config';
 import { isHoliday } from './holidays.config';
 import { CalendarUtilsService } from '@features/intranet/services/calendar/calendar-utils.service';
-import { environment } from '@config/environment';
-import { EventoCalendarioActivo } from '@core/services/eventos-calendario';
+import { EventosCalendarioService } from '@features/intranet/pages/admin/eventos-calendario/services';
+import { EventoCalendarioActivo } from '@data/models';
 import { logger } from '@core/helpers';
 
 // #endregion
@@ -31,10 +30,9 @@ import { logger } from '@core/helpers';
 })
 export class CalendaryComponent implements OnInit, AfterViewInit {
 	private platformId = inject(PLATFORM_ID);
-	private http = inject(HttpClient);
+	private eventosService = inject(EventosCalendarioService);
 	private route = inject(ActivatedRoute);
 	private calendarUtils = inject(CalendarUtilsService);
-	private readonly apiUrl = `${environment.apiUrl}/api/sistema/eventoscalendario`;
 
 	// #region State
 	calendar = signal<CalendarMonth[]>([]);
@@ -68,20 +66,18 @@ export class CalendaryComponent implements OnInit, AfterViewInit {
 	/** Fetches events from backend and generates calendar. */
 	private loadEventsFromApi(): void {
 		const year = this.currentYear();
-		this.http
-			.get<EventoCalendarioActivo[]>(`${this.apiUrl}/activos`, { params: { anio: year } })
-			.subscribe({
-				next: (response) => {
-					const mapped = (response ?? []).map((e) => this.mapApiToCalendarEvent(e));
-					this.events.set(mapped);
-					this.generateYearCalendar();
-				},
-				error: (err) => {
-					logger.error('[Calendar] Error loading events from API:', err);
-					this.events.set([]);
-					this.generateYearCalendar();
-				},
-			});
+		this.eventosService.getActivosPorAnio(year).subscribe({
+			next: (response) => {
+				const mapped = (response ?? []).map((e) => this.mapApiToCalendarEvent(e));
+				this.events.set(mapped);
+				this.generateYearCalendar();
+			},
+			error: (err) => {
+				logger.error('[Calendar] Error loading events from API:', err);
+				this.events.set([]);
+				this.generateYearCalendar();
+			},
+		});
 	}
 
 	private mapApiToCalendarEvent(e: EventoCalendarioActivo): CalendarEvent {

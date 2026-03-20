@@ -8,7 +8,9 @@ import {
 	HostListener,
 	ElementRef,
 	inject,
+	DestroyRef,
 } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { RouterLink, RouterLinkActive, Router, NavigationEnd } from '@angular/router';
 import { filter } from 'rxjs';
 
@@ -26,11 +28,12 @@ import { NavMenuItem } from '../mobile-menu';
 	styleUrl: './nav-item.component.scss',
 })
 export class NavItemComponent {
-	// * DOM access for click-outside and debug helpers.
+	// * Acceso al DOM para click-outside y helpers de debug.
 	private elementRef = inject(ElementRef);
 	private router = inject(Router);
+	private destroyRef = inject(DestroyRef);
 
-	// * Menu item inputs (route or child menu).
+	// * Inputs del item de menú (ruta o submenú).
 	@Input() route?: string;
 	@Input({ required: true }) label!: string;
 	@Input({ required: true }) icon!: string;
@@ -40,25 +43,28 @@ export class NavItemComponent {
 	isOpen = signal(false);
 
 	constructor() {
-		// * Close dropdown on navigation change.
+		// * Cerrar dropdown al cambiar de ruta.
 		this.router.events
-			.pipe(filter((event) => event instanceof NavigationEnd))
+			.pipe(
+				filter((event) => event instanceof NavigationEnd),
+				takeUntilDestroyed(this.destroyRef),
+			)
 			.subscribe(() => this.isOpen.set(false));
 	}
 
 	@HostListener('document:click', ['$event'])
 	onDocumentClick(event: MouseEvent): void {
-		// * Close menu when clicking outside.
+		// * Cerrar menú al hacer clic fuera.
 		if (!this.elementRef.nativeElement.contains(event.target)) {
 			this.isOpen.set(false);
 		}
 	}
 
 	toggle(): void {
-		// * Toggle dropdown and optionally log style diagnostics.
+		// * Toggle del dropdown y diagnóstico de estilos opcional.
 		this.isOpen.update((v) => !v);
 
-		// Debug: Log dropdown styles after DOM update
+		// Debug: Log de estilos del dropdown tras actualización del DOM
 		if (this.isOpen()) {
 			setTimeout(() => this.debugDropdownStyles(), 0);
 		}
@@ -106,7 +112,7 @@ export class NavItemComponent {
 			clipPath: styles.clipPath,
 		});
 
-		// Check parent overflow
+		// Verificar overflow del elemento padre
 		let parent = dropdown.parentElement;
 		let level = 0;
 		while (parent && level < 5) {

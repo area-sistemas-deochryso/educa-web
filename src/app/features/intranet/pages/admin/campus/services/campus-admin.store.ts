@@ -191,6 +191,18 @@ export class CampusAdminStore {
 		this._saving.set(saving);
 	}
 
+	updatePiso(id: number, updates: Partial<CampusPisoDto>): void {
+		this._pisos.update((pisos) =>
+			pisos.map((p) => (p.id === id ? { ...p, ...updates } : p)),
+		);
+	}
+
+	togglePisoEstado(id: number): void {
+		this._pisos.update((pisos) =>
+			pisos.map((p) => (p.id === id ? { ...p, estado: !p.estado } : p)),
+		);
+	}
+
 	// #endregion
 
 	// #region Comandos de editor

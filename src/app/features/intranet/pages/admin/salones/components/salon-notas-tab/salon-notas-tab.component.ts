@@ -7,8 +7,7 @@ import { SelectModule } from 'primeng/select';
 import { TagModule } from 'primeng/tag';
 import { TooltipModule } from 'primeng/tooltip';
 
-import { HorarioResponseDto } from '@features/intranet/pages/admin/horarios';
-import { SalonNotasResumenDto } from '@features/intranet/pages/profesor/models';
+import { HorarioResponseDto, SalonNotasResumenDto } from '@data/models';
 
 @Component({
 	selector: 'app-salon-notas-tab',

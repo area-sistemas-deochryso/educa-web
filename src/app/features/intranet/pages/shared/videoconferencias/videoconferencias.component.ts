@@ -5,6 +5,7 @@ import { ButtonModule } from 'primeng/button';
 import { TagModule } from 'primeng/tag';
 import { TooltipModule } from 'primeng/tooltip';
 import { ProgressSpinnerModule } from 'primeng/progressspinner';
+import { PageHeaderComponent } from '@shared/components';
 import { VideoconferenciasFacade } from './services/videoconferencias.facade';
 import { VideoconferenciaItem } from './services/videoconferencias.store';
 import { VideoconferenciaSalaComponent } from './components/videoconferencia-sala/videoconferencia-sala.component';
@@ -20,6 +21,7 @@ import { VideoconferenciaSalaComponent } from './components/videoconferencia-sal
 		TagModule,
 		TooltipModule,
 		ProgressSpinnerModule,
+		PageHeaderComponent,
 		VideoconferenciaSalaComponent,
 	],
 	changeDetection: ChangeDetectionStrategy.OnPush,

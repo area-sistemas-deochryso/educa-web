@@ -9,6 +9,7 @@ import { InputNumberModule } from 'primeng/inputnumber';
 import { ToastModule } from 'primeng/toast';
 import { MessageService } from 'primeng/api';
 
+import { PageHeaderComponent } from '@shared/components';
 import { SalonesAdminTableComponent } from '@features/intranet/pages/admin/salones/components/salones-admin-table/salones-admin-table.component';
 import { SalonDetailDialogComponent } from '@features/intranet/pages/admin/salones/components/salon-detail-dialog/salon-detail-dialog.component';
 import { AprobarEstudianteDto, AprobacionMasivaDto, NivelEducativo } from './models';
@@ -25,6 +26,7 @@ import { ProfesorFinalSalonesFacade } from './services/profesor-final-salones.fa
 		TagModule,
 		InputNumberModule,
 		ToastModule,
+		PageHeaderComponent,
 		SalonesAdminTableComponent,
 		SalonDetailDialogComponent,
 	],

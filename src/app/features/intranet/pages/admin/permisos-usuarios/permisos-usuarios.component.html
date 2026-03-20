@@ -1,16 +1,7 @@
 <!-- #region Template -->
 <div class="permisos-container">
 	<!-- * Header -->
-	<header class="page-header">
-		<div class="header-left">
-			<div class="header-icon">
-				<i class="pi pi-shield"></i>
-			</div>
-			<div class="header-text">
-				<h1>Administracion de Permisos</h1>
-				<p>Gestiona permisos personalizados por usuario</p>
-			</div>
-		</div>
+	<app-page-header icon="pi pi-shield" title="Administracion de Permisos" subtitle="Gestiona permisos personalizados por usuario">
 		<button
 			pButton
 			type="button"
@@ -20,7 +11,7 @@
 			aria-label="Refrescar datos"
 			(click)="refresh()"
 		></button>
-	</header>
+	</app-page-header>
 
 	<!-- * Filters -->
 	<section class="filters-section">

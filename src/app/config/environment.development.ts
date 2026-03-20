@@ -19,7 +19,7 @@ export const environment = {
 		calendario: true,
 		quickAccess: true,
 		notifications: true,
-		voiceRecognition: true,
+		voiceRecognition: false,
 		profesor: true,
 		estudiante: true,
 		ctestK6: true,

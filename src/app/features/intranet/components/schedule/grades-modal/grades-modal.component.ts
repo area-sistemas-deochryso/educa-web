@@ -1,5 +1,5 @@
 // #region Imports
-import { Component, EventEmitter, Input, Output, OnChanges, SimpleChanges } from '@angular/core';
+import { ChangeDetectionStrategy, Component, EventEmitter, Input, Output, OnChanges, SimpleChanges } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { DialogModule } from 'primeng/dialog';
@@ -35,6 +35,7 @@ export interface CourseGrades {
 	imports: [CommonModule, FormsModule, DialogModule],
 	templateUrl: './grades-modal.component.html',
 	styleUrl: './grades-modal.component.scss',
+	changeDetection: ChangeDetectionStrategy.OnPush,
 })
 /**
  * Grades modal with optional simulation mode.

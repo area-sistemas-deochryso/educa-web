@@ -18,9 +18,10 @@ import { DatePickerModule } from 'primeng/datepicker';
 import { IconFieldModule } from 'primeng/iconfield';
 import { InputIconModule } from 'primeng/inputicon';
 
-import { EventosCalendarioFacade } from './services/eventos-calendario.facade';
-import { EventosCalendarioStore, EventoFormData } from './services/eventos-calendario.store';
-import { EventoCalendarioLista } from '@core/services/eventos-calendario';
+import { PageHeaderComponent } from '@shared/components';
+import { EventosCalendarioFacade, EventosCalendarioStore } from './services';
+import type { EventoFormData } from './services';
+import { EventoCalendarioLista } from '@data/models';
 
 // #endregion
 // #region Implementation
@@ -44,6 +45,7 @@ import { EventoCalendarioLista } from '@core/services/eventos-calendario';
 		DatePickerModule,
 		IconFieldModule,
 		InputIconModule,
+		PageHeaderComponent,
 	],
 	providers: [ConfirmationService],
 	templateUrl: './eventos-calendario.component.html',

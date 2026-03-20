@@ -1,5 +1,5 @@
 // #region Imports
-import { Component, EventEmitter, OnInit, Output, ViewChild } from '@angular/core';
+import { ChangeDetectionStrategy, Component, EventEmitter, OnInit, Output, ViewChild } from '@angular/core';
 import { Menu, MenuModule } from 'primeng/menu';
 
 import { CommonModule } from '@angular/common';
@@ -25,6 +25,7 @@ export interface CalendarDay {
 	imports: [CommonModule, MenuModule, TooltipModule],
 	templateUrl: './schedule-calendar.component.html',
 	styleUrl: './schedule-calendar.component.scss',
+	changeDetection: ChangeDetectionStrategy.OnPush,
 })
 /**
  * Calendar view with month navigation and day actions.

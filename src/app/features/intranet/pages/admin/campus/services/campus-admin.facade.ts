@@ -34,6 +34,7 @@ export class CampusAdminFacade {
 	// #region Carga de datos
 
 	loadPisos(): void {
+		if (this.store.loading()) return;
 		this.store.setLoading(true);
 		this.api
 			.listarPisos()
@@ -64,6 +65,7 @@ export class CampusAdminFacade {
 	}
 
 	private loadPisoCompleto(pisoId: number): void {
+		if (this.store.editorLoading()) return;
 		this.store.setEditorLoading(true);
 		this.api
 			.getPisoCompleto(pisoId)
@@ -121,9 +123,9 @@ export class CampusAdminFacade {
 				takeUntilDestroyed(this.destroyRef),
 			)
 			.subscribe(() => {
+				this.store.updatePiso(id, dto);
 				this.store.setSaving(false);
 				this.store.closePisoDialog();
-				this.loadPisos();
 			});
 	}
 
@@ -138,7 +140,7 @@ export class CampusAdminFacade {
 				}),
 				takeUntilDestroyed(this.destroyRef),
 			)
-			.subscribe(() => this.loadPisos());
+			.subscribe(() => this.store.togglePisoEstado(id));
 	}
 
 	// #endregion

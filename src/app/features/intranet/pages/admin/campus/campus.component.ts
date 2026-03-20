@@ -11,7 +11,7 @@ import { TagModule } from 'primeng/tag';
 import { ToggleSwitchModule } from 'primeng/toggleswitch';
 import { TooltipModule } from 'primeng/tooltip';
 
-import { CampusAdminFacade } from './services/campus-admin.facade';
+import { CampusAdminFacade } from './services';
 import { CampusPisosPanelComponent } from './components/campus-pisos-panel/campus-pisos-panel.component';
 import { CampusEditorComponent } from './components/campus-editor/campus-editor.component';
 import {

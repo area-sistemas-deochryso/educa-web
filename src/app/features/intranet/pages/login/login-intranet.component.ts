@@ -1,4 +1,3 @@
-// #region Imports
 import { AppValidators, LoginFormGroup } from '@shared/validators';
 import {
 	AuthService,
@@ -31,8 +30,6 @@ import { logger } from '@core/helpers';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { UI_LOGIN_MESSAGES } from '@app/shared/constants';
 
-// #endregion
-// #region Implementation
 @Component({
 	selector: 'app-login-intranet',
 	changeDetection: ChangeDetectionStrategy.OnPush,
@@ -56,14 +53,16 @@ import { UI_LOGIN_MESSAGES } from '@app/shared/constants';
 	styleUrl: './login-intranet.component.scss',
 })
 export class LoginIntranetComponent implements OnInit {
+	// #region Dependencias
 	private fb = inject(FormBuilder);
 	private router = inject(Router);
 	private authService = inject(AuthService);
 	private userPermisosService = inject(UserPermisosService);
 	private swService = inject(SwService);
 	private destroyRef = inject(DestroyRef);
+	// #endregion
 
-	// * Typed reactive form with default role and validators.
+	// #region Form y estado
 	loginForm: LoginFormGroup = this.fb.group({
 		dni: this.fb.nonNullable.control('', [Validators.required, AppValidators.dni()]),
 		password: this.fb.nonNullable.control('', [Validators.required, Validators.minLength(4)]),
@@ -81,14 +80,15 @@ export class LoginIntranetComponent implements OnInit {
 	// * Stored sessions for quick-login (server-side, no passwords exposed).
 	storedSessions = signal<StoredSession[]>([]);
 
-	// * Role options rendered in the selector (order is intentional).
 	roles: RolOption[] = [
 		{ label: 'Estudiante', value: 'Estudiante' },
 		{ label: 'Profesor', value: 'Profesor' },
 		{ label: 'Director', value: 'Director' },
 		{ label: 'Asistente Administrativo', value: 'Asistente Administrativo' },
 	];
+	// #endregion
 
+	// #region Lifecycle
 	ngOnInit(): void {
 		// ! If already authenticated, skip login UI entirely.
 		if (this.authService.isAuthenticated) {
@@ -196,7 +196,9 @@ export class LoginIntranetComponent implements OnInit {
 	get isDisabled(): boolean {
 		return this.isBlocked || this.isLoading();
 	}
+	// #endregion
 
+	// #region Event handlers
 	onLogin(): void {
 		this.showError.set(false);
 		this.errorMessage.set('');
@@ -257,7 +259,10 @@ export class LoginIntranetComponent implements OnInit {
 
 	onForgotPassword(event: Event): void {
 		event.preventDefault();
-		// TODO: Implementar recuperacion de contrasena
+		// TODO: Implementar recuperación de contraseña.
+		// Flujo esperado: el usuario ingresa su DNI → backend envía un enlace/código al correo
+		// registrado → el usuario establece nueva contraseña. Requiere endpoint POST /api/auth/forgot-password
+		// y pantalla de reset. Mientras tanto, el Director puede resetear contraseñas manualmente desde Usuarios admin.
 	}
 
 	showForm(): void {
@@ -304,9 +309,11 @@ export class LoginIntranetComponent implements OnInit {
 	togglePasswordVisibility(): void {
 		this.showPassword.update((v) => !v);
 	}
+	// #endregion
 
+	// #region Helpers privados
 	private goBack(): void {
 		this.router.navigate(['/']);
 	}
+	// #endregion
 }
-// #endregion

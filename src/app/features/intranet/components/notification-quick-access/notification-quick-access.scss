@@ -1,6 +1,6 @@
 // #region Styles
 /* ===========================
-   Modern Sass Modules
+   Módulos Sass
 =========================== */
 
 @use 'sass:map';
@@ -27,8 +27,8 @@ $transition: 0.3s ease;
 $shadow-soft: 0 4px 12px rgba(0, 0, 0, 0.05);
 
 /* ===========================
-   Priority Colors (ONLY real colors)
-   âš ï¸ Sass cannot compute CSS vars
+   Colores de prioridad (solo colores reales)
+   Sass no puede computar CSS vars
 =========================== */
 
 $priority-map: (
@@ -106,7 +106,7 @@ $priority-map: (
 	transition: all $transition;
 
 	/* ===========================
-     Icon
+     Ícono
   =========================== */
 
 	.card-icon {
@@ -129,7 +129,7 @@ $priority-map: (
 			color: white;
 		}
 
-		/* Priority Variants */
+		/* Variantes de prioridad */
 		@each $level, $base in $priority-map {
 			&.badge-#{$level} {
 				@include gradient($base);
@@ -145,7 +145,7 @@ $priority-map: (
 	}
 
 	/* ===========================
-     Text Label
+     Etiqueta de texto
   =========================== */
 
 	> span {
@@ -171,15 +171,15 @@ $priority-map: (
 	}
 
 	/* ===========================
-     Disabled State (WCAG Fix)
-     ✅ Lighthouse Contrast Pass
+     Estado deshabilitado (WCAG)
+     Contraste aprobado por Lighthouse
   =========================== */
 
 	&.no-notifications {
 		opacity: 0.75;
 		filter: grayscale(20%);
 
-		/* Local Contrast Boost */
+		/* Boost de contraste local */
 		--qa-bg: #f2f2f2;
 		--qa-border: #a8a8a8;
 		--qa-icon-bg: #cfcfcf;
@@ -204,7 +204,7 @@ $priority-map: (
 	}
 
 	/* ===========================
-     Notification Active
+     Notificación activa
   =========================== */
 
 	&.notification-quick-access {
@@ -232,7 +232,7 @@ $priority-map: (
 }
 
 /* ===========================
-   Badge Counter
+   Contador de badge
 =========================== */
 
 .quick-badge {

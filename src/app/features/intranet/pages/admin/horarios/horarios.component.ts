@@ -9,8 +9,9 @@ import { DialogModule } from 'primeng/dialog';
 import { FormsModule } from '@angular/forms';
 import { CursoOption } from './models/curso.interface';
 import { HorarioDetailDrawerComponent } from './components/horario-detail-drawer/horario-detail-drawer.component';
+import { PageHeaderComponent } from '@shared/components';
 import { HorarioResponseDto } from './models/horario.interface';
-import { HorariosFacade } from './services/horarios.facade';
+import { HorariosCrudFacade, HorariosDataFacade, HorariosUiFacade } from './services';
 import { HorariosFiltersComponent } from './components/horarios-filters/horarios-filters.component';
 import { HorariosListViewComponent } from './components/horarios-list-view/horarios-list-view.component';
 import { HorariosStatsSkeletonComponent } from './components/horarios-stats-skeleton/horarios-stats-skeleton.component';
@@ -56,6 +57,7 @@ import {
 		HorariosStatsSkeletonComponent,
 		HorariosTableSkeletonComponent,
 		HorariosWeeklyViewComponent,
+		PageHeaderComponent,
 	],
 	templateUrl: './horarios.component.html',
 	styleUrl: './horarios.component.scss',
@@ -63,50 +65,49 @@ import {
 	providers: [ConfirmationService],
 })
 export class HorariosComponent implements OnInit {
-	private facade = inject(HorariosFacade);
+	private dataFacade = inject(HorariosDataFacade);
+	private crudFacade = inject(HorariosCrudFacade);
+	private uiFacade = inject(HorariosUiFacade);
 	private confirmationService = inject(ConfirmationService);
 
-	// * Store signals snapshot
-	readonly vm = this.facade.vm;
+	// * Store signals snapshot (all facades share the same store)
+	readonly vm = this.dataFacade.vm;
 
 	// #region Lifecycle
 	ngOnInit(): void {
-		// * Initial load
 		this.loadData();
 	}
 
 	// #endregion
 	// #region Métodos de carga
 	loadData(): void {
-		this.facade.loadAll();
+		this.dataFacade.loadAll();
 	}
 
 	refresh(): void {
-		// * Manual refresh
 		logger.log('Refrescando horarios...');
 		this.loadData();
 	}
 
 	onLazyLoad(event: { page: number; pageSize: number }): void {
-		this.facade.loadPage(event.page, event.pageSize);
+		this.dataFacade.loadPage(event.page, event.pageSize);
 	}
 
 	// #endregion
 	// #region Event handlers - CRUD
 	onNew(): void {
-		this.facade.openNewDialog();
+		this.uiFacade.openNewDialog();
 	}
 
 	onEdit(id: number): void {
-		this.facade.openEditDialog(id);
+		this.uiFacade.openEditDialog(id);
 	}
 
 	onViewDetail(id: number): void {
-		this.facade.loadDetalle(id);
+		this.dataFacade.loadDetalle(id);
 	}
 
 	onToggleEstado(id: number, estadoActual: boolean): void {
-		// ! Confirm before toggling active state.
 		const accion = estadoActual ? 'desactivar' : 'activar';
 		const header = estadoActual
 			? UI_CONFIRM_HEADERS.deactivateHorario
@@ -119,13 +120,12 @@ export class HorariosComponent implements OnInit {
 			acceptLabel: UI_CONFIRM_LABELS.yes,
 			rejectLabel: UI_CONFIRM_LABELS.no,
 			accept: () => {
-				this.facade.toggleEstado(id, estadoActual);
+				this.crudFacade.toggleEstado(id, estadoActual);
 			},
 		});
 	}
 
 	onDelete(id: number): void {
-		// ! Confirm before delete.
 		const horario = this.vm().horarios.find((h) => h.id === id);
 		if (!horario) return;
 
@@ -142,7 +142,7 @@ export class HorariosComponent implements OnInit {
 			rejectLabel: UI_CONFIRM_LABELS.cancel,
 			acceptButtonStyleClass: 'p-button-danger',
 			accept: () => {
-				this.facade.delete(id);
+				this.crudFacade.delete(id);
 			},
 		});
 	}
@@ -150,37 +150,36 @@ export class HorariosComponent implements OnInit {
 	// #endregion
 	// #region Event handlers - Filtros
 	onFiltroSalonChange(salonId: number | null): void {
-		this.facade.setFiltroSalon(salonId);
+		this.dataFacade.setFiltroSalon(salonId);
 	}
 
 	onFiltroProfesorChange(profesorId: number | null): void {
-		this.facade.setFiltroProfesor(profesorId);
+		this.dataFacade.setFiltroProfesor(profesorId);
 	}
 
 	onFiltroDiaSemanaChange(diaSemana: number | null): void {
-		this.facade.setFiltroDiaSemana(diaSemana);
+		this.dataFacade.setFiltroDiaSemana(diaSemana);
 	}
 
 	onFiltroEstadoChange(estadoActivo: boolean | null): void {
-		this.facade.setFiltroEstadoActivo(estadoActivo);
+		this.dataFacade.setFiltroEstadoActivo(estadoActivo);
 	}
 
 	onClearFiltros(): void {
-		this.facade.clearFiltros();
+		this.dataFacade.clearFiltros();
 	}
 
 	// #endregion
 	// #region Event handlers - Wizard Dialog
 	onNextStep(): void {
-		this.facade.nextWizardStep();
+		this.uiFacade.nextWizardStep();
 	}
 
 	onPrevStep(): void {
-		this.facade.prevWizardStep();
+		this.uiFacade.prevWizardStep();
 	}
 
 	onSaveHorario(): void {
-		// ! Create/update schedule from wizard form.
 		const formData = this.vm().formData;
 		const editingId = this.vm().editingId;
 		const currentUser = this.vm().currentUser;
@@ -191,8 +190,7 @@ export class HorariosComponent implements OnInit {
 		}
 
 		if (editingId === null) {
-			// CREAR - Solo datos básicos, profesor y estudiantes se asignan después
-			this.facade.create({
+			this.crudFacade.create({
 				diaSemana: formData.diaSemana!,
 				horaInicio: formData.horaInicio,
 				horaFin: formData.horaFin,
@@ -201,8 +199,7 @@ export class HorariosComponent implements OnInit {
 				usuarioReg: currentUser.dni || currentUser.nombreCompleto,
 			});
 		} else {
-			// EDITAR
-			this.facade.update(editingId, {
+			this.crudFacade.update(editingId, {
 				id: editingId,
 				diaSemana: formData.diaSemana!,
 				horaInicio: formData.horaInicio,
@@ -215,13 +212,13 @@ export class HorariosComponent implements OnInit {
 	}
 
 	onCancelDialog(): void {
-		this.facade.closeDialog();
+		this.uiFacade.closeDialog();
 	}
 
 	// #endregion
 	// #region Event handlers - Detail Drawer
 	onCloseDetailDrawer(): void {
-		this.facade.closeDetailDrawer();
+		this.uiFacade.closeDetailDrawer();
 	}
 
 	// #endregion
@@ -230,7 +227,7 @@ export class HorariosComponent implements OnInit {
 		const currentUser = this.vm().currentUser;
 		if (!currentUser) return;
 
-		this.facade.asignarProfesor({
+		this.crudFacade.asignarProfesor({
 			horarioId,
 			profesorId,
 			usuarioMod: currentUser.dni || currentUser.nombreCompleto,
@@ -248,7 +245,7 @@ export class HorariosComponent implements OnInit {
 			acceptLabel: UI_CONFIRM_LABELS.yesAssignAll,
 			rejectLabel: UI_CONFIRM_LABELS.cancel,
 			accept: () => {
-				this.facade.asignarTodosEstudiantes(
+				this.crudFacade.asignarTodosEstudiantes(
 					horarioId,
 					currentUser.dni || currentUser.nombreCompleto,
 				);
@@ -268,7 +265,7 @@ export class HorariosComponent implements OnInit {
 			rejectLabel: UI_CONFIRM_LABELS.cancel,
 			acceptButtonStyleClass: 'p-button-danger',
 			accept: () => {
-				this.facade.desasignarProfesor(
+				this.crudFacade.desasignarProfesor(
 					horarioId,
 					currentUser.dni || currentUser.nombreCompleto,
 				);
@@ -285,7 +282,7 @@ export class HorariosComponent implements OnInit {
 			rejectLabel: UI_CONFIRM_LABELS.cancel,
 			acceptButtonStyleClass: 'p-button-danger',
 			accept: () => {
-				this.facade.desasignarEstudiante(horarioId, estudianteId);
+				this.crudFacade.desasignarEstudiante(horarioId, estudianteId);
 			},
 		});
 	}
@@ -293,21 +290,21 @@ export class HorariosComponent implements OnInit {
 	// #endregion
 	// #region Event handlers - Vista
 	onCambiarVista(vista: 'semanal' | 'lista'): void {
-		this.facade.setVistaActual(vista);
+		this.dataFacade.setVistaActual(vista);
 	}
 
 	// #endregion
 	// #region Event handlers - Modal de Cursos
 	onOpenCursoDialog(): void {
-		this.facade.openCursoDialog();
+		this.uiFacade.openCursoDialog();
 	}
 
 	onCloseCursoDialog(): void {
-		this.facade.closeCursoDialog();
+		this.uiFacade.closeCursoDialog();
 	}
 
 	onSelectCurso(cursoId: number): void {
-		this.facade.selectCurso(cursoId);
+		this.uiFacade.selectCurso(cursoId);
 	}
 
 	// #endregion

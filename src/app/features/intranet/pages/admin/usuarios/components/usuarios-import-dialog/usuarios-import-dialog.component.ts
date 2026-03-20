@@ -9,7 +9,7 @@ import { ProgressSpinnerModule } from 'primeng/progressspinner';
 import { SelectModule } from 'primeng/select';
 import { TableModule } from 'primeng/table';
 import { TagModule } from 'primeng/tag';
-import { ImportarEstudianteItem, ImportarEstudiantesResponse } from '@core/services';
+import { ImportarEstudianteItem, ImportarEstudiantesResponse } from '../../services';
 import {
 	EstudianteImportRow,
 	SHEET_TO_GRADO,

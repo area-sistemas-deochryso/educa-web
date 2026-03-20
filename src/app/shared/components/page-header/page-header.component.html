@@ -1,0 +1,14 @@
+<!-- #region Template -->
+<div class="page-header">
+	<i [class]="icon()"></i>
+	<div class="title-container">
+		<h2>{{ title() }}</h2>
+		@if (subtitle(); as sub) {
+			<p>{{ sub }}</p>
+		}
+	</div>
+	<div class="header-actions">
+		<ng-content />
+	</div>
+</div>
+<!-- #endregion -->

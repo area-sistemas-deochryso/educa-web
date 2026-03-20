@@ -119,8 +119,10 @@ export class HorariosApiService {
   // #region Estadísticas
 
   getEstadisticas(): Observable<HorariosEstadisticas | null> {
-    // TODO: Implementar endpoint de estadísticas en el backend
-    // Por ahora, calcular estadísticas en frontend
+    // TODO: Implementar endpoint GET /api/horarios/estadisticas en el backend.
+    // Actualmente las estadísticas se calculan en frontend a partir de la lista de horarios,
+    // lo que funciona pero es ineficiente con paginación (solo cuenta la página actual).
+    // Bloqueante para: stats precisas con muchos horarios. Workaround actual: facade calcula desde array local.
     return of(null);
   }
   // #endregion

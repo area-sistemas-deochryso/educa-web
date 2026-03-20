@@ -8,7 +8,9 @@ import { TooltipModule } from 'primeng/tooltip';
 import { TabsModule } from 'primeng/tabs';
 import { ConfirmDialogModule } from 'primeng/confirmdialog';
 import { ConfirmationService } from 'primeng/api';
-import { CursoContenidoFacade } from '../../services/curso-contenido.facade';
+import { CursoContenidoDataFacade } from '../../services/curso-contenido-data.facade';
+import { CursoContenidoCrudFacade } from '../../services/curso-contenido-crud.facade';
+import { CursoContenidoUiFacade } from '../../services/curso-contenido-ui.facade';
 import { CalificacionesFacade } from '../../services/calificaciones.facade';
 import {
 	CursoContenidoSemanaDto,
@@ -62,11 +64,13 @@ import { PeriodosConfigDialogComponent } from '../periodos-config-dialog/periodo
 	styleUrl: './curso-content-dialog.component.scss',
 })
 export class CursoContentDialogComponent {
-	private readonly facade = inject(CursoContenidoFacade);
+	private readonly dataFacade = inject(CursoContenidoDataFacade);
+	private readonly crudFacade = inject(CursoContenidoCrudFacade);
+	private readonly uiFacade = inject(CursoContenidoUiFacade);
 	private readonly calFacade = inject(CalificacionesFacade);
 	private readonly confirmationService = inject(ConfirmationService);
 
-	readonly vm = this.facade.vm;
+	readonly vm = this.uiFacade.vm;
 	readonly calVm = this.calFacade.vm;
 
 	// #region Estado local
@@ -141,7 +145,7 @@ export class CursoContentDialogComponent {
 
 	onVisibleChange(visible: boolean): void {
 		if (!visible) {
-			this.facade.closeContentDialog();
+			this.uiFacade.closeContentDialog();
 			this.calFacade.resetCalificaciones();
 			this.searchQuery.set('');
 			this.activeTab.set('0');
@@ -157,26 +161,26 @@ export class CursoContentDialogComponent {
 		if (initialTab) {
 			this.activeTab.set(initialTab);
 			this.onTabChange(initialTab);
-			this.facade.clearInitialTab();
+			this.uiFacade.clearInitialTab();
 		}
 	}
 
 	// #endregion
 	// #region Semana actions
 	onEditSemana(semana: CursoContenidoSemanaDto): void {
-		this.facade.openSemanaEditDialog(semana);
+		this.uiFacade.openSemanaEditDialog(semana);
 	}
 
 	onSemanaEditVisibleChange(visible: boolean): void {
 		if (!visible) {
-			this.facade.closeSemanaEditDialog();
+			this.uiFacade.closeSemanaEditDialog();
 		}
 	}
 
 	onSaveSemana(request: { titulo: string | null; descripcion: string | null; mensajeDocente: string | null }): void {
 		const semana = this.vm().selectedSemana;
 		if (semana) {
-			this.facade.actualizarSemana(semana.id, request);
+			this.crudFacade.actualizarSemana(semana.id, request);
 		}
 	}
 
@@ -187,7 +191,7 @@ export class CursoContentDialogComponent {
 		const file = input.files?.[0];
 		if (file) {
 			this.activeSemanaId.set(semanaId);
-			this.facade.uploadArchivo(semanaId, file);
+			this.crudFacade.uploadArchivo(semanaId, file);
 		}
 		input.value = '';
 	}
@@ -201,7 +205,7 @@ export class CursoContentDialogComponent {
 			rejectLabel: 'Cancelar',
 			acceptButtonStyleClass: 'p-button-danger',
 			accept: () => {
-				this.facade.eliminarArchivo(semanaId, archivoId);
+				this.crudFacade.eliminarArchivo(semanaId, archivoId);
 			},
 		});
 	}
@@ -216,7 +220,7 @@ export class CursoContentDialogComponent {
 		const input = event.target as HTMLInputElement;
 		const file = input.files?.[0];
 		if (file) {
-			this.facade.uploadTareaArchivo(semanaId, tareaId, file);
+			this.crudFacade.uploadTareaArchivo(semanaId, tareaId, file);
 		}
 		input.value = '';
 	}
@@ -230,7 +234,7 @@ export class CursoContentDialogComponent {
 			rejectLabel: 'Cancelar',
 			acceptButtonStyleClass: 'p-button-danger',
 			accept: () => {
-				this.facade.eliminarTareaArchivo(semanaId, tareaId, archivoId);
+				this.crudFacade.eliminarTareaArchivo(semanaId, tareaId, archivoId);
 			},
 		});
 	}
@@ -238,23 +242,23 @@ export class CursoContentDialogComponent {
 	// #endregion
 	// #region Tarea actions
 	onAddTarea(): void {
-		this.facade.openTareaDialog(null);
+		this.uiFacade.openTareaDialog(null);
 	}
 
 	onEditTarea(tarea: CursoContenidoTareaDto): void {
-		this.facade.openTareaDialog(tarea);
+		this.uiFacade.openTareaDialog(tarea);
 	}
 
 	onTareaVisibleChange(visible: boolean): void {
 		if (!visible) {
-			this.facade.closeTareaDialog();
+			this.uiFacade.closeTareaDialog();
 		}
 	}
 
 	onCreateTarea(request: CrearTareaRequest): void {
 		const semana = this.getActiveSemanaForTarea();
 		if (semana) {
-			this.facade.crearTarea(semana.id, request);
+			this.crudFacade.crearTarea(semana.id, request);
 		}
 	}
 
@@ -262,7 +266,7 @@ export class CursoContentDialogComponent {
 		const semana = this.getActiveSemanaForTarea();
 		const tarea = this.vm().selectedTarea;
 		if (semana && tarea) {
-			this.facade.actualizarTarea(semana.id, tarea.id, request);
+			this.crudFacade.actualizarTarea(semana.id, tarea.id, request);
 		}
 	}
 
@@ -275,7 +279,7 @@ export class CursoContentDialogComponent {
 			rejectLabel: 'Cancelar',
 			acceptButtonStyleClass: 'p-button-danger',
 			accept: () => {
-				this.facade.eliminarTarea(semanaId, tareaId);
+				this.crudFacade.eliminarTarea(semanaId, tareaId);
 			},
 		});
 	}
@@ -283,62 +287,62 @@ export class CursoContentDialogComponent {
 	// #endregion
 	// #region Sub-modal handlers
 	onOpenArchivosSummary(): void {
-		this.facade.openArchivosSummaryDialog();
+		this.uiFacade.openArchivosSummaryDialog();
 	}
 
 	onArchivosSummaryVisibleChange(visible: boolean): void {
 		if (!visible) {
-			this.facade.closeArchivosSummaryDialog();
+			this.uiFacade.closeArchivosSummaryDialog();
 		}
 	}
 
 	onOpenTareasSummary(): void {
-		this.facade.openTareasSummaryDialog();
+		this.uiFacade.openTareasSummaryDialog();
 	}
 
 	onTareasSummaryVisibleChange(visible: boolean): void {
 		if (!visible) {
-			this.facade.closeTareasSummaryDialog();
+			this.uiFacade.closeTareasSummaryDialog();
 		}
 	}
 
 	onOpenStudentFiles(): void {
 		const contenido = this.vm().contenido;
 		if (contenido) {
-			this.facade.openStudentFilesDialog(contenido.id);
+			this.uiFacade.openStudentFilesDialog(contenido.id);
 		}
 	}
 
 	onStudentFilesVisibleChange(visible: boolean): void {
 		if (!visible) {
-			this.facade.closeStudentFilesDialog();
+			this.uiFacade.closeStudentFilesDialog();
 		}
 	}
 
 	onStudentFilesIrACalificaciones(): void {
-		this.facade.closeStudentFilesDialog();
+		this.uiFacade.closeStudentFilesDialog();
 		this.onTabChange('1');
 	}
 
 	onViewTaskSubmissions(tarea: CursoContenidoTareaDto): void {
-		this.facade.openTaskSubmissionsDialog(tarea);
+		this.uiFacade.openTaskSubmissionsDialog(tarea);
 	}
 
 	onTaskSubmissionsVisibleChange(visible: boolean): void {
 		if (!visible) {
-			this.facade.closeTaskSubmissionsDialog();
+			this.uiFacade.closeTaskSubmissionsDialog();
 		}
 	}
 
 	onTaskSubmissionsIrACalificaciones(): void {
-		this.facade.closeTaskSubmissionsDialog();
+		this.uiFacade.closeTaskSubmissionsDialog();
 		this.onTabChange('1');
 	}
 
 	// #endregion
 	// #region Refresh handlers
 	onRefreshContenido(): void {
-		this.facade.refreshContenido();
+		this.dataFacade.refreshContenido();
 	}
 
 	onRefreshCalificaciones(): void {
@@ -462,7 +466,7 @@ export class CursoContentDialogComponent {
 			rejectLabel: 'Cancelar',
 			acceptButtonStyleClass: 'p-button-danger',
 			accept: () => {
-				this.facade.eliminarContenido(contenido.id);
+				this.dataFacade.eliminarContenido(contenido.id);
 			},
 		});
 	}

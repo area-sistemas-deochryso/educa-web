@@ -5,11 +5,11 @@ import { forkJoin } from 'rxjs';
 import { logger, withRetry } from '@core/helpers';
 import { ErrorHandlerService } from '@core/services';
 import {
-	NotificacionesAdminService,
 	NotificacionLista,
 	CrearNotificacionRequest,
 	ActualizarNotificacionRequest,
-} from '@core/services/notificaciones-admin';
+} from '@data/models';
+import { NotificacionesAdminService } from './notificaciones-admin.service';
 import { UI_ADMIN_ERROR_DETAILS, UI_SUMMARIES } from '@app/shared/constants';
 
 import { NotificacionesAdminStore, NotificacionFormData } from './notificaciones-admin.store';

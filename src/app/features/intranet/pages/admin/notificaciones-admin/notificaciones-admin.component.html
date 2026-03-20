@@ -1,25 +1,19 @@
 <!-- #region Header -->
-<div class="page-header">
-	<div class="header-left">
-		<h2><i class="pi pi-bell"></i> Gestión de Notificaciones</h2>
-		<p class="subtitle">Administra las notificaciones que ven los usuarios del sistema</p>
-	</div>
-	<div class="header-right">
-		<p-select
-			[options]="[{ label: '2025', value: 2025 }, { label: '2026', value: 2026 }, { label: '2027', value: 2027 }]"
-			[ngModel]="vm().filterAnio"
-			(ngModelChange)="onChangeAnio($event)"
-			appendTo="body"
-			placeholder="Año"
-		/>
-		<button
-			pButton
-			label="Nueva Notificación"
-			icon="pi pi-plus"
-			(click)="onNew()"
-		></button>
-	</div>
-</div>
+<app-page-header icon="pi pi-bell" title="Gestión de Notificaciones" subtitle="Administra las notificaciones que ven los usuarios del sistema">
+	<p-select
+		[options]="[{ label: '2025', value: 2025 }, { label: '2026', value: 2026 }, { label: '2027', value: 2027 }]"
+		[ngModel]="vm().filterAnio"
+		(ngModelChange)="onChangeAnio($event)"
+		appendTo="body"
+		placeholder="Año"
+	/>
+	<button
+		pButton
+		label="Nueva Notificación"
+		icon="pi pi-plus"
+		(click)="onNew()"
+	></button>
+</app-page-header>
 <!-- #endregion -->
 
 <!-- #region Stats -->

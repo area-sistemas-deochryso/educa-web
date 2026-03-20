@@ -69,6 +69,13 @@ export class PathfindingService {
 	// #endregion
 	// #region A* Algorithm
 
+	/**
+	 * A* pathfinding: encuentra la ruta más corta entre dos nodos del campus.
+	 * - openSet: nodos candidatos ordenados por f = g + h (costo real + heurística)
+	 * - closedSet: nodos ya evaluados (evita revisitar)
+	 * - gScore: costo acumulado real desde el inicio hasta cada nodo
+	 * Retorna null si no existe ruta (nodos desconectados o bloqueados).
+	 */
 	private astar(
 		startId: string,
 		endId: string,
@@ -129,8 +136,10 @@ export class PathfindingService {
 	}
 
 	/**
-	 * Heurística: Distancia euclidiana + penalización por cambio de piso.
-	 * La penalización simula el tiempo extra de subir/bajar escaleras.
+	 * Heurística: Distancia euclidiana normalizada + penalización por cambio de piso.
+	 * - /50: normaliza coordenadas SVG (que van de 0~1000) a unidades comparables con las distancias de aristas.
+	 * - floorPenalty 200: equivale a recorrer ~200 unidades de distancia por piso, lo que hace que
+	 *   el algoritmo prefiera rutas en el mismo piso antes que subir/bajar escaleras (refleja el tiempo real).
 	 */
 	private heuristic(a: CampusNode, b: CampusNode): number {
 		const dx = a.x - b.x;
@@ -155,6 +164,11 @@ export class PathfindingService {
 	// #endregion
 	// #region Graph Construction
 
+	/**
+	 * Construye lista de adyacencia del grafo excluyendo caminos bloqueados.
+	 * Bloqueados se registran bidireccionalmente ("A→B" y "B→A") porque un pasillo
+	 * cerrado impide el tránsito en ambas direcciones.
+	 */
 	private buildAdjacencyList(
 		edges: CampusEdge[],
 		blockedPaths: BlockedPath[],

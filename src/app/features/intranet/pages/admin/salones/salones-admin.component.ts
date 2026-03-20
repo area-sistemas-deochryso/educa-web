@@ -9,7 +9,8 @@ import { InputNumberModule } from 'primeng/inputnumber';
 import { ToastModule } from 'primeng/toast';
 import { MessageService } from 'primeng/api';
 
-import { SalonesAdminFacade } from './services/salones-admin.facade';
+import { PageHeaderComponent } from '@shared/components';
+import { SalonesAdminFacade } from './services';
 import { SalonesAdminTableComponent } from './components/salones-admin-table/salones-admin-table.component';
 import { ConfigCalificacionDialogComponent } from './components/config-calificacion-dialog/config-calificacion-dialog.component';
 import { CerrarPeriodoDialogComponent } from './components/cerrar-periodo-dialog/cerrar-periodo-dialog.component';
@@ -34,6 +35,7 @@ import {
 		TagModule,
 		InputNumberModule,
 		ToastModule,
+		PageHeaderComponent,
 		SalonesAdminTableComponent,
 		ConfigCalificacionDialogComponent,
 		CerrarPeriodoDialogComponent,

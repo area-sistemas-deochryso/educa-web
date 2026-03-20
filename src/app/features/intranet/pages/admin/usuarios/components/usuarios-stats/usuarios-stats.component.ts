@@ -1,6 +1,6 @@
 // #region Imports
 import { ChangeDetectionStrategy, Component, input } from '@angular/core';
-import { UsuariosEstadisticas } from '@core/services';
+import { UsuariosEstadisticas } from '../../services';
 
 /**
  * Componente presentacional para las estadísticas de usuarios

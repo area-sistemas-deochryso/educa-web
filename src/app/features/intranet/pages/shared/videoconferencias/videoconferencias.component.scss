@@ -1,23 +1,3 @@
-// #region Page Layout
-.page-header {
-	display: flex;
-	align-items: center;
-	gap: 1rem;
-}
-
-.page-icon {
-	width: 48px;
-	height: 48px;
-	background: #1e3a5f;
-	border-radius: 12px;
-	display: flex;
-	align-items: center;
-	justify-content: center;
-	flex-shrink: 0;
-	color: #fff;
-}
-// #endregion
-
 // #region Empty/Error States
 .state-container {
 	display: flex;

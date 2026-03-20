@@ -1,17 +1,18 @@
 import { Component, ChangeDetectionStrategy, computed, inject, signal, OnInit, OnDestroy, DestroyRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ProgressSpinnerModule } from 'primeng/progressspinner';
+import { PageHeaderComponent } from '@shared/components';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { logger, withRetry } from '@core/helpers';
 import { EstudianteApiService } from '../services/estudiante-api.service';
-import { SalonMensajeriaFacade } from '../../profesor/salones/services/salon-mensajeria.facade';
-import { SalonForoTabComponent } from '../../profesor/salones/components/salon-foro-tab/salon-foro-tab.component';
+import { SalonMensajeriaFacade } from '@features/intranet/pages/shared/mensajeria/services/mensajeria.facade';
+import { SalonForoTabComponent } from '@features/intranet/pages/shared/mensajeria/components/foro-tab/foro-tab.component';
 import { HorarioProfesorDto } from '../models/estudiante.models';
 
 @Component({
 	selector: 'app-estudiante-foro',
 	standalone: true,
-	imports: [CommonModule, ProgressSpinnerModule, SalonForoTabComponent],
+	imports: [CommonModule, ProgressSpinnerModule, PageHeaderComponent, SalonForoTabComponent],
 	changeDetection: ChangeDetectionStrategy.OnPush,
 	styles: `
 		:host {
@@ -23,8 +24,8 @@ import { HorarioProfesorDto } from '../models/estudiante.models';
 		}
 	`,
 	template: `
-		<div class="page-container p-4">
-			<h2 class="mt-0 mb-3">Foro</h2>
+		<app-page-header icon="pi pi-comments" title="Foro" />
+		<div class="page-container p-4 pt-0">
 
 			@if (loading()) {
 				<div class="flex justify-content-center p-5">

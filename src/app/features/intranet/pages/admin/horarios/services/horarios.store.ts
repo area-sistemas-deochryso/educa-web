@@ -352,22 +352,47 @@ export class HorariosStore {
   readonly filtroDiaSemanaHabilitado = computed(() => this.vistaActual() === 'lista');
 
   // #endregion
-  // #region ViewModel consolidado
-  readonly vm = computed(() => ({
+  // #region Sub-ViewModels (agrupados por responsabilidad)
+
+  /** Datos de la tabla y detalle */
+  readonly dataVm = computed(() => ({
     horarios: this.horarios(),
     horariosFiltrados: this.horariosFiltrados(),
     horariosSemanales: this.horariosSemanales(),
     horarioDetalle: this.horarioDetalle(),
     estadisticas: this.estadisticas(),
+    totalHorarios: this.totalHorarios(),
+    horariosActivos: this.horariosActivos(),
+    horariosInactivos: this.horariosInactivos(),
+    horariosSinProfesor: this.horariosSinProfesor(),
+    isEmpty: this.horarios().length === 0,
+  }));
+
+  /** Estado de UI: loading, dialogs, vista, filtros */
+  readonly uiVm = computed(() => ({
     loading: this.loading(),
     error: this.error(),
     statsLoading: this.statsLoading(),
     detailLoading: this.detailLoading(),
+    optionsLoading: this.optionsLoading(),
+    statsReady: this.statsReady(),
+    tableReady: this.tableReady(),
     dialogVisible: this.dialogVisible(),
     detailDrawerVisible: this.detailDrawerVisible(),
-    wizardStep: this.wizardStep(),
+    cursoDialogVisible: this._state().cursoDialogVisible,
+    vistaActual: this.vistaActual(),
+    vistaSemanalHabilitada: this.vistaSemanalHabilitada(),
+    filtroDiaSemanaHabilitado: this.filtroDiaSemanaHabilitado(),
+    currentUser: this.currentUser(),
+    isAdmin: this.isAdmin(),
+    currentProfesorId: this.currentProfesorId(),
+  }));
+
+  /** Formulario wizard */
+  readonly formVm = computed(() => ({
     formData: this.formData(),
     editingId: this.editingId(),
+    wizardStep: this.wizardStep(),
     isCreating: this.isCreating(),
     isEditing: this.isEditing(),
     formValid: this.formValid(),
@@ -376,38 +401,35 @@ export class HorariosStore {
     canGoNextStep: this.canGoNextStep(),
     canGoPrevStep: this.canGoPrevStep(),
     isLastStep: this.isLastStep(),
-    totalHorarios: this.totalHorarios(),
-    horariosActivos: this.horariosActivos(),
-    horariosInactivos: this.horariosInactivos(),
-    horariosSinProfesor: this.horariosSinProfesor(),
-    isEmpty: this.horarios().length === 0,
+  }));
+
+  /** Opciones para dropdowns y filtros */
+  readonly optionsVm = computed(() => ({
+    salonesOptions: this.salonesOptions(),
+    cursosOptions: this.cursosOptions(),
+    cursosPorNivel: this.cursosPorNivel(),
+    profesoresOptions: this.profesoresOptions(),
+    filtroSalonId: this._state().filtroSalonId,
+    filtroProfesorId: this._state().filtroProfesorId,
+    filtroDiaSemana: this._state().filtroDiaSemana,
+    filtroEstadoActivo: this._state().filtroEstadoActivo,
     hasFilters:
       this._state().filtroSalonId !== null ||
       this._state().filtroProfesorId !== null ||
       this._state().filtroDiaSemana !== null ||
       this._state().filtroEstadoActivo !== null,
-    // Filtros actuales
-    filtroSalonId: this._state().filtroSalonId,
-    filtroProfesorId: this._state().filtroProfesorId,
-    filtroDiaSemana: this._state().filtroDiaSemana,
-    filtroEstadoActivo: this._state().filtroEstadoActivo,
-    currentUser: this.currentUser(),
-    isAdmin: this.isAdmin(),
-    currentProfesorId: this.currentProfesorId(),
-    vistaActual: this.vistaActual(),
-    vistaSemanalHabilitada: this.vistaSemanalHabilitada(),
-    filtroDiaSemanaHabilitado: this.filtroDiaSemanaHabilitado(),
-    salonesOptions: this.salonesOptions(),
-    cursosOptions: this.cursosOptions(),
-    cursosPorNivel: this.cursosPorNivel(),
-    profesoresOptions: this.profesoresOptions(),
-    cursoDialogVisible: this._state().cursoDialogVisible,
-    optionsLoading: this.optionsLoading(),
-    statsReady: this.statsReady(),
-    tableReady: this.tableReady(),
     page: this.page(),
     pageSize: this.pageSize(),
     totalRecords: this.totalRecords(),
+  }));
+
+  // #endregion
+  // #region ViewModel consolidado (compone sub-VMs)
+  readonly vm = computed(() => ({
+    ...this.dataVm(),
+    ...this.uiVm(),
+    ...this.formVm(),
+    ...this.optionsVm(),
   }));
 
   // #endregion

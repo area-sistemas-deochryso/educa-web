@@ -4,8 +4,14 @@ import { ButtonModule } from 'primeng/button';
 import { CommonModule } from '@angular/common';
 import { ConfirmDialogModule } from 'primeng/confirmdialog';
 import { ConfirmationService } from 'primeng/api';
-import { ROLES_USUARIOS_ADMIN, RolUsuarioAdmin, UsuarioLista } from '@core/services';
-import { UsuariosFacade } from './usuarios.facade';
+import {
+	UsuariosCrudFacade,
+	UsuariosDataFacade,
+	UsuariosUiFacade,
+	ROLES_USUARIOS_ADMIN,
+	RolUsuarioAdmin,
+	UsuarioLista,
+} from './services';
 import { UsuariosHeaderComponent } from './components/usuarios-header/usuarios-header.component';
 import { UsuariosStatsComponent } from './components/usuarios-stats/usuarios-stats.component';
 import { UsuariosStatsSkeletonComponent } from './components/usuarios-stats-skeleton/usuarios-stats-skeleton.component';
@@ -27,7 +33,7 @@ import {
 	UI_CONFIRM_LABELS,
 	buildToggleUsuarioMessage,
 } from '@app/shared/constants';
-import type { ImportarEstudianteItem } from '@core/services';
+import type { ImportarEstudianteItem } from './services';
 
 // #endregion
 // #region Implementation
@@ -54,11 +60,13 @@ import type { ImportarEstudianteItem } from '@core/services';
 	changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class UsuariosComponent implements AfterViewInit {
-	private facade = inject(UsuariosFacade);
+	private dataFacade = inject(UsuariosDataFacade);
+	private crudFacade = inject(UsuariosCrudFacade);
+	private uiFacade = inject(UsuariosUiFacade);
 	private confirmationService = inject(ConfirmationService);
 
-	// * View-model snapshot from facade (signals).
-	readonly vm = this.facade.vm;
+	// * View-model snapshot from data facade (signals).
+	readonly vm = this.dataFacade.vm;
 
 	// * Static filter options for roles/estado.
 	readonly filterOptions: FilterOptions = {
@@ -91,7 +99,7 @@ export class UsuariosComponent implements AfterViewInit {
 	constructor() {
 		// Disparar carga en constructor para que los skeletons se muestren
 		// desde el primer frame sin esperar a ngOnInit
-		this.facade.loadData();
+		this.dataFacade.loadData();
 	}
 
 	ngAfterViewInit(): void {
@@ -99,44 +107,95 @@ export class UsuariosComponent implements AfterViewInit {
 		this.fixConfirmDialogAria('Confirmación');
 	}
 
+	// #region Data & Filter handlers
 	onRefresh(): void {
-		this.facade.refresh();
+		this.dataFacade.refresh();
 	}
 
 	onSearchChange(value: string): void {
-		this.facade.setSearchTerm(value);
+		this.dataFacade.setSearchTerm(value);
 	}
 
 	onFilterRolChange(value: RolUsuarioAdmin | null): void {
-		this.facade.setFilterRol(value);
+		this.dataFacade.setFilterRol(value);
 	}
 
 	onFilterEstadoChange(value: boolean | null): void {
-		this.facade.setFilterEstado(value);
+		this.dataFacade.setFilterEstado(value);
 	}
 
 	onClearFilters(): void {
-		this.facade.clearFilters();
+		this.dataFacade.clearFilters();
 	}
 
+	onLazyLoad(event: { page: number; pageSize: number }): void {
+		this.dataFacade.loadPage(event.page, event.pageSize);
+	}
+	// #endregion
+
+	// #region UI handlers
 	onNewUsuario(): void {
-		this.facade.openNew();
+		this.uiFacade.openNew();
 	}
 
 	onViewDetail(usuario: UsuarioLista): void {
-		this.facade.openDetail(usuario);
+		this.uiFacade.openDetail(usuario);
 	}
 
 	onEditUsuario(usuario: UsuarioLista): void {
-		this.facade.editUsuario(usuario);
+		this.uiFacade.editUsuario(usuario);
 	}
 
+	onDrawerVisibleChange(visible: boolean): void {
+		if (!visible) {
+			this.uiFacade.closeDetail();
+		}
+	}
+
+	onCloseDetail(): void {
+		this.uiFacade.closeDetail();
+	}
+
+	onEditFromDetail(): void {
+		this.uiFacade.editFromDetail();
+	}
+
+	onDialogVisibleChange(visible: boolean): void {
+		if (!visible) {
+			this.uiFacade.hideDialog();
+		}
+	}
+
+	onFormFieldChange(event: { field: string; value: unknown }): void {
+		this.uiFacade.updateFormField(event.field, event.value);
+	}
+
+	onCancelDialog(): void {
+		this.uiFacade.hideDialog();
+	}
+
+	onImportUsuarios(): void {
+		this.uiFacade.openImportDialog();
+	}
+
+	onImportDialogVisibleChange(visible: boolean): void {
+		if (!visible) {
+			this.uiFacade.closeImportDialog();
+		}
+	}
+
+	onConfirmDialogHide(): void {
+		this.uiFacade.closeConfirmDialog();
+	}
+	// #endregion
+
+	// #region CRUD handlers
 	onToggleEstado(usuario: UsuarioLista): void {
 		// ! Confirmation dialog before enabling/disabling a user.
 		const header = usuario.estado
 			? UI_CONFIRM_HEADERS.deactivateUser
 			: UI_CONFIRM_HEADERS.activateUser;
-		this.facade.openConfirmDialog();
+		this.uiFacade.openConfirmDialog();
 
 		this.confirmationService.confirm({
 			message: buildToggleUsuarioMessage(usuario.nombreCompleto, usuario.estado),
@@ -146,7 +205,7 @@ export class UsuariosComponent implements AfterViewInit {
 			rejectLabel: UI_CONFIRM_LABELS.cancel,
 			acceptButtonStyleClass: usuario.estado ? 'p-button-warning' : 'p-button-success',
 			accept: () => {
-				this.facade.toggleEstado(usuario);
+				this.crudFacade.toggleEstado(usuario);
 			},
 			reject: () => {},
 		});
@@ -154,59 +213,14 @@ export class UsuariosComponent implements AfterViewInit {
 		this.fixConfirmDialogAria(header);
 	}
 
-	onLazyLoad(event: { page: number; pageSize: number }): void {
-		this.facade.loadPage(event.page, event.pageSize);
-	}
-
-	onDrawerVisibleChange(visible: boolean): void {
-		if (!visible) {
-			this.facade.closeDetail();
-		}
-	}
-
-	onCloseDetail(): void {
-		this.facade.closeDetail();
-	}
-
-	onEditFromDetail(): void {
-		this.facade.editFromDetail();
-	}
-
-	onDialogVisibleChange(visible: boolean): void {
-		if (!visible) {
-			this.facade.hideDialog();
-		}
-	}
-
-	onFormFieldChange(event: { field: string; value: unknown }): void {
-		this.facade.updateFormField(event.field, event.value);
-	}
-
 	onSaveUsuario(): void {
-		this.facade.saveUsuario();
-	}
-
-	onCancelDialog(): void {
-		this.facade.hideDialog();
-	}
-
-	onImportUsuarios(): void {
-		this.facade.openImportDialog();
-	}
-
-	onImportDialogVisibleChange(visible: boolean): void {
-		if (!visible) {
-			this.facade.closeImportDialog();
-		}
+		this.crudFacade.saveUsuario();
 	}
 
 	onImportar(filas: ImportarEstudianteItem[]): void {
-		this.facade.importarEstudiantes(filas);
+		this.crudFacade.importarEstudiantes(filas);
 	}
-
-	onConfirmDialogHide(): void {
-		this.facade.closeConfirmDialog();
-	}
+	// #endregion
 
 	private fixConfirmDialogAria(header: string): void {
 		// * PrimeNG dialog renders async; patch aria-label for a11y.

@@ -4,7 +4,7 @@ import { CommonModule } from '@angular/common';
 import { ButtonModule } from 'primeng/button';
 import { DrawerModule } from 'primeng/drawer';
 import { TagModule } from 'primeng/tag';
-import { UsuarioDetalle } from '@core/services';
+import { UsuarioDetalle } from '../../services';
 import { UiMappingService } from '@shared/services';
 
 /**

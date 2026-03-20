@@ -16,9 +16,10 @@ import { ConfirmDialogModule } from 'primeng/confirmdialog';
 import { ConfirmationService } from 'primeng/api';
 
 import { UiMappingService } from '@shared/services';
+import { PageHeaderComponent } from '@shared/components';
 import { buildDeletePermisoRolMessage } from '@app/shared/constants';
 
-import { PermisosRolesFacade } from './services/permisos-roles.facade';
+import { PermisosRolesFacade } from './services';
 import type { PermisoRol, RolTipoAdmin } from '@core/services';
 
 @Component({
@@ -37,6 +38,7 @@ import type { PermisoRol, RolTipoAdmin } from '@core/services';
 		DrawerModule,
 		SelectModule,
 		ConfirmDialogModule,
+		PageHeaderComponent,
 	],
 	providers: [ConfirmationService],
 	templateUrl: './permisos-roles.component.html',

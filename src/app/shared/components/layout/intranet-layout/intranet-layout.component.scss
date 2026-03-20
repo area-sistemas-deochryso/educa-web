@@ -8,7 +8,7 @@
 
 .intranet-header {
 	background-color: var(--intranet-background-color);
-	padding: 0 2rem;
+	padding: 0 3rem !important;
 	border-bottom: 1px solid #c0c0c0;
 	overflow: visible;
 	position: sticky;
@@ -63,7 +63,7 @@
 @media screen and (max-width: 1300px) {
 	.desktop-header {
 		// Eliminar el doble-padding: .intranet-header ya provee 2rem de cada lado
-		padding: 0;
+		padding: 0 1rem;
 	}
 
 	.nav-links {
@@ -75,7 +75,7 @@
 // A 125% zoom en 1366px/125% DPI: viewport ≈ 874px → header padding pasa de 64px a 32px
 @media screen and (max-width: 1100px) {
 	.intranet-header {
-		padding: 0 1rem;
+		padding: 0 2rem;
 	}
 
 	.nav-links {

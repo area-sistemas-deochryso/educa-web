@@ -7,9 +7,7 @@ export * from './models/horario.interface';
 
 // #endregion
 // #region Services
-export * from './services/horarios-api.service';
-export * from './services/horarios.store';
-export * from './services/horarios.facade';
+export * from './services';
 
 // #endregion
 // #region Components

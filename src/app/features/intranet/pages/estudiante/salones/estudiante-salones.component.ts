@@ -7,6 +7,7 @@ import { TagModule } from 'primeng/tag';
 import { ButtonModule } from 'primeng/button';
 import { TooltipModule } from 'primeng/tooltip';
 import { ProgressSpinnerModule } from 'primeng/progressspinner';
+import { PageHeaderComponent } from '@shared/components';
 import { EstudianteSalonesFacade } from './services/estudiante-salones.facade';
 import { EstudianteSalon, EstudianteSalonCurso } from '../models';
 import { EstudianteSalonDialogComponent } from './components/estudiante-salon-dialog/estudiante-salon-dialog.component';
@@ -22,6 +23,7 @@ import { EstudianteSalonDialogComponent } from './components/estudiante-salon-di
 		ButtonModule,
 		TooltipModule,
 		ProgressSpinnerModule,
+		PageHeaderComponent,
 		EstudianteSalonDialogComponent,
 	],
 	changeDetection: ChangeDetectionStrategy.OnPush,
@@ -45,9 +47,9 @@ import { EstudianteSalonDialogComponent } from './components/estudiante-salon-di
 				<p>No tienes salones asignados</p>
 			</div>
 		} @else {
-			<div class="p-4">
-				<h2 class="mt-0 mb-3">Mis Salones</h2>
+			<app-page-header icon="pi pi-building" title="Mis Salones" />
 
+			<div class="p-4 pt-0">
 				<p-table
 					[value]="vm().salones"
 					[rows]="10"

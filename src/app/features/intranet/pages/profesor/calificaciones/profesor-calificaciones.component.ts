@@ -16,6 +16,7 @@ import { ConfirmDialogModule } from 'primeng/confirmdialog';
 import { ConfirmationService } from 'primeng/api';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { logger, withRetry } from '@core/helpers';
+import { PageHeaderComponent } from '@shared/components';
 import { ProfesorFacade } from '../services/profesor.facade';
 import { ProfesorApiService } from '../services/profesor-api.service';
 import { CursoContenidoStore } from '../cursos/services/curso-contenido.store';
@@ -44,6 +45,7 @@ import {
 		Select,
 		ProgressSpinnerModule,
 		ConfirmDialogModule,
+		PageHeaderComponent,
 		CalificacionesPanelComponent,
 		CalificarDialogComponent,
 		EvaluacionFormDialogComponent,
@@ -63,8 +65,8 @@ import {
 		}
 	`,
 	template: `
-		<div class="p-4">
-			<h2 class="mt-0 mb-3">Calificaciones</h2>
+		<app-page-header icon="pi pi-chart-bar" title="Calificaciones" />
+		<div class="p-4 pt-0">
 
 			@if (pageLoading()) {
 				<div class="flex justify-content-center p-5">
@@ -164,6 +166,11 @@ export class ProfesorCalificacionesComponent implements OnInit, OnDestroy {
 	readonly contenido = this._contenido.asReadonly();
 	readonly calVm = this.calFacade.vm;
 
+	/**
+	 * Deduplica horarios por cursoId+salonId porque un profesor puede tener
+	 * múltiples bloques horarios del mismo curso en el mismo salón (ej: Lunes y Miércoles).
+	 * El value es el horarioId del primer bloque encontrado (suficiente para identificar el curso-salón).
+	 */
 	readonly cursoOptions = computed(() => {
 		const horarios = this.facade.vm().horarios;
 		const seen = new Map<string, boolean>();
@@ -183,6 +190,7 @@ export class ProfesorCalificacionesComponent implements OnInit, OnDestroy {
 		return options.sort((a, b) => a.label.localeCompare(b.label));
 	});
 
+	/** Mapea estudiantes del salón al formato simplificado que espera el componente de calificaciones */
 	readonly estudiantesForCalificar = computed(() => {
 		return this.calVm().salonEstudiantes.map((e) => ({
 			id: e.estudianteId,

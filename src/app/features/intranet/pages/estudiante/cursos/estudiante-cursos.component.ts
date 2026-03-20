@@ -8,6 +8,7 @@ import { TagModule } from 'primeng/tag';
 import { ButtonModule } from 'primeng/button';
 import { TooltipModule } from 'primeng/tooltip';
 import { ProgressSpinnerModule } from 'primeng/progressspinner';
+import { PageHeaderComponent } from '@shared/components';
 import { EstudianteCursosFacade } from '../services/estudiante-cursos.facade';
 import { CursoContentReadonlyDialogComponent } from './components/curso-content-readonly-dialog/curso-content-readonly-dialog.component';
 import { HorarioProfesorDto } from '../models';
@@ -23,6 +24,7 @@ import { HorarioProfesorDto } from '../models';
 		TooltipModule,
 		ProgressSpinnerModule,
 		RouterLink,
+		PageHeaderComponent,
 		CursoContentReadonlyDialogComponent,
 	],
 	changeDetection: ChangeDetectionStrategy.OnPush,
@@ -43,9 +45,9 @@ import { HorarioProfesorDto } from '../models';
 				<p>No tienes cursos asignados</p>
 			</div>
 		} @else {
-			<div class="p-4">
-				<h2 class="mt-0 mb-3">Mis Cursos</h2>
+			<app-page-header icon="pi pi-book" title="Mis Cursos" />
 
+			<div class="p-4 pt-0">
 				<p-table [value]="vm().horarios" [rows]="10" styleClass="p-datatable-sm">
 					<ng-template #header>
 						<tr>

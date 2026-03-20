@@ -5,7 +5,7 @@ import { ButtonModule } from 'primeng/button';
 import { TableLazyLoadEvent, TableModule } from 'primeng/table';
 import { TagModule } from 'primeng/tag';
 import { TooltipModule } from 'primeng/tooltip';
-import { UsuarioLista } from '@core/services';
+import { UsuarioLista } from '../../services';
 import { UiMappingService } from '@shared/services';
 import { TableLoadingDirective } from '@app/shared';
 

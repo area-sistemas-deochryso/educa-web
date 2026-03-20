@@ -1,6 +1,6 @@
 import { Injectable, signal, computed } from '@angular/core';
 
-import { NotificacionLista, NotificacionesEstadisticas } from '@core/services/notificaciones-admin';
+import { NotificacionLista, NotificacionesEstadisticas } from '@data/models';
 
 // #region Interfaces
 export interface NotificacionFormData {

@@ -6,11 +6,12 @@ import { TagModule } from 'primeng/tag';
 import { ButtonModule } from 'primeng/button';
 import { TooltipModule } from 'primeng/tooltip';
 import { ProgressSpinnerModule } from 'primeng/progressspinner';
+import { PageHeaderComponent } from '@shared/components';
 import { SalonCursoInfo, VistaPromedio, ActualizarGrupoDto } from '../models';
 import { ProfesorFacade } from '../services/profesor.facade';
 import { ProfesorSalonConEstudiantes } from '../services/profesor.store';
 import { GruposFacade } from './services/grupos.facade';
-import { SalonMensajeriaFacade } from './services/salon-mensajeria.facade';
+import { SalonMensajeriaFacade } from '@features/intranet/pages/shared/mensajeria/services/mensajeria.facade';
 import { SalonEstudiantesDialogComponent } from './components/salon-estudiantes-dialog/salon-estudiantes-dialog.component';
 import { NotaSaveEvent } from './components/salon-notas-estudiante-tab/salon-notas-estudiante-tab.component';
 
@@ -24,6 +25,7 @@ import { NotaSaveEvent } from './components/salon-notas-estudiante-tab/salon-not
 		ButtonModule,
 		TooltipModule,
 		ProgressSpinnerModule,
+		PageHeaderComponent,
 		SalonEstudiantesDialogComponent,
 	],
 	changeDetection: ChangeDetectionStrategy.OnPush,
@@ -47,9 +49,9 @@ import { NotaSaveEvent } from './components/salon-notas-estudiante-tab/salon-not
 				<p>No tienes salones asignados</p>
 			</div>
 		} @else {
-			<div class="p-4">
-				<h2 class="mt-0 mb-3">Mis Salones</h2>
+			<app-page-header icon="pi pi-building" title="Mis Salones" />
 
+			<div class="p-4 pt-0">
 				<p-table
 					[value]="vm().salonesConEstudiantes"
 					[rows]="10"

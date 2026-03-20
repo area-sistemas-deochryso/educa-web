@@ -1,38 +1,33 @@
 <!-- * Header -->
-<div class="horarios-header">
-	<div class="title-section">
-		<h1>{{ vm().isAdmin ? 'Gestión de Horarios' : 'Mis Horarios' }}</h1>
-		<p class="subtitle">
-			{{ vm().isAdmin ? 'Administra los horarios de clases por salón' : 'Consulta tus horarios de clases asignados' }}
-		</p>
-	</div>
+<app-page-header
+	icon="pi pi-clock"
+	[title]="vm().isAdmin ? 'Gestión de Horarios' : 'Mis Horarios'"
+	[subtitle]="vm().isAdmin ? 'Administra los horarios de clases por salón' : 'Consulta tus horarios de clases asignados'"
+>
+	<button
+		pButton
+		label="Refrescar"
+		icon="pi pi-refresh"
+		class="p-button-outlined"
+		(click)="refresh()"
+		[loading]="vm().loading"
+		pTooltip="Actualizar lista de horarios"
+		tooltipPosition="bottom"
+		[pt]="{ root: { 'aria-label': 'Refrescar horarios' } }"
+	></button>
 
-	<div class="actions">
+	@if (vm().isAdmin) {
 		<button
 			pButton
-			label="Refrescar"
-			icon="pi pi-refresh"
-			class="p-button-outlined"
-			(click)="refresh()"
-			[loading]="vm().loading"
-			pTooltip="Actualizar lista de horarios"
+			label="Nuevo Horario"
+			icon="pi pi-plus"
+			(click)="onNew()"
+			pTooltip="Crear un nuevo horario de clase"
 			tooltipPosition="bottom"
-			[pt]="{ root: { 'aria-label': 'Refrescar horarios' } }"
+			[pt]="{ root: { 'aria-label': 'Crear nuevo horario' } }"
 		></button>
-
-		@if (vm().isAdmin) {
-			<button
-				pButton
-				label="Nuevo Horario"
-				icon="pi pi-plus"
-				(click)="onNew()"
-				pTooltip="Crear un nuevo horario de clase"
-				tooltipPosition="bottom"
-				[pt]="{ root: { 'aria-label': 'Crear nuevo horario' } }"
-			></button>
-		}
-	</div>
-</div>
+	}
+</app-page-header>
 
 <!-- * Estadisticas -->
 @if (vm().statsReady) {

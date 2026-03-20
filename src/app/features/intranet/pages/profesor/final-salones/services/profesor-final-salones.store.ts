@@ -1,8 +1,7 @@
 import { Injectable, signal, computed } from '@angular/core';
 
 import { EstudianteAsistencia } from '@shared/services/asistencia';
-import { HorarioResponseDto } from '@features/intranet/pages/admin/horarios';
-import { SalonNotasResumenDto } from '@features/intranet/pages/profesor/models';
+import { HorarioResponseDto, SalonNotasResumenDto } from '@data/models';
 
 import {
 	NivelEducativo,

@@ -1,5 +1,5 @@
 // #region Imports
-import { Component, EventEmitter, Input, Output, OnChanges, SimpleChanges } from '@angular/core';
+import { ChangeDetectionStrategy, Component, EventEmitter, Input, Output, OnChanges, SimpleChanges } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { DialogModule } from 'primeng/dialog';
 import { TooltipModule } from 'primeng/tooltip';
@@ -59,6 +59,7 @@ export interface CourseDetails {
 	],
 	templateUrl: './course-details-modal.component.html',
 	styleUrl: './course-details-modal.component.scss',
+	changeDetection: ChangeDetectionStrategy.OnPush,
 })
 /**
  * Course details modal with weeks, evaluations, and quick actions.

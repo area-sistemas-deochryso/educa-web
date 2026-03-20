@@ -1,14 +1,15 @@
 import { Component, ChangeDetectionStrategy, computed, inject, OnInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ProgressSpinnerModule } from 'primeng/progressspinner';
+import { PageHeaderComponent } from '@shared/components';
 import { ProfesorFacade } from '../services/profesor.facade';
-import { SalonMensajeriaFacade } from '../salones/services/salon-mensajeria.facade';
-import { SalonMensajeriaTabComponent } from '../salones/components/salon-mensajeria-tab/salon-mensajeria-tab.component';
+import { SalonMensajeriaFacade } from '@features/intranet/pages/shared/mensajeria/services/mensajeria.facade';
+import { SalonMensajeriaTabComponent } from '@features/intranet/pages/shared/mensajeria/components/mensajeria-tab/mensajeria-tab.component';
 
 @Component({
 	selector: 'app-profesor-mensajeria',
 	standalone: true,
-	imports: [CommonModule, ProgressSpinnerModule, SalonMensajeriaTabComponent],
+	imports: [CommonModule, ProgressSpinnerModule, PageHeaderComponent, SalonMensajeriaTabComponent],
 	changeDetection: ChangeDetectionStrategy.OnPush,
 	styles: `
 		:host {
@@ -21,11 +22,6 @@ import { SalonMensajeriaTabComponent } from '../salones/components/salon-mensaje
 			display: flex;
 			flex-direction: column;
 			padding: 0.75rem;
-		}
-		.page-title {
-			margin: 0 0 0.5rem 0.25rem;
-			font-size: 1.25rem;
-			font-weight: 700;
 		}
 		.tab-wrapper {
 			flex: 1;
@@ -41,15 +37,11 @@ import { SalonMensajeriaTabComponent } from '../salones/components/salon-mensaje
 			.page-container {
 				padding: 0.5rem;
 			}
-			.page-title {
-				font-size: 1.1rem;
-				margin-bottom: 0.35rem;
-			}
 		}
 	`,
 	template: `
+		<app-page-header icon="pi pi-envelope" title="Mensajería" />
 		<div class="page-container">
-			<h2 class="page-title">Mensajería</h2>
 
 			@if (loading()) {
 				<div class="flex justify-content-center p-5">

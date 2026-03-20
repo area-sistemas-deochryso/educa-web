@@ -7,20 +7,11 @@
 	<!-- #endregion -->
 } @else {
 	<!-- #region Lista de cursos -->
-	<div class="p-4">
-		<!-- #region Header -->
-		<div class="page-header mb-4">
-			<div class="page-icon">
-				<i class="pi pi-video text-white" style="font-size: 1.25rem"></i>
-			</div>
-			<div>
-				<h2 class="mt-0 mb-1">Videoconferencias</h2>
-				<p class="mt-0 mb-0 text-color-secondary" style="font-size: 0.875rem">
-					Selecciona un curso para unirte a la sala de videoconferencia
-				</p>
-			</div>
-		</div>
-		<!-- #endregion -->
+	<!-- #region Header -->
+	<app-page-header icon="pi pi-video" title="Videoconferencias" subtitle="Selecciona un curso para unirte a la sala de videoconferencia" />
+	<!-- #endregion -->
+
+	<div class="p-4 pt-0">
 
 		<!-- #region Loading -->
 		@if (vm().loading) {

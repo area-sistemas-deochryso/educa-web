@@ -3,6 +3,7 @@ import { Component, ChangeDetectionStrategy, inject, OnInit, computed, signal, D
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
 import { TooltipModule } from 'primeng/tooltip';
+import { PageHeaderComponent } from '@shared/components';
 import { EstudianteHorariosFacade } from './services/estudiante-horarios.facade';
 import { EstudianteApiService } from '../services/estudiante-api.service';
 import { HorarioProfesorDto } from '../models';
@@ -159,7 +160,7 @@ function buildCountdownMap(blocks: HorarioBlock[], now: Date): Map<number, Count
 @Component({
 	selector: 'app-estudiante-horarios',
 	standalone: true,
-	imports: [CommonModule, TooltipModule],
+	imports: [CommonModule, TooltipModule, PageHeaderComponent],
 	changeDetection: ChangeDetectionStrategy.OnPush,
 	templateUrl: './estudiante-horarios.component.html',
 	styleUrl: './estudiante-horarios.component.scss',

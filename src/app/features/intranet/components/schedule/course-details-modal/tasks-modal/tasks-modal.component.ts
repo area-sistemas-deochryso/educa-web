@@ -1,5 +1,5 @@
 // #region Imports
-import { Component, EventEmitter, Input, Output } from '@angular/core';
+import { ChangeDetectionStrategy, Component, EventEmitter, Input, Output } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { DialogModule } from 'primeng/dialog';
 import { logger } from '@core/helpers';
@@ -29,6 +29,7 @@ export interface Task {
 	imports: [CommonModule, DialogModule],
 	templateUrl: './tasks-modal.component.html',
 	styleUrl: './tasks-modal.component.scss',
+	changeDetection: ChangeDetectionStrategy.OnPush,
 })
 /**
  * Tasks modal for a selected week.

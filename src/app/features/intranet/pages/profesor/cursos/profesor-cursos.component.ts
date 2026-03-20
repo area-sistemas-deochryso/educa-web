@@ -8,8 +8,10 @@ import { ButtonModule } from 'primeng/button';
 import { TooltipModule } from 'primeng/tooltip';
 import { ProgressSpinnerModule } from 'primeng/progressspinner';
 import { filter, take } from 'rxjs';
+import { PageHeaderComponent } from '@shared/components';
 import { ProfesorFacade } from '../services/profesor.facade';
-import { CursoContenidoFacade } from './services/curso-contenido.facade';
+import { CursoContenidoDataFacade } from './services/curso-contenido-data.facade';
+import { CursoContenidoUiFacade } from './services/curso-contenido-ui.facade';
 import { CursoContentDialogComponent } from './components/curso-content-dialog/curso-content-dialog.component';
 import { CursoBuilderDialogComponent } from './components/curso-builder-dialog/curso-builder-dialog.component';
 import { HorarioProfesorDto, CrearCursoContenidoRequest } from '../models';
@@ -25,6 +27,7 @@ import { HorarioProfesorDto, CrearCursoContenidoRequest } from '../models';
 		TooltipModule,
 		ProgressSpinnerModule,
 		RouterLink,
+		PageHeaderComponent,
 		CursoContentDialogComponent,
 		CursoBuilderDialogComponent,
 	],
@@ -46,9 +49,9 @@ import { HorarioProfesorDto, CrearCursoContenidoRequest } from '../models';
 				<p>No tienes cursos asignados</p>
 			</div>
 		} @else {
-			<div class="p-4">
-				<h2 class="mt-0 mb-3">Mis Cursos</h2>
+			<app-page-header icon="pi pi-book" title="Mis Cursos" />
 
+			<div class="p-4 pt-0">
 				<p-table [value]="vm().horarios" [rows]="10" styleClass="p-datatable-sm">
 					<ng-template #header>
 						<tr>
@@ -111,13 +114,14 @@ import { HorarioProfesorDto, CrearCursoContenidoRequest } from '../models';
 })
 export class ProfesorCursosComponent implements OnInit {
 	private readonly facade = inject(ProfesorFacade);
-	private readonly contenidoFacade = inject(CursoContenidoFacade);
+	private readonly contenidoDataFacade = inject(CursoContenidoDataFacade);
+	private readonly contenidoUiFacade = inject(CursoContenidoUiFacade);
 	private readonly route = inject(ActivatedRoute);
 	private readonly router = inject(Router);
 	private readonly destroyRef = inject(DestroyRef);
 
 	readonly vm = this.facade.vm;
-	readonly contenidoVm = this.contenidoFacade.vm;
+	readonly contenidoVm = this.contenidoDataFacade.vm;
 
 	ngOnInit(): void {
 		this.facade.loadData();
@@ -136,7 +140,7 @@ export class ProfesorCursosComponent implements OnInit {
 				const horarioId = Number(params['horarioId']);
 				if (horarioId) {
 					const tab = params['tab'] || undefined;
-					this.contenidoFacade.loadContenido(horarioId, tab);
+					this.contenidoDataFacade.loadContenido(horarioId, tab);
 					// Clean query params from URL without navigation
 					this.router.navigate([], { queryParams: {}, replaceUrl: true });
 				}
@@ -144,12 +148,12 @@ export class ProfesorCursosComponent implements OnInit {
 	}
 
 	onVerContenido(horario: HorarioProfesorDto): void {
-		this.contenidoFacade.loadContenido(horario.id);
+		this.contenidoDataFacade.loadContenido(horario.id);
 	}
 
 	onBuilderVisibleChange(visible: boolean): void {
 		if (!visible) {
-			this.contenidoFacade.closeBuilderDialog();
+			this.contenidoUiFacade.closeBuilderDialog();
 		}
 	}
 
@@ -158,7 +162,7 @@ export class ProfesorCursosComponent implements OnInit {
 		if (!horarioId) return;
 
 		const request: CrearCursoContenidoRequest = { horarioId, numeroSemanas };
-		this.contenidoFacade.crearContenido(request);
+		this.contenidoDataFacade.crearContenido(request);
 	}
 }
 

@@ -5,8 +5,7 @@ import { catchError, map } from 'rxjs/operators';
 
 import { environment } from '@config/environment';
 import { EstudianteAsistencia } from '@shared/services/asistencia';
-import { HorarioResponseDto } from '@features/intranet/pages/admin/horarios';
-import { SalonNotasResumenDto } from '@features/intranet/pages/profesor/models';
+import { HorarioResponseDto, SalonNotasResumenDto } from '@data/models';
 
 import {
 	SalonAdminListDto,

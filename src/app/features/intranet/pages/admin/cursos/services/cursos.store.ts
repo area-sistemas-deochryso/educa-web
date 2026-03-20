@@ -1,6 +1,6 @@
 import { Injectable, signal, computed } from '@angular/core';
 
-import { Curso, CursosEstadisticas, Grado } from '@core/services/cursos';
+import { Curso, CursosEstadisticas, Grado } from './cursos.models';
 import { detectarNivel, removeNivelPrefix } from '@core/helpers';
 
 // #region Interfaces
@@ -83,6 +83,11 @@ export class CursosStore {
 	readonly filterNivel = this._filterNivel.asReadonly();
 	// #endregion
 
+	/**
+	 * Grados por nivel: el backend devuelve grados con prefijo ("Inicial - 3 Años"),
+	 * se filtran por nivel y se les quita el prefijo para mostrar solo "3 Años" en la UI.
+	 * Se necesitan versiones separadas porque el dialog de cursos muestra 3 secciones independientes.
+	 */
 	// #region Computed — grados por nivel (con prefijo de nivel removido)
 	readonly gradosInicial = computed<GradoOption[]>(() =>
 		this._grados()
@@ -228,7 +233,7 @@ export class CursosStore {
 		this._error.set(null);
 	}
 
-	/** Mutación quirúrgica: actualizar 1 curso */
+	/** Mutación quirúrgica: actualiza solo el curso modificado sin refetch completo (mejor UX, sin parpadeo) */
 	updateCurso(id: number, updates: Partial<Curso>): void {
 		this._cursos.update((list) =>
 			list.map((c) => (c.id === id ? { ...c, ...updates } : c)),
@@ -256,7 +261,7 @@ export class CursosStore {
 		this._estadisticas.set(stats);
 	}
 
-	/** Actualización incremental de estadísticas */
+	/** Actualización incremental: evita refetch de /estadisticas después de cada CRUD */
 	incrementarEstadistica(campo: keyof CursosEstadisticas, delta: number): void {
 		this._estadisticas.update((stats) => ({
 			...stats,

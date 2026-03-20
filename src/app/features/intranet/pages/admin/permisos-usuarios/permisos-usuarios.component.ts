@@ -31,7 +31,8 @@ import {
 	UI_CONFIRM_LABELS,
 	buildDeletePermisosUsuarioMessage,
 } from '@app/shared/constants';
-import { PermisosUsuariosFacade } from './permisos-usuarios.facade';
+import { PageHeaderComponent } from '@shared/components';
+import { PermisosUsuariosFacade } from './services/permisos-usuarios.facade';
 
 @Component({
 	selector: 'app-permisos-usuarios',
@@ -51,6 +52,7 @@ import { PermisosUsuariosFacade } from './permisos-usuarios.facade';
 		DrawerModule,
 		AutoCompleteModule,
 		ConfirmDialogModule,
+		PageHeaderComponent,
 	],
 	providers: [ConfirmationService],
 	templateUrl: './permisos-usuarios.component.html',

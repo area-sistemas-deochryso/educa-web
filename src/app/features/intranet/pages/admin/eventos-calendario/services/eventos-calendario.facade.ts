@@ -5,11 +5,11 @@ import { forkJoin } from 'rxjs';
 import { logger, withRetry } from '@core/helpers';
 import { ErrorHandlerService } from '@core/services';
 import {
-	EventosCalendarioService,
 	EventoCalendarioLista,
 	CrearEventoCalendarioRequest,
 	ActualizarEventoCalendarioRequest,
-} from '@core/services/eventos-calendario';
+} from '@data/models';
+import { EventosCalendarioService } from './eventos-calendario.service';
 import { UI_ADMIN_ERROR_DETAILS, UI_SUMMARIES } from '@app/shared/constants';
 
 import { EventosCalendarioStore, EventoFormData } from './eventos-calendario.store';

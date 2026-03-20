@@ -1,36 +1,29 @@
 <!-- #region Template -->
 <div class="permisos-container">
 	<!-- #region Header -->
-	<header class="page-header">
-		<div class="header-left">
-			<div class="header-icon">
-				<i class="pi pi-id-card"></i>
-			</div>
-			<div class="header-text">
-				<h1>Permisos por Rol</h1>
-				<p>Configure las vistas permitidas para cada rol del sistema</p>
-			</div>
-		</div>
-		<div class="header-actions">
-			<button
-				pButton
-				label="Refrescar"
-				icon="pi pi-refresh"
-				class="p-button-outlined"
-				(click)="refresh()"
-			></button>
-			<button
-				pButton
-				label="Nuevo Rol"
-				icon="pi pi-plus"
-				class="p-button-success"
-				(click)="openNew()"
-				[disabled]="vm().rolesNoConfigurados.length === 0"
-				pTooltip="Todos los roles ya tienen permisos configurados"
-				[tooltipDisabled]="vm().rolesNoConfigurados.length > 0"
-			></button>
-		</div>
-	</header>
+	<app-page-header
+		icon="pi pi-id-card"
+		title="Permisos por Rol"
+		subtitle="Configure las vistas permitidas para cada rol del sistema"
+	>
+		<button
+			pButton
+			label="Refrescar"
+			icon="pi pi-refresh"
+			class="p-button-outlined"
+			(click)="refresh()"
+		></button>
+		<button
+			pButton
+			label="Nuevo Rol"
+			icon="pi pi-plus"
+			class="p-button-success"
+			(click)="openNew()"
+			[disabled]="vm().rolesNoConfigurados.length === 0"
+			pTooltip="Todos los roles ya tienen permisos configurados"
+			[tooltipDisabled]="vm().rolesNoConfigurados.length > 0"
+		></button>
+	</app-page-header>
 	<!-- #endregion -->
 
 	<!-- #region Stats cards -->

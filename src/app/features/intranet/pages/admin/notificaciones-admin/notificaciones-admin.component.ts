@@ -18,9 +18,10 @@ import { DatePickerModule } from 'primeng/datepicker';
 import { IconFieldModule } from 'primeng/iconfield';
 import { InputIconModule } from 'primeng/inputicon';
 
-import { NotificacionesAdminFacade } from './services/notificaciones-admin.facade';
-import { NotificacionesAdminStore, NotificacionFormData } from './services/notificaciones-admin.store';
-import { NotificacionLista } from '@core/services/notificaciones-admin';
+import { PageHeaderComponent } from '@shared/components';
+import { NotificacionesAdminFacade, NotificacionesAdminStore } from './services';
+import type { NotificacionFormData } from './services';
+import { NotificacionLista } from '@data/models';
 
 // #endregion
 // #region Implementation
@@ -44,6 +45,7 @@ import { NotificacionLista } from '@core/services/notificaciones-admin';
 		DatePickerModule,
 		IconFieldModule,
 		InputIconModule,
+		PageHeaderComponent,
 	],
 	providers: [ConfirmationService],
 	templateUrl: './notificaciones-admin.component.html',

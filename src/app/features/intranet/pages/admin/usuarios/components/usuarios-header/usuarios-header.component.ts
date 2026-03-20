@@ -1,5 +1,6 @@
 // #region Imports
 import { ChangeDetectionStrategy, Component, output } from '@angular/core';
+import { PageHeaderComponent } from '@shared/components';
 import { ButtonModule } from 'primeng/button';
 
 /**
@@ -11,7 +12,7 @@ import { ButtonModule } from 'primeng/button';
 @Component({
 	selector: 'app-usuarios-header',
 	standalone: true,
-	imports: [ButtonModule],
+	imports: [ButtonModule, PageHeaderComponent],
 	templateUrl: './usuarios-header.component.html',
 	styleUrl: './usuarios-header.component.scss',
 	changeDetection: ChangeDetectionStrategy.OnPush,

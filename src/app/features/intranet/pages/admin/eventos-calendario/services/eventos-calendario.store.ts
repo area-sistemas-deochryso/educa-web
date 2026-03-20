@@ -1,6 +1,6 @@
 import { Injectable, signal, computed } from '@angular/core';
 
-import { EventoCalendarioLista, EventosCalendarioEstadisticas } from '@core/services/eventos-calendario';
+import { EventoCalendarioLista, EventosCalendarioEstadisticas } from '@data/models';
 
 // #region Interfaces
 export interface EventoFormData {

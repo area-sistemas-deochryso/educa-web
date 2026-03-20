@@ -1,5 +1,5 @@
 // #region Implementation
 export * from './repositories';
-// * Data layer exports (adapters + repositories).
 export * from './adapters';
+export * from './models';
 // #endregion

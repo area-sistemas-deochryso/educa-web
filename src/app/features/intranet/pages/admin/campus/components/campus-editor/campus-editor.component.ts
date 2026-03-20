@@ -43,19 +43,19 @@ export class CampusEditorComponent {
 	private isPanning = false;
 	private panStart = { x: 0, y: 0 };
 
-	// Drag state (nodes)
+	// Estado de arrastre (nodos)
 	private isDragging = false;
 	private dragNodeId: number | null = null;
 	private dragStarted = false;
 	readonly dragOffset = signal<{ id: number; dx: number; dy: number } | null>(null);
 
-	// Drag state (bloqueos)
+	// Estado de arrastre (bloqueos)
 	private isDraggingBloqueo = false;
 	private dragBloqueoId: number | null = null;
 	private dragBloqueoStarted = false;
 	readonly dragBloqueoOffset = signal<{ id: number; dx: number; dy: number } | null>(null);
 
-	// Hover tooltip
+	// Tooltip al pasar el cursor
 	readonly hoverInfo = signal<{ type: 'node' | 'arista' | 'bloqueo'; id: number } | null>(null);
 	readonly tooltipPos = signal({ x: 0, y: 0 });
 
@@ -169,7 +169,7 @@ export class CampusEditorComponent {
 		return '';
 	}
 
-	/** Get display position accounting for active drag offset */
+	/** Posición de visualización considerando el offset de arrastre activo */
 	getNodeX(nodo: CampusNodoDto): number {
 		const drag = this.dragOffset();
 		return drag && drag.id === nodo.id ? nodo.x + drag.dx : nodo.x;
@@ -200,7 +200,7 @@ export class CampusEditorComponent {
 		return { x: svgPt.x, y: svgPt.y };
 	}
 
-	/** Convert SVG coordinates to pixel position relative to the SVG element */
+	/** Convierte coordenadas SVG a posición en píxeles relativa al elemento SVG */
 	private svgToScreen(svgX: number, svgY: number): { x: number; y: number } {
 		const svgEl = this.svgRef()?.nativeElement;
 		if (!svgEl) return { x: 0, y: 0 };
@@ -271,7 +271,7 @@ export class CampusEditorComponent {
 		this.bloqueoDblClick.emit(bloqueoId);
 	}
 
-	// Hover handlers
+	// Handlers de hover
 	onNodeMouseEnter(nodeId: number): void {
 		if (this.isDragging || this.isPanning) return;
 		const nodo = this.nodoMap().get(nodeId);
@@ -323,7 +323,7 @@ export class CampusEditorComponent {
 	}
 
 	onMouseMove(event: MouseEvent): void {
-		// Handle node dragging
+		// Arrastre de nodo
 		if (this.isDragging && this.dragNodeId !== null) {
 			const pos = this.clientToSvg(event.clientX, event.clientY);
 			const dx = pos.x - this.panStart.x;
@@ -335,7 +335,7 @@ export class CampusEditorComponent {
 			return;
 		}
 
-		// Handle bloqueo dragging
+		// Arrastre de bloqueo
 		if (this.isDraggingBloqueo && this.dragBloqueoId !== null) {
 			const pos = this.clientToSvg(event.clientX, event.clientY);
 			const dx = pos.x - this.panStart.x;
@@ -347,7 +347,7 @@ export class CampusEditorComponent {
 			return;
 		}
 
-		// Handle panning
+		// Paneo del canvas
 		if (this.isPanning) {
 			const vb = this.viewBox();
 			const svgEl = this.svgRef()?.nativeElement;
@@ -361,7 +361,7 @@ export class CampusEditorComponent {
 	}
 
 	onMouseUp(): void {
-		// Finalize node drag
+		// Finalizar arrastre de nodo
 		if (this.isDragging && this.dragNodeId !== null && this.dragStarted) {
 			const offset = this.dragOffset();
 			if (offset) {
@@ -376,7 +376,7 @@ export class CampusEditorComponent {
 			}
 		}
 
-		// Finalize bloqueo drag
+		// Finalizar arrastre de bloqueo
 		if (this.isDraggingBloqueo && this.dragBloqueoId !== null && this.dragBloqueoStarted) {
 			const offset = this.dragBloqueoOffset();
 			if (offset) {
@@ -408,7 +408,7 @@ export class CampusEditorComponent {
 		const zoomFactor = event.deltaY > 0 ? 1.1 : 0.9;
 		const newW = vb.w * zoomFactor;
 		const newH = vb.h * zoomFactor;
-		// Zoom centered on mouse position in SVG space
+		// Zoom centrado en la posición del cursor en el espacio SVG
 		const newX = svgPos.x - (svgPos.x - vb.x) * zoomFactor;
 		const newY = svgPos.y - (svgPos.y - vb.y) * zoomFactor;
 		this.viewBox.set({ x: newX, y: newY, w: newW, h: newH });

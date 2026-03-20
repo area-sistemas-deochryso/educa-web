@@ -12,7 +12,7 @@ import { StorageService } from '@app/core/services/storage';
 import { TimerManager } from '@app/core/services/destroy';
 import { SmartNotificationService } from './smart-notification.service';
 import { environment } from '@config/environment';
-import { NotificacionActiva } from '@core/services/notificaciones-admin';
+import { NotificacionActiva } from '@data/models';
 
 /**
  * Count of notifications by priority.

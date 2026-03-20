@@ -3,6 +3,8 @@ import { Injectable, inject, signal, PLATFORM_ID } from '@angular/core';
 import { isPlatformBrowser } from '@angular/common';
 import { Router } from '@angular/router';
 
+import { filter, take } from 'rxjs';
+
 import { AuthApiService } from '@core/services/auth/auth-api.service';
 import { AuthService } from '@core/services/auth/auth.service';
 import { UserPermisosService } from '@core/services/permisos/user-permisos.service';
@@ -293,6 +295,11 @@ export class SessionActivityService {
 				logger.log('[SessionActivity] Token refreshed — next in', REFRESH_TIMER_MS / 60_000, 'min');
 			},
 			error: () => {
+				if (!this.swService.isOnline) {
+					logger.warn('[SessionActivity] Refresh failed — offline, waiting for reconnection');
+					this.waitForReconnection();
+					return;
+				}
 				logger.warn('[SessionActivity] Refresh failed — session expired');
 				this.handleSessionExpired();
 			},
@@ -305,6 +312,13 @@ export class SessionActivityService {
 	 * gracefully without triggering the error interceptor's forceLogout.
 	 */
 	private verifySession(): void {
+		// If offline at startup, skip server verification and wait for reconnection
+		if (!this.swService.isOnline) {
+			logger.warn('[SessionActivity] Offline at startup — deferring session verification');
+			this.waitForReconnection();
+			return;
+		}
+
 		this.authApi.getProfile().subscribe({
 			next: (profile) => {
 				if (profile) {
@@ -334,6 +348,11 @@ export class SessionActivityService {
 				logger.log('[SessionActivity] Session recovered via refresh');
 			},
 			error: () => {
+				if (!this.swService.isOnline) {
+					logger.warn('[SessionActivity] Refresh failed — offline, waiting for reconnection');
+					this.waitForReconnection();
+					return;
+				}
 				logger.warn('[SessionActivity] Session verification failed — redirecting to login');
 				this.forceLogout();
 			},
@@ -365,6 +384,23 @@ export class SessionActivityService {
 
 	private handleSessionExpired(): void {
 		this.forceLogout();
+	}
+
+	/**
+	 * When offline, subscribe to isOnline$ and re-verify the session
+	 * once connectivity is restored instead of forcing a false logout.
+	 */
+	private waitForReconnection(): void {
+		this.swService.isOnline$
+			.pipe(
+				filter((online) => online),
+				take(1),
+			)
+			.subscribe(() => {
+				if (!this._isRunning()) return;
+				logger.log('[SessionActivity] Back online — re-verifying session');
+				this.verifySession();
+			});
 	}
 
 	// #endregion

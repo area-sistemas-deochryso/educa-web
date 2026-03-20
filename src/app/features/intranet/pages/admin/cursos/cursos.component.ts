@@ -15,10 +15,11 @@ import { ConfirmDialogModule } from 'primeng/confirmdialog';
 import { ConfirmationService } from 'primeng/api';
 
 import { UiMappingService } from '@shared/services';
+import { PageHeaderComponent } from '@shared/components';
 import { buildDeleteCursoMessage } from '@app/shared/constants';
 
-import { CursosFacade } from './services/cursos.facade';
-import type { Curso } from '@core/services/cursos';
+import { CursosFacade } from './services';
+import type { Curso } from './services/cursos.models';
 
 @Component({
 	selector: 'app-cursos',
@@ -35,6 +36,7 @@ import type { Curso } from '@core/services/cursos';
 		SelectModule,
 		ToggleSwitch,
 		ConfirmDialogModule,
+		PageHeaderComponent,
 	],
 	providers: [ConfirmationService],
 	templateUrl: './cursos.component.html',

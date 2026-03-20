@@ -1,4 +1,4 @@
-// #region Re-exports from admin salones (same DTO structure)
+// #region Re-exports from @data/models (fuente única de verdad)
 export type {
 	SalonAdminListDto,
 	AprobacionEstudianteListDto,
@@ -9,7 +9,7 @@ export type {
 	ConfiguracionCalificacionListDto,
 	SalonesAdminEstadisticas,
 	NivelEducativo,
-} from '@features/intranet/pages/admin/salones/models';
+} from '@data/models';
 
-export { NIVELES } from '@features/intranet/pages/admin/salones/models';
+export { NIVELES } from '@data/models';
 // #endregion

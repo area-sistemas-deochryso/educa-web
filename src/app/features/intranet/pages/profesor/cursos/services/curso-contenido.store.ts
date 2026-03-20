@@ -9,61 +9,43 @@ import {
 	EstudianteTareaArchivosGroupDto,
 } from '../../models';
 
-/**
- * Internal state for course content UI.
- */
-interface CursoContenidoState {
-	/** Current content detail or null when not loaded. */
+// #region State interfaces
+
+interface DomainState {
 	contenido: CursoContenidoDetalleDto | null;
-	/** True while initial load is running. */
 	loading: boolean;
-	/** True while save operations are running. */
 	saving: boolean;
-	/** Last error message, if any. */
 	error: string | null;
-	// #region Dialog state
-	/** Content dialog visibility. */
-	contentDialogVisible: boolean;
-	/** Builder dialog visibility when content does not exist. */
-	builderDialogVisible: boolean;
-	/** Week edit dialog visibility. */
-	semanaEditDialogVisible: boolean;
-	/** Task dialog visibility. */
-	tareaDialogVisible: boolean;
-	/** Selected week for edit dialog. */
-	selectedSemana: CursoContenidoSemanaDto | null;
-	/** Selected task for edit dialog. */
-	selectedTarea: CursoContenidoTareaDto | null;
-	/** Selected schedule id for content builder. */
-	selectedHorarioId: number | null;
-	/** Archivos summary sub-modal visibility. */
-	archivosSummaryDialogVisible: boolean;
-	/** Tareas summary sub-modal visibility. */
-	tareasSummaryDialogVisible: boolean;
-	/** Student files sub-modal visibility. */
-	studentFilesDialogVisible: boolean;
-	/** Student files data for professor view. */
-	studentFilesData: SemanaEstudianteArchivosDto[];
-	/** True while student files are loading. */
-	studentFilesLoading: boolean;
-	/** Initial tab to open when dialog becomes visible. */
-	initialTab: string | null;
-	/** Student task submissions dialog visibility. */
-	taskSubmissionsDialogVisible: boolean;
-	/** Student task submissions data for professor view. */
-	taskSubmissionsData: EstudianteTareaArchivosGroupDto[];
-	/** True while student task submissions are loading. */
-	taskSubmissionsLoading: boolean;
-	/** The task being viewed for submissions. */
-	taskSubmissionsTarea: CursoContenidoTareaDto | null;
-	// #endregion
 }
 
-const initialState: CursoContenidoState = {
+interface UiState {
+	contentDialogVisible: boolean;
+	builderDialogVisible: boolean;
+	semanaEditDialogVisible: boolean;
+	tareaDialogVisible: boolean;
+	selectedSemana: CursoContenidoSemanaDto | null;
+	selectedTarea: CursoContenidoTareaDto | null;
+	selectedHorarioId: number | null;
+	archivosSummaryDialogVisible: boolean;
+	tareasSummaryDialogVisible: boolean;
+	studentFilesDialogVisible: boolean;
+	studentFilesData: SemanaEstudianteArchivosDto[];
+	studentFilesLoading: boolean;
+	initialTab: string | null;
+	taskSubmissionsDialogVisible: boolean;
+	taskSubmissionsData: EstudianteTareaArchivosGroupDto[];
+	taskSubmissionsLoading: boolean;
+	taskSubmissionsTarea: CursoContenidoTareaDto | null;
+}
+
+const initialDomain: DomainState = {
 	contenido: null,
 	loading: false,
 	saving: false,
 	error: null,
+};
+
+const initialUi: UiState = {
 	contentDialogVisible: false,
 	builderDialogVisible: false,
 	semanaEditDialogVisible: false,
@@ -83,88 +65,60 @@ const initialState: CursoContenidoState = {
 	taskSubmissionsTarea: null,
 };
 
-/**
- * Store for course content state and UI dialogs.
- *
- * @example
- * const store = inject(CursoContenidoStore);
- * store.setLoading(true);
- */
+// #endregion
+
 @Injectable({ providedIn: 'root' })
 export class CursoContenidoStore {
-	// #region Estado privado
-	/** Internal mutable state signal. */
-	private readonly _state = signal<CursoContenidoState>(initialState);
-
+	// #region Estado privado (2 signals independientes)
+	private readonly _domain = signal<DomainState>(initialDomain);
+	private readonly _ui = signal<UiState>(initialUi);
 	// #endregion
-	// #region Lecturas publicas
-	/** Current content detail. */
-	readonly contenido = computed(() => this._state().contenido);
-	/** True while initial load is running. */
-	readonly loading = computed(() => this._state().loading);
-	/** True while save operations are running. */
-	readonly saving = computed(() => this._state().saving);
-	/** Last error message, if any. */
-	readonly error = computed(() => this._state().error);
-	/** Content dialog visibility. */
-	readonly contentDialogVisible = computed(() => this._state().contentDialogVisible);
-	/** Builder dialog visibility. */
-	readonly builderDialogVisible = computed(() => this._state().builderDialogVisible);
-	/** Week edit dialog visibility. */
-	readonly semanaEditDialogVisible = computed(() => this._state().semanaEditDialogVisible);
-	/** Task dialog visibility. */
-	readonly tareaDialogVisible = computed(() => this._state().tareaDialogVisible);
-	/** Selected week for edit dialog. */
-	readonly selectedSemana = computed(() => this._state().selectedSemana);
-	/** Selected task for edit dialog. */
-	readonly selectedTarea = computed(() => this._state().selectedTarea);
-	/** Selected schedule id for content builder. */
-	readonly selectedHorarioId = computed(() => this._state().selectedHorarioId);
-	/** Archivos summary sub-modal visibility. */
-	readonly archivosSummaryDialogVisible = computed(() => this._state().archivosSummaryDialogVisible);
-	/** Tareas summary sub-modal visibility. */
-	readonly tareasSummaryDialogVisible = computed(() => this._state().tareasSummaryDialogVisible);
-	/** Student files sub-modal visibility. */
-	readonly studentFilesDialogVisible = computed(() => this._state().studentFilesDialogVisible);
-	/** Student files data for professor view. */
-	readonly studentFilesData = computed(() => this._state().studentFilesData);
-	/** True while student files are loading. */
-	readonly studentFilesLoading = computed(() => this._state().studentFilesLoading);
-	/** Initial tab to open when dialog becomes visible. */
-	readonly initialTab = computed(() => this._state().initialTab);
-	/** Student task submissions dialog visibility. */
-	readonly taskSubmissionsDialogVisible = computed(() => this._state().taskSubmissionsDialogVisible);
-	/** Student task submissions data for professor view. */
-	readonly taskSubmissionsData = computed(() => this._state().taskSubmissionsData);
-	/** True while student task submissions are loading. */
-	readonly taskSubmissionsLoading = computed(() => this._state().taskSubmissionsLoading);
-	/** The task being viewed for submissions. */
-	readonly taskSubmissionsTarea = computed(() => this._state().taskSubmissionsTarea);
 
+	// #region Lecturas públicas — Domain
+	readonly contenido = computed(() => this._domain().contenido);
+	readonly loading = computed(() => this._domain().loading);
+	readonly saving = computed(() => this._domain().saving);
+	readonly error = computed(() => this._domain().error);
 	// #endregion
-	// #region Computed derivados
-	/** List of weeks from the current content detail. */
+
+	// #region Lecturas públicas — UI
+	readonly contentDialogVisible = computed(() => this._ui().contentDialogVisible);
+	readonly builderDialogVisible = computed(() => this._ui().builderDialogVisible);
+	readonly semanaEditDialogVisible = computed(() => this._ui().semanaEditDialogVisible);
+	readonly tareaDialogVisible = computed(() => this._ui().tareaDialogVisible);
+	readonly selectedSemana = computed(() => this._ui().selectedSemana);
+	readonly selectedTarea = computed(() => this._ui().selectedTarea);
+	readonly selectedHorarioId = computed(() => this._ui().selectedHorarioId);
+	readonly archivosSummaryDialogVisible = computed(() => this._ui().archivosSummaryDialogVisible);
+	readonly tareasSummaryDialogVisible = computed(() => this._ui().tareasSummaryDialogVisible);
+	readonly studentFilesDialogVisible = computed(() => this._ui().studentFilesDialogVisible);
+	readonly studentFilesData = computed(() => this._ui().studentFilesData);
+	readonly studentFilesLoading = computed(() => this._ui().studentFilesLoading);
+	readonly initialTab = computed(() => this._ui().initialTab);
+	readonly taskSubmissionsDialogVisible = computed(() => this._ui().taskSubmissionsDialogVisible);
+	readonly taskSubmissionsData = computed(() => this._ui().taskSubmissionsData);
+	readonly taskSubmissionsLoading = computed(() => this._ui().taskSubmissionsLoading);
+	readonly taskSubmissionsTarea = computed(() => this._ui().taskSubmissionsTarea);
+	// #endregion
+
+	// #region Computed derivados (solo dependen de domain)
 	readonly semanas = computed(() => this.contenido()?.semanas ?? []);
-	/** Total attachments across all weeks. */
 	readonly totalArchivos = computed(() =>
 		this.semanas().reduce((sum, s) => sum + s.archivos.length, 0),
 	);
-	/** Total tasks across all weeks. */
 	readonly totalTareas = computed(() =>
 		this.semanas().reduce((sum, s) => sum + s.tareas.length, 0),
 	);
-	/** Total student files across all weeks. */
 	readonly totalArchivosEstudiantes = computed(() =>
 		this.studentFilesData().reduce(
 			(sum, s) => sum + s.estudiantes.reduce((acc, e) => acc + e.archivos.length, 0),
 			0,
 		),
 	);
-
 	// #endregion
-	// #region ViewModel
-	/** Aggregated view model for UI binding. */
-	readonly vm = computed(() => ({
+
+	// #region Sub-ViewModels
+	readonly dataVm = computed(() => ({
 		contenido: this.contenido(),
 		semanas: this.semanas(),
 		loading: this.loading(),
@@ -172,6 +126,9 @@ export class CursoContenidoStore {
 		error: this.error(),
 		totalArchivos: this.totalArchivos(),
 		totalTareas: this.totalTareas(),
+	}));
+
+	readonly uiVm = computed(() => ({
 		contentDialogVisible: this.contentDialogVisible(),
 		builderDialogVisible: this.builderDialogVisible(),
 		semanaEditDialogVisible: this.semanaEditDialogVisible(),
@@ -192,88 +149,64 @@ export class CursoContenidoStore {
 		taskSubmissionsTarea: this.taskSubmissionsTarea(),
 	}));
 
+	/** Aggregated view model for UI binding (composes sub-VMs). */
+	readonly vm = computed(() => ({
+		...this.dataVm(),
+		...this.uiVm(),
+	}));
 	// #endregion
-	// #region Comandos de mutacion
-	/**
-	 * Set current content detail.
-	 *
-	 * @param contenido Content detail or null.
-	 *
-	 * @example
-	 * store.setContenido(detalle);
-	 */
+
+	// #region Comandos de mutación — Domain
 	setContenido(contenido: CursoContenidoDetalleDto | null): void {
-		this._state.update((s) => ({ ...s, contenido }));
+		this._domain.update((s) => ({ ...s, contenido }));
 	}
-	/**
-	 * Set loading flag.
-	 *
-	 * @param loading True while loading.
-	 *
-	 * @example
-	 * store.setLoading(true);
-	 */
+
 	setLoading(loading: boolean): void {
-		this._state.update((s) => ({ ...s, loading }));
+		this._domain.update((s) => ({ ...s, loading }));
 	}
-	/**
-	 * Set saving flag.
-	 *
-	 * @param saving True while saving.
-	 *
-	 * @example
-	 * store.setSaving(true);
-	 */
+
 	setSaving(saving: boolean): void {
-		this._state.update((s) => ({ ...s, saving }));
+		this._domain.update((s) => ({ ...s, saving }));
 	}
-	/**
-	 * Set error message.
-	 *
-	 * @param error Error message or null.
-	 *
-	 * @example
-	 * store.setError('Failed to load');
-	 */
+
 	setError(error: string | null): void {
-		this._state.update((s) => ({ ...s, error }));
+		this._domain.update((s) => ({ ...s, error }));
 	}
-	/**
-	 * Clear error message.
-	 *
-	 * @example
-	 * store.clearError();
-	 */
+
 	clearError(): void {
-		this._state.update((s) => ({ ...s, error: null }));
+		this._domain.update((s) => ({ ...s, error: null }));
 	}
-	/**
-	 * Set selected schedule id for content builder.
-	 *
-	 * @param id Schedule id or null.
-	 *
-	 * @example
-	 * store.setSelectedHorarioId(120);
-	 */
+	// #endregion
+
+	// #region Comandos de mutación — UI
 	setSelectedHorarioId(id: number | null): void {
-		this._state.update((s) => ({ ...s, selectedHorarioId: id }));
+		this._ui.update((s) => ({ ...s, selectedHorarioId: id }));
 	}
 
 	setInitialTab(tab: string | null): void {
-		this._state.update((s) => ({ ...s, initialTab: tab }));
+		this._ui.update((s) => ({ ...s, initialTab: tab }));
 	}
 
-	// #endregion
-	// #region Mutaciones quirurgicas
+	setStudentFilesData(data: SemanaEstudianteArchivosDto[]): void {
+		this._ui.update((s) => ({ ...s, studentFilesData: data }));
+	}
 
-	/**
-	 * Update a week in place without refetch.
-	 *
-	 * @param semanaId Week id.
-	 * @param updates Partial week updates.
-	 */
+	setStudentFilesLoading(loading: boolean): void {
+		this._ui.update((s) => ({ ...s, studentFilesLoading: loading }));
+	}
+
+	setTaskSubmissionsData(data: EstudianteTareaArchivosGroupDto[]): void {
+		this._ui.update((s) => ({ ...s, taskSubmissionsData: data }));
+	}
+
+	setTaskSubmissionsLoading(loading: boolean): void {
+		this._ui.update((s) => ({ ...s, taskSubmissionsLoading: loading }));
+	}
+	// #endregion
+
+	// #region Mutaciones quirúrgicas (domain)
 	updateSemana(semanaId: number, updates: Partial<CursoContenidoSemanaDto>): void {
-		this._state.update((s) => {
+		this._domain.update((s) => {
 			if (!s.contenido) return s;
 			return {
 				...s,
@@ -287,14 +220,8 @@ export class CursoContenidoStore {
 		});
 	}
 
-	/**
-	 * Add an attachment to a week.
-	 *
-	 * @param semanaId Week id.
-	 * @param archivo Attachment to add.
-	 */
 	addArchivoToSemana(semanaId: number, archivo: CursoContenidoArchivoDto): void {
-		this._state.update((s) => {
+		this._domain.update((s) => {
 			if (!s.contenido) return s;
 			return {
 				...s,
@@ -308,14 +235,8 @@ export class CursoContenidoStore {
 		});
 	}
 
-	/**
-	 * Remove an attachment from a week.
-	 *
-	 * @param semanaId Week id.
-	 * @param archivoId Attachment id.
-	 */
 	removeArchivoFromSemana(semanaId: number, archivoId: number): void {
-		this._state.update((s) => {
+		this._domain.update((s) => {
 			if (!s.contenido) return s;
 			return {
 				...s,
@@ -331,14 +252,8 @@ export class CursoContenidoStore {
 		});
 	}
 
-	/**
-	 * Add a task to a week.
-	 *
-	 * @param semanaId Week id.
-	 * @param tarea Task to add.
-	 */
 	addTareaToSemana(semanaId: number, tarea: CursoContenidoTareaDto): void {
-		this._state.update((s) => {
+		this._domain.update((s) => {
 			if (!s.contenido) return s;
 			return {
 				...s,
@@ -352,15 +267,8 @@ export class CursoContenidoStore {
 		});
 	}
 
-	/**
-	 * Update a task in a week.
-	 *
-	 * @param semanaId Week id.
-	 * @param tareaId Task id.
-	 * @param updates Partial task updates.
-	 */
 	updateTareaInSemana(semanaId: number, tareaId: number, updates: Partial<CursoContenidoTareaDto>): void {
-		this._state.update((s) => {
+		this._domain.update((s) => {
 			if (!s.contenido) return s;
 			return {
 				...s,
@@ -379,14 +287,8 @@ export class CursoContenidoStore {
 		});
 	}
 
-	/**
-	 * Remove a task from a week.
-	 *
-	 * @param semanaId Week id.
-	 * @param tareaId Task id.
-	 */
 	removeTareaFromSemana(semanaId: number, tareaId: number): void {
-		this._state.update((s) => {
+		this._domain.update((s) => {
 			if (!s.contenido) return s;
 			return {
 				...s,
@@ -402,11 +304,8 @@ export class CursoContenidoStore {
 		});
 	}
 
-	/**
-	 * Add a teacher attachment to a task inside a week.
-	 */
 	addArchivoToTarea(semanaId: number, tareaId: number, archivo: TareaArchivoDto): void {
-		this._state.update((s) => {
+		this._domain.update((s) => {
 			if (!s.contenido) return s;
 			return {
 				...s,
@@ -427,11 +326,8 @@ export class CursoContenidoStore {
 		});
 	}
 
-	/**
-	 * Remove a teacher attachment from a task inside a week.
-	 */
 	removeArchivoFromTarea(semanaId: number, tareaId: number, archivoId: number): void {
-		this._state.update((s) => {
+		this._domain.update((s) => {
 			if (!s.contenido) return s;
 			return {
 				...s,
@@ -453,150 +349,79 @@ export class CursoContenidoStore {
 			};
 		});
 	}
-
 	// #endregion
-	// #region Dialog commands
-	/**
-	 * Open content dialog.
-	 */
+
+	// #region Dialog commands (UI)
 	openContentDialog(): void {
-		this._state.update((s) => ({ ...s, contentDialogVisible: true }));
+		this._ui.update((s) => ({ ...s, contentDialogVisible: true }));
 	}
-	/**
-	 * Close content dialog and clear content state.
-	 */
+
 	closeContentDialog(): void {
-		this._state.update((s) => ({
-			...s,
-			contentDialogVisible: false,
-			contenido: null,
-			selectedHorarioId: null,
-		}));
+		this._ui.update((s) => ({ ...s, contentDialogVisible: false, selectedHorarioId: null }));
+		this._domain.update((s) => ({ ...s, contenido: null }));
 	}
-	/**
-	 * Open content builder dialog.
-	 */
+
 	openBuilderDialog(): void {
-		this._state.update((s) => ({ ...s, builderDialogVisible: true }));
+		this._ui.update((s) => ({ ...s, builderDialogVisible: true }));
 	}
-	/**
-	 * Close content builder dialog.
-	 */
+
 	closeBuilderDialog(): void {
-		this._state.update((s) => ({ ...s, builderDialogVisible: false }));
+		this._ui.update((s) => ({ ...s, builderDialogVisible: false }));
 	}
-	/**
-	 * Open week edit dialog with selection.
-	 *
-	 * @param semana Week data to edit.
-	 */
+
 	openSemanaEditDialog(semana: CursoContenidoSemanaDto): void {
-		this._state.update((s) => ({ ...s, semanaEditDialogVisible: true, selectedSemana: semana }));
+		this._ui.update((s) => ({ ...s, semanaEditDialogVisible: true, selectedSemana: semana }));
 	}
-	/**
-	 * Close week edit dialog and clear selection.
-	 */
+
 	closeSemanaEditDialog(): void {
-		this._state.update((s) => ({ ...s, semanaEditDialogVisible: false, selectedSemana: null }));
+		this._ui.update((s) => ({ ...s, semanaEditDialogVisible: false, selectedSemana: null }));
 	}
-	/**
-	 * Open task dialog with selection or null for create.
-	 *
-	 * @param tarea Task to edit or null for new.
-	 */
+
 	openTareaDialog(tarea: CursoContenidoTareaDto | null): void {
-		this._state.update((s) => ({ ...s, tareaDialogVisible: true, selectedTarea: tarea }));
+		this._ui.update((s) => ({ ...s, tareaDialogVisible: true, selectedTarea: tarea }));
 	}
-	/**
-	 * Close task dialog and clear selection.
-	 */
+
 	closeTareaDialog(): void {
-		this._state.update((s) => ({ ...s, tareaDialogVisible: false, selectedTarea: null }));
+		this._ui.update((s) => ({ ...s, tareaDialogVisible: false, selectedTarea: null }));
 	}
-	/**
-	 * Open archivos summary sub-modal.
-	 */
+
 	openArchivosSummaryDialog(): void {
-		this._state.update((s) => ({ ...s, archivosSummaryDialogVisible: true }));
+		this._ui.update((s) => ({ ...s, archivosSummaryDialogVisible: true }));
 	}
-	/**
-	 * Close archivos summary sub-modal.
-	 */
+
 	closeArchivosSummaryDialog(): void {
-		this._state.update((s) => ({ ...s, archivosSummaryDialogVisible: false }));
+		this._ui.update((s) => ({ ...s, archivosSummaryDialogVisible: false }));
 	}
-	/**
-	 * Open tareas summary sub-modal.
-	 */
+
 	openTareasSummaryDialog(): void {
-		this._state.update((s) => ({ ...s, tareasSummaryDialogVisible: true }));
+		this._ui.update((s) => ({ ...s, tareasSummaryDialogVisible: true }));
 	}
-	/**
-	 * Close tareas summary sub-modal.
-	 */
+
 	closeTareasSummaryDialog(): void {
-		this._state.update((s) => ({ ...s, tareasSummaryDialogVisible: false }));
+		this._ui.update((s) => ({ ...s, tareasSummaryDialogVisible: false }));
 	}
-	/**
-	 * Open student files sub-modal.
-	 */
+
 	openStudentFilesDialog(): void {
-		this._state.update((s) => ({ ...s, studentFilesDialogVisible: true }));
+		this._ui.update((s) => ({ ...s, studentFilesDialogVisible: true }));
 	}
-	/**
-	 * Close student files sub-modal and clear data.
-	 */
+
 	closeStudentFilesDialog(): void {
-		this._state.update((s) => ({ ...s, studentFilesDialogVisible: false }));
+		this._ui.update((s) => ({ ...s, studentFilesDialogVisible: false }));
 	}
-	/**
-	 * Open student task submissions dialog.
-	 */
+
 	openTaskSubmissionsDialog(tarea: CursoContenidoTareaDto): void {
-		this._state.update((s) => ({ ...s, taskSubmissionsDialogVisible: true, taskSubmissionsTarea: tarea }));
+		this._ui.update((s) => ({ ...s, taskSubmissionsDialogVisible: true, taskSubmissionsTarea: tarea }));
 	}
-	/**
-	 * Close student task submissions dialog and clear data.
-	 */
+
 	closeTaskSubmissionsDialog(): void {
-		this._state.update((s) => ({
-			...s,
-			taskSubmissionsDialogVisible: false,
-			taskSubmissionsTarea: null,
-		}));
+		this._ui.update((s) => ({ ...s, taskSubmissionsDialogVisible: false, taskSubmissionsTarea: null }));
 	}
-	/**
-	 * Set student task submissions data.
-	 */
-	setTaskSubmissionsData(data: EstudianteTareaArchivosGroupDto[]): void {
-		this._state.update((s) => ({ ...s, taskSubmissionsData: data }));
-	}
-	/**
-	 * Set student task submissions loading flag.
-	 */
-	setTaskSubmissionsLoading(loading: boolean): void {
-		this._state.update((s) => ({ ...s, taskSubmissionsLoading: loading }));
-	}
-	/**
-	 * Set student files data.
-	 */
-	setStudentFilesData(data: SemanaEstudianteArchivosDto[]): void {
-		this._state.update((s) => ({ ...s, studentFilesData: data }));
-	}
-	/**
-	 * Set student files loading flag.
-	 */
-	setStudentFilesLoading(loading: boolean): void {
-		this._state.update((s) => ({ ...s, studentFilesLoading: loading }));
-	}
-	/**
-	 * Reset state to initial values.
-	 *
-	 * @example
-	 * store.reset();
-	 */
+	// #endregion
+
+	// #region Reset
 	reset(): void {
-		this._state.set(initialState);
+		this._domain.set(initialDomain);
+		this._ui.set(initialUi);
 	}
 	// #endregion
 }

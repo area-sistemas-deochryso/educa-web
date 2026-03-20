@@ -15,9 +15,10 @@ import { ConfirmDialogModule } from 'primeng/confirmdialog';
 import { ConfirmationService } from 'primeng/api';
 
 import { UiMappingService } from '@shared/services';
+import { PageHeaderComponent } from '@shared/components';
 import { buildDeleteVistaMessage } from '@app/shared/constants';
 
-import { VistasFacade } from './services/vistas.facade';
+import { VistasFacade } from './services';
 import type { Vista } from '@core/services';
 
 @Component({
@@ -35,6 +36,7 @@ import type { Vista } from '@core/services';
 		SelectModule,
 		ToggleSwitch,
 		ConfirmDialogModule,
+		PageHeaderComponent,
 	],
 	providers: [ConfirmationService],
 	templateUrl: './vistas.component.html',

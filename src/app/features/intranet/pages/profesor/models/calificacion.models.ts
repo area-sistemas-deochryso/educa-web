@@ -1,38 +1,39 @@
+// #region Shared types (importados + re-exportados desde @data/models)
+import type {
+  CalificacionDto,
+  EstudianteNotasResumenDto,
+  NotaResumenDto,
+  PeriodoCalificacionDto,
+  PromedioDto,
+  SalonNotasResumenDto,
+  TipoEvaluacion,
+} from '@data/models';
+
+export type {
+  CalificacionDto,
+  EstudianteNotasResumenDto,
+  NotaResumenDto,
+  PeriodoCalificacionDto,
+  PromedioDto,
+  SalonNotasResumenDto,
+  TipoEvaluacion,
+};
+export { TIPOS_EVALUACION } from '@data/models';
+// #endregion
+
 // #region Constants
 export const NOTA_MINIMA = 0;
 export const NOTA_MAXIMA = 20;
 export const MESES_LIMITE_EDICION = 2;
 export const PESO_MINIMO = 0.01;
 export const PESO_MAXIMO = 1.0;
-
-export const TIPOS_EVALUACION = [
-  'Tarea',
-  'Examen',
-  'Exposicion',
-  'Participacion',
-  'Otro',
-] as const;
 // #endregion
 
 // #region Types
-export type TipoEvaluacion = (typeof TIPOS_EVALUACION)[number];
 export type VistaPromedio = 'semana' | 'periodo' | 'anual';
 // #endregion
 
-// #region Response DTOs
-export interface CalificacionDto {
-  id: number;
-  cursoContenidoId: number;
-  tareaId: number | null;
-  semanaId: number;
-  numeroSemana: number;
-  titulo: string;
-  peso: number;
-  fechaEvaluacion: string;
-  tipo: TipoEvaluacion;
-  esGrupal: boolean;
-  estado: boolean;
-}
+// #region Response DTOs (feature-specific)
 
 export interface CalificacionNotaDto {
   id: number;
@@ -50,14 +51,6 @@ export interface CalificacionNotaDto {
 
 export interface CalificacionConNotasDto extends CalificacionDto {
   notas: CalificacionNotaDto[];
-}
-
-export interface PeriodoCalificacionDto {
-  id: number;
-  nombre: string;
-  orden: number;
-  semanaInicio: number;
-  semanaFin: number;
 }
 // #endregion
 
@@ -101,33 +94,8 @@ export interface CambiarTipoCalificacionDto {
 }
 // #endregion
 
-// #region Salon view DTOs
-export interface PromedioDto {
-  periodo: string;
-  promedio: number | null;
-}
-
-export interface NotaResumenDto {
-  calificacionId: number;
-  nota: number | null;
-}
-
-export interface EstudianteNotasResumenDto {
-  estudianteId: number;
-  dni: string;
-  nombreCompleto: string;
-  notas: NotaResumenDto[];
-  promedios: PromedioDto[];
-}
-
-export interface SalonNotasResumenDto {
-  salonId: number;
-  cursoNombre: string;
-  evaluaciones: CalificacionDto[];
-  periodos: PeriodoCalificacionDto[];
-  estudiantes: EstudianteNotasResumenDto[];
-}
-// #endregion
+// Salon view DTOs (PromedioDto, NotaResumenDto, EstudianteNotasResumenDto, SalonNotasResumenDto)
+// re-exportados desde @data/models en la sección de arriba
 
 // #region Student view DTOs
 export interface CalificacionConMiNotaDto extends CalificacionDto {

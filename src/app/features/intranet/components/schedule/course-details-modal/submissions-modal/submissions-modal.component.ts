@@ -1,5 +1,5 @@
 // #region Imports
-import { Component, EventEmitter, Input, Output } from '@angular/core';
+import { ChangeDetectionStrategy, Component, EventEmitter, Input, Output } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { DialogModule } from 'primeng/dialog';
 import { logger } from '@core/helpers';
@@ -31,6 +31,7 @@ export interface Submission {
 	imports: [CommonModule, DialogModule],
 	templateUrl: './submissions-modal.component.html',
 	styleUrl: './submissions-modal.component.scss',
+	changeDetection: ChangeDetectionStrategy.OnPush,
 })
 /**
  * Submissions modal for a selected week.

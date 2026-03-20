@@ -4,8 +4,9 @@ import { forkJoin } from 'rxjs';
 
 import { logger, withRetry } from '@core/helpers';
 import { ErrorHandlerService, WalFacadeHelper } from '@core/services';
-import { CursosService, Curso } from '@core/services/cursos';
-import { GradosService } from '@core/services/grados/grados.service';
+import { Curso } from './cursos.models';
+import { CursosService } from './cursos.service';
+import { GradosService } from './grados.service';
 import { environment } from '@config';
 import { UI_ADMIN_ERROR_DETAILS, UI_SUMMARIES } from '@app/shared/constants';
 

@@ -49,7 +49,7 @@ export class LoggingFacade {
 		});
 	}
 
-	// ---------------- Logger ----------------
+	// #region Logger
 	setLogEnabled(enabled: boolean): void {
 		logger.setEnabled(enabled);
 		this.store.setLogEnabled(enabled);
@@ -66,7 +66,9 @@ export class LoggingFacade {
 		this.store.setLogMinLevel(level);
 	}
 
-	// ---------------- DebugService ----------------
+	// #endregion
+
+	// #region DebugService
 	setDebugEnabled(enabled: boolean): void {
 		this.debug.setEnabled(enabled);
 		this.store.setDebugEnabled(enabled);
@@ -83,7 +85,9 @@ export class LoggingFacade {
 		this.store.setDebugMinLevel(level);
 	}
 
-	// ---------------- Shared helpers ----------------
+	// #endregion
+
+	// #region Helpers compartidos
 	/**
 	 * Habilita o deshabilita logger y debug al mismo tiempo.
 	 */
@@ -100,5 +104,6 @@ export class LoggingFacade {
 		this.debug.clearOverrides();
 		this.refresh();
 	}
+	// #endregion
 }
 // #endregion

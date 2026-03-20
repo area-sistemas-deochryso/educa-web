@@ -19,21 +19,18 @@
 	<!-- #endregion -->
 
 	<!-- #region Header -->
-	<div class="notas-page p-4">
-		<div class="notas-header">
-			<h2 class="mt-0 mb-0">Mis Notas</h2>
-			<div class="notas-actions">
-				<button
-					pButton
-					label="Simular"
-					icon="pi pi-calculator"
-					class="p-button-outlined p-button-help"
-					(click)="onOpenSimulador()"
-					[disabled]="!vm().selectedCurso"
-				></button>
-			</div>
-		</div>
+	<app-page-header icon="pi pi-chart-bar" title="Mis Notas">
+		<button
+			pButton
+			label="Simular"
+			icon="pi pi-calculator"
+			class="p-button-outlined p-button-help"
+			(click)="onOpenSimulador()"
+			[disabled]="!vm().selectedCurso"
+		></button>
+	</app-page-header>
 
+	<div class="notas-page p-4 pt-0">
 		<!-- #region Filters -->
 		<div class="notas-filters">
 			@if (vm().cursoOptions.length > 1) {

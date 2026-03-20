@@ -1,0 +1,9 @@
+export { CursosApiService } from './cursos-api.service';
+export { HorariosApiService } from './horarios-api.service';
+export { HorariosAssignmentService } from './horarios-assignment.service';
+export { HorariosCrudFacade } from './horarios-crud.facade';
+export { HorariosDataFacade } from './horarios-data.facade';
+export { HorariosStore } from './horarios.store';
+export { HorariosUiFacade } from './horarios-ui.facade';
+export { ProfesoresApiService } from './profesores-api.service';
+export { SalonesApiService } from './salones-api.service';

@@ -1,11 +1,10 @@
+import { SalonProfesor, UserProfileService } from '@core/services';
 import {
 	ActualizarUsuarioRequest,
 	CrearUsuarioRequest,
 	ROLES_USUARIOS_ADMIN,
 	RolUsuarioAdmin,
-	SalonProfesor,
-	UserProfileService,
-} from '@core/services';
+} from '../../services';
 import {
 	ChangeDetectionStrategy,
 	Component,
@@ -69,9 +68,11 @@ export interface FormValidationErrors {
 	changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class UsuarioFormDialogComponent {
+	// #region Dependencias
 	private userProfile = inject(UserProfileService);
+	// #endregion
 
-	// * Inputs from parent (dialog state + form data).
+	// #region Inputs / Outputs
 	readonly visible = input.required<boolean>();
 	readonly isEditing = input.required<boolean>();
 	readonly formData = input.required<UsuarioFormData>();
@@ -79,28 +80,26 @@ export class UsuarioFormDialogComponent {
 	readonly isFormValid = input.required<boolean>();
 	readonly salones = input<SalonProfesor[]>([]);
 
-	// * Outputs for dialog actions and field updates.
 	readonly visibleChange = output<boolean>();
 	readonly fieldChange = output<{ field: string; value: unknown }>();
 	readonly save = output<void>();
 	readonly cancelDialog = output<void>();
+	// #endregion
 
-	// * Options for role selector.
+	// #region Estado local
 	readonly rolesSelectOptions = ROLES_USUARIOS_ADMIN.map((r) => ({ label: r, value: r }));
-
-	// * Only selected roles can manually edit passwords.
 	readonly allowEditPasswordRoles = ['Director', 'Asistente Administrativo'];
 
-	// * Local state for two-step salon selector (grado -> seccion).
+	// Selector de salón en dos pasos: primero grado, luego sección
 	readonly _gradoSeleccionado = signal<string | null>(null);
 	readonly _seccionSeleccionada = signal<string | null>(null);
 
-	// * Only allowed roles can edit password.
 	readonly canEditPassword = computed(() =>
 		this.allowEditPasswordRoles.includes(this.userProfile.userRole()),
 	);
+	// #endregion
 
-	// #region Validaciones de contraseña
+	// #region Computed — validaciones de contraseña
 
 	/**
 	 * Obtiene la contraseña actual del formulario
@@ -176,8 +175,9 @@ export class UsuarioFormDialogComponent {
 		// En creación, auto-generar desde apellido + DNI
 		return generatePassword(this.formData().apellidos ?? '', this.formData().dni ?? '');
 	});
+	// #endregion
 
-	// * Role helpers for conditional sections.
+	// #region Computed — opciones de salón
 	get isEstudiante(): boolean {
 		return this.formData().rol === 'Estudiante';
 	}
@@ -195,12 +195,10 @@ export class UsuarioFormDialogComponent {
 		return this.formData().rol as RolUsuarioAdmin | undefined;
 	}
 
-	// * Format display of section codes.
 	private formatSeccion(seccion: string): string {
 		return seccion === 'V' ? 'Verano' : seccion;
 	}
 
-	// * Grade options derived from salon list.
 	readonly gradosOptions = computed(() => {
 		const salones = this.salones();
 		const gradosUnicos = new Set<string>();
@@ -216,7 +214,6 @@ export class UsuarioFormDialogComponent {
 		return result;
 	});
 
-	// * Section options derived from selected grade.
 	readonly seccionesOptions = computed(() => {
 		const grado = this._gradoSeleccionado();
 		if (!grado) return [];
@@ -232,7 +229,6 @@ export class UsuarioFormDialogComponent {
 		return seccionesDelGrado;
 	});
 
-	// * Map selected grade/section to a salonId.
 	readonly salonSeleccionado = computed(() => {
 		const grado = this._gradoSeleccionado();
 		const seccion = this._seccionSeleccionada();
@@ -241,7 +237,9 @@ export class UsuarioFormDialogComponent {
 		const salones = this.salones();
 		return salones.find((s) => s.grado === grado && s.seccion === seccion) || null;
 	});
+	// #endregion
 
+	// #region Event handlers
 	onVisibleChange(visible: boolean): void {
 		this.visibleChange.emit(visible);
 	}
@@ -251,7 +249,6 @@ export class UsuarioFormDialogComponent {
 	}
 
 	onGradoChange(grado: string | null): void {
-		// * Clear section, salonId, and text fields when grade changes.
 		this._gradoSeleccionado.set(grado);
 		this._seccionSeleccionada.set(null);
 		this.fieldChange.emit({ field: 'salonId', value: undefined });
@@ -261,8 +258,6 @@ export class UsuarioFormDialogComponent {
 
 	onSeccionChange(seccion: string | null): void {
 		this._seccionSeleccionada.set(seccion);
-
-		// * Map grado + seccion to salonId and text fields in the form.
 		const salon = this.salonSeleccionado();
 		if (salon) {
 			this.fieldChange.emit({ field: 'salonId', value: salon.salonId });
@@ -275,7 +270,7 @@ export class UsuarioFormDialogComponent {
 		}
 	}
 
-	// Sincronizar grado y sección cuando cambia formData.salonId (edición)
+	// Sync grado/sección local cuando cambia formData.salonId (al abrir edición)
 	private readonly _syncGradoSeccion = effect(() => {
 		const formData = this.formData();
 		const salonId = formData.salonId;
