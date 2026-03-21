@@ -168,11 +168,6 @@
 		border-radius: 6px;
 		font-weight: 600;
 		font-size: 0.85rem;
-
-		&.secondary {
-			background: var(--surface-200);
-			color: var(--text-color);
-		}
 	}
 
 	.permisos-badge {
@@ -801,13 +796,6 @@
 		}
 	}
 
-	// Input number
-	.p-inputnumber-input {
-		background: transparent;
-		color: var(--text-color);
-		border-color: var(--surface-300);
-	}
-
 	// Autocomplete
 	.p-autocomplete {
 		width: 100%;
@@ -872,13 +860,6 @@
 		}
 	}
 
-	// Tooltips
-	.p-tooltip {
-		.p-tooltip-text {
-			background: var(--surface-900);
-			color: var(--surface-0);
-		}
-	}
 }
 
 // #endregion

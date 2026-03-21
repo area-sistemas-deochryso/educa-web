@@ -5,6 +5,18 @@ export interface Grado {
 	nombre: string;
 }
 
+/** Config per education level for data-driven rendering of grados sections */
+export interface NivelGradoConfig {
+	key: string;
+	title: string;
+	icon: string;
+	tagClass: string;
+	severity: 'info' | 'success' | 'warn';
+	allGrados: Grado[];
+	selectedGrados: Grado[];
+	availableGrados: Grado[];
+}
+
 export interface Curso {
 	id: number;
 	nombre: string;

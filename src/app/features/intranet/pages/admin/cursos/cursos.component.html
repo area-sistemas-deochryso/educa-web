@@ -262,178 +262,70 @@
 				/>
 			</div>
 
-			<!-- Grados seleccionados -->
+			<!-- Grados seleccionados — data-driven por nivel -->
 			<div class="field">
 				<div class="grados-form-content">
-					<!-- Inicial -->
-					@if (vm().gradosInicial.length > 0) {
-						<div class="grados-form-section">
-							<h4 class="form-section-title">
-								<i class="pi pi-star"></i>
-								Inicial
-							</h4>
-							<div class="selected-grados">
-								@if (vm().selectedGradosInicial.length > 0) {
-									@for (grado of vm().selectedGradosInicial; track grado.id) {
-										<span class="custom-tag tag-info">
-											<span class="tag-text">{{ grado.nombre }}</span>
-											<button
-												type="button"
-												class="tag-remove"
-												(click)="removeGrado(grado.id)"
-												[attr.aria-label]="'Remover ' + grado.nombre"
-											>
-												<i class="pi pi-times"></i>
-											</button>
-										</span>
+					@for (nivel of vm().niveles; track nivel.key) {
+						@if (nivel.allGrados.length > 0) {
+							<div class="grados-form-section">
+								<h4 class="form-section-title">
+									<i [class]="nivel.icon"></i>
+									{{ nivel.title }}
+								</h4>
+								<div class="selected-grados">
+									@if (nivel.selectedGrados.length > 0) {
+										@for (grado of nivel.selectedGrados; track grado.id) {
+											<span [class]="'custom-tag ' + nivel.tagClass">
+												<span class="tag-text">{{ grado.nombre }}</span>
+												<button
+													type="button"
+													class="tag-remove"
+													(click)="removeGrado(grado.id)"
+													[attr.aria-label]="'Remover ' + grado.nombre"
+												>
+													<i class="pi pi-times"></i>
+												</button>
+											</span>
+										}
+									} @else {
+										<span class="no-selection">Sin grados seleccionados</span>
 									}
-								} @else {
-									<span class="no-selection">Sin grados seleccionados</span>
-								}
+								</div>
 							</div>
-						</div>
-					}
-
-					<!-- Primaria -->
-					@if (vm().gradosPrimaria.length > 0) {
-						<div class="grados-form-section">
-							<h4 class="form-section-title">
-								<i class="pi pi-book"></i>
-								Primaria
-							</h4>
-							<div class="selected-grados">
-								@if (vm().selectedGradosPrimaria.length > 0) {
-									@for (grado of vm().selectedGradosPrimaria; track grado.id) {
-										<span class="custom-tag tag-success">
-											<span class="tag-text">{{ grado.nombre }}</span>
-											<button
-												type="button"
-												class="tag-remove"
-												(click)="removeGrado(grado.id)"
-												[attr.aria-label]="'Remover ' + grado.nombre"
-											>
-												<i class="pi pi-times"></i>
-											</button>
-										</span>
-									}
-								} @else {
-									<span class="no-selection">Sin grados seleccionados</span>
-								}
-							</div>
-						</div>
-					}
-
-					<!-- Secundaria -->
-					@if (vm().gradosSecundaria.length > 0) {
-						<div class="grados-form-section">
-							<h4 class="form-section-title">
-								<i class="pi pi-graduation-cap"></i>
-								Secundaria
-							</h4>
-							<div class="selected-grados">
-								@if (vm().selectedGradosSecundaria.length > 0) {
-									@for (grado of vm().selectedGradosSecundaria; track grado.id) {
-										<span class="custom-tag tag-warn">
-											<span class="tag-text">{{ grado.nombre }}</span>
-											<button
-												type="button"
-												class="tag-remove"
-												(click)="removeGrado(grado.id)"
-												[attr.aria-label]="'Remover ' + grado.nombre"
-											>
-												<i class="pi pi-times"></i>
-											</button>
-										</span>
-									}
-								} @else {
-									<span class="no-selection">Sin grados seleccionados</span>
-								}
-							</div>
-						</div>
+						}
 					}
 				</div>
 			</div>
 
-			<!-- Grados disponibles -->
+			<!-- Grados disponibles — data-driven por nivel -->
 			<div class="field">
 				<label>Grados disponibles</label>
 				<div class="available-grados-grid">
-					<!-- Inicial -->
-					@if (vm().gradosInicial.length > 0) {
-						<div class="available-column">
-							<h5 class="column-title">
-								<i class="pi pi-star"></i>
-								Inicial
-							</h5>
-							<div class="available-items">
-								@if (vm().availableInicial.length > 0) {
-									@for (grado of vm().availableInicial; track grado.id) {
-										<button
-											class="available-item"
-											(click)="addGrado(grado.id)"
-											[attr.aria-label]="'Agregar ' + grado.nombre"
-										>
-											<i class="pi pi-plus"></i>
-											<span>{{ grado.nombre }}</span>
-										</button>
+					@for (nivel of vm().niveles; track nivel.key) {
+						@if (nivel.allGrados.length > 0) {
+							<div class="available-column">
+								<h5 class="column-title">
+									<i [class]="nivel.icon"></i>
+									{{ nivel.title }}
+								</h5>
+								<div class="available-items">
+									@if (nivel.availableGrados.length > 0) {
+										@for (grado of nivel.availableGrados; track grado.id) {
+											<button
+												class="available-item"
+												(click)="addGrado(grado.id)"
+												[attr.aria-label]="'Agregar ' + grado.nombre"
+											>
+												<i class="pi pi-plus"></i>
+												<span>{{ grado.nombre }}</span>
+											</button>
+										}
+									} @else {
+										<span class="no-available">Todos seleccionados</span>
 									}
-								} @else {
-									<span class="no-available">Todos seleccionados</span>
-								}
+								</div>
 							</div>
-						</div>
-					}
-
-					<!-- Primaria -->
-					@if (vm().gradosPrimaria.length > 0) {
-						<div class="available-column">
-							<h5 class="column-title">
-								<i class="pi pi-book"></i>
-								Primaria
-							</h5>
-							<div class="available-items">
-								@if (vm().availablePrimaria.length > 0) {
-									@for (grado of vm().availablePrimaria; track grado.id) {
-										<button
-											class="available-item"
-											(click)="addGrado(grado.id)"
-											[attr.aria-label]="'Agregar ' + grado.nombre"
-										>
-											<i class="pi pi-plus"></i>
-											<span>{{ grado.nombre }}</span>
-										</button>
-									}
-								} @else {
-									<span class="no-available">Todos seleccionados</span>
-								}
-							</div>
-						</div>
-					}
-
-					<!-- Secundaria -->
-					@if (vm().gradosSecundaria.length > 0) {
-						<div class="available-column">
-							<h5 class="column-title">
-								<i class="pi pi-graduation-cap"></i>
-								Secundaria
-							</h5>
-							<div class="available-items">
-								@if (vm().availableSecundaria.length > 0) {
-									@for (grado of vm().availableSecundaria; track grado.id) {
-										<button
-											class="available-item"
-											(click)="addGrado(grado.id)"
-											[attr.aria-label]="'Agregar ' + grado.nombre"
-										>
-											<i class="pi pi-plus"></i>
-											<span>{{ grado.nombre }}</span>
-										</button>
-									}
-								} @else {
-									<span class="no-available">Todos seleccionados</span>
-								}
-							</div>
-						</div>
+						}
 					}
 				</div>
 				<small class="field-hint"
@@ -479,7 +371,7 @@
 	</ng-template>
 </p-dialog>
 
-<!-- Grados Dialog -->
+<!-- Grados Dialog — data-driven por nivel -->
 <p-dialog
 	[visible]="vm().gradosDialogVisible"
 	(visibleChange)="onGradosDialogVisibleChange($event)"
@@ -491,56 +383,21 @@
 	class="grados-dialog"
 >
 	<div class="grados-content">
-		<!-- Inicial -->
-		@if (vm().cursoGradosInicial.length > 0) {
+		@for (nivel of vm().cursoGradosNiveles; track nivel.title) {
 			<div class="grados-section">
 				<h3 class="section-title">
-					<i class="pi pi-star"></i>
-					Inicial
+					<i [class]="nivel.icon"></i>
+					{{ nivel.title }}
 				</h3>
 				<div class="grados-grid">
-					@for (grado of vm().cursoGradosInicial; track grado.id) {
-						<p-tag [value]="grado.nombre" severity="info" />
+					@for (grado of nivel.grados; track grado.id) {
+						<p-tag [value]="grado.nombre" [severity]="nivel.severity" />
 					}
 				</div>
 			</div>
 		}
 
-		<!-- Primaria -->
-		@if (vm().cursoGradosPrimaria.length > 0) {
-			<div class="grados-section">
-				<h3 class="section-title">
-					<i class="pi pi-book"></i>
-					Primaria
-				</h3>
-				<div class="grados-grid">
-					@for (grado of vm().cursoGradosPrimaria; track grado.id) {
-						<p-tag [value]="grado.nombre" severity="success" />
-					}
-				</div>
-			</div>
-		}
-
-		<!-- Secundaria -->
-		@if (vm().cursoGradosSecundaria.length > 0) {
-			<div class="grados-section">
-				<h3 class="section-title">
-					<i class="pi pi-graduation-cap"></i>
-					Secundaria
-				</h3>
-				<div class="grados-grid">
-					@for (grado of vm().cursoGradosSecundaria; track grado.id) {
-						<p-tag [value]="grado.nombre" severity="warn" />
-					}
-				</div>
-			</div>
-		}
-
-		@if (
-			vm().cursoGradosInicial.length === 0 &&
-			vm().cursoGradosPrimaria.length === 0 &&
-			vm().cursoGradosSecundaria.length === 0
-		) {
+		@if (vm().cursoGradosNiveles.length === 0) {
 			<div class="empty-grados">
 				<i class="pi pi-inbox"></i>
 				<p>Este curso no tiene grados asignados</p>

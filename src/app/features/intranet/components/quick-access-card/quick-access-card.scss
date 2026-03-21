@@ -284,10 +284,6 @@ $wf-yellow: rgba(234, 179, 8, 0.45);
 	display: flex;
 	flex-direction: column;
 	gap: 2px;
-
-	&.wf-table-compact {
-		gap: 2px;
-	}
 }
 
 .wf-row {

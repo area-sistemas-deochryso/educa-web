@@ -1,6 +1,6 @@
 import { Injectable, signal, computed } from '@angular/core';
 
-import { Curso, CursosEstadisticas, Grado } from './cursos.models';
+import { Curso, CursosEstadisticas, Grado, NivelGradoConfig } from './cursos.models';
 import { detectarNivel, removeNivelPrefix } from '@core/helpers';
 
 // #region Interfaces
@@ -143,6 +143,40 @@ export class CursosStore {
 	readonly selectedGradosFull = computed(() =>
 		this._grados().filter((g) => this.allGradosIds().includes(g.id)),
 	);
+
+	/** Unified config per nivel for data-driven rendering (edit dialog) */
+	readonly niveles = computed<NivelGradoConfig[]>(() => [
+		{
+			key: 'inicial',
+			title: 'Inicial',
+			icon: 'pi pi-star',
+			tagClass: 'tag-info',
+			severity: 'info',
+			allGrados: this.gradosInicial(),
+			selectedGrados: this.selectedGradosInicial(),
+			availableGrados: this.availableInicial(),
+		},
+		{
+			key: 'primaria',
+			title: 'Primaria',
+			icon: 'pi pi-book',
+			tagClass: 'tag-success',
+			severity: 'success',
+			allGrados: this.gradosPrimaria(),
+			selectedGrados: this.selectedGradosPrimaria(),
+			availableGrados: this.availablePrimaria(),
+		},
+		{
+			key: 'secundaria',
+			title: 'Secundaria',
+			icon: 'pi pi-graduation-cap',
+			tagClass: 'tag-warn',
+			severity: 'warn',
+			allGrados: this.gradosSecundaria(),
+			selectedGrados: this.selectedGradosSecundaria(),
+			availableGrados: this.availableSecundaria(),
+		},
+	]);
 	// #endregion
 
 	// #region Computed — grados del curso seleccionado (dialog "ver grados")
@@ -162,6 +196,16 @@ export class CursosStore {
 		const curso = this._selectedCursoForGrados();
 		if (!curso?.grados) return [];
 		return curso.grados.filter((g) => detectarNivel(g.nombre) === 'Secundaria');
+	});
+
+	/** Unified config per nivel for view dialog */
+	readonly cursoGradosNiveles = computed<{ title: string; icon: string; severity: 'info' | 'success' | 'warn'; grados: Grado[] }[]>(() => {
+		const niveles = [
+			{ title: 'Inicial', icon: 'pi pi-star', severity: 'info' as const, grados: this.cursoGradosInicial() },
+			{ title: 'Primaria', icon: 'pi pi-book', severity: 'success' as const, grados: this.cursoGradosPrimaria() },
+			{ title: 'Secundaria', icon: 'pi pi-graduation-cap', severity: 'warn' as const, grados: this.cursoGradosSecundaria() },
+		];
+		return niveles.filter((n) => n.grados.length > 0);
 	});
 	// #endregion
 
@@ -205,6 +249,9 @@ export class CursosStore {
 		cursoGradosInicial: this.cursoGradosInicial(),
 		cursoGradosPrimaria: this.cursoGradosPrimaria(),
 		cursoGradosSecundaria: this.cursoGradosSecundaria(),
+
+		niveles: this.niveles(),
+		cursoGradosNiveles: this.cursoGradosNiveles(),
 
 		searchTerm: this.searchTerm(),
 		filterEstado: this.filterEstado(),
