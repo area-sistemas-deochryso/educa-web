@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, OnInit, inject } from '@angular/core';
+import { ChangeDetectionStrategy, Component, OnInit, computed, inject } from '@angular/core';
 
 import { BadgeModule } from 'primeng/badge';
 import { ButtonModule } from 'primeng/button';
@@ -318,21 +318,19 @@ export class HorariosComponent implements OnInit {
 	}
 
 	// #endregion
-	// #region Helpers para curso seleccionado
-	getCursoSeleccionadoLabel(): string {
+	// #region Computed: curso seleccionado
+	readonly cursoSeleccionadoLabel = computed(() => {
 		const cursoId = this.vm().formData.cursoId;
 		if (!cursoId) return 'Seleccionar curso por nivel';
-
 		const curso = this.vm().cursosOptions.find((c) => c.value === cursoId);
 		return curso?.label || 'Seleccionar curso';
-	}
+	});
 
-	getCursoSeleccionadoNiveles(): string {
+	readonly cursoSeleccionadoNiveles = computed(() => {
 		const cursoId = this.vm().formData.cursoId;
 		if (!cursoId) return '';
-
 		const curso = this.vm().cursosOptions.find((c) => c.value === cursoId);
 		return curso?.niveles.join(', ') || '';
-	}
+	});
 	// #endregion
 }

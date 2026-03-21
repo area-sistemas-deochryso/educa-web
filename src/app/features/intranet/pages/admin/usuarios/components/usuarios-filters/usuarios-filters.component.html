@@ -18,6 +18,7 @@
 		[ngModel]="filterRol()"
 		(ngModelChange)="onFilterRolChange($event)"
 		placeholder="Todos los roles"
+		appendTo="body"
 		[style]="{ minWidth: '160px' }"
 	/>
 
@@ -27,6 +28,7 @@
 		[ngModel]="filterEstado()"
 		(ngModelChange)="onFilterEstadoChange($event)"
 		placeholder="Estado"
+		appendTo="body"
 		[style]="{ minWidth: '140px' }"
 	/>
 

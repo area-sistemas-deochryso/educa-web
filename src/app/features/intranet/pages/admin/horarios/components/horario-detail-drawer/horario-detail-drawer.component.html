@@ -31,8 +31,8 @@
 			<!-- * Estado y acciones rápidas -->
 			<div class="status-section">
 				<p-tag
-					[value]="getEstadoLabel(detalle()!.estado)"
-					[severity]="getEstadoSeverity(detalle()!.estado)"
+					[value]="estadoLabel()"
+					[severity]="estadoSeverity()"
 				/>
 
 				@if (isAdmin()) {

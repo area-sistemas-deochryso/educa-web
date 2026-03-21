@@ -62,6 +62,16 @@ export class HorarioDetailDrawerComponent {
 		return detalle ? detalle.estudiantes.length > 0 : false;
 	});
 
+	readonly estadoLabel = computed(() => {
+		const detalle = this.detalle();
+		return detalle?.estado ? 'Activo' : 'Inactivo';
+	});
+
+	readonly estadoSeverity = computed((): 'success' | 'danger' => {
+		const detalle = this.detalle();
+		return detalle?.estado ? 'success' : 'danger';
+	});
+
 	// #endregion
 	// #region Event handlers
 	onVisibleChange(visible: boolean): void {
@@ -146,14 +156,6 @@ export class HorarioDetailDrawerComponent {
 
 	// #endregion
 	// #region Helpers
-	getEstadoSeverity(estado: boolean): 'success' | 'danger' {
-		return estado ? 'success' : 'danger';
-	}
-
-	getEstadoLabel(estado: boolean): string {
-		return estado ? 'Activo' : 'Inactivo';
-	}
-
 	trackByEstudianteId(_index: number, estudiante: EstudianteHorarioDto): number {
 		return estudiante.id;
 	}

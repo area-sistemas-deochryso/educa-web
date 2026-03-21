@@ -303,7 +303,7 @@
 					<button
 						pButton
 						type="button"
-						[label]="getCursoSeleccionadoLabel()"
+						[label]="cursoSeleccionadoLabel()"
 						icon="pi pi-book"
 						class="p-button-outlined w-full justify-content-start"
 						(click)="onOpenCursoDialog()"
@@ -331,7 +331,7 @@
 				@if (vm().formData.cursoId) {
 					<small class="text-color-secondary mt-1">
 						<i class="pi pi-tag"></i>
-						{{ getCursoSeleccionadoNiveles() }}
+						{{ cursoSeleccionadoNiveles() }}
 					</small>
 				}
 			</div>
