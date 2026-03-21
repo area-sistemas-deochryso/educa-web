@@ -95,7 +95,9 @@
 
 			.about-image {
 				width: 100%;
+				height: auto;
 				border-radius: 20px;
+				aspect-ratio: 10 / 7;
 			}
 
 			.about-info {

@@ -6,7 +6,6 @@ import {
 	provideBrowserGlobalErrorListeners,
 } from '@angular/core';
 import {
-	PreloadAllModules,
 	withEnabledBlockingInitialNavigation,
 	withPreloading,
 } from '@angular/router';
@@ -30,6 +29,7 @@ import { provideAnimationsAsync } from '@angular/platform-browser/animations/asy
 import { providePrimeNG } from 'primeng/config';
 import { provideRouter } from '@angular/router';
 import { registerLocaleData } from '@angular/common';
+import { AdaptivePreloadingStrategy } from '@core/services/preloading/adaptive-preloading.strategy';
 import { routes } from './app.routes';
 
 // #endregion
@@ -41,7 +41,7 @@ export const appConfig: ApplicationConfig = {
 		provideBrowserGlobalErrorListeners(),
 		provideRouter(
 			routes,
-			withPreloading(PreloadAllModules),
+			withPreloading(AdaptivePreloadingStrategy),
 			withEnabledBlockingInitialNavigation(),
 		),
 		provideHttpClient(

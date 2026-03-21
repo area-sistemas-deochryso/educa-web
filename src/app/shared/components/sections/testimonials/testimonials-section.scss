@@ -39,6 +39,11 @@
 	width: 65px;
 	height: 65px;
 	object-fit: cover;
+	aspect-ratio: 1 / 1;
+}
+
+.quote-icon {
+	aspect-ratio: 1 / 1;
 }
 
 .reviews-body {
