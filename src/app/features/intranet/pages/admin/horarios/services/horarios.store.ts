@@ -153,37 +153,43 @@ export class HorariosStore {
   });
 
   // #endregion
-  // #region Computed - Opciones de dropdowns
+  // #region Computed - Opciones de dropdowns (memoización intermedia)
+
+  /** Salones activos: solo depende de salonesDisponibles, no de formData/horarios */
+  private readonly activeSalones = computed(() =>
+    this._state().salonesDisponibles.filter((s) => s.estado),
+  );
+
+  /** Mapeo de salones activos a opciones de dropdown */
+  private readonly activeSalonesAsOptions = computed<SalonOption[]>(() =>
+    this.activeSalones().map((s) => ({
+      value: s.salonId,
+      label: s.nombreSalon,
+      grado: s.grado,
+      seccion: s.seccion,
+      sede: s.sede,
+      totalEstudiantes: s.totalEstudiantes,
+    })),
+  );
 
   /**
-   * Opciones de salones disponibles (sin conflicto de horario)
-   * Si está editando, excluye el horario actual de la validación
+   * Opciones de salones disponibles (sin conflicto de horario).
+   * Si no hay día/hora seleccionados, devuelve todos los activos (memoizado).
+   * Si hay día/hora, filtra por conflicto de horario.
    */
   readonly salonesOptions = computed<SalonOption[]>(() => {
-    const salones = this._state().salonesDisponibles;
-    const horarios = this.horarios();
     const formData = this.formData();
-    const editingId = this.editingId();
 
-    // Si no hay día/hora seleccionados, mostrar todos los salones
+    // Sin día/hora → devolver opciones activas ya memoizadas
     if (!formData.diaSemana || !formData.horaInicio || !formData.horaFin) {
-      return salones
-        .filter((s) => s.estado)
-        .map((s) => ({
-          value: s.salonId,
-          label: s.nombreSalon,
-          grado: s.grado,
-          seccion: s.seccion,
-          sede: s.sede,
-          totalEstudiantes: s.totalEstudiantes,
-        }));
+      return this.activeSalonesAsOptions();
     }
 
-    // Filtrar salones que NO tienen conflicto de horario
-    const salonesDisponibles = salones.filter((salon) => {
-      if (!salon.estado) return false;
+    // Con día/hora → filtrar por conflicto de horario
+    const horarios = this.horarios();
+    const editingId = this.editingId();
 
-      // Verificar si el salón tiene conflicto de horario
+    const salonesDisponibles = this.activeSalones().filter((salon) => {
       const tieneConflicto = horarios.some((h) => {
         if (editingId !== null && h.id === editingId) return false;
         if (h.salonId !== salon.salonId || h.diaSemana !== formData.diaSemana) return false;
@@ -203,26 +209,27 @@ export class HorariosStore {
     }));
   });
 
+  /** Cursos activos: solo depende de cursosDisponibles */
+  private readonly activeCursos = computed(() =>
+    this._state().cursosDisponibles.filter((c) => c.estado),
+  );
+
   /**
    * Opciones de cursos disponibles (activos) con niveles educativos
    */
-  readonly cursosOptions = computed<CursoOption[]>(() => {
-    const cursos = this._state().cursosDisponibles;
+  readonly cursosOptions = computed<CursoOption[]>(() =>
+    this.activeCursos().map((c) => {
+      const grados = c.grados.map((g) => g.nombre);
+      const niveles = determinarNiveles(grados);
 
-    return cursos
-      .filter((c) => c.estado)
-      .map((c) => {
-        const grados = c.grados.map((g) => g.nombre);
-        const niveles = determinarNiveles(grados);
-
-        return {
-          value: c.id,
-          label: c.nombre,
-          grados,
-          niveles,
-        };
-      });
-  });
+      return {
+        value: c.id,
+        label: c.nombre,
+        grados,
+        niveles,
+      };
+    }),
+  );
 
   /**
    * Cursos agrupados por nivel educativo (Inicial, Primaria, Secundaria)
@@ -237,20 +244,21 @@ export class HorariosStore {
     };
   });
 
+  /** Profesores activos: solo depende de profesoresDisponibles */
+  private readonly activeProfesores = computed(() =>
+    this._state().profesoresDisponibles.filter((p) => p.estado),
+  );
+
   /**
    * Opciones de profesores disponibles (activos)
    */
-  readonly profesoresOptions = computed<ProfesorOption[]>(() => {
-    const profesores = this._state().profesoresDisponibles;
-
-    return profesores
-      .filter((p) => p.estado)
-      .map((p) => ({
-        value: p.id,
-        label: `${p.nombre} ${p.apellidos}`,
-        dni: p.dni,
-      }));
-  });
+  readonly profesoresOptions = computed<ProfesorOption[]>(() =>
+    this.activeProfesores().map((p) => ({
+      value: p.id,
+      label: `${p.nombre} ${p.apellidos}`,
+      dni: p.dni,
+    })),
+  );
 
   // #endregion
   // #region Computed - Filtros
