@@ -9,6 +9,7 @@ import {
 	UsuariosEstadisticas,
 } from './usuarios.models';
 import { Injectable, computed, inject, signal } from '@angular/core';
+import { Subject } from 'rxjs';
 
 import { DebugService, generatePassword } from '@core/helpers';
 import {
@@ -66,6 +67,9 @@ export class UsuariosStore {
 	private readonly _filterEstado = signal<boolean | null>(null);
 
 	// #endregion
+	/** Emits when data should be refreshed (after create/import) */
+	readonly refreshNeeded$ = new Subject<void>();
+
 	// #region Lecturas públicas (readonly)
 	readonly usuarios = this._usuarios.asReadonly();
 	readonly estadisticas = this._estadisticas.asReadonly();

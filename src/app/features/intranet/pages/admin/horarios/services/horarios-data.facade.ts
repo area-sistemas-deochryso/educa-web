@@ -243,7 +243,7 @@ export class HorariosDataFacade {
   /**
    * Calcular estadísticas desde los datos
    */
-  calculateEstadisticas(horarios: { estado: boolean; profesorId: number | null }[]): void {
+  private calculateEstadisticas(horarios: { estado: boolean; profesorId: number | null }[]): void {
     const stats = {
       totalHorarios: horarios.length,
       horariosActivos: horarios.filter((h) => h.estado).length,

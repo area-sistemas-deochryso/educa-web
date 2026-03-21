@@ -1,4 +1,4 @@
-import { DestroyRef, inject, Injectable } from '@angular/core';
+import { inject, Injectable } from '@angular/core';
 
 import { logger } from '@core/helpers';
 import { ErrorHandlerService, WalFacadeHelper } from '@core/services';
@@ -8,11 +8,10 @@ import type {
   HorarioAsignarProfesorDto,
 } from '../models/horario.interface';
 import {
-  UI_ADMIN_ERROR_DETAILS_DYNAMIC,
-  UI_GENERIC_MESSAGES,
   UI_HORARIOS_SUCCESS_MESSAGES,
   UI_SUMMARIES,
 } from '@app/shared/constants';
+import { handleHorarioApiError } from '../helpers/horario-error.utils';
 import { HorariosApiService } from './horarios-api.service';
 import { HorariosStore } from './horarios.store';
 
@@ -26,7 +25,7 @@ export class HorariosAssignmentService {
   private api = inject(HorariosApiService);
   private store = inject(HorariosStore);
   private errorHandler = inject(ErrorHandlerService);
-  private destroyRef = inject(DestroyRef);
+
   private wal = inject(WalFacadeHelper);
   private readonly apiUrl = `${environment.apiUrl}/api/horario`;
 
@@ -248,26 +247,8 @@ export class HorariosAssignmentService {
   // #endregion
   // #region Helpers privados
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  private handleApiError(err: any, accion: string): void {
-    const mensaje = err?.error?.message || err?.message || UI_GENERIC_MESSAGES.unknownError;
-
-    if (mensaje.includes('conflicto') || mensaje.includes('overlap')) {
-      this.errorHandler.showError(
-        UI_SUMMARIES.scheduleConflict,
-        UI_ADMIN_ERROR_DETAILS_DYNAMIC.horarioActionNotFound(accion),
-      );
-    } else if (mensaje.includes('no encontrado') || mensaje.includes('not found')) {
-      this.errorHandler.showError(
-        UI_SUMMARIES.error,
-        UI_ADMIN_ERROR_DETAILS_DYNAMIC.horarioActionNotFound(accion),
-      );
-    } else {
-      this.errorHandler.showError(
-        UI_SUMMARIES.error,
-        UI_ADMIN_ERROR_DETAILS_DYNAMIC.horarioActionFailed(accion),
-      );
-    }
+  private handleApiError(err: unknown, accion: string): void {
+    handleHorarioApiError(this.errorHandler, err, accion);
   }
 
   // #endregion

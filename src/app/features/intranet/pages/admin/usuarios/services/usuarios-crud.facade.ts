@@ -31,18 +31,6 @@ export class UsuariosCrudFacade {
 	private log = this.debug.dbg('FACADE:UsuariosCrud');
 	private readonly apiUrl = `${environment.apiUrl}/api/sistema/usuarios`;
 
-	/**
-	 * Callback invoked after a successful CREATE commit.
-	 * Set by UsuariosDataFacade to trigger refreshUsuariosOnly without circular dependency.
-	 */
-	onCreateCommit: (() => void) | null = null;
-
-	/**
-	 * Callback invoked after a successful import that requires refresh.
-	 * Set by UsuariosDataFacade.
-	 */
-	onImportSuccess: (() => void) | null = null;
-
 	// #region CRUD Operations
 
 	/**
@@ -179,12 +167,12 @@ export class UsuariosCrudFacade {
 					this.store.setImportResult(result);
 					this.store.setImportLoading(false);
 					if (result.creados > 0) {
-						this.onImportSuccess?.();
+						this.store.refreshNeeded$.next();
 						this.store.incrementarEstadistica('totalEstudiantes', result.creados);
 						this.store.incrementarEstadistica('totalUsuarios', result.creados);
 						this.store.incrementarEstadistica('usuariosActivos', result.creados);
 					} else if (result.actualizados > 0) {
-						this.onImportSuccess?.();
+						this.store.refreshNeeded$.next();
 					}
 				},
 				error: (err) => {
@@ -212,7 +200,7 @@ export class UsuariosCrudFacade {
 			payload,
 			http$: () => this.usuariosService.crearUsuario(payload),
 			onCommit: () => {
-				this.onCreateCommit?.();
+				this.store.refreshNeeded$.next();
 				this.store.incrementarEstadistica('totalUsuarios', 1);
 				this.store.incrementarEstadistica('usuariosActivos', 1);
 				this.updateRolEstadistica(data.rol!, 1);

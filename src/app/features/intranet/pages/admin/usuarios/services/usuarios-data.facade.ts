@@ -9,7 +9,6 @@ import { UI_ADMIN_ERROR_DETAILS, UI_SUMMARIES } from '@app/shared/constants';
 import { RolUsuarioAdmin, UsuarioLista, UsuariosEstadisticas } from './usuarios.models';
 import { UsuariosService } from './usuarios.service';
 import { UsuariosStore } from './usuarios.store';
-import { UsuariosCrudFacade } from './usuarios-crud.facade';
 
 /**
  * Facade for data loading, search, filtering, and cache refresh.
@@ -24,7 +23,6 @@ export class UsuariosDataFacade {
 	private swService = inject(SwService);
 	private walService = inject(WalService);
 	private destroyRef = inject(DestroyRef);
-	private crudFacade = inject(UsuariosCrudFacade);
 	private readonly searchTrigger$ = new Subject<string>();
 
 	// Expone ViewModel del store
@@ -33,7 +31,7 @@ export class UsuariosDataFacade {
 	constructor() {
 		this.setupSearchPipeline();
 		this.setupCacheRefresh();
-		this.wireCrudCallbacks();
+		this.setupRefreshOnCrudCommit();
 	}
 
 	// #region Data Loading
@@ -193,9 +191,10 @@ export class UsuariosDataFacade {
 	}
 
 	/** Wire callbacks so CrudFacade can trigger refresh without circular dependency */
-	private wireCrudCallbacks(): void {
-		this.crudFacade.onCreateCommit = () => this.refreshUsuariosOnly();
-		this.crudFacade.onImportSuccess = () => this.refreshUsuariosOnly();
+	private setupRefreshOnCrudCommit(): void {
+		this.store.refreshNeeded$.pipe(
+			takeUntilDestroyed(this.destroyRef),
+		).subscribe(() => this.refreshUsuariosOnly());
 	}
 
 	/**

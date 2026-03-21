@@ -11,12 +11,11 @@ import {
 } from '../models/horario.interface';
 import {
   UI_ADMIN_ERROR_DETAILS,
-  UI_ADMIN_ERROR_DETAILS_DYNAMIC,
-  UI_GENERIC_MESSAGES,
   UI_HORARIOS_SUCCESS_MESSAGES,
   UI_HORARIOS_SUCCESS_MESSAGES_DYNAMIC,
   UI_SUMMARIES,
 } from '@app/shared/constants';
+import { handleHorarioApiError } from '../helpers/horario-error.utils';
 import { HorariosApiService } from './horarios-api.service';
 import { HorariosAssignmentService } from './horarios-assignment.service';
 import { HorariosDataFacade } from './horarios-data.facade';
@@ -313,31 +312,8 @@ export class HorariosCrudFacade {
   // #endregion
   // #region Helpers privados
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  private handleApiError(err: any, accion: string): void {
-    const mensaje = err?.error?.message || err?.message || UI_GENERIC_MESSAGES.unknownError;
-
-    if (mensaje.includes('conflicto') || mensaje.includes('overlap')) {
-      this.errorHandler.showError(
-        UI_SUMMARIES.scheduleConflict,
-        UI_ADMIN_ERROR_DETAILS.horarioConflict
-      );
-    } else if (mensaje.includes('no encontrado') || mensaje.includes('not found')) {
-      this.errorHandler.showError(
-        UI_SUMMARIES.error,
-        UI_ADMIN_ERROR_DETAILS_DYNAMIC.horarioActionNotFound(accion)
-      );
-    } else if (mensaje.includes('validación') || mensaje.includes('validation')) {
-      this.errorHandler.showError(
-        UI_SUMMARIES.validationError,
-        UI_ADMIN_ERROR_DETAILS_DYNAMIC.horarioValidation(mensaje)
-      );
-    } else {
-      this.errorHandler.showError(
-        UI_SUMMARIES.error,
-        UI_ADMIN_ERROR_DETAILS_DYNAMIC.horarioActionFailed(accion)
-      );
-    }
+  private handleApiError(err: unknown, accion: string): void {
+    handleHorarioApiError(this.errorHandler, err, accion);
   }
 
   // #endregion
