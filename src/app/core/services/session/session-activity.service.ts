@@ -3,7 +3,7 @@ import { Injectable, inject, signal, PLATFORM_ID } from '@angular/core';
 import { isPlatformBrowser } from '@angular/common';
 import { Router } from '@angular/router';
 
-import { filter, take } from 'rxjs';
+import { filter, Subject, take, takeUntil } from 'rxjs';
 
 import { AuthApiService } from '@core/services/auth/auth-api.service';
 import { AuthService } from '@core/services/auth/auth.service';
@@ -83,6 +83,7 @@ export class SessionActivityService {
 	private boundActivityHandler: (() => void) | null = null;
 	private boundVisibilityHandler: (() => void) | null = null;
 	private channel: BroadcastChannel | null = null;
+	private readonly cancelReconnect$ = new Subject<void>();
 	// #endregion
 
 	// #region Public API
@@ -116,6 +117,7 @@ export class SessionActivityService {
 	stop(): void {
 		if (!this._isRunning()) return;
 
+		this.cancelReconnect$.next();
 		this.removeActivityListeners();
 		this.removeVisibilityListener();
 		this.teardownBroadcastChannel();
@@ -391,10 +393,14 @@ export class SessionActivityService {
 	 * once connectivity is restored instead of forcing a false logout.
 	 */
 	private waitForReconnection(): void {
+		// Cancel any previous reconnection listener to prevent stacking
+		this.cancelReconnect$.next();
+
 		this.swService.isOnline$
 			.pipe(
 				filter((online) => online),
 				take(1),
+				takeUntil(this.cancelReconnect$),
 			)
 			.subscribe(() => {
 				if (!this._isRunning()) return;

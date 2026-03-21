@@ -75,6 +75,8 @@ export class SignalRService {
 		if (!this.connection) return;
 
 		this.joinedGroups.clear();
+		this.connection.off('NuevoMensaje');
+		this.connection.off('UserTyping');
 		try {
 			await this.connection.stop();
 		} catch (err) {
@@ -126,6 +128,10 @@ export class SignalRService {
 	// #region Helpers privados
 	private registerHandlers(): void {
 		if (!this.connection) return;
+
+		// Prevent handler duplication on reconnect
+		this.connection.off('NuevoMensaje');
+		this.connection.off('UserTyping');
 
 		this.connection.on('NuevoMensaje', (raw: Record<string, unknown>) => {
 			const mensaje = this.normalizeMensaje(raw);

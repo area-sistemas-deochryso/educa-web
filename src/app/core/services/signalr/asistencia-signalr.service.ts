@@ -64,6 +64,7 @@ export class AsistenciaSignalRService {
 	async disconnect(): Promise<void> {
 		if (!this.connection) return;
 
+		this.connection.off('AsistenciaRegistrada');
 		try {
 			await this.connection.stop();
 		} catch (err) {
@@ -78,6 +79,9 @@ export class AsistenciaSignalRService {
 	// #region Helpers privados
 	private registerHandlers(): void {
 		if (!this.connection) return;
+
+		// Prevent handler duplication on reconnect
+		this.connection.off('AsistenciaRegistrada');
 
 		this.connection.on('AsistenciaRegistrada', (raw: Record<string, unknown>) => {
 			const event = this.normalizeEvent(raw);
