@@ -35,6 +35,7 @@ import {
 	buildToggleUsuarioMessage,
 } from '@app/shared/constants';
 import { environment } from '@env/environment';
+import { logger } from '@core/helpers';
 import type { ImportarEstudianteItem } from './services';
 
 // #endregion
@@ -228,6 +229,60 @@ export class UsuariosComponent implements AfterViewInit {
 
 	onImportar(filas: ImportarEstudianteItem[]): void {
 		this.crudFacade.importarEstudiantes(filas);
+	}
+
+	onExportCredenciales(rol: string): void {
+		this.usuariosApi.exportarCredenciales(rol).subscribe({
+			next: async (credenciales) => {
+				if (credenciales.length === 0) {
+					logger.warn('No hay credenciales para exportar');
+					return;
+				}
+				await this.generateExcel(credenciales, rol);
+			},
+			error: (err) => logger.error('Error al exportar credenciales', err),
+		});
+	}
+
+	private async generateExcel(
+		credenciales: { nombreCompleto: string; dni: string; contrasena: string | null }[],
+		rol: string,
+	): Promise<void> {
+		const ExcelJS = await import('exceljs');
+		const { saveAs } = await import('file-saver');
+
+		const workbook = new ExcelJS.Workbook();
+		const rolLabel = rol === 'Estudiante' ? 'Alumnos' : 'Profesores';
+		const sheet = workbook.addWorksheet(`Credenciales ${rolLabel}`);
+
+		sheet.columns = [
+			{ header: 'Nombre Completo', key: 'nombreCompleto', width: 40 },
+			{ header: 'DNI', key: 'dni', width: 15 },
+			{ header: 'Contraseña', key: 'contrasena', width: 20 },
+		];
+
+		// Header styling
+		sheet.getRow(1).eachCell((cell) => {
+			cell.font = { bold: true, color: { argb: 'FFFFFFFF' } };
+			cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FF4F46E5' } };
+			cell.alignment = { horizontal: 'center', vertical: 'middle' };
+		});
+		sheet.getRow(1).height = 25;
+
+		credenciales.forEach((c) => {
+			sheet.addRow({
+				nombreCompleto: c.nombreCompleto,
+				dni: c.dni,
+				contrasena: c.contrasena ?? '(no disponible)',
+			});
+		});
+
+		const buffer = await workbook.xlsx.writeBuffer();
+		const blob = new Blob([buffer], {
+			type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+		});
+		const fecha = new Date().toISOString().slice(0, 10);
+		saveAs(blob, `Credenciales_${rolLabel}_${fecha}.xlsx`);
 	}
 
 	onMigrarContrasenas(): void {

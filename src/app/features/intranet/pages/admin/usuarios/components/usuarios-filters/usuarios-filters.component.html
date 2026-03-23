@@ -48,6 +48,33 @@
 
 	<div class="filter-spacer"></div>
 
+	<!-- * Export credentials actions -->
+	<button
+		pButton
+		icon="pi pi-download"
+		label="Credenciales Alumnos"
+		class="p-button-outlined"
+		(click)="onExportCredenciales('Estudiante')"
+		[pt]="{
+			root: {
+				'aria-label': 'Exportar credenciales de alumnos a Excel',
+			},
+		}"
+	></button>
+
+	<button
+		pButton
+		icon="pi pi-download"
+		label="Credenciales Profesores"
+		class="p-button-outlined"
+		(click)="onExportCredenciales('Profesor')"
+		[pt]="{
+			root: {
+				'aria-label': 'Exportar credenciales de profesores a Excel',
+			},
+		}"
+	></button>
+
 	<!-- * Import students action -->
 	<button
 		pButton

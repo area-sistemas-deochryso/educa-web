@@ -39,6 +39,7 @@ export class UsuariosFiltersComponent {
 	readonly clearFilters = output<void>();
 	readonly newUsuario = output<void>();
 	readonly importUsuarios = output<void>();
+	readonly exportCredenciales = output<string>();
 
 	onSearchChange(value: string): void {
 		this.searchChange.emit(value);
@@ -62,6 +63,10 @@ export class UsuariosFiltersComponent {
 
 	onImportUsuarios(): void {
 		this.importUsuarios.emit();
+	}
+
+	onExportCredenciales(rol: string): void {
+		this.exportCredenciales.emit(rol);
 	}
 }
 // #endregion

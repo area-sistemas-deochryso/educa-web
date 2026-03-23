@@ -23,7 +23,7 @@ export const environment = {
 		profesor: true, //? provisional de momento
 		estudiante: true,
 		ctestK6: false,
-		videoconferencias: false,
+		videoconferencias: true,
 		campusNavigation: false,
 	},
 

@@ -2,6 +2,7 @@
 import {
 	ActualizarUsuarioRequest,
 	CrearUsuarioRequest,
+	CredencialExport,
 	ImportarEstudianteItem,
 	ImportarEstudiantesResponse,
 	UsuarioDetalle,
@@ -138,6 +139,15 @@ export class UsuariosService {
 	migrarContrasenas(): Observable<{ data: { migrados: number; yaHasheados: number; yaMigrados: number; errores: number } }> {
 		return this.http.post<{ data: { migrados: number; yaHasheados: number; yaMigrados: number; errores: number } }>(
 			`${this.apiUrl}/migrar-contrasenas`, {});
+	}
+
+	/**
+	 * Export credentials (name, DNI, password) by role.
+	 */
+	exportarCredenciales(rol: string): Observable<CredencialExport[]> {
+		return this.http
+			.get<CredencialExport[]>(`${this.apiUrl}/exportar-credenciales/${encodeURIComponent(rol)}`)
+			.pipe(catchError(() => of([])));
 	}
 
 	/**

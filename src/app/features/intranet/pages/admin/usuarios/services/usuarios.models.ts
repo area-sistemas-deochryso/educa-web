@@ -130,6 +130,15 @@ export type RolUsuarioAdmin = AppUserRoleAdmin;
 export const ROLES_USUARIOS_ADMIN: RolUsuarioAdmin[] = APP_USER_ROLE_ADMIN_LIST;
 
 /**
+ * Credential export DTO for Excel generation.
+ */
+export interface CredencialExport {
+	nombreCompleto: string;
+	dni: string;
+	contrasena: string | null;
+}
+
+/**
  * Payload for a single student in a bulk import request.
  */
 export interface ImportarEstudianteItem {
