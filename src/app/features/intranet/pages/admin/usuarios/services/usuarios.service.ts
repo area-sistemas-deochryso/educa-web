@@ -133,6 +133,14 @@ export class UsuariosService {
 	}
 
 	/**
+	 * One-time migration: encrypt plaintext passwords and hash them.
+	 */
+	migrarContrasenas(): Observable<{ data: { migrados: number; yaHasheados: number; yaMigrados: number; errores: number } }> {
+		return this.http.post<{ data: { migrados: number; yaHasheados: number; yaMigrados: number; errores: number } }>(
+			`${this.apiUrl}/migrar-contrasenas`, {});
+	}
+
+	/**
 	 * Get user statistics.
 	 */
 	obtenerEstadisticas(): Observable<UsuariosEstadisticas | null> {

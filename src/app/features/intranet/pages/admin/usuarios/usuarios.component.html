@@ -3,6 +3,25 @@
 	<!-- * Header actions -->
 	<app-usuarios-header (refresh)="onRefresh()" />
 
+	<!-- * One-time migration button (dev only, remove after use) -->
+	@if (isDev && !migracionCompletada()) {
+		<div class="migration-banner">
+			<span><i class="pi pi-info-circle"></i> Hay contraseñas en texto plano que pueden migrarse al campo encriptado.</span>
+			<button
+				pButton
+				label="Migrar Contraseñas"
+				icon="pi pi-shield"
+				class="p-button-warning p-button-sm"
+				[loading]="migracionLoading()"
+				(click)="onMigrarContrasenas()"
+			></button>
+		</div>
+	} @else if (isDev && migracionCompletada()) {
+		<div class="migration-banner migration-success">
+			<span><i class="pi pi-check-circle"></i> {{ migracionMensaje() }}</span>
+		</div>
+	}
+
 	@if (!vm().statsReady) {
 		<!-- * Stats skeleton while loading -->
 		<app-usuarios-stats-skeleton />

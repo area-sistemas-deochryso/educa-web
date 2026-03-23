@@ -1,5 +1,5 @@
 // #region Imports
-import { AfterViewInit, ChangeDetectionStrategy, Component, inject } from '@angular/core';
+import { AfterViewInit, ChangeDetectionStrategy, Component, inject, signal } from '@angular/core';
 import { ButtonModule } from 'primeng/button';
 import { CommonModule } from '@angular/common';
 import { ConfirmDialogModule } from 'primeng/confirmdialog';
@@ -12,6 +12,7 @@ import {
 	RolUsuarioAdmin,
 	UsuarioLista,
 } from './services';
+import { UsuariosService } from './services/usuarios.service';
 import { UsuariosHeaderComponent } from './components/usuarios-header/usuarios-header.component';
 import { UsuariosStatsComponent } from './components/usuarios-stats/usuarios-stats.component';
 import { UsuariosStatsSkeletonComponent } from './components/usuarios-stats-skeleton/usuarios-stats-skeleton.component';
@@ -33,6 +34,7 @@ import {
 	UI_CONFIRM_LABELS,
 	buildToggleUsuarioMessage,
 } from '@app/shared/constants';
+import { environment } from '@env/environment';
 import type { ImportarEstudianteItem } from './services';
 
 // #endregion
@@ -64,6 +66,13 @@ export class UsuariosComponent implements AfterViewInit {
 	private crudFacade = inject(UsuariosCrudFacade);
 	private uiFacade = inject(UsuariosUiFacade);
 	private confirmationService = inject(ConfirmationService);
+	private usuariosApi = inject(UsuariosService);
+
+	// * Migration state (one-time, only in development)
+	readonly isDev = !environment.production;
+	readonly migracionLoading = signal(false);
+	readonly migracionCompletada = signal(false);
+	readonly migracionMensaje = signal('');
 
 	// * View-model snapshot from data facade (signals).
 	readonly vm = this.dataFacade.vm;
@@ -219,6 +228,23 @@ export class UsuariosComponent implements AfterViewInit {
 
 	onImportar(filas: ImportarEstudianteItem[]): void {
 		this.crudFacade.importarEstudiantes(filas);
+	}
+
+	onMigrarContrasenas(): void {
+		this.migracionLoading.set(true);
+		this.usuariosApi.migrarContrasenas().subscribe({
+			next: (res) => {
+				const d = res.data;
+				this.migracionMensaje.set(
+					`Migración completada: ${d.migrados} migrados, ${d.yaHasheados} ya hasheados, ${d.yaMigrados} ya migrados.`,
+				);
+				this.migracionCompletada.set(true);
+				this.migracionLoading.set(false);
+			},
+			error: () => {
+				this.migracionLoading.set(false);
+			},
+		});
 	}
 	// #endregion
 
