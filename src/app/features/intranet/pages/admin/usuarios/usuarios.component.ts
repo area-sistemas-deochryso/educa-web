@@ -253,7 +253,6 @@ export class UsuariosComponent implements AfterViewInit {
 		rol: string,
 	): Promise<void> {
 		const ExcelJS = await import('exceljs');
-		const { saveAs } = await import('file-saver');
 
 		// eslint-disable-next-line @typescript-eslint/no-explicit-any
 		const mod = ExcelJS as any;
@@ -288,7 +287,15 @@ export class UsuariosComponent implements AfterViewInit {
 			type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
 		});
 		const fecha = new Date().toISOString().slice(0, 10);
-		saveAs(blob, `Credenciales_${rolLabel}_${fecha}.xlsx`);
+		const fileName = `Credenciales_${rolLabel}_${fecha}.xlsx`;
+
+		// Download using native browser API
+		const url = URL.createObjectURL(blob);
+		const link = document.createElement('a');
+		link.href = url;
+		link.download = fileName;
+		link.click();
+		URL.revokeObjectURL(url);
 	}
 
 	onMigrarContrasenas(): void {
