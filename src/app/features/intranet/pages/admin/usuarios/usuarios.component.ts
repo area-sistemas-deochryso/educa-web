@@ -231,8 +231,9 @@ export class UsuariosComponent implements AfterViewInit {
 		this.crudFacade.importarEstudiantes(filas);
 	}
 
-	onExportCredenciales(rol: string): void {
-		this.usuariosApi.exportarCredenciales(rol).subscribe({
+	onExportCredenciales(rol: string, esVerano = false): void {
+		const anio = rol === 'Estudiante' ? new Date().getFullYear() : undefined;
+		this.usuariosApi.exportarCredenciales(rol, anio, esVerano).subscribe({
 			next: async (credenciales) => {
 				if (!credenciales || credenciales.length === 0) {
 					logger.warn('No hay credenciales para exportar');

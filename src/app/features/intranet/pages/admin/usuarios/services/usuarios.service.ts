@@ -143,10 +143,15 @@ export class UsuariosService {
 
 	/**
 	 * Export credentials (name, DNI, password) by role.
+	 * For students: filters by year and period (regular vs verano).
 	 */
-	exportarCredenciales(rol: string): Observable<CredencialExport[]> {
+	exportarCredenciales(rol: string, anio?: number, esVerano?: boolean): Observable<CredencialExport[]> {
+		const params: Record<string, string> = {};
+		if (anio) params['anio'] = anio.toString();
+		if (esVerano) params['esVerano'] = 'true';
+
 		return this.http
-			.get<CredencialExport[]>(`${this.apiUrl}/exportar-credenciales/${encodeURIComponent(rol)}`)
+			.get<CredencialExport[]>(`${this.apiUrl}/exportar-credenciales/${encodeURIComponent(rol)}`, { params })
 			.pipe(catchError(() => of([])));
 	}
 
