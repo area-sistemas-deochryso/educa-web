@@ -1,5 +1,5 @@
 // #region Imports
-import { ChangeDetectionStrategy, Component, input, output } from '@angular/core';
+import { ChangeDetectionStrategy, Component, input, output, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { ButtonModule } from 'primeng/button';
 import { InputTextModule } from 'primeng/inputtext';
@@ -39,7 +39,10 @@ export class UsuariosFiltersComponent {
 	readonly clearFilters = output<void>();
 	readonly newUsuario = output<void>();
 	readonly importUsuarios = output<void>();
-	readonly exportCredenciales = output<string>();
+	readonly exportCredenciales = output<{ rol: string; esVerano: boolean }>();
+
+	// Toggle para periodo de exportación de alumnos
+	readonly esVerano = signal(false);
 
 	onSearchChange(value: string): void {
 		this.searchChange.emit(value);
@@ -66,7 +69,11 @@ export class UsuariosFiltersComponent {
 	}
 
 	onExportCredenciales(rol: string): void {
-		this.exportCredenciales.emit(rol);
+		this.exportCredenciales.emit({ rol, esVerano: rol === 'Estudiante' ? this.esVerano() : false });
+	}
+
+	togglePeriodo(): void {
+		this.esVerano.update((v) => !v);
 	}
 }
 // #endregion

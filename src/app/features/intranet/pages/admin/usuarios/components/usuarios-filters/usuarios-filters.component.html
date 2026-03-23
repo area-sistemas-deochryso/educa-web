@@ -51,6 +51,19 @@
 	<!-- * Export credentials actions -->
 	<button
 		pButton
+		[icon]="esVerano() ? 'pi pi-sun' : 'pi pi-calendar'"
+		[label]="esVerano() ? 'Verano' : 'Regular'"
+		class="p-button-text p-button-sm"
+		(click)="togglePeriodo()"
+		[pt]="{
+			root: {
+				'aria-label': esVerano() ? 'Cambiar a periodo regular' : 'Cambiar a periodo de verano',
+			},
+		}"
+	></button>
+
+	<button
+		pButton
 		icon="pi pi-download"
 		label="Credenciales Alumnos"
 		class="p-button-outlined"
