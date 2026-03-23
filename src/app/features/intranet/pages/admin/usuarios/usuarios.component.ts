@@ -234,11 +234,15 @@ export class UsuariosComponent implements AfterViewInit {
 	onExportCredenciales(rol: string): void {
 		this.usuariosApi.exportarCredenciales(rol).subscribe({
 			next: async (credenciales) => {
-				if (credenciales.length === 0) {
+				if (!credenciales || credenciales.length === 0) {
 					logger.warn('No hay credenciales para exportar');
 					return;
 				}
-				await this.generateExcel(credenciales, rol);
+				try {
+					await this.generateExcel(credenciales, rol);
+				} catch (err) {
+					logger.error('Error al generar Excel', err);
+				}
 			},
 			error: (err) => logger.error('Error al exportar credenciales', err),
 		});
@@ -251,7 +255,10 @@ export class UsuariosComponent implements AfterViewInit {
 		const ExcelJS = await import('exceljs');
 		const { saveAs } = await import('file-saver');
 
-		const workbook = new ExcelJS.Workbook();
+		// eslint-disable-next-line @typescript-eslint/no-explicit-any
+		const mod = ExcelJS as any;
+		const WorkbookClass = mod.Workbook ?? mod.default?.Workbook;
+		const workbook = new WorkbookClass();
 		const rolLabel = rol === 'Estudiante' ? 'Alumnos' : 'Profesores';
 		const sheet = workbook.addWorksheet(`Credenciales ${rolLabel}`);
 
@@ -262,12 +269,11 @@ export class UsuariosComponent implements AfterViewInit {
 		];
 
 		// Header styling
-		sheet.getRow(1).eachCell((cell) => {
-			cell.font = { bold: true, color: { argb: 'FFFFFFFF' } };
-			cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FF4F46E5' } };
-			cell.alignment = { horizontal: 'center', vertical: 'middle' };
-		});
-		sheet.getRow(1).height = 25;
+		const headerRow = sheet.getRow(1);
+		headerRow.font = { bold: true, color: { argb: 'FFFFFFFF' } };
+		headerRow.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FF4F46E5' } };
+		headerRow.alignment = { horizontal: 'center', vertical: 'middle' };
+		headerRow.height = 25;
 
 		credenciales.forEach((c) => {
 			sheet.addRow({
