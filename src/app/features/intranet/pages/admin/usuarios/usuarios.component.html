@@ -41,7 +41,7 @@
 		(clearFilters)="onClearFilters()"
 		(newUsuario)="onNewUsuario()"
 		(importUsuarios)="onImportUsuarios()"
-		(exportCredenciales)="onExportCredenciales($event.rol, $event.esVerano)"
+		(exportCredenciales)="onExportCredenciales($event.rol, $event.esVerano, $event.anio)"
 	/>
 
 	@if (!vm().tableReady) {

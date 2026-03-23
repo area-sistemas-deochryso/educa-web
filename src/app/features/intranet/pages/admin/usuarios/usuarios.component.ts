@@ -237,8 +237,7 @@ export class UsuariosComponent implements AfterViewInit {
 	 *   ordenado por grado → sección → nombre completo.
 	 * - Profesores: todos los activos ordenados alfabéticamente.
 	 */
-	onExportCredenciales(rol: string, esVerano = false): void {
-		const anio = rol === 'Estudiante' ? new Date().getFullYear() : undefined;
+	onExportCredenciales(rol: string, esVerano = false, anio?: number): void {
 		this.usuariosApi.exportarCredenciales(rol, anio, esVerano).subscribe({
 			next: async (credenciales) => {
 				if (!credenciales || credenciales.length === 0) {

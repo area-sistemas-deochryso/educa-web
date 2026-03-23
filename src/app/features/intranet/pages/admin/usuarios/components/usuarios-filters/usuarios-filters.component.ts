@@ -39,10 +39,18 @@ export class UsuariosFiltersComponent {
 	readonly clearFilters = output<void>();
 	readonly newUsuario = output<void>();
 	readonly importUsuarios = output<void>();
-	readonly exportCredenciales = output<{ rol: string; esVerano: boolean }>();
+	readonly exportCredenciales = output<{ rol: string; esVerano: boolean; anio?: number }>();
 
-	// Toggle para periodo de exportación de alumnos
+	// Filtros de exportación de alumnos
 	readonly esVerano = signal(false);
+	readonly exportAnio = signal(new Date().getFullYear());
+	readonly anioOptions = Array.from(
+		{ length: new Date().getFullYear() - 2026 + 1 },
+		(_, i) => {
+			const year = 2026 + i;
+			return { label: year.toString(), value: year };
+		},
+	);
 
 	onSearchChange(value: string): void {
 		this.searchChange.emit(value);
@@ -69,7 +77,11 @@ export class UsuariosFiltersComponent {
 	}
 
 	onExportCredenciales(rol: string): void {
-		this.exportCredenciales.emit({ rol, esVerano: rol === 'Estudiante' ? this.esVerano() : false });
+		this.exportCredenciales.emit({
+			rol,
+			esVerano: rol === 'Estudiante' ? this.esVerano() : false,
+			anio: rol === 'Estudiante' ? this.exportAnio() : undefined,
+		});
 	}
 
 	togglePeriodo(): void {

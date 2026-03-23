@@ -48,7 +48,15 @@
 
 	<div class="filter-spacer"></div>
 
-	<!-- * Export credentials actions -->
+	<!-- * Export filters (año + periodo) -->
+	<p-select
+		[options]="anioOptions"
+		[ngModel]="exportAnio()"
+		(ngModelChange)="exportAnio.set($event)"
+		appendTo="body"
+		[style]="{ minWidth: '90px' }"
+	/>
+
 	<button
 		pButton
 		[icon]="esVerano() ? 'pi pi-sun' : 'pi pi-calendar'"
