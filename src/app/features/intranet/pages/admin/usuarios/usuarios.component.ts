@@ -231,6 +231,12 @@ export class UsuariosComponent implements AfterViewInit {
 		this.crudFacade.importarEstudiantes(filas);
 	}
 
+	/**
+	 * Exporta credenciales a Excel.
+	 * - Estudiantes: filtra por año actual y periodo (regular = secciones A/B, verano = sección V),
+	 *   ordenado por grado → sección → nombre completo.
+	 * - Profesores: todos los activos ordenados alfabéticamente.
+	 */
 	onExportCredenciales(rol: string, esVerano = false): void {
 		const anio = rol === 'Estudiante' ? new Date().getFullYear() : undefined;
 		this.usuariosApi.exportarCredenciales(rol, anio, esVerano).subscribe({
