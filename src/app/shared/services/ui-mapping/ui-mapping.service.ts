@@ -14,6 +14,56 @@ const ROLE_SEVERITY_BY_ROLE: Record<string, Severity> = {
 	[APP_USER_ROLES.Estudiante]: 'success',
 };
 
+// #region Evento Calendario mappings
+const EVENTO_TIPO_SEVERITY: Record<string, Severity> = {
+	academic: 'info',
+	cultural: 'contrast',
+	sports: 'success',
+	meeting: 'warn',
+	other: 'secondary',
+};
+
+const EVENTO_TIPO_LABEL: Record<string, string> = {
+	academic: 'Académico',
+	cultural: 'Cultural',
+	sports: 'Deportivo',
+	meeting: 'Reunión',
+	other: 'Otro',
+};
+// #endregion
+
+// #region Notificación mappings
+const NOTIFICACION_TIPO_SEVERITY: Record<string, Severity> = {
+	matricula: 'info',
+	pago: 'warn',
+	academico: 'success',
+	festividad: 'contrast',
+	evento: 'secondary',
+};
+
+const NOTIFICACION_TIPO_LABEL: Record<string, string> = {
+	matricula: 'Matrícula',
+	pago: 'Pago',
+	academico: 'Académico',
+	festividad: 'Festividad',
+	evento: 'Evento',
+};
+
+const NOTIFICACION_PRIORIDAD_SEVERITY: Record<string, Severity> = {
+	low: 'info',
+	medium: 'warn',
+	high: 'danger',
+	urgent: 'danger',
+};
+
+const NOTIFICACION_PRIORIDAD_LABEL: Record<string, string> = {
+	low: 'Baja',
+	medium: 'Media',
+	high: 'Alta',
+	urgent: 'Urgente',
+};
+// #endregion
+
 /**
  * Servicio con utilidades de mapeo UI (severity, labels, etc.)
  * Centraliza helpers comunes para evitar código duplicado
@@ -65,5 +115,33 @@ export class UiMappingService {
 	getVistasCountLabel(count: number): string {
 		return count === 1 ? '1 vista seleccionada' : `${count} vistas seleccionadas`;
 	}
+
+	// #region Evento Calendario
+	getEventoTipoSeverity(tipo: string): Severity {
+		return EVENTO_TIPO_SEVERITY[tipo] ?? 'secondary';
+	}
+
+	getEventoTipoLabel(tipo: string): string {
+		return EVENTO_TIPO_LABEL[tipo] ?? tipo;
+	}
+	// #endregion
+
+	// #region Notificaciones
+	getNotificacionTipoSeverity(tipo: string): Severity {
+		return NOTIFICACION_TIPO_SEVERITY[tipo] ?? 'secondary';
+	}
+
+	getNotificacionTipoLabel(tipo: string): string {
+		return NOTIFICACION_TIPO_LABEL[tipo] ?? tipo;
+	}
+
+	getNotificacionPrioridadSeverity(prioridad: string): Severity {
+		return NOTIFICACION_PRIORIDAD_SEVERITY[prioridad] ?? 'secondary';
+	}
+
+	getNotificacionPrioridadLabel(prioridad: string): string {
+		return NOTIFICACION_PRIORIDAD_LABEL[prioridad] ?? prioridad;
+	}
+	// #endregion
 }
 // #endregion

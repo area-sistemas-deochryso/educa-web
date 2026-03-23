@@ -19,6 +19,7 @@ import { IconFieldModule } from 'primeng/iconfield';
 import { InputIconModule } from 'primeng/inputicon';
 
 import { PageHeaderComponent } from '@shared/components';
+import { UiMappingService } from '@shared/services';
 import { NotificacionesAdminFacade, NotificacionesAdminStore } from './services';
 import type { NotificacionFormData } from './services';
 import { NotificacionLista } from '@data/models';
@@ -56,6 +57,7 @@ export class NotificacionesAdminComponent implements OnInit {
 	private facade = inject(NotificacionesAdminFacade);
 	private store = inject(NotificacionesAdminStore);
 	private confirmationService = inject(ConfirmationService);
+	readonly uiMapping = inject(UiMappingService);
 	// #endregion
 
 	// #region Estado del facade
@@ -182,43 +184,6 @@ export class NotificacionesAdminComponent implements OnInit {
 	}
 	// #endregion
 
-	// #region UI helpers
-	getTipoSeverity(tipo: string): 'success' | 'info' | 'warn' | 'danger' | 'secondary' | 'contrast' {
-		const map: Record<string, 'success' | 'info' | 'warn' | 'danger' | 'secondary' | 'contrast'> = {
-			matricula: 'info',
-			pago: 'warn',
-			academico: 'success',
-			festividad: 'contrast',
-			evento: 'secondary',
-		};
-		return map[tipo] ?? 'secondary';
-	}
-
-	getPrioridadSeverity(prioridad: string): 'success' | 'info' | 'warn' | 'danger' | 'secondary' | 'contrast' {
-		const map: Record<string, 'success' | 'info' | 'warn' | 'danger' | 'secondary' | 'contrast'> = {
-			low: 'info',
-			medium: 'warn',
-			high: 'danger',
-			urgent: 'danger',
-		};
-		return map[prioridad] ?? 'secondary';
-	}
-
-	getPrioridadLabel(prioridad: string): string {
-		const map: Record<string, string> = { low: 'Baja', medium: 'Media', high: 'Alta', urgent: 'Urgente' };
-		return map[prioridad] ?? prioridad;
-	}
-
-	getTipoLabel(tipo: string): string {
-		const map: Record<string, string> = {
-			matricula: 'Matrícula',
-			pago: 'Pago',
-			academico: 'Académico',
-			festividad: 'Festividad',
-			evento: 'Evento',
-		};
-		return map[tipo] ?? tipo;
-	}
-	// #endregion
+	// UI helpers: uiMapping.getNotificacionTipo*(), uiMapping.getNotificacionPrioridad*()
 }
 // #endregion

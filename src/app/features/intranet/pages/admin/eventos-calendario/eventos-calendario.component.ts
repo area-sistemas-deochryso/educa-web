@@ -19,6 +19,7 @@ import { IconFieldModule } from 'primeng/iconfield';
 import { InputIconModule } from 'primeng/inputicon';
 
 import { PageHeaderComponent } from '@shared/components';
+import { UiMappingService } from '@shared/services';
 import { EventosCalendarioFacade, EventosCalendarioStore } from './services';
 import type { EventoFormData } from './services';
 import { EventoCalendarioLista } from '@data/models';
@@ -56,6 +57,7 @@ export class EventosCalendarioComponent implements OnInit {
 	private facade = inject(EventosCalendarioFacade);
 	private store = inject(EventosCalendarioStore);
 	private confirmationService = inject(ConfirmationService);
+	readonly uiMapping = inject(UiMappingService);
 	// #endregion
 
 	// #region Estado del facade
@@ -170,28 +172,6 @@ export class EventosCalendarioComponent implements OnInit {
 	}
 	// #endregion
 
-	// #region UI helpers
-	getTipoSeverity(tipo: string): 'success' | 'info' | 'warn' | 'danger' | 'secondary' | 'contrast' {
-		const map: Record<string, 'success' | 'info' | 'warn' | 'danger' | 'secondary' | 'contrast'> = {
-			academic: 'info',
-			cultural: 'contrast',
-			sports: 'success',
-			meeting: 'warn',
-			other: 'secondary',
-		};
-		return map[tipo] ?? 'secondary';
-	}
-
-	getTipoLabel(tipo: string): string {
-		const map: Record<string, string> = {
-			academic: 'Académico',
-			cultural: 'Cultural',
-			sports: 'Deportivo',
-			meeting: 'Reunión',
-			other: 'Otro',
-		};
-		return map[tipo] ?? tipo;
-	}
-	// #endregion
+	// UI helpers: uiMapping.getEventoTipoSeverity(), uiMapping.getEventoTipoLabel()
 }
 // #endregion

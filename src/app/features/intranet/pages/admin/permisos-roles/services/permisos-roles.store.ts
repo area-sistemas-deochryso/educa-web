@@ -1,5 +1,6 @@
 import { Injectable, signal, computed, inject } from '@angular/core';
 
+import { searchMatchAny } from '@core/helpers';
 import { PermisoRol, Vista, ROLES_DISPONIBLES_ADMIN, RolTipoAdmin } from '@core/services';
 import { UiMappingService } from '@shared/services';
 import { buildModulosVistasForDetail, type ModuloVistas } from '../helpers/permisos-modulos.utils';
@@ -94,7 +95,7 @@ export class PermisosRolesStore {
 	// #region Computed — filtrado de vistas en diálogo
 	readonly vistasFiltradas = computed(() => {
 		const modulos = this._modulosVistas();
-		const busqueda = this._vistasBusqueda().toLowerCase();
+		const busqueda = this._vistasBusqueda();
 		const activeIndex = this._activeModuloIndex();
 
 		if (activeIndex >= modulos.length) return [];
@@ -102,11 +103,7 @@ export class PermisosRolesStore {
 		const modulo = modulos[activeIndex];
 		if (!busqueda) return modulo.vistas;
 
-		return modulo.vistas.filter(
-			(v) =>
-				v.nombre.toLowerCase().includes(busqueda) ||
-				v.ruta.toLowerCase().includes(busqueda),
-		);
+		return modulo.vistas.filter((v) => searchMatchAny([v.nombre, v.ruta], busqueda));
 	});
 
 	readonly isAllModuloSelected = computed(() => {
@@ -137,36 +134,45 @@ export class PermisosRolesStore {
 	});
 	// #endregion
 
-	// #region ViewModel
-	readonly vm = computed(() => ({
+	// #region Sub-ViewModels
+	readonly dataVm = computed(() => ({
 		permisosRol: this.permisosRol(),
+		estadisticas: this.estadisticas(),
+		page: this.page(),
+		pageSize: this.pageSize(),
+		totalRecords: this.totalRecords(),
+	}));
+
+	readonly uiVm = computed(() => ({
 		loading: this.loading(),
 		error: this.error(),
-		estadisticas: this.estadisticas(),
-
 		dialogVisible: this.dialogVisible(),
 		detailDrawerVisible: this.detailDrawerVisible(),
 		isEditing: this.isEditing(),
+		confirmDialogVisible: this.confirmDialogVisible(),
+		rolesNoConfigurados: this.rolesNoConfigurados(),
+		rolesSelectOptions: this.rolesSelectOptions(),
+	}));
 
+	readonly formVm = computed(() => ({
 		selectedPermiso: this.selectedPermiso(),
 		selectedRol: this.selectedRol(),
 		selectedVistas: this.selectedVistas(),
-
 		modulosVistas: this.modulosVistas(),
 		activeModuloIndex: this.activeModuloIndex(),
 		vistasBusqueda: this.vistasBusqueda(),
 		vistasFiltradas: this.vistasFiltradas(),
 		isAllModuloSelected: this.isAllModuloSelected(),
-
-		rolesNoConfigurados: this.rolesNoConfigurados(),
-		rolesSelectOptions: this.rolesSelectOptions(),
 		moduloVistasForDetail: this.moduloVistasForDetail(),
 		vistasCountLabel: this.vistasCountLabel(),
-		confirmDialogVisible: this.confirmDialogVisible(),
+	}));
+	// #endregion
 
-		page: this.page(),
-		pageSize: this.pageSize(),
-		totalRecords: this.totalRecords(),
+	// #region ViewModel consolidado
+	readonly vm = computed(() => ({
+		...this.dataVm(),
+		...this.uiVm(),
+		...this.formVm(),
 	}));
 	// #endregion
 

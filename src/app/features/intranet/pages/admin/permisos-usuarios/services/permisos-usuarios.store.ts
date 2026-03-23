@@ -1,4 +1,5 @@
 import { Injectable, computed, signal } from '@angular/core';
+import { searchMatchAny } from '@core/helpers';
 import { PermisoUsuario, PermisoRol, Vista, RolTipoAdmin, UsuarioBusqueda } from '@core/services';
 
 export interface ModuloVistas {
@@ -65,14 +66,12 @@ export class PermisosUsuariosStore {
 	// #region Computed
 	readonly filteredPermisos = computed(() => {
 		let permisos = this._permisosUsuario();
-		const search = this._searchTerm().toLowerCase();
+		const search = this._searchTerm();
 		const filtroRol = this._filterRol();
 
 		if (search) {
-			permisos = permisos.filter(
-				(p) =>
-					p.nombreUsuario?.toLowerCase().includes(search) ||
-					p.usuarioId.toString().includes(search),
+			permisos = permisos.filter((p) =>
+				searchMatchAny([p.nombreUsuario, p.usuarioId.toString()], search),
 			);
 		}
 
@@ -86,7 +85,7 @@ export class PermisosUsuariosStore {
 	// Computed - Vistas filtradas por búsqueda en modal de edición
 	readonly vistasFiltradas = computed(() => {
 		const modulos = this._modulosVistas();
-		const busqueda = this._vistasBusqueda().toLowerCase();
+		const busqueda = this._vistasBusqueda();
 		const activeIndex = this._activeModuloIndex();
 
 		if (activeIndex >= modulos.length) return [];
@@ -94,11 +93,7 @@ export class PermisosUsuariosStore {
 		const modulo = modulos[activeIndex];
 		if (!busqueda) return modulo.vistas;
 
-		return modulo.vistas.filter(
-			(v) =>
-				v.nombre.toLowerCase().includes(busqueda) ||
-				v.ruta.toLowerCase().includes(busqueda),
-		);
+		return modulo.vistas.filter((v) => searchMatchAny([v.nombre, v.ruta], busqueda));
 	});
 
 	// Computed - Check if all module vistas are selected

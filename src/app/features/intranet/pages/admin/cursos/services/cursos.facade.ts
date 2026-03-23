@@ -46,7 +46,7 @@ export class CursosFacade {
 			)
 			.subscribe({
 				next: ({ cursos, stats, grados }) => {
-					this.store.setCursos(cursos.data);
+					this.store.setItems(cursos.data);
 					this.store.setPaginationData(cursos.page, cursos.pageSize, cursos.total);
 					this.store.setEstadisticas(stats);
 					this.store.setGrados(grados);
@@ -97,7 +97,7 @@ export class CursosFacade {
 	 * EDITAR: WAL → optimistic update → rollback to snapshot
 	 */
 	update(id: number, nombre: string, estado: boolean, gradosIds: number[]): void {
-		const snapshot = this.store.cursos().find((c) => c.id === id);
+		const snapshot = this.store.items().find((c) => c.id === id);
 		const payload = { nombre, estado, gradosIds, rowVersion: snapshot?.rowVersion };
 		const grados = this.store.selectedGradosFull();
 
@@ -111,11 +111,11 @@ export class CursosFacade {
 			http$: () => this.api.actualizarCurso(id, payload),
 			optimistic: {
 				apply: () => {
-					this.store.updateCurso(id, { nombre, estado, grados });
+					this.store.updateItem(id, { nombre, estado, grados });
 					this.store.closeDialog();
 				},
 				rollback: () => {
-					if (snapshot) this.store.updateCurso(id, snapshot);
+					if (snapshot) this.store.updateItem(id, snapshot);
 				},
 			},
 			onCommit: () => this.store.setLoading(false),
@@ -179,7 +179,7 @@ export class CursosFacade {
 			http$: () => this.api.eliminarCurso(curso.id),
 			optimistic: {
 				apply: () => {
-					this.store.removeCurso(curso.id);
+					this.store.removeItem(curso.id);
 					this.store.incrementarEstadistica('totalCursos', -1);
 					if (curso.estado) {
 						this.store.incrementarEstadistica('cursosActivos', -1);
@@ -188,7 +188,7 @@ export class CursosFacade {
 					}
 				},
 				rollback: () => {
-					this.store.addCurso(curso);
+					this.store.addItem(curso);
 					this.store.incrementarEstadistica('totalCursos', 1);
 					if (curso.estado) {
 						this.store.incrementarEstadistica('cursosActivos', 1);
@@ -212,7 +212,7 @@ export class CursosFacade {
 	}
 
 	openEditDialog(curso: Curso): void {
-		this.store.setSelectedCurso(curso);
+		this.store.setSelectedItem(curso);
 		this.store.setFormData({ nombre: curso.nombre, estado: curso.estado ?? true });
 		this.store.setIsEditing(true);
 
@@ -240,7 +240,7 @@ export class CursosFacade {
 		const gradosIds = this.store.allGradosIds();
 
 		if (this.store.isEditing()) {
-			const curso = this.store.selectedCurso();
+			const curso = this.store.selectedItem();
 			if (!curso) return;
 			this.update(curso.id, formData.nombre, formData.estado, gradosIds);
 		} else {
@@ -267,8 +267,8 @@ export class CursosFacade {
 	// #endregion
 
 	// #region Comandos de formulario
-	updateFormField(field: 'nombre' | 'estado', value: unknown): void {
-		this.store.updateFormField(field, value);
+	updateFormField(field: 'nombre' | 'estado', value: string | boolean): void {
+		this.store.updateFormField(field, value as never);
 	}
 
 	addGrado(gradoId: number): void {
@@ -319,7 +319,7 @@ export class CursosFacade {
 		const page = this.store.page();
 		const pageSize = this.store.pageSize();
 		const search = this.store.searchTerm() || undefined;
-		const estado = this.store.filterEstado();
+		const estado = this.store.filterEstado() as boolean | null;
 		const nivel = this.store.filterNivel() || undefined;
 
 		this.api
@@ -330,7 +330,7 @@ export class CursosFacade {
 			)
 			.subscribe({
 				next: (result) => {
-					this.store.setCursos(result.data);
+					this.store.setItems(result.data);
 					this.store.setPaginationData(result.page, result.pageSize, result.total);
 					this.store.setLoading(false);
 				},

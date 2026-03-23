@@ -1,6 +1,7 @@
 import { ChangeDetectionStrategy, Component, inject, OnInit, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
+import { calcPageFromLazyEvent } from '@core/helpers';
 
 import { TableModule } from 'primeng/table';
 import { ButtonModule } from 'primeng/button';
@@ -75,15 +76,11 @@ export class VistasComponent implements OnInit {
 
 	// #region Event handlers
 	onLazyLoad(event: { first?: number; rows?: number }): void {
-		// Ignorar el primer onLazyLoad automático: ngOnInit ya cargó los datos
 		if (!this.initialLoadDone()) {
 			this.initialLoadDone.set(true);
 			return;
 		}
-
-		const first = event.first ?? 0;
-		const rows = event.rows ?? 10;
-		const page = Math.floor(first / rows) + 1;
+		const { page, rows } = calcPageFromLazyEvent(event);
 		this.facade.loadPage(page, rows);
 	}
 
@@ -118,7 +115,7 @@ export class VistasComponent implements OnInit {
 		});
 	}
 
-	updateFormField(field: 'ruta' | 'nombre' | 'estado', value: unknown): void {
+	updateFormField(field: 'ruta' | 'nombre' | 'estado', value: string | number): void {
 		this.facade.updateFormField(field, value);
 	}
 

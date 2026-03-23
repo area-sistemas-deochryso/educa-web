@@ -41,7 +41,7 @@ export class VistasFacade {
 			)
 			.subscribe({
 				next: ({ vistas, stats }) => {
-					this.store.setVistas(vistas.data);
+					this.store.setItems(vistas.data);
 					this.store.setPaginationData(vistas.page, vistas.pageSize, vistas.total);
 					this.store.setEstadisticas(stats);
 					this.store.setLoading(false);
@@ -91,7 +91,7 @@ export class VistasFacade {
 	 * EDITAR: WAL → optimistic update → rollback to snapshot
 	 */
 	update(id: number, ruta: string, nombre: string, estado: number): void {
-		const snapshot = this.store.vistas().find((v) => v.id === id);
+		const snapshot = this.store.items().find((v) => v.id === id);
 		const payload = { ruta, nombre, estado, rowVersion: snapshot?.rowVersion };
 
 		this.wal.execute({
@@ -104,11 +104,11 @@ export class VistasFacade {
 			http$: () => this.api.actualizarVista(id, payload),
 			optimistic: {
 				apply: () => {
-					this.store.updateVista(id, { ruta, nombre, estado });
+					this.store.updateItem(id, { ruta, nombre, estado });
 					this.store.closeDialog();
 				},
 				rollback: () => {
-					if (snapshot) this.store.updateVista(id, snapshot);
+					if (snapshot) this.store.updateItem(id, snapshot);
 				},
 			},
 			onCommit: () => this.store.setLoading(false),
@@ -172,7 +172,7 @@ export class VistasFacade {
 			http$: () => this.api.eliminarVista(vista.id),
 			optimistic: {
 				apply: () => {
-					this.store.removeVista(vista.id);
+					this.store.removeItem(vista.id);
 					this.store.incrementarEstadistica('totalVistas', -1);
 					if (vista.estado === 1) {
 						this.store.incrementarEstadistica('vistasActivas', -1);
@@ -181,7 +181,7 @@ export class VistasFacade {
 					}
 				},
 				rollback: () => {
-					this.store.addVista(vista);
+					this.store.addItem(vista);
 					this.store.incrementarEstadistica('totalVistas', 1);
 					if (vista.estado === 1) {
 						this.store.incrementarEstadistica('vistasActivas', 1);
@@ -204,7 +204,7 @@ export class VistasFacade {
 		const formData = this.store.formData();
 
 		if (this.store.isEditing()) {
-			const vista = this.store.selectedVista();
+			const vista = this.store.selectedItem();
 			if (!vista) return;
 			this.update(vista.id, formData.ruta, formData.nombre, formData.estado);
 		} else {
@@ -218,7 +218,7 @@ export class VistasFacade {
 	}
 
 	openEditDialog(vista: Vista): void {
-		this.store.setSelectedVista(vista);
+		this.store.setSelectedItem(vista);
 		this.store.setFormData({
 			ruta: vista.ruta,
 			nombre: vista.nombre,
@@ -243,8 +243,8 @@ export class VistasFacade {
 	// #endregion
 
 	// #region Comandos de formulario
-	updateFormField(field: 'ruta' | 'nombre' | 'estado', value: unknown): void {
-		this.store.updateFormField(field, value);
+	updateFormField(field: 'ruta' | 'nombre' | 'estado', value: string | number): void {
+		this.store.updateFormField(field, value as never);
 	}
 	// #endregion
 
@@ -288,7 +288,7 @@ export class VistasFacade {
 		const pageSize = this.store.pageSize();
 		const search = this.store.searchTerm() || undefined;
 		const modulo = this.store.filterModulo() || undefined;
-		const estado = this.store.filterEstado();
+		const estado = this.store.filterEstado() as number | null;
 
 		this.api
 			.getVistasPaginated(page, pageSize, search, modulo, estado)
@@ -298,7 +298,7 @@ export class VistasFacade {
 			)
 			.subscribe({
 				next: (result) => {
-					this.store.setVistas(result.data);
+					this.store.setItems(result.data);
 					this.store.setPaginationData(result.page, result.pageSize, result.total);
 					this.store.setLoading(false);
 				},

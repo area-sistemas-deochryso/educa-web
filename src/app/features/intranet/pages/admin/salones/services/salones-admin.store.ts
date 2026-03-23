@@ -114,39 +114,49 @@ export class SalonesAdminStore {
 	readonly periodoCerrado = computed(() => this.periodoActual()?.estadoCierre === 'CERRADO');
 	// #endregion
 
-	// #region ViewModel
-	readonly vm = computed(() => ({
+	// #region Sub-ViewModels
+	readonly dataVm = computed(() => ({
 		salones: this.salonesFiltrados(),
 		periodos: this._periodos(),
 		configuraciones: this._configuraciones(),
 		aprobaciones: this._aprobaciones(),
+		estadisticas: this.estadisticas(),
+		periodoActual: this.periodoActual(),
+		configActual: this.configActual(),
+		periodoCerrado: this.periodoCerrado(),
+	}));
 
+	readonly uiVm = computed(() => ({
 		loading: this._loading(),
 		tableReady: this._tableReady(),
 		statsReady: this._statsReady(),
 		aprobacionesLoading: this._aprobacionesLoading(),
 		error: this._error(),
-
 		selectedNivel: this._selectedNivel(),
 		filtroAnio: this._filtroAnio(),
 		selectedSalonId: this._selectedSalonId(),
 		selectedSalon: this.selectedSalon(),
-		periodoActual: this.periodoActual(),
-		configActual: this.configActual(),
-		estadisticas: this.estadisticas(),
-		periodoCerrado: this.periodoCerrado(),
+		configDialogVisible: this._configDialogVisible(),
+		cerrarPeriodoDialogVisible: this._cerrarPeriodoDialogVisible(),
+		salonDialogVisible: this._salonDialogVisible(),
+		confirmDialogVisible: this._confirmDialogVisible(),
+	}));
 
+	readonly salonDetailVm = computed(() => ({
 		salonHorarios: this._salonHorarios(),
 		salonAsistencia: this._salonAsistencia(),
 		salonNotas: this._salonNotas(),
 		horariosLoading: this._horariosLoading(),
 		asistenciaLoading: this._asistenciaLoading(),
 		notasLoading: this._notasLoading(),
+	}));
+	// #endregion
 
-		configDialogVisible: this._configDialogVisible(),
-		cerrarPeriodoDialogVisible: this._cerrarPeriodoDialogVisible(),
-		salonDialogVisible: this._salonDialogVisible(),
-		confirmDialogVisible: this._confirmDialogVisible(),
+	// #region ViewModel consolidado
+	readonly vm = computed(() => ({
+		...this.dataVm(),
+		...this.uiVm(),
+		...this.salonDetailVm(),
 	}));
 	// #endregion
 
