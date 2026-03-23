@@ -69,7 +69,8 @@
 	right: 0;
 	width: 305px;
 	max-width: 80vw;
-	height: 100vh;
+	height: 100dvh;
+	height: 100vh; // fallback for older browsers
 	background-color: var(--intranet-background-color);
 	box-shadow: -4px 0 20px rgba(0, 0, 0, 0.15);
 	z-index: 201;
@@ -78,6 +79,11 @@
 	flex-direction: column;
 	gap: 1rem;
 	animation: slideIn 0.3s ease;
+	overscroll-behavior: contain;
+
+	@supports (height: 100dvh) {
+		height: 100dvh;
+	}
 }
 
 .logo-link {
@@ -97,6 +103,10 @@
 	flex-direction: column;
 	gap: 0.5rem;
 	flex: 1;
+	overflow-y: auto;
+	min-height: 0;
+	overscroll-behavior: contain;
+	-webkit-overflow-scrolling: touch;
 }
 
 .mobile-nav-item {

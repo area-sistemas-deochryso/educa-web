@@ -136,6 +136,8 @@ export interface CredencialExport {
 	nombreCompleto: string;
 	dni: string;
 	contrasena: string | null;
+	grado: string | null;
+	seccion: string | null;
 }
 
 /**

@@ -249,7 +249,7 @@ export class UsuariosComponent implements AfterViewInit {
 	}
 
 	private async generateExcel(
-		credenciales: { nombreCompleto: string; dni: string; contrasena: string | null }[],
+		credenciales: { nombreCompleto: string; dni: string; contrasena: string | null; grado: string | null; seccion: string | null }[],
 		rol: string,
 	): Promise<void> {
 		const ExcelJS = await import('exceljs');
@@ -265,6 +265,8 @@ export class UsuariosComponent implements AfterViewInit {
 			{ header: 'Nombre Completo', key: 'nombreCompleto', width: 40 },
 			{ header: 'DNI', key: 'dni', width: 15 },
 			{ header: 'Contraseña', key: 'contrasena', width: 20 },
+			{ header: 'Grado', key: 'grado', width: 20 },
+			{ header: 'Sección', key: 'seccion', width: 12 },
 		];
 
 		// Header styling
@@ -279,6 +281,8 @@ export class UsuariosComponent implements AfterViewInit {
 				nombreCompleto: c.nombreCompleto,
 				dni: c.dni,
 				contrasena: c.contrasena ?? '(no disponible)',
+				grado: c.grado ?? '',
+				seccion: c.seccion ?? '',
 			});
 		});
 

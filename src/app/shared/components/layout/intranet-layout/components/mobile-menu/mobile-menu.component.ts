@@ -1,5 +1,13 @@
 // #region Imports
-import { ChangeDetectionStrategy, Component, Input, output, signal } from '@angular/core';
+import {
+	ChangeDetectionStrategy,
+	Component,
+	DestroyRef,
+	inject,
+	Input,
+	output,
+	signal,
+} from '@angular/core';
 import { RouterLink, RouterLinkActive } from '@angular/router';
 import { UserProfileMenuComponent } from '../user-profile-menu';
 
@@ -30,16 +38,38 @@ export class MobileMenuComponent {
 	isOpen = signal(false);
 	expandedItems = signal<Set<string>>(new Set());
 
+	private destroyRef = inject(DestroyRef);
+
+	constructor() {
+		this.destroyRef.onDestroy(() => this.unlockBodyScroll());
+	}
+
 	toggle(): void {
 		// * Open/close the mobile menu drawer.
 		this.isOpen.update((v) => !v);
+		if (this.isOpen()) {
+			this.lockBodyScroll();
+		} else {
+			this.unlockBodyScroll();
+		}
 	}
 
 	close(): void {
 		// * Close drawer and reset submenu state.
 		this.isOpen.set(false);
 		this.expandedItems.set(new Set());
+		this.unlockBodyScroll();
 	}
+
+	// #region Body scroll lock
+	private lockBodyScroll(): void {
+		document.body.style.overflow = 'hidden';
+	}
+
+	private unlockBodyScroll(): void {
+		document.body.style.overflow = '';
+	}
+	// #endregion
 
 	toggleSubmenu(label: string): void {
 		// * Toggle a submenu by label.
