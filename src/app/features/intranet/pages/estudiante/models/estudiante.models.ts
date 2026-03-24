@@ -86,25 +86,14 @@ export interface EstudianteSalonCurso {
 // #endregion
 
 // #region Attendance DTOs (student view — own records only)
-export type EstadoAsistenciaCurso = 'P' | 'T' | 'F';
-
-export const ESTADO_ASISTENCIA_LABELS: Record<EstadoAsistenciaCurso, string> = {
-	P: 'Presente',
-	T: 'Tarde',
-	F: 'Faltó',
-};
-
-export const ESTADO_ASISTENCIA_SEVERITIES: Record<EstadoAsistenciaCurso, string> = {
-	P: 'success',
-	T: 'warn',
-	F: 'danger',
-};
-
-export const ESTADO_ASISTENCIA_ICONS: Record<EstadoAsistenciaCurso, string> = {
-	P: 'pi pi-check-circle',
-	T: 'pi pi-clock',
-	F: 'pi pi-times-circle',
-};
+// Import for local use + re-export from canonical source (profesor models)
+import type { EstadoAsistenciaCurso } from '../../profesor/models';
+export type { EstadoAsistenciaCurso };
+export {
+	ESTADO_ASISTENCIA_LABELS,
+	ESTADO_ASISTENCIA_SEVERITIES,
+	ESTADO_ASISTENCIA_ICONS,
+} from '../../profesor/models';
 
 export interface MiAsistenciaCursoItemDto {
 	fecha: string;

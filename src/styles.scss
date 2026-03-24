@@ -110,6 +110,14 @@
 }
 
 /*---------------------------------------
+  SCROLLBAR — Suave y transparente
+-----------------------------------------*/
+* {
+	scrollbar-width: thin;
+	scrollbar-color: #c0c0c0 var(--intranet-background-color, #eeeeee);
+}
+
+/*---------------------------------------
   BASE STYLES
 -----------------------------------------*/
 body {

@@ -38,7 +38,29 @@ export const MONTH_OPTIONS: MonthOption[] = [
 export const DAY_HEADERS = ['Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes'];
 
 /**
- * Mapeo de estados de asistencia a clases CSS.
+ * Configuración completa de cada estado de asistencia admin (entrada).
+ * Fuente única para clase CSS, label y grupo (presente/tardanza/falta).
+ */
+export interface AttendanceStatusConfig {
+	cssClass: string;
+	/** Clase CSS usada en la vista mensual de salones (admin) */
+	salonClass: string;
+	label: string;
+	group: 'presente' | 'tardanza' | 'falta' | 'justificado' | 'pendiente' | 'sin-registro';
+}
+
+export const ATTENDANCE_STATUS_CONFIGS: Record<AttendanceStatus, AttendanceStatusConfig> = {
+	T: { cssClass: 'status-temprano', salonClass: 'estado-presente', label: 'T', group: 'presente' },
+	A: { cssClass: 'status-atiempo', salonClass: 'estado-presente', label: 'A', group: 'presente' },
+	F: { cssClass: 'status-fuera', salonClass: 'estado-tardanza', label: 'F', group: 'tardanza' },
+	N: { cssClass: 'status-no', salonClass: 'estado-falta', label: 'N', group: 'falta' },
+	J: { cssClass: 'status-justificado', salonClass: 'estado-justificado', label: 'J', group: 'justificado' },
+	'-': { cssClass: 'status-pendiente', salonClass: 'estado-vacio', label: '-', group: 'pendiente' },
+	X: { cssClass: 'status-sin-registro', salonClass: 'estado-vacio', label: '', group: 'sin-registro' },
+};
+
+/**
+ * Mapeo de estados de asistencia a clases CSS (calendario).
  */
 export const STATUS_CLASSES: Record<AttendanceStatus, string> = {
 	T: 'status-temprano',
@@ -51,9 +73,25 @@ export const STATUS_CLASSES: Record<AttendanceStatus, string> = {
 };
 
 /**
- * Obtiene la clase CSS para un estado de asistencia.
+ * Obtiene la clase CSS para un estado de asistencia (calendario).
  */
 export function getStatusClass(status: AttendanceStatus): string {
 	return STATUS_CLASSES[status];
+}
+
+/**
+ * Obtiene la clase CSS de salón para un estado de asistencia (vista mensual admin).
+ */
+export function getSalonStatusClass(status: AttendanceStatus | null): string {
+	if (!status) return 'estado-vacio';
+	return ATTENDANCE_STATUS_CONFIGS[status]?.salonClass ?? 'estado-vacio';
+}
+
+/**
+ * Obtiene el label para un estado de asistencia.
+ */
+export function getStatusLabel(status: AttendanceStatus | null): string {
+	if (!status) return '';
+	return ATTENDANCE_STATUS_CONFIGS[status]?.label ?? '';
 }
 // #endregion

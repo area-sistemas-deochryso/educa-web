@@ -11,6 +11,7 @@ import {
 	ImportarEstudianteItem,
 	UsuarioDetalle,
 	UsuarioLista,
+	UsuariosEstadisticas,
 } from './usuarios.models';
 import { UsuariosService } from './usuarios.service';
 import { UsuariosStore } from './usuarios.store';
@@ -358,16 +359,19 @@ export class UsuariosCrudFacade {
 		};
 	}
 
-	/** Actualizar estadistica por rol (DRY helper) */
+	/** Mapeo rol → campo de estadística. Agregar aquí si se crea un nuevo rol. */
+	private readonly ROL_STAT_KEY: Record<string, keyof UsuariosEstadisticas> = {
+		Director: 'totalDirectores',
+		Profesor: 'totalProfesores',
+		Estudiante: 'totalEstudiantes',
+		Apoderado: 'totalApoderados',
+		'Asistente Administrativo': 'totalAsistentesAdministrativos',
+	};
+
 	private updateRolEstadistica(rol: string, delta: number): void {
-		if (rol === 'Director') {
-			this.store.incrementarEstadistica('totalDirectores', delta);
-		} else if (rol === 'Profesor') {
-			this.store.incrementarEstadistica('totalProfesores', delta);
-		} else if (rol === 'Estudiante') {
-			this.store.incrementarEstadistica('totalEstudiantes', delta);
-		} else if (rol === 'Asistente Administrativo') {
-			this.store.incrementarEstadistica('totalAsistentesAdministrativos', delta);
+		const key = this.ROL_STAT_KEY[rol];
+		if (key) {
+			this.store.incrementarEstadistica(key, delta);
 		}
 	}
 

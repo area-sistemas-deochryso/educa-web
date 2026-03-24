@@ -7,6 +7,11 @@ import { SelectModule } from 'primeng/select';
 import { TagModule } from 'primeng/tag';
 
 import { EstudianteAsistencia, AttendanceStatus } from '@shared/services/asistencia';
+import {
+	ATTENDANCE_STATUS_CONFIGS,
+	getSalonStatusClass,
+	getStatusLabel,
+} from '@features/intranet/pages/shared/attendance-component/config/attendance.constants';
 
 @Component({
 	selector: 'app-salon-asistencia-tab',
@@ -60,14 +65,13 @@ export class SalonAsistenciaTabComponent {
 		let presentes = 0;
 		let tardanzas = 0;
 		let faltas = 0;
-		let total = 0;
 
 		for (const est of data) {
 			for (const a of est.asistencias) {
-				total++;
-				if (a.estadoIngreso === 'T' || a.estadoIngreso === 'A') presentes++;
-				else if (a.estadoIngreso === 'F') tardanzas++;
-				else if (a.estadoIngreso === 'N') faltas++;
+				const group = ATTENDANCE_STATUS_CONFIGS[a.estadoIngreso as AttendanceStatus]?.group;
+				if (group === 'presente') presentes++;
+				else if (group === 'tardanza') tardanzas++;
+				else if (group === 'falta') faltas++;
 			}
 		}
 
@@ -90,38 +94,11 @@ export class SalonAsistenciaTabComponent {
 	}
 
 	getEstadoClass(estado: AttendanceStatus | null): string {
-		switch (estado) {
-			case 'T':
-			case 'A':
-				return 'estado-presente';
-			case 'F':
-				return 'estado-tardanza';
-			case 'N':
-				return 'estado-falta';
-			case 'J':
-				return 'estado-justificado';
-			default:
-				return 'estado-vacio';
-		}
+		return getSalonStatusClass(estado);
 	}
 
 	getEstadoLabel(estado: AttendanceStatus | null): string {
-		switch (estado) {
-			case 'T':
-				return 'T';
-			case 'A':
-				return 'A';
-			case 'F':
-				return 'F';
-			case 'N':
-				return 'N';
-			case 'J':
-				return 'J';
-			case '-':
-				return '-';
-			default:
-				return '';
-		}
+		return getStatusLabel(estado);
 	}
 	// #endregion
 }
