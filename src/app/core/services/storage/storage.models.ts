@@ -1,5 +1,6 @@
 ﻿// #region Imports
 import { AuthUser } from '../auth/auth.models';
+import { AppUserRoleValue } from '@app/shared/constants';
 
 /**
  * Storage models for local and session persisted data.
@@ -48,7 +49,7 @@ export interface PermisosStorageData {
 	/** User id. */
 	usuarioId: number;
 	/** Role name. */
-	rol: string;
+	rol: AppUserRoleValue;
 	/** Allowed view keys. */
 	vistasPermitidas: string[];
 	/** True when permissions are customized. */

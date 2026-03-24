@@ -17,6 +17,7 @@ import { ConfirmationService } from 'primeng/api';
 
 import { UiMappingService } from '@shared/services';
 import { PageHeaderComponent } from '@shared/components';
+import { EstadoSeverityPipe, EstadoToggleIconPipe, EstadoToggleLabelPipe } from '@shared/pipes';
 import { buildDeleteVistaMessage } from '@app/shared/constants';
 
 import { VistasFacade } from './services';
@@ -38,6 +39,9 @@ import type { Vista } from '@core/services';
 		ToggleSwitch,
 		ConfirmDialogModule,
 		PageHeaderComponent,
+		EstadoSeverityPipe,
+		EstadoToggleIconPipe,
+		EstadoToggleLabelPipe,
 	],
 	providers: [ConfirmationService],
 	templateUrl: './vistas.component.html',

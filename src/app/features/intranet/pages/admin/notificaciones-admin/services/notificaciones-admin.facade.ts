@@ -2,7 +2,7 @@ import { Injectable, inject, DestroyRef } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { forkJoin } from 'rxjs';
 
-import { logger, withRetry } from '@core/helpers';
+import { logger, withRetry, getEstadoToggleDeltas } from '@core/helpers';
 import { ErrorHandlerService } from '@core/services';
 import {
 	NotificacionLista,
@@ -125,14 +125,10 @@ export class NotificacionesAdminFacade {
 			.pipe(takeUntilDestroyed(this.destroyRef))
 			.subscribe({
 				next: () => {
+					const { activosDelta, inactivosDelta } = getEstadoToggleDeltas(item.estado);
 					this.store.toggleItemEstado(item.id);
-					if (item.estado) {
-						this.store.incrementarEstadistica('activas', -1);
-						this.store.incrementarEstadistica('inactivas', 1);
-					} else {
-						this.store.incrementarEstadistica('activas', 1);
-						this.store.incrementarEstadistica('inactivas', -1);
-					}
+					this.store.incrementarEstadistica('activas', activosDelta);
+					this.store.incrementarEstadistica('inactivas', inactivosDelta);
 				},
 				error: (err) => {
 					logger.error('Error al cambiar estado:', err);
@@ -148,10 +144,11 @@ export class NotificacionesAdminFacade {
 			.pipe(takeUntilDestroyed(this.destroyRef))
 			.subscribe({
 				next: () => {
+					const { activosDelta, inactivosDelta } = getEstadoToggleDeltas(item.estado, 'delete');
 					this.store.removeItem(item.id);
 					this.store.incrementarEstadistica('total', -1);
-					if (item.estado) this.store.incrementarEstadistica('activas', -1);
-					else this.store.incrementarEstadistica('inactivas', -1);
+					this.store.incrementarEstadistica('activas', activosDelta);
+					this.store.incrementarEstadistica('inactivas', inactivosDelta);
 					this.store.setLoading(false);
 				},
 				error: (err) => {

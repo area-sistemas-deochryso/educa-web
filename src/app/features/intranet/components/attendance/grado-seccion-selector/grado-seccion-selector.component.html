@@ -11,7 +11,7 @@
 					selectedGradoSeccion()?.seccion === gs.seccion
 				"
 			>
-				{{ gs.grado }} - {{ gs.seccion === 'V' ? 'Verano' : gs.seccion.toUpperCase() }}
+				{{ gs.grado }} - {{ gs.seccion | seccionLabel }}
 			</option>
 		}
 	</select>

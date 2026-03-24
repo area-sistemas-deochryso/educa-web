@@ -1,6 +1,7 @@
 // #region Imports
 import { Holiday } from './holidays.config';
 import { CalendarEvent } from './events.config';
+import { TipoEntradaCalendario } from '@data/models';
 
 // #endregion
 // #region Implementation
@@ -28,7 +29,7 @@ export interface CalendarMonth {
 }
 
 export interface ModalData {
-	type: 'holiday' | 'event';
+	type: TipoEntradaCalendario;
 	date: Date;
 	holiday?: Holiday;
 	event?: CalendarEvent;

@@ -4,6 +4,17 @@ export type NivelEducativo = 'Inicial' | 'Primaria' | 'Secundaria';
 export const NIVELES: NivelEducativo[] = ['Inicial', 'Primaria', 'Secundaria'];
 // #endregion
 
+// #region Tipos semánticos de dominio
+export const APROBACION_ESTADOS = ['APROBADO', 'DESAPROBADO', 'PENDIENTE'] as const;
+export type AprobacionEstado = (typeof APROBACION_ESTADOS)[number];
+
+export const PERIODO_CIERRE_ESTADOS = ['CERRADO', 'ABIERTO'] as const;
+export type PeriodoCierreEstado = (typeof PERIODO_CIERRE_ESTADOS)[number];
+
+export const TIPOS_CALIFICACION = ['NUMERICO', 'LITERAL'] as const;
+export type TipoCalificacion = (typeof TIPOS_CALIFICACION)[number];
+// #endregion
+
 // #region Salón Admin
 export interface SalonAdminListDto {
 	id: number;
@@ -18,15 +29,15 @@ export interface SalonAdminListDto {
 	aprobados: number;
 	desaprobados: number;
 	pendientes: number;
-	estadoPeriodo: string;
+	estadoPeriodo: PeriodoCierreEstado;
 }
 // #endregion
 
 // #region Configuración de Calificación
 export interface ConfiguracionCalificacionListDto {
 	id: number;
-	nivel: string;
-	tipoCalificacion: string;
+	nivel: NivelEducativo;
+	tipoCalificacion: TipoCalificacion;
 	notaMinAprobatoria: number | null;
 	anio: number;
 	estado: boolean;
@@ -48,12 +59,12 @@ export interface ConfiguracionLiteralDto {
 export interface PeriodoAcademicoListDto {
 	id: number;
 	nombre: string;
-	nivel: string;
+	nivel: NivelEducativo;
 	anio: number;
 	orden: number;
 	fechaInicio: string | null;
 	fechaFin: string | null;
-	estadoCierre: string;
+	estadoCierre: PeriodoCierreEstado;
 	fechaCierre: string | null;
 	usuarioCierre: string | null;
 }
@@ -68,7 +79,7 @@ export interface AprobacionEstudianteListDto {
 	salonId: number;
 	salonDescripcion: string;
 	periodoId: number;
-	estado: string;
+	estado: AprobacionEstado;
 	esVacacional: boolean;
 	salonDestinoId: number | null;
 	salonDestinoDescripcion: string | null;
@@ -80,7 +91,7 @@ export interface AprobarEstudianteDto {
 	estudianteId: number;
 	salonId: number;
 	periodoId: number;
-	estado: string;
+	estado: AprobacionEstado;
 	esVacacional: boolean;
 	promedioFinal: number | null;
 	observacion: string | null;
@@ -94,7 +105,7 @@ export interface AprobacionMasivaDto {
 
 export interface AprobacionItemDto {
 	estudianteId: number;
-	estado: string;
+	estado: AprobacionEstado;
 	esVacacional: boolean;
 	promedioFinal: number | null;
 	observacion: string | null;

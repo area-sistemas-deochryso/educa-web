@@ -39,9 +39,10 @@ export class SalonesAdminFacade {
 		this.store.setError(null);
 
 		const anio = this.store.filtroAnio();
+		const esVerano = this.store.esVerano();
 
 		forkJoin({
-			salones: this.api.getSalonesAdmin(anio),
+			salones: this.api.getSalonesAdmin(anio, esVerano),
 			periodos: this.api.getPeriodosPorAnio(anio),
 			configuraciones: this.api.getConfiguracionesPorAnio(anio),
 		})
@@ -71,9 +72,10 @@ export class SalonesAdminFacade {
 	refreshSalones(): void {
 		this.store.setLoading(true);
 		const anio = this.store.filtroAnio();
+		const esVerano = this.store.esVerano();
 
 		this.api
-			.getSalonesAdmin(anio)
+			.getSalonesAdmin(anio, esVerano)
 			.pipe(
 				withRetry({ tag: 'SalonesAdminFacade:refreshSalones' }),
 				takeUntilDestroyed(this.destroyRef),
@@ -343,6 +345,11 @@ export class SalonesAdminFacade {
 
 	setAnio(anio: number): void {
 		this.store.setFiltroAnio(anio);
+		this.loadAll();
+	}
+
+	setEsVerano(esVerano: boolean): void {
+		this.store.setEsVerano(esVerano);
 		this.loadAll();
 	}
 

@@ -8,6 +8,7 @@ import { InputTextModule } from 'primeng/inputtext';
 import { SelectModule } from 'primeng/select';
 import { TooltipModule } from 'primeng/tooltip';
 
+import type { DiaSemana } from '../../models/horario.interface';
 import type { SalonOption } from '../../models/salon.interface';
 
 // #endregion
@@ -31,7 +32,7 @@ export class HorariosFiltersComponent {
 
 	// * Outputs bubble filter changes.
 	readonly filtroSalonChange = output<number | null>();
-	readonly filtroDiaSemanaChange = output<number | null>();
+	readonly filtroDiaSemanaChange = output<DiaSemana | null>();
 	readonly filtroEstadoChange = output<boolean | null>();
 	readonly clearFiltros = output<void>();
 
@@ -54,7 +55,7 @@ export class HorariosFiltersComponent {
 		this.filtroSalonChange.emit(salonId);
 	}
 
-	onDiaChange(diaSemana: number | null): void {
+	onDiaChange(diaSemana: DiaSemana | null): void {
 		this.filtroDiaSemanaChange.emit(diaSemana);
 	}
 

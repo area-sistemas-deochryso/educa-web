@@ -31,8 +31,8 @@
 			<!-- * Estado y acciones rápidas -->
 			<div class="status-section">
 				<p-tag
-					[value]="estadoLabel()"
-					[severity]="estadoSeverity()"
+					[value]="detalle()!.estado | estadoLabel"
+					[severity]="detalle()!.estado | estadoSeverity"
 				/>
 
 				@if (isAdmin()) {
@@ -53,16 +53,16 @@
 
 						<button
 							pButton
-							[icon]="detalle()!.estado ? 'pi pi-ban' : 'pi pi-check'"
+							[icon]="detalle()!.estado | estadoToggleIcon"
 							class="p-button-rounded p-button-text"
 							[class.p-button-warning]="detalle()!.estado"
 							[class.p-button-success]="!detalle()!.estado"
 							(click)="onToggleEstado()"
-							[pTooltip]="detalle()!.estado ? 'Desactivar horario' : 'Activar horario'"
+							[pTooltip]="detalle()!.estado | estadoToggleLabel"
 							tooltipPosition="top"
 							[pt]="{
 								root: {
-									'aria-label': detalle()!.estado ? 'Desactivar' : 'Activar',
+									'aria-label': detalle()!.estado | estadoToggleLabel,
 								},
 							}"
 						></button>

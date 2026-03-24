@@ -1,11 +1,10 @@
 import { Injectable, inject, DestroyRef } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { forkJoin } from 'rxjs';
-import { logger, withRetry } from '@core/helpers';
+import { withRetry, facadeErrorHandler } from '@core/helpers';
 import { ErrorHandlerService, WalFacadeHelper } from '@core/services';
 import { environment } from '@config';
 import { ProfesorApiService } from '../../services/profesor-api.service';
-import { ProfesorStore } from '../../services/profesor.store';
 import { CursoContenidoStore } from './curso-contenido.store';
 import { CalificacionesStore } from './calificaciones.store';
 import {
@@ -25,11 +24,14 @@ export class CalificacionesFacade {
 	private readonly api = inject(ProfesorApiService);
 	private readonly store = inject(CalificacionesStore);
 	private readonly contenidoStore = inject(CursoContenidoStore);
-	private readonly profesorStore = inject(ProfesorStore);
 	private readonly errorHandler = inject(ErrorHandlerService);
 	private readonly wal = inject(WalFacadeHelper);
 	private readonly destroyRef = inject(DestroyRef);
 	private readonly calificacionUrl = `${environment.apiUrl}/api/Calificacion`;
+	private readonly errHandler = facadeErrorHandler({
+		tag: 'CalificacionesFacade',
+		errorHandler: this.errorHandler,
+	});
 	private readonly grupoUrl = `${environment.apiUrl}/api/GrupoContenido`;
 	// #endregion
 
@@ -42,12 +44,8 @@ export class CalificacionesFacade {
 	loadCalificaciones(contenidoId: number): void {
 		this.store.setLoading(true);
 
-		// Derive salonId from horarioId to load all salon students
-		const contenido = this.contenidoStore.contenido();
-		const horario = contenido
-			? this.profesorStore.horarios().find((h) => h.id === contenido.horarioId)
-			: null;
-		const salonId = horario?.salonId ?? null;
+		// salonId resuelto por el caller y almacenado en contenidoStore
+		const salonId = this.contenidoStore.salonId();
 
 		forkJoin({
 			calificaciones: this.api.getCalificaciones(contenidoId).pipe(
@@ -70,10 +68,9 @@ export class CalificacionesFacade {
 					}
 					this.store.setLoading(false);
 				},
-				error: (err) => {
-					this.handleError(err, 'cargar calificaciones');
+				error: (err) => this.errHandler.handle(err, 'cargar calificaciones', () => {
 					this.store.setLoading(false);
-				},
+				}),
 			});
 	}
 
@@ -98,7 +95,7 @@ export class CalificacionesFacade {
 				this.store.closeCalificacionDialog();
 			},
 			onError: (err) => {
-				this.handleError(err, 'crear evaluación');
+				this.errHandler.handle(err,'crear evaluación');
 				this.store.setSaving(false);
 			},
 			optimistic: {
@@ -131,7 +128,7 @@ export class CalificacionesFacade {
 				this.store.closeCalificarDialog();
 			},
 			onError: (err) => {
-				this.handleError(err, 'calificar estudiantes');
+				this.errHandler.handle(err,'calificar estudiantes');
 				this.store.setSaving(false);
 			},
 			optimistic: {
@@ -158,7 +155,7 @@ export class CalificacionesFacade {
 				this.store.closeCalificarDialog();
 			},
 			onError: (err) => {
-				this.handleError(err, 'calificar grupos');
+				this.errHandler.handle(err,'calificar grupos');
 				this.store.setSaving(false);
 			},
 			optimistic: {
@@ -184,7 +181,7 @@ export class CalificacionesFacade {
 				this.refreshCalificaciones(contenidoId);
 			},
 			onError: (err) => {
-				this.handleError(err, 'actualizar nota');
+				this.errHandler.handle(err,'actualizar nota');
 				this.store.setSaving(false);
 			},
 			optimistic: {
@@ -211,7 +208,7 @@ export class CalificacionesFacade {
 				this.store.setSaving(false);
 			},
 			onError: (err) => {
-				this.handleError(err, 'eliminar evaluación');
+				this.errHandler.handle(err,'eliminar evaluación');
 				this.store.setSaving(false);
 			},
 			optimistic: {
@@ -243,7 +240,7 @@ export class CalificacionesFacade {
 				this.store.setSaving(false);
 			},
 			onError: (err) => {
-				this.handleError(err, 'cambiar tipo de evaluación');
+				this.errHandler.handle(err,'cambiar tipo de evaluación');
 				this.store.setSaving(false);
 			},
 			optimistic: {
@@ -274,7 +271,7 @@ export class CalificacionesFacade {
 				this.store.setSaving(false);
 			},
 			onError: (err) => {
-				this.handleError(err, 'crear periodo');
+				this.errHandler.handle(err,'crear periodo');
 				this.store.setSaving(false);
 			},
 			optimistic: {
@@ -300,7 +297,7 @@ export class CalificacionesFacade {
 				this.store.setSaving(false);
 			},
 			onError: (err) => {
-				this.handleError(err, 'eliminar periodo');
+				this.errHandler.handle(err,'eliminar periodo');
 				this.store.setSaving(false);
 			},
 			optimistic: {
@@ -337,7 +334,7 @@ export class CalificacionesFacade {
 					.pipe(takeUntilDestroyed(this.destroyRef))
 					.subscribe({
 						next: (resumen) => this.store.setGruposForCalificar(resumen.grupos),
-						error: (err) => this.handleError(err, 'cargar grupos'),
+						error: (err) => this.errHandler.handle(err,'cargar grupos'),
 					});
 			}
 		}
@@ -376,9 +373,5 @@ export class CalificacionesFacade {
 			});
 	}
 
-	private handleError(err: unknown, accion: string): void {
-		logger.error(`CalificacionesFacade: Error al ${accion}`, err);
-		this.errorHandler.showError('Error', `No se pudo ${accion}`);
-	}
 	// #endregion
 }

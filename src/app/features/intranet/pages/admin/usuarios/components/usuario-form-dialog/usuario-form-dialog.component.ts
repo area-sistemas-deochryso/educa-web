@@ -16,6 +16,8 @@ import {
 	signal,
 } from '@angular/core';
 import { generatePassword } from '@core/helpers';
+import { rolRequiereSalon, rolPermiteEsTutor, canEditPassword, esSeccionDeVerano } from '@shared/models';
+import { APP_USER_ROLES } from '@shared/constants';
 
 import { ButtonModule } from 'primeng/button';
 import { Checkbox } from 'primeng/checkbox';
@@ -30,6 +32,7 @@ import { SelectModule } from 'primeng/select';
 import { TableModule } from 'primeng/table';
 import { ToggleSwitch } from 'primeng/toggleswitch';
 import { UppercaseInputDirective } from '@shared/directives';
+import { EstadoLabelPipe } from '@shared/pipes';
 
 export type UsuarioFormData = Partial<CrearUsuarioRequest & ActualizarUsuarioRequest>;
 
@@ -62,6 +65,7 @@ export interface FormValidationErrors {
 		TableModule,
 		UppercaseInputDirective,
 		Checkbox,
+		EstadoLabelPipe,
 	],
 	templateUrl: './usuario-form-dialog.component.html',
 	styleUrl: './usuario-form-dialog.component.scss',
@@ -88,15 +92,12 @@ export class UsuarioFormDialogComponent {
 
 	// #region Estado local
 	readonly rolesSelectOptions = ROLES_USUARIOS_ADMIN.map((r) => ({ label: r, value: r }));
-	readonly allowEditPasswordRoles = ['Director', 'Asistente Administrativo'];
 
 	// Selector de salón en dos pasos: primero grado, luego sección
 	readonly _gradoSeleccionado = signal<string | null>(null);
 	readonly _seccionSeleccionada = signal<string | null>(null);
 
-	readonly canEditPassword = computed(() =>
-		this.allowEditPasswordRoles.includes(this.userProfile.userRole()),
-	);
+	readonly canEditPassword = computed(() => canEditPassword(this.userProfile.userRole()));
 	// #endregion
 
 	// #region Computed — validaciones de contraseña
@@ -178,17 +179,9 @@ export class UsuarioFormDialogComponent {
 	// #endregion
 
 	// #region Computed — opciones de salón
-	get isEstudiante(): boolean {
-		return this.formData().rol === 'Estudiante';
-	}
-
-	get isProfesor(): boolean {
-		return this.formData().rol === 'Profesor';
-	}
-
-	get needsSalon(): boolean {
-		return this.isProfesor || this.isEstudiante;
-	}
+	readonly isEstudiante = computed(() => this.formData().rol === APP_USER_ROLES.Estudiante);
+	readonly isProfesor = computed(() => rolPermiteEsTutor(this.formData().rol));
+	readonly needsSalon = computed(() => rolRequiereSalon(this.formData().rol));
 
 	// Helper para tipar correctamente el rol
 	get rolValue(): RolUsuarioAdmin | undefined {
@@ -196,7 +189,7 @@ export class UsuarioFormDialogComponent {
 	}
 
 	private formatSeccion(seccion: string): string {
-		return seccion === 'V' ? 'Verano' : seccion;
+		return esSeccionDeVerano(seccion) ? 'Verano' : seccion;
 	}
 
 	readonly gradosOptions = computed(() => {

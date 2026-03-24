@@ -231,8 +231,10 @@ export class ProfesorCalificacionesComponent implements OnInit, OnDestroy {
 						return;
 					}
 					this._contenido.set(contenido);
-					// Populate CursoContenidoStore so CalificacionesFacade can resolve salonId
+					// Resolver salonId del horario y almacenarlo en el store del feature
+					const horario = this.facade.vm().horarios.find((h) => h.id === horarioId);
 					this.contenidoStore.setContenido(contenido);
+					this.contenidoStore.setSalonId(horario?.salonId ?? null);
 					this.calFacade.loadCalificaciones(contenido.id);
 					this._contenidoLoading.set(false);
 				},

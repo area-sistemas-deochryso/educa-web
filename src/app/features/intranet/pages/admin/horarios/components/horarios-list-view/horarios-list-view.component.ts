@@ -7,6 +7,7 @@ import { TableLazyLoadEvent, TableModule } from 'primeng/table';
 import { TagModule } from 'primeng/tag';
 import { TooltipModule } from 'primeng/tooltip';
 
+import { EstadoLabelPipe, EstadoSeverityPipe, EstadoToggleIconPipe, EstadoToggleLabelPipe } from '@shared/pipes';
 import type { HorarioResponseDto } from '../../models/horario.interface';
 
 // #endregion
@@ -14,7 +15,7 @@ import type { HorarioResponseDto } from '../../models/horario.interface';
 @Component({
 	selector: 'app-horarios-list-view',
 	standalone: true,
-	imports: [CommonModule, ButtonModule, TableModule, TagModule, TooltipModule],
+	imports: [CommonModule, ButtonModule, TableModule, TagModule, TooltipModule, EstadoLabelPipe, EstadoSeverityPipe, EstadoToggleIconPipe, EstadoToggleLabelPipe],
 	templateUrl: './horarios-list-view.component.html',
 	styleUrl: './horarios-list-view.component.scss',
 	changeDetection: ChangeDetectionStrategy.OnPush,

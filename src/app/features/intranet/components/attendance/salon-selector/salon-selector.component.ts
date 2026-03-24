@@ -3,6 +3,7 @@ import { ChangeDetectionStrategy, Component, input, output } from '@angular/core
 
 import { FormsModule } from '@angular/forms';
 import { SalonProfesor } from '@core/services';
+import { SeccionLabelPipe } from '@shared/pipes';
 
 /**
  * Componente presentacional (Dumb) para la selección de salón.
@@ -13,7 +14,7 @@ import { SalonProfesor } from '@core/services';
 @Component({
 	selector: 'app-salon-selector',
 	standalone: true,
-	imports: [FormsModule],
+	imports: [FormsModule, SeccionLabelPipe],
 	changeDetection: ChangeDetectionStrategy.OnPush,
 	templateUrl: './salon-selector.component.html',
 	styleUrls: ['./salon-selector.component.scss'],

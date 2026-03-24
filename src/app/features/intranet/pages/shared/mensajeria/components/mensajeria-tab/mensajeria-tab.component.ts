@@ -8,7 +8,9 @@ import { Select } from 'primeng/select';
 import { TagModule } from 'primeng/tag';
 import { ProgressSpinnerModule } from 'primeng/progressspinner';
 import { CrearConversacionDto } from '@data/models';
+import { getInitial } from '@core/helpers';
 import { SalonMensajeriaFacade } from '../../services/mensajeria.facade';
+import { toSelectOptionsFrom } from '@shared/models';
 
 // Avatar colors palette (WCAG AA contrast with white text)
 const AVATAR_COLORS = [
@@ -78,7 +80,7 @@ export class SalonMensajeriaTabComponent {
 	readonly resolvedEstudiantes = computed(() => {
 		const fromInput = this.estudiantes();
 		if (fromInput.length > 0) return fromInput;
-		return this.vm().destinatarios.map((d) => ({ label: d.nombre, value: d.dni }));
+		return toSelectOptionsFrom(this.vm().destinatarios, 'nombre', 'dni');
 	});
 
 	readonly canCreate = computed(
@@ -183,7 +185,7 @@ export class SalonMensajeriaTabComponent {
 	}
 
 	private getInicial(asunto: string): string {
-		return asunto.charAt(0).toUpperCase();
+		return getInitial(asunto);
 	}
 
 	private getColorFromName(name: string): string {

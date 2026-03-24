@@ -16,6 +16,7 @@ import {
 	ActualizarConfiguracionCalificacionDto,
 	CrearConfiguracionLiteralDto,
 	NivelEducativo,
+	TipoCalificacion,
 } from '../../models';
 
 interface LiteralRow {
@@ -59,7 +60,7 @@ export class ConfigCalificacionDialogComponent {
 	// #endregion
 
 	// #region Estado local
-	readonly tipoCalificacion = signal<string>('LITERAL');
+	readonly tipoCalificacion = signal<TipoCalificacion>('LITERAL');
 	readonly notaMinAprobatoria = signal<number | null>(11);
 	readonly literales = signal<LiteralRow[]>(this.defaultLiterales());
 	// #endregion

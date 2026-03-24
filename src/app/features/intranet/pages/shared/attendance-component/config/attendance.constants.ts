@@ -60,23 +60,11 @@ export const ATTENDANCE_STATUS_CONFIGS: Record<AttendanceStatus, AttendanceStatu
 };
 
 /**
- * Mapeo de estados de asistencia a clases CSS (calendario).
- */
-export const STATUS_CLASSES: Record<AttendanceStatus, string> = {
-	T: 'status-temprano',
-	A: 'status-atiempo',
-	F: 'status-fuera',
-	N: 'status-no',
-	J: 'status-justificado',
-	'-': 'status-pendiente',
-	X: 'status-sin-registro',
-};
-
-/**
  * Obtiene la clase CSS para un estado de asistencia (calendario).
+ * Derivado de ATTENDANCE_STATUS_CONFIGS — fuente única de verdad.
  */
 export function getStatusClass(status: AttendanceStatus): string {
-	return STATUS_CLASSES[status];
+	return ATTENDANCE_STATUS_CONFIGS[status]?.cssClass ?? 'status-sin-registro';
 }
 
 /**

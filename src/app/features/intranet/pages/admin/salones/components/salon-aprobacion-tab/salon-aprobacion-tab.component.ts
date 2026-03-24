@@ -13,6 +13,7 @@ import {
 	AprobarEstudianteDto,
 	AprobacionMasivaDto,
 	SalonAdminListDto,
+	AprobacionEstado,
 } from '../../models';
 
 @Component({
@@ -92,7 +93,7 @@ export class SalonAprobacionTabComponent {
 	// #endregion
 
 	// #region Event handlers — aprobación
-	onAprobarIndividual(aprobacion: AprobacionEstudianteListDto, estado: 'APROBADO' | 'DESAPROBADO'): void {
+	onAprobarIndividual(aprobacion: AprobacionEstudianteListDto, estado: AprobacionEstado): void {
 		const pid = this.periodoId();
 		if (!pid) return;
 
@@ -108,7 +109,7 @@ export class SalonAprobacionTabComponent {
 		this.aprobar.emit(dto);
 	}
 
-	onAprobarSeleccionados(estado: 'APROBADO' | 'DESAPROBADO'): void {
+	onAprobarSeleccionados(estado: AprobacionEstado): void {
 		const pid = this.periodoId();
 		const s = this.salon();
 		if (!pid || !s) return;
@@ -134,7 +135,7 @@ export class SalonAprobacionTabComponent {
 	// #endregion
 
 	// #region Helpers
-	getEstadoSeverity(estado: string): 'success' | 'danger' | 'warn' | 'secondary' {
+	getEstadoSeverity(estado: AprobacionEstado): 'success' | 'danger' | 'warn' | 'secondary' {
 		switch (estado) {
 			case 'APROBADO':
 				return 'success';
@@ -147,7 +148,7 @@ export class SalonAprobacionTabComponent {
 		}
 	}
 
-	getEstadoLabel(estado: string): string {
+	getEstadoLabel(estado: AprobacionEstado): string {
 		switch (estado) {
 			case 'APROBADO':
 				return 'Aprobado';

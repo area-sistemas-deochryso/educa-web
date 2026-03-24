@@ -2,7 +2,7 @@ import { Injectable, inject, DestroyRef } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { forkJoin } from 'rxjs';
 
-import { logger, withRetry } from '@core/helpers';
+import { logger, withRetry, getEstadoToggleDeltas } from '@core/helpers';
 import { ErrorHandlerService } from '@core/services';
 import {
 	EventoCalendarioLista,
@@ -67,8 +67,7 @@ export class EventosCalendarioFacade {
 					this.store.closeDialog();
 					this.refreshItemsOnly();
 					this.store.incrementarEstadistica('total', 1);
-					if (formData.estado) this.store.incrementarEstadistica('activos', 1);
-					else this.store.incrementarEstadistica('inactivos', 1);
+					this.store.incrementarEstadistica(formData.estado ? 'activos' : 'inactivos', 1);
 				},
 				error: (err) => {
 					logger.error('Error al crear evento:', err);
@@ -123,14 +122,10 @@ export class EventosCalendarioFacade {
 			.pipe(takeUntilDestroyed(this.destroyRef))
 			.subscribe({
 				next: () => {
+					const { activosDelta, inactivosDelta } = getEstadoToggleDeltas(item.estado);
 					this.store.toggleItemEstado(item.id);
-					if (item.estado) {
-						this.store.incrementarEstadistica('activos', -1);
-						this.store.incrementarEstadistica('inactivos', 1);
-					} else {
-						this.store.incrementarEstadistica('activos', 1);
-						this.store.incrementarEstadistica('inactivos', -1);
-					}
+					this.store.incrementarEstadistica('activos', activosDelta);
+					this.store.incrementarEstadistica('inactivos', inactivosDelta);
 				},
 				error: (err) => {
 					logger.error('Error al cambiar estado:', err);
@@ -146,10 +141,11 @@ export class EventosCalendarioFacade {
 			.pipe(takeUntilDestroyed(this.destroyRef))
 			.subscribe({
 				next: () => {
+					const { activosDelta, inactivosDelta } = getEstadoToggleDeltas(item.estado, 'delete');
 					this.store.removeItem(item.id);
 					this.store.incrementarEstadistica('total', -1);
-					if (item.estado) this.store.incrementarEstadistica('activos', -1);
-					else this.store.incrementarEstadistica('inactivos', -1);
+					this.store.incrementarEstadistica('activos', activosDelta);
+					this.store.incrementarEstadistica('inactivos', inactivosDelta);
 					this.store.setLoading(false);
 				},
 				error: (err) => {

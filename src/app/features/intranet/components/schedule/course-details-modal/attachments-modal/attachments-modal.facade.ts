@@ -2,7 +2,7 @@
 import { Injectable, inject, DestroyRef } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { BlobStorageService, ErrorHandlerService, WalFacadeHelper } from '@core/services';
-import { logger } from '@core/helpers';
+import { logger, extractErrorMessage, facadeErrorHandler } from '@core/helpers';
 import { environment } from '@config';
 import { ProfesorApiService } from '@features/intranet/pages/profesor/services/profesor-api.service';
 import type {
@@ -49,6 +49,10 @@ export class AttachmentsModalFacade {
 	private readonly wal = inject(WalFacadeHelper);
 	private readonly store = inject(AttachmentsModalStore);
 	private readonly destroyRef = inject(DestroyRef);
+	private readonly errHandler = facadeErrorHandler({
+		tag: 'AttachmentsModalFacade',
+		errorHandler: this.errorHandler,
+	});
 	// #endregion
 
 	// #region Exposed state
@@ -117,7 +121,7 @@ export class AttachmentsModalFacade {
 						onCommit: (archivo) => {
 							this.store.addAttachment(this.mapToAttachment(archivo));
 						},
-						onError: (err) => this.handleApiError(err, 'registrar archivo'),
+						onError: (err) => this.errHandler.handle(err, 'registrar archivo'),
 					});
 				},
 				error: (error) => {
@@ -125,8 +129,7 @@ export class AttachmentsModalFacade {
 					this.store.setUploading(false);
 					this.store.setUploadProgress(0);
 
-					const errorMsg =
-						error?.error?.message || error?.message || UI_GENERIC_MESSAGES.unknownError;
+					const errorMsg = extractErrorMessage(error, UI_GENERIC_MESSAGES.unknownError);
 					this.store.setError(errorMsg);
 					this.errorHandler.showError(
 						UI_SUMMARIES.error,
@@ -183,7 +186,7 @@ export class AttachmentsModalFacade {
 				},
 			},
 			onCommit: () => {},
-			onError: (err) => this.handleApiError(err, 'eliminar archivo'),
+			onError: (err) => this.errHandler.handle(err, 'eliminar archivo'),
 		});
 	}
 
@@ -257,16 +260,6 @@ export class AttachmentsModalFacade {
 		return null;
 	}
 
-	/**
-	 * Standardize API error handling for this facade.
-	 *
-	 * @param err Error object from API or network.
-	 * @param accion Action label for logs and UI.
-	 */
-	private handleApiError(err: unknown, accion: string): void {
-		logger.error(`AttachmentsModalFacade: Failed to ${accion}`, err);
-		this.errorHandler.showError(UI_SUMMARIES.error, `No se pudo ${accion}`);
-	}
 	// #endregion
 }
 // #endregion

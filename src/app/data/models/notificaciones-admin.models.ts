@@ -1,11 +1,21 @@
-// #region Implementation
+// #region Tipos semánticos
+
+export const NOTIFICACION_TIPOS = ['matricula', 'pago', 'academico', 'festividad', 'evento'] as const;
+export type NotificacionTipo = (typeof NOTIFICACION_TIPOS)[number];
+
+export const NOTIFICACION_PRIORIDADES = ['low', 'medium', 'high', 'urgent'] as const;
+export type NotificacionPrioridad = (typeof NOTIFICACION_PRIORIDADES)[number];
+
+// #endregion
+
+// #region DTOs
 
 export interface NotificacionLista {
 	id: number;
 	titulo: string;
 	mensaje: string;
-	tipo: string;
-	prioridad: string;
+	tipo: NotificacionTipo;
+	prioridad: NotificacionPrioridad;
 	icono: string;
 	fechaInicio: string;
 	fechaFin: string;
@@ -23,8 +33,8 @@ export interface NotificacionActiva {
 	id: number;
 	titulo: string;
 	mensaje: string;
-	tipo: string;
-	prioridad: string;
+	tipo: NotificacionTipo;
+	prioridad: NotificacionPrioridad;
 	icono: string;
 	actionUrl: string | null;
 	actionText: string | null;
@@ -34,8 +44,8 @@ export interface NotificacionActiva {
 export interface CrearNotificacionRequest {
 	titulo: string;
 	mensaje: string;
-	tipo: string;
-	prioridad: string;
+	tipo: NotificacionTipo;
+	prioridad: NotificacionPrioridad;
 	icono: string;
 	fechaInicio: string;
 	fechaFin: string;
@@ -49,8 +59,8 @@ export interface CrearNotificacionRequest {
 export interface ActualizarNotificacionRequest {
 	titulo: string;
 	mensaje: string;
-	tipo: string;
-	prioridad: string;
+	tipo: NotificacionTipo;
+	prioridad: NotificacionPrioridad;
 	icono: string;
 	fechaInicio: string;
 	fechaFin: string;

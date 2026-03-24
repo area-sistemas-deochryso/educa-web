@@ -49,7 +49,7 @@ export interface ActualizarVistaRequest {
  */
 export interface PermisoRol {
 	id: number;
-	rol: string;
+	rol: AppUserRoleValue;
 	vistas: string[];
 	rowVersion?: string;
 }
@@ -58,7 +58,7 @@ export interface PermisoRol {
  * Create role permissions request.
  */
 export interface CrearPermisoRolRequest {
-	rol: string;
+	rol: AppUserRoleValue;
 	vistas: string[];
 }
 
@@ -76,7 +76,7 @@ export interface ActualizarPermisoRolRequest {
 export interface PermisoUsuario {
 	id: number;
 	usuarioId: number;
-	rol: string;
+	rol: AppUserRoleValue;
 	vistas: string[];
 	nombreUsuario?: string;
 	rowVersion?: string;
@@ -87,7 +87,7 @@ export interface PermisoUsuario {
  */
 export interface CrearPermisoUsuarioRequest {
 	usuarioId: number;
-	rol: string;
+	rol: AppUserRoleValue;
 	vistas: string[];
 }
 
@@ -104,7 +104,7 @@ export interface ActualizarPermisoUsuarioRequest {
  */
 export interface PermisosUsuarioResultado {
 	usuarioId: number;
-	rol: string;
+	rol: AppUserRoleValue;
 	vistasPermitidas: string[];
 	tienePermisosPersonalizados: boolean;
 	/** JWT with exp that indicates when permissions expire. */
@@ -149,7 +149,7 @@ export interface VistasEstadisticas {
 export interface UsuarioBusqueda {
 	id: number;
 	nombreCompleto: string;
-	rol: string;
+	rol: AppUserRoleValue;
 	dni?: string;
 }
 

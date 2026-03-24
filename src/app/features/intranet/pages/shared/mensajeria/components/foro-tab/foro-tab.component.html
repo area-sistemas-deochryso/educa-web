@@ -60,7 +60,7 @@
 				@for (msg of vm().mensajes; track msg.id) {
 					<div class="foro-post" [class.foro-post--mio]="msg.esMio">
 						<div class="foro-post-avatar" [style.background]="getAvatarColor(msg.remitenteNombre)">
-							{{ msg.remitenteNombre.charAt(0).toUpperCase() }}
+							{{ getInitial(msg.remitenteNombre) }}
 						</div>
 						<div class="foro-post-content">
 							<div class="foro-post-header">

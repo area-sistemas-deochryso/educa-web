@@ -19,6 +19,7 @@ import { IconFieldModule } from 'primeng/iconfield';
 import { InputIconModule } from 'primeng/inputicon';
 
 import { PageHeaderComponent } from '@shared/components';
+import { EstadoLabelPipe, EstadoSeverityPipe, EstadoToggleLabelPipe } from '@shared/pipes';
 import { UiMappingService } from '@shared/services';
 import { NotificacionesAdminFacade, NotificacionesAdminStore } from './services';
 import type { NotificacionFormData } from './services';
@@ -47,6 +48,9 @@ import { NotificacionLista } from '@data/models';
 		IconFieldModule,
 		InputIconModule,
 		PageHeaderComponent,
+		EstadoLabelPipe,
+		EstadoSeverityPipe,
+		EstadoToggleLabelPipe,
 	],
 	providers: [ConfirmationService],
 	templateUrl: './notificaciones-admin.component.html',

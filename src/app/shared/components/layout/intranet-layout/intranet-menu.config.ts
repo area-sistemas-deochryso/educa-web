@@ -1,6 +1,7 @@
 // #region Imports
 import { NavMenuItem } from './components';
 import { environment } from '@config/environment';
+import { PERMISOS } from '@shared/constants';
 
 // #endregion
 // #region Implementation
@@ -19,7 +20,7 @@ const devCalendario: NavItemWithPermiso[] = environment.features.calendario
 				route: '/intranet/calendario',
 				label: 'Calendario',
 				icon: 'pi pi-calendar',
-				permiso: 'intranet/calendario',
+				permiso: PERMISOS.CALENDARIO,
 			},
 		]
 	: [];
@@ -33,43 +34,43 @@ const miAulaChildren: NavItemWithPermiso[] = [
 					route: '/intranet/estudiante/horarios',
 					label: 'Mi Horario',
 					icon: 'pi pi-clock',
-					permiso: 'intranet/estudiante/horarios',
+					permiso: PERMISOS.ESTUDIANTE_HORARIOS,
 				},
 				{
 					route: '/intranet/estudiante/cursos',
 					label: 'Mis Cursos',
 					icon: 'pi pi-book',
-					permiso: 'intranet/estudiante/cursos',
+					permiso: PERMISOS.ESTUDIANTE_CURSOS,
 				},
 				{
 					route: '/intranet/estudiante/notas',
 					label: 'Mis Calificaciones',
 					icon: 'pi pi-chart-bar',
-					permiso: 'intranet/estudiante/notas',
+					permiso: PERMISOS.ESTUDIANTE_NOTAS,
 				},
 				{
 					route: '/intranet/estudiante/asistencia',
 					label: 'Mi Asistencia',
 					icon: 'pi pi-check-square',
-					permiso: 'intranet/estudiante/asistencia',
+					permiso: PERMISOS.ESTUDIANTE_ASISTENCIA,
 				},
 				{
 					route: '/intranet/estudiante/foro',
 					label: 'Mi Foro',
 					icon: 'pi pi-comments',
-					permiso: 'intranet/estudiante/foro',
+					permiso: PERMISOS.ESTUDIANTE_FORO,
 				},
 				{
 					route: '/intranet/estudiante/mensajeria',
 					label: 'Mi Mensajería',
 					icon: 'pi pi-envelope',
-					permiso: 'intranet/estudiante/mensajeria',
+					permiso: PERMISOS.ESTUDIANTE_MENSAJERIA,
 				},
 				{
 					route: '/intranet/estudiante/salones',
 					label: 'Mis Salones',
 					icon: 'pi pi-building',
-					permiso: 'intranet/estudiante/salones',
+					permiso: PERMISOS.ESTUDIANTE_SALONES,
 				},
 			]
 		: []),
@@ -80,49 +81,49 @@ const miAulaChildren: NavItemWithPermiso[] = [
 					route: '/intranet/profesor/horarios',
 					label: 'Mi Horario',
 					icon: 'pi pi-clock',
-					permiso: 'intranet/profesor/horarios',
+					permiso: PERMISOS.PROFESOR_HORARIOS,
 				},
 				{
 					route: '/intranet/profesor/cursos',
 					label: 'Mis Cursos',
 					icon: 'pi pi-book',
-					permiso: 'intranet/profesor/cursos',
+					permiso: PERMISOS.PROFESOR_CURSOS,
 				},
 				{
 					route: '/intranet/profesor/calificaciones',
 					label: 'Mis Calificaciones',
 					icon: 'pi pi-chart-bar',
-					permiso: 'intranet/profesor/calificaciones',
+					permiso: PERMISOS.PROFESOR_CALIFICACIONES,
 				},
 				{
 					route: '/intranet/profesor/asistencia',
 					label: 'Mi Asistencia',
 					icon: 'pi pi-check-square',
-					permiso: 'intranet/profesor/asistencia',
+					permiso: PERMISOS.PROFESOR_ASISTENCIA,
 				},
 				{
 					route: '/intranet/profesor/foro',
 					label: 'Mi Foro',
 					icon: 'pi pi-comments',
-					permiso: 'intranet/profesor/foro',
+					permiso: PERMISOS.PROFESOR_FORO,
 				},
 				{
 					route: '/intranet/profesor/mensajeria',
 					label: 'Mi Mensajería',
 					icon: 'pi pi-envelope',
-					permiso: 'intranet/profesor/mensajeria',
+					permiso: PERMISOS.PROFESOR_MENSAJERIA,
 				},
 				{
 					route: '/intranet/profesor/salones',
 					label: 'Mis Salones',
 					icon: 'pi pi-building',
-					permiso: 'intranet/profesor/salones',
+					permiso: PERMISOS.PROFESOR_SALONES,
 				},
 				{
 					route: '/intranet/profesor/final-salones',
 					label: 'Administrar Salones',
 					icon: 'pi pi-th-large',
-					permiso: 'intranet/profesor/final-salones',
+					permiso: PERMISOS.PROFESOR_FINAL_SALONES,
 				},
 			]
 		: []),
@@ -133,7 +134,7 @@ const miAulaChildren: NavItemWithPermiso[] = [
 					route: '/intranet/videoconferencias',
 					label: 'Videoconferencias',
 					icon: 'pi pi-video',
-					permiso: 'intranet/videoconferencias',
+					permiso: PERMISOS.VIDEOCONFERENCIAS,
 				},
 			]
 		: []),
@@ -156,7 +157,7 @@ const devCampus: NavItemWithPermiso[] = environment.features.campusNavigation
 				route: '/intranet/admin/campus',
 				label: 'Campus',
 				icon: 'pi pi-map',
-				permiso: 'intranet/admin/campus',
+				permiso: PERMISOS.ADMIN_CAMPUS,
 			},
 		]
 	: [];
@@ -167,7 +168,7 @@ const devTestK6: NavItemWithPermiso[] = environment.features.ctestK6
 				route: '/intranet/ctest-k6',
 				label: 'Test k6',
 				icon: 'pi pi-bolt',
-				permiso: 'intranet/ctest-k6',
+				permiso: PERMISOS.CTEST_K6,
 			},
 		]
 	: [];
@@ -185,14 +186,14 @@ export const INTRANET_MENU: NavItemWithPermiso[] = [
 		label: 'Inicio',
 		icon: 'pi pi-home',
 		exact: true,
-		permiso: 'intranet',
+		permiso: PERMISOS.INTRANET,
 	},
 	// Alfabético a partir de aquí
 	{
 		route: '/intranet/asistencia',
 		label: 'Asistencia',
 		icon: 'pi pi-check-square',
-		permiso: 'intranet/asistencia',
+		permiso: PERMISOS.ASISTENCIA,
 	},
 	{
 		label: 'Configuración',
@@ -206,13 +207,13 @@ export const INTRANET_MENU: NavItemWithPermiso[] = [
 						route: '/intranet/admin/permisos/roles',
 						label: 'Por Rol',
 						icon: 'pi pi-id-card',
-						permiso: 'intranet/admin/permisos/roles',
+						permiso: PERMISOS.ADMIN_PERMISOS_ROLES,
 					},
 					{
 						route: '/intranet/admin/permisos/usuarios',
 						label: 'Por Usuario',
 						icon: 'pi pi-users',
-						permiso: 'intranet/admin/permisos/usuarios',
+						permiso: PERMISOS.ADMIN_PERMISOS_USUARIOS,
 					},
 				],
 			},
@@ -220,13 +221,13 @@ export const INTRANET_MENU: NavItemWithPermiso[] = [
 				route: '/intranet/admin/usuarios',
 				label: 'Usuarios',
 				icon: 'pi pi-user-edit',
-				permiso: 'intranet/admin/usuarios',
+				permiso: PERMISOS.ADMIN_USUARIOS,
 			},
 			{
 				route: '/intranet/admin/vistas',
 				label: 'Vistas',
 				icon: 'pi pi-eye',
-				permiso: 'intranet/admin/vistas',
+				permiso: PERMISOS.ADMIN_VISTAS,
 			},
 		],
 	},
@@ -240,31 +241,31 @@ export const INTRANET_MENU: NavItemWithPermiso[] = [
 				route: '/intranet/admin/cursos',
 				label: 'Cursos',
 				icon: 'pi pi-book',
-				permiso: 'intranet/admin/cursos',
+				permiso: PERMISOS.ADMIN_CURSOS,
 			},
 			{
 				route: '/intranet/admin/eventos-calendario',
 				label: 'Eventos',
 				icon: 'pi pi-calendar-plus',
-				permiso: 'intranet/admin/eventos-calendario',
+				permiso: PERMISOS.ADMIN_EVENTOS_CALENDARIO,
 			},
 			{
 				route: '/intranet/admin/horarios',
 				label: 'Horarios',
 				icon: 'pi pi-calendar',
-				permiso: 'intranet/admin/horarios',
+				permiso: PERMISOS.ADMIN_HORARIOS,
 			},
 			{
 				route: '/intranet/admin/notificaciones',
 				label: 'Notificaciones',
 				icon: 'pi pi-bell',
-				permiso: 'intranet/admin/notificaciones',
+				permiso: PERMISOS.ADMIN_NOTIFICACIONES,
 			},
 			{
 				route: '/intranet/admin/salones',
 				label: 'Salones',
 				icon: 'pi pi-building',
-				permiso: 'intranet/admin/salones',
+				permiso: PERMISOS.ADMIN_SALONES,
 			},
 		],
 	},

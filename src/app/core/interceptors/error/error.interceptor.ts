@@ -53,15 +53,9 @@ export const errorInterceptor: HttpInterceptorFn = (req, next) => {
 				undefined;
 			const errorCode = (errorBody?.['errorCode'] as string) ?? undefined;
 
-			// * 409 Conflict: datos modificados por otro usuario (concurrencia optimista).
-			if (error.status === 409) {
-				errorHandler.showWarning(
-					'Datos desactualizados',
-					'Otro usuario modificó este registro. Recargue los datos e intente nuevamente.',
-					6000,
-				);
-				return throwError(() => error);
-			}
+			// * 409 Conflict: let handleHttpError resolve via errorCode (CONCURRENCY_CONFLICT, etc.)
+			// No special-case here — the generic flow uses UI_ERROR_CODES for the message,
+			// which keeps it aligned with facade error policies (dedup relies on same detail).
 
 			// * 429 Too Many Requests: fully suppress toast — RateLimitBanner handles UX.
 			if (error.status === 429) {

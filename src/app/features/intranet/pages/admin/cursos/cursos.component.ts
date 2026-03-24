@@ -17,6 +17,7 @@ import { ConfirmationService } from 'primeng/api';
 
 import { UiMappingService } from '@shared/services';
 import { PageHeaderComponent } from '@shared/components';
+import { EstadoLabelPipe, EstadoSeverityPipe, EstadoToggleIconPipe, EstadoToggleLabelPipe } from '@shared/pipes';
 import { buildDeleteCursoMessage } from '@app/shared/constants';
 
 import { CursosFacade } from './services';
@@ -38,6 +39,10 @@ import type { Curso } from './services/cursos.models';
 		ToggleSwitch,
 		ConfirmDialogModule,
 		PageHeaderComponent,
+		EstadoLabelPipe,
+		EstadoSeverityPipe,
+		EstadoToggleIconPipe,
+		EstadoToggleLabelPipe,
 	],
 	providers: [ConfirmationService],
 	templateUrl: './cursos.component.html',

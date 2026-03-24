@@ -59,7 +59,7 @@
 					<p-tag [value]="horario.cantidadEstudiantes.toString()" severity="info" />
 				</td>
 				<td>
-					<p-tag [value]="horario.estado ? 'Activo' : 'Inactivo'" [severity]="horario.estado ? 'success' : 'secondary'" />
+					<p-tag [value]="horario.estado | estadoLabel" [severity]="horario.estado | estadoSeverity" />
 				</td>
 				<td>
 					<!-- * Row actions -->
@@ -85,16 +85,16 @@
 							></button>
 							<button
 								pButton
-								[icon]="horario.estado ? 'pi pi-ban' : 'pi pi-check'"
+								[icon]="horario.estado | estadoToggleIcon"
 								class="p-button-rounded p-button-text"
 								[class.p-button-warning]="horario.estado"
 								[class.p-button-success]="!horario.estado"
 								(click)="onToggleEstado(horario.id, horario.estado)"
-								[pTooltip]="horario.estado ? 'Desactivar horario' : 'Activar horario'"
+								[pTooltip]="horario.estado | estadoToggleLabel"
 								tooltipPosition="top"
 								[pt]="{
 									root: {
-										'aria-label': horario.estado ? 'Desactivar' : 'Activar',
+										'aria-label': horario.estado | estadoToggleLabel,
 									},
 								}"
 							></button>

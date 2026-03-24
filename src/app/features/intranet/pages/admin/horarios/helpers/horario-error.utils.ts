@@ -1,50 +1,41 @@
 import { HttpErrorResponse } from '@angular/common/http';
 
-import { ErrorHandlerService } from '@core/services';
-import {
-	UI_ADMIN_ERROR_DETAILS,
-	UI_ADMIN_ERROR_DETAILS_DYNAMIC,
-	UI_GENERIC_MESSAGES,
-	UI_SUMMARIES,
-} from '@app/shared/constants';
+import { type ErrorPolicy, DEFAULT_ERROR_POLICY } from '@core/helpers';
+import { UI_SUMMARIES } from '@app/shared/constants';
 
 /**
- * Handler compartido de errores de API para horarios.
- * Clasifica el mensaje del backend y muestra feedback apropiado.
+ * Política de error para horarios.
+ * Extiende la default con summaries específicos para conflictos y validación.
  */
-export function handleHorarioApiError(
-	errorHandler: ErrorHandlerService,
-	err: unknown,
-	accion: string,
-): void {
-	let mensaje: string;
-	if (err instanceof HttpErrorResponse) {
-		mensaje = err.error?.message ?? err.message ?? UI_GENERIC_MESSAGES.unknownError;
-	} else if (err instanceof Error) {
-		mensaje = err.message ?? UI_GENERIC_MESSAGES.unknownError;
-	} else {
-		mensaje = UI_GENERIC_MESSAGES.unknownError;
-	}
+export const HORARIO_ERROR_POLICY: ErrorPolicy = {
+	...DEFAULT_ERROR_POLICY,
 
-	if (mensaje.includes('conflicto') || mensaje.includes('overlap')) {
-		errorHandler.showError(
-			UI_SUMMARIES.scheduleConflict,
-			UI_ADMIN_ERROR_DETAILS.horarioConflict,
-		);
-	} else if (mensaje.includes('no encontrado') || mensaje.includes('not found')) {
-		errorHandler.showError(
-			UI_SUMMARIES.error,
-			UI_ADMIN_ERROR_DETAILS_DYNAMIC.horarioActionNotFound(accion),
-		);
-	} else if (mensaje.includes('validación') || mensaje.includes('validation')) {
-		errorHandler.showError(
-			UI_SUMMARIES.validationError,
-			UI_ADMIN_ERROR_DETAILS_DYNAMIC.horarioValidation(mensaje),
-		);
-	} else {
-		errorHandler.showError(
-			UI_SUMMARIES.error,
-			UI_ADMIN_ERROR_DETAILS_DYNAMIC.horarioActionFailed(accion),
-		);
-	}
-}
+	resolveSummary(err: unknown): string {
+		if (!(err instanceof HttpErrorResponse)) {
+			return DEFAULT_ERROR_POLICY.resolveSummary(err);
+		}
+
+		const message = (err.error?.message ?? '') as string;
+		const errorCode = (err.error?.errorCode ?? '') as string;
+
+		// Conflict: HORARIO_OVERLAP or message includes conflict keywords
+		if (
+			errorCode === 'HORARIO_OVERLAP' ||
+			message.includes('conflicto') ||
+			message.includes('overlap')
+		) {
+			return UI_SUMMARIES.scheduleConflict;
+		}
+
+		// Validation errors
+		if (
+			errorCode.includes('INVALIDO') ||
+			message.includes('validación') ||
+			message.includes('validation')
+		) {
+			return UI_SUMMARIES.validationError;
+		}
+
+		return DEFAULT_ERROR_POLICY.resolveSummary(err);
+	},
+};

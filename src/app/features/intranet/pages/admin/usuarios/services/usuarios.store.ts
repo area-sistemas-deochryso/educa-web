@@ -11,7 +11,9 @@ import {
 import { Injectable, computed, inject, signal } from '@angular/core';
 import { Subject } from 'rxjs';
 
-import { DebugService, generatePassword } from '@core/helpers';
+import { APP_USER_ROLES } from '@shared/constants';
+import { DebugService } from '@core/helpers';
+import { applyFormPolicies } from '../helpers/usuario-form-policies.utils';
 import {
 	isUsuarioFormValid,
 	validateCorreo,
@@ -113,8 +115,8 @@ export class UsuariosStore {
 		validateTelefonoApoderado(this._formData().telefonoApoderado, this._formData().rol),
 	);
 
-	readonly isEstudiante = computed(() => this._formData().rol === 'Estudiante');
-	readonly isProfesor = computed(() => this._formData().rol === 'Profesor');
+	readonly isEstudiante = computed(() => this._formData().rol === APP_USER_ROLES.Estudiante);
+	readonly isProfesor = computed(() => this._formData().rol === APP_USER_ROLES.Profesor);
 
 	readonly isFormValid = computed(() =>
 		isUsuarioFormValid(this._formData(), this._isEditing(), {
@@ -296,39 +298,7 @@ export class UsuariosStore {
 
 	updateFormData(updates: Partial<CrearUsuarioRequest & ActualizarUsuarioRequest>): void {
 		this._formData.update((current) => {
-			const newData = { ...current, ...updates };
-
-			// Auto-generar contraseña solo en creación (en edición se usa la del backend)
-			if (
-				!this._isEditing() &&
-				(updates.apellidos !== undefined || updates.dni !== undefined)
-			) {
-				const password = generatePassword(newData.apellidos ?? '', newData.dni ?? '');
-				if (password) {
-					newData.contrasena = password;
-					this.log.info('Contraseña autogenerada', { contrasena: password });
-				} else {
-					newData.contrasena = undefined;
-					this.log.trace('Contraseña no generada (datos insuficientes)');
-				}
-			}
-
-			// Limpiar campos de salón si el rol cambia y no es Profesor ni Estudiante
-			if (updates.rol !== undefined && newData.rol !== 'Profesor' && newData.rol !== 'Estudiante') {
-				newData.salonId = undefined;
-				newData.esTutor = undefined;
-			}
-
-			// Si se deselecciona el salón, limpiar esTutor
-			if (updates.salonId !== undefined && !newData.salonId) {
-				newData.esTutor = undefined;
-			}
-
-			// Si se selecciona un salón y esTutor no está definido, inicializar en false (solo Profesor)
-			if (updates.salonId !== undefined && newData.salonId && newData.esTutor === undefined && newData.rol === 'Profesor') {
-				newData.esTutor = false;
-			}
-
+			const newData = applyFormPolicies(current, updates, this._isEditing());
 			this.log.trace('updateFormData', { updates, newData });
 			return newData;
 		});

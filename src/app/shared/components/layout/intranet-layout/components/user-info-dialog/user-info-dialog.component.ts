@@ -21,6 +21,7 @@ import { InputTextModule } from 'primeng/inputtext';
 import { MessageService } from 'primeng/api';
 import { AuthService } from '@core/services';
 import { UserProfileService } from '@core/services';
+import { extractErrorMessage } from '@core/helpers';
 
 // #endregion
 // #region Implementation
@@ -149,9 +150,8 @@ export class UserInfoDialogComponent {
 					this.resetForm();
 					this.visibleChange.emit(false);
 				},
-				error: (err) => {
-					const mensaje =
-						err?.error?.mensaje || 'No se pudo actualizar la contraseña';
+				error: (err: unknown) => {
+					const mensaje = extractErrorMessage(err, 'No se pudo actualizar la contraseña');
 					this.messageService.add({
 						severity: 'error',
 						summary: 'Error',

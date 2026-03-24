@@ -2,14 +2,14 @@ import { Injectable, computed, signal } from '@angular/core';
 
 import { BaseCrudStore } from '@core/store';
 import { searchMatchAny } from '@core/helpers';
-import { NotificacionLista, NotificacionesEstadisticas } from '@data/models';
+import { NotificacionLista, NotificacionesEstadisticas, NotificacionTipo, NotificacionPrioridad } from '@data/models';
 
 // #region Interfaces
 export interface NotificacionFormData {
 	titulo: string;
 	mensaje: string;
-	tipo: string;
-	prioridad: string;
+	tipo: NotificacionTipo;
+	prioridad: NotificacionPrioridad;
 	icono: string;
 	fechaInicio: string;
 	fechaFin: string;

@@ -1,7 +1,7 @@
 import { Injectable, inject, DestroyRef } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { switchMap, tap } from 'rxjs/operators';
-import { logger } from '@core/helpers';
+import { logger, facadeErrorHandler } from '@core/helpers';
 import { AuthService, ErrorHandlerService, WalFacadeHelper } from '@core/services';
 import { SignalRService } from '@core/services/signalr';
 import { environment } from '@config';
@@ -27,6 +27,10 @@ export class SalonMensajeriaFacade {
 	private readonly signalR = inject(SignalRService);
 	private readonly auth = inject(AuthService);
 	private readonly conversacionUrl = `${environment.apiUrl}/api/conversaciones`;
+	private readonly errHandler = facadeErrorHandler({
+		tag: 'SalonMensajeriaFacade',
+		errorHandler: this.errorHandler,
+	});
 	// #endregion
 
 	// #region Estado privado
@@ -125,7 +129,7 @@ export class SalonMensajeriaFacade {
 					}
 				},
 				error: (err) => {
-					this.handleError(err, 'cargar conversaciones');
+					this.errHandler.handle(err, 'cargar conversaciones');
 					this.store.setForoLoading(false);
 				},
 			});
@@ -162,7 +166,7 @@ export class SalonMensajeriaFacade {
 					this.lastConversacionesFetchMs = Date.now();
 				},
 				error: (err) => {
-					this.handleError(err, 'cargar conversaciones');
+					this.errHandler.handle(err, 'cargar conversaciones');
 					this.store.setConversacionesLoading(false);
 				},
 			});
@@ -229,7 +233,7 @@ export class SalonMensajeriaFacade {
 				this.store.setSending(false);
 			},
 			onError: (err) => {
-				this.handleError(err, 'crear conversación');
+				this.errHandler.handle(err, 'crear conversación');
 				this.store.setSending(false);
 			},
 			optimistic: {
@@ -274,7 +278,7 @@ export class SalonMensajeriaFacade {
 				this.store.setSending(false);
 			},
 			onError: (err) => {
-				this.handleError(err, 'enviar mensaje');
+				this.errHandler.handle(err, 'enviar mensaje');
 				this.store.setSending(false);
 			},
 			optimistic: {
@@ -318,7 +322,7 @@ export class SalonMensajeriaFacade {
 					this.loadConversacionDetalle(response.conversacionId);
 				},
 				error: (err) => {
-					this.handleError(err, 'crear foro');
+					this.errHandler.handle(err, 'crear foro');
 					this.store.setForoLoading(false);
 				},
 			});
@@ -339,16 +343,12 @@ export class SalonMensajeriaFacade {
 					this.joinConversacion(id);
 				},
 				error: (err) => {
-					this.handleError(err, 'cargar conversación');
+					this.errHandler.handle(err, 'cargar conversación');
 					this.store.setDetalleLoading(false);
 					this.store.setForoLoading(false);
 				},
 			});
 	}
 
-	private handleError(err: unknown, accion: string): void {
-		logger.error(`SalonMensajeriaFacade: Error al ${accion}`, err);
-		this.errorHandler.showError('Error', `No se pudo ${accion}`);
-	}
 	// #endregion
 }

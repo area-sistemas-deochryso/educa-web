@@ -75,6 +75,43 @@ export function esNivel(gradoNombre: string, nivel: NivelEducativo): boolean {
 	return detectarNivel(gradoNombre) === nivel;
 }
 
+/**
+ * Determine the education level from a numeric grade order.
+ *
+ * @param gradoOrden Numeric order (1-3 Inicial, 4-9 Primaria, 10+ Secundaria).
+ * @returns The education level.
+ * @example
+ * determinarNivelPorOrden(2); // 'Inicial'
+ * determinarNivelPorOrden(5); // 'Primaria'
+ */
+export function determinarNivelPorOrden(gradoOrden: number): NivelEducativo {
+	if (gradoOrden >= 1 && gradoOrden <= 3) return 'Inicial';
+	if (gradoOrden >= 4 && gradoOrden <= 9) return 'Primaria';
+	return 'Secundaria';
+}
+// #endregion
+
+// #region Visual Config
+
+type NivelSeverity = 'info' | 'success' | 'warn';
+
+export interface NivelVisualConfig {
+	key: string;
+	title: NivelEducativo;
+	icon: string;
+	tagClass: string;
+	severity: NivelSeverity;
+}
+
+/** Visual config for each education level — single source of truth for icons, colors, severities. */
+export const NIVEL_VISUAL_CONFIGS: Record<NivelEducativo, NivelVisualConfig> = {
+	Inicial: { key: 'inicial', title: 'Inicial', icon: 'pi pi-star', tagClass: 'tag-info', severity: 'info' },
+	Primaria: { key: 'primaria', title: 'Primaria', icon: 'pi pi-book', tagClass: 'tag-success', severity: 'success' },
+	Secundaria: { key: 'secundaria', title: 'Secundaria', icon: 'pi pi-graduation-cap', tagClass: 'tag-warn', severity: 'warn' },
+};
+
+/** Ordered array of visual configs — use for data-driven rendering of nivel sections. */
+export const NIVEL_VISUAL_LIST: NivelVisualConfig[] = NIVEL_ORDER.map((n) => NIVEL_VISUAL_CONFIGS[n]);
 // #endregion
 
 // #region Prefix Removal

@@ -2,7 +2,7 @@ import { Injectable, inject, DestroyRef } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { forkJoin } from 'rxjs';
 
-import { logger, withRetry } from '@core/helpers';
+import { logger, withRetry, facadeErrorHandler } from '@core/helpers';
 import {
 	ErrorHandlerService,
 	PermisosService,
@@ -28,6 +28,10 @@ export class PermisosRolesFacade {
 	private destroyRef = inject(DestroyRef);
 	readonly uiMapping = inject(UiMappingService);
 	private readonly apiUrl = `${environment.apiUrl}/api/sistema/permisos`;
+	private readonly errHandler = facadeErrorHandler({
+		tag: 'PermisosRolesFacade',
+		errorHandler: this.errorHandler,
+	});
 	// #endregion
 
 	// #region Estado expuesto
@@ -103,7 +107,7 @@ export class PermisosRolesFacade {
 					this.refreshPermisosRolOnly();
 					this.errorHandler.showSuccess(UI_SUMMARIES.success, 'Permisos actualizados');
 				},
-				onError: (err) => this.handleApiError(err, 'actualizar'),
+				onError: (err) => this.errHandler.handle(err, 'actualizar permiso', () => this.store.setLoading(false)),
 				optimistic: {
 					apply: () => {
 						this.store.closeDialog();
@@ -127,7 +131,7 @@ export class PermisosRolesFacade {
 					this.refreshPermisosRolOnly();
 					this.errorHandler.showSuccess(UI_SUMMARIES.success, 'Permisos creados');
 				},
-				onError: (err) => this.handleApiError(err, 'crear'),
+				onError: (err) => this.errHandler.handle(err, 'crear permiso', () => this.store.setLoading(false)),
 				optimistic: {
 					apply: () => {
 						this.store.closeDialog();
@@ -154,7 +158,7 @@ export class PermisosRolesFacade {
 			onCommit: () => {
 				this.errorHandler.showSuccess(UI_SUMMARIES.success, 'Permiso eliminado');
 			},
-			onError: (err) => this.handleApiError(err, 'eliminar'),
+			onError: (err) => this.errHandler.handle(err, 'eliminar permiso', () => this.store.setLoading(false)),
 			optimistic: {
 				apply: () => {
 					this.store.removePermiso(permiso.id);
@@ -165,12 +169,6 @@ export class PermisosRolesFacade {
 				},
 			},
 		});
-	}
-
-	private handleApiError(err: unknown, accion: string): void {
-		logger.error(`Error al ${accion} permiso:`, err);
-		this.errorHandler.showError(UI_SUMMARIES.error, UI_ADMIN_ERROR_DETAILS.savePermiso);
-		this.store.setLoading(false);
 	}
 
 	/** Refetch solo permisos por rol (sin recargar vistas) */

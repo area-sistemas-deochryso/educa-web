@@ -1,14 +1,19 @@
 import { computed, inject, Injectable, signal } from '@angular/core';
 
 import { AuthStore } from '@core/store';
-import { determinarNiveles } from '@core/helpers';
+import { isAdminRole } from '@shared/models';
 import { CursoListaDto, CursoOption, CursosPorNivel } from '../models/curso.interface';
-import { buildWeeklyBlocks, hasOverlap } from '../helpers/horario-time.utils';
+import { buildWeeklyBlocks } from '../helpers/horario-time.utils';
+import { filterSalonesDisponibles } from '../helpers/horario-conflict.utils';
+import { validateHorarioForm, validateHoraInicio, validateHoraFin } from '../helpers/horario-form.utils';
+import { mapSalonesToOptions, mapCursosToOptions, groupCursosByNivel, mapProfesToOptions } from '../helpers/horario-mapping.utils';
 import {
+  type DiaSemana,
   type HorarioDetalleResponseDto,
   type HorarioFormData,
   type HorarioResponseDto,
   type HorariosEstadisticas,
+  type HorarioVistaType,
 } from '../models/horario.interface';
 import { ProfesorListDto, ProfesorOption } from '../models/profesor.interface';
 import { SalonListDto, SalonOption } from '../models/salon.interface';
@@ -43,7 +48,7 @@ interface HorariosStoreState {
   detailDrawerVisible: boolean;
   cursoDialogVisible: boolean; // Modal de selección de cursos
   wizardStep: number; // 0: Datos básicos, 1: Asignar profesor, 2: Asignar estudiantes
-  vistaActual: 'semanal' | 'lista'; // Vista activa
+  vistaActual: HorarioVistaType; // Vista activa
 
   // #endregion
   // #region Formulario
@@ -54,7 +59,7 @@ interface HorariosStoreState {
   // #region Filtros
   filtroSalonId: number | null;
   filtroProfesorId: number | null;
-  filtroDiaSemana: number | null;
+  filtroDiaSemana: DiaSemana | null;
   filtroEstadoActivo: boolean | null;
 
   // #endregion
@@ -139,11 +144,7 @@ export class HorariosStore {
   readonly currentUser = this.authStore.user;
 
   /** true si el usuario es Director o Asistente Administrativo */
-  readonly isAdmin = computed(() => {
-    const user = this.currentUser();
-    if (!user) return false;
-    return user.rol === 'Director' || user.rol === 'Asistente Administrativo';
-  });
+  readonly isAdmin = computed(() => isAdminRole(this.currentUser()?.rol));
 
   /** ID del profesor logueado (null si no es profesor) */
   readonly currentProfesorId = computed(() => {
@@ -160,16 +161,9 @@ export class HorariosStore {
     this._state().salonesDisponibles.filter((s) => s.estado),
   );
 
-  /** Mapeo de salones activos a opciones de dropdown */
+  /** Mapeo de salones activos a opciones de dropdown (memoizado) */
   private readonly activeSalonesAsOptions = computed<SalonOption[]>(() =>
-    this.activeSalones().map((s) => ({
-      value: s.salonId,
-      label: s.nombreSalon,
-      grado: s.grado,
-      seccion: s.seccion,
-      sede: s.sede,
-      totalEstudiantes: s.totalEstudiantes,
-    })),
+    mapSalonesToOptions(this.activeSalones()),
   );
 
   /**
@@ -185,28 +179,15 @@ export class HorariosStore {
       return this.activeSalonesAsOptions();
     }
 
-    // Con día/hora → filtrar por conflicto de horario
-    const horarios = this.horarios();
-    const editingId = this.editingId();
+    // Con día/hora → filtrar por conflicto y mapear
+    const disponibles = filterSalonesDisponibles(
+      this.activeSalones(),
+      this.horarios(),
+      formData,
+      this.editingId(),
+    );
 
-    const salonesDisponibles = this.activeSalones().filter((salon) => {
-      const tieneConflicto = horarios.some((h) => {
-        if (editingId !== null && h.id === editingId) return false;
-        if (h.salonId !== salon.salonId || h.diaSemana !== formData.diaSemana) return false;
-        return hasOverlap(formData.horaInicio, formData.horaFin, h.horaInicio, h.horaFin);
-      });
-
-      return !tieneConflicto;
-    });
-
-    return salonesDisponibles.map((s) => ({
-      value: s.salonId,
-      label: s.nombreSalon,
-      grado: s.grado,
-      seccion: s.seccion,
-      sede: s.sede,
-      totalEstudiantes: s.totalEstudiantes,
-    }));
+    return mapSalonesToOptions(disponibles);
   });
 
   /** Cursos activos: solo depende de cursosDisponibles */
@@ -218,31 +199,15 @@ export class HorariosStore {
    * Opciones de cursos disponibles (activos) con niveles educativos
    */
   readonly cursosOptions = computed<CursoOption[]>(() =>
-    this.activeCursos().map((c) => {
-      const grados = c.grados.map((g) => g.nombre);
-      const niveles = determinarNiveles(grados);
-
-      return {
-        value: c.id,
-        label: c.nombre,
-        grados,
-        niveles,
-      };
-    }),
+    mapCursosToOptions(this.activeCursos()),
   );
 
   /**
    * Cursos agrupados por nivel educativo (Inicial, Primaria, Secundaria)
    */
-  readonly cursosPorNivel = computed<CursosPorNivel>(() => {
-    const cursos = this.cursosOptions();
-
-    return {
-      inicial: cursos.filter((c) => c.niveles.includes('Inicial')),
-      primaria: cursos.filter((c) => c.niveles.includes('Primaria')),
-      secundaria: cursos.filter((c) => c.niveles.includes('Secundaria')),
-    };
-  });
+  readonly cursosPorNivel = computed<CursosPorNivel>(() =>
+    groupCursosByNivel(this.cursosOptions()),
+  );
 
   /** Profesores activos: solo depende de profesoresDisponibles */
   private readonly activeProfesores = computed(() =>
@@ -253,11 +218,7 @@ export class HorariosStore {
    * Opciones de profesores disponibles (activos)
    */
   readonly profesoresOptions = computed<ProfesorOption[]>(() =>
-    this.activeProfesores().map((p) => ({
-      value: p.id,
-      label: `${p.nombre} ${p.apellidos}`,
-      dni: p.dni,
-    })),
+    mapProfesToOptions(this.activeProfesores()),
   );
 
   // #endregion
@@ -304,46 +265,18 @@ export class HorariosStore {
 
   // #endregion
   // #region Computed - Validaciones de formulario
-  readonly formValid = computed(() => {
-    const data = this.formData();
-
-    // Validación paso 0 (datos básicos)
-    if (this.wizardStep() === 0) {
-      return (
-        data.diaSemana !== null &&
-        data.horaInicio !== '' &&
-        data.horaFin !== '' &&
-        data.salonId !== null &&
-        data.cursoId !== null &&
-        data.horaInicio < data.horaFin
-      );
-    }
-
-    // Paso 1 (profesor) es opcional
-    if (this.wizardStep() === 1) {
-      return true;
-    }
-
-    // Paso 2 (estudiantes) es opcional
-    if (this.wizardStep() === 2) {
-      return true;
-    }
-
-    return false;
-  });
+  readonly formValid = computed(() =>
+    validateHorarioForm(this.formData(), this.wizardStep()),
+  );
 
   readonly horaInicioError = computed(() => {
     const data = this.formData();
-    if (!data.horaInicio) return 'Hora de inicio requerida';
-    if (data.horaInicio >= data.horaFin) return 'Hora inicio debe ser menor a hora fin';
-    return null;
+    return validateHoraInicio(data.horaInicio, data.horaFin);
   });
 
   readonly horaFinError = computed(() => {
     const data = this.formData();
-    if (!data.horaFin) return 'Hora de fin requerida';
-    if (data.horaFin <= data.horaInicio) return 'Hora fin debe ser mayor a hora inicio';
-    return null;
+    return validateHoraFin(data.horaFin, data.horaInicio);
   });
 
   // #endregion
@@ -696,7 +629,7 @@ export class HorariosStore {
     this._state.update((s) => ({ ...s, filtroProfesorId: profesorId }));
   }
 
-  setFiltroDiaSemana(diaSemana: number | null): void {
+  setFiltroDiaSemana(diaSemana: DiaSemana | null): void {
     this._state.update((s) => ({ ...s, filtroDiaSemana: diaSemana }));
   }
 

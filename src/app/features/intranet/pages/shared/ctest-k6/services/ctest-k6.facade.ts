@@ -2,19 +2,17 @@ import { Injectable, inject, computed, DestroyRef } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
-import { logger } from '@core/helpers';
+import { logger, extractErrorMessage } from '@core/helpers';
 
 import { CTestK6Store } from './ctest-k6.store';
 import {
-	K6Endpoint,
 	K6Credential,
-	K6RoleDistribution,
-	K6Stage,
-	TestType,
 	PRESET_ENDPOINTS,
 	EDUCA_REAL_DISTRIBUTION,
 	LOGIN_ROLE_OPTIONS,
+	TestType,
 } from '../models';
+import { buildK6Script, buildK6ScenariosScript } from '../helpers/k6-script-builder.utils';
 
 // #region Interfaces
 interface LoginResponse {
@@ -47,9 +45,9 @@ export class CTestK6Facade {
 
 		const dist = vm.hasRoleDistribution ? vm.roleDistribution : [];
 		if (vm.hasPerPhaseEndpoints && vm.config.useStages) {
-			return this.buildScenariosScript(vm.config, vm.enabledEndpoints, vm.credentials, dist);
+			return buildK6ScenariosScript(vm.config, vm.enabledEndpoints, vm.credentials, dist);
 		}
-		return this.buildScript(vm.config, vm.enabledEndpoints, vm.credentials, dist);
+		return buildK6Script(vm.config, vm.enabledEndpoints, vm.credentials, dist);
 	});
 	// #endregion
 
@@ -59,7 +57,7 @@ export class CTestK6Facade {
 	}
 
 	loadPresetEndpoints(): void {
-		const allEndpoints: K6Endpoint[] = PRESET_ENDPOINTS.flatMap((p) => p.endpoints);
+		const allEndpoints = PRESET_ENDPOINTS.flatMap((p) => p.endpoints);
 		this.store.setEndpoints(allEndpoints);
 	}
 
@@ -105,9 +103,8 @@ export class CTestK6Facade {
 					this.store.setLoginLoading(false);
 					logger.log(`[CTestK6] Login exitoso: ${credential.rol} (${dni})`);
 				},
-				error: (err) => {
-					const mensaje =
-						err?.error?.mensaje ?? err?.error?.message ?? 'Error de autenticación';
+				error: (err: unknown) => {
+					const mensaje = extractErrorMessage(err, 'Error de autenticación');
 					this.store.setLoginError(mensaje);
 					this.store.setLoginLoading(false);
 					logger.warn('[CTestK6] Login fallido:', mensaje);
@@ -230,433 +227,6 @@ export class CTestK6Facade {
 		a.download = `${config.testName || 'k6-test'}.js`;
 		a.click();
 		URL.revokeObjectURL(url);
-	}
-	// #endregion
-
-	// #region Helpers privados — Generación del script k6
-	private buildScript(
-		config: ReturnType<typeof this.store.config>,
-		endpoints: K6Endpoint[],
-		credentials: K6Credential[],
-		roleDistribution: K6RoleDistribution[],
-	): string {
-		const lines: string[] = [];
-
-		lines.push(`import http from 'k6/http';`);
-		lines.push(`import { check, sleep } from 'k6';`);
-		if (credentials.length > 0) {
-			lines.push(`import exec from 'k6/execution';`);
-		}
-		lines.push('');
-
-		// Options
-		lines.push('export const options = {');
-		if (config.useStages && config.stages.length > 0) {
-			lines.push('  stages: [');
-			for (const stage of config.stages) {
-				lines.push(`    { duration: '${stage.duration}', target: ${stage.target} },`);
-			}
-			lines.push('  ],');
-		} else {
-			lines.push(`  vus: ${config.vus},`);
-			lines.push(`  duration: '${config.duration}',`);
-		}
-		// TLS: confiar en certificados auto-firmados (localhost)
-		if (config.baseUrl.includes('localhost') || config.baseUrl.includes('127.0.0.1')) {
-			lines.push('  insecureSkipTLSVerify: true,');
-		}
-		lines.push('  thresholds: {');
-		lines.push(`    http_req_duration: ['p(95)<${config.thresholds.p95Latency}'],`);
-		lines.push(
-			`    http_req_failed: ['rate<${(config.thresholds.errorRate / 100).toFixed(2)}'],`,
-		);
-		lines.push('  },');
-		lines.push('};');
-		lines.push('');
-
-		// Base URL
-		lines.push(`const BASE_URL = '${config.baseUrl}';`);
-		lines.push('');
-
-		// Credenciales y setup de login
-		if (credentials.length > 0) {
-			lines.push('// Credenciales para login (DNI + contraseña + rol)');
-			lines.push('const USERS = [');
-			for (const cred of credentials) {
-				lines.push(
-					`  { dni: '${cred.usuario}', password: '${cred.password}', rol: '${cred.rol}' },`,
-				);
-			}
-			lines.push('];');
-			lines.push('');
-
-			if (roleDistribution.length > 0) {
-				this.generateRoleArraysAndRanges(lines, roleDistribution);
-			}
-
-			this.generateSetupFunction(lines);
-		}
-
-		// Default function
-		if (credentials.length > 0) {
-			lines.push('export default function (data) {');
-			this.generateUserAssignment(lines, roleDistribution, '  ');
-			lines.push('  const cookieHeader = data.cookies[user.dni];');
-			lines.push('  if (!cookieHeader) { sleep(30); return; } // Login falló en setup, esperar para no spin-loop');
-		} else {
-			lines.push('export default function () {');
-		}
-		lines.push('');
-		lines.push('  const params = {');
-		lines.push('    headers: {');
-		lines.push(`      'Content-Type': 'application/json',`);
-		if (credentials.length > 0) {
-			lines.push("      'Cookie': cookieHeader,");
-		}
-		lines.push('    },');
-		lines.push('  };');
-		lines.push('');
-
-		// Endpoints (agrupados por rol para evitar cross-role failures)
-		const hasAuth = credentials.length > 0;
-		this.generateEndpointCalls(lines, endpoints, config, '  ', hasAuth);
-
-		lines.push('  // Pausa entre iteraciones (simula tiempo de lectura del usuario)');
-		lines.push('  sleep(Math.random() * 2 + 1);');
-		lines.push('}');
-
-		return lines.join('\n');
-	}
-
-	/**
-	 * Genera script con k6 scenarios: cada fase tiene su propia función
-	 * con sus endpoints asignados y se ejecutan secuencialmente via startTime.
-	 */
-	private buildScenariosScript(
-		config: ReturnType<typeof this.store.config>,
-		allEndpoints: K6Endpoint[],
-		credentials: K6Credential[],
-		roleDistribution: K6RoleDistribution[],
-	): string {
-		const lines: string[] = [];
-
-		lines.push(`import http from 'k6/http';`);
-		lines.push(`import { check, sleep } from 'k6';`);
-		if (credentials.length > 0) {
-			lines.push(`import exec from 'k6/execution';`);
-		}
-		lines.push('');
-
-		// Calcular startTime acumulativo y resolver endpoints por fase
-		const phases = config.stages.map((stage, i) => {
-			const eps =
-				stage.endpointIndices.length > 0
-					? stage.endpointIndices.filter((idx) => idx < allEndpoints.length).map((idx) => allEndpoints[idx])
-					: allEndpoints;
-			return { stage, eps, index: i };
-		});
-
-		// startTime acumulativo (parsear durations)
-		let cumulativeSec = 0;
-		const scenarios: { name: string; stage: K6Stage; startTime: number; prevTarget: number }[] = [];
-		let prevTarget = 0;
-		for (const phase of phases) {
-			scenarios.push({
-				name: `phase_${phase.index + 1}`,
-				stage: phase.stage,
-				startTime: cumulativeSec,
-				prevTarget,
-			});
-			prevTarget = phase.stage.target;
-			cumulativeSec += this.parseDurationToSec(phase.stage.duration);
-		}
-
-		// Options con scenarios
-		lines.push('export const options = {');
-		lines.push('  scenarios: {');
-		for (const sc of scenarios) {
-			lines.push(`    ${sc.name}: {`);
-			lines.push(`      executor: 'ramping-vus',`);
-			lines.push(`      startVUs: ${sc.prevTarget},`);
-			lines.push(`      stages: [{ duration: '${sc.stage.duration}', target: ${sc.stage.target} }],`);
-			if (sc.startTime > 0) {
-				lines.push(`      startTime: '${this.formatSec(sc.startTime)}',`);
-			}
-			lines.push(`      exec: '${sc.name}',`);
-			lines.push('    },');
-		}
-		lines.push('  },');
-		// TLS: confiar en certificados auto-firmados (localhost)
-		if (config.baseUrl.includes('localhost') || config.baseUrl.includes('127.0.0.1')) {
-			lines.push('  insecureSkipTLSVerify: true,');
-		}
-		lines.push('  thresholds: {');
-		lines.push(`    http_req_duration: ['p(95)<${config.thresholds.p95Latency}'],`);
-		lines.push(
-			`    http_req_failed: ['rate<${(config.thresholds.errorRate / 100).toFixed(2)}'],`,
-		);
-		lines.push('  },');
-		lines.push('};');
-		lines.push('');
-
-		// Base URL
-		lines.push(`const BASE_URL = '${config.baseUrl}';`);
-		lines.push('');
-
-		// Credentials y setup
-		if (credentials.length > 0) {
-			lines.push('const USERS = [');
-			for (const cred of credentials) {
-				lines.push(
-					`  { dni: '${cred.usuario}', password: '${cred.password}', rol: '${cred.rol}' },`,
-				);
-			}
-			lines.push('];');
-			lines.push('');
-
-			if (roleDistribution.length > 0) {
-				this.generateRoleArraysAndRanges(lines, roleDistribution);
-			}
-
-			this.generateSetupFunction(lines);
-		}
-
-		// Helper: params builder
-		if (credentials.length > 0) {
-			lines.push('function getParams(cookieHeader) {');
-			lines.push('  return {');
-			lines.push('    headers: {');
-			lines.push("      'Content-Type': 'application/json',");
-			lines.push("      'Cookie': cookieHeader,");
-			lines.push('    },');
-			lines.push('  };');
-			lines.push('}');
-		} else {
-			lines.push('function getParams() {');
-			lines.push('  return {');
-			lines.push('    headers: {');
-			lines.push("      'Content-Type': 'application/json',");
-			lines.push('    },');
-			lines.push('  };');
-			lines.push('}');
-		}
-		lines.push('');
-
-		// Per-phase functions
-		const hasAuth = credentials.length > 0;
-		for (const phase of phases) {
-			const fnName = `phase_${phase.index + 1}`;
-			lines.push(`// Fase ${phase.index + 1}: ${phase.stage.duration} → ${phase.stage.target} VUs`);
-			if (hasAuth) {
-				lines.push(`export function ${fnName}(data) {`);
-				this.generateUserAssignment(lines, roleDistribution, '  ');
-				lines.push('  const cookieHeader = data.cookies[user.dni];');
-				lines.push('  if (!cookieHeader) { sleep(30); return; }');
-				lines.push('  const params = getParams(cookieHeader);');
-			} else {
-				lines.push(`export function ${fnName}() {`);
-				lines.push('  const params = getParams();');
-			}
-			lines.push('');
-
-			this.generateEndpointCalls(lines, phase.eps, config, '  ', hasAuth);
-
-			lines.push('  sleep(Math.random() * 2 + 1);');
-			lines.push('}');
-			lines.push('');
-		}
-
-		return lines.join('\n').trimEnd();
-	}
-
-	/**
-	 * Detecta el rol requerido por un endpoint según su path y nombre.
-	 * Convención API: /api/Estudiante/*, /api/EstudianteCurso/*,
-	 * /api/.../estudiante/..., o nombre que empieza con "estudiante-".
-	 */
-	private detectEndpointRole(ep: K6Endpoint): string | null {
-		const lower = (ep.path + ' ' + ep.name).toLowerCase();
-		if (lower.includes('/estudiante') || lower.includes('estudiante-')) return 'Estudiante';
-		if (lower.includes('/profesor') || lower.includes('profesor-')) return 'Profesor';
-		if (lower.includes('/director') || lower.includes('director-') || lower.includes('/sistema/')) return 'Director';
-		return null;
-	}
-
-	/**
-	 * Genera las llamadas a endpoints en el script k6, agrupando por rol
-	 * para que cada VU solo ejecute endpoints de su propio rol.
-	 */
-	private generateEndpointCalls(
-		lines: string[],
-		endpoints: K6Endpoint[],
-		config: ReturnType<typeof this.store.config>,
-		indent: string,
-		hasAuth: boolean,
-	): void {
-		// Separar endpoints por rol
-		const commonEps: { ep: K6Endpoint; idx: number }[] = [];
-		const roleGroups = new Map<string, { ep: K6Endpoint; idx: number }[]>();
-
-		for (let i = 0; i < endpoints.length; i++) {
-			const ep = endpoints[i];
-			const role = hasAuth ? this.detectEndpointRole(ep) : null;
-			if (role) {
-				if (!roleGroups.has(role)) roleGroups.set(role, []);
-				roleGroups.get(role)!.push({ ep, idx: i });
-			} else {
-				commonEps.push({ ep, idx: i });
-			}
-		}
-
-		let varCounter = 0;
-
-		// Endpoints comunes (sin restricción de rol)
-		for (const { ep } of commonEps) {
-			varCounter++;
-			this.pushEndpointCall(lines, ep, `res${varCounter}`, config, indent);
-		}
-
-		// Endpoints específicos por rol, envueltos en if (user.rol === 'X')
-		for (const [role, eps] of roleGroups) {
-			lines.push(`${indent}if (user.rol === '${role}') {`);
-			for (const { ep } of eps) {
-				varCounter++;
-				this.pushEndpointCall(lines, ep, `res${varCounter}`, config, `${indent}  `);
-			}
-			lines.push(`${indent}}`);
-			lines.push('');
-		}
-	}
-
-	private pushEndpointCall(
-		lines: string[],
-		ep: K6Endpoint,
-		varName: string,
-		config: ReturnType<typeof this.store.config>,
-		indent: string,
-	): void {
-		const checkName = ep.name || varName;
-
-		if (ep.method === 'GET' || ep.method === 'DELETE') {
-			lines.push(
-				`${indent}const ${varName} = http.${ep.method.toLowerCase()}(\`\${BASE_URL}${ep.path}\`, params);`,
-			);
-		} else {
-			const bodyStr = ep.body?.trim()
-				? `JSON.stringify(${ep.body.trim()})`
-				: `JSON.stringify({})`;
-			lines.push(
-				`${indent}const ${varName} = http.${ep.method.toLowerCase()}(\`\${BASE_URL}${ep.path}\`, ${bodyStr}, params);`,
-			);
-		}
-		lines.push(`${indent}if (${varName}.status !== 200) console.warn('[VU ' + exec.vu.idInTest + '] ${checkName} → ' + ${varName}.status + ' (' + ${varName}.body.substring(0, 120) + ')');`);
-		lines.push(`${indent}check(${varName}, {`);
-		lines.push(`${indent}  '${checkName} status 200': (r) => r.status === 200,`);
-		lines.push(
-			`${indent}  '${checkName} < ${config.thresholds.p95Latency}ms': (r) => r.timings.duration < ${config.thresholds.p95Latency},`,
-		);
-		lines.push(`${indent}});`);
-		lines.push('');
-	}
-
-	private parseDurationToSec(duration: string): number {
-		const match = duration.trim().match(/^(\d+(?:\.\d+)?)\s*(s|m|h)$/i);
-		if (!match) return 0;
-		const value = parseFloat(match[1]);
-		const unit = match[2].toLowerCase();
-		if (unit === 'h') return value * 3600;
-		if (unit === 'm') return value * 60;
-		return value;
-	}
-
-	private formatSec(sec: number): string {
-		if (sec < 60) return `${sec}s`;
-		if (sec % 60 === 0) return `${sec / 60}m`;
-		return `${sec}s`;
-	}
-
-	/** Genera setup() con login + retry + cookies — reutilizado por ambos builders */
-	private generateSetupFunction(lines: string[]): void {
-		lines.push('// setup() corre UNA vez antes de todos los VUs — login sin rate-limit');
-		lines.push('export function setup() {');
-		lines.push('  const cookies = {};');
-		lines.push('  for (const user of USERS) {');
-		lines.push('    for (let attempt = 1; attempt <= 3; attempt++) {');
-		lines.push('      const loginRes = http.post(');
-		lines.push('        `${BASE_URL}/api/Auth/login`,');
-		lines.push("        JSON.stringify({ dni: user.dni, contraseña: user.password, rol: user.rol, rememberMe: false }),");
-		lines.push("        { headers: { 'Content-Type': 'application/json' } },");
-		lines.push('      );');
-		lines.push('      if (loginRes.status === 200 && loginRes.cookies) {');
-		lines.push('        cookies[user.dni] = Object.entries(loginRes.cookies)');
-		lines.push("          .map(([name, vals]) => `${name}=${vals[0].value}`)");
-		lines.push("          .join('; ');");
-		lines.push("        check(loginRes, { [`login ${user.rol} (${user.dni}) OK`]: () => true });");
-		lines.push('        break;');
-		lines.push('      }');
-		lines.push("      console.warn(`[setup] login ${user.dni} attempt ${attempt} → ${loginRes.status}`);");
-		lines.push('      sleep(3 * attempt);');
-		lines.push('    }');
-		lines.push('    sleep(2);');
-		lines.push('  }');
-		lines.push('  const ok = Object.keys(cookies).length;');
-		lines.push('  console.log(`[setup] ${ok}/${USERS.length} logins OK — cookies: ${JSON.stringify(Object.keys(cookies))}`);');
-		lines.push('  if (ok === 0) { console.error("[setup] NINGÚN login exitoso — abortando"); }');
-		lines.push('  return { cookies };');
-		lines.push('}');
-		lines.push('');
-	}
-
-	/** Genera VU_RANGES + getUser() para distribucion proporcional por rol */
-	private generateRoleArraysAndRanges(lines: string[], roleDistribution: K6RoleDistribution[]): void {
-		lines.push('// Pool de credenciales por rol');
-		for (const dist of roleDistribution) {
-			const varName = this.roleToVarName(dist.rol);
-			lines.push(`const ${varName} = USERS.filter(u => u.rol === '${dist.rol}');`);
-		}
-		lines.push('');
-		lines.push('// Rangos de VU por rol (exec.vu.idInTest es 1-based en k6)');
-		lines.push('const VU_RANGES = [');
-		let cumulative = 0;
-		for (const dist of roleDistribution) {
-			cumulative += dist.vus;
-			const varName = this.roleToVarName(dist.rol);
-			lines.push(`  { maxVU: ${cumulative}, creds: ${varName}, rol: '${dist.rol}' },`);
-		}
-		lines.push('];');
-		lines.push('');
-		lines.push('function getUser(vuId) {');
-		lines.push('  let prev = 0;');
-		lines.push('  for (const range of VU_RANGES) {');
-		lines.push('    if (vuId <= range.maxVU && range.creds.length > 0) {');
-		lines.push('      const idx = (vuId - prev - 1) % range.creds.length;');
-		lines.push('      return { ...range.creds[idx], rol: range.rol };');
-		lines.push('    }');
-		lines.push('    prev = range.maxVU;');
-		lines.push('  }');
-		lines.push('  return USERS[0]; // fallback');
-		lines.push('}');
-		lines.push('');
-	}
-
-	/** Genera asignacion de usuario: proporcional o round-robin */
-	private generateUserAssignment(lines: string[], roleDistribution: K6RoleDistribution[], indent: string): void {
-		if (roleDistribution.length > 0) {
-			lines.push(`${indent}const user = getUser(exec.vu.idInTest);`);
-		} else {
-			lines.push(`${indent}const user = USERS[exec.vu.idInTest % USERS.length];`);
-		}
-	}
-
-	private roleToVarName(rol: string): string {
-		const map: Record<string, string> = {
-			Estudiante: 'ESTUDIANTES',
-			Profesor: 'PROFESORES',
-			Director: 'DIRECTORES',
-			'Asistente Administrativo': 'ADMINS',
-			Apoderado: 'APODERADOS',
-		};
-		return map[rol] ?? rol.toUpperCase().replace(/\s+/g, '_') + 'S';
 	}
 	// #endregion
 }

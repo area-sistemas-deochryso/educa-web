@@ -1,5 +1,13 @@
 <!-- #region Header -->
 <app-page-header icon="pi pi-building" title="Gestión de Salones" subtitle="Administración de periodos, calificaciones y promoción de estudiantes">
+	<p-selectButton
+		[options]="periodoOptions"
+		[ngModel]="vm().esVerano"
+		(ngModelChange)="onPeriodoChange($event)"
+		optionLabel="label"
+		optionValue="value"
+		[allowEmpty]="false"
+	/>
 	<p-inputNumber
 		[ngModel]="vm().filtroAnio"
 		(ngModelChange)="onAnioChange($event)"
@@ -66,7 +74,7 @@
 			<p-tabpanel [value]="i">
 				<!-- Toolbar del nivel -->
 				<div class="nivel-toolbar">
-					<div class="flex items-center gap-2">
+					<div class="toolbar-tags">
 						@if (vm().periodoActual; as periodo) {
 							<p-tag
 								[value]="periodo.estadoCierre === 'CERRADO' ? 'Periodo Cerrado' : 'Periodo Abierto'"
@@ -83,7 +91,7 @@
 							/>
 						}
 					</div>
-					<div class="flex gap-2">
+					<div class="toolbar-actions">
 						<button
 							pButton
 							label="Config Calificaciones"

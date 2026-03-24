@@ -55,6 +55,7 @@ Aplicacion Angular 21 para gestion educativa con portal publico e intranet priva
 @.claude/rules/filter-transparency.md
 @.claude/rules/domain-modeling.md
 @.claude/rules/base-abstractions.md
+@.claude/rules/semantic-types.md
 
 ## Diagnóstico
 

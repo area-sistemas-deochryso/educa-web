@@ -8,6 +8,7 @@ import { logger, withRetry } from '@core/helpers';
 import { ErrorHandlerService } from '@core/services';
 import { UserProfileService } from '@core/services/user/user-profile.service';
 import { environment } from '@config/environment';
+import { canModerateVideoconference, getHorarioEndpoint } from '@shared/models';
 import { VideoconferenciasStore, VideoconferenciaItem } from './videoconferencias.store';
 
 // #endregion
@@ -45,10 +46,7 @@ export class VideoconferenciasFacade {
 	readonly displayName = this.userProfile.displayName;
 	readonly jaasAppId = environment.jitsi.appId;
 
-	readonly isModerator = computed(() => {
-		const role = this.userProfile.userRole();
-		return role === 'Profesor' || role === 'Director' || role === 'Asistente Administrativo';
-	});
+	readonly isModerator = computed(() => canModerateVideoconference(this.userProfile.userRole()));
 	// #endregion
 
 	// #region Comandos de carga
@@ -108,25 +106,19 @@ export class VideoconferenciasFacade {
 	// #endregion
 
 	// #region Helpers privados
+	/** Resuelve el endpoint de horarios consultando la policy del rol. */
 	private getHorariosByRole(): Observable<HorarioDto[]> {
-		const role = this.userProfile.userRole();
+		const endpoint = getHorarioEndpoint(this.userProfile.userRole());
 		const entityId = this.userProfile.entityId();
 
-		if (role === 'Estudiante') {
-			return this.http
-				.get<HorarioDto[]>(`${this.baseUrl}/api/EstudianteCurso/mis-horarios`)
-				.pipe(catchError(() => of([])));
-		}
+		const HORARIO_ENDPOINTS: Record<string, string> = {
+			'mis-horarios': `${this.baseUrl}/api/EstudianteCurso/mis-horarios`,
+			'by-profesor': `${this.baseUrl}/api/Horario/profesor/${entityId}`,
+			all: `${this.baseUrl}/api/Horario`,
+		};
 
-		if (role === 'Profesor' && entityId) {
-			return this.http
-				.get<HorarioDto[]>(`${this.baseUrl}/api/Horario/profesor/${entityId}`)
-				.pipe(catchError(() => of([])));
-		}
-
-		// Admin roles: Director, Asistente Administrativo
 		return this.http
-			.get<HorarioDto[]>(`${this.baseUrl}/api/Horario`)
+			.get<HorarioDto[]>(HORARIO_ENDPOINTS[endpoint])
 			.pipe(catchError(() => of([])));
 	}
 

@@ -32,6 +32,7 @@ import {
 	buildDeletePermisosUsuarioMessage,
 } from '@app/shared/constants';
 import { PageHeaderComponent } from '@shared/components';
+import { withAllOption } from '@shared/models';
 import { PermisosUsuariosFacade } from './services/permisos-usuarios.facade';
 
 @Component({
@@ -96,8 +97,9 @@ export class PermisosUsuariosComponent implements OnInit {
 
 	// Options (sin Apoderado para admin)
 	rolesDisponibles = ROLES_DISPONIBLES_ADMIN;
-	rolesOptions = [{ label: 'Todos los roles', value: null as RolTipoAdmin | null }].concat(
-		ROLES_DISPONIBLES_ADMIN.map((r) => ({ label: r, value: r as RolTipoAdmin | null })),
+	rolesOptions = withAllOption(
+		ROLES_DISPONIBLES_ADMIN.map((r) => ({ label: r, value: r })),
+		'Todos los roles',
 	);
 	rolesSelectOptions = ROLES_DISPONIBLES_ADMIN.map((r) => ({ label: r, value: r }));
 

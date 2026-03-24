@@ -1,4 +1,5 @@
 import type { Vista } from '@core/services';
+import { capitalize, groupBy, sortedEntries } from '@core/helpers';
 
 export interface ModuloVistas {
 	nombre: string;
@@ -9,10 +10,6 @@ export interface ModuloVistas {
 
 type GetModuloFn = (ruta: string) => string;
 
-function capitalizeFirst(s: string): string {
-	return s.charAt(0).toUpperCase() + s.slice(1);
-}
-
 /**
  * Agrupa todas las vistas activas por módulo, contando las seleccionadas.
  * Usado para construir el selector de módulos en el diálogo de crear/editar.
@@ -22,24 +19,14 @@ export function buildModulosVistas(
 	vistasSeleccionadas: string[],
 	getModulo: GetModuloFn,
 ): ModuloVistas[] {
-	const modulosMap = new Map<string, Vista[]>();
+	const grouped = groupBy(vistas, (v) => capitalize(getModulo(v.ruta)));
 
-	vistas.forEach((vista) => {
-		const modulo = capitalizeFirst(getModulo(vista.ruta));
-		if (!modulosMap.has(modulo)) {
-			modulosMap.set(modulo, []);
-		}
-		modulosMap.get(modulo)!.push(vista);
-	});
-
-	return Array.from(modulosMap.entries())
-		.sort((a, b) => a[0].localeCompare(b[0]))
-		.map(([nombre, vistas]) => ({
-			nombre,
-			vistas: vistas.sort((a, b) => a.nombre.localeCompare(b.nombre)),
-			seleccionadas: vistas.filter((v) => vistasSeleccionadas.includes(v.ruta)).length,
-			total: vistas.length,
-		}));
+	return sortedEntries(grouped).map(([nombre, vistas]) => ({
+		nombre,
+		vistas: vistas.sort((a, b) => a.nombre.localeCompare(b.nombre)),
+		seleccionadas: vistas.filter((v) => vistasSeleccionadas.includes(v.ruta)).length,
+		total: vistas.length,
+	}));
 }
 
 /**
@@ -51,26 +38,19 @@ export function buildModulosVistasForDetail(
 	vistasActivas: Vista[],
 	getModulo: GetModuloFn,
 ): ModuloVistas[] {
-	const modulosMap = new Map<string, Vista[]>();
+	const resolvedVistas = vistasRutas
+		.map((ruta) => ({ ruta, vista: vistasActivas.find((v) => v.ruta === ruta) }))
+		.filter((entry): entry is { ruta: string; vista: Vista } => !!entry.vista);
 
-	vistasRutas.forEach((ruta) => {
-		const modulo = capitalizeFirst(getModulo(ruta));
-		const vista = vistasActivas.find((v) => v.ruta === ruta);
+	const grouped = groupBy(resolvedVistas, (entry) => capitalize(getModulo(entry.ruta)));
 
-		if (!modulosMap.has(modulo)) {
-			modulosMap.set(modulo, []);
-		}
-		if (vista) {
-			modulosMap.get(modulo)!.push(vista);
-		}
-	});
-
-	return Array.from(modulosMap.entries())
-		.sort((a, b) => a[0].localeCompare(b[0]))
-		.map(([nombre, vistas]) => ({
+	return sortedEntries(grouped).map(([nombre, entries]) => {
+		const vistas = entries.map((e) => e.vista);
+		return {
 			nombre,
 			vistas,
 			seleccionadas: vistas.length,
 			total: vistas.length,
-		}));
+		};
+	});
 }

@@ -9,6 +9,7 @@ import { TagModule } from 'primeng/tag';
 import { ProgressSpinnerModule } from 'primeng/progressspinner';
 import { GrupoContenidoDto } from '@features/intranet/pages/profesor/models';
 import { CrearConversacionDto } from '@data/models';
+import { getInitial } from '@core/helpers';
 import { SalonMensajeriaFacade } from '../../services/mensajeria.facade';
 
 @Component({
@@ -87,6 +88,8 @@ export class SalonForoTabComponent {
 	// #endregion
 
 	// #region Helpers
+	readonly getInitial = getInitial;
+
 	private readonly avatarColors = [
 		'#4f46e5', '#0891b2', '#059669', '#d97706', '#dc2626',
 		'#7c3aed', '#db2777', '#2563eb', '#ca8a04', '#0d9488',

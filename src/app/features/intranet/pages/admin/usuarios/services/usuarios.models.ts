@@ -19,7 +19,7 @@ export interface UsuarioLista {
 	nombres: string;
 	apellidos: string;
 	nombreCompleto: string;
-	rol: string;
+	rol: AppUserRoleValue;
 	estado: boolean;
 	fechaRegistro: string;
 	telefono?: string;
@@ -59,7 +59,7 @@ export interface CrearUsuarioRequest {
 	nombres: string;
 	apellidos: string;
 	contrasena: string;
-	rol: string;
+	rol: AppUserRoleValue;
 	sedeId?: number;
 	telefono?: string;
 	correo?: string;

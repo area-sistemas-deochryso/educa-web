@@ -1,6 +1,6 @@
 import { inject, Injectable } from '@angular/core';
 
-import { logger } from '@core/helpers';
+import { facadeErrorHandler } from '@core/helpers';
 import { ErrorHandlerService, WalFacadeHelper } from '@core/services';
 import { environment } from '@config';
 import type {
@@ -11,7 +11,7 @@ import {
   UI_HORARIOS_SUCCESS_MESSAGES,
   UI_SUMMARIES,
 } from '@app/shared/constants';
-import { handleHorarioApiError } from '../helpers/horario-error.utils';
+import { HORARIO_ERROR_POLICY } from '../helpers/horario-error.utils';
 import { HorariosApiService } from './horarios-api.service';
 import { HorariosStore } from './horarios.store';
 
@@ -28,6 +28,11 @@ export class HorariosAssignmentService {
 
   private wal = inject(WalFacadeHelper);
   private readonly apiUrl = `${environment.apiUrl}/api/horario`;
+  private readonly errHandler = facadeErrorHandler({
+    tag: 'HorariosAssignmentService',
+    errorHandler: this.errorHandler,
+    policy: HORARIO_ERROR_POLICY,
+  });
 
   // #region Asignar
 
@@ -58,9 +63,9 @@ export class HorariosAssignmentService {
         );
       },
       onError: (err) => {
-        logger.error('Error al asignar profesor:', err);
-        this.handleApiError(err, 'asignar el profesor');
-        this.store.setLoading(false);
+        this.errHandler.handle(err, 'asignar el profesor', () => {
+          this.store.setLoading(false);
+        });
       },
       optimistic: {
         apply: () => {
@@ -95,9 +100,9 @@ export class HorariosAssignmentService {
         );
       },
       onError: (err) => {
-        logger.error('Error al asignar estudiantes:', err);
-        this.handleApiError(err, 'asignar los estudiantes');
-        this.store.setLoading(false);
+        this.errHandler.handle(err, 'asignar los estudiantes', () => {
+          this.store.setLoading(false);
+        });
       },
       optimistic: {
         apply: () => {
@@ -138,9 +143,9 @@ export class HorariosAssignmentService {
         );
       },
       onError: (err) => {
-        logger.error('Error al asignar todos los estudiantes:', err);
-        this.handleApiError(err, 'asignar los estudiantes');
-        this.store.setLoading(false);
+        this.errHandler.handle(err, 'asignar los estudiantes', () => {
+          this.store.setLoading(false);
+        });
       },
       optimistic: {
         apply: () => {
@@ -180,9 +185,9 @@ export class HorariosAssignmentService {
         );
       },
       onError: (err) => {
-        logger.error('Error al desasignar profesor:', err);
-        this.handleApiError(err, 'desasignar el profesor');
-        this.store.setLoading(false);
+        this.errHandler.handle(err, 'desasignar el profesor', () => {
+          this.store.setLoading(false);
+        });
       },
       optimistic: {
         apply: () => {
@@ -226,9 +231,9 @@ export class HorariosAssignmentService {
         );
       },
       onError: (err) => {
-        logger.error('Error al desasignar estudiante:', err);
-        this.handleApiError(err, 'desasignar el estudiante');
-        this.store.setLoading(false);
+        this.errHandler.handle(err, 'desasignar el estudiante', () => {
+          this.store.setLoading(false);
+        });
       },
       optimistic: {
         apply: () => {
@@ -242,13 +247,6 @@ export class HorariosAssignmentService {
         },
       },
     });
-  }
-
-  // #endregion
-  // #region Helpers privados
-
-  private handleApiError(err: unknown, accion: string): void {
-    handleHorarioApiError(this.errorHandler, err, accion);
   }
 
   // #endregion

@@ -1,6 +1,6 @@
 import { inject, Injectable } from '@angular/core';
 
-import { logger } from '@core/helpers';
+import { getEstadoToggleDeltas, getEstadoRollbackDeltas, facadeErrorHandler } from '@core/helpers';
 import { ErrorHandlerService, WalFacadeHelper } from '@core/services';
 import { environment } from '@config';
 import {
@@ -10,12 +10,11 @@ import {
   type HorarioUpdateDto,
 } from '../models/horario.interface';
 import {
-  UI_ADMIN_ERROR_DETAILS,
   UI_HORARIOS_SUCCESS_MESSAGES,
   UI_HORARIOS_SUCCESS_MESSAGES_DYNAMIC,
   UI_SUMMARIES,
 } from '@app/shared/constants';
-import { handleHorarioApiError } from '../helpers/horario-error.utils';
+import { HORARIO_ERROR_POLICY } from '../helpers/horario-error.utils';
 import { HorariosApiService } from './horarios-api.service';
 import { HorariosAssignmentService } from './horarios-assignment.service';
 import { HorariosDataFacade } from './horarios-data.facade';
@@ -34,6 +33,11 @@ export class HorariosCrudFacade {
   private errorHandler = inject(ErrorHandlerService);
   private wal = inject(WalFacadeHelper);
   private readonly apiUrl = `${environment.apiUrl}/api/horario`;
+  private readonly errHandler = facadeErrorHandler({
+    tag: 'HorariosCrudFacade',
+    errorHandler: this.errorHandler,
+    policy: HORARIO_ERROR_POLICY,
+  });
 
   // #region Comandos CRUD
 
@@ -60,9 +64,9 @@ export class HorariosCrudFacade {
         );
       },
       onError: (err) => {
-        logger.error('Error al crear horario:', err);
-        this.handleApiError(err, 'crear');
-        this.store.setLoading(false);
+        this.errHandler.handle(err, 'crear horario', () => {
+          this.store.setLoading(false);
+        });
       },
       optimistic: {
         apply: () => {
@@ -137,9 +141,9 @@ export class HorariosCrudFacade {
         );
       },
       onError: (err) => {
-        logger.error('Error al actualizar horario:', err);
-        this.handleApiError(err, 'actualizar');
-        this.store.setLoading(false);
+        this.errHandler.handle(err, 'actualizar horario', () => {
+          this.store.setLoading(false);
+        });
       },
       optimistic: {
         apply: () => {
@@ -185,34 +189,23 @@ export class HorariosCrudFacade {
         );
       },
       onError: (err) => {
-        logger.error('Error al cambiar estado de horario:', err);
-        this.errorHandler.showError(
-          UI_SUMMARIES.error,
-          UI_ADMIN_ERROR_DETAILS.horarioEstadoChange
-        );
-        this.store.setLoading(false);
+        this.errHandler.handle(err, 'cambiar estado de horario', () => {
+          this.store.setLoading(false);
+        });
       },
       optimistic: {
         apply: () => {
+          const { activosDelta, inactivosDelta } = getEstadoToggleDeltas(estadoActual);
           this.store.toggleHorarioEstado(id);
-          if (nuevoEstado) {
-            this.store.incrementarEstadistica('horariosActivos', 1);
-            this.store.incrementarEstadistica('horariosInactivos', -1);
-          } else {
-            this.store.incrementarEstadistica('horariosActivos', -1);
-            this.store.incrementarEstadistica('horariosInactivos', 1);
-          }
+          this.store.incrementarEstadistica('horariosActivos', activosDelta);
+          this.store.incrementarEstadistica('horariosInactivos', inactivosDelta);
           this.store.setLoading(true);
         },
         rollback: () => {
+          const { activosDelta, inactivosDelta } = getEstadoRollbackDeltas(estadoActual);
           this.store.toggleHorarioEstado(id);
-          if (nuevoEstado) {
-            this.store.incrementarEstadistica('horariosActivos', -1);
-            this.store.incrementarEstadistica('horariosInactivos', 1);
-          } else {
-            this.store.incrementarEstadistica('horariosActivos', 1);
-            this.store.incrementarEstadistica('horariosInactivos', -1);
-          }
+          this.store.incrementarEstadistica('horariosActivos', activosDelta);
+          this.store.incrementarEstadistica('horariosInactivos', inactivosDelta);
         },
       },
     });
@@ -241,20 +234,18 @@ export class HorariosCrudFacade {
         );
       },
       onError: (err) => {
-        logger.error('Error al eliminar horario:', err);
-        this.handleApiError(err, 'eliminar');
-        this.store.setLoading(false);
+        this.errHandler.handle(err, 'eliminar horario', () => {
+          this.store.setLoading(false);
+        });
       },
       optimistic: {
         apply: () => {
           this.store.removeHorario(id);
           this.store.incrementarEstadistica('totalHorarios', -1);
           if (horario) {
-            if (horario.estado) {
-              this.store.incrementarEstadistica('horariosActivos', -1);
-            } else {
-              this.store.incrementarEstadistica('horariosInactivos', -1);
-            }
+            const { activosDelta, inactivosDelta } = getEstadoToggleDeltas(horario.estado, 'delete');
+            this.store.incrementarEstadistica('horariosActivos', activosDelta);
+            this.store.incrementarEstadistica('horariosInactivos', inactivosDelta);
             if (horario.profesorId === null) {
               this.store.incrementarEstadistica('horariosSinProfesor', -1);
             }
@@ -263,13 +254,11 @@ export class HorariosCrudFacade {
         },
         rollback: () => {
           if (horario) {
+            const { activosDelta, inactivosDelta } = getEstadoRollbackDeltas(horario.estado, 'delete');
             this.store.addHorario(horario);
             this.store.incrementarEstadistica('totalHorarios', 1);
-            if (horario.estado) {
-              this.store.incrementarEstadistica('horariosActivos', 1);
-            } else {
-              this.store.incrementarEstadistica('horariosInactivos', 1);
-            }
+            this.store.incrementarEstadistica('horariosActivos', activosDelta);
+            this.store.incrementarEstadistica('horariosInactivos', inactivosDelta);
             if (horario.profesorId === null) {
               this.store.incrementarEstadistica('horariosSinProfesor', 1);
             }
@@ -307,13 +296,6 @@ export class HorariosCrudFacade {
 
   desasignarEstudiante(horarioId: number, estudianteId: number): void {
     this.assignment.desasignarEstudiante(horarioId, estudianteId, this.assignmentCallbacks);
-  }
-
-  // #endregion
-  // #region Helpers privados
-
-  private handleApiError(err: unknown, accion: string): void {
-    handleHorarioApiError(this.errorHandler, err, accion);
   }
 
   // #endregion

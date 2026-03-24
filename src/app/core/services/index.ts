@@ -21,4 +21,5 @@ export * from './wal';
 export * from './rate-limit/rate-limit.service';
 export * from './session';
 export * from './signalr';
+export * from './facades';
 // #endregion

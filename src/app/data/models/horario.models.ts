@@ -1,10 +1,15 @@
+// #region Tipos semánticos
+/** Día de la semana (1=Lunes ... 7=Domingo, convención Peru/BD). */
+export type DiaSemana = 1 | 2 | 3 | 4 | 5 | 6 | 7;
+// #endregion
+
 // #region Response DTOs compartidos (Backend → Frontend)
 // Estos DTOs son usados por múltiples features (horarios, salones, profesor)
 // y por eso viven en la capa de datos compartida.
 
 export interface HorarioResponseDto {
   id: number;
-  diaSemana: number;
+  diaSemana: DiaSemana;
   diaSemanaDescripcion: string;
   horaInicio: string; // "HH:mm"
   horaFin: string; // "HH:mm"
@@ -22,7 +27,7 @@ export interface HorarioResponseDto {
 
 export interface HorarioDetalleResponseDto {
   id: number;
-  diaSemana: number;
+  diaSemana: DiaSemana;
   diaSemanaDescripcion: string;
   horaInicio: string;
   horaFin: string;

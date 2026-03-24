@@ -3,6 +3,7 @@ import { ChangeDetectionStrategy, Component, input, output } from '@angular/core
 
 import { FormsModule } from '@angular/forms';
 import { GradoSeccion } from '@core/services';
+import { SeccionLabelPipe } from '@shared/pipes';
 
 /**
  * Componente presentacional para la selección de grado/sección.
@@ -13,7 +14,7 @@ import { GradoSeccion } from '@core/services';
 @Component({
 	selector: 'app-grado-seccion-selector',
 	standalone: true,
-	imports: [FormsModule],
+	imports: [FormsModule, SeccionLabelPipe],
 	changeDetection: ChangeDetectionStrategy.OnPush,
 	templateUrl: './grado-seccion-selector.component.html',
 	styleUrls: ['./grado-seccion-selector.component.scss'],

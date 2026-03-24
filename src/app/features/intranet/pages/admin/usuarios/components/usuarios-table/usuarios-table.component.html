@@ -65,8 +65,8 @@
 				<td class="text-center">
 					<!-- * Active/inactive status tag -->
 					<p-tag
-						[value]="usuario.estado ? 'Activo' : 'Inactivo'"
-						[severity]="uiMapping.getEstadoSeverity(usuario.estado)"
+						[value]="usuario.estado | estadoLabel"
+						[severity]="usuario.estado | estadoSeverity"
 					/>
 				</td>
 				<td>
@@ -100,17 +100,17 @@
 						></button>
 						<button
 							pButton
-							[icon]="usuario.estado ? 'pi pi-ban' : 'pi pi-check'"
+							[icon]="usuario.estado | estadoToggleIcon"
 							class="p-button-rounded p-button-text"
 							[class.p-button-warning]="usuario.estado"
 							[class.p-button-success]="!usuario.estado"
-							[pTooltip]="usuario.estado ? 'Desactivar' : 'Activar'"
+							[pTooltip]="usuario.estado | estadoToggleLabel"
 							tooltipPosition="left"
-							[attr.aria-label]="usuario.estado ? 'Desactivar' : 'Activar'"
+							[attr.aria-label]="usuario.estado | estadoToggleLabel"
 							(click)="onToggleEstado(usuario)"
 							[pt]="{
 								root: {
-									'aria-label': `${usuario.estado ? 'Desactivar' : 'Activar'}`,
+									'aria-label': usuario.estado | estadoToggleLabel,
 								},
 							}"
 						></button>

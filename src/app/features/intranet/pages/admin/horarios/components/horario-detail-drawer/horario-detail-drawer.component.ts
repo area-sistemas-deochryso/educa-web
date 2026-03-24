@@ -9,6 +9,7 @@ import { SelectModule } from 'primeng/select';
 import { TagModule } from 'primeng/tag';
 import { TooltipModule } from 'primeng/tooltip';
 import type { HorarioDetalleResponseDto, EstudianteHorarioDto } from '../../models/horario.interface';
+import { EstadoLabelPipe, EstadoSeverityPipe, EstadoToggleIconPipe, EstadoToggleLabelPipe } from '@shared/pipes';
 import type { ProfesorOption } from '../../models/profesor.interface';
 
 // #endregion
@@ -25,6 +26,10 @@ import type { ProfesorOption } from '../../models/profesor.interface';
 		SelectModule,
 		TagModule,
 		TooltipModule,
+		EstadoLabelPipe,
+		EstadoSeverityPipe,
+		EstadoToggleIconPipe,
+		EstadoToggleLabelPipe,
 	],
 	templateUrl: './horario-detail-drawer.component.html',
 	styleUrl: './horario-detail-drawer.component.scss',
@@ -60,16 +65,6 @@ export class HorarioDetailDrawerComponent {
 	readonly hasEstudiantes = computed(() => {
 		const detalle = this.detalle();
 		return detalle ? detalle.estudiantes.length > 0 : false;
-	});
-
-	readonly estadoLabel = computed(() => {
-		const detalle = this.detalle();
-		return detalle?.estado ? 'Activo' : 'Inactivo';
-	});
-
-	readonly estadoSeverity = computed((): 'success' | 'danger' => {
-		const detalle = this.detalle();
-		return detalle?.estado ? 'success' : 'danger';
 	});
 
 	// #endregion

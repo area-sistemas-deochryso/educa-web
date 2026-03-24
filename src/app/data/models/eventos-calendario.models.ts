@@ -1,10 +1,20 @@
-// #region Implementation
+// #region Tipos semánticos
+
+export const TIPOS_ENTRADA_CALENDARIO = ['holiday', 'event'] as const;
+export type TipoEntradaCalendario = (typeof TIPOS_ENTRADA_CALENDARIO)[number];
+
+export const TIPOS_EVENTO_CALENDARIO = ['academic', 'cultural', 'sports', 'meeting', 'other'] as const;
+export type TipoEventoCalendario = (typeof TIPOS_EVENTO_CALENDARIO)[number];
+
+// #endregion
+
+// #region DTOs
 
 export interface EventoCalendarioLista {
 	id: number;
 	titulo: string;
 	descripcion: string;
-	tipo: string;
+	tipo: TipoEventoCalendario;
 	icono: string;
 	fechaInicio: string;
 	fechaFin: string | null;
@@ -21,7 +31,7 @@ export interface EventoCalendarioActivo {
 	id: number;
 	titulo: string;
 	descripcion: string;
-	tipo: string;
+	tipo: TipoEventoCalendario;
 	icono: string;
 	fechaInicio: string;
 	fechaFin: string | null;
@@ -32,7 +42,7 @@ export interface EventoCalendarioActivo {
 export interface CrearEventoCalendarioRequest {
 	titulo: string;
 	descripcion: string;
-	tipo: string;
+	tipo: TipoEventoCalendario;
 	icono: string;
 	fechaInicio: string;
 	fechaFin?: string;
@@ -45,7 +55,7 @@ export interface CrearEventoCalendarioRequest {
 export interface ActualizarEventoCalendarioRequest {
 	titulo: string;
 	descripcion: string;
-	tipo: string;
+	tipo: TipoEventoCalendario;
 	icono: string;
 	fechaInicio: string;
 	fechaFin?: string;

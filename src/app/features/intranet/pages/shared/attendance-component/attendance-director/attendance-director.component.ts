@@ -1,5 +1,6 @@
 import { AsistenciaService, GradoSeccion, StorageService } from '@core/services';
 import { viewBlobInNewTab, downloadBlob } from '@core/helpers';
+import { periodoEnMes, filtrarPorPeriodoAcademico } from '@shared/models';
 import { JustificacionEvent } from '../../../../components/attendance/asistencia-dia-list/asistencia-dia-list.component';
 import { ChangeDetectionStrategy, Component, DestroyRef, OnInit, ViewChild, computed, inject, signal } from '@angular/core';
 
@@ -106,13 +107,8 @@ export class AttendanceDirectorComponent implements OnInit {
 	readonly gradosSecciones = computed(() => {
 		const all = this.allGradosSecciones();
 		const month = this.view.ingresos().selectedMonth;
-		const isVerano = month === 1 || month === 2;
-		// * Summer months only show "V" sections.
-		return all.filter((gs) =>
-			isVerano
-				? gs.seccion.toUpperCase() === 'V'
-				: gs.seccion.toUpperCase() !== 'V',
-		);
+		const periodo = periodoEnMes(month);
+		return filtrarPorPeriodoAcademico(all, periodo, (gs) => gs.seccion);
 	});
 	readonly selectedGradoSeccion = signal<GradoSeccion | null>(null);
 

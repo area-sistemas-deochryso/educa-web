@@ -1,222 +1,115 @@
-import { Injectable, inject, DestroyRef } from '@angular/core';
-import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import { forkJoin } from 'rxjs';
+import { Injectable, inject } from '@angular/core';
+import { Observable } from 'rxjs';
 
-import { logger, withRetry } from '@core/helpers';
-import { ErrorHandlerService, WalFacadeHelper } from '@core/services';
+import {
+	BaseCrudFacade,
+	type BaseCrudFacadeConfig,
+	type EstadisticaKeys,
+	type PaginatedResult,
+} from '@core/services';
+import { environment } from '@config';
+
 import { Curso } from './cursos.models';
 import { CursosService } from './cursos.service';
 import { GradosService } from './grados.service';
-import { environment } from '@config';
-import { UI_ADMIN_ERROR_DETAILS, UI_SUMMARIES } from '@app/shared/constants';
-
 import { CursosStore } from './cursos.store';
 
+interface CursosEstadisticas { totalCursos: number; cursosActivos: number; cursosInactivos: number }
+interface CursoFormData { nombre: string; estado: boolean }
+
+const STATS_KEYS: EstadisticaKeys = { total: 'totalCursos', activos: 'cursosActivos', inactivos: 'cursosInactivos' };
+
 @Injectable({ providedIn: 'root' })
-export class CursosFacade {
-	// #region Dependencias
-	private api = inject(CursosService);
-	private gradosApi = inject(GradosService);
-	private store = inject(CursosStore);
-	private errorHandler = inject(ErrorHandlerService);
-	private wal = inject(WalFacadeHelper);
-	private destroyRef = inject(DestroyRef);
-	private readonly apiUrl = `${environment.apiUrl}/api/sistema/cursos`;
+export class CursosFacade extends BaseCrudFacade<Curso, CursoFormData, CursosEstadisticas> {
+	// #region Dependencias específicas
+	private readonly api = inject(CursosService);
+	private readonly gradosApi = inject(GradosService);
+	protected readonly store = inject(CursosStore);
+	protected readonly config: BaseCrudFacadeConfig = {
+		tag: 'CursosFacade',
+		resourceType: 'Curso',
+		apiUrl: `${environment.apiUrl}/api/sistema/cursos`,
+		loadErrorMessage: 'No se pudieron cargar los cursos',
+	};
 	// #endregion
 
-	// #region Estado expuesto
-	readonly vm = this.store.vm;
-	// #endregion
+	constructor() {
+		super();
+		this.initErrorHandler();
+	}
 
-	// #region Comandos CRUD
+	// #region API calls (abstract implementations)
+	protected fetchItems(): Observable<PaginatedResult<Curso>> {
+		return this.api.getCursosPaginated(
+			this.store.page(),
+			this.store.pageSize(),
+			this.store.searchTerm() || undefined,
+			this.store.filterEstado() as boolean | null,
+			this.store.filterNivel() || undefined,
+		);
+	}
 
-	/** Carga inicial: estadísticas + grados + primera página en paralelo */
-	loadAll(): void {
-		this.store.setLoading(true);
-		this.store.clearError();
+	protected fetchEstadisticas(): Observable<CursosEstadisticas> {
+		return this.api.getEstadisticas();
+	}
 
-		forkJoin({
-			cursos: this.api.getCursosPaginated(1, this.store.pageSize()),
-			stats: this.api.getEstadisticas(),
+	/** Override para cargar grados junto con items + stats */
+	protected override getLoadAllSources(): Record<string, Observable<unknown>> {
+		return {
+			...super.getLoadAllSources(),
 			grados: this.gradosApi.getGrados(),
-		})
-			.pipe(
-				withRetry({ tag: 'CursosFacade:loadAll' }),
-				takeUntilDestroyed(this.destroyRef),
-			)
-			.subscribe({
-				next: ({ cursos, stats, grados }) => {
-					this.store.setItems(cursos.data);
-					this.store.setPaginationData(cursos.page, cursos.pageSize, cursos.total);
-					this.store.setEstadisticas(stats);
-					this.store.setGrados(grados);
-					this.store.setLoading(false);
-				},
-				error: (err) => {
-					logger.error('Error al cargar datos:', err);
-					this.errorHandler.showError(UI_SUMMARIES.error, UI_ADMIN_ERROR_DETAILS.loadCursos);
-					this.store.setError(UI_ADMIN_ERROR_DETAILS.loadCursos);
-					this.store.setLoading(false);
-				},
-			});
+		};
 	}
 
-	/** Cambio de página desde p-table lazy load */
-	loadPage(page: number, pageSize: number): void {
-		this.store.setPage(page);
-		this.store.setPageSize(pageSize);
-		this.refreshCursosOnly();
+	protected override applyLoadAllResult(result: Record<string, unknown>): void {
+		super.applyLoadAllResult(result);
+		this.store.setGrados(result['grados'] as never[]);
+	}
+	// #endregion
+
+	// #region CRUD commands
+	saveCurso(): void {
+		const formData = this.store.formData();
+		const gradosIds = this.store.allGradosIds();
+
+		if (this.store.isEditing()) {
+			const curso = this.store.selectedItem();
+			if (!curso) return;
+			const grados = this.store.selectedGradosFull();
+			const payload = { nombre: formData.nombre, estado: formData.estado, gradosIds, rowVersion: curso.rowVersion };
+			this.walUpdate(curso.id, payload, { nombre: formData.nombre, estado: formData.estado, grados },
+				() => this.api.actualizarCurso(curso.id, payload),
+			);
+		} else {
+			const payload = { nombre: formData.nombre, gradosIds };
+			this.walCreate(payload, () => this.api.crearCurso(payload));
+		}
 	}
 
-	/**
-	 * CREAR: WAL → optimistic close dialog → refetch on commit
-	 */
-	create(nombre: string, gradosIds: number[]): void {
-		const payload = { nombre, gradosIds };
-
-		this.wal.execute({
-			operation: 'CREATE',
-			resourceType: 'Curso',
-			endpoint: `${this.apiUrl}/crear`,
-			method: 'POST',
-			payload,
-			http$: () => this.api.crearCurso(payload),
-			optimistic: {
-				apply: () => this.store.closeDialog(),
-				rollback: () => {},
-			},
-			onCommit: () => {
-				this.refreshCursosOnly();
-				this.refreshEstadisticas();
-			},
-			onError: () => this.handleApiError(UI_ADMIN_ERROR_DETAILS.saveCurso),
-		});
-	}
-
-	/**
-	 * EDITAR: WAL → optimistic update → rollback to snapshot
-	 */
-	update(id: number, nombre: string, estado: boolean, gradosIds: number[]): void {
-		const snapshot = this.store.items().find((c) => c.id === id);
-		const payload = { nombre, estado, gradosIds, rowVersion: snapshot?.rowVersion };
-		const grados = this.store.selectedGradosFull();
-
-		this.wal.execute({
-			operation: 'UPDATE',
-			resourceType: 'Curso',
-			resourceId: id,
-			endpoint: `${this.apiUrl}/${id}/actualizar`,
-			method: 'PUT',
-			payload,
-			http$: () => this.api.actualizarCurso(id, payload),
-			optimistic: {
-				apply: () => {
-					this.store.updateItem(id, { nombre, estado, grados });
-					this.store.closeDialog();
-				},
-				rollback: () => {
-					if (snapshot) this.store.updateItem(id, snapshot);
-				},
-			},
-			onCommit: () => this.store.setLoading(false),
-			onError: () => this.handleApiError(UI_ADMIN_ERROR_DETAILS.saveCurso),
-		});
-	}
-
-	/**
-	 * TOGGLE: WAL → optimistic toggle + stats → rollback reverses
-	 */
 	toggleEstado(curso: Curso): void {
 		const gradosIds = curso.grados?.map((g) => g.id) || [];
 		const payload = { nombre: curso.nombre, estado: !curso.estado, gradosIds, rowVersion: curso.rowVersion };
-
-		this.wal.execute({
-			operation: 'UPDATE',
-			resourceType: 'Curso',
-			resourceId: curso.id,
-			endpoint: `${this.apiUrl}/${curso.id}/actualizar`,
-			method: 'PUT',
-			payload,
-			http$: () => this.api.actualizarCurso(curso.id, payload),
-			optimistic: {
-				apply: () => {
-					this.store.toggleCursoEstado(curso.id);
-					if (curso.estado) {
-						this.store.incrementarEstadistica('cursosActivos', -1);
-						this.store.incrementarEstadistica('cursosInactivos', 1);
-					} else {
-						this.store.incrementarEstadistica('cursosActivos', 1);
-						this.store.incrementarEstadistica('cursosInactivos', -1);
-					}
-				},
-				rollback: () => {
-					this.store.toggleCursoEstado(curso.id);
-					if (curso.estado) {
-						this.store.incrementarEstadistica('cursosActivos', 1);
-						this.store.incrementarEstadistica('cursosInactivos', -1);
-					} else {
-						this.store.incrementarEstadistica('cursosActivos', -1);
-						this.store.incrementarEstadistica('cursosInactivos', 1);
-					}
-				},
-			},
-			onCommit: () => this.store.setLoading(false),
-			onError: () => this.handleApiError(UI_ADMIN_ERROR_DETAILS.changeEstado),
-		});
+		this.walToggle(curso, payload,
+			() => this.api.actualizarCurso(curso.id, payload),
+			STATS_KEYS,
+			(id) => this.store.toggleCursoEstado(id),
+		);
 	}
 
-	/**
-	 * ELIMINAR: WAL → optimistic remove + stats → rollback re-adds
-	 */
 	delete(curso: Curso): void {
-		this.wal.execute({
-			operation: 'DELETE',
-			resourceType: 'Curso',
-			resourceId: curso.id,
-			endpoint: `${this.apiUrl}/${curso.id}/eliminar`,
-			method: 'DELETE',
-			payload: null,
-			http$: () => this.api.eliminarCurso(curso.id),
-			optimistic: {
-				apply: () => {
-					this.store.removeItem(curso.id);
-					this.store.incrementarEstadistica('totalCursos', -1);
-					if (curso.estado) {
-						this.store.incrementarEstadistica('cursosActivos', -1);
-					} else {
-						this.store.incrementarEstadistica('cursosInactivos', -1);
-					}
-				},
-				rollback: () => {
-					this.store.addItem(curso);
-					this.store.incrementarEstadistica('totalCursos', 1);
-					if (curso.estado) {
-						this.store.incrementarEstadistica('cursosActivos', 1);
-					} else {
-						this.store.incrementarEstadistica('cursosInactivos', 1);
-					}
-				},
-			},
-			onCommit: () => this.store.setLoading(false),
-			onError: () => this.handleApiError(UI_ADMIN_ERROR_DETAILS.deleteCurso),
-		});
+		this.walDelete(curso,
+			() => this.api.eliminarCurso(curso.id),
+			STATS_KEYS,
+		);
 	}
-
 	// #endregion
 
-	// #region Comandos de UI
-
-	openNewDialog(): void {
-		this.store.closeDialog();
-		this.store.openDialog();
-	}
-
+	// #region UI commands (specific)
 	openEditDialog(curso: Curso): void {
 		this.store.setSelectedItem(curso);
 		this.store.setFormData({ nombre: curso.nombre, estado: curso.estado ?? true });
 		this.store.setIsEditing(true);
 
-		// Split grado IDs by level
 		const gradosIds = curso.grados?.map((g) => g.id) || [];
 		const inicialIds = this.store.gradosInicial().map((g) => g.id);
 		const primariaIds = this.store.gradosPrimaria().map((g) => g.id);
@@ -231,23 +124,6 @@ export class CursosFacade {
 		this.store.openDialog();
 	}
 
-	closeDialog(): void {
-		this.store.closeDialog();
-	}
-
-	saveCurso(): void {
-		const formData = this.store.formData();
-		const gradosIds = this.store.allGradosIds();
-
-		if (this.store.isEditing()) {
-			const curso = this.store.selectedItem();
-			if (!curso) return;
-			this.update(curso.id, formData.nombre, formData.estado, gradosIds);
-		} else {
-			this.create(formData.nombre, gradosIds);
-		}
-	}
-
 	showGrados(curso: Curso): void {
 		this.store.openGradosDialog(curso);
 	}
@@ -255,15 +131,6 @@ export class CursosFacade {
 	closeGradosDialog(): void {
 		this.store.closeGradosDialog();
 	}
-
-	openConfirmDialog(): void {
-		this.store.openConfirmDialog();
-	}
-
-	closeConfirmDialog(): void {
-		this.store.closeConfirmDialog();
-	}
-
 	// #endregion
 
 	// #region Comandos de formulario
@@ -280,83 +147,17 @@ export class CursosFacade {
 	}
 	// #endregion
 
-	// #region Comandos de filtros — resetean page y refetch server-side
-	setSearchTerm(term: string): void {
-		this.store.setSearchTerm(term);
-		this.store.setPage(1);
-		this.refreshCursosOnly();
-	}
-
-	setFilterEstado(estado: boolean | null): void {
-		this.store.setFilterEstado(estado);
-		this.store.setPage(1);
-		this.refreshCursosOnly();
-	}
-
+	// #region Filtros específicos
 	setFilterNivel(nivel: string | null): void {
 		this.store.setFilterNivel(nivel);
 		this.store.setPage(1);
-		this.refreshCursosOnly();
-	}
-
-	clearFilters(): void {
-		this.store.clearFiltros();
-		this.refreshCursosOnly();
+		this.refreshItemsOnly();
 	}
 	// #endregion
 
-	// #region Helpers privados
-
-	private handleApiError(detail: string): void {
-		this.errorHandler.showError(UI_SUMMARIES.error, detail);
-		this.store.setLoading(false);
-	}
-
-	/** Refetch solo la lista paginada con filtros actuales del store */
-	private refreshCursosOnly(): void {
-		this.store.setLoading(true);
-
-		const page = this.store.page();
-		const pageSize = this.store.pageSize();
-		const search = this.store.searchTerm() || undefined;
-		const estado = this.store.filterEstado() as boolean | null;
-		const nivel = this.store.filterNivel() || undefined;
-
-		this.api
-			.getCursosPaginated(page, pageSize, search, estado, nivel)
-			.pipe(
-				withRetry({ tag: 'CursosFacade:refreshCursosOnly' }),
-				takeUntilDestroyed(this.destroyRef),
-			)
-			.subscribe({
-				next: (result) => {
-					this.store.setItems(result.data);
-					this.store.setPaginationData(result.page, result.pageSize, result.total);
-					this.store.setLoading(false);
-				},
-				error: (err) => {
-					logger.error('Error al refrescar cursos:', err);
-					this.errorHandler.showError(UI_SUMMARIES.error, UI_ADMIN_ERROR_DETAILS.refreshData);
-					this.store.setLoading(false);
-				},
-			});
-	}
-
-	/** Refetch estadísticas desde el servidor */
-	private refreshEstadisticas(): void {
-		this.api
-			.getEstadisticas()
-			.pipe(
-				withRetry({ tag: 'CursosFacade:refreshEstadisticas' }),
-				takeUntilDestroyed(this.destroyRef),
-			)
-			.subscribe({
-				next: (stats) => this.store.setEstadisticas(stats),
-				error: (err) => {
-					logger.error('Error al refrescar estadísticas:', err);
-					this.errorHandler.showError(UI_SUMMARIES.error, UI_ADMIN_ERROR_DETAILS.refreshData);
-				},
-			});
-	}
+	// #region Error labels
+	protected override getCreateErrorLabel(): string { return 'guardar el curso'; }
+	protected override getUpdateErrorLabel(): string { return 'guardar el curso'; }
+	protected override getDeleteErrorLabel(): string { return 'eliminar el curso'; }
 	// #endregion
 }

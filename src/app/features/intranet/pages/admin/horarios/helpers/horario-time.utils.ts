@@ -21,7 +21,7 @@ export function calcularPosicionVertical(horaInicio: string): number {
 }
 
 /**
- * Verifica si dos rangos horarios se solapan.
+ * @deprecated Usar `timeRangesOverlap` de `@shared/models` en su lugar.
  */
 export function hasOverlap(
 	inicioA: string,

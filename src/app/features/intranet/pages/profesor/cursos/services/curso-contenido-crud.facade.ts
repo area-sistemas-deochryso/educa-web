@@ -1,6 +1,6 @@
 import { Injectable, inject, DestroyRef } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import { logger } from '@core/helpers';
+import { logger, facadeErrorHandler } from '@core/helpers';
 import { ErrorHandlerService, WalFacadeHelper } from '@core/services';
 import { environment } from '@config';
 import { ProfesorApiService } from '../../services/profesor-api.service';
@@ -31,6 +31,10 @@ export class CursoContenidoCrudFacade {
 	private readonly wal = inject(WalFacadeHelper);
 	private readonly destroyRef = inject(DestroyRef);
 	private readonly contenidoUrl = `${environment.apiUrl}/api/CursoContenido`;
+	private readonly errHandler = facadeErrorHandler({
+		tag: 'CursoContenidoCrudFacade',
+		errorHandler: this.errorHandler,
+	});
 	// #endregion
 
 	// #region Semanas
@@ -72,7 +76,7 @@ export class CursoContenidoCrudFacade {
 			onCommit: (semana) => {
 				this.store.updateSemana(semanaId, semana);
 			},
-			onError: (err) => this.handleApiError(err, 'actualizar semana'),
+			onError: (err) => this.errHandler.handle(err, 'actualizar semana', () => this.store.setSaving(false)),
 		});
 	}
 
@@ -114,7 +118,7 @@ export class CursoContenidoCrudFacade {
 						onCommit: (archivo) => {
 							this.store.addArchivoToSemana(semanaId, archivo);
 						},
-						onError: (err) => this.handleApiError(err, 'registrar archivo'),
+						onError: (err) => this.errHandler.handle(err, 'registrar archivo', () => this.store.setSaving(false)),
 					});
 				},
 				error: (err) => {
@@ -155,7 +159,7 @@ export class CursoContenidoCrudFacade {
 				},
 			},
 			onCommit: () => {},
-			onError: (err) => this.handleApiError(err, 'eliminar archivo'),
+			onError: (err) => this.errHandler.handle(err, 'eliminar archivo', () => this.store.setSaving(false)),
 		});
 	}
 
@@ -194,7 +198,7 @@ export class CursoContenidoCrudFacade {
 						onCommit: (archivo) => {
 							this.store.addArchivoToTarea(semanaId, tareaId, archivo);
 						},
-						onError: (err) => this.handleApiError(err, 'registrar archivo de tarea'),
+						onError: (err) => this.errHandler.handle(err, 'registrar archivo de tarea', () => this.store.setSaving(false)),
 					});
 				},
 				error: (err) => {
@@ -231,7 +235,7 @@ export class CursoContenidoCrudFacade {
 				},
 			},
 			onCommit: () => {},
-			onError: (err) => this.handleApiError(err, 'eliminar archivo de tarea'),
+			onError: (err) => this.errHandler.handle(err, 'eliminar archivo de tarea', () => this.store.setSaving(false)),
 		});
 	}
 
@@ -264,7 +268,7 @@ export class CursoContenidoCrudFacade {
 			onCommit: (tarea) => {
 				this.store.addTareaToSemana(semanaId, tarea);
 			},
-			onError: (err) => this.handleApiError(err, 'crear tarea'),
+			onError: (err) => this.errHandler.handle(err, 'crear tarea', () => this.store.setSaving(false)),
 		});
 	}
 
@@ -306,7 +310,7 @@ export class CursoContenidoCrudFacade {
 			onCommit: (tarea) => {
 				this.store.updateTareaInSemana(semanaId, tareaId, tarea);
 			},
-			onError: (err) => this.handleApiError(err, 'actualizar tarea'),
+			onError: (err) => this.errHandler.handle(err, 'actualizar tarea', () => this.store.setSaving(false)),
 		});
 	}
 
@@ -340,17 +344,12 @@ export class CursoContenidoCrudFacade {
 				},
 			},
 			onCommit: () => {},
-			onError: (err) => this.handleApiError(err, 'eliminar tarea'),
+			onError: (err) => this.errHandler.handle(err, 'eliminar tarea', () => this.store.setSaving(false)),
 		});
 	}
 
 	// #endregion
 
 	// #region Helpers privados
-	private handleApiError(err: unknown, accion: string): void {
-		logger.error(`CursoContenidoCrudFacade: Error al ${accion}`, err);
-		this.errorHandler.showError('Error', `No se pudo ${accion}`);
-		this.store.setSaving(false);
-	}
 	// #endregion
 }

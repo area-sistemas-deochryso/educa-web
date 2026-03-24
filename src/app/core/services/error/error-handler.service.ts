@@ -187,7 +187,10 @@ export class ErrorHandlerService {
 	}
 
 	private showNotification(notification: ErrorNotification): void {
-		const key = `${notification.severity}:${notification.detail}`;
+		// Dedup por detail solamente (ignorar severity).
+		// Cuando el interceptor y el facade resuelven el mismo errorCode,
+		// ambos producen el mismo detail pero pueden diferir en severity.
+		const key = notification.detail;
 		const now = Date.now();
 		const last = this._recentNotifications.get(key);
 

@@ -6,7 +6,6 @@ import { of } from 'rxjs';
 
 import { GruposFacade } from './grupos.facade';
 import { GruposStore } from './grupos.store';
-import { ProfesorStore } from '../../services/profesor.store';
 import { ProfesorApiService } from '../../services/profesor-api.service';
 import { ErrorHandlerService, WalFacadeHelper } from '@core/services';
 
@@ -45,7 +44,6 @@ function createMockWal() {
 describe('GruposFacade', () => {
 	let facade: GruposFacade;
 	let store: GruposStore;
-	let profesorStore: ProfesorStore;
 	let api: ReturnType<typeof createMockApi>;
 	let wal: ReturnType<typeof createMockWal>;
 
@@ -57,7 +55,6 @@ describe('GruposFacade', () => {
 			providers: [
 				GruposFacade,
 				GruposStore,
-				ProfesorStore,
 				{ provide: ProfesorApiService, useValue: api },
 				{ provide: ErrorHandlerService, useValue: { showError: vi.fn(), showSuccess: vi.fn() } },
 				{ provide: WalFacadeHelper, useValue: wal },
@@ -66,39 +63,23 @@ describe('GruposFacade', () => {
 
 		facade = TestBed.inject(GruposFacade);
 		store = TestBed.inject(GruposStore);
-		profesorStore = TestBed.inject(ProfesorStore);
 		store.reset();
-		profesorStore.reset();
 	});
 
-	// #region loadGruposForSalonCurso
-	describe('loadGruposForSalonCurso', () => {
-		it('should load grupos when horario exists', () => {
-			profesorStore.setHorarios([
-				{ id: 1, salonId: 100, cursoId: 10, cursoNombre: 'Mat', salonDescripcion: '1A' },
-			] as never[]);
-
-			facade.loadGruposForSalonCurso(100, 10);
+	// #region loadGruposForHorario
+	describe('loadGruposForHorario', () => {
+		it('should load grupos when contenido exists', () => {
+			facade.loadGruposForHorario(1);
 
 			expect(api.getContenido).toHaveBeenCalledWith(1);
 			expect(store.contenidoId()).toBe(50);
 			expect(store.grupos()).toHaveLength(1);
 		});
 
-		it('should set noContenido when no horario found', () => {
-			facade.loadGruposForSalonCurso(999, 999);
-
-			expect(store.noContenido()).toBe(true);
-			expect(api.getContenido).not.toHaveBeenCalled();
-		});
-
 		it('should set noContenido when contenido is null', () => {
-			profesorStore.setHorarios([
-				{ id: 1, salonId: 100, cursoId: 10 },
-			] as never[]);
 			api.getContenido.mockReturnValue(of(null));
 
-			facade.loadGruposForSalonCurso(100, 10);
+			facade.loadGruposForHorario(1);
 
 			expect(store.noContenido()).toBe(true);
 		});

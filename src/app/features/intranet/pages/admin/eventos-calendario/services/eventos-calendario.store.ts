@@ -2,13 +2,14 @@ import { Injectable, computed, signal } from '@angular/core';
 
 import { BaseCrudStore } from '@core/store';
 import { searchMatchAny } from '@core/helpers';
-import { EventoCalendarioLista, EventosCalendarioEstadisticas } from '@data/models';
+import { EventoCalendarioLista, EventosCalendarioEstadisticas, TipoEventoCalendario } from '@data/models';
+import { validateDateRange } from '@shared/models';
 
 // #region Interfaces
 export interface EventoFormData {
 	titulo: string;
 	descripcion: string;
-	tipo: string;
+	tipo: TipoEventoCalendario;
 	icono: string;
 	fechaInicio: string;
 	fechaFin: string;
@@ -68,7 +69,10 @@ export class EventosCalendarioStore extends BaseCrudStore<
 	// #region Computed específicos
 	readonly isFormValid = computed(() => {
 		const f = this.formData();
-		return !!f.titulo?.trim() && !!f.descripcion?.trim() && !!f.fechaInicio;
+		if (!f.titulo?.trim() || !f.descripcion?.trim() || !f.fechaInicio) return false;
+		// Si hay fechaFin, validar invariante fechaFin >= fechaInicio
+		if (f.fechaFin) return validateDateRange(f.fechaInicio, f.fechaFin) === null;
+		return true;
 	});
 
 	readonly filteredItems = computed(() => {

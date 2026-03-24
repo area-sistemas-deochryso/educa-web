@@ -7,6 +7,7 @@ import { TagModule } from 'primeng/tag';
 import { TooltipModule } from 'primeng/tooltip';
 import { UsuarioLista } from '../../services';
 import { UiMappingService } from '@shared/services';
+import { EstadoLabelPipe, EstadoSeverityPipe, EstadoToggleIconPipe, EstadoToggleLabelPipe } from '@shared/pipes';
 import { TableLoadingDirective } from '@app/shared';
 
 /**
@@ -18,7 +19,7 @@ import { TableLoadingDirective } from '@app/shared';
 @Component({
 	selector: 'app-usuarios-table',
 	standalone: true,
-	imports: [CommonModule, TableModule, ButtonModule, TagModule, TooltipModule, TableLoadingDirective],
+	imports: [CommonModule, TableModule, ButtonModule, TagModule, TooltipModule, TableLoadingDirective, EstadoLabelPipe, EstadoSeverityPipe, EstadoToggleIconPipe, EstadoToggleLabelPipe],
 	templateUrl: './usuarios-table.component.html',
 	styleUrl: './usuarios-table.component.scss',
 	changeDetection: ChangeDetectionStrategy.OnPush,

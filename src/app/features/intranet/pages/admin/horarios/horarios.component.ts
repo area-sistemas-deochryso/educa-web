@@ -10,7 +10,7 @@ import { FormsModule } from '@angular/forms';
 import { CursoOption } from './models/curso.interface';
 import { HorarioDetailDrawerComponent } from './components/horario-detail-drawer/horario-detail-drawer.component';
 import { PageHeaderComponent } from '@shared/components';
-import { HorarioResponseDto } from './models/horario.interface';
+import { type DiaSemana, HorarioResponseDto, type HorarioVistaType } from './models/horario.interface';
 import { HorariosCrudFacade, HorariosDataFacade, HorariosUiFacade } from './services';
 import { HorariosFiltersComponent } from './components/horarios-filters/horarios-filters.component';
 import { HorariosListViewComponent } from './components/horarios-list-view/horarios-list-view.component';
@@ -157,7 +157,7 @@ export class HorariosComponent implements OnInit {
 		this.dataFacade.setFiltroProfesor(profesorId);
 	}
 
-	onFiltroDiaSemanaChange(diaSemana: number | null): void {
+	onFiltroDiaSemanaChange(diaSemana: DiaSemana | null): void {
 		this.dataFacade.setFiltroDiaSemana(diaSemana);
 	}
 
@@ -289,7 +289,7 @@ export class HorariosComponent implements OnInit {
 
 	// #endregion
 	// #region Event handlers - Vista
-	onCambiarVista(vista: 'semanal' | 'lista'): void {
+	onCambiarVista(vista: HorarioVistaType): void {
 		this.dataFacade.setVistaActual(vista);
 	}
 

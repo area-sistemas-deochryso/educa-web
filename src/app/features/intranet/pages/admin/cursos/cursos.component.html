@@ -167,8 +167,8 @@
 					</td>
 					<td class="text-left">
 						<p-tag
-							[value]="curso.estado ? 'Activo' : 'Inactivo'"
-							[severity]="curso.estado ? 'success' : 'danger'"
+							[value]="curso.estado | estadoLabel"
+							[severity]="curso.estado | estadoSeverity"
 						/>
 					</td>
 					<td>
@@ -190,15 +190,15 @@
 							<!-- Toggle Estado -->
 							<button
 								pButton
-								[icon]="curso.estado ? 'pi pi-ban' : 'pi pi-check'"
+								[icon]="curso.estado | estadoToggleIcon"
 								class="p-button-rounded p-button-text"
 								[class.p-button-warning]="curso.estado"
 								[class.p-button-success]="!curso.estado"
-								[pTooltip]="curso.estado ? 'Desactivar' : 'Activar'"
+								[pTooltip]="curso.estado | estadoToggleLabel"
 								(click)="toggleEstado(curso)"
 								[pt]="{
 									root: {
-										'aria-label': curso.estado ? 'Desactivar' : 'Activar',
+										'aria-label': curso.estado | estadoToggleLabel,
 									},
 								}"
 							></button>
@@ -343,7 +343,7 @@
 							[ngModel]="vm().formData.estado"
 							(ngModelChange)="updateFormField('estado', $event)"
 						/>
-						<span>{{ vm().formData.estado ? 'Activo' : 'Inactivo' }}</span>
+						<span>{{ vm().formData.estado | estadoLabel }}</span>
 					</div>
 				</div>
 			}

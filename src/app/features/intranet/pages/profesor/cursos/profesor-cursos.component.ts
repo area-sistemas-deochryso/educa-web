@@ -140,7 +140,11 @@ export class ProfesorCursosComponent implements OnInit {
 				const horarioId = Number(params['horarioId']);
 				if (horarioId) {
 					const tab = params['tab'] || undefined;
-					this.contenidoDataFacade.loadContenido(horarioId, tab);
+					const horario = this.facade.vm().horarios.find((h) => h.id === horarioId);
+					this.contenidoDataFacade.loadContenido(horarioId, {
+						initialTab: tab,
+						salonId: horario?.salonId,
+					});
 					// Clean query params from URL without navigation
 					this.router.navigate([], { queryParams: {}, replaceUrl: true });
 				}
@@ -148,7 +152,7 @@ export class ProfesorCursosComponent implements OnInit {
 	}
 
 	onVerContenido(horario: HorarioProfesorDto): void {
-		this.contenidoDataFacade.loadContenido(horario.id);
+		this.contenidoDataFacade.loadContenido(horario.id, { salonId: horario.salonId });
 	}
 
 	onBuilderVisibleChange(visible: boolean): void {

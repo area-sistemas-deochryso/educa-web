@@ -116,7 +116,7 @@
 			</div>
 
 			<!-- NOMBRE DEL APODERADO PARA ESTUDIANTE -->
-			@if (isEstudiante) {
+			@if (isEstudiante()) {
 				<div class="field">
 					<label for="nombreApoderado">Nombre del Apoderado</label>
 					<input
@@ -131,7 +131,7 @@
 				</div>
 			}
 			<!-- TELEFONO -->
-			@if (!isEstudiante) {
+			@if (!isEstudiante()) {
 				<div class="field">
 					<label for="telefono">Telefono</label>
 					<input
@@ -145,7 +145,7 @@
 				</div>
 			}
 			<!-- TELEFONO DEL APODERADO PARA ESTUDIANTE -->
-			@if (isEstudiante) {
+			@if (isEstudiante()) {
 				<div class="field">
 					<label for="telefonoApoderado">
 						Telefono del Apoderado
@@ -161,7 +161,7 @@
 				</div>
 			}
 			<!-- CORREO -->
-			@if (!isEstudiante) {
+			@if (!isEstudiante()) {
 				<div class="field">
 					<label for="correo">Correo</label>
 					<input
@@ -178,7 +178,7 @@
 				</div>
 			}
 			<!-- CORREO APODERADO PARA ESTUDIANTE -->
-			@if (isEstudiante) {
+			@if (isEstudiante()) {
 				<div class="field">
 					<label for="correoApoderado">
 						Correo del Apoderado
@@ -197,7 +197,7 @@
 				</div>
 			}
 			<!-- SALÓN (Grado) - Profesor y Estudiante -->
-			@if (needsSalon) {
+			@if (needsSalon()) {
 				<div class="field">
 					<label for="grado">Grado</label>
 					<p-select
@@ -213,7 +213,7 @@
 				</div>
 			}
 			<!-- SALÓN (Sección) - Profesor y Estudiante -->
-			@if (needsSalon && _gradoSeleccionado()) {
+			@if (needsSalon() && _gradoSeleccionado()) {
 				<div class="field">
 					<label for="seccion">Sección</label>
 					<p-select
@@ -228,12 +228,12 @@
 					/>
 					<small class="text-muted">
 						<i class="pi pi-info-circle" style="margin-right: 0.25rem"></i>
-						Opcional: Asigne un salón al {{ isProfesor ? 'profesor' : 'estudiante' }}
+						Opcional: Asigne un salón al {{ isProfesor() ? 'profesor' : 'estudiante' }}
 					</small>
 				</div>
 			}
 			<!-- ES TUTOR PARA PROFESOR -->
-			@if (isProfesor && formData().salonId) {
+			@if (isProfesor() && formData().salonId) {
 				<div class="field full-width">
 					<div class="checkbox-container">
 						<p-checkbox
@@ -262,7 +262,7 @@
 							[ngModel]="formData().estado"
 							(ngModelChange)="onFieldChange('estado', $event)"
 						/>
-						<span>{{ formData().estado ? 'Activo' : 'Inactivo' }}</span>
+						<span>{{ formData().estado | estadoLabel }}</span>
 					</div>
 				</div>
 			}

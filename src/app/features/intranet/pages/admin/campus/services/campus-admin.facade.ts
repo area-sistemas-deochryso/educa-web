@@ -1,6 +1,6 @@
 import { DestroyRef, inject, Injectable } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import { catchError, EMPTY } from 'rxjs';
+import { catchError, EMPTY, Observable } from 'rxjs';
 
 import { logger, withRetry } from '@core/helpers';
 import { ErrorHandlerService } from '@core/services';
@@ -18,6 +18,14 @@ import {
 import { CampusAdminApiService } from './campus-admin-api.service';
 import { CampusAdminStore } from './campus-admin.store';
 
+interface CrudOptions<T> {
+	apiCall: Observable<T>;
+	onSuccess: (result: T) => void;
+	errorMsg: string;
+	onError?: () => void;
+	saving?: boolean;
+}
+
 @Injectable({ providedIn: 'root' })
 export class CampusAdminFacade {
 	private api = inject(CampusAdminApiService);
@@ -31,11 +39,41 @@ export class CampusAdminFacade {
 
 	// #endregion
 
+	// #region Ejecución genérica
+
+	/**
+	 * Ejecuta una operación CRUD con manejo uniforme de saving, error y cleanup.
+	 * La orquestación (qué hacer) vive en cada método público.
+	 * La ejecución (cómo hacerlo) vive aquí.
+	 */
+	private executeCrud<T>({ apiCall, onSuccess, errorMsg, onError, saving = true }: CrudOptions<T>): void {
+		if (saving) this.store.setSaving(true);
+
+		apiCall
+			.pipe(
+				catchError((err) => {
+					logger.error(`Error: ${errorMsg}`, err);
+					this.errorHandler.showError('Error', errorMsg);
+					if (saving) this.store.setSaving(false);
+					onError?.();
+					return EMPTY;
+				}),
+				takeUntilDestroyed(this.destroyRef),
+			)
+			.subscribe((result) => {
+				onSuccess(result);
+				if (saving) this.store.setSaving(false);
+			});
+	}
+
+	// #endregion
+
 	// #region Carga de datos
 
 	loadPisos(): void {
 		if (this.store.loading()) return;
 		this.store.setLoading(true);
+
 		this.api
 			.listarPisos()
 			.pipe(
@@ -67,6 +105,7 @@ export class CampusAdminFacade {
 	private loadPisoCompleto(pisoId: number): void {
 		if (this.store.editorLoading()) return;
 		this.store.setEditorLoading(true);
+
 		this.api
 			.getPisoCompleto(pisoId)
 			.pipe(
@@ -85,316 +124,9 @@ export class CampusAdminFacade {
 			});
 	}
 
-	// #endregion
-
-	// #region CRUD Pisos
-
-	crearPiso(dto: CrearPisoDto): void {
-		this.store.setSaving(true);
-		this.api
-			.crearPiso(dto)
-			.pipe(
-				catchError((err) => {
-					logger.error('Error creando piso:', err);
-					this.errorHandler.showError('Error', 'No se pudo crear el piso');
-					this.store.setSaving(false);
-					return EMPTY;
-				}),
-				takeUntilDestroyed(this.destroyRef),
-			)
-			.subscribe(() => {
-				this.store.setSaving(false);
-				this.store.closePisoDialog();
-				this.loadPisos();
-			});
-	}
-
-	actualizarPiso(id: number, dto: ActualizarPisoDto): void {
-		this.store.setSaving(true);
-		this.api
-			.actualizarPiso(id, dto)
-			.pipe(
-				catchError((err) => {
-					logger.error('Error actualizando piso:', err);
-					this.errorHandler.showError('Error', 'No se pudo actualizar el piso');
-					this.store.setSaving(false);
-					return EMPTY;
-				}),
-				takeUntilDestroyed(this.destroyRef),
-			)
-			.subscribe(() => {
-				this.store.updatePiso(id, dto);
-				this.store.setSaving(false);
-				this.store.closePisoDialog();
-			});
-	}
-
-	toggleEstadoPiso(id: number): void {
-		this.api
-			.toggleEstadoPiso(id)
-			.pipe(
-				catchError((err) => {
-					logger.error('Error cambiando estado piso:', err);
-					this.errorHandler.showError('Error', 'No se pudo cambiar el estado');
-					return EMPTY;
-				}),
-				takeUntilDestroyed(this.destroyRef),
-			)
-			.subscribe(() => this.store.togglePisoEstado(id));
-	}
-
-	// #endregion
-
-	// #region CRUD Nodos
-
-	crearNodo(dto: CrearNodoDto): void {
-		this.store.setSaving(true);
-		this.api
-			.crearNodo(dto)
-			.pipe(
-				catchError((err) => {
-					logger.error('Error creando nodo:', err);
-					this.errorHandler.showError('Error', 'No se pudo crear el nodo');
-					this.store.setSaving(false);
-					return EMPTY;
-				}),
-				takeUntilDestroyed(this.destroyRef),
-			)
-			.subscribe((nodo) => {
-				this.store.addNodo(nodo);
-				this.store.setSaving(false);
-			});
-	}
-
-	actualizarNodo(id: number, dto: ActualizarNodoDto): void {
-		this.store.setSaving(true);
-		this.api
-			.actualizarNodo(id, dto)
-			.pipe(
-				catchError((err) => {
-					logger.error('Error actualizando nodo:', err);
-					this.errorHandler.showError('Error', 'No se pudo actualizar el nodo');
-					this.store.setSaving(false);
-					return EMPTY;
-				}),
-				takeUntilDestroyed(this.destroyRef),
-			)
-			.subscribe(() => {
-				this.store.updateNodo(id, dto);
-				this.store.setSaving(false);
-				this.store.closeNodeDialog();
-			});
-	}
-
-	moveNodo(id: number, x: number, y: number): void {
-		const nodo = this.store.nodos().find((n) => n.id === id);
-		if (!nodo) return;
-
-		// Optimistic local update
-		this.store.updateNodo(id, { x, y });
-
-		const dto: ActualizarNodoDto = {
-			salonId: nodo.salonId,
-			tipo: nodo.tipo,
-			etiqueta: nodo.etiqueta,
-			x,
-			y,
-			width: nodo.width,
-			height: nodo.height,
-			rotation: nodo.rotation,
-			metadataJson: nodo.metadataJson,
-		};
-
-		this.api
-			.actualizarNodo(id, dto)
-			.pipe(
-				catchError((err) => {
-					logger.error('Error moviendo nodo:', err);
-					// Revert on error
-					this.store.updateNodo(id, { x: nodo.x, y: nodo.y });
-					this.errorHandler.showError('Error', 'No se pudo mover el nodo');
-					return EMPTY;
-				}),
-				takeUntilDestroyed(this.destroyRef),
-			)
-			.subscribe();
-	}
-
-	eliminarNodo(id: number): void {
-		this.api
-			.eliminarNodo(id)
-			.pipe(
-				catchError((err) => {
-					logger.error('Error eliminando nodo:', err);
-					this.errorHandler.showError('Error', 'No se pudo eliminar el nodo');
-					return EMPTY;
-				}),
-				takeUntilDestroyed(this.destroyRef),
-			)
-			.subscribe(() => {
-				this.store.removeNodo(id);
-				this.store.clearSelection();
-			});
-	}
-
-	// #endregion
-
-	// #region CRUD Aristas
-
-	crearArista(dto: CrearAristaDto): void {
-		this.store.setSaving(true);
-		this.api
-			.crearArista(dto)
-			.pipe(
-				catchError((err) => {
-					logger.error('Error creando arista:', err);
-					this.errorHandler.showError('Error', 'No se pudo crear la conexión');
-					this.store.setSaving(false);
-					return EMPTY;
-				}),
-				takeUntilDestroyed(this.destroyRef),
-			)
-			.subscribe((arista) => {
-				this.store.addArista(arista);
-				this.store.setSaving(false);
-				this.store.setEdgeStartNodeId(null);
-			});
-	}
-
-	eliminarArista(id: number): void {
-		this.api
-			.eliminarArista(id)
-			.pipe(
-				catchError((err) => {
-					logger.error('Error eliminando arista:', err);
-					this.errorHandler.showError('Error', 'No se pudo eliminar la conexión');
-					return EMPTY;
-				}),
-				takeUntilDestroyed(this.destroyRef),
-			)
-			.subscribe(() => {
-				this.store.removeArista(id);
-				this.store.clearSelection();
-			});
-	}
-
-	// #endregion
-
-	// #region CRUD Bloqueos
-
-	crearBloqueo(dto: CrearBloqueoDto): void {
-		this.store.setSaving(true);
-		this.api
-			.crearBloqueo(dto)
-			.pipe(
-				catchError((err) => {
-					logger.error('Error creando bloqueo:', err);
-					this.errorHandler.showError('Error', 'No se pudo crear el bloqueo');
-					this.store.setSaving(false);
-					return EMPTY;
-				}),
-				takeUntilDestroyed(this.destroyRef),
-			)
-			.subscribe((bloqueo) => {
-				this.store.addBloqueo(bloqueo);
-				this.store.setSaving(false);
-			});
-	}
-
-	actualizarBloqueo(id: number, dto: ActualizarBloqueoDto): void {
-		this.store.setSaving(true);
-		this.api
-			.actualizarBloqueo(id, dto)
-			.pipe(
-				catchError((err) => {
-					logger.error('Error actualizando bloqueo:', err);
-					this.errorHandler.showError('Error', 'No se pudo actualizar el bloqueo');
-					this.store.setSaving(false);
-					return EMPTY;
-				}),
-				takeUntilDestroyed(this.destroyRef),
-			)
-			.subscribe(() => {
-				this.store.updateBloqueo(id, dto);
-				this.store.setSaving(false);
-				this.store.closeBloqueoDialog();
-			});
-	}
-
-	moveBloqueo(id: number, x: number, y: number): void {
-		const bloqueo = this.store.bloqueos().find((b) => b.id === id);
-		if (!bloqueo) return;
-
-		// Optimistic local update
-		this.store.updateBloqueo(id, { x, y });
-
-		const dto: ActualizarBloqueoDto = {
-			x,
-			y,
-			width: bloqueo.width,
-			height: bloqueo.height,
-			motivo: bloqueo.motivo,
-		};
-
-		this.api
-			.actualizarBloqueo(id, dto)
-			.pipe(
-				catchError((err) => {
-					logger.error('Error moviendo bloqueo:', err);
-					// Revert on error
-					this.store.updateBloqueo(id, { x: bloqueo.x, y: bloqueo.y });
-					this.errorHandler.showError('Error', 'No se pudo mover el bloqueo');
-					return EMPTY;
-				}),
-				takeUntilDestroyed(this.destroyRef),
-			)
-			.subscribe();
-	}
-
-	eliminarBloqueo(id: number): void {
-		this.api
-			.eliminarBloqueo(id)
-			.pipe(
-				catchError((err) => {
-					logger.error('Error eliminando bloqueo:', err);
-					this.errorHandler.showError('Error', 'No se pudo eliminar el bloqueo');
-					return EMPTY;
-				}),
-				takeUntilDestroyed(this.destroyRef),
-			)
-			.subscribe(() => {
-				this.store.removeBloqueo(id);
-				this.store.clearSelection();
-			});
-	}
-
-	// #endregion
-
-	// #region CRUD Conexiones Verticales
-
-	crearConexionVertical(dto: CrearConexionVerticalDto): void {
-		this.store.setSaving(true);
-		this.api
-			.crearConexionVertical(dto)
-			.pipe(
-				catchError((err) => {
-					logger.error('Error creando conexión vertical:', err);
-					this.errorHandler.showError('Error', 'No se pudo crear la conexión vertical');
-					this.store.setSaving(false);
-					return EMPTY;
-				}),
-				takeUntilDestroyed(this.destroyRef),
-			)
-			.subscribe((conexion) => {
-				this.store.addConexionVertical(conexion);
-				this.store.setSaving(false);
-				this.store.closeVerticalDialog();
-				this.store.setVerticalStartNodeId(null);
-			});
-	}
-
 	loadDestPisoNodos(pisoId: number): void {
 		this.store.setDestPisoLoading(true);
+
 		this.api
 			.getPisoCompleto(pisoId)
 			.pipe(
@@ -411,21 +143,212 @@ export class CampusAdminFacade {
 			});
 	}
 
+	// #endregion
+
+	// #region CRUD Pisos
+
+	crearPiso(dto: CrearPisoDto): void {
+		this.executeCrud({
+			apiCall: this.api.crearPiso(dto),
+			onSuccess: () => {
+				this.store.closePisoDialog();
+				this.loadPisos();
+			},
+			errorMsg: 'No se pudo crear el piso',
+		});
+	}
+
+	actualizarPiso(id: number, dto: ActualizarPisoDto): void {
+		this.executeCrud({
+			apiCall: this.api.actualizarPiso(id, dto),
+			onSuccess: () => {
+				this.store.updatePiso(id, dto);
+				this.store.closePisoDialog();
+			},
+			errorMsg: 'No se pudo actualizar el piso',
+		});
+	}
+
+	toggleEstadoPiso(id: number): void {
+		this.executeCrud({
+			apiCall: this.api.toggleEstadoPiso(id),
+			onSuccess: () => this.store.togglePisoEstado(id),
+			errorMsg: 'No se pudo cambiar el estado',
+			saving: false,
+		});
+	}
+
+	// #endregion
+
+	// #region CRUD Nodos
+
+	crearNodo(dto: CrearNodoDto): void {
+		this.executeCrud({
+			apiCall: this.api.crearNodo(dto),
+			onSuccess: (nodo) => this.store.addNodo(nodo),
+			errorMsg: 'No se pudo crear el nodo',
+		});
+	}
+
+	actualizarNodo(id: number, dto: ActualizarNodoDto): void {
+		this.executeCrud({
+			apiCall: this.api.actualizarNodo(id, dto),
+			onSuccess: () => {
+				this.store.updateNodo(id, dto);
+				this.store.closeNodeDialog();
+			},
+			errorMsg: 'No se pudo actualizar el nodo',
+		});
+	}
+
+	moveNodo(id: number, x: number, y: number): void {
+		const nodo = this.store.nodos().find((n) => n.id === id);
+		if (!nodo) return;
+
+		// Optimistic local update
+		this.store.updateNodo(id, { x, y });
+
+		this.executeCrud({
+			apiCall: this.api.actualizarNodo(id, {
+				salonId: nodo.salonId,
+				tipo: nodo.tipo,
+				etiqueta: nodo.etiqueta,
+				x,
+				y,
+				width: nodo.width,
+				height: nodo.height,
+				rotation: nodo.rotation,
+				metadataJson: nodo.metadataJson,
+			}),
+			onSuccess: () => {},
+			onError: () => this.store.updateNodo(id, { x: nodo.x, y: nodo.y }),
+			errorMsg: 'No se pudo mover el nodo',
+			saving: false,
+		});
+	}
+
+	eliminarNodo(id: number): void {
+		this.executeCrud({
+			apiCall: this.api.eliminarNodo(id),
+			onSuccess: () => {
+				this.store.removeNodo(id);
+				this.store.clearSelection();
+			},
+			errorMsg: 'No se pudo eliminar el nodo',
+			saving: false,
+		});
+	}
+
+	// #endregion
+
+	// #region CRUD Aristas
+
+	crearArista(dto: CrearAristaDto): void {
+		this.executeCrud({
+			apiCall: this.api.crearArista(dto),
+			onSuccess: (arista) => {
+				this.store.addArista(arista);
+				this.store.setEdgeStartNodeId(null);
+			},
+			errorMsg: 'No se pudo crear la conexión',
+		});
+	}
+
+	eliminarArista(id: number): void {
+		this.executeCrud({
+			apiCall: this.api.eliminarArista(id),
+			onSuccess: () => {
+				this.store.removeArista(id);
+				this.store.clearSelection();
+			},
+			errorMsg: 'No se pudo eliminar la conexión',
+			saving: false,
+		});
+	}
+
+	// #endregion
+
+	// #region CRUD Bloqueos
+
+	crearBloqueo(dto: CrearBloqueoDto): void {
+		this.executeCrud({
+			apiCall: this.api.crearBloqueo(dto),
+			onSuccess: (bloqueo) => this.store.addBloqueo(bloqueo),
+			errorMsg: 'No se pudo crear el bloqueo',
+		});
+	}
+
+	actualizarBloqueo(id: number, dto: ActualizarBloqueoDto): void {
+		this.executeCrud({
+			apiCall: this.api.actualizarBloqueo(id, dto),
+			onSuccess: () => {
+				this.store.updateBloqueo(id, dto);
+				this.store.closeBloqueoDialog();
+			},
+			errorMsg: 'No se pudo actualizar el bloqueo',
+		});
+	}
+
+	moveBloqueo(id: number, x: number, y: number): void {
+		const bloqueo = this.store.bloqueos().find((b) => b.id === id);
+		if (!bloqueo) return;
+
+		// Optimistic local update
+		this.store.updateBloqueo(id, { x, y });
+
+		this.executeCrud({
+			apiCall: this.api.actualizarBloqueo(id, {
+				x,
+				y,
+				width: bloqueo.width,
+				height: bloqueo.height,
+				motivo: bloqueo.motivo,
+			}),
+			onSuccess: () => {},
+			onError: () => this.store.updateBloqueo(id, { x: bloqueo.x, y: bloqueo.y }),
+			errorMsg: 'No se pudo mover el bloqueo',
+			saving: false,
+		});
+	}
+
+	eliminarBloqueo(id: number): void {
+		this.executeCrud({
+			apiCall: this.api.eliminarBloqueo(id),
+			onSuccess: () => {
+				this.store.removeBloqueo(id);
+				this.store.clearSelection();
+			},
+			errorMsg: 'No se pudo eliminar el bloqueo',
+			saving: false,
+		});
+	}
+
+	// #endregion
+
+	// #region CRUD Conexiones Verticales
+
+	crearConexionVertical(dto: CrearConexionVerticalDto): void {
+		this.executeCrud({
+			apiCall: this.api.crearConexionVertical(dto),
+			onSuccess: (conexion) => {
+				this.store.addConexionVertical(conexion);
+				this.store.closeVerticalDialog();
+				this.store.setVerticalStartNodeId(null);
+			},
+			errorMsg: 'No se pudo crear la conexión vertical',
+		});
+	}
+
 	eliminarConexionVertical(id: number): void {
-		this.api
-			.eliminarConexionVertical(id)
-			.pipe(
-				catchError((err) => {
-					logger.error('Error eliminando conexión vertical:', err);
-					this.errorHandler.showError('Error', 'No se pudo eliminar la conexión vertical');
-					return EMPTY;
-				}),
-				takeUntilDestroyed(this.destroyRef),
-			)
-			.subscribe(() => {
+		this.executeCrud({
+			apiCall: this.api.eliminarConexionVertical(id),
+			onSuccess: () => {
 				this.store.removeConexionVertical(id);
 				this.store.clearSelection();
-			});
+			},
+			errorMsg: 'No se pudo eliminar la conexión vertical',
+			saving: false,
+		});
 	}
 
 	// #endregion
@@ -496,7 +419,6 @@ export class CampusAdminFacade {
 				});
 			}
 		} else if (tool === 'addVertical') {
-			// Click a node → set as start and open dialog to select destination piso/node
 			this.store.setVerticalStartNodeId(nodeId);
 			this.store.openVerticalDialog();
 		} else if (tool === 'delete') {

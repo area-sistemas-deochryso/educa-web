@@ -2,11 +2,10 @@ import { Injectable, inject, DestroyRef } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { switchMap } from 'rxjs/operators';
 import { of } from 'rxjs';
-import { logger } from '@core/helpers';
+import { facadeErrorHandler } from '@core/helpers';
 import { ErrorHandlerService, WalFacadeHelper } from '@core/services';
 import { environment } from '@config';
 import { ProfesorApiService } from '../../services/profesor-api.service';
-import { ProfesorStore } from '../../services/profesor.store';
 import { GruposStore } from './grupos.store';
 import {
 	CrearGrupoDto,
@@ -22,11 +21,14 @@ export class GruposFacade {
 	// #region Dependencias
 	private readonly api = inject(ProfesorApiService);
 	private readonly store = inject(GruposStore);
-	private readonly profesorStore = inject(ProfesorStore);
 	private readonly errorHandler = inject(ErrorHandlerService);
 	private readonly wal = inject(WalFacadeHelper);
 	private readonly destroyRef = inject(DestroyRef);
 	private readonly grupoUrl = `${environment.apiUrl}/api/GrupoContenido`;
+	private readonly errHandler = facadeErrorHandler({
+		tag: 'GruposFacade',
+		errorHandler: this.errorHandler,
+	});
 	// #endregion
 
 	// #region Estado expuesto
@@ -36,21 +38,15 @@ export class GruposFacade {
 	// #region Comandos de carga
 
 	/**
-	 * Load groups for a salon+curso pair.
-	 * Resolves contenidoId by: horarios(salonId, cursoId) → horarioId → getContenido → contenidoId.
+	 * Load groups for a horario.
+	 * Resolves contenidoId by: horarioId → getContenido → contenidoId.
+	 * El caller resuelve horarioId desde sus propios datos (sin acoplamiento cross-store).
 	 */
-	loadGruposForSalonCurso(salonId: number, cursoId: number): void {
-		const horarios = this.profesorStore.horarios();
-		const horario = horarios.find((h) => h.salonId === salonId && h.cursoId === cursoId);
-		if (!horario) {
-			this.store.setNoContenido();
-			return;
-		}
-
+	loadGruposForHorario(horarioId: number): void {
 		this.store.setLoading(true);
 
 		this.api
-			.getContenido(horario.id)
+			.getContenido(horarioId)
 			.pipe(
 				switchMap((contenido) => {
 					if (!contenido) {
@@ -73,7 +69,7 @@ export class GruposFacade {
 					}
 				},
 				error: (err) => {
-					this.handleError(err, 'cargar grupos');
+					this.errHandler.handle(err, 'cargar grupos');
 					this.store.setLoading(false);
 				},
 			});
@@ -124,7 +120,7 @@ export class GruposFacade {
 				this.store.setSaving(false);
 			},
 			onError: (err) => {
-				this.handleError(err, 'crear grupo');
+				this.errHandler.handle(err, 'crear grupo');
 				this.store.setSaving(false);
 			},
 			optimistic: {
@@ -152,7 +148,7 @@ export class GruposFacade {
 				this.store.setSaving(false);
 			},
 			onError: (err) => {
-				this.handleError(err, 'actualizar grupo');
+				this.errHandler.handle(err, 'actualizar grupo');
 				this.store.setSaving(false);
 			},
 			optimistic: {
@@ -184,7 +180,7 @@ export class GruposFacade {
 				this.store.setSaving(false);
 			},
 			onError: (err) => {
-				this.handleError(err, 'eliminar grupo');
+				this.errHandler.handle(err, 'eliminar grupo');
 				this.store.setSaving(false);
 			},
 			optimistic: {
@@ -220,7 +216,7 @@ export class GruposFacade {
 				this.store.closeAsignarDialog();
 			},
 			onError: (err) => {
-				this.handleError(err, 'asignar estudiantes');
+				this.errHandler.handle(err, 'asignar estudiantes');
 				this.store.setSaving(false);
 			},
 			optimistic: {
@@ -248,7 +244,7 @@ export class GruposFacade {
 			http$: () => this.api.removerEstudianteDeGrupo(grupoId, estudianteId),
 			onCommit: () => this.refetchGrupos(),
 			onError: (err) => {
-				this.handleError(err, 'remover estudiante');
+				this.errHandler.handle(err, 'remover estudiante');
 				this.store.setSaving(false);
 			},
 			optimistic: {
@@ -313,7 +309,7 @@ export class GruposFacade {
 				this.refetchGrupos();
 			},
 			onError: (err) => {
-				this.handleError(err, 'mover estudiante');
+				this.errHandler.handle(err, 'mover estudiante');
 			},
 			optimistic: {
 				apply: () => {
@@ -358,7 +354,7 @@ export class GruposFacade {
 				this.store.setSaving(false);
 			},
 			onError: (err) => {
-				this.handleError(err, 'configurar máximo de estudiantes');
+				this.errHandler.handle(err, 'configurar máximo de estudiantes');
 				this.store.setSaving(false);
 			},
 			optimistic: {
@@ -396,10 +392,5 @@ export class GruposFacade {
 	}
 	// #endregion
 
-	// #region Helpers privados
-	private handleError(err: unknown, accion: string): void {
-		logger.error(`GruposFacade: Error al ${accion}`, err);
-		this.errorHandler.showError('Error', `No se pudo ${accion}`);
-	}
 	// #endregion
 }

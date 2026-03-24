@@ -4,6 +4,8 @@ import { FormsModule } from '@angular/forms';
 import { ButtonModule } from 'primeng/button';
 import { InputTextModule } from 'primeng/inputtext';
 import { SelectModule } from 'primeng/select';
+import { periodoActual, esVerano } from '@shared/models';
+import { APP_USER_ROLES } from '@shared/constants';
 import { RolUsuarioAdmin } from '../../services';
 
 // #endregion
@@ -41,8 +43,8 @@ export class UsuariosFiltersComponent {
 	readonly importUsuarios = output<void>();
 	readonly exportCredenciales = output<{ rol: string; esVerano: boolean; anio?: number }>();
 
-	// Filtros de exportación de alumnos
-	readonly esVerano = signal(false);
+	// Filtros de exportación de alumnos — auto-detecta periodo actual
+	readonly esVerano = signal(esVerano(periodoActual()));
 	readonly exportAnio = signal(new Date().getFullYear());
 	readonly anioOptions = Array.from(
 		{ length: new Date().getFullYear() - 2026 + 1 },
@@ -77,10 +79,11 @@ export class UsuariosFiltersComponent {
 	}
 
 	onExportCredenciales(rol: string): void {
+		const isEstudiante = rol === APP_USER_ROLES.Estudiante;
 		this.exportCredenciales.emit({
 			rol,
-			esVerano: rol === 'Estudiante' ? this.esVerano() : false,
-			anio: rol === 'Estudiante' ? this.exportAnio() : undefined,
+			esVerano: isEstudiante ? this.esVerano() : false,
+			anio: isEstudiante ? this.exportAnio() : undefined,
 		});
 	}
 

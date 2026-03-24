@@ -1,4 +1,5 @@
 import { AsistenciaService, SalonProfesor, StorageService, UserProfileService } from '@core/services';
+import { periodoEnMes, filtrarPorPeriodoAcademico } from '@shared/models';
 import { JustificacionEvent } from '../../../../components/attendance/asistencia-dia-list/asistencia-dia-list.component';
 import { ChangeDetectionStrategy, Component, DestroyRef, OnInit, ViewChild, computed, inject, signal } from '@angular/core';
 
@@ -67,13 +68,8 @@ export class AttendanceProfesorComponent implements OnInit {
 	readonly salones = computed(() => {
 		const all = this.allSalones();
 		const month = this.view.ingresos().selectedMonth;
-		const isVerano = month === 1 || month === 2;
-		// * Summer months only show "V" sections.
-		return all.filter((s) =>
-			isVerano
-				? s.seccion.toUpperCase() === 'V'
-				: s.seccion.toUpperCase() !== 'V',
-		);
+		const periodo = periodoEnMes(month);
+		return filtrarPorPeriodoAcademico(all, periodo, (s) => s.seccion);
 	});
 	readonly selectedSalonId = signal<number | null>(null);
 	readonly selectedSalon = computed(() => {

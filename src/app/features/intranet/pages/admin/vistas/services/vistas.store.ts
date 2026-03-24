@@ -2,6 +2,8 @@ import { Injectable, computed, signal } from '@angular/core';
 
 import { BaseCrudStore } from '@core/store';
 import { Vista, VistasEstadisticas } from '@core/services';
+import { capitalize } from '@core/helpers';
+import { withAllOption, SelectOption } from '@shared/models';
 
 // #region Interfaces
 interface VistaForm {
@@ -40,12 +42,11 @@ export class VistasStore extends BaseCrudStore<Vista, VistaForm, VistasEstadisti
 	// #region Computed específicos
 	readonly modulosOptions = computed(() => {
 		const modulos = this.estadisticas()?.modulos ?? [];
-		return [{ label: 'Todos los modulos', value: null as string | null }].concat(
-			modulos.map((m) => ({
-				label: m.charAt(0).toUpperCase() + m.slice(1),
-				value: m as string | null,
-			})),
-		);
+		const options: SelectOption<string>[] = modulos.map((m) => ({
+			label: capitalize(m),
+			value: m,
+		}));
+		return withAllOption(options, 'Todos los modulos');
 	});
 
 	readonly isFormValid = computed(() => {

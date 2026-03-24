@@ -20,6 +20,7 @@ import {
 	FilterOptions,
 	UsuariosFiltersComponent,
 } from './components/usuarios-filters/usuarios-filters.component';
+import { withAllOption } from '@shared/models';
 import { UsuariosTableComponent } from './components/usuarios-table/usuarios-table.component';
 import { UsuariosTableSkeletonComponent } from './components/usuarios-table-skeleton/usuarios-table-skeleton.component';
 import { UsuarioDetailDrawerComponent } from './components/usuario-detail-drawer/usuario-detail-drawer.component';
@@ -35,6 +36,7 @@ import {
 	buildToggleUsuarioMessage,
 } from '@app/shared/constants';
 import { environment } from '@env/environment';
+import { APP_USER_ROLES } from '@shared/constants';
 import { logger } from '@core/helpers';
 import type { ImportarEstudianteItem } from './services';
 
@@ -80,14 +82,14 @@ export class UsuariosComponent implements AfterViewInit {
 
 	// * Static filter options for roles/estado.
 	readonly filterOptions: FilterOptions = {
-		rolesOptions: [{ label: 'Todos los roles', value: null as RolUsuarioAdmin | null }].concat(
-			ROLES_USUARIOS_ADMIN.map((r) => ({ label: r, value: r as RolUsuarioAdmin | null })),
+		rolesOptions: withAllOption(
+			ROLES_USUARIOS_ADMIN.map((r) => ({ label: r, value: r })),
+			'Todos los roles',
 		),
-		estadoOptions: [
-			{ label: 'Todos', value: null },
+		estadoOptions: withAllOption([
 			{ label: 'Activos', value: true },
 			{ label: 'Inactivos', value: false },
-		],
+		]),
 	};
 
 	get formData(): UsuarioFormData {
@@ -264,7 +266,7 @@ export class UsuariosComponent implements AfterViewInit {
 		const mod = ExcelJS as any;
 		const WorkbookClass = mod.Workbook ?? mod.default?.Workbook;
 		const workbook = new WorkbookClass();
-		const rolLabel = rol === 'Estudiante' ? 'Alumnos' : 'Profesores';
+		const rolLabel = rol === APP_USER_ROLES.Estudiante ? 'Alumnos' : 'Profesores';
 		const sheet = workbook.addWorksheet(`Credenciales ${rolLabel}`);
 
 		sheet.columns = [

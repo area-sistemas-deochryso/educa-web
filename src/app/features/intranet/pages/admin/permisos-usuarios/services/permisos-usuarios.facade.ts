@@ -2,7 +2,7 @@ import { Injectable, DestroyRef, inject, computed } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { forkJoin } from 'rxjs';
 
-import { logger, withRetry } from '@core/helpers';
+import { logger, withRetry, facadeErrorHandler } from '@core/helpers';
 import {
 	PermisosService,
 	PermisoUsuario,
@@ -27,6 +27,10 @@ export class PermisosUsuariosFacade {
 	readonly uiMapping = inject(UiMappingService);
 	private destroyRef = inject(DestroyRef);
 	private readonly apiUrl = `${environment.apiUrl}/api/sistema/permisos`;
+	private readonly errHandler = facadeErrorHandler({
+		tag: 'PermisosUsuariosFacade',
+		errorHandler: this.errorHandler,
+	});
 
 	// Estado público readonly desde el store
 	readonly permisosUsuario = this.store.permisosUsuario;
@@ -197,7 +201,7 @@ export class PermisosUsuariosFacade {
 					rollback: () => {},
 				},
 				onCommit: () => this.loadData(),
-				onError: () => this.handleApiError(UI_ADMIN_ERROR_DETAILS.savePermiso),
+				onError: (err) => this.errHandler.handle(err, 'guardar el permiso', () => this.store.setLoading(false)),
 			});
 		} else {
 			const usuarioId = this.selectedUsuarioId();
@@ -218,7 +222,7 @@ export class PermisosUsuariosFacade {
 					rollback: () => {},
 				},
 				onCommit: () => this.loadData(),
-				onError: () => this.handleApiError(UI_ADMIN_ERROR_DETAILS.savePermiso),
+				onError: (err) => this.errHandler.handle(err, 'guardar el permiso', () => this.store.setLoading(false)),
 			});
 		}
 	}
@@ -241,13 +245,8 @@ export class PermisosUsuariosFacade {
 				},
 			},
 			onCommit: () => this.store.setLoading(false),
-			onError: () => this.handleApiError(UI_ADMIN_ERROR_DETAILS.deletePermiso),
+			onError: (err) => this.errHandler.handle(err, 'eliminar el permiso', () => this.store.setLoading(false)),
 		});
-	}
-
-	private handleApiError(detail: string): void {
-		this.errorHandler.showError(UI_SUMMARIES.error, detail);
-		this.store.setLoading(false);
 	}
 
 	// #endregion

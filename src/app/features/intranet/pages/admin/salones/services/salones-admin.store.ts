@@ -1,5 +1,7 @@
 import { Injectable, signal, computed } from '@angular/core';
 
+import { determinarNivelPorOrden } from '@core/helpers';
+import { periodoActual, esVerano } from '@shared/models';
 import { EstudianteAsistencia } from '@shared/services/asistencia';
 import { HorarioResponseDto, SalonNotasResumenDto } from '@data/models';
 
@@ -39,6 +41,7 @@ export class SalonesAdminStore {
 
 	private readonly _selectedNivel = signal<NivelEducativo>('Inicial');
 	private readonly _filtroAnio = signal(new Date().getFullYear());
+	private readonly _esVerano = signal(esVerano(periodoActual()));
 	private readonly _selectedSalonId = signal<number | null>(null);
 
 	private readonly _configDialogVisible = signal(false);
@@ -68,6 +71,7 @@ export class SalonesAdminStore {
 
 	readonly selectedNivel = this._selectedNivel.asReadonly();
 	readonly filtroAnio = this._filtroAnio.asReadonly();
+	readonly esVerano = this._esVerano.asReadonly();
 	readonly selectedSalonId = this._selectedSalonId.asReadonly();
 
 	readonly configDialogVisible = this._configDialogVisible.asReadonly();
@@ -78,7 +82,7 @@ export class SalonesAdminStore {
 
 	// #region Computed — filtrado por nivel
 	readonly salonesFiltrados = computed(() =>
-		this._salones().filter((s) => this.determinarNivel(s.gradoOrden) === this._selectedNivel()),
+		this._salones().filter((s) => determinarNivelPorOrden(s.gradoOrden) === this._selectedNivel()),
 	);
 
 	readonly periodoActual = computed(() => {
@@ -134,6 +138,7 @@ export class SalonesAdminStore {
 		error: this._error(),
 		selectedNivel: this._selectedNivel(),
 		filtroAnio: this._filtroAnio(),
+		esVerano: this._esVerano(),
 		selectedSalonId: this._selectedSalonId(),
 		selectedSalon: this.selectedSalon(),
 		configDialogVisible: this._configDialogVisible(),
@@ -240,6 +245,10 @@ export class SalonesAdminStore {
 		this._filtroAnio.set(anio);
 	}
 
+	setEsVerano(esVerano: boolean): void {
+		this._esVerano.set(esVerano);
+	}
+
 	setSelectedSalonId(id: number | null): void {
 		this._selectedSalonId.set(id);
 	}
@@ -282,14 +291,6 @@ export class SalonesAdminStore {
 
 	closeConfirmDialog(): void {
 		this._confirmDialogVisible.set(false);
-	}
-	// #endregion
-
-	// #region Helpers privados
-	private determinarNivel(gradoOrden: number): NivelEducativo {
-		if (gradoOrden >= 1 && gradoOrden <= 3) return 'Inicial';
-		if (gradoOrden >= 4 && gradoOrden <= 9) return 'Primaria';
-		return 'Secundaria';
 	}
 	// #endregion
 }

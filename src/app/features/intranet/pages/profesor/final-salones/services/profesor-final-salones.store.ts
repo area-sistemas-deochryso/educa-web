@@ -1,5 +1,6 @@
 import { Injectable, signal, computed } from '@angular/core';
 
+import { determinarNivelPorOrden } from '@core/helpers';
 import { EstudianteAsistencia } from '@shared/services/asistencia';
 import { HorarioResponseDto, SalonNotasResumenDto } from '@data/models';
 
@@ -74,7 +75,7 @@ export class ProfesorFinalSalonesStore {
 
 	// #region Computed — filtrado por nivel
 	readonly salonesFiltrados = computed(() =>
-		this._salones().filter((s) => this.determinarNivel(s.gradoOrden) === this._selectedNivel()),
+		this._salones().filter((s) => determinarNivelPorOrden(s.gradoOrden) === this._selectedNivel()),
 	);
 
 	readonly periodoActual = computed(() => {
@@ -114,7 +115,7 @@ export class ProfesorFinalSalonesStore {
 		const salones = this._salones();
 		const niveles = new Set<NivelEducativo>();
 		for (const s of salones) {
-			niveles.add(this.determinarNivel(s.gradoOrden));
+			niveles.add(determinarNivelPorOrden(s.gradoOrden));
 		}
 		const orden: NivelEducativo[] = ['Inicial', 'Primaria', 'Secundaria'];
 		return orden.filter((n) => niveles.has(n));
@@ -264,11 +265,4 @@ export class ProfesorFinalSalonesStore {
 	}
 	// #endregion
 
-	// #region Helpers privados
-	private determinarNivel(gradoOrden: number): NivelEducativo {
-		if (gradoOrden >= 1 && gradoOrden <= 3) return 'Inicial';
-		if (gradoOrden >= 4 && gradoOrden <= 9) return 'Primaria';
-		return 'Secundaria';
-	}
-	// #endregion
 }

@@ -11,6 +11,7 @@ import {
 import { CursosApiService } from './cursos-api.service';
 import { HorariosApiService } from './horarios-api.service';
 import { HorariosStore } from './horarios.store';
+import type { DiaSemana, HorarioVistaType } from '../models/horario.interface';
 import { ProfesoresApiService } from './profesores-api.service';
 import { SalonesApiService } from './salones-api.service';
 
@@ -176,7 +177,7 @@ export class HorariosDataFacade {
     this.store.setFiltroProfesor(profesorId);
   }
 
-  setFiltroDiaSemana(diaSemana: number | null): void {
+  setFiltroDiaSemana(diaSemana: DiaSemana | null): void {
     this.store.setFiltroDiaSemana(diaSemana);
   }
 
@@ -189,7 +190,7 @@ export class HorariosDataFacade {
     this.loadAll();
   }
 
-  setVistaActual(vista: 'semanal' | 'lista'): void {
+  setVistaActual(vista: HorarioVistaType): void {
     this.store.setVistaActual(vista);
   }
 

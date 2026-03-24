@@ -1,11 +1,14 @@
 // #region DTOs de Response (re-exportados desde @data/models)
-import type { HorarioResponseDto as _HorarioResponseDto } from '@data/models';
+import type { HorarioResponseDto as _HorarioResponseDto, DiaSemana as _DiaSemana } from '@data/models';
 
 export type {
+  DiaSemana,
   EstudianteHorarioDto,
   HorarioDetalleResponseDto,
   HorarioResponseDto,
 } from '@data/models';
+
+type DiaSemana = _DiaSemana;
 
 type HorarioResponseDto = _HorarioResponseDto;
 
@@ -13,7 +16,7 @@ type HorarioResponseDto = _HorarioResponseDto;
 // #region DTOs de Request (Frontend → Backend)
 
 export interface HorarioCreateDto {
-  diaSemana: number;
+  diaSemana: DiaSemana;
   horaInicio: string;
   horaFin: string;
   salonId: number;
@@ -23,7 +26,7 @@ export interface HorarioCreateDto {
 
 export interface HorarioUpdateDto {
   id: number;
-  diaSemana: number;
+  diaSemana: DiaSemana;
   horaInicio: string;
   horaFin: string;
   salonId: number;
@@ -45,11 +48,17 @@ export interface HorarioAsignarEstudiantesDto {
 }
 
 // #endregion
+// #region Tipos semánticos
+
+export const HORARIO_VISTAS = ['semanal', 'lista'] as const;
+export type HorarioVistaType = (typeof HORARIO_VISTAS)[number];
+
+// #endregion
 // #region Modelos Locales (Frontend)
 
 export interface HorarioFormData {
   // Paso 1: Datos básicos
-  diaSemana: number | null;
+  diaSemana: DiaSemana | null;
   horaInicio: string;
   horaFin: string;
   salonId: number | null;
@@ -95,9 +104,7 @@ export interface HorarioWeeklyBlock {
 }
 
 export interface HorarioWeeklyData {
-  dias: {
-    [key: number]: HorarioWeeklyBlock[];
-  };
+  dias: Record<number, HorarioWeeklyBlock[]>;
 }
 
 // #endregion

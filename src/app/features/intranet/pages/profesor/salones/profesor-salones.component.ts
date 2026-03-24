@@ -237,7 +237,8 @@ export class ProfesorSalonesComponent implements OnInit {
 
 		if (!this.gruposCursoId) {
 			this.gruposCursoId = cursos[0].value;
-			this.gruposFacade.loadGruposForSalonCurso(salon.salonId, cursos[0].value);
+			const horarioId = this.resolveHorarioId(salon.salonId, cursos[0].value);
+			if (horarioId) this.gruposFacade.loadGruposForHorario(horarioId);
 		}
 	}
 
@@ -245,7 +246,8 @@ export class ProfesorSalonesComponent implements OnInit {
 		const salon = this.vm().selectedSalon;
 		if (!salon) return;
 		this.gruposCursoId = cursoId;
-		this.gruposFacade.loadGruposForSalonCurso(salon.salonId, cursoId);
+		const horarioId = this.resolveHorarioId(salon.salonId, cursoId);
+		if (horarioId) this.gruposFacade.loadGruposForHorario(horarioId);
 	}
 
 	onGruposCrearGrupo(nombre: string): void {
@@ -284,7 +286,14 @@ export class ProfesorSalonesComponent implements OnInit {
 	onGruposRefresh(): void {
 		const salon = this.vm().selectedSalon;
 		if (!salon || !this.gruposCursoId) return;
-		this.gruposFacade.loadGruposForSalonCurso(salon.salonId, this.gruposCursoId);
+		const horarioId = this.resolveHorarioId(salon.salonId, this.gruposCursoId);
+		if (horarioId) this.gruposFacade.loadGruposForHorario(horarioId);
+	}
+
+	/** Resuelve horarioId desde salonId + cursoId usando los horarios del profesor. */
+	private resolveHorarioId(salonId: number, cursoId: number): number | null {
+		const horario = this.vm().horarios.find((h) => h.salonId === salonId && h.cursoId === cursoId);
+		return horario?.id ?? null;
 	}
 	// #endregion
 

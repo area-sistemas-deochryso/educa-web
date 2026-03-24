@@ -1,6 +1,6 @@
 import { Injectable, inject, DestroyRef } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import { logger, withRetry } from '@core/helpers';
+import { logger, withRetry, facadeErrorHandler } from '@core/helpers';
 import { ErrorHandlerService, WalFacadeHelper } from '@core/services';
 import { environment } from '@config';
 import { ProfesorApiService } from '../../services/profesor-api.service';
@@ -23,6 +23,10 @@ export class CursoContenidoDataFacade {
 	private readonly wal = inject(WalFacadeHelper);
 	private readonly destroyRef = inject(DestroyRef);
 	private readonly contenidoUrl = `${environment.apiUrl}/api/CursoContenido`;
+	private readonly errHandler = facadeErrorHandler({
+		tag: 'CursoContenidoDataFacade',
+		errorHandler: this.errorHandler,
+	});
 	// #endregion
 
 	// #region Estado expuesto
@@ -35,12 +39,16 @@ export class CursoContenidoDataFacade {
 	 * Load course content for a schedule and open the proper dialog.
 	 *
 	 * @param horarioId Schedule id.
-	 * @param initialTab Optional tab to open on dialog show.
+	 * @param options.initialTab Tab to open on dialog show.
+	 * @param options.salonId SalonId del horario — almacenado para que CalificacionesFacade no lea stores ajenos.
 	 */
-	loadContenido(horarioId: number, initialTab?: string): void {
+	loadContenido(horarioId: number, options?: { initialTab?: string; salonId?: number }): void {
 		if (this.store.loading()) return;
 		this.store.setSelectedHorarioId(horarioId);
-		this.store.setInitialTab(initialTab ?? null);
+		this.store.setInitialTab(options?.initialTab ?? null);
+		if (options?.salonId != null) {
+			this.store.setSalonId(options.salonId);
+		}
 		this.store.setLoading(true);
 		this.store.clearError();
 
@@ -124,7 +132,7 @@ export class CursoContenidoDataFacade {
 				this.store.setContenido(contenido);
 				this.store.openContentDialog();
 			},
-			onError: (err) => this.handleApiError(err, 'crear contenido'),
+			onError: (err) => this.errHandler.handle(err, 'crear contenido', () => this.store.setSaving(false)),
 		});
 	}
 
@@ -152,17 +160,12 @@ export class CursoContenidoDataFacade {
 				},
 			},
 			onCommit: () => {},
-			onError: (err) => this.handleApiError(err, 'eliminar contenido'),
+			onError: (err) => this.errHandler.handle(err, 'eliminar contenido', () => this.store.setSaving(false)),
 		});
 	}
 
 	// #endregion
 
 	// #region Helpers privados
-	private handleApiError(err: unknown, accion: string): void {
-		logger.error(`CursoContenidoDataFacade: Error al ${accion}`, err);
-		this.errorHandler.showError('Error', `No se pudo ${accion}`);
-		this.store.setSaving(false);
-	}
 	// #endregion
 }

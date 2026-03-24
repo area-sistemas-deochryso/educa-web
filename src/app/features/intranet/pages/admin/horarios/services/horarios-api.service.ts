@@ -6,6 +6,7 @@ import { catchError } from 'rxjs/operators';
 import { environment } from '@config/environment';
 import { PaginatedResponse } from '@data/repositories';
 import {
+  type DiaSemana,
   HorarioAsignarEstudiantesDto,
   HorarioAsignarProfesorDto,
   HorarioCreateDto,
@@ -75,7 +76,7 @@ export class HorariosApiService {
       .pipe(catchError(() => of([])));
   }
 
-  getByDiaSemana(diaSemana: number): Observable<HorarioResponseDto[]> {
+  getByDiaSemana(diaSemana: DiaSemana): Observable<HorarioResponseDto[]> {
     return this.http
       .get<HorarioResponseDto[]>(`${this.apiUrl}/dia/${diaSemana}`)
       .pipe(catchError(() => of([])));

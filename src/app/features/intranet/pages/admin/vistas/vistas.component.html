@@ -161,7 +161,7 @@
 						<td class="text-center">
 							<p-tag
 								[value]="vista.estado === 1 ? 'Activa' : 'Inactiva'"
-								[severity]="uiMapping.getEstadoSeverity(vista.estado)"
+								[severity]="vista.estado | estadoSeverity"
 							/>
 						</td>
 						<td>
@@ -176,14 +176,12 @@
 								></button>
 								<button
 									pButton
-									[icon]="vista.estado === 1 ? 'pi pi-ban' : 'pi pi-check'"
+									[icon]="vista.estado | estadoToggleIcon"
 									class="p-button-rounded p-button-text"
 									[class.p-button-warning]="vista.estado === 1"
 									[class.p-button-success]="vista.estado !== 1"
-									[pTooltip]="vista.estado === 1 ? 'Desactivar' : 'Activar'"
-									[attr.aria-label]="
-										vista.estado === 1 ? 'Desactivar' : 'Activar'
-									"
+									[pTooltip]="vista.estado | estadoToggleLabel"
+									[attr.aria-label]="vista.estado | estadoToggleLabel"
 									(click)="toggleEstado(vista)"
 								></button>
 								<button

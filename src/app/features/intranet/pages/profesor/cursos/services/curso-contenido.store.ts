@@ -13,6 +13,8 @@ import {
 
 interface DomainState {
 	contenido: CursoContenidoDetalleDto | null;
+	/** SalonId del horario asociado al contenido (resuelto por el caller). */
+	salonId: number | null;
 	loading: boolean;
 	saving: boolean;
 	error: string | null;
@@ -40,6 +42,7 @@ interface UiState {
 
 const initialDomain: DomainState = {
 	contenido: null,
+	salonId: null,
 	loading: false,
 	saving: false,
 	error: null,
@@ -76,6 +79,7 @@ export class CursoContenidoStore {
 
 	// #region Lecturas públicas — Domain
 	readonly contenido = computed(() => this._domain().contenido);
+	readonly salonId = computed(() => this._domain().salonId);
 	readonly loading = computed(() => this._domain().loading);
 	readonly saving = computed(() => this._domain().saving);
 	readonly error = computed(() => this._domain().error);
@@ -159,6 +163,10 @@ export class CursoContenidoStore {
 	// #region Comandos de mutación — Domain
 	setContenido(contenido: CursoContenidoDetalleDto | null): void {
 		this._domain.update((s) => ({ ...s, contenido }));
+	}
+
+	setSalonId(salonId: number | null): void {
+		this._domain.update((s) => ({ ...s, salonId }));
 	}
 
 	setLoading(loading: boolean): void {

@@ -5,7 +5,7 @@
 	<select id="salon-select" (change)="onSalonChange($event)">
 		@for (salon of salones(); track salon.salonId) {
 			<option [value]="salon.salonId" [selected]="salon.salonId === selectedSalonId()">
-				{{ salon.grado }} - {{ salon.seccion === 'V' ? 'Verano' : salon.seccion.toUpperCase() }}
+				{{ salon.grado }} - {{ salon.seccion | seccionLabel }}
 				@if (salon.esTutor) {
 					<!-- * Tag tutor assignments -->
 					(Tutor {{ nombreProfesor() }})

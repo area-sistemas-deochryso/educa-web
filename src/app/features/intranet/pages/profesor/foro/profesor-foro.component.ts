@@ -17,6 +17,7 @@ import { SalonMensajeriaFacade } from '@features/intranet/pages/shared/mensajeri
 import { SalonForoTabComponent } from '@features/intranet/pages/shared/mensajeria/components/foro-tab/foro-tab.component';
 import { GruposFacade } from '../salones/services/grupos.facade';
 import { ProfesorSalonConEstudiantes } from '../services/profesor.store';
+import { toSelectOptionsFrom } from '@shared/models';
 
 @Component({
 	selector: 'app-profesor-foro',
@@ -89,10 +90,9 @@ export class ProfesorForoComponent implements OnInit, OnDestroy {
 	// #region Computed
 	readonly loading = computed(() => this.facade.vm().loading);
 
-	readonly salonOptions = computed(() => {
-		const salones = this.facade.vm().salonesConEstudiantes;
-		return salones.map((s) => ({ label: s.salonDescripcion, value: s.salonId }));
-	});
+	readonly salonOptions = computed(() =>
+		toSelectOptionsFrom(this.facade.vm().salonesConEstudiantes, 'salonDescripcion', 'salonId'),
+	);
 
 	readonly selectedSalon = computed<ProfesorSalonConEstudiantes | null>(() => {
 		const id = this.selectedSalonId();
@@ -103,13 +103,13 @@ export class ProfesorForoComponent implements OnInit, OnDestroy {
 	readonly cursoOptions = computed(() => {
 		const salon = this.selectedSalon();
 		if (!salon) return [];
-		return salon.cursos.map((c) => ({ label: c.nombre, value: c.horarioId }));
+		return toSelectOptionsFrom(salon.cursos, 'nombre', 'horarioId');
 	});
 
 	readonly estudiantesOptions = computed(() => {
 		const salon = this.selectedSalon();
 		if (!salon) return [];
-		return salon.estudiantes.map((e) => ({ label: e.nombreCompleto, value: e.dni }));
+		return toSelectOptionsFrom(salon.estudiantes, 'nombreCompleto', 'dni');
 	});
 
 	readonly estudiantesDni = computed(() => {
@@ -140,7 +140,7 @@ export class ProfesorForoComponent implements OnInit, OnDestroy {
 
 		const salon = this.facade.vm().salonesConEstudiantes.find((s) => s.salonId === salonId);
 		if (salon && salon.cursos.length > 0) {
-			this.gruposFacade.loadGruposForSalonCurso(salonId, salon.cursos[0].horarioId);
+			this.gruposFacade.loadGruposForHorario(salon.cursos[0].horarioId);
 		}
 	}
 	// #endregion

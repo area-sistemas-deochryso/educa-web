@@ -1,7 +1,7 @@
 import { Injectable, signal, computed } from '@angular/core';
 
 import { BaseCrudStore } from '@core/store';
-import { detectarNivel, removeNivelPrefix } from '@core/helpers';
+import { detectarNivel, removeNivelPrefix, NIVEL_VISUAL_CONFIGS } from '@core/helpers';
 
 import { Curso, CursosEstadisticas, Grado, NivelGradoConfig } from './cursos.models';
 
@@ -118,38 +118,20 @@ export class CursosStore extends BaseCrudStore<Curso, CursoFormData, CursosEstad
 	);
 
 	/** Unified config per nivel for data-driven rendering (edit dialog) */
-	readonly niveles = computed<NivelGradoConfig[]>(() => [
-		{
-			key: 'inicial',
-			title: 'Inicial',
-			icon: 'pi pi-star',
-			tagClass: 'tag-info',
-			severity: 'info',
-			allGrados: this.gradosInicial(),
-			selectedGrados: this.selectedGradosInicial(),
-			availableGrados: this.availableInicial(),
-		},
-		{
-			key: 'primaria',
-			title: 'Primaria',
-			icon: 'pi pi-book',
-			tagClass: 'tag-success',
-			severity: 'success',
-			allGrados: this.gradosPrimaria(),
-			selectedGrados: this.selectedGradosPrimaria(),
-			availableGrados: this.availablePrimaria(),
-		},
-		{
-			key: 'secundaria',
-			title: 'Secundaria',
-			icon: 'pi pi-graduation-cap',
-			tagClass: 'tag-warn',
-			severity: 'warn',
-			allGrados: this.gradosSecundaria(),
-			selectedGrados: this.selectedGradosSecundaria(),
-			availableGrados: this.availableSecundaria(),
-		},
-	]);
+	readonly niveles = computed<NivelGradoConfig[]>(() => {
+		const gradosByNivel = {
+			Inicial: { all: this.gradosInicial(), selected: this.selectedGradosInicial(), available: this.availableInicial() },
+			Primaria: { all: this.gradosPrimaria(), selected: this.selectedGradosPrimaria(), available: this.availablePrimaria() },
+			Secundaria: { all: this.gradosSecundaria(), selected: this.selectedGradosSecundaria(), available: this.availableSecundaria() },
+		} as const;
+
+		return (['Inicial', 'Primaria', 'Secundaria'] as const).map((nivel) => ({
+			...NIVEL_VISUAL_CONFIGS[nivel],
+			allGrados: gradosByNivel[nivel].all,
+			selectedGrados: gradosByNivel[nivel].selected,
+			availableGrados: gradosByNivel[nivel].available,
+		}));
+	});
 	// #endregion
 
 	// #region Computed — grados del curso seleccionado (dialog "ver grados")
@@ -172,13 +154,16 @@ export class CursosStore extends BaseCrudStore<Curso, CursoFormData, CursosEstad
 	});
 
 	/** Unified config per nivel for view dialog */
-	readonly cursoGradosNiveles = computed<{ title: string; icon: string; severity: 'info' | 'success' | 'warn'; grados: Grado[] }[]>(() => {
-		const nivelesArr = [
-			{ title: 'Inicial', icon: 'pi pi-star', severity: 'info' as const, grados: this.cursoGradosInicial() },
-			{ title: 'Primaria', icon: 'pi pi-book', severity: 'success' as const, grados: this.cursoGradosPrimaria() },
-			{ title: 'Secundaria', icon: 'pi pi-graduation-cap', severity: 'warn' as const, grados: this.cursoGradosSecundaria() },
-		];
-		return nivelesArr.filter((n) => n.grados.length > 0);
+	readonly cursoGradosNiveles = computed(() => {
+		const gradosByNivel = {
+			Inicial: this.cursoGradosInicial(),
+			Primaria: this.cursoGradosPrimaria(),
+			Secundaria: this.cursoGradosSecundaria(),
+		} as const;
+
+		return (['Inicial', 'Primaria', 'Secundaria'] as const)
+			.map((nivel) => ({ ...NIVEL_VISUAL_CONFIGS[nivel], grados: gradosByNivel[nivel] }))
+			.filter((n) => n.grados.length > 0);
 	});
 	// #endregion
 

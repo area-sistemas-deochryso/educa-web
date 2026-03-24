@@ -1,6 +1,7 @@
 // #region Imports
 import { Injectable, inject } from '@angular/core';
 import { Vista } from '@core/services';
+import { capitalize, groupBy, sortedEntries } from '@core/helpers';
 import { UiMappingService } from '@shared/services';
 import { ModuloVistas } from './permisos-usuarios.store';
 
@@ -14,28 +15,16 @@ export class PermisosUsuariosHelperService {
 	 * Construye la estructura de módulos agrupando vistas y calculando selecciones
 	 */
 	buildModulosVistas(vistasActivas: Vista[], vistasSeleccionadas: string[]): ModuloVistas[] {
-		const modulosMap = new Map<string, Vista[]>();
+		const grouped = groupBy(vistasActivas, (v) =>
+			capitalize(this.uiMapping.getModuloFromRuta(v.ruta)),
+		);
 
-		// Agrupar vistas por módulo
-		vistasActivas.forEach((vista) => {
-			const modulo = this.uiMapping.getModuloFromRuta(vista.ruta);
-			const moduloCapitalized = modulo.charAt(0).toUpperCase() + modulo.slice(1);
-
-			if (!modulosMap.has(moduloCapitalized)) {
-				modulosMap.set(moduloCapitalized, []);
-			}
-			modulosMap.get(moduloCapitalized)!.push(vista);
-		});
-
-		// Convertir a array ordenado con contadores
-		return Array.from(modulosMap.entries())
-			.sort((a, b) => a[0].localeCompare(b[0]))
-			.map(([nombre, vistas]) => ({
-				nombre,
-				vistas: vistas.sort((a, b) => a.nombre.localeCompare(b.nombre)),
-				seleccionadas: vistas.filter((v) => vistasSeleccionadas.includes(v.ruta)).length,
-				total: vistas.length,
-			}));
+		return sortedEntries(grouped).map(([nombre, vistas]) => ({
+			nombre,
+			vistas: vistas.sort((a, b) => a.nombre.localeCompare(b.nombre)),
+			seleccionadas: vistas.filter((v) => vistasSeleccionadas.includes(v.ruta)).length,
+			total: vistas.length,
+		}));
 	}
 
 	/**
@@ -45,29 +34,23 @@ export class PermisosUsuariosHelperService {
 		vistasActivas: Vista[],
 		vistasUsuario: string[],
 	): ModuloVistas[] {
-		const modulosMap = new Map<string, Vista[]>();
+		const resolvedVistas = vistasUsuario
+			.map((ruta) => ({ ruta, vista: vistasActivas.find((v) => v.ruta === ruta) }))
+			.filter((entry): entry is { ruta: string; vista: Vista } => !!entry.vista);
 
-		vistasUsuario.forEach((ruta) => {
-			const modulo = this.uiMapping.getModuloFromRuta(ruta);
-			const moduloCapitalized = modulo.charAt(0).toUpperCase() + modulo.slice(1);
-			const vista = vistasActivas.find((v) => v.ruta === ruta);
+		const grouped = groupBy(resolvedVistas, (entry) =>
+			capitalize(this.uiMapping.getModuloFromRuta(entry.ruta)),
+		);
 
-			if (!modulosMap.has(moduloCapitalized)) {
-				modulosMap.set(moduloCapitalized, []);
-			}
-			if (vista) {
-				modulosMap.get(moduloCapitalized)!.push(vista);
-			}
-		});
-
-		return Array.from(modulosMap.entries())
-			.sort((a, b) => a[0].localeCompare(b[0]))
-			.map(([nombre, vistas]) => ({
+		return sortedEntries(grouped).map(([nombre, entries]) => {
+			const vistas = entries.map((e) => e.vista);
+			return {
 				nombre,
 				vistas,
 				seleccionadas: vistas.length,
 				total: vistas.length,
-			}));
+			};
+		});
 	}
 
 	/**

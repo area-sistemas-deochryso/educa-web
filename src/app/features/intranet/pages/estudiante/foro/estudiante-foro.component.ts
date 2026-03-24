@@ -8,6 +8,7 @@ import { EstudianteApiService } from '../services/estudiante-api.service';
 import { SalonMensajeriaFacade } from '@features/intranet/pages/shared/mensajeria/services/mensajeria.facade';
 import { SalonForoTabComponent } from '@features/intranet/pages/shared/mensajeria/components/foro-tab/foro-tab.component';
 import { HorarioProfesorDto } from '../models/estudiante.models';
+import { toSelectOptionsFrom } from '@shared/models';
 
 @Component({
 	selector: 'app-estudiante-foro',
@@ -57,16 +58,18 @@ export class EstudianteForoComponent implements OnInit, OnDestroy {
 	readonly cursoOptions = computed(() => {
 		const horarios = this._horarios();
 		const seen = new Map<number, boolean>();
-		const options: { label: string; value: number }[] = [];
+		const unique: HorarioProfesorDto[] = [];
 
 		for (const h of horarios) {
 			if (!seen.has(h.cursoId)) {
 				seen.set(h.cursoId, true);
-				options.push({ label: h.cursoNombre, value: h.id });
+				unique.push(h);
 			}
 		}
 
-		return options.sort((a, b) => a.label.localeCompare(b.label));
+		return toSelectOptionsFrom(unique, 'cursoNombre', 'id').sort((a, b) =>
+			a.label.localeCompare(b.label),
+		);
 	});
 	// #endregion
 

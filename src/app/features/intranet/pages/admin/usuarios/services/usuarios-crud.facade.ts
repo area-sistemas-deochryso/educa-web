@@ -3,7 +3,7 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
 import { environment } from '@config';
 import { ErrorHandlerService, WalFacadeHelper } from '@core/services';
-import { DebugService, logger } from '@core/helpers';
+import { DebugService, logger, getEstadoToggleDeltas, getEstadoRollbackDeltas } from '@core/helpers';
 import { UI_ADMIN_ERROR_DETAILS, UI_SUMMARIES } from '@app/shared/constants';
 import {
 	ActualizarUsuarioRequest,
@@ -77,26 +77,22 @@ export class UsuariosCrudFacade {
 			},
 			optimistic: {
 				apply: () => {
+					const { activosDelta, inactivosDelta } = getEstadoToggleDeltas(usuario.estado, 'delete');
 					this.store.removeUsuario(id);
 					this.store.setTotalRecords(this.store.totalRecords() - 1);
 					this.store.incrementarEstadistica('totalUsuarios', -1);
-					if (usuario.estado) {
-						this.store.incrementarEstadistica('usuariosActivos', -1);
-					} else {
-						this.store.incrementarEstadistica('usuariosInactivos', -1);
-					}
+					this.store.incrementarEstadistica('usuariosActivos', activosDelta);
+					this.store.incrementarEstadistica('usuariosInactivos', inactivosDelta);
 					this.updateRolEstadistica(rol, -1);
 					this.store.setLoading(true);
 				},
 				rollback: () => {
+					const { activosDelta, inactivosDelta } = getEstadoRollbackDeltas(usuario.estado, 'delete');
 					this.store.addUsuario(usuario);
 					this.store.setTotalRecords(this.store.totalRecords() + 1);
 					this.store.incrementarEstadistica('totalUsuarios', 1);
-					if (usuario.estado) {
-						this.store.incrementarEstadistica('usuariosActivos', 1);
-					} else {
-						this.store.incrementarEstadistica('usuariosInactivos', 1);
-					}
+					this.store.incrementarEstadistica('usuariosActivos', activosDelta);
+					this.store.incrementarEstadistica('usuariosInactivos', inactivosDelta);
 					this.updateRolEstadistica(rol, 1);
 				},
 			},
@@ -131,25 +127,17 @@ export class UsuariosCrudFacade {
 			},
 			optimistic: {
 				apply: () => {
+					const { activosDelta, inactivosDelta } = getEstadoToggleDeltas(usuario.estado);
 					this.store.toggleEstadoUsuario(id);
-					if (nuevoEstado) {
-						this.store.incrementarEstadistica('usuariosActivos', 1);
-						this.store.incrementarEstadistica('usuariosInactivos', -1);
-					} else {
-						this.store.incrementarEstadistica('usuariosActivos', -1);
-						this.store.incrementarEstadistica('usuariosInactivos', 1);
-					}
+					this.store.incrementarEstadistica('usuariosActivos', activosDelta);
+					this.store.incrementarEstadistica('usuariosInactivos', inactivosDelta);
 					this.store.setLoading(true);
 				},
 				rollback: () => {
+					const { activosDelta, inactivosDelta } = getEstadoRollbackDeltas(usuario.estado);
 					this.store.toggleEstadoUsuario(id);
-					if (nuevoEstado) {
-						this.store.incrementarEstadistica('usuariosActivos', -1);
-						this.store.incrementarEstadistica('usuariosInactivos', 1);
-					} else {
-						this.store.incrementarEstadistica('usuariosActivos', 1);
-						this.store.incrementarEstadistica('usuariosInactivos', -1);
-					}
+					this.store.incrementarEstadistica('usuariosActivos', activosDelta);
+					this.store.incrementarEstadistica('usuariosInactivos', inactivosDelta);
 				},
 			},
 		});

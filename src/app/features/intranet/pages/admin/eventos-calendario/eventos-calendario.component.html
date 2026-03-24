@@ -133,8 +133,8 @@
 			<td>{{ item.hora || '—' }}</td>
 			<td>
 				<p-tag
-					[value]="item.estado ? 'Activo' : 'Inactivo'"
-					[severity]="item.estado ? 'success' : 'danger'"
+					[value]="item.estado | estadoLabel"
+					[severity]="item.estado | estadoSeverity"
 				/>
 			</td>
 			<td>
@@ -155,9 +155,9 @@
 						[class.p-button-warning]="item.estado"
 						[class.p-button-success]="!item.estado"
 						(click)="onToggleEstado(item)"
-						[pTooltip]="item.estado ? 'Desactivar' : 'Activar'"
+						[pTooltip]="item.estado | estadoToggleLabel"
 						tooltipPosition="top"
-						[pt]="{ root: { 'aria-label': item.estado ? 'Desactivar' : 'Activar' } }"
+						[pt]="{ root: { 'aria-label': item.estado | estadoToggleLabel } }"
 					></button>
 					<button
 						pButton

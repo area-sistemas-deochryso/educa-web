@@ -29,8 +29,8 @@ export class SalonesAdminApiService {
 	// #endregion
 
 	// #region Salones Admin
-	getSalonesAdmin(anio: number, nivel?: string): Observable<SalonAdminListDto[]> {
-		let url = `${this.baseUrl}/api/AprobacionEstudiante/salones-admin?anio=${anio}`;
+	getSalonesAdmin(anio: number, esVerano: boolean, nivel?: string): Observable<SalonAdminListDto[]> {
+		let url = `${this.baseUrl}/api/AprobacionEstudiante/salones-admin?anio=${anio}&esVerano=${esVerano}`;
 		if (nivel) url += `&nivel=${nivel}`;
 		return this.http
 			.get<SalonAdminListDto[]>(url)

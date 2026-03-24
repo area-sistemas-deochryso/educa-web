@@ -1,6 +1,8 @@
 // #region Imports
 import { Injectable } from '@angular/core';
 import { APP_USER_ROLES } from '@app/shared/constants';
+import { getEstadoSeverity } from '@core/helpers';
+import type { TipoEventoCalendario, NotificacionTipo, NotificacionPrioridad } from '@data/models';
 
 // #endregion
 // #region Implementation
@@ -15,7 +17,7 @@ const ROLE_SEVERITY_BY_ROLE: Record<string, Severity> = {
 };
 
 // #region Evento Calendario mappings
-const EVENTO_TIPO_SEVERITY: Record<string, Severity> = {
+const EVENTO_TIPO_SEVERITY: Record<TipoEventoCalendario, Severity> = {
 	academic: 'info',
 	cultural: 'contrast',
 	sports: 'success',
@@ -23,7 +25,7 @@ const EVENTO_TIPO_SEVERITY: Record<string, Severity> = {
 	other: 'secondary',
 };
 
-const EVENTO_TIPO_LABEL: Record<string, string> = {
+const EVENTO_TIPO_LABEL: Record<TipoEventoCalendario, string> = {
 	academic: 'Académico',
 	cultural: 'Cultural',
 	sports: 'Deportivo',
@@ -33,7 +35,7 @@ const EVENTO_TIPO_LABEL: Record<string, string> = {
 // #endregion
 
 // #region Notificación mappings
-const NOTIFICACION_TIPO_SEVERITY: Record<string, Severity> = {
+const NOTIFICACION_TIPO_SEVERITY: Record<NotificacionTipo, Severity> = {
 	matricula: 'info',
 	pago: 'warn',
 	academico: 'success',
@@ -41,7 +43,7 @@ const NOTIFICACION_TIPO_SEVERITY: Record<string, Severity> = {
 	evento: 'secondary',
 };
 
-const NOTIFICACION_TIPO_LABEL: Record<string, string> = {
+const NOTIFICACION_TIPO_LABEL: Record<NotificacionTipo, string> = {
 	matricula: 'Matrícula',
 	pago: 'Pago',
 	academico: 'Académico',
@@ -49,14 +51,14 @@ const NOTIFICACION_TIPO_LABEL: Record<string, string> = {
 	evento: 'Evento',
 };
 
-const NOTIFICACION_PRIORIDAD_SEVERITY: Record<string, Severity> = {
+const NOTIFICACION_PRIORIDAD_SEVERITY: Record<NotificacionPrioridad, Severity> = {
 	low: 'info',
 	medium: 'warn',
 	high: 'danger',
 	urgent: 'danger',
 };
 
-const NOTIFICACION_PRIORIDAD_LABEL: Record<string, string> = {
+const NOTIFICACION_PRIORIDAD_LABEL: Record<NotificacionPrioridad, string> = {
 	low: 'Baja',
 	medium: 'Media',
 	high: 'Alta',
@@ -90,14 +92,11 @@ export class UiMappingService {
 	}
 
 	/**
-	 * Retorna el severity de PrimeNG según el estado
-	 * Soporta tanto boolean como number (1/0)
+	 * Retorna el severity de PrimeNG según el estado.
+	 * Delega a estado.utils.ts — fuente única de verdad.
 	 */
 	getEstadoSeverity(estado: boolean | number): 'success' | 'danger' {
-		if (typeof estado === 'boolean') {
-			return estado ? 'success' : 'danger';
-		}
-		return estado === 1 ? 'success' : 'danger';
+		return getEstadoSeverity(estado);
 	}
 
 	/**
@@ -117,29 +116,29 @@ export class UiMappingService {
 	}
 
 	// #region Evento Calendario
-	getEventoTipoSeverity(tipo: string): Severity {
+	getEventoTipoSeverity(tipo: TipoEventoCalendario): Severity {
 		return EVENTO_TIPO_SEVERITY[tipo] ?? 'secondary';
 	}
 
-	getEventoTipoLabel(tipo: string): string {
+	getEventoTipoLabel(tipo: TipoEventoCalendario): string {
 		return EVENTO_TIPO_LABEL[tipo] ?? tipo;
 	}
 	// #endregion
 
 	// #region Notificaciones
-	getNotificacionTipoSeverity(tipo: string): Severity {
+	getNotificacionTipoSeverity(tipo: NotificacionTipo): Severity {
 		return NOTIFICACION_TIPO_SEVERITY[tipo] ?? 'secondary';
 	}
 
-	getNotificacionTipoLabel(tipo: string): string {
+	getNotificacionTipoLabel(tipo: NotificacionTipo): string {
 		return NOTIFICACION_TIPO_LABEL[tipo] ?? tipo;
 	}
 
-	getNotificacionPrioridadSeverity(prioridad: string): Severity {
+	getNotificacionPrioridadSeverity(prioridad: NotificacionPrioridad): Severity {
 		return NOTIFICACION_PRIORIDAD_SEVERITY[prioridad] ?? 'secondary';
 	}
 
-	getNotificacionPrioridadLabel(prioridad: string): string {
+	getNotificacionPrioridadLabel(prioridad: NotificacionPrioridad): string {
 		return NOTIFICACION_PRIORIDAD_LABEL[prioridad] ?? prioridad;
 	}
 	// #endregion

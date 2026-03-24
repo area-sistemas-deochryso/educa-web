@@ -11,15 +11,20 @@ export type {
 	AprobacionItemDto,
 	AprobacionMasivaResultDto,
 	SalonesAdminEstadisticas,
+	AprobacionEstado,
+	PeriodoCierreEstado,
+	TipoCalificacion,
 } from '@data/models';
 
-export { NIVELES } from '@data/models';
+export { NIVELES, APROBACION_ESTADOS, PERIODO_CIERRE_ESTADOS, TIPOS_CALIFICACION } from '@data/models';
 // #endregion
 
 // #region DTOs admin-only (Crear/Actualizar/Cerrar)
+import type { TipoCalificacion } from '@data/models';
+
 export interface CrearConfiguracionCalificacionDto {
 	nivel: string;
-	tipoCalificacion: string;
+	tipoCalificacion: TipoCalificacion;
 	notaMinAprobatoria: number | null;
 	anio: number;
 	literales: CrearConfiguracionLiteralDto[];
@@ -35,7 +40,7 @@ export interface CrearConfiguracionLiteralDto {
 }
 
 export interface ActualizarConfiguracionCalificacionDto {
-	tipoCalificacion: string;
+	tipoCalificacion: TipoCalificacion;
 	notaMinAprobatoria: number | null;
 	literales: CrearConfiguracionLiteralDto[];
 }

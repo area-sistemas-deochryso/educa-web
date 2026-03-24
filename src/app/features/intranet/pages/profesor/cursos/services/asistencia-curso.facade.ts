@@ -1,6 +1,6 @@
 import { Injectable, inject, DestroyRef } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import { logger, withRetry } from '@core/helpers';
+import { withRetry, facadeErrorHandler } from '@core/helpers';
 import { ErrorHandlerService } from '@core/services';
 import { ProfesorApiService } from '../../services/profesor-api.service';
 import { CursoContenidoStore } from './curso-contenido.store';
@@ -15,6 +15,10 @@ export class AsistenciaCursoFacade {
 	private readonly contenidoStore = inject(CursoContenidoStore);
 	private readonly errorHandler = inject(ErrorHandlerService);
 	private readonly destroyRef = inject(DestroyRef);
+	private readonly errHandler = facadeErrorHandler({
+		tag: 'AsistenciaCursoFacade',
+		errorHandler: this.errorHandler,
+	});
 	// #endregion
 
 	// #region Estado expuesto
@@ -46,7 +50,7 @@ export class AsistenciaCursoFacade {
 					this.store.setRegistroLoading(false);
 				},
 				error: (err) => {
-					this.handleError(err, 'cargar asistencia');
+					this.errHandler.handle(err, 'cargar asistencia');
 					this.store.setRegistroLoading(false);
 				},
 			});
@@ -70,7 +74,7 @@ export class AsistenciaCursoFacade {
 					this.store.setResumenLoading(false);
 				},
 				error: (err) => {
-					this.handleError(err, 'cargar resumen de asistencia');
+					this.errHandler.handle(err, 'cargar resumen de asistencia');
 					this.store.setResumenLoading(false);
 				},
 			});
@@ -105,7 +109,7 @@ export class AsistenciaCursoFacade {
 				this.errorHandler.showSuccess('Éxito', 'Asistencia registrada exitosamente');
 			},
 			error: (err) => {
-				this.handleError(err, 'registrar asistencia');
+				this.errHandler.handle(err, 'registrar asistencia');
 				this.store.setRegistroSaving(false);
 			},
 		});
@@ -126,10 +130,5 @@ export class AsistenciaCursoFacade {
 	}
 	// #endregion
 
-	// #region Helpers privados
-	private handleError(err: unknown, accion: string): void {
-		logger.error(`AsistenciaCursoFacade: Error al ${accion}`, err);
-		this.errorHandler.showError('Error', `No se pudo ${accion}`);
-	}
 	// #endregion
 }
