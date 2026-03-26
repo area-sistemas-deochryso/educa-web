@@ -11,8 +11,8 @@ import {
 	NotificacionesEstadisticas,
 	CrearNotificacionRequest,
 	ActualizarNotificacionRequest,
-	ApiResponse,
 } from '@data/models';
+import { ApiResponse } from '@shared/models';
 
 // #endregion
 // #region Implementation

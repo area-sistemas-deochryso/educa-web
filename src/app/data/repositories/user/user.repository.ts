@@ -2,38 +2,12 @@
 import { Observable, catchError, map, of } from 'rxjs';
 
 import { BaseRepository } from '../base/base.repository';
+import { CreateUserDto, UpdateUserDto, User } from '@data/models';
 import { Injectable } from '@angular/core';
 import { logger } from '@core/helpers';
 
 // #endregion
 // #region Implementation
-export interface User {
-	id: number;
-	dni: string;
-	nombreCompleto: string;
-	email?: string;
-	telefono?: string;
-	rol: string;
-	activo: boolean;
-	fechaCreacion?: string;
-}
-
-export interface CreateUserDto {
-	dni: string;
-	nombreCompleto: string;
-	email?: string;
-	telefono?: string;
-	rol: string;
-	password: string;
-}
-
-export interface UpdateUserDto {
-	nombreCompleto?: string;
-	email?: string;
-	telefono?: string;
-	activo?: boolean;
-}
-
 @Injectable({
 	providedIn: 'root',
 })

@@ -10,7 +10,7 @@ import {
 } from './storage.models';
 import { SessionStorageService } from './session-storage.service';
 import { PreferencesStorageService } from './preferences-storage.service';
-import { IndexedDBService } from './indexed-db.service';
+import { NotificationStorageService } from './notification-storage.service';
 
 /**
  * Storage facade for auth, permissions, notifications, and preferences.
@@ -31,7 +31,7 @@ import { IndexedDBService } from './indexed-db.service';
 export class StorageService {
 	private session = inject(SessionStorageService);
 	private preferences = inject(PreferencesStorageService);
-	private idb = inject(IndexedDBService);
+	private notificationStorage = inject(NotificationStorageService);
 	private platformId = inject(PLATFORM_ID);
 
 	/**
@@ -158,7 +158,7 @@ export class StorageService {
 	 * const data = await storage.getDismissedNotificationsAsync();
 	 */
 	async getDismissedNotificationsAsync(): Promise<NotificationStorageData | null> {
-		const data = await this.idb.getDismissedNotifications();
+		const data = await this.notificationStorage.getDismissedNotifications();
 		if (data) return data;
 		return this._getSyncFallback<NotificationStorageData>('educa_dismissed_notifications');
 	}
@@ -173,7 +173,7 @@ export class StorageService {
 	 */
 	setDismissedNotifications(data: NotificationStorageData): void {
 		this._setSyncFallback('educa_dismissed_notifications', data);
-		this.idb.setDismissedNotifications(data);
+		this.notificationStorage.setDismissedNotifications(data);
 	}
 	/**
 	 * Store dismissed notification ids using IndexedDB.
@@ -183,7 +183,7 @@ export class StorageService {
 	 * await storage.setDismissedNotificationsAsync({ ids: [1, 2] });
 	 */
 	async setDismissedNotificationsAsync(data: NotificationStorageData): Promise<void> {
-		await this.idb.setDismissedNotifications(data);
+		await this.notificationStorage.setDismissedNotifications(data);
 	}
 	/**
 	 * Remove dismissed notification ids.
@@ -193,7 +193,7 @@ export class StorageService {
 	 */
 	removeDismissedNotifications(): void {
 		this._removeSyncFallback('educa_dismissed_notifications');
-		this.idb.removeDismissedNotifications();
+		this.notificationStorage.removeDismissedNotifications();
 	}
 
 	/**
@@ -215,7 +215,7 @@ export class StorageService {
 	 * const data = await storage.getReadNotificationsAsync();
 	 */
 	async getReadNotificationsAsync(): Promise<NotificationStorageData | null> {
-		const data = await this.idb.getReadNotifications();
+		const data = await this.notificationStorage.getReadNotifications();
 		if (data) return data;
 		return this._getSyncFallback<NotificationStorageData>('educa_read_notifications');
 	}
@@ -230,7 +230,7 @@ export class StorageService {
 	 */
 	setReadNotifications(data: NotificationStorageData): void {
 		this._setSyncFallback('educa_read_notifications', data);
-		this.idb.setReadNotifications(data);
+		this.notificationStorage.setReadNotifications(data);
 	}
 	/**
 	 * Store read notification ids using IndexedDB.
@@ -240,7 +240,7 @@ export class StorageService {
 	 * await storage.setReadNotificationsAsync({ ids: [10, 11] });
 	 */
 	async setReadNotificationsAsync(data: NotificationStorageData): Promise<void> {
-		await this.idb.setReadNotifications(data);
+		await this.notificationStorage.setReadNotifications(data);
 	}
 	/**
 	 * Remove read notification ids.
@@ -250,7 +250,7 @@ export class StorageService {
 	 */
 	removeReadNotifications(): void {
 		this._removeSyncFallback('educa_read_notifications');
-		this.idb.removeReadNotifications();
+		this.notificationStorage.removeReadNotifications();
 	}
 	/**
 	 * Get last notification check timestamp string.
@@ -283,7 +283,7 @@ export class StorageService {
 	clearNotifications(): void {
 		this._removeSyncFallback('educa_dismissed_notifications');
 		this._removeSyncFallback('educa_read_notifications');
-		this.idb.clearNotifications();
+		this.notificationStorage.clearNotifications();
 	}
 
 	// #endregion
@@ -561,7 +561,7 @@ export class StorageService {
 			'educa_dismissed_notifications',
 		);
 		if (legacyDismissed) {
-			await this.idb.setDismissedNotifications(legacyDismissed);
+			await this.notificationStorage.setDismissedNotifications(legacyDismissed);
 			logger.log('[Storage] Migrated dismissed notifications to IndexedDB');
 		}
 
@@ -569,7 +569,7 @@ export class StorageService {
 			'educa_read_notifications',
 		);
 		if (legacyRead) {
-			await this.idb.setReadNotifications(legacyRead);
+			await this.notificationStorage.setReadNotifications(legacyRead);
 			logger.log('[Storage] Migrated read notifications to IndexedDB');
 		}
 

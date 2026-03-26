@@ -6,7 +6,7 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { StorageService } from './storage.service';
 import { SessionStorageService } from './session-storage.service';
 import { PreferencesStorageService } from './preferences-storage.service';
-import { IndexedDBService } from './indexed-db.service';
+import { NotificationStorageService } from './notification-storage.service';
 import { AuthUser } from './storage.models';
 
 // #endregion
@@ -15,7 +15,7 @@ describe('StorageService', () => {
 	let service: StorageService;
 	let sessionMock: Partial<SessionStorageService>;
 	let preferencesMock: Partial<PreferencesStorageService>;
-	let idbMock: Partial<IndexedDBService>;
+	let notificationStorageMock: Partial<NotificationStorageService>;
 
 	const mockUser: AuthUser = {
 		token: 'test-token',
@@ -62,7 +62,7 @@ describe('StorageService', () => {
 			clearAttendancePreferences: vi.fn(),
 		};
 
-		idbMock = {
+		notificationStorageMock = {
 			getDismissedNotifications: vi.fn().mockResolvedValue(null),
 			setDismissedNotifications: vi.fn().mockResolvedValue(undefined),
 			removeDismissedNotifications: vi.fn(),
@@ -77,7 +77,7 @@ describe('StorageService', () => {
 				StorageService,
 				{ provide: SessionStorageService, useValue: sessionMock },
 				{ provide: PreferencesStorageService, useValue: preferencesMock },
-				{ provide: IndexedDBService, useValue: idbMock },
+				{ provide: NotificationStorageService, useValue: notificationStorageMock },
 			],
 		});
 
@@ -150,7 +150,7 @@ describe('StorageService', () => {
 			service.clearAll();
 
 			expect(sessionMock.clearAuth).toHaveBeenCalled();
-			expect(idbMock.clearNotifications).toHaveBeenCalled();
+			expect(notificationStorageMock.clearNotifications).toHaveBeenCalled();
 			expect(sessionMock.clearScheduleModalsState).toHaveBeenCalled();
 			expect(preferencesMock.clearAttendancePreferences).toHaveBeenCalled();
 		});

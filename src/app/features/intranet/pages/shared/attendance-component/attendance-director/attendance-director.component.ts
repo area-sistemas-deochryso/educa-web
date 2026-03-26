@@ -9,6 +9,8 @@ import { AttendanceLegendComponent } from '@app/features/intranet/components/att
 import { AttendanceTableComponent } from '../../../../components/attendance/attendance-table/attendance-table.component';
 import { AttendanceTableSkeletonComponent } from '../../../../components/attendance/attendance-table-skeleton/attendance-table-skeleton.component';
 import { AttendanceViewController, SelectorContext } from '../../../../services/attendance/attendance-view.service';
+import { AttendancePdfService } from '../../../../services/attendance/attendance-pdf.service';
+import { AttendanceStatsService } from '../../../../services/attendance/attendance-stats.service';
 import { ViewMode } from '../../../../components/attendance/attendance-header/attendance-header.component';
 import { ButtonModule } from 'primeng/button';
 import { DatePipe } from '@angular/common';
@@ -60,7 +62,7 @@ interface TipoReporteGroup {
 		FormsModule,
 		DatePipe,
 	],
-	providers: [AttendanceViewController],
+	providers: [AttendanceViewController, AttendancePdfService, AttendanceStatsService],
 	templateUrl: './attendance-director.component.html',
 	styleUrl: './attendance-director.component.scss',
 	changeDetection: ChangeDetectionStrategy.OnPush,

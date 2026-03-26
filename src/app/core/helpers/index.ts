@@ -16,4 +16,5 @@ export * from './stats.utils';
 export * from './error.utils';
 export * from './error-policy';
 export * from './estado.utils';
+export * from './jwt.utils';
 // #endregion

@@ -12,7 +12,7 @@ import {
 import { Injectable, inject } from '@angular/core';
 import { Observable, catchError, of } from 'rxjs';
 
-import { ApiResponse } from '@core/services';
+import { ApiResponse } from '@shared/models';
 import { HttpClient } from '@angular/common/http';
 import { PaginatedResponse } from '@data/repositories/base/base.repository';
 import { environment } from '@env/environment';

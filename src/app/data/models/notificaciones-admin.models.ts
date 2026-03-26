@@ -79,8 +79,4 @@ export interface NotificacionesEstadisticas {
 	vigentesHoy: number;
 }
 
-export interface ApiResponse {
-	mensaje: string;
-}
-
 // #endregion

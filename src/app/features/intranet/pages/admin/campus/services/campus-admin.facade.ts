@@ -17,6 +17,7 @@ import {
 } from '../models';
 import { CampusAdminApiService } from './campus-admin-api.service';
 import { CampusAdminStore } from './campus-admin.store';
+import { CampusEditorService } from './campus-editor.service';
 
 interface CrudOptions<T> {
 	apiCall: Observable<T>;
@@ -30,6 +31,7 @@ interface CrudOptions<T> {
 export class CampusAdminFacade {
 	private api = inject(CampusAdminApiService);
 	private store = inject(CampusAdminStore);
+	private editor = inject(CampusEditorService);
 	private errorHandler = inject(ErrorHandlerService);
 	private destroyRef = inject(DestroyRef);
 
@@ -353,104 +355,45 @@ export class CampusAdminFacade {
 
 	// #endregion
 
-	// #region Comandos de editor
+	// #region Comandos de editor (delega a CampusEditorService)
 
 	setActiveTool(tool: import('../models').EditorTool): void {
-		this.store.setActiveTool(tool);
+		this.editor.setActiveTool(tool);
 	}
 
 	setNewNodeType(type: import('../models').EditorNodeType): void {
-		this.store.setNewNodeType(type);
+		this.editor.setNewNodeType(type);
 	}
 
 	onEditorClick(x: number, y: number): void {
-		const tool = this.store.activeTool();
-		const pisoId = this.store.selectedPisoId();
-		if (!pisoId) return;
+		const result = this.editor.resolveCanvasClick(x, y);
+		if (!result) return;
 
-		if (tool === 'addNode') {
-			const tipo = this.store.newNodeType();
-			this.crearNodo({
-				pisoId,
-				salonId: null,
-				tipo,
-				etiqueta: null,
-				x: Math.round(x),
-				y: Math.round(y),
-				width: tipo === 'corridor' ? 0 : 90,
-				height: tipo === 'corridor' ? 0 : 60,
-				rotation: 0,
-				metadataJson: null,
-			});
-		} else if (tool === 'addBlock') {
-			this.crearBloqueo({
-				pisoId,
-				x: Math.round(x) - 40,
-				y: Math.round(y) - 25,
-				width: 80,
-				height: 50,
-				motivo: null,
-			});
-		}
+		if (result.action === 'createNode') this.crearNodo(result.data);
+		else if (result.action === 'createBlock') this.crearBloqueo(result.data);
 	}
 
 	onNodeClick(nodeId: number): void {
-		const tool = this.store.activeTool();
+		const result = this.editor.resolveNodeClick(nodeId);
+		if (!result) return;
 
-		if (tool === 'select') {
-			this.store.setSelectedNodeId(nodeId);
-		} else if (tool === 'addEdge') {
-			const startId = this.store.edgeStartNodeId();
-			if (!startId) {
-				this.store.setEdgeStartNodeId(nodeId);
-			} else if (startId !== nodeId) {
-				const nodos = this.store.nodos();
-				const origen = nodos.find((n) => n.id === startId);
-				const destino = nodos.find((n) => n.id === nodeId);
-				const distancia =
-					origen && destino
-						? Math.round(Math.sqrt(Math.pow(destino.x - origen.x, 2) + Math.pow(destino.y - origen.y, 2)) * 10) / 10
-						: 1.0;
-				this.crearArista({
-					nodoOrigenId: startId,
-					nodoDestinoId: nodeId,
-					peso: distancia,
-					bidireccional: true,
-				});
-			}
-		} else if (tool === 'addVertical') {
-			this.store.setVerticalStartNodeId(nodeId);
-			this.store.openVerticalDialog();
-		} else if (tool === 'delete') {
-			this.eliminarNodo(nodeId);
-		}
+		if (result.action === 'deleteNode') this.eliminarNodo(result.nodeId);
+		else if (result.action === 'createEdge') this.crearArista(result.data);
 	}
 
 	onAristaClick(aristaId: number): void {
-		const tool = this.store.activeTool();
-		if (tool === 'select') {
-			this.store.setSelectedAristaId(aristaId);
-		} else if (tool === 'delete') {
-			this.eliminarArista(aristaId);
-		}
+		const result = this.editor.resolveAristaClick(aristaId);
+		if (result) this.eliminarArista(result.aristaId);
 	}
 
 	onBloqueoClick(bloqueoId: number): void {
-		const tool = this.store.activeTool();
-		if (tool === 'select') {
-			this.store.setSelectedBloqueoId(bloqueoId);
-		} else if (tool === 'delete') {
-			this.eliminarBloqueo(bloqueoId);
-		}
+		const result = this.editor.resolveBloqueoClick(bloqueoId);
+		if (result) this.eliminarBloqueo(result.bloqueoId);
 	}
 
 	onConexionVerticalClick(conexionId: number): void {
-		const tool = this.store.activeTool();
-		if (tool === 'select') {
-			this.store.setSelectedConexionVerticalId(conexionId);
-		} else if (tool === 'delete') {
-			this.eliminarConexionVertical(conexionId);
-		}
+		const result = this.editor.resolveConexionVerticalClick(conexionId);
+		if (result) this.eliminarConexionVertical(result.conexionId);
 	}
 
 	// #endregion

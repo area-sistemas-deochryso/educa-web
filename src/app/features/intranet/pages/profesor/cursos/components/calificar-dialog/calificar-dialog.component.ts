@@ -19,37 +19,15 @@ import {
 	NOTA_MAXIMA,
 	esNotaEditable,
 	GrupoContenidoDto,
+	NotaRow,
+	GrupoNotaRow,
+	GrupoMiembroInfo,
 } from '../../../models';
 import {
 	getNotaSeverity as getNotaSeverityFn,
 	isNotaAprobada,
 } from '@shared/services/calificacion-config';
 import type { ConfiguracionCalificacionListDto } from '@data/models';
-
-interface NotaRow {
-	estudianteId: number;
-	estudianteNombre: string;
-	nota: number | null;
-	observacion: string;
-	existingNotaId: number | null;
-	esEditable: boolean;
-}
-
-interface GrupoNotaRow {
-	grupoId: number;
-	grupoNombre: string;
-	nota: number | null;
-	observacion: string;
-	miembros: GrupoMiembroInfo[];
-}
-
-interface GrupoMiembroInfo {
-	estudianteId: number;
-	nombre: string;
-	notaActual: number | null;
-	esOverride: boolean;
-	overrideNota: number | null;
-}
 
 @Component({
 	selector: 'app-calificar-dialog',

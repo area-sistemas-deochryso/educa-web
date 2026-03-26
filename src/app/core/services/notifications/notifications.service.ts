@@ -1,17 +1,16 @@
 import { Injectable, signal, inject, PLATFORM_ID, computed, effect } from '@angular/core';
 import { isPlatformBrowser } from '@angular/common';
-import { HttpClient } from '@angular/common/http';
-import { Router } from '@angular/router';
 import {
 	SeasonalNotification,
 	NotificationType,
 	NotificationPriority,
 } from './notifications.config';
-import { logger } from '@app/core/helpers';
-import { StorageService } from '@app/core/services/storage';
-import { TimerManager } from '@app/core/services/destroy';
+import { logger } from '@core/helpers';
+import { StorageService } from '@core/services/storage';
+import { TimerManager } from '@core/services/destroy';
 import { SmartNotificationService } from './smart-notification.service';
-import { environment } from '@config/environment';
+import { NotificationsApiService } from './notifications-api.service';
+import { NotificationsSoundService } from './notifications-sound.service';
 import { NotificacionActiva } from '@data/models';
 
 /**
@@ -25,27 +24,29 @@ export interface PriorityCount {
 }
 
 /**
- * Notifications service for seasonal and local notifications.
+ * Notifications state service.
  *
  * Responsibilities:
  * - Reactive notification state via signals and computed values
  * - Persist read and dismissed notifications with daily reset
  * - Periodic checks for new notifications
- * - Audio feedback and Browser Notification API
  * - Service Worker message handling for push events
+ *
+ * Delegates to:
+ * - NotificationsApiService for HTTP calls
+ * - NotificationsSoundService for audio and browser notifications
  */
 @Injectable({
 	providedIn: 'root',
 })
 export class NotificationsService {
 	// #region Dependencies
-	private platformId = inject(PLATFORM_ID);
-	private http = inject(HttpClient);
-	private storage = inject(StorageService);
-	private router = inject(Router);
-	private smartService = inject(SmartNotificationService);
-	private timerManager = new TimerManager();
-	private readonly apiUrl = `${environment.apiUrl}/api/sistema/notificaciones`;
+	private readonly platformId = inject(PLATFORM_ID);
+	private readonly api = inject(NotificationsApiService);
+	private readonly sound = inject(NotificationsSoundService);
+	private readonly storage = inject(StorageService);
+	private readonly smartService = inject(SmartNotificationService);
+	private readonly timerManager = new TimerManager();
 	// #endregion
 
 	// #region Private state
@@ -56,7 +57,6 @@ export class NotificationsService {
 	private readonly _isPanelOpen = signal(false);
 	private readonly _showDismissedHistory = signal(false);
 
-	private notificationSound: HTMLAudioElement | null = null;
 	private swMessageHandler: ((event: MessageEvent) => void) | null = null;
 	private hasPlayedSound = false;
 	// #endregion
@@ -100,7 +100,6 @@ export class NotificationsService {
 	// #region Initialization
 	constructor() {
 		if (isPlatformBrowser(this.platformId)) {
-			this.initSound();
 			this.loadDismissedFromStorage();
 			this.loadReadFromStorage();
 			this.checkNotifications();
@@ -111,21 +110,13 @@ export class NotificationsService {
 	}
 
 	/**
-	 * Initialize audio for notification sound.
-	 */
-	private initSound(): void {
-		this.notificationSound = new Audio();
-		this.notificationSound.src = 'sounds/notification-bell.mp3';
-		this.notificationSound.volume = 0.5;
-	}
-
-	/**
 	 * Start periodic checks for notifications.
 	 * Runs every 5 min to keep smart notifications (upcoming classes) fresh.
 	 */
 	private startPeriodicCheck(): void {
 		this.timerManager.setInterval(() => this.checkNotifications(), 5 * 60 * 1000);
 	}
+
 	/**
 	 * Re-check notifications once smart data finishes loading from IndexedDB.
 	 */
@@ -139,13 +130,12 @@ export class NotificationsService {
 	// #endregion
 
 	// #region Notification checks
-
 	/**
 	 * Fetch active notifications from API, merge with smart notifications,
 	 * filter dismissed, and sort by priority.
 	 */
 	checkNotifications(): void {
-		this.http.get<NotificacionActiva[]>(`${this.apiUrl}/activas`).subscribe({
+		this.api.getActivas().subscribe({
 			next: (response) => {
 				const apiNotifications = (response ?? []).map((n) => this.mapApiToSeasonal(n));
 				this.applyNotifications(apiNotifications);
@@ -157,7 +147,6 @@ export class NotificationsService {
 		});
 	}
 
-	/** Maps API DTO to SeasonalNotification shape used by the UI. */
 	private mapApiToSeasonal(n: NotificacionActiva): SeasonalNotification {
 		return {
 			id: `api-${n.id}`,
@@ -173,11 +162,9 @@ export class NotificationsService {
 		};
 	}
 
-	/** Merges API + smart notifications and updates state. */
 	private applyNotifications(apiNotifications: SeasonalNotification[]): void {
 		const dismissedIds = this._dismissedIds();
 
-		// Merge smart notifications as SeasonalNotification shape
 		const smartNotifs: SeasonalNotification[] = this.smartService.smartNotifications().map((sn) => ({
 			...sn,
 			shouldShow: () => true,
@@ -193,36 +180,28 @@ export class NotificationsService {
 		this._activeNotifications.set(active);
 		this._dismissedNotifications.set(dismissed);
 
-		// Save last check time.
 		this.storage.setLastNotificationCheck(new Date().toISOString());
 
-		// Play sound if there are unread notifications and it has not played yet.
+		// Play sound if there are unread notifications and it has not played yet
 		if (this.unreadCount() > 0 && !this.hasPlayedSound) {
-			this.playSound();
+			this.sound.playSound();
 			this.hasPlayedSound = true;
 		}
 
-		// Request browser notification permission if there are urgent items.
+		// Request browser notification permission if there are urgent items
 		if (active.some((n) => n.priority === 'urgent')) {
-			this.requestBrowserNotificationPermission();
+			this.sound.requestPermission();
 		}
 	}
 	// #endregion
 
 	// #region Commands - read
-
-	/**
-	 * Mark a notification as read.
-	 */
 	markAsRead(notificationId: string): void {
 		if (this._readIds().has(notificationId)) return;
 		this._readIds.update((ids) => new Set([...ids, notificationId]));
 		this.saveReadToStorage();
 	}
 
-	/**
-	 * Mark a notification as unread.
-	 */
 	markAsUnread(notificationId: string): void {
 		if (!this._readIds().has(notificationId)) return;
 		this._readIds.update((ids) => {
@@ -233,36 +212,23 @@ export class NotificationsService {
 		this.saveReadToStorage();
 	}
 
-	/**
-	 * Mark all active notifications as read.
-	 */
 	markAllAsRead(): void {
 		const allIds = this._activeNotifications().map((n) => n.id);
 		this._readIds.update((ids) => new Set([...ids, ...allIds]));
 		this.saveReadToStorage();
 	}
 
-	/**
-	 * Mark all notifications as unread.
-	 */
 	markAllAsUnread(): void {
 		this._readIds.set(new Set());
 		this.saveReadToStorage();
 	}
 
-	/**
-	 * Check if a notification is read.
-	 */
 	isRead(notificationId: string): boolean {
 		return this._readIds().has(notificationId);
 	}
 	// #endregion
 
 	// #region Commands - dismiss
-
-	/**
-	 * Dismiss a notification by id.
-	 */
 	dismiss(notificationId: string): void {
 		const notification = this._activeNotifications().find((n) => n.id === notificationId);
 		if (!notification || notification.dismissible === false) return;
@@ -273,9 +239,6 @@ export class NotificationsService {
 		this.saveDismissedToStorage();
 	}
 
-	/**
-	 * Dismiss all dismissible notifications.
-	 */
 	dismissAll(): void {
 		const active = this._activeNotifications();
 		const dismissible = active.filter((n) => n.dismissible !== false);
@@ -287,9 +250,6 @@ export class NotificationsService {
 		this.saveDismissedToStorage();
 	}
 
-	/**
-	 * Restore a dismissed notification.
-	 */
 	restore(notificationId: string): void {
 		if (!this._dismissedIds().has(notificationId)) return;
 		this._dismissedIds.update((ids) => {
@@ -301,9 +261,6 @@ export class NotificationsService {
 		this.checkNotifications();
 	}
 
-	/**
-	 * Restore all dismissed notifications.
-	 */
 	restoreAll(): void {
 		this._dismissedIds.set(new Set());
 		this.saveDismissedToStorage();
@@ -312,101 +269,50 @@ export class NotificationsService {
 	// #endregion
 
 	// #region Commands - UI
-
-	/**
-	 * Toggle the notification panel.
-	 */
 	togglePanel(): void {
 		this._isPanelOpen.update((v) => !v);
 		if (this._isPanelOpen() && this.unreadCount() > 0) {
-			this.playSound();
+			this.sound.playSound();
 		}
 	}
 
-	/**
-	 * Close the notification panel.
-	 */
 	closePanel(): void {
 		this._isPanelOpen.set(false);
 	}
 
-	/**
-	 * Toggle dismissed history visibility.
-	 */
 	toggleDismissedHistory(): void {
 		this._showDismissedHistory.update((v) => !v);
 	}
 
-	/**
-	 * Get active notifications by type.
-	 */
 	getByType(type: NotificationType): SeasonalNotification[] {
 		return this._activeNotifications().filter((n) => n.type === type);
 	}
 	// #endregion
 
-	// #region Audio and browser notifications
-
+	// #region Audio and browser notifications (delegated)
 	/**
-	 * Play notification sound if available.
+	 * Play notification sound.
 	 */
 	playSound(): void {
-		if (this.notificationSound) {
-			this.notificationSound.currentTime = 0;
-			this.notificationSound.play().catch(() => {
-				// Autoplay may be blocked before user interaction.
-			});
-		}
-	}
-
-	/**
-	 * Request browser notification permission.
-	 */
-	private async requestBrowserNotificationPermission(): Promise<void> {
-		if (!('Notification' in window) || Notification.permission !== 'default') return;
-		await Notification.requestPermission();
+		this.sound.playSound();
 	}
 
 	/**
 	 * Show a browser notification for a seasonal notification.
 	 */
 	async showBrowserNotification(notification: SeasonalNotification): Promise<void> {
-		if (!('Notification' in window) || Notification.permission !== 'granted') return;
-
-		try {
-			const browserNotif = new Notification(notification.title, {
-				body: notification.message,
-				icon: '/images/common/icono.png',
-				tag: notification.id,
-				requireInteraction: notification.priority === 'urgent',
-			});
-
-			browserNotif.onclick = () => {
-				window.focus();
-				if (notification.actionUrl) {
-					this.router.navigateByUrl(notification.actionUrl);
-				}
-				browserNotif.close();
-			};
-		} catch (e) {
-			logger.error('[Notifications] Error showing browser notification:', e);
-		}
+		await this.sound.showBrowserNotification(notification);
 	}
 
 	/**
 	 * Show urgent notifications as browser notifications.
 	 */
 	showUrgentAsBrowserNotifications(): void {
-		const urgent = this._activeNotifications().filter((n) => n.priority === 'urgent');
-		urgent.forEach((n) => this.showBrowserNotification(n));
+		this.sound.showUrgentAsBrowserNotifications(this._activeNotifications());
 	}
 	// #endregion
 
 	// #region Service Worker
-
-	/**
-	 * Listen to Service Worker messages.
-	 */
 	private listenToServiceWorker(): void {
 		if (!('serviceWorker' in navigator)) return;
 
@@ -415,7 +321,7 @@ export class NotificationsService {
 
 			switch (type) {
 				case 'PUSH_RECEIVED':
-					this.handlePushReceived(payload);
+					this.handlePushReceived();
 					break;
 				case 'NOTIFICATION_CLICKED':
 					this.handleNotificationClicked(payload);
@@ -428,17 +334,11 @@ export class NotificationsService {
 		navigator.serviceWorker.addEventListener('message', this.swMessageHandler);
 	}
 
-	/**
-	 * Handle push received message.
-	 */
-	private handlePushReceived(_payload: unknown): void {
-		this.playSound();
+	private handlePushReceived(): void {
+		this.sound.playSound();
 		this.checkNotifications();
 	}
 
-	/**
-	 * Handle notification clicked message.
-	 */
 	private handleNotificationClicked(payload: unknown): void {
 		const typedPayload = payload as { id?: string } | null;
 		if (typedPayload?.id) {
@@ -448,10 +348,6 @@ export class NotificationsService {
 	// #endregion
 
 	// #region Storage I/O
-
-	/**
-	 * Load dismissed notifications from storage.
-	 */
 	private loadDismissedFromStorage(): void {
 		try {
 			const data = this.storage.getDismissedNotifications();
@@ -469,9 +365,6 @@ export class NotificationsService {
 		}
 	}
 
-	/**
-	 * Save dismissed notifications to storage.
-	 */
 	private saveDismissedToStorage(): void {
 		try {
 			this.storage.setDismissedNotifications({
@@ -483,9 +376,6 @@ export class NotificationsService {
 		}
 	}
 
-	/**
-	 * Load read notifications from storage.
-	 */
 	private loadReadFromStorage(): void {
 		try {
 			const data = this.storage.getReadNotifications();
@@ -503,9 +393,6 @@ export class NotificationsService {
 		}
 	}
 
-	/**
-	 * Save read notifications to storage.
-	 */
 	private saveReadToStorage(): void {
 		try {
 			this.storage.setReadNotifications({
@@ -519,7 +406,6 @@ export class NotificationsService {
 	// #endregion
 
 	// #region Cleanup
-
 	/**
 	 * Cleanup timers and Service Worker listeners.
 	 */

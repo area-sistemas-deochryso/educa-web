@@ -2,7 +2,6 @@ import {
 	ActualizarPermisoRolRequest,
 	ActualizarPermisoUsuarioRequest,
 	ActualizarVistaRequest,
-	ApiResponse,
 	CrearPermisoRolRequest,
 	CrearPermisoUsuarioRequest,
 	CrearVistaRequest,
@@ -13,6 +12,7 @@ import {
 	Vista,
 	VistasEstadisticas,
 } from './permisos.models';
+import { ApiResponse } from '@shared/models';
 import { Injectable, inject } from '@angular/core';
 import { Observable, catchError, of } from 'rxjs';
 

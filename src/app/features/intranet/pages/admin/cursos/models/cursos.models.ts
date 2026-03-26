@@ -41,10 +41,6 @@ export interface ActualizarCursoRequest {
 	rowVersion?: string;
 }
 
-export interface ApiResponse {
-	mensaje: string;
-}
-
 export interface CursosEstadisticas {
 	totalCursos: number;
 	cursosActivos: number;

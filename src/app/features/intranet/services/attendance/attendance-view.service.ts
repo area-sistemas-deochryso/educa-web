@@ -4,16 +4,16 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { MenuItem } from 'primeng/api';
 
 import {
-	AsistenciaService,
 	AsistenciaDiaConEstadisticas,
-	EstadisticasAsistenciaDia,
 	EstudianteAsistencia,
 	HijoApoderado,
 	AsistenciaSignalRService,
 } from '@core/services';
 import { SwService } from '@features/intranet/services/sw/sw.service';
-import { viewBlobInNewTab, downloadBlob, logger } from '@core/helpers';
+import { logger } from '@core/helpers';
 import { AttendanceDataService } from './attendance-data.service';
+import { AttendancePdfService } from './attendance-pdf.service';
+import { AttendanceStatsService } from './attendance-stats.service';
 import { AttendanceTable } from '@features/intranet/pages/shared/attendance-component/models/attendance.types';
 import {
 	VIEW_MODE,
@@ -25,20 +25,6 @@ const ATTENDANCE_TABLE_LABELS = {
 	Ingresos: 'Ingresos',
 	Salidas: 'Salidas',
 } as const;
-
-type MonthSubMode = 'mes' | 'periodo';
-
-const MONTH_NAMES = [
-	'Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio',
-	'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre',
-];
-
-const MONTH_SUB_MODE_OPTIONS = [
-	{ label: 'Mes', value: 'mes' as MonthSubMode },
-	{ label: 'Periodo', value: 'periodo' as MonthSubMode },
-];
-
-const MONTH_OPTIONS = MONTH_NAMES.map((label, i) => ({ label, value: i + 1 }));
 
 // #region Interfaces de configuración
 
@@ -72,16 +58,17 @@ export interface AttendanceViewConfig {
 	setStoredEstudianteId(id: number): void;
 }
 
+// #endregion
+
 /**
  * Servicio scoped que centraliza la lógica compartida entre las vistas
  * de asistencia de Director y Profesor: modo día/mes, selección de estudiante, tablas y PDF.
  *
- * Se configura por componente mediante init() con callbacks que abstraen
- * las diferencias de endpoint y storage.
+ * Delega generación de PDFs a AttendancePdfService y estadísticas/periodo
+ * a AttendanceStatsService.
  */
 @Injectable()
 export class AttendanceViewController {
-	private asistenciaService = inject(AsistenciaService);
 	private attendanceDataService = inject(AttendanceDataService);
 	private asistenciaSignalR = inject(AsistenciaSignalRService);
 	private swService = inject(SwService);
@@ -93,77 +80,47 @@ export class AttendanceViewController {
 	// - Day mode: loadAsistenciaDia uses the selected date.
 	// - Reload delegates to the active viewMode.
 
-// #endregion
-	// #region Estado general
+	// #region Servicios delegados
+	readonly pdfService = inject(AttendancePdfService);
+	readonly statsService = inject(AttendanceStatsService);
+	// #endregion
 
+	// #region Estado general
 	readonly loading = signal(false);
-	readonly downloadingPdf = signal(false);
 	readonly showSkeletons = signal(true);
 	readonly tableReady = signal(false);
 
+	/** Delegado: estado de descarga de PDF */
+	readonly downloadingPdf = this.pdfService.downloadingPdf;
 	// #endregion
-	// #region Periodo (sub-modo dentro de mes)
 
-	readonly monthSubMode = signal<MonthSubMode>('mes');
-	readonly periodoInicio = signal(1);
-	readonly periodoFin = signal(new Date().getMonth() + 1);
+	// #region Delegados de stats/periodo
+	readonly monthSubMode = this.statsService.monthSubMode;
+	readonly periodoInicio = this.statsService.periodoInicio;
+	readonly periodoFin = this.statsService.periodoFin;
+	readonly monthSubModeOptions = this.statsService.monthSubModeOptions;
+	readonly periodoYear = this.statsService.periodoYear;
+	readonly maxPeriodoMonth = this.statsService.maxPeriodoMonth;
+	readonly mesOptionsInicio = this.statsService.mesOptionsInicio;
+	readonly mesOptionsFin = this.statsService.mesOptionsFin;
+	readonly isPeriodoValid = this.statsService.isPeriodoValid;
+	readonly pdfLabel = this.statsService.pdfLabel;
+	readonly estadisticasDia = this.statsService.estadisticasDia;
 
-	/** Opciones estáticas para el toggle mes/periodo */
-	readonly monthSubModeOptions = MONTH_SUB_MODE_OPTIONS;
-
-	/** Año del periodo — siempre el año seleccionado en la tabla */
-	readonly periodoYear = computed(() => this.ingresos().selectedYear);
-
-	/** Mes máximo disponible: si es el año actual, hasta el mes actual; si es año pasado, todos */
-	readonly maxPeriodoMonth = computed(() => {
-		const selectedYear = this.ingresos().selectedYear;
-		const now = new Date();
-		return selectedYear >= now.getFullYear() ? now.getMonth() + 1 : 12;
-	});
-
-	/** Opciones de mes para INICIO: 1 hasta maxPeriodoMonth */
-	readonly mesOptionsInicio = computed(() => {
-		const max = this.maxPeriodoMonth();
-		return MONTH_OPTIONS.filter((m) => m.value <= max);
-	});
-
-	/** Opciones de mes para FIN: desde periodoInicio hasta maxPeriodoMonth */
-	readonly mesOptionsFin = computed(() => {
-		const start = this.periodoInicio();
-		const max = this.maxPeriodoMonth();
-		return MONTH_OPTIONS.filter((m) => m.value >= start && m.value <= max);
-	});
-
-	/** Valida que el rango de periodo sea correcto */
-	readonly isPeriodoValid = computed(() => this.periodoInicio() <= this.periodoFin());
-
-	/** Label descriptivo para la sección PDF en modo periodo */
-	readonly pdfLabel = computed(() => {
-		const inicio = this.periodoInicio();
-		const fin = this.periodoFin();
-		const year = this.ingresos().selectedYear;
-		return `Periodo: ${MONTH_NAMES[inicio - 1]} – ${MONTH_NAMES[fin - 1]} ${year}`;
-	});
-
-	setMonthSubMode(mode: MonthSubMode): void {
-		this.monthSubMode.set(mode);
+	setMonthSubMode(mode: 'mes' | 'periodo'): void {
+		this.statsService.setMonthSubMode(mode);
 	}
 
 	setPeriodoInicio(mes: number): void {
-		this.periodoInicio.set(mes);
-		// Auto-ajustar fin si queda por debajo del inicio
-		if (this.periodoFin() < mes) {
-			this.periodoFin.set(mes);
-		}
+		this.statsService.setPeriodoInicio(mes);
 	}
 
 	setPeriodoFin(mes: number): void {
-		this.periodoFin.set(mes);
+		this.statsService.setPeriodoFin(mes);
 	}
-
 	// #endregion
-	// #region Estudiantes (modo mes)
 
+	// #region Estudiantes (modo mes)
 	readonly estudiantes = signal<EstudianteAsistencia[]>([]);
 	readonly selectedEstudianteId = signal<number | null>(null);
 	readonly selectedEstudiante = computed(() => {
@@ -182,42 +139,28 @@ export class AttendanceViewController {
 			relacion: APP_USER_ROLES.Estudiante,
 		}));
 	});
-
 	// #endregion
-	// #region Modo día/mes
 
+	// #region Modo día/mes
 	readonly viewMode = signal<ViewMode>(VIEW_MODE.Dia);
 	readonly fechaDia = signal<Date>(new Date());
 	readonly estudiantesDia = signal<EstudianteAsistencia[]>([]);
-	readonly estadisticasDia = signal<EstadisticasAsistenciaDia>({
-		total: 0,
-		temprano: 0,
-		aTiempo: 0,
-		fueraHora: 0,
-		noAsistio: 0,
-		justificado: 0,
-		pendiente: 0,
-	});
-
 	// #endregion
-	// #region Tablas de asistencia
 
+	// #region Tablas de asistencia
 	readonly ingresos = signal<AttendanceTable>(
 		this.attendanceDataService.createEmptyTable(ATTENDANCE_TABLE_LABELS.Ingresos),
 	);
 	readonly salidas = signal<AttendanceTable>(
 		this.attendanceDataService.createEmptyTable(ATTENDANCE_TABLE_LABELS.Salidas),
 	);
-
 	// #endregion
-	// #region PDF
 
-	// En mes mode usa el mes/año seleccionado; en día mode es la fecha seleccionada
+	// #region PDF
 	readonly pdfFecha = computed(() => {
 		if (this.viewMode() === VIEW_MODE.Dia) {
 			return this.fechaDia();
 		}
-		// Usar el primer día del mes/año seleccionado para reportes consolidados
 		const { selectedMonth, selectedYear } = this.ingresos();
 		return new Date(selectedYear, selectedMonth - 1, 1);
 	});
@@ -247,8 +190,8 @@ export class AttendanceViewController {
 			},
 		];
 	});
-
 	// #endregion
+
 	// #region Inicialización
 
 	/**
@@ -257,11 +200,12 @@ export class AttendanceViewController {
 	 */
 	init(config: AttendanceViewConfig): void {
 		this.config = config;
+		this.pdfService.init(() => this.config.getSelectorContext());
 		this.setupSignalR();
 	}
 
 	// #endregion
-	// #region Estudiantes (modo mes)
+	// #region Carga de estudiantes (modo mes)
 
 	/**
 	 * Cargar lista de estudiantes para el selector/grado actual.
@@ -359,6 +303,7 @@ export class AttendanceViewController {
 	onIngresosMonthChange(month: number): void {
 		this.ingresos.update((table) => ({ ...table, selectedMonth: month }));
 		this.config.onMonthChange();
+		this.syncSelectedYear();
 		this.reloadEstudianteIngresos();
 	}
 
@@ -366,6 +311,11 @@ export class AttendanceViewController {
 		this.salidas.update((table) => ({ ...table, selectedMonth: month }));
 		this.config.onMonthChange();
 		this.reloadEstudianteSalidas();
+	}
+
+	/** Sincroniza el año seleccionado en ingresos con el stats service */
+	private syncSelectedYear(): void {
+		this.statsService.setSelectedYear(this.ingresos().selectedYear);
 	}
 
 	private reloadEstudianteIngresos(): void {
@@ -459,241 +409,69 @@ export class AttendanceViewController {
 			)
 			.subscribe({
 				next: (response) => {
-					// ✅ Extraer estudiantes y estadísticas del response del backend
 					this.estudiantesDia.set(response.estudiantes);
-					this.estadisticasDia.set(response.estadisticas);
+					this.statsService.setEstadisticasDia(response.estadisticas);
 				},
 			});
 	}
 
 	// #endregion
-	// #region PDF
+	// #region PDF (delegados)
 
-	/** Ver PDF en nueva pestaña */
 	verPdfAsistenciaDia(): void {
-		const ctx = this.config.getSelectorContext();
-		if (!ctx) return;
-
-		this.downloadingPdf.set(true);
-
-		this.asistenciaService
-			.descargarPdfAsistenciaDia(ctx.gradoCodigo, ctx.seccion, this.pdfFecha())
-			.pipe(
-				takeUntilDestroyed(this.destroyRef),
-				finalize(() => this.downloadingPdf.set(false)),
-			)
-			.subscribe({
-				next: (blob) => viewBlobInNewTab(blob),
-			});
+		this.pdfService.verPdfAsistenciaDia(this.pdfFecha());
 	}
 
-	/** Descargar PDF directamente con nombre descriptivo */
 	descargarPdfAsistenciaDia(): void {
-		const ctx = this.config.getSelectorContext();
-		if (!ctx) return;
-
-		this.downloadingPdf.set(true);
-
-		this.asistenciaService
-			.descargarPdfAsistenciaDia(ctx.gradoCodigo, ctx.seccion, this.pdfFecha())
-			.pipe(
-				takeUntilDestroyed(this.destroyRef),
-				finalize(() => this.downloadingPdf.set(false)),
-			)
-			.subscribe({
-				next: (blob) => {
-					const fechaStr = this.pdfFecha().toISOString().split('T')[0];
-					downloadBlob(blob, `Asistencia_${ctx.grado}_${ctx.seccion}_${fechaStr}.pdf`);
-				},
-			});
+		this.pdfService.descargarPdfAsistenciaDia(this.pdfFecha());
 	}
 
-	/** Ver PDF mensual de un salón en nueva pestaña */
 	verPdfAsistenciaMes(): void {
 		const ctx = this.config.getSelectorContext();
 		if (!ctx) return;
-
-		this.downloadingPdf.set(true);
 		const { selectedMonth, selectedYear } = this.ingresos();
-
-		this.asistenciaService
-			.descargarPdfAsistenciaMes(ctx.gradoCodigo, ctx.seccion, selectedMonth, selectedYear)
-			.pipe(
-				takeUntilDestroyed(this.destroyRef),
-				finalize(() => this.downloadingPdf.set(false)),
-			)
-			.subscribe({
-				next: (blob) => viewBlobInNewTab(blob),
-			});
+		this.pdfService.verPdfAsistenciaMes(ctx.gradoCodigo, ctx.seccion, ctx.grado, selectedMonth, selectedYear);
 	}
 
-	/** Descargar PDF mensual de un salón con nombre descriptivo */
 	descargarPdfAsistenciaMes(): void {
 		const ctx = this.config.getSelectorContext();
 		if (!ctx) return;
-
-		this.downloadingPdf.set(true);
 		const { selectedMonth, selectedYear } = this.ingresos();
-
-		this.asistenciaService
-			.descargarPdfAsistenciaMes(ctx.gradoCodigo, ctx.seccion, selectedMonth, selectedYear)
-			.pipe(
-				takeUntilDestroyed(this.destroyRef),
-				finalize(() => this.downloadingPdf.set(false)),
-			)
-			.subscribe({
-				next: (blob) => {
-					const mes = selectedMonth.toString().padStart(2, '0');
-					downloadBlob(
-						blob,
-						`Asistencia_${ctx.grado}_${ctx.seccion}_${selectedYear}-${mes}.pdf`,
-					);
-				},
-			});
+		this.pdfService.descargarPdfAsistenciaMes(ctx.gradoCodigo, ctx.seccion, ctx.grado, selectedMonth, selectedYear);
 	}
 
-	/** Ver PDF por periodo (rango de meses) en nueva pestaña */
 	verPdfAsistenciaPeriodo(): void {
 		const ctx = this.config.getSelectorContext();
 		if (!ctx || !this.isPeriodoValid()) return;
-
-		this.downloadingPdf.set(true);
 		const mesI = this.periodoInicio();
 		const mesF = this.periodoFin();
 		const anio = this.ingresos().selectedYear;
-
-		this.asistenciaService
-			.descargarPdfAsistenciaPeriodo(ctx.gradoCodigo, ctx.seccion, mesI, anio, mesF, anio)
-			.pipe(
-				takeUntilDestroyed(this.destroyRef),
-				finalize(() => this.downloadingPdf.set(false)),
-			)
-			.subscribe({
-				next: (blob) => viewBlobInNewTab(blob),
-			});
+		this.pdfService.verPdfAsistenciaPeriodo(ctx.gradoCodigo, ctx.seccion, mesI, anio, mesF);
 	}
 
-	/** Descargar PDF por periodo (rango de meses) con nombre descriptivo */
 	descargarPdfAsistenciaPeriodo(): void {
 		const ctx = this.config.getSelectorContext();
 		if (!ctx || !this.isPeriodoValid()) return;
-
-		this.downloadingPdf.set(true);
 		const mesI = this.periodoInicio();
 		const mesF = this.periodoFin();
 		const anio = this.ingresos().selectedYear;
-
-		this.asistenciaService
-			.descargarPdfAsistenciaPeriodo(ctx.gradoCodigo, ctx.seccion, mesI, anio, mesF, anio)
-			.pipe(
-				takeUntilDestroyed(this.destroyRef),
-				finalize(() => this.downloadingPdf.set(false)),
-			)
-			.subscribe({
-				next: (blob) => {
-					const inicio = `${anio}-${mesI.toString().padStart(2, '0')}`;
-					const fin = `${anio}-${mesF.toString().padStart(2, '0')}`;
-					downloadBlob(
-						blob,
-						`Asistencia_${ctx.grado}_${ctx.seccion}_Periodo_${inicio}_a_${fin}.pdf`,
-					);
-				},
-			});
+		this.pdfService.descargarPdfAsistenciaPeriodo(ctx.gradoCodigo, ctx.seccion, ctx.grado, mesI, anio, mesF);
 	}
 
-	/** Ver PDF mensual de un salón usando mes/año derivados de fechaDia (modo día) */
 	verPdfSalonMes(): void {
-		const ctx = this.config.getSelectorContext();
-		if (!ctx) return;
-
-		this.downloadingPdf.set(true);
-		const fecha = this.fechaDia();
-		const mes = fecha.getMonth() + 1;
-		const anio = fecha.getFullYear();
-
-		this.asistenciaService
-			.descargarPdfAsistenciaMes(ctx.gradoCodigo, ctx.seccion, mes, anio)
-			.pipe(
-				takeUntilDestroyed(this.destroyRef),
-				finalize(() => this.downloadingPdf.set(false)),
-			)
-			.subscribe({
-				next: (blob) => viewBlobInNewTab(blob),
-			});
+		this.pdfService.verPdfSalonMes(this.fechaDia());
 	}
 
-	/** Descargar PDF mensual de un salón usando mes/año derivados de fechaDia (modo día) */
 	descargarPdfSalonMes(): void {
-		const ctx = this.config.getSelectorContext();
-		if (!ctx) return;
-
-		this.downloadingPdf.set(true);
-		const fecha = this.fechaDia();
-		const mes = fecha.getMonth() + 1;
-		const anio = fecha.getFullYear();
-
-		this.asistenciaService
-			.descargarPdfAsistenciaMes(ctx.gradoCodigo, ctx.seccion, mes, anio)
-			.pipe(
-				takeUntilDestroyed(this.destroyRef),
-				finalize(() => this.downloadingPdf.set(false)),
-			)
-			.subscribe({
-				next: (blob) => {
-					const mesStr = mes.toString().padStart(2, '0');
-					downloadBlob(
-						blob,
-						`Asistencia_${ctx.grado}_${ctx.seccion}_${anio}-${mesStr}.pdf`,
-					);
-				},
-			});
+		this.pdfService.descargarPdfSalonMes(this.fechaDia());
 	}
 
-	/** Ver PDF anual de un salón usando periodo ene-mesActual del año de fechaDia */
 	verPdfSalonAnio(): void {
-		const ctx = this.config.getSelectorContext();
-		if (!ctx) return;
-
-		this.downloadingPdf.set(true);
-		const anio = this.fechaDia().getFullYear();
-		const hoy = new Date();
-		const mesFin = anio === hoy.getFullYear() ? hoy.getMonth() + 1 : 12;
-
-		this.asistenciaService
-			.descargarPdfAsistenciaPeriodo(ctx.gradoCodigo, ctx.seccion, 1, anio, mesFin, anio)
-			.pipe(
-				takeUntilDestroyed(this.destroyRef),
-				finalize(() => this.downloadingPdf.set(false)),
-			)
-			.subscribe({
-				next: (blob) => viewBlobInNewTab(blob),
-			});
+		this.pdfService.verPdfSalonAnio(this.fechaDia());
 	}
 
-	/** Descargar PDF anual de un salón usando periodo ene-mesActual del año de fechaDia */
 	descargarPdfSalonAnio(): void {
-		const ctx = this.config.getSelectorContext();
-		if (!ctx) return;
-
-		this.downloadingPdf.set(true);
-		const anio = this.fechaDia().getFullYear();
-		const hoy = new Date();
-		const mesFin = anio === hoy.getFullYear() ? hoy.getMonth() + 1 : 12;
-
-		this.asistenciaService
-			.descargarPdfAsistenciaPeriodo(ctx.gradoCodigo, ctx.seccion, 1, anio, mesFin, anio)
-			.pipe(
-				takeUntilDestroyed(this.destroyRef),
-				finalize(() => this.downloadingPdf.set(false)),
-			)
-			.subscribe({
-				next: (blob) => {
-					downloadBlob(
-						blob,
-						`Asistencia_${ctx.grado}_${ctx.seccion}_Anio_${anio}.pdf`,
-					);
-				},
-			});
+		this.pdfService.descargarPdfSalonAnio(this.fechaDia());
 	}
 
 	// #endregion

@@ -126,13 +126,6 @@ export type RolTipoAdmin = AppUserRoleAdmin;
 export const ROLES_DISPONIBLES_ADMIN: RolTipoAdmin[] = APP_USER_ROLE_ADMIN_LIST;
 
 /**
- * Generic API response DTO.
- */
-export interface ApiResponse {
-	mensaje: string;
-}
-
-/**
  * Vistas stats DTO.
  */
 export interface VistasEstadisticas {

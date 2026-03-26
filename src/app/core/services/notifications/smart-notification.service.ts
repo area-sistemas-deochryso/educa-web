@@ -1,7 +1,7 @@
 import { Injectable, inject, signal, computed, PLATFORM_ID } from '@angular/core';
 import { isPlatformBrowser } from '@angular/common';
 import { logger } from '@core/helpers';
-import { IndexedDBService } from '@core/services/storage/indexed-db.service';
+import { SmartDataStorageService } from '@core/services/storage/smart-data-storage.service';
 import { StorageService } from '@core/services/storage';
 import { WalClockService } from '@core/services/wal/wal-clock.service';
 import { TimerManager } from '@core/services/destroy';
@@ -19,7 +19,7 @@ const CHECK_INTERVAL_MS = 5 * 60 * 1000;
 @Injectable({ providedIn: 'root' })
 export class SmartNotificationService {
 	// #region Dependencias
-	private readonly idb = inject(IndexedDBService);
+	private readonly smartDataStorage = inject(SmartDataStorageService);
 	private readonly storage = inject(StorageService);
 	private readonly walClock = inject(WalClockService);
 	private readonly platformId = inject(PLATFORM_ID);
@@ -87,7 +87,7 @@ export class SmartNotificationService {
 
 		this._horarios.set(snapshots);
 
-		await this.idb.setSmartData({
+		await this.smartDataStorage.setSmartData({
 			key: `${entityId}:horarios`,
 			entityId,
 			type: 'horarios',
@@ -111,7 +111,7 @@ export class SmartNotificationService {
 
 		this._actividades.set(merged);
 
-		await this.idb.setSmartData({
+		await this.smartDataStorage.setSmartData({
 			key: `${entityId}:actividades`,
 			entityId,
 			type: 'actividades',
@@ -137,7 +137,7 @@ export class SmartNotificationService {
 
 		this._calificaciones.set(calificaciones);
 
-		await this.idb.setSmartData({
+		await this.smartDataStorage.setSmartData({
 			key: `${entityId}:calificaciones`,
 			entityId,
 			type: 'calificaciones',
@@ -348,9 +348,9 @@ export class SmartNotificationService {
 
 		try {
 			const [horarios, actividades, calificaciones] = await Promise.all([
-				this.idb.getSmartData(entityId, 'horarios'),
-				this.idb.getSmartData(entityId, 'actividades'),
-				this.idb.getSmartData(entityId, 'calificaciones'),
+				this.smartDataStorage.getSmartData(entityId, 'horarios'),
+				this.smartDataStorage.getSmartData(entityId, 'actividades'),
+				this.smartDataStorage.getSmartData(entityId, 'calificaciones'),
 			]);
 
 			if (horarios) this._horarios.set(horarios.data as HorarioSnapshot[]);
@@ -363,7 +363,7 @@ export class SmartNotificationService {
 
 	private async cleanup(): Promise<void> {
 		try {
-			await this.idb.cleanOldSmartData(this.getWeekStart());
+			await this.smartDataStorage.cleanOldSmartData(this.getWeekStart());
 		} catch (e) {
 			logger.error('[SmartNotification] Error cleaning old data:', e);
 		}

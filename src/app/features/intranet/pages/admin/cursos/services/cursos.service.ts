@@ -5,7 +5,8 @@ import { Observable } from 'rxjs';
 
 import { environment } from '@config/environment';
 import { PaginatedResponse } from '@data/repositories';
-import { Curso, CrearCursoRequest, ActualizarCursoRequest, ApiResponse, CursosEstadisticas } from '../models';
+import { Curso, CrearCursoRequest, ActualizarCursoRequest, CursosEstadisticas } from '../models';
+import { ApiResponse } from '@shared/models';
 
 // #endregion
 // #region Implementation

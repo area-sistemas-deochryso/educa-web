@@ -2,7 +2,7 @@ import { Injectable, inject, signal, computed, DestroyRef, effect } from '@angul
 import { takeUntilDestroyed, toSignal } from '@angular/core/rxjs-interop';
 import { tap, catchError, of, firstValueFrom, timer, Subject, takeUntil } from 'rxjs';
 
-import { logger } from '@core/helpers';
+import { logger, isJwtExpired } from '@core/helpers';
 import { AuthService } from '../auth';
 import { StorageService } from '../storage';
 import { PermisosService } from './permisos.service';
@@ -12,21 +12,6 @@ import { PermisosUsuarioResultado } from './permisos.models';
  * Interval in ms to check for expired permissions token.
  */
 const PERMISOS_CHECK_INTERVAL_MS = 5 * 60 * 1000;
-
-/**
- * Decode JWT exp and check if it is expired.
- *
- * @param token JWT token.
- * @returns True if expired or invalid.
- */
-function isJwtExpired(token: string): boolean {
-	try {
-		const payload = JSON.parse(atob(token.split('.')[1]));
-		return Date.now() / 1000 > payload.exp;
-	} catch {
-		return true;
-	}
-}
 
 /**
  * User permissions service.

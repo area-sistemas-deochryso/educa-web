@@ -3,654 +3,476 @@ import { computed, inject, Injectable, signal } from '@angular/core';
 import { AuthStore } from '@core/store';
 import { isAdminRole } from '@shared/models';
 import { CursoListaDto, CursoOption, CursosPorNivel } from '../models/curso.interface';
-import { buildWeeklyBlocks } from '../helpers/horario-time.utils';
 import { filterSalonesDisponibles } from '../helpers/horario-conflict.utils';
-import { validateHorarioForm, validateHoraInicio, validateHoraFin } from '../helpers/horario-form.utils';
 import { mapSalonesToOptions, mapCursosToOptions, groupCursosByNivel, mapProfesToOptions } from '../helpers/horario-mapping.utils';
 import {
-  type DiaSemana,
-  type HorarioDetalleResponseDto,
-  type HorarioFormData,
-  type HorarioResponseDto,
-  type HorariosEstadisticas,
-  type HorarioVistaType,
+	type HorarioDetalleResponseDto,
+	type HorarioFormData,
+	type HorarioResponseDto,
+	type HorariosEstadisticas,
+	type HorarioVistaType,
+	type DiaSemana,
 } from '../models/horario.interface';
 import { ProfesorListDto, ProfesorOption } from '../models/profesor.interface';
 import { SalonListDto, SalonOption } from '../models/salon.interface';
-
-interface HorariosStoreState {
-  // #region Datos
-  horarios: HorarioResponseDto[];
-  horarioDetalle: HorarioDetalleResponseDto | null;
-  estadisticas: HorariosEstadisticas | null;
-
-  // #endregion
-  // #region Opciones para dropdowns
-  salonesDisponibles: SalonListDto[];
-  cursosDisponibles: CursoListaDto[];
-  profesoresDisponibles: ProfesorListDto[];
-
-  // #endregion
-  // #region Estados de carga y error
-  error: string | null;
-  loading: boolean;
-  statsLoading: boolean;
-  detailLoading: boolean;
-  optionsLoading: boolean; // Carga de salones/cursos
-
-  // Performance optimization - Skeleton screens
-  statsReady: boolean;
-  tableReady: boolean;
-
-  // #endregion
-  // #region UI State
-  dialogVisible: boolean;
-  detailDrawerVisible: boolean;
-  cursoDialogVisible: boolean; // Modal de selección de cursos
-  wizardStep: number; // 0: Datos básicos, 1: Asignar profesor, 2: Asignar estudiantes
-  vistaActual: HorarioVistaType; // Vista activa
-
-  // #endregion
-  // #region Formulario
-  formData: HorarioFormData;
-  editingId: number | null;
-
-  // #endregion
-  // #region Filtros
-  filtroSalonId: number | null;
-  filtroProfesorId: number | null;
-  filtroDiaSemana: DiaSemana | null;
-  filtroEstadoActivo: boolean | null;
-
-  // #endregion
-  // #region Paginación
-  page: number;
-  pageSize: number;
-  totalRecords: number;
-  // #endregion
-}
-
-const initialFormData: HorarioFormData = {
-  diaSemana: null,
-  horaInicio: '07:00',
-  horaFin: '08:00',
-  salonId: null,
-  cursoId: null,
-  profesorId: null,
-  estudianteIds: null,
-};
-
-const initialState: HorariosStoreState = {
-  horarios: [],
-  horarioDetalle: null,
-  estadisticas: null,
-  salonesDisponibles: [],
-  cursosDisponibles: [],
-  profesoresDisponibles: [],
-  error: null,
-  loading: false,
-  statsLoading: false,
-  detailLoading: false,
-  optionsLoading: false,
-  statsReady: false,
-  tableReady: false,
-  dialogVisible: false,
-  detailDrawerVisible: false,
-  cursoDialogVisible: false,
-  wizardStep: 0,
-  vistaActual: 'lista', // Vista por defecto es lista
-  formData: { ...initialFormData },
-  editingId: null,
-  filtroSalonId: null,
-  filtroProfesorId: null,
-  filtroDiaSemana: null,
-  filtroEstadoActivo: null,
-  page: 1,
-  pageSize: 10,
-  totalRecords: 0,
-};
+import { HorariosFormStore } from './horarios-form.store';
+import { HorariosFilterStore } from './horarios-filter.store';
 
 @Injectable({ providedIn: 'root' })
 export class HorariosStore {
-  private authStore = inject(AuthStore);
-
-  // #region Estado privado
-  private readonly _state = signal<HorariosStoreState>(initialState);
-
-  // #endregion
-  // #region Lecturas públicas (readonly)
-  readonly horarios = computed(() => this._state().horarios);
-  readonly horarioDetalle = computed(() => this._state().horarioDetalle);
-  readonly estadisticas = computed(() => this._state().estadisticas);
-  readonly error = computed(() => this._state().error);
-  readonly loading = computed(() => this._state().loading);
-  readonly statsLoading = computed(() => this._state().statsLoading);
-  readonly detailLoading = computed(() => this._state().detailLoading);
-  readonly dialogVisible = computed(() => this._state().dialogVisible);
-  readonly detailDrawerVisible = computed(() => this._state().detailDrawerVisible);
-  readonly wizardStep = computed(() => this._state().wizardStep);
-  readonly formData = computed(() => this._state().formData);
-  readonly editingId = computed(() => this._state().editingId);
-  readonly vistaActual = computed(() => this._state().vistaActual);
-  readonly optionsLoading = computed(() => this._state().optionsLoading);
-  readonly statsReady = computed(() => this._state().statsReady);
-  readonly tableReady = computed(() => this._state().tableReady);
-  readonly page = computed(() => this._state().page);
-  readonly pageSize = computed(() => this._state().pageSize);
-  readonly totalRecords = computed(() => this._state().totalRecords);
-
-  // #endregion
-  // #region Usuario actual
-  readonly currentUser = this.authStore.user;
-
-  /** true si el usuario es Director o Asistente Administrativo */
-  readonly isAdmin = computed(() => isAdminRole(this.currentUser()?.rol));
-
-  /** ID del profesor logueado (null si no es profesor) */
-  readonly currentProfesorId = computed(() => {
-    const user = this.currentUser();
-    if (!user || user.rol !== 'Profesor') return null;
-    return user.entityId;
-  });
-
-  // #endregion
-  // #region Computed - Opciones de dropdowns (memoización intermedia)
-
-  /** Salones activos: solo depende de salonesDisponibles, no de formData/horarios */
-  private readonly activeSalones = computed(() =>
-    this._state().salonesDisponibles.filter((s) => s.estado),
-  );
-
-  /** Mapeo de salones activos a opciones de dropdown (memoizado) */
-  private readonly activeSalonesAsOptions = computed<SalonOption[]>(() =>
-    mapSalonesToOptions(this.activeSalones()),
-  );
-
-  /**
-   * Opciones de salones disponibles (sin conflicto de horario).
-   * Si no hay día/hora seleccionados, devuelve todos los activos (memoizado).
-   * Si hay día/hora, filtra por conflicto de horario.
-   */
-  readonly salonesOptions = computed<SalonOption[]>(() => {
-    const formData = this.formData();
-
-    // Sin día/hora → devolver opciones activas ya memoizadas
-    if (!formData.diaSemana || !formData.horaInicio || !formData.horaFin) {
-      return this.activeSalonesAsOptions();
-    }
-
-    // Con día/hora → filtrar por conflicto y mapear
-    const disponibles = filterSalonesDisponibles(
-      this.activeSalones(),
-      this.horarios(),
-      formData,
-      this.editingId(),
-    );
-
-    return mapSalonesToOptions(disponibles);
-  });
-
-  /** Cursos activos: solo depende de cursosDisponibles */
-  private readonly activeCursos = computed(() =>
-    this._state().cursosDisponibles.filter((c) => c.estado),
-  );
-
-  /**
-   * Opciones de cursos disponibles (activos) con niveles educativos
-   */
-  readonly cursosOptions = computed<CursoOption[]>(() =>
-    mapCursosToOptions(this.activeCursos()),
-  );
-
-  /**
-   * Cursos agrupados por nivel educativo (Inicial, Primaria, Secundaria)
-   */
-  readonly cursosPorNivel = computed<CursosPorNivel>(() =>
-    groupCursosByNivel(this.cursosOptions()),
-  );
-
-  /** Profesores activos: solo depende de profesoresDisponibles */
-  private readonly activeProfesores = computed(() =>
-    this._state().profesoresDisponibles.filter((p) => p.estado),
-  );
-
-  /**
-   * Opciones de profesores disponibles (activos)
-   */
-  readonly profesoresOptions = computed<ProfesorOption[]>(() =>
-    mapProfesToOptions(this.activeProfesores()),
-  );
-
-  // #endregion
-  // #region Computed - Filtros
-  readonly horariosFiltrados = computed(() => {
-    const horarios = this.horarios();
-    const salonId = this._state().filtroSalonId;
-    const profesorId = this._state().filtroProfesorId;
-    const diaSemana = this._state().filtroDiaSemana;
-    const estadoActivo = this._state().filtroEstadoActivo;
-    const vistaActual = this._state().vistaActual;
-
-    return horarios.filter((h) => {
-      if (salonId !== null && h.salonId !== salonId) return false;
-      if (profesorId !== null && h.profesorId !== profesorId) return false;
-      // Si está en vista semanal, no filtrar por día
-      if (vistaActual !== 'semanal' && diaSemana !== null && h.diaSemana !== diaSemana) return false;
-      if (estadoActivo !== null && h.estado !== estadoActivo) return false;
-      return true;
-    });
-  });
-
-  /**
-   * La vista semanal solo está disponible cuando hay un salón o profesor seleccionado
-   */
-  readonly vistaSemanalHabilitada = computed(() => {
-    const salonId = this._state().filtroSalonId;
-    const profesorId = this._state().filtroProfesorId;
-    return salonId !== null || profesorId !== null;
-  });
-
-  // #endregion
-  // #region Computed - Vista Semanal
-  readonly horariosSemanales = computed(() => buildWeeklyBlocks(this.horariosFiltrados()));
-
-  // #endregion
-  // #region Computed - Estadísticas derivadas
-  readonly totalHorarios = computed(() => this.horarios().length);
-  readonly horariosActivos = computed(() => this.horarios().filter((h) => h.estado).length);
-  readonly horariosInactivos = computed(() => this.horarios().filter((h) => !h.estado).length);
-  readonly horariosSinProfesor = computed(() =>
-    this.horarios().filter((h) => h.profesorId === null).length
-  );
-
-  // #endregion
-  // #region Computed - Validaciones de formulario
-  readonly formValid = computed(() =>
-    validateHorarioForm(this.formData(), this.wizardStep()),
-  );
-
-  readonly horaInicioError = computed(() => {
-    const data = this.formData();
-    return validateHoraInicio(data.horaInicio, data.horaFin);
-  });
-
-  readonly horaFinError = computed(() => {
-    const data = this.formData();
-    return validateHoraFin(data.horaFin, data.horaInicio);
-  });
-
-  // #endregion
-  // #region Computed - Estados de UI
-  readonly isCreating = computed(() => this.editingId() === null);
-  readonly isEditing = computed(() => this.editingId() !== null);
-  readonly canGoNextStep = computed(() => this.formValid() && this.wizardStep() < 2);
-  readonly canGoPrevStep = computed(() => this.wizardStep() > 0);
-  readonly isLastStep = computed(() => this.wizardStep() === 2);
-
-  /**
-   * El filtro de día está habilitado solo en vista lista
-   */
-  readonly filtroDiaSemanaHabilitado = computed(() => this.vistaActual() === 'lista');
-
-  // #endregion
-  // #region Sub-ViewModels (agrupados por responsabilidad)
-
-  /** Datos de la tabla y detalle */
-  readonly dataVm = computed(() => ({
-    horarios: this.horarios(),
-    horariosFiltrados: this.horariosFiltrados(),
-    horariosSemanales: this.horariosSemanales(),
-    horarioDetalle: this.horarioDetalle(),
-    estadisticas: this.estadisticas(),
-    totalHorarios: this.totalHorarios(),
-    horariosActivos: this.horariosActivos(),
-    horariosInactivos: this.horariosInactivos(),
-    horariosSinProfesor: this.horariosSinProfesor(),
-    isEmpty: this.horarios().length === 0,
-  }));
-
-  /** Estado de UI: loading, dialogs, vista, filtros */
-  readonly uiVm = computed(() => ({
-    loading: this.loading(),
-    error: this.error(),
-    statsLoading: this.statsLoading(),
-    detailLoading: this.detailLoading(),
-    optionsLoading: this.optionsLoading(),
-    statsReady: this.statsReady(),
-    tableReady: this.tableReady(),
-    dialogVisible: this.dialogVisible(),
-    detailDrawerVisible: this.detailDrawerVisible(),
-    cursoDialogVisible: this._state().cursoDialogVisible,
-    vistaActual: this.vistaActual(),
-    vistaSemanalHabilitada: this.vistaSemanalHabilitada(),
-    filtroDiaSemanaHabilitado: this.filtroDiaSemanaHabilitado(),
-    currentUser: this.currentUser(),
-    isAdmin: this.isAdmin(),
-    currentProfesorId: this.currentProfesorId(),
-  }));
-
-  /** Formulario wizard */
-  readonly formVm = computed(() => ({
-    formData: this.formData(),
-    editingId: this.editingId(),
-    wizardStep: this.wizardStep(),
-    isCreating: this.isCreating(),
-    isEditing: this.isEditing(),
-    formValid: this.formValid(),
-    horaInicioError: this.horaInicioError(),
-    horaFinError: this.horaFinError(),
-    canGoNextStep: this.canGoNextStep(),
-    canGoPrevStep: this.canGoPrevStep(),
-    isLastStep: this.isLastStep(),
-  }));
-
-  /** Opciones para dropdowns y filtros */
-  readonly optionsVm = computed(() => ({
-    salonesOptions: this.salonesOptions(),
-    cursosOptions: this.cursosOptions(),
-    cursosPorNivel: this.cursosPorNivel(),
-    profesoresOptions: this.profesoresOptions(),
-    filtroSalonId: this._state().filtroSalonId,
-    filtroProfesorId: this._state().filtroProfesorId,
-    filtroDiaSemana: this._state().filtroDiaSemana,
-    filtroEstadoActivo: this._state().filtroEstadoActivo,
-    hasFilters:
-      this._state().filtroSalonId !== null ||
-      this._state().filtroProfesorId !== null ||
-      this._state().filtroDiaSemana !== null ||
-      this._state().filtroEstadoActivo !== null,
-    page: this.page(),
-    pageSize: this.pageSize(),
-    totalRecords: this.totalRecords(),
-  }));
-
-  // #endregion
-  // #region ViewModel consolidado (compone sub-VMs)
-  readonly vm = computed(() => ({
-    ...this.dataVm(),
-    ...this.uiVm(),
-    ...this.formVm(),
-    ...this.optionsVm(),
-  }));
-
-  // #endregion
-  // #region Comandos de mutación - Lista
-  setHorarios(horarios: HorarioResponseDto[]): void {
-    this._state.update((s) => ({ ...s, horarios }));
-  }
-
-  // #endregion
-  // #region Comandos de mutación - Opciones
-  setSalonesDisponibles(salones: SalonListDto[]): void {
-    this._state.update((s) => ({ ...s, salonesDisponibles: salones }));
-  }
-
-  setCursosDisponibles(cursos: CursoListaDto[]): void {
-    this._state.update((s) => ({ ...s, cursosDisponibles: cursos }));
-  }
-
-  setProfesoresDisponibles(profesores: ProfesorListDto[]): void {
-    this._state.update((s) => ({ ...s, profesoresDisponibles: profesores }));
-  }
-
-  setOptionsLoading(loading: boolean): void {
-    this._state.update((s) => ({ ...s, optionsLoading: loading }));
-  }
-
-  /**
-   * Mutación quirúrgica: Actualizar un horario específico sin refetch
-   */
-  updateHorario(id: number, updates: Partial<HorarioResponseDto>): void {
-    this._state.update((s) => ({
-      ...s,
-      horarios: s.horarios.map((h) => (h.id === id ? { ...h, ...updates } : h)),
-    }));
-  }
-
-  /**
-   * Mutación quirúrgica: Toggle estado de un horario
-   */
-  toggleHorarioEstado(id: number): void {
-    this._state.update((s) => ({
-      ...s,
-      horarios: s.horarios.map((h) => (h.id === id ? { ...h, estado: !h.estado } : h)),
-    }));
-  }
-
-  /**
-   * Mutación quirúrgica: Eliminar un horario
-   */
-  removeHorario(id: number): void {
-    this._state.update((s) => ({
-      ...s,
-      horarios: s.horarios.filter((h) => h.id !== id),
-    }));
-  }
-
-  /**
-   * Mutación quirúrgica: Re-agregar un horario (rollback de delete)
-   */
-  addHorario(horario: HorarioResponseDto): void {
-    this._state.update((s) => ({
-      ...s,
-      horarios: [horario, ...s.horarios],
-    }));
-  }
-
-  // #endregion
-  // #region Comandos de mutación - Detalle
-  setHorarioDetalle(detalle: HorarioDetalleResponseDto | null): void {
-    this._state.update((s) => ({ ...s, horarioDetalle: detalle }));
-  }
-
-  /**
-   * Mutación quirúrgica: quitar profesor del detalle local
-   */
-  clearDetalleProfesor(): void {
-    this._state.update((s) => {
-      if (!s.horarioDetalle) return s;
-      return {
-        ...s,
-        horarioDetalle: {
-          ...s.horarioDetalle,
-          profesorId: null,
-          profesorNombreCompleto: null,
-          profesorDni: null,
-        },
-      };
-    });
-  }
-
-  /**
-   * Mutación quirúrgica: quitar un estudiante del detalle local
-   */
-  removeEstudianteFromDetalle(estudianteId: number): void {
-    this._state.update((s) => {
-      if (!s.horarioDetalle) return s;
-      const estudiantes = s.horarioDetalle.estudiantes.filter((e) => e.id !== estudianteId);
-      return {
-        ...s,
-        horarioDetalle: {
-          ...s.horarioDetalle,
-          estudiantes,
-          cantidadEstudiantes: estudiantes.length,
-        },
-      };
-    });
-  }
-
-  // #endregion
-  // #region Comandos de mutación - Estadísticas
-  setEstadisticas(estadisticas: HorariosEstadisticas | null): void {
-    this._state.update((s) => ({ ...s, estadisticas }));
-  }
-
-  incrementarEstadistica(campo: keyof HorariosEstadisticas, delta: number): void {
-    this._state.update((s) => {
-      if (!s.estadisticas) return s;
-      return {
-        ...s,
-        estadisticas: {
-          ...s.estadisticas,
-          [campo]: (s.estadisticas[campo] || 0) + delta,
-        },
-      };
-    });
-  }
-
-  // #endregion
-  // #region Comandos de mutación - Error
-  setError(error: string | null): void {
-    this._state.update((s) => ({ ...s, error }));
-  }
-
-  clearError(): void {
-    this._state.update((s) => ({ ...s, error: null }));
-  }
-
-  // #endregion
-  // #region Comandos de mutación - Loading
-  setLoading(loading: boolean): void {
-    this._state.update((s) => ({ ...s, loading }));
-  }
-
-  setStatsLoading(loading: boolean): void {
-    this._state.update((s) => ({ ...s, statsLoading: loading }));
-  }
-
-  setDetailLoading(loading: boolean): void {
-    this._state.update((s) => ({ ...s, detailLoading: loading }));
-  }
-
-  setStatsReady(ready: boolean): void {
-    this._state.update((s) => ({ ...s, statsReady: ready }));
-  }
-
-  setTableReady(ready: boolean): void {
-    this._state.update((s) => ({ ...s, tableReady: ready }));
-  }
-
-  // #endregion
-  // #region Comandos de mutación - UI State
-  openDialog(): void {
-    this._state.update((s) => ({ ...s, dialogVisible: true }));
-  }
-
-  closeDialog(): void {
-    this._state.update((s) => ({
-      ...s,
-      dialogVisible: false,
-      wizardStep: 0,
-      formData: { ...initialFormData },
-      editingId: null,
-    }));
-  }
-
-  openDetailDrawer(): void {
-    this._state.update((s) => ({ ...s, detailDrawerVisible: true }));
-  }
-
-  closeDetailDrawer(): void {
-    this._state.update((s) => ({
-      ...s,
-      detailDrawerVisible: false,
-      horarioDetalle: null,
-    }));
-  }
-
-  openCursoDialog(): void {
-    this._state.update((s) => ({ ...s, cursoDialogVisible: true }));
-  }
-
-  closeCursoDialog(): void {
-    this._state.update((s) => ({ ...s, cursoDialogVisible: false }));
-  }
-
-  setVistaActual(vista: 'semanal' | 'lista'): void {
-    this._state.update((s) => ({
-      ...s,
-      vistaActual: vista,
-      // Si cambia a vista semanal, limpiar filtro de día
-      filtroDiaSemana: vista === 'semanal' ? null : s.filtroDiaSemana,
-    }));
-  }
-
-  // #endregion
-  // #region Comandos de mutación - Wizard
-  nextStep(): void {
-    this._state.update((s) => ({
-      ...s,
-      wizardStep: Math.min(s.wizardStep + 1, 2),
-    }));
-  }
-
-  prevStep(): void {
-    this._state.update((s) => ({
-      ...s,
-      wizardStep: Math.max(s.wizardStep - 1, 0),
-    }));
-  }
-
-  resetWizard(): void {
-    this._state.update((s) => ({
-      ...s,
-      wizardStep: 0,
-    }));
-  }
-
-  // #endregion
-  // #region Comandos de mutación - Formulario
-  setFormData(data: Partial<HorarioFormData>): void {
-    this._state.update((s) => ({
-      ...s,
-      formData: { ...s.formData, ...data },
-    }));
-  }
-
-  clearFormData(): void {
-    this._state.update((s) => ({
-      ...s,
-      formData: { ...initialFormData },
-      editingId: null,
-    }));
-  }
-
-  setEditingId(id: number | null): void {
-    this._state.update((s) => ({ ...s, editingId: id }));
-  }
-
-  // #endregion
-  // #region Comandos de mutación - Filtros
-  setFiltroSalon(salonId: number | null): void {
-    this._state.update((s) => ({ ...s, filtroSalonId: salonId }));
-  }
-
-  setFiltroProfesor(profesorId: number | null): void {
-    this._state.update((s) => ({ ...s, filtroProfesorId: profesorId }));
-  }
-
-  setFiltroDiaSemana(diaSemana: DiaSemana | null): void {
-    this._state.update((s) => ({ ...s, filtroDiaSemana: diaSemana }));
-  }
-
-  setFiltroEstadoActivo(estadoActivo: boolean | null): void {
-    this._state.update((s) => ({ ...s, filtroEstadoActivo: estadoActivo }));
-  }
-
-  clearFiltros(): void {
-    this._state.update((s) => ({
-      ...s,
-      filtroSalonId: null,
-      filtroProfesorId: null,
-      filtroDiaSemana: null,
-      filtroEstadoActivo: null,
-      page: 1,
-    }));
-  }
-
-  setPaginationData(page: number, pageSize: number, totalRecords: number): void {
-    this._state.update((s) => ({ ...s, page, pageSize, totalRecords }));
-  }
-
-  // #endregion
+	private authStore = inject(AuthStore);
+	private formStore = inject(HorariosFormStore);
+	private filterStore = inject(HorariosFilterStore);
+
+	// #region Estado privado - Datos
+	private readonly _horarios = signal<HorarioResponseDto[]>([]);
+	private readonly _horarioDetalle = signal<HorarioDetalleResponseDto | null>(null);
+	private readonly _estadisticas = signal<HorariosEstadisticas | null>(null);
+	// #endregion
+
+	// #region Estado privado - Opciones para dropdowns
+	private readonly _salonesDisponibles = signal<SalonListDto[]>([]);
+	private readonly _cursosDisponibles = signal<CursoListaDto[]>([]);
+	private readonly _profesoresDisponibles = signal<ProfesorListDto[]>([]);
+	// #endregion
+
+	// #region Estado privado - Loading
+	private readonly _error = signal<string | null>(null);
+	private readonly _loading = signal(false);
+	private readonly _statsLoading = signal(false);
+	private readonly _detailLoading = signal(false);
+	private readonly _optionsLoading = signal(false);
+	private readonly _statsReady = signal(false);
+	private readonly _tableReady = signal(false);
+	// #endregion
+
+	// #region Lecturas públicas - Datos
+	readonly horarios = this._horarios.asReadonly();
+	readonly horarioDetalle = this._horarioDetalle.asReadonly();
+	readonly estadisticas = this._estadisticas.asReadonly();
+	// #endregion
+
+	// #region Lecturas públicas - Loading
+	readonly error = this._error.asReadonly();
+	readonly loading = this._loading.asReadonly();
+	readonly statsLoading = this._statsLoading.asReadonly();
+	readonly detailLoading = this._detailLoading.asReadonly();
+	readonly optionsLoading = this._optionsLoading.asReadonly();
+	readonly statsReady = this._statsReady.asReadonly();
+	readonly tableReady = this._tableReady.asReadonly();
+	// #endregion
+
+	// #region Lecturas delegadas - Form
+	readonly formData = this.formStore.formData;
+	readonly editingId = this.formStore.editingId;
+	readonly wizardStep = this.formStore.wizardStep;
+	readonly dialogVisible = this.formStore.dialogVisible;
+	readonly detailDrawerVisible = this.formStore.detailDrawerVisible;
+	readonly formValid = this.formStore.formValid;
+	readonly horaInicioError = this.formStore.horaInicioError;
+	readonly horaFinError = this.formStore.horaFinError;
+	readonly isCreating = this.formStore.isCreating;
+	readonly isEditing = this.formStore.isEditing;
+	readonly canGoNextStep = this.formStore.canGoNextStep;
+	readonly canGoPrevStep = this.formStore.canGoPrevStep;
+	readonly isLastStep = this.formStore.isLastStep;
+	// #endregion
+
+	// #region Lecturas delegadas - Filter
+	readonly vistaActual = this.filterStore.vistaActual;
+	readonly horariosFiltrados = this.filterStore.horariosFiltrados;
+	readonly horariosSemanales = this.filterStore.horariosSemanales;
+	readonly vistaSemanalHabilitada = this.filterStore.vistaSemanalHabilitada;
+	readonly filtroDiaSemanaHabilitado = this.filterStore.filtroDiaSemanaHabilitado;
+	readonly page = this.filterStore.page;
+	readonly pageSize = this.filterStore.pageSize;
+	readonly totalRecords = this.filterStore.totalRecords;
+	// #endregion
+
+	// #region Usuario actual
+	readonly currentUser = this.authStore.user;
+
+	/** true si el usuario es Director o Asistente Administrativo */
+	readonly isAdmin = computed(() => isAdminRole(this.currentUser()?.rol));
+
+	/** ID del profesor logueado (null si no es profesor) */
+	readonly currentProfesorId = computed(() => {
+		const user = this.currentUser();
+		if (!user || user.rol !== 'Profesor') return null;
+		return user.entityId;
+	});
+	// #endregion
+
+	// #region Computed - Opciones de dropdowns (memoización intermedia)
+
+	/** Salones activos: solo depende de salonesDisponibles, no de formData/horarios */
+	private readonly activeSalones = computed(() =>
+		this._salonesDisponibles().filter((s) => s.estado),
+	);
+
+	/** Mapeo de salones activos a opciones de dropdown (memoizado) */
+	private readonly activeSalonesAsOptions = computed<SalonOption[]>(() =>
+		mapSalonesToOptions(this.activeSalones()),
+	);
+
+	/**
+	 * Opciones de salones disponibles (sin conflicto de horario).
+	 * Si no hay día/hora seleccionados, devuelve todos los activos (memoizado).
+	 * Si hay día/hora, filtra por conflicto de horario.
+	 */
+	readonly salonesOptions = computed<SalonOption[]>(() => {
+		const formData = this.formData();
+
+		// Sin día/hora -> devolver opciones activas ya memoizadas
+		if (!formData.diaSemana || !formData.horaInicio || !formData.horaFin) {
+			return this.activeSalonesAsOptions();
+		}
+
+		// Con día/hora -> filtrar por conflicto y mapear
+		const disponibles = filterSalonesDisponibles(
+			this.activeSalones(),
+			this._horarios(),
+			formData,
+			this.editingId(),
+		);
+
+		return mapSalonesToOptions(disponibles);
+	});
+
+	/** Cursos activos: solo depende de cursosDisponibles */
+	private readonly activeCursos = computed(() =>
+		this._cursosDisponibles().filter((c) => c.estado),
+	);
+
+	/** Opciones de cursos disponibles (activos) con niveles educativos */
+	readonly cursosOptions = computed<CursoOption[]>(() =>
+		mapCursosToOptions(this.activeCursos()),
+	);
+
+	/** Cursos agrupados por nivel educativo (Inicial, Primaria, Secundaria) */
+	readonly cursosPorNivel = computed<CursosPorNivel>(() =>
+		groupCursosByNivel(this.cursosOptions()),
+	);
+
+	/** Profesores activos: solo depende de profesoresDisponibles */
+	private readonly activeProfesores = computed(() =>
+		this._profesoresDisponibles().filter((p) => p.estado),
+	);
+
+	/** Opciones de profesores disponibles (activos) */
+	readonly profesoresOptions = computed<ProfesorOption[]>(() =>
+		mapProfesToOptions(this.activeProfesores()),
+	);
+	// #endregion
+
+	// #region Computed - Estadísticas derivadas
+	readonly totalHorarios = computed(() => this._horarios().length);
+	readonly horariosActivos = computed(() => this._horarios().filter((h) => h.estado).length);
+	readonly horariosInactivos = computed(() => this._horarios().filter((h) => !h.estado).length);
+	readonly horariosSinProfesor = computed(() =>
+		this._horarios().filter((h) => h.profesorId === null).length,
+	);
+	// #endregion
+
+	// #region Sub-ViewModels (agrupados por responsabilidad)
+
+	/** Datos de la tabla y detalle */
+	readonly dataVm = computed(() => ({
+		horarios: this._horarios(),
+		horariosFiltrados: this.horariosFiltrados(),
+		horariosSemanales: this.horariosSemanales(),
+		horarioDetalle: this._horarioDetalle(),
+		estadisticas: this._estadisticas(),
+		totalHorarios: this.totalHorarios(),
+		horariosActivos: this.horariosActivos(),
+		horariosInactivos: this.horariosInactivos(),
+		horariosSinProfesor: this.horariosSinProfesor(),
+		isEmpty: this._horarios().length === 0,
+	}));
+
+	/** Estado de UI: loading, dialogs, vista, filtros */
+	readonly uiVm = computed(() => ({
+		loading: this._loading(),
+		error: this._error(),
+		statsLoading: this._statsLoading(),
+		detailLoading: this._detailLoading(),
+		optionsLoading: this._optionsLoading(),
+		statsReady: this._statsReady(),
+		tableReady: this._tableReady(),
+		dialogVisible: this.formStore.dialogVisible(),
+		detailDrawerVisible: this.formStore.detailDrawerVisible(),
+		cursoDialogVisible: this.formStore.cursoDialogVisible(),
+		vistaActual: this.filterStore.vistaActual(),
+		vistaSemanalHabilitada: this.filterStore.vistaSemanalHabilitada(),
+		filtroDiaSemanaHabilitado: this.filterStore.filtroDiaSemanaHabilitado(),
+		currentUser: this.currentUser(),
+		isAdmin: this.isAdmin(),
+		currentProfesorId: this.currentProfesorId(),
+	}));
+
+	/** Formulario wizard */
+	readonly formVm = computed(() => ({
+		formData: this.formStore.formData(),
+		editingId: this.formStore.editingId(),
+		wizardStep: this.formStore.wizardStep(),
+		isCreating: this.formStore.isCreating(),
+		isEditing: this.formStore.isEditing(),
+		formValid: this.formStore.formValid(),
+		horaInicioError: this.formStore.horaInicioError(),
+		horaFinError: this.formStore.horaFinError(),
+		canGoNextStep: this.formStore.canGoNextStep(),
+		canGoPrevStep: this.formStore.canGoPrevStep(),
+		isLastStep: this.formStore.isLastStep(),
+	}));
+
+	/** Opciones para dropdowns y filtros */
+	readonly optionsVm = computed(() => ({
+		salonesOptions: this.salonesOptions(),
+		cursosOptions: this.cursosOptions(),
+		cursosPorNivel: this.cursosPorNivel(),
+		profesoresOptions: this.profesoresOptions(),
+		filtroSalonId: this.filterStore.filtroSalonId(),
+		filtroProfesorId: this.filterStore.filtroProfesorId(),
+		filtroDiaSemana: this.filterStore.filtroDiaSemana(),
+		filtroEstadoActivo: this.filterStore.filtroEstadoActivo(),
+		hasFilters: this.filterStore.hasFilters(),
+		page: this.filterStore.page(),
+		pageSize: this.filterStore.pageSize(),
+		totalRecords: this.filterStore.totalRecords(),
+	}));
+	// #endregion
+
+	// #region ViewModel consolidado (compone sub-VMs)
+	readonly vm = computed(() => ({
+		...this.dataVm(),
+		...this.uiVm(),
+		...this.formVm(),
+		...this.optionsVm(),
+	}));
+	// #endregion
+
+	// #region Comandos - Lista
+	setHorarios(horarios: HorarioResponseDto[]): void {
+		this._horarios.set(horarios);
+		this.syncHorariosToFilter();
+	}
+	// #endregion
+
+	// #region Comandos - Opciones
+	setSalonesDisponibles(salones: SalonListDto[]): void {
+		this._salonesDisponibles.set(salones);
+	}
+
+	setCursosDisponibles(cursos: CursoListaDto[]): void {
+		this._cursosDisponibles.set(cursos);
+	}
+
+	setProfesoresDisponibles(profesores: ProfesorListDto[]): void {
+		this._profesoresDisponibles.set(profesores);
+	}
+
+	setOptionsLoading(loading: boolean): void {
+		this._optionsLoading.set(loading);
+	}
+
+	/** Mutación quirúrgica: Actualizar un horario específico sin refetch */
+	updateHorario(id: number, updates: Partial<HorarioResponseDto>): void {
+		this._horarios.update((list) =>
+			list.map((h) => (h.id === id ? { ...h, ...updates } : h)),
+		);
+		this.syncHorariosToFilter();
+	}
+
+	/** Mutación quirúrgica: Toggle estado de un horario */
+	toggleHorarioEstado(id: number): void {
+		this._horarios.update((list) =>
+			list.map((h) => (h.id === id ? { ...h, estado: !h.estado } : h)),
+		);
+		this.syncHorariosToFilter();
+	}
+
+	/** Mutación quirúrgica: Eliminar un horario */
+	removeHorario(id: number): void {
+		this._horarios.update((list) => list.filter((h) => h.id !== id));
+		this.syncHorariosToFilter();
+	}
+
+	/** Mutación quirúrgica: Re-agregar un horario (rollback de delete) */
+	addHorario(horario: HorarioResponseDto): void {
+		this._horarios.update((list) => [horario, ...list]);
+		this.syncHorariosToFilter();
+	}
+	// #endregion
+
+	// #region Comandos - Detalle
+	setHorarioDetalle(detalle: HorarioDetalleResponseDto | null): void {
+		this._horarioDetalle.set(detalle);
+	}
+
+	/** Mutación quirúrgica: quitar profesor del detalle local */
+	clearDetalleProfesor(): void {
+		this._horarioDetalle.update((detalle) => {
+			if (!detalle) return detalle;
+			return {
+				...detalle,
+				profesorId: null,
+				profesorNombreCompleto: null,
+				profesorDni: null,
+			};
+		});
+	}
+
+	/** Mutación quirúrgica: quitar un estudiante del detalle local */
+	removeEstudianteFromDetalle(estudianteId: number): void {
+		this._horarioDetalle.update((detalle) => {
+			if (!detalle) return detalle;
+			const estudiantes = detalle.estudiantes.filter((e) => e.id !== estudianteId);
+			return {
+				...detalle,
+				estudiantes,
+				cantidadEstudiantes: estudiantes.length,
+			};
+		});
+	}
+	// #endregion
+
+	// #region Comandos - Estadísticas
+	setEstadisticas(estadisticas: HorariosEstadisticas | null): void {
+		this._estadisticas.set(estadisticas);
+	}
+
+	incrementarEstadistica(campo: keyof HorariosEstadisticas, delta: number): void {
+		this._estadisticas.update((stats) => {
+			if (!stats) return stats;
+			return {
+				...stats,
+				[campo]: (stats[campo] || 0) + delta,
+			};
+		});
+	}
+	// #endregion
+
+	// #region Comandos - Error
+	setError(error: string | null): void {
+		this._error.set(error);
+	}
+
+	clearError(): void {
+		this._error.set(null);
+	}
+	// #endregion
+
+	// #region Comandos - Loading
+	setLoading(loading: boolean): void {
+		this._loading.set(loading);
+	}
+
+	setStatsLoading(loading: boolean): void {
+		this._statsLoading.set(loading);
+	}
+
+	setDetailLoading(loading: boolean): void {
+		this._detailLoading.set(loading);
+	}
+
+	setStatsReady(ready: boolean): void {
+		this._statsReady.set(ready);
+	}
+
+	setTableReady(ready: boolean): void {
+		this._tableReady.set(ready);
+	}
+	// #endregion
+
+	// #region Comandos delegados - UI State (Form)
+	openDialog(): void {
+		this.formStore.openDialog();
+	}
+
+	closeDialog(): void {
+		this.formStore.closeDialog();
+	}
+
+	openDetailDrawer(): void {
+		this.formStore.openDetailDrawer();
+	}
+
+	closeDetailDrawer(): void {
+		this.formStore.closeDetailDrawer();
+		this._horarioDetalle.set(null);
+	}
+
+	openCursoDialog(): void {
+		this.formStore.openCursoDialog();
+	}
+
+	closeCursoDialog(): void {
+		this.formStore.closeCursoDialog();
+	}
+	// #endregion
+
+	// #region Comandos delegados - Wizard
+	nextStep(): void {
+		this.formStore.nextStep();
+	}
+
+	prevStep(): void {
+		this.formStore.prevStep();
+	}
+
+	resetWizard(): void {
+		this.formStore.resetWizard();
+	}
+	// #endregion
+
+	// #region Comandos delegados - Formulario
+	setFormData(data: Partial<HorarioFormData>): void {
+		this.formStore.setFormData(data);
+	}
+
+	clearFormData(): void {
+		this.formStore.clearFormData();
+	}
+
+	setEditingId(id: number | null): void {
+		this.formStore.setEditingId(id);
+	}
+	// #endregion
+
+	// #region Comandos delegados - Filtros
+	setFiltroSalon(salonId: number | null): void {
+		this.filterStore.setFiltroSalon(salonId);
+	}
+
+	setFiltroProfesor(profesorId: number | null): void {
+		this.filterStore.setFiltroProfesor(profesorId);
+	}
+
+	setFiltroDiaSemana(diaSemana: DiaSemana | null): void {
+		this.filterStore.setFiltroDiaSemana(diaSemana);
+	}
+
+	setFiltroEstadoActivo(estadoActivo: boolean | null): void {
+		this.filterStore.setFiltroEstadoActivo(estadoActivo);
+	}
+
+	clearFiltros(): void {
+		this.filterStore.clearFiltros();
+	}
+
+	setVistaActual(vista: 'semanal' | 'lista'): void {
+		this.filterStore.setVistaActual(vista);
+	}
+
+	setPaginationData(page: number, pageSize: number, totalRecords: number): void {
+		this.filterStore.setPaginationData(page, pageSize, totalRecords);
+	}
+	// #endregion
+
+	// #region Helpers privados
+	/** Sincroniza la fuente de horarios hacia el filterStore para que recalcule sus computed */
+	private syncHorariosToFilter(): void {
+		this.filterStore.setHorariosSource(this._horarios());
+	}
+	// #endregion
 }

@@ -1,50 +1,24 @@
 import { Injectable, signal, inject, PLATFORM_ID } from '@angular/core';
 import { isPlatformBrowser } from '@angular/common';
-import { Router } from '@angular/router';
-import {
-	VOICE_COMMANDS,
-	MONTH_NAMES,
-	VoiceCommandConfig,
-	VoiceCommandContext,
-	ScrollDirection,
-} from './voice-commands.config';
 import {
 	SpeechRecognitionInstance,
 	SpeechRecognitionEvent,
 	SpeechRecognitionErrorEvent,
 	IWindow,
 } from './speech-recognition.types';
+import {
+	VoiceCommandMatcherService,
+	VoiceCommand,
+	RegisteredModal,
+} from './voice-command-matcher.service';
 import { logger } from '@core/helpers';
 import {
 	UI_VOICE_MESSAGES,
 	UI_VOICE_MESSAGES_DYNAMIC,
 } from '@app/shared/constants';
 
-/**
- * Runtime voice command definition.
- */
-export interface VoiceCommand {
-	/** Patterns used to match the command. */
-	patterns: string[];
-	/** Action executed when the command matches. */
-	action: (params?: string) => void;
-	/** Display description for the command. */
-	description: string;
-}
-
-/**
- * Modal registration for voice open and close commands.
- */
-export interface RegisteredModal {
-	/** Modal name. */
-	name: string;
-	/** Alternate names for matching. */
-	aliases: string[];
-	/** Open handler. */
-	open: () => void;
-	/** Close handler. */
-	close: () => void;
-}
+// Re-export types for backward compatibility
+export type { VoiceCommand, RegisteredModal } from './voice-command-matcher.service';
 
 @Injectable({
 	providedIn: 'root',
@@ -52,7 +26,7 @@ export interface RegisteredModal {
 export class VoiceRecognitionService {
 	// #region Dependencies
 	private platformId = inject(PLATFORM_ID);
-	private router = inject(Router);
+	private matcher = inject(VoiceCommandMatcherService);
 	private recognition: SpeechRecognitionInstance | null = null;
 	// #endregion
 
@@ -65,8 +39,6 @@ export class VoiceRecognitionService {
 	private readonly _error = signal<string | null>(null);
 
 	private activeInput: HTMLInputElement | HTMLTextAreaElement | null = null;
-	private commands: VoiceCommand[] = [];
-	private registeredModals = new Map<string, RegisteredModal>();
 	private commandListeners: ((command: string, params?: string) => void)[] = [];
 
 	private startSound: HTMLAudioElement | null = null;
@@ -87,7 +59,13 @@ export class VoiceRecognitionService {
 		if (isPlatformBrowser(this.platformId)) {
 			this.initSounds();
 			this.initRecognition();
-			this.loadCommandsFromConfig();
+			this.matcher.loadCommandsFromConfig({
+				emitCommand: (cmd, p) => this.emitCommand(cmd, p),
+				clearTranscript: () => {
+					this._transcript.set('');
+					this.updateActiveInput();
+				},
+			});
 		}
 	}
 
@@ -164,8 +142,19 @@ export class VoiceRecognitionService {
 			this._interimTranscript.set(interim);
 
 			if (final) {
-				const processed = this.processTranscript(final);
-				if (!processed) {
+				const result = this.matcher.processTranscript(final, {
+					emitCommand: (cmd, p) => this.emitCommand(cmd, p),
+					clearTranscript: () => {
+						this._transcript.set('');
+						this.updateActiveInput();
+					},
+				});
+
+				if (result.matched) {
+					if (result.description) {
+						this.showLastCommand(result.description);
+					}
+				} else {
 					const current = this._transcript();
 					this._transcript.set(current ? `${current} ${final}` : final);
 					this.updateActiveInput();
@@ -202,240 +191,6 @@ export class VoiceRecognitionService {
 				this._isListening.set(false);
 			}
 		};
-	}
-	// #endregion
-
-	// #region Command parsing
-	/**
-	 * Load commands from the static configuration.
-	 */
-	private loadCommandsFromConfig(): void {
-		this.commands = VOICE_COMMANDS.map((config) => this.configToCommand(config));
-	}
-
-	/**
-	 * Normalize text for accent-insensitive matching.
-	 */
-	private normalizeText(text: string): string {
-		return text
-			.toLowerCase()
-			.normalize('NFD')
-			.replace(/[\u0300-\u036f]/g, '')
-			.trim();
-	}
-
-	/**
-	 * Convert a config object into a runtime command.
-	 */
-	private configToCommand(config: VoiceCommandConfig): VoiceCommand {
-		return {
-			patterns: config.patterns,
-			description: config.description,
-			action: (params?: string) => this.executeCommand(config, params),
-		};
-	}
-
-	/**
-	 * Process a transcript and dispatch commands if matched.
-	 *
-	 * @param text Raw recognized text.
-	 * @returns True when a command was processed.
-	 */
-	private processTranscript(text: string): boolean {
-		const normalizedText = this.normalizeText(text);
-
-		// Month commands have priority.
-		if (this.processMonthCommand(normalizedText)) {
-			return true;
-		}
-
-		// Year command.
-		const yearMatch = normalizedText.match(/(20\d{2})/);
-		if (yearMatch) {
-			this.showLastCommand(`Cambiar a anio ${yearMatch[1]}`);
-			this.emitCommand('change-year', yearMatch[1]);
-			return true;
-		}
-
-		// Modal commands.
-		if (this.processModalCommand(normalizedText)) {
-			return true;
-		}
-
-		// Registered commands.
-		for (const command of this.commands) {
-			for (const pattern of command.patterns) {
-				const regex = new RegExp(`^${pattern}$`, 'i');
-				const match = normalizedText.match(regex);
-
-				if (match) {
-					this.showLastCommand(command.description);
-					command.action(match[1]);
-					return true;
-				}
-			}
-		}
-
-		return false;
-	}
-
-	/**
-	 * Process month commands using month name matching.
-	 */
-	private processMonthCommand(text: string): boolean {
-		const normalizedText = this.normalizeText(text);
-
-		for (const [monthName, monthNumber] of Object.entries(MONTH_NAMES)) {
-			if (normalizedText.includes(monthName)) {
-				this.showLastCommand(`Cambiar a ${monthName}`);
-				this.emitCommand('change-month', monthNumber.toString());
-				return true;
-			}
-		}
-
-		return false;
-	}
-
-	/**
-	 * Process modal open and close commands.
-	 */
-	private processModalCommand(text: string): boolean {
-		const openMatch = text.match(/^abrir\s+(.+)$/i);
-		const closeMatch = text.match(/^cerrar\s+(.+)$/i);
-
-		if (openMatch) {
-			const modalName = openMatch[1].trim();
-			const modal = this.findModal(modalName);
-			if (modal) {
-				this.showLastCommand(`Abrir ${modal.name}`);
-				modal.open();
-				return true;
-			}
-			this.showLastCommand(`Abrir ${modalName}`);
-			this.emitCommand('open-modal', modalName);
-			return true;
-		}
-
-		if (closeMatch) {
-			const modalName = closeMatch[1].trim();
-			const modal = this.findModal(modalName);
-			if (modal) {
-				this.showLastCommand(`Cerrar ${modal.name}`);
-				modal.close();
-				return true;
-			}
-			this.showLastCommand(`Cerrar ${modalName}`);
-			this.emitCommand('close-modal', modalName);
-			return true;
-		}
-
-		return false;
-	}
-
-	/**
-	 * Find a registered modal by name or alias.
-	 */
-	private findModal(name: string): RegisteredModal | undefined {
-		const normalizedName = this.normalizeText(name);
-
-		if (this.registeredModals.has(normalizedName)) {
-			return this.registeredModals.get(normalizedName);
-		}
-
-		for (const modal of this.registeredModals.values()) {
-			if (modal.aliases.some((alias) => this.normalizeText(alias) === normalizedName)) {
-				return modal;
-			}
-			if (
-				this.normalizeText(modal.name).includes(normalizedName) ||
-				normalizedName.includes(this.normalizeText(modal.name))
-			) {
-				return modal;
-			}
-			if (
-				modal.aliases.some(
-					(alias) =>
-						this.normalizeText(alias).includes(normalizedName) ||
-						normalizedName.includes(this.normalizeText(alias)),
-				)
-			) {
-				return modal;
-			}
-		}
-
-		return undefined;
-	}
-	// #endregion
-
-	// #region Command execution
-	/**
-	 * Execute a configured command using the provided config.
-	 */
-	private executeCommand(config: VoiceCommandConfig, params?: string): void {
-		const context: VoiceCommandContext = {
-			router: this.router,
-			emitCommand: (cmd, p) => this.emitCommand(cmd, p),
-			clearTranscript: () => {
-				this._transcript.set('');
-				this.updateActiveInput();
-			},
-			params,
-		};
-
-		switch (config.actionType) {
-			case 'navigate':
-				if (config.route) {
-					this.router.navigate([config.route]);
-				}
-				break;
-
-			case 'emit':
-				if (config.emitCommand) {
-					this.emitCommand(config.emitCommand, params);
-				}
-				break;
-
-			case 'scroll':
-				if (config.scrollDirection) {
-					this.scrollPage(config.scrollDirection);
-				}
-				break;
-
-			case 'custom':
-				if (config.customAction) {
-					config.customAction(context);
-				}
-				break;
-		}
-	}
-
-	/**
-	 * Scroll the page based on a direction command.
-	 */
-	private scrollPage(direction: ScrollDirection): void {
-		const scrollAmount = 300;
-		const scrollOptions: ScrollToOptions = { behavior: 'smooth' };
-
-		switch (direction) {
-			case 'up':
-				window.scrollBy({ top: -scrollAmount, ...scrollOptions });
-				break;
-			case 'down':
-				window.scrollBy({ top: scrollAmount, ...scrollOptions });
-				break;
-			case 'left':
-				window.scrollBy({ left: -scrollAmount, ...scrollOptions });
-				break;
-			case 'right':
-				window.scrollBy({ left: scrollAmount, ...scrollOptions });
-				break;
-			case 'top':
-				window.scrollTo({ top: 0, ...scrollOptions });
-				break;
-			case 'bottom':
-				window.scrollTo({ top: document.body.scrollHeight, ...scrollOptions });
-				break;
-		}
 	}
 	// #endregion
 
@@ -554,7 +309,7 @@ export class VoiceRecognitionService {
 	}
 	// #endregion
 
-	// #region Modal registration
+	// #region Modal registration (delegates to matcher)
 	/**
 	 * Register a modal for voice open and close commands.
 	 *
@@ -562,29 +317,25 @@ export class VoiceRecognitionService {
 	 * @returns Unregister function.
 	 */
 	registerModal(modal: RegisteredModal): () => void {
-		const key = modal.name.toLowerCase();
-		this.registeredModals.set(key, modal);
-		return () => {
-			this.registeredModals.delete(key);
-		};
+		return this.matcher.registerModal(modal);
 	}
 
 	/**
 	 * Unregister a modal by name.
 	 */
 	unregisterModal(name: string): void {
-		this.registeredModals.delete(name.toLowerCase());
+		this.matcher.unregisterModal(name);
 	}
 
 	/**
 	 * Get registered modal keys.
 	 */
 	getRegisteredModals(): string[] {
-		return Array.from(this.registeredModals.keys());
+		return this.matcher.getRegisteredModals();
 	}
 	// #endregion
 
-	// #region Dynamic commands
+	// #region Dynamic commands (delegates to matcher)
 	/**
 	 * Add a dynamic voice command.
 	 *
@@ -592,25 +343,18 @@ export class VoiceRecognitionService {
 	 * @returns Unregister function.
 	 */
 	addCommand(command: VoiceCommand): () => void {
-		this.commands.push(command);
-		return () => {
-			const index = this.commands.indexOf(command);
-			if (index > -1) this.commands.splice(index, 1);
-		};
+		return this.matcher.addCommand(command);
 	}
 
 	/**
 	 * Get registered command patterns and descriptions.
 	 */
 	getRegisteredCommands(): { pattern: string; description: string }[] {
-		return this.commands.flatMap((cmd) =>
-			cmd.patterns.map((p) => ({ pattern: p, description: cmd.description })),
-		);
+		return this.matcher.getRegisteredCommands();
 	}
 	// #endregion
 
 	// #region Private helpers
-
 	/**
 	 * Show the last recognized command for 2 seconds.
 	 */

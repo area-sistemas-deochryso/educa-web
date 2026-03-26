@@ -6,97 +6,14 @@
  * 2. Define start and end dates (or use helper functions)
  * 3. The system will decide when to show the notification
  */
-// * Seasonal notification definitions and helpers.
 
-export type NotificationType = 'matricula' | 'pago' | 'academico' | 'festividad' | 'evento' | 'smart';
-export type NotificationPriority = 'low' | 'medium' | 'high' | 'urgent';
+import type { SeasonalNotification, NotificationType, NotificationPriority } from './notifications.types';
+import { isWithinMonthDays, isMonth, isExactDate, isLastDaysOfMonth } from './notifications-date.utils';
 
-export interface SeasonalNotification {
-	/** Unique identifier. */
-	id: string;
-	/** Notification type. */
-	type: NotificationType;
-	/** Title text. */
-	title: string;
-	/** Message or description. */
-	message: string;
-	/** Icon class (PrimeIcons). */
-	icon: string;
-	/** Priority level. */
-	priority: NotificationPriority;
-	/** Function that decides if it should show today. */
-	shouldShow: (date: Date) => boolean;
-	/** Action URL (optional). */
-	actionUrl?: string;
-	/** Action button text (optional). */
-	actionText?: string;
-	/** Whether it can be dismissed. */
-	dismissible?: boolean;
-}
+// Re-export types and date utils so existing consumers keep working
+export * from './notifications.types';
+export * from './notifications-date.utils';
 
-// #region DATE HELPERS
-
-/**
- * Check if date is within a day range in the current month.
- */
-export function isWithinMonthDays(date: Date, startDay: number, endDay: number): boolean {
-	const day = date.getDate();
-	return day >= startDay && day <= endDay;
-}
-
-/**
- * Check if date is within a specific month (1 to 12).
- */
-export function isMonth(date: Date, month: number): boolean {
-	return date.getMonth() + 1 === month;
-}
-
-/**
- * Check if date is within a specific date range across months.
- */
-export function isWithinDateRange(
-	date: Date,
-	startMonth: number,
-	startDay: number,
-	endMonth: number,
-	endDay: number,
-): boolean {
-	const month = date.getMonth() + 1;
-	const day = date.getDate();
-
-	if (startMonth === endMonth) {
-		return month === startMonth && day >= startDay && day <= endDay;
-	}
-
-	if (month === startMonth) return day >= startDay;
-	if (month === endMonth) return day <= endDay;
-	return month > startMonth && month < endMonth;
-}
-
-/**
- * Check if date is an exact month and day.
- */
-export function isExactDate(date: Date, month: number, day: number): boolean {
-	return date.getMonth() + 1 === month && date.getDate() === day;
-}
-
-/**
- * Check if date is in the last N days of the month.
- */
-export function isLastDaysOfMonth(date: Date, days: number): boolean {
-	const lastDay = new Date(date.getFullYear(), date.getMonth() + 1, 0).getDate();
-	return date.getDate() > lastDay - days;
-}
-
-/**
- * Check if date is a weekend.
- */
-export function isWeekend(date: Date): boolean {
-	const day = date.getDay();
-	return day === 0 || day === 6;
-}
-
-// #endregion
 // #region MATRICULA NOTIFICATIONS (start of year)
 
 export const MATRICULA_NOTIFICATIONS: SeasonalNotification[] = [
@@ -696,4 +613,5 @@ export function getNotificationsByType(type: NotificationType): SeasonalNotifica
 export function getNotificationsByPriority(priority: NotificationPriority): SeasonalNotification[] {
 	return ALL_NOTIFICATIONS.filter((n) => n.priority === priority);
 }
+
 // #endregion

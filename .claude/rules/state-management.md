@@ -1,196 +1,125 @@
-# Gestion de Estado y Servicios
+# Estado y Signals
 
-## 0. Objetivo
+## Principio
 
-Disenar **propiedad del estado** y **fronteras de responsabilidad** para:
+> **"Arquitectura = decidir quién puede cambiar qué, y cuándo."**
 
-- Minimizar Change Detection
-- Evitar duplicacion de verdad
-- Separar estado, tiempo e IO
+## Clasificación de Estado
 
-> **Principio fundamental**: "Arquitectura = decidir quien puede cambiar que, y cuando."
+| Tipo | Vive en | Ejemplo |
+|------|---------|---------|
+| **UI Local** | Componente (`signal()`) | `isExpanded`, hover, focus |
+| **Ephemeral** | Provider en componente (`@Injectable()` sin `providedIn`) | Wizard multi-step |
+| **Feature** | Store (`providedIn: 'root'`) | Lista, filtros, paginación |
+| **App** | Core stores / NgRx Signals | Auth, permisos, conectividad |
 
----
+**Regla: 1 concepto = 1 dueño.** El componente consume readonly, nunca duplica el estado.
 
-## 1. Clasificacion de Estado (unica verdad por concepto)
+## Signal vs RxJS — Cuándo usar cada uno
 
-| Tipo | Vive en | Persiste | Ejemplo |
-|------|---------|----------|---------|
-| **UI Local** | Componente | No persiste navegacion | `isExpanded`, hover, focus |
-| **Ephemeral / Scoped** | Provider en componente (`@Injectable()` sin `providedIn`) | Durante el flujo | Wizard multi-step, modal con tabs |
-| **Feature State** | Store del feature (`providedIn: 'root'`) | Navegacion interna del modulo | Lista, filtros, paginacion |
-| **App State** | Core stores / NgRx Signals | Toda la aplicacion | Auth, tenant, conectividad |
+| Pregunta | Tecnología |
+|----------|-----------|
+| ¿Es un valor actual? | Signal (`signal()`, `computed()`) |
+| ¿Ocurre en el tiempo? (debounce, retry, cancel) | RxJS |
+| ¿Requiere IO/red/storage? | RxJS en facade → signal en store |
+| ¿Se deriva síncronamente? | `computed()` |
 
-**Regla: 1 concepto = 1 dueno.** El componente consume readonly desde el store, nunca duplica el estado.
-
----
-
-## 2. Roles de Servicios
-
-Ver `@.claude/rules/architecture.md` para taxonomia completa.
-
-| Tipo | Estado | IO | UI |
-|------|--------|----|----|
-| Utility | No | No | No |
-| Gateway | No* | Si | No |
-| State/Store | Si | No | No |
-| Facade | No** | Si | Si |
-| Ephemeral | Si | No | Si |
-
-\* Puede tener cache interno, pero no expone estado reactivo a UI
-\*\* Muy poco, solo orquestacion
-
----
-
-## 3. Contrato Store (shape estandar)
+## Reglas de Signals
 
 ```typescript
-interface StoreState<T> {
-  criteria: SearchCriteria;
-  page: { index: number; size: number; sortBy?: string; sortOrder?: 'asc' | 'desc' };
-  entitiesById: Record<string, T>;
-  result: { ids: string[]; total: number };
-  selection: Set<string>;
-  status: { loading: boolean; error: string | null; stale: boolean };
-}
-
-interface StoreVM<T> {
-  items: T[];
-  loading: boolean;
-  error: string | null;
-  isEmpty: boolean;
-  hasSelection: boolean;
-  selectedItems: T[];
-}
-```
-
-```typescript
-@Injectable({ providedIn: 'root' })
-export class UsersStore {
-  private readonly _users = signal<User[]>([]);
-  readonly users = this._users.asReadonly();
-
-  readonly activeUsers = computed(() => this.users().filter(u => u.active));
-
-  readonly vm = computed(() => ({
-    users: this.users(),
-    loading: this.loading(),
-    isEmpty: this.users().length === 0,
-  }));
-
-  setUsers(users: User[]): void { this._users.set(users); }
-  setLoading(loading: boolean): void { this._loading.set(loading); }
-}
-```
-
----
-
-## 4. Lecturas vs Escrituras
-
-```typescript
-// CORRECTO - Lecturas readonly
+// ✅ CORRECTO — privado + asReadonly + mutación via métodos
 private readonly _users = signal<User[]>([]);
 readonly users = this._users.asReadonly();
 readonly activeUsers = computed(() => this.users().filter(u => u.active));
+setUsers(users: User[]): void { this._users.set(users); }
 
-// INCORRECTO - Mutacion publica
-readonly users = signal<User[]>([]); // Cualquiera puede hacer .set()
+// ❌ INCORRECTO — signal público mutable
+readonly users = signal<User[]>([]); // Cualquiera puede .set()
 ```
 
-> **"Un servicio no es estado; es una fuente de estado."** El componente lee desde la fuente, nunca muta directamente.
+**DO**: Signals para estado síncrono, `computed()` para derivados puros, `effect()` solo para sincronizar con DOM/storage/analytics.
 
----
+**DON'T**: Signals como streams de eventos (usar `Subject`), `effect()` para derivar datos (usar `computed()`), exponer signals mutables, `BehaviorSubject` como estado (usar signal), `detectChanges()`/`markForCheck()`.
 
-## 5. Draft vs Committed
+## Frontera RxJS → Signals
 
-- **Draft** (UI/Ephemeral): Editable, sucio, no dispara IO. Vive en el componente o servicio scoped.
-- **Committed** (Store): Dispara busqueda/carga. Vive en el store.
+RxJS termina antes del template. No mezclar signals dentro de pipes.
 
-**Regla**: No mezclar draft con estado productivo. Draft en componente, committed en store.
+```typescript
+// ❌ Signal dentro de pipe
+searchInput$.pipe(switchMap(query => {
+  const user = this.userSignal(); // Signal en pipe
+  return this.api.search(query, user.id);
+}));
 
----
-
-## 6. Signals vs RxJS
-
-| Usar Signals para | Usar RxJS para |
-|-------------------|----------------|
-| Estado actual | Tiempo (debounce, throttle) |
-| Derivados sincronos | IO asincrono |
-| ViewModel | Cancelacion (switchMap) |
-| Change Detection | Retry/error handling |
-| | Combinacion de streams |
-
----
-
-## 7. Pipeline Canonico
-
-```
-UI Event (click, input)
-         |
-         v
-Facade (comando de intencion)
-         |
-         v
-Store (intencion): setCriteria(), setLoading()
-         |
-         v
-Gateway / Cache / IO: fetch data, call API
-         |
-         v
-Store (materializacion): setResult(), setError()
-         |
-         v
-ViewModel: computed(() => ({ ... }))
-         |
-         v
-Template: {{ vm().users }}
+// ✅ toObservable + combineLatest
+const userId$ = toObservable(this.userSignal).pipe(map(u => u.id));
+searchInput$.pipe(
+  combineLatestWith(userId$),
+  switchMap(([query, userId]) => this.api.search(query, userId))
+);
 ```
 
----
+## Concurrencia RxJS
 
-## 8. Checklist de Validacion
+| Intención | Operador |
+|-----------|----------|
+| Solo importa el **último** (búsqueda) | `switchMap` |
+| **Todos** importan (analytics) | `mergeMap` |
+| En **orden** estricto (importar archivos) | `concatMap` |
+| Ignorar mientras uno **corre** (submit) | `exhaustMap` |
 
-- [ ] Un solo dueno por concepto?
-- [ ] Store no tiene mutacion publica?
-- [ ] UI solo conoce Facade?
-- [ ] Draft separado del committed?
-- [ ] Signals para estado, RxJS para tiempo/IO?
-- [ ] Template consume ViewModel?
-
-### Red flags vs Green flags
+## Pipeline Canónico
 
 ```
-RED FLAGS                              GREEN FLAGS
-.set() expuesto en servicio            readonly signals
-multiples duenos del mismo concepto    computed para derivados
-logica de negocio en componente        comandos claros (load, save, delete)
-draft mezclado con store               1 dueno por estado
-RxJS para estado sincrono              draft en componente/ephemeral
-funciones en template                  pipeline canonico respetado
+UI Event → Facade (comando) → Store (intención) → Gateway/IO → Store (resultado) → ViewModel → Template
 ```
 
----
+## Patrón Facade
 
-## 9. Antipatrones Comunes
+```typescript
+@Injectable({ providedIn: 'root' })
+export class UsersFacade {
+  private api = inject(UsersApiService);
+  private store = inject(UsersStore);
+  private destroyRef = inject(DestroyRef);
+  private searchTrigger$ = new Subject<string>();
 
-| Antipatron | Correccion |
-|------------|------------|
-| Estado duplicado (`activeUsers = signal([])`) | Usar `computed()` derivado |
-| Logica/HTTP en componente | Delegar a facade |
-| Signal publico mutable | `private _signal` + `.asReadonly()` |
-| Cache sin invalidacion | TTL + invalidacion explicita |
+  constructor() {
+    this.searchTrigger$.pipe(
+      debounceTime(300), distinctUntilChanged(),
+      tap(() => this.store.setLoading(true)),
+      switchMap(query =>
+        this.api.search(query).pipe(
+          catchError(error => { this.store.setError(error); return EMPTY; })
+        )
+      ),
+      takeUntilDestroyed(this.destroyRef)
+    ).subscribe(results => this.store.setResults(results));
+  }
 
----
+  readonly vm = computed(() => ({
+    users: this.store.users(),
+    loading: this.store.loading(),
+    error: this.store.error(),
+  }));
 
-## Resumen de Decisiones
+  search(query: string): void { this.searchTrigger$.next(query); }
+}
+```
 
-| Pregunta | Respuesta |
-|----------|-----------|
-| Estado UI? | Componente (signal local) |
-| Estado del feature? | Store (signals privados) |
-| Como expongo estado? | readonly + computed |
-| Como muto estado? | Comandos (metodos) |
-| Cuando Signals? | Estado actual + derivados |
-| Cuando RxJS? | Tiempo + IO + cancelacion |
-| Draft o Committed? | Draft en UI, Committed en Store |
-| Que consume el template? | ViewModel (computed) |
+**Reglas**: Componente no sabe de RxJS. Facade no expone Observables. Triggers privados. Un efecto = una intención.
+
+## Checklist
+
+```
+[ ] 1 solo dueño por concepto de estado?
+[ ] Store no tiene mutación pública? (private + asReadonly)
+[ ] UI solo conoce Facade?
+[ ] Signals para estado, RxJS para tiempo/IO?
+[ ] Template consume ViewModel (computed)?
+[ ] No hay subscribe() sin takeUntilDestroyed?
+[ ] Cada operador RxJS tiene intención clara?
+[ ] No hay BehaviorSubject como estado? (usar signal)
+[ ] No hay funciones/getters en template? (usar computed)
+```

@@ -30,8 +30,6 @@ Aplicacion Angular 21 para gestion educativa con portal publico e intranet priva
 @.claude/rules/debug.md
 @.claude/rules/architecture.md
 @.claude/rules/state-management.md
-@.claude/rules/signals.md
-@.claude/rules/rxjs.md
 @.claude/rules/templates.md
 @.claude/rules/testing.md
 @.claude/rules/git.md
@@ -46,26 +44,12 @@ Aplicacion Angular 21 para gestion educativa con portal publico e intranet priva
 @.claude/rules/lazy-rendering.md
 @.claude/rules/skeletons.md
 @.claude/rules/dialogs-sync.md
-@.claude/rules/crud-optimization.md
-@.claude/rules/enforcement.md
-@.claude/rules/quality-gate.md
-@.claude/rules/pwa-ios.md
+@.claude/rules/crud-patterns.md
 @.claude/rules/rate-limiting.md
 @.claude/rules/table-transparency.md
 @.claude/rules/filter-transparency.md
 @.claude/rules/domain-modeling.md
-@.claude/rules/base-abstractions.md
 @.claude/rules/semantic-types.md
-
-## Diagnóstico
-
-@.claude/diagnostic/abstraction-gaps.md
-
-## Skills
-
-@.claude/skills/commit/SKILL.md
-@.claude/skills/pr-ready/SKILL.md
-@.claude/skills/validate-code/SKILL.md
 
 ## Agents
 
@@ -74,11 +58,6 @@ Aplicacion Angular 21 para gestion educativa con portal publico e intranet priva
 ## Debug y troubleshooting
 
 @.claude/debug/README.md
-
-## Tareas activas
-
-@.claude/tasks/cache-wal-sync.md
-@.claude/tasks/robustness-improvements.md
 
 ## Historial
 

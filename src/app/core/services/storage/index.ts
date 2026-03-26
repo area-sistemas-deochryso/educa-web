@@ -5,4 +5,7 @@ export * from './storage.models';
 export * from './session-storage.service';
 export * from './preferences-storage.service';
 export * from './indexed-db.service';
+export * from './notification-storage.service';
+export * from './cache-storage.service';
+export * from './smart-data-storage.service';
 // #endregion
