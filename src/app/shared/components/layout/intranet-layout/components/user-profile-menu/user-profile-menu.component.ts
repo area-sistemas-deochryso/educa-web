@@ -14,6 +14,7 @@ import { ButtonModule } from 'primeng/button';
 import { AvatarModule } from 'primeng/avatar';
 import { BadgeModule } from 'primeng/badge';
 import { UserProfileService, NotificationsService } from '@core/services';
+import { FeatureFlagsFacade } from '@core/services/feature-flags';
 import { UserInfoDialogComponent } from '../user-info-dialog/user-info-dialog.component';
 
 // #endregion
@@ -30,6 +31,7 @@ export class UserProfileMenuComponent {
 	// #region Dependencias
 	private userProfile = inject(UserProfileService);
 	private notificationsService = inject(NotificationsService);
+	private flags = inject(FeatureFlagsFacade);
 	// #endregion
 
 	// #region I/O
@@ -46,6 +48,7 @@ export class UserProfileMenuComponent {
 	readonly userRole = this.userProfile.userRole;
 	readonly initials = this.userProfile.initials;
 
+	readonly showNotifications = computed(() => this.flags.isEnabled('notifications'));
 	readonly unreadCount = this.notificationsService.unreadCount;
 	readonly unreadBadge = computed(() => {
 		const count = this.unreadCount();

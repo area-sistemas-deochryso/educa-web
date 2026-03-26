@@ -8,7 +8,7 @@
 >
 	<div class="profile-avatar-wrapper">
 		<p-avatar [label]="initials()" shape="circle" size="normal" class="profile-avatar" />
-		@if (unreadBadge()) {
+		@if (showNotifications() && unreadBadge()) {
 			<span class="avatar-notif-badge">{{ unreadBadge() }}</span>
 		}
 	</div>
@@ -34,14 +34,16 @@
 				<span class="popover-role">{{ userRole() }}</span>
 			</div>
 		</div>
-		<div class="popover-divider"></div>
-		<button class="menu-btn" (click)="onNotificationsClick()" type="button">
-			<i class="pi pi-bell" [class.bell-shake]="unreadBadge()"></i>
-			<span>Notificaciones</span>
-			@if (unreadBadge()) {
-				<p-badge [value]="unreadBadge()" severity="danger" class="notif-badge" />
-			}
-		</button>
+		@if (showNotifications()) {
+			<div class="popover-divider"></div>
+			<button class="menu-btn" (click)="onNotificationsClick()" type="button">
+				<i class="pi pi-bell" [class.bell-shake]="unreadBadge()"></i>
+				<span>Notificaciones</span>
+				@if (unreadBadge()) {
+					<p-badge [value]="unreadBadge()" severity="danger" class="notif-badge" />
+				}
+			</button>
+		}
 		<div class="popover-divider"></div>
 		<button class="menu-btn" (click)="onInfoClick()" type="button">
 			<i class="pi pi-user-edit"></i>
