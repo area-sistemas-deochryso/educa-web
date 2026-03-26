@@ -4,6 +4,13 @@ import { forkJoin } from 'rxjs';
 
 import { logger, withRetry } from '@core/helpers';
 import { ErrorHandlerService } from '@core/services';
+import {
+	UI_SUMMARIES,
+	UI_SALONES_SUCCESS_MESSAGES,
+	UI_SALONES_ERROR_DETAILS,
+	UI_SALONES_CONFIRM_HEADERS,
+	UI_ADMIN_ERROR_DETAILS,
+} from '@shared/constants';
 
 import { SalonesAdminApiService } from './salones-admin-api.service';
 import { SalonesAdminStore } from './salones-admin.store';
@@ -61,8 +68,8 @@ export class SalonesAdminFacade {
 				},
 				error: (err) => {
 					logger.error('Error al cargar datos de salones admin:', err);
-					this.errorHandler.showError('Error', 'No se pudieron cargar los datos');
-					this.store.setError('No se pudieron cargar los datos');
+					this.errorHandler.showError(UI_SUMMARIES.error, UI_ADMIN_ERROR_DETAILS.loadHorariosData);
+					this.store.setError(UI_ADMIN_ERROR_DETAILS.loadHorariosData);
 					this.store.setLoading(false);
 				},
 			});
@@ -104,16 +111,16 @@ export class SalonesAdminFacade {
 			.subscribe({
 				next: (ok) => {
 					if (ok) {
-						this.errorHandler.showSuccess('Configuración creada', `Configuración de ${dto.nivel} guardada correctamente`);
+						this.errorHandler.showSuccess(UI_SALONES_CONFIRM_HEADERS.configCreated, UI_SALONES_SUCCESS_MESSAGES.configCreated);
 						this.store.closeConfigDialog();
 						this.refreshConfiguraciones();
 					} else {
-						this.errorHandler.showError('Error', 'No se pudo crear la configuración');
+						this.errorHandler.showError(UI_SUMMARIES.error, UI_SALONES_ERROR_DETAILS.createConfig);
 					}
 					this.store.setLoading(false);
 				},
 				error: () => {
-					this.errorHandler.showError('Error', 'No se pudo crear la configuración');
+					this.errorHandler.showError(UI_SUMMARIES.error, UI_SALONES_ERROR_DETAILS.createConfig);
 					this.store.setLoading(false);
 				},
 			});
@@ -128,16 +135,16 @@ export class SalonesAdminFacade {
 			.subscribe({
 				next: (ok) => {
 					if (ok) {
-						this.errorHandler.showSuccess('Configuración actualizada', 'Los cambios se guardaron correctamente');
+						this.errorHandler.showSuccess(UI_SALONES_CONFIRM_HEADERS.configUpdated, UI_SALONES_SUCCESS_MESSAGES.configUpdated);
 						this.store.closeConfigDialog();
 						this.refreshConfiguraciones();
 					} else {
-						this.errorHandler.showError('Error', 'No se pudo actualizar la configuración');
+						this.errorHandler.showError(UI_SUMMARIES.error, UI_SALONES_ERROR_DETAILS.updateConfig);
 					}
 					this.store.setLoading(false);
 				},
 				error: () => {
-					this.errorHandler.showError('Error', 'No se pudo actualizar la configuración');
+					this.errorHandler.showError(UI_SUMMARIES.error, UI_SALONES_ERROR_DETAILS.updateConfig);
 					this.store.setLoading(false);
 				},
 			});
@@ -163,15 +170,15 @@ export class SalonesAdminFacade {
 			.subscribe({
 				next: (ok) => {
 					if (ok) {
-						this.errorHandler.showSuccess('Periodo creado', `Periodo de ${dto.nivel} creado correctamente`);
+						this.errorHandler.showSuccess(UI_SALONES_CONFIRM_HEADERS.periodoCreated, UI_SALONES_SUCCESS_MESSAGES.periodoCreated(dto.nivel));
 						this.refreshPeriodos();
 					} else {
-						this.errorHandler.showError('Error', 'No se pudo crear el periodo');
+						this.errorHandler.showError(UI_SUMMARIES.error, UI_SALONES_ERROR_DETAILS.createPeriodo);
 					}
 					this.store.setLoading(false);
 				},
 				error: () => {
-					this.errorHandler.showError('Error', 'No se pudo crear el periodo');
+					this.errorHandler.showError(UI_SUMMARIES.error, UI_SALONES_ERROR_DETAILS.createPeriodo);
 					this.store.setLoading(false);
 				},
 			});
@@ -186,16 +193,16 @@ export class SalonesAdminFacade {
 			.subscribe({
 				next: (resultado) => {
 					if (resultado) {
-						this.errorHandler.showSuccess('Periodo cerrado', `Se crearon ${resultado.salonesCreados} salones para el próximo año. ${resultado.estudiantesPendientes} estudiantes pendientes de aprobación.`, 8000);
+						this.errorHandler.showSuccess(UI_SALONES_SUCCESS_MESSAGES.periodoClosed, `Se crearon ${resultado.salonesCreados} salones para el próximo año. ${resultado.estudiantesPendientes} estudiantes pendientes de aprobación.`, 8000);
 						this.store.closeCerrarPeriodoDialog();
 						this.loadAll();
 					} else {
-						this.errorHandler.showError('Error', 'No se pudo cerrar el periodo');
+						this.errorHandler.showError(UI_SUMMARIES.error, UI_SALONES_ERROR_DETAILS.closePeriodo);
 					}
 					this.store.setLoading(false);
 				},
 				error: () => {
-					this.errorHandler.showError('Error', 'No se pudo cerrar el periodo');
+					this.errorHandler.showError(UI_SUMMARIES.error, UI_SALONES_ERROR_DETAILS.closePeriodo);
 					this.store.setLoading(false);
 				},
 			});
@@ -245,11 +252,11 @@ export class SalonesAdminFacade {
 						});
 						this.refreshSalones();
 					} else {
-						this.errorHandler.showError('Error', 'No se pudo aprobar/desaprobar al estudiante');
+						this.errorHandler.showError(UI_SUMMARIES.error, UI_SALONES_ERROR_DETAILS.aprobarEstudiante);
 					}
 				},
 				error: () => {
-					this.errorHandler.showError('Error', 'No se pudo aprobar/desaprobar al estudiante');
+					this.errorHandler.showError(UI_SUMMARIES.error, UI_SALONES_ERROR_DETAILS.aprobarEstudiante);
 				},
 			});
 	}
@@ -263,17 +270,17 @@ export class SalonesAdminFacade {
 			.subscribe({
 				next: (resultado) => {
 					if (resultado) {
-						this.errorHandler.showSuccess('Aprobación masiva completada', `${resultado.aprobados} aprobados, ${resultado.desaprobados} desaprobados, ${resultado.errores} errores`, 5000);
+						this.errorHandler.showSuccess(UI_SALONES_CONFIRM_HEADERS.aprobacionMasiva, `${resultado.aprobados} aprobados, ${resultado.desaprobados} desaprobados, ${resultado.errores} errores`, 5000);
 						const salonId = this.store.selectedSalonId();
 						if (salonId) this.loadAprobaciones(salonId);
 						this.refreshSalones();
 					} else {
-						this.errorHandler.showError('Error', 'No se pudo completar la aprobación masiva');
+						this.errorHandler.showError(UI_SUMMARIES.error, UI_SALONES_ERROR_DETAILS.aprobarMasivo);
 					}
 					this.store.setAprobacionesLoading(false);
 				},
 				error: () => {
-					this.errorHandler.showError('Error', 'No se pudo completar la aprobación masiva');
+					this.errorHandler.showError(UI_SUMMARIES.error, UI_SALONES_ERROR_DETAILS.aprobarMasivo);
 					this.store.setAprobacionesLoading(false);
 				},
 			});

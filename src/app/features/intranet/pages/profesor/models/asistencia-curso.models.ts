@@ -1,5 +1,6 @@
 // #region Constants
-export type EstadoAsistenciaCurso = 'P' | 'T' | 'F';
+export const ESTADOS_ASISTENCIA_CURSO = ['P', 'T', 'F'] as const;
+export type EstadoAsistenciaCurso = (typeof ESTADOS_ASISTENCIA_CURSO)[number];
 
 export const ESTADO_ASISTENCIA_LABELS: Record<EstadoAsistenciaCurso, string> = {
 	P: 'Presente',

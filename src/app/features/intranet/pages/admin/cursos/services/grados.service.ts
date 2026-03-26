@@ -3,7 +3,7 @@ import { Injectable, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { environment } from '@config/environment';
-import { Grado } from './cursos.models';
+import { Grado } from '../models';
 
 // #endregion
 // #region Implementation

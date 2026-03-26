@@ -3,6 +3,7 @@ import { ChangeDetectionStrategy, Component, EventEmitter, Input, Output } from 
 import { CommonModule } from '@angular/common';
 import { DialogModule } from 'primeng/dialog';
 import { logger } from '@core/helpers';
+import { getGradeClass as getGradeClassFn } from '@shared/services/calificacion-config';
 
 // #endregion
 // #region Implementation
@@ -138,8 +139,7 @@ export class SubmissionsModalComponent {
 	 */
 	getGradeClass(grade: number | null): string {
 		if (grade === null) return '';
-		if (grade < 11) return 'grade-red';
-		return 'grade-green';
+		return getGradeClassFn(grade) || 'grade-red';
 	}
 }
 // #endregion

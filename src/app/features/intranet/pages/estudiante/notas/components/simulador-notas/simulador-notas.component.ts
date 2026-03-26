@@ -11,6 +11,8 @@ import {
 	NOTA_MAXIMA,
 } from '../../../models';
 import { NotaSimulada } from '../../services/estudiante-notas.store';
+import { getNotaSeverity, formatNotaConConfig } from '@shared/services/calificacion-config';
+import type { ConfiguracionCalificacionListDto } from '@data/models';
 
 @Component({
 	selector: 'app-simulador-notas',
@@ -26,6 +28,7 @@ export class SimuladorNotasComponent {
 	readonly curso = input.required<EstudianteMisNotasDto>();
 	readonly simulaciones = input<NotaSimulada[]>([]);
 	readonly promedioSimulado = input<number | null>(null);
+	readonly calificacionConfig = input<ConfiguracionCalificacionListDto | null>(null);
 	// #endregion
 
 	// #region Outputs
@@ -52,15 +55,11 @@ export class SimuladorNotasComponent {
 	}
 
 	getNotaSeverity(nota: number | null): 'success' | 'warn' | 'danger' | 'secondary' {
-		if (nota === null || nota === undefined) return 'secondary';
-		if (nota >= 14) return 'success';
-		if (nota >= 11) return 'warn';
-		return 'danger';
+		return getNotaSeverity(nota, this.calificacionConfig());
 	}
 
 	formatNota(nota: number | null): string {
-		if (nota === null || nota === undefined) return '-';
-		return nota.toFixed(1);
+		return formatNotaConConfig(nota, this.calificacionConfig());
 	}
 
 	onVisibleChange(value: boolean): void {

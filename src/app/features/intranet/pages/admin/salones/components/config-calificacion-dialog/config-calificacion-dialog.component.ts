@@ -17,6 +17,7 @@ import {
 	CrearConfiguracionLiteralDto,
 	NivelEducativo,
 	TipoCalificacion,
+	TIPOS_CALIFICACION,
 } from '../../models';
 
 interface LiteralRow {
@@ -68,10 +69,10 @@ export class ConfigCalificacionDialogComponent {
 	// #region Computed
 	readonly isEditing = computed(() => this.config() !== null);
 
-	readonly tipoOptions = [
-		{ label: 'Literal (AD, A, B, C)', value: 'LITERAL' },
-		{ label: 'Numérico (0-20)', value: 'NUMERICO' },
-	];
+	readonly tipoOptions: { label: string; value: TipoCalificacion }[] = TIPOS_CALIFICACION.map((tipo) => ({
+		label: tipo === 'LITERAL' ? 'Literal (AD, A, B, C)' : 'Numérico (0-20)',
+		value: tipo,
+	}));
 
 	readonly isFormValid = computed(() => {
 		const tipo = this.tipoCalificacion();

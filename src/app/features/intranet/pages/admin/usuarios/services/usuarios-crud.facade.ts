@@ -12,7 +12,7 @@ import {
 	UsuarioDetalle,
 	UsuarioLista,
 	UsuariosEstadisticas,
-} from './usuarios.models';
+} from '../models';
 import { UsuariosService } from './usuarios.service';
 import { UsuariosStore } from './usuarios.store';
 

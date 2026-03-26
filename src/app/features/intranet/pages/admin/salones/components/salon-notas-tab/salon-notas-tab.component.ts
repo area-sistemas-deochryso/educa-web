@@ -7,7 +7,8 @@ import { SelectModule } from 'primeng/select';
 import { TagModule } from 'primeng/tag';
 import { TooltipModule } from 'primeng/tooltip';
 
-import { HorarioResponseDto, SalonNotasResumenDto } from '@data/models';
+import { HorarioResponseDto, SalonNotasResumenDto, ConfiguracionCalificacionListDto } from '@data/models';
+import { isNotaAprobada, formatNotaConConfig } from '@shared/services/calificacion-config';
 
 @Component({
 	selector: 'app-salon-notas-tab',
@@ -23,6 +24,7 @@ export class SalonNotasTabComponent {
 	readonly loading = input(false);
 	readonly horarios = input<HorarioResponseDto[]>([]);
 	readonly horariosLoading = input(false);
+	readonly calificacionConfig = input<ConfiguracionCalificacionListDto | null>(null);
 
 	readonly cursoChange = output<{ salonId: number; cursoId: number }>();
 	// #endregion
@@ -78,36 +80,39 @@ export class SalonNotasTabComponent {
 	// #region Helpers
 	getNotaValue(notas: { calificacionId: number; nota: number | null }[], calificacionId: number): string {
 		const nota = notas.find((n) => n.calificacionId === calificacionId);
-		return nota?.nota !== null && nota?.nota !== undefined ? String(nota.nota) : '—';
+		if (nota?.nota === null || nota?.nota === undefined) return '—';
+		return formatNotaConConfig(nota.nota, this.calificacionConfig());
 	}
 
 	getPromedioValue(promedios: { periodo: string; promedio: number | null }[], periodoNombre: string): string {
 		const p = promedios.find((pm) => pm.periodo === periodoNombre);
-		return p?.promedio !== null && p?.promedio !== undefined ? String(p.promedio) : '—';
+		if (p?.promedio === null || p?.promedio === undefined) return '—';
+		return formatNotaConConfig(p.promedio, this.calificacionConfig());
 	}
 
 	getGeneralPromedio(promedios: { periodo: string; promedio: number | null }[]): string {
 		const p = promedios.find((pm) => pm.periodo === 'General');
-		return p?.promedio !== null && p?.promedio !== undefined ? String(p.promedio) : '—';
+		if (p?.promedio === null || p?.promedio === undefined) return '—';
+		return formatNotaConConfig(p.promedio, this.calificacionConfig());
 	}
 
-	/** Retorna clase CSS según el valor de la nota (aprobatoria >= 11) */
+	/** Retorna clase CSS según la configuración de calificación del nivel */
 	getNotaClass(notas: { calificacionId: number; nota: number | null }[], calificacionId: number): string {
 		const nota = notas.find((n) => n.calificacionId === calificacionId);
 		if (nota?.nota === null || nota?.nota === undefined) return 'nota-vacia';
-		return nota.nota >= 11 ? 'nota-alta' : 'nota-baja';
+		return isNotaAprobada(nota.nota, this.calificacionConfig()) ? 'nota-alta' : 'nota-baja';
 	}
 
 	getPromedioClass(promedios: { periodo: string; promedio: number | null }[], periodoNombre: string): string {
 		const p = promedios.find((pm) => pm.periodo === periodoNombre);
 		if (p?.promedio === null || p?.promedio === undefined) return 'nota-vacia';
-		return p.promedio >= 11 ? 'nota-alta' : 'nota-baja';
+		return isNotaAprobada(p.promedio, this.calificacionConfig()) ? 'nota-alta' : 'nota-baja';
 	}
 
 	getGeneralClass(promedios: { periodo: string; promedio: number | null }[]): string {
 		const p = promedios.find((pm) => pm.periodo === 'General');
 		if (p?.promedio === null || p?.promedio === undefined) return 'nota-vacia';
-		return p.promedio >= 11 ? 'nota-alta' : 'nota-baja';
+		return isNotaAprobada(p.promedio, this.calificacionConfig()) ? 'nota-alta' : 'nota-baja';
 	}
 	// #endregion
 }

@@ -3,6 +3,7 @@ import { ChangeDetectionStrategy, Component, EventEmitter, Input, Output, OnChan
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { DialogModule } from 'primeng/dialog';
+import { getGradeClass as getGradeClassFn } from '@shared/services/calificacion-config';
 
 // #endregion
 // #region Implementation
@@ -166,9 +167,7 @@ export class GradesModalComponent implements OnChanges {
 	 * @param grade Grade value.
 	 */
 	getGradeClass(grade: number): string {
-		if (grade === 0) return 'grade-red';
-		if (grade < 11) return 'grade-red';
-		return 'grade-green';
+		return getGradeClassFn(grade) || 'grade-red';
 	}
 }
 // #endregion

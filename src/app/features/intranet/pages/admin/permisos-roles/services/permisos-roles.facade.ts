@@ -13,7 +13,7 @@ import {
 } from '@core/services';
 import { environment } from '@config';
 import { UiMappingService } from '@shared/services';
-import { UI_ADMIN_ERROR_DETAILS, UI_SUMMARIES } from '@app/shared/constants';
+import { UI_ADMIN_ERROR_DETAILS, UI_SUMMARIES, UI_PERMISOS_SUCCESS_DETAILS } from '@app/shared/constants';
 import { buildModulosVistas } from '../helpers/permisos-modulos.utils';
 
 import { PermisosRolesStore } from './permisos-roles.store';
@@ -105,7 +105,7 @@ export class PermisosRolesFacade {
 				http$: () => this.api.actualizarPermisoRol(permiso.id, { vistas, rowVersion: permiso.rowVersion }),
 				onCommit: () => {
 					this.refreshPermisosRolOnly();
-					this.errorHandler.showSuccess(UI_SUMMARIES.success, 'Permisos actualizados');
+					this.errorHandler.showSuccess(UI_SUMMARIES.success, UI_PERMISOS_SUCCESS_DETAILS.updated);
 				},
 				onError: (err) => this.errHandler.handle(err, 'actualizar permiso', () => this.store.setLoading(false)),
 				optimistic: {
@@ -129,7 +129,7 @@ export class PermisosRolesFacade {
 				http$: () => this.api.crearPermisoRol({ rol, vistas }),
 				onCommit: () => {
 					this.refreshPermisosRolOnly();
-					this.errorHandler.showSuccess(UI_SUMMARIES.success, 'Permisos creados');
+					this.errorHandler.showSuccess(UI_SUMMARIES.success, UI_PERMISOS_SUCCESS_DETAILS.created);
 				},
 				onError: (err) => this.errHandler.handle(err, 'crear permiso', () => this.store.setLoading(false)),
 				optimistic: {
@@ -156,7 +156,7 @@ export class PermisosRolesFacade {
 			payload: null,
 			http$: () => this.api.eliminarPermisoRol(permiso.id),
 			onCommit: () => {
-				this.errorHandler.showSuccess(UI_SUMMARIES.success, 'Permiso eliminado');
+				this.errorHandler.showSuccess(UI_SUMMARIES.success, UI_PERMISOS_SUCCESS_DETAILS.deleted);
 			},
 			onError: (err) => this.errHandler.handle(err, 'eliminar permiso', () => this.store.setLoading(false)),
 			optimistic: {

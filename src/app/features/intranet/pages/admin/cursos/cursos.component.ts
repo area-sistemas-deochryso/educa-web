@@ -21,7 +21,7 @@ import { EstadoLabelPipe, EstadoSeverityPipe, EstadoToggleIconPipe, EstadoToggle
 import { buildDeleteCursoMessage } from '@app/shared/constants';
 
 import { CursosFacade } from './services';
-import type { Curso } from './services/cursos.models';
+import type { Curso } from './models';
 
 @Component({
 	selector: 'app-cursos',

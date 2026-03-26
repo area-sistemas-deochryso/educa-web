@@ -8,7 +8,7 @@ import {
 	UsuarioDetalle,
 	UsuarioLista,
 	UsuariosEstadisticas,
-} from './usuarios.models';
+} from '../models';
 import { Injectable, inject } from '@angular/core';
 import { Observable, catchError, of } from 'rxjs';
 

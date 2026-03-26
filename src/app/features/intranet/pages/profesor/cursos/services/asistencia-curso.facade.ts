@@ -2,6 +2,7 @@ import { Injectable, inject, DestroyRef } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { withRetry, facadeErrorHandler } from '@core/helpers';
 import { ErrorHandlerService } from '@core/services';
+import { UI_SUMMARIES, UI_ASISTENCIA_SUCCESS_MESSAGES } from '@shared/constants';
 import { ProfesorApiService } from '../../services/profesor-api.service';
 import { CursoContenidoStore } from './curso-contenido.store';
 import { AsistenciaCursoStore } from './asistencia-curso.store';
@@ -106,7 +107,7 @@ export class AsistenciaCursoFacade {
 		this.api.registrarAsistenciaCurso(horarioId, dto).subscribe({
 			next: () => {
 				this.store.setRegistroSaving(false);
-				this.errorHandler.showSuccess('Éxito', 'Asistencia registrada exitosamente');
+				this.errorHandler.showSuccess(UI_SUMMARIES.success, UI_ASISTENCIA_SUCCESS_MESSAGES.registered);
 			},
 			error: (err) => {
 				this.errHandler.handle(err, 'registrar asistencia');

@@ -131,6 +131,50 @@ export const UI_ATTACHMENT_MESSAGES = {
 	fileEmpty: 'El archivo está vacío',
 	fileTooLarge: (maxMb: number): string =>
 		`El archivo es demasiado grande (máximo ${maxMb}MB)`,
+	uploadFailed: 'No se pudo subir el archivo',
+	registerFailed: 'No se pudo registrar el archivo',
+	deleteFailed: 'No se pudo eliminar el archivo',
+	loadStudentFilesFailed: 'No se pudo cargar los archivos de estudiantes',
+	loadSubmissionsFailed: 'No se pudo cargar las entregas de estudiantes',
+} as const;
+
+export const UI_SALONES_SUCCESS_MESSAGES = {
+	configUpdated: 'Los cambios se guardaron correctamente',
+	configCreated: 'Configuración creada correctamente',
+	periodoCreated: (nivel: string): string => `Periodo de ${nivel} creado correctamente`,
+	periodoClosed: 'Periodo cerrado correctamente',
+} as const;
+
+export const UI_SALONES_ERROR_DETAILS = {
+	updateConfig: 'No se pudo actualizar la configuración',
+	createConfig: 'No se pudo crear la configuración',
+	createPeriodo: 'No se pudo crear el periodo',
+	closePeriodo: 'No se pudo cerrar el periodo',
+	loadAprobaciones: 'No se pudieron cargar las aprobaciones',
+	aprobarEstudiante: 'No se pudo completar la aprobación',
+	aprobarMasivo: 'No se pudo completar la aprobación masiva',
+} as const;
+
+export const UI_SALONES_CONFIRM_HEADERS = {
+	configCreated: 'Configuración creada',
+	configUpdated: 'Configuración actualizada',
+	periodoCreated: 'Periodo creado',
+	aprobacionMasiva: 'Aprobación masiva completada',
+} as const;
+
+export const UI_ASISTENCIA_SUCCESS_MESSAGES = {
+	registered: 'Asistencia registrada exitosamente',
+} as const;
+
+export const UI_PERMISOS_SUCCESS_DETAILS = {
+	updated: 'Permisos actualizados',
+	created: 'Permisos creados',
+	deleted: 'Permiso eliminado',
+} as const;
+
+export const UI_ESTUDIANTE_ERROR_DETAILS = {
+	loadCursos: 'No se pudieron cargar los cursos',
+	loadContenido: 'No se pudo cargar el contenido del curso',
 } as const;
 
 export const UI_ERROR_SUMMARIES = {

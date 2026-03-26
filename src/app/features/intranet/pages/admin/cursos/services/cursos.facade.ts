@@ -9,7 +9,7 @@ import {
 } from '@core/services';
 import { environment } from '@config';
 
-import { Curso } from './cursos.models';
+import { Curso } from '../models';
 import { CursosService } from './cursos.service';
 import { GradosService } from './grados.service';
 import { CursosStore } from './cursos.store';
@@ -31,6 +31,10 @@ export class CursosFacade extends BaseCrudFacade<Curso, CursoFormData, CursosEst
 		apiUrl: `${environment.apiUrl}/api/sistema/cursos`,
 		loadErrorMessage: 'No se pudieron cargar los cursos',
 	};
+	// #endregion
+
+	// #region Estado expuesto
+	readonly vm = this.store.vm;
 	// #endregion
 
 	constructor() {

@@ -20,6 +20,11 @@ import {
 	esNotaEditable,
 	GrupoContenidoDto,
 } from '../../../models';
+import {
+	getNotaSeverity as getNotaSeverityFn,
+	isNotaAprobada,
+} from '@shared/services/calificacion-config';
+import type { ConfiguracionCalificacionListDto } from '@data/models';
 
 interface NotaRow {
 	estudianteId: number;
@@ -71,6 +76,7 @@ export class CalificarDialogComponent {
 	readonly calificacion = input<CalificacionConNotasDto | null>(null);
 	readonly estudiantes = input<{ id: number; nombre: string }[]>([]);
 	readonly grupos = input<GrupoContenidoDto[]>([]);
+	readonly calificacionConfig = input<ConfiguracionCalificacionListDto | null>(null);
 	// #endregion
 
 	// #region Outputs
@@ -118,14 +124,15 @@ export class CalificarDialogComponent {
 	readonly stats = computed(() => {
 		this._editVersion();
 		if (this.isGrupal()) return this.grupoStats();
+		const config = this.calificacionConfig();
 		const rows = this.notaRows();
 		const conNota = rows.filter((r) => r.nota !== null && r.nota !== undefined);
 		const promedio =
 			conNota.length > 0
 				? conNota.reduce((acc, r) => acc + (r.nota ?? 0), 0) / conNota.length
 				: 0;
-		const aprobados = conNota.filter((r) => r.nota! >= 11).length;
-		const desaprobados = conNota.filter((r) => r.nota! < 11).length;
+		const aprobados = conNota.filter((r) => isNotaAprobada(r.nota, config)).length;
+		const desaprobados = conNota.length - aprobados;
 		const sinCalificar = rows.filter((r) => r.nota === null || r.nota === undefined).length;
 		return {
 			total: rows.length,
@@ -139,14 +146,15 @@ export class CalificarDialogComponent {
 
 	private readonly grupoStats = computed(() => {
 		this._editVersion();
+		const config = this.calificacionConfig();
 		const rows = this.grupoNotaRows();
 		const conNota = rows.filter((r) => r.nota !== null && r.nota !== undefined);
 		const promedio =
 			conNota.length > 0
 				? conNota.reduce((acc, r) => acc + (r.nota ?? 0), 0) / conNota.length
 				: 0;
-		const aprobados = conNota.filter((r) => r.nota! >= 11).length;
-		const desaprobados = conNota.filter((r) => r.nota! < 11).length;
+		const aprobados = conNota.filter((r) => isNotaAprobada(r.nota, config)).length;
+		const desaprobados = conNota.length - aprobados;
 		const sinCalificar = rows.filter((r) => r.nota === null || r.nota === undefined).length;
 		const totalOverrides = rows.reduce(
 			(acc, r) => acc + r.miembros.filter((m) => m.esOverride).length,
@@ -325,10 +333,7 @@ export class CalificarDialogComponent {
 	}
 
 	getNotaSeverity(nota: number | null): 'success' | 'warn' | 'danger' | 'secondary' {
-		if (nota === null) return 'secondary';
-		if (nota >= 14) return 'success';
-		if (nota >= 11) return 'warn';
-		return 'danger';
+		return getNotaSeverityFn(nota, this.calificacionConfig());
 	}
 	// #endregion
 

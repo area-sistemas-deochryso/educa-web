@@ -8,6 +8,8 @@ import { SkeletonModule } from 'primeng/skeleton';
 import { ButtonModule } from 'primeng/button';
 import { InputTextModule } from 'primeng/inputtext';
 import { SalonNotasResumenDto, calcularPromedioPonderado, NOTA_MAXIMA } from '../../../models';
+import { getNotaSeverity, formatNotaConConfig } from '@shared/services/calificacion-config';
+import type { ConfiguracionCalificacionListDto } from '@data/models';
 
 export interface NotaSaveEvent {
 	calificacionId: number;
@@ -48,6 +50,7 @@ export class SalonNotasEstudianteTabComponent {
 	readonly cursoOptions = input<{ label: string; value: number }[]>([]);
 	readonly selectedCurso = input<number | null>(null);
 	readonly estudiantes = input<{ estudianteId: number; dni: string; nombreCompleto: string }[]>([]);
+	readonly calificacionConfig = input<ConfiguracionCalificacionListDto | null>(null);
 	// #endregion
 
 	// #region Outputs
@@ -252,15 +255,11 @@ export class SalonNotasEstudianteTabComponent {
 
 	// #region Helpers
 	getNotaSeverity(nota: number | null): 'success' | 'warn' | 'danger' | 'secondary' {
-		if (nota === null || nota === undefined) return 'secondary';
-		if (nota >= 14) return 'success';
-		if (nota >= 11) return 'warn';
-		return 'danger';
+		return getNotaSeverity(nota, this.calificacionConfig());
 	}
 
 	formatNota(nota: number | null): string {
-		if (nota === null || nota === undefined) return '-';
-		return nota.toFixed(1);
+		return formatNotaConConfig(nota, this.calificacionConfig());
 	}
 	// #endregion
 }

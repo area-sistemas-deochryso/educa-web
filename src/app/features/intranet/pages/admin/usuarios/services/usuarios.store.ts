@@ -7,7 +7,7 @@ import {
 	UsuarioDetalle,
 	UsuarioLista,
 	UsuariosEstadisticas,
-} from './usuarios.models';
+} from '../models';
 import { Injectable, computed, inject, signal } from '@angular/core';
 import { Subject } from 'rxjs';
 

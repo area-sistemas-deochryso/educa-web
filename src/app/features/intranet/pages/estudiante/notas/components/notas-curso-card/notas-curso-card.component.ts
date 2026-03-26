@@ -6,6 +6,8 @@ import {
 	EstudianteMisNotasDto,
 	VistaPromedio,
 } from '../../../models';
+import { getNotaSeverity, formatNotaConConfig } from '@shared/services/calificacion-config';
+import type { ConfiguracionCalificacionListDto } from '@data/models';
 
 @Component({
 	selector: 'app-notas-curso-card',
@@ -19,6 +21,7 @@ export class NotasCursoCardComponent {
 	// #region Inputs
 	readonly curso = input.required<EstudianteMisNotasDto>();
 	readonly vistaActual = input<VistaPromedio>('semana');
+	readonly calificacionConfig = input<ConfiguracionCalificacionListDto | null>(null);
 	// #endregion
 
 	// #region Computed
@@ -55,15 +58,11 @@ export class NotasCursoCardComponent {
 	}
 
 	getNotaSeverity(nota: number | null): 'success' | 'warn' | 'danger' | 'secondary' {
-		if (nota === null || nota === undefined) return 'secondary';
-		if (nota >= 14) return 'success';
-		if (nota >= 11) return 'warn';
-		return 'danger';
+		return getNotaSeverity(nota, this.calificacionConfig());
 	}
 
 	formatNota(nota: number | null): string {
-		if (nota === null || nota === undefined) return '-';
-		return nota.toFixed(1);
+		return formatNotaConConfig(nota, this.calificacionConfig());
 	}
 	// #endregion
 }

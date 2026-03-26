@@ -3,7 +3,7 @@ import { Injectable, signal, computed } from '@angular/core';
 import { BaseCrudStore } from '@core/store';
 import { detectarNivel, removeNivelPrefix, NIVEL_VISUAL_CONFIGS } from '@core/helpers';
 
-import { Curso, CursosEstadisticas, Grado, NivelGradoConfig } from './cursos.models';
+import { Curso, CursosEstadisticas, Grado, NivelGradoConfig } from '../models';
 
 // #region Interfaces
 interface GradoOption {

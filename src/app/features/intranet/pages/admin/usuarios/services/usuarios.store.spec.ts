@@ -4,7 +4,7 @@ import { TestBed } from '@angular/core/testing';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { UsuariosStore } from './usuarios.store';
-import { UsuarioDetalle, UsuarioLista, UsuariosEstadisticas } from './usuarios.models';
+import { UsuarioDetalle, UsuarioLista, UsuariosEstadisticas } from '../models';
 import { DebugService } from '@core/helpers';
 
 // #endregion

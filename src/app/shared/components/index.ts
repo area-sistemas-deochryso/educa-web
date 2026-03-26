@@ -1,14 +1,13 @@
 // #region Implementation
-// Los componentes compartidos se mantienen temporalmente en components/shared
-// y se migrarán gradualmente a esta ubicación
-
 export * from './toast-container';
 export * from './form-error';
-export * from './form-field-error/form-field-error.component';
-export * from './skeleton-loader/skeleton-loader.component';
+export * from './form-field-error';
+export * from './skeleton-loader';
 export * from './table-skeleton';
 export * from './stats-skeleton';
-export * from './lazy-content/lazy-content.component';
+export * from './lazy-content';
+export * from './progressive-loader';
+export * from './rate-limit-banner';
 export * from './responsive-table';
 export * from './devtools';
 export * from './sync-status';

@@ -12,6 +12,8 @@ import {
 	PeriodoCalificacionDto,
 	VistaPromedio,
 } from '../../../models';
+import { getNotaSeverity, formatNotaConConfig } from '@shared/services/calificacion-config';
+import type { ConfiguracionCalificacionListDto } from '@data/models';
 
 interface PeriodoColumnsGroup {
 	periodo: PeriodoCalificacionDto;
@@ -49,6 +51,7 @@ export class SalonNotasTabComponent {
 	readonly cursoOptions = input<{ label: string; value: number }[]>([]);
 	readonly selectedCurso = input<number | null>(null);
 	readonly vistaActual = input<VistaPromedio>('semana');
+	readonly calificacionConfig = input<ConfiguracionCalificacionListDto | null>(null);
 	// #endregion
 
 	// #region Outputs
@@ -153,15 +156,11 @@ export class SalonNotasTabComponent {
 	}
 
 	getNotaSeverity(nota: number | null): 'success' | 'warn' | 'danger' | 'secondary' {
-		if (nota === null || nota === undefined) return 'secondary';
-		if (nota >= 14) return 'success';
-		if (nota >= 11) return 'warn';
-		return 'danger';
+		return getNotaSeverity(nota, this.calificacionConfig());
 	}
 
 	formatNota(nota: number | null): string {
-		if (nota === null || nota === undefined) return '-';
-		return nota.toFixed(1);
+		return formatNotaConConfig(nota, this.calificacionConfig());
 	}
 	// #endregion
 }

@@ -6,7 +6,7 @@ import { forkJoin, from, of, Subject } from 'rxjs';
 import { AsistenciaService, ErrorHandlerService, SwService, WalService } from '@core/services';
 import { logger, withRetry } from '@core/helpers';
 import { UI_ADMIN_ERROR_DETAILS, UI_SUMMARIES } from '@app/shared/constants';
-import { RolUsuarioAdmin, UsuarioLista, UsuariosEstadisticas } from './usuarios.models';
+import { RolUsuarioAdmin, UsuarioLista, UsuariosEstadisticas } from '../models';
 import { UsuariosService } from './usuarios.service';
 import { UsuariosStore } from './usuarios.store';
 

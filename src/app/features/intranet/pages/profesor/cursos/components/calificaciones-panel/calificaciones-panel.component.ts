@@ -9,6 +9,8 @@ import {
 	CalificacionDto,
 	TIPOS_EVALUACION,
 } from '../../../models';
+import { formatNotaConConfig } from '@shared/services/calificacion-config';
+import type { ConfiguracionCalificacionListDto } from '@data/models';
 
 @Component({
 	selector: 'app-calificaciones-panel',
@@ -25,6 +27,7 @@ export class CalificacionesPanelComponent {
 	readonly loading = input(false);
 	readonly saving = input(false);
 	readonly totalEvaluaciones = input(0);
+	readonly calificacionConfig = input<ConfiguracionCalificacionListDto | null>(null);
 	// #endregion
 
 	// #region Outputs
@@ -72,7 +75,8 @@ export class CalificacionesPanelComponent {
 	getPromedio(cal: CalificacionConNotasDto): string {
 		if (cal.notas.length === 0) return '-';
 		const sum = cal.notas.reduce((acc, n) => acc + n.nota, 0);
-		return (sum / cal.notas.length).toFixed(1);
+		const promedio = Math.round((sum / cal.notas.length) * 10) / 10;
+		return formatNotaConConfig(promedio, this.calificacionConfig());
 	}
 	// #endregion
 }

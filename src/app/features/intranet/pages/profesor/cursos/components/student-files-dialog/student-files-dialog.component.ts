@@ -6,6 +6,8 @@ import { TooltipModule } from 'primeng/tooltip';
 import { TagModule } from 'primeng/tag';
 import { ProgressSpinnerModule } from 'primeng/progressspinner';
 import { SemanaEstudianteArchivosDto, CalificacionConNotasDto } from '../../../models';
+import { getNotaSeverity } from '@shared/services/calificacion-config';
+import type { ConfiguracionCalificacionListDto } from '@data/models';
 
 @Component({
 	selector: 'app-student-files-dialog',
@@ -21,6 +23,7 @@ export class StudentFilesDialogComponent {
 	readonly data = input<SemanaEstudianteArchivosDto[]>([]);
 	readonly loading = input<boolean>(false);
 	readonly calificaciones = input<CalificacionConNotasDto[]>([]);
+	readonly calificacionConfig = input<ConfiguracionCalificacionListDto | null>(null);
 	readonly visibleChange = output<boolean>();
 	readonly irACalificaciones = output<void>();
 	// #endregion
@@ -71,9 +74,8 @@ export class StudentFilesDialogComponent {
 	}
 
 	getNotaSeverity(nota: number): 'success' | 'warn' | 'danger' {
-		if (nota >= 14) return 'success';
-		if (nota >= 11) return 'warn';
-		return 'danger';
+		const severity = getNotaSeverity(nota, this.calificacionConfig());
+		return severity === 'secondary' ? 'danger' : severity;
 	}
 	// #endregion
 }

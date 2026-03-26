@@ -2,6 +2,7 @@ import { Injectable, inject, DestroyRef } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { logger, withRetry, facadeErrorHandler } from '@core/helpers';
 import { ErrorHandlerService, WalFacadeHelper } from '@core/services';
+import { UI_SUMMARIES, UI_ADMIN_ERROR_DETAILS } from '@shared/constants';
 import { environment } from '@config';
 import { ProfesorApiService } from '../../services/profesor-api.service';
 import { CursoContenidoStore } from './curso-contenido.store';
@@ -71,8 +72,8 @@ export class CursoContenidoDataFacade {
 				},
 				error: (err) => {
 					logger.error('CursoContenidoDataFacade: Error al cargar contenido', err);
-					this.errorHandler.showError('Error', 'No se pudo cargar el contenido del curso');
-					this.store.setError('No se pudo cargar el contenido del curso');
+					this.errorHandler.showError(UI_SUMMARIES.error, UI_ADMIN_ERROR_DETAILS.loadContenido);
+					this.store.setError(UI_ADMIN_ERROR_DETAILS.loadContenido);
 					this.store.setLoading(false);
 				},
 			});

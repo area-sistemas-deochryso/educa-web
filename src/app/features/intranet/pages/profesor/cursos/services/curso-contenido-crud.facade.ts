@@ -2,6 +2,7 @@ import { Injectable, inject, DestroyRef } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { logger, facadeErrorHandler } from '@core/helpers';
 import { ErrorHandlerService, WalFacadeHelper } from '@core/services';
+import { UI_SUMMARIES, UI_ATTACHMENT_MESSAGES } from '@shared/constants';
 import { environment } from '@config';
 import { ProfesorApiService } from '../../services/profesor-api.service';
 import { CursoContenidoStore } from './curso-contenido.store';
@@ -123,7 +124,7 @@ export class CursoContenidoCrudFacade {
 				},
 				error: (err) => {
 					logger.error('CursoContenidoCrudFacade: Error al subir archivo', err);
-					this.errorHandler.showError('Error', 'No se pudo subir el archivo');
+					this.errorHandler.showError(UI_SUMMARIES.error, UI_ATTACHMENT_MESSAGES.uploadFailed);
 					this.store.setSaving(false);
 				},
 			});
@@ -203,7 +204,7 @@ export class CursoContenidoCrudFacade {
 				},
 				error: (err) => {
 					logger.error('CursoContenidoCrudFacade: Error al subir archivo de tarea', err);
-					this.errorHandler.showError('Error', 'No se pudo subir el archivo');
+					this.errorHandler.showError(UI_SUMMARIES.error, UI_ATTACHMENT_MESSAGES.uploadFailed);
 					this.store.setSaving(false);
 				},
 			});

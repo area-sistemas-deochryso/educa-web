@@ -6,7 +6,7 @@ import { ButtonModule } from 'primeng/button';
 import { TagModule } from 'primeng/tag';
 import { TooltipModule } from 'primeng/tooltip';
 
-import { SalonAdminListDto } from '../../models';
+import { SalonAdminListDto, PeriodoCierreEstado } from '../../models';
 
 @Component({
 	selector: 'app-salones-admin-table',
@@ -25,7 +25,7 @@ export class SalonesAdminTableComponent {
 	// #endregion
 
 	// #region Helpers
-	getEstadoPeriodoSeverity(estado: string): 'success' | 'warn' | 'danger' | 'info' | 'secondary' | 'contrast' {
+	getEstadoPeriodoSeverity(estado: PeriodoCierreEstado | string): 'success' | 'warn' | 'danger' | 'info' | 'secondary' | 'contrast' {
 		switch (estado) {
 			case 'CERRADO':
 				return 'success';
@@ -38,7 +38,7 @@ export class SalonesAdminTableComponent {
 		}
 	}
 
-	getEstadoPeriodoLabel(estado: string): string {
+	getEstadoPeriodoLabel(estado: PeriodoCierreEstado | string): string {
 		switch (estado) {
 			case 'CERRADO':
 				return 'Cerrado';

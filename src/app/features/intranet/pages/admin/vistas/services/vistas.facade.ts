@@ -30,6 +30,10 @@ export class VistasFacade extends BaseCrudFacade<Vista, { ruta: string; nombre: 
 	};
 	// #endregion
 
+	// #region Estado expuesto
+	readonly vm = this.store.vm;
+	// #endregion
+
 	constructor() {
 		super();
 		this.initErrorHandler();

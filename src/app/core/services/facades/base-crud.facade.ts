@@ -15,7 +15,7 @@ import type { BaseCrudStore } from '@core/store/base/base-crud.store';
 // #region Types
 
 export interface HasEstado {
-	estado: boolean | number;
+	estado: boolean | number | null;
 }
 
 /** Configuración que cada facade concreto provee al construir. */
@@ -86,8 +86,6 @@ export abstract class BaseCrudFacade<
 	protected abstract readonly config: BaseCrudFacadeConfig;
 	// #endregion
 
-	// #region Estado expuesto
-	get vm() { return this.store.vm; }
 	// #endregion
 
 	constructor() {
@@ -97,7 +95,7 @@ export abstract class BaseCrudFacade<
 
 	/** Llamar en el constructor del facade concreto después de super() */
 	protected initErrorHandler(): void {
-		(this as { errHandler: FacadeErrorHandler }).errHandler = facadeErrorHandler({
+		(this as unknown as { errHandler: FacadeErrorHandler }).errHandler = facadeErrorHandler({
 			tag: this.config.tag,
 			errorHandler: this.errorHandler,
 		});

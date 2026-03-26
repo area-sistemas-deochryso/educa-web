@@ -6,6 +6,7 @@ import { HorarioResponseDto, SalonNotasResumenDto } from '@data/models';
 
 import {
 	NivelEducativo,
+	NIVELES,
 	SalonAdminListDto,
 	PeriodoAcademicoListDto,
 	ConfiguracionCalificacionListDto,
@@ -117,8 +118,7 @@ export class ProfesorFinalSalonesStore {
 		for (const s of salones) {
 			niveles.add(determinarNivelPorOrden(s.gradoOrden));
 		}
-		const orden: NivelEducativo[] = ['Inicial', 'Primaria', 'Secundaria'];
-		return orden.filter((n) => niveles.has(n));
+		return NIVELES.filter((n) => niveles.has(n));
 	});
 	// #endregion
 

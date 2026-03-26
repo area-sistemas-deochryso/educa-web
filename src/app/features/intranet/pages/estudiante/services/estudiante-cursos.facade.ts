@@ -2,6 +2,7 @@ import { Injectable, inject, DestroyRef } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { logger, withRetry } from '@core/helpers';
 import { ErrorHandlerService } from '@core/services';
+import { UI_SUMMARIES, UI_ESTUDIANTE_ERROR_DETAILS, UI_ADMIN_ERROR_DETAILS, UI_ATTACHMENT_MESSAGES } from '@shared/constants';
 import { SmartNotificationService } from '@core/services/notifications/smart-notification.service';
 import { ActividadSnapshot } from '@core/services/notifications/smart-notification.models';
 import { EstudianteApiService } from './estudiante-api.service';
@@ -41,8 +42,8 @@ export class EstudianteCursosFacade {
 				},
 				error: (err) => {
 					logger.error('EstudianteCursosFacade: Error al cargar horarios', err);
-					this.errorHandler.showError('Error', 'No se pudieron cargar los cursos');
-					this.store.setError('No se pudieron cargar los cursos');
+					this.errorHandler.showError(UI_SUMMARIES.error, UI_ESTUDIANTE_ERROR_DETAILS.loadCursos);
+					this.store.setError(UI_ESTUDIANTE_ERROR_DETAILS.loadCursos);
 					this.store.setLoading(false);
 				},
 			});
@@ -69,7 +70,7 @@ export class EstudianteCursosFacade {
 				},
 				error: (err) => {
 					logger.error('EstudianteCursosFacade: Error al cargar contenido', err);
-					this.errorHandler.showError('Error', 'No se pudo cargar el contenido del curso');
+					this.errorHandler.showError(UI_SUMMARIES.error, UI_ESTUDIANTE_ERROR_DETAILS.loadContenido);
 					this.store.setContentLoading(false);
 				},
 			});
@@ -248,14 +249,14 @@ export class EstudianteCursosFacade {
 							},
 							error: (err) => {
 								logger.error('EstudianteCursosFacade: Error al registrar archivo', err);
-								this.errorHandler.showError('Error', 'No se pudo registrar el archivo');
+								this.errorHandler.showError(UI_SUMMARIES.error, UI_ATTACHMENT_MESSAGES.registerFailed);
 								this.store.setSaving(false);
 							},
 						});
 				},
 				error: (err) => {
 					logger.error('EstudianteCursosFacade: Error al subir archivo', err);
-					this.errorHandler.showError('Error', 'No se pudo subir el archivo');
+					this.errorHandler.showError(UI_SUMMARIES.error, UI_ATTACHMENT_MESSAGES.uploadFailed);
 					this.store.setSaving(false);
 				},
 			});
@@ -273,7 +274,7 @@ export class EstudianteCursosFacade {
 			.subscribe({
 				error: (err) => {
 					logger.error('EstudianteCursosFacade: Error al eliminar archivo', err);
-					this.errorHandler.showError('Error', 'No se pudo eliminar el archivo');
+					this.errorHandler.showError(UI_SUMMARIES.error, UI_ATTACHMENT_MESSAGES.deleteFailed);
 					// Re-load to restore state
 					this.loadMisArchivosForce(semanaId);
 				},
@@ -339,14 +340,14 @@ export class EstudianteCursosFacade {
 							},
 							error: (err) => {
 								logger.error('EstudianteCursosFacade: Error al registrar archivo de tarea', err);
-								this.errorHandler.showError('Error', 'No se pudo registrar el archivo');
+								this.errorHandler.showError(UI_SUMMARIES.error, UI_ATTACHMENT_MESSAGES.registerFailed);
 								this.store.setSaving(false);
 							},
 						});
 				},
 				error: (err) => {
 					logger.error('EstudianteCursosFacade: Error al subir archivo de tarea', err);
-					this.errorHandler.showError('Error', 'No se pudo subir el archivo');
+					this.errorHandler.showError(UI_SUMMARIES.error, UI_ATTACHMENT_MESSAGES.uploadFailed);
 					this.store.setSaving(false);
 				},
 			});
@@ -364,7 +365,7 @@ export class EstudianteCursosFacade {
 			.subscribe({
 				error: (err) => {
 					logger.error('EstudianteCursosFacade: Error al eliminar archivo de tarea', err);
-					this.errorHandler.showError('Error', 'No se pudo eliminar el archivo');
+					this.errorHandler.showError(UI_SUMMARIES.error, UI_ATTACHMENT_MESSAGES.deleteFailed);
 					this.loadMisTareaArchivosForce(tareaId);
 				},
 			});

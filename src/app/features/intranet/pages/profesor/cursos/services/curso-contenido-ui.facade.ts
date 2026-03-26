@@ -2,6 +2,7 @@ import { Injectable, inject, DestroyRef } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { logger, withRetry } from '@core/helpers';
 import { ErrorHandlerService } from '@core/services';
+import { UI_SUMMARIES, UI_ATTACHMENT_MESSAGES } from '@shared/constants';
 import { ProfesorApiService } from '../../services/profesor-api.service';
 import { CursoContenidoStore } from './curso-contenido.store';
 import { CursoContenidoSemanaDto, CursoContenidoTareaDto } from '../../models';
@@ -104,7 +105,7 @@ export class CursoContenidoUiFacade {
 				},
 				error: (err) => {
 					logger.error('CursoContenidoUiFacade: Error al cargar archivos de estudiantes', err);
-					this.errorHandler.showError('Error', 'No se pudo cargar los archivos de estudiantes');
+					this.errorHandler.showError(UI_SUMMARIES.error, UI_ATTACHMENT_MESSAGES.loadStudentFilesFailed);
 					this.store.setStudentFilesLoading(false);
 				},
 			});
@@ -141,7 +142,7 @@ export class CursoContenidoUiFacade {
 				},
 				error: (err) => {
 					logger.error('CursoContenidoUiFacade: Error al cargar entregas de tarea', err);
-					this.errorHandler.showError('Error', 'No se pudo cargar las entregas de estudiantes');
+					this.errorHandler.showError(UI_SUMMARIES.error, UI_ATTACHMENT_MESSAGES.loadSubmissionsFailed);
 					this.store.setTaskSubmissionsLoading(false);
 				},
 			});

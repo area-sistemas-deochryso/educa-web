@@ -8,6 +8,7 @@ import {
 	CourseSummary,
 	getCourseSummaries,
 } from '@features/intranet/pages/shared/schedule-component/courses.config';
+import { getGradeClass as getGradeClassFn } from '@shared/services/calificacion-config';
 
 // #endregion
 // #region Implementation
@@ -113,9 +114,7 @@ export class SummaryModalComponent {
 	 * @param grade Grade value.
 	 */
 	getGradeClass(grade: number): string {
-		if (grade === 0) return 'grade-red';
-		if (grade < 11) return 'grade-red';
-		return 'grade-green';
+		return getGradeClassFn(grade) || 'grade-red';
 	}
 
 	/**

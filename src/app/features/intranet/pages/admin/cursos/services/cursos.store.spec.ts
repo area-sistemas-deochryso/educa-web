@@ -4,7 +4,7 @@ import { TestBed } from '@angular/core/testing';
 import { beforeEach, describe, expect, it } from 'vitest';
 
 import { CursosStore } from './cursos.store';
-import { Curso, Grado } from './cursos.models';
+import { Curso, Grado } from '../models';
 
 // #endregion
 

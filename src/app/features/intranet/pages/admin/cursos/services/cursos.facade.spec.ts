@@ -9,7 +9,7 @@ import { CursosStore } from './cursos.store';
 import { CursosService } from './cursos.service';
 import { GradosService } from './grados.service';
 import { ErrorHandlerService, WalFacadeHelper } from '@core/services';
-import { Curso, Grado, CursosEstadisticas } from './cursos.models';
+import { Curso, Grado, CursosEstadisticas } from '../models';
 
 // #endregion
 

@@ -4,7 +4,7 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { ErrorHandlerService } from '@core/services';
 import { logger, withRetry } from '@core/helpers';
 import { UI_ADMIN_ERROR_DETAILS, UI_SUMMARIES } from '@app/shared/constants';
-import { UsuarioDetalle, UsuarioLista } from './usuarios.models';
+import { UsuarioDetalle, UsuarioLista } from '../models';
 import { UsuariosService } from './usuarios.service';
 import { UsuariosStore } from './usuarios.store';
 
