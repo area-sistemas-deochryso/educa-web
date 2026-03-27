@@ -10,14 +10,28 @@ El backend está en **Educa.API** (ASP.NET Core):
 
 ```
 Educa.API/
-├── Controllers/     # Endpoints REST — solo routing y validación
-├── Services/        # Lógica de negocio e interfaces
-├── Repositories/    # Acceso a datos e interfaces
-├── Models/          # Entidades de BD
-├── DTOs/            # Data Transfer Objects (request/response)
-├── Data/            # DbContext y configuración de EF
-├── Helpers/         # Utilidades, calculadores, extensiones
-├── Hubs/            # SignalR hubs (chat, notificaciones real-time)
+├── Controllers/     # Endpoints REST — solo routing y validación (8 subdominios, 35 controllers)
+│   ├── Academico/   # Aprobación, AsistenciaCurso, Calificación, Cursos, Horario, Salones, etc.
+│   ├── Administracion/  # Admin, Usuarios
+│   ├── Asistencias/ # Asistencia diaria, ConsultaAsistencia
+│   ├── Auth/        # Auth, PasswordRecovery
+│   ├── Campus/      # Campus 3D
+│   ├── Comunicacion/# Conversaciones (chat)
+│   ├── Integraciones/# BlobStorage, Configuracion
+│   ├── Permisos/    # MisPermisos, PermisosRol, PermisosUsuario
+│   ├── Sistema/     # EventosCalendario, Notificaciones, ServerTime, Warmup
+│   └── Videoconferencias/ # JaaS tokens
+├── Services/        # Lógica de negocio (12 subdominios, 80+ archivos)
+├── Repositories/    # Acceso a datos (9 subdominios, 31 archivos)
+├── Interfaces/      # Contratos: IServices (55) + IRepositories (30)
+├── Models/          # Entidades de BD (8 subdominios, 47 archivos)
+├── DTOs/            # Data Transfer Objects (13 namespaces, 50+ archivos)
+├── Data/            # ApplicationDbContext, configuración EF, value converters
+├── Constants/       # Auth (Roles, ClaimNames, CookieConfig), Academico, Asistencias, Sistema
+├── Helpers/         # UserClaimsExtensions, DniHelper, CalificacionHelper, DiagnosticLogger
+├── Middleware/      # GlobalException, CorrelationId, CSRF, Idempotency, RequestMetrics, SecurityHeaders
+├── Exceptions/      # NotFoundException, BusinessRuleException, UnauthorizedException, ConflictException
+├── Hubs/            # ChatHub, AsistenciaHub (SignalR real-time)
 └── Properties/      # Configuración de launch settings
 ```
 
@@ -39,6 +53,9 @@ Educa.API/
 | **Repository** | Queries a BD, CRUD de entidades | Lógica de negocio |
 | **Helper** | Lógica pura, cálculos, utilidades | Estado, IO, dependencias de BD |
 | **DTO** | Transferencia de datos, validación de input | Lógica, métodos complejos |
+| **Middleware** | Cross-cutting concerns (errores, CSRF, tracing) | Lógica de negocio |
+| **Constants** | Valores fijos del dominio (roles, estados, config keys) | Lógica, estado |
+| **Exceptions** | Excepciones tipadas del negocio | Lógica de flujo normal |
 
 ---
 
@@ -69,7 +86,7 @@ public async Task<IActionResult> ListarConversaciones()
 | Parsing de JSON/datos | Helper o Service |
 | Lógica "si X entonces Y" | Service |
 
-Helpers de claims (`ObtenerDni()`, `ObtenerRol()`) SÍ pertenecen al controller.
+Helpers de claims (`User.GetDni()`, `User.GetRol()`, `User.GetEntityId()`, `User.GetNombre()`, `User.GetSedeId()`) son extension methods en `Helpers/Auth/UserClaimsExtensions.cs`. Se llaman directamente sobre `User` (ClaimsPrincipal).
 
 ---
 
@@ -104,12 +121,69 @@ Helpers de claims (`ObtenerDni()`, `ObtenerRol()`) SÍ pertenecen al controller.
 
 ---
 
+## Respuesta API Estándar
+
+Todos los endpoints retornan `ApiResponse<T>` para uniformidad:
+
+```csharp
+// ✅ CORRECTO — usar ApiResponse<T>
+return Ok(ApiResponse<List<UsuarioDto>>.Success(usuarios, "Usuarios obtenidos"));
+
+// ❌ INCORRECTO — retornar entidad directa
+return Ok(usuarios);
+```
+
+---
+
+## Middleware Pipeline
+
+| Middleware | Orden | Responsabilidad |
+|-----------|-------|----------------|
+| `SecurityHeadersMiddleware` | 1 | HSTS, X-Frame-Options, CSP headers |
+| `CorrelationIdMiddleware` | 2 | Agrega X-Correlation-Id para tracing |
+| `RequestMetricsMiddleware` | 3 | Telemetría de performance |
+| `CsrfValidationMiddleware` | 4 | Validación CSRF en mutaciones |
+| `IdempotencyMiddleware` | 5 | Rechaza duplicados (409 Conflict) vía `X-Idempotency-Key` |
+| `GlobalExceptionMiddleware` | 6 | Captura excepciones → respuesta tipada |
+
+---
+
+## Excepciones Tipadas
+
+| Excepción | HTTP Status | Uso |
+|-----------|-------------|-----|
+| `NotFoundException` | 404 | Entidad no encontrada |
+| `BusinessRuleException` | 422 | Violación de regla de negocio |
+| `UnauthorizedException` | 401 | Sin autenticación válida |
+| `ConflictException` | 409 | Concurrencia, duplicados |
+
+`GlobalExceptionMiddleware` captura estas excepciones y retorna `ApiResponse` con el status code correcto. Los services lanzan excepciones, los controllers NO necesitan try/catch para estos casos.
+
+---
+
+## Rate Limiting
+
+Configurado en `Program.cs` con políticas por tipo de operación:
+
+| Política | Límite | Partición | Uso |
+|----------|--------|-----------|-----|
+| `global` (reads) | 200/min | userId (auth) o IP (anon) | GET endpoints |
+| `global` (writes) | 30/min | userId o IP | POST/PUT/DELETE |
+| `login` | 10/min | IP | `POST /api/auth/login` |
+| `refresh` | 20/min | IP | Token refresh |
+| `biometric` | 30/min | IP (dispositivo) | Webhook CrossChex |
+| `heavy` | 5/min | userId | Reportes, imports, batch |
+
+Decorador: `[EnableRateLimiting("heavy")]` en el controller action.
+
+---
+
 ## Manejo de Errores
 
 > **"Nunca silenciar, siempre propagar con contexto."**
 
-- **Controllers**: try/catch con status codes (400, 404, 500) + `LogError`
-- **Services**: lanzar excepciones tipadas (`NotFoundException`, `ValidationException`)
+- **Controllers**: Delegación a `GlobalExceptionMiddleware` para excepciones tipadas. Try/catch solo para casos especiales
+- **Services**: lanzar excepciones tipadas (`NotFoundException`, `BusinessRuleException`, `ConflictException`)
 - **NUNCA** catch vacío — siempre log + propagar o retornar default seguro
 
 ---
@@ -167,20 +241,36 @@ Esto aplica a:
 
 ---
 
+## Autenticación (JWT + Cookie)
+
+Token JWT se resuelve por prioridad:
+1. **HttpOnly cookie** (`educa_auth`) — preferido en producción
+2. **Authorization header** (`Bearer {token}`) — fallback
+3. **Query string** (`?access_token=`) — solo para SignalR WebSocket/SSE
+
+Cookies de auth definidas en `Constants/Auth/CookieConfig.cs`:
+- `educa_auth` — JWT principal
+- `educa_refresh` — Refresh token
+- `educa_device` — Device ID
+
+---
+
 ## Checklist de Code Review
 
 ```
 ARQUITECTURA
 [ ] ¿Controller solo delega? ¿Service tiene la lógica? ¿Repository solo queries?
 [ ] ¿Archivos > 600 líneas necesitan split?
+[ ] ¿Excepciones tipadas (NotFoundException, BusinessRuleException) en services?
 
 ERRORES
 [ ] ¿No hay catch vacíos? ¿LogError/LogWarning con contexto?
-[ ] ¿Controllers retornan status codes apropiados (400, 404, 500)?
+[ ] ¿Services lanzan excepciones tipadas? ¿GlobalExceptionMiddleware los captura?
 
 DATOS
 [ ] ¿Queries read-only usan AsNoTracking()? ¿DTOs con Data Annotations?
 [ ] ¿Strings no-nullable inicializadas con = ""?
+[ ] ¿Endpoints retornan ApiResponse<T>?
 
 LOGGING
 [ ] ¿Structured logging (placeholders, no interpolation)?
@@ -188,6 +278,8 @@ LOGGING
 SEGURIDAD
 [ ] ¿Endpoints sensibles tienen [Authorize]?
 [ ] ¿Se valida acceso al recurso? ¿No se exponen datos sensibles en errores?
+[ ] ¿Rate limiting en endpoints pesados? ([EnableRateLimiting("heavy")])
+[ ] ¿Claims se extraen con User.GetDni(), User.GetRol(), etc.?
 
 MIGRACIONES
 [ ] ¿Hay tablas/columnas/índices nuevos? → Script SQL mostrado al usuario

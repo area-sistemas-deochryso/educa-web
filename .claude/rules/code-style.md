@@ -19,8 +19,10 @@ import { AuthService } from '../../core/services/auth';
 - `@core` / `@core/*` → `src/app/core`
 - `@shared` / `@shared/*` → `src/app/shared`
 - `@features/*` → `src/app/features/*`
-- `@config` → `src/app/config`
-- `@data/*` → `src/app/data/*`
+- `@config` / `@config/*` → `src/app/config`
+- `@env` / `@env/*` → `src/app/config`
+- `@data` / `@data/*` → `src/app/data`
+- `@test` → `src/test-setup`
 
 ## Componentes - Siempre standalone
 

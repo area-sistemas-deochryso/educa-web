@@ -15,25 +15,60 @@ src/app/
 ├── config/          # Environments (production, development)
 ├── core/            # Servicios singleton, guards, interceptors, helpers
 │   ├── guards/      # authGuard, permisosGuard
-│   ├── interceptors/# authInterceptor, errorInterceptor
-│   ├── services/    # auth, storage, permisos, notifications, etc.
-│   ├── helpers/     # logger
-│   ├── store/       # NgRx Signals stores
-│   └── utils/       # TimerManager, etc.
+│   ├── helpers/     # logger, DebugService, rxjs utils (with-retry), array/string/stats utils
+│   ├── initializers/# Hooks de inicialización de app
+│   ├── interceptors/# auth, error, rate-limit, api-response, credentials, clock-sync, trace
+│   ├── services/    # ~24 carpetas organizadas por DOMINIO (ver detalle abajo)
+│   ├── store/       # NgRx Signals stores (AuthStore, BaseCrudStore)
+│   └── utils/       # Utilidades generales
 ├── data/            # Capa de datos
-│   ├── repositories/# BaseRepository, CRUDs
-│   ├── adapters/    # Transformacion de datos
-│   └── models/      # Modelos del dominio
+│   ├── adapters/    # Transformación: base, date, grade-scale
+│   ├── models/      # Modelos del dominio compartidos (user, salon, horario, calificacion, etc.)
+│   └── repositories/# BaseRepository, CRUDs (user, notification, asistencia)
 ├── shared/          # Componentes, pipes, directivas, servicios reutilizables
-│   ├── components/  # layout, form-error, toast-container
-│   ├── directives/
-│   ├── pipes/
-│   ├── services/    # UiMappingService (helpers de mapeo UI)
-│   └── validators/
+│   ├── components/  # 60+ componentes: layout, skeletons, login, floating-notification-bell, etc.
+│   ├── config/      # Configuraciones compartidas (intranet-menu.config, etc.)
+│   ├── constants/   # Constantes compartidas (app-roles, etc.)
+│   ├── directives/  # highlight, table-loading, uppercase-input
+│   ├── interfaces/  # Tipos compartidos
+│   ├── models/      # SelectOption, StatsBase, FormMeta, PaginationState, etc.
+│   ├── pipes/       # truncate
+│   ├── services/    # UiMappingService, asistencia (por rol), calificacion-config
+│   ├── utils/       # Utilidades compartidas
+│   └── validators/  # Validadores custom de formularios
 └── features/        # Modulos lazy-loaded
-    ├── public/      # home, about, contact, levels
-    └── intranet/    # login, attendance, schedule, admin
+    ├── public/      # home, about, contact, faq, levels, privacy, terms
+    └── intranet/    # login, shared (home, attendance, calendar), admin, profesor, estudiante
 ```
+
+### core/services/ — Carpetas por dominio (~24)
+
+| Dominio | Contenido |
+|---------|-----------|
+| `asistencia/` | API, store, facade de asistencia |
+| `auth/` | AuthService, AuthApiService, auth.models |
+| `blob/` | BlobStorageService |
+| `cache/` | CacheInvalidationService, CacheVersionManager |
+| `destroy/` | Utilidades de lifecycle |
+| `error/` | ErrorHandlerService, GlobalErrorHandler, error.models |
+| `excel/` | ExcelService (exportación) |
+| `facades/` | BaseCrudFacade (base class) |
+| `feature-flags/` | FeatureFlagsStore, FeatureFlagsFacade |
+| `http/` | BaseHttpService (wrapper HTTP) |
+| `keyboard/` | KeyboardShortcutsService + config |
+| `modal/` | ModalManagerService |
+| `notifications/` | NotificationsService, SmartNotificationService, NotificationsApiService |
+| `permisos/` | PermisosService, UserPermisosService |
+| `preloading/` | AdaptivePreloadingStrategy |
+| `rate-limit/` | RateLimitService |
+| `session/` | SessionActivityService, SessionCoordinator, SessionRefresh |
+| `signalr/` | SignalRService (chat), AsistenciaSignalRService |
+| `speech/` | SpeechService, VoiceRecognitionService, VoiceCommandExecutor |
+| `storage/` | StorageService (facade), SessionStorage, PreferencesStorage, IndexedDB |
+| `sw/` | SwService (Service Worker) |
+| `trace/` | RequestTraceFacade, RequestTraceStore |
+| `user/` | UserProfileService |
+| `wal/` | WalService, WalSyncEngine, WalDbService, WalFacadeHelper, WalStatusStore |
 
 ---
 
@@ -191,6 +226,8 @@ export class WizardComponent { }
 
 ## Estructura de un Feature Tipico
 
+### Feature simple (1 facade)
+
 ```
 features/intranet/pages/mi-feature/
 ├── mi-feature.component.ts      # Page/Route (Smart)
@@ -200,10 +237,51 @@ features/intranet/pages/mi-feature/
 │   ├── mi-list/
 │   ├── mi-card/
 │   └── mi-form/
+├── models/                      # DTOs y tipos del feature
+│   └── mi-feature.models.ts
+├── config/                      # Configuraciones del feature
+│   └── mi-feature.config.ts
 └── services/
     ├── mi-feature.store.ts      # Estado reactivo (signals privados)
     └── mi-feature.facade.ts     # Orquestacion (RxJS -> signals)
 ```
+
+### Feature complejo (multi-facade: data, crud, ui)
+
+Para módulos CRUD admin con múltiples responsabilidades, el facade se divide:
+
+```
+features/intranet/pages/admin/usuarios/
+├── usuarios.component.ts               # Page (Smart) — consume facades
+├── usuarios.component.html
+├── usuarios.component.scss
+├── index.ts                             # Barrel export
+├── components/                          # Sub-componentes Presentational (7+)
+│   ├── usuarios-table/
+│   ├── usuarios-stats/
+│   ├── usuarios-filters/
+│   ├── usuarios-header/
+│   ├── usuario-form-dialog/
+│   ├── usuario-detail-drawer/
+│   ├── usuarios-table-skeleton/
+│   └── usuarios-stats-skeleton/
+├── models/
+│   └── usuarios.models.ts
+└── services/
+    ├── usuarios.store.ts                # Estado reactivo (extends BaseCrudStore)
+    ├── usuarios.service.ts              # API gateway (HTTP calls)
+    ├── usuarios-data.facade.ts          # Carga de datos (load stats, load items)
+    ├── usuarios-crud.facade.ts          # Operaciones CRUD (create, update, delete, toggle)
+    └── usuarios-ui.facade.ts            # Estado UI (open/close dialog, drawer)
+```
+
+| Facade | Responsabilidad |
+|--------|----------------|
+| `*-data.facade.ts` | Carga de datos: `loadEstadisticas()`, `loadItems()`, `refreshItemsOnly()` |
+| `*-crud.facade.ts` | Operaciones: `save()`, `delete()`, `toggle()`. Integra WAL para optimistic updates |
+| `*-ui.facade.ts` | Estado UI: `openNewDialog()`, `openEditDialog()`, `openDetailDrawer()` |
+
+> No todos los módulos necesitan 3 facades. Usar 1 facade para features simples, dividir cuando la complejidad lo justifique.
 
 ## State Management con NgRx Signals
 

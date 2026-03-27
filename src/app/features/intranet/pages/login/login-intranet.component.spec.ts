@@ -1,3 +1,4 @@
+// * Tests for LoginIntranetComponent — validates form, login flow, and state.
 // #region Imports
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { Router } from '@angular/router';
@@ -5,11 +6,12 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { of } from 'rxjs';
 
 import { LoginIntranetComponent } from './login-intranet.component';
-import { AuthService } from '@core/services';
+import { AuthService, SwService, UserPermisosService } from '@core/services';
 import { testProviders } from '@test';
 
 // #endregion
-// #region Implementation
+
+// #region Tests
 describe('LoginIntranetComponent', () => {
 	let component: LoginIntranetComponent;
 	let fixture: ComponentFixture<LoginIntranetComponent>;
@@ -47,6 +49,8 @@ describe('LoginIntranetComponent', () => {
 				...testProviders,
 				{ provide: AuthService, useValue: authServiceMock },
 				{ provide: Router, useValue: routerMock },
+				{ provide: SwService, useValue: { clearCache: vi.fn() } },
+				{ provide: UserPermisosService, useValue: { clear: vi.fn() } },
 			],
 		}).compileComponents();
 
@@ -59,6 +63,7 @@ describe('LoginIntranetComponent', () => {
 		expect(component).toBeTruthy();
 	});
 
+	// #region Form initialization
 	describe('form initialization', () => {
 		it('should have a form with required controls', () => {
 			expect(component.loginForm.contains('dni')).toBe(true);
@@ -75,7 +80,9 @@ describe('LoginIntranetComponent', () => {
 			expect(formValue.rememberMe).toBe(false);
 		});
 	});
+	// #endregion
 
+	// #region Form validation
 	describe('form validation', () => {
 		it('should be invalid when empty', () => {
 			expect(component.loginForm.valid).toBe(false);
@@ -94,7 +101,9 @@ describe('LoginIntranetComponent', () => {
 			expect(component.loginForm.valid).toBe(true);
 		});
 	});
+	// #endregion
 
+	// #region onLogin
 	describe('onLogin', () => {
 		it('should not submit if form is invalid', () => {
 			component.onLogin();
@@ -155,7 +164,9 @@ describe('LoginIntranetComponent', () => {
 			expect(component.showError()).toBe(true);
 		});
 	});
+	// #endregion
 
+	// #region State getters
 	describe('state getters', () => {
 		it('should return remainingAttempts from authService', () => {
 			expect(component.remainingAttempts).toBe(3);
@@ -169,7 +180,9 @@ describe('LoginIntranetComponent', () => {
 			expect(component.isDisabled).toBe(false);
 		});
 	});
+	// #endregion
 
+	// #region UI helpers
 	describe('togglePasswordVisibility', () => {
 		it('should toggle password visibility', () => {
 			expect(component.showPassword()).toBe(false);
@@ -190,17 +203,18 @@ describe('LoginIntranetComponent', () => {
 		it('should include all user roles', () => {
 			const roleValues = component.roles.map((r) => r.value);
 			expect(roleValues).toContain('Estudiante');
-			expect(roleValues).toContain('Apoderado');
 			expect(roleValues).toContain('Profesor');
 			expect(roleValues).toContain('Director');
+			expect(roleValues).toContain('Asistente Administrativo');
 		});
 	});
+	// #endregion
 
+	// #region Redirect if authenticated
 	describe('redirect if already authenticated', () => {
-		it('should redirect to intranet if already authenticated', async () => {
+		it('should redirect to intranet if already authenticated', () => {
 			authServiceMock.isAuthenticated = true;
 
-			// Re-create component
 			const newFixture = TestBed.createComponent(LoginIntranetComponent);
 			const newComponent = newFixture.componentInstance;
 			newComponent.ngOnInit();
@@ -208,5 +222,6 @@ describe('LoginIntranetComponent', () => {
 			expect(routerMock.navigate).toHaveBeenCalledWith(['/intranet']);
 		});
 	});
+	// #endregion
 });
 // #endregion

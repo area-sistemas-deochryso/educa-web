@@ -1,175 +1,236 @@
-// * Tests for AuthService login/logout behavior.
+// * Tests for AuthService login/logout behavior (cookie-based auth).
 // #region Imports
 import { TestBed } from '@angular/core/testing';
-import { HttpTestingController, provideHttpClientTesting } from '@angular/common/http/testing';
-import { provideHttpClient } from '@angular/common/http';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { of, throwError } from 'rxjs';
 
 import { AuthService } from './auth.service';
+import { AuthApiService } from './auth-api.service';
 import { StorageService } from '../storage';
-import { AuthUser, LoginResponse, UserRole } from './auth.models';
+import { AuthUser, LoginResponse } from './auth.models';
 
 // #endregion
-// #region Implementation
+
+// #region Mocks
+const mockUser: AuthUser = {
+	rol: 'Estudiante',
+	nombreCompleto: 'Test User',
+	entityId: 1,
+	sedeId: 1,
+};
+
+const mockLoginSuccess: LoginResponse = {
+	success: true,
+	token: '',
+	rol: 'Estudiante',
+	nombreCompleto: 'Test User',
+	entityId: 1,
+	sedeId: 1,
+	mensaje: 'Login exitoso',
+};
+
+const mockLoginFailure: LoginResponse = {
+	success: false,
+	token: '',
+	rol: 'Estudiante',
+	nombreCompleto: '',
+	entityId: 0,
+	sedeId: 0,
+	mensaje: 'Credenciales inválidas',
+};
+// #endregion
+
+// #region Tests
 describe('AuthService', () => {
 	let service: AuthService;
-	let httpMock: HttpTestingController;
 	let storageMock: Partial<StorageService>;
-
-	const mockUser: AuthUser = {
-		token: 'test-token',
-		rol: 'Estudiante',
-		nombreCompleto: 'Test User',
-		entityId: 1,
-		sedeId: 1,
-	};
-
-	const mockLoginResponse: LoginResponse = {
-		token: 'test-token',
-		rol: 'Estudiante',
-		nombreCompleto: 'Test User',
-		entityId: 1,
-		sedeId: 1,
-		mensaje: 'Login exitoso',
-	};
+	let apiMock: Partial<AuthApiService>;
 
 	beforeEach(() => {
 		storageMock = {
-			hasToken: vi.fn().mockReturnValue(false),
+			hasUserInfo: vi.fn().mockReturnValue(false),
 			getUser: vi.fn().mockReturnValue(null),
-			getToken: vi.fn().mockReturnValue(null),
-			setToken: vi.fn(),
 			setUser: vi.fn(),
 			clearAuth: vi.fn(),
-			getRememberToken: vi.fn().mockReturnValue(null),
-			clearRememberToken: vi.fn(),
-			getAllPersistentTokens: vi.fn().mockReturnValue([]),
+			clearPermisos: vi.fn(),
+		};
+
+		apiMock = {
+			login: vi.fn().mockReturnValue(of(mockLoginSuccess)),
+			logout: vi.fn().mockReturnValue(of(undefined)),
+			getProfile: vi.fn().mockReturnValue(of(null)),
+			warmup: vi.fn().mockReturnValue(of(undefined)),
+			getSessions: vi.fn().mockReturnValue(of([])),
 		};
 
 		TestBed.configureTestingModule({
 			providers: [
 				AuthService,
-				provideHttpClient(),
-				provideHttpClientTesting(),
 				{ provide: StorageService, useValue: storageMock },
+				{ provide: AuthApiService, useValue: apiMock },
 			],
 		});
 
 		service = TestBed.inject(AuthService);
-		httpMock = TestBed.inject(HttpTestingController);
 	});
 
 	it('should be created', () => {
 		expect(service).toBeTruthy();
 	});
 
-	describe('isAuthenticated', () => {
-		it('should return false when no token exists', () => {
+	// #region Initial state
+	describe('initial state', () => {
+		it('should return false for isAuthenticated when no user info', () => {
 			expect(service.isAuthenticated).toBe(false);
 		});
-	});
 
-	describe('currentUser', () => {
-		it('should return null when no user is stored', () => {
+		it('should return null for currentUser when no user stored', () => {
 			expect(service.currentUser).toBeNull();
 		});
+
+		it('should start with 3 remaining attempts', () => {
+			expect(service.remainingAttempts).toBe(3);
+		});
+
+		it('should not be blocked initially', () => {
+			expect(service.isBlocked).toBe(false);
+		});
 	});
+	// #endregion
 
+	// #region Login
 	describe('login', () => {
-		it('should login successfully with valid credentials', () => {
-			const dni = '12345678';
-			const password = 'password';
-			const rol: UserRole = 'Estudiante';
-
-			service.login(dni, password, rol).subscribe((response) => {
-				expect(response.token).toBe('test-token');
-				expect(storageMock.setToken).toHaveBeenCalled();
-				expect(storageMock.setUser).toHaveBeenCalled();
+		it('should login successfully and store user', () => {
+			service.login('12345678', 'password', 'Estudiante').subscribe((response) => {
+				expect(response.success).toBe(true);
 			});
 
-			const req = httpMock.expectOne((r) => r.url.includes('/api/Auth/login'));
-			expect(req.request.method).toBe('POST');
-			req.flush(mockLoginResponse);
+			expect(storageMock.setUser).toHaveBeenCalled();
+			expect(service.isAuthenticated).toBe(true);
+			expect(service.currentUser?.nombreCompleto).toBe('Test User');
 		});
 
-		it('should handle login failure', () => {
-			const dni = '12345678';
-			const password = 'wrong-password';
-			const rol: UserRole = 'Estudiante';
+		it('should increment attempts on failed login', () => {
+			apiMock.login = vi.fn().mockReturnValue(of(mockLoginFailure));
 
-			service.login(dni, password, rol).subscribe((response) => {
-				expect(response.token).toBe('');
-			});
+			service.login('12345678', 'wrong', 'Estudiante').subscribe();
 
-			const req = httpMock.expectOne((r) => r.url.includes('/api/Auth/login'));
-			req.flush(
-				{ mensaje: 'Credenciales inválidas' },
-				{ status: 401, statusText: 'Unauthorized' },
+			expect(service.loginAttempts).toBe(1);
+			expect(service.remainingAttempts).toBe(2);
+		});
+
+		it('should increment attempts on HTTP error', () => {
+			apiMock.login = vi.fn().mockReturnValue(
+				throwError(() => ({ error: { mensaje: 'Server error' } })),
 			);
+
+			service.login('12345678', 'wrong', 'Estudiante').subscribe((response) => {
+				expect(response.success).toBe(false);
+			});
+
+			expect(service.loginAttempts).toBe(1);
 		});
 
-		it('should block after max login attempts', () => {
-			// Simular 3 intentos fallidos
+		it('should block after 3 failed attempts', () => {
+			apiMock.login = vi.fn().mockReturnValue(of(mockLoginFailure));
+
 			for (let i = 0; i < 3; i++) {
 				service.login('12345678', 'wrong', 'Estudiante').subscribe();
-				const req = httpMock.expectOne((r) => r.url.includes('/api/Auth/login'));
-				req.flush({ token: '', mensaje: 'Error' });
 			}
 
 			expect(service.isBlocked).toBe(true);
+		});
 
-			// El siguiente intento debería ser bloqueado sin hacer request
+		it('should return blocked message without calling API when blocked', () => {
+			apiMock.login = vi.fn().mockReturnValue(of(mockLoginFailure));
+
+			for (let i = 0; i < 3; i++) {
+				service.login('12345678', 'wrong', 'Estudiante').subscribe();
+			}
+
+			// Reset mock to track the next call
+			(apiMock.login as any).mockClear();
+
 			service.login('12345678', 'password', 'Estudiante').subscribe((response) => {
-				expect(response.mensaje).toContain('Demasiados intentos');
+				expect(response.success).toBe(false);
+				expect(response.mensaje).toBeTruthy();
 			});
 
-			httpMock.expectNone((r) => r.url.includes('/api/Auth/login'));
+			expect(apiMock.login).not.toHaveBeenCalled();
 		});
-	});
 
-	describe('logout', () => {
-		it('should clear auth state on logout', () => {
-			service.logout();
-
-			expect(storageMock.clearAuth).toHaveBeenCalled();
-			expect(service.isAuthenticated).toBe(false);
-			expect(service.currentUser).toBeNull();
-		});
-	});
-
-	describe('remainingAttempts', () => {
-		it('should return correct remaining attempts', () => {
-			expect(service.remainingAttempts).toBe(3);
-
+		it('should reset attempts on successful login', () => {
+			// Fail once
+			apiMock.login = vi.fn().mockReturnValue(of(mockLoginFailure));
 			service.login('12345678', 'wrong', 'Estudiante').subscribe();
-			const req = httpMock.expectOne((r) => r.url.includes('/api/Auth/login'));
-			req.flush({ token: '', mensaje: 'Error' });
-
-			expect(service.remainingAttempts).toBe(2);
-		});
-	});
-
-	describe('resetAttempts', () => {
-		it('should reset login attempts', () => {
-			// Hacer un intento fallido
-			service.login('12345678', 'wrong', 'Estudiante').subscribe();
-			const req = httpMock.expectOne((r) => r.url.includes('/api/Auth/login'));
-			req.flush({ token: '', mensaje: 'Error' });
-
 			expect(service.loginAttempts).toBe(1);
 
-			service.resetAttempts();
-
+			// Succeed
+			apiMock.login = vi.fn().mockReturnValue(of(mockLoginSuccess));
+			service.login('12345678', 'correct', 'Estudiante').subscribe();
 			expect(service.loginAttempts).toBe(0);
 		});
 	});
+	// #endregion
 
+	// #region Logout
+	describe('logout', () => {
+		it('should clear auth state on logout', () => {
+			// Login first
+			service.login('12345678', 'password', 'Estudiante').subscribe();
+
+			service.logout();
+
+			expect(storageMock.clearAuth).toHaveBeenCalled();
+			expect(storageMock.clearPermisos).toHaveBeenCalled();
+			expect(service.isAuthenticated).toBe(false);
+			expect(service.currentUser).toBeNull();
+		});
+
+		it('should reset attempts on logout', () => {
+			apiMock.login = vi.fn().mockReturnValue(of(mockLoginFailure));
+			service.login('12345678', 'wrong', 'Estudiante').subscribe();
+			expect(service.loginAttempts).toBe(1);
+
+			service.logout();
+			expect(service.loginAttempts).toBe(0);
+		});
+	});
+	// #endregion
+
+	// #region Reset attempts
+	describe('resetAttempts', () => {
+		it('should reset login attempts to zero', () => {
+			apiMock.login = vi.fn().mockReturnValue(of(mockLoginFailure));
+			service.login('12345678', 'wrong', 'Estudiante').subscribe();
+			expect(service.loginAttempts).toBe(1);
+
+			service.resetAttempts();
+			expect(service.loginAttempts).toBe(0);
+		});
+	});
+	// #endregion
+
+	// #region verifyToken
 	describe('verifyToken', () => {
-		it('should return false when no token exists', () => {
+		it('should return false when profile is null', () => {
+			apiMock.getProfile = vi.fn().mockReturnValue(of(null));
+
 			service.verifyToken().subscribe((isValid) => {
 				expect(isValid).toBe(false);
 			});
 		});
+
+		it('should return true when profile exists', () => {
+			apiMock.getProfile = vi.fn().mockReturnValue(
+				of({ dni: '12345678', rol: 'Estudiante', nombreCompleto: 'Test', entityId: '1', sedeId: '1' }),
+			);
+
+			service.verifyToken().subscribe((isValid) => {
+				expect(isValid).toBe(true);
+			});
+		});
 	});
+	// #endregion
 });
 // #endregion

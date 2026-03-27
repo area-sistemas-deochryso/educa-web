@@ -61,6 +61,8 @@ export class MiStore {
 
 ## Facade Pattern
 
+### Facade simple (features pequeños)
+
 ```typescript
 @Injectable({ providedIn: 'root' })
 export class MiFacade {
@@ -85,6 +87,78 @@ export class MiFacade {
   // (mismo patrón que editar)
 }
 ```
+
+### Multi-Facade (features CRUD admin complejos)
+
+Para módulos con muchas responsabilidades, dividir en 3 facades:
+
+| Facade | Archivo | Responsabilidad |
+|--------|---------|----------------|
+| **Data** | `*-data.facade.ts` | Carga: `loadEstadisticas()`, `loadItems()`, `refreshItemsOnly()` |
+| **CRUD** | `*-crud.facade.ts` | Operaciones: `save()`, `delete()`, `toggle()`, `importar()` |
+| **UI** | `*-ui.facade.ts` | Estado UI: `openNewDialog()`, `openEditDialog()`, `openDetailDrawer()` |
+
+```typescript
+// Data facade — solo carga
+@Injectable({ providedIn: 'root' })
+export class MiDataFacade {
+  loadEstadisticas(): void { /* ... */ }
+  loadItems(): void { /* ... */ }
+  refreshItemsOnly(): void { /* ... */ }
+}
+
+// CRUD facade — operaciones con WAL
+@Injectable({ providedIn: 'root' })
+export class MiCrudFacade {
+  private walHelper = inject(WalFacadeHelper);
+
+  save(data: FormData): void {
+    if (this.store.isEditing()) {
+      this.update(this.store.selectedItem()!.id, data);
+    } else {
+      this.create(data);
+    }
+  }
+
+  delete(item: Item): void {
+    this.walHelper.execute({
+      operation: 'DELETE',
+      resourceType: 'items',
+      request$: this.api.delete(item.id),
+      onCommit: () => {
+        this.store.removeItem(item.id);
+        this.store.incrementarEstadistica('total', -1);
+      },
+    });
+  }
+}
+
+// UI facade — dialogs y drawers
+@Injectable({ providedIn: 'root' })
+export class MiUiFacade {
+  openNewDialog(): void { this.store.clearFormData(); this.store.openDialog(); }
+  openEditDialog(item: Item): void { /* ... */ }
+  closeDialog(): void { this.store.closeDialog(); }
+}
+```
+
+> **Cuándo dividir**: Cuando un solo facade supera ~200 líneas o tiene 3+ responsabilidades distintas (data, crud, ui). Features simples usan 1 facade.
+
+### WAL Integration (Write-Ahead Log)
+
+Las operaciones de mutación usan `WalFacadeHelper` para optimistic updates con rollback:
+
+```typescript
+this.walHelper.execute({
+  operation: 'UPDATE',
+  resourceType: 'items',
+  request$: this.api.update(id, data),
+  onCommit: () => this.store.updateItem(id, data),
+  onError: (error) => this.errorHandler.handle(error),
+});
+```
+
+Ubicación del helper: `@core/services/wal/wal-facade-helper.ts`
 
 ---
 

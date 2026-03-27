@@ -1,4 +1,4 @@
-// * Tests for StorageService delegation logic.
+// * Tests for StorageService delegation logic (post cookie migration).
 // #region Imports
 import { TestBed } from '@angular/core/testing';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
@@ -10,7 +10,8 @@ import { NotificationStorageService } from './notification-storage.service';
 import { AuthUser } from './storage.models';
 
 // #endregion
-// #region Implementation
+
+// #region Tests
 describe('StorageService', () => {
 	let service: StorageService;
 	let sessionMock: Partial<SessionStorageService>;
@@ -18,7 +19,6 @@ describe('StorageService', () => {
 	let notificationStorageMock: Partial<NotificationStorageService>;
 
 	const mockUser: AuthUser = {
-		token: 'test-token',
 		rol: 'Estudiante',
 		nombreCompleto: 'Test User',
 		entityId: 1,
@@ -27,23 +27,13 @@ describe('StorageService', () => {
 
 	beforeEach(() => {
 		sessionMock = {
-			getToken: vi.fn().mockReturnValue('test-token'),
-			setToken: vi.fn(),
-			removeToken: vi.fn(),
-			hasToken: vi.fn().mockReturnValue(true),
 			getUser: vi.fn().mockReturnValue(mockUser),
 			setUser: vi.fn(),
 			removeUser: vi.fn(),
 			clearAuth: vi.fn(),
-			getRememberToken: vi.fn().mockReturnValue(null),
-			clearRememberToken: vi.fn(),
-			getAllPersistentTokens: vi.fn().mockReturnValue([]),
-			getLastNotificationCheck: vi.fn().mockReturnValue(null),
-			setLastNotificationCheck: vi.fn(),
-			getScheduleModalsState: vi.fn().mockReturnValue({}),
-			setScheduleModalsState: vi.fn(),
-			updateScheduleModalState: vi.fn(),
-			clearScheduleModalsState: vi.fn(),
+			getPermisos: vi.fn().mockReturnValue(null),
+			setPermisos: vi.fn(),
+			clearPermisos: vi.fn(),
 		};
 
 		preferencesMock = {
@@ -88,27 +78,12 @@ describe('StorageService', () => {
 		expect(service).toBeTruthy();
 	});
 
+	// #region Auth methods
 	describe('Auth methods', () => {
-		it('should delegate getToken to session service', () => {
-			const token = service.getToken();
-			expect(sessionMock.getToken).toHaveBeenCalled();
-			expect(token).toBe('test-token');
-		});
-
-		it('should delegate setToken to session service', () => {
-			service.setToken('new-token', true, 'User', 'Estudiante');
-			expect(sessionMock.setToken).toHaveBeenCalledWith(
-				'new-token',
-				true,
-				'User',
-				'Estudiante',
-			);
-		});
-
-		it('should delegate hasToken to session service', () => {
-			const hasToken = service.hasToken();
-			expect(sessionMock.hasToken).toHaveBeenCalled();
-			expect(hasToken).toBe(true);
+		it('should delegate hasUserInfo to getUser', () => {
+			expect(service.hasUserInfo()).toBe(true);
+			sessionMock.getUser = vi.fn().mockReturnValue(null);
+			expect(service.hasUserInfo()).toBe(false);
 		});
 
 		it('should delegate getUser to session service', () => {
@@ -117,12 +92,39 @@ describe('StorageService', () => {
 			expect(user).toEqual(mockUser);
 		});
 
+		it('should delegate setUser to session service', () => {
+			service.setUser(mockUser, true);
+			expect(sessionMock.setUser).toHaveBeenCalledWith(mockUser, true);
+		});
+
 		it('should delegate clearAuth to session service', () => {
 			service.clearAuth();
 			expect(sessionMock.clearAuth).toHaveBeenCalled();
 		});
 	});
+	// #endregion
 
+	// #region Permisos methods
+	describe('Permisos methods', () => {
+		it('should delegate getPermisos to session service', () => {
+			service.getPermisos();
+			expect(sessionMock.getPermisos).toHaveBeenCalled();
+		});
+
+		it('should delegate setPermisos to session service', () => {
+			const permisos = { usuarioId: 1, rol: 'Director' as const, vistasPermitidas: [], tienePermisosPersonalizados: false };
+			service.setPermisos(permisos);
+			expect(sessionMock.setPermisos).toHaveBeenCalledWith(permisos);
+		});
+
+		it('should delegate clearPermisos to session service', () => {
+			service.clearPermisos();
+			expect(sessionMock.clearPermisos).toHaveBeenCalled();
+		});
+	});
+	// #endregion
+
+	// #region Attendance preferences
 	describe('Attendance preferences', () => {
 		it('should delegate getSelectedHijoId to preferences service', () => {
 			service.getSelectedHijoId();
@@ -144,16 +146,19 @@ describe('StorageService', () => {
 			expect(preferencesMock.setSelectedSalonId).toHaveBeenCalledWith(456);
 		});
 	});
+	// #endregion
 
+	// #region clearAll
 	describe('clearAll', () => {
-		it('should clear all storage', () => {
+		it('should clear all storage services', () => {
 			service.clearAll();
 
 			expect(sessionMock.clearAuth).toHaveBeenCalled();
+			expect(sessionMock.clearPermisos).toHaveBeenCalled();
 			expect(notificationStorageMock.clearNotifications).toHaveBeenCalled();
-			expect(sessionMock.clearScheduleModalsState).toHaveBeenCalled();
 			expect(preferencesMock.clearAttendancePreferences).toHaveBeenCalled();
 		});
 	});
+	// #endregion
 });
 // #endregion

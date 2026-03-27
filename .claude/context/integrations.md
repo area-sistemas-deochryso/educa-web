@@ -55,6 +55,16 @@ Sistema de persistencia de mutaciones en IndexedDB antes de enviarlas al servido
 
 ### SignalR (Real-time)
 
-- Chat/mensajeria interna entre usuarios
-- Hubs en backend: `ChatHub`
-- Token via query string en conexion WebSocket
+Dos hubs, ambos con `[Authorize]`:
+
+| Hub              | Ruta               | Uso                                     | Transporte (prod)              |
+|------------------|--------------------|-----------------------------------------|--------------------------------|
+| `ChatHub`        | `/chathub`         | Mensajería interna entre usuarios       | ServerSentEvents + LongPolling |
+| `AsistenciaHub`  | `/asistenciahub`   | Broadcast de entrada/salida biométrica  | ServerSentEvents + LongPolling |
+
+- **Token auth**: HttpOnly cookie (`educa_auth`) con `withCredentials: true`. Fallback: `?access_token=` query param para WebSocket/SSE
+- **Netlify**: NO soporta WebSocket upgrade. Configurado con `ServerSentEvents | LongPolling` en producción (`asistencia-signalr.service.ts`, `signalr.service.ts`)
+- **Proxy**: Rutas `/chathub/*` y `/asistenciahub/*` DEBEN estar en `netlify.toml` Y `src/_redirects`
+
+**AsistenciaHub emite**:
+- `AsistenciaRegistrada` → `{ dni, nombre, tipo, hora, sede }` — broadcast a todos los clientes conectados

@@ -26,6 +26,36 @@ Director / AsistenteAdministrativo (admin completo)
 | **Apoderado** | Consulta | Ver asistencias de sus hijos, recibir notificaciones |
 | **Estudiante** | Consulta mínima | Ver su propia información |
 
+## Módulos por Rol (Intranet)
+
+### Admin (Director)
+
+- Usuarios, Salones, Cursos, Horarios, Eventos Calendario
+- Permisos (por rol y por usuario), Vistas
+- Notificaciones admin, Campus 3D
+
+### Profesor
+
+- Asistencia (marcar en clase), Calificaciones
+- Cursos (contenido, tareas, archivos — 16 sub-componentes)
+- Horarios (ver personal), Salones, Foro, Mensajería
+- Final Salones (cierre de notas por periodo)
+
+### Estudiante
+
+- Asistencia (ver propia), Cursos (ver inscritos), Notas
+- Horarios, Salones, Foro, Mensajería
+
+### Apoderado
+
+- Asistencia de hijos, Notificaciones
+
+### Shared (cross-rol)
+
+- Home/Dashboard, Asistencia general (por rol), Calendario, Videoconferencias
+
+---
+
 ## Flujos Principales
 
 ### 1. Asistencia Automática (CrossChex Cloud)
@@ -43,7 +73,8 @@ Backend: SincronizarAsistenciaDelDia()
     ├── Registra entrada/salida en BD
     └── Envía notificaciones
         ├── Push (Firebase) → App móvil del apoderado
-        ├── Email (SendGrid) → Correo del apoderado
+        ├── Email (MailKit) → Correo del apoderado
+        ├── SignalR (AsistenciaHub) → UI en tiempo real
         └── (Futuro) WhatsApp → Teléfono del apoderado
 ```
 

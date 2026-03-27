@@ -1,52 +1,64 @@
-// * Tests for auth guard routing behavior.
+// * Tests for authGuard — validates authentication check and login redirect.
 // #region Imports
 import { TestBed } from '@angular/core/testing';
-import { Router } from '@angular/router';
-import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { provideRouter, Router, UrlTree } from '@angular/router';
+import { beforeEach, describe, expect, it } from 'vitest';
 
 import { authGuard } from './auth.guard';
 import { AuthService } from '@app/core/services';
 
 // #endregion
-// #region Implementation
+
+// #region Tests
 describe('authGuard', () => {
 	let authServiceMock: Partial<AuthService>;
-	let routerMock: Partial<Router>;
 
 	beforeEach(() => {
-		authServiceMock = {
-			isAuthenticated: false,
-		};
-
-		routerMock = {
-			navigate: vi.fn(),
-		};
+		authServiceMock = { isAuthenticated: false };
 
 		TestBed.configureTestingModule({
 			providers: [
+				provideRouter([]),
 				{ provide: AuthService, useValue: authServiceMock },
-				{ provide: Router, useValue: routerMock },
 			],
 		});
 	});
 
-	it('should allow access when user is authenticated', () => {
-		authServiceMock.isAuthenticated = true;
+	// #region Authenticated — allow access
+	describe('authenticated user', () => {
+		it('should return true when user is authenticated', () => {
+			authServiceMock.isAuthenticated = true;
 
-		TestBed.runInInjectionContext(() => {
-			const result = authGuard({} as any, {} as any);
+			const result = TestBed.runInInjectionContext(() =>
+				authGuard({} as any, {} as any),
+			);
+
 			expect(result).toBe(true);
 		});
 	});
+	// #endregion
 
-	it('should deny access and redirect to login when user is not authenticated', () => {
-		authServiceMock.isAuthenticated = false;
+	// #region Unauthenticated — redirect to login
+	describe('unauthenticated user', () => {
+		it('should return UrlTree to /intranet/login', () => {
+			authServiceMock.isAuthenticated = false;
 
-		TestBed.runInInjectionContext(() => {
-			const result = authGuard({} as any, {} as any);
-			expect(result).toBe(false);
-			expect(routerMock.navigate).toHaveBeenCalledWith(['/intranet/login']);
+			const result = TestBed.runInInjectionContext(() =>
+				authGuard({} as any, {} as any),
+			);
+
+			expect(result).toBeInstanceOf(UrlTree);
+			expect((result as UrlTree).toString()).toBe('/intranet/login');
+		});
+
+		it('should redirect to login by default (isAuthenticated starts false)', () => {
+			const result = TestBed.runInInjectionContext(() =>
+				authGuard({} as any, {} as any),
+			);
+
+			expect(result).not.toBe(true);
 		});
 	});
+	// #endregion
 });
 // #endregion

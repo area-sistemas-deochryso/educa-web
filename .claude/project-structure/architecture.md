@@ -171,47 +171,69 @@ features/intranet/pages/
 │   │   ├── components/, models/, config/, services/
 │   └── ctest-k6/                #   Testing de carga
 ├── estudiante/                  # Sección del estudiante
-│   ├── cursos/, horarios/, notas/, salones/
+│   ├── asistencia/              #   Ver asistencia propia
+│   ├── cursos/                  #   Ver cursos inscritos
+│   ├── foro/                    #   Foro estudiantil
+│   ├── horarios/                #   Ver horario personal
+│   ├── mensajeria/              #   Mensajería
+│   ├── notas/                   #   Ver calificaciones
+│   ├── salones/                 #   Ver info de salón
 │   ├── models/, services/
 ├── profesor/                    # Sección del profesor
-│   ├── cursos/, horarios/, salones/
+│   ├── asistencia/              #   Marcar asistencia en clase
+│   ├── calificaciones/          #   Gestión de notas
+│   ├── cursos/                  #   Contenido, tareas, archivos (16 sub-componentes)
+│   ├── final-salones/           #   Cierre de notas por periodo
+│   ├── foro/                    #   Foro
+│   ├── horarios/                #   Ver horario personal
+│   ├── mensajeria/              #   Mensajería
+│   ├── salones/                 #   Gestión de salones asignados
 │   ├── models/, services/
 └── admin/                       # Administración (Director)
-    ├── usuarios/                # CRUD usuarios (patrón completo)
+    ├── usuarios/                # CRUD usuarios (patrón multi-facade completo)
     ├── horarios/                # CRUD horarios
     ├── cursos/                  # CRUD cursos
     ├── salones/                 # CRUD salones
     ├── permisos-roles/          # Permisos por rol
     ├── permisos-usuarios/       # Permisos por usuario
-    └── vistas/                  # Gestión de rutas/vistas
+    ├── vistas/                  # Gestión de rutas/vistas
+    ├── campus/                  # Gestión de sedes y navegación 3D
+    ├── eventos-calendario/      # Eventos del calendario escolar
+    └── notificaciones-admin/    # Notificaciones masivas a usuarios
 ```
 
 ---
 
 ## Patrón CRUD Admin Completo (referencia: usuarios/)
 
-El módulo `usuarios/` es el ejemplo canónico del patrón completo:
+El módulo `usuarios/` es el ejemplo canónico del patrón multi-facade:
 
 ```text
 admin/usuarios/
-├── usuarios.component.ts          # Page/Route (Smart) — consume facade
+├── usuarios.component.ts              # Page/Route (Smart) — consume facades
 ├── usuarios.component.html
 ├── usuarios.component.scss
-├── usuarios.facade.ts             # Comandos y orquestación
-├── usuarios.store.ts              # Estado reactivo (signals privados)
-├── index.ts                       # Barrel export
-└── components/                    # Sub-componentes presentacionales (Dumb)
-    ├── usuarios-table/            # Tabla principal
-    ├── usuarios-stats/            # Cards de estadísticas
-    ├── usuarios-filters/          # Controles de filtrado
-    ├── usuarios-header/           # Encabezado de sección
-    ├── usuario-form-dialog/       # Dialog crear/editar
-    ├── usuario-detail-drawer/     # Drawer de detalle
-    ├── usuarios-table-skeleton/   # Skeleton de tabla
-    └── usuarios-stats-skeleton/   # Skeleton de stats
+├── index.ts                           # Barrel export
+├── components/                        # Sub-componentes presentacionales (Dumb)
+│   ├── usuarios-table/                # Tabla principal
+│   ├── usuarios-stats/                # Cards de estadísticas
+│   ├── usuarios-filters/              # Controles de filtrado
+│   ├── usuarios-header/               # Encabezado de sección
+│   ├── usuario-form-dialog/           # Dialog crear/editar
+│   ├── usuario-detail-drawer/         # Drawer de detalle
+│   ├── usuarios-table-skeleton/       # Skeleton de tabla
+│   └── usuarios-stats-skeleton/       # Skeleton de stats
+└── services/
+    ├── usuarios.store.ts              # Estado reactivo (extends BaseCrudStore)
+    ├── usuarios.service.ts            # API gateway (HTTP calls)
+    ├── usuarios-data.facade.ts        # Carga: loadEstadisticas, loadItems
+    ├── usuarios-crud.facade.ts        # CRUD: save, delete, toggle (con WAL)
+    └── usuarios-ui.facade.ts          # UI: openDialog, openDrawer
 ```
 
-**Variantes**: Algunos módulos (horarios, cursos) ponen `services/` como subcarpeta en vez de al nivel raíz. El patrón base es el mismo: Store + Facade + Component + sub-componentes.
+**Multi-Facade**: Módulos complejos dividen el facade en 3 (data, crud, ui). Módulos simples usan 1 facade. El patrón base es: Store + Facade(s) + API Service + Component + sub-componentes.
+
+**Variantes**: Algunos módulos (horarios) subdividen el store en sub-stores (`HorariosFormStore`, `HorariosFilterStore`).
 
 ---
 
@@ -248,17 +270,17 @@ save(data) {
 
 ## Criterios de Organización — Resumen
 
-| Carpeta                      | Criterio de pertenencia                          |
-| ---------------------------- | ------------------------------------------------- |
-| `core/services/{dominio}/`   | Singleton, lógica transversal, infraestructura    |
-| `core/guards/`               | Protección de rutas                               |
-| `core/interceptors/`         | Transformación de HTTP requests/responses         |
-| `core/store/`                | Estado global de la app (auth)                    |
-| `data/repositories/`         | Acceso a datos con Repository Pattern             |
-| `data/adapters/`             | Transformación API response → modelo de dominio   |
-| `data/models/`               | Interfaces del dominio compartidas                |
-| `shared/components/`         | UI genérica sin lógica de negocio                 |
-| `shared/services/`           | Helpers compartidos entre features                |
-| `features/{feature}/pages/`  | Páginas/rutas del feature                         |
-| `features/.../components/`   | Sub-componentes presentacionales del feature      |
-| `features/.../services/`     | Facade + Store locales del feature                |
+| Carpeta | Criterio de pertenencia |
+| ------- | ----------------------- |
+| `core/services/{dominio}/` | Singleton, lógica transversal, infraestructura |
+| `core/guards/` | Protección de rutas |
+| `core/interceptors/` | Transformación de HTTP requests/responses |
+| `core/store/` | Estado global de la app (auth, base-crud) |
+| `data/repositories/` | Acceso a datos con Repository Pattern |
+| `data/adapters/` | Transformación API response → modelo de dominio |
+| `data/models/` | Interfaces del dominio compartidas |
+| `shared/components/` | UI genérica sin lógica de negocio |
+| `shared/services/` | Helpers compartidos entre features |
+| `features/{feature}/pages/` | Páginas/rutas del feature |
+| `features/.../components/` | Sub-componentes presentacionales del feature |
+| `features/.../services/` | Facade(s) + Store + API Service del feature |
