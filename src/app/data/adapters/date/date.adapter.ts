@@ -91,7 +91,7 @@ export class DateFormatAdapter extends BaseAdapter<Date, FormattedDate> {
 	private formatRelative(date: Date): string {
 		const now = new Date();
 		const diffMs = date.getTime() - now.getTime();
-		const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24));
+		const diffDays = Math.floor(diffMs / 86_400_000);
 
 		if (diffDays === 0) {
 			return 'Hoy';

@@ -1,6 +1,6 @@
 import { Injectable, inject, signal, computed, PLATFORM_ID } from '@angular/core';
 import { isPlatformBrowser } from '@angular/common';
-import { logger } from '@core/helpers';
+import { logger, Duration } from '@core/helpers';
 import { SmartDataStorageService } from '@core/services/storage/smart-data-storage.service';
 import { StorageService } from '@core/services/storage';
 import { WalClockService } from '@core/services/wal/wal-clock.service';
@@ -13,8 +13,8 @@ import {
 } from './smart-notification.models';
 import { NotificationPriority } from './notifications.config';
 
-// Check every 5 minutes for schedule-based notifications
-const CHECK_INTERVAL_MS = 5 * 60 * 1000;
+/** Check every 5 minutes for schedule-based notifications */
+const CHECK_INTERVAL = Duration.minutes(5);
 
 @Injectable({ providedIn: 'root' })
 export class SmartNotificationService {
@@ -64,7 +64,7 @@ export class SmartNotificationService {
 		// Periodic re-evaluation (triggers computed recalculation via signal update)
 		this.timerManager.setInterval(() => {
 			this._horarios.update((h) => [...h]);
-		}, CHECK_INTERVAL_MS);
+		}, CHECK_INTERVAL.ms);
 	}
 	// #endregion
 

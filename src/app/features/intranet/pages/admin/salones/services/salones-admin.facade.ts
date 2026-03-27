@@ -270,7 +270,10 @@ export class SalonesAdminFacade {
 			.subscribe({
 				next: (resultado) => {
 					if (resultado) {
-						this.errorHandler.showSuccess(UI_SALONES_CONFIRM_HEADERS.aprobacionMasiva, `${resultado.aprobados} aprobados, ${resultado.desaprobados} desaprobados, ${resultado.errores} errores`, 5000);
+						const detail = resultado.failed > 0
+							? `${resultado.succeeded} exitosos, ${resultado.failed} fallidos de ${resultado.total}`
+							: `${resultado.succeeded} de ${resultado.total} procesados correctamente`;
+						this.errorHandler.showSuccess(UI_SALONES_CONFIRM_HEADERS.aprobacionMasiva, detail, 5000);
 						const salonId = this.store.selectedSalonId();
 						if (salonId) this.loadAprobaciones(salonId);
 						this.refreshSalones();

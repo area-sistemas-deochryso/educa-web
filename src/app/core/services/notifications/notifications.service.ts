@@ -5,7 +5,7 @@ import {
 	NotificationType,
 	NotificationPriority,
 } from './notifications.config';
-import { logger } from '@core/helpers';
+import { logger, Duration } from '@core/helpers';
 import { StorageService } from '@core/services/storage';
 import { TimerManager } from '@core/services/destroy';
 import { SmartNotificationService } from './smart-notification.service';
@@ -114,7 +114,7 @@ export class NotificationsService {
 	 * Runs every 5 min to keep smart notifications (upcoming classes) fresh.
 	 */
 	private startPeriodicCheck(): void {
-		this.timerManager.setInterval(() => this.checkNotifications(), 5 * 60 * 1000);
+		this.timerManager.setInterval(() => this.checkNotifications(), Duration.minutes(5).ms);
 	}
 
 	/**

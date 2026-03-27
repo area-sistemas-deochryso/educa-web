@@ -12,7 +12,7 @@ import {
 	AprobacionEstudianteListDto,
 	AprobarEstudianteDto,
 	AprobacionMasivaDto,
-	AprobacionMasivaResultDto,
+	BatchCommandResult,
 	PeriodoAcademicoListDto,
 	ConfiguracionCalificacionListDto,
 } from '../models';
@@ -82,9 +82,9 @@ export class ProfesorFinalSalonesApiService {
 			);
 	}
 
-	aprobarMasivo(dto: AprobacionMasivaDto): Observable<AprobacionMasivaResultDto | null> {
+	aprobarMasivo(dto: AprobacionMasivaDto): Observable<BatchCommandResult | null> {
 		return this.http
-			.post<AprobacionMasivaResultDto>(
+			.post<BatchCommandResult>(
 				`${this.baseUrl}/api/AprobacionEstudiante/masivo`,
 				dto,
 			)

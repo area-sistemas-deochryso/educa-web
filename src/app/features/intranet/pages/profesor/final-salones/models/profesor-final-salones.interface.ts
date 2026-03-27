@@ -5,6 +5,7 @@ export type {
 	AprobarEstudianteDto,
 	AprobacionMasivaDto,
 	AprobacionMasivaResultDto,
+	BatchCommandResult,
 	PeriodoAcademicoListDto,
 	ConfiguracionCalificacionListDto,
 	SalonesAdminEstadisticas,

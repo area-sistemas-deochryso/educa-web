@@ -38,6 +38,7 @@ import {
 import { environment } from '@env/environment';
 import { APP_USER_ROLES } from '@shared/constants';
 import { logger } from '@core/helpers';
+import { ExcelService } from '@core/services';
 import type { ImportarEstudianteItem } from './services';
 
 // #endregion
@@ -70,6 +71,7 @@ export class UsuariosComponent implements AfterViewInit {
 	private uiFacade = inject(UsuariosUiFacade);
 	private confirmationService = inject(ConfirmationService);
 	private usuariosApi = inject(UsuariosService);
+	private excelService = inject(ExcelService);
 
 	// * Migration state (one-time, only in development)
 	readonly isDev = !environment.production;
@@ -260,54 +262,27 @@ export class UsuariosComponent implements AfterViewInit {
 		credenciales: { nombreCompleto: string; dni: string; contrasena: string | null; grado: string | null; seccion: string | null }[],
 		rol: string,
 	): Promise<void> {
-		const ExcelJS = await import('exceljs');
-
-		// eslint-disable-next-line @typescript-eslint/no-explicit-any
-		const mod = ExcelJS as any;
-		const WorkbookClass = mod.Workbook ?? mod.default?.Workbook;
-		const workbook = new WorkbookClass();
 		const rolLabel = rol === APP_USER_ROLES.Estudiante ? 'Alumnos' : 'Profesores';
-		const sheet = workbook.addWorksheet(`Credenciales ${rolLabel}`);
+		const fecha = new Date().toISOString().slice(0, 10);
 
-		sheet.columns = [
-			{ header: 'Nombre Completo', key: 'nombreCompleto', width: 40 },
-			{ header: 'DNI', key: 'dni', width: 15 },
-			{ header: 'Contraseña', key: 'contrasena', width: 20 },
-			{ header: 'Grado', key: 'grado', width: 20 },
-			{ header: 'Sección', key: 'seccion', width: 12 },
-		];
-
-		// Header styling
-		const headerRow = sheet.getRow(1);
-		headerRow.font = { bold: true, color: { argb: 'FFFFFFFF' } };
-		headerRow.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FF4F46E5' } };
-		headerRow.alignment = { horizontal: 'center', vertical: 'middle' };
-		headerRow.height = 25;
-
-		credenciales.forEach((c) => {
-			sheet.addRow({
+		await this.excelService.exportToXlsx({
+			sheetName: `Credenciales ${rolLabel}`,
+			fileName: `Credenciales_${rolLabel}_${fecha}.xlsx`,
+			columns: [
+				{ header: 'Nombre Completo', key: 'nombreCompleto', width: 40 },
+				{ header: 'DNI', key: 'dni', width: 15 },
+				{ header: 'Contraseña', key: 'contrasena', width: 20 },
+				{ header: 'Grado', key: 'grado', width: 20 },
+				{ header: 'Sección', key: 'seccion', width: 12 },
+			],
+			data: credenciales.map((c) => ({
 				nombreCompleto: c.nombreCompleto,
 				dni: c.dni,
 				contrasena: c.contrasena ?? '(no disponible)',
 				grado: c.grado ?? '',
 				seccion: c.seccion ?? '',
-			});
+			})),
 		});
-
-		const buffer = await workbook.xlsx.writeBuffer();
-		const blob = new Blob([buffer], {
-			type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
-		});
-		const fecha = new Date().toISOString().slice(0, 10);
-		const fileName = `Credenciales_${rolLabel}_${fecha}.xlsx`;
-
-		// Download using native browser API
-		const url = URL.createObjectURL(blob);
-		const link = document.createElement('a');
-		link.href = url;
-		link.download = fileName;
-		link.click();
-		URL.revokeObjectURL(url);
 	}
 
 	onMigrarContrasenas(): void {

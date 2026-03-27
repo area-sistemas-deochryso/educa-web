@@ -15,7 +15,9 @@
 		"compodoc": "node -e \"fs.rmSync('documentacion', { recursive: true, force: true })\" && compodoc -p tsconfig.doc.json -s -w -o --port 8080",
 		"start:prod": "node --max_old_space_size=8192 ./node_modules/@angular/cli/bin/ng serve --configuration production --port=4202",
 		"convert-images": "node scripts/convert-images.mjs",
-		"serve:ssr:educa-angular": "node dist/educa-angular/server/server.mjs"
+		"serve:ssr:educa-angular": "node dist/educa-angular/server/server.mjs",
+		"audit:deps": "node scripts/audit-deps.mjs",
+		"audit:deps:ci": "node scripts/audit-deps.mjs --ci"
 	},
 	"prettier": {
 		"printWidth": 100,
@@ -45,7 +47,6 @@
 		"@angular/service-worker": "^21.0.0",
 		"@angular/ssr": "^21.1.0",
 		"@microsoft/signalr": "^10.0.0",
-		"@ng-web-apis/speech": "^5.0.3",
 		"@ngrx/operators": "^21.0.1",
 		"@ngrx/signals": "^21.0.1",
 		"@primeng/themes": "^21.0.4",
@@ -53,11 +54,6 @@
 		"bootstrap-icons": "^1.13.1",
 		"exceljs": "^4.4.0",
 		"express": "^5.1.0",
-		"file-saver": "^2.0.5",
-		"html2canvas": "^1.4.1",
-		"jspdf": "^2.5.1",
-		"pdf-lib": "^1.17.1",
-		"pdfmake": "^0.2.10",
 		"primeicons": "^7.0.0",
 		"primeng": "^21.0.4",
 		"rxjs": "~7.8.0",
@@ -75,7 +71,6 @@
 		"@compodoc/compodoc": "^1.1.25",
 		"@eslint/js": "^9.18.0",
 		"@types/express": "^5.0.1",
-		"@types/file-saver": "^2.0.7",
 		"@types/node": "^20.17.19",
 		"@vitest/coverage-v8": "^4.0.17",
 		"angular-eslint": "^19.6.0",

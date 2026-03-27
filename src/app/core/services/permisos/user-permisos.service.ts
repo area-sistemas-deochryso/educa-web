@@ -2,16 +2,14 @@ import { Injectable, inject, signal, computed, DestroyRef, effect } from '@angul
 import { takeUntilDestroyed, toSignal } from '@angular/core/rxjs-interop';
 import { tap, catchError, of, firstValueFrom, timer, Subject, takeUntil } from 'rxjs';
 
-import { logger, isJwtExpired } from '@core/helpers';
+import { logger, isJwtExpired, Duration } from '@core/helpers';
 import { AuthService } from '../auth';
 import { StorageService } from '../storage';
 import { PermisosService } from './permisos.service';
 import { PermisosUsuarioResultado } from './permisos.models';
 
-/**
- * Interval in ms to check for expired permissions token.
- */
-const PERMISOS_CHECK_INTERVAL_MS = 5 * 60 * 1000;
+/** Interval to check for expired permissions token. */
+const PERMISOS_CHECK_INTERVAL = Duration.minutes(5);
 
 /**
  * User permissions service.
@@ -264,7 +262,7 @@ export class UserPermisosService {
 	private startPermisosRefresh(): void {
 		this.stopPermisosRefresh();
 
-		timer(0, PERMISOS_CHECK_INTERVAL_MS)
+		timer(0, PERMISOS_CHECK_INTERVAL.ms)
 			.pipe(takeUntil(this.stopRefresh$), takeUntilDestroyed(this.destroyRef))
 			.subscribe(() => {
 				const stored = this.storageService.getPermisos();

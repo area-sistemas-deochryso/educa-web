@@ -1,5 +1,5 @@
 // #region Imports
-import { ChangeDetectionStrategy, Component, computed, input, output, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, inject, input, output, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { AccordionModule } from 'primeng/accordion';
@@ -9,6 +9,7 @@ import { ProgressSpinnerModule } from 'primeng/progressspinner';
 import { SelectModule } from 'primeng/select';
 import { TableModule } from 'primeng/table';
 import { TagModule } from 'primeng/tag';
+import { ExcelService } from '@core/services';
 import { ImportarEstudianteItem, ImportarEstudiantesResponse } from '../../services';
 import {
 	EstudianteImportRow,
@@ -17,7 +18,6 @@ import {
 	parseDni,
 	splitNombreCompleto,
 } from '../../helpers/estudiante-import.config';
-import * as XLSX from 'xlsx';
 
 // #endregion
 // #region Component
@@ -48,6 +48,8 @@ interface GradoGroup {
 	changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class UsuariosImportDialogComponent {
+	private readonly excelService = inject(ExcelService);
+
 	// #region Inputs / Outputs
 	readonly visible = input.required<boolean>();
 	readonly loading = input<boolean>(false);
@@ -88,18 +90,18 @@ export class UsuariosImportDialogComponent {
 	// #region Handlers — step navigation
 
 	onSelectFile(event: Event): void {
-		const input = event.target as HTMLInputElement;
-		const file = input.files?.[0];
+		const fileInput = event.target as HTMLInputElement;
+		const file = fileInput.files?.[0];
 		if (!file) return;
 
 		this.fileName.set(file.name);
 		this.parseError.set(null);
 
 		const reader = new FileReader();
-		reader.onload = (e) => {
+		reader.onload = async (e) => {
 			try {
 				const buffer = e.target?.result as ArrayBuffer;
-				const parsed = this.parseExcel(buffer, this.seccion());
+				const parsed = await this.parseExcel(buffer, this.seccion());
 				if (parsed.length === 0) {
 					this.parseError.set(
 						'No se encontraron estudiantes válidos. Verifica que los nombres de las hojas coincidan con los grados esperados.',
@@ -114,7 +116,7 @@ export class UsuariosImportDialogComponent {
 				this.filas.set([]);
 			}
 			// Reset input para permitir seleccionar el mismo archivo de nuevo
-			input.value = '';
+			fileInput.value = '';
 		};
 		reader.readAsArrayBuffer(file);
 	}
@@ -158,18 +160,15 @@ export class UsuariosImportDialogComponent {
 
 	// #region Excel parsing
 
-	private parseExcel(buffer: ArrayBuffer, seccion: string): EstudianteImportRow[] {
-		const wb = XLSX.read(buffer, { type: 'array' });
+	private async parseExcel(buffer: ArrayBuffer, seccion: string): Promise<EstudianteImportRow[]> {
+		const sheets = await this.excelService.parseXlsx(buffer);
 		const rows: EstudianteImportRow[] = [];
 
-		for (const sheetName of wb.SheetNames) {
-			const grado = SHEET_TO_GRADO[sheetName.trim()];
+		for (const sheet of sheets) {
+			const grado = SHEET_TO_GRADO[sheet.sheetName.trim()];
 			if (!grado) continue;
 
-			const ws = wb.Sheets[sheetName];
-			const data = XLSX.utils.sheet_to_json<Record<string, unknown>>(ws, { defval: '' });
-
-			for (const raw of data) {
+			for (const raw of sheet.data) {
 				const keys = Object.keys(raw);
 
 				// Detectar columna nombre (busca APELLIDOS o NOMBRES en el header)

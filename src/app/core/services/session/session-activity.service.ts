@@ -10,16 +10,16 @@ import { SwService } from '@core/services/sw';
 import { StorageService } from '@core/services/storage';
 import { SessionRefreshService } from './session-refresh.service';
 import { SessionCoordinatorService } from './session-coordinator.service';
-import { logger } from '@core/helpers';
+import { logger, Duration } from '@core/helpers';
 // #endregion
 
 // #region Constants
 
 /** Debounce user activity tracking (30s). */
-const ACTIVITY_DEBOUNCE_MS = 30 * 1000;
+const ACTIVITY_DEBOUNCE = Duration.seconds(30);
 
 /** Without activity for 5 min = idle. */
-const IDLE_THRESHOLD_MS = 5 * 60 * 1000;
+const IDLE_THRESHOLD = Duration.minutes(5);
 
 /** DOM events that count as user activity. */
 const ACTIVITY_EVENTS: (keyof DocumentEventMap)[] = ['mousedown', 'keydown', 'touchstart', 'scroll'];
@@ -186,11 +186,11 @@ export class SessionActivityService {
 
 		this.activityDebounceTimer = setTimeout(() => {
 			this.activityDebounceTimer = null;
-		}, ACTIVITY_DEBOUNCE_MS);
+		}, ACTIVITY_DEBOUNCE.ms);
 	}
 
 	private isUserActive(): boolean {
-		return (Date.now() - this._lastActivity()) < IDLE_THRESHOLD_MS;
+		return (Date.now() - this._lastActivity()) < IDLE_THRESHOLD.ms;
 	}
 
 	// #endregion

@@ -10,6 +10,7 @@ export type {
 	AprobacionMasivaDto,
 	AprobacionItemDto,
 	AprobacionMasivaResultDto,
+	BatchCommandResult,
 	SalonesAdminEstadisticas,
 	AprobacionEstado,
 	PeriodoCierreEstado,

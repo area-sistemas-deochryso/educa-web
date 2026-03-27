@@ -18,7 +18,7 @@ import {
 	AprobacionEstudianteListDto,
 	AprobarEstudianteDto,
 	AprobacionMasivaDto,
-	AprobacionMasivaResultDto,
+	BatchCommandResult,
 } from '../models';
 
 @Injectable({ providedIn: 'root' })
@@ -148,9 +148,9 @@ export class SalonesAdminApiService {
 			);
 	}
 
-	aprobarMasivo(dto: AprobacionMasivaDto): Observable<AprobacionMasivaResultDto | null> {
+	aprobarMasivo(dto: AprobacionMasivaDto): Observable<BatchCommandResult | null> {
 		return this.http
-			.post<AprobacionMasivaResultDto>(
+			.post<BatchCommandResult>(
 				`${this.baseUrl}/api/AprobacionEstudiante/masivo`,
 				dto,
 			)

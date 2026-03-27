@@ -111,11 +111,28 @@ export interface AprobacionItemDto {
 	observacion: string | null;
 }
 
+/** @deprecated Reemplazado por BatchCommandResult */
 export interface AprobacionMasivaResultDto {
 	aprobados: number;
 	desaprobados: number;
 	errores: number;
 	mensajes: string[];
+}
+
+export interface CommandItemResult {
+	itemId: number;
+	success: boolean;
+	message: string;
+	errorCode: string | null;
+}
+
+export interface BatchCommandResult {
+	batchId: string;
+	total: number;
+	succeeded: number;
+	failed: number;
+	durationMs: number;
+	items: CommandItemResult[];
 }
 // #endregion
 

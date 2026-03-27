@@ -8,7 +8,7 @@ const SESSION_CHANNEL_NAME = 'educa-session';
 
 import { AuthApiService } from './auth-api.service';
 import { StorageService } from '../storage';
-import { logger } from '@core/helpers';
+import { logger, Duration } from '@core/helpers';
 import { UI_AUTH_MESSAGES } from '@app/shared/constants';
 
 // #endregion
@@ -137,7 +137,7 @@ export class AuthService {
 	 */
 	logout(): void {
 		this.api.logout().pipe(
-			timeout(5000),
+			timeout(Duration.seconds(5).ms),
 			catchError((err) => {
 				logger.warn('[Auth] Logout API failed — HttpOnly cookies may persist until expiry', err);
 				return EMPTY;

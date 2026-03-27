@@ -3,7 +3,7 @@ import { Injectable, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { environment } from '@config/environment';
-import { logger } from '@core/helpers';
+import { logger, FileUploadBuilder } from '@core/helpers';
 
 // #endregion
 // #region Implementation
@@ -43,11 +43,10 @@ export class BlobStorageService {
 			throw new Error('Container name is required');
 		}
 
-		// Crear FormData
-		const formData = new FormData();
-		formData.append('file', file, file.name);
-		formData.append('containerName', containerName);
-		formData.append('appendTimestamp', appendTimestamp.toString());
+		const formData = FileUploadBuilder.create(file)
+			.container(containerName)
+			.withTimestamp(appendTimestamp)
+			.build();
 
 		return this.http.post<BlobUploadResponse>(`${this.apiUrl}/upload`, formData);
 	}

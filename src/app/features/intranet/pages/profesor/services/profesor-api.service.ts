@@ -3,6 +3,7 @@ import { HttpClient } from '@angular/common/http';
 import { Observable, of } from 'rxjs';
 import { catchError } from 'rxjs/operators';
 import { environment } from '@config/environment';
+import { FileUploadBuilder } from '@core/helpers';
 import {
 	HorarioProfesorDto,
 	SalonTutoriaResponse,
@@ -390,10 +391,10 @@ export class ProfesorApiService {
 	 * @returns Observable with upload result URL and file name.
 	 */
 	uploadFile(file: File): Observable<{ url: string; fileName: string }> {
-		const formData = new FormData();
-		formData.append('file', file);
-		formData.append('containerName', 'curso-contenido');
-		formData.append('appendTimestamp', 'true');
+		const formData = FileUploadBuilder.create(file)
+			.container('curso-contenido')
+			.withTimestamp()
+			.build();
 		return this.http.post<{ url: string; fileName: string }>(`${this.blobUrl}/upload`, formData);
 	}
 	// #endregion

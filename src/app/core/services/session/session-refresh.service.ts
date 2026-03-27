@@ -8,25 +8,25 @@ import { AuthApiService } from '@core/services/auth/auth-api.service';
 import { SwService } from '@core/services/sw';
 import { TimerManager } from '@core/services/destroy/destroy.service';
 import { SessionCoordinatorService } from './session-coordinator.service';
-import { logger } from '@core/helpers';
+import { logger, Duration } from '@core/helpers';
 // #endregion
 
 // #region Constants
 
 /** Must match CookieConfig.AccessTokenExpiry on the backend (1 hour). */
-const TOKEN_LIFETIME_MS = 60 * 60 * 1000;
+const TOKEN_LIFETIME = Duration.hours(1);
 
 /** Refresh 10 min before expiry. */
-const REFRESH_BEFORE_MS = 10 * 60 * 1000;
+const REFRESH_BEFORE = Duration.minutes(10);
 
 /** Timer fires at TOKEN_LIFETIME - REFRESH_BEFORE (50 min). */
-const REFRESH_TIMER_MS = TOKEN_LIFETIME_MS - REFRESH_BEFORE_MS;
+const REFRESH_TIMER = Duration.milliseconds(TOKEN_LIFETIME.ms - REFRESH_BEFORE.ms);
 
 /** Re-check when user is idle (60s). */
-const RECHECK_INTERVAL_MS = 60 * 1000;
+const RECHECK_INTERVAL = Duration.seconds(60);
 
 /** Cooldown after another tab refreshed — skip our own refresh (2 min). */
-const CROSS_TAB_REFRESH_COOLDOWN_MS = 2 * 60 * 1000;
+const CROSS_TAB_REFRESH_COOLDOWN = Duration.minutes(2);
 
 // #endregion
 
@@ -118,7 +118,7 @@ export class SessionRefreshService {
 
 	/** Whether the token has exceeded its lifetime since last refresh. */
 	isTokenExpired(): boolean {
-		return (Date.now() - this._lastRefreshTime()) > TOKEN_LIFETIME_MS;
+		return (Date.now() - this._lastRefreshTime()) > TOKEN_LIFETIME.ms;
 	}
 
 	// #endregion
@@ -132,12 +132,12 @@ export class SessionRefreshService {
 
 	private scheduleRefresh(): void {
 		this.timerManager.clearAll();
-		this.timerManager.setTimeout(() => this.onRefreshTimerFired(), REFRESH_TIMER_MS);
+		this.timerManager.setTimeout(() => this.onRefreshTimerFired(), REFRESH_TIMER.ms);
 	}
 
 	private scheduleRecheck(): void {
 		this.timerManager.clearAll();
-		this.timerManager.setTimeout(() => this.onRefreshTimerFired(), RECHECK_INTERVAL_MS);
+		this.timerManager.setTimeout(() => this.onRefreshTimerFired(), RECHECK_INTERVAL.ms);
 	}
 
 	private onRefreshTimerFired(): void {
@@ -173,7 +173,7 @@ export class SessionRefreshService {
 				this._lastRefreshTime.set(now);
 				this.coordinator.broadcast({ type: 'refresh-done', timestamp: now });
 				this.scheduleRefresh();
-				logger.log('[SessionRefresh] Token refreshed — next in', REFRESH_TIMER_MS / 60_000, 'min');
+				logger.log('[SessionRefresh] Token refreshed — next in', REFRESH_TIMER.minutes, 'min');
 			},
 			error: () => {
 				if (!this.swService.isOnline) {
@@ -210,7 +210,7 @@ export class SessionRefreshService {
 					// Token is valid — mark refresh time so the timer schedules correctly
 					this._lastRefreshTime.set(Date.now());
 					this.scheduleRefresh();
-					logger.log('[SessionRefresh] Session verified — refresh in', REFRESH_TIMER_MS / 60_000, 'min');
+					logger.log('[SessionRefresh] Session verified — refresh in', REFRESH_TIMER.minutes, 'min');
 				} else {
 					this.attemptRefreshOrLogout();
 				}
@@ -275,7 +275,7 @@ export class SessionRefreshService {
 
 	/** Returns true if another tab refreshed recently enough that we can skip. */
 	private wasRecentlyRefreshedByOtherTab(): boolean {
-		return (Date.now() - this._lastRefreshTime()) < CROSS_TAB_REFRESH_COOLDOWN_MS;
+		return (Date.now() - this._lastRefreshTime()) < CROSS_TAB_REFRESH_COOLDOWN.ms;
 	}
 
 	// #endregion
