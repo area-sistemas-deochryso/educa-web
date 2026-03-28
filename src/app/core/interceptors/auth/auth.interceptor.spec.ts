@@ -1,30 +1,23 @@
-// * Tests for auth interceptor header injection.
+// * Tests for auth interceptor (pass-through — cookies handle auth via credentialsInterceptor).
 // #region Imports
 import { TestBed } from '@angular/core/testing';
 import { HttpClient, provideHttpClient, withInterceptors } from '@angular/common/http';
 import { HttpTestingController, provideHttpClientTesting } from '@angular/common/http/testing';
-import { describe, it, expect, beforeEach, vi } from 'vitest';
+import { describe, it, expect, beforeEach } from 'vitest';
 
 import { authInterceptor } from './auth.interceptor';
-import { StorageService } from '@app/core/services';
 
 // #endregion
 // #region Implementation
 describe('authInterceptor', () => {
 	let httpClient: HttpClient;
 	let httpMock: HttpTestingController;
-	let storageServiceMock: Partial<StorageService>;
 
 	beforeEach(() => {
-		storageServiceMock = {
-			getToken: vi.fn().mockReturnValue(null),
-		};
-
 		TestBed.configureTestingModule({
 			providers: [
 				provideHttpClient(withInterceptors([authInterceptor])),
 				provideHttpClientTesting(),
-				{ provide: StorageService, useValue: storageServiceMock },
 			],
 		});
 
@@ -36,9 +29,7 @@ describe('authInterceptor', () => {
 		httpMock.verify();
 	});
 
-	it('should not add Authorization header when no token exists', () => {
-		storageServiceMock.getToken = vi.fn().mockReturnValue(null);
-
+	it('should pass the request through without modifying headers', () => {
 		httpClient.get('/api/test').subscribe();
 
 		const req = httpMock.expectOne('/api/test');
@@ -46,19 +37,15 @@ describe('authInterceptor', () => {
 		req.flush({});
 	});
 
-	it('should add Authorization header when token exists', () => {
-		storageServiceMock.getToken = vi.fn().mockReturnValue('test-token-123');
+	it('should not add Authorization header for any endpoint', () => {
+		httpClient.get('/api/users').subscribe();
 
-		httpClient.get('/api/test').subscribe();
-
-		const req = httpMock.expectOne('/api/test');
-		expect(req.request.headers.get('Authorization')).toBe('Bearer test-token-123');
+		const req = httpMock.expectOne('/api/users');
+		expect(req.request.headers.has('Authorization')).toBe(false);
 		req.flush({});
 	});
 
-	it('should NOT add Authorization header for login endpoint even with token', () => {
-		storageServiceMock.getToken = vi.fn().mockReturnValue('test-token-123');
-
+	it('should not add Authorization header for login endpoint', () => {
 		httpClient.post('/api/Auth/login', {}).subscribe();
 
 		const req = httpMock.expectOne('/api/Auth/login');
@@ -66,19 +53,7 @@ describe('authInterceptor', () => {
 		req.flush({});
 	});
 
-	it('should add Authorization header for non-login endpoints', () => {
-		storageServiceMock.getToken = vi.fn().mockReturnValue('my-token');
-
-		httpClient.get('/api/users').subscribe();
-
-		const req = httpMock.expectOne('/api/users');
-		expect(req.request.headers.get('Authorization')).toBe('Bearer my-token');
-		req.flush({});
-	});
-
-	it('should preserve existing headers when adding Authorization', () => {
-		storageServiceMock.getToken = vi.fn().mockReturnValue('my-token');
-
+	it('should preserve existing headers without modification', () => {
 		httpClient
 			.get('/api/test', {
 				headers: { 'X-Custom-Header': 'custom-value' },
@@ -86,7 +61,7 @@ describe('authInterceptor', () => {
 			.subscribe();
 
 		const req = httpMock.expectOne('/api/test');
-		expect(req.request.headers.get('Authorization')).toBe('Bearer my-token');
+		expect(req.request.headers.has('Authorization')).toBe(false);
 		expect(req.request.headers.get('X-Custom-Header')).toBe('custom-value');
 		req.flush({});
 	});

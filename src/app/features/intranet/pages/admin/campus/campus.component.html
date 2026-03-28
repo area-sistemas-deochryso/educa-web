@@ -166,425 +166,52 @@
 <!-- #endregion -->
 
 <!-- #region Piso Dialog -->
-<p-dialog
+<app-campus-piso-dialog
 	[visible]="vm().pisoDialogVisible"
+	[isEditing]="!!vm().editingPiso"
+	[formData]="pisoFormData()"
+	[saving]="vm().saving"
 	(visibleChange)="onPisoDialogVisibleChange($event)"
-	[modal]="true"
-	[closable]="true"
-	[showHeader]="false"
-	[style]="{ width: '440px' }"
->
-	<!-- Custom header -->
-	<div class="piso-dialog-header">
-		<div class="piso-dialog-icon" [class.editing]="vm().editingPiso">
-			<i [class]="vm().editingPiso ? 'pi pi-pencil' : 'pi pi-plus'"></i>
-		</div>
-		<div class="piso-dialog-title">
-			<h3>{{ vm().editingPiso ? 'Editar Piso' : 'Nuevo Piso' }}</h3>
-			<p>{{ vm().editingPiso ? 'Modifica los datos del piso seleccionado' : 'Define un nuevo piso para el mapa del campus' }}</p>
-		</div>
-	</div>
-
-	<!-- Form -->
-	<div class="piso-dialog-form">
-		<div class="form-field">
-			<label for="pisoNombre">
-				<i class="pi pi-tag"></i>
-				Nombre del piso
-			</label>
-			<input
-				pInputText
-				id="pisoNombre"
-				[ngModel]="pisoFormNombre()"
-				(ngModelChange)="pisoFormNombre.set($event)"
-				placeholder="Ej: Primer Piso"
-			/>
-		</div>
-		<div class="form-row">
-			<div class="form-field">
-				<label for="pisoOrden">
-					<i class="pi pi-sort-numeric-up"></i>
-					Orden
-				</label>
-				<p-inputNumber
-					id="pisoOrden"
-					[ngModel]="pisoFormOrden()"
-					(ngModelChange)="pisoFormOrden.set($event)"
-					[showButtons]="true"
-					[min]="0"
-					[max]="99"
-				/>
-			</div>
-			<div class="form-field">
-				<label for="pisoAltura">
-					<i class="pi pi-arrows-v"></i>
-					Altura (m)
-				</label>
-				<p-inputNumber
-					id="pisoAltura"
-					[ngModel]="pisoFormAltura()"
-					(ngModelChange)="pisoFormAltura.set($event)"
-					[minFractionDigits]="1"
-					[maxFractionDigits]="1"
-					[min]="0.1"
-					[max]="100"
-				/>
-			</div>
-		</div>
-	</div>
-
-	<!-- Footer -->
-	<div class="piso-dialog-footer">
-		<button
-			pButton
-			label="Cancelar"
-			class="p-button-text p-button-secondary"
-			(click)="facade.closePisoDialog()"
-		></button>
-		<button
-			pButton
-			[label]="vm().editingPiso ? 'Guardar cambios' : 'Crear piso'"
-			[icon]="vm().editingPiso ? 'pi pi-check' : 'pi pi-plus'"
-			(click)="savePiso()"
-			[loading]="vm().saving"
-			[disabled]="!pisoFormNombre().trim()"
-		></button>
-	</div>
-</p-dialog>
+	(save)="savePiso()"
+	(formDataChange)="onPisoFormDataChange($event)"
+/>
 <!-- #endregion -->
 
 <!-- #region Node Edit Dialog -->
-<p-dialog
+<app-campus-node-dialog
 	[visible]="vm().nodeDialogVisible"
+	[formData]="nodeFormData()"
+	[nodeTypeOptions]="nodeTypeOptions"
+	[saving]="vm().saving"
 	(visibleChange)="onNodeDialogVisibleChange($event)"
-	[modal]="true"
-	[closable]="true"
-	[showHeader]="false"
-	[style]="{ width: '440px' }"
->
-	<div class="piso-dialog-header">
-		<div class="piso-dialog-icon editing">
-			<i class="pi pi-pencil"></i>
-		</div>
-		<div class="piso-dialog-title">
-			<h3>Editar Nodo</h3>
-			<p>Modifica las propiedades del nodo seleccionado</p>
-		</div>
-	</div>
-
-	<div class="piso-dialog-form">
-		<div class="form-field">
-			<label for="nodeEtiqueta">
-				<i class="pi pi-tag"></i>
-				Nombre / Etiqueta
-			</label>
-			<input
-				pInputText
-				id="nodeEtiqueta"
-				[ngModel]="nodeFormEtiqueta()"
-				(ngModelChange)="nodeFormEtiqueta.set($event)"
-				placeholder="Ej: Aula 101, Baño Varones..."
-			/>
-		</div>
-		<div class="form-field">
-			<label for="nodeTipo">
-				<i class="pi pi-th-large"></i>
-				Tipo
-			</label>
-			<p-select
-				id="nodeTipo"
-				[options]="nodeTypeOptions"
-				[ngModel]="nodeFormTipo()"
-				(ngModelChange)="nodeFormTipo.set($event)"
-				optionLabel="label"
-				optionValue="value"
-				appendTo="body"
-			/>
-		</div>
-		<div class="form-row">
-			<div class="form-field">
-				<label for="nodeWidth">
-					<i class="pi pi-arrows-h"></i>
-					Ancho
-				</label>
-				<p-inputNumber
-					id="nodeWidth"
-					[ngModel]="nodeFormWidth()"
-					(ngModelChange)="nodeFormWidth.set($event)"
-					[min]="0"
-					[max]="500"
-					[showButtons]="true"
-					[step]="10"
-				/>
-			</div>
-			<div class="form-field">
-				<label for="nodeHeight">
-					<i class="pi pi-arrows-v"></i>
-					Alto
-				</label>
-				<p-inputNumber
-					id="nodeHeight"
-					[ngModel]="nodeFormHeight()"
-					(ngModelChange)="nodeFormHeight.set($event)"
-					[min]="0"
-					[max]="500"
-					[showButtons]="true"
-					[step]="10"
-				/>
-			</div>
-		</div>
-	</div>
-
-	<div class="piso-dialog-footer">
-		<button
-			pButton
-			label="Cancelar"
-			class="p-button-text p-button-secondary"
-			(click)="facade.closeNodeDialog()"
-		></button>
-		<button
-			pButton
-			label="Guardar cambios"
-			icon="pi pi-check"
-			(click)="saveNode()"
-			[loading]="vm().saving"
-		></button>
-	</div>
-</p-dialog>
+	(save)="saveNode()"
+	(formDataChange)="onNodeFormDataChange($event)"
+/>
 <!-- #endregion -->
 
 <!-- #region Bloqueo Edit Dialog -->
-<p-dialog
+<app-campus-bloqueo-dialog
 	[visible]="vm().bloqueoDialogVisible"
+	[formData]="bloqueoFormData()"
+	[saving]="vm().saving"
 	(visibleChange)="onBloqueoDialogVisibleChange($event)"
-	[modal]="true"
-	[closable]="true"
-	[showHeader]="false"
-	[style]="{ width: '440px' }"
->
-	<div class="piso-dialog-header">
-		<div class="piso-dialog-icon editing">
-			<i class="pi pi-ban"></i>
-		</div>
-		<div class="piso-dialog-title">
-			<h3>Editar Bloqueo</h3>
-			<p>Modifica las dimensiones y motivo del bloqueo</p>
-		</div>
-	</div>
-
-	<div class="piso-dialog-form">
-		<div class="form-field">
-			<label for="bloqueoMotivo">
-				<i class="pi pi-info-circle"></i>
-				Motivo
-			</label>
-			<input
-				pInputText
-				id="bloqueoMotivo"
-				[ngModel]="bloqueoFormMotivo()"
-				(ngModelChange)="bloqueoFormMotivo.set($event)"
-				placeholder="Ej: En reparación, Zona restringida..."
-			/>
-		</div>
-		<div class="form-row">
-			<div class="form-field">
-				<label for="bloqueoWidth">
-					<i class="pi pi-arrows-h"></i>
-					Ancho
-				</label>
-				<p-inputNumber
-					id="bloqueoWidth"
-					[ngModel]="bloqueoFormWidth()"
-					(ngModelChange)="bloqueoFormWidth.set($event)"
-					[min]="10"
-					[max]="500"
-					[showButtons]="true"
-					[step]="10"
-				/>
-			</div>
-			<div class="form-field">
-				<label for="bloqueoHeight">
-					<i class="pi pi-arrows-v"></i>
-					Alto
-				</label>
-				<p-inputNumber
-					id="bloqueoHeight"
-					[ngModel]="bloqueoFormHeight()"
-					(ngModelChange)="bloqueoFormHeight.set($event)"
-					[min]="10"
-					[max]="500"
-					[showButtons]="true"
-					[step]="10"
-				/>
-			</div>
-		</div>
-	</div>
-
-	<div class="piso-dialog-footer">
-		<button
-			pButton
-			label="Cancelar"
-			class="p-button-text p-button-secondary"
-			(click)="facade.closeBloqueoDialog()"
-		></button>
-		<button
-			pButton
-			label="Guardar cambios"
-			icon="pi pi-check"
-			(click)="saveBloqueo()"
-			[loading]="vm().saving"
-		></button>
-	</div>
-</p-dialog>
+	(save)="saveBloqueo()"
+	(formDataChange)="onBloqueoFormDataChange($event)"
+/>
 <!-- #endregion -->
 
 <!-- #region Vertical Connection Dialog -->
-<p-dialog
+<app-campus-vertical-connection-dialog
 	[visible]="vm().verticalDialogVisible"
+	[formData]="verticalFormData()"
+	[otherPisos]="otherPisos()"
+	[destPisoNodos]="vm().destPisoNodos"
+	[destPisoLoading]="vm().destPisoLoading"
+	[typeOptions]="verticalConnectionTypeOptions"
+	[saving]="vm().saving"
 	(visibleChange)="onVerticalDialogVisibleChange($event)"
-	[modal]="true"
-	[closable]="true"
-	[showHeader]="false"
-	[style]="{ width: '480px' }"
->
-	<div class="piso-dialog-header">
-		<div class="piso-dialog-icon">
-			<i class="pi pi-arrows-v"></i>
-		</div>
-		<div class="piso-dialog-title">
-			<h3>Nueva Conexión Vertical</h3>
-			<p>Conecta un nodo de este piso con un nodo de otro piso</p>
-		</div>
-	</div>
-
-	<div class="piso-dialog-form">
-		<div class="form-field">
-			<label for="verticalTipo">
-				<i class="pi pi-th-large"></i>
-				Tipo de conexión
-			</label>
-			<p-select
-				id="verticalTipo"
-				[options]="verticalConnectionTypeOptions"
-				[ngModel]="verticalFormTipo()"
-				(ngModelChange)="verticalFormTipo.set($event)"
-				optionLabel="label"
-				optionValue="value"
-				appendTo="body"
-			/>
-		</div>
-
-		<div class="form-field">
-			<label for="verticalDestPiso">
-				<i class="pi pi-building"></i>
-				Piso destino
-			</label>
-			<p-select
-				id="verticalDestPiso"
-				[options]="otherPisos()"
-				[ngModel]="verticalFormDestPisoId()"
-				(ngModelChange)="onDestPisoChange($event)"
-				optionLabel="nombre"
-				optionValue="id"
-				appendTo="body"
-				placeholder="Selecciona un piso"
-			/>
-		</div>
-
-		@if (verticalFormDestPisoId()) {
-			<div class="form-field">
-				<label for="verticalDestNodo">
-					<i class="pi pi-map-marker"></i>
-					Nodo destino
-				</label>
-				@if (vm().destPisoLoading) {
-					<div class="loading-hint">
-						<i class="pi pi-spin pi-spinner"></i>
-						Cargando nodos...
-					</div>
-				} @else {
-					<p-select
-						id="verticalDestNodo"
-						[options]="vm().destPisoNodos"
-						[ngModel]="verticalFormDestNodoId()"
-						(ngModelChange)="verticalFormDestNodoId.set($event)"
-						optionLabel="etiqueta"
-						optionValue="id"
-						appendTo="body"
-						placeholder="Selecciona un nodo"
-					>
-						<ng-template let-node pTemplate="item">
-							<span>{{ node.etiqueta || node.tipo }} ({{ node.x | number: '1.0-0' }}, {{ node.y | number: '1.0-0' }})</span>
-						</ng-template>
-						<ng-template let-node pTemplate="selectedItem">
-							<span>{{ node.etiqueta || node.tipo }}</span>
-						</ng-template>
-					</p-select>
-				}
-			</div>
-		}
-
-		<div class="form-row">
-			<div class="form-field">
-				<label for="verticalPesoSubida">
-					<i class="pi pi-arrow-up"></i>
-					Peso subida
-				</label>
-				<p-inputNumber
-					id="verticalPesoSubida"
-					[ngModel]="verticalFormPesoSubida()"
-					(ngModelChange)="verticalFormPesoSubida.set($event)"
-					[minFractionDigits]="1"
-					[maxFractionDigits]="1"
-					[min]="0.1"
-					[max]="100"
-				/>
-			</div>
-			<div class="form-field">
-				<label for="verticalPesoBajada">
-					<i class="pi pi-arrow-down"></i>
-					Peso bajada
-				</label>
-				<p-inputNumber
-					id="verticalPesoBajada"
-					[ngModel]="verticalFormPesoBajada()"
-					(ngModelChange)="verticalFormPesoBajada.set($event)"
-					[minFractionDigits]="1"
-					[maxFractionDigits]="1"
-					[min]="0.1"
-					[max]="100"
-				/>
-			</div>
-		</div>
-
-		<div class="form-field form-field-inline">
-			<label for="verticalBidireccional">
-				<i class="pi pi-sort-alt"></i>
-				Bidireccional
-			</label>
-			<p-toggleSwitch
-				id="verticalBidireccional"
-				[ngModel]="verticalFormBidireccional()"
-				(ngModelChange)="verticalFormBidireccional.set($event)"
-			/>
-		</div>
-	</div>
-
-	<div class="piso-dialog-footer">
-		<button
-			pButton
-			label="Cancelar"
-			class="p-button-text p-button-secondary"
-			(click)="facade.closeVerticalDialog()"
-		></button>
-		<button
-			pButton
-			label="Crear conexión"
-			icon="pi pi-check"
-			(click)="saveVerticalConnection()"
-			[loading]="vm().saving"
-			[disabled]="!verticalFormDestNodoId()"
-		></button>
-	</div>
-</p-dialog>
+	(save)="saveVerticalConnection()"
+	(destPisoChange)="onDestPisoChange($event)"
+	(formDataChange)="onVerticalFormDataChange($event)"
+/>
 <!-- #endregion -->

@@ -1,0 +1,176 @@
+<div class="wizard-step-content">
+	<!-- #region Header -->
+	<div class="section-header">
+		<h3><i class="pi pi-chart-line"></i> Stages (Ramp-up/down)</h3>
+		<div class="section-toggle">
+			<p-checkbox
+				[ngModel]="vm().config.useStages"
+				(ngModelChange)="onUseStagesChange($event)"
+				[binary]="true"
+				inputId="use-stages"
+				pTooltip="Stages permiten ramp-up gradual en lugar de VUs fijos"
+				tooltipPosition="top"
+			/>
+			<label for="use-stages" class="toggle-label">Usar stages</label>
+		</div>
+	</div>
+	<!-- #endregion -->
+
+	@if (vm().config.useStages) {
+		<!-- #region Stages List -->
+		<div
+			class="stages-list"
+			cdkDropList
+			(cdkDropListDropped)="onDropStage($event)"
+		>
+			@for (stage of vm().config.stages; track $index; let i = $index) {
+				<div class="stage-row-wrapper" cdkDrag>
+					<div class="stage-row">
+						<i class="pi pi-bars drag-handle" cdkDragHandle></i>
+						<span class="stage-index">{{ i + 1 }}</span>
+						<div class="field stage-field">
+							<label>Duración</label>
+							<input
+								type="text"
+								pInputText
+								placeholder="30s"
+								[ngModel]="stage.duration"
+								(ngModelChange)="onStageDurationChange(i, $event)"
+								[style]="{ width: '100%' }"
+								pTooltip="Duración de esta fase (ej: 30s, 1m, 5m)"
+								tooltipPosition="top"
+							/>
+						</div>
+						<div class="field stage-field">
+							<label>Target VUs</label>
+							<p-inputNumber
+								[ngModel]="stage.target"
+								(ngModelChange)="onStageTargetChange(i, $event)"
+								[min]="0"
+								[max]="10000"
+								[style]="{ width: '100%' }"
+								pTooltip="Cantidad de VUs al final de esta fase"
+								tooltipPosition="top"
+							/>
+						</div>
+						<button
+							pButton
+							icon="pi pi-link"
+							class="p-button-rounded p-button-text p-button-sm"
+							[class.p-button-info]="stage.endpointIndices.length > 0"
+							(click)="onToggleStageEndpoints(i)"
+							pTooltip="Asignar endpoints a esta fase"
+							tooltipPosition="top"
+							[pt]="{
+								root: {
+									'aria-label': 'Configurar endpoints de fase',
+								},
+							}"
+						></button>
+						<button
+							pButton
+							icon="pi pi-trash"
+							class="p-button-rounded p-button-text p-button-danger p-button-sm"
+							(click)="onRemoveStage(i)"
+							[pt]="{ root: { 'aria-label': 'Eliminar stage' } }"
+						></button>
+					</div>
+
+					<!-- Panel de asignación de endpoints por fase -->
+					@if (
+						expandedStageIndex() === i &&
+						vm().enabledEndpoints.length > 0
+					) {
+						<div class="stage-endpoints-panel">
+							<span class="stage-endpoints-hint">
+								<i class="pi pi-info-circle"></i>
+								Sin selección = todos los endpoints
+							</span>
+							@for (
+								ep of vm().enabledEndpoints;
+								track $index;
+								let ei = $index
+							) {
+								<label class="stage-endpoint-item">
+									<p-checkbox
+										[ngModel]="
+											stage.endpointIndices.includes(ei)
+										"
+										(ngModelChange)="
+											onStageEndpointToggle(i, ei, $event)
+										"
+										[binary]="true"
+										[inputId]="'stage-' + i + '-ep-' + ei"
+									/>
+									<span
+										class="stage-ep-method"
+										[class]="
+											'method-' + ep.method.toLowerCase()
+										"
+										>{{ ep.method }}</span
+									>
+									<span class="stage-ep-path">{{
+										ep.path || '/api/...'
+									}}</span>
+								</label>
+							}
+						</div>
+					}
+				</div>
+			}
+
+			<button
+				pButton
+				label="Agregar Stage"
+				icon="pi pi-plus"
+				class="p-button-outlined p-button-sm w-full"
+				(click)="onAddStage()"
+				pTooltip="Agregar una nueva fase al ramp-up"
+				tooltipPosition="top"
+			></button>
+		</div>
+		<!-- #endregion -->
+
+		<!-- #region Visual Preview -->
+		<div class="stages-preview">
+			<span class="preview-label">Vista previa:</span>
+			@for (stage of vm().config.stages; track $index; let i = $index) {
+				<span class="preview-stage">
+					{{ stage.duration }} → {{ stage.target }} VUs
+				</span>
+				@if (i < vm().config.stages.length - 1) {
+					<i class="pi pi-arrow-right preview-arrow"></i>
+				}
+			}
+		</div>
+		<!-- #endregion -->
+	} @else {
+		<div class="stages-disabled-info">
+			<i class="pi pi-info-circle"></i>
+			<span
+				>Se usarán {{ vm().config.vus }} VUs fijos durante
+				{{ vm().config.duration }}</span
+			>
+		</div>
+	}
+
+	<!-- #region Footer -->
+	<div class="step-footer">
+		<button
+			pButton
+			label="Anterior"
+			icon="pi pi-arrow-left"
+			class="p-button-outlined"
+			(click)="onGoPrev()"
+		></button>
+		<div class="step-spacer"></div>
+		<button
+			pButton
+			label="Siguiente"
+			icon="pi pi-arrow-right"
+			iconPos="right"
+			(click)="onGoNext()"
+		></button>
+	</div>
+	<!-- #endregion -->
+</div>

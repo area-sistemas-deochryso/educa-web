@@ -168,6 +168,38 @@ export interface ActualizarConexionVerticalDto {
 
 // #endregion
 
+// #region Form data types
+
+export interface PisoFormData {
+	nombre: string;
+	orden: number;
+	alturaMetros: number;
+}
+
+export interface NodeFormData {
+	etiqueta: string;
+	tipo: EditorNodeType;
+	width: number;
+	height: number;
+}
+
+export interface BloqueoFormData {
+	motivo: string;
+	width: number;
+	height: number;
+}
+
+export interface VerticalConnectionFormData {
+	tipo: VerticalConnectionType;
+	destPisoId: number | null;
+	destNodoId: number | null;
+	pesoSubida: number;
+	pesoBajada: number;
+	bidireccional: boolean;
+}
+
+// #endregion
+
 // #region Editor types
 
 export type EditorTool = 'select' | 'addNode' | 'addEdge' | 'addBlock' | 'addVertical' | 'delete';

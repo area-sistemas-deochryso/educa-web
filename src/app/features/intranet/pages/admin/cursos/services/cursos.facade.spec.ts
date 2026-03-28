@@ -172,15 +172,20 @@ describe('CursosFacade', () => {
 		});
 
 		it('should close dialog on create (optimistic)', () => {
-			store.openDialog();
-			facade.create('Nuevo Curso', [10]);
+			facade.openNewDialog();
+			store.setFormData({ nombre: 'Nuevo Curso', estado: true });
+
+			facade.saveCurso();
 
 			expect(store.dialogVisible()).toBe(false);
 		});
 
 		it('should update item and close dialog on update (optimistic)', () => {
 			store.setGrados(mockGrados);
-			facade.update(1, 'Mat Updated', true, [10]);
+			facade.openEditDialog(mockCursos[0]);
+			store.setFormData({ nombre: 'Mat Updated', estado: true });
+
+			facade.saveCurso();
 
 			expect(store.items()[0].nombre).toBe('Mat Updated');
 			expect(store.dialogVisible()).toBe(false);

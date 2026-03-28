@@ -1,0 +1,157 @@
+// #region Drawer Header
+.drawer-header {
+	font-weight: 600;
+	font-size: 1.1rem;
+}
+// #endregion
+
+// #region Detail Content
+.detail-content {
+	padding: 0;
+
+	.detail-summary {
+		display: flex;
+		flex-direction: column;
+		gap: 1rem;
+		padding: 1rem;
+		background: var(--surface-50);
+		border-radius: 8px;
+		margin-bottom: 1.5rem;
+
+		.summary-item {
+			display: flex;
+			justify-content: space-between;
+			align-items: center;
+
+			.summary-label {
+				font-weight: 500;
+				color: var(--text-color-secondary);
+			}
+
+			.summary-value {
+				font-weight: 500;
+				color: var(--text-color);
+			}
+		}
+	}
+
+	.detail-modules {
+		h3 {
+			margin: 0 0 1rem 0;
+			font-size: 1rem;
+			font-weight: 600;
+			color: var(--text-color);
+		}
+
+		.module-group {
+			margin-bottom: 1rem;
+			border: 1px solid var(--surface-200);
+			border-radius: 8px;
+			overflow: hidden;
+
+			.module-header {
+				display: flex;
+				align-items: center;
+				gap: 0.5rem;
+				padding: 0.75rem 1rem;
+				background: var(--surface-50);
+				border-bottom: 1px solid var(--surface-200);
+
+				i {
+					color: var(--text-color);
+				}
+
+				.module-name {
+					font-weight: 600;
+					flex: 1;
+				}
+
+				.module-count {
+					font-size: 0.8rem;
+					color: var(--text-color-secondary);
+				}
+			}
+
+			.module-vistas {
+				padding: 0.5rem;
+
+				.vista-item {
+					display: flex;
+					align-items: flex-start;
+					gap: 0.5rem;
+					padding: 0.5rem;
+					border-radius: 6px;
+
+					&:hover {
+						background: var(--surface-50);
+					}
+
+					i {
+						color: var(--text-color);
+						margin-top: 0.15rem;
+					}
+
+					.vista-info {
+						display: flex;
+						flex-direction: column;
+						gap: 0.15rem;
+
+						.vista-nombre {
+							font-weight: 500;
+							font-size: 0.9rem;
+						}
+
+						.vista-ruta {
+							font-size: 0.8rem;
+							color: var(--text-color-secondary);
+							font-family: monospace;
+						}
+					}
+				}
+			}
+		}
+	}
+}
+// #endregion
+
+// #region Drawer Footer
+.drawer-footer {
+	display: flex;
+	justify-content: flex-end;
+	gap: 0.5rem;
+	padding-top: 1rem;
+	border-top: 1px solid var(--surface-200);
+	margin-top: 1.5rem;
+}
+// #endregion
+
+// #region Overrides PrimeNG
+:host ::ng-deep {
+	.p-drawer {
+		.p-drawer-content {
+			padding: 1.5rem;
+			background: var(--surface-ground);
+		}
+
+		.p-drawer-header {
+			background: var(--surface-ground);
+			color: var(--text-color);
+			border-bottom: 1px solid var(--surface-300);
+		}
+	}
+
+	.p-tag {
+		font-weight: 600;
+		background: var(--surface-200) !important;
+		color: var(--text-color) !important;
+	}
+
+	.p-button-text {
+		color: var(--text-color);
+
+		&:hover {
+			background: var(--surface-100);
+		}
+	}
+}
+// #endregion

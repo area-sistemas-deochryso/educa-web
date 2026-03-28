@@ -237,6 +237,72 @@ Nota individual (por evaluación)
 - La sección `"V"` está reservada exclusivamente para clases de verano/recuperación
 - El periodo regular **excluye** la sección "V"
 
+### 4.5 Flujo completo vacacional (referencia a salón original)
+
+> **"La sección V es un paréntesis, no un destino permanente."**
+
+Cuando un estudiante entra a sección "V", el sistema **debe** guardar una referencia al salón de origen (`AE_SalonOrigenId`) para que la progresión post-vacacional sepa a dónde volver.
+
+**Campo requerido**: `AprobacionEstudiante.AE_SalonOrigenId` (FK nullable a Salon) — se llena SOLO cuando el destino es sección "V". Contiene el ID del salón regular del que vino el estudiante.
+
+#### Flujo: Regular → Vacacional → Regular
+
+```
+Estudiante en 4B (Salón origen)
+  │
+  ├─ DESAPROBADO (esVacacional=true)
+  │   → Destino: 4V
+  │   → AE_SalonOrigenId = ID del salón 4B  ← GUARDAR REFERENCIA
+  │
+  └─ En 4V (verano):
+      │
+      ├─ APROBADO en 4V
+      │   → Buscar AE_SalonOrigenId del salón 4V → encuentra salón 4B
+      │   → Sección original = "B", grado original = 4
+      │   → Destino: 5B (GRA_Orden + 1 + sección original + siguiente año)
+      │
+      └─ DESAPROBADO en 4V
+          │
+          ├─ esVacacional = false (repite)
+          │   → Buscar AE_SalonOrigenId → encuentra salón 4B
+          │   → Destino: 4B (mismo grado + sección original + siguiente año)
+          │
+          └─ esVacacional = true (otro verano — caso raro)
+              → Destino: 4V (mismo grado + sección "V" + siguiente año)
+              → AE_SalonOrigenId = PRESERVAR el original (4B, no 4V)
+```
+
+#### Regla de resolución de sección para estudiantes en "V"
+
+```
+Si salonOrigen.Seccion == "V":
+  1. Buscar AE_SalonOrigenId en la AprobacionEstudiante que lo envió a "V"
+  2. Extraer la sección del salón original (ej: "B")
+  3. Usar esa sección para el cálculo de destino
+Si salonOrigen.Seccion != "V":
+  Usar salonOrigen.Seccion (flujo normal, sin cambios)
+```
+
+#### Invariante
+
+| ID | Invariante |
+|----|-----------|
+| `INV-V01` | Un estudiante en sección "V" SIEMPRE tiene `AE_SalonOrigenId` apuntando a su salón regular de origen |
+| `INV-V02` | La progresión desde "V" SIEMPRE usa la sección del salón original, nunca la sección "V" |
+| `INV-V03` | Si un estudiante va de "V" a "V" consecutivamente, `AE_SalonOrigenId` preserva el **primer** salón regular (no el "V" intermedio) |
+
+#### Tabla de progresión completa
+
+| Origen | Estado | esVacacional | Destino | AE_SalonOrigenId |
+|--------|--------|-------------|---------|-----------------|
+| 4B | APROBADO | — | 5B | `null` |
+| 4B | DESAPROBADO | `false` | 4B (siguiente año) | `null` |
+| 4B | DESAPROBADO | `true` | 4V | **ID de 4B** |
+| 4V | APROBADO | — | 5B (sección de origen) | `null` |
+| 4V | DESAPROBADO | `false` | 4B (sección de origen) | `null` |
+| 4V | DESAPROBADO | `true` | 4V (siguiente año) | **Preservar ID de 4B** |
+| 5toSec | APROBADO | — | `null` (egresa) | `null` |
+
 ---
 
 ## 5. Estructura Académica
@@ -278,6 +344,39 @@ Antes de crear o actualizar un horario, el sistema **debe** verificar:
 | **Sin doble reserva de estudiante** | Ningún estudiante inscrito puede tener otra clase en el mismo día y horario superpuesto |
 
 **Fórmula de superposición**: `Inicio1 < Fin2 AND Fin1 > Inicio2`
+
+Esta fórmula detecta los **5 casos** de superposición de intervalos (dentro del mismo día de la semana):
+
+```
+Caso 1: Exacta (A == B)               Caso 2: Contención (A contiene B)
+I1━━━━━━━━━━━F1                       I1━━━━━━━━━━━F1
+I2━━━━━━━━━━━F2                            I2━━━━F2
+I1<F2 ✓ AND F1>I2 ✓ → OVERLAP        I1<F2 ✓ AND F1>I2 ✓ → OVERLAP
+
+Caso 3: Contención inversa            Caso 4: Parcial (A empieza antes)
+     I2━━━━━━━━━━━F2                  I1━━━━━━━F1
+     I1━━━━F1                              I2━━━━━━━F2
+I1<F2 ✓ AND F1>I2 ✓ → OVERLAP        I1<F2 ✓ AND F1>I2 ✓ → OVERLAP
+
+Caso 5: Parcial (B empieza antes)
+          I1━━━━━━━F1
+     I2━━━━━━━F2
+I1<F2 ✓ AND F1>I2 ✓ → OVERLAP
+
+--- NO overlap ---
+
+Caso 6: Separados (A antes de B)
+I1━━━F1
+          I2━━━F2
+I1<F2 ✓ AND F1>I2 ✗ → NO OVERLAP
+
+Caso 7: Adyacentes (F1 == I2) — clases consecutivas permitidas
+I1━━━F1
+     I2━━━F2
+I1<F2 ✓ AND F1>I2 ✗ (F1==I2, no es >) → NO OVERLAP
+```
+
+**Nota**: Los operadores son estrictos (`<`, `>`), no `<=`/`>=`. Esto permite clases consecutivas (8:00-9:00 y 9:00-10:00) sin conflicto. La superposición exacta (caso 1) funciona porque INV-C07 garantiza `HoraInicio < HoraFin`, por lo tanto `I1 < F2` y `F1 > I2` siempre se cumplen cuando los intervalos son idénticos.
 
 **Regla**: Las 3 validaciones se aplican tanto en creación como en actualización (excluyendo el propio horario en update).
 
@@ -358,10 +457,15 @@ DNI + Rol seleccionado → switch(rol) → query directa a tabla del rol
 
 | Estado | Significado | Transición |
 |--------|-------------|-----------|
-| `ABIERTO` | En curso, calificaciones editables | → `CERRADO` |
-| `CERRADO` | Finalizado, calificaciones congeladas | Estado final (no se reabre) |
+| `ABIERTO` | En curso, calificaciones y asistencia por curso editables | → `CERRADO` |
+| `CERRADO` | Finalizado, calificaciones y asistencia por curso congeladas | Estado final (no se reabre) |
 
-**Regla**: El cierre de un periodo es **irreversible**. Una vez cerrado, las calificaciones de ese periodo no se pueden modificar y se habilita la aprobación de estudiantes.
+**Regla**: El cierre de un periodo es **irreversible**. Una vez cerrado:
+- Las **calificaciones** de ese periodo no se pueden modificar
+- La **asistencia por curso** de ese periodo no se puede modificar (los registros de P/T/F quedan inmutables)
+- Se habilita la **aprobación** de estudiantes
+
+**Nota**: La asistencia **diaria** (CrossChex) NO se congela con el periodo — opera a nivel sede, no periodo. Solo la asistencia por curso (que depende de horarios asignados al salón) se congela.
 
 ### 9.2 Relación periodo-aprobación
 
@@ -503,11 +607,437 @@ Controller → Service.OperacionMasivaAsync
 
 ---
 
+## 14. Máquinas de Estado (State Machines)
+
+> **"Si una entidad tiene estados, las transiciones válidas deben estar escritas. Lo que no está escrito, no se puede verificar."**
+
+Cada entidad con ciclo de vida tiene un diagrama de estados explícito. Las transiciones no listadas están **prohibidas**. El backend **debe** validar la transición antes de ejecutarla — si el estado actual no permite la transición solicitada, lanzar `BusinessRuleException`.
+
+---
+
+### 14.1 Estudiante
+
+```
+                    ┌─────────────────────────┐
+                    │                         ▼
+MATRICULADO ──→ ACTIVO ──→ EGRESADO ──→ (fin)
+                  │  ▲
+                  │  │
+                  ▼  │
+              INACTIVO
+```
+
+| Estado | `EST_Estado` | Significado | Transiciones permitidas |
+|--------|-------------|-------------|------------------------|
+| `MATRICULADO` | `true` | Asignado a salón, año aún no inicia | → `ACTIVO` (inicio de clases) |
+| `ACTIVO` | `true` | Cursando el año académico | → `EGRESADO` (aprobación en 5to Sec) · → `INACTIVO` (retiro/baja) |
+| `INACTIVO` | `false` | Retirado, transferido o dado de baja | → `ACTIVO` (reincorporación manual) |
+| `EGRESADO` | `false` | Completó 5to Secundaria | Estado terminal — no hay retorno |
+
+**Precondiciones**:
+- `ACTIVO → EGRESADO`: Solo si `GRA_Orden = 14` (5to Sec) AND `AprobacionEstado = APROBADO`
+- `ACTIVO → INACTIVO`: Requiere motivo registrado en observaciones
+- `INACTIVO → ACTIVO`: Solo por Director/Admin, requiere reasignación a salón
+
+**Invariante**: Un estudiante `INACTIVO` o `EGRESADO` **no aparece** en listados operativos (asistencia, calificaciones, horarios). Solo en consultas históricas (kardex, certificados).
+
+---
+
+### 14.2 Matrícula (EstudianteSalón)
+
+```
+                                ┌─────────────────────────────────────────────┐
+                                │          Flujo de Pago                      │
+                                │                                             │
+PREASIGNADO ──→ PENDIENTE_PAGO ──→ PAGADO ──→ CONFIRMADO ──→ CURSANDO ──→ FINALIZADO
+                     │                                           │
+                     ▼                                           ▼
+                  ANULADO                                    RETIRADO
+```
+
+| Estado | `ESS_EstadoMatricula` | Significado | Transiciones permitidas |
+|--------|-----------------------|-------------|------------------------|
+| `PREASIGNADO` | `"PREASIGNADO"` | Asignado por progresión automática o por admin. Pendiente de iniciar proceso de matrícula | → `PENDIENTE_PAGO` (admin inicia proceso de matrícula) |
+| `PENDIENTE_PAGO` | `"PENDIENTE_PAGO"` | Matrícula iniciada, esperando registro de pago | → `PAGADO` (admin registra pago) · → `ANULADO` (admin cancela) |
+| `PAGADO` | `"PAGADO"` | Pago registrado, pendiente de confirmación académica | → `CONFIRMADO` (admin confirma matrícula) |
+| `CONFIRMADO` | `"CONFIRMADO"` | Matrícula oficial, estudiante listo para inicio de clases | → `CURSANDO` (inicio de clases) |
+| `CURSANDO` | `"CURSANDO"` | Año académico en curso | → `FINALIZADO` (todos los periodos cerrados + aprobación) · → `RETIRADO` (baja durante el año) |
+| `FINALIZADO` | `"FINALIZADO"` | Año académico completado (aprobado o desaprobado) | Estado terminal |
+| `RETIRADO` | `"RETIRADO"` | Retirado durante el año | Estado terminal |
+| `ANULADO` | `"ANULADO"` | Matrícula cancelada antes de confirmar | Estado terminal |
+
+**Precondiciones**:
+
+| Transición | Precondiciones | Quién |
+|-----------|---------------|-------|
+| `PREASIGNADO → PENDIENTE_PAGO` | Estudiante activo, salón tiene capacidad | Director/Admin |
+| `PENDIENTE_PAGO → PAGADO` | Pago registrado con monto, método y comprobante | Director/Admin |
+| `PENDIENTE_PAGO → ANULADO` | Motivo de anulación registrado | Director/Admin |
+| `PAGADO → CONFIRMADO` | Verificación académica completada (datos del estudiante correctos) | Director/Admin |
+| `CONFIRMADO → CURSANDO` | Fecha actual ≥ fecha de inicio de clases del año | Automático o Director/Admin |
+| `CURSANDO → FINALIZADO` | TODOS los periodos del año `CERRADO` + aprobación registrada | Sistema (tras aprobación) |
+| `CURSANDO → RETIRADO` | Motivo de retiro registrado. Calificaciones permanecen para historial | Director/Admin |
+
+**Invariantes**:
+
+| ID | Invariante |
+|----|-----------|
+| `INV-M01` | Un estudiante solo puede tener **una matrícula activa** (no `ANULADO`/`RETIRADO`/`FINALIZADO`) por año |
+| `INV-M02` | `ANULADO`, `FINALIZADO` y `RETIRADO` son estados terminales — no hay retorno |
+| `INV-M03` | Un pago registrado NO puede eliminarse — solo puede anularse la matrícula completa |
+| `INV-M04` | La transición `CONFIRMADO → CURSANDO` puede ser automática (batch al inicio del año) o manual |
+
+---
+
+#### Pago de Matrícula (simulado desde admin)
+
+> **"El pago es un registro administrativo, no una pasarela de pagos."**
+
+El sistema NO integra con pasarelas de pago. El Director/Admin registra manualmente que el apoderado realizó el pago. El sistema solo almacena el registro para trazabilidad.
+
+**Modelo: `PagoMatricula`**
+
+| Campo | Tipo | Descripción |
+|-------|------|-------------|
+| `PAM_CodID` | `INT IDENTITY` | PK |
+| `PAM_ESS_CodID` | `INT` | FK a EstudianteSalon (matrícula) |
+| `PAM_Monto` | `DECIMAL(10,2)` | Monto pagado |
+| `PAM_MetodoPago` | `NVARCHAR(50)` | `"EFECTIVO"`, `"TRANSFERENCIA"`, `"YAPE"`, `"PLIN"`, `"OTRO"` |
+| `PAM_NumeroComprobante` | `NVARCHAR(100)` | Referencia del pago (boleta, N° operación, etc.) |
+| `PAM_FechaPago` | `DATETIME2` | Fecha en que se realizó el pago |
+| `PAM_Observaciones` | `NVARCHAR(500)` | Notas adicionales |
+| `PAM_Estado` | `BIT` | `true` = activo, `false` = anulado |
+| `PAM_UsuarioReg` | `NVARCHAR(50)` | Quién registró el pago |
+| `PAM_FechaReg` | `DATETIME2` | Cuándo se registró |
+
+**Métodos de pago**:
+
+```csharp
+public static class MetodosPago
+{
+    public const string Efectivo = "EFECTIVO";
+    public const string Transferencia = "TRANSFERENCIA";
+    public const string Yape = "YAPE";
+    public const string Plin = "PLIN";
+    public const string Otro = "OTRO";
+
+    public static readonly string[] Validos = { Efectivo, Transferencia, Yape, Plin, Otro };
+}
+```
+
+**Flujo desde la UI (admin)**:
+
+```
+1. Admin selecciona estudiante preasignado → clic "Iniciar Matrícula"
+   → PREASIGNADO → PENDIENTE_PAGO
+
+2. Admin registra pago: monto, método, comprobante → clic "Registrar Pago"
+   → Crea PagoMatricula
+   → PENDIENTE_PAGO → PAGADO
+
+3. Admin verifica datos → clic "Confirmar Matrícula"
+   → PAGADO → CONFIRMADO
+
+4. Al iniciar clases (manual o batch):
+   → CONFIRMADO → CURSANDO
+```
+
+**Reglas de negocio del pago**:
+
+| Regla | Descripción |
+|-------|-------------|
+| Monto > 0 | No se permiten pagos de monto cero o negativo |
+| Comprobante requerido | Siempre debe tener referencia (excepto efectivo donde puede ser "S/N") |
+| Sin doble pago | Una matrícula solo puede tener UN pago activo. Para corregir, anular el anterior |
+| Historial inmutable | Los pagos no se editan — se anulan y se crea uno nuevo si es necesario |
+| Anulación no borra | `PAM_Estado = false`, no DELETE físico (INV-D03) |
+
+---
+
+#### Cambios requeridos en `EstudianteSalon`
+
+```csharp
+// Nuevo campo en EstudianteSalon
+[StringLength(20)]
+public string ESS_EstadoMatricula { get; set; } = "PREASIGNADO";
+```
+
+**Migración**: El campo nuevo requiere un script SQL para la tabla existente. Registros existentes con `ESS_Estado = true` se migran a `"CURSANDO"`. Registros con `ESS_Estado = false` se migran a `"FINALIZADO"`.
+
+```sql
+-- Migración: agregar campo ESS_EstadoMatricula
+ALTER TABLE EstudianteSalon
+ADD ESS_EstadoMatricula NVARCHAR(20) NOT NULL DEFAULT 'PREASIGNADO';
+
+-- Migrar datos existentes
+UPDATE EstudianteSalon SET ESS_EstadoMatricula = 'CURSANDO' WHERE ESS_Estado = 1;
+UPDATE EstudianteSalon SET ESS_EstadoMatricula = 'FINALIZADO' WHERE ESS_Estado = 0;
+```
+
+---
+
+### 14.3 Calificación (Evaluación)
+
+```
+BORRADOR ──→ PUBLICADA ──→ BLOQUEADA
+                │
+                ▼
+            EDITADA (→ vuelve a PUBLICADA)
+```
+
+| Estado | Significado | Transiciones permitidas |
+|--------|-------------|------------------------|
+| `BORRADOR` | Creada pero sin notas asignadas | → `PUBLICADA` (profesor asigna notas) |
+| `PUBLICADA` | Notas visibles, dentro de ventana de edición (2 meses) | → `EDITADA` (modificación dentro de ventana) · → `BLOQUEADA` (ventana expirada o periodo cerrado) |
+| `EDITADA` | Modificada después de publicación inicial | → `PUBLICADA` (se mantiene visible) · → `BLOQUEADA` |
+| `BLOQUEADA` | Inmutable — ventana expirada o periodo cerrado | Estado terminal |
+
+**Precondiciones**:
+- `PUBLICADA → EDITADA`: Solo dentro de los 2 meses posteriores a `FechaEvaluacion` AND periodo `ABIERTO`
+- `* → BLOQUEADA`: Automático cuando `FechaActual > FechaEvaluacion + 2 meses` OR periodo cambia a `CERRADO`
+- Evaluación grupal editada individualmente: `CN_EsOverride = true`
+
+**Invariante**: Una calificación `BLOQUEADA` **nunca** puede volver a ser editable. El bloqueo es irreversible.
+
+> **Nota**: Actualmente el bloqueo se calcula dinámicamente (ventana de 2 meses). Esta máquina formaliza cuándo la evaluación deja de ser editable y por qué.
+
+---
+
+### 14.4 Periodo Académico (ya existente, formalizado)
+
+```
+ABIERTO ──→ CERRADO ──→ (fin)
+```
+
+| Estado | Significado | Transiciones permitidas |
+|--------|-------------|------------------------|
+| `ABIERTO` | Calificaciones y asistencia por curso editables, aprobaciones no permitidas | → `CERRADO` |
+| `CERRADO` | Calificaciones y asistencia por curso congeladas, aprobaciones habilitadas | Estado terminal — **irreversible** |
+
+**Precondiciones**:
+- `ABIERTO → CERRADO`: Solo Director/Admin. No requiere que todas las evaluaciones tengan notas (decision del colegio).
+
+**Efectos colaterales del cierre**:
+1. Todas las calificaciones del periodo → `BLOQUEADA`
+2. Asistencia por curso del periodo → congelada (no editable)
+3. Se habilita la aprobación de estudiantes para este periodo
+4. Se recalculan promedios finales del periodo
+
+**Nota**: Asistencia diaria (CrossChex) NO se congela — opera a nivel sede, independiente del periodo académico.
+
+---
+
+### 14.5 Aprobación (ya existente, formalizado)
+
+```
+PENDIENTE ──→ APROBADO ──→ (fin)
+    │
+    └──→ DESAPROBADO ──→ (fin)
+```
+
+| Estado | Significado | Transiciones permitidas |
+|--------|-------------|------------------------|
+| `PENDIENTE` | Default al cerrar periodo | → `APROBADO` · → `DESAPROBADO` |
+| `APROBADO` | Progresa al siguiente grado | Estado terminal |
+| `DESAPROBADO` | Repite o va a vacacional | Estado terminal |
+
+**Precondiciones**:
+- `PENDIENTE → APROBADO/DESAPROBADO`: Solo con periodo `CERRADO`. Solo Director/Admin.
+
+**Efectos colaterales**:
+- `APROBADO` en 5to Sec → Estudiante cambia a `EGRESADO`
+- `APROBADO` en otro grado → Crea/asigna salón de `GRA_Orden + 1`
+- `DESAPROBADO` con vacacional → Crea/asigna salón sección "V"
+- `DESAPROBADO` sin vacacional → Crea/asigna mismo grado, siguiente año
+
+---
+
+### 14.6 Asistencia Diaria (stateless, derivado)
+
+La asistencia diaria **no es una máquina de estados** en el sentido clásico. Es un **valor derivado** calculado a partir de las marcaciones biométricas y la hora del día.
+
+```
+Sin marcación ──→ Entrada registrada ──→ Entrada + Salida registradas
+   (Pendiente)      (Incompleta)              (Completa)
+```
+
+El "estado" (`T`, `A`, `F`, `N`, `J`, `-`, `X`) se **calcula**, no se transiciona. Ver sección 1 para reglas de cálculo.
+
+**Excepción**: La justificación (`J`) es la única transición manual — un admin puede cambiar cualquier estado calculado a `J` agregando prefijo `"Justificado:"` en observaciones.
+
+---
+
+### 14.7 Horario
+
+```
+ACTIVO ──→ INACTIVO
+  ▲            │
+  └────────────┘
+```
+
+| Estado | Significado | Transiciones permitidas |
+|--------|-------------|------------------------|
+| `ACTIVO` | Horario vigente, visible en calendarios y asistencia | → `INACTIVO` (desactivación) |
+| `INACTIVO` | Horario desactivado, no aparece en operación diaria | → `ACTIVO` (reactivación) |
+
+**Precondiciones**:
+- `→ ACTIVO` (crear o reactivar): Debe pasar las 3 validaciones de conflicto (salón, profesor, estudiantes). Ver sección 6.2.
+- `→ INACTIVO`: Si tiene asistencia de curso registrada, las calificaciones asociadas permanecen (historial).
+
+---
+
+### 14.8 Reglas Generales de State Machines
+
+| Regla | Descripción |
+|-------|-------------|
+| **Transición no listada = prohibida** | Si no está en la tabla, el backend DEBE lanzar `BusinessRuleException` |
+| **Validar estado actual antes de transicionar** | Leer el estado de BD (no confiar en lo que envía el frontend) |
+| **Efectos colaterales son transaccionales** | Si la transición tiene side effects, todo en una transacción |
+| **Log de transiciones críticas** | Estudiante, Aprobación y Periodo deben logear: `estado anterior → estado nuevo + quién + cuándo` |
+| **Idempotencia**: Transicionar al mismo estado = no-op | `APROBADO → APROBADO` no falla, simplemente no hace nada |
+
+---
+
+## 15. Registro de Invariantes
+
+> **"Una invariante es una promesa que el sistema hace. Si se rompe, hay un bug — no una excepción."**
+
+Este registro consolida TODAS las invariantes del sistema en una tabla indexable. Cada invariante tiene un ID estable para referencia en code reviews, tickets y logs de error.
+
+---
+
+### 15.1 Invariantes Estructurales (Datos)
+
+| ID | Entidad | Invariante | Enforcement | Sección |
+|----|---------|------------|-------------|---------|
+| `INV-D01` | DNI | Todo DNI tiene exactamente 8 dígitos, padding con ceros | `DniHelper.Normalizar()` + constraint BD | 7.2, 12.1 |
+| `INV-D02` | Entidad | Toda entidad tiene campos de auditoría (`UsuarioReg`, `FechaReg`, `UsuarioMod`, `FechaMod`) | Middleware/base entity | 12.2 |
+| `INV-D03` | Entidad | Soft delete — `Estado = false`, nunca DELETE físico | Convention + code review | 12.3, 12.5 |
+| `INV-D04` | Fecha | Toda fecha se almacena en hora Perú (UTC-5) | Punto de entrada (controller/webhook) | 12.4 |
+| `INV-D05` | Query | Toda query read-only usa `AsNoTracking()` | Code review | 12.6 |
+| `INV-D06` | Salón | Unicidad: solo uno por (Grado, Sección, Sede, Año) | Unique index BD + validación en service | 5.2 |
+| `INV-D07` | CursoGrado | Un curso se asigna una sola vez por grado | Unique constraint BD | 5.3 |
+| `INV-D08` | API Response | Todo endpoint retorna `ApiResponse<T>` | Convention + code review | backend.md |
+
+---
+
+### 15.2 Invariantes de Unicidad y Exclusividad
+
+| ID | Entidad | Invariante | Enforcement | Sección |
+|----|---------|------------|-------------|---------|
+| `INV-U01` | EstudianteSalón | Un estudiante solo puede estar en UN salón activo por año | Unique constraint BD | 12.7 |
+| `INV-U02` | ProfesorSalón | Un profesor puede ser tutor de UN solo salón | Validación en service | 12.8 |
+| `INV-U03` | Horario (salón) | Un salón no puede tener dos clases superpuestas en el mismo día | Validación pre-create/update | 6.2 |
+| `INV-U04` | Horario (profesor) | Un profesor no puede estar en dos clases superpuestas en el mismo día | Validación pre-create/update | 6.2 |
+| `INV-U05` | Horario (estudiante) | Un estudiante no puede tener dos clases superpuestas en el mismo día | Validación pre-create/update | 6.2 |
+| `INV-U06` | Calificación (tipo) | No se mezclan sistemas (NUMERICO/LITERAL) dentro del mismo nivel/año | Configuración por nivel + validación | 3.1 |
+
+---
+
+### 15.3 Invariantes de Transición de Estado
+
+| ID | Entidad | Invariante | Enforcement | Sección |
+|----|---------|------------|-------------|---------|
+| `INV-T01` | Periodo | El cierre es irreversible (`ABIERTO → CERRADO`, nunca al revés) | Service + no endpoint de reapertura | 9.1, 14.4 |
+| `INV-T02` | Aprobación | Solo se puede aprobar/desaprobar con periodo `CERRADO` | Service valida estado del periodo | 4.1, 14.5 |
+| `INV-T03` | Aprobación | `APROBADO` y `DESAPROBADO` son estados terminales | Service rechaza transiciones desde terminal | 4.1, 14.5 |
+| `INV-T04` | Calificación | No editable después de 2 meses o con periodo `CERRADO` | Service calcula ventana + estado periodo | 3.4, 14.3 |
+| `INV-T05` | Estudiante | `EGRESADO` es estado terminal (solo desde 5to Sec + APROBADO) | Service valida `GRA_Orden = 14` | 14.1 |
+| `INV-T06` | Estudiante | `INACTIVO → ACTIVO` requiere reasignación a salón | Service valida salón destino | 14.1 |
+
+---
+
+### 15.4 Invariantes de Cálculo
+
+| ID | Entidad | Invariante | Enforcement | Sección |
+|----|---------|------------|-------------|---------|
+| `INV-C01` | Asistencia | Estado = máxima severidad entre entrada y salida: `F(5) > N(4) > J(3) > T(2) > A(1)` | `AsistenciaEstadoCalculador` | 1.4 |
+| `INV-C02` | Asistencia | Justificación (`"Justificado:"`) tiene precedencia absoluta sobre cálculo por hora | `AsistenciaEstadoCalculador` | 1.3 |
+| `INV-C03` | Asistencia | Anti-duplicación: ventana mínima de 30 minutos entre marcaciones | Webhook handler | 1.5 |
+| `INV-C04` | Calificación | `Promedio = Σ(nota × peso)`, redondeado a 1 decimal. Pesos NO se normalizan | `CalificacionHelper` | 3.2 |
+| `INV-C05` | Progresión | Siguiente grado = `GRA_Orden + 1`. Último grado (14) = egreso | Service de aprobación | 5.1, 4.2 |
+| `INV-C06` | Horario | Superposición: `Inicio1 < Fin2 AND Fin1 > Inicio2` | Service de horarios | 6.2 |
+| `INV-C07` | Horario | `HoraInicio < HoraFin` siempre (duración > 0) | Service + constraint BD | 6.1 |
+| `INV-C08` | DiaSemana | C# `DayOfWeek.Sunday=0` → BD `7`. Fórmula: `(dow == 0) ? 7 : dow` | Helper/converter | 6.3 |
+
+---
+
+### 15.5 Invariantes de Seguridad y Concurrencia
+
+| ID | Entidad | Invariante | Enforcement | Sección |
+|----|---------|------------|-------------|---------|
+| `INV-S01` | Auth | Cuenta inactiva (`Estado = false`) → login bloqueado | AuthService | 7.1 |
+| `INV-S02` | Auth | Contraseña legacy se rehashea a BCrypt en login exitoso | `TryRehashAsync` transparente | 7.3 |
+| `INV-S03` | Permisos | Permisos personalizados REEMPLAZAN (no se suman a) permisos del rol | `PermisosService` | 8.1 |
+| `INV-S04` | Permisos | Permiso a ruta padre NO implica permiso a rutas hijas | Comparación exacta | 8.2 |
+| `INV-S05` | Concurrencia | Conflicto de RowVersion → reintentar hasta 3 veces, luego propagar | `DbUpdateConcurrencyException` handler | 10.1 |
+| `INV-S06` | Idempotencia | `X-Idempotency-Key` duplicado → 409 Conflict (no reprocesar) | `IdempotencyMiddleware` | 10.3 |
+| `INV-S07` | Notificación | Error en notificación NUNCA falla la operación principal | Fire-and-forget pattern | 11.1 |
+| `INV-S08` | Timezone | CrossChex webhook UTC+0 → convertir a UTC-5 antes de almacenar | `DateTimeOffset.Parse().ToOffset()` | 1.7 |
+
+---
+
+### 15.6 Invariantes de Asistencia por Curso
+
+| ID | Entidad | Invariante | Enforcement | Sección |
+|----|---------|------------|-------------|---------|
+| `INV-AC01` | AsistenciaCurso | Independiente de asistencia diaria — un estudiante presente en el colegio puede faltar a un curso | Modelo separado | 2.1 |
+| `INV-AC02` | AsistenciaCurso | Profesor solo marca en cursos/horarios donde está asignado | Service valida ProfesorSalón + Horario | 2.2 |
+| `INV-AC03` | AsistenciaCurso | No editable cuando el periodo está `CERRADO` | Service valida estado del periodo | 9.1 |
+
+---
+
+### 15.7 Invariantes de Vacacional
+
+| ID | Entidad | Invariante | Enforcement | Sección |
+|----|---------|------------|-------------|---------|
+| `INV-V01` | AprobacionEstudiante | Estudiante en sección "V" SIEMPRE tiene `AE_SalonOrigenId` apuntando a salón regular | Service de aprobación | 4.5 |
+| `INV-V02` | Progresión | Progresión desde "V" SIEMPRE usa sección del salón original, nunca "V" | SalonCreationService | 4.5 |
+| `INV-V03` | AprobacionEstudiante | Si V→V consecutivo, `AE_SalonOrigenId` preserva el primer salón regular | Service de aprobación | 4.5 |
+
+---
+
+### 15.8 Invariantes de Matrícula y Pago
+
+| ID | Entidad | Invariante | Enforcement | Sección |
+|----|---------|------------|-------------|---------|
+| `INV-M01` | EstudianteSalon | Un estudiante solo puede tener una matrícula activa por año | Unique filtered index + service | 14.2 |
+| `INV-M02` | EstudianteSalon | `ANULADO`, `FINALIZADO` y `RETIRADO` son estados terminales | Service rechaza transiciones desde terminal | 14.2 |
+| `INV-M03` | PagoMatricula | Un pago registrado NO puede eliminarse — solo anular matrícula | Convention + service | 14.2 |
+| `INV-M04` | EstudianteSalon | `CONFIRMADO → CURSANDO` puede ser automática (batch) o manual | Service + job opcional | 14.2 |
+
+---
+
+### 15.9 Cómo Usar Este Registro
+
+**En code reviews**: Verificar que el código no viola ningún `INV-*`. Si una PR introduce una operación sobre Horarios, revisar `INV-U03`, `INV-U04`, `INV-U05`, `INV-C06`, `INV-C07`.
+
+**En bug reports**: Referenciar el ID de la invariante violada. Ejemplo: "Bug: se creó horario superpuesto, violando `INV-U03`".
+
+**En nuevas features**: Antes de implementar, listar qué invariantes aplican y verificar que el diseño las respeta.
+
+**En logs de error**: Cuando el backend rechaza una operación por invariante, incluir el ID: `BusinessRuleException("INV-T02: No se puede aprobar con periodo ABIERTO")`.
+
+---
+
 ## Checklist: Antes de Implementar una Feature de Backend
 
 ```
+STATE MACHINE (Sección 14)
+[ ] ¿La entidad tiene estados? → Verificar diagrama en 14.x
+[ ] ¿La transición solicitada está en la tabla de transiciones válidas?
+[ ] ¿Se valida el estado ACTUAL desde BD (no confiar en frontend)?
+[ ] ¿Se cumplen las precondiciones de la transición?
+[ ] ¿Hay efectos colaterales? → Ejecutar en transacción
+[ ] ¿Se logea la transición? (estado anterior → nuevo + quién + cuándo)
+
+INVARIANTES (Sección 15)
+[ ] ¿Qué INV-* aplican a esta feature? (listar IDs)
+[ ] ¿El diseño respeta cada invariante listada?
+[ ] ¿Los errores por invariante incluyen el ID? (ej: "INV-T02: ...")
+[ ] ¿Hay invariantes nuevas que agregar al registro?
+
 REGLAS DE NEGOCIO
-[ ] ¿Qué estados puede tener la entidad? ¿Qué transiciones son válidas?
 [ ] ¿Hay ventanas de tiempo o plazos que limiten operaciones?
 [ ] ¿Quién puede ejecutar esta operación? (rol + permisos)
 [ ] ¿Hay conflictos posibles? (concurrencia, doble reserva, duplicados)
@@ -515,10 +1045,10 @@ REGLAS DE NEGOCIO
 [ ] ¿Hay cálculos con fórmulas definidas? (promedios, estados)
 
 CONSISTENCIA
-[ ] ¿Se respeta soft-delete? (toggle estado, no DELETE)
-[ ] ¿Se audita? (UsuarioReg/Mod, FechaReg/Mod)
-[ ] ¿Se maneja concurrencia? (RowVersion, retry)
-[ ] ¿Es idempotente? (X-Idempotency-Key)
+[ ] ¿Se respeta soft-delete? (toggle estado, no DELETE) — INV-D03
+[ ] ¿Se audita? (UsuarioReg/Mod, FechaReg/Mod) — INV-D02
+[ ] ¿Se maneja concurrencia? (RowVersion, retry) — INV-S05
+[ ] ¿Es idempotente? (X-Idempotency-Key) — INV-S06
 
 BATCH
 [ ] ¿La operación procesa múltiples ítems? → Usar BatchCommandExecutor
@@ -526,8 +1056,19 @@ BATCH
 [ ] ¿Se requiere audit granular por ítem? → CommandAuditLog
 [ ] ¿Se creó Command + Handler + registro en DI?
 
+VACACIONAL (Sección 4.5)
+[ ] ¿La operación involucra sección "V"? → Verificar INV-V01, INV-V02, INV-V03
+[ ] ¿Se preserva AE_SalonOrigenId al progresar desde/hacia "V"?
+[ ] ¿La progresión post-vacacional usa la sección original, no "V"?
+
+MATRÍCULA Y PAGO (Sección 14.2)
+[ ] ¿La transición de matrícula está en la tabla de estados válidos?
+[ ] ¿Se valida INV-M01? (una matrícula activa por año)
+[ ] ¿El pago tiene monto > 0, método y comprobante?
+[ ] ¿Los pagos son inmutables? (anular, no editar) — INV-M03
+
 NOTIFICACIONES
 [ ] ¿Debe notificar en tiempo real? (SignalR)
 [ ] ¿Debe enviar email? (fire-and-forget)
-[ ] ¿La notificación es NO bloqueante?
+[ ] ¿La notificación es NO bloqueante? — INV-S07
 ```

@@ -34,6 +34,8 @@ describe('NotificationsService', () => {
 			removeReadNotifications: vi.fn(),
 			getLastNotificationCheck: vi.fn().mockReturnValue(null),
 			setLastNotificationCheck: vi.fn(),
+			getUser: vi.fn().mockReturnValue(null),
+			getToken: vi.fn().mockReturnValue(null),
 		};
 
 		TestBed.configureTestingModule({

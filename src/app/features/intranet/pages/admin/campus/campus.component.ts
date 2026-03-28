@@ -1,25 +1,28 @@
-import { DecimalPipe } from '@angular/common';
 import { ChangeDetectionStrategy, Component, computed, inject, OnInit, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 
 import { ButtonModule } from 'primeng/button';
-import { DialogModule } from 'primeng/dialog';
-import { InputTextModule } from 'primeng/inputtext';
-import { InputNumberModule } from 'primeng/inputnumber';
 import { SelectModule } from 'primeng/select';
 import { TagModule } from 'primeng/tag';
-import { ToggleSwitchModule } from 'primeng/toggleswitch';
 import { TooltipModule } from 'primeng/tooltip';
 
 import { CampusAdminFacade } from './services';
 import { CampusPisosPanelComponent } from './components/campus-pisos-panel/campus-pisos-panel.component';
 import { CampusEditorComponent } from './components/campus-editor/campus-editor.component';
+import { CampusPisoDialogComponent } from './components/campus-piso-dialog/campus-piso-dialog.component';
+import { CampusNodeDialogComponent } from './components/campus-node-dialog/campus-node-dialog.component';
+import { CampusBloqueoDialogComponent } from './components/campus-bloqueo-dialog/campus-bloqueo-dialog.component';
+import { CampusVerticalConnectionDialogComponent } from './components/campus-vertical-connection-dialog/campus-vertical-connection-dialog.component';
 import {
 	CampusPisoDto,
 	CampusNodoDto,
 	CampusBloqueoDto,
 	EditorTool,
 	EditorNodeType,
+	PisoFormData,
+	NodeFormData,
+	BloqueoFormData,
+	VerticalConnectionFormData,
 	NODE_TYPE_OPTIONS,
 	VERTICAL_CONNECTION_TYPE_OPTIONS,
 	VerticalConnectionType,
@@ -29,18 +32,17 @@ import {
 	selector: 'app-campus-admin',
 	standalone: true,
 	imports: [
-		DecimalPipe,
 		FormsModule,
 		ButtonModule,
-		DialogModule,
-		InputTextModule,
-		InputNumberModule,
 		SelectModule,
 		TagModule,
-		ToggleSwitchModule,
 		TooltipModule,
 		CampusPisosPanelComponent,
 		CampusEditorComponent,
+		CampusPisoDialogComponent,
+		CampusNodeDialogComponent,
+		CampusBloqueoDialogComponent,
+		CampusVerticalConnectionDialogComponent,
 	],
 	templateUrl: './campus.component.html',
 	styleUrl: './campus.component.scss',
@@ -62,7 +64,9 @@ export class CampusComponent implements OnInit {
 	// #region Estado local
 
 	readonly nodeTypeOptions = NODE_TYPE_OPTIONS;
+	readonly verticalConnectionTypeOptions = VERTICAL_CONNECTION_TYPE_OPTIONS;
 
+	// Piso form
 	readonly pisoFormNombre = signal('');
 	readonly pisoFormOrden = signal(0);
 	readonly pisoFormAltura = signal(3.0);
@@ -79,19 +83,12 @@ export class CampusComponent implements OnInit {
 	readonly bloqueoFormMotivo = signal('');
 
 	// Vertical connection form
-	readonly verticalConnectionTypeOptions = VERTICAL_CONNECTION_TYPE_OPTIONS;
 	readonly verticalFormTipo = signal<VerticalConnectionType>('escalera');
 	readonly verticalFormPesoSubida = signal(1.5);
 	readonly verticalFormPesoBajada = signal(1.0);
 	readonly verticalFormBidireccional = signal(true);
 	readonly verticalFormDestPisoId = signal<number | null>(null);
 	readonly verticalFormDestNodoId = signal<number | null>(null);
-
-	/** Pisos disponibles como destino (excluye el piso actual) */
-	readonly otherPisos = computed(() => {
-		const currentPisoId = this.vm().selectedPisoId;
-		return this.vm().pisos.filter((p) => p.id !== currentPisoId && p.estado);
-	});
 
 	// #endregion
 
@@ -105,6 +102,41 @@ export class CampusComponent implements OnInit {
 		{ tool: 'addVertical', icon: 'pi pi-arrows-v', label: 'Conexión vertical' },
 		{ tool: 'delete', icon: 'pi pi-trash', label: 'Eliminar' },
 	];
+
+	/** Pisos disponibles como destino (excluye el piso actual) */
+	readonly otherPisos = computed(() => {
+		const currentPisoId = this.vm().selectedPisoId;
+		return this.vm().pisos.filter((p) => p.id !== currentPisoId && p.estado);
+	});
+
+	/** Form data objects for dialog sub-components */
+	readonly pisoFormData = computed<PisoFormData>(() => ({
+		nombre: this.pisoFormNombre(),
+		orden: this.pisoFormOrden(),
+		alturaMetros: this.pisoFormAltura(),
+	}));
+
+	readonly nodeFormData = computed<NodeFormData>(() => ({
+		etiqueta: this.nodeFormEtiqueta(),
+		tipo: this.nodeFormTipo(),
+		width: this.nodeFormWidth(),
+		height: this.nodeFormHeight(),
+	}));
+
+	readonly bloqueoFormData = computed<BloqueoFormData>(() => ({
+		motivo: this.bloqueoFormMotivo(),
+		width: this.bloqueoFormWidth(),
+		height: this.bloqueoFormHeight(),
+	}));
+
+	readonly verticalFormData = computed<VerticalConnectionFormData>(() => ({
+		tipo: this.verticalFormTipo(),
+		destPisoId: this.verticalFormDestPisoId(),
+		destNodoId: this.verticalFormDestNodoId(),
+		pesoSubida: this.verticalFormPesoSubida(),
+		pesoBajada: this.verticalFormPesoBajada(),
+		bidireccional: this.verticalFormBidireccional(),
+	}));
 
 	// #endregion
 
@@ -160,6 +192,12 @@ export class CampusComponent implements OnInit {
 		if (!visible) this.facade.closePisoDialog();
 	}
 
+	onPisoFormDataChange(changes: Partial<PisoFormData>): void {
+		if (changes.nombre !== undefined) this.pisoFormNombre.set(changes.nombre);
+		if (changes.orden !== undefined) this.pisoFormOrden.set(changes.orden);
+		if (changes.alturaMetros !== undefined) this.pisoFormAltura.set(changes.alturaMetros);
+	}
+
 	savePiso(): void {
 		const dto = {
 			nombre: this.pisoFormNombre(),
@@ -189,6 +227,13 @@ export class CampusComponent implements OnInit {
 
 	onNodeDialogVisibleChange(visible: boolean): void {
 		if (!visible) this.facade.closeNodeDialog();
+	}
+
+	onNodeFormDataChange(changes: Partial<NodeFormData>): void {
+		if (changes.etiqueta !== undefined) this.nodeFormEtiqueta.set(changes.etiqueta);
+		if (changes.tipo !== undefined) this.nodeFormTipo.set(changes.tipo);
+		if (changes.width !== undefined) this.nodeFormWidth.set(changes.width);
+		if (changes.height !== undefined) this.nodeFormHeight.set(changes.height);
 	}
 
 	saveNode(): void {
@@ -223,6 +268,12 @@ export class CampusComponent implements OnInit {
 		if (!visible) this.facade.closeBloqueoDialog();
 	}
 
+	onBloqueoFormDataChange(changes: Partial<BloqueoFormData>): void {
+		if (changes.motivo !== undefined) this.bloqueoFormMotivo.set(changes.motivo);
+		if (changes.width !== undefined) this.bloqueoFormWidth.set(changes.width);
+		if (changes.height !== undefined) this.bloqueoFormHeight.set(changes.height);
+	}
+
 	saveBloqueo(): void {
 		const editing = this.vm().editingBloqueo;
 		if (!editing) return;
@@ -242,6 +293,15 @@ export class CampusComponent implements OnInit {
 
 	onVerticalDialogVisibleChange(visible: boolean): void {
 		if (!visible) this.facade.closeVerticalDialog();
+	}
+
+	onVerticalFormDataChange(changes: Partial<VerticalConnectionFormData>): void {
+		if (changes.tipo !== undefined) this.verticalFormTipo.set(changes.tipo);
+		if (changes.destPisoId !== undefined) this.verticalFormDestPisoId.set(changes.destPisoId);
+		if (changes.destNodoId !== undefined) this.verticalFormDestNodoId.set(changes.destNodoId);
+		if (changes.pesoSubida !== undefined) this.verticalFormPesoSubida.set(changes.pesoSubida);
+		if (changes.pesoBajada !== undefined) this.verticalFormPesoBajada.set(changes.pesoBajada);
+		if (changes.bidireccional !== undefined) this.verticalFormBidireccional.set(changes.bidireccional);
 	}
 
 	onDestPisoChange(pisoId: number | null): void {

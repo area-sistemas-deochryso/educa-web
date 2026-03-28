@@ -1,6 +1,6 @@
 # Refactor: Organización, Responsabilidad y Claridad
 
-> **Estado**: Completado (2026-03-26)
+> **Estado**: Completado (2026-03-28)
 > **Objetivo**: Cada archivo tiene 1 responsabilidad clara, cada tipo tiene 1 ubicación, cada función tiene 1 dueño.
 
 ---
@@ -39,14 +39,27 @@
 - `ui-messages.ts` (360 → Confirm 70 + Errors 170 + Feature 130)
 - `campus-admin.facade.ts` (494 → 437 + EditorService 182)
 
----
+### Bloque 11: WAL Sync Engine (681 → ~380 + 3 helpers) ✅
+- `wal-error.utils.ts` — Funciones puras: `isConflictError`, `isPermanentError`, `extractErrorMessage`
+- `wal-cache-invalidator.service.ts` — Servicio para invalidación de cache SW post-commit
+- `wal-coalescer.service.ts` — Servicio para merge de entries UPDATE duplicados
 
-## Pendiente (al tocar cada feature)
+### Bloque 12: Templates >500 líneas (5 templates → sub-componentes) ✅
+- `ctest-k6.component.html` (650 → ~170) — 3 wizard steps extraídos: config-step, stages-step, endpoints-step
+- `campus.component.html` (590 → 217) — 4 dialogs extraídos: piso-dialog, node-dialog, bloqueo-dialog, vertical-connection-dialog
+- `curso-content-dialog.component.html` (573 → 256) — 1 accordion extraído: semanas-accordion
+- `horarios.component.html` (550 → 221) — 2 componentes extraídos: form-dialog, curso-picker
+- `permisos-usuarios.component.html` (528 → 204) — 3 componentes extraídos: stats-cards, detail-drawer, edit-dialog
 
-- [ ] `StorageService` (628 ln) — simplificar cuando se toque storage
-- [ ] `wal-sync-engine.service.ts` (680 ln) — evaluar split cuando se toque WAL
-- [ ] Templates >500 líneas (5 templates) — extraer sub-componentes al tocar
-- [ ] Considerar `BaseCrudFacade` cuando se creen 2+ facades nuevos
+### Bloque 13: BaseCrudFacade — evaluado, no migrado ✅
+- `BaseCrudFacade` ya existe y funciona bien (CursosFacade la usa correctamente)
+- UsuariosCrudFacade y HorariosCrudFacade NO se migraron: sus stores son custom y no extienden BaseCrudStore, requeriría refactor de alto riesgo con beneficio marginal
+- **Decisión**: usar BaseCrudFacade para módulos CRUD **nuevos**, no migrar los existentes
+
+### Bloque 14: StorageService — evaluado, no requiere split ✅
+- StorageService (628 ln) es un facade bien organizado con 6 regiones claras
+- Delega correctamente a 3 sub-servicios (SessionStorage, Preferences, NotificationStorage)
+- No necesita split — es el patrón correcto para una fachada de storage
 
 ---
 
@@ -57,3 +70,5 @@
 3. **Tipo usado en 2+ features → `@data/models/` o `@shared/models/`**
 4. **Archivo >350 líneas → evaluar split**. >500 → obligatorio
 5. **Config/constantes en `@shared/config/` o `@shared/constants/`**, nunca en `components/`
+6. **Template >250 líneas → extraer sub-componentes presentacionales**
+7. **Nuevos módulos CRUD admin → usar BaseCrudStore + BaseCrudFacade**

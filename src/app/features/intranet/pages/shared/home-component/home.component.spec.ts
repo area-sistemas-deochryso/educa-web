@@ -3,7 +3,9 @@ import { describe, it, expect, beforeEach, vi } from 'vitest';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { testProviders } from '@test';
 import { HomeComponent } from './home.component';
-import { StorageService, NotificationsService } from '@core/services';
+import { StorageService } from '@core/services';
+import { FeatureFlagsFacade } from '@core/services/feature-flags';
+import { UserPermisosService } from '@core/services/permisos/user-permisos.service';
 
 // #endregion
 // #region Implementation
@@ -11,20 +13,23 @@ describe('HomeComponent (Intranet)', () => {
 	let component: HomeComponent;
 	let fixture: ComponentFixture<HomeComponent>;
 	let storageServiceMock: Partial<StorageService>;
-	let notificationsServiceMock: Partial<NotificationsService>;
 
 	beforeEach(async () => {
 		storageServiceMock = {
 			getUser: vi.fn().mockReturnValue(null),
+			hasUserInfo: vi.fn().mockReturnValue(false),
+			getToken: vi.fn().mockReturnValue(null),
+			getPermisos: vi.fn().mockReturnValue([]),
 			getDismissedNotifications: vi.fn().mockReturnValue([]),
 			removeDismissedNotifications: vi.fn(),
 		};
 
-		notificationsServiceMock = {
-			notifications: vi.fn().mockReturnValue([]),
-			unreadCount: vi.fn().mockReturnValue(0),
-			dismiss: vi.fn(),
-			markAsRead: vi.fn(),
+		const featureFlagsMock = {
+			isEnabled: vi.fn().mockReturnValue(false),
+		};
+
+		const userPermisosMock = {
+			tienePermiso: vi.fn().mockReturnValue(false),
 		};
 
 		await TestBed.configureTestingModule({
@@ -32,7 +37,8 @@ describe('HomeComponent (Intranet)', () => {
 			providers: [
 				...testProviders,
 				{ provide: StorageService, useValue: storageServiceMock },
-				{ provide: NotificationsService, useValue: notificationsServiceMock },
+				{ provide: FeatureFlagsFacade, useValue: featureFlagsMock },
+				{ provide: UserPermisosService, useValue: userPermisosMock },
 			],
 		}).compileComponents();
 
@@ -50,20 +56,26 @@ describe('HomeComponent (Intranet)', () => {
 	});
 
 	it('should return default welcome message when no user', () => {
-		expect(component.welcomeTitle).toBe('Bienvenido a tu Intranet');
+		expect(component.welcomeTitle()).toBe('Bienvenido a tu Intranet');
 	});
 
-	it('should return personalized welcome message when user exists', () => {
+	it('should return personalized welcome message when user exists', async () => {
 		(storageServiceMock.getUser as ReturnType<typeof vi.fn>).mockReturnValue({
 			nombreCompleto: 'Juan Pérez',
 			rol: 'Estudiante',
 		});
-		expect(component.welcomeTitle).toBe('Bienvenido, Juan Pérez');
+
+		// Recreate component so computed() picks up the new mock value
+		fixture = TestBed.createComponent(HomeComponent);
+		component = fixture.componentInstance;
+		await fixture.whenStable();
+
+		expect(component.welcomeTitle()).toBe('Bienvenido, Juan Pérez');
 	});
 
-	it('should have available courses', () => {
-		expect(component.availableCourses).toBeDefined();
-		expect(Array.isArray(component.availableCourses)).toBe(true);
+	it('should have quickAccessItems as array', () => {
+		expect(component.quickAccessItems()).toBeDefined();
+		expect(Array.isArray(component.quickAccessItems())).toBe(true);
 	});
 });
 // #endregion

@@ -1,6 +1,6 @@
 import { Injectable, inject, DestroyRef } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import { HttpClient, HttpErrorResponse, HttpHeaders } from '@angular/common/http';
+import { HttpClient, HttpHeaders } from '@angular/common/http';
 import {
 	Observable,
 	Subject,
@@ -16,11 +16,17 @@ import { SwService } from '@features/intranet/services/sw/sw.service';
 import { WalService } from './wal.service';
 import { WalLeaderService } from './wal-leader.service';
 import { WalMetricsService } from './wal-metrics.service';
+import { WalCacheInvalidator } from './wal-cache-invalidator.service';
+import { WalCoalescer } from './wal-coalescer.service';
+import {
+	isConflictError,
+	isPermanentError,
+	extractErrorMessage,
+} from './wal-error.utils';
 import {
 	WalEntry,
 	WalProcessResult,
 	WAL_DEFAULTS,
-	WAL_CACHE_MAP,
 } from './models';
 
 /**
@@ -35,6 +41,8 @@ export class WalSyncEngine {
 	private http = inject(HttpClient);
 	private leader = inject(WalLeaderService);
 	private walMetrics = inject(WalMetricsService);
+	private cacheInvalidator = inject(WalCacheInvalidator);
+	private coalescer = inject(WalCoalescer);
 	private destroyRef = inject(DestroyRef);
 
 	// #endregion
@@ -143,9 +151,6 @@ export class WalSyncEngine {
 
 	/**
 	 * Register callbacks for an entry in this session.
-	 *
-	 * @param entryId Entry id.
-	 * @param config Callback handlers for http, commit, error, and rollback.
 	 */
 	registerCallbacks<T>(
 		entryId: string,
@@ -165,8 +170,6 @@ export class WalSyncEngine {
 	}
 	/**
 	 * Remove callbacks for an entry.
-	 *
-	 * @param entryId Entry id.
 	 */
 	unregisterCallbacks(entryId: string): void {
 		this.callbacks.delete(entryId);
@@ -195,7 +198,9 @@ export class WalSyncEngine {
 
 			while (entries.length > 0 && this.sw.isOnline) {
 				// Coalesce duplicate UPDATEs to the same resource before processing
-				entries = await this.coalesceEntries(entries);
+				entries = await this.coalescer.coalesce(entries, (id) =>
+					this.callbacks.delete(id),
+				);
 
 				logger.log(`[WAL-Sync] Processing ${entries.length} pending entries`);
 
@@ -208,7 +213,6 @@ export class WalSyncEngine {
 				}
 
 				// Drain: pick up new entries added while we were processing
-				// Uses getRetryableEntries to respect nextRetryAt backoff
 				entries = await this.wal.getRetryableEntries();
 			}
 		} finally {
@@ -218,8 +222,7 @@ export class WalSyncEngine {
 
 	/**
 	 * Process retryable entries based on nextRetryAt.
-	 * Also recovers stale IN_FLIGHT entries as a safety net:
-	 * if _isProcessing is false, no entries should be legitimately IN_FLIGHT.
+	 * Also recovers stale IN_FLIGHT entries as a safety net.
 	 */
 	async processRetryable(): Promise<void> {
 		if (this._isProcessing || !this.sw.isOnline || !this.leader.isLeader) return;
@@ -245,10 +248,7 @@ export class WalSyncEngine {
 
 	/**
 	 * Process a single WAL entry and return the result.
-	 * Outer try/catch ensures entry never stays stuck IN_FLIGHT
-	 * even if an unexpected error occurs (IndexedDB failure, etc.).
-	 *
-	 * @param entry WAL entry.
+	 * Outer try/catch ensures entry never stays stuck IN_FLIGHT.
 	 */
 	async processEntry(entry: WalEntry): Promise<WalProcessResult> {
 		try {
@@ -261,7 +261,7 @@ export class WalSyncEngine {
 
 				// Success: commit, invalidate cache, then notify
 				await this.wal.commitAndClean(entry.id);
-				await this.invalidateCacheForEntry(entry);
+				await this.cacheInvalidator.invalidateForEntry(entry);
 				cb?.onCommit(result);
 				this.callbacks.delete(entry.id);
 
@@ -286,7 +286,6 @@ export class WalSyncEngine {
 			}
 		} catch (unexpected) {
 			// Safety net: entry stuck IN_FLIGHT due to unexpected error
-			// Reset to PENDING so the periodic timer can retry it
 			logger.error('[WAL-Sync] Unexpected error, resetting entry to PENDING:', unexpected);
 			try {
 				const current = await this.wal.getEntry(entry.id);
@@ -309,8 +308,6 @@ export class WalSyncEngine {
 
 	/**
 	 * Immediately send a single entry.
-	 *
-	 * @param entry WAL entry.
 	 */
 	async sendNow(entry: WalEntry): Promise<WalProcessResult> {
 		return this.processEntry(entry);
@@ -323,9 +320,6 @@ export class WalSyncEngine {
 	/**
 	 * Send the HTTP request for a WAL entry.
 	 * Always uses raw HttpClient with X-Idempotency-Key header (entry.id).
-	 * Callbacks (onCommit/onError/rollback) are used separately after the request.
-	 *
-	 * @param entry WAL entry to send.
 	 */
 	private sendRequest(entry: WalEntry): Promise<unknown> {
 		return new Promise((resolve, reject) => {
@@ -338,8 +332,6 @@ export class WalSyncEngine {
 
 	/**
 	 * Send HTTP request with idempotency header.
-	 * Uses entry data (endpoint, method, payload) directly.
-	 * Interceptors (auth, error, rate-limit, etc.) still apply.
 	 */
 	private sendHttp(entry: WalEntry): Observable<unknown> {
 		const headers = new HttpHeaders().set(
@@ -374,8 +366,8 @@ export class WalSyncEngine {
 			rollback?: () => void;
 		},
 	): Promise<WalProcessResult> {
-		// 409 Conflict  mark conflict, no retry
-		if (this.isConflict(error)) {
+		// 409 Conflict → mark conflict, no retry
+		if (isConflictError(error)) {
 			await this.wal.markConflict(entry.id);
 			this.callbacks.delete(entry.id);
 
@@ -387,11 +379,11 @@ export class WalSyncEngine {
 			return result;
 		}
 
-		// Permanent error (4xx except 409)  mark failed, rollback
-		if (this.isPermanentError(error)) {
-			const errorMsg = this.extractErrorMessage(error);
+		// Permanent error (4xx except 409) → mark failed, rollback
+		if (isPermanentError(error)) {
+			const errorMsg = extractErrorMessage(error);
 			await this.wal.markFailed(entry.id, errorMsg);
-			await this.invalidateCacheForEntry(entry);
+			await this.cacheInvalidator.invalidateForEntry(entry);
 			cb?.rollback?.();
 			cb?.onError(error);
 			this.callbacks.delete(entry.id);
@@ -405,7 +397,7 @@ export class WalSyncEngine {
 			return result;
 		}
 
-		// Retryable error (network, timeout, 5xx)  increment retry
+		// Retryable error (network, timeout, 5xx) → increment retry
 		const updated = await this.wal.incrementRetry(entry.id);
 
 		if (!updated || updated.status === 'FAILED') {
@@ -432,88 +424,6 @@ export class WalSyncEngine {
 		};
 		this._entryProcessed$.next(result);
 		return result;
-	}
-
-	private isConflict(error: unknown): boolean {
-		return error instanceof HttpErrorResponse && error.status === 409;
-	}
-
-	private isPermanentError(error: unknown): boolean {
-		if (!(error instanceof HttpErrorResponse)) return false;
-		// 4xx errors are permanent, except:
-		// - 401 Unauthorized (token may have expired, retryable after re-auth)
-		// - 408 Request Timeout
-		// - 409 Conflict (handled separately)
-		// - 429 Too Many Requests
-		return (
-			error.status >= 400 &&
-			error.status < 500 &&
-			error.status !== 401 &&
-			error.status !== 408 &&
-			error.status !== 409 &&
-			error.status !== 429
-		);
-	}
-
-	private extractErrorMessage(error: unknown): string {
-		if (error instanceof HttpErrorResponse) {
-			if (error.status === 0) return 'Network error';
-			const serverMsg =
-				error.error?.message || error.error?.error || error.statusText;
-			return `HTTP ${error.status}: ${serverMsg}`;
-		}
-		if (error instanceof Error) return error.message;
-		return String(error);
-	}
-
-	// #endregion
-
-	// #region Cache Invalidation
-
-	/**
-	 * Invalidate SW cache patterns associated with a WAL entry's resourceType.
-	 * Called after commit (so refetch hits network) and after permanent failure
-	 * (so rollback doesn't leave stale cache).
-	 *
-	 * Uses WAL_CACHE_MAP for explicit mappings. Falls back to auto-extraction
-	 * from the entry's endpoint URL for unmapped resource types.
-	 */
-	private async invalidateCacheForEntry(entry: WalEntry): Promise<void> {
-		const patterns = WAL_CACHE_MAP[entry.resourceType]
-			?? this.extractPatternsFromEndpoint(entry.endpoint);
-
-		if (!patterns.length) return;
-
-		try {
-			const results = await Promise.all(
-				patterns.map((p) => this.sw.invalidateCacheByPattern(p)),
-			);
-			const total = results.reduce((sum, n) => sum + n, 0);
-			if (total > 0) {
-				logger.log(
-					`[WAL-Sync] Cache invalidated for ${entry.resourceType}: ${total} entries`,
-				);
-			}
-		} catch (e) {
-			// Non-critical: cache will expire via TTL anyway
-			logger.warn('[WAL-Sync] Cache invalidation failed:', e);
-		}
-	}
-
-	/**
-	 * Auto-extract cache invalidation pattern from an endpoint URL.
-	 * Extracts the base API path (e.g. '/api/Usuarios' from 'https://host/api/Usuarios/123').
-	 * Used as fallback when resourceType is not in WAL_CACHE_MAP.
-	 */
-	private extractPatternsFromEndpoint(endpoint: string): string[] {
-		try {
-			const url = new URL(endpoint, 'http://localhost');
-			const match = url.pathname.match(/^(\/api\/[^/]+)/);
-			if (match) return [match[1]];
-		} catch {
-			// Malformed URL — skip
-		}
-		return [];
 	}
 
 	// #endregion
@@ -565,115 +475,19 @@ export class WalSyncEngine {
 
 	/**
 	 * Handle a WAL entry committed by the leader tab.
-	 * Follower tabs invalidate their cache for the resource so
-	 * the next GET brings fresh data from the server.
+	 * Follower tabs invalidate their cache for the resource.
 	 */
 	private async handleCrossTabCommit(
 		entryId: string,
 		resourceType: string,
 	): Promise<void> {
-		const patterns = WAL_CACHE_MAP[resourceType] ?? [`/api/${resourceType}`];
-		if (!patterns.length) return;
-
-		try {
-			const results = await Promise.all(
-				patterns.map((p) => this.sw.invalidateCacheByPattern(p)),
-			);
-			const total = results.reduce((sum, n) => sum + n, 0);
-			if (total > 0) {
-				logger.log(
-					`[WAL-Sync] Cross-tab cache invalidated for ${resourceType}: ${total} entries (entry ${entryId.slice(0, 8)})`,
-				);
-			}
-		} catch (e) {
-			logger.warn('[WAL-Sync] Cross-tab cache invalidation failed:', e);
-		}
+		await this.cacheInvalidator.invalidateForCrossTab(
+			resourceType,
+			entryId,
+		);
 
 		// Emit so WalStatusStore refreshes counts
 		this._entryProcessed$.next({ status: 'COMMITTED', entryId });
-	}
-
-	// #endregion
-
-	// #region Coalescence
-
-	/**
-	 * Merge multiple PENDING UPDATE entries targeting the same resource.
-	 * Only the latest UPDATE per (resourceType + resourceId) is kept;
-	 * older entries are deleted from IndexedDB and their callbacks cleaned up.
-	 *
-	 * CREATE, DELETE, TOGGLE, and CUSTOM operations are never coalesced.
-	 */
-	private async coalesceEntries(entries: WalEntry[]): Promise<WalEntry[]> {
-		if (entries.length <= 1) return entries;
-
-		// Group UPDATE entries by resource key
-		const updatesByKey = new Map<string, WalEntry[]>();
-		const nonUpdateEntries: WalEntry[] = [];
-
-		for (const entry of entries) {
-			if (entry.operation === 'UPDATE' && entry.resourceId != null) {
-				const key = `${entry.resourceType}:${entry.resourceId}`;
-				const group = updatesByKey.get(key);
-				if (group) {
-					group.push(entry);
-				} else {
-					updatesByKey.set(key, [entry]);
-				}
-			} else {
-				nonUpdateEntries.push(entry);
-			}
-		}
-
-		// For each group with 2+ entries, keep only the latest
-		const survivingUpdates: WalEntry[] = [];
-		let totalCoalesced = 0;
-
-		for (const [, group] of updatesByKey) {
-			if (group.length === 1) {
-				survivingUpdates.push(group[0]);
-				continue;
-			}
-
-			// Sort by timestamp DESC — latest first
-			group.sort((a, b) => b.timestamp - a.timestamp);
-			const latest = group[0];
-
-			// Merge payload: shallow-merge all older payloads into the latest
-			// This preserves fields from earlier edits that weren't overwritten
-			if (latest.payload && typeof latest.payload === 'object') {
-				for (let i = group.length - 1; i > 0; i--) {
-					const older = group[i];
-					if (older.payload && typeof older.payload === 'object') {
-						latest.payload = { ...(older.payload as Record<string, unknown>), ...(latest.payload as Record<string, unknown>) };
-					}
-				}
-				await this.wal.updateEntryPayload(latest.id, latest.payload);
-			}
-
-			survivingUpdates.push(latest);
-
-			// Delete older entries
-			for (let i = 1; i < group.length; i++) {
-				const stale = group[i];
-				await this.wal.discardEntry(stale.id);
-				this.callbacks.delete(stale.id);
-				totalCoalesced++;
-			}
-		}
-
-		if (totalCoalesced > 0) {
-			logger.log(`[WAL-Sync] Coalesced ${totalCoalesced} duplicate UPDATE entries`);
-			if (!environment.production) {
-				this.walMetrics.recordCoalescence();
-			}
-		}
-
-		// Return in original order (non-updates first, then surviving updates by timestamp)
-		return [
-			...nonUpdateEntries,
-			...survivingUpdates.sort((a, b) => a.timestamp - b.timestamp),
-		];
 	}
 
 	// #endregion

@@ -1,0 +1,88 @@
+<p-dialog
+	[visible]="visible()"
+	(visibleChange)="onVisibleChange($event)"
+	[modal]="true"
+	[closable]="true"
+	[showHeader]="false"
+	[style]="{ width: '440px' }"
+>
+	<!-- #region Header -->
+	<div class="piso-dialog-header">
+		<div class="piso-dialog-icon editing">
+			<i class="pi pi-ban"></i>
+		</div>
+		<div class="piso-dialog-title">
+			<h3>Editar Bloqueo</h3>
+			<p>Modifica las dimensiones y motivo del bloqueo</p>
+		</div>
+	</div>
+	<!-- #endregion -->
+
+	<!-- #region Form -->
+	<div class="piso-dialog-form">
+		<div class="form-field">
+			<label for="bloqueoMotivo">
+				<i class="pi pi-info-circle"></i>
+				Motivo
+			</label>
+			<input
+				pInputText
+				id="bloqueoMotivo"
+				[ngModel]="formData().motivo"
+				(ngModelChange)="onMotivoChange($event)"
+				placeholder="Ej: En reparación, Zona restringida..."
+			/>
+		</div>
+		<div class="form-row">
+			<div class="form-field">
+				<label for="bloqueoWidth">
+					<i class="pi pi-arrows-h"></i>
+					Ancho
+				</label>
+				<p-inputNumber
+					id="bloqueoWidth"
+					[ngModel]="formData().width"
+					(ngModelChange)="onWidthChange($event)"
+					[min]="10"
+					[max]="500"
+					[showButtons]="true"
+					[step]="10"
+				/>
+			</div>
+			<div class="form-field">
+				<label for="bloqueoHeight">
+					<i class="pi pi-arrows-v"></i>
+					Alto
+				</label>
+				<p-inputNumber
+					id="bloqueoHeight"
+					[ngModel]="formData().height"
+					(ngModelChange)="onHeightChange($event)"
+					[min]="10"
+					[max]="500"
+					[showButtons]="true"
+					[step]="10"
+				/>
+			</div>
+		</div>
+	</div>
+	<!-- #endregion -->
+
+	<!-- #region Footer -->
+	<div class="piso-dialog-footer">
+		<button
+			pButton
+			label="Cancelar"
+			class="p-button-text p-button-secondary"
+			(click)="onCancel()"
+		></button>
+		<button
+			pButton
+			label="Guardar cambios"
+			icon="pi pi-check"
+			(click)="onSave()"
+			[loading]="saving()"
+		></button>
+	</div>
+	<!-- #endregion -->
+</p-dialog>

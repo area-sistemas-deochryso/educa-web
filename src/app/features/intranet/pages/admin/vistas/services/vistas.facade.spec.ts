@@ -141,13 +141,19 @@ describe('VistasFacade', () => {
 		});
 
 		it('should close dialog on create', () => {
-			store.openDialog();
-			facade.create('test/path', 'Test');
+			facade.openNewDialog();
+			store.setFormData({ ruta: 'test/path', nombre: 'Test', estado: 1 });
+
+			facade.saveVista();
+
 			expect(store.dialogVisible()).toBe(false);
 		});
 
 		it('should update item and close dialog on update', () => {
-			facade.update(1, 'new/path', 'Updated', 1);
+			facade.openEditDialog(mockVistas[0]);
+			store.setFormData({ ruta: 'new/path', nombre: 'Updated', estado: 1 });
+
+			facade.saveVista();
 
 			expect(store.items()[0].ruta).toBe('new/path');
 			expect(store.items()[0].nombre).toBe('Updated');

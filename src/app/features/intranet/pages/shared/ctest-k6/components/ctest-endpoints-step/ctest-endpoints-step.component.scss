@@ -1,0 +1,303 @@
+// #region Step Layout
+.wizard-step-content {
+	padding: 1.25rem 0;
+}
+
+.section-header {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	margin-bottom: 1rem;
+
+	h3 {
+		margin: 0 !important;
+	}
+}
+
+.step-footer {
+	display: flex;
+	align-items: center;
+	gap: 0.75rem;
+	padding-top: 1rem;
+	margin-top: 1.5rem;
+	border-top: 1px solid var(--surface-border);
+}
+
+.step-spacer {
+	flex: 1;
+}
+// #endregion
+
+// #region Endpoints
+.endpoint-actions {
+	display: flex;
+	gap: 0.5rem;
+}
+
+.toggle-all {
+	display: flex;
+	gap: 0.25rem;
+	margin-bottom: 0.5rem;
+}
+
+.endpoints-list {
+	display: flex;
+	flex-direction: column;
+	gap: 0.5rem;
+}
+
+.endpoint-card {
+	background: var(--surface-ground);
+	border-radius: 8px;
+	padding: 0.75rem;
+	transition: opacity 0.2s;
+	overflow: hidden;
+
+	&.disabled {
+		opacity: 0.5;
+	}
+}
+
+.endpoint-header {
+	display: flex;
+	align-items: center;
+	gap: 0.5rem;
+	min-width: 0;
+
+	> p-checkbox {
+		flex-shrink: 0;
+	}
+
+	> p-select {
+		flex-shrink: 0;
+		width: 110px;
+	}
+
+	.endpoint-path-input {
+		flex: 1.5;
+		min-width: 0;
+	}
+
+	.endpoint-name-input {
+		flex: 0.8;
+		min-width: 0;
+	}
+
+	> button {
+		flex-shrink: 0;
+	}
+}
+
+.endpoint-body {
+	margin-top: 0.5rem;
+	padding-left: 2.5rem;
+
+	.body-textarea {
+		width: 100%;
+		font-family: 'Cascadia Code', 'Consolas', monospace;
+		font-size: 0.8rem;
+	}
+}
+
+.empty-endpoints {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	justify-content: center;
+	padding: 2rem;
+	color: var(--text-color-secondary);
+	text-align: center;
+
+	p {
+		margin: 0.75rem 0 0.25rem;
+		font-weight: 500;
+	}
+
+	span {
+		font-size: 0.85rem;
+	}
+}
+// #endregion
+
+// #region Drag and Drop
+.drag-handle {
+	cursor: grab;
+	color: var(--text-color-secondary);
+	font-size: 0.85rem;
+	opacity: 0.5;
+	transition: opacity 0.2s;
+	flex-shrink: 0;
+
+	&:hover {
+		opacity: 1;
+	}
+
+	&:active {
+		cursor: grabbing;
+	}
+}
+
+.cdk-drag-preview {
+	box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+	border-radius: 8px;
+	opacity: 0.9;
+}
+
+.cdk-drag-placeholder {
+	opacity: 0.3;
+}
+
+.cdk-drag-animating {
+	transition: transform 200ms ease;
+}
+
+.cdk-drop-list-dragging .cdk-drag {
+	transition: transform 200ms ease;
+}
+// #endregion
+
+// #region Overrides PrimeNG
+:host ::ng-deep {
+	.p-inputtext,
+	.p-select {
+		background: transparent;
+		color: var(--text-color);
+		border-color: var(--surface-300);
+
+		&::placeholder {
+			color: var(--text-color-secondary);
+		}
+
+		&:enabled:focus {
+			border-color: var(--text-color);
+			box-shadow: 0 0 0 1px var(--text-color);
+		}
+	}
+
+	.p-select-label {
+		color: var(--text-color);
+	}
+
+	.p-select-dropdown {
+		color: var(--text-color);
+	}
+}
+// #endregion
+
+// #region Responsive
+@media (max-width: 768px) {
+	.section-header {
+		flex-direction: column;
+		align-items: flex-start;
+		gap: 0.75rem;
+	}
+
+	.endpoint-actions {
+		width: 100%;
+
+		button {
+			flex: 1;
+		}
+	}
+
+	.endpoint-header {
+		flex-wrap: wrap;
+		gap: 0.5rem;
+
+		.endpoint-path-input,
+		.endpoint-name-input {
+			flex: 1 1 100%;
+		}
+
+		p-select {
+			flex: 1;
+		}
+	}
+
+	.endpoint-body {
+		padding-left: 0;
+	}
+
+	.step-footer {
+		button {
+			flex: 1;
+		}
+	}
+}
+
+@media (max-width: 600px) {
+	.step-footer {
+		flex-direction: column;
+
+		button {
+			width: 100%;
+		}
+	}
+}
+
+@media (max-width: 480px) {
+	.wizard-step-content {
+		padding: 1rem 0;
+
+		> h3 {
+			font-size: 1rem;
+		}
+	}
+
+	.endpoint-header {
+		flex-direction: column;
+		align-items: stretch;
+
+		> p-checkbox {
+			align-self: flex-start;
+		}
+
+		> p-select {
+			width: 100%;
+		}
+
+		.endpoint-path-input,
+		.endpoint-name-input {
+			flex: 1 1 100%;
+		}
+
+		> button {
+			align-self: flex-end;
+		}
+	}
+
+	.endpoint-body {
+		padding-left: 0;
+	}
+
+	.toggle-all {
+		flex-wrap: wrap;
+	}
+
+	.empty-endpoints {
+		padding: 1.25rem 0.75rem;
+
+		i {
+			font-size: 1.5rem !important;
+		}
+
+		p {
+			font-size: 0.875rem;
+		}
+
+		span {
+			font-size: 0.8rem;
+		}
+	}
+
+	.step-footer {
+		flex-wrap: wrap;
+		gap: 0.5rem;
+
+		button {
+			flex: 1;
+			min-width: 0;
+		}
+	}
+}
+// #endregion

@@ -5,5 +5,8 @@ export { WalSyncEngine } from './wal-sync-engine.service';
 export { WalLeaderService } from './wal-leader.service';
 export { WalClockService } from './wal-clock.service';
 export { WalMetricsService } from './wal-metrics.service';
+export { WalCacheInvalidator } from './wal-cache-invalidator.service';
+export { WalCoalescer } from './wal-coalescer.service';
 export { WalStatusStore } from './wal-status.store';
 export { WalFacadeHelper } from './wal-facade-helper.service';
+export { isConflictError, isPermanentError } from './wal-error.utils';

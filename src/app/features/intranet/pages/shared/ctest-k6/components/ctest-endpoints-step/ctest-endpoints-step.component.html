@@ -1,0 +1,151 @@
+<div class="wizard-step-content">
+	<!-- #region Header -->
+	<div class="section-header">
+		<h3><i class="pi pi-link"></i> Endpoints</h3>
+		<div class="endpoint-actions">
+			<button
+				pButton
+				label="Cargar Presets"
+				icon="pi pi-download"
+				class="p-button-outlined p-button-sm"
+				(click)="onLoadPresets()"
+				pTooltip="Cargar endpoints predefinidos del proyecto (usuarios, cursos, asistencias, etc.)"
+				tooltipPosition="top"
+			></button>
+			<button
+				pButton
+				label="Agregar"
+				icon="pi pi-plus"
+				class="p-button-sm"
+				(click)="onAddEndpoint()"
+				pTooltip="Agregar un endpoint personalizado"
+				tooltipPosition="top"
+			></button>
+		</div>
+	</div>
+	<!-- #endregion -->
+
+	@if (vm().endpoints.length > 0) {
+		<!-- #region Toggle All -->
+		<div class="toggle-all">
+			<button
+				pButton
+				label="Todos"
+				icon="pi pi-check-square"
+				class="p-button-text p-button-sm"
+				(click)="onToggleAllEndpoints(true)"
+			></button>
+			<button
+				pButton
+				label="Ninguno"
+				icon="pi pi-stop"
+				class="p-button-text p-button-sm"
+				(click)="onToggleAllEndpoints(false)"
+			></button>
+		</div>
+		<!-- #endregion -->
+
+		<!-- #region Endpoints List -->
+		<div
+			class="endpoints-list"
+			cdkDropList
+			(cdkDropListDropped)="onDropEndpoint($event)"
+		>
+			@for (ep of vm().endpoints; track $index; let i = $index) {
+				<div class="endpoint-card" [class.disabled]="!ep.enabled" cdkDrag>
+					<div class="endpoint-header">
+						<i class="pi pi-bars drag-handle" cdkDragHandle></i>
+						<p-checkbox
+							[ngModel]="ep.enabled"
+							(ngModelChange)="onToggleEndpoint(i)"
+							[binary]="true"
+							[inputId]="'ep-' + i"
+						/>
+
+						<p-select
+							[options]="httpMethodOptions"
+							optionLabel="label"
+							optionValue="value"
+							[ngModel]="ep.method"
+							(ngModelChange)="onEndpointMethodChange(i, $event)"
+							appendTo="body"
+						/>
+
+						<input
+							type="text"
+							pInputText
+							placeholder="/api/usuarios"
+							[ngModel]="ep.path"
+							(ngModelChange)="onEndpointPathChange(i, $event)"
+							class="endpoint-path-input"
+						/>
+
+						<input
+							type="text"
+							pInputText
+							placeholder="nombre-check"
+							[ngModel]="ep.name"
+							(ngModelChange)="onEndpointNameChange(i, $event)"
+							class="endpoint-name-input"
+							pTooltip="Nombre para identificar este endpoint en los checks de k6"
+							tooltipPosition="top"
+						/>
+
+						<button
+							pButton
+							icon="pi pi-trash"
+							class="p-button-rounded p-button-text p-button-danger p-button-sm"
+							(click)="onRemoveEndpoint(i)"
+							[pt]="{ root: { 'aria-label': 'Eliminar endpoint' } }"
+						></button>
+					</div>
+
+					@if (showBody(ep)) {
+						<div class="endpoint-body">
+							<textarea
+								pTextarea
+								placeholder='{ "campo": "valor" }'
+								[ngModel]="ep.body"
+								(ngModelChange)="onEndpointBodyChange(i, $event)"
+								[rows]="2"
+								[autoResize]="true"
+								class="body-textarea"
+							></textarea>
+						</div>
+					}
+				</div>
+			}
+		</div>
+		<!-- #endregion -->
+	} @else {
+		<!-- #region Empty State -->
+		<div class="empty-endpoints">
+			<i class="pi pi-link" style="font-size: 2rem"></i>
+			<p>Sin endpoints configurados</p>
+			<span
+				>Carga los presets del proyecto o agrega endpoints manualmente</span
+			>
+		</div>
+		<!-- #endregion -->
+	}
+
+	<!-- #region Footer -->
+	<div class="step-footer">
+		<button
+			pButton
+			label="Anterior"
+			icon="pi pi-arrow-left"
+			class="p-button-outlined"
+			(click)="onGoPrev()"
+		></button>
+		<div class="step-spacer"></div>
+		<button
+			pButton
+			label="Siguiente"
+			icon="pi pi-arrow-right"
+			iconPos="right"
+			(click)="onGoNext()"
+		></button>
+	</div>
+	<!-- #endregion -->
+</div>

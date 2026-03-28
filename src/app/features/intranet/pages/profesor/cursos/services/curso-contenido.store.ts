@@ -38,6 +38,7 @@ interface UiState {
 	taskSubmissionsData: EstudianteTareaArchivosGroupDto[];
 	taskSubmissionsLoading: boolean;
 	taskSubmissionsTarea: CursoContenidoTareaDto | null;
+	activeSemanaId: number | null;
 }
 
 const initialDomain: DomainState = {
@@ -66,6 +67,7 @@ const initialUi: UiState = {
 	taskSubmissionsData: [],
 	taskSubmissionsLoading: false,
 	taskSubmissionsTarea: null,
+	activeSemanaId: null,
 };
 
 // #endregion
@@ -103,6 +105,7 @@ export class CursoContenidoStore {
 	readonly taskSubmissionsData = computed(() => this._ui().taskSubmissionsData);
 	readonly taskSubmissionsLoading = computed(() => this._ui().taskSubmissionsLoading);
 	readonly taskSubmissionsTarea = computed(() => this._ui().taskSubmissionsTarea);
+	readonly activeSemanaId = computed(() => this._ui().activeSemanaId);
 	// #endregion
 
 	// #region Computed derivados (solo dependen de domain)
@@ -151,6 +154,7 @@ export class CursoContenidoStore {
 		taskSubmissionsData: this.taskSubmissionsData(),
 		taskSubmissionsLoading: this.taskSubmissionsLoading(),
 		taskSubmissionsTarea: this.taskSubmissionsTarea(),
+		activeSemanaId: this.activeSemanaId(),
 	}));
 
 	/** Aggregated view model for UI binding (composes sub-VMs). */
@@ -209,6 +213,10 @@ export class CursoContenidoStore {
 
 	setTaskSubmissionsLoading(loading: boolean): void {
 		this._ui.update((s) => ({ ...s, taskSubmissionsLoading: loading }));
+	}
+
+	setActiveSemanaId(id: number | null): void {
+		this._ui.update((s) => ({ ...s, activeSemanaId: id }));
 	}
 	// #endregion
 

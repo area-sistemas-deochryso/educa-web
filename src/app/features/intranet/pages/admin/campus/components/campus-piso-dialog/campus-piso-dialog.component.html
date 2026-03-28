@@ -1,0 +1,88 @@
+<p-dialog
+	[visible]="visible()"
+	(visibleChange)="onVisibleChange($event)"
+	[modal]="true"
+	[closable]="true"
+	[showHeader]="false"
+	[style]="{ width: '440px' }"
+>
+	<!-- #region Header -->
+	<div class="piso-dialog-header">
+		<div class="piso-dialog-icon" [class.editing]="isEditing()">
+			<i [class]="isEditing() ? 'pi pi-pencil' : 'pi pi-plus'"></i>
+		</div>
+		<div class="piso-dialog-title">
+			<h3>{{ isEditing() ? 'Editar Piso' : 'Nuevo Piso' }}</h3>
+			<p>{{ isEditing() ? 'Modifica los datos del piso seleccionado' : 'Define un nuevo piso para el mapa del campus' }}</p>
+		</div>
+	</div>
+	<!-- #endregion -->
+
+	<!-- #region Form -->
+	<div class="piso-dialog-form">
+		<div class="form-field">
+			<label for="pisoNombre">
+				<i class="pi pi-tag"></i>
+				Nombre del piso
+			</label>
+			<input
+				pInputText
+				id="pisoNombre"
+				[ngModel]="formData().nombre"
+				(ngModelChange)="onNombreChange($event)"
+				placeholder="Ej: Primer Piso"
+			/>
+		</div>
+		<div class="form-row">
+			<div class="form-field">
+				<label for="pisoOrden">
+					<i class="pi pi-sort-numeric-up"></i>
+					Orden
+				</label>
+				<p-inputNumber
+					id="pisoOrden"
+					[ngModel]="formData().orden"
+					(ngModelChange)="onOrdenChange($event)"
+					[showButtons]="true"
+					[min]="0"
+					[max]="99"
+				/>
+			</div>
+			<div class="form-field">
+				<label for="pisoAltura">
+					<i class="pi pi-arrows-v"></i>
+					Altura (m)
+				</label>
+				<p-inputNumber
+					id="pisoAltura"
+					[ngModel]="formData().alturaMetros"
+					(ngModelChange)="onAlturaChange($event)"
+					[minFractionDigits]="1"
+					[maxFractionDigits]="1"
+					[min]="0.1"
+					[max]="100"
+				/>
+			</div>
+		</div>
+	</div>
+	<!-- #endregion -->
+
+	<!-- #region Footer -->
+	<div class="piso-dialog-footer">
+		<button
+			pButton
+			label="Cancelar"
+			class="p-button-text p-button-secondary"
+			(click)="onCancel()"
+		></button>
+		<button
+			pButton
+			[label]="isEditing() ? 'Guardar cambios' : 'Crear piso'"
+			[icon]="isEditing() ? 'pi pi-check' : 'pi pi-plus'"
+			(click)="onSave()"
+			[loading]="saving()"
+			[disabled]="!formData().nombre.trim()"
+		></button>
+	</div>
+	<!-- #endregion -->
+</p-dialog>

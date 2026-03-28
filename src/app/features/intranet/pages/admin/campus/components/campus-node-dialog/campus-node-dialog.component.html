@@ -1,0 +1,103 @@
+<p-dialog
+	[visible]="visible()"
+	(visibleChange)="onVisibleChange($event)"
+	[modal]="true"
+	[closable]="true"
+	[showHeader]="false"
+	[style]="{ width: '440px' }"
+>
+	<!-- #region Header -->
+	<div class="piso-dialog-header">
+		<div class="piso-dialog-icon editing">
+			<i class="pi pi-pencil"></i>
+		</div>
+		<div class="piso-dialog-title">
+			<h3>Editar Nodo</h3>
+			<p>Modifica las propiedades del nodo seleccionado</p>
+		</div>
+	</div>
+	<!-- #endregion -->
+
+	<!-- #region Form -->
+	<div class="piso-dialog-form">
+		<div class="form-field">
+			<label for="nodeEtiqueta">
+				<i class="pi pi-tag"></i>
+				Nombre / Etiqueta
+			</label>
+			<input
+				pInputText
+				id="nodeEtiqueta"
+				[ngModel]="formData().etiqueta"
+				(ngModelChange)="onEtiquetaChange($event)"
+				placeholder="Ej: Aula 101, Baño Varones..."
+			/>
+		</div>
+		<div class="form-field">
+			<label for="nodeTipo">
+				<i class="pi pi-th-large"></i>
+				Tipo
+			</label>
+			<p-select
+				id="nodeTipo"
+				[options]="nodeTypeOptions()"
+				[ngModel]="formData().tipo"
+				(ngModelChange)="onTipoChange($event)"
+				optionLabel="label"
+				optionValue="value"
+				appendTo="body"
+			/>
+		</div>
+		<div class="form-row">
+			<div class="form-field">
+				<label for="nodeWidth">
+					<i class="pi pi-arrows-h"></i>
+					Ancho
+				</label>
+				<p-inputNumber
+					id="nodeWidth"
+					[ngModel]="formData().width"
+					(ngModelChange)="onWidthChange($event)"
+					[min]="0"
+					[max]="500"
+					[showButtons]="true"
+					[step]="10"
+				/>
+			</div>
+			<div class="form-field">
+				<label for="nodeHeight">
+					<i class="pi pi-arrows-v"></i>
+					Alto
+				</label>
+				<p-inputNumber
+					id="nodeHeight"
+					[ngModel]="formData().height"
+					(ngModelChange)="onHeightChange($event)"
+					[min]="0"
+					[max]="500"
+					[showButtons]="true"
+					[step]="10"
+				/>
+			</div>
+		</div>
+	</div>
+	<!-- #endregion -->
+
+	<!-- #region Footer -->
+	<div class="piso-dialog-footer">
+		<button
+			pButton
+			label="Cancelar"
+			class="p-button-text p-button-secondary"
+			(click)="onCancel()"
+		></button>
+		<button
+			pButton
+			label="Guardar cambios"
+			icon="pi pi-check"
+			(click)="onSave()"
+			[loading]="saving()"
+		></button>
+	</div>
+	<!-- #endregion -->
+</p-dialog>

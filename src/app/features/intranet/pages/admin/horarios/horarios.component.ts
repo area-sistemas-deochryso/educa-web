@@ -1,14 +1,12 @@
 import { ChangeDetectionStrategy, Component, OnInit, computed, inject } from '@angular/core';
 
-import { BadgeModule } from 'primeng/badge';
 import { ButtonModule } from 'primeng/button';
 import { CommonModule } from '@angular/common';
 import { ConfirmDialogModule } from 'primeng/confirmdialog';
 import { ConfirmationService } from 'primeng/api';
-import { DialogModule } from 'primeng/dialog';
-import { FormsModule } from '@angular/forms';
-import { CursoOption } from './models/curso.interface';
 import { HorarioDetailDrawerComponent } from './components/horario-detail-drawer/horario-detail-drawer.component';
+import { HorariosCursoPickerComponent } from './components/horarios-curso-picker/horarios-curso-picker.component';
+import { HorariosFormDialogComponent } from './components/horarios-form-dialog/horarios-form-dialog.component';
 import { PageHeaderComponent } from '@shared/components';
 import { type DiaSemana, HorarioResponseDto, type HorarioVistaType } from './models/horario.interface';
 import { HorariosCrudFacade, HorariosDataFacade, HorariosUiFacade } from './services';
@@ -17,10 +15,6 @@ import { HorariosListViewComponent } from './components/horarios-list-view/horar
 import { HorariosStatsSkeletonComponent } from './components/horarios-stats-skeleton/horarios-stats-skeleton.component';
 import { HorariosTableSkeletonComponent } from './components/horarios-table-skeleton/horarios-table-skeleton.component';
 import { HorariosWeeklyViewComponent } from './components/horarios-weekly-view/horarios-weekly-view.component';
-import { InputTextModule } from 'primeng/inputtext';
-import { ProgressSpinnerModule } from 'primeng/progressspinner';
-import { SelectModule } from 'primeng/select';
-import { Tab, TabList, TabPanel, Tabs } from 'primeng/tabs';
 import { TagModule } from 'primeng/tag';
 import { TooltipModule } from 'primeng/tooltip';
 import { logger } from '@core/helpers';
@@ -37,22 +31,14 @@ import {
 	standalone: true,
 	imports: [
 		CommonModule,
-		FormsModule,
-		BadgeModule,
 		ButtonModule,
 		ConfirmDialogModule,
-		DialogModule,
-		InputTextModule,
-		ProgressSpinnerModule,
-		SelectModule,
-		Tabs,
-		TabList,
-		Tab,
-		TabPanel,
 		TagModule,
 		TooltipModule,
 		HorarioDetailDrawerComponent,
+		HorariosCursoPickerComponent,
 		HorariosFiltersComponent,
+		HorariosFormDialogComponent,
 		HorariosListViewComponent,
 		HorariosStatsSkeletonComponent,
 		HorariosTableSkeletonComponent,
@@ -311,10 +297,6 @@ export class HorariosComponent implements OnInit {
 	// #region Helpers para template
 	trackByHorarioId(_index: number, horario: HorarioResponseDto): number {
 		return horario.id;
-	}
-
-	trackByCursoId(_index: number, curso: CursoOption): number {
-		return curso.value;
 	}
 
 	// #endregion

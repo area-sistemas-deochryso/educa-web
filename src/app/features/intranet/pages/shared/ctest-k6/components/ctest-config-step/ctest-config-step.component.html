@@ -1,0 +1,165 @@
+<div class="wizard-step-content">
+	<h3><i class="pi pi-cog"></i> Configuración del Test</h3>
+
+	<!-- #region Name & Base URL -->
+	<div class="form-grid-2col">
+		<div class="field">
+			<label for="test-name">Nombre del Test</label>
+			<input
+				id="test-name"
+				type="text"
+				pInputText
+				placeholder="test-concurrencia-500"
+				[ngModel]="vm().config.testName"
+				(ngModelChange)="onTestNameChange($event)"
+				[style]="{ width: '100%' }"
+				pTooltip="Nombre descriptivo para identificar el test en los reportes de k6"
+				tooltipPosition="top"
+			/>
+		</div>
+
+		<div class="field">
+			<label for="base-url">URL Base</label>
+			<p-select
+				id="base-url"
+				[options]="baseUrlOptions"
+				optionLabel="label"
+				optionValue="value"
+				[ngModel]="vm().config.baseUrl"
+				(ngModelChange)="onBaseUrlChange($event)"
+				appendTo="body"
+				[style]="{ width: '100%' }"
+				pTooltip="URL del servidor. Local para desarrollo, Producción para pruebas reales"
+				tooltipPosition="top"
+			/>
+		</div>
+	</div>
+	<!-- #endregion -->
+
+	<!-- #region Test Type, VUs, Duration -->
+	<div class="form-grid-3col">
+		<div class="field">
+			<label for="test-type">Tipo de Test</label>
+			<p-select
+				id="test-type"
+				[options]="testTypeOptions"
+				optionLabel="label"
+				optionValue="value"
+				[ngModel]="vm().config.testType"
+				(ngModelChange)="onTestTypeChange($event)"
+				appendTo="body"
+				placeholder="Seleccionar tipo"
+				[style]="{ width: '100%' }"
+				pTooltip="Cada tipo preconfigura VUs, duración y stages. Selecciona uno para auto-rellenar"
+				tooltipPosition="top"
+			>
+				<ng-template let-item #item>
+					<div class="type-option">
+						<i [class]="item.icon"></i>
+						<div>
+							<span class="type-label">{{ item.label }}</span>
+							<span class="type-tooltip">{{ item.tooltip }}</span>
+						</div>
+					</div>
+				</ng-template>
+			</p-select>
+		</div>
+
+		<div class="field">
+			<label for="vus">Usuarios Virtuales (VUs)</label>
+			<p-inputNumber
+				id="vus"
+				[ngModel]="vm().config.vus"
+				(ngModelChange)="onVusChange($event)"
+				[min]="1"
+				[max]="10000"
+				[style]="{ width: '100%' }"
+				pTooltip="Usuarios virtuales = hilos concurrentes. 500 VUs ≈ 500 alumnos simultáneos"
+				tooltipPosition="top"
+			/>
+		</div>
+
+		<div class="field">
+			<label for="duration">Duración</label>
+			<input
+				id="duration"
+				type="text"
+				pInputText
+				placeholder="3m"
+				[ngModel]="vm().config.duration"
+				(ngModelChange)="onDurationChange($event)"
+				[style]="{ width: '100%' }"
+				pTooltip="Duración total del test. Formato: 30s, 1m, 5m, 1h. Solo aplica si no usa stages"
+				tooltipPosition="top"
+			/>
+		</div>
+	</div>
+	<!-- #endregion -->
+
+	<!-- #region Thresholds -->
+	<div class="form-grid-2col">
+		<div class="field">
+			<label for="p95">Latencia p95 (ms)</label>
+			<p-inputNumber
+				id="p95"
+				[ngModel]="vm().config.thresholds.p95Latency"
+				(ngModelChange)="onP95Change($event)"
+				[min]="100"
+				[max]="30000"
+				suffix=" ms"
+				[style]="{ width: '100%' }"
+				pTooltip="95% de las peticiones deben completarse en menos de este tiempo (ms)"
+				tooltipPosition="top"
+			/>
+		</div>
+
+		<div class="field">
+			<label for="error-rate">Error Rate máximo (%)</label>
+			<p-inputNumber
+				id="error-rate"
+				[ngModel]="vm().config.thresholds.errorRate"
+				(ngModelChange)="onErrorRateChange($event)"
+				[min]="0"
+				[max]="100"
+				suffix=" %"
+				[style]="{ width: '100%' }"
+				pTooltip="Porcentaje máximo aceptable de peticiones fallidas"
+				tooltipPosition="top"
+			/>
+		</div>
+	</div>
+	<!-- #endregion -->
+
+	<!-- #region Credentials Button -->
+	<button
+		pButton
+		[label]="
+			vm().hasCredentials
+				? 'Credenciales (' + vm().credentials.length + ')'
+				: 'Configurar Credenciales'
+		"
+		icon="pi pi-lock"
+		[class]="
+			vm().hasCredentials
+				? 'p-button-success w-full'
+				: 'p-button-outlined w-full'
+		"
+		(click)="onOpenCredentials()"
+		pTooltip="Tokens de autenticación reales para simular usuarios con diferentes roles"
+		tooltipPosition="top"
+	></button>
+	<!-- #endregion -->
+
+	<!-- #region Footer -->
+	<div class="step-footer">
+		<div class="step-spacer"></div>
+		<button
+			pButton
+			label="Siguiente"
+			icon="pi pi-arrow-right"
+			iconPos="right"
+			(click)="onGoNext()"
+		></button>
+	</div>
+	<!-- #endregion -->
+</div>

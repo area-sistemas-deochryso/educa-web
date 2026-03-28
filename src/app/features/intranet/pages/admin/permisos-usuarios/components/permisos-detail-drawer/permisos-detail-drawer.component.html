@@ -1,0 +1,93 @@
+<!-- #region Detail Drawer -->
+<p-drawer
+	[visible]="visible()"
+	(visibleChange)="onVisibleChange($event)"
+	position="right"
+	[style]="{ width: '500px' }"
+	[modal]="true"
+>
+	<ng-template pTemplate="header">
+		<div class="drawer-header">
+			<span
+				>Usuario:
+				{{ permiso()?.nombreUsuario || 'ID ' + permiso()?.usuarioId }}</span
+			>
+		</div>
+	</ng-template>
+
+	@if (permiso()) {
+		<div class="detail-content">
+			<!-- Info Summary -->
+			<div class="detail-summary">
+				<div class="summary-item">
+					<span class="summary-label">Usuario</span>
+					<span class="summary-value">{{
+						permiso()?.nombreUsuario || 'ID ' + permiso()?.usuarioId
+					}}</span>
+				</div>
+				<div class="summary-item">
+					<span class="summary-label">Rol</span>
+					<p-tag
+						[value]="permiso()?.rol || ''"
+						[severity]="uiMapping.getRolSeverity(permiso()?.rol || '')"
+					/>
+				</div>
+				<div class="summary-item">
+					<span class="summary-label">Permisos</span>
+					<span class="summary-value"
+						>{{ permiso()?.vistas?.length }} vistas en
+						{{ uiMapping.getModulosCount(permiso()?.vistas || []) }}
+						modulos</span
+					>
+				</div>
+			</div>
+
+			<!-- Modules and Views -->
+			<div class="detail-modules">
+				<h3>Modulos y Vistas</h3>
+				@for (modulo of moduloVistas(); track modulo.nombre) {
+					<div class="module-group">
+						<div class="module-header">
+							<i class="pi pi-folder"></i>
+							<span class="module-name">{{ modulo.nombre }}</span>
+							<span class="module-count">{{ modulo.vistas.length }} vistas</span>
+						</div>
+						<div class="module-vistas">
+							@for (vista of modulo.vistas; track vista.id) {
+								<div class="vista-item">
+									<i class="pi pi-check-circle"></i>
+									<div class="vista-info">
+										<span class="vista-nombre">{{ vista.nombre }}</span>
+										<span class="vista-ruta">{{ vista.ruta }}</span>
+									</div>
+								</div>
+							}
+						</div>
+					</div>
+				}
+			</div>
+		</div>
+
+		<div class="drawer-footer">
+			<button
+				pButton
+				type="button"
+				label="Cerrar"
+				icon="pi pi-times"
+				class="p-button-text"
+				aria-label="Cerrar detalle"
+				(click)="onClose()"
+			></button>
+			<button
+				pButton
+				type="button"
+				label="Editar Permisos"
+				icon="pi pi-pencil"
+				class="p-button-primary"
+				aria-label="Editar permisos"
+				(click)="onEdit()"
+			></button>
+		</div>
+	}
+</p-drawer>
+<!-- #endregion -->

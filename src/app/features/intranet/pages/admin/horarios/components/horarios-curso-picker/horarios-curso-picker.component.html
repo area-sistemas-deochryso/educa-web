@@ -1,0 +1,164 @@
+<!-- #region Modal de Seleccion de Cursos por Nivel -->
+<p-dialog
+	[visible]="visible()"
+	(visibleChange)="onVisibleChange($event)"
+	[modal]="true"
+	[closable]="true"
+	[draggable]="false"
+	[resizable]="false"
+	styleClass="curso-selection-dialog"
+	[style]="{ width: '90vw', 'max-width': '800px' }"
+>
+	<ng-template pTemplate="header">
+		<div class="flex align-items-center gap-2">
+			<i class="pi pi-book text-primary" style="font-size: 1.5rem"></i>
+			<span class="text-xl font-semibold">Seleccionar Curso por Nivel Educativo</span>
+		</div>
+	</ng-template>
+
+	<div class="curso-selection-content">
+		@if (loading()) {
+			<div class="flex justify-content-center align-items-center p-5">
+				<p-progressSpinner />
+			</div>
+		} @else {
+			<p-tabs value="inicial">
+				<p-tablist>
+					<p-tab value="inicial">
+						<i class="pi pi-sun"></i>
+						<span>Inicial</span>
+						<p-badge [value]="cursosPorNivel().inicial.length.toString()" />
+					</p-tab>
+					<p-tab value="primaria">
+						<i class="pi pi-pencil"></i>
+						<span>Primaria</span>
+						<p-badge [value]="cursosPorNivel().primaria.length.toString()" />
+					</p-tab>
+					<p-tab value="secundaria">
+						<i class="pi pi-graduation-cap"></i>
+						<span>Secundaria</span>
+						<p-badge [value]="cursosPorNivel().secundaria.length.toString()" />
+					</p-tab>
+				</p-tablist>
+
+				<!-- Panel: Inicial -->
+				<p-tabpanel value="inicial">
+					@if (cursosPorNivel().inicial.length === 0) {
+						<div class="text-center p-4 text-color-secondary">
+							<i class="pi pi-info-circle" style="font-size: 2rem"></i>
+							<p class="mt-2">No hay cursos disponibles para Inicial</p>
+						</div>
+					} @else {
+						<div class="curso-grid">
+							@for (
+								curso of cursosPorNivel().inicial;
+								track trackByCursoId($index, curso)
+							) {
+								<div
+									class="curso-card"
+									[class.selected]="selectedCursoId() === curso.value"
+									(click)="onSelectCurso(curso.value)"
+								>
+									<div class="curso-card-content">
+										<i class="pi pi-book curso-icon"></i>
+										<h4 class="curso-nombre">{{ curso.label }}</h4>
+										<p class="curso-grados">{{ curso.grados.join(', ') }}</p>
+									</div>
+									@if (selectedCursoId() === curso.value) {
+										<i class="pi pi-check-circle curso-selected-icon"></i>
+									}
+								</div>
+							}
+						</div>
+					}
+				</p-tabpanel>
+
+				<!-- Panel: Primaria -->
+				<p-tabpanel value="primaria">
+					@if (cursosPorNivel().primaria.length === 0) {
+						<div class="text-center p-4 text-color-secondary">
+							<i class="pi pi-info-circle" style="font-size: 2rem"></i>
+							<p class="mt-2">No hay cursos disponibles para Primaria</p>
+						</div>
+					} @else {
+						<div class="curso-grid">
+							@for (
+								curso of cursosPorNivel().primaria;
+								track trackByCursoId($index, curso)
+							) {
+								<div
+									class="curso-card"
+									[class.selected]="selectedCursoId() === curso.value"
+									(click)="onSelectCurso(curso.value)"
+								>
+									<div class="curso-card-content">
+										<i class="pi pi-book curso-icon"></i>
+										<h4 class="curso-nombre">{{ curso.label }}</h4>
+										<p class="curso-grados">{{ curso.grados.join(', ') }}</p>
+									</div>
+									@if (selectedCursoId() === curso.value) {
+										<i class="pi pi-check-circle curso-selected-icon"></i>
+									}
+								</div>
+							}
+						</div>
+					}
+				</p-tabpanel>
+
+				<!-- Panel: Secundaria -->
+				<p-tabpanel value="secundaria">
+					@if (cursosPorNivel().secundaria.length === 0) {
+						<div class="text-center p-4 text-color-secondary">
+							<i class="pi pi-info-circle" style="font-size: 2rem"></i>
+							<p class="mt-2">No hay cursos disponibles para Secundaria</p>
+						</div>
+					} @else {
+						<div class="curso-grid">
+							@for (
+								curso of cursosPorNivel().secundaria;
+								track trackByCursoId($index, curso)
+							) {
+								<div
+									class="curso-card"
+									[class.selected]="selectedCursoId() === curso.value"
+									(click)="onSelectCurso(curso.value)"
+								>
+									<div class="curso-card-content">
+										<i class="pi pi-book curso-icon"></i>
+										<h4 class="curso-nombre">{{ curso.label }}</h4>
+										<p class="curso-grados">{{ curso.grados.join(', ') }}</p>
+									</div>
+									@if (selectedCursoId() === curso.value) {
+										<i class="pi pi-check-circle curso-selected-icon"></i>
+									}
+								</div>
+							}
+						</div>
+					}
+				</p-tabpanel>
+			</p-tabs>
+		}
+	</div>
+
+	<ng-template pTemplate="footer">
+		<button
+			pButton
+			label="Cancelar"
+			icon="pi pi-times"
+			class="p-button-text"
+			(click)="onCancel()"
+			pTooltip="Cerrar sin seleccionar curso"
+			tooltipPosition="top"
+		></button>
+		<button
+			pButton
+			label="Confirmar"
+			icon="pi pi-check"
+			[disabled]="!selectedCursoId()"
+			(click)="onConfirm()"
+			pTooltip="Confirmar seleccion de curso"
+			tooltipPosition="top"
+		></button>
+	</ng-template>
+</p-dialog>
+<!-- #endregion -->

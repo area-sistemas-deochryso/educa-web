@@ -254,8 +254,8 @@ describe('HorariosStore', () => {
 
 		it('should compute hora errors', () => {
 			store.setFormData({ horaInicio: '10:00', horaFin: '09:00' });
-			expect(store.horaInicioError()).toBe('Hora inicio debe ser menor a hora fin');
-			expect(store.horaFinError()).toBe('Hora fin debe ser mayor a hora inicio');
+			expect(store.horaInicioError()).toBe('La hora de fin debe ser posterior a la hora de inicio');
+			expect(store.horaFinError()).toBe('La hora de fin debe ser posterior a la hora de inicio');
 		});
 	});
 	// #endregion

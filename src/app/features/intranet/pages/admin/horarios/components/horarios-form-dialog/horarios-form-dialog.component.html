@@ -1,0 +1,185 @@
+<!-- #region Dialog: Crear/Editar Horario -->
+<p-dialog
+	[visible]="visible()"
+	(visibleChange)="onVisibleChange($event)"
+	[header]="isEditing() ? 'Editar Horario' : 'Crear Horario'"
+	[modal]="true"
+	[style]="{ width: '600px' }"
+	[draggable]="false"
+	[resizable]="false"
+>
+	<div class="dialog-content">
+		<div class="form-grid">
+			<!-- Dia de la semana -->
+			<div class="form-field">
+				<label for="diaSemana">Dia de la semana *</label>
+				<p-select
+					id="diaSemana"
+					[(ngModel)]="formData().diaSemana"
+					[options]="diasOptions"
+					placeholder="Seleccionar dia"
+					optionLabel="label"
+					optionValue="value"
+					appendTo="body"
+					class="w-full"
+				/>
+			</div>
+
+			<!-- Hora inicio -->
+			<div class="form-field">
+				<label for="horaInicio">Hora inicio *</label>
+				<input
+					id="horaInicio"
+					type="time"
+					pInputText
+					[(ngModel)]="formData().horaInicio"
+					class="w-full"
+				/>
+			</div>
+
+			<!-- Hora fin -->
+			<div class="form-field">
+				<label for="horaFin">Hora fin *</label>
+				<input
+					id="horaFin"
+					type="time"
+					pInputText
+					[(ngModel)]="formData().horaFin"
+					class="w-full"
+				/>
+			</div>
+
+			<!-- Salon -->
+			<div class="form-field full-width">
+				<label for="salon">Salon *</label>
+				<p-select
+					id="salon"
+					[(ngModel)]="formData().salonId"
+					[options]="salonesOptions()"
+					placeholder="Seleccionar salon disponible"
+					optionLabel="label"
+					optionValue="value"
+					appendTo="body"
+					class="w-full"
+					[filter]="true"
+					filterPlaceholder="Buscar salon..."
+					[loading]="optionsLoading()"
+					[disabled]="optionsLoading()"
+				>
+					<ng-template pTemplate="selectedItem" let-option>
+						@if (option) {
+							<div class="flex align-items-center gap-2">
+								<i class="pi pi-home"></i>
+								<span>{{ option.label }}</span>
+							</div>
+						}
+					</ng-template>
+					<ng-template pTemplate="item" let-option>
+						<div class="flex flex-column" style="gap: 0.75rem; padding: 0.5rem 0">
+							<div class="flex align-items-center gap-2">
+								<i class="pi pi-home" style="font-size: 1.1rem"></i>
+								<span class="font-semibold" style="font-size: 1rem">{{
+									option.label
+								}}</span>
+							</div>
+							<div
+								class="flex flex-column"
+								style="gap: 0.5rem; padding-left: 0.25rem"
+							>
+								<small
+									class="text-color-secondary"
+									style="display: flex; align-items: center; gap: 0.5rem"
+								>
+									<i class="pi pi-tag" style="font-size: 0.8rem"></i>
+									<span>{{ option.grado }} {{ option.seccion }}</span>
+								</small>
+								<small
+									class="text-color-secondary"
+									style="display: flex; align-items: center; gap: 0.5rem"
+								>
+									<i class="pi pi-building" style="font-size: 0.8rem"></i>
+									<span>{{ option.sede }}</span>
+								</small>
+								<small
+									class="text-color-secondary"
+									style="display: flex; align-items: center; gap: 0.5rem"
+								>
+									<i class="pi pi-users" style="font-size: 0.8rem"></i>
+									<span>{{ option.totalEstudiantes }} estudiantes</span>
+								</small>
+							</div>
+						</div>
+					</ng-template>
+				</p-select>
+				@if (formData().diaSemana && formData().horaInicio && formData().horaFin) {
+					<small class="text-muted">
+						<i class="pi pi-info-circle"></i>
+						Mostrando solo salones disponibles para el dia y horario seleccionado
+					</small>
+				}
+			</div>
+
+			<!-- Curso - Boton para abrir modal de seleccion -->
+			<div class="form-field full-width">
+				<label for="curso">Curso *</label>
+				<div class="flex gap-2">
+					<button
+						pButton
+						type="button"
+						[label]="cursoSeleccionadoLabel()"
+						icon="pi pi-book"
+						class="p-button-outlined w-full justify-content-start"
+						(click)="onOpenCursoDialog()"
+						[disabled]="optionsLoading()"
+						pTooltip="Seleccionar curso organizados por nivel educativo"
+						tooltipPosition="top"
+					></button>
+					@if (formData().cursoId) {
+						<button
+							pButton
+							type="button"
+							icon="pi pi-times"
+							class="p-button-text p-button-danger"
+							(click)="onClearCurso()"
+							pTooltip="Limpiar seleccion de curso"
+							tooltipPosition="top"
+							[pt]="{
+								root: {
+									'aria-label': 'Limpiar seleccion',
+								},
+							}"
+						></button>
+					}
+				</div>
+				@if (formData().cursoId) {
+					<small class="text-color-secondary mt-1">
+						<i class="pi pi-tag"></i>
+						{{ cursoSeleccionadoNiveles() }}
+					</small>
+				}
+			</div>
+		</div>
+	</div>
+
+	<ng-template pTemplate="footer">
+		<button
+			pButton
+			label="Cancelar"
+			icon="pi pi-times"
+			class="p-button-text"
+			(click)="onCancel()"
+			pTooltip="Cerrar sin guardar cambios"
+			tooltipPosition="top"
+		></button>
+		<button
+			pButton
+			[label]="isEditing() ? 'Actualizar' : 'Crear'"
+			icon="pi pi-check"
+			(click)="onSave()"
+			[disabled]="!formValid()"
+			[pTooltip]="isEditing() ? 'Guardar cambios del horario' : 'Crear nuevo horario'"
+			tooltipPosition="top"
+		></button>
+	</ng-template>
+</p-dialog>
+<!-- #endregion -->

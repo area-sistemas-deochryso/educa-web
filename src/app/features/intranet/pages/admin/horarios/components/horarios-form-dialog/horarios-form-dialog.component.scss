@@ -1,0 +1,120 @@
+// #region Dialog Content
+.dialog-content {
+	padding: 1rem 0;
+
+	.form-grid {
+		display: grid;
+		grid-template-columns: 1fr 1fr;
+		gap: 1.5rem;
+
+		.form-field {
+			display: flex;
+			flex-direction: column;
+			gap: 0.5rem;
+
+			label {
+				font-size: 0.9rem;
+				font-weight: 600;
+				color: var(--text-color);
+			}
+
+			&.full-width {
+				grid-column: 1 / -1;
+			}
+
+			small.text-muted {
+				font-size: 0.8rem;
+				color: var(--text-color-secondary);
+				display: flex;
+				align-items: center;
+				gap: 0.5rem;
+				margin-top: 0.25rem;
+
+				i {
+					font-size: 0.75rem;
+				}
+			}
+		}
+
+		// Estilos para los ng-templates de los dropdowns
+		::ng-deep {
+			.flex {
+				display: flex;
+			}
+
+			.flex-column {
+				flex-direction: column;
+			}
+
+			.align-items-center {
+				align-items: center;
+			}
+
+			.gap-1 {
+				gap: 0.25rem;
+			}
+
+			.gap-2 {
+				gap: 0.5rem;
+			}
+
+			.font-semibold {
+				font-weight: 600;
+			}
+
+			.text-color-secondary {
+				color: var(--text-color-secondary);
+			}
+
+			.ml-2 {
+				margin-left: 0.5rem;
+			}
+
+			// Estilos para los items del dropdown
+			.p-select-option {
+				padding: 0.75rem 1rem;
+			}
+
+			.p-select-filter-container {
+				padding: 0.5rem;
+			}
+
+			.p-select-loading-icon {
+				font-size: 1rem;
+			}
+		}
+
+		@media (max-width: 600px) {
+			grid-template-columns: 1fr;
+		}
+	}
+}
+// #endregion
+
+// #region Overrides PrimeNG
+:host ::ng-deep {
+	.p-inputtext,
+	.p-select {
+		background: transparent;
+		color: var(--text-color);
+		border-color: var(--surface-300);
+
+		&::placeholder {
+			color: var(--text-color-secondary);
+		}
+
+		&:enabled:focus {
+			border-color: var(--text-color);
+			box-shadow: 0 0 0 1px var(--text-color);
+		}
+	}
+
+	.p-select-label {
+		color: var(--text-color);
+	}
+
+	.p-select-dropdown {
+		color: var(--text-color);
+	}
+}
+// #endregion

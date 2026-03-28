@@ -1,8 +1,10 @@
 // #region Imports
-import { describe, it, expect, beforeEach } from 'vitest';
+import { describe, it, expect, beforeEach, vi } from 'vitest';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { testProviders } from '@test';
+import { of } from 'rxjs';
 import { CalendaryComponent } from './calendary.component';
+import { EventosCalendarioService } from '@features/intranet/pages/admin/eventos-calendario/services';
 
 // #endregion
 // #region Implementation
@@ -11,9 +13,16 @@ describe('CalendaryComponent', () => {
 	let fixture: ComponentFixture<CalendaryComponent>;
 
 	beforeEach(async () => {
+		const eventosServiceMock = {
+			getActivosPorAnio: vi.fn().mockReturnValue(of([])),
+		};
+
 		await TestBed.configureTestingModule({
 			imports: [CalendaryComponent],
-			providers: testProviders,
+			providers: [
+				...testProviders,
+				{ provide: EventosCalendarioService, useValue: eventosServiceMock },
+			],
 		}).compileComponents();
 
 		fixture = TestBed.createComponent(CalendaryComponent);

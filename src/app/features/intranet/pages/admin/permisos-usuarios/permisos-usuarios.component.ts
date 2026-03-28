@@ -4,19 +4,11 @@ import { CommonModule } from '@angular/common';
 
 import { TableModule } from 'primeng/table';
 import { ButtonModule } from 'primeng/button';
-import { DialogModule } from 'primeng/dialog';
 import { TooltipModule } from 'primeng/tooltip';
 import { TagModule } from 'primeng/tag';
 import { ProgressSpinnerModule } from 'primeng/progressspinner';
 import { SelectModule } from 'primeng/select';
 import { InputTextModule } from 'primeng/inputtext';
-import { CheckboxModule } from 'primeng/checkbox';
-import { DrawerModule } from 'primeng/drawer';
-import {
-	AutoCompleteModule,
-	AutoCompleteCompleteEvent,
-	AutoCompleteSelectEvent,
-} from 'primeng/autocomplete';
 import { ConfirmationService } from 'primeng/api';
 import { ConfirmDialogModule } from 'primeng/confirmdialog';
 
@@ -24,7 +16,6 @@ import {
 	PermisoUsuario,
 	ROLES_DISPONIBLES_ADMIN,
 	RolTipoAdmin,
-	UsuarioBusqueda,
 } from '@core/services';
 import {
 	UI_CONFIRM_HEADERS,
@@ -34,6 +25,9 @@ import {
 import { PageHeaderComponent } from '@shared/components';
 import { withAllOption } from '@shared/models';
 import { PermisosUsuariosFacade } from './services/permisos-usuarios.facade';
+import { PermisosStatsCardsComponent } from './components/permisos-stats-cards/permisos-stats-cards.component';
+import { PermisosDetailDrawerComponent } from './components/permisos-detail-drawer/permisos-detail-drawer.component';
+import { PermisosEditDialogComponent } from './components/permisos-edit-dialog/permisos-edit-dialog.component';
 
 @Component({
 	selector: 'app-permisos-usuarios',
@@ -43,17 +37,16 @@ import { PermisosUsuariosFacade } from './services/permisos-usuarios.facade';
 		FormsModule,
 		TableModule,
 		ButtonModule,
-		DialogModule,
 		TooltipModule,
 		TagModule,
 		ProgressSpinnerModule,
 		SelectModule,
 		InputTextModule,
-		CheckboxModule,
-		DrawerModule,
-		AutoCompleteModule,
 		ConfirmDialogModule,
 		PageHeaderComponent,
+		PermisosStatsCardsComponent,
+		PermisosDetailDrawerComponent,
+		PermisosEditDialogComponent,
 	],
 	providers: [ConfirmationService],
 	templateUrl: './permisos-usuarios.component.html',
@@ -64,47 +57,34 @@ export class PermisosUsuariosComponent implements OnInit {
 	private facade = inject(PermisosUsuariosFacade);
 	private confirmationService = inject(ConfirmationService);
 
-	// * Facade state (signals)
+	// #region Facade state (signals)
 	readonly permisosUsuario = this.facade.permisosUsuario;
 	readonly vistas = this.facade.vistas;
 	readonly loading = this.facade.loading;
 	readonly dialogVisible = this.facade.dialogVisible;
 	readonly detailDrawerVisible = this.facade.detailDrawerVisible;
-	readonly isEditing = this.facade.isEditing;
 	readonly selectedPermiso = this.facade.selectedPermiso;
-	readonly selectedUsuarioId = this.facade.selectedUsuarioId;
-	readonly selectedRol = this.facade.selectedRol;
-	readonly selectedVistas = this.facade.selectedVistas;
 	readonly searchTerm = this.facade.searchTerm;
 	readonly filterRol = this.facade.filterRol;
-	readonly modulosVistas = this.facade.modulosVistas;
-	readonly activeModuloIndex = this.facade.activeModuloIndex;
-	readonly vistasBusqueda = this.facade.vistasBusqueda;
 	readonly uiMapping = this.facade.uiMapping;
+	// #endregion
 
-	// * Computed from facade
+	// #region Computed from facade
 	readonly totalUsuarios = this.facade.totalUsuarios;
 	readonly totalModulos = this.facade.totalModulos;
 	readonly filteredPermisos = this.facade.filteredPermisos;
-	readonly vistasFiltradas = this.facade.vistasFiltradas;
-	readonly vistasCountLabel = this.facade.vistasCountLabel;
 	readonly moduloVistasForDetail = this.facade.moduloVistasForDetail;
-	readonly isAllModuloSelected = this.facade.isAllModuloSelected;
+	// #endregion
 
-	// * Autocomplete
-	readonly usuariosSugeridos = this.facade.usuariosSugeridos;
-	selectedUsuario: UsuarioBusqueda | null = null;
-
-	// Options (sin Apoderado para admin)
+	// #region Options
 	rolesDisponibles = ROLES_DISPONIBLES_ADMIN;
 	rolesOptions = withAllOption(
 		ROLES_DISPONIBLES_ADMIN.map((r) => ({ label: r, value: r })),
 		'Todos los roles',
 	);
-	rolesSelectOptions = ROLES_DISPONIBLES_ADMIN.map((r) => ({ label: r, value: r }));
+	// #endregion
 
 	ngOnInit(): void {
-		// * Initial load
 		this.facade.loadData();
 	}
 
@@ -116,40 +96,31 @@ export class PermisosUsuariosComponent implements OnInit {
 	clearFilters(): void {
 		this.facade.clearFilters();
 	}
-
 	// #endregion
+
 	// #region Detail Drawer
 	openDetail(permiso: PermisoUsuario): void {
 		this.facade.openDetail(permiso);
 	}
 
-	/**
-	 * Handler para sincronizar estado del drawer
-	 * Se dispara cuando se cierra por cualquier medio: X, ESC, backdrop
-	 */
 	onDrawerVisibleChange(visible: boolean): void {
 		if (!visible) {
 			this.facade.closeDetail();
 		}
 	}
 
-	closeDetail(): void {
-		this.facade.closeDetail();
+	editFromDetail(): void {
+		this.facade.editFromDetail();
 	}
-
 	// #endregion
+
 	// #region Edit Dialog
 	openNew(): void {
-		this.selectedUsuario = null;
 		this.facade.openNew();
 	}
 
 	editPermiso(permiso: PermisoUsuario): void {
 		this.facade.editPermiso(permiso);
-	}
-
-	editFromDetail(): void {
-		this.facade.editFromDetail();
 	}
 
 	hideDialog(): void {
@@ -161,7 +132,6 @@ export class PermisosUsuariosComponent implements OnInit {
 	}
 
 	deletePermiso(permiso: PermisoUsuario): void {
-		// ! Confirm delete with explicit user/role context.
 		const nombre = permiso.nombreUsuario || `ID: ${permiso.usuarioId}`;
 		const mensaje = buildDeletePermisosUsuarioMessage(nombre, permiso.rol);
 
@@ -177,47 +147,8 @@ export class PermisosUsuariosComponent implements OnInit {
 			},
 		});
 	}
-
 	// #endregion
-	// #region Rol & Vistas
-	loadVistasFromRol(): void {
-		this.selectedUsuario = null;
-		this.facade.loadVistasFromRol();
-	}
 
-	// #endregion
-	// #region Autocomplete Usuarios
-	buscarUsuarios(event: AutoCompleteCompleteEvent): void {
-		const termino = event.query?.trim() || '';
-		this.facade.searchUsuarios(termino);
-	}
-
-	onUsuarioSeleccionado(event: AutoCompleteSelectEvent): void {
-		const usuario = event.value as UsuarioBusqueda;
-		this.selectedUsuario = usuario;
-		this.facade.setSelectedUsuarioId(usuario.id);
-	}
-
-	onUsuarioClear(): void {
-		this.selectedUsuario = null;
-		this.facade.setSelectedUsuarioId(null);
-	}
-
-	// #endregion
-	// #region Vista Selection
-	isVistaSelected(ruta: string): boolean {
-		return this.facade.isVistaSelected(ruta);
-	}
-
-	toggleVista(ruta: string): void {
-		this.facade.toggleVista(ruta);
-	}
-
-	toggleAllVistasModulo(): void {
-		this.facade.toggleAllVistasModulo();
-	}
-
-	// #endregion
 	// #region UI Helpers (bindings bidireccionales)
 	onSearchTermChange(term: string): void {
 		this.facade.setSearchTerm(term);
@@ -225,18 +156,6 @@ export class PermisosUsuariosComponent implements OnInit {
 
 	onFilterRolChange(rol: RolTipoAdmin | null): void {
 		this.facade.setFilterRol(rol);
-	}
-
-	onSelectedRolChange(rol: RolTipoAdmin | null): void {
-		this.facade.setSelectedRol(rol);
-	}
-
-	onActiveModuloIndexChange(index: number): void {
-		this.facade.setActiveModuloIndex(index);
-	}
-
-	onVistasBusquedaChange(term: string): void {
-		this.facade.setVistasBusqueda(term);
 	}
 	// #endregion
 }

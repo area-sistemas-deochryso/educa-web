@@ -161,5 +161,10 @@ export class CursoContenidoUiFacade {
 		this.store.setInitialTab(null);
 	}
 
+	/** Set the active semana ID for tarea creation/editing context. */
+	setActiveSemanaId(id: number | null): void {
+		this.store.setActiveSemanaId(id);
+	}
+
 	// #endregion
 }

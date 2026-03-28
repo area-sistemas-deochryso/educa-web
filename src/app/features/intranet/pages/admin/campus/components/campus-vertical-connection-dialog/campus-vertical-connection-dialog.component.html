@@ -1,0 +1,154 @@
+<p-dialog
+	[visible]="visible()"
+	(visibleChange)="onVisibleChange($event)"
+	[modal]="true"
+	[closable]="true"
+	[showHeader]="false"
+	[style]="{ width: '480px' }"
+>
+	<!-- #region Header -->
+	<div class="piso-dialog-header">
+		<div class="piso-dialog-icon">
+			<i class="pi pi-arrows-v"></i>
+		</div>
+		<div class="piso-dialog-title">
+			<h3>Nueva Conexion Vertical</h3>
+			<p>Conecta un nodo de este piso con un nodo de otro piso</p>
+		</div>
+	</div>
+	<!-- #endregion -->
+
+	<!-- #region Form -->
+	<div class="piso-dialog-form">
+		<div class="form-field">
+			<label for="verticalTipo">
+				<i class="pi pi-th-large"></i>
+				Tipo de conexion
+			</label>
+			<p-select
+				id="verticalTipo"
+				[options]="typeOptions()"
+				[ngModel]="formData().tipo"
+				(ngModelChange)="onTipoChange($event)"
+				optionLabel="label"
+				optionValue="value"
+				appendTo="body"
+			/>
+		</div>
+
+		<div class="form-field">
+			<label for="verticalDestPiso">
+				<i class="pi pi-building"></i>
+				Piso destino
+			</label>
+			<p-select
+				id="verticalDestPiso"
+				[options]="otherPisos()"
+				[ngModel]="formData().destPisoId"
+				(ngModelChange)="onDestPisoChange($event)"
+				optionLabel="nombre"
+				optionValue="id"
+				appendTo="body"
+				placeholder="Selecciona un piso"
+			/>
+		</div>
+
+		@if (formData().destPisoId) {
+			<div class="form-field">
+				<label for="verticalDestNodo">
+					<i class="pi pi-map-marker"></i>
+					Nodo destino
+				</label>
+				@if (destPisoLoading()) {
+					<div class="loading-hint">
+						<i class="pi pi-spin pi-spinner"></i>
+						Cargando nodos...
+					</div>
+				} @else {
+					<p-select
+						id="verticalDestNodo"
+						[options]="destPisoNodos()"
+						[ngModel]="formData().destNodoId"
+						(ngModelChange)="onDestNodoChange($event)"
+						optionLabel="etiqueta"
+						optionValue="id"
+						appendTo="body"
+						placeholder="Selecciona un nodo"
+					>
+						<ng-template let-node pTemplate="item">
+							<span>{{ node.etiqueta || node.tipo }} ({{ node.x | number: '1.0-0' }}, {{ node.y | number: '1.0-0' }})</span>
+						</ng-template>
+						<ng-template let-node pTemplate="selectedItem">
+							<span>{{ node.etiqueta || node.tipo }}</span>
+						</ng-template>
+					</p-select>
+				}
+			</div>
+		}
+
+		<div class="form-row">
+			<div class="form-field">
+				<label for="verticalPesoSubida">
+					<i class="pi pi-arrow-up"></i>
+					Peso subida
+				</label>
+				<p-inputNumber
+					id="verticalPesoSubida"
+					[ngModel]="formData().pesoSubida"
+					(ngModelChange)="onPesoSubidaChange($event)"
+					[minFractionDigits]="1"
+					[maxFractionDigits]="1"
+					[min]="0.1"
+					[max]="100"
+				/>
+			</div>
+			<div class="form-field">
+				<label for="verticalPesoBajada">
+					<i class="pi pi-arrow-down"></i>
+					Peso bajada
+				</label>
+				<p-inputNumber
+					id="verticalPesoBajada"
+					[ngModel]="formData().pesoBajada"
+					(ngModelChange)="onPesoBajadaChange($event)"
+					[minFractionDigits]="1"
+					[maxFractionDigits]="1"
+					[min]="0.1"
+					[max]="100"
+				/>
+			</div>
+		</div>
+
+		<div class="form-field form-field-inline">
+			<label for="verticalBidireccional">
+				<i class="pi pi-sort-alt"></i>
+				Bidireccional
+			</label>
+			<p-toggleSwitch
+				id="verticalBidireccional"
+				[ngModel]="formData().bidireccional"
+				(ngModelChange)="onBidireccionalChange($event)"
+			/>
+		</div>
+	</div>
+	<!-- #endregion -->
+
+	<!-- #region Footer -->
+	<div class="piso-dialog-footer">
+		<button
+			pButton
+			label="Cancelar"
+			class="p-button-text p-button-secondary"
+			(click)="onCancel()"
+		></button>
+		<button
+			pButton
+			label="Crear conexion"
+			icon="pi pi-check"
+			(click)="onSave()"
+			[loading]="saving()"
+			[disabled]="!formData().destNodoId"
+		></button>
+	</div>
+	<!-- #endregion -->
+</p-dialog>

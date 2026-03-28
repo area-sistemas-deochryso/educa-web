@@ -1,0 +1,47 @@
+<!-- #region Stats Cards -->
+<section class="stats-section">
+	<div class="stat-card">
+		<div class="stat-content">
+			<span class="stat-label">Usuarios con Override</span>
+			<span class="stat-value">{{ totalUsuarios() }}</span>
+			<span class="stat-sublabel">permisos personalizados</span>
+		</div>
+		<div class="stat-icon users">
+			<i class="pi pi-users"></i>
+		</div>
+	</div>
+
+	<div class="stat-card">
+		<div class="stat-content">
+			<span class="stat-label">Roles Disponibles</span>
+			<span class="stat-value">{{ rolesCount() }}</span>
+			<span class="stat-sublabel">roles del sistema</span>
+		</div>
+		<div class="stat-icon roles">
+			<i class="pi pi-id-card"></i>
+		</div>
+	</div>
+
+	<div class="stat-card">
+		<div class="stat-content">
+			<span class="stat-label">Modulos</span>
+			<span class="stat-value">{{ totalModulos() }}</span>
+			<span class="stat-sublabel">modulos del sistema</span>
+		</div>
+		<div class="stat-icon modules">
+			<i class="pi pi-th-large"></i>
+		</div>
+	</div>
+
+	<div class="stat-card">
+		<div class="stat-content">
+			<span class="stat-label">Vistas Totales</span>
+			<span class="stat-value">{{ vistasCount() }}</span>
+			<span class="stat-sublabel">vistas disponibles</span>
+		</div>
+		<div class="stat-icon views">
+			<i class="pi pi-eye"></i>
+		</div>
+	</div>
+</section>
+<!-- #endregion -->

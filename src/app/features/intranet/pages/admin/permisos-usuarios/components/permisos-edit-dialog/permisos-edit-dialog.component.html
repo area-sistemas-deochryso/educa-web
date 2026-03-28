@@ -1,0 +1,202 @@
+<!-- #region Edit Dialog -->
+<p-dialog
+	[visible]="visible()"
+	(visibleChange)="onHideDialog()"
+	[header]="dialogHeader"
+	[modal]="true"
+	[style]="{ width: '900px', maxHeight: '90vh' }"
+	[draggable]="false"
+	[resizable]="false"
+	class="edit-permisos-dialog"
+>
+	<div class="dialog-content">
+		<!-- User Info Header -->
+		@if (isEditing()) {
+			<div class="dialog-user-header">
+				<div class="user-info">
+					<i class="pi pi-user"></i>
+					<span class="user-name">{{
+						selectedPermiso()?.nombreUsuario || 'Usuario ' + selectedUsuarioId()
+					}}</span>
+					<p-tag
+						[value]="selectedRol() || ''"
+						[severity]="uiMapping.getRolSeverity(selectedRol() || '')"
+					/>
+				</div>
+				<div class="vistas-count"><i class="pi pi-check"></i> {{ vistasCountLabel() }}</div>
+			</div>
+		} @else {
+			<div class="new-user-form">
+				<div class="field-row">
+					<div class="field">
+						<label for="rol">Rol del Usuario</label>
+						<p-select
+							id="rol"
+							[options]="rolesSelectOptions"
+							[ngModel]="selectedRol()"
+							(ngModelChange)="onSelectedRolChange($event)"
+							placeholder="Seleccione el rol"
+							aria-label="Rol del usuario"
+							[style]="{ width: '100%' }"
+							appendTo="body"
+							(onChange)="onRolChange()"
+						/>
+					</div>
+					<div class="field">
+						<label for="usuario">Usuario</label>
+						<p-autoComplete
+							id="usuario"
+							[(ngModel)]="selectedUsuario"
+							[suggestions]="usuariosSugeridos()"
+							(completeMethod)="buscarUsuarios($event)"
+							(onSelect)="onUsuarioSeleccionado($event)"
+							(onClear)="onUsuarioClear()"
+							field="nombreCompleto"
+							optionLabel="nombreCompleto"
+							[placeholder]="
+								selectedRol()
+									? 'Buscar usuario por nombre...'
+									: 'Seleccione un rol primero'
+							"
+							[disabled]="!selectedRol()"
+							[style]="{ width: '100%' }"
+							[inputStyle]="{ width: '100%' }"
+							[showClear]="true"
+							[dropdown]="true"
+							[minLength]="0"
+							aria-label="Buscar usuario"
+						>
+							<ng-template let-usuario pTemplate="item">
+								<div class="autocomplete-item">
+									<i class="pi pi-user"></i>
+									<div class="user-info-autocomplete">
+										<span class="user-name-autocomplete">{{
+											usuario.nombreCompleto
+										}}</span>
+										@if (usuario.dni) {
+											<span class="user-dni">DNI: {{ usuario.dni }}</span>
+										}
+									</div>
+								</div>
+							</ng-template>
+						</p-autoComplete>
+					</div>
+				</div>
+			</div>
+		}
+
+		<!-- Module Tabs -->
+		@if (modulosVistas().length > 0) {
+			<div class="modules-tabs-container">
+				<div class="modules-tabs">
+					@for (modulo of modulosVistas(); track modulo.nombre; let i = $index) {
+						<button
+							type="button"
+							class="module-tab"
+							[class.active]="activeModuloIndex() === i"
+							[attr.aria-label]="'Modulo ' + modulo.nombre"
+							(click)="onActiveModuloIndexChange(i)"
+						>
+							<i class="pi pi-folder"></i>
+							{{ modulo.nombre }}
+							<span
+								class="tab-count"
+								[class.has-selection]="modulo.seleccionadas > 0"
+								>{{ modulo.seleccionadas }}/{{ modulo.total }}</span
+							>
+						</button>
+					}
+				</div>
+
+				<!-- Vistas Content -->
+				<div class="vistas-content">
+					<div class="vistas-header">
+						<label class="select-all">
+							<p-checkbox
+								[ngModel]="isAllModuloSelected()"
+								(ngModelChange)="toggleAllVistasModulo()"
+								[binary]="true"
+								inputId="select-all-vistas"
+							/>
+							<span>Seleccionar todas las vistas</span>
+						</label>
+						<span class="selection-count">
+							{{ modulosVistas()[activeModuloIndex()]?.seleccionadas }} de
+							{{ modulosVistas()[activeModuloIndex()]?.total }} seleccionadas
+						</span>
+					</div>
+
+					<div class="vistas-search">
+						<i class="pi pi-search"></i>
+						<input
+							type="text"
+							pInputText
+							placeholder="Buscar por ruta..."
+							aria-label="Buscar vista"
+							[ngModel]="vistasBusqueda()"
+							(ngModelChange)="onVistasBusquedaChange($event)"
+						/>
+					</div>
+
+					<div class="vistas-grid">
+						@for (vista of vistasFiltradas(); track vista.id) {
+							<div
+								class="vista-checkbox"
+								[class.selected]="isVistaSelected(vista.ruta)"
+							>
+								<p-checkbox
+									[ngModel]="isVistaSelected(vista.ruta)"
+									(ngModelChange)="toggleVista(vista.ruta)"
+									[binary]="true"
+									[inputId]="'vista-' + vista.id"
+								/>
+								<div
+									class="vista-details"
+									(click)="toggleVista(vista.ruta)"
+									role="button"
+									tabindex="0"
+									[attr.aria-label]="'Vista ' + vista.nombre"
+									(keydown.enter)="toggleVista(vista.ruta)"
+									(keydown.space)="toggleVista(vista.ruta)"
+								>
+									<span class="vista-name">{{ vista.nombre }}</span>
+									<span class="vista-path">{{ vista.ruta }}</span>
+								</div>
+							</div>
+						}
+					</div>
+				</div>
+			</div>
+		} @else {
+			<div class="no-vistas">
+				<i class="pi pi-info-circle"></i>
+				<p>Seleccione un rol para cargar las vistas disponibles</p>
+			</div>
+		}
+	</div>
+
+	<ng-template #footer>
+		<div class="dialog-footer">
+			<button
+				pButton
+				type="button"
+				label="Cancelar"
+				icon="pi pi-times"
+				class="p-button-text"
+				aria-label="Cancelar"
+				(click)="onHideDialog()"
+			></button>
+			<button
+				pButton
+				type="button"
+				label="Guardar Cambios"
+				icon="pi pi-check"
+				class="p-button-success"
+				aria-label="Guardar cambios"
+				(click)="onSave()"
+				[disabled]="isSaveDisabled"
+			></button>
+		</div>
+	</ng-template>
+</p-dialog>
+<!-- #endregion -->
