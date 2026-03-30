@@ -14,7 +14,8 @@ import {
 } from './permisos.models';
 import { ApiResponse } from '@shared/models';
 import { Injectable, inject } from '@angular/core';
-import { Observable, catchError, of } from 'rxjs';
+import { Observable, catchError, of, tap } from 'rxjs';
+import { logger } from '@core/helpers';
 
 import { HttpClient } from '@angular/common/http';
 import { PaginatedResponse } from '@data/repositories';
@@ -240,7 +241,12 @@ export class PermisosService {
 	getMisPermisos(): Observable<PermisosUsuarioResultado | null> {
 		return this.http
 			.get<PermisosUsuarioResultado>(`${this.apiUrl}/mis-permisos`)
-			.pipe(catchError(() => of(null)));
+			.pipe(
+				catchError((err) => {
+					logger.warn('[PermisosService] Error al cargar mis permisos — usando fallback vacío', err?.status);
+					return of(null);
+				}),
+			);
 	}
 
 	// #endregion

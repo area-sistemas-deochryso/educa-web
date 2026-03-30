@@ -4,6 +4,7 @@ import { RouterLink, RouterOutlet } from '@angular/router';
 import { VoiceButtonComponent } from '@shared/components/voice-button';
 import { FloatingNotificationBellComponent } from '@shared/components/floating-notification-bell';
 import { SyncStatusComponent } from '@shared/components/sync-status';
+import { OfflineIndicatorComponent } from '@shared/components/offline-indicator/offline-indicator.component';
 import { UserPermisosService, SessionActivityService } from '@core/services';
 import {
 	NavItemComponent,
@@ -25,6 +26,7 @@ import { FeatureFlagsFacade } from '@core/services/feature-flags';
 		VoiceButtonComponent,
 		FloatingNotificationBellComponent,
 		SyncStatusComponent,
+		OfflineIndicatorComponent,
 		NavItemComponent,
 		UserProfileMenuComponent,
 		MobileMenuComponent,

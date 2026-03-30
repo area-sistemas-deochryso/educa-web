@@ -46,7 +46,7 @@ export class AsistenciaSignalRService {
 				withCredentials: true,
 				transport,
 			})
-			.withAutomaticReconnect([0, 2000, 5000, 10000, 30000])
+			.withAutomaticReconnect([0, 2000, 5000, 10000, 30000, 60000])
 			.build();
 
 		this.registerHandlers();
@@ -92,6 +92,12 @@ export class AsistenciaSignalRService {
 		this.connection.onclose((err) => {
 			this._connected.set(false);
 			if (err) {
+				const msg = String(err);
+				if (msg.includes('401') || msg.includes('Unauthorized')) {
+					logger.warn('AsistenciaSignalR: Sesión expirada, deteniendo reconexión');
+					this.connection?.stop().catch(() => {});
+					return;
+				}
 				logger.warn('AsistenciaSignalR: Conexión cerrada con error', err);
 			}
 		});

@@ -152,9 +152,12 @@ export class SessionActivityService {
 		this.authService.logout();
 
 		logger.warn('[SessionActivity] Session revoked — redirecting to login');
-		this.router.navigate(['/intranet/login']).then(() => {
-			this._isLoggingOut = false;
-		});
+		this.router
+			.navigate(['/intranet/login'])
+			.catch((err) => logger.error('[SessionActivity] Navigation failed during logout', err))
+			.finally(() => {
+				this._isLoggingOut = false;
+			});
 	}
 
 	// #endregion
