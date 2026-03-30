@@ -1,1 +1,107 @@
-// Styles now handled by shared app-page-header component
+// #region Header actions
+.header-actions {
+	display: flex;
+	align-items: center;
+	gap: 0.5rem;
+
+	.btn-icon {
+		width: 2.25rem;
+		height: 2.25rem;
+		padding: 0;
+	}
+
+	.action-divider {
+		width: 1px;
+		height: 1.5rem;
+		background: var(--surface-300);
+		margin: 0 0.25rem;
+	}
+
+}
+// #endregion
+
+// #region Export dialog
+.export-dialog-content {
+	display: flex;
+	flex-direction: column;
+	gap: 1.25rem;
+
+	.export-description {
+		margin: 0;
+		font-size: 0.875rem;
+		color: var(--text-color-secondary);
+		line-height: 1.5;
+	}
+
+	.export-field {
+		display: flex;
+		flex-direction: column;
+		gap: 0.5rem;
+
+		label {
+			font-size: 0.8rem;
+			font-weight: 600;
+			text-transform: uppercase;
+			letter-spacing: 0.5px;
+			color: var(--text-color-secondary);
+		}
+	}
+
+	.periodo-toggle {
+		display: flex;
+		gap: 0.5rem;
+
+		button {
+			flex: 1;
+
+			&.active {
+				font-weight: 600;
+			}
+		}
+	}
+
+	.export-actions {
+		display: flex;
+		flex-direction: column;
+		gap: 0.5rem;
+		padding-top: 0.5rem;
+		border-top: 1px solid var(--surface-200);
+
+		.export-btn {
+			justify-content: center;
+		}
+	}
+}
+// #endregion
+
+// #region Overrides PrimeNG
+:host ::ng-deep {
+	.p-dialog .p-inputtext,
+	.p-dialog .p-select {
+		background: transparent;
+		color: var(--text-color);
+		border-color: var(--surface-300);
+	}
+
+	.p-dialog .p-select-label {
+		color: var(--text-color);
+	}
+
+	.p-dialog .p-select-dropdown {
+		color: var(--text-color);
+	}
+}
+// #endregion
+
+// #region Responsive
+@media (max-width: 768px) {
+	.header-actions {
+		flex-wrap: wrap;
+		justify-content: flex-end;
+
+		.action-divider {
+			display: none;
+		}
+	}
+}
+// #endregion

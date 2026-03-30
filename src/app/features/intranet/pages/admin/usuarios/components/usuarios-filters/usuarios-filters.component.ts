@@ -1,11 +1,12 @@
 // #region Imports
-import { ChangeDetectionStrategy, Component, input, output, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, input, output } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { ButtonModule } from 'primeng/button';
 import { InputTextModule } from 'primeng/inputtext';
 import { SelectModule } from 'primeng/select';
-import { periodoActual, esVerano } from '@shared/models';
-import { APP_USER_ROLES } from '@shared/constants';
+import { TooltipModule } from 'primeng/tooltip';
+import { periodoActual, filtrarPorPeriodoAcademico } from '@shared/models';
+import { SalonListDto } from '@features/intranet/pages/admin/horarios/models/salon.interface';
 import { RolUsuarioAdmin } from '../../services';
 
 // #endregion
@@ -16,44 +17,58 @@ export interface FilterOptions {
 }
 
 /**
- * Componente presentacional para los filtros de usuarios
- * Búsqueda, filtro por rol y estado
+ * Barra de filtros: búsqueda, rol, estado y salón.
  */
 @Component({
 	selector: 'app-usuarios-filters',
 	standalone: true,
-	imports: [FormsModule, ButtonModule, InputTextModule, SelectModule],
+	imports: [FormsModule, ButtonModule, InputTextModule, SelectModule, TooltipModule],
 	templateUrl: './usuarios-filters.component.html',
 	styleUrl: './usuarios-filters.component.scss',
 	changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class UsuariosFiltersComponent {
-	// * Inputs reflect current filters in the parent store.
+	// #region Inputs
 	readonly searchTerm = input.required<string>();
 	readonly filterRol = input.required<RolUsuarioAdmin | null>();
 	readonly filterEstado = input.required<boolean | null>();
+	readonly filterSalonId = input.required<number | null>();
+	readonly salones = input.required<SalonListDto[]>();
 	readonly options = input.required<FilterOptions>();
+	// #endregion
 
-	// * Outputs bubble user interactions.
+	// #region Computed
+	private readonly periodo = periodoActual();
+
+	readonly salonOptions = computed(() => {
+		const salonesFiltrados = filtrarPorPeriodoAcademico(
+			this.salones(),
+			this.periodo,
+			(s) => s.seccion,
+		);
+		const options = salonesFiltrados.map((s) => ({
+			label: `${s.grado} ${s.seccion}`,
+			value: s.salonId,
+			gradoOrden: s.gradoOrden,
+		}));
+		// Ordenar por GRA_Orden (Inicial 1-3, Primaria 4-9, Secundaria 10-14) y luego sección
+		options.sort((a, b) => a.gradoOrden - b.gradoOrden || a.label.localeCompare(b.label));
+		return [
+			{ label: 'Todos los salones', value: null as number | null, gradoOrden: 0 },
+			...options,
+		];
+	});
+	// #endregion
+
+	// #region Outputs
 	readonly searchChange = output<string>();
 	readonly filterRolChange = output<RolUsuarioAdmin | null>();
 	readonly filterEstadoChange = output<boolean | null>();
+	readonly filterSalonIdChange = output<number | null>();
 	readonly clearFilters = output<void>();
-	readonly newUsuario = output<void>();
-	readonly importUsuarios = output<void>();
-	readonly exportCredenciales = output<{ rol: string; esVerano: boolean; anio?: number }>();
+	// #endregion
 
-	// Filtros de exportación de alumnos — auto-detecta periodo actual
-	readonly esVerano = signal(esVerano(periodoActual()));
-	readonly exportAnio = signal(new Date().getFullYear());
-	readonly anioOptions = Array.from(
-		{ length: new Date().getFullYear() - 2026 + 1 },
-		(_, i) => {
-			const year = 2026 + i;
-			return { label: year.toString(), value: year };
-		},
-	);
-
+	// #region Handlers
 	onSearchChange(value: string): void {
 		this.searchChange.emit(value);
 	}
@@ -66,29 +81,13 @@ export class UsuariosFiltersComponent {
 		this.filterEstadoChange.emit(value);
 	}
 
+	onFilterSalonIdChange(value: number | null): void {
+		this.filterSalonIdChange.emit(value);
+	}
+
 	onClearFilters(): void {
 		this.clearFilters.emit();
 	}
-
-	onNewUsuario(): void {
-		this.newUsuario.emit();
-	}
-
-	onImportUsuarios(): void {
-		this.importUsuarios.emit();
-	}
-
-	onExportCredenciales(rol: string): void {
-		const isEstudiante = rol === APP_USER_ROLES.Estudiante;
-		this.exportCredenciales.emit({
-			rol,
-			esVerano: isEstudiante ? this.esVerano() : false,
-			anio: isEstudiante ? this.exportAnio() : undefined,
-		});
-	}
-
-	togglePeriodo(): void {
-		this.esVerano.update((v) => !v);
-	}
+	// #endregion
 }
 // #endregion

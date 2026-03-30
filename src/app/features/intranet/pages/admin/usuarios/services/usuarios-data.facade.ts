@@ -9,6 +9,10 @@ import { UI_ADMIN_ERROR_DETAILS, UI_SUMMARIES } from '@app/shared/constants';
 import { RolUsuarioAdmin, UsuarioLista, UsuariosEstadisticas } from '../models';
 import { UsuariosService } from './usuarios.service';
 import { UsuariosStore } from './usuarios.store';
+import { SalonesApiService } from '@features/intranet/pages/admin/horarios/services/salones-api.service';
+import { ApiResponse } from '@shared/models';
+import { map } from 'rxjs/operators';
+import { SalonListDto } from '@features/intranet/pages/admin/horarios/models/salon.interface';
 
 /**
  * Facade for data loading, search, filtering, and cache refresh.
@@ -18,6 +22,7 @@ import { UsuariosStore } from './usuarios.store';
 export class UsuariosDataFacade {
 	private usuariosService = inject(UsuariosService);
 	private asistenciaService = inject(AsistenciaService);
+	private salonesApi = inject(SalonesApiService);
 	private store = inject(UsuariosStore);
 	private errorHandler = inject(ErrorHandlerService);
 	private swService = inject(SwService);
@@ -48,6 +53,7 @@ export class UsuariosDataFacade {
 		const rol = this.store.filterRol() ?? undefined;
 		const estado = this.store.filterEstado() ?? undefined;
 		const search = this.store.searchTerm() || undefined;
+		const salonId = this.store.filterSalonId() ?? undefined;
 
 		forkJoin({
 			estadisticas: this.usuariosService.obtenerEstadisticas().pipe(
@@ -64,7 +70,14 @@ export class UsuariosDataFacade {
 					return of([]);
 				}),
 			),
-			usuarios: this.usuariosService.listarUsuariosPaginado(page, pageSize, rol, estado, search).pipe(
+			salonesFilter: this.salonesApi.listar().pipe(
+				withRetry({ tag: 'UsuariosDataFacade:loadSalonesFilter' }),
+				catchError((err) => {
+					logger.error('Error cargando salones para filtro:', err);
+					return of([] as SalonListDto[]);
+				}),
+			),
+			usuarios: this.usuariosService.listarUsuariosPaginado(page, pageSize, rol, estado, search, salonId).pipe(
 				withRetry({ tag: 'UsuariosDataFacade:loadUsuarios' }),
 				catchError((err) => {
 					logger.error('Error cargando usuarios:', err);
@@ -86,13 +99,14 @@ export class UsuariosDataFacade {
 			),
 		})
 			.pipe(takeUntilDestroyed(this.destroyRef))
-			.subscribe(({ estadisticas, salones, usuarios }) => {
+			.subscribe(({ estadisticas, salones, salonesFilter, usuarios }) => {
 				if (estadisticas) {
 					this.store.setEstadisticas(estadisticas);
 				}
 				this.store.setStatsReady(true);
 
 				this.store.setSalones(salones);
+				this.store.setSalonesFilter(salonesFilter);
 
 				this.store.setUsuarios(usuarios.data);
 				this.store.setPaginationData(usuarios.page, usuarios.pageSize, usuarios.total);
@@ -140,6 +154,12 @@ export class UsuariosDataFacade {
 		this.refreshUsuariosOnly();
 	}
 
+	setFilterSalonId(salonId: number | null): void {
+		this.store.setFilterSalonId(salonId);
+		this.store.setPage(1);
+		this.refreshUsuariosOnly();
+	}
+
 	clearFilters(): void {
 		this.store.clearFilters();
 		this.refreshUsuariosOnly();
@@ -160,9 +180,10 @@ export class UsuariosDataFacade {
 		const rol = this.store.filterRol() ?? undefined;
 		const estado = this.store.filterEstado() ?? undefined;
 		const search = this.store.searchTerm() || undefined;
+		const salonId = this.store.filterSalonId() ?? undefined;
 
 		this.usuariosService
-			.listarUsuariosPaginado(page, pageSize, rol, estado, search)
+			.listarUsuariosPaginado(page, pageSize, rol, estado, search, salonId)
 			.pipe(
 				withRetry({ tag: 'UsuariosDataFacade:refreshUsuariosOnly' }),
 				catchError((err) => {
@@ -215,9 +236,10 @@ export class UsuariosDataFacade {
 					const pageSize = this.store.pageSize();
 					const rol = this.store.filterRol() ?? undefined;
 					const estado = this.store.filterEstado() ?? undefined;
+					const salonId = this.store.filterSalonId() ?? undefined;
 
 					return this.usuariosService
-						.listarUsuariosPaginado(page, pageSize, rol, estado, search || undefined)
+						.listarUsuariosPaginado(page, pageSize, rol, estado, search || undefined, salonId)
 						.pipe(
 							withRetry({ tag: 'UsuariosDataFacade:searchUsuarios' }),
 							catchError((err) => {

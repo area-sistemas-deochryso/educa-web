@@ -1,16 +1,119 @@
 <!-- #region Template -->
 <app-page-header icon="pi pi-users" title="Administracion de Usuarios" subtitle="Gestiona todos los usuarios del sistema">
-	<button
-		pButton
-		label="Refrescar"
-		icon="pi pi-refresh"
-		class="p-button-outlined"
-		(click)="onRefresh()"
-		[pt]="{
-			root: {
-				'aria-label': 'Refrescar',
-			},
-		}"
-	></button>
+	<div class="header-actions">
+		<button
+			pButton
+			icon="pi pi-refresh"
+			class="p-button-text p-button-sm btn-icon"
+			pTooltip="Refrescar"
+			tooltipPosition="bottom"
+			(click)="onRefresh()"
+			[pt]="{ root: { 'aria-label': 'Refrescar' } }"
+		></button>
+
+		<span class="action-divider"></span>
+
+		<button
+			pButton
+			icon="pi pi-download"
+			label="Exportar"
+			class="p-button-outlined p-button-sm"
+			(click)="onOpenExportDialog()"
+			[pt]="{ root: { 'aria-label': 'Exportar credenciales' } }"
+		></button>
+
+		<button
+			pButton
+			icon="pi pi-upload"
+			label="Importar"
+			class="p-button-outlined p-button-sm"
+			(click)="onImportUsuarios()"
+			[pt]="{ root: { 'aria-label': 'Importar estudiantes' } }"
+		></button>
+
+		<button
+			pButton
+			icon="pi pi-user-plus"
+			label="Nuevo"
+			class="p-button-success p-button-sm"
+			style="color: white"
+			(click)="onNewUsuario()"
+			[pt]="{ root: { 'aria-label': 'Nuevo Usuario' } }"
+		></button>
+	</div>
 </app-page-header>
+
+<!-- * Dialog de exportación -->
+<p-dialog
+	header="Exportar Credenciales"
+	[visible]="exportDialogVisible()"
+	(visibleChange)="onExportDialogVisibleChange($event)"
+	[modal]="true"
+	[style]="{ width: '420px' }"
+	[draggable]="false"
+>
+	<div class="export-dialog-content">
+		<p class="export-description">
+			Genera un archivo Excel con las credenciales (nombre, DNI, contraseña) de los usuarios.
+		</p>
+
+		<!-- * Configuración de periodo -->
+		<div class="export-field">
+			<label>Año académico</label>
+			<p-select
+				[options]="anioOptions"
+				[ngModel]="exportAnio()"
+				(ngModelChange)="exportAnio.set($event)"
+				appendTo="body"
+				[style]="{ width: '100%' }"
+			/>
+		</div>
+
+		<div class="export-field">
+			<label>Periodo</label>
+			<div class="periodo-toggle">
+				<button
+					pButton
+					icon="pi pi-calendar"
+					label="Regular"
+					class="p-button-sm"
+					[class.p-button-outlined]="esVerano()"
+					[class.active]="!esVerano()"
+					(click)="setPeriodo(false)"
+					[pt]="{ root: { 'aria-label': 'Periodo regular' } }"
+				></button>
+				<button
+					pButton
+					icon="pi pi-sun"
+					label="Verano"
+					class="p-button-sm"
+					[class.p-button-outlined]="!esVerano()"
+					[class.active]="esVerano()"
+					(click)="setPeriodo(true)"
+					[pt]="{ root: { 'aria-label': 'Periodo de verano' } }"
+				></button>
+			</div>
+		</div>
+
+		<!-- * Botones de exportación -->
+		<div class="export-actions">
+			<button
+				pButton
+				icon="pi pi-file-excel"
+				label="Credenciales Alumnos"
+				class="p-button-outlined export-btn"
+				(click)="onExportCredenciales('Estudiante')"
+				[pt]="{ root: { 'aria-label': 'Exportar credenciales de alumnos' } }"
+			></button>
+			<button
+				pButton
+				icon="pi pi-file-excel"
+				label="Credenciales Profesores"
+				class="p-button-outlined export-btn"
+				(click)="onExportCredenciales('Profesor')"
+				[pt]="{ root: { 'aria-label': 'Exportar credenciales de profesores' } }"
+			></button>
+		</div>
+	</div>
+</p-dialog>
 <!-- #endregion -->

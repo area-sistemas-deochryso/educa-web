@@ -138,6 +138,10 @@ export class UsuariosComponent implements AfterViewInit {
 		this.dataFacade.setFilterEstado(value);
 	}
 
+	onFilterSalonIdChange(value: number | null): void {
+		this.dataFacade.setFilterSalonId(value);
+	}
+
 	onClearFilters(): void {
 		this.dataFacade.clearFilters();
 	}

@@ -4,7 +4,7 @@
 -----------------------------------------*/
 .navbar {
 	background: var(--white-color);
-	padding-top: 15px;
+	padding-top: calc(env(safe-area-inset-top, 0px) + 15px);
 	padding-bottom: 15px;
 	position: sticky;
 	top: 0;

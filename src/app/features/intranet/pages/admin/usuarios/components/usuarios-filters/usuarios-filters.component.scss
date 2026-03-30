@@ -1,52 +1,95 @@
 // #region Styles
-.filters-section {
+.filters-bar {
 	display: flex;
 	align-items: center;
-	gap: 1rem;
-	margin-bottom: 1.5rem;
-	padding: 1rem 1.25rem;
+	gap: 0.5rem;
+	margin-bottom: 1rem;
+	padding: 0.75rem 1rem;
 	background: transparent;
-	border-radius: 12px;
+	border-radius: 10px;
 	border: 1px solid var(--surface-300);
-	flex-wrap: wrap;
+}
 
-	.search-box {
-		position: relative;
-		flex: 1;
-		min-width: 200px;
-		max-width: 300px;
+.search-box {
+	position: relative;
+	flex: 1;
+	min-width: 180px;
+	max-width: 300px;
 
-		i {
-			position: absolute;
-			left: 0.75rem;
-			top: 50%;
-			transform: translateY(-50%);
-			color: var(--text-color-secondary);
-		}
-
-		input {
-			width: 100%;
-			padding-left: 2.25rem;
-		}
+	i {
+		position: absolute;
+		left: 0.75rem;
+		top: 50%;
+		transform: translateY(-50%);
+		color: var(--text-color-secondary);
+		font-size: 0.85rem;
 	}
 
-	.filter-spacer {
-		flex: 1;
+	input {
+		width: 100%;
+		padding-left: 2.25rem;
+		font-size: 0.875rem;
 	}
 }
 
+.filter-dropdowns {
+	display: flex;
+	align-items: center;
+	gap: 0.5rem;
+}
+
+.btn-clear {
+	margin-left: auto;
+	opacity: 0.5;
+
+	&:hover {
+		opacity: 1;
+	}
+}
+// #endregion
+
+// #region Overrides PrimeNG
+:host ::ng-deep {
+	.p-inputtext,
+	.p-select {
+		background: transparent;
+		color: var(--text-color);
+		border-color: var(--surface-300);
+
+		&::placeholder {
+			color: var(--text-color-secondary);
+		}
+
+		&:enabled:focus {
+			border-color: var(--text-color);
+			box-shadow: 0 0 0 1px var(--text-color);
+		}
+	}
+
+	.p-select-label {
+		color: var(--text-color);
+	}
+
+	.p-select-dropdown {
+		color: var(--text-color);
+	}
+}
+// #endregion
+
+// #region Responsive
 @media (max-width: 768px) {
-	.filters-section {
-		flex-direction: column;
-		align-items: stretch;
+	.filters-bar {
+		flex-wrap: wrap;
+	}
 
-		.search-box {
-			max-width: none;
-		}
+	.search-box {
+		flex: 1 1 100%;
+		max-width: none;
+	}
 
-		.filter-spacer {
-			display: none;
-		}
+	.filter-dropdowns {
+		flex-wrap: wrap;
+		flex: 1;
 	}
 }
 // #endregion

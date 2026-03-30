@@ -28,6 +28,7 @@
 				<th pSortableColumn="nombreCompleto">
 					NOMBRE <p-sortIcon field="nombreCompleto" />
 				</th>
+				<th style="width: 150px">SALÓN</th>
 				<th style="width: 120px" pSortableColumn="rol">ROL <p-sortIcon field="rol" /></th>
 				<th style="width: 100px" pSortableColumn="estado">
 					ESTADO <p-sortIcon field="estado" />
@@ -57,6 +58,13 @@
 							}
 						</div>
 					</div>
+				</td>
+				<td>
+					@if (usuario.salonNombre) {
+						<span class="salon-text">{{ usuario.salonNombre }}</span>
+					} @else {
+						<span class="text-muted">—</span>
+					}
 				</td>
 				<td>
 					<!-- * Role tag uses severity mapping -->
@@ -121,7 +129,7 @@
 
 		<ng-template #emptymessage>
 			<tr>
-				<td colspan="6" class="empty-message">
+				<td colspan="7" class="empty-message">
 					<!-- ! Empty state when no results -->
 					<div class="empty-state">
 						<i class="pi pi-users"></i>

@@ -112,7 +112,9 @@
       "WebFetch(domain:community.anviz.com)",
       "Bash(rm Educa.API.Tests/UnitTest1.cs)",
       "Bash(dotnet restore:*)",
-      "Bash(dotnet test:*)"
+      "Bash(dotnet test:*)",
+      "Bash(npx cap:*)",
+      "Bash(pip install:*)"
     ],
     "additionalDirectories": [
       "c:\\Users\\Asus Ryzen 9\\EducaWeb\\Educa.API\\Educa.API\\Controllers\\Sistema",

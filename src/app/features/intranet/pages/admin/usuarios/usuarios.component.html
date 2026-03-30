@@ -1,7 +1,12 @@
 <!-- #region Template -->
 <div class="usuarios-container">
-	<!-- * Header actions -->
-	<app-usuarios-header (refresh)="onRefresh()" />
+	<!-- * Header con acciones de página -->
+	<app-usuarios-header
+		(refresh)="onRefresh()"
+		(newUsuario)="onNewUsuario()"
+		(importUsuarios)="onImportUsuarios()"
+		(exportCredenciales)="onExportCredenciales($event.rol, $event.esVerano, $event.anio)"
+	/>
 
 	<!-- * One-time migration button (dev only, remove after use) -->
 	@if (isDev && !migracionCompletada()) {
@@ -23,32 +28,29 @@
 	}
 
 	@if (!vm().statsReady) {
-		<!-- * Stats skeleton while loading -->
 		<app-usuarios-stats-skeleton />
 	} @else if (vm().hasEstadisticas) {
 		<app-usuarios-stats [estadisticas]="vm().estadisticas!" />
 	}
 
-	<!-- * Filters + search -->
+	<!-- * Filtros de búsqueda -->
 	<app-usuarios-filters
 		[searchTerm]="vm().searchTerm"
 		[filterRol]="vm().filterRol"
 		[filterEstado]="vm().filterEstado"
+		[filterSalonId]="vm().filterSalonId"
+		[salones]="vm().salonesFilter"
 		[options]="filterOptions"
 		(searchChange)="onSearchChange($event)"
 		(filterRolChange)="onFilterRolChange($event)"
 		(filterEstadoChange)="onFilterEstadoChange($event)"
+		(filterSalonIdChange)="onFilterSalonIdChange($event)"
 		(clearFilters)="onClearFilters()"
-		(newUsuario)="onNewUsuario()"
-		(importUsuarios)="onImportUsuarios()"
-		(exportCredenciales)="onExportCredenciales($event.rol, $event.esVerano, $event.anio)"
 	/>
 
 	@if (!vm().tableReady) {
-		<!-- * Table skeleton while loading -->
 		<app-usuarios-table-skeleton />
 	} @else {
-		<!-- * Users table with server-side pagination -->
 		<app-usuarios-table
 			[usuarios]="vm().usuarios"
 			[loading]="vm().loading"

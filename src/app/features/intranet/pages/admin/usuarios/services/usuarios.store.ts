@@ -1,4 +1,5 @@
 import { SalonProfesor } from '@shared/services';
+import { SalonListDto } from '@features/intranet/pages/admin/horarios/models/salon.interface';
 import {
 	ActualizarUsuarioRequest,
 	CrearUsuarioRequest,
@@ -35,6 +36,7 @@ export class UsuariosStore {
 	private readonly _usuarios = signal<UsuarioLista[]>([]);
 	private readonly _estadisticas = signal<UsuariosEstadisticas | null>(null);
 	private readonly _salones = signal<SalonProfesor[]>([]);
+	private readonly _salonesFilter = signal<SalonListDto[]>([]);
 	private readonly _loading = signal(false);
 	private readonly _error = signal<string | null>(null);
 
@@ -67,6 +69,7 @@ export class UsuariosStore {
 	private readonly _searchTerm = signal('');
 	private readonly _filterRol = signal<RolUsuarioAdmin | null>(null);
 	private readonly _filterEstado = signal<boolean | null>(null);
+	private readonly _filterSalonId = signal<number | null>(null);
 
 	// #endregion
 	/** Emits when data should be refreshed (after create/import) */
@@ -76,6 +79,7 @@ export class UsuariosStore {
 	readonly usuarios = this._usuarios.asReadonly();
 	readonly estadisticas = this._estadisticas.asReadonly();
 	readonly salones = this._salones.asReadonly();
+	readonly salonesFilter = this._salonesFilter.asReadonly();
 	readonly loading = this._loading.asReadonly();
 	readonly error = this._error.asReadonly();
 
@@ -100,6 +104,7 @@ export class UsuariosStore {
 	readonly searchTerm = this._searchTerm.asReadonly();
 	readonly filterRol = this._filterRol.asReadonly();
 	readonly filterEstado = this._filterEstado.asReadonly();
+	readonly filterSalonId = this._filterSalonId.asReadonly();
 
 	// #endregion
 	// #region Computed - Validaciones
@@ -136,6 +141,7 @@ export class UsuariosStore {
 		usuarios: this._usuarios(),
 		estadisticas: this._estadisticas(),
 		salones: this._salones(),
+		salonesFilter: this._salonesFilter(),
 		isEmpty: this._usuarios().length === 0,
 		hasEstadisticas: this._estadisticas() !== null,
 		page: this._page(),
@@ -159,6 +165,7 @@ export class UsuariosStore {
 		searchTerm: this._searchTerm(),
 		filterRol: this._filterRol(),
 		filterEstado: this._filterEstado(),
+		filterSalonId: this._filterSalonId(),
 	}));
 
 	/** Formulario de usuario */
@@ -244,6 +251,10 @@ export class UsuariosStore {
 
 	setSalones(salones: SalonProfesor[]): void {
 		this._salones.set(salones);
+	}
+
+	setSalonesFilter(salones: SalonListDto[]): void {
+		this._salonesFilter.set(salones);
 	}
 
 	setLoading(loading: boolean): void {
@@ -336,10 +347,15 @@ export class UsuariosStore {
 		this._filterEstado.set(estado);
 	}
 
+	setFilterSalonId(salonId: number | null): void {
+		this._filterSalonId.set(salonId);
+	}
+
 	clearFilters(): void {
 		this._searchTerm.set('');
 		this._filterRol.set(null);
 		this._filterEstado.set(null);
+		this._filterSalonId.set(null);
 		this._page.set(1);
 	}
 

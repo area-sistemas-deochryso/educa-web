@@ -57,6 +57,10 @@ Thumbs.db
 # Local Netlify folder
 .netlify
 
+# Capacitor native projects
+android/
+ios/
+
 # Claude
 #.claude
 

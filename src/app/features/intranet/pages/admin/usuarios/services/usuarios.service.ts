@@ -53,6 +53,7 @@ export class UsuariosService {
 		rol?: string,
 		estado?: boolean,
 		search?: string,
+		salonId?: number,
 	): Observable<PaginatedResponse<UsuarioLista>> {
 		const params: Record<string, string> = {
 			page: page.toString(),
@@ -61,6 +62,7 @@ export class UsuariosService {
 		if (rol) params['rol'] = rol;
 		if (estado !== undefined) params['estado'] = estado.toString();
 		if (search) params['search'] = search;
+		if (salonId) params['salonId'] = salonId.toString();
 
 		return this.http
 			.get<PaginatedResponse<UsuarioLista>>(`${this.apiUrl}/listar`, { params })

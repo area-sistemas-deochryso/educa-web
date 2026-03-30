@@ -38,6 +38,12 @@
   [headers.values]
     Cache-Control = "public, max-age=31536000, immutable"
 
+# Serve .well-known files (Android App Links verification)
+[[redirects]]
+  from = "/.well-known/*"
+  to = "/well-known/:splat"
+  status = 200
+
 # Proxy API requests to Azure backend (must be BEFORE the SPA fallback)
 [[redirects]]
   from = "/api/*"

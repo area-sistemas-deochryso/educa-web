@@ -26,6 +26,8 @@ export interface UsuarioLista {
 	correo?: string;
 	sedeId?: number;
 	sedeNombre?: string;
+	// Salón (estudiante: su salón único; profesor: salón donde es docente)
+	salonNombre?: string;
 	// Guardian fields for student
 	nombreApoderado?: string;
 	telefonoApoderado?: string;

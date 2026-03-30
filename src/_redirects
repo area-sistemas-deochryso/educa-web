@@ -1,3 +1,4 @@
+/.well-known/*      /well-known/:splat                                          200
 /api/*              https://educa1.azurewebsites.net/api/:splat                  200
 /chathub            https://educa1.azurewebsites.net/chathub                   200
 /chathub/*          https://educa1.azurewebsites.net/chathub/:splat            200

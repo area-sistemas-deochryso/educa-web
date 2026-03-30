@@ -56,22 +56,32 @@
 								"input": "src",
 								"output": "/"
 							},
-							"src/_redirects"
+							"src/_redirects",
+							{
+								"glob": "**/*",
+								"input": "src/.well-known",
+								"output": "/.well-known"
+							},
+							{
+								"glob": "**/*",
+								"input": "src/well-known",
+								"output": "/well-known"
+							}
 						],
 						"styles": [
 							"node_modules/bootstrap-icons/font/bootstrap-icons.css",
 							"node_modules/primeicons/primeicons.css",
 							"src/styles.scss"
 						],
-						"scripts": [],
-						"server": "src/main.server.ts",
-						"outputMode": "server",
-						"ssr": {
-							"entry": "src/server.ts"
-						}
+						"scripts": []
 					},
 					"configurations": {
 						"production": {
+							"server": "src/main.server.ts",
+							"outputMode": "server",
+							"ssr": {
+								"entry": "src/server.ts"
+							},
 							"budgets": [
 								{
 									"type": "initial",
@@ -105,6 +115,37 @@
 								{
 									"replace": "src/app/config/environment.ts",
 									"with": "src/app/config/environment.development.ts"
+								}
+							]
+						},
+						"capacitor": {
+							"budgets": [
+								{
+									"type": "initial",
+									"maximumWarning": "1MB",
+									"maximumError": "2MB"
+								},
+								{
+									"type": "anyComponentStyle",
+									"maximumWarning": "24kB",
+									"maximumError": "48kB"
+								}
+							],
+							"outputHashing": "all",
+							"optimization": {
+								"scripts": true,
+								"styles": {
+									"minify": true,
+									"inlineCritical": true
+								},
+								"fonts": {
+									"inline": true
+								}
+							},
+							"fileReplacements": [
+								{
+									"replace": "src/app/config/environment.ts",
+									"with": "src/app/config/environment.capacitor.ts"
 								}
 							]
 						}

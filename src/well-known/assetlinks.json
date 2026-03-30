@@ -1,0 +1,12 @@
+[
+  {
+    "relation": ["delegate_permission/common.handle_all_urls"],
+    "target": {
+      "namespace": "android_app",
+      "package_name": "com.educa.app",
+      "sha256_cert_fingerprints": [
+        "0B:BD:A6:C6:7B:A2:47:2C:CC:8A:77:F6:F6:01:E0:54:6C:B8:B1:D1:84:8F:78:26:07:CA:B5:ED:78:9C:F4:D0"
+      ]
+    }
+  }
+]

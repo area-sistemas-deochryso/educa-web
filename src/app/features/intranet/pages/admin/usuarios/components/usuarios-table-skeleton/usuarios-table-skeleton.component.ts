@@ -19,6 +19,7 @@ export class UsuariosTableSkeletonComponent {
 		{ width: '80px', cellType: 'text' },
 		{ width: '100px', cellType: 'text' },
 		{ width: 'flex', cellType: 'avatar-text' },
+		{ width: '150px', cellType: 'text' },
 		{ width: '120px', cellType: 'badge' },
 		{ width: '100px', cellType: 'badge' },
 		{ width: '140px', cellType: 'actions' },

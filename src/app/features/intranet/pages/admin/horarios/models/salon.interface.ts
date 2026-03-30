@@ -4,6 +4,7 @@ export interface SalonListDto {
   salonId: number;
   gradoId: number;
   grado: string;
+  gradoOrden: number;
   seccionId: number;
   seccion: string;
   sedeId: number;

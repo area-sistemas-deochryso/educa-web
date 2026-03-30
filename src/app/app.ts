@@ -1,7 +1,7 @@
 // #region Imports
 import { Component, inject } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
-import { CacheVersionManagerService, SwService } from '@core/services';
+import { CacheVersionManagerService, CapacitorService, SwService } from '@core/services';
 import { DevtoolsPanelComponent } from '@shared/components/devtools';
 import { RateLimitBannerComponent } from '@shared/components/rate-limit-banner/rate-limit-banner.component';
 import { ToastContainerComponent } from '@shared/components/toast-container';
@@ -18,12 +18,12 @@ import { ToastContainerComponent } from '@shared/components/toast-container';
 export class AppComponent {
 	private swService = inject(SwService);
 	private cacheVersionManager = inject(CacheVersionManagerService);
+	private capacitor = inject(CapacitorService);
 	title = 'Educa.com.pe';
 
 	constructor() {
-		// Invalidación automática de cache cuando el backend cambia
-		// El desarrollador solo necesita cambiar versiones en cache-versions.config.ts
 		this.cacheVersionManager.initialize();
+		this.capacitor.initialize();
 	}
 }
 // #endregion

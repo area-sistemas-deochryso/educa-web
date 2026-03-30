@@ -23,4 +23,5 @@ export * from './session';
 export * from './signalr';
 export * from './facades';
 export * from './excel';
+export * from './capacitor';
 // #endregion
