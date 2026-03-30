@@ -106,6 +106,7 @@ export class HorariosComponent implements OnInit {
 			acceptLabel: UI_CONFIRM_LABELS.yes,
 			rejectLabel: UI_CONFIRM_LABELS.no,
 			accept: () => {
+				if (this.vm().loading) return;
 				this.crudFacade.toggleEstado(id, estadoActual);
 			},
 		});
@@ -128,6 +129,7 @@ export class HorariosComponent implements OnInit {
 			rejectLabel: UI_CONFIRM_LABELS.cancel,
 			acceptButtonStyleClass: 'p-button-danger',
 			accept: () => {
+				if (this.vm().loading) return;
 				this.crudFacade.delete(id);
 			},
 		});
@@ -231,6 +233,7 @@ export class HorariosComponent implements OnInit {
 			acceptLabel: UI_CONFIRM_LABELS.yesAssignAll,
 			rejectLabel: UI_CONFIRM_LABELS.cancel,
 			accept: () => {
+				if (this.vm().loading) return;
 				this.crudFacade.asignarTodosEstudiantes(
 					horarioId,
 					currentUser.dni || currentUser.nombreCompleto,
@@ -251,6 +254,7 @@ export class HorariosComponent implements OnInit {
 			rejectLabel: UI_CONFIRM_LABELS.cancel,
 			acceptButtonStyleClass: 'p-button-danger',
 			accept: () => {
+				if (this.vm().loading) return;
 				this.crudFacade.desasignarProfesor(
 					horarioId,
 					currentUser.dni || currentUser.nombreCompleto,
@@ -268,6 +272,7 @@ export class HorariosComponent implements OnInit {
 			rejectLabel: UI_CONFIRM_LABELS.cancel,
 			acceptButtonStyleClass: 'p-button-danger',
 			accept: () => {
+				if (this.vm().loading) return;
 				this.crudFacade.desasignarEstudiante(horarioId, estudianteId);
 			},
 		});

@@ -33,16 +33,6 @@ export interface HorarioProfesorDto {
 }
 
 /**
- * Response wrapper for tutor classroom information.
- */
-export interface SalonTutoriaResponse {
-	/** Response message. */
-	mensaje: string;
-	/** Tutor classroom detail or null. */
-	data: SalonTutoriaDto | null;
-}
-
-/**
  * Tutor classroom detail for the professor.
  */
 export interface SalonTutoriaDto {

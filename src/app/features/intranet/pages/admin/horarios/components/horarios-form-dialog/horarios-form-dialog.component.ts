@@ -30,6 +30,7 @@ export class HorariosFormDialogComponent {
 	readonly salonesOptions = input.required<SalonOption[]>();
 	readonly optionsLoading = input<boolean>(false);
 	readonly formValid = input<boolean>(false);
+	readonly loading = input<boolean>(false);
 	readonly cursoSeleccionadoLabel = input<string>('Seleccionar curso por nivel');
 	readonly cursoSeleccionadoNiveles = input<string>('');
 	// #endregion

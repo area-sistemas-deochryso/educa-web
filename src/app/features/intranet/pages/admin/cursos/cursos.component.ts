@@ -127,7 +127,10 @@ export class CursosComponent implements OnInit {
 			message: buildDeleteCursoMessage(curso.nombre),
 			header: 'Confirmar Eliminación',
 			icon: 'pi pi-exclamation-triangle',
-			accept: () => this.facade.delete(curso),
+			accept: () => {
+				if (this.vm().loading) return;
+				this.facade.delete(curso);
+			},
 		});
 	}
 

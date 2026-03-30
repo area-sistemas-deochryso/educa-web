@@ -6,7 +6,7 @@ import { environment } from '@config/environment';
 import { FileUploadBuilder } from '@core/helpers';
 import {
 	HorarioProfesorDto,
-	SalonTutoriaResponse,
+	SalonTutoriaDto,
 	ProfesorMisSalonesConEstudiantesDto,
 	ProfesorSalonConEstudiantesDto,
 	CursoContenidoDetalleDto,
@@ -81,10 +81,10 @@ export class ProfesorApiService {
 	 * @param profesorId Profesor id.
 	 * @returns Observable with tutor classroom response.
 	 */
-	getSalonTutoria(profesorId: number): Observable<SalonTutoriaResponse> {
+	getSalonTutoria(profesorId: number): Observable<SalonTutoriaDto | null> {
 		return this.http
-			.get<SalonTutoriaResponse>(`${this.profesorSalonUrl}/profesor/${profesorId}`)
-			.pipe(catchError(() => of({ mensaje: '', data: null })));
+			.get<SalonTutoriaDto>(`${this.profesorSalonUrl}/profesor/${profesorId}`)
+			.pipe(catchError(() => of(null)));
 	}
 	/**
 	 * Get professor classrooms with students summary.

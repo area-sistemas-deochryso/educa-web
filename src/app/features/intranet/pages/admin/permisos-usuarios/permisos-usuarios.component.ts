@@ -143,6 +143,7 @@ export class PermisosUsuariosComponent implements OnInit {
 			rejectLabel: UI_CONFIRM_LABELS.cancel,
 			acceptButtonStyleClass: 'p-button-danger',
 			accept: () => {
+				if (this.vm().loading) return;
 				this.facade.deletePermiso(permiso.id);
 			},
 		});

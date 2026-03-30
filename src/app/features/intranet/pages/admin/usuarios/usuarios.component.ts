@@ -223,6 +223,7 @@ export class UsuariosComponent implements AfterViewInit {
 			rejectLabel: UI_CONFIRM_LABELS.cancel,
 			acceptButtonStyleClass: usuario.estado ? 'p-button-warning' : 'p-button-success',
 			accept: () => {
+				if (this.vm().loading) return;
 				this.crudFacade.toggleEstado(usuario);
 			},
 			reject: () => {},

@@ -291,7 +291,7 @@
 				icon="pi pi-check"
 				class="p-button-success"
 				(click)="onSave()"
-				[disabled]="!isFormValid()"
+				[disabled]="!isFormValid() || loading()"
 				[pt]="{
 					root: {
 						'aria-label': 'Guardar',

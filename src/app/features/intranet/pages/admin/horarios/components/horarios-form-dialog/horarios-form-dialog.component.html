@@ -176,7 +176,7 @@
 			[label]="isEditing() ? 'Actualizar' : 'Crear'"
 			icon="pi pi-check"
 			(click)="onSave()"
-			[disabled]="!formValid()"
+			[disabled]="!formValid() || loading()"
 			[pTooltip]="isEditing() ? 'Guardar cambios del horario' : 'Crear nuevo horario'"
 			tooltipPosition="top"
 		></button>

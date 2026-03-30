@@ -102,7 +102,10 @@ export class PermisosRolesComponent implements OnInit {
 			message: buildDeletePermisoRolMessage(permiso.rol),
 			header: 'Confirmar Eliminación',
 			icon: 'pi pi-exclamation-triangle',
-			accept: () => this.facade.delete(permiso),
+			accept: () => {
+				if (this.vm().loading) return;
+				this.facade.delete(permiso);
+			},
 		});
 	}
 

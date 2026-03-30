@@ -82,6 +82,7 @@ export class UsuarioFormDialogComponent {
 	readonly formData = input.required<UsuarioFormData>();
 	readonly errors = input.required<FormValidationErrors>();
 	readonly isFormValid = input.required<boolean>();
+	readonly loading = input<boolean>(false);
 	readonly salones = input<SalonProfesor[]>([]);
 
 	readonly visibleChange = output<boolean>();

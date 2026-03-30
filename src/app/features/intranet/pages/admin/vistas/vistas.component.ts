@@ -115,7 +115,10 @@ export class VistasComponent implements OnInit {
 			message: buildDeleteVistaMessage(vista.nombre),
 			header: 'Confirmar Eliminación',
 			icon: 'pi pi-exclamation-triangle',
-			accept: () => this.facade.delete(vista),
+			accept: () => {
+				if (this.vm().loading) return;
+				this.facade.delete(vista);
+			},
 		});
 	}
 

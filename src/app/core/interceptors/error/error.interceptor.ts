@@ -1,7 +1,7 @@
 // #region Imports
 import { HttpErrorResponse, HttpEvent, HttpHandlerFn, HttpInterceptorFn, HttpRequest } from '@angular/common/http';
 import { inject } from '@angular/core';
-import { Observable, Subject, catchError, filter, switchMap, take, throwError } from 'rxjs';
+import { Observable, Subject, catchError, filter, switchMap, take, throwError, timeout } from 'rxjs';
 
 import { logger } from '@core/helpers';
 import { AuthApiService } from '@core/services/auth/auth-api.service';
@@ -16,6 +16,9 @@ let refreshResult$ = new Subject<boolean>();
 
 /** URLs that should never trigger a refresh-on-401 (prevents infinite loops). */
 const SKIP_REFRESH_URLS = ['/login', '/verificar', '/logout', '/refresh'];
+
+/** Max time (ms) to wait for a pending refresh before giving up. */
+const REFRESH_WAIT_TIMEOUT = 10_000;
 
 // #endregion
 // #region Implementation
@@ -89,16 +92,18 @@ function handle401(
 	sessionActivity: SessionActivityService,
 ): Observable<HttpEvent<unknown>> {
 	if (isRefreshing) {
-		// Another request already triggered a refresh — wait for it
+		// Another request already triggered a refresh — wait for it (with timeout to avoid hanging)
 		return refreshResult$.pipe(
 			filter((success) => success !== undefined),
 			take(1),
+			timeout(REFRESH_WAIT_TIMEOUT),
 			switchMap((success): Observable<HttpEvent<unknown>> => {
 				if (success) {
 					return next(req);
 				}
 				return throwError(() => new HttpErrorResponse({ status: 401 }));
 			}),
+			catchError(() => throwError(() => new HttpErrorResponse({ status: 401 }))),
 		);
 	}
 

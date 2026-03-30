@@ -39,6 +39,7 @@ const NO_CACHE_PATTERNS = [
 	'/api/sistema/permisos',
 	'/api/Auth/perfil',
 	'/api/Auth/login',
+	'/api/Auth/refresh',
 	'/api/Auth/verificar',
 	'/api/Auth/sessions',
 ];

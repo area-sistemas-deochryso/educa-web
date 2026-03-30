@@ -46,7 +46,7 @@ export class ProfesorFacade {
 			.subscribe({
 				next: ({ horarios, salonTutoria, misEstudiantes }) => {
 					this.store.setHorarios(horarios);
-					this.store.setSalonTutoria(salonTutoria.data);
+					this.store.setSalonTutoria(salonTutoria);
 					this.store.setMisEstudiantes(misEstudiantes);
 					this.store.setLoading(false);
 					this.smartNotif.saveHorarioSnapshot(horarios);

@@ -142,7 +142,10 @@ export class EventosCalendarioComponent implements OnInit {
 			message: `¿Eliminar el evento "${item.titulo}"?`,
 			header: 'Confirmar Eliminación',
 			icon: 'pi pi-exclamation-triangle',
-			accept: () => this.facade.delete(item),
+			accept: () => {
+				if (this.vm().loading) return;
+				this.facade.delete(item);
+			},
 		});
 	}
 
