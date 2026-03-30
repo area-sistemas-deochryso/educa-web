@@ -8,8 +8,10 @@ import {
 	HttpErrorDetails,
 } from './error.models';
 import { Injectable, computed, inject, signal } from '@angular/core';
+import { Router } from '@angular/router';
 
-import { HttpErrorResponse } from '@angular/common/http';
+import { HttpClient, HttpErrorResponse, HttpHeaders } from '@angular/common/http';
+import { environment } from '@config/environment';
 import { logger } from '@core/helpers';
 import {
 	UI_CLIENT_ERROR_MESSAGE,
@@ -26,8 +28,14 @@ import {
 export class ErrorHandlerService {
 	// * Centralized error handling + notification state.
 
+	private readonly http = inject(HttpClient);
+	private readonly router = inject(Router);
+
 	// Estado con Signals
 	private readonly _errors = signal<AppError[]>([]);
+	private _reportCount = 0;
+	private _reportResetTimer: ReturnType<typeof setTimeout> | null = null;
+	private static readonly MAX_REPORTS_PER_MINUTE = 5;
 	private readonly _currentNotification = signal<ErrorNotification | null>(null);
 
 	// Computed signals publicos
@@ -75,6 +83,11 @@ export class ErrorHandlerService {
 			life: error.status === 401 ? 3000 : 5000,
 		});
 
+		// Report server errors to backend for observability
+		if (error.status >= 500) {
+			this.reportToBackend(`HTTP ${error.status}: ${error.url}`, undefined, context);
+		}
+
 		return appError;
 	}
 
@@ -97,6 +110,8 @@ export class ErrorHandlerService {
 			detail: appError.message,
 			life: 5000,
 		});
+
+		this.reportToBackend(error.message, error.stack, context);
 
 		return appError;
 	}
@@ -220,6 +235,32 @@ export class ErrorHandlerService {
 			message: error.message,
 			body: error.error,
 		};
+	}
+
+	/** Fire-and-forget: sends critical errors to backend for observability. */
+	private reportToBackend(message: string, stack?: string, context?: Record<string, unknown>): void {
+		if (this._reportCount >= ErrorHandlerService.MAX_REPORTS_PER_MINUTE) return;
+		this._reportCount++;
+
+		if (!this._reportResetTimer) {
+			this._reportResetTimer = setTimeout(() => {
+				this._reportCount = 0;
+				this._reportResetTimer = null;
+			}, 60_000);
+		}
+
+		const headers = new HttpHeaders({ 'X-Skip-Error-Toast': 'true' });
+		const body = {
+			message,
+			stack: stack?.substring(0, 2000),
+			route: this.router.url,
+			correlationId: (context?.['requestId'] as string) ?? null,
+			timestamp: new Date().toISOString(),
+		};
+
+		this.http
+			.post(`${environment.apiUrl}/api/sistema/client-errors`, body, { headers })
+			.subscribe({ error: () => {} });
 	}
 
 	private getHttpErrorMessage(error: HttpErrorResponse): string {
