@@ -2,6 +2,10 @@
 <div class="home-container">
 	<app-welcome-section [title]="welcomeTitle()" />
 
+	@if (showAttendanceWidget()) {
+		<app-attendance-summary-widget />
+	}
+
 	@if (showQuickAccess() && quickAccessItems().length > 0) {
 		<section class="quick-access">
 			<h2>Accesos Rápidos</h2>

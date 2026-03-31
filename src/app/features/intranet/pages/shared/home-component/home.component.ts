@@ -5,7 +5,9 @@ import { QuickAccessCardComponent } from '@features/intranet/components/quick-ac
 import { FeatureFlagsFacade } from '@core/services/feature-flags';
 import { StorageService } from '@core/services';
 import { UserPermisosService } from '@core/services/permisos/user-permisos.service';
+import { UserProfileService } from '@core/services/user/user-profile.service';
 import { WelcomeSectionComponent } from '@features/intranet/components/welcome-section/welcome-section';
+import { AttendanceSummaryWidgetComponent } from './components/attendance-summary-widget/attendance-summary-widget.component';
 import { QUICK_ACCESS_BY_ROLE, MAX_QUICK_ACCESS, QuickAccessItem } from './quick-access.config';
 
 // #endregion
@@ -13,7 +15,7 @@ import { QUICK_ACCESS_BY_ROLE, MAX_QUICK_ACCESS, QuickAccessItem } from './quick
 @Component({
 	selector: 'app-home.component',
 	standalone: true,
-	imports: [QuickAccessCardComponent, WelcomeSectionComponent],
+	imports: [QuickAccessCardComponent, WelcomeSectionComponent, AttendanceSummaryWidgetComponent],
 	templateUrl: './home.component.html',
 	styleUrl: './home.component.scss',
 	changeDetection: ChangeDetectionStrategy.OnPush,
@@ -23,9 +25,13 @@ export class HomeComponent {
 	private storage = inject(StorageService);
 	private flags = inject(FeatureFlagsFacade);
 	private userPermisos = inject(UserPermisosService);
+	private userProfile = inject(UserProfileService);
 	// #endregion
 
 	// #region Estado
+	readonly showAttendanceWidget = computed(
+		() => this.userProfile.isDirector() || this.userProfile.isAsistenteAdministrativo(),
+	);
 	readonly showQuickAccess = computed(() => this.flags.isEnabled('quickAccess'));
 
 	readonly welcomeTitle = computed(() => {
