@@ -107,6 +107,7 @@
 			<th pSortableColumn="prioridad" style="width: 100px">Prioridad <p-sortIcon field="prioridad" /></th>
 			<th style="width: 110px">Fecha Inicio</th>
 			<th style="width: 110px">Fecha Fin</th>
+			<th style="width: 130px">Destinatario</th>
 			<th pSortableColumn="estado" style="width: 90px">Estado <p-sortIcon field="estado" /></th>
 			<th style="width: 140px">Acciones</th>
 		</tr>
@@ -128,6 +129,9 @@
 			</td>
 			<td>{{ item.fechaInicio | date: 'dd/MM/yyyy' }}</td>
 			<td>{{ item.fechaFin | date: 'dd/MM/yyyy' }}</td>
+			<td>
+				<p-tag [value]="getDestinatarioLabel(item)" [severity]="getDestinatarioLabel(item) === 'Todos' ? 'secondary' : 'info'" />
+			</td>
 			<td>
 				<p-tag
 					[value]="item.estado | estadoLabel"
@@ -172,7 +176,7 @@
 
 	<ng-template #emptymessage>
 		<tr>
-			<td colspan="7" class="text-center p-4">
+			<td colspan="8" class="text-center p-4">
 				<i class="pi pi-inbox" style="font-size: 2rem; color: var(--text-color-secondary)"></i>
 				<p>No se encontraron notificaciones</p>
 			</td>
@@ -234,6 +238,42 @@
 				[ngModel]="vm().formData.prioridad"
 				(ngModelChange)="updateField('prioridad', $event)"
 				appendTo="body"
+			/>
+		</div>
+
+		<div class="form-field">
+			<label for="destinatarioRol">Destinatario Rol</label>
+			<p-select
+				id="destinatarioRol"
+				[options]="destinatarioRolOptions"
+				[ngModel]="vm().formData.destinatarioRol"
+				(ngModelChange)="updateField('destinatarioRol', $event)"
+				appendTo="body"
+				placeholder="Todos los roles"
+			/>
+		</div>
+
+		<div class="form-field">
+			<label for="destinatarioGrado">Destinatario Grado</label>
+			<p-select
+				id="destinatarioGrado"
+				[options]="destinatarioGradoOptions"
+				[ngModel]="vm().formData.destinatarioGrado"
+				(ngModelChange)="updateField('destinatarioGrado', $event)"
+				appendTo="body"
+				placeholder="Todos los grados"
+			/>
+		</div>
+
+		<div class="form-field">
+			<label for="destinatarioSeccion">Destinatario Sección</label>
+			<p-select
+				id="destinatarioSeccion"
+				[options]="destinatarioSeccionOptions"
+				[ngModel]="vm().formData.destinatarioSeccion"
+				(ngModelChange)="updateField('destinatarioSeccion', $event)"
+				appendTo="body"
+				placeholder="Todas las secciones"
 			/>
 		</div>
 

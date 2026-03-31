@@ -1,5 +1,5 @@
 // #region Imports
-import { ChangeDetectionStrategy, Component, OnInit, inject } from '@angular/core';
+import { ChangeDetectionStrategy, Component, OnInit, inject, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ConfirmationService } from 'primeng/api';
@@ -110,6 +110,42 @@ export class NotificacionesAdminComponent implements OnInit {
 		{ label: 'Archivo', value: 'pi-file-edit' },
 		{ label: 'Refrescar', value: 'pi-refresh' },
 	];
+
+	readonly destinatarioRolOptions = [
+		{ label: 'Todos', value: null },
+		{ label: 'Estudiante', value: 'Estudiante' },
+		{ label: 'Profesor', value: 'Profesor' },
+		{ label: 'Apoderado', value: 'Apoderado' },
+		{ label: 'Director', value: 'Director' },
+		{ label: 'Asistente Administrativo', value: 'Asistente Administrativo' },
+	];
+
+	readonly destinatarioGradoOptions = [
+		{ label: 'Todos', value: null },
+		{ label: 'Inicial 3 años', value: 'Inicial 3' },
+		{ label: 'Inicial 4 años', value: 'Inicial 4' },
+		{ label: 'Inicial 5 años', value: 'Inicial 5' },
+		{ label: '1° Primaria', value: '1° Primaria' },
+		{ label: '2° Primaria', value: '2° Primaria' },
+		{ label: '3° Primaria', value: '3° Primaria' },
+		{ label: '4° Primaria', value: '4° Primaria' },
+		{ label: '5° Primaria', value: '5° Primaria' },
+		{ label: '6° Primaria', value: '6° Primaria' },
+		{ label: '1° Secundaria', value: '1° Secundaria' },
+		{ label: '2° Secundaria', value: '2° Secundaria' },
+		{ label: '3° Secundaria', value: '3° Secundaria' },
+		{ label: '4° Secundaria', value: '4° Secundaria' },
+		{ label: '5° Secundaria', value: '5° Secundaria' },
+	];
+
+	readonly destinatarioSeccionOptions = [
+		{ label: 'Todos', value: null },
+		{ label: 'A', value: 'A' },
+		{ label: 'B', value: 'B' },
+		{ label: 'C', value: 'C' },
+		{ label: 'D', value: 'D' },
+		{ label: 'V (Vacacional)', value: 'V' },
+	];
 	// #endregion
 
 	// #region Lifecycle
@@ -191,6 +227,14 @@ export class NotificacionesAdminComponent implements OnInit {
 	}
 	// #endregion
 
-	// UI helpers: uiMapping.getNotificacionTipo*(), uiMapping.getNotificacionPrioridad*()
+	// #region UI helpers
+	getDestinatarioLabel(item: NotificacionLista): string {
+		const parts: string[] = [];
+		if (item.destinatarioRol) parts.push(item.destinatarioRol);
+		if (item.destinatarioGrado) parts.push(item.destinatarioGrado);
+		if (item.destinatarioSeccion) parts.push(`Sección ${item.destinatarioSeccion}`);
+		return parts.length > 0 ? parts.join(' - ') : 'Todos';
+	}
+	// #endregion
 }
 // #endregion

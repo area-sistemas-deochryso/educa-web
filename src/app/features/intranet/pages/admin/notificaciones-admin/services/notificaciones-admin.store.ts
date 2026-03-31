@@ -18,6 +18,9 @@ export interface NotificacionFormData {
 	dismissible: boolean;
 	estado: boolean;
 	anio: number;
+	destinatarioRol: string | null;
+	destinatarioGrado: string | null;
+	destinatarioSeccion: string | null;
 }
 
 const EMPTY_FORM: NotificacionFormData = {
@@ -33,6 +36,9 @@ const EMPTY_FORM: NotificacionFormData = {
 	dismissible: true,
 	estado: true,
 	anio: new Date().getFullYear(),
+	destinatarioRol: null,
+	destinatarioGrado: null,
+	destinatarioSeccion: null,
 };
 // #endregion
 

@@ -27,6 +27,9 @@ export interface NotificacionLista {
 	fechaCreacion: string;
 	fechaModificacion: string | null;
 	rowVersion: string;
+	destinatarioRol: string | null;
+	destinatarioGrado: string | null;
+	destinatarioSeccion: string | null;
 }
 
 export interface NotificacionActiva {
@@ -54,6 +57,9 @@ export interface CrearNotificacionRequest {
 	dismissible: boolean;
 	estado: boolean;
 	anio: number;
+	destinatarioRol?: string | null;
+	destinatarioGrado?: string | null;
+	destinatarioSeccion?: string | null;
 }
 
 export interface ActualizarNotificacionRequest {
@@ -69,6 +75,9 @@ export interface ActualizarNotificacionRequest {
 	dismissible: boolean;
 	estado: boolean;
 	anio: number;
+	destinatarioRol?: string | null;
+	destinatarioGrado?: string | null;
+	destinatarioSeccion?: string | null;
 	rowVersion: string;
 }
 

@@ -107,6 +107,9 @@ export class NotificacionesAdminFacade {
 						dismissible: formData.dismissible,
 						estado: formData.estado,
 						anio: formData.anio,
+					destinatarioRol: formData.destinatarioRol || null,
+					destinatarioGrado: formData.destinatarioGrado || null,
+					destinatarioSeccion: formData.destinatarioSeccion || null,
 					});
 					this.store.closeDialog();
 					this.store.setLoading(false);
@@ -184,6 +187,9 @@ export class NotificacionesAdminFacade {
 			dismissible: item.dismissible,
 			estado: item.estado,
 			anio: item.anio,
+			destinatarioRol: item.destinatarioRol,
+			destinatarioGrado: item.destinatarioGrado,
+			destinatarioSeccion: item.destinatarioSeccion,
 		});
 		this.store.openDialog();
 	}
@@ -240,6 +246,9 @@ export class NotificacionesAdminFacade {
 			dismissible: formData.dismissible,
 			estado: formData.estado,
 			anio: formData.anio,
+			destinatarioRol: formData.destinatarioRol || null,
+			destinatarioGrado: formData.destinatarioGrado || null,
+			destinatarioSeccion: formData.destinatarioSeccion || null,
 		};
 	}
 
