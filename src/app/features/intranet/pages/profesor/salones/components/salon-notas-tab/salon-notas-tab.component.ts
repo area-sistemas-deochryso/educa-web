@@ -6,6 +6,8 @@ import { Select } from 'primeng/select';
 import { FormsModule } from '@angular/forms';
 import { SelectButtonModule } from 'primeng/selectbutton';
 import { SkeletonModule } from 'primeng/skeleton';
+import { ButtonModule } from 'primeng/button';
+import { TooltipModule } from 'primeng/tooltip';
 import {
 	SalonNotasResumenDto,
 	CalificacionDto,
@@ -39,6 +41,8 @@ interface SemanaColumnsGroup {
 		FormsModule,
 		SelectButtonModule,
 		SkeletonModule,
+		ButtonModule,
+		TooltipModule,
 	],
 	changeDetection: ChangeDetectionStrategy.OnPush,
 	templateUrl: './salon-notas-tab.component.html',
@@ -57,6 +61,7 @@ export class SalonNotasTabComponent {
 	// #region Outputs
 	readonly cursoChange = output<number>();
 	readonly vistaChange = output<VistaPromedio>();
+	readonly descargarBoletas = output<void>();
 	// #endregion
 
 	// #region Estado local

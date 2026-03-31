@@ -1,7 +1,7 @@
 import { Injectable, inject, DestroyRef } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { forkJoin } from 'rxjs';
-import { logger, withRetry } from '@core/helpers';
+import { logger, withRetry, downloadBlob } from '@core/helpers';
 import { ErrorHandlerService } from '@core/services';
 import { SmartNotificationService } from '@core/services/notifications/smart-notification.service';
 import { UI_ADMIN_ERROR_DETAILS, UI_SUMMARIES } from '@app/shared/constants';
@@ -164,6 +164,33 @@ export class ProfesorFacade {
 				);
 			},
 		});
+	}
+	// #endregion
+
+	// #region Boletas PDF
+	descargarBoletaEstudiante(estudianteId: number, salonId: number, nombreEstudiante: string): void {
+		this.api
+			.descargarBoletaEstudiante(estudianteId, salonId)
+			.pipe(takeUntilDestroyed(this.destroyRef))
+			.subscribe({
+				next: (blob) => downloadBlob(blob, `Boleta_${nombreEstudiante}.pdf`),
+				error: () =>
+					this.errorHandler.showError(UI_SUMMARIES.error, 'No se pudo descargar la boleta'),
+			});
+	}
+
+	descargarBoletaSalon(salonId: number, salonNombre: string): void {
+		this.api
+			.descargarBoletaSalon(salonId)
+			.pipe(takeUntilDestroyed(this.destroyRef))
+			.subscribe({
+				next: (blob) => downloadBlob(blob, `Boletas_${salonNombre}.pdf`),
+				error: () =>
+					this.errorHandler.showError(
+						UI_SUMMARIES.error,
+						'No se pudo descargar las boletas del salón',
+					),
+			});
 	}
 	// #endregion
 }

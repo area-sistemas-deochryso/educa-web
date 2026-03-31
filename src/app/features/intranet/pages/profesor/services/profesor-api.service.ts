@@ -398,4 +398,21 @@ export class ProfesorApiService {
 		return this.http.post<{ url: string; fileName: string }>(`${this.blobUrl}/upload`, formData);
 	}
 	// #endregion
+
+	// #region Boletas PDF
+	private readonly boletaUrl = `${environment.apiUrl}/api/BoletaNotas`;
+
+	descargarBoletaEstudiante(estudianteId: number, salonId: number): Observable<Blob> {
+		return this.http.get(`${this.boletaUrl}/estudiante/${estudianteId}`, {
+			params: { salonId: salonId.toString() },
+			responseType: 'blob',
+		});
+	}
+
+	descargarBoletaSalon(salonId: number): Observable<Blob> {
+		return this.http.get(`${this.boletaUrl}/salon/${salonId}`, {
+			responseType: 'blob',
+		});
+	}
+	// #endregion
 }

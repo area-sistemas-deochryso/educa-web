@@ -19,6 +19,17 @@
 		optionLabel="label"
 		optionValue="value"
 	/>
+	@if (hasData()) {
+		<button
+			pButton
+			icon="pi pi-file-pdf"
+			class="p-button-outlined p-button-sm"
+			(click)="descargarBoletas.emit()"
+			pTooltip="Descargar boletas de notas del salón"
+			tooltipPosition="top"
+			[pt]="{ root: { 'aria-label': 'Descargar boletas PDF' } }"
+		></button>
+	}
 </div>
 <!-- #endregion -->
 

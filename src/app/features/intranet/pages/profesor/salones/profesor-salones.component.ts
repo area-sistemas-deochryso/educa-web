@@ -159,6 +159,7 @@ import { NotaSaveEvent } from './components/salon-notas-estudiante-tab/salon-not
 			(gruposConfirmDialogHide)="gruposFacade.closeConfirmDialog()"
 			(gruposRefresh)="onGruposRefresh()"
 			(notasRefresh)="onNotasRefresh()"
+			(descargarBoletas)="onDescargarBoletas()"
 		/>
 	`,
 })
@@ -303,6 +304,12 @@ export class ProfesorSalonesComponent implements OnInit {
 		const cursoId = this.vm().notasCursoId;
 		if (!salon || !cursoId) return;
 		this.facade.loadNotasSalon(salon.salonId, cursoId);
+	}
+
+	onDescargarBoletas(): void {
+		const salon = this.vm().selectedSalon;
+		if (!salon) return;
+		this.facade.descargarBoletaSalon(salon.salonId, salon.salonDescripcion);
 	}
 	// #endregion
 }

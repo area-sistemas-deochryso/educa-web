@@ -230,6 +230,7 @@ import { NotaSaveEvent } from '../salon-notas-estudiante-tab/salon-notas-estudia
 								[vistaActual]="vistaActual()"
 								(cursoChange)="notasCursoChange.emit($event)"
 								(vistaChange)="notasVistaChange.emit($event)"
+								(descargarBoletas)="descargarBoletas.emit()"
 							/>
 						</p-tabpanel>
 						<!-- #endregion -->
@@ -319,6 +320,7 @@ export class SalonEstudiantesDialogComponent {
 	readonly gruposTabActivated = output<void>();
 	readonly gruposRefresh = output<void>();
 	readonly notasRefresh = output<void>();
+	readonly descargarBoletas = output<void>();
 	// #endregion
 
 	readonly skeletonRows = Array(5);
