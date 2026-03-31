@@ -1,0 +1,54 @@
+<!-- #region Grid -->
+<div class="grid-container">
+	<p-table [value]="rows()" [scrollable]="true" scrollHeight="500px" styleClass="p-datatable-sm">
+		<ng-template pTemplate="header">
+			<tr>
+				<th class="frozen-col row-num-col">#</th>
+				<th class="frozen-col student-col">Estudiante</th>
+				@for (cal of calificaciones(); track cal.id) {
+					<th class="eval-col">
+						<div class="eval-header">
+							<span class="eval-title">{{ cal.titulo }}</span>
+							<span class="eval-peso">{{ cal.peso * 100 | number: '1.0-0' }}%</span>
+						</div>
+					</th>
+				}
+				<th class="avg-col">Prom.</th>
+			</tr>
+		</ng-template>
+
+		<ng-template pTemplate="body" let-row let-i="rowIndex">
+			<tr>
+				<td class="frozen-col row-num-col">{{ i + 1 }}</td>
+				<td class="frozen-col student-col student-name">{{ row.nombre }}</td>
+				@for (cell of row.cells; track cell.calificacionId) {
+					<td class="grade-cell" [class]="cell.colorClass">
+						@if (cell.editable) {
+							<input
+								type="number"
+								[value]="cell.nota"
+								(blur)="onCellBlur($event, cell)"
+								(keydown.tab)="$event.stopPropagation()"
+								min="0"
+								max="20"
+								step="0.5"
+								class="grade-input"
+								[disabled]="saving()"
+							/>
+						} @else {
+							<span class="grade-readonly">{{ cell.nota ?? '-' }}</span>
+						}
+					</td>
+				}
+				<td class="avg-col" [class]="row.avgClass">{{ row.promedio }}</td>
+			</tr>
+		</ng-template>
+
+		<ng-template pTemplate="emptymessage">
+			<tr>
+				<td [attr.colspan]="totalColumns()">No hay datos para mostrar</td>
+			</tr>
+		</ng-template>
+	</p-table>
+</div>
+<!-- #endregion -->

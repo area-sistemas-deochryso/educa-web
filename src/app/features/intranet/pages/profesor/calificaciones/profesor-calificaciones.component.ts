@@ -10,6 +10,7 @@ import {
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { ButtonModule } from 'primeng/button';
 import { Select } from 'primeng/select';
 import { ProgressSpinnerModule } from 'primeng/progressspinner';
 import { ConfirmDialogModule } from 'primeng/confirmdialog';
@@ -25,6 +26,7 @@ import { CalificacionesPanelComponent } from '../cursos/components/calificacione
 import { CalificarDialogComponent } from '../cursos/components/calificar-dialog/calificar-dialog.component';
 import { EvaluacionFormDialogComponent } from '../cursos/components/evaluacion-form-dialog/evaluacion-form-dialog.component';
 import { PeriodosConfigDialogComponent } from '../cursos/components/periodos-config-dialog/periodos-config-dialog.component';
+import { CalificacionesGridComponent } from './components/calificaciones-grid/calificaciones-grid.component';
 import {
 	CalificacionDto,
 	CalificacionConNotasDto,
@@ -42,6 +44,7 @@ import {
 	imports: [
 		CommonModule,
 		FormsModule,
+		ButtonModule,
 		Select,
 		ProgressSpinnerModule,
 		ConfirmDialogModule,
@@ -50,6 +53,7 @@ import {
 		CalificarDialogComponent,
 		EvaluacionFormDialogComponent,
 		PeriodosConfigDialogComponent,
+		CalificacionesGridComponent,
 	],
 	providers: [ConfirmationService],
 	changeDetection: ChangeDetectionStrategy.OnPush,
@@ -62,6 +66,11 @@ import {
 			align-items: center;
 			gap: 1rem;
 			flex-wrap: wrap;
+		}
+		.vista-toggle {
+			display: flex;
+			gap: 0.5rem;
+			margin-bottom: 1rem;
 		}
 	`,
 	template: `
@@ -93,19 +102,37 @@ import {
 						<p-progressSpinner strokeWidth="4" />
 					</div>
 				} @else if (contenido()) {
-					<app-calificaciones-panel
-						[calificacionesPorSemana]="calVm().calificacionesPorSemana"
-						[periodos]="calVm().periodos"
-						[loading]="calVm().loading"
-						[saving]="calVm().saving"
-						[totalEvaluaciones]="calVm().totalEvaluaciones"
-						(crearEvaluacion)="calFacade.openCalificacionDialog()"
-						(editarEvaluacion)="calFacade.openCalificacionDialog($event)"
-						(calificarEstudiantes)="calFacade.openCalificarDialog($event)"
-						(eliminarEvaluacion)="onEliminar($event)"
-						(cambiarTipo)="onCambiarTipo($event)"
-						(configurarPeriodos)="calFacade.openPeriodosDialog()"
-					/>
+					@if (calVm().calificaciones.length > 0) {
+						<div class="vista-toggle">
+							<button pButton [outlined]="vistaActual() !== 'lista'" label="Lista" icon="pi pi-list" (click)="onVistaChange('lista')" class="p-button-sm"></button>
+							<button pButton [outlined]="vistaActual() !== 'planilla'" label="Planilla" icon="pi pi-table" (click)="onVistaChange('planilla')" class="p-button-sm"></button>
+						</div>
+					}
+
+					@if (vistaActual() === 'lista') {
+						<app-calificaciones-panel
+							[calificacionesPorSemana]="calVm().calificacionesPorSemana"
+							[periodos]="calVm().periodos"
+							[loading]="calVm().loading"
+							[saving]="calVm().saving"
+							[totalEvaluaciones]="calVm().totalEvaluaciones"
+							(crearEvaluacion)="calFacade.openCalificacionDialog()"
+							(editarEvaluacion)="calFacade.openCalificacionDialog($event)"
+							(calificarEstudiantes)="calFacade.openCalificarDialog($event)"
+							(eliminarEvaluacion)="onEliminar($event)"
+							(cambiarTipo)="onCambiarTipo($event)"
+							(configurarPeriodos)="calFacade.openPeriodosDialog()"
+						/>
+					}
+
+					@if (vistaActual() === 'planilla') {
+						<app-calificaciones-grid
+							[calificaciones]="calVm().calificaciones"
+							[estudiantes]="estudiantesForCalificar()"
+							[saving]="calVm().saving"
+							(notaChange)="onNotaChange($event)"
+						/>
+					}
 
 					<!-- Dialogs -->
 					<app-evaluacion-form-dialog
@@ -158,6 +185,7 @@ export class ProfesorCalificacionesComponent implements OnInit, OnDestroy {
 
 	// #region Estado local
 	selectedHorarioId = signal<number | null>(null);
+	vistaActual = signal<'lista' | 'planilla'>('lista');
 	private readonly _contenidoLoading = signal(false);
 	private readonly _contenido = signal<CursoContenidoDetalleDto | null>(null);
 
@@ -212,6 +240,19 @@ export class ProfesorCalificacionesComponent implements OnInit, OnDestroy {
 	// #endregion
 
 	// #region Handlers
+	onVistaChange(vista: 'lista' | 'planilla'): void {
+		this.vistaActual.set(vista);
+	}
+
+	onNotaChange(event: { calificacionId: number; estudianteId: number; nota: number | null }): void {
+		if (event.nota === null) return;
+		const cont = this.contenido();
+		if (!cont) return;
+		this.calFacade.calificarLote(event.calificacionId, {
+			notas: [{ estudianteId: event.estudianteId, nota: event.nota, observacion: null }],
+		}, cont.id);
+	}
+
 	onCursoChange(horarioId: number): void {
 		this.selectedHorarioId.set(horarioId);
 		this.calFacade.resetCalificaciones();
