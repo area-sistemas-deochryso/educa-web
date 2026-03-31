@@ -32,6 +32,9 @@ export class PermisosUsuariosFacade {
 		errorHandler: this.errorHandler,
 	});
 
+	// ViewModel
+	readonly vm = this.store.vm;
+
 	// Estado público readonly desde el store
 	readonly permisosUsuario = this.store.permisosUsuario;
 	readonly permisosRol = this.store.permisosRol;

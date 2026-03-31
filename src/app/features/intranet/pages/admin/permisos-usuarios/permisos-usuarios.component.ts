@@ -58,6 +58,7 @@ export class PermisosUsuariosComponent implements OnInit {
 	private confirmationService = inject(ConfirmationService);
 
 	// #region Facade state (signals)
+	readonly vm = this.facade.vm;
 	readonly permisosUsuario = this.facade.permisosUsuario;
 	readonly vistas = this.facade.vistas;
 	readonly loading = this.facade.loading;

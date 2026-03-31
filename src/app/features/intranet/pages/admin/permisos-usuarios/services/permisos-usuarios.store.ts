@@ -64,6 +64,19 @@ export class PermisosUsuariosStore {
 	// #endregion
 
 	// #region Computed
+	readonly vm = computed(() => ({
+		permisosUsuario: this._permisosUsuario(),
+		loading: this._loading(),
+		error: this._error(),
+		searchTerm: this._searchTerm(),
+		filterRol: this._filterRol(),
+		dialogVisible: this._dialogVisible(),
+		detailDrawerVisible: this._detailDrawerVisible(),
+		isEditing: this._isEditing(),
+		selectedPermiso: this._selectedPermiso(),
+		filteredPermisos: this.filteredPermisos(),
+	}));
+
 	readonly filteredPermisos = computed(() => {
 		let permisos = this._permisosUsuario();
 		const search = this._searchTerm();
