@@ -89,6 +89,17 @@ export class HorariosUiFacade {
   }
 
   // #endregion
+  // #region Comandos de import dialog
+
+  openImportDialog(): void {
+    this.store.openImportDialog();
+  }
+
+  closeImportDialog(): void {
+    this.store.closeImportDialog();
+  }
+
+  // #endregion
   // #region Comandos de detail drawer
 
   /**

@@ -4,6 +4,7 @@ import { AuthStore } from '@core/store';
 import { isAdminRole } from '@shared/models';
 import { CursoListaDto, CursoOption, CursosPorNivel } from '../models/curso.interface';
 import { filterSalonesDisponibles } from '../helpers/horario-conflict.utils';
+import { type ImportarHorariosResult } from '../helpers/horario-import.config';
 import { mapSalonesToOptions, mapCursosToOptions, groupCursosByNivel, mapProfesToOptions } from '../helpers/horario-mapping.utils';
 import {
 	type HorarioDetalleResponseDto,
@@ -46,6 +47,12 @@ export class HorariosStore {
 	private readonly _tableReady = signal(false);
 	// #endregion
 
+	// #region Estado privado - Import
+	private readonly _importDialogVisible = signal(false);
+	private readonly _importLoading = signal(false);
+	private readonly _importResult = signal<ImportarHorariosResult | null>(null);
+	// #endregion
+
 	// #region Lecturas públicas - Datos
 	readonly horarios = this._horarios.asReadonly();
 	readonly horarioDetalle = this._horarioDetalle.asReadonly();
@@ -60,6 +67,12 @@ export class HorariosStore {
 	readonly optionsLoading = this._optionsLoading.asReadonly();
 	readonly statsReady = this._statsReady.asReadonly();
 	readonly tableReady = this._tableReady.asReadonly();
+	// #endregion
+
+	// #region Lecturas públicas - Import
+	readonly importDialogVisible = this._importDialogVisible.asReadonly();
+	readonly importLoading = this._importLoading.asReadonly();
+	readonly importResult = this._importResult.asReadonly();
 	// #endregion
 
 	// #region Lecturas delegadas - Form
@@ -208,6 +221,9 @@ export class HorariosStore {
 		currentUser: this.currentUser(),
 		isAdmin: this.isAdmin(),
 		currentProfesorId: this.currentProfesorId(),
+		importDialogVisible: this._importDialogVisible(),
+		importLoading: this._importLoading(),
+		importResult: this._importResult(),
 	}));
 
 	/** Formulario wizard */
@@ -466,6 +482,26 @@ export class HorariosStore {
 
 	setPaginationData(page: number, pageSize: number, totalRecords: number): void {
 		this.filterStore.setPaginationData(page, pageSize, totalRecords);
+	}
+	// #endregion
+
+	// #region Comandos - Import
+	openImportDialog(): void {
+		this._importDialogVisible.set(true);
+		this._importResult.set(null);
+	}
+
+	closeImportDialog(): void {
+		this._importDialogVisible.set(false);
+		this._importResult.set(null);
+	}
+
+	setImportLoading(loading: boolean): void {
+		this._importLoading.set(loading);
+	}
+
+	setImportResult(result: ImportarHorariosResult | null): void {
+		this._importResult.set(result);
 	}
 	// #endregion
 

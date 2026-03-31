@@ -19,6 +19,16 @@
 	@if (vm().isAdmin) {
 		<button
 			pButton
+			label="Importar"
+			icon="pi pi-upload"
+			class="p-button-outlined"
+			(click)="onOpenImportDialog()"
+			pTooltip="Importar horarios desde Excel"
+			tooltipPosition="bottom"
+			[pt]="{ root: { 'aria-label': 'Importar horarios desde Excel' } }"
+		></button>
+		<button
+			pButton
 			label="Nuevo Horario"
 			icon="pi pi-plus"
 			(click)="onNew()"
@@ -199,6 +209,16 @@
 	[selectedCursoId]="vm().formData.cursoId"
 	(visibleChange)="onCloseCursoDialog()"
 	(cursoSelected)="onSelectCurso($event)"
+/>
+
+<!-- #endregion -->
+<!-- #region Dialog: Importar Horarios -->
+<app-horarios-import-dialog
+	[visible]="vm().importDialogVisible"
+	[loading]="vm().importLoading"
+	[result]="vm().importResult"
+	(visibleChange)="onImportDialogVisibleChange($event)"
+	(importar)="onImportarHorarios($event)"
 />
 
 <!-- #endregion -->

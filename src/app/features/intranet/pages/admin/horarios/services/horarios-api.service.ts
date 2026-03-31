@@ -5,6 +5,7 @@ import { catchError } from 'rxjs/operators';
 
 import { environment } from '@config/environment';
 import { PaginatedResponse } from '@data/repositories';
+import { type ImportarHorarioItem, type ImportarHorariosResult } from '../helpers/horario-import.config';
 import {
   type DiaSemana,
   HorarioAsignarEstudiantesDto,
@@ -114,6 +115,13 @@ export class HorariosApiService {
     return this.http.delete<boolean>(
       `${this.apiUrl}/${horarioId}/estudiante/${estudianteId}`
     );
+  }
+
+  // #endregion
+  // #region Import
+
+  importarHorarios(items: ImportarHorarioItem[]): Observable<ImportarHorariosResult> {
+    return this.http.post<ImportarHorariosResult>(`${this.apiUrl}/importar`, { items });
   }
 
   // #endregion

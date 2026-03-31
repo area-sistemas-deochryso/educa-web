@@ -7,7 +7,9 @@ import { ConfirmationService } from 'primeng/api';
 import { HorarioDetailDrawerComponent } from './components/horario-detail-drawer/horario-detail-drawer.component';
 import { HorariosCursoPickerComponent } from './components/horarios-curso-picker/horarios-curso-picker.component';
 import { HorariosFormDialogComponent } from './components/horarios-form-dialog/horarios-form-dialog.component';
+import { HorariosImportDialogComponent } from './components/horarios-import-dialog/horarios-import-dialog.component';
 import { PageHeaderComponent } from '@shared/components';
+import { type ImportarHorarioItem } from './helpers/horario-import.config';
 import { type DiaSemana, HorarioResponseDto, type HorarioVistaType } from './models/horario.interface';
 import { HorariosCrudFacade, HorariosDataFacade, HorariosUiFacade } from './services';
 import { HorariosFiltersComponent } from './components/horarios-filters/horarios-filters.component';
@@ -39,6 +41,7 @@ import {
 		HorariosCursoPickerComponent,
 		HorariosFiltersComponent,
 		HorariosFormDialogComponent,
+		HorariosImportDialogComponent,
 		HorariosListViewComponent,
 		HorariosStatsSkeletonComponent,
 		HorariosTableSkeletonComponent,
@@ -276,6 +279,22 @@ export class HorariosComponent implements OnInit {
 				this.crudFacade.desasignarEstudiante(horarioId, estudianteId);
 			},
 		});
+	}
+
+	// #endregion
+	// #region Event handlers - Import
+	onOpenImportDialog(): void {
+		this.uiFacade.openImportDialog();
+	}
+
+	onImportDialogVisibleChange(visible: boolean): void {
+		if (!visible) {
+			this.uiFacade.closeImportDialog();
+		}
+	}
+
+	onImportarHorarios(items: ImportarHorarioItem[]): void {
+		this.crudFacade.importarHorarios(items);
 	}
 
 	// #endregion

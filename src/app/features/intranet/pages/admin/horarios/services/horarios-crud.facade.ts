@@ -1,8 +1,9 @@
 import { inject, Injectable } from '@angular/core';
 
-import { getEstadoToggleDeltas, getEstadoRollbackDeltas, facadeErrorHandler } from '@core/helpers';
+import { getEstadoToggleDeltas, getEstadoRollbackDeltas, facadeErrorHandler, logger } from '@core/helpers';
 import { ErrorHandlerService, WalFacadeHelper } from '@core/services';
 import { environment } from '@config';
+import { type ImportarHorarioItem } from '../helpers/horario-import.config';
 import {
   type HorarioAsignarEstudiantesDto,
   type HorarioAsignarProfesorDto,
@@ -264,6 +265,32 @@ export class HorariosCrudFacade {
             }
           }
         },
+      },
+    });
+  }
+
+  // #endregion
+  // #region Comando de importación
+
+  importarHorarios(items: ImportarHorarioItem[]): void {
+    this.store.setImportLoading(true);
+
+    this.api.importarHorarios(items).subscribe({
+      next: (result) => {
+        this.store.setImportResult(result);
+        this.store.setImportLoading(false);
+
+        if (result.creados > 0) {
+          this.dataFacade.refreshHorariosOnly();
+          this.errorHandler.showSuccess(
+            UI_SUMMARIES.success,
+            `${result.creados} horario(s) importado(s) correctamente`,
+          );
+        }
+      },
+      error: (err) => {
+        this.store.setImportLoading(false);
+        this.errHandler.handle(err, 'importar horarios');
       },
     });
   }
