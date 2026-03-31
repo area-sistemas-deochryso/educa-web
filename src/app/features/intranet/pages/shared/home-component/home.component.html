@@ -6,6 +6,10 @@
 		<app-attendance-summary-widget />
 	}
 
+	@if (showProfesorWidget()) {
+		<app-profesor-attendance-widget />
+	}
+
 	@if (showQuickAccess() && quickAccessItems().length > 0) {
 		<section class="quick-access">
 			<h2>Accesos Rápidos</h2>

@@ -8,6 +8,7 @@ import { UserPermisosService } from '@core/services/permisos/user-permisos.servi
 import { UserProfileService } from '@core/services/user/user-profile.service';
 import { WelcomeSectionComponent } from '@features/intranet/components/welcome-section/welcome-section';
 import { AttendanceSummaryWidgetComponent } from './components/attendance-summary-widget/attendance-summary-widget.component';
+import { ProfesorAttendanceWidgetComponent } from './components/profesor-attendance-widget/profesor-attendance-widget.component';
 import { QUICK_ACCESS_BY_ROLE, MAX_QUICK_ACCESS, QuickAccessItem } from './quick-access.config';
 
 // #endregion
@@ -15,7 +16,7 @@ import { QUICK_ACCESS_BY_ROLE, MAX_QUICK_ACCESS, QuickAccessItem } from './quick
 @Component({
 	selector: 'app-home.component',
 	standalone: true,
-	imports: [QuickAccessCardComponent, WelcomeSectionComponent, AttendanceSummaryWidgetComponent],
+	imports: [QuickAccessCardComponent, WelcomeSectionComponent, AttendanceSummaryWidgetComponent, ProfesorAttendanceWidgetComponent],
 	templateUrl: './home.component.html',
 	styleUrl: './home.component.scss',
 	changeDetection: ChangeDetectionStrategy.OnPush,
@@ -32,6 +33,7 @@ export class HomeComponent {
 	readonly showAttendanceWidget = computed(
 		() => this.userProfile.isDirector() || this.userProfile.isAsistenteAdministrativo(),
 	);
+	readonly showProfesorWidget = computed(() => this.userProfile.isProfesor());
 	readonly showQuickAccess = computed(() => this.flags.isEnabled('quickAccess'));
 
 	readonly welcomeTitle = computed(() => {

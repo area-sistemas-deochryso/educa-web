@@ -78,6 +78,8 @@ import { SkeletonLoaderComponent } from '@shared/components/skeleton-loader/skel
 		// #region Host
 		:host {
 			display: block;
+			padding: 0 2rem;
+			margin-bottom: 1.5rem;
 		}
 		// #endregion
 
@@ -103,17 +105,18 @@ import { SkeletonLoaderComponent } from '@shared/components/skeleton-loader/skel
 			align-items: center;
 			gap: 0.5rem;
 
-			i { color: var(--primary-color); font-size: 1.1rem; }
+			i { color: var(--intranet-accent-color-blue, #253470); font-size: 1.1rem; }
 			h3 { margin: 0; font-size: 1rem; font-weight: 600; color: var(--text-color); }
 		}
 
 		.widget-link {
 			font-size: 0.8rem;
-			color: var(--primary-color);
+			color: var(--intranet-accent-color-blue, #253470);
 			text-decoration: none;
 			display: flex;
 			align-items: center;
 			gap: 0.25rem;
+			font-weight: 500;
 
 			&:hover { text-decoration: underline; }
 			i { font-size: 0.7rem; }
