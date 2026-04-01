@@ -3,7 +3,7 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { forkJoin } from 'rxjs';
 
 import { logger, withRetry, getEstadoToggleDeltas } from '@core/helpers';
-import { ErrorHandlerService } from '@core/services';
+import { ErrorHandlerService, SwService } from '@core/services';
 import {
 	EventoCalendarioLista,
 	CrearEventoCalendarioRequest,
@@ -19,6 +19,7 @@ export class EventosCalendarioFacade {
 	// #region Dependencias
 	private api = inject(EventosCalendarioService);
 	private store = inject(EventosCalendarioStore);
+	private swService = inject(SwService);
 	private errorHandler = inject(ErrorHandlerService);
 	private destroyRef = inject(DestroyRef);
 	// #endregion
@@ -58,14 +59,13 @@ export class EventosCalendarioFacade {
 		const formData = this.store.formData();
 		const payload: CrearEventoCalendarioRequest = this.buildCreatePayload(formData);
 
-		this.store.setLoading(true);
 		this.api
 			.crear(payload)
 			.pipe(takeUntilDestroyed(this.destroyRef))
 			.subscribe({
 				next: () => {
 					this.store.closeDialog();
-					this.refreshItemsOnly();
+					this.silentRefreshAfterCrud();
 					this.store.incrementarEstadistica('total', 1);
 					this.store.incrementarEstadistica(formData.estado ? 'activos' : 'inactivos', 1);
 				},
@@ -87,7 +87,6 @@ export class EventosCalendarioFacade {
 			rowVersion: selected.rowVersion,
 		};
 
-		this.store.setLoading(true);
 		this.api
 			.actualizar(selected.id, payload)
 			.pipe(takeUntilDestroyed(this.destroyRef))
@@ -106,7 +105,7 @@ export class EventosCalendarioFacade {
 						anio: formData.anio,
 					});
 					this.store.closeDialog();
-					this.store.setLoading(false);
+					this.silentRefreshAfterCrud();
 				},
 				error: (err) => {
 					logger.error('Error al actualizar evento:', err);
@@ -135,7 +134,6 @@ export class EventosCalendarioFacade {
 	}
 
 	delete(item: EventoCalendarioLista): void {
-		this.store.setLoading(true);
 		this.api
 			.eliminar(item.id)
 			.pipe(takeUntilDestroyed(this.destroyRef))
@@ -146,12 +144,10 @@ export class EventosCalendarioFacade {
 					this.store.incrementarEstadistica('total', -1);
 					this.store.incrementarEstadistica('activos', activosDelta);
 					this.store.incrementarEstadistica('inactivos', inactivosDelta);
-					this.store.setLoading(false);
 				},
 				error: (err) => {
 					logger.error('Error al eliminar evento:', err);
 					this.errorHandler.showError(UI_SUMMARIES.error, 'No se pudo eliminar el evento');
-					this.store.setLoading(false);
 				},
 			});
 	}
@@ -200,9 +196,23 @@ export class EventosCalendarioFacade {
 		this.loadAll();
 	}
 
+	/** Refresh manual (botón Actualizar): invalida cache SW + recarga completa. */
+	refresh(): void {
+		this.swService.invalidateCacheByPattern('/eventoscalendario').then(() => {
+			this.loadAll();
+		});
+	}
+
 	// #endregion
 
 	// #region Helpers privados
+
+	/** Refetch silencioso post-CRUD: invalida cache SW + refresh sin loading visible. */
+	private silentRefreshAfterCrud(): void {
+		this.swService.invalidateCacheByPattern('/eventoscalendario').then(() => {
+			this.refreshItemsOnly();
+		});
+	}
 
 	private refreshItemsOnly(): void {
 		const anio = this.store.filterAnio();
@@ -212,11 +222,9 @@ export class EventosCalendarioFacade {
 			.subscribe({
 				next: (response) => {
 					this.store.setItems(Array.isArray(response) ? response : response.data ?? []);
-					this.store.setLoading(false);
 				},
 				error: (err) => {
 					logger.error('Error al refrescar lista:', err);
-					this.store.setLoading(false);
 				},
 			});
 	}

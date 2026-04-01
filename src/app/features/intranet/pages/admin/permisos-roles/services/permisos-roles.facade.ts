@@ -9,6 +9,7 @@ import {
 	PermisoRol,
 	RolTipoAdmin,
 	ROLES_DISPONIBLES_ADMIN,
+	SwService,
 	WalFacadeHelper,
 } from '@core/services';
 import { environment } from '@config';
@@ -24,6 +25,7 @@ export class PermisosRolesFacade {
 	private api = inject(PermisosService);
 	private store = inject(PermisosRolesStore);
 	private wal = inject(WalFacadeHelper);
+	private swService = inject(SwService);
 	private errorHandler = inject(ErrorHandlerService);
 	private destroyRef = inject(DestroyRef);
 	readonly uiMapping = inject(UiMappingService);
@@ -104,15 +106,12 @@ export class PermisosRolesFacade {
 				payload: { vistas, rowVersion: permiso.rowVersion },
 				http$: () => this.api.actualizarPermisoRol(permiso.id, { vistas, rowVersion: permiso.rowVersion }),
 				onCommit: () => {
-					this.refreshPermisosRolOnly();
+					this.silentRefreshAfterCrud();
 					this.errorHandler.showSuccess(UI_SUMMARIES.success, UI_PERMISOS_SUCCESS_DETAILS.updated);
 				},
-				onError: (err) => this.errHandler.handle(err, 'actualizar permiso', () => this.store.setLoading(false)),
+				onError: (err) => this.errHandler.handle(err, 'actualizar permiso'),
 				optimistic: {
-					apply: () => {
-						this.store.closeDialog();
-						this.store.setLoading(false);
-					},
+					apply: () => this.store.closeDialog(),
 					rollback: () => {},
 				},
 			});
@@ -128,15 +127,12 @@ export class PermisosRolesFacade {
 				payload: { rol, vistas },
 				http$: () => this.api.crearPermisoRol({ rol, vistas }),
 				onCommit: () => {
-					this.refreshPermisosRolOnly();
+					this.silentRefreshAfterCrud();
 					this.errorHandler.showSuccess(UI_SUMMARIES.success, UI_PERMISOS_SUCCESS_DETAILS.created);
 				},
-				onError: (err) => this.errHandler.handle(err, 'crear permiso', () => this.store.setLoading(false)),
+				onError: (err) => this.errHandler.handle(err, 'crear permiso'),
 				optimistic: {
-					apply: () => {
-						this.store.closeDialog();
-						this.store.setLoading(false);
-					},
+					apply: () => this.store.closeDialog(),
 					rollback: () => {},
 				},
 			});
@@ -158,11 +154,10 @@ export class PermisosRolesFacade {
 			onCommit: () => {
 				this.errorHandler.showSuccess(UI_SUMMARIES.success, UI_PERMISOS_SUCCESS_DETAILS.deleted);
 			},
-			onError: (err) => this.errHandler.handle(err, 'eliminar permiso', () => this.store.setLoading(false)),
+			onError: (err) => this.errHandler.handle(err, 'eliminar permiso'),
 			optimistic: {
 				apply: () => {
 					this.store.removePermiso(permiso.id);
-					this.store.setLoading(false);
 				},
 				rollback: () => {
 					this.store.addPermiso(permiso);
@@ -171,9 +166,23 @@ export class PermisosRolesFacade {
 		});
 	}
 
-	/** Refetch solo permisos por rol (sin recargar vistas) */
-	private refreshPermisosRolOnly(): void {
-		this.store.setLoading(true);
+	/** Refresh manual (botón Actualizar): invalida cache SW + recarga completa. */
+	refresh(): void {
+		this.swService.invalidateCacheByPattern('/permisos').then(() => {
+			this.loadAll();
+		});
+	}
+
+	/** Refetch silencioso post-CRUD: invalida cache SW + refresh sin loading visible. */
+	private silentRefreshAfterCrud(): void {
+		this.swService.invalidateCacheByPattern('/permisos').then(() => {
+			this.refreshPermisosRolOnly(true);
+		});
+	}
+
+	/** @param silent - Si true, no muestra loading */
+	private refreshPermisosRolOnly(silent = false): void {
+		if (!silent) { this.store.setLoading(true); }
 		const page = this.store.page();
 		const pageSize = this.store.pageSize();
 
@@ -187,12 +196,12 @@ export class PermisosRolesFacade {
 				next: (result) => {
 					this.store.setPermisosRol(result.data);
 					this.store.setPaginationData(result.page, result.pageSize, result.total);
-					this.store.setLoading(false);
+					if (!silent) { this.store.setLoading(false); }
 				},
 				error: (err) => {
 					logger.error('Error al refrescar permisos:', err);
 					this.errorHandler.showError(UI_SUMMARIES.error, UI_ADMIN_ERROR_DETAILS.refreshData);
-					this.store.setLoading(false);
+					if (!silent) { this.store.setLoading(false); }
 				},
 			});
 	}

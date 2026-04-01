@@ -3,7 +3,7 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { forkJoin } from 'rxjs';
 
 import { logger, withRetry, getEstadoToggleDeltas } from '@core/helpers';
-import { ErrorHandlerService } from '@core/services';
+import { ErrorHandlerService, SwService } from '@core/services';
 import {
 	NotificacionLista,
 	CrearNotificacionRequest,
@@ -19,6 +19,7 @@ export class NotificacionesAdminFacade {
 	// #region Dependencias
 	private api = inject(NotificacionesAdminService);
 	private store = inject(NotificacionesAdminStore);
+	private swService = inject(SwService);
 	private errorHandler = inject(ErrorHandlerService);
 	private destroyRef = inject(DestroyRef);
 	// #endregion
@@ -58,14 +59,13 @@ export class NotificacionesAdminFacade {
 		const formData = this.store.formData();
 		const payload: CrearNotificacionRequest = this.buildCreatePayload(formData);
 
-		this.store.setLoading(true);
 		this.api
 			.crear(payload)
 			.pipe(takeUntilDestroyed(this.destroyRef))
 			.subscribe({
 				next: () => {
 					this.store.closeDialog();
-					this.refreshItemsOnly();
+					this.silentRefreshAfterCrud();
 					this.store.incrementarEstadistica('total', 1);
 					if (formData.estado) this.store.incrementarEstadistica('activas', 1);
 					else this.store.incrementarEstadistica('inactivas', 1);
@@ -88,7 +88,6 @@ export class NotificacionesAdminFacade {
 			rowVersion: selected.rowVersion,
 		};
 
-		this.store.setLoading(true);
 		this.api
 			.actualizar(selected.id, payload)
 			.pipe(takeUntilDestroyed(this.destroyRef))
@@ -112,7 +111,7 @@ export class NotificacionesAdminFacade {
 					destinatarioSeccion: formData.destinatarioSeccion || null,
 					});
 					this.store.closeDialog();
-					this.store.setLoading(false);
+					this.silentRefreshAfterCrud();
 				},
 				error: (err) => {
 					logger.error('Error al actualizar notificación:', err);
@@ -141,7 +140,6 @@ export class NotificacionesAdminFacade {
 	}
 
 	delete(item: NotificacionLista): void {
-		this.store.setLoading(true);
 		this.api
 			.eliminar(item.id)
 			.pipe(takeUntilDestroyed(this.destroyRef))
@@ -152,12 +150,10 @@ export class NotificacionesAdminFacade {
 					this.store.incrementarEstadistica('total', -1);
 					this.store.incrementarEstadistica('activas', activosDelta);
 					this.store.incrementarEstadistica('inactivas', inactivosDelta);
-					this.store.setLoading(false);
 				},
 				error: (err) => {
 					logger.error('Error al eliminar notificación:', err);
 					this.errorHandler.showError(UI_SUMMARIES.error, 'No se pudo eliminar la notificación');
-					this.store.setLoading(false);
 				},
 			});
 	}
@@ -211,9 +207,23 @@ export class NotificacionesAdminFacade {
 		this.loadAll();
 	}
 
+	/** Refresh manual (botón Actualizar): invalida cache SW + recarga completa. */
+	refresh(): void {
+		this.swService.invalidateCacheByPattern('/notificaciones').then(() => {
+			this.loadAll();
+		});
+	}
+
 	// #endregion
 
 	// #region Helpers privados
+
+	/** Refetch silencioso post-CRUD: invalida cache SW + refresh sin loading visible. */
+	private silentRefreshAfterCrud(): void {
+		this.swService.invalidateCacheByPattern('/notificaciones').then(() => {
+			this.refreshItemsOnly();
+		});
+	}
 
 	private refreshItemsOnly(): void {
 		const anio = this.store.filterAnio();
@@ -223,11 +233,9 @@ export class NotificacionesAdminFacade {
 			.subscribe({
 				next: (response) => {
 					this.store.setItems(Array.isArray(response) ? response : response.data ?? []);
-					this.store.setLoading(false);
 				},
 				error: (err) => {
 					logger.error('Error al refrescar lista:', err);
-					this.store.setLoading(false);
 				},
 			});
 	}

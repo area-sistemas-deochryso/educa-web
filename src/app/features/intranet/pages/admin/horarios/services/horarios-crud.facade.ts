@@ -56,7 +56,7 @@ export class HorariosCrudFacade {
       payload: data,
       http$: () => this.api.create(data),
       onCommit: () => {
-        this.dataFacade.refreshHorariosOnly();
+        this.dataFacade.silentRefreshAfterCrud();
         this.store.incrementarEstadistica('totalHorarios', 1);
         this.store.incrementarEstadistica('horariosActivos', 1);
         this.errorHandler.showSuccess(
@@ -65,18 +65,13 @@ export class HorariosCrudFacade {
         );
       },
       onError: (err) => {
-        this.errHandler.handle(err, 'crear horario', () => {
-          this.store.setLoading(false);
-        });
+        this.errHandler.handle(err, 'crear horario');
       },
       optimistic: {
         apply: () => {
           this.store.closeDialog();
-          this.store.setLoading(true);
         },
-        rollback: () => {
-          this.store.setLoading(false);
-        },
+        rollback: () => {},
       },
     });
   }
@@ -135,16 +130,14 @@ export class HorariosCrudFacade {
           }
         }
 
-        this.store.setLoading(false);
+        this.dataFacade.silentRefreshAfterCrud();
         this.errorHandler.showSuccess(
           UI_SUMMARIES.success,
           UI_HORARIOS_SUCCESS_MESSAGES.updated
         );
       },
       onError: (err) => {
-        this.errHandler.handle(err, 'actualizar horario', () => {
-          this.store.setLoading(false);
-        });
+        this.errHandler.handle(err, 'actualizar horario');
       },
       optimistic: {
         apply: () => {
@@ -156,7 +149,6 @@ export class HorariosCrudFacade {
             cursoId: data.cursoId,
           });
           this.store.closeDialog();
-          this.store.setLoading(true);
         },
         rollback: () => {
           if (previousData) {
@@ -183,16 +175,13 @@ export class HorariosCrudFacade {
       payload: { estado: nuevoEstado },
       http$: () => this.api.toggleEstado(id),
       onCommit: () => {
-        this.store.setLoading(false);
         this.errorHandler.showSuccess(
           UI_SUMMARIES.success,
           UI_HORARIOS_SUCCESS_MESSAGES_DYNAMIC.toggleEstado(nuevoEstado)
         );
       },
       onError: (err) => {
-        this.errHandler.handle(err, 'cambiar estado de horario', () => {
-          this.store.setLoading(false);
-        });
+        this.errHandler.handle(err, 'cambiar estado de horario');
       },
       optimistic: {
         apply: () => {
@@ -200,7 +189,6 @@ export class HorariosCrudFacade {
           this.store.toggleHorarioEstado(id);
           this.store.incrementarEstadistica('horariosActivos', activosDelta);
           this.store.incrementarEstadistica('horariosInactivos', inactivosDelta);
-          this.store.setLoading(true);
         },
         rollback: () => {
           const { activosDelta, inactivosDelta } = getEstadoRollbackDeltas(estadoActual);
@@ -228,16 +216,13 @@ export class HorariosCrudFacade {
       payload: null,
       http$: () => this.api.delete(id),
       onCommit: () => {
-        this.store.setLoading(false);
         this.errorHandler.showSuccess(
           UI_SUMMARIES.success,
           UI_HORARIOS_SUCCESS_MESSAGES.deleted
         );
       },
       onError: (err) => {
-        this.errHandler.handle(err, 'eliminar horario', () => {
-          this.store.setLoading(false);
-        });
+        this.errHandler.handle(err, 'eliminar horario');
       },
       optimistic: {
         apply: () => {
@@ -251,7 +236,6 @@ export class HorariosCrudFacade {
               this.store.incrementarEstadistica('horariosSinProfesor', -1);
             }
           }
-          this.store.setLoading(true);
         },
         rollback: () => {
           if (horario) {
@@ -281,7 +265,7 @@ export class HorariosCrudFacade {
         this.store.setImportLoading(false);
 
         if (result.creados > 0) {
-          this.dataFacade.refreshHorariosOnly();
+          this.dataFacade.silentRefreshAfterCrud();
           this.errorHandler.showSuccess(
             UI_SUMMARIES.success,
             `${result.creados} horario(s) importado(s) correctamente`,
@@ -300,7 +284,7 @@ export class HorariosCrudFacade {
 
   private get assignmentCallbacks() {
     return {
-      refreshHorarios: () => this.dataFacade.refreshHorariosOnly(),
+      refreshHorarios: () => this.dataFacade.silentRefreshAfterCrud(),
       loadDetalle: (id: number) => this.dataFacade.loadDetalle(id),
     };
   }

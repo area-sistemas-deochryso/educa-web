@@ -9,6 +9,7 @@ import {
 	RolTipoAdmin,
 	UsuarioBusqueda,
 	ErrorHandlerService,
+	SwService,
 	WalFacadeHelper,
 } from '@core/services';
 import { environment } from '@config';
@@ -23,6 +24,7 @@ export class PermisosUsuariosFacade {
 	private permisosService = inject(PermisosService);
 	private helperService = inject(PermisosUsuariosHelperService);
 	private errorHandler = inject(ErrorHandlerService);
+	private swService = inject(SwService);
 	private wal = inject(WalFacadeHelper);
 	readonly uiMapping = inject(UiMappingService);
 	private destroyRef = inject(DestroyRef);
@@ -119,7 +121,16 @@ export class PermisosUsuariosFacade {
 	}
 
 	refresh(): void {
-		this.loadData();
+		this.swService.invalidateCacheByPattern('/permisos').then(() => {
+			this.loadData();
+		});
+	}
+
+	/** Refetch silencioso post-CRUD: invalida cache SW + refresh sin loading visible. */
+	private silentRefreshAfterCrud(): void {
+		this.swService.invalidateCacheByPattern('/permisos').then(() => {
+			this.loadData();
+		});
 	}
 
 	// #endregion
@@ -203,8 +214,8 @@ export class PermisosUsuariosFacade {
 					apply: () => this.hideDialog(),
 					rollback: () => {},
 				},
-				onCommit: () => this.loadData(),
-				onError: (err) => this.errHandler.handle(err, 'guardar el permiso', () => this.store.setLoading(false)),
+				onCommit: () => this.silentRefreshAfterCrud(),
+				onError: (err) => this.errHandler.handle(err, 'guardar el permiso'),
 			});
 		} else {
 			const usuarioId = this.selectedUsuarioId();
@@ -224,8 +235,8 @@ export class PermisosUsuariosFacade {
 					apply: () => this.hideDialog(),
 					rollback: () => {},
 				},
-				onCommit: () => this.loadData(),
-				onError: (err) => this.errHandler.handle(err, 'guardar el permiso', () => this.store.setLoading(false)),
+				onCommit: () => this.silentRefreshAfterCrud(),
+				onError: (err) => this.errHandler.handle(err, 'guardar el permiso'),
 			});
 		}
 	}
@@ -247,8 +258,8 @@ export class PermisosUsuariosFacade {
 					if (snapshot) this.store.addPermisoUsuario(snapshot);
 				},
 			},
-			onCommit: () => this.store.setLoading(false),
-			onError: (err) => this.errHandler.handle(err, 'eliminar el permiso', () => this.store.setLoading(false)),
+			onCommit: () => {},
+			onError: (err) => this.errHandler.handle(err, 'eliminar el permiso'),
 		});
 	}
 

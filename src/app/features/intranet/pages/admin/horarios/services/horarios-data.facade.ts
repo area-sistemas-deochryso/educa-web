@@ -3,7 +3,7 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { forkJoin } from 'rxjs';
 
 import { logger, withRetry } from '@core/helpers';
-import { ErrorHandlerService } from '@core/services';
+import { ErrorHandlerService, SwService } from '@core/services';
 import {
   UI_ADMIN_ERROR_DETAILS,
   UI_SUMMARIES,
@@ -26,6 +26,7 @@ export class HorariosDataFacade {
   private cursosApi = inject(CursosApiService);
   private profesoresApi = inject(ProfesoresApiService);
   private store = inject(HorariosStore);
+  private swService = inject(SwService);
   private errorHandler = inject(ErrorHandlerService);
   private destroyRef = inject(DestroyRef);
 
@@ -197,13 +198,28 @@ export class HorariosDataFacade {
   // #endregion
   // #region Refetch y estadísticas
 
+  /** Refresh manual (botón Actualizar): invalida cache SW + recarga completa. */
+  refresh(): void {
+    this.swService.invalidateCacheByPattern('/horario').then(() => {
+      this.loadAll();
+    });
+  }
+
+  /** Refetch silencioso post-CRUD: invalida cache SW + refresh sin loading visible. */
+  silentRefreshAfterCrud(): void {
+    this.swService.invalidateCacheByPattern('/horario').then(() => {
+      this.refreshHorariosOnly(true);
+    });
+  }
+
   /**
    * Refetch solo items (sin resetear skeletons ni opciones).
-   * Profesores: refetch por su profesorId.
-   * Admins: refetch paginado.
+   * @param silent - Si true, no muestra loading (para refetch post-CRUD sin interrumpir UX)
    */
-  refreshHorariosOnly(): void {
-    this.store.setLoading(true);
+  refreshHorariosOnly(silent = false): void {
+    if (!silent) {
+      this.store.setLoading(true);
+    }
     const profesorId = this.store.currentProfesorId();
 
     if (profesorId !== null) {
@@ -218,9 +234,9 @@ export class HorariosDataFacade {
             this.store.setHorarios(horarios);
             this.store.setPaginationData(1, horarios.length, horarios.length);
             this.calculateEstadisticas(horarios);
-            this.store.setLoading(false);
+            if (!silent) { this.store.setLoading(false); }
           },
-          error: (err) => this.handleRefreshError(err),
+          error: (err) => this.handleRefreshError(err, silent),
         });
     } else {
       this.api
@@ -234,9 +250,9 @@ export class HorariosDataFacade {
             this.store.setHorarios(response.data);
             this.store.setPaginationData(response.page, response.pageSize, response.total);
             this.calculateEstadisticas(response.data);
-            this.store.setLoading(false);
+            if (!silent) { this.store.setLoading(false); }
           },
-          error: (err) => this.handleRefreshError(err),
+          error: (err) => this.handleRefreshError(err, silent),
         });
     }
   }
@@ -333,10 +349,10 @@ export class HorariosDataFacade {
       });
   }
 
-  private handleRefreshError(err: unknown): void {
+  private handleRefreshError(err: unknown, silent = false): void {
     logger.error('Error al refrescar horarios:', err);
     this.errorHandler.showError(UI_SUMMARIES.error, UI_ADMIN_ERROR_DETAILS.refreshData);
-    this.store.setLoading(false);
+    if (!silent) { this.store.setLoading(false); }
   }
 
   // #endregion
