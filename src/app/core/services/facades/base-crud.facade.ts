@@ -9,6 +9,7 @@ import {
 import { HasId } from '@shared/interfaces';
 import { UI_ADMIN_ERROR_DETAILS, UI_SUMMARIES } from '@shared/constants';
 import { ErrorHandlerService } from '@core/services/error/error-handler.service';
+import { SwService } from '@features/intranet/services/sw/sw.service';
 import { WalFacadeHelper } from '@core/services/wal/wal-facade-helper.service';
 import type { BaseCrudStore } from '@core/store/base/base-crud.store';
 
@@ -76,6 +77,7 @@ export abstract class BaseCrudFacade<
 > {
 	// #region Dependencias (heredadas)
 	protected readonly errorHandler = inject(ErrorHandlerService);
+	protected readonly swService = inject(SwService);
 	protected readonly wal = inject(WalFacadeHelper);
 	protected readonly destroyRef = inject(DestroyRef);
 	protected readonly errHandler: FacadeErrorHandler;
@@ -148,7 +150,7 @@ export abstract class BaseCrudFacade<
 
 	// #endregion
 
-	// #region Paginación
+	// #region Paginación y Refresh
 
 	loadPage(page: number, pageSize: number): void {
 		this.store.setPage(page);
@@ -156,8 +158,23 @@ export abstract class BaseCrudFacade<
 		this.refreshItemsOnly();
 	}
 
-	protected refreshItemsOnly(): void {
-		this.store.setLoading(true);
+	/**
+	 * Refresh manual (botón Actualizar): invalida cache SW + recarga completa.
+	 * Override en facades concretos si necesitan recargar fuentes adicionales.
+	 */
+	refresh(): void {
+		this.swService.invalidateCacheByPattern(this.getCachePattern()).then(() => {
+			this.loadAll();
+		});
+	}
+
+	/**
+	 * @param silent - Si true, no muestra loading (para refetch post-CRUD sin interrumpir UX)
+	 */
+	protected refreshItemsOnly(silent = false): void {
+		if (!silent) {
+			this.store.setLoading(true);
+		}
 
 		this.fetchItems()
 			.pipe(
@@ -168,14 +185,28 @@ export abstract class BaseCrudFacade<
 				next: (result) => {
 					this.store.setItems(result.data);
 					this.store.setPaginationData(result.page, result.pageSize, result.total);
-					this.store.setLoading(false);
+					if (!silent) {
+						this.store.setLoading(false);
+					}
 				},
 				error: (err) => {
 					logger.error(`${this.config.tag}: Error al refrescar:`, err);
 					this.errorHandler.showError(UI_SUMMARIES.error, UI_ADMIN_ERROR_DETAILS.refreshData);
-					this.store.setLoading(false);
+					if (!silent) {
+						this.store.setLoading(false);
+					}
 				},
 			});
+	}
+
+	/**
+	 * Refetch silencioso post-CRUD: invalida cache SW + refresh sin loading visible.
+	 * El usuario ve los datos optimistas mientras el servidor responde en background.
+	 */
+	protected silentRefreshAfterCrud(): void {
+		this.swService.invalidateCacheByPattern(this.getCachePattern()).then(() => {
+			this.refreshItemsOnly(true);
+		});
 	}
 
 	protected refreshEstadisticas(): void {
@@ -191,6 +222,11 @@ export abstract class BaseCrudFacade<
 					this.errorHandler.showError(UI_SUMMARIES.error, UI_ADMIN_ERROR_DETAILS.refreshData);
 				},
 			});
+	}
+
+	/** Patrón de URL para invalidar cache SW. Override si la ruta API no coincide con resourceType. */
+	protected getCachePattern(): string {
+		return `/${this.config.resourceType.toLowerCase()}`;
 	}
 
 	// #endregion
@@ -218,10 +254,10 @@ export abstract class BaseCrudFacade<
 				rollback: () => {},
 			},
 			onCommit: () => {
-				this.refreshItemsOnly();
+				this.silentRefreshAfterCrud();
 				this.refreshEstadisticas();
 			},
-			onError: (err) => this.errHandler.handle(err, this.getCreateErrorLabel(), () => this.store.setLoading(false)),
+			onError: (err) => this.errHandler.handle(err, this.getCreateErrorLabel()),
 		});
 	}
 
@@ -258,8 +294,8 @@ export abstract class BaseCrudFacade<
 					if (snapshot) this.store.updateItem(id, snapshot);
 				},
 			},
-			onCommit: () => this.store.setLoading(false),
-			onError: (err) => this.errHandler.handle(err, this.getUpdateErrorLabel(), () => this.store.setLoading(false)),
+			onCommit: () => this.silentRefreshAfterCrud(),
+			onError: (err) => this.errHandler.handle(err, this.getUpdateErrorLabel()),
 		});
 	}
 
@@ -302,8 +338,8 @@ export abstract class BaseCrudFacade<
 					this.store.incrementarEstadistica(statsKeys.inactivos as keyof TStats, inactivosDelta);
 				},
 			},
-			onCommit: () => this.store.setLoading(false),
-			onError: (err) => this.errHandler.handle(err, 'cambiar el estado', () => this.store.setLoading(false)),
+			onCommit: () => {},
+			onError: (err) => this.errHandler.handle(err, 'cambiar el estado'),
 		});
 	}
 
@@ -346,8 +382,8 @@ export abstract class BaseCrudFacade<
 					this.store.incrementarEstadistica(statsKeys.inactivos as keyof TStats, inactivosDelta);
 				},
 			},
-			onCommit: () => this.store.setLoading(false),
-			onError: (err) => this.errHandler.handle(err, this.getDeleteErrorLabel(), () => this.store.setLoading(false)),
+			onCommit: () => {},
+			onError: (err) => this.errHandler.handle(err, this.getDeleteErrorLabel()),
 		});
 	}
 
