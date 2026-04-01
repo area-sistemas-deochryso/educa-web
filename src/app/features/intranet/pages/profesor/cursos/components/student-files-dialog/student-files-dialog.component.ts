@@ -8,11 +8,12 @@ import { ProgressSpinnerModule } from 'primeng/progressspinner';
 import { SemanaEstudianteArchivosDto, CalificacionConNotasDto } from '../../../models';
 import { getNotaSeverity } from '@shared/services/calificacion-config';
 import type { ConfiguracionCalificacionListDto } from '@data/models';
+import { FormatFileSizePipe } from '@shared/pipes';
 
 @Component({
 	selector: 'app-student-files-dialog',
 	standalone: true,
-	imports: [CommonModule, DialogModule, ButtonModule, TooltipModule, TagModule, ProgressSpinnerModule],
+	imports: [CommonModule, DialogModule, ButtonModule, TooltipModule, TagModule, ProgressSpinnerModule, FormatFileSizePipe],
 	changeDetection: ChangeDetectionStrategy.OnPush,
 	templateUrl: './student-files-dialog.component.html',
 	styleUrl: './student-files-dialog.component.scss',
@@ -45,13 +46,6 @@ export class StudentFilesDialogComponent {
 	// #endregion
 
 	// #region Helpers
-	formatFileSize(bytes: number | null): string {
-		if (!bytes) return '';
-		if (bytes < 1024) return `${bytes} B`;
-		if (bytes < 1048576) return `${(bytes / 1024).toFixed(1)} KB`;
-		return `${(bytes / 1048576).toFixed(1)} MB`;
-	}
-
 	hasAnyFiles(): boolean {
 		return this.data().some((s) => s.estudiantes.some((e) => e.archivos.length > 0));
 	}

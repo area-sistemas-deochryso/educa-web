@@ -1,5 +1,6 @@
 // #region Imports
-import { ChangeDetectionStrategy, Component, OnInit, AfterViewInit, signal, inject, PLATFORM_ID } from '@angular/core';
+import { ChangeDetectionStrategy, Component, OnInit, AfterViewInit, DestroyRef, signal, inject, PLATFORM_ID } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { isPlatformBrowser } from '@angular/common';
 import { ActivatedRoute } from '@angular/router';
 import { CalendarHeaderComponent } from '@features/intranet/components/calendar/calendar-header/calendar-header.component';
@@ -33,6 +34,7 @@ export class CalendaryComponent implements OnInit, AfterViewInit {
 	private eventosService = inject(EventosCalendarioService);
 	private route = inject(ActivatedRoute);
 	private calendarUtils = inject(CalendarUtilsService);
+	private destroyRef = inject(DestroyRef);
 
 	// #region State
 	calendar = signal<CalendarMonth[]>([]);
@@ -66,7 +68,7 @@ export class CalendaryComponent implements OnInit, AfterViewInit {
 	/** Fetches events from backend and generates calendar. */
 	private loadEventsFromApi(): void {
 		const year = this.currentYear();
-		this.eventosService.getActivosPorAnio(year).subscribe({
+		this.eventosService.getActivosPorAnio(year).pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
 			next: (response) => {
 				const mapped = (response ?? []).map((e) => this.mapApiToCalendarEvent(e));
 				this.events.set(mapped);

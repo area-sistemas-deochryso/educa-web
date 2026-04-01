@@ -104,7 +104,10 @@ export class AsistenciaCursoFacade {
 			})),
 		};
 
-		this.api.registrarAsistenciaCurso(horarioId, dto).subscribe({
+		this.api
+			.registrarAsistenciaCurso(horarioId, dto)
+			.pipe(takeUntilDestroyed(this.destroyRef))
+			.subscribe({
 			next: () => {
 				this.store.setRegistroSaving(false);
 				this.errorHandler.showSuccess(UI_SUMMARIES.success, UI_ASISTENCIA_SUCCESS_MESSAGES.registered);

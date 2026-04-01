@@ -15,6 +15,7 @@ import {
 } from '../models';
 import { UsuariosService } from './usuarios.service';
 import { UsuariosStore } from './usuarios.store';
+import { UsuariosDataFacade } from './usuarios-data.facade';
 
 /**
  * Facade for CRUD operations on usuarios.
@@ -25,6 +26,7 @@ import { UsuariosStore } from './usuarios.store';
 export class UsuariosCrudFacade {
 	private usuariosService = inject(UsuariosService);
 	private store = inject(UsuariosStore);
+	private dataFacade = inject(UsuariosDataFacade);
 	private errorHandler = inject(ErrorHandlerService);
 	private wal = inject(WalFacadeHelper);
 	private destroyRef = inject(DestroyRef);
@@ -77,6 +79,7 @@ export class UsuariosCrudFacade {
 			},
 			optimistic: {
 				apply: () => {
+					this.dataFacade.markCrudMutation();
 					const { activosDelta, inactivosDelta } = getEstadoToggleDeltas(usuario.estado, 'delete');
 					this.store.removeUsuario(id);
 					this.store.setTotalRecords(this.store.totalRecords() - 1);
@@ -127,6 +130,7 @@ export class UsuariosCrudFacade {
 			},
 			optimistic: {
 				apply: () => {
+					this.dataFacade.markCrudMutation();
 					const { activosDelta, inactivosDelta } = getEstadoToggleDeltas(usuario.estado);
 					this.store.toggleEstadoUsuario(id);
 					this.store.incrementarEstadistica('usuariosActivos', activosDelta);
@@ -156,12 +160,12 @@ export class UsuariosCrudFacade {
 					this.store.setImportResult(result);
 					this.store.setImportLoading(false);
 					if (result.creados > 0) {
-						this.store.refreshNeeded$.next();
+						this.store.triggerRefresh();
 						this.store.incrementarEstadistica('totalEstudiantes', result.creados);
 						this.store.incrementarEstadistica('totalUsuarios', result.creados);
 						this.store.incrementarEstadistica('usuariosActivos', result.creados);
 					} else if (result.actualizados > 0) {
-						this.store.refreshNeeded$.next();
+						this.store.triggerRefresh();
 					}
 				},
 				error: (err) => {
@@ -189,7 +193,7 @@ export class UsuariosCrudFacade {
 			payload,
 			http$: () => this.usuariosService.crearUsuario(payload),
 			onCommit: () => {
-				this.store.refreshNeeded$.next();
+				this.store.triggerRefresh();
 				this.store.incrementarEstadistica('totalUsuarios', 1);
 				this.store.incrementarEstadistica('usuariosActivos', 1);
 				this.updateRolEstadistica(data.rol!, 1);
@@ -245,7 +249,7 @@ export class UsuariosCrudFacade {
 			payload,
 			http$: () => this.usuariosService.actualizarUsuario(rol, id, payload),
 			onCommit: () => {
-				this.store.setLoading(false);
+				this.store.triggerRefresh();
 			},
 			onError: (err) => {
 				logger.error('Error:', err);
@@ -257,6 +261,7 @@ export class UsuariosCrudFacade {
 			},
 			optimistic: {
 				apply: () => {
+					this.dataFacade.markCrudMutation();
 					this.store.updateUsuario(id, {
 						dni: data.dni!,
 						nombreCompleto: `${data.nombres!} ${data.apellidos!}`,

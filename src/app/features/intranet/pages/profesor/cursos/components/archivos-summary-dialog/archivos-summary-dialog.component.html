@@ -32,7 +32,7 @@
 								<div class="file-info">
 									<span class="file-name">{{ archivo.nombreArchivo }}</span>
 									@if (archivo.tamanoBytes) {
-										<span class="file-size">{{ formatFileSize(archivo.tamanoBytes) }}</span>
+										<span class="file-size">{{ archivo.tamanoBytes | formatFileSize }}</span>
 									}
 								</div>
 								<i class="pi pi-external-link file-open-icon"></i>

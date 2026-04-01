@@ -95,3 +95,4 @@ logger.tagged('MiService', 'log', 'mensaje con prefijo');
 6. **Signals para estado local**, NgRx Signals para estado global
 7. **Barrel exports** (index.ts) para agrupar exports
 8. **Strict mode** habilitado - tipar todo correctamente
+9. **No Subject/BehaviorSubject en stores** — usar signal + método de trigger

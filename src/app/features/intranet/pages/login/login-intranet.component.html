@@ -11,7 +11,7 @@
 
 				@for (session of storedSessions(); track session.sessionId) {
 					<div class="session-card">
-						<span class="session-avatar">{{ getInitials(session.nombreCompleto) }}</span>
+						<span class="session-avatar">{{ session.nombreCompleto | initials }}</span>
 						<span class="session-info">
 							<span class="session-name">{{ session.nombreCompleto }}</span>
 							<span class="session-role">{{ session.rol }}</span>

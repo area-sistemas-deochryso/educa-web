@@ -1,5 +1,5 @@
 // #region Imports
-import { Component, inject, OnInit, OnDestroy, HostListener, signal, effect } from '@angular/core';
+import { ChangeDetectionStrategy, Component, inject, OnInit, OnDestroy, HostListener, signal, effect } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { NotificationPriority, KeyboardShortcutsService } from '@core/services';
 import { ToastModule } from 'primeng/toast';
@@ -42,6 +42,7 @@ const PRIORITY_LEGEND: PriorityInfo[] = [
 
 @Component({
 	selector: 'app-floating-notification-bell',
+	changeDetection: ChangeDetectionStrategy.OnPush,
 	imports: [
 		CommonModule,
 		ToastModule,

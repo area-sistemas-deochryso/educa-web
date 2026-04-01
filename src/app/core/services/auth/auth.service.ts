@@ -1,7 +1,8 @@
 // #region Imports
 import { AuthUser, CambiarContrasenaRequest, LoginResponse, StoredSession, UserRole } from './auth.models';
-import { BehaviorSubject, EMPTY, Observable, catchError, map, of, tap, timeout } from 'rxjs';
-import { Injectable, inject } from '@angular/core';
+import { EMPTY, Observable, catchError, map, of, tap, timeout } from 'rxjs';
+import { Injectable, inject, signal } from '@angular/core';
+import { toObservable } from '@angular/core/rxjs-interop';
 
 /** Must match CHANNEL_NAME in session-activity.service.ts */
 const SESSION_CHANNEL_NAME = 'educa-session';
@@ -25,34 +26,21 @@ export class AuthService {
 	private storage = inject(StorageService);
 
 	// #region Reactive state
-	// Subjects bootstrap from storage so UI can render immediately on app load.
-	private isAuthenticatedSubject = new BehaviorSubject<boolean>(this.storage.hasUserInfo());
-	private currentUserSubject = new BehaviorSubject<AuthUser | null>(this.storage.getUser());
-	private loginAttemptsSubject = new BehaviorSubject<number>(0);
+	private readonly _isAuthenticated = signal(this.storage.hasUserInfo());
+	private readonly _currentUser = signal<AuthUser | null>(this.storage.getUser());
+	private readonly _loginAttempts = signal(0);
 
-	isAuthenticated$: Observable<boolean> = this.isAuthenticatedSubject.asObservable();
-	currentUser$: Observable<AuthUser | null> = this.currentUserSubject.asObservable();
-	loginAttempts$: Observable<number> = this.loginAttemptsSubject.asObservable();
+	// Signal reads (synchronous)
+	get isAuthenticated(): boolean { return this._isAuthenticated(); }
+	get currentUser(): AuthUser | null { return this._currentUser(); }
+	get loginAttempts(): number { return this._loginAttempts(); }
+	get remainingAttempts(): number { return this.MAX_LOGIN_ATTEMPTS - this._loginAttempts(); }
+	get isBlocked(): boolean { return this._loginAttempts() >= this.MAX_LOGIN_ATTEMPTS; }
 
-	get isAuthenticated(): boolean {
-		return this.isAuthenticatedSubject.value;
-	}
-
-	get currentUser(): AuthUser | null {
-		return this.currentUserSubject.value;
-	}
-
-	get loginAttempts(): number {
-		return this.loginAttemptsSubject.value;
-	}
-
-	get remainingAttempts(): number {
-		return this.MAX_LOGIN_ATTEMPTS - this.loginAttempts;
-	}
-
-	get isBlocked(): boolean {
-		return this.loginAttempts >= this.MAX_LOGIN_ATTEMPTS;
-	}
+	// Observable bridges for consumers that use toSignal(authService.isAuthenticated$)
+	isAuthenticated$ = toObservable(this._isAuthenticated);
+	currentUser$ = toObservable(this._currentUser);
+	loginAttempts$ = toObservable(this._loginAttempts);
 	// #endregion
 
 	// #region Commands
@@ -115,7 +103,7 @@ export class AuthService {
 						dni: profile.dni,
 						nombreCompleto: profile.nombreCompleto,
 					};
-					this.currentUserSubject.next(updatedUser);
+					this._currentUser.set(updatedUser);
 					this.storage.setUser(updatedUser);
 				}
 			}),
@@ -148,13 +136,13 @@ export class AuthService {
 		this.storage.clearPermisos();
 		this.storage.clearAuth();
 
-		this.isAuthenticatedSubject.next(false);
-		this.currentUserSubject.next(null);
+		this._isAuthenticated.set(false);
+		this._currentUser.set(null);
 		this.resetAttempts();
 	}
 
 	resetAttempts(): void {
-		this.loginAttemptsSubject.next(0);
+		this._loginAttempts.set(0);
 	}
 
 	/**
@@ -188,9 +176,9 @@ export class AuthService {
 					entityId: session.entityId,
 					sedeId: session.sedeId,
 				};
-				this.currentUserSubject.next(user);
+				this._currentUser.set(user);
 				this.storage.setUser(user);
-				this.isAuthenticatedSubject.next(true);
+				this._isAuthenticated.set(true);
 				this.broadcastLoginEvent(user);
 			}),
 		);
@@ -230,8 +218,8 @@ export class AuthService {
 		// Only store user info — token is in HttpOnly cookie
 		this.storage.setUser(user, rememberMe);
 
-		this.isAuthenticatedSubject.next(true);
-		this.currentUserSubject.next(user);
+		this._isAuthenticated.set(true);
+		this._currentUser.set(user);
 		this.resetAttempts();
 
 		// Notify other tabs: the cookie changed. Tabs with a different active user
@@ -258,7 +246,7 @@ export class AuthService {
 	}
 
 	private incrementAttempts(): void {
-		this.loginAttemptsSubject.next(this.loginAttempts + 1);
+		this._loginAttempts.set(this.loginAttempts + 1);
 	}
 
 	// #endregion

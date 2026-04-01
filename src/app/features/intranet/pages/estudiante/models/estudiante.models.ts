@@ -31,16 +31,7 @@ export {
 export type { TipoEvaluacion, VistaPromedio } from '../../profesor/models';
 
 // #region Student file DTOs
-export interface EstudianteArchivoDto {
-	id: number;
-	estudianteId: number;
-	estudianteNombre: string;
-	nombreArchivo: string;
-	urlArchivo: string;
-	tipoArchivo: string | null;
-	tamanoBytes: number | null;
-	fechaReg: string;
-}
+export type { EstudianteArchivoDto } from '@data/models';
 
 export interface RegistrarEstudianteArchivoRequest {
 	nombreArchivo: string;
@@ -51,16 +42,7 @@ export interface RegistrarEstudianteArchivoRequest {
 
 // #endregion
 // #region Student task file DTOs
-export interface EstudianteTareaArchivoDto {
-	id: number;
-	estudianteId: number;
-	estudianteNombre: string;
-	nombreArchivo: string;
-	urlArchivo: string;
-	tipoArchivo: string | null;
-	tamanoBytes: number | null;
-	fechaReg: string;
-}
+export type { EstudianteTareaArchivoDto } from '@data/models';
 
 export interface RegistrarEstudianteTareaArchivoRequest {
 	nombreArchivo: string;

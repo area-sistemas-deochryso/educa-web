@@ -1,5 +1,6 @@
 // #region Imports
-import { AfterViewInit, ChangeDetectionStrategy, Component, inject, signal } from '@angular/core';
+import { AfterViewInit, ChangeDetectionStrategy, Component, DestroyRef, inject, signal } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { ButtonModule } from 'primeng/button';
 import { CommonModule } from '@angular/common';
 import { ConfirmDialogModule } from 'primeng/confirmdialog';
@@ -72,6 +73,7 @@ export class UsuariosComponent implements AfterViewInit {
 	private confirmationService = inject(ConfirmationService);
 	private usuariosApi = inject(UsuariosService);
 	private excelService = inject(ExcelService);
+	private destroyRef = inject(DestroyRef);
 
 	// * Migration state (one-time, only in development)
 	readonly isDev = !environment.production;
@@ -247,7 +249,10 @@ export class UsuariosComponent implements AfterViewInit {
 	 * - Profesores: todos los activos ordenados alfabéticamente.
 	 */
 	onExportCredenciales(rol: string, esVerano = false, anio?: number): void {
-		this.usuariosApi.exportarCredenciales(rol, anio, esVerano).subscribe({
+		this.usuariosApi
+			.exportarCredenciales(rol, anio, esVerano)
+			.pipe(takeUntilDestroyed(this.destroyRef))
+			.subscribe({
 			next: async (credenciales) => {
 				if (!credenciales || credenciales.length === 0) {
 					logger.warn('No hay credenciales para exportar');
@@ -292,7 +297,10 @@ export class UsuariosComponent implements AfterViewInit {
 
 	onMigrarContrasenas(): void {
 		this.migracionLoading.set(true);
-		this.usuariosApi.migrarContrasenas().subscribe({
+		this.usuariosApi
+			.migrarContrasenas()
+			.pipe(takeUntilDestroyed(this.destroyRef))
+			.subscribe({
 			next: (res) => {
 				const d = res.data;
 				this.migracionMensaje.set(

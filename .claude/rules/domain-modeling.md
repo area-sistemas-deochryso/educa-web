@@ -300,6 +300,20 @@ readonly options = signal<{ label: string; value: string }[]>([]);
 readonly options = signal<SelectOption<string>[]>([]);
 ```
 
+### 5. Mismo nombre de interface en features distintas con shapes diferentes
+
+```typescript
+// ❌ INCORRECTO — "EstudianteSalon" en 2 features con shapes completamente distintas
+// data/models/asistencia.models.ts
+interface EstudianteSalon { estudianteId: number; dni: string; nombreCompleto: string; }
+// features/estudiante/models/estudiante.models.ts
+interface EstudianteSalon { salonId: number; salonDescripcion: string; cursos: Curso[]; }
+
+// ✅ CORRECTO — nombres que reflejan el contexto
+interface EstudianteAsistenciaItem { estudianteId: number; dni: string; nombreCompleto: string; }
+interface EstudianteSalon { salonId: number; salonDescripcion: string; cursos: Curso[]; }
+```
+
 ---
 
 ## Checklist de Code Review

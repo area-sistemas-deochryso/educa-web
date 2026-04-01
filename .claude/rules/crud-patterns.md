@@ -215,6 +215,9 @@ export class CursosStore extends BaseCrudStore<CursoListaDto, CursoFormData, Cur
 ### 9. ViewModel con 50+ propiedades
 **Fix**: Agrupar en sub-ViewModels por responsabilidad.
 
+### 10. `.subscribe()` sin `takeUntilDestroyed`
+**Fix**: Todo `.subscribe()` en components y facades DEBE tener `.pipe(takeUntilDestroyed(this.destroyRef))`. Inyectar `DestroyRef` si no existe.
+
 ---
 
 ## Límites de Tamaño

@@ -1,4 +1,4 @@
-import { DestroyRef, Injectable, inject } from '@angular/core';
+import { DestroyRef, Injectable, effect, inject } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { catchError, debounceTime, distinctUntilChanged, filter, switchMap, tap } from 'rxjs/operators';
 import { forkJoin, from, of, Subject } from 'rxjs';
@@ -29,6 +29,9 @@ export class UsuariosDataFacade {
 	private walService = inject(WalService);
 	private destroyRef = inject(DestroyRef);
 	private readonly searchTrigger$ = new Subject<string>();
+	// Timestamp de última mutación CRUD para ignorar cache updates stale
+	private lastCrudMutationTime = 0;
+	private static readonly CACHE_COOLDOWN_MS = 3000;
 
 	// Expone ViewModel del store
 	readonly vm = this.store.vm;
@@ -120,7 +123,10 @@ export class UsuariosDataFacade {
 	}
 
 	refresh(): void {
-		this.loadData();
+		// Invalidar cache SW para garantizar datos frescos del servidor
+		this.swService.invalidateCacheByPattern('/usuarios').then(() => {
+			this.loadData();
+		});
 	}
 
 	/** Cargar una pagina especifica (llamado desde onLazyLoad de p-table) */
@@ -211,11 +217,26 @@ export class UsuariosDataFacade {
 			});
 	}
 
-	/** Wire callbacks so CrudFacade can trigger refresh without circular dependency */
+	/**
+	 * Marca que una mutación CRUD acaba de ocurrir.
+	 * Esto evita que cacheUpdated$ sobreescriba datos optimistas con cache stale.
+	 */
+	markCrudMutation(): void {
+		this.lastCrudMutationTime = Date.now();
+	}
+
+	/** Wire refresh so CrudFacade can trigger refresh without circular dependency */
 	private setupRefreshOnCrudCommit(): void {
-		this.store.refreshNeeded$.pipe(
-			takeUntilDestroyed(this.destroyRef),
-		).subscribe(() => this.refreshUsuariosOnly());
+		effect(() => {
+			const counter = this.store.refreshCounter();
+			if (counter > 0) {
+				this.lastCrudMutationTime = Date.now();
+				// Invalidar cache SW antes de refetch para evitar datos stale (SWR)
+				this.swService.invalidateCacheByPattern('/usuarios').then(() => {
+					this.refreshUsuariosOnly();
+				});
+			}
+		});
 	}
 
 	/**
@@ -271,15 +292,20 @@ export class UsuariosDataFacade {
 
 	/**
 	 * Auto-refresh cuando el SW detecta datos nuevos del servidor (SWR).
-	 * Skips update if WAL has pending mutations to avoid overwriting optimistic state.
+	 * Skips update if WAL has pending mutations or if a CRUD mutation just happened
+	 * (cooldown) to avoid overwriting optimistic state with stale cache.
 	 */
 	private setupCacheRefresh(): void {
+		const isInCooldown = () =>
+			Date.now() - this.lastCrudMutationTime < UsuariosDataFacade.CACHE_COOLDOWN_MS;
+
 		this.swService.cacheUpdated$
 			.pipe(
 				filter(
 					(event) =>
 						event.url.includes('/usuarios') && !event.url.includes('estadisticas'),
 				),
+				filter(() => !isInCooldown()),
 				switchMap((event) =>
 					from(this.walService.hasPendingForResource('usuarios')).pipe(
 						filter((hasPending) => !hasPending),
@@ -304,6 +330,7 @@ export class UsuariosDataFacade {
 		this.swService.cacheUpdated$
 			.pipe(
 				filter((event) => event.url.includes('/usuarios/estadisticas')),
+				filter(() => !isInCooldown()),
 				switchMap((event) =>
 					from(this.walService.hasPendingForResource('usuarios')).pipe(
 						filter((hasPending) => !hasPending),

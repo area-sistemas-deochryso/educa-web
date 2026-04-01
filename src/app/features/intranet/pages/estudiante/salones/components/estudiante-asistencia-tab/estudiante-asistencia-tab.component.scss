@@ -83,3 +83,58 @@
 	}
 }
 // #endregion
+
+// #region Tabla
+::ng-deep .p-datatable {
+	background: transparent;
+
+	.p-datatable-table {
+		background: transparent;
+	}
+
+	.p-datatable-thead > tr > th {
+		background: transparent;
+	}
+
+	.p-datatable-tbody > tr {
+		background: transparent;
+
+		> td {
+			background: transparent;
+		}
+	}
+
+	.p-datatable-paginator-bottom,
+	.p-paginator {
+		background: transparent;
+	}
+}
+// #endregion
+
+// #region Overrides PrimeNG
+:host ::ng-deep {
+	.p-inputtext,
+	.p-select {
+		background: transparent;
+		color: var(--text-color);
+		border-color: var(--surface-300);
+
+		&::placeholder {
+			color: var(--text-color-secondary);
+		}
+
+		&:enabled:focus {
+			border-color: var(--text-color);
+			box-shadow: 0 0 0 1px var(--text-color);
+		}
+	}
+
+	.p-select-label {
+		color: var(--text-color);
+	}
+
+	.p-select-dropdown {
+		color: var(--text-color);
+	}
+}
+// #endregion

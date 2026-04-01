@@ -1,3 +1,4 @@
+export * from './archivo.models';
 export * from './asistencia.models';
 export * from './calificacion.models';
 export * from './eventos-calendario.models';

@@ -8,6 +8,7 @@ import { TooltipModule } from 'primeng/tooltip';
 import { ConfirmDialogModule } from 'primeng/confirmdialog';
 import { TabsModule } from 'primeng/tabs';
 import { ConfirmationService } from 'primeng/api';
+import { FormatFileSizePipe } from '@shared/pipes';
 import { EstudianteCursosFacade } from '../../../services/estudiante-cursos.facade';
 import { CursoContenidoSemanaDto, EstudianteArchivoDto, EstudianteTareaArchivoDto } from '../../../models';
 import { ArchivosSummaryDialogComponent } from '../../../../profesor/cursos/components/archivos-summary-dialog/archivos-summary-dialog.component';
@@ -26,6 +27,7 @@ import { NotasCursoCardComponent } from '../../../notas/components/notas-curso-c
 		TooltipModule,
 		ConfirmDialogModule,
 		TabsModule,
+		FormatFileSizePipe,
 		ArchivosSummaryDialogComponent,
 		TareasSummaryDialogComponent,
 		NotasCursoCardComponent,
@@ -243,13 +245,6 @@ export class CursoContentReadonlyDialogComponent {
 		if (tipoArchivo.includes('word') || tipoArchivo.includes('document')) return 'word';
 		if (tipoArchivo.includes('excel') || tipoArchivo.includes('sheet')) return 'excel';
 		return 'generic';
-	}
-
-	formatFileSize(bytes: number | null): string {
-		if (!bytes) return '';
-		if (bytes < 1024) return `${bytes} B`;
-		if (bytes < 1048576) return `${(bytes / 1024).toFixed(1)} KB`;
-		return `${(bytes / 1048576).toFixed(1)} MB`;
 	}
 
 	// #endregion

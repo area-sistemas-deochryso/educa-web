@@ -1,3 +1,6 @@
+import type { EstudianteArchivoDto, EstudianteTareaArchivoDto } from '@data/models';
+export type { EstudianteArchivoDto, EstudianteTareaArchivoDto } from '@data/models';
+
 // #region DTOs del backend
 
 /**
@@ -235,20 +238,6 @@ export interface RegistrarTareaArchivoRequest {
 }
 
 /**
- * Student-uploaded file metadata for a task.
- */
-export interface EstudianteTareaArchivoDto {
-	id: number;
-	estudianteId: number;
-	estudianteNombre: string;
-	nombreArchivo: string;
-	urlArchivo: string;
-	tipoArchivo: string | null;
-	tamanoBytes: number | null;
-	fechaReg: string;
-}
-
-/**
  * Student task files grouped by student for professor view.
  */
 export interface EstudianteTareaArchivosGroupDto {
@@ -299,20 +288,6 @@ export interface ActualizarTareaRequest {
 	esGrupal: boolean;
 	/** Concurrencia optimista. */
 	rowVersion?: string;
-}
-
-/**
- * Student-uploaded file metadata.
- */
-export interface EstudianteArchivoDto {
-	id: number;
-	estudianteId: number;
-	estudianteNombre: string;
-	nombreArchivo: string;
-	urlArchivo: string;
-	tipoArchivo: string | null;
-	tamanoBytes: number | null;
-	fechaReg: string;
 }
 
 /**

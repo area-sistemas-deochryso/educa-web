@@ -42,11 +42,12 @@
 				}
 				<!-- * Date picker (max = today) -->
 				<p-datepicker
-					[(ngModel)]="fechaValue"
+					[ngModel]="fechaValue()"
 					[showIcon]="true"
 					[maxDate]="today"
 					dateFormat="dd/mm/yy"
 					(ngModelChange)="onFechaChange($event)"
+					appendTo="body"
 					class="fecha-picker"
 				/>
 			</div>
@@ -134,7 +135,7 @@
 									@if (estudiante.horaEntrada) {
 										<i class="pi pi-sign-in"></i>
 									}
-									{{ formatTime(estudiante.horaEntrada) }}
+									{{ estudiante.horaEntrada | formatTime }}
 								</span>
 							</td>
 							<td class="text-center">
@@ -142,7 +143,7 @@
 									@if (estudiante.horaSalida) {
 										<i class="pi pi-sign-out"></i>
 									}
-									{{ formatTime(estudiante.horaSalida) }}
+									{{ estudiante.horaSalida | formatTime }}
 								</span>
 							</td>
 							<td class="text-center">
@@ -178,13 +179,13 @@
 					<div class="rt-card__field">
 						<span class="rt-card__label"><i class="pi pi-sign-in"></i> Entrada</span>
 						<span class="hora" [class.hora-empty]="!estudiante.horaEntrada">
-							{{ formatTime(estudiante.horaEntrada) }}
+							{{ estudiante.horaEntrada | formatTime }}
 						</span>
 					</div>
 					<div class="rt-card__field">
 						<span class="rt-card__label"><i class="pi pi-sign-out"></i> Salida</span>
 						<span class="hora" [class.hora-empty]="!estudiante.horaSalida">
-							{{ formatTime(estudiante.horaSalida) }}
+							{{ estudiante.horaSalida | formatTime }}
 						</span>
 					</div>
 

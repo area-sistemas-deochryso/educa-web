@@ -26,6 +26,7 @@ import { Select } from 'primeng/select';
 import { ToggleSwitch } from 'primeng/toggleswitch';
 import { Tooltip } from 'primeng/tooltip';
 import { UppercaseInputDirective } from '@app/shared';
+import { InitialsPipe } from '@shared/pipes';
 import { logger } from '@core/helpers';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { UI_LOGIN_MESSAGES } from '@app/shared/constants';
@@ -48,6 +49,7 @@ import { UI_LOGIN_MESSAGES } from '@app/shared/constants';
 		LoginOptionsComponent,
 		LoginButtonComponent,
 		UppercaseInputDirective,
+		InitialsPipe,
 	],
 	templateUrl: './login-intranet.component.html',
 	styleUrl: './login-intranet.component.scss',
@@ -295,15 +297,6 @@ export class LoginIntranetComponent implements OnInit {
 					this.showError.set(true);
 				},
 			});
-	}
-
-	getInitials(name: string): string {
-		return name
-			.split(' ')
-			.slice(0, 2)
-			.map((w) => w[0])
-			.join('')
-			.toUpperCase();
 	}
 
 	togglePasswordVisibility(): void {

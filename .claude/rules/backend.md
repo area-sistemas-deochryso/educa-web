@@ -111,6 +111,8 @@ Helpers de claims (`User.GetDni()`, `User.GetRol()`, `User.GetEntityId()`, `User
 
 - Usar `AsNoTracking()` para queries read-only
 - NO incluir lógica de categorización ni decisiones de negocio
+- **NUNCA** incluir lógica de negocio (cálculos, aggregaciones, condicionales de negocio) — solo queries y CRUD
+- **NUNCA** incluir lógica de negocio (cálculos, aggregaciones, condicionales de negocio) — solo queries y CRUD
 
 ## DTOs — Reglas
 
@@ -285,3 +287,17 @@ MIGRACIONES
 [ ] ¿Hay tablas/columnas/índices nuevos? → Script SQL mostrado al usuario
 [ ] ¿El deploy va a fallar sin migración previa? → Advertir explícitamente
 ```
+
+---
+
+## Model Checklist (Backend)
+
+Antes de crear un nuevo modelo en Educa.API:
+
+| Requisito | Cómo verificar |
+|-----------|---------------|
+| RowVersion | `[Timestamp] [Column("XXX_RowVersion")] public byte[] XXX_RowVersion` |
+| Fechas Perú | `= DateTimeHelper.PeruNow()` (NO `DateTime.Now`) |
+| Auditoría completa | 4 campos: UsuarioReg, FechaReg, UsuarioMod, FechaMod |
+| Strings inicializadas | `= ""` en campos no-nullable |
+| SQL migration | Script preparado ANTES del deploy |

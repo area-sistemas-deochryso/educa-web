@@ -1,16 +1,64 @@
 // #region Imports
-import { ChangeDetectionStrategy, Component, Input, inject } from '@angular/core';
+import { ChangeDetectionStrategy, Component, Input, Pipe, PipeTransform, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterLink } from '@angular/router';
 import { SeasonalNotification } from '@core/services';
 import { NotificationsPanelContext } from '../../notifications-panel.context';
 
 // #endregion
+
+// #region Pipes
+const TYPE_LABELS: Record<string, string> = {
+	matricula: 'Matrícula',
+	pago: 'Pago',
+	academico: 'Académico',
+	festividad: 'Festividad',
+	evento: 'Evento',
+	smart: 'Smart',
+};
+
+const TYPE_ICONS: Record<string, string> = {
+	matricula: 'pi-user-plus',
+	pago: 'pi-wallet',
+	academico: 'pi-chart-bar',
+	festividad: 'pi-star',
+	evento: 'pi-calendar',
+	smart: 'pi-bolt',
+};
+
+const PRIORITY_LABELS: Record<string, string> = {
+	urgent: 'Urgente',
+	high: 'Importante',
+	medium: 'Normal',
+	low: 'Info',
+};
+
+@Pipe({ name: 'notifTypeLabel', standalone: true, pure: true })
+export class NotifTypeLabelPipe implements PipeTransform {
+	transform(type: string): string {
+		return TYPE_LABELS[type] || type;
+	}
+}
+
+@Pipe({ name: 'notifPriorityLabel', standalone: true, pure: true })
+export class NotifPriorityLabelPipe implements PipeTransform {
+	transform(priority: string): string {
+		return PRIORITY_LABELS[priority] || priority;
+	}
+}
+
+@Pipe({ name: 'notifTypeIcon', standalone: true, pure: true })
+export class NotifTypeIconPipe implements PipeTransform {
+	transform(type: string): string {
+		return TYPE_ICONS[type] || 'pi-bell';
+	}
+}
+// #endregion
 // #region Implementation
 @Component({
 	selector: 'app-notification-card',
 	changeDetection: ChangeDetectionStrategy.OnPush,
-	imports: [CommonModule, RouterLink],
+	imports: [CommonModule, RouterLink, NotifTypeLabelPipe, NotifPriorityLabelPipe, NotifTypeIconPipe],
 	templateUrl: './notification-card.component.html',
 	styleUrl: './notification-card.component.scss',
 })
@@ -25,43 +73,6 @@ export class NotificationCardComponent {
 
 	get priorityClass(): string {
 		return `notification-${this.notification.priority}`;
-	}
-
-	getTypeIcon(type: string): string {
-		// * Map backend types to icons.
-		const icons: Record<string, string> = {
-			matricula: 'pi-user-plus',
-			pago: 'pi-wallet',
-			academico: 'pi-chart-bar',
-			festividad: 'pi-star',
-			evento: 'pi-calendar',
-			smart: 'pi-bolt',
-		};
-		return icons[type] || 'pi-bell';
-	}
-
-	getTypeLabel(type: string): string {
-		// * Map backend types to display labels.
-		const labels: Record<string, string> = {
-			matricula: 'Matrícula',
-			pago: 'Pago',
-			academico: 'Académico',
-			festividad: 'Festividad',
-			evento: 'Evento',
-			smart: 'Smart',
-		};
-		return labels[type] || type;
-	}
-
-	getPriorityLabel(priority: string): string {
-		// * Map priority to short badge labels.
-		const labels: Record<string, string> = {
-			urgent: 'Urgente',
-			high: 'Importante',
-			medium: 'Normal',
-			low: 'Info',
-		};
-		return labels[priority] || priority;
 	}
 
 	onCardClick(): void {

@@ -80,7 +80,7 @@
 												<span class="file-name">{{ archivo.nombreArchivo }}</span>
 												<span class="file-meta">
 													@if (archivo.tamanoBytes) {
-														{{ formatFileSize(archivo.tamanoBytes) }} ·
+														{{ archivo.tamanoBytes | formatFileSize }} ·
 													}
 													{{ archivo.fechaReg | date: 'dd/MM/yyyy HH:mm' }}
 												</span>

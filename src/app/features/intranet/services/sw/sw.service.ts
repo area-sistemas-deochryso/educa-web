@@ -1,5 +1,6 @@
-import { BehaviorSubject, Subject } from 'rxjs';
-import { Injectable, PLATFORM_ID, inject } from '@angular/core';
+import { Subject } from 'rxjs';
+import { Injectable, PLATFORM_ID, inject, signal } from '@angular/core';
+import { toObservable } from '@angular/core/rxjs-interop';
 
 import { isPlatformBrowser } from '@angular/common';
 import { logger } from '@core/helpers';
@@ -17,24 +18,20 @@ export class SwService {
 	private platformId = inject(PLATFORM_ID);
 	private registration: ServiceWorkerRegistration | null = null;
 
-	private _isOnline = new BehaviorSubject<boolean>(true);
-	private _isRegistered = new BehaviorSubject<boolean>(false);
-	private _updateAvailable = new BehaviorSubject<boolean>(false);
-	private _cacheUpdated = new Subject<CacheUpdateEvent>();
+	private readonly _isOnline = signal(true);
+	private readonly _isRegistered = signal(false);
+	private readonly _updateAvailable = signal(false);
+	private readonly _cacheUpdated = new Subject<CacheUpdateEvent>();
 
-	isOnline$ = this._isOnline.asObservable();
-	isRegistered$ = this._isRegistered.asObservable();
-	updateAvailable$ = this._updateAvailable.asObservable();
+	// Observable bridges for consumers using RxJS pipes or toSignal()
+	isOnline$ = toObservable(this._isOnline);
+	isRegistered$ = toObservable(this._isRegistered);
+	updateAvailable$ = toObservable(this._updateAvailable);
 	/** Emite cuando el SW actualiza el caché en background con datos nuevos */
 	cacheUpdated$ = this._cacheUpdated.asObservable();
 
-	get isOnline(): boolean {
-		return this._isOnline.value;
-	}
-
-	get isRegistered(): boolean {
-		return this._isRegistered.value;
-	}
+	get isOnline(): boolean { return this._isOnline(); }
+	get isRegistered(): boolean { return this._isRegistered(); }
 
 	constructor() {
 		if (isPlatformBrowser(this.platformId)) {
@@ -44,16 +41,16 @@ export class SwService {
 	}
 
 	private initOnlineStatus(): void {
-		this._isOnline.next(navigator.onLine);
+		this._isOnline.set(navigator.onLine);
 
 		window.addEventListener('online', () => {
 			logger.log('[SwService] Conexión restaurada');
-			this._isOnline.next(true);
+			this._isOnline.set(true);
 		});
 
 		window.addEventListener('offline', () => {
 			logger.log('[SwService] Sin conexión - usando cache');
-			this._isOnline.next(false);
+			this._isOnline.set(false);
 		});
 	}
 
@@ -72,7 +69,7 @@ export class SwService {
 			});
 
 			logger.log('[SwService] Service Worker registrado:', this.registration.scope);
-			this._isRegistered.next(true);
+			this._isRegistered.set(true);
 
 			// Verificar actualizaciones
 			this.registration.addEventListener('updatefound', () => {
@@ -81,7 +78,7 @@ export class SwService {
 					newWorker.addEventListener('statechange', () => {
 						if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
 							logger.log('[SwService] Nueva versión disponible');
-							this._updateAvailable.next(true);
+							this._updateAvailable.set(true);
 						}
 					});
 				}
@@ -243,7 +240,7 @@ export class SwService {
 		if (this.registration) {
 			const result = await this.registration.unregister();
 			if (result) {
-				this._isRegistered.next(false);
+				this._isRegistered.set(false);
 				logger.log('[SwService] Service Worker desregistrado');
 			}
 			return result;

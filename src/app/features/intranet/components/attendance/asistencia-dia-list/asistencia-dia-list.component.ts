@@ -28,6 +28,7 @@ import {
 	TableSkeletonComponent,
 } from '@shared/components';
 import type { SkeletonColumnDef } from '@shared/components';
+import { FormatTimePipe } from '@shared/pipes';
 import { getStatusClass } from '@features/intranet/pages/shared/attendance-component/config/attendance.constants';
 import { AttendanceStatus } from '@features/intranet/pages/shared/attendance-component/models/attendance.types';
 
@@ -68,6 +69,7 @@ export interface JustificacionEvent {
 		DialogModule,
 		Textarea,
 		Select,
+		FormatTimePipe,
 	],
 	templateUrl: './asistencia-dia-list.component.html',
 	styleUrl: './asistencia-dia-list.component.scss',
@@ -107,8 +109,8 @@ export class AsistenciaDiaListComponent {
 	];
 	private readonly PREFIJO_JUSTIFICACION = 'Justificado: ';
 
-	// * Local state for the datepicker model
-	fechaValue: Date = new Date();
+	// * Local state for the datepicker model (signal for OnPush reactivity)
+	readonly fechaValue = signal<Date>(new Date());
 
 	// #region Estado del diálogo de justificación
 	readonly dialogVisible = signal(false);
@@ -126,27 +128,21 @@ export class AsistenciaDiaListComponent {
 	// ✅ NUEVO: Estadísticas ya no se calculan localmente, vienen del backend como input
 
 	constructor() {
-		// * Sync datepicker model when input changes (OnPush friendly).
+		// * Sync datepicker model when parent updates the fecha input
 		effect(() => {
-			this.fechaValue = this.fecha();
+			this.fechaValue.set(this.fecha());
 		});
 	}
 
 	onFechaChange(fecha: Date | null): void {
 		if (fecha) {
+			this.fechaValue.set(fecha);
 			this.fechaChange.emit(fecha);
 		}
 	}
 
 	togglePdfMenu(event: Event): void {
 		this.pdfMenu.toggle(event);
-	}
-
-	formatTime(isoString: string | null): string {
-		if (!isoString) return '-';
-		// * Handle ISO format: "2026-01-26T09:04:35" -> "09:04"
-		const match = isoString.match(/T(\d{2}:\d{2})/);
-		return match ? match[1] : isoString;
 	}
 
 	// #endregion

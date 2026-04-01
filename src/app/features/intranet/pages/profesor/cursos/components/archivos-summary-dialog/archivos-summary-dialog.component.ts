@@ -2,11 +2,12 @@ import { Component, ChangeDetectionStrategy, input, output, computed } from '@an
 import { CommonModule } from '@angular/common';
 import { DialogModule } from 'primeng/dialog';
 import { CursoContenidoSemanaDto } from '../../../models';
+import { FormatFileSizePipe } from '@shared/pipes';
 
 @Component({
 	selector: 'app-archivos-summary-dialog',
 	standalone: true,
-	imports: [CommonModule, DialogModule],
+	imports: [CommonModule, DialogModule, FormatFileSizePipe],
 	changeDetection: ChangeDetectionStrategy.OnPush,
 	templateUrl: './archivos-summary-dialog.component.html',
 	styleUrl: './archivos-summary-dialog.component.scss',
@@ -48,10 +49,4 @@ export class ArchivosSummaryDialogComponent {
 		return 'generic';
 	}
 
-	formatFileSize(bytes: number | null): string {
-		if (!bytes) return '';
-		if (bytes < 1024) return `${bytes} B`;
-		if (bytes < 1048576) return `${(bytes / 1024).toFixed(1)} KB`;
-		return `${(bytes / 1048576).toFixed(1)} MB`;
-	}
 }

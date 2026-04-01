@@ -6,11 +6,12 @@ import { TooltipModule } from 'primeng/tooltip';
 import { TagModule } from 'primeng/tag';
 import { ProgressSpinnerModule } from 'primeng/progressspinner';
 import { EstudianteTareaArchivosGroupDto, CursoContenidoTareaDto } from '../../../models';
+import { FormatFileSizePipe } from '@shared/pipes';
 
 @Component({
 	selector: 'app-student-task-submissions-dialog',
 	standalone: true,
-	imports: [CommonModule, DialogModule, ButtonModule, TooltipModule, TagModule, ProgressSpinnerModule],
+	imports: [CommonModule, DialogModule, ButtonModule, TooltipModule, TagModule, ProgressSpinnerModule, FormatFileSizePipe],
 	changeDetection: ChangeDetectionStrategy.OnPush,
 	templateUrl: './student-task-submissions-dialog.component.html',
 	styleUrl: './student-task-submissions-dialog.component.scss',
@@ -61,13 +62,6 @@ export class StudentTaskSubmissionsDialogComponent {
 	// #endregion
 
 	// #region Helpers
-	formatFileSize(bytes: number | null): string {
-		if (!bytes) return '';
-		if (bytes < 1024) return `${bytes} B`;
-		if (bytes < 1048576) return `${(bytes / 1024).toFixed(1)} KB`;
-		return `${(bytes / 1048576).toFixed(1)} MB`;
-	}
-
 	getSubmissionStatus(estudiante: EstudianteTareaArchivosGroupDto): {
 		label: string;
 		severity: 'success' | 'warn' | 'danger' | 'secondary';

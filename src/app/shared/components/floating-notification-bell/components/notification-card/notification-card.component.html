@@ -13,16 +13,16 @@
 	}
 
 	<div class="notification-icon" [ngClass]="'icon-' + notification.type">
-		<i class="pi" [ngClass]="notification.icon || getTypeIcon(notification.type)"></i>
+		<i class="pi" [ngClass]="notification.icon || (notification.type | notifTypeIcon)"></i>
 	</div>
 
 	<div class="notification-content">
 		<div class="notification-meta">
 			<span class="notification-type-badge" [attr.data-type]="notification.type">
-				{{ getTypeLabel(notification.type) }}
+				{{ notification.type | notifTypeLabel }}
 			</span>
 			<span class="priority-indicator" [attr.data-priority]="notification.priority">
-				{{ getPriorityLabel(notification.priority) }}
+				{{ notification.priority | notifPriorityLabel }}
 			</span>
 		</div>
 		<h3 class="notification-title">{{ notification.title }}</h3>

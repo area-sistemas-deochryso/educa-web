@@ -10,7 +10,6 @@ import {
 	UsuariosEstadisticas,
 } from '../models';
 import { Injectable, computed, inject, signal } from '@angular/core';
-import { Subject } from 'rxjs';
 
 import { APP_USER_ROLES } from '@shared/constants';
 import { DebugService } from '@core/helpers';
@@ -71,11 +70,11 @@ export class UsuariosStore {
 	private readonly _filterEstado = signal<boolean | null>(null);
 	private readonly _filterSalonId = signal<number | null>(null);
 
+	private readonly _refreshCounter = signal(0);
 	// #endregion
-	/** Emits when data should be refreshed (after create/import) */
-	readonly refreshNeeded$ = new Subject<void>();
 
 	// #region Lecturas públicas (readonly)
+	readonly refreshCounter = this._refreshCounter.asReadonly();
 	readonly usuarios = this._usuarios.asReadonly();
 	readonly estadisticas = this._estadisticas.asReadonly();
 	readonly salones = this._salones.asReadonly();
@@ -193,6 +192,10 @@ export class UsuariosStore {
 
 	// #endregion
 	// #region Comandos de mutación
+
+	triggerRefresh(): void {
+		this._refreshCounter.update((c) => c + 1);
+	}
 
 	// Data mutations
 	setUsuarios(usuarios: UsuarioLista[]): void {

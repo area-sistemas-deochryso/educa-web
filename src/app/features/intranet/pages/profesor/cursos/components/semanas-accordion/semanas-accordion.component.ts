@@ -9,11 +9,12 @@ import { CursoContenidoDataFacade } from '../../services/curso-contenido-data.fa
 import { CursoContenidoCrudFacade } from '../../services/curso-contenido-crud.facade';
 import { CursoContenidoUiFacade } from '../../services/curso-contenido-ui.facade';
 import { CursoContenidoSemanaDto, CursoContenidoTareaDto } from '../../../models';
+import { FormatFileSizePipe } from '@shared/pipes';
 
 @Component({
 	selector: 'app-semanas-accordion',
 	standalone: true,
-	imports: [CommonModule, FormsModule, ButtonModule, AccordionModule, TooltipModule],
+	imports: [CommonModule, FormsModule, ButtonModule, AccordionModule, TooltipModule, FormatFileSizePipe],
 	changeDetection: ChangeDetectionStrategy.OnPush,
 	templateUrl: './semanas-accordion.component.html',
 	styleUrl: './semanas-accordion.component.scss',
@@ -178,13 +179,6 @@ export class SemanasAccordionComponent {
 		if (tipoArchivo.includes('word') || tipoArchivo.includes('document')) return 'word';
 		if (tipoArchivo.includes('excel') || tipoArchivo.includes('sheet')) return 'excel';
 		return 'generic';
-	}
-
-	formatFileSize(bytes: number | null): string {
-		if (!bytes) return '';
-		if (bytes < 1024) return `${bytes} B`;
-		if (bytes < 1048576) return `${(bytes / 1024).toFixed(1)} KB`;
-		return `${(bytes / 1048576).toFixed(1)} MB`;
 	}
 	// #endregion
 }

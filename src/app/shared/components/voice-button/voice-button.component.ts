@@ -1,6 +1,7 @@
 // #region Imports
 import {
 	AfterViewInit,
+	ChangeDetectionStrategy,
 	Component,
 	ElementRef,
 	HostListener,
@@ -21,6 +22,7 @@ import { logger } from '@core/helpers';
 @Component({
 	selector: 'app-voice-button',
 	standalone: true,
+	changeDetection: ChangeDetectionStrategy.OnPush,
 	imports: [CommonModule],
 	templateUrl: './voice-button.component.html',
 	styleUrl: './voice-button.component.scss',

@@ -73,8 +73,8 @@ export interface EstudianteAsistencia {
 	asistencias: AsistenciaDetalle[];
 }
 
-// Estudiante del salón (EstudianteSalonDto)
-export interface EstudianteSalon {
+// Estudiante en lista de asistencia (EstudianteSalonDto)
+export interface EstudianteAsistenciaItem {
 	estudianteId: number;
 	dni: string;
 	nombreCompleto: string;
@@ -90,7 +90,7 @@ export interface SalonProfesor {
 	anio: number;
 	esTutor: boolean;
 	totalEstudiantes: number;
-	estudiantes: EstudianteSalon[];
+	estudiantes: EstudianteAsistenciaItem[];
 }
 
 // Estados de asistencia para la UI
