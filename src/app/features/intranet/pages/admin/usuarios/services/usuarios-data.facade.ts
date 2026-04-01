@@ -235,11 +235,9 @@ export class UsuariosDataFacade {
 			const counter = this.store.refreshCounter();
 			if (counter > 0) {
 				this.lastCrudMutationTime = Date.now();
-				// Invalidar cache SW antes de refetch para evitar datos stale (SWR).
-				// Silent=true: no muestra loading, la tabla mantiene datos optimistas visibles.
-				this.swService.invalidateCacheByPattern('/usuarios').then(() => {
-					this.refreshUsuariosOnly(true);
-				});
+				// El interceptor swCacheInvalidationInterceptor ya invalidó el cache del SW
+				// al completarse la mutación. Silent=true: sin loading visible.
+				this.refreshUsuariosOnly(true);
 			}
 		});
 	}

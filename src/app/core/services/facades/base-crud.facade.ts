@@ -200,13 +200,12 @@ export abstract class BaseCrudFacade<
 	}
 
 	/**
-	 * Refetch silencioso post-CRUD: invalida cache SW + refresh sin loading visible.
-	 * El usuario ve los datos optimistas mientras el servidor responde en background.
+	 * Refetch silencioso post-CRUD: refresh sin loading visible.
+	 * El interceptor swCacheInvalidationInterceptor ya invalidó el cache
+	 * del SW al completarse la mutación, así que el GET va directo a red.
 	 */
 	protected silentRefreshAfterCrud(): void {
-		this.swService.invalidateCacheByPattern(this.getCachePattern()).then(() => {
-			this.refreshItemsOnly(true);
-		});
+		this.refreshItemsOnly(true);
 	}
 
 	protected refreshEstadisticas(): void {

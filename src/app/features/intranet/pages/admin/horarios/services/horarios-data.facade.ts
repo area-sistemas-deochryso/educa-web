@@ -205,11 +205,9 @@ export class HorariosDataFacade {
     });
   }
 
-  /** Refetch silencioso post-CRUD: invalida cache SW + refresh sin loading visible. */
+  /** Refetch silencioso post-CRUD: el interceptor ya invalidó el cache del SW. */
   silentRefreshAfterCrud(): void {
-    this.swService.invalidateCacheByPattern('/horario').then(() => {
-      this.refreshHorariosOnly(true);
-    });
+    this.refreshHorariosOnly(true);
   }
 
   /**

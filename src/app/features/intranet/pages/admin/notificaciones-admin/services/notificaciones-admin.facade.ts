@@ -218,11 +218,9 @@ export class NotificacionesAdminFacade {
 
 	// #region Helpers privados
 
-	/** Refetch silencioso post-CRUD: invalida cache SW + refresh sin loading visible. */
+	/** Refetch silencioso post-CRUD: el interceptor ya invalidó el cache del SW. */
 	private silentRefreshAfterCrud(): void {
-		this.swService.invalidateCacheByPattern('/notificaciones').then(() => {
-			this.refreshItemsOnly();
-		});
+		this.refreshItemsOnly();
 	}
 
 	private refreshItemsOnly(): void {

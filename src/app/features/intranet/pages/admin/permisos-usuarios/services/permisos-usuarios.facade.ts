@@ -126,11 +126,9 @@ export class PermisosUsuariosFacade {
 		});
 	}
 
-	/** Refetch silencioso post-CRUD: invalida cache SW + refresh sin loading visible. */
+	/** Refetch silencioso post-CRUD: el interceptor ya invalidó el cache del SW. */
 	private silentRefreshAfterCrud(): void {
-		this.swService.invalidateCacheByPattern('/permisos').then(() => {
-			this.loadData();
-		});
+		this.loadData();
 	}
 
 	// #endregion
