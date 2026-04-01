@@ -65,6 +65,7 @@ export class VistasFacade extends BaseCrudFacade<Vista, { ruta: string; nombre: 
 			const payload = { ruta: formData.ruta, nombre: formData.nombre, estado: formData.estado, rowVersion: vista.rowVersion };
 			this.walUpdate(vista.id, payload, { ruta: formData.ruta, nombre: formData.nombre, estado: formData.estado },
 				() => this.api.actualizarVista(vista.id, payload),
+				`vistas/${vista.id}/actualizar`,
 			);
 		} else {
 			const payload = { ruta: formData.ruta, nombre: formData.nombre };
