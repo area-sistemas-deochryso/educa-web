@@ -176,10 +176,12 @@ export class UsuariosDataFacade {
 
 	/**
 	 * Refresh solo la lista de usuarios paginada (sin resetear skeletons ni estadisticas).
-	 * Util para cuando se crea un usuario y necesitamos el ID del servidor.
+	 * @param silent - Si true, no muestra loading en la tabla (para refetch post-CRUD sin interrumpir UX)
 	 */
-	refreshUsuariosOnly(): void {
-		this.store.setLoading(true);
+	refreshUsuariosOnly(silent = false): void {
+		if (!silent) {
+			this.store.setLoading(true);
+		}
 
 		const page = this.store.page();
 		const pageSize = this.store.pageSize();
@@ -213,7 +215,9 @@ export class UsuariosDataFacade {
 			.subscribe((result) => {
 				this.store.setUsuarios(result.data);
 				this.store.setPaginationData(result.page, result.pageSize, result.total);
-				this.store.setLoading(false);
+				if (!silent) {
+					this.store.setLoading(false);
+				}
 			});
 	}
 
@@ -231,9 +235,10 @@ export class UsuariosDataFacade {
 			const counter = this.store.refreshCounter();
 			if (counter > 0) {
 				this.lastCrudMutationTime = Date.now();
-				// Invalidar cache SW antes de refetch para evitar datos stale (SWR)
+				// Invalidar cache SW antes de refetch para evitar datos stale (SWR).
+				// Silent=true: no muestra loading, la tabla mantiene datos optimistas visibles.
 				this.swService.invalidateCacheByPattern('/usuarios').then(() => {
-					this.refreshUsuariosOnly();
+					this.refreshUsuariosOnly(true);
 				});
 			}
 		});

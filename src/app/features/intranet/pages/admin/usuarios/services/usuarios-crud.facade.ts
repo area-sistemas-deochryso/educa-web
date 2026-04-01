@@ -66,16 +66,13 @@ export class UsuariosCrudFacade {
 			method: 'DELETE',
 			payload: null,
 			http$: () => this.usuariosService.eliminarUsuario(rol, id),
-			onCommit: () => {
-				this.store.setLoading(false);
-			},
+			onCommit: () => {},
 			onError: (err) => {
 				logger.error('Error al eliminar:', err);
 				this.errorHandler.showError(
 					UI_SUMMARIES.error,
 					UI_ADMIN_ERROR_DETAILS.deleteUsuario,
 				);
-				this.store.setLoading(false);
 			},
 			optimistic: {
 				apply: () => {
@@ -87,7 +84,6 @@ export class UsuariosCrudFacade {
 					this.store.incrementarEstadistica('usuariosActivos', activosDelta);
 					this.store.incrementarEstadistica('usuariosInactivos', inactivosDelta);
 					this.updateRolEstadistica(rol, -1);
-					this.store.setLoading(true);
 				},
 				rollback: () => {
 					const { activosDelta, inactivosDelta } = getEstadoRollbackDeltas(usuario.estado, 'delete');
@@ -117,16 +113,13 @@ export class UsuariosCrudFacade {
 			method: 'PATCH',
 			payload: { estado: nuevoEstado },
 			http$: () => this.usuariosService.cambiarEstado(rol, id, nuevoEstado),
-			onCommit: () => {
-				this.store.setLoading(false);
-			},
+			onCommit: () => {},
 			onError: (err) => {
 				logger.error('Error al cambiar estado:', err);
 				this.errorHandler.showError(
 					UI_SUMMARIES.error,
 					UI_ADMIN_ERROR_DETAILS.changeEstado,
 				);
-				this.store.setLoading(false);
 			},
 			optimistic: {
 				apply: () => {
@@ -135,7 +128,6 @@ export class UsuariosCrudFacade {
 					this.store.toggleEstadoUsuario(id);
 					this.store.incrementarEstadistica('usuariosActivos', activosDelta);
 					this.store.incrementarEstadistica('usuariosInactivos', inactivosDelta);
-					this.store.setLoading(true);
 				},
 				rollback: () => {
 					const { activosDelta, inactivosDelta } = getEstadoRollbackDeltas(usuario.estado);
@@ -209,11 +201,8 @@ export class UsuariosCrudFacade {
 			optimistic: {
 				apply: () => {
 					this.store.closeDialog();
-					this.store.setLoading(true);
 				},
-				rollback: () => {
-					this.store.setLoading(false);
-				},
+				rollback: () => {},
 			},
 		});
 	}
@@ -272,7 +261,6 @@ export class UsuariosCrudFacade {
 						estado: data.estado ?? true,
 					});
 					this.store.closeDialog();
-					this.store.setLoading(true);
 				},
 				rollback: () => {
 					this.store.updateUsuario(id, previousData);
