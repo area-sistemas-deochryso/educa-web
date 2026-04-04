@@ -76,7 +76,9 @@ export class ProfesorFinalSalonesStore {
 
 	// #region Computed — filtrado por nivel
 	readonly salonesFiltrados = computed(() =>
-		this._salones().filter((s) => determinarNivelPorOrden(s.gradoOrden) === this._selectedNivel()),
+		this._salones().filter(
+			(s) => determinarNivelPorOrden(s.gradoOrden) === this._selectedNivel() && s.totalEstudiantes > 0,
+		),
 	);
 
 	readonly periodoActual = computed(() => {
@@ -113,7 +115,7 @@ export class ProfesorFinalSalonesStore {
 
 	/** Niveles disponibles basados en los salones que tiene el profesor */
 	readonly nivelesDisponibles = computed<NivelEducativo[]>(() => {
-		const salones = this._salones();
+		const salones = this._salones().filter((s) => s.totalEstudiantes > 0);
 		const niveles = new Set<NivelEducativo>();
 		for (const s of salones) {
 			niveles.add(determinarNivelPorOrden(s.gradoOrden));
