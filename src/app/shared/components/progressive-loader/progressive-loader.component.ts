@@ -1,4 +1,3 @@
-// #region Imports
 import {
 	ChangeDetectionStrategy,
 	Component,
@@ -6,22 +5,8 @@ import {
 	QueryList,
 	TemplateRef,
 	input,
-	computed,
-	signal,
-	effect,
-	inject,
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
-
-/**
- * Directiva para marcar fases de carga progresiva
- */
-// #endregion
-// #region Implementation
-export class ProgressivePhaseDirective {
-	// * Capture the projected template for a phase.
-	public template = inject(TemplateRef<unknown>);
-}
 
 /**
  * Componente para renderizado progresivo multi-fase
@@ -81,14 +66,11 @@ export class ProgressiveLoaderComponent {
 
 	protected getSkeletonTemplate(phase: string): TemplateRef<unknown> | null {
 		// ! Placeholder: resolve skeleton template for phase.
-		// Lógica para encontrar el template de skeleton correspondiente
-		return null; // Implementar según necesidad
+		return null;
 	}
 
 	protected getContentTemplate(phase: string): TemplateRef<unknown> | null {
 		// ! Placeholder: resolve content template for phase.
-		// Lógica para encontrar el template de contenido correspondiente
-		return null; // Implementar según necesidad
+		return null;
 	}
 }
-// #endregion

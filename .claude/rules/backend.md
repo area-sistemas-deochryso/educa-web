@@ -42,6 +42,26 @@ Educa.API/
 
 ---
 
+## Organización de Archivos
+
+> **"Un archivo = una clase. Sin excepciones."**
+
+- Cada clase, record o struct va en su propio archivo `.cs` con el mismo nombre que la clase
+- Si un dominio necesita múltiples clases relacionadas (ej: DTOs de CRUD), cada una va en su propio archivo dentro de la misma carpeta
+- **NUNCA** agrupar múltiples clases en un solo archivo, aunque sean del mismo dominio
+
+```
+// ✅ CORRECTO
+DTOs/Usuarios/UsuarioListaDto.cs      → class UsuarioListaDto
+DTOs/Usuarios/CrearUsuarioDto.cs      → class CrearUsuarioDto
+DTOs/Usuarios/ActualizarUsuarioDto.cs → class ActualizarUsuarioDto
+
+// ❌ INCORRECTO
+DTOs/Usuarios/UsuariosDto.cs → class UsuarioListaDto + class CrearUsuarioDto + class ActualizarUsuarioDto
+```
+
+---
+
 ## Principio de Arquitectura
 
 > **"Controller delega, Service decide, Repository accede."**
@@ -96,10 +116,12 @@ Helpers de claims (`User.GetDni()`, `User.GetRol()`, `User.GetEntityId()`, `User
 
 | Líneas | Estado | Acción |
 |--------|--------|--------|
-| < 300 | OK | Mantener |
-| 300-600 | Aceptable | Revisar split |
-| > 600 | Warning | Dividir por responsabilidad |
-| > 1000 | Refactor obligatorio | Extraer sub-servicios |
+| ≤ 300 | OK | Mantener |
+| > 300 | **Refactor obligatorio** | Dividir por responsabilidad — sin zona gris |
+
+> **Regla dura: 300 líneas máximo por archivo .cs** (service, repository, controller, helper, mapper).
+> Aplica a todo el backend. Si un archivo supera 300 líneas, se divide antes de mergear.
+> Excepciones: `ApplicationDbContext` (DbSets crecen linealmente con entidades, no se puede dividir).
 
 - Siempre definir **interfaz** (`IXxxService`) + implementación
 - Registrar en DI: `builder.Services.AddScoped<IService, Service>()`
@@ -262,7 +284,7 @@ Cookies de auth definidas en `Constants/Auth/CookieConfig.cs`:
 ```
 ARQUITECTURA
 [ ] ¿Controller solo delega? ¿Service tiene la lógica? ¿Repository solo queries?
-[ ] ¿Archivos > 600 líneas necesitan split?
+[ ] ¿Algún archivo supera 300 líneas? → Dividir por responsabilidad (regla dura, sin excepciones salvo DbContext)
 [ ] ¿Excepciones tipadas (NotFoundException, BusinessRuleException) en services?
 
 ERRORES

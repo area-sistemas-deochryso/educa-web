@@ -1,4 +1,3 @@
-// #region Implementation
-// * Destroy helpers exports.
 export * from './destroy.service';
-// #endregion
+export * from './destroyable.component';
+export * from './timer-manager';

@@ -227,7 +227,7 @@ export class CursosStore extends BaseCrudStore<CursoListaDto, CursoFormData, Cur
 | Funciones | ≤ 30 ln | 31-50 ln | > 50 ln |
 | Archivos TS | ≤ 200 ln | 201-350 ln | > 500 ln |
 | Templates HTML | ≤ 150 ln | 151-250 ln | > 250 ln |
-| Backend (Service) | ≤ 300 ln | 300-600 ln | > 1000 ln |
+| Backend (.cs) | ≤ 300 ln | — | > 300 ln (refactor obligatorio) |
 
 ---
 

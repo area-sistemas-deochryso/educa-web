@@ -6,7 +6,7 @@ import { filter, Subject, take, takeUntil } from 'rxjs';
 
 import { AuthApiService } from '@core/services/auth/auth-api.service';
 import { SwService } from '@core/services/sw';
-import { TimerManager } from '@core/services/destroy/destroy.service';
+import { TimerManager } from '@core/services/destroy';
 import { SessionCoordinatorService } from './session-coordinator.service';
 import { logger, Duration } from '@core/helpers';
 // #endregion

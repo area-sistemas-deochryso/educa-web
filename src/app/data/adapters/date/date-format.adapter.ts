@@ -1,39 +1,6 @@
-// #region Imports
-import { BaseAdapter, BaseBidirectionalAdapter } from '../base/base.adapter';
-import { Injectable, inject } from '@angular/core';
-
-/**
- * Adapter para transformar fechas ISO a Date de JavaScript
- */
-// #endregion
-// #region Implementation
-@Injectable({
-	providedIn: 'root',
-})
-export class IsoDateAdapter extends BaseBidirectionalAdapter<string, Date> {
-	// * Bidirectional ISO string <-> Date adapter.
-	adapt(source: string): Date {
-		return new Date(source);
-	}
-
-	reverse(target: Date): string {
-		return target.toISOString();
-	}
-}
-
-/**
- * Modelo de fecha formateada para la UI
- */
-export interface FormattedDate {
-	date: Date;
-	iso: string;
-	short: string; // 22/01/2026
-	long: string; // 22 de enero de 2026
-	relative: string; // hace 2 días, mañana, etc.
-	dayName: string; // Miércoles
-	monthName: string; // Enero
-	time: string; // 14:30
-}
+import { Injectable } from '@angular/core';
+import { BaseAdapter } from '../base/base.adapter';
+import type { FormattedDate } from './date.adapter.models';
 
 /**
  * Adapter para transformar Date a FormattedDate con múltiples formatos
@@ -110,23 +77,3 @@ export class DateFormatAdapter extends BaseAdapter<Date, FormattedDate> {
 		}
 	}
 }
-
-/**
- * Adapter para transformar string ISO a FormattedDate
- */
-@Injectable({
-	providedIn: 'root',
-})
-export class IsoToFormattedDateAdapter extends BaseAdapter<string, FormattedDate> {
-	private isoAdapter = inject(IsoDateAdapter);
-	private formatAdapter = inject(DateFormatAdapter);
-	constructor() {
-		super();
-	}
-
-	adapt(source: string): FormattedDate {
-		const date = this.isoAdapter.adapt(source);
-		return this.formatAdapter.adapt(date);
-	}
-}
-// #endregion

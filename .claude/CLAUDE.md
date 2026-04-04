@@ -53,6 +53,10 @@ Aplicacion Angular 21 para gestion educativa con portal publico e intranet priva
 @.claude/rules/semantic-types.md
 @.claude/rules/capacitor.md
 
+## Comunicación con el usuario
+
+@.claude/rules/communication.md
+
 ## Agents
 
 @.claude/agents/code-reviewer.md
