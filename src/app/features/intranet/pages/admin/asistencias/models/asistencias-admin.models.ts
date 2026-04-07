@@ -10,6 +10,8 @@ export type {
 	CrearCierreMensualRequest,
 	RevertirCierreMensualRequest,
 	TipoOperacionAsistencia,
+	EnviarCorreosAsistenciaRequest,
+	EnviarCorreosResultado,
 } from '@data/models/asistencia-admin.models';
 
 // Form data local al feature.

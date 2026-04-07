@@ -8,6 +8,8 @@ import {
 	CrearCierreMensualRequest,
 	CrearEntradaManualRequest,
 	CrearSalidaManualRequest,
+	EnviarCorreosAsistenciaRequest,
+	EnviarCorreosResultado,
 	EstudianteParaSeleccion,
 	RevertirCierreMensualRequest,
 } from '../models';
@@ -103,6 +105,10 @@ export class AsistenciasAdminService {
 
 	sincronizarDesdeCrossChex(fecha: string): Observable<string> {
 		return this.http.post<string>(`${this.apiUrl}/sync`, null, { params: { fecha } });
+	}
+
+	enviarCorreos(dto: EnviarCorreosAsistenciaRequest): Observable<EnviarCorreosResultado> {
+		return this.http.post<EnviarCorreosResultado>(`${this.apiUrl}/enviar-correos`, dto);
 	}
 
 	// #endregion

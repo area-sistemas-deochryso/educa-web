@@ -15,6 +15,7 @@ import { SelectModule } from 'primeng/select';
 import { TableModule } from 'primeng/table';
 import { TagModule } from 'primeng/tag';
 import { TooltipModule } from 'primeng/tooltip';
+import { CheckboxModule } from 'primeng/checkbox';
 import { Tab, TabList, TabPanel, Tabs } from 'primeng/tabs';
 
 import { SkeletonColumnDef, TableSkeletonComponent, StatsSkeletonComponent } from '@shared/components';
@@ -49,6 +50,7 @@ import {
 		TableModule,
 		TagModule,
 		TooltipModule,
+		CheckboxModule,
 		TableSkeletonComponent,
 		StatsSkeletonComponent,
 		Tabs,
@@ -132,6 +134,22 @@ export class AsistenciasComponent implements OnInit {
 	onSearch(event: Event): void {
 		const term = (event.target as HTMLInputElement).value;
 		this.dataFacade.onSearch(term);
+	}
+
+	// #endregion
+
+	// #region Event handlers — Selección y correos
+
+	onToggleSelection(id: number): void {
+		this.store.toggleSelection(id);
+	}
+
+	onToggleSelectAll(): void {
+		this.store.toggleSelectAll();
+	}
+
+	onEnviarCorreos(): void {
+		this.crudFacade.enviarCorreos();
 	}
 
 	// #endregion

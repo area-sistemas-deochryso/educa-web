@@ -21,6 +21,23 @@
 		<span class="subtitle">Registro y corrección formal de asistencia diaria</span>
 	</div>
 	<div class="header-actions">
+		@if (vm().selectedCount > 0) {
+			<button
+				pButton
+				icon="pi pi-envelope"
+				[label]="'Enviar correos (' + vm().selectedCount + ')'"
+				class="p-button-outlined p-button-help"
+				[loading]="vm().enviandoCorreos"
+				(click)="onEnviarCorreos()"
+				[pt]="{
+					root: {
+						'aria-label': 'Enviar correos de asistencia a los apoderados seleccionados',
+					},
+				}"
+				pTooltip="Envía el correo de asistencia al apoderado de cada estudiante seleccionado"
+				tooltipPosition="bottom"
+			></button>
+		}
 		<button
 			pButton
 			icon="pi pi-sync"
@@ -128,6 +145,13 @@
 	>
 		<ng-template #header>
 			<tr>
+				<th style="width: 40px">
+					<p-checkbox
+						[binary]="true"
+						[ngModel]="vm().allSelected"
+						(ngModelChange)="onToggleSelectAll()"
+					/>
+				</th>
 				<th style="width: 50px">#</th>
 				<th>Estudiante</th>
 				<th style="width: 90px">Grado</th>
@@ -140,6 +164,13 @@
 		</ng-template>
 		<ng-template #body let-item let-i="rowIndex">
 			<tr>
+				<td>
+					<p-checkbox
+						[binary]="true"
+						[ngModel]="vm().selectedIds.has(item.asistenciaId)"
+						(ngModelChange)="onToggleSelection(item.asistenciaId)"
+					/>
+				</td>
 				<td>{{ i + 1 }}</td>
 				<td>
 					<div class="student-cell">
@@ -208,7 +239,7 @@
 		</ng-template>
 		<ng-template #emptymessage>
 			<tr>
-				<td colspan="8" class="text-center">
+				<td colspan="9" class="text-center">
 					No hay registros de asistencia para esta fecha
 				</td>
 			</tr>

@@ -246,6 +246,36 @@ export class AsistenciasCrudFacade {
 
 	// #endregion
 
+	// #region Enviar correos masivos
+
+	enviarCorreos(): void {
+		const ids = Array.from(this.store.selectedIds());
+		if (ids.length === 0) return;
+
+		this.store.setEnviandoCorreos(true);
+
+		this.api
+			.enviarCorreos({ asistenciaIds: ids })
+			.pipe(takeUntilDestroyed(this.destroyRef))
+			.subscribe({
+				next: (result) => {
+					this.store.setEnviandoCorreos(false);
+					this.store.clearSelection();
+
+					const msg = `${result.encolados} correo(s) encolados de ${result.total} seleccionados` +
+						(result.sinCorreo > 0 ? `. ${result.sinCorreo} sin correo de apoderado` : '');
+					this.errorHandler.showSuccess('Correos enviados', msg);
+				},
+				error: (err) => {
+					this.store.setEnviandoCorreos(false);
+					logger.error('Error al enviar correos masivos:', err);
+					this.errorHandler.showError('Error', 'No se pudieron enviar los correos');
+				},
+			});
+	}
+
+	// #endregion
+
 	// #region Cierres mensuales
 
 	crearCierre(dto: CrearCierreMensualRequest): void {

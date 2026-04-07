@@ -93,3 +93,14 @@ export interface RevertirCierreMensualRequest {
 }
 
 export type TipoOperacionAsistencia = 'entrada' | 'salida' | 'completa';
+
+export interface EnviarCorreosAsistenciaRequest {
+	asistenciaIds: number[];
+}
+
+export interface EnviarCorreosResultado {
+	total: number;
+	encolados: number;
+	sinCorreo: number;
+	noEncontrados: number;
+}

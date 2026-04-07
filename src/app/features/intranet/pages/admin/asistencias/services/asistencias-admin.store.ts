@@ -30,6 +30,10 @@ export class AsistenciasAdminStore {
 	// Sync
 	private readonly _syncing = signal(false);
 
+	// Selección para envío de correos
+	private readonly _selectedIds = signal<Set<number>>(new Set());
+	private readonly _enviandoCorreos = signal(false);
+
 	// UI
 	private readonly _dialogVisible = signal(false);
 	private readonly _cierreDialogVisible = signal(false);
@@ -60,6 +64,8 @@ export class AsistenciasAdminStore {
 	readonly tableReady = this._tableReady.asReadonly();
 
 	readonly syncing = this._syncing.asReadonly();
+	readonly selectedIds = this._selectedIds.asReadonly();
+	readonly enviandoCorreos = this._enviandoCorreos.asReadonly();
 	readonly fecha = this._fecha.asReadonly();
 	readonly sedeId = this._sedeId.asReadonly();
 	readonly searchTerm = this._searchTerm.asReadonly();
@@ -82,6 +88,14 @@ export class AsistenciasAdminStore {
 				i.nombreCompleto.toLowerCase().includes(search) ||
 				i.dni.includes(search),
 		);
+	});
+
+	readonly selectedCount = computed(() => this._selectedIds().size);
+
+	readonly allSelected = computed(() => {
+		const items = this.filteredItems();
+		const selected = this._selectedIds();
+		return items.length > 0 && items.every((i) => selected.has(i.asistenciaId));
 	});
 
 	readonly isFormValid = computed(() => {
@@ -114,6 +128,10 @@ export class AsistenciasAdminStore {
 		statsReady: this._statsReady(),
 		tableReady: this._tableReady(),
 		syncing: this._syncing(),
+		selectedIds: this._selectedIds(),
+		selectedCount: this.selectedCount(),
+		allSelected: this.allSelected(),
+		enviandoCorreos: this._enviandoCorreos(),
 		dialogVisible: this._dialogVisible(),
 		cierreDialogVisible: this._cierreDialogVisible(),
 		confirmDialogVisible: this._confirmDialogVisible(),
@@ -199,6 +217,35 @@ export class AsistenciasAdminStore {
 
 	setSyncing(v: boolean): void {
 		this._syncing.set(v);
+	}
+
+	setEnviandoCorreos(v: boolean): void {
+		this._enviandoCorreos.set(v);
+	}
+
+	toggleSelection(id: number): void {
+		this._selectedIds.update((set) => {
+			const next = new Set(set);
+			if (next.has(id)) next.delete(id);
+			else next.add(id);
+			return next;
+		});
+	}
+
+	toggleSelectAll(): void {
+		const items = this.filteredItems();
+		const selected = this._selectedIds();
+		const allSelected = items.every((i) => selected.has(i.asistenciaId));
+
+		if (allSelected) {
+			this._selectedIds.set(new Set());
+		} else {
+			this._selectedIds.set(new Set(items.map((i) => i.asistenciaId)));
+		}
+	}
+
+	clearSelection(): void {
+		this._selectedIds.set(new Set());
 	}
 	// #endregion
 
