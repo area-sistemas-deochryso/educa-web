@@ -72,14 +72,14 @@ export class HorarioDetailDrawerComponent {
 	onVisibleChange(visible: boolean): void {
 		if (!visible) {
 			this.visibleChange.emit(false);
-			this.close.emit();
+			this.closeDrawer.emit();
 			this.selectedProfesorId = null;
 			this.showProfesorEdit.set(false);
 		}
 	}
 
 	onClose(): void {
-		this.close.emit();
+		this.closeDrawer.emit();
 	}
 
 	onEdit(): void {
