@@ -13,6 +13,7 @@ import { dragState } from './drag-drop.models';
 		'(dragleave)': 'onDragLeave($event)',
 	},
 })
+// eslint-disable-next-line @angular-eslint/directive-class-suffix
 export class CdkDropList<T = unknown> implements OnInit, OnDestroy {
 	private el = inject(ElementRef<HTMLElement>);
 

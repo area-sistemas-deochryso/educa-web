@@ -8,6 +8,7 @@ import { Directive, ElementRef, inject } from '@angular/core';
 		'[style.cursor]': '"grab"',
 	},
 })
+// eslint-disable-next-line @angular-eslint/directive-class-suffix
 export class CdkDragHandle {
 	constructor() {
 		// El handle se detecta por el selector en CdkDrag.onDragStart

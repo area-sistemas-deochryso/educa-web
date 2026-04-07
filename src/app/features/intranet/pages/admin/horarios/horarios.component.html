@@ -230,7 +230,7 @@
 	[profesoresOptions]="vm().profesoresOptions"
 	[isAdmin]="vm().isAdmin"
 	(visibleChange)="vm().detailDrawerVisible && !$event && onCloseDetailDrawer()"
-	(close)="onCloseDetailDrawer()"
+	(closeDrawer)="onCloseDetailDrawer()"
 	(edit)="onEdit($event)"
 	(delete)="onDelete($event)"
 	(toggleEstado)="onToggleEstado($event.id, $event.estadoActual)"

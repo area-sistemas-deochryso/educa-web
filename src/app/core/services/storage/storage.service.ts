@@ -622,6 +622,7 @@ export class StorageService {
 		try {
 			localStorage.removeItem(key);
 		} catch {
+			// Silently ignore — localStorage may be unavailable
 		}
 	}
 	// #endregion

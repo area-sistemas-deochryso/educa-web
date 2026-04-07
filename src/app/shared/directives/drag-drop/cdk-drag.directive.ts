@@ -12,6 +12,7 @@ import { dragState } from './drag-drop.models';
 		'(dragend)': 'onDragEnd($event)',
 	},
 })
+// eslint-disable-next-line @angular-eslint/directive-class-suffix
 export class CdkDrag<T = unknown> implements OnInit {
 	private el = inject(ElementRef<HTMLElement>);
 

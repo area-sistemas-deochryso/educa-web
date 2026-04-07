@@ -46,7 +46,7 @@ export class HorarioDetailDrawerComponent {
 	// #endregion
 	// #region Outputs
 	readonly visibleChange = output<boolean>();
-	readonly close = output<void>();
+	readonly closeDrawer = output<void>();
 	readonly edit = output<number>();
 	readonly delete = output<number>();
 	readonly toggleEstado = output<{ id: number; estadoActual: boolean }>();

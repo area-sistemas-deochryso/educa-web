@@ -189,7 +189,7 @@ export class CacheInvalidationService {
 	 * @returns Total de entradas invalidadas
 	 */
 	async invalidateMultipleModules(
-		modules: Array<'asistencias' | 'usuarios' | 'salones' | 'cursos' | 'reportes'>
+		modules: ('asistencias' | 'usuarios' | 'salones' | 'cursos' | 'reportes')[]
 	): Promise<number> {
 		logger.log('[CacheInvalidation] Invalidando múltiples módulos:', modules);
 		let totalInvalidated = 0;

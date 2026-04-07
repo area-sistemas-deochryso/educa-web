@@ -61,7 +61,7 @@ import { CampusPathVisualizerService } from './services/campus-path-visualizer.s
 					[title]="isFullscreen() ? 'Salir de pantalla completa' : 'Pantalla completa'">
 					<i [class]="isFullscreen() ? 'pi pi-window-minimize' : 'pi pi-window-maximize'"></i>
 				</button>
-				<button type="button" class="exit-btn" (click)="close.emit()">✕ Salir</button>
+				<button type="button" class="exit-btn" (click)="closeView.emit()">✕ Salir</button>
 			</div>
 			</div>
 
@@ -95,7 +95,7 @@ import { CampusPathVisualizerService } from './services/campus-path-visualizer.s
 						<div class="arrival-time">⏱ {{ formattedTime() }}</div>
 						<div class="arrival-actions">
 							<button type="button" class="arrival-retry" (click)="retryNavigation()">🔄 Volver a intentar</button>
-							<button type="button" class="arrival-exit" (click)="close.emit()">✕ Salir</button>
+							<button type="button" class="arrival-exit" (click)="closeView.emit()">✕ Salir</button>
 						</div>
 					</div>
 				</div>
@@ -253,7 +253,7 @@ export class Campus3dViewComponent implements AfterViewInit, OnDestroy {
 	readonly startNodeId       = input<string | null>(null);
 
 	readonly closestNodeChange = output<string>();
-	readonly close             = output<void>();
+	readonly closeView         = output<void>();
 	// #endregion
 
 	// #region ViewChild
@@ -493,7 +493,7 @@ export class Campus3dViewComponent implements AfterViewInit, OnDestroy {
 	private readonly onKeyDown = (e: KeyboardEvent): void => {
 		const k = e.key.toLowerCase();
 		this.player.keys[k] = true;
-		if (k === 'escape') this.close.emit();
+		if (k === 'escape') this.closeView.emit();
 		if (['w','s','a','d','arrowup','arrowdown','arrowleft','arrowright',' '].includes(k)) e.preventDefault();
 	};
 	private readonly onKeyUp = (e: KeyboardEvent): void => { this.player.keys[e.key.toLowerCase()] = false; };
