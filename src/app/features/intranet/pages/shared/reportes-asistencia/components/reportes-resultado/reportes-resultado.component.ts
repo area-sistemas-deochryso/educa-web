@@ -1,4 +1,5 @@
 import { ChangeDetectionStrategy, Component, computed, input } from '@angular/core';
+import { DatePipe } from '@angular/common';
 import { TableModule } from 'primeng/table';
 import type { ReporteFiltrado, SalonReporteFiltrado } from '../../models';
 
@@ -8,6 +9,7 @@ interface FilaTabla {
 	nombreCompleto: string;
 	cantidadDias: number;
 	horaLlegada: string | null;
+	horaSalida: string | null;
 	observacion: string | null;
 	esCabeceraSalon: boolean;
 	salonInfo: SalonReporteFiltrado | null;
@@ -16,7 +18,7 @@ interface FilaTabla {
 @Component({
 	selector: 'app-reportes-resultado',
 	standalone: true,
-	imports: [TableModule],
+	imports: [TableModule, DatePipe],
 	templateUrl: './reportes-resultado.component.html',
 	styleUrl: './reportes-resultado.component.scss',
 	changeDetection: ChangeDetectionStrategy.OnPush,
@@ -40,6 +42,7 @@ export class ReportesResultadoComponent {
 				nombreCompleto: '',
 				cantidadDias: 0,
 				horaLlegada: null,
+				horaSalida: null,
 				observacion: null,
 				esCabeceraSalon: true,
 				salonInfo: salon,
@@ -52,6 +55,7 @@ export class ReportesResultadoComponent {
 					nombreCompleto: est.nombreCompleto,
 					cantidadDias: est.cantidadDias,
 					horaLlegada: est.horaLlegada,
+					horaSalida: est.horaSalida,
 					observacion: est.observacion,
 					esCabeceraSalon: false,
 					salonInfo: null,

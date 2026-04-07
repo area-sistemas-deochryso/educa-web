@@ -20,5 +20,6 @@ export const TABLE_SKELETON_COLUMNS: SkeletonColumnDef[] = [
 	{ width: '90px', cellType: 'text' },
 	{ width: 'flex', cellType: 'text-subtitle' },
 	{ width: '80px', cellType: 'text' },
+	{ width: '80px', cellType: 'text' },
 	{ width: '120px', cellType: 'text' },
 ];

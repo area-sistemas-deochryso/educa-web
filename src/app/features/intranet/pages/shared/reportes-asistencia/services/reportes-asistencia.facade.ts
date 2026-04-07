@@ -138,7 +138,12 @@ export class ReportesAsistenciaFacade {
 					dni: est.dni,
 					nombre: est.nombreCompleto,
 					dias: est.cantidadDias,
-					hora: est.horaLlegada ?? '-',
+					entrada: est.horaLlegada
+						? new Date(est.horaLlegada).toLocaleTimeString('es-PE', { hour: '2-digit', minute: '2-digit', hour12: false })
+						: '—',
+					salida: est.horaSalida
+						? new Date(est.horaSalida).toLocaleTimeString('es-PE', { hour: '2-digit', minute: '2-digit', hour12: false })
+						: '—',
 					observacion: est.observacion ?? '',
 				});
 			}
@@ -154,7 +159,10 @@ export class ReportesAsistenciaFacade {
 				{ header: 'DNI', key: 'dni', width: 12 },
 				{ header: 'Nombre', key: 'nombre', width: 35 },
 				...(esDia
-					? [{ header: 'Hora', key: 'hora', width: 10 }]
+					? [
+							{ header: 'Entrada', key: 'entrada', width: 10 },
+							{ header: 'Salida', key: 'salida', width: 10 },
+						]
 					: [{ header: 'Días', key: 'dias', width: 8 }]),
 				{ header: 'Observación', key: 'observacion', width: 25 },
 			],

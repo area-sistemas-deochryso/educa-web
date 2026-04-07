@@ -35,6 +35,7 @@ export interface EstudianteReporteFiltrado {
 	nombreCompleto: string;
 	cantidadDias: number;
 	horaLlegada: string | null;
+	horaSalida: string | null;
 	observacion: string | null;
 }
 // #endregion
