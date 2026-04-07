@@ -3,6 +3,7 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
 import { ErrorHandlerService, WalFacadeHelper } from '@core/services';
 import { logger } from '@core/helpers';
+import { environment } from '@env/environment';
 import {
 	CrearAsistenciaCompletaRequest,
 	CrearEntradaManualRequest,
@@ -213,7 +214,7 @@ export class AsistenciasCrudFacade {
 			operation: 'DELETE',
 			resourceType: 'asistencia-admin',
 			resourceId: item.asistenciaId,
-			endpoint: '',
+			endpoint: `${environment.apiUrl}/api/asistencia-admin/${item.asistenciaId}`,
 			method: 'DELETE',
 			payload: null,
 			http$: () => this.api.eliminar(item.asistenciaId),

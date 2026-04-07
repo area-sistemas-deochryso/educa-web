@@ -32,11 +32,8 @@ export class EmailOutboxApiService {
 		if (filtros?.search) params = params.set('search', filtros.search);
 
 		return this.http
-			.get<{ data: EmailOutboxLista[] }>(`${this.baseUrl}/listar`, { params })
-			.pipe(
-				map((r) => r.data),
-				catchError(() => of([])),
-			);
+			.get<EmailOutboxLista[]>(`${this.baseUrl}/listar`, { params })
+			.pipe(catchError(() => of([])));
 	}
 
 	estadisticas(desde?: string, hasta?: string): Observable<EmailOutboxEstadisticas> {
@@ -54,11 +51,8 @@ export class EmailOutboxApiService {
 		};
 
 		return this.http
-			.get<{ data: EmailOutboxEstadisticas }>(`${this.baseUrl}/estadisticas`, { params })
-			.pipe(
-				map((r) => r.data ?? defaultStats),
-				catchError(() => of(defaultStats)),
-			);
+			.get<EmailOutboxEstadisticas>(`${this.baseUrl}/estadisticas`, { params })
+			.pipe(catchError(() => of(defaultStats)));
 	}
 
 	tendencias(desde?: string, hasta?: string): Observable<EmailOutboxTendencia[]> {
@@ -67,20 +61,14 @@ export class EmailOutboxApiService {
 		if (hasta) params = params.set('hasta', hasta);
 
 		return this.http
-			.get<{ data: EmailOutboxTendencia[] }>(`${this.baseUrl}/tendencias`, { params })
-			.pipe(
-				map((r) => r.data ?? []),
-				catchError(() => of([])),
-			);
+			.get<EmailOutboxTendencia[]>(`${this.baseUrl}/tendencias`, { params })
+			.pipe(catchError(() => of([])));
 	}
 
 	obtenerHtml(id: number): Observable<string | null> {
 		return this.http
-			.get<{ data: { html: string } }>(`${this.baseUrl}/${id}/html`)
-			.pipe(
-				map((r) => r.data.html),
-				catchError(() => of(null)),
-			);
+			.get<string>(`${this.baseUrl}/${id}/html`)
+			.pipe(catchError(() => of(null)));
 	}
 	// #endregion
 
