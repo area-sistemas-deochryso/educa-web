@@ -1,7 +1,7 @@
 import type { SalonProfesor } from '@data/models/asistencia.models';
 
 // #region Tipos semánticos
-export const ESTADO_FILTROS = ['faltando', 'viniendo', 'tarde', 'temprano'] as const;
+export const ESTADO_FILTROS = ['todos', 'faltando', 'viniendo', 'tarde', 'temprano'] as const;
 export type EstadoFiltro = (typeof ESTADO_FILTROS)[number];
 
 export const RANGO_TIPOS = ['dia', 'semana', 'mes'] as const;
@@ -49,7 +49,7 @@ export interface ReporteFilters {
 
 export function getDefaultFilters(): ReporteFilters {
 	return {
-		estado: 'faltando',
+		estado: 'todos',
 		rango: 'dia',
 		fecha: new Date(),
 		salonesSeleccionados: [],

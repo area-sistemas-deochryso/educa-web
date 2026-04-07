@@ -2,6 +2,7 @@ import type { SelectOption, EstadoFiltro, RangoTipo } from '../models';
 import type { SkeletonColumnDef } from '@shared/components/table-skeleton/table-skeleton.types';
 
 export const ESTADO_OPTIONS: SelectOption<EstadoFiltro>[] = [
+	{ label: 'Todos', value: 'todos' },
 	{ label: 'Ausentes', value: 'faltando' },
 	{ label: 'Asistieron', value: 'viniendo' },
 	{ label: 'Tardanzas', value: 'tarde' },
