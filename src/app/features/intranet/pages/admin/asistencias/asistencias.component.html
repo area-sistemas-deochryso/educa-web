@@ -23,6 +23,21 @@
 	<div class="header-actions">
 		<button
 			pButton
+			icon="pi pi-sync"
+			label="Sincronizar CrossChex"
+			class="p-button-outlined"
+			[loading]="vm().syncing"
+			(click)="onSincronizar()"
+			[pt]="{
+				root: {
+					'aria-label': 'Sincronizar asistencias desde CrossChex para la fecha seleccionada',
+				},
+			}"
+			pTooltip="Re-sincroniza las marcaciones biométricas del día seleccionado"
+			tooltipPosition="bottom"
+		></button>
+		<button
+			pButton
 			icon="pi pi-lock"
 			label="Cerrar mes"
 			class="p-button-outlined p-button-warning"
@@ -249,11 +264,13 @@
 				<p-datepicker
 					[ngModel]="vm().formData.horaEntrada"
 					(ngModelChange)="store.updateFormData({ horaEntrada: $event })"
+					[timeOnly]="vm().isEditing"
+					[inline]="vm().isEditing"
 					[showTime]="true"
 					[showSeconds]="false"
 					[hourFormat]="'24'"
 					dateFormat="yy-mm-dd"
-					placeholder="Seleccionar fecha y hora..."
+					[placeholder]="vm().isEditing ? 'HH:mm' : 'Seleccionar fecha y hora...'"
 					appendTo="body"
 				/>
 			</div>
@@ -263,16 +280,35 @@
 			<!-- Hora salida -->
 			<div class="form-field">
 				<label>Hora de salida</label>
-				<p-datepicker
-					[ngModel]="vm().formData.horaSalida"
-					(ngModelChange)="store.updateFormData({ horaSalida: $event })"
-					[showTime]="true"
-					[showSeconds]="false"
-					[hourFormat]="'24'"
-					dateFormat="yy-mm-dd"
-					placeholder="Seleccionar fecha y hora..."
-					appendTo="body"
-				/>
+				<div class="field-with-action">
+					<p-datepicker
+						[ngModel]="vm().formData.horaSalida"
+						(ngModelChange)="store.updateFormData({ horaSalida: $event })"
+						[timeOnly]="vm().isEditing"
+						[inline]="vm().isEditing"
+						[showTime]="true"
+						[showSeconds]="false"
+						[hourFormat]="'24'"
+						dateFormat="yy-mm-dd"
+						[placeholder]="vm().isEditing ? 'HH:mm' : 'Seleccionar fecha y hora...'"
+						appendTo="body"
+					/>
+					@if (vm().isEditing && vm().formData.horaSalida) {
+						<button
+							pButton
+							icon="pi pi-times"
+							class="p-button-danger p-button-text p-button-sm"
+							(click)="store.updateFormData({ horaSalida: null })"
+							[pt]="{
+								root: {
+									'aria-label': 'Quitar hora de salida',
+								},
+							}"
+							pTooltip="Quitar salida"
+							tooltipPosition="top"
+						></button>
+					}
+				</div>
 			</div>
 		}
 

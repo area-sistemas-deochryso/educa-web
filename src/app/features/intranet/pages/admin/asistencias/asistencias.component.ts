@@ -136,6 +136,14 @@ export class AsistenciasComponent implements OnInit {
 
 	// #endregion
 
+	// #region Event handlers — Sync
+
+	onSincronizar(): void {
+		this.dataFacade.sincronizarDesdeCrossChex();
+	}
+
+	// #endregion
+
 	// #region Event handlers — CRUD
 
 	onNuevo(tipo: TipoOperacionAsistencia = 'entrada'): void {

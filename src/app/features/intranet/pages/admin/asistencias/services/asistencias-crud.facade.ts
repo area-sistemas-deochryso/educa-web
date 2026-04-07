@@ -157,9 +157,24 @@ export class AsistenciasCrudFacade {
 		const selected = this.store.selectedItem();
 		if (!selected) return;
 
+		// Si tenía salida y ahora no, indicar al backend que la limpie
+		const teniaHoraSalida = !!selected.horaSalida;
+		const limpiarSalida = teniaHoraSalida && !fd.horaSalida;
+
+		// En edición, timeOnly=true devuelve Date con fecha de hoy.
+		// Combinar la hora editada con la fecha original del registro.
+		const fechaBase = new Date(selected.fecha);
+		const combinarFechaHora = (hora: Date | null): string | undefined => {
+			if (!hora) return undefined;
+			const combined = new Date(fechaBase);
+			combined.setHours(hora.getHours(), hora.getMinutes(), 0, 0);
+			return combined.toISOString();
+		};
+
 		const dto: ActualizarHorasRequest = {
-			horaEntrada: fd.horaEntrada?.toISOString(),
-			horaSalida: fd.horaSalida?.toISOString(),
+			horaEntrada: combinarFechaHora(fd.horaEntrada),
+			horaSalida: combinarFechaHora(fd.horaSalida),
+			limpiarSalida: limpiarSalida || undefined,
 			observacion: fd.observacion || undefined,
 			rowVersion: selected.rowVersion,
 		};

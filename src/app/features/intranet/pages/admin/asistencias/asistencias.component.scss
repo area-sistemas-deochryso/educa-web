@@ -146,6 +146,16 @@
 			color: var(--text-color);
 			font-size: 0.875rem;
 		}
+
+		.field-with-action {
+			display: flex;
+			align-items: center;
+			gap: 0.5rem;
+
+			p-datepicker {
+				flex: 1;
+			}
+		}
 	}
 }
 // #endregion

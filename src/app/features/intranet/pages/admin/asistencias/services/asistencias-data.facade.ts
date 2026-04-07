@@ -109,6 +109,33 @@ export class AsistenciasDataFacade {
 
 	// #endregion
 
+	// #region Sincronización CrossChex
+
+	sincronizarDesdeCrossChex(): void {
+		if (this.store.syncing()) return;
+		this.store.setSyncing(true);
+
+		const fecha = this.store.fecha();
+
+		this.api
+			.sincronizarDesdeCrossChex(fecha)
+			.pipe(takeUntilDestroyed(this.destroyRef))
+			.subscribe({
+				next: (resultado) => {
+					logger.log('Sincronización completada:', resultado);
+					this.store.setSyncing(false);
+					// Recargar datos después de la sincronización
+					this.loadData();
+				},
+				error: (err) => {
+					logger.error('Error al sincronizar:', err);
+					this.store.setSyncing(false);
+				},
+			});
+	}
+
+	// #endregion
+
 	// #region Filtros
 
 	onFechaChange(fecha: string): void {

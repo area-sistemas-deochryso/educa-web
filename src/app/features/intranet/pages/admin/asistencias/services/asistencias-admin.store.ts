@@ -27,6 +27,9 @@ export class AsistenciasAdminStore {
 	private readonly _sedeId = signal<number | null>(null);
 	private readonly _searchTerm = signal('');
 
+	// Sync
+	private readonly _syncing = signal(false);
+
 	// UI
 	private readonly _dialogVisible = signal(false);
 	private readonly _cierreDialogVisible = signal(false);
@@ -56,6 +59,7 @@ export class AsistenciasAdminStore {
 	readonly statsReady = this._statsReady.asReadonly();
 	readonly tableReady = this._tableReady.asReadonly();
 
+	readonly syncing = this._syncing.asReadonly();
 	readonly fecha = this._fecha.asReadonly();
 	readonly sedeId = this._sedeId.asReadonly();
 	readonly searchTerm = this._searchTerm.asReadonly();
@@ -87,7 +91,8 @@ export class AsistenciasAdminStore {
 		}
 		const baseValid = fd.estudianteId !== null && fd.sedeId !== null && fd.horaEntrada !== null;
 		if (fd.tipoOperacion === 'completa') {
-			return baseValid && fd.horaSalida !== null;
+			// En edición se permite quitar la salida (horaSalida null)
+			return this._isEditing() ? baseValid : baseValid && fd.horaSalida !== null;
 		}
 		return baseValid;
 	});
@@ -108,6 +113,7 @@ export class AsistenciasAdminStore {
 		error: this._error(),
 		statsReady: this._statsReady(),
 		tableReady: this._tableReady(),
+		syncing: this._syncing(),
 		dialogVisible: this._dialogVisible(),
 		cierreDialogVisible: this._cierreDialogVisible(),
 		confirmDialogVisible: this._confirmDialogVisible(),
@@ -189,6 +195,10 @@ export class AsistenciasAdminStore {
 
 	setTableReady(v: boolean): void {
 		this._tableReady.set(v);
+	}
+
+	setSyncing(v: boolean): void {
+		this._syncing.set(v);
 	}
 	// #endregion
 

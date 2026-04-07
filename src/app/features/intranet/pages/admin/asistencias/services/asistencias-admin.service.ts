@@ -101,5 +101,9 @@ export class AsistenciasAdminService {
 		return this.http.post<CierreMensualLista>(`${this.cierreUrl}/${id}/revertir`, dto);
 	}
 
+	sincronizarDesdeCrossChex(fecha: string): Observable<string> {
+		return this.http.post<string>(`${this.apiUrl}/sync`, null, { params: { fecha } });
+	}
+
 	// #endregion
 }
