@@ -2,12 +2,14 @@ import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
 import { DrawerModule } from 'primeng/drawer';
 
 import { StatsSkeletonComponent, TableSkeletonComponent } from '@shared/components';
+import { ExcelService } from '@core/services/excel/excel.service';
 
 import { EmailOutboxDataFacade, EmailOutboxUiFacade } from './services';
 import { EmailOutboxHeaderComponent } from './components/email-outbox-header/email-outbox-header.component';
 import { EmailOutboxStatsComponent } from './components/email-outbox-stats/email-outbox-stats.component';
 import { EmailOutboxFiltersComponent } from './components/email-outbox-filters/email-outbox-filters.component';
 import { EmailOutboxTableComponent } from './components/email-outbox-table/email-outbox-table.component';
+import { EmailOutboxChartComponent } from './components/email-outbox-chart/email-outbox-chart.component';
 
 import { EmailOutboxLista } from '@data/models/email-outbox.models';
 
@@ -22,6 +24,7 @@ import { EmailOutboxLista } from '@data/models/email-outbox.models';
 		EmailOutboxStatsComponent,
 		EmailOutboxFiltersComponent,
 		EmailOutboxTableComponent,
+		EmailOutboxChartComponent,
 	],
 	templateUrl: './email-outbox.component.html',
 	styleUrl: './email-outbox.component.scss',
@@ -31,6 +34,7 @@ export class EmailOutboxComponent {
 	// #region Dependencias
 	private dataFacade = inject(EmailOutboxDataFacade);
 	private uiFacade = inject(EmailOutboxUiFacade);
+	private excelService = inject(ExcelService);
 	// #endregion
 
 	// #region Estado
@@ -81,6 +85,38 @@ export class EmailOutboxComponent {
 		if (!visible) {
 			this.uiFacade.closeDrawer();
 		}
+	}
+
+	async onExportExcel(): Promise<void> {
+		const items = this.vm().items;
+		await this.excelService.exportToXlsx({
+			sheetName: 'Correos',
+			fileName: `email-outbox-${new Date().toISOString().split('T')[0]}.xlsx`,
+			columns: [
+				{ header: 'ID', key: 'id', width: 10 },
+				{ header: 'Tipo', key: 'tipo', width: 25 },
+				{ header: 'Estado', key: 'estado', width: 15 },
+				{ header: 'Destinatario', key: 'destinatario', width: 35 },
+				{ header: 'Asunto', key: 'asunto', width: 40 },
+				{ header: 'Intentos', key: 'intentos', width: 10 },
+				{ header: 'Último Error', key: 'ultimoError', width: 40 },
+				{ header: 'Fecha Envío', key: 'fechaEnvio', width: 20 },
+				{ header: 'Registrado por', key: 'usuarioReg', width: 20 },
+				{ header: 'Fecha Registro', key: 'fechaReg', width: 20 },
+			],
+			data: items.map((i) => ({
+				id: i.id,
+				tipo: i.tipo,
+				estado: i.estado,
+				destinatario: i.destinatario,
+				asunto: i.asunto,
+				intentos: `${i.intentos}/${i.maxIntentos}`,
+				ultimoError: i.ultimoError ?? '',
+				fechaEnvio: i.fechaEnvio ?? '',
+				usuarioReg: i.usuarioReg,
+				fechaReg: i.fechaReg,
+			})),
+		});
 	}
 	// #endregion
 }

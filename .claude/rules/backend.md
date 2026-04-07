@@ -279,6 +279,30 @@ Cookies de auth definidas en `Constants/Auth/CookieConfig.cs`:
 
 ---
 
+## Envío de Correos — Outbox Obligatorio
+
+> **"NUNCA llamar `IEmailService` directamente desde un service de negocio."**
+
+Todo envío de correo **debe** pasar por `IEmailOutboxService.EnqueueAsync()`. El `EmailOutboxWorker` se encarga del envío real con retry exponencial, auditoría y trazabilidad.
+
+```csharp
+// ✅ CORRECTO — encolar en outbox
+await _outboxService.EnqueueAsync(email, "ASISTENCIA", usuario, "Asistencia", asistenciaId);
+
+// ❌ INCORRECTO — envío directo (sin auditoría, sin retry persistente)
+await _emailService.SendEmailAsync(email);
+```
+
+| Capa | Puede usar |
+|------|-----------|
+| Services de negocio | `IEmailOutboxService.EnqueueAsync()` (vía `IEmailNotificationService` o directo) |
+| `EmailOutboxWorker` | `IEmailService.SendEmailOnceAsync()` (único consumidor permitido) |
+| Tests / debug | `IEmailService` directamente (solo en desarrollo) |
+
+**Razón**: El outbox garantiza persistencia, retry automático (5 intentos, backoff exponencial), trazabilidad por entidad de origen, y UI admin de diagnóstico. Un `SendEmailAsync` directo pierde todo esto.
+
+---
+
 ## Checklist de Code Review
 
 ```
@@ -304,6 +328,10 @@ SEGURIDAD
 [ ] ¿Se valida acceso al recurso? ¿No se exponen datos sensibles en errores?
 [ ] ¿Rate limiting en endpoints pesados? ([EnableRateLimiting("heavy")])
 [ ] ¿Claims se extraen con User.GetDni(), User.GetRol(), etc.?
+
+CORREOS
+[ ] ¿Envío de correos usa IEmailOutboxService.EnqueueAsync()? (NUNCA IEmailService directo)
+[ ] ¿Se pasa entidadOrigen + entidadId para trazabilidad?
 
 MIGRACIONES
 [ ] ¿Hay tablas/columnas/índices nuevos? → Script SQL mostrado al usuario

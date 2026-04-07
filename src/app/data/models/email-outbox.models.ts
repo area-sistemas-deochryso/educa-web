@@ -32,4 +32,12 @@ export interface EmailOutboxEstadisticas {
 	enProceso: number;
 	porcentajeExito: number;
 }
+
+export interface EmailOutboxTendencia {
+	fecha: string;
+	enviados: number;
+	fallidos: number;
+	pendientes: number;
+	total: number;
+}
 // #endregion

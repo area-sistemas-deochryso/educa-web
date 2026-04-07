@@ -31,20 +31,24 @@ export class EmailOutboxDataFacade {
 		forkJoin({
 			items: this.api.listar(filtros),
 			stats: this.api.estadisticas(filtros.desde, filtros.hasta),
+			tendencias: this.api.tendencias(filtros.desde, filtros.hasta),
 		})
 			.pipe(takeUntilDestroyed(this.destroyRef))
 			.subscribe({
-				next: ({ items, stats }) => {
+				next: ({ items, stats, tendencias }) => {
 					this.store.setItems(items);
 					this.store.setEstadisticas(stats);
+					this.store.setTendencias(tendencias);
 					this.store.setStatsReady(true);
 					this.store.setTableReady(true);
+					this.store.setTendenciasReady(true);
 					this.store.setLoading(false);
 				},
 				error: () => {
 					this.store.setLoading(false);
 					this.store.setStatsReady(true);
 					this.store.setTableReady(true);
+					this.store.setTendenciasReady(true);
 				},
 			});
 	}

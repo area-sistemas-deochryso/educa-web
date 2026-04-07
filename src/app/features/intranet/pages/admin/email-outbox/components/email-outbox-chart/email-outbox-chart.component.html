@@ -1,0 +1,35 @@
+<!-- #region Chart -->
+<div class="chart-container">
+	<div class="chart-header">
+		<h3>Tendencia de envíos (últimos 30 días)</h3>
+		<div class="chart-legend">
+			<span class="legend-item sent"><span class="legend-dot"></span> Enviados</span>
+			<span class="legend-item failed"><span class="legend-dot"></span> Fallidos</span>
+			<span class="legend-item pending"><span class="legend-dot"></span> Pendientes</span>
+		</div>
+	</div>
+
+	@if (chartBars().length === 0) {
+		<div class="chart-empty">Sin datos para el período seleccionado</div>
+	} @else {
+		<div class="chart-bars">
+			@for (bar of chartBars(); track bar.fecha) {
+				<div class="bar-group" [title]="bar.fecha + ' — Total: ' + bar.total">
+					<div class="bar-stack">
+						@if (bar.pendientesPct > 0) {
+							<div class="bar-segment pending" [style.height.%]="bar.pendientesPct"></div>
+						}
+						@if (bar.fallidosPct > 0) {
+							<div class="bar-segment failed" [style.height.%]="bar.fallidosPct"></div>
+						}
+						@if (bar.enviadosPct > 0) {
+							<div class="bar-segment sent" [style.height.%]="bar.enviadosPct"></div>
+						}
+					</div>
+					<span class="bar-label">{{ bar.fecha }}</span>
+				</div>
+			}
+		</div>
+	}
+</div>
+<!-- #endregion -->

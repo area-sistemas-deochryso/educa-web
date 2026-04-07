@@ -4,6 +4,7 @@ import {
 	EmailOutboxEstadisticas,
 	EmailOutboxEstado,
 	EmailOutboxLista,
+	EmailOutboxTendencia,
 	EmailOutboxTipo,
 } from '@data/models/email-outbox.models';
 
@@ -35,6 +36,10 @@ export class EmailOutboxStore {
 	private readonly _selectedItem = signal<EmailOutboxLista | null>(null);
 	private readonly _previewHtml = signal<string | null>(null);
 	private readonly _previewLoading = signal(false);
+
+	// Tendencias
+	private readonly _tendencias = signal<EmailOutboxTendencia[]>([]);
+	private readonly _tendenciasReady = signal(false);
 	// #endregion
 
 	// #region Lecturas públicas
@@ -52,6 +57,8 @@ export class EmailOutboxStore {
 	readonly selectedItem = this._selectedItem.asReadonly();
 	readonly previewHtml = this._previewHtml.asReadonly();
 	readonly previewLoading = this._previewLoading.asReadonly();
+	readonly tendencias = this._tendencias.asReadonly();
+	readonly tendenciasReady = this._tendenciasReady.asReadonly();
 	// #endregion
 
 	// #region Computed
@@ -83,6 +90,8 @@ export class EmailOutboxStore {
 		selectedItem: this._selectedItem(),
 		previewHtml: this._previewHtml(),
 		previewLoading: this._previewLoading(),
+		tendencias: this._tendencias(),
+		tendenciasReady: this._tendenciasReady(),
 	}));
 	// #endregion
 
@@ -105,6 +114,14 @@ export class EmailOutboxStore {
 
 	setTableReady(ready: boolean): void {
 		this._tableReady.set(ready);
+	}
+
+	setTendencias(tendencias: EmailOutboxTendencia[]): void {
+		this._tendencias.set(tendencias);
+	}
+
+	setTendenciasReady(ready: boolean): void {
+		this._tendenciasReady.set(ready);
 	}
 
 	/** Mutación quirúrgica: marca item como PENDING tras reintento */

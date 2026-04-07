@@ -15,6 +15,13 @@ import { PageHeaderComponent } from '@shared/components/page-header/page-header.
 		>
 			<button
 				pButton
+				icon="pi pi-file-excel"
+				label="Exportar"
+				class="p-button-outlined p-button-success"
+				(click)="exportExcel.emit()"
+			></button>
+			<button
+				pButton
 				icon="pi pi-refresh"
 				label="Refrescar"
 				class="p-button-outlined"
@@ -26,4 +33,5 @@ import { PageHeaderComponent } from '@shared/components/page-header/page-header.
 })
 export class EmailOutboxHeaderComponent {
 	readonly refresh = output<void>();
+	readonly exportExcel = output<void>();
 }

@@ -1,5 +1,5 @@
 <!-- #region Header -->
-<app-email-outbox-header (refresh)="onRefresh()" />
+<app-email-outbox-header (refresh)="onRefresh()" (exportExcel)="onExportExcel()" />
 <!-- #endregion -->
 
 <!-- #region Stats -->
@@ -7,6 +7,12 @@
 	<app-stats-skeleton [count]="4" iconPosition="left" />
 } @else {
 	<app-email-outbox-stats [stats]="vm().estadisticas" />
+}
+<!-- #endregion -->
+
+<!-- #region Tendencias -->
+@if (vm().tendenciasReady && vm().tendencias.length > 0) {
+	<app-email-outbox-chart [data]="vm().tendencias" />
 }
 <!-- #endregion -->
 

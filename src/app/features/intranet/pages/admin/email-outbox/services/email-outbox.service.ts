@@ -3,7 +3,11 @@ import { HttpClient, HttpParams } from '@angular/common/http';
 import { catchError, map, Observable, of } from 'rxjs';
 
 import { environment } from '@config/environment';
-import { EmailOutboxEstadisticas, EmailOutboxLista } from '@data/models/email-outbox.models';
+import {
+	EmailOutboxEstadisticas,
+	EmailOutboxLista,
+	EmailOutboxTendencia,
+} from '@data/models/email-outbox.models';
 
 @Injectable({ providedIn: 'root' })
 export class EmailOutboxApiService {
@@ -54,6 +58,19 @@ export class EmailOutboxApiService {
 			.pipe(
 				map((r) => r.data ?? defaultStats),
 				catchError(() => of(defaultStats)),
+			);
+	}
+
+	tendencias(desde?: string, hasta?: string): Observable<EmailOutboxTendencia[]> {
+		let params = new HttpParams();
+		if (desde) params = params.set('desde', desde);
+		if (hasta) params = params.set('hasta', hasta);
+
+		return this.http
+			.get<{ data: EmailOutboxTendencia[] }>(`${this.baseUrl}/tendencias`, { params })
+			.pipe(
+				map((r) => r.data ?? []),
+				catchError(() => of([])),
 			);
 	}
 

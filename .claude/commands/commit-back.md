@@ -8,5 +8,5 @@ Crear commit en el repo **backend** (Educa.API).
 4. Agregar archivos relevantes (NO usar `git add .` — agregar por nombre)
 5. Crear el commit con Co-Authored-By
 
-**Repo**: `c:\Users\Asus Ryzen 9\EducaWeb\Educa.API` (raíz del repo git)
+**Repo**: `c:\Users\Asus Ryzen 9\EducaWeb\Educa.API\Educa.API` (raíz del repo git)
 **Rama**: `master`
