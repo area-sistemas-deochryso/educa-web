@@ -2,7 +2,7 @@ const DB_NAME = 'educa-cache-db';
 
 // Cache del app shell (Cache API, separado del IndexedDB de API)
 // Necesario para que el SW "controle" la start_url (requisito PWA Lighthouse)
-const APP_SHELL_CACHE = 'app-shell-v1';
+const APP_SHELL_CACHE = 'app-shell-v2';
 const APP_SHELL_URL = '/loader.html';
 
 // #region VERSIONADO DE CACHE - Prevencion de errores por cambios backend
@@ -339,18 +339,42 @@ self.addEventListener('install', (event) => {
 // Activacion del Service Worker
 self.addEventListener('activate', (event) => {
 	console.log('[SW] Service Worker activado');
-	event.waitUntil(Promise.all([clients.claim(), cleanExpiredCache(), listCachedUrls()]));
+	event.waitUntil(
+		Promise.all([
+			// Limpiar caches de versiones anteriores del app shell
+			caches.keys().then((keys) =>
+				Promise.all(
+					keys
+						.filter((key) => key.startsWith('app-shell-') && key !== APP_SHELL_CACHE)
+						.map((key) => {
+							console.log('[SW] Eliminando cache antiguo:', key);
+							return caches.delete(key);
+						}),
+				),
+			),
+			clients.claim(),
+			cleanExpiredCache(),
+			listCachedUrls(),
+		]),
+	);
 });
 
 // Interceptar peticiones fetch
 self.addEventListener('fetch', (event) => {
 	const request = event.request;
 
-	// Navegaciones (HTML) → servir app shell cacheado
-	// Necesario para que el SW "controle" la start_url (requisito PWA Lighthouse)
+	// Navegaciones (HTML) → network first, fallback a cache
+	// Network first garantiza que un deploy nuevo se refleje inmediatamente
 	if (request.mode === 'navigate') {
 		event.respondWith(
-			caches.match(APP_SHELL_URL).then((cached) => cached || fetch(request)),
+			fetch(request)
+				.then((response) => {
+					// Actualizar cache del app shell con la versión fresca
+					const clone = response.clone();
+					caches.open(APP_SHELL_CACHE).then((cache) => cache.put(APP_SHELL_URL, clone));
+					return response;
+				})
+				.catch(() => caches.match(APP_SHELL_URL)),
 		);
 		return;
 	}
