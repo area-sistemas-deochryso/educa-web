@@ -150,6 +150,9 @@ describe('EventosCalendarioFacade', () => {
 		});
 
 		it('should call API and update item in store', () => {
+			// silentRefreshAfterCrud re-fetches items, so mock listar to return updated data
+			api.listar.mockReturnValue(of([{ ...mockItems[0], titulo: 'Updated', descripcion: 'New desc', tipo: 'cultural', icono: 'pi-star' }]));
+
 			facade.update();
 
 			expect(api.actualizar).toHaveBeenCalledWith(1, expect.objectContaining({ titulo: 'Updated' }));
