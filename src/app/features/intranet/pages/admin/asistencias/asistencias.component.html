@@ -1,3 +1,19 @@
+<!-- #region Tabs -->
+<p-tabs value="gestion">
+	<p-tablist>
+		<p-tab value="gestion">
+			<i class="pi pi-cog mr-2"></i>
+			Gestión
+		</p-tab>
+		<p-tab value="reportes">
+			<i class="pi pi-chart-bar mr-2"></i>
+			Reportes
+		</p-tab>
+	</p-tablist>
+
+	<!-- Tab: Gestión -->
+	<p-tabpanel value="gestion">
+
 <!-- #region Header -->
 <div class="header">
 	<div class="header-left">
@@ -368,4 +384,13 @@
 
 <!-- #region Confirm dialog -->
 <p-confirmDialog (onHide)="onConfirmDialogHide()" />
+<!-- #endregion -->
+
+	</p-tabpanel>
+
+	<!-- Tab: Reportes -->
+	<p-tabpanel value="reportes">
+		<app-reportes-asistencia />
+	</p-tabpanel>
+</p-tabs>
 <!-- #endregion -->

@@ -210,14 +210,6 @@ export const INTRANET_ROUTES: Routes = [
 					),
 				title: 'Intranet - Asistencia',
 			},
-			{
-				path: 'reportes-asistencia',
-				loadComponent: () =>
-					import('./pages/shared/reportes-asistencia').then(
-						(m) => m.ReportesAsistenciaComponent,
-					),
-				title: 'Intranet - Reportes de Asistencia',
-			},
 			// #endregion
 
 			// #region Por rol (profesor / estudiante)

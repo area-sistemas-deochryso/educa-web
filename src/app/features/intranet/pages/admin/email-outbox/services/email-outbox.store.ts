@@ -11,7 +11,14 @@ import {
 export class EmailOutboxStore {
 	// #region Estado privado
 	private readonly _items = signal<EmailOutboxLista[]>([]);
-	private readonly _estadisticas = signal<EmailOutboxEstadisticas | null>(null);
+	private readonly _estadisticas = signal<EmailOutboxEstadisticas>({
+		total: 0,
+		enviados: 0,
+		fallidos: 0,
+		pendientes: 0,
+		enProceso: 0,
+		porcentajeExito: 0,
+	});
 	private readonly _loading = signal(false);
 	private readonly _statsReady = signal(false);
 	private readonly _tableReady = signal(false);

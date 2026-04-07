@@ -3,10 +3,10 @@
 <!-- #endregion -->
 
 <!-- #region Stats -->
-@if (vm().statsReady && vm().estadisticas; as stats) {
-	<app-email-outbox-stats [stats]="stats" />
-} @else {
+@if (!vm().statsReady) {
 	<app-stats-skeleton [count]="4" iconPosition="left" />
+} @else {
+	<app-email-outbox-stats [stats]="vm().estadisticas" />
 }
 <!-- #endregion -->
 

@@ -196,12 +196,6 @@ export const INTRANET_MENU: NavItemWithPermiso[] = [
 		permiso: PERMISOS.ASISTENCIA,
 	},
 	{
-		route: '/intranet/reportes-asistencia',
-		label: 'Reportes Asistencia',
-		icon: 'pi pi-chart-bar',
-		permiso: PERMISOS.REPORTES_ASISTENCIA,
-	},
-	{
 		label: 'Configuración',
 		icon: 'pi pi-cog',
 		children: [

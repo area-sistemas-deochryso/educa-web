@@ -1,17 +1,22 @@
 // #region Filters Bar
 .filters-bar {
 	display: flex;
-	flex-wrap: wrap;
-	gap: 0.75rem;
-	margin-bottom: 1.5rem;
 	align-items: center;
+	gap: 0.5rem;
+	margin-bottom: 1rem;
+	padding: 0.75rem 1rem;
+	background: transparent;
+	border-radius: 10px;
+	border: 1px solid var(--surface-300);
+	flex-wrap: wrap;
 }
 // #endregion
 
 // #region Overrides PrimeNG
 :host ::ng-deep {
 	.p-inputtext,
-	.p-select {
+	.p-select,
+	.p-datepicker-input {
 		background: transparent;
 		color: var(--text-color);
 		border-color: var(--surface-300);
@@ -32,6 +37,21 @@
 
 	.p-select-dropdown {
 		color: var(--text-color);
+	}
+
+	.p-datepicker {
+		.p-inputtext {
+			background: transparent;
+		}
+	}
+}
+// #endregion
+
+// #region Responsive
+@media (max-width: 768px) {
+	.filters-bar {
+		flex-direction: column;
+		align-items: stretch;
 	}
 }
 // #endregion

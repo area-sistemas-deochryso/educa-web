@@ -40,20 +40,20 @@ export class EmailOutboxApiService {
 		if (desde) params = params.set('desde', desde);
 		if (hasta) params = params.set('hasta', hasta);
 
+		const defaultStats: EmailOutboxEstadisticas = {
+			total: 0,
+			enviados: 0,
+			fallidos: 0,
+			pendientes: 0,
+			enProceso: 0,
+			porcentajeExito: 0,
+		};
+
 		return this.http
 			.get<{ data: EmailOutboxEstadisticas }>(`${this.baseUrl}/estadisticas`, { params })
 			.pipe(
-				map((r) => r.data),
-				catchError(() =>
-					of({
-						total: 0,
-						enviados: 0,
-						fallidos: 0,
-						pendientes: 0,
-						enProceso: 0,
-						porcentajeExito: 0,
-					}),
-				),
+				map((r) => r.data ?? defaultStats),
+				catchError(() => of(defaultStats)),
 			);
 	}
 

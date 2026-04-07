@@ -45,7 +45,7 @@
 
 		i {
 			font-size: 1.5rem;
-			color: var(--primary-color);
+			color: #4f46e5;
 		}
 
 		.stat-info {
@@ -196,6 +196,20 @@
 			display: flex;
 			gap: 0.5rem;
 			align-items: center;
+		}
+	}
+}
+// #endregion
+
+// #region Tabs
+:host ::ng-deep {
+	.p-tabs {
+		.p-tablist {
+			background: transparent;
+		}
+
+		.p-tabpanel {
+			padding: 1.5rem 0 0;
 		}
 	}
 }

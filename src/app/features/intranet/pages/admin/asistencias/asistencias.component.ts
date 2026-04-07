@@ -15,8 +15,10 @@ import { SelectModule } from 'primeng/select';
 import { TableModule } from 'primeng/table';
 import { TagModule } from 'primeng/tag';
 import { TooltipModule } from 'primeng/tooltip';
+import { Tab, TabList, TabPanel, Tabs } from 'primeng/tabs';
 
 import { SkeletonColumnDef, TableSkeletonComponent, StatsSkeletonComponent } from '@shared/components';
+import { ReportesAsistenciaComponent } from '../../shared/reportes-asistencia';
 
 import {
 	AsistenciasDataFacade,
@@ -49,6 +51,11 @@ import {
 		TooltipModule,
 		TableSkeletonComponent,
 		StatsSkeletonComponent,
+		Tabs,
+		TabList,
+		Tab,
+		TabPanel,
+		ReportesAsistenciaComponent,
 	],
 	providers: [ConfirmationService],
 	templateUrl: './asistencias.component.html',
