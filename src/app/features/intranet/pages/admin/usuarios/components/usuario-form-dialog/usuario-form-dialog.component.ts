@@ -1,4 +1,5 @@
-import { SalonProfesor, UserProfileService } from '@core/services';
+import { UserProfileService } from '@core/services';
+import { SalonListDto } from '@features/intranet/pages/admin/horarios/models/salon.interface';
 import {
 	ActualizarUsuarioRequest,
 	CrearUsuarioRequest,
@@ -83,7 +84,7 @@ export class UsuarioFormDialogComponent {
 	readonly errors = input.required<FormValidationErrors>();
 	readonly isFormValid = input.required<boolean>();
 	readonly loading = input<boolean>(false);
-	readonly salones = input<SalonProfesor[]>([]);
+	readonly salones = input<SalonListDto[]>([]);
 
 	readonly visibleChange = output<boolean>();
 	readonly fieldChange = output<{ field: string; value: unknown }>();

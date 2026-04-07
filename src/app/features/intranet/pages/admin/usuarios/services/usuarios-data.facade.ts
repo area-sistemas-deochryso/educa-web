@@ -3,7 +3,7 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { catchError, debounceTime, distinctUntilChanged, filter, switchMap, tap } from 'rxjs/operators';
 import { forkJoin, from, of, Subject } from 'rxjs';
 
-import { AsistenciaService, ErrorHandlerService, SwService, WalService } from '@core/services';
+import { ErrorHandlerService, SwService, WalService } from '@core/services';
 import { logger, withRetry } from '@core/helpers';
 import { UI_ADMIN_ERROR_DETAILS, UI_SUMMARIES } from '@app/shared/constants';
 import { RolUsuarioAdmin, UsuarioLista, UsuariosEstadisticas } from '../models';
@@ -21,7 +21,6 @@ import { SalonListDto } from '@features/intranet/pages/admin/horarios/models/sal
 @Injectable({ providedIn: 'root' })
 export class UsuariosDataFacade {
 	private usuariosService = inject(UsuariosService);
-	private asistenciaService = inject(AsistenciaService);
 	private salonesApi = inject(SalonesApiService);
 	private store = inject(UsuariosStore);
 	private errorHandler = inject(ErrorHandlerService);
@@ -66,17 +65,10 @@ export class UsuariosDataFacade {
 					return of(null);
 				}),
 			),
-			salones: this.asistenciaService.getSalonesDirector().pipe(
+			salones: this.salonesApi.listar().pipe(
 				withRetry({ tag: 'UsuariosDataFacade:loadSalones' }),
 				catchError((err) => {
 					logger.error('Error cargando salones:', err);
-					return of([]);
-				}),
-			),
-			salonesFilter: this.salonesApi.listar().pipe(
-				withRetry({ tag: 'UsuariosDataFacade:loadSalonesFilter' }),
-				catchError((err) => {
-					logger.error('Error cargando salones para filtro:', err);
 					return of([] as SalonListDto[]);
 				}),
 			),
@@ -102,14 +94,14 @@ export class UsuariosDataFacade {
 			),
 		})
 			.pipe(takeUntilDestroyed(this.destroyRef))
-			.subscribe(({ estadisticas, salones, salonesFilter, usuarios }) => {
+			.subscribe(({ estadisticas, salones, usuarios }) => {
 				if (estadisticas) {
 					this.store.setEstadisticas(estadisticas);
 				}
 				this.store.setStatsReady(true);
 
 				this.store.setSalones(salones);
-				this.store.setSalonesFilter(salonesFilter);
+				this.store.setSalonesFilter(salones);
 
 				this.store.setUsuarios(usuarios.data);
 				this.store.setPaginationData(usuarios.page, usuarios.pageSize, usuarios.total);

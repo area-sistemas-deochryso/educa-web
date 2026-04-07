@@ -1,4 +1,3 @@
-import { SalonProfesor } from '@shared/services';
 import { SalonListDto } from '@features/intranet/pages/admin/horarios/models/salon.interface';
 import {
 	ActualizarUsuarioRequest,
@@ -34,7 +33,7 @@ export class UsuariosStore {
 	// #region Estado privado
 	private readonly _usuarios = signal<UsuarioLista[]>([]);
 	private readonly _estadisticas = signal<UsuariosEstadisticas | null>(null);
-	private readonly _salones = signal<SalonProfesor[]>([]);
+	private readonly _salones = signal<SalonListDto[]>([]);
 	private readonly _salonesFilter = signal<SalonListDto[]>([]);
 	private readonly _loading = signal(false);
 	private readonly _error = signal<string | null>(null);
@@ -252,7 +251,7 @@ export class UsuariosStore {
 		this._estadisticas.set(estadisticas);
 	}
 
-	setSalones(salones: SalonProfesor[]): void {
+	setSalones(salones: SalonListDto[]): void {
 		this._salones.set(salones);
 	}
 
