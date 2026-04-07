@@ -303,6 +303,28 @@ await _emailService.SendEmailAsync(email);
 
 ---
 
+## Corrección Sistemática de Patrones
+
+> **"Si un bug revela un patrón incorrecto, buscar y corregir TODAS las instancias del patrón en el proyecto — no solo la que falló."**
+
+Cuando se identifica que un fragmento de código es incorrecto (por bug, code review, o refactor), **antes de considerar la corrección completa**:
+
+1. **Grep del patrón** — buscar todas las ocurrencias del mismo anti-patrón en el proyecto
+2. **Corregir todas** — no solo la instancia que causó el bug
+3. **Validar adyacentes** — al tocar un archivo, revisar si el código alrededor tiene el mismo problema
+
+**Ejemplo concreto**: Si se descubre que `Task.Run` con un servicio scoped causa `ObjectDisposedException`, no basta corregir el método que falló — se debe hacer `grep -r "Task.Run"` y verificar que ningún otro método tiene el mismo problema con servicios scoped.
+
+**Aplica a frontend y backend**: Un `endpoint: ''` vacío en un WAL config, un `map(r => r.data)` redundante cuando el interceptor ya hace unwrap — si se corrige en un servicio, verificar todos los servicios que usan el mismo patrón.
+
+| Señal | Acción |
+|-------|--------|
+| Se corrige un bug de runtime | Grep del patrón → corregir todas las instancias |
+| Se toca un archivo | Revisar métodos adyacentes por el mismo anti-patrón |
+| Se refactoriza un helper/base class | Verificar todos los consumidores |
+
+---
+
 ## Checklist de Code Review
 
 ```

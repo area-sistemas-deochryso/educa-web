@@ -1,20 +1,5 @@
 # Comunicación con el Usuario
 
-## Feedback de cierre de chat (OBLIGATORIO)
-
-**Señal de activación:** El usuario dice "gracias" sin más problemas pendientes.
-
-**Acción requerida — responder con:**
-
-> **Qué se hizo bien:** [comunicación, precisión, flujo]
-> **Qué se pudo hacer mejor:** [oportunidades concretas de mejora]
-
-Ser honesto y directo. No elogios vacíos. Si todo salió bien, decirlo breve. Si hubo fricciones, señalarlas con ejemplo concreto del chat.
-
-**Por qué:** Mejora continua del protocolo de comunicación técnica. El usuario quiere retroalimentación real sobre cómo fue la interacción, no cortesía.
-
----
-
 ## Protocolo de comunicación técnica
 
 Estas son las plantillas que el usuario usa para comunicar pedidos. Cuando un mensaje del usuario no siga estas plantillas, no corregirlo — simplemente interpretar la intención.
