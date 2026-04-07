@@ -1,0 +1,83 @@
+// #region Layout
+.filtros-container {
+	margin-bottom: 1.5rem;
+}
+
+.filtros-row {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 1rem;
+	align-items: flex-end;
+}
+
+.filtro-item {
+	display: flex;
+	flex-direction: column;
+	gap: 0.25rem;
+	min-width: 140px;
+
+	label {
+		font-size: 0.85rem;
+		font-weight: 600;
+		color: var(--text-color-secondary);
+	}
+}
+
+.filtro-salones {
+	flex: 1;
+	min-width: 200px;
+}
+
+.filtro-action {
+	min-width: auto;
+}
+// #endregion
+
+// #region Overrides PrimeNG
+:host ::ng-deep {
+	.p-inputtext,
+	.p-select {
+		background: transparent;
+		color: var(--text-color);
+		border-color: var(--surface-300);
+
+		&::placeholder {
+			color: var(--text-color-secondary);
+		}
+
+		&:enabled:focus {
+			border-color: var(--text-color);
+			box-shadow: 0 0 0 1px var(--text-color);
+		}
+	}
+
+	.p-select-label {
+		color: var(--text-color);
+	}
+
+	.p-select-dropdown {
+		color: var(--text-color);
+	}
+
+	.p-multiselect {
+		background: transparent;
+		border-color: var(--surface-300);
+	}
+
+	.p-multiselect-label {
+		color: var(--text-color);
+	}
+}
+// #endregion
+
+// #region Responsive
+@media (max-width: 768px) {
+	.filtros-row {
+		flex-direction: column;
+	}
+
+	.filtro-item {
+		width: 100%;
+	}
+}
+// #endregion

@@ -1,0 +1,371 @@
+<!-- #region Header -->
+<div class="header">
+	<div class="header-left">
+		<h2>Gestión de Asistencias</h2>
+		<span class="subtitle">Registro y corrección formal de asistencia diaria</span>
+	</div>
+	<div class="header-actions">
+		<button
+			pButton
+			icon="pi pi-lock"
+			label="Cerrar mes"
+			class="p-button-outlined p-button-warning"
+			(click)="onAbrirCierre()"
+		></button>
+		<button
+			pButton
+			icon="pi pi-plus"
+			label="Nueva asistencia"
+			(click)="onNuevo('entrada')"
+		></button>
+	</div>
+</div>
+<!-- #endregion -->
+
+<!-- #region Stats -->
+@if (!vm().statsReady) {
+	<app-stats-skeleton [count]="4" iconPosition="left" />
+} @else if (vm().estadisticas; as stats) {
+	<div class="stats-grid">
+		<div class="stat-card">
+			<i class="pi pi-users"></i>
+			<div class="stat-info">
+				<span class="stat-value">{{ stats.totalRegistros }}</span>
+				<span class="stat-label">Total registros</span>
+			</div>
+		</div>
+		<div class="stat-card">
+			<i class="pi pi-check-circle"></i>
+			<div class="stat-info">
+				<span class="stat-value">{{ stats.completas }}</span>
+				<span class="stat-label">Completas</span>
+			</div>
+		</div>
+		<div class="stat-card">
+			<i class="pi pi-exclamation-circle"></i>
+			<div class="stat-info">
+				<span class="stat-value">{{ stats.incompletas }}</span>
+				<span class="stat-label">Incompletas</span>
+			</div>
+		</div>
+		<div class="stat-card">
+			<i class="pi pi-pencil"></i>
+			<div class="stat-info">
+				<span class="stat-value">{{ stats.registrosManuales }}</span>
+				<span class="stat-label">Manuales</span>
+			</div>
+		</div>
+	</div>
+}
+<!-- #endregion -->
+
+<!-- #region Filtros -->
+<div class="filters">
+	<p-datepicker
+		[(ngModel)]="fechaCalendar"
+		(ngModelChange)="onFechaChange($event)"
+		dateFormat="yy-mm-dd"
+		[showIcon]="true"
+		appendTo="body"
+		placeholder="Fecha"
+	/>
+	<p-iconfield>
+		<p-inputicon styleClass="pi pi-search" />
+		<input
+			type="text"
+			pInputText
+			placeholder="Buscar por nombre o DNI..."
+			[value]="vm().searchTerm"
+			(input)="onSearch($event)"
+		/>
+	</p-iconfield>
+</div>
+<!-- #endregion -->
+
+<!-- #region Tabla -->
+@if (!vm().tableReady) {
+	<app-table-skeleton [columns]="tableColumns" [rows]="10" minHeight="420px" />
+} @else {
+	<p-table
+		[value]="vm().items"
+		[paginator]="true"
+		[rows]="10"
+		[rowsPerPageOptions]="[10, 25, 50]"
+		[showCurrentPageReport]="true"
+		currentPageReportTemplate="Mostrando {first} a {last} de {totalRecords}"
+		styleClass="p-datatable-sm"
+	>
+		<ng-template #header>
+			<tr>
+				<th style="width: 50px">#</th>
+				<th>Estudiante</th>
+				<th style="width: 90px">Grado</th>
+				<th style="width: 100px">Entrada</th>
+				<th style="width: 100px">Salida</th>
+				<th style="width: 90px">Estado</th>
+				<th style="width: 80px">Origen</th>
+				<th style="width: 140px">Acciones</th>
+			</tr>
+		</ng-template>
+		<ng-template #body let-item let-i="rowIndex">
+			<tr>
+				<td>{{ i + 1 }}</td>
+				<td>
+					<div class="student-cell">
+						<span class="student-name">{{ item.nombreCompleto }}</span>
+						<span class="student-dni">{{ item.dni }}</span>
+					</div>
+				</td>
+				<td>{{ item.grado }} {{ item.seccion }}</td>
+				<td>{{ item.horaEntrada ? (item.horaEntrada | date: 'HH:mm') : '—' }}</td>
+				<td>{{ item.horaSalida ? (item.horaSalida | date: 'HH:mm') : '—' }}</td>
+				<td>
+					<p-tag [value]="item.estado" [severity]="getEstadoSeverity(item.estado)" />
+				</td>
+				<td>
+					<p-tag
+						[value]="item.origenManual ? 'Manual' : 'Biométrico'"
+						[severity]="getOrigenSeverity(item.origenManual)"
+					/>
+				</td>
+				<td>
+					<div class="action-buttons">
+						@if (item.estado === 'Incompleta' && !item.horaSalida) {
+							<button
+								pButton
+								icon="pi pi-sign-out"
+								class="p-button-rounded p-button-text p-button-success"
+								pTooltip="Agregar salida"
+								tooltipPosition="top"
+								(click)="onAgregarSalida(item)"
+								[pt]="{
+									root: {
+										'aria-label': 'Agregar salida',
+									},
+								}"
+							></button>
+						}
+						<button
+							pButton
+							icon="pi pi-pencil"
+							class="p-button-rounded p-button-text"
+							pTooltip="Editar horas"
+							tooltipPosition="top"
+							(click)="onEditar(item)"
+							[pt]="{
+								root: {
+									'aria-label': 'Editar horas',
+								},
+							}"
+						></button>
+						<button
+							pButton
+							icon="pi pi-trash"
+							class="p-button-rounded p-button-text p-button-danger"
+							pTooltip="Eliminar"
+							tooltipPosition="top"
+							(click)="onEliminar(item)"
+							[pt]="{
+								root: {
+									'aria-label': 'Eliminar registro',
+								},
+							}"
+						></button>
+					</div>
+				</td>
+			</tr>
+		</ng-template>
+		<ng-template #emptymessage>
+			<tr>
+				<td colspan="8" class="text-center">
+					No hay registros de asistencia para esta fecha
+				</td>
+			</tr>
+		</ng-template>
+	</p-table>
+}
+<!-- #endregion -->
+
+<!-- #region Dialog de asistencia -->
+<p-dialog
+	[header]="vm().isEditing ? 'Editar horas de asistencia' : 'Registrar asistencia manual'"
+	[visible]="vm().dialogVisible"
+	(visibleChange)="onDialogVisibleChange($event)"
+	[modal]="true"
+	[style]="{ width: '500px' }"
+>
+	<div class="form-grid">
+		@if (!vm().isEditing) {
+			<!-- Tipo de operacion -->
+			<div class="form-field">
+				<label>Tipo de registro</label>
+				<p-select
+					[options]="tipoOptions()"
+					[ngModel]="vm().formData.tipoOperacion"
+					(ngModelChange)="store.updateFormData({ tipoOperacion: $event })"
+					appendTo="body"
+				/>
+			</div>
+
+			@if (vm().formData.tipoOperacion !== 'salida') {
+				<!-- Estudiante -->
+				<div class="form-field">
+					<label>Estudiante</label>
+					<p-select
+						[options]="vm().estudiantes"
+						optionLabel="nombreCompleto"
+						optionValue="estudianteId"
+						[ngModel]="vm().formData.estudianteId"
+						(ngModelChange)="store.updateFormData({ estudianteId: $event })"
+						[filter]="true"
+						filterBy="nombreCompleto,dni"
+						placeholder="Seleccionar estudiante..."
+						appendTo="body"
+					/>
+				</div>
+			}
+		}
+
+		@if (vm().formData.tipoOperacion !== 'salida' || vm().isEditing) {
+			<!-- Hora entrada -->
+			<div class="form-field">
+				<label>Hora de entrada</label>
+				<p-datepicker
+					[ngModel]="vm().formData.horaEntrada"
+					(ngModelChange)="store.updateFormData({ horaEntrada: $event })"
+					[showTime]="true"
+					[showSeconds]="false"
+					[hourFormat]="'24'"
+					dateFormat="yy-mm-dd"
+					placeholder="Seleccionar fecha y hora..."
+					appendTo="body"
+				/>
+			</div>
+		}
+
+		@if (vm().formData.tipoOperacion === 'completa' || vm().formData.tipoOperacion === 'salida' || vm().isEditing) {
+			<!-- Hora salida -->
+			<div class="form-field">
+				<label>Hora de salida</label>
+				<p-datepicker
+					[ngModel]="vm().formData.horaSalida"
+					(ngModelChange)="store.updateFormData({ horaSalida: $event })"
+					[showTime]="true"
+					[showSeconds]="false"
+					[hourFormat]="'24'"
+					dateFormat="yy-mm-dd"
+					placeholder="Seleccionar fecha y hora..."
+					appendTo="body"
+				/>
+			</div>
+		}
+
+		<!-- Observacion -->
+		<div class="form-field">
+			<label>Observación (opcional)</label>
+			<input
+				type="text"
+				pInputText
+				[ngModel]="vm().formData.observacion"
+				(ngModelChange)="store.updateFormData({ observacion: $event })"
+				placeholder="Motivo de la corrección..."
+			/>
+		</div>
+	</div>
+
+	<ng-template #footer>
+		<button
+			pButton
+			label="Cancelar"
+			class="p-button-text"
+			(click)="uiFacade.closeDialog()"
+		></button>
+		<button
+			pButton
+			[label]="vm().isEditing ? 'Actualizar' : 'Registrar'"
+			icon="pi pi-check"
+			[disabled]="!vm().isFormValid"
+			(click)="onSave()"
+		></button>
+	</ng-template>
+</p-dialog>
+<!-- #endregion -->
+
+<!-- #region Dialog de cierre mensual -->
+<p-dialog
+	header="Cierre mensual de asistencia"
+	[visible]="vm().cierreDialogVisible"
+	(visibleChange)="onCierreDialogVisibleChange($event)"
+	[modal]="true"
+	[style]="{ width: '600px' }"
+>
+	<!-- Crear cierre -->
+	<div class="cierre-form">
+		<h4>Cerrar mes</h4>
+		<div class="cierre-fields">
+			<p-select
+				[options]="mesesOptions()"
+				[(ngModel)]="cierreMes"
+				placeholder="Mes"
+				appendTo="body"
+			/>
+			<input
+				type="number"
+				pInputText
+				[(ngModel)]="cierreAnio"
+				style="width: 100px"
+			/>
+			<input
+				type="text"
+				pInputText
+				[(ngModel)]="cierreObservacion"
+				placeholder="Observación (opcional)"
+			/>
+			<button
+				pButton
+				icon="pi pi-lock"
+				label="Cerrar"
+				class="p-button-warning"
+				(click)="onCrearCierre()"
+			></button>
+		</div>
+	</div>
+
+	<!-- Cierres existentes -->
+	@if (cierresActivos().length > 0) {
+		<div class="cierres-lista">
+			<h4>Cierres activos</h4>
+			@for (cierre of cierresActivos(); track cierre.cierreId) {
+				<div class="cierre-item">
+					<div class="cierre-info">
+						<strong>{{ cierre.sede }}</strong> — {{ cierre.anio }}/{{ cierre.mes }}
+						<br />
+						<small>Cerrado por {{ cierre.usuarioCierre }} el {{ cierre.fechaCierre | date: 'dd/MM/yyyy HH:mm' }}</small>
+					</div>
+					<div class="cierre-revertir">
+						<input
+							type="text"
+							pInputText
+							[(ngModel)]="revertirObservacion"
+							placeholder="Motivo (mín 10 chars)..."
+							style="width: 200px"
+						/>
+						<button
+							pButton
+							icon="pi pi-undo"
+							label="Revertir"
+							class="p-button-outlined p-button-danger"
+							[disabled]="revertirObservacion().length < 10"
+							(click)="onRevertirCierre(cierre.cierreId, cierre.rowVersion)"
+						></button>
+					</div>
+				</div>
+			}
+		</div>
+	}
+</p-dialog>
+<!-- #endregion -->
+
+<!-- #region Confirm dialog -->
+<p-confirmDialog (onHide)="onConfirmDialogHide()" />
+<!-- #endregion -->

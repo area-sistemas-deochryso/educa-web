@@ -1,0 +1,76 @@
+<!-- #region Barra de filtros -->
+<div class="filtros-container">
+	<div class="filtros-row">
+		<!-- Estado -->
+		<div class="filtro-item">
+			<label for="estado">Tipo de reporte</label>
+			<p-select
+				inputId="estado"
+				[options]="estadoOptions"
+				[ngModel]="selectedEstado()"
+				(ngModelChange)="estadoChange.emit($event)"
+				optionLabel="label"
+				optionValue="value"
+				appendTo="body"
+			/>
+		</div>
+
+		<!-- Rango -->
+		<div class="filtro-item">
+			<label for="rango">Rango</label>
+			<p-select
+				inputId="rango"
+				[options]="rangoOptions"
+				[ngModel]="selectedRango()"
+				(ngModelChange)="rangoChange.emit($event)"
+				optionLabel="label"
+				optionValue="value"
+				appendTo="body"
+			/>
+		</div>
+
+		<!-- Fecha -->
+		<div class="filtro-item">
+			<label for="fecha">Fecha</label>
+			<p-datepicker
+				inputId="fecha"
+				[ngModel]="selectedFecha()"
+				(ngModelChange)="fechaChange.emit($event)"
+				dateFormat="dd/mm/yy"
+				appendTo="body"
+				[showIcon]="true"
+			/>
+		</div>
+
+		<!-- Salones -->
+		<div class="filtro-item filtro-salones">
+			<label for="salones">Salones</label>
+			<p-multiselect
+				inputId="salones"
+				[options]="salonOptions()"
+				[ngModel]="selectedSalones()"
+				(ngModelChange)="salonesChange.emit($event)"
+				optionLabel="label"
+				optionValue="value"
+				placeholder="Seleccionar salones"
+				appendTo="body"
+				[loading]="loadingSalones()"
+				[maxSelectedLabels]="3"
+				selectedItemsLabel="{0} salones"
+			/>
+		</div>
+
+		<!-- Botón generar -->
+		<div class="filtro-item filtro-action">
+			<button
+				pButton
+				label="Generar"
+				icon="pi pi-search"
+				(click)="generar.emit()"
+				[loading]="loading()"
+				[disabled]="selectedSalones().length === 0"
+			></button>
+		</div>
+	</div>
+</div>
+<!-- #endregion -->

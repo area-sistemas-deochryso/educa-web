@@ -1,0 +1,73 @@
+<!-- #region Header -->
+<div class="page-header">
+	<h2>Reportes de Asistencia</h2>
+
+	@if (vm().hasData) {
+		<div class="export-buttons">
+			<button
+				pButton
+				icon="pi pi-file-pdf"
+				label="PDF"
+				class="p-button-outlined p-button-danger"
+				(click)="onExportPdf()"
+				[loading]="vm().exporting"
+			></button>
+			<button
+				pButton
+				icon="pi pi-file-excel"
+				label="Excel"
+				class="p-button-outlined p-button-success"
+				(click)="onExportExcel()"
+				[loading]="vm().exporting"
+			></button>
+		</div>
+	}
+</div>
+<!-- #endregion -->
+
+<!-- #region Filtros -->
+<app-reportes-filtros
+	[salonOptions]="salonOptions()"
+	[loading]="vm().loading"
+	[loadingSalones]="vm().loadingSalones"
+	[selectedEstado]="vm().filters.estado"
+	[selectedRango]="vm().filters.rango"
+	[selectedFecha]="vm().filters.fecha"
+	[selectedSalones]="vm().filters.salonesSeleccionados"
+	(estadoChange)="onEstadoChange($event)"
+	(rangoChange)="onRangoChange($event)"
+	(fechaChange)="onFechaChange($event)"
+	(salonesChange)="onSalonesChange($event)"
+	(generar)="onGenerar()"
+/>
+<!-- #endregion -->
+
+<!-- #region Error -->
+@if (vm().error) {
+	<div class="error-message">
+		<i class="pi pi-exclamation-triangle"></i>
+		{{ vm().error }}
+	</div>
+}
+<!-- #endregion -->
+
+<!-- #region Resumen -->
+@if (vm().loading) {
+	<app-stats-skeleton [count]="3" />
+} @else if (vm().resultado) {
+	<app-reportes-resumen [resultado]="vm().resultado!" />
+}
+<!-- #endregion -->
+
+<!-- #region Resultado -->
+@if (vm().loading) {
+	<app-table-skeleton [columns]="skeletonColumns" [rows]="10" />
+} @else if (vm().resultado && vm().hasData) {
+	<app-reportes-resultado [resultado]="vm().resultado!" />
+} @else if (vm().hasResultado && !vm().hasData) {
+	<div class="empty-state">
+		<i class="pi pi-inbox"></i>
+		<p>No se encontraron estudiantes para este filtro.</p>
+	</div>
+}
+<!-- #endregion -->

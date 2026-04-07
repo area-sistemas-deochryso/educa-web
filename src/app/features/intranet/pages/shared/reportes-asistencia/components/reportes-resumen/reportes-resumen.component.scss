@@ -1,0 +1,40 @@
+// #region Grid
+.resumen-grid {
+	display: grid;
+	grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+	gap: 1rem;
+	margin-bottom: 1.5rem;
+}
+// #endregion
+
+// #region Cards
+.stat-card {
+	padding: 1rem 1.25rem;
+	border-radius: 12px;
+	border: 1px solid var(--surface-300);
+	background: transparent;
+}
+
+.stat-label {
+	font-size: 0.8rem;
+	font-weight: 600;
+	color: var(--text-color-secondary);
+	text-transform: uppercase;
+	letter-spacing: 0.5px;
+}
+
+.stat-value {
+	font-size: 1.75rem;
+	font-weight: 700;
+	color: var(--text-color);
+	margin-top: 0.25rem;
+}
+
+.stat-card--highlight {
+	border-color: var(--primary-color);
+
+	.stat-value {
+		color: var(--primary-color);
+	}
+}
+// #endregion

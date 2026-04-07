@@ -130,6 +130,27 @@ DateTimeOffset.Parse(check_time).ToOffset(TimeSpan.FromHours(-5)).DateTime
 
 **NUNCA** usar `DateTime.ParseExact` (no maneja offset) ni `.UtcDateTime` (almacena UTC, muestra hora incorrecta).
 
+### 1.8 Vías válidas de mutación (INV-AD01)
+
+Toda mutación sobre la tabla `Asistencia` debe pasar por una de estas dos vías:
+
+| Vía | Servicio | Origen | Correo |
+|-----|----------|--------|--------|
+| **Biométrica** | `IAsistenciaService` | Webhook CrossChex o registro manual interno | Correo de marcación en tiempo real |
+| **Admin/Director** | `IAsistenciaAdminService` | UI formal `intranet/admin/asistencias` | Correo diferenciado "Corrección de asistencia" (INV-AD05) |
+
+**Edición directa en BD (SSMS, Azure Portal) está prohibida en producción.** Si se detecta, los correos al apoderado no se envían y no hay auditoría.
+
+### 1.9 Precedencia manual sobre biométrica (INV-AD02)
+
+Si ya existe un registro con `ASI_OrigenManual = true` para un estudiante en una fecha, el webhook de CrossChex **descarta silenciosamente** la marcación biométrica de ese día. La validación está en `AsistenciaService.RegistrarAsistencia()`.
+
+### 1.10 Cierre mensual (INV-AD03, INV-AD04)
+
+- **Tabla**: `CierreAsistenciaMensual` — un registro por (Sede, Año, Mes) activo.
+- **Efecto**: Mientras el cierre esté activo (`CAM_Estado = true`), ninguna operación de `AsistenciaAdminService` puede mutar registros de asistencia cuya fecha caiga en ese mes/año/sede. Lanza `BusinessRuleException("ASISTENCIA_MES_CERRADO")`.
+- **Reversión (INV-AD04)**: Solo el Director puede revertir un cierre (`POST /api/cierre-asistencia/{id}/revertir`). Requiere observación de mínimo 10 caracteres y queda auditado en el campo `CAM_Observacion`.
+
 ---
 
 ## 2. Asistencia por Curso (en clase)
@@ -1008,7 +1029,19 @@ Este registro consolida TODAS las invariantes del sistema en una tabla indexable
 
 ---
 
-### 15.9 Cómo Usar Este Registro
+### 15.9 Invariantes de Asistencia Admin (Edición Formal)
+
+| ID | Entidad | Invariante | Enforcement | Sección |
+|----|---------|------------|-------------|---------|
+| `INV-AD01` | Asistencia | Toda mutación sobre tabla `Asistencia` debe pasar por `IAsistenciaService` (webhook) o `IAsistenciaAdminService` (admin). Edición directa en BD prohibida en producción | Convention + code review | 1.8 |
+| `INV-AD02` | Asistencia | Un registro con `ASI_OrigenManual = true` no puede ser sobrescrito por el webhook de CrossChex — se descarta silenciosamente | `AsistenciaService.RegistrarAsistencia()` | 1.9 |
+| `INV-AD03` | CierreAsistenciaMensual | Operaciones de `AsistenciaAdminService` sobre fechas dentro de un mes con cierre activo lanzan `BusinessRuleException("ASISTENCIA_MES_CERRADO")` | `CierreAsistenciaService.EnsureFechaNoCerradaAsync()` | 1.10 |
+| `INV-AD04` | CierreAsistenciaMensual | Un cierre mensual solo se desactiva por intervención explícita del Director con observación obligatoria (mín 10 chars) y queda auditado | `CierreAsistenciaService.RevertirCierreAsync()` + `[Authorize(Roles = "Director")]` | 1.10 |
+| `INV-AD05` | Asistencia | `AsistenciaAdminService` envía correo diferenciado al apoderado (plantilla "Corrección de asistencia") en cada operación, distinto del correo de marcación en tiempo real | `EmailNotificationService.EnviarNotificacionAsistenciaCorreccion()` fire-and-forget | 1.8 |
+
+---
+
+### 15.10 Cómo Usar Este Registro
 
 **En code reviews**: Verificar que el código no viola ningún `INV-*`. Si una PR introduce una operación sobre Horarios, revisar `INV-U03`, `INV-U04`, `INV-U05`, `INV-C06`, `INV-C07`.
 

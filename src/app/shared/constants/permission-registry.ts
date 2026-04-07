@@ -24,6 +24,8 @@ export const PERMISOS = {
 	// #endregion
 
 	// #region Admin - Gestión Académica
+	ADMIN_ASISTENCIAS: 'intranet/admin/asistencias',
+	ADMIN_EMAIL_OUTBOX: 'intranet/admin/email-outbox',
 	ADMIN_CAMPUS: 'intranet/admin/campus',
 	ADMIN_CURSOS: 'intranet/admin/cursos',
 	ADMIN_EVENTOS_CALENDARIO: 'intranet/admin/eventos-calendario',
@@ -54,6 +56,7 @@ export const PERMISOS = {
 	// #endregion
 
 	// #region Compartido
+	REPORTES_ASISTENCIA: 'intranet/reportes-asistencia',
 	CALENDARIO: 'intranet/calendario',
 	VIDEOCONFERENCIAS: 'intranet/videoconferencias',
 	CTEST_K6: 'intranet/ctest-k6',

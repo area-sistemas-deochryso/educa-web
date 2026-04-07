@@ -1,0 +1,43 @@
+<!-- #region Stats Cards -->
+<div class="stats-grid">
+	<div class="stat-card">
+		<div class="stat-icon total">
+			<i class="pi pi-inbox"></i>
+		</div>
+		<div class="stat-info">
+			<span class="stat-value">{{ stats().total | number }}</span>
+			<span class="stat-label">Total</span>
+		</div>
+	</div>
+
+	<div class="stat-card">
+		<div class="stat-icon sent">
+			<i class="pi pi-check-circle"></i>
+		</div>
+		<div class="stat-info">
+			<span class="stat-value">{{ stats().enviados | number }}</span>
+			<span class="stat-label">Enviados</span>
+		</div>
+	</div>
+
+	<div class="stat-card">
+		<div class="stat-icon failed">
+			<i class="pi pi-times-circle"></i>
+		</div>
+		<div class="stat-info">
+			<span class="stat-value">{{ stats().fallidos | number }}</span>
+			<span class="stat-label">Fallidos</span>
+		</div>
+	</div>
+
+	<div class="stat-card">
+		<div class="stat-icon pending">
+			<i class="pi pi-clock"></i>
+		</div>
+		<div class="stat-info">
+			<span class="stat-value">{{ stats().pendientes | number }}</span>
+			<span class="stat-label">Pendientes</span>
+		</div>
+	</div>
+</div>
+<!-- #endregion -->

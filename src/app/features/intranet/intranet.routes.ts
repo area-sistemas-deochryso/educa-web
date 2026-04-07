@@ -210,6 +210,14 @@ export const INTRANET_ROUTES: Routes = [
 					),
 				title: 'Intranet - Asistencia',
 			},
+			{
+				path: 'reportes-asistencia',
+				loadComponent: () =>
+					import('./pages/shared/reportes-asistencia').then(
+						(m) => m.ReportesAsistenciaComponent,
+					),
+				title: 'Intranet - Reportes de Asistencia',
+			},
 			// #endregion
 
 			// #region Por rol (profesor / estudiante)
@@ -263,6 +271,12 @@ export const INTRANET_ROUTES: Routes = [
 				title: 'Intranet - Gestión de Salones',
 			},
 			{
+				path: 'admin/asistencias',
+				loadComponent: () =>
+					import('./pages/admin/asistencias').then((m) => m.AsistenciasComponent),
+				title: 'Intranet - Gestión de Asistencias',
+			},
+			{
 				path: 'admin/eventos-calendario',
 				loadComponent: () =>
 					import('./pages/admin/eventos-calendario').then(
@@ -277,6 +291,12 @@ export const INTRANET_ROUTES: Routes = [
 						(m) => m.NotificacionesAdminComponent,
 					),
 				title: 'Intranet - Gestión de Notificaciones',
+			},
+			{
+				path: 'admin/email-outbox',
+				loadComponent: () =>
+					import('./pages/admin/email-outbox').then((m) => m.EmailOutboxComponent),
+				title: 'Intranet - Bandeja de Correos',
 			},
 			// #endregion
 		],

@@ -196,6 +196,12 @@ export const INTRANET_MENU: NavItemWithPermiso[] = [
 		permiso: PERMISOS.ASISTENCIA,
 	},
 	{
+		route: '/intranet/reportes-asistencia',
+		label: 'Reportes Asistencia',
+		icon: 'pi pi-chart-bar',
+		permiso: PERMISOS.REPORTES_ASISTENCIA,
+	},
+	{
 		label: 'Configuración',
 		icon: 'pi pi-cog',
 		children: [
@@ -266,6 +272,18 @@ export const INTRANET_MENU: NavItemWithPermiso[] = [
 				label: 'Salones',
 				icon: 'pi pi-building',
 				permiso: PERMISOS.ADMIN_SALONES,
+			},
+			{
+				route: '/intranet/admin/asistencias',
+				label: 'Asistencias',
+				icon: 'pi pi-clock',
+				permiso: PERMISOS.ADMIN_ASISTENCIAS,
+			},
+			{
+				route: '/intranet/admin/email-outbox',
+				label: 'Bandeja de Correos',
+				icon: 'pi pi-envelope',
+				permiso: PERMISOS.ADMIN_EMAIL_OUTBOX,
 			},
 		],
 	},

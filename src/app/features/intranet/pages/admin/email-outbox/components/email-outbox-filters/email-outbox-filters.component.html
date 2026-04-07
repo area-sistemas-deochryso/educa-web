@@ -1,0 +1,53 @@
+<!-- #region Filtros -->
+<div class="filters-bar">
+	<p-iconfield>
+		<p-inputicon styleClass="pi pi-search" />
+		<input
+			pInputText
+			type="text"
+			placeholder="Buscar por destinatario o asunto..."
+			(input)="searchChange.emit($any($event.target).value)"
+		/>
+	</p-iconfield>
+
+	<p-select
+		[options]="tipoOptions"
+		[ngModel]="filterTipo()"
+		(ngModelChange)="filterTipoChange.emit($event)"
+		optionLabel="label"
+		optionValue="value"
+		placeholder="Tipo"
+		appendTo="body"
+	/>
+
+	<p-select
+		[options]="estadoOptions"
+		[ngModel]="filterEstado()"
+		(ngModelChange)="filterEstadoChange.emit($event)"
+		optionLabel="label"
+		optionValue="value"
+		placeholder="Estado"
+		appendTo="body"
+	/>
+
+	<p-datepicker
+		placeholder="Desde"
+		dateFormat="yy-mm-dd"
+		[showIcon]="true"
+		appendTo="body"
+		(onSelect)="onDesdeChange($event)"
+		(onClear)="onDesdeChange(null)"
+		[showClear]="true"
+	/>
+
+	<p-datepicker
+		placeholder="Hasta"
+		dateFormat="yy-mm-dd"
+		[showIcon]="true"
+		appendTo="body"
+		(onSelect)="onHastaChange($event)"
+		(onClear)="onHastaChange(null)"
+		[showClear]="true"
+	/>
+</div>
+<!-- #endregion -->

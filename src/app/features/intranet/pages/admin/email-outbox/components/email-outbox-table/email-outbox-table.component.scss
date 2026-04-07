@@ -1,0 +1,49 @@
+// #region Celdas
+.cell-main {
+	font-weight: 500;
+	color: var(--text-color);
+}
+
+.cell-sub {
+	font-size: 0.8rem;
+	color: var(--text-color-secondary);
+	white-space: nowrap;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	max-width: 300px;
+}
+// #endregion
+
+// #region Acciones
+.action-buttons {
+	display: flex;
+	gap: 0.25rem;
+}
+// #endregion
+
+// #region Tabla
+::ng-deep .p-datatable {
+	background: transparent;
+
+	.p-datatable-table {
+		background: transparent;
+	}
+
+	.p-datatable-thead > tr > th {
+		background: transparent;
+	}
+
+	.p-datatable-tbody > tr {
+		background: transparent;
+
+		> td {
+			background: transparent;
+		}
+	}
+
+	.p-datatable-paginator-bottom,
+	.p-paginator {
+		background: transparent;
+	}
+}
+// #endregion

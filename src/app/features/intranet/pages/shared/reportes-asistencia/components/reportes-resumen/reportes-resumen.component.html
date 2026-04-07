@@ -1,0 +1,16 @@
+<!-- #region Stats Cards -->
+<div class="resumen-grid">
+	<div class="stat-card">
+		<div class="stat-label">Salones</div>
+		<div class="stat-value">{{ resultado().totalSalones }}</div>
+	</div>
+	<div class="stat-card">
+		<div class="stat-label">Total Estudiantes</div>
+		<div class="stat-value">{{ resultado().totalEstudiantesGeneral }}</div>
+	</div>
+	<div class="stat-card stat-card--highlight">
+		<div class="stat-label">{{ resultado().filtroEstadoDescripcion }}</div>
+		<div class="stat-value">{{ resultado().totalFiltrados }}</div>
+	</div>
+</div>
+<!-- #endregion -->

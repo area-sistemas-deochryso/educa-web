@@ -1,0 +1,55 @@
+<!-- #region Tabla de resultados -->
+<p-table
+	[value]="filas()"
+	[paginator]="filas().length > 20"
+	[rows]="50"
+	[rowsPerPageOptions]="[20, 50, 100]"
+	styleClass="p-datatable-sm"
+>
+	<ng-template #header>
+		<tr>
+			<th style="width: 70px">#</th>
+			<th style="width: 100px">DNI</th>
+			<th>Nombre</th>
+			@if (esDia()) {
+				<th style="width: 80px">Hora</th>
+			} @else {
+				<th style="width: 70px">Días</th>
+			}
+			<th style="width: 180px">Observación</th>
+		</tr>
+	</ng-template>
+
+	<ng-template #body let-fila let-i="rowIndex">
+		@if (fila.esCabeceraSalon) {
+			<tr class="salon-header-row">
+				<td [attr.colspan]="esDia() ? 5 : 5" class="salon-header-cell">
+					<i class="pi pi-building"></i>
+					<strong>{{ fila.salon }}</strong>
+				</td>
+			</tr>
+		} @else {
+			<tr>
+				<td>{{ i }}</td>
+				<td>{{ fila.dni }}</td>
+				<td class="nombre-cell">{{ fila.nombreCompleto }}</td>
+				@if (esDia()) {
+					<td>{{ fila.horaLlegada ?? '-' }}</td>
+				} @else {
+					<td class="dias-cell">{{ fila.cantidadDias }}</td>
+				}
+				<td class="obs-cell">{{ fila.observacion ?? '' }}</td>
+			</tr>
+		}
+	</ng-template>
+
+	<ng-template #emptymessage>
+		<tr>
+			<td [attr.colspan]="5" class="empty-message">
+				<i class="pi pi-info-circle"></i>
+				No se encontraron estudiantes para este filtro.
+			</td>
+		</tr>
+	</ng-template>
+</p-table>
+<!-- #endregion -->

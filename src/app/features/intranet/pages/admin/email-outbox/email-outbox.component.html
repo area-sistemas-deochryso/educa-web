@@ -1,0 +1,108 @@
+<!-- #region Header -->
+<app-email-outbox-header (refresh)="onRefresh()" />
+<!-- #endregion -->
+
+<!-- #region Stats -->
+@if (vm().statsReady && vm().estadisticas; as stats) {
+	<app-email-outbox-stats [stats]="stats" />
+} @else {
+	<app-stats-skeleton [count]="4" iconPosition="left" />
+}
+<!-- #endregion -->
+
+<!-- #region Filtros -->
+<app-email-outbox-filters
+	[filterTipo]="vm().filterTipo"
+	[filterEstado]="vm().filterEstado"
+	(searchChange)="onSearchChange($event)"
+	(filterTipoChange)="onFilterTipoChange($event)"
+	(filterEstadoChange)="onFilterEstadoChange($event)"
+	(filterDesdeChange)="onFilterDesdeChange($event)"
+	(filterHastaChange)="onFilterHastaChange($event)"
+/>
+<!-- #endregion -->
+
+<!-- #region Tabla -->
+@if (vm().tableReady) {
+	<app-email-outbox-table
+		[items]="vm().items"
+		[loading]="vm().loading"
+		(viewDetail)="onViewDetail($event)"
+		(retry)="onRetry($event)"
+	/>
+} @else {
+	<app-table-skeleton [columns]="tableSkeletonColumns" [rows]="10" />
+}
+<!-- #endregion -->
+
+<!-- #region Detail Drawer -->
+<p-drawer
+	[visible]="vm().drawerVisible"
+	(visibleChange)="onDrawerVisibleChange($event)"
+	position="right"
+	[style]="{ width: '40rem' }"
+	header="Detalle del correo"
+>
+	@if (vm().selectedItem; as item) {
+		<div class="detail-content">
+			<div class="detail-row">
+				<span class="detail-label">Destinatario</span>
+				<span class="detail-value">{{ item.destinatario }}</span>
+			</div>
+			<div class="detail-row">
+				<span class="detail-label">Asunto</span>
+				<span class="detail-value">{{ item.asunto }}</span>
+			</div>
+			<div class="detail-row">
+				<span class="detail-label">Tipo</span>
+				<span class="detail-value">{{ item.tipo }}</span>
+			</div>
+			<div class="detail-row">
+				<span class="detail-label">Estado</span>
+				<span class="detail-value">{{ item.estado }}</span>
+			</div>
+			<div class="detail-row">
+				<span class="detail-label">Intentos</span>
+				<span class="detail-value">{{ item.intentos }} / {{ item.maxIntentos }}</span>
+			</div>
+			@if (item.ultimoError) {
+				<div class="detail-row error">
+					<span class="detail-label">Último error</span>
+					<span class="detail-value">{{ item.ultimoError }}</span>
+				</div>
+			}
+			@if (item.fechaEnvio) {
+				<div class="detail-row">
+					<span class="detail-label">Fecha de envío</span>
+					<span class="detail-value">{{ item.fechaEnvio }}</span>
+				</div>
+			}
+			@if (item.duracionMs) {
+				<div class="detail-row">
+					<span class="detail-label">Duración</span>
+					<span class="detail-value">{{ item.duracionMs }}ms</span>
+				</div>
+			}
+			<div class="detail-row">
+				<span class="detail-label">Registrado por</span>
+				<span class="detail-value">{{ item.usuarioReg }}</span>
+			</div>
+
+			<!-- Preview HTML -->
+			<div class="preview-section">
+				<h4>Vista previa</h4>
+				@if (vm().previewLoading) {
+					<div class="preview-loading">Cargando vista previa...</div>
+				} @else if (vm().previewHtml) {
+					<iframe
+						class="preview-iframe"
+						[srcdoc]="vm().previewHtml"
+						sandbox=""
+						title="Vista previa del correo"
+					></iframe>
+				}
+			</div>
+		</div>
+	}
+</p-drawer>
+<!-- #endregion -->
