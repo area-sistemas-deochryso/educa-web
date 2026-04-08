@@ -16,6 +16,7 @@ export default defineConfig({
 			'@config': resolve(__dirname, 'src/app/config'),
 			'@env': resolve(__dirname, 'src/app/config'),
 			'@data': resolve(__dirname, 'src/app/data'),
+			'@intranet-shared': resolve(__dirname, 'src/app/features/intranet/shared'),
 			'@test': resolve(__dirname, 'src/test-setup'),
 		},
 	},
