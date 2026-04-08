@@ -1,9 +1,10 @@
 // #region Implementation
-// T = Temprano, A = A tiempo, F = Fuera de hora, N = No asistió
+// A = Asistió (ingreso dentro de +50min), T = Tardanza (+50min a +2h), F = Falta (después de +2h)
+// N = No asistió (sin marcación al final del día)
 // J = Justificado (falta con justificación registrada)
 // '-' = Pendiente (día futuro o de hoy sin hora aún)
 // 'X' = No contabilizado (antes del 26/01/2026 o período vacacional)
-export type AttendanceStatus = 'T' | 'A' | 'F' | 'N' | 'J' | '-' | 'X';
+export type AttendanceStatus = 'A' | 'T' | 'F' | 'N' | 'J' | '-' | 'X';
 
 export interface AttendanceDay {
 	day: string;

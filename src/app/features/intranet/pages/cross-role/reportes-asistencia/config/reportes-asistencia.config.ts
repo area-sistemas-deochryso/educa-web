@@ -6,7 +6,7 @@ export const ESTADO_OPTIONS: SelectOption<EstadoFiltro>[] = [
 	{ label: 'Ausentes', value: 'faltando' },
 	{ label: 'Asistieron', value: 'viniendo' },
 	{ label: 'Tardanzas', value: 'tarde' },
-	{ label: 'Puntuales', value: 'temprano' },
+	{ label: 'Tardanza', value: 'temprano' },
 ];
 
 export const RANGO_OPTIONS: SelectOption<RangoTipo>[] = [

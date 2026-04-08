@@ -102,9 +102,9 @@ export class ProfesorAsistenciaApiService {
 	private getEstadisticasVacias(): EstadisticasAsistenciaDia {
 		return {
 			total: 0,
-			temprano: 0,
-			aTiempo: 0,
-			fueraHora: 0,
+			tardanza: 0,
+			asistio: 0,
+			falta: 0,
 			noAsistio: 0,
 			justificado: 0,
 			pendiente: 0,

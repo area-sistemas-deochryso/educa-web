@@ -11,9 +11,9 @@ export type RangoTipo = (typeof RANGO_TIPOS)[number];
 // #region DTOs de respuesta API
 export interface EstadisticasAsistenciaDia {
 	total: number;
-	temprano: number;
-	aTiempo: number;
-	fueraHora: number;
+	tardanza: number;
+	asistio: number;
+	falta: number;
 	noAsistio: number;
 	justificado: number;
 	pendiente: number;

@@ -66,17 +66,16 @@ Salón/Matrícula > Aprobación/Progresión > Calificaciones > Horarios > Asiste
 
 ### 1.1 Ventanas horarias
 
-El estado de asistencia se calcula automáticamente según la hora de marcación biométrica.
+El estado de asistencia de **ingreso** se calcula automáticamente según la hora de marcación biométrica, relativa a la hora de inicio del periodo.
 
-| Periodo | Meses | Entrada Temprana | Entrada A Tiempo | Entrada Tardía |
-|---------|-------|-----------------|-----------------|----------------|
-| **Regular** | Mar-Dic | < 7:30 | 7:30 - 8:00 | > 8:00 |
-| **Verano** | Ene-Feb | < 8:30 | 8:30 - 9:30 | > 9:30 |
+| Periodo | Meses | Hora Inicio | Asistió (A) | Tardanza (T) | Falta (F) |
+|---------|-------|-------------|-------------|-------------|-----------|
+| **Regular** | Mar-Dic | 7:30 | 7:30 – 8:20 (inicio + 50min) | 8:20 – 9:30 (inicio + 2h) | > 9:30 o sin marcación |
+| **Verano** | Ene-Feb | 8:30 | 8:30 – 9:20 (inicio + 50min) | 9:20 – 10:30 (inicio + 2h) | > 10:30 o sin marcación |
 
-| Periodo | Salida Tardía | Salida Temprana | Salida A Tiempo |
-|---------|--------------|----------------|----------------|
-| **Regular** | < 14:00 | 14:00 - 14:30 | > 14:30 |
-| **Verano** | < 12:45 | 12:45 - 13:15 | > 13:15 |
+**Ingreso después de la ventana de 2 horas**: Se registra la marcación pero el estado es `F` (Falta) igualmente.
+
+**Salida simplificada**: No se clasifica por ventana horaria. Al registrar salida, la asistencia pasa de `Incompleta` a `Completa`. No afecta el estado del ingreso.
 
 **Regla**: Estas ventanas son las únicas fuentes de verdad para el cálculo de estado. Si cambian los horarios del colegio, se actualizan en `AsistenciaEstadoCalculador`, no en múltiples servicios.
 
@@ -84,9 +83,9 @@ El estado de asistencia se calcula automáticamente según la hora de marcación
 
 | Código | Significado | Cuándo se asigna |
 |--------|-------------|-----------------|
-| `T` | Temprano | Entrada antes de la ventana "a tiempo" |
-| `A` | A tiempo | Dentro de la ventana de puntualidad |
-| `F` | Fuera de hora (tardanza) | Después de la ventana de puntualidad |
+| `A` | Asistió | Ingreso dentro de los primeros 50 minutos desde hora inicio |
+| `T` | Tardanza | Ingreso entre +50min y +2h desde hora inicio |
+| `F` | Falta | Ingreso después de +2h o sin marcación pasada la ventana |
 | `N` | No asistió | Sin marcación al final del día |
 | `J` | Justificado | Justificación manual con prefijo `"Justificado:"` |
 | `-` | Pendiente | Día aún no terminó |
@@ -98,13 +97,15 @@ El estado de asistencia se calcula automáticamente según la hora de marcación
 
 ### 1.4 Estado combinado entrada + salida
 
-Cuando existen ambas marcaciones, el estado final es el de **mayor severidad**:
+El estado final de asistencia lo determina **solo el ingreso**. La salida solo afecta la completitud (`Completa`/`Incompleta`), no el código de estado.
+
+**Prioridad de severidad** (usada cuando se resuelven conflictos):
 
 ```
 F (5) > N (4) > J (3) > T (2) > A (1) > Pendiente/X (0)
 ```
 
-**Ejemplo**: Entrada=A (a tiempo), Salida=F (salió antes) → Estado final = `F`.
+**Ejemplo**: Ingreso a las 8:15 en periodo regular → `A` (Asistió). Salida a las 14:00 → estado sigue siendo `A`, asistencia pasa a `Completa`.
 
 ### 1.5 Anti-duplicación biométrica
 
@@ -972,7 +973,7 @@ Este registro consolida TODAS las invariantes del sistema en una tabla indexable
 
 | ID | Entidad | Invariante | Enforcement | Sección |
 |----|---------|------------|-------------|---------|
-| `INV-C01` | Asistencia | Estado = máxima severidad entre entrada y salida: `F(5) > N(4) > J(3) > T(2) > A(1)` | `AsistenciaEstadoCalculador` | 1.4 |
+| `INV-C01` | Asistencia | Estado final lo determina el ingreso. Salida solo afecta completitud. Severidad: `F(5) > N(4) > J(3) > T(2) > A(1)` | `AsistenciaEstadoCalculador` | 1.4 |
 | `INV-C02` | Asistencia | Justificación (`"Justificado:"`) tiene precedencia absoluta sobre cálculo por hora | `AsistenciaEstadoCalculador` | 1.3 |
 | `INV-C03` | Asistencia | Anti-duplicación: ventana mínima de 30 minutos entre marcaciones | Webhook handler | 1.5 |
 | `INV-C04` | Calificación | `Promedio = Σ(nota × peso)`, redondeado a 1 decimal. Pesos NO se normalizan | `CalificacionHelper` | 3.2 |

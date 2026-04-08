@@ -237,7 +237,7 @@ export class ReportesAsistenciaFacade {
 		// Mini estadísticas
 		const s = salon.estadisticas;
 		const statsRow = sheet.getRow(row);
-		const statsText = `T:${s.temprano}  A:${s.aTiempo}  F:${s.fueraHora}  N:${s.noAsistio}  J:${s.justificado}  -:${s.pendiente}`;
+		const statsText = `T:${s.tardanza}  A:${s.asistio}  F:${s.falta}  N:${s.noAsistio}  J:${s.justificado}  -:${s.pendiente}`;
 		statsRow.getCell(1).value = statsText;
 		sheet.mergeCells(row, 1, row, colCount);
 		statsRow.getCell(1).font = { size: 9, color: { argb: 'FF666666' } };

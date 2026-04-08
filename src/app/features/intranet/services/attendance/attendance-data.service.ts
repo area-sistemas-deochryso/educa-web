@@ -165,9 +165,9 @@ export class AttendanceDataService {
 	// * Mapea conteo del backend (campos nombrados) a StatusCounts (keyed por código).
 	private mapConteoToStatusCounts(conteo: ConteoEstados): StatusCounts {
 		return {
-			T: conteo.temprano,
-			A: conteo.aTiempo,
-			F: conteo.fueraHora,
+			T: conteo.tardanza,
+			A: conteo.asistio,
+			F: conteo.falta,
 			N: conteo.noAsistio,
 			J: conteo.justificado,
 			'-': conteo.pendiente,

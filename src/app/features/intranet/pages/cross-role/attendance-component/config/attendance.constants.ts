@@ -50,9 +50,9 @@ export interface AttendanceStatusConfig {
 }
 
 export const ATTENDANCE_STATUS_CONFIGS: Record<AttendanceStatus, AttendanceStatusConfig> = {
-	T: { cssClass: 'status-temprano', salonClass: 'estado-presente', label: 'T', group: 'presente' },
-	A: { cssClass: 'status-atiempo', salonClass: 'estado-presente', label: 'A', group: 'presente' },
-	F: { cssClass: 'status-fuera', salonClass: 'estado-tardanza', label: 'F', group: 'tardanza' },
+	A: { cssClass: 'status-asistio', salonClass: 'estado-presente', label: 'A', group: 'presente' },
+	T: { cssClass: 'status-tardanza', salonClass: 'estado-tardanza', label: 'T', group: 'tardanza' },
+	F: { cssClass: 'status-falta', salonClass: 'estado-falta', label: 'F', group: 'falta' },
 	N: { cssClass: 'status-no', salonClass: 'estado-falta', label: 'N', group: 'falta' },
 	J: { cssClass: 'status-justificado', salonClass: 'estado-justificado', label: 'J', group: 'justificado' },
 	'-': { cssClass: 'status-pendiente', salonClass: 'estado-vacio', label: '-', group: 'pendiente' },

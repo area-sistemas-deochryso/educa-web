@@ -1,7 +1,7 @@
 // Colores de estado (mismos que attendance-table)
-$color-temprano: #506ad0;
-$color-atiempo: #77a02d;
-$color-fuera: #ffcc0c;
+$color-asistio: #77a02d;
+$color-tardanza: #ffcc0c;
+$color-falta: #f44336;
 $color-no: #f44336;
 $color-justificado: #9c27b0;
 $color-pendiente: #9e9e9e;
@@ -181,16 +181,16 @@ $color-pendiente: #9e9e9e;
 }
 
 // Clases de estado (mismas que attendance-table)
-.status-temprano {
-	background-color: $color-temprano;
+.status-asistio {
+	background-color: $color-asistio;
 }
 
-.status-atiempo {
-	background-color: $color-atiempo;
+.status-tardanza {
+	background-color: $color-tardanza;
 }
 
-.status-fuera {
-	background-color: $color-fuera;
+.status-falta {
+	background-color: $color-falta;
 }
 
 .status-no {

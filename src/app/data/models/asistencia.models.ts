@@ -27,9 +27,9 @@ export interface AsistenciaDetalle {
 
 // Conteo de estados por tipo (ingreso o salida) para un mes (ConteoEstadosDto)
 export interface ConteoEstados {
-	temprano: number;
-	aTiempo: number;
-	fueraHora: number;
+	asistio: number;
+	tardanza: number;
+	falta: number;
 	noAsistio: number;
 	justificado: number;
 	pendiente: number;
@@ -94,9 +94,9 @@ export interface SalonProfesor {
 }
 
 // Estados de asistencia para la UI
-// T = Temprano, A = A tiempo, F = Fuera de hora, N = No asistió
-// J = Justificado, - = Pendiente, X = Antes del registro
-export type AttendanceStatus = 'T' | 'A' | 'F' | 'N' | 'J' | '-' | 'X';
+// A = Asistió (ingreso +50min), T = Tardanza (+50min a +2h), F = Falta (después de +2h)
+// N = No asistió, J = Justificado, - = Pendiente, X = Antes del registro
+export type AttendanceStatus = 'A' | 'T' | 'F' | 'N' | 'J' | '-' | 'X';
 
 // Director: Estadísticas del día
 export interface EstadisticasDia {
@@ -137,9 +137,9 @@ export interface EstadoAsistencia {
  */
 export interface EstadisticasAsistenciaDia {
 	total: number;
-	temprano: number;
-	aTiempo: number;
-	fueraHora: number;
+	asistio: number;
+	tardanza: number;
+	falta: number;
 	noAsistio: number;
 	justificado: number;
 	pendiente: number;

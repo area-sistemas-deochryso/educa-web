@@ -56,34 +56,34 @@ import { SkeletonLoaderComponent } from '@shared/components/skeleton-loader/skel
 
 				<div class="stat-bars">
 					<div class="stat-bar">
-						<span class="bar-label">Temprano</span>
+						<span class="bar-label">Asistió</span>
 						<div class="bar-track">
 							<div
-								class="bar-fill bar-temprano"
-								[style.width.%]="barPercent(stats()!.temprano)"
+								class="bar-fill bar-asistio"
+								[style.width.%]="barPercent(stats()!.asistio)"
 							></div>
 						</div>
-						<span class="bar-value">{{ stats()!.temprano }}</span>
-					</div>
-					<div class="stat-bar">
-						<span class="bar-label">A tiempo</span>
-						<div class="bar-track">
-							<div
-								class="bar-fill bar-atiempo"
-								[style.width.%]="barPercent(stats()!.aTiempo)"
-							></div>
-						</div>
-						<span class="bar-value">{{ stats()!.aTiempo }}</span>
+						<span class="bar-value">{{ stats()!.asistio }}</span>
 					</div>
 					<div class="stat-bar">
 						<span class="bar-label">Tardanza</span>
 						<div class="bar-track">
 							<div
 								class="bar-fill bar-tardanza"
-								[style.width.%]="barPercent(stats()!.fueraHora)"
+								[style.width.%]="barPercent(stats()!.tardanza)"
 							></div>
 						</div>
-						<span class="bar-value">{{ stats()!.fueraHora }}</span>
+						<span class="bar-value">{{ stats()!.tardanza }}</span>
+					</div>
+					<div class="stat-bar">
+						<span class="bar-label">Falta</span>
+						<div class="bar-track">
+							<div
+								class="bar-fill bar-falta"
+								[style.width.%]="barPercent(stats()!.falta)"
+							></div>
+						</div>
+						<span class="bar-value">{{ stats()!.falta }}</span>
 					</div>
 					<div class="stat-bar">
 						<span class="bar-label">Faltas</span>
@@ -268,17 +268,17 @@ import { SkeletonLoaderComponent } from '@shared/components/skeleton-loader/skel
 			transition: width 0.5s ease;
 		}
 
-		.bar-temprano {
-			background: #22c55e;
-		}
-		.bar-atiempo {
-			background: #3b82f6;
+		.bar-asistio {
+			background: #77a02d;
 		}
 		.bar-tardanza {
-			background: #eab308;
+			background: #ffcc0c;
+		}
+		.bar-falta {
+			background: #f44336;
 		}
 		.bar-faltas {
-			background: #ef4444;
+			background: #f44336;
 		}
 		// #endregion
 
@@ -326,7 +326,7 @@ export class ProfesorAttendanceWidgetComponent implements OnInit {
 	readonly presentes = computed(() => {
 		const s = this.stats();
 		if (!s) return 0;
-		return s.temprano + s.aTiempo + s.fueraHora;
+		return s.asistio + s.tardanza;
 	});
 
 	readonly porcentaje = computed(() => {

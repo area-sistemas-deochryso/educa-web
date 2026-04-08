@@ -18,9 +18,9 @@ const MONTH_OPTIONS = MONTH_NAMES.map((label, i) => ({ label, value: i + 1 }));
 
 const EMPTY_ESTADISTICAS: EstadisticasAsistenciaDia = {
 	total: 0,
-	temprano: 0,
-	aTiempo: 0,
-	fueraHora: 0,
+	tardanza: 0,
+	asistio: 0,
+	falta: 0,
 	noAsistio: 0,
 	justificado: 0,
 	pendiente: 0,
