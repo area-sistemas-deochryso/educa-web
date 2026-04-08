@@ -14,7 +14,7 @@ import { logger } from '@core/helpers';
 import { AttendanceDataService } from './attendance-data.service';
 import { AttendancePdfService } from './attendance-pdf.service';
 import { AttendanceStatsService } from './attendance-stats.service';
-import { AttendanceTable } from '@features/intranet/pages/shared/attendance-component/models/attendance.types';
+import { AttendanceTable } from '@features/intranet/pages/cross-role/attendance-component/models/attendance.types';
 import {
 	VIEW_MODE,
 	ViewMode,

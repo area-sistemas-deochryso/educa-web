@@ -2,8 +2,8 @@ import { Component, ChangeDetectionStrategy, computed, inject, OnInit, OnDestroy
 import { CommonModule } from '@angular/common';
 import { ProgressSpinnerModule } from 'primeng/progressspinner';
 import { EstudianteApiService } from '../services/estudiante-api.service';
-import { SalonMensajeriaFacade } from '@features/intranet/pages/shared/mensajeria/services/mensajeria.facade';
-import { SalonMensajeriaTabComponent } from '@features/intranet/pages/shared/mensajeria/components/mensajeria-tab/mensajeria-tab.component';
+import { SalonMensajeriaFacade } from '@features/intranet/pages/cross-role/mensajeria/services/mensajeria.facade';
+import { SalonMensajeriaTabComponent } from '@features/intranet/pages/cross-role/mensajeria/components/mensajeria-tab/mensajeria-tab.component';
 import { EstudianteSalonCurso, HorarioProfesorDto } from '../models/estudiante.models';
 import { signal, DestroyRef } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';

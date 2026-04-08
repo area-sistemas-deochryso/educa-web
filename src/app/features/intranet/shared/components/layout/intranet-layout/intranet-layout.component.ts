@@ -1,10 +1,10 @@
 // #region Imports
 import { ChangeDetectionStrategy, Component, inject, OnInit, DestroyRef, signal, effect, computed } from '@angular/core';
 import { RouterLink, RouterOutlet } from '@angular/router';
-import { VoiceButtonComponent } from '@shared/components/voice-button';
-import { FloatingNotificationBellComponent } from '@shared/components/floating-notification-bell';
-import { SyncStatusComponent } from '@shared/components/sync-status';
-import { OfflineIndicatorComponent } from '@shared/components/offline-indicator/offline-indicator.component';
+import { VoiceButtonComponent } from '@intranet-shared/components/voice-button';
+import { FloatingNotificationBellComponent } from '@intranet-shared/components/floating-notification-bell';
+import { SyncStatusComponent } from '@intranet-shared/components/sync-status';
+import { OfflineIndicatorComponent } from '@intranet-shared/components/offline-indicator/offline-indicator.component';
 import { UserPermisosService, SessionActivityService } from '@core/services';
 import {
 	NavItemComponent,

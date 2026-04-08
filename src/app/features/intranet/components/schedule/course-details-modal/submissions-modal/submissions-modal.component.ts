@@ -3,7 +3,7 @@ import { ChangeDetectionStrategy, Component, EventEmitter, Input, Output } from 
 import { CommonModule } from '@angular/common';
 import { DialogModule } from 'primeng/dialog';
 import { logger } from '@core/helpers';
-import { getGradeClass as getGradeClassFn } from '@shared/services/calificacion-config';
+import { getGradeClass as getGradeClassFn } from '@intranet-shared/services/calificacion-config';
 
 // #endregion
 // #region Implementation

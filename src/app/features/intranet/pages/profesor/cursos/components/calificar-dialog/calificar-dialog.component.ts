@@ -26,7 +26,7 @@ import {
 import {
 	getNotaSeverity as getNotaSeverityFn,
 	isNotaAprobada,
-} from '@shared/services/calificacion-config';
+} from '@intranet-shared/services/calificacion-config';
 import type { ConfiguracionCalificacionListDto } from '@data/models';
 
 @Component({

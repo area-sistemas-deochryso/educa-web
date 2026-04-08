@@ -25,20 +25,30 @@ src/app/
 │   ├── adapters/    # Transformación: base, date, grade-scale
 │   ├── models/      # Modelos del dominio compartidos (user, salon, horario, calificacion, etc.)
 │   └── repositories/# BaseRepository, CRUDs (user, notification, asistencia)
-├── shared/          # Componentes, pipes, directivas, servicios reutilizables
-│   ├── components/  # 60+ componentes: layout, skeletons, login, floating-notification-bell, etc.
-│   ├── config/      # Configuraciones compartidas (intranet-menu.config, etc.)
+├── shared/          # Código reutilizable cross-feature (public + intranet)
+│   ├── components/  # layout (header, footer, main-layout), skeleton-loader, toast, devtools
 │   ├── constants/   # Constantes compartidas (app-roles, etc.)
-│   ├── directives/  # highlight, table-loading, uppercase-input
+│   ├── directives/  # highlight
 │   ├── interfaces/  # Tipos compartidos
 │   ├── models/      # SelectOption, StatsBase, FormMeta, PaginationState, etc.
 │   ├── pipes/       # truncate
-│   ├── services/    # UiMappingService, asistencia (por rol), calificacion-config
+│   ├── services/    # UiMappingService, asistencia (por rol)
 │   ├── utils/       # Utilidades compartidas
 │   └── validators/  # Validadores custom de formularios
 └── features/        # Modulos lazy-loaded
     ├── public/      # home, about, contact, faq, levels, privacy, terms
-    └── intranet/    # login, shared (home, attendance, calendar), admin, profesor, estudiante
+    └── intranet/
+        ├── shared/          # Código compartido entre pages de intranet (@intranet-shared)
+        │   ├── components/  # login, form-error, page-header, skeletons, intranet-layout, etc.
+        │   ├── config/      # intranet-menu.config
+        │   ├── directives/  # drag-drop, table-loading, uppercase-input
+        │   ├── pipes/       # estado/*, format-time, initials, seccion-label, etc.
+        │   └── services/    # calificacion-config
+        └── pages/
+            ├── cross-role/  # Pages accesibles por múltiples roles (home, attendance, calendar)
+            ├── admin/       # Pages exclusivas de Director/Admin
+            ├── profesor/    # Pages exclusivas de Profesor
+            └── estudiante/  # Pages exclusivas de Estudiante
 ```
 
 ### core/services/ — Carpetas por dominio (~24)
@@ -302,3 +312,45 @@ private readonly _data = signal<Data[]>([]);
 readonly data = this._data.asReadonly();
 readonly derivado = computed(() => this.data().filter(d => d.active));
 ```
+
+---
+
+## Ubicación de Código Compartido
+
+> **"`shared/` = usado por public + intranet (o por 2+ features independientes)."**
+> **"`features/intranet/shared/` = usado por 2+ pages de intranet pero no por public."**
+
+| Criterio | Ubicación | Alias |
+|----------|-----------|-------|
+| Usado por public y por intranet | `src/app/shared/` | `@shared` |
+| Usado solo por intranet (2+ pages) | `src/app/features/intranet/shared/` | `@intranet-shared` |
+| Usado solo por 1 page | Dentro de la page misma | N/A |
+
+**Dependencias cross-boundary**: `@intranet-shared` puede importar de `@shared` (ej: `form-error` importa `@shared/validators`). Lo inverso está prohibido — `@shared` no debe importar de `@intranet-shared`.
+
+**Re-exports temporales**: `@shared` re-exporta algunos items que migraron a `@intranet-shared` para no romper imports existentes. Estos re-exports se eliminan gradualmente conforme los consumidores se actualicen.
+
+---
+
+## Capa de Datos
+
+**Patrón estándar**: Feature service (`*.service.ts`) con `HttpClient` directo para API específica del feature.
+
+**`@data/repositories/`**: Existe `BaseRepository` para CRUD genérico compartido, pero actualmente sin consumidores activos. Sus 2 implementaciones (`UserRepository`, `NotificationRepository`) no se inyectan en ningún servicio. Solo `PaginatedResponse` se importa como tipo. Ver task `revision-codigo-muerto.md` para decisión pendiente.
+
+Los 21+ feature services usan `HttpClient` directo — es el patrón de facto del proyecto.
+
+---
+
+## Asistencia — Subdominios
+
+Asistencia tiene 4 subdominios con ~5,600 líneas TS:
+
+| Subdominio | Ubicación | Rol |
+|------------|-----------|-----|
+| **Diaria** (CrossChex) | `pages/cross-role/attendance-component/` + `components/attendance/` | Cross-role — vista de asistencia por biométrico |
+| **Curso** (en clase) | `components/schedule/` (embebido en horarios) | Profesor marca P/T/F |
+| **Admin** (edición formal) | `pages/admin/asistencias/` | Director edita/corrige registros |
+| **Reportes** | `pages/cross-role/reportes-asistencia/` | Cross-role — estadísticas y exportación |
+
+La separación física actual es parcial — admin y reportes tienen carpetas propias, diaria y curso están mezclados con componentes del rol. Inconsistencia idiomática (`asistencia-*` vs `attendance-*`) documentada en task `normalizacion-idiomatica.md`.

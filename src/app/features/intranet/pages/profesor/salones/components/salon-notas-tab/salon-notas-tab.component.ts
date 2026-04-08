@@ -14,7 +14,7 @@ import {
 	PeriodoCalificacionDto,
 	VistaPromedio,
 } from '../../../models';
-import { getNotaSeverity, formatNotaConConfig } from '@shared/services/calificacion-config';
+import { getNotaSeverity, formatNotaConConfig } from '@intranet-shared/services/calificacion-config';
 import type { ConfiguracionCalificacionListDto } from '@data/models';
 
 interface PeriodoColumnsGroup {

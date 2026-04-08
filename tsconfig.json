@@ -27,7 +27,9 @@
       "@env/*": ["./src/app/config/*"],
       "@data": ["./src/app/data"],
       "@data/*": ["./src/app/data/*"],
-      "@test": ["./src/test-setup"]
+      "@test": ["./src/test-setup"],
+      "@intranet-shared": ["./src/app/features/intranet/shared"],
+      "@intranet-shared/*": ["./src/app/features/intranet/shared/*"]
     }
   },
   "angularCompilerOptions": {

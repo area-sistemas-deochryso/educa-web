@@ -7,8 +7,8 @@ import { MenuItem } from 'primeng/api';
 import {
 	CourseSummary,
 	getCourseSummaries,
-} from '@features/intranet/pages/shared/schedule-component/courses.config';
-import { getGradeClass as getGradeClassFn } from '@shared/services/calificacion-config';
+} from '@features/intranet/pages/cross-role/schedule-component/courses.config';
+import { getGradeClass as getGradeClassFn } from '@intranet-shared/services/calificacion-config';
 
 // #endregion
 // #region Implementation

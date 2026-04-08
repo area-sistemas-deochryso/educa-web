@@ -7,8 +7,8 @@ import {
 	AttendanceWeek,
 	AttendanceTable,
 	StatusCounts,
-} from '@features/intranet/pages/shared/attendance-component/models/attendance.types';
-import { DAY_HEADERS } from '@features/intranet/pages/shared/attendance-component/config/attendance.constants';
+} from '@features/intranet/pages/cross-role/attendance-component/models/attendance.types';
+import { DAY_HEADERS } from '@features/intranet/pages/cross-role/attendance-component/config/attendance.constants';
 import { CalendarUtilsService } from '../calendar/calendar-utils.service';
 
 // #endregion

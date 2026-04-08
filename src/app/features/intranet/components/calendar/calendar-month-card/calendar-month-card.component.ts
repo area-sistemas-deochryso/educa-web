@@ -1,7 +1,7 @@
 // #region Imports
 import { ChangeDetectionStrategy, Component, input, output, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { CalendarDay, CalendarMonth } from '@features/intranet/pages/shared/calendary-component/calendar.types';
+import { CalendarDay, CalendarMonth } from '@features/intranet/pages/cross-role/calendary-component/calendar.types';
 
 // #endregion
 // #region Implementation

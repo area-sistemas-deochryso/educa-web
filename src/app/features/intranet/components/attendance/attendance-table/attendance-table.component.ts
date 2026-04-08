@@ -10,12 +10,12 @@ import {
 	AttendanceTable,
 	AttendanceDay,
 	MonthOption,
-} from '@features/intranet/pages/shared/attendance-component/models/attendance.types';
+} from '@features/intranet/pages/cross-role/attendance-component/models/attendance.types';
 import {
 	MONTH_OPTIONS,
 	DAY_HEADERS,
 	getStatusClass,
-} from '@features/intranet/pages/shared/attendance-component/config/attendance.constants';
+} from '@features/intranet/pages/cross-role/attendance-component/config/attendance.constants';
 
 // #endregion
 // #region Implementation

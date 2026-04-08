@@ -2,7 +2,7 @@
 import { Route, Routes } from '@angular/router';
 import { authGuard, permisosGuard } from '@core/guards';
 
-import { IntranetLayoutComponent } from '@shared/components/layout';
+import { IntranetLayoutComponent } from '@intranet-shared/components/layout/intranet-layout';
 import { environment } from '@config/environment';
 // #endregion
 
@@ -124,7 +124,7 @@ const experimentalRoutes: Route[] = [
 				{
 					path: 'horarios',
 					loadComponent: () =>
-						import('./pages/shared/schedule-component/schedule.component').then(
+						import('./pages/cross-role/schedule-component/schedule.component').then(
 							(m) => m.ScheduleComponent,
 						),
 					title: 'Intranet - Horarios',
@@ -136,7 +136,7 @@ const experimentalRoutes: Route[] = [
 				{
 					path: 'calendario',
 					loadComponent: () =>
-						import('./pages/shared/calendary-component/calendary.component').then(
+						import('./pages/cross-role/calendary-component/calendary.component').then(
 							(m) => m.CalendaryComponent,
 						),
 					title: 'Intranet - Calendario',
@@ -148,7 +148,7 @@ const experimentalRoutes: Route[] = [
 				{
 					path: 'videoconferencias',
 					loadComponent: () =>
-						import('./pages/shared/videoconferencias').then(
+						import('./pages/cross-role/videoconferencias').then(
 							(m) => m.VideoconferenciasComponent,
 						),
 					title: 'Intranet - Videoconferencias',
@@ -173,7 +173,7 @@ const experimentalRoutes: Route[] = [
 				{
 					path: 'ctest-k6',
 					loadComponent: () =>
-						import('./pages/shared/ctest-k6').then((m) => m.CTestK6Component),
+						import('./pages/cross-role/ctest-k6').then((m) => m.CTestK6Component),
 					title: 'Intranet - Test k6',
 				},
 			]
@@ -197,7 +197,7 @@ export const INTRANET_ROUTES: Routes = [
 			{
 				path: '',
 				loadComponent: () =>
-					import('./pages/shared/home-component/home.component').then(
+					import('./pages/cross-role/home-component/home.component').then(
 						(m) => m.HomeComponent,
 					),
 				title: 'Intranet - Inicio',
@@ -205,7 +205,7 @@ export const INTRANET_ROUTES: Routes = [
 			{
 				path: 'asistencia',
 				loadComponent: () =>
-					import('./pages/shared/attendance-component/attendance.component').then(
+					import('./pages/cross-role/attendance-component/attendance.component').then(
 						(m) => m.AttendanceComponent,
 					),
 				title: 'Intranet - Asistencia',

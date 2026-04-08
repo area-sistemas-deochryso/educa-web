@@ -8,7 +8,7 @@ import { SkeletonModule } from 'primeng/skeleton';
 import { ButtonModule } from 'primeng/button';
 import { InputTextModule } from 'primeng/inputtext';
 import { SalonNotasResumenDto, calcularPromedioPonderado, NOTA_MAXIMA } from '../../../models';
-import { getNotaSeverity, formatNotaConConfig } from '@shared/services/calificacion-config';
+import { getNotaSeverity, formatNotaConConfig } from '@intranet-shared/services/calificacion-config';
 import type { ConfiguracionCalificacionListDto } from '@data/models';
 
 export interface NotaSaveEvent {

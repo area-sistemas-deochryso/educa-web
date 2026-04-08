@@ -11,7 +11,7 @@ import {
 	ATTENDANCE_STATUS_CONFIGS,
 	getSalonStatusClass,
 	getStatusLabel,
-} from '@features/intranet/pages/shared/attendance-component/config/attendance.constants';
+} from '@features/intranet/pages/cross-role/attendance-component/config/attendance.constants';
 
 @Component({
 	selector: 'app-salon-asistencia-tab',

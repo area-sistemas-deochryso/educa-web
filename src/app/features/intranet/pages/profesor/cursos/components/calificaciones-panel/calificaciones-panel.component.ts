@@ -9,7 +9,7 @@ import {
 	CalificacionDto,
 	TIPOS_EVALUACION,
 } from '../../../models';
-import { formatNotaConConfig } from '@shared/services/calificacion-config';
+import { formatNotaConConfig } from '@intranet-shared/services/calificacion-config';
 import type { ConfiguracionCalificacionListDto } from '@data/models';
 
 @Component({

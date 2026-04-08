@@ -8,7 +8,7 @@ import { TagModule } from 'primeng/tag';
 import { TooltipModule } from 'primeng/tooltip';
 
 import { HorarioResponseDto, SalonNotasResumenDto, ConfiguracionCalificacionListDto } from '@data/models';
-import { isNotaAprobada, formatNotaConConfig } from '@shared/services/calificacion-config';
+import { isNotaAprobada, formatNotaConConfig } from '@intranet-shared/services/calificacion-config';
 
 @Component({
 	selector: 'app-salon-notas-tab',

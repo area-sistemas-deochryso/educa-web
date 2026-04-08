@@ -5,8 +5,8 @@ import { PageHeaderComponent } from '@shared/components';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { logger, withRetry } from '@core/helpers';
 import { EstudianteApiService } from '../services/estudiante-api.service';
-import { SalonMensajeriaFacade } from '@features/intranet/pages/shared/mensajeria/services/mensajeria.facade';
-import { SalonForoTabComponent } from '@features/intranet/pages/shared/mensajeria/components/foro-tab/foro-tab.component';
+import { SalonMensajeriaFacade } from '@features/intranet/pages/cross-role/mensajeria/services/mensajeria.facade';
+import { SalonForoTabComponent } from '@features/intranet/pages/cross-role/mensajeria/components/foro-tab/foro-tab.component';
 import { HorarioProfesorDto } from '../models/estudiante.models';
 import { toSelectOptionsFrom } from '@shared/models';
 

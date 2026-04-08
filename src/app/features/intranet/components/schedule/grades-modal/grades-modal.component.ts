@@ -3,7 +3,7 @@ import { ChangeDetectionStrategy, Component, EventEmitter, Input, Output, OnChan
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { DialogModule } from 'primeng/dialog';
-import { getGradeClass as getGradeClassFn } from '@shared/services/calificacion-config';
+import { getGradeClass as getGradeClassFn } from '@intranet-shared/services/calificacion-config';
 
 // #endregion
 // #region Implementation

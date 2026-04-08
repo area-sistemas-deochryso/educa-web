@@ -1,7 +1,7 @@
 import { Component, ChangeDetectionStrategy, inject, output, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 
-import { CdkDropList, CdkDrag, CdkDragHandle, CdkDragDrop } from '@shared/directives/drag-drop';
+import { CdkDropList, CdkDrag, CdkDragHandle, CdkDragDrop } from '@intranet-shared/directives/drag-drop';
 import { ButtonModule } from 'primeng/button';
 import { InputTextModule } from 'primeng/inputtext';
 import { InputNumberModule } from 'primeng/inputnumber';

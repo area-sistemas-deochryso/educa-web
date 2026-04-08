@@ -29,8 +29,8 @@ import {
 } from '@shared/components';
 import type { SkeletonColumnDef } from '@shared/components';
 import { FormatTimePipe } from '@shared/pipes';
-import { getStatusClass } from '@features/intranet/pages/shared/attendance-component/config/attendance.constants';
-import { AttendanceStatus } from '@features/intranet/pages/shared/attendance-component/models/attendance.types';
+import { getStatusClass } from '@features/intranet/pages/cross-role/attendance-component/config/attendance.constants';
+import { AttendanceStatus } from '@features/intranet/pages/cross-role/attendance-component/models/attendance.types';
 
 export interface EstudianteAsistenciaDia {
 	estudianteId: number;

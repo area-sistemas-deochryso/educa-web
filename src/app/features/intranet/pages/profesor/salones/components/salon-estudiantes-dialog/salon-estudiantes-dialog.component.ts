@@ -11,7 +11,7 @@ import { ProfesorSalonConEstudiantes } from '../../../services/profesor.store';
 import { SalonNotasTabComponent } from '../salon-notas-tab/salon-notas-tab.component';
 import { SalonNotasEstudianteTabComponent } from '../salon-notas-estudiante-tab/salon-notas-estudiante-tab.component';
 import { SalonGruposTabComponent } from '../salon-grupos-tab/salon-grupos-tab.component';
-import { CampusNavigationComponent } from '../../../../shared/campus-navigation/campus-navigation.component';
+import { CampusNavigationComponent } from '../../../../cross-role/campus-navigation/campus-navigation.component';
 import {
 	SalonNotasResumenDto,
 	VistaPromedio,

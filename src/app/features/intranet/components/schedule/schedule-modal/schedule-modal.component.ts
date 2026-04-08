@@ -7,7 +7,7 @@ import { MenuItem } from 'primeng/api';
 import {
 	CourseSchedule,
 	getCourseSchedules,
-} from '@features/intranet/pages/shared/schedule-component/courses.config';
+} from '@features/intranet/pages/cross-role/schedule-component/courses.config';
 
 // #endregion
 // #region Implementation

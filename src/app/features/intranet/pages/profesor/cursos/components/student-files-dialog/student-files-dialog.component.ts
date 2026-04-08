@@ -6,7 +6,7 @@ import { TooltipModule } from 'primeng/tooltip';
 import { TagModule } from 'primeng/tag';
 import { ProgressSpinnerModule } from 'primeng/progressspinner';
 import { SemanaEstudianteArchivosDto, CalificacionConNotasDto } from '../../../models';
-import { getNotaSeverity } from '@shared/services/calificacion-config';
+import { getNotaSeverity } from '@intranet-shared/services/calificacion-config';
 import type { ConfiguracionCalificacionListDto } from '@data/models';
 import { FormatFileSizePipe } from '@shared/pipes';
 

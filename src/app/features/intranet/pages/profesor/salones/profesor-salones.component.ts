@@ -11,7 +11,7 @@ import { SalonCursoInfo, VistaPromedio, ActualizarGrupoDto } from '../models';
 import { ProfesorFacade } from '../services/profesor.facade';
 import { ProfesorSalonConEstudiantes } from '../services/profesor.store';
 import { GruposFacade } from './services/grupos.facade';
-import { SalonMensajeriaFacade } from '@features/intranet/pages/shared/mensajeria/services/mensajeria.facade';
+import { SalonMensajeriaFacade } from '@features/intranet/pages/cross-role/mensajeria/services/mensajeria.facade';
 import { SalonEstudiantesDialogComponent } from './components/salon-estudiantes-dialog/salon-estudiantes-dialog.component';
 import { NotaSaveEvent } from './components/salon-notas-estudiante-tab/salon-notas-estudiante-tab.component';
 

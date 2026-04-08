@@ -1,6 +1,6 @@
 // #region Imports
 import { ChangeDetectionStrategy, Component, inject, signal } from '@angular/core';
-import { getStatusClass } from '@features/intranet/pages/shared/attendance-component/config/attendance.constants';
+import { getStatusClass } from '@features/intranet/pages/cross-role/attendance-component/config/attendance.constants';
 import { AsistenciaService, EstadoAsistencia } from '@core/services';
 
 // #endregion

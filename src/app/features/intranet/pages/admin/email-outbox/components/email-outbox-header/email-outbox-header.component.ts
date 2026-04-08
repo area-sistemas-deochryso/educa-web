@@ -1,7 +1,7 @@
 import { ChangeDetectionStrategy, Component, output } from '@angular/core';
 import { ButtonModule } from 'primeng/button';
 
-import { PageHeaderComponent } from '@shared/components/page-header/page-header.component';
+import { PageHeaderComponent } from '@intranet-shared/components/page-header/page-header.component';
 
 @Component({
 	selector: 'app-email-outbox-header',

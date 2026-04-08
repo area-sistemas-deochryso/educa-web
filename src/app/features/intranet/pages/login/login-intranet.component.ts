@@ -17,9 +17,9 @@ import {
 	LoginOptionsComponent,
 	LoginRoleSelectorComponent,
 	RolOption,
-} from '@shared/components/login';
+} from '@intranet-shared/components/login';
 import { CommonModule } from '@angular/common';
-import { FormErrorComponent } from '@shared/components/form-error';
+import { FormErrorComponent } from '@intranet-shared/components/form-error';
 import { InputTextModule } from 'primeng/inputtext';
 import { Router } from '@angular/router';
 import { Select } from 'primeng/select';

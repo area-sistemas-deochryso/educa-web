@@ -19,7 +19,7 @@ import { CheckboxModule } from 'primeng/checkbox';
 import { Tab, TabList, TabPanel, Tabs } from 'primeng/tabs';
 
 import { SkeletonColumnDef, TableSkeletonComponent, StatsSkeletonComponent } from '@shared/components';
-import { ReportesAsistenciaComponent } from '../../shared/reportes-asistencia';
+import { ReportesAsistenciaComponent } from '../../cross-role/reportes-asistencia';
 
 import {
 	AsistenciasDataFacade,

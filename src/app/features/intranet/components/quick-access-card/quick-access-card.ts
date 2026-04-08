@@ -2,7 +2,7 @@
 import { ChangeDetectionStrategy, Component, input } from '@angular/core';
 import { RouterLink } from '@angular/router';
 
-import { PreviewLayout } from '@features/intranet/pages/shared/home-component/quick-access.config';
+import { PreviewLayout } from '@features/intranet/pages/cross-role/home-component/quick-access.config';
 
 // #endregion
 // #region Implementation

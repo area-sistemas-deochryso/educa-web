@@ -1,5 +1,5 @@
 import type { SelectOption, EstadoFiltro, RangoTipo } from '../models';
-import type { SkeletonColumnDef } from '@shared/components/table-skeleton/table-skeleton.types';
+import type { SkeletonColumnDef } from '@intranet-shared/components/table-skeleton/table-skeleton.types';
 
 export const ESTADO_OPTIONS: SelectOption<EstadoFiltro>[] = [
 	{ label: 'Todos', value: 'todos' },

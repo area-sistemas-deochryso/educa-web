@@ -1,7 +1,7 @@
 import { ChangeDetectionStrategy, Component, computed, inject, OnInit } from '@angular/core';
 import { ButtonModule } from 'primeng/button';
-import { TableSkeletonComponent } from '@shared/components/table-skeleton/table-skeleton.component';
-import { StatsSkeletonComponent } from '@shared/components/stats-skeleton/stats-skeleton.component';
+import { TableSkeletonComponent } from '@intranet-shared/components/table-skeleton/table-skeleton.component';
+import { StatsSkeletonComponent } from '@intranet-shared/components/stats-skeleton/stats-skeleton.component';
 import { TABLE_SKELETON_COLUMNS } from './config/reportes-asistencia.config';
 import { ReportesFiltrosComponent } from './components/reportes-filtros/reportes-filtros.component';
 import { ReportesResumenComponent } from './components/reportes-resumen/reportes-resumen.component';

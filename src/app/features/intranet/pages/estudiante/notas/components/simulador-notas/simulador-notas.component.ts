@@ -11,7 +11,7 @@ import {
 	NOTA_MAXIMA,
 } from '../../../models';
 import { NotaSimulada } from '../../services/estudiante-notas.store';
-import { getNotaSeverity, formatNotaConConfig } from '@shared/services/calificacion-config';
+import { getNotaSeverity, formatNotaConConfig } from '@intranet-shared/services/calificacion-config';
 import type { ConfiguracionCalificacionListDto } from '@data/models';
 
 @Component({

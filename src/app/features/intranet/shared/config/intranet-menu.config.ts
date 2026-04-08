@@ -1,5 +1,5 @@
 // #region Imports
-import { NavMenuItem } from '@shared/components/layout/intranet-layout/components';
+import { NavMenuItem } from '@intranet-shared/components/layout/intranet-layout/components';
 import { environment } from '@config/environment';
 import { PERMISOS } from '@shared/constants';
 
