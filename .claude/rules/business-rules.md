@@ -85,8 +85,7 @@ El estado de asistencia de **ingreso** se calcula automáticamente según la hor
 |--------|-------------|-----------------|
 | `A` | Asistió | Ingreso dentro de los primeros 50 minutos desde hora inicio |
 | `T` | Tardanza | Ingreso entre +50min y +2h desde hora inicio |
-| `F` | Falta | Ingreso después de +2h o sin marcación pasada la ventana |
-| `N` | No asistió | Sin marcación al final del día |
+| `F` | Falta | Ingreso después de +2h, o sin marcación al final del día |
 | `J` | Justificado | Justificación manual con prefijo `"Justificado:"` |
 | `-` | Pendiente | Día aún no terminó |
 | `X` | Antes del registro | Fecha anterior a `FECHA_INICIO_REGISTRO` (26-ene-2026) |
@@ -102,7 +101,7 @@ El estado final de asistencia lo determina **solo el ingreso**. La salida solo a
 **Prioridad de severidad** (usada cuando se resuelven conflictos):
 
 ```
-F (5) > N (4) > J (3) > T (2) > A (1) > Pendiente/X (0)
+F (4) > J (3) > T (2) > A (1) > Pendiente/X (0)
 ```
 
 **Ejemplo**: Ingreso a las 8:15 en periodo regular → `A` (Asistió). Salida a las 14:00 → estado sigue siendo `A`, asistencia pasa a `Completa`.
@@ -973,7 +972,7 @@ Este registro consolida TODAS las invariantes del sistema en una tabla indexable
 
 | ID | Entidad | Invariante | Enforcement | Sección |
 |----|---------|------------|-------------|---------|
-| `INV-C01` | Asistencia | Estado final lo determina el ingreso. Salida solo afecta completitud. Severidad: `F(5) > N(4) > J(3) > T(2) > A(1)` | `AsistenciaEstadoCalculador` | 1.4 |
+| `INV-C01` | Asistencia | Estado final lo determina el ingreso. Salida solo afecta completitud. Severidad: `F(4) > J(3) > T(2) > A(1)` | `AsistenciaEstadoCalculador` | 1.4 |
 | `INV-C02` | Asistencia | Justificación (`"Justificado:"`) tiene precedencia absoluta sobre cálculo por hora | `AsistenciaEstadoCalculador` | 1.3 |
 | `INV-C03` | Asistencia | Anti-duplicación: ventana mínima de 30 minutos entre marcaciones | Webhook handler | 1.5 |
 | `INV-C04` | Calificación | `Promedio = Σ(nota × peso)`, redondeado a 1 decimal. Pesos NO se normalizan | `CalificacionHelper` | 3.2 |

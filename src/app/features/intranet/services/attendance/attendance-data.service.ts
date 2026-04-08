@@ -26,7 +26,7 @@ export class AttendanceDataService {
 			selectedMonth: now.getMonth() + 1,
 			selectedYear: now.getFullYear(),
 			weeks: [],
-			counts: { T: 0, A: 0, F: 0, N: 0, J: 0, '-': 0, X: 0 },
+			counts: { T: 0, A: 0, F: 0, J: 0, '-': 0, X: 0 },
 			columnTotals: [],
 			grandTotal: '0/0',
 		};
@@ -93,13 +93,13 @@ export class AttendanceDataService {
 					ingresosDays.push({
 						day: DAY_HEADERS[dayIndex],
 						date: null,
-						status: 'N',
+						status: 'F',
 						hora: null,
 					});
 					salidasDays.push({
 						day: DAY_HEADERS[dayIndex],
 						date: null,
-						status: 'N',
+						status: 'F',
 						hora: null,
 					});
 					return;
@@ -116,14 +116,14 @@ export class AttendanceDataService {
 				// Excluir '-' (pendiente) y 'X' (sin registro) del conteo
 				if (ingresoStatus !== '-' && ingresoStatus !== 'X') {
 					ingresosValidDaysCount++;
-					// Solo contar como asistido si tiene registro (T, A, F)
-					if (ingresoStatus !== 'N') ingresosAttendedCount++;
+					// Solo contar como asistido si tiene registro (T, A, no F)
+					if (ingresoStatus !== 'F') ingresosAttendedCount++;
 				}
 
 				if (salidaStatus !== '-' && salidaStatus !== 'X') {
 					salidasValidDaysCount++;
-					// Solo contar como asistido si tiene registro (T, A, F)
-					if (salidaStatus !== 'N') salidasAttendedCount++;
+					// Solo contar como asistido si tiene registro (T, A, no F)
+					if (salidaStatus !== 'F') salidasAttendedCount++;
 				}
 
 				ingresosDays.push({
@@ -168,7 +168,6 @@ export class AttendanceDataService {
 			T: conteo.tardanza,
 			A: conteo.asistio,
 			F: conteo.falta,
-			N: conteo.noAsistio,
 			J: conteo.justificado,
 			'-': conteo.pendiente,
 			X: 0,
@@ -176,7 +175,7 @@ export class AttendanceDataService {
 	}
 
 	private calculateCounts(weeks: AttendanceWeek[]): StatusCounts {
-		const counts: StatusCounts = { T: 0, A: 0, F: 0, N: 0, J: 0, '-': 0, X: 0 };
+		const counts: StatusCounts = { T: 0, A: 0, F: 0, J: 0, '-': 0, X: 0 };
 
 		weeks.forEach((week) => {
 			week.days.forEach((day) => {
@@ -200,7 +199,7 @@ export class AttendanceDataService {
 				// Excluir días sin fecha, pendientes ('-') y sin registro ('X') del total
 				if (day?.date !== null && day?.status !== '-' && day?.status !== 'X') {
 					total++;
-					if (day?.status !== 'N') {
+					if (day?.status !== 'F') {
 						attended++;
 					}
 				}
@@ -220,7 +219,7 @@ export class AttendanceDataService {
 				// Excluir días sin fecha, pendientes ('-') y sin registro ('X') del total
 				if (day.date !== null && day.status !== '-' && day.status !== 'X') {
 					totalPossible++;
-					if (day.status !== 'N') {
+					if (day.status !== 'F') {
 						totalAttended++;
 					}
 				}

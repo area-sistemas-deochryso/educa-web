@@ -30,7 +30,6 @@ export interface ConteoEstados {
 	asistio: number;
 	tardanza: number;
 	falta: number;
-	noAsistio: number;
 	justificado: number;
 	pendiente: number;
 }
@@ -95,8 +94,8 @@ export interface SalonProfesor {
 
 // Estados de asistencia para la UI
 // A = Asistió (ingreso +50min), T = Tardanza (+50min a +2h), F = Falta (después de +2h)
-// N = No asistió, J = Justificado, - = Pendiente, X = Antes del registro
-export type AttendanceStatus = 'A' | 'T' | 'F' | 'N' | 'J' | '-' | 'X';
+// J = Justificado, - = Pendiente, X = Antes del registro
+export type AttendanceStatus = 'A' | 'T' | 'F' | 'J' | '-' | 'X';
 
 // Director: Estadísticas del día
 export interface EstadisticasDia {
@@ -140,7 +139,6 @@ export interface EstadisticasAsistenciaDia {
 	asistio: number;
 	tardanza: number;
 	falta: number;
-	noAsistio: number;
 	justificado: number;
 	pendiente: number;
 }

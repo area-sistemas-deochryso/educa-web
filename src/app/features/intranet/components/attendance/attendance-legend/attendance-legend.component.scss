@@ -3,7 +3,6 @@
 $color-asistio: #77a02d;
 $color-tardanza: #ffcc0c;
 $color-falta: #f44336;
-$color-no: #f44336;
 $color-justificado: #9c27b0;
 
 .legend-section {
@@ -60,10 +59,6 @@ $color-justificado: #9c27b0;
 
 .status-falta {
 	background-color: $color-falta;
-}
-
-.status-no {
-	background-color: $color-no;
 }
 
 .status-justificado {

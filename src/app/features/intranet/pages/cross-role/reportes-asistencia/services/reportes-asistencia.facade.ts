@@ -237,7 +237,7 @@ export class ReportesAsistenciaFacade {
 		// Mini estadísticas
 		const s = salon.estadisticas;
 		const statsRow = sheet.getRow(row);
-		const statsText = `T:${s.tardanza}  A:${s.asistio}  F:${s.falta}  N:${s.noAsistio}  J:${s.justificado}  -:${s.pendiente}`;
+		const statsText = `T:${s.tardanza}  A:${s.asistio}  F:${s.falta}  J:${s.justificado}  -:${s.pendiente}`;
 		statsRow.getCell(1).value = statsText;
 		sheet.mergeCells(row, 1, row, colCount);
 		statsRow.getCell(1).font = { size: 9, color: { argb: 'FF666666' } };
@@ -310,7 +310,6 @@ export class ReportesAsistenciaFacade {
 			case 'T': return 'FF506AD0';
 			case 'A': return 'FF77A02D';
 			case 'F': return 'FFF59E0B';
-			case 'N': return 'FFF44336';
 			case 'J': return 'FF9C27B0';
 			default: return 'FF9E9E9E';
 		}

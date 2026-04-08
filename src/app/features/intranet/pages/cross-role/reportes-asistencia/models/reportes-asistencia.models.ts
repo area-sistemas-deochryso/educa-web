@@ -14,7 +14,6 @@ export interface EstadisticasAsistenciaDia {
 	tardanza: number;
 	asistio: number;
 	falta: number;
-	noAsistio: number;
 	justificado: number;
 	pendiente: number;
 }

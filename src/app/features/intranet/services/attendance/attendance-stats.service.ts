@@ -21,7 +21,6 @@ const EMPTY_ESTADISTICAS: EstadisticasAsistenciaDia = {
 	tardanza: 0,
 	asistio: 0,
 	falta: 0,
-	noAsistio: 0,
 	justificado: 0,
 	pendiente: 0,
 };

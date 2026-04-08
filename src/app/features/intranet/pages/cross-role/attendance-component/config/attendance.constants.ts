@@ -53,7 +53,6 @@ export const ATTENDANCE_STATUS_CONFIGS: Record<AttendanceStatus, AttendanceStatu
 	A: { cssClass: 'status-asistio', salonClass: 'estado-presente', label: 'A', group: 'presente' },
 	T: { cssClass: 'status-tardanza', salonClass: 'estado-tardanza', label: 'T', group: 'tardanza' },
 	F: { cssClass: 'status-falta', salonClass: 'estado-falta', label: 'F', group: 'falta' },
-	N: { cssClass: 'status-no', salonClass: 'estado-falta', label: 'N', group: 'falta' },
 	J: { cssClass: 'status-justificado', salonClass: 'estado-justificado', label: 'J', group: 'justificado' },
 	'-': { cssClass: 'status-pendiente', salonClass: 'estado-vacio', label: '-', group: 'pendiente' },
 	X: { cssClass: 'status-sin-registro', salonClass: 'estado-vacio', label: '', group: 'sin-registro' },

@@ -85,16 +85,6 @@ import { SkeletonLoaderComponent } from '@shared/components/skeleton-loader/skel
 						</div>
 						<span class="bar-value">{{ stats()!.falta }}</span>
 					</div>
-					<div class="stat-bar">
-						<span class="bar-label">Faltas</span>
-						<div class="bar-track">
-							<div
-								class="bar-fill bar-faltas"
-								[style.width.%]="barPercent(stats()!.noAsistio)"
-							></div>
-						</div>
-						<span class="bar-value">{{ stats()!.noAsistio }}</span>
-					</div>
 				</div>
 			} @else {
 				<div class="widget-empty">
@@ -275,9 +265,6 @@ import { SkeletonLoaderComponent } from '@shared/components/skeleton-loader/skel
 			background: #ffcc0c;
 		}
 		.bar-falta {
-			background: #f44336;
-		}
-		.bar-faltas {
 			background: #f44336;
 		}
 		// #endregion
