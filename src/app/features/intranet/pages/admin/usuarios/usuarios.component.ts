@@ -32,6 +32,10 @@ import {
 } from './components/usuario-form-dialog/usuario-form-dialog.component';
 import { UsuariosImportDialogComponent } from './components/usuarios-import-dialog/usuarios-import-dialog.component';
 import {
+	UsuarioValidacionItem,
+	UsuariosValidationDialogComponent,
+} from './components/usuarios-validation-dialog/usuarios-validation-dialog.component';
+import {
 	UI_CONFIRM_HEADERS,
 	UI_CONFIRM_LABELS,
 	buildToggleUsuarioMessage,
@@ -60,6 +64,7 @@ import type { ImportarEstudianteItem } from './services';
 		UsuarioDetailDrawerComponent,
 		UsuarioFormDialogComponent,
 		UsuariosImportDialogComponent,
+		UsuariosValidationDialogComponent,
 	],
 	providers: [ConfirmationService],
 	templateUrl: './usuarios.component.html',
@@ -80,6 +85,12 @@ export class UsuariosComponent implements AfterViewInit {
 	readonly migracionLoading = signal(false);
 	readonly migracionCompletada = signal(false);
 	readonly migracionMensaje = signal('');
+
+	// * Validation dialog state
+	readonly validationDialogVisible = signal(false);
+	readonly validationLoading = signal(false);
+	readonly validationItems = signal<UsuarioValidacionItem[]>([]);
+	readonly validationAllValid = signal(false);
 
 	// * View-model snapshot from data facade (signals).
 	readonly vm = this.dataFacade.vm;
@@ -313,6 +324,82 @@ export class UsuariosComponent implements AfterViewInit {
 				this.migracionLoading.set(false);
 			},
 		});
+	}
+	// #endregion
+
+	// #region Validation handlers
+	onValidarDatos(): void {
+		this.validationDialogVisible.set(true);
+		this.validationLoading.set(true);
+		this.validationAllValid.set(false);
+		this.validationItems.set([]);
+
+		this.usuariosApi
+			.listarUsuarios()
+			.pipe(takeUntilDestroyed(this.destroyRef))
+			.subscribe({
+				next: (usuarios) => {
+					const invalidos = this.validarUsuarios(usuarios);
+					this.validationItems.set(invalidos);
+					this.validationAllValid.set(invalidos.length === 0);
+					this.validationLoading.set(false);
+				},
+				error: () => {
+					this.validationLoading.set(false);
+					logger.error('Error al cargar usuarios para validación');
+				},
+			});
+	}
+
+	onValidationDialogVisibleChange(visible: boolean): void {
+		if (!visible) {
+			this.validationDialogVisible.set(false);
+		}
+	}
+
+	private validarUsuarios(usuarios: UsuarioLista[]): UsuarioValidacionItem[] {
+		const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+		const TILDES_REGEX = /[áéíóúàèìòùäëïöüâêîôûñ]/i;
+		const DNI_REGEX = /^\d{8}$/;
+
+		const invalidos: UsuarioValidacionItem[] = [];
+
+		for (const u of usuarios) {
+			const errores: string[] = [];
+
+			// Validar DNI
+			const dni = (u.dni ?? '').trim();
+			if (!dni) {
+				errores.push('DNI vacío');
+			} else if (!DNI_REGEX.test(dni)) {
+				errores.push('DNI inválido');
+			}
+
+			// Validar correo apoderado (solo Estudiante)
+			if (u.rol === APP_USER_ROLES.Estudiante) {
+				const correo = (u.correoApoderado ?? '').trim();
+				if (!correo) {
+					errores.push('Correo apoderado vacío');
+				} else if (!EMAIL_REGEX.test(correo)) {
+					errores.push('Correo apoderado inválido');
+				} else if (TILDES_REGEX.test(correo)) {
+					errores.push('Correo apoderado con tilde');
+				}
+			}
+
+			if (errores.length > 0) {
+				invalidos.push({
+					nombreCompleto: u.nombreCompleto,
+					dni: u.dni ?? '',
+					correo: u.correoApoderado ?? u.correo ?? '',
+					rol: u.rol,
+					salonNombre: u.salonNombre ?? '',
+					errores,
+				});
+			}
+		}
+
+		return invalidos;
 	}
 	// #endregion
 

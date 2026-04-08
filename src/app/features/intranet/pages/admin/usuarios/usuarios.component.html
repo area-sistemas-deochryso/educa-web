@@ -63,6 +63,17 @@
 			(lazyLoad)="onLazyLoad($event)"
 		/>
 	}
+
+	<!-- * Botón de validación de datos -->
+	<div class="validation-action">
+		<button
+			pButton
+			label="Validar Datos"
+			icon="pi pi-check-circle"
+			class="p-button-outlined"
+			(click)="onValidarDatos()"
+		></button>
+	</div>
 </div>
 
 <!-- * Detail drawer -->
@@ -99,5 +110,13 @@
 	[result]="vm().importResult"
 	(visibleChange)="onImportDialogVisibleChange($event)"
 	(importar)="onImportar($event)"
+/>
+<!-- * Validation dialog -->
+<app-usuarios-validation-dialog
+	[visible]="validationDialogVisible()"
+	[loading]="validationLoading()"
+	[items]="validationItems()"
+	[allValid]="validationAllValid()"
+	(visibleChange)="onValidationDialogVisibleChange($event)"
 />
 <!-- #endregion -->

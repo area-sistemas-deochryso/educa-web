@@ -1,5 +1,7 @@
 # Importación Masiva de Estudiantes
 
+> **Estado**: ✅ Completado (verificado 2026-04-08)
+
 ## Objetivo
 Permitir crear/actualizar múltiples estudiantes desde un Excel multi-hoja. Cada hoja del archivo corresponde a un grado. La sesión (A, B, V) se elige globalmente antes de importar.
 

@@ -1,0 +1,96 @@
+<p-dialog
+	header="Validación de Datos de Usuarios"
+	[visible]="visible()"
+	(visibleChange)="onVisibleChange($event)"
+	[modal]="true"
+	[style]="{ width: '1000px', maxWidth: '95vw' }"
+	[draggable]="false"
+>
+	@if (loading()) {
+		<div class="validation-loading">
+			<i class="pi pi-spin pi-spinner" style="font-size: 2rem"></i>
+			<p>Validando datos de todos los usuarios...</p>
+		</div>
+	} @else if (allValid()) {
+		<div class="validation-success">
+			<i class="pi pi-check-circle"></i>
+			<h3>Todos los datos son válidos</h3>
+			<p>No se encontraron problemas de formato en DNI ni correo de apoderado.</p>
+		</div>
+	} @else {
+		<!-- #region Filtros -->
+		<div class="validation-toolbar">
+			<span class="p-input-icon-left search-field">
+				<i class="pi pi-search"></i>
+				<input
+					pInputText
+					type="text"
+					placeholder="Buscar por nombre, DNI, correo, rol..."
+					[ngModel]="searchTerm()"
+					(ngModelChange)="searchTerm.set($event)"
+				/>
+			</span>
+			<p-select
+				[options]="errorOptions()"
+				[ngModel]="filterError()"
+				(ngModelChange)="filterError.set($event)"
+				optionLabel="label"
+				optionValue="value"
+				placeholder="Tipo de error"
+				appendTo="body"
+				styleClass="error-filter"
+			/>
+		</div>
+		<!-- #endregion -->
+
+		<p class="validation-summary">
+			@if (filteredCount() === totalCount()) {
+				Se encontraron <strong>{{ totalCount() }}</strong> usuario(s) con datos inválidos o faltantes.
+			} @else {
+				Mostrando <strong>{{ filteredCount() }}</strong> de <strong>{{ totalCount() }}</strong> usuario(s) con problemas.
+			}
+		</p>
+
+		<p-table [value]="filteredItems()" [scrollable]="true" scrollHeight="400px" styleClass="p-datatable-sm">
+			<ng-template #header>
+				<tr>
+					<th style="width: 50px">#</th>
+					<th>Usuario</th>
+					<th>Rol</th>
+					<th>Salón</th>
+					<th>DNI</th>
+					<th>Correo Apoderado</th>
+					<th>Problemas</th>
+				</tr>
+			</ng-template>
+			<ng-template #body let-item let-i="rowIndex">
+				<tr>
+					<td>{{ i + 1 }}</td>
+					<td>{{ item.nombreCompleto }}</td>
+					<td>
+						<p-tag [value]="item.rol" severity="info" />
+					</td>
+					<td>{{ item.salonNombre || '—' }}</td>
+					<td [class.invalid-cell]="item.errores.includes('DNI vacío') || item.errores.includes('DNI inválido')">
+						{{ item.dni || '(vacío)' }}
+					</td>
+					<td [class.invalid-cell]="item.errores.includes('Correo apoderado vacío') || item.errores.includes('Correo apoderado inválido') || item.errores.includes('Correo apoderado con tilde')">
+						{{ item.correo || '(vacío)' }}
+					</td>
+					<td>
+						@for (error of item.errores; track error) {
+							<p-tag [value]="error" severity="danger" styleClass="mr-1 mb-1" />
+						}
+					</td>
+				</tr>
+			</ng-template>
+			<ng-template #emptymessage>
+				<tr>
+					<td colspan="7" class="empty-message">
+						No se encontraron resultados con los filtros aplicados.
+					</td>
+				</tr>
+			</ng-template>
+		</p-table>
+	}
+</p-dialog>

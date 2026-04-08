@@ -31,6 +31,7 @@ export interface UsuarioLista {
 	// Guardian fields for student
 	nombreApoderado?: string;
 	telefonoApoderado?: string;
+	correoApoderado?: string;
 	// Optimistic concurrency
 	rowVersion?: string;
 }

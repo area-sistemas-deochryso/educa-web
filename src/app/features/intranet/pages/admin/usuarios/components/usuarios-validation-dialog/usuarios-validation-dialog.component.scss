@@ -1,0 +1,152 @@
+// #region Loading & Success states
+.validation-loading {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	gap: 1rem;
+	padding: 3rem 1rem;
+	color: var(--text-color-secondary);
+
+	p {
+		margin: 0;
+		font-size: 0.95rem;
+	}
+}
+
+.validation-success {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	gap: 0.5rem;
+	padding: 3rem 1rem;
+	text-align: center;
+
+	i {
+		font-size: 3rem;
+		color: var(--green-500);
+	}
+
+	h3 {
+		margin: 0;
+		color: var(--text-color);
+		font-size: 1.25rem;
+	}
+
+	p {
+		margin: 0;
+		color: var(--text-color-secondary);
+		font-size: 0.9rem;
+	}
+}
+// #endregion
+
+// #region Toolbar
+.validation-toolbar {
+	display: flex;
+	gap: 0.75rem;
+	margin-bottom: 1rem;
+
+	.search-field {
+		flex: 1;
+		position: relative;
+
+		i {
+			position: absolute;
+			left: 0.75rem;
+			top: 50%;
+			transform: translateY(-50%);
+			color: var(--text-color-secondary);
+		}
+
+		input {
+			width: 100%;
+			padding-left: 2.25rem;
+		}
+	}
+}
+// #endregion
+
+// #region Summary
+.validation-summary {
+	margin: 0 0 1rem;
+	color: var(--text-color-secondary);
+	font-size: 0.9rem;
+}
+// #endregion
+
+// #region Table
+.invalid-cell {
+	color: var(--red-500);
+	font-weight: 600;
+}
+
+.empty-message {
+	text-align: center;
+	color: var(--text-color-secondary);
+	padding: 2rem !important;
+}
+// #endregion
+
+// #region Overrides PrimeNG
+:host ::ng-deep {
+	.p-inputtext,
+	.p-select {
+		background: transparent;
+		color: var(--text-color);
+		border-color: var(--surface-300);
+
+		&::placeholder {
+			color: var(--text-color-secondary);
+		}
+
+		&:enabled:focus {
+			border-color: var(--text-color);
+			box-shadow: 0 0 0 1px var(--text-color);
+		}
+	}
+
+	.p-select-label {
+		color: var(--text-color);
+	}
+
+	.p-select-dropdown {
+		color: var(--text-color);
+	}
+
+	.error-filter {
+		min-width: 200px;
+	}
+
+	.p-datatable {
+		background: transparent;
+
+		.p-datatable-table {
+			background: transparent;
+		}
+
+		.p-datatable-thead > tr > th {
+			background: transparent;
+		}
+
+		.p-datatable-tbody > tr {
+			background: transparent;
+
+			> td {
+				background: transparent;
+			}
+		}
+	}
+
+	.p-tag {
+		font-size: 0.75rem;
+	}
+}
+// #endregion
+
+// #region Responsive
+@media (max-width: 600px) {
+	.validation-toolbar {
+		flex-direction: column;
+	}
+}
+// #endregion

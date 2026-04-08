@@ -87,6 +87,15 @@
 }
 
 // #endregion
+
+// #region Validation action
+.validation-action {
+	display: flex;
+	justify-content: center;
+	margin-top: 1.5rem;
+}
+// #endregion
+
 // #region DEV MIGRATION PANEL
 .dev-migration-panel {
 	margin: 1.5rem 0;
