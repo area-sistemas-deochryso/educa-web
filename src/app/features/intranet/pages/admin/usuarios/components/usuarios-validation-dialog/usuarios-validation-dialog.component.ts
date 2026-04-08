@@ -1,11 +1,13 @@
 import { ChangeDetectionStrategy, Component, computed, input, output, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { ButtonModule } from 'primeng/button';
 import { DialogModule } from 'primeng/dialog';
 import { InputTextModule } from 'primeng/inputtext';
 import { SelectModule } from 'primeng/select';
 import { TableModule } from 'primeng/table';
 import { TagModule } from 'primeng/tag';
+import { TooltipModule } from 'primeng/tooltip';
 
 // #region Model
 export interface UsuarioValidacionItem {
@@ -26,7 +28,7 @@ export interface ErrorFilterOption {
 @Component({
 	selector: 'app-usuarios-validation-dialog',
 	standalone: true,
-	imports: [CommonModule, FormsModule, DialogModule, InputTextModule, SelectModule, TableModule, TagModule],
+	imports: [CommonModule, FormsModule, ButtonModule, DialogModule, InputTextModule, SelectModule, TableModule, TagModule, TooltipModule],
 	templateUrl: './usuarios-validation-dialog.component.html',
 	styleUrl: './usuarios-validation-dialog.component.scss',
 	changeDetection: ChangeDetectionStrategy.OnPush,
@@ -38,6 +40,7 @@ export class UsuariosValidationDialogComponent {
 	readonly allValid = input(false);
 
 	readonly visibleChange = output<boolean>();
+	readonly editUsuario = output<UsuarioValidacionItem>();
 
 	// #region Estado local de filtros
 	readonly searchTerm = signal('');

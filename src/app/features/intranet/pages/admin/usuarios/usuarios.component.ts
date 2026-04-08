@@ -91,6 +91,7 @@ export class UsuariosComponent implements AfterViewInit {
 	readonly validationLoading = signal(false);
 	readonly validationItems = signal<UsuarioValidacionItem[]>([]);
 	readonly validationAllValid = signal(false);
+	private validationUsuarios = signal<UsuarioLista[]>([]);
 
 	// * View-model snapshot from data facade (signals).
 	readonly vm = this.dataFacade.vm;
@@ -339,6 +340,7 @@ export class UsuariosComponent implements AfterViewInit {
 			.pipe(takeUntilDestroyed(this.destroyRef))
 			.subscribe({
 				next: (usuarios) => {
+					this.validationUsuarios.set(usuarios);
 					const invalidos = this.validarUsuarios(usuarios);
 					this.validationItems.set(invalidos);
 					this.validationAllValid.set(invalidos.length === 0);
@@ -357,6 +359,14 @@ export class UsuariosComponent implements AfterViewInit {
 		}
 	}
 
+	onEditFromValidation(item: UsuarioValidacionItem): void {
+		const usuario = this.validationUsuarios().find(
+			(u) => u.dni === item.dni && u.rol === item.rol,
+		);
+		if (!usuario) return;
+		this.uiFacade.editUsuario(usuario);
+	}
+
 	private validarUsuarios(usuarios: UsuarioLista[]): UsuarioValidacionItem[] {
 		const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 		const TILDES_REGEX = /[áéíóúàèìòùäëïöüâêîôûñ]/i;
@@ -373,6 +383,13 @@ export class UsuariosComponent implements AfterViewInit {
 				errores.push('DNI vacío');
 			} else if (!DNI_REGEX.test(dni)) {
 				errores.push('DNI inválido');
+			} else {
+				if (this.esDniDigitosIguales(dni)) {
+					errores.push('DNI imposible (dígitos iguales)');
+				}
+				if (!this.validarDniModulo11(dni)) {
+					errores.push('DNI no pasa verificación SUNAT');
+				}
 			}
 
 			// Validar correo apoderado (solo Estudiante)
@@ -400,6 +417,32 @@ export class UsuariosComponent implements AfterViewInit {
 		}
 
 		return invalidos;
+	}
+
+	/** DNI con todos los dígitos iguales (11111111, 00000000, etc.) */
+	private esDniDigitosIguales(dni: string): boolean {
+		return dni.split('').every((d) => d === dni[0]);
+	}
+
+	/**
+	 * Algoritmo Módulo 11 de SUNAT: convierte DNI a RUC-10
+	 * y verifica que el dígito verificador sea válido (0-9).
+	 * Prefijo "10" + 8 dígitos DNI → pesos [5,4,3,2,7,6,5,4,3,2].
+	 */
+	private validarDniModulo11(dni: string): boolean {
+		const ruc10 = `10${dni}`;
+		const pesos = [5, 4, 3, 2, 7, 6, 5, 4, 3, 2];
+
+		let suma = 0;
+		for (let i = 0; i < 10; i++) {
+			suma += Number(ruc10[i]) * pesos[i];
+		}
+
+		const residuo = suma % 11;
+		const digito = 11 - residuo;
+
+		// digito 11 → 0, digito 10 → inválido (no existe dígito verificador de un solo carácter)
+		return digito <= 9 || digito === 11;
 	}
 	// #endregion
 

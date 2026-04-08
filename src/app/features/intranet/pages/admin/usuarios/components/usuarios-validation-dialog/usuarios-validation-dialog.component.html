@@ -54,39 +54,47 @@
 		<p-table [value]="filteredItems()" [scrollable]="true" scrollHeight="400px" styleClass="p-datatable-sm">
 			<ng-template #header>
 				<tr>
-					<th style="width: 50px">#</th>
+					<th>DNI</th>
 					<th>Usuario</th>
 					<th>Rol</th>
-					<th>Salón</th>
-					<th>DNI</th>
-					<th>Correo Apoderado</th>
 					<th>Problemas</th>
+					<th>Correo Apoderado</th>
+					<th style="width: 60px"></th>
 				</tr>
 			</ng-template>
-			<ng-template #body let-item let-i="rowIndex">
+			<ng-template #body let-item>
 				<tr>
-					<td>{{ i + 1 }}</td>
+					<td [class.invalid-cell]="item.errores.join(',').includes('DNI')">
+						{{ item.dni || '(vacío)' }}
+					</td>
 					<td>{{ item.nombreCompleto }}</td>
 					<td>
 						<p-tag [value]="item.rol" severity="info" />
-					</td>
-					<td>{{ item.salonNombre || '—' }}</td>
-					<td [class.invalid-cell]="item.errores.includes('DNI vacío') || item.errores.includes('DNI inválido')">
-						{{ item.dni || '(vacío)' }}
-					</td>
-					<td [class.invalid-cell]="item.errores.includes('Correo apoderado vacío') || item.errores.includes('Correo apoderado inválido') || item.errores.includes('Correo apoderado con tilde')">
-						{{ item.correo || '(vacío)' }}
 					</td>
 					<td>
 						@for (error of item.errores; track error) {
 							<p-tag [value]="error" severity="danger" styleClass="mr-1 mb-1" />
 						}
 					</td>
+					<td [class.invalid-cell]="item.errores.join(',').includes('Correo')">
+						{{ item.correo || '(vacío)' }}
+					</td>
+					<td>
+						<button
+							pButton
+							icon="pi pi-pencil"
+							class="p-button-rounded p-button-text p-button-info"
+							pTooltip="Editar"
+							tooltipPosition="top"
+							(click)="editUsuario.emit(item)"
+							[pt]="{ root: { 'aria-label': 'Editar' } }"
+						></button>
+					</td>
 				</tr>
 			</ng-template>
 			<ng-template #emptymessage>
 				<tr>
-					<td colspan="7" class="empty-message">
+					<td colspan="6" class="empty-message">
 						No se encontraron resultados con los filtros aplicados.
 					</td>
 				</tr>

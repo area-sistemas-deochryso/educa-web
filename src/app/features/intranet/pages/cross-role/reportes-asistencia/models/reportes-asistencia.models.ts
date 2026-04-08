@@ -9,6 +9,16 @@ export type RangoTipo = (typeof RANGO_TIPOS)[number];
 // #endregion
 
 // #region DTOs de respuesta API
+export interface EstadisticasAsistenciaDia {
+	total: number;
+	temprano: number;
+	aTiempo: number;
+	fueraHora: number;
+	noAsistio: number;
+	justificado: number;
+	pendiente: number;
+}
+
 export interface ReporteFiltrado {
 	nombreSede: string;
 	filtroEstado: EstadoFiltro;
@@ -20,6 +30,7 @@ export interface ReporteFiltrado {
 	totalEstudiantesGeneral: number;
 	totalFiltrados: number;
 	salones: SalonReporteFiltrado[];
+	estadisticas: EstadisticasAsistenciaDia;
 }
 
 export interface SalonReporteFiltrado {
@@ -28,6 +39,8 @@ export interface SalonReporteFiltrado {
 	totalEstudiantes: number;
 	totalFiltrados: number;
 	estudiantes: EstudianteReporteFiltrado[];
+	estadisticas: EstadisticasAsistenciaDia;
+	porcentajeAsistencia: number;
 }
 
 export interface EstudianteReporteFiltrado {
@@ -37,6 +50,8 @@ export interface EstudianteReporteFiltrado {
 	horaLlegada: string | null;
 	horaSalida: string | null;
 	observacion: string | null;
+	estadoCodigo: string;
+	estadoDescripcion: string;
 }
 // #endregion
 

@@ -317,8 +317,10 @@ export class UsuariosDataFacade {
 					const paginated = data as { data: UsuarioLista[]; total: number; page: number; pageSize: number };
 					this.store.setUsuarios(paginated.data);
 					this.store.setPaginationData(paginated.page, paginated.pageSize, paginated.total);
+				} else if (Array.isArray(data)) {
+					this.store.setUsuarios(data);
 				} else {
-					this.store.setUsuarios(data as UsuarioLista[]);
+					logger.warn('[UsuariosDataFacade] Formato de cache inesperado, ignorando');
 				}
 			});
 
