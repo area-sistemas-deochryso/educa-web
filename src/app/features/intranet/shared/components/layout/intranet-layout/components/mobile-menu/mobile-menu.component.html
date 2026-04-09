@@ -1,5 +1,4 @@
 <!-- #region Template -->
-<!-- * Mobile hamburger + slide-out nav. -->
 <button class="hamburger-btn" (click)="toggle()" [class.open]="isOpen()" aria-label="Menú">
 	<span class="hamburger-line"></span>
 	<span class="hamburger-line"></span>
@@ -23,87 +22,83 @@
 			</picture>
 		</a>
 
-		<div class="nav-items">
-			@for (item of items; track item.label) {
-				@if (item.children && item.children.length > 0) {
-					<!-- * Parent item with children. -->
-					<div class="nav-group" [class.expanded]="isExpanded(item.label)">
-						<button class="mobile-nav-item parent" (click)="toggleSubmenu(item.label)">
-							<i [class]="item.icon"></i>
-							<span>{{ item.label }}</span>
-							<i class="pi pi-chevron-down chevron"></i>
-						</button>
-						@if (isExpanded(item.label)) {
-							<div class="submenu">
-								@for (child of item.children; track child.label) {
-									@if (child.children && child.children.length > 0) {
-										<!-- * Nested parent group. -->
-										<div
-											class="nav-group nested"
-											[class.expanded]="isExpanded(child.label)"
-										>
-											<button
-												class="mobile-nav-item parent nested"
-												(click)="toggleSubmenu(child.label)"
-											>
-												<i [class]="child.icon"></i>
-												<span>{{ child.label }}</span>
-												<i class="pi pi-chevron-down chevron"></i>
-											</button>
-											@if (isExpanded(child.label)) {
-												<div class="submenu nested">
-													@for (
-														grandchild of child.children;
-														track grandchild.label
-													) {
-														<a
-															[routerLink]="grandchild.route"
-															routerLinkActive="active"
-															[routerLinkActiveOptions]="{
-																exact: grandchild.exact ?? false,
-															}"
-															class="mobile-nav-item leaf"
-															(click)="close()"
-														>
-															<i [class]="grandchild.icon"></i>
-															<span>{{ grandchild.label }}</span>
-														</a>
-													}
-												</div>
-											}
-										</div>
-									} @else {
-										<!-- * Leaf child link. -->
-										<a
-											[routerLink]="child.route"
-											routerLinkActive="active"
-											[routerLinkActiveOptions]="{
-												exact: child.exact ?? false,
-											}"
-											class="mobile-nav-item leaf"
-											(click)="close()"
-										>
-											<i [class]="child.icon"></i>
-											<span>{{ child.label }}</span>
-										</a>
-									}
-								}
-							</div>
+		<!-- * Module pills (circular, 5 visible, long-press preview). -->
+		<div class="module-pills">
+			@for (modulo of visiblePills(); track modulo.id) {
+				<div
+					class="pill-wrapper"
+					[class.active]="selectedModuloId() === modulo.id"
+					[class.previewing]="previewModuloId() === modulo.id"
+				>
+					<button
+						type="button"
+						class="module-pill"
+						[class.active]="selectedModuloId() === modulo.id"
+						(click)="selectModulo(modulo.id)"
+						(touchstart)="onPillPressStart(modulo.id)"
+						(touchend)="onPillPressEnd()"
+						(touchcancel)="onPillPressEnd()"
+						(mousedown)="onPillPressStart(modulo.id)"
+						(mouseup)="onPillPressEnd()"
+						(mouseleave)="onPillPressEnd()"
+						[attr.aria-label]="modulo.label"
+					>
+						<i [class]="modulo.icon"></i>
+						@if (selectedModuloId() === modulo.id) {
+							<span class="pill-label">{{ modulo.label }}</span>
 						}
-					</div>
-				} @else {
-					<!-- * Simple leaf item. -->
+					</button>
+					<!-- * Preview: long-press (touch) o hover (desktop). -->
+					@if (modulo.items.length > 0) {
+						<div class="pill-preview">
+							<div class="pill-preview-header">{{ modulo.label }}</div>
+							@for (item of modulo.items; track item.route) {
+								<div class="pill-preview-item">
+									<i [class]="item.icon"></i>
+									<span>{{ item.label }}</span>
+								</div>
+							}
+						</div>
+					}
+				</div>
+			}
+		</div>
+
+		<!-- * Nav items (circular, 3 visible). -->
+		<div class="nav-items">
+			@for (item of visibleNavItems(); track item.label) {
+				<div class="nav-item-row">
 					<a
 						[routerLink]="item.route"
+						[queryParams]="item.queryParams"
 						routerLinkActive="active"
 						[routerLinkActiveOptions]="{ exact: item.exact ?? false }"
 						class="mobile-nav-item"
-						(click)="close()"
+						(click)="onNavItemClick(item); close()"
 					>
 						<i [class]="item.icon"></i>
 						<span>{{ item.label }}</span>
 					</a>
-				}
+					@if (favoritesService.isPersonalizing() && item.route) {
+						<button
+							type="button"
+							class="star-btn"
+							[class.starred]="favoritesService.isFavorite(item.route)"
+							[disabled]="!favoritesService.isFavorite(item.route) && !favoritesService.canAddMore()"
+							(click)="onStarClick($event, item.route)"
+							[attr.aria-label]="favoritesService.isFavorite(item.route) ? 'Quitar de accesos rápidos' : 'Agregar a accesos rápidos'"
+						>
+							<i [class]="favoritesService.isFavorite(item.route) ? 'pi pi-star-fill' : 'pi pi-star'"></i>
+						</button>
+					}
+				</div>
+			}
+
+			@if (visibleNavItems().length === 0) {
+				<div class="empty-module">
+					<i class="pi pi-home" style="font-size: 1.5rem; opacity: 0.4"></i>
+					<span>Selecciona un módulo</span>
+				</div>
 			}
 		</div>
 

@@ -42,7 +42,7 @@ export class AttendancePdfService {
 		this.downloadingPdf.set(true);
 
 		this.asistenciaService
-			.descargarPdfAsistenciaDia(ctx.gradoCodigo, ctx.seccion, fecha)
+			.descargarPdfAsistenciaDia(ctx.grado, ctx.seccion, fecha)
 			.pipe(
 				takeUntilDestroyed(this.destroyRef),
 				finalize(() => this.downloadingPdf.set(false)),
@@ -59,7 +59,7 @@ export class AttendancePdfService {
 		this.downloadingPdf.set(true);
 
 		this.asistenciaService
-			.descargarPdfAsistenciaDia(ctx.gradoCodigo, ctx.seccion, fecha)
+			.descargarPdfAsistenciaDia(ctx.grado, ctx.seccion, fecha)
 			.pipe(
 				takeUntilDestroyed(this.destroyRef),
 				finalize(() => this.downloadingPdf.set(false)),
@@ -74,11 +74,11 @@ export class AttendancePdfService {
 	// #endregion
 
 	// #region PDF Mes
-	verPdfAsistenciaMes(gradoCodigo: string, seccion: string, grado: string, mes: number, anio: number): void {
+	verPdfAsistenciaMes(grado: string, seccion: string, mes: number, anio: number): void {
 		this.downloadingPdf.set(true);
 
 		this.asistenciaService
-			.descargarPdfAsistenciaMes(gradoCodigo, seccion, mes, anio)
+			.descargarPdfAsistenciaMes(grado, seccion, mes, anio)
 			.pipe(
 				takeUntilDestroyed(this.destroyRef),
 				finalize(() => this.downloadingPdf.set(false)),
@@ -88,11 +88,11 @@ export class AttendancePdfService {
 			});
 	}
 
-	descargarPdfAsistenciaMes(gradoCodigo: string, seccion: string, grado: string, mes: number, anio: number): void {
+	descargarPdfAsistenciaMes(grado: string, seccion: string, mes: number, anio: number): void {
 		this.downloadingPdf.set(true);
 
 		this.asistenciaService
-			.descargarPdfAsistenciaMes(gradoCodigo, seccion, mes, anio)
+			.descargarPdfAsistenciaMes(grado, seccion, mes, anio)
 			.pipe(
 				takeUntilDestroyed(this.destroyRef),
 				finalize(() => this.downloadingPdf.set(false)),
@@ -107,11 +107,11 @@ export class AttendancePdfService {
 	// #endregion
 
 	// #region PDF Periodo
-	verPdfAsistenciaPeriodo(gradoCodigo: string, seccion: string, mesI: number, anio: number, mesF: number): void {
+	verPdfAsistenciaPeriodo(grado: string, seccion: string, mesI: number, anio: number, mesF: number): void {
 		this.downloadingPdf.set(true);
 
 		this.asistenciaService
-			.descargarPdfAsistenciaPeriodo(gradoCodigo, seccion, mesI, anio, mesF, anio)
+			.descargarPdfAsistenciaPeriodo(grado, seccion, mesI, anio, mesF, anio)
 			.pipe(
 				takeUntilDestroyed(this.destroyRef),
 				finalize(() => this.downloadingPdf.set(false)),
@@ -122,9 +122,8 @@ export class AttendancePdfService {
 	}
 
 	descargarPdfAsistenciaPeriodo(
-		gradoCodigo: string,
-		seccion: string,
 		grado: string,
+		seccion: string,
 		mesI: number,
 		anio: number,
 		mesF: number,
@@ -132,7 +131,7 @@ export class AttendancePdfService {
 		this.downloadingPdf.set(true);
 
 		this.asistenciaService
-			.descargarPdfAsistenciaPeriodo(gradoCodigo, seccion, mesI, anio, mesF, anio)
+			.descargarPdfAsistenciaPeriodo(grado, seccion, mesI, anio, mesF, anio)
 			.pipe(
 				takeUntilDestroyed(this.destroyRef),
 				finalize(() => this.downloadingPdf.set(false)),
@@ -160,7 +159,7 @@ export class AttendancePdfService {
 		const anio = fecha.getFullYear();
 
 		this.asistenciaService
-			.descargarPdfAsistenciaMes(ctx.gradoCodigo, ctx.seccion, mes, anio)
+			.descargarPdfAsistenciaMes(ctx.grado, ctx.seccion, mes, anio)
 			.pipe(
 				takeUntilDestroyed(this.destroyRef),
 				finalize(() => this.downloadingPdf.set(false)),
@@ -179,7 +178,7 @@ export class AttendancePdfService {
 		const anio = fecha.getFullYear();
 
 		this.asistenciaService
-			.descargarPdfAsistenciaMes(ctx.gradoCodigo, ctx.seccion, mes, anio)
+			.descargarPdfAsistenciaMes(ctx.grado, ctx.seccion, mes, anio)
 			.pipe(
 				takeUntilDestroyed(this.destroyRef),
 				finalize(() => this.downloadingPdf.set(false)),
@@ -205,7 +204,7 @@ export class AttendancePdfService {
 		const mesFin = anio === hoy.getFullYear() ? hoy.getMonth() + 1 : 12;
 
 		this.asistenciaService
-			.descargarPdfAsistenciaPeriodo(ctx.gradoCodigo, ctx.seccion, 1, anio, mesFin, anio)
+			.descargarPdfAsistenciaPeriodo(ctx.grado, ctx.seccion, 1, anio, mesFin, anio)
 			.pipe(
 				takeUntilDestroyed(this.destroyRef),
 				finalize(() => this.downloadingPdf.set(false)),
@@ -225,7 +224,7 @@ export class AttendancePdfService {
 		const mesFin = anio === hoy.getFullYear() ? hoy.getMonth() + 1 : 12;
 
 		this.asistenciaService
-			.descargarPdfAsistenciaPeriodo(ctx.gradoCodigo, ctx.seccion, 1, anio, mesFin, anio)
+			.descargarPdfAsistenciaPeriodo(ctx.grado, ctx.seccion, 1, anio, mesFin, anio)
 			.pipe(
 				takeUntilDestroyed(this.destroyRef),
 				finalize(() => this.downloadingPdf.set(false)),

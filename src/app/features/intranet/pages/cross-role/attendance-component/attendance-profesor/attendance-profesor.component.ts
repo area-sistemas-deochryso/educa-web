@@ -89,10 +89,10 @@ export class AttendanceProfesorComponent implements OnInit {
 	ngOnInit(): void {
 		// * Configure shared controller callbacks for profesor endpoints + storage.
 		this.view.init({
-			loadEstudiantes: (gradoCodigo, seccion, mes, anio) =>
-				this.asistenciaService.getAsistenciasGrado(gradoCodigo, seccion, mes, anio),
-			loadDia: (gradoCodigo, seccion, fecha) =>
-				this.asistenciaService.getAsistenciaDia(gradoCodigo, seccion, fecha),
+			loadEstudiantes: (grado, seccion, mes, anio) =>
+				this.asistenciaService.getAsistenciasGrado(grado, seccion, mes, anio),
+			loadDia: (grado, seccion, fecha) =>
+				this.asistenciaService.getAsistenciaDia(grado, seccion, fecha),
 			getSelectorContext: () => this.getSelectorContext(),
 			onMonthChange: () => this.reselectSalonIfNeeded(),
 			getStoredEstudianteId: () => this.storage.getSelectedEstudianteId(),

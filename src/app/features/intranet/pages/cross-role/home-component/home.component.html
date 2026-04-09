@@ -10,20 +10,44 @@
 		<app-profesor-attendance-widget />
 	}
 
-	@if (showQuickAccess() && quickAccessItems().length > 0) {
+	@if (showQuickAccess()) {
 		<section class="quick-access">
-			<h2>Accesos Rápidos</h2>
-			<div class="quick-access-grid">
-				@for (item of quickAccessItems(); track item.route) {
-					<app-quick-access-card
-						[label]="item.label"
-						[path]="item.route"
-						[icon]="item.icon"
-						[description]="item.description"
-						[preview]="item.preview"
-					/>
-				}
+			<div class="quick-access-header">
+				<h2>Accesos Rápidos</h2>
+				<button
+					type="button"
+					class="personalizar-btn"
+					(click)="togglePersonalizing()"
+				>
+					@if (favoritesService.isPersonalizing()) {
+						<i class="pi pi-check"></i>
+						<span>Listo</span>
+					} @else {
+						<i class="pi pi-cog"></i>
+						<span>Personalizar</span>
+					}
+				</button>
 			</div>
+			@if (favoritesService.isPersonalizing()) {
+				<p class="personalizar-hint">
+					Abre los menús de navegación y marca con <i class="pi pi-star"></i> hasta 4 páginas como accesos rápidos.
+				</p>
+			}
+			@if (quickAccessItems().length > 0) {
+				<div class="quick-access-grid">
+					@for (item of quickAccessItems(); track item.route) {
+						<app-quick-access-card
+							[label]="item.label"
+							[path]="item.route"
+							[icon]="item.icon"
+							[description]="item.description"
+							[preview]="item.preview"
+						/>
+					}
+				</div>
+			} @else if (!favoritesService.isPersonalizing()) {
+				<p class="no-favorites-hint">No tienes accesos rápidos configurados.</p>
+			}
 		</section>
 	}
 </div>

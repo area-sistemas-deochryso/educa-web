@@ -6,6 +6,7 @@ import { FeatureFlagsFacade } from '@core/services/feature-flags';
 import { StorageService } from '@core/services';
 import { UserPermisosService } from '@core/services/permisos/user-permisos.service';
 import { UserProfileService } from '@core/services/user/user-profile.service';
+import { QuickAccessFavoritesService } from '@intranet-shared/services';
 import { WelcomeSectionComponent } from '@features/intranet/components/welcome-section/welcome-section';
 import { AttendanceSummaryWidgetComponent } from './components/attendance-summary-widget/attendance-summary-widget.component';
 import { ProfesorAttendanceWidgetComponent } from './components/profesor-attendance-widget/profesor-attendance-widget.component';
@@ -27,6 +28,7 @@ export class HomeComponent {
 	private flags = inject(FeatureFlagsFacade);
 	private userPermisos = inject(UserPermisosService);
 	private userProfile = inject(UserProfileService);
+	readonly favoritesService = inject(QuickAccessFavoritesService);
 	// #endregion
 
 	// #region Estado
@@ -44,17 +46,28 @@ export class HomeComponent {
 		return 'Bienvenido a tu Intranet';
 	});
 
-	/** First 4 role-based shortcuts that the user has permission for. */
+	/** Favorites first, then role defaults as fallback. */
 	readonly quickAccessItems = computed<QuickAccessItem[]>(() => {
 		const user = this.storage.getUser();
 		if (!user?.rol) return [];
 
-		const candidates = QUICK_ACCESS_BY_ROLE[user.rol] ?? [];
+		// Si hay favoritos, resolverlos desde MENU_ITEMS
+		if (this.favoritesService.hasFavorites()) {
+			return this.favoritesService
+				.resolveFavorites()
+				.filter((item) => this.userPermisos.tienePermiso(item.permiso));
+		}
 
+		// Fallback: defaults por rol
+		const candidates = QUICK_ACCESS_BY_ROLE[user.rol] ?? [];
 		return candidates
 			.filter((item) => this.userPermisos.tienePermiso(item.permiso))
 			.slice(0, MAX_QUICK_ACCESS);
 	});
+
+	togglePersonalizing(): void {
+		this.favoritesService.togglePersonalizing();
+	}
 	// #endregion
 }
 // #endregion

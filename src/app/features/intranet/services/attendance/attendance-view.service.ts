@@ -41,10 +41,10 @@ export interface SelectorContext {
  */
 export interface AttendanceViewConfig {
 	/** Cargar estudiantes con asistencias mensuales */
-	loadEstudiantes(gradoCodigo: string, seccion: string, mes: number, anio: number): Observable<EstudianteAsistencia[]>;
+	loadEstudiantes(grado: string, seccion: string, mes: number, anio: number): Observable<EstudianteAsistencia[]>;
 	/** Cargar asistencias de un día específico con estadísticas */
 	loadDia(
-		gradoCodigo: string,
+		grado: string,
 		seccion: string,
 		fecha: Date,
 	): Observable<AsistenciaDiaConEstadisticas>;
@@ -222,7 +222,7 @@ export class AttendanceViewController {
 		const { selectedMonth, selectedYear } = this.ingresos();
 
 		this.config
-			.loadEstudiantes(ctx.gradoCodigo, ctx.seccion, selectedMonth, selectedYear)
+			.loadEstudiantes(ctx.grado, ctx.seccion, selectedMonth, selectedYear)
 			.pipe(
 				takeUntilDestroyed(this.destroyRef),
 				finalize(() => {
@@ -325,7 +325,7 @@ export class AttendanceViewController {
 		const { selectedMonth, selectedYear } = this.ingresos();
 
 		this.config
-			.loadEstudiantes(ctx.gradoCodigo, ctx.seccion, selectedMonth, selectedYear)
+			.loadEstudiantes(ctx.grado, ctx.seccion, selectedMonth, selectedYear)
 			.pipe(takeUntilDestroyed(this.destroyRef))
 			.subscribe({
 				next: (estudiantes) => {
@@ -353,7 +353,7 @@ export class AttendanceViewController {
 		const { selectedMonth, selectedYear } = this.salidas();
 
 		this.config
-			.loadEstudiantes(ctx.gradoCodigo, ctx.seccion, selectedMonth, selectedYear)
+			.loadEstudiantes(ctx.grado, ctx.seccion, selectedMonth, selectedYear)
 			.pipe(takeUntilDestroyed(this.destroyRef))
 			.subscribe({
 				next: (estudiantes) => {
@@ -402,7 +402,7 @@ export class AttendanceViewController {
 		this.loading.set(true);
 
 		this.config
-			.loadDia(ctx.gradoCodigo, ctx.seccion, this.fechaDia())
+			.loadDia(ctx.grado, ctx.seccion, this.fechaDia())
 			.pipe(
 				takeUntilDestroyed(this.destroyRef),
 				finalize(() => this.loading.set(false)),
@@ -430,14 +430,14 @@ export class AttendanceViewController {
 		const ctx = this.config.getSelectorContext();
 		if (!ctx) return;
 		const { selectedMonth, selectedYear } = this.ingresos();
-		this.pdfService.verPdfAsistenciaMes(ctx.gradoCodigo, ctx.seccion, ctx.grado, selectedMonth, selectedYear);
+		this.pdfService.verPdfAsistenciaMes(ctx.grado, ctx.seccion, selectedMonth, selectedYear);
 	}
 
 	descargarPdfAsistenciaMes(): void {
 		const ctx = this.config.getSelectorContext();
 		if (!ctx) return;
 		const { selectedMonth, selectedYear } = this.ingresos();
-		this.pdfService.descargarPdfAsistenciaMes(ctx.gradoCodigo, ctx.seccion, ctx.grado, selectedMonth, selectedYear);
+		this.pdfService.descargarPdfAsistenciaMes(ctx.grado, ctx.seccion, selectedMonth, selectedYear);
 	}
 
 	verPdfAsistenciaPeriodo(): void {
@@ -446,7 +446,7 @@ export class AttendanceViewController {
 		const mesI = this.periodoInicio();
 		const mesF = this.periodoFin();
 		const anio = this.ingresos().selectedYear;
-		this.pdfService.verPdfAsistenciaPeriodo(ctx.gradoCodigo, ctx.seccion, mesI, anio, mesF);
+		this.pdfService.verPdfAsistenciaPeriodo(ctx.grado, ctx.seccion, mesI, anio, mesF);
 	}
 
 	descargarPdfAsistenciaPeriodo(): void {
@@ -455,7 +455,7 @@ export class AttendanceViewController {
 		const mesI = this.periodoInicio();
 		const mesF = this.periodoFin();
 		const anio = this.ingresos().selectedYear;
-		this.pdfService.descargarPdfAsistenciaPeriodo(ctx.gradoCodigo, ctx.seccion, ctx.grado, mesI, anio, mesF);
+		this.pdfService.descargarPdfAsistenciaPeriodo(ctx.grado, ctx.seccion, mesI, anio, mesF);
 	}
 
 	verPdfSalonMes(): void {

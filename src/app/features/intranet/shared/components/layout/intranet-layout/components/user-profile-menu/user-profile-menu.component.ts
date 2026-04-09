@@ -45,6 +45,7 @@ export class UserProfileMenuComponent {
 	readonly infoDialogVisible = signal(false);
 
 	readonly displayName = this.userProfile.displayName;
+	readonly shortName = this.userProfile.shortName;
 	readonly userRole = this.userProfile.userRole;
 	readonly initials = this.userProfile.initials;
 

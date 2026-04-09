@@ -1,6 +1,6 @@
 <!-- #region Template -->
-<!-- * Intranet shell with desktop + mobile navigation. -->
 <header class="intranet-header">
+	<!-- #region Desktop header -->
 	<div class="header-container desktop-header">
 		<a routerLink="/" class="logo-link">
 			<picture>
@@ -17,21 +17,58 @@
 			</picture>
 		</a>
 
+		<!-- * Module pills (circular, between logo and nav). -->
+		<div class="module-pills">
+			@for (modulo of visiblePills(); track modulo.id) {
+				<div class="pill-wrapper" [class.active]="selectedModuloId() === modulo.id">
+					<button
+						type="button"
+						class="module-pill"
+						[class.active]="selectedModuloId() === modulo.id"
+						(click)="selectModulo(modulo.id)"
+						[attr.aria-label]="modulo.label"
+					>
+						<i [class]="modulo.icon"></i>
+						@if (selectedModuloId() === modulo.id) {
+							<span class="pill-label">{{ modulo.label }}</span>
+						}
+					</button>
+					<!-- * Hover preview. -->
+					@if (modulo.items.length > 0) {
+						<div class="pill-preview">
+							<div class="pill-preview-header">{{ modulo.label }}</div>
+							@for (item of modulo.items; track item.route) {
+								<div class="pill-preview-item">
+									<i [class]="item.icon"></i>
+									<span>{{ item.label }}</span>
+								</div>
+							}
+						</div>
+					}
+				</div>
+			}
+		</div>
+
+		<!-- * Nav items of selected module (circular window of 3, with dropdown support). -->
 		<nav class="nav-links">
-			@for (item of navItems(); track item.label) {
+			@for (item of visibleNavItems(); track item.label) {
 				<app-nav-item
 					[route]="item.route"
 					[label]="item.label"
 					[icon]="item.icon"
 					[exact]="item.exact ?? false"
+					[queryParams]="item.queryParams"
 					[children]="item.children"
+					(click)="onNavItemClick(item)"
 				/>
 			}
 		</nav>
 
 		<app-user-profile-menu (logoutClick)="logout()" />
 	</div>
+	<!-- #endregion -->
 
+	<!-- #region Mobile header -->
 	<div class="header-container mobile-header">
 		<a routerLink="/" class="logo-link">
 			<picture>
@@ -47,18 +84,17 @@
 				/>
 			</picture>
 		</a>
-		<app-mobile-menu [items]="navItems()" (logoutClick)="logout()" />
+		<app-mobile-menu [modulos]="modulos()" (logoutClick)="logout()" />
 	</div>
+	<!-- #endregion -->
 </header>
 
 <app-offline-indicator />
 
-<!-- * Routed intranet content. -->
 <main class="intranet-content">
 	<router-outlet />
 </main>
 
-<!-- * Optional floating widgets. -->
 @if (showNotifications()) {
 	<app-floating-notification-bell />
 }

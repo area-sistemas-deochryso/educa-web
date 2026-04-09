@@ -26,6 +26,9 @@ const PREFERENCES_KEYS = {
 	THEME: 'educa_pref_theme',
 	SIDEBAR_COLLAPSED: 'educa_pref_sidebar_collapsed',
 	NOTIFICATIONS_SOUND: 'educa_pref_notif_sound',
+
+	// Quick access favorites
+	FAVORITE_ROUTES: 'educa_pref_favorite_routes',
 } as const;
 
 /**
@@ -416,6 +419,17 @@ export class PreferencesStorageService {
 	}
 
 	// #endregion
+	// #region QUICK ACCESS FAVORITES
+
+	getFavoriteRoutes(): string[] {
+		return this.getJSON<string[]>(PREFERENCES_KEYS.FAVORITE_ROUTES) ?? [];
+	}
+
+	setFavoriteRoutes(routes: string[]): void {
+		this.setJSON(PREFERENCES_KEYS.FAVORITE_ROUTES, routes);
+	}
+
+	// #endregion
 	// #region UTILITIES
 
 	/**
@@ -429,6 +443,7 @@ export class PreferencesStorageService {
 		this.removeItem(PREFERENCES_KEYS.THEME);
 		this.removeItem(PREFERENCES_KEYS.SIDEBAR_COLLAPSED);
 		this.removeItem(PREFERENCES_KEYS.NOTIFICATIONS_SOUND);
+		this.removeItem(PREFERENCES_KEYS.FAVORITE_ROUTES);
 	}
 	// #endregion
 }

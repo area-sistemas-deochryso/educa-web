@@ -1,5 +1,7 @@
 // #region Imports
-import { ChangeDetectionStrategy, Component, computed, inject, OnInit, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, inject, OnInit, signal, DestroyRef } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { ActivatedRoute } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ConfirmationService } from 'primeng/api';
@@ -71,6 +73,8 @@ export class AsistenciasComponent implements OnInit {
 	protected uiFacade = inject(AsistenciasUiFacade);
 	protected store = inject(AsistenciasAdminStore);
 	private confirmationService = inject(ConfirmationService);
+	private route = inject(ActivatedRoute);
+	private destroyRef = inject(DestroyRef);
 	// #endregion
 
 	// #region Estado del facade
@@ -78,6 +82,7 @@ export class AsistenciasComponent implements OnInit {
 	// #endregion
 
 	// #region Estado local
+	readonly activeTab = signal<string>('gestion');
 	readonly fechaCalendar = signal<Date>(new Date());
 
 	readonly tipoOptions = signal([
@@ -120,6 +125,15 @@ export class AsistenciasComponent implements OnInit {
 	ngOnInit(): void {
 		this.dataFacade.loadData();
 		this.dataFacade.loadEstudiantes();
+
+		this.route.queryParamMap
+			.pipe(takeUntilDestroyed(this.destroyRef))
+			.subscribe((params) => {
+				const tab = params.get('tab');
+				if (tab === 'gestion' || tab === 'reportes') {
+					this.activeTab.set(tab);
+				}
+			});
 	}
 	// #endregion
 

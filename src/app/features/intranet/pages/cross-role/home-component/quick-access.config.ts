@@ -1,31 +1,7 @@
 // #region Types
 import { UserRole } from '@core/services/auth/auth.models';
+import { PreviewLayout } from '@intranet-shared/config/intranet-menu.config';
 import { PERMISOS } from '@shared/constants';
-
-/**
- * Wireframe layouts matching actual page structures:
- * - admin-table:    Stats cards + filter row + data table (Usuarios, Cursos, Salones)
- * - admin-schedule: Stats cards + filters + weekly grid with time blocks (Horarios admin)
- * - admin-notif:    Stats cards + filter row + table with priority/tipo tags (Notificaciones)
- * - week-schedule:  Day tabs + weekly grid with colored course blocks (Profesor/Estudiante Horarios)
- * - attendance:     Selector + month toggle + attendance grid with status cells (Asistencia)
- * - grades:         Course selector + vista toggle + grades card with evaluations (Notas/Calificaciones)
- * - forum:          Thread list + messages with avatars (Foro)
- * - messaging:      Contact list + chat bubbles + input (Mensajeria)
- * - course-cards:   Card grid with course info (Mis Cursos)
- * - salon-tabs:     Tab bar + content with sub-sections (Salones profesor)
- */
-export type PreviewLayout =
-	| 'admin-table'
-	| 'admin-schedule'
-	| 'admin-notif'
-	| 'week-schedule'
-	| 'attendance'
-	| 'grades'
-	| 'forum'
-	| 'messaging'
-	| 'course-cards'
-	| 'salon-tabs';
 
 export interface QuickAccessItem {
 	route: string;

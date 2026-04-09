@@ -56,7 +56,6 @@ export const PERMISOS = {
 	// #endregion
 
 	// #region Compartido
-	REPORTES_ASISTENCIA: 'intranet/reportes-asistencia',
 	CALENDARIO: 'intranet/calendario',
 	VIDEOCONFERENCIAS: 'intranet/videoconferencias',
 	CTEST_K6: 'intranet/ctest-k6',

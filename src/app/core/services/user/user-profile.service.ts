@@ -40,6 +40,16 @@ export class UserProfileService {
 
 	readonly displayName = computed(() => this._userName());
 
+	/** Nombre corto para el header: primer apellido + primer nombre (ej: "SANCHEZ MARIA"). */
+	readonly shortName = computed(() => {
+		const full = this._userName();
+		if (!full) return '';
+		const parts = full.split(' ').filter((p) => p.length > 0);
+		// Formato "Apellido1 Apellido2 Nombre1 ...": tomar parts[0] + parts[2].
+		if (parts.length >= 3) return `${parts[0]} ${parts[2]}`;
+		return full;
+	});
+
 	readonly initials = computed(() => {
 		const name = this._userName();
 		if (!name) return '';

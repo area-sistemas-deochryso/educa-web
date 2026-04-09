@@ -15,6 +15,7 @@ import { RouterLink, RouterLinkActive, Router, NavigationEnd } from '@angular/ro
 import { filter } from 'rxjs';
 
 import { logger } from '@core/helpers';
+import { QuickAccessFavoritesService } from '@intranet-shared/services';
 import { NavMenuItem } from '../mobile-menu';
 
 // #endregion
@@ -32,12 +33,14 @@ export class NavItemComponent {
 	private elementRef = inject(ElementRef);
 	private router = inject(Router);
 	private destroyRef = inject(DestroyRef);
+	readonly favoritesService = inject(QuickAccessFavoritesService);
 
 	// * Inputs del item de menú (ruta o submenú).
 	@Input() route?: string;
 	@Input({ required: true }) label!: string;
 	@Input({ required: true }) icon!: string;
 	@Input({ transform: booleanAttribute }) exact = false;
+	@Input() queryParams?: Record<string, string>;
 	@Input() children?: NavMenuItem[];
 
 	isOpen = signal(false);
@@ -125,6 +128,12 @@ export class NavItemComponent {
 			parent = parent.parentElement;
 			level++;
 		}
+	}
+
+	onStarClick(event: Event, route: string): void {
+		event.preventDefault();
+		event.stopPropagation();
+		this.favoritesService.toggleFavorite(route);
 	}
 
 	hasChildren(): boolean {

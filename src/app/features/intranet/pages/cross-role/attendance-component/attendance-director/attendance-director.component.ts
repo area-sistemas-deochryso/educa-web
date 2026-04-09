@@ -117,10 +117,10 @@ export class AttendanceDirectorComponent implements OnInit {
 	ngOnInit(): void {
 		// * Configure shared controller callbacks for director endpoints + storage.
 		this.view.init({
-			loadEstudiantes: (gradoCodigo, seccion, mes, anio) =>
-				this.asistenciaService.getAsistenciasGradoDirector(gradoCodigo, seccion, mes, anio),
-			loadDia: (gradoCodigo, seccion, fecha) =>
-				this.asistenciaService.getAsistenciaDiaDirector(gradoCodigo, seccion, fecha),
+			loadEstudiantes: (grado, seccion, mes, anio) =>
+				this.asistenciaService.getAsistenciasGradoDirector(grado, seccion, mes, anio),
+			loadDia: (grado, seccion, fecha) =>
+				this.asistenciaService.getAsistenciaDiaDirector(grado, seccion, fecha),
 			getSelectorContext: () => this.getSelectorContext(),
 			onMonthChange: () => this.reselectGradoSeccionIfNeeded(),
 			getStoredEstudianteId: () => this.storage.getSelectedEstudianteDirectorId(),
