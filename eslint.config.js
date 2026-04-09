@@ -1,10 +1,10 @@
-// #region Implementation
 // @ts-check
 const eslint = require('@eslint/js');
 const tseslint = require('typescript-eslint');
 const angular = require('angular-eslint');
 
 module.exports = tseslint.config(
+	// #region Base TS config
 	{
 		files: ['**/*.ts'],
 		extends: [
@@ -51,24 +51,187 @@ module.exports = tseslint.config(
 			'@typescript-eslint/consistent-type-definitions': ['error', 'interface'],
 
 			// General rules
-			'no-console': ['warn', { allow: ['error', 'warn'] }],
+			'no-console': ['error', { allow: ['error', 'warn'] }],
 			'prefer-const': 'error',
 			'no-var': 'error',
+
+			// Prohibir acceso directo a storage APIs — usar StorageService
+			'no-restricted-globals': [
+				'error',
+				{
+					name: 'localStorage',
+					message: 'Usar StorageService de @core/services/storage/ en su lugar.',
+				},
+				{
+					name: 'sessionStorage',
+					message: 'Usar StorageService de @core/services/storage/ en su lugar.',
+				},
+			],
 		},
 	},
+	// #endregion
+
+	// #region Enforcement de capas — shared/ no importa de features ni intranet-shared
+	{
+		files: ['src/app/shared/**/*.ts'],
+		rules: {
+			'no-restricted-imports': [
+				'error',
+				{
+					patterns: [
+						{
+							group: ['@features/*'],
+							message: 'shared/ no puede importar de features/ — dependencia inversa.',
+						},
+						{
+							group: ['@intranet-shared', '@intranet-shared/*'],
+							message:
+								'shared/ no puede importar de @intranet-shared — dependencia inversa.',
+						},
+					],
+				},
+			],
+		},
+	},
+	// #endregion
+
+	// #region Enforcement de capas — components no usan HttpClient (tipos como HttpErrorResponse sí)
+	{
+		files: ['src/app/**/*.component.ts'],
+		rules: {
+			'no-restricted-imports': [
+				'error',
+				{
+					paths: [
+						{
+							name: '@angular/common/http',
+							importNames: ['HttpClient'],
+							message:
+								'Components no deben usar HttpClient directamente — usar facade o service.',
+						},
+					],
+				},
+			],
+		},
+	},
+	// #endregion
+
+	// #region Enforcement de capas — features no importan de otras features
+	{
+		files: ['src/app/features/intranet/pages/admin/**/*.ts'],
+		rules: {
+			'no-restricted-imports': [
+				'error',
+				{
+					patterns: [
+						{
+							group: ['@features/intranet/pages/profesor/*'],
+							message: 'admin/ no puede importar de profesor/ — features independientes.',
+						},
+						{
+							group: ['@features/intranet/pages/estudiante/*'],
+							message:
+								'admin/ no puede importar de estudiante/ — features independientes.',
+						},
+					],
+				},
+			],
+		},
+	},
+	{
+		files: ['src/app/features/intranet/pages/profesor/**/*.ts'],
+		rules: {
+			'no-restricted-imports': [
+				'warn',
+				{
+					patterns: [
+						{
+							group: ['@features/intranet/pages/admin/*'],
+							message:
+								'profesor/ no puede importar de admin/ — mover componentes compartidos a @intranet-shared.',
+						},
+						{
+							group: ['@features/intranet/pages/estudiante/*'],
+							message:
+								'profesor/ no puede importar de estudiante/ — features independientes.',
+						},
+					],
+				},
+			],
+		},
+	},
+	{
+		files: ['src/app/features/intranet/pages/estudiante/**/*.ts'],
+		rules: {
+			'no-restricted-imports': [
+				'error',
+				{
+					patterns: [
+						{
+							group: ['@features/intranet/pages/admin/*'],
+							message:
+								'estudiante/ no puede importar de admin/ — features independientes.',
+						},
+						{
+							group: ['@features/intranet/pages/profesor/*'],
+							message:
+								'estudiante/ no puede importar de profesor/ — features independientes.',
+						},
+					],
+				},
+			],
+		},
+	},
+	// #endregion
+
+	// #region Excepciones — servicios de infraestructura que necesitan APIs directas
+	{
+		files: ['src/app/core/services/storage/**/*.ts'],
+		rules: {
+			'no-restricted-globals': 'off',
+		},
+	},
+	{
+		// Debug y cache usan localStorage directamente (son infraestructura, no negocio)
+		files: [
+			'src/app/core/helpers/debug/**/*.ts',
+			'src/app/core/services/cache/**/*.ts',
+		],
+		rules: {
+			'no-restricted-globals': 'off',
+		},
+	},
+	{
+		// logger.ts ES el wrapper de console — necesita acceso directo
+		files: [
+			'src/app/core/helpers/logs/**/*.ts',
+			'src/app/core/services/cache/**/*.ts',
+		],
+		rules: {
+			'no-console': 'off',
+		},
+	},
+	{
+		// Tests pueden usar localStorage y console para setup/mocking
+		files: ['**/*.spec.ts'],
+		rules: {
+			'no-restricted-globals': 'off',
+			'no-console': ['warn', { allow: ['error', 'warn'] }],
+		},
+	},
+	// #endregion
+
+	// #region HTML config
 	{
 		files: ['**/*.html'],
 		extends: [...angular.configs.templateRecommended, ...angular.configs.templateAccessibility],
 		rules: {
 			// Disable rules that conflict with PrimeNG
-			// PrimeNG's pButton directive generates content internally via label/icon attributes
 			'@angular-eslint/template/elements-content': 'off',
-
-			// Disable rules that are too strict for most projects
 			'@angular-eslint/template/click-events-have-key-events': 'off',
 			'@angular-eslint/template/interactive-supports-focus': 'off',
 			'@angular-eslint/template/label-has-associated-control': 'off',
 		},
 	},
+	// #endregion
 );
-// #endregion

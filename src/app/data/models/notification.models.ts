@@ -1,4 +1,4 @@
-import { QueryParams } from '@data/repositories/base/base.repository';
+export type QueryParams = Record<string, string | number | boolean | undefined>;
 
 export interface Notification {
 	id: number;

@@ -4,7 +4,7 @@ import { Observable, of } from 'rxjs';
 import { catchError } from 'rxjs/operators';
 
 import { environment } from '@config/environment';
-import { PaginatedResponse } from '@data/repositories';
+import { PaginatedResponse } from '@shared/models';
 import { type ImportarHorarioItem, type ImportarHorariosResult } from '../helpers/horario-import.config';
 import {
   type DiaSemana,

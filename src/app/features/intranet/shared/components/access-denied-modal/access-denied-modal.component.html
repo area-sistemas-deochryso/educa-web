@@ -1,0 +1,35 @@
+<p-dialog
+	[visible]="visible()"
+	(visibleChange)="onVisibleChange($event)"
+	[modal]="true"
+	[closable]="true"
+	[draggable]="false"
+	[resizable]="false"
+	[style]="{ width: '420px' }"
+	header="Acceso denegado"
+>
+	<div class="access-denied-body">
+		<i class="pi pi-lock access-denied-icon"></i>
+		<p class="access-denied-message">
+			No cuenta con los permisos necesarios para acceder a esta vista.
+		</p>
+		@if (deniedRoute()) {
+			<p class="access-denied-route">
+				Ruta solicitada: <code>{{ deniedRoute() }}</code>
+			</p>
+		}
+		<p class="access-denied-hint">
+			Contacte al administrador si considera que debería tener acceso.
+		</p>
+	</div>
+
+	<ng-template #footer>
+		<button
+			pButton
+			label="Volver al inicio"
+			icon="pi pi-home"
+			class="p-button-outlined"
+			(click)="goHome()"
+		></button>
+	</ng-template>
+</p-dialog>

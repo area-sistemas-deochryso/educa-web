@@ -20,7 +20,7 @@
 				<i class="pi pi-user"></i>
 			</div>
 
-			<div class="detail-name">{{ usuario()!.nombreCompleto }}</div>
+			<div class="detail-name">{{ usuario()!.apellidos | fullName: usuario()!.nombres }}</div>
 
 			<p-tag
 				[value]="usuario()!.rol"

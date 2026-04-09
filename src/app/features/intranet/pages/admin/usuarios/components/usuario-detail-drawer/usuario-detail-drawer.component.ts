@@ -6,7 +6,7 @@ import { DrawerModule } from 'primeng/drawer';
 import { TagModule } from 'primeng/tag';
 import { UsuarioDetalle } from '../../services';
 import { UiMappingService } from '@shared/services';
-import { EstadoLabelPipe, EstadoSeverityPipe } from '@shared/pipes';
+import { EstadoLabelPipe, EstadoSeverityPipe, FullNamePipe } from '@shared/pipes';
 
 /**
  * Componente presentacional para el drawer de detalles de usuario
@@ -17,7 +17,7 @@ import { EstadoLabelPipe, EstadoSeverityPipe } from '@shared/pipes';
 @Component({
 	selector: 'app-usuario-detail-drawer',
 	standalone: true,
-	imports: [CommonModule, DrawerModule, ButtonModule, TagModule, EstadoLabelPipe, EstadoSeverityPipe],
+	imports: [CommonModule, DrawerModule, ButtonModule, TagModule, EstadoLabelPipe, EstadoSeverityPipe, FullNamePipe],
 	templateUrl: './usuario-detail-drawer.component.html',
 	styleUrl: './usuario-detail-drawer.component.scss',
 	changeDetection: ChangeDetectionStrategy.OnPush,

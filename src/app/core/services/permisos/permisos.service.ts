@@ -18,7 +18,7 @@ import { Observable, catchError, of, tap } from 'rxjs';
 import { logger } from '@core/helpers';
 
 import { HttpClient } from '@angular/common/http';
-import { PaginatedResponse } from '@data/repositories';
+import { PaginatedResponse } from '@shared/models';
 import { environment } from '@env/environment';
 
 /**

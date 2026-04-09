@@ -1,4 +1,5 @@
 import { determinarNiveles } from '@core/helpers';
+import { formatFullName } from '@shared/pipes';
 import type { CursoListaDto, CursoOption, CursosPorNivel } from '../models/curso.interface';
 import type { ProfesorListDto, ProfesorOption } from '../models/profesor.interface';
 import type { SalonListDto, SalonOption } from '../models/salon.interface';
@@ -51,7 +52,7 @@ export function groupCursosByNivel(cursos: CursoOption[]): CursosPorNivel {
 export function mapProfesorToOption(profesor: ProfesorListDto): ProfesorOption {
 	return {
 		value: profesor.id,
-		label: `${profesor.nombre} ${profesor.apellidos}`,
+		label: formatFullName(profesor.apellidos, profesor.nombre),
 		dni: profesor.dni,
 	};
 }

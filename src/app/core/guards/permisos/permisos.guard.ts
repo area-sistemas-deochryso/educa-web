@@ -1,10 +1,9 @@
 // #region Imports
 import { ActivatedRouteSnapshot, CanActivateFn, Router } from '@angular/router';
-import { AuthService, ErrorHandlerService, UserPermisosService } from '@core/services';
+import { AuthService, AccessDeniedService, UserPermisosService } from '@core/services';
 
 import { inject } from '@angular/core';
 import { logger } from '@core/helpers';
-import { UI_ACCESS_DENIED_MESSAGE, UI_SUMMARIES } from '@app/shared/constants';
 
 /**
  * Route guard that verifies user access based on permissions.
@@ -23,7 +22,7 @@ export const permisosGuard: CanActivateFn = async (route: ActivatedRouteSnapshot
 	const authService = inject(AuthService);
 	const userPermisosService = inject(UserPermisosService);
 	const router = inject(Router);
-	const errorHandler = inject(ErrorHandlerService);
+	const accessDenied = inject(AccessDeniedService);
 
 	// If not authenticated, do not verify permissions here.
 	if (!authService.isAuthenticated) {
@@ -59,9 +58,9 @@ export const permisosGuard: CanActivateFn = async (route: ActivatedRouteSnapshot
 			'log',
 			'Sin permiso para:',
 			fullPath,
-			'- Redirigiendo a /intranet',
+			'- Mostrando modal de acceso denegado',
 		);
-		errorHandler.showWarning(UI_SUMMARIES.accessDenied, UI_ACCESS_DENIED_MESSAGE);
+		accessDenied.show(fullPath);
 		return router.createUrlTree(['/intranet']);
 	}
 

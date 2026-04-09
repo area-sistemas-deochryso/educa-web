@@ -14,6 +14,7 @@ import {
 } from './components';
 import { INTRANET_MENU, NavItemWithPermiso } from './intranet-menu.config';
 import { FeatureFlagsFacade } from '@core/services/feature-flags';
+import { AccessDeniedModalComponent } from '@intranet-shared/components/access-denied-modal';
 
 // #endregion
 // #region Implementation
@@ -30,6 +31,7 @@ import { FeatureFlagsFacade } from '@core/services/feature-flags';
 		NavItemComponent,
 		UserProfileMenuComponent,
 		MobileMenuComponent,
+		AccessDeniedModalComponent,
 	],
 	templateUrl: './intranet-layout.component.html',
 	styleUrl: './intranet-layout.component.scss',

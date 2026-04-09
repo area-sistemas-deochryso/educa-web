@@ -3,7 +3,7 @@ import { Observable, catchError, of } from 'rxjs';
 
 import { environment } from '@config/environment';
 import { HttpClient } from '@angular/common/http';
-import { PaginatedResponse } from '@data/repositories';
+import { PaginatedResponse } from '@shared/models';
 import {
 	AsistenciaDiaConEstadisticas,
 	EstadisticasDia,

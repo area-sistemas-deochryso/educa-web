@@ -4,7 +4,7 @@ import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 
 import { environment } from '@config/environment';
-import { PaginatedResponse } from '@data/repositories';
+import { PaginatedResponse } from '@shared/models';
 import { Curso, CrearCursoRequest, ActualizarCursoRequest, CursosEstadisticas } from '../models';
 import { ApiResponse } from '@shared/models';
 

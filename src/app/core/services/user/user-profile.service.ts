@@ -38,16 +38,7 @@ export class UserProfileService {
 		() => this._userRole() === APP_USER_ROLES.AsistenteAdministrativo,
 	);
 
-	readonly displayName = computed(() => {
-		const name = this._userName();
-		if (!name) return '';
-
-		const parts = name.split(' ');
-		if (parts.length >= 2) {
-			return `${parts[0]} ${parts[parts.length - 1]}`;
-		}
-		return name;
-	});
+	readonly displayName = computed(() => this._userName());
 
 	readonly initials = computed(() => {
 		const name = this._userName();

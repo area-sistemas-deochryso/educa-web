@@ -14,7 +14,7 @@ import { Observable, catchError, of } from 'rxjs';
 
 import { ApiResponse } from '@shared/models';
 import { HttpClient } from '@angular/common/http';
-import { PaginatedResponse } from '@data/repositories/base/base.repository';
+import { PaginatedResponse } from '@shared/models';
 import { environment } from '@env/environment';
 
 // #endregion

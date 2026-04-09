@@ -52,7 +52,7 @@
 							<i class="pi pi-user"></i>
 						</div>
 						<div class="user-info">
-							<span class="user-name">{{ usuario.nombreCompleto }}</span>
+							<span class="user-name">{{ usuario.apellidos | fullName: usuario.nombres }}</span>
 							@if (usuario.correo) {
 								<span class="user-email">{{ usuario.correo }}</span>
 							}

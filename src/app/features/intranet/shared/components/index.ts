@@ -1,4 +1,5 @@
 // #region Implementation
+export * from './access-denied-modal';
 export * from './login';
 export * from './form-error';
 export * from './form-field-error';

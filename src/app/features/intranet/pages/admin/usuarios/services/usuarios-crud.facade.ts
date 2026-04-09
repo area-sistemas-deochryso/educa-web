@@ -5,6 +5,7 @@ import { environment } from '@config';
 import { ErrorHandlerService, WalFacadeHelper } from '@core/services';
 import { DebugService, logger, getEstadoToggleDeltas, getEstadoRollbackDeltas } from '@core/helpers';
 import { UI_ADMIN_ERROR_DETAILS, UI_SUMMARIES } from '@app/shared/constants';
+import { formatFullName } from '@shared/pipes';
 import {
 	ActualizarUsuarioRequest,
 	CrearUsuarioRequest,
@@ -221,7 +222,7 @@ export class UsuariosCrudFacade {
 		// Snapshot para rollback
 		const previousData: Partial<UsuarioLista> = {
 			dni: selectedUsuario.dni,
-			nombreCompleto: `${selectedUsuario.nombres} ${selectedUsuario.apellidos}`,
+			nombreCompleto: formatFullName(selectedUsuario.apellidos, selectedUsuario.nombres),
 			nombres: selectedUsuario.nombres,
 			apellidos: selectedUsuario.apellidos,
 			correo: selectedUsuario.correo,
@@ -253,7 +254,7 @@ export class UsuariosCrudFacade {
 					this.dataFacade.markCrudMutation();
 					this.store.updateUsuario(id, {
 						dni: data.dni!,
-						nombreCompleto: `${data.nombres!} ${data.apellidos!}`,
+						nombreCompleto: formatFullName(data.apellidos!, data.nombres!),
 						nombres: data.nombres!,
 						apellidos: data.apellidos!,
 						correo: data.correo || undefined,
