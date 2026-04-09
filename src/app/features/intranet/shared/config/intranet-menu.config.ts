@@ -72,15 +72,15 @@ export const MENU_ITEMS: MenuItemDef[] = [
 	{ route: '/intranet/admin/cursos', label: 'Cursos', icon: 'pi pi-book', permiso: PERMISOS.ADMIN_CURSOS, modulo: 'academico', preview: 'admin-table', description: 'Administrar cursos y materias' },
 	{ route: '/intranet/admin/salones', label: 'Salones', icon: 'pi pi-building', permiso: PERMISOS.ADMIN_SALONES, modulo: 'academico', preview: 'salon-tabs', description: 'Gestionar aulas y secciones' },
 	{ route: '/intranet/admin/horarios', label: 'Horarios', icon: 'pi pi-calendar', permiso: PERMISOS.ADMIN_HORARIOS, modulo: 'academico', preview: 'admin-schedule', description: 'Configurar horarios escolares' },
-	// Profesor
-	{ route: '/intranet/profesor/cursos', label: 'Mis Cursos', icon: 'pi pi-book', permiso: PERMISOS.PROFESOR_CURSOS, modulo: 'academico', featureFlag: 'profesor', preview: 'course-cards', description: 'Contenido y materiales de tus cursos' },
-	{ route: '/intranet/profesor/salones', label: 'Mis Salones', icon: 'pi pi-building', permiso: PERMISOS.PROFESOR_SALONES, modulo: 'academico', featureFlag: 'profesor', preview: 'salon-tabs', description: 'Ver los salones asignados' },
-	{ route: '/intranet/profesor/horarios', label: 'Mi Horario', icon: 'pi pi-clock', permiso: PERMISOS.PROFESOR_HORARIOS, modulo: 'academico', featureFlag: 'profesor', preview: 'week-schedule', description: 'Ver tu horario semanal de clases' },
+	// Profesor — agrupados bajo "Mi Aula"
+	{ route: '/intranet/profesor/cursos', label: 'Mis Cursos', icon: 'pi pi-book', permiso: PERMISOS.PROFESOR_CURSOS, modulo: 'academico', featureFlag: 'profesor', group: { label: 'Mi Aula', icon: 'pi pi-graduation-cap' }, preview: 'course-cards', description: 'Contenido y materiales de tus cursos' },
+	{ route: '/intranet/profesor/salones', label: 'Mis Salones', icon: 'pi pi-building', permiso: PERMISOS.PROFESOR_SALONES, modulo: 'academico', featureFlag: 'profesor', group: { label: 'Mi Aula', icon: 'pi pi-graduation-cap' }, preview: 'salon-tabs', description: 'Ver los salones asignados' },
+	{ route: '/intranet/profesor/horarios', label: 'Mi Horario', icon: 'pi pi-clock', permiso: PERMISOS.PROFESOR_HORARIOS, modulo: 'academico', featureFlag: 'profesor', group: { label: 'Mi Aula', icon: 'pi pi-graduation-cap' }, preview: 'week-schedule', description: 'Ver tu horario semanal de clases' },
 	{ route: '/intranet/profesor/final-salones', label: 'Administrar Salones', icon: 'pi pi-th-large', permiso: PERMISOS.PROFESOR_FINAL_SALONES, modulo: 'academico', featureFlag: 'profesor', preview: 'admin-table', description: 'Administrar salones del profesor' },
-	// Estudiante
-	{ route: '/intranet/estudiante/cursos', label: 'Mis Cursos', icon: 'pi pi-book', permiso: PERMISOS.ESTUDIANTE_CURSOS, modulo: 'academico', featureFlag: 'estudiante', preview: 'course-cards', description: 'Contenido y materiales de tus cursos' },
-	{ route: '/intranet/estudiante/salones', label: 'Mis Salones', icon: 'pi pi-building', permiso: PERMISOS.ESTUDIANTE_SALONES, modulo: 'academico', featureFlag: 'estudiante', preview: 'salon-tabs', description: 'Ver tus salones asignados' },
-	{ route: '/intranet/estudiante/horarios', label: 'Mi Horario', icon: 'pi pi-clock', permiso: PERMISOS.ESTUDIANTE_HORARIOS, modulo: 'academico', featureFlag: 'estudiante', preview: 'week-schedule', description: 'Ver tu horario semanal de clases' },
+	// Estudiante — agrupados bajo "Mi Aula"
+	{ route: '/intranet/estudiante/cursos', label: 'Mis Cursos', icon: 'pi pi-book', permiso: PERMISOS.ESTUDIANTE_CURSOS, modulo: 'academico', featureFlag: 'estudiante', group: { label: 'Mi Aula', icon: 'pi pi-graduation-cap' }, preview: 'course-cards', description: 'Contenido y materiales de tus cursos' },
+	{ route: '/intranet/estudiante/salones', label: 'Mis Salones', icon: 'pi pi-building', permiso: PERMISOS.ESTUDIANTE_SALONES, modulo: 'academico', featureFlag: 'estudiante', group: { label: 'Mi Aula', icon: 'pi pi-graduation-cap' }, preview: 'salon-tabs', description: 'Ver tus salones asignados' },
+	{ route: '/intranet/estudiante/horarios', label: 'Mi Horario', icon: 'pi pi-clock', permiso: PERMISOS.ESTUDIANTE_HORARIOS, modulo: 'academico', featureFlag: 'estudiante', group: { label: 'Mi Aula', icon: 'pi pi-graduation-cap' }, preview: 'week-schedule', description: 'Ver tu horario semanal de clases' },
 
 	// --- Seguimiento: "Cómo van los estudiantes?" ---
 	// Cross-role
@@ -88,12 +88,12 @@ export const MENU_ITEMS: MenuItemDef[] = [
 	// Admin — agrupados bajo "Asistencias (admin)"
 	{ route: '/intranet/admin/asistencias', label: 'Gestión', icon: 'pi pi-cog', permiso: PERMISOS.ADMIN_ASISTENCIAS, modulo: 'seguimiento', queryParams: { tab: 'gestion' }, group: { label: 'Asistencias (admin)', icon: 'pi pi-clock' }, preview: 'attendance', description: 'Editar y corregir registros de asistencia' },
 	{ route: '/intranet/admin/asistencias', label: 'Reportes', icon: 'pi pi-chart-bar', permiso: PERMISOS.ADMIN_ASISTENCIAS, modulo: 'seguimiento', queryParams: { tab: 'reportes' }, group: { label: 'Asistencias (admin)', icon: 'pi pi-clock' }, preview: 'admin-table', description: 'Estadísticas y exportación de asistencia' },
-	// Profesor
-	{ route: '/intranet/profesor/calificaciones', label: 'Mis Calificaciones', icon: 'pi pi-chart-bar', permiso: PERMISOS.PROFESOR_CALIFICACIONES, modulo: 'seguimiento', featureFlag: 'profesor', preview: 'grades', description: 'Registrar y consultar notas' },
-	{ route: '/intranet/profesor/asistencia', label: 'Mi Asistencia', icon: 'pi pi-check-square', permiso: PERMISOS.PROFESOR_ASISTENCIA, modulo: 'seguimiento', featureFlag: 'profesor', preview: 'attendance', description: 'Pasar lista de tus estudiantes' },
-	// Estudiante
-	{ route: '/intranet/estudiante/notas', label: 'Mis Calificaciones', icon: 'pi pi-chart-bar', permiso: PERMISOS.ESTUDIANTE_NOTAS, modulo: 'seguimiento', featureFlag: 'estudiante', preview: 'grades', description: 'Consultar tus calificaciones' },
-	{ route: '/intranet/estudiante/asistencia', label: 'Mi Asistencia', icon: 'pi pi-check-square', permiso: PERMISOS.ESTUDIANTE_ASISTENCIA, modulo: 'seguimiento', featureFlag: 'estudiante', preview: 'attendance', description: 'Revisar tu registro de asistencia' },
+	// Profesor — agrupados bajo "Mi Seguimiento"
+	{ route: '/intranet/profesor/calificaciones', label: 'Mis Calificaciones', icon: 'pi pi-chart-bar', permiso: PERMISOS.PROFESOR_CALIFICACIONES, modulo: 'seguimiento', featureFlag: 'profesor', group: { label: 'Mi Seguimiento', icon: 'pi pi-user' }, preview: 'grades', description: 'Registrar y consultar notas' },
+	{ route: '/intranet/profesor/asistencia', label: 'Mi Asistencia', icon: 'pi pi-check-square', permiso: PERMISOS.PROFESOR_ASISTENCIA, modulo: 'seguimiento', featureFlag: 'profesor', group: { label: 'Mi Seguimiento', icon: 'pi pi-user' }, preview: 'attendance', description: 'Pasar lista de tus estudiantes' },
+	// Estudiante — agrupados bajo "Mi Seguimiento"
+	{ route: '/intranet/estudiante/notas', label: 'Mis Calificaciones', icon: 'pi pi-chart-bar', permiso: PERMISOS.ESTUDIANTE_NOTAS, modulo: 'seguimiento', featureFlag: 'estudiante', group: { label: 'Mi Seguimiento', icon: 'pi pi-user' }, preview: 'grades', description: 'Consultar tus calificaciones' },
+	{ route: '/intranet/estudiante/asistencia', label: 'Mi Asistencia', icon: 'pi pi-check-square', permiso: PERMISOS.ESTUDIANTE_ASISTENCIA, modulo: 'seguimiento', featureFlag: 'estudiante', group: { label: 'Mi Seguimiento', icon: 'pi pi-user' }, preview: 'attendance', description: 'Revisar tu registro de asistencia' },
 
 	// --- Comunicación: "Qué necesito saber o decir?" ---
 	// Compartido
@@ -102,12 +102,12 @@ export const MENU_ITEMS: MenuItemDef[] = [
 	// Admin — Calendario + Eventos + Notificaciones agrupados
 	{ route: '/intranet/admin/eventos-calendario', label: 'Eventos', icon: 'pi pi-calendar-plus', permiso: PERMISOS.ADMIN_EVENTOS_CALENDARIO, modulo: 'comunicacion', group: { label: 'Calendario', icon: 'pi pi-calendar' }, preview: 'admin-table', description: 'Gestionar eventos del calendario' },
 	{ route: '/intranet/admin/notificaciones', label: 'Notificaciones', icon: 'pi pi-bell', permiso: PERMISOS.ADMIN_NOTIFICACIONES, modulo: 'comunicacion', group: { label: 'Calendario', icon: 'pi pi-calendar' }, preview: 'admin-notif', description: 'Enviar avisos a la comunidad' },
-	// Profesor
-	{ route: '/intranet/profesor/foro', label: 'Mi Foro', icon: 'pi pi-comments', permiso: PERMISOS.PROFESOR_FORO, modulo: 'comunicacion', featureFlag: 'profesor', preview: 'forum', description: 'Participar en discusiones del aula' },
-	{ route: '/intranet/profesor/mensajeria', label: 'Mi Mensajería', icon: 'pi pi-envelope', permiso: PERMISOS.PROFESOR_MENSAJERIA, modulo: 'comunicacion', featureFlag: 'profesor', preview: 'messaging', description: 'Enviar y recibir mensajes' },
-	// Estudiante
-	{ route: '/intranet/estudiante/foro', label: 'Mi Foro', icon: 'pi pi-comments', permiso: PERMISOS.ESTUDIANTE_FORO, modulo: 'comunicacion', featureFlag: 'estudiante', preview: 'forum', description: 'Participar en discusiones del aula' },
-	{ route: '/intranet/estudiante/mensajeria', label: 'Mi Mensajería', icon: 'pi pi-envelope', permiso: PERMISOS.ESTUDIANTE_MENSAJERIA, modulo: 'comunicacion', featureFlag: 'estudiante', preview: 'messaging', description: 'Enviar y recibir mensajes' },
+	// Profesor — agrupados bajo "Mensajes"
+	{ route: '/intranet/profesor/foro', label: 'Foro', icon: 'pi pi-comments', permiso: PERMISOS.PROFESOR_FORO, modulo: 'comunicacion', featureFlag: 'profesor', group: { label: 'Mensajes', icon: 'pi pi-inbox' }, preview: 'forum', description: 'Participar en discusiones del aula' },
+	{ route: '/intranet/profesor/mensajeria', label: 'Mensajería', icon: 'pi pi-envelope', permiso: PERMISOS.PROFESOR_MENSAJERIA, modulo: 'comunicacion', featureFlag: 'profesor', group: { label: 'Mensajes', icon: 'pi pi-inbox' }, preview: 'messaging', description: 'Enviar y recibir mensajes' },
+	// Estudiante — agrupados bajo "Mensajes"
+	{ route: '/intranet/estudiante/foro', label: 'Foro', icon: 'pi pi-comments', permiso: PERMISOS.ESTUDIANTE_FORO, modulo: 'comunicacion', featureFlag: 'estudiante', group: { label: 'Mensajes', icon: 'pi pi-inbox' }, preview: 'forum', description: 'Participar en discusiones del aula' },
+	{ route: '/intranet/estudiante/mensajeria', label: 'Mensajería', icon: 'pi pi-envelope', permiso: PERMISOS.ESTUDIANTE_MENSAJERIA, modulo: 'comunicacion', featureFlag: 'estudiante', group: { label: 'Mensajes', icon: 'pi pi-inbox' }, preview: 'messaging', description: 'Enviar y recibir mensajes' },
 
 	// --- Sistema: "Cómo se configura la plataforma?" ---
 	{ route: '/intranet/admin/usuarios', label: 'Usuarios', icon: 'pi pi-user-edit', permiso: PERMISOS.ADMIN_USUARIOS, modulo: 'sistema', preview: 'admin-table', description: 'Gestionar cuentas de usuarios' },
