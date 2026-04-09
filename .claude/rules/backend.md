@@ -204,11 +204,14 @@ Decorador: `[EnableRateLimiting("heavy")]` en el controller action.
 
 ## Manejo de Errores
 
-> **"Nunca silenciar, siempre propagar con contexto."**
+> **"Nunca silenciar, siempre propagar con contexto. Nunca exponer detalles internos al cliente."**
 
 - **Controllers**: Delegación a `GlobalExceptionMiddleware` para excepciones tipadas. Try/catch solo para casos especiales
 - **Services**: lanzar excepciones tipadas (`NotFoundException`, `BusinessRuleException`, `ConflictException`)
 - **NUNCA** catch vacío — siempre log + propagar o retornar default seguro
+- **NUNCA** `ex.Message` en respuestas API, DTOs de retorno, ni strings que lleguen al cliente — solo en `ILogger`
+- **NUNCA** DNI completo en logs — usar `DniHelper.Mask(dni)` → `"***1234"` (últimos 4 dígitos)
+- **NUNCA** secrets en `appsettings.json` — usar `"CONFIGURE_VIA_USER_SECRETS"` como placeholder, valores reales en User Secrets (local) o Azure Key Vault (producción)
 
 ---
 

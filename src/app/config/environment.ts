@@ -29,7 +29,7 @@ export const environment = {
 
 	// JaaS (Jitsi as a Service)
 	jitsi: {
-		appId: '', // Configurar con App ID de JaaS (vpaas-magic-cookie-...)
+		appId: 'vpaas-magic-cookie-ab31757bc7ba406d965de2c757d33c01',
 	},
 
 	// Debug panels (siempre false en producción)
