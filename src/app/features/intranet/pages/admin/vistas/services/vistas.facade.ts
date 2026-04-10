@@ -6,7 +6,7 @@ import {
 	type BaseCrudFacadeConfig,
 	type EstadisticaKeys,
 	type PaginatedResult,
-	PermisosService,
+	PermissionsService,
 	Vista,
 } from '@core/services';
 import { environment } from '@config';
@@ -20,7 +20,7 @@ const STATS_KEYS: EstadisticaKeys = { total: 'totalVistas', activos: 'vistasActi
 @Injectable({ providedIn: 'root' })
 export class VistasFacade extends BaseCrudFacade<Vista, { ruta: string; nombre: string; estado: number }, VistasEstadisticas> {
 	// #region Dependencias específicas
-	private readonly api = inject(PermisosService);
+	private readonly api = inject(PermissionsService);
 	protected readonly store = inject(VistasStore);
 	protected readonly config: BaseCrudFacadeConfig = {
 		tag: 'VistasFacade',

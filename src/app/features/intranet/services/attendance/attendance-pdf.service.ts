@@ -2,7 +2,7 @@ import { Injectable, DestroyRef, inject, signal } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { finalize } from 'rxjs';
 
-import { AsistenciaService } from '@core/services';
+import { AttendanceService } from '@core/services';
 import { viewBlobInNewTab, downloadBlob } from '@core/helpers';
 import { SelectorContext } from './attendance-view.service';
 
@@ -15,7 +15,7 @@ import { SelectorContext } from './attendance-view.service';
  */
 @Injectable()
 export class AttendancePdfService {
-	private asistenciaService = inject(AsistenciaService);
+	private asistenciaService = inject(AttendanceService);
 	private destroyRef = inject(DestroyRef);
 
 	// #region Estado

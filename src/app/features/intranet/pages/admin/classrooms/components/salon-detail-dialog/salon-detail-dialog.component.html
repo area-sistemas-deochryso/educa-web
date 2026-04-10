@@ -1,0 +1,72 @@
+<p-dialog
+	[visible]="visible()"
+	(visibleChange)="onVisibleChange($event)"
+	[modal]="true"
+	[style]="dialogStyle()"
+	[contentStyle]="contentStyle()"
+	[styleClass]="isFullscreen() ? 'fullscreen-dialog' : ''"
+>
+	<ng-template #header>
+		<div class="dialog-header">
+			<span class="font-semibold text-lg">{{ salonDescripcion() }}</span>
+			<button
+				class="fullscreen-btn"
+				type="button"
+				(click)="toggleFullscreen()"
+				[attr.aria-label]="isFullscreen() ? 'Salir de pantalla completa' : 'Expandir a pantalla completa'"
+			>
+				<i [class]="isFullscreen() ? 'pi pi-window-minimize' : 'pi pi-window-maximize'"></i>
+			</button>
+		</div>
+	</ng-template>
+
+	@if (salon(); as s) {
+		<p-tabs value="0" (valueChange)="onTabChange($any($event))">
+			<p-tablist>
+				<p-tab value="0"><i class="pi pi-check-square tab-icon"></i>Aprobación</p-tab>
+				<p-tab value="1"><i class="pi pi-calendar tab-icon"></i>Asistencias</p-tab>
+				<p-tab value="2"><i class="pi pi-chart-bar tab-icon"></i>Notas</p-tab>
+			</p-tablist>
+
+			<p-tabpanels>
+				<!-- #region Tab Aprobación -->
+				<p-tabpanel value="0">
+					<app-classroom-approval-tab
+						[salon]="salon()"
+						[aprobaciones]="aprobaciones()"
+						[loading]="aprobacionesLoading()"
+						[periodoId]="periodoId()"
+						[periodoCerrado]="periodoCerrado()"
+						(aprobar)="onAprobar($event)"
+						(aprobarMasivo)="onAprobarMasivo($event)"
+					/>
+				</p-tabpanel>
+				<!-- #endregion -->
+
+				<!-- #region Tab Asistencias -->
+				<p-tabpanel value="1">
+					<app-classroom-attendance-tab
+						[asistenciaData]="asistenciaData()"
+						[loading]="asistenciaLoading()"
+						[grado]="s.grado"
+						[seccion]="s.seccion"
+						(mesChange)="onMesChange($event)"
+					/>
+				</p-tabpanel>
+				<!-- #endregion -->
+
+				<!-- #region Tab Notas -->
+				<p-tabpanel value="2">
+					<app-classroom-grades-tab
+						[notasData]="notasData()"
+						[loading]="notasLoading()"
+						[horarios]="horarios()"
+						[horariosLoading]="horariosLoading()"
+						(cursoChange)="onCursoChange($event)"
+					/>
+				</p-tabpanel>
+				<!-- #endregion -->
+			</p-tabpanels>
+		</p-tabs>
+	}
+</p-dialog>

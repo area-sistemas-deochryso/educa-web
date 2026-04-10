@@ -3,7 +3,7 @@ import {
 	AuthService,
 	StoredSession,
 	SwService,
-	UserPermisosService,
+	UserPermissionsService,
 	UserRole,
 } from '@core/services';
 import { HttpErrorResponse } from '@angular/common/http';
@@ -59,7 +59,7 @@ export class LoginIntranetComponent implements OnInit {
 	private fb = inject(FormBuilder);
 	private router = inject(Router);
 	private authService = inject(AuthService);
-	private userPermisosService = inject(UserPermisosService);
+	private userPermissionsService = inject(UserPermissionsService);
 	private swService = inject(SwService);
 	private destroyRef = inject(DestroyRef);
 	// #endregion
@@ -137,7 +137,7 @@ export class LoginIntranetComponent implements OnInit {
 				next: () => {
 					this.isLoading.set(false);
 					this.swService.clearCache();
-					this.userPermisosService.clear();
+					this.userPermissionsService.clear();
 					this.router.navigate(['/intranet']);
 				},
 				error: (err: HttpErrorResponse) => {
@@ -232,7 +232,7 @@ export class LoginIntranetComponent implements OnInit {
 					if (response.success) {
 						// ! Clear SW cache + permisos to avoid leaking previous session state.
 						this.swService.clearCache();
-						this.userPermisosService.clear();
+						this.userPermissionsService.clear();
 						this.router.navigate(['/intranet']);
 					} else {
 						if (this.authService.isBlocked) {

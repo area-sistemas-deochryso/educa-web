@@ -91,8 +91,8 @@ describe('UserProfileService', () => {
 			expect(service.isDirector()).toBe(false);
 		});
 
-		it('should compute display name (first + last)', () => {
-			expect(service.displayName()).toBe('Juan García');
+		it('should compute display name (full name)', () => {
+			expect(service.displayName()).toBe('Juan Carlos Pérez García');
 		});
 
 		it('should compute initials', () => {

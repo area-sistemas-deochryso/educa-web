@@ -577,6 +577,18 @@ export class StorageService {
 	}
 
 	// #endregion
+	// #region QUICK ACCESS FAVORITES
+
+	getFavoriteRoutes(): string[] {
+		return this.preferences.getFavoriteRoutes();
+	}
+
+	setFavoriteRoutes(routes: string[]): void {
+		this.preferences.setFavoriteRoutes(routes);
+	}
+
+	// #endregion
+
 	// #region SYNC FALLBACKS FOR COMPATIBILITY
 	/**
 	 * Read from localStorage when IndexedDB is not available.

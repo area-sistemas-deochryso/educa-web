@@ -5,7 +5,7 @@ import { Router } from '@angular/router';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
 import { AuthService } from '@core/services/auth/auth.service';
-import { UserPermisosService } from '@core/services/permisos/user-permisos.service';
+import { UserPermissionsService } from '@core/services/permissions/user-permisos.service';
 import { SwService } from '@core/services/sw';
 import { StorageService } from '@core/services/storage';
 import { SessionRefreshService } from './session-refresh.service';
@@ -42,7 +42,7 @@ export class SessionActivityService {
 	private refreshService = inject(SessionRefreshService);
 	private coordinator = inject(SessionCoordinatorService);
 	private authService = inject(AuthService);
-	private userPermisosService = inject(UserPermisosService);
+	private userPermissionsService = inject(UserPermissionsService);
 	private swService = inject(SwService);
 	private storage = inject(StorageService);
 	private router = inject(Router);
@@ -146,7 +146,7 @@ export class SessionActivityService {
 
 		this.coordinator.broadcast({ type: 'logout' });
 		this.stop();
-		this.userPermisosService.clear();
+		this.userPermissionsService.clear();
 		this.swService.clearCache();
 		this.storage.clearAuth();
 		this.authService.logout();

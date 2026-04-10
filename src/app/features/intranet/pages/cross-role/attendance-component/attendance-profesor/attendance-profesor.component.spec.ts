@@ -7,7 +7,7 @@ import { of } from 'rxjs';
 import { signal } from '@angular/core';
 import { testProviders } from '@test';
 import { AttendanceProfesorComponent } from './attendance-profesor.component';
-import { AsistenciaService, StorageService, UserProfileService } from '@core/services';
+import { AttendanceService, StorageService, UserProfileService } from '@core/services';
 import { AttendanceDataService } from '../../../../services/attendance/attendance-data.service';
 
 // #endregion
@@ -28,7 +28,7 @@ describe('AttendanceProfesorComponent', () => {
 	};
 
 	beforeEach(async () => {
-		const asistenciaServiceMock: Partial<AsistenciaService> = {
+		const asistenciaServiceMock: Partial<AttendanceService> = {
 			getSalonesProfesor: vi.fn().mockReturnValue(of([])),
 			getSalonesProfesorPorHorario: vi.fn().mockReturnValue(of([])),
 			getAsistenciasGrado: vi.fn().mockReturnValue(of([])),
@@ -59,7 +59,7 @@ describe('AttendanceProfesorComponent', () => {
 			imports: [AttendanceProfesorComponent],
 			providers: [
 				...testProviders,
-				{ provide: AsistenciaService, useValue: asistenciaServiceMock },
+				{ provide: AttendanceService, useValue: asistenciaServiceMock },
 				{ provide: StorageService, useValue: storageServiceMock },
 				{ provide: UserProfileService, useValue: { userName: signal('Prof. García') } },
 				{ provide: AttendanceDataService, useValue: attendanceDataServiceMock },

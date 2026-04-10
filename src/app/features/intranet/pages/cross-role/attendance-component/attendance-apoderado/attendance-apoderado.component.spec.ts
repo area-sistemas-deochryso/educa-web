@@ -8,7 +8,7 @@ import { provideHttpClient } from '@angular/common/http';
 import { provideHttpClientTesting } from '@angular/common/http/testing';
 
 import { AttendanceApoderadoComponent } from './attendance-apoderado.component';
-import { AsistenciaService, StorageService, HijoApoderado } from '@core/services';
+import { AttendanceService, StorageService, HijoApoderado } from '@core/services';
 import { AttendanceDataService } from '../../../../services/attendance/attendance-data.service';
 
 // #endregion
@@ -33,7 +33,7 @@ const emptyTable = {
 // #region Tests
 describe('AttendanceApoderadoComponent', () => {
 	let component: AttendanceApoderadoComponent;
-	let asistenciaServiceMock: Partial<AsistenciaService>;
+	let asistenciaServiceMock: Partial<AttendanceService>;
 	let storageServiceMock: Partial<StorageService>;
 	let attendanceDataServiceMock: Partial<AttendanceDataService>;
 
@@ -66,7 +66,7 @@ describe('AttendanceApoderadoComponent', () => {
 				provideHttpClient(),
 				provideHttpClientTesting(),
 				AttendanceApoderadoComponent,
-				{ provide: AsistenciaService, useValue: asistenciaServiceMock },
+				{ provide: AttendanceService, useValue: asistenciaServiceMock },
 				{ provide: StorageService, useValue: storageServiceMock },
 				{ provide: AttendanceDataService, useValue: attendanceDataServiceMock },
 			],

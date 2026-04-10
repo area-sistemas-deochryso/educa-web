@@ -4,7 +4,7 @@ import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { testProviders } from '@test';
 import { of } from 'rxjs';
 import { CalendaryComponent } from './calendary.component';
-import { EventosCalendarioService } from '@features/intranet/pages/admin/eventos-calendario/services';
+import { EventsCalendarService } from '@features/intranet/pages/admin/events-calendar/services';
 
 // #endregion
 // #region Implementation
@@ -21,7 +21,7 @@ describe('CalendaryComponent', () => {
 			imports: [CalendaryComponent],
 			providers: [
 				...testProviders,
-				{ provide: EventosCalendarioService, useValue: eventosServiceMock },
+				{ provide: EventsCalendarService, useValue: eventosServiceMock },
 			],
 		}).compileComponents();
 

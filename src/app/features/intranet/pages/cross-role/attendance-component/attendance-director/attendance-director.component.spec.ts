@@ -8,7 +8,7 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { of } from 'rxjs';
 import { testProviders } from '@test';
 import { AttendanceDirectorComponent } from './attendance-director.component';
-import { AsistenciaService, StorageService } from '@core/services';
+import { AttendanceService, StorageService } from '@core/services';
 import { AttendanceDataService } from '../../../../services/attendance/attendance-data.service';
 
 // #endregion
@@ -31,7 +31,7 @@ describe('AttendanceDirectorComponent', () => {
 	let fixture: ComponentFixture<AttendanceDirectorComponent>;
 
 	beforeEach(async () => {
-		const asistenciaServiceMock: Partial<AsistenciaService> = {
+		const asistenciaServiceMock: Partial<AttendanceService> = {
 			getGradosSeccionesDisponibles: vi.fn().mockReturnValue(of([])),
 			getReporteDirector: vi.fn().mockReturnValue(of([])),
 			getAsistenciaDiaDirector: vi.fn().mockReturnValue(of([])),
@@ -61,7 +61,7 @@ describe('AttendanceDirectorComponent', () => {
 			imports: [AttendanceDirectorComponent],
 			providers: [
 				...testProviders,
-				{ provide: AsistenciaService, useValue: asistenciaServiceMock },
+				{ provide: AttendanceService, useValue: asistenciaServiceMock },
 				{ provide: StorageService, useValue: storageServiceMock },
 				{ provide: AttendanceDataService, useValue: attendanceDataServiceMock },
 			],

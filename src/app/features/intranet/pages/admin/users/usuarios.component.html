@@ -1,0 +1,123 @@
+<!-- #region Template -->
+<div class="usuarios-container">
+	<!-- * Header con acciones de página -->
+	<app-users-header
+		(refresh)="onRefresh()"
+		(newUsuario)="onNewUsuario()"
+		(importUsuarios)="onImportUsuarios()"
+		(exportCredenciales)="onExportCredenciales($event.rol, $event.esVerano, $event.anio)"
+	/>
+
+	<!-- * One-time migration button (dev only, remove after use) -->
+	@if (isDev && !migracionCompletada()) {
+		<div class="migration-banner">
+			<span><i class="pi pi-info-circle"></i> Hay contraseñas en texto plano que pueden migrarse al campo encriptado.</span>
+			<button
+				pButton
+				label="Migrar Contraseñas"
+				icon="pi pi-shield"
+				class="p-button-warning p-button-sm"
+				[loading]="migracionLoading()"
+				(click)="onMigrarContrasenas()"
+			></button>
+		</div>
+	} @else if (isDev && migracionCompletada()) {
+		<div class="migration-banner migration-success">
+			<span><i class="pi pi-check-circle"></i> {{ migracionMensaje() }}</span>
+		</div>
+	}
+
+	@if (!vm().statsReady) {
+		<app-users-stats-skeleton />
+	} @else if (vm().hasEstadisticas) {
+		<app-users-stats [estadisticas]="vm().estadisticas!" />
+	}
+
+	<!-- * Filtros de búsqueda -->
+	<app-users-filters
+		[searchTerm]="vm().searchTerm"
+		[filterRol]="vm().filterRol"
+		[filterEstado]="vm().filterEstado"
+		[filterSalonId]="vm().filterSalonId"
+		[salones]="vm().salonesFilter"
+		[options]="filterOptions"
+		(searchChange)="onSearchChange($event)"
+		(filterRolChange)="onFilterRolChange($event)"
+		(filterEstadoChange)="onFilterEstadoChange($event)"
+		(filterSalonIdChange)="onFilterSalonIdChange($event)"
+		(clearFilters)="onClearFilters()"
+	/>
+
+	@if (!vm().tableReady) {
+		<app-users-table-skeleton />
+	} @else {
+		<app-users-table
+			[usuarios]="vm().usuarios"
+			[loading]="vm().loading"
+			[totalRecords]="vm().totalRecords"
+			[rows]="vm().pageSize"
+			[first]="(vm().page - 1) * vm().pageSize"
+			(viewDetail)="onViewDetail($event)"
+			(edit)="onEditUsuario($event)"
+			(toggleEstado)="onToggleEstado($event)"
+			(lazyLoad)="onLazyLoad($event)"
+		/>
+	}
+
+	<!-- * Botón de validación de datos -->
+	<div class="validation-action">
+		<button
+			pButton
+			label="Validar Datos"
+			icon="pi pi-check-circle"
+			class="p-button-outlined"
+			(click)="onValidarDatos()"
+		></button>
+	</div>
+</div>
+
+<!-- * Detail drawer -->
+<app-user-detail-drawer
+	[visible]="vm().detailDrawerVisible"
+	[usuario]="vm().selectedUsuario"
+	(visibleChange)="onDrawerVisibleChange($event)"
+	(closeDrawer)="onCloseDetail()"
+	(edit)="onEditFromDetail()"
+/>
+
+<!-- * Create/Edit form dialog -->
+<app-user-form-dialog
+	[visible]="vm().dialogVisible"
+	[isEditing]="vm().isEditing"
+	[formData]="formData"
+	[errors]="formErrors"
+	[isFormValid]="vm().isFormValid"
+	[loading]="vm().loading"
+	[salones]="vm().salones"
+	(visibleChange)="onDialogVisibleChange($event)"
+	(fieldChange)="onFormFieldChange($event)"
+	(save)="onSaveUsuario()"
+	(cancelDialog)="onCancelDialog()"
+/>
+
+<!-- * Confirmation dialog host -->
+<p-confirmDialog (onHide)="onConfirmDialogHide()" />
+
+<!-- * Import dialog -->
+<app-users-import-dialog
+	[visible]="vm().importDialogVisible"
+	[loading]="vm().importLoading"
+	[result]="vm().importResult"
+	(visibleChange)="onImportDialogVisibleChange($event)"
+	(importar)="onImportar($event)"
+/>
+<!-- * Validation dialog -->
+<app-users-validation-dialog
+	[visible]="validationDialogVisible()"
+	[loading]="validationLoading()"
+	[items]="validationItems()"
+	[allValid]="validationAllValid()"
+	(visibleChange)="onValidationDialogVisibleChange($event)"
+	(editUsuario)="onEditFromValidation($event)"
+/>
+<!-- #endregion -->

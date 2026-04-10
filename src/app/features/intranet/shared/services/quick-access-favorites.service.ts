@@ -1,6 +1,6 @@
 import { computed, Injectable, inject, signal } from '@angular/core';
 
-import { PreferencesStorageService } from '@core/services/storage/preferences-storage.service';
+import { StorageService } from '@core/services';
 import { MENU_ITEMS, PreviewLayout } from '@intranet-shared/config/intranet-menu.config';
 import { PermisoPath } from '@shared/constants';
 
@@ -17,7 +17,7 @@ export interface ResolvedFavorite {
 
 @Injectable({ providedIn: 'root' })
 export class QuickAccessFavoritesService {
-	private prefs = inject(PreferencesStorageService);
+	private prefs = inject(StorageService);
 
 	// #region Estado privado
 	private readonly _isPersonalizing = signal(false);

@@ -1,5 +1,5 @@
 // #region Imports
-import { AsistenciaService, HijoApoderado, StorageService } from '@core/services';
+import { AttendanceService, HijoApoderado, StorageService } from '@core/services';
 import { ChangeDetectionStrategy, Component, DestroyRef, OnInit, computed, inject, signal } from '@angular/core';
 
 import { AttendanceDataService } from '../../../../services/attendance/attendance-data.service';
@@ -24,7 +24,7 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 	changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class AttendanceApoderadoComponent implements OnInit {
-	private asistenciaService = inject(AsistenciaService);
+	private asistenciaService = inject(AttendanceService);
 	private storage = inject(StorageService);
 	private attendanceDataService = inject(AttendanceDataService);
 	private destroyRef = inject(DestroyRef);

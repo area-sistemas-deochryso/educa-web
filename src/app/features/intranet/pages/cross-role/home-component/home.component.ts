@@ -4,7 +4,7 @@ import { ChangeDetectionStrategy, Component, computed, inject } from '@angular/c
 import { QuickAccessCardComponent } from '@features/intranet/components/quick-access-card/quick-access-card';
 import { FeatureFlagsFacade } from '@core/services/feature-flags';
 import { StorageService } from '@core/services';
-import { UserPermisosService } from '@core/services/permisos/user-permisos.service';
+import { UserPermissionsService } from '@core/services/permissions/user-permisos.service';
 import { UserProfileService } from '@core/services/user/user-profile.service';
 import { QuickAccessFavoritesService } from '@intranet-shared/services';
 import { WelcomeSectionComponent } from '@features/intranet/components/welcome-section/welcome-section';
@@ -26,7 +26,7 @@ export class HomeComponent {
 	// #region Dependencias
 	private storage = inject(StorageService);
 	private flags = inject(FeatureFlagsFacade);
-	private userPermisos = inject(UserPermisosService);
+	private userPermisos = inject(UserPermissionsService);
 	private userProfile = inject(UserProfileService);
 	readonly favoritesService = inject(QuickAccessFavoritesService);
 	// #endregion

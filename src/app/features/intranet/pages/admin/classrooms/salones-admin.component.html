@@ -1,0 +1,169 @@
+<!-- #region Header -->
+<app-page-header icon="pi pi-building" title="Gestión de Salones" subtitle="Administración de periodos, calificaciones y promoción de estudiantes">
+	<p-selectButton
+		[options]="periodoOptions"
+		[ngModel]="vm().esVerano"
+		(ngModelChange)="onPeriodoChange($event)"
+		optionLabel="label"
+		optionValue="value"
+		[allowEmpty]="false"
+	/>
+	<p-inputNumber
+		[ngModel]="vm().filtroAnio"
+		(ngModelChange)="onAnioChange($event)"
+		[useGrouping]="false"
+		[min]="2020"
+		[max]="2030"
+		[style]="{ width: '100px' }"
+	/>
+	<button
+		pButton
+		icon="pi pi-refresh"
+		class="p-button-outlined"
+		(click)="onRefresh()"
+		[pt]="{
+			root: {
+				'aria-label': 'Refrescar',
+			},
+		}"
+	></button>
+</app-page-header>
+<!-- #endregion -->
+
+<!-- #region Stats -->
+@if (vm().statsReady) {
+	<div class="stats-row">
+		<div class="stat-card">
+			<i class="pi pi-building stat-icon"></i>
+			<div class="stat-value">{{ vm().estadisticas.totalSalones }}</div>
+			<div class="stat-label">Salones</div>
+		</div>
+		<div class="stat-card">
+			<i class="pi pi-users stat-icon"></i>
+			<div class="stat-value">{{ vm().estadisticas.totalEstudiantes }}</div>
+			<div class="stat-label">Estudiantes</div>
+		</div>
+		<div class="stat-card">
+			<i class="pi pi-check-circle stat-icon text-green-500"></i>
+			<div class="stat-value text-green-500">{{ vm().estadisticas.totalAprobados }}</div>
+			<div class="stat-label">Aprobados</div>
+		</div>
+		<div class="stat-card">
+			<i class="pi pi-times-circle stat-icon text-red-500"></i>
+			<div class="stat-value text-red-500">{{ vm().estadisticas.totalDesaprobados }}</div>
+			<div class="stat-label">Desaprobados</div>
+		</div>
+		<div class="stat-card">
+			<i class="pi pi-clock stat-icon text-orange-500"></i>
+			<div class="stat-value text-orange-500">{{ vm().estadisticas.totalPendientes }}</div>
+			<div class="stat-label">Pendientes</div>
+		</div>
+	</div>
+}
+<!-- #endregion -->
+
+<!-- #region Tabs por nivel -->
+<p-tabs [value]="nivelTabIndex[vm().selectedNivel]" (valueChange)="onTabChange($any($event))">
+	<p-tablist>
+		@for (nivel of niveles; track nivel; let i = $index) {
+			<p-tab [value]="i">{{ nivel }}</p-tab>
+		}
+	</p-tablist>
+	<p-tabpanels>
+		@for (nivel of niveles; track nivel; let i = $index) {
+			<p-tabpanel [value]="i">
+				<!-- Toolbar del nivel -->
+				<div class="nivel-toolbar">
+					<div class="toolbar-tags">
+						@if (vm().periodoActual; as periodo) {
+							<p-tag
+								[value]="periodo.estadoCierre === 'CERRADO' ? 'Periodo Cerrado' : 'Periodo Abierto'"
+								[severity]="periodo.estadoCierre === 'CERRADO' ? 'success' : 'info'"
+							/>
+						} @else {
+							<p-tag value="Sin periodo" severity="warn" />
+						}
+
+						@if (vm().configActual; as config) {
+							<p-tag
+								[value]="config.tipoCalificacion === 'NUMERICO' ? 'Numérico' : 'Literal'"
+								severity="secondary"
+							/>
+						}
+					</div>
+					<div class="toolbar-actions">
+						<button
+							pButton
+							label="Config Calificaciones"
+							icon="pi pi-cog"
+							class="p-button-sm p-button-outlined"
+							(click)="onOpenConfigDialog()"
+						></button>
+						@if (vm().periodoActual && !vm().periodoCerrado) {
+							<button
+								pButton
+								label="Cerrar Periodo"
+								icon="pi pi-lock"
+								class="p-button-sm p-button-danger"
+								(click)="onOpenCerrarPeriodo()"
+							></button>
+						}
+					</div>
+				</div>
+
+				<!-- Tabla de salones -->
+				<app-classrooms-admin-table
+					[salones]="vm().salones"
+					[loading]="vm().loading"
+					(selectSalon)="onSelectSalon($event)"
+				/>
+			</p-tabpanel>
+		}
+	</p-tabpanels>
+</p-tabs>
+<!-- #endregion -->
+
+<!-- #region Dialogs — siempre en el DOM -->
+<app-config-grade-dialog
+	[visible]="vm().configDialogVisible"
+	[config]="vm().configActual"
+	[nivel]="vm().selectedNivel"
+	[anio]="vm().filtroAnio"
+	[loading]="vm().loading"
+	(visibleChange)="onConfigDialogVisibleChange($event)"
+	(crear)="onCrearConfig($event)"
+	(actualizar)="onActualizarConfig($event)"
+/>
+
+<app-close-period-dialog
+	[visible]="vm().cerrarPeriodoDialogVisible"
+	[periodo]="vm().periodoActual"
+	[nivel]="vm().selectedNivel"
+	[estadisticas]="vm().estadisticas"
+	[loading]="vm().loading"
+	(visibleChange)="onCerrarPeriodoDialogVisibleChange($event)"
+	(confirmar)="onConfirmarCierrePeriodo($event)"
+/>
+
+<app-classroom-detail-dialog
+	[visible]="vm().salonDialogVisible"
+	[salon]="vm().selectedSalon"
+	[periodoId]="vm().periodoActual?.id ?? null"
+	[periodoCerrado]="vm().periodoCerrado"
+	[aprobaciones]="vm().aprobaciones"
+	[aprobacionesLoading]="vm().aprobacionesLoading"
+	[asistenciaData]="vm().salonAsistencia"
+	[asistenciaLoading]="vm().asistenciaLoading"
+	[notasData]="vm().salonNotas"
+	[notasLoading]="vm().notasLoading"
+	[horarios]="vm().salonHorarios"
+	[horariosLoading]="vm().horariosLoading"
+	(visibleChange)="onSalonDialogVisibleChange($event)"
+	(aprobar)="onAprobarEstudiante($event)"
+	(aprobarMasivo)="onAprobarMasivo($event)"
+	(loadAsistencia)="onLoadAsistencia($event)"
+	(loadNotas)="onLoadNotas($event)"
+/>
+<!-- #endregion -->
+
+<p-toast />

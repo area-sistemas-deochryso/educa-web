@@ -5,7 +5,7 @@ import { testProviders } from '@test';
 import { HomeComponent } from './home.component';
 import { StorageService } from '@core/services';
 import { FeatureFlagsFacade } from '@core/services/feature-flags';
-import { UserPermisosService } from '@core/services/permisos/user-permisos.service';
+import { UserPermissionsService } from '@core/services/permissions/user-permisos.service';
 
 // #endregion
 // #region Implementation
@@ -18,10 +18,11 @@ describe('HomeComponent (Intranet)', () => {
 		storageServiceMock = {
 			getUser: vi.fn().mockReturnValue(null),
 			hasUserInfo: vi.fn().mockReturnValue(false),
-			getToken: vi.fn().mockReturnValue(null),
 			getPermisos: vi.fn().mockReturnValue([]),
 			getDismissedNotifications: vi.fn().mockReturnValue([]),
 			removeDismissedNotifications: vi.fn(),
+			getFavoriteRoutes: vi.fn().mockReturnValue([]),
+			setFavoriteRoutes: vi.fn(),
 		};
 
 		const featureFlagsMock = {
@@ -38,7 +39,7 @@ describe('HomeComponent (Intranet)', () => {
 				...testProviders,
 				{ provide: StorageService, useValue: storageServiceMock },
 				{ provide: FeatureFlagsFacade, useValue: featureFlagsMock },
-				{ provide: UserPermisosService, useValue: userPermisosMock },
+				{ provide: UserPermissionsService, useValue: userPermisosMock },
 			],
 		}).compileComponents();
 

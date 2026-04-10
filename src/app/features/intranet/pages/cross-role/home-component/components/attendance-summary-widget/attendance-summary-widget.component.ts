@@ -1,8 +1,8 @@
 import { ChangeDetectionStrategy, Component, inject, OnInit, DestroyRef, signal, computed } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { RouterLink } from '@angular/router';
-import { DirectorAsistenciaApiService } from '@shared/services/asistencia/director-asistencia-api.service';
-import { EstadisticasDia } from '@data/models/asistencia.models';
+import { DirectorAttendanceApiService } from '@shared/services/attendance/director-attendance-api.service';
+import { EstadisticasDia } from '@data/models/attendance.models';
 import { SkeletonLoaderComponent } from '@shared/components/skeleton-loader/skeleton-loader.component';
 
 @Component({
@@ -202,7 +202,7 @@ import { SkeletonLoaderComponent } from '@shared/components/skeleton-loader/skel
 })
 export class AttendanceSummaryWidgetComponent implements OnInit {
 	// #region Dependencias
-	private api = inject(DirectorAsistenciaApiService);
+	private api = inject(DirectorAttendanceApiService);
 	private destroyRef = inject(DestroyRef);
 	// #endregion
 

@@ -6,7 +6,7 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { of } from 'rxjs';
 
 import { LoginIntranetComponent } from './login-intranet.component';
-import { AuthService, SwService, UserPermisosService } from '@core/services';
+import { AuthService, SwService, UserPermissionsService } from '@core/services';
 import { testProviders } from '@test';
 
 // #endregion
@@ -50,7 +50,7 @@ describe('LoginIntranetComponent', () => {
 				{ provide: AuthService, useValue: authServiceMock },
 				{ provide: Router, useValue: routerMock },
 				{ provide: SwService, useValue: { clearCache: vi.fn() } },
-				{ provide: UserPermisosService, useValue: { clear: vi.fn() } },
+				{ provide: UserPermissionsService, useValue: { clear: vi.fn() } },
 			],
 		}).compileComponents();
 

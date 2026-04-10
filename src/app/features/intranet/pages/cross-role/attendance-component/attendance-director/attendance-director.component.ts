@@ -1,10 +1,10 @@
-import { AsistenciaService, GradoSeccion, StorageService } from '@core/services';
+import { AttendanceService, GradoSeccion, StorageService } from '@core/services';
 import { viewBlobInNewTab, downloadBlob } from '@core/helpers';
 import { periodoEnMes, filtrarPorPeriodoAcademico } from '@shared/models';
-import { JustificacionEvent } from '../../../../components/attendance/asistencia-dia-list/asistencia-dia-list.component';
+import { JustificacionEvent } from '../../../../components/attendance/attendance-day-list/attendance-day-list.component';
 import { ChangeDetectionStrategy, Component, DestroyRef, OnInit, ViewChild, computed, inject, signal } from '@angular/core';
 
-import { AsistenciaDiaListComponent } from '../../../../components/attendance/asistencia-dia-list/asistencia-dia-list.component';
+import { AttendanceDayListComponent } from '../../../../components/attendance/attendance-day-list/attendance-day-list.component';
 import { AttendanceLegendComponent } from '@app/features/intranet/components/attendance/attendance-legend/attendance-legend.component';
 import { AttendanceTableComponent } from '../../../../components/attendance/attendance-table/attendance-table.component';
 import { AttendanceTableSkeletonComponent } from '../../../../components/attendance/attendance-table-skeleton/attendance-table-skeleton.component';
@@ -51,7 +51,7 @@ interface TipoReporteGroup {
 		AttendanceTableComponent,
 		AttendanceTableSkeletonComponent,
 		GradoSeccionSelectorComponent,
-		AsistenciaDiaListComponent,
+		AttendanceDayListComponent,
 		EmptyStateComponent,
 		AttendanceLegendComponent,
 		ButtonModule,
@@ -70,7 +70,7 @@ interface TipoReporteGroup {
 export class AttendanceDirectorComponent implements OnInit {
 	@ViewChild('pdfMenu') pdfMenu!: Menu;
 
-	private asistenciaService = inject(AsistenciaService);
+	private asistenciaService = inject(AttendanceService);
 	private storage = inject(StorageService);
 	private destroyRef = inject(DestroyRef);
 	// * Shared controller handles month/day, tables, and PDF actions.

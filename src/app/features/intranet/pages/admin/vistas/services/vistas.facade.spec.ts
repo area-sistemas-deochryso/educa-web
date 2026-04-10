@@ -6,7 +6,7 @@ import { of } from 'rxjs';
 
 import { VistasFacade } from './vistas.facade';
 import { VistasStore } from './vistas.store';
-import { PermisosService, Vista, VistasEstadisticas, WalFacadeHelper, ErrorHandlerService } from '@core/services';
+import { PermissionsService, Vista, VistasEstadisticas, WalFacadeHelper, ErrorHandlerService } from '@core/services';
 
 // #endregion
 
@@ -54,7 +54,7 @@ describe('VistasFacade', () => {
 			providers: [
 				VistasFacade,
 				VistasStore,
-				{ provide: PermisosService, useValue: api },
+				{ provide: PermissionsService, useValue: api },
 				{ provide: ErrorHandlerService, useValue: { showError: vi.fn(), showSuccess: vi.fn() } },
 				{ provide: WalFacadeHelper, useValue: wal },
 			],

@@ -1,5 +1,5 @@
 // #region Imports
-import { AsistenciaService, AsistenciaSignalRService } from '@core/services';
+import { AttendanceService, AttendanceSignalRService } from '@core/services';
 import { ChangeDetectionStrategy, Component, DestroyRef, OnInit, computed, inject, signal } from '@angular/core';
 import { logger } from '@core/helpers';
 
@@ -22,11 +22,11 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 	changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class AttendanceEstudianteComponent implements OnInit {
-	private asistenciaService = inject(AsistenciaService);
+	private asistenciaService = inject(AttendanceService);
 	private attendanceDataService = inject(AttendanceDataService);
 	private authStore = inject(AuthStore);
 	private destroyRef = inject(DestroyRef);
-	private asistenciaSignalR = inject(AsistenciaSignalRService);
+	private asistenciaSignalR = inject(AttendanceSignalRService);
 
 	// * Prefer full name; fallback keeps UI stable if profile is missing.
 	private readonly userName = computed(

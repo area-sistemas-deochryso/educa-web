@@ -10,8 +10,8 @@ import {
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { RouterLink } from '@angular/router';
 import { switchMap, of, forkJoin } from 'rxjs';
-import { ProfesorAsistenciaApiService } from '@shared/services/asistencia/profesor-asistencia-api.service';
-import { SalonProfesor, EstadisticasAsistenciaDia } from '@data/models/asistencia.models';
+import { TeacherAttendanceApiService } from '@shared/services/attendance/teacher-attendance-api.service';
+import { SalonProfesor, EstadisticasAsistenciaDia } from '@data/models/attendance.models';
 import { SkeletonLoaderComponent } from '@shared/components/skeleton-loader/skeleton-loader.component';
 
 @Component({
@@ -294,7 +294,7 @@ import { SkeletonLoaderComponent } from '@shared/components/skeleton-loader/skel
 })
 export class ProfesorAttendanceWidgetComponent implements OnInit {
 	// #region Dependencias
-	private api = inject(ProfesorAsistenciaApiService);
+	private api = inject(TeacherAttendanceApiService);
 	private destroyRef = inject(DestroyRef);
 	// #endregion
 

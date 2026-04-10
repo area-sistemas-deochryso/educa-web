@@ -15,7 +15,7 @@ import { PageHeaderComponent } from '@shared/components';
 import { ProfesorFacade } from '../services/profesor.facade';
 import { SalonMensajeriaFacade } from '@features/intranet/pages/cross-role/mensajeria/services/mensajeria.facade';
 import { SalonForoTabComponent } from '@features/intranet/pages/cross-role/mensajeria/components/foro-tab/foro-tab.component';
-import { GruposFacade } from '../salones/services/grupos.facade';
+import { GruposFacade } from '../classrooms/services/grupos.facade';
 import { ProfesorSalonConEstudiantes } from '../services/profesor.store';
 import { toSelectOptionsFrom } from '@shared/models';
 

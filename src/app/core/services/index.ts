@@ -2,7 +2,7 @@
 // * Core services re-exports.
 export * from './auth';
 export * from './storage';
-export * from './asistencia';
+export * from './attendance';
 export * from './cache';
 export * from './keyboard';
 export * from './notifications';
@@ -13,7 +13,7 @@ export * from './http';
 export * from './destroy';
 export * from './modal';
 export * from './user';
-export * from './permisos';
+export * from './permissions';
 export * from './blob/blob-storage.service';
 export * from './trace';
 export * from './feature-flags';

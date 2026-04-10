@@ -8,7 +8,7 @@ import { provideHttpClient } from '@angular/common/http';
 import { provideHttpClientTesting } from '@angular/common/http/testing';
 
 import { AttendanceEstudianteComponent } from './attendance-estudiante.component';
-import { AsistenciaService, AsistenciaSignalRService } from '@core/services';
+import { AttendanceService, AttendanceSignalRService } from '@core/services';
 import { AttendanceDataService } from '../../../../services/attendance/attendance-data.service';
 import { AuthStore } from '@core/store';
 
@@ -41,7 +41,7 @@ const mockResumen = {
 // #region Tests
 describe('AttendanceEstudianteComponent', () => {
 	let component: AttendanceEstudianteComponent;
-	let asistenciaServiceMock: Partial<AsistenciaService>;
+	let asistenciaServiceMock: Partial<AttendanceService>;
 	let attendanceDataServiceMock: Partial<AttendanceDataService>;
 
 	beforeEach(() => {
@@ -61,10 +61,10 @@ describe('AttendanceEstudianteComponent', () => {
 				provideHttpClient(),
 				provideHttpClientTesting(),
 				AttendanceEstudianteComponent,
-				{ provide: AsistenciaService, useValue: asistenciaServiceMock },
+				{ provide: AttendanceService, useValue: asistenciaServiceMock },
 				{ provide: AttendanceDataService, useValue: attendanceDataServiceMock },
 				{ provide: AuthStore, useValue: { user: () => ({ nombreCompleto: 'Test User' }) } },
-				{ provide: AsistenciaSignalRService, useValue: { connect: vi.fn().mockResolvedValue(undefined), asistenciaRegistrada$: new Subject() } },
+				{ provide: AttendanceSignalRService, useValue: { connect: vi.fn().mockResolvedValue(undefined), asistenciaRegistrada$: new Subject() } },
 			],
 		});
 

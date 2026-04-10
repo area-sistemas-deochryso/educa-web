@@ -11,7 +11,7 @@ import { CalendarDay, CalendarMonth, ModalData } from './calendar.types';
 import { CalendarEvent, getEventFromList, isDateInEventRangeFromList, isDateEventEndFromList } from './events.config';
 import { isHoliday } from './holidays.config';
 import { CalendarUtilsService } from '@features/intranet/services/calendar/calendar-utils.service';
-import { EventosCalendarioService } from '@features/intranet/pages/admin/eventos-calendario/services';
+import { EventsCalendarService } from '@features/intranet/pages/admin/events-calendar/services';
 import { EventoCalendarioActivo } from '@data/models';
 import { logger } from '@core/helpers';
 
@@ -31,7 +31,7 @@ import { logger } from '@core/helpers';
 })
 export class CalendaryComponent implements OnInit, AfterViewInit {
 	private platformId = inject(PLATFORM_ID);
-	private eventosService = inject(EventosCalendarioService);
+	private eventosService = inject(EventsCalendarService);
 	private route = inject(ActivatedRoute);
 	private calendarUtils = inject(CalendarUtilsService);
 	private destroyRef = inject(DestroyRef);

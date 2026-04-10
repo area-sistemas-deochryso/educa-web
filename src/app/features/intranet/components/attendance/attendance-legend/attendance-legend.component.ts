@@ -1,7 +1,7 @@
 // #region Imports
 import { ChangeDetectionStrategy, Component, inject, signal } from '@angular/core';
 import { getStatusClass } from '@features/intranet/pages/cross-role/attendance-component/config/attendance.constants';
-import { AsistenciaService, EstadoAsistencia } from '@core/services';
+import { AttendanceService, EstadoAsistencia } from '@core/services';
 
 // #endregion
 // #region Implementation
@@ -13,7 +13,7 @@ import { AsistenciaService, EstadoAsistencia } from '@core/services';
 	changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class AttendanceLegendComponent {
-	private asistenciaService = inject(AsistenciaService);
+	private asistenciaService = inject(AttendanceService);
 
 	// ✅ NUEVO: Cargar estados desde el backend
 	readonly legendItems = signal<EstadoAsistencia[]>([]);

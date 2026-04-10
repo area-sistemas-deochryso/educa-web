@@ -1,6 +1,6 @@
 // #region Imports
 import { Route, Routes } from '@angular/router';
-import { authGuard, permisosGuard } from '@core/guards';
+import { authGuard, permissionsGuard } from '@core/guards';
 
 import { IntranetLayoutComponent } from '@intranet-shared/components/layout/intranet-layout';
 import { environment } from '@config/environment';
@@ -11,13 +11,13 @@ const PROFESOR_ROUTES: Route[] = [
 	{
 		path: 'profesor/asistencia',
 		loadComponent: () =>
-			import('./pages/profesor').then((m) => m.ProfesorAsistenciaComponent),
+			import('./pages/profesor').then((m) => m.TeacherAttendanceComponent),
 		title: 'Intranet - Asistencia',
 	},
 	{
 		path: 'profesor/calificaciones',
 		loadComponent: () =>
-			import('./pages/profesor').then((m) => m.ProfesorCalificacionesComponent),
+			import('./pages/profesor').then((m) => m.TeacherGradesComponent),
 		title: 'Intranet - Calificaciones',
 	},
 	{
@@ -29,7 +29,7 @@ const PROFESOR_ROUTES: Route[] = [
 	{
 		path: 'profesor/final-salones',
 		loadComponent: () =>
-			import('./pages/profesor').then((m) => m.ProfesorFinalSalonesComponent),
+			import('./pages/profesor').then((m) => m.TeacherFinalClassroomsComponent),
 		title: 'Intranet - Gestión de Salones',
 	},
 	{
@@ -41,7 +41,7 @@ const PROFESOR_ROUTES: Route[] = [
 	{
 		path: 'profesor/horarios',
 		loadComponent: () =>
-			import('./pages/profesor').then((m) => m.ProfesorHorariosComponent),
+			import('./pages/profesor').then((m) => m.TeacherSchedulesComponent),
 		title: 'Intranet - Mi Horario',
 	},
 	{
@@ -53,7 +53,7 @@ const PROFESOR_ROUTES: Route[] = [
 	{
 		path: 'profesor/salones',
 		loadComponent: () =>
-			import('./pages/profesor').then((m) => m.ProfesorSalonesComponent),
+			import('./pages/profesor').then((m) => m.TeacherClassroomsComponent),
 		title: 'Intranet - Mis Salones',
 	},
 ];
@@ -62,7 +62,7 @@ const ESTUDIANTE_ROUTES: Route[] = [
 	{
 		path: 'estudiante/asistencia',
 		loadComponent: () =>
-			import('./pages/estudiante').then((m) => m.EstudianteAsistenciaComponent),
+			import('./pages/estudiante').then((m) => m.StudentAttendanceComponent),
 		title: 'Intranet - Mi Asistencia',
 	},
 	{
@@ -80,7 +80,7 @@ const ESTUDIANTE_ROUTES: Route[] = [
 	{
 		path: 'estudiante/horarios',
 		loadComponent: () =>
-			import('./pages/estudiante').then((m) => m.EstudianteHorariosComponent),
+			import('./pages/estudiante').then((m) => m.StudentSchedulesComponent),
 		title: 'Intranet - Mi Horario',
 	},
 	{
@@ -98,7 +98,7 @@ const ESTUDIANTE_ROUTES: Route[] = [
 	{
 		path: 'estudiante/salones',
 		loadComponent: () =>
-			import('./pages/estudiante').then((m) => m.EstudianteSalonesComponent),
+			import('./pages/estudiante').then((m) => m.StudentClassroomsComponent),
 		title: 'Intranet - Mis Salones',
 	},
 ];
@@ -191,7 +191,7 @@ export const INTRANET_ROUTES: Routes = [
 		path: '',
 		component: IntranetLayoutComponent,
 		canActivate: [authGuard],
-		canActivateChild: [authGuard, permisosGuard],
+		canActivateChild: [authGuard, permissionsGuard],
 		children: [
 			// #region Shared
 			{
@@ -221,21 +221,21 @@ export const INTRANET_ROUTES: Routes = [
 			{
 				path: 'admin/permisos/roles',
 				loadComponent: () =>
-					import('./pages/admin/permisos-roles').then((m) => m.PermisosRolesComponent),
+					import('./pages/admin/permissions-roles').then((m) => m.PermissionsRolesComponent),
 				title: 'Intranet - Permisos por Rol',
 			},
 			{
 				path: 'admin/permisos/usuarios',
 				loadComponent: () =>
-					import('./pages/admin/permisos-usuarios').then(
-						(m) => m.PermisosUsuariosComponent,
+					import('./pages/admin/permissions-users').then(
+						(m) => m.PermissionsUsersComponent,
 					),
 				title: 'Intranet - Permisos por Usuario',
 			},
 			{
 				path: 'admin/usuarios',
 				loadComponent: () =>
-					import('./pages/admin/usuarios').then((m) => m.UsuariosComponent),
+					import('./pages/admin/users').then((m) => m.UsersComponent),
 				title: 'Intranet - Gestión de Usuarios',
 			},
 			{
@@ -253,26 +253,26 @@ export const INTRANET_ROUTES: Routes = [
 			{
 				path: 'admin/horarios',
 				loadComponent: () =>
-					import('./pages/admin/horarios').then((m) => m.HorariosComponent),
+					import('./pages/admin/schedules').then((m) => m.SchedulesComponent),
 				title: 'Intranet - Gestión de Horarios',
 			},
 			{
 				path: 'admin/salones',
 				loadComponent: () =>
-					import('./pages/admin/salones').then((m) => m.SalonesAdminComponent),
+					import('./pages/admin/classrooms').then((m) => m.ClassroomsAdminComponent),
 				title: 'Intranet - Gestión de Salones',
 			},
 			{
 				path: 'admin/asistencias',
 				loadComponent: () =>
-					import('./pages/admin/asistencias').then((m) => m.AsistenciasComponent),
+					import('./pages/admin/attendances').then((m) => m.AttendancesComponent),
 				title: 'Intranet - Gestión de Asistencias',
 			},
 			{
 				path: 'admin/eventos-calendario',
 				loadComponent: () =>
-					import('./pages/admin/eventos-calendario').then(
-						(m) => m.EventosCalendarioComponent,
+					import('./pages/admin/events-calendar').then(
+						(m) => m.EventsCalendarComponent,
 					),
 				title: 'Intranet - Gestión de Eventos',
 			},

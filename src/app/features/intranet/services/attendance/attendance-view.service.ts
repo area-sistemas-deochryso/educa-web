@@ -7,7 +7,7 @@ import {
 	AsistenciaDiaConEstadisticas,
 	EstudianteAsistencia,
 	HijoApoderado,
-	AsistenciaSignalRService,
+	AttendanceSignalRService,
 } from '@core/services';
 import { SwService } from '@features/intranet/services/sw/sw.service';
 import { logger } from '@core/helpers';
@@ -70,7 +70,7 @@ export interface AttendanceViewConfig {
 @Injectable()
 export class AttendanceViewController {
 	private attendanceDataService = inject(AttendanceDataService);
-	private asistenciaSignalR = inject(AsistenciaSignalRService);
+	private asistenciaSignalR = inject(AttendanceSignalRService);
 	private swService = inject(SwService);
 	private destroyRef = inject(DestroyRef);
 	private config!: AttendanceViewConfig;

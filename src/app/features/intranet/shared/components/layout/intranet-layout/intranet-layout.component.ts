@@ -7,7 +7,7 @@ import { VoiceButtonComponent } from '@intranet-shared/components/voice-button';
 import { FloatingNotificationBellComponent } from '@intranet-shared/components/floating-notification-bell';
 import { SyncStatusComponent } from '@intranet-shared/components/sync-status';
 import { OfflineIndicatorComponent } from '@intranet-shared/components/offline-indicator/offline-indicator.component';
-import { UserPermisosService, SessionActivityService } from '@core/services';
+import { UserPermissionsService, SessionActivityService } from '@core/services';
 import {
 	NavItemComponent,
 	UserProfileMenuComponent,
@@ -59,7 +59,7 @@ function circularSlice<T>(items: T[], center: number, count: number): T[] {
 	styleUrl: './intranet-layout.component.scss',
 })
 export class IntranetLayoutComponent implements OnInit {
-	private userPermisosService = inject(UserPermisosService);
+	private userPermissionsService = inject(UserPermissionsService);
 	private destroyRef = inject(DestroyRef);
 	private flags = inject(FeatureFlagsFacade);
 	private sessionActivity = inject(SessionActivityService);
@@ -100,8 +100,8 @@ export class IntranetLayoutComponent implements OnInit {
 
 	constructor() {
 		effect(() => {
-			const loaded = this.userPermisosService.loaded();
-			const vistasPermitidas = this.userPermisosService.vistasPermitidas();
+			const loaded = this.userPermissionsService.loaded();
+			const vistasPermitidas = this.userPermissionsService.vistasPermitidas();
 			if (loaded) {
 				const modulos = buildModuloMenus(vistasPermitidas);
 				this._modulos.set(modulos);
@@ -127,10 +127,10 @@ export class IntranetLayoutComponent implements OnInit {
 
 	ngOnInit(): void {
 		this.sessionActivity.start();
-		if (!this.userPermisosService.loaded()) {
-			this.userPermisosService.loadPermisos(this.destroyRef);
+		if (!this.userPermissionsService.loaded()) {
+			this.userPermissionsService.loadPermisos(this.destroyRef);
 		} else {
-			const modulos = buildModuloMenus(this.userPermisosService.vistasPermitidas());
+			const modulos = buildModuloMenus(this.userPermissionsService.vistasPermitidas());
 			this._modulos.set(modulos);
 			const id = detectModuloFromUrl(this.router.url, modulos);
 			this.applySelection(id, modulos, this.router.url);
