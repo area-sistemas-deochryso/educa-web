@@ -32,6 +32,11 @@ export const errorInterceptor: HttpInterceptorFn = (req, next) => {
 
 	return next(req).pipe(
 		catchError((error: HttpErrorResponse) => {
+			// Never process errors from the error reporter itself (prevents infinite loop)
+			if (req.url.includes('/api/sistema/errors')) {
+				return throwError(() => error);
+			}
+
 			// Skip URLs handled locally (login form, token verification, refresh).
 			// BUT still report 500+ errors silently — those are backend bugs, not user errors.
 			if (SKIP_REFRESH_URLS.some((url) => req.url.includes(url))) {

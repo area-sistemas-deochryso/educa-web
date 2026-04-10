@@ -1,5 +1,7 @@
 import { HttpClient, HttpHeaders } from '@angular/common/http';
-import { Injectable, inject } from '@angular/core';
+import { DestroyRef, Injectable, inject } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { fromEvent, filter, debounceTime } from 'rxjs';
 
 import { ActivityTrackerService } from './activity-tracker.service';
 import { Breadcrumb } from './activity-tracker.models';
@@ -55,15 +57,38 @@ const BREADCRUMB_LIMITS: Record<string, number> = {
 
 // #endregion
 
+const DB_NAME = 'educa-error-outbox';
+const STORE_NAME = 'pending';
+const DB_VERSION = 1;
+const MAX_PENDING = 50;
+
 @Injectable({ providedIn: 'root' })
 export class ErrorReporterService {
 	private readonly http = inject(HttpClient);
 	private readonly activityTracker = inject(ActivityTrackerService);
+	private readonly destroyRef = inject(DestroyRef);
 
 	private reportCount = 0;
 	private resetTimer: ReturnType<typeof setTimeout> | null = null;
-	private static readonly MAX_REPORTS_PER_MINUTE = 10;
+	private static readonly MAX_REPORTS_PER_MINUTE = 5;
 	private static readonly ENDPOINT = `${environment.apiUrl}/api/sistema/errors`;
+
+	/** Dedup: evita reportar el mismo error en cascada (misma URL + status en <5s) */
+	private readonly recentReports = new Map<string, number>();
+	private static readonly DEDUP_WINDOW_MS = 5_000;
+
+	private flushInterval: ReturnType<typeof setInterval> | null = null;
+
+	constructor() {
+		this.listenOnline();
+		this.flushPending();
+		// Flush periódico cada 30s — cubre el caso donde el backend se reinicia
+		// pero el evento 'online' no se dispara (frontend y backend en misma máquina)
+		this.flushInterval = setInterval(() => this.flushPending(), 30_000);
+		this.destroyRef.onDestroy(() => {
+			if (this.flushInterval) clearInterval(this.flushInterval);
+		});
+	}
 
 	// #region API pública
 
@@ -77,12 +102,22 @@ export class ErrorReporterService {
 	): void {
 		if (!this.canReport()) return;
 
-		const origen = this.classifyHttpOrigin(status);
+		// Dedup: no reportar la misma URL + status en <5s (errores en cascada)
+		const dedupKey = `${status}:${this.sanitizeUrl(url)}`;
+		const now = Date.now();
+		if (this.recentReports.has(dedupKey) &&
+			now - this.recentReports.get(dedupKey)! < ErrorReporterService.DEDUP_WINDOW_MS) {
+			return;
+		}
+		this.recentReports.set(dedupKey, now);
+		this.cleanRecentReports(now);
+
+		// Si no hay red, el origen es NETWORK sin importar el status HTTP
+		const origen = !navigator.onLine ? 'NETWORK' : this.classifyHttpOrigin(status);
 		const breadcrumbKey = this.getBreadcrumbKey(status);
 		const maxBreadcrumbs = BREADCRUMB_LIMITS[breadcrumbKey] ?? BREADCRUMB_LIMITS['default'];
 		const sourceLocation = stack ? this.parseSourceLocation(stack) : null;
 
-		// Capturar call site del frontend si no hay stack del error
 		const effectiveStack = stack ?? this.captureCallSite();
 
 		const payload = this.buildPayload({
@@ -93,7 +128,7 @@ export class ErrorReporterService {
 			httpMethod: method ?? null,
 			httpStatus: status,
 			errorCode: errorCode ?? null,
-			severidad: status >= 500 ? 'CRITICAL' : 'ERROR',
+			severidad: status >= 500 || status === 0 ? 'CRITICAL' : 'ERROR',
 			correlationId: correlationId ?? null,
 			sourceLocation,
 			breadcrumbCount: maxBreadcrumbs,
@@ -221,6 +256,16 @@ export class ErrorReporterService {
 		return true;
 	}
 
+	private cleanRecentReports(now: number): void {
+		if (this.recentReports.size > 20) {
+			for (const [key, ts] of this.recentReports) {
+				if (now - ts > ErrorReporterService.DEDUP_WINDOW_MS) {
+					this.recentReports.delete(key);
+				}
+			}
+		}
+	}
+
 	// #endregion
 
 	// #region Builders
@@ -271,7 +316,7 @@ export class ErrorReporterService {
 
 	// #endregion
 
-	// #region Envío
+	// #region Envío con outbox offline
 
 	private send(payload: ErrorReportPayload): void {
 		const headers = new HttpHeaders({ 'X-Skip-Error-Toast': 'true' });
@@ -280,9 +325,137 @@ export class ErrorReporterService {
 			.post(ErrorReporterService.ENDPOINT, payload, { headers })
 			.subscribe({
 				error: () => {
-					logger.warn('[ErrorReporter] Failed to send error report');
+					// Si el POST falló, no hay conectividad con el backend.
+					// Reclasificar como NETWORK: el error original pudo haberse
+					// clasificado como BACKEND (500) pero la causa real es la red.
+					if (!navigator.onLine) {
+						payload.origen = 'NETWORK';
+					}
+					this.savePending(payload);
 				},
 			});
+	}
+
+	/** Cuando vuelve la conexión, reintentar los pendientes */
+	private listenOnline(): void {
+		fromEvent(window, 'online')
+			.pipe(
+				debounceTime(3000),
+				takeUntilDestroyed(this.destroyRef),
+			)
+			.subscribe(() => {
+				logger.warn('[ErrorReporter] Online detected — flushing outbox');
+				this.flushPending();
+			});
+	}
+
+	/** Envía todos los reportes pendientes en IndexedDB */
+	private flushing = false;
+	private async flushPending(): Promise<void> {
+		if (this.flushing || !navigator.onLine) return;
+		this.flushing = true;
+
+		try {
+			const db = await this.openDb();
+			const tx = db.transaction(STORE_NAME, 'readonly');
+			const store = tx.objectStore(STORE_NAME);
+
+			// Obtener keys + values para poder borrar por key después
+			const keys = await this.idbRequest<IDBValidKey[]>(store.getAllKeys());
+			const values = await this.idbRequest<ErrorReportPayload[]>(store.getAll());
+			db.close();
+
+			if (keys.length === 0) { this.flushing = false; return; }
+			logger.warn(`[ErrorReporter] Flushing ${keys.length} pending error reports`);
+
+			for (let i = 0; i < keys.length; i++) {
+				this.sendAndRemove(values[i], keys[i] as number);
+			}
+		} catch {
+			// IndexedDB no disponible
+		} finally {
+			this.flushing = false;
+		}
+	}
+
+	/** Envía un reporte pendiente y lo borra de IndexedDB si tiene éxito */
+	private sendAndRemove(payload: ErrorReportPayload, key: number): void {
+		const headers = new HttpHeaders({ 'X-Skip-Error-Toast': 'true' });
+
+		this.http
+			.post(ErrorReporterService.ENDPOINT, payload, { headers })
+			.subscribe({
+				next: () => this.removePending(key),
+				error: () => {
+					// Todavía sin conexión — se reintentará en el siguiente online
+				},
+			});
+	}
+
+	// #endregion
+
+	// #region IndexedDB outbox
+
+	private async savePending(payload: ErrorReportPayload): Promise<void> {
+		try {
+			const db = await this.openDb();
+			const tx = db.transaction(STORE_NAME, 'readwrite');
+			const store = tx.objectStore(STORE_NAME);
+
+			// Limitar a MAX_PENDING para no llenar el storage
+			const count = await this.idbRequest<number>(store.count());
+			if (count >= MAX_PENDING) {
+				db.close();
+				return;
+			}
+
+			store.add(payload);
+			await this.idbTransaction(tx);
+			db.close();
+			logger.warn('[ErrorReporter] Error report saved to offline outbox');
+		} catch {
+			// IndexedDB no disponible — se pierde silenciosamente (INV-ET07)
+		}
+	}
+
+	private async removePending(id: number): Promise<void> {
+		try {
+			const db = await this.openDb();
+			const tx = db.transaction(STORE_NAME, 'readwrite');
+			tx.objectStore(STORE_NAME).delete(id);
+			await this.idbTransaction(tx);
+			db.close();
+		} catch {
+			// Ignorar
+		}
+	}
+
+	private openDb(): Promise<IDBDatabase> {
+		return new Promise((resolve, reject) => {
+			const req = indexedDB.open(DB_NAME, DB_VERSION);
+			req.onupgradeneeded = () => {
+				const db = req.result;
+				if (!db.objectStoreNames.contains(STORE_NAME)) {
+					db.createObjectStore(STORE_NAME, { keyPath: 'id', autoIncrement: true });
+				}
+			};
+			req.onsuccess = () => resolve(req.result);
+			req.onerror = () => reject(req.error);
+		});
+	}
+
+	private idbRequest<T>(req: IDBRequest<T>): Promise<T> {
+		return new Promise((resolve, reject) => {
+			req.onsuccess = () => resolve(req.result);
+			req.onerror = () => reject(req.error);
+		});
+	}
+
+	private idbTransaction(tx: IDBTransaction): Promise<void> {
+		return new Promise((resolve, reject) => {
+			tx.oncomplete = () => resolve();
+			tx.onerror = () => reject(tx.error);
+		});
 	}
 
 	// #endregion
