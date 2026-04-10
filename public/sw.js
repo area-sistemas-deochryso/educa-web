@@ -479,6 +479,10 @@ function revalidateInBackground(request, url, cachedData) {
 		})
 		.catch(() => {
 			console.log('[SW] No se pudo revalidar en segundo plano');
+			notifyClients({
+				type: 'REVALIDATION_FAILED',
+				payload: { url: normalizeUrl(url), originalUrl: url },
+			});
 		});
 }
 

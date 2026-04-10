@@ -81,6 +81,7 @@ export class ErrorReporterService {
 
 	constructor() {
 		this.listenOnline();
+		this.listenSwRevalidationFailures();
 		this.flushPending();
 		// Flush periódico cada 30s — cubre el caso donde el backend se reinicia
 		// pero el evento 'online' no se dispara (frontend y backend en misma máquina)
@@ -334,6 +335,46 @@ export class ErrorReporterService {
 					this.savePending(payload);
 				},
 			});
+	}
+
+	/**
+	 * Escucha REVALIDATION_FAILED del Service Worker.
+	 * Cuando el SW tiene cache y devuelve SWR, la revalidación en background falla
+	 * pero Angular no ve error (recibió datos del cache). El SW nos notifica aquí.
+	 * Un solo reporte NETWORK por ráfaga (dedup 10s).
+	 */
+	private lastSwFailureReport = 0;
+	private static readonly SW_FAILURE_DEDUP_MS = 10_000;
+
+	private listenSwRevalidationFailures(): void {
+		if (typeof navigator === 'undefined' || !('serviceWorker' in navigator)) return;
+
+		navigator.serviceWorker.addEventListener('message', (event: MessageEvent) => {
+			if (event.data?.type !== 'REVALIDATION_FAILED') return;
+
+			const now = Date.now();
+			if (now - this.lastSwFailureReport < ErrorReporterService.SW_FAILURE_DEDUP_MS) return;
+			this.lastSwFailureReport = now;
+
+			const url = event.data.payload?.originalUrl ?? event.data.payload?.url ?? '';
+
+			const payload = this.buildPayload({
+				origen: 'NETWORK',
+				mensaje: `Red no disponible: ${this.sanitizeUrl(url)}`,
+				stackTrace: null,
+				url: this.sanitizeUrl(url),
+				httpMethod: 'GET',
+				httpStatus: 0,
+				errorCode: 'NETWORK_REVALIDATION_FAILED',
+				severidad: 'WARNING',
+				correlationId: null,
+				sourceLocation: null,
+				breadcrumbCount: 5,
+			});
+
+			// Guardar en outbox (no intentar enviar — no hay red)
+			this.savePending(payload);
+		});
 	}
 
 	/** Cuando vuelve la conexión, reintentar los pendientes */
