@@ -114,8 +114,7 @@ export class ErrorReporterService {
 		this.recentReports.set(dedupKey, now);
 		this.cleanRecentReports(now);
 
-		const isOnline = typeof navigator !== 'undefined' ? navigator.onLine : true;
-		const origen = !isOnline ? 'NETWORK' : this.classifyHttpOrigin(status);
+		const origen = this.classifyHttpOrigin(status);
 		const breadcrumbKey = this.getBreadcrumbKey(status);
 		const maxBreadcrumbs = BREADCRUMB_LIMITS[breadcrumbKey] ?? BREADCRUMB_LIMITS['default'];
 		const sourceLocation = stack ? this.parseSourceLocation(stack) : null;
@@ -166,13 +165,20 @@ export class ErrorReporterService {
 	// #region Clasificación de origen
 
 	/**
-	 * Determina el VERDADERO origen del error basado en el HTTP status:
-	 * - 0, 408, 504 → NETWORK (el backend no respondió)
-	 * - 500+ → BACKEND (el servidor falló)
+	 * Determina el VERDADERO origen del error:
+	 * - status 0 → NETWORK (request nunca llegó al servidor — DNS, timeout, sin red)
+	 * - 408, 502, 503, 504 → NETWORK (servidor no respondió a tiempo)
+	 * - navigator.onLine === false → NETWORK (sin conexión de red)
+	 * - 500+ → BACKEND (el servidor respondió con error)
 	 * - 4xx → FRONTEND (el frontend envió algo incorrecto)
 	 */
 	private classifyHttpOrigin(status: number): ErrorOrigen {
-		if (status === 0 || status === 408 || status === 504) return 'NETWORK';
+		// Status 0 = el request nunca llegó: sin red, DNS fail, CORS block, timeout total
+		if (status === 0) return 'NETWORK';
+		// Gateway/proxy errors = el servidor no respondió
+		if (status === 408 || status === 502 || status === 503 || status === 504) return 'NETWORK';
+		// navigator.onLine como señal adicional (no confiable solo, pero sumada al status refuerza)
+		if (this.isBrowser && !navigator.onLine) return 'NETWORK';
 		if (status >= 500) return 'BACKEND';
 		return 'FRONTEND';
 	}
@@ -327,12 +333,6 @@ export class ErrorReporterService {
 			.post(ErrorReporterService.ENDPOINT, payload, { headers })
 			.subscribe({
 				error: () => {
-					// Si el POST falló, no hay conectividad con el backend.
-					// Reclasificar como NETWORK: el error original pudo haberse
-					// clasificado como BACKEND (500) pero la causa real es la red.
-					if (this.isBrowser && !navigator.onLine) {
-						payload.origen = 'NETWORK';
-					}
 					this.savePending(payload);
 				},
 			});
