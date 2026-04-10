@@ -11,7 +11,7 @@ import { ErrorReporterService } from '@core/services/error/error-reporter.servic
 import { RequestTraceFacade } from '@core/services/trace';
 import { inject } from '@angular/core';
 
-const SLOW_REQUEST_THRESHOLD_MS = 500;
+const SLOW_REQUEST_THRESHOLD_MS = 2_000;
 
 /**
  * Adds X-Request-Id to ALL requests (prod + dev) for backend correlation.
@@ -72,11 +72,18 @@ export const requestTraceInterceptor: HttpInterceptorFn = (req, next) => {
 				activityTracker.trackApiCall(tracedReq.method, tracedReq.url, status, durationMs);
 			}
 
-			// Request lento + fallido = problema de red (el SW puede haber ocultado el error)
+			// Request lento + fallido = problema de red
 			if (!isErrorEndpoint && !ok && durationMs >= SLOW_REQUEST_THRESHOLD_MS) {
 				errorReporter.reportHttpError(
 					status ?? 0, tracedReq.url, tracedReq.method,
 					'SLOW_REQUEST_FAILED', requestId,
+				);
+			}
+
+			// Request lento + exitoso = degradación de red (WARNING)
+			if (!isErrorEndpoint && ok && durationMs >= SLOW_REQUEST_THRESHOLD_MS) {
+				errorReporter.reportSlowRequest(
+					tracedReq.method, tracedReq.url, status ?? 200, durationMs, requestId,
 				);
 			}
 

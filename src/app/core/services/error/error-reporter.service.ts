@@ -139,6 +139,40 @@ export class ErrorReporterService {
 		this.send(payload);
 	}
 
+	reportSlowRequest(
+		method: string,
+		url: string,
+		status: number,
+		durationMs: number,
+		correlationId?: string,
+	): void {
+		if (!this.isBrowser || !this.canReport()) return;
+
+		const dedupKey = `slow:${this.sanitizeUrl(url)}`;
+		const now = Date.now();
+		if (this.recentReports.has(dedupKey) &&
+			now - this.recentReports.get(dedupKey)! < ErrorReporterService.DEDUP_WINDOW_MS) {
+			return;
+		}
+		this.recentReports.set(dedupKey, now);
+
+		const payload = this.buildPayload({
+			origen: 'NETWORK',
+			mensaje: `Slow request (${Math.round(durationMs)}ms): ${method} ${this.sanitizeUrl(url)}`,
+			stackTrace: null,
+			url: this.sanitizeUrl(url),
+			httpMethod: method,
+			httpStatus: status,
+			errorCode: 'SLOW_REQUEST',
+			severidad: 'WARNING',
+			correlationId: correlationId ?? null,
+			sourceLocation: null,
+			breadcrumbCount: 5,
+		});
+
+		this.send(payload);
+	}
+
 	reportClientError(message: string, stack?: string, correlationId?: string): void {
 		if (!this.isBrowser || !this.canReport()) return;
 
