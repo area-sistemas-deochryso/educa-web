@@ -117,9 +117,10 @@ export class ErrorReporterService {
 		const origen = this.classifyHttpOrigin(status);
 		const breadcrumbKey = this.getBreadcrumbKey(status);
 		const maxBreadcrumbs = BREADCRUMB_LIMITS[breadcrumbKey] ?? BREADCRUMB_LIMITS['default'];
-		const sourceLocation = stack ? this.parseSourceLocation(stack) : null;
-
-		const effectiveStack = stack ?? this.captureCallSite();
+		const isNetworkError = origen === 'NETWORK';
+		// No capturar call site para errores de red — el stack del reporter no aporta nada
+		const sourceLocation = !isNetworkError && stack ? this.parseSourceLocation(stack) : null;
+		const effectiveStack = isNetworkError ? null : (stack ?? this.captureCallSite());
 
 		const payload = this.buildPayload({
 			origen,
