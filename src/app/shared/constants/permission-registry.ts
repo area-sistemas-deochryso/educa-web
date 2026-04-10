@@ -26,6 +26,7 @@ export const PERMISOS = {
 	// #region Admin - Gestión Académica
 	ADMIN_ASISTENCIAS: 'intranet/admin/asistencias',
 	ADMIN_EMAIL_OUTBOX: 'intranet/admin/email-outbox',
+	ADMIN_ERROR_LOGS: 'intranet/admin/trazabilidad-errores',
 	ADMIN_CAMPUS: 'intranet/admin/campus',
 	ADMIN_CURSOS: 'intranet/admin/cursos',
 	ADMIN_EVENTOS_CALENDARIO: 'intranet/admin/eventos-calendario',

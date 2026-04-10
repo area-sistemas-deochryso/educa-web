@@ -6,6 +6,7 @@ import { Observable, Subject, catchError, filter, switchMap, take, throwError, t
 import { logger } from '@core/helpers';
 import { AuthApiService } from '@core/services/auth/auth-api.service';
 import { ErrorHandlerService } from '@core/services/error';
+import { ErrorReporterService } from '@core/services/error/error-reporter.service';
 import { SessionActivityService } from '@core/services/session';
 
 // * Centralizes HTTP error handling and reporting.
@@ -24,6 +25,7 @@ const REFRESH_WAIT_TIMEOUT = 10_000;
 // #region Implementation
 export const errorInterceptor: HttpInterceptorFn = (req, next) => {
 	const errorHandler = inject(ErrorHandlerService);
+	const errorReporter = inject(ErrorReporterService);
 	const sessionActivity = inject(SessionActivityService);
 	const authApi = inject(AuthApiService);
 	const requestId = req.headers.get('X-Request-Id') ?? undefined;
@@ -31,7 +33,11 @@ export const errorInterceptor: HttpInterceptorFn = (req, next) => {
 	return next(req).pipe(
 		catchError((error: HttpErrorResponse) => {
 			// Skip URLs handled locally (login form, token verification, refresh).
+			// BUT still report 500+ errors silently — those are backend bugs, not user errors.
 			if (SKIP_REFRESH_URLS.some((url) => req.url.includes(url))) {
+				if (error.status >= 500 || error.status === 0) {
+					errorReporter.reportHttpError(error.status, req.url, req.method, undefined, requestId);
+				}
 				return throwError(() => error);
 			}
 
@@ -42,7 +48,11 @@ export const errorInterceptor: HttpInterceptorFn = (req, next) => {
 			}
 
 			// Skip error toast for requests that handle their own errors locally.
+			// Still report 500+ silently for trazability.
 			if (req.headers.has('X-Skip-Error-Toast')) {
+				if (error.status >= 500 || error.status === 0) {
+					errorReporter.reportHttpError(error.status, req.url, req.method, undefined, requestId);
+				}
 				return throwError(() => error);
 			}
 

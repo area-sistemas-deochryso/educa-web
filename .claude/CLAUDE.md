@@ -24,6 +24,7 @@ Aplicacion Angular 21 para gestion educativa con portal publico e intranet priva
 ## Reglas de codigo
 
 @.claude/rules/reading-optimization.md
+@.claude/rules/code-language.md
 @.claude/rules/code-style.md
 @.claude/rules/comments.md
 @.claude/rules/regions.md
@@ -52,6 +53,7 @@ Aplicacion Angular 21 para gestion educativa con portal publico e intranet priva
 @.claude/rules/domain-modeling.md
 @.claude/rules/semantic-types.md
 @.claude/rules/capacitor.md
+@.claude/rules/menu-modules.md
 
 ## Comunicación con el usuario
 

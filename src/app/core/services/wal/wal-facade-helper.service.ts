@@ -1,6 +1,7 @@
 import { Injectable, inject } from '@angular/core';
 import { Observable, filter, map } from 'rxjs';
 import { logger } from '@core/helpers';
+import { ActivityTrackerService } from '@core/services/error/activity-tracker.service';
 import { ErrorHandlerService } from '@core/services/error/error-handler.service';
 import { SwService } from '@features/intranet/services/sw/sw.service';
 import { WalService } from './wal.service';
@@ -20,6 +21,7 @@ export class WalFacadeHelper {
 	private statusStore = inject(WalStatusStore);
 	private sw = inject(SwService);
 	private errorHandler = inject(ErrorHandlerService);
+	private activityTracker = inject(ActivityTrackerService);
 
 	// #endregion
 
@@ -43,6 +45,11 @@ export class WalFacadeHelper {
 	 * });
 	 */
 	async execute<T>(config: WalMutationConfig<T>): Promise<void> {
+		// Track WAL operation for error breadcrumbs
+		this.activityTracker.track('WAL_OPERATION',
+			`WAL: ${config.operation} ${config.resourceType}${config.resourceId ? ` #${config.resourceId}` : ''}`,
+		);
+
 		const consistency = config.consistencyLevel ?? 'optimistic';
 
 		// server-confirmed and serialized: skip optimistic, execute directly and wait

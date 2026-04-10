@@ -71,3 +71,6 @@ ios/
 
 # Claude worktrees
 .claude/worktrees/
+
+# Codex
+.codex/

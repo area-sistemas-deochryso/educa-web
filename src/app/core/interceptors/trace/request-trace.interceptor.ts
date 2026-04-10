@@ -6,12 +6,14 @@ import {
 } from '@angular/common/http';
 import { finalize, tap } from 'rxjs';
 
+import { ActivityTrackerService } from '@core/services/error/activity-tracker.service';
 import { RequestTraceFacade } from '@core/services/trace';
 import { inject } from '@angular/core';
 
 /**
  * Adds X-Request-Id to ALL requests (prod + dev) for backend correlation.
- * Records timing and details only in dev mode.
+ * Always feeds ActivityTracker with API breadcrumbs (prod + dev).
+ * Records detailed timing only in dev mode via RequestTraceFacade.
  */
 // #endregion
 // #region Implementation
@@ -25,6 +27,7 @@ function generateRequestId(): string {
 
 export const requestTraceInterceptor: HttpInterceptorFn = (req, next) => {
 	const trace = inject(RequestTraceFacade);
+	const activityTracker = inject(ActivityTrackerService);
 
 	// Always send X-Request-Id for backend correlation (prod + dev)
 	const requestId = generateRequestId();
@@ -32,13 +35,10 @@ export const requestTraceInterceptor: HttpInterceptorFn = (req, next) => {
 		setHeaders: { 'X-Request-Id': requestId },
 	});
 
-	// Recording/timing only in dev mode
-	if (!trace.isEnabled) {
-		return next(tracedReq);
-	}
-
 	const startedAtPerf = performance.now();
-	const startedAt = new Date();
+
+	// Skip breadcrumb tracking for the error reporter itself to avoid loops
+	const isErrorEndpoint = tracedReq.url.includes('/api/sistema/errors');
 
 	let status: number | null = null;
 	let ok = false;
@@ -61,21 +61,29 @@ export const requestTraceInterceptor: HttpInterceptorFn = (req, next) => {
 			},
 		}),
 		finalize(() => {
-			const endedAt = new Date();
 			const durationMs = Math.round((performance.now() - startedAtPerf) * 100) / 100;
 
-			trace.record({
-				id: trace.newRequestId(),
-				requestId,
-				method: tracedReq.method,
-				url: tracedReq.urlWithParams,
-				status,
-				ok,
-				durationMs,
-				startedAt,
-				endedAt,
-				error: errorPayload,
-			});
+			// Always track API calls for error breadcrumbs (except error endpoint itself)
+			if (!isErrorEndpoint && status !== null) {
+				activityTracker.trackApiCall(tracedReq.method, tracedReq.url, status, durationMs);
+			}
+
+			// Detailed recording only in dev mode
+			if (trace.isEnabled) {
+				const startedAt = new Date(Date.now() - durationMs);
+				trace.record({
+					id: trace.newRequestId(),
+					requestId,
+					method: tracedReq.method,
+					url: tracedReq.urlWithParams,
+					status,
+					ok,
+					durationMs,
+					startedAt,
+					endedAt: new Date(),
+					error: errorPayload,
+				});
+			}
 		}),
 	);
 };

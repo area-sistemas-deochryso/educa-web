@@ -221,6 +221,50 @@ module.exports = tseslint.config(
 	},
 	// #endregion
 
+	// #region Enforcement de barrels — features/ y shared/ solo usan facades públicas
+	{
+		files: [
+			'src/app/features/**/*.ts',
+			'src/app/shared/**/*.ts',
+		],
+		ignores: ['**/*.spec.ts'],
+		rules: {
+			'no-restricted-imports': [
+				'error',
+				{
+					patterns: [
+						{
+							group: [
+								'@core/services/storage/session-storage*',
+								'@core/services/storage/preferences-storage*',
+								'@core/services/storage/notification-storage*',
+								'@core/services/storage/indexed-db*',
+								'@core/services/storage/cache-storage*',
+								'@core/services/storage/smart-data*',
+							],
+							message:
+								'Usar StorageService de @core/services en lugar de servicios internos de storage.',
+						},
+						{
+							group: ['@core/services/auth/auth-api*'],
+							message:
+								'Usar AuthService de @core/services en lugar de AuthApiService (interno).',
+						},
+						{
+							group: [
+								'@core/services/session/session-coordinator*',
+								'@core/services/session/session-refresh*',
+							],
+							message:
+								'Usar SessionActivityService de @core/services en lugar de servicios internos de session.',
+						},
+					],
+				},
+			],
+		},
+	},
+	// #endregion
+
 	// #region HTML config
 	{
 		files: ['**/*.html'],

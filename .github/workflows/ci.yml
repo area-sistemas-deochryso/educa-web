@@ -6,6 +6,10 @@ on:
   pull_request:
     branches: [main]
 
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   lint-test-build:
     runs-on: ubuntu-latest
@@ -15,10 +19,14 @@ jobs:
 
       - uses: actions/setup-node@v4
         with:
-          node-version: 20
+          node-version: 22
           cache: npm
 
       - run: npm ci
+
+      - name: Audit (high severity)
+        run: npm audit --audit-level=high || true
+        continue-on-error: true
 
       - name: Lint
         run: npm run lint

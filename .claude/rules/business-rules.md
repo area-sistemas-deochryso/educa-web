@@ -106,11 +106,24 @@ F (4) > J (3) > T (2) > A (1) > Pendiente/X (0)
 
 **Ejemplo**: Ingreso a las 8:15 en periodo regular → `A` (Asistió). Salida a las 14:00 → estado sigue siendo `A`, asistencia pasa a `Completa`.
 
-### 1.5 Anti-duplicación biométrica
+### 1.5 Coherencia horaria y anti-duplicación biométrica
 
-**Regla**: Ventana mínima de **30 minutos** entre entrada y salida. Una marcación dentro de los 30 minutos posteriores a la anterior se ignora silenciosamente ("Marcación ignorada").
+**Umbral de coherencia**: Las **12:00** separan horario de entrada (antes) y horario de salida (desde). Una marcación es "coherente" si ocurre en el horario que corresponde a su tipo (entrada antes de 12:00, salida desde 12:00).
 
-**Por qué**: Los dispositivos CrossChex pueden enviar duplicados o el estudiante puede marcar accidentalmente dos veces.
+**Regla de clasificación con múltiples biométricos**:
+
+| Registro existente hoy | Nueva marca en horario de entrada (<12:00) | Nueva marca en horario de salida (≥12:00) |
+|-------------------------|---------------------------------------------|---------------------------------------------|
+| **No existe** | Crear ENTRADA | Crear SALIDA (sin entrada) |
+| **Entrada coherente** (<12:00) | IGNORAR (duplicado de otro biométrico) | Completar SALIDA |
+| **Entrada incoherente** (≥12:00) | REEMPLAZAR entrada con marca coherente | REEMPLAZAR: limpiar entrada, registrar como salida |
+| **Entrada + salida completas** | IGNORAR | IGNORAR |
+
+**Principio**: Una marca coherente siempre tiene prioridad sobre una incoherente del mismo día y persona.
+
+**Anti-duplicación**: Ventana mínima de **30 minutos** entre entrada y salida al completar salida. Aplica solo cuando ya hay entrada coherente y se registra salida. Los dispositivos CrossChex pueden enviar duplicados o el estudiante puede marcar en múltiples biométricos.
+
+**Por qué**: Un colegio puede tener múltiples dispositivos biométricos (puerta principal, pasillo, etc.). Sin coherencia horaria, una segunda marcación a las 09:32 en otro dispositivo se registraba como "salida" cuando claramente es horario de entrada.
 
 ### 1.6 Estado de completitud
 
@@ -974,7 +987,7 @@ Este registro consolida TODAS las invariantes del sistema en una tabla indexable
 |----|---------|------------|-------------|---------|
 | `INV-C01` | Asistencia | Estado final lo determina el ingreso. Salida solo afecta completitud. Severidad: `F(4) > J(3) > T(2) > A(1)` | `AsistenciaEstadoCalculador` | 1.4 |
 | `INV-C02` | Asistencia | Justificación (`"Justificado:"`) tiene precedencia absoluta sobre cálculo por hora | `AsistenciaEstadoCalculador` | 1.3 |
-| `INV-C03` | Asistencia | Anti-duplicación: ventana mínima de 30 minutos entre marcaciones | Webhook handler | 1.5 |
+| `INV-C03` | Asistencia | Coherencia horaria: umbral 12:00 separa entrada/salida. Marca coherente reemplaza incoherente. Anti-duplicación 30 min al completar salida | `ClasificarYRegistrarMarcacionAsync` | 1.5 |
 | `INV-C04` | Calificación | `Promedio = Σ(nota × peso)`, redondeado a 1 decimal. Pesos NO se normalizan | `CalificacionHelper` | 3.2 |
 | `INV-C05` | Progresión | Siguiente grado = `GRA_Orden + 1`. Último grado (14) = egreso | Service de aprobación | 5.1, 4.2 |
 | `INV-C06` | Horario | Superposición: `Inicio1 < Fin2 AND Fin1 > Inicio2` | Service de horarios | 6.2 |

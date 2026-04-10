@@ -1,0 +1,306 @@
+<!-- #region Header -->
+<app-page-header
+	icon="pi pi-exclamation-triangle"
+	title="Trazabilidad de Errores"
+	subtitle="Errores de producción con contexto para diagnóstico rápido"
+>
+	<button
+		pButton
+		icon="pi pi-refresh"
+		label="Refrescar"
+		class="p-button-outlined"
+		(click)="refresh()"
+		[loading]="vm().loading"
+	></button>
+</app-page-header>
+<!-- #endregion -->
+
+<!-- #region Stats -->
+<section class="stats-section">
+	<div class="stats-grid">
+		<div class="stat-card">
+			<i class="pi pi-list stat-icon"></i>
+			<div class="stat-content">
+				<span class="stat-value">{{ vm().stats.total }}</span>
+				<span class="stat-label">Total</span>
+			</div>
+		</div>
+		<div class="stat-card stat-card--critical">
+			<i class="pi pi-times-circle stat-icon"></i>
+			<div class="stat-content">
+				<span class="stat-value">{{ vm().stats.critical }}</span>
+				<span class="stat-label">Critical</span>
+			</div>
+		</div>
+		<div class="stat-card stat-card--error">
+			<i class="pi pi-exclamation-triangle stat-icon"></i>
+			<div class="stat-content">
+				<span class="stat-value">{{ vm().stats.error }}</span>
+				<span class="stat-label">Error</span>
+			</div>
+		</div>
+		<div class="stat-card stat-card--warning">
+			<i class="pi pi-info-circle stat-icon"></i>
+			<div class="stat-content">
+				<span class="stat-value">{{ vm().stats.warning }}</span>
+				<span class="stat-label">Warning</span>
+			</div>
+		</div>
+	</div>
+</section>
+<!-- #endregion -->
+
+<!-- #region Filtros -->
+<section class="filters-section">
+	<p-select
+		[options]="origenOptions"
+		[ngModel]="vm().filterOrigen"
+		(ngModelChange)="onFilterOrigenChange($event)"
+		placeholder="Origen"
+		appendTo="body"
+	/>
+	<p-select
+		[options]="severidadOptions"
+		[ngModel]="vm().filterSeveridad"
+		(ngModelChange)="onFilterSeveridadChange($event)"
+		placeholder="Severidad"
+		appendTo="body"
+	/>
+</section>
+<!-- #endregion -->
+
+<!-- #region Tabla -->
+@if (vm().tableReady) {
+	<p-table
+		[value]="vm().items"
+		[rows]="vm().pageSize"
+		[rowHover]="true"
+		styleClass="p-datatable-sm"
+	>
+		<ng-template #header>
+			<tr>
+				<th>Fecha</th>
+				<th>Origen</th>
+				<th>Severidad</th>
+				<th>Mensaje</th>
+				<th>HTTP</th>
+				<th>Usuario</th>
+				<th>Acciones</th>
+			</tr>
+		</ng-template>
+		<ng-template #body let-item>
+			<tr>
+				<td class="col-fecha">{{ item.fecha | date: 'dd/MM HH:mm:ss' }}</td>
+				<td>
+					<p-tag
+						[value]="item.origen"
+						[icon]="getOrigenIcon(item.origen)"
+						[severity]="getOrigenSeverity(item.origen)"
+					/>
+				</td>
+				<td>
+					<p-tag
+						[value]="item.severidad"
+						[severity]="getSeveridadSeverity(item.severidad)"
+					/>
+				</td>
+				<td class="col-mensaje">
+					<span class="mensaje-text" [pTooltip]="item.mensaje" tooltipPosition="top">
+						{{ item.mensaje }}
+					</span>
+					@if (item.errorCode) {
+						<span class="error-code">{{ item.errorCode }}</span>
+					}
+				</td>
+				<td>
+					@if (item.httpStatus) {
+						<span
+							class="http-status"
+							[class.http-status--error]="item.httpStatus >= 500"
+							[class.http-status--warn]="item.httpStatus >= 400 && item.httpStatus < 500"
+						>
+							{{ item.httpStatus }}
+						</span>
+					}
+				</td>
+				<td class="col-usuario">
+					@if (item.usuarioRol) {
+						<span class="usuario-rol">{{ item.usuarioRol }}</span>
+					}
+					@if (item.usuarioDni) {
+						<span class="usuario-dni">{{ item.usuarioDni }}</span>
+					}
+				</td>
+				<td>
+					<button
+						pButton
+						icon="pi pi-eye"
+						class="p-button-rounded p-button-text p-button-sm"
+						(click)="onViewDetail(item)"
+						pTooltip="Ver detalle"
+						tooltipPosition="top"
+						[pt]="{ root: { 'aria-label': 'Ver detalle del error' } }"
+					></button>
+				</td>
+			</tr>
+		</ng-template>
+		<ng-template #emptymessage>
+			<tr>
+				<td colspan="7" class="empty-message">
+					<i class="pi pi-check-circle"></i>
+					<span>No se encontraron errores con los filtros seleccionados</span>
+				</td>
+			</tr>
+		</ng-template>
+	</p-table>
+} @else {
+	<app-table-skeleton [columns]="tableSkeletonColumns" [rows]="10" />
+}
+<!-- #endregion -->
+
+<!-- #region Drawer — Detalle del error -->
+<p-drawer
+	[visible]="vm().drawerVisible"
+	(visibleChange)="onDrawerVisibleChange($event)"
+	position="right"
+	[style]="{ width: '44rem' }"
+	header="Detalle del Error"
+>
+	@if (vm().detallesLoading) {
+		<div class="drawer-loading">
+			<i class="pi pi-spinner pi-spin"></i>
+			<span>Cargando detalle...</span>
+		</div>
+	} @else if (vm().errorCompleto; as err) {
+		<div class="detail-content">
+
+			<!-- Banner de origen + severidad -->
+			<div class="origin-banner" [class]="'origin-banner--' + err.severidad.toLowerCase()">
+				<div class="origin-banner-icon">
+					<i [class]="getOrigenIcon(err.origen)"></i>
+				</div>
+				<div class="origin-banner-content">
+					<span class="origin-banner-title">{{ getOrigenLabel(err.origen) }}</span>
+					<span class="origin-banner-subtitle">{{ err.severidad }} · {{ err.fecha | date: 'dd/MM/yyyy HH:mm:ss' }}</span>
+				</div>
+				<div class="origin-banner-tags">
+					<p-tag [value]="err.origen" [severity]="getOrigenSeverity(err.origen)" />
+					@if (err.httpStatus) {
+						<p-tag
+							[value]="'' + err.httpStatus"
+							[severity]="err.httpStatus >= 500 ? 'danger' : 'warn'"
+						/>
+					}
+					@if (err.httpMethod) {
+						<p-tag [value]="err.httpMethod" severity="secondary" />
+					}
+				</div>
+			</div>
+
+			<!-- Cadena de llamadas — dónde exactamente ocurrió -->
+			@if (formatSourceLocation(err.sourceLocation); as callChain) {
+				<div class="source-location-card">
+					<i class="pi pi-sitemap"></i>
+					<div class="source-location-content">
+						<span class="source-location-label">Cadena de llamadas</span>
+						<code class="source-location-value">{{ callChain }}</code>
+					</div>
+				</div>
+			}
+
+			<!-- Mensaje -->
+			<div class="detail-section">
+				<h4><i class="pi pi-comment"></i> Mensaje</h4>
+				<pre class="detail-pre">{{ err.mensaje }}</pre>
+			</div>
+
+			<!-- Stack Trace -->
+			@if (err.stackTrace) {
+				<div class="detail-section">
+					<h4><i class="pi pi-code"></i> Stack Trace</h4>
+					<pre class="detail-pre detail-pre--stack">{{ err.stackTrace }}</pre>
+				</div>
+			}
+
+			<!-- Contexto técnico -->
+			<div class="detail-section">
+				<h4><i class="pi pi-info-circle"></i> Contexto</h4>
+				<div class="detail-grid">
+					<div class="detail-row">
+						<span class="detail-label">URL</span>
+						<span class="detail-value detail-value--mono">{{ err.url }}</span>
+					</div>
+					@if (err.errorCode) {
+						<div class="detail-row">
+							<span class="detail-label">Error Code</span>
+							<span class="detail-value detail-value--mono">{{ err.errorCode }}</span>
+						</div>
+					}
+					@if (err.correlationId) {
+						<div class="detail-row">
+							<span class="detail-label">Correlation ID</span>
+							<span class="detail-value detail-value--mono">{{ err.correlationId }}</span>
+						</div>
+					}
+					@if (err.usuarioRol) {
+						<div class="detail-row">
+							<span class="detail-label">Usuario</span>
+							<span class="detail-value">{{ err.usuarioRol }} {{ err.usuarioDni ? '(' + err.usuarioDni + ')' : '' }}</span>
+						</div>
+					}
+					<div class="detail-row">
+						<span class="detail-label">Plataforma</span>
+						<span class="detail-value">{{ err.plataforma }}</span>
+					</div>
+					@if (err.userAgent) {
+						<div class="detail-row">
+							<span class="detail-label">User Agent</span>
+							<span class="detail-value detail-value--mono detail-value--small">{{ err.userAgent }}</span>
+						</div>
+					}
+				</div>
+			</div>
+
+			<!-- Breadcrumbs / Timeline -->
+			@if (err.breadcrumbs.length > 0) {
+				<div class="detail-section">
+					<h4>
+						<i class="pi pi-history"></i>
+						Flujo del usuario ({{ err.breadcrumbs.length }} acciones previas al error)
+					</h4>
+					<div class="breadcrumbs-timeline">
+						@for (detalle of err.breadcrumbs; track detalle.id) {
+							<div class="breadcrumb-item" [class]="'breadcrumb-item--' + detalle.tipoAccion.toLowerCase()">
+								<div class="breadcrumb-icon">
+									<i [class]="getTipoAccionIcon(detalle.tipoAccion)"></i>
+								</div>
+								<div class="breadcrumb-content">
+									<div class="breadcrumb-header">
+										<span class="breadcrumb-tipo">{{ detalle.tipoAccion }}</span>
+										<span class="breadcrumb-time">{{ detalle.timestamp | date: 'HH:mm:ss.SSS' }}</span>
+									</div>
+									<span class="breadcrumb-desc">{{ detalle.descripcion }}</span>
+									@if (detalle.ruta) {
+										<span class="breadcrumb-ruta">{{ detalle.ruta }}</span>
+									}
+								</div>
+							</div>
+						}
+						<!-- Marcador final: aquí ocurrió el error -->
+						<div class="breadcrumb-item breadcrumb-item--error-marker">
+							<div class="breadcrumb-icon">
+								<i class="pi pi-bolt"></i>
+							</div>
+							<div class="breadcrumb-content">
+								<span class="breadcrumb-desc breadcrumb-desc--error">
+									⚡ Error ocurrió aquí
+								</span>
+							</div>
+						</div>
+					</div>
+				</div>
+			}
+		</div>
+	}
+</p-drawer>
+<!-- #endregion -->

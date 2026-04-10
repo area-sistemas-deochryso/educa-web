@@ -8,6 +8,7 @@ import {
 } from '@core/helpers';
 import { HasId } from '@shared/interfaces';
 import { UI_ADMIN_ERROR_DETAILS, UI_SUMMARIES } from '@shared/constants';
+import { ActivityTrackerService } from '@core/services/error/activity-tracker.service';
 import { ErrorHandlerService } from '@core/services/error/error-handler.service';
 import { SwService } from '@features/intranet/services/sw/sw.service';
 import { WalFacadeHelper } from '@core/services/wal/wal-facade-helper.service';
@@ -81,6 +82,7 @@ export abstract class BaseCrudFacade<
 	protected readonly wal = inject(WalFacadeHelper);
 	protected readonly destroyRef = inject(DestroyRef);
 	protected readonly errHandler: FacadeErrorHandler;
+	private readonly _activityTracker = inject(ActivityTrackerService);
 	// #endregion
 
 	// #region Configuración (provista por el concreto)
@@ -391,6 +393,7 @@ export abstract class BaseCrudFacade<
 	// #region Dialog delegation
 
 	openNewDialog(): void {
+		this._activityTracker.track('USER_ACTION', `Abrir dialog: Crear ${this.config.resourceType}`);
 		this.store.closeDialog();
 		this.store.openDialog();
 	}
@@ -400,6 +403,7 @@ export abstract class BaseCrudFacade<
 	}
 
 	openConfirmDialog(): void {
+		this._activityTracker.track('USER_ACTION', `Confirmar eliminación: ${this.config.resourceType}`);
 		this.store.openConfirmDialog();
 	}
 

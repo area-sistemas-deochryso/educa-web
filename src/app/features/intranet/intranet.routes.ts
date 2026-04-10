@@ -290,6 +290,12 @@ export const INTRANET_ROUTES: Routes = [
 					import('./pages/admin/email-outbox').then((m) => m.EmailOutboxComponent),
 				title: 'Intranet - Bandeja de Correos',
 			},
+			{
+				path: 'admin/trazabilidad-errores',
+				loadComponent: () =>
+					import('./pages/admin/error-logs').then((m) => m.ErrorLogsComponent),
+				title: 'Intranet - Trazabilidad de Errores',
+			},
 			// #endregion
 		],
 	},

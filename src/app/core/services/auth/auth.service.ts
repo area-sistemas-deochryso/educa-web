@@ -7,6 +7,7 @@ import { toObservable } from '@angular/core/rxjs-interop';
 /** Must match CHANNEL_NAME in session-activity.service.ts */
 const SESSION_CHANNEL_NAME = 'educa-session';
 
+import { ActivityTrackerService } from '../error/activity-tracker.service';
 import { AuthApiService } from './auth-api.service';
 import { StorageService } from '../storage';
 import { logger, Duration } from '@core/helpers';
@@ -24,6 +25,7 @@ export class AuthService {
 	private readonly MAX_LOGIN_ATTEMPTS = 3;
 	private api = inject(AuthApiService);
 	private storage = inject(StorageService);
+	private activityTracker = inject(ActivityTrackerService);
 
 	// #region Reactive state
 	private readonly _isAuthenticated = signal(this.storage.hasUserInfo());
@@ -124,6 +126,7 @@ export class AuthService {
 	 * local state is always cleaned immediately.
 	 */
 	logout(): void {
+		this.activityTracker.track('STATE_CHANGE', 'Logout');
 		this.api.logout().pipe(
 			timeout(Duration.seconds(5).ms),
 			catchError((err) => {
@@ -221,6 +224,7 @@ export class AuthService {
 		this._isAuthenticated.set(true);
 		this._currentUser.set(user);
 		this.resetAttempts();
+		this.activityTracker.track('STATE_CHANGE', `Login exitoso: ${user.rol}`);
 
 		// Notify other tabs: the cookie changed. Tabs with a different active user
 		// will force logout so their stale menu/permisos don't cause 403 errors.

@@ -115,6 +115,7 @@ export const MENU_ITEMS: MenuItemDef[] = [
 	{ route: '/intranet/admin/permisos/roles', label: 'Por Rol', icon: 'pi pi-id-card', permiso: PERMISOS.ADMIN_PERMISOS_ROLES, modulo: 'sistema', group: { label: 'Permisos', icon: 'pi pi-shield' }, preview: 'admin-table', description: 'Gestionar permisos por rol' },
 	{ route: '/intranet/admin/permisos/usuarios', label: 'Por Usuario', icon: 'pi pi-users', permiso: PERMISOS.ADMIN_PERMISOS_USUARIOS, modulo: 'sistema', group: { label: 'Permisos', icon: 'pi pi-shield' }, preview: 'admin-table', description: 'Gestionar permisos por usuario' },
 	{ route: '/intranet/admin/email-outbox', label: 'Bandeja de Correos', icon: 'pi pi-envelope', permiso: PERMISOS.ADMIN_EMAIL_OUTBOX, modulo: 'sistema', preview: 'admin-table', description: 'Revisar bandeja de correos' },
+	{ route: '/intranet/admin/trazabilidad-errores', label: 'Trazabilidad de Errores', icon: 'pi pi-exclamation-triangle', permiso: PERMISOS.ADMIN_ERROR_LOGS, modulo: 'sistema', preview: 'admin-table', description: 'Errores de producción con contexto' },
 	{ route: '/intranet/admin/campus', label: 'Campus', icon: 'pi pi-map', permiso: PERMISOS.ADMIN_CAMPUS, modulo: 'sistema', featureFlag: 'campusNavigation', preview: 'admin-table', description: 'Navegar el campus virtual' },
 	{ route: '/intranet/ctest-k6', label: 'Test k6', icon: 'pi pi-bolt', permiso: PERMISOS.CTEST_K6, modulo: 'sistema', featureFlag: 'ctestK6', preview: 'admin-table', description: 'Herramienta de testing de carga' },
 ];
