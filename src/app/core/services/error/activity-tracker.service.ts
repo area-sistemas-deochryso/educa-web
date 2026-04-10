@@ -91,7 +91,8 @@ export class ActivityTrackerService {
 
 	private sanitizeUrl(url: string): string {
 		try {
-			const parsed = new URL(url, window.location.origin);
+			const origin = typeof window !== 'undefined' ? window.location.origin : 'http://localhost';
+			const parsed = new URL(url, origin);
 			// Solo devolver path sin query params (pueden contener datos sensibles)
 			return parsed.pathname;
 		} catch {

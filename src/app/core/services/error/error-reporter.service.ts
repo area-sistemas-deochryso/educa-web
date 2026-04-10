@@ -68,6 +68,8 @@ export class ErrorReporterService {
 	private readonly activityTracker = inject(ActivityTrackerService);
 	private readonly destroyRef = inject(DestroyRef);
 
+	private readonly isBrowser = typeof window !== 'undefined';
+
 	private reportCount = 0;
 	private resetTimer: ReturnType<typeof setTimeout> | null = null;
 	private static readonly MAX_REPORTS_PER_MINUTE = 5;
@@ -80,11 +82,10 @@ export class ErrorReporterService {
 	private flushInterval: ReturnType<typeof setInterval> | null = null;
 
 	constructor() {
+		if (!this.isBrowser) return;
 		this.listenOnline();
 		this.listenSwRevalidationFailures();
 		this.flushPending();
-		// Flush periódico cada 30s — cubre el caso donde el backend se reinicia
-		// pero el evento 'online' no se dispara (frontend y backend en misma máquina)
 		this.flushInterval = setInterval(() => this.flushPending(), 30_000);
 		this.destroyRef.onDestroy(() => {
 			if (this.flushInterval) clearInterval(this.flushInterval);
@@ -101,7 +102,7 @@ export class ErrorReporterService {
 		correlationId?: string,
 		stack?: string,
 	): void {
-		if (!this.canReport()) return;
+		if (!this.isBrowser || !this.canReport()) return;
 
 		// Dedup: no reportar la misma URL + status en <5s (errores en cascada)
 		const dedupKey = `${status}:${this.sanitizeUrl(url)}`;
@@ -113,8 +114,8 @@ export class ErrorReporterService {
 		this.recentReports.set(dedupKey, now);
 		this.cleanRecentReports(now);
 
-		// Si no hay red, el origen es NETWORK sin importar el status HTTP
-		const origen = !navigator.onLine ? 'NETWORK' : this.classifyHttpOrigin(status);
+		const isOnline = typeof navigator !== 'undefined' ? navigator.onLine : true;
+		const origen = !isOnline ? 'NETWORK' : this.classifyHttpOrigin(status);
 		const breadcrumbKey = this.getBreadcrumbKey(status);
 		const maxBreadcrumbs = BREADCRUMB_LIMITS[breadcrumbKey] ?? BREADCRUMB_LIMITS['default'];
 		const sourceLocation = stack ? this.parseSourceLocation(stack) : null;
@@ -139,7 +140,7 @@ export class ErrorReporterService {
 	}
 
 	reportClientError(message: string, stack?: string, correlationId?: string): void {
-		if (!this.canReport()) return;
+		if (!this.isBrowser || !this.canReport()) return;
 
 		const sourceLocation = stack ? this.parseSourceLocation(stack) : null;
 
@@ -147,7 +148,7 @@ export class ErrorReporterService {
 			origen: 'FRONTEND',
 			mensaje: message.substring(0, 500),
 			stackTrace: stack?.substring(0, 4000) ?? null,
-			url: window.location.pathname,
+			url: this.isBrowser ? window.location.pathname : '/',
 			httpMethod: null,
 			httpStatus: null,
 			errorCode: null,
@@ -297,7 +298,7 @@ export class ErrorReporterService {
 			errorCode: opts.errorCode,
 			severidad: opts.severidad,
 			plataforma: this.detectPlatform(),
-			userAgent: navigator.userAgent.substring(0, 500),
+			userAgent: this.isBrowser ? navigator.userAgent.substring(0, 500) : 'SSR',
 			sourceLocation: opts.sourceLocation
 				? JSON.stringify(opts.sourceLocation).substring(0, 500)
 				: null,
@@ -329,7 +330,7 @@ export class ErrorReporterService {
 					// Si el POST falló, no hay conectividad con el backend.
 					// Reclasificar como NETWORK: el error original pudo haberse
 					// clasificado como BACKEND (500) pero la causa real es la red.
-					if (!navigator.onLine) {
+					if (this.isBrowser && !navigator.onLine) {
 						payload.origen = 'NETWORK';
 					}
 					this.savePending(payload);
@@ -347,7 +348,7 @@ export class ErrorReporterService {
 	private static readonly SW_FAILURE_DEDUP_MS = 10_000;
 
 	private listenSwRevalidationFailures(): void {
-		if (typeof navigator === 'undefined' || !('serviceWorker' in navigator)) return;
+		if (!this.isBrowser || !('serviceWorker' in navigator)) return;
 
 		navigator.serviceWorker.addEventListener('message', (event: MessageEvent) => {
 			if (event.data?.type !== 'REVALIDATION_FAILED') return;
@@ -393,7 +394,7 @@ export class ErrorReporterService {
 	/** Envía todos los reportes pendientes en IndexedDB */
 	private flushing = false;
 	private async flushPending(): Promise<void> {
-		if (this.flushing || !navigator.onLine) return;
+		if (this.flushing || !this.isBrowser || !navigator.onLine) return;
 		this.flushing = true;
 
 		try {
@@ -516,7 +517,8 @@ export class ErrorReporterService {
 
 	private sanitizeUrl(url: string): string {
 		try {
-			const parsed = new URL(url, window.location.origin);
+			const origin = this.isBrowser ? window.location.origin : 'http://localhost';
+			const parsed = new URL(url, origin);
 			return parsed.pathname.substring(0, 500);
 		} catch {
 			return url.split('?')[0].substring(0, 500);
@@ -524,6 +526,7 @@ export class ErrorReporterService {
 	}
 
 	private detectPlatform(): 'WEB' | 'ANDROID' | 'IOS' {
+		if (!this.isBrowser) return 'WEB';
 		const ua = navigator.userAgent.toLowerCase();
 		if (ua.includes('android') && ua.includes('capacitor')) return 'ANDROID';
 		if ((ua.includes('iphone') || ua.includes('ipad')) && ua.includes('capacitor')) return 'IOS';
