@@ -11,7 +11,7 @@ import { ErrorReporterService } from '@core/services/error/error-reporter.servic
 import { RequestTraceFacade } from '@core/services/trace';
 import { inject } from '@angular/core';
 
-const SLOW_REQUEST_THRESHOLD_MS = 5_000;
+const SLOW_REQUEST_THRESHOLD_MS = 2_000;
 
 /**
  * Adds X-Request-Id to ALL requests (prod + dev) for backend correlation.
