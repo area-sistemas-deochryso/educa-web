@@ -7,8 +7,11 @@ import {
 import { finalize, tap } from 'rxjs';
 
 import { ActivityTrackerService } from '@core/services/error/activity-tracker.service';
+import { ErrorReporterService } from '@core/services/error/error-reporter.service';
 import { RequestTraceFacade } from '@core/services/trace';
 import { inject } from '@angular/core';
+
+const SLOW_REQUEST_THRESHOLD_MS = 5_000;
 
 /**
  * Adds X-Request-Id to ALL requests (prod + dev) for backend correlation.
@@ -28,6 +31,7 @@ function generateRequestId(): string {
 export const requestTraceInterceptor: HttpInterceptorFn = (req, next) => {
 	const trace = inject(RequestTraceFacade);
 	const activityTracker = inject(ActivityTrackerService);
+	const errorReporter = inject(ErrorReporterService);
 
 	// Always send X-Request-Id for backend correlation (prod + dev)
 	const requestId = generateRequestId();
@@ -66,6 +70,14 @@ export const requestTraceInterceptor: HttpInterceptorFn = (req, next) => {
 			// Always track API calls for error breadcrumbs (except error endpoint itself)
 			if (!isErrorEndpoint && status !== null) {
 				activityTracker.trackApiCall(tracedReq.method, tracedReq.url, status, durationMs);
+			}
+
+			// Request lento + fallido = problema de red (el SW puede haber ocultado el error)
+			if (!isErrorEndpoint && !ok && durationMs >= SLOW_REQUEST_THRESHOLD_MS) {
+				errorReporter.reportHttpError(
+					status ?? 0, tracedReq.url, tracedReq.method,
+					'SLOW_REQUEST_FAILED', requestId,
+				);
 			}
 
 			// Detailed recording only in dev mode
