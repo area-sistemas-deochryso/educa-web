@@ -1,6 +1,6 @@
 # Enforcement de Reglas — De Documentación a Restricción Técnica
 
-> **Estado**: Plan aprobado, pendiente ejecución por fases
+> **Estado**: Fase 1 completada (2026-04-09), Fase 2 completada (2026-04-13), Fases 3-5 pendientes
 > **Prioridad**: Alta (fundacional — mejora la calidad de todo lo demás)
 > **Origen**: Análisis Codex + Claude (2026-04-08)
 > **Principio**: "Una regla buena no solo se explica, se diseña para resistir mal uso"
@@ -12,12 +12,12 @@
 | Nivel de enforcement | Estado actual | Brecha |
 |---------------------|---------------|--------|
 | **Documentación** | Extensa (30+ archivos en `.claude/rules/`) | Informa pero no protege |
-| **Wrappers** | Existen para áreas críticas (Storage, WAL, HTTP, Session, Cache) | No se fuerza su uso exclusivo |
-| **Tipos** | Parcial (algunos `any`, tipos inline duplicados) | No todos los DTOs/estados usan tipos semánticos |
-| **Estructura** | Clara (core/shared/features) pero sin fronteras duras | Nada impide imports cruzados |
-| **Linting** | ESLint 9 básico, 0 reglas custom de arquitectura | No detecta violaciones de capas |
-| **Tests** | Vitest configurado, cobertura mínima | Sin tests de contrato ni invariantes |
-| **CI** | Inexistente | Nada bloquea merge de código roto |
+| **Wrappers** | Existen para áreas críticas (Storage, WAL, HTTP, Session, Cache) | No se fuerza su uso exclusivo (→ Fase 5) |
+| **Tipos** | Parcial (algunos `any`, tipos inline duplicados) | No todos los DTOs/estados usan tipos semánticos (→ Fase 3) |
+| **Estructura** | Clara (core/shared/features) con fronteras lint | ✅ Fase 1: ESLint detecta cross-imports |
+| **Linting** | ✅ ESLint 9 con reglas de arquitectura por capa | Reglas activas desde 2026-04-09 |
+| **Tests** | ✅ 101 tests de contrato (Auth, Storage, Permisos, WAL, Guards, Utils) | Cobertura P1-P2 completa. Faltan P3 (interceptors, calificación) |
+| **CI** | Inexistente | Nada bloquea merge de código roto (→ Fase 4) |
 
 ### Wrappers que YA existen (no crear de nuevo)
 
@@ -147,14 +147,17 @@ describe('AsistenciaEstadoCalculador', () => {
 #### Checklist Fase 2
 
 ```
-[ ] Tests de AuthService (login, logout, refresh)
-[ ] Tests de StorageService (facade delegation, cleanup)
-[ ] Tests de permisosGuard (ruta exacta, sin herencia)
-[ ] Tests de WalFacadeHelper (commit/error callbacks)
-[ ] Tests de cálculo de estado de asistencia
-[ ] Tests de authGuard (bloqueo sin token)
-[ ] Verificar: npm test pasa con tests nuevos
+[x] Tests de AuthService (login, logout, refresh, cambiarContrasena, switchSession) — 20 tests
+[x] Tests de StorageService (facade delegation, cleanup, clearAll exhaustivo) — 15 tests
+[x] Tests de permisosGuard (ruta exacta, sin herencia) — 9 tests (ya existían)
+[x] Tests de WalFacadeHelper (optimistic, server-confirmed, fallback, rollback, postReloadCommit$) — 20 tests NUEVOS
+[x] Tests de estado.utils (funciones puras de estado activo/inactivo) — 12 tests NUEVOS
+[x] Tests de authGuard (bloqueo sin token) — 3 tests (ya existían)
+[x] Tests de UserPermisosService (tienePermiso exacto, ensureLoaded, storage restore) — 22 tests (ya existían)
+[x] Verificar: npm test pasa con tests nuevos (67/67 en archivos modificados)
 ```
+
+**Completado**: 2026-04-13. Tests de cálculo de asistencia (INV-C01/C02) no aplican al frontend — esa lógica vive en el backend (AsistenciaEstadoCalculador.cs). Se reemplazó con tests de estado.utils.ts. Tests pre-existentes rotos en `usuarios.store.spec.ts` (53 failures) son anteriores a esta fase — el store fue refactorizado y los tests no se actualizaron.
 
 ---
 
@@ -287,16 +290,16 @@ Para cada zona crítica, la estrategia completa es:
 
 ## Mapa de Enforcement por Zona Crítica
 
-| Zona | Wrapper | Lint | Test | CI | Estado actual → Objetivo |
-|------|---------|------|------|----|--------------------------|
-| **Sesión/Auth** | SessionCoordinator | Prohibir localStorage | Login/logout flow | Obligatorio | Wrapper solo → Full stack |
-| **Storage** | StorageService | Prohibir localStorage/sessionStorage | Facade delegation | Obligatorio | Wrapper solo → Full stack |
-| **HTTP** | BaseHttpService | Prohibir HttpClient en components | — | Obligatorio | Ninguno → Lint + CI |
-| **WAL/Mutaciones** | WalFacadeHelper | Prohibir imports internos WAL | Commit/error callbacks | Obligatorio | Wrapper solo → Full stack |
-| **Cache** | CacheInvalidation | Prohibir imports internos cache | — | Obligatorio | Wrapper solo → Lint + CI |
-| **Permisos** | permisosGuard | — | Ruta exacta, sin herencia | Obligatorio | Guard solo → Test + CI |
-| **Logging** | logger | no-console: error | — | Obligatorio | Warn → Error + CI |
-| **Capas** | Arquitectura | Prohibir cross-imports | — | Obligatorio | Nada → Lint + CI |
+| Zona | Wrapper | Lint | Test | CI | Progreso |
+|------|---------|------|------|----|----------|
+| **Sesión/Auth** | ✅ SessionCoordinator | ✅ Prohibir localStorage | ✅ 20 tests | ⬜ Pendiente | Wrapper + Lint + Test |
+| **Storage** | ✅ StorageService | ✅ Prohibir localStorage/sessionStorage | ✅ 15 tests | ⬜ Pendiente | Wrapper + Lint + Test |
+| **HTTP** | ✅ BaseHttpService | ✅ Prohibir HttpClient en components | — | ⬜ Pendiente | Wrapper + Lint |
+| **WAL/Mutaciones** | ✅ WalFacadeHelper | ✅ Prohibir imports internos WAL | ✅ 20 tests | ⬜ Pendiente | Wrapper + Lint + Test |
+| **Cache** | ✅ CacheInvalidation | ✅ Prohibir imports internos cache | — | ⬜ Pendiente | Wrapper + Lint |
+| **Permisos** | ✅ permisosGuard | — | ✅ 31 tests (guard 9 + service 22) | ⬜ Pendiente | Wrapper + Test |
+| **Logging** | ✅ logger | ✅ no-console: error | — | ⬜ Pendiente | Wrapper + Lint |
+| **Capas** | ✅ Arquitectura | ✅ Prohibir cross-imports | — | ⬜ Pendiente | Lint |
 
 ---
 
@@ -331,13 +334,13 @@ Fase 5 (Barrels)  ← Cierra escape hatches, requiere lint estable
 
 ## Métricas de Éxito
 
-| Métrica | Antes | Después de Fase 1-2 | Después de Fase 4-5 |
+| Métrica | Antes | Después de Fase 1-2 (actual) | Después de Fase 4-5 (objetivo) |
 |---------|-------|---------------------|---------------------|
-| Violaciones de capa detectables | 0 | Todas (lint) | Bloqueadas (CI) |
-| Tests de invariantes | 0 | 10-15 tests críticos | Obligatorios en merge |
-| `any` en services/stores | ? (auditar) | Reducido 80% | 0 en código nuevo |
+| Violaciones de capa detectables | 0 | ✅ Todas (lint) | Bloqueadas (CI) |
+| Tests de contrato | 0 | ✅ 101 tests (Auth 20 + Storage 15 + Permisos 22+9 + WAL 20 + Guards 3 + Utils 12) | Obligatorios en merge |
+| `any` en services/stores | ? (auditar) | Pendiente (Fase 3) | 0 en código nuevo |
 | Bypass de wrappers posible | Sí (import directo) | Detectado (lint) | Bloqueado (barrel + lint) |
-| CI pipeline | No existe | — | Lint + build + test |
+| CI pipeline | No existe | Pendiente (Fase 4) | Lint + build + test |
 
 ---
 

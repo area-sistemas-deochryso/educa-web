@@ -1,0 +1,299 @@
+<!-- #region Template -->
+<div class="feedback-reports-page">
+	<!-- #region Header -->
+	<header class="page-header">
+		<div>
+			<h1>Reportes de Usuarios</h1>
+			<p class="subtitle">
+				Problemas y propuestas enviadas manualmente desde la intranet.
+			</p>
+		</div>
+		<div class="header-actions">
+			<button
+				pButton
+				type="button"
+				icon="pi pi-refresh"
+				label="Refrescar"
+				class="p-button-outlined"
+				(click)="onRefresh()"
+				[pt]="{ root: { 'aria-label': 'Refrescar listado' } }"
+			></button>
+		</div>
+	</header>
+	<!-- #endregion -->
+
+	<!-- #region Stats -->
+	@if (vm().statsReady && vm().estadisticas; as stats) {
+		<section class="stats-grid">
+			<div class="stat-card">
+				<div class="stat-label">Total</div>
+				<div class="stat-value">{{ stats.total }}</div>
+			</div>
+			<div class="stat-card stat-new">
+				<div class="stat-label">Nuevos</div>
+				<div class="stat-value">{{ stats.nuevos }}</div>
+			</div>
+			<div class="stat-card stat-progress">
+				<div class="stat-label">En progreso</div>
+				<div class="stat-value">{{ stats.enProgreso }}</div>
+			</div>
+			<div class="stat-card stat-resolved">
+				<div class="stat-label">Resueltos</div>
+				<div class="stat-value">{{ stats.resueltos }}</div>
+			</div>
+			<div class="stat-card stat-discarded">
+				<div class="stat-label">Descartados</div>
+				<div class="stat-value">{{ stats.descartados }}</div>
+			</div>
+		</section>
+	}
+	<!-- #endregion -->
+
+	<!-- #region Filtros -->
+	<section class="filters">
+		<p-select
+			[options]="tipoOptions"
+			optionLabel="label"
+			optionValue="value"
+			placeholder="Todos los tipos"
+			[showClear]="true"
+			appendTo="body"
+			[ngModel]="vm().filterTipo"
+			(ngModelChange)="onFilterTipoChange($event)"
+		></p-select>
+		<p-select
+			[options]="estadoOptions"
+			optionLabel="label"
+			optionValue="value"
+			placeholder="Todos los estados"
+			[showClear]="true"
+			appendTo="body"
+			[ngModel]="vm().filterEstado"
+			(ngModelChange)="onFilterEstadoChange($event)"
+		></p-select>
+		<p-datepicker
+			[ngModel]="vm().filterDesde"
+			(ngModelChange)="onFilterDesdeChange($event)"
+			placeholder="Desde"
+			appendTo="body"
+			[showIcon]="true"
+			dateFormat="dd/mm/yy"
+		></p-datepicker>
+		<p-datepicker
+			[ngModel]="vm().filterHasta"
+			(ngModelChange)="onFilterHastaChange($event)"
+			placeholder="Hasta"
+			appendTo="body"
+			[showIcon]="true"
+			dateFormat="dd/mm/yy"
+		></p-datepicker>
+		<button
+			pButton
+			type="button"
+			icon="pi pi-filter-slash"
+			label="Limpiar"
+			class="p-button-text"
+			(click)="onClearFilters()"
+		></button>
+	</section>
+	<!-- #endregion -->
+
+	<!-- #region Tabla -->
+	<section class="table-section">
+		<p-table
+			[value]="vm().items"
+			[rows]="20"
+			[paginator]="true"
+			[rowsPerPageOptions]="[10, 20, 50]"
+			[rowHover]="true"
+			[loading]="vm().loading"
+			dataKey="id"
+		>
+			<ng-template pTemplate="header">
+				<tr>
+					<th style="width: 140px">Fecha</th>
+					<th style="width: 180px">Tipo</th>
+					<th>Descripción</th>
+					<th style="width: 180px">Usuario</th>
+					<th style="width: 120px">Estado</th>
+					<th style="width: 80px"></th>
+				</tr>
+			</ng-template>
+			<ng-template pTemplate="body" let-item>
+				<tr class="data-row" (click)="onRowClick(item)">
+					<td>{{ item.fechaReg | date: 'dd/MM/yyyy HH:mm' }}</td>
+					<td>{{ tipoLabel(item.tipo) }}</td>
+					<td class="desc-cell">
+						<span class="desc-text">{{ item.descripcionResumen }}</span>
+						@if (item.tienePropuesta) {
+							<i
+								class="pi pi-lightbulb propuesta-icon"
+								title="Incluye propuesta de mejora"
+							></i>
+						}
+					</td>
+					<td>
+						<div class="user-cell">
+							<span class="user-name">{{ item.usuarioNombre ?? 'Anónimo' }}</span>
+							@if (item.usuarioRol) {
+								<small class="user-rol">{{ item.usuarioRol }}</small>
+							}
+						</div>
+					</td>
+					<td>
+						<p-tag
+							[value]="estadoLabel(item.estado)"
+							[severity]="estadoSeverity(item.estado)"
+						></p-tag>
+					</td>
+					<td>
+						<button
+							pButton
+							type="button"
+							icon="pi pi-eye"
+							class="p-button-rounded p-button-text"
+							(click)="onRowClick(item); $event.stopPropagation()"
+							[pt]="{ root: { 'aria-label': 'Ver detalle del reporte' } }"
+						></button>
+					</td>
+				</tr>
+			</ng-template>
+			<ng-template pTemplate="emptymessage">
+				<tr>
+					<td colspan="6" class="empty-row">
+						No hay reportes que coincidan con los filtros.
+					</td>
+				</tr>
+			</ng-template>
+		</p-table>
+	</section>
+	<!-- #endregion -->
+</div>
+
+<!-- #region Drawer detalle -->
+<p-drawer
+	[visible]="vm().drawerVisible"
+	(visibleChange)="onDrawerVisibleChange($event)"
+	position="right"
+	[style]="{ width: '520px', maxWidth: '95vw' }"
+	header="Detalle del reporte"
+>
+	@if (vm().detalleLoading) {
+		<div class="drawer-loading">
+			<i class="pi pi-spin pi-spinner"></i>
+			<span>Cargando detalle…</span>
+		</div>
+	} @else if (vm().detalle; as d) {
+		<div class="drawer-content">
+			<!-- Metadatos -->
+			<dl class="meta-list">
+				<dt>Tipo</dt>
+				<dd>{{ tipoLabel(d.tipo) }}</dd>
+				<dt>Estado actual</dt>
+				<dd>
+					<p-tag [value]="estadoLabel(d.estado)" [severity]="estadoSeverity(d.estado)"></p-tag>
+				</dd>
+				<dt>Fecha</dt>
+				<dd>{{ d.fechaReg | date: 'dd/MM/yyyy HH:mm' }}</dd>
+				<dt>Usuario</dt>
+				<dd>{{ d.usuarioNombre ?? 'Anónimo' }} <small>({{ d.usuarioRol ?? 'sin rol' }})</small></dd>
+				<dt>DNI</dt>
+				<dd>{{ d.usuarioDni ?? '—' }}</dd>
+				<dt>Plataforma</dt>
+				<dd>{{ d.plataforma }}</dd>
+				<dt>URL</dt>
+				<dd class="url-cell">{{ d.url }}</dd>
+				@if (d.userAgent) {
+					<dt>User Agent</dt>
+					<dd class="user-agent">{{ d.userAgent }}</dd>
+				}
+				@if (d.correlationId) {
+					<dt>Correlation ID</dt>
+					<dd>
+						<button
+							type="button"
+							class="correlation-link"
+							(click)="onOpenErrorDetail(d.correlationId!)"
+							pTooltip="Ver error de trazabilidad asociado"
+							tooltipPosition="top"
+						>
+							<i class="pi pi-search"></i>
+							<code>{{ d.correlationId }}</code>
+						</button>
+					</dd>
+				}
+			</dl>
+
+			<!-- Descripción -->
+			<section class="detail-block">
+				<h4>Descripción del problema</h4>
+				<p class="detail-text">{{ d.descripcion }}</p>
+			</section>
+
+			<!-- Propuesta -->
+			@if (d.propuesta) {
+				<section class="detail-block propuesta-block">
+					<h4><i class="pi pi-lightbulb"></i> Propuesta de mejora</h4>
+					<p class="detail-text">{{ d.propuesta }}</p>
+				</section>
+			}
+
+			<!-- Observación admin -->
+			@if (d.observacion) {
+				<section class="detail-block">
+					<h4>Observación del admin</h4>
+					<p class="detail-text">{{ d.observacion }}</p>
+					<small class="audit">
+						{{ d.usuarioMod ?? '—' }} · {{ d.fechaMod | date: 'dd/MM/yyyy HH:mm' }}
+					</small>
+				</section>
+			}
+
+			<!-- Cambio de estado -->
+			<section class="estado-form">
+				<h4>Cambiar estado</h4>
+				<div class="estado-field">
+					<label>Nuevo estado</label>
+					<p-select
+						[options]="estadoOptions"
+						optionLabel="label"
+						optionValue="value"
+						appendTo="body"
+						[ngModel]="nuevoEstado()"
+						(ngModelChange)="nuevoEstado.set($event)"
+					></p-select>
+				</div>
+				<div class="estado-field">
+					<label>Observación (opcional)</label>
+					<textarea
+						pTextarea
+						rows="3"
+						[ngModel]="observacionCambio()"
+						(ngModelChange)="observacionCambio.set($event)"
+						placeholder="Contexto del cambio, plan de acción, etc."
+						maxlength="1000"
+					></textarea>
+				</div>
+				<button
+					pButton
+					type="button"
+					label="Guardar cambio"
+					icon="pi pi-check"
+					(click)="onGuardarCambioEstado()"
+					[loading]="vm().estadoUpdating"
+					[disabled]="!nuevoEstado() || nuevoEstado() === d.estado"
+				></button>
+			</section>
+		</div>
+	}
+</p-drawer>
+<!-- #endregion -->
+
+<!-- #region Drawer de trazabilidad (reutilizado) -->
+<app-error-log-detail-drawer
+	[visible]="errorDrawerVisible()"
+	[correlationId]="selectedCorrelationId()"
+	(visibleChange)="onErrorDrawerVisibleChange($event)"
+/>
+<!-- #endregion -->
+<!-- #endregion -->

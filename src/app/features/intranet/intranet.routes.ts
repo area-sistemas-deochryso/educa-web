@@ -269,6 +269,14 @@ export const INTRANET_ROUTES: Routes = [
 				title: 'Intranet - Gestión de Asistencias',
 			},
 			{
+				path: 'admin/permisos-salud',
+				loadComponent: () =>
+					import('./pages/admin/health-permissions/admin-health-permissions.component').then(
+						(m) => m.AdminHealthPermissionsComponent,
+					),
+				title: 'Intranet - Permisos de Salud',
+			},
+			{
 				path: 'admin/eventos-calendario',
 				loadComponent: () =>
 					import('./pages/admin/events-calendar').then(
@@ -295,6 +303,12 @@ export const INTRANET_ROUTES: Routes = [
 				loadComponent: () =>
 					import('./pages/admin/error-logs').then((m) => m.ErrorLogsComponent),
 				title: 'Intranet - Trazabilidad de Errores',
+			},
+			{
+				path: 'admin/reportes-usuario',
+				loadComponent: () =>
+					import('./pages/admin/feedback-reports').then((m) => m.FeedbackReportsComponent),
+				title: 'Intranet - Reportes de Usuarios',
 			},
 			// #endregion
 		],

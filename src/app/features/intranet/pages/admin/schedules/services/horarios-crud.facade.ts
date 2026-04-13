@@ -69,7 +69,7 @@ export class SchedulesCrudFacade {
       },
       optimistic: {
         apply: () => {
-          this.store.closeDialog();
+          this.store.formStore.closeDialog();
         },
         rollback: () => {},
       },
@@ -148,7 +148,7 @@ export class SchedulesCrudFacade {
             salonId: data.salonId,
             cursoId: data.cursoId,
           });
-          this.store.closeDialog();
+          this.store.formStore.closeDialog();
         },
         rollback: () => {
           if (previousData) {

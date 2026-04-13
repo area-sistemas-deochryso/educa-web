@@ -5,7 +5,7 @@ import { DividerModule } from 'primeng/divider';
 import {
 	EstudianteMisNotasDto,
 	VistaPromedio,
-} from '../../../models';
+} from '@features/intranet/pages/estudiante/models';
 import { getNotaSeverity, formatNotaConConfig } from '@intranet-shared/services/calificacion-config';
 import type { ConfiguracionCalificacionListDto } from '@data/models';
 

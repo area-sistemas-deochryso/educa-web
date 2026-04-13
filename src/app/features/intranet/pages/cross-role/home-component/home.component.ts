@@ -28,12 +28,15 @@ export class HomeComponent {
 	private flags = inject(FeatureFlagsFacade);
 	private userPermisos = inject(UserPermissionsService);
 	private userProfile = inject(UserProfileService);
-	readonly favoritesService = inject(QuickAccessFavoritesService);
+	private favoritesService = inject(QuickAccessFavoritesService);
 	// #endregion
 
 	// #region Estado
 	readonly showAttendanceWidget = computed(
-		() => this.userProfile.isDirector() || this.userProfile.isAsistenteAdministrativo(),
+		() =>
+			this.userProfile.isDirector() ||
+			this.userProfile.isAsistenteAdministrativo() ||
+			this.userProfile.isPromotor(),
 	);
 	readonly showProfesorWidget = computed(() => this.userProfile.isProfesor());
 	readonly showQuickAccess = computed(() => this.flags.isEnabled('quickAccess'));
@@ -65,9 +68,6 @@ export class HomeComponent {
 			.slice(0, MAX_QUICK_ACCESS);
 	});
 
-	togglePersonalizing(): void {
-		this.favoritesService.togglePersonalizing();
-	}
 	// #endregion
 }
 // #endregion

@@ -377,9 +377,8 @@
 	}
 }
 
-// En pantallas medianas (≤1200px) ocultar nombre y rol SOLO en el header de escritorio
-// El menú hamburguesa (.mobile-nav) sí debe mostrarlos — host-context discrimina el contexto
-@media screen and (max-width: 1200px) {
+// Ocultar nombre y rol en desktop solo cuando se cambia a mobile header (≤840px)
+@media screen and (max-width: 840px) {
 	:host-context(.desktop-header) .profile-info {
 		display: none;
 	}

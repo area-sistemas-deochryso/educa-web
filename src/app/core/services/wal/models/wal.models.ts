@@ -62,6 +62,13 @@ export interface WalEntry {
 // #region Mutation Config (used by facades)
 /**
  * Optimistic UI handlers for WAL mutations.
+ *
+ * `apply` aplica el cambio visible en el store INMEDIATAMENTE (antes de
+ * llamar al servidor). `rollback` revierte al snapshot previo si la
+ * operación falla definitivamente.
+ *
+ * Regla: el cambio visible vive en `apply`. `onCommit` solo reconcilia
+ * campos derivados del server (IDs, timestamps, descripciones resueltas).
  */
 export interface WalOptimisticConfig {
 	/** Apply optimistic update to store immediately */
@@ -70,13 +77,9 @@ export interface WalOptimisticConfig {
 	rollback: () => void;
 }
 
-/**
- * WAL mutation configuration for facades.
- */
-export interface WalMutationConfig<T = unknown> {
-	operation: WalOperation;
+/** Campos comunes de toda mutación WAL. */
+interface WalMutationBase<T> {
 	resourceType: string;
-	resourceId?: number | string;
 	endpoint: string;
 	method: WalHttpMethod;
 	/** Request body (must be JSON-serializable) */
@@ -87,13 +90,59 @@ export interface WalMutationConfig<T = unknown> {
 	onCommit: (result: T) => void;
 	/** Called on permanent failure (after max retries) */
 	onError: (error: unknown) => void;
-	/** Optimistic UI support */
-	optimistic?: WalOptimisticConfig;
 	/** Override default max retries (default: 5) */
 	maxRetries?: number;
 	/** Consistency level (default: 'optimistic'). */
 	consistencyLevel?: WalConsistencyLevel;
 }
+
+/**
+ * CREATE: el store no tiene el ID del servidor todavía.
+ * `optimistic.apply` típicamente solo cierra el dialog o agrega con temp ID.
+ * `optimistic` es opcional (válido aplicarlo en `onCommit` si no hay tempId).
+ */
+export interface WalCreateConfig<T> extends WalMutationBase<T> {
+	operation: 'CREATE';
+	resourceId?: never;
+	optimistic?: WalOptimisticConfig;
+}
+
+/**
+ * UPDATE / DELETE / TOGGLE: el recurso ya existe en el store.
+ * `optimistic` es OBLIGATORIO — el cambio se ve antes del round-trip
+ * y existe un rollback determinista al snapshot previo.
+ *
+ * Si una operación requiere esperar al servidor por reglas de negocio
+ * (ej: cierre de periodo irreversible, pago), usar `consistencyLevel:
+ * 'server-confirmed'` — en ese caso `optimistic` sigue siendo requerido
+ * para consistencia de tipos, pero `apply` puede ser un no-op.
+ */
+export interface WalMutateConfig<T> extends WalMutationBase<T> {
+	operation: 'UPDATE' | 'DELETE' | 'TOGGLE';
+	resourceId: number | string;
+	optimistic: WalOptimisticConfig;
+}
+
+/**
+ * CUSTOM: operación no-CRUD (ej: bulk import, assignment).
+ * `optimistic` opcional — usar con juicio.
+ */
+export interface WalCustomConfig<T> extends WalMutationBase<T> {
+	operation: 'CUSTOM';
+	resourceId?: number | string;
+	optimistic?: WalOptimisticConfig;
+}
+
+/**
+ * WAL mutation configuration for facades.
+ *
+ * Union discriminado por `operation`. TypeScript fuerza `optimistic`
+ * obligatorio en UPDATE/DELETE/TOGGLE y `resourceId` obligatorio allí.
+ */
+export type WalMutationConfig<T = unknown> =
+	| WalCreateConfig<T>
+	| WalMutateConfig<T>
+	| WalCustomConfig<T>;
 // #endregion
 
 // #region Process Result

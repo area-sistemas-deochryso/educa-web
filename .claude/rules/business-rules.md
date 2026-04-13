@@ -1054,7 +1054,22 @@ Este registro consolida TODAS las invariantes del sistema en una tabla indexable
 
 ---
 
-### 15.10 Cómo Usar Este Registro
+### 15.10 Invariantes de Reportes de Usuario
+
+| ID | Entidad | Invariante | Enforcement | Sección |
+|----|---------|------------|-------------|---------|
+| `INV-RU01` | ReporteUsuario | Un reporte en estado `RESUELTO` se conserva indefinidamente. La purga automática nunca lo elimina — es memoria institucional de fixes entregados | `ReporteUsuarioRepository.PurgarAntiguosAsync()` filtra `estado != RESUELTO` | 16 |
+| `INV-RU02` | ReporteUsuario | Los reportes NO resueltos se purgan automáticamente a los 180 días vía Hangfire job diario (3:15 AM) | `ReporteUsuarioPurgeJob` + `HangfireExtensions` | 16 |
+| `INV-RU03` | ReporteUsuario | El `REU_CorrelationId` adjunto a un reporte manual corresponde a la última request HTTP vista por el trace interceptor ANTES del submit — NUNCA incluye el id del POST del propio reporte | `RequestTraceFacade.trackLastRequestId()` + guard en `requestTraceInterceptor` sobre `/api/sistema/reportes-usuario` | 16 |
+| `INV-RU04` | ReporteUsuario | Un submit duplicado del mismo usuario durante la misma apertura del dialog reusa la respuesta cacheada por `IdempotencyMiddleware` (TTL 24h). La key se regenera al cerrar y reabrir el dialog | `FeedbackReportFacade.currentIdempotencyKey` + `IdempotencyMiddleware` con scope `route:user:key` | 16 |
+| `INV-RU05` | ReporteUsuario | El endpoint `POST /api/sistema/reportes-usuario` permite usuarios anónimos (pre-login). Si hay sesión, extrae DNI/rol/nombre de claims; si no, persiste `null` en esos campos y `REU_UsuarioReg = "Anónimo"` | `[AllowAnonymous]` + `ReportesUsuarioController.Crear()` + rate limit `"feedback"` (5/min por userId o IP) | 16 |
+| `INV-RU06` | ReporteUsuario | Transiciones desde estado `RESUELTO` solo permiten volver a `NUEVO` (reapertura explícita) o mantenerse en `RESUELTO`. No se puede pasar directo `RESUELTO → EN_PROGRESO` | `ReporteUsuarioService.ActualizarEstadoAsync()` lanza `ConflictException("REPORTE_ESTADO_TERMINAL")` | 16 |
+| `INV-RU07` | ReporteUsuario | El DNI del usuario se almacena enmascarado (`***1234`) en el DTO que el frontend consume. El valor crudo NUNCA se expone fuera del backend — solo se usa para logging enmascarado | `MaskDni()` helper aplicado en `ToListaDto` y `ToDetalleDto` | 16 |
+| `INV-RU08` | ReporteUsuario | La notificación por correo al Director es fire-and-forget: un error al encolar NUNCA falla el insert del reporte | `ReporteUsuarioService.CrearAsync()` con try/catch alrededor de `EnviarNotificacionDirectoresAsync` + `IEmailOutboxService` | 16 |
+
+---
+
+### 15.11 Cómo Usar Este Registro
 
 **En code reviews**: Verificar que el código no viola ningún `INV-*`. Si una PR introduce una operación sobre Horarios, revisar `INV-U03`, `INV-U04`, `INV-U05`, `INV-C06`, `INV-C07`.
 
@@ -1063,6 +1078,112 @@ Este registro consolida TODAS las invariantes del sistema en una tabla indexable
 **En nuevas features**: Antes de implementar, listar qué invariantes aplican y verificar que el diseño las respeta.
 
 **En logs de error**: Cuando el backend rechaza una operación por invariante, incluir el ID: `BusinessRuleException("INV-T02: No se puede aprobar con periodo ABIERTO")`.
+
+---
+
+## 16. Reportes de Usuario (Feedback Manual)
+
+> **"El usuario tiene la última palabra sobre lo que funciona y lo que no."**
+
+Los reportes de usuario son un canal **manual** y **complementario** al sistema automático de trazabilidad de errores (sección "Trazabilidad de Errores" + tabla `ErrorLog`). Mientras la trazabilidad captura lo que el sistema detecta como fallo, los reportes de usuario capturan lo que el usuario **vive** — problemas de UX, datos incoherentes, propuestas de mejora, frustraciones que el código nunca va a saber que existen.
+
+### 16.1 Arquitectura
+
+```
+Usuario → FAB (Ctrl+Alt+F o botón flotante persistente)
+       ↓
+   FeedbackReportDialog (global en intranet-layout)
+       ↓ POST /api/sistema/reportes-usuario + X-Idempotency-Key
+   ReportesUsuarioController [AllowAnonymous] [RateLimit "feedback"]
+       ↓
+   ReporteUsuarioService
+       ├─ Validar tipo contra ReporteUsuarioTipos.Validos
+       ├─ Persistir en REU_ReporteUsuario (enmascarando DNI)
+       └─ Fire-and-forget: EmailOutbox → Directores activos
+```
+
+### 16.2 Tipos de reporte (17 categorías)
+
+Agrupados por concepto de usuario, no por módulo técnico:
+
+| Grupo | Tipos |
+|-------|-------|
+| **Rendimiento** | `PAGINA_LENTA`, `WEB_LENTA`, `FALLO_ACTUALIZAR` |
+| **Datos** | `INCONSISTENCIA_DATOS`, `DATOS_INVALIDOS`, `DATOS_VIEJOS` |
+| **Recursos/archivos** | `ENLACE_ROTO`, `PDF_NO_GENERA`, `EXCEL_MAL_GENERADO`, `RECURSOS_NO_VISIBLES` |
+| **Visual** | `ERROR_VISUAL_PC`, `ERROR_VISUAL_MOVIL` |
+| **UX** | `FORMULARIO_INEFICIENTE`, `NAVEGACION_CONFUSA`, `CONTENIDO_DESORDENADO`, `EXCESO_MODALES` |
+| **Servidor** | `ERROR_SERVIDOR` |
+
+**Fuente única de verdad**: `Educa.API/Constants/Sistema/ReporteUsuarioTipos.cs`. El frontend replica el catálogo con labels amigables en `core/services/feedback/feedback-report.tipos.ts`. Si se agrega un tipo nuevo, se actualizan ambos archivos en el mismo PR.
+
+### 16.3 Máquina de estados
+
+```
+NUEVO ──→ REVISADO ──→ EN_PROGRESO ──→ RESUELTO (terminal salvo reapertura)
+   │          │             │
+   └──────────┴─────────────┴──→ DESCARTADO (terminal)
+                                        ↑
+                            RESUELTO ──→ NUEVO (reapertura explícita)
+```
+
+| Estado | Significado | Transiciones permitidas |
+|--------|-------------|------------------------|
+| `NUEVO` | Default al crear | → `REVISADO` · → `EN_PROGRESO` · → `RESUELTO` · → `DESCARTADO` |
+| `REVISADO` | El admin lo vio y confirmó que es válido | → `EN_PROGRESO` · → `RESUELTO` · → `DESCARTADO` |
+| `EN_PROGRESO` | Hay un fix en camino | → `RESUELTO` · → `DESCARTADO` |
+| `RESUELTO` | Fix entregado | → `NUEVO` (reapertura manual del admin — regreso del infierno permitido una sola vez) |
+| `DESCARTADO` | No aplica, duplicado, fuera de alcance | Estado terminal |
+
+**Precondiciones**:
+- Cualquier cambio de estado requiere rol `Administrativos` (Director o Asistente Administrativo).
+- `ActualizarEstadoAsync` valida `RowVersion` para prevenir conflictos de concurrencia con optimistic locking.
+
+### 16.4 Correlación con trazabilidad automática
+
+Un reporte manual puede opcionalmente llevar un `correlationId` que apunta a la última request HTTP vista por el cliente **justo antes** del envío del reporte. Esto permite cruzar:
+
+1. **Reporte de usuario** ("los datos no cargan") → `REU_CorrelationId`
+2. **Request HTTP del cliente** (headers `X-Request-Id`) → logs del `CorrelationIdMiddleware`
+3. **Error automático** (si lo hubo) → `ErrorLog.ERL_CorrelationId`
+
+Con los tres IDs iguales, el desarrollador puede reconstruir qué vio el usuario, qué hizo el backend y qué salió mal en menos de un minuto.
+
+**Regla**: El trace interceptor (frontend) llama `RequestTraceFacade.trackLastRequestId()` en todas las requests **excepto** las del propio endpoint `/api/sistema/reportes-usuario` — si no, el id del POST del reporte pisaría el id de la request que el usuario quería reportar.
+
+### 16.5 Idempotencia
+
+El dialog genera un `X-Idempotency-Key` (UUID) al abrirse y lo reusa en todos los submits mientras el dialog esté abierto. El `IdempotencyMiddleware` global lo atrapa y cachea la respuesta por 24h con scope `route:user:key`.
+
+**Resultado**: doble clic, reintento de red o submit mientras el primero está en vuelo → el backend devuelve la respuesta del primer submit sin crear un duplicado.
+
+**Regeneración**: al cerrar el dialog (`close()`) la key se descarta. La siguiente apertura genera una nueva — el usuario puede legítimamente enviar dos reportes distintos en dos aperturas distintas.
+
+### 16.6 Retención y purga
+
+| Estado | Retención |
+|--------|-----------|
+| `RESUELTO` | **Indefinida** — memoria institucional de fixes entregados |
+| `NUEVO`, `REVISADO`, `EN_PROGRESO`, `DESCARTADO` | **180 días** desde `FechaReg` |
+
+El job `ReporteUsuarioPurgeJob` corre diariamente a las 3:15 AM (zona Lima) y ejecuta `DELETE WHERE FechaReg < cutoff AND Estado != 'RESUELTO'`. No hay soft-delete — a diferencia del resto del sistema, aquí sí borramos físicamente porque no hay FK ni dependientes.
+
+### 16.7 Notificación al admin
+
+Al crear un reporte, `ReporteUsuarioService.CrearAsync()` encola un correo via `IEmailOutboxService.EnqueueAsync()` con:
+- **Destinatario**: primer director activo con correo
+- **BCC**: resto de directores activos con correo
+- **Tipo outbox**: `"REPORTE_USUARIO"`
+- **Entidad origen**: `"ReporteUsuario"` + `REU_CodID` (trazabilidad en la bandeja admin)
+
+Un error al encolar se loguea como `LogWarning` pero NO falla el insert del reporte (fire-and-forget — INV-RU08).
+
+### 16.8 Privacidad
+
+- `REU_UsuarioDni` se almacena completo en BD (para auditoría admin) pero **siempre se enmascara** en DTOs que llegan al frontend (`***1234`).
+- El `DniHelper.Mask()` del proyecto no se usa aquí — el service tiene su propio `MaskDni()` porque los reportes anónimos devuelven `"***"` sin los últimos 4 dígitos.
+- `REU_Descripcion` y `REU_Propuesta` tienen un cap de 2000 caracteres — suficiente para contexto pero no para un data dump accidental.
+- Al ser `[AllowAnonymous]`, los reportes pre-login no tienen DNI — el registro queda como `REU_UsuarioReg = "Anónimo"` y los campos de usuario en `null`.
 
 ---
 

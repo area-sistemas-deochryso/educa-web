@@ -1,7 +1,12 @@
-# Roadmap de Tasks — Orden de Ejecución
+# Historial: Roadmap de Tasks — Orden de Ejecución
 
-> **Última actualización**: 2026-04-10 (roadmap completado — solo quedan items incrementales)
-> **Criterio de ordenamiento**: Dependencias + impacto + riesgo. Lo fundacional primero, lo cosmético al final.
+> **Completado**: 2026-04-10
+> **Estado**: ✅ Cerrado — las 7 tasks del roadmap completadas y archivadas
+> **Criterio original**: Dependencias + impacto + riesgo. Lo fundacional primero, lo cosmético al final.
+
+**Nota**: Los 2 items marcados como "incrementales" (archivos-grandes-refactor y enforcement F3)
+no son fases del roadmap sino trabajo continuo. Se mantienen en `.claude/tasks/` como referencia
+y se aplican oportunistamente al tocar archivos por features o bugs, no requieren planificación.
 
 ---
 

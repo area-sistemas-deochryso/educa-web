@@ -1,0 +1,82 @@
+		<div class="overlay3d">
+			<canvas #canvas3d class="scene-canvas"
+				(mousedown)="onMouseDown($event)"
+				(mousemove)="onMouseMove($event)"
+				(mouseup)="onMouseUp()"
+				(mouseleave)="onMouseUp()"
+				(contextmenu)="$event.preventDefault()"
+			></canvas>
+
+			<!-- HUD superior -->
+			<div class="hud-top">
+				<div class="hud-left">
+					<div class="dest-badge">
+						<span>📍</span>
+						<span>{{ destLabel() }}</span>
+					</div>
+					<div class="floor-badge">Piso {{ currentFloor() }}</div>
+				</div>
+				<div class="hud-right">
+				<button type="button" class="fullscreen-btn" (click)="toggleFullscreen()"
+					[title]="isFullscreen() ? 'Salir de pantalla completa' : 'Pantalla completa'">
+					<i [class]="isFullscreen() ? 'pi pi-window-minimize' : 'pi pi-window-maximize'"></i>
+				</button>
+				<button type="button" class="exit-btn" (click)="closeView.emit()">✕ Salir</button>
+			</div>
+			</div>
+
+			<!-- Minimap -->
+			<canvas #minimap class="minimap" width="170" height="170"></canvas>
+
+			<!-- Panel de controles (desktop) -->
+			@if (!isMobile) {
+				<div class="controls-panel">
+					<div class="cp-title">🎮 Controles</div>
+					<div class="cp-row"><kbd>W</kbd><kbd>S</kbd> <span>Avanzar / Retroceder</span></div>
+					<div class="cp-row"><kbd>A</kbd><kbd>D</kbd> <span>Girar</span></div>
+					<div class="cp-row"><span class="cp-mouse">🖱 Clic + arrastra</span> <span>Mirar libremente</span></div>
+					<div class="cp-row"><kbd>ESC</kbd> <span>Salir</span></div>
+				<div class="cp-row"><kbd>ESPACIO</kbd> <span>Ajustar posición</span></div>
+				</div>
+			}
+
+			<!-- Mensaje de escalera -->
+			@if (stairMsg()) {
+				<div class="stair-msg">{{ stairMsg() }}</div>
+			}
+
+			<!-- Modal de llegada -->
+			@if (arrivalVisible()) {
+				<div class="arrival-overlay">
+					<div class="arrival-card">
+						<div class="arrival-icon">🎉</div>
+						<div class="arrival-title">¡Llegaste!</div>
+						<div class="arrival-dest">{{ destLabel() }}</div>
+						<div class="arrival-time">⏱ {{ formattedTime() }}</div>
+						<div class="arrival-actions">
+							<button type="button" class="arrival-retry" (click)="retryNavigation()">🔄 Volver a intentar</button>
+							<button type="button" class="arrival-exit" (click)="closeView.emit()">✕ Salir</button>
+						</div>
+					</div>
+				</div>
+			}
+
+			<!-- Joystick (mobile) -->
+			@if (isMobile) {
+				<div class="joystick-zone"
+					(touchstart)="joyStart($event)"
+					(touchmove)="joyMove($event)"
+					(touchend)="joyEnd()"
+					(touchcancel)="joyEnd()"
+				>
+					<div class="joy-ring">
+						<div class="joy-thumb" [style.transform]="joyTransform()"></div>
+					</div>
+				</div>
+				<div class="look-zone"
+					(touchstart)="lookTouchStart($event)"
+					(touchmove)="lookTouchMove($event)"
+					(touchend)="lookTouchEnd()"
+				></div>
+			}
+		</div>

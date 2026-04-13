@@ -15,6 +15,7 @@ export interface AsistenciaAdminLista {
 	estado: 'Completa' | 'Incompleta';
 	observacion: string | null;
 	origenManual: boolean;
+	editadoManualmente: boolean;
 	estadoCodigo: string;
 	rowVersion: string;
 }

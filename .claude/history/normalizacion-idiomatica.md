@@ -1,8 +1,10 @@
-# Normalización Idiomática — Asistencia
+# Historial: Normalización Idiomática — Asistencia
 
-> **Estado**: Pendiente
+> **Completado**: 2026-04-10
+> **Estado**: ✅ Cerrado — 8 dominios renombrados español→inglés, 365 archivos modificados
 > **Origen**: Evaluación de asistencia en `higiene-estructural.md` (P2.4, 2026-04-08)
-> **Prioridad**: Media — no rompe funcionalidad pero dificulta navegación y búsquedas
+> **Resultado**: Código interno en inglés. URLs visibles al usuario en español. Regla documentada en `rules/code-language.md`.
+> **Mapa completo**: `normalizacion-idiomatica-mapa.md` (en esta misma carpeta)
 
 ---
 

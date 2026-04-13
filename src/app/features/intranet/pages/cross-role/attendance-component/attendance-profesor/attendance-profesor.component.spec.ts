@@ -8,7 +8,7 @@ import { signal } from '@angular/core';
 import { testProviders } from '@test';
 import { AttendanceProfesorComponent } from './attendance-profesor.component';
 import { AttendanceService, StorageService, UserProfileService } from '@core/services';
-import { AttendanceDataService } from '../../../../services/attendance/attendance-data.service';
+import { AttendanceDataService } from '@features/intranet/services/attendance/attendance-data.service';
 
 // #endregion
 

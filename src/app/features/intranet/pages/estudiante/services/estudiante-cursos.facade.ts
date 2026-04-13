@@ -1,13 +1,16 @@
 import { Injectable, inject, DestroyRef } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { environment } from '@config/environment';
 import { logger, withRetry } from '@core/helpers';
-import { ErrorHandlerService } from '@core/services';
-import { UI_SUMMARIES, UI_ESTUDIANTE_ERROR_DETAILS, UI_ADMIN_ERROR_DETAILS, UI_ATTACHMENT_MESSAGES } from '@shared/constants';
+import { ErrorHandlerService, WalFacadeHelper } from '@core/services';
+import { UI_SUMMARIES, UI_ESTUDIANTE_ERROR_DETAILS, UI_ATTACHMENT_MESSAGES } from '@shared/constants';
 import { SmartNotificationService } from '@core/services/notifications/smart-notification.service';
 import { ActividadSnapshot } from '@core/services/notifications/smart-notification.models';
 import { EstudianteApiService } from './estudiante-api.service';
 import { EstudianteCursosStore } from './estudiante-cursos.store';
 import { RegistrarEstudianteArchivoRequest, RegistrarEstudianteTareaArchivoRequest } from '../models';
+
+const ESTUDIANTE_CURSO_URL = `${environment.apiUrl}/api/EstudianteCurso`;
 
 @Injectable({ providedIn: 'root' })
 export class EstudianteCursosFacade {
@@ -16,6 +19,7 @@ export class EstudianteCursosFacade {
 	private readonly store = inject(EstudianteCursosStore);
 	private readonly errorHandler = inject(ErrorHandlerService);
 	private readonly smartNotif = inject(SmartNotificationService);
+	private readonly wal = inject(WalFacadeHelper);
 	private readonly destroyRef = inject(DestroyRef);
 	// #endregion
 
@@ -175,26 +179,7 @@ export class EstudianteCursosFacade {
 
 	/** Refresh notas for the current course (bypasses loaded flag). */
 	refreshMisNotasCurso(): void {
-		const contenido = this.store.contenido();
-		if (!contenido) return;
-		this.store.setMisNotasLoading(true);
-
-		this.api
-			.getMisNotas()
-			.pipe(takeUntilDestroyed(this.destroyRef))
-			.subscribe({
-				next: (allNotas) => {
-					const match = allNotas.find(
-						(n) => n.cursoContenidoId === contenido.id,
-					);
-					this.store.setMisNotasCurso(match ?? null);
-					this.store.setMisNotasLoading(false);
-				},
-				error: (err) => {
-					logger.error('EstudianteCursosFacade: Error al refrescar notas', err);
-					this.store.setMisNotasLoading(false);
-				},
-			});
+		this.loadMisNotasCurso();
 	}
 
 	/** Refresh attendance for the current course (bypasses loaded flag). */
@@ -202,20 +187,10 @@ export class EstudianteCursosFacade {
 		const contenido = this.store.contenido();
 		if (!contenido) return;
 		this.store.setMiAsistenciaLoading(true);
-
-		this.api
-			.getMiAsistencia(contenido.horarioId)
-			.pipe(takeUntilDestroyed(this.destroyRef))
-			.subscribe({
-				next: (resumen) => {
-					this.store.setMiAsistencia(resumen);
-					this.store.setMiAsistenciaLoading(false);
-				},
-				error: (err) => {
-					logger.error('EstudianteCursosFacade: Error al refrescar asistencia', err);
-					this.store.setMiAsistenciaLoading(false);
-				},
-			});
+		this.api.getMiAsistencia(contenido.horarioId).pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
+			next: (resumen) => { this.store.setMiAsistencia(resumen); this.store.setMiAsistenciaLoading(false); },
+			error: (err) => { logger.error('EstudianteCursosFacade: Error al refrescar asistencia', err); this.store.setMiAsistenciaLoading(false); },
+		});
 	}
 
 	// #endregion
@@ -225,72 +200,69 @@ export class EstudianteCursosFacade {
 	 * Upload file to blob storage then register metadata.
 	 */
 	uploadArchivo(semanaId: number, file: File): void {
+		this.uploadAndRegister(
+			file,
+			(blob) => this.api.registrarArchivo(semanaId, this.buildArchivoRequest(file, blob.url)),
+			(archivo) => this.store.addMiArchivo(semanaId, archivo),
+		);
+	}
+
+	private buildArchivoRequest(file: File, url: string): RegistrarEstudianteArchivoRequest {
+		return { nombreArchivo: file.name, urlArchivo: url, tipoArchivo: file.type || null, tamanoBytes: file.size };
+	}
+
+	private uploadAndRegister<T>(
+		file: File,
+		register: (blob: { url: string }) => import('rxjs').Observable<T>,
+		onRegistered: (result: T) => void,
+	): void {
 		this.store.setSaving(true);
-
-		this.api
-			.uploadFile(file)
-			.pipe(takeUntilDestroyed(this.destroyRef))
-			.subscribe({
-				next: (blobResponse) => {
-					const request: RegistrarEstudianteArchivoRequest = {
-						nombreArchivo: file.name,
-						urlArchivo: blobResponse.url,
-						tipoArchivo: file.type || null,
-						tamanoBytes: file.size,
-					};
-
-					this.api
-						.registrarArchivo(semanaId, request)
-						.pipe(takeUntilDestroyed(this.destroyRef))
-						.subscribe({
-							next: (archivo) => {
-								this.store.addMiArchivo(semanaId, archivo);
-								this.store.setSaving(false);
-							},
-							error: (err) => {
-								logger.error('EstudianteCursosFacade: Error al registrar archivo', err);
-								this.errorHandler.showError(UI_SUMMARIES.error, UI_ATTACHMENT_MESSAGES.registerFailed);
-								this.store.setSaving(false);
-							},
-						});
-				},
-				error: (err) => {
-					logger.error('EstudianteCursosFacade: Error al subir archivo', err);
-					this.errorHandler.showError(UI_SUMMARIES.error, UI_ATTACHMENT_MESSAGES.uploadFailed);
-					this.store.setSaving(false);
-				},
-			});
+		this.api.uploadFile(file).pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
+			next: (blob) => {
+				register(blob).pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
+					next: (result) => { onRegistered(result); this.store.setSaving(false); },
+					error: (err) => {
+						logger.error('EstudianteCursosFacade: Error al registrar', err);
+						this.errorHandler.showError(UI_SUMMARIES.error, UI_ATTACHMENT_MESSAGES.registerFailed);
+						this.store.setSaving(false);
+					},
+				});
+			},
+			error: (err) => {
+				logger.error('EstudianteCursosFacade: Error al subir archivo', err);
+				this.errorHandler.showError(UI_SUMMARIES.error, UI_ATTACHMENT_MESSAGES.uploadFailed);
+				this.store.setSaving(false);
+			},
+		});
 	}
 
 	/**
-	 * Delete student's own file with optimistic removal.
+	 * Delete student's own file with optimistic removal + deterministic rollback.
 	 */
 	eliminarArchivo(semanaId: number, archivoId: number): void {
-		this.store.removeMiArchivo(semanaId, archivoId);
+		const snapshot = (this.store.vm().misArchivos[semanaId] ?? []).find(
+			(a) => a.id === archivoId,
+		);
+		if (!snapshot) return;
 
-		this.api
-			.eliminarArchivo(archivoId)
-			.pipe(takeUntilDestroyed(this.destroyRef))
-			.subscribe({
-				error: (err) => {
-					logger.error('EstudianteCursosFacade: Error al eliminar archivo', err);
-					this.errorHandler.showError(UI_SUMMARIES.error, UI_ATTACHMENT_MESSAGES.deleteFailed);
-					// Re-load to restore state
-					this.loadMisArchivosForce(semanaId);
-				},
-			});
-	}
-
-	/**
-	 * Force reload of student files (used for rollback).
-	 */
-	private loadMisArchivosForce(semanaId: number): void {
-		this.api
-			.getMisArchivos(semanaId)
-			.pipe(takeUntilDestroyed(this.destroyRef))
-			.subscribe({
-				next: (archivos) => this.store.setMisArchivos(semanaId, archivos),
-			});
+		this.wal.execute({
+			operation: 'DELETE',
+			resourceType: 'EstudianteArchivo',
+			resourceId: archivoId,
+			endpoint: `${ESTUDIANTE_CURSO_URL}/archivo/${archivoId}`,
+			method: 'DELETE',
+			payload: null,
+			http$: () => this.api.eliminarArchivo(archivoId),
+			optimistic: {
+				apply: () => this.store.removeMiArchivo(semanaId, archivoId),
+				rollback: () => this.store.addMiArchivo(semanaId, snapshot),
+			},
+			onCommit: () => {},
+			onError: (err) => {
+				logger.error('EstudianteCursosFacade: Error al eliminar archivo', err);
+				this.errorHandler.showError(UI_SUMMARIES.error, UI_ATTACHMENT_MESSAGES.deleteFailed);
+			},
+		});
 	}
 
 	// #endregion
@@ -316,95 +288,54 @@ export class EstudianteCursosFacade {
 	 * Upload file to blob storage then register task file metadata.
 	 */
 	uploadTareaArchivo(tareaId: number, file: File): void {
-		this.store.setSaving(true);
+		this.uploadAndRegister(
+			file,
+			(blob) => this.api.registrarTareaArchivo(tareaId, this.buildTareaRequest(file, blob.url)),
+			(archivo) => this.store.addMiTareaArchivo(tareaId, archivo),
+		);
+	}
 
-		this.api
-			.uploadFile(file)
-			.pipe(takeUntilDestroyed(this.destroyRef))
-			.subscribe({
-				next: (blobResponse) => {
-					const request: RegistrarEstudianteTareaArchivoRequest = {
-						nombreArchivo: file.name,
-						urlArchivo: blobResponse.url,
-						tipoArchivo: file.type || null,
-						tamanoBytes: file.size,
-					};
-
-					this.api
-						.registrarTareaArchivo(tareaId, request)
-						.pipe(takeUntilDestroyed(this.destroyRef))
-						.subscribe({
-							next: (archivo) => {
-								this.store.addMiTareaArchivo(tareaId, archivo);
-								this.store.setSaving(false);
-							},
-							error: (err) => {
-								logger.error('EstudianteCursosFacade: Error al registrar archivo de tarea', err);
-								this.errorHandler.showError(UI_SUMMARIES.error, UI_ATTACHMENT_MESSAGES.registerFailed);
-								this.store.setSaving(false);
-							},
-						});
-				},
-				error: (err) => {
-					logger.error('EstudianteCursosFacade: Error al subir archivo de tarea', err);
-					this.errorHandler.showError(UI_SUMMARIES.error, UI_ATTACHMENT_MESSAGES.uploadFailed);
-					this.store.setSaving(false);
-				},
-			});
+	private buildTareaRequest(file: File, url: string): RegistrarEstudianteTareaArchivoRequest {
+		return { nombreArchivo: file.name, urlArchivo: url, tipoArchivo: file.type || null, tamanoBytes: file.size };
 	}
 
 	/**
-	 * Delete student's own task file with optimistic removal.
+	 * Delete student's own task file with optimistic removal + deterministic rollback.
 	 */
 	eliminarTareaArchivo(tareaId: number, archivoId: number): void {
-		this.store.removeMiTareaArchivo(tareaId, archivoId);
+		const snapshot = (this.store.vm().misTareaArchivos[tareaId] ?? []).find(
+			(a) => a.id === archivoId,
+		);
+		if (!snapshot) return;
 
-		this.api
-			.eliminarTareaArchivo(archivoId)
-			.pipe(takeUntilDestroyed(this.destroyRef))
-			.subscribe({
-				error: (err) => {
-					logger.error('EstudianteCursosFacade: Error al eliminar archivo de tarea', err);
-					this.errorHandler.showError(UI_SUMMARIES.error, UI_ATTACHMENT_MESSAGES.deleteFailed);
-					this.loadMisTareaArchivosForce(tareaId);
-				},
-			});
-	}
-
-	/**
-	 * Force reload of student task files (used for rollback).
-	 */
-	private loadMisTareaArchivosForce(tareaId: number): void {
-		this.api
-			.getMisTareaArchivos(tareaId)
-			.pipe(takeUntilDestroyed(this.destroyRef))
-			.subscribe({
-				next: (archivos) => this.store.setMisTareaArchivos(tareaId, archivos),
-			});
+		this.wal.execute({
+			operation: 'DELETE',
+			resourceType: 'EstudianteTareaArchivo',
+			resourceId: archivoId,
+			endpoint: `${ESTUDIANTE_CURSO_URL}/tarea-archivo/${archivoId}`,
+			method: 'DELETE',
+			payload: null,
+			http$: () => this.api.eliminarTareaArchivo(archivoId),
+			optimistic: {
+				apply: () => this.store.removeMiTareaArchivo(tareaId, archivoId),
+				rollback: () => this.store.addMiTareaArchivo(tareaId, snapshot),
+			},
+			onCommit: () => {},
+			onError: (err) => {
+				logger.error('EstudianteCursosFacade: Error al eliminar archivo de tarea', err);
+				this.errorHandler.showError(UI_SUMMARIES.error, UI_ATTACHMENT_MESSAGES.deleteFailed);
+			},
+		});
 	}
 
 	// #endregion
 	// #region Dialog commands
 
-	closeContentDialog(): void {
-		this.store.closeContentDialog();
-	}
-
-	openArchivosSummaryDialog(): void {
-		this.store.openArchivosSummaryDialog();
-	}
-
-	closeArchivosSummaryDialog(): void {
-		this.store.closeArchivosSummaryDialog();
-	}
-
-	openTareasSummaryDialog(): void {
-		this.store.openTareasSummaryDialog();
-	}
-
-	closeTareasSummaryDialog(): void {
-		this.store.closeTareasSummaryDialog();
-	}
+	closeContentDialog(): void { this.store.closeContentDialog(); }
+	openArchivosSummaryDialog(): void { this.store.openArchivosSummaryDialog(); }
+	closeArchivosSummaryDialog(): void { this.store.closeArchivosSummaryDialog(); }
+	openTareasSummaryDialog(): void { this.store.openTareasSummaryDialog(); }
+	closeTareasSummaryDialog(): void { this.store.closeTareasSummaryDialog(); }
 
 	// #endregion
 

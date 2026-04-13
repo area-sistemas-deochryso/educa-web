@@ -62,7 +62,7 @@ export class SchedulesDataFacade {
   loadBySalon(salonId: number): void {
     if (this.store.loading()) return;
     this.store.setLoading(true);
-    this.store.setFiltroSalon(salonId);
+    this.store.filterStore.setFiltroSalon(salonId);
 
     this.api
       .getBySalon(salonId)
@@ -94,7 +94,7 @@ export class SchedulesDataFacade {
   loadByProfesor(profesorId: number): void {
     if (this.store.loading()) return;
     this.store.setLoading(true);
-    this.store.setFiltroProfesor(profesorId);
+    this.store.filterStore.setFiltroProfesor(profesorId);
 
     this.api
       .getByProfesor(profesorId)
@@ -126,7 +126,7 @@ export class SchedulesDataFacade {
   loadDetalle(id: number): void {
     if (this.store.detailLoading()) return;
     this.store.setDetailLoading(true);
-    this.store.openDetailDrawer();
+    this.store.formStore.openDetailDrawer();
 
     this.api
       .getById(id)
@@ -163,7 +163,7 @@ export class SchedulesDataFacade {
    * Cargar página específica (llamado desde onLazyLoad del p-table)
    */
   loadPage(page: number, pageSize: number): void {
-    this.store.setPaginationData(page, pageSize, this.store.totalRecords());
+    this.store.filterStore.setPaginationData(page, pageSize, this.store.filterStore.totalRecords());
     this.refreshHorariosOnly();
   }
 
@@ -171,28 +171,28 @@ export class SchedulesDataFacade {
   // #region Comandos de filtros
 
   setFiltroSalon(salonId: number | null): void {
-    this.store.setFiltroSalon(salonId);
+    this.store.filterStore.setFiltroSalon(salonId);
   }
 
   setFiltroProfesor(profesorId: number | null): void {
-    this.store.setFiltroProfesor(profesorId);
+    this.store.filterStore.setFiltroProfesor(profesorId);
   }
 
   setFiltroDiaSemana(diaSemana: DiaSemana | null): void {
-    this.store.setFiltroDiaSemana(diaSemana);
+    this.store.filterStore.setFiltroDiaSemana(diaSemana);
   }
 
   setFiltroEstadoActivo(estadoActivo: boolean | null): void {
-    this.store.setFiltroEstadoActivo(estadoActivo);
+    this.store.filterStore.setFiltroEstadoActivo(estadoActivo);
   }
 
   clearFiltros(): void {
-    this.store.clearFiltros();
+    this.store.filterStore.clearFiltros();
     this.loadAll();
   }
 
   setVistaActual(vista: HorarioVistaType): void {
-    this.store.setVistaActual(vista);
+    this.store.filterStore.setVistaActual(vista);
   }
 
   // #endregion
@@ -230,7 +230,7 @@ export class SchedulesDataFacade {
         .subscribe({
           next: (horarios) => {
             this.store.setHorarios(horarios);
-            this.store.setPaginationData(1, horarios.length, horarios.length);
+            this.store.filterStore.setPaginationData(1, horarios.length, horarios.length);
             this.calculateEstadisticas(horarios);
             if (!silent) { this.store.setLoading(false); }
           },
@@ -238,7 +238,7 @@ export class SchedulesDataFacade {
         });
     } else {
       this.api
-        .getAllPaginated(this.store.page(), this.store.pageSize())
+        .getAllPaginated(this.store.filterStore.page(), this.store.filterStore.pageSize())
         .pipe(
           withRetry({ tag: 'SchedulesDataFacade:refreshHorariosOnly' }),
           takeUntilDestroyed(this.destroyRef),
@@ -246,7 +246,7 @@ export class SchedulesDataFacade {
         .subscribe({
           next: (response) => {
             this.store.setHorarios(response.data);
-            this.store.setPaginationData(response.page, response.pageSize, response.total);
+            this.store.filterStore.setPaginationData(response.page, response.pageSize, response.total);
             this.calculateEstadisticas(response.data);
             if (!silent) { this.store.setLoading(false); }
           },
@@ -273,8 +273,8 @@ export class SchedulesDataFacade {
   // #region Helpers privados
 
   private loadAllForAdmin(): void {
-    const page = this.store.page();
-    const pageSize = this.store.pageSize();
+    const page = this.store.filterStore.page();
+    const pageSize = this.store.filterStore.pageSize();
 
     forkJoin({
       horarios: this.api.getAllPaginated(page, pageSize),
@@ -289,7 +289,7 @@ export class SchedulesDataFacade {
       .subscribe({
         next: ({ horarios, salones, cursos, profesores }) => {
           this.store.setHorarios(horarios.data);
-          this.store.setPaginationData(horarios.page, horarios.pageSize, horarios.total);
+          this.store.filterStore.setPaginationData(horarios.page, horarios.pageSize, horarios.total);
           this.store.setSalonesDisponibles(salones);
           this.store.setCursosDisponibles(cursos);
           this.store.setProfesoresDisponibles(profesores);
@@ -325,7 +325,7 @@ export class SchedulesDataFacade {
       .subscribe({
         next: ({ horarios, salones, cursos }) => {
           this.store.setHorarios(horarios);
-          this.store.setPaginationData(1, horarios.length, horarios.length);
+          this.store.filterStore.setPaginationData(1, horarios.length, horarios.length);
           this.store.setSalonesDisponibles(salones);
           this.store.setCursosDisponibles(cursos);
           this.calculateEstadisticas(horarios);

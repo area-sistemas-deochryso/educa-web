@@ -26,6 +26,7 @@ import { AttendanceReportsComponent } from '../../cross-role/attendance-reports'
 import {
 	AttendancesDataFacade,
 	AttendancesCrudFacade,
+	AttendancesCierresFacade,
 	AttendancesUiFacade,
 	AttendancesAdminStore,
 	AsistenciaAdminLista,
@@ -70,6 +71,7 @@ export class AttendancesComponent implements OnInit {
 	// #region Dependencias
 	private dataFacade = inject(AttendancesDataFacade);
 	private crudFacade = inject(AttendancesCrudFacade);
+	private cierresFacade = inject(AttendancesCierresFacade);
 	protected uiFacade = inject(AttendancesUiFacade);
 	protected store = inject(AttendancesAdminStore);
 	private confirmationService = inject(ConfirmationService);
@@ -222,7 +224,7 @@ export class AttendancesComponent implements OnInit {
 			mes: this.cierreMes(),
 			observacion: this.cierreObservacion() || undefined,
 		};
-		this.crudFacade.crearCierre(dto);
+		this.cierresFacade.crearCierre(dto);
 		this.cierreObservacion.set('');
 	}
 
@@ -234,7 +236,7 @@ export class AttendancesComponent implements OnInit {
 			observacion: obs,
 			rowVersion,
 		};
-		this.crudFacade.revertirCierre(cierreId, dto);
+		this.cierresFacade.revertirCierre(cierreId, dto);
 		this.revertirObservacion.set('');
 	}
 
@@ -262,8 +264,16 @@ export class AttendancesComponent implements OnInit {
 		return estado === 'Completa' ? 'success' : 'warn';
 	}
 
-	getOrigenSeverity(manual: boolean): 'info' | 'secondary' {
-		return manual ? 'info' : 'secondary';
+	getOrigenLabel(item: AsistenciaAdminLista): string {
+		if (item.editadoManualmente) return 'Editado';
+		if (item.origenManual) return 'Manual';
+		return 'Biométrico';
+	}
+
+	getOrigenSeverity(item: AsistenciaAdminLista): 'warn' | 'info' | 'secondary' {
+		if (item.editadoManualmente) return 'warn';
+		if (item.origenManual) return 'info';
+		return 'secondary';
 	}
 
 	// #endregion

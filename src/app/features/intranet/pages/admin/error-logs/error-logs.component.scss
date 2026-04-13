@@ -5,6 +5,32 @@
 }
 // #endregion
 
+// #region Correlation chip
+.correlation-chip {
+	display: inline-flex;
+	align-items: center;
+	gap: 0.5rem;
+	padding: 0.375rem 0.75rem;
+	background: #dbeafe; // blue-100
+	border: 1px solid #1e40af; // blue-800
+	border-radius: 999px;
+	color: #1e40af;
+	font-size: 0.8125rem;
+
+	i { font-size: 0.875rem; }
+
+	.chip-label { font-weight: 600; }
+
+	code {
+		font-family: ui-monospace, monospace;
+		font-size: 0.75rem;
+		background: rgba(30, 64, 175, 0.1);
+		padding: 0.125rem 0.375rem;
+		border-radius: 4px;
+	}
+}
+// #endregion
+
 // #region Stats
 .stats-section {
 	margin-bottom: 1.5rem;

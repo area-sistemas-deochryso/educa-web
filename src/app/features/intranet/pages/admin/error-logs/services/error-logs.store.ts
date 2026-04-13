@@ -1,12 +1,6 @@
 import { Injectable, computed, signal } from '@angular/core';
 
-import {
-	ErrorLogCompleto,
-	ErrorLogDetalle,
-	ErrorLogLista,
-	ErrorOrigen,
-	ErrorSeveridad,
-} from '../models';
+import { ErrorLogLista, ErrorOrigen, ErrorSeveridad } from '../models';
 
 @Injectable({ providedIn: 'root' })
 export class ErrorLogsStore {
@@ -21,11 +15,9 @@ export class ErrorLogsStore {
 	private readonly _page = signal(1);
 	private readonly _pageSize = signal(20);
 
-	// Drawer
+	// Drawer (la carga del detalle la maneja el componente drawer standalone)
 	private readonly _drawerVisible = signal(false);
 	private readonly _selectedItem = signal<ErrorLogLista | null>(null);
-	private readonly _errorCompleto = signal<ErrorLogCompleto | null>(null);
-	private readonly _detallesLoading = signal(false);
 	// #endregion
 
 	// #region Lecturas públicas
@@ -38,8 +30,6 @@ export class ErrorLogsStore {
 	readonly pageSize = this._pageSize.asReadonly();
 	readonly drawerVisible = this._drawerVisible.asReadonly();
 	readonly selectedItem = this._selectedItem.asReadonly();
-	readonly errorCompleto = this._errorCompleto.asReadonly();
-	readonly detallesLoading = this._detallesLoading.asReadonly();
 	// #endregion
 
 	// #region Computed
@@ -70,8 +60,6 @@ export class ErrorLogsStore {
 		pageSize: this._pageSize(),
 		drawerVisible: this._drawerVisible(),
 		selectedItem: this._selectedItem(),
-		errorCompleto: this._errorCompleto(),
-		detallesLoading: this._detallesLoading(),
 		stats: this.stats(),
 	}));
 	// #endregion
@@ -108,21 +96,11 @@ export class ErrorLogsStore {
 	openDrawer(item: ErrorLogLista): void {
 		this._selectedItem.set(item);
 		this._drawerVisible.set(true);
-		this._errorCompleto.set(null);
 	}
 
 	closeDrawer(): void {
 		this._drawerVisible.set(false);
 		this._selectedItem.set(null);
-		this._errorCompleto.set(null);
-	}
-
-	setErrorCompleto(error: ErrorLogCompleto): void {
-		this._errorCompleto.set(error);
-	}
-
-	setDetallesLoading(loading: boolean): void {
-		this._detallesLoading.set(loading);
 	}
 	// #endregion
 }

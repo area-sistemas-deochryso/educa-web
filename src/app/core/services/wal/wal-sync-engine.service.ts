@@ -1,6 +1,6 @@
 import { Injectable, inject, DestroyRef } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import { HttpClient, HttpHeaders } from '@angular/common/http';
+import { HttpClient } from '@angular/common/http';
 import {
 	Observable,
 	Subject,
@@ -10,6 +10,7 @@ import {
 	switchMap,
 	from,
 } from 'rxjs';
+import { sendWalEntryRequest } from './wal-http.helper';
 import { logger } from '@core/helpers';
 import { environment } from '@config';
 import { SwService } from '@features/intranet/services/sw/sw.service';
@@ -257,7 +258,7 @@ export class WalSyncEngine {
 			const cb = this.callbacks.get(entry.id);
 
 			try {
-				const result = await this.sendRequest(entry);
+				const result = await sendWalEntryRequest(this.http, entry);
 
 				// Success: commit, invalidate cache, then notify
 				await this.wal.commitAndClean(entry.id);
@@ -311,44 +312,6 @@ export class WalSyncEngine {
 	 */
 	async sendNow(entry: WalEntry): Promise<WalProcessResult> {
 		return this.processEntry(entry);
-	}
-
-	// #endregion
-
-	// #region HTTP
-
-	/**
-	 * Send the HTTP request for a WAL entry.
-	 * Always uses raw HttpClient with X-Idempotency-Key header (entry.id).
-	 */
-	private sendRequest(entry: WalEntry): Promise<unknown> {
-		return new Promise((resolve, reject) => {
-			this.sendHttp(entry).subscribe({
-				next: (result) => resolve(result),
-				error: (err) => reject(err),
-			});
-		});
-	}
-
-	/**
-	 * Send HTTP request with idempotency header.
-	 */
-	private sendHttp(entry: WalEntry): Observable<unknown> {
-		const headers = new HttpHeaders().set(
-			WAL_DEFAULTS.IDEMPOTENCY_HEADER,
-			entry.id,
-		);
-
-		switch (entry.method) {
-			case 'POST':
-				return this.http.post(entry.endpoint, entry.payload, { headers });
-			case 'PUT':
-				return this.http.put(entry.endpoint, entry.payload, { headers });
-			case 'PATCH':
-				return this.http.patch(entry.endpoint, entry.payload, { headers });
-			case 'DELETE':
-				return this.http.delete(entry.endpoint, { headers });
-		}
 	}
 
 	// #endregion
@@ -431,10 +394,19 @@ export class WalSyncEngine {
 	// #region Recovery
 
 	/**
-	 * On startup: recover IN_FLIGHT entries and cleanup old COMMITTED.
+	 * Resource types that should never have WAL entries (migrated to server-confirmed).
+	 * Purged on startup to prevent stuck retry loops from past sessions.
 	 */
+	private static readonly RESOURCE_TYPES_TO_PURGE = ['reporte-usuario'];
+
 	private async initRecovery(): Promise<void> {
 		try {
+			// Phase 0: Purge entries for resource types that migrated to server-confirmed.
+			// These should never retry — they were created before the facade change.
+			for (const rt of WalSyncEngine.RESOURCE_TYPES_TO_PURGE) {
+				await this.wal.purgeByResourceType(rt);
+			}
+
 			const [recovered, cleaned, migrationNeeded] = await Promise.all([
 				this.wal.recoverInFlight(),
 				this.wal.cleanup(),

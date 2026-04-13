@@ -9,7 +9,7 @@ import {
 	EstadoAsistenciaCurso,
 	ESTADO_ASISTENCIA_LABELS,
 	ESTADO_ASISTENCIA_SEVERITIES,
-} from '../../../models';
+} from '@features/intranet/pages/estudiante/models';
 
 @Component({
 	selector: 'app-student-attendance-tab',

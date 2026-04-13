@@ -3,6 +3,13 @@ import { ChangeDetectionStrategy, Component, computed, ElementRef, input, output
 import { TooltipModule } from 'primeng/tooltip';
 
 import { CampusNodoDto, CampusAristaDto, CampusBloqueoDto, EditorTool } from '../../models';
+import {
+	NODE_TYPE_LABELS,
+	getNodeColor as getNodeColorHelper,
+	getNodeLabel as getNodeLabelHelper,
+	clientToSvg as clientToSvgHelper,
+	svgToScreen as svgToScreenHelper,
+} from './campus-editor.helpers';
 
 @Component({
 	selector: 'app-campus-editor',
@@ -87,15 +94,7 @@ export class CampusEditorComponent {
 		}
 	});
 
-	private readonly nodeTypeLabelMap: Record<string, string> = {
-		classroom: 'Aula',
-		corridor: 'Pasillo',
-		stairs: 'Escalera',
-		entrance: 'Entrada',
-		patio: 'Patio',
-		bathroom: 'Baño',
-		office: 'Oficina',
-	};
+	private readonly nodeTypeLabelMap = NODE_TYPE_LABELS;
 
 	readonly tooltipData = computed(() => {
 		const info = this.hoverInfo();
@@ -142,32 +141,8 @@ export class CampusEditorComponent {
 
 	// #region SVG helpers
 
-	getNodeColor(tipo: string): string {
-		switch (tipo) {
-			case 'classroom':
-				return '#4f46e5';
-			case 'corridor':
-				return '#6b7280';
-			case 'stairs':
-				return '#f59e0b';
-			case 'entrance':
-				return '#10b981';
-			case 'patio':
-				return '#06b6d4';
-			case 'bathroom':
-				return '#8b5cf6';
-			case 'office':
-				return '#ec4899';
-			default:
-				return '#6b7280';
-		}
-	}
-
-	getNodeLabel(nodo: CampusNodoDto): string {
-		if (nodo.etiqueta) return nodo.etiqueta;
-		if (nodo.salonDescripcion) return nodo.salonDescripcion;
-		return '';
-	}
+	getNodeColor(tipo: string): string { return getNodeColorHelper(tipo); }
+	getNodeLabel(nodo: CampusNodoDto): string { return getNodeLabelHelper(nodo); }
 
 	/** Posición de visualización considerando el offset de arrastre activo */
 	getNodeX(nodo: CampusNodoDto): number {
@@ -190,26 +165,12 @@ export class CampusEditorComponent {
 		return drag && drag.id === bloqueo.id ? bloqueo.y + drag.dy : bloqueo.y;
 	}
 
-	private clientToSvg(clientX: number, clientY: number): { x: number; y: number } {
-		const svgEl = this.svgRef()?.nativeElement;
-		if (!svgEl) return { x: 0, y: 0 };
-		const pt = svgEl.createSVGPoint();
-		pt.x = clientX;
-		pt.y = clientY;
-		const svgPt = pt.matrixTransform(svgEl.getScreenCTM()!.inverse());
-		return { x: svgPt.x, y: svgPt.y };
+	private clientToSvg(clientX: number, clientY: number) {
+		return clientToSvgHelper(this.svgRef()?.nativeElement, clientX, clientY);
 	}
 
-	/** Convierte coordenadas SVG a posición en píxeles relativa al elemento SVG */
-	private svgToScreen(svgX: number, svgY: number): { x: number; y: number } {
-		const svgEl = this.svgRef()?.nativeElement;
-		if (!svgEl) return { x: 0, y: 0 };
-		const pt = svgEl.createSVGPoint();
-		pt.x = svgX;
-		pt.y = svgY;
-		const screenPt = pt.matrixTransform(svgEl.getScreenCTM()!);
-		const rect = svgEl.getBoundingClientRect();
-		return { x: screenPt.x - rect.left, y: screenPt.y - rect.top };
+	private svgToScreen(svgX: number, svgY: number) {
+		return svgToScreenHelper(this.svgRef()?.nativeElement, svgX, svgY);
 	}
 
 	// #endregion
@@ -323,74 +284,49 @@ export class CampusEditorComponent {
 	}
 
 	onMouseMove(event: MouseEvent): void {
-		// Arrastre de nodo
 		if (this.isDragging && this.dragNodeId !== null) {
-			const pos = this.clientToSvg(event.clientX, event.clientY);
-			const dx = pos.x - this.panStart.x;
-			const dy = pos.y - this.panStart.y;
-			if (Math.abs(dx) > 2 || Math.abs(dy) > 2) {
-				this.dragStarted = true;
-				this.dragOffset.set({ id: this.dragNodeId, dx, dy });
-			}
+			const d = this.computeDragDelta(event);
+			if (d) { this.dragStarted = true; this.dragOffset.set({ id: this.dragNodeId, ...d }); }
 			return;
 		}
-
-		// Arrastre de bloqueo
 		if (this.isDraggingBloqueo && this.dragBloqueoId !== null) {
-			const pos = this.clientToSvg(event.clientX, event.clientY);
-			const dx = pos.x - this.panStart.x;
-			const dy = pos.y - this.panStart.y;
-			if (Math.abs(dx) > 2 || Math.abs(dy) > 2) {
-				this.dragBloqueoStarted = true;
-				this.dragBloqueoOffset.set({ id: this.dragBloqueoId, dx, dy });
-			}
+			const d = this.computeDragDelta(event);
+			if (d) { this.dragBloqueoStarted = true; this.dragBloqueoOffset.set({ id: this.dragBloqueoId, ...d }); }
 			return;
 		}
+		if (!this.isPanning) return;
+		const vb = this.viewBox();
+		const svgEl = this.svgRef()?.nativeElement;
+		if (!svgEl) return;
+		const scale = vb.w / svgEl.clientWidth;
+		const dx = (this.panStart.x - event.clientX) * scale;
+		const dy = (this.panStart.y - event.clientY) * scale;
+		this.viewBox.set({ x: vb.x + dx, y: vb.y + dy, w: vb.w, h: vb.h });
+		this.panStart = { x: event.clientX, y: event.clientY };
+	}
 
-		// Paneo del canvas
-		if (this.isPanning) {
-			const vb = this.viewBox();
-			const svgEl = this.svgRef()?.nativeElement;
-			if (!svgEl) return;
-			const scale = vb.w / svgEl.clientWidth;
-			const dx = (this.panStart.x - event.clientX) * scale;
-			const dy = (this.panStart.y - event.clientY) * scale;
-			this.viewBox.set({ x: vb.x + dx, y: vb.y + dy, w: vb.w, h: vb.h });
-			this.panStart = { x: event.clientX, y: event.clientY };
-		}
+	private computeDragDelta(event: MouseEvent): { dx: number; dy: number } | null {
+		const pos = this.clientToSvg(event.clientX, event.clientY);
+		const dx = pos.x - this.panStart.x;
+		const dy = pos.y - this.panStart.y;
+		return (Math.abs(dx) > 2 || Math.abs(dy) > 2) ? { dx, dy } : null;
 	}
 
 	onMouseUp(): void {
-		// Finalizar arrastre de nodo
 		if (this.isDragging && this.dragNodeId !== null && this.dragStarted) {
 			const offset = this.dragOffset();
-			if (offset) {
-				const nodo = this.nodoMap().get(this.dragNodeId);
-				if (nodo) {
-					this.nodeMoved.emit({
-						id: this.dragNodeId,
-						x: Math.round(nodo.x + offset.dx),
-						y: Math.round(nodo.y + offset.dy),
-					});
-				}
+			const nodo = offset ? this.nodoMap().get(this.dragNodeId) : null;
+			if (offset && nodo) {
+				this.nodeMoved.emit({ id: this.dragNodeId, x: Math.round(nodo.x + offset.dx), y: Math.round(nodo.y + offset.dy) });
 			}
 		}
-
-		// Finalizar arrastre de bloqueo
 		if (this.isDraggingBloqueo && this.dragBloqueoId !== null && this.dragBloqueoStarted) {
 			const offset = this.dragBloqueoOffset();
-			if (offset) {
-				const bloqueo = this.bloqueos().find((b) => b.id === this.dragBloqueoId);
-				if (bloqueo) {
-					this.bloqueoMoved.emit({
-						id: this.dragBloqueoId,
-						x: Math.round(bloqueo.x + offset.dx),
-						y: Math.round(bloqueo.y + offset.dy),
-					});
-				}
+			const bloqueo = offset ? this.bloqueos().find((b) => b.id === this.dragBloqueoId) : null;
+			if (offset && bloqueo) {
+				this.bloqueoMoved.emit({ id: this.dragBloqueoId, x: Math.round(bloqueo.x + offset.dx), y: Math.round(bloqueo.y + offset.dy) });
 			}
 		}
-
 		this.isDragging = false;
 		this.dragNodeId = null;
 		this.dragOffset.set(null);

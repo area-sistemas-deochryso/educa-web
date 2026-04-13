@@ -1,0 +1,192 @@
+<p-dialog
+	[visible]="visible()"
+	(visibleChange)="onVisibleChange($event)"
+	[modal]="true"
+	[style]="dialogStyle()"
+	[contentStyle]="contentStyle()"
+	[styleClass]="isFullscreen() ? 'fullscreen-dialog' : ''"
+>
+	<ng-template #header>
+		<div class="dialog-header-custom">
+			<span class="p-dialog-title">{{ salon()?.salonDescripcion ?? 'Salón' }}</span>
+			<button
+				class="fullscreen-toggle-btn"
+				type="button"
+				(click)="toggleFullscreen()"
+				[attr.aria-label]="isFullscreen() ? 'Salir de pantalla completa' : 'Expandir a pantalla completa'"
+			>
+				<i [class]="isFullscreen() ? 'pi pi-window-minimize' : 'pi pi-window-maximize'"></i>
+			</button>
+		</div>
+	</ng-template>
+	@if (salon(); as s) {
+		<p-tabs value="0" (valueChange)="onTabChange($any($event))">
+			<p-tablist>
+				<p-tab value="0">
+					<i class="pi pi-users tab-icon"></i>Grupos
+					@if (!dialogLoading()) {
+						<p-tag
+							[value]="s.cantidadEstudiantes.toString()"
+							severity="info"
+							[rounded]="true"
+							class="ml-2"
+						/>
+					}
+				</p-tab>
+				<p-tab value="1">
+					<i class="pi pi-user tab-icon"></i>Notas por Estudiante
+				</p-tab>
+				<p-tab value="2">
+					<i class="pi pi-book tab-icon"></i>Notas del Salón
+				</p-tab>
+				@if (showCampusNav) {
+					<p-tab value="3">
+						<i class="pi pi-map tab-icon"></i>Ubicación
+					</p-tab>
+				}
+				<p-tab value="4">
+					<i class="pi pi-heart tab-icon"></i>Permisos Salud
+				</p-tab>
+			</p-tablist>
+
+			<p-tabpanels>
+				<!-- #region Tab Grupos -->
+				<p-tabpanel value="0">
+					<div style="display: flex; justify-content: flex-end; margin-bottom: 0.5rem">
+						<button
+							pButton
+							icon="pi pi-refresh"
+							class="p-button-rounded p-button-text p-button-sm"
+							(click)="onRefreshGrupos()"
+							[disabled]="gruposLoading()"
+							pTooltip="Refrescar"
+							tooltipPosition="top"
+							[pt]="{ root: { 'aria-label': 'Refrescar grupos' } }"
+						></button>
+					</div>
+					<app-salon-grupos-tab
+						[grupos]="gruposData()"
+						[estudiantesSinGrupo]="gruposEstudiantesSinGrupo()"
+						[maxEstudiantesPorGrupo]="gruposMaxEstudiantes()"
+						[loading]="gruposLoading()"
+						[saving]="gruposSaving()"
+						[noContenido]="gruposNoContenido()"
+						[contenidoId]="gruposContenidoId()"
+						[cursoOptions]="cursoOptions()"
+						[selectedCurso]="gruposCursoId()"
+						[asignarDialogVisible]="gruposAsignarDialogVisible()"
+						[asignarGrupo]="gruposAsignarGrupo()"
+						(cursoChange)="gruposCursoChange.emit($event)"
+						(crearGrupo)="gruposCrearGrupo.emit($event)"
+						(eliminarGrupo)="gruposEliminarGrupo.emit($event)"
+						(renombrarGrupo)="gruposRenombrarGrupo.emit($event)"
+						(asignarEstudiantes)="gruposAsignarEstudiantes.emit($event)"
+						(removerEstudiante)="gruposRemoverEstudiante.emit($event)"
+						(dropEstudiante)="gruposDropEstudiante.emit($event)"
+						(configurarMax)="gruposConfigurarMax.emit($event)"
+						(openAsignar)="gruposOpenAsignar.emit($event)"
+						(closeAsignar)="gruposCloseAsignar.emit()"
+						(confirmDialogHide)="gruposConfirmDialogHide.emit()"
+					/>
+				</p-tabpanel>
+				<!-- #endregion -->
+
+				<!-- #region Tab Notas por Estudiante -->
+				<p-tabpanel value="1">
+					<div style="display: flex; justify-content: flex-end; margin-bottom: 0.5rem">
+						<button
+							pButton
+							icon="pi pi-refresh"
+							class="p-button-rounded p-button-text p-button-sm"
+							(click)="onRefreshNotas()"
+							[disabled]="notasLoading()"
+							pTooltip="Refrescar"
+							tooltipPosition="top"
+							[pt]="{ root: { 'aria-label': 'Refrescar notas' } }"
+						></button>
+					</div>
+					<app-salon-notas-estudiante-tab
+						[notasData]="notasData()"
+						[loading]="notasLoading()"
+						[cursoOptions]="cursoOptions()"
+						[selectedCurso]="selectedCurso()"
+						[estudiantes]="salon()?.estudiantes ?? []"
+						(cursoChange)="notasCursoChange.emit($event)"
+						(notaSave)="notaSave.emit($event)"
+					/>
+				</p-tabpanel>
+				<!-- #endregion -->
+
+				<!-- #region Tab Notas del Salón -->
+				<p-tabpanel value="2">
+					<div style="display: flex; justify-content: flex-end; margin-bottom: 0.5rem">
+						<button
+							pButton
+							icon="pi pi-refresh"
+							class="p-button-rounded p-button-text p-button-sm"
+							(click)="onRefreshNotas()"
+							[disabled]="notasLoading()"
+							pTooltip="Refrescar"
+							tooltipPosition="top"
+							[pt]="{ root: { 'aria-label': 'Refrescar notas' } }"
+						></button>
+					</div>
+					<app-classroom-grades-tab
+						[notasData]="notasData()"
+						[loading]="notasLoading()"
+						[cursoOptions]="cursoOptions()"
+						[selectedCurso]="selectedCurso()"
+						[vistaActual]="vistaActual()"
+						(cursoChange)="notasCursoChange.emit($event)"
+						(vistaChange)="notasVistaChange.emit($event)"
+						(descargarBoletas)="descargarBoletas.emit()"
+					/>
+				</p-tabpanel>
+				<!-- #endregion -->
+
+				<!-- #region Tab Ubicación -->
+				@if (showCampusNav) {
+					<p-tabpanel value="3">
+						@if (activeTab() === '3') {
+							<app-campus-navigation
+								[embedded]="true"
+								[targetSalonId]="s.salonId"
+							/>
+						}
+					</p-tabpanel>
+				}
+				<!-- #endregion -->
+
+				<!-- #region Tab Permisos Salud -->
+				<p-tabpanel value="4">
+					@if (activeTab() === '4') {
+						<app-salon-health-permissions-tab
+							[salonId]="s.salonId"
+							[permisosSalida]="healthPermisosSalida()"
+							[justificaciones]="healthJustificaciones()"
+							[estudiantes]="healthEstudiantes()"
+							[estudiantesConEntrada]="healthEstudiantesConEntrada()"
+							[sintomas]="healthSintomas()"
+							[fechasValidacion]="healthFechasValidacion()"
+							[loading]="healthLoading()"
+							[saving]="healthSaving()"
+							[exitDialogVisible]="healthExitDialogVisible()"
+							[justificationDialogVisible]="healthJustificationDialogVisible()"
+							(openExitDialog)="healthOpenExitDialog.emit()"
+							(openJustificationDialog)="healthOpenJustificationDialog.emit()"
+							(exitDialogVisibleChange)="healthExitDialogVisibleChange.emit($event)"
+							(justificationDialogVisibleChange)="healthJustificationDialogVisibleChange.emit($event)"
+							(saveExitPermission)="healthSaveExitPermission.emit($event)"
+							(saveJustification)="healthSaveJustification.emit($event)"
+							(anularPermiso)="healthAnularPermiso.emit($event)"
+							(anularJustificacion)="healthAnularJustificacion.emit($event)"
+							(validateDates)="healthValidateDates.emit($event)"
+							(confirmDialogHide)="healthConfirmDialogHide.emit()"
+						/>
+					}
+				</p-tabpanel>
+				<!-- #endregion -->
+			</p-tabpanels>
+		</p-tabs>
+	}
+</p-dialog>

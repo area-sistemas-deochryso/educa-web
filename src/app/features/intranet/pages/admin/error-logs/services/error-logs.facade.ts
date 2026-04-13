@@ -28,6 +28,7 @@ export class ErrorLogsFacade {
 			.getErrores(
 				this.store.filterOrigen(),
 				this.store.filterSeveridad(),
+				null,
 				this.store.page(),
 				this.store.pageSize(),
 			)
@@ -71,29 +72,13 @@ export class ErrorLogsFacade {
 	}
 	// #endregion
 
-	// #region Drawer — detalle completo del error
+	// #region Drawer — abre/cierra. La carga del detalle la maneja el drawer standalone.
 	openDetail(item: ErrorLogLista): void {
 		this.store.openDrawer(item);
-		this.loadCompleto(item.id);
 	}
 
 	closeDrawer(): void {
 		this.store.closeDrawer();
-	}
-
-	private loadCompleto(errorId: number): void {
-		this.store.setDetallesLoading(true);
-
-		this.api
-			.getCompleto(errorId)
-			.pipe(takeUntilDestroyed(this.destroyRef))
-			.subscribe({
-				next: (error) => {
-					this.store.setErrorCompleto(error);
-					this.store.setDetallesLoading(false);
-				},
-				error: () => this.store.setDetallesLoading(false),
-			});
 	}
 	// #endregion
 }

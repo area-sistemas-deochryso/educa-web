@@ -6,7 +6,7 @@ import { DialogModule } from 'primeng/dialog';
 import { ButtonModule } from 'primeng/button';
 import { InputTextModule } from 'primeng/inputtext';
 import { TextareaModule } from 'primeng/textarea';
-import { CursoContenidoSemanaDto, ActualizarSemanaRequest } from '../../../models';
+import { CursoContenidoSemanaDto, ActualizarSemanaRequest } from '@features/intranet/pages/profesor/models';
 
 // #endregion
 // #region Implementation

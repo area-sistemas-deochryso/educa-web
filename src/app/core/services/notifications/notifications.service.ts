@@ -5,12 +5,13 @@ import {
 	NotificationType,
 	NotificationPriority,
 } from './notifications.config';
-import { logger, Duration } from '@core/helpers';
+import { Duration } from '@core/helpers';
 import { StorageService } from '@core/services/storage';
 import { TimerManager } from '@core/services/destroy';
 import { SmartNotificationService } from './smart-notification.service';
 import { NotificationsApiService } from './notifications-api.service';
 import { NotificationsSoundService } from './notifications-sound.service';
+import { loadDailyIdSet, saveDailyIdSet } from './notifications-persistence.helper';
 import { NotificacionActiva } from '@data/models';
 
 /**
@@ -349,59 +350,19 @@ export class NotificationsService {
 
 	// #region Storage I/O
 	private loadDismissedFromStorage(): void {
-		try {
-			const data = this.storage.getDismissedNotifications();
-			if (data) {
-				const isToday = new Date(data.date).toDateString() === new Date().toDateString();
-				if (isToday) {
-					this._dismissedIds.set(new Set(data.ids));
-				} else {
-					this.storage.removeDismissedNotifications();
-				}
-			}
-		} catch (e) {
-			logger.error('[Notifications] Error loading dismissed:', e);
-			this.storage.removeDismissedNotifications();
-		}
+		this._dismissedIds.set(loadDailyIdSet(this.storage, 'dismissed'));
 	}
 
 	private saveDismissedToStorage(): void {
-		try {
-			this.storage.setDismissedNotifications({
-				ids: [...this._dismissedIds()],
-				date: new Date().toISOString(),
-			});
-		} catch (e) {
-			logger.error('[Notifications] Error saving dismissed:', e);
-		}
+		saveDailyIdSet(this.storage, 'dismissed', this._dismissedIds());
 	}
 
 	private loadReadFromStorage(): void {
-		try {
-			const data = this.storage.getReadNotifications();
-			if (data) {
-				const isToday = new Date(data.date).toDateString() === new Date().toDateString();
-				if (isToday) {
-					this._readIds.set(new Set(data.ids));
-				} else {
-					this.storage.removeReadNotifications();
-				}
-			}
-		} catch (e) {
-			logger.error('[Notifications] Error loading read:', e);
-			this.storage.removeReadNotifications();
-		}
+		this._readIds.set(loadDailyIdSet(this.storage, 'read'));
 	}
 
 	private saveReadToStorage(): void {
-		try {
-			this.storage.setReadNotifications({
-				ids: [...this._readIds()],
-				date: new Date().toISOString(),
-			});
-		} catch (e) {
-			logger.error('[Notifications] Error saving read:', e);
-		}
+		saveDailyIdSet(this.storage, 'read', this._readIds());
 	}
 	// #endregion
 

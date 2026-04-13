@@ -2,7 +2,9 @@
 export { PermissionsUsersComponent } from './permisos-usuarios.component';
 export {
 	PermissionsUsersStore,
-	PermissionsUsersFacade,
+	PermissionsUsersDataFacade,
+	PermissionsUsersCrudFacade,
+	PermissionsUsersUiFacade,
 	PermissionsUsersHelperService,
 } from './services';
 export type { ModuloVistas } from './services';

@@ -50,6 +50,28 @@ export const KEYBOARD_SHORTCUTS: KeyboardShortcut[] = [
 		key: 'b',
 		useCode: false,
 	},
+	{
+		id: 'open-feedback-report',
+		keys: 'Ctrl+Alt+F',
+		description: 'Abrir formulario para reportar un problema',
+		category: 'actions',
+		ctrl: true,
+		shift: false,
+		alt: true,
+		key: 'f',
+		useCode: false,
+	},
+	{
+		id: 'open-command-palette',
+		keys: 'Ctrl+K',
+		description: 'Buscar y navegar a cualquier página',
+		category: 'navigation',
+		ctrl: true,
+		shift: false,
+		alt: false,
+		key: 'k',
+		useCode: false,
+	},
 ];
 
 export const CATEGORY_LABELS: Record<ShortcutCategory, string> = {

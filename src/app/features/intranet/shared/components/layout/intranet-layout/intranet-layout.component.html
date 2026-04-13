@@ -17,39 +17,14 @@
 			</picture>
 		</a>
 
-		<!-- * Module pills (circular, between logo and nav). -->
-		<div class="module-pills">
-			@for (modulo of visiblePills(); track modulo.id) {
-				<div class="pill-wrapper" [class.active]="selectedModuloId() === modulo.id">
-					<button
-						type="button"
-						class="module-pill"
-						[class.active]="selectedModuloId() === modulo.id"
-						(click)="selectModulo(modulo.id)"
-						[attr.aria-label]="modulo.label"
-					>
-						<i [class]="modulo.icon"></i>
-						@if (selectedModuloId() === modulo.id) {
-							<span class="pill-label">{{ modulo.label }}</span>
-						}
-					</button>
-					<!-- * Hover preview. -->
-					@if (modulo.items.length > 0) {
-						<div class="pill-preview">
-							<div class="pill-preview-header">{{ modulo.label }}</div>
-							@for (item of modulo.items; track item.route) {
-								<div class="pill-preview-item">
-									<i [class]="item.icon"></i>
-									<span>{{ item.label }}</span>
-								</div>
-							}
-						</div>
-					}
-				</div>
-			}
-		</div>
+		<!-- * Module selector (search + dropdown, replaces pills). -->
+		<app-module-selector
+			[modulos]="modulos()"
+			[selectedModuloId]="selectedModuloId()"
+			(moduloSelected)="selectModulo($event)"
+		/>
 
-		<!-- * Nav items of selected module (circular window of 3, with dropdown support). -->
+		<!-- * Nav items of selected module (circular window of 2, with dropdown support). -->
 		<nav class="nav-links">
 			@for (item of visibleNavItems(); track item.label) {
 				<app-nav-item
@@ -101,6 +76,13 @@
 @if (showVoiceRecognition()) {
 	<app-voice-button />
 }
+
+<!-- Reporte de usuario: dialog SIEMPRE en el DOM (regla dialogs-sync.md) + launcher flotante -->
+@if (showFeedbackReport()) {
+	<app-feedback-report-launcher />
+}
+<app-feedback-report-dialog />
+
 <app-sync-status />
 <app-access-denied-modal />
 <!-- #endregion -->

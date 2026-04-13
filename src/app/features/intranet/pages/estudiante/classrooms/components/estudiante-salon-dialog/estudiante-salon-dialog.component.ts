@@ -6,9 +6,9 @@ import { TabsModule } from 'primeng/tabs';
 import { ButtonModule } from 'primeng/button';
 import { TooltipModule } from 'primeng/tooltip';
 import { environment } from '@config/environment';
-import { EstudianteSalon, GruposResumenDto } from '../../../models';
+import { EstudianteSalon, GruposResumenDto } from '@features/intranet/pages/estudiante/models';
 import { EstudianteGruposTabComponent } from '../estudiante-grupos-tab/estudiante-grupos-tab.component';
-import { CampusNavigationComponent } from '../../../../cross-role/campus-navigation/campus-navigation.component';
+import { CampusNavigationComponent } from '@features/intranet/pages/cross-role/campus-navigation/campus-navigation.component';
 
 // #endregion
 @Component({

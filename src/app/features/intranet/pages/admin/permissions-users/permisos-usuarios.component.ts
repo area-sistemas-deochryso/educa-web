@@ -24,7 +24,7 @@ import {
 } from '@app/shared/constants';
 import { PageHeaderComponent } from '@shared/components';
 import { withAllOption } from '@shared/models';
-import { PermissionsUsersFacade } from './services/permisos-usuarios.facade';
+import { PermissionsUsersDataFacade, PermissionsUsersCrudFacade, PermissionsUsersUiFacade } from './services';
 import { PermissionsStatsCardsComponent } from './components/permisos-stats-cards/permisos-stats-cards.component';
 import { PermissionsDetailDrawerComponent } from './components/permisos-detail-drawer/permisos-detail-drawer.component';
 import { PermissionsEditDialogComponent } from './components/permisos-edit-dialog/permisos-edit-dialog.component';
@@ -54,27 +54,29 @@ import { PermissionsEditDialogComponent } from './components/permisos-edit-dialo
 	changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class PermissionsUsersComponent implements OnInit {
-	private facade = inject(PermissionsUsersFacade);
+	private data = inject(PermissionsUsersDataFacade);
+	private crud = inject(PermissionsUsersCrudFacade);
+	private ui = inject(PermissionsUsersUiFacade);
 	private confirmationService = inject(ConfirmationService);
 
 	// #region Facade state (signals)
-	readonly vm = this.facade.vm;
-	readonly permisosUsuario = this.facade.permisosUsuario;
-	readonly vistas = this.facade.vistas;
-	readonly loading = this.facade.loading;
-	readonly dialogVisible = this.facade.dialogVisible;
-	readonly detailDrawerVisible = this.facade.detailDrawerVisible;
-	readonly selectedPermiso = this.facade.selectedPermiso;
-	readonly searchTerm = this.facade.searchTerm;
-	readonly filterRol = this.facade.filterRol;
-	readonly uiMapping = this.facade.uiMapping;
+	readonly vm = this.data.vm;
+	readonly permisosUsuario = this.data.permisosUsuario;
+	readonly vistas = this.data.vistas;
+	readonly loading = this.data.loading;
+	readonly dialogVisible = this.ui.dialogVisible;
+	readonly detailDrawerVisible = this.ui.detailDrawerVisible;
+	readonly selectedPermiso = this.data.selectedPermiso;
+	readonly searchTerm = this.data.searchTerm;
+	readonly filterRol = this.data.filterRol;
+	readonly uiMapping = this.data.uiMapping;
 	// #endregion
 
 	// #region Computed from facade
-	readonly totalUsuarios = this.facade.totalUsuarios;
-	readonly totalModulos = this.facade.totalModulos;
-	readonly filteredPermisos = this.facade.filteredPermisos;
-	readonly moduloVistasForDetail = this.facade.moduloVistasForDetail;
+	readonly totalUsuarios = this.data.totalUsuarios;
+	readonly totalModulos = this.data.totalModulos;
+	readonly filteredPermisos = this.data.filteredPermisos;
+	readonly moduloVistasForDetail = this.data.moduloVistasForDetail;
 	// #endregion
 
 	// #region Options
@@ -86,50 +88,50 @@ export class PermissionsUsersComponent implements OnInit {
 	// #endregion
 
 	ngOnInit(): void {
-		this.facade.loadData();
+		this.data.loadData();
 	}
 
 	// #region Actions
 	refresh(): void {
-		this.facade.refresh();
+		this.data.refresh();
 	}
 
 	clearFilters(): void {
-		this.facade.clearFilters();
+		this.data.clearFilters();
 	}
 	// #endregion
 
 	// #region Detail Drawer
 	openDetail(permiso: PermisoUsuario): void {
-		this.facade.openDetail(permiso);
+		this.ui.openDetail(permiso);
 	}
 
 	onDrawerVisibleChange(visible: boolean): void {
 		if (!visible) {
-			this.facade.closeDetail();
+			this.ui.closeDetail();
 		}
 	}
 
 	editFromDetail(): void {
-		this.facade.editFromDetail();
+		this.ui.editFromDetail();
 	}
 	// #endregion
 
 	// #region Edit Dialog
 	openNew(): void {
-		this.facade.openNew();
+		this.ui.openNew();
 	}
 
 	editPermiso(permiso: PermisoUsuario): void {
-		this.facade.editPermiso(permiso);
+		this.ui.editPermiso(permiso);
 	}
 
 	hideDialog(): void {
-		this.facade.hideDialog();
+		this.ui.hideDialog();
 	}
 
 	savePermiso(): void {
-		this.facade.savePermiso();
+		this.crud.savePermiso(() => this.ui.hideDialog());
 	}
 
 	deletePermiso(permiso: PermisoUsuario): void {
@@ -145,7 +147,7 @@ export class PermissionsUsersComponent implements OnInit {
 			acceptButtonStyleClass: 'p-button-danger',
 			accept: () => {
 				if (this.vm().loading) return;
-				this.facade.deletePermiso(permiso.id);
+				this.crud.deletePermiso(permiso.id);
 			},
 		});
 	}
@@ -153,11 +155,11 @@ export class PermissionsUsersComponent implements OnInit {
 
 	// #region UI Helpers (bindings bidireccionales)
 	onSearchTermChange(term: string): void {
-		this.facade.setSearchTerm(term);
+		this.data.setSearchTerm(term);
 	}
 
 	onFilterRolChange(rol: RolTipoAdmin | null): void {
-		this.facade.setFilterRol(rol);
+		this.data.setFilterRol(rol);
 	}
 	// #endregion
 }

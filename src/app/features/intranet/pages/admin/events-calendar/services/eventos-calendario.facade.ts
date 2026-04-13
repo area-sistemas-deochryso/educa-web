@@ -2,17 +2,21 @@ import { Injectable, inject, DestroyRef } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { forkJoin } from 'rxjs';
 
-import { logger, withRetry, getEstadoToggleDeltas } from '@core/helpers';
-import { ErrorHandlerService, SwService } from '@core/services';
+import { logger, withRetry, getEstadoToggleDeltas, getEstadoRollbackDeltas } from '@core/helpers';
+import { ErrorHandlerService, SwService, WalFacadeHelper } from '@core/services';
+import { environment } from '@env/environment';
 import {
 	EventoCalendarioLista,
 	CrearEventoCalendarioRequest,
 	ActualizarEventoCalendarioRequest,
 } from '@data/models';
 import { EventsCalendarService } from './eventos-calendario.service';
-import { UI_ADMIN_ERROR_DETAILS, UI_SUMMARIES } from '@app/shared/constants';
+import { UI_SUMMARIES } from '@app/shared/constants';
 
 import { EventsCalendarStore, EventoFormData } from './eventos-calendario.store';
+
+const RESOURCE = 'eventos-calendario';
+const API_BASE = `${environment.apiUrl}/api/sistema/eventoscalendario/admin`;
 
 @Injectable({ providedIn: 'root' })
 export class EventsCalendarFacade {
@@ -21,6 +25,7 @@ export class EventsCalendarFacade {
 	private store = inject(EventsCalendarStore);
 	private swService = inject(SwService);
 	private errorHandler = inject(ErrorHandlerService);
+	private wal = inject(WalFacadeHelper);
 	private destroyRef = inject(DestroyRef);
 	// #endregion
 
@@ -57,24 +62,33 @@ export class EventsCalendarFacade {
 
 	create(): void {
 		const formData = this.store.formData();
-		const payload: CrearEventoCalendarioRequest = this.buildCreatePayload(formData);
+		const payload = this.buildCreatePayload(formData);
+		const estadoNuevo = formData.estado;
 
-		this.api
-			.crear(payload)
-			.pipe(takeUntilDestroyed(this.destroyRef))
-			.subscribe({
-				next: () => {
+		this.wal.execute({
+			operation: 'CREATE',
+			resourceType: RESOURCE,
+			endpoint: `${API_BASE}/crear`,
+			method: 'POST',
+			payload,
+			http$: () => this.api.crear(payload),
+			optimistic: {
+				apply: () => {
 					this.store.closeDialog();
-					this.silentRefreshAfterCrud();
 					this.store.incrementarEstadistica('total', 1);
-					this.store.incrementarEstadistica(formData.estado ? 'activos' : 'inactivos', 1);
+					this.store.incrementarEstadistica(estadoNuevo ? 'activos' : 'inactivos', 1);
 				},
-				error: (err) => {
-					logger.error('Error al crear evento:', err);
-					this.errorHandler.showError(UI_SUMMARIES.error, 'No se pudo crear el evento');
-					this.store.setLoading(false);
+				rollback: () => {
+					this.store.incrementarEstadistica('total', -1);
+					this.store.incrementarEstadistica(estadoNuevo ? 'activos' : 'inactivos', -1);
 				},
-			});
+			},
+			onCommit: () => this.refreshItemsOnly(),
+			onError: (err) => {
+				logger.error('Error al crear evento:', err);
+				this.errorHandler.showError(UI_SUMMARIES.error, 'No se pudo crear el evento');
+			},
+		});
 	}
 
 	update(): void {
@@ -87,69 +101,129 @@ export class EventsCalendarFacade {
 			rowVersion: selected.rowVersion,
 		};
 
-		this.api
-			.actualizar(selected.id, payload)
-			.pipe(takeUntilDestroyed(this.destroyRef))
-			.subscribe({
-				next: () => {
-					this.store.updateItem(selected.id, {
-						titulo: formData.titulo,
-						descripcion: formData.descripcion,
-						tipo: formData.tipo,
-						icono: formData.icono,
-						fechaInicio: formData.fechaInicio,
-						fechaFin: formData.fechaFin || null,
-						hora: formData.hora || null,
-						ubicacion: formData.ubicacion || null,
-						estado: formData.estado,
-						anio: formData.anio,
-					});
+		const snapshot: Partial<EventoCalendarioLista> = {
+			titulo: selected.titulo,
+			descripcion: selected.descripcion,
+			tipo: selected.tipo,
+			icono: selected.icono,
+			fechaInicio: selected.fechaInicio,
+			fechaFin: selected.fechaFin,
+			hora: selected.hora,
+			ubicacion: selected.ubicacion,
+			estado: selected.estado,
+			anio: selected.anio,
+		};
+
+		const optimisticUpdate: Partial<EventoCalendarioLista> = {
+			titulo: formData.titulo,
+			descripcion: formData.descripcion,
+			tipo: formData.tipo,
+			icono: formData.icono,
+			fechaInicio: formData.fechaInicio,
+			fechaFin: formData.fechaFin || null,
+			hora: formData.hora || null,
+			ubicacion: formData.ubicacion || null,
+			estado: formData.estado,
+			anio: formData.anio,
+		};
+
+		this.wal.execute({
+			operation: 'UPDATE',
+			resourceType: RESOURCE,
+			resourceId: selected.id,
+			endpoint: `${API_BASE}/${selected.id}/actualizar`,
+			method: 'PUT',
+			payload,
+			http$: () => this.api.actualizar(selected.id, payload),
+			optimistic: {
+				apply: () => {
+					this.store.updateItem(selected.id, optimisticUpdate);
+					if (selected.estado !== formData.estado) {
+						const delta = formData.estado ? 1 : -1;
+						this.store.incrementarEstadistica('activos', delta);
+						this.store.incrementarEstadistica('inactivos', -delta);
+					}
 					this.store.closeDialog();
-					this.silentRefreshAfterCrud();
 				},
-				error: (err) => {
-					logger.error('Error al actualizar evento:', err);
-					this.errorHandler.showError(UI_SUMMARIES.error, 'No se pudo actualizar el evento');
-					this.store.setLoading(false);
+				rollback: () => {
+					this.store.updateItem(selected.id, snapshot);
+					if (selected.estado !== formData.estado) {
+						const delta = formData.estado ? -1 : 1;
+						this.store.incrementarEstadistica('activos', delta);
+						this.store.incrementarEstadistica('inactivos', -delta);
+					}
 				},
-			});
+			},
+			onCommit: () => this.refreshItemsOnly(),
+			onError: (err) => {
+				logger.error('Error al actualizar evento:', err);
+				this.errorHandler.showError(UI_SUMMARIES.error, 'No se pudo actualizar el evento');
+			},
+		});
 	}
 
 	toggleEstado(item: EventoCalendarioLista): void {
-		this.api
-			.toggleEstado(item.id)
-			.pipe(takeUntilDestroyed(this.destroyRef))
-			.subscribe({
-				next: () => {
+		this.wal.execute({
+			operation: 'TOGGLE',
+			resourceType: RESOURCE,
+			resourceId: item.id,
+			endpoint: `${API_BASE}/${item.id}/toggle`,
+			method: 'PATCH',
+			payload: {},
+			http$: () => this.api.toggleEstado(item.id),
+			optimistic: {
+				apply: () => {
 					const { activosDelta, inactivosDelta } = getEstadoToggleDeltas(item.estado);
 					this.store.toggleItemEstado(item.id);
 					this.store.incrementarEstadistica('activos', activosDelta);
 					this.store.incrementarEstadistica('inactivos', inactivosDelta);
 				},
-				error: (err) => {
-					logger.error('Error al cambiar estado:', err);
-					this.errorHandler.showError(UI_SUMMARIES.error, 'No se pudo cambiar el estado');
+				rollback: () => {
+					const { activosDelta, inactivosDelta } = getEstadoRollbackDeltas(item.estado);
+					this.store.toggleItemEstado(item.id);
+					this.store.incrementarEstadistica('activos', activosDelta);
+					this.store.incrementarEstadistica('inactivos', inactivosDelta);
 				},
-			});
+			},
+			onCommit: () => {},
+			onError: (err) => {
+				logger.error('Error al cambiar estado:', err);
+				this.errorHandler.showError(UI_SUMMARIES.error, 'No se pudo cambiar el estado');
+			},
+		});
 	}
 
 	delete(item: EventoCalendarioLista): void {
-		this.api
-			.eliminar(item.id)
-			.pipe(takeUntilDestroyed(this.destroyRef))
-			.subscribe({
-				next: () => {
+		this.wal.execute({
+			operation: 'DELETE',
+			resourceType: RESOURCE,
+			resourceId: item.id,
+			endpoint: `${API_BASE}/${item.id}/eliminar`,
+			method: 'DELETE',
+			payload: null,
+			http$: () => this.api.eliminar(item.id),
+			optimistic: {
+				apply: () => {
 					const { activosDelta, inactivosDelta } = getEstadoToggleDeltas(item.estado, 'delete');
 					this.store.removeItem(item.id);
 					this.store.incrementarEstadistica('total', -1);
 					this.store.incrementarEstadistica('activos', activosDelta);
 					this.store.incrementarEstadistica('inactivos', inactivosDelta);
 				},
-				error: (err) => {
-					logger.error('Error al eliminar evento:', err);
-					this.errorHandler.showError(UI_SUMMARIES.error, 'No se pudo eliminar el evento');
+				rollback: () => {
+					const { activosDelta, inactivosDelta } = getEstadoRollbackDeltas(item.estado, 'delete');
+					this.store.addItem(item);
+					this.store.incrementarEstadistica('total', 1);
+					this.store.incrementarEstadistica('activos', activosDelta);
+					this.store.incrementarEstadistica('inactivos', inactivosDelta);
 				},
-			});
+			},
+			onCommit: () => {},
+			onError: (err) => {
+				logger.error('Error al eliminar evento:', err);
+				this.errorHandler.showError(UI_SUMMARIES.error, 'No se pudo eliminar el evento');
+			},
+		});
 	}
 
 	// #endregion
@@ -208,10 +282,6 @@ export class EventsCalendarFacade {
 	// #region Helpers privados
 
 	/** Refetch silencioso post-CRUD: el interceptor ya invalidó el cache del SW. */
-	private silentRefreshAfterCrud(): void {
-		this.refreshItemsOnly();
-	}
-
 	private refreshItemsOnly(): void {
 		const anio = this.store.filterAnio();
 		this.api

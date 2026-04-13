@@ -5,7 +5,7 @@ import { ButtonModule } from 'primeng/button';
 import { DatePickerModule } from 'primeng/datepicker';
 import { TableModule } from 'primeng/table';
 import { TagModule } from 'primeng/tag';
-import { AsistenciaCursoResumenDto } from '../../../models';
+import { AsistenciaCursoResumenDto } from '@features/intranet/pages/profesor/models';
 
 @Component({
 	selector: 'app-attendance-summary-panel',

@@ -14,14 +14,16 @@ export class ErrorLogsService {
 	// #region Consultas
 
 	getErrores(
-		origen?: string | null,
-		severidad?: string | null,
+		origen: string | null,
+		severidad: string | null,
+		correlationId: string | null,
 		pagina = 1,
 		pageSize = 20,
 	): Observable<ErrorLogLista[]> {
 		const params: Record<string, string | number> = { pagina, pageSize };
 		if (origen) params['origen'] = origen;
 		if (severidad) params['severidad'] = severidad;
+		if (correlationId) params['correlationId'] = correlationId;
 
 		return this.http.get<ErrorLogLista[]>(this.apiUrl, { params });
 	}

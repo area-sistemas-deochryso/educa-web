@@ -1,6 +1,8 @@
 import { Injectable, inject, signal, computed, DestroyRef } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+// eslint-disable-next-line no-restricted-imports -- Razón: WalStatusStore es la proyección reactiva oficial del WAL. Es infraestructura acoplada intencionalmente al WalService/WalSyncEngine (no hay facade intermedio porque este store ES la interfaz de lectura del WAL).
 import { WalService } from './wal.service';
+// eslint-disable-next-line no-restricted-imports -- Razón: ver WalService arriba — el store se suscribe a los streams del sync engine para reflejar estado en tiempo real.
 import { WalSyncEngine } from './wal-sync-engine.service';
 import { WalEntry, WalStats } from './models';
 
@@ -88,6 +90,7 @@ export class WalStatusStore {
 
 	constructor() {
 		// Refresh after each entry is processed
+		// eslint-disable-next-line no-restricted-syntax -- Razón: este store es la proyección reactiva del WAL; la suscripción al stream del sync engine es su único trabajo. No hay facade intermedio por diseño — mover esto a un facade crearía indirección vacía.
 		this.syncEngine.entryProcessed$
 			.pipe(takeUntilDestroyed(this.destroyRef))
 			.subscribe(() => {

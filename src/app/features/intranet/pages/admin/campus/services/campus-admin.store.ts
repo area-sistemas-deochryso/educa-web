@@ -167,29 +167,12 @@ export class CampusAdminStore {
 
 	// #region Comandos de mutación
 
-	setPisos(pisos: CampusPisoDto[]): void {
-		this._pisos.set(pisos);
-	}
-
-	setSelectedPisoId(id: number | null): void {
-		this._selectedPisoId.set(id);
-	}
-
-	setPisoCompleto(piso: CampusPisoCompletoDto | null): void {
-		this._pisoCompleto.set(piso);
-	}
-
-	setLoading(loading: boolean): void {
-		this._loading.set(loading);
-	}
-
-	setEditorLoading(loading: boolean): void {
-		this._editorLoading.set(loading);
-	}
-
-	setSaving(saving: boolean): void {
-		this._saving.set(saving);
-	}
+	setPisos(pisos: CampusPisoDto[]): void { this._pisos.set(pisos); }
+	setSelectedPisoId(id: number | null): void { this._selectedPisoId.set(id); }
+	setPisoCompleto(piso: CampusPisoCompletoDto | null): void { this._pisoCompleto.set(piso); }
+	setLoading(loading: boolean): void { this._loading.set(loading); }
+	setEditorLoading(loading: boolean): void { this._editorLoading.set(loading); }
+	setSaving(saving: boolean): void { this._saving.set(saving); }
 
 	updatePiso(id: number, updates: Partial<CampusPisoDto>): void {
 		this._pisos.update((pisos) =>
@@ -242,17 +225,9 @@ export class CampusAdminStore {
 		this._selectedBloqueoId.set(null);
 	}
 
-	setNewNodeType(type: EditorNodeType): void {
-		this._newNodeType.set(type);
-	}
-
-	setEdgeStartNodeId(id: number | null): void {
-		this._edgeStartNodeId.set(id);
-	}
-
-	setVerticalStartNodeId(id: number | null): void {
-		this._verticalStartNodeId.set(id);
-	}
+	setNewNodeType(type: EditorNodeType): void { this._newNodeType.set(type); }
+	setEdgeStartNodeId(id: number | null): void { this._edgeStartNodeId.set(id); }
+	setVerticalStartNodeId(id: number | null): void { this._verticalStartNodeId.set(id); }
 
 	clearSelection(): void {
 		this._selectedNodeId.set(null);
@@ -306,13 +281,8 @@ export class CampusAdminStore {
 		this._destPisoNodos.set([]);
 	}
 
-	setDestPisoNodos(nodos: CampusNodoDto[]): void {
-		this._destPisoNodos.set(nodos);
-	}
-
-	setDestPisoLoading(loading: boolean): void {
-		this._destPisoLoading.set(loading);
-	}
+	setDestPisoNodos(nodos: CampusNodoDto[]): void { this._destPisoNodos.set(nodos); }
+	setDestPisoLoading(loading: boolean): void { this._destPisoLoading.set(loading); }
 
 	// #endregion
 

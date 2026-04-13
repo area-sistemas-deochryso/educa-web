@@ -16,7 +16,7 @@ import {
 	GrupoContenidoDto,
 	GrupoEstudianteDto,
 	EstudianteSinGrupoDto,
-} from '../../../models';
+} from '@features/intranet/pages/profesor/models';
 
 interface DragData {
 	estudianteId: number;

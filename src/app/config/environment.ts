@@ -25,6 +25,7 @@ export const environment = {
 		ctestK6: false,
 		videoconferencias: true,
 		campusNavigation: false,
+		feedbackReport: true,
 	},
 
 	// JaaS (Jitsi as a Service)

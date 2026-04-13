@@ -2,17 +2,21 @@ import { Injectable, inject, DestroyRef } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { forkJoin } from 'rxjs';
 
-import { logger, withRetry, getEstadoToggleDeltas } from '@core/helpers';
-import { ErrorHandlerService, SwService } from '@core/services';
+import { logger, withRetry, getEstadoToggleDeltas, getEstadoRollbackDeltas } from '@core/helpers';
+import { ErrorHandlerService, SwService, WalFacadeHelper } from '@core/services';
+import { environment } from '@env/environment';
 import {
 	NotificacionLista,
 	CrearNotificacionRequest,
 	ActualizarNotificacionRequest,
 } from '@data/models';
 import { NotificacionesAdminService } from './notificaciones-admin.service';
-import { UI_ADMIN_ERROR_DETAILS, UI_SUMMARIES } from '@app/shared/constants';
+import { UI_SUMMARIES } from '@app/shared/constants';
 
 import { NotificacionesAdminStore, NotificacionFormData } from './notificaciones-admin.store';
+
+const RESOURCE = 'notificaciones-admin';
+const API_BASE = `${environment.apiUrl}/api/sistema/notificaciones/admin`;
 
 @Injectable({ providedIn: 'root' })
 export class NotificacionesAdminFacade {
@@ -21,6 +25,7 @@ export class NotificacionesAdminFacade {
 	private store = inject(NotificacionesAdminStore);
 	private swService = inject(SwService);
 	private errorHandler = inject(ErrorHandlerService);
+	private wal = inject(WalFacadeHelper);
 	private destroyRef = inject(DestroyRef);
 	// #endregion
 
@@ -57,25 +62,33 @@ export class NotificacionesAdminFacade {
 
 	create(): void {
 		const formData = this.store.formData();
-		const payload: CrearNotificacionRequest = this.buildCreatePayload(formData);
+		const payload = this.buildCreatePayload(formData);
+		const estadoNuevo = formData.estado;
 
-		this.api
-			.crear(payload)
-			.pipe(takeUntilDestroyed(this.destroyRef))
-			.subscribe({
-				next: () => {
+		this.wal.execute({
+			operation: 'CREATE',
+			resourceType: RESOURCE,
+			endpoint: `${API_BASE}/crear`,
+			method: 'POST',
+			payload,
+			http$: () => this.api.crear(payload),
+			optimistic: {
+				apply: () => {
 					this.store.closeDialog();
-					this.silentRefreshAfterCrud();
 					this.store.incrementarEstadistica('total', 1);
-					if (formData.estado) this.store.incrementarEstadistica('activas', 1);
-					else this.store.incrementarEstadistica('inactivas', 1);
+					this.store.incrementarEstadistica(estadoNuevo ? 'activas' : 'inactivas', 1);
 				},
-				error: (err) => {
-					logger.error('Error al crear notificación:', err);
-					this.errorHandler.showError(UI_SUMMARIES.error, 'No se pudo crear la notificación');
-					this.store.setLoading(false);
+				rollback: () => {
+					this.store.incrementarEstadistica('total', -1);
+					this.store.incrementarEstadistica(estadoNuevo ? 'activas' : 'inactivas', -1);
 				},
-			});
+			},
+			onCommit: () => this.refreshItemsOnly(),
+			onError: (err) => {
+				logger.error('Error al crear notificación:', err);
+				this.errorHandler.showError(UI_SUMMARIES.error, 'No se pudo crear la notificación');
+			},
+		});
 	}
 
 	update(): void {
@@ -88,74 +101,139 @@ export class NotificacionesAdminFacade {
 			rowVersion: selected.rowVersion,
 		};
 
-		this.api
-			.actualizar(selected.id, payload)
-			.pipe(takeUntilDestroyed(this.destroyRef))
-			.subscribe({
-				next: () => {
-					this.store.updateItem(selected.id, {
-						titulo: formData.titulo,
-						mensaje: formData.mensaje,
-						tipo: formData.tipo,
-						prioridad: formData.prioridad,
-						icono: formData.icono,
-						fechaInicio: formData.fechaInicio,
-						fechaFin: formData.fechaFin,
-						actionUrl: formData.actionUrl || null,
-						actionText: formData.actionText || null,
-						dismissible: formData.dismissible,
-						estado: formData.estado,
-						anio: formData.anio,
-					destinatarioRol: formData.destinatarioRol || null,
-					destinatarioGrado: formData.destinatarioGrado || null,
-					destinatarioSeccion: formData.destinatarioSeccion || null,
-					});
+		const snapshot: Partial<NotificacionLista> = {
+			titulo: selected.titulo,
+			mensaje: selected.mensaje,
+			tipo: selected.tipo,
+			prioridad: selected.prioridad,
+			icono: selected.icono,
+			fechaInicio: selected.fechaInicio,
+			fechaFin: selected.fechaFin,
+			actionUrl: selected.actionUrl,
+			actionText: selected.actionText,
+			dismissible: selected.dismissible,
+			estado: selected.estado,
+			anio: selected.anio,
+			destinatarioRol: selected.destinatarioRol,
+			destinatarioGrado: selected.destinatarioGrado,
+			destinatarioSeccion: selected.destinatarioSeccion,
+		};
+
+		const optimisticUpdate: Partial<NotificacionLista> = {
+			titulo: formData.titulo,
+			mensaje: formData.mensaje,
+			tipo: formData.tipo,
+			prioridad: formData.prioridad,
+			icono: formData.icono,
+			fechaInicio: formData.fechaInicio,
+			fechaFin: formData.fechaFin,
+			actionUrl: formData.actionUrl || null,
+			actionText: formData.actionText || null,
+			dismissible: formData.dismissible,
+			estado: formData.estado,
+			anio: formData.anio,
+			destinatarioRol: formData.destinatarioRol || null,
+			destinatarioGrado: formData.destinatarioGrado || null,
+			destinatarioSeccion: formData.destinatarioSeccion || null,
+		};
+
+		this.wal.execute({
+			operation: 'UPDATE',
+			resourceType: RESOURCE,
+			resourceId: selected.id,
+			endpoint: `${API_BASE}/${selected.id}/actualizar`,
+			method: 'PUT',
+			payload,
+			http$: () => this.api.actualizar(selected.id, payload),
+			optimistic: {
+				apply: () => {
+					this.store.updateItem(selected.id, optimisticUpdate);
+					if (selected.estado !== formData.estado) {
+						const delta = formData.estado ? 1 : -1;
+						this.store.incrementarEstadistica('activas', delta);
+						this.store.incrementarEstadistica('inactivas', -delta);
+					}
 					this.store.closeDialog();
-					this.silentRefreshAfterCrud();
 				},
-				error: (err) => {
-					logger.error('Error al actualizar notificación:', err);
-					this.errorHandler.showError(UI_SUMMARIES.error, 'No se pudo actualizar la notificación');
-					this.store.setLoading(false);
+				rollback: () => {
+					this.store.updateItem(selected.id, snapshot);
+					if (selected.estado !== formData.estado) {
+						const delta = formData.estado ? -1 : 1;
+						this.store.incrementarEstadistica('activas', delta);
+						this.store.incrementarEstadistica('inactivas', -delta);
+					}
 				},
-			});
+			},
+			onCommit: () => this.refreshItemsOnly(),
+			onError: (err) => {
+				logger.error('Error al actualizar notificación:', err);
+				this.errorHandler.showError(UI_SUMMARIES.error, 'No se pudo actualizar la notificación');
+			},
+		});
 	}
 
 	toggleEstado(item: NotificacionLista): void {
-		this.api
-			.toggleEstado(item.id)
-			.pipe(takeUntilDestroyed(this.destroyRef))
-			.subscribe({
-				next: () => {
+		this.wal.execute({
+			operation: 'TOGGLE',
+			resourceType: RESOURCE,
+			resourceId: item.id,
+			endpoint: `${API_BASE}/${item.id}/toggle`,
+			method: 'PATCH',
+			payload: {},
+			http$: () => this.api.toggleEstado(item.id),
+			optimistic: {
+				apply: () => {
 					const { activosDelta, inactivosDelta } = getEstadoToggleDeltas(item.estado);
 					this.store.toggleItemEstado(item.id);
 					this.store.incrementarEstadistica('activas', activosDelta);
 					this.store.incrementarEstadistica('inactivas', inactivosDelta);
 				},
-				error: (err) => {
-					logger.error('Error al cambiar estado:', err);
-					this.errorHandler.showError(UI_SUMMARIES.error, 'No se pudo cambiar el estado');
+				rollback: () => {
+					const { activosDelta, inactivosDelta } = getEstadoRollbackDeltas(item.estado);
+					this.store.toggleItemEstado(item.id);
+					this.store.incrementarEstadistica('activas', activosDelta);
+					this.store.incrementarEstadistica('inactivas', inactivosDelta);
 				},
-			});
+			},
+			onCommit: () => {},
+			onError: (err) => {
+				logger.error('Error al cambiar estado:', err);
+				this.errorHandler.showError(UI_SUMMARIES.error, 'No se pudo cambiar el estado');
+			},
+		});
 	}
 
 	delete(item: NotificacionLista): void {
-		this.api
-			.eliminar(item.id)
-			.pipe(takeUntilDestroyed(this.destroyRef))
-			.subscribe({
-				next: () => {
+		this.wal.execute({
+			operation: 'DELETE',
+			resourceType: RESOURCE,
+			resourceId: item.id,
+			endpoint: `${API_BASE}/${item.id}/eliminar`,
+			method: 'DELETE',
+			payload: null,
+			http$: () => this.api.eliminar(item.id),
+			optimistic: {
+				apply: () => {
 					const { activosDelta, inactivosDelta } = getEstadoToggleDeltas(item.estado, 'delete');
 					this.store.removeItem(item.id);
 					this.store.incrementarEstadistica('total', -1);
 					this.store.incrementarEstadistica('activas', activosDelta);
 					this.store.incrementarEstadistica('inactivas', inactivosDelta);
 				},
-				error: (err) => {
-					logger.error('Error al eliminar notificación:', err);
-					this.errorHandler.showError(UI_SUMMARIES.error, 'No se pudo eliminar la notificación');
+				rollback: () => {
+					const { activosDelta, inactivosDelta } = getEstadoRollbackDeltas(item.estado, 'delete');
+					this.store.addItem(item);
+					this.store.incrementarEstadistica('total', 1);
+					this.store.incrementarEstadistica('activas', activosDelta);
+					this.store.incrementarEstadistica('inactivas', inactivosDelta);
 				},
-			});
+			},
+			onCommit: () => {},
+			onError: (err) => {
+				logger.error('Error al eliminar notificación:', err);
+				this.errorHandler.showError(UI_SUMMARIES.error, 'No se pudo eliminar la notificación');
+			},
+		});
 	}
 
 	// #endregion
@@ -219,10 +297,6 @@ export class NotificacionesAdminFacade {
 	// #region Helpers privados
 
 	/** Refetch silencioso post-CRUD: el interceptor ya invalidó el cache del SW. */
-	private silentRefreshAfterCrud(): void {
-		this.refreshItemsOnly();
-	}
-
 	private refreshItemsOnly(): void {
 		const anio = this.store.filterAnio();
 		this.api

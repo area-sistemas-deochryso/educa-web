@@ -290,6 +290,7 @@ export class SmartNotificationService {
 			Apoderado: '/intranet',
 			Director: '/intranet',
 			'Asistente Administrativo': '/intranet',
+			Promotor: '/intranet',
 		};
 		return rolPaths[user.rol] ?? '/intranet';
 	}

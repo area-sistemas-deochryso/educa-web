@@ -1,3 +1,9 @@
+/* eslint-disable wal/no-direct-mutation-subscribe --
+   Justificación: aprobarEstudiante/aprobarMasivo son operaciones críticas
+   del dominio académico (INV-T02 + INV-V01..03). El backend es la fuente
+   de verdad de la progresión entre años; un rollback local dejaría al
+   profesor viendo un estado que no existe en la BD. Server-confirmed
+   justificado por invariante de negocio. */
 import { Injectable, inject, DestroyRef } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { forkJoin } from 'rxjs';

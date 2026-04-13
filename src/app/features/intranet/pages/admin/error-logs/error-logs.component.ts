@@ -3,28 +3,22 @@ import { CommonModule, DatePipe } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 
 import { ButtonModule } from 'primeng/button';
-import { DrawerModule } from 'primeng/drawer';
 import { SelectModule } from 'primeng/select';
 import { TableModule } from 'primeng/table';
 import { TagModule } from 'primeng/tag';
-import { TimelineModule } from 'primeng/timeline';
 import { TooltipModule } from 'primeng/tooltip';
 
 import { PageHeaderComponent } from '@intranet-shared/components';
 import { TableSkeletonComponent, SkeletonColumnDef } from '@intranet-shared/components/table-skeleton';
 
+import { ErrorLogDetailDrawerComponent } from './components/error-log-detail-drawer';
 import { ErrorLogsFacade } from './services';
 import {
 	ErrorOrigen,
 	ErrorSeveridad,
 	SEVERIDAD_SEVERITY_MAP,
 	ORIGEN_ICON_MAP,
-	ORIGEN_LABEL_MAP,
-	TIPO_ACCION_ICON_MAP,
-	parseSourceLocation,
 	type ErrorLogLista,
-	type BreadcrumbTipoAccion,
-	type SourceLocation,
 } from './models';
 
 @Component({
@@ -35,14 +29,13 @@ import {
 		DatePipe,
 		FormsModule,
 		ButtonModule,
-		DrawerModule,
 		SelectModule,
 		TableModule,
 		TagModule,
-		TimelineModule,
 		TooltipModule,
 		PageHeaderComponent,
 		TableSkeletonComponent,
+		ErrorLogDetailDrawerComponent,
 	],
 	templateUrl: './error-logs.component.html',
 	styleUrl: './error-logs.component.scss',
@@ -88,8 +81,6 @@ export class ErrorLogsComponent implements OnInit {
 	// #region Maps para template
 	readonly severidadSeverity = SEVERIDAD_SEVERITY_MAP;
 	readonly origenIcon = ORIGEN_ICON_MAP;
-	readonly origenLabel = ORIGEN_LABEL_MAP;
-	readonly tipoAccionIcon = TIPO_ACCION_ICON_MAP;
 	// #endregion
 
 	// #region Lifecycle
@@ -129,28 +120,10 @@ export class ErrorLogsComponent implements OnInit {
 		return this.origenIcon[origen as ErrorOrigen] ?? 'pi pi-question';
 	}
 
-	getTipoAccionIcon(tipo: string): string {
-		return this.tipoAccionIcon[tipo as BreadcrumbTipoAccion] ?? 'pi pi-circle';
-	}
-
-	getOrigenLabel(origen: string): string {
-		return this.origenLabel[origen as ErrorOrigen] ?? origen;
-	}
-
 	getOrigenSeverity(origen: string): 'info' | 'warn' | 'danger' | 'secondary' {
 		if (origen === 'BACKEND') return 'warn';
 		if (origen === 'NETWORK') return 'danger';
 		return 'info';
-	}
-
-	getSourceLocation(json: string | null): SourceLocation | null {
-		return parseSourceLocation(json);
-	}
-
-	formatSourceLocation(json: string | null): string {
-		const loc = parseSourceLocation(json);
-		if (!loc?.funcion) return '';
-		return loc.funcion;
 	}
 	// #endregion
 }

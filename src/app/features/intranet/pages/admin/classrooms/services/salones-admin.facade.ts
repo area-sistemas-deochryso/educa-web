@@ -1,3 +1,8 @@
+/* eslint-disable wal/no-direct-mutation-subscribe --
+   Justificación: todas las mutaciones de este facade son server-confirmed
+   por diseño (cierre de periodo irreversible INV-T01, aprobación de
+   estudiantes INV-T02, config de calificación INV-U06). Ver JSDoc de la
+   clase para detalles. Un rollback local sería inseguro. */
 import { Injectable, inject, DestroyRef } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { forkJoin } from 'rxjs';
@@ -23,6 +28,28 @@ import {
 	CrearPeriodoAcademicoDto,
 } from '../models';
 
+/**
+ * Orquestación de operaciones sobre salones admin.
+ *
+ * **Nota sobre optimistic UI**: Este facade NO usa `WalFacadeHelper` porque sus
+ * operaciones son críticas del dominio con invariantes backend irreversibles:
+ *
+ * - `crearConfiguracion` / `actualizarConfiguracion`: cambia el sistema de
+ *   calificación (NUMERICO/LITERAL) del nivel completo (`INV-U06`). No es
+ *   un CRUD por fila — es configuración de un sistema que afecta todo el año.
+ * - `cerrarPeriodo`: **IRREVERSIBLE** (`INV-T01` de business-rules §9). Crea
+ *   salones destino del siguiente año, habilita aprobaciones. Fingir el cambio
+ *   local y revertir sería inseguro.
+ * - `aprobarEstudiante` / `aprobarMasivo`: batch que progresa estudiantes entre
+ *   años (`INV-T02`, `INV-V01`-`INV-V03`). El backend es la fuente de verdad
+ *   de la progresión — el facade solo consulta el resultado.
+ *
+ * Cualquier rollback local aquí dejaría al usuario viendo un estado que no
+ * existe en el backend. Por eso todas esperan confirmación del servidor
+ * **antes** de mutar el store. Si en el futuro alguna operación se vuelve
+ * verdaderamente CRUD (ej: editar un salón por sus campos), **migrar esa
+ * operación sí** a `WalFacadeHelper`.
+ */
 @Injectable({ providedIn: 'root' })
 export class ClassroomsAdminFacade {
 	// #region Dependencias
@@ -151,9 +178,7 @@ export class ClassroomsAdminFacade {
 	}
 
 	private refreshConfiguraciones(): void {
-		const anio = this.store.filtroAnio();
-		this.api
-			.getConfiguracionesPorAnio(anio)
+		this.api.getConfiguracionesPorAnio(this.store.filtroAnio())
 			.pipe(takeUntilDestroyed(this.destroyRef))
 			.subscribe((configs) => this.store.setConfiguraciones(configs));
 	}
@@ -209,9 +234,7 @@ export class ClassroomsAdminFacade {
 	}
 
 	private refreshPeriodos(): void {
-		const anio = this.store.filtroAnio();
-		this.api
-			.getPeriodosPorAnio(anio)
+		this.api.getPeriodosPorAnio(this.store.filtroAnio())
 			.pipe(takeUntilDestroyed(this.destroyRef))
 			.subscribe((periodos) => this.store.setPeriodos(periodos));
 	}
@@ -293,108 +316,64 @@ export class ClassroomsAdminFacade {
 	// #region Comandos de salon detail
 
 	loadHorariosSalon(salonId: number): void {
-		this.store.setHorariosLoading(true);
-
-		this.api
-			.getHorariosPorSalon(salonId)
-			.pipe(takeUntilDestroyed(this.destroyRef))
-			.subscribe({
-				next: (horarios) => {
-					this.store.setSalonHorarios(horarios);
-					this.store.setHorariosLoading(false);
-				},
-				error: (err) => {
-					logger.error('Error al cargar horarios del salón:', err);
-					this.store.setHorariosLoading(false);
-				},
-			});
+		this.loadDetailSection(
+			this.api.getHorariosPorSalon(salonId),
+			(v) => this.store.setHorariosLoading(v),
+			(d) => this.store.setSalonHorarios(d),
+			'horarios del salón',
+		);
 	}
 
 	loadAsistenciaSalon(grado: string, seccion: string, mes: number, anio: number): void {
-		this.store.setAsistenciaLoading(true);
-
-		this.api
-			.getAsistenciaMensual(grado, seccion, mes, anio)
-			.pipe(takeUntilDestroyed(this.destroyRef))
-			.subscribe({
-				next: (asistencia) => {
-					this.store.setSalonAsistencia(asistencia);
-					this.store.setAsistenciaLoading(false);
-				},
-				error: (err) => {
-					logger.error('Error al cargar asistencia del salón:', err);
-					this.store.setAsistenciaLoading(false);
-				},
-			});
+		this.loadDetailSection(
+			this.api.getAsistenciaMensual(grado, seccion, mes, anio),
+			(v) => this.store.setAsistenciaLoading(v),
+			(d) => this.store.setSalonAsistencia(d),
+			'asistencia del salón',
+		);
 	}
 
 	loadNotasSalon(salonId: number, cursoId: number): void {
-		this.store.setNotasLoading(true);
+		this.loadDetailSection(
+			this.api.getNotasSalon(salonId, cursoId),
+			(v) => this.store.setNotasLoading(v),
+			(d) => this.store.setSalonNotas(d),
+			'notas del salón',
+		);
+	}
 
-		this.api
-			.getNotasSalon(salonId, cursoId)
-			.pipe(takeUntilDestroyed(this.destroyRef))
-			.subscribe({
-				next: (notas) => {
-					this.store.setSalonNotas(notas);
-					this.store.setNotasLoading(false);
-				},
-				error: (err) => {
-					logger.error('Error al cargar notas del salón:', err);
-					this.store.setNotasLoading(false);
-				},
-			});
+	private loadDetailSection<T>(
+		obs$: import('rxjs').Observable<T>,
+		setLoading: (v: boolean) => void,
+		setData: (d: T) => void,
+		label: string,
+	): void {
+		setLoading(true);
+		obs$.pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
+			next: (d) => { setData(d); setLoading(false); },
+			error: (err) => { logger.error(`Error al cargar ${label}:`, err); setLoading(false); },
+		});
 	}
 	// #endregion
 
 	// #region Comandos de UI
 
-	setNivel(nivel: NivelEducativo): void {
-		this.store.setSelectedNivel(nivel);
-	}
+	setNivel(nivel: NivelEducativo): void { this.store.setSelectedNivel(nivel); }
+	setAnio(anio: number): void { this.store.setFiltroAnio(anio); this.loadAll(); }
+	setEsVerano(esVerano: boolean): void { this.store.setEsVerano(esVerano); this.loadAll(); }
 
-	setAnio(anio: number): void {
-		this.store.setFiltroAnio(anio);
-		this.loadAll();
-	}
-
-	setEsVerano(esVerano: boolean): void {
-		this.store.setEsVerano(esVerano);
-		this.loadAll();
-	}
-
-	openConfigDialog(): void {
-		this.store.openConfigDialog();
-	}
-
-	closeConfigDialog(): void {
-		this.store.closeConfigDialog();
-	}
-
-	openCerrarPeriodoDialog(): void {
-		this.store.openCerrarPeriodoDialog();
-	}
-
-	closeCerrarPeriodoDialog(): void {
-		this.store.closeCerrarPeriodoDialog();
-	}
+	openConfigDialog(): void { this.store.openConfigDialog(); }
+	closeConfigDialog(): void { this.store.closeConfigDialog(); }
+	openCerrarPeriodoDialog(): void { this.store.openCerrarPeriodoDialog(); }
+	closeCerrarPeriodoDialog(): void { this.store.closeCerrarPeriodoDialog(); }
+	closeSalonDialog(): void { this.store.closeSalonDialog(); }
+	openConfirmDialog(): void { this.store.openConfirmDialog(); }
+	closeConfirmDialog(): void { this.store.closeConfirmDialog(); }
 
 	openSalonDialog(salonId: number): void {
 		this.store.openSalonDialog(salonId);
 		this.loadAprobaciones(salonId);
 		this.loadHorariosSalon(salonId);
-	}
-
-	closeSalonDialog(): void {
-		this.store.closeSalonDialog();
-	}
-
-	openConfirmDialog(): void {
-		this.store.openConfirmDialog();
-	}
-
-	closeConfirmDialog(): void {
-		this.store.closeConfirmDialog();
 	}
 	// #endregion
 }

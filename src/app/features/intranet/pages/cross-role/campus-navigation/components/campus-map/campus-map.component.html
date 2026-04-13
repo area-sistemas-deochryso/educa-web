@@ -1,0 +1,134 @@
+<div class="campus-map-container">
+	<svg
+		[attr.viewBox]="viewBox()"
+		xmlns="http://www.w3.org/2000/svg"
+		class="campus-svg"
+	>
+		<defs>
+			<filter id="path-blur">
+				<feGaussianBlur stdDeviation="3" />
+			</filter>
+		</defs>
+
+		<!-- #region Fondo del edificio -->
+		<rect
+			[attr.x]="buildingBounds().minX"
+			[attr.y]="buildingBounds().minY"
+			[attr.width]="buildingBounds().w"
+			[attr.height]="buildingBounds().h"
+			rx="12"
+			class="building-bg"
+		/>
+		<!-- #endregion -->
+
+		<!-- #region Zonas caminables -->
+		@for (seg of walkableSegs(); track seg.id) {
+			<line
+				[attr.x1]="seg.x1" [attr.y1]="seg.y1"
+				[attr.x2]="seg.x2" [attr.y2]="seg.y2"
+				class="walkable-corridor"
+				[attr.stroke-width]="corridorWidth"
+			/>
+		}
+		<!-- #endregion -->
+
+		<!-- #region Path: glow + huellas -->
+		@if (pathSegments().length > 0) {
+			@for (seg of pathSegments(); track seg.id) {
+				<line
+					[attr.x1]="seg.x1" [attr.y1]="seg.y1"
+					[attr.x2]="seg.x2" [attr.y2]="seg.y2"
+					class="path-glow"
+				/>
+			}
+			@for (fp of footprints(); track fp.id) {
+				<g [attr.transform]="'translate(' + fp.x + ',' + fp.y + ') rotate(' + fp.angle + ')'"
+					class="footprint"
+					[style.animation-delay]="fp.delay * 3 + 's'"
+				>
+					<ellipse
+						[attr.cx]="fp.left ? -4 : 4"
+						cy="0"
+						rx="4" ry="6"
+						class="foot-sole"
+					/>
+					<circle [attr.cx]="fp.left ? -6 : 2" cy="-5" r="1.5" class="foot-toe"/>
+					<circle [attr.cx]="fp.left ? -3 : 5" cy="-6" r="1.5" class="foot-toe"/>
+					<circle [attr.cx]="fp.left ? -1 : 7" cy="-5" r="1.3" class="foot-toe"/>
+				</g>
+			}
+		}
+		<!-- #endregion -->
+
+		<!-- #region Nodos -->
+		@for (node of nodes(); track node.id) {
+			@if (node.type !== 'corridor') {
+				<g
+					class="node-group clickable"
+					[class.start-node]="node.id === startNodeId()"
+					[class.dest-node]="node.id === destinationNodeId()"
+					(click)="onNodeClick(node)"
+				>
+					<rect
+						[attr.x]="node.x - (node.width || 80) / 2"
+						[attr.y]="node.y - (node.height || 50) / 2"
+						[attr.width]="node.width || 80"
+						[attr.height]="node.height || 50"
+						[attr.rx]="6"
+						[class]="'node-rect node-' + node.type"
+					/>
+					<text
+						[attr.x]="node.x"
+						[attr.y]="node.y + 1"
+						class="node-label"
+						text-anchor="middle"
+						dominant-baseline="middle"
+					>
+						{{ node.label }}
+					</text>
+				</g>
+			}
+		}
+		<!-- #endregion -->
+
+		<!-- #region Nodos corredor -->
+		@for (node of corridorNodes(); track node.id) {
+			<circle
+				[attr.cx]="node.x"
+				[attr.cy]="node.y"
+				r="4"
+				class="corridor-dot"
+			/>
+		}
+		<!-- #endregion -->
+
+		<!-- #region Marcadores de inicio/destino -->
+		@if (startNode(); as sn) {
+			<circle
+				[attr.cx]="sn.x"
+				[attr.cy]="sn.y - (sn.height || 50) / 2 - 12"
+				r="9"
+				class="marker-start"
+			/>
+			<text
+				[attr.x]="sn.x"
+				[attr.y]="sn.y - (sn.height || 50) / 2 - 11"
+				class="marker-label" text-anchor="middle" dominant-baseline="middle"
+			>📍</text>
+		}
+		@if (destNode(); as dn) {
+			<circle
+				[attr.cx]="dn.x"
+				[attr.cy]="dn.y - (dn.height || 50) / 2 - 12"
+				r="9"
+				class="marker-dest"
+			/>
+			<text
+				[attr.x]="dn.x"
+				[attr.y]="dn.y - (dn.height || 50) / 2 - 11"
+				class="marker-label" text-anchor="middle" dominant-baseline="middle"
+			>🎯</text>
+		}
+		<!-- #endregion -->
+	</svg>
+</div>

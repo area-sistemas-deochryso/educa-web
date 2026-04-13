@@ -8,11 +8,8 @@ import { type ImportarHorariosResult } from '../helpers/horario-import.config';
 import { mapSalonesToOptions, mapCursosToOptions, groupCursosByNivel, mapProfesToOptions } from '../helpers/horario-mapping.utils';
 import {
 	type HorarioDetalleResponseDto,
-	type HorarioFormData,
 	type HorarioResponseDto,
 	type HorariosEstadisticas,
-	type HorarioVistaType,
-	type DiaSemana,
 } from '../models/horario.interface';
 import { ProfesorListDto, ProfesorOption } from '../models/profesor.interface';
 import { SalonListDto, SalonOption } from '../models/salon.interface';
@@ -22,8 +19,8 @@ import { SchedulesFilterStore } from './horarios-filter.store';
 @Injectable({ providedIn: 'root' })
 export class SchedulesStore {
 	private authStore = inject(AuthStore);
-	private formStore = inject(SchedulesFormStore);
-	private filterStore = inject(SchedulesFilterStore);
+	readonly formStore = inject(SchedulesFormStore);
+	readonly filterStore = inject(SchedulesFilterStore);
 
 	// #region Estado privado - Datos
 	private readonly _horarios = signal<HorarioResponseDto[]>([]);
@@ -75,31 +72,7 @@ export class SchedulesStore {
 	readonly importResult = this._importResult.asReadonly();
 	// #endregion
 
-	// #region Lecturas delegadas - Form
-	readonly formData = this.formStore.formData;
-	readonly editingId = this.formStore.editingId;
-	readonly wizardStep = this.formStore.wizardStep;
-	readonly dialogVisible = this.formStore.dialogVisible;
-	readonly detailDrawerVisible = this.formStore.detailDrawerVisible;
-	readonly formValid = this.formStore.formValid;
-	readonly horaInicioError = this.formStore.horaInicioError;
-	readonly horaFinError = this.formStore.horaFinError;
-	readonly isCreating = this.formStore.isCreating;
-	readonly isEditing = this.formStore.isEditing;
-	readonly canGoNextStep = this.formStore.canGoNextStep;
-	readonly canGoPrevStep = this.formStore.canGoPrevStep;
-	readonly isLastStep = this.formStore.isLastStep;
-	// #endregion
-
-	// #region Lecturas delegadas - Filter
-	readonly vistaActual = this.filterStore.vistaActual;
-	readonly horariosFiltrados = this.filterStore.horariosFiltrados;
-	readonly horariosSemanales = this.filterStore.horariosSemanales;
-	readonly vistaSemanalHabilitada = this.filterStore.vistaSemanalHabilitada;
-	readonly filtroDiaSemanaHabilitado = this.filterStore.filtroDiaSemanaHabilitado;
-	readonly page = this.filterStore.page;
-	readonly pageSize = this.filterStore.pageSize;
-	readonly totalRecords = this.filterStore.totalRecords;
+	// Sub-stores expuestos directamente — facades acceden a formStore/filterStore sin delegación
 	// #endregion
 
 	// #region Usuario actual
@@ -134,7 +107,7 @@ export class SchedulesStore {
 	 * Si hay día/hora, filtra por conflicto de horario.
 	 */
 	readonly salonesOptions = computed<SalonOption[]>(() => {
-		const formData = this.formData();
+		const formData = this.formStore.formData();
 
 		// Sin día/hora -> devolver opciones activas ya memoizadas
 		if (!formData.diaSemana || !formData.horaInicio || !formData.horaFin) {
@@ -146,7 +119,7 @@ export class SchedulesStore {
 			this.activeSalones(),
 			this._horarios(),
 			formData,
-			this.editingId(),
+			this.formStore.editingId(),
 		);
 
 		return mapSalonesToOptions(disponibles);
@@ -192,8 +165,8 @@ export class SchedulesStore {
 	/** Datos de la tabla y detalle */
 	readonly dataVm = computed(() => ({
 		horarios: this._horarios(),
-		horariosFiltrados: this.horariosFiltrados(),
-		horariosSemanales: this.horariosSemanales(),
+		horariosFiltrados: this.filterStore.horariosFiltrados(),
+		horariosSemanales: this.filterStore.horariosSemanales(),
 		horarioDetalle: this._horarioDetalle(),
 		estadisticas: this._estadisticas(),
 		totalHorarios: this.totalHorarios(),
@@ -358,17 +331,11 @@ export class SchedulesStore {
 	}
 
 	incrementarEstadistica(campo: keyof HorariosEstadisticas, delta: number): void {
-		this._estadisticas.update((stats) => {
-			if (!stats) return stats;
-			return {
-				...stats,
-				[campo]: (stats[campo] || 0) + delta,
-			};
-		});
+		this._estadisticas.update((stats) => stats ? { ...stats, [campo]: (stats[campo] || 0) + delta } : stats);
 	}
 	// #endregion
 
-	// #region Comandos - Error
+	// #region Comandos - Error / Loading
 	setError(error: string | null): void {
 		this._error.set(error);
 	}
@@ -376,9 +343,7 @@ export class SchedulesStore {
 	clearError(): void {
 		this._error.set(null);
 	}
-	// #endregion
 
-	// #region Comandos - Loading
 	setLoading(loading: boolean): void {
 		this._loading.set(loading);
 	}
@@ -400,88 +365,10 @@ export class SchedulesStore {
 	}
 	// #endregion
 
-	// #region Comandos delegados - UI State (Form)
-	openDialog(): void {
-		this.formStore.openDialog();
-	}
-
-	closeDialog(): void {
-		this.formStore.closeDialog();
-	}
-
-	openDetailDrawer(): void {
-		this.formStore.openDetailDrawer();
-	}
-
+	// #region Comandos - Detail drawer (tiene side effect en horarioDetalle)
 	closeDetailDrawer(): void {
 		this.formStore.closeDetailDrawer();
 		this._horarioDetalle.set(null);
-	}
-
-	openCursoDialog(): void {
-		this.formStore.openCursoDialog();
-	}
-
-	closeCursoDialog(): void {
-		this.formStore.closeCursoDialog();
-	}
-	// #endregion
-
-	// #region Comandos delegados - Wizard
-	nextStep(): void {
-		this.formStore.nextStep();
-	}
-
-	prevStep(): void {
-		this.formStore.prevStep();
-	}
-
-	resetWizard(): void {
-		this.formStore.resetWizard();
-	}
-	// #endregion
-
-	// #region Comandos delegados - Formulario
-	setFormData(data: Partial<HorarioFormData>): void {
-		this.formStore.setFormData(data);
-	}
-
-	clearFormData(): void {
-		this.formStore.clearFormData();
-	}
-
-	setEditingId(id: number | null): void {
-		this.formStore.setEditingId(id);
-	}
-	// #endregion
-
-	// #region Comandos delegados - Filtros
-	setFiltroSalon(salonId: number | null): void {
-		this.filterStore.setFiltroSalon(salonId);
-	}
-
-	setFiltroProfesor(profesorId: number | null): void {
-		this.filterStore.setFiltroProfesor(profesorId);
-	}
-
-	setFiltroDiaSemana(diaSemana: DiaSemana | null): void {
-		this.filterStore.setFiltroDiaSemana(diaSemana);
-	}
-
-	setFiltroEstadoActivo(estadoActivo: boolean | null): void {
-		this.filterStore.setFiltroEstadoActivo(estadoActivo);
-	}
-
-	clearFiltros(): void {
-		this.filterStore.clearFiltros();
-	}
-
-	setVistaActual(vista: 'semanal' | 'lista'): void {
-		this.filterStore.setVistaActual(vista);
-	}
-
-	setPaginationData(page: number, pageSize: number, totalRecords: number): void {
-		this.filterStore.setPaginationData(page, pageSize, totalRecords);
 	}
 	// #endregion
 

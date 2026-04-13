@@ -13,7 +13,6 @@ import {
 	AsignarEstudiantesGrupoDto,
 	ConfigurarMaxEstudiantesDto,
 	GrupoContenidoDto,
-	EstudianteSinGrupoDto,
 } from '../../models';
 
 @Injectable({ providedIn: 'root' })
@@ -152,9 +151,7 @@ export class GruposFacade {
 				this.store.setSaving(false);
 			},
 			optimistic: {
-				apply: () => {
-					this.store.updateGrupoNombre(grupoId, dto.nombre);
-				},
+				apply: () => this.store.updateGrupoNombre(grupoId, dto.nombre),
 				rollback: () => {
 					if (snapshot) this.store.updateGrupoNombre(grupoId, snapshot.nombre);
 				},
@@ -184,17 +181,8 @@ export class GruposFacade {
 				this.store.setSaving(false);
 			},
 			optimistic: {
-				apply: () => {
-					this.store.removeGrupo(grupoId);
-				},
-				rollback: () => {
-					// Restore full state from snapshots
-					this.store.setGruposData(
-						snapshotGrupos,
-						snapshotSinGrupo,
-						this.store.maxEstudiantesPorGrupo(),
-					);
-				},
+				apply: () => this.store.removeGrupo(grupoId),
+				rollback: () => this.store.setGruposData(snapshotGrupos, snapshotSinGrupo, this.store.maxEstudiantesPorGrupo()),
 			},
 		});
 	}
@@ -220,12 +208,8 @@ export class GruposFacade {
 				this.store.setSaving(false);
 			},
 			optimistic: {
-				apply: () => {
-					this.store.closeAsignarDialog();
-				},
-				rollback: () => {
-					this.store.openAsignarDialog(grupoId);
-				},
+				apply: () => this.store.closeAsignarDialog(),
+				rollback: () => this.store.openAsignarDialog(grupoId),
 			},
 		});
 	}
@@ -248,12 +232,8 @@ export class GruposFacade {
 				this.store.setSaving(false);
 			},
 			optimistic: {
-				apply: () => {
-					this.store.removeEstudianteOptimistic(estudianteId, grupoId);
-				},
-				rollback: () => {
-					this.refetchGrupos();
-				},
+				apply: () => this.store.removeEstudianteOptimistic(estudianteId, grupoId),
+				rollback: () => this.refetchGrupos(),
 			},
 		});
 	}
@@ -261,75 +241,67 @@ export class GruposFacade {
 	/** Optimistic drag-drop with WAL: update UI instantly, sync with API, rollback on error. */
 	dropEstudiante(data: { estudianteId: number; fromGrupoId: number | null; toGrupoId: number | null }): void {
 		const { estudianteId, fromGrupoId, toGrupoId } = data;
+		const request = this.buildDropRequest(estudianteId, fromGrupoId, toGrupoId);
+		if (!request) return;
 
-		// Snapshot for rollback
-		const snapshotGrupos = this.store.grupos().map((g) => ({
-			...g,
-			estudiantes: [...g.estudiantes],
-		}));
+		const snapshotGrupos = this.store.grupos().map((g) => ({ ...g, estudiantes: [...g.estudiantes] }));
 		const snapshotSinGrupo = [...this.store.estudiantesSinGrupo()];
-
-		// Determine endpoint and method based on move direction
-		let endpoint: string;
-		let method: 'POST' | 'DELETE' = 'POST';
-		let payload: unknown;
-		let http$: () => ReturnType<typeof this.api.asignarEstudiantes>;
-
-		if (fromGrupoId === null && toGrupoId !== null) {
-			endpoint = `${this.grupoUrl}/${toGrupoId}/estudiantes`;
-			payload = { estudianteIds: [estudianteId] };
-			http$ = () => this.api.asignarEstudiantes(toGrupoId, { estudianteIds: [estudianteId] });
-		} else if (fromGrupoId !== null && toGrupoId === null) {
-			endpoint = `${this.grupoUrl}/${fromGrupoId}/estudiantes/${estudianteId}`;
-			method = 'DELETE';
-			payload = null;
-			http$ = () => this.api.removerEstudianteDeGrupo(fromGrupoId, estudianteId);
-		} else if (fromGrupoId !== null && toGrupoId !== null) {
-			// Move = remove + assign (two-step, use CUSTOM operation)
-			endpoint = `${this.grupoUrl}/${fromGrupoId}/estudiantes/${estudianteId}`;
-			method = 'DELETE';
-			payload = { fromGrupoId, toGrupoId, estudianteId };
-			http$ = () =>
-				this.api.removerEstudianteDeGrupo(fromGrupoId, estudianteId).pipe(
-					switchMap(() => this.api.asignarEstudiantes(toGrupoId, { estudianteIds: [estudianteId] })),
-				);
-		} else {
-			return;
-		}
 
 		this.wal.execute({
 			operation: 'CUSTOM',
 			resourceType: 'GrupoContenido',
-			endpoint,
-			method,
-			payload,
-			http$,
-			onCommit: () => {
-				// Refetch to get server-confirmed state
-				this.refetchGrupos();
-			},
-			onError: (err) => {
-				this.errHandler.handle(err, 'mover estudiante');
-			},
+			endpoint: request.endpoint,
+			method: request.method,
+			payload: request.payload,
+			http$: request.http$,
+			onCommit: () => this.refetchGrupos(),
+			onError: (err) => this.errHandler.handle(err, 'mover estudiante'),
 			optimistic: {
-				apply: () => {
-					if (fromGrupoId === null && toGrupoId !== null) {
-						this.store.assignEstudianteOptimistic(estudianteId, toGrupoId);
-					} else if (fromGrupoId !== null && toGrupoId === null) {
-						this.store.removeEstudianteOptimistic(estudianteId, fromGrupoId);
-					} else if (fromGrupoId !== null && toGrupoId !== null) {
-						this.store.moveEstudianteOptimistic(estudianteId, fromGrupoId, toGrupoId);
-					}
-				},
-				rollback: () => {
-					this.store.setGruposData(
-						snapshotGrupos,
-						snapshotSinGrupo,
-						this.store.maxEstudiantesPorGrupo(),
-					);
-				},
+				apply: () => this.applyDropOptimistic(estudianteId, fromGrupoId, toGrupoId),
+				rollback: () => this.store.setGruposData(snapshotGrupos, snapshotSinGrupo, this.store.maxEstudiantesPorGrupo()),
 			},
 		});
+	}
+
+	private buildDropRequest(estudianteId: number, fromGrupoId: number | null, toGrupoId: number | null) {
+		if (fromGrupoId === null && toGrupoId !== null) {
+			return {
+				endpoint: `${this.grupoUrl}/${toGrupoId}/estudiantes`,
+				method: 'POST' as const,
+				payload: { estudianteIds: [estudianteId] },
+				http$: () => this.api.asignarEstudiantes(toGrupoId, { estudianteIds: [estudianteId] }),
+			};
+		}
+		if (fromGrupoId !== null && toGrupoId === null) {
+			return {
+				endpoint: `${this.grupoUrl}/${fromGrupoId}/estudiantes/${estudianteId}`,
+				method: 'DELETE' as const,
+				payload: null,
+				http$: () => this.api.removerEstudianteDeGrupo(fromGrupoId, estudianteId),
+			};
+		}
+		if (fromGrupoId !== null && toGrupoId !== null) {
+			return {
+				endpoint: `${this.grupoUrl}/${fromGrupoId}/estudiantes/${estudianteId}`,
+				method: 'DELETE' as const,
+				payload: { fromGrupoId, toGrupoId, estudianteId },
+				http$: () =>
+					this.api.removerEstudianteDeGrupo(fromGrupoId, estudianteId).pipe(
+						switchMap(() => this.api.asignarEstudiantes(toGrupoId, { estudianteIds: [estudianteId] })),
+					),
+			};
+		}
+		return null;
+	}
+
+	private applyDropOptimistic(estudianteId: number, fromGrupoId: number | null, toGrupoId: number | null): void {
+		if (fromGrupoId === null && toGrupoId !== null) {
+			this.store.assignEstudianteOptimistic(estudianteId, toGrupoId);
+		} else if (fromGrupoId !== null && toGrupoId === null) {
+			this.store.removeEstudianteOptimistic(estudianteId, fromGrupoId);
+		} else if (fromGrupoId !== null && toGrupoId !== null) {
+			this.store.moveEstudianteOptimistic(estudianteId, fromGrupoId, toGrupoId);
+		}
 	}
 
 	/** Configure max students per group with WAL → quirurgical update. */
@@ -358,12 +330,8 @@ export class GruposFacade {
 				this.store.setSaving(false);
 			},
 			optimistic: {
-				apply: () => {
-					this.store.setMaxEstudiantes(max);
-				},
-				rollback: () => {
-					this.store.setMaxEstudiantes(prevMax);
-				},
+				apply: () => this.store.setMaxEstudiantes(max),
+				rollback: () => this.store.setMaxEstudiantes(prevMax),
 			},
 		});
 	}
@@ -371,26 +339,10 @@ export class GruposFacade {
 	// #endregion
 
 	// #region Comandos de UI
-	openAsignarDialog(grupoId: number): void {
-		this.store.openAsignarDialog(grupoId);
-	}
-
-	closeAsignarDialog(): void {
-		this.store.closeAsignarDialog();
-	}
-
-	openConfirmDialog(): void {
-		this.store.openConfirmDialog();
-	}
-
-	closeConfirmDialog(): void {
-		this.store.closeConfirmDialog();
-	}
-
-	resetGrupos(): void {
-		this.store.reset();
-	}
-	// #endregion
-
+	openAsignarDialog(grupoId: number): void { this.store.openAsignarDialog(grupoId); }
+	closeAsignarDialog(): void { this.store.closeAsignarDialog(); }
+	openConfirmDialog(): void { this.store.openConfirmDialog(); }
+	closeConfirmDialog(): void { this.store.closeConfirmDialog(); }
+	resetGrupos(): void { this.store.reset(); }
 	// #endregion
 }

@@ -17,6 +17,10 @@ import {
 import { UsersService } from './usuarios.service';
 import { UsersStore } from './usuarios.store';
 import { UsersDataFacade } from './usuarios-data.facade';
+import {
+	buildCrearUsuarioPayload,
+	buildActualizarUsuarioPayload,
+} from './usuarios-payload.builder';
 
 /**
  * Facade for CRUD operations on usuarios.
@@ -79,7 +83,7 @@ export class UsersCrudFacade {
 				apply: () => {
 					this.dataFacade.markCrudMutation();
 					const { activosDelta, inactivosDelta } = getEstadoToggleDeltas(usuario.estado, 'delete');
-					this.store.removeUsuario(id);
+					this.store.removeItem(id);
 					this.store.setTotalRecords(this.store.totalRecords() - 1);
 					this.store.incrementarEstadistica('totalUsuarios', -1);
 					this.store.incrementarEstadistica('usuariosActivos', activosDelta);
@@ -88,7 +92,7 @@ export class UsersCrudFacade {
 				},
 				rollback: () => {
 					const { activosDelta, inactivosDelta } = getEstadoRollbackDeltas(usuario.estado, 'delete');
-					this.store.addUsuario(usuario);
+					this.store.addItem(usuario);
 					this.store.setTotalRecords(this.store.totalRecords() + 1);
 					this.store.incrementarEstadistica('totalUsuarios', 1);
 					this.store.incrementarEstadistica('usuariosActivos', activosDelta);
@@ -173,8 +177,11 @@ export class UsersCrudFacade {
 	// #region Private Helpers
 
 	private createUsuario(data: Partial<CrearUsuarioRequest & ActualizarUsuarioRequest>): void {
-		const payload = this.buildCreatePayload(data);
-		if (!payload) return;
+		const payload = buildCrearUsuarioPayload(data);
+		if (!payload) {
+			this.log.warn('createUsuario - payload inválido (falta rol o contrasena)');
+			return;
+		}
 
 		const endpoint = `${this.apiUrl}/crear`;
 
@@ -212,7 +219,7 @@ export class UsersCrudFacade {
 		data: Partial<CrearUsuarioRequest & ActualizarUsuarioRequest>,
 		selectedUsuario: UsuarioDetalle | null,
 	): void {
-		const payload = this.buildUpdatePayload(data, selectedUsuario);
+		const payload = buildActualizarUsuarioPayload(data, selectedUsuario);
 		if (!payload || !selectedUsuario) return;
 
 		const rol = selectedUsuario.rol;
@@ -252,7 +259,7 @@ export class UsersCrudFacade {
 			optimistic: {
 				apply: () => {
 					this.dataFacade.markCrudMutation();
-					this.store.updateUsuario(id, {
+					this.store.updateItem(id, {
 						dni: data.dni!,
 						nombreCompleto: formatFullName(data.apellidos!, data.nombres!),
 						nombres: data.nombres!,
@@ -264,81 +271,10 @@ export class UsersCrudFacade {
 					this.store.closeDialog();
 				},
 				rollback: () => {
-					this.store.updateUsuario(id, previousData);
+					this.store.updateItem(id, previousData);
 				},
 			},
 		});
-	}
-
-	/**
-	 * Construye el payload para crear usuario.
-	 * Retorna null si faltan campos requeridos.
-	 */
-	private buildCreatePayload(
-		data: Partial<CrearUsuarioRequest & ActualizarUsuarioRequest>,
-	): CrearUsuarioRequest | null {
-		this.log.info('buildCreatePayload - data recibida', { data });
-
-		if (!data.rol || !data.contrasena) {
-			this.log.warn('buildCreatePayload - falta rol o contrasena', {
-				rol: data.rol,
-				contrasena: data.contrasena,
-			});
-			return null;
-		}
-
-		const request: CrearUsuarioRequest = {
-			dni: data.dni!,
-			nombres: data.nombres!,
-			apellidos: data.apellidos!,
-			contrasena: data.contrasena,
-			rol: data.rol,
-			telefono: data.telefono,
-			correo: data.correo,
-			sedeId: data.sedeId,
-			fechaNacimiento: data.fechaNacimiento,
-			grado: data.grado,
-			seccion: data.seccion,
-			nombreApoderado: data.nombreApoderado,
-			telefonoApoderado: data.telefonoApoderado,
-			correoApoderado: data.correoApoderado,
-			salonId: data.salonId,
-			esTutor: data.esTutor,
-		};
-
-		this.log.info('buildCreatePayload - request a enviar', { request });
-		return request;
-	}
-
-	/**
-	 * Construye el payload para actualizar usuario.
-	 * Retorna null si no hay usuario seleccionado.
-	 */
-	private buildUpdatePayload(
-		data: Partial<CrearUsuarioRequest & ActualizarUsuarioRequest>,
-		usuario: UsuarioDetalle | null,
-	): ActualizarUsuarioRequest | null {
-		if (!usuario) return null;
-
-		return {
-			dni: data.dni!,
-			nombres: data.nombres!,
-			apellidos: data.apellidos!,
-			contrasena: data.contrasena || undefined,
-			estado: data.estado ?? true,
-			telefono: data.telefono,
-			correo: data.correo,
-			sedeId: data.sedeId,
-			fechaNacimiento: data.fechaNacimiento,
-			grado: data.grado,
-			seccion: data.seccion,
-			nombreApoderado: data.nombreApoderado,
-			telefonoApoderado: data.telefonoApoderado,
-			correoApoderado: data.correoApoderado,
-			salonId: data.salonId,
-			esTutor: data.esTutor,
-			rowVersion: usuario?.rowVersion,
-		};
 	}
 
 	/** Mapeo rol → campo de estadística. Agregar aquí si se crea un nuevo rol. */
@@ -348,6 +284,7 @@ export class UsersCrudFacade {
 		Estudiante: 'totalEstudiantes',
 		Apoderado: 'totalApoderados',
 		'Asistente Administrativo': 'totalAsistentesAdministrativos',
+		Promotor: 'totalPromotores',
 	};
 
 	private updateRolEstadistica(rol: string, delta: number): void {

@@ -1,23 +1,29 @@
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { DestroyRef, Injectable, inject } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import { fromEvent, filter, debounceTime } from 'rxjs';
+import { fromEvent, debounceTime } from 'rxjs';
 
 import { ActivityTrackerService } from './activity-tracker.service';
 import { Breadcrumb } from './activity-tracker.models';
+import {
+	saveReportToOutbox,
+	readPendingReports,
+	removeReportFromOutbox,
+} from './error-reporter-outbox.helper';
+import {
+	type ErrorOrigen,
+	type SourceLocation,
+	classifyHttpOrigin,
+	parseSourceLocation,
+	captureCallSite,
+	getBreadcrumbKey,
+	sanitizeUrl,
+	detectPlatform,
+} from './error-reporter.helpers';
 import { environment } from '@config/environment';
 import { logger } from '@core/helpers';
 
 // #region Tipos internos
-
-type ErrorOrigen = 'FRONTEND' | 'BACKEND' | 'NETWORK';
-
-interface SourceLocation {
-	archivo: string | null;
-	funcion: string | null;
-	linea: number | null;
-	columna: number | null;
-}
 
 interface ErrorReportPayload {
 	correlationId: string | null;
@@ -56,11 +62,6 @@ const BREADCRUMB_LIMITS: Record<string, number> = {
 };
 
 // #endregion
-
-const DB_NAME = 'educa-error-outbox';
-const STORE_NAME = 'pending';
-const DB_VERSION = 1;
-const MAX_PENDING = 50;
 
 @Injectable({ providedIn: 'root' })
 export class ErrorReporterService {
@@ -105,7 +106,7 @@ export class ErrorReporterService {
 		if (!this.isBrowser || !this.canReport()) return;
 
 		// Dedup: no reportar la misma URL + status en <5s (errores en cascada)
-		const dedupKey = `${status}:${this.sanitizeUrl(url)}`;
+		const dedupKey = `${status}:${sanitizeUrl(url, this.isBrowser)}`;
 		const now = Date.now();
 		if (this.recentReports.has(dedupKey) &&
 			now - this.recentReports.get(dedupKey)! < ErrorReporterService.DEDUP_WINDOW_MS) {
@@ -114,19 +115,19 @@ export class ErrorReporterService {
 		this.recentReports.set(dedupKey, now);
 		this.cleanRecentReports(now);
 
-		const origen = this.classifyHttpOrigin(status);
-		const breadcrumbKey = this.getBreadcrumbKey(status);
+		const origen = classifyHttpOrigin(status, this.isBrowser);
+		const breadcrumbKey = getBreadcrumbKey(status);
 		const maxBreadcrumbs = BREADCRUMB_LIMITS[breadcrumbKey] ?? BREADCRUMB_LIMITS['default'];
 		const isNetworkError = origen === 'NETWORK';
 		// No capturar call site para errores de red — el stack del reporter no aporta nada
-		const sourceLocation = !isNetworkError && stack ? this.parseSourceLocation(stack) : null;
-		const effectiveStack = isNetworkError ? null : (stack ?? this.captureCallSite());
+		const sourceLocation = !isNetworkError && stack ? parseSourceLocation(stack) : null;
+		const effectiveStack = isNetworkError ? null : (stack ?? captureCallSite());
 
 		const payload = this.buildPayload({
 			origen,
-			mensaje: `HTTP ${status}: ${this.sanitizeUrl(url)}`,
+			mensaje: `HTTP ${status}: ${sanitizeUrl(url, this.isBrowser)}`,
 			stackTrace: effectiveStack?.substring(0, 4000) ?? null,
-			url: this.sanitizeUrl(url),
+			url: sanitizeUrl(url, this.isBrowser),
 			httpMethod: method ?? null,
 			httpStatus: status,
 			errorCode: errorCode ?? null,
@@ -148,7 +149,7 @@ export class ErrorReporterService {
 	): void {
 		if (!this.isBrowser || !this.canReport()) return;
 
-		const dedupKey = `slow:${this.sanitizeUrl(url)}`;
+		const dedupKey = `slow:${sanitizeUrl(url, this.isBrowser)}`;
 		const now = Date.now();
 		if (this.recentReports.has(dedupKey) &&
 			now - this.recentReports.get(dedupKey)! < ErrorReporterService.DEDUP_WINDOW_MS) {
@@ -158,9 +159,9 @@ export class ErrorReporterService {
 
 		const payload = this.buildPayload({
 			origen: 'NETWORK',
-			mensaje: `Slow request (${Math.round(durationMs)}ms): ${method} ${this.sanitizeUrl(url)}`,
+			mensaje: `Slow request (${Math.round(durationMs)}ms): ${method} ${sanitizeUrl(url, this.isBrowser)}`,
 			stackTrace: null,
-			url: this.sanitizeUrl(url),
+			url: sanitizeUrl(url, this.isBrowser),
 			httpMethod: method,
 			httpStatus: status,
 			errorCode: 'SLOW_REQUEST',
@@ -176,7 +177,7 @@ export class ErrorReporterService {
 	reportClientError(message: string, stack?: string, correlationId?: string): void {
 		if (!this.isBrowser || !this.canReport()) return;
 
-		const sourceLocation = stack ? this.parseSourceLocation(stack) : null;
+		const sourceLocation = stack ? parseSourceLocation(stack) : null;
 
 		const payload = this.buildPayload({
 			origen: 'FRONTEND',
@@ -196,90 +197,6 @@ export class ErrorReporterService {
 	}
 
 	// #endregion
-
-	// #region Clasificación de origen
-
-	/**
-	 * Determina el VERDADERO origen del error:
-	 * - status 0 → NETWORK (request nunca llegó al servidor — DNS, timeout, sin red)
-	 * - 408, 502, 503, 504 → NETWORK (servidor no respondió a tiempo)
-	 * - navigator.onLine === false → NETWORK (sin conexión de red)
-	 * - 500+ → BACKEND (el servidor respondió con error)
-	 * - 4xx → FRONTEND (el frontend envió algo incorrecto)
-	 */
-	private classifyHttpOrigin(status: number): ErrorOrigen {
-		// Status 0 = el request nunca llegó: sin red, DNS fail, CORS block, timeout total
-		if (status === 0) return 'NETWORK';
-		// Gateway/proxy errors = el servidor no respondió
-		if (status === 408 || status === 502 || status === 503 || status === 504) return 'NETWORK';
-		// navigator.onLine como señal adicional (no confiable solo, pero sumada al status refuerza)
-		if (this.isBrowser && !navigator.onLine) return 'NETWORK';
-		if (status >= 500) return 'BACKEND';
-		return 'FRONTEND';
-	}
-
-	// #endregion
-
-	// #region Source location parsing
-
-	/**
-	 * Extrae la cadena de llamadas legible del stack trace.
-	 *
-	 * En Angular dev/prod, todo el código (app + librerías) va en chunks minificados.
-	 * No podemos distinguir "app code" de "library code" por nombre de archivo.
-	 *
-	 * Estrategia:
-	 * 1. Extraer funciones con nombre legible (>2 chars, no anónimas)
-	 * 2. Construir cadena: "alignOverlay → onOverlayBeforeEnter" (las más cercanas al error)
-	 * 3. Guardar como sourceLocation para mostrar en el drawer
-	 */
-	private parseSourceLocation(stack: string): SourceLocation | null {
-		const readableFunctions: string[] = [];
-
-		for (const line of stack.split('\n')) {
-			const trimmed = line.trim();
-			if (!trimmed.startsWith('at ')) continue;
-
-			// Extraer nombre de función: "at FunctionName (...)" o "at Class.method (...)"
-			const fnMatch = /at\s+([A-Za-z_$][\w$.]+(?:\.\w+)*)\s+\(/.exec(trimmed);
-			if (!fnMatch) continue;
-
-			let fn = fnMatch[1]
-				.replace(/^Object\./, '')
-				.replace(/\.prototype\./, '.');
-
-			// Quitar prefijo de variable minificada: "n.alignOverlay" → "alignOverlay"
-			// Solo si el prefijo es 1-2 chars (variable minificada, no una clase real)
-			fn = fn.replace(/^[a-z]{1,2}\./, '');
-
-			// Solo funciones legibles (>2 chars, no helpers internos genéricos)
-			if (fn.length <= 2) continue;
-			if (/^(next|error|subscribe|run|invoke|handle|emit|push|call|apply|then|catch|callback|dispatch|trigger|fire|notify|send|process|execute)$/i.test(fn)) continue;
-
-			readableFunctions.push(fn);
-			if (readableFunctions.length >= 3) break;
-		}
-
-		if (readableFunctions.length === 0) return null;
-
-		// La primera es donde ocurrió, las siguientes son quién la llamó
-		return {
-			funcion: readableFunctions.join(' ← '),
-			archivo: null,
-			linea: null,
-			columna: null,
-		};
-	}
-
-	/** Captura el call site actual para errores HTTP que no tienen stack propio */
-	private captureCallSite(): string | null {
-		try {
-			const err = new Error();
-			return err.stack?.substring(0, 2000) ?? null;
-		} catch {
-			return null;
-		}
-	}
 
 	// #endregion
 
@@ -338,7 +255,7 @@ export class ErrorReporterService {
 			httpStatus: opts.httpStatus,
 			errorCode: opts.errorCode,
 			severidad: opts.severidad,
-			plataforma: this.detectPlatform(),
+			plataforma: detectPlatform(this.isBrowser),
 			userAgent: this.isBrowser ? navigator.userAgent.substring(0, 500) : 'SSR',
 			sourceLocation: opts.sourceLocation
 				? JSON.stringify(opts.sourceLocation).substring(0, 500)
@@ -366,11 +283,7 @@ export class ErrorReporterService {
 
 		this.http
 			.post(ErrorReporterService.ENDPOINT, payload, { headers })
-			.subscribe({
-				error: () => {
-					this.savePending(payload);
-				},
-			});
+			.subscribe({ error: () => this.savePending(payload) });
 	}
 
 	/**
@@ -396,9 +309,9 @@ export class ErrorReporterService {
 
 			const payload = this.buildPayload({
 				origen: 'NETWORK',
-				mensaje: `Red no disponible: ${this.sanitizeUrl(url)}`,
+				mensaje: `Red no disponible: ${sanitizeUrl(url, this.isBrowser)}`,
 				stackTrace: null,
-				url: this.sanitizeUrl(url),
+				url: sanitizeUrl(url, this.isBrowser),
 				httpMethod: 'GET',
 				httpStatus: 0,
 				errorCode: 'NETWORK_REVALIDATION_FAILED',
@@ -431,25 +344,11 @@ export class ErrorReporterService {
 	private async flushPending(): Promise<void> {
 		if (this.flushing || !this.isBrowser || !navigator.onLine) return;
 		this.flushing = true;
-
 		try {
-			const db = await this.openDb();
-			const tx = db.transaction(STORE_NAME, 'readonly');
-			const store = tx.objectStore(STORE_NAME);
-
-			// Obtener keys + values para poder borrar por key después
-			const keys = await this.idbRequest<IDBValidKey[]>(store.getAllKeys());
-			const values = await this.idbRequest<ErrorReportPayload[]>(store.getAll());
-			db.close();
-
-			if (keys.length === 0) { this.flushing = false; return; }
-			logger.warn(`[ErrorReporter] Flushing ${keys.length} pending error reports`);
-
-			for (let i = 0; i < keys.length; i++) {
-				this.sendAndRemove(values[i], keys[i] as number);
-			}
-		} catch {
-			// IndexedDB no disponible
+			const pending = await readPendingReports<ErrorReportPayload>();
+			if (pending.length === 0) return;
+			logger.warn(`[ErrorReporter] Flushing ${pending.length} pending error reports`);
+			for (const { key, value } of pending) this.sendAndRemove(value, key);
 		} finally {
 			this.flushing = false;
 		}
@@ -471,101 +370,14 @@ export class ErrorReporterService {
 
 	// #endregion
 
-	// #region IndexedDB outbox
+	// #region IndexedDB outbox (delegated)
 
-	private async savePending(payload: ErrorReportPayload): Promise<void> {
-		try {
-			const db = await this.openDb();
-			const tx = db.transaction(STORE_NAME, 'readwrite');
-			const store = tx.objectStore(STORE_NAME);
-
-			// Limitar a MAX_PENDING para no llenar el storage
-			const count = await this.idbRequest<number>(store.count());
-			if (count >= MAX_PENDING) {
-				db.close();
-				return;
-			}
-
-			store.add(payload);
-			await this.idbTransaction(tx);
-			db.close();
-			logger.warn('[ErrorReporter] Error report saved to offline outbox');
-		} catch {
-			// IndexedDB no disponible — se pierde silenciosamente (INV-ET07)
-		}
+	private savePending(payload: ErrorReportPayload): void {
+		saveReportToOutbox(payload).then(() => logger.warn('[ErrorReporter] Error report saved to offline outbox'));
 	}
 
-	private async removePending(id: number): Promise<void> {
-		try {
-			const db = await this.openDb();
-			const tx = db.transaction(STORE_NAME, 'readwrite');
-			tx.objectStore(STORE_NAME).delete(id);
-			await this.idbTransaction(tx);
-			db.close();
-		} catch {
-			// Ignorar
-		}
-	}
-
-	private openDb(): Promise<IDBDatabase> {
-		return new Promise((resolve, reject) => {
-			const req = indexedDB.open(DB_NAME, DB_VERSION);
-			req.onupgradeneeded = () => {
-				const db = req.result;
-				if (!db.objectStoreNames.contains(STORE_NAME)) {
-					db.createObjectStore(STORE_NAME, { keyPath: 'id', autoIncrement: true });
-				}
-			};
-			req.onsuccess = () => resolve(req.result);
-			req.onerror = () => reject(req.error);
-		});
-	}
-
-	private idbRequest<T>(req: IDBRequest<T>): Promise<T> {
-		return new Promise((resolve, reject) => {
-			req.onsuccess = () => resolve(req.result);
-			req.onerror = () => reject(req.error);
-		});
-	}
-
-	private idbTransaction(tx: IDBTransaction): Promise<void> {
-		return new Promise((resolve, reject) => {
-			tx.oncomplete = () => resolve();
-			tx.onerror = () => reject(tx.error);
-		});
-	}
-
-	// #endregion
-
-	// #region Helpers
-
-	private getBreadcrumbKey(status: number): string {
-		if (status === 0 || status === 408 || status === 504) return 'http_network';
-		if (status >= 500) return 'http_500';
-		if (status === 422) return 'http_422';
-		if (status === 400) return 'http_400';
-		if (status === 401) return 'http_401';
-		if (status === 403) return 'http_403';
-		if (status === 409) return 'http_409';
-		return 'default';
-	}
-
-	private sanitizeUrl(url: string): string {
-		try {
-			const origin = this.isBrowser ? window.location.origin : 'http://localhost';
-			const parsed = new URL(url, origin);
-			return parsed.pathname.substring(0, 500);
-		} catch {
-			return url.split('?')[0].substring(0, 500);
-		}
-	}
-
-	private detectPlatform(): 'WEB' | 'ANDROID' | 'IOS' {
-		if (!this.isBrowser) return 'WEB';
-		const ua = navigator.userAgent.toLowerCase();
-		if (ua.includes('android') && ua.includes('capacitor')) return 'ANDROID';
-		if ((ua.includes('iphone') || ua.includes('ipad')) && ua.includes('capacitor')) return 'IOS';
-		return 'WEB';
+	private removePending(id: number): void {
+		removeReportFromOutbox(id);
 	}
 
 	// #endregion

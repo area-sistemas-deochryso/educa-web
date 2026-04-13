@@ -9,7 +9,7 @@ import { of } from 'rxjs';
 import { testProviders } from '@test';
 import { AttendanceDirectorComponent } from './attendance-director.component';
 import { AttendanceService, StorageService } from '@core/services';
-import { AttendanceDataService } from '../../../../services/attendance/attendance-data.service';
+import { AttendanceDataService } from '@features/intranet/services/attendance/attendance-data.service';
 
 // #endregion
 

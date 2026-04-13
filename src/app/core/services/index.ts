@@ -17,6 +17,7 @@ export * from './permissions';
 export * from './blob/blob-storage.service';
 export * from './trace';
 export * from './feature-flags';
+export * from './feedback';
 export * from './wal';
 export * from './rate-limit/rate-limit.service';
 export * from './session';

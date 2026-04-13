@@ -8,7 +8,7 @@ import { ConfirmationService } from 'primeng/api';
 import { CursoContenidoDataFacade } from '../../services/curso-contenido-data.facade';
 import { CursoContenidoCrudFacade } from '../../services/curso-contenido-crud.facade';
 import { CursoContenidoUiFacade } from '../../services/curso-contenido-ui.facade';
-import { CursoContenidoSemanaDto, CursoContenidoTareaDto } from '../../../models';
+import { CursoContenidoSemanaDto, CursoContenidoTareaDto } from '@features/intranet/pages/profesor/models';
 import { FormatFileSizePipe } from '@shared/pipes';
 
 @Component({

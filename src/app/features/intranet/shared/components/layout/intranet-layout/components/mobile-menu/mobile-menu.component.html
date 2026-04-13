@@ -8,106 +8,104 @@
 @if (isOpen()) {
 	<div class="menu-overlay" (click)="close()"></div>
 	<nav class="mobile-nav">
-		<a routerLink="/" class="logo-link" (click)="close()">
-			<picture>
-				<source srcset="images/logo.avif" type="image/avif" />
-				<source srcset="images/logo.webp" type="image/webp" />
-				<img
-					src="images/logo.png"
-					alt="Educa.com Logo"
-					class="logo"
-					width="120"
-					height="40"
-				/>
-			</picture>
-		</a>
-
-		<!-- * Module pills (circular, 5 visible, long-press preview). -->
-		<div class="module-pills">
-			@for (modulo of visiblePills(); track modulo.id) {
-				<div
-					class="pill-wrapper"
-					[class.active]="selectedModuloId() === modulo.id"
-					[class.previewing]="previewModuloId() === modulo.id"
-				>
-					<button
-						type="button"
-						class="module-pill"
-						[class.active]="selectedModuloId() === modulo.id"
-						(click)="selectModulo(modulo.id)"
-						(touchstart)="onPillPressStart(modulo.id)"
-						(touchend)="onPillPressEnd()"
-						(touchcancel)="onPillPressEnd()"
-						(mousedown)="onPillPressStart(modulo.id)"
-						(mouseup)="onPillPressEnd()"
-						(mouseleave)="onPillPressEnd()"
-						[attr.aria-label]="modulo.label"
-					>
-						<i [class]="modulo.icon"></i>
-						@if (selectedModuloId() === modulo.id) {
-							<span class="pill-label">{{ modulo.label }}</span>
-						}
-					</button>
-					<!-- * Preview: long-press (touch) o hover (desktop). -->
-					@if (modulo.items.length > 0) {
-						<div class="pill-preview">
-							<div class="pill-preview-header">{{ modulo.label }}</div>
-							@for (item of modulo.items; track item.route) {
-								<div class="pill-preview-item">
-									<i [class]="item.icon"></i>
-									<span>{{ item.label }}</span>
-								</div>
-							}
-						</div>
-					}
-				</div>
-			}
+		<!-- #region Header -->
+		<div class="nav-header">
+			<a routerLink="/" class="logo-link" (click)="close()">
+				<picture>
+					<source srcset="images/logo.avif" type="image/avif" />
+					<source srcset="images/logo.webp" type="image/webp" />
+					<img src="images/logo.png" alt="Educa.com Logo" class="logo" width="120" height="40" />
+				</picture>
+			</a>
 		</div>
+		<!-- #endregion -->
 
-		<!-- * Nav items (circular, 3 visible). -->
-		<div class="nav-items">
-			@for (item of visibleNavItems(); track item.label) {
-				<div class="nav-item-row">
-					<a
-						[routerLink]="item.route"
-						[queryParams]="item.queryParams"
-						routerLinkActive="active"
-						[routerLinkActiveOptions]="{ exact: item.exact ?? false }"
-						class="mobile-nav-item"
-						(click)="onNavItemClick(item); close()"
-					>
-						<i [class]="item.icon"></i>
-						<span>{{ item.label }}</span>
-					</a>
-					@if (favoritesService.isPersonalizing() && item.route) {
-						<button
-							type="button"
-							class="star-btn"
-							[class.starred]="favoritesService.isFavorite(item.route)"
-							[disabled]="!favoritesService.isFavorite(item.route) && !favoritesService.canAddMore()"
-							(click)="onStarClick($event, item.route)"
-							[attr.aria-label]="favoritesService.isFavorite(item.route) ? 'Quitar de accesos rápidos' : 'Agregar a accesos rápidos'"
-						>
-							<i [class]="favoritesService.isFavorite(item.route) ? 'pi pi-star-fill' : 'pi pi-star'"></i>
-						</button>
-					}
-				</div>
-			}
-
-			@if (visibleNavItems().length === 0) {
-				<div class="empty-module">
-					<i class="pi pi-home" style="font-size: 1.5rem; opacity: 0.4"></i>
-					<span>Selecciona un módulo</span>
-				</div>
-			}
-		</div>
-
-		<div class="user-profile-section">
-			<app-user-profile-menu
-				popoverclass="profile-popover-mobile"
-				(logoutClick)="onLogout()"
+		<!-- #region Search -->
+		<div class="search-bar">
+			<i class="pi pi-search search-icon"></i>
+			<input
+				#mobileSearchInput
+				type="text"
+				class="search-input"
+				placeholder="Buscar página..."
+				[ngModel]="searchTerm()"
+				(ngModelChange)="onSearchChange($event)"
+				autocomplete="off"
 			/>
+			@if (isSearching()) {
+				<button type="button" class="search-clear" (click)="searchTerm.set('')" aria-label="Limpiar búsqueda">
+					<i class="pi pi-times-circle"></i>
+				</button>
+			}
 		</div>
+		<!-- #endregion -->
+
+		<!-- #region Toolbar -->
+		<div class="nav-toolbar">
+			<button type="button" class="view-toggle" (click)="toggleViewMode()">
+				<i class="pi" [class.pi-list]="viewMode() === 'flat'" [class.pi-sitemap]="viewMode() === 'tree'"></i>
+				<span>{{ viewMode() === 'flat' ? 'A-Z' : 'Módulos' }}</span>
+			</button>
+			<span class="results-count">{{ resultCount() }} páginas</span>
+		</div>
+		<!-- #endregion -->
+
+		<!-- #region Results -->
+		<div class="nav-results">
+			@if (viewMode() === 'flat') {
+				<!-- Flat view -->
+				@for (result of filteredResults(); track result.route + result.label) {
+					<button type="button" class="nav-result-item" (click)="selectResult(result)">
+						<i [class]="result.icon" class="result-icon"></i>
+						<span class="result-label">{{ result.label }}</span>
+						<span class="result-badge">{{ result.moduloLabel }}</span>
+					</button>
+				} @empty {
+					<div class="nav-empty">
+						<i class="pi pi-search"></i>
+						<span>Sin resultados</span>
+					</div>
+				}
+			} @else {
+				<!-- Tree view -->
+				<button type="button" class="nav-result-item home-item" (click)="goHome()">
+					<i class="pi pi-home result-icon"></i>
+					<span class="result-label">Inicio</span>
+				</button>
+
+				@for (group of treeGroups(); track group.moduloLabel) {
+					<div class="tree-module">
+						<div class="tree-module-header">
+							<i [class]="group.moduloIcon"></i>
+							<span>{{ group.moduloLabel }}</span>
+						</div>
+						@for (section of group.sections; track section.label) {
+							@if (section.label !== '(General)') {
+								<div class="tree-section-header">{{ section.label }}</div>
+							}
+							@for (item of section.items; track item.route + item.label) {
+								<button type="button" class="nav-result-item tree-item" (click)="selectResult(item)">
+									<i [class]="item.icon" class="result-icon"></i>
+									<span class="result-label">{{ item.label }}</span>
+								</button>
+							}
+						}
+					</div>
+				} @empty {
+					<div class="nav-empty">
+						<i class="pi pi-search"></i>
+						<span>Sin resultados</span>
+					</div>
+				}
+			}
+		</div>
+		<!-- #endregion -->
+
+		<!-- #region Footer -->
+		<div class="user-profile-section">
+			<app-user-profile-menu popoverclass="profile-popover-mobile" (logoutClick)="onLogout()" />
+		</div>
+		<!-- #endregion -->
 	</nav>
 }
 <!-- #endregion -->

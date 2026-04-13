@@ -186,8 +186,8 @@
 				</td>
 				<td>
 					<p-tag
-						[value]="item.origenManual ? 'Manual' : 'Biométrico'"
-						[severity]="getOrigenSeverity(item.origenManual)"
+						[value]="getOrigenLabel(item)"
+						[severity]="getOrigenSeverity(item)"
 					/>
 				</td>
 				<td>

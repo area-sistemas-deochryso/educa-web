@@ -47,6 +47,7 @@ Aplicacion Angular 21 para gestion educativa con portal publico e intranet priva
 @.claude/rules/skeletons.md
 @.claude/rules/dialogs-sync.md
 @.claude/rules/crud-patterns.md
+@.claude/rules/optimistic-ui.md
 @.claude/rules/rate-limiting.md
 @.claude/rules/table-transparency.md
 @.claude/rules/filter-transparency.md

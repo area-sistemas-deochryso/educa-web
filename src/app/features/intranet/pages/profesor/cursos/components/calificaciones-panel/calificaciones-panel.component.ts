@@ -8,7 +8,7 @@ import {
 	PeriodoCalificacionDto,
 	CalificacionDto,
 	TIPOS_EVALUACION,
-} from '../../../models';
+} from '@features/intranet/pages/profesor/models';
 import { formatNotaConConfig } from '@intranet-shared/services/calificacion-config';
 import type { ConfiguracionCalificacionListDto } from '@data/models';
 

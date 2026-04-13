@@ -17,7 +17,7 @@ import {
 	TipoEvaluacion,
 	PESO_MINIMO,
 	PESO_MAXIMO,
-} from '../../../models';
+} from '@features/intranet/pages/profesor/models';
 
 interface FormData {
 	titulo: string;

@@ -118,6 +118,7 @@ export class NotificacionesAdminComponent implements OnInit {
 		{ label: 'Apoderado', value: 'Apoderado' },
 		{ label: 'Director', value: 'Director' },
 		{ label: 'Asistente Administrativo', value: 'Asistente Administrativo' },
+		{ label: 'Promotor', value: 'Promotor' },
 	];
 
 	readonly destinatarioGradoOptions = [

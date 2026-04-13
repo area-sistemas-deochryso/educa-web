@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import type { CampusNode } from '../../../models';
+import type { CampusNode } from '@features/intranet/pages/cross-role/campus-navigation/models';
 import {
 	type StairZone, type Vec2,
 	type PlayerState, type WorldData,

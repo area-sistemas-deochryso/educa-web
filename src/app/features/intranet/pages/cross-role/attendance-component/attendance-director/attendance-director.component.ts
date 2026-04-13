@@ -1,43 +1,36 @@
 import { AttendanceService, GradoSeccion, StorageService } from '@core/services';
 import { viewBlobInNewTab, downloadBlob } from '@core/helpers';
 import { periodoEnMes, filtrarPorPeriodoAcademico } from '@shared/models';
-import { JustificacionEvent } from '../../../../components/attendance/attendance-day-list/attendance-day-list.component';
+import { JustificacionEvent } from '@features/intranet/components/attendance/attendance-day-list/attendance-day-list.component';
 import { ChangeDetectionStrategy, Component, DestroyRef, OnInit, ViewChild, computed, inject, signal } from '@angular/core';
 
-import { AttendanceDayListComponent } from '../../../../components/attendance/attendance-day-list/attendance-day-list.component';
+import { AttendanceDayListComponent } from '@features/intranet/components/attendance/attendance-day-list/attendance-day-list.component';
 import { AttendanceLegendComponent } from '@app/features/intranet/components/attendance/attendance-legend/attendance-legend.component';
-import { AttendanceTableComponent } from '../../../../components/attendance/attendance-table/attendance-table.component';
-import { AttendanceTableSkeletonComponent } from '../../../../components/attendance/attendance-table-skeleton/attendance-table-skeleton.component';
-import { AttendanceViewController, SelectorContext } from '../../../../services/attendance/attendance-view.service';
-import { AttendancePdfService } from '../../../../services/attendance/attendance-pdf.service';
-import { AttendanceStatsService } from '../../../../services/attendance/attendance-stats.service';
-import { ViewMode } from '../../../../components/attendance/attendance-header/attendance-header.component';
+import { AttendanceTableComponent } from '@features/intranet/components/attendance/attendance-table/attendance-table.component';
+import { AttendanceTableSkeletonComponent } from '@features/intranet/components/attendance/attendance-table-skeleton/attendance-table-skeleton.component';
+import { AttendanceViewController, SelectorContext } from '@features/intranet/services/attendance/attendance-view.service';
+import { AttendancePdfService } from '@features/intranet/services/attendance/attendance-pdf.service';
+import { AttendanceStatsService } from '@features/intranet/services/attendance/attendance-stats.service';
+import { ViewMode } from '@features/intranet/components/attendance/attendance-header/attendance-header.component';
 import { ButtonModule } from 'primeng/button';
 import { DatePipe } from '@angular/common';
-import { EmptyStateComponent } from '../../../../components/attendance/empty-state/empty-state.component';
+import { EmptyStateComponent } from '@features/intranet/components/attendance/empty-state/empty-state.component';
 import { FormsModule } from '@angular/forms';
-import { GradoSeccionSelectorComponent } from '../../../../components/attendance/grado-seccion-selector/grado-seccion-selector.component';
+import { GradoSeccionSelectorComponent } from '@features/intranet/components/attendance/grado-seccion-selector/grado-seccion-selector.component';
 import { Menu, MenuModule } from 'primeng/menu';
 import { MenuItem } from 'primeng/api';
 import { Select } from 'primeng/select';
 import { SelectButton } from 'primeng/selectbutton';
 import { TooltipModule } from 'primeng/tooltip';
-import { Observable, finalize } from 'rxjs';
+import { finalize } from 'rxjs';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-
-// #region Tipos de reporte
-
-type TipoReporte = 'salon-dia' | 'salon-mes' | 'salon-anio' | 'todos-dia' | 'todos-semana' | 'todos-mes' | 'todos-anio';
-
-interface TipoReporteOption {
-	label: string;
-	value: TipoReporte;
-}
-
-interface TipoReporteGroup {
-	label: string;
-	items: TipoReporteOption[];
-}
+import {
+	TipoReporte,
+	TipoReporteGroup,
+	TIPO_REPORTE_OPTIONS,
+	getTodosSalonesObservable,
+	getConsolidadoFileName,
+} from './consolidated-pdf.helper';
 
 /**
  * Componente Container para vista de asistencias de Directores.
@@ -79,25 +72,7 @@ export class AttendanceDirectorComponent implements OnInit {
 // #endregion
 	// #region Tipo de reporte
 
-	readonly tipoReporteOptions: TipoReporteGroup[] = [
-		{
-			label: 'Este salón',
-			items: [
-				{ label: 'Día', value: 'salon-dia' },
-				{ label: 'Mes', value: 'salon-mes' },
-				{ label: 'Año', value: 'salon-anio' },
-			],
-		},
-		{
-			label: 'Todos los salones',
-			items: [
-				{ label: 'Día', value: 'todos-dia' },
-				{ label: 'Semana', value: 'todos-semana' },
-				{ label: 'Mes', value: 'todos-mes' },
-				{ label: 'Año', value: 'todos-anio' },
-			],
-		},
-	];
+	readonly tipoReporteOptions: TipoReporteGroup[] = TIPO_REPORTE_OPTIONS;
 	readonly tipoReporte = signal<TipoReporte>('salon-dia');
 	readonly downloadingPdfConsolidado = signal(false);
 	readonly savingJustificacion = signal(false);
@@ -330,94 +305,32 @@ export class AttendanceDirectorComponent implements OnInit {
 	// #region PDF Consolidados (todos los salones)
 
 	private verPdfConsolidado(): void {
-		this.downloadingPdfConsolidado.set(true);
-
-		const obs$ = this.getTodosSalonesObservable();
-		if (!obs$) {
-			this.downloadingPdfConsolidado.set(false);
-			return;
-		}
-
-		obs$
-			.pipe(
-				takeUntilDestroyed(this.destroyRef),
-				finalize(() => this.downloadingPdfConsolidado.set(false)),
-			)
-			.subscribe({
-				next: (blob) => viewBlobInNewTab(blob),
-			});
+		this.runConsolidadoPdf((blob) => viewBlobInNewTab(blob));
 	}
 
 	private descargarPdfConsolidado(): void {
-		this.downloadingPdfConsolidado.set(true);
+		this.runConsolidadoPdf((blob) =>
+			downloadBlob(blob, getConsolidadoFileName(this.tipoReporte(), this.view.fechaDia())),
+		);
+	}
 
-		const obs$ = this.getTodosSalonesObservable();
+	private runConsolidadoPdf(handle: (blob: Blob) => void): void {
+		this.downloadingPdfConsolidado.set(true);
+		const obs$ = getTodosSalonesObservable(
+			this.asistenciaService,
+			this.tipoReporte(),
+			this.view.fechaDia(),
+		);
 		if (!obs$) {
 			this.downloadingPdfConsolidado.set(false);
 			return;
 		}
-
 		obs$
 			.pipe(
 				takeUntilDestroyed(this.destroyRef),
 				finalize(() => this.downloadingPdfConsolidado.set(false)),
 			)
-			.subscribe({
-				next: (blob) => downloadBlob(blob, this.getConsolidadoFileName()),
-			});
-	}
-
-	/** Obtiene el Observable para reportes de todos los salones usando fechaDia como contexto */
-	private getTodosSalonesObservable(): Observable<Blob> | null {
-		const fecha = this.view.fechaDia();
-		const mes = fecha.getMonth() + 1;
-		const anio = fecha.getFullYear();
-
-		switch (this.tipoReporte()) {
-			case 'todos-dia':
-				return this.asistenciaService.descargarPdfTodosSalonesDia(fecha);
-			case 'todos-semana':
-				return this.asistenciaService.descargarPdfTodosSalonesSemana(
-					this.getInicioSemana(fecha),
-				);
-			case 'todos-mes':
-				return this.asistenciaService.descargarPdfTodosSalonesMes(mes, anio);
-			case 'todos-anio':
-				return this.asistenciaService.descargarPdfTodosSalonesAnio(anio);
-			default:
-				return null;
-		}
-	}
-
-	/** Calcula el lunes de la semana de una fecha dada */
-	private getInicioSemana(fecha: Date): Date {
-		const dia = fecha.getDay();
-		const diff = dia === 0 ? -6 : 1 - dia;
-		const lunes = new Date(fecha);
-		lunes.setDate(fecha.getDate() + diff);
-		return lunes;
-	}
-
-	private getConsolidadoFileName(): string {
-		const fecha = this.view.fechaDia();
-		const mes = fecha.getMonth() + 1;
-		const anio = fecha.getFullYear();
-		const fechaStr = fecha.toISOString().split('T')[0];
-
-		switch (this.tipoReporte()) {
-			case 'todos-dia':
-				return `Reporte_TodosSalones_${fechaStr}.pdf`;
-			case 'todos-semana': {
-				const semanaStr = this.getInicioSemana(fecha).toISOString().split('T')[0];
-				return `Reporte_TodosSalones_Semana_${semanaStr}.pdf`;
-			}
-			case 'todos-mes':
-				return `Reporte_TodosSalones_${anio}-${mes.toString().padStart(2, '0')}.pdf`;
-			case 'todos-anio':
-				return `Reporte_TodosSalones_${anio}.pdf`;
-			default:
-				return 'Reporte_TodosSalones.pdf';
-		}
+			.subscribe({ next: handle });
 	}
 
 	// #endregion

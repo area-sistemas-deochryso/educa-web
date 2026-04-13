@@ -7,17 +7,23 @@ import { SkeletonModule } from 'primeng/skeleton';
 import { ButtonModule } from 'primeng/button';
 import { TooltipModule } from 'primeng/tooltip';
 import { environment } from '@config/environment';
-import { ProfesorSalonConEstudiantes } from '../../../services/profesor.store';
+import { ProfesorSalonConEstudiantes } from '@features/intranet/pages/profesor/services/profesor.store';
 import { ClassroomGradesTabComponent } from '../salon-notas-tab/salon-notas-tab.component';
 import { SalonNotasEstudianteTabComponent } from '../salon-notas-estudiante-tab/salon-notas-estudiante-tab.component';
 import { SalonGruposTabComponent } from '../salon-grupos-tab/salon-grupos-tab.component';
-import { CampusNavigationComponent } from '../../../../cross-role/campus-navigation/campus-navigation.component';
+import { CampusNavigationComponent } from '@features/intranet/pages/cross-role/campus-navigation/campus-navigation.component';
+import { SalonHealthPermissionsTabComponent } from '../salon-health-permissions-tab/salon-health-permissions-tab.component';
 import {
 	SalonNotasResumenDto,
 	VistaPromedio,
 	GrupoContenidoDto,
 	EstudianteSinGrupoDto,
-} from '../../../models';
+	HealthExitPermissionDto,
+	HealthJustificationDto,
+	StudentForHealthDto,
+	SymptomDto,
+	DateValidationResult,
+} from '@features/intranet/pages/profesor/models';
 import { NotaSaveEvent } from '../salon-notas-estudiante-tab/salon-notas-estudiante-tab.component';
 
 @Component({
@@ -35,223 +41,11 @@ import { NotaSaveEvent } from '../salon-notas-estudiante-tab/salon-notas-estudia
 		SalonNotasEstudianteTabComponent,
 		SalonGruposTabComponent,
 		CampusNavigationComponent,
+		SalonHealthPermissionsTabComponent,
 	],
 	changeDetection: ChangeDetectionStrategy.OnPush,
-	styles: `
-		:host ::ng-deep .p-datatable {
-			--p-datatable-header-cell-background: transparent;
-			--p-datatable-row-background: transparent;
-		}
-		:host ::ng-deep .p-dialog {
-			transition: all 0.25s ease;
-		}
-		:host ::ng-deep .fullscreen-dialog {
-			border-radius: 0 !important;
-			margin: 0 !important;
-			max-height: 100vh !important;
-		}
-		:host ::ng-deep .fullscreen-dialog .p-dialog-content {
-			flex: 1;
-			max-height: none !important;
-		}
-		.tab-icon {
-			margin-right: 0.4rem;
-			font-size: 0.85rem;
-		}
-		.dialog-header-custom {
-			display: flex;
-			align-items: center;
-			gap: 0.75rem;
-			width: 100%;
-		}
-		.dialog-header-custom .p-dialog-title {
-			flex: 1;
-			font-size: 1.2rem;
-			font-weight: 600;
-		}
-		.fullscreen-toggle-btn {
-			display: flex;
-			align-items: center;
-			justify-content: center;
-			width: 2rem;
-			height: 2rem;
-			border-radius: 50%;
-			border: none;
-			background: transparent;
-			color: var(--text-color-secondary);
-			cursor: pointer;
-			transition: background 0.15s ease, color 0.15s ease;
-			flex-shrink: 0;
-		}
-		.fullscreen-toggle-btn i {
-			font-size: 0.85rem;
-		}
-		.fullscreen-toggle-btn:hover {
-			background: var(--surface-hover, rgba(0, 0, 0, 0.04));
-			color: var(--text-color);
-		}
-	`,
-	template: `
-		<p-dialog
-			[visible]="visible()"
-			(visibleChange)="onVisibleChange($event)"
-			[modal]="true"
-			[style]="dialogStyle()"
-			[contentStyle]="contentStyle()"
-			[styleClass]="isFullscreen() ? 'fullscreen-dialog' : ''"
-		>
-			<ng-template #header>
-				<div class="dialog-header-custom">
-					<span class="p-dialog-title">{{ salon()?.salonDescripcion ?? 'Salón' }}</span>
-					<button
-						class="fullscreen-toggle-btn"
-						type="button"
-						(click)="toggleFullscreen()"
-						[attr.aria-label]="isFullscreen() ? 'Salir de pantalla completa' : 'Expandir a pantalla completa'"
-					>
-						<i [class]="isFullscreen() ? 'pi pi-window-minimize' : 'pi pi-window-maximize'"></i>
-					</button>
-				</div>
-			</ng-template>
-			@if (salon(); as s) {
-				<p-tabs value="0" (valueChange)="onTabChange($any($event))">
-					<p-tablist>
-						<p-tab value="0">
-							<i class="pi pi-users tab-icon"></i>Grupos
-							@if (!dialogLoading()) {
-								<p-tag
-									[value]="s.cantidadEstudiantes.toString()"
-									severity="info"
-									[rounded]="true"
-									class="ml-2"
-								/>
-							}
-						</p-tab>
-						<p-tab value="1">
-							<i class="pi pi-user tab-icon"></i>Notas por Estudiante
-						</p-tab>
-						<p-tab value="2">
-							<i class="pi pi-book tab-icon"></i>Notas del Salón
-						</p-tab>
-						@if (showCampusNav) {
-							<p-tab value="3">
-								<i class="pi pi-map tab-icon"></i>Ubicación
-							</p-tab>
-						}
-					</p-tablist>
-
-					<p-tabpanels>
-						<!-- #region Tab Grupos -->
-						<p-tabpanel value="0">
-							<div style="display: flex; justify-content: flex-end; margin-bottom: 0.5rem">
-								<button
-									pButton
-									icon="pi pi-refresh"
-									class="p-button-rounded p-button-text p-button-sm"
-									(click)="onRefreshGrupos()"
-									[disabled]="gruposLoading()"
-									pTooltip="Refrescar"
-									tooltipPosition="top"
-									[pt]="{ root: { 'aria-label': 'Refrescar grupos' } }"
-								></button>
-							</div>
-							<app-salon-grupos-tab
-								[grupos]="gruposData()"
-								[estudiantesSinGrupo]="gruposEstudiantesSinGrupo()"
-								[maxEstudiantesPorGrupo]="gruposMaxEstudiantes()"
-								[loading]="gruposLoading()"
-								[saving]="gruposSaving()"
-								[noContenido]="gruposNoContenido()"
-								[contenidoId]="gruposContenidoId()"
-								[cursoOptions]="cursoOptions()"
-								[selectedCurso]="gruposCursoId()"
-								[asignarDialogVisible]="gruposAsignarDialogVisible()"
-								[asignarGrupo]="gruposAsignarGrupo()"
-								(cursoChange)="gruposCursoChange.emit($event)"
-								(crearGrupo)="gruposCrearGrupo.emit($event)"
-								(eliminarGrupo)="gruposEliminarGrupo.emit($event)"
-								(renombrarGrupo)="gruposRenombrarGrupo.emit($event)"
-								(asignarEstudiantes)="gruposAsignarEstudiantes.emit($event)"
-								(removerEstudiante)="gruposRemoverEstudiante.emit($event)"
-								(dropEstudiante)="gruposDropEstudiante.emit($event)"
-								(configurarMax)="gruposConfigurarMax.emit($event)"
-								(openAsignar)="gruposOpenAsignar.emit($event)"
-								(closeAsignar)="gruposCloseAsignar.emit()"
-								(confirmDialogHide)="gruposConfirmDialogHide.emit()"
-							/>
-						</p-tabpanel>
-						<!-- #endregion -->
-
-						<!-- #region Tab Notas por Estudiante -->
-						<p-tabpanel value="1">
-							<div style="display: flex; justify-content: flex-end; margin-bottom: 0.5rem">
-								<button
-									pButton
-									icon="pi pi-refresh"
-									class="p-button-rounded p-button-text p-button-sm"
-									(click)="onRefreshNotas()"
-									[disabled]="notasLoading()"
-									pTooltip="Refrescar"
-									tooltipPosition="top"
-									[pt]="{ root: { 'aria-label': 'Refrescar notas' } }"
-								></button>
-							</div>
-							<app-salon-notas-estudiante-tab
-								[notasData]="notasData()"
-								[loading]="notasLoading()"
-								[cursoOptions]="cursoOptions()"
-								[selectedCurso]="selectedCurso()"
-								[estudiantes]="salon()?.estudiantes ?? []"
-								(cursoChange)="notasCursoChange.emit($event)"
-								(notaSave)="notaSave.emit($event)"
-							/>
-						</p-tabpanel>
-						<!-- #endregion -->
-
-						<!-- #region Tab Notas del Salón -->
-						<p-tabpanel value="2">
-							<div style="display: flex; justify-content: flex-end; margin-bottom: 0.5rem">
-								<button
-									pButton
-									icon="pi pi-refresh"
-									class="p-button-rounded p-button-text p-button-sm"
-									(click)="onRefreshNotas()"
-									[disabled]="notasLoading()"
-									pTooltip="Refrescar"
-									tooltipPosition="top"
-									[pt]="{ root: { 'aria-label': 'Refrescar notas' } }"
-								></button>
-							</div>
-							<app-classroom-grades-tab
-								[notasData]="notasData()"
-								[loading]="notasLoading()"
-								[cursoOptions]="cursoOptions()"
-								[selectedCurso]="selectedCurso()"
-								[vistaActual]="vistaActual()"
-								(cursoChange)="notasCursoChange.emit($event)"
-								(vistaChange)="notasVistaChange.emit($event)"
-								(descargarBoletas)="descargarBoletas.emit()"
-							/>
-						</p-tabpanel>
-						<!-- #endregion -->
-
-						<!-- #region Tab Ubicación -->
-						@if (showCampusNav) {
-							<p-tabpanel value="3">
-								@if (activeTab() === '3') {
-									<app-campus-navigation
-										[embedded]="true"
-										[targetSalonId]="s.salonId"
-									/>
-								}
-							</p-tabpanel>
-						}
-						<!-- #endregion -->
-					</p-tabpanels>
-				</p-tabs>
-			}
-		</p-dialog>
-	`,
+	templateUrl: './salon-estudiantes-dialog.component.html',
+	styleUrl: './salon-estudiantes-dialog.component.scss',
 })
 export class SalonEstudiantesDialogComponent {
 	// #region Dialog inputs
@@ -279,6 +73,19 @@ export class SalonEstudiantesDialogComponent {
 	readonly gruposCursoId = input<number | null>(null);
 	readonly gruposAsignarDialogVisible = input<boolean>(false);
 	readonly gruposAsignarGrupo = input<GrupoContenidoDto | null>(null);
+	// #endregion
+
+	// #region Health inputs
+	readonly healthPermisosSalida = input<HealthExitPermissionDto[]>([]);
+	readonly healthJustificaciones = input<HealthJustificationDto[]>([]);
+	readonly healthEstudiantes = input<StudentForHealthDto[]>([]);
+	readonly healthEstudiantesConEntrada = input<StudentForHealthDto[]>([]);
+	readonly healthSintomas = input<SymptomDto[]>([]);
+	readonly healthFechasValidacion = input<DateValidationResult[]>([]);
+	readonly healthLoading = input(false);
+	readonly healthSaving = input(false);
+	readonly healthExitDialogVisible = input(false);
+	readonly healthJustificationDialogVisible = input(false);
 	// #endregion
 
 	// #region Estado local
@@ -321,6 +128,17 @@ export class SalonEstudiantesDialogComponent {
 	readonly gruposRefresh = output<void>();
 	readonly notasRefresh = output<void>();
 	readonly descargarBoletas = output<void>();
+	readonly healthTabActivated = output<void>();
+	readonly healthOpenExitDialog = output<void>();
+	readonly healthOpenJustificationDialog = output<void>();
+	readonly healthExitDialogVisibleChange = output<boolean>();
+	readonly healthJustificationDialogVisibleChange = output<boolean>();
+	readonly healthSaveExitPermission = output<{ estudianteId: number; sintomas: string[]; sintomaDetalle?: string; observacion?: string }>();
+	readonly healthSaveJustification = output<FormData>();
+	readonly healthAnularPermiso = output<number>();
+	readonly healthAnularJustificacion = output<number>();
+	readonly healthValidateDates = output<{ estudianteId: number; fechas: Date[] }>();
+	readonly healthConfirmDialogHide = output<void>();
 	// #endregion
 
 	readonly skeletonRows = Array(5);
@@ -340,6 +158,9 @@ export class SalonEstudiantesDialogComponent {
 		}
 		if (value === '1' || value === '2') {
 			this.notasTabActivated.emit();
+		}
+		if (value === '4') {
+			this.healthTabActivated.emit();
 		}
 	}
 

@@ -1,8 +1,33 @@
-# Plan: Trazabilidad de Errores en Producción
+# Historial: Trazabilidad de Errores en Producción
 
-> **Última actualización**: 2026-04-10
-> **Estado**: ✅ Fases 1-4 implementadas y validadas
-> **Principio**: "El usuario no debe notar nada. El desarrollador debe ver todo."
+> **Completado**: 2026-04-10
+> **Estado**: ✅ Cerrado — todas las fases implementadas, desplegadas y validadas en producción
+> **Principios transferibles**: ver `.claude/documentacion-subsistemas/trazabilidad-errores.md`
+> **Principio guía**: "El usuario no debe notar nada. El desarrollador debe ver todo."
+
+---
+
+## Resumen ejecutivo
+
+Sistema completo de trazabilidad de errores implementado en 1 día. Captura errores del frontend (JS + HTTP), backend (excepciones ≥400 excepto 401/403), y red (timeouts, status 0, requests lentas >500ms). Persiste en Azure SQL con stack trace, source location parseado, breadcrumbs del usuario, y metadata de sesión. Vista admin exclusiva para Director con timeline de breadcrumbs y correlation ID para cruce de logs distribuidos.
+
+### Iteraciones realizadas
+
+1. **Fase 1 — Backend base**: modelos EF, DTOs, service, controller, middleware fire-and-forget, Hangfire purge job
+2. **Fase 2 — Frontend ActivityTracker**: ring buffer 30, integración con router y HTTP interceptor
+3. **Fase 3 — Frontend ErrorReporter**: clasificación de origen, dedup en cascada, parse de stack trace
+4. **Fase 4 — Vista admin**: stats, filtros, tabla, drawer con timeline de breadcrumbs
+5. **Iteraciones de refinamiento** (ese mismo día):
+   - Clasificación de origen mejorada (FRONTEND/BACKEND/NETWORK con heurísticas múltiples)
+   - Parse de stack trace para extraer cadena de funciones legibles (filtra minificados)
+   - Source location C# para errores backend (clase.método en archivo:línea)
+   - Outbox IndexedDB para errores sin conexión
+   - Guard anti-loop (el reporter no se reporta a sí mismo)
+   - Detección de requests lentas como señal NETWORK (threshold 500ms)
+   - SW notification de REVALIDATION_FAILED
+   - SSR guards (`typeof window`) para Netlify build con prerender
+   - Endpoint [AllowAnonymous] para capturar errores pre-login
+   - Reporte de 500+ incluso en URLs con X-Skip-Error-Toast
 
 ---
 
@@ -337,10 +362,41 @@ ALTER TABLE ErrorLog ADD ERL_SourceLocation NVARCHAR(500) NULL;
 
 ---
 
-## Pendiente (mejoras futuras)
+## Mejoras futuras (no bloqueantes)
 
 - [ ] Paginación real en la vista admin (actualmente carga una página de 20)
 - [ ] Filtro por rango de fechas
 - [ ] Agrupar errores duplicados (mismo mensaje + mismo archivo = 1 fila con contador)
 - [ ] Alertas automáticas si CRITICAL > N en última hora
 - [ ] Exportar a Excel
+
+---
+
+## Historial de commits (frontend)
+
+| Commit | Mensaje |
+|--------|---------|
+| `8bc7c21` | `feat(error-logs): add error tracing system with activity tracking and admin UI` |
+| `8e49e21` | `fix(error-logs): improve origin classification, dedup cascades, and offline outbox` |
+| `3c16ec6` | `fix(error-logs): capture SW revalidation failures as NETWORK errors` |
+| `38b0fea` | `fix(error-logs): add SSR safety guards for window/navigator access` |
+| `d3481ba` | `fix(error-logs): simplify NETWORK classification and remove redundant navigator checks` |
+| `68d4f18` | `fix(error-logs): detect slow failed requests (>5s) as NETWORK errors` |
+| `bf192a1` | `fix(error-logs): lower slow request threshold from 5s to 2s` |
+| `8d65a60` | `fix(error-logs): lower slow threshold to 500ms and skip stack for network errors` |
+| `d4f2c32` | `feat(error-logs): report slow successful requests (>500ms) as NETWORK WARNING` |
+
+## Historial de commits (backend)
+
+| Commit | Mensaje |
+|--------|---------|
+| `7fd984e` | `feat(error-logs): add error tracing system with BD persistence and purge job` |
+
+---
+
+## Referencias relacionadas
+
+- **Principios transferibles**: `.claude/documentacion-subsistemas/trazabilidad-errores.md`
+- **Subsistema WAL** (comparte el patrón de outbox offline): `.claude/documentacion-subsistemas/wal-write-ahead-log.md`
+- **Subsistema Cache SWR** (notifica REVALIDATION_FAILED al reporter): `.claude/documentacion-subsistemas/cache-swr.md`
+- **Service Worker scope** (determina qué páginas reciben mensajes del SW): `.claude/documentacion-subsistemas/service-worker-scope.md`

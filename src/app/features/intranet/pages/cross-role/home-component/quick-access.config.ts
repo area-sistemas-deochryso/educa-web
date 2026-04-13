@@ -38,6 +38,13 @@ export const QUICK_ACCESS_BY_ROLE: Record<UserRole, QuickAccessItem[]> = {
 		{ route: '/intranet/admin/horarios', label: 'Horarios', icon: 'pi-calendar', permiso: PERMISOS.ADMIN_HORARIOS, description: 'Configurar horarios escolares', preview: 'admin-schedule' },
 		{ route: '/intranet/admin/salones', label: 'Salones', icon: 'pi-building', permiso: PERMISOS.ADMIN_SALONES, description: 'Gestionar aulas y secciones', preview: 'salon-tabs' },
 	],
+	Promotor: [
+		{ route: '/intranet/asistencia', label: 'Asistencia', icon: 'pi-check-square', permiso: PERMISOS.ASISTENCIA, description: 'Control de asistencia diaria', preview: 'attendance' },
+		{ route: '/intranet/admin/usuarios', label: 'Usuarios', icon: 'pi-user-edit', permiso: PERMISOS.ADMIN_USUARIOS, description: 'Gestionar cuentas de usuarios', preview: 'admin-table' },
+		{ route: '/intranet/admin/cursos', label: 'Cursos', icon: 'pi-book', permiso: PERMISOS.ADMIN_CURSOS, description: 'Administrar cursos y materias', preview: 'admin-table' },
+		{ route: '/intranet/admin/horarios', label: 'Horarios', icon: 'pi-calendar', permiso: PERMISOS.ADMIN_HORARIOS, description: 'Configurar horarios escolares', preview: 'admin-schedule' },
+		{ route: '/intranet/admin/salones', label: 'Salones', icon: 'pi-building', permiso: PERMISOS.ADMIN_SALONES, description: 'Gestionar aulas y secciones', preview: 'salon-tabs' },
+	],
 	Profesor: [
 		{ route: '/intranet/profesor/horarios', label: 'Mi Horario', icon: 'pi-clock', permiso: PERMISOS.PROFESOR_HORARIOS, description: 'Ver tu horario semanal de clases', preview: 'week-schedule' },
 		{ route: '/intranet/profesor/cursos', label: 'Mis Cursos', icon: 'pi-book', permiso: PERMISOS.PROFESOR_CURSOS, description: 'Contenido y materiales de tus cursos', preview: 'course-cards' },

@@ -45,6 +45,7 @@ import { APP_USER_ROLES } from '@shared/constants';
 import { logger } from '@core/helpers';
 import { ExcelService } from '@core/services';
 import type { ImportarEstudianteItem } from './services';
+import { validarUsuarios } from './usuarios-validation.helpers';
 
 // #endregion
 // #region Implementation
@@ -136,88 +137,31 @@ export class UsersComponent implements AfterViewInit {
 	}
 
 	// #region Data & Filter handlers
-	onRefresh(): void {
-		this.dataFacade.refresh();
-	}
-
-	onSearchChange(value: string): void {
-		this.dataFacade.setSearchTerm(value);
-	}
-
-	onFilterRolChange(value: RolUsuarioAdmin | null): void {
-		this.dataFacade.setFilterRol(value);
-	}
-
-	onFilterEstadoChange(value: boolean | null): void {
-		this.dataFacade.setFilterEstado(value);
-	}
-
-	onFilterSalonIdChange(value: number | null): void {
-		this.dataFacade.setFilterSalonId(value);
-	}
-
-	onClearFilters(): void {
-		this.dataFacade.clearFilters();
-	}
-
-	onLazyLoad(event: { page: number; pageSize: number }): void {
-		this.dataFacade.loadPage(event.page, event.pageSize);
-	}
+	onRefresh(): void { this.dataFacade.refresh(); }
+	onSearchChange(value: string): void { this.dataFacade.setSearchTerm(value); }
+	onFilterRolChange(value: RolUsuarioAdmin | null): void { this.dataFacade.setFilterRol(value); }
+	onFilterEstadoChange(value: boolean | null): void { this.dataFacade.setFilterEstado(value); }
+	onFilterSalonIdChange(value: number | null): void { this.dataFacade.setFilterSalonId(value); }
+	onClearFilters(): void { this.dataFacade.clearFilters(); }
+	onLazyLoad(event: { page: number; pageSize: number }): void { this.dataFacade.loadPage(event.page, event.pageSize); }
 	// #endregion
 
 	// #region UI handlers
-	onNewUsuario(): void {
-		this.uiFacade.openNew();
-	}
+	onNewUsuario(): void { this.uiFacade.openNew(); }
+	onViewDetail(usuario: UsuarioLista): void { this.uiFacade.openDetail(usuario); }
+	onEditUsuario(usuario: UsuarioLista): void { this.uiFacade.editUsuario(usuario); }
+	onCloseDetail(): void { this.uiFacade.closeDetail(); }
+	onEditFromDetail(): void { this.uiFacade.editFromDetail(); }
+	onCancelDialog(): void { this.uiFacade.hideDialog(); }
+	onImportUsuarios(): void { this.uiFacade.openImportDialog(); }
+	onConfirmDialogHide(): void { this.uiFacade.closeConfirmDialog(); }
 
-	onViewDetail(usuario: UsuarioLista): void {
-		this.uiFacade.openDetail(usuario);
-	}
-
-	onEditUsuario(usuario: UsuarioLista): void {
-		this.uiFacade.editUsuario(usuario);
-	}
-
-	onDrawerVisibleChange(visible: boolean): void {
-		if (!visible) {
-			this.uiFacade.closeDetail();
-		}
-	}
-
-	onCloseDetail(): void {
-		this.uiFacade.closeDetail();
-	}
-
-	onEditFromDetail(): void {
-		this.uiFacade.editFromDetail();
-	}
-
-	onDialogVisibleChange(visible: boolean): void {
-		if (!visible) {
-			this.uiFacade.hideDialog();
-		}
-	}
+	onDrawerVisibleChange(visible: boolean): void { if (!visible) this.uiFacade.closeDetail(); }
+	onDialogVisibleChange(visible: boolean): void { if (!visible) this.uiFacade.hideDialog(); }
+	onImportDialogVisibleChange(visible: boolean): void { if (!visible) this.uiFacade.closeImportDialog(); }
 
 	onFormFieldChange(event: { field: string; value: unknown }): void {
 		this.uiFacade.updateFormField(event.field, event.value);
-	}
-
-	onCancelDialog(): void {
-		this.uiFacade.hideDialog();
-	}
-
-	onImportUsuarios(): void {
-		this.uiFacade.openImportDialog();
-	}
-
-	onImportDialogVisibleChange(visible: boolean): void {
-		if (!visible) {
-			this.uiFacade.closeImportDialog();
-		}
-	}
-
-	onConfirmDialogHide(): void {
-		this.uiFacade.closeConfirmDialog();
 	}
 	// #endregion
 
@@ -341,7 +285,7 @@ export class UsersComponent implements AfterViewInit {
 			.subscribe({
 				next: (usuarios) => {
 					this.validationUsuarios.set(usuarios);
-					const invalidos = this.validarUsuarios(usuarios);
+					const invalidos = validarUsuarios(usuarios);
 					this.validationItems.set(invalidos);
 					this.validationAllValid.set(invalidos.length === 0);
 					this.validationLoading.set(false);
@@ -367,83 +311,6 @@ export class UsersComponent implements AfterViewInit {
 		this.uiFacade.editUsuario(usuario);
 	}
 
-	private validarUsuarios(usuarios: UsuarioLista[]): UsuarioValidacionItem[] {
-		const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-		const TILDES_REGEX = /[áéíóúàèìòùäëïöüâêîôûñ]/i;
-		const DNI_REGEX = /^\d{8}$/;
-
-		const invalidos: UsuarioValidacionItem[] = [];
-
-		for (const u of usuarios) {
-			const errores: string[] = [];
-
-			// Validar DNI
-			const dni = (u.dni ?? '').trim();
-			if (!dni) {
-				errores.push('DNI vacío');
-			} else if (!DNI_REGEX.test(dni)) {
-				errores.push('DNI inválido');
-			} else {
-				if (this.esDniDigitosIguales(dni)) {
-					errores.push('DNI imposible (dígitos iguales)');
-				}
-				if (!this.validarDniModulo11(dni)) {
-					errores.push('DNI no pasa verificación SUNAT');
-				}
-			}
-
-			// Validar correo apoderado (solo Estudiante)
-			if (u.rol === APP_USER_ROLES.Estudiante) {
-				const correo = (u.correoApoderado ?? '').trim();
-				if (!correo) {
-					errores.push('Correo apoderado vacío');
-				} else if (!EMAIL_REGEX.test(correo)) {
-					errores.push('Correo apoderado inválido');
-				} else if (TILDES_REGEX.test(correo)) {
-					errores.push('Correo apoderado con tilde');
-				}
-			}
-
-			if (errores.length > 0) {
-				invalidos.push({
-					nombreCompleto: u.nombreCompleto,
-					dni: u.dni ?? '',
-					correo: u.correoApoderado ?? u.correo ?? '',
-					rol: u.rol,
-					salonNombre: u.salonNombre ?? '',
-					errores,
-				});
-			}
-		}
-
-		return invalidos;
-	}
-
-	/** DNI con todos los dígitos iguales (11111111, 00000000, etc.) */
-	private esDniDigitosIguales(dni: string): boolean {
-		return dni.split('').every((d) => d === dni[0]);
-	}
-
-	/**
-	 * Algoritmo Módulo 11 de SUNAT: convierte DNI a RUC-10
-	 * y verifica que el dígito verificador sea válido (0-9).
-	 * Prefijo "10" + 8 dígitos DNI → pesos [5,4,3,2,7,6,5,4,3,2].
-	 */
-	private validarDniModulo11(dni: string): boolean {
-		const ruc10 = `10${dni}`;
-		const pesos = [5, 4, 3, 2, 7, 6, 5, 4, 3, 2];
-
-		let suma = 0;
-		for (let i = 0; i < 10; i++) {
-			suma += Number(ruc10[i]) * pesos[i];
-		}
-
-		const residuo = suma % 11;
-		const digito = 11 - residuo;
-
-		// digito 11 → 0, digito 10 → inválido (no existe dígito verificador de un solo carácter)
-		return digito <= 9 || digito === 11;
-	}
 	// #endregion
 
 	private fixConfirmDialogAria(header: string): void {

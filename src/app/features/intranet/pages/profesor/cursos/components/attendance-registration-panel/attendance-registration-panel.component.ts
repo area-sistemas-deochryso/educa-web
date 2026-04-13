@@ -12,7 +12,7 @@ import {
 	ESTADO_ASISTENCIA_LABELS,
 	ESTADO_ASISTENCIA_SEVERITIES,
 	ESTADO_ASISTENCIA_ICONS,
-} from '../../../models';
+} from '@features/intranet/pages/profesor/models';
 
 @Component({
 	selector: 'app-attendance-registration-panel',

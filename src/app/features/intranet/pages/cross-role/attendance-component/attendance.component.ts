@@ -3,7 +3,7 @@ import {
 	AttendanceHeaderComponent,
 	VIEW_MODE,
 	ViewMode,
-} from '../../../components/attendance/attendance-header/attendance-header.component';
+} from '@features/intranet/components/attendance/attendance-header/attendance-header.component';
 import { ChangeDetectionStrategy, Component, ViewChild, AfterViewInit, inject, signal } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 
@@ -74,7 +74,8 @@ export class AttendanceComponent implements AfterViewInit {
 			this.profesorComponent?.setViewMode(mode);
 		} else if (
 			role === APP_USER_ROLES.Director ||
-			role === APP_USER_ROLES.AsistenteAdministrativo
+			role === APP_USER_ROLES.AsistenteAdministrativo ||
+			role === APP_USER_ROLES.Promotor
 		) {
 			this.directorComponent?.setViewMode(mode);
 		}
@@ -89,7 +90,8 @@ export class AttendanceComponent implements AfterViewInit {
 			this.profesorComponent?.reload();
 		} else if (
 			role === APP_USER_ROLES.Director ||
-			role === APP_USER_ROLES.AsistenteAdministrativo
+			role === APP_USER_ROLES.AsistenteAdministrativo ||
+			role === APP_USER_ROLES.Promotor
 		) {
 			this.directorComponent?.reload();
 		} else if (role === APP_USER_ROLES.Estudiante) {

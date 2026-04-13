@@ -8,6 +8,7 @@ import {
 	SemanaEstudianteArchivosDto,
 	EstudianteTareaArchivosGroupDto,
 } from '../../models';
+import { contenidoMutations, type ContenidoMutation } from './curso-contenido.mutations';
 
 // #region State interfaces
 
@@ -165,273 +166,82 @@ export class CursoContenidoStore {
 	// #endregion
 
 	// #region Comandos de mutación — Domain
-	setContenido(contenido: CursoContenidoDetalleDto | null): void {
-		this._domain.update((s) => ({ ...s, contenido }));
-	}
-
-	setSalonId(salonId: number | null): void {
-		this._domain.update((s) => ({ ...s, salonId }));
-	}
-
-	setLoading(loading: boolean): void {
-		this._domain.update((s) => ({ ...s, loading }));
-	}
-
-	setSaving(saving: boolean): void {
-		this._domain.update((s) => ({ ...s, saving }));
-	}
-
-	setError(error: string | null): void {
-		this._domain.update((s) => ({ ...s, error }));
-	}
-
-	clearError(): void {
-		this._domain.update((s) => ({ ...s, error: null }));
-	}
+	setContenido(contenido: CursoContenidoDetalleDto | null): void { this._domain.update((s) => ({ ...s, contenido })); }
+	setSalonId(salonId: number | null): void { this._domain.update((s) => ({ ...s, salonId })); }
+	setLoading(loading: boolean): void { this._domain.update((s) => ({ ...s, loading })); }
+	setSaving(saving: boolean): void { this._domain.update((s) => ({ ...s, saving })); }
+	setError(error: string | null): void { this._domain.update((s) => ({ ...s, error })); }
+	clearError(): void { this._domain.update((s) => ({ ...s, error: null })); }
 	// #endregion
 
 	// #region Comandos de mutación — UI
-	setSelectedHorarioId(id: number | null): void {
-		this._ui.update((s) => ({ ...s, selectedHorarioId: id }));
-	}
-
-	setInitialTab(tab: string | null): void {
-		this._ui.update((s) => ({ ...s, initialTab: tab }));
-	}
-
-	setStudentFilesData(data: SemanaEstudianteArchivosDto[]): void {
-		this._ui.update((s) => ({ ...s, studentFilesData: data }));
-	}
-
-	setStudentFilesLoading(loading: boolean): void {
-		this._ui.update((s) => ({ ...s, studentFilesLoading: loading }));
-	}
-
-	setTaskSubmissionsData(data: EstudianteTareaArchivosGroupDto[]): void {
-		this._ui.update((s) => ({ ...s, taskSubmissionsData: data }));
-	}
-
-	setTaskSubmissionsLoading(loading: boolean): void {
-		this._ui.update((s) => ({ ...s, taskSubmissionsLoading: loading }));
-	}
-
-	setActiveSemanaId(id: number | null): void {
-		this._ui.update((s) => ({ ...s, activeSemanaId: id }));
-	}
+	setSelectedHorarioId(id: number | null): void { this._ui.update((s) => ({ ...s, selectedHorarioId: id })); }
+	setInitialTab(tab: string | null): void { this._ui.update((s) => ({ ...s, initialTab: tab })); }
+	setStudentFilesData(data: SemanaEstudianteArchivosDto[]): void { this._ui.update((s) => ({ ...s, studentFilesData: data })); }
+	setStudentFilesLoading(loading: boolean): void { this._ui.update((s) => ({ ...s, studentFilesLoading: loading })); }
+	setTaskSubmissionsData(data: EstudianteTareaArchivosGroupDto[]): void { this._ui.update((s) => ({ ...s, taskSubmissionsData: data })); }
+	setTaskSubmissionsLoading(loading: boolean): void { this._ui.update((s) => ({ ...s, taskSubmissionsLoading: loading })); }
+	setActiveSemanaId(id: number | null): void { this._ui.update((s) => ({ ...s, activeSemanaId: id })); }
 	// #endregion
 
 	// #region Mutaciones quirúrgicas (domain)
+	private applyMutation(mutate: ContenidoMutation): void {
+		this._domain.update((s) => (s.contenido ? { ...s, contenido: mutate(s.contenido) } : s));
+	}
+
 	updateSemana(semanaId: number, updates: Partial<CursoContenidoSemanaDto>): void {
-		this._domain.update((s) => {
-			if (!s.contenido) return s;
-			return {
-				...s,
-				contenido: {
-					...s.contenido,
-					semanas: s.contenido.semanas.map((sem) =>
-						sem.id === semanaId ? { ...sem, ...updates } : sem,
-					),
-				},
-			};
-		});
+		this.applyMutation(contenidoMutations.updateSemana(semanaId, updates));
 	}
 
 	addArchivoToSemana(semanaId: number, archivo: CursoContenidoArchivoDto): void {
-		this._domain.update((s) => {
-			if (!s.contenido) return s;
-			return {
-				...s,
-				contenido: {
-					...s.contenido,
-					semanas: s.contenido.semanas.map((sem) =>
-						sem.id === semanaId ? { ...sem, archivos: [...sem.archivos, archivo] } : sem,
-					),
-				},
-			};
-		});
+		this.applyMutation(contenidoMutations.addArchivoToSemana(semanaId, archivo));
 	}
 
 	removeArchivoFromSemana(semanaId: number, archivoId: number): void {
-		this._domain.update((s) => {
-			if (!s.contenido) return s;
-			return {
-				...s,
-				contenido: {
-					...s.contenido,
-					semanas: s.contenido.semanas.map((sem) =>
-						sem.id === semanaId
-							? { ...sem, archivos: sem.archivos.filter((a) => a.id !== archivoId) }
-							: sem,
-					),
-				},
-			};
-		});
+		this.applyMutation(contenidoMutations.removeArchivoFromSemana(semanaId, archivoId));
 	}
 
 	addTareaToSemana(semanaId: number, tarea: CursoContenidoTareaDto): void {
-		this._domain.update((s) => {
-			if (!s.contenido) return s;
-			return {
-				...s,
-				contenido: {
-					...s.contenido,
-					semanas: s.contenido.semanas.map((sem) =>
-						sem.id === semanaId ? { ...sem, tareas: [...sem.tareas, tarea] } : sem,
-					),
-				},
-			};
-		});
+		this.applyMutation(contenidoMutations.addTareaToSemana(semanaId, tarea));
 	}
 
 	updateTareaInSemana(semanaId: number, tareaId: number, updates: Partial<CursoContenidoTareaDto>): void {
-		this._domain.update((s) => {
-			if (!s.contenido) return s;
-			return {
-				...s,
-				contenido: {
-					...s.contenido,
-					semanas: s.contenido.semanas.map((sem) =>
-						sem.id === semanaId
-							? {
-									...sem,
-									tareas: sem.tareas.map((t) => (t.id === tareaId ? { ...t, ...updates } : t)),
-								}
-							: sem,
-					),
-				},
-			};
-		});
+		this.applyMutation(contenidoMutations.updateTareaInSemana(semanaId, tareaId, updates));
 	}
 
 	removeTareaFromSemana(semanaId: number, tareaId: number): void {
-		this._domain.update((s) => {
-			if (!s.contenido) return s;
-			return {
-				...s,
-				contenido: {
-					...s.contenido,
-					semanas: s.contenido.semanas.map((sem) =>
-						sem.id === semanaId
-							? { ...sem, tareas: sem.tareas.filter((t) => t.id !== tareaId) }
-							: sem,
-					),
-				},
-			};
-		});
+		this.applyMutation(contenidoMutations.removeTareaFromSemana(semanaId, tareaId));
 	}
 
 	addArchivoToTarea(semanaId: number, tareaId: number, archivo: TareaArchivoDto): void {
-		this._domain.update((s) => {
-			if (!s.contenido) return s;
-			return {
-				...s,
-				contenido: {
-					...s.contenido,
-					semanas: s.contenido.semanas.map((sem) =>
-						sem.id === semanaId
-							? {
-									...sem,
-									tareas: sem.tareas.map((t) =>
-										t.id === tareaId ? { ...t, archivos: [...t.archivos, archivo] } : t,
-									),
-								}
-							: sem,
-					),
-				},
-			};
-		});
+		this.applyMutation(contenidoMutations.addArchivoToTarea(semanaId, tareaId, archivo));
 	}
 
 	removeArchivoFromTarea(semanaId: number, tareaId: number, archivoId: number): void {
-		this._domain.update((s) => {
-			if (!s.contenido) return s;
-			return {
-				...s,
-				contenido: {
-					...s.contenido,
-					semanas: s.contenido.semanas.map((sem) =>
-						sem.id === semanaId
-							? {
-									...sem,
-									tareas: sem.tareas.map((t) =>
-										t.id === tareaId
-											? { ...t, archivos: t.archivos.filter((a) => a.id !== archivoId) }
-											: t,
-									),
-								}
-							: sem,
-					),
-				},
-			};
-		});
+		this.applyMutation(contenidoMutations.removeArchivoFromTarea(semanaId, tareaId, archivoId));
 	}
 	// #endregion
 
 	// #region Dialog commands (UI)
-	openContentDialog(): void {
-		this._ui.update((s) => ({ ...s, contentDialogVisible: true }));
-	}
-
+	openContentDialog(): void { this._ui.update((s) => ({ ...s, contentDialogVisible: true })); }
 	closeContentDialog(): void {
 		this._ui.update((s) => ({ ...s, contentDialogVisible: false, selectedHorarioId: null }));
 		this._domain.update((s) => ({ ...s, contenido: null }));
 	}
-
-	openBuilderDialog(): void {
-		this._ui.update((s) => ({ ...s, builderDialogVisible: true }));
-	}
-
-	closeBuilderDialog(): void {
-		this._ui.update((s) => ({ ...s, builderDialogVisible: false }));
-	}
-
-	openSemanaEditDialog(semana: CursoContenidoSemanaDto): void {
-		this._ui.update((s) => ({ ...s, semanaEditDialogVisible: true, selectedSemana: semana }));
-	}
-
-	closeSemanaEditDialog(): void {
-		this._ui.update((s) => ({ ...s, semanaEditDialogVisible: false, selectedSemana: null }));
-	}
-
-	openTareaDialog(tarea: CursoContenidoTareaDto | null): void {
-		this._ui.update((s) => ({ ...s, tareaDialogVisible: true, selectedTarea: tarea }));
-	}
-
-	closeTareaDialog(): void {
-		this._ui.update((s) => ({ ...s, tareaDialogVisible: false, selectedTarea: null }));
-	}
-
-	openArchivosSummaryDialog(): void {
-		this._ui.update((s) => ({ ...s, archivosSummaryDialogVisible: true }));
-	}
-
-	closeArchivosSummaryDialog(): void {
-		this._ui.update((s) => ({ ...s, archivosSummaryDialogVisible: false }));
-	}
-
-	openTareasSummaryDialog(): void {
-		this._ui.update((s) => ({ ...s, tareasSummaryDialogVisible: true }));
-	}
-
-	closeTareasSummaryDialog(): void {
-		this._ui.update((s) => ({ ...s, tareasSummaryDialogVisible: false }));
-	}
-
-	openStudentFilesDialog(): void {
-		this._ui.update((s) => ({ ...s, studentFilesDialogVisible: true }));
-	}
-
-	closeStudentFilesDialog(): void {
-		this._ui.update((s) => ({ ...s, studentFilesDialogVisible: false }));
-	}
-
-	openTaskSubmissionsDialog(tarea: CursoContenidoTareaDto): void {
-		this._ui.update((s) => ({ ...s, taskSubmissionsDialogVisible: true, taskSubmissionsTarea: tarea }));
-	}
-
-	closeTaskSubmissionsDialog(): void {
-		this._ui.update((s) => ({ ...s, taskSubmissionsDialogVisible: false, taskSubmissionsTarea: null }));
-	}
+	openBuilderDialog(): void { this._ui.update((s) => ({ ...s, builderDialogVisible: true })); }
+	closeBuilderDialog(): void { this._ui.update((s) => ({ ...s, builderDialogVisible: false })); }
+	openSemanaEditDialog(semana: CursoContenidoSemanaDto): void { this._ui.update((s) => ({ ...s, semanaEditDialogVisible: true, selectedSemana: semana })); }
+	closeSemanaEditDialog(): void { this._ui.update((s) => ({ ...s, semanaEditDialogVisible: false, selectedSemana: null })); }
+	openTareaDialog(tarea: CursoContenidoTareaDto | null): void { this._ui.update((s) => ({ ...s, tareaDialogVisible: true, selectedTarea: tarea })); }
+	closeTareaDialog(): void { this._ui.update((s) => ({ ...s, tareaDialogVisible: false, selectedTarea: null })); }
+	openArchivosSummaryDialog(): void { this._ui.update((s) => ({ ...s, archivosSummaryDialogVisible: true })); }
+	closeArchivosSummaryDialog(): void { this._ui.update((s) => ({ ...s, archivosSummaryDialogVisible: false })); }
+	openTareasSummaryDialog(): void { this._ui.update((s) => ({ ...s, tareasSummaryDialogVisible: true })); }
+	closeTareasSummaryDialog(): void { this._ui.update((s) => ({ ...s, tareasSummaryDialogVisible: false })); }
+	openStudentFilesDialog(): void { this._ui.update((s) => ({ ...s, studentFilesDialogVisible: true })); }
+	closeStudentFilesDialog(): void { this._ui.update((s) => ({ ...s, studentFilesDialogVisible: false })); }
+	openTaskSubmissionsDialog(tarea: CursoContenidoTareaDto): void { this._ui.update((s) => ({ ...s, taskSubmissionsDialogVisible: true, taskSubmissionsTarea: tarea })); }
+	closeTaskSubmissionsDialog(): void { this._ui.update((s) => ({ ...s, taskSubmissionsDialogVisible: false, taskSubmissionsTarea: null })); }
 	// #endregion
 
 	// #region Reset

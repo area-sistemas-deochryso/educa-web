@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import * as THREE from 'three';
-import type { CampusNode, PathResult } from '../../../models';
+import type { CampusNode, PathResult } from '@features/intranet/pages/cross-role/campus-navigation/models';
 import { type SceneLights, SCALE, FLOOR_H, PATH_OFFSET } from '../campus-3d.types';
 
 @Injectable()

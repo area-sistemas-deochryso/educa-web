@@ -19,7 +19,7 @@ import {
 	CalificarLoteDto,
 	CalificarGruposLoteDto,
 	CrearPeriodoDto,
-} from '../../../models';
+} from '@features/intranet/pages/profesor/models';
 import { SemanaEditDialogComponent } from '../semana-edit-dialog/semana-edit-dialog.component';
 import { TareaDialogComponent } from '../tarea-dialog/tarea-dialog.component';
 import { ArchivosSummaryDialogComponent } from '../archivos-summary-dialog/archivos-summary-dialog.component';

@@ -36,6 +36,26 @@ All imports MUST use path aliases (`@core`, `@shared`, `@features/*`, `@config`,
 - Dialogs: `[visible]` + `(visibleChange)`, never `[(visible)]` or inside `@if`
 - `p-select`/`p-multiselect`/`p-calendar`: always `appendTo="body"`
 
+### Optimistic UI (WAL) — BLOCKING
+- **Every** mutation in a facade MUST go through `WalFacadeHelper.execute()`.
+  Direct `api.xxx().subscribe(...)` on mutation verbs (`crear`/`actualizar`/
+  `eliminar`/`toggle`/`guardar`/`aprobar`/`cerrar`...) is a CRITICAL finding.
+- The **visible change** MUST live in `optimistic.apply`, NOT in `onCommit`.
+  `onCommit` only reconciles server-derived fields (rowVersion, IDs, joined
+  descriptions). If the reviewer sees `store.update(...)` in `onCommit` while
+  `apply` is empty/no-op, flag as **disguised pessimism**.
+- `rollback` MUST be deterministic: restore a captured snapshot. Using
+  `loadItems()` / refetch as rollback is a CRITICAL finding.
+- `UPDATE`/`DELETE`/`TOGGLE` without `optimistic` block: rejected by the
+  TypeScript union discriminant, should never compile — flag if bypassed.
+- `consistencyLevel: 'server-confirmed'` or higher MUST have a comment
+  citing the `INV-*` invariant from `business-rules.md` that justifies it.
+  Missing justification = WARNING.
+- ESLint rule `wal/no-direct-mutation-subscribe` must pass; any
+  `eslint-disable` for this rule requires written justification with either
+  an `INV-*` reference or a `TODO` for migration.
+- See `@.claude/rules/optimistic-ui.md` for the full pattern.
+
 ## ASP.NET Core Standards
 
 ### 3-Layer Architecture
@@ -95,6 +115,12 @@ Controller → Service → Repository → DbContext
 - [ ] Dropdowns have `appendTo="body"`
 - [ ] Icon-only buttons have `aria-label` via `pt`
 - [ ] Dialogs not inside `@if`
+- [ ] Every facade mutation goes through `WalFacadeHelper.execute()` (no direct `.subscribe()`)
+- [ ] Visible change lives in `optimistic.apply`, not `onCommit` (no disguised pessimism)
+- [ ] `rollback` restores a captured snapshot (not a refetch)
+- [ ] `UPDATE`/`DELETE`/`TOGGLE` declare `optimistic` (enforced by TS union)
+- [ ] Any `server-confirmed` consistency level cites an `INV-*` from business-rules.md
+- [ ] ESLint rule `wal/no-direct-mutation-subscribe` passes (or disables have written justification)
 
 ### ASP.NET Core
 - [ ] Controller only delegates (no business logic)

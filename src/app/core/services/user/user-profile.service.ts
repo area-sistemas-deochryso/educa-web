@@ -37,6 +37,7 @@ export class UserProfileService {
 	readonly isAsistenteAdministrativo = computed(
 		() => this._userRole() === APP_USER_ROLES.AsistenteAdministrativo,
 	);
+	readonly isPromotor = computed(() => this._userRole() === APP_USER_ROLES.Promotor);
 
 	readonly displayName = computed(() => this._userName());
 

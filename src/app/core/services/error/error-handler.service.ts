@@ -12,6 +12,7 @@ import { Injectable, computed, inject, signal } from '@angular/core';
 import { ErrorReporterService } from './error-reporter.service';
 import { HttpErrorResponse } from '@angular/common/http';
 import { logger } from '@core/helpers';
+import { RequestTraceFacade } from '@core/services/trace';
 import {
 	UI_CLIENT_ERROR_MESSAGE,
 	UI_ERROR_CODES,
@@ -28,6 +29,7 @@ export class ErrorHandlerService {
 	// * Centralized error handling + notification state.
 
 	private readonly errorReporter = inject(ErrorReporterService);
+	private readonly trace = inject(RequestTraceFacade);
 
 	// Estado con Signals
 	private readonly _errors = signal<AppError[]>([]);
@@ -85,6 +87,11 @@ export class ErrorHandlerService {
 			this.errorReporter.reportHttpError(
 				error.status, error.url ?? '', method, errorCode, correlationId,
 			);
+			// El toast se acaba de mostrar → registrar para que el dialog de feedback
+			// pueda ofrecer enlazar este reporte manual con este error específico.
+			if (correlationId) {
+				this.trace.trackVisibleError(correlationId);
+			}
 		}
 
 		return appError;
@@ -112,6 +119,9 @@ export class ErrorHandlerService {
 
 		const correlationId = (context?.['requestId'] as string) ?? undefined;
 		this.errorReporter.reportClientError(error.message, error.stack, correlationId);
+		if (correlationId) {
+			this.trace.trackVisibleError(correlationId);
+		}
 
 		return appError;
 	}

@@ -53,7 +53,7 @@ export class SchedulesAssignmentService {
       onCommit: () => {
         callbacks.refreshHorarios();
 
-        if (this.store.detailDrawerVisible()) {
+        if (this.store.formStore.detailDrawerVisible()) {
           callbacks.loadDetalle(data.horarioId);
         }
 
@@ -133,7 +133,7 @@ export class SchedulesAssignmentService {
       onCommit: () => {
         callbacks.refreshHorarios();
 
-        if (this.store.detailDrawerVisible()) {
+        if (this.store.formStore.detailDrawerVisible()) {
           callbacks.loadDetalle(horarioId);
         }
 
@@ -200,7 +200,7 @@ export class SchedulesAssignmentService {
         },
         rollback: () => {
           callbacks.refreshHorarios();
-          if (this.store.detailDrawerVisible()) {
+          if (this.store.formStore.detailDrawerVisible()) {
             callbacks.loadDetalle(horarioId);
           }
         },
@@ -241,7 +241,7 @@ export class SchedulesAssignmentService {
           this.store.setLoading(true);
         },
         rollback: () => {
-          if (this.store.detailDrawerVisible()) {
+          if (this.store.formStore.detailDrawerVisible()) {
             callbacks.loadDetalle(horarioId);
           }
         },

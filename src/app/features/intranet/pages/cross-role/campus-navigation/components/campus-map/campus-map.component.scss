@@ -1,0 +1,123 @@
+.campus-map-container {
+	border: 1px solid var(--surface-border);
+	border-radius: 12px;
+	overflow: hidden;
+	background: var(--surface-ground, #f0ece4);
+}
+
+.campus-svg {
+	width: 100%;
+	height: auto;
+	display: block;
+}
+
+// #region Edificio y pasillos
+.building-bg {
+	fill: var(--surface-100, #e8e4dc);
+	stroke: var(--surface-300, #c8c0b4);
+	stroke-width: 2;
+}
+
+.walkable-corridor {
+	stroke: var(--surface-200, #d4cec4);
+	stroke-linecap: round;
+}
+
+.corridor-dot {
+	fill: var(--surface-300, #c0b8ac);
+	stroke: none;
+}
+// #endregion
+
+// #region Path: glow + huellas
+.path-glow {
+	stroke: #22c55e;
+	stroke-width: 20;
+	stroke-linecap: round;
+	stroke-opacity: 0.1;
+	animation: glowPulse 2s ease-in-out infinite;
+}
+
+@keyframes glowPulse {
+	0%, 100% { stroke-opacity: 0.06; }
+	50% { stroke-opacity: 0.18; }
+}
+
+.footprint {
+	animation: stepFade 3s ease-in-out infinite;
+}
+
+.foot-sole {
+	fill: #6b7280;
+	opacity: 0.6;
+}
+
+.foot-toe {
+	fill: #6b7280;
+	opacity: 0.6;
+}
+
+@keyframes stepFade {
+	0%, 100% { opacity: 0.15; }
+	30%, 70% { opacity: 0.8; }
+}
+// #endregion
+
+// #region Nodos
+.node-group {
+	&.clickable {
+		cursor: pointer;
+		&:hover .node-rect {
+			stroke-width: 2.5;
+			filter: brightness(1.08);
+		}
+	}
+	&.start-node .node-rect {
+		stroke: #22c55e;
+		stroke-width: 3;
+	}
+	&.dest-node .node-rect {
+		stroke: #ef4444;
+		stroke-width: 3;
+	}
+}
+
+.node-rect { stroke-width: 1.5; transition: all 0.15s; }
+.node-classroom { fill: #dbeafe; stroke: #3b82f6; }
+.node-stairs    { fill: #fef3c7; stroke: #f59e0b; }
+.node-entrance  { fill: #d1fae5; stroke: #10b981; }
+.node-patio     { fill: #ecfdf5; stroke: #6ee7b7; }
+.node-bathroom  { fill: #e0f2fe; stroke: #0ea5e9; }
+.node-office    { fill: #f3f4f6; stroke: #6b7280; }
+
+.node-label {
+	font-size: 11px;
+	font-weight: 600;
+	fill: var(--text-color, #1e293b);
+	pointer-events: none;
+	user-select: none;
+}
+// #endregion
+
+// #region Marcadores
+.marker-start {
+	fill: #22c55e;
+	stroke: #ffffff;
+	stroke-width: 2;
+}
+.marker-dest {
+	fill: #ef4444;
+	stroke: #ffffff;
+	stroke-width: 2;
+	animation: destPulse 1s ease-in-out infinite;
+}
+.marker-label {
+	font-size: 12px;
+	pointer-events: none;
+}
+
+@keyframes destPulse {
+	0%, 100% { r: 9; }
+	50% { r: 12; }
+}
+// #endregion

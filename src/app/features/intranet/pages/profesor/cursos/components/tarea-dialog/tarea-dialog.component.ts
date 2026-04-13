@@ -8,7 +8,7 @@ import { InputTextModule } from 'primeng/inputtext';
 import { TextareaModule } from 'primeng/textarea';
 import { DatePickerModule } from 'primeng/datepicker';
 import { ToggleSwitch } from 'primeng/toggleswitch';
-import { CursoContenidoTareaDto, CrearTareaRequest, ActualizarTareaRequest } from '../../../models';
+import { CursoContenidoTareaDto, CrearTareaRequest, ActualizarTareaRequest } from '@features/intranet/pages/profesor/models';
 
 // #endregion
 // #region Implementation

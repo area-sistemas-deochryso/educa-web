@@ -26,10 +26,10 @@ export class SchedulesUiFacade {
    * Abrir dialog para crear nuevo horario
    */
   openNewDialog(): void {
-    this.store.clearFormData();
-    this.store.setEditingId(null);
-    this.store.resetWizard();
-    this.store.openDialog();
+    this.store.formStore.clearFormData();
+    this.store.formStore.setEditingId(null);
+    this.store.formStore.resetWizard();
+    this.store.formStore.openDialog();
   }
 
   /**
@@ -42,7 +42,7 @@ export class SchedulesUiFacade {
       return;
     }
 
-    this.store.setFormData({
+    this.store.formStore.setFormData({
       diaSemana: horario.diaSemana,
       horaInicio: horario.horaInicio,
       horaFin: horario.horaFin,
@@ -51,16 +51,16 @@ export class SchedulesUiFacade {
       profesorId: horario.profesorId,
       estudianteIds: null,
     });
-    this.store.setEditingId(id);
-    this.store.resetWizard();
-    this.store.openDialog();
+    this.store.formStore.setEditingId(id);
+    this.store.formStore.resetWizard();
+    this.store.formStore.openDialog();
   }
 
   /**
    * Cerrar dialog y limpiar formulario
    */
   closeDialog(): void {
-    this.store.closeDialog();
+    this.store.formStore.closeDialog();
   }
 
   // #endregion
@@ -70,22 +70,22 @@ export class SchedulesUiFacade {
    * Abrir modal de selección de cursos por nivel
    */
   openCursoDialog(): void {
-    this.store.openCursoDialog();
+    this.store.formStore.openCursoDialog();
   }
 
   /**
    * Cerrar modal de selección de cursos
    */
   closeCursoDialog(): void {
-    this.store.closeCursoDialog();
+    this.store.formStore.closeCursoDialog();
   }
 
   /**
    * Seleccionar un curso desde el modal
    */
   selectCurso(cursoId: number): void {
-    this.store.setFormData({ cursoId });
-    this.store.closeCursoDialog();
+    this.store.formStore.setFormData({ cursoId });
+    this.store.formStore.closeCursoDialog();
   }
 
   // #endregion
@@ -116,14 +116,14 @@ export class SchedulesUiFacade {
    * Avanzar en el wizard
    */
   nextWizardStep(): void {
-    this.store.nextStep();
+    this.store.formStore.nextStep();
   }
 
   /**
    * Retroceder en el wizard
    */
   prevWizardStep(): void {
-    this.store.prevStep();
+    this.store.formStore.prevStep();
   }
 
   // #endregion

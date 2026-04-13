@@ -176,6 +176,43 @@ export class WalDbService {
 			}
 		});
 	}
+
+	/**
+	 * Delete all entries matching a specific resourceType, regardless of status.
+	 * Used for one-time cleanup of entries that should never have been in the WAL
+	 * (e.g., after changing a facade from optimistic to server-confirmed).
+	 */
+	async purgeByResourceType(resourceType: string): Promise<number> {
+		const db = await this.ensureDB();
+		if (!db) return 0;
+
+		return new Promise((resolve) => {
+			try {
+				const tx = db.transaction(STORE_NAME, 'readwrite');
+				const store = tx.objectStore(STORE_NAME);
+				const request = store.openCursor();
+				let deleted = 0;
+
+				request.onsuccess = (event) => {
+					const cursor = (event.target as IDBRequest<IDBCursorWithValue>).result;
+					if (cursor) {
+						const entry = cursor.value as WalEntry;
+						if (entry.resourceType === resourceType) {
+							cursor.delete();
+							deleted++;
+						}
+						cursor.continue();
+					}
+				};
+
+				tx.oncomplete = () => resolve(deleted);
+				tx.onerror = () => resolve(deleted);
+			} catch {
+				resolve(0);
+			}
+		});
+	}
+
 	/**
 	 * Clear all WAL entries.
 	 */

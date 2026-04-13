@@ -116,7 +116,7 @@ export class UsersUiFacade {
 	// #region Form Management
 
 	updateFormField(field: string, value: unknown): void {
-		this.store.updateFormData({ [field]: value });
+		this.store.updateFormDataWithPolicies({ [field]: value });
 	}
 
 	// #endregion

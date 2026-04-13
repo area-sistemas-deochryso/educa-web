@@ -1,17 +1,20 @@
 // #region Imports
-import { ChangeDetectionStrategy, Component, inject, OnInit, DestroyRef, signal, effect, computed } from '@angular/core';
+import { ChangeDetectionStrategy, Component, inject, OnInit, OnDestroy, DestroyRef, signal, effect, computed, viewChild } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import { Router, RouterLink, RouterLinkActive, RouterOutlet, NavigationEnd } from '@angular/router';
+import { Router, RouterLink, RouterOutlet, NavigationEnd } from '@angular/router';
 import { filter } from 'rxjs';
 import { VoiceButtonComponent } from '@intranet-shared/components/voice-button';
 import { FloatingNotificationBellComponent } from '@intranet-shared/components/floating-notification-bell';
 import { SyncStatusComponent } from '@intranet-shared/components/sync-status';
 import { OfflineIndicatorComponent } from '@intranet-shared/components/offline-indicator/offline-indicator.component';
-import { UserPermissionsService, SessionActivityService } from '@core/services';
+import { FeedbackReportDialogComponent } from '@intranet-shared/components/feedback-report-dialog';
+import { FeedbackReportLauncherComponent } from '@intranet-shared/components/feedback-report-launcher';
+import { UserPermissionsService, SessionActivityService, KeyboardShortcutsService, FeedbackReportFacade } from '@core/services';
 import {
 	NavItemComponent,
 	UserProfileMenuComponent,
 	MobileMenuComponent,
+	ModuleSelectorComponent,
 	NavMenuItem,
 } from './components';
 import { ModuloMenu, buildModuloMenus, detectModuloFromUrl } from './intranet-menu.config';
@@ -23,8 +26,7 @@ import { AccessDeniedModalComponent } from '@intranet-shared/components/access-d
 // #endregion
 
 // #region Helpers
-const VISIBLE_PILLS = 5;
-const VISIBLE_NAV = 3;
+const VISIBLE_NAV = 2;
 
 function circularSlice<T>(items: T[], center: number, count: number): T[] {
 	const len = items.length;
@@ -45,26 +47,31 @@ function circularSlice<T>(items: T[], center: number, count: number): T[] {
 	imports: [
 		RouterOutlet,
 		RouterLink,
-		RouterLinkActive,
 		VoiceButtonComponent,
 		FloatingNotificationBellComponent,
 		SyncStatusComponent,
 		OfflineIndicatorComponent,
+		FeedbackReportDialogComponent,
+		FeedbackReportLauncherComponent,
 		NavItemComponent,
 		UserProfileMenuComponent,
 		MobileMenuComponent,
+		ModuleSelectorComponent,
 		AccessDeniedModalComponent,
 	],
 	templateUrl: './intranet-layout.component.html',
 	styleUrl: './intranet-layout.component.scss',
 })
-export class IntranetLayoutComponent implements OnInit {
+export class IntranetLayoutComponent implements OnInit, OnDestroy {
 	private userPermissionsService = inject(UserPermissionsService);
 	private destroyRef = inject(DestroyRef);
 	private flags = inject(FeatureFlagsFacade);
 	private sessionActivity = inject(SessionActivityService);
 	private router = inject(Router);
+	private keyboardService = inject(KeyboardShortcutsService);
+	private feedbackFacade = inject(FeedbackReportFacade);
 	readonly favoritesService = inject(QuickAccessFavoritesService);
+	private readonly moduleSelector = viewChild(ModuleSelectorComponent);
 
 	// #region Estado del menú
 	private readonly _modulos = signal<ModuloMenu[]>([]);
@@ -80,13 +87,7 @@ export class IntranetLayoutComponent implements OnInit {
 		return this._modulos().find((m) => m.id === id)?.items ?? [];
 	});
 
-	// Ventana circular de 3 pills.
-	private readonly _pillCenter = signal(0);
-	readonly visiblePills = computed(() =>
-		circularSlice(this._modulos(), this._pillCenter(), VISIBLE_PILLS),
-	);
-
-	// Ventana circular de 3 nav items.
+	// Ventana circular de nav items.
 	private readonly _navCenter = signal(0);
 	readonly visibleNavItems = computed(() =>
 		circularSlice(this._allItems(), this._navCenter(), VISIBLE_NAV),
@@ -96,6 +97,7 @@ export class IntranetLayoutComponent implements OnInit {
 	// #region Feature flags
 	readonly showNotifications = computed(() => this.flags.isEnabled('notifications'));
 	readonly showVoiceRecognition = computed(() => this.flags.isEnabled('voiceRecognition'));
+	readonly showFeedbackReport = computed(() => this.flags.isEnabled('feedbackReport'));
 	// #endregion
 
 	constructor() {
@@ -135,12 +137,24 @@ export class IntranetLayoutComponent implements OnInit {
 			const id = detectModuloFromUrl(this.router.url, modulos);
 			this.applySelection(id, modulos, this.router.url);
 		}
+
+		// Atajo global Ctrl+Alt+F → abre/cierra dialog de reporte de usuario.
+		if (this.showFeedbackReport()) {
+			this.keyboardService.register('open-feedback-report', () => this.feedbackFacade.toggle());
+		}
+
+		// Atajo global Ctrl+K → abre command palette.
+		this.keyboardService.register('open-command-palette', () => this.moduleSelector()?.toggle());
+	}
+
+	ngOnDestroy(): void {
+		this.keyboardService.unregister('open-feedback-report');
+		this.keyboardService.unregister('open-command-palette');
 	}
 
 	// #region Acciones
 	selectModulo(id: ModuloId): void {
 		this._selectedModuloId.set(id);
-		this._pillCenter.set(this._modulos().findIndex((m) => m.id === id));
 		this._navCenter.set(0);
 		if (id === 'inicio') {
 			this.router.navigate(['/intranet']);
@@ -167,8 +181,6 @@ export class IntranetLayoutComponent implements OnInit {
 	// #region Helpers privados
 	private applySelection(id: ModuloId, modulos: ModuloMenu[], url: string): void {
 		this._selectedModuloId.set(id);
-		const pillIdx = modulos.findIndex((m) => m.id === id);
-		if (pillIdx >= 0) this._pillCenter.set(pillIdx);
 
 		const items = id === 'inicio' ? [] : (modulos.find((m) => m.id === id)?.items ?? []);
 		const navIdx = items.findIndex((i) => i.route && url.startsWith(i.route));

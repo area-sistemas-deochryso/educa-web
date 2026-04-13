@@ -25,6 +25,7 @@ import { CampusSceneBuilderService } from './services/campus-scene-builder.servi
 import { CampusPlayerService } from './services/campus-player.service';
 import { CampusMinimapService } from './services/campus-minimap.service';
 import { CampusPathVisualizerService } from './services/campus-path-visualizer.service';
+import { createCampus3dSetup } from './campus-3d-setup.helper';
 
 @Component({
 	selector: 'app-campus-3d-view',
@@ -37,211 +38,8 @@ import { CampusPathVisualizerService } from './services/campus-path-visualizer.s
 		CampusMinimapService,
 		CampusPathVisualizerService,
 	],
-	template: `
-		<div class="overlay3d">
-			<canvas #canvas3d class="scene-canvas"
-				(mousedown)="onMouseDown($event)"
-				(mousemove)="onMouseMove($event)"
-				(mouseup)="onMouseUp()"
-				(mouseleave)="onMouseUp()"
-				(contextmenu)="$event.preventDefault()"
-			></canvas>
-
-			<!-- HUD superior -->
-			<div class="hud-top">
-				<div class="hud-left">
-					<div class="dest-badge">
-						<span>📍</span>
-						<span>{{ destLabel() }}</span>
-					</div>
-					<div class="floor-badge">Piso {{ currentFloor() }}</div>
-				</div>
-				<div class="hud-right">
-				<button type="button" class="fullscreen-btn" (click)="toggleFullscreen()"
-					[title]="isFullscreen() ? 'Salir de pantalla completa' : 'Pantalla completa'">
-					<i [class]="isFullscreen() ? 'pi pi-window-minimize' : 'pi pi-window-maximize'"></i>
-				</button>
-				<button type="button" class="exit-btn" (click)="closeView.emit()">✕ Salir</button>
-			</div>
-			</div>
-
-			<!-- Minimap -->
-			<canvas #minimap class="minimap" width="170" height="170"></canvas>
-
-			<!-- Panel de controles (desktop) -->
-			@if (!isMobile) {
-				<div class="controls-panel">
-					<div class="cp-title">🎮 Controles</div>
-					<div class="cp-row"><kbd>W</kbd><kbd>S</kbd> <span>Avanzar / Retroceder</span></div>
-					<div class="cp-row"><kbd>A</kbd><kbd>D</kbd> <span>Girar</span></div>
-					<div class="cp-row"><span class="cp-mouse">🖱 Clic + arrastra</span> <span>Mirar libremente</span></div>
-					<div class="cp-row"><kbd>ESC</kbd> <span>Salir</span></div>
-				<div class="cp-row"><kbd>ESPACIO</kbd> <span>Ajustar posición</span></div>
-				</div>
-			}
-
-			<!-- Mensaje de escalera -->
-			@if (stairMsg()) {
-				<div class="stair-msg">{{ stairMsg() }}</div>
-			}
-
-			<!-- Modal de llegada -->
-			@if (arrivalVisible()) {
-				<div class="arrival-overlay">
-					<div class="arrival-card">
-						<div class="arrival-icon">🎉</div>
-						<div class="arrival-title">¡Llegaste!</div>
-						<div class="arrival-dest">{{ destLabel() }}</div>
-						<div class="arrival-time">⏱ {{ formattedTime() }}</div>
-						<div class="arrival-actions">
-							<button type="button" class="arrival-retry" (click)="retryNavigation()">🔄 Volver a intentar</button>
-							<button type="button" class="arrival-exit" (click)="closeView.emit()">✕ Salir</button>
-						</div>
-					</div>
-				</div>
-			}
-
-			<!-- Joystick (mobile) -->
-			@if (isMobile) {
-				<div class="joystick-zone"
-					(touchstart)="joyStart($event)"
-					(touchmove)="joyMove($event)"
-					(touchend)="joyEnd()"
-					(touchcancel)="joyEnd()"
-				>
-					<div class="joy-ring">
-						<div class="joy-thumb" [style.transform]="joyTransform()"></div>
-					</div>
-				</div>
-				<div class="look-zone"
-					(touchstart)="lookTouchStart($event)"
-					(touchmove)="lookTouchMove($event)"
-					(touchend)="lookTouchEnd()"
-				></div>
-			}
-		</div>
-	`,
-	styles: `
-		:host { display: contents; }
-
-		.overlay3d {
-			position: fixed; inset: 0; z-index: 1100;
-			background: #87ceeb; display: flex; flex-direction: column;
-			user-select: none;
-		}
-		.scene-canvas {
-			flex: 1; width: 100%; height: 100%;
-			display: block; cursor: crosshair; touch-action: none;
-		}
-
-		// #region HUD
-		.hud-top {
-			position: absolute; top: 0; left: 0; right: 0;
-			display: flex; align-items: center; justify-content: space-between;
-			padding: 10px 16px;
-			background: linear-gradient(to bottom, rgba(0,0,0,0.45) 0%, transparent 100%);
-			pointer-events: none;
-		}
-		.hud-left { display: flex; align-items: center; gap: 8px; }
-		.dest-badge {
-			display: flex; align-items: center; gap: 8px;
-			background: rgba(255,255,255,0.82); border: 1px solid rgba(0,0,0,0.15);
-			border-radius: 20px; padding: 6px 14px; backdrop-filter: blur(6px);
-			color: #1e293b; font-size: 14px; font-weight: 600;
-		}
-		.floor-badge {
-			background: rgba(79,70,229,0.85); color: white;
-			border-radius: 14px; padding: 4px 12px; font-size: 13px; font-weight: 600;
-		}
-		.hud-right { display: flex; align-items: center; gap: 8px; pointer-events: auto; }
-		.fullscreen-btn, .exit-btn {
-			background: rgba(255,255,255,0.85); border: 1px solid rgba(0,0,0,0.15);
-			border-radius: 10px; padding: 6px 14px; cursor: pointer;
-			font-size: 13px; font-weight: 600; color: #1e293b;
-			backdrop-filter: blur(6px); transition: background 0.15s;
-		}
-		.fullscreen-btn:hover, .exit-btn:hover { background: rgba(255,255,255,1); }
-		.exit-btn { background: rgba(239,68,68,0.9); color: white; border-color: transparent; }
-		.exit-btn:hover { background: rgba(220,38,38,1); }
-		// #endregion
-
-		// #region Minimap
-		.minimap {
-			position: absolute; bottom: 16px; right: 16px;
-			border-radius: 12px; border: 2px solid rgba(0,0,0,0.15);
-			box-shadow: 0 4px 12px rgba(0,0,0,0.2);
-		}
-		// #endregion
-
-		// #region Controls panel
-		.controls-panel {
-			position: absolute; bottom: 16px; left: 16px;
-			background: rgba(255,255,255,0.88); backdrop-filter: blur(8px);
-			border-radius: 12px; padding: 10px 14px; font-size: 12px;
-			border: 1px solid rgba(0,0,0,0.1); color: #334155;
-			box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-		}
-		.cp-title { font-weight: 700; margin-bottom: 6px; font-size: 13px; }
-		.cp-row { display: flex; align-items: center; gap: 5px; margin-bottom: 3px; }
-		.cp-row kbd {
-			background: #e2e8f0; border-radius: 4px; padding: 1px 6px;
-			font-family: monospace; font-size: 11px; border: 1px solid #cbd5e1;
-		}
-		.cp-mouse { font-style: italic; }
-		// #endregion
-
-		// #region Stair message
-		.stair-msg {
-			position: absolute; bottom: 50%; left: 50%; transform: translateX(-50%);
-			background: rgba(146,64,14,0.88); color: #fbbf24;
-			border-radius: 16px; padding: 8px 20px; font-size: 14px; font-weight: 600;
-			pointer-events: none; white-space: nowrap;
-		}
-		// #endregion
-
-		// #region Arrival modal
-		.arrival-overlay {
-			position: absolute; inset: 0; background: rgba(0,0,0,0.6);
-			display: flex; align-items: center; justify-content: center; z-index: 10;
-		}
-		.arrival-card {
-			background: white; border-radius: 20px; padding: 32px 40px;
-			text-align: center; box-shadow: 0 20px 60px rgba(0,0,0,0.3);
-		}
-		.arrival-icon { font-size: 48px; margin-bottom: 8px; }
-		.arrival-title { font-size: 28px; font-weight: 800; color: #1e293b; }
-		.arrival-dest { font-size: 16px; color: #64748b; margin: 4px 0 12px; }
-		.arrival-time { font-size: 20px; font-weight: 600; color: #4f46e5; margin-bottom: 20px; }
-		.arrival-actions { display: flex; gap: 12px; justify-content: center; }
-		.arrival-retry, .arrival-exit {
-			padding: 10px 24px; border-radius: 12px; font-size: 14px;
-			font-weight: 600; cursor: pointer; border: none; transition: transform 0.1s;
-		}
-		.arrival-retry:hover, .arrival-exit:hover { transform: scale(1.03); }
-		.arrival-retry { background: #4f46e5; color: white; }
-		.arrival-exit { background: #e2e8f0; color: #334155; }
-		// #endregion
-
-		// #region Joystick (mobile)
-		.joystick-zone {
-			position: absolute; bottom: 30px; left: 30px;
-			width: 130px; height: 130px; touch-action: none;
-		}
-		.joy-ring {
-			width: 100%; height: 100%; border-radius: 50%;
-			background: rgba(255,255,255,0.25); border: 2px solid rgba(255,255,255,0.5);
-			display: flex; align-items: center; justify-content: center;
-		}
-		.joy-thumb {
-			width: 48px; height: 48px; border-radius: 50%;
-			background: rgba(255,255,255,0.7); transition: transform 0.05s;
-		}
-		.look-zone {
-			position: absolute; top: 0; right: 0; bottom: 0; width: 50%;
-			touch-action: none;
-		}
-		// #endregion
-	`,
+	templateUrl: './campus-3d-view.component.html',
+	styleUrl: './campus-3d-view.component.scss',
 })
 export class Campus3dViewComponent implements AfterViewInit, OnDestroy {
 
@@ -376,7 +174,7 @@ export class Campus3dViewComponent implements AfterViewInit, OnDestroy {
 	ngOnDestroy(): void {
 		cancelAnimationFrame(this.animId);
 		window.removeEventListener('keydown', this.onKeyDown);
-		window.removeEventListener('keyup',   this.onKeyUp);
+		window.removeEventListener('keyup', this.onKeyUp);
 		document.removeEventListener('fullscreenchange', this.onFullscreenChange);
 		this.resizeObserver?.disconnect();
 		this.renderer?.dispose();
@@ -385,35 +183,11 @@ export class Campus3dViewComponent implements AfterViewInit, OnDestroy {
 
 	// #region Three.js init
 	private initThree(): void {
-		const canvas = this.canvasRef.nativeElement;
-		const w = canvas.offsetWidth  || 800;
-		const h = canvas.offsetHeight || 600;
-
-		this.renderer = new THREE.WebGLRenderer({ canvas, antialias: true });
-		this.renderer.setSize(w, h);
-		this.renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
-		this.renderer.shadowMap.enabled = true;
-		this.renderer.shadowMap.type = THREE.PCFSoftShadowMap;
-
-		this.scene = new THREE.Scene();
-		this.scene.background = new THREE.Color(0x87ceeb);
-		this.scene.fog = new THREE.Fog(0xd0e8f8, 35, 110);
-
-		this.camera = new THREE.PerspectiveCamera(65, w / h, 0.1, 200);
-		this.camera.rotation.order = 'YXZ';
-
-		const ambient = new THREE.AmbientLight(0xffffff, 1.5);
-		const sun = new THREE.DirectionalLight(0xfff8e1, 2.2);
-		sun.position.set(30, 60, 20);
-		sun.castShadow = true;
-		sun.shadow.mapSize.width  = 2048;
-		sun.shadow.mapSize.height = 2048;
-		sun.shadow.camera.near = 0.5;
-		sun.shadow.camera.far  = 200;
-
-		const player = new THREE.PointLight(0xffffff, 0.4, 12, 1.5);
-		this.lights = { ambient, sun, player };
-		this.scene.add(ambient, sun, player);
+		const setup = createCampus3dSetup(this.canvasRef.nativeElement);
+		this.renderer = setup.renderer;
+		this.scene = setup.scene;
+		this.camera = setup.camera;
+		this.lights = setup.lights;
 	}
 	// #endregion
 
@@ -497,10 +271,9 @@ export class Campus3dViewComponent implements AfterViewInit, OnDestroy {
 		if (['w','s','a','d','arrowup','arrowdown','arrowleft','arrowright',' '].includes(k)) e.preventDefault();
 	};
 	private readonly onKeyUp = (e: KeyboardEvent): void => { this.player.keys[e.key.toLowerCase()] = false; };
-
 	private setupKeyboard(): void {
 		window.addEventListener('keydown', this.onKeyDown);
-		window.addEventListener('keyup',   this.onKeyUp);
+		window.addEventListener('keyup', this.onKeyUp);
 	}
 	// #endregion
 

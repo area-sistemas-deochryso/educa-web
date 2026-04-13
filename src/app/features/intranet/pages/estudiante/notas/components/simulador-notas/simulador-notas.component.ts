@@ -9,7 +9,7 @@ import {
 	EstudianteMisNotasDto,
 	NOTA_MINIMA,
 	NOTA_MAXIMA,
-} from '../../../models';
+} from '@features/intranet/pages/estudiante/models';
 import { NotaSimulada } from '../../services/estudiante-notas.store';
 import { getNotaSeverity, formatNotaConConfig } from '@intranet-shared/services/calificacion-config';
 import type { ConfiguracionCalificacionListDto } from '@data/models';

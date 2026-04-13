@@ -2,11 +2,11 @@
 import { AttendanceService, HijoApoderado, StorageService } from '@core/services';
 import { ChangeDetectionStrategy, Component, DestroyRef, OnInit, computed, inject, signal } from '@angular/core';
 
-import { AttendanceDataService } from '../../../../services/attendance/attendance-data.service';
+import { AttendanceDataService } from '@features/intranet/services/attendance/attendance-data.service';
 import { AttendanceLegendComponent } from '@app/features/intranet/components/attendance/attendance-legend/attendance-legend.component';
 import { AttendanceTable } from '../models/attendance.types';
-import { AttendanceTableComponent } from '../../../../components/attendance/attendance-table/attendance-table.component';
-import { EmptyStateComponent } from '../../../../components/attendance/empty-state/empty-state.component';
+import { AttendanceTableComponent } from '@features/intranet/components/attendance/attendance-table/attendance-table.component';
+import { EmptyStateComponent } from '@features/intranet/components/attendance/empty-state/empty-state.component';
 import { finalize } from 'rxjs';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 

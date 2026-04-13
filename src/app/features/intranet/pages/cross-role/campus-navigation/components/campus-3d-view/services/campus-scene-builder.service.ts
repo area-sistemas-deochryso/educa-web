@@ -1,12 +1,14 @@
 import { inject, Injectable } from '@angular/core';
 import * as THREE from 'three';
-import type { CampusNode, CampusEdge } from '../../../models';
+import type { CampusNode, CampusEdge } from '@features/intranet/pages/cross-role/campus-navigation/models';
 import {
 	type WorldData, type EdgeSeg, type StairZone, type RoomBox, type LabelEntry,
-	SCALE, ROOM_H, FLOOR_H, CORRIDOR_R, PLAYER_R, STAIR_STEPS, STAIR_LENGTH, STAIR_WIDTH,
+	SCALE, ROOM_H, FLOOR_H, CORRIDOR_R, PLAYER_R, STAIR_STEPS, STAIR_LENGTH,
 	ROOM_COLORS, FLOOR_COLORS,
 } from '../campus-3d.types';
 import { CampusCollisionService } from './campus-collision.service';
+import { buildStairGroup } from './campus-stair-builder';
+import { makeLabelSprite } from './campus-label.helper';
 
 @Injectable()
 export class CampusSceneBuilderService {
@@ -297,85 +299,10 @@ export class CampusSceneBuilderService {
 		const endZ   = lz + dirZ * stairLen;
 		const startY = lowNode.floor * FLOOR_H;
 
-		const group = new THREE.Group();
-		group.position.set(startX, startY, startZ);
-		group.rotation.y = Math.atan2(dirX, dirZ);
-		group.userData = { managed: true };
-
-		const stepMat    = new THREE.MeshLambertMaterial({ color: 0x92400e });
-		const stepTopMat = new THREE.MeshLambertMaterial({ color: 0xd97706 });
-		const railMat    = new THREE.MeshLambertMaterial({ color: 0x6b3710 });
-		const baseMat    = new THREE.MeshLambertMaterial({ color: 0x4a2208 });
-		const sw = STAIR_WIDTH;
-
-		for (let i = 0; i < totalSteps; i++) {
-			const blockH = (i + 1) * stepH;
-			const geo  = new THREE.BoxGeometry(sw, blockH, stepDepth - 0.03);
-			const step = new THREE.Mesh(geo, stepMat);
-			step.position.set(0, blockH / 2, (i + 0.5) * stepDepth);
-			step.castShadow = true;
-			group.add(step);
-
-			const topGeo  = new THREE.BoxGeometry(sw - 0.08, 0.05, stepDepth - 0.1);
-			const topFace = new THREE.Mesh(topGeo, stepTopMat);
-			topFace.position.set(0, blockH + 0.025, (i + 0.5) * stepDepth);
-			group.add(topFace);
-
-			const edgeGeo  = new THREE.BoxGeometry(sw - 0.04, 0.05, 0.05);
-			const edgeFace = new THREE.Mesh(edgeGeo, new THREE.MeshLambertMaterial({ color: 0xfbbf24 }));
-			edgeFace.position.set(0, blockH + 0.025, (i + 1) * stepDepth - 0.025);
-			group.add(edgeFace);
-		}
-
-		const rampGeo  = new THREE.BoxGeometry(sw + 0.3, 0.08, stairLen);
-		const rampMesh = new THREE.Mesh(rampGeo, baseMat);
-		rampMesh.position.set(0, -0.04, stairLen / 2);
-		group.add(rampMesh);
-
-		for (const xOff of [-sw / 2 - 0.08, sw / 2 + 0.08]) {
-			const postLow = new THREE.Mesh(new THREE.BoxGeometry(0.08, 0.8, 0.08), railMat);
-			postLow.position.set(xOff, 0.4, stepDepth * 0.5);
-			group.add(postLow);
-			const postHigh = new THREE.Mesh(new THREE.BoxGeometry(0.08, 0.8, 0.08), railMat);
-			postHigh.position.set(xOff, totalH + 0.4, stairLen - stepDepth * 0.5);
-			group.add(postHigh);
-			const railLen = Math.sqrt(stairLen * stairLen + totalH * totalH);
-			const railGeo = new THREE.BoxGeometry(0.07, 0.07, railLen);
-			const rail = new THREE.Mesh(railGeo, railMat);
-			rail.rotation.x = -Math.atan2(totalH, stairLen);
-			rail.position.set(xOff, totalH / 2 + 0.8, stairLen / 2);
-			group.add(rail);
-		}
-
-		const stairWallMat = new THREE.MeshLambertMaterial({ color: 0xc8bfb0 });
-		const enclosureH = totalH + ROOM_H;
-		const enclosureLen = stairLen + 0.4;
-
-		for (const xOff of [-sw / 2 - 0.15, sw / 2 + 0.15]) {
-			const sideWall = new THREE.Mesh(
-				new THREE.BoxGeometry(0.1, enclosureH, enclosureLen), stairWallMat,
-			);
-			sideWall.position.set(xOff, enclosureH / 2, stairLen / 2);
-			group.add(sideWall);
-		}
-
-		const roofAngle = Math.atan2(totalH, stairLen);
-		const roofLen   = Math.sqrt(stairLen * stairLen + totalH * totalH);
-		const roofMesh  = new THREE.Mesh(
-			new THREE.BoxGeometry(sw + 0.4, 0.12, roofLen + 0.4), stairWallMat,
-		);
-		roofMesh.rotation.x = -roofAngle;
-		roofMesh.position.set(0, totalH / 2 + ROOM_H, stairLen / 2);
-		group.add(roofMesh);
-
-		const backWall = new THREE.Mesh(new THREE.BoxGeometry(sw + 0.4, ROOM_H, 0.1), stairWallMat);
-		backWall.position.set(0, ROOM_H / 2, -0.05);
-		group.add(backWall);
-
-		const frontWall = new THREE.Mesh(new THREE.BoxGeometry(sw + 0.4, ROOM_H, 0.1), stairWallMat);
-		frontWall.position.set(0, totalH + ROOM_H / 2, stairLen + 0.05);
-		group.add(frontWall);
-
+		const group = buildStairGroup({
+			startX, startZ, dirX, dirZ, stairLen,
+			totalSteps, stepDepth, stepH, totalH, startY,
+		});
 		scene.add(group);
 
 		// Markers
@@ -435,32 +362,7 @@ export class CampusSceneBuilderService {
 	}
 
 	private makeLabel(text: string, color: number): THREE.Sprite {
-		const canvas = document.createElement('canvas');
-		canvas.width = 320; canvas.height = 72;
-		const ctx = canvas.getContext('2d')!;
-
-		const r = ((color >> 16) & 0xff);
-		const g = ((color >> 8)  & 0xff);
-		const b = (color & 0xff);
-		ctx.fillStyle = `rgba(${r},${g},${b},0.88)`;
-		// eslint-disable-next-line @typescript-eslint/no-explicit-any
-		(ctx as any).roundRect?.(4, 4, 312, 64, 12);
-		ctx.fill();
-
-		ctx.strokeStyle = 'rgba(255,255,255,0.6)';
-		ctx.lineWidth = 2; ctx.stroke();
-
-		ctx.fillStyle = '#ffffff';
-		ctx.font = 'bold 22px system-ui, sans-serif';
-		ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
-		ctx.shadowColor = 'rgba(0,0,0,0.4)'; ctx.shadowBlur = 3;
-		ctx.fillText(text.slice(0, 22), 160, 36);
-
-		const tex = new THREE.CanvasTexture(canvas);
-		const mat = new THREE.SpriteMaterial({ map: tex, depthTest: false, transparent: true, opacity: 0 });
-		const sprite = new THREE.Sprite(mat);
-		sprite.scale.set(3.8, 0.85, 1);
-		return sprite;
+		return makeLabelSprite(text, color);
 	}
 
 	// #endregion

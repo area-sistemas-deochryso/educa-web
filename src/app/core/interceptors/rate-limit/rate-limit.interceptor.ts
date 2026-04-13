@@ -38,6 +38,19 @@ function isApiRequest(req: HttpRequest<unknown>): boolean {
 	return req.url.includes('/api/');
 }
 
+/**
+ * Endpoints que se excluyen del rate-limit global del cliente.
+ * Un 429 en estos NO debe activar el cooldown que bloquea toda la app —
+ * son funciones opcionales (reportes manuales, trazabilidad) que el usuario
+ * puede reintentar más tarde sin afectar el resto de la intranet.
+ */
+function isExemptFromGlobalCooldown(req: HttpRequest<unknown>): boolean {
+	return (
+		req.url.includes('/api/sistema/reportes-usuario') ||
+		req.url.includes('/api/sistema/errors')
+	);
+}
+
 function acquireSlot(): Observable<void> {
 	if (inFlight < MAX_CONCURRENT) {
 		inFlight++;
@@ -128,6 +141,13 @@ export const rateLimitInterceptor: HttpInterceptorFn = (
 	next: HttpHandlerFn,
 ): Observable<HttpEvent<unknown>> => {
 	if (!isApiRequest(req)) {
+		return next(req);
+	}
+
+	// Endpoints opcionales (feedback, trazabilidad) no participan del throttling
+	// global: no consumen slot, no disparan cooldown, no se bloquean si la app
+	// está en cooldown. Un 429 aquí se maneja en el facade local.
+	if (isExemptFromGlobalCooldown(req)) {
 		return next(req);
 	}
 

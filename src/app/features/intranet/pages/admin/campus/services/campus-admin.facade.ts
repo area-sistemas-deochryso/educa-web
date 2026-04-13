@@ -152,10 +152,7 @@ export class CampusAdminFacade {
 	crearPiso(dto: CrearPisoDto): void {
 		this.executeCrud({
 			apiCall: this.api.crearPiso(dto),
-			onSuccess: () => {
-				this.store.closePisoDialog();
-				this.loadPisos();
-			},
+			onSuccess: () => { this.store.closePisoDialog(); this.loadPisos(); },
 			errorMsg: 'No se pudo crear el piso',
 		});
 	}
@@ -163,10 +160,7 @@ export class CampusAdminFacade {
 	actualizarPiso(id: number, dto: ActualizarPisoDto): void {
 		this.executeCrud({
 			apiCall: this.api.actualizarPiso(id, dto),
-			onSuccess: () => {
-				this.store.updatePiso(id, dto);
-				this.store.closePisoDialog();
-			},
+			onSuccess: () => { this.store.updatePiso(id, dto); this.store.closePisoDialog(); },
 			errorMsg: 'No se pudo actualizar el piso',
 		});
 	}
@@ -195,10 +189,7 @@ export class CampusAdminFacade {
 	actualizarNodo(id: number, dto: ActualizarNodoDto): void {
 		this.executeCrud({
 			apiCall: this.api.actualizarNodo(id, dto),
-			onSuccess: () => {
-				this.store.updateNodo(id, dto);
-				this.store.closeNodeDialog();
-			},
+			onSuccess: () => { this.store.updateNodo(id, dto); this.store.closeNodeDialog(); },
 			errorMsg: 'No se pudo actualizar el nodo',
 		});
 	}
@@ -232,10 +223,7 @@ export class CampusAdminFacade {
 	eliminarNodo(id: number): void {
 		this.executeCrud({
 			apiCall: this.api.eliminarNodo(id),
-			onSuccess: () => {
-				this.store.removeNodo(id);
-				this.store.clearSelection();
-			},
+			onSuccess: () => { this.store.removeNodo(id); this.store.clearSelection(); },
 			errorMsg: 'No se pudo eliminar el nodo',
 			saving: false,
 		});
@@ -248,10 +236,7 @@ export class CampusAdminFacade {
 	crearArista(dto: CrearAristaDto): void {
 		this.executeCrud({
 			apiCall: this.api.crearArista(dto),
-			onSuccess: (arista) => {
-				this.store.addArista(arista);
-				this.store.setEdgeStartNodeId(null);
-			},
+			onSuccess: (arista) => { this.store.addArista(arista); this.store.setEdgeStartNodeId(null); },
 			errorMsg: 'No se pudo crear la conexión',
 		});
 	}
@@ -259,10 +244,7 @@ export class CampusAdminFacade {
 	eliminarArista(id: number): void {
 		this.executeCrud({
 			apiCall: this.api.eliminarArista(id),
-			onSuccess: () => {
-				this.store.removeArista(id);
-				this.store.clearSelection();
-			},
+			onSuccess: () => { this.store.removeArista(id); this.store.clearSelection(); },
 			errorMsg: 'No se pudo eliminar la conexión',
 			saving: false,
 		});
@@ -283,10 +265,7 @@ export class CampusAdminFacade {
 	actualizarBloqueo(id: number, dto: ActualizarBloqueoDto): void {
 		this.executeCrud({
 			apiCall: this.api.actualizarBloqueo(id, dto),
-			onSuccess: () => {
-				this.store.updateBloqueo(id, dto);
-				this.store.closeBloqueoDialog();
-			},
+			onSuccess: () => { this.store.updateBloqueo(id, dto); this.store.closeBloqueoDialog(); },
 			errorMsg: 'No se pudo actualizar el bloqueo',
 		});
 	}
@@ -316,10 +295,7 @@ export class CampusAdminFacade {
 	eliminarBloqueo(id: number): void {
 		this.executeCrud({
 			apiCall: this.api.eliminarBloqueo(id),
-			onSuccess: () => {
-				this.store.removeBloqueo(id);
-				this.store.clearSelection();
-			},
+			onSuccess: () => { this.store.removeBloqueo(id); this.store.clearSelection(); },
 			errorMsg: 'No se pudo eliminar el bloqueo',
 			saving: false,
 		});
@@ -344,10 +320,7 @@ export class CampusAdminFacade {
 	eliminarConexionVertical(id: number): void {
 		this.executeCrud({
 			apiCall: this.api.eliminarConexionVertical(id),
-			onSuccess: () => {
-				this.store.removeConexionVertical(id);
-				this.store.clearSelection();
-			},
+			onSuccess: () => { this.store.removeConexionVertical(id); this.store.clearSelection(); },
 			errorMsg: 'No se pudo eliminar la conexión vertical',
 			saving: false,
 		});
@@ -357,18 +330,12 @@ export class CampusAdminFacade {
 
 	// #region Comandos de editor (delega a CampusEditorService)
 
-	setActiveTool(tool: import('../models').EditorTool): void {
-		this.editor.setActiveTool(tool);
-	}
-
-	setNewNodeType(type: import('../models').EditorNodeType): void {
-		this.editor.setNewNodeType(type);
-	}
+	setActiveTool(tool: import('../models').EditorTool): void { this.editor.setActiveTool(tool); }
+	setNewNodeType(type: import('../models').EditorNodeType): void { this.editor.setNewNodeType(type); }
 
 	onEditorClick(x: number, y: number): void {
 		const result = this.editor.resolveCanvasClick(x, y);
 		if (!result) return;
-
 		if (result.action === 'createNode') this.crearNodo(result.data);
 		else if (result.action === 'createBlock') this.crearBloqueo(result.data);
 	}
@@ -376,7 +343,6 @@ export class CampusAdminFacade {
 	onNodeClick(nodeId: number): void {
 		const result = this.editor.resolveNodeClick(nodeId);
 		if (!result) return;
-
 		if (result.action === 'deleteNode') this.eliminarNodo(result.nodeId);
 		else if (result.action === 'createEdge') this.crearArista(result.data);
 	}
@@ -400,33 +366,13 @@ export class CampusAdminFacade {
 
 	// #region Comandos de UI
 
-	openPisoDialog(piso?: import('../models').CampusPisoDto): void {
-		this.store.openPisoDialog(piso);
-	}
-
-	closePisoDialog(): void {
-		this.store.closePisoDialog();
-	}
-
-	openNodeDialog(node?: import('../models').CampusNodoDto): void {
-		this.store.openNodeDialog(node);
-	}
-
-	closeNodeDialog(): void {
-		this.store.closeNodeDialog();
-	}
-
-	openBloqueoDialog(bloqueo?: import('../models').CampusBloqueoDto): void {
-		this.store.openBloqueoDialog(bloqueo);
-	}
-
-	closeBloqueoDialog(): void {
-		this.store.closeBloqueoDialog();
-	}
-
-	openVerticalDialog(): void {
-		this.store.openVerticalDialog();
-	}
+	openPisoDialog(piso?: import('../models').CampusPisoDto): void { this.store.openPisoDialog(piso); }
+	closePisoDialog(): void { this.store.closePisoDialog(); }
+	openNodeDialog(node?: import('../models').CampusNodoDto): void { this.store.openNodeDialog(node); }
+	closeNodeDialog(): void { this.store.closeNodeDialog(); }
+	openBloqueoDialog(bloqueo?: import('../models').CampusBloqueoDto): void { this.store.openBloqueoDialog(bloqueo); }
+	closeBloqueoDialog(): void { this.store.closeBloqueoDialog(); }
+	openVerticalDialog(): void { this.store.openVerticalDialog(); }
 
 	closeVerticalDialog(): void {
 		this.store.closeVerticalDialog();

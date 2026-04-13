@@ -150,12 +150,22 @@ describe('StorageService', () => {
 
 	// #region clearAll
 	describe('clearAll', () => {
-		it('should clear all storage services', () => {
+		it('should clear auth and permisos from session storage', () => {
 			service.clearAll();
 
 			expect(sessionMock.clearAuth).toHaveBeenCalled();
 			expect(sessionMock.clearPermisos).toHaveBeenCalled();
+		});
+
+		it('should clear notifications storage', () => {
+			service.clearAll();
+
 			expect(notificationStorageMock.clearNotifications).toHaveBeenCalled();
+		});
+
+		it('should clear attendance preferences', () => {
+			service.clearAll();
+
 			expect(preferencesMock.clearAttendancePreferences).toHaveBeenCalled();
 		});
 	});

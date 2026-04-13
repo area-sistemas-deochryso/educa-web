@@ -17,17 +17,18 @@ import {
 	OverrideMiembroDto,
 	NOTA_MINIMA,
 	NOTA_MAXIMA,
-	esNotaEditable,
 	GrupoContenidoDto,
 	NotaRow,
 	GrupoNotaRow,
-	GrupoMiembroInfo,
-} from '../../../models';
-import {
-	getNotaSeverity as getNotaSeverityFn,
-	isNotaAprobada,
-} from '@intranet-shared/services/calificacion-config';
+} from '@features/intranet/pages/profesor/models';
+import { getNotaSeverity as getNotaSeverityFn } from '@intranet-shared/services/calificacion-config';
 import type { ConfiguracionCalificacionListDto } from '@data/models';
+import {
+	buildNotaRows,
+	buildGrupoNotaRows,
+	calcIndividualStats,
+	calcGrupoStats,
+} from './calificar-dialog.helpers';
 
 @Component({
 	selector: 'app-calificar-dialog',
@@ -102,51 +103,12 @@ export class CalificarDialogComponent {
 	readonly stats = computed(() => {
 		this._editVersion();
 		if (this.isGrupal()) return this.grupoStats();
-		const config = this.calificacionConfig();
-		const rows = this.notaRows();
-		const conNota = rows.filter((r) => r.nota !== null && r.nota !== undefined);
-		const promedio =
-			conNota.length > 0
-				? conNota.reduce((acc, r) => acc + (r.nota ?? 0), 0) / conNota.length
-				: 0;
-		const aprobados = conNota.filter((r) => isNotaAprobada(r.nota, config)).length;
-		const desaprobados = conNota.length - aprobados;
-		const sinCalificar = rows.filter((r) => r.nota === null || r.nota === undefined).length;
-		return {
-			total: rows.length,
-			conNota: conNota.length,
-			promedio,
-			aprobados,
-			desaprobados,
-			sinCalificar,
-		};
+		return calcIndividualStats(this.notaRows(), this.calificacionConfig());
 	});
 
 	private readonly grupoStats = computed(() => {
 		this._editVersion();
-		const config = this.calificacionConfig();
-		const rows = this.grupoNotaRows();
-		const conNota = rows.filter((r) => r.nota !== null && r.nota !== undefined);
-		const promedio =
-			conNota.length > 0
-				? conNota.reduce((acc, r) => acc + (r.nota ?? 0), 0) / conNota.length
-				: 0;
-		const aprobados = conNota.filter((r) => isNotaAprobada(r.nota, config)).length;
-		const desaprobados = conNota.length - aprobados;
-		const sinCalificar = rows.filter((r) => r.nota === null || r.nota === undefined).length;
-		const totalOverrides = rows.reduce(
-			(acc, r) => acc + r.miembros.filter((m) => m.esOverride).length,
-			0,
-		);
-		return {
-			total: rows.length,
-			conNota: conNota.length,
-			promedio,
-			aprobados,
-			desaprobados,
-			sinCalificar,
-			totalOverrides,
-		};
+		return calcGrupoStats(this.grupoNotaRows(), this.calificacionConfig());
 	});
 
 	readonly hasChanges = computed(() => {
@@ -159,67 +121,19 @@ export class CalificarDialogComponent {
 	// #endregion
 
 	constructor() {
-		// Build individual rows from calificacion + estudiantes
 		effect(() => {
 			const cal = this.calificacion();
 			const estudiantes = this.estudiantes();
 			if (!cal || cal.esGrupal || estudiantes.length === 0) return;
-
-			const rows: NotaRow[] = estudiantes.map((est) => {
-				const existingNota = cal.notas.find((n) => n.estudianteId === est.id);
-				return {
-					estudianteId: est.id,
-					estudianteNombre: est.nombre,
-					nota: existingNota?.nota ?? null,
-					observacion: existingNota?.observacion ?? '',
-					existingNotaId: existingNota?.id ?? null,
-					esEditable: existingNota ? esNotaEditable(existingNota.fechaCalificacion) : true,
-				};
-			});
-
-			this.notaRows.set(rows);
+			this.notaRows.set(buildNotaRows(cal, estudiantes));
 			this.searchQuery.set('');
 		});
 
-		// Build group rows from calificacion + grupos
 		effect(() => {
 			const cal = this.calificacion();
 			const grupos = this.grupos();
 			if (!cal || !cal.esGrupal || grupos.length === 0) return;
-
-			const rows: GrupoNotaRow[] = grupos.map((grupo) => {
-				// Find existing notas for this group's members
-				const miembros: GrupoMiembroInfo[] = grupo.estudiantes.map((est) => {
-					const existingNota = cal.notas.find((n) => n.estudianteId === est.estudianteId);
-					const isOverride = existingNota?.esOverride ?? false;
-					return {
-						estudianteId: est.estudianteId,
-						nombre: est.estudianteNombre,
-						notaActual: existingNota?.nota ?? null,
-						esOverride: isOverride,
-						overrideNota: isOverride ? (existingNota?.nota ?? null) : null,
-					};
-				});
-
-				// Derive group nota from a non-override member (the "group" nota)
-				const nonOverrideMember = miembros.find((m) => !m.esOverride && m.notaActual !== null);
-				const grupoNota = nonOverrideMember?.notaActual ?? null;
-
-				// Derive observacion from first nota with observacion
-				const firstNotaWithObs = cal.notas.find(
-					(n) => n.grupoId === grupo.id && n.observacion,
-				);
-
-				return {
-					grupoId: grupo.id,
-					grupoNombre: grupo.nombre,
-					nota: grupoNota,
-					observacion: firstNotaWithObs?.observacion ?? '',
-					miembros,
-				};
-			});
-
-			this.grupoNotaRows.set(rows);
+			this.grupoNotaRows.set(buildGrupoNotaRows(cal, grupos));
 			this.searchQuery.set('');
 		});
 	}

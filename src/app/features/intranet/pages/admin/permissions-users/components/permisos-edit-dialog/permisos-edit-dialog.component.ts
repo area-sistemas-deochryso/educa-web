@@ -15,7 +15,7 @@ import {
 
 import { ROLES_DISPONIBLES_ADMIN, RolTipoAdmin, UsuarioBusqueda } from '@core/services';
 import { UiMappingService } from '@shared/services';
-import { PermissionsUsersFacade } from '../../services/permisos-usuarios.facade';
+import { PermissionsUsersDataFacade, PermissionsUsersCrudFacade, PermissionsUsersUiFacade } from '../../services';
 
 @Component({
 	selector: 'app-permissions-edit-dialog',
@@ -35,7 +35,9 @@ import { PermissionsUsersFacade } from '../../services/permisos-usuarios.facade'
 	changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class PermissionsEditDialogComponent {
-	private facade = inject(PermissionsUsersFacade);
+	private data = inject(PermissionsUsersDataFacade);
+	private crud = inject(PermissionsUsersCrudFacade);
+	private ui = inject(PermissionsUsersUiFacade);
 	readonly uiMapping = inject(UiMappingService);
 
 	// #region Inputs / Outputs
@@ -45,18 +47,18 @@ export class PermissionsEditDialogComponent {
 	// #endregion
 
 	// #region Facade state
-	readonly isEditing = this.facade.isEditing;
-	readonly selectedPermiso = this.facade.selectedPermiso;
-	readonly selectedUsuarioId = this.facade.selectedUsuarioId;
-	readonly selectedRol = this.facade.selectedRol;
-	readonly selectedVistas = this.facade.selectedVistas;
-	readonly modulosVistas = this.facade.modulosVistas;
-	readonly activeModuloIndex = this.facade.activeModuloIndex;
-	readonly vistasBusqueda = this.facade.vistasBusqueda;
-	readonly vistasFiltradas = this.facade.vistasFiltradas;
-	readonly vistasCountLabel = this.facade.vistasCountLabel;
-	readonly isAllModuloSelected = this.facade.isAllModuloSelected;
-	readonly usuariosSugeridos = this.facade.usuariosSugeridos;
+	readonly isEditing = this.ui.isEditing;
+	readonly selectedPermiso = this.data.selectedPermiso;
+	readonly selectedUsuarioId = this.ui.selectedUsuarioId;
+	readonly selectedRol = this.data.selectedRol;
+	readonly selectedVistas = this.data.selectedVistas;
+	readonly modulosVistas = this.ui.modulosVistas;
+	readonly activeModuloIndex = this.ui.activeModuloIndex;
+	readonly vistasBusqueda = this.ui.vistasBusqueda;
+	readonly vistasFiltradas = this.ui.vistasFiltradas;
+	readonly vistasCountLabel = this.data.vistasCountLabel;
+	readonly isAllModuloSelected = this.ui.isAllModuloSelected;
+	readonly usuariosSugeridos = this.data.usuariosSugeridos;
 	// #endregion
 
 	// #region Local state
@@ -90,48 +92,48 @@ export class PermissionsEditDialogComponent {
 	}
 
 	onSelectedRolChange(rol: RolTipoAdmin | null): void {
-		this.facade.setSelectedRol(rol);
+		this.ui.setSelectedRol(rol);
 	}
 
 	onRolChange(): void {
 		this.selectedUsuario = null;
-		this.facade.loadVistasFromRol();
+		this.data.loadVistasFromRol();
 	}
 
 	onActiveModuloIndexChange(index: number): void {
-		this.facade.setActiveModuloIndex(index);
+		this.ui.setActiveModuloIndex(index);
 	}
 
 	onVistasBusquedaChange(term: string): void {
-		this.facade.setVistasBusqueda(term);
+		this.ui.setVistasBusqueda(term);
 	}
 
 	buscarUsuarios(event: AutoCompleteCompleteEvent): void {
 		const termino = event.query?.trim() || '';
-		this.facade.searchUsuarios(termino);
+		this.data.searchUsuarios(termino);
 	}
 
 	onUsuarioSeleccionado(event: AutoCompleteSelectEvent): void {
 		const usuario = event.value as UsuarioBusqueda;
 		this.selectedUsuario = usuario;
-		this.facade.setSelectedUsuarioId(usuario.id);
+		this.ui.setSelectedUsuarioId(usuario.id);
 	}
 
 	onUsuarioClear(): void {
 		this.selectedUsuario = null;
-		this.facade.setSelectedUsuarioId(null);
+		this.ui.setSelectedUsuarioId(null);
 	}
 
 	isVistaSelected(ruta: string): boolean {
-		return this.facade.isVistaSelected(ruta);
+		return this.crud.isVistaSelected(ruta);
 	}
 
 	toggleVista(ruta: string): void {
-		this.facade.toggleVista(ruta);
+		this.crud.toggleVista(ruta);
 	}
 
 	toggleAllVistasModulo(): void {
-		this.facade.toggleAllVistasModulo();
+		this.crud.toggleAllVistasModulo();
 	}
 
 	/** Reset local state when parent opens a new dialog */

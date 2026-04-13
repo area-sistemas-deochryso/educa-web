@@ -11,6 +11,8 @@ import { SalonCursoInfo, VistaPromedio, ActualizarGrupoDto } from '../models';
 import { ProfesorFacade } from '../services/profesor.facade';
 import { ProfesorSalonConEstudiantes } from '../services/profesor.store';
 import { GruposFacade } from './services/grupos.facade';
+import { HealthPermissionsFacade } from './services/health-permissions.facade';
+import { CreateHealthExitRequest } from '../models';
 import { SalonMensajeriaFacade } from '@features/intranet/pages/cross-role/mensajeria/services/mensajeria.facade';
 import { SalonEstudiantesDialogComponent } from './components/salon-estudiantes-dialog/salon-estudiantes-dialog.component';
 import { NotaSaveEvent } from './components/salon-notas-estudiante-tab/salon-notas-estudiante-tab.component';
@@ -160,6 +162,27 @@ import { NotaSaveEvent } from './components/salon-notas-estudiante-tab/salon-not
 			(gruposRefresh)="onGruposRefresh()"
 			(notasRefresh)="onNotasRefresh()"
 			(descargarBoletas)="onDescargarBoletas()"
+			[healthPermisosSalida]="healthVm().permisosSalida"
+			[healthJustificaciones]="healthVm().justificaciones"
+			[healthEstudiantes]="healthVm().estudiantes"
+			[healthEstudiantesConEntrada]="healthVm().estudiantesConEntrada"
+			[healthSintomas]="healthVm().sintomas"
+			[healthFechasValidacion]="healthVm().fechasValidacion"
+			[healthLoading]="healthVm().loading"
+			[healthSaving]="healthVm().saving"
+			[healthExitDialogVisible]="healthVm().exitDialogVisible"
+			[healthJustificationDialogVisible]="healthVm().justificationDialogVisible"
+			(healthTabActivated)="onHealthTabActivated()"
+			(healthOpenExitDialog)="healthFacade.openExitDialog()"
+			(healthOpenJustificationDialog)="healthFacade.openJustificationDialog()"
+			(healthExitDialogVisibleChange)="onHealthExitDialogVisibleChange($event)"
+			(healthJustificationDialogVisibleChange)="onHealthJustificationDialogVisibleChange($event)"
+			(healthSaveExitPermission)="onHealthSaveExitPermission($event)"
+			(healthSaveJustification)="onHealthSaveJustification($event)"
+			(healthAnularPermiso)="healthFacade.anularPermisoSalida($event)"
+			(healthAnularJustificacion)="healthFacade.anularJustificacion($event)"
+			(healthValidateDates)="healthFacade.validarFechas($event.estudianteId, $event.fechas)"
+			(healthConfirmDialogHide)="onHealthConfirmDialogHide()"
 		/>
 	`,
 })
@@ -169,11 +192,13 @@ export class TeacherClassroomsComponent implements OnInit {
 	private readonly router = inject(Router);
 	readonly gruposFacade = inject(GruposFacade);
 	private readonly mensajeriaFacade = inject(SalonMensajeriaFacade);
+	readonly healthFacade = inject(HealthPermissionsFacade);
 	// #endregion
 
 	// #region Estado
 	readonly vm = this.facade.vm;
 	readonly gruposVm = this.gruposFacade.vm;
+	readonly healthVm = this.healthFacade.vm;
 	gruposCursoId: number | null = null;
 	// #endregion
 
@@ -310,6 +335,37 @@ export class TeacherClassroomsComponent implements OnInit {
 		const salon = this.vm().selectedSalon;
 		if (!salon) return;
 		this.facade.descargarBoletaSalon(salon.salonId, salon.salonDescripcion);
+	}
+	// #endregion
+
+	// #region Health handlers
+	onHealthTabActivated(): void {
+		const salon = this.vm().selectedSalon;
+		if (!salon) return;
+		this.healthFacade.loadResumen(salon.salonId);
+	}
+
+	onHealthExitDialogVisibleChange(visible: boolean): void {
+		if (!visible) this.healthFacade.closeExitDialog();
+	}
+
+	onHealthJustificationDialogVisibleChange(visible: boolean): void {
+		if (!visible) this.healthFacade.closeJustificationDialog();
+	}
+
+	onHealthSaveExitPermission(event: { estudianteId: number; sintomas: string[]; sintomaDetalle?: string; observacion?: string }): void {
+		const salon = this.vm().selectedSalon;
+		if (!salon) return;
+		const dto: CreateHealthExitRequest = { ...event, salonId: salon.salonId };
+		this.healthFacade.crearPermisoSalida(dto);
+	}
+
+	onHealthSaveJustification(formData: FormData): void {
+		this.healthFacade.crearJustificacion(formData);
+	}
+
+	onHealthConfirmDialogHide(): void {
+		// No-op: confirmDialog cleanup handled by PrimeNG
 	}
 	// #endregion
 }

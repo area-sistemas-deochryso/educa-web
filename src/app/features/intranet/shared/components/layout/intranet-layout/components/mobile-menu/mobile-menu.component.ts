@@ -3,17 +3,19 @@ import {
 	ChangeDetectionStrategy,
 	Component,
 	DestroyRef,
+	ElementRef,
 	inject,
 	input,
 	output,
 	signal,
 	computed,
+	viewChild,
+	ViewEncapsulation,
 } from '@angular/core';
-import { Router, RouterLink, RouterLinkActive } from '@angular/router';
-import { QuickAccessFavoritesService } from '@intranet-shared/services';
+import { FormsModule } from '@angular/forms';
+import { Router, RouterLink } from '@angular/router';
 import { ModuloId } from '@shared/constants/module-registry';
 import { UserProfileMenuComponent } from '../user-profile-menu';
-
 // #endregion
 
 // #region Types
@@ -33,19 +35,24 @@ export interface ModuloMenu {
 	items: NavMenuItem[];
 }
 
-const VISIBLE_PILLS = 5;
-const VISIBLE_NAV = 3;
-const LONG_PRESS_MS = 400;
+type MobileViewMode = 'flat' | 'tree';
 
-function circularSlice<T>(items: T[], center: number, count: number): T[] {
-	const len = items.length;
-	if (len <= count) return [...items];
-	const half = Math.floor(count / 2);
-	const result: T[] = [];
-	for (let i = -half; i <= half; i++) {
-		result.push(items[((center + i) % len + len) % len]);
-	}
-	return result;
+interface MobileSearchResult {
+	label: string;
+	route: string;
+	icon: string;
+	moduloId: ModuloId;
+	moduloLabel: string;
+	moduloIcon: string;
+	groupLabel: string;
+	queryParams?: Record<string, string>;
+	keywords: string;
+}
+
+interface MobileTreeGroup {
+	moduloLabel: string;
+	moduloIcon: string;
+	sections: { label: string; items: MobileSearchResult[] }[];
 }
 // #endregion
 
@@ -54,58 +61,100 @@ function circularSlice<T>(items: T[], center: number, count: number): T[] {
 	selector: 'app-mobile-menu',
 	standalone: true,
 	changeDetection: ChangeDetectionStrategy.OnPush,
-	imports: [RouterLink, RouterLinkActive, UserProfileMenuComponent],
+	encapsulation: ViewEncapsulation.None,
+	imports: [FormsModule, RouterLink, UserProfileMenuComponent],
 	templateUrl: './mobile-menu.component.html',
 	styleUrl: './mobile-menu.component.scss',
 })
 export class MobileMenuComponent {
-	readonly favoritesService = inject(QuickAccessFavoritesService);
 	private router = inject(Router);
+	private destroyRef = inject(DestroyRef);
 
 	readonly modulos = input.required<ModuloMenu[]>();
 	logoutClick = output<void>();
 
-	isOpen = signal(false);
-
-	// #region Pills carousel
-	private readonly _selectedModuloId = signal<ModuloId>('inicio');
-	readonly selectedModuloId = this._selectedModuloId.asReadonly();
-
-	private readonly _pillCenter = signal(0);
-	readonly visiblePills = computed(() =>
-		circularSlice(this.modulos(), this._pillCenter(), VISIBLE_PILLS),
-	);
+	// #region Estado local
+	readonly isOpen = signal(false);
+	readonly searchTerm = signal('');
+	readonly viewMode = signal<MobileViewMode>('tree');
+	readonly searchInputRef = viewChild<ElementRef<HTMLInputElement>>('mobileSearchInput');
 	// #endregion
 
-	// #region Nav items carousel
-	private readonly _allItems = computed((): NavMenuItem[] => {
-		const id = this._selectedModuloId();
-		if (id === 'inicio') return [];
-		return this.modulos().find((m) => m.id === id)?.items ?? [];
+	// #region Computed — Flat index
+	private readonly allResults = computed((): MobileSearchResult[] => {
+		const results: MobileSearchResult[] = [];
+
+		for (const modulo of this.modulos()) {
+			if (modulo.id === 'inicio') continue;
+
+			for (const item of modulo.items) {
+				if (item.route) {
+					results.push(this.toResult(item, modulo, ''));
+				}
+				if (item.children) {
+					for (const child of item.children) {
+						if (child.route) {
+							results.push(this.toResult(child, modulo, item.label));
+						}
+					}
+				}
+			}
+		}
+
+		return results;
 	});
 
-	private readonly _navCenter = signal(0);
-	readonly visibleNavItems = computed(() =>
-		circularSlice(this._allItems(), this._navCenter(), VISIBLE_NAV),
-	);
-	// #endregion
+	readonly filteredResults = computed((): MobileSearchResult[] => {
+		const term = this.searchTerm().toLowerCase().trim();
+		if (!term) {
+			return [...this.allResults()].sort((a, b) => a.label.localeCompare(b.label, 'es'));
+		}
 
-	// #region Long-press preview
-	private readonly _previewModuloId = signal<ModuloId | null>(null);
-	readonly previewModuloId = this._previewModuloId.asReadonly();
-	private longPressTimer: ReturnType<typeof setTimeout> | null = null;
-	// #endregion
+		const words = term.split(/\s+/);
+		return this.allResults()
+			.map((r) => ({ result: r, score: this.score(r, words) }))
+			.filter((r) => r.score > 0)
+			.sort((a, b) => b.score - a.score)
+			.map((r) => r.result);
+	});
 
-	private destroyRef = inject(DestroyRef);
+	readonly treeGroups = computed((): MobileTreeGroup[] => {
+		const results = this.filteredResults();
+		const moduloMap = new Map<ModuloId, { label: string; icon: string; sections: Map<string, MobileSearchResult[]> }>();
+
+		for (const r of results) {
+			let entry = moduloMap.get(r.moduloId);
+			if (!entry) {
+				entry = { label: r.moduloLabel, icon: r.moduloIcon, sections: new Map() };
+				moduloMap.set(r.moduloId, entry);
+			}
+			const key = r.groupLabel || '(General)';
+			const items = entry.sections.get(key) ?? [];
+			items.push(r);
+			entry.sections.set(key, items);
+		}
+
+		return Array.from(moduloMap.values()).map((e) => ({
+			moduloLabel: e.label,
+			moduloIcon: e.icon,
+			sections: Array.from(e.sections.entries()).map(([label, items]) => ({ label, items })),
+		}));
+	});
+
+	readonly resultCount = computed(() => this.filteredResults().length);
+	readonly isSearching = computed(() => this.searchTerm().trim().length > 0);
+	// #endregion
 
 	constructor() {
 		this.destroyRef.onDestroy(() => this.unlockBodyScroll());
 	}
 
+	// #region Acciones
 	toggle(): void {
 		this.isOpen.update((v) => !v);
 		if (this.isOpen()) {
 			this.lockBodyScroll();
+			this.searchTerm.set('');
 		} else {
 			this.unlockBodyScroll();
 		}
@@ -113,61 +162,66 @@ export class MobileMenuComponent {
 
 	close(): void {
 		this.isOpen.set(false);
+		this.searchTerm.set('');
 		this.unlockBodyScroll();
 	}
 
-	selectModulo(id: ModuloId): void {
-		// Si el preview está abierto, solo cerrarlo (el tap-up no debe navegar).
-		if (this._previewModuloId() !== null) {
-			return;
-		}
-		this._selectedModuloId.set(id);
-		this._pillCenter.set(this.modulos().findIndex((m) => m.id === id));
-		this._navCenter.set(0);
-		if (id === 'inicio') {
-			this.router.navigate(['/intranet']);
-			this.close();
-		}
+	toggleViewMode(): void {
+		this.viewMode.update((m) => (m === 'flat' ? 'tree' : 'flat'));
 	}
 
-	onNavItemClick(item: NavMenuItem): void {
-		const idx = this._allItems().findIndex((i) => i.route === item.route);
-		if (idx >= 0) this._navCenter.set(idx);
+	onSearchChange(value: string): void {
+		this.searchTerm.set(value);
 	}
 
-	// #region Long-press handlers
-	onPillPressStart(id: ModuloId): void {
-		this.cancelLongPress();
-		this.longPressTimer = setTimeout(() => {
-			this._previewModuloId.set(id);
-		}, LONG_PRESS_MS);
+	selectResult(result: MobileSearchResult): void {
+		this.router.navigate([result.route], { queryParams: result.queryParams });
+		this.close();
 	}
 
-	onPillPressEnd(): void {
-		this.cancelLongPress();
-		// Cerrar preview con pequeño delay para que el click no dispare selectModulo.
-		if (this._previewModuloId() !== null) {
-			setTimeout(() => this._previewModuloId.set(null));
-		}
-	}
-
-	private cancelLongPress(): void {
-		if (this.longPressTimer) {
-			clearTimeout(this.longPressTimer);
-			this.longPressTimer = null;
-		}
-	}
-	// #endregion
-
-	onStarClick(event: Event, route: string): void {
-		event.preventDefault();
-		event.stopPropagation();
-		this.favoritesService.toggleFavorite(route);
+	goHome(): void {
+		this.router.navigate(['/intranet']);
+		this.close();
 	}
 
 	onLogout(): void {
 		this.close();
 		this.logoutClick.emit();
+	}
+	// #endregion
+
+	// #region Helpers privados
+	private toResult(
+		item: { route?: string; label: string; icon: string; queryParams?: Record<string, string> },
+		modulo: ModuloMenu,
+		groupLabel: string,
+	): MobileSearchResult {
+		const route = item.route!;
+		const routeExpanded = route.replace(/\//g, ' ').replace(/-/g, ' ');
+		const keywords = [item.label, modulo.label, groupLabel, route, routeExpanded].join(' ').toLowerCase();
+
+		return {
+			label: item.label,
+			route,
+			icon: item.icon,
+			moduloId: modulo.id,
+			moduloLabel: modulo.label,
+			moduloIcon: modulo.icon,
+			groupLabel,
+			queryParams: item.queryParams,
+			keywords,
+		};
+	}
+
+	private score(result: MobileSearchResult, words: string[]): number {
+		let total = 0;
+		for (const word of words) {
+			const labelMatch = result.label.toLowerCase().includes(word);
+			const keywordsMatch = result.keywords.includes(word);
+			if (!labelMatch && !keywordsMatch) return 0;
+			total += labelMatch ? 2 : 1;
+		}
+		return total;
 	}
 
 	private lockBodyScroll(): void {
@@ -177,5 +231,6 @@ export class MobileMenuComponent {
 	private unlockBodyScroll(): void {
 		document.body.style.overflow = '';
 	}
+	// #endregion
 }
 // #endregion

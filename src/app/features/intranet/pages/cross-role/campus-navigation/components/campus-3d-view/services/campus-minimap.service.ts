@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import type { CampusNode, PathResult } from '../../../models';
+import type { CampusNode, PathResult } from '@features/intranet/pages/cross-role/campus-navigation/models';
 import {
 	type PlayerState, type WorldData,
 	SCALE, ROOM_COLORS,

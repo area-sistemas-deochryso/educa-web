@@ -131,47 +131,6 @@
 	}
 }
 
-// #region Star button (favorites)
-.dropdown-item-row {
-	display: flex;
-	align-items: center;
-
-	.dropdown-item {
-		flex: 1;
-	}
-}
-
-.star-btn {
-	display: flex;
-	align-items: center;
-	justify-content: center;
-	width: 28px;
-	height: 28px;
-	border: none;
-	background: transparent;
-	cursor: pointer;
-	border-radius: 4px;
-	color: var(--text-color-secondary);
-	font-size: 0.85rem;
-	flex-shrink: 0;
-	transition: all 0.15s ease;
-
-	&:hover:not(:disabled) {
-		color: #d97706;
-		background-color: rgba(217, 119, 6, 0.1);
-	}
-
-	&.starred {
-		color: #d97706;
-	}
-
-	&:disabled {
-		opacity: 0.3;
-		cursor: not-allowed;
-	}
-}
-// #endregion
-
 .submenu-item {
 	width: 100%;
 	min-width: 150px;

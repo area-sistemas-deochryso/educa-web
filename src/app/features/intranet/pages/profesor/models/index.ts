@@ -5,4 +5,5 @@ export * from './calificar-dialog.models';
 export * from './grupo.models';
 export * from './attendance-course.models';
 export * from './mensajeria.models';
+export * from './health-permission.models';
 // #endregion

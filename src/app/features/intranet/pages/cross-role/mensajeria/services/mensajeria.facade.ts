@@ -267,7 +267,6 @@ export class SalonMensajeriaFacade {
 		this.wal.execute<EnviarMensajeResponseDto>({
 			operation: 'CREATE',
 			resourceType: 'Conversacion',
-			resourceId: conversacionId,
 			endpoint: `${this.conversacionUrl}/mensaje`,
 			method: 'POST',
 			payload: dto,
@@ -313,19 +312,26 @@ export class SalonMensajeriaFacade {
 			horarioId,
 		};
 
-		this.api
-			.crearConversacion(dto)
-			.pipe(takeUntilDestroyed(this.destroyRef))
-			.subscribe({
-				next: (response) => {
-					this.store.setForoConversacionId(response.conversacionId);
-					this.loadConversacionDetalle(response.conversacionId);
-				},
-				error: (err) => {
-					this.errHandler.handle(err, 'crear foro');
-					this.store.setForoLoading(false);
-				},
-			});
+		this.wal.execute({
+			operation: 'CREATE',
+			resourceType: 'Conversacion',
+			endpoint: `${this.conversacionUrl}/crear`,
+			method: 'POST',
+			payload: dto,
+			http$: () => this.api.crearConversacion(dto),
+			optimistic: {
+				apply: () => this.store.setForoLoading(true),
+				rollback: () => this.store.setForoLoading(false),
+			},
+			onCommit: (response) => {
+				this.store.setForoConversacionId(response.conversacionId);
+				this.loadConversacionDetalle(response.conversacionId);
+			},
+			onError: (err) => {
+				this.errHandler.handle(err, 'crear foro');
+				this.store.setForoLoading(false);
+			},
+		});
 	}
 
 	private loadConversacionDetalle(id: number): void {

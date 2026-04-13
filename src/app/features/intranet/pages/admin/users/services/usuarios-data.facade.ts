@@ -53,7 +53,7 @@ export class UsersDataFacade {
 		const page = this.store.page();
 		const pageSize = this.store.pageSize();
 		const rol = this.store.filterRol() ?? undefined;
-		const estado = this.store.filterEstado() ?? undefined;
+		const estado = (this.store.filterEstado() as boolean | null) ?? undefined;
 		const search = this.store.searchTerm() || undefined;
 		const salonId = this.store.filterSalonId() ?? undefined;
 
@@ -103,7 +103,7 @@ export class UsersDataFacade {
 				this.store.setSalones(salones);
 				this.store.setSalonesFilter(salones);
 
-				this.store.setUsuarios(usuarios.data);
+				this.store.setItems(usuarios.data);
 				this.store.setPaginationData(usuarios.page, usuarios.pageSize, usuarios.total);
 				this.store.setTableReady(true);
 				this.store.setLoading(false);
@@ -159,7 +159,7 @@ export class UsersDataFacade {
 	}
 
 	clearFilters(): void {
-		this.store.clearFilters();
+		this.store.clearFiltros();
 		this.refreshUsuariosOnly();
 	}
 
@@ -178,7 +178,7 @@ export class UsersDataFacade {
 		const page = this.store.page();
 		const pageSize = this.store.pageSize();
 		const rol = this.store.filterRol() ?? undefined;
-		const estado = this.store.filterEstado() ?? undefined;
+		const estado = (this.store.filterEstado() as boolean | null) ?? undefined;
 		const search = this.store.searchTerm() || undefined;
 		const salonId = this.store.filterSalonId() ?? undefined;
 
@@ -205,7 +205,7 @@ export class UsersDataFacade {
 				takeUntilDestroyed(this.destroyRef),
 			)
 			.subscribe((result) => {
-				this.store.setUsuarios(result.data);
+				this.store.setItems(result.data);
 				this.store.setPaginationData(result.page, result.pageSize, result.total);
 				if (!silent) {
 					this.store.setLoading(false);
@@ -251,7 +251,7 @@ export class UsersDataFacade {
 					const page = 1;
 					const pageSize = this.store.pageSize();
 					const rol = this.store.filterRol() ?? undefined;
-					const estado = this.store.filterEstado() ?? undefined;
+					const estado = (this.store.filterEstado() as boolean | null) ?? undefined;
 					const salonId = this.store.filterSalonId() ?? undefined;
 
 					return this.usuariosService
@@ -279,7 +279,7 @@ export class UsersDataFacade {
 				takeUntilDestroyed(this.destroyRef),
 			)
 			.subscribe((result) => {
-				this.store.setUsuarios(result.data);
+				this.store.setItems(result.data);
 				this.store.setPaginationData(result.page, result.pageSize, result.total);
 				this.store.setLoading(false);
 			});
@@ -315,10 +315,10 @@ export class UsersDataFacade {
 
 				if (data && typeof data === 'object' && 'data' in data && 'total' in data) {
 					const paginated = data as { data: UsuarioLista[]; total: number; page: number; pageSize: number };
-					this.store.setUsuarios(paginated.data);
+					this.store.setItems(paginated.data);
 					this.store.setPaginationData(paginated.page, paginated.pageSize, paginated.total);
 				} else if (Array.isArray(data)) {
-					this.store.setUsuarios(data);
+					this.store.setItems(data);
 				} else {
 					logger.warn('[UsuariosDataFacade] Formato de cache inesperado, ignorando');
 				}

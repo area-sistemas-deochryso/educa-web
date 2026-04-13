@@ -9,7 +9,7 @@ import { provideHttpClientTesting } from '@angular/common/http/testing';
 
 import { AttendanceApoderadoComponent } from './attendance-apoderado.component';
 import { AttendanceService, StorageService, HijoApoderado } from '@core/services';
-import { AttendanceDataService } from '../../../../services/attendance/attendance-data.service';
+import { AttendanceDataService } from '@features/intranet/services/attendance/attendance-data.service';
 
 // #endregion
 

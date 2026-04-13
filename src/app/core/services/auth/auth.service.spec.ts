@@ -7,7 +7,7 @@ import { of, throwError } from 'rxjs';
 import { AuthService } from './auth.service';
 import { AuthApiService } from './auth-api.service';
 import { StorageService } from '../storage';
-import { AuthUser, LoginResponse } from './auth.models';
+import { AuthUser, LoginResponse, StoredSession } from './auth.models';
 
 // #endregion
 
@@ -229,6 +229,61 @@ describe('AuthService', () => {
 			service.verifyToken().subscribe((isValid) => {
 				expect(isValid).toBe(true);
 			});
+		});
+	});
+	// #endregion
+
+	// #region cambiarContrasena
+	describe('cambiarContrasena', () => {
+		it('should delegate to API and return message', () => {
+			const dto = { contrasenaActual: 'old', nuevaContrasena: 'new' };
+			apiMock.cambiarContrasena = vi.fn().mockReturnValue(of({ mensaje: 'Contraseña actualizada' }));
+
+			service.cambiarContrasena(dto).subscribe((result) => {
+				expect(result.mensaje).toBe('Contraseña actualizada');
+			});
+
+			expect(apiMock.cambiarContrasena).toHaveBeenCalledWith(dto);
+		});
+	});
+	// #endregion
+
+	// #region Sessions (Multi-User)
+	describe('sessions', () => {
+		const mockSession: StoredSession = {
+			sessionId: 'sess-1',
+			nombreCompleto: 'Director Test',
+			rol: 'Director',
+			entityId: 10,
+			sedeId: 1,
+		};
+
+		it('should fetch sessions from API', () => {
+			apiMock.getSessions = vi.fn().mockReturnValue(of([mockSession]));
+
+			service.getSessions().subscribe((sessions) => {
+				expect(sessions).toHaveLength(1);
+				expect(sessions[0].nombreCompleto).toBe('Director Test');
+			});
+		});
+
+		it('should update auth state on switchSession', () => {
+			apiMock.switchSession = vi.fn().mockReturnValue(of(mockSession));
+
+			service.switchSession('sess-1').subscribe();
+
+			expect(service.isAuthenticated).toBe(true);
+			expect(service.currentUser?.rol).toBe('Director');
+			expect(service.currentUser?.entityId).toBe(10);
+			expect(storageMock.setUser).toHaveBeenCalled();
+		});
+
+		it('should delegate removeSession to API', () => {
+			apiMock.deleteSession = vi.fn().mockReturnValue(of(undefined));
+
+			service.removeSession('sess-1').subscribe();
+
+			expect(apiMock.deleteSession).toHaveBeenCalledWith('sess-1');
 		});
 	});
 	// #endregion

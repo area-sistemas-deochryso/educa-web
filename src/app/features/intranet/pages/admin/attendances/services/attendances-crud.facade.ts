@@ -10,12 +10,18 @@ import {
 	CrearSalidaManualRequest,
 	ActualizarHorasRequest,
 	AsistenciaAdminLista,
-	CrearCierreMensualRequest,
-	RevertirCierreMensualRequest,
 } from '../models';
 import { AttendancesAdminService } from './attendances-admin.service';
 import { AttendancesAdminStore } from './attendances-admin.store';
 import { AttendancesDataFacade } from './attendances-data.facade';
+import {
+	applyActualizarHorasDelta,
+	applyItemStatsDelta,
+	applySalidaTransitionDelta,
+} from './attendances-stats-helpers';
+
+const RESOURCE = 'asistencia-admin';
+const API_BASE = `${environment.apiUrl}/api/asistencia-admin`;
 
 @Injectable({ providedIn: 'root' })
 export class AttendancesCrudFacade {
@@ -47,7 +53,7 @@ export class AttendancesCrudFacade {
 
 	// #endregion
 
-	// #region Crear entrada
+	// #region Crear entrada (CREATE optimista)
 
 	private crearEntrada(): void {
 		const fd = this.store.formData();
@@ -60,65 +66,94 @@ export class AttendancesCrudFacade {
 			observacion: fd.observacion || undefined,
 		};
 
-		this.store.closeDialog();
-
-		this.api
-			.crearEntrada(dto)
-			.pipe(takeUntilDestroyed(this.destroyRef))
-			.subscribe({
-				next: () => {
-					this.dataFacade.refreshItemsOnly();
-					this.dataFacade.loadEstadisticas();
-				},
-				error: (err) => {
-					logger.error('Error al crear entrada:', err);
-					this.errorHandler.showError('Error', 'No se pudo registrar la entrada');
-				},
-			});
+		this.wal.execute({
+			operation: 'CREATE',
+			resourceType: RESOURCE,
+			endpoint: `${API_BASE}/entrada`,
+			method: 'POST',
+			payload: dto,
+			http$: () => this.api.crearEntrada(dto),
+			optimistic: {
+				apply: () => this.store.closeDialog(),
+				rollback: () => {},
+			},
+			onCommit: (created) => {
+				if (!created) return;
+				this.store.addItem(created);
+				applyItemStatsDelta(this.store,created, 1);
+			},
+			onError: (err) => {
+				logger.error('Error al crear entrada:', err);
+				this.errorHandler.showError('Error', 'No se pudo registrar la entrada');
+			},
+		});
 	}
 
 	// #endregion
 
-	// #region Crear salida
+	// #region Crear salida (UPDATE optimista — agrega salida a registro existente)
 
 	private crearSalida(): void {
 		const fd = this.store.formData();
 		if (!fd.asistenciaId || !fd.horaSalida) return;
 
+		const asistenciaId = fd.asistenciaId;
+		const snapshot = this.store.items().find((i) => i.asistenciaId === asistenciaId);
+		const horaSalidaIso = fd.horaSalida.toISOString();
+		const observacion = fd.observacion || undefined;
+
 		const dto: CrearSalidaManualRequest = {
-			asistenciaId: fd.asistenciaId,
-			horaSalida: fd.horaSalida.toISOString(),
-			observacion: fd.observacion || undefined,
+			asistenciaId,
+			horaSalida: horaSalidaIso,
+			observacion,
 		};
 
-		this.store.closeDialog();
-
-		this.api
-			.crearSalida(dto)
-			.pipe(takeUntilDestroyed(this.destroyRef))
-			.subscribe({
-				next: (result) => {
-					if (result) {
-						this.store.updateItem(fd.asistenciaId!, {
-							horaSalida: result.horaSalida,
-							estado: result.estado,
-							origenManual: true,
-						});
-						this.store.incrementarEstadistica('completas', 1);
-						this.store.incrementarEstadistica('incompletas', -1);
-						this.store.incrementarEstadistica('registrosManuales', 1);
-					}
+		this.wal.execute({
+			operation: 'UPDATE',
+			resourceType: RESOURCE,
+			resourceId: asistenciaId,
+			endpoint: `${API_BASE}/salida`,
+			method: 'POST',
+			payload: dto,
+			http$: () => this.api.crearSalida(dto),
+			optimistic: {
+				apply: () => {
+					this.store.updateItem(asistenciaId, {
+						horaSalida: horaSalidaIso,
+						estado: 'Completa',
+						origenManual: true,
+						editadoManualmente: true,
+						observacion: observacion ?? snapshot?.observacion ?? null,
+					});
+					applySalidaTransitionDelta(this.store,snapshot, 1);
+					this.store.closeDialog();
 				},
-				error: (err) => {
-					logger.error('Error al crear salida:', err);
-					this.errorHandler.showError('Error', 'No se pudo registrar la salida');
+				rollback: () => {
+					if (!snapshot) return;
+					this.store.updateItem(asistenciaId, snapshot);
+					applySalidaTransitionDelta(this.store,snapshot, -1);
 				},
-			});
+			},
+			onCommit: (result) => {
+				if (!result) return;
+				this.store.updateItem(asistenciaId, {
+					horaSalida: result.horaSalida,
+					estado: result.estado,
+					rowVersion: result.rowVersion,
+					origenManual: true,
+					editadoManualmente: true,
+				});
+			},
+			onError: (err) => {
+				logger.error('Error al crear salida:', err);
+				this.errorHandler.showError('Error', 'No se pudo registrar la salida');
+			},
+		});
 	}
 
 	// #endregion
 
-	// #region Crear completa
+	// #region Crear completa (CREATE optimista)
 
 	private crearCompleta(): void {
 		const fd = this.store.formData();
@@ -132,31 +167,40 @@ export class AttendancesCrudFacade {
 			observacion: fd.observacion || undefined,
 		};
 
-		this.store.closeDialog();
-
-		this.api
-			.crearCompleta(dto)
-			.pipe(takeUntilDestroyed(this.destroyRef))
-			.subscribe({
-				next: () => {
-					this.dataFacade.refreshItemsOnly();
-					this.dataFacade.loadEstadisticas();
-				},
-				error: (err) => {
-					logger.error('Error al crear asistencia completa:', err);
-					this.errorHandler.showError('Error', 'No se pudo registrar la asistencia');
-				},
-			});
+		this.wal.execute({
+			operation: 'CREATE',
+			resourceType: RESOURCE,
+			endpoint: `${API_BASE}/completa`,
+			method: 'POST',
+			payload: dto,
+			http$: () => this.api.crearCompleta(dto),
+			optimistic: {
+				apply: () => this.store.closeDialog(),
+				rollback: () => {},
+			},
+			onCommit: (created) => {
+				if (!created) return;
+				this.store.addItem(created);
+				applyItemStatsDelta(this.store,created, 1);
+			},
+			onError: (err) => {
+				logger.error('Error al crear asistencia completa:', err);
+				this.errorHandler.showError('Error', 'No se pudo registrar la asistencia');
+			},
+		});
 	}
 
 	// #endregion
 
-	// #region Actualizar horas
+	// #region Actualizar horas (UPDATE optimista con snapshot)
 
 	private actualizarHoras(): void {
 		const fd = this.store.formData();
 		const selected = this.store.selectedItem();
 		if (!selected) return;
+
+		const asistenciaId = selected.asistenciaId;
+		const snapshot = this.store.items().find((i) => i.asistenciaId === asistenciaId) ?? selected;
 
 		// Si tenía salida y ahora no, indicar al backend que la limpie
 		const teniaHoraSalida = !!selected.horaSalida;
@@ -172,75 +216,92 @@ export class AttendancesCrudFacade {
 			return combined.toISOString();
 		};
 
+		const horaEntradaIso = combinarFechaHora(fd.horaEntrada);
+		const horaSalidaIso = combinarFechaHora(fd.horaSalida);
+		const observacion = fd.observacion || undefined;
+
 		const dto: ActualizarHorasRequest = {
-			horaEntrada: combinarFechaHora(fd.horaEntrada),
-			horaSalida: combinarFechaHora(fd.horaSalida),
+			horaEntrada: horaEntradaIso,
+			horaSalida: horaSalidaIso,
 			limpiarSalida: limpiarSalida || undefined,
-			observacion: fd.observacion || undefined,
+			observacion,
 			rowVersion: selected.rowVersion,
 		};
 
-		this.store.closeDialog();
+		const nuevoEstado: 'Completa' | 'Incompleta' = horaSalidaIso ? 'Completa' : 'Incompleta';
 
-		this.api
-			.actualizarHoras(selected.asistenciaId, dto)
-			.pipe(takeUntilDestroyed(this.destroyRef))
-			.subscribe({
-				next: (result) => {
-					if (result) {
-						this.store.updateItem(selected.asistenciaId, {
-							horaEntrada: result.horaEntrada,
-							horaSalida: result.horaSalida,
-							estado: result.estado,
-							observacion: result.observacion,
-							origenManual: true,
-							rowVersion: result.rowVersion,
-						});
-					}
+		this.wal.execute({
+			operation: 'UPDATE',
+			resourceType: RESOURCE,
+			resourceId: asistenciaId,
+			endpoint: `${API_BASE}/${asistenciaId}/horas`,
+			method: 'PUT',
+			payload: dto,
+			http$: () => this.api.actualizarHoras(asistenciaId, dto),
+			optimistic: {
+				apply: () => {
+					this.store.updateItem(asistenciaId, {
+						horaEntrada: horaEntradaIso ?? snapshot.horaEntrada,
+						horaSalida: limpiarSalida ? null : horaSalidaIso ?? snapshot.horaSalida,
+						estado: nuevoEstado,
+						observacion: observacion ?? snapshot.observacion,
+						origenManual: true,
+						editadoManualmente: true,
+					});
+					applyActualizarHorasDelta(this.store,snapshot, nuevoEstado, 1);
+					this.store.closeDialog();
 				},
-				error: (err) => {
-					logger.error('Error al actualizar horas:', err);
-					this.errorHandler.showError('Error', 'No se pudo actualizar las horas');
+				rollback: () => {
+					this.store.updateItem(asistenciaId, snapshot);
+					applyActualizarHorasDelta(this.store,snapshot, nuevoEstado, -1);
 				},
-			});
+			},
+			onCommit: (result) => {
+				if (!result) return;
+				this.store.updateItem(asistenciaId, {
+					horaEntrada: result.horaEntrada,
+					horaSalida: result.horaSalida,
+					estado: result.estado,
+					observacion: result.observacion,
+					rowVersion: result.rowVersion,
+					origenManual: true,
+					editadoManualmente: true,
+				});
+			},
+			onError: (err) => {
+				logger.error('Error al actualizar horas:', err);
+				this.errorHandler.showError('Error', 'No se pudo actualizar las horas');
+			},
+		});
 	}
 
 	// #endregion
 
-	// #region Eliminar
+	// #region Eliminar (DELETE optimista con snapshot)
 
 	delete(item: AsistenciaAdminLista): void {
 		this.wal.execute({
 			operation: 'DELETE',
-			resourceType: 'asistencia-admin',
+			resourceType: RESOURCE,
 			resourceId: item.asistenciaId,
-			endpoint: `${environment.apiUrl}/api/asistencia-admin/${item.asistenciaId}`,
+			endpoint: `${API_BASE}/${item.asistenciaId}`,
 			method: 'DELETE',
 			payload: null,
 			http$: () => this.api.eliminar(item.asistenciaId),
+			optimistic: {
+				apply: () => {
+					this.store.removeItem(item.asistenciaId);
+					applyItemStatsDelta(this.store,item, -1);
+				},
+				rollback: () => {
+					this.store.addItem(item);
+					applyItemStatsDelta(this.store,item, 1);
+				},
+			},
 			onCommit: () => {},
 			onError: (err) => {
 				logger.error('Error al eliminar asistencia:', err);
 				this.errorHandler.showError('Error', 'No se pudo eliminar el registro');
-			},
-			optimistic: {
-				apply: () => {
-					this.store.removeItem(item.asistenciaId);
-					this.store.incrementarEstadistica('totalRegistros', -1);
-					if (item.estado === 'Completa') {
-						this.store.incrementarEstadistica('completas', -1);
-					} else {
-						this.store.incrementarEstadistica('incompletas', -1);
-					}
-					if (item.origenManual) {
-						this.store.incrementarEstadistica('registrosManuales', -1);
-					} else {
-						this.store.incrementarEstadistica('registrosWebhook', -1);
-					}
-				},
-				rollback: () => {
-					this.dataFacade.loadData();
-				},
 			},
 		});
 	}
@@ -271,44 +332,6 @@ export class AttendancesCrudFacade {
 					this.store.setEnviandoCorreos(false);
 					logger.error('Error al enviar correos masivos:', err);
 					this.errorHandler.showError('Error', 'No se pudieron enviar los correos');
-				},
-			});
-	}
-
-	// #endregion
-
-	// #region Cierres mensuales
-
-	crearCierre(dto: CrearCierreMensualRequest): void {
-		this.api
-			.crearCierre(dto)
-			.pipe(takeUntilDestroyed(this.destroyRef))
-			.subscribe({
-				next: (cierre) => {
-					if (cierre) {
-						this.store.addCierre(cierre);
-					}
-				},
-				error: (err) => {
-					logger.error('Error al crear cierre:', err);
-					this.errorHandler.showError('Error', 'No se pudo cerrar el mes');
-				},
-			});
-	}
-
-	revertirCierre(cierreId: number, dto: RevertirCierreMensualRequest): void {
-		this.api
-			.revertirCierre(cierreId, dto)
-			.pipe(takeUntilDestroyed(this.destroyRef))
-			.subscribe({
-				next: (result) => {
-					if (result) {
-						this.store.updateCierre(cierreId, { activo: false, observacion: result.observacion });
-					}
-				},
-				error: (err) => {
-					logger.error('Error al revertir cierre:', err);
-					this.errorHandler.showError('Error', 'No se pudo revertir el cierre');
 				},
 			});
 	}

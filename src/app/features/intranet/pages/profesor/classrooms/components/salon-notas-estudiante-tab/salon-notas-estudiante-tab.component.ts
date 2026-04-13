@@ -7,7 +7,7 @@ import { FormsModule } from '@angular/forms';
 import { SkeletonModule } from 'primeng/skeleton';
 import { ButtonModule } from 'primeng/button';
 import { InputTextModule } from 'primeng/inputtext';
-import { SalonNotasResumenDto, calcularPromedioPonderado, NOTA_MAXIMA } from '../../../models';
+import { SalonNotasResumenDto, calcularPromedioPonderado, NOTA_MAXIMA } from '@features/intranet/pages/profesor/models';
 import { getNotaSeverity, formatNotaConConfig } from '@intranet-shared/services/calificacion-config';
 import type { ConfiguracionCalificacionListDto } from '@data/models';
 

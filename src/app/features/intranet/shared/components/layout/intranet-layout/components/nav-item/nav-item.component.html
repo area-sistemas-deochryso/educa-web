@@ -22,30 +22,16 @@
 						</div>
 					} @else {
 						<!-- * Leaf link inside dropdown. -->
-						<div class="dropdown-item-row">
-							<a
-								[routerLink]="child.route"
-								[queryParams]="child.queryParams"
-								routerLinkActive="active"
-								[routerLinkActiveOptions]="{ exact: child.exact ?? false }"
-								class="dropdown-item"
-							>
-								<i [class]="child.icon"></i>
-								<span>{{ child.label }}</span>
-							</a>
-							@if (favoritesService.isPersonalizing() && child.route) {
-								<button
-									type="button"
-									class="star-btn"
-									[class.starred]="favoritesService.isFavorite(child.route)"
-									[disabled]="!favoritesService.isFavorite(child.route) && !favoritesService.canAddMore()"
-									(click)="onStarClick($event, child.route)"
-									[attr.aria-label]="favoritesService.isFavorite(child.route) ? 'Quitar de accesos rápidos' : 'Agregar a accesos rápidos'"
-								>
-									<i [class]="favoritesService.isFavorite(child.route) ? 'pi pi-star-fill' : 'pi pi-star'"></i>
-								</button>
-							}
-						</div>
+						<a
+							[routerLink]="child.route"
+							[queryParams]="child.queryParams"
+							routerLinkActive="active"
+							[routerLinkActiveOptions]="{ exact: child.exact ?? false }"
+							class="dropdown-item"
+						>
+							<i [class]="child.icon"></i>
+							<span>{{ child.label }}</span>
+						</a>
 					}
 				}
 			</div>

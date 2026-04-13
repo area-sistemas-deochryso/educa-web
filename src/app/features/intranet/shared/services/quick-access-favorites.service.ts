@@ -20,26 +20,16 @@ export class QuickAccessFavoritesService {
 	private prefs = inject(StorageService);
 
 	// #region Estado privado
-	private readonly _isPersonalizing = signal(false);
 	private readonly _favoriteRoutes = signal<string[]>(this.prefs.getFavoriteRoutes());
 	// #endregion
 
 	// #region Lecturas públicas
-	readonly isPersonalizing = this._isPersonalizing.asReadonly();
 	readonly favoriteRoutes = this._favoriteRoutes.asReadonly();
 	readonly hasFavorites = computed(() => this._favoriteRoutes().length > 0);
 	readonly canAddMore = computed(() => this._favoriteRoutes().length < MAX_QUICK_ACCESS);
 	// #endregion
 
 	// #region Comandos
-	togglePersonalizing(): void {
-		this._isPersonalizing.update((v) => !v);
-	}
-
-	stopPersonalizing(): void {
-		this._isPersonalizing.set(false);
-	}
-
 	isFavorite(route: string): boolean {
 		return this._favoriteRoutes().includes(route);
 	}

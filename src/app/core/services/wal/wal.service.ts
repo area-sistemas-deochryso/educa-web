@@ -344,6 +344,19 @@ export class WalService {
 	}
 
 	/**
+	 * Remove ALL entries of a specific resource type from IndexedDB.
+	 * One-time cleanup for entries that migrated from optimistic to server-confirmed
+	 * and should never have been in the WAL.
+	 */
+	async purgeByResourceType(resourceType: string): Promise<number> {
+		const purged = await this.db.purgeByResourceType(resourceType);
+		if (purged > 0) {
+			logger.log(`[WAL] Purged ${purged} entries for resourceType "${resourceType}"`);
+		}
+		return purged;
+	}
+
+	/**
 	 * Reset IN_FLIGHT entries back to PENDING after restart.
 	 *
 	 * @returns Number of entries recovered.

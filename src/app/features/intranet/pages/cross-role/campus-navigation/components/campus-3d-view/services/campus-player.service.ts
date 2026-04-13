@@ -1,6 +1,6 @@
 import { inject, Injectable } from '@angular/core';
 import * as THREE from 'three';
-import type { CampusNode } from '../../../models';
+import type { CampusNode } from '@features/intranet/pages/cross-role/campus-navigation/models';
 import {
 	type PlayerState, type WorldData, type LabelEntry,
 	type PlayerUpdateResult, type ClosestNodeResult,

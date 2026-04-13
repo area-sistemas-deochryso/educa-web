@@ -1,7 +1,7 @@
 import { Component, ChangeDetectionStrategy, input, output, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { DialogModule } from 'primeng/dialog';
-import { CursoContenidoSemanaDto } from '../../../models';
+import { CursoContenidoSemanaDto } from '@features/intranet/pages/profesor/models';
 
 @Component({
 	selector: 'app-tareas-summary-dialog',

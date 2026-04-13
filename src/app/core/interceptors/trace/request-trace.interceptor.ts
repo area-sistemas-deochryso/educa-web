@@ -39,6 +39,14 @@ export const requestTraceInterceptor: HttpInterceptorFn = (req, next) => {
 		setHeaders: { 'X-Request-Id': requestId },
 	});
 
+	// Skip tracking requestIds for the feedback endpoint itself — when the user
+	// submits a manual report we want the LAST correlation id from OTHER requests,
+	// not the id of the feedback POST we're about to send.
+	const isFeedbackEndpoint = tracedReq.url.includes('/api/sistema/reportes-usuario');
+	if (!isFeedbackEndpoint) {
+		trace.trackLastRequestId(requestId);
+	}
+
 	const startedAtPerf = performance.now();
 
 	// Skip breadcrumb tracking for the error reporter itself to avoid loops

@@ -1,0 +1,74 @@
+<!-- #region Template -->
+<div class="widget-card">
+	<div class="widget-header">
+		<div class="widget-title">
+			<i class="pi pi-users"></i>
+			<h3>Asistencia de Hoy</h3>
+			@if (salonLabel()) {
+				<span class="salon-badge">{{ salonLabel() }}</span>
+			}
+		</div>
+		<a routerLink="/intranet/profesor/asistencia" class="widget-link"
+			>Ver detalle <i class="pi pi-arrow-right"></i
+		></a>
+	</div>
+
+	@if (loading()) {
+		<div class="widget-skeleton">
+			<app-skeleton-loader variant="rect" width="100%" height="64px" />
+			<div class="skeleton-bars">
+				<app-skeleton-loader variant="rect" width="100%" height="24px" />
+				<app-skeleton-loader variant="rect" width="80%" height="24px" />
+			</div>
+		</div>
+	} @else if (stats()) {
+		<div class="widget-body">
+			<div class="main-stat">
+				<span class="main-number">{{ presentes() }}</span>
+				<span class="main-separator">/</span>
+				<span class="main-total">{{ stats()!.total }}</span>
+				<span class="main-label">presentes</span>
+			</div>
+			<div class="percentage" [class]="percentageClass()">{{ porcentaje() }}%</div>
+		</div>
+
+		<div class="stat-bars">
+			<div class="stat-bar">
+				<span class="bar-label">Asistió</span>
+				<div class="bar-track">
+					<div
+						class="bar-fill bar-asistio"
+						[style.width.%]="barPercent(stats()!.asistio)"
+					></div>
+				</div>
+				<span class="bar-value">{{ stats()!.asistio }}</span>
+			</div>
+			<div class="stat-bar">
+				<span class="bar-label">Tardanza</span>
+				<div class="bar-track">
+					<div
+						class="bar-fill bar-tardanza"
+						[style.width.%]="barPercent(stats()!.tardanza)"
+					></div>
+				</div>
+				<span class="bar-value">{{ stats()!.tardanza }}</span>
+			</div>
+			<div class="stat-bar">
+				<span class="bar-label">Falta</span>
+				<div class="bar-track">
+					<div
+						class="bar-fill bar-falta"
+						[style.width.%]="barPercent(stats()!.falta)"
+					></div>
+				</div>
+				<span class="bar-value">{{ stats()!.falta }}</span>
+			</div>
+		</div>
+	} @else {
+		<div class="widget-empty">
+			<i class="pi pi-info-circle"></i>
+			<span>Sin datos de asistencia para hoy</span>
+		</div>
+	}
+</div>
+<!-- #endregion -->

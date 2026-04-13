@@ -3,7 +3,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { SelectModule } from 'primeng/select';
 import { TagModule } from 'primeng/tag';
-import { GruposResumenDto } from '../../../models';
+import { GruposResumenDto } from '@features/intranet/pages/estudiante/models';
 
 @Component({
 	selector: 'app-estudiante-grupos-tab',

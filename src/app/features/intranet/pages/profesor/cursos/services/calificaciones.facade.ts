@@ -111,7 +111,10 @@ export class CalificacionesFacade {
 		});
 	}
 
-	/** Batch-grade students with WAL → refetch on commit to get updated notas. */
+	/**
+	 * Batch-grade students → server-confirmed (INV-C04: promedios recalculados server-side,
+	 * optimistic local imposible sin duplicar lógica de ponderación).
+	 */
 	calificarLote(calificacionId: number, dto: CalificarLoteDto, contenidoId: number): void {
 		this.store.setSaving(true);
 
@@ -122,13 +125,14 @@ export class CalificacionesFacade {
 			endpoint: `${this.calificacionUrl}/${calificacionId}/calificar`,
 			method: 'POST',
 			payload: dto,
+			consistencyLevel: 'server-confirmed',
 			http$: () => this.api.calificarLote(calificacionId, dto),
 			onCommit: () => {
 				this.refreshCalificaciones(contenidoId);
 				this.store.closeCalificarDialog();
 			},
 			onError: (err) => {
-				this.errHandler.handle(err,'calificar estudiantes');
+				this.errHandler.handle(err, 'calificar estudiantes');
 				this.store.setSaving(false);
 			},
 			optimistic: {
@@ -138,7 +142,10 @@ export class CalificacionesFacade {
 		});
 	}
 
-	/** Batch-grade by groups with WAL → refetch on commit. */
+	/**
+	 * Batch-grade by groups → server-confirmed (INV-C04: promedios recalculados server-side,
+	 * estructura de notas grupales no replicable localmente).
+	 */
 	calificarGruposLote(calificacionId: number, dto: CalificarGruposLoteDto, contenidoId: number): void {
 		this.store.setSaving(true);
 
@@ -149,13 +156,14 @@ export class CalificacionesFacade {
 			endpoint: `${this.grupoUrl}/${calificacionId}/calificar-grupos`,
 			method: 'POST',
 			payload: dto,
+			consistencyLevel: 'server-confirmed',
 			http$: () => this.api.calificarGruposLote(calificacionId, dto),
 			onCommit: () => {
 				this.refreshCalificaciones(contenidoId);
 				this.store.closeCalificarDialog();
 			},
 			onError: (err) => {
-				this.errHandler.handle(err,'calificar grupos');
+				this.errHandler.handle(err, 'calificar grupos');
 				this.store.setSaving(false);
 			},
 			optimistic: {
@@ -165,7 +173,10 @@ export class CalificacionesFacade {
 		});
 	}
 
-	/** Update individual grade with WAL (2-month rule enforced by backend). */
+	/**
+	 * Update individual grade → server-confirmed (INV-C04: promedios por semana/periodo
+	 * se recalculan server-side; INV-T04: ventana de 2 meses validada por backend).
+	 */
 	actualizarNota(notaId: number, dto: ActualizarNotaDto, contenidoId: number): void {
 		this.store.setSaving(true);
 
@@ -176,12 +187,13 @@ export class CalificacionesFacade {
 			endpoint: `${this.calificacionUrl}/nota/${notaId}`,
 			method: 'PUT',
 			payload: dto,
+			consistencyLevel: 'server-confirmed',
 			http$: () => this.api.actualizarNota(notaId, dto),
 			onCommit: () => {
 				this.refreshCalificaciones(contenidoId);
 			},
 			onError: (err) => {
-				this.errHandler.handle(err,'actualizar nota');
+				this.errHandler.handle(err, 'actualizar nota');
 				this.store.setSaving(false);
 			},
 			optimistic: {
@@ -222,9 +234,12 @@ export class CalificacionesFacade {
 		});
 	}
 
-	/** Change evaluation type (individual ↔ grupal) with WAL. */
+	/**
+	 * Change evaluation type (individual ↔ grupal) → server-confirmed.
+	 * Reestructura notas internas (individuales ↔ grupos); el shape del resultado
+	 * no es predecible localmente sin duplicar la lógica del backend.
+	 */
 	cambiarTipo(calificacionId: number, dto: CambiarTipoCalificacionDto): void {
-		const snapshot = this.store.calificaciones().find((c) => c.id === calificacionId);
 		this.store.setSaving(true);
 
 		this.wal.execute<CalificacionConNotasDto>({
@@ -234,20 +249,19 @@ export class CalificacionesFacade {
 			endpoint: `${this.calificacionUrl}/${calificacionId}/tipo`,
 			method: 'PUT',
 			payload: dto,
+			consistencyLevel: 'server-confirmed',
 			http$: () => this.api.cambiarTipoCalificacion(calificacionId, dto),
 			onCommit: (cal) => {
 				this.store.replaceCalificacion(cal);
 				this.store.setSaving(false);
 			},
 			onError: (err) => {
-				this.errHandler.handle(err,'cambiar tipo de evaluación');
+				this.errHandler.handle(err, 'cambiar tipo de evaluación');
 				this.store.setSaving(false);
 			},
 			optimistic: {
 				apply: () => {},
-				rollback: () => {
-					if (snapshot) this.store.replaceCalificacion(snapshot);
-				},
+				rollback: () => {},
 			},
 		});
 	}
@@ -271,12 +285,8 @@ export class CalificacionesFacade {
 				this.store.setSaving(false);
 			},
 			onError: (err) => {
-				this.errHandler.handle(err,'crear periodo');
+				this.errHandler.handle(err, 'crear periodo');
 				this.store.setSaving(false);
-			},
-			optimistic: {
-				apply: () => {},
-				rollback: () => {},
 			},
 		});
 	}
@@ -314,46 +324,25 @@ export class CalificacionesFacade {
 	// #endregion
 
 	// #region Comandos de UI
-	openCalificacionDialog(editing: CalificacionDto | null = null): void {
-		this.store.openCalificacionDialog(editing);
-	}
-
-	closeCalificacionDialog(): void {
-		this.store.closeCalificacionDialog();
-	}
+	openCalificacionDialog(editing: CalificacionDto | null = null): void { this.store.openCalificacionDialog(editing); }
+	closeCalificacionDialog(): void { this.store.closeCalificacionDialog(); }
+	closeCalificarDialog(): void { this.store.closeCalificarDialog(); }
+	openPeriodosDialog(): void { this.store.openPeriodosDialog(); }
+	closePeriodosDialog(): void { this.store.closePeriodosDialog(); }
+	resetCalificaciones(): void { this.store.reset(); }
 
 	openCalificarDialog(cal: CalificacionConNotasDto): void {
 		this.store.openCalificarDialog(cal);
-
-		// Load groups if grupal evaluation
-		if (cal.esGrupal) {
-			const contenido = this.contenidoStore.contenido();
-			if (contenido) {
-				this.api
-					.getGrupos(contenido.id)
-					.pipe(takeUntilDestroyed(this.destroyRef))
-					.subscribe({
-						next: (resumen) => this.store.setGruposForCalificar(resumen.grupos),
-						error: (err) => this.errHandler.handle(err,'cargar grupos'),
-					});
-			}
-		}
-	}
-
-	closeCalificarDialog(): void {
-		this.store.closeCalificarDialog();
-	}
-
-	openPeriodosDialog(): void {
-		this.store.openPeriodosDialog();
-	}
-
-	closePeriodosDialog(): void {
-		this.store.closePeriodosDialog();
-	}
-
-	resetCalificaciones(): void {
-		this.store.reset();
+		if (!cal.esGrupal) return;
+		const contenido = this.contenidoStore.contenido();
+		if (!contenido) return;
+		this.api
+			.getGrupos(contenido.id)
+			.pipe(takeUntilDestroyed(this.destroyRef))
+			.subscribe({
+				next: (resumen) => this.store.setGruposForCalificar(resumen.grupos),
+				error: (err) => this.errHandler.handle(err, 'cargar grupos'),
+			});
 	}
 	// #endregion
 

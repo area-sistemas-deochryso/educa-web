@@ -2,8 +2,8 @@ import { Component, ChangeDetectionStrategy, input, computed, signal } from '@an
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { SelectModule } from 'primeng/select';
-import { EstudianteMisNotasDto } from '../../../models';
-import { NotasCursoCardComponent } from '../../../notas/components/notas-curso-card/notas-curso-card.component';
+import { EstudianteMisNotasDto } from '@features/intranet/pages/estudiante/models';
+import { NotasCursoCardComponent } from '@features/intranet/pages/estudiante/notas/components/notas-curso-card/notas-curso-card.component';
 
 @Component({
 	selector: 'app-estudiante-notas-salon-tab',

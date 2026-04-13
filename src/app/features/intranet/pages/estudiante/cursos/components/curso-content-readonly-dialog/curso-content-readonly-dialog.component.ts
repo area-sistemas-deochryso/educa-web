@@ -9,11 +9,11 @@ import { ConfirmDialogModule } from 'primeng/confirmdialog';
 import { TabsModule } from 'primeng/tabs';
 import { ConfirmationService } from 'primeng/api';
 import { FormatFileSizePipe } from '@shared/pipes';
-import { EstudianteCursosFacade } from '../../../services/estudiante-cursos.facade';
-import { CursoContenidoSemanaDto, EstudianteArchivoDto, EstudianteTareaArchivoDto } from '../../../models';
-import { ArchivosSummaryDialogComponent } from '../../../../profesor/cursos/components/archivos-summary-dialog/archivos-summary-dialog.component';
-import { TareasSummaryDialogComponent } from '../../../../profesor/cursos/components/tareas-summary-dialog/tareas-summary-dialog.component';
-import { NotasCursoCardComponent } from '../../../notas/components/notas-curso-card/notas-curso-card.component';
+import { EstudianteCursosFacade } from '@features/intranet/pages/estudiante/services/estudiante-cursos.facade';
+import { CursoContenidoSemanaDto, EstudianteArchivoDto, EstudianteTareaArchivoDto } from '@features/intranet/pages/estudiante/models';
+import { ArchivosSummaryDialogComponent } from '@features/intranet/pages/profesor/cursos/components/archivos-summary-dialog/archivos-summary-dialog.component';
+import { TareasSummaryDialogComponent } from '@features/intranet/pages/profesor/cursos/components/tareas-summary-dialog/tareas-summary-dialog.component';
+import { NotasCursoCardComponent } from '@features/intranet/pages/estudiante/notas/components/notas-curso-card/notas-curso-card.component';
 
 @Component({
 	selector: 'app-curso-content-readonly-dialog',

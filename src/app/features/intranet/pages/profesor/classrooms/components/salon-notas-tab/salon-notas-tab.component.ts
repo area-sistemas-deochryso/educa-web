@@ -13,7 +13,7 @@ import {
 	CalificacionDto,
 	PeriodoCalificacionDto,
 	VistaPromedio,
-} from '../../../models';
+} from '@features/intranet/pages/profesor/models';
 import { getNotaSeverity, formatNotaConConfig } from '@intranet-shared/services/calificacion-config';
 import type { ConfiguracionCalificacionListDto } from '@data/models';
 

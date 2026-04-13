@@ -1,0 +1,151 @@
+<!-- #region Template -->
+<p-dialog
+	[visible]="vm().dialogVisible"
+	(visibleChange)="onDialogVisibleChange($event)"
+	[modal]="true"
+	[closable]="!vm().submitting"
+	[dismissableMask]="!vm().submitting"
+	[draggable]="false"
+	[resizable]="false"
+	[closeOnEscape]="!vm().submitting"
+	header="Reportar un problema o proponer una mejora"
+	styleClass="feedback-report-dialog"
+	[style]="{ width: '560px', maxWidth: '95vw' }"
+>
+	@if (vm().lastSubmittedOk) {
+		<!-- #region Estado: enviado OK -->
+		<div class="feedback-success">
+			<i class="pi pi-check-circle"></i>
+			<h3>¡Gracias por tu reporte!</h3>
+			<p>Lo hemos recibido y lo revisaremos pronto.</p>
+		</div>
+		<!-- #endregion -->
+	} @else {
+		<!-- #region Formulario -->
+		<div class="feedback-form">
+			<p class="feedback-hint">
+				Ayúdanos a mejorar. Cuéntanos qué problema viste o qué propuesta tienes.
+				Tu mensaje llega directamente al equipo.
+			</p>
+
+			@if (vm().recentErrorId) {
+				<!-- Hint: error detectado automáticamente hace <2min -->
+				<div class="recent-error-banner">
+					<i class="pi pi-info-circle"></i>
+					<div class="recent-error-content">
+						<p class="recent-error-title">Detectamos un error reciente</p>
+						<p class="recent-error-desc">
+							¿Estás reportando el error que acaba de aparecer en pantalla?
+							Si lo marcas, tu reporte se enlazará con ese error automáticamente.
+						</p>
+						<label class="recent-error-check">
+							<p-checkbox
+								[binary]="true"
+								[ngModel]="vm().linkToRecentError"
+								(ngModelChange)="onLinkToRecentErrorChange($event)"
+								inputId="feedback-link-recent"
+							/>
+							<span>Enlazar con el error reciente</span>
+						</label>
+					</div>
+				</div>
+			}
+
+			<!-- Tipo de problema -->
+			<div class="field">
+				<label for="feedback-tipo">Tipo de problema</label>
+				<p-select
+					inputId="feedback-tipo"
+					[options]="tipoOptions"
+					optionLabel="label"
+					optionValue="value"
+					placeholder="Selecciona el tipo más cercano"
+					appendTo="body"
+					[filter]="true"
+					filterPlaceholder="Buscar tipo..."
+					[ngModel]="vm().formData.tipo"
+					(ngModelChange)="onTipoChange($event)"
+					[disabled]="vm().submitting"
+				>
+					<ng-template let-option pTemplate="item">
+						<div class="tipo-option">
+							<i [class]="option.icon"></i>
+							<span>{{ option.label }}</span>
+						</div>
+					</ng-template>
+				</p-select>
+				@if (showValidation() && vm().tipoError) {
+					<small class="error-msg">{{ vm().tipoError }}</small>
+				}
+			</div>
+
+			<!-- Descripción -->
+			<div class="field">
+				<label for="feedback-desc">Descripción del problema</label>
+				<textarea
+					pTextarea
+					id="feedback-desc"
+					rows="5"
+					[ngModel]="vm().formData.descripcion"
+					(ngModelChange)="onDescripcionChange($event)"
+					placeholder="Detalla lo que pasó: qué hacías, qué esperabas y qué ocurrió en su lugar."
+					[disabled]="vm().submitting"
+					maxlength="2000"
+				></textarea>
+				<div class="field-footer">
+					@if (showValidation() && vm().descripcionError) {
+						<small class="error-msg">{{ vm().descripcionError }}</small>
+					} @else {
+						<small class="char-count">
+							{{ vm().formData.descripcion.length }} / 2000
+						</small>
+					}
+				</div>
+			</div>
+
+			<!-- Propuesta opcional -->
+			<div class="field">
+				<label for="feedback-propuesta">
+					Propuesta de mejora <span class="optional">(opcional)</span>
+				</label>
+				<textarea
+					pTextarea
+					id="feedback-propuesta"
+					rows="3"
+					[ngModel]="vm().formData.propuesta"
+					(ngModelChange)="onPropuestaChange($event)"
+					placeholder="¿Cómo crees que podríamos resolverlo o mejorarlo?"
+					[disabled]="vm().submitting"
+					maxlength="2000"
+				></textarea>
+			</div>
+
+			@if (vm().error) {
+				<p-message severity="error" [text]="vm().error ?? ''" styleClass="w-full" />
+			}
+		</div>
+		<!-- #endregion -->
+
+		<!-- #region Footer -->
+		<ng-template pTemplate="footer">
+			<button
+				pButton
+				type="button"
+				label="Cancelar"
+				class="p-button-text"
+				(click)="onCancel()"
+				[disabled]="vm().submitting"
+			></button>
+			<button
+				pButton
+				type="button"
+				label="Enviar reporte"
+				icon="pi pi-send"
+				(click)="onSubmit()"
+				[loading]="vm().submitting"
+			></button>
+		</ng-template>
+		<!-- #endregion -->
+	}
+</p-dialog>
+<!-- #endregion -->

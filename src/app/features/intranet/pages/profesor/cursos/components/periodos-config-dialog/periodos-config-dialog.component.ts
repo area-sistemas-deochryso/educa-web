@@ -6,7 +6,7 @@ import { ButtonModule } from 'primeng/button';
 import { InputTextModule } from 'primeng/inputtext';
 import { InputNumberModule } from 'primeng/inputnumber';
 import { TooltipModule } from 'primeng/tooltip';
-import { PeriodoCalificacionDto, CrearPeriodoDto } from '../../../models';
+import { PeriodoCalificacionDto, CrearPeriodoDto } from '@features/intranet/pages/profesor/models';
 
 @Component({
 	selector: 'app-periodos-config-dialog',

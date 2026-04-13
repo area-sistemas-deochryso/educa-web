@@ -21,7 +21,7 @@ const mockUsuarios: UsuarioLista[] = [
 
 const mockStats: UsuariosEstadisticas = {
 	totalUsuarios: 3, totalDirectores: 1, totalAsistentesAdministrativos: 0,
-	totalProfesores: 1, totalApoderados: 0, totalEstudiantes: 1,
+	totalPromotores: 0, totalProfesores: 1, totalApoderados: 0, totalEstudiantes: 1,
 	totalActivos: 2, totalInactivos: 1,
 };
 

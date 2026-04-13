@@ -137,12 +137,17 @@ Items sueltos que no tienen relación directa (ej: "Usuarios" y "Vistas" son de 
 
 | Módulo | Grupo | Items | Roles |
 |--------|-------|-------|-------|
+| Académico | Administración | Cursos, Salones, Horarios | Admin |
 | Académico | Mi Aula | Mis Cursos, Mis Salones, Mi Horario | Prof/Est |
-| Seguimiento | Asistencias (admin) | Gestión, Reportes | Admin |
+| Seguimiento | Asistencia | Asistencia diaria, Gestión, Reportes, Permisos Salud | Cross-role + Admin |
 | Seguimiento | Mi Seguimiento | Mis Calificaciones, Mi Asistencia | Prof/Est |
 | Comunicación | Calendario | Calendario, Eventos, Notificaciones | Admin (Eventos/Notif), Compartido (Calendario) |
+| Comunicación | — (suelto) | Videoconferencias | Compartido |
 | Comunicación | Mensajes | Foro, Mensajería | Prof/Est |
+| Sistema | Gestión | Usuarios, Vistas | Admin |
 | Sistema | Permisos | Por Rol, Por Usuario | Admin |
+| Sistema | Monitoreo | Errores, Bandeja de Correos, Reportes de Usuarios | Admin |
+| Sistema | Herramientas | Campus, Test k6 | Admin |
 
 ---
 

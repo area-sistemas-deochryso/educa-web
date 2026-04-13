@@ -202,6 +202,10 @@ export abstract class BaseCrudStore<
 	setPageSize(pageSize: number): void {
 		this._pageSize.set(pageSize);
 	}
+
+	setTotalRecords(total: number): void {
+		this._totalRecords.set(total);
+	}
 	// #endregion
 
 	// #region Comandos — Stats

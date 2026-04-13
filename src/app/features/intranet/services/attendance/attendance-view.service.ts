@@ -107,17 +107,9 @@ export class AttendanceViewController {
 	readonly pdfLabel = this.statsService.pdfLabel;
 	readonly estadisticasDia = this.statsService.estadisticasDia;
 
-	setMonthSubMode(mode: 'mes' | 'periodo'): void {
-		this.statsService.setMonthSubMode(mode);
-	}
-
-	setPeriodoInicio(mes: number): void {
-		this.statsService.setPeriodoInicio(mes);
-	}
-
-	setPeriodoFin(mes: number): void {
-		this.statsService.setPeriodoFin(mes);
-	}
+	setMonthSubMode(mode: 'mes' | 'periodo'): void { this.statsService.setMonthSubMode(mode); }
+	setPeriodoInicio(mes: number): void { this.statsService.setPeriodoInicio(mes); }
+	setPeriodoFin(mes: number): void { this.statsService.setPeriodoFin(mes); }
 	// #endregion
 
 	// #region Estudiantes (modo mes)
@@ -166,28 +158,13 @@ export class AttendanceViewController {
 	});
 
 	readonly pdfMenuItems = computed<MenuItem[]>(() => {
-		const isMonthMode = this.viewMode() === VIEW_MODE.Mes;
+		const isMonth = this.viewMode() === VIEW_MODE.Mes;
 		const isPeriodo = this.monthSubMode() === 'periodo';
-
+		const ver = () => isMonth ? (isPeriodo ? this.verPdfAsistenciaPeriodo() : this.verPdfAsistenciaMes()) : this.verPdfAsistenciaDia();
+		const desc = () => isMonth ? (isPeriodo ? this.descargarPdfAsistenciaPeriodo() : this.descargarPdfAsistenciaMes()) : this.descargarPdfAsistenciaDia();
 		return [
-			{
-				label: 'Ver PDF',
-				icon: 'pi pi-eye',
-				command: () => {
-					if (!isMonthMode) return this.verPdfAsistenciaDia();
-					return isPeriodo ? this.verPdfAsistenciaPeriodo() : this.verPdfAsistenciaMes();
-				},
-			},
-			{
-				label: 'Descargar PDF',
-				icon: 'pi pi-download',
-				command: () => {
-					if (!isMonthMode) return this.descargarPdfAsistenciaDia();
-					return isPeriodo
-						? this.descargarPdfAsistenciaPeriodo()
-						: this.descargarPdfAsistenciaMes();
-				},
-			},
+			{ label: 'Ver PDF', icon: 'pi pi-eye', command: ver },
+			{ label: 'Descargar PDF', icon: 'pi pi-download', command: desc },
 		];
 	});
 	// #endregion
@@ -213,10 +190,7 @@ export class AttendanceViewController {
 	 */
 	loadEstudiantes(): void {
 		const ctx = this.config.getSelectorContext();
-		if (!ctx) {
-			this.loading.set(false);
-			return;
-		}
+		if (!ctx) { this.loading.set(false); return; }
 
 		this.loading.set(true);
 		const { selectedMonth, selectedYear } = this.ingresos();
@@ -225,11 +199,7 @@ export class AttendanceViewController {
 			.loadEstudiantes(ctx.grado, ctx.seccion, selectedMonth, selectedYear)
 			.pipe(
 				takeUntilDestroyed(this.destroyRef),
-				finalize(() => {
-					if (this.estudiantes().length === 0) {
-						this.loading.set(false);
-					}
-				}),
+				finalize(() => { if (this.estudiantes().length === 0) this.loading.set(false); }),
 			)
 			.subscribe({
 				next: (estudiantes) => {
@@ -239,15 +209,12 @@ export class AttendanceViewController {
 						this.loadEstudianteAsistencias();
 					}
 				},
-				error: () => {
-					this.loading.set(false);
-				},
+				error: () => this.loading.set(false),
 			});
 	}
 
 	selectEstudiante(estudianteId: number): void {
 		if (this.selectedEstudianteId() === estudianteId) return;
-
 		this.selectedEstudianteId.set(estudianteId);
 		this.saveSelectedEstudiante();
 		this.loadEstudianteAsistencias();
@@ -255,41 +222,25 @@ export class AttendanceViewController {
 
 	private restoreSelectedEstudiante(): void {
 		const estudianteId = this.config.getStoredEstudianteId();
-		if (
-			estudianteId !== null &&
-			this.estudiantes().some((e) => e.estudianteId === estudianteId)
-		) {
+		if (estudianteId !== null && this.estudiantes().some((e) => e.estudianteId === estudianteId)) {
 			this.selectedEstudianteId.set(estudianteId);
 			return;
 		}
 		const first = this.estudiantes()[0];
-		if (first) {
-			this.selectedEstudianteId.set(first.estudianteId);
-		}
+		if (first) this.selectedEstudianteId.set(first.estudianteId);
 	}
 
 	private saveSelectedEstudiante(): void {
 		const id = this.selectedEstudianteId();
-		if (id) {
-			this.config.setStoredEstudianteId(id);
-		}
+		if (id) this.config.setStoredEstudianteId(id);
 	}
 
 	private loadEstudianteAsistencias(): void {
 		const estudiante = this.selectedEstudiante();
-		if (!estudiante) {
-			this.loading.set(false);
-			this.tableReady.set(true);
-			return;
-		}
-
+		if (!estudiante) { this.loading.set(false); this.tableReady.set(true); return; }
 		const { selectedMonth, selectedYear } = this.ingresos();
-
 		const tables = this.attendanceDataService.processAsistencias(
-			estudiante.asistencias,
-			selectedMonth,
-			selectedYear,
-			estudiante.nombreCompleto,
+			estudiante.asistencias, selectedMonth, selectedYear, estudiante.nombreCompleto,
 		);
 		this.ingresos.set(tables.ingresos);
 		this.salidas.set(tables.salidas);
@@ -318,57 +269,31 @@ export class AttendanceViewController {
 		this.statsService.setSelectedYear(this.ingresos().selectedYear);
 	}
 
-	private reloadEstudianteIngresos(): void {
+	private reloadEstudianteIngresos(): void { this.reloadEstudianteTable('ingresos'); }
+	private reloadEstudianteSalidas(): void { this.reloadEstudianteTable('salidas'); }
+
+	private reloadEstudianteTable(kind: 'ingresos' | 'salidas'): void {
 		const ctx = this.config.getSelectorContext();
 		if (!ctx) return;
-
-		const { selectedMonth, selectedYear } = this.ingresos();
+		const source = kind === 'ingresos' ? this.ingresos() : this.salidas();
+		const { selectedMonth, selectedYear } = source;
 
 		this.config
 			.loadEstudiantes(ctx.grado, ctx.seccion, selectedMonth, selectedYear)
 			.pipe(takeUntilDestroyed(this.destroyRef))
 			.subscribe({
 				next: (estudiantes) => {
-					this.estudiantes.set(estudiantes);
-					const estudiante = estudiantes.find(
-						(e) => e.estudianteId === this.selectedEstudianteId(),
+					if (kind === 'ingresos') this.estudiantes.set(estudiantes);
+					const estudiante = estudiantes.find((e) => e.estudianteId === this.selectedEstudianteId());
+					if (!estudiante) return;
+					const tables = this.attendanceDataService.processAsistencias(
+						estudiante.asistencias,
+						selectedMonth,
+						selectedYear,
+						estudiante.nombreCompleto,
 					);
-					if (estudiante) {
-						const tables = this.attendanceDataService.processAsistencias(
-							estudiante.asistencias,
-							selectedMonth,
-							selectedYear,
-							estudiante.nombreCompleto,
-						);
-						this.ingresos.set(tables.ingresos);
-					}
-				},
-			});
-	}
-
-	private reloadEstudianteSalidas(): void {
-		const ctx = this.config.getSelectorContext();
-		if (!ctx) return;
-
-		const { selectedMonth, selectedYear } = this.salidas();
-
-		this.config
-			.loadEstudiantes(ctx.grado, ctx.seccion, selectedMonth, selectedYear)
-			.pipe(takeUntilDestroyed(this.destroyRef))
-			.subscribe({
-				next: (estudiantes) => {
-					const estudiante = estudiantes.find(
-						(e) => e.estudianteId === this.selectedEstudianteId(),
-					);
-					if (estudiante) {
-						const tables = this.attendanceDataService.processAsistencias(
-							estudiante.asistencias,
-							selectedMonth,
-							selectedYear,
-							estudiante.nombreCompleto,
-						);
-						this.salidas.set(tables.salidas);
-					}
+					if (kind === 'ingresos') this.ingresos.set(tables.ingresos);
+					else this.salidas.set(tables.salidas);
 				},
 			});
 	}
@@ -379,34 +304,19 @@ export class AttendanceViewController {
 	setViewMode(mode: ViewMode): void {
 		if (this.viewMode() === mode) return;
 		this.viewMode.set(mode);
-
-		if (mode === VIEW_MODE.Dia) {
-			this.loadAsistenciaDia();
-		} else {
-			this.loadEstudiantes();
-		}
+		if (mode === VIEW_MODE.Dia) this.loadAsistenciaDia();
+		else this.loadEstudiantes();
 	}
 
-	onFechaDiaChange(fecha: Date): void {
-		this.fechaDia.set(fecha);
-		this.loadAsistenciaDia();
-	}
+	onFechaDiaChange(fecha: Date): void { this.fechaDia.set(fecha); this.loadAsistenciaDia(); }
 
 	loadAsistenciaDia(): void {
 		const ctx = this.config.getSelectorContext();
-		if (!ctx) {
-			this.loading.set(false);
-			return;
-		}
-
+		if (!ctx) { this.loading.set(false); return; }
 		this.loading.set(true);
-
 		this.config
 			.loadDia(ctx.grado, ctx.seccion, this.fechaDia())
-			.pipe(
-				takeUntilDestroyed(this.destroyRef),
-				finalize(() => this.loading.set(false)),
-			)
+			.pipe(takeUntilDestroyed(this.destroyRef), finalize(() => this.loading.set(false)))
 			.subscribe({
 				next: (response) => {
 					this.estudiantesDia.set(response.estudiantes);
@@ -418,13 +328,12 @@ export class AttendanceViewController {
 	// #endregion
 	// #region PDF (delegados)
 
-	verPdfAsistenciaDia(): void {
-		this.pdfService.verPdfAsistenciaDia(this.pdfFecha());
-	}
-
-	descargarPdfAsistenciaDia(): void {
-		this.pdfService.descargarPdfAsistenciaDia(this.pdfFecha());
-	}
+	verPdfAsistenciaDia(): void { this.pdfService.verPdfAsistenciaDia(this.pdfFecha()); }
+	descargarPdfAsistenciaDia(): void { this.pdfService.descargarPdfAsistenciaDia(this.pdfFecha()); }
+	verPdfSalonMes(): void { this.pdfService.verPdfSalonMes(this.fechaDia()); }
+	descargarPdfSalonMes(): void { this.pdfService.descargarPdfSalonMes(this.fechaDia()); }
+	verPdfSalonAnio(): void { this.pdfService.verPdfSalonAnio(this.fechaDia()); }
+	descargarPdfSalonAnio(): void { this.pdfService.descargarPdfSalonAnio(this.fechaDia()); }
 
 	verPdfAsistenciaMes(): void {
 		const ctx = this.config.getSelectorContext();
@@ -443,35 +352,13 @@ export class AttendanceViewController {
 	verPdfAsistenciaPeriodo(): void {
 		const ctx = this.config.getSelectorContext();
 		if (!ctx || !this.isPeriodoValid()) return;
-		const mesI = this.periodoInicio();
-		const mesF = this.periodoFin();
-		const anio = this.ingresos().selectedYear;
-		this.pdfService.verPdfAsistenciaPeriodo(ctx.grado, ctx.seccion, mesI, anio, mesF);
+		this.pdfService.verPdfAsistenciaPeriodo(ctx.grado, ctx.seccion, this.periodoInicio(), this.ingresos().selectedYear, this.periodoFin());
 	}
 
 	descargarPdfAsistenciaPeriodo(): void {
 		const ctx = this.config.getSelectorContext();
 		if (!ctx || !this.isPeriodoValid()) return;
-		const mesI = this.periodoInicio();
-		const mesF = this.periodoFin();
-		const anio = this.ingresos().selectedYear;
-		this.pdfService.descargarPdfAsistenciaPeriodo(ctx.grado, ctx.seccion, mesI, anio, mesF);
-	}
-
-	verPdfSalonMes(): void {
-		this.pdfService.verPdfSalonMes(this.fechaDia());
-	}
-
-	descargarPdfSalonMes(): void {
-		this.pdfService.descargarPdfSalonMes(this.fechaDia());
-	}
-
-	verPdfSalonAnio(): void {
-		this.pdfService.verPdfSalonAnio(this.fechaDia());
-	}
-
-	descargarPdfSalonAnio(): void {
-		this.pdfService.descargarPdfSalonAnio(this.fechaDia());
+		this.pdfService.descargarPdfAsistenciaPeriodo(ctx.grado, ctx.seccion, this.periodoInicio(), this.ingresos().selectedYear, this.periodoFin());
 	}
 
 	// #endregion
@@ -496,36 +383,30 @@ export class AttendanceViewController {
 		this.asistenciaSignalR.asistenciaRegistrada$
 			.pipe(takeUntilDestroyed(this.destroyRef))
 			.subscribe(() => {
-				// Invalidar caché antes de recargar para evitar que el SW devuelva datos
-				// stale (anteriores al scan). El SW usa SWR: sin invalidación, devuelve
-				// la caché inmediatamente y el fetch fresco llega tarde via cacheUpdated$.
-				this.swService.invalidateCacheByPattern('/api/ConsultaAsistencia').then(() => {
-					if (this.viewMode() === VIEW_MODE.Dia) {
-						if (this.isToday(this.fechaDia())) {
-							logger.log('AttendanceView: Asistencia registrada vía SignalR → recargando vista día');
-							this.loadAsistenciaDia();
-						}
-					} else {
-						// Recargar mes solo si el mes/año visible es el actual
-						const now = new Date();
-						const { selectedMonth, selectedYear } = this.ingresos();
-						if (selectedMonth === now.getMonth() + 1 && selectedYear === now.getFullYear()) {
-							logger.log('AttendanceView: Asistencia registrada vía SignalR → recargando vista mes');
-							this.loadEstudiantes();
-						}
-					}
-				});
+				this.swService.invalidateCacheByPattern('/api/ConsultaAsistencia').then(() => this.reloadAfterSignalR());
 			});
 	}
 
-	private isToday(fecha: Date): boolean {
-		const hoy = new Date();
-		return (
-			fecha.getFullYear() === hoy.getFullYear() &&
-			fecha.getMonth() === hoy.getMonth() &&
-			fecha.getDate() === hoy.getDate()
-		);
+	private reloadAfterSignalR(): void {
+		if (this.viewMode() === VIEW_MODE.Dia) {
+			if (isToday(this.fechaDia())) this.loadAsistenciaDia();
+			return;
+		}
+		const now = new Date();
+		const { selectedMonth, selectedYear } = this.ingresos();
+		if (selectedMonth === now.getMonth() + 1 && selectedYear === now.getFullYear()) {
+			this.loadEstudiantes();
+		}
 	}
 
 	// #endregion
+}
+
+function isToday(fecha: Date): boolean {
+	const hoy = new Date();
+	return (
+		fecha.getFullYear() === hoy.getFullYear() &&
+		fecha.getMonth() === hoy.getMonth() &&
+		fecha.getDate() === hoy.getDate()
+	);
 }

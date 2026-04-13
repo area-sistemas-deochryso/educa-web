@@ -38,6 +38,24 @@ export class RequestTraceFacade {
 
 	readonly vm = this.store.vm;
 
+	/**
+	 * Ring buffer de los últimos request IDs generados por el trace interceptor.
+	 * Funciona en prod + dev — el interceptor llama a `trackLastRequestId` independiente
+	 * del modo. Sirve para correlacionar reportes manuales con el último trazo automático.
+	 */
+	private lastRequestIds: string[] = [];
+	private static readonly MAX_RECENT = 5;
+
+	/**
+	 * Ring buffer de correlation IDs de errores que el usuario VIO (notificación toast,
+	 * modal de error, etc.). Es distinto al `lastRequestIds` — aquí solo entran IDs
+	 * cuyo request disparó una notificación visible. Tiene prioridad sobre
+	 * `getLastRequestId()` cuando el usuario abre el dialog de reporte, porque lo más
+	 * probable es que esté reportando ese error puntual.
+	 */
+	private visibleErrors: { id: string; timestamp: number }[] = [];
+	private static readonly MAX_VISIBLE_ERRORS = 5;
+
 	constructor(
 		@Optional() @Inject(REQUEST_TRACE_CONFIG) cfg?: RequestTraceConfig,
 	) {
@@ -61,6 +79,52 @@ export class RequestTraceFacade {
 			return crypto.randomUUID();
 		}
 		return `req_${Date.now()}_${Math.floor(Math.random() * 1e6)}`;
+	}
+
+	/**
+	 * Registra el último request ID generado por el trace interceptor.
+	 * Se llama en TODAS las requests (prod + dev) para permitir correlación
+	 * con reportes manuales del usuario.
+	 */
+	trackLastRequestId(id: string): void {
+		this.lastRequestIds.push(id);
+		if (this.lastRequestIds.length > RequestTraceFacade.MAX_RECENT) {
+			this.lastRequestIds.shift();
+		}
+	}
+
+	/**
+	 * Retorna el ID de la última request vista, o null si no hay ninguna aún.
+	 * Útil para atar un reporte manual del usuario a la última llamada HTTP real.
+	 */
+	getLastRequestId(): string | null {
+		return this.lastRequestIds.length === 0
+			? null
+			: this.lastRequestIds[this.lastRequestIds.length - 1];
+	}
+
+	/**
+	 * Registra que el usuario vio un error (notificación toast/modal).
+	 * Se llama desde `ErrorHandlerService` cada vez que se muestra una notificación
+	 * de error con su correlation ID asociado.
+	 */
+	trackVisibleError(correlationId: string): void {
+		if (!correlationId) return;
+		this.visibleErrors.push({ id: correlationId, timestamp: Date.now() });
+		if (this.visibleErrors.length > RequestTraceFacade.MAX_VISIBLE_ERRORS) {
+			this.visibleErrors.shift();
+		}
+	}
+
+	/**
+	 * Retorna el correlation ID del error visible más reciente dentro de la ventana
+	 * temporal indicada, o null si no hay ninguno. El dialog de feedback lo usa para
+	 * detectar "el usuario acaba de ver un error, seguro lo está reportando".
+	 */
+	getRecentVisibleErrorId(windowMs: number): string | null {
+		if (this.visibleErrors.length === 0) return null;
+		const last = this.visibleErrors[this.visibleErrors.length - 1];
+		return Date.now() - last.timestamp <= windowMs ? last.id : null;
 	}
 
 	shouldTrace(method: string, url: string): boolean {

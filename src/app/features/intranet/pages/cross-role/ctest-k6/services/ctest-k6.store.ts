@@ -11,6 +11,11 @@ import {
 	DEFAULT_CONFIG,
 	TEST_TYPE_OPTIONS,
 } from '../models';
+import {
+	parseDurationToSeconds,
+	formatSecondsLabel,
+	estimateRequests,
+} from '../helpers/test-profile.helpers';
 
 @Injectable({ providedIn: 'root' })
 export class CTestK6Store {
@@ -92,7 +97,7 @@ export class CTestK6Store {
 
 		if (config.useStages && config.stages.length > 0) {
 			const phases = config.stages.map((s) => ({
-				durationSec: this.parseDuration(s.duration),
+				durationSec: parseDurationToSeconds(s.duration),
 				durationLabel: s.duration,
 				targetVus: s.target,
 			}));
@@ -102,15 +107,15 @@ export class CTestK6Store {
 			return {
 				mode: 'stages' as const,
 				phases,
-				totalDuration: this.formatSeconds(totalSec),
+				totalDuration: formatSecondsLabel(totalSec),
 				totalDurationSec: totalSec,
 				peakVus,
 				endpointsCount: enabledCount,
-				estimatedRequests: this.estimateRequests(phases, enabledCount),
+				estimatedRequests: estimateRequests(phases, enabledCount),
 			};
 		}
 
-		const totalSec = this.parseDuration(config.duration);
+		const totalSec = parseDurationToSeconds(config.duration);
 		return {
 			mode: 'fixed' as const,
 			phases: [{ durationSec: totalSec, durationLabel: config.duration, targetVus: config.vus }],
@@ -341,51 +346,4 @@ export class CTestK6Store {
 	}
 	// #endregion
 
-	// #region Helpers privados
-	/** Parsea "30s", "1m", "5m", "1h" a segundos */
-	private parseDuration(duration: string): number {
-		const match = duration.trim().match(/^(\d+(?:\.\d+)?)\s*(s|m|h)$/i);
-		if (!match) return 0;
-		const value = parseFloat(match[1]);
-		const unit = match[2].toLowerCase();
-		if (unit === 'h') return value * 3600;
-		if (unit === 'm') return value * 60;
-		return value;
-	}
-
-	/** Formatea segundos a "Xm Ys" o "Xh Ym" legible */
-	private formatSeconds(sec: number): string {
-		if (sec < 60) return `${sec}s`;
-		if (sec < 3600) {
-			const m = Math.floor(sec / 60);
-			const s = sec % 60;
-			return s > 0 ? `${m}m ${s}s` : `${m}m`;
-		}
-		const h = Math.floor(sec / 3600);
-		const m = Math.floor((sec % 3600) / 60);
-		return m > 0 ? `${h}h ${m}m` : `${h}h`;
-	}
-
-	/**
-	 * Estima requests totales basado en fases.
-	 * Cada VU ejecuta ~1 iteración cada ~2s (sleep promedio 1-3s).
-	 * Cada iteración llama N endpoints.
-	 */
-	private estimateRequests(
-		phases: { durationSec: number; targetVus: number }[],
-		endpointsCount: number,
-	): number {
-		let total = 0;
-		let prevVus = 0;
-		for (const phase of phases) {
-			// VUs promedio en la fase (ramp lineal)
-			const avgVus = (prevVus + phase.targetVus) / 2;
-			// ~1 iteración cada 2s
-			const iterations = (phase.durationSec / 2) * avgVus;
-			total += iterations * endpointsCount;
-			prevVus = phase.targetVus;
-		}
-		return Math.round(total);
-	}
-	// #endregion
 }
