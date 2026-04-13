@@ -105,6 +105,7 @@ export class HealthPermissionsStore {
 
 	// #region Comandos de UI
 	openExitDialog(): void {
+		this._saving.set(false);
 		this._exitDialogVisible.set(true);
 	}
 
@@ -113,6 +114,7 @@ export class HealthPermissionsStore {
 	}
 
 	openJustificationDialog(): void {
+		this._saving.set(false);
 		this._justificationDialogVisible.set(true);
 	}
 

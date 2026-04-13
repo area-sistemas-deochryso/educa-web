@@ -84,9 +84,9 @@ export class AdminHealthPermissionsStore {
 	setSalonesLoading(v: boolean): void { this._salonesLoading.set(v); }
 	setLoading(v: boolean): void { this._loading.set(v); }
 	setSaving(v: boolean): void { this._saving.set(v); }
-	openExitDialog(): void { this._exitDialogVisible.set(true); }
+	openExitDialog(): void { this._saving.set(false); this._exitDialogVisible.set(true); }
 	closeExitDialog(): void { this._exitDialogVisible.set(false); }
-	openJustificationDialog(): void { this._justificationDialogVisible.set(true); }
+	openJustificationDialog(): void { this._saving.set(false); this._justificationDialogVisible.set(true); }
 	closeJustificationDialog(): void { this._justificationDialogVisible.set(false); this.clearFechasValidacion(); }
 
 	clearSalonData(): void {

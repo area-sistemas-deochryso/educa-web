@@ -187,9 +187,9 @@ export class HealthJustificationDialogComponent {
 
 	readonly studentOptions = signal<{ label: string; value: number }[]>([]);
 
-	readonly allDatesValid = computed(() => {
+	readonly hasAnyValidDate = computed(() => {
 		const validations = this.fechasValidacion();
-		return validations.length > 0 && validations.every((v) => v.valida);
+		return validations.length > 0 && validations.some((v) => v.valida);
 	});
 	// #endregion
 
@@ -198,7 +198,7 @@ export class HealthJustificationDialogComponent {
 			this.selectedStudent !== null &&
 			this.selectedDates.length > 0 &&
 			this.selectedFile() !== null &&
-			(this.fechasValidacion().length === 0 || this.allDatesValid())
+			(this.fechasValidacion().length === 0 || this.hasAnyValidDate())
 		);
 	}
 
@@ -242,7 +242,16 @@ export class HealthJustificationDialogComponent {
 		formData.append('EstudianteId', this.selectedStudent!.toString());
 		formData.append('SalonId', this.salonId().toString());
 
-		for (const fecha of this.selectedDates) {
+		// Solo enviar fechas validadas como válidas
+		const validaciones = this.fechasValidacion();
+		const fechasValidas = validaciones.length > 0
+			? this.selectedDates.filter((d) => {
+					const key = d.toISOString().split('T')[0];
+					return validaciones.some((v) => v.fecha === key && v.valida);
+				})
+			: this.selectedDates;
+
+		for (const fecha of fechasValidas) {
 			formData.append('Fechas', fecha.toISOString().split('T')[0]);
 		}
 
