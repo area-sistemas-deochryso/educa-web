@@ -12,6 +12,7 @@ const ROLE_SEVERITY_BY_ROLE: Record<string, Severity> = {
 	[APP_USER_ROLES.Director]: 'danger',
 	[APP_USER_ROLES.AsistenteAdministrativo]: 'contrast',
 	[APP_USER_ROLES.Promotor]: 'contrast',
+	[APP_USER_ROLES.CoordinadorAcademico]: 'contrast',
 	[APP_USER_ROLES.Profesor]: 'warn',
 	[APP_USER_ROLES.Apoderado]: 'info',
 	[APP_USER_ROLES.Estudiante]: 'success',

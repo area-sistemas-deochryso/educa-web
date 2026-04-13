@@ -1,5 +1,4 @@
 import type { CrearUsuarioRequest, ActualizarUsuarioRequest } from '../services';
-import { rolPermiteEsTutor } from '@shared/models';
 
 type UsuarioFormData = Partial<CrearUsuarioRequest & ActualizarUsuarioRequest>;
 
@@ -62,8 +61,5 @@ export function isUsuarioFormValid(
 	if (errors.correoApoderadoError) return false;
 	if (errors.nombreApoderadoError) return false;
 	if (errors.telefonoApoderadoError) return false;
-	// Invariante: profesor con salón debe tener esTutor definido
-	if (rolPermiteEsTutor(data.rol) && data.salonId !== undefined && data.esTutor === undefined)
-		return false;
 	return true;
 }

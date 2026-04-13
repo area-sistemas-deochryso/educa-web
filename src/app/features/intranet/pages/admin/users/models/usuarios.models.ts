@@ -37,6 +37,23 @@ export interface UsuarioLista {
 }
 
 /**
+ * Salon assignment for a professor (request payload).
+ */
+export interface SalonAsignacion {
+	salonId: number;
+	esTutor: boolean;
+}
+
+/**
+ * Salon info returned from detail endpoint (professor).
+ */
+export interface ProfesorSalonInfo {
+	salonId: number;
+	salonNombre: string;
+	esTutor: boolean;
+}
+
+/**
  * User detail DTO with additional fields.
  */
 export interface UsuarioDetalle extends UsuarioLista {
@@ -48,10 +65,11 @@ export interface UsuarioDetalle extends UsuarioLista {
 	usuarioRegistro?: string;
 	usuarioModificacion?: string;
 	fechaModificacion?: string;
-	// Teacher fields
+	// Student salon (single)
 	salonId?: number;
 	salonNombre?: string;
-	esTutor?: boolean;
+	// Teacher salons (multiple)
+	salones?: ProfesorSalonInfo[];
 }
 
 /**
@@ -73,9 +91,10 @@ export interface CrearUsuarioRequest {
 	nombreApoderado?: string;
 	telefonoApoderado?: string;
 	correoApoderado?: string;
-	// Teacher fields
+	// Student salon (single)
 	salonId?: number;
-	esTutor?: boolean;
+	// Teacher salons (multiple with tutor flag)
+	salones?: SalonAsignacion[];
 }
 
 /**
@@ -97,9 +116,10 @@ export interface ActualizarUsuarioRequest {
 	nombreApoderado?: string;
 	telefonoApoderado?: string;
 	correoApoderado?: string;
-	// Teacher fields
+	// Student salon (single)
 	salonId?: number;
-	esTutor?: boolean;
+	// Teacher salons (multiple with tutor flag)
+	salones?: SalonAsignacion[];
 	// Optimistic concurrency
 	rowVersion?: string;
 }

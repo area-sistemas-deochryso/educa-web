@@ -44,7 +44,7 @@ export class UsersStore extends BaseCrudStore<UsuarioLista, UsuarioFormData, Usu
 			rol: undefined,
 			estado: true,
 			salonId: undefined,
-			esTutor: undefined,
+			salones: undefined,
 		});
 	}
 
@@ -57,7 +57,7 @@ export class UsersStore extends BaseCrudStore<UsuarioLista, UsuarioFormData, Usu
 			rol: undefined,
 			estado: true,
 			salonId: undefined,
-			esTutor: undefined,
+			salones: undefined,
 		};
 	}
 
@@ -278,7 +278,7 @@ export class UsersStore extends BaseCrudStore<UsuarioLista, UsuarioFormData, Usu
 			telefonoApoderado: usuario.telefonoApoderado,
 			correoApoderado: usuario.correoApoderado,
 			salonId: usuario.salonId,
-			esTutor: usuario.esTutor,
+			salones: usuario.salones?.map((s) => ({ salonId: s.salonId, esTutor: s.esTutor })),
 		});
 		this.setIsEditing(true);
 		this.openDialog();

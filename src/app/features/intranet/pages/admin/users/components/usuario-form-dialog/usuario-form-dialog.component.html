@@ -196,8 +196,8 @@
 					<app-form-field-error [error]="errors().correoApoderadoError" />
 				</div>
 			}
-			<!-- SALÓN (Grado) - Profesor y Estudiante -->
-			@if (needsSalon()) {
+			<!-- SALÓN (Grado + Sección) - Solo para Estudiante -->
+			@if (needsSalon() && isEstudiante()) {
 				<div class="field">
 					<label for="grado">Grado</label>
 					<p-select
@@ -211,44 +211,99 @@
 						appendTo="body"
 					/>
 				</div>
-			}
-			<!-- SALÓN (Sección) - Profesor y Estudiante -->
-			@if (needsSalon() && _gradoSeleccionado()) {
-				<div class="field">
-					<label for="seccion">Sección</label>
-					<p-select
-						id="seccion"
-						[options]="seccionesOptions()"
-						[ngModel]="_seccionSeleccionada()"
-						(ngModelChange)="onSeccionChange($event)"
-						placeholder="Seleccione la sección"
-						[style]="{ width: '100%' }"
-						[showClear]="true"
-						appendTo="body"
-					/>
-					<small class="text-muted">
-						<i class="pi pi-info-circle" style="margin-right: 0.25rem"></i>
-						Opcional: Asigne un salón al {{ isProfesor() ? 'profesor' : 'estudiante' }}
-					</small>
-				</div>
-			}
-			<!-- ES TUTOR PARA PROFESOR -->
-			@if (isProfesor() && formData().salonId) {
-				<div class="field full-width">
-					<div class="checkbox-container">
-						<p-checkbox
-							inputId="esTutor"
-							[binary]="true"
-							[ngModel]="formData().esTutor ?? false"
-							(ngModelChange)="onFieldChange('esTutor', $event)"
+				@if (_gradoSeleccionado()) {
+					<div class="field">
+						<label for="seccion">Sección</label>
+						<p-select
+							id="seccion"
+							[options]="seccionesOptions()"
+							[ngModel]="_seccionSeleccionada()"
+							(ngModelChange)="onSeccionChange($event)"
+							placeholder="Seleccione la sección"
+							[style]="{ width: '100%' }"
+							[showClear]="true"
+							appendTo="body"
 						/>
-						<label for="esTutor" class="checkbox-label">
-							Es tutor de este salón
-						</label>
+						<small class="text-muted">
+							<i class="pi pi-info-circle" style="margin-right: 0.25rem"></i>
+							Opcional: Asigne un salón al estudiante
+						</small>
+					</div>
+				}
+			}
+			<!-- SALONES MÚLTIPLES - Solo para Profesor -->
+			@if (isProfesor()) {
+				<div class="field full-width salon-profesor-section">
+					<label>Salones asignados</label>
+					<!-- Lista de salones asignados -->
+					@if (salonesAsignados().length > 0) {
+						<div class="salones-list">
+							@for (salon of salonesAsignados(); track salon.salonId) {
+								<div class="salon-row">
+									<span class="salon-nombre">{{ salon.salonNombre }}</span>
+									<div class="salon-actions">
+										<p-checkbox
+											[inputId]="'tutor-' + salon.salonId"
+											[binary]="true"
+											[ngModel]="salon.esTutor"
+											(ngModelChange)="onToggleTutor(salon.salonId, $event)"
+										/>
+										<label [for]="'tutor-' + salon.salonId" class="tutor-label">Tutor</label>
+										<button
+											pButton
+											icon="pi pi-times"
+											class="p-button-rounded p-button-text p-button-danger p-button-sm"
+											(click)="onRemoverSalon(salon.salonId)"
+											[pt]="{
+												root: {
+													'aria-label': 'Quitar salón ' + salon.salonNombre,
+												},
+											}"
+										></button>
+									</div>
+								</div>
+							}
+						</div>
+					}
+					<!-- Selector para agregar nuevo salón -->
+					<div class="agregar-salon-row">
+						<p-select
+							[options]="gradosOptions()"
+							[ngModel]="_gradoSeleccionado()"
+							(ngModelChange)="onGradoChange($event)"
+							placeholder="Grado"
+							[style]="{ width: '100%' }"
+							[showClear]="true"
+							appendTo="body"
+						/>
+						@if (_gradoSeleccionado()) {
+							<p-select
+								[options]="seccionesOptions()"
+								[ngModel]="_seccionSeleccionada()"
+								(ngModelChange)="onSeccionChange($event)"
+								placeholder="Sección"
+								[style]="{ width: '100%' }"
+								[showClear]="true"
+								appendTo="body"
+							/>
+						}
+						<button
+							pButton
+							icon="pi pi-plus"
+							class="p-button-outlined p-button-sm"
+							label="Agregar"
+							(click)="onAgregarSalon()"
+							[disabled]="!salonSeleccionado() || salonYaAsignado()"
+							[pt]="{
+								root: {
+									'aria-label': 'Agregar salón',
+								},
+							}"
+						></button>
 					</div>
 					<small class="text-muted">
 						<i class="pi pi-info-circle" style="margin-right: 0.25rem"></i>
-						Marque si el profesor será tutor del salón seleccionado
+						Seleccione grado y sección para agregar salones. Marque "Tutor" en los que corresponda.
 					</small>
 				</div>
 			}

@@ -27,7 +27,7 @@ export function applyFormPolicies(
 		newData.contrasena = password || undefined;
 	}
 
-	// Constraints de rol: salonId/esTutor según el rol seleccionado
+	// Constraints de rol: salonId/salones según el rol seleccionado
 	const corrections = aplicarConstraintsDeRol(newData, updates);
 	Object.assign(newData, corrections);
 

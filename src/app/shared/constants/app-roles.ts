@@ -6,6 +6,7 @@ export const APP_USER_ROLES = {
 	Estudiante: 'Estudiante',
 	AsistenteAdministrativo: 'Asistente Administrativo',
 	Promotor: 'Promotor',
+	CoordinadorAcademico: 'Coordinador Académico',
 } as const;
 
 export type AppUserRole = (typeof APP_USER_ROLES)[keyof typeof APP_USER_ROLES] | '';
@@ -16,7 +17,8 @@ export type AppUserRoleAdmin =
 	| typeof APP_USER_ROLES.Profesor
 	| typeof APP_USER_ROLES.Estudiante
 	| typeof APP_USER_ROLES.AsistenteAdministrativo
-	| typeof APP_USER_ROLES.Promotor;
+	| typeof APP_USER_ROLES.Promotor
+	| typeof APP_USER_ROLES.CoordinadorAcademico;
 
 export const APP_USER_ROLE_LIST: AppUserRoleValue[] = [
 	APP_USER_ROLES.Director,
@@ -25,6 +27,7 @@ export const APP_USER_ROLE_LIST: AppUserRoleValue[] = [
 	APP_USER_ROLES.Estudiante,
 	APP_USER_ROLES.AsistenteAdministrativo,
 	APP_USER_ROLES.Promotor,
+	APP_USER_ROLES.CoordinadorAcademico,
 ];
 
 export const APP_USER_ROLE_ADMIN_LIST: AppUserRoleAdmin[] = [
@@ -33,5 +36,6 @@ export const APP_USER_ROLE_ADMIN_LIST: AppUserRoleAdmin[] = [
 	APP_USER_ROLES.Estudiante,
 	APP_USER_ROLES.AsistenteAdministrativo,
 	APP_USER_ROLES.Promotor,
+	APP_USER_ROLES.CoordinadorAcademico,
 ];
 // #endregion

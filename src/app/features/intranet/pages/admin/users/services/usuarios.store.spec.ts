@@ -241,19 +241,19 @@ describe('UsersStore', () => {
 
 		it('should clear salon fields when rol changes to non-Profesor/Estudiante', () => {
 			store.openNewDialog();
-			store.updateFormData({ rol: 'Profesor', salonId: 5, esTutor: true });
+			store.updateFormData({ rol: 'Profesor', salones: [{ salonId: 5, esTutor: true }] });
 			store.updateFormData({ rol: 'Director' });
 
 			expect(store.formData().salonId).toBeUndefined();
-			expect(store.formData().esTutor).toBeUndefined();
+			expect(store.formData().salones).toBeUndefined();
 		});
 
-		it('should clear esTutor when salon is set to null', () => {
+		it('should clear salones when rol changes to non-tutor role', () => {
 			store.openNewDialog();
-			store.updateFormData({ rol: 'Profesor', salonId: 5, esTutor: true });
-			store.updateFormData({ salonId: null as unknown as number });
+			store.updateFormData({ rol: 'Profesor', salones: [{ salonId: 5, esTutor: true }] });
+			store.updateFormData({ rol: 'Estudiante' });
 
-			expect(store.formData().esTutor).toBeUndefined();
+			expect(store.formData().salones).toBeUndefined();
 		});
 	});
 	// #endregion

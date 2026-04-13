@@ -40,6 +40,16 @@ const ROLE_POLICIES: Record<AppUserRoleValue, RolPolicy> = {
 		horarioEndpoint: 'all',
 		menuGroup: 'admin',
 	},
+	[APP_USER_ROLES.CoordinadorAcademico]: {
+		canModerateVideoconference: true,
+		isAdmin: true,
+		canEditPassword: true,
+		requiresSalon: false,
+		canBeTutor: false,
+		hasEntityId: false,
+		horarioEndpoint: 'all',
+		menuGroup: 'admin',
+	},
 	[APP_USER_ROLES.Profesor]: {
 		canModerateVideoconference: true,
 		isAdmin: false,

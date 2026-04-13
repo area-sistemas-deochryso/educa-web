@@ -555,7 +555,7 @@ Estas reglas aplican a todo el sistema:
 | 5 | **Delete = toggle de estado** — no se eliminan registros físicamente, se desactivan |
 | 6 | **Queries read-only usan AsNoTracking()** — performance obligatorio |
 | 7 | **Un estudiante solo puede estar en un salón activo por año** — validado por unique constraint |
-| 8 | **Un profesor puede ser tutor de un solo salón** — `PRS_EsTutor = true` es exclusivo |
+| 8 | **Un profesor puede ser tutor de múltiples salones** — `PRS_EsTutor = true` por cada `ProfesorSalon` |
 
 ---
 
@@ -960,7 +960,7 @@ Este registro consolida TODAS las invariantes del sistema en una tabla indexable
 | ID | Entidad | Invariante | Enforcement | Sección |
 |----|---------|------------|-------------|---------|
 | `INV-U01` | EstudianteSalón | Un estudiante solo puede estar en UN salón activo por año | Unique constraint BD | 12.7 |
-| `INV-U02` | ProfesorSalón | Un profesor puede ser tutor de UN solo salón | Validación en service | 12.8 |
+| `INV-U02` | ProfesorSalón | Un profesor puede ser tutor de múltiples salones (un tutor por salón) | EF Config + validación en service | 12.8 |
 | `INV-U03` | Horario (salón) | Un salón no puede tener dos clases superpuestas en el mismo día | Validación pre-create/update | 6.2 |
 | `INV-U04` | Horario (profesor) | Un profesor no puede estar en dos clases superpuestas en el mismo día | Validación pre-create/update | 6.2 |
 | `INV-U05` | Horario (estudiante) | Un estudiante no puede tener dos clases superpuestas en el mismo día | Validación pre-create/update | 6.2 |

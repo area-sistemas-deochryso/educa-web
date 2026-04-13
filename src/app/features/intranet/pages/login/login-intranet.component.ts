@@ -88,6 +88,7 @@ export class LoginIntranetComponent implements OnInit {
 		{ label: 'Director', value: 'Director' },
 		{ label: 'Asistente Administrativo', value: 'Asistente Administrativo' },
 		{ label: 'Promotor', value: 'Promotor' },
+		{ label: 'Coordinador Académico', value: 'Coordinador Académico' },
 	];
 	// #endregion
 

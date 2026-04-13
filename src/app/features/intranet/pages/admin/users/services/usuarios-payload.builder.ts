@@ -28,7 +28,7 @@ export function buildCrearUsuarioPayload(data: FormData): CrearUsuarioRequest | 
 		telefonoApoderado: data.telefonoApoderado,
 		correoApoderado: data.correoApoderado,
 		salonId: data.salonId,
-		esTutor: data.esTutor,
+		salones: data.salones,
 	};
 }
 
@@ -57,7 +57,7 @@ export function buildActualizarUsuarioPayload(
 		telefonoApoderado: data.telefonoApoderado,
 		correoApoderado: data.correoApoderado,
 		salonId: data.salonId,
-		esTutor: data.esTutor,
+		salones: data.salones,
 		rowVersion: usuario.rowVersion,
 	};
 }

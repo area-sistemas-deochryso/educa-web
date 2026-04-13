@@ -12,7 +12,8 @@ export type UserRole =
 	| 'Profesor'
 	| 'Director'
 	| 'Asistente Administrativo'
-	| 'Promotor';
+	| 'Promotor'
+	| 'Coordinador Académico';
 
 /**
  * Request payload for POST /api/Auth/login.
