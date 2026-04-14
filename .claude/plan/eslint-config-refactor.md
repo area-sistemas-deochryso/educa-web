@@ -1,6 +1,6 @@
 # Refactor del `eslint.config.js` — Fix al bug G10 (override de `no-restricted-imports`)
 
-> **Estado**: 🔄 F1 ✅ (decisión: Opción B — plugin custom) · F2-F5 ⏳
+> **Estado**: 🔄 F1-F3 ✅ · F4 ⏳ (reenganche con Plan 1) · F5 ⏳ (tests)
 > **Origen**: G10 detectado durante F3.3 del Plan 1 (Enforcement) el 2026-04-14
 > **Prioridad**: Alta — desbloquea F3.3 y F3.5 del enforcement, y remedia un falso positivo de "enforcement activo"
 > **Capa en el maestro**: Capa 5 (Patrones + Resiliencia), pero puede adelantarse si bloquea trabajo de enforcement.
@@ -52,6 +52,79 @@ absorber también barrel + shared para un solo lugar de verdad.
 - [x] F1.5 Plan + maestro actualizados
 
 F2 arranca el inventario de patterns a consolidar en la tabla declarativa del plugin.
+
+---
+
+## F2-F3 — Implementación del plugin (2026-04-14)
+
+### Inventario consolidado (tabla `LAYER_RULES`)
+
+| id | match | severidad | restricciones |
+|----|-------|-----------|---------------|
+| `shared-no-features` | `/src/app/shared/` | error | `@features/*`, `@intranet-shared` |
+| `component-no-http-no-store` | `*.component.ts` | error | `HttpClient` from `@angular/common/http`, `**/*.store{.ts}` |
+| `store-no-io-no-facade` | `*.store.ts` | error | `HttpClient`, `**/*.facade{.ts}`, `**/*.service{.ts}` |
+| `facade-no-cross-facade` | `*.facade.ts` excl `-data/-crud/-ui` | error | `**/*.facade{.ts}` |
+| `admin-no-cross-feature` | `features/admin/` | error | `@features/intranet/pages/profesor/*`, `.../estudiante/*` |
+| `profesor-no-cross-feature` | `features/profesor/` | **warn** | `.../admin/*`, `.../estudiante/*` |
+| `estudiante-no-cross-feature` | `features/estudiante/` | error | `.../admin/*`, `.../profesor/*` |
+
+### Implementación
+
+Plugin `layer-enforcement` en `eslint.config.js` (región propia, sigue el patrón de
+`walPlugin` y `structurePlugin`). Expone dos reglas con nombres únicos:
+
+- `layer-enforcement/imports-error` — reporta violaciones con severidad error
+- `layer-enforcement/imports-warn` — reporta violaciones con severidad warn
+
+Ambas leen la misma tabla `LAYER_RULES`, filtran por severidad y visitan
+`ImportDeclaration`. El chequeo soporta `importedNames` opcional para restringir solo
+cuando un named specifier específico está presente (ej: `HttpClient`).
+
+Se eliminaron los 7 bloques que hoy vivían silenciados por G10:
+
+- `shared/` → `@features`, `@intranet-shared`
+- `*.component.ts` → HttpClient, stores
+- `*.store.ts` → HttpClient, facades, services (la regla `no-restricted-syntax` de
+  `.subscribe()` queda en su bloque propio — nombre distinto, no hay override)
+- `*.facade.ts` → cross-facade
+- `admin/`, `profesor/`, `estudiante/` → cross-feature
+
+Se conserva: barrel enforcement nativo (bloquea internals de storage/auth/session/WAL/cache;
+es el último bloque `no-restricted-imports` de todo el config, no hay override posterior).
+
+### Verificación empírica
+
+`npx eslint --print-config` sobre un component en `features/**` ahora retorna:
+
+```text
+layer-enforcement/imports-error: [2]
+layer-enforcement/imports-warn: [1]
+```
+
+`npm run lint` ahora detecta violaciones que antes quedaban invisibles:
+
+- Components importando stores directamente (~12 instancias)
+- Stores importando services (~3 instancias)
+- admin/ importando de profesor/ (~5 instancias)
+- estudiante/ importando de profesor/ (~2 instancias)
+- profesor/ importando de admin/ (~2 instancias, warn)
+
+Estas correcciones son trabajo de **Plan 1 F3.5**, no de este plan.
+
+### Criterios de aceptación cumplidos
+
+1. ✅ `--print-config` sobre cualquier `.component.ts` en `features/**` incluye `layer-enforcement/imports-error`
+2. ✅ Lo mismo para `.store.ts`, `.facade.ts`, archivos en `admin/`, `profesor/`, `estudiante/`
+3. ✅ `npm run lint` detecta violaciones pre-existentes (esperado: aumento de errores hasta F3.5)
+4. ⏳ F4: actualizar `rules/eslint.md` para reflejar la realidad del enforcement
+
+### Side effect detectado
+
+3 directivas `// eslint-disable-next-line no-restricted-imports` en `shared/*/index.ts`
+quedan huérfanas (emiten warning "Unused eslint-disable directive") porque el plugin usa
+nombres distintos. Limpieza: cambiar a `layer-enforcement/imports-error` o removerlas
+en F4.
 
 ---
 

@@ -253,6 +253,211 @@ const structurePlugin = {
 };
 // #endregion
 
+// #region Plugin local: layer-enforcement — fix G10 (override de no-restricted-imports)
+// Problema: ESLint flat config reemplaza (no mergea) `no-restricted-imports` entre bloques
+// que matchean el mismo archivo. El bloque de barrel enforcement (último) invalida las reglas
+// intermedias para features/** y shared/**.
+// Solución: un plugin propio con dos reglas (error/warn) que iteran una tabla declarativa y
+// no son overrideadas porque tienen nombres únicos. Sustituye los bloques: shared, component,
+// store, facade cross, admin, profesor, estudiante.
+// Escape hatch: // eslint-disable-next-line layer-enforcement/imports-error -- Razón: <...>
+
+function normalizePath(p) {
+	return (p || '').replace(/\\/g, '/');
+}
+
+function hasImportedName(node, names) {
+	if (!Array.isArray(names) || names.length === 0) return true;
+	return (node.specifiers || []).some(
+		(s) => s.type === 'ImportSpecifier' && names.includes(s.imported?.name),
+	);
+}
+
+// Tabla declarativa de restricciones por capa.
+// Cada entry: { id, severity, match(filename), restrictions: [{ sourcePattern, importedNames?, message }] }
+// - sourcePattern: RegExp contra node.source.value
+// - importedNames (opcional): solo reporta si el import trae alguno de estos named specifiers
+const LAYER_RULES = [
+	{
+		id: 'shared-no-features',
+		severity: 'error',
+		match: (f) => /\/src\/app\/shared\//.test(f),
+		restrictions: [
+			{
+				sourcePattern: /^@features\//,
+				message: 'shared/ no puede importar de features/ — dependencia inversa.',
+			},
+			{
+				sourcePattern: /^@intranet-shared(\/|$)/,
+				message: 'shared/ no puede importar de @intranet-shared — dependencia inversa.',
+			},
+		],
+	},
+	{
+		id: 'component-no-http-no-store',
+		severity: 'error',
+		match: (f) => /\.component\.ts$/.test(f),
+		restrictions: [
+			{
+				sourcePattern: /^@angular\/common\/http$/,
+				importedNames: ['HttpClient'],
+				message:
+					'Components no deben usar HttpClient directamente — usar facade o service.',
+			},
+			{
+				sourcePattern: /\.store(\.ts)?$/,
+				message:
+					'Components no deben importar stores directamente — consumir vía facade. El facade expone el vm/signals del store.',
+			},
+		],
+	},
+	{
+		id: 'store-no-io-no-facade',
+		severity: 'error',
+		match: (f) => /\.store\.ts$/.test(f),
+		restrictions: [
+			{
+				sourcePattern: /^@angular\/common\/http$/,
+				importedNames: ['HttpClient'],
+				message:
+					'Stores no deben usar HttpClient — el facade orquesta IO y llama a store.setX() con el resultado.',
+			},
+			{
+				sourcePattern: /\.facade(\.ts)?$/,
+				message:
+					'Stores no pueden importar facades — el flujo es facade → store, nunca al revés.',
+			},
+			{
+				sourcePattern: /\.service(\.ts)?$/,
+				message:
+					'Stores no deben importar services de IO — el facade hace la llamada y entrega el resultado al store.',
+			},
+		],
+	},
+	{
+		id: 'facade-no-cross-facade',
+		severity: 'error',
+		match: (f) =>
+			/\.facade\.ts$/.test(f) &&
+			!/-data\.facade\.ts$/.test(f) &&
+			!/-crud\.facade\.ts$/.test(f) &&
+			!/-ui\.facade\.ts$/.test(f),
+		restrictions: [
+			{
+				sourcePattern: /\.facade(\.ts)?$/,
+				message:
+					'Facades no deben importar otros facades — genera acoplamiento. Orquestar desde el componente o extraer lógica compartida a un store. G9 del inventario F3.1 — 0 violaciones al 2026-04-14, subido a error.',
+			},
+		],
+	},
+	{
+		id: 'admin-no-cross-feature',
+		severity: 'error',
+		match: (f) => /\/src\/app\/features\/intranet\/pages\/admin\//.test(f),
+		restrictions: [
+			{
+				sourcePattern: /^@features\/intranet\/pages\/profesor\//,
+				message: 'admin/ no puede importar de profesor/ — features independientes.',
+			},
+			{
+				sourcePattern: /^@features\/intranet\/pages\/estudiante\//,
+				message: 'admin/ no puede importar de estudiante/ — features independientes.',
+			},
+		],
+	},
+	{
+		id: 'profesor-no-cross-feature',
+		severity: 'warn',
+		match: (f) => /\/src\/app\/features\/intranet\/pages\/profesor\//.test(f),
+		restrictions: [
+			{
+				sourcePattern: /^@features\/intranet\/pages\/admin\//,
+				message:
+					'profesor/ no puede importar de admin/ — mover componentes compartidos a @intranet-shared.',
+			},
+			{
+				sourcePattern: /^@features\/intranet\/pages\/estudiante\//,
+				message: 'profesor/ no puede importar de estudiante/ — features independientes.',
+			},
+		],
+	},
+	{
+		id: 'estudiante-no-cross-feature',
+		severity: 'error',
+		match: (f) => /\/src\/app\/features\/intranet\/pages\/estudiante\//.test(f),
+		restrictions: [
+			{
+				sourcePattern: /^@features\/intranet\/pages\/admin\//,
+				message: 'estudiante/ no puede importar de admin/ — features independientes.',
+			},
+			{
+				sourcePattern: /^@features\/intranet\/pages\/profesor\//,
+				message: 'estudiante/ no puede importar de profesor/ — features independientes.',
+			},
+		],
+	},
+];
+
+function createImportChecker(severityFilter) {
+	return function check(context) {
+		const filename = normalizePath(context.filename ?? context.getFilename());
+		const applicable = LAYER_RULES.filter(
+			(r) => r.severity === severityFilter && r.match(filename),
+		);
+		if (applicable.length === 0) return {};
+
+		return {
+			ImportDeclaration(node) {
+				const source = node.source?.value;
+				if (typeof source !== 'string') return;
+				for (const rule of applicable) {
+					for (const restriction of rule.restrictions) {
+						if (!restriction.sourcePattern.test(source)) continue;
+						if (!hasImportedName(node, restriction.importedNames)) continue;
+						context.report({
+							node: node.source,
+							message: restriction.message,
+						});
+						break; // un report por rule por import
+					}
+				}
+			},
+		};
+	};
+}
+
+const layerEnforcementPlugin = {
+	rules: {
+		'imports-error': {
+			meta: {
+				type: 'problem',
+				docs: {
+					description:
+						'Restricciones de import por capa (shared/component/store/facade/cross-feature) con severidad error. Fix G10: reemplaza bloques no-restricted-imports overrideados por el barrel enforcement.',
+				},
+				schema: [],
+			},
+			create(context) {
+				return createImportChecker('error')(context);
+			},
+		},
+		'imports-warn': {
+			meta: {
+				type: 'suggestion',
+				docs: {
+					description:
+						'Restricciones de import por capa con severidad warn (actualmente: profesor cross-feature).',
+				},
+				schema: [],
+			},
+			create(context) {
+				return createImportChecker('warn')(context);
+			},
+		},
+	},
+};
+// #endregion
+
 module.exports = tseslint.config(
 	// #region Base TS config
 	{
@@ -266,6 +471,7 @@ module.exports = tseslint.config(
 		processor: angular.processInlineTemplates,
 		plugins: {
 			structure: structurePlugin,
+			'layer-enforcement': layerEnforcementPlugin,
 		},
 		rules: {
 			// Estructura y crecimiento
@@ -278,6 +484,11 @@ module.exports = tseslint.config(
 			'structure/no-deep-relative-imports': 'error',
 			'structure/no-repeated-blocks': 'warn',
 			'structure/no-compact-trivial-setter': ['warn', ],
+
+			// layer-enforcement (fix G10): reglas de restricción de imports por capa.
+			// Tabla declarativa en LAYER_RULES. Nombres únicos evitan el override de no-restricted-imports.
+			'layer-enforcement/imports-error': 'error',
+			'layer-enforcement/imports-warn': 'warn',
 
 			// Angular rules
 			'@angular-eslint/component-class-suffix': 'error',
@@ -346,189 +557,18 @@ module.exports = tseslint.config(
 	},
 	// #endregion
 
-	// #region Enforcement de capas — shared/ no importa de features ni intranet-shared
-	{
-		files: ['src/app/shared/**/*.ts'],
-		rules: {
-			'no-restricted-imports': [
-				'error',
-				{
-					patterns: [
-						{
-							group: ['@features/*'],
-							message: 'shared/ no puede importar de features/ — dependencia inversa.',
-						},
-						{
-							group: ['@intranet-shared', '@intranet-shared/*'],
-							message:
-								'shared/ no puede importar de @intranet-shared — dependencia inversa.',
-						},
-					],
-				},
-			],
-		},
-	},
-	// #endregion
-
-	// #region Enforcement de capas — components no usan HttpClient ni importan stores directamente
-	// Los components deben consumir facades. El facade expone vm/readonly del store.
-	// Escape hatch: // eslint-disable-next-line <rule> -- Razón: <justificación específica>
-	{
-		files: ['src/app/**/*.component.ts'],
-		rules: {
-			'no-restricted-imports': [
-				'error',
-				{
-					paths: [
-						{
-							name: '@angular/common/http',
-							importNames: ['HttpClient'],
-							message:
-								'Components no deben usar HttpClient directamente — usar facade o service.',
-						},
-					],
-					patterns: [
-						{
-							group: ['**/*.store', '**/*.store.ts'],
-							message:
-								'Components no deben importar stores directamente — consumir vía facade. El facade expone el vm/signals del store.',
-						},
-					],
-				},
-			],
-		},
-	},
-	// #endregion
-
-	// #region Enforcement de capas — stores son fuente de estado, no hablan con IO
-	// "Un servicio no es estado. Es una fuente de estado." Los stores no hacen HTTP ni subscribe —
-	// eso lo hace el facade, que orquesta IO y llama a store.setX() con el resultado.
-	// Escape hatch: // eslint-disable-next-line <rule> -- Razón: <justificación específica>
+	// #region Enforcement de capas — stores no hacen .subscribe() (regla aparte; imports en layer-enforcement)
+	// "Un servicio no es estado. Es una fuente de estado." El store solo muta estado síncrono.
+	// Escape hatch: // eslint-disable-next-line no-restricted-syntax -- Razón: <justificación específica>
 	{
 		files: ['src/app/**/*.store.ts'],
 		rules: {
-			'no-restricted-imports': [
-				'error',
-				{
-					paths: [
-						{
-							name: '@angular/common/http',
-							importNames: ['HttpClient'],
-							message:
-								'Stores no deben usar HttpClient — el facade orquesta IO y llama a store.setX() con el resultado.',
-						},
-					],
-					patterns: [
-						{
-							group: ['**/*.facade', '**/*.facade.ts'],
-							message:
-								'Stores no pueden importar facades — el flujo es facade → store, nunca al revés.',
-						},
-						{
-							group: ['**/*.service', '**/*.service.ts'],
-							message:
-								'Stores no deben importar services de IO — el facade hace la llamada y entrega el resultado al store.',
-						},
-					],
-				},
-			],
 			'no-restricted-syntax': [
 				'error',
 				{
 					selector: "CallExpression[callee.property.name='subscribe']",
 					message:
 						'Stores no deben hacer .subscribe() — mover la suscripción al facade. El store solo muta estado síncrono.',
-				},
-			],
-		},
-	},
-	// #endregion
-
-	// #region Enforcement de capas — facades no se importan entre sí (evitar acoplamiento)
-	// Si dos facades necesitan coordinarse, el componente orquesta o se extrae lógica compartida a un store/servicio.
-	// Escape hatch: // eslint-disable-next-line <rule> -- Razón: <justificación específica>
-	{
-		files: ['src/app/**/*.facade.ts'],
-		ignores: ['src/app/**/*-data.facade.ts', 'src/app/**/*-crud.facade.ts', 'src/app/**/*-ui.facade.ts'],
-		rules: {
-			'no-restricted-imports': [
-				'error',
-				{
-					patterns: [
-						{
-							group: ['**/*.facade', '**/*.facade.ts'],
-							message:
-								'Facades no deben importar otros facades — genera acoplamiento. Orquestar desde el componente o extraer lógica compartida a un store. G9 del inventario F3.1 — 0 violaciones al 2026-04-14, subido a error.',
-						},
-					],
-				},
-			],
-		},
-	},
-	// #endregion
-
-	// #region Enforcement de capas — features no importan de otras features
-	{
-		files: ['src/app/features/intranet/pages/admin/**/*.ts'],
-		rules: {
-			'no-restricted-imports': [
-				'error',
-				{
-					patterns: [
-						{
-							group: ['@features/intranet/pages/profesor/*'],
-							message: 'admin/ no puede importar de profesor/ — features independientes.',
-						},
-						{
-							group: ['@features/intranet/pages/estudiante/*'],
-							message:
-								'admin/ no puede importar de estudiante/ — features independientes.',
-						},
-					],
-				},
-			],
-		},
-	},
-	{
-		files: ['src/app/features/intranet/pages/profesor/**/*.ts'],
-		rules: {
-			'no-restricted-imports': [
-				'warn',
-				{
-					patterns: [
-						{
-							group: ['@features/intranet/pages/admin/*'],
-							message:
-								'profesor/ no puede importar de admin/ — mover componentes compartidos a @intranet-shared.',
-						},
-						{
-							group: ['@features/intranet/pages/estudiante/*'],
-							message:
-								'profesor/ no puede importar de estudiante/ — features independientes.',
-						},
-					],
-				},
-			],
-		},
-	},
-	{
-		files: ['src/app/features/intranet/pages/estudiante/**/*.ts'],
-		rules: {
-			'no-restricted-imports': [
-				'error',
-				{
-					patterns: [
-						{
-							group: ['@features/intranet/pages/admin/*'],
-							message:
-								'estudiante/ no puede importar de admin/ — features independientes.',
-						},
-						{
-							group: ['@features/intranet/pages/profesor/*'],
-							message:
-								'estudiante/ no puede importar de profesor/ — features independientes.',
-						},
-					],
 				},
 			],
 		},

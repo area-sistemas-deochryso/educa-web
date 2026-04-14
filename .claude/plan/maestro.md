@@ -20,7 +20,7 @@
 | 8 | Design Patterns Backend | FE | [tasks/design-patterns-backend.md](../tasks/design-patterns-backend.md) | Incremental |
 | 9 | Design Patterns Frontend | FE | [tasks/design-patterns-frontend.md](../tasks/design-patterns-frontend.md) | Incremental |
 | 10 | Flujos Alternos (resiliencia) | FE | [plan/flujos-alternos.md](flujos-alternos.md) | ⏳ (bloqueado) |
-| 11 | Refactor `eslint.config.js` (fix G10) | FE | [plan/eslint-config-refactor.md](eslint-config-refactor.md) | F1 ✅ (decisión: Opción B plugin) · F2-F5 ⏳ |
+| 11 | Refactor `eslint.config.js` (fix G10) | FE | [plan/eslint-config-refactor.md](eslint-config-refactor.md) | F1-F3 ✅ (plugin `layer-enforcement` activo) · F4-F5 ⏳ |
 
 ---
 
@@ -133,9 +133,9 @@ Capa 5: PATRONES + RESILIENCIA                                                  
 #### Plan 11 — Refactor `eslint.config.js` (fix G10) — ejecutar PRIMERO
 
 - [x] F1 Spike y decisión — **Opción B (plugin `layer-enforcement`)** el 2026-04-14. Mezcla de severidades (profesor warn vs resto error) + combinatoria admin/profesor/estudiante × component/store/facade hace inviable Opción A.
-- [ ] F2 Inventario de patterns a consolidar
-- [ ] F3 Implementación (plugin local `layer-enforcement`, siguiendo patrón `walPlugin`/`structurePlugin`)
-- [ ] F4 Reenganche con Plan 1 F3.3 (re-habilitar G5/G6, confirmar G9)
+- [x] F2 Inventario de patterns a consolidar — tabla `LAYER_RULES` con 7 entries (shared, component, store, facade-cross, admin, profesor, estudiante)
+- [x] F3 Implementación — plugin local `layer-enforcement` con 2 reglas (`imports-error`, `imports-warn`) en `eslint.config.js`. Removidos los 7 bloques overrideados por barrel. Verificado con `--print-config` y lint completo (detecta ~28 violaciones pre-existentes que eran invisibles).
+- [ ] F4 Reenganche con Plan 1 F3.3 (re-habilitar G5/G6, confirmar G9, limpiar 3 `eslint-disable` huérfanos en `shared/*/index.ts`, actualizar `rules/eslint.md`)
 - [ ] F5 Tests de guardia (opcional)
 
 Ver [plan/eslint-config-refactor.md](eslint-config-refactor.md).
