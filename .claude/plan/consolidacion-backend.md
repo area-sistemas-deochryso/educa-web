@@ -57,8 +57,9 @@ logica compleja de ventanas horarias, coherencia biometrica, y generacion de PDF
 ### Estado actual
 
 - Branch de trabajo: `refactor/split-services-fase1` en `Educa.API` (mergeable a `master`)
-- Prioridad 1 COMPLETADA — commit `107d758`
-- Prioridades 2-5 pendientes
+- Prioridades 1, 2, 3 COMPLETADAS — commits `107d758`, `aaf89c8`, `30f1290`
+- Prioridades 4-5 pendientes (AsistenciaService 487 ln, ReporteFiltradoAsistenciaService 441 ln)
+- ~1799 líneas refactorizadas hasta ahora (649 + 638 + 512). Tests: 699/699 estable en cada commit.
 
 ### Convenciones aplicadas (seguir en los siguientes splits)
 
