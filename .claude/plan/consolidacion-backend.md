@@ -3,6 +3,8 @@
 > **Fecha**: 2026-04-13
 > **Objetivo**: Limpiar la arquitectura interna sin romper la estabilidad operativa
 > **Principio rector**: "Backend confiable operativamente, todavia no del todo limpio arquitectonicamente"
+>
+> **Coordinación cross-plan**: `Educa.API/.claude/plan/asignacion-profesor-salon-curso.md` tiene precedencia sobre las Fases 6 (audit `HorarioAsignacionService`) y 7 (Matrícula). El refactor de Fase 6 **debe** consumir los validadores (`TutorPlenoValidator`, `ModoAsignacionResolver`) en lugar de duplicar lógica. Fase 7 Matrícula al asignar estudiante a salón **debe** validar el modo del grado (INV-AS01/02/03).
 > **Horizonte**: 3-6 meses, trabajo incremental
 > **Repo**: Educa.API — branch `master`
 

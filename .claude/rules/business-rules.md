@@ -359,6 +359,41 @@ Si salonOrigen.Seccion != "V":
 
 Un curso puede enseñarse en múltiples grados (tabla `CursoGrado`), pero cada asignación curso-grado es única. No se puede asignar "Matemáticas" dos veces al mismo grado.
 
+### 5.4 Modelo de asignación profesor-salón-curso
+
+> **"La forma en que un profesor se asigna depende del grado del salón, no de una política uniforme."**
+
+El colegio opera con dos modelos de asignación distintos según el nivel/grado. Cualquier cambio que toque asignaciones de profesores, permisos de calificación o asistencia por curso **debe** respetar esta distinción.
+
+| Rango | `GRA_Orden` | Modelo | Relación natural |
+|-------|-------------|--------|------------------|
+| Inicial (3 grados) → 4to Primaria | 1 – 8 | **Tutor pleno** — un profesor por salón dicta TODOS los cursos | Profesor ↔ Salón |
+| 5to Primaria → 5to Secundaria | 9 – 14 | **Por curso** — un profesor puede dictar uno o más cursos; un salón tiene múltiples profesores | Profesor ↔ Curso (en contexto de Salón vía Horario) |
+
+**Consecuencias**:
+
+- En modo **tutor pleno**, el profesor del horario **debe** coincidir con el `ProfesorSalon` tutor del salón. No se permiten horarios con profesores distintos al tutor.
+- En modo **por curso**, cualquier profesor asignado al curso puede dictarlo. La relación pasa por Horario (no hay tabla `ProfesorCurso` directa hoy).
+- Los flujos de UI (asignación masiva, creación de horarios, permisos de calificación/asistencia) **deben** ramificar según `GRA_Orden` del salón.
+
+**Estado actual del back (deuda de diseño)**:
+
+El modelo actual (`ProfesorSalon` + curso resuelto vía `Horario`) fue construido antes de conocer esta distinción. Hoy no distingue entre tutor pleno y asignación por curso — todo pasa por Horario. Al refinar este diseño se evaluará:
+
+- Campo `ModoAsignacion` derivado de `GRA_Orden` (o columna explícita en `Grado`/`Salon`).
+- Validación en creación de horarios: si salón es tutor pleno, el profesor debe ser el tutor.
+- Posible tabla `ProfesorCurso` para 5to Primaria en adelante si la asignación por curso se independiza del horario.
+
+**Invariantes** (propuestos, a formalizar en sección 15 cuando se implemente el refinamiento):
+
+| ID | Invariante |
+|----|-----------|
+| `INV-AS01` | Salones con `GRA_Orden ≤ 8` operan en modo tutor pleno: todo horario del salón debe tener como profesor al `ProfesorSalon` tutor (`PRS_EsTutor = true`) |
+| `INV-AS02` | Salones con `GRA_Orden ≥ 9` operan en modo por curso: múltiples profesores pueden tener horarios en el mismo salón, uno por curso |
+| `INV-AS03` | Un profesor en modo tutor pleno dicta obligatoriamente todos los cursos asignados al grado del salón vía `CursoGrado` |
+
+**Impacto transversal**: Esta regla afecta BD (posible nueva columna/tabla), backend (validaciones de horarios, servicios de asignación) y frontend (UI de asignación diferenciada por grado). Cualquier cambio debe coordinarse en las tres capas.
+
 ---
 
 ## 6. Horarios

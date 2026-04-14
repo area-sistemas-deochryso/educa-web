@@ -1,7 +1,8 @@
 // #region Imports
-import { ChangeDetectionStrategy, Component, inject, input, output } from '@angular/core';
+import { ChangeDetectionStrategy, Component, inject, input, output, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ButtonModule } from 'primeng/button';
+import { DialogModule } from 'primeng/dialog';
 import { TableLazyLoadEvent, TableModule } from 'primeng/table';
 import { TagModule } from 'primeng/tag';
 import { TooltipModule } from 'primeng/tooltip';
@@ -19,7 +20,7 @@ import { TableLoadingDirective } from '@app/shared';
 @Component({
 	selector: 'app-users-table',
 	standalone: true,
-	imports: [CommonModule, TableModule, ButtonModule, TagModule, TooltipModule, TableLoadingDirective, EstadoLabelPipe, EstadoSeverityPipe, EstadoToggleIconPipe, EstadoToggleLabelPipe, FullNamePipe],
+	imports: [CommonModule, TableModule, ButtonModule, DialogModule, TagModule, TooltipModule, TableLoadingDirective, EstadoLabelPipe, EstadoSeverityPipe, EstadoToggleIconPipe, EstadoToggleLabelPipe, FullNamePipe],
 	templateUrl: './usuarios-table.component.html',
 	styleUrl: './usuarios-table.component.scss',
 	changeDetection: ChangeDetectionStrategy.OnPush,
@@ -42,6 +43,22 @@ export class UsersTableComponent {
 
 	// * Track first load to avoid duplicate initial fetch
 	private initialLoadDone = false;
+
+	// * Dialog para mostrar salones múltiples de un profesor
+	readonly salonesDialogVisible = signal(false);
+	readonly salonesDialogUsuario = signal<UsuarioLista | null>(null);
+
+	openSalonesDialog(usuario: UsuarioLista): void {
+		this.salonesDialogUsuario.set(usuario);
+		this.salonesDialogVisible.set(true);
+	}
+
+	onSalonesDialogVisibleChange(visible: boolean): void {
+		if (!visible) {
+			this.salonesDialogVisible.set(false);
+			this.salonesDialogUsuario.set(null);
+		}
+	}
 
 	onViewDetail(usuario: UsuarioLista): void {
 		this.viewDetail.emit(usuario);

@@ -61,7 +61,24 @@
 				</td>
 				<td>
 					@if (usuario.salonNombre) {
-						<span class="salon-text">{{ usuario.salonNombre }}</span>
+						<div class="salon-cell">
+							<span class="salon-text">{{ usuario.salonNombre }}</span>
+							@if (usuario.salonesNombres && usuario.salonesNombres.length > 1) {
+								<button
+									pButton
+									icon="pi pi-eye"
+									class="p-button-rounded p-button-text p-button-sm"
+									pTooltip="Ver todos los salones ({{ usuario.salonesNombres.length }})"
+									tooltipPosition="top"
+									(click)="openSalonesDialog(usuario)"
+									[pt]="{
+										root: {
+											'aria-label': 'Ver todos los salones',
+										},
+									}"
+								></button>
+							}
+						</div>
 					} @else {
 						<span class="text-muted">—</span>
 					}
@@ -141,4 +158,32 @@
 		</ng-template>
 	</p-table>
 </section>
+
+<!-- #region Dialog salones profesor -->
+<p-dialog
+	[visible]="salonesDialogVisible()"
+	(visibleChange)="onSalonesDialogVisibleChange($event)"
+	[modal]="true"
+	[draggable]="false"
+	[resizable]="false"
+	[style]="{ width: '420px' }"
+	[header]="salonesDialogUsuario()?.nombreCompleto ?? 'Salones del profesor'"
+>
+	@if (salonesDialogUsuario(); as u) {
+		<div class="salones-dialog-content">
+			<p class="salones-dialog-subtitle">
+				Salones asignados ({{ u.salonesNombres?.length ?? 0 }})
+			</p>
+			<ul class="salones-list">
+				@for (salon of u.salonesNombres; track salon) {
+					<li class="salones-list-item">
+						<i class="pi pi-book"></i>
+						<span>{{ salon }}</span>
+					</li>
+				}
+			</ul>
+		</div>
+	}
+</p-dialog>
+<!-- #endregion -->
 <!-- #endregion -->
