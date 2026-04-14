@@ -86,17 +86,29 @@ logica compleja de ventanas horarias, coherencia biometrica, y generacion de PDF
 
 Build limpio, 699/699 tests.
 
-#### AsistenciaPdfComposer.cs (638 ln) — Prioridad 2
+#### AsistenciaPdfComposer.cs (638 ln) — Prioridad 2 — COMPLETADO (commit aaf89c8)
 
-**Analisis**: Generacion de PDFs es inherentemente verbosa. Probablemente mezcla
-layout, datos, y renderizado.
+**Analisis real**: No es un service con responsabilidades mezcladas — es un static helper class
+puro (sin estado, sin DI). La division por Layout/Data no aplicaba. Se dividio por tipo de
+seccion PDF usando `partial class static`, preservando la API publica (cero cambios en los 3
+consumers: `ReporteFiltradoPdfService`, `ReporteAsistenciaSalonPdfService`,
+`ReporteAsistenciaConsolidadoPdfService`).
 
-**Division propuesta**:
-| Nuevo servicio | Responsabilidad |
-|---------------|-----------------|
-| AsistenciaPdfLayoutService | Estructura y layout del PDF |
-| AsistenciaPdfDataService | Obtencion y formateo de datos para el PDF |
-| AsistenciaPdfComposer (reducido) | Orquestacion: llama layout + data |
+**Division aplicada** en `Services/Asistencias/AsistenciaPdf/`:
+
+| Archivo (partial) | Lineas | Contenido |
+|-------------------|--------|-----------|
+| `AsistenciaPdfComposer.Colors.cs` | 127 | PdfColorScheme + esquemas (Blue/Green/...) + ColorEstado/Bg + NivelAsistencia + ComposeLeyendaAsistencia |
+| `AsistenciaPdfComposer.StatCards.cs` | 62 | ComposeStatCard + ComposeStatRow |
+| `AsistenciaPdfComposer.StudentSections.cs` | 84 | ComposeStudentSection (tabla genérica parametrizada) |
+| `AsistenciaPdfComposer.DiarioSections.cs` | 193 | SectionAsistieronATiempo + SectionLlegaronTarde + SectionJustificados + SectionNoAsistieron |
+| `AsistenciaPdfComposer.RangoSections.cs` | 167 | SectionRangoSimple + SectionRangoJustificados + ComposeContentConsolidadoRango + ComposeSalonResumenRango |
+| `AsistenciaPdfComposer.Footer.cs` | 35 | ComposeFooter |
+
+Build limpio, 699/699 tests.
+
+**Aprendizaje**: cuando un archivo grande es un helper estatico sin estado, `partial class`
+es mejor que fachada porque no requiere interfaces ni DI y los callers no cambian.
 
 #### AsistenciaAdminService.cs (512 ln) — Prioridad 3
 
@@ -127,8 +139,8 @@ Misma estrategia: separar data retrieval de formatting/rendering.
 ### Orden de ejecucion
 
 1. PermisoSaludService — COMPLETADO (commit 107d758)
-2. AsistenciaPdfComposer (638 ln) — SIGUIENTE
-3. AsistenciaAdminService (512 ln)
+2. AsistenciaPdfComposer — COMPLETADO (commit aaf89c8)
+3. AsistenciaAdminService (512 ln) — SIGUIENTE
 4. AsistenciaService (487 ln) — webhook CrossChex, division delicada
 5. ReporteFiltradoAsistenciaService (441 ln)
 6. Resto (ReporteFiltradoPdfService, ReporteAsistenciaDataService, ReporteAsistenciaConsolidadoPdfService): incremental al tocar el archivo
@@ -137,7 +149,7 @@ Misma estrategia: separar data retrieval de formatting/rendering.
 
 Prompt sugerido:
 
-> Continuar Fase 1 del plan `consolidacion-backend.md`. Ya se dividio `PermisoSaludService` (commit 107d758 en branch `refactor/split-services-fase1`). Siguiente: dividir `Educa.API/Services/Asistencias/AsistenciaPdfComposer.cs` (638 ln) aplicando el patron fachada. Verificar build + 699 tests despues.
+> Continuar Fase 1 del plan `consolidacion-backend.md`. Ya se dividieron `PermisoSaludService` (107d758) y `AsistenciaPdfComposer` (aaf89c8) en branch `refactor/split-services-fase1`. Siguiente: dividir `Educa.API/Services/Asistencias/AsistenciaAdminService.cs` (512 ln) aplicando el patron fachada (este si es un service con DI, no helper estatico). Verificar build + 699 tests despues.
 
 Pasos del flujo:
 1. Verificar que el repo `Educa.API` esta en branch `refactor/split-services-fase1` y limpio (`git status`)
@@ -161,7 +173,7 @@ Pasos del flujo:
 ### Criterio de completitud
 
 - [x] PermisoSaludService dividido (commit 107d758)
-- [ ] AsistenciaPdfComposer dividido
+- [x] AsistenciaPdfComposer dividido (commit aaf89c8)
 - [ ] AsistenciaAdminService dividido
 - [ ] AsistenciaService dividido
 - [ ] ReporteFiltradoAsistenciaService dividido
