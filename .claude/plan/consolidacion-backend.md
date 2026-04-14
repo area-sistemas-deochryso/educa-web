@@ -57,9 +57,9 @@ logica compleja de ventanas horarias, coherencia biometrica, y generacion de PDF
 ### Estado actual
 
 - Branch de trabajo: `refactor/split-services-fase1` en `Educa.API` (mergeable a `master`)
-- Prioridades 1, 2, 3 COMPLETADAS — commits `107d758`, `aaf89c8`, `30f1290`
-- Prioridades 4-5 pendientes (AsistenciaService 487 ln, ReporteFiltradoAsistenciaService 441 ln)
-- ~1799 líneas refactorizadas hasta ahora (649 + 638 + 512). Tests: 699/699 estable en cada commit.
+- Prioridades 1, 2, 3, 4 COMPLETADAS — commits `107d758`, `aaf89c8`, `30f1290`, `ed24566`
+- Prioridad 5 pendiente (ReporteFiltradoAsistenciaService 441 ln)
+- ~2286 líneas refactorizadas hasta ahora (649 + 638 + 512 + 487). Tests: 699/699 estable en cada commit.
 
 ### Convenciones aplicadas (seguir en los siguientes splits)
 
@@ -127,14 +127,18 @@ es mejor que fachada porque no requiere interfaces ni DI y los callers no cambia
 Cada service con interfaz en `Interfaces/Services/Asistencias/`. DI registrada helpers -> services -> fachada.
 Build limpio, 699/699 tests.
 
-#### AsistenciaService.cs (487 ln) — Prioridad 4
+#### AsistenciaService.cs (487 ln) — Prioridad 4 — COMPLETADO (commit ed24566)
 
-**Division propuesta**:
-| Nuevo servicio | Responsabilidad |
-|---------------|-----------------|
-| AsistenciaBiometricaService | Logica de webhook CrossChex + coherencia horaria |
-| AsistenciaRegistroService | Registro y clasificacion de marcaciones |
-| AsistenciaService (reducido) | Coordinacion general |
+**Division aplicada** (2 sub-services + fachada; webhook se mantuvo en la fachada por tamaño pequeño y dependencia circular con `IAsistenciaService`):
+
+| Archivo | Lineas | Rol |
+|---------|--------|-----|
+| `Services/Asistencias/AsistenciaService.cs` (fachada) | 289 | Orquesta `RegistrarAsistencia` (INV-AD02, INV-C03 via `CoherenciaHorariaValidator`) + webhook (INV-S08) + `ResolverSedeIdPorNombreAsync` |
+| `Services/Asistencias/Registro/AsistenciaMarcacionExecutor.cs` | 166 | 5 mutaciones: CrearEntrada, CrearSalidaSinEntrada, ReemplazarEntrada, ConvertirEntradaEnSalida, CompletarSalida — con `ConcurrencyRetry` (INV-S05) |
+| `Services/Asistencias/Registro/AsistenciaNotificationDispatcher.cs` | 70 | SignalR + email outbox fire-and-forget (INV-S07) |
+
+**Nota**: subcarpeta nombrada `Registro/` (no `Asistencia/`) para evitar colisión de namespace con el tipo `Models.Asistencias.Asistencia`.
+Tests actualizados: componen sub-services reales sobre los mismos mocks `repo/channel/email`. 699/699 tests pasando.
 
 #### ReporteFiltradoAsistenciaService.cs (441 ln) — Prioridad 5
 
@@ -149,15 +153,15 @@ Misma estrategia: separar data retrieval de formatting/rendering.
 1. PermisoSaludService — COMPLETADO (commit 107d758)
 2. AsistenciaPdfComposer — COMPLETADO (commit aaf89c8)
 3. AsistenciaAdminService — COMPLETADO (commit 30f1290)
-4. AsistenciaService (487 ln) — SIGUIENTE — webhook CrossChex, division delicada
-5. ReporteFiltradoAsistenciaService (441 ln)
+4. AsistenciaService — COMPLETADO (commit ed24566)
+5. ReporteFiltradoAsistenciaService (441 ln) — SIGUIENTE
 6. Resto (ReporteFiltradoPdfService, ReporteAsistenciaDataService, ReporteAsistenciaConsolidadoPdfService): incremental al tocar el archivo
 
 ### Para retomar en chat nuevo
 
 Prompt sugerido:
 
-> Continuar Fase 1 del plan `consolidacion-backend.md`. Ya se dividieron `PermisoSaludService` (107d758), `AsistenciaPdfComposer` (aaf89c8) y `AsistenciaAdminService` (30f1290) en branch `refactor/split-services-fase1`. Siguiente: dividir `Educa.API/Services/Asistencias/AsistenciaService.cs` (487 ln) — contiene logica del webhook CrossChex, coherencia horaria biometrica (INV-C03) y anti-duplicacion; division delicada. Aplicar patron fachada. Verificar build + 699 tests despues.
+> Continuar Fase 1 del plan `consolidacion-backend.md`. Ya se dividieron `PermisoSaludService` (107d758), `AsistenciaPdfComposer` (aaf89c8), `AsistenciaAdminService` (30f1290) y `AsistenciaService` (ed24566) en branch `refactor/split-services-fase1`. Siguiente: dividir `Educa.API/Services/Asistencias/ReporteFiltradoAsistenciaService.cs` (441 ln) — separar query builder de formatter. Aplicar patron fachada. Verificar build + 699 tests despues.
 
 Pasos del flujo:
 1. Verificar que el repo `Educa.API` esta en branch `refactor/split-services-fase1` y limpio (`git status`)
@@ -183,7 +187,7 @@ Pasos del flujo:
 - [x] PermisoSaludService dividido (commit 107d758)
 - [x] AsistenciaPdfComposer dividido (commit aaf89c8)
 - [x] AsistenciaAdminService dividido (commit 30f1290)
-- [ ] AsistenciaService dividido
+- [x] AsistenciaService dividido (commit ed24566)
 - [ ] ReporteFiltradoAsistenciaService dividido
 - [ ] Ningun service de feature >300 lineas
 - [ ] Cada nuevo servicio con interfaz registrada en DI
