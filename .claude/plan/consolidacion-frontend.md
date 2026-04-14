@@ -220,7 +220,8 @@ Ninguna. Cada flujo restante es independiente; usar el patrón WAL mock controll
 | 2 | horarios.store.ts | 401 → 333 | `b785800` | Extraído `SchedulesOptionsStore` (113 ln) siguiendo patrón de form/filter stores |
 | 3 | storage.service.ts | 641 → 326 | `5b76f19` | Thin facade — strip JSDoc boilerplate (sub-facades ya existían) |
 | 4 | notifications.service.ts | 382 → 345 | `a8a3fe6` | Thin facade — strip JSDoc redundante (api/sound/smart sub-services ya existían) |
-| 5 | campus-admin.facade.ts | 383 → 328 | _pendiente_ | Extraído `CampusAdminUiFacade` (107 ln): editor tool, click resolvers, dialogs. Main facade queda con carga + CRUD |
+| 5 | campus-admin.facade.ts | 383 → 328 | `805ef12` | Extraído `CampusAdminUiFacade` (107 ln): editor tool, click resolvers, dialogs. Main facade queda con carga + CRUD. Plan proponía 3 facades (data/crud/ui); un solo split fue suficiente para bajar de 350 |
+| 6 | pathfinding.service.ts | 439 (escape hatch) | `29afad0` | Reclasificado a Grupo A. A* + geometría de safe-path son cohesivos, comparten tipos y flujo de datos. Comentario de escape hatch en primera línea del archivo |
 
 **Nota**: `storage.service.ts` pertenece a Grupo A, no B. Los sub-facades mencionados en plan (auth-storage, preferences-storage, cache-storage) ya existían como `SessionStorageService`, `PreferencesStorageService`, `NotificationStorageService`. La solución real era reducir boilerplate JSDoc, no refactorizar estructura.
 
@@ -248,10 +249,10 @@ Estos archivos son gordos porque acumularon responsabilidades. Dividir por rol.
 |---------|--------|------------------------|
 | profesor-api.service.ts | ~~417~~ → 201 ✅ | Aggregate pattern: 3 sub-services (salones 78, cursos 241, asistencia 49). Aggregate delega para no romper 14 consumidores. |
 | horarios.store.ts | ~~401~~ → 333 ✅ | Extraído SchedulesOptionsStore (113 ln): salones/cursos/profesores disponibles + computed options + optionsLoading. Main store delega. Filters+Form ya estaban extraídos. |
-| campus-admin.facade.ts | 383 | Dividir en multi-facade: campus-data.facade + campus-crud.facade + campus-ui.facade |
+| campus-admin.facade.ts | ~~383~~ → 328 ✅ | Extraído `CampusAdminUiFacade` (107 ln): editor tool + click resolvers + dialogs. Main facade queda con carga + CRUD. |
 | salones-admin.facade.ts | 379 | Ya es facade unico — dividir en multi-facade si tiene 3+ responsabilidades |
 | campus-admin.store.ts | 379 | Extraer computed pesados a campus-admin-derived.store.ts o mover a facade |
-| notifications.service.ts | 382 | Dividir: notification-api.service.ts + notification-state.service.ts |
+| notifications.service.ts | ~~382~~ → 345 ✅ | Thin facade — sub-services (api/sound/smart/persistence) ya existían. Strip JSDoc redundante. |
 | error-reporter.service.ts | 384 | Revisar si hay logica que deberia estar en interceptor |
 | preferences-storage.service.ts | 449 | Dividir por dominio de preferencias si hay 3+ grupos logicos |
 | session-storage.service.ts | 421 | Dividir: auth-session-storage + general-session-storage |
@@ -261,11 +262,23 @@ Estos archivos son gordos porque acumularon responsabilidades. Dividir por rol.
 
 Priorizar archivos que se tocan seguido (mayor riesgo de regresion):
 
-1. **profesor-api.service.ts** — se toca en cada feature de profesor
-2. **horarios.store.ts** — modulo activo con ediciones recientes
-3. **storage.service.ts** — facade central, tocada indirectamente por muchos
-4. **notifications.service.ts** — se toca al agregar features de comunicacion
-5. El resto: incremental al tocar el archivo
+1. ✅ **profesor-api.service.ts** — se toca en cada feature de profesor
+2. ✅ **horarios.store.ts** — modulo activo con ediciones recientes
+3. ✅ **storage.service.ts** — facade central, tocada indirectamente por muchos
+4. ✅ **notifications.service.ts** — se toca al agregar features de comunicacion
+5. ✅ **campus-admin.facade.ts** — admin de campus 3D
+6. ✅ **pathfinding.service.ts** — reclasificado a Grupo A (escape hatch)
+7. El resto: incremental al tocar el archivo
+
+### Restante Grupo B (4 archivos)
+
+| Prioridad | Archivo | Lineas | Nota al retomar |
+|-----------|---------|--------|-----------------|
+| Siguiente | campus-admin.store.ts | 379 | Contexto ya cargado de Fase 2 #5 (campus). 11 trivial-setter warnings de ESLint. Extraer computed pesados o usar `patchState` inline |
+| Siguiente | salones-admin.facade.ts | 379 | 1 trivial-setter warning. Evaluar si necesita split multi-facade |
+| Después | error-reporter.service.ts | 384 | Revisar si hay logica que debería estar en interceptor |
+| Después | preferences-storage.service.ts | 449 | Dividir por dominio si hay 3+ grupos logicos |
+| Después | session-storage.service.ts | 421 | Dividir: auth-session + general-session |
 
 ### Criterio de completitud
 
