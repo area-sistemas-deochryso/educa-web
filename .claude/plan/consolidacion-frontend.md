@@ -62,7 +62,7 @@
 > **Problema**: 99 spec files pero la mayoria valida creacion, no comportamiento.
 > **Objetivo**: Cubrir los 5 flujos criticos con tests que detecten regresiones reales.
 > **Esfuerzo**: ~8-12 horas total
-> **Estado**: 2/5 flujos completos (2026-04-14)
+> **Estado**: 5/5 flujos completos ✅ (2026-04-14)
 
 ### Contexto
 
@@ -75,9 +75,9 @@ Lo que falta son tests de **flujo de datos**: facade llama API → store se actu
 |---|-------|---------------------|--------|--------|
 | 2 | **CRUD usuarios (patron base)** | usuarios-crud.facade + usuarios.store | ✅ Hecho | `22c1c3d` (18 tests) + `6aa26de` (25 tests) |
 | 5 | **WAL optimistic flow** | WalFacadeHelper + facade concreto | ✅ Parcial — cubierto dentro del flujo 2 (apply inmediato, rollback en error, onCommit stats) | junto con flujo 2 |
-| 1 | **Login → session → permisos** | AuthService, SessionCoordinator, UserPermisosService | ⬜ Pendiente | — |
-| 3 | **Asistencia director** | attendance-director.component, attendance-view.service | ⬜ Pendiente | — |
-| 4 | **Horarios admin** | horarios-crud.facade, horarios.store | ⬜ Pendiente | — |
+| 1 | **Login → session → permisos** | AuthService, SessionCoordinator, UserPermisosService | ✅ Hecho | specs existentes + nuevo `session-coordinator.service.spec.ts` (11 tests) |
+| 3 | **Asistencia director** | attendance-director.component, attendance-view.service | ✅ Hecho | `attendance-view.service.spec.ts` (18 tests) |
+| 4 | **Horarios admin** | horarios-crud.facade, horarios.store | ✅ Hecho | `horarios-crud.facade.spec.ts` (16 tests) |
 
 ### Progreso detallado
 
@@ -124,50 +124,59 @@ function createControllableWal() {
 }
 ```
 
-#### ⬜ Flujo 1 — Login/session/permisos (pendiente, PRÓXIMO)
+#### ✅ Flujo 1 — Login/session/permisos (completo)
 
-**Archivos clave**:
-- `@core/services/auth/auth.service.ts` — login, logout, refresh
-- `@core/services/session/session-coordinator.ts` — timeouts, idle
-- `@core/services/permisos/user-permisos.service.ts` — carga permisos, `tienePermiso()`
-- `@core/store/auth.store.ts` (NgRx Signals store global)
+**Diagnóstico**: La mayoría del flujo ya estaba cubierto por specs existentes. Se auditaron y se identificó un gap real en `SessionCoordinatorService` (coordinación multi-tab vía BroadcastChannel) que no tenía spec.
 
-**Qué testear**:
-- Login exitoso → token en storage → permisos cargados → AuthStore actualizado
-- Login fallido → error surface + loginAttempts incrementa
-- Logout → limpia storage + permisos + SW cache + redirect
-- `tienePermiso(ruta)` con permisos personalizados overridea los del rol (INV-S03)
-- Comparación exacta de ruta: tener `intranet` NO da acceso a `intranet/admin` (INV-S04)
+**Cobertura verificada en specs existentes**:
+- `auth.service.spec.ts` (25 tests) — login success/failure, block tras 3 intentos, reset, logout (limpia storage+permisos), verifyToken, cambiarContrasena, sessions multi-user (getSessions, switchSession, removeSession)
+- `auth.store.spec.ts` — NgRx Signals store global
+- `user-permisos.service.spec.ts` (24 tests) — `tienePermiso()` con match exacto case-insensitive, **INV-S04** (ruta padre no da acceso a hijas, ni parcial), `ensurePermisosLoaded`, restore desde storage, clear
+- `user-permisos-security.contract.spec.ts` — contratos de seguridad
 
-**Consideraciones**:
-- `HttpClient` con `provideHttpClient() + provideHttpClientTesting()`
-- Mock `StorageService` (session + preferences)
-- Cuidado con efectos lanzados por `AuthStore` — usar `TestBed` con providers aislados
+**Nuevo spec** (`session-coordinator.service.spec.ts`, 11 tests):
+- `setup()` abre `BroadcastChannel('educa-session')` y fallback graceful si no está disponible
+- `teardown()` cierra canal; broadcast posterior es no-op
+- `broadcast()` envía mensajes y tolera `postMessage` que lanza (canal cerrado)
+- `message$` re-emite todos los mensajes recibidos (refresh-done, logout, login)
+- Detección de login con usuario distinto: warning no bloquea, mensaje se re-emite igual
 
-#### ⬜ Flujo 3 — Asistencia director (pendiente)
+**Patrón aplicado**: `MockBroadcastChannel` class instalado en `globalThis.BroadcastChannel` con helper `fire()` para simular mensajes entrantes desde otro tab. Canales se limpian en `afterEach`.
 
-**Archivos clave** (ya refactorizados en commit `64b03c0`):
-- `pages/cross-role/attendance-component/attendance-director/attendance-director.component.ts`
-- `services/attendance/attendance-view.service.ts`
-- `services/attendance/attendance-view.models.ts` (nuevos modelos extraídos)
-- `services/attendance/attendance-pdf.service.ts`
+#### ✅ Flujo 3 — Asistencia director (completo)
 
-**Qué testear**:
-- Cambio de filtros (mes, sede, salón) → recarga datos
-- Exportar PDF → llama servicio con datos correctos
-- Cambio de vista (diaria, mensual) → estado correcto del vm
+**Archivos cubiertos** (refactor en commit `64b03c0`):
+- `services/attendance/attendance-view.service.ts` (AttendanceViewController, 327 líneas)
 
-#### ⬜ Flujo 4 — Horarios admin (pendiente)
+**Nuevo spec** (`attendance-view.service.spec.ts`, 18 tests) cubre:
+- `init()` — inicializa PDF con getter de contexto y conecta SignalR
+- `setViewMode()` — cambio Día↔Mes dispara carga correspondiente; no-op si mismo modo
+- `loadEstudiantes()` — restauración desde storage, fallback al primero, no-op sin contexto, set de tablas ingresos+salidas
+- `selectEstudiante()` — guarda en storage + recarga; no-op si mismo id
+- `onIngresosMonthChange / onSalidasMonthChange` — actualiza mes, dispara `onMonthChange` y `syncSelectedYear`; cambio en salidas no toca ingresos
+- `reload()` — delega según viewMode activo
+- `onFechaDiaChange` — actualiza fecha y recarga día
+- `pdfFecha` computed — en Día devuelve `fechaDia`, en Mes devuelve primer día del mes seleccionado
 
-**Archivos clave**:
-- `pages/admin/schedules/services/horarios-crud.facade.ts`
-- `pages/admin/schedules/services/horarios.store.ts` (401 líneas — candidato Fase 2)
+**Patrón aplicado**: `processAsistencias` mock dinámico que refleja el mes/año recibidos (evita que el re-fetch interno sobrescriba el estado con valores del emptyTable).
 
-**Qué testear**:
-- Crear horario → WAL CREATE + onCommit refetch
-- Editar → mutación quirúrgica + rollback
-- Eliminar → remove + confirm
-- Validación de conflictos (INV-U03/U04/U05) debe estar en backend; aquí verificar UI surface error
+#### ✅ Flujo 4 — Horarios admin (completo)
+
+**Archivos cubiertos**:
+
+- `pages/admin/schedules/services/horarios-crud.facade.ts` (313 líneas)
+- `pages/admin/schedules/services/horarios.store.ts` (401 líneas — candidato Fase 2, ya tenía spec propio)
+
+**Nuevo spec** (`horarios-crud.facade.spec.ts`, 16 tests) con WAL mock controllable, cubre:
+
+- **CREATE**: emite operation `CREATE`; onCommit incrementa `totalHorarios` + `horariosActivos` y refresca; onError no toca stats
+- **UPDATE**: apply aplica mutación quirúrgica al store; rollback restaura snapshot exacto; onCommit ajusta `horariosSinProfesor` al asignar/desasignar profesor
+- **TOGGLE**: apply mueve contadores `horariosActivos` ↔ `horariosInactivos` según estado; rollback revierte
+- **DELETE**: apply remueve + decrementa total/activos/horariosSinProfesor; rollback re-añade con stats restauradas
+- **importarHorarios**: `creados>0` refresca y notifica; `creados=0` no refresca ni notifica éxito
+- **Asignaciones**: `asignarProfesor`, `desasignarEstudiante` delegan en `SchedulesAssignmentService`
+
+**Validación de conflictos** (INV-U03/U04/U05): responsabilidad del backend — el facade solo surfaces el error al usuario.
 
 ### Patron de test para facades
 
@@ -186,9 +195,9 @@ describe('XxxCrudFacade', () => {
 - [x] Los 15 tests rotos en usuarios.store.spec.ts arreglados (reescritos)
 - [x] Flujo 2 con test de comportamiento completo (18 tests facade + 25 tests store)
 - [x] Flujo 5 WAL cubierto dentro del flujo 2
-- [ ] Flujo 1 Login/session/permisos
-- [ ] Flujo 3 Asistencia director
-- [ ] Flujo 4 Horarios admin
+- [x] Flujo 1 Login/session/permisos (specs existentes + nuevo session-coordinator spec)
+- [x] Flujo 3 Asistencia director (attendance-view.service.spec.ts, 18 tests)
+- [x] Flujo 4 Horarios admin (horarios-crud.facade.spec.ts, 16 tests)
 
 ### Dependencia
 
