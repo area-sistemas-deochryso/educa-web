@@ -7,15 +7,20 @@ import { AttendanceDayListComponent } from '@features/intranet/components/attend
 import { AttendanceLegendComponent } from '@app/features/intranet/components/attendance/attendance-legend/attendance-legend.component';
 import { AttendanceTableComponent } from '@features/intranet/components/attendance/attendance-table/attendance-table.component';
 import { AttendanceTableSkeletonComponent } from '@features/intranet/components/attendance/attendance-table-skeleton/attendance-table-skeleton.component';
-import { AttendanceViewController, SelectorContext } from '@features/intranet/services/attendance/attendance-view.service';
+import { AttendanceViewController } from '@features/intranet/services/attendance/attendance-view.service';
+import { SelectorContext } from '@features/intranet/services/attendance/attendance-view.models';
 import { AttendancePdfService } from '@features/intranet/services/attendance/attendance-pdf.service';
 import { AttendanceStatsService } from '@features/intranet/services/attendance/attendance-stats.service';
-import { ViewMode } from '@features/intranet/components/attendance/attendance-header/attendance-header.component';
+import {
+	VIEW_MODE,
+	ViewMode,
+} from '@features/intranet/components/attendance/attendance-header/attendance-header.component';
 import { ButtonModule } from 'primeng/button';
 import { DatePipe } from '@angular/common';
 import { EmptyStateComponent } from '@features/intranet/components/attendance/empty-state/empty-state.component';
 import { FormsModule } from '@angular/forms';
 import { Menu, MenuModule } from 'primeng/menu';
+import { MenuItem } from 'primeng/api';
 import { SalonSelectorComponent } from '@features/intranet/components/attendance/salon-selector/salon-selector.component';
 import { Select } from 'primeng/select';
 import { SelectButton } from 'primeng/selectbutton';
@@ -226,6 +231,25 @@ export class AttendanceProfesorComponent implements OnInit {
 
 	// #endregion
 	// #region PDF menu
+
+	readonly pdfMenuItems = computed<MenuItem[]>(() => {
+		const isMonth = this.view.viewMode() === VIEW_MODE.Mes;
+		const isPeriodo = this.view.monthSubMode() === 'periodo';
+		const { selectedMonth, selectedYear } = this.view.ingresos();
+		const fecha = this.view.pdfFecha();
+
+		const ver = () => isMonth
+			? (isPeriodo ? this.view.pdf.verPeriodoFromContext(this.view.periodoInicio(), selectedYear, this.view.periodoFin()) : this.view.pdf.verMesFromContext(selectedMonth, selectedYear))
+			: this.view.pdf.verPdfAsistenciaDia(fecha);
+		const desc = () => isMonth
+			? (isPeriodo ? this.view.pdf.descargarPeriodoFromContext(this.view.periodoInicio(), selectedYear, this.view.periodoFin()) : this.view.pdf.descargarMesFromContext(selectedMonth, selectedYear))
+			: this.view.pdf.descargarPdfAsistenciaDia(fecha);
+
+		return [
+			{ label: 'Ver PDF', icon: 'pi pi-eye', command: ver },
+			{ label: 'Descargar PDF', icon: 'pi pi-download', command: desc },
+		];
+	});
 
 	togglePdfMenu(event: Event): void {
 		this.pdfMenu.toggle(event);

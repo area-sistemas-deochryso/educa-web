@@ -8,7 +8,8 @@ import { AttendanceDayListComponent } from '@features/intranet/components/attend
 import { AttendanceLegendComponent } from '@app/features/intranet/components/attendance/attendance-legend/attendance-legend.component';
 import { AttendanceTableComponent } from '@features/intranet/components/attendance/attendance-table/attendance-table.component';
 import { AttendanceTableSkeletonComponent } from '@features/intranet/components/attendance/attendance-table-skeleton/attendance-table-skeleton.component';
-import { AttendanceViewController, SelectorContext } from '@features/intranet/services/attendance/attendance-view.service';
+import { AttendanceViewController } from '@features/intranet/services/attendance/attendance-view.service';
+import { SelectorContext } from '@features/intranet/services/attendance/attendance-view.models';
 import { AttendancePdfService } from '@features/intranet/services/attendance/attendance-pdf.service';
 import { AttendanceStatsService } from '@features/intranet/services/attendance/attendance-stats.service';
 import { ViewMode } from '@features/intranet/components/attendance/attendance-header/attendance-header.component';
@@ -207,24 +208,24 @@ export class AttendanceDirectorComponent implements OnInit {
 		const isMonthMode = this.view.viewMode() === 'mes';
 
 		if (isMonthMode) {
-			// Month mode: always salon (periodo or mensual)
 			const isPeriodo = this.view.monthSubMode() === 'periodo';
+			const { selectedMonth, selectedYear } = this.view.ingresos();
 			return [
 				{
 					label: 'Ver PDF',
 					icon: 'pi pi-eye',
 					command: () =>
 						isPeriodo
-							? this.view.verPdfAsistenciaPeriodo()
-							: this.view.verPdfAsistenciaMes(),
+							? this.view.pdf.verPeriodoFromContext(this.view.periodoInicio(), selectedYear, this.view.periodoFin())
+							: this.view.pdf.verMesFromContext(selectedMonth, selectedYear),
 				},
 				{
 					label: 'Descargar PDF',
 					icon: 'pi pi-download',
 					command: () =>
 						isPeriodo
-							? this.view.descargarPdfAsistenciaPeriodo()
-							: this.view.descargarPdfAsistenciaMes(),
+							? this.view.pdf.descargarPeriodoFromContext(this.view.periodoInicio(), selectedYear, this.view.periodoFin())
+							: this.view.pdf.descargarMesFromContext(selectedMonth, selectedYear),
 				},
 			];
 		}
@@ -276,26 +277,28 @@ export class AttendanceDirectorComponent implements OnInit {
 	// #region PDF dispatch (día mode)
 
 	private verPdf(tipo: TipoReporte): void {
+		const fecha = this.view.fechaDia();
 		switch (tipo) {
 			case 'salon-dia':
-				return this.view.verPdfAsistenciaDia();
+				return this.view.pdf.verPdfAsistenciaDia(fecha);
 			case 'salon-mes':
-				return this.view.verPdfSalonMes();
+				return this.view.pdf.verPdfSalonMes(fecha);
 			case 'salon-anio':
-				return this.view.verPdfSalonAnio();
+				return this.view.pdf.verPdfSalonAnio(fecha);
 			default:
 				return this.verPdfConsolidado();
 		}
 	}
 
 	private descargarPdf(tipo: TipoReporte): void {
+		const fecha = this.view.fechaDia();
 		switch (tipo) {
 			case 'salon-dia':
-				return this.view.descargarPdfAsistenciaDia();
+				return this.view.pdf.descargarPdfAsistenciaDia(fecha);
 			case 'salon-mes':
-				return this.view.descargarPdfSalonMes();
+				return this.view.pdf.descargarPdfSalonMes(fecha);
 			case 'salon-anio':
-				return this.view.descargarPdfSalonAnio();
+				return this.view.pdf.descargarPdfSalonAnio(fecha);
 			default:
 				return this.descargarPdfConsolidado();
 		}

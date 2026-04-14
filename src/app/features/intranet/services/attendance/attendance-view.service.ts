@@ -1,10 +1,8 @@
 import { Injectable, DestroyRef, computed, inject, signal } from '@angular/core';
-import { Observable, finalize } from 'rxjs';
+import { finalize } from 'rxjs';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import { MenuItem } from 'primeng/api';
 
 import {
-	AsistenciaDiaConEstadisticas,
 	EstudianteAsistencia,
 	HijoApoderado,
 	AttendanceSignalRService,
@@ -20,45 +18,12 @@ import {
 	ViewMode,
 } from '@app/features/intranet/components/attendance/attendance-header/attendance-header.component';
 import { APP_USER_ROLES } from '@app/shared/constants';
+import { AttendanceViewConfig } from './attendance-view.models';
 
 const ATTENDANCE_TABLE_LABELS = {
 	Ingresos: 'Ingresos',
 	Salidas: 'Salidas',
 } as const;
-
-// #region Interfaces de configuración
-
-/** Contexto del selector actualmente activo (grado/salon → campos compartidos). */
-export interface SelectorContext {
-	grado: string;
-	gradoCodigo: string;
-	seccion: string;
-}
-
-/**
- * Configuración por-componente que abstrae las diferencias entre Director y Profesor.
- * Se pasa mediante init() en ngOnInit del componente contenedor.
- */
-export interface AttendanceViewConfig {
-	/** Cargar estudiantes con asistencias mensuales */
-	loadEstudiantes(grado: string, seccion: string, mes: number, anio: number): Observable<EstudianteAsistencia[]>;
-	/** Cargar asistencias de un día específico con estadísticas */
-	loadDia(
-		grado: string,
-		seccion: string,
-		fecha: Date,
-	): Observable<AsistenciaDiaConEstadisticas>;
-	/** Obtener contexto del selector actualmente seleccionado, o null si no hay selección */
-	getSelectorContext(): SelectorContext | null;
-	/** Callback al cambiar de mes — permite al componente re-seleccionar si el selector actual no aplica (filtro Verano) */
-	onMonthChange(): void;
-	/** Restaurar ID de estudiante desde storage */
-	getStoredEstudianteId(): number | null;
-	/** Guardar ID de estudiante en storage */
-	setStoredEstudianteId(id: number): void;
-}
-
-// #endregion
 
 /**
  * Servicio scoped que centraliza la lógica compartida entre las vistas
@@ -80,36 +45,33 @@ export class AttendanceViewController {
 	// - Day mode: loadAsistenciaDia uses the selected date.
 	// - Reload delegates to the active viewMode.
 
-	// #region Servicios delegados
-	readonly pdfService = inject(AttendancePdfService);
-	readonly statsService = inject(AttendanceStatsService);
+	// #region Servicios delegados (accesibles desde componentes)
+	readonly pdf = inject(AttendancePdfService);
+	readonly stats = inject(AttendanceStatsService);
 	// #endregion
 
 	// #region Estado general
 	readonly loading = signal(false);
 	readonly showSkeletons = signal(true);
 	readonly tableReady = signal(false);
-
-	/** Delegado: estado de descarga de PDF */
-	readonly downloadingPdf = this.pdfService.downloadingPdf;
 	// #endregion
 
 	// #region Delegados de stats/periodo
-	readonly monthSubMode = this.statsService.monthSubMode;
-	readonly periodoInicio = this.statsService.periodoInicio;
-	readonly periodoFin = this.statsService.periodoFin;
-	readonly monthSubModeOptions = this.statsService.monthSubModeOptions;
-	readonly periodoYear = this.statsService.periodoYear;
-	readonly maxPeriodoMonth = this.statsService.maxPeriodoMonth;
-	readonly mesOptionsInicio = this.statsService.mesOptionsInicio;
-	readonly mesOptionsFin = this.statsService.mesOptionsFin;
-	readonly isPeriodoValid = this.statsService.isPeriodoValid;
-	readonly pdfLabel = this.statsService.pdfLabel;
-	readonly estadisticasDia = this.statsService.estadisticasDia;
+	readonly monthSubMode = this.stats.monthSubMode;
+	readonly periodoInicio = this.stats.periodoInicio;
+	readonly periodoFin = this.stats.periodoFin;
+	readonly monthSubModeOptions = this.stats.monthSubModeOptions;
+	readonly periodoYear = this.stats.periodoYear;
+	readonly maxPeriodoMonth = this.stats.maxPeriodoMonth;
+	readonly mesOptionsInicio = this.stats.mesOptionsInicio;
+	readonly mesOptionsFin = this.stats.mesOptionsFin;
+	readonly isPeriodoValid = this.stats.isPeriodoValid;
+	readonly pdfLabel = this.stats.pdfLabel;
+	readonly estadisticasDia = this.stats.estadisticasDia;
 
-	setMonthSubMode(mode: 'mes' | 'periodo'): void { this.statsService.setMonthSubMode(mode); }
-	setPeriodoInicio(mes: number): void { this.statsService.setPeriodoInicio(mes); }
-	setPeriodoFin(mes: number): void { this.statsService.setPeriodoFin(mes); }
+	setMonthSubMode(mode: 'mes' | 'periodo'): void { this.stats.setMonthSubMode(mode); }
+	setPeriodoInicio(mes: number): void { this.stats.setPeriodoInicio(mes); }
+	setPeriodoFin(mes: number): void { this.stats.setPeriodoFin(mes); }
 	// #endregion
 
 	// #region Estudiantes (modo mes)
@@ -148,24 +110,13 @@ export class AttendanceViewController {
 	);
 	// #endregion
 
-	// #region PDF
+	// #region PDF (computed de fecha)
 	readonly pdfFecha = computed(() => {
 		if (this.viewMode() === VIEW_MODE.Dia) {
 			return this.fechaDia();
 		}
 		const { selectedMonth, selectedYear } = this.ingresos();
 		return new Date(selectedYear, selectedMonth - 1, 1);
-	});
-
-	readonly pdfMenuItems = computed<MenuItem[]>(() => {
-		const isMonth = this.viewMode() === VIEW_MODE.Mes;
-		const isPeriodo = this.monthSubMode() === 'periodo';
-		const ver = () => isMonth ? (isPeriodo ? this.verPdfAsistenciaPeriodo() : this.verPdfAsistenciaMes()) : this.verPdfAsistenciaDia();
-		const desc = () => isMonth ? (isPeriodo ? this.descargarPdfAsistenciaPeriodo() : this.descargarPdfAsistenciaMes()) : this.descargarPdfAsistenciaDia();
-		return [
-			{ label: 'Ver PDF', icon: 'pi pi-eye', command: ver },
-			{ label: 'Descargar PDF', icon: 'pi pi-download', command: desc },
-		];
 	});
 	// #endregion
 
@@ -177,7 +128,7 @@ export class AttendanceViewController {
 	 */
 	init(config: AttendanceViewConfig): void {
 		this.config = config;
-		this.pdfService.init(() => this.config.getSelectorContext());
+		this.pdf.init(() => this.config.getSelectorContext());
 		this.setupSignalR();
 	}
 
@@ -266,7 +217,7 @@ export class AttendanceViewController {
 
 	/** Sincroniza el año seleccionado en ingresos con el stats service */
 	private syncSelectedYear(): void {
-		this.statsService.setSelectedYear(this.ingresos().selectedYear);
+		this.stats.setSelectedYear(this.ingresos().selectedYear);
 	}
 
 	private reloadEstudianteIngresos(): void { this.reloadEstudianteTable('ingresos'); }
@@ -320,45 +271,9 @@ export class AttendanceViewController {
 			.subscribe({
 				next: (response) => {
 					this.estudiantesDia.set(response.estudiantes);
-					this.statsService.setEstadisticasDia(response.estadisticas);
+					this.stats.setEstadisticasDia(response.estadisticas);
 				},
 			});
-	}
-
-	// #endregion
-	// #region PDF (delegados)
-
-	verPdfAsistenciaDia(): void { this.pdfService.verPdfAsistenciaDia(this.pdfFecha()); }
-	descargarPdfAsistenciaDia(): void { this.pdfService.descargarPdfAsistenciaDia(this.pdfFecha()); }
-	verPdfSalonMes(): void { this.pdfService.verPdfSalonMes(this.fechaDia()); }
-	descargarPdfSalonMes(): void { this.pdfService.descargarPdfSalonMes(this.fechaDia()); }
-	verPdfSalonAnio(): void { this.pdfService.verPdfSalonAnio(this.fechaDia()); }
-	descargarPdfSalonAnio(): void { this.pdfService.descargarPdfSalonAnio(this.fechaDia()); }
-
-	verPdfAsistenciaMes(): void {
-		const ctx = this.config.getSelectorContext();
-		if (!ctx) return;
-		const { selectedMonth, selectedYear } = this.ingresos();
-		this.pdfService.verPdfAsistenciaMes(ctx.grado, ctx.seccion, selectedMonth, selectedYear);
-	}
-
-	descargarPdfAsistenciaMes(): void {
-		const ctx = this.config.getSelectorContext();
-		if (!ctx) return;
-		const { selectedMonth, selectedYear } = this.ingresos();
-		this.pdfService.descargarPdfAsistenciaMes(ctx.grado, ctx.seccion, selectedMonth, selectedYear);
-	}
-
-	verPdfAsistenciaPeriodo(): void {
-		const ctx = this.config.getSelectorContext();
-		if (!ctx || !this.isPeriodoValid()) return;
-		this.pdfService.verPdfAsistenciaPeriodo(ctx.grado, ctx.seccion, this.periodoInicio(), this.ingresos().selectedYear, this.periodoFin());
-	}
-
-	descargarPdfAsistenciaPeriodo(): void {
-		const ctx = this.config.getSelectorContext();
-		if (!ctx || !this.isPeriodoValid()) return;
-		this.pdfService.descargarPdfAsistenciaPeriodo(ctx.grado, ctx.seccion, this.periodoInicio(), this.ingresos().selectedYear, this.periodoFin());
 	}
 
 	// #endregion

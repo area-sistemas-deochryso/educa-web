@@ -57,7 +57,7 @@
 
 				<p-button
 					icon="pi pi-file-pdf"
-					[loading]="view.downloadingPdf()"
+					[loading]="view.pdf.downloadingPdf()"
 					[disabled]="view.monthSubMode() === 'periodo' && !view.isPeriodoValid()"
 					severity="danger"
 					[text]="true"
@@ -71,7 +71,7 @@
 						},
 					}"
 				/>
-				<p-menu #pdfMenu [model]="view.pdfMenuItems()" [popup]="true" appendTo="body" />
+				<p-menu #pdfMenu [model]="pdfMenuItems()" [popup]="true" appendTo="body" />
 			</div>
 		</div>
 	}
@@ -109,8 +109,8 @@
 			[estadisticas]="view.estadisticasDia()"
 			[loading]="view.loading()"
 			[showPdfButton]="selectedSalon() !== null"
-			[downloadingPdf]="view.downloadingPdf()"
-			[pdfMenuItems]="view.pdfMenuItems()"
+			[downloadingPdf]="view.pdf.downloadingPdf()"
+			[pdfMenuItems]="pdfMenuItems()"
 			[allowJustify]="true"
 			[savingJustificacion]="savingJustificacion()"
 			(fechaChange)="view.onFechaDiaChange($event)"

@@ -56,7 +56,7 @@
 
 				<p-button
 					icon="pi pi-file-pdf"
-					[loading]="view.downloadingPdf()"
+					[loading]="view.pdf.downloadingPdf()"
 					[disabled]="!selectedGradoSeccion() || (view.monthSubMode() === 'periodo' && !view.isPeriodoValid())"
 					severity="danger"
 					[text]="true"
@@ -108,7 +108,7 @@
 			[estadisticas]="view.estadisticasDia()"
 			[loading]="view.loading()"
 			[showPdfButton]="true"
-			[downloadingPdf]="tipoReporte().startsWith('salon-') ? view.downloadingPdf() : downloadingPdfConsolidado()"
+			[downloadingPdf]="tipoReporte().startsWith('salon-') ? view.pdf.downloadingPdf() : downloadingPdfConsolidado()"
 			[pdfMenuItems]="pdfMenuItems()"
 			[tipoReporteOptions]="tipoReporteOptions"
 			[tipoReporte]="tipoReporte()"

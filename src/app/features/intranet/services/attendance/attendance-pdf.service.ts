@@ -4,7 +4,7 @@ import { finalize } from 'rxjs';
 
 import { AttendanceService } from '@core/services';
 import { viewBlobInNewTab, downloadBlob } from '@core/helpers';
-import { SelectorContext } from './attendance-view.service';
+import { SelectorContext } from './attendance-view.models';
 
 /**
  * Servicio scoped que encapsula toda la lógica de generación y descarga de PDFs
@@ -237,6 +237,37 @@ export class AttendancePdfService {
 					);
 				},
 			});
+	}
+	// #endregion
+
+	// #region Métodos con contexto (usan getSelectorContext internamente)
+
+	/** Ver PDF mensual usando el selector activo */
+	verMesFromContext(mes: number, anio: number): void {
+		const ctx = this.getSelectorContext();
+		if (!ctx) return;
+		this.verPdfAsistenciaMes(ctx.grado, ctx.seccion, mes, anio);
+	}
+
+	/** Descargar PDF mensual usando el selector activo */
+	descargarMesFromContext(mes: number, anio: number): void {
+		const ctx = this.getSelectorContext();
+		if (!ctx) return;
+		this.descargarPdfAsistenciaMes(ctx.grado, ctx.seccion, mes, anio);
+	}
+
+	/** Ver PDF de periodo usando el selector activo */
+	verPeriodoFromContext(mesI: number, anio: number, mesF: number): void {
+		const ctx = this.getSelectorContext();
+		if (!ctx) return;
+		this.verPdfAsistenciaPeriodo(ctx.grado, ctx.seccion, mesI, anio, mesF);
+	}
+
+	/** Descargar PDF de periodo usando el selector activo */
+	descargarPeriodoFromContext(mesI: number, anio: number, mesF: number): void {
+		const ctx = this.getSelectorContext();
+		if (!ctx) return;
+		this.descargarPdfAsistenciaPeriodo(ctx.grado, ctx.seccion, mesI, anio, mesF);
 	}
 	// #endregion
 }
