@@ -2,25 +2,25 @@ import { computed, inject, Injectable, signal } from '@angular/core';
 
 import { AuthStore } from '@core/store';
 import { isAdminRole } from '@shared/models';
-import { CursoListaDto, CursoOption, CursosPorNivel } from '../models/curso.interface';
-import { filterSalonesDisponibles } from '../helpers/horario-conflict.utils';
+import { CursoListaDto } from '../models/curso.interface';
 import { type ImportarHorariosResult } from '../helpers/horario-import.config';
-import { mapSalonesToOptions, mapCursosToOptions, groupCursosByNivel, mapProfesToOptions } from '../helpers/horario-mapping.utils';
 import {
 	type HorarioDetalleResponseDto,
 	type HorarioResponseDto,
 	type HorariosEstadisticas,
 } from '../models/horario.interface';
-import { ProfesorListDto, ProfesorOption } from '../models/profesor.interface';
-import { SalonListDto, SalonOption } from '../models/salon.interface';
+import { ProfesorListDto } from '../models/profesor.interface';
+import { SalonListDto } from '../models/salon.interface';
 import { SchedulesFormStore } from './horarios-form.store';
 import { SchedulesFilterStore } from './horarios-filter.store';
+import { SchedulesOptionsStore } from './horarios-options.store';
 
 @Injectable({ providedIn: 'root' })
 export class SchedulesStore {
 	private authStore = inject(AuthStore);
 	readonly formStore = inject(SchedulesFormStore);
 	readonly filterStore = inject(SchedulesFilterStore);
+	readonly optionsStore = inject(SchedulesOptionsStore);
 
 	// #region Estado privado - Datos
 	private readonly _horarios = signal<HorarioResponseDto[]>([]);
@@ -28,18 +28,11 @@ export class SchedulesStore {
 	private readonly _estadisticas = signal<HorariosEstadisticas | null>(null);
 	// #endregion
 
-	// #region Estado privado - Opciones para dropdowns
-	private readonly _salonesDisponibles = signal<SalonListDto[]>([]);
-	private readonly _cursosDisponibles = signal<CursoListaDto[]>([]);
-	private readonly _profesoresDisponibles = signal<ProfesorListDto[]>([]);
-	// #endregion
-
 	// #region Estado privado - Loading
 	private readonly _error = signal<string | null>(null);
 	private readonly _loading = signal(false);
 	private readonly _statsLoading = signal(false);
 	private readonly _detailLoading = signal(false);
-	private readonly _optionsLoading = signal(false);
 	private readonly _statsReady = signal(false);
 	private readonly _tableReady = signal(false);
 	// #endregion
@@ -61,9 +54,10 @@ export class SchedulesStore {
 	readonly loading = this._loading.asReadonly();
 	readonly statsLoading = this._statsLoading.asReadonly();
 	readonly detailLoading = this._detailLoading.asReadonly();
-	readonly optionsLoading = this._optionsLoading.asReadonly();
 	readonly statsReady = this._statsReady.asReadonly();
 	readonly tableReady = this._tableReady.asReadonly();
+	// Re-export del sub-store (consumers legacy)
+	readonly optionsLoading = this.optionsStore.optionsLoading;
 	// #endregion
 
 	// #region Lecturas públicas - Import
@@ -72,16 +66,11 @@ export class SchedulesStore {
 	readonly importResult = this._importResult.asReadonly();
 	// #endregion
 
-	// Sub-stores expuestos directamente — facades acceden a formStore/filterStore sin delegación
-	// #endregion
-
 	// #region Usuario actual
 	readonly currentUser = this.authStore.user;
 
-	/** true si el usuario es Director o Asistente Administrativo */
 	readonly isAdmin = computed(() => isAdminRole(this.currentUser()?.rol));
 
-	/** ID del profesor logueado (null si no es profesor) */
 	readonly currentProfesorId = computed(() => {
 		const user = this.currentUser();
 		if (!user || user.rol !== 'Profesor') return null;
@@ -89,66 +78,11 @@ export class SchedulesStore {
 	});
 	// #endregion
 
-	// #region Computed - Opciones de dropdowns (memoización intermedia)
-
-	/** Salones activos: solo depende de salonesDisponibles, no de formData/horarios */
-	private readonly activeSalones = computed(() =>
-		this._salonesDisponibles().filter((s) => s.estado),
-	);
-
-	/** Mapeo de salones activos a opciones de dropdown (memoizado) */
-	private readonly activeSalonesAsOptions = computed<SalonOption[]>(() =>
-		mapSalonesToOptions(this.activeSalones()),
-	);
-
-	/**
-	 * Opciones de salones disponibles (sin conflicto de horario).
-	 * Si no hay día/hora seleccionados, devuelve todos los activos (memoizado).
-	 * Si hay día/hora, filtra por conflicto de horario.
-	 */
-	readonly salonesOptions = computed<SalonOption[]>(() => {
-		const formData = this.formStore.formData();
-
-		// Sin día/hora -> devolver opciones activas ya memoizadas
-		if (!formData.diaSemana || !formData.horaInicio || !formData.horaFin) {
-			return this.activeSalonesAsOptions();
-		}
-
-		// Con día/hora -> filtrar por conflicto y mapear
-		const disponibles = filterSalonesDisponibles(
-			this.activeSalones(),
-			this._horarios(),
-			formData,
-			this.formStore.editingId(),
-		);
-
-		return mapSalonesToOptions(disponibles);
-	});
-
-	/** Cursos activos: solo depende de cursosDisponibles */
-	private readonly activeCursos = computed(() =>
-		this._cursosDisponibles().filter((c) => c.estado),
-	);
-
-	/** Opciones de cursos disponibles (activos) con niveles educativos */
-	readonly cursosOptions = computed<CursoOption[]>(() =>
-		mapCursosToOptions(this.activeCursos()),
-	);
-
-	/** Cursos agrupados por nivel educativo (Inicial, Primaria, Secundaria) */
-	readonly cursosPorNivel = computed<CursosPorNivel>(() =>
-		groupCursosByNivel(this.cursosOptions()),
-	);
-
-	/** Profesores activos: solo depende de profesoresDisponibles */
-	private readonly activeProfesores = computed(() =>
-		this._profesoresDisponibles().filter((p) => p.estado),
-	);
-
-	/** Opciones de profesores disponibles (activos) */
-	readonly profesoresOptions = computed<ProfesorOption[]>(() =>
-		mapProfesToOptions(this.activeProfesores()),
-	);
+	// #region Computed - Options (re-export del sub-store)
+	readonly salonesOptions = this.optionsStore.salonesOptions;
+	readonly cursosOptions = this.optionsStore.cursosOptions;
+	readonly cursosPorNivel = this.optionsStore.cursosPorNivel;
+	readonly profesoresOptions = this.optionsStore.profesoresOptions;
 	// #endregion
 
 	// #region Computed - Estadísticas derivadas
@@ -160,9 +94,7 @@ export class SchedulesStore {
 	);
 	// #endregion
 
-	// #region Sub-ViewModels (agrupados por responsabilidad)
-
-	/** Datos de la tabla y detalle */
+	// #region Sub-ViewModels
 	readonly dataVm = computed(() => ({
 		horarios: this._horarios(),
 		horariosFiltrados: this.filterStore.horariosFiltrados(),
@@ -176,13 +108,12 @@ export class SchedulesStore {
 		isEmpty: this._horarios().length === 0,
 	}));
 
-	/** Estado de UI: loading, dialogs, vista, filtros */
 	readonly uiVm = computed(() => ({
 		loading: this._loading(),
 		error: this._error(),
 		statsLoading: this._statsLoading(),
 		detailLoading: this._detailLoading(),
-		optionsLoading: this._optionsLoading(),
+		optionsLoading: this.optionsStore.optionsLoading(),
 		statsReady: this._statsReady(),
 		tableReady: this._tableReady(),
 		dialogVisible: this.formStore.dialogVisible(),
@@ -199,7 +130,6 @@ export class SchedulesStore {
 		importResult: this._importResult(),
 	}));
 
-	/** Formulario wizard */
 	readonly formVm = computed(() => ({
 		formData: this.formStore.formData(),
 		editingId: this.formStore.editingId(),
@@ -214,12 +144,11 @@ export class SchedulesStore {
 		isLastStep: this.formStore.isLastStep(),
 	}));
 
-	/** Opciones para dropdowns y filtros */
 	readonly optionsVm = computed(() => ({
-		salonesOptions: this.salonesOptions(),
-		cursosOptions: this.cursosOptions(),
-		cursosPorNivel: this.cursosPorNivel(),
-		profesoresOptions: this.profesoresOptions(),
+		salonesOptions: this.optionsStore.salonesOptions(),
+		cursosOptions: this.optionsStore.cursosOptions(),
+		cursosPorNivel: this.optionsStore.cursosPorNivel(),
+		profesoresOptions: this.optionsStore.profesoresOptions(),
 		filtroSalonId: this.filterStore.filtroSalonId(),
 		filtroProfesorId: this.filterStore.filtroProfesorId(),
 		filtroDiaSemana: this.filterStore.filtroDiaSemana(),
@@ -231,7 +160,7 @@ export class SchedulesStore {
 	}));
 	// #endregion
 
-	// #region ViewModel consolidado (compone sub-VMs)
+	// #region ViewModel consolidado
 	readonly vm = computed(() => ({
 		...this.dataVm(),
 		...this.uiVm(),
@@ -243,25 +172,25 @@ export class SchedulesStore {
 	// #region Comandos - Lista
 	setHorarios(horarios: HorarioResponseDto[]): void {
 		this._horarios.set(horarios);
-		this.syncHorariosToFilter();
+		this.syncHorariosDownstream();
 	}
 	// #endregion
 
-	// #region Comandos - Opciones
+	// #region Comandos - Opciones (delega en optionsStore)
 	setSalonesDisponibles(salones: SalonListDto[]): void {
-		this._salonesDisponibles.set(salones);
+		this.optionsStore.setSalonesDisponibles(salones);
 	}
 
 	setCursosDisponibles(cursos: CursoListaDto[]): void {
-		this._cursosDisponibles.set(cursos);
+		this.optionsStore.setCursosDisponibles(cursos);
 	}
 
 	setProfesoresDisponibles(profesores: ProfesorListDto[]): void {
-		this._profesoresDisponibles.set(profesores);
+		this.optionsStore.setProfesoresDisponibles(profesores);
 	}
 
 	setOptionsLoading(loading: boolean): void {
-		this._optionsLoading.set(loading);
+		this.optionsStore.setOptionsLoading(loading);
 	}
 
 	/** Mutación quirúrgica: Actualizar un horario específico sin refetch */
@@ -269,7 +198,7 @@ export class SchedulesStore {
 		this._horarios.update((list) =>
 			list.map((h) => (h.id === id ? { ...h, ...updates } : h)),
 		);
-		this.syncHorariosToFilter();
+		this.syncHorariosDownstream();
 	}
 
 	/** Mutación quirúrgica: Toggle estado de un horario */
@@ -277,19 +206,19 @@ export class SchedulesStore {
 		this._horarios.update((list) =>
 			list.map((h) => (h.id === id ? { ...h, estado: !h.estado } : h)),
 		);
-		this.syncHorariosToFilter();
+		this.syncHorariosDownstream();
 	}
 
 	/** Mutación quirúrgica: Eliminar un horario */
 	removeHorario(id: number): void {
 		this._horarios.update((list) => list.filter((h) => h.id !== id));
-		this.syncHorariosToFilter();
+		this.syncHorariosDownstream();
 	}
 
 	/** Mutación quirúrgica: Re-agregar un horario (rollback de delete) */
 	addHorario(horario: HorarioResponseDto): void {
 		this._horarios.update((list) => [horario, ...list]);
-		this.syncHorariosToFilter();
+		this.syncHorariosDownstream();
 	}
 	// #endregion
 
@@ -331,7 +260,9 @@ export class SchedulesStore {
 	}
 
 	incrementarEstadistica(campo: keyof HorariosEstadisticas, delta: number): void {
-		this._estadisticas.update((stats) => stats ? { ...stats, [campo]: (stats[campo] || 0) + delta } : stats);
+		this._estadisticas.update((stats) =>
+			stats ? { ...stats, [campo]: (stats[campo] || 0) + delta } : stats,
+		);
 	}
 	// #endregion
 
@@ -365,7 +296,7 @@ export class SchedulesStore {
 	}
 	// #endregion
 
-	// #region Comandos - Detail drawer (tiene side effect en horarioDetalle)
+	// #region Comandos - Detail drawer
 	closeDetailDrawer(): void {
 		this.formStore.closeDetailDrawer();
 		this._horarioDetalle.set(null);
@@ -393,9 +324,10 @@ export class SchedulesStore {
 	// #endregion
 
 	// #region Helpers privados
-	/** Sincroniza la fuente de horarios hacia el filterStore para que recalcule sus computed */
-	private syncHorariosToFilter(): void {
+	/** Sincroniza horarios hacia filterStore (filtros) y optionsStore (conflictos) */
+	private syncHorariosDownstream(): void {
 		this.filterStore.setHorariosSource(this._horarios());
+		this.optionsStore.setHorariosSource(this._horarios());
 	}
 	// #endregion
 }

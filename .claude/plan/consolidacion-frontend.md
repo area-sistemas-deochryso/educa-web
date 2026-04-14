@@ -233,7 +233,7 @@ Estos archivos son gordos porque acumularon responsabilidades. Dividir por rol.
 | Archivo | Lineas | Estrategia de division |
 |---------|--------|------------------------|
 | profesor-api.service.ts | ~~417~~ → 201 ✅ | Aggregate pattern: 3 sub-services (salones 78, cursos 241, asistencia 49). Aggregate delega para no romper 14 consumidores. |
-| horarios.store.ts | 401 | Extraer: estado de filtros → horarios-filters.store.ts. Estado de UI → ya deberia estar en ui.facade |
+| horarios.store.ts | ~~401~~ → 333 ✅ | Extraído SchedulesOptionsStore (113 ln): salones/cursos/profesores disponibles + computed options + optionsLoading. Main store delega. Filters+Form ya estaban extraídos. |
 | campus-admin.facade.ts | 383 | Dividir en multi-facade: campus-data.facade + campus-crud.facade + campus-ui.facade |
 | salones-admin.facade.ts | 379 | Ya es facade unico — dividir en multi-facade si tiene 3+ responsabilidades |
 | campus-admin.store.ts | 379 | Extraer computed pesados a campus-admin-derived.store.ts o mover a facade |
