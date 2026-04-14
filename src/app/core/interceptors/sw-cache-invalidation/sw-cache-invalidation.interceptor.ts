@@ -69,9 +69,12 @@ function extractResourcePattern(url: string): string | null {
 
 		const resourceSegments: string[] = [];
 		for (const segment of segments) {
-			// Parar antes de IDs numéricos o acciones CRUD
+			// Parar antes de IDs numéricos, acciones CRUD, o discriminadores PascalCase
+			// (ej: /api/sistema/usuarios/Profesor/24 → el segmento "Profesor" es un rol,
+			// no parte del recurso base — la lista paginada vive en /api/sistema/usuarios).
 			if (/^\d+$/.test(segment)) break;
 			if (isActionSegment(segment)) break;
+			if (/^[A-Z]/.test(segment)) break;
 			resourceSegments.push(segment);
 		}
 
