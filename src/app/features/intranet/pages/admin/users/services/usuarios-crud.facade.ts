@@ -304,16 +304,26 @@ export class UsersCrudFacade {
 
 	/**
 	 * Resuelve el nombre del salón a mostrar en la tabla tras editar.
-	 * - Estudiante: lookup en store.salones() por salonId del form.
-	 * - Profesor: preserva el valor previo (salones múltiples no se representan en la columna).
-	 * - Otros roles: sin salón asignado.
+	 * Formato backend: "{grado} {seccion}" (ej: "5° A"), ver ProfesorQueryStrategy / EstudianteQueryStrategy.
+	 * - Estudiante: salón único por salonId.
+	 * - Profesor: primer salón del array salones (FirstOrDefault del backend).
+	 * - Otros roles: null (sin salón).
 	 */
 	private resolveSalonNombre(
 		data: Partial<CrearUsuarioRequest & ActualizarUsuarioRequest>,
 		selectedUsuario: UsuarioDetalle,
 	): string | undefined {
-		if (data.rol === 'Estudiante' && data.salonId) {
-			return this.store.salones().find((s) => s.salonId === data.salonId)?.nombreSalon;
+		const formatSalon = (salonId: number): string | undefined => {
+			const salon = this.store.salones().find((s) => s.salonId === salonId);
+			return salon ? `${salon.grado} ${salon.seccion}` : undefined;
+		};
+
+		if (data.rol === 'Estudiante') {
+			return data.salonId ? formatSalon(data.salonId) : undefined;
+		}
+		if (data.rol === 'Profesor') {
+			const firstSalon = data.salones?.[0];
+			return firstSalon ? formatSalon(firstSalon.salonId) : undefined;
 		}
 		return selectedUsuario.salonNombre;
 	}
