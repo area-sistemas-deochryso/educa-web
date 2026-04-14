@@ -6,7 +6,7 @@ import { SelectModule } from 'primeng/select';
 import { TagModule } from 'primeng/tag';
 import { TooltipModule } from 'primeng/tooltip';
 
-import { CampusAdminFacade } from './services';
+import { CampusAdminFacade, CampusAdminUiFacade } from './services';
 import { CampusPisosPanelComponent } from './components/campus-pisos-panel/campus-pisos-panel.component';
 import { CampusEditorComponent } from './components/campus-editor/campus-editor.component';
 import { CampusPisoDialogComponent } from './components/campus-piso-dialog/campus-piso-dialog.component';
@@ -52,6 +52,7 @@ export class CampusComponent implements OnInit {
 	// #region Dependencias
 
 	readonly facade = inject(CampusAdminFacade);
+	readonly uiFacade = inject(CampusAdminUiFacade);
 
 	// #endregion
 
@@ -151,11 +152,11 @@ export class CampusComponent implements OnInit {
 	// #region Toolbar handlers
 
 	onToolSelect(tool: EditorTool): void {
-		this.facade.setActiveTool(tool);
+		this.uiFacade.setActiveTool(tool);
 	}
 
 	onNodeTypeChange(type: EditorNodeType): void {
-		this.facade.setNewNodeType(type);
+		this.uiFacade.setNewNodeType(type);
 	}
 
 	// #endregion
@@ -170,14 +171,14 @@ export class CampusComponent implements OnInit {
 		this.pisoFormNombre.set('');
 		this.pisoFormOrden.set(this.vm().pisos.length);
 		this.pisoFormAltura.set(3.0);
-		this.facade.openPisoDialog();
+		this.uiFacade.openPisoDialog();
 	}
 
 	onEditPiso(piso: CampusPisoDto): void {
 		this.pisoFormNombre.set(piso.nombre);
 		this.pisoFormOrden.set(piso.orden);
 		this.pisoFormAltura.set(piso.alturaMetros);
-		this.facade.openPisoDialog(piso);
+		this.uiFacade.openPisoDialog(piso);
 	}
 
 	onToggleEstadoPiso(pisoId: number): void {
@@ -189,7 +190,7 @@ export class CampusComponent implements OnInit {
 	// #region Piso dialog handlers
 
 	onPisoDialogVisibleChange(visible: boolean): void {
-		if (!visible) this.facade.closePisoDialog();
+		if (!visible) this.uiFacade.closePisoDialog();
 	}
 
 	onPisoFormDataChange(changes: Partial<PisoFormData>): void {
@@ -222,11 +223,11 @@ export class CampusComponent implements OnInit {
 		this.nodeFormTipo.set(node.tipo as EditorNodeType);
 		this.nodeFormWidth.set(node.width);
 		this.nodeFormHeight.set(node.height);
-		this.facade.openNodeDialog(node);
+		this.uiFacade.openNodeDialog(node);
 	}
 
 	onNodeDialogVisibleChange(visible: boolean): void {
-		if (!visible) this.facade.closeNodeDialog();
+		if (!visible) this.uiFacade.closeNodeDialog();
 	}
 
 	onNodeFormDataChange(changes: Partial<NodeFormData>): void {
@@ -261,11 +262,11 @@ export class CampusComponent implements OnInit {
 		this.bloqueoFormWidth.set(bloqueo.width);
 		this.bloqueoFormHeight.set(bloqueo.height);
 		this.bloqueoFormMotivo.set(bloqueo.motivo ?? '');
-		this.facade.openBloqueoDialog(bloqueo);
+		this.uiFacade.openBloqueoDialog(bloqueo);
 	}
 
 	onBloqueoDialogVisibleChange(visible: boolean): void {
-		if (!visible) this.facade.closeBloqueoDialog();
+		if (!visible) this.uiFacade.closeBloqueoDialog();
 	}
 
 	onBloqueoFormDataChange(changes: Partial<BloqueoFormData>): void {
@@ -292,7 +293,7 @@ export class CampusComponent implements OnInit {
 	// #region Vertical connection dialog handlers
 
 	onVerticalDialogVisibleChange(visible: boolean): void {
-		if (!visible) this.facade.closeVerticalDialog();
+		if (!visible) this.uiFacade.closeVerticalDialog();
 	}
 
 	onVerticalFormDataChange(changes: Partial<VerticalConnectionFormData>): void {
@@ -332,11 +333,11 @@ export class CampusComponent implements OnInit {
 	// #region Editor handlers
 
 	onEditorClick(pos: { x: number; y: number }): void {
-		this.facade.onEditorClick(pos.x, pos.y);
+		this.uiFacade.onEditorClick(pos.x, pos.y);
 	}
 
 	onNodeClick(nodeId: number): void {
-		this.facade.onNodeClick(nodeId);
+		this.uiFacade.onNodeClick(nodeId);
 	}
 
 	onNodeDblClick(nodeId: number): void {
@@ -349,11 +350,11 @@ export class CampusComponent implements OnInit {
 	}
 
 	onAristaClick(aristaId: number): void {
-		this.facade.onAristaClick(aristaId);
+		this.uiFacade.onAristaClick(aristaId);
 	}
 
 	onBloqueoClick(bloqueoId: number): void {
-		this.facade.onBloqueoClick(bloqueoId);
+		this.uiFacade.onBloqueoClick(bloqueoId);
 	}
 
 	onBloqueoDblClick(bloqueoId: number): void {

@@ -17,7 +17,6 @@ import {
 } from '../models';
 import { CampusAdminApiService } from './campus-admin-api.service';
 import { CampusAdminStore } from './campus-admin.store';
-import { CampusEditorService } from './campus-editor.service';
 
 interface CrudOptions<T> {
 	apiCall: Observable<T>;
@@ -31,7 +30,6 @@ interface CrudOptions<T> {
 export class CampusAdminFacade {
 	private api = inject(CampusAdminApiService);
 	private store = inject(CampusAdminStore);
-	private editor = inject(CampusEditorService);
 	private errorHandler = inject(ErrorHandlerService);
 	private destroyRef = inject(DestroyRef);
 
@@ -324,59 +322,6 @@ export class CampusAdminFacade {
 			errorMsg: 'No se pudo eliminar la conexión vertical',
 			saving: false,
 		});
-	}
-
-	// #endregion
-
-	// #region Comandos de editor (delega a CampusEditorService)
-
-	setActiveTool(tool: import('../models').EditorTool): void { this.editor.setActiveTool(tool); }
-	setNewNodeType(type: import('../models').EditorNodeType): void { this.editor.setNewNodeType(type); }
-
-	onEditorClick(x: number, y: number): void {
-		const result = this.editor.resolveCanvasClick(x, y);
-		if (!result) return;
-		if (result.action === 'createNode') this.crearNodo(result.data);
-		else if (result.action === 'createBlock') this.crearBloqueo(result.data);
-	}
-
-	onNodeClick(nodeId: number): void {
-		const result = this.editor.resolveNodeClick(nodeId);
-		if (!result) return;
-		if (result.action === 'deleteNode') this.eliminarNodo(result.nodeId);
-		else if (result.action === 'createEdge') this.crearArista(result.data);
-	}
-
-	onAristaClick(aristaId: number): void {
-		const result = this.editor.resolveAristaClick(aristaId);
-		if (result) this.eliminarArista(result.aristaId);
-	}
-
-	onBloqueoClick(bloqueoId: number): void {
-		const result = this.editor.resolveBloqueoClick(bloqueoId);
-		if (result) this.eliminarBloqueo(result.bloqueoId);
-	}
-
-	onConexionVerticalClick(conexionId: number): void {
-		const result = this.editor.resolveConexionVerticalClick(conexionId);
-		if (result) this.eliminarConexionVertical(result.conexionId);
-	}
-
-	// #endregion
-
-	// #region Comandos de UI
-
-	openPisoDialog(piso?: import('../models').CampusPisoDto): void { this.store.openPisoDialog(piso); }
-	closePisoDialog(): void { this.store.closePisoDialog(); }
-	openNodeDialog(node?: import('../models').CampusNodoDto): void { this.store.openNodeDialog(node); }
-	closeNodeDialog(): void { this.store.closeNodeDialog(); }
-	openBloqueoDialog(bloqueo?: import('../models').CampusBloqueoDto): void { this.store.openBloqueoDialog(bloqueo); }
-	closeBloqueoDialog(): void { this.store.closeBloqueoDialog(); }
-	openVerticalDialog(): void { this.store.openVerticalDialog(); }
-
-	closeVerticalDialog(): void {
-		this.store.closeVerticalDialog();
-		this.store.setVerticalStartNodeId(null);
 	}
 
 	// #endregion
