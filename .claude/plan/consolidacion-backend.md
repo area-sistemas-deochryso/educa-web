@@ -110,14 +110,21 @@ Build limpio, 699/699 tests.
 **Aprendizaje**: cuando un archivo grande es un helper estatico sin estado, `partial class`
 es mejor que fachada porque no requiere interfaces ni DI y los callers no cambian.
 
-#### AsistenciaAdminService.cs (512 ln) — Prioridad 3
+#### AsistenciaAdminService.cs (512 ln) — Prioridad 3 — COMPLETADO (commit 30f1290)
 
-**Division propuesta**:
-| Nuevo servicio | Responsabilidad |
-|---------------|-----------------|
-| AsistenciaAdminCrudService | Operaciones CRUD de registros |
-| AsistenciaAdminValidationService | Validaciones (cierre mensual, precedencia manual) |
-| AsistenciaAdminService (reducido) | Orquestacion |
+**Division aplicada** (mas granular que la propuesta original — 5 services por responsabilidad):
+
+| Archivo | Lineas | Rol |
+|---------|--------|-----|
+| `Services/Asistencias/AsistenciaAdminService.cs` (fachada) | 63 | Delega a los 5 services |
+| `Services/Asistencias/AsistenciaAdmin/AsistenciaAdminValidator.cs` | 44 | Validar estudiante activo + sede activa (helpers compartidos) |
+| `Services/Asistencias/AsistenciaAdmin/AsistenciaAdminEmailNotifier.cs` | 76 | Correos correccion/eliminacion background (INV-AD05, INV-S07) |
+| `Services/Asistencias/AsistenciaAdmin/AsistenciaAdminCrudService.cs` | 280 | 5 operaciones CRUD + CargarDto + CombinarObservacion |
+| `Services/Asistencias/AsistenciaAdmin/AsistenciaAdminQueryService.cs` | 32 | Lecturas (listar dia, estadisticas, estudiantes) |
+| `Services/Asistencias/AsistenciaAdmin/AsistenciaAdminBulkEmailService.cs` | 89 | Envio masivo de marcacion |
+
+Cada service con interfaz en `Interfaces/Services/Asistencias/`. DI registrada helpers -> services -> fachada.
+Build limpio, 699/699 tests.
 
 #### AsistenciaService.cs (487 ln) — Prioridad 4
 
@@ -140,8 +147,8 @@ Misma estrategia: separar data retrieval de formatting/rendering.
 
 1. PermisoSaludService — COMPLETADO (commit 107d758)
 2. AsistenciaPdfComposer — COMPLETADO (commit aaf89c8)
-3. AsistenciaAdminService (512 ln) — SIGUIENTE
-4. AsistenciaService (487 ln) — webhook CrossChex, division delicada
+3. AsistenciaAdminService — COMPLETADO (commit 30f1290)
+4. AsistenciaService (487 ln) — SIGUIENTE — webhook CrossChex, division delicada
 5. ReporteFiltradoAsistenciaService (441 ln)
 6. Resto (ReporteFiltradoPdfService, ReporteAsistenciaDataService, ReporteAsistenciaConsolidadoPdfService): incremental al tocar el archivo
 
@@ -149,7 +156,7 @@ Misma estrategia: separar data retrieval de formatting/rendering.
 
 Prompt sugerido:
 
-> Continuar Fase 1 del plan `consolidacion-backend.md`. Ya se dividieron `PermisoSaludService` (107d758) y `AsistenciaPdfComposer` (aaf89c8) en branch `refactor/split-services-fase1`. Siguiente: dividir `Educa.API/Services/Asistencias/AsistenciaAdminService.cs` (512 ln) aplicando el patron fachada (este si es un service con DI, no helper estatico). Verificar build + 699 tests despues.
+> Continuar Fase 1 del plan `consolidacion-backend.md`. Ya se dividieron `PermisoSaludService` (107d758), `AsistenciaPdfComposer` (aaf89c8) y `AsistenciaAdminService` (30f1290) en branch `refactor/split-services-fase1`. Siguiente: dividir `Educa.API/Services/Asistencias/AsistenciaService.cs` (487 ln) — contiene logica del webhook CrossChex, coherencia horaria biometrica (INV-C03) y anti-duplicacion; division delicada. Aplicar patron fachada. Verificar build + 699 tests despues.
 
 Pasos del flujo:
 1. Verificar que el repo `Educa.API` esta en branch `refactor/split-services-fase1` y limpio (`git status`)
@@ -174,7 +181,7 @@ Pasos del flujo:
 
 - [x] PermisoSaludService dividido (commit 107d758)
 - [x] AsistenciaPdfComposer dividido (commit aaf89c8)
-- [ ] AsistenciaAdminService dividido
+- [x] AsistenciaAdminService dividido (commit 30f1290)
 - [ ] AsistenciaService dividido
 - [ ] ReporteFiltradoAsistenciaService dividido
 - [ ] Ningun service de feature >300 lineas
