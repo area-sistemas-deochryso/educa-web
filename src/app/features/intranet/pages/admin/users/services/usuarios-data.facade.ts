@@ -227,9 +227,13 @@ export class UsersDataFacade {
 			const counter = this.store.refreshCounter();
 			if (counter > 0) {
 				this.lastCrudMutationTime = Date.now();
-				// El interceptor swCacheInvalidationInterceptor ya invalidó el cache del SW
-				// al completarse la mutación. Silent=true: sin loading visible.
-				this.refreshUsuariosOnly(true);
+				// El interceptor swCacheInvalidationInterceptor invalida el cache del SW
+				// de forma asíncrona (tap sin await). Forzamos la invalidación aquí antes
+				// del refetch para evitar que el GET pegue contra cache stale y pierda
+				// los registros recién creados. Silent=true: sin loading visible.
+				this.swService.invalidateCacheByPattern('/usuarios').then(() => {
+					this.refreshUsuariosOnly(true);
+				});
 			}
 		});
 	}

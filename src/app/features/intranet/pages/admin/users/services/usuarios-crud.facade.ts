@@ -235,6 +235,10 @@ export class UsersCrudFacade {
 			correo: selectedUsuario.correo,
 			telefono: selectedUsuario.telefono,
 			estado: selectedUsuario.estado,
+			salonNombre: selectedUsuario.salonNombre,
+			nombreApoderado: selectedUsuario.nombreApoderado,
+			telefonoApoderado: selectedUsuario.telefonoApoderado,
+			correoApoderado: selectedUsuario.correoApoderado,
 		};
 
 		this.wal.execute({
@@ -245,9 +249,8 @@ export class UsersCrudFacade {
 			method: 'PUT',
 			payload,
 			http$: () => this.usuariosService.actualizarUsuario(rol, id, payload),
-			onCommit: () => {
-				this.store.triggerRefresh();
-			},
+			// WAL: onCommit no debe disparar refetch — el cambio visible ya ocurrió en apply.
+			onCommit: () => {},
 			onError: (err) => {
 				logger.error('Error:', err);
 				this.errorHandler.showError(
@@ -259,6 +262,7 @@ export class UsersCrudFacade {
 			optimistic: {
 				apply: () => {
 					this.dataFacade.markCrudMutation();
+					const salonNombre = this.resolveSalonNombre(data, selectedUsuario);
 					this.store.updateItem(id, {
 						dni: data.dni!,
 						nombreCompleto: formatFullName(data.apellidos!, data.nombres!),
@@ -267,6 +271,10 @@ export class UsersCrudFacade {
 						correo: data.correo || undefined,
 						telefono: data.telefono || undefined,
 						estado: data.estado ?? true,
+						salonNombre,
+						nombreApoderado: data.nombreApoderado || undefined,
+						telefonoApoderado: data.telefonoApoderado || undefined,
+						correoApoderado: data.correoApoderado || undefined,
 					});
 					this.store.closeDialog();
 				},
@@ -292,6 +300,22 @@ export class UsersCrudFacade {
 		if (key) {
 			this.store.incrementarEstadistica(key, delta);
 		}
+	}
+
+	/**
+	 * Resuelve el nombre del salón a mostrar en la tabla tras editar.
+	 * - Estudiante: lookup en store.salones() por salonId del form.
+	 * - Profesor: preserva el valor previo (salones múltiples no se representan en la columna).
+	 * - Otros roles: sin salón asignado.
+	 */
+	private resolveSalonNombre(
+		data: Partial<CrearUsuarioRequest & ActualizarUsuarioRequest>,
+		selectedUsuario: UsuarioDetalle,
+	): string | undefined {
+		if (data.rol === 'Estudiante' && data.salonId) {
+			return this.store.salones().find((s) => s.salonId === data.salonId)?.nombreSalon;
+		}
+		return selectedUsuario.salonNombre;
 	}
 
 	// #endregion
