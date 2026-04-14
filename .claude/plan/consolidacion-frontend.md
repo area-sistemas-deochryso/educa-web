@@ -24,7 +24,7 @@
 
 | Lineas | Archivo | Tipo |
 |--------|---------|------|
-| 641 | core/services/storage/storage.service.ts | Facade de storage |
+| ~~641~~ → 326 ✅ | core/services/storage/storage.service.ts | Facade de storage (cleanup JSDoc redundante, sub-facades ya existían) |
 | 466 | core/services/wal/wal-sync-engine.service.ts | Infraestructura WAL |
 | 449 | core/services/storage/preferences-storage.service.ts | Storage impl |
 | 442 | core/services/facades/base-crud.facade.ts | Base class |
