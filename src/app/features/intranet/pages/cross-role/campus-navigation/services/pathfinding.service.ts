@@ -1,3 +1,7 @@
+// Escape hatch max-lines: algoritmo A* + geometría de safe-path son dos rutinas puras
+// cohesivas que comparten tipos internos (Point, ObstacleRect) y flujo de datos (los
+// nodos del A* alimentan la geometría). Separarlos rompería esa cohesión y el contrato
+// público (findPath + generateSafePathPoints sirven al mismo caso de uso).
 import { Injectable } from '@angular/core';
 
 import {

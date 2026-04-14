@@ -210,7 +210,7 @@ Ninguna. Cada flujo restante es independiente; usar el patrón WAL mock controll
 > **Problema**: 15 archivos superan la regla max-lines:300, algunos por mucho (641 ln).
 > **Objetivo**: Ningun archivo de feature >350 lineas. Core/infra puede tener escape hatch justificado.
 > **Esfuerzo**: ~10-15 horas total (incremental, 1-2 archivos por sesion)
-> **Estado**: 5/10 completos — 2026-04-14
+> **Estado**: 6/10 completos (5 Grupo B + reclasificación pathfinding a Grupo A) — 2026-04-14
 
 ### Progreso
 
@@ -238,6 +238,7 @@ Dividir solo si hay separacion logica clara.
 | base-crud.facade.ts | 442 | Escape hatch: base class — cada linea es contrato compartido |
 | wal.service.ts | 399 | Escape hatch: core del WAL |
 | wal-db.service.ts | 395 | Escape hatch: IndexedDB wrapper |
+| pathfinding.service.ts | 439 | Escape hatch: A* + geometría de safe-path son cohesivos, comparten tipos y flujo de datos ✅ |
 
 #### Grupo B — Features (dividir obligatorio)
 
@@ -254,7 +255,7 @@ Estos archivos son gordos porque acumularon responsabilidades. Dividir por rol.
 | error-reporter.service.ts | 384 | Revisar si hay logica que deberia estar en interceptor |
 | preferences-storage.service.ts | 449 | Dividir por dominio de preferencias si hay 3+ grupos logicos |
 | session-storage.service.ts | 421 | Dividir: auth-session-storage + general-session-storage |
-| pathfinding.service.ts | 439 | Feature campus — aceptable si es algoritmo puro. Escapar si es cohesivo |
+| ~~pathfinding.service.ts~~ | ~~439~~ | Reclasificado a Grupo A — escape hatch aplicado (A* + safe-path geometry cohesivos) ✅ |
 
 ### Orden de ejecucion (por frecuencia de edicion)
 
