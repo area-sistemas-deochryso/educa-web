@@ -91,6 +91,137 @@
 
 ---
 
+### Fase 1.5 — Inventario de reglas `no-restricted-imports` (F3.1 del maestro, 2026-04-14)
+
+> **Objetivo**: Cerrar gaps de lint de capas antes de proceder con F3.2-F3.5.
+
+#### Reglas activas hoy
+
+| Scope | Prohibe | Nivel |
+| --- | --- | --- |
+| `shared/**` | `@features/*`, `@intranet-shared(/*)` | error |
+| `*.component.ts` | `HttpClient` (de `@angular/common/http`) | error |
+| `*.component.ts` | `**/*.store(.ts)` | error |
+| `*.store.ts` | `HttpClient`, `**/*.facade(.ts)`, `**/*.service(.ts)` | error |
+| `*.store.ts` | `.subscribe()` (via `no-restricted-syntax`) | error |
+| `*.facade.ts` (excl. `-data/-crud/-ui`) | `**/*.facade(.ts)` (cross-facade) | **warn** |
+| `admin/**` | `profesor/*`, `estudiante/*` | error |
+| `profesor/**` | `admin/*`, `estudiante/*` | **warn** (violación existente) |
+| `estudiante/**` | `admin/*`, `profesor/*` | error |
+| `features/**` + `shared/**` | Internals de storage (session/preferences/notification/indexed-db/cache/smart-data), `auth-api`, `session-coordinator/refresh` | error |
+
+**Otras relacionadas**:
+
+- `no-restricted-globals`: `localStorage`, `sessionStorage` (con exenciones en `storage/`, `debug/`, `cache/`, tests).
+- `wal/no-direct-mutation-subscribe`: facades (excl. `-data/-ui`).
+- `structure/no-deep-relative-imports`, `no-repeated-blocks`, `no-compact-trivial-setter`, `max-lines: 300`.
+
+#### Gaps detectados
+
+| # | Gap | Dónde | Acción sugerida | Subfase |
+| --- | --- | --- | --- | --- |
+| G1 | Components pueden importar `*-api.service.ts` o `BaseHttpService` directamente | `*.component.ts` | Agregar pattern `**/*-api.service(.ts)` + `**/base-http*` a la regla existente | F3.2 |
+| G2 | `document.cookie` documentado como prohibido pero no bloqueado | global | Agregar a `no-restricted-globals` con exención en `storage/` | F3.2 |
+| G3 | WAL internals expuestos (`WalService`, `WalSyncEngine`, `WalDbService`) | `features/**` + `shared/**` barrel enforcement | Extender barrel enforcement | F3.2 / F5 |
+| G4 | Cache internals: `CacheVersionManagerService` no bloqueado | `features/**` + `shared/**` | Extender barrel enforcement | F3.2 / F5 |
+| G5 | `*.service.ts` (gateway IO) puede importar stores | `*.service.ts` | Agregar regla: services no importan `*.store` | F3.3 |
+| G6 | `cross-role/**` sin restricciones de cross-feature | `cross-role/**` | Definir política (¿puede importar de admin/profesor/estudiante?) | F3.3 |
+| G7 | `profesor → admin` sigue en **warn** (violación `final-salones/`) | `profesor/**` | Migrar `SalonesAdminTable`+`SalonDetailDialog` a `@intranet-shared` y subir a error | F3.5 |
+| G8 | Re-exports temporales `@shared` → `@intranet-shared` con `eslint-disable` | `shared/**/index.ts` | Auditar consumidores + eliminar | F3.4 / F5 |
+| G9 | Cross-facade es **warn**, no error | `*.facade.ts` | Subir a error cuando 0 violaciones | F3.3 tras limpieza |
+
+#### Notas
+
+- G1 y G5 son gaps de lint de capa puros → **F3.2-F3.3**.
+- G3/G4 solapan con F5 (hardening de barrels); la diferencia es si se bloquea desde barrel (`index.ts` deja de exportar) o desde ESLint pattern. Hacer ambos.
+- G7/G8 dependen de refactor previo (migrar código a `@intranet-shared`) → **F3.4-F3.5**.
+
+#### Checklist F3.1
+
+```
+[x] Inventariar reglas actuales
+[x] Identificar gaps por regla
+[x] Mapear cada gap a subfase F3.x
+[x] Actualizar maestro (marcar F3.1 ✅)
+```
+
+#### F3.2 — Cerrar G2, G3, G4 (2026-04-14)
+
+**G1 movido a F3.5** — 8 componentes importan `*-api.service.ts` directamente (violaciones pre-existentes). Requiere migrar a facades primero.
+
+Reglas agregadas a `eslint.config.js`:
+
+- **G2**: `no-restricted-properties` bloquea `document.cookie` globalmente. 0 violaciones.
+- **G3**: barrel enforcement para WAL internals (`wal-db`, `wal-sync-engine`, `wal-leader`, `wal-metrics`, `wal-cache-invalidator`, `wal-coalescer`, `wal-http`, `wal-error`) en `features/**` + `shared/**`. 0 violaciones desde esas capas.
+- **G4**: barrel enforcement para `cache-version-manager*` en `features/**` + `shared/**`. 0 violaciones (único consumidor es `src/app/app.ts`, fuera del scope).
+
+Verificación: `npx eslint src/app/**/*.ts` → 191 problemas (6 errores + 185 warnings), todos **pre-existentes** (2 `max-lines`, 4 `wal/no-direct-mutation-subscribe` en health-permissions facades). Ninguna regla nueva disparó violaciones.
+
+Checklist F3.2:
+
+```
+[x] Bloquear document.cookie (G2)
+[x] Barrel enforcement WAL internals (G3)
+[x] Barrel enforcement Cache internals (G4)
+[x] Verificar lint sin errores nuevos
+[x] Mover G1 a F3.5 (requiere refactor previo a facades)
+```
+
+#### F3.3 — Intento cerrar G5/G6/G9 + descubrimiento G10 (2026-04-14)
+
+**G9 subido a error** (cross-facade warn → error en `src/app/**/*.facade.ts`). 0 violaciones. **Advertencia**: efectivo solo para facades **fuera** de `features/**` (ver G10).
+
+**G5 y G6 revertidos** tras descubrir G10.
+
+##### G10 — Bug estructural del config (nuevo, bloqueante para F3.3)
+
+> **ESLint flat config reemplaza (no merge) el valor de `no-restricted-imports` cuando múltiples configs matchean el mismo archivo. El último gana.**
+
+Consecuencia: el bloque de barrel enforcement (aplica a `features/**` + `shared/**`) **sobrescribe** todas las reglas intermedias para archivos dentro de esas capas.
+
+**Verificación con `eslint --print-config`**:
+
+- `users.store.ts` → sin restricción de no importar facades/services.
+- `users-crud.facade.ts` → sin restricción cross-facade (G9).
+- `calendary.component.ts` (productivo) → sin restricción cross-role (G6).
+- `campus-editor.service.ts` → sin restricción services→stores (G5).
+- `*.component.ts` en features → sin restricción de no importar stores/HttpClient.
+
+**Reglas de capa afectadas (todas las intermedias)**:
+
+| Regla (doc) | Archivo | Estado real |
+| --- | --- | --- |
+| `components` no importan `HttpClient` | `*.component.ts` en features/ | **Inefectiva** — barrel enforcement overwrite |
+| `components` no importan `*.store` | `*.component.ts` en features/ | **Inefectiva** |
+| `stores` no importan facades/services | `*.store.ts` en features/ | **Inefectiva** |
+| `stores` no hacen `.subscribe()` | `*.store.ts` en features/ | ✅ Efectiva (otra regla: `no-restricted-syntax`) |
+| Cross-facade | `*.facade.ts` en features/ | **Inefectiva** |
+| Cross-feature (admin↔profesor↔estudiante) | features pages | **Inefectiva** |
+| Barrel enforcement (storage/auth/session internals) | features/ + shared/ | ✅ Efectiva (es el que gana) |
+| WAL/Cache internals (G3/G4) | features/ + shared/ | ✅ Efectiva (mismo bloque) |
+
+**Opciones de fix (todas fuera del alcance de F3.3 chat-sized)**:
+
+1. **Consolidar patterns en un único bloque por scope de archivo** (reescribir config entero). Cada bloque de archivo define TODOS sus patterns. Elimina sobreescritura.
+2. **Plugin custom** como `wal/no-direct-mutation-subscribe` — una rule propia que inspecciona la ubicación del archivo y aplica restricciones acumulativas. Más código, más mantenible.
+3. **Reordenar configs**: barrel enforcement primero, específicos después. Invierte el problema — los específicos pierden las restricciones de barrel.
+
+**Decisión**: G10 se mueve a **F5 (hardening de wrappers)** como tarea de refactor estructural del config. Requiere chat dedicado con diseño previo.
+
+##### Checklist F3.3
+
+```
+[x] G9 subido a error (efectivo en core/, inefectivo en features/ por G10)
+[x] G5 revertido — requiere fix de G10 primero
+[x] G6 revertido — requiere fix de G10 primero
+[x] G10 documentado como bloqueante
+[x] Verificar lint vuelve a baseline F3.2 (191 problemas, mismos pre-existentes)
+```
+
+**Impacto en el plan**: F3.3 se considera **cerrada parcialmente** (solo G9). F3.4 puede proceder independientemente (es auditoría). F3.5 hereda G1, G5, G6, y ahora G10 también depende de F5.
+
+---
+
 ### Fase 2 — Tests de Contrato e Invariantes (red de seguridad)
 
 > **Objetivo**: Que las reglas de negocio críticas tengan tests que fallen si alguien las rompe.

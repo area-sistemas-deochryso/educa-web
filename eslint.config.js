@@ -331,6 +331,17 @@ module.exports = tseslint.config(
 					message: 'Usar StorageService de @core/services/storage/ en su lugar.',
 				},
 			],
+			// G2 del inventario F3.1: document.cookie prohibido — usar StorageService.
+			// Las cookies de auth son HttpOnly y las maneja el backend.
+			'no-restricted-properties': [
+				'error',
+				{
+					object: 'document',
+					property: 'cookie',
+					message:
+						'document.cookie está prohibido — usar StorageService de @core/services/storage/. Las cookies de auth son HttpOnly y las maneja el backend.',
+				},
+			],
 		},
 	},
 	// #endregion
@@ -441,13 +452,13 @@ module.exports = tseslint.config(
 		ignores: ['src/app/**/*-data.facade.ts', 'src/app/**/*-crud.facade.ts', 'src/app/**/*-ui.facade.ts'],
 		rules: {
 			'no-restricted-imports': [
-				'warn',
+				'error',
 				{
 					patterns: [
 						{
 							group: ['**/*.facade', '**/*.facade.ts'],
 							message:
-								'Facades no deben importar otros facades — genera acoplamiento. Orquestar desde el componente o extraer lógica compartida a un store.',
+								'Facades no deben importar otros facades — genera acoplamiento. Orquestar desde el componente o extraer lógica compartida a un store. G9 del inventario F3.1 — 0 violaciones al 2026-04-14, subido a error.',
 						},
 					],
 				},
@@ -609,6 +620,29 @@ module.exports = tseslint.config(
 							],
 							message:
 								'Usar SessionActivityService de @core/services en lugar de servicios internos de session.',
+						},
+						{
+							// G3 del inventario F3.1: WAL internals bloqueados en features/ y shared/.
+							// Público: WalFacadeHelper, WalStatusStore, WalService, WalClockService, isConflictError/isPermanentError.
+							group: [
+								'@core/services/wal/wal-db*',
+								'@core/services/wal/wal-sync-engine*',
+								'@core/services/wal/wal-leader*',
+								'@core/services/wal/wal-metrics*',
+								'@core/services/wal/wal-cache-invalidator*',
+								'@core/services/wal/wal-coalescer*',
+								'@core/services/wal/wal-http*',
+								'@core/services/wal/wal-error*',
+							],
+							message:
+								'WAL internals — usar WalFacadeHelper o WalStatusStore desde @core/services.',
+						},
+						{
+							// G4 del inventario F3.1: CacheVersionManagerService es interno.
+							// Público: CacheInvalidationService.
+							group: ['@core/services/cache/cache-version-manager*'],
+							message:
+								'CacheVersionManagerService es interno — usar CacheInvalidationService desde @core/services.',
 						},
 					],
 				},
