@@ -23,10 +23,10 @@ Registro de tareas completadas y cambios significativos del proyecto.
 | `eslint-prevenir-compactacion-setters.md` | Regla ESLint `structure/no-compact-trivial-setter` para detectar setters one-liner que burlan max-lines. Implementada + documentada | 2026-04-13 |
 | `refactor-honesto-post-max-lines.md` | Refactor real de deuda post-max-lines: calificaciones WAL→server-confirmed (INV-C04), usuarios.store→BaseCrudStore, horarios.store→sub-stores expuestos, permisos-usuarios.facade→multi-facade (data/crud/ui) | 2026-04-13 |
 | `eslint-subfolder-grouping.md` | Convención de agrupación en subcarpetas (18 carpetas detectadas). No automatizable — vigente como guía de code review | 2026-04-13 |
+| `archivos-grandes-refactor.md` | Refactor de archivos grandes de asistencia: `attendance-view.service.ts` dividido (412→327), 4 archivos evaluados pasan ESLint sin split. Nuevo `attendance-view.models.ts` + métodos con contexto en `AttendancePdfService` | 2026-04-13 |
 
 ## Tareas pendientes (en `tasks/`)
 
 | Tarea | Archivo | Estado |
 | --- | --- | --- |
-| Archivos grandes — refactor | `archivos-grandes-refactor.md` | ⏳ Incremental — aplicar al tocar cada archivo |
 | Enforcement Fase 3 — tipos semánticos | `enforcement-reglas.md` | ⏳ Incremental — aplicar al tocar cada archivo |
