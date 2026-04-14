@@ -42,7 +42,7 @@ export interface WalEntry {
 	status: WalEntryStatus;
 	/** Current retry count */
 	retries: number;
-	/** Maximum retries before marking FAILED (default: 5) */
+	/** Maximum retries before marking FAILED (default: 2) */
 	maxRetries: number;
 	/** Last error message */
 	error?: string;
@@ -90,7 +90,7 @@ interface WalMutationBase<T> {
 	onCommit: (result: T) => void;
 	/** Called on permanent failure (after max retries) */
 	onError: (error: unknown) => void;
-	/** Override default max retries (default: 5) */
+	/** Override default max retries (default: 2) */
 	maxRetries?: number;
 	/** Consistency level (default: 'optimistic'). */
 	consistencyLevel?: WalConsistencyLevel;
@@ -208,7 +208,7 @@ export const CURRENT_WAL_SCHEMA_VERSION = 1;
 
 /** Default WAL configuration values. */
 export const WAL_DEFAULTS = {
-	MAX_RETRIES: 5,
+	MAX_RETRIES: 2,
 	/** Max backoff delay in ms (30 seconds) */
 	MAX_BACKOFF_MS: 30_000,
 	/** Base backoff delay in ms */
