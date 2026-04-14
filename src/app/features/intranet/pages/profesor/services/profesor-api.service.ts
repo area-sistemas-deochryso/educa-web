@@ -1,9 +1,13 @@
+/**
+ * Aggregate facade. ProfesorApiService delega en 3 sub-services domain-specific
+ * (ProfesorSalonesApiService, ProfesorCursosApiService, ProfesorAsistenciaApiService)
+ * para respetar la regla max-lines:300 sin romper los 14 consumidores existentes.
+ * Cada sub-service tiene su dominio (horarios+salones+boletas / contenido+
+ * calificaciones+grupos / asistencia). Si nuevos consumidores: preferir inyectar
+ * el sub-service correspondiente directamente.
+ */
 import { Injectable, inject } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
-import { Observable, of } from 'rxjs';
-import { catchError } from 'rxjs/operators';
-import { environment } from '@config/environment';
-import { FileUploadBuilder } from '@core/helpers';
+import { Observable } from 'rxjs';
 import {
 	HorarioProfesorDto,
 	SalonTutoriaDto,
@@ -41,378 +45,157 @@ import {
 	RegistrarAsistenciaCursoDto,
 	AsistenciaCursoResumenDto,
 } from '../models';
+import { ProfesorSalonesApiService } from './profesor-salones-api.service';
+import { ProfesorCursosApiService } from './profesor-cursos-api.service';
+import { ProfesorAsistenciaApiService } from './profesor-asistencia-api.service';
 
-/**
- * API client for professor endpoints.
- *
- * NOTE: The apiResponseInterceptor already unwraps { success, data } envelopes,
- * so return types here reflect the unwrapped payload (T, not ApiResponse<T>).
- */
 @Injectable({ providedIn: 'root' })
 export class ProfesorApiService {
-	private readonly http = inject(HttpClient);
-	/** Base URL for schedule endpoints. */
-	private readonly horarioUrl = `${environment.apiUrl}/api/Horario`;
-	/** Base URL for professor classroom endpoints. */
-	private readonly profesorSalonUrl = `${environment.apiUrl}/api/ProfesorSalon`;
-	/** Base URL for professor endpoints. */
-	private readonly profesorUrl = `${environment.apiUrl}/api/Profesor`;
-	/** Base URL for course content endpoints. */
-	private readonly contenidoUrl = `${environment.apiUrl}/api/CursoContenido`;
-	/** Base URL for blob storage endpoints. */
-	private readonly blobUrl = `${environment.apiUrl}/api/blobstorage`;
-	/**
-	 * Get schedules for a professor.
-	 *
-	 * @param profesorId Profesor id.
-	 * @returns Observable with schedule list.
-	 *
-	 * @example
-	 * api.getHorarios(profesorId);
-	 */
+	private readonly salones = inject(ProfesorSalonesApiService);
+	private readonly cursos = inject(ProfesorCursosApiService);
+	private readonly asistencia = inject(ProfesorAsistenciaApiService);
+
+	// #region Horarios + Salones + Boletas + ServerTime
 	getHorarios(profesorId: number): Observable<HorarioProfesorDto[]> {
-		return this.http
-			.get<HorarioProfesorDto[]>(`${this.horarioUrl}/profesor/${profesorId}`)
-			.pipe(catchError(() => of([])));
+		return this.salones.getHorarios(profesorId);
 	}
-	/**
-	 * Get tutor classroom for a professor.
-	 *
-	 * @param profesorId Profesor id.
-	 * @returns Observable with tutor classroom response.
-	 */
 	getSalonTutoria(profesorId: number): Observable<SalonTutoriaDto | null> {
-		return this.http
-			.get<SalonTutoriaDto>(`${this.profesorSalonUrl}/profesor/${profesorId}`)
-			.pipe(catchError(() => of(null)));
+		return this.salones.getSalonTutoria(profesorId);
 	}
-	/**
-	 * Get professor classrooms with students summary.
-	 *
-	 * @returns Observable with classrooms and counts.
-	 */
 	getMisEstudiantes(): Observable<ProfesorMisSalonesConEstudiantesDto> {
-		return this.http
-			.get<ProfesorMisSalonesConEstudiantesDto>(`${this.profesorUrl}/mis-estudiantes`)
-			.pipe(catchError(() => of({ salones: [], totalEstudiantes: 0, totalSalones: 0 })));
+		return this.salones.getMisEstudiantes();
 	}
-	/**
-	 * Get students for a classroom.
-	 *
-	 * @param salonId Classroom id.
-	 * @returns Observable with classroom detail or null.
-	 */
 	getEstudiantesSalon(salonId: number): Observable<ProfesorSalonConEstudiantesDto | null> {
-		return this.http
-			.get<ProfesorSalonConEstudiantesDto>(`${this.profesorUrl}/estudiantes-salon/${salonId}`)
-			.pipe(catchError(() => of(null)));
+		return this.salones.getEstudiantesSalon(salonId);
 	}
-
-	// #region Curso Contenido
-	/**
-	 * Get course content for a schedule.
-	 *
-	 * @param horarioId Schedule id.
-	 * @returns Observable with content detail or null.
-	 */
-	getContenido(horarioId: number): Observable<CursoContenidoDetalleDto | null> {
-		return this.http.get<CursoContenidoDetalleDto | null>(
-			`${this.contenidoUrl}/horario/${horarioId}`,
-		);
+	descargarBoletaEstudiante(estudianteId: number, salonId: number): Observable<Blob> {
+		return this.salones.descargarBoletaEstudiante(estudianteId, salonId);
 	}
-	/**
-	 * Create course content for a schedule.
-	 *
-	 * @param request Creation payload.
-	 * @returns Observable with created content detail.
-	 */
-	crearContenido(request: CrearCursoContenidoRequest): Observable<CursoContenidoDetalleDto> {
-		return this.http.post<CursoContenidoDetalleDto>(this.contenidoUrl, request);
+	descargarBoletaSalon(salonId: number): Observable<Blob> {
+		return this.salones.descargarBoletaSalon(salonId);
 	}
-	/**
-	 * Delete course content by id.
-	 *
-	 * @param id Content id.
-	 * @returns Observable with confirmation message.
-	 */
-	eliminarContenido(id: number): Observable<{ mensaje: string }> {
-		return this.http.delete<{ mensaje: string }>(`${this.contenidoUrl}/${id}`);
-	}
-	/**
-	 * Update a week in course content.
-	 *
-	 * @param semanaId Week id.
-	 * @param request Update payload.
-	 * @returns Observable with updated week detail.
-	 */
-	actualizarSemana(semanaId: number, request: ActualizarSemanaRequest): Observable<CursoContenidoSemanaDto> {
-		return this.http.put<CursoContenidoSemanaDto>(
-			`${this.contenidoUrl}/semana/${semanaId}`,
-			request,
-		);
-	}
-	/**
-	 * Register attachment metadata for a week.
-	 *
-	 * @param semanaId Week id.
-	 * @param request Attachment metadata payload.
-	 * @returns Observable with created attachment detail.
-	 */
-	registrarArchivo(semanaId: number, request: RegistrarArchivoRequest): Observable<CursoContenidoArchivoDto> {
-		return this.http.post<CursoContenidoArchivoDto>(
-			`${this.contenidoUrl}/semana/${semanaId}/archivo`,
-			request,
-		);
-	}
-	/**
-	 * Delete an attachment by id.
-	 *
-	 * @param archivoId Attachment id.
-	 * @returns Observable with confirmation message.
-	 */
-	eliminarArchivo(archivoId: number): Observable<{ mensaje: string }> {
-		return this.http.delete<{ mensaje: string }>(`${this.contenidoUrl}/archivo/${archivoId}`);
-	}
-	/**
-	 * Create a task for a week.
-	 *
-	 * @param semanaId Week id.
-	 * @param request Task creation payload.
-	 * @returns Observable with created task detail.
-	 */
-	crearTarea(semanaId: number, request: CrearTareaRequest): Observable<CursoContenidoTareaDto> {
-		return this.http.post<CursoContenidoTareaDto>(
-			`${this.contenidoUrl}/semana/${semanaId}/tarea`,
-			request,
-		);
-	}
-	/**
-	 * Update a task by id.
-	 *
-	 * @param tareaId Task id.
-	 * @param request Task update payload.
-	 * @returns Observable with updated task detail.
-	 */
-	actualizarTarea(tareaId: number, request: ActualizarTareaRequest): Observable<CursoContenidoTareaDto> {
-		return this.http.put<CursoContenidoTareaDto>(
-			`${this.contenidoUrl}/tarea/${tareaId}`,
-			request,
-		);
-	}
-	/**
-	 * Delete a task by id.
-	 *
-	 * @param tareaId Task id.
-	 * @returns Observable with confirmation message.
-	 */
-	eliminarTarea(tareaId: number): Observable<{ mensaje: string }> {
-		return this.http.delete<{ mensaje: string }>(`${this.contenidoUrl}/tarea/${tareaId}`);
-	}
-
-	/**
-	 * Get all student-uploaded files for a content (professor view).
-	 */
-	getArchivosEstudiantes(contenidoId: number): Observable<SemanaEstudianteArchivosDto[]> {
-		return this.http.get<SemanaEstudianteArchivosDto[]>(
-			`${this.contenidoUrl}/${contenidoId}/archivos-estudiantes`,
-		);
-	}
-
-	/**
-	 * Register teacher attachment metadata for a task.
-	 */
-	registrarTareaArchivo(tareaId: number, request: RegistrarTareaArchivoRequest): Observable<TareaArchivoDto> {
-		return this.http.post<TareaArchivoDto>(
-			`${this.contenidoUrl}/tarea/${tareaId}/archivo`,
-			request,
-		);
-	}
-	/**
-	 * Delete a teacher attachment from a task.
-	 */
-	eliminarTareaArchivo(archivoId: number): Observable<{ mensaje: string }> {
-		return this.http.delete<{ mensaje: string }>(`${this.contenidoUrl}/tarea-archivo/${archivoId}`);
-	}
-	/**
-	 * Get all student-uploaded files for a task (professor view).
-	 */
-	getArchivosTareaEstudiantes(tareaId: number): Observable<EstudianteTareaArchivosGroupDto[]> {
-		return this.http.get<EstudianteTareaArchivosGroupDto[]>(
-			`${this.contenidoUrl}/tarea/${tareaId}/archivos-estudiantes`,
-		);
+	getServerTime(): Observable<string | null> {
+		return this.salones.getServerTime();
 	}
 	// #endregion
+
+	// #region Curso Contenido
+	getContenido(horarioId: number): Observable<CursoContenidoDetalleDto | null> {
+		return this.cursos.getContenido(horarioId);
+	}
+	crearContenido(request: CrearCursoContenidoRequest): Observable<CursoContenidoDetalleDto> {
+		return this.cursos.crearContenido(request);
+	}
+	eliminarContenido(id: number): Observable<{ mensaje: string }> {
+		return this.cursos.eliminarContenido(id);
+	}
+	actualizarSemana(semanaId: number, request: ActualizarSemanaRequest): Observable<CursoContenidoSemanaDto> {
+		return this.cursos.actualizarSemana(semanaId, request);
+	}
+	registrarArchivo(semanaId: number, request: RegistrarArchivoRequest): Observable<CursoContenidoArchivoDto> {
+		return this.cursos.registrarArchivo(semanaId, request);
+	}
+	eliminarArchivo(archivoId: number): Observable<{ mensaje: string }> {
+		return this.cursos.eliminarArchivo(archivoId);
+	}
+	crearTarea(semanaId: number, request: CrearTareaRequest): Observable<CursoContenidoTareaDto> {
+		return this.cursos.crearTarea(semanaId, request);
+	}
+	actualizarTarea(tareaId: number, request: ActualizarTareaRequest): Observable<CursoContenidoTareaDto> {
+		return this.cursos.actualizarTarea(tareaId, request);
+	}
+	eliminarTarea(tareaId: number): Observable<{ mensaje: string }> {
+		return this.cursos.eliminarTarea(tareaId);
+	}
+	getArchivosEstudiantes(contenidoId: number): Observable<SemanaEstudianteArchivosDto[]> {
+		return this.cursos.getArchivosEstudiantes(contenidoId);
+	}
+	registrarTareaArchivo(tareaId: number, request: RegistrarTareaArchivoRequest): Observable<TareaArchivoDto> {
+		return this.cursos.registrarTareaArchivo(tareaId, request);
+	}
+	eliminarTareaArchivo(archivoId: number): Observable<{ mensaje: string }> {
+		return this.cursos.eliminarTareaArchivo(archivoId);
+	}
+	getArchivosTareaEstudiantes(tareaId: number): Observable<EstudianteTareaArchivosGroupDto[]> {
+		return this.cursos.getArchivosTareaEstudiantes(tareaId);
+	}
 	// #endregion
 
 	// #region Calificaciones
-	/** Base URL for grading endpoints. */
-	private readonly calificacionUrl = `${environment.apiUrl}/api/Calificacion`;
-
 	getCalificaciones(contenidoId: number): Observable<CalificacionConNotasDto[]> {
-		return this.http.get<CalificacionConNotasDto[]>(
-			`${this.calificacionUrl}/contenido/${contenidoId}`,
-		);
+		return this.cursos.getCalificaciones(contenidoId);
 	}
-
 	crearCalificacion(dto: CrearCalificacionDto): Observable<CalificacionConNotasDto> {
-		return this.http.post<CalificacionConNotasDto>(this.calificacionUrl, dto);
+		return this.cursos.crearCalificacion(dto);
 	}
-
 	calificarLote(calificacionId: number, dto: CalificarLoteDto): Observable<void> {
-		return this.http.post<void>(`${this.calificacionUrl}/${calificacionId}/calificar`, dto);
+		return this.cursos.calificarLote(calificacionId, dto);
 	}
-
 	actualizarNota(notaId: number, dto: ActualizarNotaDto): Observable<void> {
-		return this.http.put<void>(`${this.calificacionUrl}/nota/${notaId}`, dto);
+		return this.cursos.actualizarNota(notaId, dto);
 	}
-
 	eliminarCalificacion(calificacionId: number): Observable<void> {
-		return this.http.delete<void>(`${this.calificacionUrl}/${calificacionId}`);
+		return this.cursos.eliminarCalificacion(calificacionId);
 	}
-
 	eliminarNotaEstudiante(calificacionId: number, estudianteId: number): Observable<void> {
-		return this.http.delete<void>(
-			`${this.calificacionUrl}/${calificacionId}/estudiante/${estudianteId}`,
-		);
+		return this.cursos.eliminarNotaEstudiante(calificacionId, estudianteId);
 	}
-
-	cambiarTipoCalificacion(
-		calificacionId: number,
-		dto: CambiarTipoCalificacionDto,
-	): Observable<CalificacionConNotasDto> {
-		return this.http.put<CalificacionConNotasDto>(
-			`${this.calificacionUrl}/${calificacionId}/tipo`,
-			dto,
-		);
+	cambiarTipoCalificacion(calificacionId: number, dto: CambiarTipoCalificacionDto): Observable<CalificacionConNotasDto> {
+		return this.cursos.cambiarTipoCalificacion(calificacionId, dto);
 	}
-
 	getPeriodos(contenidoId: number): Observable<PeriodoCalificacionDto[]> {
-		return this.http.get<PeriodoCalificacionDto[]>(
-			`${this.calificacionUrl}/periodos/${contenidoId}`,
-		);
+		return this.cursos.getPeriodos(contenidoId);
 	}
-
 	crearPeriodo(dto: CrearPeriodoDto): Observable<PeriodoCalificacionDto> {
-		return this.http.post<PeriodoCalificacionDto>(`${this.calificacionUrl}/periodo`, dto);
+		return this.cursos.crearPeriodo(dto);
 	}
-
 	eliminarPeriodo(periodoId: number): Observable<void> {
-		return this.http.delete<void>(`${this.calificacionUrl}/periodo/${periodoId}`);
+		return this.cursos.eliminarPeriodo(periodoId);
 	}
-
 	getNotasSalon(salonId: number, cursoId: number): Observable<SalonNotasResumenDto> {
-		return this.http.get<SalonNotasResumenDto>(
-			`${this.calificacionUrl}/salon/${salonId}/curso/${cursoId}`,
-		);
+		return this.cursos.getNotasSalon(salonId, cursoId);
 	}
 	// #endregion
 
 	// #region Grupos
-	/** Base URL for group endpoints. */
-	private readonly grupoUrl = `${environment.apiUrl}/api/GrupoContenido`;
-
 	getGrupos(contenidoId: number): Observable<GruposResumenDto> {
-		return this.http.get<GruposResumenDto>(`${this.grupoUrl}/contenido/${contenidoId}`);
+		return this.cursos.getGrupos(contenidoId);
 	}
-
 	crearGrupo(dto: CrearGrupoDto): Observable<GrupoContenidoDto> {
-		return this.http.post<GrupoContenidoDto>(this.grupoUrl, dto);
+		return this.cursos.crearGrupo(dto);
 	}
-
 	actualizarGrupo(grupoId: number, dto: ActualizarGrupoDto): Observable<void> {
-		return this.http.put<void>(`${this.grupoUrl}/${grupoId}`, dto);
+		return this.cursos.actualizarGrupo(grupoId, dto);
 	}
-
 	eliminarGrupo(grupoId: number): Observable<void> {
-		return this.http.delete<void>(`${this.grupoUrl}/${grupoId}`);
+		return this.cursos.eliminarGrupo(grupoId);
 	}
-
 	asignarEstudiantes(grupoId: number, dto: AsignarEstudiantesGrupoDto): Observable<void> {
-		return this.http.post<void>(`${this.grupoUrl}/${grupoId}/estudiantes`, dto);
+		return this.cursos.asignarEstudiantes(grupoId, dto);
 	}
-
 	removerEstudianteDeGrupo(grupoId: number, estudianteId: number): Observable<void> {
-		return this.http.delete<void>(`${this.grupoUrl}/${grupoId}/estudiante/${estudianteId}`);
+		return this.cursos.removerEstudianteDeGrupo(grupoId, estudianteId);
 	}
-
 	configurarMaxEstudiantes(contenidoId: number, dto: ConfigurarMaxEstudiantesDto): Observable<void> {
-		return this.http.put<void>(`${this.grupoUrl}/contenido/${contenidoId}/config`, dto);
+		return this.cursos.configurarMaxEstudiantes(contenidoId, dto);
 	}
-
 	calificarGruposLote(calificacionId: number, dto: CalificarGruposLoteDto): Observable<void> {
-		return this.http.post<void>(`${this.grupoUrl}/${calificacionId}/calificar-grupos`, dto);
+		return this.cursos.calificarGruposLote(calificacionId, dto);
 	}
 	// #endregion
 
-	// #region Asistencia Curso
-	/** Base URL for course attendance endpoints. */
-	private readonly asistenciaCursoUrl = `${environment.apiUrl}/api/AsistenciaCurso`;
-
+	// #region Asistencia Curso + Blob upload
 	getAsistenciaCursoFecha(horarioId: number, fecha: string): Observable<AsistenciaCursoFechaDto> {
-		return this.http.get<AsistenciaCursoFechaDto>(
-			`${this.asistenciaCursoUrl}/horario/${horarioId}/fecha`,
-			{ params: { fecha } },
-		);
+		return this.asistencia.getAsistenciaCursoFecha(horarioId, fecha);
 	}
-
 	registrarAsistenciaCurso(horarioId: number, dto: RegistrarAsistenciaCursoDto): Observable<void> {
-		return this.http.post<void>(
-			`${this.asistenciaCursoUrl}/horario/${horarioId}/registrar`,
-			dto,
-		);
+		return this.asistencia.registrarAsistenciaCurso(horarioId, dto);
 	}
-
-	getAsistenciaCursoResumen(
-		horarioId: number,
-		fechaInicio: string,
-		fechaFin: string,
-	): Observable<AsistenciaCursoResumenDto> {
-		return this.http.get<AsistenciaCursoResumenDto>(
-			`${this.asistenciaCursoUrl}/horario/${horarioId}/resumen`,
-			{ params: { fechaInicio, fechaFin } },
-		);
+	getAsistenciaCursoResumen(horarioId: number, fechaInicio: string, fechaFin: string): Observable<AsistenciaCursoResumenDto> {
+		return this.asistencia.getAsistenciaCursoResumen(horarioId, fechaInicio, fechaFin);
 	}
-	// #endregion
-
-	// #region Server Time
-	/** Lightweight call to get UTC server time for clock sync. Returns null if unavailable. */
-	getServerTime(): Observable<string | null> {
-		return this.http
-			.get<string>(`${environment.apiUrl}/api/ServerTime`)
-			.pipe(catchError(() => of(null)));
-	}
-	// #endregion
-
-	// #region Blob Storage (file upload)
-	/**
-	 * Upload a file to blob storage.
-	 *
-	 * @param file File to upload.
-	 * @returns Observable with upload result URL and file name.
-	 */
 	uploadFile(file: File): Observable<{ url: string; fileName: string }> {
-		const formData = FileUploadBuilder.create(file)
-			.container('curso-contenido')
-			.withTimestamp()
-			.build();
-		return this.http.post<{ url: string; fileName: string }>(`${this.blobUrl}/upload`, formData);
-	}
-	// #endregion
-
-	// #region Boletas PDF
-	private readonly boletaUrl = `${environment.apiUrl}/api/BoletaNotas`;
-
-	descargarBoletaEstudiante(estudianteId: number, salonId: number): Observable<Blob> {
-		return this.http.get(`${this.boletaUrl}/estudiante/${estudianteId}`, {
-			params: { salonId: salonId.toString() },
-			responseType: 'blob',
-		});
-	}
-
-	descargarBoletaSalon(salonId: number): Observable<Blob> {
-		return this.http.get(`${this.boletaUrl}/salon/${salonId}`, {
-			responseType: 'blob',
-		});
+		return this.cursos.uploadFile(file);
 	}
 	// #endregion
 }
