@@ -54,19 +54,37 @@ logica compleja de ventanas horarias, coherencia biometrica, y generacion de PDF
 > **Objetivo**: Ningun service >300 lineas. Dividir por responsabilidad, no por tamano arbitrario.
 > **Esfuerzo**: ~12-18 horas total (1-2 services por sesion)
 
+### Estado actual
+
+- Branch de trabajo: `refactor/split-services-fase1` en `Educa.API` (mergeable a `master`)
+- Prioridad 1 COMPLETADA — commit `107d758`
+- Prioridades 2-5 pendientes
+
+### Convenciones aplicadas (seguir en los siguientes splits)
+
+- **Patron fachada**: mantener el service original como fachada que delega. Preserva `IXxxService` -> controller y tests intactos.
+- **Subcarpeta por dominio**: `Services/Asistencias/{Dominio}/` agrupa los splits. Ej: `Services/Asistencias/PermisoSalud/`.
+- **Interface por servicio nuevo**: `Interfaces/Services/Asistencias/IXxx.cs`.
+- **Registro DI**: orden = helpers primero, servicios especializados, fachada ultimo en `Extensions/ServiceExtensions.cs`.
+- **Namespaces**: `BusinessRuleException` y `NotFoundException` viven en `Educa.API.Exceptions.Http` (no en `Educa.API.Exceptions`).
+- **Un commit por service dividido**: commit message `refactor({dominio}): split N-line service into K focused services`.
+
 ### Estrategia de division por servicio
 
-#### PermisoSaludService.cs (649 ln) — Prioridad 1
+#### PermisoSaludService.cs (649 ln) — Prioridad 1 — COMPLETADO (commit 107d758)
 
-**Analisis**: Servicio mas grande del proyecto. Probablemente mezcla validacion de permisos,
-logica de salud del estudiante, y coordinacion de datos.
+**Division aplicada** (diferente a la propuesta original: se divide por recurso, no por validacion/query):
 
-**Division propuesta**:
-| Nuevo servicio | Responsabilidad |
-|---------------|-----------------|
-| PermisoSaludValidationService | Validaciones de reglas de negocio |
-| PermisoSaludService (reducido) | Coordinacion y orquestacion |
-| PermisoSaludQueryService | Consultas complejas de datos de salud |
+| Archivo | Lineas | Rol |
+|---------|--------|-----|
+| `Services/Asistencias/PermisoSaludService.cs` (fachada) | 54 | Delega a los 5 servicios |
+| `Services/Asistencias/PermisoSalud/PermisoSaludAuthorizationHelper.cs` | 69 | Auth + helpers compartidos (ValidarAutorizacion, EsAdmin, ObtenerEstudianteConSede, ObtenerEstudianteIdsDeSalon, ObtenerNombreEmisor) |
+| `Services/Asistencias/PermisoSalud/PermisoSaludEmailNotifier.cs` | 75 | Correos al apoderado (permiso salida + justificacion) |
+| `Services/Asistencias/PermisoSalud/PermisoSaludQueryService.cs` | 197 | Reads: ObtenerResumen, ListarEstudiantes, ValidarFechas, ObtenerSintomas, ListarSalones |
+| `Services/Asistencias/PermisoSalud/PermisoSaludSalidaService.cs` | 148 | CRUD permiso de salida (mismo dia) |
+| `Services/Asistencias/PermisoSalud/JustificacionSaludService.cs` | 228 | CRUD justificacion medica (otros dias) |
+
+Build limpio, 699/699 tests.
 
 #### AsistenciaPdfComposer.cs (638 ln) — Prioridad 2
 
@@ -108,11 +126,29 @@ Misma estrategia: separar data retrieval de formatting/rendering.
 
 ### Orden de ejecucion
 
-1. PermisoSaludService — mas grande, probablemente mas simple de dividir
-2. AsistenciaPdfComposer — generacion PDF tiene separacion natural
-3. AsistenciaAdminService — core del negocio, division por validacion/crud
-4. AsistenciaService — core del webhook, division delicada (mas tests)
-5. Resto: incremental al tocar el archivo
+1. PermisoSaludService — COMPLETADO (commit 107d758)
+2. AsistenciaPdfComposer (638 ln) — SIGUIENTE
+3. AsistenciaAdminService (512 ln)
+4. AsistenciaService (487 ln) — webhook CrossChex, division delicada
+5. ReporteFiltradoAsistenciaService (441 ln)
+6. Resto (ReporteFiltradoPdfService, ReporteAsistenciaDataService, ReporteAsistenciaConsolidadoPdfService): incremental al tocar el archivo
+
+### Para retomar en chat nuevo
+
+Prompt sugerido:
+
+> Continuar Fase 1 del plan `consolidacion-backend.md`. Ya se dividio `PermisoSaludService` (commit 107d758 en branch `refactor/split-services-fase1`). Siguiente: dividir `Educa.API/Services/Asistencias/AsistenciaPdfComposer.cs` (638 ln) aplicando el patron fachada. Verificar build + 699 tests despues.
+
+Pasos del flujo:
+1. Verificar que el repo `Educa.API` esta en branch `refactor/split-services-fase1` y limpio (`git status`)
+2. Leer el archivo completo y analizar que responsabilidades mezcla
+3. Proponer division (N servicios + fachada) al usuario antes de ejecutar
+4. Crear interfaces en `Interfaces/Services/Asistencias/`
+5. Crear implementaciones en `Services/Asistencias/AsistenciaPdf/` (subcarpeta por dominio)
+6. Reducir el service original a fachada que delega
+7. Registrar en `Extensions/ServiceExtensions.cs` (helpers -> servicios -> fachada)
+8. `dotnet build` + `dotnet test` verde
+9. Commit: `refactor({dominio}): split N-line service into K focused services`
 
 ### Reglas de la division
 
@@ -124,7 +160,11 @@ Misma estrategia: separar data retrieval de formatting/rendering.
 
 ### Criterio de completitud
 
-- [ ] Top 5 services divididos (los de >450 lineas)
+- [x] PermisoSaludService dividido (commit 107d758)
+- [ ] AsistenciaPdfComposer dividido
+- [ ] AsistenciaAdminService dividido
+- [ ] AsistenciaService dividido
+- [ ] ReporteFiltradoAsistenciaService dividido
 - [ ] Ningun service de feature >300 lineas
 - [ ] Cada nuevo servicio con interfaz registrada en DI
 - [ ] 699 tests siguen pasando
