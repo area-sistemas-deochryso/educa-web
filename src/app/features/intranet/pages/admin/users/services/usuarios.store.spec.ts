@@ -1,4 +1,6 @@
-// * Tests for UsersStore — validates user management state.
+// * Tests for UsersStore — validates feature-specific behavior.
+// Base CRUD primitives (setItems/addItem/updateItem/removeItem/filters/pagination/form)
+// are covered by base-crud.store.spec.ts; here we only test what UsersStore adds.
 // #region Imports
 import { TestBed } from '@angular/core/testing';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
@@ -14,15 +16,15 @@ const noopLog = { info: vi.fn(), warn: vi.fn(), error: vi.fn(), trace: vi.fn(), 
 const mockDebug = { dbg: () => noopLog } as unknown as DebugService;
 
 const mockUsuarios: UsuarioLista[] = [
-	{ id: 1, dni: '11111111', nombres: 'Juan', apellidos: 'Pérez', nombreCompleto: 'Juan Pérez', rol: 'Director', estado: true, sedeId: 1, rowVersion: 'v1' },
-	{ id: 2, dni: '22222222', nombres: 'María', apellidos: 'García', nombreCompleto: 'María García', rol: 'Profesor', estado: true, sedeId: 1, rowVersion: 'v1' },
-	{ id: 3, dni: '33333333', nombres: 'Pedro', apellidos: 'López', nombreCompleto: 'Pedro López', rol: 'Estudiante', estado: false, sedeId: 1, rowVersion: 'v1' },
+	{ id: 1, dni: '11111111', nombres: 'Juan', apellidos: 'Pérez', nombreCompleto: 'Juan Pérez', rol: 'Director', estado: true, fechaRegistro: '2025-01-01', sedeId: 1, rowVersion: 'v1' },
+	{ id: 2, dni: '22222222', nombres: 'María', apellidos: 'García', nombreCompleto: 'María García', rol: 'Profesor', estado: true, fechaRegistro: '2025-01-01', sedeId: 1, rowVersion: 'v1' },
+	{ id: 3, dni: '33333333', nombres: 'Pedro', apellidos: 'López', nombreCompleto: 'Pedro López', rol: 'Estudiante', estado: false, fechaRegistro: '2025-01-01', sedeId: 1, rowVersion: 'v1' },
 ];
 
 const mockStats: UsuariosEstadisticas = {
 	totalUsuarios: 3, totalDirectores: 1, totalAsistentesAdministrativos: 0,
 	totalPromotores: 0, totalProfesores: 1, totalApoderados: 0, totalEstudiantes: 1,
-	totalActivos: 2, totalInactivos: 1,
+	usuariosActivos: 2, usuariosInactivos: 1,
 };
 
 const mockDetalle: UsuarioDetalle = {
@@ -47,136 +49,74 @@ describe('UsersStore', () => {
 		store = TestBed.inject(UsersStore);
 	});
 
-	// #region Initial state
-	describe('initial state', () => {
-		it('should have empty data', () => {
-			expect(store.usuarios()).toEqual([]);
-			expect(store.estadisticas()).toBeNull();
-			expect(store.loading()).toBe(false);
-			expect(store.error()).toBeNull();
+	// #region Initial state (feature-specific)
+	describe('initial state (feature-specific)', () => {
+		it('should have empty salones and filter salones', () => {
+			expect(store.salones()).toEqual([]);
+			expect(store.salonesFilter()).toEqual([]);
 		});
 
-		it('should have default UI state', () => {
-			expect(store.dialogVisible()).toBe(false);
-			expect(store.detailDrawerVisible()).toBe(false);
-			expect(store.importDialogVisible()).toBe(false);
-			expect(store.isEditing()).toBe(false);
-		});
-
-		it('should have default pagination', () => {
-			expect(store.page()).toBe(1);
-			expect(store.pageSize()).toBe(10);
-			expect(store.totalRecords()).toBe(0);
-		});
-
-		it('should have default filters', () => {
-			expect(store.searchTerm()).toBe('');
-			expect(store.filterRol()).toBeNull();
-			expect(store.filterEstado()).toBeNull();
-		});
-
-		it('should show skeletons initially', () => {
+		it('should show skeletons initially with no phase ready', () => {
 			expect(store.showSkeletons()).toBe(true);
 			expect(store.statsReady()).toBe(false);
 			expect(store.tableReady()).toBe(false);
 		});
-	});
-	// #endregion
 
-	// #region CRUD mutations
-	describe('CRUD mutations', () => {
-		it('should set usuarios', () => {
-			store.setUsuarios(mockUsuarios);
-			expect(store.usuarios()).toHaveLength(3);
+		it('should have drawers/import closed and no selected user', () => {
+			expect(store.detailDrawerVisible()).toBe(false);
+			expect(store.importDialogVisible()).toBe(false);
+			expect(store.importLoading()).toBe(false);
+			expect(store.importResult()).toBeNull();
+			expect(store.selectedUsuario()).toBeNull();
 		});
 
-		it('should add usuario at beginning', () => {
-			store.setUsuarios(mockUsuarios);
-			const nuevo: UsuarioLista = { id: 4, dni: '44444444', nombres: 'Ana', apellidos: 'Ruiz', nombreCompleto: 'Ana Ruiz', rol: 'Apoderado', estado: true, sedeId: 1, rowVersion: 'v1' };
-			store.addUsuario(nuevo);
-
-			expect(store.usuarios()[0].id).toBe(4);
-			expect(store.usuarios()).toHaveLength(4);
-		});
-
-		it('should update usuario by id', () => {
-			store.setUsuarios(mockUsuarios);
-			store.updateUsuario(2, { nombres: 'María Luisa' });
-
-			expect(store.usuarios().find((u) => u.id === 2)?.nombres).toBe('María Luisa');
-			expect(store.usuarios().find((u) => u.id === 1)?.nombres).toBe('Juan');
-		});
-
-		it('should toggle estado', () => {
-			store.setUsuarios(mockUsuarios);
-			store.toggleEstadoUsuario(1);
-
-			expect(store.usuarios().find((u) => u.id === 1)?.estado).toBe(false);
-		});
-
-		it('should remove usuario', () => {
-			store.setUsuarios(mockUsuarios);
-			store.removeUsuario(2);
-
-			expect(store.usuarios()).toHaveLength(2);
-			expect(store.usuarios().find((u) => u.id === 2)).toBeUndefined();
-		});
-	});
-	// #endregion
-
-	// #region Estadísticas
-	describe('estadísticas', () => {
-		it('should set estadisticas', () => {
-			store.setEstadisticas(mockStats);
-			expect(store.estadisticas()).toEqual(mockStats);
-		});
-
-		it('should increment estadistica', () => {
-			store.setEstadisticas(mockStats);
-			store.incrementarEstadistica('totalUsuarios', 1);
-			expect(store.estadisticas()!.totalUsuarios).toBe(4);
-		});
-
-		it('should not crash with null stats', () => {
-			store.incrementarEstadistica('totalUsuarios', 1);
-			expect(store.estadisticas()).toBeNull();
-		});
-	});
-	// #endregion
-
-	// #region Filters
-	describe('filters', () => {
-		it('should set filters', () => {
-			store.setSearchTerm('juan');
-			store.setFilterRol('Director');
-			store.setFilterEstado(true);
-
-			expect(store.searchTerm()).toBe('juan');
-			expect(store.filterRol()).toBe('Director');
-			expect(store.filterEstado()).toBe(true);
-		});
-
-		it('should clear all filters and reset page', () => {
-			store.setSearchTerm('test');
-			store.setFilterRol('Profesor');
-			store.setFilterEstado(false);
-			store.setPage(5);
-
-			store.clearFilters();
-
-			expect(store.searchTerm()).toBe('');
+		it('should have no role/salon filters', () => {
 			expect(store.filterRol()).toBeNull();
-			expect(store.filterEstado()).toBeNull();
-			expect(store.page()).toBe(1);
+			expect(store.filterSalonId()).toBeNull();
 		});
 	});
 	// #endregion
 
-	// #region Dialog commands
-	describe('dialog commands', () => {
-		it('should open new dialog with empty form', () => {
-			store.openNewDialog();
+	// #region Feature-specific setters
+	describe('feature setters', () => {
+		it('sets salones and filter salones independently', () => {
+			store.setSalones([{ id: 1 }] as never);
+			store.setSalonesFilter([{ id: 2 }, { id: 3 }] as never);
+			expect(store.salones()).toHaveLength(1);
+			expect(store.salonesFilter()).toHaveLength(2);
+		});
 
+		it('tracks progressive skeleton phases', () => {
+			store.setStatsReady(true);
+			expect(store.statsReady()).toBe(true);
+			expect(store.tableReady()).toBe(false);
+
+			store.setTableReady(true);
+			store.setShowSkeletons(false);
+			expect(store.tableReady()).toBe(true);
+			expect(store.showSkeletons()).toBe(false);
+		});
+
+		it('updates role and salon filters', () => {
+			store.setFilterRol('Profesor');
+			store.setFilterSalonId(7);
+			expect(store.filterRol()).toBe('Profesor');
+			expect(store.filterSalonId()).toBe(7);
+		});
+
+		it('manages import dialog state', () => {
+			store.setImportLoading(true);
+			store.setImportResult({ exitosos: 5, fallidos: 0 } as never);
+			expect(store.importLoading()).toBe(true);
+			expect(store.importResult()).toEqual({ exitosos: 5, fallidos: 0 });
+		});
+	});
+	// #endregion
+
+	// #region Feature-specific dialogs and drawers
+	describe('feature dialogs', () => {
+		it('openNewDialog resets selection and form, opens dialog', () => {
+			store.openNewDialog();
 			expect(store.dialogVisible()).toBe(true);
 			expect(store.isEditing()).toBe(false);
 			expect(store.selectedUsuario()).toBeNull();
@@ -184,9 +124,8 @@ describe('UsersStore', () => {
 			expect(store.formData().estado).toBe(true);
 		});
 
-		it('should open edit dialog with user data', () => {
+		it('openEditDialog populates form from detalle and sets isEditing', () => {
 			store.openEditDialog(mockDetalle);
-
 			expect(store.dialogVisible()).toBe(true);
 			expect(store.isEditing()).toBe(true);
 			expect(store.selectedUsuario()).toEqual(mockDetalle);
@@ -195,13 +134,7 @@ describe('UsersStore', () => {
 			expect(store.formData().correo).toBe('maria@test.com');
 		});
 
-		it('should close dialog', () => {
-			store.openNewDialog();
-			store.closeDialog();
-			expect(store.dialogVisible()).toBe(false);
-		});
-
-		it('should open/close detail drawer', () => {
+		it('opens and closes detail drawer with selected user', () => {
 			store.openDetailDrawer(mockDetalle);
 			expect(store.detailDrawerVisible()).toBe(true);
 			expect(store.selectedUsuario()).toEqual(mockDetalle);
@@ -210,15 +143,8 @@ describe('UsersStore', () => {
 			expect(store.detailDrawerVisible()).toBe(false);
 		});
 
-		it('should open/close confirm dialog', () => {
-			store.openConfirmDialogVisible();
-			expect(store.vm().confirmDialogVisible).toBe(true);
-
-			store.closeConfirmDialogVisible();
-			expect(store.vm().confirmDialogVisible).toBe(false);
-		});
-
-		it('should open/close import dialog', () => {
+		it('opens import dialog clearing previous result', () => {
+			store.setImportResult({ exitosos: 3, fallidos: 1 } as never);
 			store.openImportDialog();
 			expect(store.importDialogVisible()).toBe(true);
 			expect(store.importResult()).toBeNull();
@@ -226,100 +152,145 @@ describe('UsersStore', () => {
 			store.closeImportDialog();
 			expect(store.importDialogVisible()).toBe(false);
 		});
-	});
-	// #endregion
 
-	// #region Form mutations
-	describe('updateFormData', () => {
-		it('should update partial form data', () => {
-			store.openNewDialog();
-			store.updateFormData({ nombres: 'Carlos' });
+		it('exposes confirm dialog aliases', () => {
+			store.openConfirmDialogVisible();
+			expect(store.confirmDialogVisible()).toBe(true);
 
-			expect(store.formData().nombres).toBe('Carlos');
-			expect(store.formData().dni).toBe('');
-		});
-
-		it('should clear salon fields when rol changes to non-Profesor/Estudiante', () => {
-			store.openNewDialog();
-			store.updateFormData({ rol: 'Profesor', salones: [{ salonId: 5, esTutor: true }] });
-			store.updateFormData({ rol: 'Director' });
-
-			expect(store.formData().salonId).toBeUndefined();
-			expect(store.formData().salones).toBeUndefined();
-		});
-
-		it('should clear salones when rol changes to non-tutor role', () => {
-			store.openNewDialog();
-			store.updateFormData({ rol: 'Profesor', salones: [{ salonId: 5, esTutor: true }] });
-			store.updateFormData({ rol: 'Estudiante' });
-
-			expect(store.formData().salones).toBeUndefined();
+			store.closeConfirmDialogVisible();
+			expect(store.confirmDialogVisible()).toBe(false);
 		});
 	});
 	// #endregion
 
-	// #region Computed — role checks
+	// #region Feature-specific mutations
+	describe('feature mutations', () => {
+		it('toggleEstadoUsuario flips estado of the target user only', () => {
+			store.setItems(mockUsuarios);
+			store.toggleEstadoUsuario(1);
+			expect(store.items().find((u) => u.id === 1)?.estado).toBe(false);
+			expect(store.items().find((u) => u.id === 2)?.estado).toBe(true);
+		});
+
+		it('toggleEstadoUsuario is a no-op for missing id', () => {
+			store.setItems(mockUsuarios);
+			store.toggleEstadoUsuario(999);
+			expect(store.items().every((u, i) => u.estado === mockUsuarios[i].estado)).toBe(true);
+		});
+
+		it('triggerRefresh increments refreshCounter monotonically', () => {
+			const initial = store.refreshCounter();
+			store.triggerRefresh();
+			store.triggerRefresh();
+			expect(store.refreshCounter()).toBe(initial + 2);
+		});
+	});
+	// #endregion
+
+	// #region onClearFiltros override
+	describe('onClearFiltros override', () => {
+		it('clearFiltros clears base filters plus role and salon filters', () => {
+			store.setSearchTerm('test');
+			store.setFilterEstado(false);
+			store.setFilterRol('Profesor');
+			store.setFilterSalonId(5);
+			store.setPage(4);
+
+			store.clearFiltros();
+
+			expect(store.searchTerm()).toBe('');
+			expect(store.filterEstado()).toBeNull();
+			expect(store.filterRol()).toBeNull();
+			expect(store.filterSalonId()).toBeNull();
+			expect(store.page()).toBe(1);
+		});
+	});
+	// #endregion
+
+	// #region Role-based computed
 	describe('role-based computed', () => {
-		it('should detect estudiante role', () => {
+		it('isEstudiante is true only when rol=Estudiante', () => {
 			store.openNewDialog();
-			store.updateFormData({ rol: 'Estudiante' });
+			store.updateFormDataWithPolicies({ rol: 'Estudiante' });
 			expect(store.isEstudiante()).toBe(true);
 			expect(store.isProfesor()).toBe(false);
 		});
 
-		it('should detect profesor role', () => {
+		it('isProfesor is true only when rol=Profesor', () => {
 			store.openNewDialog();
-			store.updateFormData({ rol: 'Profesor' });
+			store.updateFormDataWithPolicies({ rol: 'Profesor' });
 			expect(store.isProfesor()).toBe(true);
 			expect(store.isEstudiante()).toBe(false);
 		});
 	});
 	// #endregion
 
-	// #region Sub-ViewModels
-	describe('sub-viewmodels', () => {
-		it('should compose dataVm', () => {
-			store.setUsuarios(mockUsuarios);
-			store.setEstadisticas(mockStats);
-			const vm = store.dataVm();
+	// #region updateFormDataWithPolicies (business rules)
+	describe('updateFormDataWithPolicies applies role constraints', () => {
+		it('clears salones when switching from Profesor to a non-teaching role', () => {
+			store.openNewDialog();
+			store.updateFormDataWithPolicies({ rol: 'Profesor', salones: [{ salonId: 5, esTutor: true }] });
+			expect(store.formData().salones).toHaveLength(1);
 
-			expect(vm.usuarios).toHaveLength(3);
-			expect(vm.isEmpty).toBe(false);
-			expect(vm.hasEstadisticas).toBe(true);
+			store.updateFormDataWithPolicies({ rol: 'Director' });
+			expect(store.formData().salones).toBeUndefined();
+			expect(store.formData().salonId).toBeUndefined();
 		});
 
-		it('should compose uiVm', () => {
-			store.setLoading(true);
-			store.setSearchTerm('test');
-			const vm = store.uiVm();
-
-			expect(vm.loading).toBe(true);
-			expect(vm.searchTerm).toBe('test');
-		});
-
-		it('should compose full vm', () => {
-			store.setUsuarios(mockUsuarios);
-			const vm = store.vm();
-
-			expect(vm.usuarios).toHaveLength(3);
-			expect(vm.loading).toBe(false);
-			expect(vm.isEditing).toBe(false);
+		it('clears salones and keeps salonId intent when switching Profesor → Estudiante', () => {
+			store.openNewDialog();
+			store.updateFormDataWithPolicies({ rol: 'Profesor', salones: [{ salonId: 5, esTutor: true }] });
+			store.updateFormDataWithPolicies({ rol: 'Estudiante' });
+			expect(store.formData().salones).toBeUndefined();
 		});
 	});
 	// #endregion
 
-	// #region Skeleton state
-	describe('skeleton state', () => {
-		it('should track progressive loading', () => {
-			store.setStatsReady(true);
-			expect(store.statsReady()).toBe(true);
-			expect(store.tableReady()).toBe(false);
+	// #region Validation computed
+	describe('validation computed', () => {
+		it('dniError surfaces invalid dni', () => {
+			store.openNewDialog();
+			store.updateFormDataWithPolicies({ dni: '123' });
+			expect(store.dniError()).not.toBeNull();
 
-			store.setTableReady(true);
-			expect(store.tableReady()).toBe(true);
+			store.updateFormDataWithPolicies({ dni: '12345678' });
+			expect(store.dniError()).toBeNull();
+		});
 
-			store.setShowSkeletons(false);
-			expect(store.showSkeletons()).toBe(false);
+		it('correoError surfaces invalid email shape', () => {
+			store.openNewDialog();
+			store.updateFormDataWithPolicies({ correo: 'no-arroba' });
+			expect(store.correoError()).not.toBeNull();
+
+			store.updateFormDataWithPolicies({ correo: 'ok@test.com' });
+			expect(store.correoError()).toBeNull();
+		});
+	});
+	// #endregion
+
+	// #region ViewModel composition
+	describe('vm composition', () => {
+		it('vm exposes items, stats, UI state and form together', () => {
+			store.setItems(mockUsuarios);
+			store.setEstadisticas(mockStats);
+			store.setLoading(true);
+			store.setSearchTerm('maria');
+
+			const vm = store.vm();
+			expect(vm.usuarios).toHaveLength(3);
+			expect(vm.estadisticas).toEqual(mockStats);
+			expect(vm.hasEstadisticas).toBe(true);
+			expect(vm.loading).toBe(true);
+			expect(vm.searchTerm).toBe('maria');
+			expect(vm.isEditing).toBe(false);
+		});
+
+		it('vm reflects editing mode after openEditDialog', () => {
+			store.openEditDialog(mockDetalle);
+			const vm = store.vm();
+			expect(vm.isEditing).toBe(true);
+			expect(vm.selectedUsuario).toEqual(mockDetalle);
+			expect(vm.dialogVisible).toBe(true);
 		});
 	});
 	// #endregion
