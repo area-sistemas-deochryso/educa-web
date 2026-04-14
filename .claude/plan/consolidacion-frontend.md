@@ -62,6 +62,7 @@
 > **Problema**: 99 spec files pero la mayoria valida creacion, no comportamiento.
 > **Objetivo**: Cubrir los 5 flujos criticos con tests que detecten regresiones reales.
 > **Esfuerzo**: ~8-12 horas total
+> **Estado**: 2/5 flujos completos (2026-04-14)
 
 ### Contexto
 
@@ -70,36 +71,128 @@ Lo que falta son tests de **flujo de datos**: facade llama API → store se actu
 
 ### Tests prioritarios por flujo critico
 
-| # | Flujo | Archivos a testear | Que verificar |
-|---|-------|---------------------|---------------|
-| 1 | **Login → session → permisos** | AuthService, SessionCoordinator, UserPermisosService | Login exitoso → token guardado → permisos cargados → redirect correcto |
-| 2 | **CRUD usuarios (patron base)** | usuarios-crud.facade, usuarios.store | Create → refetch items + stats increment. Edit → mutacion quirurgica. Toggle → mutacion + stats. Delete → remove + stats |
-| 3 | **Asistencia director** | attendance-director.component, attendance-view.service | Cambio de filtros → recarga datos. Exportar PDF → genera correctamente |
-| 4 | **Horarios admin** | horarios-crud.facade, horarios.store | Crear horario → validacion conflictos. Editar → mutacion local. Eliminar → confirm + remove |
-| 5 | **WAL optimistic flow** | WalFacadeHelper (ya tiene 20 tests) + un facade concreto | apply() se ejecuta inmediato. Error → rollback restaura snapshot exacto |
+| # | Flujo | Archivos a testear | Estado | Commit |
+|---|-------|---------------------|--------|--------|
+| 2 | **CRUD usuarios (patron base)** | usuarios-crud.facade + usuarios.store | ✅ Hecho | `22c1c3d` (18 tests) + `6aa26de` (25 tests) |
+| 5 | **WAL optimistic flow** | WalFacadeHelper + facade concreto | ✅ Parcial — cubierto dentro del flujo 2 (apply inmediato, rollback en error, onCommit stats) | junto con flujo 2 |
+| 1 | **Login → session → permisos** | AuthService, SessionCoordinator, UserPermisosService | ⬜ Pendiente | — |
+| 3 | **Asistencia director** | attendance-director.component, attendance-view.service | ⬜ Pendiente | — |
+| 4 | **Horarios admin** | horarios-crud.facade, horarios.store | ⬜ Pendiente | — |
+
+### Progreso detallado
+
+#### ✅ Flujo 2 — CRUD usuarios (completo)
+
+**Diagnóstico inicial**: El spec de `usuarios.store.spec.ts` tenía 15 tests rotos (no 53 como decía el plan original) por API desfasada tras refactor a `BaseCrudStore`. Nombres viejos (`setUsuarios`, `removeUsuario`, `clearFilters`, `updateFormData`, `uiVm`, `dataVm`) no existían en la API actual.
+
+**Fix store spec** (`6aa26de`): Reescrito a 25 tests enfocados SOLO en comportamiento feature-specific (salones, skeletons, import, filtros rol/salón, diálogos custom, `toggleEstadoUsuario`, `triggerRefresh`, `onClearFiltros` override, `updateFormDataWithPolicies`, computed de rol/validación, composición de vm). La base CRUD ya tiene su propio spec (`base-crud.store.spec.ts`) — evitamos duplicación.
+
+**Nuevo facade spec** (`22c1c3d`): 18 tests de comportamiento para `UsersCrudFacade` usando un **WAL mock controllable** que captura el último config y expone `commit()`/`fail()` para que cada test decida cuándo disparar `onCommit` o `rollback+onError`. Cubre:
+- Dispatch create vs update (saveUsuario)
+- Create flow: optimistic close dialog + onCommit incrementa stats (total/activos/rol)
+- Update flow: optimistic quirúrgico + close; rollback restaura snapshot; onCommit triggerRefresh
+- Delete flow: optimistic remove + decrementa activos O inactivos según estado; rollback exacto
+- Toggle flow: flip estado + mueve contador activos ↔ inactivos; rollback exacto
+- Import flow: success con creados>0 incrementa; success con solo actualizados solo refetch; error preserva stats
+
+**Patrón replicable del WAL mock controllable** (usar en los otros flujos):
+
+```typescript
+interface WalConfig {
+  operation: string;
+  optimistic?: { apply: () => void; rollback: () => void };
+  onCommit: (result?: unknown) => void;
+  onError: (err: unknown) => void;
+}
+
+function createControllableWal() {
+  const configs: WalConfig[] = [];
+  const execute = vi.fn((config: WalConfig) => {
+    configs.push(config);
+    config.optimistic?.apply();  // apply inmediato
+  });
+  return {
+    execute,
+    last: () => configs[configs.length - 1],
+    commit: (result?: unknown) => configs[configs.length - 1].onCommit(result),
+    fail: (err: unknown) => {
+      const cfg = configs[configs.length - 1];
+      cfg.optimistic?.rollback();
+      cfg.onError(err);
+    },
+  };
+}
+```
+
+#### ⬜ Flujo 1 — Login/session/permisos (pendiente, PRÓXIMO)
+
+**Archivos clave**:
+- `@core/services/auth/auth.service.ts` — login, logout, refresh
+- `@core/services/session/session-coordinator.ts` — timeouts, idle
+- `@core/services/permisos/user-permisos.service.ts` — carga permisos, `tienePermiso()`
+- `@core/store/auth.store.ts` (NgRx Signals store global)
+
+**Qué testear**:
+- Login exitoso → token en storage → permisos cargados → AuthStore actualizado
+- Login fallido → error surface + loginAttempts incrementa
+- Logout → limpia storage + permisos + SW cache + redirect
+- `tienePermiso(ruta)` con permisos personalizados overridea los del rol (INV-S03)
+- Comparación exacta de ruta: tener `intranet` NO da acceso a `intranet/admin` (INV-S04)
+
+**Consideraciones**:
+- `HttpClient` con `provideHttpClient() + provideHttpClientTesting()`
+- Mock `StorageService` (session + preferences)
+- Cuidado con efectos lanzados por `AuthStore` — usar `TestBed` con providers aislados
+
+#### ⬜ Flujo 3 — Asistencia director (pendiente)
+
+**Archivos clave** (ya refactorizados en commit `64b03c0`):
+- `pages/cross-role/attendance-component/attendance-director/attendance-director.component.ts`
+- `services/attendance/attendance-view.service.ts`
+- `services/attendance/attendance-view.models.ts` (nuevos modelos extraídos)
+- `services/attendance/attendance-pdf.service.ts`
+
+**Qué testear**:
+- Cambio de filtros (mes, sede, salón) → recarga datos
+- Exportar PDF → llama servicio con datos correctos
+- Cambio de vista (diaria, mensual) → estado correcto del vm
+
+#### ⬜ Flujo 4 — Horarios admin (pendiente)
+
+**Archivos clave**:
+- `pages/admin/schedules/services/horarios-crud.facade.ts`
+- `pages/admin/schedules/services/horarios.store.ts` (401 líneas — candidato Fase 2)
+
+**Qué testear**:
+- Crear horario → WAL CREATE + onCommit refetch
+- Editar → mutación quirúrgica + rollback
+- Eliminar → remove + confirm
+- Validación de conflictos (INV-U03/U04/U05) debe estar en backend; aquí verificar UI surface error
 
 ### Patron de test para facades
 
 ```typescript
-describe('UsuariosCrudFacade', () => {
-  // Setup: mock API service, real store
-  it('create → calls API → refreshes items → increments stats', () => {});
-  it('update → calls API → mutacion quirurgica sin refetch', () => {});
-  it('toggle → optimistic update → rollback on error', () => {});
-  it('delete → remove from list → decrement stats', () => {});
+describe('XxxCrudFacade', () => {
+  // Setup: WAL controllable (ver arriba), real store, mock API, mock dataFacade/errorHandler
+  it('create → optimistic close + onCommit increments stats', () => {});
+  it('update → optimistic local + rollback restaura snapshot exacto', () => {});
+  it('toggle → optimistic flip + mueve activos↔inactivos', () => {});
+  it('delete → optimistic remove + decrementa stats', () => {});
 });
 ```
 
 ### Criterio de completitud
 
-- [ ] 5 flujos con tests de comportamiento (no solo creacion)
-- [ ] Cada test verifica el flujo completo: accion → efecto en store → reflejo en vm
-- [ ] Tests fallan si alguien cambia la logica del facade (no solo si rompe la firma)
-- [ ] Los 53 tests rotos en usuarios.store.spec.ts arreglados o eliminados
+- [x] Los 15 tests rotos en usuarios.store.spec.ts arreglados (reescritos)
+- [x] Flujo 2 con test de comportamiento completo (18 tests facade + 25 tests store)
+- [x] Flujo 5 WAL cubierto dentro del flujo 2
+- [ ] Flujo 1 Login/session/permisos
+- [ ] Flujo 3 Asistencia director
+- [ ] Flujo 4 Horarios admin
 
 ### Dependencia
 
-Ninguna. Se puede empezar inmediatamente.
+Ninguna. Cada flujo restante es independiente; usar el patrón WAL mock controllable del flujo 2 como plantilla.
 
 ---
 
