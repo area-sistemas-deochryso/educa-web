@@ -210,7 +210,7 @@ Ninguna. Cada flujo restante es independiente; usar el patrón WAL mock controll
 > **Problema**: 15 archivos superan la regla max-lines:300, algunos por mucho (641 ln).
 > **Objetivo**: Ningun archivo de feature >350 lineas. Core/infra puede tener escape hatch justificado.
 > **Esfuerzo**: ~10-15 horas total (incremental, 1-2 archivos por sesion)
-> **Estado**: 3/10 completos (2 Grupo B + 1 Grupo A) — 2026-04-14
+> **Estado**: 4/10 completos (2 Grupo B + 1 Grupo A + 1 cleanup) — 2026-04-14
 
 ### Progreso
 
@@ -219,6 +219,7 @@ Ninguna. Cada flujo restante es independiente; usar el patrón WAL mock controll
 | 1 | profesor-api.service.ts | 417 → 201 | `fb569a8` | Aggregate pattern: 3 sub-services (salones 78, cursos 241, asistencia 49) + delegator |
 | 2 | horarios.store.ts | 401 → 333 | `b785800` | Extraído `SchedulesOptionsStore` (113 ln) siguiendo patrón de form/filter stores |
 | 3 | storage.service.ts | 641 → 326 | `5b76f19` | Thin facade — strip JSDoc boilerplate (sub-facades ya existían) |
+| 4 | notifications.service.ts | 382 → 345 | _pendiente_ | Thin facade — strip JSDoc redundante (api/sound/smart sub-services ya existían) |
 
 **Nota**: `storage.service.ts` pertenece a Grupo A, no B. Los sub-facades mencionados en plan (auth-storage, preferences-storage, cache-storage) ya existían como `SessionStorageService`, `PreferencesStorageService`, `NotificationStorageService`. La solución real era reducir boilerplate JSDoc, no refactorizar estructura.
 

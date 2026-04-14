@@ -14,9 +14,6 @@ import { NotificationsSoundService } from './notifications-sound.service';
 import { loadDailyIdSet, saveDailyIdSet } from './notifications-persistence.helper';
 import { NotificacionActiva } from '@data/models';
 
-/**
- * Count of notifications by priority.
- */
 export interface PriorityCount {
 	urgent: number;
 	high: number;
@@ -24,19 +21,6 @@ export interface PriorityCount {
 	low: number;
 }
 
-/**
- * Notifications state service.
- *
- * Responsibilities:
- * - Reactive notification state via signals and computed values
- * - Persist read and dismissed notifications with daily reset
- * - Periodic checks for new notifications
- * - Service Worker message handling for push events
- *
- * Delegates to:
- * - NotificationsApiService for HTTP calls
- * - NotificationsSoundService for audio and browser notifications
- */
 @Injectable({
 	providedIn: 'root',
 })
@@ -110,17 +94,12 @@ export class NotificationsService {
 		}
 	}
 
-	/**
-	 * Start periodic checks for notifications.
-	 * Runs every 5 min to keep smart notifications (upcoming classes) fresh.
-	 */
+	// Runs every 5 min to keep smart notifications (upcoming classes) fresh.
 	private startPeriodicCheck(): void {
 		this.timerManager.setInterval(() => this.checkNotifications(), Duration.minutes(5).ms);
 	}
 
-	/**
-	 * Re-check notifications once smart data finishes loading from IndexedDB.
-	 */
+	// Re-check notifications once smart data finishes loading from IndexedDB.
 	private watchSmartInit(): void {
 		effect(() => {
 			if (this.smartService.initialized()) {
@@ -131,10 +110,6 @@ export class NotificationsService {
 	// #endregion
 
 	// #region Notification checks
-	/**
-	 * Fetch active notifications from API, merge with smart notifications,
-	 * filter dismissed, and sort by priority.
-	 */
 	checkNotifications(): void {
 		this.api.getActivas().subscribe({
 			next: (response) => {
@@ -291,23 +266,14 @@ export class NotificationsService {
 	// #endregion
 
 	// #region Audio and browser notifications (delegated)
-	/**
-	 * Play notification sound.
-	 */
 	playSound(): void {
 		this.sound.playSound();
 	}
 
-	/**
-	 * Show a browser notification for a seasonal notification.
-	 */
 	async showBrowserNotification(notification: SeasonalNotification): Promise<void> {
 		await this.sound.showBrowserNotification(notification);
 	}
 
-	/**
-	 * Show urgent notifications as browser notifications.
-	 */
 	showUrgentAsBrowserNotifications(): void {
 		this.sound.showUrgentAsBrowserNotifications(this._activeNotifications());
 	}
@@ -367,9 +333,6 @@ export class NotificationsService {
 	// #endregion
 
 	// #region Cleanup
-	/**
-	 * Cleanup timers and Service Worker listeners.
-	 */
 	cleanup(): void {
 		this.timerManager.clearAll();
 
