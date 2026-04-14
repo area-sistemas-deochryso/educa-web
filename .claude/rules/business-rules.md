@@ -952,6 +952,7 @@ Este registro consolida TODAS las invariantes del sistema en una tabla indexable
 | `INV-D06` | Salón | Unicidad: solo uno por (Grado, Sección, Sede, Año) | Unique index BD + validación en service | 5.2 |
 | `INV-D07` | CursoGrado | Un curso se asigna una sola vez por grado | Unique constraint BD | 5.3 |
 | `INV-D08` | API Response | Todo endpoint retorna `ApiResponse<T>` | Convention + code review | backend.md |
+| `INV-D09` | Tabla de relación | Toda query de lectura sobre una tabla de relación (ProfesorSalon, EstudianteSalon, CursoGrado, etc.) que derive datos para la UI debe filtrar por `_Estado = true`. Sin este filtro, `FirstOrDefault/Any/Where` retorna registros soft-deleted como si fueran actuales | Code review + naming explícito (`ListarTodas*` solo para reconciliación) | backend.md — "Soft-delete en tablas de relación" |
 
 ---
 

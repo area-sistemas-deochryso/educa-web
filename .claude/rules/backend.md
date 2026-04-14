@@ -134,7 +134,44 @@ Helpers de claims (`User.GetDni()`, `User.GetRol()`, `User.GetEntityId()`, `User
 - Usar `AsNoTracking()` para queries read-only
 - NO incluir lógica de categorización ni decisiones de negocio
 - **NUNCA** incluir lógica de negocio (cálculos, aggregaciones, condicionales de negocio) — solo queries y CRUD
-- **NUNCA** incluir lógica de negocio (cálculos, aggregaciones, condicionales de negocio) — solo queries y CRUD
+
+### Soft-delete en tablas de relación — filtrar SIEMPRE por `_Estado`
+
+> **"Toda consulta sobre una tabla de relación (EstudianteSalon, ProfesorSalon, CursoGrado, etc.) que derive datos para la UI debe filtrar por `_Estado = true`. Sin excepciones salvo reconciliación explícita."**
+
+El sistema usa soft-delete: al "eliminar" una asignación, el registro queda en la tabla con `XXX_Estado = false`. Esto preserva historial pero rompe cualquier query que no filtre:
+
+```csharp
+// ❌ INCORRECTO — FirstOrDefault puede devolver un registro soft-deleted
+SalonNombre = ctx.ProfesorSalon
+    .Where(ps => ps.PRS_PRO_CodID == p.PRO_CodID)
+    .Select(ps => ps.Salon.Grado.GRA_Nombre + " " + ps.Salon.Seccion.SEC_Nombre)
+    .FirstOrDefault();
+
+// ✅ CORRECTO
+SalonNombre = ctx.ProfesorSalon
+    .Where(ps => ps.PRS_PRO_CodID == p.PRO_CodID && ps.PRS_Estado)
+    .Select(ps => ...)
+    .FirstOrDefault();
+```
+
+**Síntoma típico**: la tabla/listado muestra un dato "fijo" (el primer registro insertado históricamente) aunque el detail y la BD reflejen correctamente el valor actual. Se percibe como bug de cache cuando es bug de query — el cache está bien, el backend está devolviendo datos mezclados con registros inactivos.
+
+**Aplica a**:
+- `.FirstOrDefault()` / `.First()` → el registro inactivo con ID menor gana
+- `.Any()` en filtros → incluye profesores/estudiantes cuyo vínculo está desactivado
+- `.Where(...).Select(...)` sin filtro → listas contaminadas con histórico
+- `.Count()` → conteos inflados
+
+**Excepción legítima**: métodos de reconciliación que necesitan ver TODOS los registros para reactivar soft-deleted en vez de insertar duplicados (ver `ProfesorSalonRepository.ListarTodasPorProfesorIdAsync`). Estos métodos deben tener nombre explícito (`ListarTodas*`, `*IncludeInactive`) y documentar por qué no filtran.
+
+**Checklist de code review**:
+```
+[ ] ¿La query lee de una tabla de relación con campo _Estado?
+[ ] ¿Filtra por _Estado = true?
+[ ] Si NO filtra, ¿es una excepción documentada de reconciliación?
+[ ] ¿Los datos retornados se muestran al usuario (DTO de lista/detalle)?
+```
 
 ## DTOs — Reglas
 
