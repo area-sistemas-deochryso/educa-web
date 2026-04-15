@@ -4,7 +4,7 @@ import { TestBed } from '@angular/core/testing';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { CampusNavigationStore } from './campus-navigation.store';
-import { PathfindingService } from './pathfinding.service';
+import { PathfindingHelper } from './pathfinding.helper';
 
 // #endregion
 
@@ -37,7 +37,7 @@ describe('CampusNavigationStore', () => {
 		TestBed.configureTestingModule({
 			providers: [
 				CampusNavigationStore,
-				{ provide: PathfindingService, useValue: { generateSafePathPoints: vi.fn().mockReturnValue('100,100 200,100') } },
+				{ provide: PathfindingHelper, useValue: { generateSafePathPoints: vi.fn().mockReturnValue('100,100 200,100') } },
 			],
 		});
 		store = TestBed.inject(CampusNavigationStore);

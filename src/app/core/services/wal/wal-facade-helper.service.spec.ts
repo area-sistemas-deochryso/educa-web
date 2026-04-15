@@ -7,7 +7,7 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { WalFacadeHelper } from './wal-facade-helper.service';
 import { WalService } from './wal.service';
 import { WalSyncEngine } from './wal-sync-engine.service';
-import { WalStatusStore } from './wal-status.store';
+import { WalStatusFacade } from './wal-status.facade';
 import { WalEntry, WalProcessResult } from './models';
 import { ErrorHandlerService } from '@core/services/error/error-handler.service';
 import { ActivityTrackerService } from '@core/services/error/activity-tracker.service';
@@ -55,7 +55,7 @@ describe('WalFacadeHelper', () => {
 	let helper: WalFacadeHelper;
 	let walMock: Partial<WalService>;
 	let syncEngineMock: Partial<WalSyncEngine>;
-	let statusStoreMock: Partial<WalStatusStore>;
+	let statusFacadeMock: Partial<WalStatusFacade>;
 	let swMock: Partial<SwService>;
 	let errorHandlerMock: Partial<ErrorHandlerService>;
 	let activityTrackerMock: Partial<ActivityTrackerService>;
@@ -74,7 +74,7 @@ describe('WalFacadeHelper', () => {
 			entryProcessed$: entryProcessed$.asObservable(),
 		};
 
-		statusStoreMock = {
+		statusFacadeMock = {
 			refresh: vi.fn(),
 		};
 
@@ -96,7 +96,7 @@ describe('WalFacadeHelper', () => {
 				WalFacadeHelper,
 				{ provide: WalService, useValue: walMock },
 				{ provide: WalSyncEngine, useValue: syncEngineMock },
-				{ provide: WalStatusStore, useValue: statusStoreMock },
+				{ provide: WalStatusFacade, useValue: statusFacadeMock },
 				{ provide: SwService, useValue: swMock },
 				{ provide: ErrorHandlerService, useValue: errorHandlerMock },
 				{ provide: ActivityTrackerService, useValue: activityTrackerMock },
@@ -173,7 +173,7 @@ describe('WalFacadeHelper', () => {
 				'Sin conexion',
 				expect.any(String),
 			);
-			expect(statusStoreMock.refresh).toHaveBeenCalled();
+			expect(statusFacadeMock.refresh).toHaveBeenCalled();
 		});
 
 		it('should track WAL operation via activityTracker', async () => {

@@ -6,7 +6,7 @@ import { ErrorHandlerService } from '@core/services/error/error-handler.service'
 import { SwService } from '@features/intranet/services/sw/sw.service';
 import { WalService } from './wal.service';
 import { WalSyncEngine } from './wal-sync-engine.service';
-import { WalStatusStore } from './wal-status.store';
+import { WalStatusFacade } from './wal-status.facade';
 import { WalMutationConfig } from './models';
 
 /**
@@ -18,7 +18,7 @@ export class WalFacadeHelper {
 
 	private wal = inject(WalService);
 	private syncEngine = inject(WalSyncEngine);
-	private statusStore = inject(WalStatusStore);
+	private statusFacade = inject(WalStatusFacade);
 	private sw = inject(SwService);
 	private errorHandler = inject(ErrorHandlerService);
 	private activityTracker = inject(ActivityTrackerService);
@@ -90,7 +90,7 @@ export class WalFacadeHelper {
 				// Online: serialize via processAllPending (drain loop picks up new entries)
 				// Prevents concurrent requests to the same DB row on rapid clicks
 				this.syncEngine.processAllPending().finally(() => {
-					this.statusStore.refresh();
+					this.statusFacade.refresh();
 				});
 			} else {
 				// Offline: notify user, entry stays PENDING in IndexedDB
@@ -98,7 +98,7 @@ export class WalFacadeHelper {
 					'Sin conexion',
 					'La operacion se guardara cuando vuelva la conexion',
 				);
-				this.statusStore.refresh();
+				this.statusFacade.refresh();
 			}
 		} catch (e) {
 			// WAL append failed (IndexedDB unavailable or quota exceeded)

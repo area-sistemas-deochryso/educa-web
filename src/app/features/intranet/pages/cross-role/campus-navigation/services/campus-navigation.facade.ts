@@ -14,13 +14,13 @@ import {
 import { CampusEdge, CampusNode, CampusNodeType } from '../models';
 import { CampusNavigationApiService } from './campus-navigation-api.service';
 import { CampusNavigationStore } from './campus-navigation.store';
-import { PathfindingService } from './pathfinding.service';
+import { PathfindingHelper } from './pathfinding.helper';
 
 @Injectable({ providedIn: 'root' })
 export class CampusNavigationFacade {
 	private api = inject(CampusNavigationApiService);
 	private store = inject(CampusNavigationStore);
-	private pathfinding = inject(PathfindingService);
+	private pathfinding = inject(PathfindingHelper);
 	private errorHandler = inject(ErrorHandlerService);
 	private destroyRef = inject(DestroyRef);
 

@@ -7,7 +7,7 @@ import {
 	computed,
 } from '@angular/core';
 import { DatePipe } from '@angular/common';
-import { WalStatusStore } from '@core/services';
+import { WalStatusFacade } from '@core/services';
 import { WalEntry } from '@core/services/wal/models';
 import { DrawerModule } from 'primeng/drawer';
 import { ButtonModule } from 'primeng/button';
@@ -45,7 +45,7 @@ const RESOURCE_LABELS: Record<string, string> = {
 export class SyncStatusComponent {
 	// #region Dependencies
 
-	private walStatus = inject(WalStatusStore);
+	private walStatus = inject(WalStatusFacade);
 
 	// #endregion
 

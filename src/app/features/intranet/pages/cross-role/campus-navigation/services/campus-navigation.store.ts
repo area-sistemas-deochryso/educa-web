@@ -1,7 +1,7 @@
 import { computed, inject, Injectable, signal } from '@angular/core';
 
 import { BlockedPath, CampusEdge, CampusNode, MiHorarioHoyItem, PathResult } from '../models';
-import { PathfindingService } from './pathfinding.service';
+import { PathfindingHelper } from './pathfinding.helper';
 
 interface SelectOption {
 	label: string;
@@ -11,7 +11,7 @@ interface SelectOption {
 
 @Injectable({ providedIn: 'root' })
 export class CampusNavigationStore {
-	private readonly pathfinding = inject(PathfindingService);
+	private readonly pathfinding = inject(PathfindingHelper);
 
 	// #region Estado privado
 

@@ -1,75 +1,44 @@
-import { Injectable, inject, signal, computed, DestroyRef } from '@angular/core';
-import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-// eslint-disable-next-line no-restricted-imports -- Razón: WalStatusStore es la proyección reactiva oficial del WAL. Es infraestructura acoplada intencionalmente al WalService/WalSyncEngine (no hay facade intermedio porque este store ES la interfaz de lectura del WAL).
-import { WalService } from './wal.service';
-// eslint-disable-next-line no-restricted-imports -- Razón: ver WalService arriba — el store se suscribe a los streams del sync engine para reflejar estado en tiempo real.
-import { WalSyncEngine } from './wal-sync-engine.service';
-import { WalEntry, WalStats } from './models';
+import { Injectable, signal, computed } from '@angular/core';
+import { WalEntry } from './models';
 
 /**
- * Store for WAL status indicators.
+ * Pure reactive state container for WAL status indicators.
+ * IO and subscription lifecycle live in WalStatusFacade.
  */
 @Injectable({ providedIn: 'root' })
 export class WalStatusStore {
-	// #region Dependencies
-
-	private wal = inject(WalService);
-	private syncEngine = inject(WalSyncEngine);
-	private destroyRef = inject(DestroyRef);
-
-	// #endregion
-
 	// #region Private State
 
-	/** Pending entry count. */
 	private readonly _pendingCount = signal(0);
-	/** In-flight entry count. */
 	private readonly _inFlightCount = signal(0);
-	/** Failed entry count. */
 	private readonly _failedCount = signal(0);
-	/** True while sync engine is processing. */
 	private readonly _isSyncing = signal(false);
-	/** Timestamp of last sync or null. */
 	private readonly _lastSyncTime = signal<number | null>(null);
-	/** Failed entries list. */
 	private readonly _failedEntries = signal<WalEntry[]>([]);
-	/** Entries requiring schema migration. */
 	private readonly _migrationCount = signal(0);
 
 	// #endregion
 
 	// #region Public Readonly
 
-	/** Pending entry count. */
 	readonly pendingCount = this._pendingCount.asReadonly();
-	/** Failed entry count. */
 	readonly failedCount = this._failedCount.asReadonly();
-	/** True while sync engine is processing. */
 	readonly isSyncing = this._isSyncing.asReadonly();
-	/** Timestamp of last sync or null. */
 	readonly lastSyncTime = this._lastSyncTime.asReadonly();
-	/** Failed entries list. */
 	readonly failedEntries = this._failedEntries.asReadonly();
-	/** Migration entries count. */
 	readonly migrationCount = this._migrationCount.asReadonly();
 
 	// #endregion
 
 	// #region Computed
 
-	/** True when there are pending entries. */
 	readonly hasPending = computed(() => this._pendingCount() > 0);
-	/** True when there are failed entries. */
 	readonly hasFailures = computed(() => this._failedCount() > 0);
-	/** True when there is pending or in-flight activity. */
 	readonly hasActivity = computed(
 		() => this._pendingCount() > 0 || this._inFlightCount() > 0,
 	);
-
-	/** True when there are entries requiring migration. */
 	readonly hasMigrations = computed(() => this._migrationCount() > 0);
 
-	/** Aggregated view model for UI binding. */
 	readonly vm = computed(() => ({
 		pendingCount: this._pendingCount(),
 		inFlightCount: this._inFlightCount(),
@@ -86,76 +55,34 @@ export class WalStatusStore {
 
 	// #endregion
 
-	// #region Initialization
+	// #region Setters
 
-	constructor() {
-		// Refresh after each entry is processed
-		// eslint-disable-next-line no-restricted-syntax -- Razón: este store es la proyección reactiva del WAL; la suscripción al stream del sync engine es su único trabajo. No hay facade intermedio por diseño — mover esto a un facade crearía indirección vacía.
-		this.syncEngine.entryProcessed$
-			.pipe(takeUntilDestroyed(this.destroyRef))
-			.subscribe(() => {
-				this._lastSyncTime.set(Date.now());
-				this.refresh();
-			});
-
-		// Initial load
-		this.refresh();
+	setPendingCount(value: number): void {
+		this._pendingCount.set(value);
 	}
 
-	// #endregion
-
-	// #region Commands
-	/**
-	 * Refresh counts and failed entries from WAL.
-	 */
-	async refresh(): Promise<void> {
-		try {
-			const [stats, failedEntries, migrationEntries] = await Promise.all([
-				this.wal.getStats(),
-				this.wal.getFailedEntries(),
-				this.wal.getMigrationEntries(),
-			]);
-
-			this._pendingCount.set(stats.pending);
-			this._inFlightCount.set(stats.inFlight);
-			this._failedCount.set(stats.failed);
-			this._failedEntries.set(failedEntries);
-			this._migrationCount.set(migrationEntries.length);
-			this._isSyncing.set(this.syncEngine.isProcessing);
-		} catch {
-			// Silently handle. WAL might not be available (SSR, no IndexedDB)
-		}
+	setInFlightCount(value: number): void {
+		this._inFlightCount.set(value);
 	}
 
-	/**
-	 * Retry a failed entry and refresh state.
-	 *
-	 * @param id Entry id.
-	 */
-	async retryEntry(id: string): Promise<void> {
-		await this.wal.retryEntry(id);
-		await this.refresh();
+	setFailedCount(value: number): void {
+		this._failedCount.set(value);
 	}
 
-	/**
-	 * Discard a failed entry and refresh state.
-	 *
-	 * @param id Entry id.
-	 */
-	async discardEntry(id: string): Promise<void> {
-		await this.wal.discardEntry(id);
-		await this.refresh();
+	setIsSyncing(value: boolean): void {
+		this._isSyncing.set(value);
 	}
 
-	/**
-	 * Discard all entries requiring schema migration and refresh state.
-	 *
-	 * @returns Number of entries discarded.
-	 */
-	async discardMigrationEntries(): Promise<number> {
-		const count = await this.wal.discardMigrationEntries();
-		await this.refresh();
-		return count;
+	setLastSyncTime(value: number | null): void {
+		this._lastSyncTime.set(value);
+	}
+
+	setFailedEntries(entries: WalEntry[]): void {
+		this._failedEntries.set(entries);
+	}
+
+	setMigrationCount(value: number): void {
+		this._migrationCount.set(value);
 	}
 
 	// #endregion

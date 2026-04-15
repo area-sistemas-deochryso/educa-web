@@ -44,7 +44,7 @@ const COLLISION_PADDING = 8;
  * Pure utility: no guarda estado, solo calcula rutas.
  */
 @Injectable({ providedIn: 'root' })
-export class PathfindingService {
+export class PathfindingHelper {
 	// #region API Pública
 
 	findPath(
