@@ -6,7 +6,9 @@ import { ProgressSpinnerModule } from 'primeng/progressspinner';
 import { PageHeaderComponent } from '@shared/components';
 
 import { AdminHealthPermissionsFacade } from './services/admin-health-permissions.facade';
+// eslint-disable-next-line layer-enforcement/imports-error -- Razón: health-permissions es concepto cross-role (admin supervisa lo que profesor gestiona). Ubicación física bajo profesor/ es histórica; migración a @intranet-shared diferida (ver maestro F3.5.C notas de seguimiento).
 import { CreateHealthExitRequest } from '@features/intranet/pages/profesor/models';
+// eslint-disable-next-line layer-enforcement/imports-error -- Razón: tab compartido entre admin (supervisión) y profesor (gestión); migración a @intranet-shared diferida.
 import { SalonHealthPermissionsTabComponent } from '@features/intranet/pages/profesor/classrooms/components/salon-health-permissions-tab/salon-health-permissions-tab.component';
 
 @Component({

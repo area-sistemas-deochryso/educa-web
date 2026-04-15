@@ -4,8 +4,10 @@ import { forkJoin, Subject, EMPTY } from 'rxjs';
 import { switchMap, debounceTime, distinctUntilChanged, catchError, tap } from 'rxjs/operators';
 
 import { logger } from '@core/helpers';
+// eslint-disable-next-line layer-enforcement/imports-error -- Razón: API service de health-permissions es cross-role (admin supervisa lo mismo que profesor gestiona); migración física a @intranet-shared diferida (ver maestro F3.5.C).
 import { HealthPermissionsApiService } from '@features/intranet/pages/profesor/classrooms/services/health-permissions-api.service';
 import { AdminHealthPermissionsStore } from './admin-health-permissions.store';
+// eslint-disable-next-line layer-enforcement/imports-error -- Razón: DTOs del dominio health-permissions; ubicación física bajo profesor/ es histórica.
 import { CreateHealthExitRequest, SymptomDto, ValidateDatesRequest } from '@features/intranet/pages/profesor/models';
 
 @Injectable({ providedIn: 'root' })

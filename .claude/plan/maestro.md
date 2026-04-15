@@ -8,19 +8,22 @@
 
 ## Inventario de planes (11)
 
-| # | Plan | Repo | Ruta | Estado |
-|---|------|------|------|--------|
-| 1 | Enforcement de Reglas | FE | [tasks/enforcement-reglas.md](../tasks/enforcement-reglas.md) | F1-F2 ✅ · F3.1-F3.3 ✅ · F3.4-F5 ⏳ (22 violaciones destapadas catalogadas) |
-| 2 | Arquitectura Backend — Opciones A/B/C | BE | [Educa.API/.claude/plan/arquitectura-backend-opciones.md](../../../Educa.API/.claude/plan/arquitectura-backend-opciones.md) | A ✅ · B 🔄 · C ⏳ |
-| 3 | Domain Layer (Opción A) | BE | [Educa.API/.claude/plan/domain-layer.md](../../../Educa.API/.claude/plan/domain-layer.md) | Fases 1-3,5-6 ✅ · F4 🔒 |
-| 4 | Consolidación Backend | FE | [plan/consolidacion-backend.md](consolidacion-backend.md) | ⏳ |
-| 5 | Consolidación Frontend | FE | [plan/consolidacion-frontend.md](consolidacion-frontend.md) | ⏳ |
-| 6 | Asignación Profesor-Salón-Curso | BE | [Educa.API/.claude/plan/asignacion-profesor-salon-curso.md](../../../Educa.API/.claude/plan/asignacion-profesor-salon-curso.md) | F0 ✅ · F1-6 ⏳ |
-| 7 | Error Trace Backend | BE | [Educa.API/.claude/plan/error-trace-backend.md](../../../Educa.API/.claude/plan/error-trace-backend.md) | ⏳ |
-| 8 | Design Patterns Backend | FE | [tasks/design-patterns-backend.md](../tasks/design-patterns-backend.md) | Incremental |
-| 9 | Design Patterns Frontend | FE | [tasks/design-patterns-frontend.md](../tasks/design-patterns-frontend.md) | Incremental |
-| 10 | Flujos Alternos (resiliencia) | FE | [plan/flujos-alternos.md](flujos-alternos.md) | ⏳ (bloqueado) |
-| 11 | Refactor `eslint.config.js` (fix G10) | FE | [plan/eslint-config-refactor.md](eslint-config-refactor.md) | ✅ F1-F5 (2026-04-15: re-exports cubiertos; F5.3 tests opcionales sin ejecutar) |
+| # | Plan | Repo | Ruta | Estado | % |
+|---|------|------|------|--------|---|
+| 1 | Enforcement de Reglas | FE | [tasks/enforcement-reglas.md](../tasks/enforcement-reglas.md) | F1-F2 ✅ · F3.1-F3.3 ✅ · F3.5 Lotes A+B+C ✅ · F3.5.E ✅ · F3.4, F3.5.D, F3.6, F4, F5 ⏳ | ~45% |
+| 2 | Arquitectura Backend — Opciones A/B/C | BE | [Educa.API/.claude/plan/arquitectura-backend-opciones.md](../../../Educa.API/.claude/plan/arquitectura-backend-opciones.md) | A ✅ · B 🔄 (5/8) · C ⏳ | ~33% |
+| 3 | Domain Layer (Opción A) | BE | [Educa.API/.claude/plan/domain-layer.md](../../../Educa.API/.claude/plan/domain-layer.md) | Fases 1-3,5-6 ✅ · F4 🔒 (bloqueada por Matrícula) | ~85% |
+| 4 | Consolidación Backend | FE | [plan/consolidacion-backend.md](consolidacion-backend.md) | ⏳ | 0% |
+| 5 | Consolidación Frontend | FE | [plan/consolidacion-frontend.md](consolidacion-frontend.md) | ⏳ | 0% |
+| 6 | Asignación Profesor-Salón-Curso | BE | [Educa.API/.claude/plan/asignacion-profesor-salon-curso.md](../../../Educa.API/.claude/plan/asignacion-profesor-salon-curso.md) | F0 ✅ · F1-6 ⏳ | ~10% |
+| 7 | Error Trace Backend | BE | [Educa.API/.claude/plan/error-trace-backend.md](../../../Educa.API/.claude/plan/error-trace-backend.md) | ⏳ | 0% |
+| 8 | Design Patterns Backend | FE | [tasks/design-patterns-backend.md](../tasks/design-patterns-backend.md) | Incremental | N/A |
+| 9 | Design Patterns Frontend | FE | [tasks/design-patterns-frontend.md](../tasks/design-patterns-frontend.md) | Incremental | N/A |
+| 10 | Flujos Alternos (resiliencia) | FE | [plan/flujos-alternos.md](flujos-alternos.md) | ⏳ (bloqueado) | 0% |
+| 11 | Refactor `eslint.config.js` (fix G10) | FE | [plan/eslint-config-refactor.md](eslint-config-refactor.md) | ✅ F1-F5 (F5.3 tests opcionales sin ejecutar) | ~95% |
+
+**Resumen por capa**: Capa 1 ~55% · Capa 2 ~35% · Capa 3 0% · Capa 4 0% · Capa 5 0%
+**Total consolidado**: **~25-30%** del plan maestro terminado.
 
 ---
 
@@ -159,9 +162,9 @@ Ver [plan/eslint-config-refactor.md](eslint-config-refactor.md).
     - [x] F3.5.B Lote B — Stores → services (3 archivos) — **cerrado 2026-04-15**
       - [x] F3.5.B.1 `wal-status.store.ts`: extraída subscripción + IO a nuevo `WalStatusFacade`. Store quedó como estado puro (signals + setters). Consumidores migrados: `WalFacadeHelper` y `SyncStatusComponent` inyectan el facade. Escapes huérfanos de `no-restricted-imports` eliminados (no se legitimaron como `layer-enforcement/imports-error`).
       - [x] F3.5.B.2 `campus-navigation.store.ts`: `PathfindingService` renombrado a `PathfindingHelper` (archivo `pathfinding.helper.ts`). Era pure utility (A* + geometría, sin IO) — la clasificación correcta es Utility/Helper, no Gateway/IO. Imports actualizados en facade, store, spec e index.
-    - [ ] F3.5.C Lote C — Cross-feature admin↔estudiante (7 imports en 4 archivos): `admin/health-permissions` (→ profesor), `estudiante/cursos/curso-content-readonly-dialog` (→ profesor). Decidir: subir a `@intranet-shared` o escape justificado.
+    - [x] F3.5.C Lote C — Cross-feature admin↔estudiante (2026-04-15): escape hatches justificados en 4 archivos (7 imports). Migración física a `@intranet-shared` diferida como tarea estructural separada (~15 archivos — fuera de budget chat-sized). Ver plan base para detalle por archivo y nota de seguimiento.
     - [ ] F3.5.D Lote D — G1 heredado (8 components importando `*-api.service` directo, de F3.2). Fix: migrar a facade por módulo.
-    - [ ] F3.5.E Verificar `npx eslint .` con 0 errores de `layer-enforcement/imports-error`.
+    - [x] F3.5.E Verificar `npx eslint .` con 0 errores de `layer-enforcement/imports-error` (2026-04-15, cumplido al cerrar F3.5.C).
   - [ ] F3.6 Actualizar plan base + maestro
 
 - [ ] **F4 — Tests de invariantes**
@@ -339,11 +342,11 @@ Ver [plan/eslint-config-refactor.md](eslint-config-refactor.md).
   - [ ] QW1.3 Verificar `npx eslint` deja 0 errores de `wal/no-direct-mutation-subscribe` en estos archivos.
   - [ ] QW1.4 Actualizar maestro marcando QW1 ✅.
 
-- [ ] **QW2 — Limpiar ruido de lint en build artifacts**
-  - [ ] QW2.1 Agregar a `eslint.config.js` en el bloque `ignores`: `'android/**'`, `'ios/**'`, `'coverage/**'`, `'dist/**'` (si faltan). Detectado 2026-04-15: `npx eslint .` lintea `android/app/build/intermediates/assets/debug/mergeDebugAssets/native-bridge.js` (error real de rule not found) y `coverage/*.js` (3 warnings). Son artifacts, no código fuente.
-  - [ ] QW2.2 `src/server.ts:62` tiene 1 error `no-console` legítimo (logging de bootstrap SSR). Decidir: escape hatch justificado (`// eslint-disable-next-line no-console -- Razón: bootstrap SSR, sin logger disponible`) o agregar `server.ts` como excepción en la config de `no-console` igual que `core/helpers/logs/**`.
-  - [ ] QW2.3 Verificar `npx eslint .` sin los errores de build artifacts ni `no-console`.
-  - [ ] QW2.4 Actualizar maestro marcando QW2 ✅.
+- [x] **QW2 — Limpiar ruido de lint en build artifacts** ✅ (2026-04-15)
+  - [x] QW2.1 Agregado bloque `ignores` global al inicio de `eslint.config.js` con `android/**`, `ios/**`, `coverage/**`, `dist/**`, `.angular/**`, `node_modules/**`.
+  - [x] QW2.2 `src/server.ts` agregado como excepción al bloque `no-console: 'off'` junto con `core/helpers/logs/**` y `core/services/cache/**` (bootstrap SSR, sin logger disponible en ese contexto).
+  - [x] QW2.3 `npx eslint .` verificado: sin errores de `android/`/`coverage/` ni `no-console` en `server.ts`. Los 12 errores restantes son pre-existentes y ajenos a QW2 (layer-enforcement admin↔profesor/estudiante, WAL direct-subscribe en health-permissions = QW1, max-lines de wal-sync-engine = DS1).
+  - [x] QW2.4 Maestro actualizado.
 
 ---
 

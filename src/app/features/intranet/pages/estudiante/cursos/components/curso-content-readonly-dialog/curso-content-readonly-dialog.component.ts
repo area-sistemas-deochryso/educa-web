@@ -11,7 +11,9 @@ import { ConfirmationService } from 'primeng/api';
 import { FormatFileSizePipe } from '@shared/pipes';
 import { EstudianteCursosFacade } from '@features/intranet/pages/estudiante/services/estudiante-cursos.facade';
 import { CursoContenidoSemanaDto, EstudianteArchivoDto, EstudianteTareaArchivoDto } from '@features/intranet/pages/estudiante/models';
+// eslint-disable-next-line layer-enforcement/imports-error -- Razón: summary dialogs de archivos/tareas son vistas read-only cross-role (estudiante lee contenido que profesor publica); migración a @intranet-shared diferida (ver maestro F3.5.C).
 import { ArchivosSummaryDialogComponent } from '@features/intranet/pages/profesor/cursos/components/archivos-summary-dialog/archivos-summary-dialog.component';
+// eslint-disable-next-line layer-enforcement/imports-error -- Razón: ver import anterior — mismo dialog cross-role.
 import { TareasSummaryDialogComponent } from '@features/intranet/pages/profesor/cursos/components/tareas-summary-dialog/tareas-summary-dialog.component';
 import { NotasCursoCardComponent } from '@features/intranet/pages/estudiante/notas/components/notas-curso-card/notas-curso-card.component';
 

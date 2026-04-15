@@ -474,6 +474,20 @@ const layerEnforcementPlugin = {
 // #endregion
 
 module.exports = tseslint.config(
+	// #region Global ignores — build artifacts y outputs generados
+	// No son código fuente: nativos de Capacitor, coverage de Vitest, dist de build, node_modules.
+	{
+		ignores: [
+			'android/**',
+			'ios/**',
+			'coverage/**',
+			'dist/**',
+			'.angular/**',
+			'node_modules/**',
+		],
+	},
+	// #endregion
+
 	// #region Base TS config
 	{
 		files: ['**/*.ts'],
@@ -618,9 +632,11 @@ module.exports = tseslint.config(
 	},
 	{
 		// logger.ts ES el wrapper de console — necesita acceso directo
+		// server.ts: bootstrap SSR sin logger disponible en ese contexto
 		files: [
 			'src/app/core/helpers/logs/**/*.ts',
 			'src/app/core/services/cache/**/*.ts',
+			'src/server.ts',
 		],
 		rules: {
 			'no-console': 'off',

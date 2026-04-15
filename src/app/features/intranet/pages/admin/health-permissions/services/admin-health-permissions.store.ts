@@ -1,5 +1,6 @@
 import { Injectable, signal, computed } from '@angular/core';
 
+/* eslint-disable layer-enforcement/imports-error -- Razón: DTOs del dominio health-permissions cross-role; ubicación física bajo profesor/ es histórica. Migración a @intranet-shared diferida (ver maestro F3.5.C). */
 import {
 	HealthExitPermissionDto,
 	HealthJustificationDto,
@@ -7,6 +8,7 @@ import {
 	SymptomDto,
 	DateValidationResult,
 } from '@features/intranet/pages/profesor/models';
+/* eslint-enable layer-enforcement/imports-error */
 import { SalonForHealthDto } from '../models/admin-health-permissions.models';
 
 @Injectable({ providedIn: 'root' })

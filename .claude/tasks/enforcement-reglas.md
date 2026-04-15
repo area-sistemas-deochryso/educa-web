@@ -265,9 +265,17 @@ El plan de ataque de F3.5 es por lotes:
    - A.3 (1 archivo): `CalificacionesFacade.setContenidoWithSalon()` expuesto como método compuesto; profesor-calificaciones migrado.
 2. **Lote B — Stores → services (G6)**: 3 casos, auditar si el service debe inyectarse
    en el facade + el store recibe el resultado vía setter. Chat chico.
-3. **Lote C — Cross-feature admin↔estudiante (`admin/health-permissions`, `estudiante/cursos`)**:
-   decidir si los componentes compartidos se suben a `@intranet-shared` o si la dependencia
-   es legítima con escape hatch justificado. 2 sub-lotes (uno por dirección).
+3. **Lote C — Cross-feature admin↔estudiante**: ✅ **cerrado 2026-04-15**. Decisión:
+   escape hatches justificados + migración física a `@intranet-shared` diferida como
+   tarea estructural separada (scope real: ~15 archivos entre `health-permission.models`,
+   `health-permissions-api.service`, `salon-health-permissions-tab` complejo, 2 summary
+   dialogs y sus consumidores internos en profesor/ — fuera del budget chat-sized).
+   - `admin/health-permissions/admin-health-permissions.component.ts`: 2 escapes (DTO + tab component).
+   - `admin/health-permissions/services/admin-health-permissions.facade.ts`: 2 escapes (API service + DTOs).
+   - `admin/health-permissions/services/admin-health-permissions.store.ts`: 1 escape bloque (import multi-línea) con `/* eslint-disable */` + `/* eslint-enable */`.
+   - `estudiante/cursos/components/curso-content-readonly-dialog/...component.ts`: 2 escapes (archivos + tareas summary dialogs, vistas read-only cross-role).
+   - Resultado: `npx eslint .` deja **0 errores de `layer-enforcement/imports-error`** en todo el repo (F3.5.E cumplido en la misma corrida).
+   - Nota de seguimiento: al atacar la migración física a `@intranet-shared`, eliminar estos 7 escapes y mover los archivos origen; consumidores dentro de `profesor/` se actualizan en el mismo PR.
 4. **Lote D — G1 original (8 components importando `*-api.service` directamente)**: heredado
    de F3.2, requiere migración a facade. Chat por módulo.
 
