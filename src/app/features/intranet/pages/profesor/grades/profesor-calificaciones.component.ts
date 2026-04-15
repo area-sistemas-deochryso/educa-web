@@ -18,7 +18,6 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { logger, withRetry } from '@core/helpers';
 import { PageHeaderComponent } from '@shared/components';
 import { ProfesorFacade } from '../services/profesor.facade';
-import { ProfesorApiService } from '../services/profesor-api.service';
 import { CalificacionesFacade } from '../cursos/services/calificaciones.facade';
 import { CalificacionesPanelComponent } from '../cursos/components/calificaciones-panel/calificaciones-panel.component';
 import { CalificarDialogComponent } from '../cursos/components/calificar-dialog/calificar-dialog.component';
@@ -146,7 +145,6 @@ import {
 export class TeacherGradesComponent implements OnInit, OnDestroy {
 	// #region Dependencias
 	private readonly facade = inject(ProfesorFacade);
-	private readonly api = inject(ProfesorApiService);
 	readonly calFacade = inject(CalificacionesFacade);
 	private readonly confirmationService = inject(ConfirmationService);
 	private readonly destroyRef = inject(DestroyRef);
@@ -214,7 +212,7 @@ export class TeacherGradesComponent implements OnInit, OnDestroy {
 		this._contenido.set(null);
 		this._contenidoLoading.set(true);
 
-		this.api
+		this.facade
 			.getContenido(horarioId)
 			.pipe(
 				withRetry({ tag: 'ProfesorCalificaciones:loadContenido' }),

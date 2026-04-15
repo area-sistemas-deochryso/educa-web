@@ -1,12 +1,12 @@
 import { Injectable, inject, DestroyRef } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import { forkJoin } from 'rxjs';
+import { Observable, forkJoin } from 'rxjs';
 import { logger, withRetry, downloadBlob } from '@core/helpers';
 import { ErrorHandlerService } from '@core/services';
 import { SmartNotificationService } from '@core/services/notifications/smart-notification.service';
 import { UI_ADMIN_ERROR_DETAILS, UI_SUMMARIES } from '@app/shared/constants';
 import { UserProfileService } from '@core/services/user/user-profile.service';
-import { VistaPromedio } from '../models';
+import { CursoContenidoDetalleDto, VistaPromedio } from '../models';
 import { ProfesorApiService } from './profesor-api.service';
 import { ProfesorStore, ProfesorSalonConEstudiantes } from './profesor.store';
 
@@ -164,6 +164,16 @@ export class ProfesorFacade {
 				);
 			},
 		});
+	}
+	// #endregion
+
+	// #region Reads delegados (sub-features sin store propio)
+	getContenido(horarioId: number): Observable<CursoContenidoDetalleDto | null> {
+		return this.api.getContenido(horarioId);
+	}
+
+	getServerTime(): Observable<string | null> {
+		return this.api.getServerTime();
 	}
 	// #endregion
 

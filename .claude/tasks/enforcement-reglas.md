@@ -280,7 +280,7 @@ El plan de ataque de F3.5 es por lotes:
    de F3.2, requiere migración a facade. Chat por módulo.
    - **D.1 cerrado 2026-04-15** — cross-role widgets (2 archivos): `profesor-attendance-widget` y `attendance-summary-widget` migrados de `TeacherAttendanceApiService`/`DirectorAttendanceApiService` a `AttendanceService` (facade existente en `@shared/services/attendance/`). La interfaz del facade cubre 1:1 los métodos consumidos (`getSalonesProfesor`, `getAsistenciaDia`, `getEstadisticasDirector`), cero cambios de tipos. En la misma corrida se extendió `component-no-http-no-store` con pattern `-api\.service(\.ts)?$` — las 6 violaciones restantes ya son bloqueantes en lint.
    - **D.2 cerrado 2026-04-15** — módulo estudiante (4 archivos): `foro/estudiante-foro`, `mensajeria/estudiante-mensajeria`, `attendance/student-attendance` y `schedules/estudiante-horarios` migrados a nuevo `EstudianteFacade` fino en `estudiante/services/estudiante.facade.ts`. Delega 3 métodos de lectura (`getMisHorarios`, `getMiAsistencia`, `getServerTime`) a `EstudianteApiService`. Se eligió el patrón de D.1 (facade delgado cross-sub-feature, estilo `AttendanceService`) en vez de facades dedicados con store por cada sub-feature: los 4 componentes solo necesitan 1-2 lecturas, crear stores completos sería sobrediseño. Los facades que sí tienen store propio (`EstudianteCursosFacade`, `StudentSchedulesFacade`) siguen consumiendo `EstudianteApiService` directo — ese es su rol legítimo.
-   - **D.3 pendiente** — módulo profesor (2 archivos): `schedules/profesor-horarios`, `grades/profesor-calificaciones`. Existe `ProfesorFacade` + `CalificacionesFacade` — revisar si hay gap de métodos expuestos vs consumidos.
+   - **D.3 cerrado 2026-04-15** — módulo profesor (2 archivos): `schedules/profesor-horarios` y `grades/profesor-calificaciones` dejaron de inyectar `ProfesorApiService`. Se extendió `ProfesorFacade` con 2 reads delegados (`getServerTime()`, `getContenido(horarioId)`) siguiendo el mismo patrón fino que `EstudianteFacade` de D.2. `CalificacionesFacade` ya cubría el resto del flujo de calificaciones, no requirió cambios. Lint + tsc limpios.
 
 Cada lote actualiza este plan (marca progreso de G-IDs) y el maestro (sub-bullets bajo
 F3.5) al terminar.
@@ -300,6 +300,38 @@ Los 15 re-exports ya están silenciados con escape hatch `/* eslint-disable laye
 **Verificación**: `npx eslint src/app/shared` → 0 errores.
 
 **Resultado**: F3.4 ✅. G8 queda delegado a F5.3 (eliminar re-exports tras migrar consumidores a `@intranet-shared`).
+
+##### F3.6 — Cierre consolidado de F3 (2026-04-15)
+
+F3 (Lint de capas) queda **cerrada**. Resumen de estado por subfase:
+
+| Subfase | Estado | Resultado |
+|---------|--------|-----------|
+| F3.1 Inventario gaps G1-G9 | ✅ | Tabla de 9 gaps documentada |
+| F3.2 Cerrar G2/G3/G4 | ✅ | `document.cookie`, WAL internals, Cache internals bloqueados |
+| F3.3 G5/G6/G9 + descubrimiento G10 | ✅ | G9 efectivo; G5/G6 efectivos tras fix G10 (Plan 11) |
+| F3.4 Auditoría `shared/` | ✅ | 0 imports cross-layer; 15 re-exports silenciados con TODO(F5.3) |
+| F3.5 Violaciones destapadas (A+B+C+D+E) | ✅ | 22 violaciones resueltas en 4 lotes |
+| F3.6 Cierre procedural | ✅ | Este bloque |
+
+**Estado de gaps G1-G10 al cierre**:
+
+| Gap | Estado | Nota |
+|-----|--------|------|
+| G1 (components → `*-api.service`) | ✅ | 8 components migrados a facades (D.1+D.2+D.3) |
+| G2 (components → stores) | ✅ | 12 components migrados (A.1+A.2+A.3) |
+| G3 (WAL internals) | ✅ | Barrel enforcement extendido |
+| G4 (Cache internals) | ✅ | Barrel enforcement extendido |
+| G5 (services → stores) | ✅ | Regla activa + violaciones resueltas (Lote B) |
+| G6 (cross-role) | ✅ | Política definida (facade-only) |
+| G7 (profesor → admin warn) | 🔄 | Diferido: migración `@intranet-shared` como tarea estructural |
+| G8 (re-exports `@shared` → `@intranet-shared`) | 🔄 | Delegado a F5.3 |
+| G9 (cross-facade warn) | ✅ | Efectivo en error |
+| G10 (bug ESLint flat config) | ✅ | Resuelto por Plan 11 (plugin `layer-enforcement`) |
+
+**Verificación final**: `npx eslint .` → 0 errores de `layer-enforcement/imports-error` en todo el repo.
+
+**Siguiente tramo**: F4 (Tests de invariantes). F4.1-F4.3 ejecutables sin bloqueos. F4.4-F4.5 esperan Plan 2/B y Plan 3 F4 respectivamente.
 
 ---
 

@@ -10,7 +10,7 @@
 
 | # | Plan | Repo | Ruta | Estado | % |
 |---|------|------|------|--------|---|
-| 1 | Enforcement de Reglas | FE | [tasks/enforcement-reglas.md](../tasks/enforcement-reglas.md) | F1-F2 ✅ · F3.1-F3.4 ✅ · F3.5 Lotes A+B+C ✅ · F3.5.D.1+D.2 ✅ · F3.5.E ✅ · F3.5.D.3, F3.6, F4, F5 ⏳ | ~54% |
+| 1 | Enforcement de Reglas | FE | [tasks/enforcement-reglas.md](../tasks/enforcement-reglas.md) | F1-F3 ✅ · F4, F5 ⏳ | ~60% |
 | 2 | Arquitectura Backend — Opciones A/B/C | BE | [Educa.API/.claude/plan/arquitectura-backend-opciones.md](../../../Educa.API/.claude/plan/arquitectura-backend-opciones.md) | A ✅ · B 🔄 (5/8) · C ⏳ | ~33% |
 | 3 | Domain Layer (Opción A) | BE | [Educa.API/.claude/plan/domain-layer.md](../../../Educa.API/.claude/plan/domain-layer.md) | Fases 1-3,5-6 ✅ · F4 🔒 (bloqueada por Matrícula) | ~85% |
 | 4 | Consolidación Backend | FE | [plan/consolidacion-backend.md](consolidacion-backend.md) | ⏳ | 0% |
@@ -42,7 +42,17 @@
 | Plan 6 F4 (DTOs con modoAsignacion) | Plan 5 F4 (computed FE) | Frontend lee el campo del DTO |
 | Capas 1-4 cerradas | Plan 10 (Flujos Alternos) | Requisito explícito: "proyecto limpio" |
 
-**Próximo tramo ejecutable (3-5 chats)**: F3.5.D → F3.6 → F4.1-F4.3 (tests INV-C/U no bloqueados) → Plan 11 F5.3 opcional → arranque Plan 2/B.
+**Próximo tramo ejecutable (3-5 chats, sin bloqueos)**:
+
+1. **Plan 1 F4.1-F4.3** — tests de invariantes INV-C01..C08 + INV-U01..U06. Calculables en FE sin BE.
+2. **Plan 11 F5.3** (opcional) — tests de eslint-config para cerrar Plan 11 a 100%.
+3. **Arranque Plan 2/B** — 3 state machines faltantes (Estudiante, Calificación, Horario). Desbloquea F4.4 + Plan 4 F6.
+
+**Bloqueos duros activos (no ejecutables sin dependencia previa)**:
+
+- Plan 3 F4 🔒 por feature Matrícula (admin UI + service layer pendientes)
+- Plan 5 F4 depende de Plan 6 F4 (campo `modoAsignacion` en DTO)
+- Plan 10 🔒 hasta que Capas 1-4 cierren
 
 ---
 
@@ -185,9 +195,9 @@ Ver [plan/eslint-config-refactor.md](eslint-config-refactor.md).
     - [ ] **F3.5.D Lote D — G1 heredado (components importando `*-api.service` directo)**
       - [x] F3.5.D.1 Cross-role widgets (2 archivos, 2026-04-15): `profesor-attendance-widget` y `attendance-summary-widget` migrados a `AttendanceService` (facade existente en `@shared/services/attendance/`). Regla `layer-enforcement/imports-error` extendida con pattern `-api\.service(\.ts)?$` en `component-no-http-no-store`. Las 6 violaciones restantes (estudiante: 4, profesor: 2) ahora son bloqueantes en lint.
       - [x] F3.5.D.2 Módulo estudiante (4 archivos, 2026-04-15): `foro`, `mensajeria`, `attendance` y `schedules` migrados a nuevo `EstudianteFacade` fino (`estudiante/services/estudiante.facade.ts`) que delega 3 métodos de lectura (`getMisHorarios`, `getMiAsistencia`, `getServerTime`) a `EstudianteApiService`. Mismo patrón que D.1 (facade delgado estilo `AttendanceService`). Sub-feature facades con store propio (`EstudianteCursosFacade`, `StudentSchedulesFacade`) siguen usando el api service directo — ese es su rol legítimo. Solo quedan los 2 de profesor (D.3).
-      - [ ] F3.5.D.3 Módulo profesor (2 archivos: schedules, grades — consumen `ProfesorApiService`). Fix: extender `ProfesorFacade` o dividir en sub-facades.
+      - [x] F3.5.D.3 Módulo profesor (2 archivos, 2026-04-15): `schedules/profesor-horarios` y `grades/profesor-calificaciones` dejaron de inyectar `ProfesorApiService`. Se extendió `ProfesorFacade` con 2 reads delegados (`getServerTime()`, `getContenido(horarioId)`) siguiendo el patrón fino de `EstudianteFacade` en D.2. `CalificacionesFacade` ya cubría el resto. Lint + tsc limpios.
     - [x] F3.5.E Verificar `npx eslint .` con 0 errores de `layer-enforcement/imports-error` (2026-04-15, cumplido al cerrar F3.5.C).
-  - [ ] F3.6 Actualizar plan base + maestro
+  - [x] F3.6 Cierre consolidado F3 (2026-04-15): resumen de estado G1-G10 documentado en plan base. G7 y G8 quedan trackeados como deuda (migración física a `@intranet-shared` + eliminación de re-exports delegada a F5.3). Siguiente tramo: F4 tests de invariantes.
 
 - [ ] **F4 — Tests de invariantes**
   - [ ] F4.1 Catalogar INV-* testeable vs no testeable (tabla en plan base). **Dependencia explícita**: INV-C01..C08 e INV-U01..U06 son testeables hoy (cálculo puro, unicidad). INV-T01..T06 requieren Plan 2/B cerrado (state machines integradas). INV-M01..M04 requieren Plan 3 F4 (Matrícula) cerrado.

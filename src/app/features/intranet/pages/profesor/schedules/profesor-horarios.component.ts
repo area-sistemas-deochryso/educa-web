@@ -6,7 +6,6 @@ import { TooltipModule } from 'primeng/tooltip';
 import { PageHeaderComponent } from '@shared/components';
 import { environment } from '@config/environment';
 import { ProfesorFacade } from '../services/profesor.facade';
-import { ProfesorApiService } from '../services/profesor-api.service';
 import {
 	HorarioBlock,
 	CountdownInfo,
@@ -27,7 +26,6 @@ import {
 export class TeacherSchedulesComponent implements OnInit {
 	// #region Dependencias
 	private readonly facade = inject(ProfesorFacade);
-	private readonly api = inject(ProfesorApiService);
 	private readonly router = inject(Router);
 	private readonly destroyRef = inject(DestroyRef);
 
@@ -162,7 +160,7 @@ export class TeacherSchedulesComponent implements OnInit {
 		this._syncing = true;
 		this._syncError.set('');
 
-		this.api.getServerTime().subscribe({
+		this.facade.getServerTime().subscribe({
 			next: (isoStr) => {
 				this._rawServerResponse.set(JSON.stringify(isoStr));
 				if (isoStr) {
