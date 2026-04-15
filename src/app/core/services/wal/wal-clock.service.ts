@@ -1,4 +1,4 @@
-import { Injectable, inject, signal, computed } from '@angular/core';
+import { Injectable, signal, computed } from '@angular/core';
 import { logger } from '@core/helpers';
 import { WAL_DEFAULTS } from './models';
 

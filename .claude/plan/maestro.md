@@ -347,6 +347,14 @@ Ver [plan/eslint-config-refactor.md](eslint-config-refactor.md).
 
 ---
 
+## Deuda estructural diferida (chat dedicado)
+
+- [ ] **DS1 — Split estructural de `wal-sync-engine.service.ts`** — ver [tasks/wal-sync-engine-split.md](../tasks/wal-sync-engine-split.md)
+  - **Origen**: F3.5.B (2026-04-15). Archivo en 303 líneas efectivas (límite 300). Fix temporal con `eslint-disable max-lines` justificado en el encabezado del archivo. No es quick-win: requiere entender el loop del engine + tests mínimos previos + extracción cohesiva (candidato principal: Error Handling como helper puro).
+  - **Por qué diferido**: preexistente al F3.5.B, no bloquea ninguna tarea activa, y el escape hatch honesto es preferible a un refactor cosmético que colapse comentarios para pasar el umbral sin resolver el fondo.
+
+---
+
 ## Notas de ubicación
 
 - Planes en `educa-web/.claude/plan/` son los de **alcance amplio** (incluyen refs cruzadas al backend).

@@ -1,3 +1,4 @@
+/* eslint-disable max-lines -- Razón: WalSyncEngine es el loop central de procesamiento del WAL. Las 8 regiones (dependencies, state, lifecycle, callback registration, processing, error handling, recovery, cross-tab coordination) son cohesivas y comparten estado privado (queue, inFlight, leader election). Separarlas crearía coupling cruzado sin ganancia. Split estructural planeado en .claude/tasks/wal-sync-engine-split.md cuando haya bandwidth — requiere chat dedicado. */
 import { Injectable, inject, DestroyRef } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { HttpClient } from '@angular/common/http';
