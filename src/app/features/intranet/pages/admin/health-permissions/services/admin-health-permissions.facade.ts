@@ -4,6 +4,8 @@ import { forkJoin, Subject, EMPTY } from 'rxjs';
 import { switchMap, debounceTime, distinctUntilChanged, catchError, tap } from 'rxjs/operators';
 
 import { logger } from '@core/helpers';
+import { WalFacadeHelper } from '@core/services';
+import { environment } from '@config';
 // eslint-disable-next-line layer-enforcement/imports-error -- Razón: API service de health-permissions es cross-role (admin supervisa lo mismo que profesor gestiona); migración física a @intranet-shared diferida (ver maestro F3.5.C).
 import { HealthPermissionsApiService } from '@features/intranet/pages/profesor/classrooms/services/health-permissions-api.service';
 import { AdminHealthPermissionsStore } from './admin-health-permissions.store';
@@ -16,6 +18,8 @@ export class AdminHealthPermissionsFacade {
 	private api = inject(HealthPermissionsApiService);
 	private store = inject(AdminHealthPermissionsStore);
 	private destroyRef = inject(DestroyRef);
+	private wal = inject(WalFacadeHelper);
+	private readonly apiUrl = `${environment.apiUrl}/api/permisos-salud`;
 	// #endregion
 
 	// #region Estado expuesto
@@ -101,17 +105,19 @@ export class AdminHealthPermissionsFacade {
 
 	// #region Permiso de salida
 	crearPermisoSalida(dto: CreateHealthExitRequest): void {
-		this.store.setSaving(true);
-		this.api.crearPermisoSalida(dto).pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
-			next: (permiso) => {
-				this.store.addPermisoSalida(permiso);
-				this.store.closeExitDialog();
-				this.store.setSaving(false);
+		this.wal.execute({
+			operation: 'CREATE',
+			resourceType: 'permisos-salud-salida',
+			endpoint: `${this.apiUrl}/salida`,
+			method: 'POST',
+			payload: dto,
+			http$: () => this.api.crearPermisoSalida(dto),
+			optimistic: {
+				apply: () => this.store.closeExitDialog(),
+				rollback: () => {},
 			},
-			error: (err) => {
-				logger.error('Error creando permiso', err);
-				this.store.setSaving(false);
-			},
+			onCommit: (permiso) => this.store.addPermisoSalida(permiso),
+			onError: (err) => logger.error('Error creando permiso de salida', err),
 		});
 	}
 
@@ -125,17 +131,19 @@ export class AdminHealthPermissionsFacade {
 
 	// #region Justificacion
 	crearJustificacion(formData: FormData): void {
-		this.store.setSaving(true);
-		this.api.crearJustificacion(formData).pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
-			next: (j) => {
-				this.store.addJustificacion(j);
-				this.store.closeJustificationDialog();
-				this.store.setSaving(false);
+		this.wal.execute({
+			operation: 'CREATE',
+			resourceType: 'permisos-salud-justificacion',
+			endpoint: `${this.apiUrl}/justificacion`,
+			method: 'POST',
+			payload: formData,
+			http$: () => this.api.crearJustificacion(formData),
+			optimistic: {
+				apply: () => this.store.closeJustificationDialog(),
+				rollback: () => {},
 			},
-			error: (err) => {
-				logger.error('Error creando justificación', err);
-				this.store.setSaving(false);
-			},
+			onCommit: (j) => this.store.addJustificacion(j),
+			onError: (err) => logger.error('Error creando justificación', err),
 		});
 	}
 

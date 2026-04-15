@@ -336,11 +336,12 @@ Ver [plan/eslint-config-refactor.md](eslint-config-refactor.md).
 
 > Tareas chat-sized **sin dependencias** que arreglan errores pre-existentes ya detectados por lint. Pueden ejecutarse en cualquier momento que haya bandwidth — no bloquean ni son bloqueadas por ninguna capa.
 
-- [ ] **QW1 — Migrar `health-permissions` a WAL (optimistic UI)**
-  - [ ] QW1.1 Archivo `features/intranet/pages/admin/health-permissions/services/admin-health-permissions.facade.ts` — migrar `crearPermisoSalida` (línea 103) y `crearJustificacion` (línea 127) a `wal.execute()` con optimistic apply/rollback. Ver [rules/optimistic-ui.md](../rules/optimistic-ui.md).
-  - [ ] QW1.2 Archivo `features/intranet/pages/profesor/classrooms/services/health-permissions.facade.ts` — migrar `crearPermisoSalida` (línea 87) y `crearJustificacion` (línea 122) al mismo patrón.
-  - [ ] QW1.3 Verificar `npx eslint` deja 0 errores de `wal/no-direct-mutation-subscribe` en estos archivos.
-  - [ ] QW1.4 Actualizar maestro marcando QW1 ✅.
+- [x] **QW1 — Migrar `health-permissions` a WAL (optimistic UI)** ✅ (2026-04-15)
+  - [x] QW1.1 `admin-health-permissions.facade.ts` — `crearPermisoSalida` y `crearJustificacion` migrados a `wal.execute({ operation: 'CREATE', optimistic: { apply: closeDialog, rollback: noop }, onCommit: addItem, onError: log })`. Inyectado `WalFacadeHelper` + `environment.apiUrl`. `setSaving` removido del flow de mutación (dialog cierra inmediato en apply).
+  - [x] QW1.2 `profesor/classrooms/services/health-permissions.facade.ts` — mismo patrón para ambos métodos.
+  - [x] QW1.3 `npx eslint` sobre los 3 archivos modificados: 0 errores de `wal/no-direct-mutation-subscribe`. Warnings preexistentes de `structure/no-compact-trivial-setter` (10, en store admin) no relacionadas con QW1.
+  - [x] QW1.4 Maestro actualizado.
+  - **Nota FormData**: `crearJustificacion` pasa FormData como payload. El optimistic apply funciona fine en la sesión actual (closure captura el FormData); replay post-reload no funciona porque el closure se pierde — caso edge aceptable para file uploads, el usuario reintenta si pasa.
 
 - [x] **QW2 — Limpiar ruido de lint en build artifacts** ✅ (2026-04-15)
   - [x] QW2.1 Agregado bloque `ignores` global al inicio de `eslint.config.js` con `android/**`, `ios/**`, `coverage/**`, `dist/**`, `.angular/**`, `node_modules/**`.
