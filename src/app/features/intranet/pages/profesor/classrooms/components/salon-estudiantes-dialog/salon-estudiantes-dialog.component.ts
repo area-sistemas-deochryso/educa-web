@@ -7,7 +7,7 @@ import { SkeletonModule } from 'primeng/skeleton';
 import { ButtonModule } from 'primeng/button';
 import { TooltipModule } from 'primeng/tooltip';
 import { environment } from '@config/environment';
-import { ProfesorSalonConEstudiantes } from '@features/intranet/pages/profesor/services/profesor.store';
+import { ProfesorSalonConEstudiantes } from '@features/intranet/pages/profesor/models';
 import { ClassroomGradesTabComponent } from '../salon-notas-tab/salon-notas-tab.component';
 import { SalonNotasEstudianteTabComponent } from '../salon-notas-estudiante-tab/salon-notas-estudiante-tab.component';
 import { SalonGruposTabComponent } from '../salon-grupos-tab/salon-grupos-tab.component';

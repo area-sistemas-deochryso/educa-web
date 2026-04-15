@@ -1,19 +1,8 @@
 // #region Imports
 import { Injectable, signal, computed } from '@angular/core';
+import { VideoconferenciaItem } from './videoconferencias.models';
 
 // #endregion
-
-export interface VideoconferenciaItem {
-	horarioId: number;
-	cursoId: number;
-	cursoNombre: string;
-	salonDescripcion: string;
-	diaSemanaDescripcion: string;
-	horaInicio: string;
-	horaFin: string;
-	profesorNombreCompleto: string | null;
-	cantidadEstudiantes: number;
-}
 
 // #region Implementation
 @Injectable({ providedIn: 'root' })

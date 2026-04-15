@@ -5,7 +5,9 @@ import { DialogModule } from 'primeng/dialog';
 import { ButtonModule } from 'primeng/button';
 import { ProgressSpinnerModule } from 'primeng/progressspinner';
 import { FileUploadModule } from 'primeng/fileupload';
-import { AttachmentsModalStore, type Attachment } from './attachments-modal.store';
+import type { Attachment } from './attachments-modal.models';
+// eslint-disable-next-line layer-enforcement/imports-error -- Razón: AttachmentsModalStore es ephemeral/scoped, se registra como provider del component junto al facade (patrón wizard/modal local). No se consumen sus APIs directamente.
+import { AttachmentsModalStore } from './attachments-modal.store';
 import { AttachmentsModalFacade } from './attachments-modal.facade';
 
 // #endregion

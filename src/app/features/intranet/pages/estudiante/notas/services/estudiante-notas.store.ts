@@ -5,14 +5,7 @@ import {
 	VistaPromedio,
 	calcularPromedioPonderado,
 } from '../../models';
-
-/** Nota simulada: nota original + nota editada por el estudiante */
-export interface NotaSimulada {
-	calificacionId: number;
-	notaOriginal: number | null;
-	notaSimulada: number | null;
-	peso: number;
-}
+import { NotaSimulada } from './estudiante-notas.models';
 
 interface EstudianteNotasState {
 	cursos: EstudianteMisNotasDto[];

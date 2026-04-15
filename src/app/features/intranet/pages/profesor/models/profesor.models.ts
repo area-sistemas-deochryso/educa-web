@@ -347,4 +347,10 @@ export interface ProfesorSalon {
 	/** True when professor is tutor. */
 	esTutor: boolean;
 }
+
+/** Salón enriquecido con datos de estudiantes (vista UI). */
+export interface ProfesorSalonConEstudiantes extends ProfesorSalon {
+	cantidadEstudiantes: number;
+	estudiantes: ProfesorEstudianteSalonDto[];
+}
 // #endregion

@@ -10,7 +10,7 @@ import {
 	NOTA_MINIMA,
 	NOTA_MAXIMA,
 } from '@features/intranet/pages/estudiante/models';
-import { NotaSimulada } from '../../services/estudiante-notas.store';
+import { NotaSimulada } from '../../services/estudiante-notas.models';
 import { getNotaSeverity, formatNotaConConfig } from '@intranet-shared/services/calificacion-config';
 import type { ConfiguracionCalificacionListDto } from '@data/models';
 

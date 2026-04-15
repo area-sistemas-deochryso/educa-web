@@ -6,7 +6,7 @@ import { TagModule } from 'primeng/tag';
 
 import { PermisoUsuario } from '@core/services';
 import { UiMappingService } from '@shared/services';
-import { ModuloVistas } from '../../services/permisos-usuarios.store';
+import { ModuloVistas } from '../../services/permisos-usuarios.models';
 
 
 @Component({

@@ -4,4 +4,4 @@ export { ProfesorCursosApiService } from './profesor-cursos-api.service';
 export { ProfesorAsistenciaApiService } from './profesor-asistencia-api.service';
 export { ProfesorFacade } from './profesor.facade';
 export { ProfesorStore } from './profesor.store';
-export type { ProfesorSalonConEstudiantes } from './profesor.store';
+export type { ProfesorSalonConEstudiantes } from '../models';

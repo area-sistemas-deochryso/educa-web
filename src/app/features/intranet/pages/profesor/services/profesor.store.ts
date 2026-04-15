@@ -4,20 +4,14 @@ import {
 	SalonTutoriaDto,
 	ProfesorCurso,
 	ProfesorSalon,
+	ProfesorSalonConEstudiantes,
 	SalonCursoInfo,
 	ProfesorMisSalonesConEstudiantesDto,
 	ProfesorSalonConEstudiantesDto,
-	ProfesorEstudianteSalonDto,
 	SalonNotasResumenDto,
 	VistaPromedio,
 	recalcularPromedios,
 } from '../models';
-
-/** Salón enriquecido con datos de estudiantes */
-export interface ProfesorSalonConEstudiantes extends ProfesorSalon {
-	cantidadEstudiantes: number;
-	estudiantes: ProfesorEstudianteSalonDto[];
-}
 
 interface ProfesorStoreState {
 	horarios: HorarioProfesorDto[];

@@ -1,13 +1,7 @@
 import { Injectable, computed, signal } from '@angular/core';
 import { searchMatchAny } from '@core/helpers';
 import { PermisoUsuario, PermisoRol, Vista, RolTipoAdmin, UsuarioBusqueda } from '@core/services';
-
-export interface ModuloVistas {
-	nombre: string;
-	vistas: Vista[];
-	seleccionadas: number;
-	total: number;
-}
+import { ModuloVistas } from './permisos-usuarios.models';
 
 @Injectable({ providedIn: 'root' })
 export class PermissionsUsersStore {
