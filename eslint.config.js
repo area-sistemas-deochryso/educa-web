@@ -268,9 +268,15 @@ function normalizePath(p) {
 
 function hasImportedName(node, names) {
 	if (!Array.isArray(names) || names.length === 0) return true;
-	return (node.specifiers || []).some(
-		(s) => s.type === 'ImportSpecifier' && names.includes(s.imported?.name),
-	);
+	// ImportDeclaration: specifiers con imported.name (ImportSpecifier)
+	// ExportNamedDeclaration con source: specifiers con local.name (ExportSpecifier)
+	// ExportAllDeclaration: sin specifiers — si se pide importedNames específicos, no aplica
+	if (node.type === 'ExportAllDeclaration') return false;
+	return (node.specifiers || []).some((s) => {
+		if (s.type === 'ImportSpecifier') return names.includes(s.imported?.name);
+		if (s.type === 'ExportSpecifier') return names.includes(s.local?.name);
+		return false;
+	});
 }
 
 // Tabla declarativa de restricciones por capa.
@@ -406,21 +412,30 @@ function createImportChecker(severityFilter) {
 		);
 		if (applicable.length === 0) return {};
 
-		return {
-			ImportDeclaration(node) {
-				const source = node.source?.value;
-				if (typeof source !== 'string') return;
-				for (const rule of applicable) {
-					for (const restriction of rule.restrictions) {
-						if (!restriction.sourcePattern.test(source)) continue;
-						if (!hasImportedName(node, restriction.importedNames)) continue;
-						context.report({
-							node: node.source,
-							message: restriction.message,
-						});
-						break; // un report por rule por import
-					}
+		function checkNode(node) {
+			const source = node.source?.value;
+			if (typeof source !== 'string') return;
+			for (const rule of applicable) {
+				for (const restriction of rule.restrictions) {
+					if (!restriction.sourcePattern.test(source)) continue;
+					if (!hasImportedName(node, restriction.importedNames)) continue;
+					context.report({
+						node: node.source,
+						message: restriction.message,
+					});
+					break; // un report por rule por declaración
 				}
+			}
+		}
+
+		return {
+			ImportDeclaration: checkNode,
+			// Re-exports (F5): `export * from 'x'` y `export { A } from 'x'` heredan las mismas
+			// restricciones. Sin esto, un barrel de shared/ puede re-exportar @intranet-shared
+			// y violar la dependencia invertida de forma invisible.
+			ExportAllDeclaration: checkNode,
+			ExportNamedDeclaration(node) {
+				if (node.source) checkNode(node);
 			},
 		};
 	};

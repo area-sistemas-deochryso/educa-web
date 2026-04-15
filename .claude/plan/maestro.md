@@ -10,7 +10,7 @@
 
 | # | Plan | Repo | Ruta | Estado |
 |---|------|------|------|--------|
-| 1 | Enforcement de Reglas | FE | [tasks/enforcement-reglas.md](../tasks/enforcement-reglas.md) | F1-F2 ✅ · F3.1-F3.2 ✅ · F3.3 parcial (bloqueada por Plan 11) · F3.4-F5 ⏳ |
+| 1 | Enforcement de Reglas | FE | [tasks/enforcement-reglas.md](../tasks/enforcement-reglas.md) | F1-F2 ✅ · F3.1-F3.3 ✅ · F3.4-F5 ⏳ (22 violaciones destapadas catalogadas) |
 | 2 | Arquitectura Backend — Opciones A/B/C | BE | [Educa.API/.claude/plan/arquitectura-backend-opciones.md](../../../Educa.API/.claude/plan/arquitectura-backend-opciones.md) | A ✅ · B 🔄 · C ⏳ |
 | 3 | Domain Layer (Opción A) | BE | [Educa.API/.claude/plan/domain-layer.md](../../../Educa.API/.claude/plan/domain-layer.md) | Fases 1-3,5-6 ✅ · F4 🔒 |
 | 4 | Consolidación Backend | FE | [plan/consolidacion-backend.md](consolidacion-backend.md) | ⏳ |
@@ -20,7 +20,7 @@
 | 8 | Design Patterns Backend | FE | [tasks/design-patterns-backend.md](../tasks/design-patterns-backend.md) | Incremental |
 | 9 | Design Patterns Frontend | FE | [tasks/design-patterns-frontend.md](../tasks/design-patterns-frontend.md) | Incremental |
 | 10 | Flujos Alternos (resiliencia) | FE | [plan/flujos-alternos.md](flujos-alternos.md) | ⏳ (bloqueado) |
-| 11 | Refactor `eslint.config.js` (fix G10) | FE | [plan/eslint-config-refactor.md](eslint-config-refactor.md) | F1-F3 ✅ (plugin `layer-enforcement` activo) · F4-F5 ⏳ |
+| 11 | Refactor `eslint.config.js` (fix G10) | FE | [plan/eslint-config-refactor.md](eslint-config-refactor.md) | ✅ F1-F5 (2026-04-15: re-exports cubiertos; F5.3 tests opcionales sin ejecutar) |
 
 ---
 
@@ -135,8 +135,12 @@ Capa 5: PATRONES + RESILIENCIA                                                  
 - [x] F1 Spike y decisión — **Opción B (plugin `layer-enforcement`)** el 2026-04-14. Mezcla de severidades (profesor warn vs resto error) + combinatoria admin/profesor/estudiante × component/store/facade hace inviable Opción A.
 - [x] F2 Inventario de patterns a consolidar — tabla `LAYER_RULES` con 7 entries (shared, component, store, facade-cross, admin, profesor, estudiante)
 - [x] F3 Implementación — plugin local `layer-enforcement` con 2 reglas (`imports-error`, `imports-warn`) en `eslint.config.js`. Removidos los 7 bloques overrideados por barrel. Verificado con `--print-config` y lint completo (detecta ~28 violaciones pre-existentes que eran invisibles).
-- [ ] F4 Reenganche con Plan 1 F3.3 (re-habilitar G5/G6, confirmar G9, limpiar 3 `eslint-disable` huérfanos en `shared/*/index.ts`, actualizar `rules/eslint.md`)
-- [ ] F5 Tests de guardia (opcional)
+- [x] F4 Reenganche con Plan 1 (2026-04-14): 3 `eslint-disable` huérfanos removidos de `shared/{components,directives,pipes}/index.ts`; `rules/eslint.md` actualizado (tabla, ejemplos, excepciones); G5/G6/G9 confirmados efectivos; 22 violaciones destapadas catalogadas por categoría y linkeadas a Plan 1 F3.5 (lotes A-D). Gap anotado: `layer-enforcement` solo hookea `ImportDeclaration`, no re-exports.
+- [x] **F5 — Extender plugin a re-exports + tests de guardia** (2026-04-15)
+  - [x] F5.1 `layer-enforcement` ahora cubre `ExportAllDeclaration` y `ExportNamedDeclaration` con `source`. Handler `checkNode` compartido por las 3 formas. `hasImportedName` actualizado para `ExportSpecifier.local.name`.
+  - [x] F5.2 Escape hatch `/* eslint-disable layer-enforcement/imports-error -- Razón: shim temporal... */` agregado en los 3 barrels. Los 15 re-exports ahora detectados y silenciados con deuda visible.
+  - [ ] F5.3 Tests de guardia (opcional — no ejecutado; el lint sobre los barrels cumple como regression test implícito).
+  - [x] F5.4 `rules/eslint.md` actualizado: limitación removida, tabla de excepciones refleja el nuevo estado.
 
 Ver [plan/eslint-config-refactor.md](eslint-config-refactor.md).
 
@@ -145,9 +149,14 @@ Ver [plan/eslint-config-refactor.md](eslint-config-refactor.md).
 - [ ] **F3 — Lint de capas**
   - [x] F3.1 Inventariar reglas `no-restricted-imports` actuales vs faltantes (doc corto en el plan base) — ver [enforcement-reglas.md § Fase 1.5](../tasks/enforcement-reglas.md)
   - [x] F3.2 Regla: components no importan `HttpClient` ni `*.store.ts` (ya parcial) — cerrar gaps detectados en F3.1 — G2 (document.cookie), G3 (WAL internals), G4 (Cache internals) cerrados. G1 movido a F3.5.
-  - [x] F3.3 Parcial — G9 (cross-facade) subido a error. G5/G6 revertidos por descubrimiento **G10** (bug estructural: barrel enforcement sobrescribe reglas intermedias). G10 → F5.
-  - [ ] F3.4 Regla: `shared/` no importa `features/*` ni `@intranet-shared` — auditar violaciones y listarlas
-  - [ ] F3.5 Corregir violaciones detectadas en F3.4 + migrar G1 (8 components → facades) + G5/G6 tras fix de G10
+  - [x] F3.3 Cerrada (2026-04-14) — G9 efectivo; G5/G6 efectivos tras fix G10 (Plan 11); destapa 22 violaciones que pasan a F3.5.
+  - [ ] F3.4 Regla: `shared/` no importa `features/*` ni `@intranet-shared` — auditar violaciones y listarlas. Nota: `layer-enforcement/shared-no-features` ya bloquea `ImportDeclaration`; auditar también `export * from` (no detectado por el plugin).
+  - [ ] **F3.5 — Corregir violaciones destapadas + G1 + G5/G6** (lotes chat-sized)
+    - [ ] F3.5.A Lote A — Components importando stores (12 archivos): ctest-k6 (4), videoconferencias, simulador-notas, profesor-salones, profesor-foro, profesor-calificaciones, salon-estudiantes-dialog, permisos-detail-drawer, attachments-modal. Fix: migrar a facade.
+    - [ ] F3.5.B Lote B — Stores → services (3 archivos): `wal-status.store` (2), `campus-navigation.store` (1). Fix: mover IO al facade.
+    - [ ] F3.5.C Lote C — Cross-feature admin↔estudiante (7 imports en 4 archivos): `admin/health-permissions` (→ profesor), `estudiante/cursos/curso-content-readonly-dialog` (→ profesor). Decidir: subir a `@intranet-shared` o escape justificado.
+    - [ ] F3.5.D Lote D — G1 heredado (8 components importando `*-api.service` directo, de F3.2). Fix: migrar a facade por módulo.
+    - [ ] F3.5.E Verificar `npx eslint .` con 0 errores de `layer-enforcement/imports-error`.
   - [ ] F3.6 Actualizar plan base + maestro
 
 - [ ] **F4 — Tests de invariantes**

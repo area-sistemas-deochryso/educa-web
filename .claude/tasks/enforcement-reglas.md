@@ -220,6 +220,60 @@ Consecuencia: el bloque de barrel enforcement (aplica a `features/**` + `shared/
 
 **Impacto en el plan**: F3.3 se considera **cerrada parcialmente** (solo G9). F3.4 puede proceder independientemente (es auditoría). F3.5 hereda G1, G5, G6, y ahora G10 también depende de F5.
 
+##### Update 2026-04-14 — G10 resuelto por Plan 11
+
+Plan 11 (refactor `eslint.config.js`) cerró G10 introduciendo plugin local `layer-enforcement`
+con dos reglas (`imports-error` / `imports-warn`) que iteran una tabla declarativa. Los
+7 bloques `no-restricted-imports` intermedios fueron reemplazados. Desbloquea F3.3→F3.5.
+
+**Verificación post-fix (`npx eslint .` al 2026-04-14)**: 30 errores totales. 22 son
+`layer-enforcement/imports-error` previamente invisibles. Catálogo en Plan 11 F4.
+
+**Reenganche F3.3**:
+
+- G5 (stores no importan `HttpClient`) → ya efectivo, tapa quedó cubierta por
+  `store-no-io-no-facade` de `LAYER_RULES`. 0 violaciones activas.
+- G6 (stores no importan services) → ya efectivo. Destapa **3 violaciones**:
+  `wal-status.store.ts` (2) + `campus-navigation.store.ts` (1). Pasan a F3.5.
+- G9 (cross-facade) → confirmado efectivo. 0 violaciones nuevas.
+- G10 → resuelto. Quedó ✅.
+
+F3.3 queda **totalmente cerrada**. F3.5 recibe G1 (existente) + G5/G6 (ya efectivos pero
+con violaciones pre-existentes que catalogamos abajo) + las 22 violaciones nuevas.
+
+##### Inventario F3.5 — violaciones destapadas por fix G10
+
+Las 22 violaciones `layer-enforcement/imports-error` destapadas al habilitar el plugin
+agrupan así:
+
+| Categoría | Cantidad | Archivos |
+|-----------|---------:|----------|
+| Components importando stores (G2 extendido) | 12 | ctest-k6 (4), videoconferencias, simulador-notas, profesor-salones, profesor-foro, profesor-calificaciones, salon-estudiantes-dialog, permisos-detail-drawer, attachments-modal |
+| `admin/` → `profesor/` (cross-feature) | 5 | admin-health-permissions (3 archivos) |
+| Stores → services (G6) | 3 | wal-status.store (2), campus-navigation.store (1) |
+| `estudiante/` → `profesor/` (cross-feature) | 2 | curso-content-readonly-dialog |
+
+Más 2 warnings `profesor/` → `admin/`/`estudiante/` (severidad warn por migración gradual
+— ver G7/G8) y los QW1 del maestro (WAL). Los `max-lines` y unused-vars/console están
+fuera de scope de F3.5.
+
+El plan de ataque de F3.5 es por lotes:
+
+1. **Lote A — G2 extendido (components importando stores)**: 12 archivos. El fix canónico
+   es crear/usar facade que exponga lo que el component necesita (vm + comandos). Varios
+   casos podrían ser simplemente cambiar el import del store al facade si el facade ya
+   existe. Chat-sized por páginas relacionadas (ctest-k6 completo va en un chat).
+2. **Lote B — Stores → services (G6)**: 3 casos, auditar si el service debe inyectarse
+   en el facade + el store recibe el resultado vía setter. Chat chico.
+3. **Lote C — Cross-feature admin↔estudiante (`admin/health-permissions`, `estudiante/cursos`)**:
+   decidir si los componentes compartidos se suben a `@intranet-shared` o si la dependencia
+   es legítima con escape hatch justificado. 2 sub-lotes (uno por dirección).
+4. **Lote D — G1 original (8 components importando `*-api.service` directamente)**: heredado
+   de F3.2, requiere migración a facade. Chat por módulo.
+
+Cada lote actualiza este plan (marca progreso de G-IDs) y el maestro (sub-bullets bajo
+F3.5) al terminar.
+
 ---
 
 ### Fase 2 — Tests de Contrato e Invariantes (red de seguridad)

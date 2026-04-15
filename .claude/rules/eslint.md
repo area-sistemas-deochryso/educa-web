@@ -104,18 +104,18 @@ toggleExpanded(): void { this._expanded.update(v => !v); }
 
 ## Reglas de arquitectura (enforcement de capas)
 
+> **Plugin local `layer-enforcement`** (fix G10). Define dos reglas (`imports-error` / `imports-warn`) que iteran una tabla declarativa `LAYER_RULES` en `eslint.config.js`. Reemplaza los antiguos bloques `no-restricted-imports` que el flat config sobreescribía entre bloques que matcheaban el mismo archivo. Cubre tanto `ImportDeclaration` como re-exports (`export * from 'x'` y `export { A } from 'x'`) — una dependencia invertida expresada como re-export dispara la misma regla que el import equivalente.
+
 | Regla | Nivel | Qué prohíbe |
 |-------|-------|-------------|
 | `no-restricted-globals` (localStorage/sessionStorage) | error | Acceso directo fuera de `@core/services/storage/` |
-| `no-restricted-imports` (shared → features) | error | `shared/` no puede importar de `@features/*` |
-| `no-restricted-imports` (shared → intranet-shared) | error | `shared/` no puede importar de `@intranet-shared` |
-| `no-restricted-imports` (HttpClient en components) | error | Components no pueden importar `HttpClient` (solo tipos como `HttpErrorResponse`) |
-| `no-restricted-imports` (store en components) | error | Components no pueden importar `*.store.ts` directamente — consumir vía facade |
-| `no-restricted-imports` (HttpClient en stores) | error | Stores no pueden importar `HttpClient` — el facade hace IO |
-| `no-restricted-imports` (facade/service en stores) | error | Stores no pueden importar facades ni services — flujo es facade → store |
+| `layer-enforcement/imports-error` — shared → features / intranet-shared | error | `shared/` no puede importar de `@features/*` ni `@intranet-shared` |
+| `layer-enforcement/imports-error` — HttpClient/store en components | error | Components no pueden importar `HttpClient` ni `*.store.ts` — consumir vía facade |
+| `layer-enforcement/imports-error` — HttpClient/facade/service en stores | error | Stores no pueden importar `HttpClient`, facades ni services — flujo es facade → store |
 | `no-restricted-syntax` (subscribe en stores) | error | Stores no pueden hacer `.subscribe()` — mover al facade |
-| `no-restricted-imports` (cross-facade) | warn | Facades no deben importar otros facades — evitar acoplamiento |
-| `no-restricted-imports` (cross-feature) | error/warn | Features no importan de otras features (`admin/` ↔ `profesor/` ↔ `estudiante/`) |
+| `layer-enforcement/imports-error` — cross-facade | error | Facades no importan otros facades — evitar acoplamiento |
+| `layer-enforcement/imports-error` — admin/estudiante cross-feature | error | `admin/` y `estudiante/` no importan de otras features de rol |
+| `layer-enforcement/imports-warn` — profesor cross-feature | warn | `profesor/` no importa de `admin/` ni `estudiante/` (warn durante migración) |
 
 ### Principio de las reglas de capa
 
@@ -135,7 +135,7 @@ Cada capa tiene un rol específico y las reglas lo hacen cumplir:
 Las reglas arquitectónicas admiten excepciones cuando el caso lo justifica. Para desactivar una regla en una línea específica, usar el formato con **descripción obligatoria**:
 
 ```typescript
-// eslint-disable-next-line no-restricted-imports -- Razón: <justificación específica>
+// eslint-disable-next-line layer-enforcement/imports-error -- Razón: <justificación específica>
 import { SomeStore } from './some.store';
 ```
 
@@ -150,11 +150,11 @@ import { SomeStore } from './some.store';
 
 ```typescript
 // ✅ Caso legítimo — store global que otros stores necesitan leer por composición
-// eslint-disable-next-line no-restricted-imports -- Razón: AuthStore es global y el filtro depende del userId actual
+// eslint-disable-next-line layer-enforcement/imports-error -- Razón: AuthStore es global y el filtro depende del userId actual
 import { AuthStore } from '@core/store/auth.store';
 
 // ✅ Caso legítimo — facade coordina con otro facade por dependencia de dominio real
-// eslint-disable-next-line no-restricted-imports -- Razón: PermisosFacade se consulta porque UsuariosCrudFacade debe refrescar permisos al cambiar rol
+// eslint-disable-next-line layer-enforcement/imports-error -- Razón: PermisosFacade se consulta porque UsuariosCrudFacade debe refrescar permisos al cambiar rol
 import { PermisosFacade } from '@core/services/permisos';
 ```
 
@@ -162,15 +162,15 @@ import { PermisosFacade } from '@core/services/permisos';
 
 ```typescript
 // ❌ Sin razón
-// eslint-disable-next-line no-restricted-imports
+// eslint-disable-next-line layer-enforcement/imports-error
 import { UsersStore } from './users.store';
 
 // ❌ Razón genérica
-// eslint-disable-next-line no-restricted-imports -- es necesario
+// eslint-disable-next-line layer-enforcement/imports-error -- es necesario
 import { UsersStore } from './users.store';
 
 // ❌ Escape de bloque (oculta múltiples violaciones)
-/* eslint-disable no-restricted-imports */
+/* eslint-disable layer-enforcement/imports-error */
 ```
 
 ### Excepciones configuradas
@@ -182,7 +182,7 @@ import { UsersStore } from './users.store';
 | `core/services/cache/**` | `localStorage` + `console` permitidos | Infraestructura de cache |
 | `core/helpers/logs/**` | `console` permitido | Es el wrapper de logging |
 | `**/*.spec.ts` | `localStorage` + `console` relajados | Tests necesitan mocking |
-| `shared/**/index.ts` | Re-exports `@intranet-shared` con `eslint-disable` | Migración gradual (TODO F5) |
+| `shared/**/index.ts` | Re-exports de `@intranet-shared` detectados y silenciados con `/* eslint-disable layer-enforcement/imports-error */` justificado | Son migración gradual (TODO F5 del Plan 1) — eliminar los re-exports y los escapes cuando los consumidores usen `@intranet-shared` directamente |
 
 ### Violaciones conocidas (pendientes de refactor)
 

@@ -1,6 +1,6 @@
 # Refactor del `eslint.config.js` — Fix al bug G10 (override de `no-restricted-imports`)
 
-> **Estado**: 🔄 F1-F3 ✅ · F4 ⏳ (reenganche con Plan 1) · F5 ⏳ (tests)
+> **Estado**: ✅ F1-F5 (F5.3 tests opcionales sin ejecutar; re-exports cubiertos el 2026-04-15)
 > **Origen**: G10 detectado durante F3.3 del Plan 1 (Enforcement) el 2026-04-14
 > **Prioridad**: Alta — desbloquea F3.3 y F3.5 del enforcement, y remedia un falso positivo de "enforcement activo"
 > **Capa en el maestro**: Capa 5 (Patrones + Resiliencia), pero puede adelantarse si bloquea trabajo de enforcement.
@@ -117,14 +117,126 @@ Estas correcciones son trabajo de **Plan 1 F3.5**, no de este plan.
 1. ✅ `--print-config` sobre cualquier `.component.ts` en `features/**` incluye `layer-enforcement/imports-error`
 2. ✅ Lo mismo para `.store.ts`, `.facade.ts`, archivos en `admin/`, `profesor/`, `estudiante/`
 3. ✅ `npm run lint` detecta violaciones pre-existentes (esperado: aumento de errores hasta F3.5)
-4. ⏳ F4: actualizar `rules/eslint.md` para reflejar la realidad del enforcement
+4. ✅ F4: `rules/eslint.md` refleja la realidad del enforcement (ver F4 abajo)
 
-### Side effect detectado
+---
 
-3 directivas `// eslint-disable-next-line no-restricted-imports` en `shared/*/index.ts`
-quedan huérfanas (emiten warning "Unused eslint-disable directive") porque el plugin usa
-nombres distintos. Limpieza: cambiar a `layer-enforcement/imports-error` o removerlas
-en F4.
+## F4 — Reenganche con Plan 1 (2026-04-14)
+
+### Limpieza de directivas huérfanas
+
+3 directivas `/* eslint-disable no-restricted-imports */` en barrels de `shared/*/index.ts`
+quedaron huérfanas tras el fix. Removidas completamente:
+
+- `src/app/shared/components/index.ts` — bloque envolviendo 7 re-exports
+- `src/app/shared/directives/index.ts` — bloque envolviendo 3 re-exports
+- `src/app/shared/pipes/index.ts` — bloque envolviendo 5 re-exports
+
+**Por qué removerlas en vez de renombrarlas a `layer-enforcement/imports-error`**: el plugin
+`layer-enforcement` solo hookea `ImportDeclaration`. Re-exports (`export * from`,
+`export { X } from`) no disparan la regla. Las directivas no suprimen nada — solo generan
+ruido ("Unused eslint-disable"). El TODO(F5) en los barrels sigue marcando el trabajo real:
+migrar consumidores a `@intranet-shared` y eliminar los re-exports.
+
+**Gap del plugin anotado**: `layer-enforcement` no detecta la violación arquitectónica de
+`shared/` re-exportando `@intranet-shared`. Si se quisiera enforcement duro, habría que
+extender el plugin a `ExportAllDeclaration` / `ExportNamedDeclaration`. Pero la política
+actual prefiere eliminar los re-exports (F5 del Plan 1) antes que legitimarlos con una
+regla que los proteja.
+
+### Actualización de `rules/eslint.md`
+
+- Sección "Reglas de arquitectura" reescrita: tabla ahora refleja el plugin `layer-enforcement`
+  con sus 7 entries (shared, component, store, facade-cross, admin/profesor/estudiante
+  cross-feature). Severidades explícitas.
+- Bloque introductorio explica qué es `layer-enforcement`, por qué existe, y la limitación
+  de `ImportDeclaration`-only.
+- Todos los ejemplos de escape hatch actualizados a
+  `// eslint-disable-next-line layer-enforcement/imports-error -- Razón: …`.
+- Tabla de excepciones configuradas actualizada: la entrada de `shared/**/index.ts` ahora
+  explica que los re-exports NO disparan la regla y deben ser **eliminados** (no legitimados).
+
+### Panorama destapado para Plan 1 F3.5
+
+Lint completo a 2026-04-14 reporta **30 errores totales**, de los cuales **22** son
+`layer-enforcement/imports-error` que antes eran invisibles. Desglose por categoría:
+
+| Categoría | Cantidad | Archivos afectados |
+|-----------|---------:|--------------------|
+| Components importando stores directamente | 12 | ctest-k6 (4), videoconferencias, simulador-notas, profesor-salones, profesor-foro, profesor-calificaciones, salon-estudiantes-dialog, permisos-detail-drawer, attachments-modal |
+| `admin/` importando de `profesor/` | 5 | admin-health-permissions (3 archivos × hasta 2 imports) |
+| Stores importando services | 3 | wal-status.store (2), campus-navigation.store (1) |
+| `estudiante/` importando de `profesor/` | 2 | curso-content-readonly-dialog |
+
+**No contados en los 22 pero parte del trabajo destapado**:
+- 2 warnings `profesor → admin/estudiante` (severidad warn por diseño — migración gradual)
+- 4 `wal/no-direct-mutation-subscribe` ya catalogados como QW1 en el maestro
+- 2 `max-lines` (wal-sync-engine, profesor-salones) — ya listados en Plan 5 F6.1
+- 2 `no-unused-vars`, 1 `no-console` (limpieza menor fuera de enforcement)
+
+El trabajo de corregir estas 22 violaciones vive en **Plan 1 F3.5**. Este plan (11) solo
+destapó el trabajo, no lo ejecuta.
+
+### Entregables de F4
+
+- [x] F4.1 Removidas 3 directivas huérfanas en `shared/*/index.ts`
+- [x] F4.2 `rules/eslint.md` actualizado (tabla, ejemplos, excepciones, limitación)
+- [x] F4.3 Panorama de violaciones destapadas catalogado (arriba) y linkeado a Plan 1 F3.5
+- [x] F4.4 `npx eslint` sobre los 3 barrels → 0 warnings (verificado)
+- [x] F4.5 Maestro + este plan actualizados
+
+---
+
+## F5 — Extensión a re-exports (2026-04-15)
+
+### Cambio
+
+`createImportChecker` ahora visita también `ExportAllDeclaration` y
+`ExportNamedDeclaration` con `source`. Un re-export como
+`export * from '@intranet-shared/…'` dispara la misma regla de capa que el
+`import` equivalente. Implementado con un handler único `checkNode(node)`
+compartido por las 3 formas.
+
+`hasImportedName` actualizado para distinguir:
+
+- `ImportDeclaration` → `specifier.imported.name` (ImportSpecifier)
+- `ExportNamedDeclaration` → `specifier.local.name` (ExportSpecifier)
+- `ExportAllDeclaration` → sin specifiers; si la restricción pide
+  `importedNames` específicos, no aplica (retorna `false`)
+
+### Escape hatches en los 3 barrels (F5.2)
+
+Los 15 re-exports de `shared/*/index.ts` → `@intranet-shared/*` quedan ahora
+detectados. Se silenciaron con bloque justificado:
+
+```typescript
+/* eslint-disable layer-enforcement/imports-error -- Razón: shim temporal de
+   migración @shared → @intranet-shared; eliminar cuando los consumidores usen
+   el alias final (Plan 1 F5.3). */
+export * from '@intranet-shared/…';
+```
+
+Escape de bloque (no `next-line`) porque son N re-exports contiguos con la misma
+justificación. La deuda queda **visible y acotada** — eliminar los escapes es la
+prueba de que los consumidores migraron.
+
+### Verificación
+
+- `npx eslint src/app/shared/{components,directives,pipes}/index.ts` → 0
+  errores, 0 warnings (antes del escape hatch reportaba 15 errores).
+- `npx eslint .` → 30 errores totales (22 `layer-enforcement/imports-error`
+  pre-existentes del Plan 1 F3.5 + 4 `wal/no-direct-mutation-subscribe` + 2
+  `max-lines` + 2 menores). **Sin regresiones** introducidas por el cambio.
+
+### Entregables
+
+- [x] F5.1 Plugin extendido a `ExportAllDeclaration` + `ExportNamedDeclaration`
+- [x] F5.2 Escape hatches justificados en los 3 barrels
+- [ ] F5.3 Tests de guardia (opcional, no ejecutado — el lint sobre los barrels
+  actúa como regression test implícito)
+- [x] F5.4 `rules/eslint.md` actualizado: quitada la limitación
+  "`layer-enforcement` solo chequea `ImportDeclaration`"; tabla de excepciones
+  refleja que los re-exports ahora se detectan y silencian con justificación
 
 ---
 
