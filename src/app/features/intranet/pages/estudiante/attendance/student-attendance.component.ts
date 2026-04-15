@@ -15,7 +15,7 @@ import { TableModule } from 'primeng/table';
 import { ProgressSpinnerModule } from 'primeng/progressspinner';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { logger, withRetry } from '@core/helpers';
-import { EstudianteApiService } from '../services/estudiante-api.service';
+import { EstudianteFacade } from '../services/estudiante.facade';
 import {
 	HorarioProfesorDto,
 	MiAsistenciaCursoResumenDto,
@@ -120,7 +120,7 @@ import {
 })
 export class StudentAttendanceComponent implements OnInit {
 	// #region Dependencias
-	private readonly api = inject(EstudianteApiService);
+	private readonly api = inject(EstudianteFacade);
 	private readonly destroyRef = inject(DestroyRef);
 	// #endregion
 

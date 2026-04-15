@@ -5,7 +5,7 @@ import { Router } from '@angular/router';
 import { TooltipModule } from 'primeng/tooltip';
 import { PageHeaderComponent } from '@shared/components';
 import { StudentSchedulesFacade } from './services/estudiante-horarios.facade';
-import { EstudianteApiService } from '../services/estudiante-api.service';
+import { EstudianteFacade } from '../services/estudiante.facade';
 import { HorarioProfesorDto } from '../models';
 
 // #endregion
@@ -168,7 +168,7 @@ function buildCountdownMap(blocks: HorarioBlock[], now: Date): Map<number, Count
 export class StudentSchedulesComponent implements OnInit {
 	// #region Dependencias
 	private readonly facade = inject(StudentSchedulesFacade);
-	private readonly api = inject(EstudianteApiService);
+	private readonly api = inject(EstudianteFacade);
 	private readonly router = inject(Router);
 	private readonly destroyRef = inject(DestroyRef);
 

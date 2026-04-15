@@ -4,7 +4,7 @@ import { ProgressSpinnerModule } from 'primeng/progressspinner';
 import { PageHeaderComponent } from '@shared/components';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { logger, withRetry } from '@core/helpers';
-import { EstudianteApiService } from '../services/estudiante-api.service';
+import { EstudianteFacade } from '../services/estudiante.facade';
 import { SalonMensajeriaFacade } from '@features/intranet/pages/cross-role/mensajeria/services/mensajeria.facade';
 import { SalonForoTabComponent } from '@features/intranet/pages/cross-role/mensajeria/components/foro-tab/foro-tab.component';
 import { HorarioProfesorDto } from '../models/estudiante.models';
@@ -45,7 +45,7 @@ import { toSelectOptionsFrom } from '@shared/models';
 })
 export class EstudianteForoComponent implements OnInit, OnDestroy {
 	// #region Dependencias
-	private readonly api = inject(EstudianteApiService);
+	private readonly api = inject(EstudianteFacade);
 	private readonly mensajeriaFacade = inject(SalonMensajeriaFacade);
 	private readonly destroyRef = inject(DestroyRef);
 	// #endregion

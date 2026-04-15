@@ -1,7 +1,7 @@
 import { Component, ChangeDetectionStrategy, computed, inject, OnInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ProgressSpinnerModule } from 'primeng/progressspinner';
-import { EstudianteApiService } from '../services/estudiante-api.service';
+import { EstudianteFacade } from '../services/estudiante.facade';
 import { SalonMensajeriaFacade } from '@features/intranet/pages/cross-role/mensajeria/services/mensajeria.facade';
 import { SalonMensajeriaTabComponent } from '@features/intranet/pages/cross-role/mensajeria/components/mensajeria-tab/mensajeria-tab.component';
 import { EstudianteSalonCurso, HorarioProfesorDto } from '../models/estudiante.models';
@@ -69,7 +69,7 @@ import { PageHeaderComponent } from '@shared/components';
 })
 export class EstudianteMensajeriaComponent implements OnInit, OnDestroy {
 	// #region Dependencias
-	private readonly api = inject(EstudianteApiService);
+	private readonly api = inject(EstudianteFacade);
 	private readonly mensajeriaFacade = inject(SalonMensajeriaFacade);
 	private readonly destroyRef = inject(DestroyRef);
 	// #endregion
