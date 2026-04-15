@@ -153,7 +153,7 @@ Ver [plan/eslint-config-refactor.md](eslint-config-refactor.md).
   - [ ] F3.4 Regla: `shared/` no importa `features/*` ni `@intranet-shared` — auditar violaciones y listarlas. Nota: `layer-enforcement/shared-no-features` ya bloquea `ImportDeclaration`; auditar también `export * from` (no detectado por el plugin).
   - [ ] **F3.5 — Corregir violaciones destapadas + G1 + G5/G6** (lotes chat-sized)
     - [ ] F3.5.A Lote A — Components importando stores (12 archivos): ctest-k6 (4), videoconferencias, simulador-notas, profesor-salones, profesor-foro, profesor-calificaciones, salon-estudiantes-dialog, permisos-detail-drawer, attachments-modal. Fix: migrar a facade.
-    - [ ] F3.5.B Lote B — Stores → services (3 archivos): `wal-status.store` (2), `campus-navigation.store` (1). Fix: mover IO al facade.
+    - [ ] F3.5.B Lote B — Stores → services (3 archivos): `wal-status.store` (2), `campus-navigation.store` (1). Fix: mover IO al facade. **Nota**: `wal-status.store.ts` además tiene 2 `/* eslint-disable no-restricted-imports */` huérfanos (líneas 3 y 5) — escapes de la era pre-plugin que no suprimen nada hoy. Removerlos al migrar el archivo (no agregar `layer-enforcement/imports-error` equivalente — el objetivo es eliminar la violación, no legitimarla).
     - [ ] F3.5.C Lote C — Cross-feature admin↔estudiante (7 imports en 4 archivos): `admin/health-permissions` (→ profesor), `estudiante/cursos/curso-content-readonly-dialog` (→ profesor). Decidir: subir a `@intranet-shared` o escape justificado.
     - [ ] F3.5.D Lote D — G1 heredado (8 components importando `*-api.service` directo, de F3.2). Fix: migrar a facade por módulo.
     - [ ] F3.5.E Verificar `npx eslint .` con 0 errores de `layer-enforcement/imports-error`.
@@ -333,6 +333,12 @@ Ver [plan/eslint-config-refactor.md](eslint-config-refactor.md).
   - [ ] QW1.2 Archivo `features/intranet/pages/profesor/classrooms/services/health-permissions.facade.ts` — migrar `crearPermisoSalida` (línea 87) y `crearJustificacion` (línea 122) al mismo patrón.
   - [ ] QW1.3 Verificar `npx eslint` deja 0 errores de `wal/no-direct-mutation-subscribe` en estos archivos.
   - [ ] QW1.4 Actualizar maestro marcando QW1 ✅.
+
+- [ ] **QW2 — Limpiar ruido de lint en build artifacts**
+  - [ ] QW2.1 Agregar a `eslint.config.js` en el bloque `ignores`: `'android/**'`, `'ios/**'`, `'coverage/**'`, `'dist/**'` (si faltan). Detectado 2026-04-15: `npx eslint .` lintea `android/app/build/intermediates/assets/debug/mergeDebugAssets/native-bridge.js` (error real de rule not found) y `coverage/*.js` (3 warnings). Son artifacts, no código fuente.
+  - [ ] QW2.2 `src/server.ts:62` tiene 1 error `no-console` legítimo (logging de bootstrap SSR). Decidir: escape hatch justificado (`// eslint-disable-next-line no-console -- Razón: bootstrap SSR, sin logger disponible`) o agregar `server.ts` como excepción en la config de `no-console` igual que `core/helpers/logs/**`.
+  - [ ] QW2.3 Verificar `npx eslint .` sin los errores de build artifacts ni `no-console`.
+  - [ ] QW2.4 Actualizar maestro marcando QW2 ✅.
 
 ---
 
