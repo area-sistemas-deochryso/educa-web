@@ -278,9 +278,28 @@ El plan de ataque de F3.5 es por lotes:
    - Nota de seguimiento: al atacar la migración física a `@intranet-shared`, eliminar estos 7 escapes y mover los archivos origen; consumidores dentro de `profesor/` se actualizan en el mismo PR.
 4. **Lote D — G1 original (8 components importando `*-api.service` directamente)**: heredado
    de F3.2, requiere migración a facade. Chat por módulo.
+   - **D.1 cerrado 2026-04-15** — cross-role widgets (2 archivos): `profesor-attendance-widget` y `attendance-summary-widget` migrados de `TeacherAttendanceApiService`/`DirectorAttendanceApiService` a `AttendanceService` (facade existente en `@shared/services/attendance/`). La interfaz del facade cubre 1:1 los métodos consumidos (`getSalonesProfesor`, `getAsistenciaDia`, `getEstadisticasDirector`), cero cambios de tipos. En la misma corrida se extendió `component-no-http-no-store` con pattern `-api\.service(\.ts)?$` — las 6 violaciones restantes ya son bloqueantes en lint.
+   - **D.2 pendiente** — módulo estudiante (4 archivos): `foro/estudiante-foro`, `attendance/student-attendance`, `schedules/estudiante-horarios`, `mensajeria/estudiante-mensajeria`. Todos consumen `EstudianteApiService` directamente. Hoy solo existe `EstudianteCursosFacade` (scoped a cursos). Requiere extender con facades por sub-feature o crear `EstudianteFacade` amplio.
+   - **D.3 pendiente** — módulo profesor (2 archivos): `schedules/profesor-horarios`, `grades/profesor-calificaciones`. Existe `ProfesorFacade` + `CalificacionesFacade` — revisar si hay gap de métodos expuestos vs consumidos.
 
 Cada lote actualiza este plan (marca progreso de G-IDs) y el maestro (sub-bullets bajo
 F3.5) al terminar.
+
+##### Update 2026-04-15 — F3.4 cerrada (auditoría `shared/` → `features/` / `@intranet-shared`)
+
+Auditoría sobre `src/app/shared/**`:
+
+| Patrón | Violaciones | Detalle |
+|--------|-------------|---------|
+| `import ... from '@features/*'` | 0 | Limpio |
+| `import ... from '@intranet-shared/...'` | 0 | Limpio |
+| `export * from '@intranet-shared/...'` (G8) | 15 | 3 barrels: `components/index.ts` (7), `pipes/index.ts` (5), `directives/index.ts` (3) |
+
+Los 15 re-exports ya están silenciados con escape hatch `/* eslint-disable layer-enforcement/imports-error -- Razón: shim temporal de migración @shared → @intranet-shared */` desde Plan 11 F5.2 — deuda visible con TODO(F5.3) para eliminarlos cuando los consumidores migren al alias final.
+
+**Verificación**: `npx eslint src/app/shared` → 0 errores.
+
+**Resultado**: F3.4 ✅. G8 queda delegado a F5.3 (eliminar re-exports tras migrar consumidores a `@intranet-shared`).
 
 ---
 

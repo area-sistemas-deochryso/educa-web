@@ -315,6 +315,11 @@ const LAYER_RULES = [
 				message:
 					'Components no deben importar stores directamente — consumir vía facade. El facade expone el vm/signals del store.',
 			},
+			{
+				sourcePattern: /-api\.service(\.ts)?$/,
+				message:
+					'Components no deben importar *-api.service.ts directamente — consumir vía facade. G1 del inventario F3.1.',
+			},
 		],
 	},
 	{

@@ -10,7 +10,7 @@
 
 | # | Plan | Repo | Ruta | Estado | % |
 |---|------|------|------|--------|---|
-| 1 | Enforcement de Reglas | FE | [tasks/enforcement-reglas.md](../tasks/enforcement-reglas.md) | F1-F2 ✅ · F3.1-F3.3 ✅ · F3.5 Lotes A+B+C ✅ · F3.5.E ✅ · F3.4, F3.5.D, F3.6, F4, F5 ⏳ | ~45% |
+| 1 | Enforcement de Reglas | FE | [tasks/enforcement-reglas.md](../tasks/enforcement-reglas.md) | F1-F2 ✅ · F3.1-F3.4 ✅ · F3.5 Lotes A+B+C ✅ · F3.5.D.1 ✅ · F3.5.E ✅ · F3.5.D.2-3, F3.6, F4, F5 ⏳ | ~52% |
 | 2 | Arquitectura Backend — Opciones A/B/C | BE | [Educa.API/.claude/plan/arquitectura-backend-opciones.md](../../../Educa.API/.claude/plan/arquitectura-backend-opciones.md) | A ✅ · B 🔄 (5/8) · C ⏳ | ~33% |
 | 3 | Domain Layer (Opción A) | BE | [Educa.API/.claude/plan/domain-layer.md](../../../Educa.API/.claude/plan/domain-layer.md) | Fases 1-3,5-6 ✅ · F4 🔒 (bloqueada por Matrícula) | ~85% |
 | 4 | Consolidación Backend | FE | [plan/consolidacion-backend.md](consolidacion-backend.md) | ⏳ | 0% |
@@ -24,6 +24,25 @@
 
 **Resumen por capa**: Capa 1 ~55% · Capa 2 ~35% · Capa 3 0% · Capa 4 0% · Capa 5 0%
 **Total consolidado**: **~25-30%** del plan maestro terminado.
+
+---
+
+## Bloqueos activos (qué desbloquea qué)
+
+> Lectura rápida para elegir próximo chat. Complementa al diagrama de dependencias.
+
+| Si cierro… | Desbloqueo… | Por qué |
+|------------|-------------|---------|
+| Plan 1 F3.5.D (G1: 8 components → api.service) | Cierre formal de Capa 1 | Último lote de violaciones destapadas por fix G10 |
+| Plan 1 F3.6 (update plan base + maestro de F3) | Cierre formal de Capa 1 | Requisito procedural del maestro |
+| Plan 1 F4 parcial (INV-C01..C08, INV-U01..U06) | Tests de invariantes no dependientes de state machines BE | Calculables en FE sin cambios BE |
+| Plan 2/B (3 state machines faltantes) | Plan 1 F4.4 (INV-T01..T06) + Plan 4 F6 | Transiciones no se pueden testear sin la máquina integrada |
+| Plan 3 F4 (Matrícula) | Plan 1 F4.5 (INV-M01..M04) + Plan 2/B Matrícula | Feature bloqueado esperando diseño admin UI |
+| Plan 6 F5 (Backfill Asignación) | Plan 4 F6 (Audit HorarioAsignacionService) | Audit requiere validadores en su lugar |
+| Plan 6 F4 (DTOs con modoAsignacion) | Plan 5 F4 (computed FE) | Frontend lee el campo del DTO |
+| Capas 1-4 cerradas | Plan 10 (Flujos Alternos) | Requisito explícito: "proyecto limpio" |
+
+**Próximo tramo ejecutable (3-5 chats)**: F3.5.D → F3.6 → F4.1-F4.3 (tests INV-C/U no bloqueados) → Plan 11 F5.3 opcional → arranque Plan 2/B.
 
 ---
 
@@ -74,7 +93,7 @@ Orden acordado en **Plan 2**:
 
 **Plan 6 antes que Consolidación BE Fase 6 y FE Fase 6** (ver coordinaciones en los headers de cada plan).
 
-**Plan 7 es independiente** — se puede ejecutar en paralelo con cualquier capa una vez que F1 (enforcement) deje el middleware estable.
+**Plan 7 es paralelizable con matices** — toca `GlobalExceptionMiddleware`, crea tabla `ErrorLog` y expone endpoint admin + UI. No modifica contratos de otros endpoints ni altera state machines. Paralelizable con Capas 2-3 **siempre que**: (a) no colisione con cambios en `GlobalExceptionMiddleware` que pueda introducir Plan 4, y (b) la tabla `ErrorLog` no comparta storage con `CommandAuditLog` (Plan 2 Batch). Si cualquiera de esas condiciones cambia, coordinar secuencia.
 
 ---
 
@@ -153,7 +172,7 @@ Ver [plan/eslint-config-refactor.md](eslint-config-refactor.md).
   - [x] F3.1 Inventariar reglas `no-restricted-imports` actuales vs faltantes (doc corto en el plan base) — ver [enforcement-reglas.md § Fase 1.5](../tasks/enforcement-reglas.md)
   - [x] F3.2 Regla: components no importan `HttpClient` ni `*.store.ts` (ya parcial) — cerrar gaps detectados en F3.1 — G2 (document.cookie), G3 (WAL internals), G4 (Cache internals) cerrados. G1 movido a F3.5.
   - [x] F3.3 Cerrada (2026-04-14) — G9 efectivo; G5/G6 efectivos tras fix G10 (Plan 11); destapa 22 violaciones que pasan a F3.5.
-  - [ ] F3.4 Regla: `shared/` no importa `features/*` ni `@intranet-shared` — auditar violaciones y listarlas. Nota: `layer-enforcement/shared-no-features` ya bloquea `ImportDeclaration`; auditar también `export * from` (no detectado por el plugin).
+  - [x] F3.4 Auditoría cerrada (2026-04-15): 0 imports desde `@features/*`, 0 imports desde `@intranet-shared`, 15 re-exports `export * from '@intranet-shared/...'` en 3 barrels (components/pipes/directives) ya silenciados por Plan 11 F5 con escape hatch TODO(F5.3). `npx eslint src/app/shared` limpio. G8 queda delegado a F5.3 (eliminar re-exports tras migrar consumidores).
   - [ ] **F3.5 — Corregir violaciones destapadas + G1 + G5/G6** (lotes chat-sized)
     - [x] F3.5.A Lote A — Components importando stores (12 archivos) — **cerrado 2026-04-15**
       - [x] F3.5.A.1 Type-only imports + provider pattern (7 archivos, 2026-04-15): `ProfesorSalonConEstudiantes` movido a `profesor/models/profesor.models.ts` (usado por 3 components: salon-estudiantes-dialog, profesor-salones, profesor-foro). `ModuloVistas`, `VideoconferenciaItem`, `NotaSimulada`, `Attachment` extraídos a archivos `*.models.ts` hermanos del store (4 components: permisos-detail-drawer, videoconferencias, simulador-notas, attachments-modal). `attachments-modal.component.ts` retiene `AttachmentsModalStore` como provider scoped con escape hatch justificado (patrón ephemeral). `services/index.ts` del módulo profesor re-exporta `ProfesorSalonConEstudiantes` desde `../models` en vez de desde el store.
@@ -163,12 +182,15 @@ Ver [plan/eslint-config-refactor.md](eslint-config-refactor.md).
       - [x] F3.5.B.1 `wal-status.store.ts`: extraída subscripción + IO a nuevo `WalStatusFacade`. Store quedó como estado puro (signals + setters). Consumidores migrados: `WalFacadeHelper` y `SyncStatusComponent` inyectan el facade. Escapes huérfanos de `no-restricted-imports` eliminados (no se legitimaron como `layer-enforcement/imports-error`).
       - [x] F3.5.B.2 `campus-navigation.store.ts`: `PathfindingService` renombrado a `PathfindingHelper` (archivo `pathfinding.helper.ts`). Era pure utility (A* + geometría, sin IO) — la clasificación correcta es Utility/Helper, no Gateway/IO. Imports actualizados en facade, store, spec e index.
     - [x] F3.5.C Lote C — Cross-feature admin↔estudiante (2026-04-15): escape hatches justificados en 4 archivos (7 imports). Migración física a `@intranet-shared` diferida como tarea estructural separada (~15 archivos — fuera de budget chat-sized). Ver plan base para detalle por archivo y nota de seguimiento.
-    - [ ] F3.5.D Lote D — G1 heredado (8 components importando `*-api.service` directo, de F3.2). Fix: migrar a facade por módulo.
+    - [ ] **F3.5.D Lote D — G1 heredado (components importando `*-api.service` directo)**
+      - [x] F3.5.D.1 Cross-role widgets (2 archivos, 2026-04-15): `profesor-attendance-widget` y `attendance-summary-widget` migrados a `AttendanceService` (facade existente en `@shared/services/attendance/`). Regla `layer-enforcement/imports-error` extendida con pattern `-api\.service(\.ts)?$` en `component-no-http-no-store`. Las 6 violaciones restantes (estudiante: 4, profesor: 2) ahora son bloqueantes en lint.
+      - [ ] F3.5.D.2 Módulo estudiante (4 archivos: foro, attendance, schedules, mensajeria — consumen `EstudianteApiService`). Fix: crear/extender facade por sub-feature.
+      - [ ] F3.5.D.3 Módulo profesor (2 archivos: schedules, grades — consumen `ProfesorApiService`). Fix: extender `ProfesorFacade` o dividir en sub-facades.
     - [x] F3.5.E Verificar `npx eslint .` con 0 errores de `layer-enforcement/imports-error` (2026-04-15, cumplido al cerrar F3.5.C).
   - [ ] F3.6 Actualizar plan base + maestro
 
 - [ ] **F4 — Tests de invariantes**
-  - [ ] F4.1 Catalogar INV-* testeable vs no testeable (tabla en plan base)
+  - [ ] F4.1 Catalogar INV-* testeable vs no testeable (tabla en plan base). **Dependencia explícita**: INV-C01..C08 e INV-U01..U06 son testeables hoy (cálculo puro, unicidad). INV-T01..T06 requieren Plan 2/B cerrado (state machines integradas). INV-M01..M04 requieren Plan 3 F4 (Matrícula) cerrado.
   - [ ] F4.2 Suite de tests para INV-C01..C08 (asistencia, cálculo)
   - [ ] F4.3 Suite de tests para INV-U01..U06 (unicidad/horarios)
   - [ ] F4.4 Suite de tests para INV-T01..T06 (transiciones de estado)
