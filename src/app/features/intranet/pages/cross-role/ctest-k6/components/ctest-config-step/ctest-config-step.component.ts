@@ -7,7 +7,6 @@ import { InputNumberModule } from 'primeng/inputnumber';
 import { SelectModule } from 'primeng/select';
 import { TooltipModule } from 'primeng/tooltip';
 
-import { CTestK6Store } from '../../services/ctest-k6.store';
 import { CTestK6Facade } from '../../services/ctest-k6.facade';
 import { TEST_TYPE_OPTIONS, BASE_URL_OPTIONS } from '../../models';
 import { TestType } from '../../models';
@@ -29,7 +28,6 @@ import { TestType } from '../../models';
 })
 export class CTestConfigStepComponent {
 	// #region Dependencias
-	private readonly store = inject(CTestK6Store);
 	private readonly facade = inject(CTestK6Facade);
 	// #endregion
 
@@ -49,11 +47,11 @@ export class CTestConfigStepComponent {
 
 	// #region Event handlers
 	onTestNameChange(value: string): void {
-		this.store.updateConfigField('testName', value);
+		this.facade.updateConfigField('testName', value);
 	}
 
 	onBaseUrlChange(value: string): void {
-		this.store.setBaseUrl(value);
+		this.facade.setBaseUrl(value);
 	}
 
 	onTestTypeChange(value: TestType): void {
@@ -61,21 +59,21 @@ export class CTestConfigStepComponent {
 	}
 
 	onVusChange(value: number): void {
-		this.store.updateConfigField('vus', value ?? 1);
+		this.facade.updateConfigField('vus', value ?? 1);
 	}
 
 	onDurationChange(value: string): void {
-		this.store.updateConfigField('duration', value);
+		this.facade.updateConfigField('duration', value);
 	}
 
 	onP95Change(value: number): void {
 		const current = this.vm().config.thresholds;
-		this.store.updateConfigField('thresholds', { ...current, p95Latency: value ?? 2000 });
+		this.facade.updateConfigField('thresholds', { ...current, p95Latency: value ?? 2000 });
 	}
 
 	onErrorRateChange(value: number): void {
 		const current = this.vm().config.thresholds;
-		this.store.updateConfigField('thresholds', { ...current, errorRate: value ?? 1 });
+		this.facade.updateConfigField('thresholds', { ...current, errorRate: value ?? 1 });
 	}
 
 	onOpenCredentials(): void {

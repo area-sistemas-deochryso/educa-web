@@ -259,10 +259,10 @@ fuera de scope de F3.5.
 
 El plan de ataque de F3.5 es por lotes:
 
-1. **Lote A — G2 extendido (components importando stores)**: 12 archivos. El fix canónico
-   es crear/usar facade que exponga lo que el component necesita (vm + comandos). Varios
-   casos podrían ser simplemente cambiar el import del store al facade si el facade ya
-   existe. Chat-sized por páginas relacionadas (ctest-k6 completo va en un chat).
+1. **Lote A — G2 extendido (components importando stores)**: ✅ **cerrado 2026-04-15**. 12 archivos migrados en 3 sub-lotes:
+   - A.1 (7 archivos): tipos extraídos a `*.models.ts` hermanos del store (permisos-detail-drawer, videoconferencias, simulador-notas, attachments-modal) o a carpeta `models/` compartida (profesor-salones/foro/salon-estudiantes-dialog). `attachments-modal` retiene store como provider scoped con escape hatch justificado.
+   - A.2 (4 archivos): `CTestK6Facade` extendido con 14 pass-through methods; ctest-k6.component + 3 steps migrados.
+   - A.3 (1 archivo): `CalificacionesFacade.setContenidoWithSalon()` expuesto como método compuesto; profesor-calificaciones migrado.
 2. **Lote B — Stores → services (G6)**: 3 casos, auditar si el service debe inyectarse
    en el facade + el store recibe el resultado vía setter. Chat chico.
 3. **Lote C — Cross-feature admin↔estudiante (`admin/health-permissions`, `estudiante/cursos`)**:

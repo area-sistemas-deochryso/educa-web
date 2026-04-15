@@ -8,7 +8,6 @@ import { InputNumberModule } from 'primeng/inputnumber';
 import { CheckboxModule } from 'primeng/checkbox';
 import { TooltipModule } from 'primeng/tooltip';
 
-import { CTestK6Store } from '../../services/ctest-k6.store';
 import { CTestK6Facade } from '../../services/ctest-k6.facade';
 
 @Component({
@@ -31,7 +30,6 @@ import { CTestK6Facade } from '../../services/ctest-k6.facade';
 })
 export class CTestStagesStepComponent {
 	// #region Dependencias
-	private readonly store = inject(CTestK6Store);
 	private readonly facade = inject(CTestK6Facade);
 	// #endregion
 
@@ -51,28 +49,28 @@ export class CTestStagesStepComponent {
 
 	// #region Event handlers
 	onUseStagesChange(value: boolean): void {
-		this.store.updateConfigField('useStages', value);
+		this.facade.updateConfigField('useStages', value);
 	}
 
 	onAddStage(): void {
-		this.store.addStage();
+		this.facade.addStage();
 	}
 
 	onRemoveStage(index: number): void {
-		this.store.removeStage(index);
+		this.facade.removeStage(index);
 	}
 
 	onStageDurationChange(index: number, value: string): void {
-		this.store.updateStage(index, 'duration', value);
+		this.facade.updateStage(index, 'duration', value);
 	}
 
 	onStageTargetChange(index: number, value: number): void {
-		this.store.updateStage(index, 'target', value ?? 0);
+		this.facade.updateStage(index, 'target', value ?? 0);
 	}
 
 	onDropStage(event: CdkDragDrop<unknown>): void {
 		if (event.previousIndex !== event.currentIndex) {
-			this.store.reorderStages(event.previousIndex, event.currentIndex);
+			this.facade.reorderStages(event.previousIndex, event.currentIndex);
 		}
 	}
 
@@ -89,7 +87,7 @@ export class CTestStagesStepComponent {
 		} else {
 			indices = indices.filter((i) => i !== endpointIndex);
 		}
-		this.store.updateStageEndpoints(stageIndex, indices);
+		this.facade.updateStageEndpoints(stageIndex, indices);
 	}
 
 	onGoNext(): void {

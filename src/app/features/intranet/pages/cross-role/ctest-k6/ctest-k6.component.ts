@@ -10,7 +10,6 @@ import { StepPanels } from 'primeng/stepper';
 import { StepPanel } from 'primeng/stepper';
 
 import { CTestK6Facade } from './services/ctest-k6.facade';
-import { CTestK6Store } from './services/ctest-k6.store';
 import { CredentialsDialogComponent } from './components/credentials-dialog/credentials-dialog.component';
 import { ScriptOutputComponent } from './components/script-output/script-output.component';
 import { LoadProfileComponent } from './components/load-profile/load-profile.component';
@@ -44,7 +43,6 @@ import { CTestEndpointsStepComponent } from './components/ctest-endpoints-step/c
 export class CTestK6Component {
 	// #region Dependencias
 	private readonly facade = inject(CTestK6Facade);
-	private readonly store = inject(CTestK6Store);
 	// #endregion
 
 	// #region Estado del facade
@@ -73,7 +71,7 @@ export class CTestK6Component {
 	}
 
 	onRemoveCredential(usuario: string): void {
-		this.store.removeCredential(usuario);
+		this.facade.removeCredential(usuario);
 	}
 
 	onImportBulkCredentials(text: string): void {
@@ -85,7 +83,7 @@ export class CTestK6Component {
 	}
 
 	onUpdateRoleVUs(event: { rol: string; vus: number }): void {
-		this.store.updateRoleVUs(event.rol, event.vus);
+		this.facade.updateRoleVUs(event.rol, event.vus);
 	}
 
 	onApplyPresetDistribution(): void {

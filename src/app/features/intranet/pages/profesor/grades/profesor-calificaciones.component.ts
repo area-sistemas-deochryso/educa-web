@@ -19,19 +19,16 @@ import { logger, withRetry } from '@core/helpers';
 import { PageHeaderComponent } from '@shared/components';
 import { ProfesorFacade } from '../services/profesor.facade';
 import { ProfesorApiService } from '../services/profesor-api.service';
-import { CursoContenidoStore } from '../cursos/services/curso-contenido.store';
 import { CalificacionesFacade } from '../cursos/services/calificaciones.facade';
 import { CalificacionesPanelComponent } from '../cursos/components/calificaciones-panel/calificaciones-panel.component';
 import { CalificarDialogComponent } from '../cursos/components/calificar-dialog/calificar-dialog.component';
 import { EvaluacionFormDialogComponent } from '../cursos/components/evaluacion-form-dialog/evaluacion-form-dialog.component';
 import { PeriodosConfigDialogComponent } from '../cursos/components/periodos-config-dialog/periodos-config-dialog.component';
 import {
-	CalificacionDto,
 	CalificacionConNotasDto,
 	CrearCalificacionDto,
 	CalificarLoteDto,
 	CalificarGruposLoteDto,
-	CrearPeriodoDto,
 	CambiarTipoCalificacionDto,
 	CursoContenidoDetalleDto,
 } from '../models';
@@ -150,7 +147,6 @@ export class TeacherGradesComponent implements OnInit, OnDestroy {
 	// #region Dependencias
 	private readonly facade = inject(ProfesorFacade);
 	private readonly api = inject(ProfesorApiService);
-	private readonly contenidoStore = inject(CursoContenidoStore);
 	readonly calFacade = inject(CalificacionesFacade);
 	private readonly confirmationService = inject(ConfirmationService);
 	private readonly destroyRef = inject(DestroyRef);
@@ -231,10 +227,9 @@ export class TeacherGradesComponent implements OnInit, OnDestroy {
 						return;
 					}
 					this._contenido.set(contenido);
-					// Resolver salonId del horario y almacenarlo en el store del feature
+					// Resolver salonId del horario y almacenarlo vía facade (necesario para roster)
 					const horario = this.facade.vm().horarios.find((h) => h.id === horarioId);
-					this.contenidoStore.setContenido(contenido);
-					this.contenidoStore.setSalonId(horario?.salonId ?? null);
+					this.calFacade.setContenidoWithSalon(contenido, horario?.salonId ?? null);
 					this.calFacade.loadCalificaciones(contenido.id);
 					this._contenidoLoading.set(false);
 				},

@@ -16,6 +16,7 @@ import {
 	CalificacionDto,
 	CalificarGruposLoteDto,
 	CambiarTipoCalificacionDto,
+	CursoContenidoDetalleDto,
 } from '../../models';
 
 @Injectable({ providedIn: 'root' })
@@ -40,6 +41,8 @@ export class CalificacionesFacade {
 	// #endregion
 
 	// #region Comandos de carga
+
+	setContenidoWithSalon(contenido: CursoContenidoDetalleDto, salonId: number | null): void { this.contenidoStore.setContenido(contenido); this.contenidoStore.setSalonId(salonId); }
 
 	loadCalificaciones(contenidoId: number): void {
 		this.store.setLoading(true);

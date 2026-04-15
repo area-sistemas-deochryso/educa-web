@@ -9,7 +9,6 @@ import { CheckboxModule } from 'primeng/checkbox';
 import { TooltipModule } from 'primeng/tooltip';
 import { TextareaModule } from 'primeng/textarea';
 
-import { CTestK6Store } from '../../services/ctest-k6.store';
 import { CTestK6Facade } from '../../services/ctest-k6.facade';
 import { HTTP_METHOD_OPTIONS, HttpMethod, K6Endpoint } from '../../models';
 
@@ -34,7 +33,6 @@ import { HTTP_METHOD_OPTIONS, HttpMethod, K6Endpoint } from '../../models';
 })
 export class CTestEndpointsStepComponent {
 	// #region Dependencias
-	private readonly store = inject(CTestK6Store);
 	private readonly facade = inject(CTestK6Facade);
 	// #endregion
 
@@ -61,36 +59,36 @@ export class CTestEndpointsStepComponent {
 	}
 
 	onRemoveEndpoint(index: number): void {
-		this.store.removeEndpoint(index);
+		this.facade.removeEndpoint(index);
 	}
 
 	onToggleEndpoint(index: number): void {
-		this.store.toggleEndpoint(index);
+		this.facade.toggleEndpoint(index);
 	}
 
 	onEndpointMethodChange(index: number, method: HttpMethod): void {
-		this.store.updateEndpoint(index, 'method', method);
+		this.facade.updateEndpoint(index, 'method', method);
 	}
 
 	onEndpointPathChange(index: number, path: string): void {
-		this.store.updateEndpoint(index, 'path', path);
+		this.facade.updateEndpoint(index, 'path', path);
 	}
 
 	onEndpointNameChange(index: number, name: string): void {
-		this.store.updateEndpoint(index, 'name', name);
+		this.facade.updateEndpoint(index, 'name', name);
 	}
 
 	onEndpointBodyChange(index: number, body: string): void {
-		this.store.updateEndpoint(index, 'body', body);
+		this.facade.updateEndpoint(index, 'body', body);
 	}
 
 	onToggleAllEndpoints(enabled: boolean): void {
-		this.store.toggleAllEndpoints(enabled);
+		this.facade.toggleAllEndpoints(enabled);
 	}
 
 	onDropEndpoint(event: CdkDragDrop<unknown>): void {
 		if (event.previousIndex !== event.currentIndex) {
-			this.store.reorderEndpoints(event.previousIndex, event.currentIndex);
+			this.facade.reorderEndpoints(event.previousIndex, event.currentIndex);
 		}
 	}
 

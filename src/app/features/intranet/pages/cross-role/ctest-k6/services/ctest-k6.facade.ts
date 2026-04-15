@@ -7,6 +7,9 @@ import { logger, extractErrorMessage } from '@core/helpers';
 import { CTestK6Store } from './ctest-k6.store';
 import {
 	K6Credential,
+	K6TestConfig,
+	K6Endpoint,
+	K6Stage,
 	PRESET_ENDPOINTS,
 	EDUCA_REAL_DISTRIBUTION,
 	LOGIN_ROLE_OPTIONS,
@@ -63,6 +66,62 @@ export class CTestK6Facade {
 
 	addCustomEndpoint(): void {
 		this.store.addEndpoint();
+	}
+
+	updateConfigField<K extends keyof K6TestConfig>(field: K, value: K6TestConfig[K]): void {
+		this.store.updateConfigField(field, value);
+	}
+
+	setBaseUrl(url: string): void {
+		this.store.setBaseUrl(url);
+	}
+
+	removeEndpoint(index: number): void {
+		this.store.removeEndpoint(index);
+	}
+
+	toggleEndpoint(index: number): void {
+		this.store.toggleEndpoint(index);
+	}
+
+	updateEndpoint(index: number, field: keyof K6Endpoint, value: unknown): void {
+		this.store.updateEndpoint(index, field, value);
+	}
+
+	toggleAllEndpoints(enabled: boolean): void {
+		this.store.toggleAllEndpoints(enabled);
+	}
+
+	reorderEndpoints(fromIndex: number, toIndex: number): void {
+		this.store.reorderEndpoints(fromIndex, toIndex);
+	}
+
+	addStage(): void {
+		this.store.addStage();
+	}
+
+	removeStage(index: number): void {
+		this.store.removeStage(index);
+	}
+
+	updateStage(index: number, field: keyof K6Stage, value: string | number): void {
+		this.store.updateStage(index, field, value);
+	}
+
+	reorderStages(fromIndex: number, toIndex: number): void {
+		this.store.reorderStages(fromIndex, toIndex);
+	}
+
+	updateStageEndpoints(stageIndex: number, endpointIndices: number[]): void {
+		this.store.updateStageEndpoints(stageIndex, endpointIndices);
+	}
+
+	removeCredential(usuario: string): void {
+		this.store.removeCredential(usuario);
+	}
+
+	updateRoleVUs(rol: string, vus: number): void {
+		this.store.updateRoleVUs(rol, vus);
 	}
 	// #endregion
 
