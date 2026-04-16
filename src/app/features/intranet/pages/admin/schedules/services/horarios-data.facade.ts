@@ -12,6 +12,7 @@ import { CursosApiService } from './cursos-api.service';
 import { SchedulesApiService } from './horarios-api.service';
 import { SchedulesStore } from './horarios.store';
 import type { DiaSemana, HorarioVistaType } from '../models/horario.interface';
+import { ProfesorCursoApiService } from './profesor-curso-api.service';
 import { ProfesoresApiService } from './profesores-api.service';
 import { ClassroomsApiService } from './salones-api.service';
 
@@ -25,6 +26,7 @@ export class SchedulesDataFacade {
   private salonesApi = inject(ClassroomsApiService);
   private cursosApi = inject(CursosApiService);
   private profesoresApi = inject(ProfesoresApiService);
+  private profesorCursoApi = inject(ProfesorCursoApiService);
   private store = inject(SchedulesStore);
   private swService = inject(SwService);
   private errorHandler = inject(ErrorHandlerService);
@@ -165,6 +167,24 @@ export class SchedulesDataFacade {
   loadPage(page: number, pageSize: number): void {
     this.store.filterStore.setPaginationData(page, pageSize, this.store.filterStore.totalRecords());
     this.refreshHorariosOnly();
+  }
+
+  /**
+   * Carga los profesores asignados a un curso (modo PorCurso).
+   * Se llama cuando se selecciona un curso en un salón con GRA_Orden >= 8.
+   */
+  loadProfesoresCurso(cursoId: number, anio: number): void {
+    this.profesorCursoApi
+      .listarPorCurso(cursoId, anio)
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe({
+        next: (profesoresCurso) => this.store.setProfesoresCurso(profesoresCurso),
+        error: () => this.store.clearProfesoresCurso(),
+      });
+  }
+
+  clearProfesoresCurso(): void {
+    this.store.clearProfesoresCurso();
   }
 
   // #endregion

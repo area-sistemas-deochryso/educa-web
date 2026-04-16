@@ -8,6 +8,7 @@ import { DrawerModule } from 'primeng/drawer';
 import { SelectModule } from 'primeng/select';
 import { TagModule } from 'primeng/tag';
 import { TooltipModule } from 'primeng/tooltip';
+import type { ModoAsignacion } from '@data/models';
 import type { HorarioDetalleResponseDto, EstudianteHorarioDto } from '../../models/horario.interface';
 import { EstadoLabelPipe, EstadoSeverityPipe, EstadoToggleIconPipe, EstadoToggleLabelPipe } from '@shared/pipes';
 import type { ProfesorOption } from '../../models/profesor.interface';
@@ -41,6 +42,7 @@ export class ScheduleDetailDrawerComponent {
 	readonly detalle = input<HorarioDetalleResponseDto | null>(null);
 	readonly loading = input<boolean>(false);
 	readonly profesoresOptions = input<ProfesorOption[]>([]);
+	readonly modoAsignacion = input<ModoAsignacion | null>(null);
 	readonly isAdmin = input<boolean>(true);
 
 	// #endregion
@@ -65,6 +67,29 @@ export class ScheduleDetailDrawerComponent {
 	readonly hasEstudiantes = computed(() => {
 		const detalle = this.detalle();
 		return detalle ? detalle.estudiantes.length > 0 : false;
+	});
+
+	readonly modoLabel = computed(() => {
+		const modo = this.modoAsignacion();
+		if (modo === 'TutorPleno') return 'Tutor pleno';
+		if (modo === 'PorCurso') return 'Por curso';
+		if (modo === 'Flexible') return 'Flexible';
+		return null;
+	});
+
+	readonly modoSeverity = computed<'info' | 'warn' | 'secondary'>(() => {
+		const modo = this.modoAsignacion();
+		if (modo === 'TutorPleno') return 'info';
+		if (modo === 'PorCurso') return 'warn';
+		return 'secondary';
+	});
+
+	readonly modoTooltip = computed(() => {
+		const modo = this.modoAsignacion();
+		if (modo === 'TutorPleno') return 'En salones hasta 4to de Primaria, el tutor dicta todos los cursos';
+		if (modo === 'PorCurso') return 'En salones desde 5to de Primaria, cada curso tiene un profesor asignado';
+		if (modo === 'Flexible') return 'Sección vacacional: sin restricciones de asignación';
+		return '';
 	});
 
 	// #endregion

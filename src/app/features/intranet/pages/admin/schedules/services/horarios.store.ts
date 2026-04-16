@@ -1,6 +1,7 @@
 import { computed, inject, Injectable, signal } from '@angular/core';
 
 import { AuthStore } from '@core/store';
+import { type ProfesorCursoListaDto } from '@data/models';
 import { isAdminRole } from '@shared/models';
 import { CursoListaDto } from '../models/curso.interface';
 import { type ImportarHorariosResult } from '../helpers/horario-import.config';
@@ -85,6 +86,15 @@ export class SchedulesStore {
 	readonly profesoresOptions = this.optionsStore.profesoresOptions;
 	// #endregion
 
+	// #region Computed - Modo de asignación
+	/** Modo de asignación del salón del horario en el detail drawer. */
+	readonly modoAsignacionDetalle = computed(() => {
+		const detalle = this._horarioDetalle();
+		if (!detalle) return null;
+		return this.optionsStore.resolveModoForSalon(detalle.salonId);
+	});
+	// #endregion
+
 	// #region Computed - Estadísticas derivadas
 	readonly totalHorarios = computed(() => this._horarios().length);
 	readonly horariosActivos = computed(() => this._horarios().filter((h) => h.estado).length);
@@ -128,6 +138,7 @@ export class SchedulesStore {
 		importDialogVisible: this._importDialogVisible(),
 		importLoading: this._importLoading(),
 		importResult: this._importResult(),
+		modoAsignacionDetalle: this.modoAsignacionDetalle(),
 	}));
 
 	readonly formVm = computed(() => ({
@@ -149,6 +160,8 @@ export class SchedulesStore {
 		cursosOptions: this.optionsStore.cursosOptions(),
 		cursosPorNivel: this.optionsStore.cursosPorNivel(),
 		profesoresOptions: this.optionsStore.profesoresOptions(),
+		modoAsignacion: this.optionsStore.modoAsignacion(),
+		profesoresParaAsignacion: this.optionsStore.profesoresParaAsignacion(),
 		filtroSalonId: this.filterStore.filtroSalonId(),
 		filtroProfesorId: this.filterStore.filtroProfesorId(),
 		filtroDiaSemana: this.filterStore.filtroDiaSemana(),
@@ -191,6 +204,14 @@ export class SchedulesStore {
 
 	setOptionsLoading(loading: boolean): void {
 		this.optionsStore.setOptionsLoading(loading);
+	}
+
+	setProfesoresCurso(profesoresCurso: ProfesorCursoListaDto[]): void {
+		this.optionsStore.setProfesoresCurso(profesoresCurso);
+	}
+
+	clearProfesoresCurso(): void {
+		this.optionsStore.clearProfesoresCurso();
 	}
 
 	/** Mutación quirúrgica: Actualizar un horario específico sin refetch */

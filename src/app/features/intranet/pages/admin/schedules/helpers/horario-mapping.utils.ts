@@ -10,9 +10,11 @@ export function mapSalonToOption(salon: SalonListDto): SalonOption {
 		value: salon.salonId,
 		label: salon.nombreSalon,
 		grado: salon.grado,
+		gradoOrden: salon.gradoOrden,
 		seccion: salon.seccion,
 		sede: salon.sede,
 		totalEstudiantes: salon.totalEstudiantes,
+		tutorNombre: salon.tutorNombre,
 	};
 }
 

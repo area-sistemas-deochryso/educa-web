@@ -18,6 +18,7 @@
 				Grado <p-sortIcon field="grado" />
 			</th>
 			<th style="width: 80px">Sección</th>
+			<th style="width: 110px" class="text-center">Modo</th>
 			<th style="min-width: 100px">Sede</th>
 			<th style="min-width: 180px">Tutor</th>
 			<th style="width: 80px" class="text-center">Estudiantes</th>
@@ -33,6 +34,12 @@
 			<td>{{ rowIndex + 1 }}</td>
 			<td>{{ salon.grado }}</td>
 			<td>{{ salon.seccion }}</td>
+			<td class="text-center">
+				<p-tag
+					[value]="getModoLabel(getModoAsignacion(salon))"
+					[severity]="getModoSeverity(getModoAsignacion(salon))"
+				/>
+			</td>
 			<td>{{ salon.sede }}</td>
 			<td>{{ salon.tutorNombre || '—' }}</td>
 			<td class="text-center">
@@ -84,7 +91,7 @@
 	</ng-template>
 	<ng-template #emptymessage>
 		<tr>
-			<td colspan="11" class="text-center p-4">
+			<td colspan="12" class="text-center p-4">
 				No hay salones para este nivel y año.
 			</td>
 		</tr>

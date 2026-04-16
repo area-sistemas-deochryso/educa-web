@@ -1,5 +1,8 @@
 import { UserProfileService } from '@core/services';
 import { SalonListDto } from '@features/intranet/pages/admin/schedules/models/salon.interface';
+import { CursoListaDto } from '@features/intranet/pages/admin/schedules/models/curso.interface';
+import { type ProfesorCursoListaDto } from '@data/models';
+import { resolveModoAsignacion } from '@data/models';
 import {
 	ActualizarUsuarioRequest,
 	CrearUsuarioRequest,
@@ -29,9 +32,11 @@ import { DialogModule } from 'primeng/dialog';
 import { FormFieldErrorComponent } from '@shared/components';
 import { FormsModule } from '@angular/forms';
 import { InputTextModule } from 'primeng/inputtext';
+import { MultiSelectModule } from 'primeng/multiselect';
 import { PasswordModule } from 'primeng/password';
 import { SelectModule } from 'primeng/select';
 import { TableModule } from 'primeng/table';
+import { TagModule } from 'primeng/tag';
 import { ToggleSwitch } from 'primeng/toggleswitch';
 import { UppercaseInputDirective } from '@shared/directives';
 import { EstadoLabelPipe } from '@shared/pipes';
@@ -59,7 +64,9 @@ export interface FormValidationErrors {
 		DialogModule,
 		ButtonModule,
 		InputTextModule,
+		MultiSelectModule,
 		SelectModule,
+		TagModule,
 		ToggleSwitch,
 		PasswordModule,
 		DatePickerModule,
@@ -86,11 +93,16 @@ export class UserFormDialogComponent {
 	readonly isFormValid = input.required<boolean>();
 	readonly loading = input<boolean>(false);
 	readonly salones = input<SalonListDto[]>([]);
+	readonly profesorCursos = input<ProfesorCursoListaDto[]>([]);
+	readonly cursosDisponibles = input<CursoListaDto[]>([]);
+	readonly profesorCursosLoading = input<boolean>(false);
 
 	readonly visibleChange = output<boolean>();
 	readonly fieldChange = output<{ field: string; value: unknown }>();
 	readonly save = output<void>();
 	readonly cancelDialog = output<void>();
+	readonly asignarCursos = output<number[]>();
+	readonly desasignarCurso = output<number>();
 	// #endregion
 
 	// #region Estado local
@@ -208,6 +220,47 @@ export class UserFormDialogComponent {
 	});
 	// #endregion
 
+	// #region Computed — ProfesorCurso (sección "Cursos que dicta")
+
+	/** Visible solo si el profesor tiene salones en modo PorCurso (GRA_Orden ≥ 8). */
+	readonly showCursosSection = computed(() => {
+		if (!this.isProfesor() || !this.isEditing()) return false;
+		const asignaciones = this.formData().salones ?? [];
+		const allSalones = this.salones();
+		return asignaciones.some((a) => {
+			const salon = allSalones.find((s) => s.salonId === a.salonId);
+			return salon && resolveModoAsignacion(salon.gradoOrden, salon.seccion) === 'PorCurso';
+		});
+	});
+
+	/** IDs de grados PorCurso del profesor (para filtrar cursos disponibles). */
+	private readonly gradosPorCurso = computed(() => {
+		const asignaciones = this.formData().salones ?? [];
+		const allSalones = this.salones();
+		const gradoIds = new Set<number>();
+		for (const a of asignaciones) {
+			const salon = allSalones.find((s) => s.salonId === a.salonId);
+			if (salon && resolveModoAsignacion(salon.gradoOrden, salon.seccion) === 'PorCurso') {
+				gradoIds.add(salon.gradoId);
+			}
+		}
+		return gradoIds;
+	});
+
+	/** Cursos disponibles filtrados por los grados PorCurso del profesor, excluyendo ya asignados. */
+	readonly cursosOptions = computed(() => {
+		const gradoIds = this.gradosPorCurso();
+		const asignados = new Set(this.profesorCursos().map((c) => c.cursoId));
+		return this.cursosDisponibles()
+			.filter((c) => c.estado && c.grados.some((g) => gradoIds.has(g.id)))
+			.filter((c) => !asignados.has(c.id))
+			.map((c) => ({ label: c.nombre, value: c.id }));
+	});
+
+	// Cursos seleccionados en el multi-select para agregar
+	readonly _cursosSeleccionados = signal<number[]>([]);
+	// #endregion
+
 	// #region Event handlers
 	onVisibleChange(visible: boolean): void {
 		this.visibleChange.emit(visible);
@@ -301,6 +354,18 @@ export class UserFormDialogComponent {
 			this._seccionSeleccionada.set(formData.seccion ?? null);
 		}
 	});
+
+	// ProfesorCurso handlers
+	onAgregarCursos(): void {
+		const ids = this._cursosSeleccionados();
+		if (ids.length === 0) return;
+		this.asignarCursos.emit(ids);
+		this._cursosSeleccionados.set([]);
+	}
+
+	onDesasignarCurso(profesorCursoId: number): void {
+		this.desasignarCurso.emit(profesorCursoId);
+	}
 
 	onSave(): void {
 		this.save.emit();

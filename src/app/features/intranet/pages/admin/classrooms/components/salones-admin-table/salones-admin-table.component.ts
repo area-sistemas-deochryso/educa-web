@@ -6,6 +6,7 @@ import { ButtonModule } from 'primeng/button';
 import { TagModule } from 'primeng/tag';
 import { TooltipModule } from 'primeng/tooltip';
 
+import { type ModoAsignacion, resolveModoAsignacion } from '@data/models';
 import { SalonAdminListDto, PeriodoCierreEstado } from '../../models';
 
 @Component({
@@ -49,6 +50,22 @@ export class ClassroomsAdminTableComponent {
 			default:
 				return estado;
 		}
+	}
+
+	getModoAsignacion(salon: SalonAdminListDto): ModoAsignacion {
+		return resolveModoAsignacion(salon.gradoOrden, salon.seccion);
+	}
+
+	getModoLabel(modo: ModoAsignacion): string {
+		if (modo === 'TutorPleno') return 'Tutor pleno';
+		if (modo === 'PorCurso') return 'Por curso';
+		return 'Flexible';
+	}
+
+	getModoSeverity(modo: ModoAsignacion): 'info' | 'warn' | 'secondary' {
+		if (modo === 'TutorPleno') return 'info';
+		if (modo === 'PorCurso') return 'warn';
+		return 'secondary';
 	}
 	// #endregion
 }

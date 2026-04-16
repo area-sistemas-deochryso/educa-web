@@ -69,6 +69,62 @@
 			}
 		}
 
+		// Sección de cursos del profesor (modo PorCurso)
+		.cursos-profesor-section {
+			.cursos-loading {
+				display: flex;
+				align-items: center;
+				gap: 0.5rem;
+				padding: 0.75rem;
+				color: var(--text-color-secondary);
+				font-size: 0.9rem;
+			}
+
+			.no-cursos {
+				display: flex;
+				align-items: center;
+				gap: 0.375rem;
+				padding: 0.5rem 0;
+			}
+
+			.cursos-list {
+				display: flex;
+				flex-direction: column;
+				gap: 0.375rem;
+				margin-bottom: 1rem;
+
+				.curso-row {
+					display: flex;
+					align-items: center;
+					justify-content: space-between;
+					padding: 0.5rem 0.75rem;
+					background: var(--surface-100);
+					border-radius: 8px;
+					border: 1px solid var(--surface-300);
+					min-height: 2.5rem;
+
+					.curso-nombre {
+						font-weight: 500;
+						font-size: 0.9rem;
+						color: var(--text-color);
+						flex: 1;
+						min-width: 0;
+						overflow: hidden;
+						text-overflow: ellipsis;
+						white-space: nowrap;
+					}
+				}
+			}
+
+			.agregar-cursos-row {
+				display: grid;
+				grid-template-columns: 1fr auto;
+				align-items: start;
+				gap: 0.5rem;
+				margin-bottom: 0.25rem;
+			}
+		}
+
 		// Sección de salones del profesor
 		.salon-profesor-section {
 			.salones-list {

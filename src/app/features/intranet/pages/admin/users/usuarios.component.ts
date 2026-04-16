@@ -163,6 +163,17 @@ export class UsersComponent implements AfterViewInit {
 	onFormFieldChange(event: { field: string; value: unknown }): void {
 		this.uiFacade.updateFormField(event.field, event.value);
 	}
+
+	onAsignarCursos(cursoIds: number[]): void {
+		const usuario = this.vm().selectedUsuario;
+		if (usuario) {
+			this.uiFacade.asignarCursos(usuario.id, cursoIds);
+		}
+	}
+
+	onDesasignarCurso(profesorCursoId: number): void {
+		this.uiFacade.desasignarCurso(profesorCursoId);
+	}
 	// #endregion
 
 	// #region CRUD handlers

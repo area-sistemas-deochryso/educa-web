@@ -7,4 +7,5 @@ export * from './mensajeria.models';
 export * from './notification.models';
 export * from './notificaciones-admin.models';
 export * from './classroom.models';
+export * from './profesor-curso.models';
 export * from './user.models';

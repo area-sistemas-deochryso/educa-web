@@ -24,8 +24,10 @@ export interface SalonOption {
   value: number; // salonId
   label: string; // "3° A - Sede Principal"
   grado: string;
+  gradoOrden: number;
   seccion: string;
   sede: string;
   totalEstudiantes: number;
+  tutorNombre: string | null;
 }
 // #endregion

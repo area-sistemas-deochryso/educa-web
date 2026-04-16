@@ -13,6 +13,22 @@ export type PeriodoCierreEstado = (typeof PERIODO_CIERRE_ESTADOS)[number];
 
 export const TIPOS_CALIFICACION = ['NUMERICO', 'LITERAL'] as const;
 export type TipoCalificacion = (typeof TIPOS_CALIFICACION)[number];
+
+/** Modo de asignación profesor-salón según GRA_Orden del grado. */
+export const MODOS_ASIGNACION = ['TutorPleno', 'PorCurso', 'Flexible'] as const;
+export type ModoAsignacion = (typeof MODOS_ASIGNACION)[number];
+
+/** Umbral inclusivo: GRA_Orden ≤ 7 → TutorPleno, ≥ 8 → PorCurso, sección V → Flexible. */
+export const UMBRAL_TUTOR_PLENO = 7;
+
+/**
+ * Resuelve el modo de asignación profesor-salón-curso.
+ * Replica la lógica de `ModoAsignacionResolver.cs` del backend.
+ */
+export function resolveModoAsignacion(gradoOrden: number, seccion: string | null): ModoAsignacion {
+  if (seccion?.trim().toUpperCase() === 'V') return 'Flexible';
+  return gradoOrden <= UMBRAL_TUTOR_PLENO ? 'TutorPleno' : 'PorCurso';
+}
 // #endregion
 
 // #region Salón Admin

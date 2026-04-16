@@ -307,6 +307,79 @@
 					</small>
 				</div>
 			}
+			<!-- CURSOS QUE DICTA — Solo visible si profesor tiene salones PorCurso -->
+			@if (showCursosSection()) {
+				<div class="field full-width cursos-profesor-section">
+					<label>Cursos que dicta</label>
+					<!-- Lista de cursos asignados -->
+					@if (profesorCursosLoading()) {
+						<div class="cursos-loading">
+							<i class="pi pi-spinner pi-spin"></i>
+							<span>Cargando cursos...</span>
+						</div>
+					} @else {
+						@if (profesorCursos().length > 0) {
+							<div class="cursos-list">
+								@for (curso of profesorCursos(); track curso.id) {
+									<div class="curso-row">
+										<span class="curso-nombre">{{ curso.cursoNombre }}</span>
+										<button
+											pButton
+											icon="pi pi-times"
+											class="p-button-rounded p-button-text p-button-danger p-button-sm"
+											(click)="onDesasignarCurso(curso.id)"
+											[pt]="{
+												root: {
+													'aria-label': 'Quitar curso ' + curso.cursoNombre,
+												},
+											}"
+										></button>
+									</div>
+								}
+							</div>
+						} @else {
+							<small class="text-muted no-cursos">
+								<i class="pi pi-info-circle"></i>
+								No tiene cursos asignados
+							</small>
+						}
+						<!-- Selector para agregar cursos -->
+						@if (cursosOptions().length > 0) {
+							<div class="agregar-cursos-row">
+								<p-multiselect
+									[options]="cursosOptions()"
+									[ngModel]="_cursosSeleccionados()"
+									(ngModelChange)="_cursosSeleccionados.set($event)"
+									placeholder="Seleccionar cursos..."
+									[style]="{ width: '100%' }"
+									appendTo="body"
+									[showClear]="true"
+									[filter]="true"
+									filterPlaceholder="Buscar curso..."
+								/>
+								<button
+									pButton
+									icon="pi pi-plus"
+									class="p-button-outlined p-button-sm"
+									label="Asignar"
+									(click)="onAgregarCursos()"
+									[disabled]="_cursosSeleccionados().length === 0"
+									[pt]="{
+										root: {
+											'aria-label': 'Asignar cursos seleccionados',
+										},
+									}"
+								></button>
+							</div>
+						}
+						<small class="text-muted">
+							<i class="pi pi-info-circle" style="margin-right: 0.25rem"></i>
+							Cursos para salones en modo "Por Curso" (5° Primaria en adelante).
+							Los cambios se guardan inmediatamente.
+						</small>
+					}
+				</div>
+			}
 			<!-- ESTADO -->
 			@if (isEditing()) {
 				<div class="field full-width">

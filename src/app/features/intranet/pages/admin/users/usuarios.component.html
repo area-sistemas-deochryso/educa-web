@@ -94,10 +94,15 @@
 	[isFormValid]="vm().isFormValid"
 	[loading]="vm().loading"
 	[salones]="vm().salones"
+	[profesorCursos]="vm().profesorCursos"
+	[cursosDisponibles]="vm().cursosDisponibles"
+	[profesorCursosLoading]="vm().profesorCursosLoading"
 	(visibleChange)="onDialogVisibleChange($event)"
 	(fieldChange)="onFormFieldChange($event)"
 	(save)="onSaveUsuario()"
 	(cancelDialog)="onCancelDialog()"
+	(asignarCursos)="onAsignarCursos($event)"
+	(desasignarCurso)="onDesasignarCurso($event)"
 />
 
 <!-- * Confirmation dialog host -->

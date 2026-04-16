@@ -6,7 +6,9 @@ import { TabsModule } from 'primeng/tabs';
 import { ButtonModule } from 'primeng/button';
 
 import { EstudianteAsistencia } from '@shared/services/attendance';
-import { HorarioResponseDto, SalonNotasResumenDto } from '@data/models';
+import { HorarioResponseDto, SalonNotasResumenDto, resolveModoAsignacion } from '@data/models';
+import { TagModule } from 'primeng/tag';
+import { TooltipModule } from 'primeng/tooltip';
 
 import {
 	SalonAdminListDto,
@@ -26,6 +28,8 @@ import { ClassroomGradesTabComponent } from '../salon-notas-tab/salon-notas-tab.
 		DialogModule,
 		TabsModule,
 		ButtonModule,
+		TagModule,
+		TooltipModule,
 		ClassroomApprovalTabComponent,
 		ClassroomAttendanceTabComponent,
 		ClassroomGradesTabComponent,
@@ -76,6 +80,35 @@ export class ClassroomDetailDialogComponent {
 	readonly salonDescripcion = computed(() => {
 		const s = this.salon();
 		return s ? `${s.grado} ${s.seccion} — ${s.sede}` : 'Salón';
+	});
+
+	readonly modoAsignacion = computed(() => {
+		const s = this.salon();
+		if (!s) return null;
+		return resolveModoAsignacion(s.gradoOrden, s.seccion);
+	});
+
+	readonly modoLabel = computed(() => {
+		const modo = this.modoAsignacion();
+		if (modo === 'TutorPleno') return 'Tutor pleno';
+		if (modo === 'PorCurso') return 'Por curso';
+		if (modo === 'Flexible') return 'Flexible';
+		return null;
+	});
+
+	readonly modoSeverity = computed<'info' | 'warn' | 'secondary'>(() => {
+		const modo = this.modoAsignacion();
+		if (modo === 'TutorPleno') return 'info';
+		if (modo === 'PorCurso') return 'warn';
+		return 'secondary';
+	});
+
+	readonly modoTooltip = computed(() => {
+		const modo = this.modoAsignacion();
+		if (modo === 'TutorPleno') return 'El tutor dicta todos los cursos';
+		if (modo === 'PorCurso') return 'Cada curso tiene un profesor asignado';
+		if (modo === 'Flexible') return 'Sección vacacional: sin restricciones';
+		return '';
 	});
 
 	readonly dialogStyle = computed(() =>

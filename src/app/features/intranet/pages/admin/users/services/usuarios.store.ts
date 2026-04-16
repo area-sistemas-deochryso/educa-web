@@ -1,9 +1,11 @@
 import { Injectable, computed, inject, signal } from '@angular/core';
 
 import { SalonListDto } from '@features/intranet/pages/admin/schedules/models/salon.interface';
+import { CursoListaDto } from '@features/intranet/pages/admin/schedules/models/curso.interface';
 import { APP_USER_ROLES } from '@shared/constants';
 import { DebugService } from '@core/helpers';
 import { BaseCrudStore } from '@core/store/base/base-crud.store';
+import { type ProfesorCursoListaDto } from '@data/models';
 import {
 	ActualizarUsuarioRequest,
 	CrearUsuarioRequest,
@@ -78,6 +80,11 @@ export class UsersStore extends BaseCrudStore<UsuarioLista, UsuarioFormData, Usu
 	private readonly _filterRol = signal<RolUsuarioAdmin | null>(null);
 	private readonly _filterSalonId = signal<number | null>(null);
 	private readonly _refreshCounter = signal(0);
+
+	// ProfesorCurso — cursos asignados al profesor en edición
+	private readonly _profesorCursos = signal<ProfesorCursoListaDto[]>([]);
+	private readonly _cursosDisponibles = signal<CursoListaDto[]>([]);
+	private readonly _profesorCursosLoading = signal(false);
 	// #endregion
 
 	// #region Lecturas públicas — Feature-specific
@@ -94,6 +101,9 @@ export class UsersStore extends BaseCrudStore<UsuarioLista, UsuarioFormData, Usu
 	readonly filterRol = this._filterRol.asReadonly();
 	readonly filterSalonId = this._filterSalonId.asReadonly();
 	readonly refreshCounter = this._refreshCounter.asReadonly();
+	readonly profesorCursos = this._profesorCursos.asReadonly();
+	readonly cursosDisponibles = this._cursosDisponibles.asReadonly();
+	readonly profesorCursosLoading = this._profesorCursosLoading.asReadonly();
 	// #endregion
 
 	// #region Computed — Validaciones
@@ -158,6 +168,9 @@ export class UsersStore extends BaseCrudStore<UsuarioLista, UsuarioFormData, Usu
 		isFormValid: this.isFormValid(),
 		isEstudiante: this.isEstudiante(),
 		isProfesor: this.isProfesor(),
+		profesorCursos: this._profesorCursos(),
+		cursosDisponibles: this._cursosDisponibles(),
+		profesorCursosLoading: this._profesorCursosLoading(),
 		dniError: this.dniError(),
 		correoError: this.correoError(),
 		correoApoderadoError: this.correoApoderadoError(),
@@ -205,6 +218,24 @@ export class UsersStore extends BaseCrudStore<UsuarioLista, UsuarioFormData, Usu
 
 	triggerRefresh(): void {
 		this._refreshCounter.update((c) => c + 1);
+	}
+
+	setProfesorCursos(cursos: ProfesorCursoListaDto[]): void {
+		this._profesorCursos.set(cursos);
+	}
+
+	setCursosDisponibles(cursos: CursoListaDto[]): void {
+		this._cursosDisponibles.set(cursos);
+	}
+
+	setProfesorCursosLoading(loading: boolean): void {
+		this._profesorCursosLoading.set(loading);
+	}
+
+	clearProfesorCursos(): void {
+		this._profesorCursos.set([]);
+		this._cursosDisponibles.set([]);
+		this._profesorCursosLoading.set(false);
 	}
 	// #endregion
 
@@ -255,6 +286,7 @@ export class UsersStore extends BaseCrudStore<UsuarioLista, UsuarioFormData, Usu
 	openNewDialog(): void {
 		this._selectedUsuario.set(null);
 		this.resetFormData();
+		this.clearProfesorCursos();
 		this.setIsEditing(false);
 		this.openDialog();
 	}

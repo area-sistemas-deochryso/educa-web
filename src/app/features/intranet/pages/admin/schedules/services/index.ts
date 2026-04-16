@@ -5,5 +5,6 @@ export { SchedulesCrudFacade } from './horarios-crud.facade';
 export { SchedulesDataFacade } from './horarios-data.facade';
 export { SchedulesStore } from './horarios.store';
 export { SchedulesUiFacade } from './horarios-ui.facade';
+export { ProfesorCursoApiService } from './profesor-curso-api.service';
 export { ProfesoresApiService } from './profesores-api.service';
 export { ClassroomsApiService } from './salones-api.service';

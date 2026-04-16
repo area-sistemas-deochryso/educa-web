@@ -9,6 +9,15 @@
 	<ng-template #header>
 		<div class="dialog-header">
 			<span class="font-semibold text-lg">{{ salonDescripcion() }}</span>
+			@if (modoLabel()) {
+				<p-tag
+					[value]="modoLabel()!"
+					[severity]="modoSeverity()"
+					[pTooltip]="modoTooltip()"
+					tooltipPosition="top"
+					class="ml-2"
+				/>
+			}
 			<button
 				class="fullscreen-btn"
 				type="button"

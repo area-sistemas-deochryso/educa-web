@@ -15,7 +15,7 @@
 | 3 | Domain Layer (Opción A) | BE | [Educa.API/.claude/plan/domain-layer.md](../../../Educa.API/.claude/plan/domain-layer.md) | Fases 1-3,5-6 ✅ · F4 🔒 (bloqueada por Matrícula) | ~85% |
 | 4 | Consolidación Backend | FE | [plan/consolidacion-backend.md](consolidacion-backend.md) | ⏳ | 0% |
 | 5 | Consolidación Frontend | FE | [plan/consolidacion-frontend.md](consolidacion-frontend.md) | ⏳ | 0% |
-| 6 | Asignación Profesor-Salón-Curso | BE | [Educa.API/.claude/plan/asignacion-profesor-salon-curso.md](../../../Educa.API/.claude/plan/asignacion-profesor-salon-curso.md) | F0 ✅ · F1-6 ⏳ | ~10% |
+| 6 | Asignación Profesor-Salón-Curso | BE+FE | [Educa.API/.claude/plan/asignacion-profesor-salon-curso.md](../../../Educa.API/.claude/plan/asignacion-profesor-salon-curso.md) | F0-F3 ✅ · F4 🔄 (F4.1-F4.4 ✅) · F5-6 ⏳ | ~65% |
 | 7 | Error Trace Backend | BE | [Educa.API/.claude/plan/error-trace-backend.md](../../../Educa.API/.claude/plan/error-trace-backend.md) | ⏳ | 0% |
 | 8 | Design Patterns Backend | FE | [tasks/design-patterns-backend.md](../tasks/design-patterns-backend.md) | Incremental | N/A |
 | 9 | Design Patterns Frontend | FE | [tasks/design-patterns-frontend.md](../tasks/design-patterns-frontend.md) | Incremental | N/A |
@@ -35,7 +35,7 @@
 |------------|-------------|---------|
 | ~~QW3 (specs rotos)~~ | ~~CI verde → F4.6 efectivo~~ | ✅ Cerrado 2026-04-16 |
 | Plan 6 F1 (BD ProfesorCurso) | Plan 6 F2+F3 (Domain + Services) | Tabla nueva necesaria para todo lo demás |
-| Plan 6 F3 (BE services) | Plan 6 F4 (Frontend) | UI consume endpoints nuevos |
+| ~~Plan 6 F3 (BE services)~~ | ~~Plan 6 F4 (Frontend)~~ | ✅ Cerrado 2026-04-16 |
 | Plan 2/B (3 state machines) | Plan 1 F4.4 (INV-T*) + integración Plan 6 en HorarioStateMachine | Transiciones formales, no bloqueante para Plan 6 core |
 | Plan 3 F4 (Matrícula) | Plan 1 F4.5 (INV-M*) | Feature independiente, no bloquea asignación |
 | Capas 1-4 cerradas | Plan 10 (Flujos Alternos) | Requisito explícito: "proyecto limpio" |
@@ -43,10 +43,10 @@
 **Próximo tramo ejecutable — FEATURES FIRST**:
 
 1. ~~**QW3**~~ ✅ (2026-04-16) — CI verde, 0 fallos.
-2. **Plan 6 F1** — BD: crear tabla `ProfesorCurso` + migración desde Horario existente. 1 chat (BE). **← PRÓXIMO**
-3. **Plan 6 F2** — Domain validators: `ModoAsignacionResolver`, `TutorPlenoValidator`, `ProfesorCursoValidator`. 1 chat (BE).
-4. **Plan 6 F3** — BE Services: `ProfesorCursoService` + integración en `HorarioService`. 1-2 chats (BE).
-5. **Plan 6 F4** — Frontend: UI horarios ramificada por modo + badge salones + sección "Cursos que dicta" en usuarios. 2-3 chats (FE).
+2. ~~**Plan 6 F1**~~ ✅ (2026-04-16) — BD: tabla `ProfesorCurso` + migración + modelo EF.
+3. ~~**Plan 6 F2**~~ ✅ (2026-04-16) — Domain validators: 4 archivos + 42 tests. Build OK.
+4. ~~**Plan 6 F3**~~ ✅ (2026-04-16) — BE Services: 7 archivos nuevos + 9 modificados. 741 tests OK.
+5. **Plan 6 F4** — Frontend (🔄 F4.1-F4.4 ✅, F4.5 pendiente). Badge de modo en drawer + tabla salones. Siguiente: sección "Cursos que dicta" en usuarios. **← PRÓXIMO**
 
 **En paralelo (deuda técnica, cuando haya bandwidth)**:
 - Plan 1 F5.3 (re-exports cleanup, 48 archivos)
@@ -165,35 +165,35 @@ CARRIL C — DIFERIDO
 
 #### Plan 6 — Asignación Profesor-Salón-Curso (tutor pleno vs por curso)
 
-- [ ] **F1 — BD** (1 chat, repo BE)
-  - [ ] F1.0 **SELECT primero**: inspeccionar estructura real de `Profesor`, `Salon`, `Grado`, `Horario`, `ProfesorSalon`, `CursoGrado` en Azure SQL. El usuario ejecuta los queries y comparte resultados antes de diseñar el script.
-  - [ ] F1.1 Crear tabla `ProfesorCurso` (script SQL) — **decisión ya tomada** en plan base (Opción C)
-  - [ ] F1.2 Migración: poblar desde `Horario` existente (`GRA_Orden ≥ 8`)
-  - [ ] F1.3 Modelo EF + `DbSet` en `ApplicationDbContext`
-  - [ ] F1.4 Actualizar plan base + maestro
+- [x] **F1 — BD** (1 chat, repo BE) ✅ (2026-04-16)
+  - [x] F1.0 SELECT primero: inspeccionada estructura real de 6 tablas en prueba y producción
+  - [x] F1.1 CREATE TABLE ProfesorCurso + 3 índices (único filtrado + 2 de consulta) — ejecutado en ambas BDs
+  - [x] F1.2 Migración desde Horario: prueba 3 filas, producción 0 filas (sin horarios activos GRA_Orden ≥ 8)
+  - [x] F1.3 Modelo EF (`ProfesorCurso.cs`) + `ProfesorCursoConfiguration.cs` + DbSet + nav properties en Profesor/Curso. Build OK.
+  - [x] F1.4 Plan base y maestro actualizados
 
-- [ ] **F2 — Domain validators** (1 chat, repo BE)
-  - [ ] F2.1 `ModoAsignacionResolver` — función pura: `(gradoOrden, seccion) → TutorPleno | PorCurso | Flexible`
-  - [ ] F2.2 `TutorPlenoValidator` (INV-AS01) — profesor del horario == tutor del salón
-  - [ ] F2.3 `ProfesorCursoValidator` (INV-AS02) — profesor tiene entrada activa en `ProfesorCurso`
-  - [ ] F2.4 Tests unitarios (~30 casos)
-  - [ ] F2.5 Actualizar plan base + maestro
+- [x] **F2 — Domain validators** (1 chat, repo BE) ✅ (2026-04-16)
+  - [x] F2.1 `ModoAsignacionResolver` — función pura con umbral 7, sección V flexible
+  - [x] F2.2 `TutorPlenoValidator` (INV-AS01) — Validar + Ensure con BusinessRuleException
+  - [x] F2.3 `ProfesorCursoValidator` (INV-AS02) — Validar + Ensure con BusinessRuleException
+  - [x] F2.4 Tests unitarios — 42 tests pasando (3 archivos)
+  - [x] F2.5 Plan base + maestro actualizados
 
-- [ ] **F3 — Backend Services** (1-2 chats, repo BE)
-  - [ ] F3.1 `ProfesorCursoService` + `ProfesorCursoRepository` + DTOs (CRUD estándar)
-  - [ ] F3.2 `ProfesorCursoController` — endpoints: listar, asignar batch, desasignar
-  - [ ] F3.3 Integrar validators en `HorarioService.CrearAsync/ActualizarAsync`
-  - [ ] F3.4 Regla desactivación tutor mid-año en `ProfesorService`
-  - [ ] F3.5 Regla eliminar salón tutor pleno con horarios activos en `SalonesService`
-  - [ ] F3.6 Tests de integración
-  - [ ] F3.7 Actualizar plan base + maestro
+- [x] **F3 — Backend Services** (1 chat, repo BE) ✅ (2026-04-16)
+  - [x] F3.1 `ProfesorCursoService` + `ProfesorCursoRepository` + DTOs (CRUD estándar)
+  - [x] F3.2 `ProfesorCursoController` — 4 endpoints (GET profesor, GET curso, POST asignar, DELETE)
+  - [x] F3.3 Integrar validators en `HorarioAsignacionService.AsignarProfesorAsync` + `HorarioService.UpdateAsync`
+  - [x] F3.4 Regla desactivación tutor mid-año en `ProfesorStrategy.CambiarEstadoAsync`
+  - [x] F3.5 Regla eliminar salón tutor pleno con horarios activos en `SalonesService.EliminarAsync`
+  - [x] F3.6 DI registration + build OK + 741 tests OK
+  - [x] F3.7 Plan base + maestro actualizados
 
-- [ ] **F4 — Frontend: horarios + salones** (2-3 chats, repo FE)
-  - [ ] F4.1 Tipos: `ModoAsignacion` en `@data/models/salon.models.ts`, `ProfesorCurso` DTOs en `@data/models/`
-  - [ ] F4.2 `modoAsignacion` computed en `SchedulesOptionsStore` + `profesoresDisponibles` filtrado por modo
-  - [ ] F4.3 Form dialog: readonly "Tutor" en tutor pleno, select filtrado en por curso
-  - [ ] F4.4 Badge de modo en tabla de salones admin + `SalonDetailDialog`
-  - [ ] F4.5 Sección "Cursos que dicta" en edición de profesor (`/admin/usuarios`)
+- [ ] **F4 — Frontend: horarios + salones** (2-3 chats, repo FE) 🔄
+  - [x] F4.1 Tipos: `ModoAsignacion` + `resolveModoAsignacion()` en `@data/models/classroom.models.ts`, `ProfesorCursoListaDto` en `profesor-curso.models.ts` ✅ (2026-04-16)
+  - [x] F4.2 `modoAsignacion` computed en `SchedulesOptionsStore` + `profesoresParaAsignacion` filtrado por modo + `ProfesorCursoApiService` ✅ (2026-04-16)
+  - [x] F4.3 Detail drawer: badge de modo + info contextual (tag Tutor/PorCurso/Flexible con tooltip) ✅ (2026-04-16)
+  - [x] F4.4 Badge de modo en tabla de salones admin + `SalonDetailDialog` header ✅ (2026-04-16)
+  - [ ] F4.5 Sección "Cursos que dicta" en edición de profesor (`/admin/usuarios`) ← PRÓXIMO CHAT
   - [ ] F4.6 Actualizar plan base + maestro
 
 - [ ] **F5 — Backfill y auditoría** (1 chat, repo BE)

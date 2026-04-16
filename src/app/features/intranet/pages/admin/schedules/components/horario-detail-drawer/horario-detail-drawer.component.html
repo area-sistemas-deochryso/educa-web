@@ -133,6 +133,20 @@
 							</div>
 						</div>
 					}
+
+					@if (modoLabel()) {
+						<div class="info-item full-width">
+							<label>Modo de asignación</label>
+							<div class="info-value">
+								<p-tag
+									[value]="modoLabel()!"
+									[severity]="modoSeverity()"
+									[pTooltip]="modoTooltip()"
+									tooltipPosition="top"
+								/>
+							</div>
+						</div>
+					}
 				</div>
 			</div>
 
@@ -143,6 +157,9 @@
 						<i class="pi pi-user"></i>
 						Profesor Asignado
 					</h3>
+					@if (modoAsignacion() === 'TutorPleno') {
+						<p-tag value="Tutor" severity="info" class="modo-tag" />
+					}
 					@if (isAdmin() && detalle()!.profesorId) {
 						<div class="section-actions">
 							<button
