@@ -299,36 +299,6 @@
 }
 // #endregion
 
-// #region Footer
-.panel-footer {
-	display: flex;
-	align-items: center;
-	gap: 0.75rem;
-	padding: 0.5rem 1rem;
-	border-top: 1px solid var(--surface-200, #e5e7eb);
-	flex-shrink: 0;
-}
-
-.panel-hint {
-	display: flex;
-	align-items: center;
-	gap: 0.25rem;
-	font-size: 0.65rem;
-	color: var(--text-color-secondary);
-
-	kbd {
-		font-family: inherit;
-		font-size: 0.6rem;
-		font-weight: 600;
-		background: var(--surface-100, #f3f4f6);
-		border: 1px solid var(--surface-300, #d1d5db);
-		border-radius: 3px;
-		padding: 0.0625rem 0.25rem;
-		min-width: 16px;
-		text-align: center;
-	}
-}
-// #endregion
 
 // #region Responsive
 @media screen and (max-width: 1300px) {

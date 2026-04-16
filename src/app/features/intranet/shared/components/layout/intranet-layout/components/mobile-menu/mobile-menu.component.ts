@@ -15,6 +15,7 @@ import {
 import { FormsModule } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
 import { ModuloId } from '@shared/constants/module-registry';
+import { QuickAccessFavoritesService } from '@intranet-shared/services';
 import { UserProfileMenuComponent } from '../user-profile-menu';
 // #endregion
 
@@ -34,8 +35,6 @@ export interface ModuloMenu {
 	icon: string;
 	items: NavMenuItem[];
 }
-
-type MobileViewMode = 'flat' | 'tree';
 
 interface MobileSearchResult {
 	label: string;
@@ -69,6 +68,7 @@ interface MobileTreeGroup {
 export class MobileMenuComponent {
 	private router = inject(Router);
 	private destroyRef = inject(DestroyRef);
+	readonly favorites = inject(QuickAccessFavoritesService);
 
 	readonly modulos = input.required<ModuloMenu[]>();
 	logoutClick = output<void>();
@@ -76,11 +76,10 @@ export class MobileMenuComponent {
 	// #region Estado local
 	readonly isOpen = signal(false);
 	readonly searchTerm = signal('');
-	readonly viewMode = signal<MobileViewMode>('tree');
 	readonly searchInputRef = viewChild<ElementRef<HTMLInputElement>>('mobileSearchInput');
 	// #endregion
 
-	// #region Computed — Flat index
+	// #region Computed
 	private readonly allResults = computed((): MobileSearchResult[] => {
 		const results: MobileSearchResult[] = [];
 
@@ -119,10 +118,10 @@ export class MobileMenuComponent {
 	});
 
 	readonly treeGroups = computed((): MobileTreeGroup[] => {
-		const results = this.filteredResults();
+		const all = this.allResults();
 		const moduloMap = new Map<ModuloId, { label: string; icon: string; sections: Map<string, MobileSearchResult[]> }>();
 
-		for (const r of results) {
+		for (const r of all) {
 			let entry = moduloMap.get(r.moduloId);
 			if (!entry) {
 				entry = { label: r.moduloLabel, icon: r.moduloIcon, sections: new Map() };
@@ -141,7 +140,12 @@ export class MobileMenuComponent {
 		}));
 	});
 
-	readonly resultCount = computed(() => this.filteredResults().length);
+	readonly favoriteResults = computed((): MobileSearchResult[] => {
+		const routes = this.favorites.favoriteRoutes();
+		const all = this.allResults();
+		return routes.map((r) => all.find((a) => a.route === r)).filter((r): r is MobileSearchResult => !!r);
+	});
+
 	readonly isSearching = computed(() => this.searchTerm().trim().length > 0);
 	// #endregion
 
@@ -166,10 +170,6 @@ export class MobileMenuComponent {
 		this.unlockBodyScroll();
 	}
 
-	toggleViewMode(): void {
-		this.viewMode.update((m) => (m === 'flat' ? 'tree' : 'flat'));
-	}
-
 	onSearchChange(value: string): void {
 		this.searchTerm.set(value);
 	}
@@ -182,6 +182,12 @@ export class MobileMenuComponent {
 	goHome(): void {
 		this.router.navigate(['/intranet']);
 		this.close();
+	}
+
+	onStarClick(event: Event, route: string): void {
+		event.preventDefault();
+		event.stopPropagation();
+		this.favorites.toggleFavorite(route);
 	}
 
 	onLogout(): void {

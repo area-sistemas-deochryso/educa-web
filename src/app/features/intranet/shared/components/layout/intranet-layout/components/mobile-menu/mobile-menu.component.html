@@ -40,21 +40,11 @@
 		</div>
 		<!-- #endregion -->
 
-		<!-- #region Toolbar -->
-		<div class="nav-toolbar">
-			<button type="button" class="view-toggle" (click)="toggleViewMode()">
-				<i class="pi" [class.pi-list]="viewMode() === 'flat'" [class.pi-sitemap]="viewMode() === 'tree'"></i>
-				<span>{{ viewMode() === 'flat' ? 'A-Z' : 'Módulos' }}</span>
-			</button>
-			<span class="results-count">{{ resultCount() }} páginas</span>
-		</div>
-		<!-- #endregion -->
-
-		<!-- #region Results -->
+		<!-- #region Content -->
 		<div class="nav-results">
-			@if (viewMode() === 'flat') {
-				<!-- Flat view -->
-				@for (result of filteredResults(); track result.route + result.label) {
+			@if (isSearching()) {
+				<!-- Search results (flat, ranked) -->
+				@for (result of filteredResults(); track result.route) {
 					<button type="button" class="nav-result-item" (click)="selectResult(result)">
 						<i [class]="result.icon" class="result-icon"></i>
 						<span class="result-label">{{ result.label }}</span>
@@ -67,41 +57,61 @@
 					</div>
 				}
 			} @else {
-				<!-- Tree view -->
+				<!-- Home -->
 				<button type="button" class="nav-result-item home-item" (click)="goHome()">
 					<i class="pi pi-home result-icon"></i>
 					<span class="result-label">Inicio</span>
 				</button>
 
+				<!-- Favorites -->
+				@if (favoriteResults().length > 0) {
+					<div class="section-header">
+						<i class="pi pi-star-fill section-star"></i>
+						<span>Accesos rápidos</span>
+					</div>
+					@for (fav of favoriteResults(); track fav.route) {
+						<button type="button" class="nav-result-item" (click)="selectResult(fav)">
+							<i [class]="fav.icon" class="result-icon"></i>
+							<span class="result-label">{{ fav.label }}</span>
+						</button>
+					}
+					<div class="section-divider"></div>
+				}
+
+				<!-- Module groups -->
 				@for (group of treeGroups(); track group.moduloLabel) {
-					<div class="tree-module">
-						<div class="tree-module-header">
-							<i [class]="group.moduloIcon"></i>
-							<span>{{ group.moduloLabel }}</span>
-						</div>
-						@for (section of group.sections; track section.label) {
-							@if (section.label !== '(General)') {
-								<div class="tree-section-header">{{ section.label }}</div>
-							}
-							@for (item of section.items; track item.route + item.label) {
-								<button type="button" class="nav-result-item tree-item" (click)="selectResult(item)">
-									<i [class]="item.icon" class="result-icon"></i>
-									<span class="result-label">{{ item.label }}</span>
-								</button>
-							}
+					<div class="section-header">
+						<i [class]="group.moduloIcon"></i>
+						<span>{{ group.moduloLabel }}</span>
+					</div>
+					@for (section of group.sections; track section.label) {
+						@if (section.label !== '(General)') {
+							<div class="group-label">{{ section.label }}</div>
 						}
-					</div>
-				} @empty {
-					<div class="nav-empty">
-						<i class="pi pi-search"></i>
-						<span>Sin resultados</span>
-					</div>
+						@for (item of section.items; track item.route) {
+							<button type="button" class="nav-result-item tree-item" (click)="selectResult(item)">
+								<i [class]="item.icon" class="result-icon"></i>
+								<span class="result-label">{{ item.label }}</span>
+								<button
+									type="button"
+									class="star-btn"
+									[class.starred]="favorites.isFavorite(item.route)"
+									[disabled]="!favorites.isFavorite(item.route) && !favorites.canAddMore()"
+									(click)="onStarClick($event, item.route)"
+									[attr.aria-label]="favorites.isFavorite(item.route) ? 'Quitar de accesos rápidos' : 'Agregar a accesos rápidos'"
+								>
+									<i [class]="favorites.isFavorite(item.route) ? 'pi pi-star-fill' : 'pi pi-star'"></i>
+								</button>
+							</button>
+						}
+					}
+					<div class="section-divider"></div>
 				}
 			}
 		</div>
 		<!-- #endregion -->
 
-		<!-- #region Footer -->
+		<!-- #region User profile -->
 		<div class="user-profile-section">
 			<app-user-profile-menu popoverclass="profile-popover-mobile" (logoutClick)="onLogout()" />
 		</div>
