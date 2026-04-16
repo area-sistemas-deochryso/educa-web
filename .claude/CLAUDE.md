@@ -56,6 +56,10 @@ Aplicacion Angular 21 para gestion educativa con portal publico e intranet priva
 @.claude/rules/capacitor.md
 @.claude/rules/menu-modules.md
 
+## Metodología operativa
+
+@.claude/rules/chat-modes.md
+
 ## Comunicación con el usuario
 
 @.claude/rules/communication.md

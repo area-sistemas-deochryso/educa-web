@@ -10,32 +10,35 @@
 
 | # | Plan | Repo | Ruta | Estado | % |
 |---|------|------|------|--------|---|
-| 1 | Enforcement de Reglas | FE | [tasks/enforcement-reglas.md](../tasks/enforcement-reglas.md) | F1-F3 ✅ · F4 parcial ✅ (F4.4-F4.5 🔒) · F5 ⏳ | ~75% |
-| 2 | Arquitectura Backend — Opciones A/B/C | BE | [Educa.API/.claude/plan/arquitectura-backend-opciones.md](../../../Educa.API/.claude/plan/arquitectura-backend-opciones.md) | A ✅ · B 🔄 (5/8) · C ⏳ | ~33% |
-| 3 | Domain Layer (Opción A) | BE | [Educa.API/.claude/plan/domain-layer.md](../../../Educa.API/.claude/plan/domain-layer.md) | Fases 1-3,5-6 ✅ · F4 🔒 (bloqueada por Matrícula) | ~85% |
-| 4 | Consolidación Backend | FE | [plan/consolidacion-backend.md](consolidacion-backend.md) | ⏳ | 0% |
-| 5 | Consolidación Frontend | FE | [plan/consolidacion-frontend.md](consolidacion-frontend.md) | ⏳ | 0% |
-| 6 | Asignación Profesor-Salón-Curso | BE+FE | [Educa.API/.claude/plan/asignacion-profesor-salon-curso.md](../../../Educa.API/.claude/plan/asignacion-profesor-salon-curso.md) | ✅ F0-F6 cerrado | 100% |
-| 7 | Error Trace Backend | BE | [Educa.API/.claude/plan/error-trace-backend.md](../../../Educa.API/.claude/plan/error-trace-backend.md) | ⏳ | 0% |
-| 8 | Design Patterns Backend | FE | [tasks/design-patterns-backend.md](../tasks/design-patterns-backend.md) | Incremental | N/A |
-| 9 | Design Patterns Frontend | FE | [tasks/design-patterns-frontend.md](../tasks/design-patterns-frontend.md) | Incremental | N/A |
-| 10 | Flujos Alternos (resiliencia) | FE | [plan/flujos-alternos.md](flujos-alternos.md) | ⏳ (bloqueado) | 0% |
-| 11 | Refactor `eslint.config.js` (fix G10) | FE | [plan/eslint-config-refactor.md](eslint-config-refactor.md) | ✅ F1-F5 (F5.3 tests opcionales sin ejecutar) | ~95% |
-| 12 | Backend Test Gaps | BE | [plan/test-backend-gaps.md](test-backend-gaps.md) | ⏳ | 0% |
-| 13 | Frontend Test Gaps | FE | [plan/test-frontend-gaps.md](test-frontend-gaps.md) | ⏳ | 0% |
-| 14 | Contratos FE-BE | FE+BE | [plan/contratos-fe-be.md](contratos-fe-be.md) | ⏳ | 0% |
-| 15 | Release Protocol y Operaciones | FE+BE | [plan/release-operations.md](release-operations.md) | F1 ✅ · F2-F5 ⏳ | ~20% |
-| 16 | Auditoría de Seguridad | BE | [plan/security-audit.md](security-audit.md) | ⏳ | 0% |
+| 1 | Enforcement de Reglas | FE | `tasks/enforcement-reglas.md` (pendiente crear) | F1-F3 ✅ · F4 parcial ✅ (F4.4-F4.5 🔒) · F5 ⏳ | ~75% |
+| 2 | Arquitectura Backend — Opciones A/B/C | BE | `Educa.API/.claude/plan/arquitectura-backend-opciones.md` (pendiente crear) | A ✅ · B 🔄 (5/8) · C ⏳ | ~33% |
+| 3 | Domain Layer (Opción A) | BE | `Educa.API/.claude/plan/domain-layer.md` (pendiente crear) | Fases 1-3,5-6 ✅ · F4 🔒 (bloqueada por Matrícula) | ~85% |
+| 4 | Consolidación Backend | FE | `plan/consolidacion-backend.md` (pendiente crear) | ⏳ | 0% |
+| 5 | Consolidación Frontend | FE | `plan/consolidacion-frontend.md` (pendiente crear) | ⏳ | 0% |
+| 6 | Asignación Profesor-Salón-Curso | BE+FE | `Educa.API/.claude/plan/asignacion-profesor-salon-curso.md` (pendiente crear) | ✅ F0-F6 cerrado | 100% |
+| 7 | Error Trace Backend | BE | `Educa.API/.claude/plan/error-trace-backend.md` (pendiente crear) | ⏳ | 0% |
+| 8 | Design Patterns Backend | FE | `tasks/design-patterns-backend.md` (pendiente crear) | Incremental | N/A |
+| 9 | Design Patterns Frontend | FE | `tasks/design-patterns-frontend.md` (pendiente crear) | Incremental | N/A |
+| 10 | Flujos Alternos (resiliencia) | FE | `plan/flujos-alternos.md` (pendiente crear) | ⏳ (bloqueado) | 0% |
+| 11 | Refactor `eslint.config.js` (fix G10) | FE | `plan/eslint-config-refactor.md` (pendiente crear) | ✅ F1-F5 (F5.3 tests opcionales sin ejecutar) | ~95% |
+| 12 | Backend Test Gaps | BE | `plan/test-backend-gaps.md` (pendiente crear) | ⏳ | 0% |
+| 13 | Frontend Test Gaps | FE | `plan/test-frontend-gaps.md` (pendiente crear) | ⏳ | 0% |
+| 14 | Contratos FE-BE | FE+BE | `plan/contratos-fe-be.md` (pendiente crear) | ⏳ | 0% |
+| 15 | Release Protocol y Operaciones | FE+BE | `plan/release-operations.md` (pendiente crear) | F1 ✅ · F2-F5 ⏳ | ~20% |
+| 16 | Auditoría de Seguridad | BE | `plan/security-audit.md` (pendiente crear) | ⏳ | 0% |
+| 17 | Enforcement max-lines BE (CI) | BE | (inline en maestro) | ⏳ | 0% |
+| 18 | Tests de flujo de negocio E2E | BE+FE | (inline en maestro) | ⏳ | 0% |
+| 19 | Comunicación: foro + mensajería + push | FE+BE | (pendiente planificar) | ⏳ | 0% |
 
 **Semáforo de readiness**:
 
 | Dimensión | Estado | Gate mínimo |
 |---|---|---|
-| **Feature readiness** | 🟢 Listo | Carril A ✅ + QW4 ✅ + push |
-| **Production readiness** | 🟡 Parcial | Plan 15 F1 ✅ (DEPLOY.md) · Falta: health endpoint, smoke automatizado |
-| **Reliability readiness** | 🔴 Sin red | Falta: tests de contrato, auditoría endpoints, error trace, fallbacks P0 |
+| **Feature readiness** | 🟢 Listo | Carril A ✅ + QW4 ✅ — código listo para push |
+| **Deploy readiness** | 🟡 Parcial | Plan 15 F1 ✅ (DEPLOY.md + checklist + rollback) · Falta: health endpoint, smoke automatizado |
+| **Production reliability** | 🔴 Sin red | Falta: tests de contrato, auditoría endpoints, error trace, fallbacks P0 |
 
-**Foco: push a producción (QW4.6) → Carril D (confiabilidad) → Carril B (deuda)**.
+**Foco: commit + push → deploy con checklist (DEPLOY.md) → Carril D inmediato post-deploy → Carril B**.
 
 ---
 
@@ -48,6 +51,7 @@
 | ~~QW3 (specs rotos)~~ | ~~CI verde → F4.6 efectivo~~ | ✅ Cerrado 2026-04-16 |
 | ~~Plan 6 (completo)~~ | ~~Plan 4 (Consolidación BE) + Plan 5 (Consolidación FE)~~ | ✅ Cerrado 2026-04-16 |
 | Plan 2/B (3 state machines) | Plan 1 F4.4 (INV-T*) | Transiciones formales necesarias para tests de invariantes |
+| Plan 3 F3.5 (Diseño UI matrícula) | Plan 3 F4 (implementación matrícula) | Diseño desbloquea implementación |
 | Plan 3 F4 (Matrícula) | Plan 1 F4.5 (INV-M*) | Feature independiente |
 | Carril B sustancialmente cerrado | Plan 10 F1+ (Flujos Alternos completo) | Requisito explícito: "proyecto limpio" (P0 extraído a Carril D, desbloqueado) |
 
@@ -80,6 +84,8 @@
 7. **Plan 15 F2** — Health check endpoint (1 chat)
 8. **Plan 7 F1-F2** — Error Trace Backend: observabilidad mínima en producción (1-2 chats)
 9. **Plan 10 P0** — Fallbacks críticos: offline, auth failure, API down (1 chat)
+10. **Plan 17** — Enforcement max-lines .cs en CI (1 chat, BE)
+11. **Plan 18** — Tests de flujo de negocio E2E: asistencia, calificaciones, aprobación cross-layer (2-3 chats, tras Plan 12+13)
 
 **Carril B — Deuda técnica (cuando Carril D tenga base sólida)**:
 
@@ -93,7 +99,7 @@
 
 - Plan 1 F4.4 🔒 por Plan 2/B (state machines)
 - Plan 1 F4.5 🔒 por Plan 3 F4 (Matrícula)
-- Plan 3 F4 🔒 por diseño admin UI pendiente
+- Plan 3 F4 🔒 por Plan 3 F3.5 (diseño admin UI matrícula)
 - Plan 10 F1+ 🔒 hasta que Carril B cierre sustancialmente (P0 desbloqueado en Carril D)
 
 ---
@@ -118,6 +124,8 @@
 - **Plan 14** — Contratos FE-BE: snapshots de DTOs, endpoints, enums
 - **Plan 7** — Error Trace Backend: observabilidad de errores en producción (movido desde Carril B — tracing es confiabilidad, no deuda)
 - **Plan 10 P0** — Fallbacks críticos: offline, auth failure, API down (subset mínimo extraído de Plan 10)
+- **Plan 17** — Enforcement max-lines .cs en CI: script que falla el build si un .cs > 300 líneas (previene regresión post Plan 2/C)
+- **Plan 18** — Tests de flujo de negocio E2E: asistencia, calificación→aprobación, login→permisos (tras Plan 12+13)
 
 Estos se ejecutan inmediatamente después del push. Son la red de seguridad que el proyecto necesita antes de operar en producción con confianza.
 
@@ -135,7 +143,8 @@ Estos se ejecutan cuando el Carril D provea red de seguridad mínima (Plan 15 F1
 
 ### Carril C — Diferido (bloqueado o bajo prioridad)
 
-- **Plan 3 F4** — Matrícula (🔒 diseño admin UI pendiente)
+- **Plan 3 F4** — Matrícula (🔒 diseño admin UI pendiente → ver Plan 3 F3.5 abajo para desbloquear)
+- **Plan 19** — Comunicación: foro + mensajería + push (planificación pendiente)
 - **Plan 10** — Flujos Alternos (🔒 proyecto limpio)
 - **Planes 8-9** — Design Patterns (incrementales al tocar módulos)
 
@@ -158,6 +167,9 @@ CARRIL D — CONFIABILIDAD SISTÉMICA (foco actual, post-push)
    Plan 15 F2 (Health endpoint) ── sin bloqueos
    Plan 7 F1-F2 (Error Trace) ── sin bloqueos (observabilidad = confiabilidad)
    Plan 10 P0 (Fallbacks P0) ── sin bloqueos (subset mínimo: offline, auth, API down)
+   Plan 17 (Enforcement max-lines BE) ── sin bloqueos
+   Plan 18 F1-F2 (E2E flujos BE) ── tras Plan 12 F1 (necesita infra de tests)
+   Plan 18 F3 (E2E flujos FE) ── tras Plan 13 F1 (necesita infra de tests)
 
 CARRIL B — DEUDA TÉCNICA (cuando Carril D tenga base)
 
@@ -169,7 +181,9 @@ CARRIL B — DEUDA TÉCNICA (cuando Carril D tenga base)
 
 CARRIL C — DIFERIDO
 
-   Plan 3 F4 (Matrícula) 🔒 ── espera diseño admin UI
+   Plan 3 F3.5 (Diseño UI matrícula) ── sin bloqueos (modo /design, 1 chat)
+   Plan 3 F4 (Matrícula) 🔒 ── espera Plan 3 F3.5
+   Plan 19 (Comunicación: foro+mensajería+push) ── planificación primero (F1)
    Plan 10 F1+ (Flujos Alternos completo) 🔒 ── espera Carril B cerrado
    Plan 7 F3+ (Error Trace avanzado) ── tras Plan 7 F1-F2 en Carril D
 ```
@@ -410,6 +424,33 @@ CARRIL C — DIFERIDO
 - [ ] **P0.3 — Offline + WAL sync failure** (1 chat, FE)
   - [ ] ¿Qué pasa con operaciones WAL encoladas cuando la reconexión falla persistentemente?
 
+#### Plan 17 — Enforcement max-lines .cs en CI
+
+> **Origen**: Auditoría de investigación (2026-04-16). El frontend tiene `max-lines` en ESLint que bloquea el build. El backend tiene la regla en `backend.md` pero nada la enforcea — resultado: 23 archivos la violan. Plan 2/C arregla los actuales, pero sin gate en CI volverán a aparecer.
+
+- [ ] **F1 — Script o Roslyn analyzer** (1 chat, BE)
+  - [ ] F1.1 Crear script (`scripts/check-max-lines.sh` o `.ps1`) que cuente líneas por archivo .cs y falle si alguno > 300
+  - [ ] F1.2 Excepción explícita: `ApplicationDbContext.cs` (DbSets crecen linealmente)
+  - [ ] F1.3 Integrar en CI (GitHub Actions o pre-push hook) — falla el build si viola
+  - [ ] F1.4 Verificar que los 23 archivos actuales están exentos con `TODO` o que Plan 2/C ya los resolvió
+
+#### Plan 18 — Tests de flujo de negocio E2E (cross-layer)
+
+> **Origen**: Auditoría de investigación (2026-04-16). Plan 12 y 13 testan piezas aisladas. Nadie testa flujos completos como "profesor pasa lista → apoderado recibe correo → estadística se actualiza". Estos tests cruzan Controller → Service → Repository → SignalR/Email y verifican que el flujo de negocio funciona de punta a punta.
+> **Dependencia**: ejecutar DESPUÉS de Plan 12 F1 y Plan 13 F1 (necesita infra de tests ya montada).
+
+- [ ] **F1 — Flujo de asistencia completo** (1 chat, BE)
+  - [ ] F1.1 Webhook CrossChex → AsistenciaService → estado calculado → EmailOutbox encolado → SignalR notificado
+  - [ ] F1.2 Admin corrige asistencia → correo diferenciado → estado actualizado
+
+- [ ] **F2 — Flujo de calificación → aprobación** (1 chat, BE)
+  - [ ] F2.1 Profesor registra notas → promedio calculado → periodo se cierra → aprobación habilitada
+  - [ ] F2.2 Aprobación masiva → progresión (siguiente grado, sección V, egreso)
+
+- [ ] **F3 — Flujo de login → permisos → navegación** (1 chat, FE)
+  - [ ] F3.1 Login → JWT cookie → guard permite ruta → permissionsGuard filtra por rol → UI muestra solo lo permitido
+  - [ ] F3.2 Token expira → 401 → refresh → retry transparente
+
 ---
 
 ### Carril B — Deuda técnica (cuando Carril D tenga base sólida)
@@ -430,7 +471,7 @@ CARRIL C — DIFERIDO
 
 <details><summary>F3 — Lint de capas ✅ (cerrado)</summary>
 
-- [x] F3.1-F3.6 cerrados (2026-04-14 a 2026-04-15). Detalle en [enforcement-reglas.md](../tasks/enforcement-reglas.md).
+- [x] F3.1-F3.6 cerrados (2026-04-14 a 2026-04-15). Detalle en `tasks/enforcement-reglas.md` (pendiente crear).
 
 </details>
 
@@ -456,8 +497,33 @@ CARRIL C — DIFERIDO
 - [ ] **Opción B — State Machines (3 faltantes)** — desbloquea Plan 1 F4.4
   - [ ] B.1-B.6 (ver plan base)
 
-- [ ] **Opción C — Split archivos >300 líneas BE**
-  - [ ] C.1-C.6 (ver plan base)
+- [ ] **Opción C — Split archivos >300 líneas BE** (auditoría 2026-04-16: 23 archivos violan, 34 en zona 200-300)
+  - [ ] C.1 — **Patrón 1: Validators/Rules** — extraer lógica pura de services densos (1-2 chats, BE)
+    - `HorarioService` (395) → extraer `HorarioConflictValidator`
+    - `AprobacionEstudianteService` (381) → extraer `AprobacionRules`
+    - `AuthService` (373) → extraer `PasswordMigrationHelper` o `AuthValidator`
+    - `AsistenciaAdminCrudService` (323) → extraer validaciones de cierre mensual
+    - `PasswordRecoveryService` (334), `GrupoContenidoService` (317), `ConversacionesService` (316), `ErrorLogService` (313) → evaluar caso por caso
+  - [ ] C.2 — **Patrón 2: PDF Builder genérico** — separar config de layout en reportes (2-3 chats, BE)
+    - [ ] C.2.1 Crear `PdfBuilderService` genérico compartido (recibe columnas, secciones, estilos como config → genera layout). **No solo split — abstracción reutilizable.**
+    - [ ] C.2.2 Migrar cada service de reportes a config + builder:
+      - `ReporteFiltradoAsistenciaService` (441) → config + builder compartido
+      - `ReporteFiltradoPdfService` (425) → idem
+      - `ReporteAsistenciaDataService` (396) → idem
+      - `ReporteAsistenciaConsolidadoPdfService` (389) → idem
+      - `BoletaNotasPdfService` (381) → idem
+      - `ReporteAsistenciaSalonPdfService` (314) → idem
+    - [ ] C.2.3 `EmailNotificationService` (375) → separar templates de correo a configs
+  - [ ] C.3 — **Patrón 3: Repositories auxiliares** — dividir queries especializadas (1 chat, BE)
+    - `UsuariosRepository` (460) → `UsuariosQueryRepository` + `UsuariosStatsRepository`
+    - `ConsultaAsistenciaRepository` (427) → `ConsultaAsistenciaQueryRepository`
+    - `CampusRepository` (421) → `CampusQueryRepository`
+    - `HorarioRepository` (386) → `HorarioQueryRepository`
+    - `CursoContenidoRepository` (348) → evaluar
+    - `ProfesorEstudiantesQueryRepository` (318) → evaluar (ya es auxiliar)
+  - [ ] C.4 — **Controller inflado** (1 chat, BE)
+    - `ConsultaAsistenciaController` (400) → dividir por sub-dominio (diaria vs reportes)
+  - [ ] C.5 — Verificación: `0 archivos > 300 líneas` (excepción: `ApplicationDbContext`)
 
 #### Plan 4 — Consolidación Backend (tras Plan 2/B+C)
 
@@ -471,9 +537,19 @@ CARRIL C — DIFERIDO
 
 ### Carril C — Diferido
 
-#### Plan 3 F4 — Matrícula 🔒
+#### Plan 3 F3.5 — Diseño UI admin de matrícula (desbloquea Plan 3 F4)
 
-- [ ] Espera diseño admin UI + service layer
+> **Origen**: Auditoría de investigación (2026-04-16). Plan 3 F4 está bloqueado por "diseño admin UI pendiente", pero ninguna tarea produce ese diseño. Este es el desbloqueador.
+
+- [ ] **F3.5.1 — Diseño de la UI admin de matrícula** (1 chat, modo `/design`)
+  - [ ] Wireframe: listado de estudiantes preasignados, flujo de matrícula (PREASIGNADO → PENDIENTE_PAGO → PAGADO → CONFIRMADO), formulario de pago, estados visuales
+  - [ ] Definir qué endpoints nuevos se necesitan (o si los existentes bastan)
+  - [ ] Definir qué DTOs faltan
+  - [ ] Entregable: wireframe + lista de endpoints + lista de DTOs → desbloquea F4
+
+#### Plan 3 F4 — Matrícula 🔒 (bloqueado por Plan 3 F3.5)
+
+- [ ] Espera diseño admin UI (Plan 3 F3.5) + service layer
 
 #### Plan 7 F3+ — Error Trace avanzado
 
@@ -482,6 +558,18 @@ CARRIL C — DIFERIDO
 #### Plan 10 F1+ — Flujos Alternos completo 🔒
 
 - [ ] Espera carriles A+B sustancialmente cerrados (P0 ya extraído a Carril D)
+
+#### Plan 19 — Comunicación: foro + mensajería directa + push notifications
+
+> **Origen**: Auditoría de investigación (2026-04-16). Chat (SignalR) y calendario/eventos funcionan. Pero foro, mensajería directa y push notifications están parcialmente implementados o con feature flags apagados. Ningún plan del maestro los cubría.
+
+- [ ] **F1 — Planificación** (1 chat, modo `/design`)
+  - [ ] F1.1 Inventario: qué existe hoy (código, feature flags, endpoints, plugins Capacitor)
+  - [ ] F1.2 Priorizar: ¿qué necesita el colegio primero? (push > mensajería > foro probablemente)
+  - [ ] F1.3 Definir fases con dependencias (push requiere Firebase config, mensajería requiere UI, foro requiere moderación)
+  - [ ] F1.4 Estimar esfuerzo por fase
+
+- [ ] **F2+ — Ejecución** (según lo que defina F1)
 
 #### Planes 8-9 — Design Patterns
 
@@ -497,9 +585,19 @@ CARRIL C — DIFERIDO
 
 ---
 
+## Auditoría WAL + Cache (standalone, 3 chats)
+
+> **Origen**: Auditoría modo Validar (2026-04-16). Hallazgos en `tasks/wal-cache-audit-fixes.md` (pendiente crear).
+
+- [ ] **H1** — Bug interceptor PascalCase + H8/H9 módulos incompletos y versiones (P0, 1 chat)
+- [ ] **H7** — Normalizar naming `WAL_CACHE_MAP` (P1, 1 chat)
+- [ ] **H2-H6, H10** — Fixes cosméticos y duplicación de patrones (P2, 1 chat)
+
+---
+
 ## Deuda estructural diferida (chat dedicado)
 
-- [ ] **DS1 — Split estructural de `wal-sync-engine.service.ts`** — ver [tasks/wal-sync-engine-split.md](../tasks/wal-sync-engine-split.md)
+- [ ] **DS1 — Split estructural de `wal-sync-engine.service.ts`** — ver `tasks/wal-sync-engine-split.md` (pendiente crear)
   - **Origen**: F3.5.B (2026-04-15). Archivo en 303 líneas efectivas (límite 300). Fix temporal con `eslint-disable max-lines` justificado en el encabezado del archivo. No es quick-win: requiere entender el loop del engine + tests mínimos previos + extracción cohesiva (candidato principal: Error Handling como helper puro).
   - **Por qué diferido**: preexistente al F3.5.B, no bloquea ninguna tarea activa, y el escape hatch honesto es preferible a un refactor cosmético que colapse comentarios para pasar el umbral sin resolver el fondo.
 

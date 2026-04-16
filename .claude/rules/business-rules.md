@@ -1109,7 +1109,16 @@ Este registro consolida TODAS las invariantes del sistema en una tabla indexable
 
 ---
 
-### 15.12 Invariantes de Asignación Profesor-Salón-Curso
+### 15.12 Invariantes de Error Tracing
+
+| ID | Entidad | Invariante | Enforcement | Sección |
+|----|---------|------------|-------------|---------|
+| `INV-ET01` | ErrorLog | Todo error HTTP ≥ 400 (excepto 401/403) se persiste en `ErrorLog` con CorrelationId, URL, método, status code, DNI y rol | `GlobalExceptionMiddleware.PersistErrorFireAndForget()` filtra por status code | — |
+| `INV-ET02` | ErrorLog | La persistencia de errores en `ErrorLog` es **fire-and-forget**: un fallo al persistir NUNCA falla la respuesta HTTP al cliente ni la operación principal. Aplica tanto a errores backend (middleware) como a errores frontend (endpoint `POST /api/sistema/errors`) y reportes de usuario | `GlobalExceptionMiddleware` + `ErrorLogController.ReportarError()` + `ReportesUsuarioController.Crear()` — todos con try/catch que loguean `LogWarning` y continúan | — |
+
+---
+
+### 15.13 Invariantes de Asignación Profesor-Salón-Curso
 
 | ID | Entidad | Invariante | Enforcement | Sección |
 |----|---------|------------|-------------|---------|

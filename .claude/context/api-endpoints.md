@@ -1,6 +1,6 @@
 # APIs Backend Disponibles
 
-Organización: 35 controllers en 10 dominios. Todos retornan `ApiResponse<T>`.
+Organización: 42 controllers en 10 dominios. Todos retornan `ApiResponse<T>`.
 
 ## Auth & Sesión
 
@@ -39,6 +39,8 @@ Organización: 35 controllers en 10 dominios. Todos retornan `ApiResponse<T>`.
 - `GET /api/salones/{id}/estudiantes` — Estudiantes del salón
 - `GET /api/profesorsalon` — Profesores asignados a salones
 - `POST /api/profesorsalon` — Asignar profesor a salón
+- `PUT /api/profesorsalon/{profesorId}` — Actualizar asignación profesor-salón
+- `DELETE /api/profesorsalon/{profesorId}` — Remover profesor de salón
 
 ## Cursos
 
@@ -47,7 +49,17 @@ Organización: 35 controllers en 10 dominios. Todos retornan `ApiResponse<T>`.
 - `PUT /api/cursos/{id}` — Actualizar curso
 - `DELETE /api/cursos/{id}` — Eliminar curso
 - `GET /api/cursos/{id}/contenido` — Contenido del curso
-- `GET /api/estudiantecurso` — Estudiantes por curso
+- `GET /api/estudiantecurso/mis-horarios` — Horarios del estudiante autenticado
+- `GET /api/estudiantecurso/horario/{horarioId}/contenido` — Contenido de un horario (estudiante)
+- `POST /api/estudiantecurso/semana/{semanaId}/archivo` — Subir archivo a semana
+- `GET /api/estudiantecurso/semana/{semanaId}/mis-archivos` — Archivos del estudiante en semana
+- `DELETE /api/estudiantecurso/archivo/{archivoId}` — Eliminar archivo propio
+- `POST /api/estudiantecurso/tarea/{tareaId}/archivo` — Subir archivo a tarea
+- `GET /api/estudiantecurso/tarea/{tareaId}/mis-archivos` — Archivos del estudiante en tarea
+- `DELETE /api/estudiantecurso/tarea-archivo/{archivoId}` — Eliminar archivo de tarea
+- `GET /api/estudiantecurso/mis-notas` — Notas del estudiante autenticado
+- `GET /api/estudiantecurso/horario/{horarioId}/mi-asistencia` — Asistencia por curso del estudiante
+- `GET /api/estudiantecurso/horario/{horarioId}/grupos` — Grupos del horario (estudiante)
 
 ## Académico
 
@@ -58,6 +70,10 @@ Organización: 35 controllers en 10 dominios. Todos retornan `ApiResponse<T>`.
 - `DELETE /api/horario/{id}` — Eliminar horario
 - `GET /api/periodoacademico` — Periodos académicos
 - `PUT /api/periodoacademico/{id}/cerrar` — Cerrar periodo
+- `GET /api/profesorcurso/profesor/{profesorId}` — Cursos asignados a un profesor (por año)
+- `GET /api/profesorcurso/curso/{cursoId}` — Profesores asignados a un curso (por año)
+- `POST /api/profesorcurso/asignar` — Asignar profesor a curso(s) en batch
+- `DELETE /api/profesorcurso/{id}` — Desasignar profesor de curso
 
 ## Calificaciones
 
@@ -66,8 +82,17 @@ Organización: 35 controllers en 10 dominios. Todos retornan `ApiResponse<T>`.
 - `PUT /api/calificacion/{id}` — Actualizar calificación
 - `GET /api/configuracioncalificacion` — Config de evaluación por nivel
 - `PUT /api/configuracioncalificacion` — Actualizar config de evaluación
+- `GET /api/boletanotas/estudiante/{estudianteId}` — Descargar boleta PDF de un estudiante `[heavy]`
+- `GET /api/boletanotas/salon/{salonId}` — Descargar boleta PDF de todo un salón `[heavy]`
 - `GET /api/cursocontenido` — Contenido y tareas de curso
-- `GET /api/grupocontenido` — Grupos de contenido
+- `GET /api/grupocontenido/contenido/{contenidoId}` — Grupos de un contenido
+- `POST /api/grupocontenido` — Crear grupo de contenido
+- `PUT /api/grupocontenido/{grupoId}` — Actualizar grupo
+- `DELETE /api/grupocontenido/{grupoId}` — Eliminar grupo
+- `POST /api/grupocontenido/{grupoId}/estudiantes` — Asignar estudiantes a grupo
+- `DELETE /api/grupocontenido/{grupoId}/estudiante/{estudianteId}` — Remover estudiante de grupo
+- `PUT /api/grupocontenido/contenido/{contenidoId}/config` — Configurar máximo de estudiantes por grupo
+- `POST /api/grupocontenido/{calificacionId}/calificar-grupos` — Calificar grupos en lote
 
 ## Aprobación
 
@@ -81,6 +106,29 @@ Organización: 35 controllers en 10 dominios. Todos retornan `ApiResponse<T>`.
 - `POST /api/asistencia/webhook` — Webhook de CrossChex (automático)
 - `POST /api/asistencia/manual` — Registro manual de asistencia
 - `GET /api/asistencia/reporte-pdf` — Generar PDF de reporte mensual
+
+## Asistencia Admin (Director)
+
+- `GET /api/asistenciaadmin` — Listar asistencias con filtros para edición
+- `POST /api/asistenciaadmin` — Crear registro de asistencia manual
+- `PUT /api/asistenciaadmin/{id}` — Editar registro de asistencia
+- `DELETE /api/asistenciaadmin/{id}` — Eliminar registro de asistencia
+- `GET /api/cierre-asistencia` — Listar cierres mensuales
+- `POST /api/cierre-asistencia` — Crear cierre mensual (INV-AD03)
+- `POST /api/cierre-asistencia/{id}/revertir` — Revertir cierre (INV-AD04, solo Director)
+- `GET /api/reportesasistencia` — Reportes de asistencia con filtros
+
+## Permisos de Salud
+
+- `GET /api/permisos-salud/sintomas` — Catálogo de síntomas
+- `GET /api/permisos-salud/resumen` — Resumen de permisos por salón
+- `GET /api/permisos-salud/estudiantes` — Estudiantes con permisos de salud
+- `POST /api/permisos-salud/validar-fechas` — Validar fechas de justificación
+- `GET /api/permisos-salud/salones` — Salones disponibles (admin)
+- `POST /api/permisos-salud/salida` — Crear permiso de salida por salud
+- `DELETE /api/permisos-salud/salida/{id}` — Anular permiso de salida
+- `POST /api/permisos-salud/justificacion` — Crear justificación médica
+- `DELETE /api/permisos-salud/justificacion/{id}` — Anular justificación
 
 ## Asistencia por Curso
 
@@ -110,6 +158,21 @@ Organización: 35 controllers en 10 dominios. Todos retornan `ApiResponse<T>`.
 - `GET /api/servertime` — Hora del servidor (para clock sync)
 - `GET /api/warmup` — Health check / warm up
 - `POST /api/videoconferencia/token` — Generar token JaaS (Jitsi)
+- `POST /api/sistema/client-errors` — Reportar error del frontend (INV-ET02)
+- `POST /api/sistema/errors` — Reportar error de frontend con detalle `[AllowAnonymous]` `[heavy]`
+- `GET /api/sistema/errors` — Listar errores (Director)
+- `GET /api/sistema/errors/{id}` — Detalle completo de error (Director)
+- `GET /api/sistema/errors/{id}/detalles` — Detalles técnicos del error (Director)
+- `GET /api/sistema/email-outbox/listar` — Listar correos con filtros (admin)
+- `GET /api/sistema/email-outbox/estadisticas` — Estadísticas de envío (admin)
+- `GET /api/sistema/email-outbox/{id}/html` — Ver cuerpo HTML del correo (admin)
+- `GET /api/sistema/email-outbox/tendencias` — Tendencias de envío (admin)
+- `POST /api/sistema/email-outbox/{id}/reintentar` — Reintentar envío fallido (admin)
+- `POST /api/sistema/reportes-usuario` — Crear reporte de usuario `[AllowAnonymous]` `[feedback]`
+- `GET /api/sistema/reportes-usuario` — Listar reportes (admin)
+- `GET /api/sistema/reportes-usuario/estadisticas` — Estadísticas de reportes (admin)
+- `GET /api/sistema/reportes-usuario/{id}` — Detalle de reporte (admin)
+- `PATCH /api/sistema/reportes-usuario/{id}/estado` — Cambiar estado del reporte (admin)
 
 ## SignalR Hubs
 

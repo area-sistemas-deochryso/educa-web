@@ -72,5 +72,8 @@ ios/
 # Claude worktrees
 .claude/worktrees/
 
+# Claude drift-check reports (generated, not tracked)
+.claude/reporte-drift-check/
+
 # Codex
 .codex/

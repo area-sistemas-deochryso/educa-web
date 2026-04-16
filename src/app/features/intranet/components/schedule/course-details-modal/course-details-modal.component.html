@@ -95,9 +95,18 @@
 </p-dialog>
 
 <!-- * Sub-modals for week content -->
-<app-attachments-modal [(visible)]="showAttachmentsModal" [weekName]="selectedWeekName" />
+<app-attachments-modal
+	[visible]="showAttachmentsModal"
+	(visibleChange)="showAttachmentsModal = $event"
+	[weekName]="selectedWeekName" />
 
-<app-tasks-modal [(visible)]="showTasksModal" [weekName]="selectedWeekName" />
+<app-tasks-modal
+	[visible]="showTasksModal"
+	(visibleChange)="showTasksModal = $event"
+	[weekName]="selectedWeekName" />
 
-<app-submissions-modal [(visible)]="showSubmissionsModal" [weekName]="selectedWeekName" />
+<app-submissions-modal
+	[visible]="showSubmissionsModal"
+	(visibleChange)="showSubmissionsModal = $event"
+	[weekName]="selectedWeekName" />
 <!-- #endregion -->

@@ -127,6 +127,92 @@ Helpers de claims (`User.GetDni()`, `User.GetRol()`, `User.GetEntityId()`, `User
 - Registrar en DI: `builder.Services.AddScoped<IService, Service>()`
 - Services lanzan excepciones tipadas, NO retornan `IActionResult`
 
+### Cómo dividir un service > 300 líneas
+
+> **"Si puedes nombrar la responsabilidad que extraes, extrae. Si solo estás partiendo un archivo a la mitad para bajar de 300, no."**
+
+NO crear una subarquitectura formal de N sub-services (QueryService/CommandService/ValidationService) como en el frontend. El backend tiene un ciclo más uniforme (`validar → ejecutar → retornar`) que no justifica la misma división. En su lugar, dividir **por patrón de inflación** — cada tipo de archivo gordo tiene su fix natural:
+
+#### Patrón 1: Service con validaciones/cálculos complejos
+
+**Señal**: El service mezcla CRUD con validaciones de negocio o cálculos puros que no necesitan DbContext.
+
+```
+Antes:
+  HorarioService.cs (395 líneas)
+    - CRUD
+    - Validación de 3 conflictos (salón, profesor, estudiante)
+    - Cálculo de disponibilidad
+
+Después:
+  HorarioService.cs (~200)             → CRUD + orquestación
+  HorarioConflictValidator.cs (~100)   → Las 3 validaciones de conflicto (lógica pura)
+```
+
+**Criterio**: extraer la lógica pura (validaciones, cálculos, resolución de reglas) a un `*Validator.cs`, `*Calculator.cs` o `*Rules.cs`. El service los consume vía inyección.
+
+**Aplica a**: `HorarioService`, `AprobacionEstudianteService`, `AuthService`, `AsistenciaAdminCrudService`.
+
+#### Patrón 2: Service con generación de reportes/PDFs
+
+**Señal**: El service consulta datos Y construye el layout del documento. Cada sección del reporte suma 20-40 líneas.
+
+```
+Antes:
+  ReporteFiltradoAsistenciaService.cs (441 líneas)
+    - Consultar datos
+    - Construir layout PDF (headers, celdas, estilos, paginación)
+
+Después:
+  ReporteFiltradoAsistenciaService.cs (~150)  → Consulta datos + config del reporte
+  AsistenciaReportConfig.cs (~80)              → Columnas, estilos, secciones
+  PdfBuilderService.cs (genérico, compartido)  → Layout, celdas, headers reutilizables
+```
+
+**Criterio**: separar la *configuración del reporte* (qué columnas, qué datos) de la *construcción del layout* (cómo renderizar). El builder es genérico y compartido entre reportes.
+
+**Aplica a**: los 6 services de PDF/reportes (`ReporteFiltrado*`, `ReporteAsistencia*`, `BoletaNotasPdf*`).
+
+#### Patrón 3: Repository con queries complejas
+
+**Señal**: El repository tiene queries de listado (con muchos filtros), queries de detalle, queries de estadísticas y queries de importación/exportación — todas mezcladas.
+
+```
+Antes:
+  UsuariosRepository.cs (460 líneas)
+
+Después:
+  UsuariosRepository.cs (~200)         → CRUD básico
+  UsuariosQueryRepository.cs (~150)    → Queries complejas de listado con filtros
+  UsuariosStatsRepository.cs (~100)    → Queries de estadísticas/agregaciones
+```
+
+**Criterio**: dividir por tipo de query. El CRUD básico queda en el repository principal. Las queries especializadas (listados filtrados, stats, exports) van a repositories auxiliares con nombre explícito.
+
+**Aplica a**: `UsuariosRepository`, `ConsultaAsistenciaRepository`, `CampusRepository`, `HorarioRepository`.
+
+#### Tabla de decisión
+
+| Si el service tiene > 300 líneas por... | Extraer a... | Nombre del archivo |
+|----------------------------------------|-------------|--------------------|
+| Validaciones de negocio / reglas puras | Validator o Rules | `*Validator.cs`, `*Rules.cs` |
+| Cálculos puros sin IO | Calculator o Helper | `*Calculator.cs`, `*Helper.cs` |
+| Generación de PDFs/reportes | Config + Builder genérico | `*ReportConfig.cs`, `PdfBuilderService.cs` |
+| Múltiples sub-dominios | Service por sub-dominio | `*CrudService.cs`, `*QueryService.cs` |
+| Queries complejas en repository | Repository auxiliar | `*QueryRepository.cs`, `*StatsRepository.cs` |
+
+#### Anti-patrón: división sin nombre
+
+```csharp
+// ❌ INCORRECTO — división mecánica sin responsabilidad clara
+HorarioService.cs       → "la primera mitad"
+HorarioService2.cs      → "la segunda mitad"
+
+// ✅ CORRECTO — cada archivo tiene un nombre que describe su responsabilidad
+HorarioService.cs            → CRUD + orquestación
+HorarioConflictValidator.cs  → Validación de conflictos de superposición
+```
+
 ## Repository — Reglas
 
 > **"Solo queries, nunca decisiones."**

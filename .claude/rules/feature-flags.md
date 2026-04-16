@@ -17,6 +17,7 @@ features: {
   ctestK6: false,
   videoconferencias: true,
   campusNavigation: false,
+  feedbackReport: true,
 }
 
 // environment.development.ts — mismas flags, algunas habilitadas para dev
@@ -36,6 +37,7 @@ features: {
 | `ctestK6` | Herramienta de testing de carga k6 | `intranet.routes.ts` |
 | `videoconferencias` | Módulo de videoconferencia (JaaS/Jitsi) | `intranet.routes.ts` |
 | `campusNavigation` | Navegación 3D/2D del campus | `intranet.routes.ts` |
+| `feedbackReport` | Botón flotante + dialog de reporte de usuario (Ctrl+Alt+F) | `intranet-layout.component.html` |
 
 ## Uso en rutas y menús
 
