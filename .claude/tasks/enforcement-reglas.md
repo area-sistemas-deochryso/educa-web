@@ -405,6 +405,163 @@ describe('AsistenciaEstadoCalculador', () => {
 
 ---
 
+#### F4.1 — Catálogo de invariantes testeables (2026-04-15)
+
+> **Objetivo del catálogo**: decidir, para cada `INV-*` del registro de `business-rules.md § 15`, **dónde vive la lógica** y, por tanto, **dónde debe vivir el test**. Evita duplicar lógica BE en tests FE y evita dejar invariantes sin cobertura.
+
+**Criterios de clasificación**:
+
+| Clasificación | Definición | Ejemplo |
+|---------------|-----------|---------|
+| **FE-testable** | Lógica pura o constraint replicable desde el cliente sin tocar BD | Formato DNI (8 dígitos), validación de superposición horaria con fórmula compartida |
+| **BE-testable** | Cálculo/constraint que solo existe en backend (servicio, repo, DB constraint) | Cálculo de estados A/T/F, unique constraints SQL, transacciones EF |
+| **Contract-testable** | Requiere respuesta del BE real o mock del contrato — test de integración, no unit | Respuesta `ApiResponse<T>`, idempotency header rechaza duplicados |
+| **Blocked** | Depende de feature/plan aún no cerrado | Matrícula (INV-M*) requiere Plan 3 F4 |
+| **N/A-FE** | Invariante puramente de infraestructura BE (índices, middleware, logging) | `DniHelper.Mask()` en logs BE |
+
+**Tabla de catalogación** (79 invariantes totales):
+
+##### Estructurales (INV-D*) — 9 invariantes
+
+| ID | Clasificación | Plan de test | Nota |
+|----|--------------|--------------|------|
+| D01 | FE-testable | `dni.utils.spec.ts` | Helper FE replica normalización 8 dígitos |
+| D02 | N/A-FE | — | Convención BE (base entity); no hay equivalente FE |
+| D03 | N/A-FE | — | Soft delete es semántica BE; FE solo consume `estado: boolean` |
+| D04 | FE-testable | `fecha-peru.utils.spec.ts` | Si existe helper de conversión UTC→Lima en FE |
+| D05 | N/A-FE | — | `AsNoTracking()` vive en BE |
+| D06 | BE-testable | — | Unique index SQL |
+| D07 | BE-testable | — | Unique constraint SQL |
+| D08 | Contract-testable | `api-response.interceptor.spec.ts` (si existe) | Shape del wrapper |
+| D09 | BE-testable | — | Query filtrando `_Estado = true` en repo |
+
+##### Unicidad (INV-U*) — 6 invariantes
+
+| ID | Clasificación | Plan de test | Nota |
+|----|--------------|--------------|------|
+| U01 | BE-testable | — | Unique constraint + validación en service |
+| U02 | BE-testable | — | EF Config + service |
+| U03-U05 | **FE-testable** | `horario-overlap.utils.spec.ts` | Fórmula `I1<F2 AND F1>I2` es pura, replicable en FE para preview antes de guardar |
+| U06 | BE-testable | — | Config por nivel |
+
+##### Transiciones de estado (INV-T*) — 6 invariantes — **Bloqueadas por Plan 2/B**
+
+| ID | Clasificación | Plan de test |
+|----|--------------|--------------|
+| T01-T06 | Blocked → BE-testable tras Plan 2/B | State machine integrada primero |
+
+##### Cálculo (INV-C*) — 8 invariantes
+
+| ID | Clasificación | Plan de test | Nota |
+|----|--------------|--------------|------|
+| C01 | BE-testable | — | `AsistenciaEstadoCalculador.cs` — vive en BE |
+| C02 | BE-testable | — | Precedencia de justificación en servicio BE |
+| C03 | BE-testable | — | `ClasificarYRegistrarMarcacionAsync` BE |
+| C04 | **FE-testable** | `promedio.utils.spec.ts` | Fórmula `Σ(nota × peso)` pura; si existe helper FE que calcule promedio en vivo |
+| C05 | **FE-testable** | `grado-progresion.utils.spec.ts` | Si FE muestra "siguiente grado" en preview de aprobación |
+| C06 | **FE-testable** | `horario-overlap.utils.spec.ts` (compartido con U03-U05) | Misma fórmula |
+| C07 | **FE-testable** | `horario-validacion.utils.spec.ts` | `HoraInicio < HoraFin` validación form |
+| C08 | **FE-testable** | `dia-semana.utils.spec.ts` | Conversión `DayOfWeek → 1-7` |
+
+##### Seguridad (INV-S*) — 8 invariantes
+
+| ID | Clasificación | Plan de test | Nota |
+|----|--------------|--------------|------|
+| S01 | BE-testable | — | AuthService BE valida estado |
+| S02 | N/A-FE | — | Rehash BCrypt en BE |
+| S03 | **FE-testable** | `user-permisos.service.spec.ts` (ya existe) | Resolución 2 capas en `UserPermisosService` — cubierto por 22 tests pre-existentes |
+| S04 | **FE-testable** | `user-permisos.service.spec.ts` (ya existe) | Comparación exacta ruta — cubierto |
+| S05 | BE-testable | — | RowVersion handler en BE |
+| S06 | Contract-testable | — | Middleware BE + header FE (ya manda key) |
+| S07 | **FE-testable** | `notification-fire-forget.spec.ts` | Si hay notificación en FE que no debe bloquear |
+| S08 | BE-testable | — | Webhook BE |
+
+##### Asistencia por curso (INV-AC*) — 3 invariantes
+
+| ID | Clasificación |
+|----|--------------|
+| AC01-AC03 | BE-testable (todos) |
+
+##### Vacacional (INV-V*) — 3 invariantes — **Bloqueadas por Plan 2/B (aprobación)**
+
+| ID | Clasificación |
+|----|--------------|
+| V01-V03 | Blocked → BE-testable |
+
+##### Matrícula (INV-M*) — 4 invariantes — **Bloqueadas por Plan 3 F4**
+
+| ID | Clasificación |
+|----|--------------|
+| M01-M04 | Blocked → BE-testable |
+
+##### Asistencia Admin (INV-AD*) — 5 invariantes
+
+| ID | Clasificación |
+|----|--------------|
+| AD01-AD05 | BE-testable (todos) |
+
+##### Asignación (INV-AS*) — 3 invariantes — **Bloqueadas por Plan 6**
+
+| ID | Clasificación |
+|----|--------------|
+| AS01-AS03 | Blocked → BE-testable tras Plan 6 F2 |
+
+##### Reportes Usuario (INV-RU*) — 8 invariantes
+
+| ID | Clasificación | Plan de test |
+|----|--------------|--------------|
+| RU01-RU02 | BE-testable | Job Hangfire + repo BE |
+| RU03 | **FE-testable** | `request-trace.facade.spec.ts` | Guard del interceptor en submit de reporte — lógica FE pura |
+| RU04 | **FE-testable** | `feedback-report.facade.spec.ts` | Lifecycle de idempotencyKey al abrir/cerrar dialog |
+| RU05-RU08 | BE-testable | — |
+
+##### Resumen agregado
+
+| Bucket | Conteo | Acción |
+|--------|--------|--------|
+| **FE-testable (hoy)** | **~12 invariantes** | Plan F4.2 + F4.3 |
+| Contract-testable | ~2 | Diferido (baja prioridad) |
+| BE-testable | ~41 | Delegado al backend (no alcance de este plan) |
+| Blocked (T/V/M/AS) | ~16 | Esperan Plan 2/B, Plan 3 F4, Plan 6 |
+| N/A-FE | ~8 | Sin test FE por diseño |
+
+**Lote F4.2 — Cálculo (C04-C08 + U03-U05/C06)** — ✅ cerrado 2026-04-15 (35 specs verdes):
+
+| Helper FE | Ubicación | Spec creado | Invariantes | Tests |
+|-----------|-----------|-------------|-------------|-------|
+| `timeRangesOverlap` + `validateTimeRange` + `createTimeRange` | `@shared/utils/time-range.utils.ts` | `time-range.utils.spec.ts` | INV-C06, INV-C07 (aplicados a U03/U04/U05) | 15 |
+| `parseDiaSemana` + `parseHora` | `features/admin/schedules/helpers/horario-import.config.ts` | `horario-import.config.spec.ts` | INV-C08 (1=Lun, 7=Dom) | 10 |
+| `calcularPromedioPonderado` + `esNotaEditable` | `features/profesor/utils/calificacion.utils.ts` | `calificacion.utils.spec.ts` | INV-C04 (pesos NO normalizados, redondeo 1 decimal), INV-T04 parcial (ventana 2 meses) | 10 |
+
+**Sin helper FE — documentado como "cubierto solo en BE"**:
+
+- **INV-C05** (progresión: GRA_Orden + 1, egreso en 14) — sin helper FE. La UI actual no calcula ni muestra preview del siguiente grado; la progresión ocurre como efecto colateral de aprobar desde admin y el BE responde con el salón destino ya resuelto. Si más adelante se agrega UI de preview, crear `grado-progresion.utils.ts` + spec.
+- **INV-C01..C03** (asistencia — estado calculado, precedencia justificación, coherencia horaria con umbral 12:00) — sin helper FE. El FE solo muestra el estado que envía el BE (`AsistenciaEstadoCalculador`). Crear helper FE aquí duplicaría lógica y sería contract-testable, no unit. Cerrado como BE-testable.
+
+Todos los specs corren con vitest (jsdom), sin dependencias externas. Ejecutar con `npx vitest run`.
+
+**Lote F4.3 — Unicidad/Seguridad FE (S03/S04/S07/RU03/RU04)** — ✅ cerrado 2026-04-16 (25 specs verdes):
+
+Ya cubiertos pre-existentes:
+- S03/S04 → `user-permisos.service.spec.ts` (22 tests pre-existentes) ✅
+- S07 → fire-and-forget es patrón BE — N/A-FE
+
+Specs nuevos:
+
+| Spec | Invariante | Tests |
+|------|-----------|-------|
+| `core/services/trace/request-trace.facade.spec.ts` | INV-RU03 (ring buffer de lastRequestId, exclusión del feedback endpoint garantizada por interceptor línea 45-48) | 10 |
+| `core/services/feedback/feedback-report.store.spec.ts` | INV-RU04 (lifecycle: resetForm en apertura, closeDialog limpia correlación+estado, submitting guard previene doble-submit). Nota: la idempotency key migró de `currentIdempotencyKey` manual a UUID-por-operación del WAL engine — el guard de doble-submit es el contrato testeable del FE. | 15 |
+
+**Decisión de alcance del Plan 1 F4** (2026-04-15, actualizado 2026-04-16):
+
+- F4.2 ✅ (35 specs) + F4.3 ✅ (25 specs) = **60 specs nuevos** → F4.6 CI gate ejecutable.
+- F4.4 (INV-T*) queda **bloqueada formalmente** hasta Plan 2/B — confirmado.
+- F4.5 (INV-V/M) queda **bloqueada formalmente** hasta Plan 3 F4 + Plan 2/B — confirmado.
+- F4.6 (CI gate) ahora ejecutable (60 specs >> umbral de 4).
+
+---
+
 ### Fase 3 — Tipos Semánticos Completos (enforcement por compilador)
 
 > **Objetivo**: Que TypeScript rechace datos mal formados en compilación, no en runtime.
@@ -478,9 +635,9 @@ jobs:
 #### Checklist Fase 4
 
 ```
-[ ] Crear .github/workflows/ci.yml para educa-web
-[ ] lint + build + test obligatorios
-[ ] PR no mergeable sin CI verde
+[x] Crear .github/workflows/ci.yml para educa-web — ya existe (npm ci + lint + test + build)
+[x] lint + build + test obligatorios — incluidos en ci.yml
+[ ] PR no mergeable sin CI verde — requiere configurar branch protection rules en GitHub
 [ ] Crear .github/workflows/ci-backend.yml cuando haya tests backend
 ```
 
@@ -581,10 +738,10 @@ Fase 5 (Barrels)  ← Cierra escape hatches, requiere lint estable
 | Métrica | Antes | Después de Fase 1-2 (actual) | Después de Fase 4-5 (objetivo) |
 |---------|-------|---------------------|---------------------|
 | Violaciones de capa detectables | 0 | ✅ Todas (lint) | Bloqueadas (CI) |
-| Tests de contrato | 0 | ✅ 101 tests (Auth 20 + Storage 15 + Permisos 22+9 + WAL 20 + Guards 3 + Utils 12) | Obligatorios en merge |
+| Tests de contrato | 0 | ✅ 161 tests (Auth 20 + Storage 15 + Permisos 22+9 + WAL 20 + Guards 3 + Utils 12 + **INV specs 60**) | Obligatorios en merge |
 | `any` en services/stores | ? (auditar) | Pendiente (Fase 3) | 0 en código nuevo |
-| Bypass de wrappers posible | Sí (import directo) | Detectado (lint) | Bloqueado (barrel + lint) |
-| CI pipeline | No existe | Pendiente (Fase 4) | Lint + build + test |
+| Bypass de wrappers posible | Sí (import directo) | Detectado (lint), 0 violaciones localStorage/console | Bloqueado (barrel + lint) |
+| CI pipeline | No existía | ✅ `.github/workflows/ci.yml` (lint + test + build) | Lint + build + test |
 
 ---
 
