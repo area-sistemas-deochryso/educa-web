@@ -222,25 +222,25 @@ export class UserFormDialogComponent {
 
 	// #region Computed — ProfesorCurso (sección "Cursos que dicta")
 
-	/** Visible solo si el profesor tiene salones en modo PorCurso (GRA_Orden ≥ 8). */
+	/** Visible si el profesor tiene salones que NO son TutorPleno (PorCurso o Flexible/Verano). */
 	readonly showCursosSection = computed(() => {
 		if (!this.isProfesor() || !this.isEditing()) return false;
 		const asignaciones = this.formData().salones ?? [];
 		const allSalones = this.salones();
 		return asignaciones.some((a) => {
 			const salon = allSalones.find((s) => s.salonId === a.salonId);
-			return salon && resolveModoAsignacion(salon.gradoOrden, salon.seccion) === 'PorCurso';
+			return salon && resolveModoAsignacion(salon.gradoOrden, salon.seccion) !== 'TutorPleno';
 		});
 	});
 
-	/** IDs de grados PorCurso del profesor (para filtrar cursos disponibles). */
+	/** IDs de grados no-TutorPleno del profesor (para filtrar cursos disponibles). */
 	private readonly gradosPorCurso = computed(() => {
 		const asignaciones = this.formData().salones ?? [];
 		const allSalones = this.salones();
 		const gradoIds = new Set<number>();
 		for (const a of asignaciones) {
 			const salon = allSalones.find((s) => s.salonId === a.salonId);
-			if (salon && resolveModoAsignacion(salon.gradoOrden, salon.seccion) === 'PorCurso') {
+			if (salon && resolveModoAsignacion(salon.gradoOrden, salon.seccion) !== 'TutorPleno') {
 				gradoIds.add(salon.gradoId);
 			}
 		}

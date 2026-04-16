@@ -8,7 +8,8 @@ import { UI_ADMIN_ERROR_DETAILS, UI_SUMMARIES } from '@app/shared/constants';
 import { UserProfileService } from '@core/services/user/user-profile.service';
 import { CursoContenidoDetalleDto, VistaPromedio } from '../models';
 import { ProfesorApiService } from './profesor-api.service';
-import { ProfesorStore, ProfesorSalonConEstudiantes } from './profesor.store';
+import { ProfesorStore } from './profesor.store';
+import { ProfesorSalonConEstudiantes } from '../models';
 
 @Injectable({ providedIn: 'root' })
 export class ProfesorFacade {

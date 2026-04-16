@@ -20,8 +20,6 @@ import { QuickAccessFavoritesService } from '@intranet-shared/services';
 // #endregion
 
 // #region Types
-export type PaletteViewMode = 'flat' | 'tree';
-
 /** Flat search result — a single navigable page. */
 export interface SearchResult {
 	label: string;
@@ -71,7 +69,6 @@ export class ModuleSelectorComponent {
 	readonly isOpen = signal(false);
 	readonly searchTerm = signal('');
 	readonly activeIndex = signal(0);
-	readonly viewMode = signal<PaletteViewMode>('flat');
 	readonly searchInput = viewChild<ElementRef<HTMLInputElement>>('searchInput');
 	// #endregion
 
@@ -112,19 +109,50 @@ export class ModuleSelectorComponent {
 			.map((r) => r.result);
 	});
 
-	/** Tree view: grouped by module → section. Uses same filter. */
-	readonly treeGroups = computed((): TreeGroup[] => {
-		const results = this.filteredResults();
+	/** Flat list of all panel items in visual order (for keyboard nav). */
+	private readonly panelFlat = computed((): SearchResult[] => {
+		const flat: SearchResult[] = [...this.favoriteResults()];
+		for (const col of this.megaColumns()) {
+			for (const section of col.sections) {
+				flat.push(...section.items);
+			}
+		}
+		return flat;
+	});
+
+	/** The active list depends on whether the user is searching. */
+	readonly activeList = computed((): SearchResult[] =>
+		this.isSearching() ? this.filteredResults() : this.panelFlat(),
+	);
+
+	readonly selectedModulo = computed(() => {
+		const id = this.selectedModuloId();
+		return this.modulos().find((m) => m.id === id);
+	});
+
+	/** Favorite items with full metadata for the top row. */
+	readonly favoriteResults = computed((): SearchResult[] => {
+		const routes = this.favorites.favoriteRoutes();
+		const all = this.allResults();
+		return routes.map((r) => all.find((a) => a.route === r)).filter((r): r is SearchResult => !!r);
+	});
+
+	/** Whether the user is actively searching (shows flat results instead of mega menu). */
+	readonly isSearching = computed(() => this.searchTerm().trim().length > 0);
+
+	/** Mega menu columns: modules excluding 'inicio' (it has no pages). */
+	readonly megaColumns = computed((): TreeGroup[] => {
+		const all = this.allResults();
 		const moduloMap = new Map<ModuloId, { label: string; icon: string; sections: Map<string, SearchResult[]> }>();
 
-		for (const r of results) {
+		for (const r of all) {
+			if (r.moduloId === 'inicio') continue;
 			let modEntry = moduloMap.get(r.moduloId);
 			if (!modEntry) {
 				const mod = this.modulos().find((m) => m.id === r.moduloId);
 				modEntry = { label: r.moduloLabel, icon: mod?.icon ?? 'pi pi-folder', sections: new Map() };
 				moduloMap.set(r.moduloId, modEntry);
 			}
-
 			const sectionKey = r.groupLabel || '(General)';
 			const sectionItems = modEntry.sections.get(sectionKey) ?? [];
 			sectionItems.push(r);
@@ -136,27 +164,6 @@ export class ModuleSelectorComponent {
 			moduloIcon: entry.icon,
 			sections: Array.from(entry.sections.entries()).map(([label, items]) => ({ label, items })),
 		}));
-	});
-
-	/** Flat list of results in tree order (for keyboard nav in tree mode). */
-	readonly treeFlat = computed((): SearchResult[] => {
-		const flat: SearchResult[] = [];
-		for (const group of this.treeGroups()) {
-			for (const section of group.sections) {
-				flat.push(...section.items);
-			}
-		}
-		return flat;
-	});
-
-	/** The active list depends on the current view mode. */
-	readonly activeList = computed((): SearchResult[] =>
-		this.viewMode() === 'flat' ? this.filteredResults() : this.treeFlat(),
-	);
-
-	readonly selectedModulo = computed(() => {
-		const id = this.selectedModuloId();
-		return this.modulos().find((m) => m.id === id);
 	});
 	// #endregion
 
@@ -189,11 +196,6 @@ export class ModuleSelectorComponent {
 		} else {
 			this.open();
 		}
-	}
-
-	toggleViewMode(): void {
-		this.viewMode.update((m) => (m === 'flat' ? 'tree' : 'flat'));
-		this.activeIndex.set(0);
 	}
 
 	onSearchChange(value: string): void {
@@ -293,7 +295,7 @@ export class ModuleSelectorComponent {
 
 	private scrollActiveIntoView(): void {
 		setTimeout(() => {
-			const el = this.elementRef.nativeElement.querySelector('.result-item.active');
+			const el = this.elementRef.nativeElement.querySelector('.panel-item.active');
 			el?.scrollIntoView({ block: 'nearest' });
 		}, 0);
 	}

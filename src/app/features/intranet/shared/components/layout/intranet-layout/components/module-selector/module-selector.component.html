@@ -19,130 +19,122 @@
 </button>
 <!-- #endregion -->
 
-<!-- #region Command palette -->
+<!-- #region Side panel -->
 @if (isOpen()) {
-	<div class="palette-backdrop" (click)="close()"></div>
-	<div class="palette" (keydown)="onKeydown($event)" role="listbox">
-		<!-- #region Search header -->
-		<div class="palette-header">
-			<div class="palette-search">
-				<i class="pi pi-search palette-search-icon"></i>
-				<input
-					#searchInput
-					type="text"
-					class="palette-search-input"
-					placeholder="Buscar página..."
-					[ngModel]="searchTerm()"
-					(ngModelChange)="onSearchChange($event)"
-					autocomplete="off"
-				/>
-				<kbd class="palette-kbd">ESC</kbd>
-			</div>
-			<div class="palette-toolbar">
-				<button
-					type="button"
-					class="view-toggle"
-					[class.active]="viewMode() === 'flat'"
-					(click)="toggleViewMode()"
-					[attr.aria-label]="viewMode() === 'flat' ? 'Cambiar a vista por módulo' : 'Cambiar a vista alfabética'"
-				>
-					<i class="pi" [class.pi-list]="viewMode() === 'flat'" [class.pi-sitemap]="viewMode() === 'tree'"></i>
-					<span>{{ viewMode() === 'flat' ? 'A-Z' : 'Módulos' }}</span>
-				</button>
-				<span class="results-count">{{ activeList().length }} páginas</span>
-			</div>
+	<div class="panel-backdrop" (click)="close()"></div>
+	<aside class="panel" (keydown)="onKeydown($event)">
+		<!-- #region Search -->
+		<div class="panel-search">
+			<i class="pi pi-search panel-search-icon"></i>
+			<input
+				#searchInput
+				type="text"
+				class="panel-search-input"
+				placeholder="Buscar página..."
+				[ngModel]="searchTerm()"
+				(ngModelChange)="onSearchChange($event)"
+				autocomplete="off"
+			/>
+			<kbd class="panel-kbd">ESC</kbd>
 		</div>
 		<!-- #endregion -->
 
-		<!-- #region Results -->
-		<div class="palette-results">
-			@if (viewMode() === 'flat') {
-				<!-- Flat view (alphabetical / search ranked) -->
-				@for (result of filteredResults(); track result.route + result.label; let i = $index) {
+		<!-- #region Content -->
+		<div class="panel-content" role="listbox">
+			@if (isSearching()) {
+				<!-- Search results (flat, ranked) -->
+				@for (result of filteredResults(); track result.route; let i = $index) {
 					<button
 						type="button"
-						class="result-item"
+						class="panel-item"
 						[class.active]="activeIndex() === i"
 						(click)="selectResult(result)"
 						(mouseenter)="activeIndex.set(i)"
 						role="option"
 						[attr.aria-selected]="activeIndex() === i"
 					>
-						<i [class]="result.icon" class="result-icon"></i>
-						<span class="result-label">{{ result.label }}</span>
-						<button
-							type="button"
-							class="star-btn"
-							[class.starred]="favorites.isFavorite(result.route)"
-							[disabled]="!favorites.isFavorite(result.route) && !favorites.canAddMore()"
-							(click)="onStarClick($event, result.route)"
-							[attr.aria-label]="favorites.isFavorite(result.route) ? 'Quitar de accesos rápidos' : 'Agregar a accesos rápidos'"
-						>
-							<i [class]="favorites.isFavorite(result.route) ? 'pi pi-star-fill' : 'pi pi-star'"></i>
-						</button>
-						<span class="result-module">{{ result.moduloLabel }}</span>
+						<i [class]="result.icon" class="panel-item-icon"></i>
+						<span class="panel-item-label">{{ result.label }}</span>
+						<span class="panel-item-badge">{{ result.moduloLabel }}</span>
 					</button>
 				} @empty {
-					<div class="palette-empty">
+					<div class="panel-empty">
 						<i class="pi pi-search"></i>
 						<span>Sin resultados para "{{ searchTerm() }}"</span>
 					</div>
 				}
 			} @else {
-				<!-- Tree view (grouped by module → section) -->
-				@for (group of treeGroups(); track group.moduloLabel) {
-					<div class="tree-module">
-						<div class="tree-module-header">
-							<i [class]="group.moduloIcon" class="tree-module-icon"></i>
-							<span>{{ group.moduloLabel }}</span>
-						</div>
-						@for (section of group.sections; track section.label) {
-							@if (section.label !== '(General)') {
-								<div class="tree-section-header">{{ section.label }}</div>
-							}
-							@for (item of section.items; track item.route + item.label) {
+				<!-- Favorites -->
+				@if (favoriteResults().length > 0) {
+					<div class="panel-section-header">
+						<i class="pi pi-star-fill panel-section-star"></i>
+						<span>Accesos rápidos</span>
+					</div>
+					@for (fav of favoriteResults(); track fav.route) {
+						<button
+							type="button"
+							class="panel-item"
+							[class.active]="isActiveResult(fav)"
+							(click)="selectResult(fav)"
+							(mouseenter)="setActiveFromResult(fav)"
+							role="option"
+							[attr.aria-selected]="isActiveResult(fav)"
+						>
+							<i [class]="fav.icon" class="panel-item-icon"></i>
+							<span class="panel-item-label">{{ fav.label }}</span>
+						</button>
+					}
+					<div class="panel-divider"></div>
+				}
+
+				<!-- Module groups -->
+				@for (col of megaColumns(); track col.moduloLabel) {
+					<div class="panel-section-header">
+						<i [class]="col.moduloIcon"></i>
+						<span>{{ col.moduloLabel }}</span>
+					</div>
+					@for (section of col.sections; track section.label) {
+						@if (section.label !== '(General)') {
+							<div class="panel-group-label">{{ section.label }}</div>
+						}
+						@for (item of section.items; track item.route) {
+							<button
+								type="button"
+								class="panel-item"
+								[class.active]="isActiveResult(item)"
+								(click)="selectResult(item)"
+								(mouseenter)="setActiveFromResult(item)"
+								role="option"
+								[attr.aria-selected]="isActiveResult(item)"
+							>
+								<i [class]="item.icon" class="panel-item-icon"></i>
+								<span class="panel-item-label">{{ item.label }}</span>
 								<button
 									type="button"
-									class="result-item tree-item"
-									[class.active]="isActiveResult(item)"
-									(click)="selectResult(item)"
-									(mouseenter)="setActiveFromResult(item)"
-									role="option"
-									[attr.aria-selected]="isActiveResult(item)"
+									class="star-btn"
+									[class.starred]="favorites.isFavorite(item.route)"
+									[disabled]="!favorites.isFavorite(item.route) && !favorites.canAddMore()"
+									(click)="onStarClick($event, item.route)"
+									[attr.aria-label]="favorites.isFavorite(item.route) ? 'Quitar de accesos rápidos' : 'Agregar a accesos rápidos'"
 								>
-									<i [class]="item.icon" class="result-icon"></i>
-									<span class="result-label">{{ item.label }}</span>
-									<button
-										type="button"
-										class="star-btn"
-										[class.starred]="favorites.isFavorite(item.route)"
-										[disabled]="!favorites.isFavorite(item.route) && !favorites.canAddMore()"
-										(click)="onStarClick($event, item.route)"
-										[attr.aria-label]="favorites.isFavorite(item.route) ? 'Quitar de accesos rápidos' : 'Agregar a accesos rápidos'"
-									>
-										<i [class]="favorites.isFavorite(item.route) ? 'pi pi-star-fill' : 'pi pi-star'"></i>
-									</button>
+									<i [class]="favorites.isFavorite(item.route) ? 'pi pi-star-fill' : 'pi pi-star'"></i>
 								</button>
-							}
+							</button>
 						}
-					</div>
-				} @empty {
-					<div class="palette-empty">
-						<i class="pi pi-search"></i>
-						<span>Sin resultados para "{{ searchTerm() }}"</span>
-					</div>
+					}
+					<div class="panel-divider"></div>
 				}
 			}
 		</div>
 		<!-- #endregion -->
 
 		<!-- #region Footer -->
-		<div class="palette-footer">
-			<span class="palette-hint"><kbd>↑↓</kbd> navegar</span>
-			<span class="palette-hint"><kbd>↵</kbd> <kbd>Tab</kbd> seleccionar</span>
-			<span class="palette-hint"><kbd>Esc</kbd> cerrar</span>
+		<div class="panel-footer">
+			<span class="panel-hint"><kbd>↑↓</kbd> navegar</span>
+			<span class="panel-hint"><kbd>↵</kbd> ir</span>
+			<span class="panel-hint"><kbd>Esc</kbd> cerrar</span>
 		</div>
 		<!-- #endregion -->
-	</div>
+	</aside>
 }
 <!-- #endregion -->

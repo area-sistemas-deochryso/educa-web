@@ -194,12 +194,12 @@ export class UsersUiFacade {
 			return;
 		}
 
-		// Verificar si tiene salones PorCurso
+		// Verificar si tiene salones no-TutorPleno (PorCurso o Flexible/Verano)
 		const salones = this.store.salones();
 		const salonesProfesor = detalle.salones ?? [];
 		const tienePorCurso = salonesProfesor.some((sp) => {
 			const salon = salones.find((s) => s.salonId === sp.salonId);
-			return salon && resolveModoAsignacion(salon.gradoOrden, salon.seccion) === 'PorCurso';
+			return salon && resolveModoAsignacion(salon.gradoOrden, salon.seccion) !== 'TutorPleno';
 		});
 
 		if (!tienePorCurso) {

@@ -105,6 +105,12 @@ export class ErrorReporterService {
 	): void {
 		if (!this.isBrowser || !this.canReport()) return;
 
+		// Never report 429 — it's rate limiting, not a real error. Reporting it causes cascading 429s.
+		if (status === 429) return;
+
+		// Never report errors from own endpoint (anti-loop)
+		if (url.includes('/api/sistema/errors')) return;
+
 		// Dedup: no reportar la misma URL + status en <5s (errores en cascada)
 		const dedupKey = `${status}:${sanitizeUrl(url, this.isBrowser)}`;
 		const now = Date.now();
@@ -283,7 +289,13 @@ export class ErrorReporterService {
 
 		this.http
 			.post(ErrorReporterService.ENDPOINT, payload, { headers })
-			.subscribe({ error: () => this.savePending(payload) });
+			.subscribe({
+				error: (err) => {
+					// Never save 429 to outbox — retrying rate-limited requests makes it worse
+					if (err?.status === 429) return;
+					this.savePending(payload);
+				},
+			});
 	}
 
 	/**
@@ -362,7 +374,12 @@ export class ErrorReporterService {
 			.post(ErrorReporterService.ENDPOINT, payload, { headers })
 			.subscribe({
 				next: () => this.removePending(key),
-				error: () => {
+				error: (err) => {
+					// 429 = rate limited — remove from outbox to stop retry loop
+					if (err?.status === 429) {
+						this.removePending(key);
+						return;
+					}
 					// Todavía sin conexión — se reintentará en el siguiente online
 				},
 			});

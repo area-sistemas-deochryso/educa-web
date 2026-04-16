@@ -3,7 +3,7 @@ import { Injectable, inject } from '@angular/core';
 import { Vista } from '@core/services';
 import { capitalize, groupBy, sortedEntries } from '@core/helpers';
 import { UiMappingService } from '@shared/services';
-import { ModuloVistas } from './permisos-usuarios.store';
+import { ModuloVistas } from './permisos-usuarios.models';
 
 
 // #endregion

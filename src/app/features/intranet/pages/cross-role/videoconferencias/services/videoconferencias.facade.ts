@@ -9,7 +9,8 @@ import { ErrorHandlerService } from '@core/services';
 import { UserProfileService } from '@core/services/user/user-profile.service';
 import { environment } from '@config/environment';
 import { canModerateVideoconference, getHorarioEndpoint } from '@shared/models';
-import { VideoconferenciasStore, VideoconferenciaItem } from './videoconferencias.store';
+import { VideoconferenciasStore } from './videoconferencias.store';
+import { VideoconferenciaItem } from './videoconferencias.models';
 
 // #endregion
 
