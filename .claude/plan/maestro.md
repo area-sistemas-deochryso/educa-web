@@ -22,8 +22,8 @@
 | 10 | Flujos Alternos (resiliencia) | FE | [plan/flujos-alternos.md](flujos-alternos.md) | ⏳ (bloqueado) | 0% |
 | 11 | Refactor `eslint.config.js` (fix G10) | FE | [plan/eslint-config-refactor.md](eslint-config-refactor.md) | ✅ F1-F5 (F5.3 tests opcionales sin ejecutar) | ~95% |
 
-**Resumen por carril**: Carril A (features) ~80% · Carril B (deuda) ~50% · Carril C (diferido) 0%
-**Total consolidado**: **~45-50%** del plan maestro terminado.
+**Resumen por carril**: Carril A (features) ✅ 100% · Carril B (deuda) ~50% · Carril C (diferido) 0%
+**Total consolidado**: **~55-60%** del plan maestro terminado. Carril A cerrado, foco en Carril B.
 
 ---
 
@@ -34,30 +34,39 @@
 | Si cierro… | Desbloqueo… | Por qué |
 |------------|-------------|---------|
 | ~~QW3 (specs rotos)~~ | ~~CI verde → F4.6 efectivo~~ | ✅ Cerrado 2026-04-16 |
-| Plan 6 F1 (BD ProfesorCurso) | Plan 6 F2+F3 (Domain + Services) | Tabla nueva necesaria para todo lo demás |
-| ~~Plan 6 F3 (BE services)~~ | ~~Plan 6 F4 (Frontend)~~ | ✅ Cerrado 2026-04-16 |
-| Plan 2/B (3 state machines) | Plan 1 F4.4 (INV-T*) + integración Plan 6 en HorarioStateMachine | Transiciones formales, no bloqueante para Plan 6 core |
-| Plan 3 F4 (Matrícula) | Plan 1 F4.5 (INV-M*) | Feature independiente, no bloquea asignación |
-| Capas 1-4 cerradas | Plan 10 (Flujos Alternos) | Requisito explícito: "proyecto limpio" |
+| ~~Plan 6 (completo)~~ | ~~Plan 4 (Consolidación BE) + Plan 5 (Consolidación FE)~~ | ✅ Cerrado 2026-04-16 |
+| Plan 2/B (3 state machines) | Plan 1 F4.4 (INV-T*) | Transiciones formales necesarias para tests de invariantes |
+| Plan 3 F4 (Matrícula) | Plan 1 F4.5 (INV-M*) | Feature independiente |
+| Carril B sustancialmente cerrado | Plan 10 (Flujos Alternos) | Requisito explícito: "proyecto limpio" |
 
-**Próximo tramo ejecutable — FEATURES FIRST**:
+**Carril A — CERRADO** ✅ (2026-04-16). Plan 6 completado en todas sus fases (F0-F6).
 
-1. ~~**QW3**~~ ✅ (2026-04-16) — CI verde, 0 fallos.
-2. ~~**Plan 6 F1**~~ ✅ (2026-04-16) — BD: tabla `ProfesorCurso` + migración + modelo EF.
-3. ~~**Plan 6 F2**~~ ✅ (2026-04-16) — Domain validators: 4 archivos + 42 tests. Build OK.
-4. ~~**Plan 6 F3**~~ ✅ (2026-04-16) — BE Services: 7 archivos nuevos + 9 modificados. 741 tests OK.
-5. ~~**Plan 6 F4**~~ ✅ (2026-04-16) — Frontend: tipos + badges + cursos que dicta en usuarios. 25 archivos, commit `11c1658`.
-6. ~~**Plan 6 F5**~~ ✅ (2026-04-16) — Auditoría SQL: 0 violaciones INV-AS01/AS02 en ambas BDs.
-7. ~~**Plan 6 F6**~~ ✅ (2026-04-16) — Tests facade (4 nuevos) + invariantes formalizados + error codes mapeados. **Plan 6 CERRADO.**
+<details><summary>Historial Carril A (cerrado)</summary>
 
-**En paralelo (deuda técnica, cuando haya bandwidth)**:
-- Plan 1 F5.3 (re-exports cleanup, 48 archivos)
-- Plan 2/B (state machines restantes)
-- Plan 2/C (split archivos >300 líneas BE)
+1. ~~**QW3**~~ ✅ — CI verde, 0 fallos.
+2. ~~**Plan 6 F1**~~ ✅ — BD: tabla `ProfesorCurso` + migración + modelo EF.
+3. ~~**Plan 6 F2**~~ ✅ — Domain validators: 4 archivos + 42 tests.
+4. ~~**Plan 6 F3**~~ ✅ — BE Services: 7 archivos nuevos + 9 modificados. 741 tests.
+5. ~~**Plan 6 F4**~~ ✅ — Frontend: tipos + badges + cursos que dicta. 25 archivos.
+6. ~~**Plan 6 F5**~~ ✅ — Auditoría SQL: 0 violaciones INV-AS01/AS02.
+7. ~~**Plan 6 F6**~~ ✅ — Tests facade + invariantes formalizados + error codes.
+
+</details>
+
+**Próximo tramo ejecutable — CARRIL B (deuda técnica)**:
+
+1. **Plan 1 F5.3** — Re-exports cleanup `@shared` → `@intranet-shared` (48 archivos, FE, 3-4 chats) **← PRÓXIMO**
+2. **Plan 2/B** — State Machines (3 faltantes, BE) — desbloquea Plan 1 F4.4
+3. **Plan 2/C** — Split archivos >300 líneas BE
+4. **Plan 4** — Consolidación Backend
+5. **Plan 5** — Consolidación Frontend
+6. **Plan 7** — Error Trace Backend
 
 **Bloqueos duros (no ejecutables sin dependencia previa)**:
-- Plan 3 F4 🔒 por feature Matrícula (diseño admin UI pendiente)
-- Plan 10 🔒 hasta que Capas 1-4 cierren
+- Plan 1 F4.4 🔒 por Plan 2/B (state machines)
+- Plan 1 F4.5 🔒 por Plan 3 F4 (Matrícula)
+- Plan 3 F4 🔒 por diseño admin UI pendiente
+- Plan 10 🔒 hasta que Carril B cierre sustancialmente
 
 ---
 
@@ -65,23 +74,10 @@
 
 > Reorganizado 2026-04-16: features primero. La arquitectura limpia es un medio, no un fin.
 
-### Carril A — Features (prioridad máxima)
+### Carril A — Features ✅ CERRADO (2026-04-16)
 
-> "Si no hay feature nueva, no hay valor entregado."
-
-- **Plan 6** — Asignación Profesor-Salón-Curso (tutor pleno vs por curso)
-  - **Dependencia real**: ninguna dura. La tabla `ProfesorCurso` y los validators son código nuevo que no colisiona con nada existente.
-  - **Integración opcional**: Plan 2/B7 (`HorarioStateMachine.→ACTIVO`) puede invocar los validators, pero Plan 6 funciona sin state machine formal — basta con la validación en `HorarioService`.
-
-**Análisis de dependencias de Plan 6**:
-
-| Plan 6 necesita de… | ¿Bloquea? | Razón |
-|----------------------|-----------|-------|
-| Plan 3 (Domain Layer) | **No** | Plan 6 crea validators nuevos en `Domain/Academico/`, no modifica los existentes |
-| Plan 2/B (State Machines) | **No** | La validación se integra en `HorarioService.Crear/Actualizar` directamente, no necesita `HorarioStateMachine` |
-| Plan 1 (Enforcement) | **No** | El código nuevo seguirá las reglas ya enforced (capas, imports, etc.) |
-| Plan 4/5 (Consolidación) | **No** | Plan 6 crea nuevos archivos, no refactoriza existentes |
-| QW3 (CI verde) | **Sí** | CI debe estar verde para detectar regresiones al mergear |
+> Plan 6 (Asignación Profesor-Salón-Curso) completado: BD + Domain + Backend + Frontend + Auditoría + Tests.
+> Validators INV-AS01/AS02 enforced en HorarioService. 0 violaciones en producción. 1321 tests verdes.
 
 ### Carril B — Deuda técnica (en paralelo, cuando haya bandwidth)
 
@@ -104,32 +100,25 @@ Estos se ejecutan en chats disponibles entre fases del Carril A, o cuando el Car
 
 ---
 
-## Diagrama de dependencias (actualizado)
+## Diagrama de dependencias (actualizado 2026-04-16)
 
 ```
-CARRIL A — FEATURES (prioridad)
+CARRIL A — FEATURES ✅ CERRADO
+   QW3 ✅ ──► Plan 6 F1-F6 ✅ (completo)
 
-   QW3 (CI verde) ──► Plan 6 F1 (BD) ──► Plan 6 F2 (Domain) ──► Plan 6 F3 (BE Services)
-                                                                        │
-                                                                        ▼
-                                                                  Plan 6 F4 (Frontend)
-                                                                        │
-                                                                        ▼
-                                                                  Plan 6 F5-F6 (Tests + Audit)
+CARRIL B — DEUDA TÉCNICA (foco actual)
 
-CARRIL B — DEUDA TÉCNICA (paralelo)
-
-   Plan 1 F5 (re-exports) ── sin bloqueos, ejecutar cuando haya bandwidth
+   Plan 1 F5 (re-exports) ── sin bloqueos ← PRÓXIMO
    Plan 2/B (State Machines) ── desbloquea Plan 1 F4.4 (tests INV-T*)
    Plan 2/C (Split BE) ── sin bloqueos
-   Plan 4 (Consolidación BE) ── tras Plan 2/B+C, consume validadores de Plan 6
-   Plan 5 (Consolidación FE) ── tras Plan 4 + Plan 6 F4
+   Plan 4 (Consolidación BE) ── tras Plan 2/B+C
+   Plan 5 (Consolidación FE) ── tras Plan 4
    Plan 7 (Error Trace) ── paralelo a todo
 
 CARRIL C — DIFERIDO
 
    Plan 3 F4 (Matrícula) 🔒 ── espera diseño admin UI
-   Plan 10 (Flujos Alternos) 🔒 ── espera carriles A+B cerrados
+   Plan 10 (Flujos Alternos) 🔒 ── espera Carril B cerrado
 ```
 
 ---
@@ -258,11 +247,11 @@ CARRIL C — DIFERIDO
 - [ ] **Opción C — Split archivos >300 líneas BE**
   - [ ] C.1-C.6 (ver plan base)
 
-#### Plan 4 — Consolidación Backend (tras Plan 2 + Plan 6 F5)
+#### Plan 4 — Consolidación Backend (tras Plan 2/B+C)
 
 - [ ] F1-F6 (ver plan base)
 
-#### Plan 5 — Consolidación Frontend (tras Plan 4 + Plan 6 F4)
+#### Plan 5 — Consolidación Frontend (tras Plan 4)
 
 - [ ] F1-F6 (ver plan base)
 
