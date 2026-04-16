@@ -1,6 +1,6 @@
 # Plan Maestro — Orden y Dependencias
 
-> **Fecha**: 2026-04-14
+> **Fecha**: 2026-04-14 (última revisión: 2026-04-16)
 > **Objetivo**: Ordenar los 11 planes dispersos entre `educa-web/.claude/` y `Educa.API/.claude/` en una secuencia con dependencias explícitas.
 > **Principio rector** (actualizado 2026-04-16): "Features primero — el enforcement y la arquitectura son valiosos solo si soportan funcionalidad real. La deuda técnica se paga en paralelo, no como prerrequisito."
 
@@ -21,9 +21,21 @@
 | 9 | Design Patterns Frontend | FE | [tasks/design-patterns-frontend.md](../tasks/design-patterns-frontend.md) | Incremental | N/A |
 | 10 | Flujos Alternos (resiliencia) | FE | [plan/flujos-alternos.md](flujos-alternos.md) | ⏳ (bloqueado) | 0% |
 | 11 | Refactor `eslint.config.js` (fix G10) | FE | [plan/eslint-config-refactor.md](eslint-config-refactor.md) | ✅ F1-F5 (F5.3 tests opcionales sin ejecutar) | ~95% |
+| 12 | Backend Test Gaps | BE | [plan/test-backend-gaps.md](test-backend-gaps.md) | ⏳ | 0% |
+| 13 | Frontend Test Gaps | FE | [plan/test-frontend-gaps.md](test-frontend-gaps.md) | ⏳ | 0% |
+| 14 | Contratos FE-BE | FE+BE | [plan/contratos-fe-be.md](contratos-fe-be.md) | ⏳ | 0% |
+| 15 | Release Protocol y Operaciones | FE+BE | [plan/release-operations.md](release-operations.md) | F1 ✅ · F2-F5 ⏳ | ~20% |
+| 16 | Auditoría de Seguridad | BE | [plan/security-audit.md](security-audit.md) | ⏳ | 0% |
 
-**Resumen por carril**: Carril A (features) ✅ 100% · QW4 (lint limpio) ✅ 100% · Carril B (deuda) ~50% · Carril C (diferido) 0%
-**Total consolidado**: **~65%** del plan maestro terminado. Carril A + QW4 cerrados. **Foco: push a producción (QW4.6) y luego Carril B**.
+**Semáforo de readiness**:
+
+| Dimensión | Estado | Gate mínimo |
+|---|---|---|
+| **Feature readiness** | 🟢 Listo | Carril A ✅ + QW4 ✅ + push |
+| **Production readiness** | 🟡 Parcial | Plan 15 F1 ✅ (DEPLOY.md) · Falta: health endpoint, smoke automatizado |
+| **Reliability readiness** | 🔴 Sin red | Falta: tests de contrato, auditoría endpoints, error trace, fallbacks P0 |
+
+**Foco: push a producción (QW4.6) → Carril D (confiabilidad) → Carril B (deuda)**.
 
 ---
 
@@ -37,7 +49,7 @@
 | ~~Plan 6 (completo)~~ | ~~Plan 4 (Consolidación BE) + Plan 5 (Consolidación FE)~~ | ✅ Cerrado 2026-04-16 |
 | Plan 2/B (3 state machines) | Plan 1 F4.4 (INV-T*) | Transiciones formales necesarias para tests de invariantes |
 | Plan 3 F4 (Matrícula) | Plan 1 F4.5 (INV-M*) | Feature independiente |
-| Carril B sustancialmente cerrado | Plan 10 (Flujos Alternos) | Requisito explícito: "proyecto limpio" |
+| Carril B sustancialmente cerrado | Plan 10 F1+ (Flujos Alternos completo) | Requisito explícito: "proyecto limpio" (P0 extraído a Carril D, desbloqueado) |
 
 **Carril A — CERRADO** ✅ (2026-04-16). Plan 6 completado en todas sus fases (F0-F6).
 
@@ -55,21 +67,34 @@
 
 **QW4 — LINT LIMPIO ✅** (2026-04-16): 0 errors, 0 warnings. 1321 tests. Build OK. **Listo para push.**
 
-**Próximo paso — PUSH a producción (QW4.6) y luego CARRIL B (deuda técnica)**:
+**Próximo paso — PUSH a producción (QW4.6) → Carril D (confiabilidad) → Carril B (deuda)**:
+
+**Carril D — Confiabilidad sistémica (post-push, antes de Carril B)**:
+
+1. **Plan 15 F1** — Checklist de deploy + smoke checks + rollback protocol (proceso, 1 chat) ✅
+2. **Plan 16 F1** — Auditoría de endpoints y autorización (1 chat)
+3. **Plan 12 F1** — Controller contract tests P0: Auth, Asistencia, Aprobación (2-3 chats)
+4. **Plan 13 F1** — Interceptores core sin cobertura (1 chat)
+5. **Plan 12 F3** — Security boundary tests (1-2 chats)
+6. **Plan 14 F1-F2** — Snapshots de DTOs (mínimo viable de contratos, 1-2 chats)
+7. **Plan 15 F2** — Health check endpoint (1 chat)
+8. **Plan 7 F1-F2** — Error Trace Backend: observabilidad mínima en producción (1-2 chats)
+9. **Plan 10 P0** — Fallbacks críticos: offline, auth failure, API down (1 chat)
+
+**Carril B — Deuda técnica (cuando Carril D tenga base sólida)**:
 
 1. **Plan 1 F5.3** — Re-exports cleanup `@shared` → `@intranet-shared` (48 archivos, FE, 3-4 chats)
 2. **Plan 2/B** — State Machines (3 faltantes, BE) — desbloquea Plan 1 F4.4
 3. **Plan 2/C** — Split archivos >300 líneas BE
 4. **Plan 4** — Consolidación Backend
 5. **Plan 5** — Consolidación Frontend
-6. **Plan 7** — Error Trace Backend
 
 **Bloqueos duros (no ejecutables sin dependencia previa)**:
 
 - Plan 1 F4.4 🔒 por Plan 2/B (state machines)
 - Plan 1 F4.5 🔒 por Plan 3 F4 (Matrícula)
 - Plan 3 F4 🔒 por diseño admin UI pendiente
-- Plan 10 🔒 hasta que Carril B cierre sustancialmente
+- Plan 10 F1+ 🔒 hasta que Carril B cierre sustancialmente (P0 desbloqueado en Carril D)
 
 ---
 
@@ -82,7 +107,21 @@
 > Plan 6 (Asignación Profesor-Salón-Curso) completado: BD + Domain + Backend + Frontend + Auditoría + Tests.
 > Validators INV-AS01/AS02 enforced en HorarioService. 0 violaciones en producción. 1321 tests verdes.
 
-### Carril B — Deuda técnica (en paralelo, cuando haya bandwidth)
+### Carril D — Confiabilidad sistémica (post-push, ANTES de Carril B)
+
+> "Funciona es condición necesaria, no suficiente. Verificable, reversible y observable es el estándar."
+
+- **Plan 15** — Release Protocol: checklist, smoke checks, rollback, health endpoint
+- **Plan 16** — Auditoría de Seguridad: endpoints, secretos, headers, sesiones
+- **Plan 12** — Backend Test Gaps: controllers, repos, security, workers, concurrencia
+- **Plan 13** — Frontend Test Gaps: interceptores, páginas admin, flujos, WAL/offline
+- **Plan 14** — Contratos FE-BE: snapshots de DTOs, endpoints, enums
+- **Plan 7** — Error Trace Backend: observabilidad de errores en producción (movido desde Carril B — tracing es confiabilidad, no deuda)
+- **Plan 10 P0** — Fallbacks críticos: offline, auth failure, API down (subset mínimo extraído de Plan 10)
+
+Estos se ejecutan inmediatamente después del push. Son la red de seguridad que el proyecto necesita antes de operar en producción con confianza.
+
+### Carril B — Deuda técnica (cuando Carril D tenga base sólida)
 
 > "La deuda se paga mientras se construye, no antes."
 
@@ -91,9 +130,8 @@
 - **Plan 2/C** — Split archivos >300 líneas BE
 - **Plan 4** — Consolidación Backend
 - **Plan 5** — Consolidación Frontend
-- **Plan 7** — Error Trace Backend
 
-Estos se ejecutan en chats disponibles entre fases del Carril A, o cuando el Carril A espera feedback/decisiones del negocio.
+Estos se ejecutan cuando el Carril D provea red de seguridad mínima (Plan 15 F1 + Plan 16 F1 + Plan 12 F1 P0 + Plan 7 F1).
 
 ### Carril C — Diferido (bloqueado o bajo prioridad)
 
@@ -109,19 +147,31 @@ Estos se ejecutan en chats disponibles entre fases del Carril A, o cuando el Car
 CARRIL A — FEATURES ✅ CERRADO
    QW3 ✅ ──► Plan 6 F1-F6 ✅ (completo)
 
-CARRIL B — DEUDA TÉCNICA (foco actual)
+CARRIL D — CONFIABILIDAD SISTÉMICA (foco actual, post-push)
 
-   Plan 1 F5 (re-exports) ── sin bloqueos ← PRÓXIMO
+   Plan 15 F1 (Checklist deploy) ── sin bloqueos ← ✅ HECHO
+   Plan 16 F1 (Auditoría endpoints) ── sin bloqueos
+   Plan 12 F1 (Controller tests P0) ── sin bloqueos
+   Plan 13 F1 (Interceptores FE) ── sin bloqueos
+   Plan 12 F3 (Security tests) ── tras Plan 16 F1 (necesita la matriz de endpoints)
+   Plan 14 F1-F2 (Contratos DTOs) ── sin bloqueos
+   Plan 15 F2 (Health endpoint) ── sin bloqueos
+   Plan 7 F1-F2 (Error Trace) ── sin bloqueos (observabilidad = confiabilidad)
+   Plan 10 P0 (Fallbacks P0) ── sin bloqueos (subset mínimo: offline, auth, API down)
+
+CARRIL B — DEUDA TÉCNICA (cuando Carril D tenga base)
+
+   Plan 1 F5 (re-exports) ── sin bloqueos
    Plan 2/B (State Machines) ── desbloquea Plan 1 F4.4 (tests INV-T*)
    Plan 2/C (Split BE) ── sin bloqueos
    Plan 4 (Consolidación BE) ── tras Plan 2/B+C
    Plan 5 (Consolidación FE) ── tras Plan 4
-   Plan 7 (Error Trace) ── paralelo a todo
 
 CARRIL C — DIFERIDO
 
    Plan 3 F4 (Matrícula) 🔒 ── espera diseño admin UI
-   Plan 10 (Flujos Alternos) 🔒 ── espera Carril B cerrado
+   Plan 10 F1+ (Flujos Alternos completo) 🔒 ── espera Carril B cerrado
+   Plan 7 F3+ (Error Trace avanzado) ── tras Plan 7 F1-F2 en Carril D
 ```
 
 ---
@@ -247,9 +297,124 @@ CARRIL C — DIFERIDO
 
 ---
 
-### Carril B — Deuda técnica (tras push a producción)
+### Carril D — Confiabilidad sistémica (post-push, ANTES de Carril B)
 
-> Estas tareas se ejecutan después del push estable, cuando haya bandwidth.
+> **"Corregir lo que duele es un fix. Tener red de seguridad antes de que duela es ingeniería."**
+> Estas tareas se ejecutan inmediatamente después del push. Son la red de seguridad que falta para operar en producción con confianza.
+
+#### Plan 15 — Release Protocol y Operaciones
+
+- [x] **F1 — Checklist de deploy** (1 chat, proceso puro) ✅ (2026-04-16)
+  - [x] F1.1 Pre-deploy checklist (build, tests, scripts SQL, orden de deploy)
+  - [x] F1.2 Post-deploy smoke checks (~20 verificaciones manuales)
+  - [x] F1.3 Rollback protocol (FE, BE, BD)
+  - [x] Entregable: `DEPLOY.md` en raíz del proyecto
+
+- [ ] **F2 — Health check endpoint** (1 chat, BE)
+  - [ ] F2.1 `GET /api/health` — BD accesible, outbox no bloqueada, jobs activos
+  - [ ] F2.2 Response tipado: healthy/degraded/unhealthy
+
+- [ ] **F3 — Validación datos post-deploy** (1 chat, SQL)
+  - [ ] F3.1 Queries de consistencia (estudiantes huérfanos, salones duplicados, horarios con profesor inactivo)
+
+- [ ] **F4 — Feature flags como safety net** (documentación)
+  - [ ] F4.1 Patrón: flag=false en prod → smoke → flag=true → re-deploy
+
+- [ ] **F5 — Monitoreo básico** (evaluar + cubrir gaps)
+  - [ ] F5.1 Verificar que RequestMetricsMiddleware logea a destino consultable
+  - [ ] F5.2 Si lo existente no alcanza: definir mínimo de alertas (5xx rate, latency P95, health degraded)
+
+#### Plan 16 — Auditoría de Seguridad
+
+- [ ] **F1 — Auditoría de endpoints** (1 chat, BE)
+  - [ ] F1.1 Listar todos los endpoints con atributos de seguridad
+  - [ ] F1.2 Matriz endpoints vs roles esperados
+  - [ ] F1.3 Identificar endpoints sin [Authorize] que deberían tenerlo
+  - [ ] F1.4 Identificar endpoints sin rate limiting que deberían tenerlo
+
+- [ ] **F2 — Auditoría de secretos** (1 chat, ambos repos)
+  - [ ] F2.1 Grep de patrones de secretos en código
+  - [ ] F2.2 Verificar .gitignore cubre archivos sensibles
+  - [ ] F2.3 Verificar DniHelper.Mask() en todos los puntos de salida
+
+- [ ] **F3 — Headers y CORS** (1 chat, BE)
+- [ ] **F4 — Sesión y tokens** (1 chat, BE)
+- [ ] **F5 — Datos sensibles en respuestas** (1 chat, BE)
+
+#### Plan 12 — Backend Test Gaps
+
+- [ ] **F1 — Controller contract tests** (3-4 chats, BE)
+  - [ ] F1.P0 Auth + Asistencia + Aprobación
+  - [ ] F1.P1 Usuarios + Horarios + Calificaciones + Permisos
+  - [ ] F1.P2 Resto de controllers
+
+- [ ] **F2 — Repository integration tests** (2-3 chats, BE)
+  - [ ] F2.P0 Asistencia + EstudianteSalon + ProfesorSalon
+  - [ ] F2.P1 Horario + Calificación + Aprobación
+
+- [ ] **F3 — Security boundary tests** (1-2 chats, BE)
+  - [ ] Cross-role access, tokens expirados, idempotencia, cuenta inactiva
+
+- [ ] **F4 — Workers/jobs tests** (1 chat, BE)
+- [ ] **F5 — Concurrencia e idempotencia** (1 chat, BE)
+
+#### Plan 13 — Frontend Test Gaps
+
+- [ ] **F1 — Interceptores core** (1 chat, FE)
+  - [ ] api-response, clock-sync, sw-cache-invalidation, request-trace
+
+- [ ] **F2 — Páginas admin críticas** (2 chats, FE)
+  - [ ] asistencias admin, feedback-reports, health-permissions, email-outbox, error-logs
+
+- [ ] **F3 — Flujos de integración UI** (1-2 chats, FE)
+  - [ ] Login completo, Guard+Permisos, CRUD admin tipo, Error recovery
+
+- [ ] **F4 — WAL/Offline/Cache** (1 chat, FE)
+- [ ] **F5 — Componentes shared de alto uso** (1 chat, FE)
+
+#### Plan 14 — Contratos FE-BE
+
+- [ ] **F1-F2 — Snapshot de DTOs** (mínimo viable, 1-2 chats)
+  - [ ] F1 Backend: reflection → dtos.snapshot.json
+  - [ ] F2 Frontend: test que verifica interfaces vs snapshot
+
+- [ ] **F3-F4 — Snapshot de endpoints** (1-2 chats)
+- [ ] **F5 — Enums y constantes** (1 chat)
+- [ ] **F6 — Automatización** (1 chat)
+
+#### Plan 7 — Error Trace Backend (observabilidad — movido desde Carril B)
+
+> Tracing de errores es confiabilidad, no deuda técnica. Sin observabilidad no hay producción segura.
+
+- [ ] **F1 — Structured error logging** (1 chat, BE)
+  - [ ] F1.1 Auditar qué logea GlobalExceptionMiddleware hoy y a dónde va
+  - [ ] F1.2 Garantizar que CorrelationId aparece en todos los logs de error
+  - [ ] F1.3 Verificar que ErrorLog persiste con suficiente contexto para diagnóstico
+
+- [ ] **F2 — Error visibility mínima** (1 chat, FE+BE)
+  - [ ] F2.1 Verificar que error-logs admin consume ErrorLog correctamente
+  - [ ] F2.2 Verificar correlación ReporteUsuario → ErrorLog vía CorrelationId
+
+- [ ] F3+ — Fases avanzadas (alertas, dashboards, métricas) → Carril C cuando F1-F2 estén cerrados
+
+#### Plan 10 P0 — Fallbacks críticos (subset mínimo extraído de Plan 10)
+
+> El Plan 10 completo espera Carril B. Pero estos 3 fallbacks son seguridad de producción.
+
+- [ ] **P0.1 — API down / timeout** (1 chat, FE)
+  - [ ] ¿Qué ve el usuario cuando el backend no responde? ¿Hay mensaje claro o pantalla rota?
+
+- [ ] **P0.2 — Auth token expirado / refresh falla** (1 chat, FE)
+  - [ ] ¿El usuario es redirigido a login limpiamente o queda en estado roto?
+
+- [ ] **P0.3 — Offline + WAL sync failure** (1 chat, FE)
+  - [ ] ¿Qué pasa con operaciones WAL encoladas cuando la reconexión falla persistentemente?
+
+---
+
+### Carril B — Deuda técnica (cuando Carril D tenga base sólida)
+
+> Estas tareas se ejecutan después de que el Carril D provea red de seguridad mínima.
 
 #### Plan 11 — Refactor `eslint.config.js` ✅ (~95%)
 
@@ -302,10 +467,6 @@ CARRIL C — DIFERIDO
 
 - [ ] F1-F6 (ver plan base)
 
-#### Plan 7 — Error Trace Backend (paralelo a todo)
-
-- [ ] F1-F6 (ver plan base)
-
 ---
 
 ### Carril C — Diferido
@@ -314,9 +475,13 @@ CARRIL C — DIFERIDO
 
 - [ ] Espera diseño admin UI + service layer
 
-#### Plan 10 — Flujos Alternos 🔒
+#### Plan 7 F3+ — Error Trace avanzado
 
-- [ ] Espera carriles A+B sustancialmente cerrados
+- [ ] Alertas, dashboards, métricas — tras Plan 7 F1-F2 en Carril D
+
+#### Plan 10 F1+ — Flujos Alternos completo 🔒
+
+- [ ] Espera carriles A+B sustancialmente cerrados (P0 ya extraído a Carril D)
 
 #### Planes 8-9 — Design Patterns
 
