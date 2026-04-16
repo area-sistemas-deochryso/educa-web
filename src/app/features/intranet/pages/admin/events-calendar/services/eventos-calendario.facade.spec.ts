@@ -8,7 +8,7 @@ import { of, throwError } from 'rxjs';
 import { EventsCalendarFacade } from './eventos-calendario.facade';
 import { EventsCalendarStore } from './eventos-calendario.store';
 import { EventsCalendarService } from './eventos-calendario.service';
-import { ErrorHandlerService } from '@core/services';
+import { ErrorHandlerService, SwService, WalFacadeHelper } from '@core/services';
 import { EventoCalendarioLista, EventosCalendarioEstadisticas } from '@data/models';
 
 // #endregion
@@ -39,6 +39,36 @@ function createMockApi() {
 function createMockErrorHandler() {
 	return { showError: vi.fn(), showSuccess: vi.fn(), showInfo: vi.fn() };
 }
+
+// Controllable WAL mock: captures configs, auto-calls optimistic.apply on execute.
+interface WalConfig {
+	operation: string;
+	optimistic?: { apply: () => void; rollback: () => void };
+	onCommit: (result?: unknown) => void;
+	onError: (err: unknown) => void;
+}
+
+function createControllableWal() {
+	const configs: WalConfig[] = [];
+	const execute = vi.fn((config: WalConfig) => {
+		configs.push(config);
+		config.optimistic?.apply();
+	});
+	return {
+		execute,
+		last: () => configs[configs.length - 1],
+		commit: (result?: unknown) => configs[configs.length - 1].onCommit(result),
+		fail: (err: unknown) => {
+			const cfg = configs[configs.length - 1];
+			cfg.optimistic?.rollback();
+			cfg.onError(err);
+		},
+	};
+}
+
+function createMockSwService() {
+	return { invalidateCacheByPattern: vi.fn().mockResolvedValue(0), clearCache: vi.fn() };
+}
 // #endregion
 
 // #region Tests
@@ -47,10 +77,12 @@ describe('EventsCalendarFacade', () => {
 	let store: EventsCalendarStore;
 	let api: ReturnType<typeof createMockApi>;
 	let errorHandler: ReturnType<typeof createMockErrorHandler>;
+	let wal: ReturnType<typeof createControllableWal>;
 
 	beforeEach(() => {
 		api = createMockApi();
 		errorHandler = createMockErrorHandler();
+		wal = createControllableWal();
 
 		TestBed.configureTestingModule({
 			providers: [
@@ -58,6 +90,8 @@ describe('EventsCalendarFacade', () => {
 				EventsCalendarStore,
 				{ provide: EventsCalendarService, useValue: api },
 				{ provide: ErrorHandlerService, useValue: errorHandler },
+				{ provide: WalFacadeHelper, useValue: wal },
+				{ provide: SwService, useValue: createMockSwService() },
 			],
 		});
 
@@ -107,25 +141,27 @@ describe('EventsCalendarFacade', () => {
 			});
 		});
 
-		it('should call API and refresh items', () => {
+		it('should execute WAL and close dialog via optimistic apply', () => {
 			facade.create();
 
-			expect(api.crear).toHaveBeenCalled();
+			expect(wal.execute).toHaveBeenCalledTimes(1);
+			expect(wal.last().operation).toBe('CREATE');
 			expect(store.dialogVisible()).toBe(false);
 		});
 
-		it('should increment stats on success', () => {
+		it('should increment stats on optimistic apply', () => {
 			facade.create();
 			expect(store.estadisticas()!.total).toBe(2);
 			expect(store.estadisticas()!.activos).toBe(2);
 		});
 
-		it('should handle error', () => {
-			api.crear.mockReturnValue(throwError(() => new Error('fail')));
+		it('should rollback stats and show error on failure', () => {
 			facade.create();
+			wal.fail(new Error('fail'));
 
 			expect(errorHandler.showError).toHaveBeenCalled();
-			expect(store.loading()).toBe(false);
+			expect(store.estadisticas()!.total).toBe(mockStats.total);
+			expect(store.estadisticas()!.activos).toBe(mockStats.activos);
 		});
 	});
 	// #endregion
@@ -149,13 +185,11 @@ describe('EventsCalendarFacade', () => {
 			});
 		});
 
-		it('should call API and update item in store', () => {
-			// silentRefreshAfterCrud re-fetches items, so mock listar to return updated data
-			api.listar.mockReturnValue(of([{ ...mockItems[0], titulo: 'Updated', descripcion: 'New desc', tipo: 'cultural', icono: 'pi-star' }]));
-
+		it('should execute WAL and update item optimistically', () => {
 			facade.update();
 
-			expect(api.actualizar).toHaveBeenCalledWith(1, expect.objectContaining({ titulo: 'Updated' }));
+			expect(wal.execute).toHaveBeenCalledTimes(1);
+			expect(wal.last().operation).toBe('UPDATE');
 			expect(store.items()[0].titulo).toBe('Updated');
 			expect(store.dialogVisible()).toBe(false);
 		});
@@ -163,7 +197,7 @@ describe('EventsCalendarFacade', () => {
 		it('should do nothing without selected item', () => {
 			store.setSelectedItem(null);
 			facade.update();
-			expect(api.actualizar).not.toHaveBeenCalled();
+			expect(wal.execute).not.toHaveBeenCalled();
 		});
 	});
 	// #endregion
@@ -175,7 +209,7 @@ describe('EventsCalendarFacade', () => {
 			store.setEstadisticas(mockStats);
 		});
 
-		it('should toggle item estado and update stats', () => {
+		it('should toggle item estado and update stats optimistically', () => {
 			facade.toggleEstado(mockItems[0]);
 
 			expect(store.items()[0].estado).toBe(false);
@@ -183,10 +217,13 @@ describe('EventsCalendarFacade', () => {
 			expect(store.estadisticas()!.inactivos).toBe(1);
 		});
 
-		it('should handle error', () => {
-			api.toggleEstado.mockReturnValue(throwError(() => new Error('fail')));
+		it('should rollback on error and show error', () => {
 			facade.toggleEstado(mockItems[0]);
+			wal.fail(new Error('fail'));
 
+			expect(store.items()[0].estado).toBe(true);
+			expect(store.estadisticas()!.activos).toBe(mockStats.activos);
+			expect(store.estadisticas()!.inactivos).toBe(mockStats.inactivos);
 			expect(errorHandler.showError).toHaveBeenCalled();
 		});
 	});

@@ -13,6 +13,7 @@ import { of, throwError } from 'rxjs';
 
 import { errorInterceptor } from './error.interceptor';
 import { ErrorHandlerService } from '@core/services/error';
+import { ErrorReporterService } from '@core/services/error/error-reporter.service';
 import { AuthApiService } from '@core/services/auth/auth-api.service';
 import { SessionActivityService } from '@core/services/session';
 
@@ -23,11 +24,13 @@ describe('errorInterceptor', () => {
 	let httpClient: HttpClient;
 	let httpMock: HttpTestingController;
 	let errorHandlerMock: Partial<ErrorHandlerService>;
+	let errorReporterMock: Partial<ErrorReporterService>;
 	let authApiMock: Partial<AuthApiService>;
 	let sessionActivityMock: Partial<SessionActivityService>;
 
 	beforeEach(() => {
 		errorHandlerMock = { handleHttpError: vi.fn() };
+		errorReporterMock = { reportHttpError: vi.fn() };
 		authApiMock = { refresh: vi.fn().mockReturnValue(of({ rol: 'Director', nombreCompleto: 'Test', entityId: 1, sedeId: 1 })) };
 		sessionActivityMock = { forceLogout: vi.fn() };
 
@@ -36,6 +39,7 @@ describe('errorInterceptor', () => {
 				provideHttpClient(withInterceptors([errorInterceptor])),
 				provideHttpClientTesting(),
 				{ provide: ErrorHandlerService, useValue: errorHandlerMock },
+				{ provide: ErrorReporterService, useValue: errorReporterMock },
 				{ provide: AuthApiService, useValue: authApiMock },
 				{ provide: SessionActivityService, useValue: sessionActivityMock },
 			],

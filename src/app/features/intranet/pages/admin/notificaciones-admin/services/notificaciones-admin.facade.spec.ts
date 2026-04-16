@@ -7,7 +7,7 @@ import { of, throwError } from 'rxjs';
 import { NotificacionesAdminFacade } from './notificaciones-admin.facade';
 import { NotificacionesAdminStore } from './notificaciones-admin.store';
 import { NotificacionesAdminService } from './notificaciones-admin.service';
-import { ErrorHandlerService } from '@core/services';
+import { ErrorHandlerService, SwService, WalFacadeHelper } from '@core/services';
 import { NotificacionLista, NotificacionesEstadisticas } from '@data/models';
 
 // #endregion
@@ -35,6 +35,36 @@ function createMockApi() {
 		eliminar: vi.fn().mockReturnValue(of({ mensaje: 'ok' })),
 	};
 }
+
+// Controllable WAL mock: captures configs, auto-calls optimistic.apply on execute.
+interface WalConfig {
+	operation: string;
+	optimistic?: { apply: () => void; rollback: () => void };
+	onCommit: (result?: unknown) => void;
+	onError: (err: unknown) => void;
+}
+
+function createControllableWal() {
+	const configs: WalConfig[] = [];
+	const execute = vi.fn((config: WalConfig) => {
+		configs.push(config);
+		config.optimistic?.apply();
+	});
+	return {
+		execute,
+		last: () => configs[configs.length - 1],
+		commit: (result?: unknown) => configs[configs.length - 1].onCommit(result),
+		fail: (err: unknown) => {
+			const cfg = configs[configs.length - 1];
+			cfg.optimistic?.rollback();
+			cfg.onError(err);
+		},
+	};
+}
+
+function createMockSwService() {
+	return { invalidateCacheByPattern: vi.fn().mockResolvedValue(0), clearCache: vi.fn() };
+}
 // #endregion
 
 // #region Tests
@@ -43,10 +73,12 @@ describe('NotificacionesAdminFacade', () => {
 	let store: NotificacionesAdminStore;
 	let api: ReturnType<typeof createMockApi>;
 	let errorHandler: { showError: ReturnType<typeof vi.fn> };
+	let wal: ReturnType<typeof createControllableWal>;
 
 	beforeEach(() => {
 		api = createMockApi();
 		errorHandler = { showError: vi.fn(), showSuccess: vi.fn() } as never;
+		wal = createControllableWal();
 
 		TestBed.configureTestingModule({
 			providers: [
@@ -54,6 +86,8 @@ describe('NotificacionesAdminFacade', () => {
 				NotificacionesAdminStore,
 				{ provide: NotificacionesAdminService, useValue: api },
 				{ provide: ErrorHandlerService, useValue: errorHandler },
+				{ provide: WalFacadeHelper, useValue: wal },
+				{ provide: SwService, useValue: createMockSwService() },
 			],
 		});
 
@@ -96,10 +130,11 @@ describe('NotificacionesAdminFacade', () => {
 			});
 		});
 
-		it('should call API, close dialog, increment stats', () => {
+		it('should execute WAL, close dialog, increment stats optimistically', () => {
 			facade.create();
 
-			expect(api.crear).toHaveBeenCalled();
+			expect(wal.execute).toHaveBeenCalledTimes(1);
+			expect(wal.last().operation).toBe('CREATE');
 			expect(store.dialogVisible()).toBe(false);
 			expect(store.estadisticas()!.total).toBe(2);
 			expect(store.estadisticas()!.activas).toBe(2);

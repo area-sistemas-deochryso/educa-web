@@ -4,6 +4,9 @@ import { TestBed } from '@angular/core/testing';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { SchedulesStore } from './horarios.store';
+import { SchedulesFormStore } from './horarios-form.store';
+import { SchedulesFilterStore } from './horarios-filter.store';
+import { SchedulesOptionsStore } from './horarios-options.store';
 import { AuthStore } from '@core/store';
 import { StorageService } from '@core/services/storage';
 
@@ -47,16 +50,23 @@ const mockStorageService = {
 // #region Tests
 describe('SchedulesStore', () => {
 	let store: SchedulesStore;
+	let formStore: SchedulesFormStore;
+	let filterStore: SchedulesFilterStore;
 
 	beforeEach(() => {
 		TestBed.configureTestingModule({
 			providers: [
 				SchedulesStore,
+				SchedulesFormStore,
+				SchedulesFilterStore,
+				SchedulesOptionsStore,
 				AuthStore,
 				{ provide: StorageService, useValue: mockStorageService },
 			],
 		});
 		store = TestBed.inject(SchedulesStore);
+		formStore = TestBed.inject(SchedulesFormStore);
+		filterStore = TestBed.inject(SchedulesFilterStore);
 	});
 
 	// #region Initial state
@@ -69,17 +79,17 @@ describe('SchedulesStore', () => {
 		});
 
 		it('should have default form data', () => {
-			expect(store.formData().diaSemana).toBeNull();
-			expect(store.formData().horaInicio).toBe('07:00');
-			expect(store.formData().horaFin).toBe('08:00');
+			expect(formStore.formData().diaSemana).toBeNull();
+			expect(formStore.formData().horaInicio).toBe('07:00');
+			expect(formStore.formData().horaFin).toBe('08:00');
 		});
 
 		it('should default to lista view', () => {
-			expect(store.vistaActual()).toBe('lista');
+			expect(filterStore.vistaActual()).toBe('lista');
 		});
 
 		it('should have wizard at step 0', () => {
-			expect(store.wizardStep()).toBe(0);
+			expect(formStore.wizardStep()).toBe(0);
 		});
 
 		it('should have no filters', () => {
@@ -147,52 +157,52 @@ describe('SchedulesStore', () => {
 		});
 
 		it('should return all without filters', () => {
-			expect(store.horariosFiltrados()).toHaveLength(4);
+			expect(filterStore.horariosFiltrados()).toHaveLength(4);
 		});
 
 		it('should filter by salonId', () => {
-			store.setFiltroSalon(10);
-			expect(store.horariosFiltrados()).toHaveLength(2);
+			filterStore.setFiltroSalon(10);
+			expect(filterStore.horariosFiltrados()).toHaveLength(2);
 		});
 
 		it('should filter by profesorId', () => {
-			store.setFiltroProfesor(30);
-			expect(store.horariosFiltrados()).toHaveLength(2);
+			filterStore.setFiltroProfesor(30);
+			expect(filterStore.horariosFiltrados()).toHaveLength(2);
 		});
 
 		it('should filter by diaSemana in lista view', () => {
-			store.setFiltroDiaSemana(1);
-			expect(store.horariosFiltrados()).toHaveLength(2);
+			filterStore.setFiltroDiaSemana(1);
+			expect(filterStore.horariosFiltrados()).toHaveLength(2);
 		});
 
 		it('should NOT filter by diaSemana in semanal view', () => {
-			store.setFiltroDiaSemana(1);
-			store.setVistaActual('semanal');
-			expect(store.horariosFiltrados()).toHaveLength(4);
+			filterStore.setFiltroDiaSemana(1);
+			filterStore.setVistaActual('semanal');
+			expect(filterStore.horariosFiltrados()).toHaveLength(4);
 		});
 
 		it('should filter by estadoActivo', () => {
-			store.setFiltroEstadoActivo(false);
-			expect(store.horariosFiltrados()).toHaveLength(1);
+			filterStore.setFiltroEstadoActivo(false);
+			expect(filterStore.horariosFiltrados()).toHaveLength(1);
 		});
 
 		it('should combine filters', () => {
-			store.setFiltroSalon(10);
-			store.setFiltroEstadoActivo(true);
-			expect(store.horariosFiltrados()).toHaveLength(2);
+			filterStore.setFiltroSalon(10);
+			filterStore.setFiltroEstadoActivo(true);
+			expect(filterStore.horariosFiltrados()).toHaveLength(2);
 		});
 
 		it('should clear all filters', () => {
-			store.setFiltroSalon(10);
-			store.setFiltroProfesor(30);
-			store.setPaginationData(3, 10, 100);
+			filterStore.setFiltroSalon(10);
+			filterStore.setFiltroProfesor(30);
+			filterStore.setPaginationData(3, 10, 100);
 
-			store.clearFiltros();
+			filterStore.clearFiltros();
 
 			expect(store.vm().filtroSalonId).toBeNull();
 			expect(store.vm().filtroProfesorId).toBeNull();
 			expect(store.vm().hasFilters).toBe(false);
-			expect(store.page()).toBe(1);
+			expect(filterStore.page()).toBe(1);
 		});
 	});
 	// #endregion
@@ -221,41 +231,41 @@ describe('SchedulesStore', () => {
 	// #region Computed — form validation
 	describe('form validation', () => {
 		it('should be invalid with empty form at step 0', () => {
-			expect(store.formValid()).toBe(false);
+			expect(formStore.formValid()).toBe(false);
 		});
 
 		it('should be valid with complete step 0 data', () => {
-			store.setFormData({
+			formStore.setFormData({
 				diaSemana: 1,
 				horaInicio: '08:00',
 				horaFin: '09:30',
 				salonId: 10,
 				cursoId: 20,
 			});
-			expect(store.formValid()).toBe(true);
+			expect(formStore.formValid()).toBe(true);
 		});
 
 		it('should be invalid when horaInicio >= horaFin', () => {
-			store.setFormData({
+			formStore.setFormData({
 				diaSemana: 1,
 				horaInicio: '10:00',
 				horaFin: '09:00',
 				salonId: 10,
 				cursoId: 20,
 			});
-			expect(store.formValid()).toBe(false);
+			expect(formStore.formValid()).toBe(false);
 		});
 
 		it('should be valid at step 1 (profesor is optional)', () => {
-			store.nextStep();
-			expect(store.wizardStep()).toBe(1);
-			expect(store.formValid()).toBe(true);
+			formStore.nextStep();
+			expect(formStore.wizardStep()).toBe(1);
+			expect(formStore.formValid()).toBe(true);
 		});
 
 		it('should compute hora errors', () => {
-			store.setFormData({ horaInicio: '10:00', horaFin: '09:00' });
-			expect(store.horaInicioError()).toBe('La hora de fin debe ser posterior a la hora de inicio');
-			expect(store.horaFinError()).toBe('La hora de fin debe ser posterior a la hora de inicio');
+			formStore.setFormData({ horaInicio: '10:00', horaFin: '09:00' });
+			expect(formStore.horaInicioError()).toBe('La hora de fin debe ser posterior a la hora de inicio');
+			expect(formStore.horaFinError()).toBe('La hora de fin debe ser posterior a la hora de inicio');
 		});
 	});
 	// #endregion
@@ -263,43 +273,43 @@ describe('SchedulesStore', () => {
 	// #region Wizard
 	describe('wizard navigation', () => {
 		it('should advance and go back steps', () => {
-			expect(store.wizardStep()).toBe(0);
+			expect(formStore.wizardStep()).toBe(0);
 
-			store.nextStep();
-			expect(store.wizardStep()).toBe(1);
+			formStore.nextStep();
+			expect(formStore.wizardStep()).toBe(1);
 
-			store.nextStep();
-			expect(store.wizardStep()).toBe(2);
-			expect(store.isLastStep()).toBe(true);
+			formStore.nextStep();
+			expect(formStore.wizardStep()).toBe(2);
+			expect(formStore.isLastStep()).toBe(true);
 
-			store.nextStep();
-			expect(store.wizardStep()).toBe(2);
+			formStore.nextStep();
+			expect(formStore.wizardStep()).toBe(2);
 
-			store.prevStep();
-			expect(store.wizardStep()).toBe(1);
+			formStore.prevStep();
+			expect(formStore.wizardStep()).toBe(1);
 
-			store.prevStep();
-			expect(store.wizardStep()).toBe(0);
+			formStore.prevStep();
+			expect(formStore.wizardStep()).toBe(0);
 
-			store.prevStep();
-			expect(store.wizardStep()).toBe(0);
+			formStore.prevStep();
+			expect(formStore.wizardStep()).toBe(0);
 		});
 
 		it('should reset wizard', () => {
-			store.nextStep();
-			store.nextStep();
-			store.resetWizard();
-			expect(store.wizardStep()).toBe(0);
+			formStore.nextStep();
+			formStore.nextStep();
+			formStore.resetWizard();
+			expect(formStore.wizardStep()).toBe(0);
 		});
 
 		it('should compute navigation state', () => {
-			expect(store.canGoPrevStep()).toBe(false);
-			expect(store.isCreating()).toBe(true);
-			expect(store.isEditing()).toBe(false);
+			expect(formStore.canGoPrevStep()).toBe(false);
+			expect(formStore.isCreating()).toBe(true);
+			expect(formStore.isEditing()).toBe(false);
 
-			store.setEditingId(5);
-			expect(store.isCreating()).toBe(false);
-			expect(store.isEditing()).toBe(true);
+			formStore.setEditingId(5);
+			expect(formStore.isCreating()).toBe(false);
+			expect(formStore.isEditing()).toBe(true);
 		});
 	});
 	// #endregion
@@ -307,29 +317,29 @@ describe('SchedulesStore', () => {
 	// #region Dialog management
 	describe('dialog management', () => {
 		it('should open and close main dialog', () => {
-			store.openDialog();
-			expect(store.dialogVisible()).toBe(true);
+			formStore.openDialog();
+			expect(formStore.dialogVisible()).toBe(true);
 
-			store.closeDialog();
-			expect(store.dialogVisible()).toBe(false);
-			expect(store.wizardStep()).toBe(0);
-			expect(store.editingId()).toBeNull();
+			formStore.closeDialog();
+			expect(formStore.dialogVisible()).toBe(false);
+			expect(formStore.wizardStep()).toBe(0);
+			expect(formStore.editingId()).toBeNull();
 		});
 
 		it('should open and close detail drawer', () => {
-			store.openDetailDrawer();
-			expect(store.detailDrawerVisible()).toBe(true);
+			formStore.openDetailDrawer();
+			expect(formStore.detailDrawerVisible()).toBe(true);
 
 			store.closeDetailDrawer();
-			expect(store.detailDrawerVisible()).toBe(false);
+			expect(formStore.detailDrawerVisible()).toBe(false);
 			expect(store.horarioDetalle()).toBeNull();
 		});
 
 		it('should open and close curso dialog', () => {
-			store.openCursoDialog();
+			formStore.openCursoDialog();
 			expect(store.vm().cursoDialogVisible).toBe(true);
 
-			store.closeCursoDialog();
+			formStore.closeCursoDialog();
 			expect(store.vm().cursoDialogVisible).toBe(false);
 		});
 	});
@@ -338,32 +348,32 @@ describe('SchedulesStore', () => {
 	// #region Vista switching
 	describe('vista switching', () => {
 		it('should switch to semanal and clear dia filter', () => {
-			store.setFiltroDiaSemana(1);
-			store.setVistaActual('semanal');
+			filterStore.setFiltroDiaSemana(1);
+			filterStore.setVistaActual('semanal');
 
-			expect(store.vistaActual()).toBe('semanal');
+			expect(filterStore.vistaActual()).toBe('semanal');
 			expect(store.vm().filtroDiaSemana).toBeNull();
 		});
 
 		it('should keep dia filter when switching to lista', () => {
-			store.setFiltroDiaSemana(1);
-			store.setVistaActual('lista');
+			filterStore.setFiltroDiaSemana(1);
+			filterStore.setVistaActual('lista');
 
 			expect(store.vm().filtroDiaSemana).toBe(1);
 		});
 
 		it('should enable semanal view when salon or profesor is filtered', () => {
-			expect(store.vistaSemanalHabilitada()).toBe(false);
+			expect(filterStore.vistaSemanalHabilitada()).toBe(false);
 
-			store.setFiltroSalon(10);
-			expect(store.vistaSemanalHabilitada()).toBe(true);
+			filterStore.setFiltroSalon(10);
+			expect(filterStore.vistaSemanalHabilitada()).toBe(true);
 		});
 
 		it('should enable dia filter only in lista view', () => {
-			expect(store.filtroDiaSemanaHabilitado()).toBe(true);
+			expect(filterStore.filtroDiaSemanaHabilitado()).toBe(true);
 
-			store.setVistaActual('semanal');
-			expect(store.filtroDiaSemanaHabilitado()).toBe(false);
+			filterStore.setVistaActual('semanal');
+			expect(filterStore.filtroDiaSemanaHabilitado()).toBe(false);
 		});
 	});
 	// #endregion

@@ -210,10 +210,10 @@ describe('UsersCrudFacade', () => {
 			expect(errorHandler.showError).toHaveBeenCalled();
 		});
 
-		it('onCommit triggers refresh', () => {
+		it('onCommit is a no-op (no refetch for updates)', () => {
 			const before = store.refreshCounter();
 			wal.commit();
-			expect(store.refreshCounter()).toBe(before + 1);
+			expect(store.refreshCounter()).toBe(before);
 		});
 	});
 	// #endregion
