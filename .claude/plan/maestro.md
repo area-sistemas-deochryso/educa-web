@@ -15,7 +15,7 @@
 | 3 | Domain Layer (Opción A) | BE | [Educa.API/.claude/plan/domain-layer.md](../../../Educa.API/.claude/plan/domain-layer.md) | Fases 1-3,5-6 ✅ · F4 🔒 (bloqueada por Matrícula) | ~85% |
 | 4 | Consolidación Backend | FE | [plan/consolidacion-backend.md](consolidacion-backend.md) | ⏳ | 0% |
 | 5 | Consolidación Frontend | FE | [plan/consolidacion-frontend.md](consolidacion-frontend.md) | ⏳ | 0% |
-| 6 | Asignación Profesor-Salón-Curso | BE+FE | [Educa.API/.claude/plan/asignacion-profesor-salon-curso.md](../../../Educa.API/.claude/plan/asignacion-profesor-salon-curso.md) | F0-F5 ✅ · F6 ⏳ | ~90% |
+| 6 | Asignación Profesor-Salón-Curso | BE+FE | [Educa.API/.claude/plan/asignacion-profesor-salon-curso.md](../../../Educa.API/.claude/plan/asignacion-profesor-salon-curso.md) | ✅ F0-F6 cerrado | 100% |
 | 7 | Error Trace Backend | BE | [Educa.API/.claude/plan/error-trace-backend.md](../../../Educa.API/.claude/plan/error-trace-backend.md) | ⏳ | 0% |
 | 8 | Design Patterns Backend | FE | [tasks/design-patterns-backend.md](../tasks/design-patterns-backend.md) | Incremental | N/A |
 | 9 | Design Patterns Frontend | FE | [tasks/design-patterns-frontend.md](../tasks/design-patterns-frontend.md) | Incremental | N/A |
@@ -48,7 +48,7 @@
 4. ~~**Plan 6 F3**~~ ✅ (2026-04-16) — BE Services: 7 archivos nuevos + 9 modificados. 741 tests OK.
 5. ~~**Plan 6 F4**~~ ✅ (2026-04-16) — Frontend: tipos + badges + cursos que dicta en usuarios. 25 archivos, commit `11c1658`.
 6. ~~**Plan 6 F5**~~ ✅ (2026-04-16) — Auditoría SQL: 0 violaciones INV-AS01/AS02 en ambas BDs.
-7. **Plan 6 F6** — Tests E2E + cierre (repo FE). **← PRÓXIMO**
+7. ~~**Plan 6 F6**~~ ✅ (2026-04-16) — Tests facade (4 nuevos) + invariantes formalizados + error codes mapeados. **Plan 6 CERRADO.**
 
 **En paralelo (deuda técnica, cuando haya bandwidth)**:
 - Plan 1 F5.3 (re-exports cleanup, 48 archivos)
@@ -203,10 +203,11 @@ CARRIL C — DIFERIDO
   - [x] F5.2 Resultado: **0 violaciones** en test y producción. No hay grandfathering que gestionar.
   - [x] F5.3 Actualizar plan base + maestro ✅
 
-- [ ] **F6 — Tests E2E + cierre** (1 chat)
-  - [ ] F6.1 Tests facade FE: crear horario tutor pleno OK/KO, por curso OK/KO
-  - [ ] F6.2 Formalizar INV-AS01/02/03 en `business-rules.md § 15`
-  - [ ] F6.3 Actualizar plan base + maestro
+- [x] **F6 — Tests E2E + cierre** (1 chat) ✅ (2026-04-16)
+  - [x] F6.1 Tests facade FE: 4 tests (INV-AS01 reject, INV-AS02 reject, tutor pleno OK, por curso OK). Suite: 1321 tests, 0 fallos.
+  - [x] F6.2 Formalizar INV-AS01/02/03/04/05 en `business-rules.md § 15.12` + actualizar § 5.4 (umbrales corregidos, estado implementado)
+  - [x] F6.3 Mapear 4 error codes nuevos en `UI_ERROR_CODES`
+  - [x] F6.4 Actualizar plan base + maestro ✅
 
 ---
 
