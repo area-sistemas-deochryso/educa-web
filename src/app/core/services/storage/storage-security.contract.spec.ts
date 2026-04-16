@@ -77,19 +77,19 @@ describe('StorageService — Security Contracts', () => {
 	// #region INV: No token methods on StorageService
 	describe('INV: StorageService must NOT expose token access methods', () => {
 		it('should NOT have getToken method', () => {
-			expect(typeof (service as any).getToken).toBe('undefined');
+			expect(typeof (service as unknown as Record<string, unknown>).getToken).toBe('undefined');
 		});
 
 		it('should NOT have setToken method', () => {
-			expect(typeof (service as any).setToken).toBe('undefined');
+			expect(typeof (service as unknown as Record<string, unknown>).setToken).toBe('undefined');
 		});
 
 		it('should NOT have hasToken method', () => {
-			expect(typeof (service as any).hasToken).toBe('undefined');
+			expect(typeof (service as unknown as Record<string, unknown>).hasToken).toBe('undefined');
 		});
 
 		it('should NOT have removeToken method', () => {
-			expect(typeof (service as any).removeToken).toBe('undefined');
+			expect(typeof (service as unknown as Record<string, unknown>).removeToken).toBe('undefined');
 		});
 	});
 	// #endregion

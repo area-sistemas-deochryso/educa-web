@@ -202,7 +202,7 @@ describe('errorInterceptor', () => {
 	// #region 401 refresh flow
 	describe('401 refresh flow', () => {
 		it('should retry request after successful token refresh', () => {
-			let responseData: any;
+			let responseData: unknown;
 			httpClient.get('/api/protected').subscribe({
 				next: (data) => { responseData = data; },
 				error: () => {},

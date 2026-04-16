@@ -10,7 +10,9 @@ import { ToastModule } from 'primeng/toast';
 import { MessageService } from 'primeng/api';
 
 import { PageHeaderComponent } from '@shared/components';
+// eslint-disable-next-line layer-enforcement/imports-warn -- Razón: pendiente mover SalonesAdminTable y SalonDetailDialog a @intranet-shared (Plan maestro Carril B)
 import { ClassroomsAdminTableComponent } from '@features/intranet/pages/admin/classrooms/components/salones-admin-table/salones-admin-table.component';
+// eslint-disable-next-line layer-enforcement/imports-warn -- Razón: pendiente mover SalonesAdminTable y SalonDetailDialog a @intranet-shared (Plan maestro Carril B)
 import { ClassroomDetailDialogComponent } from '@features/intranet/pages/admin/classrooms/components/salon-detail-dialog/salon-detail-dialog.component';
 import { AprobarEstudianteDto, AprobacionMasivaDto, NivelEducativo } from './models';
 import { TeacherFinalClassroomsFacade } from './services/profesor-final-salones.facade';

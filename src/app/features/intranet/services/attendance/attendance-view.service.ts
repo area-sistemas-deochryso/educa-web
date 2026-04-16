@@ -69,9 +69,15 @@ export class AttendanceViewController {
 	readonly pdfLabel = this.stats.pdfLabel;
 	readonly estadisticasDia = this.stats.estadisticasDia;
 
-	setMonthSubMode(mode: 'mes' | 'periodo'): void { this.stats.setMonthSubMode(mode); }
-	setPeriodoInicio(mes: number): void { this.stats.setPeriodoInicio(mes); }
-	setPeriodoFin(mes: number): void { this.stats.setPeriodoFin(mes); }
+	setMonthSubMode(mode: 'mes' | 'periodo'): void {
+		this.stats.setMonthSubMode(mode);
+	}
+	setPeriodoInicio(mes: number): void {
+		this.stats.setPeriodoInicio(mes);
+	}
+	setPeriodoFin(mes: number): void {
+		this.stats.setPeriodoFin(mes);
+	}
 	// #endregion
 
 	// #region Estudiantes (modo mes)

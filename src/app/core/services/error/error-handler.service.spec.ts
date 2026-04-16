@@ -2,7 +2,7 @@
 // #region Imports
 import { TestBed } from '@angular/core/testing';
 import { HttpErrorResponse } from '@angular/common/http';
-import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { beforeEach, describe, expect, it } from 'vitest';
 
 import { ErrorHandlerService } from './error-handler.service';
 

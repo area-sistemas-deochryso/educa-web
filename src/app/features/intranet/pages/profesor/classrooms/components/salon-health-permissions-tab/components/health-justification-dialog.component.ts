@@ -1,4 +1,4 @@
-import { Component, ChangeDetectionStrategy, input, output, signal, computed } from '@angular/core';
+import { Component, ChangeDetectionStrategy, input, output, signal, computed, OnChanges } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { DialogModule } from 'primeng/dialog';
@@ -165,7 +165,7 @@ import { StudentForHealthDto, DateValidationResult } from '@features/intranet/pa
 		`,
 	],
 })
-export class HealthJustificationDialogComponent {
+export class HealthJustificationDialogComponent implements OnChanges {
 	// #region Inputs/Outputs
 	readonly visible = input(false);
 	readonly estudiantes = input<StudentForHealthDto[]>([]);

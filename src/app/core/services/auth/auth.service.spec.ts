@@ -12,7 +12,7 @@ import { AuthUser, LoginResponse, StoredSession } from './auth.models';
 // #endregion
 
 // #region Mocks
-const mockUser: AuthUser = {
+const _mockUser: AuthUser = {
 	rol: 'Estudiante',
 	nombreCompleto: 'Test User',
 	entityId: 1,
@@ -149,7 +149,7 @@ describe('AuthService', () => {
 			}
 
 			// Reset mock to track the next call
-			(apiMock.login as any).mockClear();
+			vi.mocked(apiMock.login!).mockClear();
 
 			service.login('12345678', 'password', 'Estudiante').subscribe((response) => {
 				expect(response.success).toBe(false);

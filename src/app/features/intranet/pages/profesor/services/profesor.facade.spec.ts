@@ -2,7 +2,7 @@
 // #region Imports
 import { TestBed } from '@angular/core/testing';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
-import { of, throwError } from 'rxjs';
+import { of } from 'rxjs';
 
 import { ProfesorFacade } from './profesor.facade';
 import { ProfesorStore, ProfesorSalonConEstudiantes } from './profesor.store';

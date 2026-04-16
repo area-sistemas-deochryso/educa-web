@@ -3,7 +3,7 @@
 import { TestBed } from '@angular/core/testing';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { of, Subject } from 'rxjs';
-import { provideZonelessChangeDetection, DestroyRef } from '@angular/core';
+import { provideZonelessChangeDetection } from '@angular/core';
 import { provideHttpClient } from '@angular/common/http';
 import { provideHttpClientTesting } from '@angular/common/http/testing';
 
@@ -128,7 +128,7 @@ describe('AttendanceEstudianteComponent', () => {
 
 	it('should call getMisAsistencias with new month on onIngresosMonthChange', () => {
 		component.ngOnInit();
-		(asistenciaServiceMock.getMisAsistencias as any).mockClear();
+		vi.mocked(asistenciaServiceMock.getMisAsistencias!).mockClear();
 
 		component.onIngresosMonthChange(5);
 
@@ -137,7 +137,7 @@ describe('AttendanceEstudianteComponent', () => {
 
 	it('should call getMisAsistencias with new month on onSalidasMonthChange', () => {
 		component.ngOnInit();
-		(asistenciaServiceMock.getMisAsistencias as any).mockClear();
+		vi.mocked(asistenciaServiceMock.getMisAsistencias!).mockClear();
 
 		component.onSalidasMonthChange(8);
 

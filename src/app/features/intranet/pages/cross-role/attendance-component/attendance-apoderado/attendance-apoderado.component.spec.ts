@@ -115,7 +115,7 @@ describe('AttendanceApoderadoComponent', () => {
 
 	it('should reload data when reload method is called', () => {
 		component.ngOnInit();
-		(asistenciaServiceMock.getAsistenciaHijo as any).mockClear();
+		vi.mocked(asistenciaServiceMock.getAsistenciaHijo!).mockClear();
 
 		component.reload();
 

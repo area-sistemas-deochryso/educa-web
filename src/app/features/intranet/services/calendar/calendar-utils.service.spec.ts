@@ -73,7 +73,7 @@ describe('CalendarUtilsService', () => {
 			const weeks = service.getWorkWeeksOfMonth(3, 2026);
 			// First and last weeks may have nulls
 			const allDays = weeks.flat();
-			const nullDays = allDays.filter((d) => d === null);
+			const _nullDays = allDays.filter((d) => d === null);
 			// At least some days should be non-null
 			const validDays = allDays.filter((d) => d !== null);
 			expect(validDays.length).toBeGreaterThan(0);

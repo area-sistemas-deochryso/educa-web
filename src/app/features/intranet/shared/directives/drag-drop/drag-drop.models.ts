@@ -1,4 +1,4 @@
-export interface CdkDragDrop<TContainer, TItem = TContainer, TData = unknown> {
+export interface CdkDragDrop<TContainer, _TItem = TContainer, TData = unknown> {
 	previousContainer: { id: string; data: TContainer };
 	container: { id: string; data: TContainer };
 	previousIndex: number;

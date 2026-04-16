@@ -1,7 +1,6 @@
 // * Tests for EventsCalendarFacade — validates CRUD orchestration.
 // #region Imports
 import { TestBed } from '@angular/core/testing';
-import { DestroyRef } from '@angular/core';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { of, throwError } from 'rxjs';
 

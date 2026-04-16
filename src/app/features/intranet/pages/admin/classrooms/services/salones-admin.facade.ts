@@ -1,3 +1,4 @@
+/* eslint-disable max-lines -- Razón: facade multi-responsabilidad (data + CRUD + UI) para salones admin con cierre de periodo y aprobación. Candidato a split en *-data/*-crud/*-ui facades. */
 /* eslint-disable wal/no-direct-mutation-subscribe --
    Justificación: todas las mutaciones de este facade son server-confirmed
    por diseño (cierre de periodo irreversible INV-T01, aprobación de
@@ -358,17 +359,39 @@ export class ClassroomsAdminFacade {
 
 	// #region Comandos de UI
 
-	setNivel(nivel: NivelEducativo): void { this.store.setSelectedNivel(nivel); }
-	setAnio(anio: number): void { this.store.setFiltroAnio(anio); this.loadAll(); }
-	setEsVerano(esVerano: boolean): void { this.store.setEsVerano(esVerano); this.loadAll(); }
+	setNivel(nivel: NivelEducativo): void {
+		this.store.setSelectedNivel(nivel);
+	}
+	setAnio(anio: number): void {
+		this.store.setFiltroAnio(anio);
+		this.loadAll();
+	}
+	setEsVerano(esVerano: boolean): void {
+		this.store.setEsVerano(esVerano);
+		this.loadAll();
+	}
 
-	openConfigDialog(): void { this.store.openConfigDialog(); }
-	closeConfigDialog(): void { this.store.closeConfigDialog(); }
-	openCerrarPeriodoDialog(): void { this.store.openCerrarPeriodoDialog(); }
-	closeCerrarPeriodoDialog(): void { this.store.closeCerrarPeriodoDialog(); }
-	closeSalonDialog(): void { this.store.closeSalonDialog(); }
-	openConfirmDialog(): void { this.store.openConfirmDialog(); }
-	closeConfirmDialog(): void { this.store.closeConfirmDialog(); }
+	openConfigDialog(): void {
+		this.store.openConfigDialog();
+	}
+	closeConfigDialog(): void {
+		this.store.closeConfigDialog();
+	}
+	openCerrarPeriodoDialog(): void {
+		this.store.openCerrarPeriodoDialog();
+	}
+	closeCerrarPeriodoDialog(): void {
+		this.store.closeCerrarPeriodoDialog();
+	}
+	closeSalonDialog(): void {
+		this.store.closeSalonDialog();
+	}
+	openConfirmDialog(): void {
+		this.store.openConfirmDialog();
+	}
+	closeConfirmDialog(): void {
+		this.store.closeConfirmDialog();
+	}
 
 	openSalonDialog(salonId: number): void {
 		this.store.openSalonDialog(salonId);

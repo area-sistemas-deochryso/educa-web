@@ -10,8 +10,6 @@ import { RolUsuarioAdmin, UsuarioLista, UsuariosEstadisticas } from '../models';
 import { UsersService } from './usuarios.service';
 import { UsersStore } from './usuarios.store';
 import { ClassroomsApiService } from '@features/intranet/pages/admin/schedules/services/salones-api.service';
-import { ApiResponse } from '@shared/models';
-import { map } from 'rxjs/operators';
 import { SalonListDto } from '@features/intranet/pages/admin/schedules/models/salon.interface';
 
 /**

@@ -1,7 +1,7 @@
 // * Tests for authGuard — validates authentication check and login redirect.
 // #region Imports
 import { TestBed } from '@angular/core/testing';
-import { provideRouter, Router, UrlTree } from '@angular/router';
+import { ActivatedRouteSnapshot, provideRouter, RouterStateSnapshot, UrlTree } from '@angular/router';
 import { beforeEach, describe, expect, it } from 'vitest';
 
 import { authGuard } from './auth.guard';
@@ -30,7 +30,7 @@ describe('authGuard', () => {
 			authServiceMock.isAuthenticated = true;
 
 			const result = TestBed.runInInjectionContext(() =>
-				authGuard({} as any, {} as any),
+				authGuard({} as ActivatedRouteSnapshot, {} as RouterStateSnapshot),
 			);
 
 			expect(result).toBe(true);
@@ -44,7 +44,7 @@ describe('authGuard', () => {
 			authServiceMock.isAuthenticated = false;
 
 			const result = TestBed.runInInjectionContext(() =>
-				authGuard({} as any, {} as any),
+				authGuard({} as ActivatedRouteSnapshot, {} as RouterStateSnapshot),
 			);
 
 			expect(result).toBeInstanceOf(UrlTree);
@@ -53,7 +53,7 @@ describe('authGuard', () => {
 
 		it('should redirect to login by default (isAuthenticated starts false)', () => {
 			const result = TestBed.runInInjectionContext(() =>
-				authGuard({} as any, {} as any),
+				authGuard({} as ActivatedRouteSnapshot, {} as RouterStateSnapshot),
 			);
 
 			expect(result).not.toBe(true);

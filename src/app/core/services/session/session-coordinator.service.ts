@@ -1,7 +1,7 @@
 // #region Imports
 import { Injectable, inject } from '@angular/core';
 
-import { Observable, Subject } from 'rxjs';
+import { Subject } from 'rxjs';
 
 import { AuthService } from '@core/services/auth/auth.service';
 import { logger } from '@core/helpers';

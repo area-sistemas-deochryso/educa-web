@@ -19,7 +19,7 @@ export function validateCorreo(correo: string | undefined): string | null {
 
 export function validateCorreoApoderado(
 	correo: string | undefined,
-	rol: string | undefined,
+	_rol: string | undefined,
 ): string | null {
 	if (!correo) return null;
 	if (!EMAIL_REGEX.test(correo)) return 'Ingrese un correo valido';
@@ -27,15 +27,15 @@ export function validateCorreoApoderado(
 }
 
 export function validateNombreApoderado(
-	nombre: string | undefined,
-	rol: string | undefined,
+	_nombre: string | undefined,
+	_rol: string | undefined,
 ): string | null {
 	return null;
 }
 
 export function validateTelefonoApoderado(
-	telefono: string | undefined,
-	rol: string | undefined,
+	_telefono: string | undefined,
+	_rol: string | undefined,
 ): string | null {
 	return null;
 }

@@ -6,7 +6,7 @@ import {
 	HttpRequest,
 } from '@angular/common/http';
 import { inject } from '@angular/core';
-import { Observable, Subject, throwError, timer } from 'rxjs';
+import { Observable, Subject, throwError } from 'rxjs';
 import { catchError, finalize, mergeMap, take } from 'rxjs/operators';
 
 import { logger } from '@core/helpers';

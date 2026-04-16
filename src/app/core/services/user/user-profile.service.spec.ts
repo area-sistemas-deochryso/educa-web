@@ -1,7 +1,7 @@
 // * Tests for UserProfileService — validates user identity derivations.
 // #region Imports
 import { TestBed } from '@angular/core/testing';
-import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { beforeEach, describe, expect, it } from 'vitest';
 import { BehaviorSubject } from 'rxjs';
 
 import { UserProfileService } from './user-profile.service';

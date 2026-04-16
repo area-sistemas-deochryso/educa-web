@@ -110,22 +110,22 @@ describe('AuthService — Security Contracts', () => {
 			expect('getToken' in mocks.storage).toBe(false);
 			// Also verify on a real instance shape
 			const realStorage = TestBed.inject(StorageService);
-			expect(typeof (realStorage as any).getToken).toBe('undefined');
+			expect(typeof (realStorage as unknown as Record<string, unknown>).getToken).toBe('undefined');
 		});
 
 		it('should NOT expose setToken method', () => {
 			const realStorage = TestBed.inject(StorageService);
-			expect(typeof (realStorage as any).setToken).toBe('undefined');
+			expect(typeof (realStorage as unknown as Record<string, unknown>).setToken).toBe('undefined');
 		});
 
 		it('should NOT expose hasToken method', () => {
 			const realStorage = TestBed.inject(StorageService);
-			expect(typeof (realStorage as any).hasToken).toBe('undefined');
+			expect(typeof (realStorage as unknown as Record<string, unknown>).hasToken).toBe('undefined');
 		});
 
 		it('should NOT expose removeToken method', () => {
 			const realStorage = TestBed.inject(StorageService);
-			expect(typeof (realStorage as any).removeToken).toBe('undefined');
+			expect(typeof (realStorage as unknown as Record<string, unknown>).removeToken).toBe('undefined');
 		});
 	});
 	// #endregion

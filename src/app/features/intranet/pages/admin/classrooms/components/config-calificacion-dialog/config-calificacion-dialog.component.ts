@@ -1,4 +1,4 @@
-import { Component, ChangeDetectionStrategy, input, output, signal, computed } from '@angular/core';
+import { Component, ChangeDetectionStrategy, input, output, signal, computed, OnChanges } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 
@@ -47,7 +47,7 @@ interface LiteralRow {
 	styleUrl: './config-calificacion-dialog.component.scss',
 	changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class ConfigGradeDialogComponent {
+export class ConfigGradeDialogComponent implements OnChanges {
 	// #region Inputs / Outputs
 	readonly visible = input(false);
 	readonly config = input<ConfiguracionCalificacionListDto | null>(null);

@@ -1,7 +1,7 @@
 // * Tests for permissionsGuard — validates permission checks, path building, and redirect behavior.
 // #region Imports
 import { TestBed } from '@angular/core/testing';
-import { ActivatedRouteSnapshot, provideRouter, UrlSegment, UrlTree } from '@angular/router';
+import { ActivatedRouteSnapshot, provideRouter, RouterStateSnapshot, UrlSegment, UrlTree } from '@angular/router';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { permissionsGuard } from './permisos.guard';
@@ -58,7 +58,7 @@ describe('permissionsGuard', () => {
 			authServiceMock.isAuthenticated = false;
 			const route = buildRouteChain(['intranet'], ['admin']);
 
-			const result = await TestBed.runInInjectionContext(() => permissionsGuard(route, {} as any));
+			const result = await TestBed.runInInjectionContext(() => permissionsGuard(route, {} as RouterStateSnapshot));
 
 			expect(result).toBe(true);
 			expect(userPermisosMock.ensurePermisosLoaded).not.toHaveBeenCalled();
@@ -69,10 +69,10 @@ describe('permissionsGuard', () => {
 	// #region Permissions loaded — access granted
 	describe('access granted', () => {
 		it('should return true when user has permission for the route', async () => {
-			(userPermisosMock.tienePermiso as any).mockReturnValue(true);
+			(userPermisosMock.tienePermiso as ReturnType<typeof vi.fn>).mockReturnValue(true);
 			const route = buildRouteChain(['intranet'], ['admin'], ['usuarios']);
 
-			const result = await TestBed.runInInjectionContext(() => permissionsGuard(route, {} as any));
+			const result = await TestBed.runInInjectionContext(() => permissionsGuard(route, {} as RouterStateSnapshot));
 
 			expect(result).toBe(true);
 			expect(userPermisosMock.tienePermiso).toHaveBeenCalledWith('intranet/admin/usuarios');
@@ -83,10 +83,10 @@ describe('permissionsGuard', () => {
 	// #region Permissions loaded — access denied
 	describe('access denied', () => {
 		it('should redirect to /intranet and show warning', async () => {
-			(userPermisosMock.tienePermiso as any).mockReturnValue(false);
+			(userPermisosMock.tienePermiso as ReturnType<typeof vi.fn>).mockReturnValue(false);
 			const route = buildRouteChain(['intranet'], ['admin'], ['salones']);
 
-			const result = await TestBed.runInInjectionContext(() => permissionsGuard(route, {} as any));
+			const result = await TestBed.runInInjectionContext(() => permissionsGuard(route, {} as RouterStateSnapshot));
 
 			expect(result).toBeInstanceOf(UrlTree);
 			expect((result as UrlTree).toString()).toBe('/intranet');
@@ -98,10 +98,10 @@ describe('permissionsGuard', () => {
 	// #region Permissions fail to load — force logout
 	describe('permissions fail to load', () => {
 		it('should logout and redirect to login when ensurePermisosLoaded returns false', async () => {
-			(userPermisosMock.ensurePermisosLoaded as any).mockResolvedValue(false);
+			(userPermisosMock.ensurePermisosLoaded as ReturnType<typeof vi.fn>).mockResolvedValue(false);
 			const route = buildRouteChain(['intranet'], ['admin']);
 
-			const result = await TestBed.runInInjectionContext(() => permissionsGuard(route, {} as any));
+			const result = await TestBed.runInInjectionContext(() => permissionsGuard(route, {} as RouterStateSnapshot));
 
 			expect(authServiceMock.logout).toHaveBeenCalled();
 			expect(result).toBeInstanceOf(UrlTree);
@@ -115,7 +115,7 @@ describe('permissionsGuard', () => {
 		it('should build path from nested route segments', async () => {
 			const route = buildRouteChain(['intranet'], ['profesor'], ['horarios']);
 
-			await TestBed.runInInjectionContext(() => permissionsGuard(route, {} as any));
+			await TestBed.runInInjectionContext(() => permissionsGuard(route, {} as RouterStateSnapshot));
 
 			expect(userPermisosMock.tienePermiso).toHaveBeenCalledWith('intranet/profesor/horarios');
 		});
@@ -123,7 +123,7 @@ describe('permissionsGuard', () => {
 		it('should handle single segment routes', async () => {
 			const route = buildRouteChain(['intranet']);
 
-			await TestBed.runInInjectionContext(() => permissionsGuard(route, {} as any));
+			await TestBed.runInInjectionContext(() => permissionsGuard(route, {} as RouterStateSnapshot));
 
 			expect(userPermisosMock.tienePermiso).toHaveBeenCalledWith('intranet');
 		});
@@ -131,7 +131,7 @@ describe('permissionsGuard', () => {
 		it('should skip empty url segments in route chain', async () => {
 			const route = buildRouteChain([], ['intranet'], [], ['admin']);
 
-			await TestBed.runInInjectionContext(() => permissionsGuard(route, {} as any));
+			await TestBed.runInInjectionContext(() => permissionsGuard(route, {} as RouterStateSnapshot));
 
 			expect(userPermisosMock.tienePermiso).toHaveBeenCalledWith('intranet/admin');
 		});

@@ -14,7 +14,7 @@ import {
 } from './permisos.models';
 import { ApiResponse } from '@shared/models';
 import { Injectable, inject } from '@angular/core';
-import { Observable, catchError, of, tap } from 'rxjs';
+import { Observable, catchError, of } from 'rxjs';
 import { logger } from '@core/helpers';
 
 import { HttpClient } from '@angular/common/http';

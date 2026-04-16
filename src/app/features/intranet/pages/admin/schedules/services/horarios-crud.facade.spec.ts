@@ -11,7 +11,14 @@ import { SchedulesApiService } from './horarios-api.service';
 import { SchedulesDataFacade } from './horarios-data.facade';
 import { SchedulesAssignmentService } from './horarios-assignment.service';
 import { ErrorHandlerService, WalFacadeHelper } from '@core/services';
-import type { HorarioResponseDto, HorariosEstadisticas } from '../models/horario.interface';
+import type {
+	HorarioResponseDto,
+	HorariosEstadisticas,
+	HorarioCreateDto,
+	HorarioUpdateDto,
+	HorarioAsignarProfesorDto,
+} from '../models/horario.interface';
+import type { ImportarHorarioItem } from '../helpers/horario-import.config';
 // #endregion
 
 // #region Fixtures
@@ -136,14 +143,14 @@ describe('SchedulesCrudFacade', () => {
 				horaFin: '11:00',
 				salonId: 10,
 				cursoId: 100,
-			} as any);
+			} as Partial<HorarioCreateDto> as HorarioCreateDto);
 
 			expect(wal.execute).toHaveBeenCalledTimes(1);
 			expect(wal.last().operation).toBe('CREATE');
 		});
 
 		it('onCommit incrementa totalHorarios + horariosActivos y refresca', () => {
-			facade.create({ diaSemana: 2, horaInicio: '10:00', horaFin: '11:00', salonId: 10, cursoId: 100 } as any);
+			facade.create({ diaSemana: 2, horaInicio: '10:00', horaFin: '11:00', salonId: 10, cursoId: 100 } as Partial<HorarioCreateDto> as HorarioCreateDto);
 			const before = store.estadisticas()!;
 
 			wal.commit();
@@ -156,7 +163,7 @@ describe('SchedulesCrudFacade', () => {
 		});
 
 		it('onError surface mensaje sin tocar stats', () => {
-			facade.create({ diaSemana: 2, horaInicio: '10:00', horaFin: '11:00', salonId: 10, cursoId: 100 } as any);
+			facade.create({ diaSemana: 2, horaInicio: '10:00', horaFin: '11:00', salonId: 10, cursoId: 100 } as Partial<HorarioCreateDto> as HorarioCreateDto);
 			const before = { ...store.estadisticas()! };
 
 			wal.fail(new Error('boom'));
@@ -169,7 +176,7 @@ describe('SchedulesCrudFacade', () => {
 	// #region UPDATE
 	describe('update', () => {
 		it('apply aplica mutación quirúrgica local al store', () => {
-			facade.update(1, { diaSemana: 5, horaInicio: '14:00', horaFin: '15:00', salonId: 10, cursoId: 100 } as any);
+			facade.update(1, { diaSemana: 5, horaInicio: '14:00', horaFin: '15:00', salonId: 10, cursoId: 100 } as Partial<HorarioUpdateDto> as HorarioUpdateDto);
 
 			const h = store.horarios().find((x) => x.id === 1)!;
 			expect(h.diaSemana).toBe(5);
@@ -178,7 +185,7 @@ describe('SchedulesCrudFacade', () => {
 
 		it('rollback restaura valores previos', () => {
 			const original = store.horarios().find((x) => x.id === 1)!;
-			facade.update(1, { diaSemana: 5, horaInicio: '14:00', horaFin: '15:00', salonId: 10, cursoId: 100 } as any);
+			facade.update(1, { diaSemana: 5, horaInicio: '14:00', horaFin: '15:00', salonId: 10, cursoId: 100 } as Partial<HorarioUpdateDto> as HorarioUpdateDto);
 
 			wal.fail(new Error('server'));
 
@@ -190,7 +197,7 @@ describe('SchedulesCrudFacade', () => {
 		it('onCommit actualiza stats horariosSinProfesor cuando se asigna profesor a horario sin uno', () => {
 			// id=2 no tiene profesor (profesorId=null) → stats.horariosSinProfesor=1
 			const before = store.estadisticas()!.horariosSinProfesor;
-			facade.update(2, { diaSemana: 3, horaInicio: '09:00', horaFin: '10:00', salonId: 10, cursoId: 100 } as any);
+			facade.update(2, { diaSemana: 3, horaInicio: '09:00', horaFin: '10:00', salonId: 10, cursoId: 100 } as Partial<HorarioUpdateDto> as HorarioUpdateDto);
 
 			wal.commit({
 				diaSemana: 3,
@@ -212,7 +219,7 @@ describe('SchedulesCrudFacade', () => {
 		it('onCommit incrementa horariosSinProfesor cuando se desasigna profesor', () => {
 			// id=1 tiene profesor → al quitarlo stats.horariosSinProfesor sube
 			const before = store.estadisticas()!.horariosSinProfesor;
-			facade.update(1, { diaSemana: 1, horaInicio: '08:00', horaFin: '09:00', salonId: 10, cursoId: 100 } as any);
+			facade.update(1, { diaSemana: 1, horaInicio: '08:00', horaFin: '09:00', salonId: 10, cursoId: 100 } as Partial<HorarioUpdateDto> as HorarioUpdateDto);
 
 			wal.commit({
 				diaSemana: 1,
@@ -298,7 +305,7 @@ describe('SchedulesCrudFacade', () => {
 				horaFin: '09:00',
 				salonId: 10,
 				cursoId: 100,
-			} as any);
+			} as Partial<HorarioCreateDto> as HorarioCreateDto);
 
 			const beforeStats = { ...store.estadisticas()! };
 			const httpErr = { status: 422, error: { errorCode: 'INV_AS01_TUTOR_PLENO', message: 'Profesor no es tutor' } };
@@ -316,7 +323,7 @@ describe('SchedulesCrudFacade', () => {
 				horaFin: '11:00',
 				salonId: 20,
 				cursoId: 200,
-			} as any);
+			} as Partial<HorarioCreateDto> as HorarioCreateDto);
 
 			const httpErr = { status: 422, error: { errorCode: 'INV_AS02_PROFESOR_CURSO', message: 'Sin asignación' } };
 			wal.fail(httpErr);
@@ -331,7 +338,7 @@ describe('SchedulesCrudFacade', () => {
 				horaFin: '09:00',
 				salonId: 10,
 				cursoId: 100,
-			} as any);
+			} as Partial<HorarioCreateDto> as HorarioCreateDto);
 
 			const before = store.estadisticas()!;
 			wal.commit();
@@ -348,7 +355,7 @@ describe('SchedulesCrudFacade', () => {
 				horaFin: '15:00',
 				salonId: 30,
 				cursoId: 300,
-			} as any);
+			} as Partial<HorarioCreateDto> as HorarioCreateDto);
 
 			const before = store.estadisticas()!;
 			wal.commit();
@@ -364,7 +371,7 @@ describe('SchedulesCrudFacade', () => {
 		it('success con creados>0 refresca y muestra mensaje', () => {
 			api.importarHorarios.mockReturnValue(of({ creados: 5, errores: [] }));
 
-			facade.importarHorarios([{ diaSemana: 1 } as any]);
+			facade.importarHorarios([{ diaSemana: 1 } as Partial<ImportarHorarioItem> as ImportarHorarioItem]);
 
 			expect(store.importLoading()).toBe(false);
 			expect(store.importResult()).toEqual({ creados: 5, errores: [] });
@@ -375,7 +382,7 @@ describe('SchedulesCrudFacade', () => {
 		it('success con creados=0 no refresca ni notifica éxito', () => {
 			api.importarHorarios.mockReturnValue(of({ creados: 0, errores: [{ fila: 1, mensaje: 'dup' }] }));
 
-			facade.importarHorarios([{ diaSemana: 1 } as any]);
+			facade.importarHorarios([{ diaSemana: 1 } as Partial<ImportarHorarioItem> as ImportarHorarioItem]);
 
 			expect(dataFacade.silentRefreshAfterCrud).not.toHaveBeenCalled();
 			expect(errorHandler.showSuccess).not.toHaveBeenCalled();
@@ -387,7 +394,7 @@ describe('SchedulesCrudFacade', () => {
 	// #region Asignaciones delegadas
 	describe('asignaciones', () => {
 		it('asignarProfesor delega en SchedulesAssignmentService', () => {
-			facade.asignarProfesor({ horarioId: 1, profesorId: 200 } as any);
+			facade.asignarProfesor({ horarioId: 1, profesorId: 200 } as Partial<HorarioAsignarProfesorDto> as HorarioAsignarProfesorDto);
 			expect(assignment.asignarProfesor).toHaveBeenCalled();
 		});
 

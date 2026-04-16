@@ -71,25 +71,62 @@ export class AdminHealthPermissionsStore {
 	// #endregion
 
 	// #region Comandos
-	setSalones(salones: SalonForHealthDto[]): void { this._salones.set(salones); }
-	setSelectedSalonId(id: number | null): void { this._selectedSalonId.set(id); }
-	setPermisosSalida(p: HealthExitPermissionDto[]): void { this._permisosSalida.set(p); }
-	addPermisoSalida(p: HealthExitPermissionDto): void { this._permisosSalida.update((l) => [p, ...l]); }
-	removePermisoSalida(id: number): void { this._permisosSalida.update((l) => l.filter((p) => p.id !== id)); }
-	setJustificaciones(j: HealthJustificationDto[]): void { this._justificaciones.set(j); }
-	addJustificacion(j: HealthJustificationDto): void { this._justificaciones.update((l) => [j, ...l]); }
-	removeJustificacion(id: number): void { this._justificaciones.update((l) => l.filter((j) => j.id !== id)); }
-	setEstudiantes(e: StudentForHealthDto[]): void { this._estudiantes.set(e); }
-	setSintomas(s: SymptomDto[]): void { this._sintomas.set(s); }
-	setFechasValidacion(f: DateValidationResult[]): void { this._fechasValidacion.set(f); }
+	setSalones(salones: SalonForHealthDto[]): void {
+		this._salones.set(salones);
+	}
+	setSelectedSalonId(id: number | null): void {
+		this._selectedSalonId.set(id);
+	}
+	setPermisosSalida(p: HealthExitPermissionDto[]): void {
+		this._permisosSalida.set(p);
+	}
+	addPermisoSalida(p: HealthExitPermissionDto): void {
+		this._permisosSalida.update((l) => [p, ...l]);
+	}
+	removePermisoSalida(id: number): void {
+		this._permisosSalida.update((l) => l.filter((p) => p.id !== id));
+	}
+	setJustificaciones(j: HealthJustificationDto[]): void {
+		this._justificaciones.set(j);
+	}
+	addJustificacion(j: HealthJustificationDto): void {
+		this._justificaciones.update((l) => [j, ...l]);
+	}
+	removeJustificacion(id: number): void {
+		this._justificaciones.update((l) => l.filter((j) => j.id !== id));
+	}
+	setEstudiantes(e: StudentForHealthDto[]): void {
+		this._estudiantes.set(e);
+	}
+	setSintomas(s: SymptomDto[]): void {
+		this._sintomas.set(s);
+	}
+	setFechasValidacion(f: DateValidationResult[]): void {
+		this._fechasValidacion.set(f);
+	}
 	clearFechasValidacion(): void { this._fechasValidacion.set([]); }
-	setSalonesLoading(v: boolean): void { this._salonesLoading.set(v); }
-	setLoading(v: boolean): void { this._loading.set(v); }
-	setSaving(v: boolean): void { this._saving.set(v); }
-	openExitDialog(): void { this._saving.set(false); this._exitDialogVisible.set(true); }
+	setSalonesLoading(v: boolean): void {
+		this._salonesLoading.set(v);
+	}
+	setLoading(v: boolean): void {
+		this._loading.set(v);
+	}
+	setSaving(v: boolean): void {
+		this._saving.set(v);
+	}
+	openExitDialog(): void {
+		this._saving.set(false);
+		this._exitDialogVisible.set(true);
+	}
 	closeExitDialog(): void { this._exitDialogVisible.set(false); }
-	openJustificationDialog(): void { this._saving.set(false); this._justificationDialogVisible.set(true); }
-	closeJustificationDialog(): void { this._justificationDialogVisible.set(false); this.clearFechasValidacion(); }
+	openJustificationDialog(): void {
+		this._saving.set(false);
+		this._justificationDialogVisible.set(true);
+	}
+	closeJustificationDialog(): void {
+		this._justificationDialogVisible.set(false);
+		this.clearFechasValidacion();
+	}
 
 	clearSalonData(): void {
 		this._permisosSalida.set([]);

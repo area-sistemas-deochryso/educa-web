@@ -339,7 +339,9 @@ export class GruposFacade {
 	// #endregion
 
 	// #region Comandos de UI
-	openAsignarDialog(grupoId: number): void { this.store.openAsignarDialog(grupoId); }
+	openAsignarDialog(grupoId: number): void {
+		this.store.openAsignarDialog(grupoId);
+	}
 	closeAsignarDialog(): void { this.store.closeAsignarDialog(); }
 	openConfirmDialog(): void { this.store.openConfirmDialog(); }
 	closeConfirmDialog(): void { this.store.closeConfirmDialog(); }

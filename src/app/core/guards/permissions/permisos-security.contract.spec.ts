@@ -3,7 +3,7 @@
 // * Complements permisos.guard.spec.ts (functional behavior).
 // #region Imports
 import { TestBed } from '@angular/core/testing';
-import { ActivatedRouteSnapshot, provideRouter, UrlSegment, UrlTree } from '@angular/router';
+import { ActivatedRouteSnapshot, provideRouter, RouterStateSnapshot, UrlSegment, UrlTree } from '@angular/router';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { permissionsGuard } from './permisos.guard';
@@ -57,7 +57,7 @@ describe('permissionsGuard — Security Contracts', () => {
 			);
 
 			const route = buildRouteChain(['intranet'], ['admin'], ['usuarios']);
-			const result = await TestBed.runInInjectionContext(() => permissionsGuard(route, {} as any));
+			const result = await TestBed.runInInjectionContext(() => permissionsGuard(route, {} as RouterStateSnapshot));
 
 			// tienePermiso is called with full path, not parent
 			expect(userPermisosMock.tienePermiso).toHaveBeenCalledWith('intranet/admin/usuarios');
@@ -70,7 +70,7 @@ describe('permissionsGuard — Security Contracts', () => {
 			);
 
 			const route = buildRouteChain(['intranet'], ['admin']);
-			const result = await TestBed.runInInjectionContext(() => permissionsGuard(route, {} as any));
+			const result = await TestBed.runInInjectionContext(() => permissionsGuard(route, {} as RouterStateSnapshot));
 
 			expect(userPermisosMock.tienePermiso).toHaveBeenCalledWith('intranet/admin');
 			expect(result).toBeInstanceOf(UrlTree);
@@ -84,7 +84,7 @@ describe('permissionsGuard — Security Contracts', () => {
 			(userPermisosMock.ensurePermisosLoaded as ReturnType<typeof vi.fn>).mockResolvedValue(false);
 
 			const route = buildRouteChain(['intranet'], ['admin']);
-			const result = await TestBed.runInInjectionContext(() => permissionsGuard(route, {} as any));
+			const result = await TestBed.runInInjectionContext(() => permissionsGuard(route, {} as RouterStateSnapshot));
 
 			expect(authServiceMock.logout).toHaveBeenCalled();
 			expect(result).toBeInstanceOf(UrlTree);
@@ -107,7 +107,7 @@ describe('permissionsGuard — Security Contracts', () => {
 			});
 
 			const route = buildRouteChain(['intranet'], ['admin']);
-			await TestBed.runInInjectionContext(() => permissionsGuard(route, {} as any));
+			await TestBed.runInInjectionContext(() => permissionsGuard(route, {} as RouterStateSnapshot));
 
 			expect(callOrder[0]).toBe('ensureLoaded');
 			expect(callOrder[1]).toBe('tienePermiso');

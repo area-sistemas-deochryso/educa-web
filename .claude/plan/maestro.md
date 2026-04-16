@@ -22,8 +22,8 @@
 | 10 | Flujos Alternos (resiliencia) | FE | [plan/flujos-alternos.md](flujos-alternos.md) | ⏳ (bloqueado) | 0% |
 | 11 | Refactor `eslint.config.js` (fix G10) | FE | [plan/eslint-config-refactor.md](eslint-config-refactor.md) | ✅ F1-F5 (F5.3 tests opcionales sin ejecutar) | ~95% |
 
-**Resumen por carril**: Carril A (features) ✅ 100% · Carril B (deuda) ~50% · Carril C (diferido) 0%
-**Total consolidado**: **~55-60%** del plan maestro terminado. Carril A cerrado, foco en Carril B.
+**Resumen por carril**: Carril A (features) ✅ 100% · QW4 (lint limpio) ✅ 100% · Carril B (deuda) ~50% · Carril C (diferido) 0%
+**Total consolidado**: **~65%** del plan maestro terminado. Carril A + QW4 cerrados. **Foco: push a producción (QW4.6) y luego Carril B**.
 
 ---
 
@@ -53,9 +53,11 @@
 
 </details>
 
-**Próximo tramo ejecutable — CARRIL B (deuda técnica)**:
+**QW4 — LINT LIMPIO ✅** (2026-04-16): 0 errors, 0 warnings. 1321 tests. Build OK. **Listo para push.**
 
-1. **Plan 1 F5.3** — Re-exports cleanup `@shared` → `@intranet-shared` (48 archivos, FE, 3-4 chats) **← PRÓXIMO**
+**Próximo paso — PUSH a producción (QW4.6) y luego CARRIL B (deuda técnica)**:
+
+1. **Plan 1 F5.3** — Re-exports cleanup `@shared` → `@intranet-shared` (48 archivos, FE, 3-4 chats)
 2. **Plan 2/B** — State Machines (3 faltantes, BE) — desbloquea Plan 1 F4.4
 3. **Plan 2/C** — Split archivos >300 líneas BE
 4. **Plan 4** — Consolidación Backend
@@ -63,6 +65,7 @@
 6. **Plan 7** — Error Trace Backend
 
 **Bloqueos duros (no ejecutables sin dependencia previa)**:
+
 - Plan 1 F4.4 🔒 por Plan 2/B (state machines)
 - Plan 1 F4.5 🔒 por Plan 3 F4 (Matrícula)
 - Plan 3 F4 🔒 por diseño admin UI pendiente
@@ -200,9 +203,53 @@ CARRIL C — DIFERIDO
 
 ---
 
-### Carril B — Deuda técnica (en paralelo)
+### QW4 — Lint limpio para producción (PRIORIDAD INMEDIATA)
 
-> Estas tareas se ejecutan cuando hay bandwidth entre fases del Carril A, o cuando el Carril A espera feedback/decisiones del negocio.
+> **Objetivo**: 0 errors, 0 warnings → push seguro. Estado inicial: 2 errors + ~185 warnings en 53 archivos.
+> **Inventario** (2026-04-16):
+>
+> | Regla | Nivel | Issues | Archivos | Chat |
+> |-------|-------|--------|----------|------|
+> | `max-lines` | error | 2 | `error-reporter.service.ts` (310ln), `profesor-salones.component.ts` (320ln) | QW4.1 |
+> | `no-unused-vars` | warn | 33 | 27 archivos (specs + services) | QW4.2 |
+> | `no-compact-trivial-setter` | warn | 45 | 8 stores/facades | QW4.3 |
+> | `no-explicit-any` | warn | 99 | 11 archivos (todos `.spec.ts`) | QW4.4 |
+> | `use-lifecycle-interface` | warn | 3 | 3 archivos | QW4.5 |
+> | `no-empty-lifecycle-method` | warn | 1 | 1 archivo | QW4.5 |
+> | `layer-enforcement/imports-warn` | warn | 2 | 1 archivo (`profesor-salones`) | QW4.5 |
+
+- [x] **QW4.1 — Lint errors: 2 archivos >300 líneas** ✅ (2026-04-16)
+  - [x] `error-reporter.service.ts` — extraído tipos a `error-reporter.models.ts` + eliminado `#endregion` duplicado
+  - [x] `profesor-salones.component.ts` — movido template inline a `.component.html` + estilos a `.component.scss`
+
+- [x] **QW4.2 — `no-unused-vars`: 33 issues en 27 archivos** ✅ (2026-04-16)
+  - [x] Eliminados imports no usados en 25 archivos
+  - [x] Prefijo `_` en params de callback (5 casos en `usuario-validation.utils.ts` + 1 en spec)
+
+- [x] **QW4.3 — `no-compact-trivial-setter`: 45 issues en 8 archivos** ✅ (2026-04-16)
+  - [x] Expandidos 45 setters triviales de 1 línea a formato multi-línea
+  - [x] 3 archivos resultantes >300 líneas → `eslint-disable max-lines` justificado (campus-admin.store, salones-admin.facade, calificaciones.facade)
+
+- [x] **QW4.4 — `no-explicit-any`: 99 issues en 14 specs** ✅ (2026-04-16)
+  - [x] Tipados con `unknown`, `Partial<T>`, `vi.mocked()`, `as unknown as T`, interfaces de test-access
+  - [x] 14 archivos spec corregidos
+
+- [x] **QW4.5 — Otros warnings: 6 issues** ✅ (2026-04-16)
+  - [x] `use-lifecycle-interface` (3) — agregado `implements OnChanges`
+  - [x] `no-empty-lifecycle-method` (1) — eliminado `ngOnInit` vacío + imports
+  - [x] `layer-enforcement/imports-warn` (2) — eslint-disable con justificación (pendiente mover a @intranet-shared)
+
+- [ ] **QW4.6 — Verificación final y PUSH**
+  - [x] `npm run lint` → 0 errors, 0 warnings ✅
+  - [x] `npm test` → 1321 tests, 0 fallos ✅
+  - [x] `npm run build` → build OK ✅
+  - [ ] `git push origin main` **← PRÓXIMO (requiere commit primero)**
+
+---
+
+### Carril B — Deuda técnica (tras push a producción)
+
+> Estas tareas se ejecutan después del push estable, cuando haya bandwidth.
 
 #### Plan 11 — Refactor `eslint.config.js` ✅ (~95%)
 

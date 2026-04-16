@@ -1,5 +1,5 @@
 // #region Imports
-import { ChangeDetectionStrategy, Component, OnInit, effect, inject, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, effect, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 
@@ -37,7 +37,7 @@ import { FeedbackReportFacade, REPORTE_TIPO_OPTIONS, ReporteTipo } from '@core/s
 	templateUrl: './feedback-report-dialog.component.html',
 	styleUrl: './feedback-report-dialog.component.scss',
 })
-export class FeedbackReportDialogComponent implements OnInit {
+export class FeedbackReportDialogComponent {
 	private readonly facade = inject(FeedbackReportFacade);
 
 	readonly vm = this.facade.vm;
@@ -62,10 +62,6 @@ export class FeedbackReportDialogComponent implements OnInit {
 			}
 			return undefined;
 		});
-	}
-
-	ngOnInit(): void {
-		// Nada: el handler del atajo Ctrl+Alt+F se registra en el intranet-layout.
 	}
 
 	onDialogVisibleChange(visible: boolean): void {

@@ -78,18 +78,36 @@ export class FeedbackReportsStore {
 	// #endregion
 
 	// #region Comandos — Data
-	setItems(items: ReporteUsuarioListaDto[]): void { this._items.set(items); }
-	setEstadisticas(stats: ReporteUsuarioEstadisticasDto): void { this._estadisticas.set(stats); }
-	setLoading(v: boolean): void { this._loading.set(v); }
-	setStatsReady(v: boolean): void { this._statsReady.set(v); }
-	setTableReady(v: boolean): void { this._tableReady.set(v); }
+	setItems(items: ReporteUsuarioListaDto[]): void {
+		this._items.set(items);
+	}
+	setEstadisticas(stats: ReporteUsuarioEstadisticasDto): void {
+		this._estadisticas.set(stats);
+	}
+	setLoading(v: boolean): void {
+		this._loading.set(v);
+	}
+	setStatsReady(v: boolean): void {
+		this._statsReady.set(v);
+	}
+	setTableReady(v: boolean): void {
+		this._tableReady.set(v);
+	}
 	// #endregion
 
 	// #region Comandos — Filtros
-	setFilterTipo(v: string | null): void { this._filterTipo.set(v); }
-	setFilterEstado(v: string | null): void { this._filterEstado.set(v); }
-	setFilterDesde(v: Date | null): void { this._filterDesde.set(v); }
-	setFilterHasta(v: Date | null): void { this._filterHasta.set(v); }
+	setFilterTipo(v: string | null): void {
+		this._filterTipo.set(v);
+	}
+	setFilterEstado(v: string | null): void {
+		this._filterEstado.set(v);
+	}
+	setFilterDesde(v: Date | null): void {
+		this._filterDesde.set(v);
+	}
+	setFilterHasta(v: Date | null): void {
+		this._filterHasta.set(v);
+	}
 	clearFilters(): void {
 		this._filterTipo.set(null);
 		this._filterEstado.set(null);
@@ -111,9 +129,15 @@ export class FeedbackReportsStore {
 		this._detalle.set(null);
 	}
 
-	setDetalle(detalle: ReporteUsuarioDetalleDto): void { this._detalle.set(detalle); }
-	setDetalleLoading(v: boolean): void { this._detalleLoading.set(v); }
-	setEstadoUpdating(v: boolean): void { this._estadoUpdating.set(v); }
+	setDetalle(detalle: ReporteUsuarioDetalleDto): void {
+		this._detalle.set(detalle);
+	}
+	setDetalleLoading(v: boolean): void {
+		this._detalleLoading.set(v);
+	}
+	setEstadoUpdating(v: boolean): void {
+		this._estadoUpdating.set(v);
+	}
 
 	/** Mutación quirúrgica: actualiza estado de un ítem sin refetch completo. */
 	updateItemEstado(id: number, estado: ReporteUsuarioListaDto['estado']): void {

@@ -13,6 +13,7 @@ import { AttendanceSignalRService } from '@core/services';
 import { SwService } from '@features/intranet/services/sw/sw.service';
 import { AttendanceViewConfig, SelectorContext } from './attendance-view.models';
 import { VIEW_MODE } from '@features/intranet/components/attendance/attendance-header/attendance-header.component';
+import { EstudianteAsistencia } from '@core/services';
 // #endregion
 
 // #region Helpers / mocks
@@ -33,7 +34,7 @@ function buildProcesadoTables(mes: number, anio: number) {
 	};
 }
 
-function buildEstudiante(id: number, nombre = 'Alumno'): any {
+function buildEstudiante(id: number, nombre = 'Alumno'): EstudianteAsistencia {
 	return {
 		estudianteId: id,
 		dni: `0000000${id}`,
@@ -69,24 +70,24 @@ function setup(configOverrides: Partial<AttendanceViewConfig> = {}) {
 		init: vi.fn(),
 	};
 
-	const statsMock: Partial<AttendanceStatsService> = {
-		monthSubMode: vi.fn().mockReturnValue('mes') as any,
-		periodoInicio: vi.fn().mockReturnValue(1) as any,
-		periodoFin: vi.fn().mockReturnValue(4) as any,
-		monthSubModeOptions: [] as any,
-		periodoYear: vi.fn().mockReturnValue(2026) as any,
-		maxPeriodoMonth: vi.fn().mockReturnValue(12) as any,
-		mesOptionsInicio: vi.fn().mockReturnValue([]) as any,
-		mesOptionsFin: vi.fn().mockReturnValue([]) as any,
-		isPeriodoValid: vi.fn().mockReturnValue(true) as any,
-		pdfLabel: vi.fn().mockReturnValue('abril') as any,
-		estadisticasDia: vi.fn().mockReturnValue({}) as any,
+	const statsMock = {
+		monthSubMode: vi.fn().mockReturnValue('mes'),
+		periodoInicio: vi.fn().mockReturnValue(1),
+		periodoFin: vi.fn().mockReturnValue(4),
+		monthSubModeOptions: [],
+		periodoYear: vi.fn().mockReturnValue(2026),
+		maxPeriodoMonth: vi.fn().mockReturnValue(12),
+		mesOptionsInicio: vi.fn().mockReturnValue([]),
+		mesOptionsFin: vi.fn().mockReturnValue([]),
+		isPeriodoValid: vi.fn().mockReturnValue(true),
+		pdfLabel: vi.fn().mockReturnValue('abril'),
+		estadisticasDia: vi.fn().mockReturnValue({}),
 		setMonthSubMode: vi.fn(),
 		setPeriodoInicio: vi.fn(),
 		setPeriodoFin: vi.fn(),
 		setSelectedYear: vi.fn(),
 		setEstadisticasDia: vi.fn(),
-	};
+	} as unknown as AttendanceStatsService;
 
 	const signalRMock: Partial<AttendanceSignalRService> = {
 		connect: vi.fn().mockResolvedValue(undefined),
@@ -125,7 +126,7 @@ describe('AttendanceViewController', () => {
 	describe('init()', () => {
 		it('inicializa pdf con el getter de contexto y setup SignalR.connect', () => {
 			const { controller, signalRMock } = setup();
-			expect((controller.pdf as any).init).toHaveBeenCalledTimes(1);
+			expect(vi.mocked(controller.pdf.init)).toHaveBeenCalledTimes(1);
 			expect(signalRMock.connect).toHaveBeenCalled();
 		});
 
@@ -149,7 +150,7 @@ describe('AttendanceViewController', () => {
 		it('cambiar a Día carga asistencia del día', () => {
 			const { controller, config } = setup();
 			controller.setViewMode(VIEW_MODE.Mes);
-			(config.loadEstudiantes as any).mockClear();
+			vi.mocked(config.loadEstudiantes).mockClear();
 
 			controller.setViewMode(VIEW_MODE.Dia);
 			expect(controller.viewMode()).toBe(VIEW_MODE.Dia);
@@ -158,7 +159,7 @@ describe('AttendanceViewController', () => {
 
 		it('no dispara carga si el modo no cambió', () => {
 			const { controller, config } = setup();
-			(config.loadDia as any).mockClear();
+			vi.mocked(config.loadDia).mockClear();
 			controller.setViewMode(VIEW_MODE.Dia);
 			expect(config.loadDia).not.toHaveBeenCalled();
 		});
@@ -168,7 +169,7 @@ describe('AttendanceViewController', () => {
 	// #region loadEstudiantes — restauración y selección
 	describe('loadEstudiantes', () => {
 		it('restaura estudiante desde storage si existe en la lista', () => {
-			const { controller, config } = setup({
+			const { controller } = setup({
 				getStoredEstudianteId: vi.fn().mockReturnValue(2),
 			});
 			controller.loadEstudiantes();
@@ -208,7 +209,7 @@ describe('AttendanceViewController', () => {
 		it('guarda en storage y recarga asistencias', () => {
 			const { controller, config, dataServiceMock } = setup();
 			controller.loadEstudiantes();
-			(dataServiceMock.processAsistencias as any).mockClear();
+			vi.mocked(dataServiceMock.processAsistencias!).mockClear();
 
 			controller.selectEstudiante(2);
 
@@ -220,7 +221,7 @@ describe('AttendanceViewController', () => {
 		it('no hace nada si el id es el mismo ya seleccionado', () => {
 			const { controller, config } = setup();
 			controller.loadEstudiantes();
-			(config.setStoredEstudianteId as any).mockClear();
+			vi.mocked(config.setStoredEstudianteId).mockClear();
 
 			controller.selectEstudiante(1);
 			expect(config.setStoredEstudianteId).not.toHaveBeenCalled();
@@ -259,7 +260,7 @@ describe('AttendanceViewController', () => {
 	describe('reload', () => {
 		it('en modo Día llama loadDia', () => {
 			const { controller, config } = setup();
-			(config.loadDia as any).mockClear();
+			vi.mocked(config.loadDia).mockClear();
 			controller.reload();
 			expect(config.loadDia).toHaveBeenCalled();
 		});
@@ -267,7 +268,7 @@ describe('AttendanceViewController', () => {
 		it('en modo Mes llama loadEstudiantes', () => {
 			const { controller, config } = setup();
 			controller.setViewMode(VIEW_MODE.Mes);
-			(config.loadEstudiantes as any).mockClear();
+			vi.mocked(config.loadEstudiantes).mockClear();
 			controller.reload();
 			expect(config.loadEstudiantes).toHaveBeenCalled();
 		});
@@ -278,7 +279,7 @@ describe('AttendanceViewController', () => {
 	describe('onFechaDiaChange', () => {
 		it('actualiza fechaDia y recarga asistencia del día', () => {
 			const { controller, config } = setup();
-			(config.loadDia as any).mockClear();
+			vi.mocked(config.loadDia).mockClear();
 			const fecha = new Date(2026, 3, 10);
 
 			controller.onFechaDiaChange(fecha);

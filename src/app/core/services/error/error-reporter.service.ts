@@ -20,48 +20,9 @@ import {
 	sanitizeUrl,
 	detectPlatform,
 } from './error-reporter.helpers';
+import { type ErrorReportPayload, type BreadcrumbPayload, BREADCRUMB_LIMITS } from './error-reporter.models';
 import { environment } from '@config/environment';
 import { logger } from '@core/helpers';
-
-// #region Tipos internos
-
-interface ErrorReportPayload {
-	correlationId: string | null;
-	origen: ErrorOrigen;
-	mensaje: string;
-	stackTrace: string | null;
-	url: string;
-	httpMethod: string | null;
-	httpStatus: number | null;
-	errorCode: string | null;
-	severidad: 'CRITICAL' | 'ERROR' | 'WARNING';
-	plataforma: 'WEB' | 'ANDROID' | 'IOS';
-	userAgent: string;
-	sourceLocation: string | null;
-	breadcrumbs: BreadcrumbPayload[];
-}
-
-interface BreadcrumbPayload {
-	tipo: string;
-	descripcion: string;
-	ruta: string;
-	timestamp: number;
-	metadata: string | null;
-}
-
-const BREADCRUMB_LIMITS: Record<string, number> = {
-	js_unhandled: 30,
-	http_500: 30,
-	http_422: 15,
-	http_400: 15,
-	http_401: 10,
-	http_403: 10,
-	http_409: 10,
-	http_network: 5,
-	default: 15,
-};
-
-// #endregion
 
 @Injectable({ providedIn: 'root' })
 export class ErrorReporterService {
@@ -201,8 +162,6 @@ export class ErrorReporterService {
 
 		this.send(payload);
 	}
-
-	// #endregion
 
 	// #endregion
 

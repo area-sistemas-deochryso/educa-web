@@ -2,7 +2,6 @@
 import { Injectable, inject } from '@angular/core';
 import { AsistenciaDetalle, ConteoEstados, ConteoEstadosMensual } from '@core/services';
 import {
-	AttendanceStatus,
 	AttendanceDay,
 	AttendanceWeek,
 	AttendanceTable,

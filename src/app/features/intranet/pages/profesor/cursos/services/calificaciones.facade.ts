@@ -1,3 +1,4 @@
+/* eslint-disable max-lines -- Razón: facade de calificaciones con CRUD + carga de contenido + evaluaciones + notas. 301 líneas efectivas — 1 sobre el límite por expansión de setters. */
 import { Injectable, inject, DestroyRef } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { forkJoin } from 'rxjs';
@@ -327,7 +328,9 @@ export class CalificacionesFacade {
 	// #endregion
 
 	// #region Comandos de UI
-	openCalificacionDialog(editing: CalificacionDto | null = null): void { this.store.openCalificacionDialog(editing); }
+	openCalificacionDialog(editing: CalificacionDto | null = null): void {
+		this.store.openCalificacionDialog(editing);
+	}
 	closeCalificacionDialog(): void { this.store.closeCalificacionDialog(); }
 	closeCalificarDialog(): void { this.store.closeCalificarDialog(); }
 	openPeriodosDialog(): void { this.store.openPeriodosDialog(); }

@@ -10,6 +10,13 @@ import { StorageService } from '../storage';
 import { PermissionsService } from './permisos.service';
 import { PermisosUsuarioResultado } from './permisos.models';
 
+// Test-only type to access private signals for state setup
+interface PermissionsServiceTestAccess {
+	_permisos: { set: (v: PermisosUsuarioResultado | null) => void };
+	_loaded: { set: (v: boolean) => void };
+	_loadFailed: { set: (v: boolean) => void };
+}
+
 // #endregion
 
 // #region Mocks
@@ -93,8 +100,8 @@ describe('UserPermissionsService', () => {
 	// #region tienePermiso — core authorization logic
 	describe('tienePermiso', () => {
 		beforeEach(() => {
-			(service as any)._permisos.set(mockPermisos);
-			(service as any)._loaded.set(true);
+			(service as unknown as PermissionsServiceTestAccess)._permisos.set(mockPermisos);
+			(service as unknown as PermissionsServiceTestAccess)._loaded.set(true);
 		});
 
 		it('should allow exact route match', () => {
@@ -136,22 +143,22 @@ describe('UserPermissionsService', () => {
 		});
 
 		it('should allow all when loaded with empty vistas (no permissions configured)', () => {
-			(service as any)._permisos.set({ ...mockPermisos, vistasPermitidas: [] });
-			(service as any)._loaded.set(true);
+			(service as unknown as PermissionsServiceTestAccess)._permisos.set({ ...mockPermisos, vistasPermitidas: [] });
+			(service as unknown as PermissionsServiceTestAccess)._loaded.set(true);
 
 			expect(service.tienePermiso('any/route')).toBe(true);
 		});
 
 		it('should handle empty string route', () => {
-			(service as any)._permisos.set(mockPermisos);
-			(service as any)._loaded.set(true);
+			(service as unknown as PermissionsServiceTestAccess)._permisos.set(mockPermisos);
+			(service as unknown as PermissionsServiceTestAccess)._loaded.set(true);
 
 			expect(service.tienePermiso('')).toBe(false);
 		});
 
 		it('should handle route with only slashes', () => {
-			(service as any)._permisos.set(mockPermisos);
-			(service as any)._loaded.set(true);
+			(service as unknown as PermissionsServiceTestAccess)._permisos.set(mockPermisos);
+			(service as unknown as PermissionsServiceTestAccess)._loaded.set(true);
 
 			expect(service.tienePermiso('/')).toBe(false);
 		});
@@ -170,8 +177,8 @@ describe('UserPermissionsService', () => {
 
 		it('should return true immediately when already loaded', async () => {
 			mocks.authService.isAuthenticated = true;
-			(service as any)._loaded.set(true);
-			(service as any)._permisos.set(mockPermisos);
+			(service as unknown as PermissionsServiceTestAccess)._loaded.set(true);
+			(service as unknown as PermissionsServiceTestAccess)._permisos.set(mockPermisos);
 
 			const result = await service.ensurePermisosLoaded();
 
@@ -213,7 +220,7 @@ describe('UserPermissionsService', () => {
 
 		it('should return false immediately if already failed', async () => {
 			mocks.authService.isAuthenticated = true;
-			(service as any)._loadFailed.set(true);
+			(service as unknown as PermissionsServiceTestAccess)._loadFailed.set(true);
 
 			const result = await service.ensurePermisosLoaded();
 
@@ -268,8 +275,8 @@ describe('UserPermissionsService', () => {
 	// #region clear
 	describe('clear', () => {
 		it('should reset state and clear storage', () => {
-			(service as any)._permisos.set(mockPermisos);
-			(service as any)._loaded.set(true);
+			(service as unknown as PermissionsServiceTestAccess)._permisos.set(mockPermisos);
+			(service as unknown as PermissionsServiceTestAccess)._loaded.set(true);
 
 			service.clear();
 
@@ -285,22 +292,22 @@ describe('UserPermissionsService', () => {
 	// #region computed signals
 	describe('computed signals', () => {
 		it('should derive vistasPermitidas from permisos', () => {
-			(service as any)._permisos.set(mockPermisos);
+			(service as unknown as PermissionsServiceTestAccess)._permisos.set(mockPermisos);
 			expect(service.vistasPermitidas()).toEqual(mockPermisos.vistasPermitidas);
 		});
 
 		it('should derive tienePermisosPersonalizados', () => {
-			(service as any)._permisos.set(mockPermisosPersonalizados);
+			(service as unknown as PermissionsServiceTestAccess)._permisos.set(mockPermisosPersonalizados);
 			expect(service.tienePermisosPersonalizados()).toBe(true);
 		});
 
 		it('should return empty array when permisos is null', () => {
-			(service as any)._permisos.set(null);
+			(service as unknown as PermissionsServiceTestAccess)._permisos.set(null);
 			expect(service.vistasPermitidas()).toEqual([]);
 		});
 
 		it('should return false for personalizados when permisos is null', () => {
-			(service as any)._permisos.set(null);
+			(service as unknown as PermissionsServiceTestAccess)._permisos.set(null);
 			expect(service.tienePermisosPersonalizados()).toBe(false);
 		});
 	});

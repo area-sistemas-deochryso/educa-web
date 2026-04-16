@@ -1,6 +1,6 @@
 import { inject, Injectable } from '@angular/core';
 
-import { getEstadoToggleDeltas, getEstadoRollbackDeltas, facadeErrorHandler, logger } from '@core/helpers';
+import { getEstadoToggleDeltas, getEstadoRollbackDeltas, facadeErrorHandler } from '@core/helpers';
 import { ErrorHandlerService, WalFacadeHelper } from '@core/services';
 import { environment } from '@config';
 import { type ImportarHorarioItem } from '../helpers/horario-import.config';

@@ -1,0 +1,8 @@
+:host ::ng-deep .p-datatable {
+	--p-datatable-header-cell-background: transparent;
+	--p-datatable-row-background: transparent;
+}
+
+:host ::ng-deep .p-datatable .p-datatable-tbody > tr {
+	cursor: pointer;
+}

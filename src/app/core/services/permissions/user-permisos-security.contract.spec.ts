@@ -12,6 +12,12 @@ import { StorageService } from '../storage';
 import { PermissionsService } from './permisos.service';
 import { PermisosUsuarioResultado } from './permisos.models';
 
+// Test-only type to access private signals for state setup
+interface PermissionsServiceTestAccess {
+	_permisos: { set: (v: PermisosUsuarioResultado | null) => void };
+	_loaded: { set: (v: boolean) => void };
+}
+
 // #endregion
 
 // #region Mocks
@@ -64,12 +70,12 @@ describe('UserPermissionsService — Security Contracts', () => {
 	// #region INV-S03: Custom permisos replace role permisos entirely
 	describe('INV-S03: Custom permissions REPLACE role permissions (not additive)', () => {
 		it('should report tienePermisosPersonalizados correctly', () => {
-			(service as any)._permisos.set({
+			(service as unknown as PermissionsServiceTestAccess)._permisos.set({
 				...mockPermisos,
 				tienePermisosPersonalizados: true,
 				vistasPermitidas: ['intranet/profesor/horarios'],
 			});
-			(service as any)._loaded.set(true);
+			(service as unknown as PermissionsServiceTestAccess)._loaded.set(true);
 
 			expect(service.tienePermisosPersonalizados()).toBe(true);
 			// Custom permisos only include horarios — no access to admin routes
@@ -82,8 +88,8 @@ describe('UserPermissionsService — Security Contracts', () => {
 	// #region INV-S04: Exact path matching, no inheritance
 	describe('INV-S04: Exact route match — no wildcard or parent inheritance', () => {
 		beforeEach(() => {
-			(service as any)._permisos.set(mockPermisos);
-			(service as any)._loaded.set(true);
+			(service as unknown as PermissionsServiceTestAccess)._permisos.set(mockPermisos);
+			(service as unknown as PermissionsServiceTestAccess)._loaded.set(true);
 		});
 
 		it('should deny parent route when only child is permitted', () => {
@@ -92,7 +98,7 @@ describe('UserPermissionsService — Security Contracts', () => {
 		});
 
 		it('should deny child route when only parent is permitted', () => {
-			(service as any)._permisos.set({
+			(service as unknown as PermissionsServiceTestAccess)._permisos.set({
 				...mockPermisos,
 				vistasPermitidas: ['intranet/admin'],
 			});
@@ -115,8 +121,8 @@ describe('UserPermissionsService — Security Contracts', () => {
 		});
 
 		it('should allow all when loaded with empty vistasPermitidas (backend controls access)', () => {
-			(service as any)._permisos.set({ ...mockPermisos, vistasPermitidas: [] });
-			(service as any)._loaded.set(true);
+			(service as unknown as PermissionsServiceTestAccess)._permisos.set({ ...mockPermisos, vistasPermitidas: [] });
+			(service as unknown as PermissionsServiceTestAccess)._loaded.set(true);
 
 			expect(service.tienePermiso('any/route/whatsoever')).toBe(true);
 		});
@@ -126,8 +132,8 @@ describe('UserPermissionsService — Security Contracts', () => {
 	// #region INV: clear() is thorough
 	describe('INV: clear() stops refresh, resets signals, and clears storage', () => {
 		it('should reset all state signals', () => {
-			(service as any)._permisos.set(mockPermisos);
-			(service as any)._loaded.set(true);
+			(service as unknown as PermissionsServiceTestAccess)._permisos.set(mockPermisos);
+			(service as unknown as PermissionsServiceTestAccess)._loaded.set(true);
 
 			service.clear();
 
@@ -144,8 +150,8 @@ describe('UserPermissionsService — Security Contracts', () => {
 		});
 
 		it('should deny all routes after clear', () => {
-			(service as any)._permisos.set(mockPermisos);
-			(service as any)._loaded.set(true);
+			(service as unknown as PermissionsServiceTestAccess)._permisos.set(mockPermisos);
+			(service as unknown as PermissionsServiceTestAccess)._loaded.set(true);
 			expect(service.tienePermiso('intranet/admin/usuarios')).toBe(true);
 
 			service.clear();

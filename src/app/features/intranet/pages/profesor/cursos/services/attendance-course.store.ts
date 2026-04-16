@@ -3,7 +3,6 @@ import {
 	AsistenciaCursoFechaDto,
 	AsistenciaCursoResumenDto,
 	EstadoAsistenciaCurso,
-	ESTADOS_ASISTENCIA_CURSO,
 } from '../../models';
 
 interface AsistenciaCursoState {

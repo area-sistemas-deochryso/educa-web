@@ -5,6 +5,9 @@ import { signal } from '@angular/core';
 import { testProviders } from '@test';
 import { AttendanceComponent } from './attendance.component';
 import { UserProfileService } from '@core/services';
+import { AttendanceApoderadoComponent } from './attendance-apoderado/attendance-apoderado.component';
+import { AttendanceEstudianteComponent } from './attendance-estudiante/attendance-estudiante.component';
+import { AppUserRole } from '@shared/constants/app-roles';
 
 // #endregion
 // #region Implementation
@@ -45,7 +48,7 @@ describe('AttendanceComponent', () => {
 		// Mock apoderado component
 		component.apoderadoComponent = {
 			reload: vi.fn(),
-		} as any;
+		} as unknown as AttendanceApoderadoComponent;
 
 		component.onReload();
 
@@ -64,7 +67,7 @@ describe('AttendanceComponent', () => {
 	it('should have onReload method that delegates to appropriate component', () => {
 		// Mock apoderado component (current role)
 		const mockApoderado = { reload: vi.fn() };
-		component.apoderadoComponent = mockApoderado as any;
+		component.apoderadoComponent = mockApoderado as unknown as AttendanceApoderadoComponent;
 
 		component.onReload();
 
@@ -78,7 +81,7 @@ describe('AttendanceComponent', () => {
 		const newComponent = newFixture.componentInstance;
 
 		const mockEstudiante = { reload: vi.fn() };
-		newComponent.estudianteComponent = mockEstudiante as any;
+		newComponent.estudianteComponent = mockEstudiante as unknown as AttendanceEstudianteComponent;
 
 		newComponent.onReload();
 
@@ -87,7 +90,7 @@ describe('AttendanceComponent', () => {
 
 	it('should handle unexpected role in constructor', () => {
 		// This test verifies the component doesn't crash with unexpected roles
-		userProfileMock.userRole = signal('UnknownRole' as any);
+		userProfileMock.userRole = signal('UnknownRole' as AppUserRole);
 
 		// Component should still create without errors
 		expect(() => {

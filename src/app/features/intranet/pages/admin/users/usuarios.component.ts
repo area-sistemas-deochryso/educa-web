@@ -138,18 +138,30 @@ export class UsersComponent implements AfterViewInit {
 
 	// #region Data & Filter handlers
 	onRefresh(): void { this.dataFacade.refresh(); }
-	onSearchChange(value: string): void { this.dataFacade.setSearchTerm(value); }
-	onFilterRolChange(value: RolUsuarioAdmin | null): void { this.dataFacade.setFilterRol(value); }
-	onFilterEstadoChange(value: boolean | null): void { this.dataFacade.setFilterEstado(value); }
-	onFilterSalonIdChange(value: number | null): void { this.dataFacade.setFilterSalonId(value); }
+	onSearchChange(value: string): void {
+		this.dataFacade.setSearchTerm(value);
+	}
+	onFilterRolChange(value: RolUsuarioAdmin | null): void {
+		this.dataFacade.setFilterRol(value);
+	}
+	onFilterEstadoChange(value: boolean | null): void {
+		this.dataFacade.setFilterEstado(value);
+	}
+	onFilterSalonIdChange(value: number | null): void {
+		this.dataFacade.setFilterSalonId(value);
+	}
 	onClearFilters(): void { this.dataFacade.clearFilters(); }
 	onLazyLoad(event: { page: number; pageSize: number }): void { this.dataFacade.loadPage(event.page, event.pageSize); }
 	// #endregion
 
 	// #region UI handlers
 	onNewUsuario(): void { this.uiFacade.openNew(); }
-	onViewDetail(usuario: UsuarioLista): void { this.uiFacade.openDetail(usuario); }
-	onEditUsuario(usuario: UsuarioLista): void { this.uiFacade.editUsuario(usuario); }
+	onViewDetail(usuario: UsuarioLista): void {
+		this.uiFacade.openDetail(usuario);
+	}
+	onEditUsuario(usuario: UsuarioLista): void {
+		this.uiFacade.editUsuario(usuario);
+	}
 	onCloseDetail(): void { this.uiFacade.closeDetail(); }
 	onEditFromDetail(): void { this.uiFacade.editFromDetail(); }
 	onCancelDialog(): void { this.uiFacade.hideDialog(); }

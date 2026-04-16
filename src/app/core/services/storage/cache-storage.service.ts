@@ -1,5 +1,4 @@
 import { Injectable, inject } from '@angular/core';
-import { logger } from '@app/core/helpers';
 import { IndexedDBService, IDB_STORES } from './indexed-db.service';
 
 /**

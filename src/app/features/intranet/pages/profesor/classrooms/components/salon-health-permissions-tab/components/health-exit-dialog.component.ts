@@ -1,4 +1,4 @@
-import { Component, ChangeDetectionStrategy, input, output, signal } from '@angular/core';
+import { Component, ChangeDetectionStrategy, input, output, signal, OnChanges } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { DialogModule } from 'primeng/dialog';
@@ -113,7 +113,7 @@ import { StudentForHealthDto, SymptomDto } from '@features/intranet/pages/profes
 		`,
 	],
 })
-export class HealthExitDialogComponent {
+export class HealthExitDialogComponent implements OnChanges {
 	// #region Inputs/Outputs
 	readonly visible = input(false);
 	readonly estudiantes = input<StudentForHealthDto[]>([]);
