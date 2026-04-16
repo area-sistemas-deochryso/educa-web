@@ -367,8 +367,9 @@ El colegio opera con dos modelos de asignación distintos según el nivel/grado.
 
 | Rango | `GRA_Orden` | Modelo | Relación natural |
 |-------|-------------|--------|------------------|
-| Inicial (3 grados) → 4to Primaria | 1 – 8 | **Tutor pleno** — un profesor por salón dicta TODOS los cursos | Profesor ↔ Salón |
-| 5to Primaria → 5to Secundaria | 9 – 14 | **Por curso** — un profesor puede dictar uno o más cursos; un salón tiene múltiples profesores | Profesor ↔ Curso (en contexto de Salón vía Horario) |
+| Inicial (3 grados) → 3ro Primaria | 1 – 7 | **Tutor pleno** — un profesor por salón dicta TODOS los cursos | Profesor ↔ Salón |
+| 4to Primaria → 5to Secundaria | 8 – 14 | **Por curso** — un profesor puede dictar uno o más cursos; un salón tiene múltiples profesores | Profesor ↔ Curso (tabla `ProfesorCurso`, validado en Horario) |
+| Sección "V" (cualquier grado) | cualquiera | **Flexible** — sin validación de modo (verano/recuperación) | Sin restricción |
 
 **Consecuencias**:
 
@@ -376,23 +377,26 @@ El colegio opera con dos modelos de asignación distintos según el nivel/grado.
 - En modo **por curso**, cualquier profesor asignado al curso puede dictarlo. La relación pasa por Horario (no hay tabla `ProfesorCurso` directa hoy).
 - Los flujos de UI (asignación masiva, creación de horarios, permisos de calificación/asistencia) **deben** ramificar según `GRA_Orden` del salón.
 
-**Estado actual del back (deuda de diseño)**:
+**Estado actual del back (implementado — Plan 6, 2026-04-16)**:
 
-El modelo actual (`ProfesorSalon` + curso resuelto vía `Horario`) fue construido antes de conocer esta distinción. Hoy no distingue entre tutor pleno y asignación por curso — todo pasa por Horario. Al refinar este diseño se evaluará:
+- `ModoAsignacionResolver` calcula el modo a partir de `GRA_Orden` + sección (función pura, sin columna en BD).
+- `TutorPlenoValidator` y `ProfesorCursoValidator` se ejecutan en `HorarioAsignacionService` (crear) y `HorarioService.UpdateAsync` (editar).
+- Tabla `ProfesorCurso` implementada para 4to Primaria en adelante (`GRA_Orden ≥ 8`), con CRUD completo.
+- Frontend diferencia modos con badges en salones, horarios y edición de profesor.
 
-- Campo `ModoAsignacion` derivado de `GRA_Orden` (o columna explícita en `Grado`/`Salon`).
-- Validación en creación de horarios: si salón es tutor pleno, el profesor debe ser el tutor.
-- Posible tabla `ProfesorCurso` para 5to Primaria en adelante si la asignación por curso se independiza del horario.
+**Invariantes** (implementados — Plan 6, 2026-04-16):
 
-**Invariantes** (propuestos, a formalizar en sección 15 cuando se implemente el refinamiento):
+| ID | Invariante | Enforcement |
+|----|-----------|-------------|
+| `INV-AS01` | Salones con `GRA_Orden ≤ 7` (excluye sección V) operan en modo tutor pleno: todo horario del salón debe tener como profesor al `ProfesorSalon` tutor (`PRS_EsTutor = true`) | `TutorPlenoValidator` + `HorarioAsignacionService` + `HorarioService.UpdateAsync` |
+| `INV-AS02` | Salones con `GRA_Orden ≥ 8` (excluye sección V) operan en modo por curso: el profesor de un horario debe tener entrada activa en `ProfesorCurso` para ese curso y año. Co-docencia permitida (múltiples profesores por curso-salón) | `ProfesorCursoValidator` + `HorarioAsignacionService` + `HorarioService.UpdateAsync` |
+| `INV-AS03` | Un profesor en modo tutor pleno dicta obligatoriamente todos los cursos asignados al grado del salón vía `CursoGrado` | Convención de asignación (no enforced en runtime aún) |
 
-| ID | Invariante |
-|----|-----------|
-| `INV-AS01` | Salones con `GRA_Orden ≤ 8` operan en modo tutor pleno: todo horario del salón debe tener como profesor al `ProfesorSalon` tutor (`PRS_EsTutor = true`) |
-| `INV-AS02` | Salones con `GRA_Orden ≥ 9` operan en modo por curso: múltiples profesores pueden tener horarios en el mismo salón, uno por curso |
-| `INV-AS03` | Un profesor en modo tutor pleno dicta obligatoriamente todos los cursos asignados al grado del salón vía `CursoGrado` |
+**Resolución de modo** (`ModoAsignacionResolver`): Si la sección es "V" → `Flexible` (sin validación de modo). Si `GRA_Orden ≤ 7` → `TutorPleno`. Si `GRA_Orden ≥ 8` → `PorCurso`. Umbral constante: `UMBRAL_TUTOR_PLENO = 7`.
 
-**Impacto transversal**: Esta regla afecta BD (posible nueva columna/tabla), backend (validaciones de horarios, servicios de asignación) y frontend (UI de asignación diferenciada por grado). Cualquier cambio debe coordinarse en las tres capas.
+**Tabla ProfesorCurso**: Relación profesor-curso-año con unique index filtrado `(PCU_PRO_CodID, PCU_CUR_CodID, PCU_Anio) WHERE PCU_Estado = 1`. Endpoints CRUD en `ProfesorCursoController`.
+
+**Impacto transversal**: Esta regla afecta BD (`ProfesorCurso` table), backend (validaciones de horarios, servicios de asignación) y frontend (UI de asignación diferenciada por grado). Los tres están implementados.
 
 ---
 
@@ -1102,6 +1106,20 @@ Este registro consolida TODAS las invariantes del sistema en una tabla indexable
 | `INV-RU06` | ReporteUsuario | Transiciones desde estado `RESUELTO` solo permiten volver a `NUEVO` (reapertura explícita) o mantenerse en `RESUELTO`. No se puede pasar directo `RESUELTO → EN_PROGRESO` | `ReporteUsuarioService.ActualizarEstadoAsync()` lanza `ConflictException("REPORTE_ESTADO_TERMINAL")` | 16 |
 | `INV-RU07` | ReporteUsuario | El DNI del usuario se almacena enmascarado (`***1234`) en el DTO que el frontend consume. El valor crudo NUNCA se expone fuera del backend — solo se usa para logging enmascarado | `MaskDni()` helper aplicado en `ToListaDto` y `ToDetalleDto` | 16 |
 | `INV-RU08` | ReporteUsuario | La notificación por correo al Director es fire-and-forget: un error al encolar NUNCA falla el insert del reporte | `ReporteUsuarioService.CrearAsync()` con try/catch alrededor de `EnviarNotificacionDirectoresAsync` + `IEmailOutboxService` | 16 |
+
+---
+
+### 15.12 Invariantes de Asignación Profesor-Salón-Curso
+
+| ID | Entidad | Invariante | Enforcement | Sección |
+|----|---------|------------|-------------|---------|
+| `INV-AS01` | Horario | Salones con `GRA_Orden ≤ 7` (excluye sección V): el profesor del horario debe ser el `ProfesorSalon` tutor (`PRS_EsTutor = true`) del salón | `TutorPlenoValidator` en `HorarioAsignacionService` + `HorarioService.UpdateAsync`. Error: `INV_AS01_TUTOR_PLENO` | 5.4 |
+| `INV-AS02` | Horario | Salones con `GRA_Orden ≥ 8` (excluye sección V): el profesor del horario debe tener entrada activa en `ProfesorCurso` para ese curso y año | `ProfesorCursoValidator` en `HorarioAsignacionService` + `HorarioService.UpdateAsync`. Error: `INV_AS02_PROFESOR_CURSO` | 5.4 |
+| `INV-AS03` | ProfesorSalon | En modo tutor pleno, el profesor dicta todos los cursos del grado vía `CursoGrado` | Convención (no enforced en runtime). Deuda técnica menor | 5.4 |
+| `INV-AS04` | ProfesorSalon | Un tutor activo de un salón tutor pleno con horarios activos no puede desactivarse sin reemplazo | `ProfesorStrategy.CambiarEstadoAsync`. Error: `TUTOR_PLENO_CON_HORARIOS` | 5.4 |
+| `INV-AS05` | Salon | Un salón tutor pleno con horarios activos no puede eliminarse | `SalonesService.EliminarAsync`. Error: `SALON_TUTOR_PLENO_CON_HORARIOS` | 5.4 |
+
+**Auditoría** (2026-04-16): Queries ejecutadas en ambas BDs (test + producción). **0 violaciones** INV-AS01/AS02. Los datos existentes cumplen los invariantes.
 
 ---
 

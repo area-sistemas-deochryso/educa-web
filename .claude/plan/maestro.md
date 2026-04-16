@@ -15,7 +15,7 @@
 | 3 | Domain Layer (Opción A) | BE | [Educa.API/.claude/plan/domain-layer.md](../../../Educa.API/.claude/plan/domain-layer.md) | Fases 1-3,5-6 ✅ · F4 🔒 (bloqueada por Matrícula) | ~85% |
 | 4 | Consolidación Backend | FE | [plan/consolidacion-backend.md](consolidacion-backend.md) | ⏳ | 0% |
 | 5 | Consolidación Frontend | FE | [plan/consolidacion-frontend.md](consolidacion-frontend.md) | ⏳ | 0% |
-| 6 | Asignación Profesor-Salón-Curso | BE+FE | [Educa.API/.claude/plan/asignacion-profesor-salon-curso.md](../../../Educa.API/.claude/plan/asignacion-profesor-salon-curso.md) | F0-F4 ✅ · F5-6 ⏳ | ~80% |
+| 6 | Asignación Profesor-Salón-Curso | BE+FE | [Educa.API/.claude/plan/asignacion-profesor-salon-curso.md](../../../Educa.API/.claude/plan/asignacion-profesor-salon-curso.md) | F0-F5 ✅ · F6 ⏳ | ~90% |
 | 7 | Error Trace Backend | BE | [Educa.API/.claude/plan/error-trace-backend.md](../../../Educa.API/.claude/plan/error-trace-backend.md) | ⏳ | 0% |
 | 8 | Design Patterns Backend | FE | [tasks/design-patterns-backend.md](../tasks/design-patterns-backend.md) | Incremental | N/A |
 | 9 | Design Patterns Frontend | FE | [tasks/design-patterns-frontend.md](../tasks/design-patterns-frontend.md) | Incremental | N/A |
@@ -47,7 +47,8 @@
 3. ~~**Plan 6 F2**~~ ✅ (2026-04-16) — Domain validators: 4 archivos + 42 tests. Build OK.
 4. ~~**Plan 6 F3**~~ ✅ (2026-04-16) — BE Services: 7 archivos nuevos + 9 modificados. 741 tests OK.
 5. ~~**Plan 6 F4**~~ ✅ (2026-04-16) — Frontend: tipos + badges + cursos que dicta en usuarios. 25 archivos, commit `11c1658`.
-6. **Plan 6 F5** — Backfill y auditoría (repo BE). Query SQL de violaciones INV-AS01/AS02. **← PRÓXIMO**
+6. ~~**Plan 6 F5**~~ ✅ (2026-04-16) — Auditoría SQL: 0 violaciones INV-AS01/AS02 en ambas BDs.
+7. **Plan 6 F6** — Tests E2E + cierre (repo FE). **← PRÓXIMO**
 
 **En paralelo (deuda técnica, cuando haya bandwidth)**:
 - Plan 1 F5.3 (re-exports cleanup, 48 archivos)
@@ -197,10 +198,10 @@ CARRIL C — DIFERIDO
   - [x] F4.5 Sección "Cursos que dicta" en edición de profesor (`/admin/usuarios`) ✅ (2026-04-16)
   - [x] F4.6 Actualizar plan base + maestro ✅ (2026-04-16)
 
-- [ ] **F5 — Backfill y auditoría** (1 chat, repo BE)
-  - [ ] F5.1 Query SQL de violaciones existentes INV-AS01/AS02
-  - [ ] F5.2 Reporte para admin (grandfathering — no se corrige automáticamente)
-  - [ ] F5.3 Actualizar plan base + maestro
+- [x] **F5 — Backfill y auditoría** (1 chat, repo BE) ✅ (2026-04-16)
+  - [x] F5.1 Query SQL de violaciones existentes INV-AS01/AS02 — ejecutadas en ambas BDs
+  - [x] F5.2 Resultado: **0 violaciones** en test y producción. No hay grandfathering que gestionar.
+  - [x] F5.3 Actualizar plan base + maestro ✅
 
 - [ ] **F6 — Tests E2E + cierre** (1 chat)
   - [ ] F6.1 Tests facade FE: crear horario tutor pleno OK/KO, por curso OK/KO

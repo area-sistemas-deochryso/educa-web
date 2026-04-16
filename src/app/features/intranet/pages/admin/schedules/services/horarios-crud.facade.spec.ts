@@ -289,6 +289,76 @@ describe('SchedulesCrudFacade', () => {
 	});
 	// #endregion
 
+	// #region CREATE — INV-AS01/AS02 (assignment mode validation)
+	describe('create — assignment mode errors', () => {
+		it('INV-AS01: backend rejects tutor pleno violation → rollback + error shown', () => {
+			facade.create({
+				diaSemana: 1,
+				horaInicio: '08:00',
+				horaFin: '09:00',
+				salonId: 10,
+				cursoId: 100,
+			} as any);
+
+			const beforeStats = { ...store.estadisticas()! };
+			const httpErr = { status: 422, error: { errorCode: 'INV_AS01_TUTOR_PLENO', message: 'Profesor no es tutor' } };
+			wal.fail(httpErr);
+
+			// Stats unchanged (create rollback is no-op since nothing was added)
+			expect(store.estadisticas()!.totalHorarios).toBe(beforeStats.totalHorarios);
+			expect(errorHandler.showError).toHaveBeenCalled();
+		});
+
+		it('INV-AS02: backend rejects profesor-curso violation → rollback + error shown', () => {
+			facade.create({
+				diaSemana: 2,
+				horaInicio: '10:00',
+				horaFin: '11:00',
+				salonId: 20,
+				cursoId: 200,
+			} as any);
+
+			const httpErr = { status: 422, error: { errorCode: 'INV_AS02_PROFESOR_CURSO', message: 'Sin asignación' } };
+			wal.fail(httpErr);
+
+			expect(errorHandler.showError).toHaveBeenCalled();
+		});
+
+		it('create succeeds for tutor pleno salon → stats incremented normally', () => {
+			facade.create({
+				diaSemana: 1,
+				horaInicio: '08:00',
+				horaFin: '09:00',
+				salonId: 10,
+				cursoId: 100,
+			} as any);
+
+			const before = store.estadisticas()!;
+			wal.commit();
+
+			expect(store.estadisticas()!.totalHorarios).toBe(before.totalHorarios + 1);
+			expect(store.estadisticas()!.horariosActivos).toBe(before.horariosActivos + 1);
+			expect(errorHandler.showSuccess).toHaveBeenCalled();
+		});
+
+		it('create succeeds for por-curso salon → stats incremented normally', () => {
+			facade.create({
+				diaSemana: 3,
+				horaInicio: '14:00',
+				horaFin: '15:00',
+				salonId: 30,
+				cursoId: 300,
+			} as any);
+
+			const before = store.estadisticas()!;
+			wal.commit();
+
+			expect(store.estadisticas()!.totalHorarios).toBe(before.totalHorarios + 1);
+			expect(errorHandler.showSuccess).toHaveBeenCalled();
+		});
+	});
+	// #endregion
+
 	// #region importarHorarios
 	describe('importarHorarios', () => {
 		it('success con creados>0 refresca y muestra mensaje', () => {

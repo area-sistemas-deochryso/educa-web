@@ -94,6 +94,14 @@ export const UI_ERROR_CODES: Record<string, string> = {
 	HORARIO_USUARIO_REG_REQUERIDO: 'El parámetro usuarioReg es requerido.',
 	HORARIO_USUARIO_MOD_REQUERIDO: 'El parámetro usuarioMod es requerido.',
 	HORARIO_ACCESS_DENIED: 'No tiene acceso a este horario.',
+	INV_AS01_TUTOR_PLENO:
+		'En este salón (tutor pleno), el profesor del horario debe ser el tutor asignado.',
+	INV_AS02_PROFESOR_CURSO:
+		'El profesor no tiene asignación activa a este curso. Asigne primero el curso al profesor en Usuarios.',
+	TUTOR_PLENO_CON_HORARIOS:
+		'No se puede desactivar al tutor porque tiene horarios activos en un salón de tutor pleno.',
+	SALON_TUTOR_PLENO_CON_HORARIOS:
+		'No se puede eliminar el salón porque tiene horarios activos en modo tutor pleno.',
 
 	// Cursos
 	CURSO_NOT_FOUND: 'No se encontró el curso solicitado.',
