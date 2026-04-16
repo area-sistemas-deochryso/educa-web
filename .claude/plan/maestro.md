@@ -15,15 +15,15 @@
 | 3 | Domain Layer (Opción A) | BE | [Educa.API/.claude/plan/domain-layer.md](../../../Educa.API/.claude/plan/domain-layer.md) | Fases 1-3,5-6 ✅ · F4 🔒 (bloqueada por Matrícula) | ~85% |
 | 4 | Consolidación Backend | FE | [plan/consolidacion-backend.md](consolidacion-backend.md) | ⏳ | 0% |
 | 5 | Consolidación Frontend | FE | [plan/consolidacion-frontend.md](consolidacion-frontend.md) | ⏳ | 0% |
-| 6 | Asignación Profesor-Salón-Curso | BE+FE | [Educa.API/.claude/plan/asignacion-profesor-salon-curso.md](../../../Educa.API/.claude/plan/asignacion-profesor-salon-curso.md) | F0-F3 ✅ · F4 🔄 (F4.1-F4.4 ✅) · F5-6 ⏳ | ~65% |
+| 6 | Asignación Profesor-Salón-Curso | BE+FE | [Educa.API/.claude/plan/asignacion-profesor-salon-curso.md](../../../Educa.API/.claude/plan/asignacion-profesor-salon-curso.md) | F0-F4 ✅ · F5-6 ⏳ | ~80% |
 | 7 | Error Trace Backend | BE | [Educa.API/.claude/plan/error-trace-backend.md](../../../Educa.API/.claude/plan/error-trace-backend.md) | ⏳ | 0% |
 | 8 | Design Patterns Backend | FE | [tasks/design-patterns-backend.md](../tasks/design-patterns-backend.md) | Incremental | N/A |
 | 9 | Design Patterns Frontend | FE | [tasks/design-patterns-frontend.md](../tasks/design-patterns-frontend.md) | Incremental | N/A |
 | 10 | Flujos Alternos (resiliencia) | FE | [plan/flujos-alternos.md](flujos-alternos.md) | ⏳ (bloqueado) | 0% |
 | 11 | Refactor `eslint.config.js` (fix G10) | FE | [plan/eslint-config-refactor.md](eslint-config-refactor.md) | ✅ F1-F5 (F5.3 tests opcionales sin ejecutar) | ~95% |
 
-**Resumen por carril**: Carril A (features) ~10% · Carril B (deuda) ~50% · Carril C (diferido) 0%
-**Total consolidado**: **~25-30%** del plan maestro terminado.
+**Resumen por carril**: Carril A (features) ~80% · Carril B (deuda) ~50% · Carril C (diferido) 0%
+**Total consolidado**: **~45-50%** del plan maestro terminado.
 
 ---
 
@@ -46,7 +46,8 @@
 2. ~~**Plan 6 F1**~~ ✅ (2026-04-16) — BD: tabla `ProfesorCurso` + migración + modelo EF.
 3. ~~**Plan 6 F2**~~ ✅ (2026-04-16) — Domain validators: 4 archivos + 42 tests. Build OK.
 4. ~~**Plan 6 F3**~~ ✅ (2026-04-16) — BE Services: 7 archivos nuevos + 9 modificados. 741 tests OK.
-5. **Plan 6 F4** — Frontend (🔄 F4.1-F4.4 ✅, F4.5 pendiente). Badge de modo en drawer + tabla salones. Siguiente: sección "Cursos que dicta" en usuarios. **← PRÓXIMO**
+5. ~~**Plan 6 F4**~~ ✅ (2026-04-16) — Frontend: tipos + badges + cursos que dicta en usuarios. 25 archivos, commit `11c1658`.
+6. **Plan 6 F5** — Backfill y auditoría (repo BE). Query SQL de violaciones INV-AS01/AS02. **← PRÓXIMO**
 
 **En paralelo (deuda técnica, cuando haya bandwidth)**:
 - Plan 1 F5.3 (re-exports cleanup, 48 archivos)
@@ -188,13 +189,13 @@ CARRIL C — DIFERIDO
   - [x] F3.6 DI registration + build OK + 741 tests OK
   - [x] F3.7 Plan base + maestro actualizados
 
-- [ ] **F4 — Frontend: horarios + salones** (2-3 chats, repo FE) 🔄
+- [x] **F4 — Frontend: horarios + salones + usuarios** (3 chats, repo FE) ✅ (2026-04-16)
   - [x] F4.1 Tipos: `ModoAsignacion` + `resolveModoAsignacion()` en `@data/models/classroom.models.ts`, `ProfesorCursoListaDto` en `profesor-curso.models.ts` ✅ (2026-04-16)
   - [x] F4.2 `modoAsignacion` computed en `SchedulesOptionsStore` + `profesoresParaAsignacion` filtrado por modo + `ProfesorCursoApiService` ✅ (2026-04-16)
   - [x] F4.3 Detail drawer: badge de modo + info contextual (tag Tutor/PorCurso/Flexible con tooltip) ✅ (2026-04-16)
   - [x] F4.4 Badge de modo en tabla de salones admin + `SalonDetailDialog` header ✅ (2026-04-16)
-  - [ ] F4.5 Sección "Cursos que dicta" en edición de profesor (`/admin/usuarios`) ← PRÓXIMO CHAT
-  - [ ] F4.6 Actualizar plan base + maestro
+  - [x] F4.5 Sección "Cursos que dicta" en edición de profesor (`/admin/usuarios`) ✅ (2026-04-16)
+  - [x] F4.6 Actualizar plan base + maestro ✅ (2026-04-16)
 
 - [ ] **F5 — Backfill y auditoría** (1 chat, repo BE)
   - [ ] F5.1 Query SQL de violaciones existentes INV-AS01/AS02
