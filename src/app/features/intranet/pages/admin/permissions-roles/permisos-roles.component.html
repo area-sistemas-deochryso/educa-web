@@ -105,10 +105,7 @@
 				<ng-template #body let-permiso>
 					<tr>
 						<td>
-							<p-tag
-								[value]="permiso.rol"
-								[severity]="uiMapping.getRolSeverity(permiso.rol)"
-							/>
+							<p-tag [value]="permiso.rol" styleClass="tag-neutral" />
 						</td>
 						<td class="text-center">
 							<span class="count-badge">{{ permiso.vistas.length }}</span>
@@ -215,10 +212,7 @@
 			<div class="detail-summary">
 				<div class="summary-item">
 					<span class="summary-label">Rol</span>
-					<p-tag
-						[value]="vm().selectedPermiso?.rol || ''"
-						[severity]="uiMapping.getRolSeverity(vm().selectedPermiso?.rol || '')"
-					/>
+					<p-tag [value]="vm().selectedPermiso?.rol || ''" styleClass="tag-neutral" />
 				</div>
 				<div class="summary-item">
 					<span class="summary-label">Vistas Permitidas</span>
@@ -295,10 +289,7 @@
 			<div class="dialog-role-header">
 				<div class="role-info">
 					<i class="pi pi-id-card"></i>
-					<p-tag
-						[value]="vm().selectedRol || ''"
-						[severity]="uiMapping.getRolSeverity(vm().selectedRol || '')"
-					/>
+					<p-tag [value]="vm().selectedRol || ''" styleClass="tag-neutral" />
 				</div>
 				<div class="vistas-count">
 					<i class="pi pi-check"></i> {{ vm().vistasCountLabel }}

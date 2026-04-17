@@ -18,10 +18,7 @@
 					<span class="user-name">{{
 						selectedPermiso()?.nombreUsuario || 'Usuario ' + selectedUsuarioId()
 					}}</span>
-					<p-tag
-						[value]="selectedRol() || ''"
-						[severity]="uiMapping.getRolSeverity(selectedRol() || '')"
-					/>
+					<p-tag [value]="selectedRol() || ''" styleClass="tag-neutral" />
 				</div>
 				<div class="vistas-count"><i class="pi pi-check"></i> {{ vistasCountLabel() }}</div>
 			</div>

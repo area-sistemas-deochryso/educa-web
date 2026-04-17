@@ -126,7 +126,7 @@
 				</div>
 			</td>
 			<td>
-				<p-tag [value]="uiMapping.getEventoTipoLabel(item.tipo)" [severity]="uiMapping.getEventoTipoSeverity(item.tipo)" />
+				<p-tag [value]="uiMapping.getEventoTipoLabel(item.tipo)" styleClass="tag-neutral" />
 			</td>
 			<td>{{ item.fechaInicio | date: 'dd/MM/yyyy' }}</td>
 			<td>{{ item.fechaFin ? (item.fechaFin | date: 'dd/MM/yyyy') : '—' }}</td>

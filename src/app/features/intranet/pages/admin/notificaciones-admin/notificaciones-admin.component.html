@@ -122,7 +122,7 @@
 				</div>
 			</td>
 			<td>
-				<p-tag [value]="uiMapping.getNotificacionTipoLabel(item.tipo)" [severity]="uiMapping.getNotificacionTipoSeverity(item.tipo)" />
+				<p-tag [value]="uiMapping.getNotificacionTipoLabel(item.tipo)" styleClass="tag-neutral" />
 			</td>
 			<td>
 				<p-tag [value]="uiMapping.getNotificacionPrioridadLabel(item.prioridad)" [severity]="uiMapping.getNotificacionPrioridadSeverity(item.prioridad)" />
@@ -130,7 +130,7 @@
 			<td>{{ item.fechaInicio | date: 'dd/MM/yyyy' }}</td>
 			<td>{{ item.fechaFin | date: 'dd/MM/yyyy' }}</td>
 			<td>
-				<p-tag [value]="getDestinatarioLabel(item)" [severity]="getDestinatarioLabel(item) === 'Todos' ? 'secondary' : 'info'" />
+				<p-tag [value]="getDestinatarioLabel(item)" styleClass="tag-neutral" />
 			</td>
 			<td>
 				<p-tag
