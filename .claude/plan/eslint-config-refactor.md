@@ -1,6 +1,6 @@
 # Refactor del `eslint.config.js` — Fix al bug G10 (override de `no-restricted-imports`)
 
-> **Estado**: ✅ F1-F5 (F5.3 tests opcionales sin ejecutar; re-exports cubiertos el 2026-04-15)
+> **Estado**: ✅ F1-F5 completo (F5.3 cerrado 2026-04-17 con guard spec en Vitest)
 > **Origen**: G10 detectado durante F3.3 del Plan 1 (Enforcement) el 2026-04-14
 > **Prioridad**: Alta — desbloquea F3.3 y F3.5 del enforcement, y remedia un falso positivo de "enforcement activo"
 > **Capa en el maestro**: Capa 5 (Patrones + Resiliencia), pero puede adelantarse si bloquea trabajo de enforcement.
@@ -232,8 +232,14 @@ prueba de que los consumidores migraron.
 
 - [x] F5.1 Plugin extendido a `ExportAllDeclaration` + `ExportNamedDeclaration`
 - [x] F5.2 Escape hatches justificados en los 3 barrels
-- [ ] F5.3 Tests de guardia (opcional, no ejecutado — el lint sobre los barrels
-  actúa como regression test implícito)
+- [x] F5.3 Tests de guardia (2026-04-17) — `src/eslint-config-guards.spec.ts`:
+  13 tests vitest que usan `ESLint.calculateConfigForFile()` para verificar
+  que las reglas clave siguen aplicadas tras cualquier cambio futuro del
+  `eslint.config.js`. Cubren: `layer-enforcement/imports-error` y `/imports-warn`
+  por capa (component/store/facade/admin/profesor/estudiante/shared), barrel
+  enforcement (storage/auth/session/WAL/cache internals), globales
+  (`no-restricted-globals`, `no-restricted-properties`, `no-console`, `max-lines`).
+  Si un cambio accidental saca una regla de su scope, el test falla en CI.
 - [x] F5.4 `rules/eslint.md` actualizado: quitada la limitación
   "`layer-enforcement` solo chequea `ImportDeclaration`"; tabla de excepciones
   refleja que los re-exports ahora se detectan y silencian con justificación

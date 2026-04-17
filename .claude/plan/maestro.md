@@ -20,8 +20,8 @@
 | 8 | Design Patterns Backend | FE | `tasks/design-patterns-backend.md` (pendiente crear) | Incremental | N/A |
 | 9 | Design Patterns Frontend | FE | `tasks/design-patterns-frontend.md` (pendiente crear) | Incremental | N/A |
 | 10 | Flujos Alternos (resiliencia) | FE | `plan/flujos-alternos.md` (pendiente crear) | ⏳ (bloqueado) | 0% |
-| 11 | Refactor `eslint.config.js` (fix G10) | FE | `plan/eslint-config-refactor.md` (pendiente crear) | ✅ F1-F5 (F5.3 tests opcionales sin ejecutar) | ~95% |
-| 12 | Backend Test Gaps | BE | `plan/test-backend-gaps.md` (pendiente crear) | ⏳ | 0% |
+| 11 | Refactor `eslint.config.js` (fix G10) | FE | `plan/eslint-config-refactor.md` | ✅ F1-F5 (F5.3 cerrado 2026-04-17 con guard spec) | 100% |
+| 12 | Backend Test Gaps | BE | `Educa.API/.claude/plan/test-backend-gaps.md` | F1.A ✅ · F1.B-F1.C ⏳ · F2-F5 ⏳ | ~10% |
 | 13 | Frontend Test Gaps | FE | `plan/test-frontend-gaps.md` (pendiente crear) | ⏳ | 0% |
 | 14 | Contratos FE-BE | FE+BE | `plan/contratos-fe-be.md` (pendiente crear) | ⏳ | 0% |
 | 15 | Release Protocol y Operaciones | FE+BE | `plan/release-operations.md` (pendiente crear) | F1 ✅ · F2 ✅ · F3-F5 ⏳ | ~40% |
@@ -78,7 +78,7 @@
 
 1. **Plan 15 F1** — Checklist de deploy + smoke checks + rollback protocol (proceso, 1 chat) ✅
 2. **Plan 16 F1** — Auditoría de endpoints y autorización (1 chat) ✅ (2026-04-17)
-3. **Plan 12 F1** — Controller contract tests P0: Auth, Asistencia, Aprobación (2-3 chats)
+3. **Plan 12 F1** — Controller contract tests por patrones: infra+Auth ejemplar → controllers con lógica de capa controller (Asistencia, Aprobación). Descarta tests artesanales de delegación pura (3-4 chats)
 4. **Plan 13 F1** — Interceptores core sin cobertura (1 chat)
 5. **Plan 12 F3** — Security boundary tests (1-2 chats)
 6. **Plan 14 F1-F2** — Snapshots de DTOs (mínimo viable de contratos, 1-2 chats)
@@ -361,10 +361,38 @@ CARRIL C — DIFERIDO
 
 #### Plan 12 — Backend Test Gaps
 
-- [ ] **F1 — Controller contract tests** (3-4 chats, BE)
-  - [ ] F1.P0 Auth + Asistencia + Aprobación
-  - [ ] F1.P1 Usuarios + Horarios + Calificaciones + Permisos
-  - [ ] F1.P2 Resto de controllers
+- [ ] **F1 — Controller contract tests por patrones** (3-4 chats, BE)
+
+  > **Principio rector**: el controller test verifica lo que pertenece a la capa controller — claims extraction, cookies, autorización, routing, status codes propios del controller. **No** se re-testea lo que ya cubre el service a nivel unitario (validaciones de negocio, cálculos, excepciones tipadas). Esto evita duplicación, reduce mantenimiento y mantiene cada test con ROI claro.
+  >
+  > **Decisión 2026-04-17**: el approach original "3 tests por endpoint × N endpoints × M controllers" producía ~60-90 tests de bajo valor (mayormente verificando que el controller llama al service). Se reemplaza por un enfoque estructurado en 3 subfases (A/B/C) que prioriza tests donde la capa controller agrega comportamiento propio.
+
+  - [x] **F1.A — Infraestructura reutilizable + Auth ejemplar** ✅ (2026-04-17, 1 chat, BE)
+    - [x] Helpers en `Educa.API.Tests/Controllers/Common/`:
+      - [x] `ClaimsPrincipalBuilder` — builder fluent con `WithDni`, `WithRol`, `WithNombre`, `WithEntityId`, `WithSedeId` + `Anonymous()`
+      - [x] `ControllerTestBase.AttachContext(...)` — monta `HttpContext` + `ControllerContext`; cookies vía header `Cookie` (DefaultHttpContext parsea automáticamente)
+      - [x] `ApiResponseAssertions` — `.ShouldBeSuccess<T>()`, `.ShouldBeUnauthorized()`, `.ShouldBeBadRequest()`, `.ShouldBeOk()`
+    - [x] `AuthControllerTests.cs` — 6 tests sobre lo que no cubre `AuthServiceTests`:
+      - [x] Login setea las 3 cookies (auth + refresh + csrf) con valores correctos
+      - [x] Logout extrae DNI de claims + deviceId de cookie, delega al facade, limpia cookies
+      - [x] RefreshToken sin cookie `educa_refresh` → `UnauthorizedException("AUTH_REFRESH_NOT_FOUND")`
+      - [x] RefreshToken con facade null → `UnauthorizedException("AUTH_REFRESH_INVALID")` + cookies limpiados
+      - [x] ObtenerPerfil con claims completas → `PerfilUsuarioDto` con todos los campos del JWT
+      - [x] CambiarContrasena sin claims → 401 sin delegar al facade
+    - [x] README de `Educa.API.Tests/Controllers/` — guía operativa (test de valor para decidir cuándo agregar tests, helpers disponibles, patrón canónico)
+    - [x] Plan base creado: `Educa.API/.claude/plan/test-backend-gaps.md`
+    - [x] Suite completa: 747/747 tests verdes (+6 desde 741)
+
+  - [ ] **F1.B — Controllers con lógica propia de capa controller** (1 chat c/u, BE)
+    - [ ] `AsistenciaControllerTests` — webhook `[AllowAnonymous]` + admin `[Authorize(Roles="Director")]` + preservación de `ASI_OrigenManual` en respuestas (~4 tests)
+    - [ ] `AprobacionEstudianteControllerTests` — rol Director únicamente, delegación al `BatchCommandExecutor` con args correctos (~3 tests)
+    - [ ] `ConsultaAsistenciaControllerTests` — evaluar si aplica: filtros por rol (profesor ve solo sus salones, apoderado solo sus hijos)
+
+  - [ ] **F1.C — Controllers de delegación pura: descartar tests artesanales**
+    - [ ] Regla: si un controller es pass-through al service sin claims/cookies/autorización compleja, **no se testea a nivel controller**. El service ya está cubierto y el middleware maneja excepciones tipadas.
+    - [ ] Excepción: si un endpoint tiene claim-handling no trivial o manipula cookies, agregar test puntual al controller test existente.
+    - [ ] Controllers típicamente en esta categoría: Usuarios, Horarios, Calificaciones, Permisos, Cursos, Salones, Eventos, Notificaciones, etc.
+    - [ ] Documentar esta regla en el README de F1.A para evitar sobre-testing futuro.
 
 - [ ] **F2 — Repository integration tests** (2-3 chats, BE)
   - [ ] F2.P0 Asistencia + EstudianteSalon + ProfesorSalon
@@ -461,13 +489,13 @@ CARRIL C — DIFERIDO
 
 > Estas tareas se ejecutan después de que el Carril D provea red de seguridad mínima.
 
-#### Plan 11 — Refactor `eslint.config.js` ✅ (~95%)
+#### Plan 11 — Refactor `eslint.config.js` ✅ 100% (cerrado 2026-04-17)
 
 <details><summary>Detalle (cerrado)</summary>
 
 - [x] F1-F4 cerrados
 - [x] F5.1-F5.2 cerrados, F5.4 cerrado
-- [ ] F5.3 Tests de guardia (opcional)
+- [x] F5.3 Tests de guardia (2026-04-17) — `src/eslint-config-guards.spec.ts` con 13 tests que verifican via `ESLint.calculateConfigForFile()` que las reglas clave (layer-enforcement, barrel enforcement, globales) siguen aplicadas por capa. Falla el CI si un cambio futuro del config saca una regla de su scope.
 
 </details>
 
