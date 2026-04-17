@@ -91,7 +91,7 @@ import { HealthJustificationDto } from '@features/intranet/pages/profesor/models
 			}
 
 			.doc-link {
-				color: #1e40af;
+				color: var(--blue-800);
 				text-decoration: none;
 				display: inline-flex;
 				align-items: center;

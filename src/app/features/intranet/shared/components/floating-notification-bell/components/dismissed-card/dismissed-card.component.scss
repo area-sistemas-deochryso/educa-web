@@ -17,7 +17,7 @@
 	}
 
 	&.notification-urgent {
-		border-left-color: #dc2626;
+		border-left-color: var(--red-600);
 	}
 
 	&.notification-high {

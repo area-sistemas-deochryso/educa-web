@@ -18,7 +18,7 @@ const PRIORITY_LEGEND: PriorityInfo[] = [
 		priority: 'urgent',
 		label: 'Urgente',
 		description: 'Requiere atención inmediata. Fechas límite próximas o vencidas.',
-		color: '#dc2626',
+		color: 'var(--red-600)',
 	},
 	{
 		priority: 'high',

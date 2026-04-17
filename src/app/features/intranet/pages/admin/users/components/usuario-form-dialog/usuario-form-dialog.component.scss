@@ -26,15 +26,15 @@
 				display: block;
 				margin-top: 0.35rem;
 				font-size: 0.8rem;
-				color: #e24c4c;
+				color: var(--red-500);
 			}
 
 			input.ng-invalid.ng-dirty {
-				border-color: #e24c4c;
+				border-color: var(--red-500);
 
 				&:focus {
-					border-color: #e24c4c;
-					box-shadow: 0 0 0 1px #e24c4c;
+					border-color: var(--red-500);
+					box-shadow: 0 0 0 1px var(--red-500);
 				}
 			}
 

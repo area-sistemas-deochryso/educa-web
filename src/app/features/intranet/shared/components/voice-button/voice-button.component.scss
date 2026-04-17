@@ -335,7 +335,7 @@
 	animation: slideUp 0.2s ease;
 
 	i.pi-exclamation-triangle {
-		color: #dc2626;
+		color: var(--red-600);
 		font-size: 1rem;
 		flex-shrink: 0;
 		margin-top: 2px;

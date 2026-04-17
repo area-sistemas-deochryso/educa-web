@@ -1,5 +1,5 @@
 // #region Styles
-$priority-urgent: #dc2626;
+$priority-urgent: var(--red-600);
 
 @keyframes slideInRight {
 	from {

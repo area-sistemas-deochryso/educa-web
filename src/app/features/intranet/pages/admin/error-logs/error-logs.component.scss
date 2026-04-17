@@ -12,9 +12,9 @@
 	gap: 0.5rem;
 	padding: 0.375rem 0.75rem;
 	background: #dbeafe; // blue-100
-	border: 1px solid #1e40af; // blue-800
+	border: 1px solid var(--blue-800); // blue-800
 	border-radius: 999px;
-	color: #1e40af;
+	color: var(--blue-800);
 	font-size: 0.8125rem;
 
 	i { font-size: 0.875rem; }
@@ -73,9 +73,9 @@
 	}
 
 	&--critical {
-		border-color: #dc2626;
-		.stat-icon { color: #dc2626; }
-		.stat-value { color: #dc2626; }
+		border-color: var(--red-600);
+		.stat-icon { color: var(--red-600); }
+		.stat-value { color: var(--red-600); }
 	}
 
 	&--error {
@@ -137,7 +137,7 @@
 	font-weight: 600;
 	font-size: 0.85rem;
 
-	&--error { color: #dc2626; }
+	&--error { color: var(--red-600); }
 	&--warn { color: #f59e0b; }
 }
 
@@ -249,10 +249,10 @@
 	}
 
 	&--critical {
-		border-left-color: #dc2626;
+		border-left-color: var(--red-600);
 		background: rgba(220, 38, 38, 0.05);
-		.origin-banner-title { color: #dc2626; }
-		.origin-banner-icon { color: #dc2626; }
+		.origin-banner-title { color: var(--red-600); }
+		.origin-banner-icon { color: var(--red-600); }
 	}
 
 	&--error {
@@ -371,7 +371,7 @@
 		max-height: 250px;
 		font-size: 0.72rem;
 		line-height: 1.4;
-		color: #dc2626;
+		color: var(--red-600);
 		background: rgba(220, 38, 38, 0.04);
 		border: 1px solid rgba(220, 38, 38, 0.1);
 	}
@@ -479,8 +479,8 @@
 
 	// Colores por tipo
 	&--api_error .breadcrumb-icon {
-		border-color: #dc2626;
-		i { color: #dc2626; }
+		border-color: var(--red-600);
+		i { color: var(--red-600); }
 	}
 
 	&--navigation .breadcrumb-icon {
@@ -505,13 +505,13 @@
 
 	&--error-marker {
 		.breadcrumb-icon {
-			border-color: #dc2626;
-			background: #dc2626 !important;
+			border-color: var(--red-600);
+			background: var(--red-600) !important;
 			i { color: #fff !important; font-size: 0.8rem; }
 		}
 		.breadcrumb-desc--error {
 			font-weight: 700;
-			color: #dc2626;
+			color: var(--red-600);
 			font-size: 0.85rem;
 		}
 	}

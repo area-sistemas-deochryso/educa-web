@@ -2,7 +2,7 @@
 
 Componentes UI con tema **Aura**. Dark mode con clase `.dark-mode`.
 
-> **Para estructura recomendada por componente** (stat card, tabla, filter bar, dialogs, drawers, alert banners): ver `rules/design-system.md` sección 6 (pautas B1-B11). Esta regla cubre cómo importar y configurar PrimeNG; el design-system cubre cómo ensamblar los componentes en páginas consistentes.
+> **Para estructura recomendada por componente** (stat card, tabla, filter bar, dialogs, drawers, alert banners): ver `rules/design-system.md` sección 7 (pautas B1-B11). Esta regla cubre cómo importar y configurar PrimeNG; el design-system cubre cómo ensamblar los componentes en páginas consistentes.
 
 ## Importar componentes individualmente
 

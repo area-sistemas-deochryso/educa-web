@@ -24,12 +24,12 @@
 	gap: 0.75rem;
 	padding: 0.875rem 1rem;
 	background: #dbeafe; // blue-100
-	border-left: 4px solid #1e40af; // blue-800
+	border-left: 4px solid var(--blue-800); // blue-800
 	border-radius: 8px;
 
 	> i {
 		font-size: 1.125rem;
-		color: #1e40af;
+		color: var(--blue-800);
 		margin-top: 0.125rem;
 	}
 }
@@ -45,13 +45,13 @@
 	margin: 0;
 	font-weight: 600;
 	font-size: 0.8125rem;
-	color: #1e40af;
+	color: var(--blue-800);
 }
 
 .recent-error-desc {
 	margin: 0;
 	font-size: 0.75rem;
-	color: #1e40af;
+	color: var(--blue-800);
 	line-height: 1.4;
 }
 
@@ -63,7 +63,7 @@
 	cursor: pointer;
 	font-size: 0.8125rem;
 	font-weight: 600;
-	color: #1e40af;
+	color: var(--blue-800);
 }
 // #endregion
 
@@ -97,7 +97,7 @@
 }
 
 .error-msg {
-	color: #dc2626;
+	color: var(--red-600);
 	font-size: 0.75rem;
 }
 

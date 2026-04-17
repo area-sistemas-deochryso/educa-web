@@ -201,12 +201,23 @@ Si se neutraliza globalmente, esas páginas pierden el color-coding visual (la s
 - **Deudas C1-C4 mencionadas inline**: el ejemplo de `.field .p-error` en B8 referencia `// deuda C1 — pendiente token var(--red-500)` y el `color: #ffffff` de success referencia "deuda C4 — ver B7". Esto las mantiene visibles hasta F4.
 - **Regla de cross-reference**: B4 referencia `rules/design-system.md` sección 1 (globales de transparencia) en lugar de duplicar; B5 referencia `rules/a11y.md`; B6 referencia `rules/primeng.md` (appendTo=body); B8 referencia `rules/dialogs-sync.md`. Así se evita que design-system se convierta en un monolito que repite otras reglas.
 
-### F4 — (Opcional, diferible) Migración de tokens hardcoded C1-C4
+### F4 — Migración de tokens hardcoded C1-C4 ✅ (2026-04-17)
 
-- [ ] F4.1 Reemplazar `#e24c4c`, `#dc2626` por `var(--red-500)` en archivos que los usan (grep project-wide)
-- [ ] F4.2 Resolver `color: white` inline en `p-button-success` configurando tema PrimeNG (o dejando como convención documentada si no vale la pena)
-- [ ] F4.3 Reemplazar `#1e40af` por token primary/custom
-- [ ] F4.4 Actualizar maestro + este task
+- [x] F4.1 Reemplazar `#e24c4c` → `var(--red-500)` (form invalid) y `#dc2626` → `var(--red-600)` (error fuerte) en ~25 archivos: admin (usuarios form-dialog, usuarios-import, error-logs + detail-drawer, feedback-reports, horarios-import, campus-editor, salon-notas-tab admin, salon-attendance-tab admin), shared (form-field-error, feedback-report-dialog, voice-button, user-profile-menu, floating-notification-bell + 4 hijos), cross-role (attendance-reports result+summary, ctest-k6 credentials-dialog + load-profile, home-component profesor-attendance-widget + attendance-summary-widget, login), estudiante (student-attendance-tab), profesor (health-justification-list).
+- [x] F4.2 Agregada regla global A5 en `styles.scss`: `app-intranet-layout .p-button.p-button-success { color: var(--white-color) }` (más hover). Eliminado `style="color: white"` inline de `usuarios-header.component.html`. Convención documentada en design-system.md secciones 5 y B7.
+- [x] F4.3 Reemplazar `#1e40af` → `var(--blue-800)` en ~8 archivos: error-logs, usuarios-table, feedback-reports, feedback-report-dialog, attendance-reports (result+summary), health-justification-list. Token alineado con a11y.md que ya oficializaba `#1e40af` como acento azul sobre fondo claro.
+- [x] F4.4 Design-system.md actualizado: secciones 5 (A5), 8 (D: Tokens de color con mapa canónico) nuevas, B7 actualizado (ya no menciona `color: white` como deuda), B8 ya no tiene `color: #e24c4c` en ejemplo, stat-card B3 crítico usa `var(--red-600)`. Marcador "deuda C1/C4" eliminado, cross-ref de primeng.md actualizado a "sección 7". Historial con Fase 4.
+
+**Excepciones justificadas** (hex literal se mantiene con razón documentada):
+- `notification-quick-access.scss` — `$priority-map` usa `#dc2626` porque Sass `color.adjust()` requiere color literal en compile time.
+- `campus-minimap.service.ts` — `ctx.fillStyle = '#dc2626'` porque Canvas API no soporta `var()` en strings de color.
+- `foro-tab.component.ts` / `mensajeria-tab.component.ts` — paletas rotativas de colores de avatar (decorativas, no semánticas).
+- `salon-notas-tab.scss` / `salon-notas-estudiante-tab.scss` — ya usan fallback defensivo `var(--red-600, #dc2626)`, el hex está en posición de fallback.
+- `styles.scss` toast error (`#fee2e2` background): migrado el border-left a `var(--red-600)`, el background `#fee2e2` es un tinte `red-100` ligeramente custom para el toast — se puede migrar a `var(--red-100)` en un follow-up si se valida visualmente.
+
+**Build**: OK (solo warnings ESM pre-existentes de dayjs/saxes/exceljs, no relacionados con F4).
+
+**Scope no cubierto** (bajo impacto, diferible): `color: white` en ~22 archivos restantes (todos en contextos de badges/icons/hovers sobre fondos coloreados, no en botones — no son deuda C4). Tokens `#dbeafe` (blue-100), `#d97706` (yellow-600), `#16a34a` (green-600) no estaban en el scope original de F4 pero aparecen hardcoded en varios archivos — candidatos para follow-up micro-task si se quiere extender la convención de tokens.
 
 ### F5 — (Opcional, diferible) Migración de páginas existentes al estándar
 
@@ -230,9 +241,10 @@ Si se neutraliza globalmente, esas páginas pierden el color-coding visual (la s
 
 ## Criterios de éxito
 
-- [ ] F1 cerrado: patrones A2-A4 en global, decisión A1 tomada, regla existente actualizada
-- [ ] F2 cerrado: patrón A1 aplicado según opción elegida, verificación visual en 3-4 páginas
-- [ ] F3 cerrado: `rules/design-system.md` creado con pautas B1-B11 y cross-refs en CLAUDE.md/primeng.md
-- [ ] Build OK sin warnings nuevos
-- [ ] Overrides locales redundantes identificados (no necesariamente removidos) vía grep
-- [ ] Plan maestro actualizado
+- [x] F1 cerrado: patrones A2-A4 en global, decisión A1 tomada, regla existente actualizada
+- [x] F2 cerrado: patrón A1 aplicado según opción elegida, verificación visual en 3-4 páginas
+- [x] F3 cerrado: `rules/design-system.md` con pautas B1-B11 y cross-refs en CLAUDE.md/primeng.md
+- [x] F4 cerrado: tokens hardcoded migrados (C1/C3/C4 resueltas), secciones 5 (A5) + 8 (D) agregadas, deuda documentada como convención
+- [x] Build OK sin warnings nuevos (solo ESM pre-existentes de dayjs/saxes/exceljs)
+- [ ] F5 — (diferible) Overrides locales redundantes removidos incrementalmente al tocar cada archivo
+- [x] Plan maestro actualizado

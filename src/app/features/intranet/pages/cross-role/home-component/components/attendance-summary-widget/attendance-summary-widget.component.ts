@@ -150,7 +150,7 @@ import { SkeletonLoaderComponent } from '@shared/components/skeleton-loader/skel
 
 			&.high { background: rgba(34, 197, 94, 0.15); color: #16a34a; }
 			&.medium { background: rgba(234, 179, 8, 0.15); color: #ca8a04; }
-			&.low { background: rgba(239, 68, 68, 0.15); color: #dc2626; }
+			&.low { background: rgba(239, 68, 68, 0.15); color: var(--red-600); }
 		}
 		// #endregion
 

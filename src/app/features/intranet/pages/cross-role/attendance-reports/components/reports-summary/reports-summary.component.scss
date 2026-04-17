@@ -31,10 +31,10 @@
 }
 
 .stat-card--highlight {
-	border-color: #1e40af;
+	border-color: var(--blue-800);
 
 	.stat-value {
-		color: #1e40af;
+		color: var(--blue-800);
 	}
 }
 // #endregion

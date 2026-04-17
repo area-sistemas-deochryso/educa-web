@@ -62,7 +62,7 @@
 	background: rgba(220, 38, 38, 0.08);
 	border: 1px solid rgba(220, 38, 38, 0.3);
 	border-radius: 6px;
-	color: #dc2626;
+	color: var(--red-600);
 	font-size: 0.9rem;
 }
 
@@ -167,14 +167,14 @@
 .error-table-title {
 	font-size: 0.9rem;
 	font-weight: 600;
-	color: #dc2626;
+	color: var(--red-600);
 	display: flex;
 	align-items: center;
 	gap: 0.4rem;
 }
 
 .error-reason {
-	color: #dc2626;
+	color: var(--red-600);
 	font-size: 0.85rem;
 }
 

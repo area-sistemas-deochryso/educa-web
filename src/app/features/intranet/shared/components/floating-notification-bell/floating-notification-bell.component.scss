@@ -1,7 +1,7 @@
 // #region VARIABLES DE COLORES DE INTRANET
 
 // Colores por prioridad usando variables de intranet
-$priority-urgent: #dc2626; // Rojo urgente
+$priority-urgent: var(--red-600); // Rojo urgente
 $priority-high: var(--intranet-accent-color-yellow, #ffcc0c); // Amarillo importante
 $priority-medium: var(--intranet-accent-color-blue, #253470); // Azul normal
 $priority-low: var(--intranet-accent-color-green, #77a02d); // Verde info
@@ -940,7 +940,7 @@ $priority-low: var(--intranet-accent-color-green, #77a02d); // Verde info
 	}
 
 	&.notification-urgent {
-		border-left-color: #dc2626;
+		border-left-color: $priority-urgent;
 	}
 
 	&.notification-high {

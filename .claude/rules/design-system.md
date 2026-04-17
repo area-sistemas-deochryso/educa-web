@@ -10,6 +10,7 @@ Este archivo es la fuente de verdad para overrides de PrimeNG y utilidades de CS
 |---|---|---|
 | **Globales (A)** — overrides y utilidades en `src/styles.scss` | Qué pinta PrimeNG "solo" sin escribir SCSS en el componente | 1-5 |
 | **Pautas recomendadas (B)** — estructura, clases y ejemplos canónicos | Cómo armar un componente nuevo para que encaje con el estándar | 6 (B1-B11) |
+| **Tokens de color (D)** — variables CSS del tema PrimeNG Aura usadas como fuente de verdad | Qué variable usar en lugar de hex literal | 7 |
 
 Cuando aparezca un patrón nuevo que se repite en 3+ páginas, decidir en qué capa vive: si es visualmente invariable (background, color, border-color de PrimeNG) → A en `styles.scss`. Si es estructural o requiere clases semánticas (layout de filtros, anatomía de stat card, acciones de fila) → B como pauta.
 
@@ -150,7 +151,30 @@ Utility opt-in para labels UPPERCASE del estándar (headers de tabla, labels de 
 
 ---
 
-## 5. `p-tag` — Convención semántica (A1 · Opción C)
+## 5. Botón `p-button-success` — texto blanco (A5)
+
+> **Todos los `p-button-success` dentro de `app-intranet-layout` llevan `color: var(--white-color)` por defecto.**
+> Cubierto globalmente en `src/styles.scss` — **NO** usar `style="color: white"` inline en los componentes.
+
+```scss
+app-intranet-layout {
+	.p-button.p-button-success {
+		color: var(--white-color);
+
+		&:enabled:hover {
+			color: var(--white-color);
+		}
+	}
+}
+```
+
+**Origen**: El tema PrimeNG Aura no garantiza texto blanco en `p-button-success`. Históricamente cada consumidor aplicaba `style="color: white"` inline en el template. El override global centraliza la decisión y elimina el inline en todas las páginas (ver Plan 20 F4.2, 2026-04-17).
+
+**Scope**: `app-intranet-layout` — no afecta CTAs del portal público.
+
+---
+
+## 6. `p-tag` — Convención semántica (A1 · Opción C)
 
 > **Dos tipos de tag en el sistema: `tag-neutral` e `tag-crítico`. La decisión es explícita por tag, no global.**
 
@@ -210,7 +234,7 @@ Preguntarse antes de decidir:
 
 ---
 
-## 6. Pautas recomendadas por componente (B1-B11)
+## 7. Pautas recomendadas por componente (B1-B11)
 
 > **Estándar extraído literalmente de `/intranet/admin/usuarios`.** Los ejemplos de esta sección son copy-paste-ables — si tu página nueva tiene el mismo componente, copia la estructura y adáptala.
 >
@@ -615,7 +639,7 @@ Flex horizontal con **search-box (relative, icono absolute dentro) + filter-drop
 
 | Rol | Clase | Uso | Ejemplo |
 |---|---|---|---|
-| **Primary** (acción principal de la página) | `p-button-success` (con `color: white`) | Guardar, Nuevo, Crear | Botón "Nuevo" del header, "Guardar" de dialog |
+| **Primary** (acción principal de la página) | `p-button-success` | Guardar, Nuevo, Crear | Botón "Nuevo" del header, "Guardar" de dialog |
 | **Secondary** (acción secundaria) | `p-button-outlined` | Exportar, Importar, Validar | Botones de exportar/importar, "Validar Datos" |
 | **Destructive** | `p-button-danger p-button-outlined` | Eliminar, Descartar | Confirmaciones de borrado |
 | **Clear / Close** | `p-button-text` | Cancelar, Cerrar, Limpiar | Cancelar de dialog, cerrar drawer, clear filters |
@@ -623,7 +647,7 @@ Flex horizontal con **search-box (relative, icono absolute dentro) + filter-drop
 
 **Size estándar**: `p-button-sm` en header y filtros, tamaño default en dialogs.
 
-**Convención "color: white" inline en success**: decisión documentada como deuda (C4 en el task). El tema PrimeNG no lo da por default; hasta resolverlo, mantener el inline.
+**Texto blanco en `p-button-success`**: se aplica globalmente en `styles.scss` dentro de `app-intranet-layout` (ver sección A5). **NO** usar `style="color: white"` inline en los componentes — el global ya lo resuelve.
 
 ---
 
@@ -706,7 +730,7 @@ Estructura canónica: **header tipado según modo + content con `.form-grid` de 
 			display: block;
 			margin-top: 0.35rem;
 			font-size: 0.8rem;
-			color: #e24c4c;  // deuda C1 — pendiente token var(--red-500)
+			color: var(--red-500);
 		}
 	}
 }
@@ -715,8 +739,7 @@ Estructura canónica: **header tipado según modo + content con `.form-grid` de 
 	display: flex;
 	justify-content: flex-end;
 	gap: 0.5rem;
-
-	.p-button-success { color: #ffffff; }  // deuda C4 — ver B7
+	// p-button-success ya lleva color blanco por el global en styles.scss (A5)
 }
 
 @media (max-width: 768px) {
@@ -993,6 +1016,54 @@ readonly isDev = !environment.production;
 
 ---
 
+## 8. Tokens de color — Convención (D)
+
+> **"Ningún color hex literal sobre fondo plano de la intranet. Siempre token."**
+
+El tema PrimeNG Aura expone variables CSS de paleta completas (`--red-50..900`, `--blue-50..900`, `--green-50..900`, `--yellow-50..900`, etc.). Son la fuente de verdad para colores semánticos en la intranet.
+
+### Mapa canónico
+
+| Intención | Token | Valor aproximado | Usos |
+|---|---|---|---|
+| Error de formulario (invalid state, `.p-error`) | `var(--red-500)` | `#ef4444` | Borde + texto de campo inválido, mensaje de error bajo input |
+| Error operativo fuerte (CRITICAL, eliminar, métrica alarmante) | `var(--red-600)` | `#dc2626` | Stat críticos, banner de error, icono de peligro, texto de alerta alta |
+| Acento azul sobre fondo claro (textos y bordes destacados) | `var(--blue-800)` | `#1e40af` | Icono/texto sobre `--surface-100`, header destacado, link fuerte |
+| Fondo de sección destacada | `var(--blue-100)` | `#dbeafe` | Fondo suave de banners informativos |
+| Éxito operativo | `var(--green-500)`, `var(--green-600)` | `#22c55e`, `#16a34a` | Estado APROBADO, success banner |
+| Advertencia | `var(--yellow-500)`, `var(--yellow-700)` | `#eab308`, `#a16207` | Tag warn, borde de alerta de cuidado |
+| Texto blanco sobre fondo primario | `var(--white-color)` | `#ffffff` | Texto en botones `p-button-success` (ver A5) |
+
+### Reglas
+
+1. **No usar hex literal** (`#dc2626`, `#1e40af`, `#e24c4c`) en SCSS de componentes. Usar siempre el token equivalente.
+2. **No reinventar variables locales** (`$priority-urgent: #dc2626`): si existe el token, usarlo directo (`$priority-urgent: var(--red-600)`). La SCSS var se mantiene solo como alias semántico local.
+3. **No usar `color: white`** inline: el global (A5) lo aplica en `p-button-success`. Para otros botones con fondo oscuro, usar `var(--white-color)` del `:root`.
+4. **Excepciones legítimas** (documentar inline con comentario `// motivo`):
+   - **Sass color functions** (`color.adjust`, `darken`): la función necesita un color literal en compile time, no resuelve `var()`. Ej: `notification-quick-access.scss` usa `$priority-map` con hex literales para generar gradientes Sass.
+   - **Canvas API** (`ctx.fillStyle = '#dc2626'`): el Canvas API no soporta `var()` directamente.
+   - **Paletas de avatares / decorativas** (chat, foro): los colores son slots rotativos, no semánticos; no aplica esta convención.
+5. **Fallback defensivo aceptable**: `var(--red-600, #dc2626)` es válido si el archivo se carga antes del tema o para resiliencia. Preferir sin fallback; con fallback si ya existe y funciona.
+
+### Estado de migración (Plan 20 F4, 2026-04-17)
+
+- **Admin pages**: migradas (usuarios, error-logs, feedback-reports, classrooms, schedules, campus, ctest-k6).
+- **Shared**: migrado (form-field-error, feedback-report-dialog, voice-button, user-profile-menu, floating-notification-bell).
+- **Cross-role + profesor + estudiante**: migrados (reports, attendance widgets, home widgets, student tabs, health-justification-list).
+- **Excepciones activas**: 3 archivos con hex literal justificado (notification-quick-access Sass, campus-minimap Canvas, mensajería/foro avatar palettes).
+
+Buscar tokens hardcoded restantes:
+
+```bash
+# Los 3 tokens principales del design system
+grep -rn "#e24c4c\|#dc2626\|#1e40af" src/ --include="*.scss" --include="*.ts"
+
+# color: white inline (solo HTML)
+grep -rn 'style="color: white' src/ --include="*.html"
+```
+
+---
+
 ## ❌ NO hacer
 
 ```scss
@@ -1034,9 +1105,9 @@ readonly isDev = !environment.production;
 	.stat-value { color: var(--text-color); }
 
 	&--critical {
-		border-color: #dc2626;
-		.stat-icon { color: #dc2626; }
-		.stat-value { color: #dc2626; }
+		border-color: var(--red-600);
+		.stat-icon { color: var(--red-600); }
+		.stat-value { color: var(--red-600); }
 	}
 }
 ```
@@ -1085,7 +1156,8 @@ El escape hatch exige comentario con la razón específica del negocio — "lo n
 - **Fase 0 (pre-2026-04-17)** — Transparencia per-component (pattern `::ng-deep .p-datatable { ... }` repetido en cada `.scss`, y `.stat-card { background: var(--surface-card) }` en 19+ archivos).
 - **Fase 1 (2026-04-17)** — Migrado a global: tablas, paginador, stat-cards. Regla original `table-transparency.md` creada.
 - **Fase 2 (2026-04-17, Design System F1)** — Renombrado a `design-system.md`. Agregados A2 (inputs/selects reset), A3 (buttons text/outlined), A4 (utility `.label-uppercase`).
-- **Fase 3 (2026-04-17, Design System F3)** — Agregada sección 6 con pautas recomendadas B1-B11 (container con border, page header, stat card, tabla, row actions triplet, filter bar, botones canónicos, dialogs, alert banners con `color-mix()`, drawer detalle, dev banners). Extraídas literalmente de `/intranet/admin/usuarios`.
+- **Fase 3 (2026-04-17, Design System F3)** — Agregada sección 7 (antes 6) con pautas recomendadas B1-B11 (container con border, page header, stat card, tabla, row actions triplet, filter bar, botones canónicos, dialogs, alert banners con `color-mix()`, drawer detalle, dev banners). Extraídas literalmente de `/intranet/admin/usuarios`.
+- **Fase 4 (2026-04-17, Design System F4)** — Agregada sección 5 (A5: `p-button-success` con texto blanco global) + sección 8 (D: Tokens de color con mapa canónico). Migrados ~30 archivos de admin/shared/cross-role/profesor/estudiante: `#e24c4c → var(--red-500)`, `#dc2626 → var(--red-600)`, `#1e40af → var(--blue-800)`. Eliminado `style="color: white"` inline en `usuarios-header`. Excepciones justificadas documentadas (Sass color functions, Canvas API, avatar palettes). Deuda C1/C4 resuelta, C3 resuelta con token; C2 resuelta en todas las rutas migrables.
 
 Overrides existentes son redundantes con los globales pero no rompen nada — se pueden limpiar incrementalmente al tocar cada archivo.
 
