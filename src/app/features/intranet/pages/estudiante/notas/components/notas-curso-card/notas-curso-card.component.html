@@ -44,7 +44,7 @@
 				<div class="eval-info">
 					<span class="eval-titulo">{{ eval.titulo }}</span>
 					<div class="eval-meta">
-						<p-tag [value]="getTipoLabel(eval.tipo)" severity="info" [rounded]="true" />
+						<p-tag [value]="getTipoLabel(eval.tipo)" styleClass="tag-neutral" [rounded]="true" />
 						<span class="text-xs text-color-secondary">Peso: {{ (eval.peso * 100).toFixed(0) }}%</span>
 					</div>
 				</div>

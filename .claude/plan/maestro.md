@@ -29,7 +29,7 @@
 | 17 | Enforcement max-lines BE (CI) | BE | (inline en maestro) | ⏳ | 0% |
 | 18 | Tests de flujo de negocio E2E | BE+FE | (inline en maestro) | ⏳ | 0% |
 | 19 | Comunicación: foro + mensajería + push | FE+BE | (pendiente planificar) | ⏳ | 0% |
-| 20 | Design System — Estándar desde `usuarios` | FE | `tasks/design-system-from-usuarios.md` | F1 ✅ · F2.1 ✅ · F2.2-F2.5 ⏳ · F3-F5 ⏳ | ~30% |
+| 20 | Design System — Estándar desde `usuarios` | FE | `tasks/design-system-from-usuarios.md` | F1 ✅ · F2.1-F2.4 ✅ · F2.5 ⏳ · F3-F5 ⏳ | ~60% |
 
 **Semáforo de readiness**:
 
@@ -612,9 +612,9 @@ CARRIL C — DIFERIDO
 
 - **F2 — Aplicar decisión sobre `p-tag`** (opción C elegida, dividido en 5 subfases)
   - [x] **F2.1 — Infraestructura + canonical** ✅ (2026-04-17) — `.tag-neutral` agregado a `styles.scss`, convención documentada en `design-system.md` (sección 5), `styleClass="tag-neutral"` aplicado en 4 archivos de usuarios (7 tags de 8; el tag de error de validación queda crítico). Build OK.
-  - [ ] F2.2 — Estados operativos (asistencia, aprobación, error-logs, ~8 archivos) — audit para confirmar que ninguno lleva `tag-neutral` accidental
-  - [ ] F2.3 — Metadatos admin (vistas, permisos, events, notificaciones, email-outbox, feedback-reports, ~12 archivos) — candidatos fuertes a `tag-neutral`
-  - [ ] F2.4 — Académico (horarios, salones, cursos, calificaciones, grupos, ~15 archivos) — mezcla, audit por tag
+  - [x] **F2.2 — Estados operativos** ✅ (2026-04-17) — Audit de 11 archivos (asistencia/aprobación/error-logs/feedback-reports/cierre-periodo/notas): **0 violaciones**. Todos los tags operativos usan `severity` apropiadamente. 2 `severity="secondary"` en stacks informativos (httpMethod, contadores) se conservan por consistencia cromática del grupo. Tipo de evaluación (`simulador-notas`, `notas-curso-card`) queda para F2.4.
+  - [x] **F2.3 — Metadatos admin** ✅ (2026-04-17) — 8 tags en 7 archivos migrados a `tag-neutral`: permisos-roles/usuarios/detail-drawer/edit-dialog (6 tags de rol), eventos-calendario (tipo), notificaciones-admin (tipo+destinatario), email-outbox (tipo). Estados críticos (prioridad, estado operativo, FAILED) mantienen `severity`. Build OK.
+  - [x] **F2.4 — Académico** ✅ (2026-04-17) — 22 tags en 17 archivos migrados a `tag-neutral`: modo asignación (3), "Tutor" badges (2), tipo calificación (2), grado.nombre (1), cursos como chips (2), contadores (6), tipo de evaluación (5), "Tutor" de profesor-salones (1). Notas con severity por aprobación, estados operativos, stats de aprobados/desaprobados, y alertas (warn) mantienen `severity`. Build OK.
   - [ ] F2.5 — Misc y cross-role (videoconferencias, mensajería, foro, ctest-k6, campus, ~10 archivos)
 
 - [ ] **F3 — `rules/design-system.md` con pautas B1-B11** (chat 3)

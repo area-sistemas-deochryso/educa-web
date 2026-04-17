@@ -118,28 +118,44 @@ Si se neutraliza globalmente, esas páginas pierden el color-coding visual (la s
   - [x] F2.1.4 Build OK (warnings pre-existentes de ESM, hints de deprecation de `styleClass` en PrimeNG 21 — issue transversal del proyecto, ~100+ tags)
   - [x] F2.1.5 Maestro + task file actualizados con división F2.2-F2.5
 
-- [ ] **F2.2 — Estados operativos** (chat separado, ~8 archivos)
-  - [ ] Auditar `asistencia` (A/T/F/J diario + por curso): confirmar que NO tengan `tag-neutral` — `severity` de cada estado es información crítica
-  - [ ] Auditar `aprobación` (APROBADO/DESAPROBADO/PENDIENTE): sin `tag-neutral`
-  - [ ] Auditar `error-logs` (CRITICAL/ERROR/WARN/INFO): sin `tag-neutral` — severidad es lo que escanea el admin
-  - [ ] Archivos candidatos: `attendance-registration-panel`, `attendance-summary-panel`, `attendances.component`, `error-logs.component`, `error-log-detail-drawer`, `salon-aprobacion-tab`, `simulador-notas` (si tiene estados)
+- [x] **F2.2 — Estados operativos** ✅ (2026-04-17) — 11 archivos auditados, **0 violaciones**
+  - [x] Asistencia (A/T/F/J): `attendances.component`, `attendance-registration-panel`, `attendance-summary-panel`, `student-attendance-tab` — todos usan `severity` (success/warn/danger). Sin `tag-neutral` accidental.
+  - [x] Aprobación (APROBADO/DESAPROBADO/PENDIENTE): `salon-aprobacion-tab` — usa `severity` dinámico. Sin `tag-neutral`.
+  - [x] Error-logs (CRITICAL/ERROR/WARN/INFO): `error-logs.component`, `error-log-detail-drawer` — usan `severity`. Sin `tag-neutral`.
+  - [x] Feedback reports (estado del reporte): usa `severity` dinámico. Sin `tag-neutral`.
+  - [x] Cierre de periodo (ABIERTO/CERRADO): usa `severity`. Sin `tag-neutral`.
+  - [x] Notas (promedio por severidad de nota): `simulador-notas`, `notas-curso-card` — tags de promedio usan `severity` (crítico, indica aprueba/desaprueba). Sin `tag-neutral`.
+  - **Observación**: 2 tags `severity="secondary"` en contextos informativos (httpMethod en error-log-detail-drawer, contadores "Total/Clases" en paneles de asistencia). Se mantienen porque forman parte de stacks visuales donde migrar a `tag-neutral` rompería la consistencia cromática del grupo. No violan la convención.
+  - **Migración diferida a F2.4 (Académico)**: tipo de evaluación (`severity="info"`) en `simulador-notas` línea 39 y `notas-curso-card` línea 47 — es metadato informativo, aplica convención `tag-neutral`, pero cae en el alcance académico.
 
-- [ ] **F2.3 — Metadatos admin** (chat separado, ~12 archivos)
-  - [ ] Aplicar `tag-neutral` a tags de categoría/tipo/metadato en:
-    - `vistas.component` — tipo de vista (menu/secundaria)
-    - `permisos-roles`, `permisos-usuarios`, `permisos-detail-drawer`, `permisos-edit-dialog` — módulos y scopes
-    - `eventos-calendario` — tipo y categoría de evento
-    - `notificaciones-admin` — tipo y prioridad
-    - `email-outbox-table` — tipo de correo y estado (estado puede ser crítico: FAILED en rojo — ojo)
-    - `feedback-reports` — categoría/tipo del reporte
+- [x] **F2.3 — Metadatos admin** ✅ (2026-04-17) — 7 archivos, 8 tags migrados a `tag-neutral`, build OK
+  - [x] `permisos-roles.component.html` — 3 tags de rol (tabla + 2 summaries) → `tag-neutral`
+  - [x] `permisos-usuarios.component.html` — 1 tag de rol → `tag-neutral`
+  - [x] `permisos-detail-drawer.component.html` — 1 tag de rol → `tag-neutral`
+  - [x] `permisos-edit-dialog.component.html` — 1 tag de rol → `tag-neutral`
+  - [x] `eventos-calendario.component.html` L129 — tipo evento → `tag-neutral` (L135 estado queda con `severity`, crítico)
+  - [x] `notificaciones-admin.component.html` L125 tipo + L133 destinatario → `tag-neutral` (L128 prioridad + L136 estado mantienen `severity`, críticos)
+  - [x] `email-outbox-table.component.html` L35 tipo correo → `tag-neutral` (L42 estado FAILED/SENT/PENDING mantiene `severity`, crítico)
+  - **Auditados sin cambios** (tags ya son críticos, mantienen `severity`):
+    - `vistas.component` — estado Activa/Inactiva (booleano operativo)
+    - `feedback-reports` — estado del reporte (admin escanea NUEVO/PENDIENTE)
+  - **Hint transversal**: `styleClass is deprecated` en PrimeNG 21 — issue pre-existente del proyecto (~100+ tags), no bloquea F2.3. Decisión de migración a `class=` pendiente para fase futura.
 
-- [ ] **F2.4 — Académico** (chat separado, ~15 archivos)
-  - [ ] Audit por tag — mezcla informativo/crítico:
-    - `horarios-list-view`, `horario-detail-drawer`, `horarios-import-dialog` — salón, curso, profesor (informativos)
-    - `salones-admin-table`, `salon-detail-dialog`, `cerrar-periodo-dialog` — estado de periodo (puede ser crítico si ABIERTO/CERRADO importa visualmente)
-    - `cursos.component` — nivel, tipo de calificación
-    - `calificar-dialog`, `calificaciones-panel`, `notas-curso-card`, `salon-notas-tab`, `salon-notas-estudiante-tab`, `estudiante-grupos-tab`, `salon-grupos-tab` — grupo, tipo de evaluación (informativos); puntajes con severidad (pueden ser críticos)
-    - `profesor-salones`, `profesor-final-salones`, `estudiante-salones`, `estudiante-cursos`, `profesor-cursos` — estado del salón/curso
+- [x] **F2.4 — Académico** ✅ (2026-04-17) — 22 tags en 17 archivos migrados a `tag-neutral`, build OK
+  - [x] **Modo asignación + tipo calificación + grado** (6 tags): horario-detail-drawer (modo+Tutor), salones-admin (tipo cal), salones-admin-table (modo), salon-detail-dialog (modo), profesor-final-salones (tipo cal), cursos.component (grado.nombre)
+  - [x] **Contadores** (5 tags): horarios-list-view, profesor-salones, salon-estudiantes-dialog, estudiante-salones (2), estudiante-grupos-tab (integrantes), salon-grupos-tab (grupos+asignados)
+  - [x] **Cursos como chips clickables** (2 tags): profesor-salones, estudiante-salones
+  - [x] **"Tutor" badge** (2 tags): horario-detail-drawer, profesor-salones — migrados por consistencia (rol es informativo); ícono estrella mantiene distintivo visual
+  - [x] **Tipo de evaluación** (5 tags): calificaciones-panel, calificar-dialog, salon-notas-estudiante-tab, notas-curso-card, simulador-notas
+  - **Mantienen `severity`** (críticos operativos):
+    - Notas con color por aprobación (calificar-dialog, salon-notas-tab, salon-notas-estudiante-tab, notas-curso-card, simulador-notas promedio)
+    - Estados: horario.estado, curso.estado, estado periodo (CERRADO/ABIERTO), estado aprobación
+    - Contadores semánticos: aprobados/desaprobados/pendientes en salones-admin-table (verde/rojo/warn)
+    - Stats de calificación: aprobados/desaprobados/sin-nota en calificar-dialog
+    - "Grupal" warn marker
+    - Import status (OK/error)
+    - Alertas: "N sin grupo" warn, "grupo lleno" warn, "Sin periodo" warn
+  - **Build**: OK (solo warnings pre-existentes ESM dayjs/saxes)
 
 - [ ] **F2.5 — Misc y cross-role** (chat separado, ~10 archivos)
   - [ ] `videoconferencias` — estado de sesión (ACTIVA/FINALIZADA — puede ser crítico)

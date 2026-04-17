@@ -30,7 +30,7 @@
 						<div class="flex align-items-center gap-2">
 							<span class="font-semibold">{{ salon.salonDescripcion }}</span>
 							@if (salon.esTutor) {
-								<p-tag value="Tutor" severity="success" icon="pi pi-star-fill" />
+								<p-tag value="Tutor" styleClass="tag-neutral" icon="pi pi-star-fill" />
 							}
 						</div>
 					</td>
@@ -39,8 +39,7 @@
 							@for (curso of salon.cursos; track curso.horarioId) {
 								<p-tag
 									[value]="curso.nombre"
-									severity="info"
-									class="cursor-pointer"
+									styleClass="tag-neutral cursor-pointer"
 									(click)="onVerCursoContenido(curso)"
 									pTooltip="Ver contenido"
 									tooltipPosition="top"
@@ -54,7 +53,7 @@
 					<td class="text-center">
 						<p-tag
 							[value]="salon.cantidadEstudiantes.toString()"
-							severity="info"
+							styleClass="tag-neutral"
 							[rounded]="true"
 						/>
 					</td>

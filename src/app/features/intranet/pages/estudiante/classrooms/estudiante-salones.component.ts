@@ -73,8 +73,7 @@ import { EstudianteSalonDialogComponent } from './components/estudiante-salon-di
 									@for (curso of salon.cursos; track curso.cursoId) {
 										<p-tag
 											[value]="curso.cursoNombre"
-											severity="info"
-											class="cursor-pointer"
+											styleClass="tag-neutral cursor-pointer"
 											(click)="onVerCurso(curso, $event)"
 											pTooltip="Ver contenido del curso"
 											tooltipPosition="top"
@@ -88,7 +87,7 @@ import { EstudianteSalonDialogComponent } from './components/estudiante-salon-di
 							<td class="text-center">
 								<p-tag
 									[value]="salon.cantidadEstudiantes.toString()"
-									severity="info"
+									styleClass="tag-neutral"
 									[rounded]="true"
 								/>
 							</td>

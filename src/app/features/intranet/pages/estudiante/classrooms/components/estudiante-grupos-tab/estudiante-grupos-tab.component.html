@@ -33,7 +33,7 @@
 					<h4>
 						<i class="pi pi-users mr-2"></i>{{ grupo.nombre }}
 					</h4>
-					<p-tag [value]="grupo.estudiantes.length + ' integrantes'" severity="info" />
+					<p-tag [value]="grupo.estudiantes.length + ' integrantes'" styleClass="tag-neutral" />
 				</div>
 				<div class="grupo-members">
 					@for (est of grupo.estudiantes; track est.estudianteId) {

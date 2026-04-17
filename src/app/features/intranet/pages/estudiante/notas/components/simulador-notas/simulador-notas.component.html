@@ -36,7 +36,7 @@
 				<div class="sim-info">
 					<span class="sim-titulo">{{ getEvalTitulo(sim.calificacionId) }}</span>
 					<div class="sim-meta">
-						<p-tag [value]="getEvalTipo(sim.calificacionId)" severity="info" [rounded]="true" />
+						<p-tag [value]="getEvalTipo(sim.calificacionId)" styleClass="tag-neutral" [rounded]="true" />
 						<span class="text-xs text-color-secondary">Peso: {{ (sim.peso * 100).toFixed(0) }}%</span>
 					</div>
 				</div>

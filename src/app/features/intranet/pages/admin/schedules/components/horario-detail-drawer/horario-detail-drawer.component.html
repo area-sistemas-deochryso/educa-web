@@ -140,7 +140,7 @@
 							<div class="info-value">
 								<p-tag
 									[value]="modoLabel()!"
-									[severity]="modoSeverity()"
+									styleClass="tag-neutral"
 									[pTooltip]="modoTooltip()"
 									tooltipPosition="top"
 								/>
@@ -158,7 +158,7 @@
 						Profesor Asignado
 					</h3>
 					@if (modoAsignacion() === 'TutorPleno') {
-						<p-tag value="Tutor" severity="info" class="modo-tag" />
+						<p-tag value="Tutor" styleClass="tag-neutral" class="modo-tag" />
 					}
 					@if (isAdmin() && detalle()!.profesorId) {
 						<div class="section-actions">

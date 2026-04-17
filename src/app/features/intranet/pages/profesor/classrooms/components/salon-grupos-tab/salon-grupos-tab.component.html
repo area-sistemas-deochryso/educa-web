@@ -91,12 +91,12 @@
 		<div class="flex align-items-center gap-2">
 			<p-tag
 				[value]="grupos().length + ' grupo' + (grupos().length !== 1 ? 's' : '')"
-				severity="secondary"
+				styleClass="tag-neutral"
 				icon="pi pi-th-large"
 			/>
 			<p-tag
 				[value]="totalEstudiantesEnGrupos() + ' asignados'"
-				severity="info"
+				styleClass="tag-neutral"
 				icon="pi pi-users"
 			/>
 		</div>

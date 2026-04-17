@@ -9,7 +9,7 @@
 	<!-- #region Header metadata -->
 	@if (calificacion(); as cal) {
 		<div class="calificar-metadata">
-			<p-tag [value]="cal.tipo" severity="info" />
+			<p-tag [value]="cal.tipo" styleClass="tag-neutral" />
 			@if (cal.esGrupal) {
 				<p-tag value="Grupal" severity="warn" icon="pi pi-users" />
 			}
