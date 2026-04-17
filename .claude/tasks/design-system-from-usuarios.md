@@ -84,15 +84,22 @@ Si se neutraliza globalmente, esas páginas pierden el color-coding visual (la s
 
 ## Plan de ejecución
 
-### F1 — Decisión de alcance + globales sin polémica (chat 1)
+### F1 — Decisión de alcance + globales sin polémica (chat 1) ✅ (2026-04-17)
 
-- [ ] F1.0 Confirmar con usuario cuál opción aplicar para patrón A1 (p-tag)
-- [ ] F1.1 Agregar patrón A2 (reset de inputs/selects) a `styles.scss` en bloque nuevo "INPUT/SELECT RESET"
-- [ ] F1.2 Agregar patrón A3 (botones `p-button-text`/`p-button-outlined`) a `styles.scss` en bloque nuevo "BUTTON TEXT/OUTLINED RESET"
-- [ ] F1.3 Agregar utility class A4 (`.label-uppercase`) a `styles.scss`
-- [ ] F1.4 Build OK + visual check de 3-4 páginas muestra (usuarios, error-logs, feedback-reports, asistencia)
-- [ ] F1.5 Actualizar `rules/table-transparency.md` → renombrar a `design-system.md` o crear uno nuevo que lo incluya
-- [ ] F1.6 Actualizar maestro + este task
+- [ ] F1.0 Confirmar con usuario cuál opción aplicar para patrón A1 (p-tag) — **pendiente, bloquea F2**
+- [x] F1.1 Agregar patrón A2 (reset de inputs/selects) a `styles.scss` — scoped a `app-intranet-layout`
+- [x] F1.2 Agregar patrón A3 (botones `p-button-text`/`p-button-outlined`) a `styles.scss` — scoped a `app-intranet-layout`
+- [x] F1.3 Agregar utility class A4 (`.label-uppercase`) a `styles.scss`
+- [x] F1.4 Build OK (warnings pre-existentes de ESM de `dayjs`/`saxes`, no relacionados)
+- [x] F1.5 Renombrado `rules/table-transparency.md` → `rules/design-system.md` con secciones para A2, A3, A4 + referencia histórica a `filter-transparency.md` como superseded
+- [x] F1.6 Maestro actualizado (tabla inventario + checklist F1) + este task actualizado
+
+**Notas de ejecución**:
+
+- **Scope `app-intranet-layout`**: A2 (inputs/selects) y A3 (botones) se scopearon al selector del layout de intranet para no alterar formularios ni CTAs del portal público. Las páginas públicas conservan el `--primary-color` del tema.
+- **Scope global**: A4 (`.label-uppercase`) es opt-in global — solo aplica cuando se agrega explícitamente la clase.
+- **Supersede `filter-transparency.md`**: el patrón per-component de inputs/selects documentado en esa regla queda superado por A2 global. La regla vieja no se borra todavía — al tocar un componente con override local, se elimina para no duplicar. Consolidación final cuando F3 escriba pautas B1-B11.
+- **Visual check diferido**: F1.4 se limitó a `npm run build` exitoso. Verificación visual en páginas muestra (usuarios, error-logs, feedback-reports, asistencia) se ejecuta al recibir feedback visual del usuario en `/design`-mode sobre el resultado.
 
 ### F2 — Ejecutar patrón A1 según opción elegida (chat 2)
 

@@ -29,7 +29,7 @@
 | 17 | Enforcement max-lines BE (CI) | BE | (inline en maestro) | ⏳ | 0% |
 | 18 | Tests de flujo de negocio E2E | BE+FE | (inline en maestro) | ⏳ | 0% |
 | 19 | Comunicación: foro + mensajería + push | FE+BE | (pendiente planificar) | ⏳ | 0% |
-| 20 | Design System — Estándar desde `usuarios` | FE | `tasks/design-system-from-usuarios.md` | ⏳ (sin prerrequisitos, ejecutable ya) | 0% |
+| 20 | Design System — Estándar desde `usuarios` | FE | `tasks/design-system-from-usuarios.md` | F1 ✅ · F2 🔒 (decisión A1) · F3-F5 ⏳ | ~20% |
 
 **Semáforo de readiness**:
 
@@ -602,12 +602,13 @@ CARRIL C — DIFERIDO
 > **Origen**: Conversación 2026-04-17. Tras cerrar parches de transparencia (tablas, paginadores, stat-cards, wrappers), se eleva `/intranet/admin/usuarios` como referencia canónica de diseño. Detalle en `tasks/design-system-from-usuarios.md`.
 > **Sin prerrequisitos · Ejecutable ahora**
 
-- [ ] **F1 — Globales sin polémica + decisión A1** (chat 1)
-  - [ ] Confirmar opción para neutralización de `p-tag` (A global / B opt-in / C semántica)
-  - [ ] Reset de inputs/selects en `styles.scss` (transparente, foco text-color)
-  - [ ] Override global de `p-button-text` y `p-button-outlined` (text-color + surface-300)
-  - [ ] Utility class `.label-uppercase` en `styles.scss`
-  - [ ] Actualizar `rules/table-transparency.md` (o renombrar a `design-system.md`)
+- [x] **F1 — Globales sin polémica** ✅ (2026-04-17)
+  - [x] Reset de inputs/selects en `styles.scss` (transparente, foco text-color) — scoped a `app-intranet-layout`
+  - [x] Override global de `p-button-text` y `p-button-outlined` (text-color + surface-300) — scoped a `app-intranet-layout`
+  - [x] Utility class `.label-uppercase` en `styles.scss`
+  - [x] Renombrado `rules/table-transparency.md` → `rules/design-system.md` con secciones para A2, A3, A4
+  - [x] CLAUDE.md actualizado con nueva referencia
+  - [ ] F1.0 Decisión A1 (neutralización `p-tag`) — **pendiente del usuario**, bloquea F2
 
 - [ ] **F2 — Aplicar decisión sobre `p-tag`** (chat 2, depende de F1.0)
   - [ ] Ejecutar según opción elegida (A/B/C)

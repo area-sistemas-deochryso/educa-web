@@ -566,6 +566,85 @@ strong {
 }
 
 /*---------------------------------------
+  INPUT / SELECT RESET - INTRANET (A2)
+  Design System: reset de inputs y selects en
+  la intranet para tener un look consistente y
+  neutro. Focus usa --text-color en vez de
+  --primary-color del tema (evita ring azul).
+  Scope: app-intranet-layout para no afectar
+  formularios del portal público.
+-----------------------------------------*/
+app-intranet-layout {
+	.p-inputtext,
+	.p-select {
+		background: transparent;
+		color: var(--text-color);
+		border-color: var(--surface-300);
+
+		&::placeholder {
+			color: var(--text-color-secondary);
+		}
+
+		&:enabled:focus {
+			border-color: var(--text-color);
+			box-shadow: 0 0 0 1px var(--text-color);
+		}
+	}
+
+	.p-select-label {
+		color: var(--text-color);
+	}
+
+	.p-select-dropdown {
+		color: var(--text-color);
+	}
+}
+
+/*---------------------------------------
+  BUTTON TEXT / OUTLINED RESET - INTRANET (A3)
+  Design System: botones secundarios homogéneos
+  en la intranet. Usan --text-color y --surface-300
+  en vez del primary del tema. Hover con surface-100.
+  Scope: app-intranet-layout para no alterar
+  CTAs del portal público.
+-----------------------------------------*/
+app-intranet-layout {
+	.p-button.p-button-text {
+		color: var(--text-color);
+
+		&:enabled:hover {
+			background: var(--surface-100);
+			color: var(--text-color);
+		}
+	}
+
+	.p-button.p-button-outlined {
+		color: var(--text-color);
+		border-color: var(--surface-300);
+
+		&:enabled:hover {
+			background: var(--surface-100);
+			color: var(--text-color);
+			border-color: var(--surface-300);
+		}
+	}
+}
+
+/*---------------------------------------
+  UTILITY: .label-uppercase (A4)
+  Utility class para labels UPPERCASE del
+  design system. Opt-in (no afecta nada salvo
+  que se aplique explícitamente).
+  Valores canónicos del estándar usuarios.
+-----------------------------------------*/
+.label-uppercase {
+	font-size: 0.8rem;
+	font-weight: 600;
+	text-transform: uppercase;
+	letter-spacing: 0.5px;
+}
+
+/*---------------------------------------
   PRIMENG SELECT FILTER - INTRANET
 -----------------------------------------*/
 .p-select-overlay {
