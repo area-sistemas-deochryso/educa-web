@@ -631,6 +631,24 @@ app-intranet-layout {
 }
 
 /*---------------------------------------
+  TAG NEUTRAL - SEMANTIC OPT-IN (A1 / Opción C)
+  Design System: convención semántica para p-tag.
+  - tag-neutral (esta clase): tags informativos
+    (rol, sección, categoría, metadato) → gris neutro.
+  - Sin clase: tags críticos/operativos (severity,
+    estado F/APROBADO/CRITICAL) → conservan los
+    colores del tema por severidad.
+  Se aplica con styleClass="tag-neutral" en cada
+  <p-tag> cuya severidad NO sea información útil
+  para el usuario.
+-----------------------------------------*/
+.p-tag.tag-neutral {
+	background: var(--surface-200);
+	color: var(--text-color);
+	font-weight: 600;
+}
+
+/*---------------------------------------
   UTILITY: .label-uppercase (A4)
   Utility class para labels UPPERCASE del
   design system. Opt-in (no afecta nada salvo

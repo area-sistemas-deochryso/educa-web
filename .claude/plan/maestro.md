@@ -29,7 +29,7 @@
 | 17 | Enforcement max-lines BE (CI) | BE | (inline en maestro) | ⏳ | 0% |
 | 18 | Tests de flujo de negocio E2E | BE+FE | (inline en maestro) | ⏳ | 0% |
 | 19 | Comunicación: foro + mensajería + push | FE+BE | (pendiente planificar) | ⏳ | 0% |
-| 20 | Design System — Estándar desde `usuarios` | FE | `tasks/design-system-from-usuarios.md` | F1 ✅ · F2 🔒 (decisión A1) · F3-F5 ⏳ | ~20% |
+| 20 | Design System — Estándar desde `usuarios` | FE | `tasks/design-system-from-usuarios.md` | F1 ✅ · F2.1 ✅ · F2.2-F2.5 ⏳ · F3-F5 ⏳ | ~30% |
 
 **Semáforo de readiness**:
 
@@ -610,9 +610,12 @@ CARRIL C — DIFERIDO
   - [x] CLAUDE.md actualizado con nueva referencia
   - [ ] F1.0 Decisión A1 (neutralización `p-tag`) — **pendiente del usuario**, bloquea F2
 
-- [ ] **F2 — Aplicar decisión sobre `p-tag`** (chat 2, depende de F1.0)
-  - [ ] Ejecutar según opción elegida (A/B/C)
-  - [ ] Verificación visual: usuarios, error-logs, feedback-reports, asistencia, aprobación
+- **F2 — Aplicar decisión sobre `p-tag`** (opción C elegida, dividido en 5 subfases)
+  - [x] **F2.1 — Infraestructura + canonical** ✅ (2026-04-17) — `.tag-neutral` agregado a `styles.scss`, convención documentada en `design-system.md` (sección 5), `styleClass="tag-neutral"` aplicado en 4 archivos de usuarios (7 tags de 8; el tag de error de validación queda crítico). Build OK.
+  - [ ] F2.2 — Estados operativos (asistencia, aprobación, error-logs, ~8 archivos) — audit para confirmar que ninguno lleva `tag-neutral` accidental
+  - [ ] F2.3 — Metadatos admin (vistas, permisos, events, notificaciones, email-outbox, feedback-reports, ~12 archivos) — candidatos fuertes a `tag-neutral`
+  - [ ] F2.4 — Académico (horarios, salones, cursos, calificaciones, grupos, ~15 archivos) — mezcla, audit por tag
+  - [ ] F2.5 — Misc y cross-role (videoconferencias, mensajería, foro, ctest-k6, campus, ~10 archivos)
 
 - [ ] **F3 — `rules/design-system.md` con pautas B1-B11** (chat 3)
   - [ ] Containers con border no background, page header, stat card, tabla, row actions triplet, filter bar, botones canónicos, dialogs, alert banners con `color-mix()`, drawer detalle, dev banners

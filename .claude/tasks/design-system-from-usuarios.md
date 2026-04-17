@@ -101,13 +101,54 @@ Si se neutraliza globalmente, esas páginas pierden el color-coding visual (la s
 - **Supersede `filter-transparency.md`**: el patrón per-component de inputs/selects documentado en esa regla queda superado por A2 global. La regla vieja no se borra todavía — al tocar un componente con override local, se elimina para no duplicar. Consolidación final cuando F3 escriba pautas B1-B11.
 - **Visual check diferido**: F1.4 se limitó a `npm run build` exitoso. Verificación visual en páginas muestra (usuarios, error-logs, feedback-reports, asistencia) se ejecuta al recibir feedback visual del usuario en `/design`-mode sobre el resultado.
 
-### F2 — Ejecutar patrón A1 según opción elegida (chat 2)
+### F2 — Ejecutar patrón A1 (Opción C elegida 2026-04-17, dividido en subfases)
 
-- [ ] F2.1 Si **Opción A** (global): agregar override de `p-tag` a `styles.scss` con `!important`. Verificar visualmente impacto en error-logs + asistencia + aprobación.
-- [ ] F2.2 Si **Opción B** (opt-in): crear clase `.neutral-tags` en `styles.scss` que neutraliza tags descendientes. Aplicarla en `<app-usuarios>` wrapper. Migrar patrón de usuarios a usar esta clase.
-- [ ] F2.3 Si **Opción C** (semántica): crear convención `.tag-neutral` / `.tag-critical` + documentar en regla. Aplicar selectivamente.
-- [ ] F2.4 Documentar decisión en regla de design system
-- [ ] F2.5 Actualizar maestro + este task
+**Decisión del usuario**: **Opción C — Semántica explícita**. Razón: el colegio tiene estados operativos reales (faltas, errores críticos, aprobaciones) donde el color es información útil. Neutralizar todo perdería feedback visual crítico. Opt-in (B) dejaría usuarios como excepción en vez de estándar. La convención semántica escala a nuevas páginas sin volver a decidir.
+
+**Divisón por módulo** (119 `p-tag` en 53 archivos excede 1 chat → 5 subfases):
+
+- [x] **F2.1 — Infraestructura + canonical example (usuarios)** ✅ (2026-04-17)
+  - [x] F2.1.1 Agregar `.p-tag.tag-neutral` a `styles.scss` (`background: --surface-200`, `color: --text-color`, `font-weight: 600`)
+  - [x] F2.1.2 Documentar convención en `rules/design-system.md` sección 5 (reemplaza sección "Pendiente A1"). Incluye tabla informativo/crítico, ejemplos canónicos, criterio de decisión.
+  - [x] F2.1.3 Aplicar `styleClass="tag-neutral"` a tags informativos de usuarios:
+    - `usuario-detail-drawer.component.html` — rol + estado
+    - `usuarios-table.component.html` — rol + estado
+    - `usuarios-validation-dialog.component.html` — rol (el tag de error con `severity="danger"` queda SIN `tag-neutral` porque es crítico — el usuario viene a verlo)
+    - `usuarios-import-dialog.component.html` — sección + contador "N estudiantes"
+  - [x] F2.1.4 Build OK (warnings pre-existentes de ESM, hints de deprecation de `styleClass` en PrimeNG 21 — issue transversal del proyecto, ~100+ tags)
+  - [x] F2.1.5 Maestro + task file actualizados con división F2.2-F2.5
+
+- [ ] **F2.2 — Estados operativos** (chat separado, ~8 archivos)
+  - [ ] Auditar `asistencia` (A/T/F/J diario + por curso): confirmar que NO tengan `tag-neutral` — `severity` de cada estado es información crítica
+  - [ ] Auditar `aprobación` (APROBADO/DESAPROBADO/PENDIENTE): sin `tag-neutral`
+  - [ ] Auditar `error-logs` (CRITICAL/ERROR/WARN/INFO): sin `tag-neutral` — severidad es lo que escanea el admin
+  - [ ] Archivos candidatos: `attendance-registration-panel`, `attendance-summary-panel`, `attendances.component`, `error-logs.component`, `error-log-detail-drawer`, `salon-aprobacion-tab`, `simulador-notas` (si tiene estados)
+
+- [ ] **F2.3 — Metadatos admin** (chat separado, ~12 archivos)
+  - [ ] Aplicar `tag-neutral` a tags de categoría/tipo/metadato en:
+    - `vistas.component` — tipo de vista (menu/secundaria)
+    - `permisos-roles`, `permisos-usuarios`, `permisos-detail-drawer`, `permisos-edit-dialog` — módulos y scopes
+    - `eventos-calendario` — tipo y categoría de evento
+    - `notificaciones-admin` — tipo y prioridad
+    - `email-outbox-table` — tipo de correo y estado (estado puede ser crítico: FAILED en rojo — ojo)
+    - `feedback-reports` — categoría/tipo del reporte
+
+- [ ] **F2.4 — Académico** (chat separado, ~15 archivos)
+  - [ ] Audit por tag — mezcla informativo/crítico:
+    - `horarios-list-view`, `horario-detail-drawer`, `horarios-import-dialog` — salón, curso, profesor (informativos)
+    - `salones-admin-table`, `salon-detail-dialog`, `cerrar-periodo-dialog` — estado de periodo (puede ser crítico si ABIERTO/CERRADO importa visualmente)
+    - `cursos.component` — nivel, tipo de calificación
+    - `calificar-dialog`, `calificaciones-panel`, `notas-curso-card`, `salon-notas-tab`, `salon-notas-estudiante-tab`, `estudiante-grupos-tab`, `salon-grupos-tab` — grupo, tipo de evaluación (informativos); puntajes con severidad (pueden ser críticos)
+    - `profesor-salones`, `profesor-final-salones`, `estudiante-salones`, `estudiante-cursos`, `profesor-cursos` — estado del salón/curso
+
+- [ ] **F2.5 — Misc y cross-role** (chat separado, ~10 archivos)
+  - [ ] `videoconferencias` — estado de sesión (ACTIVA/FINALIZADA — puede ser crítico)
+  - [ ] `mensajeria-tab`, `foro-tab` — categoría del mensaje
+  - [ ] `ctest-k6`, `credentials-dialog` — metadatos de prueba
+  - [ ] `campus` — tipo de edificio/zona
+  - [ ] `user-info-dialog` — rol del usuario (informativo)
+  - [ ] `health-justification-dialog` — tipo de justificación
+  - [ ] `salon-estudiantes-dialog`, `salon-health-permissions-tab` — estado
 
 ### F3 — Documentar pautas (B1-B11) como design-system.md (chat 3)
 

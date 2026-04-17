@@ -85,7 +85,7 @@
 				<span class="summary-count">
 					<strong>{{ totalFilas() }}</strong> estudiantes en
 					<strong>{{ gradoGroups().length }}</strong> grados — Sección:
-					<p-tag [value]="seccion()" severity="info" />
+					<p-tag [value]="seccion()" severity="info" styleClass="tag-neutral" />
 				</span>
 				<button
 					pButton
@@ -103,7 +103,7 @@
 					<p-accordionpanel [value]="group.grado">
 						<p-accordionheader>
 							{{ group.grado }}
-							<p-tag [value]="group.filas.length + ' estudiantes'" severity="secondary" styleClass="ml-2" />
+							<p-tag [value]="group.filas.length + ' estudiantes'" severity="secondary" styleClass="ml-2 tag-neutral" />
 						</p-accordionheader>
 						<p-accordioncontent>
 							<p-table

@@ -85,13 +85,14 @@
 				</td>
 				<td>
 					<!-- * Role tag uses severity mapping -->
-					<p-tag [value]="usuario.rol" [severity]="uiMapping.getRolSeverity(usuario.rol)" />
+					<p-tag [value]="usuario.rol" [severity]="uiMapping.getRolSeverity(usuario.rol)" styleClass="tag-neutral" />
 				</td>
 				<td class="text-center">
 					<!-- * Active/inactive status tag -->
 					<p-tag
 						[value]="usuario.estado | estadoLabel"
 						[severity]="usuario.estado | estadoSeverity"
+						styleClass="tag-neutral"
 					/>
 				</td>
 				<td>

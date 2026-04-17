@@ -143,19 +143,63 @@ Utility opt-in para labels UPPERCASE del estándar (headers de tabla, labels de 
 
 ---
 
-## 5. Pendiente — Neutralización de `p-tag` (A1)
+## 5. `p-tag` — Convención semántica (A1 · Opción C)
 
-> **Decisión abierta, bloquea F2 del task de design system.**
+> **Dos tipos de tag en el sistema: `tag-neutral` e `tag-crítico`. La decisión es explícita por tag, no global.**
 
-Actualmente `p-tag` muestra colores por severidad (error-logs CRITICAL rojo, asistencia A/T/F con colores, aprobación APROBADO/DESAPROBADO con colores). La página `usuarios` los neutraliza (`--surface-200` + `--text-color`).
+### La regla
 
-Tres opciones bajo evaluación del usuario (ver `tasks/design-system-from-usuarios.md` § "Decisión crítica previa al F1"):
+| Intención del tag | Clase | Color |
+|---|---|---|
+| **Informativo** — responde "¿qué tipo/rol/categoría/metadato es esto?" (rol del usuario, sección, tipo de evento, categoría de notificación, estado de periodo que no requiere atención urgente) | `styleClass="tag-neutral"` | Gris (`--surface-200` + `--text-color`) |
+| **Crítico/operativo** — responde "¿necesito atención aquí ya?" (severity de error, asistencia F, aprobación APROBADO/DESAPROBADO, CRITICAL logs) | **Sin clase** (`styleClass` ausente) + `severity="danger"/"success"/...` | Colores del tema por severidad |
 
-- **A** — Global: neutralizar todos los tags en la intranet
-- **B** — Opt-in: crear clase `.neutral-tags` y aplicarla selectivamente
-- **C** — Semántica: distinguir tags "informativos" (neutros) vs "críticos" (con color)
+### Implementación global (styles.scss)
 
-F1 cerró las overrides sin polémica (A2, A3, A4). A1 se ejecuta en F2 cuando se confirme la opción.
+```scss
+.p-tag.tag-neutral {
+	background: var(--surface-200);
+	color: var(--text-color);
+	font-weight: 600;
+}
+```
+
+No existe `.tag-critical` como clase — los tags críticos usan el default de PrimeNG con `severity`. Se puede introducir en el futuro si se necesita marcador semántico explícito (ej: agregar ícono prefijo a críticos), pero hoy `severity` solo ya hace el trabajo visual.
+
+### Ejemplos canónicos
+
+```html
+<!-- ✅ Informativo: rol, sección, categoría → tag-neutral -->
+<p-tag [value]="usuario.rolNombre" styleClass="tag-neutral" />
+<p-tag [value]="'Sección ' + salon.seccion" styleClass="tag-neutral" />
+<p-tag [value]="evento.tipo" styleClass="tag-neutral" />
+<p-tag [value]="notificacion.categoria" styleClass="tag-neutral" />
+
+<!-- ✅ Crítico: severity hace el trabajo → sin tag-neutral -->
+<p-tag [value]="asistencia.estado" [severity]="estadoSeverity" />
+<p-tag [value]="'CRITICAL'" severity="danger" />
+<p-tag [value]="aprobacion.estado" [severity]="aprobacionSeverity" />
+
+<!-- ❌ Incorrecto: tag-neutral + severity pelean -->
+<p-tag value="CRITICAL" severity="danger" styleClass="tag-neutral" />
+```
+
+### Criterio de decisión para tags dudosos
+
+Preguntarse antes de decidir:
+
+1. **¿El usuario escanea esta columna buscando problemas?** → crítico (sin `tag-neutral`)
+2. **¿El color comunica información que el texto ya dice igual de bien?** → informativo (con `tag-neutral`)
+3. **¿Eliminar el color haría más difícil el uso operativo de la página?** → crítico (sin `tag-neutral`)
+4. **¿El tag es solo para categorizar/agrupar/identificar?** → informativo (con `tag-neutral`)
+
+### Estado de migración
+
+- **F2.1** ✅ (2026-04-17) — Infraestructura + usuarios como ejemplo canónico. 4 archivos de usuarios tocados.
+- **F2.2** ⏳ — Estados operativos (asistencia, aprobación, error-logs). Mayoría ya usa `severity`, audit para confirmar que ninguno lleva `tag-neutral` accidental.
+- **F2.3** ⏳ — Metadatos admin (vistas, permisos, events, notificaciones, email-outbox, feedback-reports). Candidatos fuertes a `tag-neutral`.
+- **F2.4** ⏳ — Académico (horarios, salones, cursos, calificaciones, grupos). Mezcla — requiere audit por tag.
+- **F2.5** ⏳ — Misc y cross-role (videoconferencias, mensajería, foro, ctest-k6, campus).
 
 ---
 

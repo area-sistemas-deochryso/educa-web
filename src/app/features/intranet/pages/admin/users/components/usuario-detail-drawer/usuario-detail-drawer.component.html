@@ -25,6 +25,7 @@
 			<p-tag
 				[value]="usuario()!.rol"
 				[severity]="uiMapping.getRolSeverity(usuario()!.rol)"
+				styleClass="tag-neutral"
 			/>
 
 			<!-- * Basic info list -->
@@ -38,6 +39,7 @@
 					<p-tag
 						[value]="usuario()!.estado | estadoLabel"
 						[severity]="usuario()!.estado | estadoSeverity"
+						styleClass="tag-neutral"
 					/>
 				</div>
 				@if (usuario()!.correo) {
