@@ -25,7 +25,7 @@
 | 13 | Frontend Test Gaps | FE | `plan/test-frontend-gaps.md` (pendiente crear) | ⏳ | 0% |
 | 14 | Contratos FE-BE | FE+BE | `plan/contratos-fe-be.md` (pendiente crear) | ⏳ | 0% |
 | 15 | Release Protocol y Operaciones | FE+BE | `plan/release-operations.md` (pendiente crear) | F1 ✅ · F2 ✅ · F3-F5 ⏳ | ~40% |
-| 16 | Auditoría de Seguridad | BE | `plan/security-audit.md` (pendiente crear) | ⏳ | 0% |
+| 16 | Auditoría de Seguridad | BE | `Educa.API/.claude/plan/security-audit.md` | F1 ✅ · F2-F5 ⏳ | ~20% |
 | 17 | Enforcement max-lines BE (CI) | BE | (inline en maestro) | ⏳ | 0% |
 | 18 | Tests de flujo de negocio E2E | BE+FE | (inline en maestro) | ⏳ | 0% |
 | 19 | Comunicación: foro + mensajería + push | FE+BE | (pendiente planificar) | ⏳ | 0% |
@@ -77,7 +77,7 @@
 **Carril D — Confiabilidad sistémica (post-push, antes de Carril B)**:
 
 1. **Plan 15 F1** — Checklist de deploy + smoke checks + rollback protocol (proceso, 1 chat) ✅
-2. **Plan 16 F1** — Auditoría de endpoints y autorización (1 chat)
+2. **Plan 16 F1** — Auditoría de endpoints y autorización (1 chat) ✅ (2026-04-17)
 3. **Plan 12 F1** — Controller contract tests P0: Auth, Asistencia, Aprobación (2-3 chats)
 4. **Plan 13 F1** — Interceptores core sin cobertura (1 chat)
 5. **Plan 12 F3** — Security boundary tests (1-2 chats)
@@ -343,11 +343,12 @@ CARRIL C — DIFERIDO
 
 #### Plan 16 — Auditoría de Seguridad
 
-- [ ] **F1 — Auditoría de endpoints** (1 chat, BE)
-  - [ ] F1.1 Listar todos los endpoints con atributos de seguridad
-  - [ ] F1.2 Matriz endpoints vs roles esperados
-  - [ ] F1.3 Identificar endpoints sin [Authorize] que deberían tenerlo
-  - [ ] F1.4 Identificar endpoints sin rate limiting que deberían tenerlo
+- [x] **F1 — Auditoría de endpoints** (1 chat, BE) ✅ (2026-04-17)
+  - [x] F1.1 Listar todos los endpoints con atributos de seguridad — 45 controllers, ~280 endpoints documentados
+  - [x] F1.2 Matriz endpoints vs roles esperados — matriz completa por subdominio en `Educa.API/.claude/plan/security-audit.md`
+  - [x] F1.3 Identificar endpoints sin [Authorize] que deberían tenerlo — 12 [AllowAnonymous] justificados técnicamente. **0 endpoints públicos accidentales.**
+  - [x] F1.4 Identificar endpoints sin rate limiting que deberían tenerlo — 5 gaps (G1-G5): 1 ALTA (MigrarContrasenas), 2 MEDIA (SolicitarOtp enum, CerrarPeriodo), 2 BAJA (listados sin heavy, DELETEs admin)
+  - [x] F1.5 Cruce con invariantes — INV-AD01/AD04/RU05 ✅ · INV-T01 ⚠️ (G4)
 
 - [ ] **F2 — Auditoría de secretos** (1 chat, ambos repos)
   - [ ] F2.1 Grep de patrones de secretos en código

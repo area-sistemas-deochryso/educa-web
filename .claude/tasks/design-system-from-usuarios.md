@@ -175,15 +175,31 @@ Si se neutraliza globalmente, esas páginas pierden el color-coding visual (la s
   - **Build**: OK (solo warnings pre-existentes ESM dayjs/saxes/exceljs, no relacionados)
   - **Hint transversal**: `styleClass is deprecated` en PrimeNG 21 — issue pre-existente del proyecto (~100+ tags), no bloquea F2.5. Decisión de migración a `class=` pendiente para fase futura.
 
-### F3 — Documentar pautas (B1-B11) como design-system.md (chat 3)
+### F3 — Documentar pautas (B1-B11) como design-system.md ✅ (2026-04-17)
 
-- [ ] F3.1 Crear `rules/design-system.md` con todas las pautas B1-B11:
-  - Estructura recomendada por componente (copy-paste-able)
-  - Ejemplos canónicos tomados literal de usuarios
-  - Anti-patrones comunes a evitar
-- [ ] F3.2 Agregar referencia al design-system en CLAUDE.md project
-- [ ] F3.3 Actualizar `rules/primeng.md` para cross-referenciar design-system en secciones relevantes
-- [ ] F3.4 Actualizar maestro + este task
+- [x] F3.1 Agregada **sección 6 "Pautas recomendadas por componente (B1-B11)"** a `rules/design-system.md` (existente). Contiene las 11 pautas con HTML + SCSS copy-paste-ables extraídos literal de usuarios:
+  - **B1** Container con border, no background (anti-patrón `background: var(--surface-card)` explicado)
+  - **B2** Page header (shared `<app-page-header>` + orden canónico de botones + separador semántico)
+  - **B3** Stat card (anatomía content-left + icon-right 48×48, responsive grid)
+  - **B4** Tabla (wrapper con border + headers UPPERCASE + row-inactive con opacity 0.5)
+  - **B5** Row actions triplet (ver/editar/toggle con severities secondary/info/dinámico + aria-label obligatorio)
+  - **B6** Filter bar (search-box relative + filter-dropdowns + btn-clear con margin-left auto + opacity 0.5→1 en hover)
+  - **B7** Botones canónicos por rol semántico (tabla primary/secondary/destructive/clear/icon-only)
+  - **B8** Dialogs CRUD (header tipado + form-grid 2-col + footer derecha + fondo surface-ground en header/content/footer)
+  - **B9** Alert banners con `color-mix()` + paleta semántica info/success/warning/danger (explicación de por qué no `rgba()`)
+  - **B10** Drawer detalle right-side 450px (avatar 80px + name + tag + info list en surface-50)
+  - **B11** Dev banners con border dashed + flag `isDev` (diferencia vs B9 explicada)
+- [x] F3.2 CLAUDE.md ya referenciaba `rules/design-system.md` — no requirió cambio.
+- [x] F3.3 `rules/primeng.md` actualizado con cross-ref bidireccional en el header introductorio: "Para estructura recomendada por componente ver design-system sección 6". `rules/design-system.md` referencia `rules/primeng.md` y `rules/a11y.md` y `rules/dialogs-sync.md` dentro de los ejemplos.
+- [x] F3.4 Intro del archivo reescrito: agregada tabla que divide capa A (globales en styles.scss) vs capa B (pautas en design-system.md) + criterio de decisión "si es visualmente invariable → A; si es estructural → B". Historial actualizado: Fase 3 marcada 2026-04-17.
+- [x] F3.5 Maestro (tabla inventario + checklist F3) + este task actualizados.
+
+**Notas de ejecución**:
+
+- **Sin cambios de código SCSS**: F3 es solo documentación. Los componentes de usuarios ya aplican todas las pautas; no se tocó código fuente.
+- **Ejemplos literales con contexto**: cada bloque B incluye una línea de "**Por qué**" o "**Diferencia vs X**" para que el consumidor entienda la decisión, no solo la copie. El objetivo es que el próximo chat que haga un módulo nuevo pueda pegarse a la referencia sin volver a mirar usuarios.
+- **Deudas C1-C4 mencionadas inline**: el ejemplo de `.field .p-error` en B8 referencia `// deuda C1 — pendiente token var(--red-500)` y el `color: #ffffff` de success referencia "deuda C4 — ver B7". Esto las mantiene visibles hasta F4.
+- **Regla de cross-reference**: B4 referencia `rules/design-system.md` sección 1 (globales de transparencia) en lugar de duplicar; B5 referencia `rules/a11y.md`; B6 referencia `rules/primeng.md` (appendTo=body); B8 referencia `rules/dialogs-sync.md`. Así se evita que design-system se convierta en un monolito que repite otras reglas.
 
 ### F4 — (Opcional, diferible) Migración de tokens hardcoded C1-C4
 
