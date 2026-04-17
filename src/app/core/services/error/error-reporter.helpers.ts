@@ -69,15 +69,86 @@ export function getBreadcrumbKey(status: number): string {
 	return 'default';
 }
 
+// #region Sanitización de payloads y URLs
+
+/** Query params que se stripean completamente (cache-busting, tokens) */
+const STRIP_PARAMS = new Set(['access_token', 'token', '_', 't', 'timestamp', 'cachebust', 'nocache']);
+
+/** Keys de payload que se enmascaran */
+const SENSITIVE_KEYS = new Set([
+	'password', 'contrasena', 'contraseña', 'token', 'secret',
+	'accesstoken', 'access_token', 'refreshtoken', 'refresh_token',
+	'authorization', 'cookie',
+]);
+const DNI_KEYS = new Set(['dni', 'usuariodni']);
+
 export function sanitizeUrl(url: string, isBrowser: boolean): string {
 	try {
 		const origin = isBrowser ? window.location.origin : 'http://localhost';
 		const parsed = new URL(url, origin);
-		return parsed.pathname.substring(0, 500);
+
+		// Preservar query params (sanitizados), solo stripear cache-busting y tokens
+		const sanitizedParams = new URLSearchParams();
+		for (const [key, value] of parsed.searchParams) {
+			if (STRIP_PARAMS.has(key.toLowerCase())) continue;
+			if (SENSITIVE_KEYS.has(key.toLowerCase())) {
+				sanitizedParams.set(key, '***');
+			} else if (DNI_KEYS.has(key.toLowerCase())) {
+				sanitizedParams.set(key, value.length >= 4 ? `***${value.slice(-4)}` : '***');
+			} else {
+				sanitizedParams.set(key, value);
+			}
+		}
+
+		const qs = sanitizedParams.toString();
+		const result = qs ? `${parsed.pathname}?${qs}` : parsed.pathname;
+		return result.substring(0, 500);
 	} catch {
 		return url.split('?')[0].substring(0, 500);
 	}
 }
+
+/**
+ * Sanitiza un payload (request body o response body) para almacenamiento seguro.
+ * Enmascara campos sensibles (passwords, tokens, DNIs).
+ */
+export function sanitizePayload(body: unknown, maxLength = 4000): string | null {
+	if (body == null) return null;
+
+	try {
+		const str = typeof body === 'string' ? body : JSON.stringify(body);
+		if (!str || str === '{}' || str === 'null') return null;
+
+		const parsed = JSON.parse(str) as unknown;
+		const sanitized = sanitizeObject(parsed);
+		const result = JSON.stringify(sanitized);
+		return result.length <= maxLength ? result : result.substring(0, maxLength - 12) + '...[truncado]';
+	} catch {
+		const raw = String(body);
+		return raw.length <= maxLength ? raw : raw.substring(0, maxLength - 12) + '...[truncado]';
+	}
+}
+
+function sanitizeObject(obj: unknown): unknown {
+	if (obj === null || obj === undefined) return obj;
+	if (Array.isArray(obj)) return obj.map(sanitizeObject);
+	if (typeof obj !== 'object') return obj;
+
+	const result: Record<string, unknown> = {};
+	for (const [key, value] of Object.entries(obj as Record<string, unknown>)) {
+		const lower = key.toLowerCase();
+		if (SENSITIVE_KEYS.has(lower)) {
+			result[key] = '***';
+		} else if (DNI_KEYS.has(lower) && typeof value === 'string') {
+			result[key] = value.length >= 4 ? `***${value.slice(-4)}` : '***';
+		} else {
+			result[key] = sanitizeObject(value);
+		}
+	}
+	return result;
+}
+
+// #endregion
 
 export function detectPlatform(isBrowser: boolean): 'WEB' | 'ANDROID' | 'IOS' {
 	if (!isBrowser) return 'WEB';

@@ -61,6 +61,9 @@ export interface ErrorLogCompleto {
 	sourceLocation: string | null;
 	fecha: string;
 	totalBreadcrumbs: number;
+	requestBody: string | null;
+	responseBody: string | null;
+	requestHeaders: string | null;
 	breadcrumbs: ErrorLogDetalle[];
 }
 // #endregion

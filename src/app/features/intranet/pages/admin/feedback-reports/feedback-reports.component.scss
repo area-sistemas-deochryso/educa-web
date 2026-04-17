@@ -76,7 +76,7 @@
 
 // #region Tabla
 .table-section {
-	background: var(--surface-card, #ffffff);
+	background: transparent;
 	border: 1px solid var(--surface-200);
 	border-radius: 12px;
 	overflow: hidden;
@@ -259,20 +259,8 @@
 }
 // #endregion
 
-// #region Overrides PrimeNG — transparencia de tabla y filtros
+// #region Overrides PrimeNG — filtros (tabla cubierta por global)
 :host ::ng-deep {
-	.p-datatable {
-		background: transparent;
-
-		.p-datatable-table { background: transparent; }
-		.p-datatable-thead > tr > th { background: transparent; }
-		.p-datatable-tbody > tr {
-			background: transparent;
-			> td { background: transparent; }
-		}
-		.p-paginator { background: transparent; }
-	}
-
 	.p-inputtext,
 	.p-select,
 	.p-datepicker-input,
@@ -280,6 +268,45 @@
 		background: transparent;
 		color: var(--text-color);
 		border-color: var(--surface-300);
+	}
+}
+// #endregion
+
+// #region Eliminar reporte
+.delete-section {
+	display: flex;
+	flex-direction: column;
+	gap: 0.75rem;
+	padding: 1rem;
+	border: 1px solid rgba(220, 38, 38, 0.2);
+	border-radius: 8px;
+	background: rgba(220, 38, 38, 0.04);
+	margin-top: 1.5rem;
+}
+
+.delete-warning {
+	display: flex;
+	gap: 0.75rem;
+	align-items: flex-start;
+
+	> i {
+		font-size: 1.2rem;
+		color: #dc2626;
+		margin-top: 0.1rem;
+	}
+
+	strong {
+		display: block;
+		color: #dc2626;
+		font-size: 0.9rem;
+		margin-bottom: 0.25rem;
+	}
+
+	p {
+		margin: 0;
+		font-size: 0.8rem;
+		line-height: 1.5;
+		color: var(--text-color-secondary);
 	}
 }
 // #endregion

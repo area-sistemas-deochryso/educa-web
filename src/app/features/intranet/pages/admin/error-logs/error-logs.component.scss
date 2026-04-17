@@ -170,30 +170,7 @@
 	}
 }
 
-::ng-deep .p-datatable {
-	background: transparent;
-
-	.p-datatable-table {
-		background: transparent;
-	}
-
-	.p-datatable-thead > tr > th {
-		background: transparent;
-	}
-
-	.p-datatable-tbody > tr {
-		background: transparent;
-
-		> td {
-			background: transparent;
-		}
-	}
-
-	.p-datatable-paginator-bottom,
-	.p-paginator {
-		background: transparent;
-	}
-}
+// Transparencia de tabla y paginator cubierta globalmente en styles.scss
 // #endregion
 
 // #region Overrides PrimeNG

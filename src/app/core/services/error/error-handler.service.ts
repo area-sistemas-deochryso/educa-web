@@ -80,12 +80,13 @@ export class ErrorHandlerService {
 			life: error.status === 401 ? 3000 : 5000,
 		});
 
-		// Report errors to backend with breadcrumbs for trazability
+		// Report errors to backend with breadcrumbs + reproduction context
 		if (error.status >= 400) {
 			const errorCode = error.error?.errorCode as string | undefined;
 			const correlationId = (context?.['requestId'] as string) ?? undefined;
 			this.errorReporter.reportHttpError(
 				error.status, error.url ?? '', method, errorCode, correlationId,
+				undefined, context?.['body'], error.error,
 			);
 			// El toast se acaba de mostrar → registrar para que el dialog de feedback
 			// pueda ofrecer enlazar este reporte manual con este error específico.

@@ -11,6 +11,8 @@ export interface ErrorReportPayload {
 	plataforma: 'WEB' | 'ANDROID' | 'IOS';
 	userAgent: string;
 	sourceLocation: string | null;
+	requestBody: string | null;
+	responseBody: string | null;
 	breadcrumbs: BreadcrumbPayload[];
 }
 

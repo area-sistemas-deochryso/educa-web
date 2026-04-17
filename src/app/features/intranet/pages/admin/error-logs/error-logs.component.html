@@ -66,6 +66,20 @@
 		placeholder="Severidad"
 		appendTo="body"
 	/>
+	<p-select
+		[options]="httpOptions"
+		[ngModel]="vm().filterHttp"
+		(ngModelChange)="onFilterHttpChange($event)"
+		placeholder="HTTP"
+		appendTo="body"
+	/>
+	<p-select
+		[options]="rolOptions"
+		[ngModel]="vm().filterUsuarioRol"
+		(ngModelChange)="onFilterRolChange($event)"
+		placeholder="Rol"
+		appendTo="body"
+	/>
 </section>
 <!-- #endregion -->
 
@@ -153,6 +167,15 @@
 			</tr>
 		</ng-template>
 	</p-table>
+	<p-paginator
+		[rows]="vm().pageSize"
+		[first]="paginatorFirst()"
+		[totalRecords]="totalRecordsEstimate()"
+		[rowsPerPageOptions]="[5, 10, 15]"
+		[showCurrentPageReport]="true"
+		currentPageReportTemplate="Página {currentPage}"
+		(onPageChange)="onPageChange($event)"
+	/>
 } @else {
 	<app-table-skeleton [columns]="tableSkeletonColumns" [rows]="10" />
 }
@@ -162,6 +185,13 @@
 <app-error-log-detail-drawer
 	[visible]="vm().drawerVisible"
 	[errorId]="vm().selectedItem?.id ?? null"
+	[canDelete]="true"
 	(visibleChange)="onDrawerVisibleChange($event)"
+	(deleteRequested)="onDeleteRequested($event)"
+	(staleDataDetected)="onStaleDataDetected($event)"
 />
+<!-- #endregion -->
+
+<!-- #region ConfirmDialog — siempre en DOM (regla dialogs-sync.md) -->
+<p-confirmDialog />
 <!-- #endregion -->

@@ -69,5 +69,11 @@ export class FeedbackReportService {
 		return this.http.patch<string>(`${this.apiUrl}/${id}/estado`, dto);
 	}
 	// #endregion
+
+	// #region DELETE — Eliminación manual (admin)
+	eliminar(id: number): Observable<void> {
+		return this.http.delete<void>(`${this.apiUrl}/${id}`);
+	}
+	// #endregion
 }
 // #endregion

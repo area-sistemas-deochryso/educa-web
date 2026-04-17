@@ -19,11 +19,15 @@ export class ErrorLogsService {
 		correlationId: string | null,
 		pagina = 1,
 		pageSize = 20,
+		httpFilter: string | null = null,
+		usuarioRol: string | null = null,
 	): Observable<ErrorLogLista[]> {
 		const params: Record<string, string | number> = { pagina, pageSize };
 		if (origen) params['origen'] = origen;
 		if (severidad) params['severidad'] = severidad;
 		if (correlationId) params['correlationId'] = correlationId;
+		if (httpFilter) params['httpFilter'] = httpFilter;
+		if (usuarioRol) params['usuarioRol'] = usuarioRol;
 
 		return this.http.get<ErrorLogLista[]>(this.apiUrl, { params });
 	}
@@ -34,6 +38,14 @@ export class ErrorLogsService {
 
 	getCompleto(errorId: number): Observable<ErrorLogCompleto> {
 		return this.http.get<ErrorLogCompleto>(`${this.apiUrl}/${errorId}`);
+	}
+
+	// #endregion
+
+	// #region Mutaciones
+
+	deleteError(errorId: number): Observable<void> {
+		return this.http.delete<void>(`${this.apiUrl}/${errorId}`);
 	}
 
 	// #endregion

@@ -145,6 +145,11 @@ export class FeedbackReportsStore {
 			list.map((i) => (i.id === id ? { ...i, estado } : i)),
 		);
 	}
+
+	/** Mutación quirúrgica: elimina un ítem del listado sin refetch. */
+	removeItem(id: number): void {
+		this._items.update((list) => list.filter((i) => i.id !== id));
+	}
 	// #endregion
 }
 // #endregion

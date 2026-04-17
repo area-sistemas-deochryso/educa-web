@@ -18,6 +18,7 @@ import {
 	captureCallSite,
 	getBreadcrumbKey,
 	sanitizeUrl,
+	sanitizePayload,
 	detectPlatform,
 } from './error-reporter.helpers';
 import { type ErrorReportPayload, type BreadcrumbPayload, BREADCRUMB_LIMITS } from './error-reporter.models';
@@ -63,6 +64,8 @@ export class ErrorReporterService {
 		errorCode?: string,
 		correlationId?: string,
 		stack?: string,
+		requestBody?: unknown,
+		responseBody?: unknown,
 	): void {
 		if (!this.isBrowser || !this.canReport()) return;
 
@@ -101,6 +104,8 @@ export class ErrorReporterService {
 			severidad: status >= 500 || status === 0 ? 'CRITICAL' : 'ERROR',
 			correlationId: correlationId ?? null,
 			sourceLocation,
+			requestBody: sanitizePayload(requestBody),
+			responseBody: sanitizePayload(responseBody, 2000),
 			breadcrumbCount: maxBreadcrumbs,
 		});
 
@@ -206,6 +211,8 @@ export class ErrorReporterService {
 		severidad: 'CRITICAL' | 'ERROR' | 'WARNING';
 		correlationId: string | null;
 		sourceLocation: SourceLocation | null;
+		requestBody?: string | null;
+		responseBody?: string | null;
 		breadcrumbCount: number;
 	}): ErrorReportPayload {
 		const breadcrumbs = this.activityTracker.getBreadcrumbs(opts.breadcrumbCount);
@@ -225,6 +232,8 @@ export class ErrorReporterService {
 			sourceLocation: opts.sourceLocation
 				? JSON.stringify(opts.sourceLocation).substring(0, 500)
 				: null,
+			requestBody: opts.requestBody ?? null,
+			responseBody: opts.responseBody ?? null,
 			breadcrumbs: breadcrumbs.map(this.mapBreadcrumb),
 		};
 	}

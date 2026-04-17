@@ -41,7 +41,9 @@ export const errorInterceptor: HttpInterceptorFn = (req, next) => {
 			// BUT still report 500+ errors silently — those are backend bugs, not user errors.
 			if (SKIP_REFRESH_URLS.some((url) => req.url.includes(url))) {
 				if (error.status >= 500 || error.status === 0) {
-					errorReporter.reportHttpError(error.status, req.url, req.method, undefined, requestId);
+					errorReporter.reportHttpError(
+						error.status, req.url, req.method, undefined, requestId,
+						undefined, req.body, error.error);
 				}
 				return throwError(() => error);
 			}
@@ -56,7 +58,9 @@ export const errorInterceptor: HttpInterceptorFn = (req, next) => {
 			// Still report 500+ silently for trazability.
 			if (req.headers.has('X-Skip-Error-Toast')) {
 				if (error.status >= 500 || error.status === 0) {
-					errorReporter.reportHttpError(error.status, req.url, req.method, undefined, requestId);
+					errorReporter.reportHttpError(
+						error.status, req.url, req.method, undefined, requestId,
+						undefined, req.body, error.error);
 				}
 				return throwError(() => error);
 			}

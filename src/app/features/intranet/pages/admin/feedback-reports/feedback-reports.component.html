@@ -284,6 +284,30 @@
 					[disabled]="!nuevoEstado() || nuevoEstado() === d.estado"
 				></button>
 			</section>
+
+			<!-- #region Eliminar reporte -->
+			<section class="delete-section">
+				<div class="delete-warning">
+					<i class="pi pi-exclamation-triangle"></i>
+					<div>
+						<strong>Eliminación manual</strong>
+						<p>
+							Útil para limpiar reportes huérfanos — por ejemplo, cuando el correlation ID
+							apunta a un error de trazabilidad que ya fue purgado o borrado. Esta acción
+							es <strong>irreversible</strong>.
+						</p>
+					</div>
+				</div>
+				<button
+					pButton
+					type="button"
+					icon="pi pi-trash"
+					label="Eliminar reporte #{{ d.id }}"
+					class="p-button-danger p-button-outlined"
+					(click)="onDeleteReport()"
+				></button>
+			</section>
+			<!-- #endregion -->
 		</div>
 	}
 </p-drawer>
@@ -295,5 +319,9 @@
 	[correlationId]="selectedCorrelationId()"
 	(visibleChange)="onErrorDrawerVisibleChange($event)"
 />
+<!-- #endregion -->
+
+<!-- #region ConfirmDialog — siempre en DOM (regla dialogs-sync.md) -->
+<p-confirmDialog />
 <!-- #endregion -->
 <!-- #endregion -->

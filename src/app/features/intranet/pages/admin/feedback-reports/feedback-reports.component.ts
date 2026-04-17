@@ -3,7 +3,9 @@ import { ChangeDetectionStrategy, Component, OnInit, inject, signal } from '@ang
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 
+import { ConfirmationService } from 'primeng/api';
 import { ButtonModule } from 'primeng/button';
+import { ConfirmDialogModule } from 'primeng/confirmdialog';
 import { DatePickerModule } from 'primeng/datepicker';
 import { DrawerModule } from 'primeng/drawer';
 import { SelectModule } from 'primeng/select';
@@ -40,6 +42,7 @@ interface EstadoOption {
 		TableModule,
 		TagModule,
 		ButtonModule,
+		ConfirmDialogModule,
 		SelectModule,
 		DatePickerModule,
 		DrawerModule,
@@ -47,11 +50,13 @@ interface EstadoOption {
 		TooltipModule,
 		ErrorLogDetailDrawerComponent,
 	],
+	providers: [ConfirmationService],
 	templateUrl: './feedback-reports.component.html',
 	styleUrl: './feedback-reports.component.scss',
 })
 export class FeedbackReportsComponent implements OnInit {
 	private readonly facade = inject(FeedbackReportsFacade);
+	private readonly confirmationService = inject(ConfirmationService);
 
 	readonly vm = this.facade.vm;
 	readonly tipoOptions = REPORTE_TIPO_OPTIONS;
@@ -119,6 +124,38 @@ export class FeedbackReportsComponent implements OnInit {
 		if (!estado) return;
 		const obs = this.observacionCambio().trim();
 		this.facade.cambiarEstado(estado, obs || null);
+	}
+
+	onDeleteReport(): void {
+		const detalle = this.vm().detalle;
+		if (!detalle) return;
+
+		const fecha = new Date(detalle.fechaReg).toLocaleString('es-PE');
+		const tipo = this.tipoLabel(detalle.tipo);
+		const descripcion = detalle.descripcion.length > 100
+			? detalle.descripcion.slice(0, 100) + '…'
+			: detalle.descripcion;
+		const usuario = detalle.usuarioNombre || detalle.usuarioRol || 'Anónimo';
+
+		this.confirmationService.confirm({
+			header: 'Confirmar eliminación',
+			message: `¿Eliminar el reporte #${detalle.id}?
+
+Fecha: ${fecha}
+Tipo: ${tipo}
+Usuario: ${usuario}
+Estado: ${this.estadoLabel(detalle.estado)}
+Descripción: "${descripcion}"
+
+Esta acción es irreversible.`,
+			icon: 'pi pi-exclamation-triangle',
+			acceptLabel: 'Sí, eliminar',
+			rejectLabel: 'Cancelar',
+			acceptButtonStyleClass: 'p-button-danger',
+			accept: () => {
+				this.facade.deleteReporte(detalle.id);
+			},
+		});
 	}
 	// #endregion
 

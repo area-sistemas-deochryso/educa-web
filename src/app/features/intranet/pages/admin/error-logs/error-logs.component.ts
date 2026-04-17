@@ -1,12 +1,18 @@
-import { ChangeDetectionStrategy, Component, inject, OnInit } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, inject, OnInit } from '@angular/core';
 import { CommonModule, DatePipe } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 
+import { ConfirmationService } from 'primeng/api';
 import { ButtonModule } from 'primeng/button';
+import { ConfirmDialogModule } from 'primeng/confirmdialog';
+import { PaginatorModule, PaginatorState } from 'primeng/paginator';
 import { SelectModule } from 'primeng/select';
 import { TableModule } from 'primeng/table';
 import { TagModule } from 'primeng/tag';
 import { TooltipModule } from 'primeng/tooltip';
+
+import { logger } from '@core/helpers';
+import { SwService } from '@core/services/sw';
 
 import { PageHeaderComponent } from '@intranet-shared/components';
 import { TableSkeletonComponent, SkeletonColumnDef } from '@intranet-shared/components/table-skeleton';
@@ -18,6 +24,7 @@ import {
 	ErrorSeveridad,
 	SEVERIDAD_SEVERITY_MAP,
 	ORIGEN_ICON_MAP,
+	type ErrorLogCompleto,
 	type ErrorLogLista,
 } from './models';
 
@@ -29,6 +36,8 @@ import {
 		DatePipe,
 		FormsModule,
 		ButtonModule,
+		ConfirmDialogModule,
+		PaginatorModule,
 		SelectModule,
 		TableModule,
 		TagModule,
@@ -37,6 +46,7 @@ import {
 		TableSkeletonComponent,
 		ErrorLogDetailDrawerComponent,
 	],
+	providers: [ConfirmationService],
 	templateUrl: './error-logs.component.html',
 	styleUrl: './error-logs.component.scss',
 	changeDetection: ChangeDetectionStrategy.OnPush,
@@ -44,10 +54,24 @@ import {
 export class ErrorLogsComponent implements OnInit {
 	// #region Dependencias
 	private readonly facade = inject(ErrorLogsFacade);
+	private readonly confirmationService = inject(ConfirmationService);
+	private readonly swService = inject(SwService);
 	// #endregion
 
 	// #region Estado
 	readonly vm = this.facade.vm;
+
+	/**
+	 * Estimación de totalRecords para el paginador. Backend no devuelve total:
+	 * si la página está llena asumimos que hay más; si viene corta, es la última.
+	 */
+	readonly totalRecordsEstimate = computed(() => {
+		const { page, pageSize, items } = this.vm();
+		const offset = (page - 1) * pageSize;
+		return items.length < pageSize ? offset + items.length : offset + pageSize + 1;
+	});
+
+	readonly paginatorFirst = computed(() => (this.vm().page - 1) * this.vm().pageSize);
 	// #endregion
 
 	// #region Opciones de filtro
@@ -63,6 +87,26 @@ export class ErrorLogsComponent implements OnInit {
 		{ label: 'Critical', value: 'CRITICAL' },
 		{ label: 'Error', value: 'ERROR' },
 		{ label: 'Warning', value: 'WARNING' },
+	];
+
+	readonly httpOptions = [
+		{ label: 'Todos', value: null },
+		{ label: '4xx (cliente)', value: '4xx' },
+		{ label: '5xx (servidor)', value: '5xx' },
+		{ label: '400 Bad Request', value: '400' },
+		{ label: '404 Not Found', value: '404' },
+		{ label: '409 Conflict', value: '409' },
+		{ label: '422 Unprocessable', value: '422' },
+		{ label: '500 Server Error', value: '500' },
+	];
+
+	readonly rolOptions = [
+		{ label: 'Todos los roles', value: null },
+		{ label: 'Director', value: 'Director' },
+		{ label: 'Asistente Administrativo', value: 'Asistente Administrativo' },
+		{ label: 'Profesor', value: 'Profesor' },
+		{ label: 'Apoderado', value: 'Apoderado' },
+		{ label: 'Estudiante', value: 'Estudiante' },
 	];
 	// #endregion
 
@@ -102,6 +146,14 @@ export class ErrorLogsComponent implements OnInit {
 		this.facade.setFilterSeveridad(severidad);
 	}
 
+	onFilterHttpChange(http: string | null): void {
+		this.facade.setFilterHttp(http);
+	}
+
+	onFilterRolChange(rol: string | null): void {
+		this.facade.setFilterUsuarioRol(rol);
+	}
+
 	onViewDetail(item: ErrorLogLista): void {
 		this.facade.openDetail(item);
 	}
@@ -110,6 +162,59 @@ export class ErrorLogsComponent implements OnInit {
 		if (!visible) {
 			this.facade.closeDrawer();
 		}
+	}
+
+	onPageChange(event: PaginatorState): void {
+		const currentPageSize = this.vm().pageSize;
+		const newPageSize = event.rows ?? currentPageSize;
+		const newPage = (event.page ?? 0) + 1;
+
+		// Prioridad: cambio de pageSize resetea a página 1
+		if (newPageSize !== currentPageSize) {
+			this.facade.setPageSize(newPageSize);
+			return;
+		}
+		if (newPage !== this.vm().page) {
+			this.facade.loadPage(newPage);
+		}
+	}
+
+
+	/**
+	 * El drawer recibió 404 al cargar un item que estaba en la lista.
+	 * Señal de que el cache SW está desactualizado (típicamente post-purga diaria).
+	 * Invalidamos el cache del endpoint y refrescamos la lista — el usuario verá
+	 * el mensaje "no encontrado" en el drawer, pero al cerrarlo los items fantasma
+	 * ya no estarán.
+	 */
+	async onStaleDataDetected(id: number): Promise<void> {
+		logger.warn(`[ErrorLogs] Cache stale detectado — item #${id} no existe. Invalidando y refrescando.`);
+		const count = await this.swService.invalidateCacheByPattern('/api/sistema/errors');
+		logger.log(`[ErrorLogs] ${count} entradas de cache invalidadas`);
+		this.facade.refresh();
+	}
+
+	onDeleteRequested(err: ErrorLogCompleto): void {
+		const fecha = new Date(err.fecha).toLocaleString('es-PE');
+		const mensaje = err.mensaje.length > 100 ? err.mensaje.slice(0, 100) + '…' : err.mensaje;
+
+		this.confirmationService.confirm({
+			header: 'Confirmar eliminación',
+			message: `¿Eliminar el error #${err.id}?
+
+Fecha: ${fecha}
+Origen: ${err.origen} · ${err.severidad}
+Mensaje: "${mensaje}"
+
+Esta acción es irreversible y también borra los breadcrumbs asociados.`,
+			icon: 'pi pi-exclamation-triangle',
+			acceptLabel: 'Sí, eliminar',
+			rejectLabel: 'Cancelar',
+			acceptButtonStyleClass: 'p-button-danger',
+			accept: () => {
+				this.facade.deleteError(err.id);
+			},
+		});
 	}
 
 	getSeveridadSeverity(severidad: string): 'danger' | 'warn' | 'info' {

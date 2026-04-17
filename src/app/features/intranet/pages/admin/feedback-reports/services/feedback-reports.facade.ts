@@ -4,6 +4,7 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
 import { environment } from '@config/environment';
 import { logger } from '@core/helpers';
+import { ErrorHandlerService } from '@core/services/error';
 import {
 	ActualizarEstadoReporteRequest,
 	FeedbackReportService,
@@ -27,6 +28,7 @@ export class FeedbackReportsFacade {
 	private readonly service = inject(FeedbackReportService);
 	private readonly store = inject(FeedbackReportsStore);
 	private readonly wal = inject(WalFacadeHelper);
+	private readonly errorHandler = inject(ErrorHandlerService);
 	private readonly destroyRef = inject(DestroyRef);
 	private readonly apiUrl = `${environment.apiUrl}/api/sistema/reportes-usuario`;
 
@@ -185,6 +187,45 @@ export class FeedbackReportsFacade {
 				logger.error('[FeedbackReportsFacade] Error cambiando estado', err);
 			},
 		});
+	}
+	// #endregion
+
+	// #region Mutaciones — Eliminar
+	/**
+	 * Elimina un reporte manualmente. Útil para limpiar reportes huérfanos
+	 * (ej: correlation ID apunta a un error ya purgado). Aplica optimistic:
+	 * cierra drawer, remueve del listado, refresca stats. En error: restaura.
+	 */
+	deleteReporte(id: number): void {
+		// Snapshot para rollback
+		const snapshot = this.store.items();
+
+		// Optimistic: cerrar drawer + remover del listado
+		this.store.closeDrawer();
+		this.store.removeItem(id);
+
+		// eslint-disable-next-line wal/no-direct-mutation-subscribe -- Razón: reportes-usuario admin-only, acción destructiva que NO debe encolarse offline. Si falla, el admin debe ver el error y reintentar manualmente.
+		this.service
+			.eliminar(id)
+			.pipe(takeUntilDestroyed(this.destroyRef))
+			.subscribe({
+				next: () => {
+					this.errorHandler.showSuccess(
+						'Reporte eliminado',
+						'El reporte se eliminó correctamente',
+					);
+					this.loadEstadisticas();
+				},
+				error: (err) => {
+					logger.error('[FeedbackReportsFacade] Error al eliminar reporte', err);
+					// Rollback: restaurar snapshot
+					this.store.setItems(snapshot);
+					this.errorHandler.showError(
+						'No se pudo eliminar',
+						'Ocurrió un error al eliminar el reporte. Se restauró la lista.',
+					);
+				},
+			});
 	}
 	// #endregion
 
