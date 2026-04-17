@@ -1,6 +1,6 @@
 # Plan Maestro — Orden y Dependencias
 
-> **Fecha**: 2026-04-14 (última revisión: 2026-04-16, deploy completado)
+> **Fecha**: 2026-04-14 (última revisión: 2026-04-17, Design System F1+F2.1 cerrados)
 > **Objetivo**: Ordenar los 11 planes dispersos entre `educa-web/.claude/` y `Educa.API/.claude/` en una secuencia con dependencias explícitas.
 > **Principio rector** (actualizado 2026-04-16): "Features primero — el enforcement y la arquitectura son valiosos solo si soportan funcionalidad real. La deuda técnica se paga en paralelo, no como prerrequisito."
 
@@ -36,10 +36,10 @@
 | Dimensión | Estado | Gate mínimo |
 |---|---|---|
 | **Feature readiness** | 🟢 Listo | Carril A ✅ + QW4 ✅ — deploy completado |
-| **Deploy readiness** | 🟢 Deployed | FE (Netlify) + BE (Azure) desplegados 2026-04-16. Pendiente validar estabilidad 2026-04-17. |
+| **Deploy readiness** | 🟢 Estable | FE (Netlify) + BE (Azure) desplegados 2026-04-16. 2026-04-17 sin incidentes reportados. |
 | **Production reliability** | 🔴 Sin red | Falta: tests de contrato, auditoría endpoints, error trace, fallbacks P0 |
 
-**Foco: validar estabilidad post-deploy (2026-04-17) → Carril D (confiabilidad) → Carril B (deuda)**.
+**Foco: Carril D (confiabilidad) + Design System F2.2-F2.5 en paralelo → Carril B (deuda)**.
 
 ---
 
@@ -70,9 +70,9 @@
 
 </details>
 
-**QW4 — LINT LIMPIO + DEPLOY ✅** (2026-04-16): 0 errors, 0 warnings. 1321 tests. Build OK. **Push y deploy completados (FE+BE). Pendiente validar estabilidad 2026-04-17.**
+**QW4 — LINT LIMPIO + DEPLOY ✅** (2026-04-16): 0 errors, 0 warnings. 1321 tests. Build OK. **Push y deploy completados (FE+BE). 2026-04-17 sin incidentes reportados.**
 
-**Próximo paso — Validar estabilidad (2026-04-17) → Carril D (confiabilidad) → Carril B (deuda)**:
+**Próximo paso — Carril D (confiabilidad) + Design System F2.2-F2.5 en paralelo → Carril B (deuda)**:
 
 **Carril D — Confiabilidad sistémica (post-push, antes de Carril B)**:
 
@@ -597,10 +597,10 @@ CARRIL C — DIFERIDO
 
 ---
 
-## Design System — Estándar desde `usuarios` (standalone, 2-3 chats)
+## Design System — Estándar desde `usuarios` (standalone, ~8 chats restantes)
 
 > **Origen**: Conversación 2026-04-17. Tras cerrar parches de transparencia (tablas, paginadores, stat-cards, wrappers), se eleva `/intranet/admin/usuarios` como referencia canónica de diseño. Detalle en `tasks/design-system-from-usuarios.md`.
-> **Sin prerrequisitos · Ejecutable ahora**
+> **Sin prerrequisitos · Ejecutable en paralelo a Carril D**
 
 - [x] **F1 — Globales sin polémica** ✅ (2026-04-17)
   - [x] Reset de inputs/selects en `styles.scss` (transparente, foco text-color) — scoped a `app-intranet-layout`
@@ -608,7 +608,7 @@ CARRIL C — DIFERIDO
   - [x] Utility class `.label-uppercase` en `styles.scss`
   - [x] Renombrado `rules/table-transparency.md` → `rules/design-system.md` con secciones para A2, A3, A4
   - [x] CLAUDE.md actualizado con nueva referencia
-  - [ ] F1.0 Decisión A1 (neutralización `p-tag`) — **pendiente del usuario**, bloquea F2
+  - [x] F1.0 Decisión A1 resuelta 2026-04-17: **Opción C — semántica explícita** (`tag-neutral` opt-in para informativos, `severity` nativo para críticos)
 
 - **F2 — Aplicar decisión sobre `p-tag`** (opción C elegida, dividido en 5 subfases)
   - [x] **F2.1 — Infraestructura + canonical** ✅ (2026-04-17) — `.tag-neutral` agregado a `styles.scss`, convención documentada en `design-system.md` (sección 5), `styleClass="tag-neutral"` aplicado en 4 archivos de usuarios (7 tags de 8; el tag de error de validación queda crítico). Build OK.
