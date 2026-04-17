@@ -1,6 +1,6 @@
 # Plan Maestro — Orden y Dependencias
 
-> **Fecha**: 2026-04-14 (última revisión: 2026-04-17, Design System F1+F2.1 cerrados)
+> **Fecha**: 2026-04-14 (última revisión: 2026-04-17, Design System F2 completo: F2.1-F2.5 cerrados)
 > **Objetivo**: Ordenar los 11 planes dispersos entre `educa-web/.claude/` y `Educa.API/.claude/` en una secuencia con dependencias explícitas.
 > **Principio rector** (actualizado 2026-04-16): "Features primero — el enforcement y la arquitectura son valiosos solo si soportan funcionalidad real. La deuda técnica se paga en paralelo, no como prerrequisito."
 
@@ -29,7 +29,7 @@
 | 17 | Enforcement max-lines BE (CI) | BE | (inline en maestro) | ⏳ | 0% |
 | 18 | Tests de flujo de negocio E2E | BE+FE | (inline en maestro) | ⏳ | 0% |
 | 19 | Comunicación: foro + mensajería + push | FE+BE | (pendiente planificar) | ⏳ | 0% |
-| 20 | Design System — Estándar desde `usuarios` | FE | `tasks/design-system-from-usuarios.md` | F1 ✅ · F2.1-F2.4 ✅ · F2.5 ⏳ · F3-F5 ⏳ | ~60% |
+| 20 | Design System — Estándar desde `usuarios` | FE | `tasks/design-system-from-usuarios.md` | F1 ✅ · F2 ✅ (F2.1-F2.5) · F3-F5 ⏳ | ~70% |
 
 **Semáforo de readiness**:
 
@@ -615,7 +615,7 @@ CARRIL C — DIFERIDO
   - [x] **F2.2 — Estados operativos** ✅ (2026-04-17) — Audit de 11 archivos (asistencia/aprobación/error-logs/feedback-reports/cierre-periodo/notas): **0 violaciones**. Todos los tags operativos usan `severity` apropiadamente. 2 `severity="secondary"` en stacks informativos (httpMethod, contadores) se conservan por consistencia cromática del grupo. Tipo de evaluación (`simulador-notas`, `notas-curso-card`) queda para F2.4.
   - [x] **F2.3 — Metadatos admin** ✅ (2026-04-17) — 8 tags en 7 archivos migrados a `tag-neutral`: permisos-roles/usuarios/detail-drawer/edit-dialog (6 tags de rol), eventos-calendario (tipo), notificaciones-admin (tipo+destinatario), email-outbox (tipo). Estados críticos (prioridad, estado operativo, FAILED) mantienen `severity`. Build OK.
   - [x] **F2.4 — Académico** ✅ (2026-04-17) — 22 tags en 17 archivos migrados a `tag-neutral`: modo asignación (3), "Tutor" badges (2), tipo calificación (2), grado.nombre (1), cursos como chips (2), contadores (6), tipo de evaluación (5), "Tutor" de profesor-salones (1). Notas con severity por aprobación, estados operativos, stats de aprobados/desaprobados, y alertas (warn) mantienen `severity`. Build OK.
-  - [ ] F2.5 — Misc y cross-role (videoconferencias, mensajería, foro, ctest-k6, campus, ~10 archivos)
+  - [x] **F2.5 — Misc y cross-role** ✅ (2026-04-17) — 10 tags en 7 archivos migrados a `tag-neutral`: videoconferencias (salonDescripcion), mensajeria-tab + foro-tab (labels), ctest-k6 (contadores del header), credentials-dialog (rol, 2 tags + eliminación de `getRolSeverity` helper ya no usado), campus (piso.nombre + conexion.tipo), user-info-dialog (userRole con clase combinada). Auditados sin cambios (mantienen severity, críticos operativos): mensajería no-leídos (danger), campus bidireccional/unidireccional (info/warn), health-justification, horarios-import, student-task-submissions, student-files. Build OK.
 
 - [ ] **F3 — `rules/design-system.md` con pautas B1-B11** (chat 3)
   - [ ] Containers con border no background, page header, stat card, tabla, row actions triplet, filter bar, botones canónicos, dialogs, alert banners con `color-mix()`, drawer detalle, dev banners

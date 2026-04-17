@@ -8,14 +8,14 @@
 		@if (vm().hasCredentials) {
 			<p-tag
 				[value]="vm().credentials.length + ' credencial(es)'"
-				severity="success"
+				styleClass="tag-neutral"
 				icon="pi pi-lock"
 			/>
 		}
 		@if (vm().endpointCount.enabled > 0) {
 			<p-tag
 				[value]="vm().endpointCount.enabled + '/' + vm().endpointCount.total + ' endpoints'"
-				severity="info"
+				styleClass="tag-neutral"
 				icon="pi pi-link"
 			/>
 		}

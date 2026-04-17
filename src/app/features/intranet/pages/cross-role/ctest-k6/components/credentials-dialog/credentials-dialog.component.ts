@@ -141,17 +141,6 @@ export class CredentialsDialogComponent {
 	// #endregion
 
 	// #region Helpers
-	getRolSeverity(rol: string): 'success' | 'info' | 'warn' | 'danger' | 'secondary' {
-		const map: Record<string, 'success' | 'info' | 'warn' | 'danger' | 'secondary'> = {
-			Director: 'danger',
-			Profesor: 'info',
-			Apoderado: 'warn',
-			Estudiante: 'success',
-			'Asistente Administrativo': 'secondary',
-		};
-		return map[rol] ?? 'info';
-	}
-
 	getRoleVUs(rol: string): number {
 		const dist = this.roleDistribution().find((d) => d.rol === rol);
 		return dist?.vus ?? 0;

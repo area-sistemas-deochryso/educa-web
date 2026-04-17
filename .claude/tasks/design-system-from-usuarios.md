@@ -157,14 +157,23 @@ Si se neutraliza globalmente, esas páginas pierden el color-coding visual (la s
     - Alertas: "N sin grupo" warn, "grupo lleno" warn, "Sin periodo" warn
   - **Build**: OK (solo warnings pre-existentes ESM dayjs/saxes)
 
-- [ ] **F2.5 — Misc y cross-role** (chat separado, ~10 archivos)
-  - [ ] `videoconferencias` — estado de sesión (ACTIVA/FINALIZADA — puede ser crítico)
-  - [ ] `mensajeria-tab`, `foro-tab` — categoría del mensaje
-  - [ ] `ctest-k6`, `credentials-dialog` — metadatos de prueba
-  - [ ] `campus` — tipo de edificio/zona
-  - [ ] `user-info-dialog` — rol del usuario (informativo)
-  - [ ] `health-justification-dialog` — tipo de justificación
-  - [ ] `salon-estudiantes-dialog`, `salon-health-permissions-tab` — estado
+- [x] **F2.5 — Misc y cross-role** ✅ (2026-04-17) — 10 tags en 7 archivos migrados a `tag-neutral`, build OK
+  - [x] `videoconferencias.component.html` L57 — `salonDescripcion` → `tag-neutral` (nombre de salón, metadato)
+  - [x] `mensajeria-tab.component.html` L16 — label del curso → `tag-neutral` (metadato del tab)
+  - [x] `foro-tab.component.html` L16 — label del curso → `tag-neutral` (metadato del tab)
+  - [x] `ctest-k6.component.html` L9-13 credenciales count + L16-20 endpoints count → `tag-neutral` (contadores informativos del header)
+  - [x] `credentials-dialog.component.html` L113 + L242 — rol del usuario (2 tags) → `tag-neutral`. Helper `getRolSeverity()` eliminado del `.ts` (ya no se usa)
+  - [x] `campus.component.html` L67 `piso.nombre` + L131 `conexion.tipo` → `tag-neutral` (metadatos del editor)
+  - [x] `user-info-dialog.component.html` L20 — `userRole()` → `styleClass="tag-neutral role-tag"` (preserva `align-self` del `role-tag`)
+  - **Auditados sin cambios** (tags críticos operativos que mantienen `severity`):
+    - `mensajeria-tab.component.html` L90 — contador de mensajes no leídos `severity="danger"` (rojo = pendiente operativo)
+    - `campus.component.html` L153 — bidireccional/unidireccional `info`/`warn` (warn informa limitación del grafo)
+    - `health-justification-dialog.component.ts` L68+L70 — "Válida"/"No válida" `success`/`danger` (estado crítico de la justificación)
+    - `horarios-import-dialog.component.html` L78+L119+L121 — estados de import OK/con errores (crítico operativo)
+    - `student-task-submissions-dialog.component.html` L74 — estado de entrega (profesor escanea pendientes)
+    - `student-files-dialog.component.html` L60 — nota del estudiante (crítico: aprobación/desaprobación)
+  - **Build**: OK (solo warnings pre-existentes ESM dayjs/saxes/exceljs, no relacionados)
+  - **Hint transversal**: `styleClass is deprecated` en PrimeNG 21 — issue pre-existente del proyecto (~100+ tags), no bloquea F2.5. Decisión de migración a `class=` pendiente para fase futura.
 
 ### F3 — Documentar pautas (B1-B11) como design-system.md (chat 3)
 

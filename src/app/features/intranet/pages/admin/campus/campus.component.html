@@ -64,7 +64,7 @@
 
 				<div class="toolbar-right">
 					@if (vm().selectedPiso; as piso) {
-						<p-tag [value]="piso.nombre" severity="info" [rounded]="true" />
+						<p-tag [value]="piso.nombre" styleClass="tag-neutral" [rounded]="true" />
 					}
 					@if (vm().saving) {
 						<i class="pi pi-spin pi-spinner saving-indicator"></i>
@@ -128,7 +128,7 @@
 				<div class="tooltip-body">
 					<div class="tooltip-header">
 						<span class="tooltip-type" style="color: #f59e0b">Conexión Vertical</span>
-						<p-tag [value]="conexion.tipo" severity="info" [rounded]="true" />
+						<p-tag [value]="conexion.tipo" styleClass="tag-neutral" [rounded]="true" />
 						<button
 							pButton
 							icon="pi pi-trash"
