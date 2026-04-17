@@ -1,6 +1,6 @@
 # Plan Maestro — Orden y Dependencias
 
-> **Fecha**: 2026-04-14 (última revisión: 2026-04-17, Design System F2 completo: F2.1-F2.5 cerrados)
+> **Fecha**: 2026-04-14 (última revisión: 2026-04-17, Design System F3 cerrado — pautas B1-B11 documentadas en `rules/design-system.md`)
 > **Objetivo**: Ordenar los 11 planes dispersos entre `educa-web/.claude/` y `Educa.API/.claude/` en una secuencia con dependencias explícitas.
 > **Principio rector** (actualizado 2026-04-16): "Features primero — el enforcement y la arquitectura son valiosos solo si soportan funcionalidad real. La deuda técnica se paga en paralelo, no como prerrequisito."
 
@@ -24,12 +24,12 @@
 | 12 | Backend Test Gaps | BE | `plan/test-backend-gaps.md` (pendiente crear) | ⏳ | 0% |
 | 13 | Frontend Test Gaps | FE | `plan/test-frontend-gaps.md` (pendiente crear) | ⏳ | 0% |
 | 14 | Contratos FE-BE | FE+BE | `plan/contratos-fe-be.md` (pendiente crear) | ⏳ | 0% |
-| 15 | Release Protocol y Operaciones | FE+BE | `plan/release-operations.md` (pendiente crear) | F1 ✅ · F2-F5 ⏳ | ~20% |
+| 15 | Release Protocol y Operaciones | FE+BE | `plan/release-operations.md` (pendiente crear) | F1 ✅ · F2 ✅ · F3-F5 ⏳ | ~40% |
 | 16 | Auditoría de Seguridad | BE | `plan/security-audit.md` (pendiente crear) | ⏳ | 0% |
 | 17 | Enforcement max-lines BE (CI) | BE | (inline en maestro) | ⏳ | 0% |
 | 18 | Tests de flujo de negocio E2E | BE+FE | (inline en maestro) | ⏳ | 0% |
 | 19 | Comunicación: foro + mensajería + push | FE+BE | (pendiente planificar) | ⏳ | 0% |
-| 20 | Design System — Estándar desde `usuarios` | FE | `tasks/design-system-from-usuarios.md` | F1 ✅ · F2 ✅ (F2.1-F2.5) · F3-F5 ⏳ | ~70% |
+| 20 | Design System — Estándar desde `usuarios` | FE | `tasks/design-system-from-usuarios.md` | F1 ✅ · F2 ✅ (F2.1-F2.5) · F3 ✅ · F4-F5 ⏳ | ~80% |
 
 **Semáforo de readiness**:
 
@@ -82,7 +82,7 @@
 4. **Plan 13 F1** — Interceptores core sin cobertura (1 chat)
 5. **Plan 12 F3** — Security boundary tests (1-2 chats)
 6. **Plan 14 F1-F2** — Snapshots de DTOs (mínimo viable de contratos, 1-2 chats)
-7. **Plan 15 F2** — Health check endpoint (1 chat)
+7. ~~**Plan 15 F2**~~ ✅ — Health check endpoint `GET /api/health` (2026-04-17)
 8. **Plan 7 F1-F2** — Error Trace Backend: observabilidad mínima en producción (1-2 chats)
 9. **Plan 10 P0** — Fallbacks críticos: offline, auth failure, API down (1 chat)
 10. **Plan 17** — Enforcement max-lines .cs en CI (1 chat, BE)
@@ -326,9 +326,10 @@ CARRIL C — DIFERIDO
   - [x] F1.3 Rollback protocol (FE, BE, BD)
   - [x] Entregable: `DEPLOY.md` en raíz del proyecto
 
-- [ ] **F2 — Health check endpoint** (1 chat, BE)
-  - [ ] F2.1 `GET /api/health` — BD accesible, outbox no bloqueada, jobs activos
-  - [ ] F2.2 Response tipado: healthy/degraded/unhealthy
+- [x] **F2 — Health check endpoint** (1 chat, BE) ✅ (2026-04-17)
+  - [x] F2.1 `GET /api/health` `[AllowAnonymous]` — BD (`SELECT 1` con timeout 3s), EmailOutbox (counts PENDING stuck >1h + FAILED 24h), workers (heartbeat in-memory vía `IWorkerHealthTracker` singleton)
+  - [x] F2.2 Response tipado: `ApiResponse<HealthStatusDto>` con `healthy`/`degraded`/`unhealthy` + por-check details. HTTP 200 para healthy/degraded, 503 solo para unhealthy (BD caída)
+  - [x] F2.3 Archivos nuevos (8): `HealthStatusDto`, `HealthCheckDto`, `HealthStatusNames`, `IWorkerHealthTracker`, `WorkerHealthTracker`, `IHealthCheckService`, `HealthCheckService`, `HealthController`. Editados (3): `EmailOutboxWorker` + `EmailOutboxCleanupWorker` (pulse heartbeat), `ServiceExtensions` (DI). Build 0 warnings, 0 errors.
 
 - [ ] **F3 — Validación datos post-deploy** (1 chat, SQL)
   - [ ] F3.1 Queries de consistencia (estudiantes huérfanos, salones duplicados, horarios con profesor inactivo)
@@ -617,9 +618,10 @@ CARRIL C — DIFERIDO
   - [x] **F2.4 — Académico** ✅ (2026-04-17) — 22 tags en 17 archivos migrados a `tag-neutral`: modo asignación (3), "Tutor" badges (2), tipo calificación (2), grado.nombre (1), cursos como chips (2), contadores (6), tipo de evaluación (5), "Tutor" de profesor-salones (1). Notas con severity por aprobación, estados operativos, stats de aprobados/desaprobados, y alertas (warn) mantienen `severity`. Build OK.
   - [x] **F2.5 — Misc y cross-role** ✅ (2026-04-17) — 10 tags en 7 archivos migrados a `tag-neutral`: videoconferencias (salonDescripcion), mensajeria-tab + foro-tab (labels), ctest-k6 (contadores del header), credentials-dialog (rol, 2 tags + eliminación de `getRolSeverity` helper ya no usado), campus (piso.nombre + conexion.tipo), user-info-dialog (userRole con clase combinada). Auditados sin cambios (mantienen severity, críticos operativos): mensajería no-leídos (danger), campus bidireccional/unidireccional (info/warn), health-justification, horarios-import, student-task-submissions, student-files. Build OK.
 
-- [ ] **F3 — `rules/design-system.md` con pautas B1-B11** (chat 3)
-  - [ ] Containers con border no background, page header, stat card, tabla, row actions triplet, filter bar, botones canónicos, dialogs, alert banners con `color-mix()`, drawer detalle, dev banners
-  - [ ] Cross-refs desde CLAUDE.md y `rules/primeng.md`
+- [x] **F3 — `rules/design-system.md` con pautas B1-B11** ✅ (2026-04-17)
+  - [x] Sección 6 agregada con B1-B11: container con border no background, page header, stat card, tabla, row actions triplet, filter bar, botones canónicos, dialogs, alert banners con `color-mix()`, drawer detalle, dev banners. Todos los ejemplos extraídos literalmente de `/intranet/admin/usuarios`.
+  - [x] Cross-refs: CLAUDE.md ya incluía `rules/design-system.md`; agregado cross-ref bidireccional en `rules/primeng.md` (header introductorio).
+  - [x] Intro del archivo reescrito con tabla A (globales) vs B (pautas) y criterio de decisión. Historial actualizado.
 
 - [ ] **F4 — (Opcional, diferible) Migración de tokens hardcoded** (`#e24c4c`, `#dc2626`, `#1e40af`, `color: white` inline)
 
