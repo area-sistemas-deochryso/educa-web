@@ -536,6 +536,36 @@ strong {
 }
 
 /*---------------------------------------
+  PRIMENG TABLES & PAGINATOR - TRANSPARENT
+  Cobertura completa de p-table (partes internas)
+  y p-paginator (tanto dentro de la tabla como
+  standalone). Regla del proyecto: todas las tablas
+  llevan fondo transparente sobre --surface-ground.
+  No se requiere override por componente.
+-----------------------------------------*/
+.p-datatable .p-datatable-table,
+.p-datatable .p-datatable-thead > tr > th,
+.p-datatable .p-datatable-tbody > tr,
+.p-datatable .p-datatable-tbody > tr > td,
+.p-datatable .p-datatable-tfoot > tr > td,
+.p-datatable .p-datatable-paginator-top,
+.p-datatable .p-datatable-paginator-bottom,
+.p-paginator {
+	background: transparent !important;
+}
+
+/*---------------------------------------
+  STAT CARDS - TRANSPARENT
+  Cards de estadísticas/KPIs del proyecto.
+  Regla: fondo transparente sobre --surface-ground.
+  Las variantes (stat-new, stat--critical, etc.)
+  solo modifican border y color del texto.
+-----------------------------------------*/
+.stat-card {
+	background: transparent !important;
+}
+
+/*---------------------------------------
   PRIMENG SELECT FILTER - INTRANET
 -----------------------------------------*/
 .p-select-overlay {

@@ -1,6 +1,6 @@
 # Plan Maestro — Orden y Dependencias
 
-> **Fecha**: 2026-04-14 (última revisión: 2026-04-16)
+> **Fecha**: 2026-04-14 (última revisión: 2026-04-16, deploy completado)
 > **Objetivo**: Ordenar los 11 planes dispersos entre `educa-web/.claude/` y `Educa.API/.claude/` en una secuencia con dependencias explícitas.
 > **Principio rector** (actualizado 2026-04-16): "Features primero — el enforcement y la arquitectura son valiosos solo si soportan funcionalidad real. La deuda técnica se paga en paralelo, no como prerrequisito."
 
@@ -29,16 +29,17 @@
 | 17 | Enforcement max-lines BE (CI) | BE | (inline en maestro) | ⏳ | 0% |
 | 18 | Tests de flujo de negocio E2E | BE+FE | (inline en maestro) | ⏳ | 0% |
 | 19 | Comunicación: foro + mensajería + push | FE+BE | (pendiente planificar) | ⏳ | 0% |
+| 20 | Design System — Estándar desde `usuarios` | FE | `tasks/design-system-from-usuarios.md` | ⏳ (sin prerrequisitos, ejecutable ya) | 0% |
 
 **Semáforo de readiness**:
 
 | Dimensión | Estado | Gate mínimo |
 |---|---|---|
-| **Feature readiness** | 🟢 Listo | Carril A ✅ + QW4 ✅ — código listo para push |
-| **Deploy readiness** | 🟡 Parcial | Plan 15 F1 ✅ (DEPLOY.md + checklist + rollback) · Falta: health endpoint, smoke automatizado |
+| **Feature readiness** | 🟢 Listo | Carril A ✅ + QW4 ✅ — deploy completado |
+| **Deploy readiness** | 🟢 Deployed | FE (Netlify) + BE (Azure) desplegados 2026-04-16. Pendiente validar estabilidad 2026-04-17. |
 | **Production reliability** | 🔴 Sin red | Falta: tests de contrato, auditoría endpoints, error trace, fallbacks P0 |
 
-**Foco: commit + push → deploy con checklist (DEPLOY.md) → Carril D inmediato post-deploy → Carril B**.
+**Foco: validar estabilidad post-deploy (2026-04-17) → Carril D (confiabilidad) → Carril B (deuda)**.
 
 ---
 
@@ -69,9 +70,9 @@
 
 </details>
 
-**QW4 — LINT LIMPIO ✅** (2026-04-16): 0 errors, 0 warnings. 1321 tests. Build OK. **Listo para push.**
+**QW4 — LINT LIMPIO + DEPLOY ✅** (2026-04-16): 0 errors, 0 warnings. 1321 tests. Build OK. **Push y deploy completados (FE+BE). Pendiente validar estabilidad 2026-04-17.**
 
-**Próximo paso — PUSH a producción (QW4.6) → Carril D (confiabilidad) → Carril B (deuda)**:
+**Próximo paso — Validar estabilidad (2026-04-17) → Carril D (confiabilidad) → Carril B (deuda)**:
 
 **Carril D — Confiabilidad sistémica (post-push, antes de Carril B)**:
 
@@ -303,11 +304,12 @@ CARRIL C — DIFERIDO
   - [x] `no-empty-lifecycle-method` (1) — eliminado `ngOnInit` vacío + imports
   - [x] `layer-enforcement/imports-warn` (2) — eslint-disable con justificación (pendiente mover a @intranet-shared)
 
-- [ ] **QW4.6 — Verificación final y PUSH**
+- [x] **QW4.6 — Verificación final y PUSH** ✅ (2026-04-16)
   - [x] `npm run lint` → 0 errors, 0 warnings ✅
   - [x] `npm test` → 1321 tests, 0 fallos ✅
   - [x] `npm run build` → build OK ✅
-  - [ ] `git push origin main` **← PRÓXIMO (requiere commit primero)**
+  - [x] Push FE (main) + BE (master) → deploy completado (Netlify + Azure) ✅
+  - [ ] Validar estabilidad en producción (2026-04-17)
 
 ---
 
@@ -592,6 +594,32 @@ CARRIL C — DIFERIDO
 - [ ] **H1** — Bug interceptor PascalCase + H8/H9 módulos incompletos y versiones (P0, 1 chat)
 - [ ] **H7** — Normalizar naming `WAL_CACHE_MAP` (P1, 1 chat)
 - [ ] **H2-H6, H10** — Fixes cosméticos y duplicación de patrones (P2, 1 chat)
+
+---
+
+## Design System — Estándar desde `usuarios` (standalone, 2-3 chats)
+
+> **Origen**: Conversación 2026-04-17. Tras cerrar parches de transparencia (tablas, paginadores, stat-cards, wrappers), se eleva `/intranet/admin/usuarios` como referencia canónica de diseño. Detalle en `tasks/design-system-from-usuarios.md`.
+> **Sin prerrequisitos · Ejecutable ahora**
+
+- [ ] **F1 — Globales sin polémica + decisión A1** (chat 1)
+  - [ ] Confirmar opción para neutralización de `p-tag` (A global / B opt-in / C semántica)
+  - [ ] Reset de inputs/selects en `styles.scss` (transparente, foco text-color)
+  - [ ] Override global de `p-button-text` y `p-button-outlined` (text-color + surface-300)
+  - [ ] Utility class `.label-uppercase` en `styles.scss`
+  - [ ] Actualizar `rules/table-transparency.md` (o renombrar a `design-system.md`)
+
+- [ ] **F2 — Aplicar decisión sobre `p-tag`** (chat 2, depende de F1.0)
+  - [ ] Ejecutar según opción elegida (A/B/C)
+  - [ ] Verificación visual: usuarios, error-logs, feedback-reports, asistencia, aprobación
+
+- [ ] **F3 — `rules/design-system.md` con pautas B1-B11** (chat 3)
+  - [ ] Containers con border no background, page header, stat card, tabla, row actions triplet, filter bar, botones canónicos, dialogs, alert banners con `color-mix()`, drawer detalle, dev banners
+  - [ ] Cross-refs desde CLAUDE.md y `rules/primeng.md`
+
+- [ ] **F4 — (Opcional, diferible) Migración de tokens hardcoded** (`#e24c4c`, `#dc2626`, `#1e40af`, `color: white` inline)
+
+- [ ] **F5 — (Opcional, diferible) Migración de páginas existentes al estándar** (1 página por chat)
 
 ---
 
