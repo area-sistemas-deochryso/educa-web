@@ -21,7 +21,7 @@
 | 9 | Design Patterns Frontend | FE | `tasks/design-patterns-frontend.md` (pendiente crear) | Incremental | N/A |
 | 10 | Flujos Alternos (resiliencia) | FE | `plan/flujos-alternos.md` (pendiente crear) | ⏳ (bloqueado) | 0% |
 | 11 | Refactor `eslint.config.js` (fix G10) | FE | `plan/eslint-config-refactor.md` | ✅ F1-F5 (F5.3 cerrado 2026-04-17 con guard spec) | 100% |
-| 12 | Backend Test Gaps | BE | `Educa.API/.claude/plan/test-backend-gaps.md` | F1.A ✅ · F1.B 🔄 (1/3: Asistencia ✅) · F1.C ⏳ · F2-F5 ⏳ | ~15% |
+| 12 | Backend Test Gaps | BE | `Educa.API/.claude/plan/test-backend-gaps.md` | F1.A ✅ · F1.B 🔄 (2/3: Asistencia ✅ · Aprobación ✅) · F1.C ⏳ · F2-F5 ⏳ | ~20% |
 | 13 | Frontend Test Gaps | FE | `plan/test-frontend-gaps.md` (pendiente crear) | ⏳ | 0% |
 | 14 | Contratos FE-BE | FE+BE | `plan/contratos-fe-be.md` (pendiente crear) | ⏳ | 0% |
 | 15 | Release Protocol y Operaciones | FE+BE | `plan/release-operations.md` (pendiente crear) | F1 ✅ · F2 ✅ · F3-F5 ⏳ | ~40% |
@@ -76,13 +76,13 @@
 
 > **Principio de orden**: cerrar primero lo empezado, luego abrir frentes independientes, consolidar auditoría de seguridad antes de tests de seguridad, contratos + observabilidad antes de fallbacks, E2E al final como verificación cross-layer. Cada ola tiene un **gate explícito**: no se abre la siguiente sin cerrar la anterior.
 
-**Ya cerrado en Carril D** ✅: Plan 15 F1, Plan 15 F2 (health endpoint), Plan 16 F1 (auditoría endpoints), Plan 12 F1.A (infra + Auth), Plan 12 F1.B.1 (Asistencia controller tests).
+**Ya cerrado en Carril D** ✅: Plan 15 F1, Plan 15 F2 (health endpoint), Plan 16 F1 (auditoría endpoints), Plan 12 F1.A (infra + Auth), Plan 12 F1.B.1 (Asistencia controller tests), Plan 12 F1.B.2 (Aprobación controller tests).
 
 ---
 
 **Ola 1 — Terminar Plan 12 F1 (cerrar lo iniciado)** — 2 chats, BE
 
-1. **Plan 12 F1.B.2** — `AprobacionEstudianteControllerTests` (Director-only, delegación a `BatchCommandExecutor`)
+1. ~~**Plan 12 F1.B.2** — `AprobacionEstudianteControllerTests`~~ ✅ (2026-04-18) — 4 tests: guard manual `GetEntityId`, default año Perú, mapeo tupla (exito, mensaje) → Ok/BadRequest. `AprobarMasivo` y consultas descartados (delegación pura → F1.C). Suite 756/756.
 2. **Plan 12 F1.B.3** — Evaluar `ConsultaAsistenciaControllerTests` (filtros por rol). Si es delegación pura → saltar y documentar en F1.C
 3. **Plan 12 F1.C** — Documentar regla "no testear delegación pura" en `Educa.API.Tests/Controllers/README.md`
 
@@ -447,9 +447,9 @@ CARRIL C — DIFERIDO
     - [x] Plan base creado: `Educa.API/.claude/plan/test-backend-gaps.md`
     - [x] Suite completa: 747/747 tests verdes (+6 desde 741)
 
-  - [ ] **F1.B — Controllers con lógica propia de capa controller** (1 chat c/u, BE) 🔄 1/3
+  - [ ] **F1.B — Controllers con lógica propia de capa controller** (1 chat c/u, BE) 🔄 2/3
     - [x] `AsistenciaControllerTests` ✅ (2026-04-17) — 5 tests: guard payload vacío (`ASISTENCIA_PAYLOAD_INVALIDO`), verificación firma CrossChex via FixedTimeEquals (sin header, firma incorrecta → `ASISTENCIA_FIRMA_INVALIDA`), fan-out SignalR al grupo `sede_{id}` con/sin `SignalRPayload`. Suite 752/752.
-    - [ ] `AprobacionEstudianteControllerTests` — rol Director únicamente, delegación al `BatchCommandExecutor` con args correctos (~3 tests)
+    - [x] `AprobacionEstudianteControllerTests` ✅ (2026-04-18) — 4 tests: guard manual `User.GetEntityId() == 0 → Unauthorized(ApiResponse.Fail(...))` (no usa RequireProfesorId), default `anio=0 → PeruNow().Year`, mapeo tupla (exito, mensaje) del service a `Ok`/`BadRequest` con `UsuarioActual` como auditoría. `AprobarMasivo` y listados descartados (delegación pura, caen en F1.C). Suite 756/756.
     - [ ] `ConsultaAsistenciaControllerTests` — evaluar si aplica: filtros por rol (profesor ve solo sus salones, apoderado solo sus hijos)
 
   - [ ] **F1.C — Controllers de delegación pura: descartar tests artesanales**
