@@ -29,7 +29,7 @@
 | 17 | Enforcement max-lines BE (CI) | BE | (inline en maestro) | ⏳ | 0% |
 | 18 | Tests de flujo de negocio E2E | BE+FE | (inline en maestro) | ⏳ | 0% |
 | 19 | Comunicación: foro + mensajería + push | FE+BE | (pendiente planificar) | ⏳ | 0% |
-| 20 | Design System — Estándar desde `usuarios` | FE | `tasks/design-system-from-usuarios.md` | F1 ✅ · F2 ✅ (F2.1-F2.5) · F3 ✅ · F4 ✅ · F5 ⏳ | ~95% |
+| 20 | Design System — Estándar desde `usuarios` | FE | `tasks/design-system-from-usuarios.md` | F1 ✅ · F2 ✅ (F2.1-F2.5) · F3 ✅ · F4 ✅ · F5.1-F5.2 ✅ · F5.3 ⏳ (0/8) | ~96% |
 
 **Semáforo de readiness**:
 
@@ -72,21 +72,85 @@
 
 **QW4 — LINT LIMPIO + DEPLOY ✅** (2026-04-16): 0 errors, 0 warnings. 1321 tests. Build OK. **Push y deploy completados (FE+BE). 2026-04-17 sin incidentes reportados.**
 
-**Próximo paso — Carril D (confiabilidad) + Design System F2.2-F2.5 en paralelo → Carril B (deuda)**:
+**Próximo paso — Cierre de Carril D en 6 olas + Design System F5.3 en paralelo → Carril B (deuda)**:
 
-**Carril D — Confiabilidad sistémica (post-push, antes de Carril B)**:
+> **Principio de orden**: cerrar primero lo empezado, luego abrir frentes independientes, consolidar auditoría de seguridad antes de tests de seguridad, contratos + observabilidad antes de fallbacks, E2E al final como verificación cross-layer. Cada ola tiene un **gate explícito**: no se abre la siguiente sin cerrar la anterior.
 
-1. **Plan 15 F1** — Checklist de deploy + smoke checks + rollback protocol (proceso, 1 chat) ✅
-2. **Plan 16 F1** — Auditoría de endpoints y autorización (1 chat) ✅ (2026-04-17)
-3. **Plan 12 F1** — Controller contract tests por patrones: infra+Auth ejemplar → controllers con lógica de capa controller (Asistencia, Aprobación). Descarta tests artesanales de delegación pura (3-4 chats)
-4. **Plan 13 F1** — Interceptores core sin cobertura (1 chat)
-5. **Plan 12 F3** — Security boundary tests (1-2 chats)
-6. **Plan 14 F1-F2** — Snapshots de DTOs (mínimo viable de contratos, 1-2 chats)
-7. ~~**Plan 15 F2**~~ ✅ — Health check endpoint `GET /api/health` (2026-04-17)
-8. **Plan 7 F1-F2** — Error Trace Backend: observabilidad mínima en producción (1-2 chats)
-9. **Plan 10 P0** — Fallbacks críticos: offline, auth failure, API down (1 chat)
-10. **Plan 17** — Enforcement max-lines .cs en CI (1 chat, BE)
-11. **Plan 18** — Tests de flujo de negocio E2E: asistencia, calificaciones, aprobación cross-layer (2-3 chats, tras Plan 12+13)
+**Ya cerrado en Carril D** ✅: Plan 15 F1, Plan 15 F2 (health endpoint), Plan 16 F1 (auditoría endpoints), Plan 12 F1.A (infra + Auth), Plan 12 F1.B.1 (Asistencia controller tests).
+
+---
+
+**Ola 1 — Terminar Plan 12 F1 (cerrar lo iniciado)** — 2 chats, BE
+
+1. **Plan 12 F1.B.2** — `AprobacionEstudianteControllerTests` (Director-only, delegación a `BatchCommandExecutor`)
+2. **Plan 12 F1.B.3** — Evaluar `ConsultaAsistenciaControllerTests` (filtros por rol). Si es delegación pura → saltar y documentar en F1.C
+3. **Plan 12 F1.C** — Documentar regla "no testear delegación pura" en `Educa.API.Tests/Controllers/README.md`
+
+*Gate Ola 1*: Plan 12 F1 al 100% · infraestructura de controller tests documentada y replicable.
+
+---
+
+**Ola 2 — Frentes independientes de bajo riesgo** — 3 chats
+
+1. **Plan 13 F1** — Interceptores core FE (api-response, clock-sync, sw-cache-invalidation, request-trace) — 1 chat
+2. **Plan 17** — Script + CI gate `max-lines 300` para .cs (previene regresión cuando Plan 2/C cierre) — 1 chat, BE
+3. **Plan 15 F3** — Queries SQL de consistencia post-deploy (estudiantes huérfanos, salones duplicados, horarios con profesor inactivo) — 1 chat
+
+*Gate Ola 2*: cobertura mínima FE de interceptores · enforcement estructural BE activo · script de validación de datos disponible.
+
+---
+
+**Ola 3 — Cierre de auditoría de seguridad (Plan 16 completo)** — 4 chats, BE
+
+1. **Plan 16 F2** — Secretos: grep de patrones + verificación `.gitignore` + `DniHelper.Mask()` en puntos de salida
+2. **Plan 16 F3** — Headers y CORS
+3. **Plan 16 F4** — Sesión y tokens (cookies, refresh, CSRF)
+4. **Plan 16 F5** — Datos sensibles en respuestas (DTOs + enmascaramiento)
+
+*Gate Ola 3*: Plan 16 cerrado · matriz de endpoints + superficie de seguridad completa · desbloquea Plan 12 F3 con contexto sólido.
+
+---
+
+**Ola 4 — Contratos + observabilidad mínima** — 3-4 chats
+
+1. **Plan 14 F1** — Snapshot de DTOs backend (reflection → `dtos.snapshot.json`) — 1 chat, BE
+2. **Plan 14 F2** — Test frontend que compara interfaces TS vs snapshot — 1 chat, FE
+3. **Plan 7 F1** — Auditar `GlobalExceptionMiddleware` + verificar CorrelationId + contexto de `ErrorLog` — 1 chat, BE
+4. **Plan 7 F2** — Verificar consumo `error-logs` admin + correlación `ReporteUsuario` → `ErrorLog` — 1 chat, FE+BE
+
+*Gate Ola 4*: contratos FE-BE congelados (cualquier drift futuro rompe CI) · error trace verificable en producción.
+
+---
+
+**Ola 5 — Fallbacks P0 + tests de seguridad (consume olas 3+4)** — 4-5 chats
+
+1. **Plan 10 P0.1** — API down / timeout: mensaje claro + retry UI — 1 chat, FE
+2. **Plan 10 P0.2** — Auth token expirado / refresh falla: redirect limpio a login — 1 chat, FE
+3. **Plan 10 P0.3** — Offline + WAL sync failure persistente — 1 chat, FE
+4. **Plan 12 F3** — Security boundary tests (cross-role, tokens expirados, idempotencia, cuenta inactiva) — 1-2 chats, BE
+
+*Gate Ola 5*: red de fallbacks críticos desplegada · tests de boundary protegen los invariantes de seguridad identificados en Ola 3.
+
+---
+
+**Ola 6 — E2E cross-layer (verificación final del carril)** — 3 chats
+
+1. **Plan 18 F1** — Flujo asistencia: webhook CrossChex → estado → EmailOutbox → SignalR — 1 chat, BE
+2. **Plan 18 F2** — Flujo calificación → aprobación → progresión — 1 chat, BE
+3. **Plan 18 F3** — Flujo login → permisos → navegación + refresh transparente — 1 chat, FE
+
+*Gate Ola 6*: **Carril D CERRADO** → abrir Carril B.
+
+---
+
+**Diferidos dentro de Carril D** (documentación, no chat-sized):
+
+- Plan 15 F4 — Patrón de feature flags como safety net (docs, al toque de Ola 5)
+- Plan 15 F5 — Monitoreo básico (evaluar RequestMetricsMiddleware y decidir gaps, al toque de Ola 4)
+
+**Estimado total para cerrar Carril D**: ~19-21 chats.
+
+---
 
 **Carril B — Deuda técnica (cuando Carril D tenga base sólida)**:
 
@@ -654,7 +718,17 @@ CARRIL C — DIFERIDO
 
 - [x] **F4 — Migración de tokens hardcoded** ✅ (2026-04-17) — `#e24c4c → var(--red-500)`, `#dc2626 → var(--red-600)`, `#1e40af → var(--blue-800)` en ~30 archivos (admin, shared, cross-role, profesor, estudiante). Regla global A5 en `styles.scss`: `p-button-success` con `color: var(--white-color)` → eliminado `style="color: white"` inline en usuarios-header. Design-system.md: secciones 5 (A5) + 8 (D: Tokens de color con mapa canónico) agregadas, deuda C1/C3/C4 resuelta, B7/B8/B3 ejemplos actualizados. Excepciones justificadas documentadas (Sass color functions, Canvas API, avatar palettes). Build OK.
 
-- [ ] **F5 — (Opcional, diferible) Migración de páginas existentes al estándar** (1 página por chat)
+- [x] **F5.1-F5.2 — Auditoría + priorización de páginas admin** ✅ (2026-04-18) — 14 páginas admin inspeccionadas contra B1/B2/B3/B6. Backlog de 8 migraciones priorizado en `tasks/design-system-from-usuarios.md § F5`. Divergencias principales: 4 páginas sin `<app-page-header>` (feedback-reports, attendances, email-outbox, campus), 1 página con `bg: #fff` literal (email-outbox L57), ~8 componentes con residuo anti-B1 (`bg: surface-card` + `box-shadow`). Subcomponentes con shadows decorativos legítimos (drag & drop, canvas) marcados como excepción.
+
+- [ ] **F5.3 — Migración 1 página por chat** (8 chats, en orden de backlog F5.2)
+  - [ ] F5.3.1 `feedback-reports` (falta app-page-header)
+  - [ ] F5.3.2 `attendances` (falta app-page-header)
+  - [ ] F5.3.3 `email-outbox` (falta app-page-header + `bg: #fff`)
+  - [ ] F5.3.4 `vistas` (remover `bg: surface-card` + shadow de stat-card)
+  - [ ] F5.3.5 `cursos` (remover shadow de filters-bar)
+  - [ ] F5.3.6 Stats residuales (permisos-roles, permisos-stats-cards, usuarios-stats)
+  - [ ] F5.3.7 `horarios/schedules` root shadows
+  - [ ] F5.3.8 `campus` (header solo; documentar canvas como excepción)
 
 ---
 

@@ -221,9 +221,63 @@ Si se neutraliza globalmente, esas páginas pierden el color-coding visual (la s
 
 ### F5 — (Opcional, diferible) Migración de páginas existentes al estándar
 
-- [ ] F5.1 Auditar páginas admin que NO siguen el estándar (identificar con grep de patrones divergentes)
-- [ ] F5.2 Priorizar por visibilidad (error-logs, feedback-reports, attendances primero)
-- [ ] F5.3 Migrar 1 página por chat
+- [x] **F5.1 — Auditoría de páginas admin** ✅ (2026-04-18) — 14 páginas admin inspeccionadas con grep de patrones divergentes (anti-B1 `background: var(--surface-card)` + `box-shadow`, ausencia de `<app-page-header>`, tags hardcoded `#fff`/`#ffffff`).
+
+  **Resumen de divergencias detectadas**:
+
+  | Página | `<app-page-header>` | Anti-B1 (bg+shadow) | `bg: #fff` literal | Observación |
+  |--------|---------------------|---------------------|--------------------|-------------|
+  | **users** (canónica) | ✅ | ⚠️ `usuarios-stats` tiene `box-shadow: 0 1px 3px rgba(0,0,0,0.1)` | — | Referencia — el propio subcomponente stats tiene residuo que contradice B1 |
+  | error-logs | ✅ | ✅ ok | — | Cumple estándar |
+  | feedback-reports | ❌ **falta** | ✅ ok | — | Prioridad alta por visibilidad |
+  | attendances | ❌ **falta** | ✅ ok | — | Prioridad alta (admin usa frecuentemente) |
+  | email-outbox | ❌ **falta** | — | ⚠️ `.email-outbox.scss:57 background: #fff` | Monitoreo admin |
+  | feedback-reports / error-logs / attendances | mix | — | — | stats + filters en orden canónico |
+  | campus | ❌ **falta** | ⚠️ varios `box-shadow` | — | **Caso especial**: editor 3D/2D, layout imperativo con canvas — aplicar estándar solo al header/toolbar, no al canvas |
+  | vistas | ✅ | ⚠️ `.stat-card` con `bg: var(--surface-card)` + `box-shadow` | — | Stat-card tiene anatomía correcta pero viola B1 |
+  | cursos | ✅ | ⚠️ `box-shadow: 0 1px 3px` en `.filters-bar` | — | Filters-bar debería tener solo border |
+  | salones-admin (classrooms) | ✅ | ✅ ok | — | Cumple estándar |
+  | schedules (horarios) | ✅ | ⚠️ 3 `box-shadow` en root scss | — | Subcomponentes `curso-picker` y `weekly-view` tienen shadows decorativos legítimos (drag & drop, event cards) — no migrar |
+  | eventos-calendario | ✅ | ✅ ok | — | Cumple estándar |
+  | notificaciones-admin | ✅ | ✅ ok | — | Cumple estándar |
+  | permisos-roles | ✅ | ⚠️ `box-shadow: 0 1px 3px` | — | Probable `.filters-bar` o header |
+  | permisos-usuarios | ✅ | ⚠️ `permisos-stats-cards` tiene `box-shadow` | — | Subcomponente stats |
+  | permisos-edit-dialog | — | ⚠️ `box-shadow` | — | Dialog con shadow decorativo — posible legítimo (overlay panel), revisar |
+
+- [x] **F5.2 — Priorización para F5.3** ✅ (2026-04-18)
+
+  **Criterios**: (1) visibilidad/frecuencia de uso, (2) magnitud de divergencia, (3) esfuerzo acotado a 1 chat.
+
+  **Backlog ordenado**:
+
+  | Orden | Página | Alcance | Divergencias a resolver | Chat |
+  |-------|--------|---------|-------------------------|------|
+  | **1** | `feedback-reports` | 1 chat | Agregar `<app-page-header>` con refresh+exportar, verificar filter-bar canónica, row actions triplet si aplica | F5.3.1 |
+  | **2** | `attendances` | 1 chat | Agregar `<app-page-header>`, revisar stat-cards + filters-bar contra B2/B3/B6 | F5.3.2 |
+  | **3** | `email-outbox` | 1 chat | Agregar `<app-page-header>`, reemplazar `background: #fff` en `email-outbox.scss:57`, alinear stats card | F5.3.3 |
+  | **4** | `vistas` | 1 chat | Remover `background: var(--surface-card)` + `box-shadow` del stat-card (el global ya da transparencia, el box-shadow queda huérfano rompiendo B1) | F5.3.4 |
+  | **5** | `cursos` | 1 chat | Remover `box-shadow` de filters-bar (debería tener solo border B6) | F5.3.5 |
+  | **6** | `permisos-roles` + `permisos-stats-cards` + `usuarios-stats` | 1 chat | Remover `box-shadow: 0 1px 3px rgba(0,0,0,0.1)` residual en 3 componentes de stats (anti-B3) | F5.3.6 |
+  | **7** | `horarios/schedules` (root scss) | 1 chat | Revisar los 3 `box-shadow` del root scss — si son de wrappers, remover; si son de componentes internos legítimos, no tocar. **No tocar** subcomponentes `curso-picker` y `weekly-view` (shadows de drag & drop + event cards son legítimos). | F5.3.7 |
+  | **8** | `campus` | 1 chat | **Caso especial**: aplicar estándar solo al header + toolbar, dejar el canvas/editor 3D como excepción legítima (layout imperativo). Posible documentar excepción en design-system.md § "Excepciones legítimas". | F5.3.8 |
+
+  **Subcomponentes NO a migrar** (shadows decorativos legítimos, documentados como excepción):
+  - `horarios-curso-picker` — drag previews
+  - `horarios-weekly-view` — event cards con depth intencional
+  - `permisos-edit-dialog` — overlay panel
+  - `campus-editor` — canvas overlay
+
+  **Sin prisa operativa**: todas estas migraciones son cosméticas, no bloquean features ni confiabilidad. Se ejecutan 1 por chat conforme el proyecto lo requiera o al tocar cada página por otra razón (regla "cleanup gradual al tocar archivo").
+
+- [ ] **F5.3 — Migración** (1 chat por página del backlog F5.2, en orden)
+  - [ ] F5.3.1 `feedback-reports`
+  - [ ] F5.3.2 `attendances`
+  - [ ] F5.3.3 `email-outbox`
+  - [ ] F5.3.4 `vistas`
+  - [ ] F5.3.5 `cursos`
+  - [ ] F5.3.6 Stats residuales (`permisos-roles`, `permisos-stats-cards`, `usuarios-stats`)
+  - [ ] F5.3.7 `horarios/schedules` root
+  - [ ] F5.3.8 `campus` (header solo, documentar excepción canvas)
 
 ---
 
