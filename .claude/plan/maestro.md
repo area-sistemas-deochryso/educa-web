@@ -21,7 +21,7 @@
 | 9 | Design Patterns Frontend | FE | `tasks/design-patterns-frontend.md` (pendiente crear) | Incremental | N/A |
 | 10 | Flujos Alternos (resiliencia) | FE | `plan/flujos-alternos.md` (pendiente crear) | ⏳ (bloqueado) | 0% |
 | 11 | Refactor `eslint.config.js` (fix G10) | FE | `plan/eslint-config-refactor.md` | ✅ F1-F5 (F5.3 cerrado 2026-04-17 con guard spec) | 100% |
-| 12 | Backend Test Gaps | BE | `Educa.API/.claude/plan/test-backend-gaps.md` | F1.A ✅ · F1.B 🔄 (2/3: Asistencia ✅ · Aprobación ✅) · F1.C ⏳ · F2-F5 ⏳ | ~20% |
+| 12 | Backend Test Gaps | BE | `Educa.API/.claude/plan/test-backend-gaps.md` | F1 ✅ (A+B+C, 23 tests en 4 archivos) · F2-F5 ⏳ | ~30% |
 | 13 | Frontend Test Gaps | FE | `plan/test-frontend-gaps.md` (pendiente crear) | ⏳ | 0% |
 | 14 | Contratos FE-BE | FE+BE | `plan/contratos-fe-be.md` (pendiente crear) | ⏳ | 0% |
 | 15 | Release Protocol y Operaciones | FE+BE | `plan/release-operations.md` (pendiente crear) | F1 ✅ · F2 ✅ · F3-F5 ⏳ | ~40% |
@@ -76,17 +76,17 @@
 
 > **Principio de orden**: cerrar primero lo empezado, luego abrir frentes independientes, consolidar auditoría de seguridad antes de tests de seguridad, contratos + observabilidad antes de fallbacks, E2E al final como verificación cross-layer. Cada ola tiene un **gate explícito**: no se abre la siguiente sin cerrar la anterior.
 
-**Ya cerrado en Carril D** ✅: Plan 15 F1, Plan 15 F2 (health endpoint), Plan 16 F1 (auditoría endpoints), Plan 12 F1.A (infra + Auth), Plan 12 F1.B.1 (Asistencia controller tests), Plan 12 F1.B.2 (Aprobación controller tests).
+**Ya cerrado en Carril D** ✅: Plan 15 F1, Plan 15 F2 (health endpoint), Plan 16 F1 (auditoría endpoints), Plan 12 F1 completo (infra + Auth + Asistencia + Aprobación + ConsultaAsistencia + regla F1.C documentada). Suite BE: **764/764 tests verdes**.
 
 ---
 
-**Ola 1 — Terminar Plan 12 F1 (cerrar lo iniciado)** — 2 chats, BE
+**Ola 1 — Terminar Plan 12 F1 (cerrar lo iniciado)** ✅ CERRADA (2026-04-18)
 
 1. ~~**Plan 12 F1.B.2** — `AprobacionEstudianteControllerTests`~~ ✅ (2026-04-18) — 4 tests: guard manual `GetEntityId`, default año Perú, mapeo tupla (exito, mensaje) → Ok/BadRequest. `AprobarMasivo` y consultas descartados (delegación pura → F1.C). Suite 756/756.
-2. **Plan 12 F1.B.3** — Evaluar `ConsultaAsistenciaControllerTests` (filtros por rol). Si es delegación pura → saltar y documentar en F1.C
-3. **Plan 12 F1.C** — Documentar regla "no testear delegación pura" en `Educa.API.Tests/Controllers/README.md`
+2. ~~**Plan 12 F1.B.3** — `ConsultaAsistenciaControllerTests`~~ ✅ (2026-04-18) — 8 tests: ownership apoderado→hijo (`Forbid()`), guard `sedeId=0 → UnauthorizedException`, fallback `GetEmail() ?? UsuarioActual`, mensaje según `Quitar`, mapeo bool→BusinessRuleException, validaciones inline de rangos de fecha en PDF período. `WithEmail` agregado a `ClaimsPrincipalBuilder`. Suite 764/764.
+3. ~~**Plan 12 F1.C**~~ ✅ (2026-04-18) — Regla "no testear delegación pura" documentada en `Educa.API.Tests/Controllers/README.md` con definición operativa (4 criterios), ejemplos positivos (F1.B) y negativos (controllers pass-through enteros). Cierra la preocupación de "¿por qué no hay tests de UsuariosController?" sin escribirlos.
 
-*Gate Ola 1*: Plan 12 F1 al 100% · infraestructura de controller tests documentada y replicable.
+*Gate Ola 1*: ✅ Plan 12 F1 al 100% · infraestructura de controller tests documentada y replicable · 23 tests en 4 archivos de controller (Auth 6 + Asistencia 5 + Aprobación 4 + ConsultaAsistencia 8).
 
 ---
 
@@ -425,7 +425,7 @@ CARRIL C — DIFERIDO
 
 #### Plan 12 — Backend Test Gaps
 
-- [ ] **F1 — Controller contract tests por patrones** (3-4 chats, BE)
+- [x] **F1 — Controller contract tests por patrones** ✅ (2026-04-18, 4 chats, BE)
 
   > **Principio rector**: el controller test verifica lo que pertenece a la capa controller — claims extraction, cookies, autorización, routing, status codes propios del controller. **No** se re-testea lo que ya cubre el service a nivel unitario (validaciones de negocio, cálculos, excepciones tipadas). Esto evita duplicación, reduce mantenimiento y mantiene cada test con ROI claro.
   >
@@ -447,16 +447,16 @@ CARRIL C — DIFERIDO
     - [x] Plan base creado: `Educa.API/.claude/plan/test-backend-gaps.md`
     - [x] Suite completa: 747/747 tests verdes (+6 desde 741)
 
-  - [ ] **F1.B — Controllers con lógica propia de capa controller** (1 chat c/u, BE) 🔄 2/3
+  - [x] **F1.B — Controllers con lógica propia de capa controller** ✅ 3/3 (1 chat c/u, BE)
     - [x] `AsistenciaControllerTests` ✅ (2026-04-17) — 5 tests: guard payload vacío (`ASISTENCIA_PAYLOAD_INVALIDO`), verificación firma CrossChex via FixedTimeEquals (sin header, firma incorrecta → `ASISTENCIA_FIRMA_INVALIDA`), fan-out SignalR al grupo `sede_{id}` con/sin `SignalRPayload`. Suite 752/752.
     - [x] `AprobacionEstudianteControllerTests` ✅ (2026-04-18) — 4 tests: guard manual `User.GetEntityId() == 0 → Unauthorized(ApiResponse.Fail(...))` (no usa RequireProfesorId), default `anio=0 → PeruNow().Year`, mapeo tupla (exito, mensaje) del service a `Ok`/`BadRequest` con `UsuarioActual` como auditoría. `AprobarMasivo` y listados descartados (delegación pura, caen en F1.C). Suite 756/756.
-    - [ ] `ConsultaAsistenciaControllerTests` — evaluar si aplica: filtros por rol (profesor ve solo sus salones, apoderado solo sus hijos)
+    - [x] `ConsultaAsistenciaControllerTests` ✅ (2026-04-18) — 8 tests: ownership apoderado→hijo (`Forbid()`), guard `sedeId=0 → UnauthorizedException("ASISTENCIA_SEDE_NOT_FOUND")`, fallback `GetEmail() ?? UsuarioActual`, mensaje dinámico según `request.Quitar`, mapeo `service=false → BusinessRuleException("ASISTENCIA_JUSTIFICACION_ERROR")`, 2 validaciones inline de rangos en `DescargarPdfAsistenciaPeriodo` (`anio<2026 → 400`, `inicio>fin → 400`). `WithEmail` agregado a `ClaimsPrincipalBuilder`. Los ~12 endpoints restantes (profesor/salones, director/grado, director/reporte, estudiante/mis, etc.) cayeron en F1.C. Suite 764/764.
 
-  - [ ] **F1.C — Controllers de delegación pura: descartar tests artesanales**
-    - [ ] Regla: si un controller es pass-through al service sin claims/cookies/autorización compleja, **no se testea a nivel controller**. El service ya está cubierto y el middleware maneja excepciones tipadas.
-    - [ ] Excepción: si un endpoint tiene claim-handling no trivial o manipula cookies, agregar test puntual al controller test existente.
-    - [ ] Controllers típicamente en esta categoría: Usuarios, Horarios, Calificaciones, Permisos, Cursos, Salones, Eventos, Notificaciones, etc.
-    - [ ] Documentar esta regla en el README de F1.A para evitar sobre-testing futuro.
+  - [x] **F1.C — Controllers de delegación pura: descartar tests artesanales** ✅ (2026-04-18)
+    - [x] Regla documentada en `Educa.API.Tests/Controllers/README.md` sección "Regla: no testear delegación pura" con definición operativa (4 criterios que debe cumplir TODO el endpoint).
+    - [x] Ejemplos positivos (F1.B) y negativos (controllers pass-through enteros) en el README.
+    - [x] Lista de controllers enteramente en esta categoría: Cursos, Salones, EventosCalendario, Notificaciones, Calificacion (listados), Vistas, Horario, mayoría de Usuarios/Administracion/PermisosUsuario/Campus, ReportesUsuario, sub-dominios completos Comunicacion/Integraciones/Videoconferencias/Sistema.
+    - [x] Excepción documentada: si algunos endpoints tienen lógica propia, se crea `<Controller>Tests.cs` SOLO con esos. El resto queda intencionalmente sin tests (ejemplo: `ConsultaAsistenciaController` solo cubre 3 de ~15 endpoints).
 
 - [ ] **F2 — Repository integration tests** (2-3 chats, BE)
   - [ ] F2.P0 Asistencia + EstudianteSalon + ProfesorSalon
