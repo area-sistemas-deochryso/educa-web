@@ -21,7 +21,7 @@
 | 9 | Design Patterns Frontend | FE | `tasks/design-patterns-frontend.md` (pendiente crear) | Incremental | N/A |
 | 10 | Flujos Alternos (resiliencia) | FE | `plan/flujos-alternos.md` (pendiente crear) | ⏳ (bloqueado) | 0% |
 | 11 | Refactor `eslint.config.js` (fix G10) | FE | `plan/eslint-config-refactor.md` | ✅ F1-F5 (F5.3 cerrado 2026-04-17 con guard spec) | 100% |
-| 12 | Backend Test Gaps | BE | `Educa.API/.claude/plan/test-backend-gaps.md` | F1.A ✅ · F1.B-F1.C ⏳ · F2-F5 ⏳ | ~10% |
+| 12 | Backend Test Gaps | BE | `Educa.API/.claude/plan/test-backend-gaps.md` | F1.A ✅ · F1.B 🔄 (1/3: Asistencia ✅) · F1.C ⏳ · F2-F5 ⏳ | ~15% |
 | 13 | Frontend Test Gaps | FE | `plan/test-frontend-gaps.md` (pendiente crear) | ⏳ | 0% |
 | 14 | Contratos FE-BE | FE+BE | `plan/contratos-fe-be.md` (pendiente crear) | ⏳ | 0% |
 | 15 | Release Protocol y Operaciones | FE+BE | `plan/release-operations.md` (pendiente crear) | F1 ✅ · F2 ✅ · F3-F5 ⏳ | ~40% |
@@ -383,8 +383,8 @@ CARRIL C — DIFERIDO
     - [x] Plan base creado: `Educa.API/.claude/plan/test-backend-gaps.md`
     - [x] Suite completa: 747/747 tests verdes (+6 desde 741)
 
-  - [ ] **F1.B — Controllers con lógica propia de capa controller** (1 chat c/u, BE)
-    - [ ] `AsistenciaControllerTests` — webhook `[AllowAnonymous]` + admin `[Authorize(Roles="Director")]` + preservación de `ASI_OrigenManual` en respuestas (~4 tests)
+  - [ ] **F1.B — Controllers con lógica propia de capa controller** (1 chat c/u, BE) 🔄 1/3
+    - [x] `AsistenciaControllerTests` ✅ (2026-04-17) — 5 tests: guard payload vacío (`ASISTENCIA_PAYLOAD_INVALIDO`), verificación firma CrossChex via FixedTimeEquals (sin header, firma incorrecta → `ASISTENCIA_FIRMA_INVALIDA`), fan-out SignalR al grupo `sede_{id}` con/sin `SignalRPayload`. Suite 752/752.
     - [ ] `AprobacionEstudianteControllerTests` — rol Director únicamente, delegación al `BatchCommandExecutor` con args correctos (~3 tests)
     - [ ] `ConsultaAsistenciaControllerTests` — evaluar si aplica: filtros por rol (profesor ve solo sus salones, apoderado solo sus hijos)
 
