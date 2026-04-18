@@ -144,20 +144,18 @@ export class VideoconferenciaSalaComponent implements OnInit, OnDestroy {
 	// #endregion
 
 	// #region Jitsi integration
-	/** Obtiene JWT del backend antes de cargar el script de JaaS */
+	/** Obtiene JWT + appId del backend antes de cargar el script de JaaS */
 	private fetchTokenAndLoad(): void {
-		const appId = this.facade.jaasAppId;
-		if (!appId) {
-			this.errorMsg.set('Servicio de videoconferencia no configurado');
-			this.connecting.set(false);
-			return;
-		}
-
 		this.connectingStep.set('auth');
 		this.facade.getJaaSToken(this.roomName()).subscribe({
 			next: (response) => {
+				if (!response.appId) {
+					this.errorMsg.set('Servicio de videoconferencia no configurado');
+					this.connecting.set(false);
+					return;
+				}
 				this.connectingStep.set('script');
-				this.loadJitsiScript(appId, response.jwt);
+				this.loadJitsiScript(response.appId, response.jwt);
 			},
 			error: () => {
 				this.errorMsg.set('No se pudo obtener acceso a la sala');

@@ -16,6 +16,7 @@ import { VideoconferenciaItem } from './videoconferencias.models';
 
 interface JaaSTokenResponse {
 	jwt: string;
+	appId: string;
 }
 
 interface HorarioDto {
@@ -45,7 +46,6 @@ export class VideoconferenciasFacade {
 	// #region Estado expuesto
 	readonly vm = this.store.vm;
 	readonly displayName = this.userProfile.displayName;
-	readonly jaasAppId = environment.jitsi.appId;
 
 	readonly isModerator = computed(() => canModerateVideoconference(this.userProfile.userRole()));
 	// #endregion

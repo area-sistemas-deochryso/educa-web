@@ -27,11 +27,6 @@ export const environment = {
 		feedbackReport: true,
 	},
 
-	// JaaS (Jitsi as a Service)
-	jitsi: {
-		appId: '',
-	},
-
 	// Debug panels
 	debug: {
 		horarioSync: false,

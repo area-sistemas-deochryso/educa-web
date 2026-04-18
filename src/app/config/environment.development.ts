@@ -28,11 +28,6 @@ export const environment = {
 		feedbackReport: true,
 	},
 
-	// JaaS (Jitsi as a Service)
-	jitsi: {
-		appId: 'vpaas-magic-cookie-ab31757bc7ba406d965de2c757d33c01',
-	},
-
 	// Debug panels (solo development)
 	debug: {
 		horarioSync: true,
