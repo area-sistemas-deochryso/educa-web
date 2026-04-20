@@ -32,6 +32,7 @@
 | 20 | Design System — Estándar desde `usuarios` | FE | `tasks/design-system-from-usuarios.md` | F1 ✅ · F2 ✅ (F2.1-F2.5) · F3 ✅ · F4 ✅ · F5.1-F5.2 ✅ · F5.3 ⏳ (0/8) | ~96% |
 | **21** | **🟡 Asistencia de Profesores en CrossChex** | **BE+FE** | **`plan/asistencia-profesores.md`** | **✅ Chat 1 + Chat 1.5 + Chat 2 + Chat 3 + Chat 4 + Chat 6 cerrados (2026-04-20) · Chat 6 (armonización UX "Mi asistencia"): vista profesor "Mi asistencia" reescrita como **copia estructural** de `AttendanceEstudianteComponent` — mismo calendario mensual (2 `<app-attendance-table>` ingresos+salidas) + `<app-attendance-legend />` + `<app-empty-state>`. Consume `/profesor/me/mes` (ya existente, Chat 4) y procesa con `AttendanceDataService.processAsistencias` usando el `nombreCompleto` del response. Eliminados store/facade/scss custom (diseño innecesariamente diferente del original). El pill día/mes se **oculta automáticamente** cuando la tab "Mi asistencia" está activa (output `showModeSelectorChange` del shell → computed en padre), coherente con estudiante/apoderado que tampoco tienen pill en su vista propia; **reaparece** al cambiar a "Mis estudiantes". **Decisión arquitectónica**: cuando dos vistas tienen el mismo propósito ("ver mi propia asistencia"), usan los mismos componentes compartidos — no diseño aparte. Backend: 766 verdes (sin cambios). Frontend: 1341 verdes, lint + tsc + build limpios. **Chat 7 nuevo (pendiente)**: armonizar vista admin "Profesores" con admin "Estudiantes" (hoy filtros+rango+tabla-resumen, debe ser leyenda+stat-cards+pill día/mes+day-list/table-mes). Requiere endpoint backend nuevo + generalizar `AttendanceDayListComponent`. **Deuda técnica lateral** (chats futuros): `PermisoSaludAuthorizationHelper.cs:63` anti-pattern `DIR_DNI == dni`; `ErrorLog` en prueba le faltan 3 columnas. Deploy pendiente: `plan21_chat15_FkRepointAsistenciaPersona.sql` (Chat 5)** | **~85%** |
 | 22 | Endurecimiento correos de asistencia | BE+FE | `Educa.API/.claude/plan/asistencia-correos-endurecimiento.md` | 🔒 Bloqueado por Plan 21 cerrado · Diseño cerrado 2026-04-20: validación ASCII+RFC al encolar (F1), clasificación SMTP + retry 0/1 según causa (F2), notificación triple outbox+ErrorLog+correo resumen diario (F3), auditoría retroactiva de correos mal formados en BD (F4) | 0% |
+| **23** | **🟡 Extensión `/intranet/admin/asistencias` a Profesores** | **BE+FE** | **`plan/asistencia-admin-profesores.md`** | **✅ Chat 1 + Chat 2 cerrados (2026-04-20). Chat 1 BE: parametrizado por `tipoPersona`, DTOs ampliados, rutas `/personas` (nueva) + `/estudiantes` (alias), `POST /sync` devuelve `SincronizarResultadoDto` estructurado, repo dividido en partials (300-línea cap), 12 tests nuevos, BE 781 verdes. **Chat 2 FE (tab Gestión)**: signal `tipoPersonaFilter` (default `'E'` retrocompat) en `AttendancesAdminStore`; `p-selectButton` de 3 opciones en el header + badge "Filtro activo · Cambiar"; `AttendancesDataFacade` convierte `'todos'` → `null` antes de enviar al service (stats siempre globales con desglose E/P); columna "Grado" → "Contexto" muestra `contextoPersona` polimórfico; badge `tag-neutral` "Estudiante"/"Profesor" junto al nombre; sub-label "de los cuales N son profesores" en card Total cuando filtro=Todos; formulario "Nueva asistencia" con `p-selectButton` Estudiante/Profesor que recarga `listarPersonas` al cambiar; sync con `p-confirmDialog` previo + label "Sincronizar CrossChex · DD/MM/YYYY" + toast estructurado consumiendo `SincronizarResultado` ("Fecha X: N_E estudiantes + N_P profesores importados, K preservados"); query param `?tipoPersona=E\|P\|todos` leído al mount (cross-link del Chat 5). Tests: 19 specs nuevos (8 store + 11 data facade). Suite FE: 1374 verdes (baseline 1341, +33 nuevos). Lint + tsc + build limpios. Chats 3-5 pendientes: FE+BE Reportes · INV-AD05/06 · deploy.** | **40%** |
 
 **Semáforo de readiness**:
 
@@ -66,6 +67,47 @@
 - [x] `Firebase__CredentialsJson` configurada con JSON válido (verificado 2026-04-18)
 - [x] `JaaS__AppId` configurada con `vpaas-magic-cookie-ab31757bc7ba406d965de2c757d33c01` (verificado 2026-04-18)
 - [ ] `ASPNETCORE_ENVIRONMENT=Production` aplicada explícitamente (creada en sesión, confirmar que el "Aplicar" final quedó guardado)
+
+### Pre-push — estandarizar idioma de commits pendientes a inglés
+
+> **Origen**: Decisión 2026-04-20. A partir de ahora los mensajes de commit se redactan en inglés (ver skills `commit-back.md`, `commit-front.md`, `commit-local.md`). Los commits **ya pusheados** quedan como están — esto aplica solo a lo que aún no se ha subido.
+
+**Regla**: type/scope/descripción en inglés. Nombres propios del dominio en español van **entre comillas** (ej: `"Mi asistencia"`, `"AsistenciaPersona"`). Scopes de Conventional Commits (nombres de carpeta/módulo) se mantienen sin comillas aunque sean en español: `feat(asistencia)`, `fix(home)`, `docs(maestro)`.
+
+**Commits pendientes a reescribir (frontend, `main`, desde `origin/main`)**:
+
+- [ ] `8b9c32d tweak(home): Plan 22 — threshold medium de 70 a 60` → `tweak(home): Plan 22 — medium threshold from 70 to 60`
+- [ ] `0ef5a68 fix(home): Plan 22 — fallback hex en barras y badges` → `fix(home): Plan 22 — hex fallback in bars and badges`
+- [ ] `55652cf feat(home): Plan 22 Chat 2 — widgets de asistencia del día por rol` → `feat(home): Plan 22 Chat 2 — day attendance widgets by role`
+- [ ] `864ec72 fix(asistencia): Plan 21 Chat 7 — shell director delega setViewMode a profesores` → `fix(asistencia): Plan 21 Chat 7 — director shell delegates setViewMode to teachers`
+- [ ] `43da0fb feat(asistencia): Plan 21 Chat 7.C — vista admin profesores armonizada` → `feat(asistencia): Plan 21 Chat 7.C — teachers admin view harmonized`
+- [ ] `b84c159 feat(asistencia): Plan 21 Chat 7.B — day-list genérico y service API día-profesores` → `feat(asistencia): Plan 21 Chat 7.B — generic day-list and day-teachers API service`
+- [ ] `d3d8708 style(asistencia): alinear tabs del shell profesor con el header de pagina` → `style(asistencia): align teacher shell tabs with page header`
+- [ ] `e8c1aa6 style(asistencia): tabs transparentes en shell profesor` → `style(asistencia): transparent tabs in teacher shell`
+- [ ] `e030b6d refactor(asistencia): Plan 21 Chat 6 - pivote "Mi asistencia" profesor = igual que estudiante` → `refactor(asistencia): Plan 21 Chat 6 — pivot teacher "Mi asistencia" to match student`
+- [ ] `f02b695 feat(asistencia): Plan 21 Chat 6 - armonizacion UX "Mi asistencia" profesor` → `feat(asistencia): Plan 21 Chat 6 — UX harmonization of teacher "Mi asistencia"`
+- [ ] `98beb3d feat(asistencia): Plan 21 Chat 4 - frontend profesor con p-tabs "Mi asistencia" + "Mis estudiantes"` → `feat(asistencia): Plan 21 Chat 4 — teacher frontend with p-tabs "Mi asistencia" + "Mis estudiantes"`
+- [ ] `41fc77d docs(maestro): Plan 21 Chat 2 ✅ — backend feature profesor cerrado` → `docs(maestro): close Plan 21 Chat 2 — teacher backend feature`
+- [ ] `e7f8bb8 docs(maestro): Plan 21 Chat 1.5 ✅ — reads + FKs migrados a AsistenciaPersona` → `docs(maestro): close Plan 21 Chat 1.5 — reads + FKs migrated to "AsistenciaPersona"`
+- [ ] `52b81a7 docs(maestro): Plan 21 Chat 1 ✅ + Chat 1.5 agregado (B-split)` → `docs(maestro): close Plan 21 Chat 1 + add Chat 1.5 (B-split)`
+
+**Commits pendientes a reescribir (backend, `master`, desde `origin/master`)**:
+
+- [ ] `f59267e feat(asistencia): Plan 21 Chat 7.A — endpoint dia-profesores admin` → `feat(asistencia): Plan 21 Chat 7.A — admin day-teachers endpoint`
+- [ ] `7ae6427 feat(asistencia): Plan 21 Chat 4 - endpoints self-service profesor + fixes repo` → `feat(asistencia): Plan 21 Chat 4 — teacher self-service endpoints + repo fixes`
+- [ ] `a7426a6 feat(asistencia): Plan 21 Chat 2 — backend feature profesor (consulta + PDF + email + guard INV-AD06)` → `feat(asistencia): Plan 21 Chat 2 — teacher backend feature (query + PDF + email + INV-AD06 guard)`
+- [ ] `59ace30 feat(asistencia): Plan 21 Chat 1.5 — reads + FKs + servicios secundarios migrados a AsistenciaPersona` → `feat(asistencia): Plan 21 Chat 1.5 — reads + FKs + secondary services migrated to "AsistenciaPersona"`
+- [ ] `97ca115 feat(asistencia): dispatch polimórfico Profesor/Estudiante + tabla AsistenciaPersona` → `feat(asistencia): polymorphic Teacher/Student dispatch + "AsistenciaPersona" table`
+
+**Commits ya correctos en inglés (no tocar)**: `b9b0e04`, `9f7d836`..`9d204fd` (frontend); `89e48b3`, `810d437`..`bd9f12a` (backend).
+
+**Cómo ejecutar**:
+
+- Usar `git rebase -i origin/main` en frontend y `git rebase -i origin/master` en backend.
+- Cambiar `pick` por `reword` en cada commit a corregir.
+- Guardar y editar cada mensaje con el texto nuevo. Preservar trailer `Co-Authored-By:` si existe.
+- Validar con `git log --oneline origin/main..HEAD` que no quede ningún commit en español.
+- Re-ejecutar `pre-push` (lint + tests) antes del push por si algún hook se disparó.
 
 ### Post-deploy
 
@@ -112,6 +154,36 @@ Cada día que pasa sin resolver esto, se pierden marcaciones biométricas de pro
 - **Relacionado con**: Plan 1 F4 (INV-* en tests) — al formalizar INV-AD06 conviene que haya test unitario del guard de jurisdicción.
 - **No toca**: `/intranet/admin/asistencias` (ese módulo queda fuera de este plan).
 - **Sucesor agendado**: **Plan 22 — Endurecimiento correos de asistencia** (`Educa.API/.claude/plan/asistencia-correos-endurecimiento.md`) queda 🔒 congelado hasta que Plan 21 cierre. Razón: la lógica de distinción estudiante/profesor en el dispatcher y routing de correos se consolida en los Chat 3+ de Plan 21, y F1/F3/F4 del Plan 22 la necesitan para validar, notificar y auditar por tipo de persona.
+- **Sucesor agendado**: **Plan 23 — Extensión `/intranet/admin/asistencias` a Profesores** (`plan/asistencia-admin-profesores.md`). Razón: Plan 21 cerró el dispatch y la tabla `AsistenciaPersona` pero la pantalla admin de gestión y reportes todavía asume universo "solo estudiantes". Plan 23 parametriza endpoints por `tipoPersona` y agrega toggle Estudiantes/Profesores/Todos sin duplicar vistas. Puede arrancar en paralelo a Plan 22 (tocan capas distintas: Plan 22 = outbox/SMTP, Plan 23 = UI admin + endpoints listar/crear/reportar).
+
+---
+
+## 🟡 Plan 23 — Extensión `/intranet/admin/asistencias` a Profesores
+
+> **Origen**: Conversación 2026-04-20. Tras cerrar Plan 21, CrossChex sincroniza marcaciones de profesores y el backend las persiste en `AsistenciaPersona`, pero `/intranet/admin/asistencias` (tabs Gestión + Reportes) aún filtra/muestra solo estudiantes. El Director no puede auditar profesores ni corregir manualmente marcaciones biométricas de profesor desde el admin formal.
+> **Plan**: [`plan/asistencia-admin-profesores.md`](asistencia-admin-profesores.md) — Plan #23 del inventario.
+> **Estado**: ⏳ Plan nuevo, 5 chats diseñados (BE → FE Gestión → BE+FE Reportes → BE+FE INV-AD05/06 → deploy).
+> **Puede arrancar en paralelo a Plan 22** — tocan capas distintas (Plan 22 = outbox/SMTP, Plan 23 = UI admin + endpoints listar/crear/reportar).
+
+### Qué se decidió en diseño
+
+- **Parametrizar, no duplicar**: query param `tipoPersona ∈ {E, P, todos}` en endpoints existentes. Default admin = `todos`.
+- **UI**: toggle 3-opciones en tab Gestión con default `E` por retrocompatibilidad visual; columna "Grado" → "Contexto" polimórfico (`"1ro Secundaria A"` para E, `"Matemáticas — Secundaria"` para P).
+- **Formulario "Nueva asistencia"**: pestaña Estudiante/Profesor con selector subyacente diferente (reutiliza UX de `AttendanceDirectorComponent` Chat 7).
+- **Reportes**: eje `tipoPersona` adicional, header PDF dinámico, selector "Salones" oculto cuando tipo = Profesores/Todos.
+- **Cross-link UI**: botón "Editar en admin" desde `AttendanceDirectorComponent` Chat 7 lleva a `/intranet/admin/asistencias?tab=gestion&tipoPersona=P&dni=...&fecha=...`.
+- **Invariantes**: INV-AD05 ampliado (correo de corrección a profesor + Director, no apoderado); INV-AD06 reforzado con test de boundary.
+- **Sin migración SQL nueva**: Plan 21 ya entregó `AsistenciaPersona`.
+
+### Por qué importa
+
+Cada día que pasa sin resolver, el Director acumula registros de profesores invisibles en la UI formal. La única vía de auditoría hoy es `AttendanceDirectorComponent` (Plan 21 Chat 7) que es read-only. No hay flujo formal para corregir marcaciones biométricas de profesor desde admin.
+
+### Dependencias
+
+- **Dura**: Plan 21 cerrado (tabla `AsistenciaPersona` + dispatcher Profesor→Estudiante existen).
+- **Blanda con Plan 22**: si Plan 22 cierra antes, se hereda validación ASCII+RFC y clasificación SMTP automáticamente. Si Plan 23 cierra antes, Plan 22 encuentra universo completo sin rework.
+- **Relacionado con**: Plan 12 F3 (Security boundary tests) — el test de INV-AD06 (rol Profesor no puede mutar otro profesor) calza en esa suite.
 
 ---
 
@@ -324,6 +396,7 @@ CARRIL C — DIFERIDO
    Plan 10 F1+ (Flujos Alternos completo) 🔒 ── espera Carril B cerrado
    Plan 7 F3+ (Error Trace avanzado) ── tras Plan 7 F1-F2 en Carril D
    Plan 22 (Endurecimiento correos asistencia) 🔒 ── espera Plan 21 cerrado
+   Plan 23 (Admin asistencias a Profesores) ── espera Plan 21 cerrado (puede arrancar en paralelo a Plan 22)
 ```
 
 ---
