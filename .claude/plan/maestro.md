@@ -30,7 +30,7 @@
 | 18 | Tests de flujo de negocio E2E | BE+FE | (inline en maestro) | ⏳ | 0% |
 | 19 | Comunicación: foro + mensajería + push | FE+BE | (pendiente planificar) | ⏳ | 0% |
 | 20 | Design System — Estándar desde `usuarios` | FE | `tasks/design-system-from-usuarios.md` | F1 ✅ · F2 ✅ (F2.1-F2.5) · F3 ✅ · F4 ✅ · F5.1-F5.2 ✅ · F5.3 ⏳ (0/8) | ~96% |
-| **21** | **🟡 Asistencia de Profesores en CrossChex** | **BE+FE** | **`plan/asistencia-profesores.md`** | **✅ Chat 1 cerrado (2026-04-20) · SQL migration + writes polimórficos + 3 tests dispatch en verde · Chat 1.5 pendiente (reads + FKs + secundarios)** | **~20%** |
+| **21** | **🟡 Asistencia de Profesores en CrossChex** | **BE+FE** | **`plan/asistencia-profesores.md`** | **✅ Chat 1 + Chat 1.5 cerrados (2026-04-20) · Reads, FKs (script) y servicios secundarios migrados a `AsistenciaPersona` · Build limpio + 752 tests verdes · Deploy pendiente: ejecutar `plan21_chat15_FkRepointAsistenciaPersona.sql`** | **~35%** |
 
 **Semáforo de readiness**:
 
@@ -90,8 +90,8 @@
 > **Origen**: Investigación 2026-04-18 + diseño cerrado 2026-04-18. CrossChex ya envía marcaciones biométricas de profesores, pero el webhook del backend y el sync manual las descartan silenciosamente porque la tabla `Asistencia` solo tiene FK a `Estudiante`.
 > **Impacto**: ~1 semana de registros de profesores pendientes de procesar. **No hay pérdida definitiva** — `AsistenciaSyncService.SobreescribirDesdeCrossChexAsync` recupera días históricos una vez corregido el dispatch.
 > **Plan**: [`plan/asistencia-profesores.md`](asistencia-profesores.md) — Plan #21 del inventario.
-> **Estado**: ✅ Chat 1 cerrado (2026-04-20, Camino 1 · B-split). SQL migration ejecutada en prueba (80) y producción (1345). Writes biométricos + admin CRUD migrados a `AsistenciaPersona` con dispatch `Profesor → Estudiante → rechazar` + guard `DNI_COLISION_CROSS_TABLE`. Build limpio, 752 tests verdes.
-> **Próximo paso**: Chat 1.5 (reads + FKs `JustificacionSaludDia`/`PermisoSaludSalida` + servicios secundarios). **Debe cerrar antes que Chat 2** para que frontend consuma data coherente.
+> **Estado**: ✅ Chat 1 + Chat 1.5 cerrados (2026-04-20, Camino 1 · B-split). Chat 1: SQL migration ejecutada en prueba (80) y producción (1345); writes biométricos + admin CRUD sobre `AsistenciaPersona` con dispatch polimórfico + guard `DNI_COLISION_CROSS_TABLE`. Chat 1.5: reads migrados (admin, consulta, reportes, write-repo, legacy), servicios secundarios adaptados (BulkEmail, NotificacionFaltas, PermisoSalud/JustificacionSalud, JustificacionAsistenciaStrategy), EF configs de `JustificacionSaludDia`/`PermisoSaludSalida` apuntando a `AsistenciaPersona`, `ManejarPersonaNoEncontradaAsync` con fallback polimórfico para profesor desactivado. Build limpio, 752 tests verdes.
+> **Próximo paso**: Chat 2 (DTOs + endpoints profesor + reportes PDF + guard INV-AD06 + SignalR). Ejecutar `plan21_chat15_FkRepointAsistenciaPersona.sql` en prueba/producción **antes** del deploy de backend.
 
 ### Qué se decidió en investigación
 

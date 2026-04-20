@@ -140,23 +140,28 @@ Orden: `Profesor → Estudiante → rechazar`. Justificación: hay menos profeso
 - Producción: 1345 registros, max ID 1850, 7/7 validaciones OK.
 - `ASP_HoraEntrada`/`ASP_HoraSalida` = `DATETIME` (consistencia binaria con legacy, no `TIME`).
 
-### Chat 1.5 — Backend reads + FKs + secundarios (B-split parte 2)
+### Chat 1.5 — Backend reads + FKs + secundarios (B-split parte 2) ✅ 2026-04-20
 
-**Objetivo**: Cerrar el split — reads migran a `AsistenciaPersona`, servicios secundarios adaptan firmas, FKs `JustificacionSaludDia.JUD_ASI_CodID` y `PermisoSaludSalida` repuntan a `ASP_CodID` (IDs preservados por seed).
+**Objetivo**: Cerrar el split — reads migran a `AsistenciaPersona`, servicios secundarios adaptan firmas, FKs `JustificacionSaludDia.JSD_ASI_CodID` y `PermisoSaludSalida.PSS_ASI_CodID` repuntan a `ASP_CodID` (IDs preservados por seed del Chat 1).
 
 **Pre-requisito**: Chat 1.5 **debe cerrar antes que Chat 2** para que frontend de profesor consuma data coherente.
 
-| Entregable | Archivo |
-| ---------- | ------- |
-| Reads admin | `AsistenciaAdminRepository.cs` — migrar `ListarAsistenciasDelDiaAsync`, `CalcularEstadisticasDelDiaAsync`, `GetByIdsAsync` a `AsistenciaPersona`. |
-| Reads consulta | `ConsultaAsistenciaRepository.cs` — consultas de apoderado/estudiante/director por periodo. |
-| Reads reportes | `ReporteAsistenciaRepository.cs` — queries PDF de salones. |
-| Reads write-repo | `AsistenciaWriteRepository.cs` — consumidores de bulk write. |
-| Reads legacy | `AsistenciaRepository.GetDnisConAsistenciaCompletaAsync`, `GetDnisConAsistenciaEditadaAsync`, `GetAsistenciaDelDiaAsync`, `GetAsistenciaPendientePorDniAsync` — redirigir a `AsistenciaPersona` o marcar deprecated si ya no se consumen. |
-| FKs migration | Script SQL para `JustificacionSaludDia.JUD_ASI_CodID` + `PermisoSaludSalida` — repuntar a `AsistenciaPersona.ASP_CodID`. |
-| EF configs | `JustificacionSaludDiaConfiguration.cs`, `PermisoSaludSalidaConfiguration.cs` — actualizar navegaciones. |
-| Servicios secundarios | `AsistenciaAdminBulkEmailService`, `NotificacionFaltasService`, `PermisoSaludQueryService`, `JustificacionAsistenciaStrategy`, `JustificacionSaludService`, `AsistenciaCursoService` (si tiene dep). |
-| Tests | Regresión de consulta + reportes + permisos de salud — verificar que lectura polimórfica funciona idéntico. |
+| Entregable | Archivo | Estado |
+| ---------- | ------- | ------ |
+| Script SQL FKs | `Educa.API/Scripts/plan21_chat15_FkRepointAsistenciaPersona.sql` — inspección + drop/create FKs + verificación post-repoint | ✅ Preparado (pendiente de ejecución en BD prueba/producción) |
+| Reads admin | `AsistenciaAdminRepository.cs` — `ListarAsistenciasDelDiaAsync`, `CalcularEstadisticasDelDiaAsync`, `GetEmailDataByIdsAsync` join polimórfico sobre `AsistenciaPersona` (`TipoPersona='E'`) | ✅ |
+| Reads consulta | `ConsultaAsistenciaRepository.cs` — apoderado, estudiante, profesor (día/rango), director (reporte + estadísticas + salones/sede). `ObtenerEstadisticasDiaRawAsync` reemplaza el llamado a `fn_EstadisticasAsistenciaDia` por LINQ directo contra `AsistenciaPersona` | ✅ |
+| Reads reportes | `ReporteAsistenciaRepository.cs` — subqueries correlacionados `ObtenerEstudiantesConAsistenciaDiaAsync` y `ObtenerEstudiantesConAsistenciaRangoAsync` sobre `AsistenciaPersona` | ✅ |
+| Reads write-repo | `AsistenciaWriteRepository.cs` + `IAsistenciaWriteRepository` — firmas cambiadas a `AsistenciaPersona` | ✅ |
+| Reads legacy | `AsistenciaRepository` — `GetDnisConAsistenciaCompletaAsync`/`GetDnisConAsistenciaEditadaAsync` polimórficos (E + P), `GetAsistenciaPendientePorDniAsync` retorna `AsistenciaPersona?` cubriendo fallback profesor. `GetAsistenciaDelDiaAsync` y todos los comandos CRUD legacy (Create/Update/Reload/EliminarAsistenciasDelDia) removidos de la interfaz | ✅ |
+| EF configs | `JustificacionSaludDiaConfiguration.cs` + `PermisoSaludSalidaConfiguration.cs` — navegaciones ahora apuntan a `AsistenciaPersona`, constraint names `FK_*_AsistenciaPersona` | ✅ |
+| Models | `JustificacionSaludDia.Asistencia` → `AsistenciaPersona?`; `PermisoSaludSalida.Asistencia` → `AsistenciaPersona` | ✅ |
+| Servicios secundarios | `AsistenciaAdminBulkEmailService` (consume `AsistenciaEmailDataRow`), `NotificacionFaltasService` (lista estudiantes con asistencia del día desde `AsistenciaPersona`), `PermisoSaludQueryService` (ListarEstudiantes + ValidarFechas), `JustificacionAsistenciaStrategy` (opera sobre `AsistenciaPersona`), `JustificacionSaludService` (crear + anular), `PermisoSaludSalidaService` (crear + anular). `AsistenciaCursoService` NO consume `Asistencia` legacy — sin cambios. `AsistenciaService.ManejarPersonaNoEncontradaAsync` usa directamente el retorno polimórfico de `GetAsistenciaPendientePorDniAsync` (cubre profesor desactivado intradía) | ✅ |
+| Tests | Build limpio + 752 tests en verde — sin regresiones en consulta/reportes/permisos de salud (el contrato de DTOs no cambió) | ✅ |
+
+**Trade-off cerrado**: con Chat 1.5 la UI de consulta/reportes ya lee `AsistenciaPersona`, por lo que los datos de profesor que el Chat 1 empezó a escribir son visibles transparentemente para el frontend actual (que sigue filtrando a `TipoPersona='E'` en backend). El Chat 2 habilitará el surface profesor-específico vía DTOs con `tipoPersona` y endpoints nuevos.
+
+**Deploy pendiente (bloquea Chat 5)**: ejecutar `plan21_chat15_FkRepointAsistenciaPersona.sql` en prueba y producción antes del deploy del backend. El script revisa huérfanos (sección 1.3/1.4) antes de intentar el repoint y valida post-condiciones (sección 3).
 
 ### Chat 2 — Backend feature (consulta + reportes + email + guard)
 
