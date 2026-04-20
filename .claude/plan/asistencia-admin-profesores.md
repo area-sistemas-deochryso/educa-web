@@ -184,19 +184,32 @@ Si este plan cierra primero, Plan 22 al arrancar ya encuentra el universo de cor
 - Dialogs-sync: `p-confirmDialog` siempre en DOM con `(onHide)`; `p-selectButton` con `[ngModel]`+`(ngModelChange)`; `appendTo="body"` en todos los `p-select` nuevos/existentes.
 - Lint + tsc + build limpios.
 
-### Chat 3 — Frontend: tab Reportes con eje `tipoPersona` (FE + BE)
+### Chat 3 — Reportes con eje `tipoPersona` (separado en 3.A BE → 3.B FE)
 
-**Objetivo**: la pestaña Reportes respeta el universo de personas.
+**Objetivo**: la pestaña Reportes respeta el universo de personas. Separado por riesgo de acoplamiento FE/BE: 3.A entrega contract, 3.B lo consume.
 
-- [ ] Backend: endpoints de `ReportesAsistenciaController` aceptan `tipoPersona`. Queries internas filtran por `AsistenciaPersona.ASP_TipoPersona`.
-- [ ] Header PDF dinámico: "Reporte de asistencia — Estudiantes/Profesores/Consolidado".
-- [ ] Frontend: agregar selector "Tipo de persona" al lado de "Rango".
-- [ ] Selector "Salones" se oculta o deshabilita cuando tipo = Profesores (no aplica — profesores no están adscritos a un salón para asistencia).
-- [ ] Cuando tipo = Todos: selector salones oculto, header PDF = "Consolidado".
-- [ ] Tests FE: spec del facade de reportes con los 3 valores del filtro.
-- [ ] Tests BE: 2-3 tests del controller / service de reportes con `tipoPersona`.
+#### Chat 3.A — BE · parametrizar reportes por tipoPersona ✅ (2026-04-20)
 
-**Gate**: se pueden generar reportes para profesores sin bypass (Excel/PDF) desde `/intranet/admin/asistencias?tab=reportes`.
+- [x] `ReportesAsistenciaController` (`/datos`, `/pdf`) acepta `tipoPersona ∈ {E, P, todos}` (default `E`). Valida: `"P"` ignora `salones`; `"E"`/`"todos"` exigen salones.
+- [x] Nuevo `PersonaProfesorReporteDto` (shape aplanado equivalente al de estudiantes).
+- [x] `ReporteFiltradoAsistenciaDto` gana `TipoPersona`, `Profesores?` (nullable) + `TotalProfesoresGeneral`/`TotalProfesoresFiltrados`.
+- [x] `IReporteFiltradoAsistenciaService.ObtenerReporteFiltradoAsync` firma ampliada con `tipoPersona = "E"`.
+- [x] `ReporteFiltradoAsistenciaService` dividido en 3 partial classes (main orquestación + helpers comunes, `.Estudiantes` con `ProcesarSalon*`, `.Profesores` con `PoblarProfesoresAsync` + `ProcesarProfesores{Dia,Rango}`). Rama `P` delega a `IReporteFiltradoProfesoresService` y mapea a `PersonaProfesorReporteDto`; rama `todos` ejecuta ambas.
+- [x] `ReporteFiltradoPdfService` dividido en 3 partial classes (main + `.Estudiantes` con `ComposeSalonSection`/resumen + `.Profesores` con `ComposeProfesoresSection` y helper `SubtituloTipoPersona`). Header "REPORTE DE ASISTENCIA — {Estudiantes|Profesores|Consolidado}" dinámico. Filename PDF incluye `tipoPersona`. Resumen general se omite cuando solo es profesores.
+- [x] 3 tests unitarios en `ReporteFiltradoAsistenciaServiceTipoPersonaTests` (E, P, todos) verifican dispatch correcto al repo de estudiantes y al service de profesores. Suite BE: **784 verdes** (baseline 781, +3).
+- [x] Cap 300 líneas respetado en todos los archivos tocados.
+
+**Gate BE**: ✅ endpoints aceptan los 3 valores; dispatch correcto sin duplicar controllers; PDF con header dinámico.
+
+#### Chat 3.B — FE · selector tipoPersona en tab Reportes (pendiente)
+
+- [ ] Frontend: agregar selector "Tipo de persona" (`p-selectButton` 3 opciones) al lado de "Rango" en tab Reportes.
+- [ ] Selector "Salones" se oculta cuando tipo = Profesores.
+- [ ] `ReporteFilters.tipoPersona` default `'E'`; api-service agrega query param; facade skippea validación de salones cuando tipo = `'P'`.
+- [ ] Vista de resultado: si response trae `profesores[]`, renderizar sección al final reusando layout de estudiantes.
+- [ ] Test FE: 1 spec del facade con los 3 valores.
+
+**Gate FE**: se pueden generar reportes para profesores sin bypass (PDF) desde `/intranet/admin/asistencias?tab=reportes`. Suite FE ≥ 1375 (baseline 1374, +1).
 
 ### Chat 4 — Enforcement INV-AD06 + correo de corrección profesor (BE + FE)
 
