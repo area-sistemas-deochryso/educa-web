@@ -130,23 +130,23 @@
 	letter-spacing: 0.5px;
 
 	&.estado-asistio {
-		background: color-mix(in srgb, var(--green-500) 15%, transparent);
-		color: var(--green-600);
+		background: color-mix(in srgb, #22c55e 15%, transparent);
+		color: #16a34a;
 	}
 	&.estado-tardanza {
-		background: color-mix(in srgb, var(--yellow-500) 15%, transparent);
-		color: var(--yellow-700);
+		background: color-mix(in srgb, #eab308 15%, transparent);
+		color: #a16207;
 	}
 	&.estado-falta {
-		background: color-mix(in srgb, var(--red-500) 15%, transparent);
-		color: var(--red-600);
+		background: color-mix(in srgb, #ef4444 15%, transparent);
+		color: #dc2626;
 	}
 	&.estado-justificado {
-		background: color-mix(in srgb, var(--blue-500) 15%, transparent);
-		color: var(--blue-800);
+		background: color-mix(in srgb, #3b82f6 15%, transparent);
+		color: #1e40af;
 	}
 	&.estado-pendiente {
-		background: var(--surface-200);
+		background: var(--surface-200, #e5e7eb);
 		color: var(--text-color-secondary);
 	}
 }
@@ -192,16 +192,16 @@
 	border-radius: 6px;
 
 	&.high {
-		background: color-mix(in srgb, var(--green-500) 15%, transparent);
-		color: var(--green-600);
+		background: color-mix(in srgb, #22c55e 15%, transparent);
+		color: #16a34a;
 	}
 	&.medium {
-		background: color-mix(in srgb, var(--yellow-500) 15%, transparent);
-		color: var(--yellow-700);
+		background: color-mix(in srgb, #eab308 15%, transparent);
+		color: #a16207;
 	}
 	&.low {
-		background: color-mix(in srgb, var(--red-500) 15%, transparent);
-		color: var(--red-600);
+		background: color-mix(in srgb, #ef4444 15%, transparent);
+		color: #dc2626;
 	}
 }
 // #endregion
@@ -233,7 +233,7 @@
 
 .bar-track {
 	height: 8px;
-	background: var(--surface-200);
+	background: var(--surface-300, #d4d4d8);
 	border-radius: 4px;
 	overflow: hidden;
 }
@@ -245,13 +245,13 @@
 }
 
 .bar-asistio {
-	background: var(--green-500);
+	background: var(--green-500, #22c55e);
 }
 .bar-tardanza {
-	background: var(--yellow-500);
+	background: var(--yellow-500, #eab308);
 }
 .bar-falta {
-	background: var(--red-500);
+	background: var(--red-500, #ef4444);
 }
 // #endregion
 
