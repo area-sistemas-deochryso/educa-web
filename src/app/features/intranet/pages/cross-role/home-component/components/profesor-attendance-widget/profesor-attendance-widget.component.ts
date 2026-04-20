@@ -68,7 +68,7 @@ export class ProfesorAttendanceWidgetComponent implements OnInit {
 	readonly percentageClass = computed(() => {
 		const p = this.porcentaje();
 		if (p >= 85) return 'high';
-		if (p >= 70) return 'medium';
+		if (p >= 60) return 'medium';
 		return 'low';
 	});
 	// #endregion

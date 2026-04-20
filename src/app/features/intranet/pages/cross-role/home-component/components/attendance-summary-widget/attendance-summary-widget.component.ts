@@ -69,7 +69,7 @@ export class AttendanceSummaryWidgetComponent implements OnInit {
 	readonly estPercentageClass = computed(() => {
 		const p = this.estStats()?.porcentajeAsistencia ?? 0;
 		if (p >= 85) return 'high';
-		if (p >= 70) return 'medium';
+		if (p >= 60) return 'medium';
 		return 'low';
 	});
 	// #endregion
@@ -90,7 +90,7 @@ export class AttendanceSummaryWidgetComponent implements OnInit {
 	readonly profPercentageClass = computed(() => {
 		const p = this.profPorcentaje();
 		if (p >= 85) return 'high';
-		if (p >= 70) return 'medium';
+		if (p >= 60) return 'medium';
 		return 'low';
 	});
 
