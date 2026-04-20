@@ -51,6 +51,15 @@ export class AttendancesCrudFacade {
 		}
 	}
 
+	/**
+	 * Plan 23 Chat 4: toast de éxito diferenciado por tipoPersona — INV-AD05 ampliado.
+	 * `tipo==='P'` → "Profesor <verbo>"; en cualquier otro caso → "Estudiante <verbo>".
+	 */
+	private notificarExito(tipo: 'E' | 'P' | null | undefined, verbo: string, detalle: string): void {
+		const persona = tipo === 'P' ? 'Profesor' : 'Estudiante';
+		this.errorHandler.showSuccess(`${persona} ${verbo}`, detalle);
+	}
+
 	// #endregion
 
 	// #region Crear entrada (CREATE optimista)
@@ -82,6 +91,7 @@ export class AttendancesCrudFacade {
 				if (!created) return;
 				this.store.addItem(created);
 				applyItemStatsDelta(this.store,created, 1);
+				this.notificarExito(fd.tipoPersona, 'registrado', 'Entrada registrada correctamente');
 			},
 			onError: (err) => {
 				logger.error('Error al crear entrada:', err);
@@ -145,6 +155,7 @@ export class AttendancesCrudFacade {
 					origenManual: true,
 					editadoManualmente: true,
 				});
+				this.notificarExito(fd.tipoPersona, 'actualizado', 'Salida registrada correctamente');
 			},
 			onError: (err) => {
 				logger.error('Error al crear salida:', err);
@@ -185,6 +196,7 @@ export class AttendancesCrudFacade {
 				if (!created) return;
 				this.store.addItem(created);
 				applyItemStatsDelta(this.store,created, 1);
+				this.notificarExito(fd.tipoPersona, 'registrado', 'Asistencia completa registrada correctamente');
 			},
 			onError: (err) => {
 				logger.error('Error al crear asistencia completa:', err);
@@ -271,6 +283,7 @@ export class AttendancesCrudFacade {
 					origenManual: true,
 					editadoManualmente: true,
 				});
+				this.notificarExito(selected.tipoPersona, 'actualizado', 'Horas actualizadas correctamente');
 			},
 			onError: (err) => {
 				logger.error('Error al actualizar horas:', err);
@@ -302,7 +315,9 @@ export class AttendancesCrudFacade {
 					applyItemStatsDelta(this.store,item, 1);
 				},
 			},
-			onCommit: () => {},
+			onCommit: () => {
+				this.notificarExito(item.tipoPersona, 'eliminado', 'Registro de asistencia eliminado correctamente');
+			},
 			onError: (err) => {
 				logger.error('Error al eliminar asistencia:', err);
 				this.errorHandler.showError('Error', 'No se pudo eliminar el registro');
