@@ -4,7 +4,7 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { ActivatedRoute } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { ConfirmationService } from 'primeng/api';
+import { ConfirmationService, MessageService } from 'primeng/api';
 
 import { ButtonModule } from 'primeng/button';
 import { DatePickerModule } from 'primeng/datepicker';
@@ -14,11 +14,13 @@ import { IconFieldModule } from 'primeng/iconfield';
 import { InputIconModule } from 'primeng/inputicon';
 import { InputTextModule } from 'primeng/inputtext';
 import { SelectModule } from 'primeng/select';
+import { SelectButtonModule } from 'primeng/selectbutton';
 import { TableModule } from 'primeng/table';
 import { TagModule } from 'primeng/tag';
 import { TooltipModule } from 'primeng/tooltip';
 import { CheckboxModule } from 'primeng/checkbox';
 import { Tab, TabList, TabPanel, Tabs } from 'primeng/tabs';
+import { ToastModule } from 'primeng/toast';
 
 import { SkeletonColumnDef, TableSkeletonComponent, StatsSkeletonComponent } from '@shared/components';
 import { AttendanceReportsComponent } from '../../cross-role/attendance-reports';
@@ -31,6 +33,9 @@ import {
 	AttendancesAdminStore,
 	AsistenciaAdminLista,
 	TipoOperacionAsistencia,
+	TipoPersonaAsistencia,
+	TipoPersonaFilter,
+	SincronizarResultado,
 	CrearCierreMensualRequest,
 	RevertirCierreMensualRequest,
 } from './services';
@@ -50,8 +55,10 @@ import {
 		InputIconModule,
 		InputTextModule,
 		SelectModule,
+		SelectButtonModule,
 		TableModule,
 		TagModule,
+		ToastModule,
 		TooltipModule,
 		CheckboxModule,
 		TableSkeletonComponent,
@@ -62,7 +69,7 @@ import {
 		TabPanel,
 		AttendanceReportsComponent,
 	],
-	providers: [ConfirmationService],
+	providers: [ConfirmationService, MessageService],
 	templateUrl: './attendances.component.html',
 	styleUrl: './attendances.component.scss',
 	changeDetection: ChangeDetectionStrategy.OnPush,
@@ -75,6 +82,7 @@ export class AttendancesComponent implements OnInit {
 	protected uiFacade = inject(AttendancesUiFacade);
 	protected store = inject(AttendancesAdminStore);
 	private confirmationService = inject(ConfirmationService);
+	private messageService = inject(MessageService);
 	private route = inject(ActivatedRoute);
 	private destroyRef = inject(DestroyRef);
 	// #endregion
@@ -91,6 +99,17 @@ export class AttendancesComponent implements OnInit {
 		{ label: 'Solo entrada', value: 'entrada' as TipoOperacionAsistencia },
 		{ label: 'Solo salida', value: 'salida' as TipoOperacionAsistencia },
 		{ label: 'Entrada + Salida', value: 'completa' as TipoOperacionAsistencia },
+	]);
+
+	readonly tipoPersonaOptions = signal([
+		{ label: 'Estudiantes', value: 'E' as TipoPersonaFilter },
+		{ label: 'Profesores', value: 'P' as TipoPersonaFilter },
+		{ label: 'Todos', value: 'todos' as TipoPersonaFilter },
+	]);
+
+	readonly tipoPersonaFormOptions = signal([
+		{ label: 'Estudiante', value: 'E' as TipoPersonaAsistencia },
+		{ label: 'Profesor', value: 'P' as TipoPersonaAsistencia },
 	]);
 
 	// Cierre mensual form
@@ -121,6 +140,17 @@ export class AttendancesComponent implements OnInit {
 	);
 
 	readonly cierresActivos = computed(() => this.vm().cierres.filter((c) => c.activo));
+
+	/** Fecha en formato DD/MM/YYYY para labels/dialogs. */
+	readonly fechaLabel = computed(() => this.formatFecha(this.vm().fecha));
+
+	/** Label del filtro activo ('Estudiantes' / 'Profesores' / 'Todos'). */
+	readonly filtroLabel = computed(() => {
+		const value = this.vm().tipoPersonaFilter;
+		return this.tipoPersonaOptions().find((o) => o.value === value)?.label ?? 'Estudiantes';
+	});
+
+	readonly isFilterDefault = computed(() => this.vm().tipoPersonaFilter === 'E');
 	// #endregion
 
 	// #region Lifecycle
@@ -134,6 +164,10 @@ export class AttendancesComponent implements OnInit {
 				const tab = params.get('tab');
 				if (tab === 'gestion' || tab === 'reportes') {
 					this.activeTab.set(tab);
+				}
+				const tipo = params.get('tipoPersona');
+				if (tipo === 'E' || tipo === 'P' || tipo === 'todos') {
+					this.dataFacade.onTipoPersonaChange(tipo);
 				}
 			});
 	}
@@ -173,7 +207,55 @@ export class AttendancesComponent implements OnInit {
 	// #region Event handlers — Sync
 
 	onSincronizar(): void {
-		this.dataFacade.sincronizarDesdeCrossChex();
+		const fechaLabel = this.fechaLabel();
+		this.uiFacade.openConfirmDialog();
+		this.confirmationService.confirm({
+			message: `Se reemplazarán las marcaciones automáticas del ${fechaLabel}. Los registros editados manualmente se preservan. ¿Continuar?`,
+			header: 'Sincronizar CrossChex',
+			icon: 'pi pi-sync',
+			acceptLabel: 'Sincronizar',
+			rejectLabel: 'Cancelar',
+			accept: () => {
+				this.dataFacade.sincronizarDesdeCrossChex(
+					(res) => this.showSyncSuccessToast(res, fechaLabel),
+					() => this.showSyncErrorToast(fechaLabel),
+				);
+			},
+		});
+	}
+
+	private showSyncSuccessToast(res: SincronizarResultado, fechaLabel: string): void {
+		const e = res.estudiantes;
+		const p = res.profesores;
+		const preservados = e.preservados + p.preservados;
+		this.messageService.add({
+			severity: 'success',
+			summary: 'Sincronización completada',
+			detail: `Fecha ${fechaLabel}: ${e.nuevos} estudiantes + ${p.nuevos} profesores importados, ${preservados} preservados (editados manualmente)`,
+			life: 7000,
+		});
+	}
+
+	private showSyncErrorToast(fechaLabel: string): void {
+		this.messageService.add({
+			severity: 'error',
+			summary: 'Error al sincronizar',
+			detail: `No se pudo sincronizar CrossChex del ${fechaLabel}.`,
+			life: 5000,
+		});
+	}
+
+	// #endregion
+
+	// #region Event handlers — Filtro tipo de persona
+
+	onTipoPersonaFilterChange(tipo: TipoPersonaFilter): void {
+		if (!tipo) return;
+		this.dataFacade.onTipoPersonaChange(tipo);
+	}
+
+	onResetTipoPersonaFilter(): void {
+		this.dataFacade.onTipoPersonaChange('E');
 	}
 
 	// #endregion
@@ -182,6 +264,16 @@ export class AttendancesComponent implements OnInit {
 
 	onNuevo(tipo: TipoOperacionAsistencia = 'entrada'): void {
 		this.uiFacade.openNewDialog(tipo);
+		// Asegurar que el selector del form tiene la lista de personas correcta.
+		const fd = this.store.formData();
+		this.dataFacade.loadPersonas(fd.tipoPersona);
+	}
+
+	onFormTipoPersonaChange(tipo: TipoPersonaAsistencia): void {
+		if (!tipo) return;
+		// Cambiar tipo resetea selección de persona y recarga el selector.
+		this.store.updateFormData({ tipoPersona: tipo, estudianteId: null });
+		this.dataFacade.loadPersonas(tipo);
 	}
 
 	onAgregarSalida(item: AsistenciaAdminLista): void {
@@ -274,6 +366,17 @@ export class AttendancesComponent implements OnInit {
 		if (item.editadoManualmente) return 'warn';
 		if (item.origenManual) return 'info';
 		return 'secondary';
+	}
+
+	getTipoPersonaLabel(tipo: TipoPersonaAsistencia): string {
+		return tipo === 'P' ? 'Profesor' : 'Estudiante';
+	}
+
+	/** "yyyy-MM-dd" → "dd/MM/yyyy". */
+	private formatFecha(iso: string): string {
+		if (!iso || iso.length < 10) return iso;
+		const [y, m, d] = iso.slice(0, 10).split('-');
+		return `${d}/${m}/${y}`;
 	}
 
 	// #endregion

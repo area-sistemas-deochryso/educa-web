@@ -64,6 +64,7 @@ export class AttendancesCrudFacade {
 			sedeId: fd.sedeId,
 			horaEntrada: fd.horaEntrada.toISOString(),
 			observacion: fd.observacion || undefined,
+			tipoPersona: fd.tipoPersona,
 		};
 
 		this.wal.execute({
@@ -106,6 +107,7 @@ export class AttendancesCrudFacade {
 			asistenciaId,
 			horaSalida: horaSalidaIso,
 			observacion,
+			tipoPersona: fd.tipoPersona,
 		};
 
 		this.wal.execute({
@@ -165,6 +167,7 @@ export class AttendancesCrudFacade {
 			horaEntrada: fd.horaEntrada.toISOString(),
 			horaSalida: fd.horaSalida.toISOString(),
 			observacion: fd.observacion || undefined,
+			tipoPersona: fd.tipoPersona,
 		};
 
 		this.wal.execute({
@@ -226,6 +229,7 @@ export class AttendancesCrudFacade {
 			limpiarSalida: limpiarSalida || undefined,
 			observacion,
 			rowVersion: selected.rowVersion,
+			tipoPersona: selected.tipoPersona,
 		};
 
 		const nuevoEstado: 'Completa' | 'Incompleta' = horaSalidaIso ? 'Completa' : 'Incompleta';

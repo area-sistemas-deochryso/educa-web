@@ -10,8 +10,10 @@ import {
 	CrearSalidaManualRequest,
 	EnviarCorreosAsistenciaRequest,
 	EnviarCorreosResultado,
-	EstudianteParaSeleccion,
+	PersonaParaSeleccion,
 	RevertirCierreMensualRequest,
+	SincronizarResultado,
+	TipoPersonaAsistencia,
 } from '../models';
 import { Injectable, inject } from '@angular/core';
 import { Observable, catchError, of } from 'rxjs';
@@ -32,33 +34,54 @@ export class AttendancesAdminService {
 
 	// #region Consultas (GET) — interceptor unwraps ApiResponse<T> automatically
 
-	listarDelDia(fecha: string, sedeId?: number, search?: string): Observable<AsistenciaAdminLista[]> {
+	listarDelDia(
+		fecha: string,
+		sedeId?: number,
+		search?: string,
+		tipoPersona?: TipoPersonaAsistencia | null,
+	): Observable<AsistenciaAdminLista[]> {
 		const params: Record<string, string> = { fecha };
 		if (sedeId) params['sedeId'] = sedeId.toString();
 		if (search) params['search'] = search;
+		if (tipoPersona) params['tipoPersona'] = tipoPersona;
 
 		return this.http
 			.get<AsistenciaAdminLista[]>(`${this.apiUrl}/dia`, { params })
 			.pipe(catchError(() => of([])));
 	}
 
-	obtenerEstadisticas(fecha: string, sedeId?: number): Observable<AsistenciaAdminEstadisticas | null> {
+	obtenerEstadisticas(
+		fecha: string,
+		sedeId?: number,
+		tipoPersona?: TipoPersonaAsistencia | null,
+	): Observable<AsistenciaAdminEstadisticas | null> {
 		const params: Record<string, string> = { fecha };
 		if (sedeId) params['sedeId'] = sedeId.toString();
+		if (tipoPersona) params['tipoPersona'] = tipoPersona;
 
 		return this.http
 			.get<AsistenciaAdminEstadisticas>(`${this.apiUrl}/estadisticas`, { params })
 			.pipe(catchError(() => of(null)));
 	}
 
-	listarEstudiantes(sedeId?: number, search?: string): Observable<EstudianteParaSeleccion[]> {
+	listarPersonas(
+		sedeId?: number,
+		search?: string,
+		tipoPersona?: TipoPersonaAsistencia | null,
+	): Observable<PersonaParaSeleccion[]> {
 		const params: Record<string, string> = {};
 		if (sedeId) params['sedeId'] = sedeId.toString();
 		if (search) params['search'] = search;
+		if (tipoPersona) params['tipoPersona'] = tipoPersona;
 
 		return this.http
-			.get<EstudianteParaSeleccion[]>(`${this.apiUrl}/estudiantes`, { params })
+			.get<PersonaParaSeleccion[]>(`${this.apiUrl}/personas`, { params })
 			.pipe(catchError(() => of([])));
+	}
+
+	/** Alias retrocompat — reenvía a `listarPersonas` con `tipoPersona='E'`. */
+	listarEstudiantes(sedeId?: number, search?: string): Observable<PersonaParaSeleccion[]> {
+		return this.listarPersonas(sedeId, search, 'E');
 	}
 
 	listarCierres(sedeId?: number, anio?: number): Observable<CierreMensualLista[]> {
@@ -103,8 +126,8 @@ export class AttendancesAdminService {
 		return this.http.post<CierreMensualLista>(`${this.cierreUrl}/${id}/revertir`, dto);
 	}
 
-	sincronizarDesdeCrossChex(fecha: string): Observable<string> {
-		return this.http.post<string>(`${this.apiUrl}/sync`, null, { params: { fecha } });
+	sincronizarDesdeCrossChex(fecha: string): Observable<SincronizarResultado> {
+		return this.http.post<SincronizarResultado>(`${this.apiUrl}/sync`, null, { params: { fecha } });
 	}
 
 	enviarCorreos(dto: EnviarCorreosAsistenciaRequest): Observable<EnviarCorreosResultado> {

@@ -5,8 +5,10 @@ import {
 	AsistenciaAdminLista,
 	AsistenciaFormData,
 	CierreMensualLista,
-	EstudianteParaSeleccion,
+	PersonaParaSeleccion,
 	TipoOperacionAsistencia,
+	TipoPersonaAsistencia,
+	TipoPersonaFilter,
 } from '../models';
 
 @Injectable({ providedIn: 'root' })
@@ -14,7 +16,7 @@ export class AttendancesAdminStore {
 	// #region Estado privado
 	private readonly _items = signal<AsistenciaAdminLista[]>([]);
 	private readonly _estadisticas = signal<AsistenciaAdminEstadisticas | null>(null);
-	private readonly _estudiantes = signal<EstudianteParaSeleccion[]>([]);
+	private readonly _personas = signal<PersonaParaSeleccion[]>([]);
 	private readonly _cierres = signal<CierreMensualLista[]>([]);
 	private readonly _loading = signal(false);
 	private readonly _error = signal<string | null>(null);
@@ -26,6 +28,8 @@ export class AttendancesAdminStore {
 	private readonly _fecha = signal<string>(new Date().toISOString().split('T')[0]);
 	private readonly _sedeId = signal<number | null>(null);
 	private readonly _searchTerm = signal('');
+	// Default 'E' por retrocompatibilidad visual: admin venía acostumbrado a ver solo estudiantes.
+	private readonly _tipoPersonaFilter = signal<TipoPersonaFilter>('E');
 
 	// Sync
 	private readonly _syncing = signal(false);
@@ -50,13 +54,16 @@ export class AttendancesAdminStore {
 		horaSalida: null,
 		observacion: '',
 		asistenciaId: null,
+		tipoPersona: 'E',
 	});
 	// #endregion
 
 	// #region Lecturas publicas (readonly)
 	readonly items = this._items.asReadonly();
 	readonly estadisticas = this._estadisticas.asReadonly();
-	readonly estudiantes = this._estudiantes.asReadonly();
+	readonly personas = this._personas.asReadonly();
+	/** Alias retrocompat — los consumidores viejos usan `estudiantes`. */
+	readonly estudiantes = this._personas.asReadonly();
 	readonly cierres = this._cierres.asReadonly();
 	readonly loading = this._loading.asReadonly();
 	readonly error = this._error.asReadonly();
@@ -69,6 +76,7 @@ export class AttendancesAdminStore {
 	readonly fecha = this._fecha.asReadonly();
 	readonly sedeId = this._sedeId.asReadonly();
 	readonly searchTerm = this._searchTerm.asReadonly();
+	readonly tipoPersonaFilter = this._tipoPersonaFilter.asReadonly();
 
 	readonly dialogVisible = this._dialogVisible.asReadonly();
 	readonly cierreDialogVisible = this._cierreDialogVisible.asReadonly();
@@ -117,7 +125,8 @@ export class AttendancesAdminStore {
 		items: this.filteredItems(),
 		allItems: this._items(),
 		estadisticas: this._estadisticas(),
-		estudiantes: this._estudiantes(),
+		personas: this._personas(),
+		estudiantes: this._personas(),
 		cierres: this._cierres(),
 		isEmpty: this._items().length === 0,
 	}));
@@ -138,6 +147,7 @@ export class AttendancesAdminStore {
 		fecha: this._fecha(),
 		sedeId: this._sedeId(),
 		searchTerm: this._searchTerm(),
+		tipoPersonaFilter: this._tipoPersonaFilter(),
 	}));
 
 	readonly formVm = computed(() => ({
@@ -181,8 +191,13 @@ export class AttendancesAdminStore {
 		this._estadisticas.update((s) => (s ? { ...s, [campo]: (s[campo] as number) + delta } : s));
 	}
 
-	setEstudiantes(estudiantes: EstudianteParaSeleccion[]): void {
-		this._estudiantes.set(estudiantes);
+	setPersonas(personas: PersonaParaSeleccion[]): void {
+		this._personas.set(personas);
+	}
+
+	/** Alias retrocompat. */
+	setEstudiantes(personas: PersonaParaSeleccion[]): void {
+		this._personas.set(personas);
 	}
 
 	setCierres(cierres: CierreMensualLista[]): void {
@@ -261,10 +276,17 @@ export class AttendancesAdminStore {
 	setSearchTerm(term: string): void {
 		this._searchTerm.set(term);
 	}
+
+	setTipoPersonaFilter(tipo: TipoPersonaFilter): void {
+		this._tipoPersonaFilter.set(tipo);
+	}
 	// #endregion
 
 	// #region Comandos de mutacion — UI
 	openNewDialog(tipo: TipoOperacionAsistencia = 'entrada'): void {
+		const filter = this._tipoPersonaFilter();
+		// El form por defecto toma el tipo del filtro; 'todos' cae en 'E' como default seguro.
+		const tipoPersona: TipoPersonaAsistencia = filter === 'P' ? 'P' : 'E';
 		this._selectedItem.set(null);
 		this._formData.set({
 			tipoOperacion: tipo,
@@ -274,6 +296,7 @@ export class AttendancesAdminStore {
 			horaSalida: null,
 			observacion: '',
 			asistenciaId: null,
+			tipoPersona,
 		});
 		this._isEditing.set(false);
 		this._dialogVisible.set(true);
@@ -289,6 +312,7 @@ export class AttendancesAdminStore {
 			horaSalida: null,
 			observacion: '',
 			asistenciaId: item.asistenciaId,
+			tipoPersona: item.tipoPersona,
 		});
 		this._isEditing.set(false);
 		this._dialogVisible.set(true);
@@ -304,6 +328,7 @@ export class AttendancesAdminStore {
 			horaSalida: item.horaSalida ? new Date(item.horaSalida) : null,
 			observacion: item.observacion ?? '',
 			asistenciaId: item.asistenciaId,
+			tipoPersona: item.tipoPersona,
 		});
 		this._isEditing.set(true);
 		this._dialogVisible.set(true);

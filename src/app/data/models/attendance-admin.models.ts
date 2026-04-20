@@ -1,5 +1,8 @@
 // Modelos compartidos para el modulo admin de asistencia diaria.
 
+export type TipoPersonaAsistencia = 'E' | 'P';
+export type TipoPersonaFilter = TipoPersonaAsistencia | 'todos';
+
 export interface AsistenciaAdminLista {
 	asistenciaId: number;
 	estudianteId: number;
@@ -18,6 +21,8 @@ export interface AsistenciaAdminLista {
 	editadoManualmente: boolean;
 	estadoCodigo: string;
 	rowVersion: string;
+	tipoPersona: TipoPersonaAsistencia;
+	contextoPersona: string;
 }
 
 export interface AsistenciaAdminEstadisticas {
@@ -27,6 +32,10 @@ export interface AsistenciaAdminEstadisticas {
 	incompletas: number;
 	registrosManuales: number;
 	registrosWebhook: number;
+	totalEstudiantes: number;
+	totalProfesores: number;
+	completasEstudiantes: number;
+	completasProfesores: number;
 }
 
 export interface CrearEntradaManualRequest {
@@ -34,12 +43,14 @@ export interface CrearEntradaManualRequest {
 	sedeId: number;
 	horaEntrada: string;
 	observacion?: string;
+	tipoPersona?: TipoPersonaAsistencia;
 }
 
 export interface CrearSalidaManualRequest {
 	asistenciaId: number;
 	horaSalida: string;
 	observacion?: string;
+	tipoPersona?: TipoPersonaAsistencia;
 }
 
 export interface CrearAsistenciaCompletaRequest {
@@ -48,6 +59,7 @@ export interface CrearAsistenciaCompletaRequest {
 	horaEntrada: string;
 	horaSalida: string;
 	observacion?: string;
+	tipoPersona?: TipoPersonaAsistencia;
 }
 
 export interface ActualizarHorasRequest {
@@ -56,9 +68,10 @@ export interface ActualizarHorasRequest {
 	limpiarSalida?: boolean;
 	observacion?: string;
 	rowVersion: string;
+	tipoPersona?: TipoPersonaAsistencia;
 }
 
-export interface EstudianteParaSeleccion {
+export interface PersonaParaSeleccion {
 	estudianteId: number;
 	dni: string;
 	nombreCompleto: string;
@@ -66,6 +79,23 @@ export interface EstudianteParaSeleccion {
 	seccion: string;
 	sedeId: number | null;
 	sede: string | null;
+	tipoPersona: TipoPersonaAsistencia;
+	contextoPersona: string;
+}
+
+/** Alias retrocompat — mantiene nombre viejo mientras se migra el resto del código. */
+export type EstudianteParaSeleccion = PersonaParaSeleccion;
+
+export interface SincronizarTipoResultado {
+	nuevos: number;
+	preservados: number;
+	errores: number;
+}
+
+export interface SincronizarResultado {
+	mensaje: string;
+	estudiantes: SincronizarTipoResultado;
+	profesores: SincronizarTipoResultado;
 }
 
 export interface CierreMensualLista {

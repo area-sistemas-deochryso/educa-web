@@ -41,7 +41,7 @@
 		<button
 			pButton
 			icon="pi pi-sync"
-			label="Sincronizar CrossChex"
+			[label]="'Sincronizar CrossChex · ' + fechaLabel()"
 			class="p-button-outlined"
 			[loading]="vm().syncing"
 			(click)="onSincronizar()"
@@ -50,7 +50,7 @@
 					'aria-label': 'Sincronizar asistencias desde CrossChex para la fecha seleccionada',
 				},
 			}"
-			pTooltip="Re-sincroniza las marcaciones biométricas del día seleccionado"
+			pTooltip="Sincroniza ambos tipos (estudiantes y profesores). El filtro de tipo solo afecta la visualización."
 			tooltipPosition="bottom"
 		></button>
 		<button
@@ -64,9 +64,44 @@
 			pButton
 			icon="pi pi-plus"
 			label="Nueva asistencia"
+			class="p-button-success"
 			(click)="onNuevo('entrada')"
 		></button>
 	</div>
+</div>
+<!-- #endregion -->
+
+<!-- #region Filtro tipo persona -->
+<div class="tipo-persona-bar">
+	<p-selectButton
+		[options]="tipoPersonaOptions()"
+		[ngModel]="vm().tipoPersonaFilter"
+		(ngModelChange)="onTipoPersonaFilterChange($event)"
+		optionLabel="label"
+		optionValue="value"
+		[allowEmpty]="false"
+		[pt]="{
+			root: {
+				'aria-label': 'Filtro por tipo de persona',
+			},
+		}"
+	/>
+	@if (!isFilterDefault()) {
+		<span class="filter-active-badge">
+			Filtro activo: {{ filtroLabel() }}
+			<button
+				pButton
+				label="Cambiar"
+				class="p-button-text p-button-sm"
+				(click)="onResetTipoPersonaFilter()"
+				[pt]="{
+					root: {
+						'aria-label': 'Restablecer filtro a Estudiantes',
+					},
+				}"
+			></button>
+		</span>
+	}
 </div>
 <!-- #endregion -->
 
@@ -80,6 +115,9 @@
 			<div class="stat-info">
 				<span class="stat-value">{{ stats.totalRegistros }}</span>
 				<span class="stat-label">Total registros</span>
+				@if (vm().tipoPersonaFilter === 'todos' && stats.totalProfesores > 0) {
+					<span class="stat-sublabel">de los cuales {{ stats.totalProfesores }} son profesores</span>
+				}
 			</div>
 		</div>
 		<div class="stat-card">
@@ -153,8 +191,8 @@
 					/>
 				</th>
 				<th style="width: 50px">#</th>
-				<th>Estudiante</th>
-				<th style="width: 90px">Grado</th>
+				<th>Persona</th>
+				<th style="width: 140px">Contexto</th>
 				<th style="width: 100px">Entrada</th>
 				<th style="width: 100px">Salida</th>
 				<th style="width: 90px">Estado</th>
@@ -174,11 +212,17 @@
 				<td>{{ i + 1 }}</td>
 				<td>
 					<div class="student-cell">
-						<span class="student-name">{{ item.nombreCompleto }}</span>
+						<div class="student-name-row">
+							<span class="student-name">{{ item.nombreCompleto }}</span>
+							<p-tag
+								[value]="getTipoPersonaLabel(item.tipoPersona)"
+								styleClass="tag-neutral"
+							/>
+						</div>
 						<span class="student-dni">{{ item.dni }}</span>
 					</div>
 				</td>
-				<td>{{ item.grado }} {{ item.seccion }}</td>
+				<td>{{ item.contextoPersona }}</td>
 				<td>{{ item.horaEntrada ? (item.horaEntrada | date: 'HH:mm') : '—' }}</td>
 				<td>{{ item.horaSalida ? (item.horaSalida | date: 'HH:mm') : '—' }}</td>
 				<td>
@@ -196,7 +240,7 @@
 							<button
 								pButton
 								icon="pi pi-sign-out"
-								class="p-button-rounded p-button-text p-button-success"
+								class="p-button-rounded p-button-text btn-agregar-salida"
 								pTooltip="Agregar salida"
 								tooltipPosition="top"
 								(click)="onAgregarSalida(item)"
@@ -240,7 +284,7 @@
 		<ng-template #emptymessage>
 			<tr>
 				<td colspan="9" class="text-center">
-					No hay registros de asistencia para esta fecha
+					No hay registros de asistencia para esta fecha con el filtro activo
 				</td>
 			</tr>
 		</ng-template>
@@ -258,6 +302,24 @@
 >
 	<div class="form-grid">
 		@if (!vm().isEditing) {
+			<!-- Tipo de persona (pestañas Estudiante / Profesor) -->
+			<div class="form-field">
+				<label>Tipo de persona</label>
+				<p-selectButton
+					[options]="tipoPersonaFormOptions()"
+					[ngModel]="vm().formData.tipoPersona"
+					(ngModelChange)="onFormTipoPersonaChange($event)"
+					optionLabel="label"
+					optionValue="value"
+					[allowEmpty]="false"
+					[pt]="{
+						root: {
+							'aria-label': 'Tipo de persona para el registro',
+						},
+					}"
+				/>
+			</div>
+
 			<!-- Tipo de operacion -->
 			<div class="form-field">
 				<label>Tipo de registro</label>
@@ -270,18 +332,18 @@
 			</div>
 
 			@if (vm().formData.tipoOperacion !== 'salida') {
-				<!-- Estudiante -->
+				<!-- Persona -->
 				<div class="form-field">
-					<label>Estudiante</label>
+					<label>{{ vm().formData.tipoPersona === 'P' ? 'Profesor' : 'Estudiante' }}</label>
 					<p-select
-						[options]="vm().estudiantes"
+						[options]="vm().personas"
 						optionLabel="nombreCompleto"
 						optionValue="estudianteId"
 						[ngModel]="vm().formData.estudianteId"
 						(ngModelChange)="store.updateFormData({ estudianteId: $event })"
 						[filter]="true"
 						filterBy="nombreCompleto,dni"
-						placeholder="Seleccionar estudiante..."
+						[placeholder]="vm().formData.tipoPersona === 'P' ? 'Seleccionar profesor...' : 'Seleccionar estudiante...'"
 						appendTo="body"
 					/>
 				</div>
@@ -449,8 +511,9 @@
 </p-dialog>
 <!-- #endregion -->
 
-<!-- #region Confirm dialog -->
+<!-- #region Confirm dialog + Toast -->
 <p-confirmDialog (onHide)="onConfirmDialogHide()" />
+<p-toast position="top-right" />
 <!-- #endregion -->
 
 	</p-tabpanel>

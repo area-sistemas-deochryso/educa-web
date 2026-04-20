@@ -62,6 +62,12 @@
 				font-size: 0.8rem;
 				color: var(--text-color-secondary);
 			}
+
+			.stat-sublabel {
+				font-size: 0.75rem;
+				color: var(--text-color-secondary);
+				margin-top: 0.25rem;
+			}
 		}
 	}
 }
@@ -75,12 +81,38 @@
 	flex-wrap: wrap;
 	align-items: center;
 }
+
+.tipo-persona-bar {
+	display: flex;
+	align-items: center;
+	gap: 1rem;
+	margin-bottom: 1rem;
+	flex-wrap: wrap;
+
+	.filter-active-badge {
+		display: inline-flex;
+		align-items: center;
+		gap: 0.5rem;
+		padding: 0.25rem 0.75rem;
+		border-radius: 999px;
+		background: var(--surface-200);
+		color: var(--text-color);
+		font-size: 0.85rem;
+	}
+}
 // #endregion
 
 // #region Tabla
 .student-cell {
 	display: flex;
 	flex-direction: column;
+
+	.student-name-row {
+		display: flex;
+		align-items: center;
+		gap: 0.5rem;
+		flex-wrap: wrap;
+	}
 
 	.student-name {
 		font-weight: 500;
@@ -96,6 +128,17 @@
 .action-buttons {
 	display: flex;
 	gap: 0.25rem;
+}
+
+// Agregar salida: naranja oscuro (complementario del verde de entrada) con contraste AA sobre fondo claro.
+// Motivo: p-button-text p-button-success renderiza verde pálido casi invisible sobre --surface-ground.
+:host ::ng-deep .btn-agregar-salida.p-button-text {
+	color: var(--orange-700, #c2410c);
+
+	&:enabled:hover {
+		background: color-mix(in srgb, var(--orange-500, #f97316) 15%, transparent);
+		color: var(--orange-800, #9a3412);
+	}
 }
 
 .text-center {

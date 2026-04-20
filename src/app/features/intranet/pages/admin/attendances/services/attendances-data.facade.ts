@@ -2,8 +2,14 @@ import { DestroyRef, Injectable, inject } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
 import { logger } from '@core/helpers';
+import { SincronizarResultado, TipoPersonaAsistencia, TipoPersonaFilter } from '../models';
 import { AttendancesAdminService } from './attendances-admin.service';
 import { AttendancesAdminStore } from './attendances-admin.store';
+
+/** Convierte el filtro UI (`'todos'`) al param que el backend espera (`null`). */
+function toApiTipoPersona(filter: TipoPersonaFilter): TipoPersonaAsistencia | null {
+	return filter === 'todos' ? null : filter;
+}
 
 @Injectable({ providedIn: 'root' })
 export class AttendancesDataFacade {
@@ -27,9 +33,9 @@ export class AttendancesDataFacade {
 	loadEstadisticas(): void {
 		const fecha = this.store.fecha();
 		const sedeId = this.store.sedeId() ?? undefined;
-
+		// Stats siempre globales (E+P desglosado) — no dependen del filtro UI.
 		this.api
-			.obtenerEstadisticas(fecha, sedeId)
+			.obtenerEstadisticas(fecha, sedeId, null)
 			.pipe(takeUntilDestroyed(this.destroyRef))
 			.subscribe({
 				next: (stats) => {
@@ -48,9 +54,10 @@ export class AttendancesDataFacade {
 
 		const fecha = this.store.fecha();
 		const sedeId = this.store.sedeId() ?? undefined;
+		const tipoPersona = toApiTipoPersona(this.store.tipoPersonaFilter());
 
 		this.api
-			.listarDelDia(fecha, sedeId)
+			.listarDelDia(fecha, sedeId, undefined, tipoPersona)
 			.pipe(takeUntilDestroyed(this.destroyRef))
 			.subscribe({
 				next: (items) => {
@@ -69,9 +76,10 @@ export class AttendancesDataFacade {
 	refreshItemsOnly(): void {
 		const fecha = this.store.fecha();
 		const sedeId = this.store.sedeId() ?? undefined;
+		const tipoPersona = toApiTipoPersona(this.store.tipoPersonaFilter());
 
 		this.api
-			.listarDelDia(fecha, sedeId)
+			.listarDelDia(fecha, sedeId, undefined, tipoPersona)
 			.pipe(takeUntilDestroyed(this.destroyRef))
 			.subscribe({
 				next: (items) => {
@@ -80,17 +88,24 @@ export class AttendancesDataFacade {
 			});
 	}
 
-	loadEstudiantes(search?: string): void {
+	loadPersonas(tipoPersona: TipoPersonaAsistencia, search?: string): void {
 		const sedeId = this.store.sedeId() ?? undefined;
 
 		this.api
-			.listarEstudiantes(sedeId, search)
+			.listarPersonas(sedeId, search, tipoPersona)
 			.pipe(takeUntilDestroyed(this.destroyRef))
 			.subscribe({
-				next: (estudiantes) => {
-					this.store.setEstudiantes(estudiantes ?? []);
+				next: (personas) => {
+					this.store.setPersonas(personas ?? []);
 				},
 			});
+	}
+
+	/** Alias retrocompat — carga personas del tipo configurado (default `E`). */
+	loadEstudiantes(search?: string): void {
+		const filter = this.store.tipoPersonaFilter();
+		const tipo: TipoPersonaAsistencia = filter === 'P' ? 'P' : 'E';
+		this.loadPersonas(tipo, search);
 	}
 
 	loadCierres(): void {
@@ -111,7 +126,10 @@ export class AttendancesDataFacade {
 
 	// #region Sincronización CrossChex
 
-	sincronizarDesdeCrossChex(): void {
+	sincronizarDesdeCrossChex(
+		onSuccess?: (resultado: SincronizarResultado) => void,
+		onError?: (err: unknown) => void,
+	): void {
 		if (this.store.syncing()) return;
 		this.store.setSyncing(true);
 
@@ -124,12 +142,13 @@ export class AttendancesDataFacade {
 				next: (resultado) => {
 					logger.log('Sincronización completada:', resultado);
 					this.store.setSyncing(false);
-					// Recargar datos después de la sincronización
 					this.loadData();
+					onSuccess?.(resultado);
 				},
 				error: (err) => {
 					logger.error('Error al sincronizar:', err);
 					this.store.setSyncing(false);
+					onError?.(err);
 				},
 			});
 	}
@@ -154,6 +173,13 @@ export class AttendancesDataFacade {
 
 	onSearch(term: string): void {
 		this.store.setSearchTerm(term);
+	}
+
+	onTipoPersonaChange(tipo: TipoPersonaFilter): void {
+		if (this.store.tipoPersonaFilter() === tipo) return;
+		this.store.setTipoPersonaFilter(tipo);
+		this.store.setTableReady(false);
+		this.loadItems();
 	}
 
 	// #endregion
