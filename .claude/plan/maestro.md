@@ -30,6 +30,7 @@
 | 18 | Tests de flujo de negocio E2E | BE+FE | (inline en maestro) | ⏳ | 0% |
 | 19 | Comunicación: foro + mensajería + push | FE+BE | (pendiente planificar) | ⏳ | 0% |
 | 20 | Design System — Estándar desde `usuarios` | FE | `tasks/design-system-from-usuarios.md` | F1 ✅ · F2 ✅ (F2.1-F2.5) · F3 ✅ · F4 ✅ · F5.1-F5.2 ✅ · F5.3 ⏳ (0/8) | ~96% |
+| **21** | **🟡 Asistencia de Profesores en CrossChex** | **BE+FE** | **`plan/asistencia-profesores.md`** | **✅ Chat 1 cerrado (2026-04-20) · SQL migration + writes polimórficos + 3 tests dispatch en verde · Chat 1.5 pendiente (reads + FKs + secundarios)** | **~20%** |
 
 **Semáforo de readiness**:
 
@@ -40,6 +41,75 @@
 | **Production reliability** | 🔴 Sin red | Falta: tests de contrato, auditoría endpoints, error trace, fallbacks P0 |
 
 **Foco: Carril D (confiabilidad) + Design System F2.2-F2.5 en paralelo → Carril B (deuda)**.
+
+---
+
+## ⚠️ Pendientes para el próximo deploy
+
+> **Origen**: Conversación 2026-04-18. Migración de credenciales Firebase + JaaS a env vars de Azure App Service. Cambios commiteados localmente; push pendiente por política de no-deploy en fines de semana (solo lunes y jueves).
+
+### Cambios listos (commit local hecho, push pendiente)
+
+**Backend** — `Educa.API` (master, commit `89e48b3`):
+
+- Mensaje: `feat(security): read Firebase credential from env var, return JaaS appId in token response`
+- Archivos: `appsettings.json`, `Controllers/Videoconferencias/VideoconferenciaController.cs`
+
+**Frontend** — `educa-web` (main, commit `b9b0e04`):
+
+- Mensaje: `feat(security): get JaaS appId from backend response, drop from environment`
+- Archivos: 3 environments (`environment.ts`, `environment.development.ts`, `environment.capacitor.ts`) + `videoconferencias.facade.ts` + `videoconferencia-sala.component.ts`
+
+### Pre-deploy (Azure App Service `educa1` → Variables de entorno)
+
+- [x] `Firebase__CredentialsJson` configurada con JSON válido (verificado 2026-04-18)
+- [x] `JaaS__AppId` configurada con `vpaas-magic-cookie-ab31757bc7ba406d965de2c757d33c01` (verificado 2026-04-18)
+- [ ] `ASPNETCORE_ENVIRONMENT=Production` aplicada explícitamente (creada en sesión, confirmar que el "Aplicar" final quedó guardado)
+
+### Post-deploy
+
+- [ ] Log stream del App Service: `Application started` sin errores `FirebaseException` ni `Unable to find credentials`
+- [ ] DevTools → request a `/api/Videoconferencia/token` devuelve `{jwt, appId}` (no solo `{jwt}`)
+- [ ] Sala de videoconferencia carga el iframe de Jitsi correctamente con audio/video
+- [ ] Forzar un 500 (ej: `GET /api/Usuarios/999999999`) → response NO incluye stack trace (solo `mensaje` + `correlationId`)
+- [ ] Si se ejercita un flujo que envía push notification (FCM), validar que sigue llegando
+
+### Pendiente futuro (en otro chat, sin presión)
+
+- [ ] Rotar credential Firebase en [Firebase Console](https://console.firebase.google.com) (la actual está expuesta en git history del backend)
+- [ ] Actualizar `Firebase__CredentialsJson` en Azure con el JSON nuevo
+- [ ] `git rm --cached Educa.API/educa-4f684-firebase-adminsdk-fbsvc-d5a369a2f9.json` + commit en backend
+- [ ] (Opcional) Limpiar git history del archivo con `git-filter-repo` o BFG si el repo está en remoto público
+
+> Nota de seguridad: ver hallazgos del audit (16/20 → 17/20 al cerrar estos tres puntos). Hallazgos descartados intencionalmente por priorizar UX (BCrypt 12, captcha en SessionEndpoints, sanitización exhaustiva de errores).
+
+---
+
+## 🟡 Asistencia de Profesores en CrossChex
+
+> **Origen**: Investigación 2026-04-18 + diseño cerrado 2026-04-18. CrossChex ya envía marcaciones biométricas de profesores, pero el webhook del backend y el sync manual las descartan silenciosamente porque la tabla `Asistencia` solo tiene FK a `Estudiante`.
+> **Impacto**: ~1 semana de registros de profesores pendientes de procesar. **No hay pérdida definitiva** — `AsistenciaSyncService.SobreescribirDesdeCrossChexAsync` recupera días históricos una vez corregido el dispatch.
+> **Plan**: [`plan/asistencia-profesores.md`](asistencia-profesores.md) — Plan #21 del inventario.
+> **Estado**: ✅ Chat 1 cerrado (2026-04-20, Camino 1 · B-split). SQL migration ejecutada en prueba (80) y producción (1345). Writes biométricos + admin CRUD migrados a `AsistenciaPersona` con dispatch `Profesor → Estudiante → rechazar` + guard `DNI_COLISION_CROSS_TABLE`. Build limpio, 752 tests verdes.
+> **Próximo paso**: Chat 1.5 (reads + FKs `JustificacionSaludDia`/`PermisoSaludSalida` + servicios secundarios). **Debe cerrar antes que Chat 2** para que frontend consuma data coherente.
+
+### Qué se decidió en investigación
+
+- **Modelo**: Opción C — nueva tabla `AsistenciaPersona` con discriminador `ASP_TipoPersona ∈ {'E','P'}` y FK polimórfica.
+- **Webhook**: dispatch por DNI en orden Profesor → Estudiante → rechazar.
+- **Reutilización**: mismas ventanas horarias, invariantes horarios (INV-C01/02/03), cierre mensual (INV-AD03), origen manual (INV-AD02).
+- **Invariantes nuevos/modificados**: INV-AD05 ampliado (profesor solo correo a sistemas), **INV-AD06 nuevo** (justificación de profesor requiere rol administrativo; profesor no puede autojustificarse ni justificar a colega), regla nueva de jurisdicción a `permissions.md`.
+- **UI**: submenú Estudiantes/Profesores en `AttendanceDirectorComponent` para los 4 roles administrativos (Director + Asistente Admin + Promotor + Coordinador Académico); panel propio read-only en `AttendanceProfesorComponent`.
+
+### Por qué es urgente
+
+Cada día que pasa sin resolver esto, se pierden marcaciones biométricas de profesores en CrossChex. El costo marginal crece diario y no hay forma de reconstruir los datos retroactivamente a partir del webhook — el dispositivo los envía una sola vez.
+
+### Dependencias
+
+- **Ninguna dura**: el plan puede arrancar en paralelo a cualquier ola de Carril D.
+- **Relacionado con**: Plan 1 F4 (INV-* en tests) — al formalizar INV-AD06 conviene que haya test unitario del guard de jurisdicción.
+- **No toca**: `/intranet/admin/asistencias` (ese módulo queda fuera de este plan).
 
 ---
 
