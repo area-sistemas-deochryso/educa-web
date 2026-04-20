@@ -11,6 +11,9 @@ import { AttendanceDirectorProfesoresComponent } from './profesores/attendance-d
  * Shell del panel admin de asistencia (Director + 3 administrativos no-Director).
  * Expone un submenú Estudiantes/Profesores (Plan 21 Chat 3) que delega la lógica
  * a dos componentes hermanos especializados.
+ *
+ * Tras Plan 21 Chat 7, ambos sub-componentes responden al pill día/mes del header
+ * cross-role — `setViewMode` y `reload` se delegan al componente activo.
  */
 type SubMenu = 'estudiantes' | 'profesores';
 
@@ -36,43 +39,49 @@ export class AttendanceDirectorComponent {
 	@ViewChild(AttendanceDirectorEstudiantesComponent)
 	estudiantesComponent?: AttendanceDirectorEstudiantesComponent;
 
-	// * El submenú por defecto muestra Estudiantes para preservar el flujo actual.
+	@ViewChild(AttendanceDirectorProfesoresComponent)
+	profesoresComponent?: AttendanceDirectorProfesoresComponent;
+
 	readonly selectedSubMenu = signal<SubMenu>('estudiantes');
 	readonly submenuOptions = SUBMENU_OPTIONS;
 
-	// * Cache del último modo recibido para reaplicarlo al volver a Estudiantes.
+	// * Cache del último modo recibido del header — se reaplica al cambiar de submenú
+	//   para que el sub-componente recién montado respete la elección día/mes del usuario.
 	private pendingViewMode: ViewMode | null = null;
 
 	setSubMenu(sub: SubMenu): void {
+		if (this.selectedSubMenu() === sub) return;
 		this.selectedSubMenu.set(sub);
+		// El @switch del template destruye y crea el sub-componente. El ViewChild solo
+		// estará disponible después del próximo ciclo de render — usamos setTimeout
+		// para aplicar el mode pendiente entonces.
+		setTimeout(() => this.applyPendingViewMode(), 0);
 	}
 
 	/**
-	 * Delega `setViewMode` al sub-componente activo.
-	 * Solo "Estudiantes" soporta el toggle Día/Mes del header — Profesores tiene
-	 * su propio switch interno.
+	 * Delega `setViewMode` al sub-componente activo. Ambos soportan el toggle Día/Mes
+	 * del header desde Chat 7.
 	 */
 	setViewMode(mode: ViewMode): void {
 		this.pendingViewMode = mode;
-		if (this.selectedSubMenu() === 'estudiantes' && this.estudiantesComponent) {
-			this.estudiantesComponent.setViewMode(mode);
-		}
+		this.applyPendingViewMode();
 	}
 
-	/**
-	 * Delega reload al sub-componente activo. Profesores no reutiliza el botón
-	 * global del header porque su refresh se controla desde la barra de filtros.
-	 */
 	reload(): void {
 		if (this.selectedSubMenu() === 'estudiantes') {
 			this.estudiantesComponent?.reload();
+		} else {
+			this.profesoresComponent?.reload();
 		}
 	}
 
-	// * Re-aplica cambios de modo pendientes al renderizar Estudiantes.
-	onEstudiantesRendered(): void {
-		if (this.pendingViewMode && this.estudiantesComponent) {
-			this.estudiantesComponent.setViewMode(this.pendingViewMode);
+	private applyPendingViewMode(): void {
+		const mode = this.pendingViewMode;
+		if (!mode) return;
+		if (this.selectedSubMenu() === 'estudiantes') {
+			this.estudiantesComponent?.setViewMode(mode);
+		} else {
+			this.profesoresComponent?.setViewMode(mode);
 		}
 	}
 }
