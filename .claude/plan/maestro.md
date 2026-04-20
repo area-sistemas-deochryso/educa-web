@@ -30,7 +30,8 @@
 | 18 | Tests de flujo de negocio E2E | BE+FE | (inline en maestro) | ⏳ | 0% |
 | 19 | Comunicación: foro + mensajería + push | FE+BE | (pendiente planificar) | ⏳ | 0% |
 | 20 | Design System — Estándar desde `usuarios` | FE | `tasks/design-system-from-usuarios.md` | F1 ✅ · F2 ✅ (F2.1-F2.5) · F3 ✅ · F4 ✅ · F5.1-F5.2 ✅ · F5.3 ⏳ (0/8) | ~96% |
-| **21** | **🟡 Asistencia de Profesores en CrossChex** | **BE+FE** | **`plan/asistencia-profesores.md`** | **✅ Chat 1 + Chat 1.5 + Chat 2 cerrados (2026-04-20) · Chat 2: DTOs, 4 endpoints profesor + 3 endpoints PDF, repositorio + service polimórficos, PDFs (día/mes/filtrado), email routing (profesor solo al colegio), guard INV-AD06, SignalR payload con `tipoPersona`. Build limpio + 761 tests verdes. Deploy pendiente: ejecutar `plan21_chat15_FkRepointAsistenciaPersona.sql`** | **~55%** |
+| **21** | **🟡 Asistencia de Profesores en CrossChex** | **BE+FE** | **`plan/asistencia-profesores.md`** | **✅ Chat 1 + Chat 1.5 + Chat 2 + Chat 3 + Chat 4 cerrados (2026-04-20, validado E2E con seed en prueba) · Chat 4: backend agrega `GET /profesor/me/dia` + `GET /profesor/me/mes` self-service (DNI del claim). Frontend: shell profesor reescrito con `p-tabs` ("Mi asistencia" default + "Mis estudiantes" condicional). Vista estudiantes extraída a sub-componente; nueva vista `propia` con navegación mes + 5 stat-cards + tabla. Durante validación E2E se descubrieron y corrigieron 2 bugs críticos: (1) subquery correlacionada anidada de EF Core 9 en repo admin devolvía arrays vacíos sin error — rewrite a split query; (2) lookup de profesor por `PRO_DNI == dni` fallaba siempre (AES no-determinístico) — fix con `PRO_DNI_Hash` SHA256. Backend: 766 tests verdes (+5 nuevos). Frontend: 1340 tests verdes (+3 netos), lint + tsc + build limpios. **Deuda UX identificada**: vista "Mi asistencia" tiene diseño aislado (no usa pill día/mes del header, no muestra attendance-legend, tabla custom, stat-cards propias) — armonización propuesta como Chat 6, no bloquea Chat 5. **Deuda técnica lateral**: `PermisoSaludAuthorizationHelper.cs:63` tiene mismo anti-pattern `DIR_DNI == dni`; `ErrorLog` en prueba le faltan 3 columnas. Deploy pendiente: `plan21_chat15_FkRepointAsistenciaPersona.sql` (Chat 5)** | **~85%** |
+| 22 | Endurecimiento correos de asistencia | BE+FE | `Educa.API/.claude/plan/asistencia-correos-endurecimiento.md` | 🔒 Bloqueado por Plan 21 cerrado · Diseño cerrado 2026-04-20: validación ASCII+RFC al encolar (F1), clasificación SMTP + retry 0/1 según causa (F2), notificación triple outbox+ErrorLog+correo resumen diario (F3), auditoría retroactiva de correos mal formados en BD (F4) | 0% |
 
 **Semáforo de readiness**:
 
@@ -110,6 +111,7 @@ Cada día que pasa sin resolver esto, se pierden marcaciones biométricas de pro
 - **Ninguna dura**: el plan puede arrancar en paralelo a cualquier ola de Carril D.
 - **Relacionado con**: Plan 1 F4 (INV-* en tests) — al formalizar INV-AD06 conviene que haya test unitario del guard de jurisdicción.
 - **No toca**: `/intranet/admin/asistencias` (ese módulo queda fuera de este plan).
+- **Sucesor agendado**: **Plan 22 — Endurecimiento correos de asistencia** (`Educa.API/.claude/plan/asistencia-correos-endurecimiento.md`) queda 🔒 congelado hasta que Plan 21 cierre. Razón: la lógica de distinción estudiante/profesor en el dispatcher y routing de correos se consolida en los Chat 3+ de Plan 21, y F1/F3/F4 del Plan 22 la necesitan para validar, notificar y auditar por tipo de persona.
 
 ---
 
@@ -321,6 +323,7 @@ CARRIL C — DIFERIDO
    Plan 19 (Comunicación: foro+mensajería+push) ── planificación primero (F1)
    Plan 10 F1+ (Flujos Alternos completo) 🔒 ── espera Carril B cerrado
    Plan 7 F3+ (Error Trace avanzado) ── tras Plan 7 F1-F2 en Carril D
+   Plan 22 (Endurecimiento correos asistencia) 🔒 ── espera Plan 21 cerrado
 ```
 
 ---
@@ -740,6 +743,17 @@ CARRIL C — DIFERIDO
 #### Planes 8-9 — Design Patterns
 
 - [ ] Incrementales al tocar cada módulo
+
+#### Plan 22 — Endurecimiento correos de asistencia 🔒 (bloqueado por Plan 21 cerrado)
+
+> **Origen**: Conversación 2026-04-20. Tres patrones de fallo silencioso en correos CrossChex detectados en el buzón `sistemas@laazulitasac.com`: caracteres no-ASCII (ñ/tildes) que rebotan como 550 no such user, bandejas llenas (4.2.2 over quota) y rate limit del SMTP saliente (`laazulitasac.com exceeded 5/5 failures/hour`) que descarta silenciosamente correos legítimos. El retry agresivo actual (5 intentos por bounce) amplifica el problema.
+> **Plan**: [`Educa.API/.claude/plan/asistencia-correos-endurecimiento.md`](../../Educa.API/.claude/plan/asistencia-correos-endurecimiento.md) — Plan #22 del inventario.
+> **Dependencia dura**: Plan 21 cerrado — la distinción estudiante/profesor en dispatcher y routing se consolida en Chat 3+ de Plan 21 y este plan la necesita para validar, notificar y auditar por tipo de persona.
+
+- [ ] **F1 — Validación proactiva al encolar** (1 chat, BE) — `EmailValidator` (ASCII + RFC), guard en `EmailOutboxService.EnqueueAsync` solo para tipos de asistencia, registro FAILED directo sin intento SMTP
+- [ ] **F2 — Clasificación SMTP + política de retry** (1 chat, BE) — columna `EO_TipoFallo`, clasificador de `SmtpCommandException.StatusCode`, retry 0 para permanentes (5.1.1, 5.2.2, 5.7.x, 4.2.2) y 1 retry a 60s para transitorios reales (421, 4.x.x no-2.2). Migración SQL + índice
+- [ ] **F3 — Notificación triple** (2 chats: BE + FE) — outbox con badge de TipoFallo y botón reintentar condicional, inserción fire-and-forget en `ErrorLog`, job Hangfire 07:00 AM Lima que envía correo resumen al área de sistemas
+- [ ] **F4 — Auditoría retroactiva** (2 chats: BE + FE) — endpoint `GET /api/sistema/auditoria-correos-asistencia` + pantalla `/intranet/admin/auditoria-correos` que detecta correos inválidos en BD ANTES del próximo webhook
 
 ---
 

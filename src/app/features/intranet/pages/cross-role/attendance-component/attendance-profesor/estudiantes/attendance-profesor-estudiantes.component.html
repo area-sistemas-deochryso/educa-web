@@ -1,0 +1,124 @@
+<!-- #region Template -->
+<!-- * Shared legend for attendance codes -->
+<app-attendance-legend />
+
+@if (salones().length > 0) {
+	<div class="selector-row">
+		<!-- * Salon selector drives which group is loaded -->
+		<app-salon-selector
+			[salones]="salones()"
+			[selectedSalonId]="selectedSalonId()"
+			[nombreProfesor]="nombreProfesor()"
+			(salonChange)="selectSalon($event)"
+		/>
+	</div>
+
+	@if (selectedSalon() && view.viewMode() === 'mes') {
+		<!-- * PDF actions below selector -->
+		<div class="pdf-section">
+			<!-- Toggle mes/periodo -->
+			<p-selectButton
+				[options]="view.monthSubModeOptions"
+				[ngModel]="view.monthSubMode()"
+				(ngModelChange)="view.setMonthSubMode($event)"
+				optionLabel="label"
+				optionValue="value"
+				[allowEmpty]="false"
+				styleClass="pdf-mode-toggle"
+			/>
+
+			<!-- Grouped: label/selectors + PDF button wrap together -->
+			<div class="pdf-report-info">
+				@if (view.monthSubMode() === 'periodo') {
+					<span class="pdf-label">Periodo:</span>
+					<p-select
+						[options]="view.mesOptionsInicio()"
+						[ngModel]="view.periodoInicio()"
+						(ngModelChange)="view.setPeriodoInicio($event)"
+						optionLabel="label"
+						optionValue="value"
+						appendTo="body"
+						styleClass="periodo-select"
+					/>
+					<span class="periodo-separator">–</span>
+					<p-select
+						[options]="view.mesOptionsFin()"
+						[ngModel]="view.periodoFin()"
+						(ngModelChange)="view.setPeriodoFin($event)"
+						optionLabel="label"
+						optionValue="value"
+						appendTo="body"
+						styleClass="periodo-select"
+					/>
+					<span class="pdf-label">{{ view.periodoYear() }}</span>
+				} @else {
+					<span class="pdf-label">Reporte mensual: {{ view.pdfFecha() | date: 'MMMM yyyy' }}</span>
+				}
+
+				<p-button
+					icon="pi pi-file-pdf"
+					[loading]="view.pdf.downloadingPdf()"
+					[disabled]="view.monthSubMode() === 'periodo' && !view.isPeriodoValid()"
+					severity="danger"
+					[text]="true"
+					[rounded]="true"
+					(onClick)="togglePdfMenu($event)"
+					pTooltip="Opciones de PDF"
+					tooltipPosition="top"
+					[pt]="{
+						root: {
+							'aria-label': 'Opciones de PDF',
+						},
+					}"
+				/>
+				<p-menu #pdfMenu [model]="pdfMenuItems()" [popup]="true" appendTo="body" />
+			</div>
+		</div>
+	}
+
+	@if (view.viewMode() === 'mes') {
+		@if (view.showSkeletons() && !view.tableReady()) {
+			<!-- * Skeleton: reserve space while data loads -->
+			<app-attendance-table-skeleton />
+			<app-attendance-table-skeleton />
+		} @else if (view.estudiantes().length > 0) {
+			<!-- * Month tables: ingresos and salidas -->
+			<app-attendance-table
+				[table]="view.ingresos()"
+				[hijos]="view.estudiantesAsHijos()"
+				[selectedHijoId]="view.selectedEstudianteId()"
+				(monthChange)="view.onIngresosMonthChange($event)"
+				(hijoChange)="view.selectEstudiante($event)"
+			/>
+			<app-attendance-table
+				[table]="view.salidas()"
+				[hijos]="view.estudiantesAsHijos()"
+				[selectedHijoId]="view.selectedEstudianteId()"
+				(monthChange)="view.onSalidasMonthChange($event)"
+				(hijoChange)="view.selectEstudiante($event)"
+			/>
+		} @else if (!view.loading()) {
+			<!-- ! Empty state after load -->
+			<app-empty-state message="No se encontraron estudiantes en este salón." />
+		}
+	} @else {
+		<!-- * Day mode list with date picker + PDF options + estadísticas desde backend -->
+		<app-attendance-day-list
+			[estudiantes]="view.estudiantesDia()"
+			[fecha]="view.fechaDia()"
+			[estadisticas]="view.estadisticasDia()"
+			[loading]="view.loading()"
+			[showPdfButton]="selectedSalon() !== null"
+			[downloadingPdf]="view.pdf.downloadingPdf()"
+			[pdfMenuItems]="pdfMenuItems()"
+			[allowJustify]="true"
+			[savingJustificacion]="savingJustificacion()"
+			(fechaChange)="view.onFechaDiaChange($event)"
+			(justificar)="onJustificar($event)"
+		/>
+	}
+} @else if (!view.loading()) {
+	<!-- ! No assigned salons -->
+	<app-empty-state message="No tiene salones asignados." />
+}
+<!-- #endregion -->

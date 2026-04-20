@@ -1,0 +1,102 @@
+// #region Selector row con PDF
+.selector-row {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	flex-wrap: wrap;
+	gap: 1rem;
+	margin: 0 1rem 1rem 1rem;
+	padding-left: 1.5rem;
+
+	// Remover margin-bottom del selector dentro del row
+	::ng-deep app-grado-seccion-selector .grado-seccion-selector {
+		margin: 0;
+	}
+}
+
+@media (max-width: 768px) {
+	.selector-row {
+		padding-left: 0;
+	}
+}
+
+// #endregion
+// #region PDF section
+.pdf-section {
+	display: flex;
+	align-items: center;
+	gap: 0.75rem;
+	padding: 0.75rem 1.25rem;
+	flex-wrap: wrap;
+
+	.pdf-label {
+		font-size: 0.95rem;
+		font-weight: 500;
+		color: var(--text-color);
+		white-space: nowrap;
+	}
+}
+
+// #endregion
+// #region Report info group
+.pdf-report-info {
+	display: flex;
+	align-items: center;
+	gap: 0.5rem;
+	flex-wrap: wrap;
+}
+
+.periodo-separator {
+	font-size: 0.9rem;
+	color: var(--text-color-secondary);
+}
+
+::ng-deep .periodo-select {
+	min-width: 120px;
+	max-width: 160px;
+}
+
+::ng-deep .pdf-mode-toggle {
+	.p-togglebutton {
+		padding: 0.4rem 0.75rem;
+		font-size: 0.85rem;
+		background: transparent;
+	}
+}
+
+// #endregion
+// #region Personalización del menú PDF
+::ng-deep .p-menu {
+	background: var(--intranet-background-color) !important;
+	border: 1px solid #ddd !important;
+	box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1) !important;
+
+	a:hover {
+		color: initial !important;
+	}
+
+	.p-menuitem-icon,
+	.p-menuitem-text,
+	.p-menu-item-icon,
+	a {
+		color: var(--intranet-accent-color-blue) !important;
+	}
+	.p-menuitem-link {
+		color: var(--intranet-default-text-color) !important;
+		padding: 0.75rem 1rem !important;
+		transition: all 0.3s ease !important;
+
+		.p-menuitem-icon {
+			color: var(--intranet-default-text-color) !important;
+		}
+
+		.p-menuitem-text {
+			color: var(--intranet-default-text-color) !important;
+		}
+
+		&:focus {
+			box-shadow: none !important;
+		}
+	}
+}
+// #endregion

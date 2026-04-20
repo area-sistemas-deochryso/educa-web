@@ -180,33 +180,75 @@ Orden: `Profesor → Estudiante → rechazar`. Justificación: hay menos profeso
 | DI | `ServiceExtensions.cs` — registradas `IReporteFiltradoProfesoresService` + `IReporteAsistenciaProfesorPdfService`. | ✅ |
 | Tests nuevos | `JustificacionAsistenciaStrategyTests.cs` (3 tests: guard INV-AD06 lanza, admin crea con TipoPersona='P', método estudiante delega al core). `ConsultaAsistenciaControllerTests.cs` región Profesores (6 tests: sede=0 → Unauthorized, profesor no existe → NotFound, delegación correcta, rango inválido → BusinessRule, dia/mes). `AsistenciaServiceTests.cs` actualizado: ahora verifica que profesor envía correo al colegio y NUNCA al apoderado (antes era `Never` por scope Chat 1). | ✅ 761 tests verdes (+9 vs Chat 1.5) |
 
-### Chat 3 — Frontend admin (submenú + vista profesores)
+### Chat 3 — Frontend admin (submenú + vista profesores) ✅ 2026-04-20
 
-**Objetivo**: Admin puede consultar, filtrar, exportar reportes y justificar asistencia de profesores.
+**Objetivo**: Admin puede consultar, filtrar y exportar reportes de asistencia de profesores desde `/intranet/asistencia`. Justificación manual queda diferida (se conecta a `JustificarAsistenciaProfesor` cuando el endpoint se exponga al frontend — Chat 4/5).
 
-| Entregable | Archivo |
-| ---------- | ------- |
-| Deuda bloqueante | `shared/constants/app-roles.ts` — corregir `APP_USER_ROLE_ADMIN_LIST` para que contenga solo Director + 3 administrativos no-Director. |
-| Shell submenú | `attendance-director.component.ts` + `.html` — agregar `p-selectButton` Estudiantes/Profesores al inicio. Extraer lógica actual a `attendance-director-estudiantes.component.ts`. |
-| Vista profesores | `attendance-director-profesores.component.ts` + `.html` + `.scss` — selector profesor individual + rango fecha + estado (A/T/F/J). Modos Día/Mes. Botones exportar reportes. |
-| Service API | `asistencia-profesor.service.ts` — gateway HTTP a los 4 endpoints nuevos. |
-| Store | `asistencia-profesor.store.ts` — estado: lista, filtros, loading, selección. |
-| Facade data | `asistencia-profesor-data.facade.ts` — carga/refresh con WAL read-only. |
-| Facade UI | `asistencia-profesor-ui.facade.ts` — toggle vista, filtros. |
-| Modelos | `data/models/asistencia.models.ts` — agregar `AsistenciaProfesorDto`, `TipoPersona = 'E' \| 'P'` (semantic-types). |
-| Mapping | `shared/services/ui-mapping.service.ts` — helper `getTipoPersonaLabel`. |
-| Reports preview | Componentes preview para profesor-día/mes/año/consolidado. |
+| Entregable | Archivo | Estado |
+| ---------- | ------- | ------ |
+| Deuda bloqueante | `shared/constants/app-roles.ts` — `APP_USER_ROLE_ADMIN_LIST` y `AppUserRoleAdmin` ahora solo contienen Director + 3 administrativos no-Director. Los usos previos que necesitaban "todos los roles gestionables" (`ROLES_DISPONIBLES_ADMIN`, `ROLES_USUARIOS_ADMIN`) migraron a `APP_USER_ROLE_LIST`. | ✅ |
+| Shell submenú | `attendance-director.component` (ts + html + scss) reescritos como shell con `p-selectButton` Estudiantes/Profesores. Delega a los dos sub-componentes y conserva el contrato `setViewMode`/`reload` usado por `attendance.component` vía ViewChild. | ✅ |
+| Vista estudiantes extraída | `attendance-director/estudiantes/attendance-director-estudiantes.component` (ts + html + scss) — copia 1:1 de la lógica anterior del director. Ruta del helper `consolidated-pdf.helper` actualizada a `../`. Spec nuevo con los mismos checks que el anterior. | ✅ |
+| Vista profesores | `attendance-director/profesores/attendance-director-profesores.component` (ts + html + scss) — filtros rango + estado, tabla paginada (`lazy` + `rowsPerPageOptions`), detalle expandido con toggle Día/Mes, datepicker/mes+año, tag de estado, 3 PDFs (día / mes / filtrado). | ✅ |
+| Service API | `shared/services/attendance/asistencia-profesor-api.service.ts` — gateway HTTP a los 7 endpoints (4 JSON + 3 PDF) del Chat 2. Re-exportado en `@shared/services/attendance`. | ✅ |
+| Store | `attendance-director/profesores/services/asistencia-profesor.store.ts` — signals privados con `asReadonly()`, pagination/filters/viewMode/selectedDate/selectedMes/selectedAnio/downloadingPdf, computed `profesorOptions`/`hasItems`/`totalPages`. | ✅ |
+| Facade data | `asistencia-profesor-data.facade.ts` — `loadList`/`refreshList`/`applyFilters`/`changePage`/`loadProfesorDia`/`loadProfesorMes`/`refreshDetail` con `withRetry` + `catchError` + `ErrorHandlerService`. Re-expone signals del store para que el componente no lo importe directo (regla `layer-enforcement`). | ✅ |
+| Facade UI | `asistencia-profesor-ui.facade.ts` — selección, toggle modo/fecha/mes/año, filtros, 6 acciones de PDF (ver+descargar × día+mes+filtrado). | ✅ |
+| Modelos | `data/models/attendance.models.ts` — agregados `TIPO_PERSONA` (const array) + `TipoPersona` (semantic-types, valores `'E'` o `'P'`) + `AsistenciaProfesorDto`. | ✅ |
+| Mapping | `shared/services/ui-mapping/ui-mapping.service.ts` — `getTipoPersonaLabel(tipo: TipoPersona): string`. | ✅ |
+| Shell cross-role | `attendance.component` (ts + html) — agregado `CoordinadorAcademico` al switch de rol y al mode selector header (consistente con el nuevo alcance de administrativos). | ✅ |
+| Reports preview | Reutiliza los endpoints PDF del Chat 2 (el usuario ve el PDF vía `viewBlobInNewTab`). No se crearon componentes preview dedicados — la UX actual abre el PDF en tab aparte, consistente con el flujo de estudiantes. | ✅ |
+| Tests | 5 tests nuevos (2 en `AttendanceDirectorEstudiantesComponent` portados del spec anterior, 3 en shell `AttendanceDirectorComponent` cubriendo submenú). Lint + `tsc --noEmit` limpios. Build dev OK. 1337 tests verdes (de 1332 previos). | ✅ |
 
-### Chat 4 — Frontend profesor (panel propia)
+### Chat 4 — Frontend profesor (panel propia) ✅ 2026-04-20
 
-**Objetivo**: Profesor ve su propia asistencia read-only.
+**Objetivo**: Profesor ve su propia asistencia read-only. Requiere backend nuevo: dos endpoints self-service (`/profesor/me/dia`, `/profesor/me/mes`) con `[Authorize(Roles = Profesor)]` que extraen el DNI del claim — los endpoints existentes `/profesor/{dni}/*` (solo `Administrativos`) no se alteran.
 
-| Entregable | Archivo |
-| ---------- | ------- |
-| Panel en profesor | `attendance-profesor.component.ts` + `.html` — agregar `p-tabView` con "Mi asistencia" + (si tutor) "Mis estudiantes". |
-| Sub-componente | `attendance-profesor-propia.component.ts` — consume endpoint `/profesor/{dni}/mes` con DNI del usuario autenticado. Read-only. Skeleton. |
-| Store/facade | `asistencia-propia.store.ts` + `asistencia-propia.facade.ts` — carga mes actual, permite navegar meses anteriores. |
-| Detección tutor | Verificar si profesor actual tiene salones como tutor — si no, solo mostrar "Mi asistencia" sin tab. |
+**Validación end-to-end**: 2026-04-20. Probado en BD `educa-prueba` (local SQL Express) con seed de 4 asistencias de profesor en abril 2026. Response JSON retorna los 4 registros con `estadoCodigo` correcto calculado (A/T/F/J). UI muestra stat-cards + tabla sin errores.
+
+**Bugs descubiertos y corregidos durante validación**:
+
+1. **EF Core 9 subquery correlacionada anidada devolvía arrays vacíos sin error** en `ListarProfesoresPorFechaRangoAsync` y `GetAsistenciaProfesorAsync`. La forma `select new { ..., Collection = _context.X.Where(...).Select(y => new { ..., Nested = _context.Z.Where(...) }).ToList() }` con 2 niveles de subquery en proyección falla silenciosamente. **Fix**: rewrite a split query (2 queries separadas + GroupBy client-side).
+
+2. **Lookup de profesor por `p.PRO_DNI == dni` fallaba 100% del tiempo**. El campo `PRO_DNI` está mapeado via value converter a `PRO_DNI_Encrypted` (varbinary) con AES-256 **no-determinístico** (IV random). Cada encriptación de `dni` produce ciphertext distinto → el compare nunca matchea → `NotFoundException`. **Fix**: inyectar `IDniEncryptionService` en `ConsultaAsistenciaRepository` y lookup por `PRO_DNI_Hash` (SHA256 determinístico) vía `_dniEncryption.ComputeHash(dni)`. Mismo patrón que `AsistenciaService`/`ProfesorRepository`/`AsistenciaRepository`.
+
+**Deuda técnica observada durante testing** (no bloqueante Plan 21):
+
+- `Services/Asistencias/PermisoSalud/PermisoSaludAuthorizationHelper.cs:63` usa el mismo anti-pattern `d.DIR_DNI == dni`. Falla cuando el caller es director buscándose a sí mismo. Fix trivial (inyectar `IDniEncryptionService` + hash lookup), chat futuro.
+- Tabla `ErrorLog` en BD de prueba le faltan columnas `ERL_RequestBody`, `ERL_RequestHeaders`, `ERL_ResponseBody`. Migration SQL pendiente. El código es tolerante (fire-and-forget INV-ET02) pero floodea logs con warnings.
+
+**Deuda de UX (Chat 4 ≥ Chat 5)** 🟡:
+
+La vista "Mi asistencia" (`attendance-profesor-propia.component`) quedó con **diseño aislado** del resto del módulo asistencia. Discrepancias:
+
+- **No usa el pill día/mes** del `attendance-header.component` compartido (el `setViewMode` del shell intencionalmente ignora la tab "Mi asistencia" porque la vista solo soporta modo mes). Como consecuencia, cuando el profesor está en esta tab, el pill del header sigue visible pero no tiene efecto — UX confuso.
+- **No muestra `app-attendance-legend`** con la leyenda A/T/F/J que usan todas las demás vistas (estudiante, apoderado, admin).
+- **Tabla custom** en lugar de `AttendanceTableComponent`/`AttendanceDayListComponent` compartidos. Los tags de color y el layout general son consistentes pero no reutilizan el mismo componente.
+- **Stat-cards propias** (5 cards: Total/A/T/F/J) en lugar de integrar con `AttendanceStatsService` que ya calcula el mismo conteo para otras vistas.
+
+**Plan de armonización (Chat 6 propuesto)**:
+
+| Acción | Resultado |
+| ------ | --------- |
+| Wire del pill día/mes al tab "Mi asistencia" | El selector funciona también aquí (requiere agregar endpoint `/profesor/me/dia` al frontend y vista modo día) |
+| Embeber `<app-attendance-legend />` al tope del panel propia | Consistencia visual con estudiante/apoderado |
+| Reusar `AttendanceTableComponent` en lugar de tabla custom | DRY + consistencia de tags/colores |
+| Integrar con `AttendanceViewController` | Mismo mental model que estudiante/apoderado (salones, días, etc.) |
+
+Scope ~1 chat pequeño. No bloquea Chat 5 (deploy + sync + cierre del plan).
+
+| Entregable | Archivo | Estado |
+| ---------- | ------- | ------ |
+| Backend endpoints self-service | `ConsultaAsistenciaController.cs` — `GET /profesor/me/dia` + `GET /profesor/me/mes` con `[Authorize(Roles = Roles.Profesor)]`; extraen DNI vía `User.GetDni()`, delegan a los métodos existentes del service (`ObtenerAsistenciaProfesorDia/Mes`). Lanzan `UnauthorizedException("ASISTENCIA_SEDE_NOT_FOUND" / "ASISTENCIA_DNI_NOT_FOUND")` y `NotFoundException("PROFESOR_NOT_FOUND")`. | ✅ |
+| Backend tests | `ConsultaAsistenciaControllerTests.cs` — region nueva "Self-service profesor" con 5 tests: sin sedeId → Unauthorized, sin DNI → Unauthorized, día con DNI del claim, mes con default mes/año, profesor no existe → NotFound. | ✅ 766 tests verdes (761 del Chat 2 + 5 nuevos) |
+| Service API frontend | `shared/services/attendance/asistencia-profesor-api.service.ts` — métodos `obtenerMiAsistenciaDia(fecha)` y `obtenerMiAsistenciaMes(mes?, anio?)` que consumen los nuevos endpoints. | ✅ |
+| Store self-service | `attendance-profesor/propia/services/asistencia-propia.store.ts` — `providedIn: 'root'`, signals privados con `asReadonly()` para detalle/loading/error/mes/anio, computed `asistencias`/`conteo` (A/T/F/J/pendiente)/`selectedLabel`/`hasData`. | ✅ |
+| Facade self-service | `asistencia-propia.facade.ts` — `loadMes()`/`refresh()`/`setMes`/`setAnio`/`nextMonth`/`prevMonth`/`goToCurrent`/`isCurrentMonth()` con rollover de año en enero/diciembre. `withRetry` + `catchError` + `ErrorHandlerService`. | ✅ |
+| Sub-componente propia | `attendance-profesor-propia.component.{ts,html,scss}` — consume facade, navegación mes con chevrons + selectores mes/año + botón "Hoy"/"Actualizar". 5 stat-cards (total, asistió, tardanza, falta, justificado). Tabla con skeleton. | ✅ |
+| Shell profesor con tabs | `attendance-profesor.component.{ts,html,scss}` reescrito como shell usando `p-tabs` de PrimeNG 21. Tabs: "Mi asistencia" (default) + "Mis estudiantes" (solo si `hasSalones`). Carga salones (`getSalonesProfesor` + `getSalonesProfesorPorHorario`) para decidir visibilidad. Preserva contrato `setViewMode`/`reload`/`selectSalonFromQueryParam` vía ViewChild delegando al tab activo. | ✅ |
+| Vista estudiantes extraída | `attendance-profesor/estudiantes/attendance-profesor-estudiantes.component.{ts,html,scss}` — copia 1:1 de la lógica anterior del shell profesor (AttendanceViewController, forkJoin tutoría+horario, justificación, PDF menu). Agrega output `salonesLoaded` (emitido por consistencia aunque el shell carga en paralelo). | ✅ |
+| Tests shell | 5 tests en `attendance-profesor.component.spec.ts`: should create, default tab 'propia', hasSalones=false sin salones, onTabChange cambia tab, onTabChange ignora valores inválidos. | ✅ |
+| Frontend validación | Lint limpio (`npm run lint` — All files pass). TypeScript limpio. Build dev OK. 1340 tests verdes (1337 del Chat 3 + 3 nuevos netos del shell — 2 antiguos eliminados del spec previo). | ✅ |
 
 ### Chat 5 — Cierre (deploy + sync histórico + reglas)
 

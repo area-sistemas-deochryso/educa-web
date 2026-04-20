@@ -2,7 +2,12 @@
 import { Injectable } from '@angular/core';
 import { APP_USER_ROLES } from '@app/shared/constants';
 import { getEstadoSeverity } from '@core/helpers';
-import type { TipoEventoCalendario, NotificacionTipo, NotificacionPrioridad } from '@data/models';
+import type {
+	TipoEventoCalendario,
+	NotificacionTipo,
+	NotificacionPrioridad,
+	TipoPersona,
+} from '@data/models';
 
 // #endregion
 // #region Implementation
@@ -65,6 +70,13 @@ const NOTIFICACION_PRIORIDAD_LABEL: Record<NotificacionPrioridad, string> = {
 	medium: 'Media',
 	high: 'Alta',
 	urgent: 'Urgente',
+};
+// #endregion
+
+// #region Tipo Persona (Plan 21)
+const TIPO_PERSONA_LABEL: Record<TipoPersona, string> = {
+	E: 'Estudiante',
+	P: 'Profesor',
 };
 // #endregion
 
@@ -142,6 +154,15 @@ export class UiMappingService {
 
 	getNotificacionPrioridadLabel(prioridad: NotificacionPrioridad): string {
 		return NOTIFICACION_PRIORIDAD_LABEL[prioridad] ?? prioridad;
+	}
+	// #endregion
+
+	// #region Tipo Persona (Plan 21)
+	/**
+	 * Label amigable para el discriminador `TipoPersona` ('E' | 'P').
+	 */
+	getTipoPersonaLabel(tipo: TipoPersona): string {
+		return TIPO_PERSONA_LABEL[tipo] ?? tipo;
 	}
 	// #endregion
 }

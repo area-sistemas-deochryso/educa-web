@@ -1,118 +1,95 @@
-import { AttendanceService, SalonProfesor, StorageService, UserProfileService } from '@core/services';
-import { periodoEnMes, filtrarPorPeriodoAcademico } from '@shared/models';
-import { JustificacionEvent } from '@features/intranet/components/attendance/attendance-day-list/attendance-day-list.component';
-import { ChangeDetectionStrategy, Component, DestroyRef, OnInit, ViewChild, computed, inject, signal } from '@angular/core';
-
-import { AttendanceDayListComponent } from '@features/intranet/components/attendance/attendance-day-list/attendance-day-list.component';
-import { AttendanceLegendComponent } from '@app/features/intranet/components/attendance/attendance-legend/attendance-legend.component';
-import { AttendanceTableComponent } from '@features/intranet/components/attendance/attendance-table/attendance-table.component';
-import { AttendanceTableSkeletonComponent } from '@features/intranet/components/attendance/attendance-table-skeleton/attendance-table-skeleton.component';
-import { AttendanceViewController } from '@features/intranet/services/attendance/attendance-view.service';
-import { SelectorContext } from '@features/intranet/services/attendance/attendance-view.models';
-import { AttendancePdfService } from '@features/intranet/services/attendance/attendance-pdf.service';
-import { AttendanceStatsService } from '@features/intranet/services/attendance/attendance-stats.service';
-import {
-	VIEW_MODE,
-	ViewMode,
-} from '@features/intranet/components/attendance/attendance-header/attendance-header.component';
-import { ButtonModule } from 'primeng/button';
-import { DatePipe } from '@angular/common';
-import { EmptyStateComponent } from '@features/intranet/components/attendance/empty-state/empty-state.component';
-import { FormsModule } from '@angular/forms';
-import { Menu, MenuModule } from 'primeng/menu';
-import { MenuItem } from 'primeng/api';
-import { SalonSelectorComponent } from '@features/intranet/components/attendance/salon-selector/salon-selector.component';
-import { Select } from 'primeng/select';
-import { SelectButton } from 'primeng/selectbutton';
-import { TooltipModule } from 'primeng/tooltip';
-import { finalize, forkJoin } from 'rxjs';
+import { ChangeDetectionStrategy, Component, ViewChild, computed, inject, signal } from '@angular/core';
+import { forkJoin, finalize } from 'rxjs';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { DestroyRef } from '@angular/core';
+
+import { TabsModule } from 'primeng/tabs';
+
+import { AttendanceService, SalonProfesor } from '@core/services';
+import { ViewMode } from '@features/intranet/components/attendance/attendance-header/attendance-header.component';
+
+import { AttendanceProfesorPropiaComponent } from './propia/attendance-profesor-propia.component';
+import { AttendanceProfesorEstudiantesComponent } from './estudiantes/attendance-profesor-estudiantes.component';
 
 /**
- * Componente Container para vista de asistencias de Profesores.
- * Maneja la selección de salón; la lógica compartida (estudiantes,
- * modo día/mes, tablas y PDF) vive en AttendanceViewController.
+ * Shell del panel de asistencia para el rol Profesor (Plan 21 Chat 4).
+ *
+ * Arma dos pestañas:
+ * - "Mi asistencia" (self-service): siempre visible.
+ * - "Mis estudiantes" (tutor/docente): visible solo si el profesor tiene
+ *   salones asignados (como tutor o vía horario).
+ *
+ * El shell mantiene el contrato `setViewMode` / `reload` usado por el
+ * componente padre `AttendanceComponent` vía ViewChild. La delegación se
+ * hace al tab activo.
  */
 @Component({
 	selector: 'app-attendance-profesor',
 	standalone: true,
-	imports: [
-		AttendanceTableComponent,
-		AttendanceTableSkeletonComponent,
-		SalonSelectorComponent,
-		AttendanceDayListComponent,
-		EmptyStateComponent,
-		AttendanceLegendComponent,
-		ButtonModule,
-		TooltipModule,
-		MenuModule,
-		DatePipe,
-		FormsModule,
-		Select,
-		SelectButton,
-	],
-	providers: [AttendanceViewController, AttendancePdfService, AttendanceStatsService],
+	imports: [TabsModule, AttendanceProfesorPropiaComponent, AttendanceProfesorEstudiantesComponent],
 	templateUrl: './attendance-profesor.component.html',
 	styleUrl: './attendance-profesor.component.scss',
 	changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class AttendanceProfesorComponent implements OnInit {
-	@ViewChild('pdfMenu') pdfMenu!: Menu;
+export class AttendanceProfesorComponent {
+	private readonly asistenciaService = inject(AttendanceService);
+	private readonly destroyRef = inject(DestroyRef);
 
-	private asistenciaService = inject(AttendanceService);
-	private storage = inject(StorageService);
-	private destroyRef = inject(DestroyRef);
-	// * Shared controller handles month/day, tables, and PDF actions.
-	readonly view = inject(AttendanceViewController);
-	// * Used by the selector and PDF header.
-	readonly nombreProfesor = inject(UserProfileService).userName;
+	@ViewChild(AttendanceProfesorEstudiantesComponent)
+	private estudiantesComponent?: AttendanceProfesorEstudiantesComponent;
 
-	// #region Salones
+	@ViewChild(AttendanceProfesorPropiaComponent)
+	private propiaComponent?: AttendanceProfesorPropiaComponent;
 
-	/** Salón pendiente de selección (viene de query param antes de que carguen los salones) */
-	private _pendingSalonId: number | null = null;
-	private readonly allSalones = signal<SalonProfesor[]>([]);
-	readonly salones = computed(() => {
-		const all = this.allSalones().filter((s) => s.totalEstudiantes > 0);
-		const month = this.view.ingresos().selectedMonth;
-		const periodo = periodoEnMes(month);
-		return filtrarPorPeriodoAcademico(all, periodo, (s) => s.seccion);
+	// #region Detección de salones del profesor
+
+	/**
+	 * Salones del profesor (tutor + horario). Null mientras no cargan.
+	 * Si está vacío, la pestaña "Mis estudiantes" se oculta.
+	 */
+	private readonly salonesProfesor = signal<SalonProfesor[] | null>(null);
+
+	/**
+	 * true si el profesor tiene al menos un salón asignado.
+	 * Se muestra la pestaña "Mis estudiantes" solo en ese caso.
+	 */
+	readonly hasSalones = computed(() => {
+		const salones = this.salonesProfesor();
+		return salones !== null && salones.length > 0;
 	});
-	readonly selectedSalonId = signal<number | null>(null);
-	readonly selectedSalon = computed(() => {
-		const id = this.selectedSalonId();
-		// Buscar primero en salones filtrados, luego en todos (para query param que bypass verano filter)
-		return this.salones().find((s) => s.salonId === id)
-			|| this.allSalones().find((s) => s.salonId === id)
-			|| null;
-	});
+
+	readonly salonesReady = computed(() => this.salonesProfesor() !== null);
 
 	// #endregion
-	// #region Justificación
-	readonly savingJustificacion = signal(false);
+	// #region Tabs
 
-	ngOnInit(): void {
-		// * Configure shared controller callbacks for profesor endpoints + storage.
-		this.view.init({
-			loadEstudiantes: (grado, seccion, mes, anio) =>
-				this.asistenciaService.getAsistenciasGrado(grado, seccion, mes, anio),
-			loadDia: (grado, seccion, fecha) =>
-				this.asistenciaService.getAsistenciaDia(grado, seccion, fecha),
-			getSelectorContext: () => this.getSelectorContext(),
-			onMonthChange: () => this.reselectSalonIfNeeded(),
-			getStoredEstudianteId: () => this.storage.getSelectedEstudianteId(),
-			setStoredEstudianteId: (id) => this.storage.setSelectedEstudianteId(id),
-		});
-		this.loadSalones();
+	/**
+	 * Tab activo.
+	 * - Default: 'propia' (el profesor abre primero su propia asistencia).
+	 * - Si no tiene salones, permanece en 'propia' (la otra tab está oculta).
+	 */
+	readonly activeTab = signal<'propia' | 'estudiantes'>('propia');
+
+	onTabChange(value: string): void {
+		if (value === 'propia' || value === 'estudiantes') {
+			this.activeTab.set(value);
+		}
 	}
 
 	// #endregion
-	// #region Carga y selección de salón
+	// #region Ciclo de vida
 
-	private loadSalones(): void {
-		// * Fetch from both ProfesorSalon (tutor) and Horarios (teaching), then merge.
-		this.view.loading.set(true);
+	constructor() {
+		this.loadSalonesProfesor();
+	}
 
+	/**
+	 * Carga los salones del profesor autenticado para decidir si mostrar
+	 * la pestaña "Mis estudiantes". Usa los mismos endpoints que la vista
+	 * estudiantes — el resultado queda cacheado por el SW (SWR) y el tab
+	 * estudiantes lo consume de cache cuando se monte.
+	 */
+	private loadSalonesProfesor(): void {
 		forkJoin({
 			tutoria: this.asistenciaService.getSalonesProfesor(),
 			horario: this.asistenciaService.getSalonesProfesorPorHorario(),
@@ -120,171 +97,61 @@ export class AttendanceProfesorComponent implements OnInit {
 			.pipe(
 				takeUntilDestroyed(this.destroyRef),
 				finalize(() => {
-					if (this.salones().length === 0) {
-						this.view.loading.set(false);
+					if (this.salonesProfesor() === null) {
+						// Marcar como cargado aunque haya fallado para no bloquear la UI
+						this.salonesProfesor.set([]);
 					}
 				}),
 			)
 			.subscribe({
 				next: ({ tutoria, horario }) => {
-					// Merge: tutoria takes priority (has EsTutor=true), add horario salons not already present
-					const merged = [...tutoria];
 					const existingIds = new Set(tutoria.map((s) => s.salonId));
+					const merged = [...tutoria];
 					for (const salon of horario) {
-						if (!existingIds.has(salon.salonId)) {
-							merged.push(salon);
-						}
+						if (!existingIds.has(salon.salonId)) merged.push(salon);
 					}
-					this.allSalones.set(merged);
-
-					// Si hay un salón pendiente de query param, buscarlo en TODOS los salones
-					if (this._pendingSalonId !== null) {
-						const pending = this._pendingSalonId;
-						this._pendingSalonId = null;
-						const found = merged.some((s) => s.salonId === pending);
-						if (found) {
-							this.selectedSalonId.set(pending);
-							this.saveSelectedSalon();
-							this.view.reload();
-							return;
-						}
-					}
-
-					if (this.salones().length > 0) {
-						this.restoreSelectedSalon();
-						this.view.reload();
-					}
+					this.salonesProfesor.set(merged);
 				},
-				error: () => {
-					this.view.loading.set(false);
-				},
+				error: () => this.salonesProfesor.set([]),
 			});
 	}
 
-	selectSalon(salonId: number): void {
-		// * Avoid reload if the same salon is re-selected.
-		if (this.selectedSalonId() === salonId) return;
+	// #endregion
+	// #region Delegados al padre (AttendanceComponent via @ViewChild)
 
-		this.selectedSalonId.set(salonId);
-		this.saveSelectedSalon();
-		this.view.reload();
-	}
-
-	private restoreSelectedSalon(): void {
-		// * Persisted selection helps keep context between navigations.
-		const salonId = this.storage.getSelectedSalonId();
-		if (salonId !== null && this.salones().some((s) => s.salonId === salonId)) {
-			this.selectedSalonId.set(salonId);
-			return;
-		}
-		const firstSalon = this.salones()[0];
-		if (firstSalon) {
-			this.selectedSalonId.set(firstSalon.salonId);
-		}
-	}
-
-	private saveSelectedSalon(): void {
-		const id = this.selectedSalonId();
-		if (id) {
-			this.storage.setSelectedSalonId(id);
-		}
-	}
-
-	private reselectSalonIfNeeded(): void {
-		// * When month changes (verano filter), ensure selection is still valid.
-		const currentId = this.selectedSalonId();
-		const filtered = this.salones();
-		if (currentId && filtered.some((s) => s.salonId === currentId)) {
-			return;
-		}
-		const first = filtered[0] ?? null;
-		this.selectedSalonId.set(first?.salonId ?? null);
-		if (first) {
-			this.saveSelectedSalon();
+	/**
+	 * Delega el cambio de modo día/mes al tab activo.
+	 * - Tab "Mi asistencia" no soporta modo día — ignora.
+	 * - Tab "Mis estudiantes" delega al sub-componente.
+	 */
+	setViewMode(mode: ViewMode): void {
+		if (this.activeTab() === 'estudiantes') {
+			this.estudiantesComponent?.setViewMode(mode);
 		}
 	}
 
 	/**
-	 * Pre-selecciona un salón desde query param (ej: navegación desde horarios).
-	 * Si los salones ya están cargados, selecciona inmediatamente.
-	 * Si no, guarda como pendiente para aplicar cuando loadSalones complete.
+	 * Delega el reload al tab activo.
 	 */
-	selectSalonFromQueryParam(salonId: number): void {
-		if (this.salones().length > 0) {
-			this.selectSalon(salonId);
+	reload(): void {
+		if (this.activeTab() === 'propia') {
+			this.propiaComponent?.onRefresh();
 		} else {
-			this._pendingSalonId = salonId;
+			this.estudiantesComponent?.reload();
 		}
 	}
 
-	// #endregion
-	// #region Delegados al servicio (llamados por el padre via @ViewChild)
-
-	// * Parent component calls these via ViewChild.
-	setViewMode(mode: ViewMode): void {
-		this.view.setViewMode(mode);
+	/**
+	 * Pre-selecciona un salón desde query param (navegación desde horarios).
+	 * Requiere cambiar a la tab de estudiantes primero.
+	 */
+	selectSalonFromQueryParam(salonId: number): void {
+		this.activeTab.set('estudiantes');
+		// * queueMicrotask asegura que el ViewChild esté disponible tras el cambio de tab.
+		queueMicrotask(() => {
+			this.estudiantesComponent?.selectSalonFromQueryParam(salonId);
+		});
 	}
 
-	reload(): void {
-		this.view.reload();
-	}
-
-	// #endregion
-	// #region PDF menu
-
-	readonly pdfMenuItems = computed<MenuItem[]>(() => {
-		const isMonth = this.view.viewMode() === VIEW_MODE.Mes;
-		const isPeriodo = this.view.monthSubMode() === 'periodo';
-		const { selectedMonth, selectedYear } = this.view.ingresos();
-		const fecha = this.view.pdfFecha();
-
-		const ver = () => isMonth
-			? (isPeriodo ? this.view.pdf.verPeriodoFromContext(this.view.periodoInicio(), selectedYear, this.view.periodoFin()) : this.view.pdf.verMesFromContext(selectedMonth, selectedYear))
-			: this.view.pdf.verPdfAsistenciaDia(fecha);
-		const desc = () => isMonth
-			? (isPeriodo ? this.view.pdf.descargarPeriodoFromContext(this.view.periodoInicio(), selectedYear, this.view.periodoFin()) : this.view.pdf.descargarMesFromContext(selectedMonth, selectedYear))
-			: this.view.pdf.descargarPdfAsistenciaDia(fecha);
-
-		return [
-			{ label: 'Ver PDF', icon: 'pi pi-eye', command: ver },
-			{ label: 'Descargar PDF', icon: 'pi pi-download', command: desc },
-		];
-	});
-
-	togglePdfMenu(event: Event): void {
-		this.pdfMenu.toggle(event);
-	}
-
-	// #endregion
-	// #region Justificación
-
-	onJustificar(event: JustificacionEvent): void {
-		const fecha = this.view.fechaDia();
-		this.savingJustificacion.set(true);
-
-		this.asistenciaService
-			.justificarAsistencia(event.estudianteId, fecha, event.observacion, event.quitar)
-			.pipe(
-				takeUntilDestroyed(this.destroyRef),
-				finalize(() => this.savingJustificacion.set(false)),
-			)
-			.subscribe({
-				next: (response) => {
-					if (response.success) {
-						// Recargar datos del día para reflejar el cambio
-						this.view.reload();
-					}
-				},
-			});
-	}
-
-	// #endregion
-	// #region Helpers privados
-
-	private getSelectorContext(): SelectorContext | null {
-		const salon = this.selectedSalon();
-		if (!salon) return null;
-		return { grado: salon.grado, gradoCodigo: salon.gradoCodigo, seccion: salon.seccion };
-	}
 	// #endregion
 }

@@ -1,0 +1,184 @@
+.profesores-container {
+	display: flex;
+	flex-direction: column;
+	gap: 1rem;
+	padding: 0 1rem 1rem;
+}
+
+// #region Filters bar
+.filters-bar {
+	display: flex;
+	align-items: flex-end;
+	gap: 1rem;
+	padding: 0.75rem 1rem;
+	background: transparent;
+	border: 1px solid var(--surface-300);
+	border-radius: 10px;
+	flex-wrap: wrap;
+
+	.filter-field {
+		display: flex;
+		flex-direction: column;
+		gap: 0.35rem;
+		min-width: 160px;
+	}
+
+	.filter-actions {
+		display: flex;
+		align-items: center;
+		gap: 0.5rem;
+		margin-left: auto;
+	}
+}
+
+:host ::ng-deep .estado-select {
+	min-width: 160px;
+}
+
+@media (max-width: 768px) {
+	.filters-bar {
+		.filter-actions {
+			margin-left: 0;
+			width: 100%;
+			justify-content: flex-end;
+		}
+	}
+}
+// #endregion
+
+// #region Table
+.table-section {
+	background: transparent;
+	border: 1px solid var(--surface-300);
+	border-radius: 12px;
+	overflow: hidden;
+
+	.dni-cell {
+		font-family: monospace;
+		font-size: 0.9rem;
+	}
+
+	.actions {
+		display: flex;
+		justify-content: center;
+		gap: 0.25rem;
+	}
+
+	.row-selected > td {
+		background: var(--surface-100) !important;
+	}
+
+	.empty-message {
+		padding: 2rem 1rem;
+		text-align: center;
+	}
+
+	.empty-state {
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+		gap: 0.5rem;
+		color: var(--text-color-secondary);
+
+		i {
+			font-size: 2rem;
+		}
+
+		p {
+			margin: 0;
+			font-weight: 600;
+		}
+
+		span {
+			margin: 0;
+			font-size: 0.85rem;
+		}
+	}
+}
+// #endregion
+
+// #region Detail section
+.detail-section {
+	display: flex;
+	flex-direction: column;
+	gap: 1rem;
+	padding: 1rem 1.25rem;
+	background: transparent;
+	border: 1px solid var(--surface-300);
+	border-radius: 12px;
+
+	.detail-header {
+		display: flex;
+		justify-content: space-between;
+		align-items: center;
+		gap: 1rem;
+		flex-wrap: wrap;
+
+		.detail-title {
+			display: flex;
+			flex-direction: column;
+			gap: 0.25rem;
+
+			h3 {
+				margin: 0;
+				font-size: 1.1rem;
+			}
+
+			.detail-meta {
+				font-size: 0.85rem;
+				color: var(--text-color-secondary);
+			}
+		}
+
+		.detail-actions {
+			display: flex;
+			align-items: center;
+			gap: 0.5rem;
+		}
+	}
+
+	.detail-controls {
+		display: flex;
+		gap: 0.5rem;
+		flex-wrap: wrap;
+	}
+
+	.loading-state,
+	.empty-state {
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+		justify-content: center;
+		gap: 0.5rem;
+		padding: 2rem 1rem;
+		color: var(--text-color-secondary);
+
+		i {
+			font-size: 2rem;
+		}
+
+		p {
+			margin: 0;
+			font-weight: 600;
+		}
+
+		span {
+			margin: 0;
+			font-size: 0.85rem;
+		}
+	}
+
+	.observacion-cell {
+		font-size: 0.85rem;
+		color: var(--text-color-secondary);
+	}
+}
+
+:host ::ng-deep .mes-select {
+	min-width: 140px;
+}
+
+:host ::ng-deep .anio-select {
+	min-width: 100px;
+}
+// #endregion

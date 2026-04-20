@@ -1,11 +1,6 @@
 // * Usuario DTOs and role helpers.
 // #region Imports
-import {
-	APP_USER_ROLE_ADMIN_LIST,
-	APP_USER_ROLE_LIST,
-	AppUserRoleAdmin,
-	AppUserRoleValue,
-} from '@app/shared/constants';
+import { APP_USER_ROLE_LIST, AppUserRoleValue } from '@app/shared/constants';
 
 // #endregion
 // #region Implementation
@@ -150,10 +145,12 @@ export const ROLES_USUARIOS: RolUsuario[] = APP_USER_ROLE_LIST;
 
 /**
  * User role type values for admin management.
+ * Incluye todos los roles porque el form de admin permite crear usuarios
+ * de cualquier rol.
  */
-export type RolUsuarioAdmin = AppUserRoleAdmin;
+export type RolUsuarioAdmin = AppUserRoleValue;
 
-export const ROLES_USUARIOS_ADMIN: RolUsuarioAdmin[] = APP_USER_ROLE_ADMIN_LIST;
+export const ROLES_USUARIOS_ADMIN: RolUsuarioAdmin[] = APP_USER_ROLE_LIST;
 
 /**
  * Credential export DTO for Excel generation.

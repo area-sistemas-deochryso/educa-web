@@ -72,11 +72,7 @@ export class AttendanceComponent implements AfterViewInit {
 		const role = this.userRole();
 		if (role === APP_USER_ROLES.Profesor) {
 			this.profesorComponent?.setViewMode(mode);
-		} else if (
-			role === APP_USER_ROLES.Director ||
-			role === APP_USER_ROLES.AsistenteAdministrativo ||
-			role === APP_USER_ROLES.Promotor
-		) {
+		} else if (this.isAdminRole(role)) {
 			this.directorComponent?.setViewMode(mode);
 		}
 	}
@@ -88,15 +84,20 @@ export class AttendanceComponent implements AfterViewInit {
 			this.apoderadoComponent?.reload();
 		} else if (role === APP_USER_ROLES.Profesor) {
 			this.profesorComponent?.reload();
-		} else if (
-			role === APP_USER_ROLES.Director ||
-			role === APP_USER_ROLES.AsistenteAdministrativo ||
-			role === APP_USER_ROLES.Promotor
-		) {
+		} else if (this.isAdminRole(role)) {
 			this.directorComponent?.reload();
 		} else if (role === APP_USER_ROLES.Estudiante) {
 			this.estudianteComponent?.reload();
 		}
+	}
+
+	private isAdminRole(role: string): boolean {
+		return (
+			role === APP_USER_ROLES.Director ||
+			role === APP_USER_ROLES.AsistenteAdministrativo ||
+			role === APP_USER_ROLES.Promotor ||
+			role === APP_USER_ROLES.CoordinadorAcademico
+		);
 	}
 }
 // #endregion

@@ -97,6 +97,33 @@ export interface SalonProfesor {
 // J = Justificado, - = Pendiente, X = Antes del registro
 export type AttendanceStatus = 'A' | 'T' | 'F' | 'J' | '-' | 'X';
 
+// #region Tipo de persona (Plan 21 Chat 3)
+
+/**
+ * Discriminador polimórfico de `AsistenciaPersona` (backend):
+ * 'E' = Estudiante, 'P' = Profesor.
+ */
+export const TIPO_PERSONA = ['E', 'P'] as const;
+export type TipoPersona = (typeof TIPO_PERSONA)[number];
+
+// #endregion
+// #region DTO Profesor (Plan 21 Chat 2 backend)
+
+/**
+ * Espejo frontend de `AsistenciaProfesorDto` (backend).
+ * Vista de un profesor con sus asistencias en un rango dado.
+ */
+export interface AsistenciaProfesorDto {
+	profesorId: number;
+	dni: string;
+	nombreCompleto: string;
+	sede: string;
+	sedeId: number;
+	tipoPersona: TipoPersona;
+	asistencias: AsistenciaDetalle[];
+}
+// #endregion
+
 // Director: Estadísticas del día
 export interface EstadisticasDia {
 	fecha: string;

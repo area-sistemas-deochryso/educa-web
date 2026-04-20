@@ -1,11 +1,6 @@
 // * DTOs and role helpers for permisos APIs.
 // #region Imports
-import {
-	APP_USER_ROLE_ADMIN_LIST,
-	APP_USER_ROLE_LIST,
-	AppUserRoleAdmin,
-	AppUserRoleValue,
-} from '@app/shared/constants';
+import { APP_USER_ROLE_LIST, AppUserRoleValue } from '@app/shared/constants';
 
 // #endregion
 // #region Implementation
@@ -120,10 +115,12 @@ export const ROLES_DISPONIBLES: RolTipo[] = APP_USER_ROLE_LIST;
 
 /**
  * Role type values for admin management.
+ * Incluye todos los roles porque los UIs de gestión (permisos, usuarios)
+ * deben poder asignar permisos/crear usuarios de cualquier rol.
  */
-export type RolTipoAdmin = AppUserRoleAdmin;
+export type RolTipoAdmin = AppUserRoleValue;
 
-export const ROLES_DISPONIBLES_ADMIN: RolTipoAdmin[] = APP_USER_ROLE_ADMIN_LIST;
+export const ROLES_DISPONIBLES_ADMIN: RolTipoAdmin[] = APP_USER_ROLE_LIST;
 
 /**
  * Vistas stats DTO.

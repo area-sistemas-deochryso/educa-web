@@ -1,5 +1,5 @@
-// * Tests for AttendanceProfesorComponent — component creation and DI.
-// NOTE: Uses scoped providers (AttendanceViewController) that make deep testing impractical.
+// * Tests del shell AttendanceProfesorComponent (Plan 21 Chat 4).
+// Valida la lógica de tabs: detección de salones + delegación al tab activo.
 // #region Imports
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
@@ -9,11 +9,10 @@ import { testProviders } from '@test';
 import { AttendanceProfesorComponent } from './attendance-profesor.component';
 import { AttendanceService, StorageService, UserProfileService } from '@core/services';
 import { AttendanceDataService } from '@features/intranet/services/attendance/attendance-data.service';
-
 // #endregion
 
 // #region Tests
-describe('AttendanceProfesorComponent', () => {
+describe('AttendanceProfesorComponent (shell)', () => {
 	let component: AttendanceProfesorComponent;
 	let fixture: ComponentFixture<AttendanceProfesorComponent>;
 
@@ -61,7 +60,7 @@ describe('AttendanceProfesorComponent', () => {
 				...testProviders,
 				{ provide: AttendanceService, useValue: asistenciaServiceMock },
 				{ provide: StorageService, useValue: storageServiceMock },
-				{ provide: UserProfileService, useValue: { userName: signal('Prof. García') } },
+				{ provide: UserProfileService, useValue: { userName: signal('Prof. García'), userDni: signal('12345678') } },
 				{ provide: AttendanceDataService, useValue: attendanceDataServiceMock },
 			],
 		}).compileComponents();
@@ -74,8 +73,23 @@ describe('AttendanceProfesorComponent', () => {
 		expect(component).toBeTruthy();
 	});
 
-	it('should initialize with empty salones', () => {
-		expect(component.salones()).toEqual([]);
+	it('default tab is "propia"', () => {
+		expect(component.activeTab()).toBe('propia');
+	});
+
+	it('no muestra tab estudiantes cuando el profesor no tiene salones', () => {
+		fixture.detectChanges();
+		expect(component.hasSalones()).toBe(false);
+	});
+
+	it('onTabChange cambia el tab activo a "estudiantes"', () => {
+		component.onTabChange('estudiantes');
+		expect(component.activeTab()).toBe('estudiantes');
+	});
+
+	it('onTabChange ignora valores no válidos', () => {
+		component.onTabChange('otro');
+		expect(component.activeTab()).toBe('propia');
 	});
 });
 // #endregion

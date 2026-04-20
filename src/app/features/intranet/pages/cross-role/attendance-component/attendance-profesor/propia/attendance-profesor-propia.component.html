@@ -1,0 +1,185 @@
+<!-- #region Template -->
+<div class="propia-container">
+	<!-- * Header con navegación de mes -->
+	<header class="propia-header">
+		<div class="header-title">
+			<h3>Mi asistencia</h3>
+			<span class="header-subtitle">{{ facade.selectedLabel() }}</span>
+		</div>
+
+		<div class="header-nav">
+			<button
+				pButton
+				icon="pi pi-chevron-left"
+				class="p-button-text p-button-rounded"
+				(click)="onPrevMonth()"
+				pTooltip="Mes anterior"
+				tooltipPosition="top"
+				[disabled]="facade.loading()"
+				[pt]="{ root: { 'aria-label': 'Mes anterior' } }"
+			></button>
+
+			<p-select
+				[options]="mesOptions"
+				[ngModel]="facade.selectedMes()"
+				(ngModelChange)="onMesChange($event)"
+				optionLabel="label"
+				optionValue="value"
+				appendTo="body"
+				styleClass="propia-mes-select"
+				[disabled]="facade.loading()"
+			/>
+			<p-select
+				[options]="anioOptions()"
+				[ngModel]="facade.selectedAnio()"
+				(ngModelChange)="onAnioChange($event)"
+				optionLabel="label"
+				optionValue="value"
+				appendTo="body"
+				styleClass="propia-anio-select"
+				[disabled]="facade.loading()"
+			/>
+
+			<button
+				pButton
+				icon="pi pi-chevron-right"
+				class="p-button-text p-button-rounded"
+				(click)="onNextMonth()"
+				pTooltip="Mes siguiente"
+				tooltipPosition="top"
+				[disabled]="facade.loading()"
+				[pt]="{ root: { 'aria-label': 'Mes siguiente' } }"
+			></button>
+
+			<button
+				pButton
+				icon="pi pi-calendar"
+				label="Hoy"
+				class="p-button-outlined p-button-sm"
+				(click)="onGoToCurrent()"
+				[disabled]="facade.loading() || isCurrentMonth()"
+				pTooltip="Volver al mes actual"
+				tooltipPosition="top"
+			></button>
+
+			<button
+				pButton
+				icon="pi pi-refresh"
+				class="p-button-text p-button-rounded"
+				(click)="onRefresh()"
+				[disabled]="facade.loading()"
+				pTooltip="Actualizar"
+				tooltipPosition="top"
+				[pt]="{ root: { 'aria-label': 'Actualizar' } }"
+			></button>
+		</div>
+	</header>
+
+	<!-- * Estadísticas del mes -->
+	<section class="stats-section">
+		<div class="stat-card">
+			<div class="stat-content">
+				<span class="stat-label">Total Días</span>
+				<span class="stat-value">{{ facade.conteo().total }}</span>
+				<span class="stat-sublabel">registros del mes</span>
+			</div>
+			<div class="stat-icon">
+				<i class="pi pi-calendar"></i>
+			</div>
+		</div>
+		<div class="stat-card stat-asistio">
+			<div class="stat-content">
+				<span class="stat-label">Asistió</span>
+				<span class="stat-value">{{ facade.conteo().asistio }}</span>
+				<span class="stat-sublabel">a tiempo</span>
+			</div>
+			<div class="stat-icon">
+				<i class="pi pi-check-circle"></i>
+			</div>
+		</div>
+		<div class="stat-card stat-tardanza">
+			<div class="stat-content">
+				<span class="stat-label">Tardanza</span>
+				<span class="stat-value">{{ facade.conteo().tardanza }}</span>
+				<span class="stat-sublabel">ingresos con atraso</span>
+			</div>
+			<div class="stat-icon">
+				<i class="pi pi-clock"></i>
+			</div>
+		</div>
+		<div class="stat-card stat-falta">
+			<div class="stat-content">
+				<span class="stat-label">Falta</span>
+				<span class="stat-value">{{ facade.conteo().falta }}</span>
+				<span class="stat-sublabel">sin registro</span>
+			</div>
+			<div class="stat-icon">
+				<i class="pi pi-times-circle"></i>
+			</div>
+		</div>
+		<div class="stat-card stat-justificado">
+			<div class="stat-content">
+				<span class="stat-label">Justificado</span>
+				<span class="stat-value">{{ facade.conteo().justificado }}</span>
+				<span class="stat-sublabel">con observación</span>
+			</div>
+			<div class="stat-icon">
+				<i class="pi pi-info-circle"></i>
+			</div>
+		</div>
+	</section>
+
+	<!-- * Tabla de asistencias -->
+	<section class="table-section">
+		@if (facade.loading()) {
+			<app-table-skeleton [columns]="skeletonColumns" [rows]="8" minHeight="360px" />
+		} @else if (facade.error()) {
+			<div class="empty-state">
+				<i class="pi pi-exclamation-circle"></i>
+				<p>{{ facade.error() }}</p>
+				<button
+					pButton
+					label="Reintentar"
+					icon="pi pi-refresh"
+					class="p-button-outlined p-button-sm"
+					(click)="onRefresh()"
+				></button>
+			</div>
+		} @else if (!facade.hasData()) {
+			<div class="empty-state">
+				<i class="pi pi-inbox"></i>
+				<p>Sin registros de asistencia</p>
+				<span>No tienes asistencias registradas en {{ facade.selectedLabel() }}</span>
+			</div>
+		} @else {
+			<p-table [value]="facade.asistencias()" class="p-datatable-sm" dataKey="asistenciaId">
+				<ng-template #header>
+					<tr>
+						<th style="width: 140px">Fecha</th>
+						<th style="width: 110px">Entrada</th>
+						<th style="width: 110px">Salida</th>
+						<th style="width: 100px">Estado</th>
+						<th>Observación</th>
+					</tr>
+				</ng-template>
+				<ng-template #body let-asistencia>
+					<tr>
+						<td>{{ asistencia.fecha | date: 'dd/MM/yyyy' }}</td>
+						<td>{{ asistencia.horaEntrada ?? '—' }}</td>
+						<td>{{ asistencia.horaSalida ?? '—' }}</td>
+						<td>
+							<p-tag
+								[value]="asistencia.estadoCodigo"
+								[severity]="getEstadoSeverity(asistencia.estadoCodigo)"
+								[pTooltip]="asistencia.estadoDescripcion"
+								tooltipPosition="top"
+							/>
+						</td>
+						<td class="observacion-cell">{{ asistencia.observacion ?? '—' }}</td>
+					</tr>
+				</ng-template>
+			</p-table>
+		}
+	</section>
+</div>
+<!-- #endregion -->

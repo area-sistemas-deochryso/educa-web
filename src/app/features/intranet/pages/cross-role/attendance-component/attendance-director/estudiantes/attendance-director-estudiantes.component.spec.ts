@@ -1,6 +1,5 @@
-// * Tests for AttendanceDirectorComponent shell — submenú Estudiantes/Profesores.
-// * Plan 21 Chat 3: el shell solo delega a sub-componentes; la lógica de
-// * estudiantes se probó en attendance-director-estudiantes.component.spec.ts.
+// * Tests for AttendanceDirectorEstudiantesComponent — extracted in Plan 21 Chat 3.
+// * Same contract as the old AttendanceDirectorComponent pre-refactor.
 // #region Imports
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
@@ -8,14 +7,26 @@ import { of } from 'rxjs';
 
 import { testProviders } from '@test';
 import { AttendanceService, StorageService } from '@core/services';
+import { AttendanceDataService } from '@features/intranet/services/attendance/attendance-data.service';
 
-import { AttendanceDirectorComponent } from './attendance-director.component';
-import { AsistenciaProfesorApiService } from '@shared/services/attendance/asistencia-profesor-api.service';
+import { AttendanceDirectorEstudiantesComponent } from './attendance-director-estudiantes.component';
 // #endregion
 
-describe('AttendanceDirectorComponent (shell)', () => {
-	let component: AttendanceDirectorComponent;
-	let fixture: ComponentFixture<AttendanceDirectorComponent>;
+// #region Mocks
+const emptyTable = {
+	title: 'Test',
+	selectedMonth: 1,
+	selectedYear: 2026,
+	weeks: [],
+	counts: { T: 0, A: 0, F: 0, N: 0, '-': 0, X: 0 },
+	columnTotals: [],
+	grandTotal: '0/0',
+};
+// #endregion
+
+describe('AttendanceDirectorEstudiantesComponent', () => {
+	let component: AttendanceDirectorEstudiantesComponent;
+	let fixture: ComponentFixture<AttendanceDirectorEstudiantesComponent>;
 
 	beforeEach(async () => {
 		const asistenciaServiceMock: Partial<AttendanceService> = {
@@ -24,6 +35,7 @@ describe('AttendanceDirectorComponent (shell)', () => {
 			getAsistenciaDiaDirector: vi.fn().mockReturnValue(
 				of({ estudiantes: [], estadisticas: null }),
 			),
+			descargarPdfAsistenciaDia: vi.fn().mockReturnValue(of(new Blob())),
 			getEstadosValidos: vi.fn().mockReturnValue(of([])),
 		};
 
@@ -40,31 +52,24 @@ describe('AttendanceDirectorComponent (shell)', () => {
 			clearPermisos: vi.fn(),
 		};
 
-		const profesorApiMock: Partial<AsistenciaProfesorApiService> = {
-			listarProfesores: vi.fn().mockReturnValue(
-				of({
-					data: [],
-					total: 0,
-					page: 1,
-					pageSize: 25,
-					totalPages: 0,
-					hasNextPage: false,
-					hasPreviousPage: false,
-				}),
-			),
+		const attendanceDataServiceMock: Partial<AttendanceDataService> = {
+			createEmptyTable: vi.fn().mockReturnValue(emptyTable),
+			processAsistencias: vi
+				.fn()
+				.mockReturnValue({ ingresos: emptyTable, salidas: emptyTable }),
 		};
 
 		await TestBed.configureTestingModule({
-			imports: [AttendanceDirectorComponent],
+			imports: [AttendanceDirectorEstudiantesComponent],
 			providers: [
 				...testProviders,
 				{ provide: AttendanceService, useValue: asistenciaServiceMock },
 				{ provide: StorageService, useValue: storageServiceMock },
-				{ provide: AsistenciaProfesorApiService, useValue: profesorApiMock },
+				{ provide: AttendanceDataService, useValue: attendanceDataServiceMock },
 			],
 		}).compileComponents();
 
-		fixture = TestBed.createComponent(AttendanceDirectorComponent);
+		fixture = TestBed.createComponent(AttendanceDirectorEstudiantesComponent);
 		component = fixture.componentInstance;
 	});
 
@@ -72,15 +77,7 @@ describe('AttendanceDirectorComponent (shell)', () => {
 		expect(component).toBeTruthy();
 	});
 
-	it('should default to "estudiantes" submenu', () => {
-		expect(component.selectedSubMenu()).toBe('estudiantes');
-	});
-
-	it('should toggle submenu selection', () => {
-		component.setSubMenu('profesores');
-		expect(component.selectedSubMenu()).toBe('profesores');
-
-		component.setSubMenu('estudiantes');
-		expect(component.selectedSubMenu()).toBe('estudiantes');
+	it('should have initial empty gradosSecciones', () => {
+		expect(component.gradosSecciones()).toEqual([]);
 	});
 });

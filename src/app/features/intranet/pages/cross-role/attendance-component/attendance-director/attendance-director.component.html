@@ -1,126 +1,27 @@
 <!-- #region Template -->
-<!-- * Shared legend for attendance codes -->
-<app-attendance-legend />
+<nav class="submenu">
+	<p-selectButton
+		[options]="submenuOptions"
+		[ngModel]="selectedSubMenu()"
+		(ngModelChange)="setSubMenu($event)"
+		optionLabel="label"
+		optionValue="value"
+		[allowEmpty]="false"
+		styleClass="submenu-toggle"
+	>
+		<ng-template let-option pTemplate>
+			<i [class]="option.icon" aria-hidden="true"></i>
+			<span class="submenu-label">{{ option.label }}</span>
+		</ng-template>
+	</p-selectButton>
+</nav>
 
-@if (gradosSecciones().length > 0) {
-	<div class="selector-row">
-		<!-- * Grade/section selector drives which group is loaded -->
-		<app-grado-seccion-selector
-			[gradosSecciones]="gradosSecciones()"
-			[selectedGradoSeccion]="selectedGradoSeccion()"
-			(gradoSeccionChange)="selectGradoSeccion($event)"
-		/>
-	</div>
-
-	@if (view.viewMode() === 'mes') {
-		<!-- * PDF actions below selector (always "Reporte por Salón") -->
-		<div class="pdf-section">
-			<!-- Toggle mes/periodo -->
-			<p-selectButton
-				[options]="view.monthSubModeOptions"
-				[ngModel]="view.monthSubMode()"
-				(ngModelChange)="view.setMonthSubMode($event)"
-				optionLabel="label"
-				optionValue="value"
-				[allowEmpty]="false"
-				styleClass="pdf-mode-toggle"
-			/>
-
-			<!-- Grouped: label/selectors + PDF button wrap together -->
-			<div class="pdf-report-info">
-				@if (view.monthSubMode() === 'periodo') {
-					<span class="pdf-label">Periodo:</span>
-					<p-select
-						[options]="view.mesOptionsInicio()"
-						[ngModel]="view.periodoInicio()"
-						(ngModelChange)="view.setPeriodoInicio($event)"
-						optionLabel="label"
-						optionValue="value"
-						appendTo="body"
-						styleClass="periodo-select"
-					/>
-					<span class="periodo-separator">–</span>
-					<p-select
-						[options]="view.mesOptionsFin()"
-						[ngModel]="view.periodoFin()"
-						(ngModelChange)="view.setPeriodoFin($event)"
-						optionLabel="label"
-						optionValue="value"
-						appendTo="body"
-						styleClass="periodo-select"
-					/>
-					<span class="pdf-label">{{ view.periodoYear() }}</span>
-				} @else {
-					<span class="pdf-label">Reporte mensual: {{ view.pdfFecha() | date: 'MMMM yyyy' }}</span>
-				}
-
-				<p-button
-					icon="pi pi-file-pdf"
-					[loading]="view.pdf.downloadingPdf()"
-					[disabled]="!selectedGradoSeccion() || (view.monthSubMode() === 'periodo' && !view.isPeriodoValid())"
-					severity="danger"
-					[text]="true"
-					[rounded]="true"
-					(onClick)="togglePdfMenu($event)"
-					pTooltip="Opciones de PDF"
-					tooltipPosition="top"
-					[pt]="{
-						root: {
-							'aria-label': 'Opciones de PDF',
-						},
-					}"
-				/>
-				<p-menu #pdfMenu [model]="pdfMenuItems()" [popup]="true" appendTo="body" />
-			</div>
-		</div>
+@switch (selectedSubMenu()) {
+	@case ('estudiantes') {
+		<app-attendance-director-estudiantes />
 	}
-
-	@if (view.viewMode() === 'mes') {
-		@if (view.showSkeletons() && !view.tableReady()) {
-			<!-- * Skeleton: reserve space while data loads -->
-			<app-attendance-table-skeleton />
-			<app-attendance-table-skeleton />
-		} @else if (view.estudiantes().length > 0) {
-			<!-- * Month tables: ingresos and salidas -->
-			<app-attendance-table
-				[table]="view.ingresos()"
-				[hijos]="view.estudiantesAsHijos()"
-				[selectedHijoId]="view.selectedEstudianteId()"
-				(monthChange)="view.onIngresosMonthChange($event)"
-				(hijoChange)="view.selectEstudiante($event)"
-			/>
-			<app-attendance-table
-				[table]="view.salidas()"
-				[hijos]="view.estudiantesAsHijos()"
-				[selectedHijoId]="view.selectedEstudianteId()"
-				(monthChange)="view.onSalidasMonthChange($event)"
-				(hijoChange)="view.selectEstudiante($event)"
-			/>
-		} @else if (!view.loading()) {
-			<!-- ! Empty state after load -->
-			<app-empty-state message="No se encontraron estudiantes en este grado/sección." />
-		}
-	} @else {
-		<!-- * Day mode list with date picker + PDF options + tipo de reporte selector -->
-		<app-attendance-day-list
-			[estudiantes]="view.estudiantesDia()"
-			[fecha]="view.fechaDia()"
-			[estadisticas]="view.estadisticasDia()"
-			[loading]="view.loading()"
-			[showPdfButton]="true"
-			[downloadingPdf]="tipoReporte().startsWith('salon-') ? view.pdf.downloadingPdf() : downloadingPdfConsolidado()"
-			[pdfMenuItems]="pdfMenuItems()"
-			[tipoReporteOptions]="tipoReporteOptions"
-			[tipoReporte]="tipoReporte()"
-			(tipoReporteChange)="tipoReporte.set($any($event))"
-			[allowJustify]="true"
-			[savingJustificacion]="savingJustificacion()"
-			(fechaChange)="view.onFechaDiaChange($event)"
-			(justificar)="onJustificar($event)"
-		/>
+	@case ('profesores') {
+		<app-attendance-director-profesores />
 	}
-} @else if (!view.loading()) {
-	<!-- ! No available grade/section data -->
-	<app-empty-state message="No hay grados/secciones disponibles." />
 }
 <!-- #endregion -->
