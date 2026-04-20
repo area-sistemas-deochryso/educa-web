@@ -179,4 +179,45 @@ export interface AsistenciaDiaConEstadisticas {
 	estudiantes: EstudianteAsistencia[];
 	estadisticas: EstadisticasAsistenciaDia;
 }
+
+/**
+ * Respuesta del endpoint de asistencia del día de profesores (Plan 21 Chat 7)
+ * GET /api/ConsultaAsistencia/director/profesores-asistencia-dia
+ */
+export interface AsistenciaDiaProfesoresConEstadisticas {
+	profesores: AsistenciaProfesorDto[];
+	estadisticas: EstadisticasAsistenciaDia;
+}
+// #endregion
+
+// #region Persona polimórfica para day-list compartido (Plan 21 Chat 7)
+
+/**
+ * Representación polimórfica de una persona (estudiante o profesor) con sus asistencias.
+ * Consumida por `AttendancePersonaDayListComponent`, que es la variante genérica
+ * del `AttendanceDayListComponent` legacy (ligado a `EstudianteAsistencia`).
+ *
+ * El caller adapta desde el shape específico:
+ * - `EstudianteAsistencia` (estudiantes): `{ personaId: estudianteId, tipoPersona: 'E', ... }`
+ * - `AsistenciaProfesorDto` (profesores): `{ personaId: profesorId, tipoPersona: 'P', ... }`
+ */
+export interface PersonaAsistencia {
+	personaId: number;
+	tipoPersona: TipoPersona;
+	dni: string;
+	nombreCompleto: string;
+	asistencias: AsistenciaDetalle[];
+}
+
+/** Adapter: profesor → persona (preserva tipoPersona='P'). */
+export function profesorToPersonaAsistencia(profesor: AsistenciaProfesorDto): PersonaAsistencia {
+	return {
+		personaId: profesor.profesorId,
+		tipoPersona: profesor.tipoPersona,
+		dni: profesor.dni,
+		nombreCompleto: profesor.nombreCompleto,
+		asistencias: profesor.asistencias,
+	};
+}
+
 // #endregion

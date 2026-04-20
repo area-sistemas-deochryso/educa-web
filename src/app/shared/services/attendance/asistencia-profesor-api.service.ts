@@ -3,7 +3,10 @@ import { Injectable, inject } from '@angular/core';
 import { Observable } from 'rxjs';
 
 import { environment } from '@config/environment';
-import { AsistenciaProfesorDto } from '@data/models/attendance.models';
+import {
+	AsistenciaDiaProfesoresConEstadisticas,
+	AsistenciaProfesorDto,
+} from '@data/models/attendance.models';
 import { PaginatedResponse } from '@shared/models';
 
 /**
@@ -96,6 +99,20 @@ export class AsistenciaProfesorApiService {
 		return this.http.get<AsistenciaProfesorDto>(`${this.apiUrl}/profesor/${dni}/mes`, {
 			params,
 		});
+	}
+
+	/**
+	 * Lista todos los profesores activos de la sede con su asistencia del día + estadísticas.
+	 * Consumido por la vista admin "Profesores" en modo día (Plan 21 Chat 7).
+	 */
+	obtenerAsistenciaDiaProfesoresDirector(
+		fecha: Date,
+	): Observable<AsistenciaDiaProfesoresConEstadisticas> {
+		const params = { fecha: this.formatDateLocal(fecha) };
+		return this.http.get<AsistenciaDiaProfesoresConEstadisticas>(
+			`${this.apiUrl}/director/profesores-asistencia-dia`,
+			{ params },
+		);
 	}
 
 	// #endregion

@@ -1,0 +1,711 @@
+// Colores de estado (mismos que attendance-table)
+$color-asistio: #77a02d;
+$color-tardanza: #ffcc0c;
+$color-falta: #f44336;
+$color-justificado: #9c27b0;
+$color-pendiente: #9e9e9e;
+
+.card-header {
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+	padding: 1rem 1.25rem;
+	border-bottom: 1px solid var(--intranet-alternative-text-color);
+
+	h2 {
+		margin: 0;
+		font-size: 1rem;
+		font-weight: 600;
+		color: var(--intranet-default-text-color);
+		display: flex;
+		align-items: center;
+		gap: 0.5rem;
+
+		i {
+			color: var(--intranet-accent-color-green);
+		}
+	}
+
+	.header-actions {
+		display: flex;
+		align-items: center;
+		gap: 0.75rem;
+
+		.pdf-label {
+			font-size: 0.95rem;
+			font-weight: 500;
+			color: var(--text-color);
+			white-space: nowrap;
+		}
+	}
+}
+
+:host ::ng-deep {
+	.header-actions .tipo-reporte-selector {
+		min-width: 200px;
+	}
+
+	.header-actions .pdf-button {
+		margin-right: -1.8rem;
+	}
+
+	.header-actions .fecha-picker {
+		margin-left: 2rem;
+	}
+
+	@media (max-width: 768px) {
+		.header-actions .fecha-picker {
+			margin-left: 0;
+		}
+
+		.header-actions .pdf-button {
+			margin-right: 0;
+		}
+	}
+
+	@media (max-width: 480px) {
+		.header-actions .tipo-reporte-selector {
+			min-width: 160px;
+		}
+	}
+}
+
+// #region Skeleton
+.skeleton-footer {
+	display: flex;
+	flex-wrap: wrap;
+	justify-content: space-between;
+	gap: 0.5rem;
+	padding: 1rem 1.25rem;
+	border-top: 1px solid var(--intranet-alternative-text-color);
+}
+
+.skeleton-badge {
+	flex: 1 1 auto;
+	min-width: 120px;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	gap: 0.75rem;
+	padding: 0.75rem;
+	border-radius: 6px;
+	border: 1px solid var(--intranet-alternative-text-color);
+}
+
+.skeleton-badge-content {
+	display: flex;
+	flex-direction: column;
+	gap: 0.25rem;
+}
+// #endregion
+
+.empty-state {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	justify-content: center;
+	padding: 3rem 1rem;
+	color: var(--intranet-soft-text-color);
+
+	i {
+		font-size: 3rem;
+		margin-bottom: 1rem;
+		opacity: 0.5;
+	}
+
+	p {
+		margin: 0;
+		font-size: 1rem;
+	}
+}
+
+.text-center {
+	text-align: center;
+}
+
+.row-number {
+	font-weight: 500;
+	color: var(--intranet-soft-text-color);
+}
+
+.estudiante-info {
+	display: flex;
+	flex-direction: column;
+	gap: 0.25rem;
+
+	.nombre {
+		font-weight: 500;
+		color: var(--intranet-default-text-color);
+		text-transform: capitalize;
+	}
+
+	.dni {
+		font-size: 0.75rem;
+		color: var(--intranet-soft-text-color);
+		font-family: monospace;
+	}
+}
+
+.hora {
+	display: inline-flex;
+	align-items: center;
+	gap: 0.375rem;
+	font-weight: 500;
+	font-family: monospace;
+	font-size: 0.9rem;
+	color: var(--intranet-default-text-color);
+
+	i {
+		font-size: 0.75rem;
+		color: var(--intranet-accent-color-green);
+	}
+
+	&.hora-empty {
+		color: var(--intranet-soft-text-color);
+		font-weight: 400;
+	}
+}
+
+// Estado box con letra y color - mismo tamaño que footer
+.estado-box {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	width: 44px;
+	height: 44px;
+	border-radius: 4px;
+	font-weight: 600;
+	font-size: 1.25rem;
+	color: #333;
+}
+
+// Clases de estado (mismas que attendance-table)
+.status-asistio {
+	background-color: $color-asistio;
+}
+
+.status-tardanza {
+	background-color: $color-tardanza;
+}
+
+.status-falta {
+	background-color: $color-falta;
+}
+
+.status-justificado {
+	background-color: $color-justificado;
+}
+
+.status-pendiente {
+	background-color: $color-pendiente;
+}
+
+.status-sin-registro {
+	background-color: transparent;
+	border: 1px dashed #ccc;
+	color: var(--intranet-soft-text-color);
+}
+
+.resumen-footer {
+	display: flex;
+	flex-wrap: wrap;
+	justify-content: space-between;
+	gap: 0.5rem;
+	padding: 1rem 1.25rem;
+	border-top: 1px solid var(--intranet-alternative-text-color);
+
+	.stat-badge {
+		flex: 1 1 auto;
+		min-width: 120px;
+		display: flex;
+		flex-direction: row;
+		align-items: center;
+		justify-content: center;
+		gap: 0.75rem;
+		padding: 0.75rem;
+		border-radius: 6px;
+		background: transparent;
+		border: 1px solid var(--intranet-alternative-text-color);
+		transition: all 0.15s ease;
+
+		&:hover {
+			border-color: var(--intranet-soft-text-color);
+		}
+
+		.status-indicator {
+			display: inline-flex;
+			align-items: center;
+			justify-content: center;
+			width: 52px;
+			height: 52px;
+			border-radius: 6px;
+			font-weight: 600;
+			font-size: 1.75rem;
+			color: #333;
+			flex-shrink: 0;
+		}
+
+		.badge-icon {
+			display: inline-flex;
+			align-items: center;
+			justify-content: center;
+			width: 52px;
+			height: 52px;
+			border-radius: 6px;
+			background: var(--intranet-accent-color-blue);
+			flex-shrink: 0;
+
+			i {
+				font-size: 1.5rem;
+				color: #fff;
+			}
+		}
+
+		.badge-content {
+			display: flex;
+			flex-direction: column;
+			gap: 0.125rem;
+			min-width: 0;
+		}
+
+		.value {
+			font-weight: 700;
+			font-size: 1.25rem;
+			line-height: 1;
+			color: var(--intranet-default-text-color);
+		}
+
+		.label {
+			font-size: 0.7rem;
+			text-transform: uppercase;
+			letter-spacing: 0.3px;
+			color: var(--intranet-soft-text-color);
+			white-space: nowrap;
+		}
+	}
+}
+
+:host ::ng-deep {
+	.asistencia-dia-card {
+		background: transparent;
+		border: 1px solid var(--intranet-alternative-text-color);
+		border-radius: 10px;
+
+		.p-card-body {
+			padding: 0;
+		}
+
+		.p-card-content {
+			padding: 0;
+		}
+	}
+
+	// Datepicker estilo integrado
+	.fecha-picker {
+		border: 1px solid var(--intranet-default-text-color);
+		border-radius: 4px;
+		transition: border-color 0.15s ease;
+
+		&:focus-within {
+			border-color: var(--intranet-accent-color-green);
+		}
+
+		&.p-datepicker {
+			.p-datepicker-input {
+				background: transparent;
+				border: none;
+				padding: 0.5rem 0.25rem 0.5rem 0.75rem;
+				font-size: 0.9rem;
+				font-weight: 500;
+				color: var(--intranet-default-text-color);
+				width: 100px;
+
+				&:focus {
+					box-shadow: none;
+					outline: none;
+				}
+			}
+
+			.p-datepicker-dropdown {
+				background: transparent;
+				border: none;
+				color: var(--intranet-soft-text-color);
+				padding: 0 0.5rem;
+
+				&:hover {
+					background: rgba(0, 0, 0, 0.05);
+					color: var(--intranet-accent-color-green);
+				}
+			}
+		}
+	}
+
+	// Tabla con fondo transparente y bordes entre columnas
+	.asistencia-table {
+		&.p-datatable {
+			background: transparent;
+
+			.p-datatable-thead > tr > th {
+				background: transparent;
+				font-weight: 600;
+				font-size: 0.8rem;
+				text-transform: uppercase;
+				letter-spacing: 0.5px;
+				color: var(--intranet-soft-text-color);
+				padding: 0.75rem 1rem;
+				border-bottom: 1px solid var(--intranet-alternative-text-color);
+				border-right: 1px solid var(--intranet-alternative-text-color);
+
+				&:last-child {
+					border-right: none;
+				}
+			}
+
+			.p-datatable-tbody > tr {
+				background: transparent;
+				transition: background-color 0.15s ease;
+
+				&:hover {
+					background: rgba(0, 0, 0, 0.02) !important;
+				}
+
+				> td {
+					background: transparent;
+					padding: 0.75rem 1rem;
+					border-bottom: 1px solid var(--intranet-alternative-text-color);
+					border-right: 1px solid var(--intranet-alternative-text-color);
+					color: var(--intranet-soft-text-color);
+
+					&:last-child {
+						border-right: none;
+					}
+				}
+
+				&:last-child > td {
+					border-bottom: none;
+				}
+			}
+		}
+	}
+}
+
+// Responsive
+@media (max-width: 992px) {
+	.resumen-footer .stat-badge {
+		flex: 1 1 calc(33.33% - 0.5rem);
+		min-width: 100px;
+	}
+
+	.skeleton-footer .skeleton-badge {
+		flex: 1 1 calc(33.33% - 0.5rem);
+		min-width: 100px;
+	}
+}
+
+@media (max-width: 768px) {
+	.card-header {
+		flex-direction: column;
+		align-items: flex-start;
+		gap: 0.75rem;
+
+		.header-actions {
+			flex-wrap: wrap;
+			width: 100%;
+			gap: 0.5rem;
+		}
+	}
+
+	.skeleton-footer {
+		.skeleton-badge {
+			flex: 1 1 calc(50% - 0.5rem);
+			padding: 0.5rem;
+		}
+	}
+
+	.resumen-footer {
+		.stat-badge {
+			flex: 1 1 calc(50% - 0.5rem);
+			padding: 0.5rem;
+
+			.status-indicator,
+			.badge-icon {
+				width: 44px;
+				height: 44px;
+				font-size: 1.5rem;
+
+				i {
+					font-size: 1.25rem;
+				}
+			}
+
+			.value {
+				font-size: 1.1rem;
+			}
+
+			.label {
+				font-size: 0.6rem;
+			}
+		}
+	}
+}
+
+@media (max-width: 480px) {
+	.skeleton-footer {
+		.skeleton-badge {
+			flex: 1 1 calc(50% - 0.25rem);
+		}
+	}
+
+	.resumen-footer {
+		.stat-badge {
+			flex: 1 1 calc(50% - 0.25rem);
+
+			.status-indicator,
+			.badge-icon {
+				width: 40px;
+				height: 40px;
+				font-size: 1.35rem;
+
+				i {
+					font-size: 1.1rem;
+				}
+			}
+
+			.value {
+				font-size: 1rem;
+			}
+
+			.label {
+				font-size: 0.55rem;
+			}
+		}
+	}
+}
+
+// #region Mobile card (app-responsive-table)
+:host ::ng-deep .rt-card-list .rt-card {
+	border-radius: 0;
+	border-left: none;
+	border-right: none;
+	border-bottom: 1px solid var(--intranet-alternative-text-color);
+
+	&:first-child {
+		border-top: none;
+	}
+
+	&:last-child {
+		border-bottom: none;
+	}
+}
+
+:host ::ng-deep .rt-card-list {
+	gap: 0;
+}
+
+.mobile-card-inner {
+	display: flex;
+	flex-direction: column;
+	gap: 0;
+}
+
+.mobile-card-title {
+	display: flex;
+	justify-content: space-between;
+	align-items: flex-start;
+	gap: 0.75rem;
+
+	.estudiante-info {
+		flex: 1;
+		min-width: 0;
+	}
+
+	.estado-box {
+		flex-shrink: 0;
+	}
+}
+
+.mobile-card-observacion {
+	.observacion {
+		max-width: none;
+		white-space: normal;
+		overflow: visible;
+		text-overflow: unset;
+	}
+}
+// #endregion
+
+// #region Filas clickeables para justificación
+.row-clickable {
+	cursor: pointer;
+	transition: background-color 0.15s ease;
+
+	&:hover {
+		background: rgba(156, 39, 176, 0.08) !important;
+	}
+}
+
+// #endregion
+// #region Observación en la celda de estudiante
+.observacion {
+	display: block;
+	font-size: 0.75rem;
+	color: $color-justificado;
+	font-style: italic;
+	margin-top: 0.25rem;
+	max-width: 200px;
+	white-space: nowrap;
+	overflow: hidden;
+	text-overflow: ellipsis;
+}
+
+// #endregion
+// #region Diálogo de justificación
+:host ::ng-deep {
+	// Centrar el mask completo
+	.p-dialog-mask {
+		display: flex !important;
+		align-items: center !important;
+		justify-content: center !important;
+	}
+
+	.justificacion-dialog {
+		// Resetear posicionamiento predeterminado
+		position: static !important;
+		top: auto !important;
+		left: auto !important;
+		transform: none !important;
+		margin: 0 !important;
+
+		.p-dialog-header {
+			padding: 1rem 1.25rem;
+			border-bottom: 1px solid var(--intranet-alternative-text-color);
+
+			.p-dialog-title {
+				font-size: 1.1rem;
+				font-weight: 600;
+				color: var(--intranet-default-text-color);
+			}
+		}
+
+		.p-dialog-content {
+			padding: 1.25rem;
+		}
+
+		.p-dialog-footer {
+			padding: 0.75rem 1.25rem;
+			border-top: 1px solid var(--intranet-alternative-text-color);
+		}
+	}
+}
+
+.dialog-content {
+	display: flex;
+	flex-direction: column;
+	gap: 1.25rem;
+
+	.estudiante-header {
+		display: flex;
+		align-items: center;
+		gap: 1rem;
+		padding: 0.75rem;
+		background: var(--surface-50);
+		border-radius: 6px;
+
+		.avatar {
+			width: 48px;
+			height: 48px;
+			border-radius: 50%;
+			background: $color-justificado;
+			color: #fff;
+			display: flex;
+			align-items: center;
+			justify-content: center;
+			font-size: 1.25rem;
+			flex-shrink: 0;
+		}
+
+		.info {
+			display: flex;
+			flex-direction: column;
+			gap: 0.125rem;
+
+			.nombre {
+				font-weight: 600;
+				color: var(--intranet-default-text-color);
+				text-transform: capitalize;
+			}
+
+			.dni {
+				font-size: 0.8rem;
+				color: var(--intranet-soft-text-color);
+				font-family: monospace;
+			}
+		}
+	}
+
+	.field {
+		display: flex;
+		flex-direction: column;
+		gap: 0.5rem;
+
+		label {
+			font-weight: 500;
+			font-size: 0.9rem;
+			color: var(--intranet-default-text-color);
+
+			.required {
+				color: var(--red-500);
+			}
+		}
+
+		textarea {
+			width: 100%;
+			min-height: 100px;
+			resize: vertical;
+		}
+	}
+
+	.dialog-footer {
+		display: flex;
+		justify-content: flex-end;
+		gap: 0.5rem;
+		padding-top: 0.5rem;
+	}
+}
+
+// #endregion
+// #region Personalización del menú PDF
+:host ::ng-deep .p-menu {
+	background: var(--intranet-background-color) !important;
+	border: 1px solid #ddd !important;
+	box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1) !important;
+
+	a:hover {
+		color: initial !important;
+	}
+
+	.p-menuitem-icon,
+	.p-menuitem-text,
+	.p-menu-item-icon,
+	a {
+		color: var(--intranet-accent-color-blue) !important;
+	}
+	.p-menuitem-link {
+		color: var(--intranet-default-text-color) !important;
+		padding: 0.75rem 1rem !important;
+		transition: all 0.3s ease !important;
+
+		.p-menuitem-icon {
+			color: var(--intranet-default-text-color) !important;
+		}
+
+		.p-menuitem-text {
+			color: var(--intranet-default-text-color) !important;
+		}
+
+		&:focus {
+			box-shadow: none !important;
+		}
+	}
+}
+// #endregion
