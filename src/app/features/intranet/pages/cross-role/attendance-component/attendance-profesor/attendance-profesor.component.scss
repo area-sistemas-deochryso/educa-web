@@ -1,5 +1,16 @@
 // #region Tabs shell
 :host ::ng-deep {
+	// * Tabs con fondo transparente (coherente con el resto de la intranet
+	//   que opera sobre --intranet-background-color). Sin esto PrimeNG
+	//   renderiza --surface-0 (blanco) y rompe la continuidad visual.
+	.p-tabs,
+	.p-tablist,
+	.p-tablist-tab-list,
+	.p-tabpanels,
+	.p-tabpanel {
+		background: transparent;
+	}
+
 	.tab-icon {
 		margin-right: 0.5rem;
 	}
