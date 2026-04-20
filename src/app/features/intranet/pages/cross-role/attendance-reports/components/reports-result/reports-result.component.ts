@@ -1,7 +1,11 @@
 import { ChangeDetectionStrategy, Component, computed, input } from '@angular/core';
 import { DatePipe } from '@angular/common';
 import { TableModule } from 'primeng/table';
-import type { ReporteFiltrado, SalonReporteFiltrado } from '../../models';
+import type {
+	PersonaProfesorReporte,
+	ReporteFiltrado,
+	SalonReporteFiltrado,
+} from '../../models';
 
 interface FilaTabla {
 	salon: string;
@@ -63,6 +67,21 @@ export class ReportsResultComponent {
 			}
 		}
 		return result;
+	});
+
+	readonly profesores = computed<PersonaProfesorReporte[]>(
+		() => this.resultado().profesores ?? [],
+	);
+
+	readonly hasProfesores = computed(() => this.profesores().length > 0);
+
+	readonly hasEstudiantes = computed(() => this.filas().length > 0);
+
+	readonly profesoresHeader = computed(() => {
+		const r = this.resultado();
+		return `Profesores — ${r.totalProfesoresFiltrados ?? this.profesores().length} de ${
+			r.totalProfesoresGeneral ?? this.profesores().length
+		}`;
 	});
 	// #endregion
 }

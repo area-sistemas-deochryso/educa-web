@@ -34,10 +34,12 @@
 	[selectedRango]="vm().filters.rango"
 	[selectedFecha]="vm().filters.fecha"
 	[selectedSalones]="vm().filters.salonesSeleccionados"
+	[selectedTipoPersona]="vm().filters.tipoPersona"
 	(estadoChange)="onEstadoChange($event)"
 	(rangoChange)="onRangoChange($event)"
 	(fechaChange)="onFechaChange($event)"
 	(salonesChange)="onSalonesChange($event)"
+	(tipoPersonaChange)="onTipoPersonaChange($event)"
 	(generar)="onGenerar()"
 />
 <!-- #endregion -->

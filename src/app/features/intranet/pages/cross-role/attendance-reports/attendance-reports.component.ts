@@ -7,7 +7,12 @@ import { ReportsFiltersComponent } from './components/reports-filters/reports-fi
 import { ReportsSummaryComponent } from './components/reports-summary/reports-summary.component';
 import { ReportsResultComponent } from './components/reports-result/reports-result.component';
 import { AttendanceReportsFacade } from './services';
-import { salonToOption, type EstadoFiltro, type RangoTipo } from './models';
+import {
+	salonToOption,
+	type EstadoFiltro,
+	type RangoTipo,
+	type TipoPersonaReporte,
+} from './models';
 
 @Component({
 	selector: 'app-attendance-reports',
@@ -62,6 +67,10 @@ export class AttendanceReportsComponent implements OnInit {
 
 	onSalonesChange(salones: string[]): void {
 		this.facade.updateFilters({ salonesSeleccionados: salones });
+	}
+
+	onTipoPersonaChange(tipoPersona: TipoPersonaReporte): void {
+		this.facade.updateFilters({ tipoPersona });
 	}
 
 	onGenerar(): void {

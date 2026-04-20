@@ -68,3 +68,25 @@
 	}
 }
 // #endregion
+
+// #region Sección profesores
+.profesores-section {
+	margin-top: 1.5rem;
+
+	.profesores-header {
+		display: flex;
+		align-items: center;
+		gap: 0.5rem;
+		padding: 0.6rem 1rem;
+		margin-bottom: 0.5rem;
+		background: #dbeafe;
+		color: var(--blue-800);
+		border-radius: 8px;
+		font-size: 0.9rem;
+
+		i {
+			font-size: 1rem;
+		}
+	}
+}
+// #endregion

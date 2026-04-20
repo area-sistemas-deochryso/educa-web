@@ -27,11 +27,16 @@ export class AttendanceReportsApiService {
 	// #region Helpers
 	private buildParams(filters: ReporteFilters): HttpParams {
 		const fecha = filters.fecha.toISOString().split('T')[0];
-		return new HttpParams()
+		let params = new HttpParams()
 			.set('filtro', filters.estado)
 			.set('rango', filters.rango)
 			.set('fecha', fecha)
-			.set('salones', filters.salonesSeleccionados.join(','));
+			.set('tipoPersona', filters.tipoPersona);
+		// BE ignora salones cuando tipoPersona = 'P'; no enviarlos evita ruido en el query
+		if (filters.tipoPersona !== 'P') {
+			params = params.set('salones', filters.salonesSeleccionados.join(','));
+		}
+		return params;
 	}
 	// #endregion
 }

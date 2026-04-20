@@ -29,6 +29,19 @@
 			/>
 		</div>
 
+		<!-- Tipo de persona -->
+		<div class="filtro-item filtro-tipo-persona">
+			<label>Tipo de persona</label>
+			<p-selectButton
+				[options]="tipoPersonaOptions"
+				[ngModel]="selectedTipoPersona()"
+				(ngModelChange)="tipoPersonaChange.emit($event)"
+				optionLabel="label"
+				optionValue="value"
+				[allowEmpty]="false"
+			/>
+		</div>
+
 		<!-- Fecha -->
 		<div class="filtro-item">
 			<label for="fecha">Fecha</label>
@@ -42,23 +55,25 @@
 			/>
 		</div>
 
-		<!-- Salones -->
-		<div class="filtro-item filtro-salones">
-			<label for="salones">Salones</label>
-			<p-multiselect
-				inputId="salones"
-				[options]="salonOptions()"
-				[ngModel]="selectedSalones()"
-				(ngModelChange)="salonesChange.emit($event)"
-				optionLabel="label"
-				optionValue="value"
-				placeholder="Seleccionar salones"
-				appendTo="body"
-				[loading]="loadingSalones()"
-				[maxSelectedLabels]="3"
-				selectedItemsLabel="{0} salones"
-			/>
-		</div>
+		<!-- Salones (ocultos cuando tipo = Profesores) -->
+		@if (showSalones()) {
+			<div class="filtro-item filtro-salones">
+				<label for="salones">Salones</label>
+				<p-multiselect
+					inputId="salones"
+					[options]="salonOptions()"
+					[ngModel]="selectedSalones()"
+					(ngModelChange)="salonesChange.emit($event)"
+					optionLabel="label"
+					optionValue="value"
+					placeholder="Seleccionar salones"
+					appendTo="body"
+					[loading]="loadingSalones()"
+					[maxSelectedLabels]="3"
+					selectedItemsLabel="{0} salones"
+				/>
+			</div>
+		}
 
 		<!-- Botón generar -->
 		<div class="filtro-item filtro-action">
@@ -68,7 +83,7 @@
 				icon="pi pi-search"
 				(click)="generar.emit()"
 				[loading]="loading()"
-				[disabled]="selectedSalones().length === 0"
+				[disabled]="disableGenerar()"
 			></button>
 		</div>
 	</div>

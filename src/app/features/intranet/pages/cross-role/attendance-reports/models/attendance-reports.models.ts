@@ -6,6 +6,9 @@ export type EstadoFiltro = (typeof ESTADO_FILTROS)[number];
 
 export const RANGO_TIPOS = ['dia', 'semana', 'mes'] as const;
 export type RangoTipo = (typeof RANGO_TIPOS)[number];
+
+export const TIPOS_PERSONA = ['E', 'P', 'todos'] as const;
+export type TipoPersonaReporte = (typeof TIPOS_PERSONA)[number];
 // #endregion
 
 // #region DTOs de respuesta API
@@ -30,6 +33,10 @@ export interface ReporteFiltrado {
 	totalFiltrados: number;
 	salones: SalonReporteFiltrado[];
 	estadisticas: EstadisticasAsistenciaDia;
+	tipoPersona: TipoPersonaReporte;
+	profesores?: PersonaProfesorReporte[] | null;
+	totalProfesoresGeneral?: number;
+	totalProfesoresFiltrados?: number;
 }
 
 export interface SalonReporteFiltrado {
@@ -52,6 +59,17 @@ export interface EstudianteReporteFiltrado {
 	estadoCodigo: string;
 	estadoDescripcion: string;
 }
+
+export interface PersonaProfesorReporte {
+	dni: string;
+	nombreCompleto: string;
+	cantidadDias: number;
+	horaLlegada: string | null;
+	horaSalida: string | null;
+	observacion: string | null;
+	estadoCodigo: string;
+	estadoDescripcion: string;
+}
 // #endregion
 
 // #region Estado de filtros
@@ -60,6 +78,7 @@ export interface ReporteFilters {
 	rango: RangoTipo;
 	fecha: Date;
 	salonesSeleccionados: string[];
+	tipoPersona: TipoPersonaReporte;
 }
 
 export function getDefaultFilters(): ReporteFilters {
@@ -68,6 +87,7 @@ export function getDefaultFilters(): ReporteFilters {
 		rango: 'dia',
 		fecha: new Date(),
 		salonesSeleccionados: [],
+		tipoPersona: 'E',
 	};
 }
 // #endregion

@@ -32,7 +32,9 @@ export class AttendanceReportsStore {
 	readonly hasResultado = computed(() => this._resultado() !== null);
 	readonly hasData = computed(() => {
 		const r = this._resultado();
-		return r !== null && r.totalFiltrados > 0;
+		if (r === null) return false;
+		const profCount = r.profesores?.length ?? 0;
+		return r.totalFiltrados > 0 || profCount > 0;
 	});
 	// #endregion
 
