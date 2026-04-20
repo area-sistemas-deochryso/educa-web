@@ -66,26 +66,31 @@ Salón/Matrícula > Aprobación/Progresión > Calificaciones > Horarios > Asiste
 
 ### 1.1 Ventanas horarias
 
-El estado de asistencia de **ingreso** se calcula automáticamente según la hora de marcación biométrica, relativa a la hora de inicio del periodo.
+El estado de asistencia de **ingreso** se calcula automáticamente según la hora de marcación biométrica. **En periodo regular los umbrales son absolutos y dependen del tipo persona** (Plan 24 Chat 1, 2026-04-20). En verano se mantiene la fórmula "inicio + delta".
 
-| Periodo | Meses | Hora Inicio | Asistió (A) | Tardanza (T) | Falta (F) |
-|---------|-------|-------------|-------------|-------------|-----------|
-| **Regular** | Mar-Dic | 7:30 | 7:30 – 8:20 (inicio + 50min) | 8:20 – 9:30 (inicio + 2h) | > 9:30 o sin marcación |
-| **Verano** | Ene-Feb | 8:30 | 8:30 – 9:20 (inicio + 50min) | 9:20 – 10:30 (inicio + 2h) | > 10:30 o sin marcación |
+| Periodo | Tipo persona | Meses | Asistió (A) | Tardanza (T) | Falta (F) |
+|---------|--------------|-------|-------------|-------------|-----------|
+| **Regular** | Estudiante (E) | Mar-Dic | `[05:00, 07:46)` | `[07:46, 09:30)` | `≥ 09:30` o sin marcación |
+| **Regular** | Profesor (P)   | Mar-Dic | `[05:00, 07:31)` | `[07:31, 09:30)` | `≥ 09:30` o sin marcación |
+| **Verano**  | Ambos (E/P)    | Ene-Feb | `08:30 – 09:20` (inicio + 50min) | `09:20 – 10:30` (inicio + 2h) | `> 10:30` o sin marcación |
 
-**Ingreso después de la ventana de 2 horas**: Se registra la marcación pero el estado es `F` (Falta) igualmente.
+**Apertura de ingreso regular (INV-C10)**: Marcaciones de entrada **antes de 05:00** se descartan silenciosamente por el validador de coherencia horaria (solo periodo regular, ambos tipos persona). Se loggean como `Information` y no crean registro.
 
-**Salida simplificada**: No se clasifica por ventana horaria. Al registrar salida, la asistencia pasa de `Incompleta` a `Completa`. No afecta el estado del ingreso.
+**Ventana mínima de salida para estudiantes (INV-C09)**: Marcaciones de salida de estudiantes **antes de 13:55** se descartan silenciosamente (solo periodo regular). Profesores no tienen ventana mínima de salida — pueden salir tarde sin restricción. Verano no aplica guard de salida temprana.
 
-**Regla**: Estas ventanas son las únicas fuentes de verdad para el cálculo de estado. Si cambian los horarios del colegio, se actualizan en `AsistenciaEstadoCalculador`, no en múltiples servicios.
+**Ingreso después del umbral de falta**: Se registra la marcación pero el estado es `F` (Falta) igualmente.
+
+**Salida simplificada**: No se clasifica por ventana horaria en el cálculo de estado (salvo los guards INV-C09). Al registrar salida, la asistencia pasa de `Incompleta` a `Completa`. No afecta el estado del ingreso.
+
+**Regla**: Estas ventanas son las únicas fuentes de verdad para el cálculo de estado y su clasificación se hace en `AsistenciaRules` + `EstadoAsistenciaCalculator` (Domain). Si cambian los horarios del colegio, se actualizan allí, no en múltiples servicios.
 
 ### 1.2 Códigos de estado
 
 | Código | Significado | Cuándo se asigna |
 |--------|-------------|-----------------|
-| `A` | Asistió | Ingreso dentro de los primeros 50 minutos desde hora inicio |
-| `T` | Tardanza | Ingreso entre +50min y +2h desde hora inicio |
-| `F` | Falta | Ingreso después de +2h, o sin marcación al final del día |
+| `A` | Asistió | Ingreso dentro de la ventana de "a tiempo" (ver §1.1, depende de tipo persona en regular) |
+| `T` | Tardanza | Ingreso en la ventana entre umbral de tardanza y umbral de falta |
+| `F` | Falta | Ingreso pasado el umbral de falta, o sin marcación al final del día |
 | `J` | Justificado | Justificación manual con prefijo `"Justificado:"` |
 | `-` | Pendiente | Día aún no terminó |
 | `X` | Antes del registro | Fecha anterior a `FECHA_INICIO_REGISTRO` (26-ene-2026) |
@@ -109,6 +114,15 @@ F (4) > J (3) > T (2) > A (1) > Pendiente/X (0)
 ### 1.5 Coherencia horaria y anti-duplicación biométrica
 
 **Umbral de coherencia**: Las **12:00** separan horario de entrada (antes) y horario de salida (desde). Una marcación es "coherente" si ocurre en el horario que corresponde a su tipo (entrada antes de 12:00, salida desde 12:00).
+
+**Guards de apertura (solo periodo regular, evaluados ANTES del resto de reglas)**:
+
+| Guard | Condición | Acción |
+|-------|-----------|--------|
+| INV-C10 | Entrada `<05:00` (ambos tipos persona) | Ignorar silenciosamente (no se crea registro) |
+| INV-C09 | Salida `<13:55` de **estudiante** (`TipoPersona='E'`) | Ignorar silenciosamente |
+
+Los guards NO aplican en verano (Ene-Feb) — en verano cualquier marcación se procesa con las reglas tradicionales.
 
 **Regla de clasificación con múltiples biométricos**:
 
@@ -153,6 +167,8 @@ Toda mutación sobre la tabla `Asistencia` debe pasar por una de estas dos vías
 | **Admin/Director** | `IAsistenciaAdminService` | UI formal `intranet/admin/asistencias` | Correo diferenciado "Corrección de asistencia" (INV-AD05) |
 
 **Edición directa en BD (SSMS, Azure Portal) está prohibida en producción.** Si se detecta, los correos al apoderado no se envían y no hay auditoría.
+
+**INV-AD05 ampliado a profesores (Plan 23 Chat 4, 2026-04-20)**: cuando la persona editada tiene `TipoPersona = 'P'`, el correo de corrección se envía al propio **profesor** (`Profesor.PRO_Correo`) con BCC al colegio/Director (`EmailSettings.CopiaAsistenciaEmail`); nunca al apoderado. El outbox se etiqueta como `"ASISTENCIA_CORRECCION_PROFESOR"` / `TipoEntidadOrigen = "AsistenciaProfesor"` para separar bandejas admin. Misma plantilla azul administrativa que para estudiante, con saludo "Estimado/a profesor/a".
 
 ### 1.9 Precedencia manual sobre biométrica (INV-AD02)
 
@@ -1025,14 +1041,16 @@ Este registro consolida TODAS las invariantes del sistema en una tabla indexable
 
 | ID | Entidad | Invariante | Enforcement | Sección |
 |----|---------|------------|-------------|---------|
-| `INV-C01` | Asistencia | Estado final lo determina el ingreso. Salida solo afecta completitud. Severidad: `F(4) > J(3) > T(2) > A(1)` | `AsistenciaEstadoCalculador` | 1.4 |
-| `INV-C02` | Asistencia | Justificación (`"Justificado:"`) tiene precedencia absoluta sobre cálculo por hora | `AsistenciaEstadoCalculador` | 1.3 |
-| `INV-C03` | Asistencia | Coherencia horaria: umbral 12:00 separa entrada/salida. Marca coherente reemplaza incoherente. Anti-duplicación 30 min al completar salida | `ClasificarYRegistrarMarcacionAsync` | 1.5 |
+| `INV-C01` | Asistencia | Estado final lo determina el ingreso. En regular los umbrales son **absolutos** y dependen de `TipoPersona` (E: 7:46 tardanza / 9:30 falta; P: 7:31 tardanza / 9:30 falta). Verano mantiene fórmula inicio+delta. Severidad: `F(4) > J(3) > T(2) > A(1)` | `EstadoAsistenciaCalculator` (Domain) | 1.1, 1.4 |
+| `INV-C02` | Asistencia | Justificación (`"Justificado:"`) tiene precedencia absoluta sobre cálculo por hora | `EstadoAsistenciaCalculator` | 1.3 |
+| `INV-C03` | Asistencia | Coherencia horaria: umbral 12:00 separa entrada/salida. Marca coherente reemplaza incoherente. Anti-duplicación 30 min al completar salida | `CoherenciaHorariaValidator` | 1.5 |
 | `INV-C04` | Calificación | `Promedio = Σ(nota × peso)`, redondeado a 1 decimal. Pesos NO se normalizan | `CalificacionHelper` | 3.2 |
 | `INV-C05` | Progresión | Siguiente grado = `GRA_Orden + 1`. Último grado (14) = egreso | Service de aprobación | 5.1, 4.2 |
 | `INV-C06` | Horario | Superposición: `Inicio1 < Fin2 AND Fin1 > Inicio2` | Service de horarios | 6.2 |
 | `INV-C07` | Horario | `HoraInicio < HoraFin` siempre (duración > 0) | Service + constraint BD | 6.1 |
 | `INV-C08` | DiaSemana | C# `DayOfWeek.Sunday=0` → BD `7`. Fórmula: `(dow == 0) ? 7 : dow` | Helper/converter | 6.3 |
+| `INV-C09` | Asistencia | Salida de **estudiante** antes de `13:55` en periodo regular se descarta silenciosamente (log `Information`, no crea registro). Profesores y verano no aplican | `CoherenciaHorariaValidator.Clasificar` → `MarcacionAccion.IgnorarSalidaTemprana` | 1.1, 1.5 |
+| `INV-C10` | Asistencia | Entrada antes de `05:00` en periodo regular se descarta silenciosamente (ambos tipos persona). Verano no aplica | `CoherenciaHorariaValidator.Clasificar` → `MarcacionAccion.IgnorarAntesDeApertura` | 1.1, 1.5 |
 
 ---
 
@@ -1090,7 +1108,7 @@ Este registro consolida TODAS las invariantes del sistema en una tabla indexable
 | `INV-AD02` | Asistencia | Un registro con `ASI_OrigenManual = true` no puede ser sobrescrito por el webhook de CrossChex — se descarta silenciosamente | `AsistenciaService.RegistrarAsistencia()` | 1.9 |
 | `INV-AD03` | CierreAsistenciaMensual | Operaciones de `AsistenciaAdminService` sobre fechas dentro de un mes con cierre activo lanzan `BusinessRuleException("ASISTENCIA_MES_CERRADO")` | `CierreAsistenciaService.EnsureFechaNoCerradaAsync()` | 1.10 |
 | `INV-AD04` | CierreAsistenciaMensual | Un cierre mensual solo se desactiva por intervención explícita del Director con observación obligatoria (mín 10 chars) y queda auditado | `CierreAsistenciaService.RevertirCierreAsync()` + `[Authorize(Roles = "Director")]` | 1.10 |
-| `INV-AD05` | Asistencia | `AsistenciaAdminService` envía correo diferenciado al apoderado (plantilla "Corrección de asistencia") en cada operación, distinto del correo de marcación en tiempo real | `EmailNotificationService.EnviarNotificacionAsistenciaCorreccion()` fire-and-forget | 1.8 |
+| `INV-AD05` | Asistencia | `AsistenciaAdminService` envía correo diferenciado en cada operación, distinto del correo de marcación en tiempo real. Destinatarios polimórficos por `TipoPersona`: **E** → apoderado (`EST_CorreoApoderado`) con BCC al colegio; **P** → profesor (`PRO_Correo`) con BCC al colegio. Sin correo del destinatario principal → se omite silenciosamente. | `EmailNotificationService.EnviarNotificacionAsistenciaCorreccion()` + `EnviarNotificacionAsistenciaCorreccionProfesor()`, vía `IAsistenciaAdminEmailNotifier`. Fire-and-forget (INV-S07). | 1.8 |
 
 ---
 

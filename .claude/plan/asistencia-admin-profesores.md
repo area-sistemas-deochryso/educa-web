@@ -201,27 +201,50 @@ Si este plan cierra primero, Plan 22 al arrancar ya encuentra el universo de cor
 
 **Gate BE**: ✅ endpoints aceptan los 3 valores; dispatch correcto sin duplicar controllers; PDF con header dinámico.
 
-#### Chat 3.B — FE · selector tipoPersona en tab Reportes (pendiente)
+#### Chat 3.B — FE · selector tipoPersona en tab Reportes ✅ (2026-04-20)
 
-- [ ] Frontend: agregar selector "Tipo de persona" (`p-selectButton` 3 opciones) al lado de "Rango" en tab Reportes.
-- [ ] Selector "Salones" se oculta cuando tipo = Profesores.
-- [ ] `ReporteFilters.tipoPersona` default `'E'`; api-service agrega query param; facade skippea validación de salones cuando tipo = `'P'`.
-- [ ] Vista de resultado: si response trae `profesores[]`, renderizar sección al final reusando layout de estudiantes.
-- [ ] Test FE: 1 spec del facade con los 3 valores.
+- [x] Frontend: agregar selector "Tipo de persona" (`p-selectButton` 3 opciones) al lado de "Rango" en tab Reportes.
+- [x] Selector "Salones" se oculta cuando tipo = Profesores.
+- [x] `ReporteFilters.tipoPersona` default `'E'`; api-service agrega query param; facade skippea validación de salones cuando tipo = `'P'`.
+- [x] Vista de resultado: si response trae `profesores[]`, renderizar sección al final reusando layout de estudiantes.
+- [x] Test FE: 6 specs del facade (3 valores de `tipoPersona` + 3 de validación de salones). Suite FE: **1380 verdes** (baseline 1374, +6).
 
-**Gate FE**: se pueden generar reportes para profesores sin bypass (PDF) desde `/intranet/admin/asistencias?tab=reportes`. Suite FE ≥ 1375 (baseline 1374, +1).
+**Gate FE**: ✅ se pueden generar reportes para profesores sin bypass (PDF) desde `/intranet/admin/asistencias?tab=reportes`.
 
-### Chat 4 — Enforcement INV-AD06 + correo de corrección profesor (BE + FE)
+**Notas de implementación**:
+
+- Modelos (`attendance-reports.models.ts`): agregado `TIPOS_PERSONA` const + `TipoPersonaReporte`; `ReporteFilters.tipoPersona` default `'E'`; `ReporteFiltrado` gana `tipoPersona` + `profesores?` + `totalProfesoresGeneral?` + `totalProfesoresFiltrados?`; nuevo `PersonaProfesorReporte` shape aplanado (mismos campos que `EstudianteReporteFiltrado`).
+- Config (`attendance-reports.config.ts`): agregado `TIPO_PERSONA_OPTIONS: SelectOption<TipoPersonaReporte>[]`.
+- API service (`buildParams`): agrega `tipoPersona` al query; cuando es `'P'` NO incluye `salones` (el BE los ignora pero evitamos ruido).
+- Facade (`generarReporte`): la validación "Debe seleccionar al menos un salón" se skippea cuando `tipoPersona === 'P'`.
+- Store (`hasData`): ahora considera `profesores.length` además de `totalFiltrados` para que el layout externo muestre el resultado cuando el reporte es solo profesores.
+- Filters component: `p-selectButton` tipoPersona al lado de Rango (sin `appendTo` — no aplica a selectButton); `@if (showSalones())` oculta el `p-multiselect` cuando tipo = `'P'`; `disableGenerar` computed no bloquea botón cuando tipo = `'P'`.
+- Result component: nueva sección "Profesores — N de M" con header teñido en `#dbeafe` + tabla plana (sin agrupación por salón) reusando el mismo `p-table`/columnas de la tabla de estudiantes (entrada/salida cuando rango=día, días cuando rango=semana/mes). Las dos tablas coexisten cuando `tipoPersona = 'todos'`.
+- Design-system: `p-selectButton` + reuso del layout de tabla existente (B4); SCSS `.profesores-section` con header `#dbeafe` / `--blue-800` (design-system sección D tokens azul sobre fondo claro).
+- tsc limpio, lint limpio, build de producción OK, suite 1380/1380 verdes.
+
+### Chat 4 — Enforcement INV-AD06 + correo de corrección profesor (BE + FE) ✅ (2026-04-20)
 
 **Objetivo**: las mutaciones sobre profesores desde admin disparan el correo correcto y están cubiertas por tests.
 
-- [ ] Verificar `[Authorize(Roles = "Director,Asistente Administrativo,Promotor,Coordinador Académico")]` a nivel `AsistenciaAdminController` (debería estar por Plan 21).
-- [ ] Test de boundary (rol Profesor intentando POST sobre otro profesor → 403): agregar a suite de security tests.
-- [ ] Auditar `EmailNotificationService` — al editar un registro con `TipoPersona = 'P'`, el correo va al profesor **y** al Director (no al apoderado). Verificar que plantilla INV-AD05 usa placeholder "estudiante/profesor" correctamente.
-- [ ] Documentar INV-AD06 como test unitario (cualquiera no-admin que intente mutar → excepción).
-- [ ] Frontend: toast de confirmación usa "profesor" en lugar de "estudiante" cuando aplique.
+- [x] Auditado `[Authorize(Roles = Roles.Administrativos)]` a nivel `AsistenciaAdminController` (ya presente desde Plan 21). El alcance incluye los 4 roles administrativos: Director, Asistente Administrativo, Promotor, Coordinador Académico.
+- [x] Test de boundary INV-AD06: `AsistenciaAdminControllerAuthorizationTests` (6 tests por reflection) verifica el atributo a nivel clase y rechaza explícitamente Profesor / Apoderado / Estudiante del conjunto autorizado. Falla el build si alguien remueve el atributo o agrega un rol no-admin.
+- [x] `IEmailNotificationService.EnviarNotificacionAsistenciaCorreccionProfesor` agregado: destinatario = `PRO_Correo` del profesor, BCC = colegio/Director (`_copiaEmail`), nunca apoderado. Outbox etiquetado con `"ASISTENCIA_CORRECCION_PROFESOR"` + entidad origen `"AsistenciaProfesor"`.
+- [x] `EmailNotificationService.cs` dividido en 2 partial classes (`Operaciones` + `Templates`) para respetar el cap 300ln. Plantilla `GenerarHtmlCorreoCorreccionProfesor` reutiliza el template base `HtmlCorreccion` con saludo "Estimado/a profesor/a".
+- [x] `IAsistenciaAdminEmailNotifier` extendido con `NotificarCorreccionProfesorAsync` + `NotificarEliminacionProfesorAsync`. Fire-and-forget (INV-S07): error al encolar nunca falla la operación.
+- [x] TODOs completados en `AsistenciaAdminCrudHelpers.NotificarCorreccionAsync` y `AsistenciaAdminCrudMutateService.EliminarAsync`: rama `TipoPersona == 'P'` delega al notifier de profesor.
+- [x] Tests unitarios `AsistenciaAdminEmailNotifierTests` (7 tests): E con correo → apoderado; E sin correo → no-op; P con correo → profesor (nunca apoderado); P sin correo → no-op; eliminación E/P con tipoOperacion="eliminada"; errores fire-and-forget (INV-S07) en ambos canales.
+- [x] Frontend: helper `notificarExito(tipo, verbo, detalle)` en `AttendancesCrudFacade`. Toasts de éxito diferenciados por `tipoPersona` ('P' → "Profesor"; otro → "Estudiante") en los 5 puntos de mutación (crearEntrada, crearSalida, crearCompleta, actualizarHoras, delete). Tests del módulo siguen verdes; ningún spec nuevo necesario (helper trivial).
+- [x] Suite BE: **800 verdes** (baseline 784 + 16 del Chat 4). Suite FE: **1380 verdes** (sin regresión).
 
-**Gate**: no se puede mutar asistencia de profesor sin rol administrativo. El correo se envía al canal correcto.
+**Gate**: ✅ no se puede mutar asistencia de profesor sin rol administrativo (test de reflection falla el build si cambia). El correo va al canal correcto (tests verifican routing E/P). Toast del admin diferencia tipo.
+
+**Notas de implementación**:
+
+- `EmailNotificationService.cs` refactor sin cambio funcional: partial `EmailNotificationService.Templates.cs` contiene las 3 plantillas HTML (ingreso/salida real-time, corrección estudiante, corrección profesor). Deduplica el shell del HTML azul vía helper `HtmlCorreccion(saludo, descripcion, ...)`.
+- `IAsistenciaAdminEmailNotifier` se mantuvo con 4 métodos separados (2 E, 2 P) en lugar de polimórfico con discriminador porque el tipo de entidad en la firma es parte del contrato y evita downcasts.
+- `AsistenciaAdminControllerAuthorizationTests` usa reflection (`GetCustomAttributes<AuthorizeAttribute>`) en vez de integración con `WebApplicationFactory` — más rápido, aísla el invariante y documenta explícitamente INV-AD06.
+- El frontend no tenía toast de éxito previo (solo errores con copy neutro "la entrada", "el registro"). Chat 4 agregó el toast diferenciado; si el usuario no lo quiere visible, basta quitar `notificarExito` de los `onCommit`. Tests existentes (8 store + 11 data facade) no tocaron al CRUD facade por diseño — la lógica del toast es cosmética y se valida en QA manual.
 
 ### Chat 5 — Deploy + armonización con Plan 21 Chat 7 (vista read-only profesor)
 
