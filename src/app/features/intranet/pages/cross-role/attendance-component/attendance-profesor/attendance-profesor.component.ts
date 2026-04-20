@@ -121,11 +121,13 @@ export class AttendanceProfesorComponent {
 
 	/**
 	 * Delega el cambio de modo día/mes al tab activo.
-	 * - Tab "Mi asistencia" no soporta modo día — ignora.
-	 * - Tab "Mis estudiantes" delega al sub-componente.
+	 * Ambas vistas (propia y estudiantes) soportan día/mes — cada una consume
+	 * sus propios endpoints (self-service vs por salón).
 	 */
 	setViewMode(mode: ViewMode): void {
-		if (this.activeTab() === 'estudiantes') {
+		if (this.activeTab() === 'propia') {
+			this.propiaComponent?.setViewMode(mode);
+		} else {
 			this.estudiantesComponent?.setViewMode(mode);
 		}
 	}

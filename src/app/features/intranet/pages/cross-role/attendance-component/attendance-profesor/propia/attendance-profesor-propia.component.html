@@ -1,6 +1,10 @@
 <!-- #region Template -->
 <div class="propia-container">
-	<!-- * Header con navegación de mes -->
+	<!-- #region Leyenda compartida -->
+	<app-attendance-legend />
+	<!-- #endregion -->
+
+	<!-- #region Header con navegación -->
 	<header class="propia-header">
 		<div class="header-title">
 			<h3>Mi asistencia</h3>
@@ -8,48 +12,62 @@
 		</div>
 
 		<div class="header-nav">
-			<button
-				pButton
-				icon="pi pi-chevron-left"
-				class="p-button-text p-button-rounded"
-				(click)="onPrevMonth()"
-				pTooltip="Mes anterior"
-				tooltipPosition="top"
-				[disabled]="facade.loading()"
-				[pt]="{ root: { 'aria-label': 'Mes anterior' } }"
-			></button>
+			@if (isDiaMode()) {
+				<!-- * Modo día: DatePicker único -->
+				<p-datepicker
+					[ngModel]="facade.selectedDate()"
+					(ngModelChange)="onDateChange($event)"
+					dateFormat="dd/mm/yy"
+					[maxDate]="today"
+					appendTo="body"
+					[showIcon]="true"
+					[disabled]="facade.loading()"
+				/>
+			} @else {
+				<!-- * Modo mes: prev / mes / año / next -->
+				<button
+					pButton
+					icon="pi pi-chevron-left"
+					class="p-button-text p-button-rounded"
+					(click)="onPrevMonth()"
+					pTooltip="Mes anterior"
+					tooltipPosition="top"
+					[disabled]="facade.loading()"
+					[pt]="{ root: { 'aria-label': 'Mes anterior' } }"
+				></button>
 
-			<p-select
-				[options]="mesOptions"
-				[ngModel]="facade.selectedMes()"
-				(ngModelChange)="onMesChange($event)"
-				optionLabel="label"
-				optionValue="value"
-				appendTo="body"
-				styleClass="propia-mes-select"
-				[disabled]="facade.loading()"
-			/>
-			<p-select
-				[options]="anioOptions()"
-				[ngModel]="facade.selectedAnio()"
-				(ngModelChange)="onAnioChange($event)"
-				optionLabel="label"
-				optionValue="value"
-				appendTo="body"
-				styleClass="propia-anio-select"
-				[disabled]="facade.loading()"
-			/>
+				<p-select
+					[options]="mesOptions"
+					[ngModel]="facade.selectedMes()"
+					(ngModelChange)="onMesChange($event)"
+					optionLabel="label"
+					optionValue="value"
+					appendTo="body"
+					styleClass="propia-mes-select"
+					[disabled]="facade.loading()"
+				/>
+				<p-select
+					[options]="anioOptions()"
+					[ngModel]="facade.selectedAnio()"
+					(ngModelChange)="onAnioChange($event)"
+					optionLabel="label"
+					optionValue="value"
+					appendTo="body"
+					styleClass="propia-anio-select"
+					[disabled]="facade.loading()"
+				/>
 
-			<button
-				pButton
-				icon="pi pi-chevron-right"
-				class="p-button-text p-button-rounded"
-				(click)="onNextMonth()"
-				pTooltip="Mes siguiente"
-				tooltipPosition="top"
-				[disabled]="facade.loading()"
-				[pt]="{ root: { 'aria-label': 'Mes siguiente' } }"
-			></button>
+				<button
+					pButton
+					icon="pi pi-chevron-right"
+					class="p-button-text p-button-rounded"
+					(click)="onNextMonth()"
+					pTooltip="Mes siguiente"
+					tooltipPosition="top"
+					[disabled]="facade.loading()"
+					[pt]="{ root: { 'aria-label': 'Mes siguiente' } }"
+				></button>
+			}
 
 			<button
 				pButton
@@ -57,8 +75,8 @@
 				label="Hoy"
 				class="p-button-outlined p-button-sm"
 				(click)="onGoToCurrent()"
-				[disabled]="facade.loading() || isCurrentMonth()"
-				pTooltip="Volver al mes actual"
+				[disabled]="facade.loading() || (!isDiaMode() && isCurrentMonth())"
+				pTooltip="Volver a hoy"
 				tooltipPosition="top"
 			></button>
 
@@ -74,65 +92,69 @@
 			></button>
 		</div>
 	</header>
+	<!-- #endregion -->
 
-	<!-- * Estadísticas del mes -->
-	<section class="stats-section">
-		<div class="stat-card">
-			<div class="stat-content">
-				<span class="stat-label">Total Días</span>
-				<span class="stat-value">{{ facade.conteo().total }}</span>
-				<span class="stat-sublabel">registros del mes</span>
+	<!-- #region Estadísticas (mes) -->
+	@if (!isDiaMode()) {
+		<section class="stats-section">
+			<div class="stat-card">
+				<div class="stat-content">
+					<span class="stat-label">Total Días</span>
+					<span class="stat-value">{{ facade.conteo().total }}</span>
+					<span class="stat-sublabel">registros del mes</span>
+				</div>
+				<div class="stat-icon">
+					<i class="pi pi-calendar"></i>
+				</div>
 			</div>
-			<div class="stat-icon">
-				<i class="pi pi-calendar"></i>
+			<div class="stat-card stat-asistio">
+				<div class="stat-content">
+					<span class="stat-label">Asistió</span>
+					<span class="stat-value">{{ facade.conteo().asistio }}</span>
+					<span class="stat-sublabel">a tiempo</span>
+				</div>
+				<div class="stat-icon">
+					<i class="pi pi-check-circle"></i>
+				</div>
 			</div>
-		</div>
-		<div class="stat-card stat-asistio">
-			<div class="stat-content">
-				<span class="stat-label">Asistió</span>
-				<span class="stat-value">{{ facade.conteo().asistio }}</span>
-				<span class="stat-sublabel">a tiempo</span>
+			<div class="stat-card stat-tardanza">
+				<div class="stat-content">
+					<span class="stat-label">Tardanza</span>
+					<span class="stat-value">{{ facade.conteo().tardanza }}</span>
+					<span class="stat-sublabel">ingresos con atraso</span>
+				</div>
+				<div class="stat-icon">
+					<i class="pi pi-clock"></i>
+				</div>
 			</div>
-			<div class="stat-icon">
-				<i class="pi pi-check-circle"></i>
+			<div class="stat-card stat-falta">
+				<div class="stat-content">
+					<span class="stat-label">Falta</span>
+					<span class="stat-value">{{ facade.conteo().falta }}</span>
+					<span class="stat-sublabel">sin registro</span>
+				</div>
+				<div class="stat-icon">
+					<i class="pi pi-times-circle"></i>
+				</div>
 			</div>
-		</div>
-		<div class="stat-card stat-tardanza">
-			<div class="stat-content">
-				<span class="stat-label">Tardanza</span>
-				<span class="stat-value">{{ facade.conteo().tardanza }}</span>
-				<span class="stat-sublabel">ingresos con atraso</span>
+			<div class="stat-card stat-justificado">
+				<div class="stat-content">
+					<span class="stat-label">Justificado</span>
+					<span class="stat-value">{{ facade.conteo().justificado }}</span>
+					<span class="stat-sublabel">con observación</span>
+				</div>
+				<div class="stat-icon">
+					<i class="pi pi-info-circle"></i>
+				</div>
 			</div>
-			<div class="stat-icon">
-				<i class="pi pi-clock"></i>
-			</div>
-		</div>
-		<div class="stat-card stat-falta">
-			<div class="stat-content">
-				<span class="stat-label">Falta</span>
-				<span class="stat-value">{{ facade.conteo().falta }}</span>
-				<span class="stat-sublabel">sin registro</span>
-			</div>
-			<div class="stat-icon">
-				<i class="pi pi-times-circle"></i>
-			</div>
-		</div>
-		<div class="stat-card stat-justificado">
-			<div class="stat-content">
-				<span class="stat-label">Justificado</span>
-				<span class="stat-value">{{ facade.conteo().justificado }}</span>
-				<span class="stat-sublabel">con observación</span>
-			</div>
-			<div class="stat-icon">
-				<i class="pi pi-info-circle"></i>
-			</div>
-		</div>
-	</section>
+		</section>
+	}
+	<!-- #endregion -->
 
-	<!-- * Tabla de asistencias -->
+	<!-- #region Contenido — loading / error / empty / data -->
 	<section class="table-section">
 		@if (facade.loading()) {
-			<app-table-skeleton [columns]="skeletonColumns" [rows]="8" minHeight="360px" />
+			<app-table-skeleton [columns]="skeletonColumns" [rows]="isDiaMode() ? 1 : 8" minHeight="200px" />
 		} @else if (facade.error()) {
 			<div class="empty-state">
 				<i class="pi pi-exclamation-circle"></i>
@@ -181,5 +203,6 @@
 			</p-table>
 		}
 	</section>
+	<!-- #endregion -->
 </div>
 <!-- #endregion -->

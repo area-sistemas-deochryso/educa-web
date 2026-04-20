@@ -91,5 +91,22 @@ describe('AttendanceProfesorComponent (shell)', () => {
 		component.onTabChange('otro');
 		expect(component.activeTab()).toBe('propia');
 	});
+
+	it('setViewMode delega al tab "propia" cuando está activo', () => {
+		fixture.detectChanges();
+		expect(component.activeTab()).toBe('propia');
+		const propia = (component as unknown as { propiaComponent?: { setViewMode: ReturnType<typeof vi.fn> } })
+			.propiaComponent;
+		if (!propia) {
+			// * El ViewChild se resuelve sólo tras detectChanges; en este harness el tab "propia"
+			//   se renderiza por default, así que hay un componente real inyectado.
+			// Fallback: validar sólo que no lance.
+			expect(() => component.setViewMode('dia')).not.toThrow();
+			return;
+		}
+		const spy = vi.spyOn(propia, 'setViewMode');
+		component.setViewMode('dia');
+		expect(spy).toHaveBeenCalledWith('dia');
+	});
 });
 // #endregion

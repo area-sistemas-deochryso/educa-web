@@ -217,25 +217,7 @@ Orden: `Profesor → Estudiante → rechazar`. Justificación: hay menos profeso
 - `Services/Asistencias/PermisoSalud/PermisoSaludAuthorizationHelper.cs:63` usa el mismo anti-pattern `d.DIR_DNI == dni`. Falla cuando el caller es director buscándose a sí mismo. Fix trivial (inyectar `IDniEncryptionService` + hash lookup), chat futuro.
 - Tabla `ErrorLog` en BD de prueba le faltan columnas `ERL_RequestBody`, `ERL_RequestHeaders`, `ERL_ResponseBody`. Migration SQL pendiente. El código es tolerante (fire-and-forget INV-ET02) pero floodea logs con warnings.
 
-**Deuda de UX (Chat 4 ≥ Chat 5)** 🟡:
-
-La vista "Mi asistencia" (`attendance-profesor-propia.component`) quedó con **diseño aislado** del resto del módulo asistencia. Discrepancias:
-
-- **No usa el pill día/mes** del `attendance-header.component` compartido (el `setViewMode` del shell intencionalmente ignora la tab "Mi asistencia" porque la vista solo soporta modo mes). Como consecuencia, cuando el profesor está en esta tab, el pill del header sigue visible pero no tiene efecto — UX confuso.
-- **No muestra `app-attendance-legend`** con la leyenda A/T/F/J que usan todas las demás vistas (estudiante, apoderado, admin).
-- **Tabla custom** en lugar de `AttendanceTableComponent`/`AttendanceDayListComponent` compartidos. Los tags de color y el layout general son consistentes pero no reutilizan el mismo componente.
-- **Stat-cards propias** (5 cards: Total/A/T/F/J) en lugar de integrar con `AttendanceStatsService` que ya calcula el mismo conteo para otras vistas.
-
-**Plan de armonización (Chat 6 propuesto)**:
-
-| Acción | Resultado |
-| ------ | --------- |
-| Wire del pill día/mes al tab "Mi asistencia" | El selector funciona también aquí (requiere agregar endpoint `/profesor/me/dia` al frontend y vista modo día) |
-| Embeber `<app-attendance-legend />` al tope del panel propia | Consistencia visual con estudiante/apoderado |
-| Reusar `AttendanceTableComponent` en lugar de tabla custom | DRY + consistencia de tags/colores |
-| Integrar con `AttendanceViewController` | Mismo mental model que estudiante/apoderado (salones, días, etc.) |
-
-Scope ~1 chat pequeño. No bloquea Chat 5 (deploy + sync + cierre del plan).
+**Deuda de UX (Chat 4 ≥ Chat 5)** 🟡 → ✅ **Resuelta en Chat 6 (2026-04-20)**.
 
 | Entregable | Archivo | Estado |
 | ---------- | ------- | ------ |
@@ -249,6 +231,25 @@ Scope ~1 chat pequeño. No bloquea Chat 5 (deploy + sync + cierre del plan).
 | Vista estudiantes extraída | `attendance-profesor/estudiantes/attendance-profesor-estudiantes.component.{ts,html,scss}` — copia 1:1 de la lógica anterior del shell profesor (AttendanceViewController, forkJoin tutoría+horario, justificación, PDF menu). Agrega output `salonesLoaded` (emitido por consistencia aunque el shell carga en paralelo). | ✅ |
 | Tests shell | 5 tests en `attendance-profesor.component.spec.ts`: should create, default tab 'propia', hasSalones=false sin salones, onTabChange cambia tab, onTabChange ignora valores inválidos. | ✅ |
 | Frontend validación | Lint limpio (`npm run lint` — All files pass). TypeScript limpio. Build dev OK. 1340 tests verdes (1337 del Chat 3 + 3 nuevos netos del shell — 2 antiguos eliminados del spec previo). | ✅ |
+
+### Chat 6 — Frontend armonización UX "Mi asistencia" ✅ 2026-04-20
+
+**Objetivo**: Cerrar la deuda de UX identificada en Chat 4. La vista "Mi asistencia" ahora usa la leyenda compartida, soporta modo día/mes respondiendo al pill del header cross-role, y aplica los mismos severity del resto del módulo.
+
+**Trade-off aceptado**: NO se reusa `AttendanceTableComponent` ni `AttendanceDayListComponent`. Su shape de datos (`EstudianteAsistencia[]`) está pensado para listar estudiantes en una tabla/grid, no para listar días de un solo profesor. Adaptar el shape implicaba un wrapper artificial. Se optó por **homologar styling** (legend compartido + `severity` del `p-tag` con los mismos colores del tema) sin duplicar componentes. El SCSS custom es pequeño (~50 líneas) y refleja la vista específica (lista cronológica de días con entrada/salida/estado/observación).
+
+| Entregable | Archivo | Estado |
+| ---------- | ------- | ------ |
+| Store extendido | `asistencia-propia.store.ts` — agregados `_viewMode` (`VIEW_MODE.Mes` default), `_selectedDate` + computed `selectedLabel` que cambia según el modo ("Abril 2026" vs "15 de abril de 2026"). | ✅ |
+| Facade extendido | `asistencia-propia.facade.ts` — `load()` delega según modo, `loadDia()` consume `/profesor/me/dia`, `setViewMode()` sincroniza la fecha al entrar en día (al mes actual si coincide, al primer día del mes visible si no), `setDate()` mantiene mes/año sincronizados para volver a mes sin saltar de periodo. | ✅ |
+| Sub-componente propia | `attendance-profesor-propia.component.ts/html/scss` — embebe `<app-attendance-legend />` al tope, expone `setViewMode(mode)` como API pública para el shell, renderiza `p-datepicker` (modo día) o pills prev/mes/año/next (modo mes). Stats-cards solo se muestran en modo mes. `p-tag` con `severity` — se removió `getStatusClass/styleClass` redundante (PrimeNG ya colorea por severity). | ✅ |
+| Shell profesor | `attendance-profesor.component.ts` — `setViewMode` ahora delega al tab activo (propia o estudiantes). Ambas vistas soportan día/mes con sus propios endpoints. | ✅ |
+| Tests shell | `attendance-profesor.component.spec.ts` — 1 test nuevo: `setViewMode` delega a `propiaComponent` cuando la tab activa es `'propia'`. 6/6 verdes (5 previos + 1 nuevo). | ✅ |
+| Validación | `npx tsc --noEmit` limpio. `npm run lint` limpio (All files pass). `npm run build` OK. Vitest: **1341 tests verdes** (+1 vs Chat 4). Backend sin cambios: **766 tests verdes**. | ✅ |
+
+**Fuera de scope (sigue en Chat 5)**: deploy backend/frontend, ejecutar `plan21_chat15_FkRepointAsistenciaPersona.sql`, sync histórico "Sobreescribir desde CrossChex", rename legacy `Asistencia`, actualizar `business-rules.md` (INV-AD05/AD06) y `permissions.md` (jurisdicción).
+
+**Deuda lateral (no atacada)**: `PermisoSaludAuthorizationHelper.cs:61` anti-pattern `DIR_DNI == dni` y columnas faltantes en `ErrorLog` de BD prueba. Chats futuros.
 
 ### Chat 5 — Cierre (deploy + sync histórico + reglas)
 

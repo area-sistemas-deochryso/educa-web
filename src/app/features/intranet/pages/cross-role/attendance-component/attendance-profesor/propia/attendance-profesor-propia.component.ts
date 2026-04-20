@@ -3,6 +3,7 @@ import { DatePipe } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 
 import { ButtonModule } from 'primeng/button';
+import { DatePickerModule } from 'primeng/datepicker';
 import { Select } from 'primeng/select';
 import { TableModule } from 'primeng/table';
 import { TagModule } from 'primeng/tag';
@@ -11,29 +12,37 @@ import { TooltipModule } from 'primeng/tooltip';
 import type { SkeletonColumnDef } from '@shared/components';
 import { TableSkeletonComponent } from '@shared/components';
 import { AttendanceStatus } from '@data/models/attendance.models';
+import { AttendanceLegendComponent } from '@features/intranet/components/attendance/attendance-legend/attendance-legend.component';
+import {
+	VIEW_MODE,
+	ViewMode,
+} from '@features/intranet/components/attendance/attendance-header/attendance-header.component';
 
 import { AsistenciaPropiaFacade } from './services/asistencia-propia.facade';
 
 /**
  * Vista self-service "Mi asistencia" para el profesor autenticado
- * (Plan 21 Chat 4).
+ * (Plan 21 Chat 4 + Chat 6 modo día/mes + leyenda compartida).
  *
- * Read-only. Consume `/profesor/me/mes` — el backend extrae el DNI
- * del claim, no se expone como parámetro en el frontend.
+ * Read-only. Consume `/profesor/me/mes` y `/profesor/me/dia` — el backend
+ * extrae el DNI del claim, no se expone como parámetro en el frontend.
  *
- * Navegación: mes anterior / mes actual / mes siguiente + selectores
- * explícitos de mes y año.
+ * Modos:
+ * - `mes` (default): lista de todas las asistencias del mes seleccionado.
+ * - `dia`: detalle de una fecha puntual (picker de calendario).
  */
 @Component({
 	selector: 'app-attendance-profesor-propia',
 	standalone: true,
 	imports: [
 		ButtonModule,
+		DatePickerModule,
 		Select,
 		TableModule,
 		TagModule,
 		TooltipModule,
 		TableSkeletonComponent,
+		AttendanceLegendComponent,
 		FormsModule,
 		DatePipe,
 	],
@@ -44,6 +53,11 @@ import { AsistenciaPropiaFacade } from './services/asistencia-propia.facade';
 export class AttendanceProfesorPropiaComponent implements OnInit {
 	readonly facade = inject(AsistenciaPropiaFacade);
 
+	// #region Constantes / Modos
+
+	readonly VIEW_MODE = VIEW_MODE;
+
+	// #endregion
 	// #region Opciones de UI
 
 	readonly mesOptions = [
@@ -79,16 +93,29 @@ export class AttendanceProfesorPropiaComponent implements OnInit {
 	];
 
 	readonly isCurrentMonth = computed(() => this.facade.isCurrentMonth());
+	readonly isDiaMode = computed(() => this.facade.viewMode() === VIEW_MODE.Dia);
+	readonly today = new Date();
 
 	// #endregion
 	// #region Lifecycle
 
 	ngOnInit(): void {
-		this.facade.loadMes();
+		this.facade.load();
 	}
 
 	// #endregion
-	// #region Handlers
+	// #region Handlers — API pública para el shell (setViewMode)
+
+	/**
+	 * Llamado por el shell `AttendanceProfesorComponent` cuando el usuario
+	 * cambia el pill día/mes del header compartido.
+	 */
+	setViewMode(mode: ViewMode): void {
+		this.facade.setViewMode(mode);
+	}
+
+	// #endregion
+	// #region Handlers — UI local
 
 	onMesChange(mes: number): void {
 		this.facade.setMes(mes);
@@ -96,6 +123,10 @@ export class AttendanceProfesorPropiaComponent implements OnInit {
 
 	onAnioChange(anio: number): void {
 		this.facade.setAnio(anio);
+	}
+
+	onDateChange(date: Date | null): void {
+		if (date) this.facade.setDate(date);
 	}
 
 	onPrevMonth(): void {
