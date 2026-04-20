@@ -1,0 +1,149 @@
+<!-- #region Template -->
+<div class="widget-card">
+	<div class="widget-header">
+		<div class="widget-title">
+			<i class="pi pi-users"></i>
+			<h3>Asistencia de Hoy</h3>
+		</div>
+		<a routerLink="/intranet/asistencia" class="widget-link"
+			>Ver detalle <i class="pi pi-arrow-right"></i
+		></a>
+	</div>
+
+	@if (loading()) {
+		<div class="widget-skeleton">
+			<app-skeleton-loader variant="rect" width="30%" height="16px" />
+			<app-skeleton-loader variant="rect" width="100%" height="48px" />
+			<div class="skeleton-bars">
+				<app-skeleton-loader variant="rect" width="100%" height="20px" />
+				<app-skeleton-loader variant="rect" width="100%" height="20px" />
+				<app-skeleton-loader variant="rect" width="100%" height="20px" />
+			</div>
+			<div class="section-divider"></div>
+			<app-skeleton-loader variant="rect" width="30%" height="16px" />
+			<app-skeleton-loader variant="rect" width="100%" height="48px" />
+			<div class="skeleton-bars">
+				<app-skeleton-loader variant="rect" width="100%" height="20px" />
+				<app-skeleton-loader variant="rect" width="100%" height="20px" />
+				<app-skeleton-loader variant="rect" width="100%" height="20px" />
+			</div>
+		</div>
+	} @else {
+		<!-- Sección Estudiantes -->
+		<section class="resumen-section">
+			<h4 class="section-title">Estudiantes</h4>
+
+			@if (estStats(); as s) {
+				<div class="widget-body">
+					<div class="main-stat">
+						<span class="main-number">{{ s.conEntrada }}</span>
+						<span class="main-separator">/</span>
+						<span class="main-total">{{ s.totalEstudiantes }}</span>
+						<span class="main-label">presentes</span>
+					</div>
+					<div class="percentage" [class]="estPercentageClass()">
+						{{ s.porcentajeAsistencia }}%
+					</div>
+				</div>
+
+				<div class="stat-bars">
+					<div class="stat-bar">
+						<span class="bar-label">Completas</span>
+						<div class="bar-track">
+							<div
+								class="bar-fill bar-completas"
+								[style.width.%]="estCompletasPercent()"
+							></div>
+						</div>
+						<span class="bar-value">{{ s.asistenciasCompletas }}</span>
+					</div>
+					<div class="stat-bar">
+						<span class="bar-label">Solo entrada</span>
+						<div class="bar-track">
+							<div
+								class="bar-fill bar-entrada"
+								[style.width.%]="estSoloEntradaPercent()"
+							></div>
+						</div>
+						<span class="bar-value">{{ estSoloEntrada() }}</span>
+					</div>
+					<div class="stat-bar">
+						<span class="bar-label">Faltas</span>
+						<div class="bar-track">
+							<div
+								class="bar-fill bar-faltas"
+								[style.width.%]="estFaltasPercent()"
+							></div>
+						</div>
+						<span class="bar-value">{{ s.faltas }}</span>
+					</div>
+				</div>
+			} @else {
+				<div class="widget-empty">
+					<i class="pi pi-info-circle"></i>
+					<span>Sin datos de estudiantes para hoy</span>
+				</div>
+			}
+		</section>
+
+		<div class="section-divider"></div>
+
+		<!-- Sección Profesores -->
+		<section class="resumen-section">
+			<h4 class="section-title">Profesores</h4>
+
+			@if (profStats(); as p) {
+				<div class="widget-body">
+					<div class="main-stat">
+						<span class="main-number">{{ profPresentes() }}</span>
+						<span class="main-separator">/</span>
+						<span class="main-total">{{ p.total }}</span>
+						<span class="main-label">presentes</span>
+					</div>
+					<div class="percentage" [class]="profPercentageClass()">
+						{{ profPorcentaje() }}%
+					</div>
+				</div>
+
+				<div class="stat-bars">
+					<div class="stat-bar">
+						<span class="bar-label">Asistió</span>
+						<div class="bar-track">
+							<div
+								class="bar-fill bar-asistio"
+								[style.width.%]="profBarPercent(p.asistio)"
+							></div>
+						</div>
+						<span class="bar-value">{{ p.asistio }}</span>
+					</div>
+					<div class="stat-bar">
+						<span class="bar-label">Tardanza</span>
+						<div class="bar-track">
+							<div
+								class="bar-fill bar-tardanza"
+								[style.width.%]="profBarPercent(p.tardanza)"
+							></div>
+						</div>
+						<span class="bar-value">{{ p.tardanza }}</span>
+					</div>
+					<div class="stat-bar">
+						<span class="bar-label">Falta</span>
+						<div class="bar-track">
+							<div
+								class="bar-fill bar-faltas"
+								[style.width.%]="profBarPercent(p.falta)"
+							></div>
+						</div>
+						<span class="bar-value">{{ p.falta }}</span>
+					</div>
+				</div>
+			} @else {
+				<div class="widget-empty">
+					<i class="pi pi-info-circle"></i>
+					<span>Sin datos de profesores para hoy</span>
+				</div>
+			}
+		</section>
+	}
+</div>
+<!-- #endregion -->

@@ -40,17 +40,6 @@
 	}
 }
 
-.salon-badge {
-	font-size: 0.7rem;
-	font-weight: 600;
-	color: #fff;
-	background: var(--intranet-accent-color-blue, #253470);
-	padding: 0.15rem 0.5rem;
-	border-radius: 6px;
-	letter-spacing: 0.02em;
-	margin-left: 0.5rem;
-}
-
 .widget-link {
 	font-size: 0.8rem;
 	color: var(--intranet-accent-color-blue, #253470);
@@ -77,8 +66,6 @@
 	text-transform: uppercase;
 	letter-spacing: 0.5px;
 	color: var(--text-color-secondary);
-	display: flex;
-	align-items: center;
 }
 
 .section-divider {
@@ -88,71 +75,7 @@
 }
 // #endregion
 
-// #region Mi asistencia
-.mi-asistencia-row {
-	display: flex;
-	align-items: center;
-	justify-content: space-between;
-	gap: 1rem;
-}
-
-.mi-horas {
-	display: flex;
-	gap: 1.5rem;
-}
-
-.hora-item {
-	display: flex;
-	flex-direction: column;
-	gap: 0.15rem;
-}
-
-.hora-label {
-	font-size: 0.75rem;
-	color: var(--text-color-secondary);
-	text-transform: uppercase;
-	letter-spacing: 0.5px;
-}
-
-.hora-value {
-	font-size: 1.25rem;
-	font-weight: 700;
-	color: var(--text-color);
-	font-variant-numeric: tabular-nums;
-}
-
-.estado-badge {
-	font-size: 0.8rem;
-	font-weight: 700;
-	padding: 0.3rem 0.75rem;
-	border-radius: 6px;
-	text-transform: uppercase;
-	letter-spacing: 0.5px;
-
-	&.estado-asistio {
-		background: color-mix(in srgb, var(--green-500) 15%, transparent);
-		color: var(--green-600);
-	}
-	&.estado-tardanza {
-		background: color-mix(in srgb, var(--yellow-500) 15%, transparent);
-		color: var(--yellow-700);
-	}
-	&.estado-falta {
-		background: color-mix(in srgb, var(--red-500) 15%, transparent);
-		color: var(--red-600);
-	}
-	&.estado-justificado {
-		background: color-mix(in srgb, var(--blue-500) 15%, transparent);
-		color: var(--blue-800);
-	}
-	&.estado-pendiente {
-		background: var(--surface-200);
-		color: var(--text-color-secondary);
-	}
-}
-// #endregion
-
-// #region Main stat (Mi salón)
+// #region Main stat
 .widget-body {
 	display: flex;
 	align-items: baseline;
@@ -244,14 +167,20 @@
 	transition: width 0.5s ease;
 }
 
+.bar-completas {
+	background: var(--green-500);
+}
+.bar-entrada {
+	background: var(--yellow-500);
+}
+.bar-faltas {
+	background: var(--red-500);
+}
 .bar-asistio {
 	background: var(--green-500);
 }
 .bar-tardanza {
 	background: var(--yellow-500);
-}
-.bar-falta {
-	background: var(--red-500);
 }
 // #endregion
 
@@ -269,8 +198,9 @@
 	display: flex;
 	flex-direction: column;
 	gap: 0.5rem;
-	min-height: 240px;
+	min-height: 280px;
 }
+
 .skeleton-bars {
 	display: flex;
 	flex-direction: column;

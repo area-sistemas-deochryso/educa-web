@@ -38,6 +38,9 @@ export class UserProfileService {
 		() => this._userRole() === APP_USER_ROLES.AsistenteAdministrativo,
 	);
 	readonly isPromotor = computed(() => this._userRole() === APP_USER_ROLES.Promotor);
+	readonly isCoordinadorAcademico = computed(
+		() => this._userRole() === APP_USER_ROLES.CoordinadorAcademico,
+	);
 
 	readonly displayName = computed(() => this._userName());
 

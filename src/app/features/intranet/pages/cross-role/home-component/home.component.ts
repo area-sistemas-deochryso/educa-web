@@ -36,7 +36,8 @@ export class HomeComponent {
 		() =>
 			this.userProfile.isDirector() ||
 			this.userProfile.isAsistenteAdministrativo() ||
-			this.userProfile.isPromotor(),
+			this.userProfile.isPromotor() ||
+			this.userProfile.isCoordinadorAcademico(),
 	);
 	readonly showProfesorWidget = computed(() => this.userProfile.isProfesor());
 	readonly showQuickAccess = computed(() => this.flags.isEnabled('quickAccess'));
