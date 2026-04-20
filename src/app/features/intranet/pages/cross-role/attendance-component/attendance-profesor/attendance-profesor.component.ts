@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, ViewChild, computed, inject, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, OnInit, ViewChild, computed, inject, output, signal } from '@angular/core';
 import { forkJoin, finalize } from 'rxjs';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { DestroyRef } from '@angular/core';
@@ -31,7 +31,7 @@ import { AttendanceProfesorEstudiantesComponent } from './estudiantes/attendance
 	styleUrl: './attendance-profesor.component.scss',
 	changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class AttendanceProfesorComponent {
+export class AttendanceProfesorComponent implements OnInit {
 	private readonly asistenciaService = inject(AttendanceService);
 	private readonly destroyRef = inject(DestroyRef);
 
@@ -70,9 +70,17 @@ export class AttendanceProfesorComponent {
 	 */
 	readonly activeTab = signal<'propia' | 'estudiantes'>('propia');
 
+	/**
+	 * Emite true cuando la tab activa requiere el pill día/mes del header
+	 * cross-role (tab "Mis estudiantes"), false cuando no aplica (tab
+	 * "Mi asistencia" — vista mensual pura idéntica a la del estudiante).
+	 */
+	readonly showModeSelectorChange = output<boolean>();
+
 	onTabChange(value: string): void {
 		if (value === 'propia' || value === 'estudiantes') {
 			this.activeTab.set(value);
+			this.showModeSelectorChange.emit(value === 'estudiantes');
 		}
 	}
 
@@ -81,6 +89,11 @@ export class AttendanceProfesorComponent {
 
 	constructor() {
 		this.loadSalonesProfesor();
+	}
+
+	ngOnInit(): void {
+		// * Emitir el estado inicial del pill: tab default es 'propia' → no aplica.
+		this.showModeSelectorChange.emit(false);
 	}
 
 	/**
@@ -121,13 +134,12 @@ export class AttendanceProfesorComponent {
 
 	/**
 	 * Delega el cambio de modo día/mes al tab activo.
-	 * Ambas vistas (propia y estudiantes) soportan día/mes — cada una consume
-	 * sus propios endpoints (self-service vs por salón).
+	 * - Tab "Mi asistencia" NO responde al pill (vista mensual pura, igual que
+	 *   la vista del estudiante viendo su propia asistencia).
+	 * - Tab "Mis estudiantes" delega al sub-componente.
 	 */
 	setViewMode(mode: ViewMode): void {
-		if (this.activeTab() === 'propia') {
-			this.propiaComponent?.setViewMode(mode);
-		} else {
+		if (this.activeTab() === 'estudiantes') {
 			this.estudiantesComponent?.setViewMode(mode);
 		}
 	}
@@ -137,7 +149,7 @@ export class AttendanceProfesorComponent {
 	 */
 	reload(): void {
 		if (this.activeTab() === 'propia') {
-			this.propiaComponent?.onRefresh();
+			this.propiaComponent?.reload();
 		} else {
 			this.estudiantesComponent?.reload();
 		}

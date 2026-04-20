@@ -4,7 +4,7 @@ import {
 	VIEW_MODE,
 	ViewMode,
 } from '@features/intranet/components/attendance/attendance-header/attendance-header.component';
-import { ChangeDetectionStrategy, Component, ViewChild, AfterViewInit, inject, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, ViewChild, AfterViewInit, computed, inject, signal } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 
 import { AttendanceApoderadoComponent } from './attendance-apoderado/attendance-apoderado.component';
@@ -54,6 +54,22 @@ export class AttendanceComponent implements AfterViewInit {
 	readonly userRole = this.userProfile.userRole;
 	readonly loading = signal(false);
 	readonly selectedMode = signal<ViewMode>(VIEW_MODE.Dia);
+
+	// * El pill día/mes aplica solo cuando el usuario mira a otros (no a sí mismo).
+	//   - Admin: siempre aplica.
+	//   - Profesor: solo cuando tab "Mis estudiantes" está activa (reportado vía output del shell).
+	//   - Estudiante / Apoderado: nunca aplica — su vista propia es mensual pura.
+	private readonly profesorShowModeSelector = signal(false);
+	readonly showModeSelector = computed(() => {
+		const role = this.userRole();
+		if (this.isAdminRole(role)) return true;
+		if (role === APP_USER_ROLES.Profesor) return this.profesorShowModeSelector();
+		return false;
+	});
+
+	onProfesorShowModeSelectorChange(show: boolean): void {
+		this.profesorShowModeSelector.set(show);
+	}
 
 	ngAfterViewInit(): void {
 		// Leer salonId de query params (viene desde horarios del profesor)

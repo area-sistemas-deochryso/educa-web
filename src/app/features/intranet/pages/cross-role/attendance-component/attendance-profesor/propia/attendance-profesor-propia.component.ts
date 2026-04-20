@@ -1,167 +1,135 @@
-import { ChangeDetectionStrategy, Component, OnInit, computed, inject } from '@angular/core';
-import { DatePipe } from '@angular/common';
-import { FormsModule } from '@angular/forms';
-
-import { ButtonModule } from 'primeng/button';
-import { DatePickerModule } from 'primeng/datepicker';
-import { Select } from 'primeng/select';
-import { TableModule } from 'primeng/table';
-import { TagModule } from 'primeng/tag';
-import { TooltipModule } from 'primeng/tooltip';
-
-import type { SkeletonColumnDef } from '@shared/components';
-import { TableSkeletonComponent } from '@shared/components';
-import { AttendanceStatus } from '@data/models/attendance.models';
-import { AttendanceLegendComponent } from '@features/intranet/components/attendance/attendance-legend/attendance-legend.component';
 import {
-	VIEW_MODE,
-	ViewMode,
-} from '@features/intranet/components/attendance/attendance-header/attendance-header.component';
+	ChangeDetectionStrategy,
+	Component,
+	DestroyRef,
+	OnInit,
+	inject,
+	signal,
+} from '@angular/core';
+import { finalize } from 'rxjs';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
-import { AsistenciaPropiaFacade } from './services/asistencia-propia.facade';
+import { AttendanceDataService } from '@features/intranet/services/attendance/attendance-data.service';
+import { AttendanceLegendComponent } from '@features/intranet/components/attendance/attendance-legend/attendance-legend.component';
+import { AttendanceTableComponent } from '@features/intranet/components/attendance/attendance-table/attendance-table.component';
+import { EmptyStateComponent } from '@features/intranet/components/attendance/empty-state/empty-state.component';
+import { AttendanceTable } from '@features/intranet/pages/cross-role/attendance-component/models/attendance.types';
+import { AsistenciaProfesorApiService } from '@shared/services/attendance';
+import { logger } from '@core/helpers';
 
 /**
- * Vista self-service "Mi asistencia" para el profesor autenticado
- * (Plan 21 Chat 4 + Chat 6 modo día/mes + leyenda compartida).
+ * Vista "Mi asistencia" del profesor autenticado (Plan 21 Chat 6).
  *
- * Read-only. Consume `/profesor/me/mes` y `/profesor/me/dia` — el backend
- * extrae el DNI del claim, no se expone como parámetro en el frontend.
+ * Diseño **idéntico** a `AttendanceEstudianteComponent`: leyenda + 2 tablas
+ * mensuales (ingresos y salidas) con el calendario `AttendanceTableComponent`.
+ * No soporta modo día — el pill día/mes del header cross-role no aplica
+ * (igual que no aplica a la vista del estudiante viendo su propia asistencia).
  *
- * Modos:
- * - `mes` (default): lista de todas las asistencias del mes seleccionado.
- * - `dia`: detalle de una fecha puntual (picker de calendario).
+ * Consume `/profesor/me/mes` del backend. El DNI se extrae del claim en el
+ * backend, no se expone al frontend.
  */
 @Component({
 	selector: 'app-attendance-profesor-propia',
 	standalone: true,
-	imports: [
-		ButtonModule,
-		DatePickerModule,
-		Select,
-		TableModule,
-		TagModule,
-		TooltipModule,
-		TableSkeletonComponent,
-		AttendanceLegendComponent,
-		FormsModule,
-		DatePipe,
-	],
+	imports: [AttendanceLegendComponent, AttendanceTableComponent, EmptyStateComponent],
 	templateUrl: './attendance-profesor-propia.component.html',
-	styleUrl: './attendance-profesor-propia.component.scss',
 	changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class AttendanceProfesorPropiaComponent implements OnInit {
-	readonly facade = inject(AsistenciaPropiaFacade);
+	private readonly api = inject(AsistenciaProfesorApiService);
+	private readonly attendanceDataService = inject(AttendanceDataService);
+	private readonly destroyRef = inject(DestroyRef);
 
-	// #region Constantes / Modos
+	readonly ingresos = signal<AttendanceTable>(
+		this.attendanceDataService.createEmptyTable('Mis Ingresos'),
+	);
+	readonly salidas = signal<AttendanceTable>(
+		this.attendanceDataService.createEmptyTable('Mis Salidas'),
+	);
+	readonly loading = signal(false);
+	readonly hasData = signal(false);
 
-	readonly VIEW_MODE = VIEW_MODE;
-
-	// #endregion
-	// #region Opciones de UI
-
-	readonly mesOptions = [
-		{ label: 'Enero', value: 1 },
-		{ label: 'Febrero', value: 2 },
-		{ label: 'Marzo', value: 3 },
-		{ label: 'Abril', value: 4 },
-		{ label: 'Mayo', value: 5 },
-		{ label: 'Junio', value: 6 },
-		{ label: 'Julio', value: 7 },
-		{ label: 'Agosto', value: 8 },
-		{ label: 'Septiembre', value: 9 },
-		{ label: 'Octubre', value: 10 },
-		{ label: 'Noviembre', value: 11 },
-		{ label: 'Diciembre', value: 12 },
-	];
-
-	readonly anioOptions = computed(() => {
-		const currentYear = new Date().getFullYear();
-		// Ventana de 3 años hacia atrás + año actual
-		return [currentYear - 3, currentYear - 2, currentYear - 1, currentYear].map((y) => ({
-			label: y.toString(),
-			value: y,
-		}));
-	});
-
-	readonly skeletonColumns: SkeletonColumnDef[] = [
-		{ width: '140px', cellType: 'text' },
-		{ width: '110px', cellType: 'text' },
-		{ width: '110px', cellType: 'text' },
-		{ width: '100px', cellType: 'badge' },
-		{ width: 'flex', cellType: 'text' },
-	];
-
-	readonly isCurrentMonth = computed(() => this.facade.isCurrentMonth());
-	readonly isDiaMode = computed(() => this.facade.viewMode() === VIEW_MODE.Dia);
-	readonly today = new Date();
-
-	// #endregion
-	// #region Lifecycle
+	// * Nombre resuelto desde el backend (`AsistenciaProfesorDto.nombreCompleto`)
+	//   — se actualiza en la primera respuesta. Hasta entonces se usa el fallback.
+	private readonly profesorNombre = signal<string>('Profesor');
 
 	ngOnInit(): void {
-		this.facade.load();
+		const now = new Date();
+		this.loadAsistencias(now.getMonth() + 1, now.getFullYear(), 'ingresos');
 	}
 
-	// #endregion
-	// #region Handlers — API pública para el shell (setViewMode)
-
-	/**
-	 * Llamado por el shell `AttendanceProfesorComponent` cuando el usuario
-	 * cambia el pill día/mes del header compartido.
-	 */
-	setViewMode(mode: ViewMode): void {
-		this.facade.setViewMode(mode);
+	onIngresosMonthChange(month: number): void {
+		this.loadAsistencias(month, this.ingresos().selectedYear, 'ingresos');
 	}
 
-	// #endregion
-	// #region Handlers — UI local
-
-	onMesChange(mes: number): void {
-		this.facade.setMes(mes);
+	onSalidasMonthChange(month: number): void {
+		this.loadAsistencias(month, this.salidas().selectedYear, 'salidas');
 	}
 
-	onAnioChange(anio: number): void {
-		this.facade.setAnio(anio);
+	reload(): void {
+		const now = new Date();
+		this.loadAsistencias(now.getMonth() + 1, now.getFullYear(), 'ingresos');
 	}
 
-	onDateChange(date: Date | null): void {
-		if (date) this.facade.setDate(date);
+	private loadAsistencias(month: number, year: number, target: 'ingresos' | 'salidas'): void {
+		this.loading.set(true);
+
+		this.api
+			.obtenerMiAsistenciaMes(month, year)
+			.pipe(
+				finalize(() => this.loading.set(false)),
+				takeUntilDestroyed(this.destroyRef),
+			)
+			.subscribe({
+				next: (response) => {
+					if (!response) {
+						this.hasData.set(false);
+						this.resetTable(target);
+						return;
+					}
+
+					if (response.nombreCompleto) {
+						this.profesorNombre.set(response.nombreCompleto);
+					}
+
+					if (response.asistencias && response.asistencias.length > 0) {
+						this.hasData.set(true);
+						const { ingresos, salidas } = this.attendanceDataService.processAsistencias(
+							response.asistencias,
+							month,
+							year,
+							this.profesorNombre(),
+						);
+						if (target === 'ingresos') {
+							this.ingresos.set(ingresos);
+							// Mantener salidas en su mes actual salvo coincidencia
+							if (this.salidas().selectedMonth === month && this.salidas().selectedYear === year) {
+								this.salidas.set(salidas);
+							}
+						} else {
+							this.salidas.set(salidas);
+							if (this.ingresos().selectedMonth === month && this.ingresos().selectedYear === year) {
+								this.ingresos.set(ingresos);
+							}
+						}
+					} else {
+						this.hasData.set(false);
+						this.resetTable(target);
+					}
+				},
+				error: (err) => {
+					logger.error('AttendanceProfesorPropia: Error cargando mi asistencia', err);
+					this.hasData.set(false);
+					this.resetTable(target);
+				},
+			});
 	}
 
-	onPrevMonth(): void {
-		this.facade.prevMonth();
-	}
-
-	onNextMonth(): void {
-		this.facade.nextMonth();
-	}
-
-	onGoToCurrent(): void {
-		this.facade.goToCurrent();
-	}
-
-	onRefresh(): void {
-		this.facade.refresh();
-	}
-
-	// #endregion
-	// #region Helpers UI
-
-	getEstadoSeverity(estado: AttendanceStatus): 'success' | 'warn' | 'danger' | 'info' | 'secondary' {
-		switch (estado) {
-			case 'A':
-				return 'success';
-			case 'T':
-				return 'warn';
-			case 'F':
-				return 'danger';
-			case 'J':
-				return 'info';
-			default:
-				return 'secondary';
+	private resetTable(target: 'ingresos' | 'salidas'): void {
+		if (target === 'ingresos') {
+			this.ingresos.set(this.attendanceDataService.createEmptyTable('Mis Ingresos'));
+		} else {
+			this.salidas.set(this.attendanceDataService.createEmptyTable('Mis Salidas'));
 		}
 	}
-
-	// #endregion
 }

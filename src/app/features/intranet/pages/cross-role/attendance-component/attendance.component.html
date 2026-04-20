@@ -3,13 +3,7 @@
 	<!-- * Header compartido por todos los roles -->
 	<app-attendance-header
 		[loading]="loading()"
-		[showModeSelector]="
-			userRole() === 'Profesor' ||
-			userRole() === 'Director' ||
-			userRole() === 'Asistente Administrativo' ||
-			userRole() === 'Promotor' ||
-			userRole() === 'Coordinador Académico'
-		"
+		[showModeSelector]="showModeSelector()"
 		[selectedMode]="selectedMode()"
 		(modeChange)="onModeChange($event)"
 		(reload)="onReload()"
@@ -21,7 +15,9 @@
 			<app-attendance-apoderado />
 		}
 		@case ('Profesor') {
-			<app-attendance-profesor />
+			<app-attendance-profesor
+				(showModeSelectorChange)="onProfesorShowModeSelectorChange($event)"
+			/>
 		}
 		@case ('Director') {
 			<app-attendance-director />

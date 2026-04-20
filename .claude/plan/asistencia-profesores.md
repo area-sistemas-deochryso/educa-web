@@ -234,22 +234,28 @@ Orden: `Profesor → Estudiante → rechazar`. Justificación: hay menos profeso
 
 ### Chat 6 — Frontend armonización UX "Mi asistencia" ✅ 2026-04-20
 
-**Objetivo**: Cerrar la deuda de UX identificada en Chat 4. La vista "Mi asistencia" ahora usa la leyenda compartida, soporta modo día/mes respondiendo al pill del header cross-role, y aplica los mismos severity del resto del módulo.
+**Objetivo**: Cerrar la deuda de UX del Chat 4. La vista "Mi asistencia" del profesor debe ser **idéntica** en diseño a "Mi asistencia" del estudiante — mismo calendario mensual, misma leyenda, mismos componentes compartidos. No hay "vista especial para profesor".
 
-**Trade-off aceptado**: NO se reusa `AttendanceTableComponent` ni `AttendanceDayListComponent`. Su shape de datos (`EstudianteAsistencia[]`) está pensado para listar estudiantes en una tabla/grid, no para listar días de un solo profesor. Adaptar el shape implicaba un wrapper artificial. Se optó por **homologar styling** (legend compartido + `severity` del `p-tag` con los mismos colores del tema) sin duplicar componentes. El SCSS custom es pequeño (~50 líneas) y refleja la vista específica (lista cronológica de días con entrada/salida/estado/observación).
+**Pivote durante ejecución**: El primer intento (store + facade con modos día/mes + stat-cards propias + tabla cronológica) respetaba el wire del pill pero seguía siendo un diseño distinto al del estudiante. Feedback del usuario: "No quiero vistas diferentes en diseño para estudiantes y para profesor. La propia asistencia de uno la sigue viendo igual". Se descartó el primer diseño y se reescribió como copia estructural de `AttendanceEstudianteComponent`.
+
+**Decisión arquitectónica**: "Mi asistencia" es vista mensual pura — calendario con 2 tablas (ingresos + salidas) + leyenda. No responde al pill día/mes del header cross-role (igual que no responde para el estudiante viendo su propia asistencia — el pill aplica solo a los que miran a otros: admin viendo profesores/estudiantes, profesor viendo sus estudiantes).
 
 | Entregable | Archivo | Estado |
 | ---------- | ------- | ------ |
-| Store extendido | `asistencia-propia.store.ts` — agregados `_viewMode` (`VIEW_MODE.Mes` default), `_selectedDate` + computed `selectedLabel` que cambia según el modo ("Abril 2026" vs "15 de abril de 2026"). | ✅ |
-| Facade extendido | `asistencia-propia.facade.ts` — `load()` delega según modo, `loadDia()` consume `/profesor/me/dia`, `setViewMode()` sincroniza la fecha al entrar en día (al mes actual si coincide, al primer día del mes visible si no), `setDate()` mantiene mes/año sincronizados para volver a mes sin saltar de periodo. | ✅ |
-| Sub-componente propia | `attendance-profesor-propia.component.ts/html/scss` — embebe `<app-attendance-legend />` al tope, expone `setViewMode(mode)` como API pública para el shell, renderiza `p-datepicker` (modo día) o pills prev/mes/año/next (modo mes). Stats-cards solo se muestran en modo mes. `p-tag` con `severity` — se removió `getStatusClass/styleClass` redundante (PrimeNG ya colorea por severity). | ✅ |
-| Shell profesor | `attendance-profesor.component.ts` — `setViewMode` ahora delega al tab activo (propia o estudiantes). Ambas vistas soportan día/mes con sus propios endpoints. | ✅ |
-| Tests shell | `attendance-profesor.component.spec.ts` — 1 test nuevo: `setViewMode` delega a `propiaComponent` cuando la tab activa es `'propia'`. 6/6 verdes (5 previos + 1 nuevo). | ✅ |
-| Validación | `npx tsc --noEmit` limpio. `npm run lint` limpio (All files pass). `npm run build` OK. Vitest: **1341 tests verdes** (+1 vs Chat 4). Backend sin cambios: **766 tests verdes**. | ✅ |
+| Sub-componente propia reescrito | `attendance-profesor-propia.component.ts/html` — imports `AttendanceLegendComponent` + `AttendanceTableComponent` × 2 + `EmptyStateComponent` + `AttendanceDataService`. Consume `/profesor/me/mes` (ya existente), procesa `AsistenciaDetalle[]` via `processAsistencias()` con el `nombreCompleto` del response. Sin store ni facade propio — vista simple con signals `ingresos`/`salidas`/`hasData`/`loading`. HTML idéntico al del estudiante: `<app-attendance-legend />` + `@if (hasData())` → 2 `<app-attendance-table>`, else `<app-empty-state>`. | ✅ |
+| Archivos eliminados | `asistencia-propia.store.ts`, `asistencia-propia.facade.ts`, `attendance-profesor-propia.component.scss`, carpeta `propia/services/`. El endpoint backend `/profesor/me/dia` queda sin consumidor frontend (se conserva por si se reutiliza en Chat 7). | ✅ |
+| Shell profesor | `attendance-profesor.component.ts` — `setViewMode` ya NO delega a propia. `reload` sigue funcionando para ambas tabs. Agregado output `showModeSelectorChange` que emite true/false según la tab activa (estudiantes/propia). | ✅ |
+| Padre cross-role | `attendance.component.ts/html` — nuevo computed `showModeSelector` que considera rol + tab activa del shell profesor. El pill se **oculta automáticamente** cuando el profesor está en "Mi asistencia" (coherente con estudiante/apoderado que tampoco tienen pill), y **reaparece** al cambiar a "Mis estudiantes". Se eliminó la expresión booleana inline del template. | ✅ |
+| Tests shell | `attendance-profesor.component.spec.ts` — test actualizado: `setViewMode no lanza cuando la tab "propia" está activa (no aplica)`. 6/6 verdes. | ✅ |
+| Validación | `npx tsc --noEmit` limpio. `npm run lint` limpio. `npm run build` OK. Vitest: **1341 tests verdes**. Backend sin cambios: **766 tests verdes**. | ✅ |
 
-**Fuera de scope (sigue en Chat 5)**: deploy backend/frontend, ejecutar `plan21_chat15_FkRepointAsistenciaPersona.sql`, sync histórico "Sobreescribir desde CrossChex", rename legacy `Asistencia`, actualizar `business-rules.md` (INV-AD05/AD06) y `permissions.md` (jurisdicción).
+**Aprendizaje registrado en feedback**: cuando dos vistas tienen el mismo propósito semántico ("ver mi propia asistencia"), deben usar los mismos componentes compartidos, no duplicar diseño. El argumento de "shape de datos incompatible" no justifica diseños distintos si el mismo transform (`AttendanceDataService.processAsistencias`) ya los hace equivalentes — `AsistenciaDetalle[]` es común tanto en estudiantes como en profesores.
 
-**Deuda lateral (no atacada)**: `PermisoSaludAuthorizationHelper.cs:61` anti-pattern `DIR_DNI == dni` y columnas faltantes en `ErrorLog` de BD prueba. Chats futuros.
+**Fuera de scope (Chat 7 nuevo)**: armonizar vista admin "Profesores" con admin "Estudiantes" — hoy el tab "Profesores" es filtros+rango+tabla-resumen, debe ser leyenda+stat-cards+pill día/mes+day-list/table-mes (igual que estudiantes). Requiere endpoint backend nuevo `/director/profesores-asistencia-dia?fecha=…` y generalizar `AttendanceDayListComponent` (o variante para profesores).
+
+**Fuera de scope (sigue en Chat 5)**: deploy, `plan21_chat15_FkRepointAsistenciaPersona.sql`, sync histórico, rename legacy, reglas `business-rules.md` + `permissions.md`.
+
+**Deuda lateral (no atacada)**: `PermisoSaludAuthorizationHelper.cs:61` anti-pattern `DIR_DNI == dni`; columnas faltantes en `ErrorLog` de BD prueba.
 
 ### Chat 5 — Cierre (deploy + sync histórico + reglas)
 

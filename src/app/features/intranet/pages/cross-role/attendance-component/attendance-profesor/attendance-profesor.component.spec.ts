@@ -92,21 +92,12 @@ describe('AttendanceProfesorComponent (shell)', () => {
 		expect(component.activeTab()).toBe('propia');
 	});
 
-	it('setViewMode delega al tab "propia" cuando está activo', () => {
+	it('setViewMode no lanza cuando la tab "propia" está activa (no aplica)', () => {
 		fixture.detectChanges();
 		expect(component.activeTab()).toBe('propia');
-		const propia = (component as unknown as { propiaComponent?: { setViewMode: ReturnType<typeof vi.fn> } })
-			.propiaComponent;
-		if (!propia) {
-			// * El ViewChild se resuelve sólo tras detectChanges; en este harness el tab "propia"
-			//   se renderiza por default, así que hay un componente real inyectado.
-			// Fallback: validar sólo que no lance.
-			expect(() => component.setViewMode('dia')).not.toThrow();
-			return;
-		}
-		const spy = vi.spyOn(propia, 'setViewMode');
-		component.setViewMode('dia');
-		expect(spy).toHaveBeenCalledWith('dia');
+		// * La vista propia es calendario mensual puro (igual que el estudiante) —
+		//   el pill día/mes del header cross-role no aplica en esta tab.
+		expect(() => component.setViewMode('dia')).not.toThrow();
 	});
 });
 // #endregion
