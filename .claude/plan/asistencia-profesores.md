@@ -163,19 +163,22 @@ Orden: `Profesor → Estudiante → rechazar`. Justificación: hay menos profeso
 
 **Deploy pendiente (bloquea Chat 5)**: ejecutar `plan21_chat15_FkRepointAsistenciaPersona.sql` en prueba y producción antes del deploy del backend. El script revisa huérfanos (sección 1.3/1.4) antes de intentar el repoint y valida post-condiciones (sección 3).
 
-### Chat 2 — Backend feature (consulta + reportes + email + guard)
+### Chat 2 — Backend feature (consulta + reportes + email + guard) ✅ 2026-04-20
 
 **Objetivo**: API y side-effects completos para que frontend pueda consumir.
 
-| Entregable | Archivo |
-| ---------- | ------- |
-| DTOs | `DTOs/Asistencias/AsistenciaProfesorDto.cs` + agregar `tipoPersona` a `AsistenciaListaDto` (backward compatible). |
-| Endpoints consulta | `Controllers/Asistencias/ConsultaAsistenciaController.cs` — 4 endpoints: `GET /profesores/{dni}`, `GET /profesores?fechaInicio&fechaFin&estado`, `GET /profesor/{dni}/dia`, `GET /profesor/{dni}/mes`. |
-| Repositorio consulta | `ConsultaAsistenciaRepository.cs` — nuevos métodos `ListarProfesoresPorFechaRango`, `GetAsistenciaProfesorAsync`. |
-| Reportes PDF | `ReporteAsistenciaProfesorPdfService.cs` + `ReporteFiltradoProfesoresService.cs` (nuevos — reutilizan `PdfBuilder` base, mismo formato visual que salón-consolidado). |
-| Email routing | `EmailNotificationService.EnviarNotificacionAsistenciaAsync(persona, tipoPersona, ...)` — si `P`, skip apoderado. Template usa `{{TipoSujeto}}`. Outbox `TipoEntidadOrigen = "AsistenciaProfesor"` para separar bandejas admin. |
-| Guard INV-AD06 | `AsistenciaAdminService.JustificarAsistenciaAsync` — si target `TipoPersona = 'P'`, valida rol admin. Si no, lanza `BusinessRuleException("INV-AD06_JUSTIFICACION_PROFESOR_REQUIERE_ADMIN")`. |
-| SignalR | `Hubs/AsistenciaHub.cs` — broadcast `AsistenciaRegistrada` incluye `tipoPersona` para que frontend filtre. |
+| Entregable | Archivo | Estado |
+| ---------- | ------- | ------ |
+| DTOs | `DTOs/Asistencia/AsistenciaProfesorDto.cs` (nuevo) + `AsistenciaAdminListaDto` (campo `TipoPersona` backward compat) + `AsistenciaSignalRPayload` (campo `TipoPersona`) + `AsistenciaRegistroResult` (record nuevo para propagar tipoPersona desde `RegistrarAsistencia`). | ✅ |
+| Endpoints consulta | `ConsultaAsistenciaController.cs` — 4 endpoints JSON: `GET /profesores/{dni}`, `GET /profesores?fechaInicio&fechaFin&estado`, `GET /profesor/{dni}/dia`, `GET /profesor/{dni}/mes`. + 3 endpoints PDF: `/profesor/{dni}/dia/pdf`, `/profesor/{dni}/mes/pdf`, `/profesores/reporte-filtrado/pdf`. Todos con `[Authorize(Roles = Administrativos)]` + `[EnableRateLimiting("heavy")]` en los PDF. | ✅ |
+| Repositorio consulta | `ConsultaAsistenciaRepository.cs` — nuevos métodos `GetAsistenciaProfesorAsync(sedeId, dni, fechaInicio, fechaFin)` y `ListarProfesoresPorFechaRangoAsync(sedeId, fechaInicio, fechaFin, estadoCodigo?)` sobre `AsistenciaPersona` filtrando `TipoPersona='P'`. | ✅ |
+| Service consulta | `IConsultaAsistenciaService` + `ConsultaAsistenciaService` — `ObtenerAsistenciaProfesor(Dia/Mes)`, `ObtenerProfesoresPorFechaRango` (con enrichment vía `ConsultaAsistenciaHelper` y filtro por estado). | ✅ |
+| Reportes PDF | `ReporteAsistenciaProfesorPdfService` + `ReporteFiltradoProfesoresService` (nuevos). Reutilizan `AsistenciaPdfComposer.ComposeFooter` y layout consistente con reportes de salón. | ✅ |
+| Email routing (INV-AD05 ampliado) | `IEmailNotificationService.EnviarNotificacionAsistenciaProfesor(...)` (nuevo): `To=_copiaEmail`, sin BCC ni apoderado, outbox `TipoEntidadOrigen="AsistenciaProfesor"`. `AsistenciaNotificationDispatcher.EnviarNotificacionesProfesorEnBackgroundAsync(Profesor, Sede, ...)`. `AsistenciaService.RegistrarAsistencia` dispatch polimórfico: estudiante → apoderado + colegio; profesor → solo colegio. | ✅ |
+| Guard INV-AD06 | `IJustificacionAsistenciaStrategy.JustificarAsistenciaProfesor(..., bool callerEsAdmin)` — si `!callerEsAdmin` lanza `BusinessRuleException("INV-AD06_JUSTIFICACION_PROFESOR_REQUIERE_ADMIN")` antes de tocar el repo. Método existente `JustificarAsistencia` (estudiante) delega al core polimórfico. `IAsistenciaWriteRepository.FindAsistenciaPorPersonaFechaAsync(tipoPersona, personaId, fecha)` nuevo. | ✅ |
+| SignalR | `AsistenciaSignalRPayload.TipoPersona` agregado (default 'E' backward compat). `IAsistenciaService.RegistrarAsistencia` retorna `AsistenciaRegistroResult(Mensaje, TipoPersona?)`. `AsistenciaController.HandleWebhook` broadcast incluye `tipoPersona` para que frontend filtre/diferencie. Callers actualizados: `AsistenciaService.ProcesarWebhookAsync`, `AsistenciaController.RegistrarManual`, `AsistenciaSyncService`. | ✅ |
+| DI | `ServiceExtensions.cs` — registradas `IReporteFiltradoProfesoresService` + `IReporteAsistenciaProfesorPdfService`. | ✅ |
+| Tests nuevos | `JustificacionAsistenciaStrategyTests.cs` (3 tests: guard INV-AD06 lanza, admin crea con TipoPersona='P', método estudiante delega al core). `ConsultaAsistenciaControllerTests.cs` región Profesores (6 tests: sede=0 → Unauthorized, profesor no existe → NotFound, delegación correcta, rango inválido → BusinessRule, dia/mes). `AsistenciaServiceTests.cs` actualizado: ahora verifica que profesor envía correo al colegio y NUNCA al apoderado (antes era `Never` por scope Chat 1). | ✅ 761 tests verdes (+9 vs Chat 1.5) |
 
 ### Chat 3 — Frontend admin (submenú + vista profesores)
 

@@ -30,7 +30,7 @@
 | 18 | Tests de flujo de negocio E2E | BE+FE | (inline en maestro) | ⏳ | 0% |
 | 19 | Comunicación: foro + mensajería + push | FE+BE | (pendiente planificar) | ⏳ | 0% |
 | 20 | Design System — Estándar desde `usuarios` | FE | `tasks/design-system-from-usuarios.md` | F1 ✅ · F2 ✅ (F2.1-F2.5) · F3 ✅ · F4 ✅ · F5.1-F5.2 ✅ · F5.3 ⏳ (0/8) | ~96% |
-| **21** | **🟡 Asistencia de Profesores en CrossChex** | **BE+FE** | **`plan/asistencia-profesores.md`** | **✅ Chat 1 + Chat 1.5 cerrados (2026-04-20) · Reads, FKs (script) y servicios secundarios migrados a `AsistenciaPersona` · Build limpio + 752 tests verdes · Deploy pendiente: ejecutar `plan21_chat15_FkRepointAsistenciaPersona.sql`** | **~35%** |
+| **21** | **🟡 Asistencia de Profesores en CrossChex** | **BE+FE** | **`plan/asistencia-profesores.md`** | **✅ Chat 1 + Chat 1.5 + Chat 2 cerrados (2026-04-20) · Chat 2: DTOs, 4 endpoints profesor + 3 endpoints PDF, repositorio + service polimórficos, PDFs (día/mes/filtrado), email routing (profesor solo al colegio), guard INV-AD06, SignalR payload con `tipoPersona`. Build limpio + 761 tests verdes. Deploy pendiente: ejecutar `plan21_chat15_FkRepointAsistenciaPersona.sql`** | **~55%** |
 
 **Semáforo de readiness**:
 
