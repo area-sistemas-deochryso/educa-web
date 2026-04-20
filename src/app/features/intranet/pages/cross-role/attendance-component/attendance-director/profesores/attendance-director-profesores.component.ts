@@ -1,259 +1,357 @@
-import { ChangeDetectionStrategy, Component, computed, inject, OnInit } from '@angular/core';
-import { DatePipe, NgClass } from '@angular/common';
-import { FormsModule } from '@angular/forms';
+import {
+	ChangeDetectionStrategy,
+	Component,
+	DestroyRef,
+	OnInit,
+	computed,
+	inject,
+	signal,
+} from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { finalize } from 'rxjs';
+
+import { AttendanceLegendComponent } from '@features/intranet/components/attendance/attendance-legend/attendance-legend.component';
+import { AttendancePersonaDayListComponent } from '@features/intranet/components/attendance/attendance-persona-day-list/attendance-persona-day-list.component';
+import { AttendanceTableComponent } from '@features/intranet/components/attendance/attendance-table/attendance-table.component';
+import { AttendanceTableSkeletonComponent } from '@features/intranet/components/attendance/attendance-table-skeleton/attendance-table-skeleton.component';
+import { EmptyStateComponent } from '@features/intranet/components/attendance/empty-state/empty-state.component';
+import {
+	VIEW_MODE,
+	ViewMode,
+} from '@features/intranet/components/attendance/attendance-header/attendance-header.component';
+import { AttendanceDataService } from '@features/intranet/services/attendance/attendance-data.service';
+import { AttendanceTable } from '@features/intranet/pages/cross-role/attendance-component/models/attendance.types';
+
+import {
+	AsistenciaProfesorDto,
+	EstadisticasAsistenciaDia,
+	HijoApoderado,
+	PersonaAsistencia,
+	profesorToPersonaAsistencia,
+} from '@data/models/attendance.models';
+import { APP_USER_ROLES } from '@shared/constants';
+import { AsistenciaProfesorApiService } from '@shared/services/attendance';
+import { downloadBlob, viewBlobInNewTab } from '@core/helpers';
+import { ErrorHandlerService } from '@core/services';
 
 import { ButtonModule } from 'primeng/button';
-import { DatePickerModule } from 'primeng/datepicker';
-import { Menu, MenuModule } from 'primeng/menu';
 import { MenuItem } from 'primeng/api';
-import { Select } from 'primeng/select';
-import { SelectButton } from 'primeng/selectbutton';
-import { TableLazyLoadEvent, TableModule } from 'primeng/table';
-import { TagModule } from 'primeng/tag';
+import { MenuModule } from 'primeng/menu';
 import { TooltipModule } from 'primeng/tooltip';
 
-import { AttendanceStatus } from '@data/models/attendance.models';
-import { UiMappingService } from '@shared/services/ui-mapping/ui-mapping.service';
-
-import { AsistenciaProfesorDataFacade } from './services/asistencia-profesor-data.facade';
-import { AsistenciaProfesorUiFacade } from './services/asistencia-profesor-ui.facade';
-
-interface EstadoOption {
-	label: string;
-	value: AttendanceStatus | null;
-}
-
 /**
- * Vista "Profesores" del panel admin de asistencia (Plan 21 Chat 3).
+ * Vista "Profesores" del panel admin de asistencia (Plan 21 Chat 7 — rediseño).
  *
- * Permite al administrativo (Director + 3 no-Director):
- * - Listar profesores con asistencias en un rango.
- * - Filtrar por estado (A/T/F/J).
- * - Ver detalle de un profesor en modo día o mes.
- * - Exportar PDFs (día, mes, filtrado).
+ * Armonizada con "Estudiantes": leyenda + day-list con stat-cards (modo día)
+ * + calendario mensual con ingresos/salidas (modo mes). Responde al pill
+ * día/mes del header cross-role vía `setViewMode` llamado por el shell.
+ *
+ * Diferencias vs "Estudiantes":
+ * - Sin grado/sección — todos los profesores activos de la sede en una sola lista.
+ * - Día consume `GET /director/profesores-asistencia-dia` (Chat 7.A).
+ * - Mes selecciona un profesor del listado y muestra sus tablas ingresos/salidas.
+ * - Justificación deshabilitada por UI (INV-AD06 queda para chat posterior).
  */
 @Component({
 	selector: 'app-attendance-director-profesores',
 	standalone: true,
 	imports: [
+		AttendanceLegendComponent,
+		AttendancePersonaDayListComponent,
+		AttendanceTableComponent,
+		AttendanceTableSkeletonComponent,
+		EmptyStateComponent,
 		ButtonModule,
-		DatePickerModule,
 		MenuModule,
-		Select,
-		SelectButton,
-		TableModule,
-		TagModule,
 		TooltipModule,
-		FormsModule,
-		DatePipe,
-		NgClass,
 	],
 	templateUrl: './attendance-director-profesores.component.html',
 	styleUrl: './attendance-director-profesores.component.scss',
 	changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class AttendanceDirectorProfesoresComponent implements OnInit {
-	readonly dataFacade = inject(AsistenciaProfesorDataFacade);
-	readonly uiFacade = inject(AsistenciaProfesorUiFacade);
-	readonly uiMapping = inject(UiMappingService);
+	private api = inject(AsistenciaProfesorApiService);
+	private dataService = inject(AttendanceDataService);
+	private errorHandler = inject(ErrorHandlerService);
+	private destroyRef = inject(DestroyRef);
 
-	// #region Options
-
-	readonly estadoOptions: EstadoOption[] = [
-		{ label: 'Todos', value: null },
-		{ label: 'Asistió (A)', value: 'A' },
-		{ label: 'Tardanza (T)', value: 'T' },
-		{ label: 'Falta (F)', value: 'F' },
-		{ label: 'Justificado (J)', value: 'J' },
-	];
-
-	readonly viewModeOptions = [
-		{ label: 'Día', value: 'dia' as const },
-		{ label: 'Mes', value: 'mes' as const },
-	];
-
-	readonly mesOptions = [
-		{ label: 'Enero', value: 1 },
-		{ label: 'Febrero', value: 2 },
-		{ label: 'Marzo', value: 3 },
-		{ label: 'Abril', value: 4 },
-		{ label: 'Mayo', value: 5 },
-		{ label: 'Junio', value: 6 },
-		{ label: 'Julio', value: 7 },
-		{ label: 'Agosto', value: 8 },
-		{ label: 'Septiembre', value: 9 },
-		{ label: 'Octubre', value: 10 },
-		{ label: 'Noviembre', value: 11 },
-		{ label: 'Diciembre', value: 12 },
-	];
-
-	readonly anioOptions = [
-		{ label: '2024', value: 2024 },
-		{ label: '2025', value: 2025 },
-		{ label: '2026', value: 2026 },
-	];
-
+	// #region Estado general
+	readonly loading = signal(false);
+	readonly tableReady = signal(false);
+	readonly downloadingPdf = signal(false);
 	// #endregion
-	// #region Computed
 
+	// #region Modo día/mes + fecha
+	readonly viewMode = signal<ViewMode>(VIEW_MODE.Dia);
+	readonly fechaDia = signal<Date>(new Date());
+	// #endregion
+
+	// #region Modo día
+	readonly profesoresDia = signal<AsistenciaProfesorDto[]>([]);
+	readonly estadisticasDia = signal<EstadisticasAsistenciaDia>({
+		total: 0,
+		asistio: 0,
+		tardanza: 0,
+		falta: 0,
+		justificado: 0,
+		pendiente: 0,
+	});
+	readonly personasDia = computed<PersonaAsistencia[]>(() =>
+		this.profesoresDia().map(profesorToPersonaAsistencia),
+	);
+	// #endregion
+
+	// #region Modo mes
+	readonly profesoresMes = signal<AsistenciaProfesorDto[]>([]);
+	readonly selectedProfesorId = signal<number | null>(null);
 	readonly selectedProfesor = computed(() => {
-		const dni = this.dataFacade.selectedProfesorDni();
-		if (!dni) return null;
-		return this.dataFacade.items().find((p) => p.dni === dni) ?? null;
+		const id = this.selectedProfesorId();
+		return this.profesoresMes().find((p) => p.profesorId === id) ?? null;
 	});
+	readonly profesoresAsHijos = computed<HijoApoderado[]>(() =>
+		this.profesoresMes().map((p) => ({
+			estudianteId: p.profesorId,
+			dni: p.dni,
+			nombreCompleto: p.nombreCompleto,
+			grado: '',
+			seccion: '',
+			relacion: APP_USER_ROLES.Profesor,
+		})),
+	);
+	readonly ingresos = signal<AttendanceTable>(
+		this.dataService.createEmptyTable('Ingresos'),
+	);
+	readonly salidas = signal<AttendanceTable>(
+		this.dataService.createEmptyTable('Salidas'),
+	);
+	// #endregion
 
-	readonly detalleAsistencias = computed(() => {
-		return this.dataFacade.selectedProfesorDetalle()?.asistencias ?? [];
-	});
-
+	// #region PDF
 	readonly pdfMenuItems = computed<MenuItem[]>(() => {
-		const mode = this.uiFacade.viewMode();
-		const hasProfesor = !!this.dataFacade.selectedProfesorDni();
-
-		if (!hasProfesor) {
+		if (this.viewMode() === VIEW_MODE.Mes) {
+			const profesor = this.selectedProfesor();
+			if (!profesor) return [];
+			const { selectedMonth, selectedYear } = this.ingresos();
 			return [
 				{
-					label: 'Ver reporte filtrado',
+					label: 'Ver PDF (mes)',
 					icon: 'pi pi-eye',
-					command: () => this.uiFacade.verPdfFiltrado(),
+					command: () => this.verPdfProfesorMes(profesor.dni, selectedMonth, selectedYear),
 				},
 				{
-					label: 'Descargar reporte filtrado',
+					label: 'Descargar PDF (mes)',
 					icon: 'pi pi-download',
-					command: () => this.uiFacade.descargarPdfFiltrado(),
-				},
-			];
-		}
-
-		if (mode === 'dia') {
-			return [
-				{
-					label: 'Ver PDF (día)',
-					icon: 'pi pi-eye',
-					command: () => this.uiFacade.verPdfDia(),
-				},
-				{
-					label: 'Descargar PDF (día)',
-					icon: 'pi pi-download',
-					command: () => this.uiFacade.descargarPdfDia(),
-				},
-				{ separator: true },
-				{
-					label: 'Ver reporte filtrado',
-					icon: 'pi pi-eye',
-					command: () => this.uiFacade.verPdfFiltrado(),
-				},
-				{
-					label: 'Descargar reporte filtrado',
-					icon: 'pi pi-download',
-					command: () => this.uiFacade.descargarPdfFiltrado(),
+					command: () =>
+						this.descargarPdfProfesorMes(profesor.dni, selectedMonth, selectedYear),
 				},
 			];
 		}
 
 		return [
 			{
-				label: 'Ver PDF (mes)',
+				label: 'Ver reporte del día',
 				icon: 'pi pi-eye',
-				command: () => this.uiFacade.verPdfMes(),
+				command: () => this.verPdfReporteDia(),
 			},
 			{
-				label: 'Descargar PDF (mes)',
+				label: 'Descargar reporte del día',
 				icon: 'pi pi-download',
-				command: () => this.uiFacade.descargarPdfMes(),
-			},
-			{ separator: true },
-			{
-				label: 'Ver reporte filtrado',
-				icon: 'pi pi-eye',
-				command: () => this.uiFacade.verPdfFiltrado(),
-			},
-			{
-				label: 'Descargar reporte filtrado',
-				icon: 'pi pi-download',
-				command: () => this.uiFacade.descargarPdfFiltrado(),
+				command: () => this.descargarPdfReporteDia(),
 			},
 		];
 	});
-
 	// #endregion
-	// #region Lifecycle
 
 	ngOnInit(): void {
-		this.dataFacade.loadList();
-	}
-
-	// #endregion
-	// #region Handlers
-
-	onFechaInicioChange(fecha: Date): void {
-		this.uiFacade.setFechaInicio(fecha);
-	}
-
-	onFechaFinChange(fecha: Date): void {
-		this.uiFacade.setFechaFin(fecha);
-	}
-
-	onEstadoChange(estado: AttendanceStatus | null): void {
-		this.uiFacade.setFilterEstado(estado);
-	}
-
-	onAplicarFiltros(): void {
-		this.uiFacade.applyFilters();
-	}
-
-	onSelectProfesor(dni: string): void {
-		this.uiFacade.selectProfesor(dni);
-	}
-
-	onClearSelection(): void {
-		this.uiFacade.selectProfesor(null);
-	}
-
-	onViewModeChange(mode: 'dia' | 'mes'): void {
-		this.uiFacade.setViewMode(mode);
-	}
-
-	onSelectedDateChange(fecha: Date): void {
-		this.uiFacade.setSelectedDate(fecha);
-	}
-
-	onSelectedMesChange(mes: number): void {
-		this.uiFacade.setSelectedMes(mes);
-	}
-
-	onSelectedAnioChange(anio: number): void {
-		this.uiFacade.setSelectedAnio(anio);
-	}
-
-	onLazyLoad(event: TableLazyLoadEvent): void {
-		const first = event.first ?? 0;
-		const pageSize = event.rows ?? this.dataFacade.pagination().pageSize;
-		const page = Math.floor(first / pageSize) + 1;
-		this.dataFacade.changePage(page, pageSize);
-	}
-
-	togglePdfMenu(event: Event, menu: Menu): void {
-		menu.toggle(event);
-	}
-
-	// #endregion
-	// #region Helpers de UI
-
-	getEstadoSeverity(estado: AttendanceStatus): 'success' | 'warn' | 'danger' | 'info' | 'secondary' {
-		switch (estado) {
-			case 'A':
-				return 'success';
-			case 'T':
-				return 'warn';
-			case 'F':
-				return 'danger';
-			case 'J':
-				return 'info';
-			default:
-				return 'secondary';
+		if (this.viewMode() === VIEW_MODE.Dia) {
+			this.loadDia();
+		} else {
+			this.loadMes();
 		}
 	}
 
+	// #region Delegados llamados por el shell vía @ViewChild
+	setViewMode(mode: ViewMode): void {
+		if (this.viewMode() === mode) return;
+		this.viewMode.set(mode);
+		this.tableReady.set(false);
+		if (mode === VIEW_MODE.Dia) {
+			this.loadDia();
+		} else {
+			this.loadMes();
+		}
+	}
+
+	reload(): void {
+		if (this.viewMode() === VIEW_MODE.Dia) {
+			this.loadDia();
+		} else {
+			this.loadMes();
+		}
+	}
+	// #endregion
+
+	// #region Handlers
+	onFechaDiaChange(fecha: Date): void {
+		this.fechaDia.set(fecha);
+		this.loadDia();
+	}
+
+	selectProfesor(profesorId: number): void {
+		if (this.selectedProfesorId() === profesorId) return;
+		this.selectedProfesorId.set(profesorId);
+		this.updateTablasMes();
+	}
+
+	onIngresosMonthChange(month: number): void {
+		this.ingresos.update((t) => ({ ...t, selectedMonth: month }));
+		this.loadMes();
+	}
+
+	onSalidasMonthChange(month: number): void {
+		this.salidas.update((t) => ({ ...t, selectedMonth: month }));
+		// Se regenera a partir del mismo mes en ingresos (ambas tablas comparten mes).
+		this.updateTablasMes();
+	}
+	// #endregion
+
+	// #region Carga — modo día
+	private loadDia(): void {
+		this.loading.set(true);
+		this.api
+			.obtenerAsistenciaDiaProfesoresDirector(this.fechaDia())
+			.pipe(
+				takeUntilDestroyed(this.destroyRef),
+				finalize(() => this.loading.set(false)),
+			)
+			.subscribe({
+				next: (resp) => {
+					this.profesoresDia.set(resp.profesores);
+					this.estadisticasDia.set(resp.estadisticas);
+				},
+				error: (err) => this.errorHandler.handleHttpError(err),
+			});
+	}
+	// #endregion
+
+	// #region Carga — modo mes
+	private loadMes(): void {
+		const { selectedMonth, selectedYear } = this.ingresos();
+		const fechaInicio = new Date(selectedYear, selectedMonth - 1, 1);
+		const fechaFin = new Date(selectedYear, selectedMonth, 0);
+
+		this.loading.set(true);
+		this.api
+			.listarProfesores(fechaInicio, fechaFin, null, 1, 500)
+			.pipe(
+				takeUntilDestroyed(this.destroyRef),
+				finalize(() => this.loading.set(false)),
+			)
+			.subscribe({
+				next: (resp) => {
+					const profesores = resp.data ?? [];
+					this.profesoresMes.set(profesores);
+					if (profesores.length > 0) {
+						this.restoreSelectedProfesor();
+						this.updateTablasMes();
+					} else {
+						this.selectedProfesorId.set(null);
+						this.tableReady.set(true);
+					}
+				},
+				error: (err) => {
+					this.errorHandler.handleHttpError(err);
+					this.tableReady.set(true);
+				},
+			});
+	}
+
+	private restoreSelectedProfesor(): void {
+		const id = this.selectedProfesorId();
+		if (id !== null && this.profesoresMes().some((p) => p.profesorId === id)) return;
+		const first = this.profesoresMes()[0];
+		if (first) this.selectedProfesorId.set(first.profesorId);
+	}
+
+	private updateTablasMes(): void {
+		const profesor = this.selectedProfesor();
+		if (!profesor) {
+			this.tableReady.set(true);
+			return;
+		}
+		const { selectedMonth, selectedYear } = this.ingresos();
+		const tables = this.dataService.processAsistencias(
+			profesor.asistencias,
+			selectedMonth,
+			selectedYear,
+			profesor.nombreCompleto,
+		);
+		this.ingresos.set(tables.ingresos);
+		this.salidas.set(tables.salidas);
+		this.tableReady.set(true);
+	}
+	// #endregion
+
+	// #region PDFs
+	private verPdfReporteDia(): void {
+		this.runPdfFiltrado((blob) => viewBlobInNewTab(blob));
+	}
+
+	private descargarPdfReporteDia(): void {
+		this.runPdfFiltrado((blob) =>
+			downloadBlob(blob, `Reporte_Profesores_${this.formatDateLocal(this.fechaDia())}.pdf`),
+		);
+	}
+
+	private runPdfFiltrado(handle: (blob: Blob) => void): void {
+		const fecha = this.fechaDia();
+		this.downloadingPdf.set(true);
+		this.api
+			.descargarPdfReporteFiltradoProfesores(fecha, fecha, null)
+			.pipe(
+				takeUntilDestroyed(this.destroyRef),
+				finalize(() => this.downloadingPdf.set(false)),
+			)
+			.subscribe({
+				next: handle,
+				error: (err) => this.errorHandler.handleHttpError(err),
+			});
+	}
+
+	private verPdfProfesorMes(dni: string, mes: number, anio: number): void {
+		this.runPdfProfesorMes(dni, mes, anio, (blob) => viewBlobInNewTab(blob));
+	}
+
+	private descargarPdfProfesorMes(dni: string, mes: number, anio: number): void {
+		this.runPdfProfesorMes(dni, mes, anio, (blob) =>
+			downloadBlob(blob, `Asistencia_Profesor_${dni}_${anio}-${mes.toString().padStart(2, '0')}.pdf`),
+		);
+	}
+
+	private runPdfProfesorMes(
+		dni: string,
+		mes: number,
+		anio: number,
+		handle: (blob: Blob) => void,
+	): void {
+		this.downloadingPdf.set(true);
+		this.api
+			.descargarPdfProfesorMes(dni, mes, anio)
+			.pipe(
+				takeUntilDestroyed(this.destroyRef),
+				finalize(() => this.downloadingPdf.set(false)),
+			)
+			.subscribe({
+				next: handle,
+				error: (err) => this.errorHandler.handleHttpError(err),
+			});
+	}
+
+	private formatDateLocal(fecha: Date): string {
+		const year = fecha.getFullYear();
+		const month = String(fecha.getMonth() + 1).padStart(2, '0');
+		const day = String(fecha.getDate()).padStart(2, '0');
+		return `${year}-${month}-${day}`;
+	}
 	// #endregion
 }

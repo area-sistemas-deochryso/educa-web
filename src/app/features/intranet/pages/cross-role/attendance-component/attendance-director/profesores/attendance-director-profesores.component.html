@@ -1,235 +1,72 @@
 <!-- #region Template -->
-<div class="profesores-container">
-	<!-- * Filtros de rango + estado + acciones de PDF -->
-	<section class="filters-bar">
-		<div class="filter-field">
-			<label class="label-uppercase" for="fecha-inicio">Desde</label>
-			<p-datepicker
-				inputId="fecha-inicio"
-				[ngModel]="dataFacade.filters().fechaInicio"
-				(ngModelChange)="onFechaInicioChange($event)"
-				dateFormat="dd/mm/yy"
-				[showIcon]="true"
-				appendTo="body"
-			/>
-		</div>
-		<div class="filter-field">
-			<label class="label-uppercase" for="fecha-fin">Hasta</label>
-			<p-datepicker
-				inputId="fecha-fin"
-				[ngModel]="dataFacade.filters().fechaFin"
-				(ngModelChange)="onFechaFinChange($event)"
-				dateFormat="dd/mm/yy"
-				[showIcon]="true"
-				appendTo="body"
-			/>
-		</div>
-		<div class="filter-field">
-			<label class="label-uppercase" for="estado">Estado</label>
-			<p-select
-				inputId="estado"
-				[options]="estadoOptions"
-				[ngModel]="dataFacade.filters().estado"
-				(ngModelChange)="onEstadoChange($event)"
-				optionLabel="label"
-				optionValue="value"
-				appendTo="body"
-				styleClass="estado-select"
-			/>
-		</div>
-		<div class="filter-actions">
-			<p-button
-				label="Aplicar"
-				icon="pi pi-filter"
-				severity="success"
-				(onClick)="onAplicarFiltros()"
-				[loading]="dataFacade.loading()"
-			/>
-			<p-button
-				icon="pi pi-file-pdf"
-				severity="danger"
-				[text]="true"
-				[rounded]="true"
-				[loading]="uiFacade.downloadingPdf()"
-				(onClick)="togglePdfMenu($event, pdfMenu)"
-				pTooltip="Opciones de PDF"
-				tooltipPosition="top"
-				[pt]="{
-					root: {
-						'aria-label': 'Opciones de PDF',
-					},
-				}"
-			/>
-			<p-menu #pdfMenu [model]="pdfMenuItems()" [popup]="true" appendTo="body" />
-		</div>
-	</section>
+<!-- * Leyenda compartida de estados -->
+<app-attendance-legend />
 
-	<!-- * Tabla paginada de profesores -->
-	<section class="table-section">
-		<p-table
-			[value]="dataFacade.items()"
-			[lazy]="true"
-			[paginator]="true"
-			[rows]="dataFacade.pagination().pageSize"
-			[first]="(dataFacade.pagination().page - 1) * dataFacade.pagination().pageSize"
-			[totalRecords]="dataFacade.pagination().total"
-			[rowsPerPageOptions]="[10, 25, 50, 100]"
-			[showCurrentPageReport]="true"
-			[loading]="dataFacade.loading()"
-			currentPageReportTemplate="Mostrando {first} a {last} de {totalRecords} profesores"
-			(onLazyLoad)="onLazyLoad($event)"
-			class="p-datatable-sm"
-			dataKey="dni"
-		>
-			<ng-template #header>
-				<tr>
-					<th>DNI</th>
-					<th>Profesor</th>
-					<th>Sede</th>
-					<th style="width: 100px">Días</th>
-					<th style="width: 120px">Acciones</th>
-				</tr>
-			</ng-template>
-			<ng-template #body let-profesor>
-				<tr [ngClass]="{ 'row-selected': profesor.dni === dataFacade.selectedProfesorDni() }">
-					<td class="dni-cell">{{ profesor.dni }}</td>
-					<td>{{ profesor.nombreCompleto }}</td>
-					<td>{{ profesor.sede }}</td>
-					<td>{{ profesor.asistencias.length }}</td>
-					<td class="actions">
-						<button
-							pButton
-							icon="pi pi-eye"
-							class="p-button-rounded p-button-text p-button-info"
-							pTooltip="Ver detalle"
-							tooltipPosition="top"
-							(click)="onSelectProfesor(profesor.dni)"
-							[pt]="{
-								root: {
-									'aria-label': 'Ver detalle del profesor',
-								},
-							}"
-						></button>
-					</td>
-				</tr>
-			</ng-template>
-			<ng-template #emptymessage>
-				<tr>
-					<td colspan="5" class="empty-message">
-						<div class="empty-state">
-							<i class="pi pi-users"></i>
-							<p>No se encontraron profesores</p>
-							<span>Intenta ajustar los filtros de búsqueda</span>
-						</div>
-					</td>
-				</tr>
-			</ng-template>
-		</p-table>
-	</section>
-
-	<!-- * Detalle del profesor seleccionado -->
+@if (viewMode() === 'mes') {
+	<!-- * PDF actions — contextual al profesor seleccionado -->
 	@if (selectedProfesor(); as profesor) {
-		<section class="detail-section">
-			<header class="detail-header">
-				<div class="detail-title">
-					<h3>{{ profesor.nombreCompleto }}</h3>
-					<span class="detail-meta">DNI {{ profesor.dni }} · {{ profesor.sede }}</span>
-				</div>
-				<div class="detail-actions">
-					<p-selectButton
-						[options]="viewModeOptions"
-						[ngModel]="uiFacade.viewMode()"
-						(ngModelChange)="onViewModeChange($event)"
-						optionLabel="label"
-						optionValue="value"
-						[allowEmpty]="false"
-					/>
-					<button
-						pButton
-						icon="pi pi-times"
-						class="p-button-text p-button-rounded p-button-secondary"
-						pTooltip="Cerrar detalle"
-						tooltipPosition="top"
-						(click)="onClearSelection()"
-						[pt]="{
-							root: {
-								'aria-label': 'Cerrar detalle del profesor',
-							},
-						}"
-					></button>
-				</div>
-			</header>
-
-			<div class="detail-controls">
-				@if (uiFacade.viewMode() === 'dia') {
-					<p-datepicker
-						[ngModel]="uiFacade.selectedDate()"
-						(ngModelChange)="onSelectedDateChange($event)"
-						dateFormat="dd/mm/yy"
-						[showIcon]="true"
-						appendTo="body"
-					/>
-				} @else {
-					<p-select
-						[options]="mesOptions"
-						[ngModel]="uiFacade.selectedMes()"
-						(ngModelChange)="onSelectedMesChange($event)"
-						optionLabel="label"
-						optionValue="value"
-						appendTo="body"
-						styleClass="mes-select"
-					/>
-					<p-select
-						[options]="anioOptions"
-						[ngModel]="uiFacade.selectedAnio()"
-						(ngModelChange)="onSelectedAnioChange($event)"
-						optionLabel="label"
-						optionValue="value"
-						appendTo="body"
-						styleClass="anio-select"
-					/>
-				}
+		<div class="pdf-section">
+			<div class="pdf-report-info">
+				<span class="pdf-label"
+					>Reporte mensual de {{ profesor.nombreCompleto }} —
+					{{ ingresos().selectedMonth }}/{{ ingresos().selectedYear }}</span
+				>
+				<p-button
+					icon="pi pi-file-pdf"
+					[loading]="downloadingPdf()"
+					severity="danger"
+					[text]="true"
+					[rounded]="true"
+					(onClick)="pdfMenu.toggle($event)"
+					pTooltip="Opciones de PDF"
+					tooltipPosition="top"
+					[pt]="{
+						root: {
+							'aria-label': 'Opciones de PDF',
+						},
+					}"
+				/>
+				<p-menu #pdfMenu [model]="pdfMenuItems()" [popup]="true" appendTo="body" />
 			</div>
-
-			@if (dataFacade.loadingDetail()) {
-				<div class="loading-state">
-					<i class="pi pi-spin pi-spinner"></i>
-					<span>Cargando asistencias...</span>
-				</div>
-			} @else if (detalleAsistencias().length === 0) {
-				<div class="empty-state">
-					<i class="pi pi-inbox"></i>
-					<p>Sin registros de asistencia</p>
-					<span>No hay asistencias para el período seleccionado</span>
-				</div>
-			} @else {
-				<p-table [value]="detalleAsistencias()" class="p-datatable-sm">
-					<ng-template #header>
-						<tr>
-							<th style="width: 140px">Fecha</th>
-							<th style="width: 120px">Entrada</th>
-							<th style="width: 120px">Salida</th>
-							<th style="width: 100px">Estado</th>
-							<th>Observación</th>
-						</tr>
-					</ng-template>
-					<ng-template #body let-asistencia>
-						<tr>
-							<td>{{ asistencia.fecha | date: 'dd/MM/yyyy' }}</td>
-							<td>{{ asistencia.horaEntrada ?? '—' }}</td>
-							<td>{{ asistencia.horaSalida ?? '—' }}</td>
-							<td>
-								<p-tag
-									[value]="asistencia.estadoCodigo"
-									[severity]="getEstadoSeverity(asistencia.estadoCodigo)"
-								/>
-							</td>
-							<td class="observacion-cell">{{ asistencia.observacion ?? '—' }}</td>
-						</tr>
-					</ng-template>
-				</p-table>
-			}
-		</section>
+		</div>
 	}
-</div>
+
+	@if (loading() && !tableReady()) {
+		<!-- * Skeleton: reserve space while data loads -->
+		<app-attendance-table-skeleton />
+		<app-attendance-table-skeleton />
+	} @else if (profesoresMes().length > 0 && selectedProfesor()) {
+		<!-- * Month tables: ingresos and salidas -->
+		<app-attendance-table
+			[table]="ingresos()"
+			[hijos]="profesoresAsHijos()"
+			[selectedHijoId]="selectedProfesorId()"
+			(monthChange)="onIngresosMonthChange($event)"
+			(hijoChange)="selectProfesor($event)"
+		/>
+		<app-attendance-table
+			[table]="salidas()"
+			[hijos]="profesoresAsHijos()"
+			[selectedHijoId]="selectedProfesorId()"
+			(monthChange)="onSalidasMonthChange($event)"
+			(hijoChange)="selectProfesor($event)"
+		/>
+	} @else if (!loading()) {
+		<!-- ! Empty state after load -->
+		<app-empty-state message="No se encontraron profesores en el mes seleccionado." />
+	}
+} @else {
+	<!-- * Day mode: persona day list (lista + stat-cards + PDF) -->
+	<app-attendance-persona-day-list
+		[personas]="personasDia()"
+		[fecha]="fechaDia()"
+		[estadisticas]="estadisticasDia()"
+		[loading]="loading()"
+		[showPdfButton]="true"
+		[downloadingPdf]="downloadingPdf()"
+		[pdfMenuItems]="pdfMenuItems()"
+		[allowJustify]="false"
+		(fechaChange)="onFechaDiaChange($event)"
+	/>
+}
 <!-- #endregion -->
