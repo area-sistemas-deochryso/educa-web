@@ -1,3 +1,11 @@
+// #region Host
+// * Alineado con `.page-header` del attendance-header (padding: 0 2rem).
+:host {
+	display: block;
+	padding: 0 2rem;
+}
+// #endregion
+
 // #region Tabs shell
 :host ::ng-deep {
 	// * Tabs con fondo transparente (coherente con el resto de la intranet
@@ -20,7 +28,7 @@
 	}
 
 	.p-tabpanel {
-		padding: 1rem 0.25rem 0;
+		padding: 1rem 0 0;
 	}
 }
 // #endregion
