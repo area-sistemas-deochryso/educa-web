@@ -50,4 +50,4 @@ La tabla `AsistenciaPersona` es polimórfica (estudiantes + profesores). Las mut
 
 **Enforcement**: `AsistenciaAdminController` tiene `[Authorize(Roles = Roles.Administrativos)]` a nivel clase (4 roles administrativos). Verificado por `AsistenciaAdminControllerAuthorizationTests` (6 tests por reflection que rechazan explícitamente Profesor, Apoderado y Estudiante).
 
-**Auto-servicio del profesor**: un profesor puede consultar su propia asistencia (`/profesor/me/mes`, `/profesor/me/dia`) pero NO puede mutarla. Cualquier corrección va por el canal administrativo con correo diferenciado al profesor + BCC al colegio (INV-AD05).
+**Auto-servicio del profesor**: un profesor puede consultar su propia asistencia (`/profesor/me/mes`, `/profesor/me/dia`) pero NO puede mutarla. Cualquier corrección va por el canal administrativo con correo diferenciado al profesor (INV-AD05).
