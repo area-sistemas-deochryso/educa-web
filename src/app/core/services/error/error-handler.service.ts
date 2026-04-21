@@ -12,6 +12,7 @@ import { Injectable, computed, inject, signal } from '@angular/core';
 import { ErrorReporterService } from './error-reporter.service';
 import { HttpErrorResponse } from '@angular/common/http';
 import { logger } from '@core/helpers';
+import { RateLimitCountdownService } from '@core/services/rate-limit-countdown';
 import { RequestTraceFacade } from '@core/services/trace';
 import {
 	UI_CLIENT_ERROR_MESSAGE,
@@ -30,6 +31,7 @@ export class ErrorHandlerService {
 
 	private readonly errorReporter = inject(ErrorReporterService);
 	private readonly trace = inject(RequestTraceFacade);
+	private readonly rateLimitCountdown = inject(RateLimitCountdownService);
 
 	// Estado con Signals
 	private readonly _errors = signal<AppError[]>([]);
@@ -59,6 +61,19 @@ export class ErrorHandlerService {
 			context && typeof context['method'] === 'string' ? context['method'] : undefined;
 		const details = this.extractHttpDetails(error, method);
 		const message = this.getHttpErrorMessage(error);
+
+		// * 429 Too Many Requests tiene UX dedicada (countdown informativo) y
+		// telemetría propia en RateLimitEvent. No emitimos toast genérico ni
+		// lo reportamos a ErrorLog (sería duplicación con RateLimitEvent).
+		if (error.status === 429) {
+			const retryAfter = RateLimitCountdownService.parseRetryAfter(error);
+			this.rateLimitCountdown.start(retryAfter, error.url ?? 'endpoint');
+			return this.createError(message, 'warn', 'http', {
+				statusCode: 429,
+				originalError: error,
+				context: { ...context, httpDetails: details },
+			});
+		}
 
 		// For 500+ errors, append short trace reference for support correlation
 		const traceId = context?.['traceId'] as string | undefined;

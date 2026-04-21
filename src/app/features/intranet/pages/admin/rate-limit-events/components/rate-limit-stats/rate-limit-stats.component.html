@@ -1,0 +1,68 @@
+<section class="stats-section">
+	<div class="stats-grid">
+		<!-- Total -->
+		<div class="stat-card">
+			<i class="pi pi-chart-line stat-icon"></i>
+			<div class="stat-content">
+				<span class="stat-value">{{ stats()?.total ?? 0 }}</span>
+				<span class="stat-label">Total eventos</span>
+				<span class="stat-sublabel">últimas {{ stats()?.horas ?? 24 }}h</span>
+			</div>
+		</div>
+
+		<!-- Rechazados -->
+		<div
+			class="stat-card"
+			[class.stat-card--critical]="(stats()?.totalRechazados ?? 0) > 50"
+		>
+			<i class="pi pi-ban stat-icon"></i>
+			<div class="stat-content">
+				<span class="stat-value">{{ stats()?.totalRechazados ?? 0 }}</span>
+				<span class="stat-label">Rechazados</span>
+				<span class="stat-sublabel">
+					{{ (stats()?.totalRechazados ?? 0) > 50 ? 'alto volumen' : 'últimas ' + (stats()?.horas ?? 24) + 'h' }}
+				</span>
+			</div>
+		</div>
+
+		<!-- Top rol -->
+		<div class="stat-card">
+			<i class="pi pi-users stat-icon"></i>
+			<div class="stat-content">
+				@if (stats()?.topRoles && stats()!.topRoles.length > 0) {
+					<span class="stat-value stat-value--text" [pTooltip]="stats()!.topRoles[0].key">
+						{{ stats()!.topRoles[0].key }}
+					</span>
+					<span class="stat-label">Top rol</span>
+					<span class="stat-sublabel">{{ stats()!.topRoles[0].total }} eventos</span>
+				} @else {
+					<span class="stat-value stat-value--text">—</span>
+					<span class="stat-label">Top rol</span>
+					<span class="stat-sublabel">sin datos</span>
+				}
+			</div>
+		</div>
+
+		<!-- Top endpoint -->
+		<div class="stat-card">
+			<i class="pi pi-link stat-icon"></i>
+			<div class="stat-content">
+				@if (stats()?.topEndpoints && stats()!.topEndpoints.length > 0) {
+					<span
+						class="stat-value stat-value--endpoint"
+						[pTooltip]="stats()!.topEndpoints[0].key"
+						tooltipPosition="top"
+					>
+						{{ stats()!.topEndpoints[0].key }}
+					</span>
+					<span class="stat-label">Top endpoint</span>
+					<span class="stat-sublabel">{{ stats()!.topEndpoints[0].total }} eventos</span>
+				} @else {
+					<span class="stat-value stat-value--text">—</span>
+					<span class="stat-label">Top endpoint</span>
+					<span class="stat-sublabel">sin datos</span>
+				}
+			</div>
+		</div>
+	</div>
+</section>

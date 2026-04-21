@@ -1,0 +1,21 @@
+@if (visible()) {
+	<div class="rate-limit-toast" role="status" aria-live="polite">
+		<div class="rate-limit-toast__icon" aria-hidden="true">
+			<i class="pi pi-clock"></i>
+		</div>
+		<div class="rate-limit-toast__content">
+			<div class="rate-limit-toast__title">Demasiadas solicitudes</div>
+			<div class="rate-limit-toast__detail">
+				Podrás reintentar en <strong>{{ remainingLabel() }}</strong>
+			</div>
+		</div>
+		<button
+			type="button"
+			class="rate-limit-toast__close"
+			(click)="onDismiss()"
+			aria-label="Cerrar aviso"
+		>
+			<i class="pi pi-times" aria-hidden="true"></i>
+		</button>
+	</div>
+}

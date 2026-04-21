@@ -1,7 +1,6 @@
 // #region Implementation
 export * from './toast-container';
 export * from './skeleton-loader';
-export * from './rate-limit-banner';
 export * from './devtools';
 // #endregion
 

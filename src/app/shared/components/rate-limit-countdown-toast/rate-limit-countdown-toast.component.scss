@@ -1,0 +1,113 @@
+:host {
+	position: fixed;
+	top: 1rem;
+	right: 1rem;
+	z-index: 100000;
+	pointer-events: none;
+}
+
+.rate-limit-toast {
+	display: flex;
+	align-items: center;
+	gap: 0.75rem;
+	padding: 0.75rem 1rem;
+	min-width: 280px;
+	max-width: 380px;
+	border-radius: 10px;
+	border: 1px solid var(--surface-300);
+	// Fondo sólido explícito — var(--surface-card) resulta translúcido en este
+	// tema y el header del layout se leía a través del toast. Fallback literal
+	// en caso que el token no esté disponible.
+	background: var(--surface-0, #ffffff);
+	opacity: 1;
+	box-shadow: 0 10px 28px rgba(0, 0, 0, 0.22);
+	pointer-events: auto;
+	animation: rateLimitToastIn 180ms ease-out;
+
+	&__icon {
+		flex: 0 0 auto;
+		width: 36px;
+		height: 36px;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		border-radius: 50%;
+		background: color-mix(in srgb, var(--blue-500) 12%, transparent);
+		color: var(--blue-800);
+
+		i {
+			font-size: 1rem;
+		}
+	}
+
+	&__content {
+		flex: 1;
+		min-width: 0;
+	}
+
+	&__title {
+		font-size: 0.9rem;
+		font-weight: 600;
+		color: var(--text-color);
+		line-height: 1.2;
+	}
+
+	&__detail {
+		font-size: 0.8rem;
+		color: var(--text-color-secondary);
+		margin-top: 0.15rem;
+
+		strong {
+			color: var(--blue-800);
+			font-variant-numeric: tabular-nums;
+		}
+	}
+
+	&__close {
+		flex: 0 0 auto;
+		background: transparent;
+		border: 0;
+		padding: 0.25rem;
+		cursor: pointer;
+		color: var(--text-color-secondary);
+		border-radius: 4px;
+		line-height: 0;
+		transition: background 120ms ease, color 120ms ease;
+
+		i {
+			font-size: 0.75rem;
+		}
+
+		&:hover,
+		&:focus-visible {
+			background: var(--surface-100);
+			color: var(--text-color);
+			outline: none;
+		}
+	}
+}
+
+@keyframes rateLimitToastIn {
+	from {
+		opacity: 0;
+		transform: translateY(-6px);
+	}
+	to {
+		opacity: 1;
+		transform: translateY(0);
+	}
+}
+
+@media (max-width: 480px) {
+	:host {
+		top: 0.5rem;
+		right: 0.5rem;
+		left: 0.5rem;
+	}
+
+	.rate-limit-toast {
+		min-width: 0;
+		max-width: none;
+		width: 100%;
+	}
+}

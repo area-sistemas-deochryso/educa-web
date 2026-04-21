@@ -49,6 +49,54 @@
 
 ---
 
+## 🚨 Restricción crítica — Límites SMTP del hosting (cPanel)
+
+> **Origen**: Dato confirmado por el usuario 2026-04-21. Estos son los **techos duros reales** que aplica el hosting (cPanel) al envío saliente para evitar que el dominio entre en listas negras por spam. Superarlos significa que el servidor **descarta silenciosamente** los correos excedentes dentro de la ventana de una hora — sin bounce, sin error, sin log.
+>
+> **Acción urgente**: afecta el diseño/estado de Plan 22, Plan 24 y Plan 26. Antes de retomar cualquiera de esos planes, revisar qué fases necesitan rediseño a la luz de estas cifras. No son "objetivo" ni "buena práctica" — son límites del hosting que no negociamos.
+
+### Cifras exactas
+
+| Ámbito | Envíos permitidos / hora |
+|--------|--------------------------|
+| **Por cuenta cPanel** (agregado de todos sus dominios) | 300 |
+| **Por dominio** | 200 |
+| **Por dirección de correo individual** (buzón remitente, ej. `sistemas@laazulitasac.com`) | 50 |
+| **Por script PHP** | 30 |
+
+Cuellos de botella efectivos para el sistema:
+
+- **50/hora por buzón remitente** — el más restrictivo. Cualquier flujo que use un solo remitente (correcciones de asistencia, resumen diario, notificaciones admin) se topa con este primero.
+- **200/hora por dominio** — techo conjunto si se usan varios buzones del mismo dominio. No se suma con el buzón: el más bajo aplica.
+- **300/hora por cuenta cPanel** — holgura si hay múltiples dominios alojados.
+- **30/hora por script PHP** — no aplica directamente (Educa.API es .NET, no PHP), pero es dato de referencia si alguna vez se migran correos transaccionales a otro canal.
+
+### Qué planes revisar antes de seguir
+
+- [ ] **Plan 22 — Endurecimiento correos de asistencia** (33% avanzado, F2 cerrado con retry 0/1 + `+60s` entre intentos)
+  - F1-F3 BE ✅ y F3.FE ✅ están bien. La validación y clasificación **no** son afectadas — de hecho, descartar temprano los inválidos **ayuda** a no consumir cuota.
+  - **F4.BE pendiente (auditoría preventiva)**: NO afectada, es lectura.
+  - **⚠️ Posible F5/F6 nuevo — Throttle saliente por buzón remitente**: el diseño actual del `EmailOutboxWorker` consume el outbox sin límite de cadencia. Si hay un lote de 100 correcciones de asistencia, dispara 100 envíos en minutos → agota los 50/h del buzón y los 51 restantes se descartan silenciosos. **Revisar si conviene agregar sliding window 50/h por `EO_Remitente` al worker antes de cerrar Plan 22.**
+  - La correlación `5 fallos/hora` que dio origen al Plan 22 (en el bounce histórico) **no es** el mismo techo — ese era bounces acumulados. Estos son **envíos totales aceptados**. Distinguirlo en la narrativa del plan.
+- [ ] **Plan 24 — Sync CrossChex en Background Job** (0%, 4 chats diseñados)
+  - Si el job encola correos al finalizar (resumen de la sincronización, notificaciones a afectados), **necesita respetar el techo de 50/h del buzón**. Decidir en diseño si el resumen va a un remitente distinto del que ya emite correcciones de asistencia, para no colisionar cuotas.
+- [ ] **Plan 26 — Rate limiting flexible** (15%, F1 cerrado con telemetría de 429 HTTP)
+  - Dominio distinto (rate limit de requests HTTP entrantes vs envíos SMTP salientes), **no** se fusiona con esto. Pero el patrón de telemetría (`RateLimitEvent`) puede inspirar una tabla análoga `EmailSendEvent` si el throttle saliente del Plan 22 F5/F6 lo amerita — evaluar al diseñar.
+
+### Consecuencias de diseño transversales
+
+- **Un solo buzón remitente = cuello de 50/h**. Si se requiere mayor volumen, la solución estructural es **rotar remitentes** (ej. `asistencia@`, `notificaciones@`, `reportes@` del mismo dominio) hasta el techo del dominio (200/h). No es un fix de código — es decisión de infraestructura que requiere crear los buzones en cPanel.
+- **Correos masivos legítimos** (import de usuarios con notificación, aprobación masiva, resumen diario a muchos directores) pueden agotar la cuota en **minutos**. Antes de disparar, estimar volumen y decidir si se diferencia en el tiempo (spread) o se divide por remitentes.
+- **No reintentar agresivamente**. El retry por bounce ya bajó de 5 → 2 en F2 del Plan 22. Pero incluso con retry bajo, un lote grande puede consumir cuota solo en primeros intentos. **El throttle saliente protege mejor que bajar más el retry.**
+
+### Validación pendiente (pre-diseño de fases nuevas)
+
+- [ ] Confirmar con el hosting: ¿las cifras son **rolling window de 60 min** o **hora del reloj** (00-59)? Cambia cómo se calcula el throttle.
+- [ ] Confirmar: ¿el contador se reinicia con bounces? Un 550 cuenta como "envío" para la cuota?
+- [ ] Inventariar remitentes actuales: cuántos buzones del dominio están emitiendo hoy y a qué cadencia (consultar logs o tabla `EmailOutbox` del último mes agrupando por `EO_Remitente`).
+
+---
+
 ## ⚠️ Pendientes para el próximo deploy
 
 > **Origen**: Conversación 2026-04-18. Migración de credenciales Firebase + JaaS a env vars de Azure App Service. Cambios commiteados localmente; push pendiente por política de no-deploy en fines de semana (solo lunes y jueves).
@@ -964,14 +1012,14 @@ CARRIL C — DIFERIDO
 
 ### Fases
 
-- [ ] **F1 — Telemetría sobre policies actuales** (2-3 chats: 2 BE + 1 FE) — Chat 1 BE ✅ 2026-04-21
-  - [x] F1.1 Tabla `RateLimitEvent` + modelo EF + script SQL ejecutado en BD de prueba (prod pendiente de deploy coordinado) ✅ 2026-04-21
+- [x] **F1 — Telemetría sobre policies actuales** ✅ 2026-04-21 (Chat 1 BE + Chat 2 FE + stats BE)
+  - [x] F1.1 Tabla `RateLimitEvent` + modelo EF + script SQL ejecutado en BD de prueba y producción ✅ 2026-04-21
   - [x] F1.2 Middleware `RateLimitTelemetryMiddleware` que intercepta respuestas 429 y persiste fire-and-forget (INV-S07 + INV-ET02) ✅ 2026-04-21
   - [~] F1.3 También loguear requests que pasaron pero consumieron >80% de la cuota — **diferido a F2**: ASP.NET Core 9 `RateLimiter` nativo no expone tokens restantes. El método `LogEarlyWarningAsync` queda implementado pero sin llamador; se activa en F2 con custom limiter
   - [x] F1.4 Endpoint `GET /api/sistema/rate-limit-events` con filtros (dni/rol/endpoint/policy/rango/soloRechazados) + `[Authorize(Roles = Roles.Administrativos)]` + DNI enmascarado en DTO ✅ 2026-04-21
-  - [ ] F1.5 Vista admin FE `/intranet/admin/rate-limit` — stats cards (top rol, top endpoint, total 429 24h), tabla con eventos recientes, filtros — **Chat 2**
-  - [ ] F1.6 Feature flag `rateLimitMonitoring` + menú módulo Sistema submenú Monitoreo — **Chat 2**
-  - **Estado**: 9 archivos BE nuevos + 3 modificados + 12 tests nuevos (21 casos, todos verdes; suite completa 1027 verdes, 0 regresiones). Cap 300 líneas respetado (máx 182). Sin tocar policies — solo observar 1-2 semanas para calibrar F2.
+  - [x] F1.5 Vista admin FE `/intranet/admin/rate-limit-events` — stats cards (total/rechazados/top-rol/top-endpoint), tabla con filtros (endpoint/rol/policy/rango/soloRechazados), drawer detalle con copy de correlationId ✅ 2026-04-21 (Chat 2)
+  - [x] F1.6 Feature flag `rateLimitMonitoring` (on en prod + dev) + menú módulo Sistema submenú Monitoreo + endpoint BE `/stats?horas=24` (opción B — agregados server-side) ✅ 2026-04-21 (Chat 2)
+  - **Estado**: F1 100%. BE Chat 1: 9 archivos nuevos + 3 modificados. Chat 2 BE: +1 DTO (`RateLimitStatsDto`) + 3 interfaces/repo/service modificados + 5 tests nuevos (28 totales en módulo, suite 1034 verdes). Chat 2 FE: 17 archivos nuevos (models + services + 4 sub-componentes + page + tests) + 4 modificados (environment x2, routes, menu, permisos). 26 tests FE nuevos (suite 1460 verdes). Cap 300 líneas respetado. Plan 26 pasa a ~20% con F1 completo.
 
 - [ ] **F2 — B + C (multiplier por rol + modifier por endpoint)** (2 chats, BE)
   - [ ] F2.1 Custom attribute `[RateLimitOverride(policy, multiplier)]` + resolver que combina con `[EnableRateLimiting]`

@@ -1,0 +1,82 @@
+// #region Tabla — tipografía específica
+.col-fecha {
+	font-family: ui-monospace, monospace;
+	font-size: 0.8rem;
+	white-space: nowrap;
+}
+
+.col-method {
+	.method-badge {
+		display: inline-block;
+		font-family: ui-monospace, monospace;
+		font-size: 0.75rem;
+		font-weight: 600;
+		padding: 0.2rem 0.5rem;
+		border-radius: 4px;
+		background: var(--surface-200);
+		color: var(--text-color);
+		text-transform: uppercase;
+		letter-spacing: 0.5px;
+	}
+}
+
+.col-endpoint {
+	max-width: 280px;
+
+	.endpoint-text {
+		display: block;
+		font-family: ui-monospace, monospace;
+		font-size: 0.8rem;
+		overflow: hidden;
+		text-overflow: ellipsis;
+		white-space: nowrap;
+	}
+}
+
+.col-dni,
+.col-ip,
+.col-correlation {
+	font-size: 0.8rem;
+}
+
+.mono {
+	font-family: ui-monospace, monospace;
+	font-size: 0.8rem;
+}
+
+.muted {
+	color: var(--text-color-secondary);
+}
+
+.correlation-chip {
+	cursor: help;
+}
+
+.col-actions {
+	width: 80px;
+	text-align: center;
+}
+
+.empty-message {
+	text-align: center;
+	padding: 3rem 1rem !important;
+	color: var(--text-color-secondary);
+
+	i {
+		font-size: 2rem;
+		display: block;
+		margin-bottom: 0.5rem;
+		color: var(--blue-800);
+	}
+
+	span {
+		display: block;
+		font-weight: 600;
+		margin-bottom: 0.25rem;
+	}
+
+	small {
+		font-size: 0.75rem;
+	}
+}
+// #endregion

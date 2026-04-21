@@ -26,6 +26,7 @@ export const environment = {
 		videoconferencias: true,
 		campusNavigation: false,
 		feedbackReport: true,
+		rateLimitMonitoring: true,
 	},
 
 	// Debug panels (siempre false en producción)

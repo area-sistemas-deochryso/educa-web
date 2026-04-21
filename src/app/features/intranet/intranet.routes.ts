@@ -178,6 +178,18 @@ const experimentalRoutes: Route[] = [
 				},
 			]
 		: []),
+	...(environment.features.rateLimitMonitoring
+		? [
+				{
+					path: 'admin/rate-limit-events',
+					loadComponent: () =>
+						import('./pages/admin/rate-limit-events').then(
+							(m) => m.RateLimitEventsComponent,
+						),
+					title: 'Intranet - Telemetría de Rate Limiting',
+				},
+			]
+		: []),
 ];
 // #endregion
 

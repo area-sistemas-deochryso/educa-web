@@ -79,11 +79,6 @@ export const errorInterceptor: HttpInterceptorFn = (req, next) => {
 			// No special-case here — the generic flow uses UI_ERROR_CODES for the message,
 			// which keeps it aligned with facade error policies (dedup relies on same detail).
 
-			// * 429 Too Many Requests: fully suppress toast — RateLimitBanner handles UX.
-			if (error.status === 429) {
-				return throwError(() => error);
-			}
-
 			errorHandler.handleHttpError(error, {
 				url: req.url,
 				method: req.method,

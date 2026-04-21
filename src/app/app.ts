@@ -3,7 +3,7 @@ import { Component, inject } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
 import { CacheVersionManagerService, CapacitorService, SwService } from '@core/services';
 import { DevtoolsPanelComponent } from '@shared/components/devtools';
-import { RateLimitBannerComponent } from '@shared/components/rate-limit-banner/rate-limit-banner.component';
+import { RateLimitCountdownToastComponent } from '@shared/components/rate-limit-countdown-toast';
 import { ToastContainerComponent } from '@shared/components/toast-container';
 
 // #endregion
@@ -11,7 +11,12 @@ import { ToastContainerComponent } from '@shared/components/toast-container';
 @Component({
 	selector: 'app-root',
 	standalone: true,
-	imports: [RouterOutlet, ToastContainerComponent, DevtoolsPanelComponent, RateLimitBannerComponent],
+	imports: [
+		RouterOutlet,
+		ToastContainerComponent,
+		DevtoolsPanelComponent,
+		RateLimitCountdownToastComponent,
+	],
 	templateUrl: './app.html',
 	styleUrl: './app.scss',
 })

@@ -1,4 +1,5 @@
-// * Tests for rateLimitInterceptor — validates concurrency control, queue, cooldown, and 429 handling.
+// Tests for rateLimitInterceptor: solo cola de concurrencia.
+// NO cooldown global, NO 429 sintéticos, NO banner — el 429 del BE se propaga al caller.
 // #region Imports
 import { TestBed } from '@angular/core/testing';
 import { provideHttpClient, withInterceptors } from '@angular/common/http';
@@ -7,7 +8,6 @@ import { HttpClient, HttpErrorResponse } from '@angular/common/http';
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 
 import { rateLimitInterceptor } from './rate-limit.interceptor';
-import { RateLimitService } from '@core/services/rate-limit/rate-limit.service';
 
 // #endregion
 
@@ -15,20 +15,17 @@ import { RateLimitService } from '@core/services/rate-limit/rate-limit.service';
 describe('rateLimitInterceptor', () => {
 	let http: HttpClient;
 	let httpMock: HttpTestingController;
-	let rateLimitService: RateLimitService;
 
 	beforeEach(() => {
 		TestBed.configureTestingModule({
 			providers: [
 				provideHttpClient(withInterceptors([rateLimitInterceptor])),
 				provideHttpClientTesting(),
-				RateLimitService,
 			],
 		});
 
 		http = TestBed.inject(HttpClient);
 		httpMock = TestBed.inject(HttpTestingController);
-		rateLimitService = TestBed.inject(RateLimitService);
 	});
 
 	afterEach(() => {
@@ -37,23 +34,30 @@ describe('rateLimitInterceptor', () => {
 
 	// #region Non-API pass-through
 	describe('non-API requests', () => {
-		it('should pass through non-API requests without rate limiting', () => {
+		it('pasa non-API requests sin tocar la cola', () => {
 			http.get('/assets/config.json').subscribe();
-			const req = httpMock.expectOne('/assets/config.json');
-			req.flush({});
-		});
-
-		it('should pass through static file requests', () => {
-			http.get('/manifest.webmanifest').subscribe();
-			const req = httpMock.expectOne('/manifest.webmanifest');
-			req.flush({});
+			httpMock.expectOne('/assets/config.json').flush({});
 		});
 	});
 	// #endregion
 
-	// #region Normal API flow
-	describe('normal API requests', () => {
-		it('should allow API requests under concurrency limit', () => {
+	// #region Bypass endpoints
+	describe('endpoints que bypassean la cola', () => {
+		it('reportes-usuario bypassea la cola', () => {
+			http.post('/api/sistema/reportes-usuario', {}).subscribe();
+			httpMock.expectOne('/api/sistema/reportes-usuario').flush({});
+		});
+
+		it('errors bypassea la cola', () => {
+			http.post('/api/sistema/errors', {}).subscribe();
+			httpMock.expectOne('/api/sistema/errors').flush({});
+		});
+	});
+	// #endregion
+
+	// #region Flujo normal
+	describe('API requests', () => {
+		it('permite request cuando está bajo el límite de concurrencia', () => {
 			http.get('/api/test').subscribe((data) => {
 				expect(data).toEqual({ ok: true });
 			});
@@ -63,94 +67,72 @@ describe('rateLimitInterceptor', () => {
 			req.flush({ ok: true });
 		});
 
-		it('should release slot after request completes', () => {
-			// Send first request, complete it
+		it('libera slot al completar permitiendo siguiente request', () => {
 			http.get('/api/first').subscribe();
 			httpMock.expectOne('/api/first').flush({ ok: true });
 
-			// Second request should work fine
 			http.get('/api/second').subscribe();
 			httpMock.expectOne('/api/second').flush({ ok: true });
+		});
+
+		it('permite múltiples concurrentes bajo el límite', () => {
+			for (let i = 0; i < 5; i++) {
+				http.get(`/api/concurrent-${i}`).subscribe();
+			}
+			for (let i = 0; i < 5; i++) {
+				httpMock.expectOne(`/api/concurrent-${i}`).flush({ index: i });
+			}
 		});
 	});
 	// #endregion
 
-	// #region 429 handling
-	describe('429 response handling', () => {
-		it('should activate cooldown on 429 from server', () => {
+	// #region 429 del BE se propaga al caller
+	describe('429 del servidor', () => {
+		it('propaga el 429 del BE al caller sin activar cooldown ni banner', () => {
+			let receivedError: HttpErrorResponse | null = null;
+
 			http.get('/api/test').subscribe({
 				error: (err: HttpErrorResponse) => {
-					expect(err.status).toBe(429);
+					receivedError = err;
 				},
 			});
 
 			httpMock.expectOne('/api/test').flush(
-				{ retryAfterSeconds: 30 },
+				{ mensaje: 'Demasiadas solicitudes', retryAfterSeconds: 30 },
 				{ status: 429, statusText: 'Too Many Requests' },
 			);
 
-			expect(rateLimitService.isCoolingDown()).toBe(true);
-			expect(rateLimitService.remainingSeconds()).toBe(30);
+			expect(receivedError).not.toBeNull();
+			expect(receivedError!.status).toBe(429);
+			// Error cuerpo preservado — el caller decide cómo mostrarlo
+			expect((receivedError!.error as { mensaje: string }).mensaje).toBe('Demasiadas solicitudes');
 		});
 
-		it('should use default 60s cooldown when no Retry-After header or body', () => {
-			http.get('/api/test').subscribe({ error: () => {} });
-
-			httpMock.expectOne('/api/test').flush(null, {
+		it('un 429 en un endpoint NO bloquea otros endpoints', () => {
+			// Primer endpoint recibe 429
+			http.get('/api/reports/heavy').subscribe({ error: () => {} });
+			httpMock.expectOne('/api/reports/heavy').flush(null, {
 				status: 429,
 				statusText: 'Too Many Requests',
 			});
 
-			expect(rateLimitService.isCoolingDown()).toBe(true);
-			expect(rateLimitService.remainingSeconds()).toBe(60);
-		});
-
-		it('should parse Retry-After from response body field', () => {
-			http.get('/api/test').subscribe({ error: () => {} });
-
-			httpMock.expectOne('/api/test').flush(
-				{ retryAfterSeconds: 45 },
-				{ status: 429, statusText: 'Too Many Requests' },
-			);
-
-			expect(rateLimitService.remainingSeconds()).toBe(45);
-		});
-	});
-	// #endregion
-
-	// #region Cooldown blocking
-	describe('cooldown blocking', () => {
-		it('should block ALL API requests during cooldown', () => {
-			rateLimitService.activateCooldown(30);
-
-			http.get('/api/test').subscribe({
-				error: (err: HttpErrorResponse) => {
-					expect(err.status).toBe(429);
-					expect(err.statusText).toContain('cooldown');
-				},
+			// Segundo endpoint sigue funcionando normalmente
+			http.get('/api/other').subscribe((data) => {
+				expect(data).toEqual({ ok: true });
 			});
-
-			// No request should reach the server
-			httpMock.expectNone('/api/test');
-		});
-
-		it('should still allow non-API requests during cooldown', () => {
-			rateLimitService.activateCooldown(30);
-
-			http.get('/assets/i18n/es.json').subscribe();
-
-			const req = httpMock.expectOne('/assets/i18n/es.json');
-			req.flush({});
+			httpMock.expectOne('/api/other').flush({ ok: true });
 		});
 	});
 	// #endregion
 
-	// #region Non-429 errors pass through
-	describe('non-429 errors', () => {
-		it('should pass through 500 errors without activating cooldown', () => {
+	// #region Errores no-429 pasan igual
+	describe('errores no-429', () => {
+		it('500 se propaga al caller', () => {
+			let receivedError: HttpErrorResponse | null = null;
+
 			http.get('/api/test').subscribe({
 				error: (err: HttpErrorResponse) => {
-					expect(err.status).toBe(500);
+					receivedError = err;
 				},
 			});
 
@@ -159,50 +141,7 @@ describe('rateLimitInterceptor', () => {
 				statusText: 'Server Error',
 			});
 
-			expect(rateLimitService.isCoolingDown()).toBe(false);
-		});
-
-		it('should pass through 404 errors without cooldown', () => {
-			http.get('/api/notfound').subscribe({
-				error: (err: HttpErrorResponse) => {
-					expect(err.status).toBe(404);
-				},
-			});
-
-			httpMock.expectOne('/api/notfound').flush(null, {
-				status: 404,
-				statusText: 'Not Found',
-			});
-
-			expect(rateLimitService.isCoolingDown()).toBe(false);
-		});
-	});
-	// #endregion
-
-	// #region Concurrency control
-	describe('concurrency control', () => {
-		it('should allow multiple concurrent requests up to the limit', () => {
-			// Fire 5 concurrent requests — all should reach the server
-			for (let i = 0; i < 5; i++) {
-				http.get(`/api/concurrent-${i}`).subscribe();
-			}
-
-			for (let i = 0; i < 5; i++) {
-				const req = httpMock.expectOne(`/api/concurrent-${i}`);
-				req.flush({ index: i });
-			}
-		});
-
-		it('should release slots allowing queued requests to proceed', () => {
-			// Fire request, complete it, fire another — slot should be free
-			http.get('/api/first').subscribe();
-			httpMock.expectOne('/api/first').flush({});
-
-			http.get('/api/second').subscribe();
-			httpMock.expectOne('/api/second').flush({});
-
-			http.get('/api/third').subscribe();
-			httpMock.expectOne('/api/third').flush({});
+			expect(receivedError!.status).toBe(500);
 		});
 	});
 	// #endregion

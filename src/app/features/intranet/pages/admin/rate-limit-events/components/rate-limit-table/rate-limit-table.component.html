@@ -1,0 +1,96 @@
+<p-table
+	[value]="items()"
+	[paginator]="true"
+	[rows]="20"
+	[rowsPerPageOptions]="[10, 20, 50]"
+	[rowHover]="true"
+	[showCurrentPageReport]="true"
+	currentPageReportTemplate="Mostrando {first} a {last} de {totalRecords}"
+	styleClass="p-datatable-sm"
+>
+	<ng-template #header>
+		<tr>
+			<th class="label-uppercase col-fecha">Fecha</th>
+			<th class="label-uppercase col-method">Método</th>
+			<th class="label-uppercase">Endpoint</th>
+			<th class="label-uppercase col-policy">Policy</th>
+			<th class="label-uppercase col-rol">Rol</th>
+			<th class="label-uppercase col-dni">DNI</th>
+			<th class="label-uppercase col-rechazado">Rechazado</th>
+			<th class="label-uppercase col-ip">IP</th>
+			<th class="label-uppercase col-correlation">CorrelationId</th>
+			<th class="label-uppercase col-actions">Acciones</th>
+		</tr>
+	</ng-template>
+
+	<ng-template #body let-item>
+		<tr>
+			<td class="col-fecha">{{ item.fecha | date: 'dd/MM HH:mm:ss' }}</td>
+			<td class="col-method">
+				<span class="method-badge">{{ item.httpMethod }}</span>
+			</td>
+			<td class="col-endpoint">
+				<span class="endpoint-text" [pTooltip]="item.endpoint" tooltipPosition="top">
+					{{ item.endpoint }}
+				</span>
+			</td>
+			<td class="col-policy">
+				<p-tag [value]="displayPolicy(item.policy)" styleClass="tag-neutral" />
+			</td>
+			<td class="col-rol">
+				@if (item.usuarioRol) {
+					<p-tag [value]="item.usuarioRol" styleClass="tag-neutral" />
+				} @else {
+					<span class="muted">—</span>
+				}
+			</td>
+			<td class="col-dni">
+				<span class="mono">{{ item.usuarioDniMasked ?? '—' }}</span>
+			</td>
+			<td class="col-rechazado">
+				@if (item.fueRechazado) {
+					<p-tag value="SI" severity="danger" />
+				} @else {
+					<p-tag value="NO" styleClass="tag-neutral" />
+				}
+			</td>
+			<td class="col-ip">
+				<span class="mono">{{ item.ipAddress ?? '—' }}</span>
+			</td>
+			<td class="col-correlation">
+				@if (item.correlationId) {
+					<span
+						class="mono correlation-chip"
+						[pTooltip]="item.correlationId"
+						tooltipPosition="top"
+					>
+						{{ truncateCorrelation(item.correlationId) }}
+					</span>
+				} @else {
+					<span class="muted">—</span>
+				}
+			</td>
+			<td class="col-actions">
+				<button
+					pButton
+					icon="pi pi-eye"
+					class="p-button-rounded p-button-text p-button-sm"
+					(click)="onRowSelect(item)"
+					pTooltip="Ver detalle"
+					tooltipPosition="top"
+					[pt]="{ root: { 'aria-label': 'Ver detalle del evento' } }"
+				></button>
+			</td>
+		</tr>
+	</ng-template>
+
+	<ng-template #emptymessage>
+		<tr>
+			<td colspan="10" class="empty-message">
+				<i class="pi pi-shield"></i>
+				<span>No se encontraron eventos de rate limiting</span>
+				<small>Los eventos aparecen cuando se rechazan requests con 429</small>
+			</td>
+		</tr>
+	</ng-template>
+</p-table>

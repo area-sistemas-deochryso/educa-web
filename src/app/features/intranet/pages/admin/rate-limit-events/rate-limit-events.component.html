@@ -1,0 +1,65 @@
+<!-- #region Header -->
+<app-page-header
+	icon="pi pi-shield"
+	title="Telemetría de Rate Limiting"
+	subtitle="Observabilidad de respuestas 429 y consumo de tokens por policy"
+>
+	<button
+		pButton
+		icon="pi pi-refresh"
+		class="p-button-text p-button-sm"
+		(click)="onRefresh()"
+		[loading]="vm().loading || vm().loadingStats"
+		[pt]="{ root: { 'aria-label': 'Refrescar' } }"
+	></button>
+</app-page-header>
+<!-- #endregion -->
+
+<!-- #region Stats -->
+<app-rate-limit-stats
+	[stats]="vm().stats"
+	[loading]="vm().loadingStats"
+/>
+<!-- #endregion -->
+
+<!-- #region Filtros -->
+<app-rate-limit-filters
+	[filter]="vm().filter"
+	(filterChange)="onFilterChange($event)"
+	(clearFilters)="onClearFilters()"
+/>
+<!-- #endregion -->
+
+<!-- #region Error inline -->
+@if (vm().error) {
+	<div class="error-banner">
+		<i class="pi pi-exclamation-triangle"></i>
+		<span>{{ vm().error }}</span>
+	</div>
+}
+<!-- #endregion -->
+
+<!-- #region Tabla -->
+@if (vm().tableReady) {
+	<section class="table-section">
+		<app-rate-limit-table
+			[items]="vm().items"
+			(rowSelected)="onRowSelected($event)"
+		/>
+	</section>
+} @else {
+	<app-table-skeleton [columns]="tableSkeletonColumns" [rows]="10" />
+}
+<!-- #endregion -->
+
+<!-- #region Drawer -->
+<app-rate-limit-detail-drawer
+	[visible]="vm().drawerVisible"
+	[item]="vm().selectedItem"
+	(visibleChange)="onDrawerVisibleChange($event)"
+/>
+<!-- #endregion -->
+
+<!-- #region Toast (para copy-to-clipboard) -->
+<p-toast />
+<!-- #endregion -->

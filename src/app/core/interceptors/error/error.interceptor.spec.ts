@@ -163,21 +163,24 @@ describe('errorInterceptor', () => {
 	});
 	// #endregion
 
-	// #region 429 suppression
+	// #region 429 Too Many Requests — tratado como cualquier otro error
+	// Tras eliminar el banner global de rate-limit, el 429 ya no tiene tratamiento
+	// especial: pasa por handleHttpError como cualquier otro error HTTP y el caller
+	// recibe el error para manejarlo en contexto.
 	describe('429 Too Many Requests', () => {
-		it('should suppress errorHandler toast for 429', () => {
+		it('delega al errorHandler con el mensaje del BE', () => {
 			httpClient.get('/api/heavy').subscribe({
 				error: (err) => {
 					expect(err.status).toBe(429);
 				},
 			});
 
-			httpMock.expectOne('/api/heavy').flush(null, {
-				status: 429,
-				statusText: 'Too Many Requests',
-			});
+			httpMock.expectOne('/api/heavy').flush(
+				{ mensaje: 'Demasiadas solicitudes', retryAfterSeconds: 30 },
+				{ status: 429, statusText: 'Too Many Requests' },
+			);
 
-			expect(errorHandlerMock.handleHttpError).not.toHaveBeenCalled();
+			expect(errorHandlerMock.handleHttpError).toHaveBeenCalledTimes(1);
 		});
 	});
 	// #endregion

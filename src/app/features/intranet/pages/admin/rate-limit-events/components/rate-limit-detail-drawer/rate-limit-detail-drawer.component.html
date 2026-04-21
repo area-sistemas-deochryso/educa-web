@@ -1,0 +1,118 @@
+<p-drawer
+	[visible]="visible()"
+	(visibleChange)="onVisibleChange($event)"
+	position="right"
+	[style]="{ width: '480px' }"
+	[modal]="true"
+>
+	<ng-template pTemplate="header">
+		<div class="drawer-header">
+			<i class="pi pi-shield"></i>
+			<span>Detalle del evento</span>
+		</div>
+	</ng-template>
+
+	@if (item()) {
+		<div class="detail-content">
+			<!-- Banner principal -->
+			<div class="detail-banner" [class.detail-banner--rejected]="item()!.fueRechazado">
+				<div class="banner-icon">
+					<i [class]="item()!.fueRechazado ? 'pi pi-ban' : 'pi pi-exclamation-circle'"></i>
+				</div>
+				<div class="banner-text">
+					<div class="banner-title">
+						{{ item()!.fueRechazado ? 'Rechazado (429)' : 'Early warning' }}
+					</div>
+					<div class="banner-subtitle">
+						{{ item()!.fecha | date: 'dd/MM/yyyy HH:mm:ss' }}
+					</div>
+				</div>
+			</div>
+
+			<!-- Info principal -->
+			<div class="detail-section">
+				<h4><i class="pi pi-link"></i> Request</h4>
+				<div class="detail-grid">
+					<div class="detail-row">
+						<span class="detail-label">Método</span>
+						<span class="detail-value mono">{{ item()!.httpMethod }}</span>
+					</div>
+					<div class="detail-row">
+						<span class="detail-label">Endpoint</span>
+						<span class="detail-value mono" [pTooltip]="item()!.endpoint">
+							{{ item()!.endpoint }}
+						</span>
+					</div>
+					<div class="detail-row">
+						<span class="detail-label">Policy</span>
+						<p-tag [value]="displayPolicy(item()!.policy)" styleClass="tag-neutral" />
+					</div>
+				</div>
+			</div>
+
+			<!-- Usuario -->
+			<div class="detail-section">
+				<h4><i class="pi pi-user"></i> Usuario</h4>
+				<div class="detail-grid">
+					<div class="detail-row">
+						<span class="detail-label">Rol</span>
+						<span class="detail-value">{{ item()!.usuarioRol ?? '—' }}</span>
+					</div>
+					<div class="detail-row">
+						<span class="detail-label">DNI</span>
+						<span class="detail-value mono">{{ item()!.usuarioDniMasked ?? '—' }}</span>
+					</div>
+					<div class="detail-row">
+						<span class="detail-label">IP</span>
+						<span class="detail-value mono">{{ item()!.ipAddress ?? '—' }}</span>
+					</div>
+				</div>
+			</div>
+
+			<!-- Consumo (si aplica) -->
+			@if (item()!.limiteEfectivo !== null || item()!.tokensConsumidos !== null) {
+				<div class="detail-section">
+					<h4><i class="pi pi-chart-bar"></i> Consumo</h4>
+					<div class="detail-grid">
+						<div class="detail-row">
+							<span class="detail-label">Límite efectivo</span>
+							<span class="detail-value mono">{{ item()!.limiteEfectivo ?? '—' }}</span>
+						</div>
+						<div class="detail-row">
+							<span class="detail-label">Tokens consumidos</span>
+							<span class="detail-value mono">{{ item()!.tokensConsumidos ?? '—' }}</span>
+						</div>
+					</div>
+				</div>
+			}
+
+			<!-- CorrelationId con acciones -->
+			@if (item()!.correlationId) {
+				<div class="detail-section">
+					<h4><i class="pi pi-compass"></i> Correlación</h4>
+					<div class="correlation-block">
+						<code class="correlation-code">{{ item()!.correlationId }}</code>
+						<div class="correlation-actions">
+							<button
+								pButton
+								icon="pi pi-copy"
+								label="Copiar"
+								class="p-button-text p-button-sm"
+								(click)="onCopyCorrelation(item()!.correlationId)"
+								[pt]="{ root: { 'aria-label': 'Copiar correlationId' } }"
+							></button>
+							<button
+								pButton
+								icon="pi pi-external-link"
+								label="Buscar en ErrorLog"
+								class="p-button-outlined p-button-sm"
+								(click)="onBuscarEnErrorLog(item()!.correlationId)"
+								[pt]="{ root: { 'aria-label': 'Buscar en trazabilidad de errores' } }"
+							></button>
+						</div>
+					</div>
+				</div>
+			}
+		</div>
+	}
+</p-drawer>

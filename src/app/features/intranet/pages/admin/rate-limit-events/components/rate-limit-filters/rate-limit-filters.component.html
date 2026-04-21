@@ -1,0 +1,59 @@
+<div class="filters-bar">
+	<div class="search-box">
+		<i class="pi pi-search"></i>
+		<input
+			type="text"
+			pInputText
+			placeholder="Buscar por endpoint..."
+			[ngModel]="endpointSearch()"
+			(ngModelChange)="onEndpointChange($event)"
+		/>
+	</div>
+
+	<div class="filter-dropdowns">
+		<p-select
+			[options]="rolOptions"
+			[ngModel]="filter().rol"
+			(ngModelChange)="onRolChange($event)"
+			placeholder="Rol"
+			appendTo="body"
+		/>
+
+		<p-select
+			[options]="policyOptions"
+			[ngModel]="filter().policy"
+			(ngModelChange)="onPolicyChange($event)"
+			placeholder="Policy"
+			appendTo="body"
+		/>
+
+		<p-datepicker
+			selectionMode="range"
+			[ngModel]="fechaRango()"
+			(ngModelChange)="onFechaRangoChange($event)"
+			[showIcon]="true"
+			appendTo="body"
+			placeholder="Rango de fechas"
+			dateFormat="dd/mm/yy"
+			[readonlyInput]="true"
+		/>
+
+		<label class="toggle-label">
+			<p-toggleswitch
+				[ngModel]="filter().soloRechazados ?? false"
+				(ngModelChange)="onSoloRechazadosChange($event)"
+			/>
+			<span>Solo rechazados</span>
+		</label>
+	</div>
+
+	<button
+		pButton
+		icon="pi pi-filter-slash"
+		class="p-button-text p-button-sm btn-clear"
+		pTooltip="Limpiar filtros"
+		tooltipPosition="top"
+		(click)="onClear()"
+		[pt]="{ root: { 'aria-label': 'Limpiar filtros' } }"
+	></button>
+</div>
