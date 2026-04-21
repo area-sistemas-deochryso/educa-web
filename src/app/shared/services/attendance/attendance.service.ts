@@ -160,8 +160,8 @@ export class AttendanceService {
 		return this.directorApi.descargarPdfTodosSalonesMes(mes, anio);
 	}
 
-	descargarPdfTodosSalonesAnio(anio?: number): Observable<Blob> {
-		return this.directorApi.descargarPdfTodosSalonesAnio(anio);
+	descargarPdfTodosSalonesAnio(anio?: number, periodo?: string): Observable<Blob> {
+		return this.directorApi.descargarPdfTodosSalonesAnio(anio, periodo);
 	}
 
 	descargarExcelAsistenciaDia(grado: string, seccion: string, fecha?: Date): Observable<Blob> {
@@ -207,8 +207,8 @@ export class AttendanceService {
 		return this.directorApi.descargarExcelTodosSalonesMes(mes, anio);
 	}
 
-	descargarExcelTodosSalonesAnio(anio?: number): Observable<Blob> {
-		return this.directorApi.descargarExcelTodosSalonesAnio(anio);
+	descargarExcelTodosSalonesAnio(anio?: number, periodo?: string): Observable<Blob> {
+		return this.directorApi.descargarExcelTodosSalonesAnio(anio, periodo);
 	}
 
 	getSalonesDirector(): Observable<SalonProfesor[]> {

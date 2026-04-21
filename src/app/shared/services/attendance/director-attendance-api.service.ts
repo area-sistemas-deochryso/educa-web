@@ -254,12 +254,12 @@ export class DirectorAttendanceApiService {
 		return this.downloadConsolidado('mes', 'excel', this.mesAnioParams(mes, anio));
 	}
 
-	descargarPdfTodosSalonesAnio(anio?: number): Observable<Blob> {
-		return this.downloadConsolidado('anio', 'pdf', this.anioParams(anio));
+	descargarPdfTodosSalonesAnio(anio?: number, periodo?: string): Observable<Blob> {
+		return this.downloadConsolidado('anio', 'pdf', this.anioParams(anio, periodo));
 	}
 
-	descargarExcelTodosSalonesAnio(anio?: number): Observable<Blob> {
-		return this.downloadConsolidado('anio', 'excel', this.anioParams(anio));
+	descargarExcelTodosSalonesAnio(anio?: number, periodo?: string): Observable<Blob> {
+		return this.downloadConsolidado('anio', 'excel', this.anioParams(anio, periodo));
 	}
 
 	private downloadReport(
@@ -317,9 +317,10 @@ export class DirectorAttendanceApiService {
 		return params;
 	}
 
-	private anioParams(anio?: number): Record<string, string> {
+	private anioParams(anio?: number, periodo?: string): Record<string, string> {
 		const params: Record<string, string> = {};
 		if (anio !== undefined) params['anio'] = anio.toString();
+		if (periodo) params['periodo'] = periodo;
 		return params;
 	}
 

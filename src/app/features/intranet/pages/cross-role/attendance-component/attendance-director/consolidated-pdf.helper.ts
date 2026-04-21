@@ -9,7 +9,27 @@ export type TipoReporte =
 	| 'todos-dia'
 	| 'todos-semana'
 	| 'todos-mes'
-	| 'todos-anio';
+	| 'todos-anio'
+	| 'todos-anio-verano'
+	| 'todos-anio-regular';
+
+/**
+ * Plan 25 Chat 5B — mapea el tipo de reporte anual al query param `periodo`
+ * aceptado por el backend (ver <c>Constants/Asistencias/PeriodoAnual</c>).
+ * Tipos no anuales devuelven <c>undefined</c>.
+ */
+export function getPeriodoFromTipo(tipo: TipoReporte): string | undefined {
+	switch (tipo) {
+		case 'todos-anio':
+			return 'ambos';
+		case 'todos-anio-verano':
+			return 'verano';
+		case 'todos-anio-regular':
+			return 'regular';
+		default:
+			return undefined;
+	}
+}
 
 export interface TipoReporteOption {
 	label: string;
@@ -36,7 +56,10 @@ export const TIPO_REPORTE_OPTIONS: TipoReporteGroup[] = [
 			{ label: 'Día', value: 'todos-dia' },
 			{ label: 'Semana', value: 'todos-semana' },
 			{ label: 'Mes', value: 'todos-mes' },
-			{ label: 'Año', value: 'todos-anio' },
+			// Plan 25 Chat 5B: el año se divide en dos periodos.
+			{ label: 'Año (ambos periodos)', value: 'todos-anio' },
+			{ label: 'Año — solo Verano (Ene-Feb)', value: 'todos-anio-verano' },
+			{ label: 'Año — solo Regular (Mar-Dic)', value: 'todos-anio-regular' },
 		],
 	},
 ];
@@ -66,7 +89,9 @@ export function getTodosSalonesObservable(
 		case 'todos-mes':
 			return service.descargarPdfTodosSalonesMes(mes, anio);
 		case 'todos-anio':
-			return service.descargarPdfTodosSalonesAnio(anio);
+		case 'todos-anio-verano':
+		case 'todos-anio-regular':
+			return service.descargarPdfTodosSalonesAnio(anio, getPeriodoFromTipo(tipo));
 		default:
 			return null;
 	}
@@ -88,7 +113,9 @@ export function getTodosSalonesExcelObservable(
 		case 'todos-mes':
 			return service.descargarExcelTodosSalonesMes(mes, anio);
 		case 'todos-anio':
-			return service.descargarExcelTodosSalonesAnio(anio);
+		case 'todos-anio-verano':
+		case 'todos-anio-regular':
+			return service.descargarExcelTodosSalonesAnio(anio, getPeriodoFromTipo(tipo));
 		default:
 			return null;
 	}
@@ -133,7 +160,11 @@ export function getConsolidadoFileName(
 		case 'todos-mes':
 			return `Reporte_TodosSalones_${anio}-${mes.toString().padStart(2, '0')}.${extension}`;
 		case 'todos-anio':
-			return `Reporte_TodosSalones_${anio}.${extension}`;
+			return `Reporte_TodosSalones_${anio}_ambos.${extension}`;
+		case 'todos-anio-verano':
+			return `Reporte_TodosSalones_${anio}_verano.${extension}`;
+		case 'todos-anio-regular':
+			return `Reporte_TodosSalones_${anio}_regular.${extension}`;
 		default:
 			return `Reporte_TodosSalones.${extension}`;
 	}

@@ -109,11 +109,25 @@ describe('getTodosSalonesObservable', () => {
 		expect(service.descargarPdfTodosSalonesMes).toHaveBeenCalledWith(4, 2026);
 	});
 
-	it('routes "todos-anio" with anio derived from fecha', () => {
+	it('routes "todos-anio" with anio + periodo "ambos" (Plan 25 Chat 5B)', () => {
 		const service = mkService();
 		getTodosSalonesObservable(service, 'todos-anio', fecha);
 
-		expect(service.descargarPdfTodosSalonesAnio).toHaveBeenCalledWith(2026);
+		expect(service.descargarPdfTodosSalonesAnio).toHaveBeenCalledWith(2026, 'ambos');
+	});
+
+	it('routes "todos-anio-verano" with periodo "verano"', () => {
+		const service = mkService();
+		getTodosSalonesObservable(service, 'todos-anio-verano', fecha);
+
+		expect(service.descargarPdfTodosSalonesAnio).toHaveBeenCalledWith(2026, 'verano');
+	});
+
+	it('routes "todos-anio-regular" with periodo "regular"', () => {
+		const service = mkService();
+		getTodosSalonesObservable(service, 'todos-anio-regular', fecha);
+
+		expect(service.descargarPdfTodosSalonesAnio).toHaveBeenCalledWith(2026, 'regular');
 	});
 
 	it('returns null for "salon-*" tipos (only handles consolidated)', () => {
@@ -164,12 +178,34 @@ describe('getTodosSalonesExcelObservable', () => {
 			descargarExcelTodosSalonesMes: vi.fn().mockReturnValue(of(new Blob())),
 			descargarExcelTodosSalonesAnio: vi.fn().mockReturnValue(of(new Blob())),
 		} as Partial<AttendanceService> as AttendanceService;
-		const tipos = ['todos-dia', 'todos-semana', 'todos-mes', 'todos-anio'] as const;
+		const tipos = [
+			'todos-dia', 'todos-semana', 'todos-mes',
+			'todos-anio', 'todos-anio-verano', 'todos-anio-regular',
+		] as const;
 
 		for (const tipo of tipos) {
 			expect(getTodosSalonesObservable(service, tipo, fecha)).not.toBeNull();
 			expect(getTodosSalonesExcelObservable(service, tipo, fecha)).not.toBeNull();
 		}
+	});
+});
+
+describe('getConsolidadoFileName — Plan 25 Chat 5B periodo suffix', () => {
+	const fecha = new Date(2026, 3, 20);
+
+	it('appends "ambos" suffix for todos-anio default', () => {
+		expect(getConsolidadoFileName('todos-anio', fecha, 'xlsx'))
+			.toBe('Reporte_TodosSalones_2026_ambos.xlsx');
+	});
+
+	it('appends "verano" suffix for todos-anio-verano', () => {
+		expect(getConsolidadoFileName('todos-anio-verano', fecha, 'pdf'))
+			.toBe('Reporte_TodosSalones_2026_verano.pdf');
+	});
+
+	it('appends "regular" suffix for todos-anio-regular', () => {
+		expect(getConsolidadoFileName('todos-anio-regular', fecha, 'xlsx'))
+			.toBe('Reporte_TodosSalones_2026_regular.xlsx');
 	});
 });
 
@@ -190,8 +226,8 @@ describe('getConsolidadoFileName', () => {
 			.toBe('Reporte_TodosSalones_2026-04.xlsx');
 	});
 
-	it('formats consolidado anual with just year', () => {
+	it('formats consolidado anual with "ambos" periodo suffix (Chat 5B)', () => {
 		expect(getConsolidadoFileName('todos-anio', fecha, 'xlsx'))
-			.toBe('Reporte_TodosSalones_2026.xlsx');
+			.toBe('Reporte_TodosSalones_2026_ambos.xlsx');
 	});
 });
