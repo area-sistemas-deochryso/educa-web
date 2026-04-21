@@ -1,3 +1,4 @@
+/* eslint-disable max-lines -- Razón: vista admin con 2 modos (día/mes) + datos de profesor + tablas ingresos/salidas + descarga PDF/Excel. La lógica vive cohesionada en el componente; separarla no mejora claridad. */
 import {
 	ChangeDetectionStrategy,
 	Component,
@@ -43,18 +44,12 @@ import { MenuItem } from 'primeng/api';
 import { MenuModule } from 'primeng/menu';
 import { TooltipModule } from 'primeng/tooltip';
 
+import { buildPdfExcelMenuItems } from '../consolidated-pdf.helper';
+
 /**
- * Vista "Profesores" del panel admin de asistencia (Plan 21 Chat 7 — rediseño).
- *
- * Armonizada con "Estudiantes": leyenda + day-list con stat-cards (modo día)
- * + calendario mensual con ingresos/salidas (modo mes). Responde al pill
- * día/mes del header cross-role vía `setViewMode` llamado por el shell.
- *
- * Diferencias vs "Estudiantes":
- * - Sin grado/sección — todos los profesores activos de la sede en una sola lista.
- * - Día consume `GET /director/profesores-asistencia-dia` (Chat 7.A).
- * - Mes selecciona un profesor del listado y muestra sus tablas ingresos/salidas.
- * - Justificación deshabilitada por UI (INV-AD06 queda para chat posterior).
+ * Vista "Profesores" del panel admin (Plan 21 Chat 7). Sin grado/sección — lista todos
+ * los profesores activos. Día: /director/profesores-asistencia-dia. Mes: tablas
+ * ingresos/salidas del profesor seleccionado. INV-AD06: sin justificación en UI.
  */
 @Component({
 	selector: 'app-attendance-director-profesores',
@@ -131,39 +126,26 @@ export class AttendanceDirectorProfesoresComponent implements OnInit {
 	);
 	// #endregion
 
-	// #region PDF
+	// #region PDF/Excel
 	readonly pdfMenuItems = computed<MenuItem[]>(() => {
 		if (this.viewMode() === VIEW_MODE.Mes) {
 			const profesor = this.selectedProfesor();
 			if (!profesor) return [];
 			const { selectedMonth, selectedYear } = this.ingresos();
-			return [
-				{
-					label: 'Ver PDF (mes)',
-					icon: 'pi pi-eye',
-					command: () => this.verPdfProfesorMes(profesor.dni, selectedMonth, selectedYear),
-				},
-				{
-					label: 'Descargar PDF (mes)',
-					icon: 'pi pi-download',
-					command: () =>
-						this.descargarPdfProfesorMes(profesor.dni, selectedMonth, selectedYear),
-				},
-			];
+			return buildPdfExcelMenuItems({
+				labelSuffix: '(mes)',
+				verPdf: () => this.verPdfProfesorMes(profesor.dni, selectedMonth, selectedYear),
+				descargarPdf: () => this.descargarPdfProfesorMes(profesor.dni, selectedMonth, selectedYear),
+				descargarExcel: () => this.descargarExcelProfesorMes(profesor.dni, selectedMonth, selectedYear),
+			});
 		}
 
-		return [
-			{
-				label: 'Ver reporte del día',
-				icon: 'pi pi-eye',
-				command: () => this.verPdfReporteDia(),
-			},
-			{
-				label: 'Descargar reporte del día',
-				icon: 'pi pi-download',
-				command: () => this.descargarPdfReporteDia(),
-			},
-		];
+		return buildPdfExcelMenuItems({
+			labelSuffix: '(día)',
+			verPdf: () => this.verPdfReporteDia(),
+			descargarPdf: () => this.descargarPdfReporteDia(),
+			descargarExcel: () => this.descargarExcelReporteDia(),
+		});
 	});
 	// #endregion
 
@@ -368,6 +350,27 @@ export class AttendanceDirectorProfesoresComponent implements OnInit {
 				finalize(() => this.downloadingPdf.set(false)),
 			)
 			.subscribe({ next: handle, error: (err) => this.errorHandler.handleHttpError(err) });
+	}
+	// #endregion
+
+	// #region Excel
+	private descargarExcelReporteDia(): void {
+		const fecha = this.fechaDia();
+		this.runPdf$(
+			this.api.descargarExcelReporteFiltradoProfesores(fecha, fecha, null),
+			(blob) =>
+				downloadBlob(
+					blob,
+					`Reporte_Profesores_${formatDateLocalIso(fecha)}.xlsx`,
+				),
+		);
+	}
+
+	private descargarExcelProfesorMes(dni: string, mes: number, anio: number): void {
+		const mesPad = mes.toString().padStart(2, '0');
+		this.runPdf$(this.api.descargarExcelProfesorMes(dni, mes, anio), (blob) =>
+			downloadBlob(blob, `Asistencia_Profesor_${dni}_${anio}-${mesPad}.xlsx`),
+		);
 	}
 	// #endregion
 }

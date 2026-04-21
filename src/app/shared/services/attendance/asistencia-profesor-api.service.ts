@@ -177,6 +177,44 @@ export class AsistenciaProfesorApiService {
 	}
 
 	// #endregion
+	// #region Descargas Excel
+
+	descargarExcelProfesorDia(dni: string, fecha: Date): Observable<Blob> {
+		const params = { fecha: this.formatDateLocal(fecha) };
+		return this.http.get(`${this.apiUrl}/profesor/${dni}/dia/excel`, {
+			params,
+			responseType: 'blob',
+		});
+	}
+
+	descargarExcelProfesorMes(dni: string, mes?: number, anio?: number): Observable<Blob> {
+		const params: Record<string, string> = {};
+		if (mes !== undefined) params['mes'] = mes.toString();
+		if (anio !== undefined) params['anio'] = anio.toString();
+
+		return this.http.get(`${this.apiUrl}/profesor/${dni}/mes/excel`, {
+			params,
+			responseType: 'blob',
+		});
+	}
+
+	descargarExcelReporteFiltradoProfesores(
+		fechaInicio?: Date,
+		fechaFin?: Date,
+		estado?: string | null,
+	): Observable<Blob> {
+		const params: Record<string, string> = {};
+		if (fechaInicio) params['fechaInicio'] = this.formatDateLocal(fechaInicio);
+		if (fechaFin) params['fechaFin'] = this.formatDateLocal(fechaFin);
+		if (estado) params['estado'] = estado;
+
+		return this.http.get(`${this.apiUrl}/profesores/reporte-filtrado/excel`, {
+			params,
+			responseType: 'blob',
+		});
+	}
+
+	// #endregion
 	// #region Helpers privados
 
 	private formatDateLocal(fecha: Date): string {

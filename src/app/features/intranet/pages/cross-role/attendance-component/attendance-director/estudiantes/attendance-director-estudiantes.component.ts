@@ -1,3 +1,4 @@
+/* eslint-disable max-lines -- Razón: componente orquesta 6 variantes de descarga (día/mes/periodo × salón/consolidado) × 2 formatos (PDF/Excel) + selector grado-sección + justificación. Dispersar en helpers externos fragmentaría la lógica cohesiva del componente. */
 import { AttendanceService, GradoSeccion, StorageService } from '@core/services';
 import { downloadBlob, viewBlobInNewTab } from '@core/helpers';
 import { periodoEnMes, filtrarPorPeriodoAcademico } from '@shared/models';
@@ -29,7 +30,9 @@ import {
 	TipoReporte,
 	TipoReporteGroup,
 	TIPO_REPORTE_OPTIONS,
+	buildPdfExcelMenuItems,
 	getTodosSalonesObservable,
+	getTodosSalonesExcelObservable,
 	getConsolidadoFileName,
 } from '../consolidated-pdf.helper';
 
@@ -192,46 +195,29 @@ export class AttendanceDirectorEstudiantesComponent implements OnInit {
 	}
 
 	// #endregion
-	// #region PDF menu
+	// #region PDF/Excel menu
 	readonly pdfMenuItems = computed<MenuItem[]>(() => {
-		const isMonthMode = this.view.viewMode() === 'mes';
-
-		if (isMonthMode) {
+		if (this.view.viewMode() === 'mes') {
 			const isPeriodo = this.view.monthSubMode() === 'periodo';
 			const { selectedMonth, selectedYear } = this.view.ingresos();
-			return [
-				{
-					label: 'Ver PDF',
-					icon: 'pi pi-eye',
-					command: () =>
-						isPeriodo
-							? this.view.pdf.verPeriodoFromContext(this.view.periodoInicio(), selectedYear, this.view.periodoFin())
-							: this.view.pdf.verMesFromContext(selectedMonth, selectedYear),
-				},
-				{
-					label: 'Descargar PDF',
-					icon: 'pi pi-download',
-					command: () =>
-						isPeriodo
-							? this.view.pdf.descargarPeriodoFromContext(this.view.periodoInicio(), selectedYear, this.view.periodoFin())
-							: this.view.pdf.descargarMesFromContext(selectedMonth, selectedYear),
-				},
-			];
+			const pdf = this.view.pdf;
+			const dispatch = <T>(mes: (m: number, a: number) => T, periodo: (mi: number, a: number, mf: number) => T) =>
+				isPeriodo
+					? periodo(this.view.periodoInicio(), selectedYear, this.view.periodoFin())
+					: mes(selectedMonth, selectedYear);
+			return buildPdfExcelMenuItems({
+				verPdf: () => dispatch(pdf.verMesFromContext.bind(pdf), pdf.verPeriodoFromContext.bind(pdf)),
+				descargarPdf: () => dispatch(pdf.descargarMesFromContext.bind(pdf), pdf.descargarPeriodoFromContext.bind(pdf)),
+				descargarExcel: () => dispatch(pdf.descargarExcelMesFromContext.bind(pdf), pdf.descargarExcelPeriodoFromContext.bind(pdf)),
+			});
 		}
 
 		const tipo = this.tipoReporte();
-		return [
-			{
-				label: 'Ver PDF',
-				icon: 'pi pi-eye',
-				command: () => this.verPdf(tipo),
-			},
-			{
-				label: 'Descargar PDF',
-				icon: 'pi pi-download',
-				command: () => this.descargarPdf(tipo),
-			},
-		];
+		return buildPdfExcelMenuItems({
+			verPdf: () => this.verPdf(tipo),
+			descargarPdf: () => this.descargarPdf(tipo),
+			descargarExcel: () => this.descargarExcel(tipo),
+		});
 	});
 
 	togglePdfMenu(event: Event): void {
@@ -289,15 +275,35 @@ export class AttendanceDirectorEstudiantesComponent implements OnInit {
 		}
 	}
 
+	private descargarExcel(tipo: TipoReporte): void {
+		const fecha = this.view.fechaDia();
+		switch (tipo) {
+			case 'salon-dia':
+				return this.view.pdf.descargarExcelAsistenciaDia(fecha);
+			case 'salon-mes':
+				return this.view.pdf.descargarExcelSalonMes(fecha);
+			case 'salon-anio':
+				return this.view.pdf.descargarExcelSalonAnio(fecha);
+			default:
+				return this.descargarExcelConsolidado();
+		}
+	}
+
 	// #endregion
-	// #region PDF Consolidados (todos los salones)
+	// #region PDF/Excel Consolidados (todos los salones)
 	private verPdfConsolidado(): void {
 		this.runConsolidadoPdf((blob) => viewBlobInNewTab(blob));
 	}
 
 	private descargarPdfConsolidado(): void {
 		this.runConsolidadoPdf((blob) =>
-			downloadBlob(blob, getConsolidadoFileName(this.tipoReporte(), this.view.fechaDia())),
+			downloadBlob(blob, getConsolidadoFileName(this.tipoReporte(), this.view.fechaDia(), 'pdf')),
+		);
+	}
+
+	private descargarExcelConsolidado(): void {
+		this.runConsolidadoExcel((blob) =>
+			downloadBlob(blob, getConsolidadoFileName(this.tipoReporte(), this.view.fechaDia(), 'xlsx')),
 		);
 	}
 
@@ -320,12 +326,30 @@ export class AttendanceDirectorEstudiantesComponent implements OnInit {
 			.subscribe({ next: handle });
 	}
 
+	private runConsolidadoExcel(handle: (blob: Blob) => void): void {
+		this.downloadingPdfConsolidado.set(true);
+		const obs$ = getTodosSalonesExcelObservable(
+			this.asistenciaService,
+			this.tipoReporte(),
+			this.view.fechaDia(),
+		);
+		if (!obs$) {
+			this.downloadingPdfConsolidado.set(false);
+			return;
+		}
+		obs$
+			.pipe(
+				takeUntilDestroyed(this.destroyRef),
+				finalize(() => this.downloadingPdfConsolidado.set(false)),
+			)
+			.subscribe({ next: handle });
+	}
+
 	// #endregion
-	// #region Helpers privados
+
 	private getSelectorContext(): SelectorContext | null {
 		const gs = this.selectedGradoSeccion();
 		if (!gs) return null;
 		return { grado: gs.grado, gradoCodigo: gs.gradoCodigo, seccion: gs.seccion };
 	}
-	// #endregion
 }

@@ -28,6 +28,8 @@ import { TooltipModule } from 'primeng/tooltip';
 import { finalize, forkJoin } from 'rxjs';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
+import { buildPdfExcelMenuItems } from '../../attendance-director/consolidated-pdf.helper';
+
 /**
  * Vista "Mis estudiantes" del panel profesor (Plan 21 Chat 4).
  * Extraída del antiguo AttendanceProfesorComponent para permitir que el shell
@@ -248,18 +250,19 @@ export class AttendanceProfesorEstudiantesComponent implements OnInit {
 		const isPeriodo = this.view.monthSubMode() === 'periodo';
 		const { selectedMonth, selectedYear } = this.view.ingresos();
 		const fecha = this.view.pdfFecha();
+		const pdf = this.view.pdf;
 
 		const ver = () => isMonth
-			? (isPeriodo ? this.view.pdf.verPeriodoFromContext(this.view.periodoInicio(), selectedYear, this.view.periodoFin()) : this.view.pdf.verMesFromContext(selectedMonth, selectedYear))
-			: this.view.pdf.verPdfAsistenciaDia(fecha);
-		const desc = () => isMonth
-			? (isPeriodo ? this.view.pdf.descargarPeriodoFromContext(this.view.periodoInicio(), selectedYear, this.view.periodoFin()) : this.view.pdf.descargarMesFromContext(selectedMonth, selectedYear))
-			: this.view.pdf.descargarPdfAsistenciaDia(fecha);
+			? (isPeriodo ? pdf.verPeriodoFromContext(this.view.periodoInicio(), selectedYear, this.view.periodoFin()) : pdf.verMesFromContext(selectedMonth, selectedYear))
+			: pdf.verPdfAsistenciaDia(fecha);
+		const descPdf = () => isMonth
+			? (isPeriodo ? pdf.descargarPeriodoFromContext(this.view.periodoInicio(), selectedYear, this.view.periodoFin()) : pdf.descargarMesFromContext(selectedMonth, selectedYear))
+			: pdf.descargarPdfAsistenciaDia(fecha);
+		const descExcel = () => isMonth
+			? (isPeriodo ? pdf.descargarExcelPeriodoFromContext(this.view.periodoInicio(), selectedYear, this.view.periodoFin()) : pdf.descargarExcelMesFromContext(selectedMonth, selectedYear))
+			: pdf.descargarExcelAsistenciaDia(fecha);
 
-		return [
-			{ label: 'Ver PDF', icon: 'pi pi-eye', command: ver },
-			{ label: 'Descargar PDF', icon: 'pi pi-download', command: desc },
-		];
+		return buildPdfExcelMenuItems({ verPdf: ver, descargarPdf: descPdf, descargarExcel: descExcel });
 	});
 
 	togglePdfMenu(event: Event): void {

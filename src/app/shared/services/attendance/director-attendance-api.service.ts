@@ -196,144 +196,131 @@ export class DirectorAttendanceApiService {
 
 	// #endregion
 
-	// #region Descargas PDF
+	// #region Descargas PDF / Excel
+	// Cada método público delega a `downloadReport` con el sufijo de formato.
+	// Para agregar un formato nuevo (csv, etc.), duplicar el método con '/csv'.
 
-	/**
-	 * Descargar PDF de asistencia del dia
-	 * GET /api/ConsultaAsistencia/director/asistencia-dia/pdf?grado={grado}&seccion={seccion}&fecha={fecha}
-	 */
 	descargarPdfAsistenciaDia(grado: string, seccion: string, fecha?: Date): Observable<Blob> {
-		const params: Record<string, string> = { grado, seccion };
-
-		if (fecha) {
-			params['fecha'] = this.formatDateLocal(fecha);
-		}
-
-		return this.http.get(`${this.apiUrl}/director/asistencia-dia/pdf`, {
-			params,
-			responseType: 'blob',
-		});
+		return this.downloadReport('asistencia-dia', 'pdf', this.diaParams(grado, seccion, fecha));
 	}
 
-	/**
-	 * Descargar PDF mensual de asistencia de un salon especifico
-	 * GET /api/ConsultaAsistencia/director/asistencia-mes/pdf?grado={grado}&seccion={seccion}&mes={mes}&anio={anio}
-	 */
-	descargarPdfAsistenciaMes(
-		grado: string,
-		seccion: string,
-		mes: number,
-		anio: number,
-	): Observable<Blob> {
-		const params: Record<string, string> = {
-			grado,
-			seccion,
-			mes: mes.toString(),
-			anio: anio.toString(),
-		};
-
-		return this.http.get(`${this.apiUrl}/director/asistencia-mes/pdf`, {
-			params,
-			responseType: 'blob',
-		});
+	descargarExcelAsistenciaDia(grado: string, seccion: string, fecha?: Date): Observable<Blob> {
+		return this.downloadReport('asistencia-dia', 'excel', this.diaParams(grado, seccion, fecha));
 	}
 
-	/**
-	 * Descargar PDF de asistencia por periodo (rango de meses) de un salon
-	 * GET /api/ConsultaAsistencia/director/asistencia-periodo/pdf
-	 */
+	descargarPdfAsistenciaMes(grado: string, seccion: string, mes: number, anio: number): Observable<Blob> {
+		return this.downloadReport('asistencia-mes', 'pdf', this.mesParams(grado, seccion, mes, anio));
+	}
+
+	descargarExcelAsistenciaMes(grado: string, seccion: string, mes: number, anio: number): Observable<Blob> {
+		return this.downloadReport('asistencia-mes', 'excel', this.mesParams(grado, seccion, mes, anio));
+	}
+
 	descargarPdfAsistenciaPeriodo(
-		grado: string,
-		seccion: string,
-		mesInicio: number,
-		anioInicio: number,
-		mesFin: number,
-		anioFin: number,
+		grado: string, seccion: string, mesInicio: number, anioInicio: number, mesFin: number, anioFin: number,
 	): Observable<Blob> {
-		const params: Record<string, string> = {
-			grado,
-			seccion,
-			mesInicio: mesInicio.toString(),
-			anioInicio: anioInicio.toString(),
-			mesFin: mesFin.toString(),
-			anioFin: anioFin.toString(),
-		};
-
-		return this.http.get(`${this.apiUrl}/director/asistencia-periodo/pdf`, {
-			params,
-			responseType: 'blob',
-		});
+		return this.downloadReport('asistencia-periodo', 'pdf',
+			this.periodoParams(grado, seccion, mesInicio, anioInicio, mesFin, anioFin));
 	}
 
-	/**
-	 * Descargar PDF consolidado de todos los salones - Dia
-	 * GET /api/ConsultaAsistencia/director/reporte/todos-salones/dia/pdf?fecha={fecha}
-	 */
+	descargarExcelAsistenciaPeriodo(
+		grado: string, seccion: string, mesInicio: number, anioInicio: number, mesFin: number, anioFin: number,
+	): Observable<Blob> {
+		return this.downloadReport('asistencia-periodo', 'excel',
+			this.periodoParams(grado, seccion, mesInicio, anioInicio, mesFin, anioFin));
+	}
+
 	descargarPdfTodosSalonesDia(fecha?: Date): Observable<Blob> {
-		const params: Record<string, string> = {};
-
-		if (fecha) {
-			params['fecha'] = this.formatDateLocal(fecha);
-		}
-
-		return this.http.get(`${this.apiUrl}/director/reporte/todos-salones/dia/pdf`, {
-			params,
-			responseType: 'blob',
-		});
+		return this.downloadConsolidado('dia', 'pdf', this.optionalFechaParam('fecha', fecha));
 	}
 
-	/**
-	 * Descargar PDF consolidado de todos los salones - Semana
-	 * GET /api/ConsultaAsistencia/director/reporte/todos-salones/semana/pdf?fechaInicio={fechaInicio}
-	 */
+	descargarExcelTodosSalonesDia(fecha?: Date): Observable<Blob> {
+		return this.downloadConsolidado('dia', 'excel', this.optionalFechaParam('fecha', fecha));
+	}
+
 	descargarPdfTodosSalonesSemana(fechaInicio?: Date): Observable<Blob> {
-		const params: Record<string, string> = {};
-
-		if (fechaInicio) {
-			params['fechaInicio'] = this.formatDateLocal(fechaInicio);
-		}
-
-		return this.http.get(`${this.apiUrl}/director/reporte/todos-salones/semana/pdf`, {
-			params,
-			responseType: 'blob',
-		});
+		return this.downloadConsolidado('semana', 'pdf', this.optionalFechaParam('fechaInicio', fechaInicio));
 	}
 
-	/**
-	 * Descargar PDF consolidado de todos los salones - Mes
-	 * GET /api/ConsultaAsistencia/director/reporte/todos-salones/mes/pdf?mes={mes}&anio={anio}
-	 */
+	descargarExcelTodosSalonesSemana(fechaInicio?: Date): Observable<Blob> {
+		return this.downloadConsolidado('semana', 'excel', this.optionalFechaParam('fechaInicio', fechaInicio));
+	}
+
 	descargarPdfTodosSalonesMes(mes?: number, anio?: number): Observable<Blob> {
-		const params: Record<string, string> = {};
+		return this.downloadConsolidado('mes', 'pdf', this.mesAnioParams(mes, anio));
+	}
 
-		if (mes !== undefined) {
-			params['mes'] = mes.toString();
-		}
-		if (anio !== undefined) {
-			params['anio'] = anio.toString();
-		}
+	descargarExcelTodosSalonesMes(mes?: number, anio?: number): Observable<Blob> {
+		return this.downloadConsolidado('mes', 'excel', this.mesAnioParams(mes, anio));
+	}
 
-		return this.http.get(`${this.apiUrl}/director/reporte/todos-salones/mes/pdf`, {
+	descargarPdfTodosSalonesAnio(anio?: number): Observable<Blob> {
+		return this.downloadConsolidado('anio', 'pdf', this.anioParams(anio));
+	}
+
+	descargarExcelTodosSalonesAnio(anio?: number): Observable<Blob> {
+		return this.downloadConsolidado('anio', 'excel', this.anioParams(anio));
+	}
+
+	private downloadReport(
+		endpoint: 'asistencia-dia' | 'asistencia-mes' | 'asistencia-periodo',
+		formato: 'pdf' | 'excel',
+		params: Record<string, string>,
+	): Observable<Blob> {
+		return this.http.get(`${this.apiUrl}/director/${endpoint}/${formato}`, {
 			params,
 			responseType: 'blob',
 		});
 	}
 
-	/**
-	 * Descargar PDF consolidado de todos los salones - Anio
-	 * GET /api/ConsultaAsistencia/director/reporte/todos-salones/anio/pdf?anio={anio}
-	 */
-	descargarPdfTodosSalonesAnio(anio?: number): Observable<Blob> {
-		const params: Record<string, string> = {};
-
-		if (anio !== undefined) {
-			params['anio'] = anio.toString();
-		}
-
-		return this.http.get(`${this.apiUrl}/director/reporte/todos-salones/anio/pdf`, {
+	private downloadConsolidado(
+		rango: 'dia' | 'semana' | 'mes' | 'anio',
+		formato: 'pdf' | 'excel',
+		params: Record<string, string>,
+	): Observable<Blob> {
+		return this.http.get(`${this.apiUrl}/director/reporte/todos-salones/${rango}/${formato}`, {
 			params,
 			responseType: 'blob',
 		});
+	}
+
+	private diaParams(grado: string, seccion: string, fecha?: Date): Record<string, string> {
+		const params: Record<string, string> = { grado, seccion };
+		if (fecha) params['fecha'] = this.formatDateLocal(fecha);
+		return params;
+	}
+
+	private mesParams(grado: string, seccion: string, mes: number, anio: number): Record<string, string> {
+		return { grado, seccion, mes: mes.toString(), anio: anio.toString() };
+	}
+
+	private periodoParams(
+		grado: string, seccion: string, mesInicio: number, anioInicio: number, mesFin: number, anioFin: number,
+	): Record<string, string> {
+		return {
+			grado, seccion,
+			mesInicio: mesInicio.toString(), anioInicio: anioInicio.toString(),
+			mesFin: mesFin.toString(), anioFin: anioFin.toString(),
+		};
+	}
+
+	private optionalFechaParam(key: string, fecha?: Date): Record<string, string> {
+		const params: Record<string, string> = {};
+		if (fecha) params[key] = this.formatDateLocal(fecha);
+		return params;
+	}
+
+	private mesAnioParams(mes?: number, anio?: number): Record<string, string> {
+		const params: Record<string, string> = {};
+		if (mes !== undefined) params['mes'] = mes.toString();
+		if (anio !== undefined) params['anio'] = anio.toString();
+		return params;
+	}
+
+	private anioParams(anio?: number): Record<string, string> {
+		const params: Record<string, string> = {};
+		if (anio !== undefined) params['anio'] = anio.toString();
+		return params;
 	}
 
 	// #endregion

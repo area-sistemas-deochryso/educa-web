@@ -22,6 +22,7 @@ function createMockApi() {
 	return {
 		getReporte: vi.fn<(filters: unknown) => ReturnType<typeof of>>(),
 		descargarPdf: vi.fn(),
+		descargarExcel: vi.fn(),
 	};
 }
 

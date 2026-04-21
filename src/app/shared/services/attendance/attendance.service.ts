@@ -164,6 +164,53 @@ export class AttendanceService {
 		return this.directorApi.descargarPdfTodosSalonesAnio(anio);
 	}
 
+	descargarExcelAsistenciaDia(grado: string, seccion: string, fecha?: Date): Observable<Blob> {
+		return this.directorApi.descargarExcelAsistenciaDia(grado, seccion, fecha);
+	}
+
+	descargarExcelAsistenciaMes(
+		grado: string,
+		seccion: string,
+		mes: number,
+		anio: number,
+	): Observable<Blob> {
+		return this.directorApi.descargarExcelAsistenciaMes(grado, seccion, mes, anio);
+	}
+
+	descargarExcelAsistenciaPeriodo(
+		grado: string,
+		seccion: string,
+		mesInicio: number,
+		anioInicio: number,
+		mesFin: number,
+		anioFin: number,
+	): Observable<Blob> {
+		return this.directorApi.descargarExcelAsistenciaPeriodo(
+			grado,
+			seccion,
+			mesInicio,
+			anioInicio,
+			mesFin,
+			anioFin,
+		);
+	}
+
+	descargarExcelTodosSalonesDia(fecha?: Date): Observable<Blob> {
+		return this.directorApi.descargarExcelTodosSalonesDia(fecha);
+	}
+
+	descargarExcelTodosSalonesSemana(fechaInicio?: Date): Observable<Blob> {
+		return this.directorApi.descargarExcelTodosSalonesSemana(fechaInicio);
+	}
+
+	descargarExcelTodosSalonesMes(mes?: number, anio?: number): Observable<Blob> {
+		return this.directorApi.descargarExcelTodosSalonesMes(mes, anio);
+	}
+
+	descargarExcelTodosSalonesAnio(anio?: number): Observable<Blob> {
+		return this.directorApi.descargarExcelTodosSalonesAnio(anio);
+	}
+
 	getSalonesDirector(): Observable<SalonProfesor[]> {
 		return this.directorApi.getSalonesDirector();
 	}

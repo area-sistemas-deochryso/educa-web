@@ -2,19 +2,19 @@
 @if (estadisticas()) {
 	<div class="estadisticas-container">
 		<div class="header-row">
-			<!-- * PDF actions -->
+			<!-- * Descarga PDF/Excel -->
 			<p-button
-				icon="pi pi-file-pdf"
+				icon="pi pi-download"
 				[loading]="downloadingPdf()"
-				severity="danger"
+				severity="secondary"
 				[text]="true"
 				[rounded]="true"
 				(onClick)="toggleMenu($event)"
-				pTooltip="Opciones de PDF"
+				pTooltip="Descargar reporte"
 				tooltipPosition="top"
 				[pt]="{
 					root: {
-						'aria-label': 'Opciones de PDF',
+						'aria-label': 'Descargar reporte',
 					},
 				}"
 			/>

@@ -22,6 +22,14 @@ export class AttendanceReportsApiService {
 			responseType: 'blob',
 		});
 	}
+
+	descargarExcel(filters: ReporteFilters): Observable<Blob> {
+		const params = this.buildParams(filters);
+		return this.http.get(`${this.apiUrl}/excel`, {
+			params,
+			responseType: 'blob',
+		});
+	}
 	// #endregion
 
 	// #region Helpers

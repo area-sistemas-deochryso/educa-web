@@ -29,20 +29,26 @@ export class EstadisticasDiaComponent {
 	estadisticas = input.required<EstadisticasDia | null>();
 	downloadingPdf = input<boolean>(false);
 
-	// * Outputs for PDF actions
+	// * Outputs for PDF + Excel actions
 	verPdf = output<void>();
 	descargarPdf = output<void>();
+	descargarExcel = output<void>();
 
 	readonly menuItems: MenuItem[] = [
 		{
 			label: 'Ver PDF',
-			icon: 'pi pi-eye',
+			icon: 'pi pi-file-pdf',
 			command: () => this.onVerPdf(),
 		},
 		{
 			label: 'Descargar PDF',
-			icon: 'pi pi-download',
+			icon: 'pi pi-file-pdf',
 			command: () => this.onDescargarPdf(),
+		},
+		{
+			label: 'Descargar Excel',
+			icon: 'pi pi-file-excel',
+			command: () => this.onDescargarExcel(),
 		},
 	];
 
@@ -56,6 +62,10 @@ export class EstadisticasDiaComponent {
 
 	onDescargarPdf(): void {
 		this.descargarPdf.emit();
+	}
+
+	onDescargarExcel(): void {
+		this.descargarExcel.emit();
 	}
 }
 // #endregion
