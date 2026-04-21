@@ -30,6 +30,16 @@
 		appendTo="body"
 	/>
 
+	<p-select
+		[options]="tipoFalloOptions"
+		[ngModel]="filterTipoFallo()"
+		(ngModelChange)="filterTipoFalloChange.emit($event)"
+		optionLabel="label"
+		optionValue="value"
+		placeholder="Tipo de fallo"
+		appendTo="body"
+	/>
+
 	<p-datepicker
 		placeholder="Desde"
 		dateFormat="yy-mm-dd"

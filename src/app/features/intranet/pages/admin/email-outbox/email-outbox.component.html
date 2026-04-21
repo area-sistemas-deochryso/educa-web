@@ -20,9 +20,11 @@
 <app-email-outbox-filters
 	[filterTipo]="vm().filterTipo"
 	[filterEstado]="vm().filterEstado"
+	[filterTipoFallo]="vm().filterTipoFallo"
 	(searchChange)="onSearchChange($event)"
 	(filterTipoChange)="onFilterTipoChange($event)"
 	(filterEstadoChange)="onFilterEstadoChange($event)"
+	(filterTipoFalloChange)="onFilterTipoFalloChange($event)"
 	(filterDesdeChange)="onFilterDesdeChange($event)"
 	(filterHastaChange)="onFilterHastaChange($event)"
 />
@@ -71,6 +73,12 @@
 				<span class="detail-label">Intentos</span>
 				<span class="detail-value">{{ item.intentos }} / {{ item.maxIntentos }}</span>
 			</div>
+			@if (item.tipoFallo) {
+				<div class="detail-row">
+					<span class="detail-label">Tipo de fallo</span>
+					<span class="detail-value">{{ item.tipoFallo }}</span>
+				</div>
+			}
 			@if (item.ultimoError) {
 				<div class="detail-row error">
 					<span class="detail-label">Último error</span>

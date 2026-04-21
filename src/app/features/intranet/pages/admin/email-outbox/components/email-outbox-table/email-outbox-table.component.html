@@ -20,6 +20,9 @@
 			<th pSortableColumn="estado" style="width: 110px">
 				Estado <p-sortIcon field="estado" />
 			</th>
+			<th pSortableColumn="tipoFallo" style="width: 150px">
+				Tipo de fallo <p-sortIcon field="tipoFallo" />
+			</th>
 			<th style="width: 80px">Intentos</th>
 			<th pSortableColumn="fechaReg" style="width: 140px">
 				Fecha <p-sortIcon field="fechaReg" />
@@ -44,6 +47,14 @@
 					[severity]="getEstadoSeverity(item.estado)"
 				/>
 			</td>
+			<td>
+				<p-tag
+					[value]="item.tipoFallo | tipoFalloLabel"
+					[severity]="item.tipoFallo | tipoFalloSeverity"
+					[pTooltip]="item.ultimoError || ''"
+					tooltipPosition="top"
+				/>
+			</td>
 			<td class="text-center">{{ item.intentos }}/{{ item.maxIntentos }}</td>
 			<td>{{ item.fechaReg | date: 'dd/MM/yy HH:mm' }}</td>
 			<td>
@@ -66,12 +77,19 @@
 							pButton
 							icon="pi pi-refresh"
 							class="p-button-rounded p-button-text p-button-sm p-button-warning"
-							pTooltip="Reintentar"
+							[pTooltip]="
+								esPermanente(item.tipoFallo)
+									? 'No se puede reintentar: fallo permanente. Corregir el registro origen primero.'
+									: 'Reintentar'
+							"
 							tooltipPosition="top"
+							[disabled]="esPermanente(item.tipoFallo)"
 							(click)="retry.emit(item)"
 							[pt]="{
 								root: {
-									'aria-label': 'Reintentar envío',
+									'aria-label': esPermanente(item.tipoFallo)
+										? 'Reintento bloqueado por fallo permanente'
+										: 'Reintentar envío',
 								},
 							}"
 						></button>
@@ -83,7 +101,7 @@
 
 	<ng-template pTemplate="emptymessage">
 		<tr>
-			<td colspan="7" class="text-center p-4">No se encontraron correos</td>
+			<td colspan="8" class="text-center p-4">No se encontraron correos</td>
 		</tr>
 	</ng-template>
 </p-table>

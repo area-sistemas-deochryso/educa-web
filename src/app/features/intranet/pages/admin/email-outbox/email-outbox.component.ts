@@ -65,6 +65,10 @@ export class EmailOutboxComponent {
 		this.dataFacade.onFilterEstadoChange(estado);
 	}
 
+	onFilterTipoFalloChange(tipoFallo: string | null): void {
+		this.dataFacade.onFilterTipoFalloChange(tipoFallo);
+	}
+
 	onFilterDesdeChange(desde: string | null): void {
 		this.dataFacade.onFilterDesdeChange(desde);
 	}
@@ -96,6 +100,7 @@ export class EmailOutboxComponent {
 				{ header: 'ID', key: 'id', width: 10 },
 				{ header: 'Tipo', key: 'tipo', width: 25 },
 				{ header: 'Estado', key: 'estado', width: 15 },
+				{ header: 'Tipo de fallo', key: 'tipoFallo', width: 25 },
 				{ header: 'Destinatario', key: 'destinatario', width: 35 },
 				{ header: 'Asunto', key: 'asunto', width: 40 },
 				{ header: 'Intentos', key: 'intentos', width: 10 },
@@ -108,6 +113,7 @@ export class EmailOutboxComponent {
 				id: i.id,
 				tipo: i.tipo,
 				estado: i.estado,
+				tipoFallo: i.tipoFallo ?? '',
 				destinatario: i.destinatario,
 				asunto: i.asunto,
 				intentos: `${i.intentos}/${i.maxIntentos}`,

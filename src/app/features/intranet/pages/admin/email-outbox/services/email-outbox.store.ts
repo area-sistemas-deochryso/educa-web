@@ -28,6 +28,7 @@ export class EmailOutboxStore {
 	private readonly _searchTerm = signal('');
 	private readonly _filterTipo = signal<EmailOutboxTipo | null>(null);
 	private readonly _filterEstado = signal<EmailOutboxEstado | null>(null);
+	private readonly _filterTipoFallo = signal<string | null>(null);
 	private readonly _filterDesde = signal<string | null>(null);
 	private readonly _filterHasta = signal<string | null>(null);
 
@@ -51,6 +52,7 @@ export class EmailOutboxStore {
 	readonly searchTerm = this._searchTerm.asReadonly();
 	readonly filterTipo = this._filterTipo.asReadonly();
 	readonly filterEstado = this._filterEstado.asReadonly();
+	readonly filterTipoFallo = this._filterTipoFallo.asReadonly();
 	readonly filterDesde = this._filterDesde.asReadonly();
 	readonly filterHasta = this._filterHasta.asReadonly();
 	readonly drawerVisible = this._drawerVisible.asReadonly();
@@ -65,12 +67,16 @@ export class EmailOutboxStore {
 	readonly filteredItems = computed(() => {
 		const items = this._items();
 		const search = this._searchTerm().toLowerCase();
-		if (!search) return items;
-		return items.filter(
-			(i) =>
+		const tipoFallo = this._filterTipoFallo();
+
+		return items.filter((i) => {
+			if (tipoFallo && i.tipoFallo !== tipoFallo) return false;
+			if (!search) return true;
+			return (
 				i.destinatario.toLowerCase().includes(search) ||
-				i.asunto.toLowerCase().includes(search),
-		);
+				i.asunto.toLowerCase().includes(search)
+			);
+		});
 	});
 	// #endregion
 
@@ -84,6 +90,7 @@ export class EmailOutboxStore {
 		searchTerm: this._searchTerm(),
 		filterTipo: this._filterTipo(),
 		filterEstado: this._filterEstado(),
+		filterTipoFallo: this._filterTipoFallo(),
 		filterDesde: this._filterDesde(),
 		filterHasta: this._filterHasta(),
 		drawerVisible: this._drawerVisible(),
@@ -143,6 +150,10 @@ export class EmailOutboxStore {
 
 	setFilterEstado(estado: EmailOutboxEstado | null): void {
 		this._filterEstado.set(estado);
+	}
+
+	setFilterTipoFallo(tipoFallo: string | null): void {
+		this._filterTipoFallo.set(tipoFallo);
 	}
 
 	setFilterDesde(desde: string | null): void {

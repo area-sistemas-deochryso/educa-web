@@ -13,6 +13,9 @@ import {
 	EmailOutboxTipo,
 } from '@data/models/email-outbox.models';
 
+import { TIPOS_FALLO } from '../../models/tipo-fallo.models';
+import { TipoFalloLabelPipe } from '../../pipes/tipo-fallo-label.pipe';
+
 interface SelectOption {
 	label: string;
 	value: string | null;
@@ -37,12 +40,14 @@ export class EmailOutboxFiltersComponent {
 	// #region Inputs
 	readonly filterTipo = input<EmailOutboxTipo | null>(null);
 	readonly filterEstado = input<EmailOutboxEstado | null>(null);
+	readonly filterTipoFallo = input<string | null>(null);
 	// #endregion
 
 	// #region Outputs
 	readonly searchChange = output<string>();
 	readonly filterTipoChange = output<string | null>();
 	readonly filterEstadoChange = output<string | null>();
+	readonly filterTipoFalloChange = output<string | null>();
 	readonly filterDesdeChange = output<string | null>();
 	readonly filterHastaChange = output<string | null>();
 	// #endregion
@@ -57,6 +62,14 @@ export class EmailOutboxFiltersComponent {
 		{ label: 'Todos', value: null },
 		...EMAIL_OUTBOX_ESTADOS.map((e) => ({ label: e, value: e })),
 	];
+
+	readonly tipoFalloOptions: SelectOption[] = (() => {
+		const labelPipe = new TipoFalloLabelPipe();
+		return [
+			{ label: 'Todos', value: null },
+			...TIPOS_FALLO.map((t) => ({ label: labelPipe.transform(t), value: t })),
+		];
+	})();
 	// #endregion
 
 	// #region Handlers

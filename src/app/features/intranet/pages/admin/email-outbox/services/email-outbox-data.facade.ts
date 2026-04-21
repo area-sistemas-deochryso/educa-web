@@ -73,6 +73,10 @@ export class EmailOutboxDataFacade {
 		this.loadData();
 	}
 
+	onFilterTipoFalloChange(tipoFallo: string | null): void {
+		this.store.setFilterTipoFallo(tipoFallo);
+	}
+
 	onFilterDesdeChange(desde: string | null): void {
 		this.store.setFilterDesde(desde);
 		this.loadData();

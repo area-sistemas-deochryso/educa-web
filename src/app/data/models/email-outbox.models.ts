@@ -18,6 +18,7 @@ export interface EmailOutboxLista {
 	intentos: number;
 	maxIntentos: number;
 	ultimoError: string | null;
+	tipoFallo: string | null;
 	fechaEnvio: string | null;
 	duracionMs: number | null;
 	usuarioReg: string;
