@@ -126,4 +126,34 @@ describe('AttendanceReportsFacade — eje tipoPersona', () => {
 			expect(api.getReporte).not.toHaveBeenCalled();
 		});
 	});
+
+	// Plan 25 Chat 4 — Excel client-side (ExcelJS) reemplazado por el endpoint BE.
+	describe('exportarExcel — delega al endpoint BE (Plan 25 Chat 3/4)', () => {
+		it('llama api.descargarExcel con los filters actuales cuando hay resultado', () => {
+			// Preparar estado: hay resultado cargado.
+			api.descargarExcel.mockReturnValue(of(new Blob()));
+			store.updateFilters({ tipoPersona: 'E', salonesSeleccionados: ['1ro A'] });
+			facade.generarReporte();
+			// generarReporte actualiza store.resultado con mockReporte (tipoPersona "E").
+
+			facade.exportarExcel();
+
+			expect(api.descargarExcel).toHaveBeenCalledOnce();
+			const filtersArg = api.descargarExcel.mock.calls[0][0] as {
+				tipoPersona: TipoPersonaReporte;
+				salonesSeleccionados: string[];
+			};
+			expect(filtersArg.tipoPersona).toBe('E');
+			expect(filtersArg.salonesSeleccionados).toEqual(['1ro A']);
+		});
+
+		it('no llama al endpoint Excel si no hay resultado cargado todavía', () => {
+			// Sin generarReporte previo → store.resultado() es null → short-circuit.
+			api.descargarExcel.mockReturnValue(of(new Blob()));
+
+			facade.exportarExcel();
+
+			expect(api.descargarExcel).not.toHaveBeenCalled();
+		});
+	});
 });

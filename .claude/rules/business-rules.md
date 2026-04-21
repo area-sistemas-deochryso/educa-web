@@ -1286,6 +1286,63 @@ Un error al encolar se loguea como `LogWarning` pero NO falla el insert del repo
 
 ---
 
+## 17. Reportes exportables — paridad de formatos
+
+> **"Todo endpoint BE o acción de UI que exporta un reporte en PDF DEBE ofrecer también la versión Excel equivalente."**
+
+Aplica a reportes nuevos y mantiene la paridad en los 14 existentes hoy (detalle en
+`.claude/plan/maestro.md` — Plan 25). Rule of thumb al agregar un reporte nuevo:
+
+1. El controller BE agrega **2 endpoints** mirror: `/foo/pdf` y `/foo/excel`. Ambos
+   consumen el mismo data service con los mismos parámetros de filtro.
+2. El UI del FE agrega **un menú único** con 3 items — `Ver PDF`, `Descargar PDF`,
+   `Descargar Excel` — vía el helper `buildPdfExcelMenuItems`
+   (`consolidated-pdf.helper.ts`) o el equivalente por feature.
+3. Los tests BE verifican que ambos endpoints retornan el content-type correcto
+   (`application/pdf` vs `application/vnd.openxmlformats-officedocument.spreadsheetml.sheet`)
+   y consumen el mismo data service con los mismos args (paridad estructural).
+4. La paridad fila-a-fila se garantiza estructuralmente porque los services PDF
+   y Excel reciben el mismo DTO del mismo data service.
+
+### 17.1 Excepciones
+
+**Excepción única**: layout puramente tipográfico sin datos tabulares (ej:
+certificados, diplomas). Ningún reporte actual entra en esta excepción. Un
+reporte con tablas, listas o datos repetitivos por fila queda dentro de la
+regla sin ambigüedad.
+
+### 17.2 Consecuencia de romper la regla
+
+Director/Admin re-transcribe datos del PDF al Excel a mano — señal inequívoca
+de que hay que abrir un chat para agregar el endpoint faltante.
+
+### 17.3 Inventario actual (Plan 25, cerrado)
+
+| Controller BE | Endpoints `/pdf` | Endpoints `/excel` |
+|---------------|-----------------|-------------------|
+| `ReportesAsistenciaController` | 1 | 1 |
+| `BoletaNotasController` | 2 | 2 |
+| `ConsultaAsistenciaController` | 11 | 11 |
+| **Total** | **14** | **14** |
+
+Las 5 páginas FE migradas en Chat 3 que exponen los 3 items del menú:
+
+- `estadisticas-dia` (cross-role attendance)
+- `attendance-director-estudiantes`
+- `attendance-director-profesores`
+- `attendance-profesor-estudiantes`
+- `attendance-reports` (facade `exportarExcel` delega al endpoint BE, reemplazando el Excel client-side ExcelJS previo)
+
+### 17.4 Invariantes
+
+| ID | Invariante | Enforcement |
+|----|-----------|-------------|
+| `INV-RE01` | Todo endpoint controller que termina en `/pdf` tiene su mirror `/excel` (salvo excepción §17.1). El mirror consume el mismo data service con los mismos args. | Tests `*ExcelEndpointTests` en `Educa.API.Tests/Controllers/` |
+| `INV-RE02` | Todo endpoint `/excel` retorna `File(bytes, ExcelHelpers.ContentTypeXlsx, "...xlsx")`. Content-type y extensión consistentes, sin variaciones. | Tests contract por endpoint + constante única en `Services/Excel/ExcelHelpers.cs` |
+| `INV-RE03` | Cada acción de UI que descarga PDF expone también `Descargar Excel` en el mismo menú de 3 items. El default sigue siendo `Ver PDF` (no invertir el orden). | Smoke tests sobre el helper `buildPdfExcelMenuItems` + por componente |
+
+---
+
 ## Checklist: Antes de Implementar una Feature de Backend
 
 ```
@@ -1337,4 +1394,11 @@ NOTIFICACIONES
 [ ] ¿Debe notificar en tiempo real? (SignalR)
 [ ] ¿Debe enviar email? (fire-and-forget)
 [ ] ¿La notificación es NO bloqueante? — INV-S07
+
+REPORTES EXPORTABLES (Sección 17)
+[ ] ¿La feature agrega un endpoint que exporta PDF? → Agregar también `/excel` mirror — INV-RE01
+[ ] ¿Ambos endpoints consumen el mismo data service con los mismos args?
+[ ] ¿El endpoint `/excel` retorna `File(bytes, ExcelHelpers.ContentTypeXlsx, "...xlsx")`? — INV-RE02
+[ ] ¿El UI del FE expone un menú de 3 items (`Ver PDF` / `Descargar PDF` / `Descargar Excel`)? — INV-RE03
+[ ] ¿Hay tests contract (`*ExcelEndpointTests.cs`) por cada endpoint nuevo?
 ```
