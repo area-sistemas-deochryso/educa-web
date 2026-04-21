@@ -51,7 +51,7 @@
 	</ng-template>
 
 	@if (loading()) {
-		<app-table-skeleton [columns]="diaColumns" [rows]="6" minHeight="300px" />
+		<app-table-skeleton [columns]="diaColumns()" [rows]="6" minHeight="300px" />
 
 		<div class="skeleton-footer">
 			@for (_ of skeletonBadges; track $index) {
@@ -87,6 +87,9 @@
 							<th style="width: 100px" class="text-center">Entrada</th>
 							<th style="width: 100px" class="text-center">Salida</th>
 							<th style="width: 80px" class="text-center">Estado</th>
+							@if (showEditAdminAction()) {
+								<th style="width: 70px" class="text-center">Acciones</th>
+							}
 						</tr>
 					</ng-template>
 					<ng-template #body let-persona let-i="rowIndex">
@@ -143,6 +146,24 @@
 									{{ persona.estadoCodigo }}
 								</span>
 							</td>
+							@if (showEditAdminAction()) {
+								<td class="text-center">
+									<button
+										pButton
+										type="button"
+										icon="pi pi-pencil"
+										class="p-button-rounded p-button-text p-button-info"
+										pTooltip="Editar asistencia del profesor"
+										tooltipPosition="top"
+										(click)="onEditAdminClick($event, persona)"
+										[pt]="{
+											root: {
+												'aria-label': 'Editar asistencia del profesor',
+											},
+										}"
+									></button>
+								</td>
+							}
 						</tr>
 					</ng-template>
 				</p-table>
@@ -185,6 +206,24 @@
 								<i class="pi pi-info-circle"></i>
 								{{ persona.observacion }}
 							</span>
+						</div>
+					}
+
+					@if (showEditAdminAction()) {
+						<div class="rt-card__field mobile-card-actions">
+							<button
+								pButton
+								type="button"
+								icon="pi pi-pencil"
+								label="Editar en admin"
+								class="p-button-outlined p-button-info p-button-sm"
+								(click)="onEditAdminClick($event, persona)"
+								[pt]="{
+									root: {
+										'aria-label': 'Editar asistencia del profesor en admin',
+									},
+								}"
+							></button>
 						</div>
 					}
 				</div>

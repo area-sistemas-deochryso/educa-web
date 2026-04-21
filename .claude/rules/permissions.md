@@ -35,3 +35,19 @@ if (userPermisosService.tienePermiso('intranet/admin/usuarios')) {
 - Apoderado - Acceso a información de sus hijos
 - Estudiante - Acceso a su propia información
 - Asistente Administrativo - Acceso administrativo limitado
+
+## Jurisdicción sobre asistencia (Plan 21 + Plan 23, 2026-04-20)
+
+> **"Ningún profesor audita asistencia de otro profesor. Las correcciones formales las ejecuta el área administrativa."**
+
+La tabla `AsistenciaPersona` es polimórfica (estudiantes + profesores). Las mutaciones desde la vista admin `/intranet/admin/asistencias` están restringidas por rol según el `TipoPersona` del registro afectado (INV-AD06).
+
+| Acción | Sobre Estudiante (`E`) | Sobre Profesor (`P`) |
+|--------|-----------------------|---------------------|
+| Ver asistencia diaria (read-only) | Director, Asistente Admin, Promotor, Coordinador Académico, Profesor (sus estudiantes tutor), Estudiante (la propia), Apoderado (la de sus hijos) | Director, Asistente Admin, Promotor, Coordinador Académico, Profesor (**solo la propia**) |
+| Crear/editar/eliminar registro formal desde admin UI | Director, Asistente Admin, Promotor, Coordinador Académico | Director, Asistente Admin, Promotor, Coordinador Académico |
+| Justificar ausencia | Director, Asistente Admin, Promotor, Coordinador Académico | Director, Asistente Admin, Promotor, Coordinador Académico (**nunca el propio profesor ni un colega**) |
+
+**Enforcement**: `AsistenciaAdminController` tiene `[Authorize(Roles = Roles.Administrativos)]` a nivel clase (4 roles administrativos). Verificado por `AsistenciaAdminControllerAuthorizationTests` (6 tests por reflection que rechazan explícitamente Profesor, Apoderado y Estudiante).
+
+**Auto-servicio del profesor**: un profesor puede consultar su propia asistencia (`/profesor/me/mes`, `/profesor/me/dia`) pero NO puede mutarla. Cualquier corrección va por el canal administrativo con correo diferenciado al profesor + BCC al colegio (INV-AD05).

@@ -64,6 +64,23 @@ Salón/Matrícula > Aprobación/Progresión > Calificaciones > Horarios > Asiste
 
 ## 1. Asistencia Diaria (CrossChex)
 
+### 1.0 Modelo polimórfico (Plan 21, 2026-04-20)
+
+> **"La asistencia vive en `AsistenciaPersona`, no en `Asistencia`. El tipo de persona (E/P) es un discriminador, no un campo accesorio."**
+
+La tabla histórica `Asistencia` (FK exclusiva a `Estudiante`) fue reemplazada por `AsistenciaPersona` con discriminador polimórfico. Un mismo webhook de CrossChex, un mismo flujo admin, registran tanto estudiantes como profesores.
+
+| Campo clave | Valor | Significado |
+|-------------|-------|-------------|
+| `ASP_TipoPersona` | `'E'` \| `'P'` | Discriminador obligatorio (CHECK constraint en BD) |
+| `ASP_PersonaCodID` | `INT` | FK **polimórfica** — validada en service, no en BD (apunta a `Estudiante.EST_CodID` si `E`, a `Profesor.PRO_CodID` si `P`) |
+
+**Dispatch del webhook**: orden `Profesor → Estudiante → rechazar`. Justificación: hay menos profesores (lookup más barato) y el invariante `DNI_COLISION_CROSS_TABLE` garantiza que un DNI no puede existir simultáneamente en ambas tablas activas (validado por query SQL 2026-04-18: 0 colisiones históricas).
+
+**Migración histórica**: `Asistencia` renombrada a `Asistencia_deprecated_2026_04` tras repoint de FKs (`JustificacionSaludDia.JSD_ASI_CodID` y `PermisoSaludSalida.PSS_ASI_CodID` → `AsistenciaPersona.ASP_CodID`). DROP definitivo a los 60 días si no hay issues.
+
+**Reglas comunes** (INV-C01/C09/C10, INV-AD01-06): aplican indistintamente a estudiantes y profesores salvo donde se indique explícitamente "solo estudiante" o "solo profesor".
+
 ### 1.1 Ventanas horarias
 
 El estado de asistencia de **ingreso** se calcula automáticamente según la hora de marcación biométrica. **En periodo regular los umbrales son absolutos y dependen del tipo persona** (Plan 24 Chat 1, 2026-04-20). En verano se mantiene la fórmula "inicio + delta".
@@ -1109,6 +1126,7 @@ Este registro consolida TODAS las invariantes del sistema en una tabla indexable
 | `INV-AD03` | CierreAsistenciaMensual | Operaciones de `AsistenciaAdminService` sobre fechas dentro de un mes con cierre activo lanzan `BusinessRuleException("ASISTENCIA_MES_CERRADO")` | `CierreAsistenciaService.EnsureFechaNoCerradaAsync()` | 1.10 |
 | `INV-AD04` | CierreAsistenciaMensual | Un cierre mensual solo se desactiva por intervención explícita del Director con observación obligatoria (mín 10 chars) y queda auditado | `CierreAsistenciaService.RevertirCierreAsync()` + `[Authorize(Roles = "Director")]` | 1.10 |
 | `INV-AD05` | Asistencia | `AsistenciaAdminService` envía correo diferenciado en cada operación, distinto del correo de marcación en tiempo real. Destinatarios polimórficos por `TipoPersona`: **E** → apoderado (`EST_CorreoApoderado`) con BCC al colegio; **P** → profesor (`PRO_Correo`) con BCC al colegio. Sin correo del destinatario principal → se omite silenciosamente. | `EmailNotificationService.EnviarNotificacionAsistenciaCorreccion()` + `EnviarNotificacionAsistenciaCorreccionProfesor()`, vía `IAsistenciaAdminEmailNotifier`. Fire-and-forget (INV-S07). | 1.8 |
+| `INV-AD06` | Asistencia | Un profesor no puede autojustificarse ni justificar/corregir asistencia de un colega profesor. Toda mutación sobre `AsistenciaPersona` con `TipoPersona = 'P'` requiere rol administrativo (Director, Asistente Administrativo, Promotor o Coordinador Académico). | `AsistenciaAdminController` con `[Authorize(Roles = Roles.Administrativos)]` (4 roles). Verificado por `AsistenciaAdminControllerAuthorizationTests` (6 tests por reflection). | 1.8 |
 
 ---
 

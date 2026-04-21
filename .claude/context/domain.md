@@ -60,8 +60,10 @@ Director / AsistenteAdministrativo (admin completo)
 
 ### 1. Asistencia Automática (CrossChex Cloud)
 
+> **Polimórfica desde Plan 21 (2026-04-20)**: registra marcaciones tanto de estudiantes como de profesores en la tabla `AsistenciaPersona` (discriminador `TipoPersona = 'E' | 'P'`). Ver `rules/business-rules.md` § 1.0.
+
 ```text
-Estudiante marca biométrico en dispositivo CrossChex
+Persona (Estudiante o Profesor) marca biométrico en dispositivo CrossChex
     ↓
 CrossChex Cloud API registra evento
     ↓
@@ -69,11 +71,12 @@ Hangfire Job (cada 5 min, 8:00-10:59 AM)
     ↓
 Backend: SincronizarAsistenciaDelDia()
     ├── Obtiene registros del día desde CrossChex API
-    ├── Filtra DNIs ya registrados
-    ├── Registra entrada/salida en BD
+    ├── Dispatch por DNI: Profesor → Estudiante → rechazar
+    ├── Filtra DNIs ya registrados (por persona + fecha)
+    ├── Registra entrada/salida en AsistenciaPersona
     └── Envía notificaciones
-        ├── Push (Firebase) → App móvil del apoderado
-        ├── Email (MailKit) → Correo del apoderado
+        ├── Estudiante → Push + Email al apoderado + BCC al colegio
+        ├── Profesor   → Email al profesor + BCC al colegio (sin push)
         ├── SignalR (AsistenciaHub) → UI en tiempo real
         └── (Futuro) WhatsApp → Teléfono del apoderado
 ```

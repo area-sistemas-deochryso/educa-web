@@ -3,6 +3,7 @@
 export * from './logs/logger';
 export * from './debug';
 export * from './logging';
+export * from './date.utils';
 export * from './duration.utils';
 export * from './file-upload.builder';
 export * from './nivel-educativo.utils';

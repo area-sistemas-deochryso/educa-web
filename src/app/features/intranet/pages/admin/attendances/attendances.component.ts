@@ -38,6 +38,8 @@ import {
 	SincronizarResultado,
 	CrearCierreMensualRequest,
 	RevertirCierreMensualRequest,
+	isValidDateIso,
+	parseIsoDate,
 } from './services';
 // #endregion
 
@@ -158,6 +160,8 @@ export class AttendancesComponent implements OnInit {
 		this.dataFacade.loadData();
 		this.dataFacade.loadEstudiantes();
 
+		// Cross-link desde `AttendanceDirectorComponent` tab profesores (Plan 23 Chat 5).
+		// Query params soportados: `tab`, `tipoPersona`, `dni`, `fecha` (YYYY-MM-DD).
 		this.route.queryParamMap
 			.pipe(takeUntilDestroyed(this.destroyRef))
 			.subscribe((params) => {
@@ -165,9 +169,21 @@ export class AttendancesComponent implements OnInit {
 				if (tab === 'gestion' || tab === 'reportes') {
 					this.activeTab.set(tab);
 				}
+
+				const fecha = params.get('fecha');
+				if (fecha && isValidDateIso(fecha)) {
+					this.fechaCalendar.set(parseIsoDate(fecha));
+					this.dataFacade.onFechaChange(fecha);
+				}
+
 				const tipo = params.get('tipoPersona');
 				if (tipo === 'E' || tipo === 'P' || tipo === 'todos') {
 					this.dataFacade.onTipoPersonaChange(tipo);
+				}
+
+				const dni = params.get('dni');
+				if (dni) {
+					this.dataFacade.onSearch(dni);
 				}
 			});
 	}

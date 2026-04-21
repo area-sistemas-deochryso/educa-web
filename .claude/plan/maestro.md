@@ -30,10 +30,11 @@
 | 18 | Tests de flujo de negocio E2E | BE+FE | (inline en maestro) | ⏳ | 0% |
 | 19 | Comunicación: foro + mensajería + push | FE+BE | (pendiente planificar) | ⏳ | 0% |
 | 20 | Design System — Estándar desde `usuarios` | FE | `tasks/design-system-from-usuarios.md` | F1 ✅ · F2 ✅ (F2.1-F2.5) · F3 ✅ · F4 ✅ · F5.1-F5.2 ✅ · F5.3 ⏳ (0/8) | ~96% |
-| **21** | **🟡 Asistencia de Profesores en CrossChex** | **BE+FE** | **`plan/asistencia-profesores.md`** | **✅ Chat 1 + Chat 1.5 + Chat 2 + Chat 3 + Chat 4 + Chat 6 cerrados (2026-04-20) · Chat 6 (armonización UX "Mi asistencia"): vista profesor "Mi asistencia" reescrita como **copia estructural** de `AttendanceEstudianteComponent` — mismo calendario mensual (2 `<app-attendance-table>` ingresos+salidas) + `<app-attendance-legend />` + `<app-empty-state>`. Consume `/profesor/me/mes` (ya existente, Chat 4) y procesa con `AttendanceDataService.processAsistencias` usando el `nombreCompleto` del response. Eliminados store/facade/scss custom (diseño innecesariamente diferente del original). El pill día/mes se **oculta automáticamente** cuando la tab "Mi asistencia" está activa (output `showModeSelectorChange` del shell → computed en padre), coherente con estudiante/apoderado que tampoco tienen pill en su vista propia; **reaparece** al cambiar a "Mis estudiantes". **Decisión arquitectónica**: cuando dos vistas tienen el mismo propósito ("ver mi propia asistencia"), usan los mismos componentes compartidos — no diseño aparte. Backend: 766 verdes (sin cambios). Frontend: 1341 verdes, lint + tsc + build limpios. **Chat 7 nuevo (pendiente)**: armonizar vista admin "Profesores" con admin "Estudiantes" (hoy filtros+rango+tabla-resumen, debe ser leyenda+stat-cards+pill día/mes+day-list/table-mes). Requiere endpoint backend nuevo + generalizar `AttendanceDayListComponent`. **Deuda técnica lateral** (chats futuros): `PermisoSaludAuthorizationHelper.cs:63` anti-pattern `DIR_DNI == dni`; `ErrorLog` en prueba le faltan 3 columnas. Deploy pendiente: `plan21_chat15_FkRepointAsistenciaPersona.sql` (Chat 5)** | **~85%** |
+| **21** | **✅ Asistencia de Profesores en CrossChex** | **BE+FE** | **`plan/asistencia-profesores.md`** | **✅ Cerrado 2026-04-21. Chats 1 + 1.5 + 2 + 3 + 4 + 6 + 7 (A/B/C) + 5 completos. **Chat 5 cerrado**: SQL FKs ejecutado en prueba+producción · deploy BE+FE en Azure/Netlify · sync histórico de profesores vía "Sobreescribir desde CrossChex" · `sp_rename 'Asistencia' → 'Asistencia_deprecated_2026_04'` · reglas actualizadas 2026-04-21: `business-rules.md` § 1.0 "Modelo polimórfico" + INV-AD06 nuevo en § 15.9; `permissions.md` sección "Jurisdicción sobre asistencia"; `domain.md` flujo 1 refleja polimorfismo E/P. **Deuda técnica lateral** (chats futuros, no bloquea cierre): `PermisoSaludAuthorizationHelper.cs:63` anti-pattern `DIR_DNI == dni`; `ErrorLog` en BD prueba le faltan 3 columnas (`ERL_RequestBody`, `ERL_RequestHeaders`, `ERL_ResponseBody`); DROP definitivo de `Asistencia_deprecated_2026_04` a los 60 días.** | **100%** |
 | 22 | Endurecimiento correos de asistencia | BE+FE | `Educa.API/.claude/plan/asistencia-correos-endurecimiento.md` | 🔒 Bloqueado por Plan 21 cerrado · Diseño cerrado 2026-04-20: validación ASCII+RFC al encolar (F1), clasificación SMTP + retry 0/1 según causa (F2), notificación triple outbox+ErrorLog+correo resumen diario (F3), auditoría retroactiva de correos mal formados en BD (F4) | 0% |
-| **23** | **🟡 Extensión `/intranet/admin/asistencias` a Profesores** | **BE+FE** | **`plan/asistencia-admin-profesores.md`** | **✅ Chats 1 BE + 2 FE + 3.A BE + 3.B FE + 4 BE+FE cerrados (2026-04-20). **Chat 4 (enforcement INV-AD06 + correo profesor)**: `AsistenciaAdminController` ya tenía `[Authorize(Roles = Roles.Administrativos)]` (4 roles) desde Plan 21 — auditado y documentado. Nuevo `AsistenciaAdminControllerAuthorizationTests` con 6 tests por reflection que verifican el atributo a nivel clase y rechazan explícitamente Profesor/Apoderado/Estudiante. `IEmailNotificationService` extendido con `EnviarNotificacionAsistenciaCorreccionProfesor`: destinatario = `PRO_Correo`, BCC = colegio (`_copiaEmail`), nunca apoderado; outbox tag `"ASISTENCIA_CORRECCION_PROFESOR"` + entidad origen `"AsistenciaProfesor"`. `EmailNotificationService` dividido en 2 partial classes (`.cs` + `.Templates.cs`) respetando cap 300ln; template `GenerarHtmlCorreoCorreccionProfesor` reutiliza helper base `HtmlCorreccion(saludo, descripcion, ...)` compartido con la plantilla de estudiante. `IAsistenciaAdminEmailNotifier` extendido con `NotificarCorreccionProfesorAsync` + `NotificarEliminacionProfesorAsync`. TODOs completados en `AsistenciaAdminCrudHelpers.NotificarCorreccionAsync` y `AsistenciaAdminCrudMutateService.EliminarAsync`: rama `TipoPersona == 'P'` delega al notifier de profesor. Nuevo `AsistenciaAdminEmailNotifierTests` con 7 tests: routing E/P (profesor con correo → profesor, no apoderado; sin correo → no-op), eliminación tipoOperacion="eliminada", fire-and-forget (INV-S07) en ambos canales. FE: helper `notificarExito(tipo, verbo, detalle)` en `AttendancesCrudFacade` emite toast diferenciado ("Profesor X" vs "Estudiante X") en los 5 puntos de mutación (crearEntrada, crearSalida, crearCompleta, actualizarHoras, delete). Suite BE: 800 verdes (baseline 784, +16). Suite FE: 1380 verdes (sin regresión). `business-rules.md` sección 1.8 y registro INV-AD05 actualizados con alcance ampliado. Cap 300ln respetado en todos los archivos tocados. Chat 5 pendiente: deploy + armonización con Plan 21 Chat 7 + cross-link UI.** | **85%** |
+| **23** | **✅ Extensión `/intranet/admin/asistencias` a Profesores** | **BE+FE** | **`plan/asistencia-admin-profesores.md`** | **✅ Cerrado 2026-04-21. Chats 1 BE + 2 FE + 3.A BE + 3.B FE + 4 BE+FE + 5 FE completos. **Chat 5 cerrado** (2026-04-21): (1) cross-link UI "Editar en admin" en `AttendanceDirectorComponent` tab profesores: botón icon-only per-row en vista día (`pi pi-pencil` + tooltip + `aria-label` "Editar asistencia del profesor") vía nuevos `showEditAdminAction` + `editAdmin` en `AttendancePersonaDayListComponent` (gated por flag, default `false`); botón contextual en vista mes junto al PDF. Navega a `/intranet/admin/asistencias?tab=gestion&tipoPersona=P&dni=...&fecha=YYYY-MM-DD` vía `Router.navigate`. (2) Query params ampliados en [attendances.component.ts:163-185](src/app/features/intranet/pages/admin/attendances/attendances.component.ts): ahora lee `tab` + `tipoPersona` + `dni` (aplica a search filter) + `fecha` (aplica a `fechaCalendar` + `dataFacade.onFechaChange`). Helpers `isValidDateIso` + `parseIsoDate` extraídos a `services/attendances-query-params.ts` (testables y reutilizables). `takeUntilDestroyed` respetado. (3) Auditoría de divergencia: ambas vistas consumen `AsistenciaPersona` (Plan 21) vía endpoints polimórficos coherentes con INV-C01/INV-C03 — sin divergencia esperada por código; smoke de campo delegado al Director en producción (sin archivo de hallazgo creado). Nuevo helper `@core/helpers/date.utils.ts` con `formatDateLocalIso(fecha)` (YYYY-MM-DD local, sin desfase UTC). Métodos PDF en profesores component consolidados (6 → 4) con `runPdf$(req$, handle)` genérico. Cap 300 líneas respetado en archivos tocados tras refactor. Lint + tsc + **1380 tests verdes** (sin regresión). **Chat 4 (enforcement INV-AD06 + correo profesor)**: `AsistenciaAdminController` ya tenía `[Authorize(Roles = Roles.Administrativos)]` (4 roles) desde Plan 21 — auditado. Nuevo `AsistenciaAdminControllerAuthorizationTests` (6 tests reflection). `IEmailNotificationService.EnviarNotificacionAsistenciaCorreccionProfesor`: destinatario = `PRO_Correo`, BCC = colegio, outbox tag `"ASISTENCIA_CORRECCION_PROFESOR"`. `EmailNotificationService` dividido en 2 partials respetando cap 300ln. `AsistenciaAdminEmailNotifierTests` (7 tests): routing E/P, fire-and-forget (INV-S07). FE: helper `notificarExito` en `AttendancesCrudFacade` emite toast diferenciado en los 5 puntos de mutación. Suite BE: 800 verdes. `business-rules.md` sección 1.8 + INV-AD05 + `permissions.md` jurisdicción actualizados. Deploy BE+FE en producción 2026-04-21. **Hardening adicional cerrado** (commit `332ef11`): INV-C01/C09/C10 — umbrales absolutos de tardanza/falta diferenciados por `TipoPersona` en periodo regular (E: 7:46/9:30 · P: 7:31/9:30); guards INV-C09 (salida estudiante <13:55) e INV-C10 (entrada <05:00).** | **100%** |
 | 24 | 🟡 Sync CrossChex en Background Job | BE+FE | (inline en maestro) | ⏳ Plan nuevo 2026-04-20. Diagnóstico cerrado: `Task.Delay(30000)` entre páginas bloquea UI 2+ min; `.subscribe()` directo en FE no corre en background. 4 chats diseñados (BE job + SignalR + FE progreso + validar rate limit) | 0% |
+| 25 | 🟡 Paridad Excel para reportes PDF | BE+FE | (inline en maestro) | ⏳ Plan nuevo 2026-04-21. Regla: **todo reporte que exporta PDF debe exportar también Excel**. 6+ reportes actuales solo ofrecen PDF. Depende parcialmente de Plan 2/C.2 (PdfBuilderService genérico) para compartir config de columnas entre ambos formatos. | 0% |
 
 **Semáforo de readiness**:
 
@@ -68,6 +69,11 @@
 - [x] `Firebase__CredentialsJson` configurada con JSON válido (verificado 2026-04-18)
 - [x] `JaaS__AppId` configurada con `vpaas-magic-cookie-ab31757bc7ba406d965de2c757d33c01` (verificado 2026-04-18)
 - [ ] `ASPNETCORE_ENVIRONMENT=Production` aplicada explícitamente (creada en sesión, confirmar que el "Aplicar" final quedó guardado)
+
+### Deuda SQL en BD de prueba (no bloqueante)
+
+- [ ] Agregar columnas `ERL_RequestBody`, `ERL_RequestHeaders`, `ERL_ResponseBody` a `ErrorLog` en BD de prueba (el código es tolerante fire-and-forget INV-ET02, pero floodea warnings en logs)
+- [ ] DROP de `Asistencia_deprecated_2026_04` a los 60 días del rename (fecha: ~2026-06-20) si no hay issues
 
 ### Pre-push — estandarizar idioma de commits pendientes a inglés
 
@@ -224,6 +230,57 @@ El Director pierde 2+ minutos bloqueado cada vez que sincroniza (operación frec
 - BE: `Educa.API/Services/Asistencias/AsistenciaSyncService.cs:118-199` — `SobreescribirDesdeCrossChexAsync` (mover a job)
 - FE: `src/app/features/intranet/pages/admin/attendances/services/attendances-data.facade.ts:129-154` — `.subscribe()` directo
 - FE: `src/app/features/intranet/pages/admin/attendances/attendances.component.ts:209-225` — `onSincronizar` (reemplazar spinner por progress)
+
+---
+
+## 🟡 Plan 25 — Paridad Excel para reportes PDF
+
+> **Origen**: Decisión 2026-04-21. Los usuarios (Director + Administrativos) necesitan los mismos reportes en Excel para analizar, filtrar y cruzar datos en hojas de cálculo. Hoy solo se entrega PDF — formato cerrado, no manipulable.
+> **Plan**: inline en este maestro (sin archivo separado por ahora).
+> **Estado**: ⏳ Diseño pendiente.
+
+### Regla nueva
+
+> **"Todo endpoint o acción de UI que exporta un reporte en PDF debe ofrecer también la versión Excel equivalente."**
+
+Aplica a reportes nuevos y a los 6+ existentes. Sin excepciones salvo justificación escrita (ej: layout puramente tipográfico sin datos tabulares — no aplica a ningún reporte actual).
+
+### Reportes actuales a cubrir
+
+Todos son BE (`Services/Reportes*`) consumidos por FE admin o cross-role:
+
+- `ReporteFiltradoAsistenciaService` (441 ln) — reporte filtrado de asistencia (admin + reportes-asistencia)
+- `ReporteFiltradoPdfService` (425 ln) — layout del anterior
+- `ReporteAsistenciaDataService` (396 ln) — data para reporte agregado
+- `ReporteAsistenciaConsolidadoPdfService` (389 ln) — consolidado por periodo
+- `ReporteAsistenciaSalonPdfService` (314 ln) — por salón
+- `BoletaNotasPdfService` (381 ln) — boleta de notas del estudiante
+- PDF de asistencia de profesor (Plan 21 Chat 2, consulta-asistencia)
+
+### Qué diseñar (4 chats estimados)
+
+- **Chat 1 — BE: abstracción común PDF/Excel**: apalancar Plan 2/C.2 (`PdfBuilderService` genérico propuesto) extendiéndolo a `IReportBuilder` con dos implementaciones: `PdfReportBuilder` y `ExcelReportBuilder` (ambos consumen la misma config de columnas/secciones/filtros). Reusar `ExcelService` existente (`Services/Excel/ExcelService.cs`, ya implementado para exportación de listados). Contrato común: `IReportConfig` → `{ headers, rows, filters, metadata }`. Si Plan 2/C.2 aún no se ha ejecutado, este chat lo dispara.
+- **Chat 2 — BE: endpoints Excel paralelos**: para cada `GET /api/.../pdf` crear `GET /api/.../excel` con misma firma de parámetros. Content-Type `application/vnd.openxmlformats-officedocument.spreadsheetml.sheet`. Mismo rate limit (`heavy`, ver `backend.md` §Rate Limiting). Migrar los 6+ services a la abstracción común en el mismo PR.
+- **Chat 3 — FE: UI dual (botón desplegable o split button)**: reemplazar cada botón "Descargar PDF" por un `p-splitButton` o dropdown "Descargar" con opciones PDF/Excel. Reusar componente compartido si 3+ páginas lo repiten. Aplicar en: `reportes-asistencia` (cross-role), `attendances` admin (Reportes), `boleta-notas` (estudiante), consulta-asistencia profesor, y cualquier otra página que exporte PDF hoy.
+- **Chat 4 — Documentación + tests**: actualizar `business-rules.md` con la regla nueva (ubicación candidata: sección operativa, no domain invariants). Agregar tests BE: un test por endpoint Excel verificando content-type, headers, y que los datos coincidan fila a fila con el PDF equivalente (mismo filtro → misma cantidad de rows). FE: smoke test de UI dual.
+
+### Por qué importa (Plan 25)
+
+- **Operativo**: el Director y el equipo administrativo procesan datos en Excel — hoy deben re-transcribir desde el PDF o pedir exportación manual al área de sistemas.
+- **Arquitectura**: obliga a terminar la abstracción `PdfBuilderService` (Plan 2/C.2) — si no se hace ahora, duplicar el código PDF en código Excel dobla la deuda. La regla **previene** que cada reporte nuevo nazca solo-PDF.
+
+### Dependencias (Plan 25)
+
+- **Plan 2/C.2 (PDF Builder genérico)**: fuerte afinidad — si C.2 arranca primero, Plan 25 Chat 1 se simplifica. Si Plan 25 arranca primero, su Chat 1 ejecuta de facto el trabajo de C.2.
+- **`ExcelService` existente**: reusar, no reimplementar. Ya genera hojas de cálculo en módulos de administración (revisar alcance actual antes de extender).
+- **No toca reglas de negocio**: los datos exportados son los mismos, cambia solo el formato. Invariantes de dominio (INV-*) no se tocan.
+
+### Referencias clave (Plan 25)
+
+- BE: `Educa.API/Services/Excel/ExcelService.cs` — service de Excel existente (verificar API)
+- BE: `Educa.API/Services/Reportes*/` — los 6+ services de PDF actuales
+- Plan 2/C.2 en este maestro (sección Carril B) — abstracción PdfBuilder que habilita la paridad
+- `backend.md` §Rate Limiting — política `heavy` aplica a ambos formatos
 
 ---
 

@@ -8,10 +8,14 @@ import {
 	signal,
 } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import { finalize } from 'rxjs';
+import { Router } from '@angular/router';
+import { Observable, finalize } from 'rxjs';
 
 import { AttendanceLegendComponent } from '@features/intranet/components/attendance/attendance-legend/attendance-legend.component';
-import { AttendancePersonaDayListComponent } from '@features/intranet/components/attendance/attendance-persona-day-list/attendance-persona-day-list.component';
+import {
+	AttendancePersonaDayListComponent,
+	PersonaAsistenciaDia,
+} from '@features/intranet/components/attendance/attendance-persona-day-list/attendance-persona-day-list.component';
 import { AttendanceTableComponent } from '@features/intranet/components/attendance/attendance-table/attendance-table.component';
 import { AttendanceTableSkeletonComponent } from '@features/intranet/components/attendance/attendance-table-skeleton/attendance-table-skeleton.component';
 import { EmptyStateComponent } from '@features/intranet/components/attendance/empty-state/empty-state.component';
@@ -31,7 +35,7 @@ import {
 } from '@data/models/attendance.models';
 import { APP_USER_ROLES } from '@shared/constants';
 import { AsistenciaProfesorApiService } from '@shared/services/attendance';
-import { downloadBlob, viewBlobInNewTab } from '@core/helpers';
+import { downloadBlob, formatDateLocalIso, viewBlobInNewTab } from '@core/helpers';
 import { ErrorHandlerService } from '@core/services';
 
 import { ButtonModule } from 'primeng/button';
@@ -73,6 +77,7 @@ export class AttendanceDirectorProfesoresComponent implements OnInit {
 	private api = inject(AsistenciaProfesorApiService);
 	private dataService = inject(AttendanceDataService);
 	private errorHandler = inject(ErrorHandlerService);
+	private router = inject(Router);
 	private destroyRef = inject(DestroyRef);
 
 	// #region Estado general
@@ -213,6 +218,38 @@ export class AttendanceDirectorProfesoresComponent implements OnInit {
 		// Se regenera a partir del mismo mes en ingresos (ambas tablas comparten mes).
 		this.updateTablasMes();
 	}
+
+	/**
+	 * Cross-link desde el día: navega a `/intranet/admin/asistencias` con pre-filtros
+	 * (tipoPersona=P, dni del profesor, fecha del día activo) para que el Director
+	 * edite la asistencia formal sin perder contexto (Plan 23 Chat 5).
+	 */
+	onEditarEnAdminDia(persona: PersonaAsistenciaDia): void {
+		this.router.navigate(['/intranet/admin/asistencias'], {
+			queryParams: {
+				tab: 'gestion',
+				tipoPersona: 'P',
+				dni: persona.dni,
+				fecha: formatDateLocalIso(this.fechaDia()),
+			},
+		});
+	}
+
+	/**
+	 * Cross-link desde el mes: navega a admin con DNI del profesor pre-filtrado.
+	 * Sin fecha — el admin default es hoy y el usuario ajusta al día que quiere editar.
+	 */
+	onEditarEnAdminMes(): void {
+		const profesor = this.selectedProfesor();
+		if (!profesor) return;
+		this.router.navigate(['/intranet/admin/asistencias'], {
+			queryParams: {
+				tab: 'gestion',
+				tipoPersona: 'P',
+				dni: profesor.dni,
+			},
+		});
+	}
 	// #endregion
 
 	// #region Carga — modo día
@@ -294,64 +331,43 @@ export class AttendanceDirectorProfesoresComponent implements OnInit {
 
 	// #region PDFs
 	private verPdfReporteDia(): void {
-		this.runPdfFiltrado((blob) => viewBlobInNewTab(blob));
+		this.runPdfDia((blob) => viewBlobInNewTab(blob));
 	}
 
 	private descargarPdfReporteDia(): void {
-		this.runPdfFiltrado((blob) =>
-			downloadBlob(blob, `Reporte_Profesores_${this.formatDateLocal(this.fechaDia())}.pdf`),
+		this.runPdfDia((blob) =>
+			downloadBlob(blob, `Reporte_Profesores_${formatDateLocalIso(this.fechaDia())}.pdf`),
 		);
-	}
-
-	private runPdfFiltrado(handle: (blob: Blob) => void): void {
-		const fecha = this.fechaDia();
-		this.downloadingPdf.set(true);
-		this.api
-			.descargarPdfReporteFiltradoProfesores(fecha, fecha, null)
-			.pipe(
-				takeUntilDestroyed(this.destroyRef),
-				finalize(() => this.downloadingPdf.set(false)),
-			)
-			.subscribe({
-				next: handle,
-				error: (err) => this.errorHandler.handleHttpError(err),
-			});
 	}
 
 	private verPdfProfesorMes(dni: string, mes: number, anio: number): void {
-		this.runPdfProfesorMes(dni, mes, anio, (blob) => viewBlobInNewTab(blob));
+		this.runPdfMes(dni, mes, anio, (blob) => viewBlobInNewTab(blob));
 	}
 
 	private descargarPdfProfesorMes(dni: string, mes: number, anio: number): void {
-		this.runPdfProfesorMes(dni, mes, anio, (blob) =>
-			downloadBlob(blob, `Asistencia_Profesor_${dni}_${anio}-${mes.toString().padStart(2, '0')}.pdf`),
+		const mesPad = mes.toString().padStart(2, '0');
+		this.runPdfMes(dni, mes, anio, (blob) =>
+			downloadBlob(blob, `Asistencia_Profesor_${dni}_${anio}-${mesPad}.pdf`),
 		);
 	}
 
-	private runPdfProfesorMes(
-		dni: string,
-		mes: number,
-		anio: number,
-		handle: (blob: Blob) => void,
-	): void {
+	private runPdfDia(handle: (blob: Blob) => void): void {
+		const fecha = this.fechaDia();
+		this.runPdf$(this.api.descargarPdfReporteFiltradoProfesores(fecha, fecha, null), handle);
+	}
+
+	private runPdfMes(dni: string, mes: number, anio: number, handle: (blob: Blob) => void): void {
+		this.runPdf$(this.api.descargarPdfProfesorMes(dni, mes, anio), handle);
+	}
+
+	private runPdf$(req$: Observable<Blob>, handle: (blob: Blob) => void): void {
 		this.downloadingPdf.set(true);
-		this.api
-			.descargarPdfProfesorMes(dni, mes, anio)
+		req$
 			.pipe(
 				takeUntilDestroyed(this.destroyRef),
 				finalize(() => this.downloadingPdf.set(false)),
 			)
-			.subscribe({
-				next: handle,
-				error: (err) => this.errorHandler.handleHttpError(err),
-			});
-	}
-
-	private formatDateLocal(fecha: Date): string {
-		const year = fecha.getFullYear();
-		const month = String(fecha.getMonth() + 1).padStart(2, '0');
-		const day = String(fecha.getDate()).padStart(2, '0');
-		return `${year}-${month}-${day}`;
+			.subscribe({ next: handle, error: (err) => this.errorHandler.handleHttpError(err) });
 	}
 	// #endregion
 }

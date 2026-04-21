@@ -12,6 +12,20 @@
 					{{ ingresos().selectedMonth }}/{{ ingresos().selectedYear }}</span
 				>
 				<p-button
+					icon="pi pi-pencil"
+					severity="info"
+					[text]="true"
+					[rounded]="true"
+					(onClick)="onEditarEnAdminMes()"
+					pTooltip="Editar asistencia del profesor en admin"
+					tooltipPosition="top"
+					[pt]="{
+						root: {
+							'aria-label': 'Editar asistencia del profesor en admin',
+						},
+					}"
+				/>
+				<p-button
 					icon="pi pi-file-pdf"
 					[loading]="downloadingPdf()"
 					severity="danger"
@@ -66,7 +80,9 @@
 		[downloadingPdf]="downloadingPdf()"
 		[pdfMenuItems]="pdfMenuItems()"
 		[allowJustify]="false"
+		[showEditAdminAction]="true"
 		(fechaChange)="onFechaDiaChange($event)"
+		(editAdmin)="onEditarEnAdminDia($event)"
 	/>
 }
 <!-- #endregion -->

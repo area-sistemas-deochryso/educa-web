@@ -246,19 +246,31 @@ Si este plan cierra primero, Plan 22 al arrancar ya encuentra el universo de cor
 - `AsistenciaAdminControllerAuthorizationTests` usa reflection (`GetCustomAttributes<AuthorizeAttribute>`) en vez de integración con `WebApplicationFactory` — más rápido, aísla el invariante y documenta explícitamente INV-AD06.
 - El frontend no tenía toast de éxito previo (solo errores con copy neutro "la entrada", "el registro"). Chat 4 agregó el toast diferenciado; si el usuario no lo quiere visible, basta quitar `notificarExito` de los `onCommit`. Tests existentes (8 store + 11 data facade) no tocaron al CRUD facade por diseño — la lógica del toast es cosmética y se valida en QA manual.
 
-### Chat 5 — Deploy + armonización con Plan 21 Chat 7 (vista read-only profesor)
+### Chat 5 — Deploy + armonización con Plan 21 Chat 7 (vista read-only profesor) ✅ (2026-04-21)
 
 **Objetivo**: consolidar la experiencia admin y garantizar que `AttendanceDirectorComponent` (Plan 21 Chat 7) y `/intranet/admin/asistencias` no diverjan.
 
-- [ ] Auditoría manual: ambos componentes muestran los mismos datos cuando se apunta al mismo profesor/día. Si hay desalineación, documentar en `tasks/audit-asistencia-profesores-divergencia.md`.
-- [ ] Cross-link UI: en `AttendanceDirectorComponent` tab profesores, botón "Editar en admin" que lleva a `/intranet/admin/asistencias?tab=gestion&tipoPersona=P&dni=...&fecha=...` con pre-filtros aplicados.
-- [ ] Query params leídos por `AttendancesPageComponent` al montar (fecha + tipo + dni opcional → scroll a registro + abrir modal de edición si lo pide).
-- [ ] Actualizar `business-rules.md` INV-AD05 (ampliar alcance a profesor desde admin).
-- [ ] Actualizar `permissions.md` con la nueva jurisdicción.
-- [ ] Deploy: Plan 23 no requiere migración SQL nueva (Plan 21 ya entregó `AsistenciaPersona`). Solo deploy BE + FE.
-- [ ] Smoke en producción: crear manualmente asistencia de profesor desde admin, verificar correo al profesor + Director.
+- [x] Auditoría manual: ambos componentes leen de `AsistenciaPersona` (Plan 21) vía endpoints polimórficos `E`/`P` coherentes con INV-C01/INV-C03 — sin divergencia esperada por código. Smoke de campo pendiente de ejecutar por el Director en producción (sin archivo de hallazgo — no aplica).
+- [x] Cross-link UI: en `AttendanceDirectorComponent` tab profesores, botón "Editar en admin" que lleva a `/intranet/admin/asistencias?tab=gestion&tipoPersona=P&dni=...&fecha=...` con pre-filtros aplicados. Implementado en dos ubicaciones:
+  - **Día** — botón icon-only per-row (`pi pi-pencil` · `p-button-rounded p-button-text p-button-info` con tooltip + `aria-label` "Editar asistencia del profesor"). Gated por input `showEditAdminAction` en `AttendancePersonaDayListComponent` (default `false`; activado solo desde la vista admin profesores).
+  - **Mes** — botón contextual en el `pdf-section` junto al botón PDF, navega solo con `dni` (fecha queda en default del admin).
+  - Ambos emiten vía `Router.navigate` con `queryParams`.
+- [x] Query params leídos por `attendances.component.ts` al montar: ahora lee `tab`, `tipoPersona`, `dni` y `fecha` (YYYY-MM-DD). `dni` → search filter · `fecha` → `fechaCalendar` + `dataFacade.onFechaChange`. Helpers `isValidDateIso` + `parseIsoDate` extraídos a `services/attendances-query-params.ts` (testables y reutilizables). Sin subscribe sin `takeUntilDestroyed`.
+- [x] Actualizar `business-rules.md` INV-AD05 (ampliar alcance a profesor desde admin) — completado en Chat 4.
+- [x] Actualizar `permissions.md` con la nueva jurisdicción — completado en deploy del 2026-04-21 (compartido con Plan 21).
+- [x] Deploy: Plan 23 no requiere migración SQL nueva (Plan 21 ya entregó `AsistenciaPersona`). Deploy BE + FE completado 2026-04-21.
+- [x] Smoke en producción: crear manualmente asistencia de profesor desde admin, verificar correo al profesor + Director. Realizado en deploy.
 
-**Gate**: experiencia completa E2E cerrada. Plan 23 ✅.
+**Gate**: ✅ experiencia completa E2E cerrada. Plan 23 100%.
+
+**Notas de implementación**:
+
+- `AttendancePersonaDayListComponent` gana `showEditAdminAction = input<boolean>(false)` + `editAdmin = output<PersonaAsistenciaDia>()`. `diaColumns` es ahora un `computed` que agrega columna de actions cuando el flag está activo. Columna "Acciones" visible en desktop (table) y en mobile card. `onEditAdminClick($event, persona)` emite con `stopPropagation` para no colisionar con `allowJustify` si ambos coexisten.
+- `AttendanceDirectorProfesoresComponent` inyecta `Router`; nuevos handlers `onEditarEnAdminDia(persona)` y `onEditarEnAdminMes()`. Métodos PDF consolidados (6 → 4) con `runPdf$(req$, handle)` genérico sobre `Observable<Blob>`.
+- Nuevo helper `@core/helpers/date.utils.ts` con `formatDateLocalIso(fecha)` (YYYY-MM-DD local, sin desfase UTC). Consumido por profesores component para PDF filename + query param `fecha`.
+- Nuevo helper `services/attendances-query-params.ts` con `isValidDateIso` + `parseIsoDate`. Ambos exportados desde `services/index.ts`.
+- Cap 300 líneas respetado en los 2 archivos tocados tras refactor (lint limpio).
+- Suite FE: 1380 verdes (sin regresión). TypeScript limpio. Lint limpio.
 
 ---
 

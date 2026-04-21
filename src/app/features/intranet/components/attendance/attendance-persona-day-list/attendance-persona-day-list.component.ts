@@ -116,11 +116,17 @@ export class AttendancePersonaDayListComponent {
 		{ label: string; items: { label: string; value: string }[] }[]
 	>([]);
 	readonly tipoReporte = input<string>('salon');
+	/**
+	 * Muestra columna/botón "Editar en admin" por fila (Plan 23 Chat 5 — cross-link).
+	 * Gating a nivel padre: solo se activa desde la vista admin de profesores.
+	 */
+	readonly showEditAdminAction = input<boolean>(false);
 
 	// * Outputs
 	readonly fechaChange = output<Date>();
 	readonly justificar = output<JustificacionPersonaEvent>();
 	readonly tipoReporteChange = output<string>();
+	readonly editAdmin = output<PersonaAsistenciaDia>();
 
 	// * ViewChild
 	@ViewChild('pdfMenu') pdfMenu!: Menu;
@@ -128,13 +134,18 @@ export class AttendancePersonaDayListComponent {
 	// * Constants
 	readonly today = new Date();
 	readonly skeletonBadges = Array(7);
-	readonly diaColumns: SkeletonColumnDef[] = [
+	private readonly baseDiaColumns: SkeletonColumnDef[] = [
 		{ width: '50px', cellType: 'text' },
 		{ width: 'flex', cellType: 'text-subtitle' },
 		{ width: '100px', cellType: 'text' },
 		{ width: '100px', cellType: 'text' },
 		{ width: '80px', cellType: 'badge' },
 	];
+	readonly diaColumns = computed<SkeletonColumnDef[]>(() =>
+		this.showEditAdminAction()
+			? [...this.baseDiaColumns, { width: '70px', cellType: 'actions' } as SkeletonColumnDef]
+			: this.baseDiaColumns,
+	);
 	private readonly PREFIJO_JUSTIFICACION = 'Justificado: ';
 
 	// * Local state for the datepicker model (signal for OnPush reactivity)
@@ -169,6 +180,11 @@ export class AttendancePersonaDayListComponent {
 
 	togglePdfMenu(event: Event): void {
 		this.pdfMenu.toggle(event);
+	}
+
+	onEditAdminClick(event: Event, persona: PersonaAsistenciaDia): void {
+		event.stopPropagation();
+		this.editAdmin.emit(persona);
 	}
 
 	// #endregion
