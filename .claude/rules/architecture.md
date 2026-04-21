@@ -70,7 +70,7 @@ src/app/
 | `notifications/` | NotificationsService, SmartNotificationService, NotificationsApiService |
 | `permisos/` | PermisosService, UserPermisosService |
 | `preloading/` | AdaptivePreloadingStrategy |
-| `rate-limit/` | RateLimitService |
+| `rate-limit-countdown/` | RateLimitCountdownService (toast informativo no-bloqueante ante 429 del BE) |
 | `session/` | SessionActivityService, SessionCoordinator, SessionRefresh |
 | `signalr/` | SignalRService (chat), AsistenciaSignalRService |
 | `speech/` | SpeechService, VoiceRecognitionService, VoiceCommandExecutor |
