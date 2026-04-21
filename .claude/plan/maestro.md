@@ -35,6 +35,7 @@
 | **23** | **✅ Extensión `/intranet/admin/asistencias` a Profesores** | **BE+FE** | **`plan/asistencia-admin-profesores.md`** | **✅ Cerrado 2026-04-21. Chats 1 BE + 2 FE + 3.A BE + 3.B FE + 4 BE+FE + 5 FE completos. **Chat 5 cerrado** (2026-04-21): (1) cross-link UI "Editar en admin" en `AttendanceDirectorComponent` tab profesores: botón icon-only per-row en vista día (`pi pi-pencil` + tooltip + `aria-label` "Editar asistencia del profesor") vía nuevos `showEditAdminAction` + `editAdmin` en `AttendancePersonaDayListComponent` (gated por flag, default `false`); botón contextual en vista mes junto al PDF. Navega a `/intranet/admin/asistencias?tab=gestion&tipoPersona=P&dni=...&fecha=YYYY-MM-DD` vía `Router.navigate`. (2) Query params ampliados en [attendances.component.ts:163-185](src/app/features/intranet/pages/admin/attendances/attendances.component.ts): ahora lee `tab` + `tipoPersona` + `dni` (aplica a search filter) + `fecha` (aplica a `fechaCalendar` + `dataFacade.onFechaChange`). Helpers `isValidDateIso` + `parseIsoDate` extraídos a `services/attendances-query-params.ts` (testables y reutilizables). `takeUntilDestroyed` respetado. (3) Auditoría de divergencia: ambas vistas consumen `AsistenciaPersona` (Plan 21) vía endpoints polimórficos coherentes con INV-C01/INV-C03 — sin divergencia esperada por código; smoke de campo delegado al Director en producción (sin archivo de hallazgo creado). Nuevo helper `@core/helpers/date.utils.ts` con `formatDateLocalIso(fecha)` (YYYY-MM-DD local, sin desfase UTC). Métodos PDF en profesores component consolidados (6 → 4) con `runPdf$(req$, handle)` genérico. Cap 300 líneas respetado en archivos tocados tras refactor. Lint + tsc + **1380 tests verdes** (sin regresión). **Chat 4 (enforcement INV-AD06 + correo profesor)**: `AsistenciaAdminController` ya tenía `[Authorize(Roles = Roles.Administrativos)]` (4 roles) desde Plan 21 — auditado. Nuevo `AsistenciaAdminControllerAuthorizationTests` (6 tests reflection). `IEmailNotificationService.EnviarNotificacionAsistenciaCorreccionProfesor`: destinatario = `PRO_Correo`, BCC = colegio, outbox tag `"ASISTENCIA_CORRECCION_PROFESOR"`. `EmailNotificationService` dividido en 2 partials respetando cap 300ln. `AsistenciaAdminEmailNotifierTests` (7 tests): routing E/P, fire-and-forget (INV-S07). FE: helper `notificarExito` en `AttendancesCrudFacade` emite toast diferenciado en los 5 puntos de mutación. Suite BE: 800 verdes. `business-rules.md` sección 1.8 + INV-AD05 + `permissions.md` jurisdicción actualizados. Deploy BE+FE en producción 2026-04-21. **Hardening adicional cerrado** (commit `332ef11`): INV-C01/C09/C10 — umbrales absolutos de tardanza/falta diferenciados por `TipoPersona` en periodo regular (E: 7:46/9:30 · P: 7:31/9:30); guards INV-C09 (salida estudiante <13:55) e INV-C10 (entrada <05:00).** | **100%** |
 | 24 | 🟡 Sync CrossChex en Background Job | BE+FE | (inline en maestro) | ⏳ Plan nuevo 2026-04-20. Diagnóstico cerrado: `Task.Delay(30000)` entre páginas bloquea UI 2+ min; `.subscribe()` directo en FE no corre en background. 4 chats diseñados (BE job + SignalR + FE progreso + validar rate limit) | 0% |
 | **25** | **✅ Paridad Excel para reportes PDF** | **BE+FE** | **(inline en maestro)** | **✅ Cerrado 2026-04-21. Chats 1 + 2 + 3 + 4 completos. 14 endpoints `/excel` mirror de los `/pdf` en BE (1 `ReportesAsistenciaController` + 2 `BoletaNotasController` + 11 `ConsultaAsistenciaController`). 5 páginas FE con menú dual 3-items (`Ver PDF` / `Descargar PDF` / `Descargar Excel`) vía helper `buildPdfExcelMenuItems`. `§17 Reportes exportables — paridad de formatos` en `business-rules.md` con INV-RE01/02/03 + checklist. Tests paridad: BE 930 (+26 nuevos, 0 regresiones sobre baseline 904); FE 1429 (+19 nuevos, 0 regresiones sobre baseline 1410). `attendance-reports.facade` migrado de ExcelJS client-side a endpoint BE. Tests contract usan `ControllerTestBase` + `ClaimsPrincipalBuilder` existentes (no se montó `WebApplicationFactory`).** | **100%** |
+| **26** | **🟡 Rate limiting flexible** | **BE+FE** | **(inline en maestro)** | **🟡 Chat 1 BE (F1.1-F1.4) ✅ 2026-04-21 — telemetría sin tocar policies. Tabla `RateLimitEvent` (12 columnas, 3 índices, convención `REL_`) creada en BD prueba. Middleware `RateLimitTelemetryMiddleware` captura 429 fire-and-forget (INV-S07 + INV-ET02) en pipeline DESPUÉS de `UseRateLimiter()`. Endpoint admin `GET /api/sistema/rate-limit-events` con filtros (dni/rol/endpoint/policy/rango/soloRechazados) + `[Authorize(Roles = Roles.Administrativos)]` + DNI enmascarado (INV-D01). F1.3 early warning >80% **diferido a F2**: `RateLimiter` nativo de ASP.NET Core 9 no expone tokens restantes; método `LogEarlyWarningAsync` implementado pero sin llamador. 9 archivos nuevos + 3 modificados + 12 tests (21 casos, todos verdes; suite completa **1027 verdes, 0 regresiones**). Cap 300 líneas respetado (máx 182 en `RateLimitTelemetryService`). **Pendiente** (Chat 2): F1.5 FE admin view + F1.6 feature flag + deploy coordinado script SQL en prod.** | **15%** |
 
 **Semáforo de readiness**:
 
@@ -932,6 +933,101 @@ CARRIL C — DIFERIDO
 - [x] **Chat 4 — F3.FE** ✅ (FE, 2026-04-21, repo `educa-web`) — UI admin `/admin/email-outbox` con visibilidad de `tipoFallo`. Models feature-scoped `tipo-fallo.models.ts` (`TIPOS_FALLO` const, `TipoFallo` type, `TIPOS_PERMANENTES` array, helper `esPermanente` que trata `null`/string desconocido como no-permanente). Pipes puros `TipoFalloLabelPipe` (etiqueta user-friendly: `"Dirección inválida"`, `"Sin correo"`, `"Bandeja llena"`, `"Rechazado por servidor"`, `"Error desconocido"`, `"Transitorio agotado"`, `"En reintento"`, `"Sin clasificar"` para null; string crudo para desconocidos — forward-compat con nuevos tipos backend) y `TipoFalloSeverityPipe` (permanentes → `danger`, transitorios/unknown → `warn`, TRANSIENT/null → `info`). DTO `EmailOutboxLista` extendido con `tipoFallo: string | null`. Columna "Tipo de fallo" agregada a la tabla (`<p-tag>` con severity semántico + tooltip con `ultimoError`), sortable. Filtro dropdown nuevo "Tipo de fallo" en filter bar con `appendTo="body"`, **filtrado 100% client-side** via `filteredItems` computed en store (sin refetch — backend ya entrega el universo). Botón "Reintentar" `disabled` cuando `esPermanente(tipoFallo)` con tooltip explicativo ("No se puede reintentar: fallo permanente. Corregir el registro origen primero.") y `aria-label` dinámico via `pt` (a11y.md). Detalle drawer muestra `tipoFallo` técnico para correlación con backend/logs. Export Excel incluye columna `tipoFallo`. Store + data facade extendidos con `_filterTipoFallo`/`setFilterTipoFallo`/`onFilterTipoFalloChange`. **30 tests Vitest nuevos verdes** (10 label + 10 severity + 10 esPermanente), 1410/1410 suite completa sin regresiones. `npm run lint` limpio, `npm run build` OK. Archivos nuevos: 5 (models + 2 pipes + 2 specs + spec del helper). Archivos modificados: 7 (DTO base + store + data-facade + filters + table + component host + email-outbox.component.html).
 - [ ] **Chat 5 — F4.BE** (BE, 1 chat) — Endpoint `GET /api/sistema/auditoria-correos-asistencia` · repository + service + controller + authorization tests · reusa `EmailValidator` de F1 · pre-work obligatorio: mostrar `SELECT` de inspección al usuario y confirmar estructura/universo antes de codificar (regla DB SELECT first)
 - [ ] **Chat 6 — F4.FE** (FE, 1 chat, repo `educa-web`) — Pantalla `/intranet/admin/auditoria-correos` · feature flag `auditoriaCorreos` · menú módulo Sistema submenú Monitoreo · accesible solo a Director + Asistente Administrativo
+
+---
+
+## 🔵 Plan 26 — Rate limiting flexible (rol × endpoint × contexto + telemetría)
+
+> **Origen**: Conversación 2026-04-21. El uso admin normal dispara 429 "Demasiadas solicitudes" con frecuencia — caso testigo: exportar 4-5 reportes de asistencia seguidos agota la política `heavy` (5/min por usuario). Las 6 políticas actuales (`global` reads/writes, `login`, `refresh`, `biometric`, `heavy`) son demasiado gruesas: no distinguen rol, no permiten override por endpoint, no aprovechan contexto (horario escolar vs fuera de horario, ráfaga legítima vs sostenido) y no hay visibilidad de quién/qué está hitting 429.
+>
+> **Plan**: inline en maestro. Si al iniciar el primer chat el diseño crece, mover a `Educa.API/.claude/plan/rate-limit-flexible.md`.
+>
+> **Estado**: 🔵 Pendiente diseño. Ejes aprobados (2026-04-21): **B + C + D + E**. A (config externa) diferido a F5 sin prerrequisito duro.
+>
+> **Precede a Plan 24**: sin telemetría (F1) el job CrossChex en background puede disparar rate limits invisibles. Conviene cerrar F1 antes o junto con Plan 24.
+
+### Decisiones de diseño aprobadas
+
+- **B. Multiplier por rol** — Diccionario `roleMultipliers` (inicial en código, luego appsettings en F5): `{ Director: 3.0, AsistenteAdmin: 2.5, Profesor: 2.0, Apoderado: 1.0, Estudiante: 1.0 }`. Refleja que roles administrativos tienen patrón de uso masivo legítimo (reportes, imports, batch).
+- **C. Modifier por endpoint** — Attribute custom `[RateLimitOverride(policy: "reports", multiplier: 2.0)]` que ajusta la cuota base sin crear policy nueva. Complementa (no reemplaza) `[EnableRateLimiting]`.
+- **D.1 Time-of-day** — Franja escolar (**7am-5pm Lima, L-V**) aplica multiplier global `x1.5`. Fuera de horario queda en cuota base. Leer con `IClock` inyectable (no `DateTime.Now` directo).
+- **D.2 Burst + sustained** — Token bucket con dos ventanas concéntricas: **burst** (10 tokens / 30s refill) permite ráfagas legítimas; **sustained** (200 tokens / 5min refill) corta abuso prolongado. Request consume ambos.
+- **E. Telemetría** — Tabla `RateLimitEvent` (userId, rol, endpoint, policy, límiteEfectivo, fueRechazado, correlationId, timestamp). Vista admin con top usuarios/endpoints rechazados últimas 24h y timeline.
+
+### Guardrails
+
+- **Cap máximo de multiplier acumulado**: `5x` sobre cuota base. Rol × endpoint × franja no puede superarlo.
+- **Policies de auth/biometric NO se tocan**: `login`, `refresh`, `biometric` ya están calibradas y son sensibles a abuso. D.2 aplica solo a `reports`, `batch`, `global`.
+- **Testing obligatorio en F4**: integración con `TestServer` + `TestClock` manipulable. La combinatoria rol × endpoint × franja × burst/sustained es grande y los 429 son difíciles de reproducir en QA.
+- **Retención `RateLimitEvent`**: 90 días con purge nocturno (job Hangfire). INV-S07 (fire-and-forget) — un error al escribir el log NO falla la request.
+- **Reemplazo de `heavy`**: F2 introduce `reports` (reportes PDF/Excel — lectura pesada) y `batch` (imports y aprobación masiva — escritura pesada). `heavy` se deprecia gradualmente.
+
+### Fases
+
+- [ ] **F1 — Telemetría sobre policies actuales** (2-3 chats: 2 BE + 1 FE) — Chat 1 BE ✅ 2026-04-21
+  - [x] F1.1 Tabla `RateLimitEvent` + modelo EF + script SQL ejecutado en BD de prueba (prod pendiente de deploy coordinado) ✅ 2026-04-21
+  - [x] F1.2 Middleware `RateLimitTelemetryMiddleware` que intercepta respuestas 429 y persiste fire-and-forget (INV-S07 + INV-ET02) ✅ 2026-04-21
+  - [~] F1.3 También loguear requests que pasaron pero consumieron >80% de la cuota — **diferido a F2**: ASP.NET Core 9 `RateLimiter` nativo no expone tokens restantes. El método `LogEarlyWarningAsync` queda implementado pero sin llamador; se activa en F2 con custom limiter
+  - [x] F1.4 Endpoint `GET /api/sistema/rate-limit-events` con filtros (dni/rol/endpoint/policy/rango/soloRechazados) + `[Authorize(Roles = Roles.Administrativos)]` + DNI enmascarado en DTO ✅ 2026-04-21
+  - [ ] F1.5 Vista admin FE `/intranet/admin/rate-limit` — stats cards (top rol, top endpoint, total 429 24h), tabla con eventos recientes, filtros — **Chat 2**
+  - [ ] F1.6 Feature flag `rateLimitMonitoring` + menú módulo Sistema submenú Monitoreo — **Chat 2**
+  - **Estado**: 9 archivos BE nuevos + 3 modificados + 12 tests nuevos (21 casos, todos verdes; suite completa 1027 verdes, 0 regresiones). Cap 300 líneas respetado (máx 182). Sin tocar policies — solo observar 1-2 semanas para calibrar F2.
+
+- [ ] **F2 — B + C (multiplier por rol + modifier por endpoint)** (2 chats, BE)
+  - [ ] F2.1 Custom attribute `[RateLimitOverride(policy, multiplier)]` + resolver que combina con `[EnableRateLimiting]`
+  - [ ] F2.2 Partition key resolver que extrae rol del `ClaimsPrincipal` y aplica `roleMultipliers[rol]`
+  - [ ] F2.3 Definir multipliers iniciales en constante tipada (no appsettings aún — F5)
+  - [ ] F2.4 Reemplazar `heavy` por `reports` (multiplier por defecto x1) + `batch` (x1). Aplicar `[RateLimitOverride("reports", 2.0)]` en los 14 endpoints de reportes (ver Plan 25 cerrado) para compensar exportaciones en serie
+  - [ ] F2.5 Tests integración: mismo endpoint, roles distintos → límites efectivos distintos. Cap 5x verificado
+  - [ ] F2.6 Verificar con telemetría F1 que las 429 caen en los roles/endpoints esperados
+  - **Entregable**: Director/Asistente Admin ya no chocan con límite en uso normal (ej: exportar 8-10 reportes seguidos).
+
+- [ ] **F3 — D.1 Time-of-day modifier** (1 chat, BE)
+  - [ ] F3.1 Helper `SchoolHoursResolver` — inyectable, lee `IClock` + zona Lima, expone `IsSchoolHours(DateTimeOffset): bool`
+  - [ ] F3.2 Integrar en resolver de F2 como capa adicional (antes del cap 5x)
+  - [ ] F3.3 Tests con `TestClock` — lunes 10am L-V → multiplier x1.5 aplicado; domingo 10am → no aplicado; lunes 18:30 → no aplicado
+  - **Entregable**: ventana de tolerancia extra en horario de uso intensivo administrativo.
+
+- [ ] **F4 — D.2 Burst + sustained** (2 chats, BE)
+  - [ ] F4.1 Custom `PartitionedRateLimiter` con dos buckets concéntricos (token bucket biventana). Request consume 1 token de cada bucket
+  - [ ] F4.2 Migrar `reports` y `batch` al limiter biventana. `global` reads se evalúa caso por caso
+  - [ ] F4.3 Tests de ráfaga: 10 requests en 10s → OK; 20 requests en 10s → throttled; burst recuperado en 30s
+  - [ ] F4.4 Tests de sustained: 200 requests distribuidos en 5min → OK; 210 → throttled
+  - [ ] F4.5 Monitorear con F1 que las 429 bajan sin explosión de uso indebido (comparar métricas pre vs post)
+  - **Entregable**: ráfagas legítimas permitidas sin abrir boquete para bots.
+
+- [ ] **F5 — A Config externa** 🔒 (diferido, sin prerrequisito duro)
+  - [ ] F5.1 Migrar `roleMultipliers`, franja escolar, parámetros de token bucket a `appsettings.json`
+  - [ ] F5.2 Integrar Azure App Configuration para cambio sin redeploy
+  - [ ] F5.3 Hot reload de config (o graceful restart)
+  - **Cuándo**: cuando el equipo necesite tunear en prod sin ciclo de release. No bloquea F1-F4.
+
+### Dudas a resolver durante el diseño
+
+- ¿Profesor con import de notas en bulk necesita multiplier `x2` o más? (responder con datos de F1 tras 1-2 semanas)
+- ¿`biometric` (webhook CrossChex) necesita ajuste? Hoy 30/min IP; en colegios grandes con 1000+ marcaciones en 10min puede chocar. **Tentativamente NO se toca** — usar telemetría para confirmar
+- ¿Multipliers por rol son fijos o varían por tipo de endpoint? (ej: Director `x3` en reports pero `x1.5` en writes). F2 comienza con fijo; escalar a matriz solo si telemetría lo pide
+- ¿La vista admin de F1 permite *acción* (ej: "bloquear este user 1h") o solo *observación*? Arrancar con observación; acciones son otro plan
+- ¿Qué hacer cuando un usuario anónimo (pre-login) hitting 429 en `/api/sistema/reportes-usuario` (Plan §16)? Hoy parte de IP — mantener sin multiplier de rol (rol = "Anónimo")
+
+### Relaciones con otros planes
+
+- **Plan 22 (Correos)**: independiente. Ambos tocan telemetría pero dominios distintos (correos vs requests HTTP)
+- **Plan 7 (Error Trace BE)**: complementario. `RateLimitEvent` es paralelo a `ErrorLog` — 429 no es error, no debe mezclarse
+- **Plan 24 (Sync CrossChex en Background)**: el job opera server-side sin userId → partición por "system" con cuota propia. F1 debe cubrir este caso antes que Plan 24 arranque
+- **Plan 16 (Auditoría de seguridad)**: rate limit es capa de defensa. F1 aporta visibilidad que el audit puede requerir para recomendaciones
+- **Plan 25 (Paridad Excel)**: fue el detonante — 14 endpoints `/pdf` + 14 `/excel` duplican el consumo potencial de `heavy`. F2 los marca con `[RateLimitOverride("reports", 2.0)]`
+
+### Checklist pre-inicio
+
+```
+[ ] ¿Usuario confirma multipliers iniciales por rol (3.0 / 2.5 / 2.0 / 1.0 / 1.0)?
+[ ] ¿Usuario confirma franja escolar 7am-5pm L-V?
+[ ] ¿Usuario confirma burst 10/30s + sustained 200/5min como punto de partida?
+[ ] ¿Usuario confirma retención 90 días de RateLimitEvent?
+[ ] ¿Usuario confirma que F1 (telemetría) va primero — 1-2 semanas de datos antes de tocar policies?
+[ ] Si se arranca Plan 24 antes que Plan 26 F1, ¿se acepta el riesgo de 429 invisibles del job CrossChex?
+```
 
 ---
 
