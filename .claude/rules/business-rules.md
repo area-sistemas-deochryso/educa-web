@@ -197,6 +197,84 @@ Si ya existe un registro con `ASI_OrigenManual = true` para un estudiante en una
 - **Efecto**: Mientras el cierre esté activo (`CAM_Estado = true`), ninguna operación de `AsistenciaAdminService` puede mutar registros de asistencia cuya fecha caiga en ese mes/año/sede. Lanza `BusinessRuleException("ASISTENCIA_MES_CERRADO")`.
 - **Reversión (INV-AD04)**: Solo el Director puede revertir un cierre (`POST /api/cierre-asistencia/{id}/revertir`). Requiere observación de mínimo 10 caracteres y queda auditado en el campo `CAM_Observacion`.
 
+### 1.11 Filtro temporal por grado — INV-C11 (Plan 27, 2026-04-22)
+
+> **"La asistencia diaria CrossChex solo aplica a estudiantes con `GRA_Orden >= UmbralGradoAsistenciaDiaria`. Los grados inferiores quedan fuera mientras el colegio no tenga biométrico asignado para ellos. La regla es temporal y reversible por cambio de constante."**
+
+**Qué**
+
+Estudiantes con `GRA_Orden < UmbralGradoAsistenciaDiaria` (actualmente `8` = 5to Primaria) no generan registros de asistencia diaria biométrica. Aplica a periodo regular y verano. Profesores (`TipoPersona = 'P'`) **no están sujetos** a este filtro.
+
+Mapeo de grados vigente (ver §5.1 para la tabla completa):
+
+| `GRA_Orden` | Grado | Estado en INV-C11 |
+|-------------|-------|-------------------|
+| 1-3 | Inicial 3/4/5 años | ❌ Excluido |
+| 4-7 | 1ro-4to Primaria | ❌ Excluido |
+| **8** | **5to Primaria** | ✅ **Límite inferior** |
+| 9-14 | 6to Primaria — 5to Secundaria | ✅ Incluido |
+
+**Por qué**
+
+El dispositivo CrossChex del colegio solo cubre los grados incluidos en el plan vigente. Los grados inferiores operan con cuaderno físico del salón y no tienen marcación biométrica. La restricción es **operativa del colegio**, no técnica.
+
+**Dónde se aplica (alcance IN)**
+
+| Punto | Comportamiento |
+|-------|---------------|
+| Webhook CrossChex (`AsistenciaService.ClasificarYRegistrarMarcacionAsync`, rama `TipoPersona = 'E'`) | Descarta la marcación silenciosamente vía `CoherenciaHorariaValidator.Clasificar` → `MarcacionAccion.IgnorarGradoFueraAlcance`. Log `Information` con DNI enmascarado + `GRA_Orden`. HTTP 200 al dispositivo. |
+| Consultas admin día (`ConsultaAsistenciaRepository`, 3 queries + `AsistenciaAdminQueryRepository` 2 queries) | Filtran `GRA_Orden >= 8`. Listado del día, estadísticas, reporte filtrado. Profesores (`TipoPersona = 'P'`) intactos. |
+| Reportes PDF/Excel estudiantes (`ReporteAsistenciaRepository`, 3 queries) | Filtran `GRA_Orden >= 8` en las 3 queries + nota `AsistenciaGrados.NotaReportePlan27` en header de los 6 reportes (3 PDF + 3 Excel). Reportes solo-profesor sin filtro. |
+| Correos (`EmailNotificationService.EnviarNotificacionAsistencia` y `EnviarNotificacionAsistenciaCorreccion`) | Early-return cuando `graOrden < 8`. Cubre correos de marcación en tiempo real **y** correcciones admin (INV-AD05). El outbox queda genérico. |
+| Self-service estudiante / apoderado | UI muestra mensaje "La asistencia diaria está suspendida temporalmente para este grado". Apoderado con hijos mixtos: mensaje **por-hijo** (consume `ResumenAsistenciaDto.GraOrden` + `HijoApoderadoDto.GraOrden`). |
+| Banner admin fijo `/intranet/admin/asistencias` | `AttendanceScopeBannerComponent` presentacional, no dismissible, colores `--blue-100`/`--blue-800`. Cubre tabs gestión y reportes. |
+| Widget "Asistencia de Hoy" (home) | Sin código propio de filtro — consume `/api/ConsultaAsistencia/director/estadisticas` que ya filtra en backend. Numerador y denominador vienen del mismo objeto filtrado. |
+
+**Dónde NO se aplica (alcance OUT)**
+
+- **Profesores** (`TipoPersona = 'P'`, Plan 21) — flujo polimórfico intacto. Endpoints `/profesor/*` y `/director/profesores-asistencia-dia` no aplican el filtro.
+- **Búsqueda de estudiantes** (home, perfiles) — el estudiante sigue existiendo para calificaciones, matrícula, kardex.
+- **Kardex / historia académica** — lectura histórica sin recorte.
+- **Asistencia por curso** (§2) — modelo independiente; profesor sigue marcando `P/T/F` en clase.
+- **Calificaciones (§3), aprobación (§4), periodos (§9, §14.4), horarios (§6), matrícula/pagos (§14.2)** — dominios separados.
+- **Correcciones admin sobre registros históricos** (decisión 6 del Chat 1): admin mantiene control sobre writes de registros existentes. Los writes nuevos del webhook se bloquean, pero `AsistenciaAdminService` puede editar/justificar registros preexistentes. **Por eso no existe `INV-AD07`**.
+
+**Fuente de verdad (constante + sus mirrors)**
+
+La constante vive en **dos repos independientes** que se actualizan en el mismo despliegue:
+
+| Repo | Archivo | Símbolo |
+|------|---------|---------|
+| Backend (`Educa.API`) | `Constants/Asistencias/AsistenciaGrados.cs` | `public const int UmbralGradoAsistenciaDiaria = 8;` |
+| Frontend (`educa-web`) | `src/app/shared/constants/attendance-scope.ts` | `export const UMBRAL_GRADO_ASISTENCIA_DIARIA = 8;` |
+
+No comparten código compilado. Cambiar el umbral requiere **tocar ambos** archivos en el mismo PR coordinado. Si en el futuro se consolida vía un manifiesto compartido o migra a configuración de BD (deuda técnica menor), actualizar esta sección.
+
+**NO consolidar con `UMBRAL_TUTOR_PLENO = 7`** (decisión 10 del Chat 1). Ambas valen `7 < valor <= 8` circunstancialmente, pero son conceptos distintos (tutor pleno es modelo de asignación profesor-salón; INV-C11 es alcance del biométrico). El comentario cruzado en cada constante documenta la coincidencia.
+
+**Dos implementaciones del lookup `GetGraOrden*` por división read/write**
+
+| Repositorio | Método | Consumidor |
+|-------------|--------|-----------|
+| `AsistenciaRepository` (write path) | `GetGraOrdenEstudianteActivoAsync` | Webhook → `AsistenciaService` para el guard INV-C11 |
+| `ConsultaAsistenciaRepository` (read path) | `ObtenerGraOrdenEstudianteAsync` | DTOs self-service (`ResumenAsistenciaDto.GraOrden`, `HijoApoderadoDto.GraOrden`) |
+
+Son queries idénticas de ~10 líneas; se mantienen separadas para respetar la división read/write de repositorios. El anti-patrón "Corrección Sistemática" de `backend.md` no aplica aquí porque son dominios de acceso distintos. Si el proyecto consolida repositorios en el futuro, migrar a un único método en capa de dominio.
+
+**Plan de reversión (bajar el umbral)**
+
+Diseñado para ser **completamente reversible sin data loss**:
+
+1. PR que cambia `UmbralGradoAsistenciaDiaria` en BE de `8` a `1` (o al nuevo valor que defina el colegio). Actualizar **también** `UMBRAL_GRADO_ASISTENCIA_DIARIA` en FE al mismo valor.
+2. Deploy coordinado (BE primero, FE después). A partir del deploy BE, la próxima marcación CrossChex de los grados reincorporados crea registros normalmente.
+3. **(Opcional) Job de catch-up** si el colegio quiere generar estados `F` para los días que transcurrieron sin captura. No es obligatorio: el flujo normal de `F` por ausencia opera a futuro desde el deploy. El cálculo de `F` histórico para un día cerrado requiere agregar manualmente los registros `AsistenciaPersona` con `ASP_Estado = 'F'` y `ASP_OrigenManual = true` — nunca borrar ni alterar registros existentes (INV-AD01/INV-AD02).
+4. Correos retoman flujo normal sin cambios adicionales de código (el early-return en `EmailNotificationService` consulta la constante viva).
+5. Banner y mensaje de self-service dejan de mostrarse al siguiente deploy FE.
+
+**No se eliminan datos históricos**. Los registros que ya existen en `AsistenciaPersona` de grados afectados siguen en BD; los endpoints filtran pero no borran. Consultas SQL directas siguen mostrándolos.
+
+**Deuda técnica menor**: si el colegio cambia el umbral con frecuencia, migrar la constante a configuración en BD (`ConfiguracionSistema` o similar) para evitar deploys. Hoy no aplica — Plan 27 es temporal e infrecuente.
+
 ---
 
 ## 2. Asistencia por Curso (en clase)
@@ -1068,6 +1146,7 @@ Este registro consolida TODAS las invariantes del sistema en una tabla indexable
 | `INV-C08` | DiaSemana | C# `DayOfWeek.Sunday=0` → BD `7`. Fórmula: `(dow == 0) ? 7 : dow` | Helper/converter | 6.3 |
 | `INV-C09` | Asistencia | Salida de **estudiante** antes de `13:55` en periodo regular se descarta silenciosamente (log `Information`, no crea registro). Profesores y verano no aplican | `CoherenciaHorariaValidator.Clasificar` → `MarcacionAccion.IgnorarSalidaTemprana` | 1.1, 1.5 |
 | `INV-C10` | Asistencia | Entrada antes de `05:00` en periodo regular se descarta silenciosamente (ambos tipos persona). Verano no aplica | `CoherenciaHorariaValidator.Clasificar` → `MarcacionAccion.IgnorarAntesDeApertura` | 1.1, 1.5 |
+| `INV-C11` | Asistencia | Marcaciones CrossChex de estudiantes (`TipoPersona = 'E'`) con `GRA_Orden < UmbralGradoAsistenciaDiaria` (hoy `8` = 5to Primaria) se descartan silenciosamente (log `Information` con DNI enmascarado, sin registro). Consultas admin, reportes PDF/Excel y correos aplican el mismo filtro. Admin conserva edición sobre registros históricos (no existe `INV-AD07`). Profesores no aplican. Revertir = bajar `UmbralGradoAsistenciaDiaria` en BE + `UMBRAL_GRADO_ASISTENCIA_DIARIA` en FE (mirror) y redeployar | Webhook: `CoherenciaHorariaValidator.Clasificar` → `MarcacionAccion.IgnorarGradoFueraAlcance` consumido por `AsistenciaService.ClasificarYRegistrarMarcacionAsync`. Lectura: filtros en `ConsultaAsistenciaRepository` (3 queries), `AsistenciaAdminQueryRepository` (2 queries), `ReporteAsistenciaRepository` (3 queries). Correos: early-return en `EmailNotificationService.EnviarNotificacionAsistencia` y `EnviarNotificacionAsistenciaCorreccion` | 1.11 |
 
 ---
 
