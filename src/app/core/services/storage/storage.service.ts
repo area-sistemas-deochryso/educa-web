@@ -297,6 +297,24 @@ export class StorageService {
 	}
 	// #endregion
 
+	// #region THROTTLE STATUS WIDGET (Plan 22 Chat B)
+	getThrottleWidgetAutoRefresh(): boolean {
+		return this.preferences.getThrottleWidgetAutoRefresh();
+	}
+
+	setThrottleWidgetAutoRefresh(enabled: boolean): void {
+		this.preferences.setThrottleWidgetAutoRefresh(enabled);
+	}
+
+	getThrottleWidgetCollapsed(): boolean {
+		return this.preferences.getThrottleWidgetCollapsed();
+	}
+
+	setThrottleWidgetCollapsed(collapsed: boolean): void {
+		this.preferences.setThrottleWidgetCollapsed(collapsed);
+	}
+	// #endregion
+
 	// #region SYNC FALLBACKS — localStorage cuando IndexedDB no está disponible
 	private _getSyncFallback<T>(key: string): T | null {
 		try {

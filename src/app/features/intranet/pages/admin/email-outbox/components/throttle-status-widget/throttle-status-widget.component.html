@@ -1,0 +1,114 @@
+<!-- #region Widget container -->
+<section class="throttle-widget" [attr.aria-busy]="loading()">
+	<!-- #region Header con controles -->
+	<header class="throttle-widget__header">
+		<button
+			type="button"
+			class="throttle-widget__toggle"
+			(click)="onCollapseToggle()"
+			[attr.aria-expanded]="!collapsed()"
+			[attr.aria-label]="
+				collapsed() ? 'Expandir estado del throttle' : 'Contraer estado del throttle'
+			"
+		>
+			<i
+				class="pi"
+				[class.pi-chevron-down]="!collapsed()"
+				[class.pi-chevron-right]="collapsed()"
+			></i>
+			<span class="throttle-widget__title">Throttle saliente SMTP</span>
+		</button>
+
+		<div class="throttle-widget__actions">
+			<label class="throttle-widget__autorefresh">
+				<span>Auto-refresh 30s</span>
+				<p-toggleswitch
+					[ngModel]="autoRefresh()"
+					(ngModelChange)="onAutoRefreshToggle($event)"
+					inputId="throttle-autorefresh"
+				/>
+			</label>
+			<button
+				pButton
+				icon="pi pi-refresh"
+				class="p-button-outlined p-button-sm"
+				(click)="onRefreshClick()"
+				pTooltip="Refrescar ahora"
+				tooltipPosition="top"
+				[loading]="loading()"
+				[pt]="{ root: { 'aria-label': 'Refrescar estado del throttle' } }"
+			></button>
+		</div>
+	</header>
+	<!-- #endregion -->
+
+	<!-- #region Body colapsable -->
+	@if (!collapsed()) {
+		@if (throttleDisabled()) {
+			<div class="throttle-widget__disabled" role="status">
+				<i class="pi pi-info-circle"></i>
+				<span>
+					Throttle deshabilitado en configuración (<code>ThrottleEnabled=false</code>). La
+					pool de senders y los counters no se están aplicando.
+				</span>
+			</div>
+		} @else if (hasData(); as _) {
+			<!-- Card de dominio (full-width) -->
+			<div
+				class="throttle-card throttle-card--domain"
+				[class.throttle-card--near-limit]="domainNearLimit()"
+			>
+				<div class="throttle-card__content">
+					<span class="throttle-card__label">Dominio — total últimos 60 min</span>
+					<span class="throttle-card__value">
+						{{ status()!.domainCount }}
+						<span class="throttle-card__limit">/ {{ status()!.domainLimit }}</span>
+					</span>
+					@if (domainNearLimit()) {
+						<span class="throttle-card__warning" role="alert">
+							Acercándose al techo del dominio
+						</span>
+					}
+				</div>
+				<p-tag
+					[value]="labelFor(status()!.domainCount, status()!.domainLimit)"
+					[severity]="domainSeverity()"
+				/>
+			</div>
+
+			<!-- Grid de cards per-sender -->
+			<div class="throttle-widget__grid">
+				@for (sender of status()!.senders; track sender.index) {
+					<div
+						class="throttle-card throttle-card--sender"
+						[class.throttle-card--saturated]="sender.saturated"
+					>
+						<div class="throttle-card__content">
+							<span class="throttle-card__label">{{ sender.address }}</span>
+							<span class="throttle-card__value">
+								{{ sender.count }}
+								<span class="throttle-card__limit">/ {{ sender.limit }}</span>
+							</span>
+						</div>
+						<p-tag
+							[value]="labelFor(sender.count, sender.limit)"
+							[severity]="severityFor(sender.count, sender.limit)"
+						/>
+					</div>
+				} @empty {
+					<div class="throttle-widget__empty">
+						<i class="pi pi-exclamation-circle"></i>
+						<span>No hay senders configurados.</span>
+					</div>
+				}
+			</div>
+		} @else {
+			<div class="throttle-widget__empty" aria-live="polite">
+				<i class="pi pi-spin pi-spinner"></i>
+				<span>Cargando estado del throttle...</span>
+			</div>
+		}
+	}
+	<!-- #endregion -->
+</section>
+<!-- #endregion -->

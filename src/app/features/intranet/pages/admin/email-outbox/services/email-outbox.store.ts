@@ -7,6 +7,7 @@ import {
 	EmailOutboxTendencia,
 	EmailOutboxTipo,
 } from '@data/models/email-outbox.models';
+import { ThrottleStatus } from '../models/throttle-status.models';
 
 @Injectable({ providedIn: 'root' })
 export class EmailOutboxStore {
@@ -41,6 +42,12 @@ export class EmailOutboxStore {
 	// Tendencias
 	private readonly _tendencias = signal<EmailOutboxTendencia[]>([]);
 	private readonly _tendenciasReady = signal(false);
+
+	// Plan 22 Chat B — throttle status widget (per-sender + dominio + polling opcional)
+	private readonly _throttleStatus = signal<ThrottleStatus | null>(null);
+	private readonly _throttleLoading = signal(false);
+	private readonly _throttleAutoRefresh = signal(false);
+	private readonly _throttleCollapsed = signal(false);
 	// #endregion
 
 	// #region Lecturas públicas
@@ -61,6 +68,10 @@ export class EmailOutboxStore {
 	readonly previewLoading = this._previewLoading.asReadonly();
 	readonly tendencias = this._tendencias.asReadonly();
 	readonly tendenciasReady = this._tendenciasReady.asReadonly();
+	readonly throttleStatus = this._throttleStatus.asReadonly();
+	readonly throttleLoading = this._throttleLoading.asReadonly();
+	readonly throttleAutoRefresh = this._throttleAutoRefresh.asReadonly();
+	readonly throttleCollapsed = this._throttleCollapsed.asReadonly();
 	// #endregion
 
 	// #region Computed
@@ -99,6 +110,10 @@ export class EmailOutboxStore {
 		previewLoading: this._previewLoading(),
 		tendencias: this._tendencias(),
 		tendenciasReady: this._tendenciasReady(),
+		throttleStatus: this._throttleStatus(),
+		throttleLoading: this._throttleLoading(),
+		throttleAutoRefresh: this._throttleAutoRefresh(),
+		throttleCollapsed: this._throttleCollapsed(),
 	}));
 	// #endregion
 
@@ -136,6 +151,23 @@ export class EmailOutboxStore {
 		this._items.update((list) =>
 			list.map((i) => (i.id === id ? { ...i, estado: 'PENDING' as const, intentos: 0 } : i)),
 		);
+	}
+
+	// * Plan 22 Chat B — throttle status
+	setThrottleStatus(status: ThrottleStatus | null): void {
+		this._throttleStatus.set(status);
+	}
+
+	setThrottleLoading(loading: boolean): void {
+		this._throttleLoading.set(loading);
+	}
+
+	setThrottleAutoRefresh(enabled: boolean): void {
+		this._throttleAutoRefresh.set(enabled);
+	}
+
+	setThrottleCollapsed(collapsed: boolean): void {
+		this._throttleCollapsed.set(collapsed);
 	}
 	// #endregion
 

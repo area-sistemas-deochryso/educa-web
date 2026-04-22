@@ -15,12 +15,12 @@
 | 3 | Domain Layer (Opción A) | BE | `Educa.API/.claude/plan/domain-layer.md` (pendiente crear) | Fases 1-3,5-6 ✅ · F4 🔒 (bloqueada por Matrícula) | ~85% |
 | 4 | Consolidación Backend | FE | `plan/consolidacion-backend.md` (pendiente crear) | ⏳ | 0% |
 | 5 | Consolidación Frontend | FE | `plan/consolidacion-frontend.md` (pendiente crear) | ⏳ | 0% |
-| 6 | Asignación Profesor-Salón-Curso | BE+FE | `Educa.API/.claude/plan/asignacion-profesor-salon-curso.md` (pendiente crear) | ✅ F0-F6 cerrado | 100% |
+| 6 | Asignación Profesor-Salón-Curso | BE+FE | `Educa.API/.claude/plan/asignacion-profesor-salon-curso.md` | ✅ **100% — archivado 2026-04-22** en [history/planes-cerrados.md](../history/planes-cerrados.md#plan-6) | — |
 | 7 | Error Trace Backend | BE | `Educa.API/.claude/plan/error-trace-backend.md` (pendiente crear) | ⏳ | 0% |
 | 8 | Design Patterns Backend | FE | `tasks/design-patterns-backend.md` (pendiente crear) | Incremental | N/A |
 | 9 | Design Patterns Frontend | FE | `tasks/design-patterns-frontend.md` (pendiente crear) | Incremental | N/A |
 | 10 | Flujos Alternos (resiliencia) | FE | `plan/flujos-alternos.md` (pendiente crear) | ⏳ (bloqueado) | 0% |
-| 11 | Refactor `eslint.config.js` (fix G10) | FE | `plan/eslint-config-refactor.md` | ✅ F1-F5 (F5.3 cerrado 2026-04-17 con guard spec) | 100% |
+| 11 | Refactor `eslint.config.js` (fix G10) | FE | `plan/eslint-config-refactor.md` | ✅ **100% — archivado 2026-04-22** en [history/planes-cerrados.md](../history/planes-cerrados.md#plan-11) | — |
 | 12 | Backend Test Gaps | BE | `Educa.API/.claude/plan/test-backend-gaps.md` | F1 ✅ (A+B+C, 23 tests en 4 archivos) · F2-F5 ⏳ | ~30% |
 | 13 | Frontend Test Gaps | FE | `plan/test-frontend-gaps.md` (pendiente crear) | ⏳ | 0% |
 | 14 | Contratos FE-BE | FE+BE | `plan/contratos-fe-be.md` (pendiente crear) | ⏳ | 0% |
@@ -30,11 +30,11 @@
 | 18 | Tests de flujo de negocio E2E | BE+FE | (inline en maestro) | ⏳ | 0% |
 | 19 | Comunicación: foro + mensajería + push | FE+BE | (pendiente planificar) | ⏳ | 0% |
 | 20 | Design System — Estándar desde `usuarios` | FE | `tasks/design-system-from-usuarios.md` | F1 ✅ · F2 ✅ (F2.1-F2.5) · F3 ✅ · F4 ✅ · F5.1-F5.2 ✅ · F5.3 ⏳ (0/8) | ~96% |
-| **21** | **✅ Asistencia de Profesores en CrossChex** | **BE+FE** | **`plan/asistencia-profesores.md`** | **✅ Cerrado 2026-04-21. Chats 1 + 1.5 + 2 + 3 + 4 + 6 + 7 (A/B/C) + 5 completos. **Chat 5 cerrado**: SQL FKs ejecutado en prueba+producción · deploy BE+FE en Azure/Netlify · sync histórico de profesores vía "Sobreescribir desde CrossChex" · `sp_rename 'Asistencia' → 'Asistencia_deprecated_2026_04'` · reglas actualizadas 2026-04-21: `business-rules.md` § 1.0 "Modelo polimórfico" + INV-AD06 nuevo en § 15.9; `permissions.md` sección "Jurisdicción sobre asistencia"; `domain.md` flujo 1 refleja polimorfismo E/P. **Deuda técnica lateral** (chats futuros, no bloquea cierre): `PermisoSaludAuthorizationHelper.cs:63` anti-pattern `DIR_DNI == dni`; `ErrorLog` en BD prueba le faltan 3 columnas (`ERL_RequestBody`, `ERL_RequestHeaders`, `ERL_ResponseBody`); DROP definitivo de `Asistencia_deprecated_2026_04` a los 60 días.** | **100%** |
-| 22 | Endurecimiento correos de asistencia | BE+FE | `Educa.API/.claude/plan/asistencia-correos-endurecimiento.md` | 🟢 En progreso · **Chats 1 (F1) + 2 (F2) + 3 (F3.BE) + A (F5+F6) + A-cierre ✅ cerrados 2026-04-21**. **Chat A cierre (2026-04-21)**: build limpio · **1053 tests verdes** (baseline superado, 0 regresiones) · 4 scripts SQL ejecutados en BD prueba (11 filas) y producción (2789 filas) con `sin_remitente=0` y `con_contador_cero=total` en ambas · commits BE (`a2f4bfd` en `master`) y FE maestro (`b0c5832` en `main`) + push a origin · INV-AD05 actualizado en `business-rules.md` + `permissions.md` removiendo "BCC al colegio" (consistente con `CopiaAsistenciaEmail` eliminado de `appsettings.json`). **Chat A (F5+F6 merged — SMTP outbound throttle + multi-sender)**: techo efectivo 50/h (single) → 200/h (domain-bound) con 7 buzones `@laazulitasac.com`. Sliding window 60 min con dos counters (per-sender 50/h + per-dominio 200/h). `IQuotaThrottleService` + `QuotaThrottleService` (lógica pura, `AsNoTracking()`). `EmailOutboxWorker` `partial class` (293ln main + 106ln `.Sender.cs`) respetando cap 300ln; `SelectSenderOrApplyQuotaSaturationAsync` + `GetFallbackSender` (INV-S07 fail-open a sender[0]). Round-robin stateful `_lastSenderIndex`, skip de saturados. Re-enqueue con `min(FechaEnvio domain window) + 60 min + jitter(1..5 min)`. Tras `ThrottleMaxReintentosCuota=5` defers → FAILED `"FAILED_QUOTA_EXCEEDED"`. **Contador separado `EO_IntentosPorCuota`** (Opción 2 del usuario — no mezcla con `EO_Intentos` del retry SMTP F2). `EmailSettings` + 6 slots planos (Address2..7) + 5 props throttle; `Senders` filtra slots vacíos (rollback: borrar env vars 2-7 → single-sender sin redeploy). Nueva columna `EO_Remitente` + índice `IX_EmailOutbox_Remitente_FechaEnvio_Sent` + `EO_IntentosPorCuota INT NOT NULL DEFAULT 0`. 13 unit tests (`QuotaThrottleServiceTests`) + 6 integration tests nuevos (casos g-l). Post-deploy pendiente: monitoreo 24-48h (distribución 7 senders + `FAILED_QUOTA_EXCEEDED` > 0). **Chat B (F5.6 FE widget `/intranet/admin/bandeja-correos` + endpoint `/api/email-outbox/throttle-status`)** pendiente. Chat 4 (F3.FE) + Chats 5-6 (F4 BE+FE) también pendientes. | 75% |
-| **23** | **✅ Extensión `/intranet/admin/asistencias` a Profesores** | **BE+FE** | **`plan/asistencia-admin-profesores.md`** | **✅ Cerrado 2026-04-21. Chats 1 BE + 2 FE + 3.A BE + 3.B FE + 4 BE+FE + 5 FE completos. **Chat 5 cerrado** (2026-04-21): (1) cross-link UI "Editar en admin" en `AttendanceDirectorComponent` tab profesores: botón icon-only per-row en vista día (`pi pi-pencil` + tooltip + `aria-label` "Editar asistencia del profesor") vía nuevos `showEditAdminAction` + `editAdmin` en `AttendancePersonaDayListComponent` (gated por flag, default `false`); botón contextual en vista mes junto al PDF. Navega a `/intranet/admin/asistencias?tab=gestion&tipoPersona=P&dni=...&fecha=YYYY-MM-DD` vía `Router.navigate`. (2) Query params ampliados en [attendances.component.ts:163-185](src/app/features/intranet/pages/admin/attendances/attendances.component.ts): ahora lee `tab` + `tipoPersona` + `dni` (aplica a search filter) + `fecha` (aplica a `fechaCalendar` + `dataFacade.onFechaChange`). Helpers `isValidDateIso` + `parseIsoDate` extraídos a `services/attendances-query-params.ts` (testables y reutilizables). `takeUntilDestroyed` respetado. (3) Auditoría de divergencia: ambas vistas consumen `AsistenciaPersona` (Plan 21) vía endpoints polimórficos coherentes con INV-C01/INV-C03 — sin divergencia esperada por código; smoke de campo delegado al Director en producción (sin archivo de hallazgo creado). Nuevo helper `@core/helpers/date.utils.ts` con `formatDateLocalIso(fecha)` (YYYY-MM-DD local, sin desfase UTC). Métodos PDF en profesores component consolidados (6 → 4) con `runPdf$(req$, handle)` genérico. Cap 300 líneas respetado en archivos tocados tras refactor. Lint + tsc + **1380 tests verdes** (sin regresión). **Chat 4 (enforcement INV-AD06 + correo profesor)**: `AsistenciaAdminController` ya tenía `[Authorize(Roles = Roles.Administrativos)]` (4 roles) desde Plan 21 — auditado. Nuevo `AsistenciaAdminControllerAuthorizationTests` (6 tests reflection). `IEmailNotificationService.EnviarNotificacionAsistenciaCorreccionProfesor`: destinatario = `PRO_Correo`, BCC = colegio, outbox tag `"ASISTENCIA_CORRECCION_PROFESOR"`. `EmailNotificationService` dividido en 2 partials respetando cap 300ln. `AsistenciaAdminEmailNotifierTests` (7 tests): routing E/P, fire-and-forget (INV-S07). FE: helper `notificarExito` en `AttendancesCrudFacade` emite toast diferenciado en los 5 puntos de mutación. Suite BE: 800 verdes. `business-rules.md` sección 1.8 + INV-AD05 + `permissions.md` jurisdicción actualizados. Deploy BE+FE en producción 2026-04-21. **Hardening adicional cerrado** (commit `332ef11`): INV-C01/C09/C10 — umbrales absolutos de tardanza/falta diferenciados por `TipoPersona` en periodo regular (E: 7:46/9:30 · P: 7:31/9:30); guards INV-C09 (salida estudiante <13:55) e INV-C10 (entrada <05:00).** | **100%** |
+| 21 | Asistencia de Profesores en CrossChex | BE+FE | `plan/asistencia-profesores.md` | ✅ **100% — archivado 2026-04-22** en [history/planes-cerrados.md](../history/planes-cerrados.md#plan-21). Deuda lateral pendiente: `PermisoSaludAuthorizationHelper.cs:63`; cols `ERL_*` en BD prueba; DROP `Asistencia_deprecated_2026_04` ~2026-06-20 | — |
+| 22 | Endurecimiento correos de asistencia | BE+FE | `Educa.API/.claude/plan/asistencia-correos-endurecimiento.md` | 🟢 En progreso · **Chats 1 (F1) + 2 (F2) + 3 (F3.BE) + A (F5+F6) + A-cierre ✅ cerrados 2026-04-21** · **Chat B (F5.6 FE widget) ✅ cerrado 2026-04-22**. **Chat B (2026-04-22)**: endpoint BE `GET /api/sistema/email-outbox/throttle-status` con `EmailOutboxMonitoringService` que orquesta `IQuotaThrottleService.CheckQuotaAsync` por sender + 1 query de dominio `AsNoTracking()` sobre índice `IX_EmailOutbox_FechaEnvio_Sent` (Chat A). Emails enmascarados en BE (`sistemas@***.com`) antes de devolverse al cliente. Widget FE `<app-throttle-status-widget>` presentacional (OnPush, inputs/outputs) integrado en `/intranet/admin/bandeja-correos` entre chart y filtros: 7 cards per-sender + 1 card full-width de dominio con severity por ratio count/limit (success/info/warn/danger). Polling opcional 30s togglable (switch PrimeNG + botón refresh manual + colapsable). Preferencias `emailOutboxThrottleWidget` (feature flag OFF prod, ON dev) + `throttleWidgetAutoRefresh/Collapsed` persistidas via `StorageService`. **+10 tests BE** (5 service + 5 reflection authz, `1063 tests verdes`) · **+12 tests FE** (6 widget + 6 facade polling con vitest fake timers, `1478 tests verdes`) · lint + build OK en ambos repos. **Chat A cierre (2026-04-21)**: build limpio · 1053 tests · 4 scripts SQL (11 + 2789 filas) · commits `a2f4bfd` (BE) + `b0c5832` (FE) · INV-AD05 sin BCC. **Chat A (F5+F6 merged)**: techo 50/h → 200/h con 7 buzones, sliding window 60 min, round-robin, re-enqueue jitter, `FAILED_QUOTA_EXCEEDED`, `EO_IntentosPorCuota` separado. Post-deploy Chat A pendiente monitoreo 24-48h. Chat 4 (F3.FE) + Chats 5-6 (F4 BE+FE) pendientes. | 90% |
+| 23 | Extensión `/intranet/admin/asistencias` a Profesores | BE+FE | `plan/asistencia-admin-profesores.md` | ✅ **100% — archivado 2026-04-22** en [history/planes-cerrados.md](../history/planes-cerrados.md#plan-23) | — |
 | 24 | 🟡 Sync CrossChex en Background Job | BE+FE | (inline en maestro) | ⏳ Plan nuevo 2026-04-20. Diagnóstico cerrado: `Task.Delay(30000)` entre páginas bloquea UI 2+ min; `.subscribe()` directo en FE no corre en background. 4 chats diseñados (BE job + SignalR + FE progreso + validar rate limit) | 0% |
-| **25** | **✅ Paridad Excel para reportes PDF** | **BE+FE** | **(inline en maestro)** | **✅ Cerrado 2026-04-21. Chats 1 + 2 + 3 + 4 completos. 14 endpoints `/excel` mirror de los `/pdf` en BE (1 `ReportesAsistenciaController` + 2 `BoletaNotasController` + 11 `ConsultaAsistenciaController`). 5 páginas FE con menú dual 3-items (`Ver PDF` / `Descargar PDF` / `Descargar Excel`) vía helper `buildPdfExcelMenuItems`. `§17 Reportes exportables — paridad de formatos` en `business-rules.md` con INV-RE01/02/03 + checklist. Tests paridad: BE 930 (+26 nuevos, 0 regresiones sobre baseline 904); FE 1429 (+19 nuevos, 0 regresiones sobre baseline 1410). `attendance-reports.facade` migrado de ExcelJS client-side a endpoint BE. Tests contract usan `ControllerTestBase` + `ClaimsPrincipalBuilder` existentes (no se montó `WebApplicationFactory`).** | **100%** |
+| 25 | Paridad Excel para reportes PDF | BE+FE | (archivado en historial) | ✅ **100% — archivado 2026-04-22** en [history/planes-cerrados.md](../history/planes-cerrados.md#plan-25). Regla §17 en `business-rules.md` con INV-RE01/02/03 | — |
 | **26** | **🟡 Rate limiting flexible** | **BE+FE** | **(inline en maestro)** | **🟡 F1 ✅ cerrada 2026-04-21 (Chat 1 BE + Chat 2 BE+FE). Telemetría viva en prod: tabla `RateLimitEvent` + middleware fire-and-forget (INV-S07 + INV-ET02) + endpoint admin + **vista admin `/intranet/admin/rate-limit-events`** (stats cards, filtros, drawer detalle, feature flag `rateLimitMonitoring` on en prod+dev). Chat 2 agregó **endpoint agregado `/stats?horas=24`** (opción B — SQL GroupBy server-side), **fix de orden del pipeline** (middleware ANTES de `UseRateLimiter` — sin esto ningún 429 se persistía; el limiter corta el pipeline al rechazar), **fix LINQ** (record con ctor no traducible → proyección anónima + map en memoria) y **quick-fix C**: `heavy` 5 → 15/min como parche revertible cuando F2 aterrice multiplier por rol. FE adicional Opción A: **eliminado banner global + `RateLimitService`** (sintetizaban 429s y bloqueaban toda la app ante UN solo 429) y **nuevo `RateLimitCountdownToast`** no-bloqueante (solo informa, tick reactivo fuera de zone). Tests: BE 1034 verdes (+6 nuevos Chat 2); FE 1466 verdes (+26 admin view + 15 countdown + 9 interceptor reescrito). F1.3 early warning >80% diferido a F2. Plan ~20%. **Siguiente**: F2 (multiplier por rol + `[RateLimitOverride]`) una vez la telemetría haya capturado 1-2 semanas reales.** | **20%** |
 
 **Semáforo de readiness**:
@@ -184,65 +184,6 @@ Cuellos de botella efectivos para el sistema:
 
 ---
 
-## 🟡 Asistencia de Profesores en CrossChex
-
-> **Origen**: Investigación 2026-04-18 + diseño cerrado 2026-04-18. CrossChex ya envía marcaciones biométricas de profesores, pero el webhook del backend y el sync manual las descartan silenciosamente porque la tabla `Asistencia` solo tiene FK a `Estudiante`.
-> **Impacto**: ~1 semana de registros de profesores pendientes de procesar. **No hay pérdida definitiva** — `AsistenciaSyncService.SobreescribirDesdeCrossChexAsync` recupera días históricos una vez corregido el dispatch.
-> **Plan**: [`plan/asistencia-profesores.md`](asistencia-profesores.md) — Plan #21 del inventario.
-> **Estado**: ✅ Chat 1 + Chat 1.5 + Chat 2 + Chat 3 + Chat 4 + Chat 6 cerrados (2026-04-20). Chat 6 cerró la deuda UX del Chat 4: vista "Mi asistencia" ahora usa la leyenda compartida, responde al pill día/mes del header y aplica severity coherente con el resto del módulo. Frontend: 1341 tests verdes. Backend: 766 tests verdes.
-> **Próximo paso**: Chat 5 (deploy). Ejecutar `plan21_chat15_FkRepointAsistenciaPersona.sql` en prueba/producción → deploy backend → deploy frontend → sync histórico "Sobreescribir desde CrossChex" → rename legacy `Asistencia` → actualizar `business-rules.md` (INV-AD05/AD06) y `permissions.md`.
-
-### Qué se decidió en investigación
-
-- **Modelo**: Opción C — nueva tabla `AsistenciaPersona` con discriminador `ASP_TipoPersona ∈ {'E','P'}` y FK polimórfica.
-- **Webhook**: dispatch por DNI en orden Profesor → Estudiante → rechazar.
-- **Reutilización**: mismas ventanas horarias, invariantes horarios (INV-C01/02/03), cierre mensual (INV-AD03), origen manual (INV-AD02).
-- **Invariantes nuevos/modificados**: INV-AD05 ampliado (profesor solo correo a sistemas), **INV-AD06 nuevo** (justificación de profesor requiere rol administrativo; profesor no puede autojustificarse ni justificar a colega), regla nueva de jurisdicción a `permissions.md`.
-- **UI**: submenú Estudiantes/Profesores en `AttendanceDirectorComponent` para los 4 roles administrativos (Director + Asistente Admin + Promotor + Coordinador Académico); panel propio read-only en `AttendanceProfesorComponent`.
-
-### Por qué es urgente
-
-Cada día que pasa sin resolver esto, se pierden marcaciones biométricas de profesores en CrossChex. El costo marginal crece diario y no hay forma de reconstruir los datos retroactivamente a partir del webhook — el dispositivo los envía una sola vez.
-
-### Dependencias
-
-- **Ninguna dura**: el plan puede arrancar en paralelo a cualquier ola de Carril D.
-- **Relacionado con**: Plan 1 F4 (INV-* en tests) — al formalizar INV-AD06 conviene que haya test unitario del guard de jurisdicción.
-- **No toca**: `/intranet/admin/asistencias` (ese módulo queda fuera de este plan).
-- **Sucesor agendado**: **Plan 22 — Endurecimiento correos de asistencia** (`Educa.API/.claude/plan/asistencia-correos-endurecimiento.md`) queda 🔒 congelado hasta que Plan 21 cierre. Razón: la lógica de distinción estudiante/profesor en el dispatcher y routing de correos se consolida en los Chat 3+ de Plan 21, y F1/F3/F4 del Plan 22 la necesitan para validar, notificar y auditar por tipo de persona.
-- **Sucesor agendado**: **Plan 23 — Extensión `/intranet/admin/asistencias` a Profesores** (`plan/asistencia-admin-profesores.md`). Razón: Plan 21 cerró el dispatch y la tabla `AsistenciaPersona` pero la pantalla admin de gestión y reportes todavía asume universo "solo estudiantes". Plan 23 parametriza endpoints por `tipoPersona` y agrega toggle Estudiantes/Profesores/Todos sin duplicar vistas. Puede arrancar en paralelo a Plan 22 (tocan capas distintas: Plan 22 = outbox/SMTP, Plan 23 = UI admin + endpoints listar/crear/reportar).
-
----
-
-## 🟡 Plan 23 — Extensión `/intranet/admin/asistencias` a Profesores
-
-> **Origen**: Conversación 2026-04-20. Tras cerrar Plan 21, CrossChex sincroniza marcaciones de profesores y el backend las persiste en `AsistenciaPersona`, pero `/intranet/admin/asistencias` (tabs Gestión + Reportes) aún filtra/muestra solo estudiantes. El Director no puede auditar profesores ni corregir manualmente marcaciones biométricas de profesor desde el admin formal.
-> **Plan**: [`plan/asistencia-admin-profesores.md`](asistencia-admin-profesores.md) — Plan #23 del inventario.
-> **Estado**: ⏳ Plan nuevo, 5 chats diseñados (BE → FE Gestión → BE+FE Reportes → BE+FE INV-AD05/06 → deploy).
-> **Puede arrancar en paralelo a Plan 22** — tocan capas distintas (Plan 22 = outbox/SMTP, Plan 23 = UI admin + endpoints listar/crear/reportar).
-
-### Qué se decidió en diseño
-
-- **Parametrizar, no duplicar**: query param `tipoPersona ∈ {E, P, todos}` en endpoints existentes. Default admin = `todos`.
-- **UI**: toggle 3-opciones en tab Gestión con default `E` por retrocompatibilidad visual; columna "Grado" → "Contexto" polimórfico (`"1ro Secundaria A"` para E, `"Matemáticas — Secundaria"` para P).
-- **Formulario "Nueva asistencia"**: pestaña Estudiante/Profesor con selector subyacente diferente (reutiliza UX de `AttendanceDirectorComponent` Chat 7).
-- **Reportes**: eje `tipoPersona` adicional, header PDF dinámico, selector "Salones" oculto cuando tipo = Profesores/Todos.
-- **Cross-link UI**: botón "Editar en admin" desde `AttendanceDirectorComponent` Chat 7 lleva a `/intranet/admin/asistencias?tab=gestion&tipoPersona=P&dni=...&fecha=...`.
-- **Invariantes**: INV-AD05 ampliado (correo de corrección a profesor + Director, no apoderado); INV-AD06 reforzado con test de boundary.
-- **Sin migración SQL nueva**: Plan 21 ya entregó `AsistenciaPersona`.
-
-### Por qué importa
-
-Cada día que pasa sin resolver, el Director acumula registros de profesores invisibles en la UI formal. La única vía de auditoría hoy es `AttendanceDirectorComponent` (Plan 21 Chat 7) que es read-only. No hay flujo formal para corregir marcaciones biométricas de profesor desde admin.
-
-### Dependencias
-
-- **Dura**: Plan 21 cerrado (tabla `AsistenciaPersona` + dispatcher Profesor→Estudiante existen).
-- **Blanda con Plan 22**: si Plan 22 cierra antes, se hereda validación ASCII+RFC y clasificación SMTP automáticamente. Si Plan 23 cierra antes, Plan 22 encuentra universo completo sin rework.
-- **Relacionado con**: Plan 12 F3 (Security boundary tests) — el test de INV-AD06 (rol Profesor no puede mutar otro profesor) calza en esa suite.
-
----
-
 ## 🟡 Plan 24 — Sincronización CrossChex en Background Job
 
 > **Origen**: Conversación 2026-04-20. En `/intranet/admin/asistencias?tab=gestion`, "Sincronizar CrossChex" bloquea al usuario 2+ minutos sin feedback granular. Si el usuario navega, pierde el resultado (subscripción cancelada, request sigue viva en server).
@@ -283,61 +224,6 @@ El Director pierde 2+ minutos bloqueado cada vez que sincroniza (operación frec
 
 ---
 
-## ✅ Plan 25 — Paridad Excel para reportes PDF — CERRADO 2026-04-21
-
-> **Origen**: Decisión 2026-04-21. Los usuarios (Director + Administrativos) necesitan los mismos reportes en Excel para analizar, filtrar y cruzar datos en hojas de cálculo. Hoy solo se entrega PDF — formato cerrado, no manipulable.
-> **Plan**: inline en este maestro (sin archivo separado por ahora).
-> **Estado**: ✅ **Cerrado 2026-04-21**. Chat 1 ✅ + Chat 2 ✅ + Chat 3 ✅ + Chat 4 ✅ + Chat 5A ✅ + Chat 5B ✅ (6 de 6 chats cerrados, 100%). Reapertura se cerró completamente — Chat 5A alineó colores + leyenda + nombres de mes en Excel; Chat 5B entregó división Verano/Regular del reporte anual (query param `periodo`) + espejo PDF de subtítulos en español + refactor `FechaFormatoHelper` compartido entre Excel y PDF.
-
-### Regla nueva
-
-> **"Todo endpoint o acción de UI que exporta un reporte en PDF debe ofrecer también la versión Excel equivalente."**
-
-Aplica a reportes nuevos y a los 6+ existentes. Sin excepciones salvo justificación escrita (ej: layout puramente tipográfico sin datos tabulares — no aplica a ningún reporte actual).
-
-### Reportes actuales a cubrir
-
-Todos son BE (`Services/Reportes*`) consumidos por FE admin o cross-role:
-
-- `ReporteFiltradoAsistenciaService` (441 ln) — reporte filtrado de asistencia (admin + reportes-asistencia)
-- `ReporteFiltradoPdfService` (425 ln) — layout del anterior
-- `ReporteAsistenciaDataService` (396 ln) — data para reporte agregado
-- `ReporteAsistenciaConsolidadoPdfService` (389 ln) — consolidado por periodo
-- `ReporteAsistenciaSalonPdfService` (314 ln) — por salón
-- `BoletaNotasPdfService` (381 ln) — boleta de notas del estudiante
-- PDF de asistencia de profesor (Plan 21 Chat 2, consulta-asistencia)
-
-### Qué diseñar (4 chats estimados)
-
-- **Chat 1 — BE: ClosedXML + `ReporteFiltradoAsistencia` Excel parity** ✅ **cerrado 2026-04-21**. Decisión práctica: NO abstraer `IReportBuilder` genérico (diferido a Plan 2/C.2) — entrega aditiva pura al lado del PDF, sin tocar servicios existentes. Se agregó `ClosedXML 0.104.*`, `IAsistenciaExcelService` + `AsistenciaExcelService` (base + partials `Estudiantes`/`Profesores`, todos <300 ln), endpoint `GET /api/reportes-asistencia/excel` con `[EnableRateLimiting("heavy")]` mirror del `/pdf`, 12 tests nuevos (877 total, 0 regresiones). Dos hojas separadas cuando `tipoPersona=todos`. DNI como texto (INV-D01), horas en Perú (INV-D04).
-- **Chat 2 — BE: migrar 4 reportes PDF restantes a Excel** ✅ **cerrado 2026-04-21**. 4 services nuevos con sus interfaces: `IReporteAsistenciaSalonExcelService`, `IReporteAsistenciaConsolidadoExcelService`, `IReporteAsistenciaProfesorExcelService`, `IBoletaNotasExcelService`. 13 endpoints `/excel` mirror de los `/pdf` (11 en `ConsultaAsistenciaController` + 2 en `BoletaNotasController`), todos con `[EnableRateLimiting("heavy")]` y Content-Type correcto. **ExcelHelpers.cs estático extraído** (constantes + `EscribirDniComoTexto`, `FormatearHora`, `AplicarEstiloHeader`, `EscribirHeaders`, `PintarFilaAlterna`, `FinalizarHoja`, `EscribirSinResultados`) — consolidación de helpers duplicados de Chat 1, `AsistenciaExcelService` refactorizado para consumirlo. 27 tests nuevos (904 total, +27 sobre 877 baseline de Chat 1, 0 regresiones). Cap 300 ln respetado en los 8 archivos nuevos. NO se adelantó `IReportBuilder` (Plan 2/C.2) — la duplicación de mapeo se absorbió sin dolor con el partial pattern + helpers compartidos. Deuda: `ConsultaAsistenciaController.cs` quedó en 839 ln (ya estaba en 630 pre-Chat 2, split fuera de scope).
-- **Chat 3 — FE: UI dual PDF/Excel** ✅ **cerrado 2026-04-21**. Inventario real en FE = 5 puntos (no 6): `estadisticas-dia`, `attendance-director-estudiantes`, `attendance-director-profesores`, `attendance-profesor-estudiantes`, `attendance-reports`. En lugar de un shared `<app-download-split-button>`, se extendió el patrón existente `<p-menu>` agregando "Descargar Excel" a cada `pdfMenuItems` — cada componente construye su menú según modo (día/mes/periodo/consolidado) y no justificaba un wrapper. Helper común `buildPdfExcelMenuItems()` en `consolidated-pdf.helper.ts` consolida los 3 items. Services: `DirectorAttendanceApiService` refactorizado con `downloadReport`/`downloadConsolidado` privados paramétricos por formato (PDF/Excel) — 7 métodos PDF + 7 Excel. `AsistenciaProfesorApiService`: 3 métodos Excel nuevos. Fachada `AttendanceService`: 7 wrappers Excel. `AttendancePdfService` scoped: helper `run(obs, handle)` común + métodos Excel espejo. `attendance-reports.facade.ts`: **reemplazado ExcelJS client-side por endpoint BE** `/api/ReportesAsistencia/excel` (consistencia con lo que hace PDF). 0 regresiones (1410 tests verdes), lint limpio, build OK. Dos escape hatches `max-lines` con justificación en los 2 componentes director (>300 ln por la cohesión de 2 modos × 2 formatos × 4 variantes de reporte).
-- **Chat 4 — Documentación + tests de paridad end-to-end** ✅ **cerrado 2026-04-21**. Docs: `§17 Reportes exportables — paridad de formatos` agregado a `business-rules.md` con la regla operativa ("todo endpoint o acción UI que exporta PDF debe ofrecer Excel"), INV-RE01/02/03, inventario actual de 14 endpoints, excepción única (layouts tipográficos sin datos tabulares) y entrada de checklist backend. Tests BE: `ReportesAsistenciaExcelEndpointTests` + `BoletaNotasExcelEndpointTests` + `ConsultaAsistenciaExcelEndpointTests` — 26 tests contract por endpoint verifican (a) content-type `application/vnd.openxmlformats-officedocument.spreadsheetml.sheet`, (b) extensión `.xlsx` en `FileDownloadName`, (c) que PDF y Excel invocan el mismo data service con los mismos args (paridad estructural). Decisión: **NO** se montó `WebApplicationFactory` — tests unit de controller usando `ControllerTestBase` + `ClaimsPrincipalBuilder` existentes cubren lo mismo sin la infraestructura pesada. Tests FE: `consolidated-pdf.helper.spec.ts` (17 tests) cubre el helper compartido `buildPdfExcelMenuItems` — 3-item menu, dispatch a callbacks, `labelSuffix`, y la paridad del switch `getTodosSalonesObservable` ↔ `getTodosSalonesExcelObservable`. Siguiendo aprendizaje transferible #2 del handoff, **NO** se duplicó cobertura agregando specs por componente — el helper es la unidad de verdad. `attendance-reports.facade.spec.ts` extendido con 2 tests para `exportarExcel` (delegación al endpoint BE + short-circuit sin resultado). Suite BE: 930 verdes (+26). Suite FE: 1429 verdes (+19). Lint FE + build Angular verdes.
-- **Chat 5A — BE: paridad visual Excel ↔ PDF (colores + leyenda + nombres de mes)** ✅ **cerrado 2026-04-21**. Reapertura del plan por feedback visual del usuario post-Chat 4: los Excel no seguían el color coding del PDF, no tenían leyenda de estados, y los subtítulos usaban rangos numéricos feos en vez de nombres de mes en español. Entrega: **(1)** catálogo compartido `Constants/Asistencias/EstadoAsistenciaColores.cs` — fuente única de verdad para los 6 códigos (T/A/F/J/-/X) con `Foreground` + `Background` + `Label` + `Orden` + helper `ToArgbNoHash` (convierte `"#506ad0"` → `"FF506AD0"` para ClosedXML). `AsistenciaPdfComposer.Colors.cs` refactorizado a facade (preserva API pública `ColorEstado`/`ColorEstadoBg`/`EstadosAsistencia` — zero breaking change para PDF). **(2)** `ExcelHelpers` extendido: `EscribirLeyendaEstados` (5 badges horizontales con fondos de color), `AplicarColorEstado` (pinta celda individual con fg+bg del catálogo), `FormatearMesAnio` (`"ABRIL 2026"`), `FormatearRangoSemana` (`"Semana del lunes 20 al domingo 26 de abril de 2026"`). **(3)** Celdas de estado pintadas en `AsistenciaExcelService.Estudiantes`/`.Profesores`, `ReporteAsistenciaProfesorExcelService.Tables` (día/mes/filtrado) y `ReporteAsistenciaSalonExcelService.Tables` (hoja Día). Consolidados por salón no pintan celdas (columnas de conteo, no de estado) pero tampoco llevan leyenda. **(4)** Leyenda invocada en fila 4 del reporte filtrado (estudiantes+profesores) y fila 3-4 de reportes de profesor (día/mes/filtrado) — headerRow pasó de 5→6 en esos services con los 10 tests hardcodeados actualizados. **(5)** Subtítulos con nombre de mes en español en todos los services de rango (consolidado, salón, profesor). El año consolidado queda simple `"AÑO 2026"` — Chat 5B lo enriquece con Verano/Regular. Decisiones pre-work: catálogo en Opción A (`Constants/Asistencias/`), espejo PDF de subtítulos diferido a 5B (PDF services ya están en 395/320 ln). Tests nuevos: `EstadoAsistenciaColoresTests` (15 tests catálogo + ToArgbNoHash + fallbacks), `AsistenciaPdfColoresParidadTests` (15 tests pinean paridad PDF↔catálogo — preventivo de drift), `ExcelHelpersLeyendaTests` (8 tests: leyenda + AplicarColorEstado + FormatearMesAnio + FormatearRangoSemana), `AsistenciaExcelServiceColorTests` (6 tests: 4 códigos × celda estudiante + celda profesor + leyenda en fila 4), extensión de `ReporteAsistenciaConsolidadoExcelServiceTests` (2 tests: subtítulo mes en español + "AÑO 2026" simple). Suite BE: **986 verdes** (+56 sobre 930 baseline de Chat 4, 0 regresiones). Cap 300 ln respetado en todos los archivos tocados. Agregado `InternalsVisibleTo("Educa.API.Tests")` al `.csproj` para testear helpers internos.
-- **Chat 5B — BE + FE: división Verano/Regular del reporte anual + espejo PDF de subtítulos** ✅ **cerrado 2026-04-21**. Decisiones pre-work: **Opción B** (query param `periodo=ambos|verano|regular`, default `ambos`) + promover `FechaFormatoHelper` a shared para que PDF lo consuma sin acoplarse al namespace Excel. Entrega en 3 commits BE + 1 FE: **(1) refactor(reports) `d3188ed`** — `FormatearMesAnio`/`FormatearRangoSemana` movidos a `Helpers/Formatting/FechaFormatoHelper.cs`; `ExcelHelpers` mantiene delegates thin para no romper 6+ consumers. `FechaFormatoHelperTests` (6 tests) pinea contrato directo, los 8 tests de Chat 5A siguen verdes vía delegates. **(2) feat(reports) `7618021`** — `PeriodoAnual` constants class (ambos/verano/regular + `Normalizar`/`IncluyeVerano`/`IncluyeRegular`), `AnioDivididoDto` (Verano + Regular lists), `ObtenerDatosTodosSalonesAnioDividido` en `DataService` (partial `*.AnualDividido.cs` — principal ya estaba en 400 ln deuda pre-existente, no empeorada), `GenerarExcelTodosSalonesAnio` acepta `periodo` y genera 1-2 hojas (`Verano` / `Regular`), `GenerarPdfTodosSalonesAnio` acepta `periodo` y genera 1-2 páginas independientes. Controllers `/anio/pdf` y `/anio/excel` aceptan `[FromQuery] string? periodo`. **Cleanup de dead code**: 3 métodos nunca llamados (`ComposeSeccionBuenaAsistencia`, `ComposeSeccionBajaAsistencia`, `ComposeContentResumen`) eliminados de `ReporteAsistenciaConsolidadoPdfService` — archivo pasó de 395→295 ln, dentro del cap sin partial split. **(3) feat(reports) `98fa14f`** — subtítulos PDF en español vía `FechaFormatoHelper` en `ReporteAsistenciaConsolidadoPdfService` (semana/mes), `ReporteAsistenciaSalonPdfService` (mes — split a partial `*.Headers.cs` porque era 320 ln pre-existente, ahora 171+160), `ReporteAsistenciaProfesorPdfService` (mes). Cierra visual parity Excel↔PDF. **(4) feat(reports) FE `dd137f8`** — `TipoReporte` extendido con `todos-anio-verano` + `todos-anio-regular`; helper `getPeriodoFromTipo` mapea al query param BE; `TIPO_REPORTE_OPTIONS` expone 3 items ("Año (ambos periodos)", "Año — solo Verano (Ene-Feb)", "Año — solo Regular (Mar-Dic)"); filenames con sufijo de periodo. Tests nuevos: 3 DataService + 4 Excel consolidado + 3 PDF consolidado anual + 5 PDF subtítulos español + 6 FechaFormatoHelper = **20 BE nuevos**, suite **1006 verdes** (+20 sobre 986 Chat 5A, 0 regresiones). **5 tests FE nuevos** (3 routing per periodo + 3 filename suffix, 1 actualizado) → 22 vitest verdes en el helper. Cap 300 ln respetado en todos los archivos tocados (partial splits con nombre de responsabilidad explícito). INV-RE01 preservado — ambos endpoints PDF/Excel aceptan el mismo param. INV-C01 no se tocó (las reglas de umbral viven en Domain, Chat 5B solo separa el agregado).
-
-### Por qué importa (Plan 25)
-
-- **Operativo**: el Director y el equipo administrativo procesan datos en Excel — hoy deben re-transcribir desde el PDF o pedir exportación manual al área de sistemas.
-- **Arquitectura**: obliga a terminar la abstracción `PdfBuilderService` (Plan 2/C.2) — si no se hace ahora, duplicar el código PDF en código Excel dobla la deuda. La regla **previene** que cada reporte nuevo nazca solo-PDF.
-
-### Dependencias (Plan 25)
-
-- **Plan 2/C.2 (PDF Builder genérico)**: diferida. Chat 1 decidió NO adelantar la abstracción genérica — entrega aditiva que no toca servicios PDF existentes. Chat 2 decidirá si la duplicación de mapeo de columnas justifica adelantar C.2 o seguir con services hermanos.
-- **Backend Excel desde cero**: **no existe `ExcelService` en BE** (corrección a diseño original del plan — el `ExcelService` del monorepo es frontend). Chat 1 agregó `ClosedXML` como librería base y creó `AsistenciaExcelService` nuevo.
-- **No toca reglas de negocio**: los datos exportados son los mismos, cambia solo el formato. Invariantes de dominio (INV-*) no se tocan.
-
-### Referencias clave (Plan 25)
-
-- BE: `Educa.API/Services/Excel/AsistenciaExcelService.cs` (+ partials) — Chat 1 entregado
-- BE: `Educa.API/Interfaces/Services/Asistencias/IAsistenciaExcelService.cs` — contrato
-- BE: `Educa.API/Services/Reportes*/` — los 5+ services de PDF restantes por migrar
-- BE tests: `Educa.API.Tests/Services/Excel/` — 12 tests paridad + edge cases (DNI, horas, TipoPersona)
-- Plan 2/C.2 en este maestro (sección Carril B) — abstracción PdfBuilder que se pospuso en Chat 1
-- `backend.md` §Rate Limiting — política `heavy` aplica a ambos formatos
-
----
-
 ## Bloqueos activos (qué desbloquea qué)
 
 > Lectura rápida para elegir próximo chat. Complementa al diagrama de dependencias.
@@ -375,13 +261,7 @@ Todos son BE (`Services/Reportes*`) consumidos por FE admin o cross-role:
 
 ---
 
-**Ola 1 — Terminar Plan 12 F1 (cerrar lo iniciado)** ✅ CERRADA (2026-04-18)
-
-1. ~~**Plan 12 F1.B.2** — `AprobacionEstudianteControllerTests`~~ ✅ (2026-04-18) — 4 tests: guard manual `GetEntityId`, default año Perú, mapeo tupla (exito, mensaje) → Ok/BadRequest. `AprobarMasivo` y consultas descartados (delegación pura → F1.C). Suite 756/756.
-2. ~~**Plan 12 F1.B.3** — `ConsultaAsistenciaControllerTests`~~ ✅ (2026-04-18) — 8 tests: ownership apoderado→hijo (`Forbid()`), guard `sedeId=0 → UnauthorizedException`, fallback `GetEmail() ?? UsuarioActual`, mensaje según `Quitar`, mapeo bool→BusinessRuleException, validaciones inline de rangos de fecha en PDF período. `WithEmail` agregado a `ClaimsPrincipalBuilder`. Suite 764/764.
-3. ~~**Plan 12 F1.C**~~ ✅ (2026-04-18) — Regla "no testear delegación pura" documentada en `Educa.API.Tests/Controllers/README.md` con definición operativa (4 criterios), ejemplos positivos (F1.B) y negativos (controllers pass-through enteros). Cierra la preocupación de "¿por qué no hay tests de UsuariosController?" sin escribirlos.
-
-*Gate Ola 1*: ✅ Plan 12 F1 al 100% · infraestructura de controller tests documentada y replicable · 23 tests en 4 archivos de controller (Auth 6 + Asistencia 5 + Aprobación 4 + ConsultaAsistencia 8).
+**Ola 1 — Terminar Plan 12 F1 (cerrar lo iniciado)** ✅ CERRADA (2026-04-18) — archivada en [history/planes-cerrados.md](../history/planes-cerrados.md#ola-1-carril-d--terminar-plan-12-f1--cerrada-2026-04-18).
 
 ---
 
@@ -574,106 +454,6 @@ CARRIL C — DIFERIDO
 
 ---
 
-### Carril A — Features (PRIORIDAD)
-
-#### QW3 — CI verde (prerrequisito para mergear features)
-
-- [x] QW3.1 `horarios.store.spec.ts` (26 fallos) — métodos renombrados en store ✅ (2026-04-16)
-- [x] QW3.2 `error.interceptor.spec.ts` (13 fallos) — mocks desactualizados ✅ (2026-04-16)
-- [x] QW3.3-QW3.6 Facades + login (6 fallos) — WAL pattern + role count ✅ (2026-04-16)
-- [x] QW3.7 Verificar `npm test` con 0 fallos ✅ (2026-04-16) — 108 files, 1317 tests passed
-
-#### Plan 6 — Asignación Profesor-Salón-Curso (tutor pleno vs por curso)
-
-- [x] **F1 — BD** (1 chat, repo BE) ✅ (2026-04-16)
-  - [x] F1.0 SELECT primero: inspeccionada estructura real de 6 tablas en prueba y producción
-  - [x] F1.1 CREATE TABLE ProfesorCurso + 3 índices (único filtrado + 2 de consulta) — ejecutado en ambas BDs
-  - [x] F1.2 Migración desde Horario: prueba 3 filas, producción 0 filas (sin horarios activos GRA_Orden ≥ 8)
-  - [x] F1.3 Modelo EF (`ProfesorCurso.cs`) + `ProfesorCursoConfiguration.cs` + DbSet + nav properties en Profesor/Curso. Build OK.
-  - [x] F1.4 Plan base y maestro actualizados
-
-- [x] **F2 — Domain validators** (1 chat, repo BE) ✅ (2026-04-16)
-  - [x] F2.1 `ModoAsignacionResolver` — función pura con umbral 7, sección V flexible
-  - [x] F2.2 `TutorPlenoValidator` (INV-AS01) — Validar + Ensure con BusinessRuleException
-  - [x] F2.3 `ProfesorCursoValidator` (INV-AS02) — Validar + Ensure con BusinessRuleException
-  - [x] F2.4 Tests unitarios — 42 tests pasando (3 archivos)
-  - [x] F2.5 Plan base + maestro actualizados
-
-- [x] **F3 — Backend Services** (1 chat, repo BE) ✅ (2026-04-16)
-  - [x] F3.1 `ProfesorCursoService` + `ProfesorCursoRepository` + DTOs (CRUD estándar)
-  - [x] F3.2 `ProfesorCursoController` — 4 endpoints (GET profesor, GET curso, POST asignar, DELETE)
-  - [x] F3.3 Integrar validators en `HorarioAsignacionService.AsignarProfesorAsync` + `HorarioService.UpdateAsync`
-  - [x] F3.4 Regla desactivación tutor mid-año en `ProfesorStrategy.CambiarEstadoAsync`
-  - [x] F3.5 Regla eliminar salón tutor pleno con horarios activos en `SalonesService.EliminarAsync`
-  - [x] F3.6 DI registration + build OK + 741 tests OK
-  - [x] F3.7 Plan base + maestro actualizados
-
-- [x] **F4 — Frontend: horarios + salones + usuarios** (3 chats, repo FE) ✅ (2026-04-16)
-  - [x] F4.1 Tipos: `ModoAsignacion` + `resolveModoAsignacion()` en `@data/models/classroom.models.ts`, `ProfesorCursoListaDto` en `profesor-curso.models.ts` ✅ (2026-04-16)
-  - [x] F4.2 `modoAsignacion` computed en `SchedulesOptionsStore` + `profesoresParaAsignacion` filtrado por modo + `ProfesorCursoApiService` ✅ (2026-04-16)
-  - [x] F4.3 Detail drawer: badge de modo + info contextual (tag Tutor/PorCurso/Flexible con tooltip) ✅ (2026-04-16)
-  - [x] F4.4 Badge de modo en tabla de salones admin + `SalonDetailDialog` header ✅ (2026-04-16)
-  - [x] F4.5 Sección "Cursos que dicta" en edición de profesor (`/admin/usuarios`) ✅ (2026-04-16)
-  - [x] F4.6 Actualizar plan base + maestro ✅ (2026-04-16)
-
-- [x] **F5 — Backfill y auditoría** (1 chat, repo BE) ✅ (2026-04-16)
-  - [x] F5.1 Query SQL de violaciones existentes INV-AS01/AS02 — ejecutadas en ambas BDs
-  - [x] F5.2 Resultado: **0 violaciones** en test y producción. No hay grandfathering que gestionar.
-  - [x] F5.3 Actualizar plan base + maestro ✅
-
-- [x] **F6 — Tests E2E + cierre** (1 chat) ✅ (2026-04-16)
-  - [x] F6.1 Tests facade FE: 4 tests (INV-AS01 reject, INV-AS02 reject, tutor pleno OK, por curso OK). Suite: 1321 tests, 0 fallos.
-  - [x] F6.2 Formalizar INV-AS01/02/03/04/05 en `business-rules.md § 15.12` + actualizar § 5.4 (umbrales corregidos, estado implementado)
-  - [x] F6.3 Mapear 4 error codes nuevos en `UI_ERROR_CODES`
-  - [x] F6.4 Actualizar plan base + maestro ✅
-
----
-
-### QW4 — Lint limpio para producción (PRIORIDAD INMEDIATA)
-
-> **Objetivo**: 0 errors, 0 warnings → push seguro. Estado inicial: 2 errors + ~185 warnings en 53 archivos.
-> **Inventario** (2026-04-16):
->
-> | Regla | Nivel | Issues | Archivos | Chat |
-> |-------|-------|--------|----------|------|
-> | `max-lines` | error | 2 | `error-reporter.service.ts` (310ln), `profesor-salones.component.ts` (320ln) | QW4.1 |
-> | `no-unused-vars` | warn | 33 | 27 archivos (specs + services) | QW4.2 |
-> | `no-compact-trivial-setter` | warn | 45 | 8 stores/facades | QW4.3 |
-> | `no-explicit-any` | warn | 99 | 11 archivos (todos `.spec.ts`) | QW4.4 |
-> | `use-lifecycle-interface` | warn | 3 | 3 archivos | QW4.5 |
-> | `no-empty-lifecycle-method` | warn | 1 | 1 archivo | QW4.5 |
-> | `layer-enforcement/imports-warn` | warn | 2 | 1 archivo (`profesor-salones`) | QW4.5 |
-
-- [x] **QW4.1 — Lint errors: 2 archivos >300 líneas** ✅ (2026-04-16)
-  - [x] `error-reporter.service.ts` — extraído tipos a `error-reporter.models.ts` + eliminado `#endregion` duplicado
-  - [x] `profesor-salones.component.ts` — movido template inline a `.component.html` + estilos a `.component.scss`
-
-- [x] **QW4.2 — `no-unused-vars`: 33 issues en 27 archivos** ✅ (2026-04-16)
-  - [x] Eliminados imports no usados en 25 archivos
-  - [x] Prefijo `_` en params de callback (5 casos en `usuario-validation.utils.ts` + 1 en spec)
-
-- [x] **QW4.3 — `no-compact-trivial-setter`: 45 issues en 8 archivos** ✅ (2026-04-16)
-  - [x] Expandidos 45 setters triviales de 1 línea a formato multi-línea
-  - [x] 3 archivos resultantes >300 líneas → `eslint-disable max-lines` justificado (campus-admin.store, salones-admin.facade, calificaciones.facade)
-
-- [x] **QW4.4 — `no-explicit-any`: 99 issues en 14 specs** ✅ (2026-04-16)
-  - [x] Tipados con `unknown`, `Partial<T>`, `vi.mocked()`, `as unknown as T`, interfaces de test-access
-  - [x] 14 archivos spec corregidos
-
-- [x] **QW4.5 — Otros warnings: 6 issues** ✅ (2026-04-16)
-  - [x] `use-lifecycle-interface` (3) — agregado `implements OnChanges`
-  - [x] `no-empty-lifecycle-method` (1) — eliminado `ngOnInit` vacío + imports
-  - [x] `layer-enforcement/imports-warn` (2) — eslint-disable con justificación (pendiente mover a @intranet-shared)
-
-- [x] **QW4.6 — Verificación final y PUSH** ✅ (2026-04-16)
-  - [x] `npm run lint` → 0 errors, 0 warnings ✅
-  - [x] `npm test` → 1321 tests, 0 fallos ✅
-  - [x] `npm run build` → build OK ✅
-  - [x] Push FE (main) + BE (master) → deploy completado (Netlify + Azure) ✅
-  - [ ] Validar estabilidad en producción (2026-04-17)
-
----
-
 ### Carril D — Confiabilidad sistémica (post-push, ANTES de Carril B)
 
 > **"Corregir lo que duele es un fix. Tener red de seguridad antes de que duela es ingeniería."**
@@ -850,15 +630,9 @@ CARRIL C — DIFERIDO
 
 > Estas tareas se ejecutan después de que el Carril D provea red de seguridad mínima.
 
-#### Plan 11 — Refactor `eslint.config.js` ✅ 100% (cerrado 2026-04-17)
+#### Plan 11 — Refactor `eslint.config.js` ✅ 100% (archivado 2026-04-22)
 
-<details><summary>Detalle (cerrado)</summary>
-
-- [x] F1-F4 cerrados
-- [x] F5.1-F5.2 cerrados, F5.4 cerrado
-- [x] F5.3 Tests de guardia (2026-04-17) — `src/eslint-config-guards.spec.ts` con 13 tests que verifican via `ESLint.calculateConfigForFile()` que las reglas clave (layer-enforcement, barrel enforcement, globales) siguen aplicadas por capa. Falla el CI si un cambio futuro del config saca una regla de su scope.
-
-</details>
+Ver [history/planes-cerrados.md](../history/planes-cerrados.md#plan-11).
 
 #### Plan 1 — Enforcement de Reglas (~75%)
 
@@ -1078,14 +852,6 @@ CARRIL C — DIFERIDO
 [x] ¿Usuario confirma que F1 (telemetría) va primero — 1-2 semanas de datos antes de tocar policies? ✅ 2026-04-21 (F1 cerrada; recolección de datos en curso)
 [x] Si se arranca Plan 24 antes que Plan 26 F1, ¿se acepta el riesgo de 429 invisibles del job CrossChex? ✅ 2026-04-21 (ya no aplica — F1 cerrada antes de que Plan 24 arranque)
 ```
-
----
-
-## Quick wins cerrados
-
-- [x] **QW1 — Migrar `health-permissions` a WAL** ✅ (2026-04-15)
-- [x] **QW2 — Limpiar ruido de lint en build artifacts** ✅ (2026-04-15)
-- [x] **QW3 — CI verde** ✅ (2026-04-16) — 6 spec files fixed (40 fallos → 0). 108 files, 1317 tests.
 
 ---
 

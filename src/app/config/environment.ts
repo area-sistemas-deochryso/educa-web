@@ -27,6 +27,7 @@ export const environment = {
 		campusNavigation: false,
 		feedbackReport: true,
 		rateLimitMonitoring: true,
+		emailOutboxThrottleWidget: false,
 	},
 
 	// Debug panels (siempre false en producción)

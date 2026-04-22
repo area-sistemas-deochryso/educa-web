@@ -16,6 +16,20 @@
 }
 <!-- #endregion -->
 
+<!-- #region Throttle status widget (Plan 22 Chat B, feature flag) -->
+@if (throttleWidgetEnabled) {
+	<app-throttle-status-widget
+		[status]="vm().throttleStatus"
+		[loading]="vm().throttleLoading"
+		[autoRefresh]="vm().throttleAutoRefresh"
+		[collapsed]="vm().throttleCollapsed"
+		(refresh)="onThrottleRefresh()"
+		(autoRefreshChange)="onThrottleAutoRefreshChange($event)"
+		(collapsedChange)="onThrottleCollapsedChange($event)"
+	/>
+}
+<!-- #endregion -->
+
 <!-- #region Filtros -->
 <app-email-outbox-filters
 	[filterTipo]="vm().filterTipo"

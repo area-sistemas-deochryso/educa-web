@@ -29,6 +29,10 @@ const PREFERENCES_KEYS = {
 
 	// Quick access favorites
 	FAVORITE_ROUTES: 'educa_pref_favorite_routes',
+
+	// Plan 22 Chat B — throttle status widget
+	THROTTLE_WIDGET_AUTO_REFRESH: 'educa_pref_throttle_widget_auto_refresh',
+	THROTTLE_WIDGET_COLLAPSED: 'educa_pref_throttle_widget_collapsed',
 } as const;
 
 /**
@@ -427,6 +431,34 @@ export class PreferencesStorageService {
 
 	setFavoriteRoutes(routes: string[]): void {
 		this.setJSON(PREFERENCES_KEYS.FAVORITE_ROUTES, routes);
+	}
+
+	// #endregion
+	// #region THROTTLE STATUS WIDGET (Plan 22 Chat B)
+
+	/**
+	 * Whether the throttle status widget auto-refreshes every 30 seconds.
+	 * Defaults to false — el admin opta in conscientemente antes de disparar
+	 * polling sobre un endpoint que toca BD.
+	 */
+	getThrottleWidgetAutoRefresh(): boolean {
+		return this.getItem(PREFERENCES_KEYS.THROTTLE_WIDGET_AUTO_REFRESH) === 'true';
+	}
+
+	setThrottleWidgetAutoRefresh(enabled: boolean): void {
+		this.setItem(PREFERENCES_KEYS.THROTTLE_WIDGET_AUTO_REFRESH, enabled.toString());
+	}
+
+	/**
+	 * Whether the throttle status widget starts collapsed on page load.
+	 * Defaults to false (expanded) — el admin quiere ver el estado al entrar.
+	 */
+	getThrottleWidgetCollapsed(): boolean {
+		return this.getItem(PREFERENCES_KEYS.THROTTLE_WIDGET_COLLAPSED) === 'true';
+	}
+
+	setThrottleWidgetCollapsed(collapsed: boolean): void {
+		this.setItem(PREFERENCES_KEYS.THROTTLE_WIDGET_COLLAPSED, collapsed.toString());
 	}
 
 	// #endregion

@@ -3,6 +3,7 @@ import { DrawerModule } from 'primeng/drawer';
 
 import { StatsSkeletonComponent, TableSkeletonComponent } from '@shared/components';
 import { ExcelService } from '@core/services/excel/excel.service';
+import { environment } from '@config/environment';
 
 import { EmailOutboxDataFacade, EmailOutboxUiFacade } from './services';
 import { EmailOutboxHeaderComponent } from './components/email-outbox-header/email-outbox-header.component';
@@ -10,6 +11,7 @@ import { EmailOutboxStatsComponent } from './components/email-outbox-stats/email
 import { EmailOutboxFiltersComponent } from './components/email-outbox-filters/email-outbox-filters.component';
 import { EmailOutboxTableComponent } from './components/email-outbox-table/email-outbox-table.component';
 import { EmailOutboxChartComponent } from './components/email-outbox-chart/email-outbox-chart.component';
+import { ThrottleStatusWidgetComponent } from './components/throttle-status-widget/throttle-status-widget.component';
 
 import { EmailOutboxLista } from '@data/models/email-outbox.models';
 
@@ -25,6 +27,7 @@ import { EmailOutboxLista } from '@data/models/email-outbox.models';
 		EmailOutboxFiltersComponent,
 		EmailOutboxTableComponent,
 		EmailOutboxChartComponent,
+		ThrottleStatusWidgetComponent,
 	],
 	templateUrl: './email-outbox.component.html',
 	styleUrl: './email-outbox.component.scss',
@@ -40,11 +43,15 @@ export class EmailOutboxComponent {
 	// #region Estado
 	readonly vm = this.dataFacade.vm;
 	readonly tableSkeletonColumns = EmailOutboxTableComponent.skeletonColumns;
+	readonly throttleWidgetEnabled = environment.features.emailOutboxThrottleWidget;
 	// #endregion
 
 	// #region Lifecycle
 	constructor() {
 		this.dataFacade.loadData();
+		if (this.throttleWidgetEnabled) {
+			this.dataFacade.initThrottleWidget();
+		}
 	}
 	// #endregion
 
@@ -89,6 +96,18 @@ export class EmailOutboxComponent {
 		if (!visible) {
 			this.uiFacade.closeDrawer();
 		}
+	}
+
+	onThrottleRefresh(): void {
+		this.dataFacade.loadThrottleStatus();
+	}
+
+	onThrottleAutoRefreshChange(enabled: boolean): void {
+		this.dataFacade.setThrottleAutoRefresh(enabled);
+	}
+
+	onThrottleCollapsedChange(collapsed: boolean): void {
+		this.dataFacade.setThrottleCollapsed(collapsed);
 	}
 
 	async onExportExcel(): Promise<void> {

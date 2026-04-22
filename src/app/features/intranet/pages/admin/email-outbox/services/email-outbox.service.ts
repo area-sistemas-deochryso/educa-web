@@ -8,6 +8,7 @@ import {
 	EmailOutboxLista,
 	EmailOutboxTendencia,
 } from '@data/models/email-outbox.models';
+import { ThrottleStatus } from '../models/throttle-status.models';
 
 @Injectable({ providedIn: 'root' })
 export class EmailOutboxApiService {
@@ -69,6 +70,12 @@ export class EmailOutboxApiService {
 		return this.http
 			.get<string>(`${this.baseUrl}/${id}/html`)
 			.pipe(catchError(() => of(null)));
+	}
+
+	// * Plan 22 Chat B — snapshot del throttle saliente (per-sender + dominio).
+	// * El interceptor global desempaqueta ApiResponse<T>, por eso el genérico es T directo.
+	throttleStatus(): Observable<ThrottleStatus> {
+		return this.http.get<ThrottleStatus>(`${this.baseUrl}/throttle-status`);
 	}
 	// #endregion
 
