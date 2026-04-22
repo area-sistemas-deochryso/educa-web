@@ -90,6 +90,7 @@ export interface SalonProfesor {
 	salonId: number;
 	grado: string;
 	gradoCodigo: string;
+	graOrden: number | null;
 	seccion: string;
 	nombreSalon: string;
 	anio: number;

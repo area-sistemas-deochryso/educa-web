@@ -21,12 +21,14 @@ import {
 	AsistenciaDiaConEstadisticas,
 	AttendanceStatus,
 } from '@data/models/attendance.models';
+import { esGradoAsistenciaDiaria } from '@shared/constants/attendance-scope';
+import { AttendanceScopeStudentNoticeComponent } from '@intranet-shared/components/attendance-scope-student-notice';
 import { SkeletonLoaderComponent } from '@shared/components/skeleton-loader/skeleton-loader.component';
 
 @Component({
 	selector: 'app-profesor-attendance-widget',
 	standalone: true,
-	imports: [RouterLink, SkeletonLoaderComponent],
+	imports: [RouterLink, SkeletonLoaderComponent, AttendanceScopeStudentNoticeComponent],
 	changeDetection: ChangeDetectionStrategy.OnPush,
 	templateUrl: './profesor-attendance-widget.component.html',
 	styleUrl: './profesor-attendance-widget.component.scss',
@@ -51,6 +53,17 @@ export class ProfesorAttendanceWidgetComponent implements OnInit {
 	readonly salonLabel = computed(() => {
 		const s = this.salon();
 		return s ? `${s.grado} ${s.seccion}` : '';
+	});
+
+	/**
+	 * Plan 27 · INV-C11 — true cuando el salón tutor del profesor tiene `GRA_Orden < 8`.
+	 * En ese caso el widget muestra el notice en lugar de las barras de asistencia,
+	 * que saldrían en cero porque el webhook descarta las marcaciones.
+	 */
+	readonly salonFueraAlcance = computed(() => {
+		const s = this.salon();
+		if (!s) return false;
+		return !esGradoAsistenciaDiaria(s.graOrden);
 	});
 
 	readonly presentes = computed(() => {

@@ -19,13 +19,27 @@ import {
 // #region Fixtures
 const salonTutor: SalonProfesor = {
 	salonId: 1,
-	grado: '4to',
-	gradoCodigo: '4',
+	grado: '1ro Secundaria',
+	gradoCodigo: '1',
+	graOrden: 10,
 	seccion: 'B',
-	nombreSalon: '4to B',
+	nombreSalon: '1ro Secundaria B',
 	anio: 2026,
 	esTutor: true,
 	totalEstudiantes: 20,
+	estudiantes: [],
+};
+
+const salonTutorFueraAlcance: SalonProfesor = {
+	salonId: 2,
+	grado: '3ro Primaria',
+	gradoCodigo: '3',
+	graOrden: 6,
+	seccion: 'A',
+	nombreSalon: '3ro Primaria A',
+	anio: 2026,
+	esTutor: true,
+	totalEstudiantes: 22,
 	estudiantes: [],
 };
 
@@ -112,12 +126,36 @@ describe('ProfesorAttendanceWidgetComponent', () => {
 
 			expect(component.loading()).toBe(false);
 			expect(component.hasSalonData()).toBe(true);
-			expect(component.salonLabel()).toBe('4to B');
+			expect(component.salonLabel()).toBe('1ro Secundaria B');
 			expect(component.stats()).toEqual(asistenciaDia.estadisticas);
 			expect(component.miAsistencia()).toEqual(miAsistenciaDetalle);
 			expect(component.miEstadoCodigo()).toBe('A');
 			expect(component.miEstadoLabel()).toBe('Asistió');
 			expect(component.miEstadoClass()).toBe('estado-asistio');
+		});
+	});
+
+	describe('Plan 27 · INV-C11 — salón tutor fuera de alcance', () => {
+		it('should flag salonFueraAlcance=true when tutor salon has graOrden < 8', async () => {
+			attendanceMock.getSalonesProfesor.mockReturnValue(of([salonTutorFueraAlcance]));
+			attendanceMock.getAsistenciaDia.mockReturnValue(of(asistenciaDia));
+			profesorApiMock.obtenerMiAsistenciaDia.mockReturnValue(of(miDto));
+
+			await bootstrap();
+
+			expect(component.hasSalonData()).toBe(true);
+			expect(component.salonFueraAlcance()).toBe(true);
+			expect(component.salonLabel()).toBe('3ro Primaria A');
+		});
+
+		it('should flag salonFueraAlcance=false when tutor salon has graOrden >= 8', async () => {
+			attendanceMock.getSalonesProfesor.mockReturnValue(of([salonTutor]));
+			attendanceMock.getAsistenciaDia.mockReturnValue(of(asistenciaDia));
+			profesorApiMock.obtenerMiAsistenciaDia.mockReturnValue(of(miDto));
+
+			await bootstrap();
+
+			expect(component.salonFueraAlcance()).toBe(false);
 		});
 	});
 

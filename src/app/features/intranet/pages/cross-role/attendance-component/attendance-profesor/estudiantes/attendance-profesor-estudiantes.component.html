@@ -13,6 +13,10 @@
 		/>
 	</div>
 
+	@if (salonFueraAlcance()) {
+		<!-- Plan 27 · INV-C11 — Salón con GRA_Orden < 8: sin data biométrica -->
+		<app-attendance-scope-student-notice [nombre]="selectedSalon()!.nombreSalon" />
+	} @else {
 	@if (selectedSalon() && view.viewMode() === 'mes') {
 		<!-- * PDF actions below selector -->
 		<div class="pdf-section">
@@ -116,6 +120,7 @@
 			(fechaChange)="view.onFechaDiaChange($event)"
 			(justificar)="onJustificar($event)"
 		/>
+	}
 	}
 } @else if (!view.loading()) {
 	<!-- ! No assigned salons -->

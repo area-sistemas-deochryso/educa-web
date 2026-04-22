@@ -1,10 +1,12 @@
 import { AttendanceService, SalonProfesor, StorageService, UserProfileService } from '@core/services';
+import { esGradoAsistenciaDiaria } from '@shared/constants/attendance-scope';
 import { periodoEnMes, filtrarPorPeriodoAcademico } from '@shared/models';
 import { JustificacionEvent } from '@features/intranet/components/attendance/attendance-day-list/attendance-day-list.component';
 import { ChangeDetectionStrategy, Component, DestroyRef, OnInit, ViewChild, computed, inject, output, signal } from '@angular/core';
 
 import { AttendanceDayListComponent } from '@features/intranet/components/attendance/attendance-day-list/attendance-day-list.component';
 import { AttendanceLegendComponent } from '@app/features/intranet/components/attendance/attendance-legend/attendance-legend.component';
+import { AttendanceScopeStudentNoticeComponent } from '@intranet-shared/components/attendance-scope-student-notice';
 import { AttendanceTableComponent } from '@features/intranet/components/attendance/attendance-table/attendance-table.component';
 import { AttendanceTableSkeletonComponent } from '@features/intranet/components/attendance/attendance-table-skeleton/attendance-table-skeleton.component';
 import { AttendanceViewController } from '@features/intranet/services/attendance/attendance-view.service';
@@ -44,6 +46,7 @@ import { buildPdfExcelMenuItems } from '../../attendance-director/consolidated-p
 	imports: [
 		AttendanceTableComponent,
 		AttendanceTableSkeletonComponent,
+		AttendanceScopeStudentNoticeComponent,
 		SalonSelectorComponent,
 		AttendanceDayListComponent,
 		EmptyStateComponent,
@@ -96,6 +99,16 @@ export class AttendanceProfesorEstudiantesComponent implements OnInit {
 		return this.salones().find((s) => s.salonId === id)
 			|| this.allSalones().find((s) => s.salonId === id)
 			|| null;
+	});
+	/**
+	 * Plan 27 · INV-C11 — true cuando el salón seleccionado tiene `GRA_Orden < 8`
+	 * (fuera del alcance del CrossChex). El template renderiza el notice en lugar
+	 * de la tabla/día para evitar mostrar listas vacías con métricas contaminadas.
+	 */
+	readonly salonFueraAlcance = computed(() => {
+		const salon = this.selectedSalon();
+		if (!salon) return false;
+		return !esGradoAsistenciaDiaria(salon.graOrden);
 	});
 
 	// #endregion
