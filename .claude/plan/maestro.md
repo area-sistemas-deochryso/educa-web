@@ -1,6 +1,6 @@
 # Plan Maestro — Orden y Dependencias
 
-> **Fecha**: 2026-04-14 (última revisión: 2026-04-17, Design System F4 cerrado — tokens hardcoded migrados a variables CSS del tema, deuda C1/C3/C4 resuelta)
+> **Fecha**: 2026-04-14 (última revisión: 2026-04-22, **Plan 27 Chat 2 `/execute` BE ✅ cerrado** — filtro INV-C11 aplicado en webhook + admin + correos, 1130 tests verdes)
 > **Objetivo**: Ordenar los 11 planes dispersos entre `educa-web/.claude/` y `Educa.API/.claude/` en una secuencia con dependencias explícitas.
 > **Principio rector** (actualizado 2026-04-16): "Features primero — el enforcement y la arquitectura son valiosos solo si soportan funcionalidad real. La deuda técnica se paga en paralelo, no como prerrequisito."
 
@@ -36,6 +36,7 @@
 | 24 | 🟡 Sync CrossChex en Background Job | BE+FE | (inline en maestro) | ⏳ Plan nuevo 2026-04-20. Diagnóstico cerrado: `Task.Delay(30000)` entre páginas bloquea UI 2+ min; `.subscribe()` directo en FE no corre en background. 4 chats diseñados (BE job + SignalR + FE progreso + validar rate limit) | 0% |
 | 25 | Paridad Excel para reportes PDF | BE+FE | (archivado en historial) | ✅ **100% — archivado 2026-04-22** en [history/planes-cerrados.md](../history/planes-cerrados.md#plan-25). Regla §17 en `business-rules.md` con INV-RE01/02/03 | — |
 | **26** | **🟡 Rate limiting flexible** | **BE+FE** | **(inline en maestro)** | **🟡 F1 ✅ cerrada 2026-04-21 + F2 Chat 1 ✅ cerrado 2026-04-22 (máquina del multiplier). F2 Chat 2 ⏳ pendiente aplicar `[RateLimitOverride]` a 14 endpoints reportes + 2 vistas admin. F2 Chat 1: `RateLimitOverrideAttribute` + `RoleMultipliers` (Director 3.0 / Asistente Admin / Promotor / Coordinador Académico 2.5 / Profesor 2.0 / resto 1.0) + `RateLimitPartitionResolver` (cache reflection, cap 5x acumulado) + nuevas policies `reports` y `batch` con base 5/min + resolver. `heavy` revertido a 5/min (parche temporal Chat 2 removido) y deja como deprecated funcional para los 14 controllers de Plan 25 que aún la usan (Chat 2 los migra). Telemetría viva en prod desde F1 (RateLimitEvent, INV-S07/ET02). FE intacto: la vista admin `/intranet/admin/rate-limit-events` ya rotula por rol; los datos nuevos aparecerán automáticamente cuando las 429 caigan. Tests: +28 unit (`RoleMultipliersTests`, `RateLimitPartitionResolverTests`) + 6 integración con `TestServer` real + `TestAuthHandler` reusable. Suite BE 1097 verdes (baseline 1063 + 34 nuevos). Plan ~30%. **Siguiente**: F2 Chat 2 (aplicar overrides a 14+2 endpoints) y luego observar telemetría 1-2 semanas antes de F3.** | **30%** |
+| **27** | **🔴 Filtro temporal asistencia diaria por grado (5to Primaria +)** | **BE+FE** | **(inline en maestro — el diseño cupo en 1 chat, no se promueve a archivo dedicado)** | **🔴 MÁXIMA PRIORIDAD · Chat 1 `/design` ✅ cerrado 2026-04-22. 10 decisiones acordadas: constante `UMBRAL_GRADO_ASISTENCIA_DIARIA = 8` (5to Primaria +) en `Constants/Asistencias/`, descarte silencioso webhook con `MarcacionAccion.IgnorarGradoFueraAlcance` + log Information + DNI enmascarado, banner fijo en `/intranet/admin/asistencias` + nota en PDF/Excel, early-return en `EmailNotificationService` (no en outbox), self-service muestra mensaje "suspendida temporalmente" por-hijo, admin sigue editando registros históricos (sin INV-AD07), reportes históricos filtran uniforme sin endpoint de escape, widget home aplica filtro, búsqueda de estudiantes intacta, `UMBRAL_GRADO_ASISTENCIA_DIARIA` separado de `UMBRAL_TUTOR_PLENO` (coincidencia circunstancial). **Nuevo invariante `INV-C11`** a formalizar en Chat 5. Total 4 chats de ejecución + cierre. Chat 2 (BE webhook+admin+correos) listo para arrancar. Validación final del jefe al post-deploy.** | **10%** |
 
 **Semáforo de readiness**:
 
@@ -45,7 +46,7 @@
 | **Deploy readiness** | 🟢 Estable | FE (Netlify) + BE (Azure) desplegados 2026-04-16. 2026-04-17 sin incidentes reportados. |
 | **Production reliability** | 🔴 Sin red | Falta: tests de contrato, auditoría endpoints, error trace, fallbacks P0 |
 
-**Foco: Carril D (confiabilidad) + Design System F2.2-F2.5 en paralelo → Carril B (deuda)**.
+**Foco (actualizado 2026-04-22, post-cierre Chat 2)**: 🔴 **Plan 27 Chat 3 `/execute` BE** — reportes PDF/Excel (6 services `ReporteAsistencia*` + `ReporteFiltradoAsistencia*` + `BoletaNotasPdf*` según alcance) + tests contract + nota en header "filtro temporal 5to Primaria+". Luego Chat 4 (FE admin + self-service + widget home), Chat 5 (cierre + documentar INV-C11 en `business-rules.md §15.4`). Otros frentes (Plan 22 F4/F5.6 BE, Plan 26 F2 Chat 2, Carril D, Design System F5.3) pueden avanzar en paralelo según capacidad.
 
 ---
 
@@ -94,6 +95,148 @@ Cuellos de botella efectivos para el sistema:
 - [x] ~~Confirmar con el hosting: ¿las cifras son **rolling window de 60 min** o **hora del reloj** (00-59)? Cambia cómo se calcula el throttle.~~ **Asunción operativa en Plan 22 Chat A: rolling window 60 min.** Si el hosting aplica hora de reloj, el sliding window se reajustará como variante en chat posterior; en la práctica rolling es estrictamente más conservador que hora de reloj.
 - [x] ~~Confirmar: ¿el contador se reinicia con bounces? Un 550 cuenta como "envío" para la cuota?~~ **Decisión en Plan 22 Chat A: counter cuenta solo `EO_Estado='SENT'` (ignora FAILED).** Asunción verificable post-deploy: si el hosting también cuenta los FAILED contra la cuota, ajustar el counter para incluir `FAILED` transitorios que llegaron al SMTP.
 - [x] ~~Inventariar remitentes actuales~~ — en Plan 22 Chat A se asume un único remitente histórico (`sistemas@laazulitasac.com`) y el script SQL 3.2 hace backfill de `EO_Remitente` a ese valor en las 2.788 filas.
+
+---
+
+## 🔴 Plan 27 — Filtro temporal de asistencia diaria por grado (5to Primaria en adelante)
+
+> **Origen**: Requerimiento del usuario 2026-04-22. **MÁXIMA PRIORIDAD**.
+> **Plan**: inline en este maestro. El diseño cupo en 1 chat de `/design` — **no se promueve** a archivo dedicado.
+> **Estado**: 🟢 **Chats 1-2 ✅ cerrados 2026-04-22** — diseño aprobado + BE implementado (webhook guard INV-C11, filtros admin queries, early-return correos, 1130 tests verdes). Listo para Chat 3 `/execute` BE (reportes PDF/Excel).
+> **Validación**: Diseño validado por el usuario. El resultado final (post-deploy) requiere OK del jefe — Chat 5 de cierre no se considera definitivo hasta esa validación.
+
+### Qué se quiere
+
+De forma **temporal**, el colegio deja de contemplar a estudiantes de **Inicial a 4to de Primaria** (`GRA_Orden ≤ 7`, según §5.1 de `business-rules.md`) en el flujo de **asistencia diaria CrossChex** y en los **correos relacionados**. Solo se mantiene el flujo completo para estudiantes de **5to de Primaria en adelante** (`GRA_Orden ≥ 8`).
+
+**Mapeo de grados confirmado con la BD real** (Chat 1, 2026-04-22):
+
+| `GRA_Orden` | Grado              | Estado en Plan 27       |
+|-------------|--------------------|-------------------------|
+| 1-3         | Inicial 3/4/5 años | ❌ Excluido              |
+| 4-7         | 1ro-4to Primaria   | ❌ Excluido              |
+| **8**       | **5to Primaria**   | ✅ **Límite inferior**   |
+| 9           | 6to Primaria       | ✅ Incluido              |
+| 10-14       | 1ro-5to Secundaria | ✅ Incluido              |
+
+Primaria tiene **6 grados** (orden 4-9), no 5. El umbral `UMBRAL_GRADO_ASISTENCIA_DIARIA = 8` coincide circunstancialmente con `UMBRAL_TUTOR_PLENO = 7` (decisión 10 de Chat 1: mantener separadas — conceptualmente distintas).
+
+### Qué entra en el alcance (IN)
+
+- Webhook CrossChex (`AsistenciaService.RegistrarAsistencia` tras el dispatch polimórfico, rama `TipoPersona = 'E'`).
+- Admin `/intranet/admin/asistencias` — listados, stats, correcciones formales, justificaciones, exportaciones.
+- Reportes de **asistencia diaria** (`ReporteAsistencia*Service`, `ConsultaAsistenciaService`, endpoints `/pdf` + `/excel`).
+- Correos de asistencia (de marcación en tiempo real y de corrección formal — INV-AD05 — para estudiantes; apoderados de `GRA_Orden < 8` dejan de recibirlos mientras dure la restricción).
+- Self-service estudiante / apoderado — vistas de "Mi Asistencia" / "Asistencia de mi hijo" para grados afectados.
+
+### Qué NO entra en el alcance (OUT)
+
+> El usuario fue explícito: **"no aplica a más áreas"**. Confirmar en Chat 1 que cada uno de estos NO se toca.
+
+- Calificaciones (§3), aprobación y progresión (§4), periodos académicos (§9, §14.4).
+- Horarios (§6).
+- **Asistencia por curso** (§2) — modelo independiente; profesor sigue marcando `P/T/F` en clase.
+- Matrícula y pagos (§14.2).
+- **Profesores** (Plan 21) — su flujo polimórfico `TipoPersona = 'P'` no se toca; sigue operando normal.
+- Datos históricos — se preservan. El filtro opera sobre reads y sobre writes nuevos, no borra nada.
+
+### Decisiones tomadas en Chat 1 (`/design` ✅ 2026-04-22)
+
+**Preguntas bloqueantes (pre-decisiones)**:
+
+- **Umbral definitivo**: `GRA_Orden >= 8` (5to Primaria en adelante). Validado contra tabla `Grado` real de BD.
+- **Duración**: indefinida — justifica **constante** hardcoded, no AppSetting.
+- **Validación**: diseño validado por el usuario; resultado final post-deploy validado por el jefe (Chat 5 no se cierra hasta su OK).
+
+**Las 10 decisiones de diseño**:
+
+| # | Tema | Decisión |
+|---|------|----------|
+| 1 | Mecanismo de gating | **Constante en código** `UMBRAL_GRADO_ASISTENCIA_DIARIA = 8` en `Constants/Asistencias/AsistenciaConstants.cs` con comentario explícito (fecha, razón, cómo revertir) |
+| 2 | Webhook CrossChex | **Descartar silencioso** — agregar `MarcacionAccion.IgnorarGradoFueraAlcance` en `CoherenciaHorariaValidator` (patrón molde INV-C10). Log `Information` con DNI enmascarado (`DniHelper.Mask()`) + `GRA_Orden`. HTTP 200 al dispositivo. Aplica a periodo regular y verano |
+| 3 | Admin UI | **Banner fijo** (no dismissible) en `/intranet/admin/asistencias`. Texto: *"Asistencia diaria limitada temporalmente a estudiantes de 5to Primaria en adelante. Los grados inferiores no tienen dispositivo biométrico asignado."* Colores `--blue-100` fondo + `--blue-800` texto. **Nota en PDF/Excel**: `"Datos filtrados: GRA_Orden ≥ 8"` en header de cada reporte |
+| 4 | Correos | **Early-return a nivel negocio** en `EmailNotificationService.EnviarNotificacionAsistencia*`. El outbox queda genérico (no sabe de reglas de grado). Cubre ambos tipos de correo: marcación en tiempo real y corrección formal admin (INV-AD05) |
+| 5 | Self-service estudiante/apoderado | **Opción B** — mostrar ruta con mensaje *"La asistencia diaria está suspendida temporalmente para este grado. Las evaluaciones y asistencia por curso continúan normalmente."* **Apoderado con hijos mixtos**: mensaje **por-hijo** (si uno es `GRA_Orden=5` y otro `GRA_Orden=10`, se muestra data del segundo + mensaje para el primero) |
+| 6 | Correcciones admin sobre registros históricos | **Opción A** — permitir edición/justificación de registros existentes. Los writes nuevos del webhook se bloquean, pero admin mantiene control sobre data histórica (crítico por INV-AD03 de cierres mensuales). **Consecuencia: NO se introduce `INV-AD07`** |
+| 7 | Reportes históricos PDF/Excel | **Filtrar uniforme** — todos los reportes generados desde el sistema aplican `GRA_Orden ≥ 8`, incluidos periodos cerrados. Sin endpoint de escape. Si se requiere histórico completo: consulta SQL directa |
+| 8 | Alcance extendido | **Widget "Asistencia de Hoy" (home)**: aplicar filtro (numerador y denominador, 47% → ~90%). **Búsqueda de estudiantes**: NO filtrar (el estudiante sigue existiendo para perfil/calificaciones/matrícula). **Reportes cross-módulo**: nota *"Asistencia diaria filtrada: GRA_Orden ≥ 8"* en footer |
+| 9 | Nombre de la constante | `UMBRAL_GRADO_ASISTENCIA_DIARIA` (alineado con `UMBRAL_TUTOR_PLENO`). Comentario adjunto obligatorio (ver bloque abajo) |
+| 10 | Consolidar con `UMBRAL_TUTOR_PLENO` | **Mantener SEPARADAS**. Conceptualmente distintas (tutor pleno vs CrossChex). Coincidir hoy es accidente del modelo educativo. Comentario cruzado documenta la coincidencia |
+
+**Comentario obligatorio de la constante** (para Chat 2):
+
+```csharp
+// Plan 27 — 2026-04-22 — Filtro temporal de asistencia diaria CrossChex.
+// Solo estudiantes con GRA_Orden >= UMBRAL_GRADO_ASISTENCIA_DIARIA (8 = 5to Primaria) se registran.
+// Los grados inferiores no tienen biométrico asignado.
+// Revertir: bajar a 1 cuando el colegio reincorpore grados bajos.
+// Ver: business-rules.md §1 + INV-C11.
+// NO consolidar con UMBRAL_TUTOR_PLENO (7): conceptos distintos, coincidencia circunstancial.
+public const int UMBRAL_GRADO_ASISTENCIA_DIARIA = 8;
+```
+
+### Plan de ejecución (confirmado post-Chat 1)
+
+| Chat | Alcance | Repo | Tamaño |
+|------|---------|------|--------|
+| **Chat 1 — /design** | ✅ **Cerrado 2026-04-22** — 10 decisiones acordadas | N/A | 1 chat |
+| **Chat 2 — BE: webhook + admin queries + correos** | ✅ **Cerrado 2026-04-22** — `UmbralGradoAsistenciaDiaria = 8` en `Constants/Asistencias/AsistenciaGrados.cs` + `MarcacionAccion.IgnorarGradoFueraAlcance` en `CoherenciaHorariaValidator.Clasificar(..., int? graOrden)` + lookup `GetGraOrdenEstudianteActivoAsync` en `IAsistenciaRepository` + `IAsistenciaAdminRepository` + guard en `AsistenciaService.ClasificarYRegistrarMarcacionAsync` (rama E) con log `Information` + `DniHelper.Mask()` + filtros `GRA_Orden >= 8` en `ConsultaAsistenciaRepository` (3 queries) + `AsistenciaAdminQueryRepository` (listar día estudiantes + estadísticas, profesores intactos) + early-return opcional `int? graOrden = null` en `EmailNotificationService.EnviarNotificacionAsistencia` y `EnviarNotificacionAsistenciaCorreccion` + propagación via `PersonaAsistenciaContext.GraOrden` → `IAsistenciaAdminEmailNotifier`. **11 tests BE nuevos** (3 validator, 3 service, 5 email). Baseline 1097 → **1130 verdes**. | BE | 1 chat |
+| **Chat 3 — BE: reportes + tests** | ⏳ **Siguiente**. Aplicar filtro + nota en header en 6 services PDF/Excel de asistencia (respetando INV-RE01/02/03) + 15-20 tests de invariante (INV-C11, INV-D09) + auditoría por soft-delete | BE | 1 chat |
+| **Chat 4 — FE: admin + self-service + widget home** | Banner fijo en `/intranet/admin/asistencias` + mensaje por-hijo en self-service estudiante/apoderado + widget "Asistencia de Hoy" con filtro aplicado (denominador y numerador `GRA_Orden ≥ 8`) + búsqueda de estudiantes intacta | FE | 1 chat |
+| **Chat 5 — Cierre** | Documentar en `business-rules.md` §1 (nueva subsección "Filtro temporal por grado") + formalizar `INV-C11` en §15.4 (Cálculo) + plan de reversión + movimiento de chat files a `closed/`. **No cierra hasta validación del jefe post-deploy** | FE+BE | 1 chat |
+
+**Total confirmado**: 5 chats (1 `/design` ✅ + 3 `/execute` + 1 cierre).
+
+### Invariantes a formalizar en Chat 5
+
+| ID | Invariante | Enforcement |
+|----|-----------|-------------|
+| `INV-C11` | Marcaciones CrossChex de estudiantes con `GRA_Orden < UMBRAL_GRADO_ASISTENCIA_DIARIA` se descartan silenciosamente (log `Information`, sin registro). Aplica a periodo regular y verano mientras la constante esté en 8. Revertir = bajar la constante | `CoherenciaHorariaValidator.Clasificar` → `MarcacionAccion.IgnorarGradoFueraAlcance`, consumido por `AsistenciaService.RegistrarAsistencia` rama estudiante |
+| ~~`INV-AD07`~~ | **DESCARTADO** (decisión 6 de Chat 1 = A). Admin mantiene control sobre writes de registros históricos | — |
+
+### Reversibilidad (sin cambios respecto al diseño inicial)
+
+Plan diseñado para ser **completamente reversible**:
+
+1. PR que cambia `UMBRAL_GRADO_ASISTENCIA_DIARIA` de `8` a `1` (o al valor nuevo que defina el colegio).
+2. Deploy BE — la próxima marcación de CrossChex ya crea registros para los grados reincorporados.
+3. (Opcional) Job de "catch-up" si el colegio quiere generar estados `F` para los días que pasaron sin captura. No es obligatorio: el flujo normal de `F` por ausencia requiere que el día haya terminado sin marcación, y eso ya lo calcula `EstadoAsistenciaCalculator` para fechas futuras.
+4. Emails retoman su flujo normal sin cambios de código adicionales.
+
+**No se eliminan datos históricos.** Los registros que ya existen en `AsistenciaPersona` de grados afectados siguen en BD; los endpoints filtran pero no borran. Consultas SQL directas siguen mostrándolos.
+
+### Dependencias y coordinación
+
+- **Ninguna dura** — Chat 2 puede arrancar inmediatamente.
+- **Positivo para Plan 22 (cuota SMTP)**: al reducir volumen de correos por estudiante fuera de alcance, baja la presión sobre el techo 200/h por dominio. Si el monitoreo post-deploy de Plan 22 mostraba picos, Plan 27 los suaviza.
+- **No interfiere con Plan 24** (sync CrossChex en background): el job sigue trayendo marcaciones; el filtro opera aguas abajo en `AsistenciaService.RegistrarAsistencia`. Si el job procesa 100 marcaciones de un estudiante `GRA_Orden = 5`, las 100 se descartan silenciosamente — sin registros, sin correos, sin 429.
+- **No interfiere con Plan 26** (rate limit): dominio distinto.
+- **Alineado con Plan 21** (asistencia polimórfica): el dispatch ya separa `TipoPersona E/P`. El filtro se aplica solo en la rama `E` después del dispatch; la rama `P` (profesores) queda intacta.
+
+### Prioridad y descongelamiento de otros frentes
+
+Chat 1 cerrado → **los congelamientos se levantan**. Otros frentes pueden avanzar en paralelo según capacidad:
+
+- Plan 22 (F4 y F5.6 BE pendiente).
+- Plan 26 F2 Chat 2 (aplicar overrides a 14+2 endpoints).
+- Design System F5.3.
+- Carril D Olas 2+.
+
+Plan 27 mantiene prioridad **alta** — Chats 2-5 no deben perder tracción hasta cerrar.
+
+### Checklist pre-inicio Chat 2 `/execute` BE
+
+```text
+[x] Chat 1 /design cerrado con 10 decisiones acordadas
+[x] Umbral confirmado: GRA_Orden >= 8 (5to Primaria)
+[x] Mecanismo confirmado: constante (no AppSetting)
+[x] Comunicación UI confirmada: banner fijo + nota en PDF/Excel
+[x] Alcance confirmado: webhook + admin queries + correos + reportes + self-service + widget home + NO búsqueda
+[x] Invariante nuevo definido: INV-C11. INV-AD07 descartado
+[x] Chat file 016 movido a .claude/chats/closed/
+[x] Prompt de Chat 2 generado (/next-chat → 017)
+[x] Chat 2 cerrado 2026-04-22 — BE implementado, 1130 tests verdes
+```
 
 ---
 
@@ -230,6 +373,7 @@ El Director pierde 2+ minutos bloqueado cada vez que sincroniza (operación frec
 
 | Si cierro… | Desbloqueo… | Por qué |
 |------------|-------------|---------|
+| 🔴 **Plan 27 Chat 1 (/design)** | **Resto de frentes** (Plan 22 F4, Plan 26 F2 Chat 2, Design System F5.3, Carril D Ola 2+) | **Congelamiento explícito** hasta tener el diseño de filtro por grado aprobado. Sin Chat 1, no se abren chats nuevos en otros planes |
 | ~~QW3 (specs rotos)~~ | ~~CI verde → F4.6 efectivo~~ | ✅ Cerrado 2026-04-16 |
 | ~~Plan 6 (completo)~~ | ~~Plan 4 (Consolidación BE) + Plan 5 (Consolidación FE)~~ | ✅ Cerrado 2026-04-16 |
 | Plan 2/B (3 state machines) | Plan 1 F4.4 (INV-T*) | Transiciones formales necesarias para tests de invariantes |
