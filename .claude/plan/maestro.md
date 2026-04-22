@@ -1,6 +1,6 @@
 # Plan Maestro — Orden y Dependencias
 
-> **Fecha**: 2026-04-14 (última revisión: 2026-04-22, **Plan 27 Chat 2 `/execute` BE ✅ cerrado** — filtro INV-C11 aplicado en webhook + admin + correos, 1130 tests verdes)
+> **Fecha**: 2026-04-14 (última revisión: 2026-04-22, **Plan 27 Chat 3 `/execute` BE ✅ cerrado** — filtro INV-C11 + nota Plan 27 aplicada en reportes PDF/Excel, 1149 tests verdes)
 > **Objetivo**: Ordenar los 11 planes dispersos entre `educa-web/.claude/` y `Educa.API/.claude/` en una secuencia con dependencias explícitas.
 > **Principio rector** (actualizado 2026-04-16): "Features primero — el enforcement y la arquitectura son valiosos solo si soportan funcionalidad real. La deuda técnica se paga en paralelo, no como prerrequisito."
 
@@ -102,7 +102,7 @@ Cuellos de botella efectivos para el sistema:
 
 > **Origen**: Requerimiento del usuario 2026-04-22. **MÁXIMA PRIORIDAD**.
 > **Plan**: inline en este maestro. El diseño cupo en 1 chat de `/design` — **no se promueve** a archivo dedicado.
-> **Estado**: 🟢 **Chats 1-2 ✅ cerrados 2026-04-22** — diseño aprobado + BE implementado (webhook guard INV-C11, filtros admin queries, early-return correos, 1130 tests verdes). Listo para Chat 3 `/execute` BE (reportes PDF/Excel).
+> **Estado**: 🟢 **Chats 1-3 ✅ cerrados 2026-04-22** — diseño aprobado + BE implementado (webhook guard INV-C11, filtros admin queries, early-return correos, reportes PDF/Excel con filtro + nota header, 1149 tests verdes). Listo para Chat 4 `/execute` FE (banner admin + self-service + widget home).
 > **Validación**: Diseño validado por el usuario. El resultado final (post-deploy) requiere OK del jefe — Chat 5 de cierre no se considera definitivo hasta esa validación.
 
 ### Qué se quiere
@@ -181,8 +181,8 @@ public const int UMBRAL_GRADO_ASISTENCIA_DIARIA = 8;
 |------|---------|------|--------|
 | **Chat 1 — /design** | ✅ **Cerrado 2026-04-22** — 10 decisiones acordadas | N/A | 1 chat |
 | **Chat 2 — BE: webhook + admin queries + correos** | ✅ **Cerrado 2026-04-22** — `UmbralGradoAsistenciaDiaria = 8` en `Constants/Asistencias/AsistenciaGrados.cs` + `MarcacionAccion.IgnorarGradoFueraAlcance` en `CoherenciaHorariaValidator.Clasificar(..., int? graOrden)` + lookup `GetGraOrdenEstudianteActivoAsync` en `IAsistenciaRepository` + `IAsistenciaAdminRepository` + guard en `AsistenciaService.ClasificarYRegistrarMarcacionAsync` (rama E) con log `Information` + `DniHelper.Mask()` + filtros `GRA_Orden >= 8` en `ConsultaAsistenciaRepository` (3 queries) + `AsistenciaAdminQueryRepository` (listar día estudiantes + estadísticas, profesores intactos) + early-return opcional `int? graOrden = null` en `EmailNotificationService.EnviarNotificacionAsistencia` y `EnviarNotificacionAsistenciaCorreccion` + propagación via `PersonaAsistenciaContext.GraOrden` → `IAsistenciaAdminEmailNotifier`. **11 tests BE nuevos** (3 validator, 3 service, 5 email). Baseline 1097 → **1130 verdes**. | BE | 1 chat |
-| **Chat 3 — BE: reportes + tests** | ⏳ **Siguiente**. Aplicar filtro + nota en header en 6 services PDF/Excel de asistencia (respetando INV-RE01/02/03) + 15-20 tests de invariante (INV-C11, INV-D09) + auditoría por soft-delete | BE | 1 chat |
-| **Chat 4 — FE: admin + self-service + widget home** | Banner fijo en `/intranet/admin/asistencias` + mensaje por-hijo en self-service estudiante/apoderado + widget "Asistencia de Hoy" con filtro aplicado (denominador y numerador `GRA_Orden ≥ 8`) + búsqueda de estudiantes intacta | FE | 1 chat |
+| **Chat 3 — BE: reportes + tests** | ✅ **Cerrado 2026-04-22** — `AsistenciaGrados.NotaReportePlan27` constante + filtro `GRA_Orden >= 8` aplicado en las 3 queries de `ReporteAsistenciaRepository` (`ObtenerSalonesActivosAsync` / `ObtenerEstudiantesConAsistenciaDiaAsync` / `ObtenerEstudiantesConAsistenciaRangoAsync`) + helper `AsistenciaPdfComposer.ComposeNotaPlan27` (PDF) + `ExcelHelpers.EscribirNotaPlan27` (Excel) + nota aplicada en headers de los 6 reportes de estudiantes (3 PDF consolidado + 1 PDF salón + 1 PDF filtrado + 3 Excel paralelos). Reportes solo-profesor mantenidos sin filtro (INV-C11 no aplica). Split `ReporteAsistenciaConsolidadoPdfService.cs` → `.Headers.cs` para respetar cap 300 ln. **16 tests nuevos** (10 `ReporteAsistenciaRepositoryPlan27Tests` + 2 `ReporteAsistenciaConsolidadoExcelServiceTests` nota + 2 `ReporteAsistenciaSalonExcelServiceTests` nota + 2 `AsistenciaExcelServiceTests` paridad E/P). Baseline 1133 → **1149 verdes**. | BE | 1 chat |
+| **Chat 4 — FE: admin + self-service + widget home** | ⏳ **Siguiente**. Banner fijo en `/intranet/admin/asistencias` + mensaje por-hijo en self-service estudiante/apoderado + widget "Asistencia de Hoy" con filtro aplicado (denominador y numerador `GRA_Orden ≥ 8`) + búsqueda de estudiantes intacta | FE | 1 chat |
 | **Chat 5 — Cierre** | Documentar en `business-rules.md` §1 (nueva subsección "Filtro temporal por grado") + formalizar `INV-C11` en §15.4 (Cálculo) + plan de reversión + movimiento de chat files a `closed/`. **No cierra hasta validación del jefe post-deploy** | FE+BE | 1 chat |
 
 **Total confirmado**: 5 chats (1 `/design` ✅ + 3 `/execute` + 1 cierre).
