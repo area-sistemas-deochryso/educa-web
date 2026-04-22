@@ -1,6 +1,6 @@
 # Plan Maestro — Orden y Dependencias
 
-> **Fecha**: 2026-04-14 (última revisión: 2026-04-22, **Plan 28 🟢 Chat 2 BE ✅ cerrado** — modelo polimórfico `'A'` + dispatch 3 pasos `Profesor → AsistenteAdmin → Estudiante` + queries admin extendidas + migración SQL ejecutada. 14 archivos prod + 3 archivos test. Colisión real Vivian Canchari (dual AA+Profesor, CodIDs 3 y 4) resuelta por first-match-wins → cae como `'P'`; los otros 3 AAs puros. Hallazgo: discriminador del rol es `DIR_UsuarioReg='Asistente Administrativo'` (convención pre-existente, no hay columna `DIR_Rol`). **+18 tests BE, 1185 verdes.** Siguiente: Chat 3 BE (reportes PDF/Excel extendidos + correo diferenciado AA + bandeja admin + composer notificaciones + authz `INV-AD08`). Plan 27 Chat 5c ✅ cerrado — pendiente solo validación del jefe post-deploy)
+> **Fecha**: 2026-04-14 (última revisión: 2026-04-22, **🔴 Plan 29 nuevo — MÁXIMA PRIORIDAD** — descubierto 2026-04-22 en investigación de correos fallidos `261ochapa@gmail.com`: cPanel/Exim bloquea el dominio entero durante 60 min cuando llega a **5 defers+fails/h por dominio** (`max_defer_fail_percentage`). Es un techo separado de los 50/h buzón / 200/h dominio / 300/h cuenta documentados en `project_smtp_limits.md`. CrossChex está mandando desde SMTP compartido con correos inválidos de su lista interna → agota el contador → todos los correos legítimos de Educa se descartan silenciosamente. **Plan 29 inline** con 4 chats: pre-filtro + blacklist + corte SMTP CrossChex + docs INV-MAIL01/02/03. Plan 22 Chat B (widget) se posterga hasta cerrar Plan 29. **Plan 28 Chat 2 BE ✅ cerrado** — modelo polimórfico `'A'` + dispatch 3 pasos + queries admin extendidas + migración SQL ejecutada. +18 tests BE, 1185 verdes. Plan 27 Chat 5c ✅ cerrado — pendiente solo validación del jefe post-deploy)
 > **Objetivo**: Ordenar los 11 planes dispersos entre `educa-web/.claude/` y `Educa.API/.claude/` en una secuencia con dependencias explícitas.
 > **Principio rector** (actualizado 2026-04-16): "Features primero — el enforcement y la arquitectura son valiosos solo si soportan funcionalidad real. La deuda técnica se paga en paralelo, no como prerrequisito."
 
@@ -37,6 +37,7 @@
 | 25 | Paridad Excel para reportes PDF | BE+FE | (archivado en historial) | ✅ **100% — archivado 2026-04-22** en [history/planes-cerrados.md](../history/planes-cerrados.md#plan-25). Regla §17 en `business-rules.md` con INV-RE01/02/03 | — |
 | **26** | **🟡 Rate limiting flexible** | **BE+FE** | **(inline en maestro)** | **🟡 F1 ✅ cerrada 2026-04-21 + F2 Chat 1 ✅ cerrado 2026-04-22 (máquina del multiplier). F2 Chat 2 ⏳ pendiente aplicar `[RateLimitOverride]` a 14 endpoints reportes + 2 vistas admin. F2 Chat 1: `RateLimitOverrideAttribute` + `RoleMultipliers` (Director 3.0 / Asistente Admin / Promotor / Coordinador Académico 2.5 / Profesor 2.0 / resto 1.0) + `RateLimitPartitionResolver` (cache reflection, cap 5x acumulado) + nuevas policies `reports` y `batch` con base 5/min + resolver. `heavy` revertido a 5/min (parche temporal Chat 2 removido) y deja como deprecated funcional para los 14 controllers de Plan 25 que aún la usan (Chat 2 los migra). Telemetría viva en prod desde F1 (RateLimitEvent, INV-S07/ET02). FE intacto: la vista admin `/intranet/admin/rate-limit-events` ya rotula por rol; los datos nuevos aparecerán automáticamente cuando las 429 caigan. Tests: +28 unit (`RoleMultipliersTests`, `RateLimitPartitionResolverTests`) + 6 integración con `TestServer` real + `TestAuthHandler` reusable. Suite BE 1097 verdes (baseline 1063 + 34 nuevos). Plan ~30%. **Siguiente**: F2 Chat 2 (aplicar overrides a 14+2 endpoints) y luego observar telemetría 1-2 semanas antes de F3.** | **30%** |
 | **28** | **🟢 Inclusión de Asistentes Administrativos en reportes de profesores** | **BE+FE** | **(inline en maestro — decisión confirmada post-Chat 1: 6 chats no justifican archivo dedicado)** | **🟢 Chat 2 BE ✅ cerrado 2026-04-22 — modelo + dispatch + queries. Migración SQL ejecutada (CHECK expandido a `('E','P','A')`). 14 archivos prod tocados: constante `TipoPersona.AsistenteAdmin = "A"`, lookup `GetAsistenteAdminActivoConSedeByDniAsync` filtrando `DIR_UsuarioReg='Asistente Administrativo'` (discriminador del rol es `DIR_UsuarioReg`, no `DIR_Rol` — convención pre-existente del proyecto), dispatch `Profesor → AsistenteAdmin → Estudiante → rechazar` en `AsistenciaService.ResolverPersonaAsync`, rama 'A' en 3 queries de `AsistenciaRepository` + nuevo método `ListarAsistentesAdminDelDiaAsync` en `AsistenciaAdminQueryRepository` + selector admin extendido + helper `ContextoAsistenteAdmin` + DTO estadísticas con campos AA + tupla `(E,P,A)` en `ContarEditados` + log sync service. Colisión real resuelta por dispatch: Vivian Canchari existe dual (AA+Profesor) → cae como `'P'` por first-match-wins (3 AAs puros: Ricardo/Ray/Diana). **+18 tests** (6 lookup, 6 dispatch, 6 `TardanzaRegular`) → **1185 BE verdes**. Commit en Educa.API branch master. **🟢 Chat 1 `/design` ✅ cerrado 2026-04-22 con 8 decisiones: (1) alcance B-amplio acotado al rol "Asistente Administrativo" (4 personas hoy: RICARDO REY, VIVIAN CANCHARI, RAY ORTIZ, DIANA TUESTA — rol = "Asistente Administrativo" explícito, se excluyen Director/Promotor/Coord Académico); filas IN del inventario 11 = {1-3 asistencia admin + 9-10 comunicación (correos + notificaciones)}; filas OUT = {4-5 filtros rol usuarios/tutores, 6-8 horarios/cursos/salones tutoreados, 11 permisos} — criterio: si no es reporte de asistencia o función que el AA no cumple, no entra; (2) `TipoPersona='A'` en `AsistenciaPersona` con `ASP_PersonaCodID` → `Director.DIR_CodID` (extiende dispatch polimórfico Plan 21 con 3er tipo); (3) dispatch webhook `Profesor → Director(rol=AA) → Estudiante → rechazar` — **modifica el orden del Plan 21** (hoy `Profesor → Estudiante`) por regla §7.1 "menor a mayor volumen"; (4) correos diferenciados: helper nuevo `EnviarNotificacionAsistenciaCorreccionAsistenteAdmin` reusa plantilla azul administrativa con saludo propio, destinatario `Director.DIR_Correo`, `TipoEntidadOrigen='AsistenciaAsistenteAdmin'`; (5) self-service "Mi asistencia" generalizado — componente `attendance-profesor-personal` se renombra a `attendance-personal` parametrizado por `TipoPersona` (reusa tabla mensual + día puntual + widget home); (6) horarios = profesor (periodo regular 07:31 tardanza / 09:30 falta, apertura INV-C10 sí aplica, INV-C09 salida temprana no aplica — es `'E'`-only); (7) `INV-AD08` principio general "ningún rol administrativo corrige asistencia de su propio rol" → AA no puede mutar `TipoPersona='A'`; jurisdicción `Roles.SupervisoresAsistenteAdmin = {Director, Promotor, Coordinador Académico}`; (8) alcance persona acotado al rol "Asistente Administrativo" específicamente (Director, Promotor, Coord Académico NO entran al scope — son roles distintos con funciones no operativas-auxiliares). **Plan inline, 6 chats confirmados**: Chat 1 ✅ + Chat 2 BE (modelo + dispatch + queries) + Chat 3 BE (reportes PDF/Excel + correos + bandeja + notificaciones) + Chat 4 FE (admin UI + badge + self-service generalizado + widget home) + Chat 5 cierre docs (INV-AD08/09 en business-rules.md §15.9 + §17 Excel paridad) + Chat 6 gap fix reservado (patrón probado Plan 27). **Chat 2 bloqueado hasta validación del jefe Plan 27 post-deploy** (evita PRs simultáneos sobre `AsistenciaPersona` + `EmailNotificationService`). Invariantes a formalizar en Chat 5: `INV-AD08`, `INV-AD09`, nota cruzada en `INV-AD06`.** | **~15%** |
+| **29** | **🔴 Corte de cascada SMTP (`max_defer_fail_percentage`)** | **BE+OPS** | **(inline en maestro — 4 chats, no justifica archivo dedicado)** | **🟢 Chat 1 `/design` ✅ cerrado 2026-04-22 con 8 decisiones. Hallazgo clave: el NDR de `durbyangelica19@gmail.com` prueba que **Educa es el remitente** del correo bloqueado (template HTML, `From: Sistemas Educa <sistemas3@laazulitasac.com>`, helo `webwk000002`, subject `Registro de Entrada - CAYCHO RAMOS JULIO`) — CrossChex NO es culpable estructural. Query A = 0 → no hay bounces permanentes históricos a blacklist. El contador `5/h` lo consumen fallos propios (SSL handshake dominante). Decisiones: regex pre-outbox `^[A-Za-z0-9._%+\-]+@[A-Za-z0-9.\-]+\.[A-Za-z]{2,}$` + normalización con strip de invisibles (rechazar, no silenciar) · esquema `EmailBlacklist` con normalización en storage + índice `(EBL_Correo, EBL_Estado)` · umbral 3 bounces `5.x.x` (SSL/auth/timeout/throttle host `max defers` NO cuentan) · endpoint `DELETE /api/sistema/email-blacklist/{correo}` en Chat 2 (UI admin FE queda como deuda) · CrossChex reformulada a **inspección-only** en Chat 3 OPS · fix SSL handshake **sube a prioridad máxima Chat 2** (StartTls+TLS1.2 con feature flag `EmailService:TlsStrictMode` para rollback) · `INV-MAIL01/02/03` wording final a **§18** de `business-rules.md` (sección nueva, no §16) · saneamiento Outbox reducido (archivar `FAILED >30d`, NO purgar — preservar trazabilidad forense). Deudas derivadas: D1 reputación `IE_VL_PBL_*` hosting, D2 UI admin `EmailBlacklist`, D3 validador en form Estudiante/Profesor, D4 widget Plan 22 Chat B debe incluir `DeferFailStatus`. **Siguiente: Chat 2 BE — MÁXIMA PRIORIDAD** (mata correos legítimos en producción).** | **~15%** |
 | **27** | **🟢 Filtro temporal asistencia diaria por grado (5to Primaria +)** | **BE+FE** | **(inline en maestro — el diseño cupo en 1 chat, no se promueve a archivo dedicado)** | **🟢 Cerrado docs 2026-04-22 (pendiente validación del jefe post-deploy). Los 5 chats completaron: Chat 1 `/design` + Chat 2 BE webhook/admin/correos (1130 verdes) + Chat 3 BE reportes + nota (1149 verdes) + Chat 4 BE mínimo `GraOrden` self-service + FE completo banner/per-student/widget (1155 BE + 1507 FE verdes) + Chat 5 cierre docs `INV-C11` en `business-rules.md §1.11 + §15.4` + **Chat 5b (fix gap) 2026-04-22**: 2 queries de `ConsultaAsistenciaRepository` (`ObtenerEstudiantesPorGradoConAsistenciasAsync` + `ObtenerEstudiantesPorDiaAsync`) quedaban sin filtrar → endpoints `profesor/grado`, `profesor/asistencia-dia`, `director/grado`, `director/asistencia-dia` devolvían listas con `Asistencias = []` y el FE calculaba 100% falta. Fix: filtro `GRA_Orden >= 8` + `SalonProfesorDto.GraOrden` expuesto + `salonFueraAlcance` computed en `attendance-profesor-estudiantes` y `profesor-attendance-widget` del home (reutiliza `AttendanceScopeStudentNoticeComponent` del Chat 4). **+6 tests BE** (4 filtro + 2 `GraOrden`) → **1161 verdes**. **+2 tests FE** (widget INV-C11) → **1509 verdes**. **Chat 5c (gap fix bulk email) 2026-04-22**: la proyección dedicada `AsistenciaEmailDataRow` consumida por `AsistenciaAdminBulkEmailService.EnviarCorreosMasivosAsync` (`POST /api/AsistenciaAdmin/correos-masivos`) no traía `GraOrden`, así que el early-return de `EmailNotificationService` nunca disparaba y el reenvío masivo salía para estudiantes con `GRA_Orden < 8`. Fix: `AsistenciaEmailDataRow` gana `int? GraOrden` · `GetEmailDataByIdsAsync` + `GetEmailDataByIdAsync` agregan subquery correlacionada con filtro `ESS_Estado=true && SAL_Estado=true && SAL_Anio=anioActual` (INV-D09) · el service propaga `asistencia.GraOrden` en entrada y salida. **+6 tests BE** (4 repo + 2 service) → **1167 verdes**. FE sin cambios (1509 verdes). 10 decisiones acordadas preservadas. Reversibilidad documentada (bajar la constante en ambos repos + redeploy; job catch-up opcional sin data loss). Una vez que el jefe valide el comportamiento post-deploy, el plan pasa a `history/planes-cerrados.md`.** | **100%** |
 
 **Semáforo de readiness**:
@@ -47,17 +48,44 @@
 | **Deploy readiness** | 🟢 Estable | FE (Netlify) + BE (Azure) desplegados 2026-04-16. 2026-04-17 sin incidentes reportados. |
 | **Production reliability** | 🔴 Sin red | Falta: tests de contrato, auditoría endpoints, error trace, fallbacks P0 |
 
-**Foco (actualizado 2026-04-22, post-Chat 2 Plan 28)**: 🟢 **Plan 28 Chat 2 BE ✅ cerrado** — modelo polimórfico `'A'` + dispatch 3 pasos + queries admin extendidas + migración SQL ejecutada en BD desarrollo. **18 tests nuevos, 1185 BE verdes**. Siguiente: **Chat 3 BE** (reportes PDF/Excel extendidos a `'A'` + correo diferenciado `EnviarNotificacionAsistenciaCorreccionAsistenteAdmin` con saludo propio + bandeja admin filtro por `TipoEntidadOrigen` + `INotificacionesAdminService` composer expande rol "Profesor" a `{Profesor, AsistenteAdmin}` + `[Authorize(Roles = Roles.SupervisoresAsistenteAdmin)]` en mutaciones sobre `TipoPersona='A'` para enforzar `INV-AD08`). **Hallazgo Chat 2 importante**: el discriminador del rol AA es `DIR_UsuarioReg='Asistente Administrativo'` (convención pre-existente, no hay columna `DIR_Rol` en el modelo). Vivian Canchari es dual Profesor+AA — dispatch lo resuelve por first-match-wins como `'P'`. 🟢 **Plan 27 cerrado en docs + código completo** — `INV-C11` formalizado en `business-rules.md` (§1.11 + §15.4), pendiente solo validación del jefe post-deploy para archivarse en `history/planes-cerrados.md`. **Frentes abiertos sin bloqueo**: Plan 22 F4/F5.6 BE, Plan 26 F2 Chat 2 (aplicar `[RateLimitOverride]` a 14+2 endpoints), Design System F5.3, Carril D Olas 2+.
+**Foco (actualizado 2026-04-22, post-cierre Plan 29 Chat 1)**: 🟢 **Plan 29 Chat 1 `/design` ✅ cerrado** con 8 decisiones resueltas. Hallazgo clave del chat: el NDR de `durbyangelica19@gmail.com` del 2026-04-22 prueba que **Educa es el remitente** del correo bloqueado (`From: Sistemas Educa <sistemas3@laazulitasac.com>`, subject `Registro de Entrada - CAYCHO RAMOS JULIO`, template HTML del backend con banner `medylo.blob.core.windows.net`, helo `webwk000002`). El error de Exim `5/5 (100%) max defers and failures` rechazó ANTES de intentar enviar a Gmail → `durbyangelica19@gmail.com` es probablemente válido. Query A (rebotes permanentes históricos en `EmailOutbox`) = 0 → no hay backfill a blacklist. **CrossChex NO es culpable estructural** — hipótesis inicial descartada. Culpable del contador `5/h`: fallos propios de Educa (SSL handshake dominante, `535 auth fail` histórico). Esto reprioriza decisiones del Chat 1: (5) CrossChex baja a inspección-only, (6) fix SSL sube a prioridad máxima Chat 2, (8) saneamiento Outbox se reduce (no hay backfill). 🔴 **Siguiente: Chat 2 BE — MÁXIMA PRIORIDAD ABSOLUTA** (mata correos legítimos en producción): `EmailValidator` helper + tabla `EmailBlacklist` + repo + service + hook `EnqueueAsync` + worker auto-insert tras 3 bounces + fix MailKit TLS con feature flag + saneamiento Outbox (archivar `FAILED >30d` a `EmailOutbox_Archive`, NO purgar). 🟢 **Plan 28 Chat 2 BE ✅ cerrado** (18 tests nuevos, 1185 BE verdes) — **Chat 3 se posterga** hasta Plan 29 Chat 2 cerrado (ambos tocan `EmailOutboxService` y no queremos PRs simultáneos). 🟢 **Plan 27 cerrado en docs + código completo** — `INV-C11` formalizado, pendiente solo validación del jefe post-deploy. **Frentes bloqueados por Plan 29**: Plan 22 Chat B (widget debe incluir métricas `DeferFailStatus` además de `ThrottleStatus` — deuda D4 del Chat 1). **Frentes abiertos sin bloqueo**: Plan 26 F2 Chat 2 (aplicar `[RateLimitOverride]` a 14+2 endpoints — dominio HTTP distinto), Design System F5.3, Carril D Olas 2+.
 
 ---
 
 ## 🚨 Restricción crítica — Límites SMTP del hosting (cPanel)
 
-> **Origen**: Dato confirmado por el usuario 2026-04-21. Estos son los **techos duros reales** que aplica el hosting (cPanel) al envío saliente para evitar que el dominio entre en listas negras por spam. Superarlos significa que el servidor **descarta silenciosamente** los correos excedentes dentro de la ventana de una hora — sin bounce, sin error, sin log.
+> **Origen**: Dato confirmado por el usuario 2026-04-21 (cuotas de envío) y 2026-04-22 (bloqueo por defer/fail). Estos son los **techos duros reales** que aplica el hosting (cPanel) al envío saliente para evitar que el dominio entre en listas negras por spam. Superarlos significa que el servidor **descarta silenciosamente** los correos excedentes dentro de la ventana de una hora — sin bounce, sin error, sin log.
 >
-> **Acción urgente**: afecta el diseño/estado de Plan 22, Plan 24 y Plan 26. Antes de retomar cualquiera de esos planes, revisar qué fases necesitan rediseño a la luz de estas cifras. No son "objetivo" ni "buena práctica" — son límites del hosting que no negociamos.
+> **Hay DOS contadores independientes**. Uno limita envíos aceptados (cuotas); el otro bloquea el dominio entero cuando hay demasiados rebotes. Uno tiene holgura, el otro se agota con 5 correos inválidos. **Ambos hay que cuidar.**
+>
+> **Acción urgente**: afecta el diseño/estado de Plan 22, Plan 24, Plan 26 y motiva el nuevo **Plan 29** (corte de cascada defer/fail). Antes de retomar cualquiera de esos planes, revisar qué fases necesitan rediseño a la luz de estas cifras. No son "objetivo" ni "buena práctica" — son límites del hosting que no negociamos.
 
-### Cifras exactas
+### Contador 1 — `max_defer_fail_percentage` (descubierto 2026-04-22, MOTIVA PLAN 29)
+
+Techo: **5 defers+fails/hora por dominio**. Valor que el admin del hosting configuró; puede negociarse subirlo pero es bajísimo hoy.
+
+Mensaje literal visto en la bandeja `sistemas6@laazulitasac.com`:
+
+> *"Domain laazulitasac.com has exceeded the max defers and failures per hour (5/5 (100%)) allowed. Message discarded."*
+
+**Qué cuenta** contra el contador:
+
+- Bounces permanentes (550 NoSuchUser, 5.x.x)
+- SSL/TLS handshake failures hacia el SMTP remoto (`SslHandshakeException`)
+- Timeouts y 4xx temporales
+- Defers internos de Exim
+
+**Efecto cuando se agota**: 60 min de **bloqueo total** de envíos del dominio. Ningún correo legítimo sale, sin bounce ni log visible para el remitente. Es silencioso para la aplicación.
+
+**Por qué importa tanto**: a diferencia de las cuotas de envío (200/h dominio es mucho), este contador llega a 5 **en minutos** si hay correos inválidos. Un solo correo mal escrito que rebote 2-3 veces por retry puede saturar el techo por sí solo. Y **Plan 22 F5/F6 NO protege contra esto** — el throttle cuenta envíos aceptados, no rebotes.
+
+**Causa raíz identificada**: CrossChex comparte el pool SMTP saliente del dominio con Educa. Su lista interna de usuarios tiene correos desactualizados que ya no están en la BD Educa (`261ochapa@gmail.com` no aparece en `Estudiante`, `Profesor`, `Director`, `Apoderado` ni `EmailOutbox`). Cada rebote que genera CrossChex consume quota del dominio completo — y con 5/h bastan para bloquear a Educa.
+
+Ver `Plan 29` más abajo para estrategia de mitigación.
+
+### Contador 2 — Cuotas de envío aceptado
+
+#### Cifras exactas
 
 | Ámbito | Envíos permitidos / hora |
 |--------|--------------------------|
@@ -96,6 +124,130 @@ Cuellos de botella efectivos para el sistema:
 - [x] ~~Confirmar con el hosting: ¿las cifras son **rolling window de 60 min** o **hora del reloj** (00-59)? Cambia cómo se calcula el throttle.~~ **Asunción operativa en Plan 22 Chat A: rolling window 60 min.** Si el hosting aplica hora de reloj, el sliding window se reajustará como variante en chat posterior; en la práctica rolling es estrictamente más conservador que hora de reloj.
 - [x] ~~Confirmar: ¿el contador se reinicia con bounces? Un 550 cuenta como "envío" para la cuota?~~ **Decisión en Plan 22 Chat A: counter cuenta solo `EO_Estado='SENT'` (ignora FAILED).** Asunción verificable post-deploy: si el hosting también cuenta los FAILED contra la cuota, ajustar el counter para incluir `FAILED` transitorios que llegaron al SMTP.
 - [x] ~~Inventariar remitentes actuales~~ — en Plan 22 Chat A se asume un único remitente histórico (`sistemas@laazulitasac.com`) y el script SQL 3.2 hace backfill de `EO_Remitente` a ese valor en las 2.788 filas.
+
+---
+
+## 🔴 Plan 29 — Corte de cascada SMTP (`max_defer_fail_percentage`)
+
+> **Origen**: Descubierto 2026-04-22 durante investigación de correos fallidos (`261ochapa@gmail.com`, `giovanna02@gmail.com`). **MÁXIMA PRIORIDAD ABSOLUTA** — mata correos legítimos en producción hoy.
+> **Plan**: **inline en este maestro** — 4 chats, mismo criterio que Plan 27 y Plan 28.
+> **Estado**: 🟢 **Chat 1 `/design` ✅ cerrado 2026-04-22** con 8 decisiones resueltas. Siguiente: Chat 2 BE (MÁXIMA PRIORIDAD — mata correos legítimos en producción).
+> **Validación**: post-deploy requiere 48-72h sin bloqueo del dominio antes de archivar.
+
+### Qué se quiere
+
+Impedir que un correo inválido (bounce 550) o una falla de SSL agote en minutos el contador `max_defer_fail_percentage` de cPanel y bloquee el dominio `laazulitasac.com` durante 60 min para TODOS los correos de Educa.
+
+### Por qué importa ahora
+
+- Hallazgo 2026-04-22: umbral configurado en **5 defers+fails/h**. Un solo correo mal escrito con retry agota el contador.
+- **CrossChex comparte el pool SMTP del dominio** y envía desde su propia lista de usuarios (correos que no existen en la BD Educa). Sus rebotes consumen la cuota que necesita Educa.
+- Los fallos de `luzbenitez19980405@gmail.com` y `Judithramos705@gmail.com` en el Outbox actual son `SslHandshakeException` — indica problema de configuración TLS en `EmailService` que también cuenta contra el umbral.
+- **Plan 22 F5/F6 no protege esto**. El throttle per-sender cuenta envíos aceptados; el `max_defer_fail` cuenta rebotes. Son techos independientes y requieren defensas distintas.
+- Durante el bloqueo, los correos legítimos de apoderados/profesores se **descartan en silencio** — sin bounce, sin log, sin error en la app. La víctima es el dominio completo.
+
+### Diagnóstico confirmado
+
+Queries ejecutadas por el usuario el 2026-04-22 buscando `261ochapa@gmail.com`:
+
+| Tabla consultada | Resultado |
+|------------------|-----------|
+| `Estudiante.EST_CorreoApoderado` | 0 filas |
+| `Profesor.PRO_Correo` | 0 filas |
+| `Director.DIR_Correo` | 0 filas |
+| `Apoderado.APO_Correo` | 0 filas (tabla vacía, no se usa) |
+| `EmailOutbox.EO_Destinatario` | 0 filas |
+
+Conclusión: **Educa.API no generó ese correo**. CrossChex (u otro sistema del cPanel compartido) lo envió desde su propia fuente.
+
+> **Actualización 2026-04-22 (Chat 1 `/design`)**: el NDR de `durbyangelica19@gmail.com` inspeccionado durante el Chat 1 revela que **el correo bloqueado SÍ es de Educa** (`Subject: Registro de Entrada - CAYCHO RAMOS JULIO`, template HTML con banner `medylo.blob.core.windows.net`, `From: Sistemas Educa <sistemas3@laazulitasac.com>`, helo `webwk000002`). El caso original `261ochapa@gmail.com` sigue sin aparecer en Educa (hipótesis: viene de otro sistema cPanel o CrossChex para ese caso puntual), pero la causa **estructural** del bloqueo del dominio son los fallos propios de Educa (SSL handshake dominante). Query A (rebotes permanentes históricos) = 0 → no hay destinatarios muertos acumulados. El contador `5/h` lo consumen errores evitables nuestros. Ver sección "Las 8 decisiones" para el replanteo de las mitigaciones.
+
+### Las 8 decisiones (Chat 1 cerrado 2026-04-22)
+
+> **Hallazgo clave del Chat 1**: el NDR del 2026-04-22 (`durbyangelica19@gmail.com`) muestra que el correo rechazado por Exim es del template HTML de Educa (`Subject: Registro de Entrada - CAYCHO RAMOS JULIO`, `From: Sistemas Educa <sistemas3@laazulitasac.com>`, banner `medylo.blob.core.windows.net`, helo `webwk000002`). **CrossChex NO es el culpable estructural** — la hipótesis inicial queda descartada. Query A = 0 → no hay bounces permanentes históricos a blacklist. El contador `5/h` lo consumen fallos propios de Educa (SSL handshake dominante). Esto cambia el peso relativo de las decisiones pero no el diseño base.
+
+| # | Tema | Decisión | Justificación |
+|---|------|----------|---------------|
+| **1** | **Regex + normalización pre-outbox** | Regex `^[A-Za-z0-9._%+\-]+@[A-Za-z0-9.\-]+\.[A-Za-z]{2,}$`. Normalización: `Trim()`, `ToLowerInvariant()`, strip de caracteres invisibles (zero-width, NBSP). **NO** validar MX. Aplica solo en `EmailOutboxService.EnqueueAsync` (validación en form admin FE queda como deuda). Caracteres invisibles: **rechazar con LogWarning**, no normalizar silenciosamente. | Data contaminada por copy-paste desde Excel o formularios web no debe llegar al outbox. Normalizar silenciosamente oculta bugs en las fuentes de captura. Rechazar explícito fuerza corrección aguas arriba. |
+| **2** | **Esquema `EmailBlacklist`** | El del brief con 3 ajustes: `EBL_Correo` siempre normalizado (lookup también); `EBL_MotivoBloqueo` admite `'BOUNCE_5XX' \| 'MANUAL' \| 'BULK_IMPORT' \| 'FORMAT_INVALID'` (el 4to reservado para uso manual futuro); índice adicional `(EBL_Correo, EBL_Estado)` para lookup eficiente del `EnqueueAsync`. Auditoría completa (INV-D02) y `ROWVERSION` se quedan. | El índice único filtrado `WHERE EBL_Estado = 1` del brief original no es óptimo si hay mucho historial despejado — un índice secundario no filtrado acelera el path caliente. Normalización en storage evita inconsistencias `Gmail.com` vs `gmail.com`. |
+| **3** | **Umbral auto-blacklist** | 3 bounces permanentes `5.x.x` → blacklist. Sin ventana temporal. SSL handshake, timeouts y `535 auth fail` **no cuentan**. **Nuevo del hallazgo**: el rechazo Exim `exceeded the max defers and failures per hour` **tampoco cuenta** para el destinatario — worker lo detecta por keyword y marca `FAILED_THROTTLE_HOST` sin imputárselo. | Imputar fallos que nunca llegaron al destinatario (throttle del host) penalizaría correos válidos. El umbral 3 queda porque equilibra protección (1-2 pueden ser transitorios en grises) vs cobertura (no tolerar más de 3 intentos muertos). |
+| **4** | **Reversión blacklist** | Endpoint `DELETE /api/sistema/email-blacklist/{correo}` en Chat 2. `[Authorize(Roles = "Director,Asistente Administrativo")]`. Lanza `NotFoundException` si no existe. Vista admin FE **fuera del Plan 29** (deuda en maestro). Al despejar: nada automático, próximo `EnqueueAsync` funciona normal. | Endpoint mínimo viable desbloquea la operación manual. UI puede esperar sin costo — mientras tanto query SQL directa resuelve casos excepcionales. |
+| **5** | **Política con CrossChex** | **Reformulada por hallazgo**: Chat 3 OPS confirma vía inspección del panel CrossChex que NO hay SMTP saliente activo. Si por sorpresa lo hay, se desactiva preventivamente (opción a). Resultado esperado: no cambia nada del problema actual. Queda como verificación de higiene. | NDR del 2026-04-22 prueba que Educa es el único remitente del correo bloqueado (template HTML, helo `webwk000002`, dominio `@laazulitasac.com`). Cortar CrossChex no resuelve el defer/fail hoy. Se mantiene la inspección por higiene (evitar sorpresas futuras si alguien vuelve a activar SMTP en CrossChex). |
+| **6** | **Fix SSL handshake** | **Sube a prioridad máxima en Chat 2**. Orden: (1) `SecureSocketOptions.StartTls` explícito en puerto 587, (2) `SslProtocols.Tls12` mínimo, (3) `ServerCertificateValidationCallback` custom solo si (1)+(2) fallan. Rollback vía feature flag `EmailService:TlsStrictMode`. 3 envíos de prueba desde staging antes de prod. Criterio de éxito: 0 `SslHandshakeException` en 48h post-deploy. | El hallazgo reposiciona esto como el cambio con más impacto: si SSL handshake es el que consume el contador `5/h` (consistente con el brief y la memoria), fixarlo es el único cambio que directamente reduce defers+fails. Feature flag permite revertir sin redeploy si rompe envíos legítimos. |
+| **7** | **Invariantes `INV-MAIL01/02/03`** | Sección nueva **§18 "Correos salientes y protección del canal SMTP"** en `business-rules.md` (no integrar a §16 Reportes de Usuario — dominios distintos). Wording final en el bloque "Invariantes a formalizar en Chat 4" más abajo. `INV-MAIL03` afirma explícitamente que el umbral `5/h` es política del hosting no configurable y que `INV-MAIL01/02` son las únicas defensas. | Hosting confirmado no negociable (jefe ya al tanto). `INV-MAIL03` pierde su salvedad "hasta que hosting aumente" — se redacta como restricción permanente. Sección propia (no §16) evita acoplar correos con reportes de usuario, que tienen ciclo de vida distinto. |
+| **8** | **Saneamiento Outbox existente** | Query A = 0 → **no hay backfill a `EmailBlacklist`**. Script pre-deploy reducido: (a) `PROCESSING` con `EO_FechaReg < NOW - 2h` → `FAILED` con `EO_UltimoError = 'Worker cleanup — huérfano al deploy Plan 29'`; (b) `FAILED` con `EO_FechaReg < NOW - 30 días` → **archivar a tabla histórica** `EmailOutbox_Archive` (no purga — preservar trazabilidad forense como la que habilitó este mismo chat). Idempotente con `WHERE` excluyente. Script se muestra al usuario antes de mergear Chat 2. | Purgar hubiera perdido el NDR que sirvió de evidencia del hallazgo. Costo de almacenamiento despreciable. Archivar mantiene la opción de queries forenses sin penalizar el path caliente del worker (que solo lee `EO_Estado IN ('PENDING','RETRYING')`). |
+
+**Deudas derivadas del Chat 1 (trackear en maestro)**:
+
+| # | Item | Plan destino |
+|---|------|-------------|
+| D1 | Reputación degradada del dominio en ImunifyEmail (flags `IE_VL_PBL_*` en el NDR inspeccionado). Investigar si es estructural o respuesta al ritmo de envío | Plan futuro post-29, evaluar tras 48-72h de métricas post-deploy |
+| D2 | Vista admin FE para `EmailBlacklist` (listar, buscar, despejar) | Chat separado — post Chat 2 del Plan 29 |
+| D3 | Validador de formato en form de creación/edición de Estudiante y Profesor (FE + BE) | Plan futuro — no entra al alcance del Plan 29 |
+| D4 | Widget Plan 22 Chat B incluye `DeferFailStatus` además de `ThrottleStatus` (métricas defer/fail 5/h por dominio) | Requisito de Chat 2 BE del Plan 29 — los agregados deben quedar listos |
+
+### Plan de ejecución (4 chats)
+
+#### Chat 1 — `/design` ✅ cerrado 2026-04-22
+
+Las 8 decisiones se cerraron con los resultados del pre-work (NDR inspeccionado + Query A = 0 candidatos + hosting no negociable). Ver sección **"Las 8 decisiones (Chat 1 cerrado 2026-04-22)"** más abajo.
+
+#### Chat 2 — BE (implementación)
+
+- `EmailValidator.IsValidFormat(string email)` helper puro.
+- Tabla `EmailBlacklist` + `EmailBlacklistRepository` + `IEmailBlacklistService`.
+- Modificación de `EmailOutboxService.EnqueueAsync`: `if !IsValidFormat || IsBlacklisted → return silent + LogWarning`.
+- Modificación de `EmailOutboxWorker`: tras 3 rebotes `5.x.x`, insert en `EmailBlacklist` y marcar outbox como `FAILED_BLACKLISTED`.
+- Fix SSL handshake en `EmailService` (appsettings config + force TLS 1.2).
+- Migración SQL: crear `EmailBlacklist` + backfill inicial con destinatarios que tienen 3+ fallos `5.x.x` en `EmailOutbox` histórico.
+- **Tests BE**: validator (formato válido/inválido, trim, case), blacklist enqueue-skip, worker inserción tras 3 bounces.
+
+#### Chat 3 — OPS (coordinación externa)
+
+- Pedir al hosting **subir `max_defer_fail_percentage`** a 25-30% (o count absoluto ~50). Es negociación, no código. Trackear fecha/confirmación.
+- Decidir y ejecutar política CrossChex del Chat 1 decisión 5: desactivar su SMTP / migrar / esperar Plan 24.
+- Validación post-deploy Chat 2: 48-72h sin bloqueo del dominio, log de `EmailBlacklist` insertions, log de `EnqueueAsync` descartes por formato.
+
+#### Chat 4 — docs + cierre
+
+- Agregar nueva **§18 "Correos salientes y protección del canal SMTP"** en `business-rules.md` con `INV-MAIL01/02/03` (decisión 7 del Chat 1 — no integrar a §16 Reportes de Usuario).
+- Actualizar `Registro de Invariantes` §15 en `business-rules.md`.
+- Entrada en `history/planes-cerrados.md` una vez cerrado el post-deploy.
+- Actualizar `project_smtp_defer_fail_block.md` con valores finales acordados (umbral negociado, tabla blacklist real, etc).
+
+### Reversibilidad
+
+- La tabla `EmailBlacklist` se puede vaciar con un `TRUNCATE` sin afectar el outbox ni BD de estudiantes.
+- El pre-filtro de `EnqueueAsync` se puede desactivar con una feature flag (`environment.features.emailPreFilter`) si bloquea correos legítimos inesperadamente.
+- El fix SSL handshake es estrictamente mejora — no hay revert necesario.
+
+### Dependencias y coordinación
+
+| Plan | Relación |
+|------|----------|
+| Plan 22 (endurecimiento correos) | **Complementario, no sustitutivo**. Throttle 50/h per-sender cuida cuota de envíos; Plan 29 cuida cuota de fallos. Ambos necesarios. |
+| Plan 22 Chat B (widget throttle) | 🔒 **Bloqueado hasta Plan 29 Chat 2** — el widget debe incluir métricas de defer/fail para ser útil. |
+| Plan 24 (sync CrossChex background) | Habilitador futuro: si Educa consume CrossChex biométrico directamente, podemos cortar el SMTP de CrossChex sin perder funcionalidad. |
+| Plan 26 (rate limit flexible) | Dominio distinto (HTTP entrante). No se fusiona. Patrón de telemetría (`EmailFailEvent` análogo a `RateLimitEvent`) puede inspirar auditoría. |
+| Plan 28 Chat 3 (reportes AA) | ⚠️ **Posterga hasta Plan 29 Chats 1-2 cerrados**. Ambos tocan `EmailOutboxService` / `EmailNotificationService` y no queremos PRs simultáneos. |
+
+### Invariantes a formalizar en Chat 4 (wording final cerrado 2026-04-22)
+
+Van a nueva **§18 "Correos salientes y protección del canal SMTP"** en `business-rules.md` (después de §17 — no integrar a §16 Reportes de Usuario, son dominios distintos):
+
+- **`INV-MAIL01` — Validación de destinatario pre-encolado**: Todo llamado a `EmailOutboxService.EnqueueAsync` valida el destinatario contra el regex canónico y consulta `EmailBlacklist`. Correos con formato inválido o presentes en blacklist con `EBL_Estado = 1` se rechazan silenciosamente con `LogWarning` (email enmascarado), sin crear registro en `EmailOutbox`.
+- **`INV-MAIL02` — Auto-blacklist por bounces permanentes**: Cuando un destinatario acumula ≥ 3 rebotes con código SMTP `5.x.x`, `EmailOutboxWorker` lo inserta en `EmailBlacklist` (`MotivoBloqueo = 'BOUNCE_5XX'`) dentro de la misma transacción que actualiza el registro a `EO_Estado = 'FAILED_BLACKLISTED'`. SSL handshake, timeouts, `535 auth fail` y rechazos tipo `max defers and failures per hour` del MTA del hosting **no** cuentan para este umbral.
+- **`INV-MAIL03` — Defensa contra `max_defer_fail_percentage`**: El hosting cPanel descarta silenciosamente todo correo del dominio `laazulitasac.com` cuando acumula 5 defers+fails en una hora. Este umbral es política del hosting y no es configurable. `INV-MAIL01` y `INV-MAIL02` son las únicas defensas disponibles — el sistema no controla el contador, solo qué envía al MTA. Cualquier fallo evitable (SSL handshake, auth, formato inválido) consume el contador y se considera deuda que agota la cuota para correos legítimos.
+
+### Checklist pre-Chat 1 `/design` ✅ completado 2026-04-22
+
+- [x] Memoria `project_smtp_defer_fail_block.md` creada
+- [x] Sección en maestro.md
+- [x] Inventario de planes actualizado (Plan 29 agregado)
+- [x] Foco actualizado para reflejar máxima prioridad
+- [x] Validar con el jefe el corte del SMTP de CrossChex — **jefe ya al tanto 2026-04-22**; decisión 5 reformulada por hallazgo (CrossChex no es culpable, el NDR prueba que Educa es el remitente)
+- [x] Confirmar con hosting valores actuales de `max_defer_fail_percentage` — **confirmado no configurable (política externa fija 5/h)**
+- [x] Inspeccionar headers de un rebote real — **NDR `durbyangelica19@gmail.com` inspeccionado 2026-04-22**; confirma Educa como remitente (template HTML, helo `webwk000002`, subject `Registro de Entrada - CAYCHO RAMOS JULIO`), descarta hipótesis CrossChex
 
 ---
 
