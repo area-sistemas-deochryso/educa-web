@@ -15,8 +15,46 @@ import { AttendanceDataService } from '@features/intranet/services/attendance/at
 
 // #region Mocks
 const mockHijos: HijoApoderado[] = [
-	{ estudianteId: 1, dni: '12345678', nombreCompleto: 'Juan Pérez', grado: 1, seccion: 'A', relacion: 'Hijo' },
-	{ estudianteId: 2, dni: '87654321', nombreCompleto: 'María Pérez', grado: 2, seccion: 'B', relacion: 'Hija' },
+	{
+		estudianteId: 1,
+		dni: '12345678',
+		nombreCompleto: 'Juan Pérez',
+		grado: '1ro Primaria',
+		seccion: 'A',
+		relacion: 'Hijo',
+		graOrden: 4,
+	},
+	{
+		estudianteId: 2,
+		dni: '87654321',
+		nombreCompleto: 'María Pérez',
+		grado: '2do Primaria',
+		seccion: 'B',
+		relacion: 'Hija',
+		graOrden: 5,
+	},
+];
+
+/** Plan 27 · INV-C11: dataset mixto (un hijo fuera de alcance, otro dentro). */
+const mockHijosMixtos: HijoApoderado[] = [
+	{
+		estudianteId: 10,
+		dni: '10000001',
+		nombreCompleto: 'Pepe Gómez',
+		grado: '3ro Primaria',
+		seccion: 'A',
+		relacion: 'Hijo',
+		graOrden: 6, // < 8 → fuera de alcance
+	},
+	{
+		estudianteId: 11,
+		dni: '10000002',
+		nombreCompleto: 'Lucía Gómez',
+		grado: '1ro Secundaria',
+		seccion: 'A',
+		relacion: 'Hija',
+		graOrden: 10, // >= 8 → dentro de alcance
+	},
 ];
 
 const emptyTable = {
@@ -121,5 +159,59 @@ describe('AttendanceApoderadoComponent', () => {
 
 		expect(asistenciaServiceMock.getAsistenciaHijo).toHaveBeenCalled();
 	});
+
+	// #region Plan 27 · INV-C11 — Fuera de alcance biométrico
+
+	it('INV-C11: selectedHijoFueraDeAlcance es true cuando el hijo tiene graOrden < 8', () => {
+		asistenciaServiceMock.getHijos = vi.fn().mockReturnValue(of(mockHijosMixtos));
+
+		component.ngOnInit();
+		// Default: primer hijo (graOrden = 6 → fuera de alcance)
+		expect(component.selectedHijoId()).toBe(10);
+		expect(component.selectedHijoFueraDeAlcance()).toBe(true);
+	});
+
+	it('INV-C11: selectedHijoFueraDeAlcance es false cuando el hijo tiene graOrden >= 8', () => {
+		asistenciaServiceMock.getHijos = vi.fn().mockReturnValue(of(mockHijosMixtos));
+
+		component.ngOnInit();
+		component.selectHijo(11); // graOrden = 10 → dentro de alcance
+		expect(component.selectedHijoFueraDeAlcance()).toBe(false);
+	});
+
+	it('INV-C11: alternar entre hijo fuera y dentro recalcula el flag correctamente', () => {
+		asistenciaServiceMock.getHijos = vi.fn().mockReturnValue(of(mockHijosMixtos));
+
+		component.ngOnInit();
+		// Inicio: primer hijo (fuera)
+		expect(component.selectedHijoFueraDeAlcance()).toBe(true);
+
+		component.selectHijo(11);
+		expect(component.selectedHijoFueraDeAlcance()).toBe(false);
+
+		component.selectHijo(10);
+		expect(component.selectedHijoFueraDeAlcance()).toBe(true);
+	});
+
+	it('INV-C11: hijo sin graOrden (sin salón activo) NO dispara fueraDeAlcance', () => {
+		// Defensivo: si el BE devuelve null/undefined, no asumimos fuera de alcance.
+		const hijosSinSalon: HijoApoderado[] = [
+			{
+				estudianteId: 20,
+				dni: '20000001',
+				nombreCompleto: 'Sin Salón',
+				grado: '',
+				seccion: '',
+				relacion: 'Hijo',
+				graOrden: null,
+			},
+		];
+		asistenciaServiceMock.getHijos = vi.fn().mockReturnValue(of(hijosSinSalon));
+
+		component.ngOnInit();
+		expect(component.selectedHijoFueraDeAlcance()).toBe(false);
+	});
+
+	// #endregion
 });
 // #endregion

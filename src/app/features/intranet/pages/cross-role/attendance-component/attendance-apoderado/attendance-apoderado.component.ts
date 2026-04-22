@@ -4,9 +4,11 @@ import { ChangeDetectionStrategy, Component, DestroyRef, OnInit, computed, injec
 
 import { AttendanceDataService } from '@features/intranet/services/attendance/attendance-data.service';
 import { AttendanceLegendComponent } from '@app/features/intranet/components/attendance/attendance-legend/attendance-legend.component';
+import { AttendanceScopeStudentNoticeComponent } from '@intranet-shared/components/attendance-scope-student-notice';
 import { AttendanceTable } from '../models/attendance.types';
 import { AttendanceTableComponent } from '@features/intranet/components/attendance/attendance-table/attendance-table.component';
 import { EmptyStateComponent } from '@features/intranet/components/attendance/empty-state/empty-state.component';
+import { UMBRAL_GRADO_ASISTENCIA_DIARIA } from '@shared/constants';
 import { finalize } from 'rxjs';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
@@ -19,7 +21,12 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 @Component({
 	selector: 'app-attendance-apoderado',
 	standalone: true,
-	imports: [AttendanceTableComponent, EmptyStateComponent, AttendanceLegendComponent],
+	imports: [
+		AttendanceTableComponent,
+		EmptyStateComponent,
+		AttendanceLegendComponent,
+		AttendanceScopeStudentNoticeComponent,
+	],
 	templateUrl: './attendance-apoderado.component.html',
 	changeDetection: ChangeDetectionStrategy.OnPush,
 })
@@ -36,6 +43,15 @@ export class AttendanceApoderadoComponent implements OnInit {
 	readonly selectedHijo = computed(() => {
 		const id = this.selectedHijoId();
 		return this.hijos().find((h) => h.estudianteId === id) || null;
+	});
+
+	/**
+	 * Plan 27 · INV-C11: `true` si el hijo seleccionado tiene `GRA_Orden < 8`.
+	 * Reemplaza las tablas por el aviso "aún no usa asistencia biométrica".
+	 */
+	readonly selectedHijoFueraDeAlcance = computed(() => {
+		const orden = this.selectedHijo()?.graOrden;
+		return typeof orden === 'number' && orden < UMBRAL_GRADO_ASISTENCIA_DIARIA;
 	});
 
 	// * Attendance tables update from the selected child and month.

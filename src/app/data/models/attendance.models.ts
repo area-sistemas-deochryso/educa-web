@@ -50,6 +50,10 @@ export interface ResumenAsistencia {
 	porcentajeAsistencia: number;
 	detalle: AsistenciaDetalle[];
 	conteoEstados: ConteoEstadosMensual;
+	// Plan 27 · INV-C11: GRA_Orden del salón activo; null si no tiene salón.
+	// El FE lo compara contra UMBRAL_GRADO_ASISTENCIA_DIARIA para decidir
+	// si muestra el mensaje "este alumno aún no usa asistencia biométrica".
+	graOrden?: number | null;
 }
 
 // Hijo del apoderado (HijoApoderadoDto)
@@ -60,6 +64,8 @@ export interface HijoApoderado {
 	grado: string;
 	seccion: string;
 	relacion: string;
+	// Plan 27 · INV-C11: GRA_Orden del salón activo; null si no tiene salón.
+	graOrden?: number | null;
 }
 
 // Estudiante con asistencias (EstudianteAsistenciaDto) - Para profesor

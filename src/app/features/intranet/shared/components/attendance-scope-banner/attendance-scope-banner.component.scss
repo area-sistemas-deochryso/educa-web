@@ -1,0 +1,44 @@
+// #region Plan 27 · INV-C11 — Banner estático admin de asistencia
+.scope-banner {
+	display: flex;
+	align-items: flex-start;
+	gap: 0.75rem;
+	padding: 0.875rem 1rem;
+	margin-bottom: 1rem;
+	border-radius: 8px;
+	background: color-mix(in srgb, var(--blue-500) 15%, transparent);
+	border: 1px solid var(--blue-500);
+	color: var(--text-color);
+	font-size: 0.875rem;
+	line-height: 1.5;
+
+	&__icon {
+		font-size: 1.25rem;
+		color: var(--blue-800);
+		flex-shrink: 0;
+		margin-top: 0.125rem;
+	}
+
+	&__text {
+		flex: 1;
+	}
+
+	&__ref {
+		display: inline-block;
+		margin-left: 0.5rem;
+		font-size: 0.75rem;
+		font-weight: 600;
+		color: var(--blue-800);
+		white-space: nowrap;
+	}
+
+	code {
+		padding: 0.05rem 0.35rem;
+		font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+		font-size: 0.8rem;
+		background: color-mix(in srgb, var(--blue-500) 20%, transparent);
+		border-radius: 4px;
+		color: var(--blue-800);
+	}
+}
+// #endregion

@@ -5,10 +5,12 @@ import { logger } from '@core/helpers';
 
 import { AttendanceDataService } from '@features/intranet/services/attendance/attendance-data.service';
 import { AttendanceLegendComponent } from '@app/features/intranet/components/attendance/attendance-legend/attendance-legend.component';
+import { AttendanceScopeStudentNoticeComponent } from '@intranet-shared/components/attendance-scope-student-notice';
 import { AttendanceTable } from '../models/attendance.types';
 import { AttendanceTableComponent } from '@features/intranet/components/attendance/attendance-table/attendance-table.component';
 import { AuthStore } from '@core/store';
 import { EmptyStateComponent } from '@features/intranet/components/attendance/empty-state/empty-state.component';
+import { UMBRAL_GRADO_ASISTENCIA_DIARIA } from '@shared/constants';
 import { finalize } from 'rxjs';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
@@ -17,7 +19,12 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 @Component({
 	selector: 'app-attendance-estudiante',
 	standalone: true,
-	imports: [AttendanceTableComponent, EmptyStateComponent, AttendanceLegendComponent],
+	imports: [
+		AttendanceTableComponent,
+		EmptyStateComponent,
+		AttendanceLegendComponent,
+		AttendanceScopeStudentNoticeComponent,
+	],
 	templateUrl: './attendance-estudiante.component.html',
 	changeDetection: ChangeDetectionStrategy.OnPush,
 })
@@ -42,6 +49,16 @@ export class AttendanceEstudianteComponent implements OnInit {
 	);
 	readonly loading = signal(false);
 	readonly hasData = signal(false);
+
+	// * Plan 27 · INV-C11: GRA_Orden del salón activo (lo trae el BE en ResumenAsistenciaDto).
+	// null mientras no cargó; undefined si el BE no lo envió o no tiene salón activo.
+	readonly graOrden = signal<number | null | undefined>(null);
+
+	/** `true` si el estudiante NO está dentro del alcance biométrico (< umbral). */
+	readonly fueraDeAlcance = computed(() => {
+		const orden = this.graOrden();
+		return typeof orden === 'number' && orden < UMBRAL_GRADO_ASISTENCIA_DIARIA;
+	});
 
 	ngOnInit(): void {
 		// * Initial load uses the current month.
@@ -90,6 +107,8 @@ export class AttendanceEstudianteComponent implements OnInit {
 				takeUntilDestroyed(this.destroyRef),
 			)
 			.subscribe((resumen) => {
+				// Plan 27 · INV-C11: el BE publica graOrden en el resumen.
+				this.graOrden.set(resumen?.graOrden ?? null);
 				if (resumen && resumen.detalle && resumen.detalle.length > 0) {
 					this.hasData.set(true);
 					// * Map raw asistencia rows into table-friendly structures.
@@ -124,6 +143,7 @@ export class AttendanceEstudianteComponent implements OnInit {
 				takeUntilDestroyed(this.destroyRef),
 			)
 			.subscribe((resumen) => {
+				this.graOrden.set(resumen?.graOrden ?? null);
 				if (resumen && resumen.detalle && resumen.detalle.length > 0) {
 					this.hasData.set(true);
 					const { ingresos, salidas } = this.attendanceDataService.processAsistencias(
@@ -160,6 +180,7 @@ export class AttendanceEstudianteComponent implements OnInit {
 				takeUntilDestroyed(this.destroyRef),
 			)
 			.subscribe((resumen) => {
+				this.graOrden.set(resumen?.graOrden ?? null);
 				if (resumen && resumen.detalle && resumen.detalle.length > 0) {
 					this.hasData.set(true);
 					const { ingresos, salidas } = this.attendanceDataService.processAsistencias(

@@ -23,6 +23,7 @@ import { Tab, TabList, TabPanel, Tabs } from 'primeng/tabs';
 import { ToastModule } from 'primeng/toast';
 
 import { SkeletonColumnDef, TableSkeletonComponent, StatsSkeletonComponent } from '@shared/components';
+import { AttendanceScopeBannerComponent } from '@intranet-shared/components/attendance-scope-banner';
 import { AttendanceReportsComponent } from '../../cross-role/attendance-reports';
 
 import {
@@ -69,6 +70,7 @@ import {
 		TabList,
 		Tab,
 		TabPanel,
+		AttendanceScopeBannerComponent,
 		AttendanceReportsComponent,
 	],
 	providers: [ConfirmationService, MessageService],

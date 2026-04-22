@@ -1,23 +1,41 @@
 <!-- #region Template -->
-<!-- * Shared legend for attendance codes -->
-<app-attendance-legend />
-
 @if (hijos().length > 0) {
-	<!-- * Two tables: ingresos and salidas for the selected child -->
-	<app-attendance-table
-		[table]="ingresos()"
-		[hijos]="hijos()"
-		[selectedHijoId]="selectedHijoId()"
-		(monthChange)="onIngresosMonthChange($event)"
-		(hijoChange)="selectHijo($event)"
-	/>
-	<app-attendance-table
-		[table]="salidas()"
-		[hijos]="hijos()"
-		[selectedHijoId]="selectedHijoId()"
-		(monthChange)="onSalidasMonthChange($event)"
-		(hijoChange)="selectHijo($event)"
-	/>
+	@if (selectedHijoFueraDeAlcance()) {
+		<!--
+			Plan 27 · INV-C11: hijo seleccionado con GRA_Orden < 8.
+			Conservamos la tabla de ingresos como selector de hijos (avatares arriba)
+			para que el apoderado pueda alternar entre hijos mixtos. La tabla en sí
+			se renderiza vacía porque el BE devuelve detalle:[] para este hijo.
+			El aviso explica el por qué.
+		-->
+		<app-attendance-table
+			[table]="ingresos()"
+			[hijos]="hijos()"
+			[selectedHijoId]="selectedHijoId()"
+			(monthChange)="onIngresosMonthChange($event)"
+			(hijoChange)="selectHijo($event)"
+		/>
+		<app-attendance-scope-student-notice [nombre]="selectedHijo()?.nombreCompleto ?? null" />
+	} @else {
+		<!-- * Shared legend for attendance codes -->
+		<app-attendance-legend />
+
+		<!-- * Two tables: ingresos and salidas for the selected child -->
+		<app-attendance-table
+			[table]="ingresos()"
+			[hijos]="hijos()"
+			[selectedHijoId]="selectedHijoId()"
+			(monthChange)="onIngresosMonthChange($event)"
+			(hijoChange)="selectHijo($event)"
+		/>
+		<app-attendance-table
+			[table]="salidas()"
+			[hijos]="hijos()"
+			[selectedHijoId]="selectedHijoId()"
+			(monthChange)="onSalidasMonthChange($event)"
+			(hijoChange)="selectHijo($event)"
+		/>
+	}
 } @else if (!loading()) {
 	<!-- ! Empty state only after loading ends -->
 	<app-empty-state message="No se encontraron hijos registrados." />

@@ -11,5 +11,7 @@ export * from './page-header';
 export * from './responsive-table';
 export * from './stats-skeleton';
 export * from './table-skeleton';
+export * from './attendance-scope-banner';
+export * from './attendance-scope-student-notice';
 export * from './layout/intranet-layout';
 // #endregion

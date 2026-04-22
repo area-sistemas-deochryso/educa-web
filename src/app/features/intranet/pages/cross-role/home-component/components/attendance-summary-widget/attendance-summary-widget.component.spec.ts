@@ -107,5 +107,47 @@ describe('AttendanceSummaryWidgetComponent', () => {
 		expect(component.estStats()).toEqual(estudiantesStats);
 		expect(component.profStats()).toBeNull();
 	});
+
+	// #region Plan 27 · INV-C11 — widget respeta filtro del BE
+
+	it('INV-C11: consume getEstadisticasDirector (endpoint ya filtrado por GRA_Orden >= 8 en Chat 2)', async () => {
+		attendanceMock.getEstadisticasDirector.mockReturnValue(of(estudiantesStats));
+		profesorApiMock.obtenerAsistenciaDiaProfesoresDirector.mockReturnValue(
+			of(profesoresResponse),
+		);
+
+		await bootstrap();
+
+		// El widget NO debe llamar a otro endpoint que pudiera traer grados bajos —
+		// el contrato es "totalEstudiantes y conEntrada ya vienen filtrados por el BE".
+		expect(attendanceMock.getEstadisticasDirector).toHaveBeenCalledTimes(1);
+	});
+
+	it('INV-C11: numerador y denominador del widget provienen del mismo stats filtrado', async () => {
+		// Si ambos vienen del mismo objeto EstadisticasDia, el ratio es consistente —
+		// no se puede mezclar "estudiantes con entrada (filtrado)" con "total sin filtro".
+		const statsFiltrado: EstadisticasDia = {
+			fecha: '2026-04-20',
+			totalEstudiantes: 50, // solo GRA_Orden >= 8
+			conEntrada: 40,
+			asistenciasCompletas: 35,
+			faltas: 10,
+			porcentajeAsistencia: 80,
+		};
+		attendanceMock.getEstadisticasDirector.mockReturnValue(of(statsFiltrado));
+		profesorApiMock.obtenerAsistenciaDiaProfesoresDirector.mockReturnValue(
+			of(profesoresResponse),
+		);
+
+		await bootstrap();
+
+		const stats = component.estStats();
+		expect(stats?.totalEstudiantes).toBe(50);
+		expect(stats?.conEntrada).toBe(40);
+		// El porcentaje refleja el universo filtrado, no el total del colegio.
+		expect(stats?.porcentajeAsistencia).toBe(80);
+	});
+
+	// #endregion
 });
 // #endregion
