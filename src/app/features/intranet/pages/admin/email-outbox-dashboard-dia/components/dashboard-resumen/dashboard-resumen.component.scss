@@ -1,0 +1,325 @@
+// #region Base card styles
+.stat-card {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	border: 1px solid var(--surface-300);
+	border-radius: 10px;
+	background: transparent;
+
+	.stat-content {
+		display: flex;
+		flex-direction: column;
+		gap: 0.1rem;
+		min-width: 0;
+
+		.stat-label {
+			font-size: 0.8rem;
+			color: var(--text-color-secondary);
+			font-weight: 500;
+		}
+
+		.stat-value {
+			font-size: 1.5rem;
+			font-weight: 700;
+			color: var(--text-color);
+			font-variant-numeric: tabular-nums;
+			line-height: 1.1;
+		}
+
+		.stat-sublabel {
+			font-size: 0.7rem;
+			color: var(--text-color-secondary);
+		}
+	}
+
+	.stat-icon {
+		width: 40px;
+		height: 40px;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		border-radius: 10px;
+		background: var(--surface-200);
+		flex-shrink: 0;
+
+		i {
+			font-size: 1.05rem;
+			color: var(--text-color);
+		}
+	}
+
+	.stat-icon-small {
+		width: 28px;
+		height: 28px;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		border-radius: 7px;
+		background: var(--surface-200);
+		flex-shrink: 0;
+
+		i {
+			font-size: 0.85rem;
+			color: var(--text-color);
+		}
+	}
+
+	// #region Variants (border-left + icon color)
+	&--success {
+		border-left: 3px solid var(--green-500);
+		.stat-icon i,
+		.stat-icon-small i {
+			color: var(--green-600);
+		}
+	}
+
+	&--danger {
+		border-left: 3px solid var(--red-500);
+		.stat-icon i,
+		.stat-icon-small i {
+			color: var(--red-600);
+		}
+	}
+
+	&--warning {
+		border-left: 3px solid var(--yellow-500);
+		.stat-icon i,
+		.stat-icon-small i {
+			color: var(--yellow-700);
+		}
+	}
+
+	&--info {
+		border-left: 3px solid var(--blue-800);
+		.stat-icon i,
+		.stat-icon-small i {
+			color: var(--blue-800);
+		}
+	}
+	// #endregion
+
+	&--zero {
+		opacity: 0.8;
+
+		.stat-icon i,
+		.stat-icon-small i {
+			color: var(--text-color-secondary) !important;
+		}
+	}
+}
+// #endregion
+
+// #region Zona 1: general (3 cards, compactas)
+.stats-general {
+	display: grid;
+	grid-template-columns: repeat(3, 1fr);
+	gap: 0.75rem;
+	margin-bottom: 0.75rem;
+
+	.stat-card--large {
+		padding: 0.9rem 1rem;
+
+		.stat-content .stat-value {
+			font-size: 1.75rem;
+		}
+
+		.stat-icon {
+			width: 44px;
+			height: 44px;
+		}
+	}
+}
+
+@media (max-width: 768px) {
+	.stats-general {
+		grid-template-columns: 1fr;
+	}
+}
+// #endregion
+
+// #region Zona 2: banner cPanel (compacto horizontal)
+.cpanel-banner {
+	display: flex;
+	align-items: center;
+	gap: 0.85rem;
+	padding: 0.6rem 1rem;
+	margin-bottom: 0.75rem;
+	border-radius: 10px;
+	border: 1px solid;
+
+	&__icon {
+		width: 36px;
+		height: 36px;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		border-radius: 50%;
+		flex-shrink: 0;
+
+		i {
+			font-size: 1.15rem;
+		}
+	}
+
+	&__body {
+		flex: 1;
+		min-width: 0;
+		display: flex;
+		align-items: center;
+		gap: 1rem;
+		flex-wrap: wrap;
+	}
+
+	&__headline {
+		display: flex;
+		align-items: baseline;
+		gap: 0.4rem;
+	}
+
+	&__title {
+		font-size: 0.85rem;
+		font-weight: 600;
+		color: var(--text-color);
+	}
+
+	&__count {
+		font-size: 1.25rem;
+		font-weight: 700;
+		font-variant-numeric: tabular-nums;
+	}
+
+	&__unit {
+		font-size: 0.75rem;
+		color: var(--text-color-secondary);
+	}
+
+	&__message {
+		margin: 0;
+		font-size: 0.8rem;
+		color: var(--text-color);
+	}
+
+	&--ok {
+		background: color-mix(in srgb, var(--green-500) 8%, transparent);
+		border-color: var(--green-500);
+		.cpanel-banner__icon {
+			background: color-mix(in srgb, var(--green-500) 20%, transparent);
+			i {
+				color: var(--green-600);
+			}
+		}
+		.cpanel-banner__count {
+			color: var(--green-600);
+		}
+	}
+
+	&--warning {
+		background: color-mix(in srgb, var(--yellow-500) 12%, transparent);
+		border-color: var(--yellow-500);
+		.cpanel-banner__icon {
+			background: color-mix(in srgb, var(--yellow-500) 22%, transparent);
+			i {
+				color: var(--yellow-700);
+			}
+		}
+		.cpanel-banner__count {
+			color: var(--yellow-700);
+		}
+	}
+
+	&--critical {
+		background: color-mix(in srgb, var(--red-500) 12%, transparent);
+		border-color: var(--red-500);
+		.cpanel-banner__icon {
+			background: color-mix(in srgb, var(--red-500) 22%, transparent);
+			i {
+				color: var(--red-600);
+			}
+		}
+		.cpanel-banner__count {
+			color: var(--red-600);
+		}
+	}
+}
+// #endregion
+
+// #region Zona 3: desglose de fallos (6 cards compactas en una fila)
+.stats-breakdown {
+	margin-bottom: 0.75rem;
+	padding: 0.75rem 1rem;
+	border: 1px solid var(--surface-300);
+	border-radius: 10px;
+
+	&--muted {
+		.stats-breakdown__grid {
+			opacity: 0.75;
+		}
+	}
+
+	&__header {
+		display: flex;
+		align-items: baseline;
+		justify-content: space-between;
+		gap: 1rem;
+		flex-wrap: wrap;
+		margin-bottom: 0.65rem;
+	}
+
+	&__title {
+		font-size: 0.9rem;
+		font-weight: 600;
+		color: var(--text-color);
+	}
+
+	&__hint {
+		font-size: 0.75rem;
+		color: var(--text-color-secondary);
+	}
+
+	&__grid {
+		display: grid;
+		grid-template-columns: repeat(6, 1fr);
+		gap: 0.5rem;
+	}
+
+	.stat-card--compact {
+		padding: 0.5rem 0.65rem;
+		gap: 0.5rem;
+		justify-content: flex-start;
+		border-radius: 8px;
+
+		.stat-content {
+			min-width: 0;
+			flex: 1;
+
+			.stat-label {
+				font-size: 0.75rem;
+				white-space: nowrap;
+				overflow: hidden;
+				text-overflow: ellipsis;
+			}
+
+			.stat-value {
+				font-size: 1.1rem;
+			}
+
+			.stat-sublabel {
+				display: none;
+			}
+		}
+	}
+}
+
+@media (max-width: 1200px) {
+	.stats-breakdown__grid {
+		grid-template-columns: repeat(3, 1fr);
+	}
+}
+
+@media (max-width: 600px) {
+	.stats-breakdown__grid {
+		grid-template-columns: 1fr 1fr;
+	}
+}
+// #endregion

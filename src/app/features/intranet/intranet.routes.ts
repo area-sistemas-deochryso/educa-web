@@ -203,6 +203,18 @@ const experimentalRoutes: Route[] = [
 				},
 			]
 		: []),
+	...(environment.features.emailOutboxDashboardDia
+		? [
+				{
+					path: 'admin/email-outbox/dashboard-dia',
+					loadComponent: () =>
+						import('./pages/admin/email-outbox-dashboard-dia').then(
+							(m) => m.EmailOutboxDashboardDiaComponent,
+						),
+					title: 'Intranet - Dashboard de Correos',
+				},
+			]
+		: []),
 ];
 // #endregion
 

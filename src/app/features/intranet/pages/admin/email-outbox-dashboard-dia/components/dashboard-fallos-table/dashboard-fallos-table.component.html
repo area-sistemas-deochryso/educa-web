@@ -1,0 +1,68 @@
+<!-- #region Fallos del día table -->
+<section class="table-section" aria-label="Correos que fallaron hoy">
+	<header class="section-header">
+		<h3>Correos que fallaron</h3>
+		<span class="section-subtitle">
+			{{ items().length }} correos en estado <code>FAILED</code> hoy · destinatario +
+			tipo de fallo + último error
+		</span>
+	</header>
+
+	<p-table
+		[value]="items()"
+		class="p-datatable-sm fallos-table"
+		styleClass="p-datatable-gridlines"
+		[paginator]="items().length > 10"
+		[rows]="10"
+		[rowsPerPageOptions]="[10, 25, 50]"
+	>
+		<ng-template #header>
+			<tr>
+				<th class="label-uppercase col-hora">Hora</th>
+				<th class="label-uppercase col-dest">Destinatario</th>
+				<th class="label-uppercase col-tipo">Tipo</th>
+				<th class="label-uppercase col-fallo">Tipo de fallo</th>
+				<th class="label-uppercase col-error">Último error</th>
+				<th class="label-uppercase col-actions">Acciones</th>
+			</tr>
+		</ng-template>
+		<ng-template #body let-row>
+			<tr>
+				<td class="col-hora">{{ formatHora(row.fechaReg) }}</td>
+				<td class="cell-dest">
+					<code>{{ row.destinatario }}</code>
+				</td>
+				<td>
+					<p-tag [value]="row.tipo" styleClass="tag-neutral" />
+				</td>
+				<td>
+					<p-tag [value]="row.tipoFallo | tipoFalloLabel" severity="danger" />
+				</td>
+				<td class="cell-error" [title]="row.ultimoError ?? ''">
+					{{ row.ultimoError ?? '—' }}
+				</td>
+				<td class="col-actions">
+					<button
+						pButton
+						icon="pi pi-copy"
+						class="p-button-text p-button-sm btn-icon"
+						pTooltip="Copiar correo"
+						(click)="onCopy(row.destinatario)"
+						[pt]="{ root: { 'aria-label': 'Copiar correo' } }"
+					></button>
+				</td>
+			</tr>
+		</ng-template>
+		<ng-template #emptymessage>
+			<tr>
+				<td colspan="6" class="empty-message">
+					<div class="empty-state">
+						<i class="pi pi-check-circle"></i>
+						<p>Sin correos fallidos hoy</p>
+					</div>
+				</td>
+			</tr>
+		</ng-template>
+	</p-table>
+</section>
+<!-- #endregion -->

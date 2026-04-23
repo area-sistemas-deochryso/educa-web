@@ -1,0 +1,129 @@
+// #region Tabs (fondo transparente para integrarse con --surface-ground)
+:host ::ng-deep .dashboard-tabs {
+	background: transparent;
+
+	.p-tabs,
+	.p-tablist,
+	.p-tablist-tab-list,
+	.p-tabpanels,
+	.p-tabpanel {
+		background: transparent;
+	}
+
+	.p-tablist {
+		border-bottom: 1px solid var(--surface-300);
+		margin-bottom: 1rem;
+	}
+
+	.p-tab {
+		display: inline-flex;
+		align-items: center;
+		gap: 0.5rem;
+		font-size: 0.9rem;
+		background: transparent;
+		padding: 0.6rem 1rem;
+
+		i {
+			font-size: 0.95rem;
+		}
+	}
+
+	// * Specificity alta + !important para ganar a los resets de PrimeNG
+	.p-tabs .p-tab .tab-badge,
+	.p-tablist .p-tab .tab-badge {
+		display: inline-flex !important;
+		align-items: center;
+		justify-content: center;
+		min-width: 1.25rem;
+		height: 1.25rem;
+		padding: 0 0.45rem;
+		border-radius: 999px;
+		background: var(--red-600, #dc2626) !important;
+		color: #ffffff !important;
+		font-size: 0.7rem;
+		font-weight: 700;
+		font-variant-numeric: tabular-nums;
+		line-height: 1;
+		box-shadow: 0 1px 2px rgba(0, 0, 0, 0.12);
+	}
+
+	.p-tabpanels {
+		padding: 0;
+	}
+
+	.p-tabpanel {
+		padding: 0;
+	}
+}
+// #endregion
+
+// #region Stack de tablas dentro del tab detalle
+.tables-stack {
+	display: flex;
+	flex-direction: column;
+	gap: 1rem;
+}
+
+.tables-grid {
+	display: grid;
+	grid-template-columns: minmax(0, 1fr) minmax(0, 1.4fr);
+	gap: 1rem;
+
+	@media (max-width: 1100px) {
+		grid-template-columns: 1fr;
+	}
+}
+
+// * Previene que los grid-items con contenido largo fuercen overflow
+.tables-grid__left,
+.tables-grid__right {
+	min-width: 0;
+}
+// #endregion
+
+// #region Chart skeleton (cuando no hay datos todavía)
+.chart-skeleton {
+	border: 1px solid var(--surface-300);
+	border-radius: 12px;
+	padding: 1rem;
+	min-height: 180px;
+
+	.chart-skeleton-bars {
+		display: grid;
+		grid-template-columns: repeat(24, 1fr);
+		gap: 0.3rem;
+		align-items: end;
+		height: 140px;
+	}
+
+	.chart-skeleton-bar {
+		width: 100%;
+		height: 40%;
+		background: linear-gradient(
+			90deg,
+			var(--surface-100) 25%,
+			var(--surface-200) 50%,
+			var(--surface-100) 75%
+		);
+		background-size: 200% 100%;
+		border-radius: 3px;
+		animation: skeleton-shimmer 1.4s ease-in-out infinite;
+
+		&:nth-child(4n) {
+			height: 70%;
+		}
+		&:nth-child(7n) {
+			height: 90%;
+		}
+	}
+}
+
+@keyframes skeleton-shimmer {
+	0% {
+		background-position: 200% 0;
+	}
+	100% {
+		background-position: -200% 0;
+	}
+}
+// #endregion

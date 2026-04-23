@@ -1,0 +1,86 @@
+// #region PorTipo table
+.table-section {
+	border: 1px solid var(--surface-300);
+	border-radius: 12px;
+	overflow: hidden;
+	background: transparent;
+
+	.section-header {
+		padding: 0.7rem 1rem;
+		border-bottom: 1px solid var(--surface-300);
+
+		h3 {
+			margin: 0;
+			font-size: 0.95rem;
+			font-weight: 600;
+			color: var(--text-color);
+		}
+
+		.section-subtitle {
+			font-size: 0.8rem;
+			color: var(--text-color-secondary);
+
+			code {
+				font-size: 0.8rem;
+				background: var(--surface-100);
+				padding: 1px 4px;
+				border-radius: 3px;
+			}
+		}
+	}
+
+	.col-num {
+		text-align: right;
+		font-variant-numeric: tabular-nums;
+		width: 80px;
+	}
+
+	.val-sent {
+		color: var(--green-600);
+		font-weight: 600;
+	}
+
+	.val-failed {
+		color: var(--red-600);
+		font-weight: 600;
+	}
+
+	:host ::ng-deep .p-datatable {
+		.p-datatable-table-container,
+		.p-datatable-wrapper,
+		&.p-datatable {
+			overflow-x: hidden !important;
+			width: 100%;
+		}
+
+		table {
+			table-layout: fixed;
+			width: 100%;
+		}
+
+		td {
+			vertical-align: middle !important;
+			word-break: break-all;
+			overflow-wrap: anywhere;
+			white-space: normal;
+		}
+
+		// * Las tags de tipo pueden ser largas (ReporteFallosCorreoAsistencia).
+		// * Permitir wrap dentro del tag.
+		.p-tag {
+			display: inline-block;
+			max-width: 100%;
+			white-space: normal;
+			text-align: left;
+			line-height: 1.25;
+			word-break: break-word;
+		}
+	}
+
+	.empty-message {
+		text-align: center;
+		padding: 2rem 1rem;
+		color: var(--text-color-secondary);
+	}
+}
+// #endregion

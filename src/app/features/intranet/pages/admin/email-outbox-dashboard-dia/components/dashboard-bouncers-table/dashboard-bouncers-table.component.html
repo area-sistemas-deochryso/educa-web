@@ -1,0 +1,61 @@
+<!-- #region Bouncers table -->
+<section class="table-section" aria-label="Destinatarios con 2+ bounces">
+	<header class="section-header">
+		<h3>Bounces acumulados</h3>
+		<span class="section-subtitle">
+			Top 50 destinatarios con 2+ rebotes post-SMTP · al 3er bounce <code>5.x.x</code> el
+			BE auto-blacklistea (INV-MAIL02)
+		</span>
+	</header>
+
+	<p-table [value]="data()" class="p-datatable-sm" styleClass="p-datatable-gridlines">
+		<ng-template #header>
+			<tr>
+				<th class="label-uppercase">Destinatario</th>
+				<th class="label-uppercase col-num">Bounces</th>
+				<th class="label-uppercase">Último intento</th>
+				<th class="label-uppercase">Último error</th>
+				<th class="label-uppercase col-actions">Acciones</th>
+			</tr>
+		</ng-template>
+		<ng-template #body let-row>
+			<tr
+				[class.row-critical]="isCritical(row.bouncesAcumulados)"
+				[class.row-warning]="isWarning(row.bouncesAcumulados)"
+			>
+				<td class="cell-dest">
+					<code>{{ row.destinatarioMasked }}</code>
+				</td>
+				<td class="col-num">
+					<p-tag
+						[value]="row.bouncesAcumulados"
+						[severity]="severity(row.bouncesAcumulados)"
+					/>
+				</td>
+				<td class="cell-fecha">{{ row.ultimoIntento }}</td>
+				<td class="cell-error" [title]="row.ultimoError">{{ row.ultimoError }}</td>
+				<td class="col-actions">
+					<button
+						pButton
+						icon="pi pi-copy"
+						class="p-button-text p-button-sm btn-icon"
+						pTooltip="Copiar destinatario"
+						(click)="onCopy(row.destinatarioMasked)"
+						[pt]="{ root: { 'aria-label': 'Copiar destinatario' } }"
+					></button>
+				</td>
+			</tr>
+		</ng-template>
+		<ng-template #emptymessage>
+			<tr>
+				<td colspan="5" class="empty-message">
+					<div class="empty-state">
+						<i class="pi pi-check-circle"></i>
+						<p>Sin destinatarios con bounces acumulados</p>
+					</div>
+				</td>
+			</tr>
+		</ng-template>
+	</p-table>
+</section>
+<!-- #endregion -->

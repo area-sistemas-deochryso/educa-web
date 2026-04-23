@@ -1,0 +1,260 @@
+<!-- #region Chart PorHora — SVG stacked bars -->
+<section class="chart-section" aria-label="Envíos por hora">
+	<header class="chart-header">
+		<div class="chart-title">
+			<h3>Por hora</h3>
+			<span class="chart-subtitle">
+				24 buckets · hora Lima · pico: {{ maxValue() }} por hora
+			</span>
+		</div>
+		<div class="chart-legend">
+			<span class="legend-item">
+				<svg class="legend-swatch" viewBox="0 0 12 12" aria-hidden="true">
+					<rect width="12" height="12" rx="2" fill="var(--green-500, #22c55e)" />
+				</svg>
+				Enviados
+			</span>
+			<span class="legend-item">
+				<svg class="legend-swatch" viewBox="0 0 12 12" aria-hidden="true">
+					<rect width="12" height="12" rx="2" fill="var(--red-500, #ef4444)" />
+				</svg>
+				Fallidos
+			</span>
+			<span class="legend-item">
+				<svg class="legend-swatch" viewBox="0 0 12 12" aria-hidden="true">
+					<rect width="12" height="12" rx="2" fill="var(--blue-800, #1e40af)" />
+				</svg>
+				En tránsito SMTP
+			</span>
+		</div>
+	</header>
+
+	@if (sinDatos()) {
+		<div class="chart-empty">Sin datos para el día seleccionado</div>
+	} @else {
+		<div class="chart-body">
+			<div class="chart-y-axis" aria-hidden="true">
+				<span>{{ maxValue() }}</span>
+				<span>{{ midValue() }}</span>
+				<span>0</span>
+			</div>
+
+			<div class="chart-svg-wrap">
+				<svg
+					class="chart-svg"
+					[attr.viewBox]="viewBox"
+					preserveAspectRatio="none"
+					role="img"
+					aria-label="Barras apiladas de envíos por hora"
+				>
+					<style>
+						.chart-svg .bar-track {
+							fill: var(--surface-200, #e5e7eb);
+							stroke: var(--surface-300, #d1d5db);
+							stroke-width: 1;
+						}
+						.chart-svg .grid-line {
+							stroke: var(--surface-400, #94a3b8);
+							stroke-width: 0.5;
+							stroke-dasharray: 3 3;
+							vector-effect: non-scaling-stroke;
+						}
+						.chart-svg .now-marker {
+							stroke: var(--blue-800, #1e40af);
+							stroke-width: 1.5;
+							stroke-dasharray: 4 3;
+							vector-effect: non-scaling-stroke;
+							opacity: 0.55;
+						}
+						.chart-svg .bar-segment {
+							stroke: var(--surface-0, #ffffff);
+							stroke-width: 0.5;
+							vector-effect: non-scaling-stroke;
+						}
+						.chart-svg .bar-segment.sent {
+							fill: var(--green-500, #22c55e);
+						}
+						.chart-svg .bar-segment.failed {
+							fill: var(--red-500, #ef4444);
+						}
+						.chart-svg .bar-segment.pending {
+							fill: var(--blue-800, #1e40af);
+						}
+						.chart-svg .seg-value {
+							fill: #ffffff;
+							font-size: 10px;
+							font-weight: 700;
+							font-family: inherit;
+							paint-order: stroke;
+							stroke: rgba(0, 0, 0, 0.25);
+							stroke-width: 0.4;
+						}
+						.chart-svg .top-value {
+							fill: var(--text-color, #111827);
+							font-size: 10px;
+							font-weight: 700;
+							font-family: inherit;
+						}
+						.chart-svg g:hover .bar-track {
+							stroke: var(--surface-400, #94a3b8);
+							stroke-width: 1.5;
+						}
+						.chart-svg .bar-group-enter {
+							animation: barFadeIn 400ms ease-out both;
+						}
+						@keyframes barFadeIn {
+							from {
+								opacity: 0;
+								transform: translateY(6px);
+							}
+							to {
+								opacity: 1;
+								transform: translateY(0);
+							}
+						}
+					</style>
+
+					<!-- Grid lines horizontales (0, 50%, 100%) -->
+					<line
+						class="grid-line"
+						x1="0"
+						[attr.y1]="gridY0"
+						[attr.x2]="viewW"
+						[attr.y2]="gridY0"
+					/>
+					<line
+						class="grid-line"
+						x1="0"
+						[attr.y1]="gridYMid"
+						[attr.x2]="viewW"
+						[attr.y2]="gridYMid"
+					/>
+					<line
+						class="grid-line"
+						x1="0"
+						[attr.y1]="gridYBottom"
+						[attr.x2]="viewW"
+						[attr.y2]="gridYBottom"
+					/>
+
+					@for (bar of bars(); track bar.hora) {
+						<g class="bar-group-enter">
+							<rect
+								class="bar-track"
+								[attr.x]="bar.x"
+								y="0"
+								[attr.width]="bar.width"
+								[attr.height]="trackH"
+								rx="2"
+							/>
+
+							<!-- Verde (enviados — base) -->
+							@if (bar.sent.visible) {
+								<rect
+									class="bar-segment sent"
+									[attr.x]="bar.x"
+									[attr.y]="bar.sent.y"
+									[attr.width]="bar.width"
+									[attr.height]="bar.sent.height"
+								/>
+								@if (bar.sent.showValue) {
+									<text
+										class="seg-value"
+										[attr.x]="bar.cx"
+										[attr.y]="bar.sent.cy + 3.5"
+										text-anchor="middle"
+									>
+										{{ bar.sent.value }}
+									</text>
+								}
+							}
+
+							<!-- Azul (delta queLlegaron - enviados) — solo cuando hay divergencia -->
+							@if (bar.pending.visible) {
+								<rect
+									class="bar-segment pending"
+									[attr.x]="bar.x"
+									[attr.y]="bar.pending.y"
+									[attr.width]="bar.width"
+									[attr.height]="bar.pending.height"
+								/>
+								@if (bar.pending.showValue) {
+									<text
+										class="seg-value"
+										[attr.x]="bar.cx"
+										[attr.y]="bar.pending.cy + 3.5"
+										text-anchor="middle"
+									>
+										{{ bar.pending.value }}
+									</text>
+								}
+							}
+
+							<!-- Rojo (fallidos — arriba) -->
+							@if (bar.failed.visible) {
+								<rect
+									class="bar-segment failed"
+									[attr.x]="bar.x"
+									[attr.y]="bar.failed.y"
+									[attr.width]="bar.width"
+									[attr.height]="bar.failed.height"
+								/>
+								@if (bar.failed.showValue) {
+									<text
+										class="seg-value"
+										[attr.x]="bar.cx"
+										[attr.y]="bar.failed.cy + 3.5"
+										text-anchor="middle"
+									>
+										{{ bar.failed.value }}
+									</text>
+								}
+							}
+
+							<!-- Valor del total encima de la barra cuando el verde no cabe adentro -->
+							@if (bar.showTopLabel) {
+								<text
+									class="top-value"
+									[attr.x]="bar.cx"
+									[attr.y]="bar.stackTop - 4"
+									text-anchor="middle"
+								>
+									{{ bar.topLabel }}
+								</text>
+							}
+
+							<title>
+								{{ bar.horaLabel }}:00 — Enviados: {{ bar.enviados }} · Fallidos:
+								{{ bar.fallidos }} · Llegaron SMTP: {{ bar.queLlegaronAlSmtp }}
+							</title>
+						</g>
+					}
+
+					<!-- Marker vertical de "hora actual Lima" -->
+					<line
+						class="now-marker"
+						[attr.x1]="horaActualX()"
+						[attr.y1]="gridY0"
+						[attr.x2]="horaActualX()"
+						[attr.y2]="gridYBottom"
+					>
+						<title>Hora actual (Lima)</title>
+					</line>
+				</svg>
+
+				<div class="chart-x-axis" aria-hidden="true">
+					@for (bar of bars(); track bar.hora) {
+						<span
+							class="x-label"
+							[class.has-data]="bar.hasData"
+							[class.is-now]="bar.hora === horaActualLima()"
+						>
+							{{ bar.horaLabel }}
+						</span>
+					}
+				</div>
+			</div>
+		</div>
+	}
+</section>
+<!-- #endregion -->

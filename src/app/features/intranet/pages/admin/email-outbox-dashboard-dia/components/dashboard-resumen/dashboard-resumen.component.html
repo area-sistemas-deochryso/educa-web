@@ -1,0 +1,84 @@
+<!-- #region Zona 1: Estado general (3 cards grandes) -->
+<section class="stats-general" aria-label="Estado general del día">
+	@for (card of generalCards(); track card.key) {
+		<div class="stat-card stat-card--large" [class]="'stat-card--' + card.variant">
+			<div class="stat-content">
+				<span class="stat-label">{{ card.label }}</span>
+				<span class="stat-value">{{ card.value }}</span>
+				<span class="stat-sublabel">{{ card.sublabel }}</span>
+			</div>
+			<div class="stat-icon">
+				<i [class]="card.icon"></i>
+			</div>
+		</div>
+	}
+</section>
+<!-- #endregion -->
+
+<!-- #region Zona 2: Banner semáforo cPanel -->
+<section
+	class="cpanel-banner"
+	[class]="'cpanel-banner--' + deferFailLevel()"
+	aria-label="Salud del canal cPanel"
+>
+	<div class="cpanel-banner__icon">
+		@switch (deferFailLevel()) {
+			@case ('ok') {
+				<i class="pi pi-check-circle"></i>
+			}
+			@case ('warning') {
+				<i class="pi pi-exclamation-triangle"></i>
+			}
+			@case ('critical') {
+				<i class="pi pi-times-circle"></i>
+			}
+		}
+	</div>
+	<div class="cpanel-banner__body">
+		<div class="cpanel-banner__headline">
+			<span class="cpanel-banner__title">Defer/Fail cPanel</span>
+			<span class="cpanel-banner__count">{{ deferFailCount() }}</span>
+			<span class="cpanel-banner__unit">acumulado del día</span>
+		</div>
+		<p class="cpanel-banner__message">{{ deferFailMessage() }}</p>
+	</div>
+</section>
+<!-- #endregion -->
+
+<!-- #region Zona 3: Desglose de fallos (6 cards compactas) -->
+<section
+	class="stats-breakdown"
+	[class.stats-breakdown--muted]="totalFallos() === 0"
+	aria-label="Desglose de fallos"
+>
+	<header class="stats-breakdown__header">
+		<span class="stats-breakdown__title">Desglose de fallos</span>
+		<span class="stats-breakdown__hint">
+			@if (totalFallos() === 0) {
+				Sin fallos hoy — valores en cero esperados
+			} @else {
+				Clasificación de los {{ totalFallos() }} correos que fallaron
+			}
+		</span>
+	</header>
+
+	<div class="stats-breakdown__grid">
+		@for (card of breakdownCards(); track card.key) {
+			<div
+				class="stat-card stat-card--compact"
+				[class]="'stat-card--' + card.variant"
+				[class.stat-card--zero]="card.value === 0"
+			>
+				<div class="stat-icon-small">
+					<i [class]="card.icon"></i>
+				</div>
+				<div class="stat-content">
+					<span class="stat-label">{{ card.label }}</span>
+					<span class="stat-value">{{ card.value }}</span>
+					<span class="stat-sublabel">{{ card.sublabel }}</span>
+				</div>
+			</div>
+		}
+	</div>
+</section>
+<!-- #endregion -->

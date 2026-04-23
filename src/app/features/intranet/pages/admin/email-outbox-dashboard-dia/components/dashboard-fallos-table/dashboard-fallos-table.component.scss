@@ -1,0 +1,139 @@
+// #region Fallos del día table
+.table-section {
+	border: 1px solid var(--surface-300);
+	border-radius: 12px;
+	overflow: hidden;
+	background: transparent;
+
+	.section-header {
+		padding: 0.7rem 1rem;
+		border-bottom: 1px solid var(--surface-300);
+
+		h3 {
+			margin: 0;
+			font-size: 0.95rem;
+			font-weight: 600;
+			color: var(--text-color);
+		}
+
+		.section-subtitle {
+			font-size: 0.8rem;
+			color: var(--text-color-secondary);
+
+			code {
+				font-size: 0.8rem;
+				background: var(--surface-100);
+				padding: 1px 4px;
+				border-radius: 3px;
+			}
+		}
+	}
+
+	// #region PrimeNG overrides — elimina scroll horizontal + permite wrap
+	:host ::ng-deep .fallos-table {
+		.p-datatable-table-container,
+		.p-datatable-wrapper,
+		.p-datatable {
+			overflow-x: hidden !important;
+			width: 100%;
+		}
+
+		table {
+			table-layout: fixed;
+			width: 100%;
+		}
+
+		// * Celdas: alinear arriba (para que múltiples líneas no centren el texto
+		// * en el medio cuando otras celdas son cortas) + permitir wrap
+		td {
+			vertical-align: top !important;
+			word-break: break-word;
+			overflow-wrap: anywhere;
+			white-space: normal;
+		}
+
+		// * Tag del tipoFallo — forzar nowrap para que no se parta
+		.p-tag {
+			white-space: nowrap;
+		}
+	}
+	// #endregion
+
+	// #region Widths por columna
+	.col-hora {
+		width: 55px;
+		font-variant-numeric: tabular-nums;
+	}
+
+	.col-dest {
+		width: 26%;
+		min-width: 160px;
+	}
+
+	.col-tipo {
+		width: 110px;
+	}
+
+	.col-fallo {
+		width: 140px;
+	}
+
+	.col-error {
+		// toma el resto
+	}
+
+	.col-actions {
+		width: 52px;
+		text-align: center;
+	}
+	// #endregion
+
+	.cell-dest code {
+		font-family: monospace;
+		font-size: 0.8rem;
+		color: var(--text-color);
+		word-break: break-all;
+	}
+
+	.cell-error {
+		font-size: 0.8rem;
+		color: var(--text-color);
+		line-height: 1.35;
+		// Permite hasta 3 líneas visibles, con ellipsis al final si se pasa
+		display: -webkit-box;
+		-webkit-line-clamp: 3;
+		-webkit-box-orient: vertical;
+		overflow: hidden;
+	}
+
+	.btn-icon {
+		width: 2rem;
+		height: 2rem;
+		padding: 0;
+	}
+
+	.empty-message {
+		padding: 2rem 1rem;
+		text-align: center;
+
+		.empty-state {
+			display: flex;
+			flex-direction: column;
+			align-items: center;
+			gap: 0.5rem;
+			color: var(--text-color);
+			font-size: 0.9rem;
+
+			i {
+				font-size: 1.75rem;
+				color: var(--green-600);
+			}
+
+			p {
+				margin: 0;
+				font-weight: 500;
+			}
+		}
+	}
+}
+// #endregion

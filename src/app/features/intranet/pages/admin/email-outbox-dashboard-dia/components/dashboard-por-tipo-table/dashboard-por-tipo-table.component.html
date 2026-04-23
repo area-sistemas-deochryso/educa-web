@@ -1,0 +1,34 @@
+<!-- #region PorTipo table -->
+<section class="table-section" aria-label="Agregación por tipo">
+	<header class="section-header">
+		<h3>Por tipo</h3>
+		<span class="section-subtitle">Agregación por <code>EO_Tipo</code></span>
+	</header>
+
+	<p-table [value]="data()" class="p-datatable-sm" styleClass="p-datatable-gridlines">
+		<ng-template #header>
+			<tr>
+				<th class="label-uppercase">Tipo</th>
+				<th class="label-uppercase col-num">Enviados</th>
+				<th class="label-uppercase col-num">Fallidos</th>
+				<th class="label-uppercase col-num">Pendientes</th>
+			</tr>
+		</ng-template>
+		<ng-template #body let-row>
+			<tr>
+				<td>
+					<p-tag [value]="row.tipo" styleClass="tag-neutral" />
+				</td>
+				<td class="col-num val-sent">{{ row.enviados }}</td>
+				<td class="col-num val-failed">{{ row.fallidos }}</td>
+				<td class="col-num">{{ row.pendientes }}</td>
+			</tr>
+		</ng-template>
+		<ng-template #emptymessage>
+			<tr>
+				<td colspan="4" class="empty-message">Sin datos</td>
+			</tr>
+		</ng-template>
+	</p-table>
+</section>
+<!-- #endregion -->

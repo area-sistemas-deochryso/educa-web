@@ -29,6 +29,7 @@ export const environment = {
 		rateLimitMonitoring: true,
 		emailOutboxThrottleWidget: false,
 		emailOutboxDeferFailWidget: false,
+		emailOutboxDashboardDia: true,
 		auditoriaCorreos: false,
 	},
 

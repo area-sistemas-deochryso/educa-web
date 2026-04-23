@@ -1,0 +1,81 @@
+<!-- #region Header -->
+<app-dashboard-header
+	[fechaConsulta]="vm().fechaConsulta"
+	[generatedAt]="vm().generatedAt"
+	[loading]="vm().loading"
+	(refresh)="onRefresh()"
+	(fechaChange)="onFechaChange($event)"
+/>
+<!-- #endregion -->
+
+<!-- #region Tabs -->
+<p-tabs value="resumen" class="dashboard-tabs">
+	<p-tablist>
+		<p-tab value="resumen">
+			<i class="pi pi-th-large"></i>
+			<span>Resumen</span>
+		</p-tab>
+		<p-tab value="detalle">
+			<i class="pi pi-list"></i>
+			<span>Detalle de fallos</span>
+			@if (totalFallos() + totalBounces() > 0) {
+				<span class="tab-badge">{{ totalFallos() + totalBounces() }}</span>
+			}
+		</p-tab>
+	</p-tablist>
+
+	<p-tabpanels>
+		<!-- Tab 1: Resumen (cards + banner + desglose + chart) -->
+		<p-tabpanel value="resumen">
+			@if (vm().loading && !hasData()) {
+				<app-stats-skeleton [count]="3" iconPosition="right" />
+			} @else if (vm().resumen; as resumen) {
+				<app-dashboard-resumen [resumen]="resumen" />
+			}
+
+			@if (vm().loading && !hasData()) {
+				<section class="chart-skeleton" aria-hidden="true">
+					<div class="chart-skeleton-bars">
+						@for (i of [].constructor(24); track $index) {
+							<div class="chart-skeleton-bar"></div>
+						}
+					</div>
+				</section>
+			} @else if (hasData()) {
+				<app-dashboard-chart-hora [data]="vm().porHora" />
+			}
+		</p-tabpanel>
+
+		<!-- Tab 2: Detalle (tablas) -->
+		<p-tabpanel value="detalle">
+			<div class="tables-stack">
+				<!-- Fallos del día (lo más útil arriba) -->
+				@if (vm().loading && !hasData()) {
+					<app-table-skeleton [columns]="fallosSkeletonColumns" [rows]="6" />
+				} @else if (hasData()) {
+					<app-dashboard-fallos-table [items]="vm().fallosDia" />
+				}
+
+				<!-- Fila 2 columnas: PorTipo (chica) + Bounces (grande) -->
+				<div class="tables-grid">
+					<div class="tables-grid__left">
+						@if (vm().loading && !hasData()) {
+							<app-table-skeleton [columns]="porTipoSkeletonColumns" [rows]="4" />
+						} @else if (hasData()) {
+							<app-dashboard-por-tipo-table [data]="vm().porTipo" />
+						}
+					</div>
+
+					<div class="tables-grid__right">
+						@if (vm().loading && !hasData()) {
+							<app-table-skeleton [columns]="bouncersSkeletonColumns" [rows]="8" />
+						} @else if (hasData()) {
+							<app-dashboard-bouncers-table [data]="vm().bouncesAcumulados" />
+						}
+					</div>
+				</div>
+			</div>
+		</p-tabpanel>
+	</p-tabpanels>
+</p-tabs>
+<!-- #endregion -->
