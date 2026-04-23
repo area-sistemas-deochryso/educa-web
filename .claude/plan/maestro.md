@@ -56,9 +56,9 @@
 >
 > **Formato**: `N. [Plan·Chat·Repo·Tipo] — scope — razón de prioridad`. Tipo: BE / FE / OPS / docs / design. OPS no genera brief (no es código).
 
-1. **[Plan 30 · Chat 2 · `educa-web` · FE]** — Pantalla admin del dashboard-dia (`/intranet/admin/email-outbox/dashboard-dia`) que consume el endpoint cerrado en Chat 1. **Reordenado por decisión del usuario 2026-04-23**: "si el back ya está, vamos al front" — el FE se adelanta antes que los Chats 3/4 BE del Plan 30 (gap asistencia, diagnóstico). Brief en `.claude/chats/035-plan-30-chat-2-fe-dashboard-correos-dia-page.md`.
-2. **[Plan 24 · Chat 3 · `educa-web` · FE]** — Frontend con `p-progressBar` + suscripción al `AsistenciaHub` en servicio singleton (sobrevive navegación). Consume `CrossChexSyncStatusDto` + eventos `"SyncProgress"` del hub (BE listo tras commit `513c6cc`). Asciende del slot #3 al #2 al cerrar Plan 30 Chat 1. Reactivable tras cerrar Plan 30 Chat 2 FE.
-3. **[Plan 30 · Chat 3 · `Educa.API` · BE]** — Gap asistencia-vs-correos: endpoint `GET /api/sistema/asistencia/diagnostico-correos-dia`. Antes numerado Chat 2 del Plan 30; se aborda después del FE cuando la pantalla muestre qué datos faltan.
+1. **[Plan 24 · Chat 3 · `educa-web` · FE]** — Frontend con `p-progressBar` + suscripción al `AsistenciaHub` en servicio singleton (sobrevive navegación). Consume `CrossChexSyncStatusDto` + eventos `"SyncProgress"` del hub (BE listo tras commit `513c6cc`). **Promovido al slot #1** tras cerrar Plan 30 Chat 2 FE (2026-04-23).
+2. **[Plan 30 · Chat 3 · `Educa.API` · BE]** — Gap asistencia-vs-correos: endpoint `GET /api/sistema/asistencia/diagnostico-correos-dia`. Antes numerado Chat 2 del Plan 30; se aborda con feedback de la pantalla FE ya en uso.
+3. **[Plan 30 · Chat 4 · `Educa.API` · BE]** — Búsqueda diagnóstico por correo específico: endpoint `GET /api/sistema/email-outbox/diagnostico?correo={email}`. Antes numerado Chat 3. Menos prioritario que el gap de asistencia.
 
 **Notas**:
 
@@ -696,7 +696,7 @@ El Director pierde 2+ minutos bloqueado cada vez que sincroniza (operación frec
 
 > **Origen**: 2026-04-23, sesión de cierre del Plan 24 Chat 2. El admin hoy depende de 25+ queries SQL manuales en SSMS para verificar el estado diario de correos y asistencia. Declarado "altamente impráctico" — bloquea autonomía del admin y consume tiempo del desarrollador que arma las queries cada día.
 > **Plan**: inline en este maestro (sin archivo separado).
-> **Estado**: 🟡 **En progreso 2026-04-23**, ~25% avanzado (Chat 1 de 4 ✅). Chat 1 F1.BE cerrado con commit `c8a0360` en Educa.API (1316 → 1330 tests). Brief del Chat 2 F2.FE (reordenado) listo en `.claude/chats/035-plan-30-chat-2-fe-dashboard-correos-dia-page.md`.
+> **Estado**: 🟡 **En progreso 2026-04-23**, ~50% avanzado (Chat 1 BE ✅ + Chat 2 FE ✅, faltan Chats 3/4 BE). Chat 1 F1.BE cerrado con commit `c8a0360` en Educa.API (1316 → 1330 tests). Chat 2 F2.FE cerrado 2026-04-23 en `educa-web main` — pantalla `/intranet/admin/email-outbox/dashboard-dia` consumiendo el endpoint de F1 (1535 → 1549 FE verdes, +14 tests). Brief del Chat 2 en `.claude/chats/closed/035-plan-30-chat-2-fe-dashboard-correos-dia-page.md`.
 
 ### Diagnóstico
 
@@ -716,7 +716,9 @@ Pantallas admin ya existentes (**no cubren este dolor**):
 - **Chat 1 · F1.BE — Dashboard correos del día** ✅ **Cerrado 2026-04-23** (commit `c8a0360` en Educa.API): endpoint `GET /api/sistema/email-outbox/dashboard-dia?fecha={yyyy-MM-dd}` con DTO compuesto (Resumen + PorHora[] + PorTipo[] + BouncesAcumulados[]). Reemplaza Q1/Q3/Q4/Q8 + D1/D4.
 - **Chat 2 · F2.BE — Gap asistencia-vs-correos**: endpoint `GET /api/sistema/asistencia/diagnostico-correos-dia?fecha={yyyy-MM-dd}&sedeId={n}` que cruza `AsistenciaPersona` + `Estudiante` + `EmailOutbox` + `EmailBlacklist`. Responde: entradas marcadas, correos enviados, estudiantes sin correo apoderado, apoderados blacklisteados. Reemplaza verificación INV-C11 + D2/D3/D5.
 - **Chat 3 · F3.BE — Búsqueda diagnóstico por correo**: endpoint `GET /api/sistema/email-outbox/diagnostico?correo={email}` que retorna historia completa: últimos N intentos en outbox (+ archive), estado blacklist, a qué persona(s) pertenece (Estudiante/Profesor/Director). Reemplaza M1-M8.
-- **Chat 4 · F4.FE — Pantallas admin "Monitoreo avanzado"**: submenu `/intranet/admin/monitoreo/...` con 3 rutas consumiendo los 3 endpoints. Gráficas ligeras (Chart.js o PrimeNG chart). Drill-down entre pantallas (click en "6 sin correo" → abre diagnóstico). **Orden de ejecución reordenado 2026-04-23**: el FE se adelanta consumiendo solo el endpoint de Chat 1 (pantalla dashboard-dia, brief en `.claude/chats/035-plan-30-chat-2-fe-dashboard-correos-dia-page.md`). Los Chats 2/3 BE y la extensión del FE con sus endpoints quedan para iteraciones posteriores.
+- **Chat 2 (reordenado) · F2.FE — Pantalla `dashboard-dia`** ✅ **Cerrado 2026-04-23** (`educa-web main`): pantalla `/intranet/admin/email-outbox/dashboard-dia` consume el endpoint de F1. 4 secciones: Resumen (10 stat cards), PorHora (barras apiladas 24 buckets · Enviados/Fallidos/LlegaronSMTP), PorTipo (tabla agregada), BouncesAcumulados (top 50 + row-warning/critical + copy-to-clipboard). Header con `p-datepicker` (maxDate=hoy, minDate=hoy-90d, `yy-mm-dd`) + botón refresh + label `Actualizado hace X min`. Error codes del BE (`FECHA_FORMATO_INVALIDO` / `FECHA_FUTURA_INVALIDA` / `FECHA_DEMASIADO_ANTIGUA`) mapeados a toast localizados en facade. No auto-polling (decisión 3). Gated por feature flag `emailOutboxDashboardDia` (OFF prod / ON dev) + permiso nuevo `ADMIN_EMAIL_OUTBOX_DASHBOARD_DIA`. Menú "Dashboard del día" en **Sistema > Monitoreo**. **+14 tests** (4 store + 7 facade + 1 resumen + 2 bouncers) → **1549 FE verdes** (baseline 1535). Lint + build OK.
+- **Chat 3 · F3.BE — Gap asistencia-vs-correos (antes Chat 2)**: endpoint `GET /api/sistema/asistencia/diagnostico-correos-dia?fecha={yyyy-MM-dd}&sedeId={n}` que cruza `AsistenciaPersona` + `Estudiante` + `EmailOutbox` + `EmailBlacklist`. Responde: entradas marcadas, correos enviados, estudiantes sin correo apoderado, apoderados blacklisteados. Reemplaza verificación INV-C11 + D2/D3/D5.
+- **Chat 4 · F4.BE — Búsqueda diagnóstico por correo (antes Chat 3)**: endpoint `GET /api/sistema/email-outbox/diagnostico?correo={email}` que retorna historia completa: últimos N intentos en outbox (+ archive), estado blacklist, a qué persona(s) pertenece. Reemplaza M1-M8. FE consumer posterior.
 
 ### Priorización
 
