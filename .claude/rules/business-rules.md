@@ -1248,6 +1248,17 @@ Este registro consolida TODAS las invariantes del sistema en una tabla indexable
 
 ---
 
+### 15.14 Invariantes de Correos Salientes
+
+| ID | Entidad | Invariante | Enforcement | Sección |
+|----|---------|------------|-------------|---------|
+| `INV-MAIL01` | EmailOutbox | Todo llamado a `EmailOutboxService.EnqueueAsync` valida el destinatario contra el regex canónico y consulta `EmailBlacklist`. Correos con formato inválido o presentes en blacklist con `EBL_Estado = 1` se rechazan silenciosamente con `LogWarning` (email enmascarado), sin crear registro en `EmailOutbox`. | `EmailOutboxService.EnqueueAsync` + `EmailValidator.Validate` + `IEmailBlacklistService.IsBlacklistedAsync` | 18.2 |
+| `INV-MAIL02` | EmailBlacklist | Cuando un destinatario acumula ≥ 3 rebotes con código SMTP `5.x.x`, `EmailOutboxWorker` lo inserta en `EmailBlacklist` (`MotivoBloqueo = 'BOUNCE_5XX'`) dentro de la misma transacción que actualiza el registro a `EO_Estado = 'FAILED_BLACKLISTED'`. SSL handshake, timeouts, `535 auth fail` y rechazos tipo `max defers and failures per hour` del MTA del hosting **no** cuentan para este umbral. | `EmailBounceBlacklistHandler` dentro del `ProcessSingleEmailAsync.catch` del worker, con mutación atómica vía ChangeTracker | 18.2 |
+| `INV-MAIL03` | Hosting (externo) | El hosting cPanel descarta silenciosamente todo correo del dominio `laazulitasac.com` cuando acumula <!-- TBD post-OPS: Chat 3 puede subir a 25-30/h --> 5 defers+fails en una hora. Este umbral es política del hosting y no es configurable. `INV-MAIL01` y `INV-MAIL02` son las únicas defensas disponibles — el sistema no controla el contador, solo qué envía al MTA. Cualquier fallo evitable (SSL handshake, auth, formato inválido) consume el contador y se considera deuda que agota la cuota para correos legítimos. | **No enforced en código** — política del hosting. Se honra vía INV-MAIL01/02 que evitan consumir el contador | 18.1 |
+| `INV-MAIL04` | EmailOutbox + widget admin | El sistema expone `GET /api/sistema/email-outbox/defer-fail-status` con el contador de la hora actual vs threshold configurable `Email:DeferFailThresholdPerHour` (default <!-- TBD post-OPS: alinear con INV-MAIL03 si OPS sube el techo --> 5, ajustable en caliente sin redeploy cuando el hosting negocia un valor superior). El semáforo se calcula por bandas — OK (<60%), WARNING (60-100%), CRITICAL (≥100%). El widget admin `DeferFailStatusWidget` (Plan 22 Chat B) consume este endpoint cada 60s para visibilizar el riesgo antes de que el hosting bloquee el dominio. Service BE con fallback-CRITICAL en `try/catch` global (INV-S07) — un fallo interno de telemetría nunca falla el envío de correos, pero tampoco oculta un problema real. | `GET /api/sistema/email-outbox/defer-fail-status` (Plan 29 Chat 2.6) + `DeferFailStatusWidget` FE (Plan 22 Chat B) | 18.2, 18.4 |
+
+---
+
 ### 15.11 Cómo Usar Este Registro
 
 **En code reviews**: Verificar que el código no viola ningún `INV-*`. Si una PR introduce una operación sobre Horarios, revisar `INV-U03`, `INV-U04`, `INV-U05`, `INV-C06`, `INV-C07`.
@@ -1423,6 +1434,90 @@ Las 5 páginas FE migradas en Chat 3 que exponen los 3 items del menú:
 
 ---
 
+## 18. Correos Salientes y Protección del Canal SMTP
+
+> **"El hosting no lo controlamos. Lo que controlamos es qué le enviamos."**
+
+Esta sección documenta las defensas del canal SMTP saliente frente al techo
+`max_defer_fail_percentage` que el hosting cPanel impone a nivel de dominio.
+El sistema no controla el contador — solo controla qué entrega al MTA. Los
+invariantes `INV-MAIL01`–`INV-MAIL04` formalizan las capas que evitan agotar
+esa cuota con fallos prevenibles.
+
+### 18.1 Contexto — el techo cPanel
+
+El hosting configura un techo <!-- TBD post-OPS: Chat 3 puede subir a 25-30/h --> `max_defer_fail_percentage = 5/h` por dominio. Cuando el
+contador llega a ese umbral dentro de una ventana deslizante de 60 minutos,
+el MTA del hosting **descarta silenciosamente** todo correo saliente del
+dominio durante aproximadamente 60 min más — sin NDR, sin bounce, sin entrada
+en el log visible al cliente. Es política externa del hosting, no
+configurable desde el sistema y confirmada no-negociable en configuración
+de infraestructura básica (el único remedio es negociar con el hosting que
+suba el techo como excepción — objetivo del Chat 3 OPS del Plan 29).
+
+Cualquier fallo evitable que llegue al MTA (SSL handshake, auth `535`,
+bounce `5.x.x`, formato de destinatario inválido, destinatario ya rebotado
+anteriormente) consume el contador y se considera **deuda** que agota la
+cuota para correos legítimos del día. Este es el motivo del Plan 29:
+cortar la cascada de SMTP fails antes de que lleguen al MTA.
+
+### 18.2 Defensas en capas
+
+| Capa | Dónde vive | Invariante | Qué evita |
+|------|-----------|-----------|-----------|
+| 1 — Pre-encolado | `EmailOutboxService.EnqueueAsync` (`EmailValidator.Validate` + `IEmailBlacklistService.IsBlacklistedAsync`) | `INV-MAIL01` | Que un correo con formato inválido o destinatario ya blacklisteado llegue siquiera a crear fila en `EmailOutbox`. Ni siquiera consume el contador del MTA — se rechaza silenciosamente con `LogWarning` y email enmascarado. |
+| 2 — Durante envío | `EmailOutboxWorker` → `EmailBounceBlacklistHandler` dentro del `ProcessSingleEmailAsync.catch` | `INV-MAIL02` | Que un destinatario con ≥3 bounces `5.x.x` permanentes se siga intentando. Al tercer `5.x.x`, se inserta en `EmailBlacklist` (`MotivoBloqueo = 'BOUNCE_5XX'`) en la misma transacción que pone `EO_Estado = 'FAILED_BLACKLISTED'`. A partir de ahí, INV-MAIL01 se encarga de bloquear futuros envíos. |
+| 3 — Monitoreo | `GET /api/sistema/email-outbox/defer-fail-status` (Plan 29 Chat 2.6) + `DeferFailStatusWidget` FE (Plan 22 Chat B) | `INV-MAIL04` | Que el dominio se acerque al techo sin que el admin lo vea. Polling 60s con semáforo OK (<60%) / WARNING (60-100%) / CRITICAL (≥100%). Fallback CRITICAL en `try/catch` global del service (INV-S07) — un fallo interno de telemetría nunca falla el envío. |
+
+`INV-MAIL03` no es una defensa del sistema — es la **realidad externa** del
+hosting. Se honra indirectamente vía las tres capas: si ninguna genera deuda,
+el contador cPanel nunca llega al techo.
+
+### 18.3 Qué cuenta y qué no cuenta contra el contador cPanel
+
+| Evento | ¿Cuenta? | Por qué |
+|--------|----------|---------|
+| Bounce `5.x.x` (mailbox unknown, user unknown, etc.) | ✅ Sí | El MTA procesó el correo y recibió rechazo del destino. |
+| `535 auth fail` (credenciales del buzón mal) | ✅ Sí | El MTA intentó conectar al relay con credenciales inválidas. |
+| Timeout al MTA / SSL handshake failure | ✅ Sí | El MTA contó el intento aunque nunca completó la entrega. |
+| Rechazo `max defers and failures per hour` del MTA | ✅ Sí (es **el propio techo** saltando) | Cuando el contador ya está al límite, el MTA rebota los subsiguientes como `4xx defer` que también cuentan — bucle de retroalimentación. |
+| Rechazo pre-SMTP por `INV-MAIL01` (formato inválido) | ❌ No | Nunca cruzó al MTA. El pre-filtro de `EnqueueAsync` lo rechazó en Educa. |
+| Rechazo pre-SMTP por `INV-MAIL01` (blacklisted) | ❌ No | Mismo — nunca cruzó al MTA. |
+| Envío exitoso (`Sent`) | ❌ No | Cuenta contra el throttle per-sender del Plan 22 (cuota de envíos), no contra defer/fail. |
+| Reintento `Retrying` interno antes de que Educa entregue al MTA | ❌ No | La entrega al MTA aún no ocurrió — es backoff dentro de Educa. |
+
+**Consecuencia operativa**: las únicas defensas que reducen el contador son
+las capas 1 y 2. La capa 3 (monitoreo) solo visibiliza, no previene.
+
+### 18.4 Coordinación con throttle (Plan 22)
+
+El Plan 22 (throttle per-sender 50/h por buzón → 200/h con 7 buzones
+round-robin) y el Plan 29 (defer/fail 5/h por dominio) son **complementarios,
+no sustitutivos**. Cubren dos cuotas distintas del hosting:
+
+- **Throttle per-sender** (`Plan 22` — `GET /api/email-outbox/throttle-status`):
+  cuida la cuota de **envíos exitosos** por buzón individual. Si un buzón
+  ya envió 50 correos en la última hora, los siguientes se pausan hasta
+  que la ventana deslizante libere cupo.
+- **Defer/fail por dominio** (`Plan 29` — `GET /api/sistema/email-outbox/defer-fail-status`):
+  cuida la cuota de **fallos** acumulados a nivel dominio. Un dominio puede
+  estar muy debajo del throttle per-sender y aun así agotar el techo
+  defer/fail si los correos que envía rebotan.
+
+Un envío exitoso consume throttle per-sender pero no defer/fail. Un bounce
+`5.x.x` consume defer/fail pero no throttle per-sender. Por eso los dos
+widgets en `/intranet/admin/email-outbox` no son redundantes — uno mide
+caudal, el otro mide salud del canal.
+
+### 18.5 Invariantes
+
+- **`INV-MAIL01`** — Validación pre-encolado: `EnqueueAsync` rechaza inválidos y blacklisteados sin crear fila. Ver §15.14.
+- **`INV-MAIL02`** — Auto-blacklist por 3+ bounces `5.x.x` en la misma transacción que `FAILED_BLACKLISTED`. SSL/auth/max-defers no cuentan. Ver §15.14.
+- **`INV-MAIL03`** — Techo cPanel <!-- TBD post-OPS: Chat 3 puede subir a 25-30/h --> 5 defers+fails/h por dominio, no configurable. Defensa solo vía INV-MAIL01/02. Ver §15.14.
+- **`INV-MAIL04`** — Monitoreo vía endpoint `defer-fail-status` + widget admin 60s polling, fallback CRITICAL por INV-S07. Ver §15.14.
+
+---
+
 ## Checklist: Antes de Implementar una Feature de Backend
 
 ```
@@ -1481,4 +1576,12 @@ REPORTES EXPORTABLES (Sección 17)
 [ ] ¿El endpoint `/excel` retorna `File(bytes, ExcelHelpers.ContentTypeXlsx, "...xlsx")`? — INV-RE02
 [ ] ¿El UI del FE expone un menú de 3 items (`Ver PDF` / `Descargar PDF` / `Descargar Excel`)? — INV-RE03
 [ ] ¿Hay tests contract (`*ExcelEndpointTests.cs`) por cada endpoint nuevo?
+
+CORREOS SALIENTES (Sección 18)
+[ ] ¿La feature envía correos? → NUNCA `IEmailService` directo; SIEMPRE `IEmailOutboxService.EnqueueAsync` (ver `backend.md`)
+[ ] ¿Se respeta `INV-MAIL01`? `EnqueueAsync` valida regex + blacklist antes de crear fila
+[ ] ¿Se respeta `INV-MAIL02`? Solo bounces `5.x.x` acumulan hacia blacklist (SSL/auth/max-defers NO cuentan)
+[ ] ¿Se entiende `INV-MAIL03`? El techo cPanel <!-- TBD post-OPS --> 5/h por dominio no es configurable — INV-MAIL01/02 son las únicas defensas
+[ ] ¿El admin tiene visibilidad vía `INV-MAIL04`? Widget `DeferFailStatusWidget` polea `/api/sistema/email-outbox/defer-fail-status` cada 60s
+[ ] ¿Errores de telemetría devuelven CRITICAL sin fallar el envío? — INV-S07 + `try/catch` global en el service
 ```
