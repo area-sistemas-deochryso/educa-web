@@ -1,0 +1,278 @@
+// #region Widget container — B1 container con border, no background
+.defer-fail-widget {
+	background: transparent;
+	border: 1px solid var(--surface-300);
+	border-radius: 12px;
+	padding: 1rem 1.25rem;
+	margin-bottom: 1rem;
+
+	&--warning {
+		border-color: var(--yellow-500);
+		background: color-mix(in srgb, var(--yellow-500) 6%, transparent);
+	}
+
+	&--critical {
+		border-color: var(--red-600);
+		background: color-mix(in srgb, var(--red-500) 8%, transparent);
+	}
+
+	&__header {
+		display: flex;
+		align-items: center;
+		gap: 1rem;
+		flex-wrap: wrap;
+	}
+
+	&__toggle {
+		display: flex;
+		align-items: center;
+		gap: 0.5rem;
+		background: transparent;
+		border: none;
+		color: var(--text-color);
+		font-size: 0.95rem;
+		font-weight: 600;
+		cursor: pointer;
+		padding: 0.25rem 0;
+
+		&:hover {
+			color: var(--text-color);
+		}
+
+		i {
+			font-size: 0.9rem;
+			color: var(--text-color-secondary);
+		}
+	}
+
+	&__title {
+		letter-spacing: 0.25px;
+	}
+
+	&__actions {
+		display: flex;
+		align-items: center;
+		gap: 1rem;
+		margin-left: auto;
+	}
+
+	&__autorefresh {
+		display: flex;
+		align-items: center;
+		gap: 0.5rem;
+		font-size: 0.85rem;
+		color: var(--text-color-secondary);
+		cursor: pointer;
+		user-select: none;
+	}
+
+	&__empty {
+		display: flex;
+		align-items: center;
+		gap: 0.75rem;
+		margin-top: 0.75rem;
+		padding: 0.85rem 1rem;
+		border-radius: 8px;
+		font-size: 0.875rem;
+		color: var(--text-color-secondary);
+		background: var(--surface-100);
+		border: 1px solid var(--surface-300);
+
+		i {
+			font-size: 1.1rem;
+			color: var(--green-600);
+		}
+	}
+
+	&__telemetry-warning {
+		display: flex;
+		align-items: center;
+		gap: 0.75rem;
+		margin-top: 1rem;
+		padding: 0.85rem 1rem;
+		border-radius: 8px;
+		font-size: 0.85rem;
+		color: var(--text-color);
+		background: color-mix(in srgb, var(--yellow-500) 15%, transparent);
+		border: 1px solid var(--yellow-500);
+
+		i {
+			color: var(--yellow-700);
+			font-size: 1.1rem;
+		}
+	}
+}
+// #endregion
+
+// #region Secciones del body
+.defer-fail-section {
+	margin-top: 1.25rem;
+
+	&__title {
+		margin: 0 0 0.75rem 0;
+		color: var(--text-color-secondary);
+	}
+}
+// #endregion
+
+// #region Hora actual
+.defer-fail-hour {
+	display: flex;
+	align-items: baseline;
+	justify-content: space-between;
+	gap: 1rem;
+	padding: 0.85rem 1rem;
+	border: 1px solid var(--surface-300);
+	border-radius: 10px;
+	background: transparent;
+
+	&__value {
+		display: flex;
+		align-items: baseline;
+		gap: 0.5rem;
+	}
+
+	&__count {
+		font-size: 2rem;
+		font-weight: 700;
+		color: var(--text-color);
+		line-height: 1;
+	}
+
+	&__threshold {
+		font-size: 1rem;
+		color: var(--text-color-secondary);
+	}
+
+	&__percent {
+		font-size: 0.9rem;
+		font-weight: 600;
+		color: var(--blue-800);
+	}
+
+	&__meta {
+		font-size: 0.8rem;
+		color: var(--text-color-secondary);
+	}
+}
+
+.defer-fail-widget--warning .defer-fail-hour__percent {
+	color: var(--yellow-700);
+}
+
+.defer-fail-widget--critical .defer-fail-hour__percent {
+	color: var(--red-600);
+}
+// #endregion
+
+// #region Grid de stats
+.defer-fail-grid {
+	display: grid;
+	grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+	gap: 0.75rem;
+
+	&--blacklist {
+		grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+	}
+}
+
+.defer-fail-stat {
+	display: flex;
+	flex-direction: column;
+	gap: 0.15rem;
+	padding: 0.75rem 0.85rem;
+	background: transparent;
+	border: 1px solid var(--surface-300);
+	border-radius: 8px;
+
+	&__label {
+		font-size: 0.75rem;
+		color: var(--text-color-secondary);
+		text-transform: uppercase;
+		letter-spacing: 0.35px;
+	}
+
+	&__value {
+		font-size: 1.35rem;
+		font-weight: 700;
+		color: var(--text-color);
+		line-height: 1.1;
+	}
+
+	&__hint {
+		margin-top: 0.2rem;
+		font-size: 0.7rem;
+		color: var(--text-color-secondary);
+		font-style: italic;
+	}
+
+	&--ok {
+		border-color: var(--green-500);
+		.defer-fail-stat__value {
+			color: var(--green-600);
+		}
+	}
+
+	&--info {
+		.defer-fail-stat__value {
+			color: var(--blue-800);
+		}
+	}
+
+	&--retry {
+		border-color: var(--yellow-500);
+		.defer-fail-stat__value {
+			color: var(--yellow-700);
+		}
+	}
+
+	&--cpanel {
+		border-color: var(--red-600);
+		.defer-fail-stat__value {
+			color: var(--red-600);
+		}
+	}
+
+	&--pre-smtp {
+		border-style: dashed;
+		border-color: var(--surface-300);
+		opacity: 0.85;
+	}
+
+	&--total {
+		.defer-fail-stat__value {
+			color: var(--blue-800);
+		}
+	}
+}
+// #endregion
+
+// #region Meta de blacklist
+.defer-fail-blacklist-meta {
+	margin-top: 0.75rem;
+	display: flex;
+	flex-wrap: wrap;
+	gap: 1.5rem;
+	font-size: 0.8rem;
+	color: var(--text-color-secondary);
+}
+// #endregion
+
+// #region Responsive
+@media (max-width: 768px) {
+	.defer-fail-grid {
+		grid-template-columns: repeat(2, 1fr);
+	}
+}
+
+@media (max-width: 480px) {
+	.defer-fail-grid {
+		grid-template-columns: 1fr;
+	}
+
+	.defer-fail-hour {
+		flex-direction: column;
+		align-items: flex-start;
+	}
+}
+// #endregion

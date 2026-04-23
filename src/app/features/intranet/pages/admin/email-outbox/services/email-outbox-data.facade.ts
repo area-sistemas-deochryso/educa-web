@@ -9,6 +9,7 @@ import { EmailOutboxApiService } from './email-outbox.service';
 import { EmailOutboxStore } from './email-outbox.store';
 
 const THROTTLE_POLL_INTERVAL_MS = 30_000;
+const DEFER_FAIL_POLL_INTERVAL_MS = 60_000;
 
 @Injectable({ providedIn: 'root' })
 export class EmailOutboxDataFacade {
@@ -21,6 +22,7 @@ export class EmailOutboxDataFacade {
 
 	// Handle del polling activo. null cuando no hay polling corriendo.
 	private pollHandle: ReturnType<typeof setInterval> | null = null;
+	private deferFailPollHandle: ReturnType<typeof setInterval> | null = null;
 	// #endregion
 
 	// #region Estado expuesto
@@ -31,7 +33,10 @@ export class EmailOutboxDataFacade {
 		// Cleanup automático: detener polling cuando el servicio se destruye.
 		// El provider es root-singleton, así que solo dispara si la app se
 		// reinicia — igual dejamos el guard para no leakear el interval.
-		this.destroyRef.onDestroy(() => this.stopThrottlePolling());
+		this.destroyRef.onDestroy(() => {
+			this.stopThrottlePolling();
+			this.stopDeferFailPolling();
+		});
 	}
 
 	// #region Carga de datos
@@ -165,6 +170,71 @@ export class EmailOutboxDataFacade {
 		if (this.pollHandle) {
 			clearInterval(this.pollHandle);
 			this.pollHandle = null;
+		}
+	}
+
+	// #endregion
+
+	// #region Defer/fail status widget (Plan 22 Chat B / Plan 29 Chat 2.6)
+
+	/**
+	 * Hidrata auto-refresh + collapsed desde PreferencesStorage. Se llama una
+	 * vez al montar el componente. Si auto-refresh venía ON, arranca polling.
+	 */
+	initDeferFailWidget(): void {
+		const autoRefresh = this.storage.getDeferFailWidgetAutoRefresh();
+		const collapsed = this.storage.getDeferFailWidgetCollapsed();
+		this.store.setDeferFailAutoRefresh(autoRefresh);
+		this.store.setDeferFailCollapsed(collapsed);
+
+		this.loadDeferFailStatus();
+		if (autoRefresh) this.startDeferFailPolling();
+	}
+
+	loadDeferFailStatus(): void {
+		this.store.setDeferFailLoading(true);
+		this.api
+			.deferFailStatus()
+			.pipe(takeUntilDestroyed(this.destroyRef))
+			.subscribe({
+				next: (status) => {
+					this.store.setDeferFailStatus(status);
+					this.store.setDeferFailLoading(false);
+				},
+				error: () => {
+					this.store.setDeferFailLoading(false);
+					this.errorHandler.showError(
+						'Defer/Fail',
+						'No se pudo cargar el estado defer/fail',
+					);
+				},
+			});
+	}
+
+	setDeferFailAutoRefresh(enabled: boolean): void {
+		this.store.setDeferFailAutoRefresh(enabled);
+		this.storage.setDeferFailWidgetAutoRefresh(enabled);
+		if (enabled) this.startDeferFailPolling();
+		else this.stopDeferFailPolling();
+	}
+
+	setDeferFailCollapsed(collapsed: boolean): void {
+		this.store.setDeferFailCollapsed(collapsed);
+		this.storage.setDeferFailWidgetCollapsed(collapsed);
+	}
+
+	private startDeferFailPolling(): void {
+		if (this.deferFailPollHandle) return;
+		this.deferFailPollHandle = setInterval(
+			() => this.loadDeferFailStatus(),
+			DEFER_FAIL_POLL_INTERVAL_MS,
+		);
+	}
+
+	private stopDeferFailPolling(): void {
+		if (this.deferFailPollHandle) {
+			clearInterval(this.deferFailPollHandle);
+			this.deferFailPollHandle = null;
 		}
 	}
 

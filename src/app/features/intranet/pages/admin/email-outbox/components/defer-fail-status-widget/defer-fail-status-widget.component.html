@@ -1,0 +1,200 @@
+<!-- #region Widget container -->
+<section
+	class="defer-fail-widget"
+	[class.defer-fail-widget--critical]="status()?.status === 'CRITICAL'"
+	[class.defer-fail-widget--warning]="status()?.status === 'WARNING'"
+	[attr.aria-busy]="loading()"
+>
+	<!-- #region Header con semáforo + controles -->
+	<header class="defer-fail-widget__header">
+		<button
+			type="button"
+			class="defer-fail-widget__toggle"
+			(click)="onCollapseToggle()"
+			[attr.aria-expanded]="!collapsed()"
+			[attr.aria-label]="
+				collapsed() ? 'Expandir estado defer/fail' : 'Contraer estado defer/fail'
+			"
+		>
+			<i
+				class="pi"
+				[class.pi-chevron-down]="!collapsed()"
+				[class.pi-chevron-right]="collapsed()"
+			></i>
+			<span class="defer-fail-widget__title">Defer / Fail (cPanel)</span>
+			@if (hasData()) {
+				<p-tag [value]="levelLabel()" [severity]="levelSeverity()" [icon]="levelIcon()" />
+			}
+		</button>
+
+		<div class="defer-fail-widget__actions">
+			<label class="defer-fail-widget__autorefresh">
+				<span>Auto-refresh 60s</span>
+				<p-toggleswitch
+					[ngModel]="autoRefresh()"
+					(ngModelChange)="onAutoRefreshToggle($event)"
+					inputId="defer-fail-autorefresh"
+				/>
+			</label>
+			<button
+				pButton
+				icon="pi pi-refresh"
+				class="p-button-outlined p-button-sm"
+				(click)="onRefreshClick()"
+				pTooltip="Refrescar ahora"
+				tooltipPosition="top"
+				[loading]="loading()"
+				[pt]="{ root: { 'aria-label': 'Refrescar estado defer/fail' } }"
+			></button>
+		</div>
+	</header>
+	<!-- #endregion -->
+
+	<!-- #region Body colapsable -->
+	@if (!collapsed()) {
+		@if (showTelemetryWarning()) {
+			<div class="defer-fail-widget__telemetry-warning" role="alert">
+				<i class="pi pi-exclamation-triangle"></i>
+				<span>
+					CRITICAL con contadores en 0: probable error interno del backend.
+					Verificar logs del servidor (INV-S07).
+				</span>
+			</div>
+		}
+
+		@if (hasData(); as _) {
+			<!-- #region Sección 1 — Hora actual vs techo cPanel -->
+			<div class="defer-fail-section">
+				<h4 class="defer-fail-section__title label-uppercase">Hora actual vs techo cPanel</h4>
+				<div class="defer-fail-hour">
+					<div class="defer-fail-hour__value">
+						<span class="defer-fail-hour__count">
+							{{ status()!.currentHour.deferFailCount }}
+						</span>
+						<span class="defer-fail-hour__threshold">
+							/ {{ status()!.currentHour.threshold }}
+						</span>
+						<span class="defer-fail-hour__percent">
+							({{ status()!.currentHour.percentUsed | number: '1.0-0' }}%)
+						</span>
+					</div>
+					<div class="defer-fail-hour__meta">
+						<span>
+							Hora base:
+							{{ status()!.currentHour.hourStart | date: 'HH:mm' }}
+						</span>
+					</div>
+				</div>
+			</div>
+			<!-- #endregion -->
+
+			<!-- #region Sección 2 — Breakdown 24h -->
+			<div class="defer-fail-section">
+				<h4 class="defer-fail-section__title label-uppercase">Últimas 24h ({{ status()!.last24h.total }})</h4>
+				<div class="defer-fail-grid">
+					<!-- Correctos + en vuelo -->
+					<div class="defer-fail-stat defer-fail-stat--ok">
+						<span class="defer-fail-stat__label">Enviados</span>
+						<span class="defer-fail-stat__value">{{ status()!.last24h.sent }}</span>
+					</div>
+					<div class="defer-fail-stat defer-fail-stat--info">
+						<span class="defer-fail-stat__label">Pendientes</span>
+						<span class="defer-fail-stat__value">{{ status()!.last24h.pending }}</span>
+					</div>
+					<div class="defer-fail-stat defer-fail-stat--retry" pTooltip="Cola que migración a retry manual deberá resolver" tooltipPosition="top">
+						<span class="defer-fail-stat__label">Retrying</span>
+						<span class="defer-fail-stat__value">{{ status()!.last24h.retrying }}</span>
+					</div>
+
+					<!-- Cuenta para cPanel -->
+					<div class="defer-fail-stat defer-fail-stat--cpanel">
+						<span class="defer-fail-stat__label">Throttle host</span>
+						<span class="defer-fail-stat__value">{{ status()!.last24h.failedThrottleHost }}</span>
+						<span class="defer-fail-stat__hint">cuenta cPanel</span>
+					</div>
+					<div class="defer-fail-stat defer-fail-stat--cpanel">
+						<span class="defer-fail-stat__label">Otros fallos SMTP</span>
+						<span class="defer-fail-stat__value">{{ status()!.last24h.failedOther }}</span>
+						<span class="defer-fail-stat__hint">cuenta cPanel</span>
+					</div>
+
+					<!-- No cuenta para cPanel (rechazados pre-SMTP) -->
+					<div class="defer-fail-stat defer-fail-stat--pre-smtp">
+						<span class="defer-fail-stat__label">Dirección inválida</span>
+						<span class="defer-fail-stat__value">{{ status()!.last24h.failedInvalidAddress }}</span>
+						<span class="defer-fail-stat__hint">no cuenta</span>
+					</div>
+					<div class="defer-fail-stat defer-fail-stat--pre-smtp">
+						<span class="defer-fail-stat__label">Sin correo</span>
+						<span class="defer-fail-stat__value">{{ status()!.last24h.failedNoEmail }}</span>
+						<span class="defer-fail-stat__hint">no cuenta</span>
+					</div>
+					<div class="defer-fail-stat defer-fail-stat--pre-smtp">
+						<span class="defer-fail-stat__label">Blacklisted</span>
+						<span class="defer-fail-stat__value">{{ status()!.last24h.failedBlacklisted }}</span>
+						<span class="defer-fail-stat__hint">no cuenta</span>
+					</div>
+				</div>
+			</div>
+			<!-- #endregion -->
+
+			<!-- #region Sección 3 — Resumen blacklist -->
+			<div class="defer-fail-section">
+				<h4 class="defer-fail-section__title label-uppercase">Blacklist activa</h4>
+				@if (blacklistEmpty()) {
+					<div class="defer-fail-widget__empty">
+						<i class="pi pi-check-circle"></i>
+						<span>Sin bloqueos activos</span>
+					</div>
+				} @else {
+					<div class="defer-fail-grid defer-fail-grid--blacklist">
+						<div class="defer-fail-stat defer-fail-stat--total">
+							<span class="defer-fail-stat__label">Total activos</span>
+							<span class="defer-fail-stat__value">{{ status()!.blacklist.totalActivos }}</span>
+						</div>
+						<div class="defer-fail-stat">
+							<span class="defer-fail-stat__label">Bounce 5xx</span>
+							<span class="defer-fail-stat__value">{{ status()!.blacklist.byReasonBounce5xx }}</span>
+						</div>
+						<div class="defer-fail-stat">
+							<span class="defer-fail-stat__label">Manual</span>
+							<span class="defer-fail-stat__value">{{ status()!.blacklist.byReasonManual }}</span>
+						</div>
+						<div class="defer-fail-stat">
+							<span class="defer-fail-stat__label">Carga masiva</span>
+							<span class="defer-fail-stat__value">{{ status()!.blacklist.byReasonBulkImport }}</span>
+						</div>
+						<div class="defer-fail-stat">
+							<span class="defer-fail-stat__label">Formato inválido</span>
+							<span class="defer-fail-stat__value">{{ status()!.blacklist.byReasonFormatInvalid }}</span>
+						</div>
+					</div>
+					@if (status()!.blacklist.oldestEntry || status()!.blacklist.newestEntry) {
+						<div class="defer-fail-blacklist-meta">
+							@if (status()!.blacklist.oldestEntry) {
+								<span>
+									Más antiguo:
+									{{ status()!.blacklist.oldestEntry | date: 'dd/MM/yyyy HH:mm' }}
+								</span>
+							}
+							@if (status()!.blacklist.newestEntry) {
+								<span>
+									Más reciente:
+									{{ status()!.blacklist.newestEntry | date: 'dd/MM/yyyy HH:mm' }}
+								</span>
+							}
+						</div>
+					}
+				}
+			</div>
+			<!-- #endregion -->
+		} @else {
+			<div class="defer-fail-widget__empty" aria-live="polite">
+				<i class="pi pi-spin pi-spinner"></i>
+				<span>Cargando estado defer/fail...</span>
+			</div>
+		}
+	}
+	<!-- #endregion -->
+</section>
+<!-- #endregion -->

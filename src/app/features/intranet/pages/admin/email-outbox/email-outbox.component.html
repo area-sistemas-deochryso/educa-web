@@ -30,6 +30,20 @@
 }
 <!-- #endregion -->
 
+<!-- #region Defer/fail status widget (Plan 22 Chat B / Plan 29 Chat 2.6, feature flag) -->
+@if (deferFailWidgetEnabled) {
+	<app-defer-fail-status-widget
+		[status]="vm().deferFailStatus"
+		[loading]="vm().deferFailLoading"
+		[autoRefresh]="vm().deferFailAutoRefresh"
+		[collapsed]="vm().deferFailCollapsed"
+		(refresh)="onDeferFailRefresh()"
+		(autoRefreshChange)="onDeferFailAutoRefreshChange($event)"
+		(collapsedChange)="onDeferFailCollapsedChange($event)"
+	/>
+}
+<!-- #endregion -->
+
 <!-- #region Filtros -->
 <app-email-outbox-filters
 	[filterTipo]="vm().filterTipo"

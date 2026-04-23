@@ -12,6 +12,7 @@ import { EmailOutboxFiltersComponent } from './components/email-outbox-filters/e
 import { EmailOutboxTableComponent } from './components/email-outbox-table/email-outbox-table.component';
 import { EmailOutboxChartComponent } from './components/email-outbox-chart/email-outbox-chart.component';
 import { ThrottleStatusWidgetComponent } from './components/throttle-status-widget/throttle-status-widget.component';
+import { DeferFailStatusWidgetComponent } from './components/defer-fail-status-widget/defer-fail-status-widget.component';
 
 import { EmailOutboxLista } from '@data/models/email-outbox.models';
 
@@ -28,6 +29,7 @@ import { EmailOutboxLista } from '@data/models/email-outbox.models';
 		EmailOutboxTableComponent,
 		EmailOutboxChartComponent,
 		ThrottleStatusWidgetComponent,
+		DeferFailStatusWidgetComponent,
 	],
 	templateUrl: './email-outbox.component.html',
 	styleUrl: './email-outbox.component.scss',
@@ -44,6 +46,7 @@ export class EmailOutboxComponent {
 	readonly vm = this.dataFacade.vm;
 	readonly tableSkeletonColumns = EmailOutboxTableComponent.skeletonColumns;
 	readonly throttleWidgetEnabled = environment.features.emailOutboxThrottleWidget;
+	readonly deferFailWidgetEnabled = environment.features.emailOutboxDeferFailWidget;
 	// #endregion
 
 	// #region Lifecycle
@@ -51,6 +54,9 @@ export class EmailOutboxComponent {
 		this.dataFacade.loadData();
 		if (this.throttleWidgetEnabled) {
 			this.dataFacade.initThrottleWidget();
+		}
+		if (this.deferFailWidgetEnabled) {
+			this.dataFacade.initDeferFailWidget();
 		}
 	}
 	// #endregion
@@ -108,6 +114,18 @@ export class EmailOutboxComponent {
 
 	onThrottleCollapsedChange(collapsed: boolean): void {
 		this.dataFacade.setThrottleCollapsed(collapsed);
+	}
+
+	onDeferFailRefresh(): void {
+		this.dataFacade.loadDeferFailStatus();
+	}
+
+	onDeferFailAutoRefreshChange(enabled: boolean): void {
+		this.dataFacade.setDeferFailAutoRefresh(enabled);
+	}
+
+	onDeferFailCollapsedChange(collapsed: boolean): void {
+		this.dataFacade.setDeferFailCollapsed(collapsed);
 	}
 
 	async onExportExcel(): Promise<void> {

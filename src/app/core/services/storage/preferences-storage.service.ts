@@ -33,6 +33,10 @@ const PREFERENCES_KEYS = {
 	// Plan 22 Chat B — throttle status widget
 	THROTTLE_WIDGET_AUTO_REFRESH: 'educa_pref_throttle_widget_auto_refresh',
 	THROTTLE_WIDGET_COLLAPSED: 'educa_pref_throttle_widget_collapsed',
+
+	// Plan 22 Chat B / Plan 29 Chat 2.6 — defer/fail status widget
+	DEFER_FAIL_WIDGET_AUTO_REFRESH: 'educa_pref_defer_fail_widget_auto_refresh',
+	DEFER_FAIL_WIDGET_COLLAPSED: 'educa_pref_defer_fail_widget_collapsed',
 } as const;
 
 /**
@@ -459,6 +463,34 @@ export class PreferencesStorageService {
 
 	setThrottleWidgetCollapsed(collapsed: boolean): void {
 		this.setItem(PREFERENCES_KEYS.THROTTLE_WIDGET_COLLAPSED, collapsed.toString());
+	}
+
+	// #endregion
+	// #region DEFER/FAIL STATUS WIDGET (Plan 22 Chat B / Plan 29 Chat 2.6)
+
+	/**
+	 * Whether the defer/fail status widget auto-refreshes every 60 seconds.
+	 * Defaults to false — el admin opta in conscientemente antes de disparar
+	 * polling del endpoint agregador (EmailOutbox + EmailBlacklist por llamada).
+	 */
+	getDeferFailWidgetAutoRefresh(): boolean {
+		return this.getItem(PREFERENCES_KEYS.DEFER_FAIL_WIDGET_AUTO_REFRESH) === 'true';
+	}
+
+	setDeferFailWidgetAutoRefresh(enabled: boolean): void {
+		this.setItem(PREFERENCES_KEYS.DEFER_FAIL_WIDGET_AUTO_REFRESH, enabled.toString());
+	}
+
+	/**
+	 * Whether the defer/fail widget starts collapsed on page load.
+	 * Defaults to false (expanded) — el admin quiere ver el estado al entrar.
+	 */
+	getDeferFailWidgetCollapsed(): boolean {
+		return this.getItem(PREFERENCES_KEYS.DEFER_FAIL_WIDGET_COLLAPSED) === 'true';
+	}
+
+	setDeferFailWidgetCollapsed(collapsed: boolean): void {
+		this.setItem(PREFERENCES_KEYS.DEFER_FAIL_WIDGET_COLLAPSED, collapsed.toString());
 	}
 
 	// #endregion

@@ -8,6 +8,7 @@ import {
 	EmailOutboxLista,
 	EmailOutboxTendencia,
 } from '@data/models/email-outbox.models';
+import { DeferFailStatus } from '../models/defer-fail-status.models';
 import { ThrottleStatus } from '../models/throttle-status.models';
 
 @Injectable({ providedIn: 'root' })
@@ -76,6 +77,12 @@ export class EmailOutboxApiService {
 	// * El interceptor global desempaqueta ApiResponse<T>, por eso el genérico es T directo.
 	throttleStatus(): Observable<ThrottleStatus> {
 		return this.http.get<ThrottleStatus>(`${this.baseUrl}/throttle-status`);
+	}
+
+	// * Plan 22 Chat B / Plan 29 Chat 2.6 — snapshot agregado del techo
+	// * defer/fail cPanel + breakdown 24h + blacklist resumen.
+	deferFailStatus(): Observable<DeferFailStatus> {
+		return this.http.get<DeferFailStatus>(`${this.baseUrl}/defer-fail-status`);
 	}
 	// #endregion
 

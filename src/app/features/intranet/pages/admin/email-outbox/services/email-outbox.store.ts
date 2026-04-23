@@ -7,6 +7,7 @@ import {
 	EmailOutboxTendencia,
 	EmailOutboxTipo,
 } from '@data/models/email-outbox.models';
+import { DeferFailStatus } from '../models/defer-fail-status.models';
 import { ThrottleStatus } from '../models/throttle-status.models';
 
 @Injectable({ providedIn: 'root' })
@@ -48,6 +49,12 @@ export class EmailOutboxStore {
 	private readonly _throttleLoading = signal(false);
 	private readonly _throttleAutoRefresh = signal(false);
 	private readonly _throttleCollapsed = signal(false);
+
+	// Plan 22 Chat B / Plan 29 Chat 2.6 — defer/fail status widget (techo cPanel + 24h + blacklist)
+	private readonly _deferFailStatus = signal<DeferFailStatus | null>(null);
+	private readonly _deferFailLoading = signal(false);
+	private readonly _deferFailAutoRefresh = signal(false);
+	private readonly _deferFailCollapsed = signal(false);
 	// #endregion
 
 	// #region Lecturas públicas
@@ -72,6 +79,10 @@ export class EmailOutboxStore {
 	readonly throttleLoading = this._throttleLoading.asReadonly();
 	readonly throttleAutoRefresh = this._throttleAutoRefresh.asReadonly();
 	readonly throttleCollapsed = this._throttleCollapsed.asReadonly();
+	readonly deferFailStatus = this._deferFailStatus.asReadonly();
+	readonly deferFailLoading = this._deferFailLoading.asReadonly();
+	readonly deferFailAutoRefresh = this._deferFailAutoRefresh.asReadonly();
+	readonly deferFailCollapsed = this._deferFailCollapsed.asReadonly();
 	// #endregion
 
 	// #region Computed
@@ -114,6 +125,10 @@ export class EmailOutboxStore {
 		throttleLoading: this._throttleLoading(),
 		throttleAutoRefresh: this._throttleAutoRefresh(),
 		throttleCollapsed: this._throttleCollapsed(),
+		deferFailStatus: this._deferFailStatus(),
+		deferFailLoading: this._deferFailLoading(),
+		deferFailAutoRefresh: this._deferFailAutoRefresh(),
+		deferFailCollapsed: this._deferFailCollapsed(),
 	}));
 	// #endregion
 
@@ -168,6 +183,23 @@ export class EmailOutboxStore {
 
 	setThrottleCollapsed(collapsed: boolean): void {
 		this._throttleCollapsed.set(collapsed);
+	}
+
+	// * Plan 22 Chat B / Plan 29 Chat 2.6 — defer/fail status
+	setDeferFailStatus(status: DeferFailStatus | null): void {
+		this._deferFailStatus.set(status);
+	}
+
+	setDeferFailLoading(loading: boolean): void {
+		this._deferFailLoading.set(loading);
+	}
+
+	setDeferFailAutoRefresh(enabled: boolean): void {
+		this._deferFailAutoRefresh.set(enabled);
+	}
+
+	setDeferFailCollapsed(collapsed: boolean): void {
+		this._deferFailCollapsed.set(collapsed);
 	}
 	// #endregion
 

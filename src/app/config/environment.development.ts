@@ -28,6 +28,7 @@ export const environment = {
 		feedbackReport: true,
 		rateLimitMonitoring: true,
 		emailOutboxThrottleWidget: true,
+		emailOutboxDeferFailWidget: true,
 	},
 
 	// Debug panels (solo development)

@@ -315,6 +315,24 @@ export class StorageService {
 	}
 	// #endregion
 
+	// #region DEFER/FAIL STATUS WIDGET (Plan 22 Chat B / Plan 29 Chat 2.6)
+	getDeferFailWidgetAutoRefresh(): boolean {
+		return this.preferences.getDeferFailWidgetAutoRefresh();
+	}
+
+	setDeferFailWidgetAutoRefresh(enabled: boolean): void {
+		this.preferences.setDeferFailWidgetAutoRefresh(enabled);
+	}
+
+	getDeferFailWidgetCollapsed(): boolean {
+		return this.preferences.getDeferFailWidgetCollapsed();
+	}
+
+	setDeferFailWidgetCollapsed(collapsed: boolean): void {
+		this.preferences.setDeferFailWidgetCollapsed(collapsed);
+	}
+	// #endregion
+
 	// #region SYNC FALLBACKS — localStorage cuando IndexedDB no está disponible
 	private _getSyncFallback<T>(key: string): T | null {
 		try {
