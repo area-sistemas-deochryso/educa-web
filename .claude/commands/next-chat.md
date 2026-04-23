@@ -6,6 +6,23 @@ Genera un archivo numerado en `educa-web/.claude/chats/NNN-plan-X-chat-Y-<repo>-
 
 Al final del chat actual, cuando se sabe qué sigue (siguiente subfase, próximo chat del plan, tarea pendiente). El usuario abre un chat nuevo y pega el contenido o referencia `@.claude/chats/NNN-...md`.
 
+## Fuente de autoridad — la cola del maestro
+
+**Antes de inferir qué chat generar, leer la sección `📋 Próximos 3 chats (cola ordenada)` de `.claude/plan/maestro.md`**. Esa sección es la fuente de verdad.
+
+Comportamiento según estado de la cola:
+
+| Estado cola | Acción |
+|---|---|
+| 1+ items en la cola con Tipo ≠ OPS | Tomar el primer item sin preguntar, generar brief directo. |
+| Primer item es Tipo **OPS** (coordinación externa, no código) | Saltarlo (no genera brief) y tomar el siguiente. Avisar al usuario: "El primer item es OPS, genero el siguiente de la cola. ¿OK?". |
+| Cola vacía | Preguntar al usuario cuál es el siguiente antes de generar. Ofrecer candidatos basados en estado del maestro (Foco + frentes abiertos). |
+| Empate / ambigüedad explícita en la cola | Listar opciones + razón y pedir decisión. |
+
+**Nunca** inferir prioridad leyendo múltiples archivos históricos en `chats/closed/` cuando la cola del maestro está poblada — eso significa que la cola está desactualizada, y en ese caso la corrección es **actualizar la cola primero**, no improvisar.
+
+Después de generar el brief, recordar al usuario mantener la cola: "Agregá el nuevo trabajo derivado al final de la cola del maestro si aplica."
+
 ## Reglas
 
 - El archivo es **autocontenido**: el chat nuevo no debe necesitar leer nada externo para empezar (salvo el plan file referenciado).

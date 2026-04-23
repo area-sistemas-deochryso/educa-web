@@ -48,6 +48,26 @@
 | **Deploy readiness** | 🟢 Estable | FE (Netlify) + BE (Azure) desplegados 2026-04-16. 2026-04-17 sin incidentes reportados. |
 | **Production reliability** | 🔴 Sin red | Falta: tests de contrato, auditoría endpoints, error trace, fallbacks P0 |
 
+## 📋 Próximos 3 chats (cola ordenada)
+
+> **Qué es esto**: cola explícita de los próximos 3 chats a abordar, ordenados por prioridad real (no cronológica). Fuente de verdad para `/next-chat` — si esta cola está poblada, el comando toma el primer item sin preguntar; si está vacía o hay empate, pregunta al usuario.
+>
+> **Regla de mantenimiento**: al cerrar un chat, actualizar esta cola (remover el item cerrado + agregar uno nuevo al final si se descubrió trabajo derivado). Si un chat en la cola se vuelve obsoleto por un cambio de rumbo, eliminarlo aquí aunque no se haya ejecutado.
+>
+> **Formato**: `N. [Plan·Chat·Repo·Tipo] — scope — razón de prioridad`. Tipo: BE / FE / OPS / docs / design. OPS no genera brief (no es código).
+
+1. **[Plan 22 · Chat B · `educa-web` · FE]** — widget `DeferFailStatus` en `/intranet/admin/email-outbox` — brief `028-plan-22-chat-b-fe-defer-fail-status-widget.md` ya generado. Desbloqueado por Chat 2.6 BE recién cerrado. Alto valor (completa admin UI de correos) y bajo costo (el widget gemelo `ThrottleStatusWidget` ya existe — patrón a copiar).
+2. **[Plan 29 · Chat 3 · `—` · OPS]** — inspección CrossChex + negociación con hosting para subir `max_defer_fail_percentage` (5/h → 25-30/h). **No es código — no requiere brief**. Bloquea Chat 4 docs (los invariantes `INV-MAIL04` quedan con threshold final). Depende de tu coordinación con el admin cPanel.
+3. **[Plan 29 · Chat 4 · `educa-web` · docs]** — formalizar `INV-MAIL01/02/03/04` en nueva sección `§18 Correos salientes y protección del canal SMTP` de `.claude/rules/business-rules.md` + registro de invariantes §15. Cierre documental del Plan 29. Ejecutar **después** de Chat 3 OPS para anclar el threshold negociado.
+
+**Notas**:
+
+- Chat 3 OPS lo ejecuta el usuario con el hosting; cuando cierre, reabrir este orden.
+- Chat B FE del Plan 22 puede arrancar ya — no depende de OPS.
+- Frentes abiertos sin bloqueo (Plan 26 F2 Chat 2, Design System F5.3, Carril D Olas 2+) no entran aquí hasta que desplazen prioridad a uno de los 3 ítems.
+
+---
+
 **Foco (actualizado 2026-04-23, post-cierre Plan 29 Chat 2.6)**: 🟢 **Plan 29 Chat 2.6 BE ✅ cerrado** (commit `7b2a962` en Educa.API `master`). Endpoint `GET /api/sistema/email-outbox/defer-fail-status` expone agregados empaquetados para el widget admin: contador defer/fail hora actual vs techo cPanel (threshold configurable `Email:DeferFailThresholdPerHour`, default 5, banda OK/WARNING/CRITICAL), breakdown 24h por `EO_Estado` + `EO_TipoFallo` (incluye `Retrying` como métrica separada), resumen blacklist por motivo. Service con 3 queries secuenciales + fallback-CRITICAL (INV-S07). Route `/api/sistema/email-outbox/*` coherente con `EmailBlacklistController`. Sin rate limit especial (GlobalLimiter basta). **+21 tests** → **1274 BE verdes** (baseline 1253). **Deuda D4 cerrada** y **Plan 22 Chat B desbloqueado** — widget FE puede consumir el endpoint. 🟢 **Plan 29 Chat 2.5 BE ✅ cerrado 2026-04-23** (commit `0580983`, +11 tests, 1253 verdes). 🟢 **Plan 29 Chat 2 BE ✅ cerrado 2026-04-22** (commit `674e86a`, +35 tests). 🔴 **Siguiente por prioridad**: Chat 3 OPS (inspección CrossChex + negociación umbral hosting con el admin cPanel) + Chat 4 docs (§18 `business-rules.md` con `INV-MAIL01/02/03/04`). Post-deploy: 48-72h monitoreo 0 `SslHandshakeException` + contador defer/fail cPanel bajando antes de Chat 4 docs. Señal anotada para chat futuro: retry automático del worker puede ser peligroso con threshold bajo — evaluar migración a retry manual (el endpoint expone `Retrying` como métrica separada justamente para esto). 🟢 **Plan 28 Chat 3 desbloqueado**. 🟢 **Plan 27 cerrado en docs + código completo** — `INV-C11` formalizado, pendiente solo validación del jefe post-deploy. **Frentes desbloqueados**: Plan 22 Chat B (widget FE ya puede consumir `/api/sistema/email-outbox/defer-fail-status`). **Frentes abiertos sin bloqueo**: Plan 26 F2 Chat 2, Design System F5.3, Carril D Olas 2+.
 
 ---
