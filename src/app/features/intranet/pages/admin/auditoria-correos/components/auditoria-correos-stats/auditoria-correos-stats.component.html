@@ -1,0 +1,45 @@
+<section class="stats-section">
+	<div class="stat-card">
+		<div class="stat-content">
+			<span class="stat-label">Total</span>
+			<span class="stat-value">{{ stats().total | number }}</span>
+			<span class="stat-sublabel">correos inválidos</span>
+		</div>
+		<div class="stat-icon">
+			<i class="pi pi-envelope"></i>
+		</div>
+	</div>
+
+	<div class="stat-card">
+		<div class="stat-content">
+			<span class="stat-label">Estudiantes</span>
+			<span class="stat-value">{{ stats().estudiantes | number }}</span>
+			<span class="stat-sublabel">correos de apoderado</span>
+		</div>
+		<div class="stat-icon">
+			<i class="pi pi-user"></i>
+		</div>
+	</div>
+
+	<div class="stat-card">
+		<div class="stat-content">
+			<span class="stat-label">Apoderados</span>
+			<span class="stat-value">{{ stats().apoderados | number }}</span>
+			<span class="stat-sublabel">correo directo</span>
+		</div>
+		<div class="stat-icon">
+			<i class="pi pi-users"></i>
+		</div>
+	</div>
+
+	<div class="stat-card">
+		<div class="stat-content">
+			<span class="stat-label">Profesores</span>
+			<span class="stat-value">{{ stats().profesores | number }}</span>
+			<span class="stat-sublabel">correo institucional</span>
+		</div>
+		<div class="stat-icon">
+			<i class="pi pi-briefcase"></i>
+		</div>
+	</div>
+</section>

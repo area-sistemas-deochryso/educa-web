@@ -1,0 +1,59 @@
+<!-- #region Header -->
+<app-page-header
+	icon="pi pi-envelope"
+	title="Auditoría de Correos"
+	subtitle="Correos activos con formato inválido que EmailOutboxService rechaza silenciosamente (INV-MAIL01)"
+>
+	<button
+		pButton
+		icon="pi pi-refresh"
+		label="Refrescar"
+		class="p-button-outlined p-button-sm"
+		(click)="refresh()"
+		[loading]="vm().loading"
+	></button>
+</app-page-header>
+<!-- #endregion -->
+
+@if (!vm().tableReady) {
+	<app-auditoria-correos-skeleton />
+} @else {
+	<!-- #region Banner informativo sobre caracteres invisibles (B9) -->
+	<div class="info-banner">
+		<i class="pi pi-info-circle"></i>
+		<div>
+			<p>
+				Estos correos existen en tus registros pero <strong>no pasan el validador</strong>.
+				El caso más común son <strong>caracteres invisibles</strong> (espacios no rompibles,
+				zero-width space) o tildes/ñ que el correo no ve pero el validador sí.
+			</p>
+			<p>
+				Al ir a Usuarios desde la tabla, copiamos el nombre al portapapeles —
+				pégalo en el buscador para ubicar el registro y corregir el dato en la fuente.
+				Tip: pega el correo viejo en Notepad++ o VS Code con whitespace visible
+				para detectar los caracteres invisibles.
+			</p>
+		</div>
+	</div>
+	<!-- #endregion -->
+
+	<!-- #region Stats + Filtros + Tabla -->
+	<app-auditoria-correos-stats [stats]="vm().stats" />
+
+	<app-auditoria-correos-filters
+		[searchTerm]="vm().searchTerm"
+		[filterTipo]="vm().filterTipo"
+		[hasActiveFilters]="vm().hasActiveFilters"
+		(searchChange)="onSearchChange($event)"
+		(filterTipoChange)="onFilterTipoChange($event)"
+		(clearFilters)="onClearFilters()"
+	/>
+
+	<app-auditoria-correos-table
+		[items]="vm().items"
+		[universeTotal]="vm().universeTotal"
+		[hasActiveFilters]="vm().hasActiveFilters"
+		(navegarUsuario)="onNavegarUsuario($event)"
+	/>
+	<!-- #endregion -->
+}

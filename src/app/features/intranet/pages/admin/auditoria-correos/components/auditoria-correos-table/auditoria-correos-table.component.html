@@ -1,0 +1,81 @@
+<section class="table-section">
+	<p-table
+		[value]="items()"
+		[rowHover]="true"
+		styleClass="p-datatable-sm"
+	>
+		<ng-template #header>
+			<tr>
+				<th style="width: 120px">TIPO</th>
+				<th style="width: 110px">DNI</th>
+				<th>NOMBRE COMPLETO</th>
+				<th style="width: 220px">CORREO ACTUAL</th>
+				<th style="width: 150px">FALLO</th>
+				<th>RAZÓN</th>
+				<th style="width: 80px">ACCIONES</th>
+			</tr>
+		</ng-template>
+
+		<ng-template #body let-item>
+			<tr>
+				<td>
+					<p-tag [value]="item.tipoOrigen" styleClass="tag-neutral" />
+				</td>
+				<td>
+					<span class="dni-mono">{{ item.dni }}</span>
+				</td>
+				<td>
+					<span class="nombre">{{ item.nombreCompleto }}</span>
+				</td>
+				<td>
+					<span class="correo-mono" [pTooltip]="item.correoActual" tooltipPosition="top">
+						{{ item.correoActual }}
+					</span>
+				</td>
+				<td>
+					<p-tag
+						[value]="getTipoFalloLabel(item.tipoFallo)"
+						[severity]="getTipoFalloSeverity(item.tipoFallo)"
+					/>
+				</td>
+				<td>
+					<span class="razon" [pTooltip]="item.razon" tooltipPosition="top">
+						{{ item.razon }}
+					</span>
+				</td>
+				<td class="col-actions">
+					<button
+						pButton
+						icon="pi pi-external-link"
+						class="p-button-rounded p-button-text p-button-info"
+						pTooltip="Ir a Usuarios (copia el nombre al portapapeles)"
+						tooltipPosition="top"
+						(click)="onNavegar(item)"
+						[pt]="{ root: { 'aria-label': 'Ir al registro en Usuarios' } }"
+					></button>
+				</td>
+			</tr>
+		</ng-template>
+
+		<ng-template #emptymessage>
+			<tr>
+				<td colspan="7" class="empty-message">
+					<div class="empty-state">
+						@if (hasActiveFilters()) {
+							<i class="pi pi-filter-slash"></i>
+							<p>No se encontraron resultados con los filtros aplicados.</p>
+							<span>Prueba limpiando los filtros.</span>
+						} @else if (universeTotal() === 0) {
+							<i class="pi pi-check-circle"></i>
+							<p>No hay correos inválidos — todo está en orden.</p>
+							<span>El universo actual pasa el validador.</span>
+						} @else {
+							<i class="pi pi-inbox"></i>
+							<p>Sin coincidencias.</p>
+						}
+					</div>
+				</td>
+			</tr>
+		</ng-template>
+	</p-table>
+</section>

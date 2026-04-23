@@ -1,0 +1,33 @@
+<div class="filters-bar">
+	<div class="search-box">
+		<i class="pi pi-search"></i>
+		<input
+			type="text"
+			pInputText
+			placeholder="Buscar por nombre, DNI o correo..."
+			[ngModel]="searchTerm()"
+			(ngModelChange)="onSearchChange($event)"
+		/>
+	</div>
+
+	<div class="filter-dropdowns">
+		<p-select
+			[options]="tipoOptions"
+			[ngModel]="filterTipo()"
+			(ngModelChange)="onTipoChange($event)"
+			placeholder="Tipo"
+			appendTo="body"
+		/>
+	</div>
+
+	<button
+		pButton
+		icon="pi pi-filter-slash"
+		class="p-button-text p-button-sm btn-clear"
+		pTooltip="Limpiar filtros"
+		tooltipPosition="top"
+		[disabled]="!hasActiveFilters()"
+		(click)="onClear()"
+		[pt]="{ root: { 'aria-label': 'Limpiar filtros' } }"
+	></button>
+</div>

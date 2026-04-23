@@ -1,3 +1,4 @@
+/* eslint-disable max-lines -- Razón: archivo central de rutas de la intranet; crece linealmente con cada feature nuevo registrado y cada spread condicional por feature flag. Fraccionarlo (ej: `intranet-admin.routes.ts`) es un refactor transversal y se posterga como deuda técnica menor. */
 // #region Imports
 import { Route, Routes } from '@angular/router';
 import { authGuard, permissionsGuard } from '@core/guards';
@@ -187,6 +188,18 @@ const experimentalRoutes: Route[] = [
 							(m) => m.RateLimitEventsComponent,
 						),
 					title: 'Intranet - Telemetría de Rate Limiting',
+				},
+			]
+		: []),
+	...(environment.features.auditoriaCorreos
+		? [
+				{
+					path: 'admin/auditoria-correos',
+					loadComponent: () =>
+						import('./pages/admin/auditoria-correos').then(
+							(m) => m.AuditoriaCorreosComponent,
+						),
+					title: 'Intranet - Auditoría de Correos',
 				},
 			]
 		: []),

@@ -30,6 +30,7 @@ export const PERMISOS = {
 	ADMIN_ERROR_LOGS: 'intranet/admin/trazabilidad-errores',
 	ADMIN_REPORTES_USUARIO: 'intranet/admin/reportes-usuario',
 	ADMIN_RATE_LIMIT_EVENTS: 'intranet/admin/rate-limit-events',
+	ADMIN_AUDITORIA_CORREOS: 'intranet/admin/auditoria-correos',
 	ADMIN_CAMPUS: 'intranet/admin/campus',
 	ADMIN_CURSOS: 'intranet/admin/cursos',
 	ADMIN_EVENTOS_CALENDARIO: 'intranet/admin/eventos-calendario',
