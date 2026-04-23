@@ -56,9 +56,9 @@
 >
 > **Formato**: `N. [Plan·Chat·Repo·Tipo] — scope — razón de prioridad`. Tipo: BE / FE / OPS / docs / design. OPS no genera brief (no es código).
 
-1. **[Plan 29 · Chat 3 · `—` · OPS]** — inspección CrossChex + negociación con hosting para subir `max_defer_fail_percentage` (5/h → 25-30/h). **No es código — no requiere brief**. Si OPS sube el techo, disparar micro-chat docs para swap de los 5 `<!-- TBD post-OPS -->` en `business-rules.md` y `INV-MAIL03/04`. Depende de tu coordinación con el admin cPanel.
-2. **[Plan 30 · Chat 1 · `Educa.API` · BE]** — Dashboard admin "correos del día" (`GET /api/sistema/email-outbox/dashboard-dia`). **Priorizado sobre Plan 24 Chat 3 FE** (decisión 2026-04-23): resuelve un dolor diario real — el admin hoy depende de 25+ queries SQL manuales para verificar correos y asistencia. Plan 30 F1 reemplaza Q1/Q3/Q4/Q8+D1/D4 del set SQL con un endpoint único. Brief en `.claude/chats/034-plan-30-f1-be-dashboard-correos-dia.md`.
-3. **[Plan 24 · Chat 3 · `educa-web` · FE]** — Frontend con `p-progressBar` + suscripción al `AsistenciaHub` en servicio singleton (sobrevive navegación). Consume `CrossChexSyncStatusDto` + eventos `"SyncProgress"` del hub (BE listo tras commit `513c6cc`). **Desplazado al #3 por Plan 30 F1**: el sync CrossChex ya funciona con polling hoy; la visibilidad admin es el dolor diario real. Reactivable tras cerrar Plan 30 F1.
+1. **[Plan 30 · Chat 2 · `educa-web` · FE]** — Pantalla admin del dashboard-dia (`/intranet/admin/email-outbox/dashboard-dia`) que consume el endpoint cerrado en Chat 1. **Reordenado por decisión del usuario 2026-04-23**: "si el back ya está, vamos al front" — el FE se adelanta antes que los Chats 3/4 BE del Plan 30 (gap asistencia, diagnóstico). Brief en `.claude/chats/035-plan-30-chat-2-fe-dashboard-correos-dia-page.md`.
+2. **[Plan 24 · Chat 3 · `educa-web` · FE]** — Frontend con `p-progressBar` + suscripción al `AsistenciaHub` en servicio singleton (sobrevive navegación). Consume `CrossChexSyncStatusDto` + eventos `"SyncProgress"` del hub (BE listo tras commit `513c6cc`). Asciende del slot #3 al #2 al cerrar Plan 30 Chat 1. Reactivable tras cerrar Plan 30 Chat 2 FE.
+3. **[Plan 30 · Chat 3 · `Educa.API` · BE]** — Gap asistencia-vs-correos: endpoint `GET /api/sistema/asistencia/diagnostico-correos-dia`. Antes numerado Chat 2 del Plan 30; se aborda después del FE cuando la pantalla muestre qué datos faltan.
 
 **Notas**:
 
@@ -696,7 +696,7 @@ El Director pierde 2+ minutos bloqueado cada vez que sincroniza (operación frec
 
 > **Origen**: 2026-04-23, sesión de cierre del Plan 24 Chat 2. El admin hoy depende de 25+ queries SQL manuales en SSMS para verificar el estado diario de correos y asistencia. Declarado "altamente impráctico" — bloquea autonomía del admin y consume tiempo del desarrollador que arma las queries cada día.
 > **Plan**: inline en este maestro (sin archivo separado).
-> **Estado**: 🆕 **Creado 2026-04-23**, 0% avanzado. Brief del Chat 1 listo en `.claude/chats/034-plan-30-f1-be-dashboard-correos-dia.md`.
+> **Estado**: 🟡 **En progreso 2026-04-23**, ~25% avanzado (Chat 1 de 4 ✅). Chat 1 F1.BE cerrado con commit `c8a0360` en Educa.API (1316 → 1330 tests). Brief del Chat 2 F2.FE (reordenado) listo en `.claude/chats/035-plan-30-chat-2-fe-dashboard-correos-dia-page.md`.
 
 ### Diagnóstico
 
@@ -713,17 +713,16 @@ Pantallas admin ya existentes (**no cubren este dolor**):
 
 ### Qué diseñar (4 chats)
 
-- **Chat 1 · F1.BE — Dashboard correos del día**: endpoint `GET /api/sistema/email-outbox/dashboard-dia?fecha={yyyy-MM-dd}` con DTO compuesto (Resumen + PorHora[] + PorTipo[] + BouncesAcumulados[]). Reemplaza Q1/Q3/Q4/Q8 + D1/D4. Brief listo.
+- **Chat 1 · F1.BE — Dashboard correos del día** ✅ **Cerrado 2026-04-23** (commit `c8a0360` en Educa.API): endpoint `GET /api/sistema/email-outbox/dashboard-dia?fecha={yyyy-MM-dd}` con DTO compuesto (Resumen + PorHora[] + PorTipo[] + BouncesAcumulados[]). Reemplaza Q1/Q3/Q4/Q8 + D1/D4.
 - **Chat 2 · F2.BE — Gap asistencia-vs-correos**: endpoint `GET /api/sistema/asistencia/diagnostico-correos-dia?fecha={yyyy-MM-dd}&sedeId={n}` que cruza `AsistenciaPersona` + `Estudiante` + `EmailOutbox` + `EmailBlacklist`. Responde: entradas marcadas, correos enviados, estudiantes sin correo apoderado, apoderados blacklisteados. Reemplaza verificación INV-C11 + D2/D3/D5.
 - **Chat 3 · F3.BE — Búsqueda diagnóstico por correo**: endpoint `GET /api/sistema/email-outbox/diagnostico?correo={email}` que retorna historia completa: últimos N intentos en outbox (+ archive), estado blacklist, a qué persona(s) pertenece (Estudiante/Profesor/Director). Reemplaza M1-M8.
-- **Chat 4 · F4.FE — Pantallas admin "Monitoreo avanzado"**: submenu `/intranet/admin/monitoreo/...` con 3 rutas consumiendo los 3 endpoints. Gráficas ligeras (Chart.js o PrimeNG chart). Drill-down entre pantallas (click en "6 sin correo" → abre diagnóstico).
+- **Chat 4 · F4.FE — Pantallas admin "Monitoreo avanzado"**: submenu `/intranet/admin/monitoreo/...` con 3 rutas consumiendo los 3 endpoints. Gráficas ligeras (Chart.js o PrimeNG chart). Drill-down entre pantallas (click en "6 sin correo" → abre diagnóstico). **Orden de ejecución reordenado 2026-04-23**: el FE se adelanta consumiendo solo el endpoint de Chat 1 (pantalla dashboard-dia, brief en `.claude/chats/035-plan-30-chat-2-fe-dashboard-correos-dia-page.md`). Los Chats 2/3 BE y la extensión del FE con sus endpoints quedan para iteraciones posteriores.
 
 ### Priorización
 
-- **F1 promovido a slot #2 de cola top 3** (decisión 2026-04-23): desplaza Plan 24 Chat 3 FE porque el dolor diario del admin es mayor que la UX pulida del sync CrossChex.
-- F2 → promover a #2 tras cerrar F1.
-- F3 → promover tras F2 o paralelizar con F4 FE (independientes).
-- F4 FE → último, cuando los 3 BE estén listos y el usuario vea el shape real.
+- **F1 ✅ cerrado 2026-04-23**, commit `c8a0360` en Educa.API (1316 → 1330 tests).
+- **F4 FE promovido al slot #1 de cola top 3** (decisión 2026-04-23: "si el back ya está, vamos al front"): la pantalla se ejecuta antes que F2/F3 BE para que el admin la vea funcional cuanto antes. Consume solo el endpoint de F1.
+- F2 y F3 BE quedan ejecutables en paralelo después del FE, cuando el usuario confirme qué datos adicionales pide la pantalla en uso real.
 
 ### Dependencias
 
