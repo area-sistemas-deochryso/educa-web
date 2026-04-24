@@ -34,35 +34,68 @@
 			}
 		</p-tabpanel>
 
-		<!-- Sub-tab 2: Detalle (3 tablas drill-down) -->
+		<!-- Sub-tab 2: Detalle (3 sub-sub-tabs, una tabla por tab) -->
 		<p-tabpanel value="detalle">
-			<div class="tables-stack">
-				<!-- Entradas sin correo enviado — la más importante, va primero -->
-				@if (vm().loading && !hasData()) {
-					<app-table-skeleton [columns]="entradasColumns" [rows]="8" />
-				} @else if (hasData()) {
-					<app-entradas-sin-correo-table [data]="vm().entradasSinCorreoEnviado" />
-				}
+			<p-tabs value="entradas" class="detalle-subtabs">
+				<p-tablist>
+					<p-tab value="entradas">
+						<i class="pi pi-sign-in"></i>
+						<span>Entradas sin correo</span>
+						@if (hasData() && vm().entradasSinCorreoEnviado.length > 0) {
+							<span class="tab-badge tab-badge--neutral">
+								{{ vm().entradasSinCorreoEnviado.length }}
+							</span>
+						}
+					</p-tab>
+					<p-tab value="estudiantes">
+						<i class="pi pi-user-minus"></i>
+						<span>Sin correo apoderado</span>
+						@if (hasData() && vm().estudiantesSinCorreo.length > 0) {
+							<span class="tab-badge tab-badge--neutral">
+								{{ vm().estudiantesSinCorreo.length }}
+							</span>
+						}
+					</p-tab>
+					<p-tab value="apoderados">
+						<i class="pi pi-ban"></i>
+						<span>Apoderados blacklisteados</span>
+						@if (hasData() && vm().apoderadosBlacklisteados.length > 0) {
+							<span class="tab-badge tab-badge--neutral">
+								{{ vm().apoderadosBlacklisteados.length }}
+							</span>
+						}
+					</p-tab>
+				</p-tablist>
 
-				<!-- Grid 2 columnas: estudiantes sin correo + apoderados blacklisteados -->
-				<div class="tables-grid">
-					<div class="tables-grid__left">
+				<p-tabpanels>
+					<!-- Entradas sin correo enviado — la razón "raíz" del gap -->
+					<p-tabpanel value="entradas">
 						@if (vm().loading && !hasData()) {
-							<app-table-skeleton [columns]="listaSimpleColumns" [rows]="5" />
+							<app-table-skeleton [columns]="entradasColumns" [rows]="8" />
+						} @else if (hasData()) {
+							<app-entradas-sin-correo-table [data]="vm().entradasSinCorreoEnviado" />
+						}
+					</p-tabpanel>
+
+					<!-- Estudiantes cuyo apoderado no tiene correo registrado -->
+					<p-tabpanel value="estudiantes">
+						@if (vm().loading && !hasData()) {
+							<app-table-skeleton [columns]="listaSimpleColumns" [rows]="8" />
 						} @else if (hasData()) {
 							<app-estudiantes-sin-correo-table [data]="vm().estudiantesSinCorreo" />
 						}
-					</div>
+					</p-tabpanel>
 
-					<div class="tables-grid__right">
+					<!-- Apoderados blacklisteados por bounces acumulados -->
+					<p-tabpanel value="apoderados">
 						@if (vm().loading && !hasData()) {
-							<app-table-skeleton [columns]="blacklistColumns" [rows]="5" />
+							<app-table-skeleton [columns]="blacklistColumns" [rows]="8" />
 						} @else if (hasData()) {
 							<app-apoderados-blacklisteados-table [data]="vm().apoderadosBlacklisteados" />
 						}
-					</div>
-				</div>
-			</div>
+					</p-tabpanel>
+				</p-tabpanels>
+			</p-tabs>
 		</p-tabpanel>
 	</p-tabpanels>
 </p-tabs>

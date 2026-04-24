@@ -1,4 +1,4 @@
-// #region Sub-tabs (fondo transparente para integrarse con --surface-ground)
+// #region Sub-tabs nivel 2 (Resumen | Detalle)
 :host ::ng-deep .gap-subtabs {
 	background: transparent;
 
@@ -15,7 +15,8 @@
 		margin-bottom: 1rem;
 	}
 
-	.p-tab {
+	> .p-tabs > .p-tablist .p-tab,
+	> .p-tablist .p-tab {
 		display: inline-flex;
 		align-items: center;
 		gap: 0.5rem;
@@ -28,9 +29,11 @@
 		}
 	}
 
-	// * Specificity alta + !important para ganar a los resets de PrimeNG
-	.p-tabs .p-tab .tab-badge,
-	.p-tablist .p-tab .tab-badge {
+	// * Badge rojo del nivel 2 = total del gap (señal crítica).
+	// * Specificity alta + !important para ganar a los resets de PrimeNG.
+	// * El selector `>` aísla los badges del nivel 2 de los del nivel 3.
+	> .p-tabs > .p-tablist .p-tab .tab-badge,
+	> .p-tablist .p-tab .tab-badge {
 		display: inline-flex !important;
 		align-items: center;
 		justify-content: center;
@@ -57,22 +60,66 @@
 }
 // #endregion
 
-// #region Stack de tablas dentro del sub-tab detalle
-.tables-stack {
-	display: flex;
-	flex-direction: column;
-	gap: 0.75rem;
-}
+// #region Sub-sub-tabs nivel 3 (Entradas | Sin correo apoderado | Apoderados blacklisteados)
+:host ::ng-deep .detalle-subtabs {
+	background: transparent;
+	margin-top: 0.5rem;
 
-.tables-grid {
-	display: grid;
-	grid-template-columns: 1fr 1fr;
-	gap: 0.75rem;
-}
+	.p-tabs,
+	.p-tablist,
+	.p-tablist-tab-list,
+	.p-tabpanels,
+	.p-tabpanel {
+		background: transparent;
+	}
 
-@media (max-width: 1024px) {
-	.tables-grid {
-		grid-template-columns: 1fr;
+	.p-tablist {
+		border-bottom: 1px solid var(--surface-200);
+		margin-bottom: 0.75rem;
+	}
+
+	.p-tab {
+		display: inline-flex;
+		align-items: center;
+		gap: 0.5rem;
+		font-size: 0.82rem;
+		font-weight: 500;
+		background: transparent;
+		padding: 0.45rem 0.85rem;
+
+		i {
+			font-size: 0.85rem;
+			opacity: 0.85;
+		}
+	}
+
+	// * Badge gris neutral (nivel 3) — solo indica volumen, NO severidad.
+	// * Selector directo `.tab-badge--neutral` sin .p-tab intermedio para
+	// * ganar specificity vs clases internas de PrimeNG.
+	.tab-badge--neutral {
+		display: inline-flex !important;
+		align-items: center;
+		justify-content: center;
+		min-width: 1.35rem;
+		height: 1.35rem;
+		padding: 0 0.5rem;
+		margin-left: 0.1rem;
+		border-radius: 999px;
+		background: var(--surface-200) !important;
+		color: var(--text-color) !important;
+		border: 1px solid var(--surface-300);
+		font-size: 0.7rem;
+		font-weight: 700;
+		font-variant-numeric: tabular-nums;
+		line-height: 1;
+	}
+
+	.p-tabpanels {
+		padding: 0;
+	}
+
+	.p-tabpanel {
+		padding: 0;
 	}
 }
 // #endregion

@@ -1,28 +1,46 @@
+// #region Tabs shell (Gap del día | Diagnóstico por correo)
 .diagnostico-tabs {
 	display: block;
 }
 
-:host ::ng-deep .p-tabs {
-	.p-tablist {
-		padding: 0 0 0.5rem;
-	}
+// * Scopeado a .diagnostico-tabs — los sub-tabs anidados (.gap-subtabs,
+// * .detalle-subtabs) re-aplican lo propio, no chocan porque también declaran
+// * transparente en su ámbito.
+:host ::ng-deep .diagnostico-tabs {
+	background: transparent !important;
 
-	.p-tab {
-		display: inline-flex;
-		align-items: center;
-		gap: 0.4rem;
-		font-size: 0.9rem;
-
-		i {
-			font-size: 0.9rem;
-		}
-	}
-
-	.p-tabpanels {
-		padding: 0.75rem 0 0;
-	}
-
+	.p-tabs,
+	.p-tablist,
+	.p-tablist-tab-list,
+	.p-tabpanels,
 	.p-tabpanel {
-		padding: 0;
+		background: transparent !important;
 	}
 }
+
+// * Reglas específicas SOLO del nivel 1 (shell). Usamos child-combinator
+// * para no impactar los tabs anidados del tab "Gap del día".
+:host ::ng-deep .diagnostico-tabs > .p-tablist {
+	padding: 0 0 0.5rem;
+}
+
+:host ::ng-deep .diagnostico-tabs > .p-tablist .p-tab {
+	display: inline-flex;
+	align-items: center;
+	gap: 0.6rem;
+	font-size: 0.95rem;
+	padding: 0.65rem 1.1rem;
+
+	i {
+		font-size: 1rem;
+	}
+}
+
+:host ::ng-deep .diagnostico-tabs > .p-tabpanels {
+	padding: 0.75rem 0 0;
+}
+
+:host ::ng-deep .diagnostico-tabs > .p-tabpanels > .p-tabpanel {
+	padding: 0;
+}
+// #endregion
