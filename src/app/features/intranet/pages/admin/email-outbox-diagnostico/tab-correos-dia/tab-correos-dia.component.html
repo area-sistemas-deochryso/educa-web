@@ -1,4 +1,4 @@
-<!-- #region Header -->
+<!-- #region Header (fuera de los sub-tabs — compartido por ambos) -->
 <app-correos-dia-header
 	[fechaConsulta]="vm().fechaConsulta"
 	[generatedAt]="vm().generatedAt"
@@ -8,40 +8,62 @@
 />
 <!-- #endregion -->
 
-<!-- #region Resumen -->
-@if (vm().loading && !hasData()) {
-	<app-stats-skeleton [count]="3" iconPosition="right" />
-} @else if (vm().resumen; as resumen) {
-	<app-correos-dia-resumen [resumen]="resumen" />
-}
-<!-- #endregion -->
-
-<!-- #region Tablas drill-down -->
-<div class="tables-stack">
-	<!-- Entradas sin correo enviado — la más importante, va primero -->
-	@if (vm().loading && !hasData()) {
-		<app-table-skeleton [columns]="entradasColumns" [rows]="8" />
-	} @else if (hasData()) {
-		<app-entradas-sin-correo-table [data]="vm().entradasSinCorreoEnviado" />
-	}
-
-	<!-- Grid 2 columnas: estudiantes sin correo + apoderados blacklisteados -->
-	<div class="tables-grid">
-		<div class="tables-grid__left">
-			@if (vm().loading && !hasData()) {
-				<app-table-skeleton [columns]="listaSimpleColumns" [rows]="5" />
-			} @else if (hasData()) {
-				<app-estudiantes-sin-correo-table [data]="vm().estudiantesSinCorreo" />
+<!-- #region Sub-tabs Resumen | Detalle -->
+<p-tabs value="resumen" class="gap-subtabs">
+	<p-tablist>
+		<p-tab value="resumen">
+			<i class="pi pi-th-large"></i>
+			<span>Resumen</span>
+		</p-tab>
+		<p-tab value="detalle">
+			<i class="pi pi-list"></i>
+			<span>Detalle</span>
+			@if (vm().totalGap > 0) {
+				<span class="tab-badge">{{ vm().totalGap }}</span>
 			}
-		</div>
+		</p-tab>
+	</p-tablist>
 
-		<div class="tables-grid__right">
+	<p-tabpanels>
+		<!-- Sub-tab 1: Resumen (stat cards 3 + 6) -->
+		<p-tabpanel value="resumen">
 			@if (vm().loading && !hasData()) {
-				<app-table-skeleton [columns]="blacklistColumns" [rows]="5" />
-			} @else if (hasData()) {
-				<app-apoderados-blacklisteados-table [data]="vm().apoderadosBlacklisteados" />
+				<app-stats-skeleton [count]="3" iconPosition="right" />
+			} @else if (vm().resumen; as resumen) {
+				<app-correos-dia-resumen [resumen]="resumen" />
 			}
-		</div>
-	</div>
-</div>
+		</p-tabpanel>
+
+		<!-- Sub-tab 2: Detalle (3 tablas drill-down) -->
+		<p-tabpanel value="detalle">
+			<div class="tables-stack">
+				<!-- Entradas sin correo enviado — la más importante, va primero -->
+				@if (vm().loading && !hasData()) {
+					<app-table-skeleton [columns]="entradasColumns" [rows]="8" />
+				} @else if (hasData()) {
+					<app-entradas-sin-correo-table [data]="vm().entradasSinCorreoEnviado" />
+				}
+
+				<!-- Grid 2 columnas: estudiantes sin correo + apoderados blacklisteados -->
+				<div class="tables-grid">
+					<div class="tables-grid__left">
+						@if (vm().loading && !hasData()) {
+							<app-table-skeleton [columns]="listaSimpleColumns" [rows]="5" />
+						} @else if (hasData()) {
+							<app-estudiantes-sin-correo-table [data]="vm().estudiantesSinCorreo" />
+						}
+					</div>
+
+					<div class="tables-grid__right">
+						@if (vm().loading && !hasData()) {
+							<app-table-skeleton [columns]="blacklistColumns" [rows]="5" />
+						} @else if (hasData()) {
+							<app-apoderados-blacklisteados-table [data]="vm().apoderadosBlacklisteados" />
+						}
+					</div>
+				</div>
+			</div>
+		</p-tabpanel>
+	</p-tabpanels>
+</p-tabs>
 <!-- #endregion -->

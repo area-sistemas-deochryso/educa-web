@@ -1,4 +1,5 @@
 import { ChangeDetectionStrategy, Component, computed, inject } from '@angular/core';
+import { TabsModule } from 'primeng/tabs';
 
 import { StatsSkeletonComponent, TableSkeletonComponent } from '@shared/components';
 import type { SkeletonColumnDef } from '@shared/components';
@@ -36,6 +37,7 @@ const ENTRADAS_COLUMNS: SkeletonColumnDef[] = [
 	selector: 'app-tab-correos-dia',
 	standalone: true,
 	imports: [
+		TabsModule,
 		StatsSkeletonComponent,
 		TableSkeletonComponent,
 		CorreosDiaHeaderComponent,

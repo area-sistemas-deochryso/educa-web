@@ -34,6 +34,18 @@ export class CorreosDiaStore {
 	);
 	readonly fecha = computed(() => this._dto()?.fecha ?? null);
 	readonly generatedAt = computed(() => this._dto()?.generatedAt ?? null);
+	// * Total del gap = suma de las 5 razones del descalce. Fuente única para badge + resumen.
+	readonly totalGap = computed(() => {
+		const r = this.resumen();
+		if (!r) return 0;
+		return (
+			r.estudiantesSinCorreoApoderado +
+			r.correosApoderadosBlacklisteados +
+			r.correosFallidos +
+			r.correosPendientes +
+			r.correosFaltantes
+		);
+	});
 	// #endregion
 
 	// #region ViewModel
@@ -49,6 +61,7 @@ export class CorreosDiaStore {
 		entradasSinCorreoEnviado: this.entradasSinCorreoEnviado(),
 		fecha: this.fecha(),
 		generatedAt: this.generatedAt(),
+		totalGap: this.totalGap(),
 	}));
 	// #endregion
 
