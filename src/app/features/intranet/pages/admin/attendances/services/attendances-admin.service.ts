@@ -12,7 +12,6 @@ import {
 	EnviarCorreosResultado,
 	PersonaParaSeleccion,
 	RevertirCierreMensualRequest,
-	SincronizarResultado,
 	TipoPersonaAsistencia,
 } from '../models';
 import { Injectable, inject } from '@angular/core';
@@ -21,6 +20,7 @@ import { Observable, catchError, of } from 'rxjs';
 import { ApiResponse } from '@shared/models';
 import { HttpClient } from '@angular/common/http';
 import { environment } from '@env/environment';
+import { CrossChexSyncAceptadoDto } from '@core/services/signalr';
 
 // #endregion
 
@@ -126,8 +126,16 @@ export class AttendancesAdminService {
 		return this.http.post<CierreMensualLista>(`${this.cierreUrl}/${id}/revertir`, dto);
 	}
 
-	sincronizarDesdeCrossChex(fecha: string): Observable<SincronizarResultado> {
-		return this.http.post<SincronizarResultado>(`${this.apiUrl}/sync`, null, { params: { fecha } });
+	/**
+	 * Plan 24 Chat 3 — Encola un job de sync background en el BE.
+	 * Retorna 202 Accepted con `{ jobId, estado: "QUEUED" }`.
+	 * En 409 Conflict el body del error incluye el jobId del sync en curso
+	 * (el FE lo extrae en el facade y re-suscribe al hub).
+	 */
+	sincronizarDesdeCrossChex(fecha: string): Observable<CrossChexSyncAceptadoDto> {
+		return this.http.post<CrossChexSyncAceptadoDto>(`${this.apiUrl}/sync`, null, {
+			params: { fecha },
+		});
 	}
 
 	enviarCorreos(dto: EnviarCorreosAsistenciaRequest): Observable<EnviarCorreosResultado> {

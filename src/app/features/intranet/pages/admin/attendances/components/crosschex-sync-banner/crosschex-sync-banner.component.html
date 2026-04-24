@@ -1,0 +1,58 @@
+@if (visible()) {
+	<div
+		class="sync-banner"
+		[class.sync-banner--failed]="isFailed()"
+		role="status"
+		aria-live="polite"
+	>
+		<div class="sync-banner__body">
+			<div class="sync-banner__header">
+				<div class="sync-banner__title">
+					@if (isFailed()) {
+						<i class="pi pi-exclamation-circle"></i>
+						<span>Sincronización fallida</span>
+					} @else {
+						<i class="pi pi-sync pi-spin"></i>
+						<span>Sincronizando CrossChex</span>
+					}
+				</div>
+
+				@if (fase(); as f) {
+					<span class="sync-banner__fase">{{ f }}</span>
+				}
+			</div>
+
+			<p class="sync-banner__message">{{ mensaje() }}</p>
+
+			@if (!isFailed()) {
+				@if (indeterminate()) {
+					<p-progressBar mode="indeterminate" [style]="{ height: '6px' }" />
+				} @else {
+					<p-progressBar [value]="percent()" [style]="{ height: '6px' }" />
+				}
+			}
+		</div>
+
+		@if (isFailed()) {
+			<div class="sync-banner__actions">
+				<button
+					pButton
+					type="button"
+					label="Reintentar"
+					icon="pi pi-refresh"
+					class="p-button-outlined p-button-danger p-button-sm"
+					(click)="onRetry()"
+					[pt]="{ root: { 'aria-label': 'Reintentar sincronización' } }"
+				></button>
+				<button
+					pButton
+					type="button"
+					icon="pi pi-times"
+					class="p-button-text p-button-sm"
+					(click)="onDismiss()"
+					[pt]="{ root: { 'aria-label': 'Cerrar banner' } }"
+				></button>
+			</div>
+		}
+	</div>
+}

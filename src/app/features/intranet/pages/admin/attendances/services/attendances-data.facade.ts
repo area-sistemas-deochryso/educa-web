@@ -1,8 +1,13 @@
 import { DestroyRef, Injectable, inject } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { HttpErrorResponse } from '@angular/common/http';
 
 import { logger } from '@core/helpers';
-import { SincronizarResultado, TipoPersonaAsistencia, TipoPersonaFilter } from '../models';
+import {
+	CrossChexSyncAceptadoDto,
+	CrossChexSyncStatusService,
+} from '@core/services/signalr';
+import { TipoPersonaAsistencia, TipoPersonaFilter } from '../models';
 import { AttendancesAdminService } from './attendances-admin.service';
 import { AttendancesAdminStore } from './attendances-admin.store';
 
@@ -16,6 +21,7 @@ export class AttendancesDataFacade {
 	// #region Dependencias
 	private api = inject(AttendancesAdminService);
 	private store = inject(AttendancesAdminStore);
+	private syncService = inject(CrossChexSyncStatusService);
 	private destroyRef = inject(DestroyRef);
 	// #endregion
 
@@ -124,12 +130,20 @@ export class AttendancesDataFacade {
 
 	// #endregion
 
-	// #region Sincronización CrossChex
+	// #region Sincronización CrossChex (Plan 24 Chat 3 — background job)
 
-	sincronizarDesdeCrossChex(
-		onSuccess?: (resultado: SincronizarResultado) => void,
-		onError?: (err: unknown) => void,
-	): void {
+	/**
+	 * Dispara el sync background y delega el tracking del progreso al
+	 * `CrossChexSyncStatusService`. El POST retorna 202 Accepted con
+	 * `{ jobId, estado: "QUEUED" }`; en 409 Conflict el body del error trae
+	 * el jobId del sync ya activo (UX conveniente — re-suscribimos a ese).
+	 *
+	 * El éxito final (COMPLETED) y error (FAILED) se observan vía
+	 * `syncService.terminal$` — el componente orquesta toast + refetch ahí.
+	 */
+	sincronizarDesdeCrossChex(onError?: (err: unknown) => void): void {
+		// Guard: si ya hay tracking activo, no dispares otro sync.
+		if (this.syncService.isActive()) return;
 		if (this.store.syncing()) return;
 		this.store.setSyncing(true);
 
@@ -139,18 +153,42 @@ export class AttendancesDataFacade {
 			.sincronizarDesdeCrossChex(fecha)
 			.pipe(takeUntilDestroyed(this.destroyRef))
 			.subscribe({
-				next: (resultado) => {
-					logger.log('Sincronización completada:', resultado);
+				next: (dto) => {
 					this.store.setSyncing(false);
-					this.loadData();
-					onSuccess?.(resultado);
+					void this.syncService.startTracking(dto.jobId);
 				},
 				error: (err) => {
-					logger.error('Error al sincronizar:', err);
 					this.store.setSyncing(false);
+					const conflict = this.tryExtractConflict(err);
+					if (conflict) {
+						logger.log('[Sync] 409 con job activo — re-suscribiendo', conflict);
+						void this.syncService.startTracking(conflict.jobId);
+						return;
+					}
+					logger.error('Error al sincronizar:', err);
 					onError?.(err);
 				},
 			});
+	}
+
+	/**
+	 * Extrae el DTO del 409 Conflict. El BE responde con
+	 * `{ success: false, data: { jobId, estado }, message }` y el interceptor
+	 * NO unwrappea respuestas con `success: false` → el body queda crudo en
+	 * `HttpErrorResponse.error`.
+	 */
+	private tryExtractConflict(err: unknown): CrossChexSyncAceptadoDto | null {
+		if (!(err instanceof HttpErrorResponse) || err.status !== 409) return null;
+		const body = err.error as { data?: unknown } | null;
+		if (!body?.data) return null;
+
+		const data = body.data as Record<string, unknown>;
+		const jobId = (data['jobId'] ?? data['JobId']) as string | undefined;
+		const estado = (data['estado'] ?? data['Estado']) as
+			| CrossChexSyncAceptadoDto['estado']
+			| undefined;
+		if (!jobId || !estado) return null;
+		return { jobId, estado };
 	}
 
 	// #endregion

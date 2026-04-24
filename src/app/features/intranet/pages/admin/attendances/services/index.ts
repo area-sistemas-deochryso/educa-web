@@ -5,4 +5,11 @@ export { AttendancesCrudFacade } from './attendances-crud.facade';
 export { AttendancesDataFacade } from './attendances-data.facade';
 export { AttendancesUiFacade } from './attendances-ui.facade';
 export { isValidDateIso, parseIsoDate } from './attendances-query-params';
+export {
+	estadoSeverity,
+	origenLabel,
+	origenSeverity,
+	tipoPersonaLabel,
+	formatFechaIso,
+} from './attendances-template-helpers';
 export * from '../models';

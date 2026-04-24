@@ -1,13 +1,14 @@
 // * Tests for AttendancesDataFacade — valida paso de tipoPersona al service y sync response.
 // #region Imports
 import { TestBed } from '@angular/core/testing';
+import { HttpErrorResponse } from '@angular/common/http';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { of, throwError } from 'rxjs';
 
+import { CrossChexSyncStatusService } from '@core/services/signalr';
 import { AttendancesAdminService } from './attendances-admin.service';
 import { AttendancesAdminStore } from './attendances-admin.store';
 import { AttendancesDataFacade } from './attendances-data.facade';
-import { SincronizarResultado } from '../models';
 // #endregion
 
 // #region Mocks
@@ -22,25 +23,29 @@ function createMockApi() {
 	};
 }
 
-const mockSyncResult: SincronizarResultado = {
-	mensaje: 'ok',
-	estudiantes: { nuevos: 10, preservados: 2, errores: 0 },
-	profesores: { nuevos: 3, preservados: 1, errores: 0 },
-};
+function createMockSyncService() {
+	return {
+		isActive: vi.fn().mockReturnValue(false),
+		startTracking: vi.fn().mockResolvedValue(undefined),
+	};
+}
 // #endregion
 
 describe('AttendancesDataFacade', () => {
 	let facade: AttendancesDataFacade;
 	let store: AttendancesAdminStore;
 	let api: ReturnType<typeof createMockApi>;
+	let syncService: ReturnType<typeof createMockSyncService>;
 
 	beforeEach(() => {
 		api = createMockApi();
+		syncService = createMockSyncService();
 		TestBed.configureTestingModule({
 			providers: [
 				AttendancesDataFacade,
 				AttendancesAdminStore,
 				{ provide: AttendancesAdminService, useValue: api },
+				{ provide: CrossChexSyncStatusService, useValue: syncService },
 			],
 		});
 		facade = TestBed.inject(AttendancesDataFacade);
@@ -130,34 +135,62 @@ describe('AttendancesDataFacade', () => {
 		});
 	});
 
-	describe('sincronizarDesdeCrossChex', () => {
-		it('invoca onSuccess con el resultado estructurado', () => {
-			api.sincronizarDesdeCrossChex.mockReturnValue(of(mockSyncResult));
-			const onSuccess = vi.fn();
-			const onError = vi.fn();
+	describe('sincronizarDesdeCrossChex (Plan 24 Chat 3 — background job)', () => {
+		const VALID_JOB_ID = 'a1b2c3d4e5f6a7b8c9d0e1f2a3b4c5d6';
 
-			facade.sincronizarDesdeCrossChex(onSuccess, onError);
+		it('202 Accepted → delega el tracking al CrossChexSyncStatusService', () => {
+			api.sincronizarDesdeCrossChex.mockReturnValue(
+				of({ jobId: VALID_JOB_ID, estado: 'QUEUED' }),
+			);
 
-			expect(onSuccess).toHaveBeenCalledWith(mockSyncResult);
-			expect(onError).not.toHaveBeenCalled();
+			facade.sincronizarDesdeCrossChex();
+
+			expect(syncService.startTracking).toHaveBeenCalledWith(VALID_JOB_ID);
 			expect(store.syncing()).toBe(false);
 		});
 
-		it('invoca onError cuando el service falla', () => {
-			api.sincronizarDesdeCrossChex.mockReturnValue(throwError(() => new Error('boom')));
-			const onSuccess = vi.fn();
+		it('409 Conflict con jobId activo → re-suscribe al jobId del error', () => {
+			const conflictError = new HttpErrorResponse({
+				status: 409,
+				error: {
+					success: false,
+					message: 'Ya hay una sync en curso',
+					data: { jobId: VALID_JOB_ID, estado: 'RUNNING' },
+				},
+			});
+			api.sincronizarDesdeCrossChex.mockReturnValue(throwError(() => conflictError));
 			const onError = vi.fn();
 
-			facade.sincronizarDesdeCrossChex(onSuccess, onError);
+			facade.sincronizarDesdeCrossChex(onError);
+
+			expect(syncService.startTracking).toHaveBeenCalledWith(VALID_JOB_ID);
+			expect(onError).not.toHaveBeenCalled();
+		});
+
+		it('error no-409 → invoca onError', () => {
+			api.sincronizarDesdeCrossChex.mockReturnValue(throwError(() => new Error('boom')));
+			const onError = vi.fn();
+
+			facade.sincronizarDesdeCrossChex(onError);
 
 			expect(onError).toHaveBeenCalled();
-			expect(onSuccess).not.toHaveBeenCalled();
+			expect(syncService.startTracking).not.toHaveBeenCalled();
 			expect(store.syncing()).toBe(false);
 		});
 
-		it('no arranca si ya está sincronizando', () => {
+		it('no dispara sync si ya hay uno activo (syncService.isActive)', () => {
+			syncService.isActive.mockReturnValue(true);
+
+			facade.sincronizarDesdeCrossChex();
+
+			expect(api.sincronizarDesdeCrossChex).not.toHaveBeenCalled();
+		});
+
+		it('no arranca si store.syncing ya es true', () => {
 			store.setSyncing(true);
-			api.sincronizarDesdeCrossChex.mockReturnValue(of(mockSyncResult));
+			api.sincronizarDesdeCrossChex.mockReturnValue(
+				of({ jobId: VALID_JOB_ID, estado: 'QUEUED' }),
+			);
 
 			facade.sincronizarDesdeCrossChex();
 

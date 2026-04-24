@@ -31,6 +31,23 @@ export class AttendanceSignalRService {
 	readonly asistenciaRegistrada$ = this.asistenciaRegistradaSubject.asObservable();
 	// #endregion
 
+	// #region Connection sharing — Plan 24 Chat 3
+
+	/**
+	 * Garantiza que el hub esté conectado y devuelve la conexión viva para que
+	 * consumidores del mismo hub (ej: CrossChexSyncStatusService) puedan hacer
+	 * `invoke()` y `on()` sin abrir una segunda WebSocket/SSE.
+	 */
+	async ensureConnected(): Promise<signalR.HubConnection> {
+		if (this.connection?.state !== signalR.HubConnectionState.Connected) {
+			await this.connect();
+		}
+		// After `connect()` succeeds, `this.connection` está seteada. El cast es seguro.
+		return this.connection as signalR.HubConnection;
+	}
+
+	// #endregion
+
 	// #region Connection lifecycle
 	async connect(): Promise<void> {
 		if (this.connection?.state === signalR.HubConnectionState.Connected) return;

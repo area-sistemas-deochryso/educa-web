@@ -418,4 +418,29 @@ export class SessionStorageService {
 		this.clearPermisos();
 	}
 	// #endregion
+
+	// #region CROSSCHEX SYNC JOB — Plan 24 Chat 3
+
+	/**
+	 * Lee el jobId del sync CrossChex persistido en la sesión actual.
+	 * Permite rehidratar el tracking del banner tras un refresh F5.
+	 */
+	getCrossChexJobId(): string | null {
+		return this.getItem('educa_crosschex_sync_job');
+	}
+
+	/**
+	 * Persiste el jobId del sync CrossChex activo en la sesión actual, o lo
+	 * borra cuando se pasa `null`. La sesión expira con el tab — aceptado para
+	 * este flujo (si el user cierra el navegador, el sync sigue en Hangfire).
+	 */
+	setCrossChexJobId(jobId: string | null): void {
+		if (jobId === null) {
+			this.removeItem('educa_crosschex_sync_job');
+		} else {
+			this.setItem('educa_crosschex_sync_job', jobId);
+		}
+	}
+
+	// #endregion
 }

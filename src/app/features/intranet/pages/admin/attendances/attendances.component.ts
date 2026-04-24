@@ -22,9 +22,12 @@ import { CheckboxModule } from 'primeng/checkbox';
 import { Tab, TabList, TabPanel, Tabs } from 'primeng/tabs';
 import { ToastModule } from 'primeng/toast';
 
+import { logger } from '@core/helpers';
 import { SkeletonColumnDef, TableSkeletonComponent, StatsSkeletonComponent } from '@shared/components';
 import { AttendanceScopeBannerComponent } from '@intranet-shared/components/attendance-scope-banner';
 import { AttendanceReportsComponent } from '../../cross-role/attendance-reports';
+import { CrossChexSyncStatusService } from '@core/services/signalr';
+import { CrossChexSyncBannerComponent } from './components/crosschex-sync-banner';
 
 import {
 	AttendancesDataFacade,
@@ -36,11 +39,15 @@ import {
 	TipoOperacionAsistencia,
 	TipoPersonaAsistencia,
 	TipoPersonaFilter,
-	SincronizarResultado,
 	CrearCierreMensualRequest,
 	RevertirCierreMensualRequest,
 	isValidDateIso,
 	parseIsoDate,
+	estadoSeverity,
+	origenLabel,
+	origenSeverity,
+	tipoPersonaLabel,
+	formatFechaIso,
 } from './services';
 // #endregion
 
@@ -72,6 +79,7 @@ import {
 		TabPanel,
 		AttendanceScopeBannerComponent,
 		AttendanceReportsComponent,
+		CrossChexSyncBannerComponent,
 	],
 	providers: [ConfirmationService, MessageService],
 	templateUrl: './attendances.component.html',
@@ -81,10 +89,11 @@ import {
 export class AttendancesComponent implements OnInit {
 	// #region Dependencias
 	private dataFacade = inject(AttendancesDataFacade);
-	private crudFacade = inject(AttendancesCrudFacade);
+	protected crudFacade = inject(AttendancesCrudFacade);
 	private cierresFacade = inject(AttendancesCierresFacade);
 	protected uiFacade = inject(AttendancesUiFacade);
 	protected store = inject(AttendancesAdminStore);
+	private syncService = inject(CrossChexSyncStatusService);
 	private confirmationService = inject(ConfirmationService);
 	private messageService = inject(MessageService);
 	private route = inject(ActivatedRoute);
@@ -93,30 +102,28 @@ export class AttendancesComponent implements OnInit {
 
 	// #region Estado del facade
 	readonly vm = this.store.vm;
+
+	/** `true` mientras hay un job de sync activo (QUEUED o RUNNING). */
+	readonly syncActive = this.syncService.isActive;
 	// #endregion
 
 	// #region Estado local
 	readonly activeTab = signal<string>('gestion');
 	readonly fechaCalendar = signal<Date>(new Date());
-
-	readonly tipoOptions = signal([
-		{ label: 'Solo entrada', value: 'entrada' as TipoOperacionAsistencia },
-		{ label: 'Solo salida', value: 'salida' as TipoOperacionAsistencia },
-		{ label: 'Entrada + Salida', value: 'completa' as TipoOperacionAsistencia },
+	readonly tipoOptions = signal<{ label: string; value: TipoOperacionAsistencia }[]>([
+		{ label: 'Solo entrada', value: 'entrada' },
+		{ label: 'Solo salida', value: 'salida' },
+		{ label: 'Entrada + Salida', value: 'completa' },
 	]);
-
-	readonly tipoPersonaOptions = signal([
-		{ label: 'Estudiantes', value: 'E' as TipoPersonaFilter },
-		{ label: 'Profesores', value: 'P' as TipoPersonaFilter },
-		{ label: 'Todos', value: 'todos' as TipoPersonaFilter },
+	readonly tipoPersonaOptions = signal<{ label: string; value: TipoPersonaFilter }[]>([
+		{ label: 'Estudiantes', value: 'E' },
+		{ label: 'Profesores', value: 'P' },
+		{ label: 'Todos', value: 'todos' },
 	]);
-
-	readonly tipoPersonaFormOptions = signal([
-		{ label: 'Estudiante', value: 'E' as TipoPersonaAsistencia },
-		{ label: 'Profesor', value: 'P' as TipoPersonaAsistencia },
+	readonly tipoPersonaFormOptions = signal<{ label: string; value: TipoPersonaAsistencia }[]>([
+		{ label: 'Estudiante', value: 'E' },
+		{ label: 'Profesor', value: 'P' },
 	]);
-
-	// Cierre mensual form
 	readonly cierreAnio = signal(new Date().getFullYear());
 	readonly cierreMes = signal(new Date().getMonth() + 1);
 	readonly cierreObservacion = signal('');
@@ -161,16 +168,44 @@ export class AttendancesComponent implements OnInit {
 	ngOnInit(): void {
 		this.dataFacade.loadData();
 		this.dataFacade.loadEstudiantes();
+		// Plan 24 Chat 3 — recuperar sync activo tras refresh F5 + listener terminal.
+		void this.syncService.rehydrate();
+		this.subscribeToSyncTerminal();
+		this.subscribeToQueryParams();
+	}
 
-		// Cross-link desde `AttendanceDirectorComponent` tab profesores (Plan 23 Chat 5).
-		// Query params soportados: `tab`, `tipoPersona`, `dni`, `fecha` (YYYY-MM-DD).
+	private subscribeToSyncTerminal(): void {
+		this.syncService.terminal$
+			.pipe(takeUntilDestroyed(this.destroyRef))
+			.subscribe(({ status }) => {
+				if (status.estado === 'COMPLETED') {
+					this.messageService.add({
+						severity: 'success',
+						summary: 'Sincronización completada',
+						detail: status.mensaje ?? 'Refrescando tabla…',
+						life: 5000,
+					});
+					this.dataFacade.loadData();
+					void this.syncService.stopTracking();
+				} else if (status.estado === 'FAILED') {
+					this.messageService.add({
+						severity: 'error',
+						summary: 'Error al sincronizar',
+						detail: status.error ?? status.mensaje ?? 'Falló la sincronización CrossChex',
+						life: 7000,
+					});
+				}
+			});
+	}
+
+	// Cross-link desde `AttendanceDirectorComponent` tab profesores (Plan 23 Chat 5).
+	// Query params soportados: `tab`, `tipoPersona`, `dni`, `fecha` (YYYY-MM-DD).
+	private subscribeToQueryParams(): void {
 		this.route.queryParamMap
 			.pipe(takeUntilDestroyed(this.destroyRef))
 			.subscribe((params) => {
 				const tab = params.get('tab');
-				if (tab === 'gestion' || tab === 'reportes') {
-					this.activeTab.set(tab);
-				}
+				if (tab === 'gestion' || tab === 'reportes') this.activeTab.set(tab);
 
 				const fecha = params.get('fecha');
 				if (fecha && isValidDateIso(fecha)) {
@@ -184,9 +219,7 @@ export class AttendancesComponent implements OnInit {
 				}
 
 				const dni = params.get('dni');
-				if (dni) {
-					this.dataFacade.onSearch(dni);
-				}
+				if (dni) this.dataFacade.onSearch(dni);
 			});
 	}
 	// #endregion
@@ -206,21 +239,6 @@ export class AttendancesComponent implements OnInit {
 
 	// #endregion
 
-	// #region Event handlers — Selección y correos
-
-	onToggleSelection(id: number): void {
-		this.store.toggleSelection(id);
-	}
-
-	onToggleSelectAll(): void {
-		this.store.toggleSelectAll();
-	}
-
-	onEnviarCorreos(): void {
-		this.crudFacade.enviarCorreos();
-	}
-
-	// #endregion
 
 	// #region Event handlers — Sync
 
@@ -233,33 +251,28 @@ export class AttendancesComponent implements OnInit {
 			icon: 'pi pi-sync',
 			acceptLabel: 'Sincronizar',
 			rejectLabel: 'Cancelar',
-			accept: () => {
-				this.dataFacade.sincronizarDesdeCrossChex(
-					(res) => this.showSyncSuccessToast(res, fechaLabel),
-					() => this.showSyncErrorToast(fechaLabel),
-				);
-			},
+			accept: () => this.dispatchSync(fechaLabel),
 		});
 	}
 
-	private showSyncSuccessToast(res: SincronizarResultado, fechaLabel: string): void {
-		const e = res.estudiantes;
-		const p = res.profesores;
-		const preservados = e.preservados + p.preservados;
-		this.messageService.add({
-			severity: 'success',
-			summary: 'Sincronización completada',
-			detail: `Fecha ${fechaLabel}: ${e.nuevos} estudiantes + ${p.nuevos} profesores importados, ${preservados} preservados (editados manualmente)`,
-			life: 7000,
-		});
+	onSyncRetry(): void {
+		void this.syncService.stopTracking();
+		this.dispatchSync(this.fechaLabel());
 	}
 
-	private showSyncErrorToast(fechaLabel: string): void {
-		this.messageService.add({
-			severity: 'error',
-			summary: 'Error al sincronizar',
-			detail: `No se pudo sincronizar CrossChex del ${fechaLabel}.`,
-			life: 5000,
+	onSyncDismiss(): void {
+		void this.syncService.stopTracking();
+	}
+
+	private dispatchSync(fechaLabel: string): void {
+		this.dataFacade.sincronizarDesdeCrossChex((err) => {
+			this.messageService.add({
+				severity: 'error',
+				summary: 'Error al sincronizar',
+				detail: `No se pudo iniciar el sync del ${fechaLabel}.`,
+				life: 5000,
+			});
+			logger.error('[AttendancesComponent] Sync dispatch error', err);
 		});
 	}
 
@@ -339,14 +352,9 @@ export class AttendancesComponent implements OnInit {
 	}
 
 	onRevertirCierre(cierreId: number, rowVersion: string): void {
-		const obs = this.revertirObservacion();
-		if (obs.length < 10) return;
-
-		const dto: RevertirCierreMensualRequest = {
-			observacion: obs,
-			rowVersion,
-		};
-		this.cierresFacade.revertirCierre(cierreId, dto);
+		const observacion = this.revertirObservacion();
+		if (observacion.length < 10) return;
+		this.cierresFacade.revertirCierre(cierreId, { observacion, rowVersion } satisfies RevertirCierreMensualRequest);
 		this.revertirObservacion.set('');
 	}
 
@@ -368,34 +376,11 @@ export class AttendancesComponent implements OnInit {
 
 	// #endregion
 
-	// #region Helpers de template
-
-	getEstadoSeverity(estado: string): 'success' | 'warn' {
-		return estado === 'Completa' ? 'success' : 'warn';
-	}
-
-	getOrigenLabel(item: AsistenciaAdminLista): string {
-		if (item.editadoManualmente) return 'Editado';
-		if (item.origenManual) return 'Manual';
-		return 'Biométrico';
-	}
-
-	getOrigenSeverity(item: AsistenciaAdminLista): 'warn' | 'info' | 'secondary' {
-		if (item.editadoManualmente) return 'warn';
-		if (item.origenManual) return 'info';
-		return 'secondary';
-	}
-
-	getTipoPersonaLabel(tipo: TipoPersonaAsistencia): string {
-		return tipo === 'P' ? 'Profesor' : 'Estudiante';
-	}
-
-	/** "yyyy-MM-dd" → "dd/MM/yyyy". */
-	private formatFecha(iso: string): string {
-		if (!iso || iso.length < 10) return iso;
-		const [y, m, d] = iso.slice(0, 10).split('-');
-		return `${d}/${m}/${y}`;
-	}
-
+	// #region Helpers de template — delegan a funciones puras en ./services
+	readonly getEstadoSeverity = estadoSeverity;
+	readonly getOrigenLabel = origenLabel;
+	readonly getOrigenSeverity = origenSeverity;
+	readonly getTipoPersonaLabel = tipoPersonaLabel;
+	private formatFecha = formatFechaIso;
 	// #endregion
 }

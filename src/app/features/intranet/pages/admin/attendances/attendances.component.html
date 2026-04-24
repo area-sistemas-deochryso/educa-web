@@ -31,7 +31,7 @@
 				[label]="'Enviar correos (' + vm().selectedCount + ')'"
 				class="p-button-outlined p-button-help"
 				[loading]="vm().enviandoCorreos"
-				(click)="onEnviarCorreos()"
+				(click)="crudFacade.enviarCorreos()"
 				[pt]="{
 					root: {
 						'aria-label': 'Enviar correos de asistencia a los apoderados seleccionados',
@@ -47,13 +47,18 @@
 			[label]="'Sincronizar CrossChex · ' + fechaLabel()"
 			class="p-button-outlined"
 			[loading]="vm().syncing"
+			[disabled]="syncActive()"
 			(click)="onSincronizar()"
 			[pt]="{
 				root: {
 					'aria-label': 'Sincronizar asistencias desde CrossChex para la fecha seleccionada',
 				},
 			}"
-			pTooltip="Sincroniza ambos tipos (estudiantes y profesores). El filtro de tipo solo afecta la visualización."
+			[pTooltip]="
+				syncActive()
+					? 'Hay un sync en curso. Espera a que termine.'
+					: 'Sincroniza ambos tipos (estudiantes y profesores). El filtro de tipo solo afecta la visualización.'
+			"
 			tooltipPosition="bottom"
 		></button>
 		<button
@@ -73,6 +78,9 @@
 	</div>
 </div>
 <!-- #endregion -->
+
+<!-- Plan 24 Chat 3 · progreso del sync CrossChex en background -->
+<app-crosschex-sync-banner (retry)="onSyncRetry()" (dismiss)="onSyncDismiss()" />
 
 <!-- #region Filtro tipo persona -->
 <div class="tipo-persona-bar">
@@ -190,7 +198,7 @@
 					<p-checkbox
 						[binary]="true"
 						[ngModel]="vm().allSelected"
-						(ngModelChange)="onToggleSelectAll()"
+						(ngModelChange)="store.toggleSelectAll()"
 					/>
 				</th>
 				<th style="width: 50px">#</th>
@@ -209,7 +217,7 @@
 					<p-checkbox
 						[binary]="true"
 						[ngModel]="vm().selectedIds.has(item.asistenciaId)"
-						(ngModelChange)="onToggleSelection(item.asistenciaId)"
+						(ngModelChange)="store.toggleSelection(item.asistenciaId)"
 					/>
 				</td>
 				<td>{{ i + 1 }}</td>

@@ -315,6 +315,18 @@ export class StorageService {
 	}
 	// #endregion
 
+	// #region CROSSCHEX SYNC JOB — Plan 24 Chat 3
+	/** Lee el jobId del sync CrossChex activo. Se usa para rehidratar tras F5. */
+	getCrossChexJobId(): string | null {
+		return this.session.getCrossChexJobId();
+	}
+
+	/** Persiste el jobId activo o lo borra (pasando `null`). */
+	setCrossChexJobId(jobId: string | null): void {
+		this.session.setCrossChexJobId(jobId);
+	}
+	// #endregion
+
 	// #region DEFER/FAIL STATUS WIDGET (Plan 22 Chat B / Plan 29 Chat 2.6)
 	getDeferFailWidgetAutoRefresh(): boolean {
 		return this.preferences.getDeferFailWidgetAutoRefresh();
