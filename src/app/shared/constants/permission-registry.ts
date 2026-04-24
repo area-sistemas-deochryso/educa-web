@@ -28,6 +28,7 @@ export const PERMISOS = {
 	ADMIN_PERMISOS_SALUD: 'intranet/admin/permisos-salud',
 	ADMIN_EMAIL_OUTBOX: 'intranet/admin/email-outbox',
 	ADMIN_EMAIL_OUTBOX_DASHBOARD_DIA: 'intranet/admin/email-outbox/dashboard-dia',
+	ADMIN_EMAIL_OUTBOX_DIAGNOSTICO: 'intranet/admin/email-outbox/diagnostico',
 	ADMIN_ERROR_LOGS: 'intranet/admin/trazabilidad-errores',
 	ADMIN_REPORTES_USUARIO: 'intranet/admin/reportes-usuario',
 	ADMIN_RATE_LIMIT_EVENTS: 'intranet/admin/rate-limit-events',

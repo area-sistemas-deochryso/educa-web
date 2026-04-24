@@ -1,0 +1,217 @@
+// #region Base card styles (idénticas al molde dashboard-resumen)
+.stat-card {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	border: 1px solid var(--surface-300);
+	border-radius: 10px;
+	background: transparent;
+
+	.stat-content {
+		display: flex;
+		flex-direction: column;
+		gap: 0.1rem;
+		min-width: 0;
+
+		.stat-label {
+			font-size: 0.8rem;
+			color: var(--text-color-secondary);
+			font-weight: 500;
+		}
+
+		.stat-value {
+			font-size: 1.5rem;
+			font-weight: 700;
+			color: var(--text-color);
+			font-variant-numeric: tabular-nums;
+			line-height: 1.1;
+		}
+
+		.stat-sublabel {
+			font-size: 0.7rem;
+			color: var(--text-color-secondary);
+		}
+	}
+
+	.stat-icon {
+		width: 40px;
+		height: 40px;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		border-radius: 10px;
+		background: var(--surface-200);
+		flex-shrink: 0;
+
+		i {
+			font-size: 1.05rem;
+			color: var(--text-color);
+		}
+	}
+
+	.stat-icon-small {
+		width: 28px;
+		height: 28px;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		border-radius: 7px;
+		background: var(--surface-200);
+		flex-shrink: 0;
+
+		i {
+			font-size: 0.85rem;
+			color: var(--text-color);
+		}
+	}
+
+	&--success {
+		border-left: 3px solid var(--green-500);
+		.stat-icon i,
+		.stat-icon-small i {
+			color: var(--green-600);
+		}
+	}
+
+	&--danger {
+		border-left: 3px solid var(--red-500);
+		.stat-icon i,
+		.stat-icon-small i {
+			color: var(--red-600);
+		}
+	}
+
+	&--warning {
+		border-left: 3px solid var(--yellow-500);
+		.stat-icon i,
+		.stat-icon-small i {
+			color: var(--yellow-700);
+		}
+	}
+
+	&--info {
+		border-left: 3px solid var(--blue-800);
+		.stat-icon i,
+		.stat-icon-small i {
+			color: var(--blue-800);
+		}
+	}
+
+	&--zero {
+		opacity: 0.8;
+
+		.stat-icon i,
+		.stat-icon-small i {
+			color: var(--text-color-secondary) !important;
+		}
+	}
+}
+// #endregion
+
+// #region Zona 1: general (3 cards grandes)
+.stats-general {
+	display: grid;
+	grid-template-columns: repeat(3, 1fr);
+	gap: 0.75rem;
+	margin-bottom: 0.75rem;
+
+	.stat-card--large {
+		padding: 0.9rem 1rem;
+
+		.stat-content .stat-value {
+			font-size: 1.75rem;
+		}
+
+		.stat-icon {
+			width: 44px;
+			height: 44px;
+		}
+	}
+}
+
+@media (max-width: 768px) {
+	.stats-general {
+		grid-template-columns: 1fr;
+	}
+}
+// #endregion
+
+// #region Zona 2: desglose del gap (6 cards compactas)
+.stats-breakdown {
+	margin-bottom: 0.75rem;
+	padding: 0.75rem 1rem;
+	border: 1px solid var(--surface-300);
+	border-radius: 10px;
+
+	&--muted {
+		.stats-breakdown__grid {
+			opacity: 0.75;
+		}
+	}
+
+	&__header {
+		display: flex;
+		align-items: baseline;
+		justify-content: space-between;
+		gap: 1rem;
+		flex-wrap: wrap;
+		margin-bottom: 0.65rem;
+	}
+
+	&__title {
+		font-size: 0.9rem;
+		font-weight: 600;
+		color: var(--text-color);
+	}
+
+	&__hint {
+		font-size: 0.75rem;
+		color: var(--text-color-secondary);
+	}
+
+	&__grid {
+		display: grid;
+		grid-template-columns: repeat(6, 1fr);
+		gap: 0.5rem;
+	}
+
+	.stat-card--compact {
+		padding: 0.5rem 0.65rem;
+		gap: 0.5rem;
+		justify-content: flex-start;
+		border-radius: 8px;
+
+		.stat-content {
+			min-width: 0;
+			flex: 1;
+
+			.stat-label {
+				font-size: 0.75rem;
+				white-space: nowrap;
+				overflow: hidden;
+				text-overflow: ellipsis;
+			}
+
+			.stat-value {
+				font-size: 1.1rem;
+			}
+
+			.stat-sublabel {
+				display: none;
+			}
+		}
+	}
+}
+
+@media (max-width: 1200px) {
+	.stats-breakdown__grid {
+		grid-template-columns: repeat(3, 1fr);
+	}
+}
+
+@media (max-width: 600px) {
+	.stats-breakdown__grid {
+		grid-template-columns: 1fr 1fr;
+	}
+}
+// #endregion

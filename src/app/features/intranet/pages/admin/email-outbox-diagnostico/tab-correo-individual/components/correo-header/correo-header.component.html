@@ -1,0 +1,65 @@
+<app-page-header
+	icon="pi pi-envelope"
+	title="Diagnóstico por correo"
+	[subtitle]="generatedAtLabel() || 'Qué pasó con un destinatario específico'"
+>
+	<form class="header-actions" (ngSubmit)="onSubmit()">
+		<input
+			type="email"
+			pInputText
+			class="correo-input"
+			placeholder="correo@dominio.com"
+			autocomplete="off"
+			[ngModel]="correoInput()"
+			name="correo"
+			maxlength="200"
+			[disabled]="loading()"
+			(ngModelChange)="onInputChange($event)"
+		/>
+
+		<button
+			type="submit"
+			pButton
+			label="Buscar"
+			icon="pi pi-search"
+			class="p-button-success p-button-sm"
+			[disabled]="loading() || !correoInput().trim()"
+		></button>
+
+		@if (correoConsultado()) {
+			<button
+				type="button"
+				pButton
+				icon="pi pi-times"
+				class="p-button-text p-button-sm btn-icon"
+				pTooltip="Limpiar"
+				(click)="onLimpiar()"
+				[pt]="{ root: { 'aria-label': 'Limpiar' } }"
+			></button>
+		}
+	</form>
+</app-page-header>
+
+<!-- #region Eco del correo consultado -->
+@if (correoConsultado()) {
+	<section class="correo-echo" aria-label="Correo consultado">
+		<div class="correo-echo__label">Mostrando resultados para:</div>
+		<code class="correo-echo__value">{{ correoConsultado() }}</code>
+		<button
+			type="button"
+			pButton
+			icon="pi pi-copy"
+			class="p-button-text p-button-sm btn-icon"
+			pTooltip="Copiar correo"
+			(click)="onCopyConsultado()"
+			[pt]="{ root: { 'aria-label': 'Copiar correo consultado' } }"
+		></button>
+		@if (mostrarEcoNormalizado()) {
+			<span class="correo-echo__hint">
+				<i class="pi pi-info-circle"></i>
+				El BE normalizó tu input (trim + minúsculas)
+			</span>
+		}
+	</section>
+}
+<!-- #endregion -->

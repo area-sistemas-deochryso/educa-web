@@ -1,0 +1,42 @@
+<app-page-header
+	icon="pi pi-search"
+	title="Gap asistencia vs correos"
+	[subtitle]="generatedAtLabel() || 'Quiénes marcaron entrada y por qué no llegó su correo'"
+>
+	<div class="header-actions">
+		<p-datepicker
+			[ngModel]="selectedDate()"
+			[showIcon]="true"
+			[maxDate]="maxDate()"
+			[minDate]="minDate()"
+			dateFormat="yy-mm-dd"
+			placeholder="Hoy"
+			appendTo="body"
+			(ngModelChange)="onDateChange($event)"
+			class="fecha-picker"
+		/>
+
+		@if (fechaConsulta()) {
+			<button
+				pButton
+				icon="pi pi-times"
+				class="p-button-text p-button-sm btn-icon"
+				pTooltip="Volver a hoy"
+				(click)="onClearDate()"
+				[pt]="{ root: { 'aria-label': 'Volver a hoy' } }"
+			></button>
+		}
+
+		<span class="action-divider"></span>
+
+		<button
+			pButton
+			icon="pi pi-refresh"
+			class="p-button-text p-button-sm btn-icon"
+			pTooltip="Refrescar"
+			[disabled]="loading()"
+			(click)="onRefresh()"
+			[pt]="{ root: { 'aria-label': 'Refrescar' } }"
+		></button>
+	</div>
+</app-page-header>

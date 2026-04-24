@@ -1,0 +1,45 @@
+<section class="table-section" aria-label="Personas asociadas al correo">
+	<header class="section-header">
+		<h3>Personas asociadas</h3>
+		<span class="section-subtitle">
+			Dueño(s) actual(es) del correo — un mismo destinatario puede aparecer en
+			múltiples tablas (p. ej. madre en <code>EST_CorreoApoderado</code> +
+			<code>APO_Correo</code>)
+		</span>
+	</header>
+
+	<p-table [value]="data()" class="p-datatable-sm" styleClass="p-datatable-gridlines">
+		<ng-template #header>
+			<tr>
+				<th class="label-uppercase col-tipofallo">Tipo</th>
+				<th class="label-uppercase col-dni">DNI</th>
+				<th class="label-uppercase">Nombre</th>
+				<th class="label-uppercase col-razon">Campo</th>
+			</tr>
+		</ng-template>
+		<ng-template #body let-row>
+			<tr>
+				<td class="col-tipofallo">
+					<p-tag [value]="row.tipoPersona | tipoPersonaLabel" [severity]="severity(row.tipoPersona)" />
+				</td>
+				<td class="col-dni">
+					<code>{{ row.dniMasked }}</code>
+				</td>
+				<td class="cell-nombre">{{ row.nombreCompleto }}</td>
+				<td class="col-razon">
+					<code class="cell-campo">{{ row.campo }}</code>
+				</td>
+			</tr>
+		</ng-template>
+		<ng-template #emptymessage>
+			<tr>
+				<td colspan="4" class="empty-message">
+					<div class="empty-state">
+						<i class="pi pi-user-minus"></i>
+						<p>Sin personas asociadas</p>
+					</div>
+				</td>
+			</tr>
+		</ng-template>
+	</p-table>
+</section>

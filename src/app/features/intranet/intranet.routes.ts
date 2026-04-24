@@ -215,6 +215,18 @@ const experimentalRoutes: Route[] = [
 				},
 			]
 		: []),
+	...(environment.features.emailOutboxDiagnostico
+		? [
+				{
+					path: 'admin/email-outbox/diagnostico',
+					loadComponent: () =>
+						import('./pages/admin/email-outbox-diagnostico').then(
+							(m) => m.EmailOutboxDiagnosticoComponent,
+						),
+					title: 'Intranet - Diagnóstico de Correos',
+				},
+			]
+		: []),
 ];
 // #endregion
 

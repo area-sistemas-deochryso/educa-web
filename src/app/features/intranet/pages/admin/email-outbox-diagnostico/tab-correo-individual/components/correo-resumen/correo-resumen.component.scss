@@ -1,0 +1,152 @@
+// #region Stat card base
+.stat-card {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	padding: 0.9rem 1rem;
+	border: 1px solid var(--surface-300);
+	border-radius: 10px;
+	background: transparent;
+
+	.stat-content {
+		display: flex;
+		flex-direction: column;
+		gap: 0.1rem;
+		min-width: 0;
+
+		.stat-label {
+			font-size: 0.8rem;
+			color: var(--text-color-secondary);
+			font-weight: 500;
+		}
+
+		.stat-value {
+			font-size: 1.5rem;
+			font-weight: 700;
+			color: var(--text-color);
+			font-variant-numeric: tabular-nums;
+			line-height: 1.1;
+		}
+
+		.stat-sublabel {
+			font-size: 0.7rem;
+			color: var(--text-color-secondary);
+		}
+	}
+
+	.stat-icon {
+		width: 40px;
+		height: 40px;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		border-radius: 10px;
+		background: var(--surface-200);
+		flex-shrink: 0;
+
+		i {
+			font-size: 1.05rem;
+			color: var(--text-color);
+		}
+	}
+
+	&--success {
+		border-left: 3px solid var(--green-500);
+		.stat-icon i {
+			color: var(--green-600);
+		}
+	}
+
+	&--danger {
+		border-left: 3px solid var(--red-500);
+		.stat-icon i {
+			color: var(--red-600);
+		}
+	}
+
+	&--warning {
+		border-left: 3px solid var(--yellow-500);
+		.stat-icon i {
+			color: var(--yellow-700);
+		}
+	}
+
+	&--info {
+		border-left: 3px solid var(--blue-800);
+		.stat-icon i {
+			color: var(--blue-800);
+		}
+	}
+
+	&--zero {
+		opacity: 0.75;
+
+		.stat-icon i {
+			color: var(--text-color-secondary) !important;
+		}
+	}
+}
+// #endregion
+
+.stats-row {
+	display: grid;
+	grid-template-columns: repeat(4, 1fr);
+	gap: 0.75rem;
+	margin-bottom: 0.75rem;
+}
+
+@media (max-width: 1024px) {
+	.stats-row {
+		grid-template-columns: repeat(2, 1fr);
+	}
+}
+
+@media (max-width: 480px) {
+	.stats-row {
+		grid-template-columns: 1fr;
+	}
+}
+
+// #region Timeline
+.timeline {
+	display: grid;
+	grid-template-columns: repeat(3, 1fr);
+	gap: 0.75rem;
+	margin-bottom: 0.75rem;
+	padding: 0.75rem 1rem;
+	border: 1px solid var(--surface-300);
+	border-radius: 10px;
+
+	&__item {
+		display: flex;
+		flex-direction: column;
+		gap: 0.2rem;
+	}
+
+	&__label {
+		font-size: 0.75rem;
+		color: var(--text-color-secondary);
+		text-transform: uppercase;
+		letter-spacing: 0.5px;
+		font-weight: 500;
+	}
+
+	&__value {
+		font-size: 0.9rem;
+		color: var(--text-color);
+		font-weight: 500;
+		font-variant-numeric: tabular-nums;
+	}
+
+	.muted {
+		color: var(--text-color-secondary);
+		font-weight: 300;
+	}
+}
+
+@media (max-width: 768px) {
+	.timeline {
+		grid-template-columns: 1fr;
+	}
+}
+// #endregion

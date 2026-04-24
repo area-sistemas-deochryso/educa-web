@@ -1,0 +1,53 @@
+<section class="stats-row" aria-label="Resumen del destinatario">
+	@for (card of cards(); track card.key) {
+		<div
+			class="stat-card"
+			[class]="'stat-card--' + card.variant"
+			[class.stat-card--zero]="card.value === 0"
+		>
+			<div class="stat-content">
+				<span class="stat-label">{{ card.label }}</span>
+				<span class="stat-value">{{ card.value }}</span>
+				<span class="stat-sublabel">{{ card.sublabel }}</span>
+			</div>
+			<div class="stat-icon">
+				<i [class]="card.icon"></i>
+			</div>
+		</div>
+	}
+</section>
+
+<!-- #region Timeline del destinatario -->
+<section class="timeline" aria-label="Cronología de intentos">
+	<div class="timeline__item">
+		<span class="timeline__label">Primer intento</span>
+		<span class="timeline__value">
+			@if (primerIntento(); as fecha) {
+				{{ fecha | date: 'yyyy-MM-dd HH:mm' }}
+			} @else {
+				<span class="muted">Nunca</span>
+			}
+		</span>
+	</div>
+	<div class="timeline__item">
+		<span class="timeline__label">Último intento</span>
+		<span class="timeline__value">
+			@if (ultimoIntento(); as fecha) {
+				{{ fecha | date: 'yyyy-MM-dd HH:mm' }}
+			} @else {
+				<span class="muted">Nunca</span>
+			}
+		</span>
+	</div>
+	<div class="timeline__item">
+		<span class="timeline__label">Mostrando</span>
+		<span class="timeline__value">
+			@if (totalIntentos() === 0) {
+				<span class="muted">—</span>
+			} @else {
+				Últimos {{ mostrandoUltimos() }} de {{ totalIntentos() }}
+			}
+		</span>
+	</div>
+</section>
+<!-- #endregion -->

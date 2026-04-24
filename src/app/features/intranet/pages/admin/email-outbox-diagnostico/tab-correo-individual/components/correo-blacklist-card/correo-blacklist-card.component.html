@@ -1,0 +1,64 @@
+<section
+	class="blacklist-card"
+	[class.blacklist-card--active]="blacklist().estado === 'ACTIVO'"
+	[class.blacklist-card--cleared]="blacklist().estado === 'DESPEJADO'"
+	aria-label="Estado en blacklist"
+>
+	<header class="blacklist-card__header">
+		<div class="blacklist-card__title">
+			<i class="pi pi-ban"></i>
+			<span>Estado en blacklist</span>
+		</div>
+		<p-tag [value]="blacklist().estado" [severity]="severity()" />
+	</header>
+
+	<p class="blacklist-card__headline">{{ headline() }}</p>
+
+	<div class="blacklist-card__grid">
+		<div class="field">
+			<span class="field__label">Motivo</span>
+			<span class="field__value">
+				<code>{{ blacklist().motivoBloqueo }}</code>
+			</span>
+		</div>
+
+		<div class="field">
+			<span class="field__label">Intentos fallidos</span>
+			<span class="field__value">{{ blacklist().intentosFallidos }}</span>
+		</div>
+
+		<div class="field">
+			<span class="field__label">Primer fallo</span>
+			<span class="field__value">
+				@if (blacklist().fechaPrimerFallo; as f) {
+					{{ f | date: 'yyyy-MM-dd HH:mm' }}
+				} @else {
+					<span class="muted">—</span>
+				}
+			</span>
+		</div>
+
+		<div class="field">
+			<span class="field__label">Último fallo</span>
+			<span class="field__value">
+				@if (blacklist().fechaUltimoFallo; as f) {
+					{{ f | date: 'yyyy-MM-dd HH:mm' }}
+				} @else {
+					<span class="muted">—</span>
+				}
+			</span>
+		</div>
+
+		<div class="field">
+			<span class="field__label">Bloqueado desde</span>
+			<span class="field__value">{{ blacklist().fechaReg | date: 'yyyy-MM-dd HH:mm' }}</span>
+		</div>
+
+		@if (blacklist().ultimoError; as err) {
+			<div class="field field--wide">
+				<span class="field__label">Último error</span>
+				<span class="field__value field__error">{{ err }}</span>
+			</div>
+		}
+	</div>
+</section>

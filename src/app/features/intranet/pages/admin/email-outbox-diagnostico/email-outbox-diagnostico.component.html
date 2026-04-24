@@ -1,0 +1,22 @@
+<p-tabs [value]="activeTab()" (valueChange)="onTabChange($event)" class="diagnostico-tabs">
+	<p-tablist>
+		<p-tab value="gap">
+			<i class="pi pi-search"></i>
+			<span>Gap del día</span>
+		</p-tab>
+		<p-tab value="correo">
+			<i class="pi pi-envelope"></i>
+			<span>Diagnóstico por correo</span>
+		</p-tab>
+	</p-tablist>
+
+	<p-tabpanels>
+		<p-tabpanel value="gap">
+			<app-tab-correos-dia />
+		</p-tabpanel>
+
+		<p-tabpanel value="correo">
+			<app-tab-correo-individual [initialCorreo]="initialCorreo()" />
+		</p-tabpanel>
+	</p-tabpanels>
+</p-tabs>

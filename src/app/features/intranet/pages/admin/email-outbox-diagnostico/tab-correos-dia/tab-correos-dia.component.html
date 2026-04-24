@@ -1,0 +1,47 @@
+<!-- #region Header -->
+<app-correos-dia-header
+	[fechaConsulta]="vm().fechaConsulta"
+	[generatedAt]="vm().generatedAt"
+	[loading]="vm().loading"
+	(refresh)="onRefresh()"
+	(fechaChange)="onFechaChange($event)"
+/>
+<!-- #endregion -->
+
+<!-- #region Resumen -->
+@if (vm().loading && !hasData()) {
+	<app-stats-skeleton [count]="3" iconPosition="right" />
+} @else if (vm().resumen; as resumen) {
+	<app-correos-dia-resumen [resumen]="resumen" />
+}
+<!-- #endregion -->
+
+<!-- #region Tablas drill-down -->
+<div class="tables-stack">
+	<!-- Entradas sin correo enviado — la más importante, va primero -->
+	@if (vm().loading && !hasData()) {
+		<app-table-skeleton [columns]="entradasColumns" [rows]="8" />
+	} @else if (hasData()) {
+		<app-entradas-sin-correo-table [data]="vm().entradasSinCorreoEnviado" />
+	}
+
+	<!-- Grid 2 columnas: estudiantes sin correo + apoderados blacklisteados -->
+	<div class="tables-grid">
+		<div class="tables-grid__left">
+			@if (vm().loading && !hasData()) {
+				<app-table-skeleton [columns]="listaSimpleColumns" [rows]="5" />
+			} @else if (hasData()) {
+				<app-estudiantes-sin-correo-table [data]="vm().estudiantesSinCorreo" />
+			}
+		</div>
+
+		<div class="tables-grid__right">
+			@if (vm().loading && !hasData()) {
+				<app-table-skeleton [columns]="blacklistColumns" [rows]="5" />
+			} @else if (hasData()) {
+				<app-apoderados-blacklisteados-table [data]="vm().apoderadosBlacklisteados" />
+			}
+		</div>
+	</div>
+</div>
+<!-- #endregion -->

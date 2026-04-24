@@ -1,0 +1,106 @@
+<section class="table-section" aria-label="Historial de intentos">
+	<header class="section-header">
+		<h3>Historial de intentos</h3>
+		<span class="section-subtitle">
+			Últimas {{ data().length }} filas de <code>EmailOutbox</code> (ordenadas DESC
+			por el BE) — click en la flecha para ver error, remitente y bounce
+		</span>
+	</header>
+
+	<p-table
+		[value]="data()"
+		[paginator]="data().length > 10"
+		[rows]="10"
+		[rowsPerPageOptions]="[10, 25, 50]"
+		class="p-datatable-sm"
+		styleClass="p-datatable-gridlines"
+	>
+		<ng-template #header>
+			<tr>
+				<th class="label-uppercase col-expand"></th>
+				<th class="label-uppercase col-fecha">Fecha</th>
+				<th class="label-uppercase col-motivo">Tipo</th>
+				<th class="label-uppercase">Asunto</th>
+				<th class="label-uppercase col-tipofallo">Estado</th>
+				<th class="label-uppercase col-tipofallo">Tipo fallo</th>
+				<th class="label-uppercase col-num">Intentos</th>
+			</tr>
+		</ng-template>
+		<ng-template #body let-row>
+			<tr [class.row-muted]="row.estado === 'SENT'">
+				<td class="col-expand">
+					@if (hasDetalle(row)) {
+						<button
+							pButton
+							[icon]="isExpanded(row.id) ? 'pi pi-chevron-down' : 'pi pi-chevron-right'"
+							class="p-button-text p-button-sm btn-icon"
+							[pTooltip]="isExpanded(row.id) ? 'Ocultar detalles' : 'Ver detalles'"
+							(click)="toggleExpand(row.id)"
+							[pt]="{ root: { 'aria-label': 'Expandir detalles' } }"
+						></button>
+					}
+				</td>
+				<td class="cell-fecha col-fecha">{{ row.fecha | date: 'yyyy-MM-dd HH:mm' }}</td>
+				<td class="col-motivo">
+					<p-tag [value]="row.tipo" styleClass="tag-neutral" />
+				</td>
+				<td class="cell-nombre">{{ row.asunto }}</td>
+				<td class="col-tipofallo">
+					<p-tag [value]="row.estado" [severity]="estadoSeverity(row.estado)" />
+				</td>
+				<td class="col-tipofallo">
+					@if (row.tipoFallo) {
+						<code class="cell-tipofallo">{{ row.tipoFallo }}</code>
+					} @else {
+						<span class="muted">—</span>
+					}
+				</td>
+				<td class="col-num">{{ row.intentos }}</td>
+			</tr>
+
+			@if (isExpanded(row.id) && hasDetalle(row)) {
+				<tr class="row-detail">
+					<td></td>
+					<td colspan="6">
+						<div class="detail-grid">
+							@if (row.ultimoError) {
+								<div class="detail-item detail-item--wide">
+									<span class="detail-label">Último error</span>
+									<span class="detail-value detail-error">{{ row.ultimoError }}</span>
+								</div>
+							}
+							@if (row.remitente) {
+								<div class="detail-item">
+									<span class="detail-label">Remitente</span>
+									<code class="detail-value">{{ row.remitente }}</code>
+								</div>
+							}
+							@if (row.bounceSource) {
+								<div class="detail-item">
+									<span class="detail-label">Bounce source</span>
+									<code class="detail-value">{{ row.bounceSource }}</code>
+								</div>
+							}
+							@if (row.bounceDetectedAt) {
+								<div class="detail-item">
+									<span class="detail-label">Bounce detectado</span>
+									<span class="detail-value">{{ row.bounceDetectedAt | date: 'yyyy-MM-dd HH:mm' }}</span>
+								</div>
+							}
+						</div>
+					</td>
+				</tr>
+			}
+		</ng-template>
+		<ng-template #emptymessage>
+			<tr>
+				<td colspan="7" class="empty-message">
+					<div class="empty-state">
+						<i class="pi pi-inbox"></i>
+						<p>Sin intentos registrados para este correo</p>
+					</div>
+				</td>
+			</tr>
+		</ng-template>
+	</p-table>
+</section>

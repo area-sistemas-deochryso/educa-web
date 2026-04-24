@@ -1,0 +1,167 @@
+// #region Shared table-section — base styles compartidos por las tablas del diagnóstico
+.table-section {
+	border: 1px solid var(--surface-300);
+	border-radius: 12px;
+	overflow: hidden;
+	background: transparent;
+
+	.section-header {
+		padding: 0.7rem 1rem;
+		border-bottom: 1px solid var(--surface-300);
+
+		h3 {
+			margin: 0;
+			font-size: 0.95rem;
+			font-weight: 600;
+			color: var(--text-color);
+		}
+
+		.section-subtitle {
+			font-size: 0.8rem;
+			color: var(--text-color-secondary);
+
+			code {
+				font-size: 0.8rem;
+				background: var(--surface-100);
+				padding: 1px 4px;
+				border-radius: 3px;
+			}
+		}
+	}
+
+	:host ::ng-deep .p-datatable {
+		.p-datatable-table-container,
+		.p-datatable-wrapper,
+		&.p-datatable {
+			overflow-x: hidden !important;
+			width: 100%;
+		}
+
+		table {
+			table-layout: auto;
+			width: 100%;
+		}
+
+		td {
+			word-break: break-word;
+			overflow-wrap: anywhere;
+		}
+	}
+
+	.col-dni,
+	.cell-dni,
+	.cell-dest code {
+		font-family: monospace;
+		font-size: 0.85rem;
+		color: var(--text-color);
+	}
+
+	.cell-nombre {
+		font-weight: 500;
+		color: var(--text-color);
+	}
+
+	.cell-fecha {
+		font-size: 0.8rem;
+		color: var(--text-color-secondary);
+		font-variant-numeric: tabular-nums;
+	}
+
+	.cell-error {
+		font-size: 0.8rem;
+		max-width: 320px;
+		overflow: hidden;
+		text-overflow: ellipsis;
+		white-space: nowrap;
+	}
+
+	.col-num {
+		text-align: right;
+		font-variant-numeric: tabular-nums;
+	}
+
+	.col-salon {
+		width: 160px;
+	}
+
+	.col-dni {
+		width: 110px;
+	}
+
+	.col-fecha {
+		width: 170px;
+	}
+
+	.col-motivo {
+		width: 140px;
+	}
+
+	.col-hijos {
+		width: 120px;
+		text-align: center;
+	}
+
+	.col-hora {
+		width: 100px;
+		text-align: center;
+		font-variant-numeric: tabular-nums;
+	}
+
+	.col-razon {
+		width: 200px;
+	}
+
+	.col-tipofallo {
+		width: 160px;
+	}
+
+	.col-actions {
+		width: 70px;
+		text-align: center;
+	}
+
+	.btn-icon {
+		width: 2rem;
+		height: 2rem;
+		padding: 0;
+	}
+
+	:host ::ng-deep .p-datatable-tbody > tr {
+		&.row-warning > td {
+			background: color-mix(in srgb, var(--yellow-500) 8%, transparent);
+		}
+
+		&.row-critical > td {
+			background: color-mix(in srgb, var(--red-500) 10%, transparent);
+		}
+
+		&.row-muted > td {
+			opacity: 0.7;
+		}
+	}
+
+	.empty-message {
+		padding: 2rem 1rem;
+		text-align: center;
+
+		.empty-state {
+			display: flex;
+			flex-direction: column;
+			align-items: center;
+			gap: 0.5rem;
+			color: var(--text-color);
+			font-size: 0.9rem;
+
+			i {
+				font-size: 1.75rem;
+				color: var(--green-600);
+			}
+
+			p {
+				margin: 0;
+				font-weight: 500;
+			}
+		}
+	}
+}
+// #endregion

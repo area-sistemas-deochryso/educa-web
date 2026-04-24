@@ -1,0 +1,47 @@
+<section class="table-section" aria-label="Apoderados blacklisteados del día">
+	<header class="section-header">
+		<h3>Apoderados blacklisteados</h3>
+		<span class="section-subtitle">
+			Correos en <code>EmailBlacklist</code> activa que afectan estudiantes con
+			entrada hoy — INV-MAIL02
+		</span>
+	</header>
+
+	<p-table [value]="data()" class="p-datatable-sm" styleClass="p-datatable-gridlines">
+		<ng-template #header>
+			<tr>
+				<th class="label-uppercase">Correo apoderado</th>
+				<th class="label-uppercase col-motivo">Motivo</th>
+				<th class="label-uppercase col-fecha">Bloqueado desde</th>
+				<th class="label-uppercase col-hijos">Hijos afectados</th>
+			</tr>
+		</ng-template>
+		<ng-template #body let-row>
+			<tr [class.row-critical]="row.hijosAfectadosConEntradaHoy > 1">
+				<td class="cell-dest">
+					<code>{{ row.correoMasked }}</code>
+				</td>
+				<td class="col-motivo">
+					<p-tag [value]="row.motivoBloqueo" severity="warn" />
+				</td>
+				<td class="cell-fecha col-fecha">{{ row.fechaBloqueo | date: 'yyyy-MM-dd HH:mm' }}</td>
+				<td class="col-hijos">
+					<p-tag
+						[value]="row.hijosAfectadosConEntradaHoy"
+						[severity]="row.hijosAfectadosConEntradaHoy > 1 ? 'danger' : 'warn'"
+					/>
+				</td>
+			</tr>
+		</ng-template>
+		<ng-template #emptymessage>
+			<tr>
+				<td colspan="4" class="empty-message">
+					<div class="empty-state">
+						<i class="pi pi-check-circle"></i>
+						<p>Ningún apoderado blacklisteado afecta hoy</p>
+					</div>
+				</td>
+			</tr>
+		</ng-template>
+	</p-table>
+</section>

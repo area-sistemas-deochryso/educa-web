@@ -1,0 +1,17 @@
+.tables-stack {
+	display: flex;
+	flex-direction: column;
+	gap: 0.75rem;
+}
+
+.tables-grid {
+	display: grid;
+	grid-template-columns: 1fr 1fr;
+	gap: 0.75rem;
+}
+
+@media (max-width: 1024px) {
+	.tables-grid {
+		grid-template-columns: 1fr;
+	}
+}

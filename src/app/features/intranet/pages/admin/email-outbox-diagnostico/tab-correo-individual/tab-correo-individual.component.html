@@ -1,0 +1,47 @@
+<!-- #region Header -->
+<app-correo-header
+	[correoInput]="vm().correoInput"
+	[correoConsultado]="vm().correoConsultado"
+	[generatedAt]="vm().generatedAt"
+	[loading]="vm().loading"
+	(correoInputChange)="onCorreoInputChange($event)"
+	(buscar)="onBuscar($event)"
+	(limpiar)="onLimpiar()"
+/>
+<!-- #endregion -->
+
+<!-- #region Contenido -->
+@if (vm().loading && !vm().hasResult) {
+	<!-- Skeleton inicial mientras llega el primer resultado -->
+	<app-stats-skeleton [count]="4" iconPosition="right" />
+	<app-table-skeleton [columns]="personasColumns" [rows]="3" />
+	<app-table-skeleton [columns]="historiaColumns" [rows]="8" />
+} @else if (vm().hasResult) {
+	<!-- Resumen -->
+	@if (vm().resumen; as resumen) {
+		<app-correo-resumen [resumen]="resumen" />
+	}
+
+	<!-- Blacklist card (condicional) -->
+	@if (vm().blacklist; as blacklist) {
+		<app-correo-blacklist-card [blacklist]="blacklist" />
+	}
+
+	<!-- Personas asociadas -->
+	<app-correo-personas-table [data]="vm().personasAsociadas" />
+
+	<!-- Historia de intentos -->
+	<app-correo-historia-table [data]="vm().historia" />
+} @else {
+	<!-- Empty state — aún no se ha buscado -->
+	<section class="empty-initial" aria-label="Sin resultados">
+		<i class="pi pi-search"></i>
+		<h3>Busca un correo para empezar</h3>
+		<p>
+			Escribe el correo del apoderado, profesor o director en la barra superior y
+			pulsa Buscar. Obtendrás el historial completo de envíos, estado de
+			blacklist y a quién pertenece el correo.
+		</p>
+	</section>
+}
+<!-- #endregion -->

@@ -1,0 +1,54 @@
+<!-- #region Zona 1: Estado general (3 cards grandes) -->
+<section class="stats-general" aria-label="Universo del día">
+	@for (card of generalCards(); track card.key) {
+		<div class="stat-card stat-card--large" [class]="'stat-card--' + card.variant">
+			<div class="stat-content">
+				<span class="stat-label">{{ card.label }}</span>
+				<span class="stat-value">{{ card.value }}</span>
+				<span class="stat-sublabel">{{ card.sublabel }}</span>
+			</div>
+			<div class="stat-icon">
+				<i [class]="card.icon"></i>
+			</div>
+		</div>
+	}
+</section>
+<!-- #endregion -->
+
+<!-- #region Zona 2: Desglose del gap (6 cards compactas) -->
+<section
+	class="stats-breakdown"
+	[class.stats-breakdown--muted]="totalGap() === 0"
+	aria-label="Desglose del gap"
+>
+	<header class="stats-breakdown__header">
+		<span class="stats-breakdown__title">Desglose del gap</span>
+		<span class="stats-breakdown__hint">
+			@if (totalGap() === 0) {
+				Sin gaps hoy — todas las entradas tienen correo asociado
+			} @else {
+				Razones por las que {{ totalGap() }} entradas no generaron correo exitoso
+			}
+		</span>
+	</header>
+
+	<div class="stats-breakdown__grid">
+		@for (card of gapCards(); track card.key) {
+			<div
+				class="stat-card stat-card--compact"
+				[class]="'stat-card--' + card.variant"
+				[class.stat-card--zero]="card.value === 0"
+			>
+				<div class="stat-icon-small">
+					<i [class]="card.icon"></i>
+				</div>
+				<div class="stat-content">
+					<span class="stat-label">{{ card.label }}</span>
+					<span class="stat-value">{{ card.value }}</span>
+					<span class="stat-sublabel">{{ card.sublabel }}</span>
+				</div>
+			</div>
+		}
+	</div>
+</section>
+<!-- #endregion -->
