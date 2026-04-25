@@ -35,6 +35,13 @@ export class ErrorLogsFacade {
 	}
 
 	// #region Carga de datos
+	/**
+	 * Carga la página actual + el total de filas que matchean los filtros.
+	 * Total y items van en paralelo — el paginador necesita el total real
+	 * desde la primera carga para mostrar las páginas reales (antes la
+	 * cuenta era progresiva: el FE descubría más páginas avanzando una
+	 * a una).
+	 */
 	loadData(): void {
 		if (this.store.loading()) return;
 		this.store.setLoading(true);
@@ -60,6 +67,29 @@ export class ErrorLogsFacade {
 					logger.error('[ErrorLogsFacade] Error al cargar errores:', err);
 					this.store.setLoading(false);
 					this.store.setTableReady(true);
+				},
+			});
+
+		this.loadCount();
+	}
+
+	private loadCount(): void {
+		this.api
+			.getCount(
+				this.store.filterOrigen(),
+				this.store.filterSeveridad(),
+				this.store.filterCorrelationId(),
+				this.store.filterHttp(),
+				this.store.filterUsuarioRol(),
+			)
+			.pipe(takeUntilDestroyed(this.destroyRef))
+			.subscribe({
+				next: (count) => this.store.setTotalCount(count),
+				error: (err) => {
+					// Fail-safe: si el count falla, dejamos null y el componente
+					// vuelve a la estimación progresiva (no rompe la página).
+					logger.warn('[ErrorLogsFacade] Error al cargar total de errores', err);
+					this.store.setTotalCount(null);
 				},
 			});
 	}
@@ -108,7 +138,31 @@ export class ErrorLogsFacade {
 
 	loadPage(page: number): void {
 		this.store.setPage(page);
-		this.loadData();
+		// Cambiar de página NO requiere recargar el count (mismos filtros);
+		// solo refrescamos los items.
+		if (this.store.loading()) return;
+		this.store.setLoading(true);
+		this.api
+			.getErrores(
+				this.store.filterOrigen(),
+				this.store.filterSeveridad(),
+				this.store.filterCorrelationId(),
+				this.store.page(),
+				this.store.pageSize(),
+				this.store.filterHttp(),
+				this.store.filterUsuarioRol(),
+			)
+			.pipe(takeUntilDestroyed(this.destroyRef))
+			.subscribe({
+				next: (items) => {
+					this.store.setItems(items);
+					this.store.setLoading(false);
+				},
+				error: (err) => {
+					logger.error('[ErrorLogsFacade] Error al cargar página:', err);
+					this.store.setLoading(false);
+				},
+			});
 	}
 
 	setPageSize(pageSize: number): void {

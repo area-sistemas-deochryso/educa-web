@@ -8,6 +8,7 @@ export class ErrorLogsStore {
 	private readonly _items = signal<ErrorLogLista[]>([]);
 	private readonly _loading = signal(false);
 	private readonly _tableReady = signal(false);
+	private readonly _totalCount = signal<number | null>(null);
 
 	// Filtros
 	private readonly _filterOrigen = signal<ErrorOrigen | null>(null);
@@ -27,6 +28,7 @@ export class ErrorLogsStore {
 	readonly items = this._items.asReadonly();
 	readonly loading = this._loading.asReadonly();
 	readonly tableReady = this._tableReady.asReadonly();
+	readonly totalCount = this._totalCount.asReadonly();
 	readonly filterOrigen = this._filterOrigen.asReadonly();
 	readonly filterSeveridad = this._filterSeveridad.asReadonly();
 	readonly filterHttp = this._filterHttp.asReadonly();
@@ -60,6 +62,7 @@ export class ErrorLogsStore {
 		items: this._items(),
 		loading: this._loading(),
 		tableReady: this._tableReady(),
+		totalCount: this._totalCount(),
 		filterOrigen: this._filterOrigen(),
 		filterSeveridad: this._filterSeveridad(),
 		filterHttp: this._filterHttp(),
@@ -86,9 +89,16 @@ export class ErrorLogsStore {
 		this._tableReady.set(ready);
 	}
 
+	/** Total real de items que matchean los filtros (lo devuelve `errors/count`). */
+	setTotalCount(count: number | null): void {
+		this._totalCount.set(count);
+	}
+
 	/** Mutación quirúrgica: elimina un item del listado sin refetch. */
 	removeItem(id: number): void {
 		this._items.update((list) => list.filter((i) => i.id !== id));
+		// Mantener el totalCount consistente con la mutación local.
+		this._totalCount.update((c) => (c !== null && c > 0 ? c - 1 : c));
 	}
 	// #endregion
 

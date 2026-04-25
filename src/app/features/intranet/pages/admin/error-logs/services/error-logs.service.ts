@@ -40,6 +40,28 @@ export class ErrorLogsService {
 		return this.http.get<ErrorLogCompleto>(`${this.apiUrl}/${errorId}`);
 	}
 
+	/**
+	 * Total de errores que matchean los filtros. El componente lo consume para
+	 * mostrar el número real de páginas en el paginador (antes hacía estimación
+	 * progresiva: solo descubría más páginas avanzando una a una).
+	 */
+	getCount(
+		origen: string | null,
+		severidad: string | null,
+		correlationId: string | null,
+		httpFilter: string | null = null,
+		usuarioRol: string | null = null,
+	): Observable<number> {
+		const params: Record<string, string> = {};
+		if (origen) params['origen'] = origen;
+		if (severidad) params['severidad'] = severidad;
+		if (correlationId) params['correlationId'] = correlationId;
+		if (httpFilter) params['httpFilter'] = httpFilter;
+		if (usuarioRol) params['usuarioRol'] = usuarioRol;
+
+		return this.http.get<number>(`${this.apiUrl}/count`, { params });
+	}
+
 	// #endregion
 
 	// #region Mutaciones

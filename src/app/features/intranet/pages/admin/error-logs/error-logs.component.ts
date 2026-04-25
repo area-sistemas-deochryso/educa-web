@@ -73,11 +73,15 @@ export class ErrorLogsComponent implements OnInit {
 	readonly vm = this.facade.vm;
 
 	/**
-	 * Estimación de totalRecords para el paginador. Backend no devuelve total:
-	 * si la página está llena asumimos que hay más; si viene corta, es la última.
+	 * Total de records para el paginador. Cuando el endpoint `/count` devuelve
+	 * un valor, lo usamos directamente para mostrar el número real de páginas
+	 * desde la primera carga. Si por alguna razón el count no llegó (fallo
+	 * fire-and-forget), caemos a la estimación progresiva original (`offset +
+	 * items.length` en última página, `offset + pageSize + 1` en página llena).
 	 */
 	readonly totalRecordsEstimate = computed(() => {
-		const { page, pageSize, items } = this.vm();
+		const { page, pageSize, items, totalCount } = this.vm();
+		if (totalCount !== null) return totalCount;
 		const offset = (page - 1) * pageSize;
 		return items.length < pageSize ? offset + items.length : offset + pageSize + 1;
 	});
