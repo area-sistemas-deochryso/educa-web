@@ -23,6 +23,8 @@ export interface EmailOutboxLista {
 	duracionMs: number | null;
 	usuarioReg: string;
 	fechaReg: string;
+	/** Plan 32 Chat 2 BE — id de correlación inyectado en el outbox para tracing cross-fuente. */
+	correlationId: string | null;
 }
 
 export interface EmailOutboxEstadisticas {

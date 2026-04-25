@@ -27,6 +27,11 @@ export class RateLimitEventsService {
 		if (filtro.soloRechazados) params = params.set('soloRechazados', 'true');
 		if (filtro.desde) params = params.set('desde', filtro.desde.toISOString());
 		if (filtro.hasta) params = params.set('hasta', filtro.hasta.toISOString());
+		// Plan 32 Chat 4 — el query param correlationId se envía al BE igualmente.
+		// Hoy el BE lo ignora (no está en RateLimitEventFiltroDto); el filter
+		// efectivo se aplica client-side en el facade. Cuando el BE lo soporte,
+		// el filtrado pasa a ser server-side sin tocar acá.
+		if (filtro.correlationId) params = params.set('correlationId', filtro.correlationId);
 
 		return this.http.get<RateLimitEventListaDto[]>(this.apiUrl, { params });
 	}

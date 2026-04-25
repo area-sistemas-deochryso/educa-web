@@ -27,6 +27,7 @@
 			<th pSortableColumn="fechaReg" style="width: 140px">
 				Fecha <p-sortIcon field="fechaReg" />
 			</th>
+			<th style="width: 110px">Correlation</th>
 			<th style="width: 100px">Acciones</th>
 		</tr>
 	</ng-template>
@@ -57,6 +58,9 @@
 			</td>
 			<td class="text-center">{{ item.intentos }}/{{ item.maxIntentos }}</td>
 			<td>{{ item.fechaReg | date: 'dd/MM/yy HH:mm' }}</td>
+			<td>
+				<app-correlation-id-pill [id]="item.correlationId" [compact]="true" />
+			</td>
 			<td>
 				<div class="action-buttons">
 					<button
@@ -101,7 +105,7 @@
 
 	<ng-template pTemplate="emptymessage">
 		<tr>
-			<td colspan="8" class="text-center p-4">No se encontraron correos</td>
+			<td colspan="9" class="text-center p-4">No se encontraron correos</td>
 		</tr>
 	</ng-template>
 </p-table>

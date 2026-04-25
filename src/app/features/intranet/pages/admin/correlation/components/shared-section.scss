@@ -1,0 +1,132 @@
+.correlation-section {
+	background: transparent;
+	border: 1px solid var(--surface-300);
+	border-radius: 12px;
+	padding: 1rem 1.25rem 1.25rem;
+	display: flex;
+	flex-direction: column;
+	gap: 0.75rem;
+	overflow: hidden;
+}
+
+.correlation-section__header {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	gap: 0.75rem;
+	flex-wrap: wrap;
+}
+
+.correlation-section__title {
+	display: flex;
+	align-items: center;
+	gap: 0.5rem;
+	color: var(--text-color);
+
+	i {
+		font-size: 1rem;
+		color: var(--blue-800);
+	}
+
+	h3 {
+		margin: 0;
+		font-size: 1rem;
+		font-weight: 600;
+	}
+}
+
+.correlation-section__count {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	min-width: 1.75rem;
+	height: 1.5rem;
+	padding: 0 0.5rem;
+	background: var(--surface-200);
+	color: var(--text-color);
+	border-radius: 999px;
+	font-size: 0.75rem;
+	font-weight: 600;
+}
+
+.correlation-section__empty {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	gap: 0.5rem;
+	padding: 1.5rem;
+	text-align: center;
+	background: var(--surface-50);
+	border-radius: 8px;
+	color: var(--text-color-secondary);
+
+	i {
+		font-size: 1.5rem;
+		color: var(--green-600);
+	}
+
+	p {
+		margin: 0;
+		font-size: 0.875rem;
+	}
+}
+
+.correlation-section__cap {
+	display: flex;
+	align-items: center;
+	gap: 0.5rem;
+	padding: 0.5rem 0.75rem;
+	background: color-mix(in srgb, var(--yellow-500) 12%, transparent);
+	border: 1px solid var(--yellow-500);
+	border-radius: 6px;
+	color: var(--text-color);
+	font-size: 0.8rem;
+	margin: 0;
+
+	i {
+		color: var(--yellow-700);
+	}
+}
+
+.cell-mono {
+	font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+	font-size: 0.8rem;
+	color: var(--text-color);
+}
+
+.cell-url {
+	display: inline-block;
+	max-width: 18rem;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+	vertical-align: middle;
+}
+
+.cell-message {
+	display: inline-block;
+	max-width: 22rem;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+	vertical-align: middle;
+}
+
+.cell-user {
+	display: flex;
+	flex-direction: column;
+	gap: 0.15rem;
+}
+
+.cell-user__rol {
+	font-size: 0.7rem;
+	color: var(--text-color-secondary);
+	text-transform: uppercase;
+	letter-spacing: 0.5px;
+}
+
+.muted {
+	color: var(--text-color-secondary);
+	font-style: italic;
+	font-size: 0.85rem;
+}

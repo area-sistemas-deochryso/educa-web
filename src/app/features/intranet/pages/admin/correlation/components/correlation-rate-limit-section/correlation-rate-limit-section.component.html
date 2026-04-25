@@ -1,0 +1,84 @@
+<section class="correlation-section">
+	<header class="correlation-section__header">
+		<div class="correlation-section__title">
+			<i class="pi pi-shield"></i>
+			<h3>Eventos de rate limit</h3>
+			<span class="correlation-section__count">{{ count() }}</span>
+		</div>
+		<a
+			[routerLink]="['/intranet/admin/rate-limit-events']"
+			[queryParams]="{ correlationId: correlationId() }"
+			pButton
+			type="button"
+			label="Abrir en rate-limit"
+			icon="pi pi-external-link"
+			class="p-button-text p-button-sm"
+		></a>
+	</header>
+
+	@if (count() === 0) {
+		<div class="correlation-section__empty">
+			<i class="pi pi-check-circle"></i>
+			<p>Sin rebotes de rate limit con este correlation id.</p>
+		</div>
+	} @else {
+		<p-table [value]="items()" class="p-datatable-sm" [scrollable]="true" scrollHeight="flex">
+			<ng-template #header>
+				<tr>
+					<th style="width: 80px">Método</th>
+					<th>Endpoint</th>
+					<th style="width: 110px">Política</th>
+					<th style="width: 90px">Rechazado</th>
+					<th style="width: 110px">Límite</th>
+					<th style="width: 130px">Usuario</th>
+					<th style="width: 160px">Fecha</th>
+				</tr>
+			</ng-template>
+			<ng-template #body let-row>
+				<tr>
+					<td><span class="cell-mono">{{ row.httpMethod }}</span></td>
+					<td>
+						<span class="cell-mono cell-url" [pTooltip]="row.endpoint" tooltipPosition="top">
+							{{ row.endpoint }}
+						</span>
+					</td>
+					<td><p-tag [value]="displayPolicy(row.policy)" styleClass="tag-neutral" /></td>
+					<td>
+						@if (row.fueRechazado) {
+							<p-tag value="Sí" severity="danger" />
+						} @else {
+							<p-tag value="No" styleClass="tag-neutral" />
+						}
+					</td>
+					<td>
+						@if (row.limiteEfectivo !== null) {
+							<span class="cell-mono">{{ row.tokensConsumidos ?? '?' }} / {{ row.limiteEfectivo }}</span>
+						} @else {
+							<span class="muted">—</span>
+						}
+					</td>
+					<td>
+						@if (row.usuarioDniMasked) {
+							<div class="cell-user">
+								<span class="cell-mono">{{ row.usuarioDniMasked }}</span>
+								@if (row.usuarioRol) {
+									<span class="cell-user__rol">{{ row.usuarioRol }}</span>
+								}
+							</div>
+						} @else {
+							<span class="muted">Anónimo</span>
+						}
+					</td>
+					<td>{{ row.fecha | date: 'dd/MM/yyyy HH:mm:ss' }}</td>
+				</tr>
+			</ng-template>
+		</p-table>
+
+		@if (cappedRows()) {
+			<p class="correlation-section__cap">
+				<i class="pi pi-info-circle"></i>
+				Mostrando 100 filas (cap defensivo del backend).
+			</p>
+		}
+	}
+</section>

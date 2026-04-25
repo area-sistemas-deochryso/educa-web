@@ -70,6 +70,13 @@ export class FeedbackReportsFacade {
 			.pipe(takeUntilDestroyed(this.destroyRef))
 			.subscribe({
 				next: (items) => {
+					// Plan 32 Chat 4 — el BE no expone correlationId en
+					// ReporteUsuarioListaDto, así que el filter cliente-side por
+					// correlationId no es factible aquí (la lista no lo trae).
+					// El deep-link ?correlationId=X conserva el id en URL pero no
+					// filtra; el admin ve todos los reportes y abre el detalle del
+					// que aplique. Deuda lateral del Plan 32: agregar el campo al
+					// DTO de lista para habilitar el filter completo.
 					this.store.setItems(items);
 					this.store.setLoading(false);
 					this.store.setTableReady(true);
@@ -106,6 +113,16 @@ export class FeedbackReportsFacade {
 
 	clearFilters(): void {
 		this.store.clearFilters();
+		this.loadItems();
+	}
+
+	/**
+	 * Plan 32 Chat 4 — el hub linkea acá con `?correlationId=<id>`. El page
+	 * setea el filtro y dispara load; el facade aplica filter client-side
+	 * porque el BE de reportes-usuario no expone el filtro hoy.
+	 */
+	setFilterCorrelationId(correlationId: string | null): void {
+		this.store.setFilterCorrelationId(correlationId);
 		this.loadItems();
 	}
 	// #endregion

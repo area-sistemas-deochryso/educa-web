@@ -200,6 +200,13 @@
 			font-size: 0.72rem !important;
 			line-height: 1.3;
 		}
+
+		&--correlation {
+			display: inline-flex;
+			align-items: center;
+			gap: 0.5rem;
+			flex-wrap: wrap;
+		}
 	}
 }
 

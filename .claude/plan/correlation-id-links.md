@@ -125,9 +125,32 @@ Este mismo. Brief en `.claude/chats/042-plan-32-chat-1-design-correlation-id-lin
 | Commit | `7184bab` en `Educa.API master`: `feat(sistema): Plan 32 Chat 3 — correlation hub endpoint` |
 | Verificación post-deploy | Pendiente del usuario: `GET /api/sistema/correlation/{id}` con un id real (lookup vía `SELECT TOP 1 ERL_CorrelationId FROM ErrorLog WHERE ERL_CorrelationId IS NOT NULL`) y confirmar que las 4 secciones llegan con el shape esperado por Chat 4 FE |
 
-### Chat 4 FE — Pantalla hub + pill + wiring en 4 dashboards
+### Chat 4 FE — Pantalla hub + pill + wiring en 4 dashboards ✅ cerrado 2026-04-25
 
 **Repo**: `educa-web main`
+
+**Resultado real**:
+
+- ✅ Pill `<app-correlation-id-pill>` en `@shared/components/correlation-id-pill/` (standalone, OnPush). Inputs `id` requerido + `compact` opcional; tag-neutral; aria-label dinámico; click navega via Router; tests verdes (5).
+- ✅ Hub `/intranet/admin/correlation/:id` operativo. Renderiza 4 secciones SIEMPRE (`correlation-errors-section`, `-rate-limit-section`, `-reports-section`, `-emails-section`) con empty states inline. Banner azul con id + meta + copiar; loading + error states; botón Volver/Reintentar. Tests: 1 service + 4 facade + 3 component = 8.
+- ✅ Permiso reusado vía `data.permissionPath: 'intranet/admin/trazabilidad-errores'` (override añadido a `permisos.guard.ts:getFullPath`). Sin entrada de menú; sin permiso nuevo en el registry.
+- ✅ Wiring 4 dashboards:
+  - **error-logs**: drawer con pill + botón "Ver eventos correlacionados" en el detail-row del CorrelationId. Store + facade + component leen query param `correlationId` para deep-link reverso (server-side filter ya existía). Tests del store (3).
+  - **rate-limit-events**: pill compact en columna existente; drawer con pill; `onBuscarEnErrorLog` redirige al hub. Filter `correlationId` agregado al modelo + service (BE no lo soporta hoy → filter client-side en el facade). Store init via query param. Test del store extendido.
+  - **feedback-reports**: pill en el detalle-row del CorrelationId; flujo del drawer de error-logs reutilizado **eliminado** (decisión: la pill al hub es la nueva navegación canónica, más informativa). Component lee query param. **Limitación**: `ReporteUsuarioListaDto` BE no incluye `correlationId`, así que el filter client-side por ese campo no es factible en la lista; el deep-link conserva el id en URL pero no filtra (deuda lateral menor — agregar el campo al DTO de lista permitiría filtrar).
+  - **email-outbox**: nueva columna "Correlation" con pill compact; `EmailOutboxLista` extendido con `correlationId: string | null` (BE ya lo retornaba en `EmailOutboxListaDto.CorrelationId` desde Plan 32 Chat 2 BE — solo faltaba reflejarlo en el DTO TS). Filter client-side via `filteredItems` computed. Component lee query param.
+- ✅ Lint OK (1 warning preexistente fuera del scope). Build OK (warnings de exceljs preexistentes).
+- ✅ Suite Vitest: **1600 verdes / 146 archivos** (baseline 1535 + nuevos = OK; 11 + 13 = 24 tests nuevos del Chat 4 + ajustes en 1 spec existente).
+
+**Decisiones tomadas**:
+
+1. **Permiso reusado** vía `data.permissionPath` en routes — el guard ya hace exact match, así que con id dinámico nunca matchea; el override evita crear un permiso nuevo en el registry. Solución retrocompatible (existing routes sin override siguen funcionando como antes).
+2. **Cross-link feedback-reports → drawer error-logs eliminado** — la pill al hub es estrictamente más informativa (4 fuentes vs 1) y simplifica el component (menos signals, menos imports).
+3. **Filter client-side en rate-limit y email-outbox** — el BE ya cerró Chat 3, no se toca. El query param `correlationId` se envía al BE igualmente (lo ignora hoy); cuando el BE lo soporte, el filter pasa a server-side sin tocar FE.
+4. **No filtrado en feedback-reports** — la lista no trae el campo `correlationId`. Documentado como deuda lateral menor.
+5. **Tabla email-outbox extendida con columna Correlation** — width 110px, con pill compact (8 chars + tooltip). skeletonColumns ajustado.
+
+**Commit FE**: pendiente (lo crea la sesión al cerrar el chat)
 
 **Scope**:
 

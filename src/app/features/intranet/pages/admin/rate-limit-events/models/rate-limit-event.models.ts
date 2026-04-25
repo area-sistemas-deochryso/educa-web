@@ -48,6 +48,12 @@ export interface RateLimitEventFiltro {
 	soloRechazados?: boolean;
 	desde?: Date | null;
 	hasta?: Date | null;
+	/**
+	 * Plan 32 Chat 4 — filtra eventos por correlationId. Cuando el page se abre
+	 * con `?correlationId=<id>` desde el hub, el store lo inicializa acá.
+	 * Backend filtra por exact match.
+	 */
+	correlationId?: string | null;
 	/** Default 200 en el service. Backend clampa a máx 500. */
 	take?: number;
 }

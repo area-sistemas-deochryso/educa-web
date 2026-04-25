@@ -43,7 +43,7 @@ export class ErrorLogsFacade {
 			.getErrores(
 				this.store.filterOrigen(),
 				this.store.filterSeveridad(),
-				null,
+				this.store.filterCorrelationId(),
 				this.store.page(),
 				this.store.pageSize(),
 				this.store.filterHttp(),
@@ -91,6 +91,17 @@ export class ErrorLogsFacade {
 
 	setFilterUsuarioRol(rol: string | null): void {
 		this.store.setFilterUsuarioRol(rol);
+		this.store.setPage(1);
+		this.loadData();
+	}
+
+	/**
+	 * Plan 32 Chat 4 — el hub de correlation linkea acá con `?correlationId=<id>`.
+	 * El page lo lee del query param en init y llama este método para aplicar
+	 * el filtro y disparar el load.
+	 */
+	setFilterCorrelationId(correlationId: string | null): void {
+		this.store.setFilterCorrelationId(correlationId);
 		this.store.setPage(1);
 		this.loadData();
 	}
@@ -215,7 +226,8 @@ export class ErrorLogsFacade {
 				matchString('origen', this.store.filterOrigen()) &&
 				matchString('severidad', this.store.filterSeveridad()) &&
 				matchString('httpFilter', this.store.filterHttp()) &&
-				matchString('usuarioRol', this.store.filterUsuarioRol())
+				matchString('usuarioRol', this.store.filterUsuarioRol()) &&
+				matchString('correlationId', this.store.filterCorrelationId())
 			);
 		} catch {
 			return false;

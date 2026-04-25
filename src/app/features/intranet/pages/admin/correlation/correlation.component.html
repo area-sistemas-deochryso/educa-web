@@ -1,0 +1,88 @@
+<app-page-header
+	icon="pi pi-share-alt"
+	title="Eventos correlacionados"
+	subtitle="Hub central que agrupa los 4 tipos de telemetría que comparten un mismo correlation id"
+>
+	<div class="header-actions">
+		<button
+			pButton
+			icon="pi pi-arrow-left"
+			label="Volver"
+			class="p-button-text p-button-sm"
+			(click)="onBack()"
+			[pt]="{ root: { 'aria-label': 'Volver' } }"
+		></button>
+		<button
+			pButton
+			icon="pi pi-refresh"
+			class="p-button-text p-button-sm btn-icon"
+			[disabled]="vm().loading || !vm().correlationId"
+			(click)="onRetry()"
+			pTooltip="Recargar snapshot"
+			[pt]="{ root: { 'aria-label': 'Recargar snapshot' } }"
+		></button>
+	</div>
+</app-page-header>
+
+@if (vm().correlationId) {
+	<section class="correlation-id-banner">
+		<div class="correlation-id-banner__content">
+			<span class="correlation-id-banner__label">Correlation id</span>
+			<code class="correlation-id-banner__value">{{ vm().correlationId }}</code>
+		</div>
+		<div class="correlation-id-banner__actions">
+			@if (vm().snapshot?.generatedAt; as ts) {
+				<span class="correlation-id-banner__meta">
+					Snapshot generado: {{ ts | date: 'dd/MM/yyyy HH:mm:ss' }}
+				</span>
+			}
+			<button
+				pButton
+				icon="pi pi-copy"
+				label="Copiar id"
+				class="p-button-text p-button-sm"
+				(click)="onCopyId(vm().correlationId)"
+				[pt]="{ root: { 'aria-label': 'Copiar correlation id al portapapeles' } }"
+			></button>
+		</div>
+	</section>
+}
+
+@if (vm().loading) {
+	<div class="correlation-loading">
+		<i class="pi pi-spinner pi-spin"></i>
+		<p>Cargando eventos correlacionados…</p>
+	</div>
+} @else if (vm().error) {
+	<div class="correlation-error">
+		<i class="pi pi-exclamation-triangle"></i>
+		<h3>No se pudo cargar el snapshot</h3>
+		<p>{{ vm().error }}</p>
+		<button
+			pButton
+			label="Reintentar"
+			icon="pi pi-refresh"
+			class="p-button-outlined p-button-sm"
+			(click)="onRetry()"
+		></button>
+	</div>
+} @else {
+	<div class="correlation-grid">
+		<app-correlation-errors-section
+			[items]="vm().errorLogs"
+			[correlationId]="vm().correlationId"
+		/>
+		<app-correlation-rate-limit-section
+			[items]="vm().rateLimitEvents"
+			[correlationId]="vm().correlationId"
+		/>
+		<app-correlation-reports-section
+			[items]="vm().reportesUsuario"
+			[correlationId]="vm().correlationId"
+		/>
+		<app-correlation-emails-section
+			[items]="vm().emailOutbox"
+			[correlationId]="vm().correlationId"
+		/>
+	</div>
+}

@@ -7,6 +7,7 @@ import { TooltipModule } from 'primeng/tooltip';
 
 import { EmailOutboxLista } from '@data/models/email-outbox.models';
 import type { SkeletonColumnDef } from '@shared/components';
+import { CorrelationIdPillComponent } from '@shared/components/correlation-id-pill';
 
 import { esPermanente } from '../../models/tipo-fallo.models';
 import { TipoFalloLabelPipe } from '../../pipes/tipo-fallo-label.pipe';
@@ -23,6 +24,7 @@ import { TipoFalloSeverityPipe } from '../../pipes/tipo-fallo-severity.pipe';
 		DatePipe,
 		TipoFalloLabelPipe,
 		TipoFalloSeverityPipe,
+		CorrelationIdPillComponent,
 	],
 	templateUrl: './email-outbox-table.component.html',
 	styleUrl: './email-outbox-table.component.scss',
@@ -45,6 +47,7 @@ export class EmailOutboxTableComponent {
 		{ width: '140px', cellType: 'badge' },
 		{ width: '80px', cellType: 'text' },
 		{ width: '130px', cellType: 'text' },
+		{ width: '110px', cellType: 'badge' },
 		{ width: '100px', cellType: 'actions' },
 	];
 	// #endregion

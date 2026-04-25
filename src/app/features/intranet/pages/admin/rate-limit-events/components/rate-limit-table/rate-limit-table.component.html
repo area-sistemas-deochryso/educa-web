@@ -58,17 +58,7 @@
 				<span class="mono">{{ item.ipAddress ?? '—' }}</span>
 			</td>
 			<td class="col-correlation">
-				@if (item.correlationId) {
-					<span
-						class="mono correlation-chip"
-						[pTooltip]="item.correlationId"
-						tooltipPosition="top"
-					>
-						{{ truncateCorrelation(item.correlationId) }}
-					</span>
-				} @else {
-					<span class="muted">—</span>
-				}
+				<app-correlation-id-pill [id]="item.correlationId" [compact]="true" />
 			</td>
 			<td class="col-actions">
 				<button

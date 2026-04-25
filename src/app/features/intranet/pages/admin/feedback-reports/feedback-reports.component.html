@@ -209,17 +209,9 @@
 				}
 				@if (d.correlationId) {
 					<dt>Correlation ID</dt>
-					<dd>
-						<button
-							type="button"
-							class="correlation-link"
-							(click)="onOpenErrorDetail(d.correlationId!)"
-							pTooltip="Ver error de trazabilidad asociado"
-							tooltipPosition="top"
-						>
-							<i class="pi pi-search"></i>
-							<code>{{ d.correlationId }}</code>
-						</button>
+					<dd class="correlation-cell">
+						<app-correlation-id-pill [id]="d.correlationId" />
+						<code class="correlation-cell__id">{{ d.correlationId }}</code>
 					</dd>
 				}
 			</dl>
@@ -311,14 +303,6 @@
 		</div>
 	}
 </p-drawer>
-<!-- #endregion -->
-
-<!-- #region Drawer de trazabilidad (reutilizado) -->
-<app-error-log-detail-drawer
-	[visible]="errorDrawerVisible()"
-	[correlationId]="selectedCorrelationId()"
-	(visibleChange)="onErrorDrawerVisibleChange($event)"
-/>
 <!-- #endregion -->
 
 <!-- #region ConfirmDialog — siempre en DOM (regla dialogs-sync.md) -->

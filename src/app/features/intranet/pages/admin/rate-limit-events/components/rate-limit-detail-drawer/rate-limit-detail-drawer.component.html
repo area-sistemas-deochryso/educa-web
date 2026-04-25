@@ -91,7 +91,10 @@
 				<div class="detail-section">
 					<h4><i class="pi pi-compass"></i> Correlación</h4>
 					<div class="correlation-block">
-						<code class="correlation-code">{{ item()!.correlationId }}</code>
+						<div class="correlation-row">
+							<app-correlation-id-pill [id]="item()!.correlationId" />
+							<code class="correlation-code">{{ item()!.correlationId }}</code>
+						</div>
 						<div class="correlation-actions">
 							<button
 								pButton
@@ -103,11 +106,11 @@
 							></button>
 							<button
 								pButton
-								icon="pi pi-external-link"
-								label="Buscar en ErrorLog"
+								icon="pi pi-share-alt"
+								label="Ver eventos correlacionados"
 								class="p-button-outlined p-button-sm"
 								(click)="onBuscarEnErrorLog(item()!.correlationId)"
-								[pt]="{ root: { 'aria-label': 'Buscar en trazabilidad de errores' } }"
+								[pt]="{ root: { 'aria-label': 'Ver eventos correlacionados en el hub' } }"
 							></button>
 						</div>
 					</div>

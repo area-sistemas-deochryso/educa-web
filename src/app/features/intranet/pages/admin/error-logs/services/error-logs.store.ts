@@ -14,6 +14,7 @@ export class ErrorLogsStore {
 	private readonly _filterSeveridad = signal<ErrorSeveridad | null>(null);
 	private readonly _filterHttp = signal<string | null>(null);
 	private readonly _filterUsuarioRol = signal<string | null>(null);
+	private readonly _filterCorrelationId = signal<string | null>(null);
 	private readonly _page = signal(1);
 	private readonly _pageSize = signal(15);
 
@@ -30,6 +31,7 @@ export class ErrorLogsStore {
 	readonly filterSeveridad = this._filterSeveridad.asReadonly();
 	readonly filterHttp = this._filterHttp.asReadonly();
 	readonly filterUsuarioRol = this._filterUsuarioRol.asReadonly();
+	readonly filterCorrelationId = this._filterCorrelationId.asReadonly();
 	readonly page = this._page.asReadonly();
 	readonly pageSize = this._pageSize.asReadonly();
 	readonly drawerVisible = this._drawerVisible.asReadonly();
@@ -62,6 +64,7 @@ export class ErrorLogsStore {
 		filterSeveridad: this._filterSeveridad(),
 		filterHttp: this._filterHttp(),
 		filterUsuarioRol: this._filterUsuarioRol(),
+		filterCorrelationId: this._filterCorrelationId(),
 		page: this._page(),
 		pageSize: this._pageSize(),
 		drawerVisible: this._drawerVisible(),
@@ -104,6 +107,10 @@ export class ErrorLogsStore {
 
 	setFilterUsuarioRol(rol: string | null): void {
 		this._filterUsuarioRol.set(rol);
+	}
+
+	setFilterCorrelationId(correlationId: string | null): void {
+		this._filterCorrelationId.set(correlationId);
 	}
 
 	setPage(page: number): void {

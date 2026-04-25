@@ -71,14 +71,29 @@ export const permissionsGuard: CanActivateFn = async (route: ActivatedRouteSnaps
 /**
  * Build the full route path from an ActivatedRouteSnapshot.
  *
+ * Honors `data.permissionPath` as an explicit override — used by routes with
+ * dynamic params (e.g. `correlation/:id`) where the resolved URL never
+ * matches an entry in `vistasPermitidas`. The route declares its canonical
+ * permission path and the guard checks against that instead.
+ *
  * @param route Current route snapshot.
  * @returns Full path without query params.
  * @example
  * const path = getFullPath(route);
  */
 function getFullPath(route: ActivatedRouteSnapshot): string {
-	const segments: string[] = [];
+	// Explicit override (deep-link routes with :id placeholders).
 	let current: ActivatedRouteSnapshot | null = route;
+	while (current) {
+		const override = current.data?.['permissionPath'];
+		if (typeof override === 'string' && override.length > 0) {
+			return override;
+		}
+		current = current.parent;
+	}
+
+	const segments: string[] = [];
+	current = route;
 
 	while (current) {
 		// Walk parent hierarchy to build the root path.

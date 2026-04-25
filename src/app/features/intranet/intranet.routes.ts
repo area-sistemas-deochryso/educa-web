@@ -354,6 +354,17 @@ export const INTRANET_ROUTES: Routes = [
 				title: 'Intranet - Trazabilidad de Errores',
 			},
 			{
+				// Plan 32 Chat 4 — Hub central que cruza los 4 tipos de telemetría que
+				// comparten un correlation id. Deep-link only (sin entrada de menú).
+				// Reusa el permiso de error-logs vía data.permissionPath porque la ruta
+				// con :id nunca matchea exact en vistasPermitidas.
+				path: 'admin/correlation/:id',
+				loadComponent: () =>
+					import('./pages/admin/correlation').then((m) => m.CorrelationComponent),
+				data: { permissionPath: 'intranet/admin/trazabilidad-errores' },
+				title: 'Intranet - Eventos correlacionados',
+			},
+			{
 				path: 'admin/reportes-usuario',
 				loadComponent: () =>
 					import('./pages/admin/feedback-reports').then((m) => m.FeedbackReportsComponent),

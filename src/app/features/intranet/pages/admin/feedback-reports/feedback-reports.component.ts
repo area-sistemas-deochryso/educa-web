@@ -1,7 +1,9 @@
 // #region Imports
-import { ChangeDetectionStrategy, Component, OnInit, inject, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, DestroyRef, OnInit, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { ActivatedRoute } from '@angular/router';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
 import { ConfirmationService } from 'primeng/api';
 import { ButtonModule } from 'primeng/button';
@@ -21,8 +23,8 @@ import {
 	ReporteEstado,
 	ReporteUsuarioListaDto,
 } from '@core/services/feedback';
+import { CorrelationIdPillComponent } from '@shared/components/correlation-id-pill';
 
-import { ErrorLogDetailDrawerComponent } from '../error-logs/components/error-log-detail-drawer';
 import { FeedbackReportsFacade } from './services';
 
 // #endregion
@@ -48,7 +50,7 @@ interface EstadoOption {
 		DrawerModule,
 		TextareaModule,
 		TooltipModule,
-		ErrorLogDetailDrawerComponent,
+		CorrelationIdPillComponent,
 	],
 	providers: [ConfirmationService],
 	templateUrl: './feedback-reports.component.html',
@@ -57,6 +59,8 @@ interface EstadoOption {
 export class FeedbackReportsComponent implements OnInit {
 	private readonly facade = inject(FeedbackReportsFacade);
 	private readonly confirmationService = inject(ConfirmationService);
+	private readonly route = inject(ActivatedRoute);
+	private readonly destroyRef = inject(DestroyRef);
 
 	readonly vm = this.facade.vm;
 	readonly tipoOptions = REPORTE_TIPO_OPTIONS;
@@ -71,13 +75,20 @@ export class FeedbackReportsComponent implements OnInit {
 	readonly nuevoEstado = signal<ReporteEstado | null>(null);
 	readonly observacionCambio = signal<string>('');
 
-	// Drawer de trazabilidad de errores reutilizado — se abre al hacer clic
-	// sobre el correlation ID en el detalle de un reporte.
-	readonly errorDrawerVisible = signal(false);
-	readonly selectedCorrelationId = signal<string | null>(null);
-
 	ngOnInit(): void {
-		this.facade.loadAll();
+		// Plan 32 Chat 4 — leer correlationId del query param para deep-link desde
+		// el hub. Si viene, se aplica como filtro client-side y dispara load.
+		this.route.queryParamMap
+			.pipe(takeUntilDestroyed(this.destroyRef))
+			.subscribe((params) => {
+				const correlationId = params.get('correlationId');
+				if (correlationId) {
+					this.facade.setFilterCorrelationId(correlationId);
+					this.facade.loadEstadisticas();
+				} else {
+					this.facade.loadAll();
+				}
+			});
 	}
 
 	// #region Handlers — Filtros
@@ -156,20 +167,6 @@ Esta acción es irreversible.`,
 				this.facade.deleteReporte(detalle.id);
 			},
 		});
-	}
-	// #endregion
-
-	// #region Handlers — Error drawer (correlationId clicable)
-	onOpenErrorDetail(correlationId: string): void {
-		this.selectedCorrelationId.set(correlationId);
-		this.errorDrawerVisible.set(true);
-	}
-
-	onErrorDrawerVisibleChange(visible: boolean): void {
-		this.errorDrawerVisible.set(visible);
-		if (!visible) {
-			this.selectedCorrelationId.set(null);
-		}
 	}
 	// #endregion
 

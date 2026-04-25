@@ -1,6 +1,15 @@
-import { ChangeDetectionStrategy, Component, computed, inject, OnInit } from '@angular/core';
+import {
+	ChangeDetectionStrategy,
+	Component,
+	DestroyRef,
+	OnInit,
+	computed,
+	inject,
+} from '@angular/core';
 import { CommonModule, DatePipe } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { ActivatedRoute } from '@angular/router';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
 import { ConfirmationService } from 'primeng/api';
 import { ButtonModule } from 'primeng/button';
@@ -56,6 +65,8 @@ export class ErrorLogsComponent implements OnInit {
 	private readonly facade = inject(ErrorLogsFacade);
 	private readonly confirmationService = inject(ConfirmationService);
 	private readonly swService = inject(SwService);
+	private readonly route = inject(ActivatedRoute);
+	private readonly destroyRef = inject(DestroyRef);
 	// #endregion
 
 	// #region Estado
@@ -129,7 +140,18 @@ export class ErrorLogsComponent implements OnInit {
 
 	// #region Lifecycle
 	ngOnInit(): void {
-		this.facade.loadData();
+		// Plan 32 Chat 4 — leer correlationId del query param para deep-link desde
+		// el hub. Si viene, se aplica como filtro y dispara load. Si no, carga normal.
+		this.route.queryParamMap
+			.pipe(takeUntilDestroyed(this.destroyRef))
+			.subscribe((params) => {
+				const correlationId = params.get('correlationId');
+				if (correlationId !== this.vm().filterCorrelationId) {
+					this.facade.setFilterCorrelationId(correlationId);
+				} else if (!this.vm().tableReady) {
+					this.facade.loadData();
+				}
+			});
 	}
 	// #endregion
 

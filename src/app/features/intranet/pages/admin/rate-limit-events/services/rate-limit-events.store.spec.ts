@@ -20,6 +20,19 @@ describe('RateLimitEventsStore', () => {
 		expect(store.drawerVisible()).toBe(false);
 		expect(store.filter().take).toBe(200);
 		expect(store.filter().rol).toBeNull();
+		expect(store.filter().correlationId).toBeNull();
+	});
+
+	it('Plan 32 Chat 4 — setFilter acepta correlationId y se preserva en merge', () => {
+		store.setFilter({ correlationId: 'abc-123' });
+		expect(store.filter().correlationId).toBe('abc-123');
+
+		store.setFilter({ rol: 'Director' });
+		expect(store.filter().correlationId).toBe('abc-123');
+		expect(store.filter().rol).toBe('Director');
+
+		store.resetFilter();
+		expect(store.filter().correlationId).toBeNull();
 	});
 
 	it('setItems actualiza la lista', () => {

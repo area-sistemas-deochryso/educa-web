@@ -1,0 +1,14 @@
+@if (isClickable()) {
+	<button
+		type="button"
+		class="correlation-id-pill__btn"
+		(click)="onClick($event)"
+		[attr.aria-label]="ariaLabel()"
+		[pTooltip]="tooltip()"
+		tooltipPosition="top"
+	>
+		<p-tag [value]="displayValue()" styleClass="tag-neutral correlation-id-pill__tag" />
+	</button>
+} @else {
+	<span class="correlation-id-pill__empty" [attr.aria-label]="ariaLabel()">—</span>
+}

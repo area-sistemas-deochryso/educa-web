@@ -27,6 +27,7 @@ export class FeedbackReportsStore {
 	private readonly _filterEstado = signal<string | null>(null);
 	private readonly _filterDesde = signal<Date | null>(null);
 	private readonly _filterHasta = signal<Date | null>(null);
+	private readonly _filterCorrelationId = signal<string | null>(null);
 
 	// Drawer
 	private readonly _drawerVisible = signal(false);
@@ -46,6 +47,7 @@ export class FeedbackReportsStore {
 	readonly filterEstado = this._filterEstado.asReadonly();
 	readonly filterDesde = this._filterDesde.asReadonly();
 	readonly filterHasta = this._filterHasta.asReadonly();
+	readonly filterCorrelationId = this._filterCorrelationId.asReadonly();
 	readonly drawerVisible = this._drawerVisible.asReadonly();
 	readonly selectedItem = this._selectedItem.asReadonly();
 	readonly detalle = this._detalle.asReadonly();
@@ -68,6 +70,7 @@ export class FeedbackReportsStore {
 		filterEstado: this._filterEstado(),
 		filterDesde: this._filterDesde(),
 		filterHasta: this._filterHasta(),
+		filterCorrelationId: this._filterCorrelationId(),
 		drawerVisible: this._drawerVisible(),
 		selectedItem: this._selectedItem(),
 		detalle: this._detalle(),
@@ -108,11 +111,15 @@ export class FeedbackReportsStore {
 	setFilterHasta(v: Date | null): void {
 		this._filterHasta.set(v);
 	}
+	setFilterCorrelationId(v: string | null): void {
+		this._filterCorrelationId.set(v);
+	}
 	clearFilters(): void {
 		this._filterTipo.set(null);
 		this._filterEstado.set(null);
 		this._filterDesde.set(null);
 		this._filterHasta.set(null);
+		this._filterCorrelationId.set(null);
 	}
 	// #endregion
 

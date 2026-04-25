@@ -12,6 +12,7 @@ import {
 } from '@angular/core';
 import { CommonModule, DatePipe } from '@angular/common';
 import { HttpErrorResponse } from '@angular/common/http';
+import { RouterLink } from '@angular/router';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
 import { ButtonModule } from 'primeng/button';
@@ -20,6 +21,7 @@ import { TagModule } from 'primeng/tag';
 import { TooltipModule } from 'primeng/tooltip';
 
 import { logger } from '@core/helpers';
+import { CorrelationIdPillComponent } from '@shared/components/correlation-id-pill';
 
 import { ErrorLogsService } from '../../services';
 import {
@@ -50,7 +52,16 @@ import {
 	selector: 'app-error-log-detail-drawer',
 	standalone: true,
 	changeDetection: ChangeDetectionStrategy.OnPush,
-	imports: [CommonModule, DatePipe, ButtonModule, DrawerModule, TagModule, TooltipModule],
+	imports: [
+		CommonModule,
+		DatePipe,
+		RouterLink,
+		ButtonModule,
+		DrawerModule,
+		TagModule,
+		TooltipModule,
+		CorrelationIdPillComponent,
+	],
 	templateUrl: './error-log-detail-drawer.component.html',
 	styleUrl: './error-log-detail-drawer.component.scss',
 })

@@ -33,6 +33,7 @@ export class EmailOutboxStore {
 	private readonly _filterTipoFallo = signal<string | null>(null);
 	private readonly _filterDesde = signal<string | null>(null);
 	private readonly _filterHasta = signal<string | null>(null);
+	private readonly _filterCorrelationId = signal<string | null>(null);
 
 	// UI
 	private readonly _drawerVisible = signal(false);
@@ -69,6 +70,7 @@ export class EmailOutboxStore {
 	readonly filterTipoFallo = this._filterTipoFallo.asReadonly();
 	readonly filterDesde = this._filterDesde.asReadonly();
 	readonly filterHasta = this._filterHasta.asReadonly();
+	readonly filterCorrelationId = this._filterCorrelationId.asReadonly();
 	readonly drawerVisible = this._drawerVisible.asReadonly();
 	readonly selectedItem = this._selectedItem.asReadonly();
 	readonly previewHtml = this._previewHtml.asReadonly();
@@ -90,9 +92,13 @@ export class EmailOutboxStore {
 		const items = this._items();
 		const search = this._searchTerm().toLowerCase();
 		const tipoFallo = this._filterTipoFallo();
+		const correlationId = this._filterCorrelationId();
 
 		return items.filter((i) => {
 			if (tipoFallo && i.tipoFallo !== tipoFallo) return false;
+			// Plan 32 Chat 4 — filter por correlationId aplicado client-side
+			// (BE de email-outbox no expone el filtro hoy).
+			if (correlationId && i.correlationId !== correlationId) return false;
 			if (!search) return true;
 			return (
 				i.destinatario.toLowerCase().includes(search) ||
@@ -115,6 +121,7 @@ export class EmailOutboxStore {
 		filterTipoFallo: this._filterTipoFallo(),
 		filterDesde: this._filterDesde(),
 		filterHasta: this._filterHasta(),
+		filterCorrelationId: this._filterCorrelationId(),
 		drawerVisible: this._drawerVisible(),
 		selectedItem: this._selectedItem(),
 		previewHtml: this._previewHtml(),
@@ -226,6 +233,10 @@ export class EmailOutboxStore {
 
 	setFilterHasta(hasta: string | null): void {
 		this._filterHasta.set(hasta);
+	}
+
+	setFilterCorrelationId(correlationId: string | null): void {
+		this._filterCorrelationId.set(correlationId);
 	}
 	// #endregion
 

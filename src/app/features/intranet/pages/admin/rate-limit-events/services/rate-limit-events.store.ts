@@ -15,6 +15,7 @@ const DEFAULT_FILTER: RateLimitEventFiltro = {
 	soloRechazados: false,
 	desde: null,
 	hasta: null,
+	correlationId: null,
 	take: DEFAULT_TAKE,
 };
 

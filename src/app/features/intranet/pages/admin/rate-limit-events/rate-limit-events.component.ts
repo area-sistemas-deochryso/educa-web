@@ -1,5 +1,7 @@
-import { ChangeDetectionStrategy, Component, inject, OnInit } from '@angular/core';
+import { ChangeDetectionStrategy, Component, DestroyRef, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { ActivatedRoute } from '@angular/router';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
 import { ButtonModule } from 'primeng/button';
 import { MessageService } from 'primeng/api';
@@ -40,6 +42,8 @@ import { RateLimitEventsFacade } from './services';
 export class RateLimitEventsComponent implements OnInit {
 	// #region Dependencias
 	private readonly facade = inject(RateLimitEventsFacade);
+	private readonly route = inject(ActivatedRoute);
+	private readonly destroyRef = inject(DestroyRef);
 	// #endregion
 
 	// #region Estado
@@ -63,7 +67,18 @@ export class RateLimitEventsComponent implements OnInit {
 
 	// #region Lifecycle
 	ngOnInit(): void {
-		this.facade.loadData();
+		// Plan 32 Chat 4 — leer correlationId del query param y aplicarlo como
+		// filtro inicial. Si no viene, carga normal.
+		this.route.queryParamMap
+			.pipe(takeUntilDestroyed(this.destroyRef))
+			.subscribe((params) => {
+				const correlationId = params.get('correlationId');
+				if (correlationId) {
+					this.facade.updateFilter({ correlationId });
+				} else if (!this.vm().tableReady) {
+					this.facade.loadData();
+				}
+			});
 	}
 	// #endregion
 

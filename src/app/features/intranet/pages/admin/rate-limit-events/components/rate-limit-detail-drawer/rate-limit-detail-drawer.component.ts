@@ -9,13 +9,22 @@ import { TagModule } from 'primeng/tag';
 import { TooltipModule } from 'primeng/tooltip';
 
 import { logger } from '@core/helpers';
+import { CorrelationIdPillComponent } from '@shared/components/correlation-id-pill';
 
 import { RateLimitEventListaDto, displayPolicy } from '../../models';
 
 @Component({
 	selector: 'app-rate-limit-detail-drawer',
 	standalone: true,
-	imports: [CommonModule, DatePipe, ButtonModule, DrawerModule, TagModule, TooltipModule],
+	imports: [
+		CommonModule,
+		DatePipe,
+		ButtonModule,
+		DrawerModule,
+		TagModule,
+		TooltipModule,
+		CorrelationIdPillComponent,
+	],
 	templateUrl: './rate-limit-detail-drawer.component.html',
 	styleUrl: './rate-limit-detail-drawer.component.scss',
 	changeDetection: ChangeDetectionStrategy.OnPush,
@@ -54,10 +63,14 @@ export class RateLimitDetailDrawerComponent {
 		}
 	}
 
+	/**
+	 * Plan 32 Chat 4 — el handler navega al hub central. El nombre se conserva
+	 * por compatibilidad con el template existente; ahora el destino canónico
+	 * es `/intranet/admin/correlation/:id` que ofrece la vista cruzada de los
+	 * 4 tipos de telemetría (incluyendo error-logs).
+	 */
 	onBuscarEnErrorLog(correlationId: string | null): void {
 		if (!correlationId) return;
-		this.router.navigate(['/intranet/admin/trazabilidad-errores'], {
-			queryParams: { correlationId },
-		});
+		void this.router.navigate(['/intranet/admin/correlation', correlationId]);
 	}
 }

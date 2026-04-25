@@ -6,12 +6,22 @@ import { TableModule } from 'primeng/table';
 import { TagModule } from 'primeng/tag';
 import { TooltipModule } from 'primeng/tooltip';
 
+import { CorrelationIdPillComponent } from '@shared/components/correlation-id-pill';
+
 import { RateLimitEventListaDto, displayPolicy } from '../../models';
 
 @Component({
 	selector: 'app-rate-limit-table',
 	standalone: true,
-	imports: [CommonModule, DatePipe, ButtonModule, TableModule, TagModule, TooltipModule],
+	imports: [
+		CommonModule,
+		DatePipe,
+		ButtonModule,
+		TableModule,
+		TagModule,
+		TooltipModule,
+		CorrelationIdPillComponent,
+	],
 	templateUrl: './rate-limit-table.component.html',
 	styleUrl: './rate-limit-table.component.scss',
 	changeDetection: ChangeDetectionStrategy.OnPush,

@@ -100,7 +100,17 @@
 					@if (err.correlationId) {
 						<div class="detail-row">
 							<span class="detail-label">Correlation ID</span>
-							<span class="detail-value detail-value--mono">{{ err.correlationId }}</span>
+							<span class="detail-value detail-value--correlation">
+								<app-correlation-id-pill [id]="err.correlationId" />
+								<a
+									[routerLink]="['/intranet/admin/correlation', err.correlationId]"
+									pButton
+									type="button"
+									label="Ver eventos correlacionados"
+									icon="pi pi-share-alt"
+									class="p-button-text p-button-sm"
+								></a>
+							</span>
 						</div>
 					}
 					@if (err.usuarioRol) {

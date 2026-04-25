@@ -40,12 +40,19 @@ export class RateLimitEventsFacade {
 		this.store.setLoading(true);
 		this.store.setError(null);
 
+		const filter = this.store.filter();
 		this.api
-			.listar(this.store.filter())
+			.listar(filter)
 			.pipe(takeUntilDestroyed(this.destroyRef))
 			.subscribe({
 				next: (items) => {
-					this.store.setItems(items);
+					// Plan 32 Chat 4 — el BE aún no soporta filtro correlationId; aplicamos
+					// el filter client-side. La cantidad de items por correlationId
+					// típicamente es 1-3, así que filtrar localmente es seguro.
+					const filtered = filter.correlationId
+						? items.filter((i) => i.correlationId === filter.correlationId)
+						: items;
+					this.store.setItems(filtered);
 					this.store.setTableReady(true);
 					this.store.setLoading(false);
 				},

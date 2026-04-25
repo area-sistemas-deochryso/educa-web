@@ -108,6 +108,15 @@ export class EmailOutboxDataFacade {
 		this.store.setFilterHasta(hasta);
 		this.loadData();
 	}
+
+	/**
+	 * Plan 32 Chat 4 — el hub linkea acá con `?correlationId=<id>`. El page
+	 * setea el filter en init; el filter es client-side (computed `filteredItems`),
+	 * así que no se requiere un nuevo fetch — basta con setear el signal.
+	 */
+	setFilterCorrelationId(correlationId: string | null): void {
+		this.store.setFilterCorrelationId(correlationId);
+	}
 	// #endregion
 
 	// #region Throttle status widget (Plan 22 Chat B)

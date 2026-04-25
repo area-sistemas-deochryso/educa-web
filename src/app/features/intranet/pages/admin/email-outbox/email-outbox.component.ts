@@ -1,4 +1,6 @@
-import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
+import { ChangeDetectionStrategy, Component, DestroyRef, inject } from '@angular/core';
+import { ActivatedRoute } from '@angular/router';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { DrawerModule } from 'primeng/drawer';
 
 import { StatsSkeletonComponent, TableSkeletonComponent } from '@shared/components';
@@ -40,6 +42,8 @@ export class EmailOutboxComponent {
 	private dataFacade = inject(EmailOutboxDataFacade);
 	private uiFacade = inject(EmailOutboxUiFacade);
 	private excelService = inject(ExcelService);
+	private route = inject(ActivatedRoute);
+	private destroyRef = inject(DestroyRef);
 	// #endregion
 
 	// #region Estado
@@ -51,6 +55,15 @@ export class EmailOutboxComponent {
 
 	// #region Lifecycle
 	constructor() {
+		// Plan 32 Chat 4 — leer correlationId del query param para deep-link desde
+		// el hub. El filter es client-side via computed; basta con setearlo antes
+		// del fetch para que la primera lista pintada ya esté filtrada.
+		this.route.queryParamMap
+			.pipe(takeUntilDestroyed(this.destroyRef))
+			.subscribe((params) => {
+				this.dataFacade.setFilterCorrelationId(params.get('correlationId'));
+			});
+
 		this.dataFacade.loadData();
 		if (this.throttleWidgetEnabled) {
 			this.dataFacade.initThrottleWidget();
