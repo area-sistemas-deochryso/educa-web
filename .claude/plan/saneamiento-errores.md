@@ -1,4 +1,4 @@
-> **Plan**: 34 · Fecha creación: 2026-04-25 · Estado: /design ✅ cerrado, Chat 2 BE ✅ cerrado 2026-04-25, Chat 3 BE listo para arrancar
+> **Plan**: 34 · Fecha creación: 2026-04-25 · Estado: /design ✅ cerrado, Chat 2 BE ✅ cerrado 2026-04-25, Chat 3 BE ✅ cerrado 2026-04-25, Chat 4 FE listo para arrancar
 > **Repo principal**: `Educa.API` (master) para Chats 1-2 · `educa-web` (main) para Chats 3-5
 > **Prioridad**: media — entra a la cola después de los 3 chats actualmente prioritarios (Plan 31 Chat 2, Plan 30 FE, Plan 24 Chat 4 B). No bloquea ni es bloqueado por ellos.
 
@@ -138,7 +138,9 @@ Este mismo. Decisiones 1-15 cerradas con confirmación del usuario.
 - Scripts SQL en `scripts/` o documentados en este plan
 - Tests: `Helpers/Sanitization/ErrorFingerprintCalculatorTests.cs` + `Services/Sistema/ErrorLogServiceUpsertTests.cs`
 
-### Chat 3 BE — `ErrorGroupService` + Controller + DTOs + purga selectiva
+### Chat 3 BE ✅ cerrado 2026-04-25 — `ErrorGroupService` + Controller + DTOs + purga selectiva
+
+> Cerrado en `Educa.API master`. 4 DTOs, `IErrorGroupRepository` + `ErrorGroupRepository`, `IErrorGroupService` + `ErrorGroupService` partial (`.Purga.cs`) con state machine en `Domain/Common/StateMachine/StateMachines.cs` (entry en lugar de archivo separado, simetría con las 7 máquinas existentes), `ErrorGroupController` con `[Authorize(Roles = Roles.Director)]` y 5 endpoints, `ErrorLogPurgeJob` reescrito a 2 llamadas (selectiva + huérfanos legacy), DI registrado, business-rules.md FE actualizado con INV-ET03..07 + nueva sección §19. **+45 tests verdes** (6 state machine + 13 service + 13 controller authz + 7 purga selectiva con fallback InMemory documentado + 6 helpers existentes) → suite BE **1466 verde** (baseline 1421). Build limpio, cap 300 respetado en todos los archivos producción.
 
 **Repo**: `Educa.API master`
 

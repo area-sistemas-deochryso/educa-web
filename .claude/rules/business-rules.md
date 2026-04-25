@@ -1231,6 +1231,11 @@ Este registro consolida TODAS las invariantes del sistema en una tabla indexable
 |----|---------|------------|-------------|---------|
 | `INV-ET01` | ErrorLog | Todo error HTTP ≥ 400 (excepto 401/403) se persiste en `ErrorLog` con CorrelationId, URL, método, status code, DNI y rol | `GlobalExceptionMiddleware.PersistErrorFireAndForget()` filtra por status code | — |
 | `INV-ET02` | ErrorLog | La persistencia de errores en `ErrorLog` es **fire-and-forget**: un fallo al persistir NUNCA falla la respuesta HTTP al cliente ni la operación principal. Aplica tanto a errores backend (middleware) como a errores frontend (endpoint `POST /api/sistema/errors`) y reportes de usuario | `GlobalExceptionMiddleware` + `ErrorLogController.ReportarError()` + `ReportesUsuarioController.Crear()` — todos con try/catch que loguean `LogWarning` y continúan | — |
+| `INV-ET03` | ErrorGroup | Toda ocurrencia (`ErrorLog`) pertenece a un `ErrorGroup` determinado por `ERG_Fingerprint`. Si el grupo no existe, se crea con estado `NUEVO`. Si existe en estado `RESUELTO`, se reabre a `NUEVO` automáticamente y se incrementa `ERG_ContadorPostResolucion`. Si está en `IGNORADO`, NO se reabre (las ocurrencias se persisten igual para audit trail) | `ErrorLogService.PersistErrorLogWithGroupAsync` (Chat 2) | 19 |
+| `INV-ET04` | ErrorGroup | El estado del bug vive en `ErrorGroup`, no en ocurrencias individuales. Los breadcrumbs (`ErrorLogDetalle`) siguen vinculados a su ocurrencia | Modelo + UPSERT del Chat 2 | 19 |
+| `INV-ET05` | ErrorGroup | Purga selectiva por estado del grupo: `IGNORADO` → 7 días, `NUEVO/VISTO/EN_PROGRESO` → 30 días, `RESUELTO` → 180 días desde `ERG_UltimaFecha`. El delete del grupo elimina sus ocurrencias y breadcrumbs en cascade. `ErrorLog` con `ERL_ERG_CodID = NULL` (huérfanos legacy) siguen purgándose con la regla vieja de 7 días por `ERL_Fecha` | `ErrorGroupService.PurgarGruposPorEstadoAsync` + `ErrorLogService.PurgarOcurrenciasHuerfanasAsync` (Chat 3) | 19 |
+| `INV-ET06` | ErrorGroup | `ERG_Fingerprint` se computa con `SHA-256(severidad ‖ normalize(mensaje) ‖ normalize(url) ‖ httpStatus ‖ errorCode)` por `ErrorFingerprintCalculator`. Cambiar el algoritmo de normalización requiere job de rehash documentado | `Helpers/Sanitization/ErrorFingerprintCalculator.cs` (Chat 2) | 19 |
+| `INV-ET07` | ErrorGroup | Transiciones de estado validan `RowVersion` (optimistic concurrency). Solo Director muta. Estados activos (NUEVO/VISTO/EN_PROGRESO) transicionan libremente entre sí; RESUELTO/IGNORADO solo reabren a NUEVO. Drops desde la UI Kanban a transiciones inválidas se previenen visualmente y el backend rechaza con `BusinessRuleException("ERRORGROUP_TRANSICION_INVALIDA")` por defensa en profundidad | `ErrorGroupService.CambiarEstadoAsync` + `Domain/Common/StateMachine/StateMachines.ErrorGroup` (Chat 3) | 19 |
 
 ---
 
@@ -1515,6 +1520,74 @@ caudal, el otro mide salud del canal.
 - **`INV-MAIL02`** — Auto-blacklist por 3+ bounces `5.x.x` en la misma transacción que `FAILED_BLACKLISTED`. SSL/auth/max-defers no cuentan. Ver §15.14.
 - **`INV-MAIL03`** — Techo cPanel <!-- TBD post-OPS: Chat 3 puede subir a 25-30/h --> 5 defers+fails/h por dominio, no configurable. Defensa solo vía INV-MAIL01/02. Ver §15.14.
 - **`INV-MAIL04`** — Monitoreo vía endpoint `defer-fail-status` + widget admin 60s polling, fallback CRITICAL por INV-S07. Ver §15.14.
+
+---
+
+## 19. Saneamiento de errores con ErrorGroup
+
+> **"Si lo veo, lo resuelvo y vuelve a ocurrir, no quiero ver evento huérfano sino el mismo bug con su historia."**
+
+El sistema mantiene tres capas para errores trazables:
+
+1. **`ErrorLog`** — ocurrencia inmutable de un error puntual (timestamp, correlationId, breadcrumbs, payloads). Cada request fallida es una fila.
+2. **`ErrorGroup`** — bug agrupado por huella SHA-256 (`ERG_Fingerprint`). Estados, contadores, ventana temporal del bug. **El estado del bug vive aquí, no en las ocurrencias** (INV-ET04).
+3. **Admin UI** — vista Kanban para Director (Chat 4-5 FE), drill-down a ocurrencias de un grupo.
+
+Es el complemento natural del subsistema de Reportes de Usuario (§16): ErrorLog/ErrorGroup captura lo que el sistema detecta como fallo automáticamente; ReporteUsuario captura lo que el usuario *vive* y reporta manualmente. Ambos comparten el `correlationId` para cross-link en el hub de correlation (Plan 32).
+
+### 19.1 Arquitectura de las 3 capas
+
+```
+ErrorLog (ocurrencia)        ErrorGroup (bug)               Admin UI (Director)
+──────────────────────       ──────────────────────         ──────────────────────
+ERL_CodID PK                 ERG_CodID PK                   Tabla con filtros
+ERL_CorrelationId            ERG_Fingerprint UNIQUE         estado / severidad / origen / q
+ERL_Fecha                    ERG_Estado                     Drawer detalle + ocurrencias
+ERL_Mensaje              →   ERG_PrimeraFecha               Kanban (Chat 5 FE)
+ERL_Url                      ERG_UltimaFecha                  drag-drop entre estados
+ERL_HttpStatus               ERG_ContadorTotal              PATCH /estado con RowVersion
+ERL_ERG_CodID FK ─────→     ERG_ContadorPostResolucion
+                             ERG_RowVersion (Timestamp)
+                             ON DELETE CASCADE → ErrorLog
+                                                  → ErrorLogDetalle (breadcrumbs)
+```
+
+UPSERT en cada insert de `ErrorLog` (Chat 2): si el fingerprint existe, incrementa `ContadorTotal`; si está en `RESUELTO`, reabre a `NUEVO` e incrementa `ContadorPostResolucion` (INV-ET03). `IGNORADO` no se reabre; las ocurrencias se persisten igual para audit trail.
+
+### 19.2 Máquina de estados
+
+Matriz de transiciones permitidas (INV-ET07, defensa en profundidad — la UI Kanban del Chat 5 visualmente filtrará, el BE rechaza con `BusinessRuleException("ERRORGROUP_TRANSICION_INVALIDA")`):
+
+| Desde \ Hacia | NUEVO | VISTO | EN_PROGRESO | RESUELTO | IGNORADO |
+|---|:---:|:---:|:---:|:---:|:---:|
+| **NUEVO** | — (no-op) | ✅ | ✅ | ✅ | ✅ |
+| **VISTO** | ✅ (rebound) | — (no-op) | ✅ | ✅ | ✅ |
+| **EN_PROGRESO** | ✅ (rebound) | ✅ (back to triage) | — (no-op) | ✅ | ✅ |
+| **RESUELTO** | ✅ (reapertura manual) | ❌ | ❌ | — (no-op) | ❌ |
+| **IGNORADO** | ✅ (unignore manual) | ❌ | ❌ | ❌ | — (no-op) |
+
+**Justificación**: estados activos (NUEVO/VISTO/EN_PROGRESO) transicionan libremente — el admin reordena el triage como necesite. RESUELTO/IGNORADO son "terminales suaves": solo se reabren a NUEVO. Esto preserva la semántica de "estos son cierres conscientes" — ir directo de RESUELTO a EN_PROGRESO sería confuso.
+
+**Auto-reapertura del UPSERT (Chat 2)**: la transición automática RESUELTO → NUEVO desde nuevas ocurrencias NO usa esta máquina; muta directo en `ErrorLogService.PersistErrorLogWithGroupAsync` porque es flujo automático del UPSERT, no transición manual del admin.
+
+### 19.3 Privacidad y retención
+
+- **DNIs enmascarados** en DTOs de ocurrencia (`***1234`) — patrón heredado del UPSERT del Chat 2.
+- **Retención por estado** (INV-ET05, calculada desde `ERG_UltimaFecha`):
+
+| Estado | Retención |
+|--------|-----------|
+| `IGNORADO` | 7 días |
+| `NUEVO`, `VISTO`, `EN_PROGRESO` | 30 días |
+| `RESUELTO` | 180 días |
+
+El delete del grupo elimina ocurrencias y breadcrumbs en cascade (FK con `ON DELETE CASCADE`). Ocurrencias huérfanas legacy (`ERL_ERG_CodID = NULL`, anteriores al Chat 2) se purgan con la regla vieja de 7 días por `ERL_Fecha` vía `ErrorLogService.PurgarOcurrenciasHuerfanasAsync`.
+
+### 19.4 Correlación con otras vistas admin
+
+- **Hub de correlación (Plan 32)** — el endpoint `GET /api/sistema/correlation/{id}` cruza `ErrorLog` + `RateLimitEvent` + `ReporteUsuario` + `EmailOutbox` por `CorrelationId`. El admin que abre el detalle de un grupo y ve una ocurrencia puede saltar al hub para reconstruir todo el contexto de la request fallida.
+- **Reportes de Usuario (§16)** — un reporte manual con `REU_CorrelationId` apunta al `ErrorLog` que el usuario vivió. Si ese `ErrorLog` pertenece a un `ErrorGroup`, el admin tiene el bug agrupado + el reporte manual juntos para priorizar.
+- **Permisos** — el panel `/intranet/admin/error-groups` es exclusivo de `Director` (INV-ET07). Si en el futuro `AsistenteAdministrativo` necesita acceso, se relaja en Chat 4 FE con justificación documentada.
 
 ---
 
