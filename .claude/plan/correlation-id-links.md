@@ -38,7 +38,7 @@ Frase del usuario que motivó el plan:
 Este mismo. Brief en `.claude/chats/042-plan-32-chat-1-design-correlation-id-links.md`
 (movido a `closed/` al cerrar).
 
-### Chat 2 BE — EmailOutbox gana `EO_CorrelationId` (precondición de Chat 3)
+### Chat 2 BE — EmailOutbox gana `EO_CorrelationId` ✅ cerrado 2026-04-25
 
 **Repo**: `Educa.API master`
 
@@ -63,6 +63,18 @@ Este mismo. Brief en `.claude/chats/042-plan-32-chat-1-design-correlation-id-lin
 - `DTOs/Sistema/EmailOutbox*Dto.cs`
 - Scripts SQL en `scripts/` o comentario en el plan
 - Tests: `Services/Notifications/EmailOutboxServiceEnqueueCorrelationTests.cs`
+
+#### Resultado real (2026-04-25)
+
+| Hallazgo | Detalle |
+|---|---|
+| Key del middleware | **No existía** en `HttpContext.Items`. El middleware solo inyectaba el id en el `BeginScope` del logger y en el header de RESPONSE `X-Correlation-Id`. Se agregó `public const string CorrelationIdItemKey = "CorrelationId"` al `CorrelationIdMiddleware` + `context.Items[CorrelationIdItemKey] = correlationId;` antes del `OnStarting`. El hook del service consume esta constante (no string mágico) |
+| Listado admin del outbox | **Ya existía** (`EmailOutboxListaDto` consumido por `EmailOutboxService.ListarAsync`). Se extendió con `string? CorrelationId` y la proyección de `ListarAsync` lo hidrata. Chat 4 FE puede pintar la pill en la columna correspondiente sin crear endpoint nuevo |
+| Archivos tocados | 6: `Middleware/CorrelationIdMiddleware.cs` (+key + Items), `Models/Sistema/EmailOutbox.cs` (+propiedad), `Services/Notifications/EmailOutboxService.cs` (+`IHttpContextAccessor?` en ctor + proyección DTO), `Services/Notifications/EmailOutboxService.Enqueue.cs` (+helper `ResolveCorrelationId` + asignación), `DTOs/Sistema/EmailOutboxListaDto.cs` (+`CorrelationId`), `Educa.API.Tests/Services/Notifications/EmailOutboxServiceEnqueueCorrelationTests.cs` (nuevo, 6 tests) |
+| Tests | 6 nuevos + 1373 baseline = **1379 verdes**, 0 fallidos. Build sin warnings nuevos |
+| Cap 300 | Respetado en todos los archivos: `EmailOutboxService.cs` queda ≈215 líneas; `Enqueue.cs` queda ≈140 |
+| Deuda detectada | `EmailFailureLogger.ExtractCorrelationId` sigue leyendo el header `X-Correlation-Id` del **request** (no del response que el middleware escribe), lo que en producción puede devolver null si el cliente no manda ese header. **No se tocó** (fuera del scope) — registrar como deuda chica para Chat 3 BE o un chat aparte |
+| Verificación post-deploy | Pendiente del usuario: ejecutar una request admin (login, submit reporte usuario) y correr `SELECT TOP 5 EO_CodID, EO_Destinatario, EO_CorrelationId, EO_FechaReg FROM EmailOutbox ORDER BY EO_CodID DESC;` para confirmar que las filas nuevas traen el id |
 
 ### Chat 3 BE — Endpoint `/correlation/{id}` + índices BD
 
@@ -204,7 +216,7 @@ CREATE NONCLUSTERED INDEX IX_EmailOutbox_CorrelationId
 ## Criterios de cierre del plan (al 100%)
 
 - [x] Chat 1 `/design` ✅ — plan file creado, decisiones registradas
-- [ ] Chat 2 BE — `EO_CorrelationId` + hook en EnqueueAsync + tests verdes
+- [x] Chat 2 BE ✅ 2026-04-25 — `EO_CorrelationId` + hook en `EnqueueAsync` + 6 tests verdes (suite completa 1379/1379, baseline 1373 + 6). Commit `1ca1098` en `Educa.API master`
 - [ ] Chat 3 BE — endpoint `/correlation/{id}` + 4 índices BD + tests verdes
 - [ ] Chat 4 FE — hub page + pill + wiring en 4 dashboards + query param sync + tests verdes
 - [ ] Navegación end-to-end probada en browser post-deploy
