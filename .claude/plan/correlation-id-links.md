@@ -76,7 +76,7 @@ Este mismo. Brief en `.claude/chats/042-plan-32-chat-1-design-correlation-id-lin
 | Deuda detectada | `EmailFailureLogger.ExtractCorrelationId` sigue leyendo el header `X-Correlation-Id` del **request** (no del response que el middleware escribe), lo que en producción puede devolver null si el cliente no manda ese header. **No se tocó** (fuera del scope) — registrar como deuda chica para Chat 3 BE o un chat aparte |
 | Verificación post-deploy | Pendiente del usuario: ejecutar una request admin (login, submit reporte usuario) y correr `SELECT TOP 5 EO_CodID, EO_Destinatario, EO_CorrelationId, EO_FechaReg FROM EmailOutbox ORDER BY EO_CodID DESC;` para confirmar que las filas nuevas traen el id |
 
-### Chat 3 BE — Endpoint `/correlation/{id}` + índices BD
+### Chat 3 BE — Endpoint `/correlation/{id}` + índices BD ✅ cerrado 2026-04-25
 
 **Repo**: `Educa.API master`
 
@@ -106,6 +106,24 @@ Este mismo. Brief en `.claude/chats/042-plan-32-chat-1-design-correlation-id-lin
 - 1-4 métodos nuevos en repositories existentes
 - Scripts SQL
 - Tests: `Services/Sistema/CorrelationServiceTests.cs`, `Controllers/Sistema/CorrelationControllerAuthorizationTests.cs`
+
+#### Resultado real (2026-04-25)
+
+| Hallazgo | Detalle |
+|---|---|
+| Arquitectura | Patrón Plan 30 canónico: `ApplicationDbContext` directo, 4 queries `AsNoTracking()` secuenciales (DbContext NO es thread-safe), cada query con su propio try/catch + fallback a lista vacía (INV-S07 por tabla). Catch global vía `CorrelationSnapshotFactory.BuildEmpty(eco, generatedAt)` |
+| Sin repositorios separados | Decisión consciente: las 4 queries son simples (filter por id, OrderByDescending, Take), no justificaban infra de repository. Mismo enfoque que `EmailDiagnosticoService` del Plan 30 |
+| Caps defensivos | 100 filas por tabla, 200 chars en `ERL_Mensaje`, `EO_UltimoError`, `REU_Descripcion`, `REU_Propuesta`. DNIs enmascarados antes de salir del service vía `DniHelper.Mask` (excepto `ERL_UsuarioDni` que ya viene enmascarado del `EmailFailureLogger`) |
+| Validación path id | `CorrelationController` valida no-empty + cap defensivo de 64 chars antes de delegar; trim de whitespace en el service para idempotencia. Retorna `ApiResponse<CorrelationSnapshotDto>` (INV-D08) con `[Authorize(Roles = Roles.Administrativos)]` |
+| Índices BD | 2 de 4 ya existían (`IX_ErrorLog_CorrelationId`, `IX_REU_CorrelationId`, ambos `WHERE ... IS NOT NULL`). Los 2 faltantes los creó manualmente el usuario en este chat: `IX_RateLimitEvent_CorrelationId`, `IX_EmailOutbox_CorrelationId` (mismo patrón filtrado, costo escritura bajo, alto beneficio en latencia de lectura cuando las tablas crezcan) |
+| Naming inconsistente | El índice de `ReporteUsuario` ya existente se llama `IX_REU_CorrelationId` (sin sufijo `_ReporteUsuario`). Los 2 nuevos sí siguen el patrón `IX_<TablaName>_CorrelationId`. No se consolidó — el existente quedó así |
+| Tabla real | `[Table("REU_ReporteUsuario")]` (no `ReporteUsuario`). El SELECT inicial fallaba si solo se filtraba `'ReporteUsuario'` — corregido en el SQL del SELECT del pre-work |
+| Archivos tocados | 13 (12 commit + 1 fix de tests): `Controllers/Sistema/CorrelationController.cs`, `Services/Sistema/CorrelationService.cs` (239 líneas), `Services/Sistema/CorrelationSnapshotFactory.cs`, `Interfaces/Services/Sistema/ICorrelationService.cs`, 5 DTOs (`CorrelationSnapshotDto`, `CorrelationErrorLogDto`, `CorrelationRateLimitEventDto`, `CorrelationReporteUsuarioDto`, `CorrelationEmailOutboxDto`), `Extensions/ServiceExtensions.cs` (DI), 2 tests (`CorrelationServiceTests`, `CorrelationControllerAuthorizationTests`), `TestDbContextFactory.cs` (relajación `REU_RowVersion`) |
+| Fix de tests | Tras correr la primera vez fallaron 4 tests por nullability de `REU_RowVersion` en EF InMemory. Se agregó relajación al `RelaxedDbContext` en línea con el patrón ya existente para `EmailOutbox`, `EmailBlacklist` y `CrossChexSyncJob` |
+| Tests | 18 nuevos (9 service + 9 controller, no 8 como decía el brief — el authz incluye 1 extra de path id) + 1379 baseline = **1397 verdes**, 0 fallidos |
+| Cap 300 | Respetado: `CorrelationService.cs` queda en 239 líneas |
+| Commit | `7184bab` en `Educa.API master`: `feat(sistema): Plan 32 Chat 3 — correlation hub endpoint` |
+| Verificación post-deploy | Pendiente del usuario: `GET /api/sistema/correlation/{id}` con un id real (lookup vía `SELECT TOP 1 ERL_CorrelationId FROM ErrorLog WHERE ERL_CorrelationId IS NOT NULL`) y confirmar que las 4 secciones llegan con el shape esperado por Chat 4 FE |
 
 ### Chat 4 FE — Pantalla hub + pill + wiring en 4 dashboards
 
