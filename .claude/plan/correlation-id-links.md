@@ -150,7 +150,7 @@ Este mismo. Brief en `.claude/chats/042-plan-32-chat-1-design-correlation-id-lin
 4. **No filtrado en feedback-reports** — la lista no trae el campo `correlationId`. Documentado como deuda lateral menor.
 5. **Tabla email-outbox extendida con columna Correlation** — width 110px, con pill compact (8 chars + tooltip). skeletonColumns ajustado.
 
-**Commit FE**: pendiente (lo crea la sesión al cerrar el chat)
+**Commit FE**: `a70b8d3` en `educa-web main`.
 
 **Scope**:
 
