@@ -68,9 +68,14 @@ export class EmailOutboxApiService {
 	}
 
 	obtenerHtml(id: number): Observable<string | null> {
+		// El BE devuelve { html: string } envuelto en ApiResponse; el interceptor
+		// desempaqueta hasta el objeto interno. Hay que extraer la propiedad.
 		return this.http
-			.get<string>(`${this.baseUrl}/${id}/html`)
-			.pipe(catchError(() => of(null)));
+			.get<{ html: string } | string | null>(`${this.baseUrl}/${id}/html`)
+			.pipe(
+				map((res) => (typeof res === 'string' ? res : (res?.html ?? null))),
+				catchError(() => of(null)),
+			);
 	}
 
 	// * Plan 22 Chat B — snapshot del throttle saliente (per-sender + dominio).

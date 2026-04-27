@@ -4,6 +4,7 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { DrawerModule } from 'primeng/drawer';
 
 import { StatsSkeletonComponent, TableSkeletonComponent } from '@shared/components';
+import { CorrelationIdPillComponent } from '@shared/components/correlation-id-pill';
 import { ExcelService } from '@core/services/excel/excel.service';
 import { environment } from '@config/environment';
 
@@ -32,6 +33,7 @@ import { EmailOutboxLista } from '@data/models/email-outbox.models';
 		EmailOutboxChartComponent,
 		ThrottleStatusWidgetComponent,
 		DeferFailStatusWidgetComponent,
+		CorrelationIdPillComponent,
 	],
 	templateUrl: './email-outbox.component.html',
 	styleUrl: './email-outbox.component.scss',
