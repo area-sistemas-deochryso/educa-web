@@ -179,54 +179,47 @@ const experimentalRoutes: Route[] = [
 				},
 			]
 		: []),
-	...(environment.features.rateLimitMonitoring
-		? [
-				{
-					path: 'admin/rate-limit-events',
-					loadComponent: () =>
-						import('./pages/admin/rate-limit-events').then(
-							(m) => m.RateLimitEventsComponent,
-						),
-					title: 'Intranet - Telemetría de Rate Limiting',
-				},
-			]
-		: []),
-	...(environment.features.auditoriaCorreos
-		? [
-				{
-					path: 'admin/auditoria-correos',
-					loadComponent: () =>
-						import('./pages/admin/auditoria-correos').then(
-							(m) => m.AuditoriaCorreosComponent,
-						),
-					title: 'Intranet - Auditoría de Correos',
-				},
-			]
-		: []),
-	...(environment.features.emailOutboxDashboardDia
-		? [
-				{
-					path: 'admin/email-outbox/dashboard-dia',
-					loadComponent: () =>
-						import('./pages/admin/email-outbox-dashboard-dia').then(
-							(m) => m.EmailOutboxDashboardDiaComponent,
-						),
-					title: 'Intranet - Dashboard de Correos',
-				},
-			]
-		: []),
-	...(environment.features.emailOutboxDiagnostico
-		? [
-				{
-					path: 'admin/email-outbox/diagnostico',
-					loadComponent: () =>
-						import('./pages/admin/email-outbox-diagnostico').then(
-							(m) => m.EmailOutboxDiagnosticoComponent,
-						),
-					title: 'Intranet - Diagnóstico de Correos',
-				},
-			]
-		: []),
+];
+
+/**
+ * Redirects de las 7 URLs antiguas del submódulo "Monitoreo" hacia su nueva
+ * ubicación bajo `/admin/monitoreo`. Conservan bookmarks, deep-links externos
+ * (correos, Slack, Plan 32) y referencias en histórico.
+ *
+ * Plan 35 — Rediseño UX/UI Monitoreo, 2026-04-27.
+ */
+const MONITOREO_LEGACY_REDIRECTS: Route[] = [
+	{ path: 'admin/email-outbox', redirectTo: 'admin/monitoreo/correos/bandeja', pathMatch: 'full' },
+	{
+		path: 'admin/email-outbox/dashboard-dia',
+		redirectTo: 'admin/monitoreo/correos/dashboard',
+		pathMatch: 'full',
+	},
+	{
+		path: 'admin/email-outbox/diagnostico',
+		redirectTo: 'admin/monitoreo/correos/diagnostico',
+		pathMatch: 'full',
+	},
+	{
+		path: 'admin/auditoria-correos',
+		redirectTo: 'admin/monitoreo/correos/auditoria',
+		pathMatch: 'full',
+	},
+	{
+		path: 'admin/trazabilidad-errores',
+		redirectTo: 'admin/monitoreo/incidencias/errores',
+		pathMatch: 'full',
+	},
+	{
+		path: 'admin/reportes-usuario',
+		redirectTo: 'admin/monitoreo/incidencias/reportes',
+		pathMatch: 'full',
+	},
+	{
+		path: 'admin/rate-limit-events',
+		redirectTo: 'admin/monitoreo/seguridad/rate-limit',
+		pathMatch: 'full',
+	},
 ];
 // #endregion
 
@@ -341,18 +334,16 @@ export const INTRANET_ROUTES: Routes = [
 					),
 				title: 'Intranet - Gestión de Notificaciones',
 			},
+			// Plan 35 — Submódulo "Monitoreo" reagrupado en hub + 3 dominios.
+			// Las 7 rutas viejas (email-outbox, trazabilidad-errores, reportes-usuario,
+			// rate-limit-events, auditoria-correos, dashboard-dia, diagnostico) viven ahora
+			// dentro de `admin/monitoreo` con shells. Los redirects abajo conservan URLs viejas.
 			{
-				path: 'admin/email-outbox',
-				loadComponent: () =>
-					import('./pages/admin/email-outbox').then((m) => m.EmailOutboxComponent),
-				title: 'Intranet - Bandeja de Correos',
+				path: 'admin/monitoreo',
+				loadChildren: () =>
+					import('./pages/admin/monitoreo/monitoreo.routes').then((m) => m.default),
 			},
-			{
-				path: 'admin/trazabilidad-errores',
-				loadComponent: () =>
-					import('./pages/admin/error-groups').then((m) => m.ErrorGroupsComponent),
-				title: 'Intranet - Trazabilidad de Errores',
-			},
+			...MONITOREO_LEGACY_REDIRECTS,
 			{
 				// Plan 32 Chat 4 — Hub central que cruza los 4 tipos de telemetría que
 				// comparten un correlation id. Deep-link only (sin entrada de menú).
@@ -363,12 +354,6 @@ export const INTRANET_ROUTES: Routes = [
 					import('./pages/admin/correlation').then((m) => m.CorrelationComponent),
 				data: { permissionPath: 'intranet/admin/trazabilidad-errores' },
 				title: 'Intranet - Eventos correlacionados',
-			},
-			{
-				path: 'admin/reportes-usuario',
-				loadComponent: () =>
-					import('./pages/admin/feedback-reports').then((m) => m.FeedbackReportsComponent),
-				title: 'Intranet - Reportes de Usuarios',
 			},
 			// #endregion
 		],

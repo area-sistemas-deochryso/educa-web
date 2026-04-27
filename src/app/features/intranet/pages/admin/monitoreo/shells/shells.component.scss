@@ -1,0 +1,10 @@
+// #region Layout — separación entre tabs y outlet
+:host {
+	display: block;
+}
+
+p-tabs {
+	display: block;
+	margin-bottom: 1rem;
+}
+// #endregion

@@ -1,0 +1,16 @@
+<!-- #region Tabs -->
+<p-tabs [value]="activeTab()" (valueChange)="onTabChange($event)">
+	<p-tablist>
+		@for (tab of tabs(); track tab.value) {
+			<p-tab [value]="tab.value">
+				<i [class]="tab.icon + ' mr-2'"></i>
+				{{ tab.label }}
+			</p-tab>
+		}
+	</p-tablist>
+</p-tabs>
+<!-- #endregion -->
+
+<!-- #region Outlet -->
+<router-outlet />
+<!-- #endregion -->
