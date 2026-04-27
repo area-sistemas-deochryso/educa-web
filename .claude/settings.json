@@ -1,7 +1,38 @@
 {
+  "$schema": "https://json.schemastore.org/claude-code-settings.json",
   "permissions": {
     "allow": [
-      "Bash(node --version:*)"
+      "Bash(node --version:*)",
+      "Bash(git status:*)",
+      "Bash(git diff:*)",
+      "Bash(git log:*)",
+      "Bash(git mv .claude/chats/**)",
+      "Bash(mkdir -p .claude/**)",
+      "Bash(bash .claude/hooks/backlog-check.sh:*)",
+      "Bash(bash .claude/scripts/progress.sh:*)"
+    ]
+  },
+  "hooks": {
+    "SessionStart": [
+      {
+        "matcher": "startup|resume",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash .claude/hooks/backlog-check.sh"
+          }
+        ]
+      }
+    ],
+    "UserPromptSubmit": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash .claude/hooks/backlog-check.sh --wrap-system-reminder"
+          }
+        ]
+      }
     ]
   }
 }

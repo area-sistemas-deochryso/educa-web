@@ -1,6 +1,8 @@
 # Comando: Generar prompt para siguiente chat
 
-Genera un archivo numerado en `educa-web/.claude/chats/NNN-plan-X-chat-Y-<repo>-<scope>.md` con el prompt **autocontenido** que el próximo chat (fresh context) debe recibir para ejecutar la tarea acordada. Evita errores al pegar prompts largos en el chat box.
+Genera un archivo numerado en `educa-web/.claude/chats/open/NNN-plan-X-chat-Y-<repo>-<scope>.md` con el prompt **autocontenido** que el próximo chat (fresh context) debe recibir para ejecutar la tarea acordada. Evita errores al pegar prompts largos en el chat box.
+
+> **Cambio 2026-04-27**: los briefs ahora viven en `chats/open/` (no `chats/` directo). Ver el ciclo de vida de chats: `open/` → `running/` → (`waiting/` | `troubles/`)? → `closed/`. Ver [rules/backlog-hygiene.md](../rules/backlog-hygiene.md).
 
 ## Cuándo invocar
 
@@ -26,17 +28,19 @@ Después de generar el brief, recordar al usuario mantener la cola: "Agregá el 
 ## Reglas
 
 - El archivo es **autocontenido**: el chat nuevo no debe necesitar leer nada externo para empezar (salvo el plan file referenciado).
-- **Ubicación única**: `educa-web/.claude/chats/` — un solo lugar para todos los chats pendientes, sin importar si el trabajo es BE o FE. El BE no mantiene `chats/` propio.
+- **Ubicación**: `educa-web/.claude/chats/open/` — los briefs nuevos entran en `open/` y de ahí los consume `/start-chat` (o automáticamente `/go`). El BE no mantiene `chats/` propio. Ciclo: `open/` → `running/` → (`waiting/` | `troubles/`)? → `closed/`.
 - **Numeración**: `NNN` con 3 dígitos, secuencial, independiente del plan/repo/fecha. El siguiente número = `max(NNN existentes en chats/ y chats/closed/) + 1`.
 - **Nombre**: `NNN-plan-X-chat-Y-<repo>-<scope-corto>.md` (ej: `003-plan-25-chat-2-be-migrar-reportes-restantes.md`). Scope en kebab-case, ≤ 6 palabras.
 - **Metadato obligatorio al inicio** (antes del `# Título`):
 
   ```markdown
   > **Repo destino**: `educa-web` (frontend, branch `main`) | `Educa.API` (backend, branch `master`). Abrir el chat nuevo en este repo.
-  > **Plan**: N · **Chat**: M · **Fase**: FX.YY · **Estado**: ⏳ pendiente | 🟡 WIP | ✅ cerrado.
+  > **Plan**: N · **Chat**: M · **Fase**: FX.YY · **Creado**: YYYY-MM-DD · **Estado**: ⏳ pendiente | 🟡 WIP | ✅ cerrado.
 
   ---
   ```
+
+  **Importante**: el campo `Creado:` lo lee el [hook backlog-check.sh](../hooks/backlog-check.sh) y `/triage` para medir edad de los briefs. Sin ese campo, el hook cae al `mtime` del archivo (menos confiable porque las ediciones lo resetean).
 
 - Sobrescribir solo si el número ya existe con el mismo plan/chat (retomar un chat pendiente); en general **no sobrescribir** — siempre siguiente número libre.
 - Formato markdown con secciones claras, code blocks para SQL/snippets/comandos.
@@ -44,20 +48,21 @@ Después de generar el brief, recordar al usuario mantener la cola: "Agregá el 
 
 ## Cómo calcular el siguiente número
 
-Antes de escribir, listar los archivos existentes:
+Antes de escribir, listar los archivos existentes en los 5 buckets del ciclo de vida:
 
 ```bash
-ls "educa-web/.claude/chats/" | grep -E "^[0-9]{3}-" | sort | tail -3
-ls "educa-web/.claude/chats/closed/" 2>/dev/null | grep -E "^[0-9]{3}-" | sort | tail -3
+for d in open running waiting troubles closed; do
+  ls "educa-web/.claude/chats/$d/" 2>/dev/null | grep -E "^[0-9]{3}-" || true
+done | sort | tail -5
 ```
 
-Tomar el mayor NNN entre ambos directorios y sumar 1. Si no hay archivos aún, empezar en `001`.
+Tomar el mayor NNN y sumar 1. Si no hay archivos aún, empezar en `001`. **Los NNN son globales y no se reutilizan** — cada brief tiene identidad única durante todo su ciclo de vida.
 
 ## Estructura obligatoria
 
 ```markdown
 > **Repo destino**: `Educa.API` (backend, branch `master`). Abrir el chat nuevo en este repo.
-> **Plan**: 25 · **Chat**: 1 · **Fase**: F1 · **Estado**: ⏳ pendiente arrancar.
+> **Plan**: 25 · **Chat**: 1 · **Fase**: F1 · **Creado**: 2026-04-27 · **Estado**: ⏳ pendiente arrancar.
 
 ---
 
@@ -92,7 +97,7 @@ Explícito — qué NO tocar (siguientes fases, otros repos, etc.).
 
 ## CRITERIOS DE CIERRE
 Checklist accionable con `[ ]`. Incluir siempre:
-- [ ] Mover este archivo a `educa-web/.claude/chats/closed/` al cerrar el chat.
+- [ ] Mover este archivo de `chats/running/` a `chats/closed/` al cerrar el chat (lo hace `/end` automático en caso /ship).
 
 ## COMMIT MESSAGE sugerido
 Texto exacto a usar. **Obligatorio respetar las reglas de la skill `commit`** (`.claude/skills/commit/SKILL.md`):
@@ -109,13 +114,17 @@ Qué feedback pedir al cerrar (decisiones no obvias, si siguiente fase requiere 
 
 ## Al cerrar un chat (limpieza)
 
-Cuando el chat termina exitosamente (commit hecho + maestro actualizado):
+**Nuevo flujo recomendado**: usar [`/end`](end.md) — detecta el caso (ship completo, pausa, abort, commit aparte) y hace el move + commit + actualización del maestro automáticamente, delegando el commit en `/commit-front`/`/commit-back`/`/commit-local`.
+
+Si por alguna razón hacés el cierre manual:
 
 ```bash
-mv "educa-web/.claude/chats/NNN-...md" "educa-web/.claude/chats/closed/"
+git mv "educa-web/.claude/chats/running/NNN-...md" "educa-web/.claude/chats/closed/"
 ```
 
 No se borra — queda como historia. El número NNN **no se reutiliza**.
+
+**Invariante**: un brief no entra a `closed/` sin commit que lo mueva ahí. Si encontrás un brief en `closed/` sin commit que lo justifique, es un error — devolverlo a `open/` y cerrarlo bien.
 
 ## Al terminar la generación
 

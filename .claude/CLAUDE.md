@@ -60,6 +60,8 @@ Aplicacion Angular 21 para gestion educativa con portal publico e intranet priva
 ## Metodología operativa
 
 @.claude/rules/chat-modes.md
+@.claude/rules/chat-shortcuts.md
+@.claude/rules/backlog-hygiene.md
 
 ## Comunicación con el usuario
 
