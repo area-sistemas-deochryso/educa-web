@@ -1,5 +1,5 @@
 > **Repo destino**: `Educa.API` (backend, branch `master`). Abrir el chat nuevo en este repo.
-> **Validación prod**: ⏳ pendiente desde 2026-04-27 (backfill — cierre original anterior, ver git log)
+> **Validación prod**: ✅ verificada 2026-04-27 — endpoint expone correlationId + campos esperados en JSON.
 > **Plan**: 30b · **Chat**: BE · **Fase**: F1.BE · **Estado**: ⏳ pendiente arrancar.
 
 ---

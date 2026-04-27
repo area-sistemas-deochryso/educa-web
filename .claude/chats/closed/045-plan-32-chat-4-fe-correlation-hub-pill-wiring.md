@@ -1,5 +1,5 @@
 > **Repo destino**: `educa-web` (frontend, branch `main`). Abrir el chat nuevo en este repo.
-> **Validación prod**: ⏳ pendiente desde 2026-04-27 (backfill — cierre original anterior, ver git log)
+> **Validación prod**: ✅ verificada 2026-04-27 — hub /intranet/admin/correlation/:id renderiza las 4 secciones; pills funcionan en error-logs.
 > **Plan**: 32 · **Chat**: 4 · **Fase**: FE · **Estado**: ⏳ pendiente arrancar.
 
 ---
