@@ -46,8 +46,33 @@
 			}
 		</p-tabpanel>
 
-		<!-- Tab 2: Detalle (tablas) -->
+		<!-- Tab 2: Detalle (KPIs + tablas) -->
 		<p-tabpanel value="detalle">
+			<!-- #region KPIs del detalle -->
+			@if (vm().loading && !hasData()) {
+				<app-stats-skeleton [count]="4" iconPosition="right" />
+			} @else if (hasData()) {
+				<section class="detalle-kpis" aria-label="Resumen de fallos del día">
+					@for (card of detalleKpiCards(); track card.key) {
+						<div
+							class="stat-card"
+							[class]="'stat-card--' + card.variant"
+							[class.stat-card--zero]="card.value === 0"
+						>
+							<div class="stat-content">
+								<span class="stat-label">{{ card.label }}</span>
+								<span class="stat-value">{{ card.value }}</span>
+								<span class="stat-sublabel">{{ card.sublabel }}</span>
+							</div>
+							<div class="stat-icon">
+								<i [class]="card.icon"></i>
+							</div>
+						</div>
+					}
+				</section>
+			}
+			<!-- #endregion -->
+
 			<div class="tables-stack">
 				<!-- Fallos del día (lo más útil arriba) -->
 				@if (vm().loading && !hasData()) {

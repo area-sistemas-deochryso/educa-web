@@ -37,6 +37,17 @@ const FALLOS_SKELETON_COLUMNS: SkeletonColumnDef[] = [
 	{ width: '70px', cellType: 'actions' },
 ];
 
+const BOUNCES_CRITICAL_THRESHOLD = 3;
+
+interface DetalleKpiCard {
+	readonly key: string;
+	readonly label: string;
+	readonly value: number;
+	readonly sublabel: string;
+	readonly icon: string;
+	readonly variant: 'danger' | 'warning' | 'info' | 'success';
+}
+
 @Component({
 	selector: 'app-email-outbox-dashboard-dia',
 	standalone: true,
@@ -68,6 +79,56 @@ export class EmailOutboxDashboardDiaComponent {
 	readonly hasData = computed(() => this.vm().dto !== null);
 	readonly totalFallos = computed(() => this.vm().resumen?.fallidos ?? 0);
 	readonly totalBounces = computed(() => this.vm().bouncesAcumulados.length);
+	readonly bouncesCriticos = computed(
+		() =>
+			this.vm().bouncesAcumulados.filter(
+				(b) => b.bouncesAcumulados >= BOUNCES_CRITICAL_THRESHOLD,
+			).length,
+	);
+	readonly tiposConFallos = computed(
+		() => this.vm().porTipo.filter((t) => t.fallidos > 0).length,
+	);
+
+	readonly detalleKpiCards = computed<DetalleKpiCard[]>(() => {
+		const fallos = this.totalFallos();
+		const bouncers = this.totalBounces();
+		const criticos = this.bouncesCriticos();
+		const tipos = this.tiposConFallos();
+		return [
+			{
+				key: 'fallos',
+				label: 'Fallos del día',
+				value: fallos,
+				sublabel: fallos === 0 ? 'sin correos en FAILED' : 'correos en estado FAILED',
+				icon: 'pi pi-times-circle',
+				variant: fallos === 0 ? 'success' : 'danger',
+			},
+			{
+				key: 'bouncers',
+				label: 'Bouncers únicos',
+				value: bouncers,
+				sublabel: bouncers === 0 ? 'sin rebotes acumulados' : 'destinatarios con 2+ rebotes',
+				icon: 'pi pi-reply',
+				variant: bouncers === 0 ? 'success' : 'warning',
+			},
+			{
+				key: 'criticos',
+				label: 'Próximos a blacklist',
+				value: criticos,
+				sublabel: '≥3 bounces · auto-blacklist al siguiente fallo',
+				icon: 'pi pi-exclamation-triangle',
+				variant: criticos === 0 ? 'success' : 'danger',
+			},
+			{
+				key: 'tipos',
+				label: 'Tipos afectados',
+				value: tipos,
+				sublabel: tipos === 0 ? 'ningún tipo con fallos' : 'tipos de correo con fallos hoy',
+				icon: 'pi pi-tag',
+				variant: tipos === 0 ? 'success' : 'info',
+			},
+		];
+	});
 	// #endregion
 
 	// #region Lifecycle
