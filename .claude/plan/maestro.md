@@ -66,7 +66,7 @@
 
 1. **[Plan 31 · Chat 2 · `Educa.API` · BE]** — Parser IMAP + Hangfire job + tabla `BounceParserProcessed`. `BounceParserService` + partial `.Imap.cs` + `Ndr3464Parser` + `BounceCorrelator` + `BounceParserJob` recurring `*/5 * * * *`. Procesa `INBOX`/`Junk`/`Trash` de los 7 buzones del pool Plan 22 F6. **Bloqueado hasta validación del header `X-Educa-Outbox-Id` en Roundcube post-deploy del Chat 1 (`c46dfa0` aún sin pushear)**. Brief en `.claude/chats/038-plan-31-chat-2-be-bounce-parser-imap-job.md` listo para cuando desbloquée.
 2. **[Plan 24 · Chat 4 (B) · `Educa.API` · BE+OPS]** — subfase (A') cerrada 2026-04-24 con `CrossChexPollingOptions` + instrumentación Stopwatch (commit `862d4ca`). Falta (B): medir 48-72h de logs en prod (`ConfiguredMs / ElapsedMs / Drift`) y, si el proveedor lo permite, bajar `CrossChex:Polling:DelayBetweenPagesMs` de 30000 a 10000-15000 vía Azure App Configuration (sin redeploy). Cierra Plan 24 al 100%.
-3. **[Plan 36 · Chat 5 · `educa-web` · FE]** — flag flip `auditoriaCorreos: false → true` en `environment.ts`. Brief en `.claude/chats/open/060-plan-36-chat-5-fe-auditoria-correos-flag-flip.md`. Cambio puntual sin riesgo, destraba ver la página #4 del Plan 36.
+3. _(Plan 36 Chat 5 cerrado local 2026-04-27 — `awaiting-prod/` esperando smoke test del menú Auditoría en prod.)_
 
 **Notas**:
 

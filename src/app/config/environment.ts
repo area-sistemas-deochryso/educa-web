@@ -31,7 +31,7 @@ export const environment = {
 		emailOutboxDeferFailWidget: false,
 		emailOutboxDashboardDia: true,
 		emailOutboxDiagnostico: true,
-		auditoriaCorreos: false,
+		auditoriaCorreos: true,
 	},
 
 	// Debug panels (siempre false en producción)

@@ -1,5 +1,6 @@
 > **Repo destino**: `educa-web` (frontend, branch `main`).
-> **Plan**: 36 · **Chat**: 5 · **Fase**: F5 (`/execute`) · **Creado**: 2026-04-27 · **Estado**: ⏳ pendiente arrancar.
+> **Plan**: 36 · **Chat**: 5 · **Fase**: F5 (`/execute`) · **Creado**: 2026-04-27 · **Estado**: ✅ cerrado local 2026-04-27.
+> **Validación prod**: ⏳ pendiente desde 2026-04-27 — smoke test del menú/ruta `/intranet/admin/monitoreo/correos/auditoria` post-deploy.
 
 ---
 
