@@ -13,7 +13,7 @@ const CORREOS_CHILDREN: Routes = [
 		loadComponent: () =>
 			import('../email-outbox').then((m) => m.EmailOutboxComponent),
 		canActivate: [authGuard, permissionsGuard],
-		data: { permissionPath: 'intranet/admin/email-outbox' },
+		data: { permissionPath: 'intranet/admin/monitoreo/correos/bandeja' },
 		title: 'Intranet - Bandeja de Correos',
 	},
 	...(environment.features.emailOutboxDashboardDia
@@ -25,7 +25,7 @@ const CORREOS_CHILDREN: Routes = [
 							(m) => m.EmailOutboxDashboardDiaComponent,
 						),
 					canActivate: [authGuard, permissionsGuard],
-					data: { permissionPath: 'intranet/admin/email-outbox/dashboard-dia' },
+					data: { permissionPath: 'intranet/admin/monitoreo/correos/dashboard' },
 					title: 'Intranet - Dashboard de Correos',
 				},
 			]
@@ -39,7 +39,7 @@ const CORREOS_CHILDREN: Routes = [
 							(m) => m.EmailOutboxDiagnosticoComponent,
 						),
 					canActivate: [authGuard, permissionsGuard],
-					data: { permissionPath: 'intranet/admin/email-outbox/diagnostico' },
+					data: { permissionPath: 'intranet/admin/monitoreo/correos/diagnostico' },
 					title: 'Intranet - Diagnóstico de Correos',
 				},
 			]
@@ -51,7 +51,7 @@ const CORREOS_CHILDREN: Routes = [
 					loadComponent: () =>
 						import('../auditoria-correos').then((m) => m.AuditoriaCorreosComponent),
 					canActivate: [authGuard, permissionsGuard],
-					data: { permissionPath: 'intranet/admin/auditoria-correos' },
+					data: { permissionPath: 'intranet/admin/monitoreo/correos/auditoria' },
 					title: 'Intranet - Auditoría de Correos',
 				},
 			]
@@ -67,7 +67,7 @@ const INCIDENCIAS_CHILDREN: Routes = [
 		loadComponent: () =>
 			import('../error-groups').then((m) => m.ErrorGroupsComponent),
 		canActivate: [authGuard, permissionsGuard],
-		data: { permissionPath: 'intranet/admin/trazabilidad-errores' },
+		data: { permissionPath: 'intranet/admin/monitoreo/incidencias/errores' },
 		title: 'Intranet - Trazabilidad de Errores',
 	},
 	{
@@ -75,7 +75,7 @@ const INCIDENCIAS_CHILDREN: Routes = [
 		loadComponent: () =>
 			import('../feedback-reports').then((m) => m.FeedbackReportsComponent),
 		canActivate: [authGuard, permissionsGuard],
-		data: { permissionPath: 'intranet/admin/reportes-usuario' },
+		data: { permissionPath: 'intranet/admin/monitoreo/incidencias/reportes' },
 		title: 'Intranet - Reportes de Usuarios',
 	},
 ];
@@ -110,7 +110,7 @@ export default [
 					loadComponent: () =>
 						import('../rate-limit-events').then((m) => m.RateLimitEventsComponent),
 					canActivate: [authGuard, permissionsGuard],
-					data: { permissionPath: 'intranet/admin/rate-limit-events' },
+					data: { permissionPath: 'intranet/admin/monitoreo/seguridad/rate-limit' },
 					title: 'Intranet - Telemetría de Rate Limiting',
 				},
 			]

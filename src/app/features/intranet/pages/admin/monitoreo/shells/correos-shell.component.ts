@@ -68,14 +68,12 @@ export class CorreosShellComponent {
 		ALL_TABS.filter((t) => !t.featureFlag || environment.features[t.featureFlag]),
 	);
 
-	private readonly initialTab = this.resolveActiveTab();
-
 	readonly activeTab = toSignal(
 		this.router.events.pipe(
 			filter((e) => e instanceof NavigationEnd),
 			map(() => this.resolveActiveTab()),
 		),
-		{ initialValue: this.initialTab },
+		{ initialValue: this.resolveActiveTab() },
 	);
 	// #endregion
 
@@ -88,7 +86,7 @@ export class CorreosShellComponent {
 
 	// #region Helpers
 	private resolveActiveTab(): string {
-		const segment = this.route.firstChild?.snapshot.url[0]?.path;
+		const segment = this.route.firstChild?.snapshot?.url?.[0]?.path;
 		return segment ?? ALL_TABS[0].value;
 	}
 	// #endregion

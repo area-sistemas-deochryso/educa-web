@@ -2,8 +2,6 @@
 import { ChangeDetectionStrategy, Component, computed, inject } from '@angular/core';
 import { RouterLink } from '@angular/router';
 
-import { ButtonModule } from 'primeng/button';
-
 import { PageHeaderComponent } from '@intranet-shared/components/page-header/page-header.component';
 import { UserPermissionsService } from '@core/services';
 import { PERMISOS, PermisoPath } from '@shared/constants';
@@ -20,12 +18,14 @@ interface MonitoreoLink {
 	featureFlag?: FeatureFlagKey;
 }
 
+type MonitoreoTone = 'blue' | 'amber' | 'green';
+
 interface MonitoreoCard {
 	id: 'correos' | 'incidencias' | 'seguridad';
 	icon: string;
 	title: string;
 	description: string;
-	primaryRoute: string;
+	tone: MonitoreoTone;
 	links: MonitoreoLink[];
 }
 // #endregion
@@ -37,7 +37,7 @@ const ALL_CARDS: MonitoreoCard[] = [
 		icon: 'pi pi-envelope',
 		title: 'Correos',
 		description: 'Bandeja, salud del envío, diagnóstico y auditoría del canal SMTP.',
-		primaryRoute: '/intranet/admin/monitoreo/correos',
+		tone: 'blue',
 		links: [
 			{
 				label: 'Bandeja',
@@ -69,7 +69,7 @@ const ALL_CARDS: MonitoreoCard[] = [
 		icon: 'pi pi-megaphone',
 		title: 'Incidencias',
 		description: 'Errores con contexto y reportes manuales de usuarios.',
-		primaryRoute: '/intranet/admin/monitoreo/incidencias',
+		tone: 'amber',
 		links: [
 			{
 				label: 'Errores',
@@ -88,7 +88,7 @@ const ALL_CARDS: MonitoreoCard[] = [
 		icon: 'pi pi-shield',
 		title: 'Seguridad',
 		description: 'Saturación, abuso y respuestas 429 del rate limiter.',
-		primaryRoute: '/intranet/admin/monitoreo/seguridad/rate-limit',
+		tone: 'green',
 		links: [
 			{
 				label: 'Rate Limit',
@@ -104,7 +104,7 @@ const ALL_CARDS: MonitoreoCard[] = [
 @Component({
 	selector: 'app-monitoreo-hub',
 	standalone: true,
-	imports: [RouterLink, ButtonModule, PageHeaderComponent],
+	imports: [RouterLink, PageHeaderComponent],
 	templateUrl: './monitoreo-hub.component.html',
 	styleUrl: './monitoreo-hub.component.scss',
 	changeDetection: ChangeDetectionStrategy.OnPush,

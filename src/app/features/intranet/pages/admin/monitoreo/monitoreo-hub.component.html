@@ -10,39 +10,28 @@
 @if (hasAnyCard()) {
 	<section class="cards-grid">
 		@for (card of cards(); track card.id) {
-			<article class="monitoreo-card">
+			<article class="monitoreo-card" [attr.data-tone]="card.tone">
 				<header class="card-header">
-					<i [class]="card.icon"></i>
+					<span class="card-icon">
+						<i [class]="card.icon"></i>
+					</span>
 					<div class="card-title-stack">
 						<h3>{{ card.title }}</h3>
-						<span class="card-count">
-							{{ card.links.length }}
-							{{ card.links.length === 1 ? 'sub-vista' : 'sub-vistas' }}
-						</span>
+						<p class="card-description">{{ card.description }}</p>
 					</div>
+					<span class="card-badge">{{ card.links.length }}</span>
 				</header>
-
-				<p class="card-description">{{ card.description }}</p>
 
 				<ul class="card-links">
 					@for (link of card.links; track link.route) {
 						<li>
-							<a [routerLink]="link.route">
+							<a [routerLink]="link.route" class="link-pill">
+								<span class="link-label">{{ link.label }}</span>
 								<i class="pi pi-arrow-right"></i>
-								<span>{{ link.label }}</span>
 							</a>
 						</li>
 					}
 				</ul>
-
-				<a
-					pButton
-					[routerLink]="card.primaryRoute"
-					[label]="'Abrir ' + card.title"
-					icon="pi pi-external-link"
-					iconPos="right"
-					class="p-button-sm card-cta"
-				></a>
 			</article>
 		}
 	</section>

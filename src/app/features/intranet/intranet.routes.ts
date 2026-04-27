@@ -352,7 +352,7 @@ export const INTRANET_ROUTES: Routes = [
 				path: 'admin/correlation/:id',
 				loadComponent: () =>
 					import('./pages/admin/correlation').then((m) => m.CorrelationComponent),
-				data: { permissionPath: 'intranet/admin/trazabilidad-errores' },
+				data: { permissionPath: 'intranet/admin/monitoreo/incidencias/errores' },
 				title: 'Intranet - Eventos correlacionados',
 			},
 			// #endregion

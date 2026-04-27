@@ -12,7 +12,9 @@ import {
 	viewChild,
 } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { Router } from '@angular/router';
+import { NavigationEnd, Router } from '@angular/router';
+import { toSignal } from '@angular/core/rxjs-interop';
+import { filter, map, startWith } from 'rxjs/operators';
 
 import { ModuloMenu } from '../../intranet-menu.config';
 import { ModuloId } from '@shared/constants/module-registry';
@@ -70,6 +72,16 @@ export class ModuleSelectorComponent {
 	readonly searchTerm = signal('');
 	readonly activeIndex = signal(0);
 	readonly searchInput = viewChild<ElementRef<HTMLInputElement>>('searchInput');
+
+	/** Reactive current URL — used to highlight the page the user is on. */
+	private readonly currentUrl = toSignal(
+		this.router.events.pipe(
+			filter((e): e is NavigationEnd => e instanceof NavigationEnd),
+			map((e) => e.urlAfterRedirects),
+			startWith(this.router.url),
+		),
+		{ initialValue: this.router.url },
+	);
 	// #endregion
 
 	// #region Computed — Flat index of all navigable pages
@@ -218,6 +230,17 @@ export class ModuleSelectorComponent {
 	/** Check if a result is the active one (used in tree view). */
 	isActiveResult(result: SearchResult): boolean {
 		return this.activeList()[this.activeIndex()] === result;
+	}
+
+	/**
+	 * Check if a result corresponds to the page the user is currently on.
+	 * Matches by exact path or as a prefix of the current URL (e.g.
+	 * `/intranet/admin/monitoreo` highlights when on `/.../monitoreo/correos/bandeja`).
+	 */
+	isCurrentRoute(result: SearchResult): boolean {
+		const url = this.currentUrl().split('?')[0];
+		const r = result.route;
+		return url === r || url.startsWith(r + '/');
 	}
 
 	/** Set active index from a result (used in tree view mouseenter). */

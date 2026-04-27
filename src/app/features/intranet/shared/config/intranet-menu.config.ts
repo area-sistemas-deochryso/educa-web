@@ -118,9 +118,7 @@ export const MENU_ITEMS: MenuItemDef[] = [
 	{ route: '/intranet/admin/permisos/usuarios', label: 'Por Usuario', icon: 'pi pi-users', permiso: PERMISOS.ADMIN_PERMISOS_USUARIOS, modulo: 'sistema', group: { label: 'Permisos', icon: 'pi pi-lock' }, preview: 'admin-table', description: 'Gestionar permisos por usuario' },
 	// Monitoreo — Plan 35: 7 entradas planas colapsadas en 1 hub.
 	// El hub `/admin/monitoreo` filtra cards por permiso individual del usuario.
-	// El permiso del menú item usa ADMIN_EMAIL_OUTBOX (más universal entre admins de soporte);
-	// usuarios con sólo otros permisos pueden llegar al hub vía URL directa o redirects de URLs viejas.
-	{ route: '/intranet/admin/monitoreo', label: 'Monitoreo', icon: 'pi pi-chart-bar', permiso: PERMISOS.ADMIN_EMAIL_OUTBOX, modulo: 'sistema', preview: 'admin-table', description: 'Hub de monitoreo: correos, incidencias y seguridad' },
+	{ route: '/intranet/admin/monitoreo', label: 'Monitoreo', icon: 'pi pi-chart-bar', permiso: PERMISOS.ADMIN_MONITOREO, modulo: 'sistema', preview: 'admin-table', description: 'Hub de monitoreo: correos, incidencias y seguridad' },
 	// Herramientas — utilidades dev/admin (no son observabilidad)
 	{ route: '/intranet/admin/campus', label: 'Campus', icon: 'pi pi-map', permiso: PERMISOS.ADMIN_CAMPUS, modulo: 'sistema', featureFlag: 'campusNavigation', group: { label: 'Herramientas', icon: 'pi pi-wrench' }, preview: 'admin-table', description: 'Navegar el campus virtual' },
 	{ route: '/intranet/ctest-k6', label: 'Test k6', icon: 'pi pi-bolt', permiso: PERMISOS.CTEST_K6, modulo: 'sistema', featureFlag: 'ctestK6', group: { label: 'Herramientas', icon: 'pi pi-wrench' }, preview: 'admin-table', description: 'Herramienta de testing de carga' },

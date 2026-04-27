@@ -2,7 +2,7 @@
 .cards-grid {
 	display: grid;
 	grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-	gap: 1.25rem;
+	gap: 1.5rem;
 	margin-top: 1.5rem;
 }
 // #endregion
@@ -11,59 +11,145 @@
 .monitoreo-card {
 	display: flex;
 	flex-direction: column;
-	gap: 1rem;
+	gap: 1.25rem;
 	padding: 1.5rem;
 	border: 1px solid var(--surface-300);
-	border-radius: 12px;
-	background: transparent;
-	transition: background 0.15s ease, border-color 0.15s ease;
+	border-radius: 14px;
+	background: var(--surface-0, #ffffff);
+	box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04);
+	transition: transform 0.18s ease, box-shadow 0.18s ease,
+		border-color 0.18s ease;
+	position: relative;
+	overflow: hidden;
+
+	// Borde de acento superior por dominio
+	&::before {
+		content: '';
+		position: absolute;
+		top: 0;
+		left: 0;
+		right: 0;
+		height: 5px;
+		background: linear-gradient(
+			90deg,
+			var(--card-accent),
+			var(--card-accent-strong)
+		);
+	}
+
+	// Decoración suave de fondo con el color del dominio (ambient)
+	&::after {
+		content: '';
+		position: absolute;
+		top: -40px;
+		right: -40px;
+		width: 140px;
+		height: 140px;
+		border-radius: 50%;
+		background: var(--card-tint);
+		opacity: 0.5;
+		pointer-events: none;
+		z-index: 0;
+	}
+
+	> * {
+		position: relative;
+		z-index: 1;
+	}
 
 	&:hover {
-		background: var(--surface-50);
-		border-color: var(--surface-400);
+		transform: translateY(-3px);
+		box-shadow: 0 10px 24px color-mix(in srgb, var(--card-accent) 20%, transparent),
+			0 2px 6px rgba(0, 0, 0, 0.04);
+		border-color: var(--card-accent);
+	}
+
+	// Tonos por dominio (con fallback hex por si la paleta no está expuesta)
+	&[data-tone='blue'] {
+		--card-accent: var(--blue-500, #3b82f6);
+		--card-accent-strong: var(--blue-600, #2563eb);
+		--card-tint: color-mix(in srgb, var(--blue-500, #3b82f6) 14%, transparent);
+		--card-tint-strong: color-mix(in srgb, var(--blue-500, #3b82f6) 22%, transparent);
+		--card-icon: var(--blue-700, #1d4ed8);
+		--card-text: var(--blue-800, #1e40af);
+	}
+	&[data-tone='amber'] {
+		--card-accent: var(--orange-500, #f97316);
+		--card-accent-strong: var(--orange-600, #ea580c);
+		--card-tint: color-mix(in srgb, var(--orange-500, #f97316) 14%, transparent);
+		--card-tint-strong: color-mix(in srgb, var(--orange-500, #f97316) 22%, transparent);
+		--card-icon: var(--orange-700, #c2410c);
+		--card-text: var(--orange-800, #9a3412);
+	}
+	&[data-tone='green'] {
+		--card-accent: var(--green-500, #22c55e);
+		--card-accent-strong: var(--green-600, #16a34a);
+		--card-tint: color-mix(in srgb, var(--green-500, #22c55e) 14%, transparent);
+		--card-tint-strong: color-mix(in srgb, var(--green-500, #22c55e) 22%, transparent);
+		--card-icon: var(--green-700, #15803d);
+		--card-text: var(--green-800, #166534);
 	}
 
 	.card-header {
-		display: flex;
-		align-items: center;
+		display: grid;
+		grid-template-columns: auto 1fr auto;
+		align-items: start;
 		gap: 1rem;
 
-		i {
-			font-size: 1.75rem;
-			color: var(--text-color);
-			width: 48px;
-			height: 48px;
+		.card-icon {
+			width: 56px;
+			height: 56px;
 			display: flex;
 			align-items: center;
 			justify-content: center;
-			border-radius: 12px;
-			background: var(--surface-200);
+			border-radius: 14px;
+			background: var(--card-tint-strong);
+			box-shadow: 0 1px 0 0 color-mix(in srgb, var(--card-accent) 20%, transparent) inset;
+
+			i {
+				font-size: 1.65rem;
+				color: var(--card-icon);
+			}
 		}
 
 		.card-title-stack {
 			display: flex;
 			flex-direction: column;
-			gap: 0.15rem;
+			gap: 0.25rem;
+			min-width: 0;
 
 			h3 {
 				margin: 0;
 				font-size: 1.15rem;
 				font-weight: 600;
 				color: var(--text-color);
+				line-height: 1.2;
 			}
 
-			.card-count {
-				font-size: 0.8rem;
+			.card-description {
+				margin: 0;
+				font-size: 0.85rem;
 				color: var(--text-color-secondary);
+				line-height: 1.4;
 			}
 		}
-	}
 
-	.card-description {
-		margin: 0;
-		font-size: 0.9rem;
-		color: var(--text-color-secondary);
-		line-height: 1.4;
+		.card-badge {
+			align-self: start;
+			min-width: 30px;
+			height: 30px;
+			padding: 0 0.65rem;
+			display: inline-flex;
+			align-items: center;
+			justify-content: center;
+			border-radius: 999px;
+			background: var(--card-tint-strong);
+			color: var(--card-text);
+			font-size: 0.85rem;
+			font-weight: 700;
+			line-height: 1;
+			letter-spacing: 0.02em;
+		}
 	}
 
 	.card-links {
@@ -74,35 +160,53 @@
 		flex-direction: column;
 		gap: 0.4rem;
 
-		li a {
+		.link-pill {
 			display: flex;
 			align-items: center;
+			justify-content: space-between;
 			gap: 0.5rem;
-			padding: 0.5rem 0.75rem;
-			border-radius: 6px;
+			padding: 0.7rem 0.95rem;
+			border-radius: 10px;
+			border: 1px solid var(--surface-300);
+			background: var(--surface-0, #ffffff);
 			color: var(--text-color);
-			font-size: 0.875rem;
+			font-size: 0.9rem;
+			font-weight: 500;
 			text-decoration: none;
-			transition: background 0.15s ease;
+			transition: background 0.18s ease, border-color 0.18s ease,
+				color 0.18s ease, box-shadow 0.18s ease, transform 0.18s ease;
+
+			.link-label {
+				min-width: 0;
+				overflow: hidden;
+				text-overflow: ellipsis;
+				white-space: nowrap;
+			}
 
 			i {
-				font-size: 0.75rem;
-				color: var(--text-color-secondary);
+				font-size: 0.85rem;
+				color: var(--card-icon);
+				transition: transform 0.18s ease, color 0.18s ease;
 			}
 
 			&:hover {
-				background: var(--surface-100);
+				background: var(--card-tint);
+				border-color: var(--card-accent);
+				color: var(--card-text);
+				transform: translateX(2px);
+				box-shadow: 0 2px 6px color-mix(in srgb, var(--card-accent) 15%, transparent);
 
 				i {
-					color: var(--text-color);
+					color: var(--card-text);
+					transform: translateX(3px);
 				}
 			}
-		}
-	}
 
-	.card-cta {
-		align-self: flex-start;
-		margin-top: auto;
+			&:focus-visible {
+				outline: 2px solid var(--card-accent);
+				outline-offset: 2px;
+			}
+		}
 	}
 }
 // #endregion

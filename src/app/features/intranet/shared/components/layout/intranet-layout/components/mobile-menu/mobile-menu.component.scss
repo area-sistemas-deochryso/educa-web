@@ -198,6 +198,26 @@ app-mobile-menu .nav-result-item {
 	&:active {
 		background: rgba(92, 122, 40, 0.12);
 	}
+
+	// Current route — the page the user is on.
+	&.is-current {
+		background: color-mix(in srgb, var(--blue-500) 12%, transparent);
+		box-shadow: inset 4px 0 0 0 var(--blue-600);
+
+		.result-label {
+			font-weight: 600;
+			color: var(--blue-800);
+		}
+
+		.result-icon {
+			color: var(--blue-700);
+		}
+
+		.result-badge {
+			background: color-mix(in srgb, var(--blue-500) 18%, transparent);
+			color: var(--blue-800);
+		}
+	}
 }
 
 app-mobile-menu .home-item {

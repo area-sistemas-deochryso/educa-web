@@ -13,7 +13,9 @@ import {
 	ViewEncapsulation,
 } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { Router, RouterLink } from '@angular/router';
+import { NavigationEnd, Router, RouterLink } from '@angular/router';
+import { toSignal } from '@angular/core/rxjs-interop';
+import { filter, map, startWith } from 'rxjs/operators';
 import { ModuloId } from '@shared/constants/module-registry';
 import { QuickAccessFavoritesService } from '@intranet-shared/services';
 import { UserProfileMenuComponent } from '../user-profile-menu';
@@ -77,6 +79,16 @@ export class MobileMenuComponent {
 	readonly isOpen = signal(false);
 	readonly searchTerm = signal('');
 	readonly searchInputRef = viewChild<ElementRef<HTMLInputElement>>('mobileSearchInput');
+
+	/** Reactive current URL — used to highlight the page the user is on. */
+	private readonly currentUrl = toSignal(
+		this.router.events.pipe(
+			filter((e): e is NavigationEnd => e instanceof NavigationEnd),
+			map((e) => e.urlAfterRedirects),
+			startWith(this.router.url),
+		),
+		{ initialValue: this.router.url },
+	);
 	// #endregion
 
 	// #region Computed
@@ -193,6 +205,21 @@ export class MobileMenuComponent {
 	onLogout(): void {
 		this.close();
 		this.logoutClick.emit();
+	}
+
+	/**
+	 * Check if a result corresponds to the page the user is currently on.
+	 * Matches by exact path or as a prefix of the current URL.
+	 */
+	isCurrentRoute(result: MobileSearchResult): boolean {
+		const url = this.currentUrl().split('?')[0];
+		const r = result.route;
+		return url === r || url.startsWith(r + '/');
+	}
+
+	/** Same check, but for the home button (no result wrapper). */
+	isHomeCurrent(): boolean {
+		return this.currentUrl().split('?')[0] === '/intranet';
 	}
 	// #endregion
 

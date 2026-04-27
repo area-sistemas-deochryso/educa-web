@@ -48,10 +48,12 @@
 						type="button"
 						class="panel-item"
 						[class.active]="activeIndex() === i"
+						[class.is-current]="isCurrentRoute(result)"
 						(click)="selectResult(result)"
 						(mouseenter)="activeIndex.set(i)"
 						role="option"
 						[attr.aria-selected]="activeIndex() === i"
+						[attr.aria-current]="isCurrentRoute(result) ? 'page' : null"
 					>
 						<i [class]="result.icon" class="panel-item-icon"></i>
 						<span class="panel-item-label">{{ result.label }}</span>
@@ -75,10 +77,12 @@
 							type="button"
 							class="panel-item"
 							[class.active]="isActiveResult(fav)"
+							[class.is-current]="isCurrentRoute(fav)"
 							(click)="selectResult(fav)"
 							(mouseenter)="setActiveFromResult(fav)"
 							role="option"
 							[attr.aria-selected]="isActiveResult(fav)"
+							[attr.aria-current]="isCurrentRoute(fav) ? 'page' : null"
 						>
 							<i [class]="fav.icon" class="panel-item-icon"></i>
 							<span class="panel-item-label">{{ fav.label }}</span>
@@ -102,10 +106,12 @@
 								type="button"
 								class="panel-item"
 								[class.active]="isActiveResult(item)"
+								[class.is-current]="isCurrentRoute(item)"
 								(click)="selectResult(item)"
 								(mouseenter)="setActiveFromResult(item)"
 								role="option"
 								[attr.aria-selected]="isActiveResult(item)"
+								[attr.aria-current]="isCurrentRoute(item) ? 'page' : null"
 							>
 								<i [class]="item.icon" class="panel-item-icon"></i>
 								<span class="panel-item-label">{{ item.label }}</span>

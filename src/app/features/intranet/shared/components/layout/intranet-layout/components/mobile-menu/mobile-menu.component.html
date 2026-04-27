@@ -45,7 +45,13 @@
 			@if (isSearching()) {
 				<!-- Search results (flat, ranked) -->
 				@for (result of filteredResults(); track result.route) {
-					<button type="button" class="nav-result-item" (click)="selectResult(result)">
+					<button
+						type="button"
+						class="nav-result-item"
+						[class.is-current]="isCurrentRoute(result)"
+						[attr.aria-current]="isCurrentRoute(result) ? 'page' : null"
+						(click)="selectResult(result)"
+					>
 						<i [class]="result.icon" class="result-icon"></i>
 						<span class="result-label">{{ result.label }}</span>
 						<span class="result-badge">{{ result.moduloLabel }}</span>
@@ -58,7 +64,13 @@
 				}
 			} @else {
 				<!-- Home -->
-				<button type="button" class="nav-result-item home-item" (click)="goHome()">
+				<button
+					type="button"
+					class="nav-result-item home-item"
+					[class.is-current]="isHomeCurrent()"
+					[attr.aria-current]="isHomeCurrent() ? 'page' : null"
+					(click)="goHome()"
+				>
 					<i class="pi pi-home result-icon"></i>
 					<span class="result-label">Inicio</span>
 				</button>
@@ -70,7 +82,13 @@
 						<span>Accesos rápidos</span>
 					</div>
 					@for (fav of favoriteResults(); track fav.route) {
-						<button type="button" class="nav-result-item" (click)="selectResult(fav)">
+						<button
+							type="button"
+							class="nav-result-item"
+							[class.is-current]="isCurrentRoute(fav)"
+							[attr.aria-current]="isCurrentRoute(fav) ? 'page' : null"
+							(click)="selectResult(fav)"
+						>
 							<i [class]="fav.icon" class="result-icon"></i>
 							<span class="result-label">{{ fav.label }}</span>
 						</button>
@@ -89,7 +107,13 @@
 							<div class="group-label">{{ section.label }}</div>
 						}
 						@for (item of section.items; track item.route) {
-							<button type="button" class="nav-result-item tree-item" (click)="selectResult(item)">
+							<button
+								type="button"
+								class="nav-result-item tree-item"
+								[class.is-current]="isCurrentRoute(item)"
+								[attr.aria-current]="isCurrentRoute(item) ? 'page' : null"
+								(click)="selectResult(item)"
+							>
 								<i [class]="item.icon" class="result-icon"></i>
 								<span class="result-label">{{ item.label }}</span>
 								<button
