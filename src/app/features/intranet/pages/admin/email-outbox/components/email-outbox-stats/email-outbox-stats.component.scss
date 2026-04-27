@@ -3,7 +3,6 @@
 	display: grid;
 	grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
 	gap: 1rem;
-	margin-bottom: 1.5rem;
 }
 
 .stat-card {
@@ -12,8 +11,8 @@
 	gap: 1rem;
 	padding: 1.25rem;
 	border-radius: 12px;
-	background: var(--surface-card);
-	border: 1px solid var(--surface-border);
+	border: 1px solid var(--surface-300);
+	// background: transparent — aplicado global en styles.scss (design-system §1)
 }
 
 .stat-icon {
@@ -24,38 +23,38 @@
 	height: 48px;
 	border-radius: 12px;
 	font-size: 1.25rem;
+	background: var(--surface-200);
 
-	&.total {
-		background: rgba(99, 102, 241, 0.1);
-		color: #6366f1;
+	&.total i {
+		color: var(--blue-800);
 	}
-	&.sent {
-		background: rgba(34, 197, 94, 0.1);
-		color: #22c55e;
+	&.sent i {
+		color: var(--green-600);
 	}
-	&.failed {
-		background: rgba(239, 68, 68, 0.1);
-		color: #ef4444;
+	&.failed i {
+		color: var(--red-600);
 	}
-	&.pending {
-		background: rgba(245, 158, 11, 0.1);
-		color: #f59e0b;
+	&.pending i {
+		color: var(--yellow-700);
 	}
 }
 
 .stat-info {
 	display: flex;
 	flex-direction: column;
+	gap: 0.25rem;
 }
 
 .stat-value {
-	font-size: 1.5rem;
+	font-size: 1.75rem;
 	font-weight: 700;
 	color: var(--text-color);
+	line-height: 1;
 }
 
 .stat-label {
 	font-size: 0.85rem;
 	color: var(--text-color-secondary);
+	font-weight: 500;
 }
 // #endregion

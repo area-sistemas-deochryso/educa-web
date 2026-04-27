@@ -15,17 +15,17 @@ import { PageHeaderComponent } from '@intranet-shared/components/page-header/pag
 		>
 			<button
 				pButton
-				icon="pi pi-file-excel"
-				label="Exportar"
-				class="p-button-outlined p-button-success"
-				(click)="exportExcel.emit()"
+				icon="pi pi-refresh"
+				label="Refrescar"
+				class="p-button-outlined p-button-sm"
+				(click)="refresh.emit()"
 			></button>
 			<button
 				pButton
-				icon="pi pi-refresh"
-				label="Refrescar"
-				class="p-button-outlined"
-				(click)="refresh.emit()"
+				icon="pi pi-file-excel"
+				label="Exportar"
+				class="p-button-success p-button-sm"
+				(click)="exportExcel.emit()"
 			></button>
 		</app-page-header>
 	`,

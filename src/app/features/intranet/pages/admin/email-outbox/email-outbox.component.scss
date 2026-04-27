@@ -5,6 +5,30 @@
 }
 // #endregion
 
+// #region Overview Grid (stats + chart en row)
+.overview-grid {
+	display: grid;
+	grid-template-columns: minmax(0, 1fr);
+	gap: 1rem;
+	margin-bottom: 1.5rem;
+}
+
+@media (min-width: 1100px) {
+	.overview-grid {
+		grid-template-columns: minmax(0, 1.4fr) minmax(0, 1fr);
+		align-items: stretch;
+	}
+
+	.overview-chart {
+		min-width: 0;
+	}
+}
+
+.overview-stats {
+	min-width: 0;
+}
+// #endregion
+
 // #region Detail Drawer
 .detail-content {
 	display: flex;

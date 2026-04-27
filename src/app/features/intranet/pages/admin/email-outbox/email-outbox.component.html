@@ -2,18 +2,21 @@
 <app-email-outbox-header (refresh)="onRefresh()" (exportExcel)="onExportExcel()" />
 <!-- #endregion -->
 
-<!-- #region Stats -->
-@if (!vm().statsReady) {
-	<app-stats-skeleton [count]="4" iconPosition="left" />
-} @else {
-	<app-email-outbox-stats [stats]="vm().estadisticas" />
-}
-<!-- #endregion -->
-
-<!-- #region Tendencias -->
-@if (vm().tendenciasReady && vm().tendencias.length > 0) {
-	<app-email-outbox-chart [data]="vm().tendencias" />
-}
+<!-- #region Stats + Chart en grid -->
+<section class="overview-grid">
+	<div class="overview-stats">
+		@if (!vm().statsReady) {
+			<app-stats-skeleton [count]="4" iconPosition="left" />
+		} @else {
+			<app-email-outbox-stats [stats]="vm().estadisticas" />
+		}
+	</div>
+	@if (vm().tendenciasReady && vm().tendencias.length > 0) {
+		<div class="overview-chart">
+			<app-email-outbox-chart [data]="vm().tendencias" />
+		</div>
+	}
+</section>
 <!-- #endregion -->
 
 <!-- #region Throttle status widget (Plan 22 Chat B, feature flag) -->

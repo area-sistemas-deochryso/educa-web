@@ -1,5 +1,6 @@
 > **Repo destino**: `educa-web` (frontend, branch `main`).
-> **Plan**: 36 · **Chat**: 2 · **Fase**: F2 (`/design + /execute`) · **Creado**: 2026-04-27 · **Estado**: ⏳ pendiente arrancar.
+> **Plan**: 36 · **Chat**: 2 · **Fase**: F2 (`/design + /execute`) · **Creado**: 2026-04-27 · **Estado**: ✅ cerrado local 2026-04-27.
+> **Validación prod**: ⏳ pendiente desde 2026-04-27 (smoke test browser post-deploy).
 
 ---
 

@@ -555,6 +555,23 @@ strong {
 }
 
 /*---------------------------------------
+  PRIMENG TABS - TRANSPARENT
+  Cobertura de p-tabs (PrimeNG v18+):
+  tablist y tabs llevan fondo transparente sobre
+  --surface-ground. Aplica a shells de monitoreo
+  y cualquier otro consumidor de p-tabs en intranet.
+-----------------------------------------*/
+.p-tabs,
+.p-tablist,
+.p-tablist-tab-list,
+.p-tablist-content,
+.p-tabs .p-tab,
+.p-tabs .p-tabpanels,
+.p-tabs .p-tabpanel {
+	background: transparent !important;
+}
+
+/*---------------------------------------
   STAT CARDS - TRANSPARENT
   Cards de estadísticas/KPIs del proyecto.
   Regla: fondo transparente sobre --surface-ground.

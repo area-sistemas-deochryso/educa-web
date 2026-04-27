@@ -1,3 +1,12 @@
+// #region Wrapper de tabla
+:host {
+	display: block;
+	border: 1px solid var(--surface-300);
+	border-radius: 12px;
+	overflow: hidden;
+}
+// #endregion
+
 // #region Celdas
 .cell-main {
 	font-weight: 500;
@@ -21,29 +30,26 @@
 }
 // #endregion
 
-// #region Tabla
+// #region Headers UPPERCASE
 :host ::ng-deep .p-datatable {
-	background: transparent;
-
-	.p-datatable-table {
-		background: transparent;
-	}
-
 	.p-datatable-thead > tr > th {
-		background: transparent;
+		font-weight: 600;
+		font-size: 0.8rem;
+		text-transform: uppercase;
+		letter-spacing: 0.5px;
+		color: var(--text-color);
+		border-color: var(--surface-300);
 	}
 
-	.p-datatable-tbody > tr {
-		background: transparent;
-
-		> td {
-			background: transparent;
-		}
+	.p-datatable-tbody > tr > td {
+		border-color: var(--surface-300);
+		vertical-align: middle;
 	}
 
 	.p-datatable-paginator-bottom,
 	.p-paginator {
-		background: transparent;
+		padding: 0.75rem 1rem;
+		border-top: 1px solid var(--surface-300);
 	}
 }
 // #endregion

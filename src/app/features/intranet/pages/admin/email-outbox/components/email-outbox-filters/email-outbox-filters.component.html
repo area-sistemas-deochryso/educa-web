@@ -1,63 +1,85 @@
 <!-- #region Filtros -->
 <div class="filters-bar">
-	<p-iconfield>
-		<p-inputicon styleClass="pi pi-search" />
-		<input
-			pInputText
-			type="text"
-			placeholder="Buscar por destinatario o asunto..."
-			(input)="searchChange.emit($any($event.target).value)"
+	<div class="field field--search">
+		<label class="label-uppercase" for="filter-buscar">Buscar</label>
+		<p-iconfield>
+			<p-inputicon styleClass="pi pi-search" />
+			<input
+				id="filter-buscar"
+				pInputText
+				type="text"
+				placeholder="Destinatario o asunto..."
+				(input)="searchChange.emit($any($event.target).value)"
+			/>
+		</p-iconfield>
+	</div>
+
+	<div class="field">
+		<label class="label-uppercase" for="filter-tipo">Tipo de correo</label>
+		<p-select
+			inputId="filter-tipo"
+			[options]="tipoOptions"
+			[ngModel]="filterTipo()"
+			(ngModelChange)="filterTipoChange.emit($event)"
+			optionLabel="label"
+			optionValue="value"
+			placeholder="Todos los tipos"
+			appendTo="body"
 		/>
-	</p-iconfield>
+	</div>
 
-	<p-select
-		[options]="tipoOptions"
-		[ngModel]="filterTipo()"
-		(ngModelChange)="filterTipoChange.emit($event)"
-		optionLabel="label"
-		optionValue="value"
-		placeholder="Tipo"
-		appendTo="body"
-	/>
+	<div class="field">
+		<label class="label-uppercase" for="filter-estado">Estado del envío</label>
+		<p-select
+			inputId="filter-estado"
+			[options]="estadoOptions"
+			[ngModel]="filterEstado()"
+			(ngModelChange)="filterEstadoChange.emit($event)"
+			optionLabel="label"
+			optionValue="value"
+			placeholder="Todos los estados"
+			appendTo="body"
+		/>
+	</div>
 
-	<p-select
-		[options]="estadoOptions"
-		[ngModel]="filterEstado()"
-		(ngModelChange)="filterEstadoChange.emit($event)"
-		optionLabel="label"
-		optionValue="value"
-		placeholder="Estado"
-		appendTo="body"
-	/>
+	<div class="field">
+		<label class="label-uppercase" for="filter-tipo-fallo">Tipo de fallo</label>
+		<p-select
+			inputId="filter-tipo-fallo"
+			[options]="tipoFalloOptions"
+			[ngModel]="filterTipoFallo()"
+			(ngModelChange)="filterTipoFalloChange.emit($event)"
+			optionLabel="label"
+			optionValue="value"
+			placeholder="Cualquier fallo"
+			appendTo="body"
+		/>
+	</div>
 
-	<p-select
-		[options]="tipoFalloOptions"
-		[ngModel]="filterTipoFallo()"
-		(ngModelChange)="filterTipoFalloChange.emit($event)"
-		optionLabel="label"
-		optionValue="value"
-		placeholder="Tipo de fallo"
-		appendTo="body"
-	/>
+	<div class="field">
+		<label class="label-uppercase">Desde</label>
+		<p-datepicker
+			placeholder="dd/mm/yyyy"
+			dateFormat="yy-mm-dd"
+			[showIcon]="true"
+			appendTo="body"
+			(onSelect)="onDesdeChange($event)"
+			(onClear)="onDesdeChange(null)"
+			[showClear]="true"
+		/>
+	</div>
 
-	<p-datepicker
-		placeholder="Desde"
-		dateFormat="yy-mm-dd"
-		[showIcon]="true"
-		appendTo="body"
-		(onSelect)="onDesdeChange($event)"
-		(onClear)="onDesdeChange(null)"
-		[showClear]="true"
-	/>
-
-	<p-datepicker
-		placeholder="Hasta"
-		dateFormat="yy-mm-dd"
-		[showIcon]="true"
-		appendTo="body"
-		(onSelect)="onHastaChange($event)"
-		(onClear)="onHastaChange(null)"
-		[showClear]="true"
-	/>
+	<div class="field">
+		<label class="label-uppercase">Hasta</label>
+		<p-datepicker
+			placeholder="dd/mm/yyyy"
+			dateFormat="yy-mm-dd"
+			[showIcon]="true"
+			appendTo="body"
+			(onSelect)="onHastaChange($event)"
+			(onClear)="onHastaChange(null)"
+			[showClear]="true"
+		/>
+	</div>
 </div>
 <!-- #endregion -->
