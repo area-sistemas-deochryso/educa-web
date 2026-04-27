@@ -1,0 +1,81 @@
+<p-dialog
+	[visible]="visible()"
+	(visibleChange)="onVisibleChange($event)"
+	[modal]="true"
+	[style]="{ width: '500px' }"
+	[draggable]="false"
+	[resizable]="false"
+	header="Cambiar estado de grupo de errores"
+	class="change-status-dialog"
+>
+	<div class="dialog-content">
+		@if (group(); as grp) {
+			<div class="form-grid">
+				<div class="field full-width">
+					<label class="label-uppercase">Estado actual</label>
+					<p-tag
+						[value]="getEstadoLabel(grp.estado)"
+						[severity]="getEstadoSeverity(grp.estado)"
+					/>
+				</div>
+
+				<div class="field full-width">
+					<label for="newEstado" class="label-uppercase">Nuevo estado *</label>
+					<p-select
+						inputId="newEstado"
+						[options]="estadoOptions()"
+						[ngModel]="estado()"
+						(ngModelChange)="onEstadoChange($event)"
+						placeholder="Selecciona el nuevo estado"
+						appendTo="body"
+						[style]="{ width: '100%' }"
+					/>
+				</div>
+
+				<div class="field full-width">
+					<label for="observacion" class="label-uppercase">
+						Observación (opcional)
+					</label>
+					<textarea
+						id="observacion"
+						pTextarea
+						rows="4"
+						class="observacion-input"
+						[ngModel]="observacion()"
+						(ngModelChange)="onObservacionChange($event)"
+						[maxlength]="observacionMax"
+						placeholder="Anota el motivo del cambio (máx. 1000 caracteres)"
+					></textarea>
+					<div class="observacion-counter">
+						{{ observacionLength() }} / {{ observacionMax }}
+					</div>
+				</div>
+			</div>
+		}
+	</div>
+
+	<ng-template #footer>
+		<div class="dialog-footer">
+			<button
+				pButton
+				type="button"
+				label="Cancelar"
+				icon="pi pi-times"
+				class="p-button-text"
+				(click)="onCancel()"
+				[pt]="{ root: { 'aria-label': 'Cancelar' } }"
+			></button>
+			<button
+				pButton
+				type="button"
+				label="Guardar"
+				icon="pi pi-check"
+				class="p-button-success"
+				[disabled]="!canSubmit()"
+				[loading]="loading()"
+				(click)="onConfirm()"
+				[pt]="{ root: { 'aria-label': 'Guardar cambio de estado' } }"
+			></button>
+		</div>
+	</ng-template>
+</p-dialog>

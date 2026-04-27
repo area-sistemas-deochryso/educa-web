@@ -9,8 +9,10 @@ import {
 	PermisosStorageData,
 } from './storage.models';
 import { SessionStorageService } from './session-storage.service';
-import { PreferencesStorageService } from './preferences-storage.service';
+import { ErrorGroupsViewMode, PreferencesStorageService } from './preferences-storage.service';
 import { NotificationStorageService } from './notification-storage.service';
+
+export type { ErrorGroupsViewMode } from './preferences-storage.service';
 
 /**
  * Storage facade for auth, permissions, notifications, and preferences.
@@ -342,6 +344,16 @@ export class StorageService {
 
 	setDeferFailWidgetCollapsed(collapsed: boolean): void {
 		this.preferences.setDeferFailWidgetCollapsed(collapsed);
+	}
+	// #endregion
+
+	// #region ERROR GROUPS VIEW MODE (Plan 34 Chat 5)
+	getErrorGroupsViewMode(): ErrorGroupsViewMode {
+		return this.preferences.getErrorGroupsViewMode();
+	}
+
+	setErrorGroupsViewMode(mode: ErrorGroupsViewMode): void {
+		this.preferences.setErrorGroupsViewMode(mode);
 	}
 	// #endregion
 

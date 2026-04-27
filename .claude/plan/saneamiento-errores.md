@@ -193,7 +193,9 @@ Este mismo. Decisiones 1-15 cerradas con confirmación del usuario.
 - Tests: `ErrorGroupServiceTests.cs` + `ErrorGroupControllerAuthorizationTests.cs` + `ErrorLogPurgeJobSelectivoTests.cs`
 - DI registrado en `RepositoryExtensions.AddRepositories` + `ServiceExtensions.AddApplicationServices`
 
-### Chat 4 FE — Vista tabla + multi-facade + drawer + dialog cambio estado
+### Chat 4 FE ✅ cerrado 2026-04-25 — Vista tabla + multi-facade + drawer + dialog cambio estado
+
+> Cerrado en `educa-web main`. Feature `error-logs/` renombrado a `error-groups/` con ruta pública `/intranet/admin/trazabilidad-errores` preservada. Multi-facade (data + crud + ui) + store + service espejo de los 5 endpoints BE Chat 3. Drawer del grupo con tabs Resumen/Ocurrencias usando `p-tabs`. Sub-drawer de ocurrencia movido (no duplicado) desde `error-log-detail-drawer/` con la pill de correlation Plan 32 intacta. Dialog cambio estado con select que solo lista destinos válidos según `ESTADO_TRANSITIONS_MAP` (defensa en profundidad — el BE rechaza transiciones inválidas con `ERRORGROUP_TRANSICION_INVALIDA`). WAL optimista en `cambiarEstado` con rollback exacto al snapshot + manejo específico de `INV-ET07_ROW_VERSION_STALE` (refetch + warning) y 404 (remove + warning). Toggle "Ocultar resueltos/ignorados" ON por defecto (filtro client-side cuando no hay filtro estado explícito — deuda menor documentada). Filtros sincronizados con URL para deep-link y back button. **+33 tests** (12 store + 7 service + 6 crud-facade + 8 dialog) → **1630 FE verdes** (baseline 1600). Lint OK (0 errores), build OK, cap 300 ln respetado en todos los archivos. Carpeta vieja `pages/admin/error-logs/` eliminada (sin imports rotos confirmado por grep).
 
 **Repo**: `educa-web main`
 
@@ -259,11 +261,31 @@ Este mismo. Decisiones 1-15 cerradas con confirmación del usuario.
 - `components/change-group-status-dialog/` (3 archivos)
 - Routing: ajuste de path interno preservando URL pública
 
-### Chat 5 FE — Vista Kanban + drag-drop CDK + toggle vista + exploración mobile
+### Chat 5 FE — Vista Kanban + drag-drop CDK + toggle vista + exploración mobile ✅ CERRADO 2026-04-27
 
-**Repo**: `educa-web main`
+**Repo**: `educa-web main` (commit pendiente — incluye Chat 4 acumulado)
 
-**Scope**:
+**Estado de cierre**:
+
+- Kanban funcional con 5 columnas (NUEVO/VISTO/EN_PROGRESO/RESUELTO/IGNORADO), top 20 por columna ordenadas por `ultimaFecha DESC`, "Cargar más" client-side por columna.
+- Toggle Kanban/Tabla en el header, persiste en `PreferencesStorage` con key `educa_pref_error_groups_view_mode`. Default `kanban`.
+- Drop predicates espejo de `ESTADO_TRANSITIONS_MAP` (defensa en profundidad — el BE rechaza con `ERRORGROUP_TRANSICION_INVALIDA`). Visual feedback al iniciar drag: columnas válidas se iluminan verde, inválidas se atenúan a opacity 0.45.
+- WAL handler `moveCardOptimistic(group, toEstado)` en `error-groups-crud.facade.ts` reusa el `cambiarEstado` existente (apply + rollback contra snapshot, manejo de `INV-ET07_ROW_VERSION_STALE`, 404, transición inválida del BE).
+- Filtro estado oculto en modo Kanban (las columnas son los estados). Severidad/origen/búsqueda siguen filtrando en ambas vistas. Toggle "Ocultar resueltos/ignorados" oculta las columnas RESUELTO+IGNORADO en Kanban.
+- Click en card del Kanban abre el mismo drawer del Chat 4 (sin duplicar carga).
+- `StorageService` extendido con `getErrorGroupsViewMode/setErrorGroupsViewMode` para respetar el patrón facade — los componentes nunca tocan `PreferencesStorageService` directo.
+
+**Decisión 13 (mobile) — pendiente de validación en device real**:
+
+CDK habilita touch automáticamente en `cdkDrag`, así que la implementación lleva el toggle visible también en pantallas < 768px. La decisión final ("Kanban en mobile" vs "fallback a tabla forzada con toggle oculto") se toma cuando el usuario pruebe la build en su navegador / dispositivo. Si el long-press confunde con scroll horizontal o el feedback es ruidoso, abrir mini-plan derivado para forzar `viewMode = 'table'` cuando `window.matchMedia('(max-width: 768px)').matches`. **No se toma esa decisión sin evidencia real-device.**
+
+**Métricas de cierre**:
+
+- 18 tests nuevos (3 preferences + 3 card + 4 view-toggle + 6 kanban-board + 2 facade `moveCardOptimistic`) → **1648 FE verdes** (baseline 1630).
+- Lint OK (0 errores; 1 warning preexistente ajeno al chat). Build production OK.
+- Cap 300 ln respetado: kanban-board 137 ln, card 56 ln, view-toggle 45 ln, crud-facade 113 ln, error-groups.component 286 ln efectivas, preferences-storage 193 ln.
+
+**Scope original (referencia)**:
 
 - Setup Angular CDK drag-drop: import en `error-groups.module` o standalone
 - Componente `components/error-groups-kanban-board/`:

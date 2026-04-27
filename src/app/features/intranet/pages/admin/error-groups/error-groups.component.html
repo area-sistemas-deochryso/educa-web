@@ -1,0 +1,272 @@
+<!-- #region Header -->
+<app-page-header
+	icon="pi pi-bolt"
+	title="Trazabilidad de Errores"
+	subtitle="Grupos de errores agrupados por fingerprint con cambio de estado y triage"
+>
+	<div class="header-actions">
+		<app-error-groups-view-toggle (modeChange)="onViewModeChange($event)" />
+		<button
+			pButton
+			icon="pi pi-refresh"
+			label="Refrescar"
+			class="p-button-outlined p-button-sm"
+			(click)="onRefresh()"
+			[loading]="loading()"
+		></button>
+	</div>
+</app-page-header>
+<!-- #endregion -->
+
+<!-- #region Stats -->
+<section class="stats-section">
+	<div class="stat-card">
+		<div class="stat-content">
+			<span class="stat-label">Total grupos (página)</span>
+			<span class="stat-value">{{ stats().total }}</span>
+			<span class="stat-sublabel">grupos visibles</span>
+		</div>
+		<div class="stat-icon">
+			<i class="pi pi-list"></i>
+		</div>
+	</div>
+	<div class="stat-card stat-card--critical">
+		<div class="stat-content">
+			<span class="stat-label">Critical</span>
+			<span class="stat-value">{{ stats().critical }}</span>
+			<span class="stat-sublabel">bugs urgentes</span>
+		</div>
+		<div class="stat-icon">
+			<i class="pi pi-times-circle"></i>
+		</div>
+	</div>
+	<div class="stat-card stat-card--error">
+		<div class="stat-content">
+			<span class="stat-label">Error</span>
+			<span class="stat-value">{{ stats().error }}</span>
+			<span class="stat-sublabel">errores estándar</span>
+		</div>
+		<div class="stat-icon">
+			<i class="pi pi-exclamation-triangle"></i>
+		</div>
+	</div>
+	<div class="stat-card stat-card--warning">
+		<div class="stat-content">
+			<span class="stat-label">Warning</span>
+			<span class="stat-value">{{ stats().warning }}</span>
+			<span class="stat-sublabel">avisos</span>
+		</div>
+		<div class="stat-icon">
+			<i class="pi pi-info-circle"></i>
+		</div>
+	</div>
+</section>
+<!-- #endregion -->
+
+<!-- #region Filtros -->
+<div class="filters-bar">
+	<p-iconfield class="search-box">
+		<p-inputicon class="pi pi-search" />
+		<input
+			type="text"
+			pInputText
+			placeholder="Buscar en mensaje..."
+			[ngModel]="searchTerm()"
+			(ngModelChange)="onSearchChange($event)"
+			[maxlength]="searchMax"
+		/>
+	</p-iconfield>
+
+	<div class="filter-dropdowns">
+		@if (viewMode() === 'table') {
+			<p-select
+				[options]="estadoOptions"
+				[ngModel]="filterEstado()"
+				(ngModelChange)="onFilterEstadoChange($event)"
+				placeholder="Estado"
+				appendTo="body"
+			/>
+		}
+		<p-select
+			[options]="severidadOptions"
+			[ngModel]="filterSeveridad()"
+			(ngModelChange)="onFilterSeveridadChange($event)"
+			placeholder="Severidad"
+			appendTo="body"
+		/>
+		<p-select
+			[options]="origenOptions"
+			[ngModel]="filterOrigen()"
+			(ngModelChange)="onFilterOrigenChange($event)"
+			placeholder="Origen"
+			appendTo="body"
+		/>
+	</div>
+
+	<div class="filter-toggle">
+		<p-checkbox
+			inputId="hideResolvedIgnored"
+			[ngModel]="hideResolvedIgnored()"
+			(ngModelChange)="onHideResolvedIgnoredChange($event)"
+			[binary]="true"
+		/>
+		<label for="hideResolvedIgnored" class="toggle-label">
+			Ocultar resueltos / ignorados
+		</label>
+	</div>
+
+	<button
+		pButton
+		icon="pi pi-filter-slash"
+		class="p-button-text p-button-sm btn-clear"
+		pTooltip="Limpiar filtros"
+		(click)="onClearFilters()"
+		[pt]="{ root: { 'aria-label': 'Limpiar filtros' } }"
+	></button>
+</div>
+<!-- #endregion -->
+
+<!-- #region Vista (Kanban o Tabla) -->
+@if (!tableReady()) {
+	<app-table-skeleton [columns]="tableSkeletonColumns" [rows]="10" />
+} @else if (viewMode() === 'kanban') {
+	<app-error-groups-kanban-board
+		[groups]="items()"
+		[hideResolvedIgnored]="hideResolvedIgnored()"
+		(cardClick)="onRowClick($event)"
+		(cardDropped)="onKanbanCardDropped($event)"
+	/>
+} @else {
+	<section class="table-section">
+		<p-table
+			[value]="items()"
+			[rowHover]="true"
+			styleClass="p-datatable-sm"
+		>
+			<ng-template #header>
+				<tr>
+					<th>Severidad</th>
+					<th>Estado</th>
+					<th>Mensaje</th>
+					<th>Ocurrencias</th>
+					<th>Origen</th>
+					<th>Última fecha</th>
+					<th>Acciones</th>
+				</tr>
+			</ng-template>
+			<ng-template #body let-item>
+				<tr (click)="onRowClick(item)" class="group-row">
+					<td>
+						<p-tag
+							[value]="item.severidad"
+							[severity]="getSeveridadSeverity(item.severidad)"
+						/>
+					</td>
+					<td>
+						<p-tag
+							[value]="getEstadoLabel(item.estado)"
+							[severity]="getEstadoSeverity(item.estado)"
+						/>
+					</td>
+					<td class="col-mensaje">
+						<span class="mensaje-text" [pTooltip]="item.mensajeRepresentativo" tooltipPosition="top">
+							{{ item.mensajeRepresentativo }}
+						</span>
+						@if (item.errorCode) {
+							<span class="error-code">{{ item.errorCode }}</span>
+						}
+					</td>
+					<td>
+						<span class="contador">
+							{{ item.contadorTotal }}
+							@if (item.contadorPostResolucion > 0) {
+								<span class="post-res" pTooltip="Ocurrencias después de resolver">
+									(+{{ item.contadorPostResolucion }})
+								</span>
+							}
+						</span>
+					</td>
+					<td>
+						<p-tag [value]="item.origen" [icon]="getOrigenIcon(item.origen)" severity="info" />
+					</td>
+					<td class="col-fecha">{{ item.ultimaFecha | date: 'dd/MM HH:mm' }}</td>
+					<td (click)="$event.stopPropagation()">
+						<button
+							pButton
+							icon="pi pi-eye"
+							class="p-button-rounded p-button-text p-button-sm"
+							pTooltip="Ver detalle"
+							tooltipPosition="left"
+							(click)="onRowClick(item)"
+							[pt]="{ root: { 'aria-label': 'Ver detalle del grupo' } }"
+						></button>
+						<button
+							pButton
+							icon="pi pi-pencil"
+							class="p-button-rounded p-button-text p-button-sm"
+							pTooltip="Cambiar estado"
+							tooltipPosition="left"
+							(click)="onStatusChangeRequested(item)"
+							[pt]="{ root: { 'aria-label': 'Cambiar estado del grupo' } }"
+						></button>
+					</td>
+				</tr>
+			</ng-template>
+			<ng-template #emptymessage>
+				<tr>
+					<td colspan="7" class="empty-message">
+						<i class="pi pi-check-circle"></i>
+						<span>No se encontraron grupos con los filtros seleccionados</span>
+					</td>
+				</tr>
+			</ng-template>
+		</p-table>
+		<p-paginator
+			[rows]="pageSize()"
+			[first]="paginatorFirst()"
+			[totalRecords]="totalRecordsEstimate()"
+			[rowsPerPageOptions]="[10, 20, 50]"
+			[showCurrentPageReport]="true"
+			currentPageReportTemplate="Página {currentPage}"
+			(onPageChange)="onPageChange($event)"
+		/>
+	</section>
+}
+<!-- #endregion -->
+
+<!-- #region Drawer del grupo (siempre en DOM) -->
+<app-error-group-detail-drawer
+	[visible]="drawerVisible()"
+	[group]="selectedGroup()"
+	[detalle]="selectedDetalle()"
+	[detalleLoading]="detalleLoading()"
+	[ocurrencias]="ocurrencias()"
+	[ocurrenciasLoading]="ocurrenciasLoading()"
+	[ocurrenciasPage]="ocurrenciasPage()"
+	[ocurrenciasPageSize]="ocurrenciasPageSize()"
+	(visibleChange)="onDrawerVisibleChange($event)"
+	(occurrenceSelected)="onOccurrenceSelected($event)"
+	(statusChangeRequested)="onStatusChangeRequested($event)"
+	(ocurrenciasPageChange)="onOcurrenciasPageChange($event)"
+/>
+<!-- #endregion -->
+
+<!-- #region Sub-drawer de ocurrencia (siempre en DOM) -->
+<app-error-occurrence-drawer
+	[visible]="occurrenceDrawerVisible()"
+	[errorId]="selectedOcurrenciaId()"
+	(visibleChange)="onOccurrenceDrawerVisibleChange($event)"
+	(staleDataDetected)="onOccurrenceStaleData($event)"
+/>
+<!-- #endregion -->
+
+<!-- #region Dialog cambio estado (siempre en DOM) -->
+<app-change-group-status-dialog
+	[visible]="dialogVisible()"
+	[group]="dialogGroup()"
+	[loading]="loading()"
+	(visibleChange)="onDialogVisibleChange($event)"
+	(confirmStatus)="onDialogConfirm($event)"
+	(cancelStatus)="onDialogCancel()"
+/>
+<!-- #endregion -->

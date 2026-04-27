@@ -1,0 +1,38 @@
+<div class="card-header">
+	<p-tag
+		[value]="group().severidad"
+		[severity]="severidadSeverity()"
+		styleClass="severity-tag"
+	/>
+	<span class="counter" pTooltip="Ocurrencias totales" tooltipPosition="top">
+		<i class="pi pi-list"></i>
+		{{ group().contadorTotal }}
+		@if (hasPostResolucion()) {
+			<span
+				class="post-res-badge"
+				pTooltip="Ocurrencias después de resolver"
+				tooltipPosition="top"
+			>+{{ group().contadorPostResolucion }}</span>
+		}
+	</span>
+</div>
+
+<div class="card-body">
+	<span
+		class="message"
+		[pTooltip]="group().mensajeRepresentativo"
+		tooltipPosition="top"
+	>
+		{{ group().mensajeRepresentativo }}
+	</span>
+	@if (group().errorCode) {
+		<span class="error-code">{{ group().errorCode }}</span>
+	}
+</div>
+
+<div class="card-footer">
+	<span class="origen" [pTooltip]="group().origen" tooltipPosition="top">
+		<i [class]="origenIcon()"></i>
+	</span>
+	<span class="fecha">{{ group().ultimaFecha | date: 'dd/MM HH:mm' }}</span>
+</div>

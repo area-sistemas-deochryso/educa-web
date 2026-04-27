@@ -158,6 +158,25 @@ describe('PreferencesStorageService', () => {
 	});
 	// #endregion
 
+	// #region Error groups view mode (Plan 34 Chat 5)
+	describe('error groups view mode', () => {
+		it('should default to kanban when localStorage is empty', () => {
+			expect(service.getErrorGroupsViewMode()).toBe('kanban');
+		});
+
+		it('should set and get table mode', () => {
+			service.setErrorGroupsViewMode('table');
+			expect(service.getErrorGroupsViewMode()).toBe('table');
+		});
+
+		it('should set and get kanban mode', () => {
+			service.setErrorGroupsViewMode('table');
+			service.setErrorGroupsViewMode('kanban');
+			expect(service.getErrorGroupsViewMode()).toBe('kanban');
+		});
+	});
+	// #endregion
+
 	// #region clearAll
 	describe('clearAll', () => {
 		it('should clear everything', () => {

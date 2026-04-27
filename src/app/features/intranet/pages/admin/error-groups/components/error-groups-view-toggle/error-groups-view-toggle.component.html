@@ -1,0 +1,14 @@
+<p-selectButton
+	[options]="options"
+	[ngModel]="viewMode()"
+	(ngModelChange)="onModeChange($event)"
+	optionLabel="label"
+	optionValue="value"
+	[allowEmpty]="false"
+	styleClass="view-toggle"
+>
+	<ng-template let-option #item>
+		<i [class]="option.icon"></i>
+		<span class="toggle-label">{{ option.label }}</span>
+	</ng-template>
+</p-selectButton>

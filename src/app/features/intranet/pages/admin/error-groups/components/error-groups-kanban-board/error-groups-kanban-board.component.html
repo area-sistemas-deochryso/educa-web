@@ -1,0 +1,60 @@
+<div class="kanban-board">
+	@for (col of columns(); track trackByEstado($index, col)) {
+		<div
+			class="kanban-column"
+			[class.kanban-column--valid-drop]="columnDropClass(col.estado) === 'kanban-column--valid-drop'"
+			[class.kanban-column--invalid-drop]="columnDropClass(col.estado) === 'kanban-column--invalid-drop'"
+		>
+			<div class="kanban-column__header">
+				<i [class]="col.icon"></i>
+				<span class="column-label">{{ col.label }}</span>
+				<span class="column-counter">{{ col.allItems.length }}</span>
+			</div>
+
+			<div
+				class="kanban-column__list"
+				cdkDropList
+				[id]="'kanban-col-' + col.estado"
+				[cdkDropListData]="col.estado"
+				[cdkDropListConnectedTo]="dropListIds()"
+				[cdkDropListEnterPredicate]="dropPredicate(col.estado)"
+				(cdkDropListDropped)="onDrop($any($event), col.estado)"
+			>
+				@if (col.visibleItems.length === 0) {
+					<div class="kanban-column__empty">
+						<i class="pi pi-inbox"></i>
+						<span>Sin grupos</span>
+					</div>
+				}
+				@for (group of col.visibleItems; track trackById($index, group)) {
+					<div
+						class="kanban-card-wrapper"
+						cdkDrag
+						[cdkDragData]="group"
+						(cdkDragStarted)="onDragStarted(group)"
+						(cdkDragEnded)="onDragEnded()"
+					>
+						<app-error-group-card
+							[group]="group"
+							(cardClick)="onCardClick($event)"
+						/>
+					</div>
+				}
+			</div>
+
+			@if (col.hasMore) {
+				<div class="kanban-column__footer">
+					<button
+						pButton
+						type="button"
+						label="Cargar más"
+						icon="pi pi-arrow-down"
+						class="p-button-text p-button-sm"
+						(click)="onLoadMore(col.estado)"
+						[pt]="{ root: { 'aria-label': 'Cargar más en columna ' + col.label } }"
+					></button>
+				</div>
+			}
+		</div>
+	}
+</div>

@@ -1,0 +1,174 @@
+:host {
+	display: contents;
+}
+
+// #region Header del grupo
+.group-header {
+	display: flex;
+	flex-direction: column;
+	gap: 0.5rem;
+	padding-bottom: 1rem;
+	border-bottom: 1px solid var(--surface-300);
+	margin-bottom: 1rem;
+}
+
+.group-header-tags {
+	display: flex;
+	gap: 0.5rem;
+	flex-wrap: wrap;
+}
+
+.group-header-mensaje {
+	margin: 0;
+	font-size: 1rem;
+	font-weight: 600;
+	color: var(--text-color);
+	line-height: 1.4;
+	display: -webkit-box;
+	-webkit-line-clamp: 3;
+	-webkit-box-orient: vertical;
+	overflow: hidden;
+}
+
+.group-header-meta {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 1rem;
+	font-size: 0.8rem;
+	color: var(--text-color-secondary);
+
+	.meta-item {
+		display: inline-flex;
+		align-items: center;
+		gap: 0.35rem;
+
+		i {
+			font-size: 0.75rem;
+		}
+
+		code {
+			font-family: monospace;
+			background: var(--surface-100);
+			padding: 1px 6px;
+			border-radius: 4px;
+			font-size: 0.75rem;
+		}
+	}
+}
+// #endregion
+
+// #region Tabs
+.group-tabs {
+	margin-top: 0.5rem;
+}
+
+.tab-loading,
+.tab-empty {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	gap: 0.75rem;
+	padding: 2rem;
+	color: var(--text-color-secondary);
+
+	i {
+		font-size: 1.25rem;
+	}
+}
+// #endregion
+
+// #region Detail grid
+.detail-grid {
+	display: flex;
+	flex-direction: column;
+	gap: 0.75rem;
+	padding: 1rem 0;
+}
+
+.detail-row {
+	display: flex;
+	gap: 1rem;
+	align-items: baseline;
+
+	&--full {
+		flex-direction: column;
+		gap: 0.25rem;
+	}
+
+	.detail-label {
+		flex: 0 0 180px;
+		font-size: 0.8rem;
+		font-weight: 500;
+		color: var(--text-color-secondary);
+	}
+
+	.detail-value {
+		font-size: 0.85rem;
+		color: var(--text-color);
+		word-break: break-all;
+		flex: 1;
+
+		&--mono {
+			font-family: monospace;
+			font-size: 0.8rem;
+		}
+
+		&--small {
+			font-size: 0.7rem;
+			line-height: 1.4;
+		}
+	}
+}
+// #endregion
+
+// #region Tabla de ocurrencias
+.ocurrencia-row {
+	cursor: pointer;
+}
+
+.col-fecha {
+	font-family: monospace;
+	font-size: 0.8rem;
+	white-space: nowrap;
+}
+
+.col-mensaje {
+	max-width: 300px;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+	font-size: 0.85rem;
+}
+
+.col-usuario {
+	font-size: 0.8rem;
+
+	.usuario-rol {
+		display: block;
+		font-weight: 500;
+	}
+
+	.usuario-dni {
+		display: block;
+		font-size: 0.72rem;
+		color: var(--text-color-secondary);
+		font-family: monospace;
+	}
+}
+
+.http-status {
+	font-family: monospace;
+	font-size: 0.8rem;
+}
+// #endregion
+
+// #region Footer
+.drawer-footer {
+	display: flex;
+	justify-content: flex-end;
+	gap: 0.5rem;
+	padding: 1rem 0;
+	border-top: 1px solid var(--surface-300);
+	margin-top: 1rem;
+}
+// #endregion

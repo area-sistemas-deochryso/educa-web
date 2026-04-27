@@ -350,7 +350,7 @@ export const INTRANET_ROUTES: Routes = [
 			{
 				path: 'admin/trazabilidad-errores',
 				loadComponent: () =>
-					import('./pages/admin/error-logs').then((m) => m.ErrorLogsComponent),
+					import('./pages/admin/error-groups').then((m) => m.ErrorGroupsComponent),
 				title: 'Intranet - Trazabilidad de Errores',
 			},
 			{

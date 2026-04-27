@@ -37,7 +37,12 @@ const PREFERENCES_KEYS = {
 	// Plan 22 Chat B / Plan 29 Chat 2.6 — defer/fail status widget
 	DEFER_FAIL_WIDGET_AUTO_REFRESH: 'educa_pref_defer_fail_widget_auto_refresh',
 	DEFER_FAIL_WIDGET_COLLAPSED: 'educa_pref_defer_fail_widget_collapsed',
+
+	// Plan 34 Chat 5 — error-groups view mode (kanban vs table)
+	ERROR_GROUPS_VIEW_MODE: 'educa_pref_error_groups_view_mode',
 } as const;
+
+export type ErrorGroupsViewMode = 'kanban' | 'table';
 
 /**
  * Theme preference for the UI.
@@ -491,6 +496,22 @@ export class PreferencesStorageService {
 
 	setDeferFailWidgetCollapsed(collapsed: boolean): void {
 		this.setItem(PREFERENCES_KEYS.DEFER_FAIL_WIDGET_COLLAPSED, collapsed.toString());
+	}
+
+	// #endregion
+	// #region ERROR GROUPS VIEW MODE (Plan 34 Chat 5)
+
+	/**
+	 * View mode for the admin "error-groups" page (kanban vs table).
+	 * Defaults to 'kanban' first time — el admin entra al Kanban directo.
+	 */
+	getErrorGroupsViewMode(): ErrorGroupsViewMode {
+		const stored = this.getItem(PREFERENCES_KEYS.ERROR_GROUPS_VIEW_MODE);
+		return stored === 'table' ? 'table' : 'kanban';
+	}
+
+	setErrorGroupsViewMode(mode: ErrorGroupsViewMode): void {
+		this.setItem(PREFERENCES_KEYS.ERROR_GROUPS_VIEW_MODE, mode);
 	}
 
 	// #endregion
