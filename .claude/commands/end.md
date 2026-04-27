@@ -4,6 +4,37 @@
 
 **Principio**: `/end` es la contraparte de [`/go`](go.md). Lo invocás una vez, y Claude resuelve commit + movimiento de brief + update del maestro apropiado al caso.
 
+## Recomendación de modelo y esfuerzo (antes de arrancar)
+
+> **Antes de cualquier acción del flujo**, recomendar al usuario el modelo y nivel de esfuerzo. Esperar `y` / `n` / `seguir` antes de continuar.
+
+Los cambios reales los hace el usuario **por UI** (panel de **Modes** + slider de **Effort** en la barra inferior de Claude Code). El asistente no swappea modelo ni esfuerzo — solo recomienda y espera confirmación.
+
+`/end` es **mecánico por diseño**: detección de estado + dispatch de validación a Agents paralelos + edits de texto en brief/maestro + commits delegados a skills. **Recomendación por defecto**: opus + `low`. No hay razonamiento que justifique `xhigh`/`max` en un cierre típico.
+
+### Cuándo subir el esfuerzo
+
+| Situación | Esfuerzo |
+| --- | --- |
+| Validación pasa, todo limpio, /ship directo | `low` |
+| Enriquecer brief minimal-from-go con aprendizajes capturados del chat | `low` (sigue mecánico) |
+| Caso 2 (pausa): commit de infra + reporte de qué quedó | `low` |
+| Caso 3 (rollback): elegir entre opciones A/B/C con el usuario | `medium` (hay decisión real) |
+| Caso 4 (commit aparte): sin brief, identificar scope correcto | `low` |
+| Validación falla y el cierre escala a debugging del fail | reportar y sugerir subir a `medium`, **no auto-cambiar** |
+
+### Formato del reporte (antes del banner de cierre)
+
+```text
+## Modelo recomendado: opus · Esfuerzo: low
+Razón: /end es mecánico (validate dispatch + text edits + commits).
+Acción: ajustá modo/esfuerzo por UI si querés cambiarlo, después respondé `y` (acepto), `n` (uso otro) o `seguir` (uso el actual sin tocar nada).
+```
+
+**Esperar respuesta una sola vez** antes de continuar al banner de cierre y al flujo de [Detección de estado](#detección-de-estado). Si el usuario responde `y` o `seguir`, arrancar. Si responde `n`, no avanzar — esperar a que ajuste por UI y vuelva a tipear `/end`.
+
+**Excepción**: si la validación falla y el cierre se vuelve un debugging real, reportar el cambio de magnitud y sugerir subir el esfuerzo — el cierre se degrada a caso 2 (pausa) y la decisión de subir esfuerzo es del usuario.
+
 ## Detección de estado
 
 1. **Brief en `running/` + trabajo completado** (validación pasa, criterios de cierre del brief cumplidos) → **caso /ship**.
@@ -11,6 +42,8 @@
 3. **Brief en `running/` + sin progreso real** → **caso rollback**.
 4. **Sin brief en `running/` + cambios uncommitted** (típicamente infra/config/docs) → **caso commit aparte**.
 5. **Sin brief ni cambios** → **caso sin-op**.
+
+> Nota: el bucket `awaiting-prod/` (chats cerrados localmente esperando validación post-deploy) NO entra en esta detección. `/end` solo lo **alimenta** (en caso 1 cuando aplica el gate). Para mover un brief de `awaiting-prod/` → `closed/` o `awaiting-prod/` → `running/`, usar [`/verify`](verify.md).
 
 ## Casos
 
@@ -25,7 +58,11 @@ Flujo de cierre con commit:
 - Si todo pasa:
   - Actualizar [plan/maestro.md](../plan/maestro.md): remover el item de la cola "📋 Próximos chats", actualizar el % del plan en el inventario si aplica, sumar derivados al final de la cola si los hay.
   - **Enriquecer brief minimal-from-go**: si el brief lleva el comentario HTML `<!-- minimal-from-go -->` (plantado por `/go` cuando lo generó desde la cola), antes del `git mv` cosechar del chat los aprendizajes transferibles, decisiones tomadas y métricas, y agregarlos al brief para que su versión en `closed/` no quede más pobre que un brief generado por `/next-chat`. Remover el comentario flag al hacerlo.
-  - `git mv` brief `running/NNN-...md` → `closed/NNN-...md`.
+  - **Gate post-deploy** (paso nuevo): preguntar al usuario:
+    > ¿Este chat requiere **validación post-deploy** antes de considerarse 100% terminado? (smoke test browser, query SQL en prod, validación del jefe, telemetría observada, etc.) — `s/n`
+    - **Si responde `s`** → el destino del `git mv` es `chats/awaiting-prod/NNN-...md` (NO `closed/`). Agregar línea `> **Validación prod**: ⏳ pendiente desde YYYY-MM-DD` debajo del header del brief antes de mover. La verificación se completa después con [`/verify <NNN>`](verify.md). Heurística para auto-sugerir `s` por default: si el brief o la conversación contienen frases como "post-deploy", "smoke test", "validar en prod", "subir a azure", "esperar telemetría", "el jefe valida", o el commit está sin pushear, sugerir `s` y pedir confirmación.
+    - **Si responde `n`** → flujo actual, destino `closed/`.
+  - `git mv` brief `running/NNN-...md` → `closed/NNN-...md` **o** `awaiting-prod/NNN-...md` según el gate.
   - **Delegar el commit en la skill correspondiente**:
     - Cambios solo FE → invocar `/commit-front` (skill existente).
     - Cambios solo BE → invocar `/commit-back` (skill existente).
@@ -103,7 +140,7 @@ El output se compone de **4 bloques visuales** clavados:
 | Campo | Valor |
 | --- | --- |
 | 📌 Caso | `/ship` \| pausa \| rollback \| commit-aparte \| sin-op |
-| 🔗 Brief | running/NNN-...md → **closed/** (o "sigue en running/") |
+| 🔗 Brief | running/NNN-...md → **closed/** \| **awaiting-prod/** (gate post-deploy) \| (sigue en running/) |
 | 💾 Commit | `<hash>` via `/commit-front` \| `/commit-back` \| `/commit-local` (o "ninguno: <motivo>") |
 | 📋 Maestro | cola actualizada · % de plan NN: 80% → 100% (o "sin cambios") |
 ```
@@ -149,7 +186,8 @@ Después del progress, banner de cierre:
 | --- | --- |
 | Retomar lo que está activo en `running/` | tipear `retomar` o `/retomar` |
 | Arrancar el siguiente trabajo (open/cola) | tipear `go` o `/go` |
-| Ver estado de los 6 backlogs con acciones sugeridas | tipear `triage` o `/triage` |
+| Ver estado de los 7 backlogs con acciones sugeridas | tipear `triage` o `/triage` |
+| Verificar un chat en `awaiting-prod/` post-deploy | tipear `/verify <NNN>` |
 
 **Recomendación basada en el cierre**: <1 línea con sugerencia concreta — ej: "El siguiente en cola es Plan 31 Chat 2 BE — abrir chat en `Educa.API` y tipear `go`".
 ```
@@ -159,6 +197,7 @@ Después del progress, banner de cierre:
 ## Referencias
 
 - [commands/go.md](go.md) — contraparte: arranca el chat siguiente.
+- [commands/verify.md](verify.md) — cierra el ciclo de un chat en `awaiting-prod/` cuando la verificación post-deploy pasó (o falló).
 - [commands/commit-front.md](../skills/commit-front/SKILL.md) (si aplica) o `/commit-front`, `/commit-back`, `/commit-local` — skills de commit existentes.
 - [commands/next-chat.md](next-chat.md) — si hay trabajo derivado que encolar, invocar explícito.
 - [commands/progress.md](progress.md) — reporte visual que se rendea post-cierre.

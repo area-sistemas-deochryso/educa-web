@@ -4,9 +4,53 @@
 
 **Principio**: vos tipeás `/go` una vez. Claude orquesta los modos internos según el `MODO SUGERIDO` del brief (típicamente `/execute → /validate`; también `/investigate`, `/design`, `/refactor` cuando aplican). Sin skill-hopping manual de tu parte.
 
+## Recomendación de modelo y esfuerzo (antes de arrancar)
+
+> **Antes de cualquier acción del flujo**, recomendar al usuario el modelo y nivel de esfuerzo que mejor encajan con el trabajo del brief, y esperar `y` / `n` / `seguir` antes de continuar.
+
+Los cambios reales los hace el usuario **por UI** (panel de **Modes** + slider de **Effort** en la barra inferior de Claude Code). El asistente no swappea modelo ni esfuerzo desde dentro del flujo — solo recomienda y espera confirmación.
+
+**Estrategia por defecto**: quedarse en **opus** y variar solo el esfuerzo. Bajar a `sonnet`/`haiku` únicamente cuando la tarea es 100% trivial sin razonamiento.
+
+**Niveles de esfuerzo**: `low` · `medium` · `high` · `xhigh` (default Opus 4.7) · `max`. Modelos sin xhigh (Opus 4.6, Sonnet 4.6): `low` · `medium` · `high` · `max`.
+
+### Heurística por tipo de trabajo
+
+| Tipo de trabajo | Modelo | Esfuerzo |
+| --- | --- | --- |
+| Investigación profunda, audit cross-system, código no entendido | opus | `high` |
+| Diseño (tradeoffs, ADR, decidir entre opciones) | opus | `high` |
+| Debug complejo (bug que no se reproduce) | opus | `high` |
+| Refactor ambiguo, cross-file con dependencias inciertas | opus | `medium` |
+| Ejecución mecánica con plan claro (batch, migración con patrón validado) | opus | `low` |
+| Refactor mecánico de una sola dimensión | opus | `low` |
+| Validación pura (lint/build/test dispatch) | opus | `low` |
+| Mover archivos / commit / brief minimal | opus | `low` |
+| Tarea trivial sin ningún razonamiento (renombrar 2 vars) | sonnet | `low` |
+
+**Señales que pisan la heurística**:
+
+- "patrón ya validado", "batch N de M", "mecánico" → bajar a `low`.
+- "exploratorio", "no claro", "audit", "decidir" → subir a `high`.
+- "solo lint", "solo doc", "solo commit" → `low`.
+
+### Formato del reporte (antes del banner de arranque)
+
+```text
+## Modelo recomendado: opus · Esfuerzo: <low|medium|high>
+Razón: <una línea — tipo del trabajo + señal dominante del brief>.
+Acción: ajustá modo/esfuerzo por UI si querés cambiarlo, después respondé `y` (acepto), `n` (uso otro) o `seguir` (uso el actual sin tocar nada).
+```
+
+**Esperar respuesta una sola vez** antes de continuar al banner de arranque y al flujo de [Detección de estado](#detección-de-estado-en-orden). Si el usuario responde `y` o `seguir`, arrancar. Si responde `n`, no avanzar — esperar a que ajuste por UI y vuelva a tipear `/go`.
+
+**Excepción**: si el flujo escala mid-chat a algo más complejo de lo recomendado (ej. el `/investigate` revela un problema que requiere diseño), reportar el cambio de magnitud y sugerir subir el esfuerzo — **no auto-cambiar**, solo recomendar.
+
 ## Detección de estado (en orden)
 
 > **Principio**: solo preguntar cuando hay **empate genuino**. Si hay forma de inferir el siguiente paso (cola del maestro, fecha de creación, brief WIP), tomarlo sin preguntar.
+>
+> **El bucket `chats/awaiting-prod/` NO entra en esta detección**. `/go` no consume briefs que están esperando validación post-deploy — ese cierre lo resuelve [`/verify <NNN>`](verify.md), no `/go`. Si querés trabajar en algo de `awaiting-prod/`, usá `/verify` con caso rollback o esperá el deploy.
 
 1. **`chats/running/` tiene brief** → continuar desde donde quedó. Leer contexto, retomar el modo pendiente. **No preguntar nada** — siempre retomar el activo.
 

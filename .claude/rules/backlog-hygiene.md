@@ -2,9 +2,9 @@
 
 > **"El trabajo se acumula en muchos lugares. Sin política, todos crecen sin control."**
 
-El proyecto tiene **6 lugares** donde el trabajo puede acumularse. Esta regla define **límites por bucket** y **umbrales de edad** que disparan revisión.
+El proyecto tiene **7 lugares** donde el trabajo puede acumularse. Esta regla define **límites por bucket** y **umbrales de edad** que disparan revisión.
 
-## Los 6 backlogs
+## Los 7 backlogs
 
 ```
 .claude/tasks/                       → TODOs sin plan todavía (ideas crudas)
@@ -13,7 +13,8 @@ El proyecto tiene **6 lugares** donde el trabajo puede acumularse. Esta regla de
 .claude/chats/running/               → chat activo (WIP real)
 .claude/chats/waiting/               → bloqueado por externo (decisión, dependencia)
 .claude/chats/troubles/              → bloqueado técnicamente (problema sin resolver)
-.claude/chats/closed/                → cerrado (no tiene límite, es historia)
+.claude/chats/awaiting-prod/         → cerrado localmente, esperando validación post-deploy
+.claude/chats/closed/                → cerrado y verificado (no tiene límite, es historia)
 ```
 
 ## Límites
@@ -24,6 +25,7 @@ El proyecto tiene **6 lugares** donde el trabajo puede acumularse. Esta regla de
 | `chats/open/` | 5 | blando | >30d |
 | `chats/waiting/` | 3 | blando | >14d |
 | `chats/troubles/` | 2 | blando | >7d |
+| `chats/awaiting-prod/` | 8 | blando | >14d |
 | `tasks/` | 8 | blando | >60d |
 | `plan/maestro.md` cola (top-3) | 12 | blando | — |
 
@@ -73,9 +75,20 @@ Bloqueado por algo **técnico**: bug que no se reproduce, herramienta que falla,
 
 **Razón del límite (2) y edad (7d)**: los troubles técnicos no mejoran solos. 7 días sin movimiento = ya no sabés cómo destrabarlo; hay que escalar a `/investigate` con cabeza fresca o abandonar.
 
+### `chats/awaiting-prod/`
+
+Briefs cerrados localmente (commit hecho, validación local pasó) que esperan **confirmación post-deploy del usuario**: smoke test browser, query SQL en prod, validación del jefe, telemetría observada, etc. Salen del bucket vía [`/verify <NNN>`](../commands/verify.md) — `✅` mueve a `closed/`, `❌ rollback` mueve a `running/` con motivo registrado.
+
+**Razón del límite (8) y edad crítica (14d)**: validar un deploy debería tomar minutos a días, no semanas. Si un brief lleva >14d sin verificarse, hay dos lecturas posibles:
+
+- El deploy nunca ocurrió (mover a `waiting/` — bloqueo externo real, no validación pendiente).
+- El deploy ocurrió pero se olvidó verificar (forzar `/verify <NNN>` confirmando ✅ o detectar el bug si lo hubo).
+
+Más de 8 items simultáneamente es señal de que se está deployando rápido sin verificar — el bottleneck deja de ser "qué construir" y se vuelve "qué confirmar que funciona en prod".
+
 ### `chats/closed/`
 
-Sin límite duro. Es historia. El único cuidado base es que todo archivo en `closed/` tenga un commit que lo movió ahí — invariante ya documentado en [next-chat.md](../commands/next-chat.md).
+Sin límite duro. Es historia. El único cuidado base es que todo archivo en `closed/` tenga un commit que lo movió ahí — invariante ya documentado en [next-chat.md](../commands/next-chat.md). A diferencia de `awaiting-prod/`, los briefs en `closed/` ya pasaron por verificación de producción (o nunca la requirieron porque eran cambios sin impacto runtime — docs, refactors internos sin behavior change, etc.).
 
 ## Convención: fecha de creación
 
@@ -94,7 +107,8 @@ Para items en `tasks/`, misma idea: primera línea del archivo lleva `<!-- creat
 |---|---|---|
 | [`/next-chat`](../commands/next-chat.md) | `open/` ≤ 5, items viejos en `waiting/troubles/` | Frena si excede, propone `/triage` |
 | [`/start-chat`](../commands/start-chat.md) | `running/` = 0 | **Frena duro** si hay chat activo |
-| [`/end`](../commands/end.md) | cola de maestro ≤ 12 al cerrar | Avisa, no bloquea |
+| [`/end`](../commands/end.md) | cola de maestro ≤ 12 al cerrar; pregunta gate post-deploy | Rutea brief a `closed/` o `awaiting-prod/` según gate |
+| [`/verify`](../commands/verify.md) | brief existe en `awaiting-prod/` | Mueve a `closed/` (✅) o a `running/` (❌ rollback) |
 | [`/triage`](../commands/triage.md) | todo lo de arriba, explícitamente | Reporta + propone acciones |
 | Hook `backlog-check.sh` | Imprime snapshot al abrir sesión + warning si hay buckets fuera de política | Telemetría no bloqueante |
 
@@ -120,6 +134,13 @@ Cada bucket tiene un menú corto. El chat que excede elige una antes de seguir:
 - `/investigate` fresco para re-atacar el problema técnico.
 - Cerrar como "no reproduce" o "fuera de scope".
 - Abrir issue externo si es bug de herramienta de terceros.
+
+**`chats/awaiting-prod/` al límite (≥8) o item viejo (>14d)**:
+
+- `/verify <NNN>` confirmando ✅ si ya se validó (típico cuando se olvidó cerrar el ciclo).
+- `/verify <NNN> rollback "razón"` si la verificación detectó un bug (mueve a `running/` con motivo).
+- Mover a `waiting/` si el deploy nunca ocurrió y depende de input externo (cuenta como bloqueo, no como validación pendiente).
+- Investigar por qué tantos chats deployan sin verificar — puede indicar falta de proceso de validación post-deploy o gating insuficiente del CI/CD.
 
 **`tasks/` al límite (≥8)**:
 

@@ -1,0 +1,8 @@
+# Bucket: awaiting-prod/
+
+Briefs cerrados localmente (commit hecho, validación local pasó) que esperan
+confirmación post-deploy del usuario. Una vez verificados, se mueven a `closed/`
+vía `/verify <NNN>`. Si el deploy falló, se vuelven a `running/` con
+`/verify <NNN> rollback "razón"`.
+
+Ver: rules/backlog-hygiene.md, commands/verify.md.

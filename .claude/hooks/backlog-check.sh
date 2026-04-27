@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # .claude/hooks/backlog-check.sh
 #
-# Reporta estado de los 6 backlogs por rules/backlog-hygiene.md.
+# Reporta estado de los 7 backlogs por rules/backlog-hygiene.md.
 # Sin argumento: imprime snapshot completo (para SessionStart).
 # Con --wrap-system-reminder: solo imprime si hay warnings, envuelto
 # en <system-reminder> tags (para UserPromptSubmit).
@@ -136,11 +136,12 @@ last_shipped() {
   ls "$dir"/*.md 2>/dev/null | sort | tail -1 | xargs -I{} basename {} .md
 }
 
-check_bucket "running/"  "$CLAUDE/chats/running"  1 "-"  "duro"
-check_bucket "open/"     "$CLAUDE/chats/open"     5 30   "blando"
-check_bucket "waiting/"  "$CLAUDE/chats/waiting"  3 14   "blando"
-check_bucket "troubles/" "$CLAUDE/chats/troubles" 2 7    "blando"
-check_bucket "tasks/"    "$CLAUDE/tasks"          8 60   "blando"
+check_bucket "running/"        "$CLAUDE/chats/running"        1 "-"  "duro"
+check_bucket "open/"           "$CLAUDE/chats/open"           5 30   "blando"
+check_bucket "waiting/"        "$CLAUDE/chats/waiting"        3 14   "blando"
+check_bucket "troubles/"       "$CLAUDE/chats/troubles"       2 7    "blando"
+check_bucket "awaiting-prod/"  "$CLAUDE/chats/awaiting-prod"  8 14   "blando"
+check_bucket "tasks/"          "$CLAUDE/tasks"                8 60   "blando"
 
 cola=$(cola_count)
 if (( cola > 12 )); then

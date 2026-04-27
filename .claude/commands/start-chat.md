@@ -16,6 +16,8 @@ El usuario pasa path o `NNN`. Si solo pasó `/start-chat` sin argumento:
 - Si hay varios, listar y pedir decisión (no elegir por mi cuenta).
 - Si `open/` está vacío, abortar: sugerir `/next-chat` si hay trabajo hecho para encolar, o revisar [maestro](../plan/maestro.md) si no.
 
+> **`chats/awaiting-prod/` no es elegible**. Briefs ahí ya cerraron localmente y esperan validación post-deploy — no se "arrancan" con `/start-chat`. Si el deploy falló y hay que retomar trabajo, usar [`/verify <NNN> rollback "razón"`](verify.md) que mueve el brief a `running/` con flag de rollback.
+
 ### 2. El brief no está ya en `running/`
 
 Si ya está ahí, reportar: "Este brief ya está activo en `chats/running/`. Continuá con el modo sugerido en su sección `## MODO SUGERIDO` o usá `/retomar`."
@@ -74,6 +76,7 @@ Aplicar `/<modo>` según el brief.
 - [rules/backlog-hygiene.md](../rules/backlog-hygiene.md) — gate duro sobre `running/`.
 - [commands/next-chat.md](next-chat.md) — quien genera los briefs que consumo.
 - [commands/block-chat.md](block-chat.md) — si aparece bloqueo durante el trabajo.
-- [commands/end.md](end.md) — cierre (mueve `running/` → `closed/` con commit).
+- [commands/end.md](end.md) — cierre (mueve `running/` → `closed/` o `awaiting-prod/` con commit, según gate post-deploy).
+- [commands/verify.md](verify.md) — cierra el ciclo de un chat en `awaiting-prod/` cuando la validación post-deploy pasó (o falló).
 - [commands/triage.md](triage.md) — si abortás por backlogs saturados.
 - [plan/maestro.md](../plan/maestro.md) — cola + sección En progreso.

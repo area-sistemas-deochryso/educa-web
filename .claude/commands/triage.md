@@ -1,6 +1,6 @@
 # Modo: Triage (barrido de backlogs)
 
-**Objetivo**: reportar el estado de los 6 backlogs del proyecto ([rules/backlog-hygiene.md](../rules/backlog-hygiene.md)), marcar items que cruzaron límite o edad crítica, y proponer acción concreta por cada uno. **No ejecuta nada** — decide el usuario.
+**Objetivo**: reportar el estado de los 7 backlogs del proyecto ([rules/backlog-hygiene.md](../rules/backlog-hygiene.md)), marcar items que cruzaron límite o edad crítica, y proponer acción concreta por cada uno. **No ejecuta nada** — decide el usuario.
 
 Útil cuando:
 
@@ -10,7 +10,7 @@
 
 ## Qué hago
 
-Un pase por los 6 buckets, en orden. Para cada uno:
+Un pase por los 7 buckets, en orden. Para cada uno:
 
 1. **Contar** items actuales.
 2. **Comparar** contra el límite de [backlog-hygiene.md](../rules/backlog-hygiene.md).
@@ -47,6 +47,10 @@ Un bloque por backlog. Formato compacto, scanable, con acción propuesta por ite
 
 ### chats/troubles/ (N / 2 blando, crítico >7d)
 ...
+
+### chats/awaiting-prod/ (N / 8 blando, crítico >14d)
+- `045-plan-32-chat-4-fe-correlation-hub-pill-wiring.md` — 2d en bucket — OK
+- (si >14d, marcar VIEJO con acción: forzar `/verify` o investigar por qué no hubo deploy)
 
 ### tasks/ (N / 8 blando, crítico >60d)
 ...
@@ -117,5 +121,6 @@ Triage es idempotente y no muta estado:
 - [hooks/backlog-check.sh](../hooks/backlog-check.sh) — telemetría compacta.
 - [commands/next-chat.md](next-chat.md) — produce briefs en `open/`.
 - [commands/start-chat.md](start-chat.md) — consume briefs de `open/`.
-- [commands/end.md](end.md) — cierra y mueve a `closed/`.
+- [commands/end.md](end.md) — cierra y mueve a `closed/` o `awaiting-prod/` según el gate post-deploy.
+- [commands/verify.md](verify.md) — cierra el ciclo de un chat en `awaiting-prod/`.
 - [plan/maestro.md](../plan/maestro.md) — cola priorizada.
