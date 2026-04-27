@@ -365,18 +365,29 @@
 			<!-- Hora entrada -->
 			<div class="form-field">
 				<label>Hora de entrada</label>
-				<p-datepicker
-					[ngModel]="vm().formData.horaEntrada"
-					(ngModelChange)="store.updateFormData({ horaEntrada: $event })"
-					[timeOnly]="vm().isEditing"
-					[inline]="vm().isEditing"
-					[showTime]="true"
-					[showSeconds]="false"
-					[hourFormat]="'24'"
-					dateFormat="yy-mm-dd"
-					[placeholder]="vm().isEditing ? 'HH:mm' : 'Seleccionar fecha y hora...'"
-					appendTo="body"
-				/>
+				@if (vm().isEditing) {
+					<p-datepicker
+						[ngModel]="vm().formData.horaEntrada"
+						(ngModelChange)="store.updateFormData({ horaEntrada: $event })"
+						[timeOnly]="true"
+						[inline]="true"
+						[showTime]="true"
+						[showSeconds]="false"
+						[hourFormat]="'24'"
+						placeholder="HH:mm"
+					/>
+				} @else {
+					<p-datepicker
+						[ngModel]="vm().formData.horaEntrada"
+						(ngModelChange)="store.updateFormData({ horaEntrada: $event })"
+						[showTime]="true"
+						[showSeconds]="false"
+						[hourFormat]="'24'"
+						dateFormat="yy-mm-dd"
+						placeholder="Seleccionar fecha y hora..."
+						appendTo="body"
+					/>
+				}
 			</div>
 		}
 
@@ -385,18 +396,29 @@
 			<div class="form-field">
 				<label>Hora de salida</label>
 				<div class="field-with-action">
-					<p-datepicker
-						[ngModel]="vm().formData.horaSalida"
-						(ngModelChange)="store.updateFormData({ horaSalida: $event })"
-						[timeOnly]="vm().isEditing"
-						[inline]="vm().isEditing"
-						[showTime]="true"
-						[showSeconds]="false"
-						[hourFormat]="'24'"
-						dateFormat="yy-mm-dd"
-						[placeholder]="vm().isEditing ? 'HH:mm' : 'Seleccionar fecha y hora...'"
-						appendTo="body"
-					/>
+					@if (vm().isEditing) {
+						<p-datepicker
+							[ngModel]="vm().formData.horaSalida"
+							(ngModelChange)="store.updateFormData({ horaSalida: $event })"
+							[timeOnly]="true"
+							[inline]="true"
+							[showTime]="true"
+							[showSeconds]="false"
+							[hourFormat]="'24'"
+							placeholder="HH:mm"
+						/>
+					} @else {
+						<p-datepicker
+							[ngModel]="vm().formData.horaSalida"
+							(ngModelChange)="store.updateFormData({ horaSalida: $event })"
+							[showTime]="true"
+							[showSeconds]="false"
+							[hourFormat]="'24'"
+							dateFormat="yy-mm-dd"
+							placeholder="Seleccionar fecha y hora..."
+							appendTo="body"
+						/>
+					}
 					@if (vm().isEditing && vm().formData.horaSalida) {
 						<button
 							pButton
