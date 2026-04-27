@@ -30,7 +30,7 @@ export const environment = {
 		emailOutboxThrottleWidget: false,
 		emailOutboxDeferFailWidget: false,
 		emailOutboxDashboardDia: true,
-		emailOutboxDiagnostico: false,
+		emailOutboxDiagnostico: true,
 		auditoriaCorreos: false,
 	},
 
