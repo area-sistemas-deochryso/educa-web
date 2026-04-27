@@ -1,5 +1,5 @@
 > **Repo destino**: `educa-web` (frontend, branch `main`). Abrir el chat nuevo en este repo.
-> **Validación prod**: ⏳ pendiente desde 2026-04-27 (backfill — cierre original anterior, ver git log)
+> **Validación prod**: ✅ verificada 2026-04-27
 > **Plan**: 35 · **Chat**: 1 · **Fase**: F1.FE · **Creado**: 2026-04-27 · **Estado**: ⏳ pendiente arrancar.
 > **Modo sugerido**: `/execute → /validate` (diseño ya cerrado en plan file).
 
