@@ -1,0 +1,15 @@
+@use '../../../table-section' as *;
+
+:host .table-section {
+	.col-correo code {
+		font-size: 0.78rem;
+	}
+
+	.col-estado {
+		text-align: center;
+	}
+
+	.col-correlation {
+		text-align: center;
+	}
+}

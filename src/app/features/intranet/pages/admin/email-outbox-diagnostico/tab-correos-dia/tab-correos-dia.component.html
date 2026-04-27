@@ -65,6 +65,15 @@
 							</span>
 						}
 					</p-tab>
+					<p-tab value="enviados">
+						<i class="pi pi-check-circle"></i>
+						<span>Entradas con correo</span>
+						@if (hasData() && vm().entradasConCorreoEnviado.length > 0) {
+							<span class="tab-badge tab-badge--success">
+								{{ vm().entradasConCorreoEnviado.length }}
+							</span>
+						}
+					</p-tab>
 				</p-tablist>
 
 				<p-tabpanels>
@@ -92,6 +101,15 @@
 							<app-table-skeleton [columns]="blacklistColumns" [rows]="8" />
 						} @else if (hasData()) {
 							<app-apoderados-blacklisteados-table [data]="vm().apoderadosBlacklisteados" />
+						}
+					</p-tabpanel>
+
+					<!-- Plan 30b — lista simétrica positiva: entradas cuyo correo SÍ se envió -->
+					<p-tabpanel value="enviados">
+						@if (vm().loading && !hasData()) {
+							<app-table-skeleton [columns]="enviadosColumns" [rows]="8" />
+						} @else if (hasData()) {
+							<app-entradas-con-correo-table [data]="vm().entradasConCorreoEnviado" />
 						}
 					</p-tabpanel>
 				</p-tabpanels>

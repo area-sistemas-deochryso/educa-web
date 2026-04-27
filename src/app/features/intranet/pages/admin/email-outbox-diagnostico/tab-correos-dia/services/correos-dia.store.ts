@@ -32,6 +32,9 @@ export class CorreosDiaStore {
 	readonly entradasSinCorreoEnviado = computed(
 		() => this._dto()?.entradasSinCorreoEnviado ?? [],
 	);
+	readonly entradasConCorreoEnviado = computed(
+		() => this._dto()?.entradasConCorreoEnviado ?? [],
+	);
 	readonly fecha = computed(() => this._dto()?.fecha ?? null);
 	readonly generatedAt = computed(() => this._dto()?.generatedAt ?? null);
 	// * Total del gap = suma de las 5 razones del descalce. Fuente única para badge + resumen.
@@ -59,6 +62,7 @@ export class CorreosDiaStore {
 		estudiantesSinCorreo: this.estudiantesSinCorreo(),
 		apoderadosBlacklisteados: this.apoderadosBlacklisteados(),
 		entradasSinCorreoEnviado: this.entradasSinCorreoEnviado(),
+		entradasConCorreoEnviado: this.entradasConCorreoEnviado(),
 		fecha: this.fecha(),
 		generatedAt: this.generatedAt(),
 		totalGap: this.totalGap(),

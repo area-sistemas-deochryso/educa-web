@@ -29,6 +29,7 @@ function makeDto(overrides: Partial<DiagnosticoCorreosDiaDto> = {}): Diagnostico
 		estudiantesSinCorreo: [],
 		apoderadosBlacklisteados: [],
 		entradasSinCorreoEnviado: [],
+		entradasConCorreoEnviado: [],
 		generatedAt: '2026-04-27T07:30:00',
 		...overrides,
 	};

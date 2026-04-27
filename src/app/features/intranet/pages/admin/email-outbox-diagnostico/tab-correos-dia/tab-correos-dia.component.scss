@@ -114,6 +114,28 @@
 		line-height: 1;
 	}
 
+	// * Badge verde success (Plan 30b — lista simétrica positiva).
+	// * Mismo dimensionamiento que `.tab-badge--neutral` pero con tinte verde
+	// * via color-mix (design-system B9 / sección A1 Opción C: positivo crítico
+	// * = severity success). El color-mix respeta tema light/dark del tema.
+	.tab-badge--success {
+		display: inline-flex !important;
+		align-items: center;
+		justify-content: center;
+		min-width: 1.35rem;
+		height: 1.35rem;
+		padding: 0 0.5rem;
+		margin-left: 0.1rem;
+		border-radius: 999px;
+		background: color-mix(in srgb, var(--green-500) 15%, transparent) !important;
+		color: var(--green-700) !important;
+		border: 1px solid var(--green-500);
+		font-size: 0.7rem;
+		font-weight: 700;
+		font-variant-numeric: tabular-nums;
+		line-height: 1;
+	}
+
 	.p-tabpanels {
 		padding: 0;
 	}

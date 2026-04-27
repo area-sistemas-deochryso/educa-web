@@ -7,6 +7,7 @@ export interface DiagnosticoCorreosDiaDto {
 	estudiantesSinCorreo: EstudianteSinCorreoApoderado[];
 	apoderadosBlacklisteados: ApoderadoBlacklisteadoDelDia[];
 	entradasSinCorreoEnviado: EntradaSinCorreoEnviado[];
+	entradasConCorreoEnviado: EntradaConCorreoEnviado[];
 	generatedAt: string;
 }
 
@@ -47,6 +48,24 @@ export interface EntradaSinCorreoEnviado {
 	horaEntrada: string;
 	razon: DiagnosticoRazon;
 	tipoFallo: string | null;
+}
+
+// * Plan 30b: lista simétrica positiva. `estado` se deja abierto a expansión
+// * (PENDING/RETRYING) aunque hoy siempre llega `"SENT"` desde el BE.
+export interface EntradaConCorreoEnviado {
+	asistenciaId: number;
+	estudianteId: number;
+	dniMasked: string;
+	nombreCompleto: string;
+	salon: string;
+	graOrden: number;
+	horaEntrada: string;
+	emailOutboxId: number;
+	correoApoderadoMasked: string;
+	estado: string;
+	fechaEnvio: string;
+	remitente: string | null;
+	correlationId: string | null;
 }
 
 // #endregion

@@ -7,6 +7,7 @@ import type { SkeletonColumnDef } from '@shared/components';
 import { ApoderadosBlacklisteadosTableComponent } from './components/apoderados-blacklisteados-table/apoderados-blacklisteados-table.component';
 import { CorreosDiaHeaderComponent } from './components/correos-dia-header/correos-dia-header.component';
 import { CorreosDiaResumenComponent } from './components/correos-dia-resumen/correos-dia-resumen.component';
+import { EntradasConCorreoTableComponent } from './components/entradas-con-correo-table/entradas-con-correo-table.component';
 import { EntradasSinCorreoTableComponent } from './components/entradas-sin-correo-table/entradas-sin-correo-table.component';
 import { EstudiantesSinCorreoTableComponent } from './components/estudiantes-sin-correo-table/estudiantes-sin-correo-table.component';
 import { CorreosDiaFacade } from './services';
@@ -33,6 +34,17 @@ const ENTRADAS_COLUMNS: SkeletonColumnDef[] = [
 	{ width: '160px', cellType: 'text' },
 ];
 
+const ENVIADOS_COLUMNS: SkeletonColumnDef[] = [
+	{ width: '110px', cellType: 'text' },
+	{ width: 'flex', cellType: 'text' },
+	{ width: '160px', cellType: 'badge' },
+	{ width: '90px', cellType: 'text' },
+	{ width: '180px', cellType: 'text' },
+	{ width: '90px', cellType: 'text' },
+	{ width: '90px', cellType: 'badge' },
+	{ width: '110px', cellType: 'badge' },
+];
+
 @Component({
 	selector: 'app-tab-correos-dia',
 	standalone: true,
@@ -45,6 +57,7 @@ const ENTRADAS_COLUMNS: SkeletonColumnDef[] = [
 		EstudiantesSinCorreoTableComponent,
 		ApoderadosBlacklisteadosTableComponent,
 		EntradasSinCorreoTableComponent,
+		EntradasConCorreoTableComponent,
 	],
 	templateUrl: './tab-correos-dia.component.html',
 	styleUrl: './tab-correos-dia.component.scss',
@@ -60,6 +73,7 @@ export class TabCorreosDiaComponent {
 	readonly listaSimpleColumns = LISTA_SIMPLE_COLUMNS;
 	readonly blacklistColumns = BLACKLIST_COLUMNS;
 	readonly entradasColumns = ENTRADAS_COLUMNS;
+	readonly enviadosColumns = ENVIADOS_COLUMNS;
 	readonly hasData = computed(() => this.vm().dto !== null);
 	// #endregion
 
