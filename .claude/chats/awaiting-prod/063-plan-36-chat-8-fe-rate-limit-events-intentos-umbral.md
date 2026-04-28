@@ -1,6 +1,6 @@
 > **Repo destino**: `educa-web` (frontend, branch `main`).
 > **Plan**: 36 · **Chat**: 8 · **Fase**: F8 (`/design + /execute`) · **Creado**: 2026-04-27 · **Estado**: ✅ cerrado local 2026-04-28.
-> **Validación prod**: ⏳ pendiente desde 2026-04-28.
+> **Validación prod**: ⏳ pendiente desde 2026-04-28 — falla parcial detectada en prod (columna renderizada pero datos vacíos `— / —`). Investigación local derivada en [`064-plan-36-chat-8b-fe-rate-limit-intentos-umbral-investigar.md`](../open/064-plan-36-chat-8b-fe-rate-limit-intentos-umbral-investigar.md). Cierre depende del fix de 064.
 
 ---
 
