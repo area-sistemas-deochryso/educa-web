@@ -1,43 +1,40 @@
-# Idioma del Código
+# code-language (override de educa-web)
 
-## Principio
+> Política universal: ver `~/.claude/rules/code-language.md`. Acá viven el glosario del dominio y los detalles del stack Angular + Educa.API.
 
-> **"Código interno en inglés. Todo lo visible al usuario final en español."**
+## Tabla de elementos del stack (frontend)
 
----
-
-## Qué va en inglés (código interno)
+### En inglés (código interno)
 
 | Elemento | Ejemplo |
-|----------|---------|
-| Nombres de archivos y carpetas | `attendance.service.ts`, `schedules/` |
+|---|---|
+| Archivos y carpetas | `attendance.service.ts`, `schedules/` |
 | Clases y tipos | `AttendanceService`, `SchedulesStore` |
-| Selectores de componentes | `app-attendance-day-list` |
+| Selectores | `app-attendance-day-list` |
 | Variables y funciones | `loadStudents()`, `isActive` |
 | Interfaces y enums | `AttendanceStatus`, `GradeType` |
 | Barrel exports | `export { SchedulesComponent }` |
-| Nombres de guards | `permissionsGuard` |
-| Paths de `loadComponent` en routes | `import('./pages/admin/schedules')` |
+| Guards | `permissionsGuard` |
+| Paths de `loadComponent` | `import('./pages/admin/schedules')` |
 | Tags de logger | `logger.tagged('AttendanceReports', ...)` |
 
-## Qué va en español (visible al usuario)
+### En español (visible al usuario)
 
 | Elemento | Ejemplo |
-|----------|---------|
-| Rutas URL (`path:` en routes) | `path: 'profesor/asistencia'` |
-| Títulos de página (`title:` en routes) | `title: 'Intranet - Asistencia'` |
+|---|---|
+| Rutas URL (`path:`) | `path: 'profesor/asistencia'` |
+| Títulos de página (`title:`) | `title: 'Intranet - Asistencia'` |
 | Labels de menú | `label: 'Horarios'` |
-| Textos en templates HTML | `<h2>Gestión de Asistencias</h2>` |
+| Textos en HTML | `<h2>Gestión de Asistencias</h2>` |
 | Mensajes de error/toast | `'Usuario no encontrado'` |
-| Placeholders de inputs | `placeholder="Buscar por nombre..."` |
+| Placeholders | `placeholder="Buscar por nombre..."` |
 | Feature flags (mapean a rutas) | `environment.features.horarios` |
 | Endpoints de API del backend | `/api/ConsultaAsistencia` |
-| Comentarios explicativos | `// Validar que el periodo esté cerrado` |
 
-## Nombres de dominio — Glosario
+## Glosario de dominio
 
 | Español (URL/UI) | Inglés (código) |
-|-------------------|-----------------|
+|---|---|
 | asistencia | attendance |
 | horarios | schedules |
 | salones | classrooms |
@@ -54,10 +51,18 @@
 
 **Nota**: Los segmentos de rol en URLs (`profesor/`, `estudiante/`) se mantienen en español porque son visibles al usuario.
 
-## Al crear código nuevo
+## Backend (Educa.API)
+
+El backend mantiene naming en español (Controllers, DTOs, Services). Esta regla aplica **solo al frontend**. Los DTOs consumidos desde Angular se mapean a tipos en inglés en la capa `@data/`.
+
+## Convivencia con código heredado
+
+Si un archivo existente aún usa naming en español (quedan algunos archivos internos pendientes de renombrar dentro de carpetas ya renombradas), **renombrarlo en el mismo PR** si el cambio es trivial. No crear PRs dedicados sólo para renames individuales.
+
+## Ejemplo
 
 ```typescript
-// ✅ CORRECTO — archivo y clase en inglés, UI en español
+// ✅ archivo y clase en inglés, UI en español
 // teacher-grades.component.ts
 @Component({
   selector: 'app-teacher-grades',
@@ -65,18 +70,10 @@
 })
 export class TeacherGradesComponent { }
 
-// ❌ INCORRECTO — clase en español
+// ❌ clase en español
 // profesor-calificaciones.component.ts
 @Component({
   selector: 'app-profesor-calificaciones',
 })
 export class ProfesorCalificacionesComponent { }
 ```
-
-## Al tocar código existente
-
-Si un archivo existente aún usa naming en español (quedan algunos archivos internos pendientes de renombrar dentro de carpetas ya renombradas), **renombrarlo en el mismo PR** si el cambio es trivial. No crear PRs dedicados solo para renames individuales.
-
-## Backend
-
-El backend (Educa.API) mantiene naming en español (Controllers, DTOs, Services). Esta regla aplica **solo al frontend**.

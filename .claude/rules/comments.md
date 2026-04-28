@@ -1,65 +1,22 @@
-# Comentarios en Código
+# comments (override de educa-web)
 
-## Principio fundamental
+> Filosofía universal: ver `~/.claude/rules/comments.md`. Acá viven el formato `#region` y las reglas por tipo de archivo del stack Angular + NgRx Signals.
 
-> **"Comentarios mínimos pero útiles que permitan ubicar fácilmente qué se hace."**
+## Formato preferido
 
-- ✅ Facilitar la navegación rápida del código
-- ✅ Explicar el "por qué", no el "qué"
-- ✅ Marcar secciones lógicas
-- ❌ NO describir lo obvio ni ser redundantes
-
----
-
-## Cuándo comentar
-
-### ✅ SÍ comentar
-
-| Situación | Ejemplo |
-|-----------|---------|
-| **Secciones lógicas** | Agrupar bloques relacionados |
-| **Decisiones no obvias** | Por qué se eligió un approach específico |
-| **Workarounds** | Soluciones temporales o hacks necesarios |
-| **Validaciones complejas** | Reglas de negocio no evidentes |
-| **APIs públicas** | Servicios, métodos públicos, interfaces |
-
-### ❌ NO comentar
-
-| Situación | Por qué |
-|-----------|---------|
-| Código auto-explicativo | `// Incrementar contador` antes de `count++` |
-| Nombres descriptivos | Si la variable/función explica su propósito |
-| Código temporal | Comentar código en lugar de eliminarlo |
-| Obviedades | `// Constructor` antes del constructor |
-
----
+**`// #region` / `// #endregion`** en lugar de separadores tipo `// ============`. Ver `@.claude/rules/regions.md` para la convención completa.
 
 ## Reglas por tipo de archivo
 
 | Tipo | ✅ SÍ | ❌ NO |
-|------|-------|------|
-| **Stores/Services** | Separadores de sección, documentar mutaciones quirúrgicas con `/** */`, validaciones de negocio | Cada getter/setter, código obvio de signals |
-| **Components** | Separar secciones (Signals, Estado local, Computed, Lifecycle, Handlers), computed complejos | Cada event handler simple, cada property |
-| **Facades** | Estrategia de cada operación CRUD (refetch vs mutación), helpers no obvios | Métodos que solo delegan |
+|---|---|---|
+| **Stores / Services** | Separadores de sección, `/** */` en mutaciones quirúrgicas, validaciones de negocio | Cada getter/setter, código obvio de signals |
+| **Components** | Separar secciones (Signals, Estado local, Computed, Lifecycle, Handlers), `computed` complejos | Cada event handler simple, cada property |
+| **Facades** | Estrategia de cada operación CRUD (refetch vs mutación quirúrgica), helpers no obvios | Métodos que sólo delegan |
 | **Templates HTML** | Secciones visuales grandes (Header, Stats, Filtros, Tabla, Dialogs), grupos de filtros/botones | Cada binding simple, estructura obvia de PrimeNG |
 | **SCSS** | Secciones por componente visual, overrides de `::ng-deep`, hacks necesarios | Cada propiedad CSS, layouts obvios |
 
----
-
-## Formato de comentarios
-
-**PREFERIR `// #region`** en lugar de `// ============`. Ver `@.claude/rules/regions.md`.
-
-| Tipo | Cuándo usar |
-|------|-------------|
-| `// #region` | Separadores de sección colapsables (preferido) |
-| `// Comentario` | Explicar "por qué" inline |
-| `/** JSDoc */` | Documentar APIs públicas y mutaciones quirúrgicas |
-| ❌ Nada | Código auto-explicativo |
-
----
-
-## Ejemplo: ✅ CORRECTO
+## Ejemplo: ✅ correcto
 
 ```typescript
 export class UsersStore {
@@ -98,7 +55,7 @@ export class UsersStore {
 }
 ```
 
-## Ejemplo: ❌ INCORRECTO
+## Ejemplo: ❌ incorrecto
 
 ```typescript
 export class UsersStore {
@@ -117,17 +74,7 @@ export class UsersStore {
 }
 ```
 
----
+## Ver también
 
-## Checklist de revisión
-
-```
-[ ] ¿Hay separadores de sección donde ayudan a navegar?
-[ ] ¿Los comentarios explican "por qué" en lugar de "qué"?
-[ ] ¿Las decisiones no obvias están documentadas?
-[ ] ¿Las APIs públicas tienen JSDoc?
-[ ] ¿Se evitaron comentarios redundantes y obviedades?
-[ ] ¿El código puede entenderse sin los comentarios?
-```
-
-**Frase clave**: *"Comentar lo justo para navegar rápido y entender decisiones no obvias."*
+- `@.claude/rules/regions.md` — convención `#region` completa.
+- `~/.claude/rules/comments.md` — filosofía universal.
