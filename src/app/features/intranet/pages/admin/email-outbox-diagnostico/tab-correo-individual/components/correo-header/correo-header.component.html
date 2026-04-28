@@ -29,19 +29,24 @@
 			<ng-template let-persona pTemplate="item">
 				<div class="suggestion">
 					<div class="suggestion__avatar" [attr.data-tipo]="persona.tipoPersona">
-						<i class="pi pi-user"></i>
+						<i [class]="tipoPersonaIcon(persona.tipoPersona)"></i>
 					</div>
 					<div class="suggestion__body">
 						<div class="suggestion__line-1">
 							<span class="suggestion__name">{{ persona.nombreCompleto }}</span>
-							<span class="suggestion__tipo">{{ tipoPersonaLabel(persona.tipoPersona) }}</span>
+							<span
+								class="suggestion__tipo"
+								[attr.data-tipo]="persona.tipoPersona"
+							>{{ tipoPersonaLabel(persona.tipoPersona) }}</span>
 						</div>
 						<div class="suggestion__line-2">
 							<i class="pi pi-envelope"></i>
-							<code>{{ persona.correoMasked }}</code>
-							<span class="suggestion__sep">·</span>
-							<span class="suggestion__dni">DNI {{ persona.dniMasked }}</span>
-							<span class="suggestion__sep">·</span>
+							<code class="suggestion__correo">{{ persona.correoMasked }}</code>
+						</div>
+						<div class="suggestion__line-3">
+							<span class="suggestion__dni">
+								<i class="pi pi-id-card"></i>{{ persona.dniMasked }}
+							</span>
 							<span class="suggestion__campo">{{ persona.campo | campoCorreoLabel }}</span>
 						</div>
 					</div>

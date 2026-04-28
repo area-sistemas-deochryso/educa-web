@@ -101,12 +101,22 @@ export class CorreoIndividualFacade {
 			return;
 		}
 
-		if (correo.length > CORREO_MAX_LENGTH || !correo.includes('@')) {
+		if (correo.length > CORREO_MAX_LENGTH) {
 			this.errorHandler.showError(
 				'Diagnóstico por correo',
-				'El correo no tiene un formato válido.',
+				'El correo es demasiado largo.',
 			);
 			this.store.setError('CORREO_INVALIDO');
+			return;
+		}
+
+		// * Si el input no parece correo (sin @) puede ser un nombre/apellido/DNI:
+		// * resolver vía sugerencias en lugar de cortar al admin con "formato inválido".
+		// * - 1 sugerencia → autopick (intención clara).
+		// * - 0 sugerencias → mensaje específico según si es DNI o texto.
+		// * - >1 sugerencias → pedir selección explícita.
+		if (!correo.includes('@')) {
+			this.resolverDesdeSugerencias(correo);
 			return;
 		}
 
@@ -131,6 +141,35 @@ export class CorreoIndividualFacade {
 
 	limpiar(): void {
 		this.store.clear();
+	}
+
+	// * Submit con input que no es correo (sin @): el admin probablemente tipeó
+	// * un nombre, apellido o DNI. Resolvemos via las sugerencias actuales.
+	private resolverDesdeSugerencias(input: string): void {
+		const sugerencias = this.store.sugerencias();
+		const esDniNumerico = /^\d{1,8}$/.test(input);
+
+		if (sugerencias.length === 1) {
+			// * Una sola coincidencia → asumimos esa.
+			this.seleccionarPersona(sugerencias[0]);
+			return;
+		}
+
+		if (sugerencias.length > 1) {
+			this.errorHandler.showWarning(
+				'Diagnóstico por correo',
+				'Seleccioná una persona de las sugerencias para diagnosticar su correo.',
+			);
+			this.store.setError('SELECCION_REQUERIDA');
+			return;
+		}
+
+		// * 0 sugerencias — distinguimos DNI vs texto para dar pista útil.
+		const mensaje = esDniNumerico
+			? 'No encontramos a nadie activo con ese DNI. Verificá el número o probá con apellido o correo.'
+			: 'No encontramos coincidencias. Tipea un correo completo (con @) o probá otro nombre.';
+		this.errorHandler.showError('Diagnóstico por correo', mensaje);
+		this.store.setError('SIN_COINCIDENCIAS');
 	}
 	// #endregion
 
@@ -176,6 +215,12 @@ export class CorreoIndividualFacade {
 				return 'El correo es obligatorio.';
 			case 'CORREO_INVALIDO':
 				return 'El correo no tiene un formato válido.';
+			case 'SELECCION_REQUERIDA':
+				return 'Seleccioná una persona de las sugerencias.';
+			case 'SIN_COINCIDENCIAS':
+				return 'No encontramos coincidencias.';
+			case 'UNKNOWN':
+				return 'No se pudo obtener el diagnóstico.';
 		}
 	}
 	// #endregion

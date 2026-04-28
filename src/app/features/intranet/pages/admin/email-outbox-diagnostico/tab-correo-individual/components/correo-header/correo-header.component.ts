@@ -17,6 +17,13 @@ const TIPO_PERSONA_LABEL: Record<TipoPersona, string> = {
 	APO: 'Apoderado',
 };
 
+const TIPO_PERSONA_ICON: Record<TipoPersona, string> = {
+	E: 'pi pi-graduation-cap',
+	P: 'pi pi-book',
+	D: 'pi pi-shield',
+	APO: 'pi pi-users',
+};
+
 @Component({
 	selector: 'app-correo-header',
 	standalone: true,
@@ -132,6 +139,10 @@ export class CorreoHeaderComponent {
 	// #region Helpers
 	tipoPersonaLabel(tipo: TipoPersona): string {
 		return TIPO_PERSONA_LABEL[tipo] ?? tipo;
+	}
+
+	tipoPersonaIcon(tipo: TipoPersona): string {
+		return TIPO_PERSONA_ICON[tipo] ?? 'pi pi-user';
 	}
 
 	private minutesSince(iso: string): number | null {

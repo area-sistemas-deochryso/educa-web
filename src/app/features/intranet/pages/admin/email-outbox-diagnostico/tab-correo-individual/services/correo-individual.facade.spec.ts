@@ -116,14 +116,64 @@ describe('CorreoIndividualFacade', () => {
 		);
 	});
 
-	it('buscar con formato inválido (sin @) rechaza sin pegar al BE (CORREO_INVALIDO)', () => {
+	it('buscar sin @ con 0 sugerencias texto: SIN_COINCIDENCIAS + mensaje genérico', () => {
 		facade.buscar('no-arroba');
+
+		expect(api.obtenerDiagnostico).not.toHaveBeenCalled();
+		expect(store.error()).toBe('SIN_COINCIDENCIAS');
+		expect(errorHandler.showError).toHaveBeenCalledWith(
+			'Diagnóstico por correo',
+			expect.stringContaining('correo completo'),
+		);
+	});
+
+	it('buscar sin @ con DNI numérico y 0 sugerencias: mensaje específico de DNI', () => {
+		facade.buscar('12345678');
+
+		expect(api.obtenerDiagnostico).not.toHaveBeenCalled();
+		expect(store.error()).toBe('SIN_COINCIDENCIAS');
+		expect(errorHandler.showError).toHaveBeenCalledWith(
+			'Diagnóstico por correo',
+			expect.stringContaining('DNI'),
+		);
+	});
+
+	it('buscar sin @ con 1 sugerencia disponible: autopick (usa el correo de la sugerencia)', () => {
+		const persona = makePersona({ correo: 'auto@pick.com', nombreCompleto: 'Garcia, Ana' });
+		store.setSugerencias([persona], 1);
+		const dto = makeDto({ correoConsultado: 'auto@pick.com' });
+		api.obtenerDiagnostico.mockReturnValueOnce(of(dto));
+
+		facade.buscar('garcia');
+
+		expect(api.obtenerDiagnostico).toHaveBeenCalledWith('auto@pick.com');
+		expect(store.correoInput()).toBe('auto@pick.com');
+		expect(store.dto()).toBe(dto);
+	});
+
+	it('buscar sin @ con varias sugerencias: SELECCION_REQUERIDA + warning', () => {
+		store.setSugerencias([makePersona(), makePersona({ id: 2 })], 2);
+
+		facade.buscar('gar');
+
+		expect(api.obtenerDiagnostico).not.toHaveBeenCalled();
+		expect(store.error()).toBe('SELECCION_REQUERIDA');
+		expect(errorHandler.showWarning).toHaveBeenCalledWith(
+			'Diagnóstico por correo',
+			expect.stringContaining('Seleccioná'),
+		);
+	});
+
+	it('buscar con correo demasiado largo (>200): CORREO_INVALIDO', () => {
+		const longCorreo = 'a'.repeat(195) + '@b.com'; // 201 chars
+
+		facade.buscar(longCorreo);
 
 		expect(api.obtenerDiagnostico).not.toHaveBeenCalled();
 		expect(store.error()).toBe('CORREO_INVALIDO');
 		expect(errorHandler.showError).toHaveBeenCalledWith(
 			'Diagnóstico por correo',
-			expect.stringContaining('formato válido'),
+			expect.stringContaining('largo'),
 		);
 	});
 

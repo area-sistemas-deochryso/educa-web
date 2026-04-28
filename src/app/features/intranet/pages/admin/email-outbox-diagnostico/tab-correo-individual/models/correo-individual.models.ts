@@ -86,7 +86,12 @@ export type BlacklistEstado = (typeof BLACKLIST_ESTADOS)[number];
 
 // #region Error codes del BE (400)
 
-export type CorreoIndividualErrorCode = 'CORREO_REQUERIDO' | 'CORREO_INVALIDO';
+export type CorreoIndividualErrorCode =
+	| 'CORREO_REQUERIDO'
+	| 'CORREO_INVALIDO'
+	| 'SELECCION_REQUERIDA'
+	| 'SIN_COINCIDENCIAS'
+	| 'UNKNOWN';
 
 // * Códigos del endpoint /diagnostico/buscar-personas (Plan 36 Chat 4b)
 export type BuscarPersonasErrorCode = 'Q_REQUERIDO' | 'Q_MUY_CORTO' | 'Q_MUY_LARGO';
