@@ -14,7 +14,8 @@ export class AttendanceReportsStore {
 	private readonly _resultado = signal<ReporteFiltrado | null>(null);
 	private readonly _loading = signal(false);
 	private readonly _loadingSalones = signal(false);
-	private readonly _exporting = signal(false);
+	private readonly _exportingPdf = signal(false);
+	private readonly _exportingExcel = signal(false);
 	private readonly _error = signal<string | null>(null);
 	// #endregion
 
@@ -24,7 +25,8 @@ export class AttendanceReportsStore {
 	readonly resultado = this._resultado.asReadonly();
 	readonly loading = this._loading.asReadonly();
 	readonly loadingSalones = this._loadingSalones.asReadonly();
-	readonly exporting = this._exporting.asReadonly();
+	readonly exportingPdf = this._exportingPdf.asReadonly();
+	readonly exportingExcel = this._exportingExcel.asReadonly();
 	readonly error = this._error.asReadonly();
 	// #endregion
 
@@ -45,7 +47,8 @@ export class AttendanceReportsStore {
 		resultado: this._resultado(),
 		loading: this._loading(),
 		loadingSalones: this._loadingSalones(),
-		exporting: this._exporting(),
+		exportingPdf: this._exportingPdf(),
+		exportingExcel: this._exportingExcel(),
 		error: this._error(),
 		hasResultado: this.hasResultado(),
 		hasData: this.hasData(),
@@ -69,8 +72,12 @@ export class AttendanceReportsStore {
 		this._loadingSalones.set(loading);
 	}
 
-	setExporting(exporting: boolean): void {
-		this._exporting.set(exporting);
+	setExportingPdf(exporting: boolean): void {
+		this._exportingPdf.set(exporting);
+	}
+
+	setExportingExcel(exporting: boolean): void {
+		this._exportingExcel.set(exporting);
 	}
 
 	setError(error: string | null): void {

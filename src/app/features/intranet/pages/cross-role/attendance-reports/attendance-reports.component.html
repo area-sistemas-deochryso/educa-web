@@ -10,15 +10,15 @@
 				label="PDF"
 				class="p-button-outlined p-button-danger"
 				(click)="onExportPdf()"
-				[loading]="vm().exporting"
+				[loading]="vm().exportingPdf"
 			></button>
 			<button
 				pButton
 				icon="pi pi-file-excel"
 				label="Excel"
-				class="p-button-outlined p-button-success"
+				class="p-button-success"
 				(click)="onExportExcel()"
-				[loading]="vm().exporting"
+				[loading]="vm().exportingExcel"
 			></button>
 		</div>
 	}

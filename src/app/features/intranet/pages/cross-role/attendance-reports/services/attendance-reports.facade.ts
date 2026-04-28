@@ -98,8 +98,10 @@ export class AttendanceReportsFacade {
 
 	// #region Exportar PDF
 	exportarPdf(): void {
+		if (this.store.exportingPdf()) return;
+
 		const filters = this.store.filters();
-		this.store.setExporting(true);
+		this.store.setExportingPdf(true);
 
 		this.api
 			.descargarPdf(filters)
@@ -108,11 +110,11 @@ export class AttendanceReportsFacade {
 				next: (blob) => {
 					const url = URL.createObjectURL(blob);
 					window.open(url, '_blank');
-					this.store.setExporting(false);
+					this.store.setExportingPdf(false);
 				},
 				error: (err) => {
 					logger.error('[AttendanceReports] Error al exportar PDF', err);
-					this.store.setExporting(false);
+					this.store.setExportingPdf(false);
 				},
 			});
 	}
@@ -120,11 +122,13 @@ export class AttendanceReportsFacade {
 
 	// #region Exportar Excel
 	exportarExcel(): void {
+		if (this.store.exportingExcel()) return;
+
 		const filters = this.store.filters();
 		const resultado = this.store.resultado();
 		if (!resultado) return;
 
-		this.store.setExporting(true);
+		this.store.setExportingExcel(true);
 
 		this.api
 			.descargarExcel(filters)
@@ -133,11 +137,11 @@ export class AttendanceReportsFacade {
 				next: (blob) => {
 					const fechaStr = filters.fecha.toISOString().split('T')[0];
 					downloadBlob(blob, `Reporte_${resultado.filtroEstado}_${fechaStr}.xlsx`);
-					this.store.setExporting(false);
+					this.store.setExportingExcel(false);
 				},
 				error: (err) => {
 					logger.error('[AttendanceReports] Error al exportar Excel', err);
-					this.store.setExporting(false);
+					this.store.setExportingExcel(false);
 				},
 			});
 	}
