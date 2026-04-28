@@ -1,65 +1,39 @@
-# Modo: Progress (reporte de avance)
+---
+description: Modo Progress — reporte read-only de tendencia de commits, briefs/sem, churn, zonas muertas y top de cola del maestro.
+---
 
-**Objetivo**: ver de un vistazo cómo avanza el proyecto educa-web — tendencia de commits y briefs cerrados/semana, subsistemas con más actividad, zonas muertas. Cero mutación.
+# /progress (override de educa-web)
 
-## Qué hago
+> Política universal: ver `~/.claude/commands/progress.md`.
 
-- Correr [`.claude/scripts/progress.sh`](../scripts/progress.sh) con `Bash`.
-- Devolver la salida tal cual (markdown con sparklines y tablas con emoji status).
-- Si el reporte revela algo accionable (zona muerta crítica, churn concentrado en una sola carpeta, regresión), señalarlo en una línea al final.
+## Específico de educa-web
 
-## Qué reporta el script
+### Sección extra: Cola del maestro
 
 | Sección | Qué muestra | Cómo se calcula |
-|---|---|---|
-| **Volumen general** | Sparklines de commits y briefs cerrados/semana en ventana 12w | `git log --since="12 weeks ago"`, escala log |
-| **Subsistemas con churn** | Top 8 carpetas más modificadas en `src/app/{core,features,shared}/*/` | `git log --name-only` agrupado |
-| **Zonas muertas** | Subsistemas FE sin commits en >42d | `git log -1` por carpeta vs threshold |
-| **Cola del maestro** | Top 5 items de "📋 Próximos chats" del maestro | parse del archivo |
+| --- | --- | --- |
+| **Cola del maestro** | Top 5 items de "📋 Próximos chats" del [../plan/maestro.md](../plan/maestro.md) | Parse del archivo |
 
-## Iconos de churn
+### Sin tabla de flujos
 
-| Ícono | Cuándo |
-|---|---|
-| 🔥 | Top 3 (subsistemas más activos) |
-| 🟢 | Posiciones 4-6 |
-| 🟡 | Posiciones 7-8 |
+A diferencia de app-fgame, educa-web **no usa la convención `plans/<flow>/<step>.md`** — los planes son flat en [../plan/](../plan/). Por eso el reporte **no tiene** la sección "Flujos". Si en el futuro se quiere implementar, requiere convención nueva equivalente a [`flow-format.md`](https://github.com/...) (no existe acá hoy).
 
-## Iconos de zonas muertas
+### Auto-disparo
 
-| Ícono | Días sin commit |
-|---|---|
-| 🟡 | 42-60d |
-| 🔴 | 60-90d |
-| 💀 | >90d |
+- `/go` lo corre automáticamente al inicio.
+- `/end` lo corre automáticamente al final del cierre.
 
-## Limitaciones conocidas
+### Argumentos extra
+
+- `/progress --weeks 4` — ventana custom de 4 semanas (el script acepta `--weeks N`). Default 12.
+
+### Limitaciones específicas
 
 - **Solo mide el repo `educa-web` (FE)**. El BE (`Educa.API/`) tiene su propia historia git, fuera del alcance de este reporte.
-- **Sin tabla de flujos**. La versión original del script (en otro proyecto) parsea `plans/<flow>/<step>.md` y agrega briefs por flujo. educa-web no usa esa convención (planes flat en `plan/`), así que esa sección se omite. Si en el futuro se quiere implementar, requiere convención nueva.
-- **Sparklines aplastados al inicio**: si el sistema de briefs cerrados arrancó hace pocas semanas, la serie es corta hasta acumular más historia.
+- **Sin tabla de flujos**: ver arriba.
 
-## Qué NO hago
+## Referencias locales
 
-- Modificar archivos, encolar tareas, mutar maestro.
-- Reemplazar `/triage` (eso barre buckets de chats/tasks; progress mira tendencia y churn).
-- Generar reporte de plans/maestro completo — solo el top 5 de la cola.
-
-## Argumentos
-
-- `/progress` (sin arg) — reporte completo, ventana default **12 semanas**.
-- `/progress --weeks 4` — ventana custom de 4 semanas (el script acepta `--weeks N`).
-
-## Cuándo correrlo
-
-- Antes de planificar — saber qué subsistema está stalled y por qué.
-- Tras cerrar un chat grande — confirmar que el churn refleja lo que esperabas.
-- Si una carpeta lleva >60d sin tocar pero es importante — investigar drift.
-- Como parte del flujo `/end` se corre automáticamente al final del cierre.
-- Como parte del flujo `/go` se corre automáticamente al inicio.
-
-## Ver también
-
-- [scripts/progress.sh](../scripts/progress.sh) — implementación.
-- [commands/triage.md](triage.md) — visión del estado de chats/tasks (complementaria).
-- [hooks/backlog-check.sh](../hooks/backlog-check.sh) — snapshot puntual de buckets en SessionStart.
+- [../scripts/progress.sh](../scripts/progress.sh) — implementación.
+- [triage.md](triage.md) — visión del estado de chats/tasks (complementaria).
+- [../hooks/backlog-check.sh](../hooks/backlog-check.sh) — snapshot puntual de buckets en SessionStart.
