@@ -5,7 +5,10 @@ import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 
 import { environment } from '@config/environment';
 
-import { EmailDiagnosticoDto } from '../models/correo-individual.models';
+import {
+	BuscarPersonasResponseDto,
+	EmailDiagnosticoDto,
+} from '../models/correo-individual.models';
 
 import { CorreoIndividualService } from './correo-individual.service';
 
@@ -70,5 +73,40 @@ describe('CorreoIndividualService', () => {
 		);
 
 		expect(capturedStatus).toBe(400);
+	});
+
+	it('buscarPersonas hace GET /diagnostico/buscar-personas con query param q', () => {
+		const expected: BuscarPersonasResponseDto = {
+			query: 'garcia',
+			total: 2,
+			personas: [
+				{
+					tipoPersona: 'E',
+					id: 1,
+					dniMasked: '***1234',
+					nombreCompleto: 'Garcia, Ana',
+					campo: 'EST_CorreoApoderado',
+					correo: 'apo@example.com',
+					correoMasked: 'a***@example.com',
+				},
+				{
+					tipoPersona: 'P',
+					id: 2,
+					dniMasked: '***5678',
+					nombreCompleto: 'Garcia, Luis',
+					campo: 'PRO_Correo',
+					correo: 'luis@example.com',
+					correoMasked: 'l***@example.com',
+				},
+			],
+		};
+		service.buscarPersonas('garcia').subscribe((r) => expect(r).toBe(expected));
+
+		const req = httpMock.expectOne(
+			(r) =>
+				r.url === `${apiBase}/diagnostico/buscar-personas` && r.params.get('q') === 'garcia',
+		);
+		expect(req.request.method).toBe('GET');
+		req.flush(expected);
 	});
 });

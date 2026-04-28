@@ -8,6 +8,7 @@ import { CorreoHeaderComponent } from './components/correo-header/correo-header.
 import { CorreoHistoriaTableComponent } from './components/correo-historia-table/correo-historia-table.component';
 import { CorreoPersonasTableComponent } from './components/correo-personas-table/correo-personas-table.component';
 import { CorreoResumenComponent } from './components/correo-resumen/correo-resumen.component';
+import { PersonaConCorreoDto } from './models/correo-individual.models';
 import { CorreoIndividualFacade } from './services';
 
 const PERSONAS_COLUMNS: SkeletonColumnDef[] = [
@@ -85,6 +86,14 @@ export class TabCorreoIndividualComponent {
 
 	onLimpiar(): void {
 		this.facade.limpiar();
+	}
+
+	onTypeaheadQuery(q: string): void {
+		this.facade.onTypeaheadQuery(q);
+	}
+
+	onSeleccionarPersona(persona: PersonaConCorreoDto): void {
+		this.facade.seleccionarPersona(persona);
 	}
 	// #endregion
 }

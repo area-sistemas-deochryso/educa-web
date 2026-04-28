@@ -1,17 +1,25 @@
 import { HttpErrorResponse } from '@angular/common/http';
 import { DestroyRef, inject, Injectable } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { Subject } from 'rxjs';
+import { catchError, debounceTime, distinctUntilChanged, of, switchMap, tap } from 'rxjs';
 
 import { ErrorHandlerService } from '@core/services/error/error-handler.service';
 import { logger } from '@core/helpers/logs/logger';
 
-import { CorreoIndividualErrorCode } from '../models/correo-individual.models';
+import {
+	CorreoIndividualErrorCode,
+	PersonaConCorreoDto,
+} from '../models/correo-individual.models';
 
 import { CorreoIndividualService } from './correo-individual.service';
 import { CorreoIndividualStore } from './correo-individual.store';
 
 const LOG_TAG = 'DiagnosticoCorreo:Facade';
 const CORREO_MAX_LENGTH = 200;
+// * Typeahead — el BE valida ≥ 2 chars; aquí filtramos local para evitar requests inútiles.
+const SUGERENCIAS_MIN_LENGTH = 2;
+const SUGERENCIAS_DEBOUNCE_MS = 300;
 
 @Injectable({ providedIn: 'root' })
 export class CorreoIndividualFacade {
@@ -24,6 +32,54 @@ export class CorreoIndividualFacade {
 
 	// #region Estado expuesto
 	readonly vm = this.store.vm;
+	// #endregion
+
+	// #region Typeahead — Plan 36 Chat 4b
+	private readonly buscarSugerencias$ = new Subject<string>();
+
+	constructor() {
+		// * Pipeline de typeahead: switchMap cancela requests viejas si el admin sigue tipeando.
+		this.buscarSugerencias$
+			.pipe(
+				debounceTime(SUGERENCIAS_DEBOUNCE_MS),
+				distinctUntilChanged(),
+				tap((q) => {
+					if (q.length < SUGERENCIAS_MIN_LENGTH) {
+						this.store.clearSugerencias();
+						this.store.setLoadingSugerencias(false);
+					} else {
+						this.store.setLoadingSugerencias(true);
+					}
+				}),
+				switchMap((q) => {
+					if (q.length < SUGERENCIAS_MIN_LENGTH) return of(null);
+					return this.api.buscarPersonas(q).pipe(
+						catchError((err: unknown) => {
+							logger.tagged(LOG_TAG, 'warn', 'sugerencias_error', err);
+							return of(null);
+						}),
+					);
+				}),
+				takeUntilDestroyed(this.destroyRef),
+			)
+			.subscribe((res) => {
+				this.store.setLoadingSugerencias(false);
+				if (!res) {
+					this.store.clearSugerencias();
+					return;
+				}
+				this.store.setSugerencias(res.personas, res.total);
+			});
+	}
+
+	onTypeaheadQuery(q: string): void {
+		this.buscarSugerencias$.next((q ?? '').trim());
+	}
+
+	seleccionarPersona(persona: PersonaConCorreoDto): void {
+		this.store.setCorreoInput(persona.correo);
+		this.buscar(persona.correo);
+	}
 	// #endregion
 
 	// #region Comandos

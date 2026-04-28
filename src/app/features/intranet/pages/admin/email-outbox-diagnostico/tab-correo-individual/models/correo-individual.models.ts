@@ -53,6 +53,27 @@ export interface EmailDiagnosticoPersonaAsociada {
 
 // #endregion
 
+// #region DTOs typeahead — Plan 36 Chat 4b BE
+// * Mirror del response de GET /api/sistema/email-outbox/diagnostico/buscar-personas?q=
+
+export interface PersonaConCorreoDto {
+	tipoPersona: TipoPersona;
+	id: number;
+	dniMasked: string;
+	nombreCompleto: string;
+	campo: string;
+	correo: string;
+	correoMasked: string;
+}
+
+export interface BuscarPersonasResponseDto {
+	query: string;
+	total: number;
+	personas: PersonaConCorreoDto[];
+}
+
+// #endregion
+
 // #region Tipos semánticos
 
 export const TIPOS_PERSONA = ['E', 'P', 'D', 'APO'] as const;
@@ -66,5 +87,8 @@ export type BlacklistEstado = (typeof BLACKLIST_ESTADOS)[number];
 // #region Error codes del BE (400)
 
 export type CorreoIndividualErrorCode = 'CORREO_REQUERIDO' | 'CORREO_INVALIDO';
+
+// * Códigos del endpoint /diagnostico/buscar-personas (Plan 36 Chat 4b)
+export type BuscarPersonasErrorCode = 'Q_REQUERIDO' | 'Q_MUY_CORTO' | 'Q_MUY_LARGO';
 
 // #endregion

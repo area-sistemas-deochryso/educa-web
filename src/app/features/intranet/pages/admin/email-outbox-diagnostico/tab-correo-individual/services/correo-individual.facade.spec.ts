@@ -1,11 +1,15 @@
 import { HttpErrorResponse } from '@angular/common/http';
 import { TestBed } from '@angular/core/testing';
 import { of, throwError } from 'rxjs';
-import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { ErrorHandlerService } from '@core/services/error/error-handler.service';
 
-import { EmailDiagnosticoDto } from '../models/correo-individual.models';
+import {
+	BuscarPersonasResponseDto,
+	EmailDiagnosticoDto,
+	PersonaConCorreoDto,
+} from '../models/correo-individual.models';
 
 import { CorreoIndividualFacade } from './correo-individual.facade';
 import { CorreoIndividualService } from './correo-individual.service';
@@ -31,9 +35,27 @@ function makeDto(overrides: Partial<EmailDiagnosticoDto> = {}): EmailDiagnostico
 	};
 }
 
+function makePersona(overrides: Partial<PersonaConCorreoDto> = {}): PersonaConCorreoDto {
+	return {
+		tipoPersona: 'E',
+		id: 1,
+		dniMasked: '***1234',
+		nombreCompleto: 'Garcia, Ana',
+		campo: 'EST_CorreoApoderado',
+		correo: 'apo@example.com',
+		correoMasked: 'a***@example.com',
+		...overrides,
+	};
+}
+
 function createMockApi() {
 	return {
 		obtenerDiagnostico: vi.fn().mockReturnValue(of(makeDto())),
+		buscarPersonas: vi
+			.fn()
+			.mockReturnValue(
+				of<BuscarPersonasResponseDto>({ query: '', total: 0, personas: [] }),
+			),
 	};
 }
 
@@ -65,6 +87,10 @@ describe('CorreoIndividualFacade', () => {
 		});
 		facade = TestBed.inject(CorreoIndividualFacade);
 		store = TestBed.inject(CorreoIndividualStore);
+	});
+
+	afterEach(() => {
+		vi.useRealTimers();
 	});
 
 	it('buscar happy path: trim + envía al BE + setDto + setLoading(false)', () => {
@@ -146,4 +172,62 @@ describe('CorreoIndividualFacade', () => {
 		expect(store.error()).toBeNull();
 		expect(store.correoInput()).toBe('');
 	});
+
+	// #region Typeahead — Plan 36 Chat 4b
+	it('onTypeaheadQuery con < 2 chars no llama al BE y limpia sugerencias', () => {
+		vi.useFakeTimers();
+		store.setSugerencias([makePersona()], 1);
+
+		facade.onTypeaheadQuery('a');
+		vi.advanceTimersByTime(400);
+
+		expect(api.buscarPersonas).not.toHaveBeenCalled();
+		expect(store.sugerencias()).toEqual([]);
+		expect(store.sugerenciasTotal()).toBe(0);
+	});
+
+	it('onTypeaheadQuery con ≥ 2 chars hace debounce y llama al BE', () => {
+		vi.useFakeTimers();
+		const response: BuscarPersonasResponseDto = {
+			query: 'gar',
+			total: 1,
+			personas: [makePersona({ nombreCompleto: 'Garcia, Ana' })],
+		};
+		api.buscarPersonas.mockReturnValueOnce(of(response));
+
+		facade.onTypeaheadQuery('gar');
+		expect(api.buscarPersonas).not.toHaveBeenCalled();
+
+		vi.advanceTimersByTime(400);
+
+		expect(api.buscarPersonas).toHaveBeenCalledWith('gar');
+		expect(store.sugerencias()).toEqual(response.personas);
+		expect(store.sugerenciasTotal()).toBe(1);
+		expect(store.loadingSugerencias()).toBe(false);
+	});
+
+	it('seleccionarPersona setea correoInput y dispara buscar()', () => {
+		const persona = makePersona({ correo: 'foo@bar.com' });
+		const dto = makeDto({ correoConsultado: 'foo@bar.com' });
+		api.obtenerDiagnostico.mockReturnValueOnce(of(dto));
+
+		facade.seleccionarPersona(persona);
+
+		expect(store.correoInput()).toBe('foo@bar.com');
+		expect(api.obtenerDiagnostico).toHaveBeenCalledWith('foo@bar.com');
+		expect(store.dto()).toBe(dto);
+	});
+
+	it('onTypeaheadQuery con error del BE limpia sugerencias y no propaga', () => {
+		vi.useFakeTimers();
+		api.buscarPersonas.mockReturnValueOnce(throwError(() => new Error('500')));
+		store.setSugerencias([makePersona()], 1);
+
+		facade.onTypeaheadQuery('garcia');
+		vi.advanceTimersByTime(400);
+
+		expect(store.sugerencias()).toEqual([]);
+		expect(store.loadingSugerencias()).toBe(false);
+	});
+	// #endregion
 });

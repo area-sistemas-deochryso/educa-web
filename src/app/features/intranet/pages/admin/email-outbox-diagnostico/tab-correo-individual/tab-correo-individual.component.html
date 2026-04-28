@@ -4,9 +4,14 @@
 	[correoConsultado]="vm().correoConsultado"
 	[generatedAt]="vm().generatedAt"
 	[loading]="vm().loading"
+	[sugerencias]="vm().sugerencias"
+	[loadingSugerencias]="vm().loadingSugerencias"
+	[sugerenciasTotal]="vm().sugerenciasTotal"
 	(correoInputChange)="onCorreoInputChange($event)"
 	(buscar)="onBuscar($event)"
 	(limpiar)="onLimpiar()"
+	(typeaheadQuery)="onTypeaheadQuery($event)"
+	(seleccionarPersona)="onSeleccionarPersona($event)"
 />
 <!-- #endregion -->
 

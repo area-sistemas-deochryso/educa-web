@@ -1,21 +1,62 @@
 <app-page-header
 	icon="pi pi-envelope"
 	title="Diagnóstico por correo"
-	[subtitle]="generatedAtLabel() || 'Qué pasó con un destinatario específico'"
+	[subtitle]="generatedAtLabel() || 'Buscá por nombre, apellido, correo o DNI'"
 >
 	<form class="header-actions" (ngSubmit)="onSubmit()">
-		<input
-			type="email"
-			pInputText
-			class="correo-input"
-			placeholder="correo@dominio.com"
-			autocomplete="off"
+		<p-autoComplete
+			class="correo-autocomplete"
 			[ngModel]="correoInput()"
 			name="correo"
-			maxlength="200"
+			[suggestions]="sugerencias()"
+			(completeMethod)="onComplete($event)"
+			(ngModelChange)="onModelChange($event)"
+			(onSelect)="onSelect($event)"
+			placeholder="Apellido, nombre, correo o DNI…"
+			[delay]="300"
+			[minLength]="2"
+			[maxlength]="200"
 			[disabled]="loading()"
-			(ngModelChange)="onInputChange($event)"
-		/>
+			[forceSelection]="false"
+			[showEmptyMessage]="true"
+			emptyMessage="Sin coincidencias"
+			appendTo="body"
+			[panelStyle]="{ minWidth: '420px' }"
+			[inputStyle]="{ width: '100%' }"
+			[style]="{ width: '100%' }"
+			aria-label="Buscar por correo, nombre, apellido o DNI"
+		>
+			<ng-template let-persona pTemplate="item">
+				<div class="suggestion">
+					<div class="suggestion__avatar" [attr.data-tipo]="persona.tipoPersona">
+						<i class="pi pi-user"></i>
+					</div>
+					<div class="suggestion__body">
+						<div class="suggestion__line-1">
+							<span class="suggestion__name">{{ persona.nombreCompleto }}</span>
+							<span class="suggestion__tipo">{{ tipoPersonaLabel(persona.tipoPersona) }}</span>
+						</div>
+						<div class="suggestion__line-2">
+							<i class="pi pi-envelope"></i>
+							<code>{{ persona.correoMasked }}</code>
+							<span class="suggestion__sep">·</span>
+							<span class="suggestion__dni">DNI {{ persona.dniMasked }}</span>
+							<span class="suggestion__sep">·</span>
+							<span class="suggestion__campo">{{ persona.campo }}</span>
+						</div>
+					</div>
+				</div>
+			</ng-template>
+
+			@if (mostrarRefiname()) {
+				<ng-template pTemplate="footer">
+					<div class="suggestion-footer">
+						<i class="pi pi-info-circle"></i>
+						Mostrando los primeros 10 — refiná tu búsqueda para ver más.
+					</div>
+				</ng-template>
+			}
+		</p-autoComplete>
 
 		<button
 			type="submit"
@@ -24,6 +65,7 @@
 			icon="pi pi-search"
 			class="p-button-success p-button-sm"
 			[disabled]="loading() || !correoInput().trim()"
+			[pt]="{ root: { 'aria-label': 'Buscar diagnóstico' } }"
 		></button>
 
 		@if (correoConsultado()) {

@@ -4,7 +4,10 @@ import { Observable } from 'rxjs';
 
 import { environment } from '@config/environment';
 
-import { EmailDiagnosticoDto } from '../models/correo-individual.models';
+import {
+	BuscarPersonasResponseDto,
+	EmailDiagnosticoDto,
+} from '../models/correo-individual.models';
 
 @Injectable({ providedIn: 'root' })
 export class CorreoIndividualService {
@@ -20,6 +23,16 @@ export class CorreoIndividualService {
 		return this.http.get<EmailDiagnosticoDto>(`${this.baseUrl}/diagnostico`, {
 			params,
 		});
+	}
+
+	// * Plan 36 Chat 4b — typeahead: busca personas por correo, nombre, apellidos o DNI.
+	// * Cap 10 resultados (BE), min 2 chars, max 100.
+	buscarPersonas(q: string): Observable<BuscarPersonasResponseDto> {
+		const params = new HttpParams().set('q', q);
+		return this.http.get<BuscarPersonasResponseDto>(
+			`${this.baseUrl}/diagnostico/buscar-personas`,
+			{ params },
+		);
 	}
 	// #endregion
 }

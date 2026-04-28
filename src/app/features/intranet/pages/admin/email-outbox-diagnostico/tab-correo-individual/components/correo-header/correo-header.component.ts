@@ -1,16 +1,25 @@
 import { ChangeDetectionStrategy, Component, computed, inject, input, output } from '@angular/core';
 import { FormsModule } from '@angular/forms';
+import { AutoCompleteCompleteEvent, AutoCompleteModule, AutoCompleteSelectEvent } from 'primeng/autocomplete';
 import { ButtonModule } from 'primeng/button';
-import { InputTextModule } from 'primeng/inputtext';
 import { TooltipModule } from 'primeng/tooltip';
 
 import { ErrorHandlerService } from '@core/services/error/error-handler.service';
 import { PageHeaderComponent } from '@intranet-shared/components/page-header';
 
+import { PersonaConCorreoDto, TipoPersona } from '../../models/correo-individual.models';
+
+const TIPO_PERSONA_LABEL: Record<TipoPersona, string> = {
+	E: 'Estudiante',
+	P: 'Profesor',
+	D: 'Director',
+	APO: 'Apoderado',
+};
+
 @Component({
 	selector: 'app-correo-header',
 	standalone: true,
-	imports: [FormsModule, ButtonModule, InputTextModule, TooltipModule, PageHeaderComponent],
+	imports: [FormsModule, AutoCompleteModule, ButtonModule, TooltipModule, PageHeaderComponent],
 	templateUrl: './correo-header.component.html',
 	styleUrl: './correo-header.component.scss',
 	changeDetection: ChangeDetectionStrategy.OnPush,
@@ -23,10 +32,15 @@ export class CorreoHeaderComponent {
 	readonly correoConsultado = input<string | null>(null);
 	readonly generatedAt = input<string | null>(null);
 	readonly loading = input<boolean>(false);
+	readonly sugerencias = input<readonly PersonaConCorreoDto[]>([]);
+	readonly loadingSugerencias = input<boolean>(false);
+	readonly sugerenciasTotal = input<number>(0);
 
 	readonly correoInputChange = output<string>();
 	readonly buscar = output<string>();
 	readonly limpiar = output<void>();
+	readonly typeaheadQuery = output<string>();
+	readonly seleccionarPersona = output<PersonaConCorreoDto>();
 	// #endregion
 
 	// #region Computed
@@ -52,16 +66,38 @@ export class CorreoHeaderComponent {
 		const input = (this.correoInput() ?? '').trim().toLowerCase();
 		return !!consultado && consultado !== input;
 	});
+
+	readonly mostrarRefiname = computed(() => this.sugerenciasTotal() >= 10);
 	// #endregion
 
-	// #region Handlers
-	onInputChange(value: string): void {
-		this.correoInputChange.emit(value);
+	// #region Handlers — typeahead
+	// * El input del p-autoComplete acepta string libre o PersonaConCorreoDto al seleccionar.
+	// * Mantenemos en el ngModel un string siempre — al seleccionar emitimos via (onSelect).
+	onComplete(event: AutoCompleteCompleteEvent): void {
+		this.typeaheadQuery.emit(event.query ?? '');
 	}
 
+	onModelChange(value: string | PersonaConCorreoDto): void {
+		// * PrimeNG llama (ngModelChange) con el string mientras tipeás y con el objeto al seleccionar.
+		// * El (onSelect) handler ya emite seleccionarPersona, así que acá solo nos importa el string.
+		if (typeof value === 'string') {
+			this.correoInputChange.emit(value);
+		}
+	}
+
+	onSelect(event: AutoCompleteSelectEvent): void {
+		const persona = event.value as PersonaConCorreoDto;
+		this.seleccionarPersona.emit(persona);
+	}
+	// #endregion
+
+	// #region Handlers — submit / limpiar
 	onSubmit(): void {
 		if (this.loading()) return;
-		this.buscar.emit(this.correoInput() ?? '');
+		const valor = this.correoInput() ?? '';
+		const trimmed = valor.trim();
+		if (!trimmed) return;
+		this.buscar.emit(trimmed);
 	}
 
 	onLimpiar(): void {
@@ -86,6 +122,10 @@ export class CorreoHeaderComponent {
 	// #endregion
 
 	// #region Helpers
+	tipoPersonaLabel(tipo: TipoPersona): string {
+		return TIPO_PERSONA_LABEL[tipo] ?? tipo;
+	}
+
 	private minutesSince(iso: string): number | null {
 		const parsed = new Date(iso);
 		if (Number.isNaN(parsed.getTime())) return null;
