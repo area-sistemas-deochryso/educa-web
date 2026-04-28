@@ -1,5 +1,59 @@
 > **Repo destino**: `Educa.API` (backend, branch `master`). Abrir el chat nuevo en este repo.
-> **Plan**: 31 · **Chat**: 2 · **Fase**: F2.BE · **Estado**: ⏳ pendiente arrancar.
+> **Plan**: 31 · **Chat**: 2a · **Fase**: F2.BE · **Estado**: 🟡 retomado para implementar.
+> **Validación prod 2026-04-28**: ❌ negativa — `BounceParserProcessed` vacía + carpeta IMAP `Processed/` no existe en `sistemas6@` + Hangfire 401.
+> **Root cause encontrado**: el brief estaba mal-routeado a `awaiting-prod/` — el Chat 2 **nunca se implementó**. Solo el Chat 1 foundation (`c46dfa0` con `BounceParserConstants` + header `X-Educa-Outbox-Id` + tabla `BounceParserProcessed`) está en `master`.
+> **Bloquea**: Plan 37 Chat 1 (066), Plan 37 Chat 2 (067), Plan 37 Chat 3 (068).
+
+---
+
+## SCOPE NARROWED 2026-04-28 — Split en Chat 2a (este 038) + Chat 2b (069)
+
+Decisión del usuario tras descubrir que el Chat 2 nunca se implementó: **partir en 2 chats** (Opción B del menú `/go`). Razón: el Chat 2 entero es ~8 archivos C# nuevos + tabla DbSet + tests + cambio Hangfire + IMAP config. Sub-dividirlo permite commits atómicos, validación local antes del deployment, y desbloquea el Plan 37 progresivamente.
+
+### Chat 2a (este brief, 038) — TODO menos el wiring final
+
+**Incluye** (testeable end-to-end con stub IMAP, sin tocar prod):
+
+- `BounceParserSettings` sub-config (modelo + binding desde `Email:BounceParser`)
+- `BounceParserProcessed` model + DbSet + Fluent API en `ApplicationDbContext`
+- `Ndr3464Parser` puro (input `MimeMessage`, output `NdrParsedResult`)
+- `BounceCorrelator` con las 3 estrategias (header / message-id stub / fallback window)
+- `IImapMailClient` wrapper interface + implementación `MailKitImapMailClient` (Opción A del brief original — desbloquea testabilidad completa)
+- `IBounceParserService` interface + `BounceParserService.cs` orquestador + `BounceParserService.Imap.cs` partial (consumen `IImapMailClient`, no `ImapClient` directo)
+- DI: registrar todos los servicios anteriores como `Scoped`
+- Los 14 tests del checklist (todos ejecutables con stub del wrapper)
+
+**Excluye** (queda para Chat 2b / 069):
+
+- `BounceParserJob.cs` (wrapper Hangfire)
+- Modificación de `HangfireExtensions.cs` (registro `RecurringJob.AddOrUpdate`)
+- Modificación de `HangfireJobs.cs` constant `BounceParser = "bounce-parser-imap"`
+- Configuración real de credenciales IMAP de los 7 buzones en App Service settings
+- Decisión sobre creación automática de carpeta `Processed/` vs creación manual desde Roundcube
+- Smoke prod (hangfire dashboard, primera fila en `BounceParserProcessed`, NDR movido)
+
+### Validación pendiente del header (originalmente CRÍTICA, ya resuelta)
+
+Commit `61a1ebf chore(briefs): close 037 — X-Educa-Outbox-Id header validated in prod` (2026-04-28 en `educa-web main`) confirma que el header `X-Educa-Outbox-Id` se preserva en envíos post-deploy del Chat 1. **No requiere re-verificación** — la estrategia 1 del correlator es viable.
+
+### Criterios de cierre del Chat 2a (override sobre la sección original)
+
+```
+[ ] BounceParserSettings sub-config + bind a Email:BounceParser
+[ ] BounceParserProcessed model + DbSet + Fluent API
+[ ] Ndr3464Parser puro (multipart/report + heurística subject + extracción header)
+[ ] BounceCorrelator 3 estrategias
+[ ] IImapMailClient wrapper interface + MailKitImapMailClient impl
+[ ] IBounceParserService + BounceParserService + .Imap.cs partial (consume wrapper)
+[ ] DI: Scoped registrations (sin BounceParserJob, sin HangfireExtensions)
+[ ] 14 tests verdes con stub del wrapper
+[ ] Tests existentes baseline ≥ 1336 BE intactos
+[ ] dotnet build sin warnings nuevos · dotnet test verde
+[ ] Cap 300 ln respetado en cada .cs
+[ ] Logs con email enmascarado (EmailHelper.Mask)
+→ NO toca Hangfire, NO toca App Service settings, NO smoke prod
+→ Pasa a awaiting-prod SOLO cuando 069 cierre exitoso
+```
 
 ---
 
