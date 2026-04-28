@@ -32,7 +32,7 @@ export class CorreoHeaderComponent {
 	readonly correoConsultado = input<string | null>(null);
 	readonly generatedAt = input<string | null>(null);
 	readonly loading = input<boolean>(false);
-	readonly sugerencias = input<readonly PersonaConCorreoDto[]>([]);
+	readonly sugerencias = input<PersonaConCorreoDto[]>([]);
 	readonly loadingSugerencias = input<boolean>(false);
 	readonly sugerenciasTotal = input<number>(0);
 
