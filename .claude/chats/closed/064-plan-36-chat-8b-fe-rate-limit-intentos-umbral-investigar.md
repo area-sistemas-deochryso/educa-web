@@ -104,3 +104,17 @@ Sí — verificar en prod con un 429 real (ya hay tráfico que los genera, o for
 - 064 NO entrega fix FE — el FE está correcto.
 - Derivar **Chat 8c BE** en `Educa.API` con scope: persistir tokens/limite en rechazos (cambios en `RateLimitingExtensions.cs` + `RateLimitTelemetryService.cs` + `RateLimitTelemetryMiddleware.cs`).
 - 064 → `waiting/` hasta que 8c BE deployee. Luego volver, validar columna con datos reales en prod, cerrar 063 + 064 juntos.
+
+---
+
+## CIERRE — ABSORBIDO POR 065 (2026-04-28)
+
+Causa raíz fixeada por **chat 065 BE** (`Educa.API master 5165b62`, deployado 2026-04-28). Validación end-to-end ejecutada el mismo día con un 429 real en `POST /api/Auth/login` desde DevTools de prod:
+
+- **BD**: 5 filas `RateLimitEvent` con `REL_FueRechazado=1`, `REL_LimiteEfectivo=30`, `REL_TokensConsumidos=30` — confirma persistencia.
+- **UI** (`/intranet/admin/monitoreo/seguridad/rate-limit`): columna `INTENTOS / UMBRAL` muestra `30 / 30` por fila (ya no `— / —`).
+- **Cards**: `45 total / 45 rechazados / Top rol Director / Top endpoint /api/Auth/login (40 eventos)` — todo poblado.
+
+Hallazgo lateral: en prod `loginLimit = 30` (no `60` como default del code) — hay un override por App Configuration. El stash captura el `PermitLimit` real de runtime, no el hardcoded — invariante respetado.
+
+**064 nunca generó código** (fue investigación pura). Se cierra como "absorbido por 065" para mantener trazabilidad.

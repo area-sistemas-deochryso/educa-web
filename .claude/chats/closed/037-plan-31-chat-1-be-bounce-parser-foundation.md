@@ -291,3 +291,26 @@ Pedir feedback del usuario sobre:
 2. **Manejo de tests legacy del handler** — si encontraste 5+ tests usando `HandleAsync`, ¿alias `[Obsolete]` o cambio masivo?
 3. **Verificación manual del header en Roundcube** — confirmar que el usuario lo verificó post-deploy (importante para validar que cPanel/Exim no strippea el header — premisa del Chat 2).
 4. **Tiempo entre Chat 1 y Chat 2** — recomendar al usuario esperar 24-48h entre deploys para acumular correos en producción con el header inyectado, así Chat 2 tiene NDRs reales con `X-Educa-Outbox-Id` para validar el correlator.
+
+---
+
+## VALIDACIÓN POST-DEPLOY (2026-04-28)
+
+✅ **Header `X-Educa-Outbox-Id` confirmado en prod**. Sample real verificado en Roundcube (`Sent` folder de `sistemas@laazulitasac.com`):
+
+```
+From: Sistemas Educa <sistemas@laazulitasac.com>
+Date: Tue, 28 Apr 2026 09:03:02 -0500
+Subject: Registro de Entrada - RODRIGO DIAZ JHORDAN
+Message-Id: <9Y3A2Y0M4TU4.DBIH9CL1U4RC@webwk00000d>
+To: rosmeryrodrigodiaz@gmail.com
+X-Educa-Outbox-Id: 3617
+MIME-Version: 1.0
+```
+
+**Confirma**:
+- cPanel/Exim NO strippea el header (premisa crítica del Chat 2 ✅).
+- `EmailService.BuildMimeMessage` inyecta correctamente cuando el worker pasa `OutboxId`.
+- El valor (`3617`) es un `EO_CodID` real → habilita correlación O(1) en el parser IMAP del Chat 2 sin caer al fallback de ventana temporal.
+
+**Plan 31 Chat 2 desbloqueado** — listo para arrancar.
