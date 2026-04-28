@@ -56,6 +56,7 @@ export class RateLimitEventsComponent implements OnInit {
 		{ width: '70px', cellType: 'badge' },
 		{ width: 'flex', cellType: 'text' },
 		{ width: '100px', cellType: 'badge' },
+		{ width: '90px', cellType: 'text' },
 		{ width: '110px', cellType: 'badge' },
 		{ width: '90px', cellType: 'text' },
 		{ width: '90px', cellType: 'badge' },

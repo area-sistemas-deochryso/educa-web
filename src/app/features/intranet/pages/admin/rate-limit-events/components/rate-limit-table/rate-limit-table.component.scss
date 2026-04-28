@@ -39,6 +39,20 @@
 	font-size: 0.8rem;
 }
 
+.col-consumo {
+	white-space: nowrap;
+	text-align: center;
+
+	.consumo-text {
+		font-size: 0.8rem;
+
+		&--exceeded {
+			color: var(--red-600);
+			font-weight: 600;
+		}
+	}
+}
+
 .mono {
 	font-family: ui-monospace, monospace;
 	font-size: 0.8rem;

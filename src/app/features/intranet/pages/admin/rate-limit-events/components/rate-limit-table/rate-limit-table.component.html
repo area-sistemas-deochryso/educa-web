@@ -14,6 +14,13 @@
 			<th class="label-uppercase col-method">Método</th>
 			<th class="label-uppercase">Endpoint</th>
 			<th class="label-uppercase col-policy">Policy</th>
+			<th
+				class="label-uppercase col-consumo"
+				pTooltip="Intentos consumidos / umbral del policy en su ventana"
+				tooltipPosition="top"
+			>
+				Intentos / Umbral
+			</th>
 			<th class="label-uppercase col-rol">Rol</th>
 			<th class="label-uppercase col-dni">DNI</th>
 			<th class="label-uppercase col-rechazado">Rechazado</th>
@@ -36,6 +43,22 @@
 			</td>
 			<td class="col-policy">
 				<p-tag [value]="displayPolicy(item.policy)" styleClass="tag-neutral" />
+			</td>
+			<td class="col-consumo">
+				@if (item.tokensConsumidos !== null || item.limiteEfectivo !== null) {
+					<span
+						class="consumo-text mono"
+						[class.consumo-text--exceeded]="
+							item.tokensConsumidos !== null &&
+							item.limiteEfectivo !== null &&
+							item.tokensConsumidos >= item.limiteEfectivo
+						"
+					>
+						{{ item.tokensConsumidos ?? '—' }} / {{ item.limiteEfectivo ?? '—' }}
+					</span>
+				} @else {
+					<span class="muted">—</span>
+				}
 			</td>
 			<td class="col-rol">
 				@if (item.usuarioRol) {
@@ -76,7 +99,7 @@
 
 	<ng-template #emptymessage>
 		<tr>
-			<td colspan="10" class="empty-message">
+			<td colspan="11" class="empty-message">
 				<i class="pi pi-shield"></i>
 				<span>No se encontraron eventos de rate limiting</span>
 				<small>Los eventos aparecen cuando se rechazan requests con 429</small>

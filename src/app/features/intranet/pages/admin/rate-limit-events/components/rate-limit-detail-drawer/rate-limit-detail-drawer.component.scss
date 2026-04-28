@@ -109,6 +109,11 @@
 		font-family: ui-monospace, monospace;
 		font-size: 0.8rem;
 	}
+
+	.consumo-exceeded {
+		color: var(--red-600);
+		font-weight: 600;
+	}
 }
 
 .correlation-block {
