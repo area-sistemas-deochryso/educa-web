@@ -1,6 +1,15 @@
 {
   "$schema": "https://json.schemastore.org/claude-code-settings.json",
   "permissions": {
+    "deny": [
+      "Read(./node_modules/**)",
+      "Read(./dist/**)",
+      "Read(./.angular/**)",
+      "Read(./.netlify/**)",
+      "Read(./coverage/**)",
+      "Read(./android/**)",
+      "Read(./ios/**)"
+    ],
     "allow": [
       "Bash(node --version:*)",
       "Bash(git status:*)",
@@ -9,7 +18,25 @@
       "Bash(git mv .claude/chats/**)",
       "Bash(mkdir -p .claude/**)",
       "Bash(bash .claude/hooks/backlog-check.sh:*)",
-      "Bash(bash .claude/scripts/progress.sh:*)"
+      "Bash(bash .claude/scripts/progress.sh:*)",
+      "Bash(dotnet build:*)",
+      "Bash(dotnet add:*)",
+      "Bash(dotnet ef:*)",
+      "Bash(dotnet tool install:*)",
+      "Bash(dotnet user-secrets:*)",
+      "Bash(dotnet user-secrets set:*)",
+      "Bash(dotnet restore:*)",
+      "Bash(dotnet test:*)",
+      "Bash(npm run convert-images:*)",
+      "WebFetch(domain:www.anviz.com)",
+      "WebFetch(domain:community.anviz.com)",
+      "WebFetch(domain:panel.inkani.com)",
+      "Read(//c/Users/Asus Ryzen 9/EducaWeb/Educa.API/Educa.API/Controllers/**)",
+      "Read(//c/Users/Asus Ryzen 9/EducaWeb/Educa.API/Educa.API/DTOs/**)"
+    ],
+    "additionalDirectories": [
+      "c:\\Users\\Asus Ryzen 9\\EducaWeb\\Educa.API\\Educa.API\\Controllers\\Sistema",
+      "c:\\Users\\Asus Ryzen 9\\EducaWeb\\Educa.API\\Educa.API\\DTOs"
     ]
   },
   "hooks": {

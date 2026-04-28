@@ -1,6 +1,6 @@
 > **Repo destino**: `Educa.API` (backend, branch `master`). Abrir el chat en este repo.
 > **Plan**: 36 · **Chat**: 4b · **Fase**: F4.BE (`/design + /execute`) · **Creado**: 2026-04-27 · **Estado**: 🟢 cerrado local 2026-04-28 (awaiting-prod) · **Bloquea**: Chat 4 FE (059).
-> **Validación prod**: ⏳ pendiente desde 2026-04-28 — el FE Chat 4 (059) consume `GET /api/sistema/email-outbox/diagnostico/buscar-personas?q=` y necesita el endpoint deployado + smoke test antes de arrancar.
+> **Validación prod**: ✅ verificada 2026-04-28
 
 ---
 
