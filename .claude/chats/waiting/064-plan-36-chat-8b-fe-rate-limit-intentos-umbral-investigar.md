@@ -64,3 +64,43 @@ Sí — verificar en prod con un 429 real (ya hay tráfico que los genera, o for
 063 sigue en `awaiting-prod/` con la columna implementada pero datos vacíos. Cuando 064 entregue el fix, decidir:
 - Si 063 + 064 deployan juntos → `/verify 063` ✅ tras verificar que la columna ya muestra datos reales en prod post-fix.
 - Si 064 reemplaza el scope de 063 → cerrar 063 con nota "absorbido por 064".
+
+---
+
+## INVESTIGACIÓN — HALLAZGOS (2026-04-28)
+
+**Reproducción**: no fue necesaria; causa raíz visible por inspección de código. BE y FE state cleanos en `main`/`master`.
+
+### Hipótesis evaluadas
+
+| # | Hipótesis | Estado |
+|---|-----------|--------|
+| 1 | BE no devuelve `intentos`/`umbral` en DTO | ❌ Descartada — `RateLimitEventListaDto.cs` tiene `LimiteEfectivo` (int?) y `TokensConsumidos` (int?) |
+| 2 | FE no lee los campos | ❌ Descartada — `models/rate-limit-event.models.ts` los mapea bien; tabla y drawer renderizan `tokensConsumidos ?? '—' / limiteEfectivo ?? '—'` |
+| 3 | BE persiste `null` en eventos | ✅ **CONFIRMADA — causa raíz** |
+| 4 | Banner inconsistente con tabla | ⚠️ Parcial — facade ya separa stats vs listar (stats solo loggea, listar setea error). El banner queda pegado tras un refresh fallido (429 propio). Issue secundario, no bloqueante |
+| 5 | Polling autoinducido del 429 | ⚠️ No descartada — no hay polling en `facade.loadData()`, pero 429 visible en screenshot sugiere refresh manual repetido del usuario |
+
+### Causa raíz (Hipótesis 3)
+
+`Educa.API/Services/Sistema/RateLimitTelemetryService.cs:38-59` — `LogRejectedAsync` **NO recibe ni persiste** `LimiteEfectivo` ni `TokensConsumidos`. Solo `LogEarlyWarningAsync` (línea 61-91) los setea, y este se llama solo cuando ya hubo >=80% antes del rechazo (FueRechazado=false). En prod, los eventos visibles son **rechazos** (429) → `REL_LimiteEfectivo = NULL` y `REL_TokensConsumidos = NULL` en BD → DTO devuelve null → FE renderiza `— / —`. Comportamiento del FE es **correcto**.
+
+`Educa.API/Middleware/RateLimitTelemetryMiddleware.cs` (consumer del servicio) tampoco tiene acceso a las stats del partition rejecter en el momento del 429 — habría que reorganizar para usar el callback `OnRejected` de `RateLimiterOptions` en `RateLimitingExtensions.cs`, donde `OnRejectedContext.Lease` y `RateLimitPartition.GetStatistics()` exponen `CurrentAvailablePermits`.
+
+### Fix requerido (BE — fuera del scope FE)
+
+1. En `RateLimitingExtensions.cs`, agregar `OnRejected` global (o por policy) que extraiga el límite efectivo y los tokens consumidos del `RateLimiter` correspondiente.
+2. Pasar esos valores al middleware vía `HttpContext.Items` o exponer un servicio que los emita.
+3. `LogRejectedAsync` extender firma con `int? limiteEfectivo, int? tokensConsumidos` y persistirlos.
+4. Validar con un 429 real que la columna muestra valores reales.
+
+### Issues secundarios FE (registrar pero no fixear ahora)
+
+- **Banner pegado**: si listar falla (429 propio), `setError` queda hasta próxima carga exitosa. Mejora futura: limpiar `error` también en `loadStats` exitoso o agregar timeout. No bloqueante para 064.
+- **Cards=0 con tabla poblada**: stats filtra últimas 24h, listar trae take=200 sin filtro temporal. Si los eventos visibles son >24h, son consistentes pero confusos. Mejora futura: alinear ventana o documentar en tooltip de cards.
+
+### Decisión
+
+- 064 NO entrega fix FE — el FE está correcto.
+- Derivar **Chat 8c BE** en `Educa.API` con scope: persistir tokens/limite en rechazos (cambios en `RateLimitingExtensions.cs` + `RateLimitTelemetryService.cs` + `RateLimitTelemetryMiddleware.cs`).
+- 064 → `waiting/` hasta que 8c BE deployee. Luego volver, validar columna con datos reales en prod, cerrar 063 + 064 juntos.
