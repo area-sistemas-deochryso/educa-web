@@ -24,26 +24,56 @@
 
 	<!-- #region Stats -->
 	@if (vm().statsReady && vm().estadisticas; as stats) {
-		<section class="stats-grid">
+		<section class="stats-section">
 			<div class="stat-card">
-				<div class="stat-label">Total</div>
-				<div class="stat-value">{{ stats.total }}</div>
+				<div class="stat-content">
+					<span class="stat-label">Total</span>
+					<span class="stat-value">{{ stats.total }}</span>
+					<span class="stat-sublabel">reportes recibidos</span>
+				</div>
+				<div class="stat-icon">
+					<i class="pi pi-inbox"></i>
+				</div>
 			</div>
 			<div class="stat-card stat-new">
-				<div class="stat-label">Nuevos</div>
-				<div class="stat-value">{{ stats.nuevos }}</div>
+				<div class="stat-content">
+					<span class="stat-label">Nuevos</span>
+					<span class="stat-value">{{ stats.nuevos }}</span>
+					<span class="stat-sublabel">sin revisar</span>
+				</div>
+				<div class="stat-icon">
+					<i class="pi pi-flag"></i>
+				</div>
 			</div>
 			<div class="stat-card stat-progress">
-				<div class="stat-label">En progreso</div>
-				<div class="stat-value">{{ stats.enProgreso }}</div>
+				<div class="stat-content">
+					<span class="stat-label">En progreso</span>
+					<span class="stat-value">{{ stats.enProgreso }}</span>
+					<span class="stat-sublabel">en atención</span>
+				</div>
+				<div class="stat-icon">
+					<i class="pi pi-clock"></i>
+				</div>
 			</div>
 			<div class="stat-card stat-resolved">
-				<div class="stat-label">Resueltos</div>
-				<div class="stat-value">{{ stats.resueltos }}</div>
+				<div class="stat-content">
+					<span class="stat-label">Resueltos</span>
+					<span class="stat-value">{{ stats.resueltos }}</span>
+					<span class="stat-sublabel">cerrados con fix</span>
+				</div>
+				<div class="stat-icon">
+					<i class="pi pi-check-circle"></i>
+				</div>
 			</div>
 			<div class="stat-card stat-discarded">
-				<div class="stat-label">Descartados</div>
-				<div class="stat-value">{{ stats.descartados }}</div>
+				<div class="stat-content">
+					<span class="stat-label">Descartados</span>
+					<span class="stat-value">{{ stats.descartados }}</span>
+					<span class="stat-sublabel">no aplica</span>
+				</div>
+				<div class="stat-icon">
+					<i class="pi pi-times-circle"></i>
+				</div>
 			</div>
 		</section>
 	}

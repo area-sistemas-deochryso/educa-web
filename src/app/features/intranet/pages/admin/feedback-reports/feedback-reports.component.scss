@@ -29,39 +29,83 @@
 }
 // #endregion
 
-// #region Stats
-.stats-grid {
+// #region Stats — patrón B3 (design-system §B3)
+.stats-section {
 	display: grid;
-	grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-	gap: 0.875rem;
+	grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+	gap: 1rem;
+
+	.stat-card {
+		display: flex;
+		align-items: center;
+		justify-content: space-between;
+		padding: 1.25rem;
+		border: 1px solid var(--surface-300);
+		border-radius: 12px;
+
+		.stat-content {
+			display: flex;
+			flex-direction: column;
+			gap: 0.25rem;
+
+			.stat-label {
+				font-size: 0.85rem;
+				color: var(--text-color-secondary);
+				font-weight: 500;
+			}
+
+			.stat-value {
+				font-size: 1.75rem;
+				font-weight: 700;
+				color: var(--text-color);
+			}
+
+			.stat-sublabel {
+				font-size: 0.75rem;
+				color: var(--text-color-secondary);
+			}
+		}
+
+		.stat-icon {
+			width: 48px;
+			height: 48px;
+			display: flex;
+			align-items: center;
+			justify-content: center;
+			border-radius: 12px;
+			background: var(--surface-200);
+
+			i {
+				font-size: 1.25rem;
+				color: var(--text-color);
+			}
+		}
+
+		// Variantes semánticas: solo border-left + color de icono (no background)
+		&.stat-new {
+			border-left: 4px solid var(--blue-800);
+			.stat-icon i { color: var(--blue-800); }
+		}
+		&.stat-progress {
+			border-left: 4px solid var(--yellow-700);
+			.stat-icon i { color: var(--yellow-700); }
+		}
+		&.stat-resolved {
+			border-left: 4px solid var(--green-600);
+			.stat-icon i { color: var(--green-600); }
+		}
+		&.stat-discarded {
+			border-left: 4px solid var(--surface-500);
+			.stat-icon i { color: var(--text-color-secondary); }
+		}
+	}
 }
 
-.stat-card {
-	background: var(--surface-card, #ffffff);
-	border: 1px solid var(--surface-200);
-	border-radius: 12px;
-	padding: 1rem 1.125rem;
-	display: flex;
-	flex-direction: column;
-	gap: 0.25rem;
-
-	.stat-label {
-		font-size: 0.75rem;
-		text-transform: uppercase;
-		letter-spacing: 0.05em;
-		color: var(--text-color-secondary);
-	}
-
-	.stat-value {
-		font-size: 1.75rem;
-		font-weight: 700;
-		color: var(--text-color);
-	}
-
-	&.stat-new { border-left: 4px solid var(--blue-800); }
-	&.stat-progress { border-left: 4px solid #d97706; }
-	&.stat-resolved { border-left: 4px solid #16a34a; }
-	&.stat-discarded { border-left: 4px solid #64748b; }
+@media (max-width: 768px) {
+	.stats-section { grid-template-columns: 1fr 1fr; }
+}
+@media (max-width: 480px) {
+	.stats-section { grid-template-columns: 1fr; }
 }
 // #endregion
 
