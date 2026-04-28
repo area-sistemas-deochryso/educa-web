@@ -1,18 +1,27 @@
-# Modo: Investigar
+---
+description: Modo Investigar — explorar y juntar hechos del código sin modificar nada.
+---
 
-Entender sin tocar. Este chat es de investigación.
+# /investigate (override de educa-web)
 
-## Reglas del modo
+> Política universal: ver `~/.claude/commands/investigate.md`.
 
-- **SÍ**: Leer código, trazar flujos, mapear dependencias, responder preguntas
-- **NO**: Editar archivos, crear archivos, proponer cambios no solicitados
+## Específico de educa-web
 
-## Al iniciar
+### Documentación local relevante
 
-1. Confirmar qué necesito entender (módulo, flujo, impacto)
-2. Investigar leyendo código y buscando dependencias
-3. Responder con explicación, diagrama o mapa según corresponda
+- Estructura del FE: [../docs/](../docs/) (si existe).
+- Plan maestro y planes activos: [../plan/maestro.md](../plan/maestro.md).
+- Skills internas (incluye `commit`, etc.): [../skills/](../skills/).
 
-## Entregable
+### Cross-repo (FE ↔ BE)
 
-Explicación clara. Sin archivos tocados.
+Investigaciones que cruzan los dos repos (`educa-web` frontend + `Educa.API` backend):
+
+- Si la query incluye un endpoint, leer **el controller del BE** además del servicio del FE — `educa-web/src/...` solo cuenta cómo se consume.
+- Convenciones BE: sufijos `*Controller.cs` / `*Service.cs` / `*Repository.cs`. Reglas INV-* viven en `Educa.API/.claude/rules/` (si están).
+- Reportar cuál de los 2 repos contiene el código para que el chat siguiente abra el correcto.
+
+### Invariantes nominados
+
+`INV-*` en el BE — antes de inferir comportamiento, buscar la regla del invariante. La violación silenciosa es el caso típico que `/investigate` debe encontrar.

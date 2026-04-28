@@ -1,23 +1,37 @@
-# Modo: Diseñar
+---
+description: Modo Diseñar — proponer enfoque/arquitectura y dejarlo escrito antes de ejecutar.
+---
 
-Decidir qué construir y cómo. Sin escribir código de implementación.
+# /design (override de educa-web)
 
-## Reglas del modo
+> Política universal: ver `~/.claude/commands/design.md`.
 
-- **SÍ**: Proponer estructura, listar archivos a crear/modificar, identificar invariantes (INV-*), crear/actualizar plan o task
-- **NO**: Escribir código de implementación, crear archivos de código, ejecutar lint/build/test, asumir decisiones sin validar
+## Específico de educa-web
 
-## Al iniciar
+### Plan files
 
-1. Confirmar el objetivo del cambio
-2. Identificar qué invariantes y reglas de negocio aplican
-3. Proponer estructura con archivos, decisiones de arquitectura y dependencias
-4. Validar con el usuario antes de considerar cerrado
+Ubicación: [../plan/](../plan/) (singular). Cada plan numerado (`plan-NN.md` o equivalente). Sub-maestro de cada plan opcional. El maestro vive en [../plan/maestro.md](../plan/maestro.md) — contiene foco actual + cola "📋 Próximos chats".
 
-## Entregable
+### Invariantes nominados (INV-*)
 
-Plan concreto: archivos a tocar, decisiones tomadas, dependencias, estimado de chats de ejecución.
+Cuando el diseño toca código del BE, **enumerar los INV-*** que aplican y dejar explícito cómo el plan los respeta. Algunos típicos:
 
-## Regla clave
+- Convenciones de naming: `*Controller.cs`, `*Service.cs`, `*Repository.cs`.
+- Lectura: usar `AsNoTracking()` en queries que no mutan.
+- Background work: fire-and-forget para tareas async no críticas.
+- Cap 300 ln por archivo.
 
-Este modo es **obligatorio** antes de Ejecutar cuando la tarea toca 3+ archivos o implica decisiones de arquitectura. Si el usuario pide ejecutar directamente algo complejo, sugerir diseñar primero.
+Si un INV-* nuevo emerge del diseño, agregarlo a las rules del BE (en `Educa.API/.claude/rules/` si existe) en el mismo plan, no en otro chat.
+
+### Cross-repo
+
+Si el diseño abarca FE+BE, listar **los dos repos** en el alcance:
+
+- FE: archivos en `educa-web/src/...` con líneas estimadas.
+- BE: archivos en `Educa.API/...` con líneas estimadas.
+
+Indicar **orden de implementación** (típicamente BE primero, FE después).
+
+### Reglas duras
+
+- [../rules/code-style.md](../rules/code-style.md), [../rules/code-language.md](../rules/code-language.md), [../rules/comments.md](../rules/comments.md) — convenciones del proyecto.
