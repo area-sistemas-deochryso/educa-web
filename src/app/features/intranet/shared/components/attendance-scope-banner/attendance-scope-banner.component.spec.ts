@@ -24,10 +24,11 @@ describe('AttendanceScopeBannerComponent', () => {
 		expect(fixture.componentInstance).toBeTruthy();
 	});
 
-	it('renderiza "5to Primaria" y referencia al invariante INV-C11', () => {
+	it('renderiza el filtro temporal y menciona "5to Primaria en adelante"', () => {
 		const text = (fixture.nativeElement as HTMLElement).textContent ?? '';
-		expect(text).toContain('5to Primaria');
-		expect(text).toContain('INV-C11');
+		expect(text).toContain('Filtro temporal activo');
+		expect(text).toContain('5to Primaria en adelante');
+		expect(text).toContain('CrossChex');
 	});
 
 	it('a11y: tiene role="note" para lectores de pantalla', () => {
