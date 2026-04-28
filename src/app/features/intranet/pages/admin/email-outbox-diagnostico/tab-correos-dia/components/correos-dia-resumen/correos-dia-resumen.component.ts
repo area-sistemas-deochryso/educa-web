@@ -15,7 +15,8 @@ const GENERAL_CARDS: StatCardDef[] = [
 	{
 		key: 'entradasMarcadas',
 		label: 'Entradas marcadas',
-		sublabel: 'estudiantes en alcance INV-C11',
+		// Universo INV-C11: 5to Primaria en adelante.
+		sublabel: 'estudiantes con biométrico habilitado',
 		icon: 'pi pi-sign-in',
 		variant: 'info',
 	},
@@ -40,7 +41,8 @@ const GAP_CARDS: StatCardDef[] = [
 	{
 		key: 'estudiantesSinCorreoApoderado',
 		label: 'Sin correo apoderado',
-		sublabel: 'EST_CorreoApoderado vacío',
+		// Apunta a EST_CorreoApoderado vacío en BD.
+		sublabel: 'sin correo registrado',
 		icon: 'pi pi-user-minus',
 		variant: 'warning',
 	},
@@ -75,7 +77,8 @@ const GAP_CARDS: StatCardDef[] = [
 	{
 		key: 'estudiantesFueraDeAlcance',
 		label: 'Fuera de alcance',
-		sublabel: 'GRA_Orden < 8 (informativo)',
+		// GRA_Orden < UmbralGradoAsistenciaDiaria — INV-C11.
+		sublabel: 'grados sin biométrico (informativo)',
 		icon: 'pi pi-filter',
 		variant: 'neutral',
 	},

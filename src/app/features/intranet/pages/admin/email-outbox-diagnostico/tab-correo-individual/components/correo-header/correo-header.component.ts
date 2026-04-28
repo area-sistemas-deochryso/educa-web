@@ -8,6 +8,7 @@ import { ErrorHandlerService } from '@core/services/error/error-handler.service'
 import { PageHeaderComponent } from '@intranet-shared/components/page-header';
 
 import { PersonaConCorreoDto, TipoPersona } from '../../models/correo-individual.models';
+import { CampoCorreoLabelPipe } from '../../pipes/campo-correo-label.pipe';
 
 const TIPO_PERSONA_LABEL: Record<TipoPersona, string> = {
 	E: 'Estudiante',
@@ -19,7 +20,14 @@ const TIPO_PERSONA_LABEL: Record<TipoPersona, string> = {
 @Component({
 	selector: 'app-correo-header',
 	standalone: true,
-	imports: [FormsModule, AutoCompleteModule, ButtonModule, TooltipModule, PageHeaderComponent],
+	imports: [
+		FormsModule,
+		AutoCompleteModule,
+		ButtonModule,
+		TooltipModule,
+		PageHeaderComponent,
+		CampoCorreoLabelPipe,
+	],
 	templateUrl: './correo-header.component.html',
 	styleUrl: './correo-header.component.scss',
 	changeDetection: ChangeDetectionStrategy.OnPush,

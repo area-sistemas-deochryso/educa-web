@@ -6,6 +6,7 @@ import {
 	EmailDiagnosticoPersonaAsociada,
 	TipoPersona,
 } from '../../models/correo-individual.models';
+import { CampoCorreoLabelPipe } from '../../pipes/campo-correo-label.pipe';
 import { TipoPersonaLabelPipe } from '../../pipes/tipo-persona-label.pipe';
 
 type Severity = 'secondary' | 'info' | 'success';
@@ -20,7 +21,7 @@ const TIPO_SEVERITY: Record<TipoPersona, Severity> = {
 @Component({
 	selector: 'app-correo-personas-table',
 	standalone: true,
-	imports: [TableModule, TagModule, TipoPersonaLabelPipe],
+	imports: [TableModule, TagModule, CampoCorreoLabelPipe, TipoPersonaLabelPipe],
 	templateUrl: './correo-personas-table.component.html',
 	styleUrl: './correo-personas-table.component.scss',
 	changeDetection: ChangeDetectionStrategy.OnPush,

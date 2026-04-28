@@ -1,10 +1,11 @@
 <section class="table-section" aria-label="Personas asociadas al correo">
 	<header class="section-header">
 		<h3>Personas asociadas</h3>
+		<!-- El correo puede figurar simultáneamente en EST_CorreoApoderado, APO_Correo y PRO_Correo. -->
 		<span class="section-subtitle">
 			Dueño(s) actual(es) del correo — un mismo destinatario puede aparecer en
-			múltiples tablas (p. ej. madre en <code>EST_CorreoApoderado</code> +
-			<code>APO_Correo</code>)
+			múltiples roles (por ejemplo, una madre registrada como apoderada de un
+			hijo y como contacto del estudiante).
 		</span>
 	</header>
 
@@ -14,7 +15,7 @@
 				<th class="label-uppercase col-tipofallo">Tipo</th>
 				<th class="label-uppercase col-dni">DNI</th>
 				<th class="label-uppercase">Nombre</th>
-				<th class="label-uppercase col-razon">Campo</th>
+				<th class="label-uppercase col-razon">Origen</th>
 			</tr>
 		</ng-template>
 		<ng-template #body let-row>
@@ -27,7 +28,7 @@
 				</td>
 				<td class="cell-nombre">{{ row.nombreCompleto }}</td>
 				<td class="col-razon">
-					<code class="cell-campo">{{ row.campo }}</code>
+					<span class="cell-campo">{{ row.campo | campoCorreoLabel }}</span>
 				</td>
 			</tr>
 		</ng-template>

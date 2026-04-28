@@ -53,11 +53,12 @@
 	<!-- #region Body colapsable -->
 	@if (!collapsed()) {
 		@if (showTelemetryWarning()) {
+			<!-- Fallback CRITICAL del service (INV-S07): la telemetría falló pero el envío sigue. -->
 			<div class="defer-fail-widget__telemetry-warning" role="alert">
 				<i class="pi pi-exclamation-triangle"></i>
 				<span>
 					CRITICAL con contadores en 0: probable error interno del backend.
-					Verificar logs del servidor (INV-S07).
+					Verificar logs del servidor.
 				</span>
 			</div>
 		}
