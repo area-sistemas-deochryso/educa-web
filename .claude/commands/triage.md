@@ -1,35 +1,22 @@
-# Modo: Triage (barrido de backlogs)
+# triage (override de educa-web)
 
-**Objetivo**: reportar el estado de los 7 backlogs del proyecto ([rules/backlog-hygiene.md](../rules/backlog-hygiene.md)), marcar items que cruzaron límite o edad crítica, y proponer acción concreta por cada uno. **No ejecuta nada** — decide el usuario.
+> Política universal: ver `~/.claude/commands/triage.md`.
 
-Útil cuando:
+## Buckets de este proyecto (7)
 
-- Un gate en `/next-chat` o `/start-chat` avisó que algo está al límite.
-- Pasaron semanas desde el último barrido y querés ver qué quedó colgado.
-- Antes de planificar próximos chats, para limpiar ruido.
+| Bucket | Límite | Tipo | Edad crítica |
+| --- | ---: | --- | --- |
+| `chats/running/` | 1 | duro | — |
+| `chats/open/` | 5 | blando | >30d |
+| `chats/waiting/` | 3 | blando | >14d |
+| `chats/troubles/` | 2 | blando | >7d |
+| `chats/awaiting-prod/` | 8 | blando | >14d |
+| `tasks/` | 8 | blando | >60d |
+| `plan/maestro.md` cola | 12 | blando | — |
 
-## Qué hago
+Definidos en [rules/backlog-hygiene.md](../rules/backlog-hygiene.md).
 
-Un pase por los 7 buckets, en orden. Para cada uno:
-
-1. **Contar** items actuales.
-2. **Comparar** contra el límite de [backlog-hygiene.md](../rules/backlog-hygiene.md).
-3. **Medir edad** del más viejo (por `> **Creado**: YYYY-MM-DD` del brief, `<!-- created: YYYY-MM-DD -->` en tasks, o fallback al `mtime` del archivo).
-4. **Clasificar** cada item: `OK`, `AL LÍMITE`, `EXCEDIDO`, `VIEJO` (cruzó edad crítica).
-5. **Proponer acción** por item marcado (del menú de [backlog-hygiene.md](../rules/backlog-hygiene.md#acciones-cuando-se-excede-un-límite)).
-
-No mover archivos ni commitear. No decidir. Solo reportar.
-
-## Qué NO hago
-
-- **No ejecuto las acciones** propuestas — eso corresponde a las skills específicas (`/start-chat`, `/end`, edición manual).
-- **No re-priorizo la cola del maestro** — propongo bajar items, no reordenar por mi cuenta.
-- **No abro issues externos** ni toco otros repos.
-- **No regenero briefs**. Si algo está viejo y sigue válido, el usuario actualiza; si no, cierra.
-
-## Output estándar
-
-Un bloque por backlog. Formato compacto, scanable, con acción propuesta por item marcado:
+## Output esperado
 
 ```markdown
 ## 🧹 Triage — YYYY-MM-DD
@@ -59,68 +46,24 @@ Un bloque por backlog. Formato compacto, scanable, con acción propuesta por ite
 ...
 
 ## Resumen
-
-- **M items necesitan acción** (listados arriba con →).
-- **K buckets excedidos** (listados con ⚠️).
+- **M items necesitan acción**, **K buckets excedidos**.
 - Recomendación global: <1 frase>.
 ```
 
-Si todo está OK, el output es corto y termina con:
+## Comandos del lifecycle
 
-```markdown
-## Resumen
-Todos los backlogs dentro de límites y sin items viejos. Nada que triage-ear.
-```
-
-## Flujo típico de uso
-
-1. Usuario invoca `/triage`.
-2. Reporte en pantalla.
-3. Usuario decide acciones (una por una o batch):
-   - "Cerrá el brief `038-...` como abandonado" → edición manual + commit.
-   - "Mové este item del maestro a tasks/" → edición manual.
-   - "`/start-chat 038`" → arranca otro chat.
-4. Nada queda pendiente en este chat.
-
-## Señales para arrancar
-
-| Señal | Disparador |
-| --- | --- |
-| Gate en `/next-chat` o `/start-chat` avisó límite | Automático — el comando sugiere `/triage` primero |
-| >2 semanas desde el último barrido | El usuario se acuerda |
-| Sensación de "tengo muchas cosas a medias" | Subjetivo, pero válido |
-| Arrancar un sprint / bloque de trabajo | Empezar limpio |
-
-## Cómo computar la edad
-
-Orden de preferencia:
-
-1. **`> **Creado**: YYYY-MM-DD`** en el blockquote del brief (chat briefs).
-2. **`<!-- created: YYYY-MM-DD -->`** en la primera línea (tasks/ items).
-3. **`git log --diff-filter=A -n 1 --format=%aI -- <file>`** — fecha del primer commit del archivo. Fallback universal.
-4. **`mtime`** del archivo — último recurso, poco confiable porque edits lo resetean.
-
-Los items en la cola de `plan/maestro.md` no tienen fecha por item; si el usuario quiere aging ahí, hay que agregarlo como convención (no se hace en MVP).
+- [`/start-chat`](start-chat.md) — promueve `open/` → `running/`.
+- [`/end`](end.md) — cierra `running/` → `closed/` o `awaiting-prod/` según el gate post-deploy.
+- [`/verify`](verify.md) — cierra el ciclo de un chat en `awaiting-prod/`.
+- [`/block-chat`](block-chat.md) — pausa `running/` → `waiting/` o `troubles/`.
+- [`/next-chat`](next-chat.md) — produce briefs en `open/`.
 
 ## Comando complementario
 
 - `bash .claude/hooks/backlog-check.sh` (sin args) — output más compacto que el `/triage` completo. Útil para chequeo rápido sin generar un reporte largo.
 
-## Criterios de cierre
-
-Triage es idempotente y no muta estado:
-
-- [ ] Reporte impreso con todos los buckets.
-- [ ] Items marcados con acción propuesta (no ejecutada).
-- [ ] Nada commiteado. Nada movido.
-- [ ] Usuario sabe qué falta decidir.
-
 ## Referencias
 
 - [rules/backlog-hygiene.md](../rules/backlog-hygiene.md) — límites, edades, acciones.
 - [hooks/backlog-check.sh](../hooks/backlog-check.sh) — telemetría compacta.
-- [commands/next-chat.md](next-chat.md) — produce briefs en `open/`.
-- [commands/start-chat.md](start-chat.md) — consume briefs de `open/`.
-- [commands/end.md](end.md) — cierra y mueve a `closed/` o `awaiting-prod/` según el gate post-deploy.
-- [commands/verify.md](verify.md) — cierra el ciclo de un chat en `awaiting-prod/`.
 - [plan/maestro.md](../plan/maestro.md) — cola priorizada.
