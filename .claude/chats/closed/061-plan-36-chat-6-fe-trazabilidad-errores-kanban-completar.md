@@ -1,6 +1,6 @@
 > **Repo destino**: `educa-web` (frontend, branch `main`).
 > **Plan**: 36 · **Chat**: 6 · **Fase**: F6 (`/design + /execute`) · **Creado**: 2026-04-27 · **Estado**: ✅ cerrado local 2026-04-28.
-> **Validación prod**: ⏳ pendiente desde 2026-04-28 — smoke visual de las 5 columnas + drag-drop a Resuelto/Ignorado en prod.
+> **Validación prod**: ✅ verificada 2026-04-28.
 
 ---
 
