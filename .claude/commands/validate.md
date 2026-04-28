@@ -25,23 +25,9 @@ Agent(description: "Build BE", prompt: "Corré `dotnet build` en cwd. Reportá �
 Agent(description: "Test BE", prompt: "Corré `dotnet test --no-build`. Reportá `N pass / M fail`. <100 palabras.")
 ```
 
-### Variante: modo audit (code review por severidad)
+### Code review por severidad
 
-`/validate` también se usa para **auditar código existente** (revisar lo que existe, sin correr necesariamente lint/build). En ese caso:
-
-- **SÍ**: code review, buscar anti-patrones, auditar contra reglas e invariantes (INV-*), generar reporte.
-- **NO**: editar archivos, corregir lo encontrado (salvo pedido explícito), agregar features.
-
-Categorizar hallazgos por severidad:
-
-| Severidad | Significado |
-| --- | --- |
-| **Bug** | Error funcional que afecta comportamiento |
-| **Regla violada** | Código que contradice una regla del proyecto |
-| **Inconsistencia** | Naming, patrones o convenciones no uniformes |
-| **Observación** | No es error pero vale discutir (diseño, deuda) |
-
-Entregable: reporte priorizado. Opcionalmente, crear task en [../tasks/](../tasks/) si hay trabajo de corrección. Si el usuario pide "corregí los hallazgos", el chat transiciona a `/execute`.
+Para auditar código existente (no validar cambios), usar [`/audit`](../../../.claude/commands/audit.md) — modo separado con reporte por severidad (Bug / Regla violada / Inconsistencia / Observación). El proyecto puede agregar override local `commands/audit.md` si necesita reglas específicas (INV-*, paths típicos).
 
 ### Cross-repo
 
