@@ -81,12 +81,16 @@ describe('ErrorGroupsStore', () => {
 		store.setFilterEstado('NUEVO');
 		store.setFilterSeveridad('CRITICAL');
 		store.setSearchTerm('hola');
-		store.setHideResolvedIgnored(false);
+		store.setHideResolvedIgnored(true);
 		store.clearFilters();
 		expect(store.filterEstado()).toBeNull();
 		expect(store.filterSeveridad()).toBeNull();
 		expect(store.searchTerm()).toBe('');
-		expect(store.hideResolvedIgnored()).toBe(true);
+		expect(store.hideResolvedIgnored()).toBe(false);
+	});
+
+	it('hideResolvedIgnored default es false (Plan 36 Chat 6 — 5 columnas visibles por defecto)', () => {
+		expect(store.hideResolvedIgnored()).toBe(false);
 	});
 
 	it('openDrawer + closeDrawer sincronizan visibility y selectedGroup', () => {
@@ -100,6 +104,7 @@ describe('ErrorGroupsStore', () => {
 	});
 
 	it('visibleItems filtra resueltos/ignorados cuando toggle ON sin filtro estado', () => {
+		store.setHideResolvedIgnored(true);
 		store.setGroups([
 			makeGroup({ id: 1, estado: 'NUEVO' }),
 			makeGroup({ id: 2, estado: 'RESUELTO' }),
@@ -107,6 +112,17 @@ describe('ErrorGroupsStore', () => {
 			makeGroup({ id: 4, estado: 'EN_PROGRESO' }),
 		]);
 		expect(store.visibleItems().map((g) => g.id)).toEqual([1, 4]);
+	});
+
+	it('visibleItems devuelve los 5 estados por defecto (toggle OFF)', () => {
+		store.setGroups([
+			makeGroup({ id: 1, estado: 'NUEVO' }),
+			makeGroup({ id: 2, estado: 'VISTO' }),
+			makeGroup({ id: 3, estado: 'EN_PROGRESO' }),
+			makeGroup({ id: 4, estado: 'RESUELTO' }),
+			makeGroup({ id: 5, estado: 'IGNORADO' }),
+		]);
+		expect(store.visibleItems()).toHaveLength(5);
 	});
 
 	it('visibleItems no filtra cuando hay filtro estado explícito', () => {

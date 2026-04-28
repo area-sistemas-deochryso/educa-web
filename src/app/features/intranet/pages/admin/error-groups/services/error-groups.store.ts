@@ -26,11 +26,11 @@ export class ErrorGroupsStore {
 	private readonly _filterOrigen = signal<ErrorOrigen | null>(null);
 	private readonly _searchTerm = signal<string>('');
 	/**
-	 * Toggle "Ocultar resueltos/ignorados" — ON por defecto. Cuando ON sin filtro
+	 * Toggle "Ocultar resueltos/ignorados" — OFF por defecto. Cuando ON sin filtro
 	 * de estado explícito se aplica filtro client-side post-fetch (la deuda
 	 * documentada en el plan: el BE acepta solo 1 estado).
 	 */
-	private readonly _hideResolvedIgnored = signal(true);
+	private readonly _hideResolvedIgnored = signal(false);
 	// #endregion
 
 	// #region Estado privado — drawer + dialog + ocurrencias
@@ -196,7 +196,7 @@ export class ErrorGroupsStore {
 		this._filterSeveridad.set(null);
 		this._filterOrigen.set(null);
 		this._searchTerm.set('');
-		this._hideResolvedIgnored.set(true);
+		this._hideResolvedIgnored.set(false);
 	}
 	// #endregion
 
