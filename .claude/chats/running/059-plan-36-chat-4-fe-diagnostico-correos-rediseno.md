@@ -1,6 +1,8 @@
 > **Repo destino**: `educa-web` (frontend, branch `main`).
 > **Plan**: 36 · **Chat**: 4 · **Fase**: F4.FE (`/design + /execute`) · **Creado**: 2026-04-27 · **Estado**: 🟢 cerrado local 2026-04-28 (awaiting-prod) · **Bloqueado por**: Chat 4b BE (058) deployed + verificado.
-> **Validación prod**: ⏳ pendiente desde 2026-04-28
+> **Validación prod**: ❌ rollback 2026-04-28
+> **Motivo del rollback**: typeahead funciona con texto (apellidos/nombres) pero NO con DNI numérico — al tipear 8 dígitos no devuelve sugerencias y el submit cae en validación de "formato de correo inválido". Además el diseño del item template requiere iteración visual.
+> **Estado**: 🟡 retomado para fix.
 
 ---
 
