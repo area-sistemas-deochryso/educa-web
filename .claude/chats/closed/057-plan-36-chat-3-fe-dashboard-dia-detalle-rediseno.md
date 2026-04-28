@@ -1,6 +1,6 @@
 > **Repo destino**: `educa-web` (frontend, branch `main`).
 > **Plan**: 36 · **Chat**: 3 · **Fase**: F3 (`/design + /execute`) · **Creado**: 2026-04-27 · **Estado**: ✅ cerrado local 2026-04-27.
-> **Validación prod**: ⏳ pendiente desde 2026-04-27.
+> **Validación prod**: ✅ verificada 2026-04-28 — dashboard del día funcional (resumen + detalle de fallos, 0 fallos hoy). Pendiente: otra fase de rediseño no crítica para pulir layout (no bloqueante, abrir chat futuro cuando aplique).
 
 ---
 

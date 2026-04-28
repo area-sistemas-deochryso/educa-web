@@ -1,7 +1,7 @@
 # 054 · Meta · Bucket `awaiting-prod/` + comando `/verify`
 
 > **Repo destino**: `educa-web` (frontend, branch `main`) — solo toca `.claude/`, no código de la app.
-> **Validación prod**: ⏳ pendiente desde 2026-04-27 (dogfood: validar en próximo `/end` que el gate aparece, en próximo `/triage` que lista 7 buckets, y en `/verify 054` el cierre del ciclo).
+> **Validación prod**: ✅ verificada 2026-04-28 — dogfood completo: gate visible en `/end`, `/triage` lista 7 buckets, `/verify` cierra el ciclo.
 > **Plan**: meta · **Chat**: único · **Fase**: única · **Creado**: 2026-04-27 · **Estado**: ✅ cerrado localmente, en `awaiting-prod/`.
 > **MODO SUGERIDO**: `/execute` (diseño cerrado en conversación previa al brief).
 
