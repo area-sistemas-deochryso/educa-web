@@ -1,150 +1,108 @@
-# Comando: Generar prompt para siguiente chat
+---
+description: Modo Handoff — cerrar un chat con trabajo real empaquetando decisiones y contexto en un brief para el chat siguiente.
+---
 
-Genera un archivo numerado en `educa-web/.claude/chats/open/NNN-plan-X-chat-Y-<repo>-<scope>.md` con el prompt **autocontenido** que el próximo chat (fresh context) debe recibir para ejecutar la tarea acordada. Evita errores al pegar prompts largos en el chat box.
+# /next-chat (override de educa-web)
 
-> **Cambio 2026-04-27**: los briefs ahora viven en `chats/open/` (no `chats/` directo). Ver el ciclo de vida de chats: `open/` → `running/` → (`waiting/` | `troubles/`)? → `closed/`. Ver [rules/backlog-hygiene.md](../rules/backlog-hygiene.md).
+> Política universal: ver `~/.claude/commands/next-chat.md`.
 
-## Cuándo invocar
+## Específico de educa-web
 
-Al final del chat actual, cuando se sabe qué sigue (siguiente subfase, próximo chat del plan, tarea pendiente). El usuario abre un chat nuevo y pega el contenido o referencia `@.claude/chats/NNN-...md`.
+### Maestro y cola
 
-## Fuente de autoridad — la cola del maestro
+- Path: [../plan/maestro.md](../plan/maestro.md) (singular `plan/`).
+- **La cola del maestro es la fuente de autoridad principal**. Antes de inferir qué chat generar, leer la sección `📋 Próximos 3 chats (cola ordenada)` de `../plan/maestro.md`.
+- Comportamiento según estado de la cola:
 
-**Antes de inferir qué chat generar, leer la sección `📋 Próximos 3 chats (cola ordenada)` de `.claude/plan/maestro.md`**. Esa sección es la fuente de verdad.
+  | Estado cola | Acción |
+  | --- | --- |
+  | 1+ items con Tipo ≠ OPS | Tomar el primer item sin preguntar, generar brief directo. |
+  | Primer item es Tipo **OPS** (coordinación externa) | Saltarlo, tomar el siguiente. Avisar al usuario. |
+  | Cola vacía | Preguntar al usuario cuál es el siguiente. Ofrecer candidatos basados en Foco + frentes abiertos. |
+  | Empate / ambigüedad explícita | Listar opciones + razón y pedir decisión. |
 
-Comportamiento según estado de la cola:
+- **Nunca** inferir prioridad leyendo briefs históricos en `chats/closed/` cuando la cola está poblada — eso significa que la cola está desactualizada y la corrección es **actualizarla primero**.
+- Después de generar el brief, recordar al usuario: *"Agregá el nuevo trabajo derivado al final de la cola del maestro si aplica."*
 
-| Estado cola | Acción |
-|---|---|
-| 1+ items en la cola con Tipo ≠ OPS | Tomar el primer item sin preguntar, generar brief directo. |
-| Primer item es Tipo **OPS** (coordinación externa, no código) | Saltarlo (no genera brief) y tomar el siguiente. Avisar al usuario: "El primer item es OPS, genero el siguiente de la cola. ¿OK?". |
-| Cola vacía | Preguntar al usuario cuál es el siguiente antes de generar. Ofrecer candidatos basados en estado del maestro (Foco + frentes abiertos). |
-| Empate / ambigüedad explícita en la cola | Listar opciones + razón y pedir decisión. |
+### Filename obligatorio
 
-**Nunca** inferir prioridad leyendo múltiples archivos históricos en `chats/closed/` cuando la cola del maestro está poblada — eso significa que la cola está desactualizada, y en ese caso la corrección es **actualizar la cola primero**, no improvisar.
+`NNN-plan-X-chat-Y-<repo>-<scope>.md`. Repo = `fe` o `be`. Scope kebab-case ≤ 6 palabras.
 
-Después de generar el brief, recordar al usuario mantener la cola: "Agregá el nuevo trabajo derivado al final de la cola del maestro si aplica."
+Ejemplos:
 
-## Reglas
+- `001-plan-22-chat-4-fe-email-outbox-tipofallo.md` — claro qué página y qué feature.
+- `002-plan-25-chat-1-be-closedxml-primer-excel.md` — dependencia clave + entregable.
+- `003-plan-25-chat-2-be-migrar-reportes-restantes.md` — verbo + objeto.
 
-- El archivo es **autocontenido**: el chat nuevo no debe necesitar leer nada externo para empezar (salvo el plan file referenciado).
-- **Ubicación**: `educa-web/.claude/chats/open/` — los briefs nuevos entran en `open/` y de ahí los consume `/start-chat` (o automáticamente `/go`). El BE no mantiene `chats/` propio. Ciclo: `open/` → `running/` → (`waiting/` | `troubles/`)? → `closed/`.
-- **Numeración**: `NNN` con 3 dígitos, secuencial, independiente del plan/repo/fecha. El siguiente número = `max(NNN existentes en chats/ y chats/closed/) + 1`.
-- **Nombre**: `NNN-plan-X-chat-Y-<repo>-<scope-corto>.md` (ej: `003-plan-25-chat-2-be-migrar-reportes-restantes.md`). Scope en kebab-case, ≤ 6 palabras.
-- **Metadato obligatorio al inicio** (antes del `# Título`):
+Evitar: scope vago (`stuff`), sin scope, demasiado largo.
 
-  ```markdown
-  > **Repo destino**: `educa-web` (frontend, branch `main`) | `Educa.API` (backend, branch `master`). Abrir el chat nuevo en este repo.
-  > **Plan**: N · **Chat**: M · **Fase**: FX.YY · **Creado**: YYYY-MM-DD · **Estado**: ⏳ pendiente | 🟡 WIP | ✅ cerrado.
+### Header obligatorio del brief
 
-  ---
-  ```
+```markdown
+> **Repo destino**: `educa-web` (frontend, branch `main`) | `Educa.API` (backend, branch `master`). Abrir el chat nuevo en este repo.
+> **Plan**: N · **Chat**: M · **Fase**: FX.YY · **Creado**: YYYY-MM-DD · **Estado**: ⏳ pendiente | 🟡 WIP | ✅ cerrado.
 
-  **Importante**: el campo `Creado:` lo lee el [hook backlog-check.sh](../hooks/backlog-check.sh) y `/triage` para medir edad de los briefs. Sin ese campo, el hook cae al `mtime` del archivo (menos confiable porque las ediciones lo resetean).
+---
+```
 
-- Sobrescribir solo si el número ya existe con el mismo plan/chat (retomar un chat pendiente); en general **no sobrescribir** — siempre siguiente número libre.
-- Formato markdown con secciones claras, code blocks para SQL/snippets/comandos.
-- Incluir aprendizajes del chat actual que transfieren (dependencias ya instaladas, patterns descubiertos, archivos ya tocados).
+El campo `Creado:` lo lee [hook backlog-check.sh](../hooks/backlog-check.sh) y `/triage` para medir edad. Sin ese campo, cae al `mtime` (menos confiable).
 
-## Cómo calcular el siguiente número
-
-Antes de escribir, listar los archivos existentes en los 5 buckets del ciclo de vida:
+### Cómo calcular el siguiente número
 
 ```bash
-for d in open running waiting troubles closed; do
+for d in open running waiting troubles closed awaiting-prod; do
   ls "educa-web/.claude/chats/$d/" 2>/dev/null | grep -E "^[0-9]{3}-" || true
 done | sort | tail -5
 ```
 
-Tomar el mayor NNN y sumar 1. Si no hay archivos aún, empezar en `001`. **Los NNN son globales y no se reutilizan** — cada brief tiene identidad única durante todo su ciclo de vida.
+Tomar mayor NNN + 1. Los NNN son globales y no se reutilizan.
 
-## Estructura obligatoria
+### Reglas obligatorias a listar en el brief
 
-```markdown
-> **Repo destino**: `Educa.API` (backend, branch `master`). Abrir el chat nuevo en este repo.
-> **Plan**: 25 · **Chat**: 1 · **Fase**: F1 · **Creado**: 2026-04-27 · **Estado**: ⏳ pendiente arrancar.
+Las que apliquen del paquete técnico:
 
----
+- **BE (Educa.API)**: INV-* (regla por carpeta), cap 300 ln, `AsNoTracking()` en queries de lectura, fire-and-forget para tareas async no críticas, sufijos `*Service.cs` / `*Repository.cs` / `*Controller.cs`.
+- **FE (educa-web)**: Standalone components + OnPush, `inject()`, signals, alias `@app/@core/@data/@config/...`, logger `@core/helpers`, `takeUntilDestroyed`, NgRx donde aplique.
 
-# <Plan # Chat # — Título corto>
+### Plan file
 
-## PLAN FILE
-Ruta al plan + sección exacta (ej: "Chat 2 — F2").
-Siempre referenciar el maestro de `educa-web/.claude/plan/maestro.md` con path relativo
-desde el repo destino (`../../educa-web/...` desde BE, `.claude/...` desde FE).
+Siempre referenciar el maestro `educa-web/.claude/plan/maestro.md` con path relativo desde el repo destino:
 
-## OBJETIVO
-1-2 líneas de qué resuelve esta tarea.
+- Desde BE: `../../educa-web/.claude/plan/...`
+- Desde FE: `.claude/plan/...`
 
-## PRE-WORK OBLIGATORIO (si aplica)
-SQL a mostrar, confirmaciones, setup previo antes de codificar.
+### COMMIT MESSAGE — reglas locales
 
-## ALCANCE
-Archivos a crear/modificar con rutas, roles y líneas estimadas.
-
-## TESTS MÍNIMOS
-Casos concretos en formato "input → resultado esperado".
-
-## REGLAS OBLIGATORIAS
-INV-*, cap 300 ln, AsNoTracking(), fire-and-forget, etc. — las que apliquen.
-
-## APRENDIZAJES TRANSFERIBLES (del chat actual)
-Descubrimientos no obvios, dependencias ya instaladas, patterns reutilizables,
-decisiones que el chat nuevo debería conocer para no redescubrir.
-
-## FUERA DE ALCANCE
-Explícito — qué NO tocar (siguientes fases, otros repos, etc.).
-
-## CRITERIOS DE CIERRE
-Checklist accionable con `[ ]`. Incluir siempre:
-- [ ] Mover este archivo de `chats/running/` a `chats/closed/` al cerrar el chat (lo hace `/end` automático en caso /ship).
-
-## COMMIT MESSAGE sugerido
-Texto exacto a usar. **Obligatorio respetar las reglas de la skill `commit`** (`.claude/skills/commit/SKILL.md`):
+**Obligatorio respetar la skill `commit`** (`.claude/skills/commit/SKILL.md`):
 
 - **Idioma: inglés.** Subject y body en inglés, modo imperativo (`add`, `fix`, `close`, no `added`/`cerrando`).
-- **Español solo entre `"..."`** para términos de dominio que quedan en español en el código o BD (ej: `"tipoPersona"`, `"EO_TipoFallo"`, `"AsistenciaProfesor"`, `"ReporteFallosCorreoAsistencia"`).
+- **Español solo entre `"..."`** para términos de dominio que quedan en español en código o BD (ej: `"tipoPersona"`, `"EO_TipoFallo"`, `"AsistenciaProfesor"`, `"ReporteFallosCorreoAsistencia"`).
 - **NUNCA agregar `Co-Authored-By`** — la skill lo prohíbe explícitamente.
 - Subject ≤ 72 caracteres, formato `type(scope): description`.
-- Si hay commit separado para backend y frontend (un chat que toca ambos repos), generar los dos mensajes, ambos bajo estas reglas.
+- Si un chat toca ambos repos, generar dos mensajes (uno por commit), ambos bajo estas reglas.
 
-## CIERRE
-Qué feedback pedir al cerrar (decisiones no obvias, si siguiente fase requiere ajustes).
-```
+### Comando de cierre
 
-## Al cerrar un chat (limpieza)
+`/end` detecta el caso (ship completo, pausa, abort, commit aparte) y delega en `/commit-front`/`/commit-back`/`/commit-local`. Ver [end.md](end.md).
 
-**Nuevo flujo recomendado**: usar [`/end`](end.md) — detecta el caso (ship completo, pausa, abort, commit aparte) y hace el move + commit + actualización del maestro automáticamente, delegando el commit en `/commit-front`/`/commit-back`/`/commit-local`.
+### Buckets adicionales
 
-Si por alguna razón hacés el cierre manual:
+`chats/awaiting-prod/` — briefs cerrados localmente esperando validación post-deploy. Incluir en el cálculo de NNN. Ver [verify.md](verify.md) para el cierre del ciclo.
 
-```bash
-git mv "educa-web/.claude/chats/running/NNN-...md" "educa-web/.claude/chats/closed/"
-```
+### Indicación al usuario tras generar
 
-No se borra — queda como historia. El número NNN **no se reutiliza**.
-
-**Invariante**: un brief no entra a `closed/` sin commit que lo mueva ahí. Si encontrás un brief en `closed/` sin commit que lo justifique, es un error — devolverlo a `open/` y cerrarlo bien.
-
-## Al terminar la generación
-
-1. Mostrar el path del archivo generado: `educa-web/.claude/chats/NNN-plan-X-chat-Y-<repo>-<scope>.md`.
-2. Indicar el **repo destino** (BE o FE) para que el usuario abra el chat nuevo ahí.
-3. Recordar al usuario cómo invocarlo:
-   - Opción A: abrir chat nuevo en el repo destino y escribir `/execute @../../educa-web/.claude/chats/NNN-...md` (si es BE) o `/execute @.claude/chats/NNN-...md` (si es FE).
+1. Mostrar path del archivo: `educa-web/.claude/chats/open/NNN-plan-X-chat-Y-<repo>-<scope>.md`.
+2. Indicar **repo destino** (BE o FE) para que abra el chat nuevo ahí.
+3. Recordar invocación:
+   - Opción A: abrir chat nuevo en repo destino y escribir `/execute @../../educa-web/.claude/chats/NNN-...md` (BE) o `/execute @.claude/chats/NNN-...md` (FE).
    - Opción B: abrir chat nuevo y pegar el contenido del archivo directo.
-4. **NO** hacer commit de los archivos de `chats/` salvo pedido explícito — son contexto de transición, no deliverable del producto.
+4. **NO** commitear archivos de `chats/` salvo pedido explícito.
 
-## Convenciones de scope (últimas palabras del nombre)
+## Referencias locales
 
-Ejemplos aprobados:
-
-- `001-plan-22-chat-4-fe-email-outbox-tipofallo.md` — claro qué página y qué feature
-- `002-plan-25-chat-1-be-closedxml-primer-excel.md` — dependencia clave (ClosedXML) + entregable (primer Excel)
-- `003-plan-25-chat-2-be-migrar-reportes-restantes.md` — verbo (migrar) + objeto (reportes restantes)
-
-Evitar:
-
-- `003-plan-25-chat-2.md` (sin scope — no se sabe qué hace)
-- `003-plan-25-chat-2-stuff.md` (vago)
-- `003-plan-25-chat-2-be-lots-of-things-and-more.md` (demasiado largo)
+- [../rules/backlog-hygiene.md](../rules/backlog-hygiene.md) — límites + edades.
+- [../plan/maestro.md](../plan/maestro.md) — cola.
+- [ask.md](ask.md) — cuándo parar.
+- [end.md](end.md) — flujo de cierre.
+- [verify.md](verify.md) — cierre post-deploy.
+- [triage.md](triage.md) — barrido cuando un gate avisa.
