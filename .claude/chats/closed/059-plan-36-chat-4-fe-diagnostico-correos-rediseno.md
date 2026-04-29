@@ -1,6 +1,6 @@
 > **Repo destino**: `educa-web` (frontend, branch `main`).
 > **Plan**: 36 · **Chat**: 4 · **Fase**: F4.FE (`/design + /execute`) · **Creado**: 2026-04-27 · **Estado**: 🟢 cerrado local 2026-04-28 v2 (awaiting-prod, fix iteration) · **Bloqueado por**: Chat 4b BE (058) deployed + verificado.
-> **Validación prod v1**: ❌ rollback 2026-04-28 · **Validación prod v2**: pendiente.
+> **Validación prod v1**: ❌ rollback 2026-04-28 · **Validación prod v2**: ✅ verificada 2026-04-28 — el plan quedó desfasado (la ruta real es otra), pero el rediseño está hecho y funcionando en prod.
 
 ---
 
