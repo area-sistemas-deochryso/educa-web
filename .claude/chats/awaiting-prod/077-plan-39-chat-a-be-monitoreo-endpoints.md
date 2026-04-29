@@ -1,9 +1,10 @@
 # Plan 39 Chat A BE — Endpoints de monitoreo + service + caché + tests + índice SQL
 
 > **Repo destino**: `Educa.API` (master)
-> **Plan**: 39 · **Chat**: A · **Fase**: F2.Execute · **Estado**: ⏳ pendiente arrancar — prioridad alta
+> **Plan**: 39 · **Chat**: A · **Fase**: F2.Execute · **Estado**: ⏳ awaiting-prod desde 2026-04-29 — local commit `Educa.API@17099d1`
 > **Creado**: 2026-04-29 · **Modo sugerido**: `/execute`
-> **Pre-req duro**: ejecutar `Educa.API/Scripts/plan39_chat2_AddDashboardIndex.sql` antes del deploy
+> **Pre-req duro**: ✅ SQL `plan39_chat2_AddDashboardIndex.sql` ejecutado en Azure (confirmado 2026-04-29 por usuario antes de empezar)
+> **Cierre local**: 30 tests nuevos verdes (suite completa 1559/1559). Falta deploy del BE para `/verify`.
 
 ## CONTEXTO INMEDIATO
 
