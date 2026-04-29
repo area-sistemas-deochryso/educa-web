@@ -4,18 +4,11 @@ Guía para que Claude (Cowork mode) tenga el entorno listo en una nueva sesión.
 
 ## Pegar este bloque al iniciar un chat nuevo
 
-```text
-Lee C:\devtest\qa-cowork-playbook.md y aplica el flujo.
-Lee C:\devtest\setup-cowork-template.md para saber cómo escribir el SETUP del proyecto.
-Lee .claude/claude-cowork/SETUP-COWORK.md de este repo para datos del proyecto y hallazgos abiertos.
-
-Proyecto: educa-web
-Ruta repo FE: C:\Users\Asus Ryzen 9\EducaWeb\educa-web
-Ruta repo BE: C:\Users\Asus Ryzen 9\EducaWeb\Educa.API
-URL local: http://localhost:4201/intranet
-Stack: Angular 21 + Capacitor + .NET 9 + EF Core 9
-Login: DNI 74125896 / pwd 12349898 / rol Director
 ```
+educa-web
+```
+
+> Cowork lee `C:\devtest\qa-cowork-playbook.md` + `C:\devtest\setup-cowork-template.md` + este archivo automáticamente. Solo el slug del proyecto basta.
 
 ---
 
@@ -25,12 +18,12 @@ Login: DNI 74125896 / pwd 12349898 / rol Director
 - **"Sin ediciones" significa**: NO clic en Guardar/Confirmar/Eliminar. SÍ se permite abrir dialogs, expandir filas, click en botones de navegación/acción mientras no muten data real.
 - **Rutas BE en kebab-case**: el backend usa `/api/asistencia-admin` (no `/api/AsistenciaAdmin`). Confirmar siempre con `Grep "[Route"` en `Educa.API/Controllers/...` antes de fetch directo.
 - **Permisos**: Director ve TODO. Otros roles (Profesor, Estudiante, Apoderado, Asistente Admin) requieren credenciales separadas — pedir al usuario.
-- **Reglas del proyecto** que viven en `educa-web/.claude/CLAUDE.md`. Antes de sugerir cambios de código, leer:
-  - `../rules/business-rules.md` — invariantes del dominio (INV-*)
-  - `../rules/architecture.md` — taxonomía servicios/componentes
-  - `../rules/a11y.md` — contraste y accesibilidad
-  - `../rules/design-system.md` — pautas visuales B1-B11
-  - `../rules/communication.md` — protocolo de mensajes
+- **Reglas del proyecto** que viven en `educa-web/.claude/CLAUDE.md` (infra Claude Code, raíz `.claude/`). Antes de sugerir cambios de código, leer:
+  - `rules/business-rules.md` — invariantes del dominio (INV-*)
+  - `rules/architecture.md` — taxonomía servicios/componentes
+  - `rules/a11y.md` — contraste y accesibilidad
+  - `rules/design-system.md` — pautas visuales B1-B11
+  - `rules/communication.md` — protocolo de mensajes
 
 ---
 
@@ -75,7 +68,7 @@ Login: DNI 74125896 / pwd 12349898 / rol Director
 ## 6. Limitaciones técnicas específicas del proyecto
 
 - **PrimeNG `p-select`**: `form_input` MCP a veces falla con "SPAN is not a supported form input". Workaround: usar `javascript_tool` con `dispatchEvent('change')` sobre el `<select>` nativo si está expuesto, o click en el trigger por coordenadas.
-- **Two-way binding en dialogs PrimeNG**: nunca usar `[(visible)]`; siempre `[visible]` + `(visibleChange)` (regla del proyecto en `../rules/dialogs-sync.md`).
+- **Two-way binding en dialogs PrimeNG**: nunca usar `[(visible)]`; siempre `[visible]` + `(visibleChange)` (regla del proyecto en `rules/dialogs-sync.md`).
 - **MCPs útiles para este stack**: Microsoft Learn (`89a7ddf5-2a6b-410c-be11-aa0e1a1b35a6`) para .NET 9 docs y Exa (`91408932-1110-4350-97c7-2d6b3a6d9694`) para búsqueda web.
 
 ---
