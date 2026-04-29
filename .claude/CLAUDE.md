@@ -78,3 +78,11 @@ Aplicacion Angular 21 para gestion educativa con portal publico e intranet priva
 ## Historial
 
 @.claude/history/README.md
+
+## Organización del .claude/
+
+| Carpeta                              | Rol                                                                                                                                                                          |
+| ------------------------------------ | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| [claude-cowork/](claude-cowork/)     | Namespace de Cowork (QA asistido en navegador). Setup, reportes y hallazgos. No es Claude Code — vive separado para no mezclarse con commands/hooks/settings.                |
+
+Convención de namespacing: el resto de `.claude/` (raíz + carpetas de la tabla, salvo `claude-cowork/`) es infra de Claude Code y queda en su ruta convencional porque commands, hooks, settings y CLAUDE.md se autodescubren desde rutas fijas. Cualquier herramienta IA adicional entra como subcarpeta hermana de `claude-cowork/`.
