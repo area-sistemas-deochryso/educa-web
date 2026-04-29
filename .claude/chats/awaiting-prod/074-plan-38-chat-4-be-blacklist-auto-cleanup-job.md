@@ -75,3 +75,48 @@ dotnet test --filter FullyQualifiedName~BlacklistAutoCleanupJob
 ## ENTREGABLE AL CERRAR
 
 Commit `feat(email): blacklist auto-cleanup job for BOUNCE_MAILBOX_FULL`. Brief a `awaiting-prod/`.
+
+---
+
+## CIERRE LOCAL — 2026-04-29
+
+**Commit BE**: `d90bb72` en `Educa.API master` (sin push).
+
+**Archivos**: 4 nuevos + 6 modificados.
+
+- **Nuevos**:
+  - `Services/Notifications/BlacklistAutoCleanupJob.cs` (78 ln) — wrapper Hangfire con try/catch global INV-S07. Constante `UsuarioMod = "blacklist-auto-cleanup"`.
+  - `Models/Sistema/BlacklistAutoCleanupSettings.cs` (29 ln) — sub-clase `{ Enabled, CronOverride? }`.
+  - `Tests/Services/Notifications/BlacklistAutoCleanupJobTests.cs` — 6 tests (1-4 + audit + INV-S07 con `ThrowingRepository`).
+  - `Tests/Services/Notifications/HangfireExtensionsTests.cs` — 3 tests del helper `ResolveCleanupCron` (Disabled / default / CronOverride).
+- **Modificados**:
+  - `Constants/Sistema/HangfireJobs.cs` — `BlacklistAutoCleanup = "blacklist-auto-cleanup"`.
+  - `Models/Sistema/EmailSettings.cs` — propiedad `BlacklistAutoCleanup`.
+  - `Interfaces/Repositories/Notifications/IEmailBlacklistRepository.cs` + `Repositories/Notifications/EmailBlacklistRepository.cs` — `MarcarDespejadasPorAntiguedadAsync(motivo, fechaUltimoFalloAntes, usuarioMod, ct)` con UPDATE batch trackeado (mantiene auditoría INV-D02 vía `ApplyAuditFields`).
+  - `Extensions/HangfireExtensions.cs` — registra el job con helper internal `ResolveCleanupCron` (default `"0 3 * * *"` Lima · Enabled=false → `Cron.Never()` · CronOverride toma precedencia).
+  - `Extensions/ServiceExtensions.cs` — `services.AddScoped<BlacklistAutoCleanupJob>()`.
+
+**Métricas**:
+
+- Build BE: 0 errores · 19 warnings preexistentes.
+- Tests del filtro: **9/9 verdes** (6 job + 3 extensions).
+- Suite completa BE: **1582/1582 verdes** (+9 tests netos).
+- Cap 300 ln respetado en todos los archivos producción (max: `EmailBlacklistRepository.cs` 220 ln, `HangfireExtensions.cs` 202 ln).
+
+**Decisiones de implementación**:
+
+1. **`ResolveCleanupCron` como `internal static`** en `HangfireExtensions` (no inline en `UseHangfireServices`) para testear sin montar storage de Hangfire. `InternalsVisibleTo("Educa.API.Tests")` ya estaba en el csproj.
+2. **`MailboxFullCleanupDays` con guard `> 0 ? : 7`** — defensa por si la config llega a 0 o negativo desde appsettings.
+3. **UPDATE trackeado vs `ExecuteUpdateAsync`** — uso `ToListAsync` + asignación in-memory + `SaveChangesAsync` para que `ApplyAuditFields` setee `EBL_FechaMod` automáticamente (mismo patrón que `DespejarAsync`). `ExecuteUpdateAsync` saltaría el interceptor de auditoría.
+4. **Test 5 del brief reinterpretado**: el brief listaba "Disabled_NoEjecuta" bajo `BlacklistAutoCleanupJobTests.cs`, pero la decisión `Enabled = false` vive en `HangfireExtensions` (el job no chequea el flag — si Hangfire lo dispara, ejecuta). El test quedó en `HangfireExtensionsTests.cs` como `Disabled_NoEjecuta_DevuelveCronNever`. Total final: 6 + 3 = 9 (brief planteaba 6 + 1 = 7), +2 sobre el plan por agregar `CronOverride_TomaPrecedencia` y mover el de Disabled al test correcto.
+
+**Aprendizaje transferible** (replicable en futuros jobs Hangfire):
+
+- **`InternalsVisibleTo` + helper internal static** es el patrón canónico cuando una decisión vive embebida en una extension method de Hangfire/DI/Pipeline pero requiere test unitario sin levantar la infra del scheduler. Aplica directo a Plan 38 Chat 5+ y cualquier nuevo `RecurringJob.AddOrUpdate` que mezcle config + cron.
+
+**Verificación pendiente post-deploy** (4 pasos del brief):
+
+1. `/hangfire` muestra `blacklist-auto-cleanup` con próximo run a 03:00 Perú.
+2. `RecurringJob.Trigger("blacklist-auto-cleanup")` manual + revisar logs.
+3. Insertar fila prueba `EBL_FechaUltimoFallo = NOW() - 10 days, EBL_MotivoBloqueo = 'BOUNCE_MAILBOX_FULL', EBL_Estado = 1` → tras trigger queda `EBL_Estado = 0`, `EBL_UsuarioMod = 'blacklist-auto-cleanup'`.
+4. Logs `BlacklistAutoCleanup: terminado JobRuns=1 JobMarkedRows=N` visibles.
