@@ -64,8 +64,7 @@
 >
 > **Formato**: `N. [Plan·Chat·Repo·Tipo] — scope — razón de prioridad`. Tipo: BE / FE / OPS / docs / design. OPS no genera brief (no es código).
 
-1. **[Plan 38 · Chat 3 · `Educa.API` · BE]** — `POST /api/sistema/email-blacklist` + `GET` paginado server-side + DTOs + tests controller. Brief en `.claude/chats/open/073-plan-38-chat-3-be-blacklist-crud-endpoints.md`. Depende de Chat 2 mergeado (motivo válido en BD).
-2. **[Plan 38 · Chat 4 · `Educa.API` · BE]** — `BlacklistAutoCleanupJob` Hangfire diario para `INV-MAIL06`. Brief en `.claude/chats/open/074-plan-38-chat-4-be-blacklist-auto-cleanup-job.md`. Depende de Chat 2 mergeado.
+1. **[Plan 38 · Chat 4 · `Educa.API` · BE]** — `BlacklistAutoCleanupJob` Hangfire diario para `INV-MAIL06`. Brief en `.claude/chats/open/074-plan-38-chat-4-be-blacklist-auto-cleanup-job.md`. Depende de Chat 2 mergeado.
 3. **[Plan 38 · Chat 5 · `educa-web` · FE]** — Tab "Blacklist" en `/intranet/admin/email-outbox` con tabla server-paginated, filtros, dialog "Agregar", drawer detalle, despejar. Brief en `.claude/chats/open/075-plan-38-chat-5-fe-blacklist-tab-admin.md`. Depende de Chat 3 deployado.
 4. **[Plan 38 · Chat 6 · `Educa.API`+`educa-web` · BE+FE]** — `EmailHub` SignalR + banner B9 + toast cuando `defer-fail-status >= 4/5` o `MailboxFullBlacklistHandler` dispara. Brief en `.claude/chats/open/076-plan-38-chat-6-fe-banner-b9-toast-signalr.md`. Depende de Chat 5 mergeado + Plan 37 Chat 3 (068).
 5. **[Plan 39 · Chat B · `Educa.API` · BE]** — `EmailHub` SignalR (server-side) + `SignalREmailHubNotifier` real (reemplaza `NullEmailHubNotifier` registrado por Plan 38 Chat 2) + dispatch de 3 eventos (`BlacklistEntryCreated`, `DeferFailStatusUpdated`, `CandidatoBlacklistDetectado`) + invalidación de caché `defer-fail-status` antes de pushear. Brief en `.claude/chats/open/078-plan-39-chat-b-be-emailhub-signalr-push.md`. **Pre-req duro**: Plan 38 Chat 2 (072) deployado. Conviene Chat A 077 mergeado antes (no duro).
@@ -77,6 +76,7 @@
 11. **[Plan 37 · Chat 3 · `educa-web` · FE]** — visibilidad admin de cuarentena en `/intranet/admin/email-outbox`. Brief en `.claude/chats/open/068-plan-37-chat-3-fe-quarantine-admin-visibility.md`. Depende del Chat 2.
 12. _(Plan 39 Chat A cerrado local 2026-04-29 — `awaiting-prod/077` esperando deploy del BE. Local commit `Educa.API@17099d1`. SQL `plan39_chat2_AddDashboardIndex.sql` ya ejecutado en Azure por el usuario. 30 tests nuevos verdes (suite 1559/1559).)_
 13. _(Plan 38 Chat 2 cerrado local 2026-04-29 — `awaiting-prod/072` esperando deploy + 2 hits 4.2.2 sandbox + verificar fila `EmailBlacklist` con motivo `BOUNCE_MAILBOX_FULL`. SQL `plan38_chat2_AddBounceMailboxFullMotivo.sql` ya ejecutado en Azure.)_
+14. _(Plan 38 Chat 3 cerrado local 2026-04-29 — `awaiting-prod/073` esperando deploy + smoke test 5 endpoints (POST manual idempotente, GET paginado con filtros estado/motivo/q, cap pageSize=100, DELETE despeje sigue OK, POST motivo automático → 400). 10 tests nuevos (8 controller + 2 service) → suite total 1573/1573 verdes. Sin SQL nuevo — depende del CHECK ya migrado por Chat 2.)_
 14. _(Plan 37 Chat 1 cerrado local 2026-04-29 — `awaiting-prod/066` esperando ejecución de SQL + 1er ciclo con NDR delayed real.)_
 15. _(Plan 36 Chat 5 cerrado local 2026-04-27 — `awaiting-prod/` esperando smoke test del menú Auditoría en prod.)_
 
