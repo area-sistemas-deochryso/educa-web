@@ -1,6 +1,62 @@
 > **Repo destino**: `Educa.API` (backend, branch `master`).
-> **Plan**: 37 · **Chat**: 1 · **Fase**: F1.BE · **Estado**: ⏳ pendiente arrancar.
-> **Creado**: 2026-04-28 · **Modo sugerido**: `/execute` con `/design` corto inicial.
+> **Plan**: 37 · **Chat**: 1 · **Fase**: F1.BE · **Estado**: ✅ implementado local — pendiente commit + verificación post-deploy.
+> **Creado**: 2026-04-28 · **Trabajado**: 2026-04-29 · **Modo sugerido**: `/execute` con `/design` corto inicial.
+
+---
+
+## RESUMEN DE EJECUCIÓN (2026-04-29)
+
+**Archivos creados** (4):
+- `Educa.API/Constants/Sistema/EmailDeferEventTipos.cs` (5 tipos + 2 origenes + default domain)
+- `Educa.API/Models/Sistema/EmailDeferEvent.cs` (94 ln)
+- `Educa.API/Data/Configurations/EmailDeferEventConfiguration.cs` (3 índices filtrados)
+- `Educa.API/Services/Notifications/DeferEventDetector.cs` (193 ln, motor puro 5 reglas)
+- `Educa.API/Services/Notifications/DeferEventService.cs` (118 ln, persistencia + lookup soft-bounce 7d)
+
+**Archivos modificados** (4):
+- `Educa.API/Services/Notifications/Ndr3464Parser.cs` — extrae `Action` del per-recipient block, lo expone en `NdrParsedResult` (también `Subject`)
+- `Educa.API/Services/Notifications/NdrParsedResult.cs` — `Action` y `Subject` opcionales nuevos
+- `Educa.API/Services/Notifications/BounceParserService.cs` — inyecta `DeferEventService`, salta `_handler` cuando `Action: delayed`, registra eventos try/catch (INV-S07), 234 ln
+- `Educa.API/Data/ApplicationDbContext.cs` — `DbSet<EmailDeferEvent>`
+- `Educa.API/Extensions/ServiceExtensions.cs` — DI registration de detector + service
+
+**Tests agregados** (10):
+- `DeferEventDetectorTests` — 7 tests (24h, 72h via subject, domain blocked extrayendo dominio, 5.2.2 mailbox full, soft-bounce-recurrent agrega evento, 5.1.1 normal sin eventos, 4.2.2 mailbox full transient)
+- `DeferEventServiceTests` — 2 tests (persiste con outbox null; persiste 2 eventos cuando hay warning previo + setea FK al BPR)
+- `BounceParserServiceTests` — 1 test nuevo (Action: delayed registra evento, mueve a Processed, NO toca handler ni blacklist)
+
+**Tests verdes**: 1514 / 1514 (baseline ≥1336 superado).
+
+**SQL ejecutar en Azure SQL antes del deploy** (mostrado al usuario, pendiente):
+```sql
+CREATE TABLE EmailDeferEvent (
+    EDE_CodID BIGINT IDENTITY(1,1) NOT NULL,
+    EDE_TipoEvento NVARCHAR(40) NOT NULL,
+    EDE_Destinatario NVARCHAR(200) NULL,
+    EDE_DominioReceptor NVARCHAR(100) NULL,
+    EDE_StatusCode NVARCHAR(10) NULL,
+    EDE_DiagnosticCode NVARCHAR(500) NULL,
+    EDE_EmailOutboxId BIGINT NULL,
+    EDE_BounceParserProcessedId BIGINT NULL,
+    EDE_Detectado NVARCHAR(20) NOT NULL,
+    EDE_Fecha DATETIME2 NOT NULL,
+    EDE_FechaReg DATETIME2 NOT NULL,
+    CONSTRAINT PK_EmailDeferEvent PRIMARY KEY (EDE_CodID)
+);
+CREATE INDEX IX_EmailDeferEvent_Destinatario_Fecha ON EmailDeferEvent(EDE_Destinatario, EDE_Fecha) WHERE EDE_Destinatario IS NOT NULL;
+CREATE INDEX IX_EmailDeferEvent_Dominio_Fecha ON EmailDeferEvent(EDE_DominioReceptor, EDE_Fecha) WHERE EDE_DominioReceptor IS NOT NULL;
+CREATE INDEX IX_EmailDeferEvent_Tipo_Fecha ON EmailDeferEvent(EDE_TipoEvento, EDE_Fecha);
+```
+
+**Decisiones tomadas (auto mode)**:
+1. **Pre-req Plan 31 Chat 2**: BE master tiene commit `b399399` (parser IMAP wired a Hangfire) — código presente, awaiting-prod (069). Procedí porque la implementación local no necesita prod corriendo.
+2. **Fixtures reales sin pedir**: usé fixtures sintéticos siguiendo patrones del MTA típico (Postfix/Exim wording). Tests son heurísticos pero cubren los 5 tipos. Validación post-deploy con NDRs reales queda como criterio de cierre.
+3. **`bpr.BPR_CodID` real**: cambié el patrón a 2 SaveChangesAsync (BPR primero para tener ID, defer events después con FK lógico). Más limpio que pasar `null` al detector.
+
+**Pendiente para `/end`**:
+- Ejecutar SQL en Azure SQL.
+- Commit BE.
+- Verificación post-deploy: confirmar filas en `EmailDeferEvent` tras primer ciclo con NDRs delayed reales.
 
 ---
 
