@@ -1,7 +1,7 @@
 > **Repo destino**: `Educa.API` (backend, branch `master`).
 > **Plan**: 38 · **Chat**: 2 · **Fase**: F2.BE · **Modo sugerido**: `/execute`
 > **Creado**: 2026-04-29 · **Estado**: ⏳ pendiente arrancar.
-> **Pre-requisito DURO**: ejecutar `Educa.API/sql/migrations/38-chat2-01-add-bounce-mailbox-full-motivo.sql` en Azure SQL **antes** del deploy del binario nuevo.
+> **Pre-requisito DURO**: ejecutar `Educa.API/Educa.API/Scripts/plan38_chat2_AddBounceMailboxFullMotivo.sql` en Azure SQL **antes** del deploy del binario nuevo.
 
 ---
 
@@ -26,7 +26,7 @@ Hallazgo del design: el handler existente cuenta `FAILED_MAILBOX_FULL` mezclado 
 - `Educa.API/Constants/Sistema/EmailBlacklistMotivos.cs` — agregar `BounceMailboxFull = "BOUNCE_MAILBOX_FULL"` al array `Validos` + `IsValid` + helper `GetLabel(motivo)` (D20).
 - `Educa.API/Models/Notifications/EmailSettings.cs` (sub-clase) — agregar `MailboxFullThresholdHits` (default 2), `MailboxFullThresholdHours` (default 24), `MailboxFullCleanupDays` (default 7).
 - `Educa.API/Services/Notifications/MailboxFullBlacklistHandler.cs` — handler nuevo con `HandleSyncFailureAsync` + `HandleBounceAsync` análogos al patrón existente. Inyecta `IOptionsMonitor<EmailSettings>` para umbrales hot-config.
-- `Educa.API/sql/migrations/38-chat2-01-add-bounce-mailbox-full-motivo.sql` — migración SQL D10 exacta.
+- `Educa.API/Educa.API/Scripts/plan38_chat2_AddBounceMailboxFullMotivo.sql` — migración SQL D10 exacta.
 
 ### Modificados
 
@@ -71,7 +71,7 @@ dotnet test Educa.API/Educa.API.Tests/Educa.API.Tests.csproj --filter FullyQuali
 # Esperado: ≥1525 tests verdes (1514 baseline + 13 nuevos).
 
 # SQL (ejecutar en Azure SQL ANTES del deploy)
-# Educa.API/sql/migrations/38-chat2-01-add-bounce-mailbox-full-motivo.sql
+# Educa.API/Educa.API/Scripts/plan38_chat2_AddBounceMailboxFullMotivo.sql
 SELECT name, definition FROM sys.check_constraints WHERE name = 'CK_EmailBlacklist_Motivo';
 # Debe mostrar 5 motivos: BOUNCE_5XX, BOUNCE_MAILBOX_FULL, MANUAL, BULK_IMPORT, FORMAT_INVALID
 ```
