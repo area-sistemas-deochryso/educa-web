@@ -2,6 +2,8 @@
 > **Plan**: 38 · **Chat**: 2 · **Fase**: F2.BE · **Modo sugerido**: `/execute`
 > **Creado**: 2026-04-29 · **Estado**: ⏳ pendiente arrancar.
 > **Pre-requisito DURO**: ejecutar `Educa.API/Educa.API/Scripts/plan38_chat2_AddBounceMailboxFullMotivo.sql` en Azure SQL **antes** del deploy del binario nuevo.
+>
+> **🔗 Cross-link Plan 39 (D5/D13 del brief 071)**: registrar `IEmailHubNotifier` con implementación `NullEmailHubNotifier` (loggea, no pushea) en este chat. Plan 39 Chat B (078) reemplaza la registration por la implementación SignalR real. El handler `MailboxFullBlacklistHandler` invoca `notifier.NotifyBlacklistEntryCreatedAsync(...)` y, cuando `hits == thresholdHits - 1` (early warning antes de auto-blacklist), `notifier.NotifyCandidatoBlacklistDetectadoAsync(...)`. El interface define los 3 métodos (`NotifyBlacklistEntryCreatedAsync`, `NotifyDeferFailStatusUpdatedAsync`, `NotifyCandidatoBlacklistDetectadoAsync`) — coordinar con Chat A (077) para no duplicar el archivo si llega primero.
 
 ---
 

@@ -2,6 +2,8 @@
 > **Plan**: 38 · **Chat**: 5 · **Fase**: F5.FE · **Modo sugerido**: `/execute`
 > **Creado**: 2026-04-29 · **Estado**: ⏳ pendiente arrancar.
 > **Pre-requisito**: Chat 3 (073) deployado a Azure App Service y validado (POST/GET responden).
+>
+> **🔗 Cross-link Plan 39 (D11/D13 del brief 071)**: el dialog "Agregar a blacklist" debe leer query param `?correo=...` y prellenar el campo. Plan 39 Chat C (079) genera CTAs "Bloquear" desde los tiles "Top destinatarios" y "Candidatos" del dashboard de monitoreo, navegando a `/intranet/admin/email-outbox?tab=blacklist&action=add&correo=...`. Implementación: en el `OnInit` del componente padre, leer `route.snapshot.queryParamMap.get('correo')` y `get('action')`, y si `action === 'add'` con correo presente, abrir el dialog con form prefilled.
 
 ---
 

@@ -2,6 +2,14 @@
 > **Plan**: 38 · **Chat**: 6 · **Fase**: F6.FE+BE · **Modo sugerido**: `/execute`
 > **Creado**: 2026-04-29 · **Estado**: ⏳ pendiente arrancar.
 > **Pre-requisito**: Chat 5 (075) mergeado + Plan 37 Chat 3 (068) deployado (tab blacklist y cuarentena visibles).
+>
+> **🔗 Cross-link Plan 39 (D5/D13 del brief 071)**: el ownership del `EmailHub` server-side se movió a Plan 39 Chat B (078) — este chat NO crea `Hubs/EmailHub.cs`. Este chat **solo** registra el listener FE para los **3 eventos** del hub (no solo `BlacklistEntryCreated`):
+>
+> - `BlacklistEntryCreated(correo, motivo, intentos)` — Plan 38.
+> - `DeferFailStatusUpdated(hits, limit, ventana, banda)` — Plan 39.
+> - `CandidatoBlacklistDetectado(destinatario, hits, ultimoHit)` — Plan 39.
+>
+> El listener vive en un service compartido `email-hub.service.ts` que crea Plan 39 Chat C (079). Plan 39 Chat D (080) reusa ese service para alinear el banner B9 cross-páginas. **Pre-req actualizado**: además del Chat 5 + Plan 37 Chat 3, este chat necesita Plan 39 Chat B (078) BE deployado para que el hub server-side exista. Si Plan 39 Chat C (079) llega antes, el service `email-hub.service.ts` ya está creado y este chat solo agrega el banner B9 + toast.
 
 ---
 
