@@ -1,0 +1,88 @@
+<p-dialog
+	[visible]="visible()"
+	(visibleChange)="onVisibleChange($event)"
+	header="Agregar correo a blacklist"
+	[modal]="true"
+	[style]="{ width: '520px' }"
+	[draggable]="false"
+	[resizable]="false"
+	class="blacklist-add-dialog"
+>
+	<div class="dialog-content">
+		<div class="form-grid">
+			<div class="field full-width">
+				<label for="bl-correo">Correo *</label>
+				<input
+					id="bl-correo"
+					pInputText
+					type="email"
+					autocomplete="off"
+					[ngModel]="formData().correo"
+					(ngModelChange)="onCorreoChange($event)"
+					placeholder="ejemplo@dominio.com"
+					[disabled]="submitting()"
+				/>
+				@if (touched() && correoError()) {
+					<small class="p-error">{{ correoError() }}</small>
+				}
+			</div>
+
+			<div class="field full-width">
+				<label for="bl-motivo">Motivo *</label>
+				<p-select
+					inputId="bl-motivo"
+					[options]="motivoOptions"
+					optionLabel="label"
+					optionValue="value"
+					[ngModel]="formData().motivo"
+					(ngModelChange)="onMotivoChange($event)"
+					placeholder="Seleccioná un motivo"
+					appendTo="body"
+					[disabled]="submitting()"
+				/>
+				@if (touched() && motivoError()) {
+					<small class="p-error">{{ motivoError() }}</small>
+				}
+			</div>
+
+			<div class="field full-width">
+				<label for="bl-observacion">Observación</label>
+				<textarea
+					id="bl-observacion"
+					pTextarea
+					rows="3"
+					maxlength="500"
+					autocomplete="off"
+					[ngModel]="formData().observacion"
+					(ngModelChange)="onObservacionChange($event)"
+					placeholder="Notas opcionales (motivo de la decisión, contexto, etc.)"
+					[disabled]="submitting()"
+				></textarea>
+				<small class="hint">Máx. 500 caracteres.</small>
+			</div>
+		</div>
+	</div>
+
+	<ng-template #footer>
+		<div class="dialog-footer">
+			<button
+				pButton
+				label="Cancelar"
+				icon="pi pi-times"
+				class="p-button-text"
+				(click)="onCancel()"
+				[disabled]="submitting()"
+				[pt]="{ root: { 'aria-label': 'Cancelar' } }"
+			></button>
+			<button
+				pButton
+				label="Bloquear"
+				icon="pi pi-shield"
+				class="p-button-success"
+				(click)="onConfirm()"
+				[disabled]="!canSubmit()"
+				[pt]="{ root: { 'aria-label': 'Bloquear correo' } }"
+			></button>
+		</div>
+	</ng-template>
+</p-dialog>

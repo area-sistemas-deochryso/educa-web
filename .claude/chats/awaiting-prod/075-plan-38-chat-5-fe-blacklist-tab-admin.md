@@ -120,3 +120,63 @@ npm run build
 ## ENTREGABLE AL CERRAR
 
 Commit `feat(email-outbox): admin blacklist tab with paginated CRUD`. Brief a `awaiting-prod/`.
+
+---
+
+## CIERRE LOCAL — 2026-04-30
+
+**Commit FE**: `educa-web main` (sin push) — pendiente de hash.
+
+**Decisión de scope reportada**: el brief asumía "tabs internos en `email-outbox.component`" pero el shell `correos-shell` ya implementaba **routing-based tabs** (Bandeja/Dashboard/Diagnóstico/Auditoría como rutas hermanas, Plan 36 Chat 1). Implementé el patrón consistente — Blacklist es una nueva ruta hija `/intranet/admin/monitoreo/correos/blacklist` con feature flag `emailBlacklistTab` y permiso `ADMIN_EMAIL_BLACKLIST`. El componente `email-outbox.component` queda **intacto** (cero regresión en la página de Bandeja).
+
+**Archivos**: 12 nuevos + 8 modificados.
+
+- **Nuevos (modelos + components + services)**:
+  - `data/models/email-blacklist.models.ts` (~85 ln) — DTOs espejo del BE + tipos semánticos `EmailBlacklistMotivo`, `EmailBlacklistFiltroEstado`, `BlacklistFormData`, `BlacklistFiltros`, `BlacklistEstadisticas` + `EMAIL_BLACKLIST_MOTIVOS_MANUALES` para D17.8.
+  - `pages/admin/email-outbox/components/blacklist-tab/` — smart container 200 ln (orquesta filtros + tabla + dialog + drawer + URL prefill `?action=add&correo=` para cross-link Plan 39 Chat C / D11+D13).
+  - `pages/admin/email-outbox/components/blacklist-table/` — presentational, server-paginated, B4+B5 del design-system (header UPPERCASE, row-actions triplet con `aria-label` vía `pt`, empty state con detección de `hasActiveFilters`).
+  - `pages/admin/email-outbox/components/blacklist-add-dialog/` — presentational, B8 del design-system. Solo expone `MANUAL` + `BULK_IMPORT` en el `<p-select>` (D17.8). Validación inline correo + motivo, normalización trim+lowercase al submit.
+  - `pages/admin/email-outbox/components/blacklist-detail-drawer/` — presentational, B10 del design-system. Avatar shield 80px, info-list con audit completo, botón "Despejar" condicional al estado activo.
+  - `pages/admin/email-outbox/services/blacklist.service.ts` — HTTP gateway (`getPaginado` + `crear` + `despejar` con encodeURIComponent del correo).
+  - `pages/admin/email-outbox/services/blacklist.store.ts` — extiende `BaseCrudStore<EmailBlacklistEntry, BlacklistFormData, BlacklistEstadisticas>` con extras: `filterMotivo`, `filterEstadoBlacklist`, `drawerVisible`/`drawerItem`, `tableReady`, helpers `onCreado`/`onDespejado`, `hasActiveFilters` computed.
+  - `pages/admin/email-outbox/services/blacklist-data.facade.ts` — load paginado + search debounced 300ms + filtros + `deriveStats` (best-effort sobre la página visible cuando no hay filterEstado, exacto cuando filterEstado fija el universo).
+  - `pages/admin/email-outbox/services/blacklist-crud.facade.ts` — WAL optimista. CREATE: `apply` cierra dialog, `onCommit` agrega item + stats; rollback re-abre dialog con datos previos. DELETE: `apply` quirúrgico (remove + stats), `rollback` restaura **posición original** del item (no prepend/refetch). Maneja 404 con refresh + warning.
+  - `pages/admin/email-outbox/services/blacklist-ui.facade.ts` — orquesta visibilidad de dialog + drawer.
+  - `+ 7 archivos de test` (44 tests nuevos).
+
+- **Modificados**:
+  - `data/models/index.ts` — barrel re-export.
+  - `pages/admin/email-outbox/services/index.ts` — barrel exports nuevos.
+  - `pages/admin/monitoreo/monitoreo.routes.ts` — ruta hija condicional `blacklist` con `[authGuard, permissionsGuard]` + permissionPath dedicado.
+  - `pages/admin/monitoreo/shells/correos-shell.component.ts` — tab `Blacklist` agregado al array `ALL_TABS` (5to tab).
+  - `shared/constants/permission-registry.ts` — `ADMIN_EMAIL_BLACKLIST: 'intranet/admin/monitoreo/correos/blacklist'`.
+  - `shared/services/ui-mapping/ui-mapping.service.ts` — `getBlacklistMotivoSeverity` + `getBlacklistMotivoLabel` (D12 + D20).
+  - `config/environment.ts` + `config/environment.development.ts` — flag `emailBlacklistTab: true` en ambos.
+
+**Métricas**:
+
+- Lint: ✅ 0 errores · 1 warning preexistente fuera de scope.
+- Build production: ✅ OK.
+- Vitest: **1738/1738 verdes** (baseline 1683 → +55 netos: 44 nuevos del feature + 11 ajustes en specs preexistentes que recalibró TestBed por el providers nuevo).
+
+**Decisiones de implementación**:
+
+1. **Routing-based tabs vs tabs internos**: el shell `correos-shell` ya usa el primer patrón (`p-tabs` con `(valueChange)` que navega), así que Blacklist se montó como ruta hija hermana. El brief asumía tabs internos al `email-outbox.component`. Ambas opciones eran válidas; elegí la consistente con el shell para no introducir un patrón híbrido que confunda al siguiente chat (Plan 37 Chat 2 Cuarentena hará lo mismo).
+2. **Permiso dedicado** (`ADMIN_EMAIL_BLACKLIST`) en lugar de reusar `ADMIN_EMAIL_OUTBOX`: la blacklist es un dominio operativo distinto (mutaciones que afectan envío real). Dejarlo separado permite que el Director pueda dar acceso a soporte solo a Bandeja (read-only) sin habilitar el blockblock manual.
+3. **`deriveStats` best-effort**: el BE no expone `/stats` para blacklist. Cuando `filterEstado` está activo, el ratio es 100% (exacto). Sin filtro, uso el ratio de la página visible × total. Es ruido aceptable hasta que se agregue endpoint dedicado (deuda menor documentada para chat futuro).
+4. **`rollback` de DELETE preserva posición original**: `findIndex` antes del `apply` + `splice` en `rollback` para restaurar el item exactamente donde estaba. Patrón replicable en otras facades CRUD donde el order matters.
+5. **Outputs renombrados** (`confirm`/`cancel`/`close` → `confirmAdd`/`cancelAdd`/`closeDrawer`): ESLint `@angular-eslint/no-output-native` los rechaza por colisionar con eventos DOM nativos.
+
+**Aprendizaje transferible** (replicable en futuros tabs del shell):
+
+- **Patrón `routing-based tabs + feature flag + permission dedicado`** está consolidado en `correos-shell` (5 tabs ahora) e `incidencias-shell` (2 tabs). Plantilla a seguir: agregar entry en `ALL_TABS` del shell, ruta hija condicional en `monitoreo.routes.ts` con `permissionPath`, registry permiso, flag en ambos environments. **Sin tabs internos**: cada tab es una ruta lazy con su propio component standalone, evitando god-components con 4+ responsabilidades.
+
+**Verificación post-deploy** (los 7 pasos del brief):
+
+1. `/intranet/admin/monitoreo/correos/blacklist` muestra tab activo + tabla con entradas reales.
+2. Filtro `motivo=BOUNCE_MAILBOX_FULL` filtra correctamente.
+3. Búsqueda `q=gmail` reduce filas (LIKE %q%).
+4. Click "Agregar" → dialog → completar correo + motivo MANUAL → POST → fila aparece sin refresh.
+5. Click "Despejar" en una fila → confirm → DELETE → fila desaparece sin refresh.
+6. Click "Ver" abre drawer con detalle + audit (UsuarioReg, FechaReg, UltimoError truncado).
+7. Deep-link `?action=add&correo=foo@x.com` abre dialog prefilled (cross-link Plan 39 Chat C / D11+D13).

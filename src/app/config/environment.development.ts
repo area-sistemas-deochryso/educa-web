@@ -32,6 +32,7 @@ export const environment = {
 		emailOutboxDashboardDia: true,
 		emailOutboxDiagnostico: true,
 		auditoriaCorreos: true,
+		emailBlacklistTab: true,
 	},
 
 	// Debug panels (solo development)

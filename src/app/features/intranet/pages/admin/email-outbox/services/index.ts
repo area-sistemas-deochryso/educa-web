@@ -2,3 +2,8 @@ export { EmailOutboxApiService } from './email-outbox.service';
 export { EmailOutboxStore } from './email-outbox.store';
 export { EmailOutboxDataFacade } from './email-outbox-data.facade';
 export { EmailOutboxUiFacade } from './email-outbox-ui.facade';
+export { BlacklistService } from './blacklist.service';
+export { BlacklistStore } from './blacklist.store';
+export { BlacklistDataFacade } from './blacklist-data.facade';
+export { BlacklistCrudFacade } from './blacklist-crud.facade';
+export { BlacklistUiFacade } from './blacklist-ui.facade';

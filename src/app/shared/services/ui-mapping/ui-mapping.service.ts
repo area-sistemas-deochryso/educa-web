@@ -8,6 +8,7 @@ import type {
 	NotificacionPrioridad,
 	TipoPersona,
 } from '@data/models';
+import type { EmailBlacklistMotivo } from '@data/models/email-blacklist.models';
 
 // #endregion
 // #region Implementation
@@ -77,6 +78,24 @@ const NOTIFICACION_PRIORIDAD_LABEL: Record<NotificacionPrioridad, string> = {
 const TIPO_PERSONA_LABEL: Record<TipoPersona, string> = {
 	E: 'Estudiante',
 	P: 'Profesor',
+};
+// #endregion
+
+// #region Blacklist mappings (Plan 38 Chat 5)
+const BLACKLIST_MOTIVO_SEVERITY: Record<EmailBlacklistMotivo, Severity> = {
+	BOUNCE_5XX: 'danger',
+	BOUNCE_MAILBOX_FULL: 'warn',
+	MANUAL: 'info',
+	BULK_IMPORT: 'secondary',
+	FORMAT_INVALID: 'contrast',
+};
+
+const BLACKLIST_MOTIVO_LABEL: Record<EmailBlacklistMotivo, string> = {
+	BOUNCE_5XX: 'Bounce permanente 5.x.x',
+	BOUNCE_MAILBOX_FULL: 'Buzón lleno crónico (4.2.2)',
+	MANUAL: 'Bloqueo manual',
+	BULK_IMPORT: 'Carga masiva',
+	FORMAT_INVALID: 'Formato inválido',
 };
 // #endregion
 
@@ -163,6 +182,16 @@ export class UiMappingService {
 	 */
 	getTipoPersonaLabel(tipo: TipoPersona): string {
 		return TIPO_PERSONA_LABEL[tipo] ?? tipo;
+	}
+	// #endregion
+
+	// #region Blacklist motivo (Plan 38 Chat 5 — D12 / D20)
+	getBlacklistMotivoSeverity(motivo: EmailBlacklistMotivo): Severity {
+		return BLACKLIST_MOTIVO_SEVERITY[motivo] ?? 'secondary';
+	}
+
+	getBlacklistMotivoLabel(motivo: EmailBlacklistMotivo): string {
+		return BLACKLIST_MOTIVO_LABEL[motivo] ?? motivo;
 	}
 	// #endregion
 }

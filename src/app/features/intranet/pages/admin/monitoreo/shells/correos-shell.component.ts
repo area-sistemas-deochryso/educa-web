@@ -46,6 +46,12 @@ const ALL_TABS: ShellTab[] = [
 		icon: 'pi pi-exclamation-triangle',
 		featureFlag: 'auditoriaCorreos',
 	},
+	{
+		value: 'blacklist',
+		label: 'Blacklist',
+		icon: 'pi pi-shield',
+		featureFlag: 'emailBlacklistTab',
+	},
 ];
 // #endregion
 

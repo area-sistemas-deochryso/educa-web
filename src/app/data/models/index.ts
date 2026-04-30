@@ -1,5 +1,6 @@
 export * from './archivo.models';
 export * from './attendance.models';
+export * from './email-blacklist.models';
 export * from './calificacion.models';
 export * from './events-calendar.models';
 export * from './schedule.models';

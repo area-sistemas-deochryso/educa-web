@@ -1,0 +1,128 @@
+<!-- #region Stats inline -->
+@if (vm().estadisticas; as stats) {
+	<section class="stats-inline">
+		<div class="stat-pill">
+			<span class="stat-pill-label">Total</span>
+			<span class="stat-pill-value">{{ stats.total }}</span>
+		</div>
+		<div class="stat-pill stat-pill--active">
+			<span class="stat-pill-label">Activos</span>
+			<span class="stat-pill-value">{{ stats.activas }}</span>
+		</div>
+		<div class="stat-pill stat-pill--inactive">
+			<span class="stat-pill-label">Despejados</span>
+			<span class="stat-pill-value">{{ stats.inactivas }}</span>
+		</div>
+	</section>
+}
+<!-- #endregion -->
+
+<!-- #region Filtros -->
+<div class="filters-bar">
+	<div class="search-box">
+		<i class="pi pi-search"></i>
+		<input
+			type="text"
+			pInputText
+			placeholder="Buscar por correo (LIKE %q%)..."
+			[ngModel]="vm().searchTerm"
+			(ngModelChange)="onSearchChange($event)"
+		/>
+	</div>
+
+	<div class="filter-dropdowns">
+		<p-select
+			[options]="estadoOptions"
+			optionLabel="label"
+			optionValue="value"
+			[ngModel]="vm().filterEstado"
+			(ngModelChange)="onFilterEstadoChange($event)"
+			placeholder="Estado"
+			[showClear]="true"
+			appendTo="body"
+		/>
+		<p-select
+			[options]="motivoOptions"
+			optionLabel="label"
+			optionValue="value"
+			[ngModel]="vm().filterMotivo"
+			(ngModelChange)="onFilterMotivoChange($event)"
+			placeholder="Motivo"
+			[showClear]="true"
+			appendTo="body"
+		/>
+	</div>
+
+	<button
+		pButton
+		icon="pi pi-filter-slash"
+		class="p-button-text p-button-sm btn-clear"
+		pTooltip="Limpiar filtros"
+		tooltipPosition="top"
+		(click)="onClearFiltros()"
+		[pt]="{ root: { 'aria-label': 'Limpiar filtros' } }"
+	></button>
+
+	<button
+		pButton
+		icon="pi pi-refresh"
+		class="p-button-text p-button-sm"
+		pTooltip="Refrescar"
+		tooltipPosition="top"
+		(click)="onRefresh()"
+		[pt]="{ root: { 'aria-label': 'Refrescar' } }"
+	></button>
+
+	<button
+		pButton
+		label="Agregar"
+		icon="pi pi-plus"
+		class="p-button-success p-button-sm"
+		(click)="onOpenAddDialog()"
+		[pt]="{ root: { 'aria-label': 'Agregar correo a blacklist' } }"
+	></button>
+</div>
+<!-- #endregion -->
+
+<!-- #region Tabla -->
+@if (vm().tableReady) {
+	<app-blacklist-table
+		[items]="vm().items"
+		[loading]="vm().loading"
+		[total]="vm().totalRecords"
+		[page]="vm().page"
+		[pageSize]="vm().pageSize"
+		[hasActiveFilters]="vm().hasActiveFilters"
+		(viewDetail)="onViewDetail($event)"
+		(despejar)="onDespejar($event)"
+		(lazyLoad)="onLazyLoad($event)"
+	/>
+} @else {
+	<app-table-skeleton [columns]="skeletonColumns" [rows]="10" />
+}
+<!-- #endregion -->
+
+<!-- #region Add Dialog -->
+<app-blacklist-add-dialog
+	[visible]="vm().dialogVisible"
+	[formData]="vm().formData"
+	(visibleChange)="onDialogVisibleChange($event)"
+	(correoChange)="onDialogCorreoChange($event)"
+	(motivoChange)="onDialogMotivoChange($event)"
+	(observacionChange)="onDialogObservacionChange($event)"
+	(confirmAdd)="onDialogConfirm($event)"
+	(cancelAdd)="onDialogCancel()"
+/>
+<!-- #endregion -->
+
+<!-- #region Detail Drawer -->
+<app-blacklist-detail-drawer
+	[visible]="vm().drawerVisible"
+	[entry]="vm().drawerItem"
+	(visibleChange)="onDrawerVisibleChange($event)"
+	(closeDrawer)="onDrawerClose()"
+	(despejar)="onDrawerDespejar($event)"
+/>
+<!-- #endregion -->
+
+<p-confirmDialog />

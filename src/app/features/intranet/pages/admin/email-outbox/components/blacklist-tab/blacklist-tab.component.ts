@@ -1,0 +1,208 @@
+import {
+	ChangeDetectionStrategy,
+	Component,
+	DestroyRef,
+	OnInit,
+	inject,
+} from '@angular/core';
+import { FormsModule } from '@angular/forms';
+import { ActivatedRoute } from '@angular/router';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { ButtonModule } from 'primeng/button';
+import { ConfirmDialogModule } from 'primeng/confirmdialog';
+import { ConfirmationService } from 'primeng/api';
+import { InputTextModule } from 'primeng/inputtext';
+import { SelectModule } from 'primeng/select';
+import { TableLazyLoadEvent } from 'primeng/table';
+import { TooltipModule } from 'primeng/tooltip';
+
+import { TableSkeletonComponent } from '@shared/components';
+import {
+	CrearBlacklistRequest,
+	EmailBlacklistEntry,
+	EmailBlacklistFiltroEstado,
+	EmailBlacklistMotivo,
+} from '@data/models/email-blacklist.models';
+
+import {
+	BlacklistCrudFacade,
+	BlacklistDataFacade,
+	BlacklistUiFacade,
+} from '../../services';
+import { BlacklistTableComponent } from '../blacklist-table/blacklist-table.component';
+import { BlacklistAddDialogComponent } from '../blacklist-add-dialog/blacklist-add-dialog.component';
+import { BlacklistDetailDrawerComponent } from '../blacklist-detail-drawer/blacklist-detail-drawer.component';
+
+interface SelectOption<T> {
+	label: string;
+	value: T;
+}
+
+const ESTADO_OPTIONS: SelectOption<EmailBlacklistFiltroEstado>[] = [
+	{ label: 'Activa', value: 'activa' },
+	{ label: 'Despejada', value: 'inactiva' },
+];
+
+const MOTIVO_OPTIONS: SelectOption<EmailBlacklistMotivo>[] = [
+	{ label: 'Bounce permanente 5.x.x', value: 'BOUNCE_5XX' },
+	{ label: 'Buzón lleno crónico (4.2.2)', value: 'BOUNCE_MAILBOX_FULL' },
+	{ label: 'Bloqueo manual', value: 'MANUAL' },
+	{ label: 'Carga masiva', value: 'BULK_IMPORT' },
+	{ label: 'Formato inválido', value: 'FORMAT_INVALID' },
+];
+
+/**
+ * Plan 38 Chat 5 — Smart container del tab "Blacklist".
+ *
+ * Orquesta filtros + tabla + dialog + drawer. Lee `?correo=...&action=add`
+ * del query param para prefill del dialog (cross-link Plan 39 Chat C).
+ */
+@Component({
+	selector: 'app-blacklist-tab',
+	standalone: true,
+	imports: [
+		FormsModule,
+		ButtonModule,
+		InputTextModule,
+		SelectModule,
+		TooltipModule,
+		ConfirmDialogModule,
+		TableSkeletonComponent,
+		BlacklistTableComponent,
+		BlacklistAddDialogComponent,
+		BlacklistDetailDrawerComponent,
+	],
+	providers: [ConfirmationService],
+	templateUrl: './blacklist-tab.component.html',
+	styleUrl: './blacklist-tab.component.scss',
+	changeDetection: ChangeDetectionStrategy.OnPush,
+})
+export class BlacklistTabComponent implements OnInit {
+	// #region Dependencias
+	private readonly dataFacade = inject(BlacklistDataFacade);
+	private readonly crudFacade = inject(BlacklistCrudFacade);
+	private readonly uiFacade = inject(BlacklistUiFacade);
+	private readonly route = inject(ActivatedRoute);
+	private readonly destroyRef = inject(DestroyRef);
+	private readonly confirmationService = inject(ConfirmationService);
+	// #endregion
+
+	// #region Estado
+	readonly vm = this.dataFacade.vm;
+	readonly skeletonColumns = BlacklistTableComponent.skeletonColumns;
+	readonly estadoOptions = ESTADO_OPTIONS;
+	readonly motivoOptions = MOTIVO_OPTIONS;
+	// #endregion
+
+	ngOnInit(): void {
+		this.dataFacade.loadData();
+
+		// Cross-link Plan 39 Chat C: prefill del dialog cuando se navega
+		// con `?action=add&correo=...` desde el dashboard.
+		this.route.queryParamMap
+			.pipe(takeUntilDestroyed(this.destroyRef))
+			.subscribe((params) => {
+				const action = params.get('action');
+				const correo = params.get('correo');
+				if (action === 'add' && correo) {
+					this.uiFacade.openAddDialog(correo);
+				}
+			});
+	}
+
+	// #region Search / filtros
+	onSearchChange(term: string): void {
+		this.dataFacade.onSearchChange(term);
+	}
+
+	onFilterEstadoChange(value: EmailBlacklistFiltroEstado | null): void {
+		this.dataFacade.onFilterEstadoChange(value);
+	}
+
+	onFilterMotivoChange(value: EmailBlacklistMotivo | null): void {
+		this.dataFacade.onFilterMotivoChange(value);
+	}
+
+	onClearFiltros(): void {
+		this.dataFacade.clearFiltros();
+	}
+
+	onRefresh(): void {
+		this.dataFacade.refresh();
+	}
+	// #endregion
+
+	// #region Tabla
+	onLazyLoad(event: TableLazyLoadEvent): void {
+		const first = event.first ?? 0;
+		const rows = event.rows ?? this.vm().pageSize;
+		const page = Math.floor(first / rows) + 1;
+		if (page === this.vm().page && rows === this.vm().pageSize) return;
+		this.dataFacade.loadPage(page, rows);
+	}
+
+	onViewDetail(item: EmailBlacklistEntry): void {
+		this.uiFacade.openDetailDrawer(item);
+	}
+	// #endregion
+
+	// #region Despejar (con confirm)
+	onDespejar(item: EmailBlacklistEntry): void {
+		this.confirmationService.confirm({
+			header: 'Despejar bloqueo',
+			message: `¿Estás seguro de despejar el bloqueo de "${item.correo}"? El correo volverá a recibir intentos de envío.`,
+			acceptLabel: 'Despejar',
+			rejectLabel: 'Cancelar',
+			acceptButtonStyleClass: 'p-button-warning',
+			rejectButtonStyleClass: 'p-button-text',
+			icon: 'pi pi-exclamation-triangle',
+			accept: () => this.crudFacade.despejar(item),
+		});
+	}
+	// #endregion
+
+	// #region Dialog "Agregar"
+	onOpenAddDialog(): void {
+		this.uiFacade.openAddDialog();
+	}
+
+	onDialogVisibleChange(visible: boolean): void {
+		if (!visible) this.uiFacade.closeDialog();
+	}
+
+	onDialogCorreoChange(value: string): void {
+		this.dataFacade.updateFormCorreo(value);
+	}
+
+	onDialogMotivoChange(value: EmailBlacklistMotivo | null): void {
+		this.dataFacade.updateFormMotivo(value);
+	}
+
+	onDialogObservacionChange(value: string): void {
+		this.dataFacade.updateFormObservacion(value);
+	}
+
+	onDialogConfirm(request: CrearBlacklistRequest): void {
+		this.crudFacade.crear(request);
+	}
+
+	onDialogCancel(): void {
+		this.uiFacade.closeDialog();
+	}
+	// #endregion
+
+	// #region Drawer detalle
+	onDrawerVisibleChange(visible: boolean): void {
+		if (!visible) this.uiFacade.closeDetailDrawer();
+	}
+
+	onDrawerClose(): void {
+		this.uiFacade.closeDetailDrawer();
+	}
+
+	onDrawerDespejar(item: EmailBlacklistEntry): void {
+		// Cierra drawer (lo hace el rollback/commit) y delega al confirm.
+		this.onDespejar(item);
+	}
+	// #endregion
+}

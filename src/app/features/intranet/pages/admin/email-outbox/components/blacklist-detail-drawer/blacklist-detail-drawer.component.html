@@ -1,0 +1,101 @@
+<p-drawer
+	[visible]="visible()"
+	(visibleChange)="onVisibleChange($event)"
+	position="right"
+	[style]="{ width: '450px' }"
+	[modal]="true"
+	header="Detalle del bloqueo"
+>
+	@if (entry(); as item) {
+		<div class="detail-content">
+			<div class="detail-avatar">
+				<i class="pi pi-shield"></i>
+			</div>
+			<div class="detail-name">{{ item.correo }}</div>
+
+			<p-tag
+				[value]="uiMapping.getBlacklistMotivoLabel(item.motivo)"
+				[severity]="uiMapping.getBlacklistMotivoSeverity(item.motivo)"
+			/>
+
+			<div class="detail-info">
+				<div class="info-item">
+					<span class="info-label">ID</span>
+					<span class="info-value">#{{ item.id }}</span>
+				</div>
+				<div class="info-item">
+					<span class="info-label">Estado</span>
+					<p-tag
+						[value]="item.estado ? 'Activa' : 'Despejada'"
+						[severity]="item.estado ? 'success' : 'danger'"
+						styleClass="tag-neutral"
+					/>
+				</div>
+				<div class="info-item">
+					<span class="info-label">Hits acumulados</span>
+					<span class="info-value">{{ item.intentosFallidos }}</span>
+				</div>
+				@if (item.fechaPrimerFallo) {
+					<div class="info-item">
+						<span class="info-label">Primer fallo</span>
+						<span class="info-value">{{ item.fechaPrimerFallo | date: 'dd/MM/yyyy HH:mm' }}</span>
+					</div>
+				}
+				@if (item.fechaUltimoFallo) {
+					<div class="info-item">
+						<span class="info-label">Último fallo</span>
+						<span class="info-value">{{ item.fechaUltimoFallo | date: 'dd/MM/yyyy HH:mm' }}</span>
+					</div>
+				}
+				<div class="info-item">
+					<span class="info-label">Bloqueado por</span>
+					<span class="info-value">{{ item.usuarioReg }}</span>
+				</div>
+				<div class="info-item">
+					<span class="info-label">Bloqueado el</span>
+					<span class="info-value">{{ item.fechaReg | date: 'dd/MM/yyyy HH:mm' }}</span>
+				</div>
+				@if (item.usuarioMod && !item.estado) {
+					<div class="info-item">
+						<span class="info-label">Despejado por</span>
+						<span class="info-value">{{ item.usuarioMod }}</span>
+					</div>
+				}
+				@if (item.fechaMod && !item.estado) {
+					<div class="info-item">
+						<span class="info-label">Despejado el</span>
+						<span class="info-value">{{ item.fechaMod | date: 'dd/MM/yyyy HH:mm' }}</span>
+					</div>
+				}
+			</div>
+
+			@if (item.ultimoError) {
+				<div class="detail-error">
+					<span class="info-label">Último error SMTP</span>
+					<pre class="error-text">{{ item.ultimoError }}</pre>
+				</div>
+			}
+		</div>
+
+		<div class="drawer-footer">
+			<button
+				pButton
+				label="Cerrar"
+				icon="pi pi-times"
+				class="p-button-text"
+				(click)="onClose()"
+				[pt]="{ root: { 'aria-label': 'Cerrar' } }"
+			></button>
+			@if (item.estado) {
+				<button
+					pButton
+					label="Despejar"
+					icon="pi pi-check"
+					class="p-button-warning"
+					(click)="onDespejar()"
+					[pt]="{ root: { 'aria-label': 'Despejar bloqueo' } }"
+				></button>
+			}
+		</div>
+	}
+</p-drawer>

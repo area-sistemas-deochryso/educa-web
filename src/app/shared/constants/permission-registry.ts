@@ -31,6 +31,7 @@ export const PERMISOS = {
 	ADMIN_EMAIL_OUTBOX_DASHBOARD_DIA: 'intranet/admin/monitoreo/correos/dashboard',
 	ADMIN_EMAIL_OUTBOX_DIAGNOSTICO: 'intranet/admin/monitoreo/correos/diagnostico',
 	ADMIN_AUDITORIA_CORREOS: 'intranet/admin/monitoreo/correos/auditoria',
+	ADMIN_EMAIL_BLACKLIST: 'intranet/admin/monitoreo/correos/blacklist',
 	ADMIN_ERROR_LOGS: 'intranet/admin/monitoreo/incidencias/errores',
 	ADMIN_REPORTES_USUARIO: 'intranet/admin/monitoreo/incidencias/reportes',
 	ADMIN_RATE_LIMIT_EVENTS: 'intranet/admin/monitoreo/seguridad/rate-limit',

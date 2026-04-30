@@ -56,6 +56,20 @@ const CORREOS_CHILDREN: Routes = [
 				},
 			]
 		: []),
+	...(environment.features.emailBlacklistTab
+		? [
+				{
+					path: 'blacklist',
+					loadComponent: () =>
+						import('../email-outbox/components/blacklist-tab/blacklist-tab.component').then(
+							(m) => m.BlacklistTabComponent,
+						),
+					canActivate: [authGuard, permissionsGuard],
+					data: { permissionPath: 'intranet/admin/monitoreo/correos/blacklist' },
+					title: 'Intranet - Blacklist de Correos',
+				},
+			]
+		: []),
 ];
 // #endregion
 
