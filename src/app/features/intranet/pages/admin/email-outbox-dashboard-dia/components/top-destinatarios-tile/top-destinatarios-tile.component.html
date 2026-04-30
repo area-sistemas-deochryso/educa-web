@@ -1,0 +1,63 @@
+<section class="tile">
+	<header class="tile__header">
+		<div class="tile__title">
+			<i class="pi pi-list"></i>
+			<h3>Top destinatarios fallidos · {{ ventanaDias() }}d</h3>
+		</div>
+	</header>
+
+	@if (loading() && !hasData()) {
+		<app-table-skeleton [columns]="skeletonColumns" [rows]="5" minHeight="220px" />
+	} @else if (!hasData()) {
+		<div class="tile__empty">
+			<i class="pi pi-check-circle"></i>
+			<p>Sin destinatarios con fallos en la ventana</p>
+		</div>
+	} @else {
+		<table class="dest-table">
+			<thead>
+				<tr>
+					<th>Destinatario</th>
+					<th class="num">Hits</th>
+					<th class="num">Días</th>
+					<th class="num">4.2.2</th>
+					<th class="num">Otros 5xx</th>
+					<th>Acción</th>
+				</tr>
+			</thead>
+			<tbody>
+				@for (d of items(); track d.destinatario) {
+					<tr [class.row-blacklisted]="d.yaBlacklisteado">
+						<td>
+							<div class="dest">
+								<span class="dest__email">{{ d.destinatario }}</span>
+								@if (d.yaBlacklisteado) {
+									<p-tag value="Blacklisted" severity="danger" />
+								}
+							</div>
+						</td>
+						<td class="num">{{ d.hitsFallidos }}</td>
+						<td class="num">{{ d.diasConFalla }}</td>
+						<td class="num">{{ d.mailboxFull }}</td>
+						<td class="num">{{ d.otros5xx }}</td>
+						<td>
+							@if (!d.yaBlacklisteado) {
+								<button
+									pButton
+									label="Bloquear"
+									icon="pi pi-ban"
+									class="p-button-sm p-button-outlined p-button-danger"
+									[routerLink]="[blacklistRoute]"
+									[queryParams]="queryParamsFor(d.destinatario)"
+									[pt]="{
+										root: { 'aria-label': 'Bloquear ' + d.destinatario }
+									}"
+								></button>
+							}
+						</td>
+					</tr>
+				}
+			</tbody>
+		</table>
+	}
+</section>

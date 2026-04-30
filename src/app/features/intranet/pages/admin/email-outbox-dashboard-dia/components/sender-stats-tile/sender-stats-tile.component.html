@@ -1,0 +1,53 @@
+<section class="tile">
+	<header class="tile__header">
+		<div class="tile__title">
+			<i class="pi pi-send"></i>
+			<h3>Sender Mix · {{ ventanaDias() }}d</h3>
+		</div>
+	</header>
+
+	@if (loading() && !hasData()) {
+		<app-table-skeleton [columns]="skeletonColumns" [rows]="5" minHeight="220px" />
+	} @else if (!hasData()) {
+		<div class="tile__empty">
+			<i class="pi pi-inbox"></i>
+			<p>Sin remitentes activos en la ventana</p>
+		</div>
+	} @else {
+		<table class="sender-table">
+			<thead>
+				<tr>
+					<th>Remitente</th>
+					<th class="num">Total</th>
+					<th class="num">Enviados</th>
+					<th class="num">Fallidos</th>
+					<th class="num">% fallo</th>
+				</tr>
+			</thead>
+			<tbody>
+				@for (s of items(); track s.remitente) {
+					<tr>
+						<td>
+							<div class="sender">
+								<span class="sender__email">{{ s.remitente }}</span>
+								<span class="sender__last">Último uso: {{ s.ultimoUso | date: 'short' }}</span>
+								<div class="sender__bar">
+									<div
+										class="sender__bar-fill"
+										[style.width.%]="percentageOfMax(s.total)"
+									></div>
+								</div>
+							</div>
+						</td>
+						<td class="num">{{ s.total }}</td>
+						<td class="num">{{ s.enviados }}</td>
+						<td class="num">{{ s.fallidos }}</td>
+						<td class="num" [class]="'pct--' + severityClass(s.tasaFalloPct)">
+							{{ s.tasaFalloPct | number: '1.1-1' }}%
+						</td>
+					</tr>
+				}
+			</tbody>
+		</table>
+	}
+</section>

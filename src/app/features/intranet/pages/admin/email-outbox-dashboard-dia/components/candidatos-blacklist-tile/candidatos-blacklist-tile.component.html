@@ -1,0 +1,50 @@
+<section class="tile">
+	<header class="tile__header">
+		<div class="tile__title">
+			<i class="pi pi-exclamation-triangle"></i>
+			<h3>Candidatos a blacklist</h3>
+		</div>
+	</header>
+
+	@if (loading() && !hasData()) {
+		<app-table-skeleton [columns]="skeletonColumns" [rows]="4" minHeight="180px" />
+	} @else if (!hasData()) {
+		<div class="tile__empty">
+			<i class="pi pi-check-circle"></i>
+			<p>Sin candidatos. Excelente.</p>
+		</div>
+	} @else {
+		<table class="cand-table">
+			<thead>
+				<tr>
+					<th>Destinatario</th>
+					<th class="num">Hits</th>
+					<th>Último hit</th>
+					<th>Acción</th>
+				</tr>
+			</thead>
+			<tbody>
+				@for (c of items(); track c.destinatario) {
+					<tr>
+						<td>{{ c.destinatario }}</td>
+						<td class="num"><span class="pill pill--warn">{{ c.hits }}</span></td>
+						<td>{{ c.ultimoHit | date: 'short' }}</td>
+						<td>
+							<button
+								pButton
+								label="Bloquear"
+								icon="pi pi-ban"
+								class="p-button-sm p-button-outlined p-button-danger"
+								[routerLink]="[blacklistRoute]"
+								[queryParams]="queryParamsFor(c.destinatario)"
+								[pt]="{
+									root: { 'aria-label': 'Bloquear ' + c.destinatario }
+								}"
+							></button>
+						</td>
+					</tr>
+				}
+			</tbody>
+		</table>
+	}
+</section>

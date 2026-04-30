@@ -1,0 +1,50 @@
+<section class="tile">
+	<header class="tile__header">
+		<div class="tile__title">
+			<i class="pi pi-globe"></i>
+			<h3>Dominios receptores · {{ ventanaDias() }}d</h3>
+		</div>
+	</header>
+
+	@if (loading() && !hasData()) {
+		<app-table-skeleton [columns]="skeletonColumns" [rows]="5" minHeight="220px" />
+	} @else if (!hasData()) {
+		<div class="tile__empty">
+			<i class="pi pi-inbox"></i>
+			<p>Sin dominios receptores en la ventana</p>
+		</div>
+	} @else {
+		<table class="dom-table">
+			<thead>
+				<tr>
+					<th>Dominio</th>
+					<th class="num">Total</th>
+					<th class="num">Fallidos</th>
+					<th class="num">% fallo</th>
+				</tr>
+			</thead>
+			<tbody>
+				@for (d of items(); track d.dominio) {
+					<tr>
+						<td>
+							<div class="dom">
+								<span class="dom__name">{{ d.dominio }}</span>
+								<div class="dom__bar">
+									<div
+										class="dom__bar-fill"
+										[style.width.%]="percentageOfMax(d.total)"
+									></div>
+								</div>
+							</div>
+						</td>
+						<td class="num">{{ d.total }}</td>
+						<td class="num">{{ d.fallidos }}</td>
+						<td class="num" [class]="'pct--' + severityClass(d.tasaFalloPct)">
+							{{ d.tasaFalloPct | number: '1.1-1' }}%
+						</td>
+					</tr>
+				}
+			</tbody>
+		</table>
+	}
+</section>

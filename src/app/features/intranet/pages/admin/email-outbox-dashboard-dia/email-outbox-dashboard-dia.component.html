@@ -22,6 +22,10 @@
 				<span class="tab-badge">{{ totalFallos() + totalBounces() }}</span>
 			}
 		</p-tab>
+		<p-tab value="mapa">
+			<i class="pi pi-compass"></i>
+			<span>Mapa de envío</span>
+		</p-tab>
 	</p-tablist>
 
 	<p-tabpanels>
@@ -100,6 +104,11 @@
 					</div>
 				</div>
 			</div>
+		</p-tabpanel>
+
+		<!-- Tab 3: Mapa de envío (Plan 39 Chat C) -->
+		<p-tabpanel value="mapa">
+			<app-mapa-envio-tab />
 		</p-tabpanel>
 	</p-tabpanels>
 </p-tabs>

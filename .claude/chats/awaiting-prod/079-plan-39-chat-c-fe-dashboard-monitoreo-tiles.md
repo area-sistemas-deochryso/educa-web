@@ -1,7 +1,7 @@
 # Plan 39 Chat C FE — Tab "Mapa de envío" en Dashboard del día con 6 tiles
 
 > **Repo destino**: `educa-web` (main)
-> **Plan**: 39 · **Chat**: C · **Fase**: F2.Execute · **Estado**: ⏳ pendiente arrancar — prioridad alta
+> **Plan**: 39 · **Chat**: C · **Fase**: F2.Execute · **Estado**: ✅ cerrado local 2026-04-30 — `awaiting-prod/079`
 > **Creado**: 2026-04-29 · **Modo sugerido**: `/execute`
 > **Pre-req**: Chat A (077) deployado. Plan 38 Chat 5 (075) deployado (cross-link "Bloquear" a tab Blacklist).
 
@@ -114,3 +114,29 @@ El Service Worker del proyecto cachea automáticamente las responses GET (regla 
 - Brief design: `.claude/chats/closed/071-plan-39-chat-1-monitoreo-empirico-design.md` (D11 + D13).
 - Reglas: `templates.md`, `skeletons.md`, `a11y.md`, `service-worker.md`, `crud-patterns.md`.
 - Plan 38 Chat 5 brief: `.claude/chats/open/075-plan-38-chat-5-fe-blacklist-tab-admin.md` (cross-link `?correo=`).
+
+## CIERRE 2026-04-30 (local awaiting-prod)
+
+### Entregable
+
+- 21 archivos nuevos: 5 services (api/store/facade/hub + monitoreo facade) + models + 6 tiles + container + 8 spec files.
+- 4 archivos modificados: dashboard-dia (tab "Mapa de envío"), services index, monitoreo-hub (badge defer-fail crítico).
+- Lint 0 errores, typecheck strict 0 errores, **suite 1752/1752 verde** (+14 sobre baseline 1738), build production OK.
+
+### Decisiones de implementación
+
+1. **Polling fallback 30s en lugar de no-degradación**: el brief dice "graceful degradation si SignalR no conecta, polling 30s al endpoint defer-fail-status". Implementado en el facade vía `timer(30s, 30s)` que se prende en el `catch` del `hub.connect()` y se apaga cuando el hub conecta. Si reconecta automático luego, el polling sigue activo (acumula tráfico). Deuda menor: agregar `onreconnected` que apague polling. No bloquea Plan 38 Chat 6 (076) porque el hub server existe y el caso polling es solo fallback Netlify.
+2. **`OnInit/OnDestroy` en lugar de `effect`**: el container `mapa-envio-tab` usa lifecycle hooks porque el `MessageService` toast requiere ejecutarse después del DI scope. Patrón consistente con `signalr.service.ts` y `attendance-signalr.service.ts`.
+3. **Tile A defer-fail-live-counter consume `DeferFailStatus` directo del Plan 22/29**: el brief sugería "extiende widget Plan 29" — implementado como tile nuevo que reusa el mismo modelo (`DeferFailStatus`) y deja el widget Plan 22 en `email-outbox.component` intacto. Evita acoplamiento; el widget original sigue para vista clásica.
+4. **Email-hub.service.ts vive en `email-outbox-dashboard-dia/services/`**: el brief decía "reutilizable por Plan 38 Chat 6 (D13)". El path actual permite que Plan 38 Chat 6 lo importe vía `@features/intranet/pages/admin/email-outbox-dashboard-dia/services` o se mueva a `core/services/signalr/` cuando 076 lo necesite. Decisión de no anticipar el move.
+5. **Badge crítico en monitoreo-hub**: `deferFailCritical` se calcula `>= 4`, no `>= 4/5` proporcional. Threshold absoluto del cPanel (5), por eso `>= 4` significa "queda 1 fail antes del bloqueo". Animación `pulse-alert` para llamar atención sin saturar.
+
+### Aprendizajes transferibles
+
+- **Patrón "tile presentational con CSS-only chart"** funciona bien para serie temporal (24 puntos × 30 días sin librerías). Cuando la chart es simple (barras apiladas, % proporcionales, sparklines), evitar Chart.js / ECharts ahorra ~150KB en bundle. Para gráficos interactivos sí justifica librería.
+- **`fixture.componentRef.injector.get(MessageService)` vs `TestBed.inject`**: cuando el componente declara `providers: [MessageService]`, Vitest no lo expone vía `TestBed.inject` (queda en scope del componente). Usar `componentRef.injector.get` o agregar a TestBed providers. Documentar en `rules/testing.md` si el patrón se repite.
+- **Multi-tile facade single-store**: estado por-tile (`senderLoading`, `topLoading`, etc.) en vez de estado global del facade permite que cada skeleton se resuelva independiente. Patrón replicable cuando un dashboard cubre 5+ endpoints paralelos.
+
+### Verificación post-deploy
+
+5 pasos del brief (ver §VERIFICACIÓN POST-DEPLOY arriba). Cuando se confirmen, cerrar con `/verify 079` ✅. Si falla cualquier paso, `/verify 079 ❌ rollback`.

@@ -150,6 +150,22 @@
 			line-height: 1;
 			letter-spacing: 0.02em;
 		}
+
+		.card-alert-badge {
+			align-self: start;
+			width: 30px;
+			height: 30px;
+			display: inline-flex;
+			align-items: center;
+			justify-content: center;
+			border-radius: 50%;
+			background: var(--red-600);
+			color: var(--white-color);
+			margin-left: 0.25rem;
+			animation: pulse-alert 2s ease-in-out infinite;
+
+			i { font-size: 0.95rem; }
+		}
 	}
 
 	.card-links {
@@ -239,5 +255,10 @@
 		margin: 0;
 		font-size: 0.9rem;
 	}
+}
+
+@keyframes pulse-alert {
+	0%, 100% { transform: scale(1); opacity: 1; }
+	50% { transform: scale(1.08); opacity: 0.85; }
 }
 // #endregion

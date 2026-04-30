@@ -1,0 +1,109 @@
+.tile {
+	display: flex;
+	flex-direction: column;
+	gap: 0.75rem;
+	padding: 1.25rem;
+	border: 1px solid var(--surface-300);
+	border-radius: 12px;
+	background: transparent;
+	min-height: 180px;
+
+	&--critical {
+		border-color: var(--red-600);
+	}
+
+	&__header {
+		display: flex;
+		align-items: center;
+		justify-content: space-between;
+	}
+
+	&__title {
+		display: flex;
+		align-items: center;
+		gap: 0.5rem;
+
+		h3 {
+			margin: 0;
+			font-size: 0.95rem;
+			font-weight: 600;
+			color: var(--text-color);
+		}
+
+		i {
+			color: var(--blue-800);
+		}
+	}
+
+	&__skeleton {
+		display: flex;
+		flex-direction: column;
+		gap: 0.5rem;
+	}
+
+	&__body {
+		display: flex;
+		flex-direction: column;
+		gap: 0.5rem;
+	}
+
+	&__subtitle {
+		margin: 0;
+		font-size: 0.8rem;
+		color: var(--text-color-secondary);
+	}
+}
+
+.hub-dot {
+	display: inline-block;
+	width: 8px;
+	height: 8px;
+	border-radius: 50%;
+
+	&--live {
+		background: var(--green-500);
+	}
+
+	&--polling {
+		background: var(--yellow-500);
+	}
+}
+
+.counter {
+	display: flex;
+	align-items: baseline;
+	gap: 0.25rem;
+	font-family: monospace;
+
+	&__value {
+		font-size: 2rem;
+		font-weight: 700;
+		color: var(--text-color);
+	}
+
+	&__divider {
+		font-size: 1.25rem;
+		color: var(--text-color-secondary);
+	}
+
+	&__threshold {
+		font-size: 1.25rem;
+		color: var(--text-color-secondary);
+	}
+}
+
+.bar {
+	height: 8px;
+	background: var(--surface-200);
+	border-radius: 4px;
+	overflow: hidden;
+
+	&__fill {
+		height: 100%;
+		transition: width 0.3s ease;
+
+		&--success { background: var(--green-500); }
+		&--warn { background: var(--yellow-500); }
+		&--danger { background: var(--red-600); }
+	}
+}

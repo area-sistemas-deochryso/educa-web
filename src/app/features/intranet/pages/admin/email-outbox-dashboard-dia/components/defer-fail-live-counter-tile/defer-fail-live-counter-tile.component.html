@@ -1,0 +1,36 @@
+<section class="tile" [class.tile--critical]="level() === 'danger'">
+	<header class="tile__header">
+		<div class="tile__title">
+			<i class="pi pi-bolt"></i>
+			<h3>Defer/Fail en vivo</h3>
+		</div>
+		@if (hubConnected()) {
+			<span class="hub-dot hub-dot--live" aria-label="Conexión SignalR activa"></span>
+		} @else {
+			<span class="hub-dot hub-dot--polling" aria-label="Polling fallback (sin SignalR)"></span>
+		}
+	</header>
+
+	@if (loading() && !hasData()) {
+		<div class="tile__skeleton">
+			<app-skeleton-loader variant="rect" width="100%" height="48px" />
+			<app-skeleton-loader variant="text" width="60%" height="14px" />
+		</div>
+	} @else {
+		<div class="tile__body">
+			<div class="counter">
+				<span class="counter__value">{{ counter() }}</span>
+				<span class="counter__divider">/</span>
+				<span class="counter__threshold">{{ threshold() }}</span>
+			</div>
+
+			<p-tag [value]="levelLabel()" [severity]="level()" />
+
+			<div class="bar" role="progressbar" [attr.aria-valuenow]="percent()" aria-valuemin="0" aria-valuemax="100">
+				<div class="bar__fill" [class]="'bar__fill--' + level()" [style.width.%]="percent()"></div>
+			</div>
+
+			<p class="tile__subtitle">{{ subtitle() }}</p>
+		</div>
+	}
+</section>

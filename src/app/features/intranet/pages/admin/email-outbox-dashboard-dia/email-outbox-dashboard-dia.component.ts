@@ -10,6 +10,7 @@ import { DashboardFallosTableComponent } from './components/dashboard-fallos-tab
 import { DashboardHeaderComponent } from './components/dashboard-header/dashboard-header.component';
 import { DashboardPorTipoTableComponent } from './components/dashboard-por-tipo-table/dashboard-por-tipo-table.component';
 import { DashboardResumenComponent } from './components/dashboard-resumen/dashboard-resumen.component';
+import { MapaEnvioTabComponent } from './components/mapa-envio-tab/mapa-envio-tab.component';
 import { EmailOutboxDashboardDiaFacade } from './services';
 
 const PORTIPO_SKELETON_COLUMNS: SkeletonColumnDef[] = [
@@ -61,6 +62,7 @@ interface DetalleKpiCard {
 		DashboardPorTipoTableComponent,
 		DashboardBouncersTableComponent,
 		DashboardFallosTableComponent,
+		MapaEnvioTabComponent,
 	],
 	templateUrl: './email-outbox-dashboard-dia.component.html',
 	styleUrl: './email-outbox-dashboard-dia.component.scss',

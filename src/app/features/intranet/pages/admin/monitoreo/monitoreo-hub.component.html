@@ -20,6 +20,15 @@
 						<p class="card-description">{{ card.description }}</p>
 					</div>
 					<span class="card-badge">{{ card.links.length }}</span>
+					@if (card.id === 'correos' && deferFailCritical()) {
+						<span
+							class="card-alert-badge"
+							[attr.aria-label]="'Defer/Fail ' + deferFailLevel()"
+							title="Defer/Fail crítico — revisar"
+						>
+							<i class="pi pi-exclamation-circle"></i>
+						</span>
+					}
 				</header>
 
 				<ul class="card-links">

@@ -1,0 +1,43 @@
+<p-toast position="top-right" />
+
+<div class="mapa-envio">
+	<div class="mapa-envio__sticky">
+		<app-defer-fail-live-counter-tile
+			[status]="vm().deferFailStatus"
+			[loading]="vm().deferFailLoading"
+			[hubConnected]="hubConnected()"
+		/>
+	</div>
+
+	<div class="mapa-envio__grid">
+		<app-sender-stats-tile
+			[items]="vm().senderStats"
+			[loading]="vm().senderLoading"
+			[ventanaDias]="vm().filters.ventanaDias"
+		/>
+
+		<app-top-destinatarios-tile
+			[items]="vm().topDestinatarios"
+			[loading]="vm().topLoading"
+			[ventanaDias]="vm().filters.ventanaDias"
+		/>
+
+		<app-serie-temporal-tile
+			[items]="vm().serieTemporal"
+			[loading]="vm().serieLoading"
+			[granularidad]="vm().filters.granularidad"
+			(granularidadChange)="onGranularidadChange($event)"
+		/>
+
+		<app-dominios-receptores-tile
+			[items]="vm().dominios"
+			[loading]="vm().dominiosLoading"
+			[ventanaDias]="vm().filters.ventanaDias"
+		/>
+
+		<app-candidatos-blacklist-tile
+			[items]="vm().candidatos"
+			[loading]="vm().candidatosLoading"
+		/>
+	</div>
+</div>

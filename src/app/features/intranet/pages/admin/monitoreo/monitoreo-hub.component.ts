@@ -6,6 +6,7 @@ import { PageHeaderComponent } from '@intranet-shared/components/page-header/pag
 import { UserPermissionsService } from '@core/services';
 import { PERMISOS, PermisoPath } from '@shared/constants';
 import { environment } from '@config/environment';
+import { EmailMonitoreoFacade } from '../email-outbox-dashboard-dia/services';
 // #endregion
 
 // #region Types
@@ -112,7 +113,22 @@ const ALL_CARDS: MonitoreoCard[] = [
 export class MonitoreoHubComponent {
 	// #region Dependencies
 	private readonly userPermisos = inject(UserPermissionsService);
+	private readonly emailMonitoreo = inject(EmailMonitoreoFacade);
 	// #endregion
+
+	// #region Defer/Fail badge — Plan 39 Chat C
+	readonly deferFailCritical = computed(() => {
+		const status = this.emailMonitoreo.vm().deferFailStatus;
+		if (!status) return false;
+		return status.currentHour.deferFailCount >= 4;
+	});
+
+	readonly deferFailLevel = computed(() => this.emailMonitoreo.vm().deferFailStatus?.status ?? 'OK');
+	// #endregion
+
+	constructor() {
+		this.emailMonitoreo.loadDeferFailStatus();
+	}
 
 	// #region Cards visibles (filtradas por permiso + feature flag)
 	readonly cards = computed<MonitoreoCard[]>(() => {
