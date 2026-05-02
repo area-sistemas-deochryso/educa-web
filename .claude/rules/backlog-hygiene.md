@@ -23,7 +23,7 @@
 | `chats/open/` | 5 | blando | >30d |
 | `chats/waiting/` | 3 | blando | >14d |
 | `chats/troubles/` | 2 | blando | >7d |
-| `chats/awaiting-prod/` | 8 | blando | >14d |
+| `chats/awaiting-prod/` | 10 (soft) · 20 (hard) | mixto | >14d |
 | `tasks/` | 8 | blando | >60d |
 | `plan/maestro.md` cola (top-3) | 12 | blando | — |
 
@@ -35,12 +35,12 @@ Dos chats activos en repos distintos (FE + BE) trabajando en piezas independient
 
 Briefs cerrados localmente (commit hecho, validación local pasó) que esperan **confirmación post-deploy del usuario**: smoke test browser, query SQL en prod, validación del jefe, telemetría observada, etc. Salen del bucket vía [`/verify <NNN>`](../commands/verify.md) — `✅` mueve a `closed/`, `❌ rollback` mueve a `running/` con motivo registrado.
 
-**Razón del límite (8) y edad crítica (14d)**: validar un deploy debería tomar minutos a días, no semanas. Si un brief lleva >14d sin verificarse:
+**Razón de los límites (soft=10, hard=20) y edad crítica (14d)**: validar un deploy debería tomar minutos a días, no semanas. Si un brief lleva >14d sin verificarse:
 
 - El deploy nunca ocurrió (mover a `waiting/` — bloqueo externo real).
 - El deploy ocurrió pero se olvidó verificar (forzar `/verify <NNN>` confirmando ✅ o detectar el bug).
 
-Más de 8 simultáneamente es señal de que se está deployando rápido sin verificar.
+El soft (10) avisa que hay riesgo de drenaje insuficiente; el hard (20) frena `/end` para forzar verify antes de seguir cerrando local. Este desdoble se introdujo porque hay ventanas de varios días sin permiso de deploy (ej: viernes→lunes, freeze pre-release) durante las cuales el equipo necesita poder seguir cerrando trabajo localmente sin que el gate frene `/end` cada cierre.
 
 ## Comandos que enforzan
 
