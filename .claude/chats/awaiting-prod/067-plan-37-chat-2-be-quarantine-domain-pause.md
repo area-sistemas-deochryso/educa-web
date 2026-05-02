@@ -1,6 +1,39 @@
 > **Repo destino**: `Educa.API` (backend, branch `master`).
-> **Plan**: 37 · **Chat**: 2 · **Fase**: F2.BE · **Estado**: ⏳ pendiente arrancar (depende de Chat 1).
-> **Creado**: 2026-04-28 · **Modo sugerido**: `/design` corto + `/execute`.
+> **Plan**: 37 · **Chat**: 2 · **Fase**: F2.BE · **Estado**: ✅ cerrado local 2026-05-02 — esperando deploy a Azure App Service.
+> **Creado**: 2026-04-28 · **Cerrado local**: 2026-05-02 · **Commit**: `Educa.API@e32153f`.
+> **Modo sugerido**: `/design` corto + `/execute`.
+
+---
+
+## RESULTADO
+
+**Suite**: 1615/1615 verdes (+21 sobre baseline 1594). `dotnet build` 0 errores. Mayor archivo nuevo: 218 ln (cap 300).
+
+**33 archivos creados + 8 modificados**. La realidad arquitectónica sumó capas `Repositories/Notifications/` y `Data/Configurations/` que el brief original (escrito antes de leer el repo BE en detalle) no contemplaba.
+
+### Decisiones de cierre
+
+1. **3ra cuarentena → blacklist permanente** reusando motivo `Bounce5xx` con contexto en `EBL_UltimoError = "Promoted from quarantine, hit #N"`. Evita `ALTER TABLE` al CHECK constraint de `EmailBlacklist`. Si más adelante se quiere distinguir promoción-por-quarantine de bounce directo, chat aparte con su SQL.
+2. **`EnqueueResult`** simple record `(Outcome, OutboxId?)`; legacy `EnqueueAsync(...) → Guid?` delega y descarta. 0 cambios en los ~12 callers existentes.
+3. **Cap 5 domain pauses** se enforza en el evaluador puro como skip silencioso + `LogWarning`. No rechaza envíos; admin libera manualmente vía GET endpoint.
+4. **`QuarantinePromotionEvaluator` Singleton** porque es puro (sin DbContext, sin IO).
+5. **`DeferEventService` partido en partial** (`DeferEventService.cs` 145 ln + `DeferEventService.Evaluate.cs` 218 ln) para respetar cap 300 ln sin perder cohesión.
+
+### Aprendizaje transferible
+
+Cuando un brief proyecta N archivos contra un layout sin contar capas `Repositories/` y `Configurations/` que el repo sí usa, el conteo real puede subir 50-70% sin que sea scope creep. Vale validar la arquitectura existente antes de cerrar el conteo en `/design`.
+
+### Verificación post-deploy (gate awaiting-prod)
+
+- [ ] Deploy BE a Azure App Service (push `Educa.API master e32153f`).
+- [ ] `/hangfire` muestra `email-quarantine-release` y `email-domain-pause-release` activos cron `*/15 * * * *`.
+- [ ] Tras 1er evento `MAILBOX_FULL_TRANSIENT` real → fila en `EmailQuarantine` con `EQU_OriginEventId` poblado y `EQU_RetryAfter ≈ now+24h`.
+- [ ] Smoke endpoints admin (rol Director): GET `/api/sistema/email-outbox/quarantine?activas=true` → 200 lista; POST liberar → 200 con audit completo (`EQU_FechaLiberacion`, `EQU_MotivoLiberacion='MANUAL_RELEASE'`).
+- [ ] 48h sin regresiones en `EmailDeferEvent` (Chat 1 sigue insertando aunque el evaluador esté activo).
+
+**Cuando ✅** → cerrar 067 vía `/verify` + memoria nueva "Cuarentena + domain pause activos desde {fecha}". **Desbloquea Chat 3 FE (068)**.
+
+---
 
 ---
 
