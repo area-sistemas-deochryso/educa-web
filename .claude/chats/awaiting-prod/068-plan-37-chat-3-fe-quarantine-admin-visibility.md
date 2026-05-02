@@ -1,6 +1,43 @@
 > **Repo destino**: `educa-web` (frontend, branch `main`).
-> **Plan**: 37 · **Chat**: 3 · **Fase**: F3.FE · **Estado**: ⏳ pendiente arrancar (depende de Chat 2).
-> **Creado**: 2026-04-28 · **Modo sugerido**: `/design` corto + `/execute`.
+> **Plan**: 37 · **Chat**: 3 · **Fase**: F3.FE · **Estado**: ✅ cerrado local 2026-05-02 — esperando deploy del FE.
+> **Creado**: 2026-04-28 · **Cerrado local**: 2026-05-02 · **Commit**: `educa-web@b8dd4d5`.
+> **Modo sugerido**: `/design` corto + `/execute`.
+
+---
+
+## RESULTADO
+
+**Suite**: 1784/1784 verdes (+46 sobre baseline 1738). Lint 0 errores. Build production OK. Mayor archivo nuevo: 236 ln (cap 300).
+
+**44 archivos creados + 8 modificados**. 3 routing-based tabs en `correos-shell` (no tabs internos al `email-outbox.component`), siguiendo plantilla consolidada de Plan 38 Chat 5 (`feature flag + permiso dedicado`).
+
+### Decisiones de cierre
+
+1. **Routing-based tabs**: el brief proponía tabs internos al `email-outbox.component` con state local. Override aplicado: 3 rutas hijas en `correos-shell` con feature flag (`emailQuarantineTab`, `emailDomainPausesTab`, `emailDeferEventsTab` — todos `false` en producción) + permiso dedicado por tab (`ADMIN_EMAIL_QUARANTINE`, `ADMIN_EMAIL_DOMAIN_PAUSES`, `ADMIN_EMAIL_DEFER_EVENTS`). Patrón validado por Plan 38 Chat 5.
+2. **`DomainBlockedDetected` SignalR event no existe en BE**: `EmailHub` (Plan 39 Chat B) expone solo 3 eventos (`BlacklistEntryCreated`, `DeferFailStatusUpdated`, `CandidatoBlacklistDetectado`). Fallback aplicado: `DomainBlockedAlertBannerComponent` polea `GET /defer-events?tipo=DOMAIN_BLOCKED&desde=<now-12h>` al init. Estructura lista para wirear observable cuando BE agregue el evento.
+3. **Release con `ConfirmationService`** + `motivoLiberacion='OTRO'` default en lugar de dialog dedicado. UX más rico con selector de motivo agregable después si surge necesidad.
+4. **Pause de dominio manual desde UI**: SÍ expuesto (endpoint BE ya existía).
+5. **Tab eventos**: paginado server-side 25 filas/página.
+
+### Aprendizaje transferible
+
+Cuando el FE necesita reaccionar a un evento BE en tiempo real y ese evento aún no está publicado, el fallback de polling sobre el endpoint que registra ese evento (mismo dato, vía pull en lugar de push) deja la UI funcional sin bloquear el chat. El SignalR push se cablea después con un cambio mínimo cuando BE lo agregue.
+
+### Verificación post-deploy (gate awaiting-prod)
+
+- [ ] Deploy FE a Netlify (push `educa-web main b8dd4d5`).
+- [ ] Activar feature flags en `environment.ts` cuando se quiera exponer (los 3 en `false` por default).
+- [ ] BE Plan 37 Chat 2 (commit `Educa.API@e32153f`) ya desplegado en Azure App Service para que los endpoints respondan.
+- [ ] Smoke admin con rol Director:
+  - `/intranet/admin/monitoreo/correos/quarantine` → tabla server-paginated, filtros activa/motivo, agregar manual, liberar manual.
+  - `/intranet/admin/monitoreo/correos/domain-pauses` → tabla, agregar manual, liberar.
+  - `/intranet/admin/monitoreo/correos/defer-events` → timeline 24h, filtros tipo+fecha, exportar CSV.
+- [ ] Cross-link: en `email-outbox` con `defer-fail-status-widget` en estado WARNING/CRITICAL → click navega a `/defer-events?desde=hoy`.
+- [ ] Banner DOMAIN_BLOCKED: si hay evento en últimas 12h, banner crítico aparece arriba de las tabs.
+
+**Cuando ✅** → cerrar 068 vía `/verify` + memoria nueva. **Pendiente de seguimiento separado**: extender `EmailHub` BE con evento `DomainBlockedDetected` para sustituir polling — ticket potencial Plan 39 si se prioriza.
+
+---
 
 ---
 
