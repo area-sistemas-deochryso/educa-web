@@ -1,9 +1,9 @@
-// #region Banner B9 — defer-fail / mailbox-full alerts
-.defer-fail-banner {
+// #region Banner B9 cross-páginas — defer-fail / mailbox-full alerts
+.email-defer-fail-banner {
 	display: flex;
 	align-items: flex-start;
 	gap: 1rem;
-	padding: 1rem 1.25rem;
+	padding: 0.85rem 1.1rem;
 	margin-bottom: 1rem;
 	background: transparent;
 	border: 1px solid var(--surface-300);
@@ -21,21 +21,21 @@
 	}
 }
 
-.defer-fail-banner__icon {
-	font-size: 1.1rem;
+.email-defer-fail-banner__icon {
+	font-size: 1.05rem;
 	color: var(--blue-800);
-	margin-top: 0.15rem;
+	margin-top: 0.2rem;
 }
 
-.defer-fail-banner--warn .defer-fail-banner__icon {
+.email-defer-fail-banner--warn .email-defer-fail-banner__icon {
 	color: var(--yellow-700);
 }
 
-.defer-fail-banner--danger .defer-fail-banner__icon {
+.email-defer-fail-banner--danger .email-defer-fail-banner__icon {
 	color: var(--red-600);
 }
 
-.defer-fail-banner__body {
+.email-defer-fail-banner__body {
 	flex: 1;
 	display: flex;
 	flex-direction: column;
@@ -43,43 +43,33 @@
 	min-width: 0;
 }
 
-.defer-fail-banner__header {
-	display: flex;
-	align-items: center;
-	gap: 0.5rem;
-}
-
-.defer-fail-banner__title {
+.email-defer-fail-banner__title {
 	font-size: 0.95rem;
 	font-weight: 600;
 	color: var(--text-color);
 }
 
-.defer-fail-banner__message {
+.email-defer-fail-banner__message {
 	margin: 0;
 	font-size: 0.875rem;
-	color: var(--text-color);
 	display: flex;
 	flex-direction: column;
 	gap: 0.25rem;
 }
 
-.defer-fail-banner__counter {
+.email-defer-fail-banner__counter,
+.email-defer-fail-banner__recent {
 	font-weight: 500;
 }
 
-.defer-fail-banner__recent strong {
-	font-weight: 600;
-}
-
-.defer-fail-banner__hint {
+.email-defer-fail-banner__hint {
 	font-size: 0.8rem;
 	color: var(--text-color-secondary);
 }
 // #endregion
 
 @media (max-width: 640px) {
-	.defer-fail-banner {
+	.email-defer-fail-banner {
 		flex-direction: column;
 	}
 }

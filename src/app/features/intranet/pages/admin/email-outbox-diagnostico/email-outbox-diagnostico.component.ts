@@ -6,6 +6,7 @@ import { TabsModule } from 'primeng/tabs';
 
 import { TabCorreoIndividualComponent } from './tab-correo-individual/tab-correo-individual.component';
 import { TabCorreosDiaComponent } from './tab-correos-dia/tab-correos-dia.component';
+import { EmailDeferFailBannerComponent } from '@features/intranet/pages/admin/email-outbox-dashboard-dia/components/email-defer-fail-banner/email-defer-fail-banner.component';
 
 type TabId = 'gap' | 'correo';
 
@@ -14,7 +15,12 @@ const TAB_IDS: readonly TabId[] = ['gap', 'correo'] as const;
 @Component({
 	selector: 'app-email-outbox-diagnostico',
 	standalone: true,
-	imports: [TabsModule, TabCorreosDiaComponent, TabCorreoIndividualComponent],
+	imports: [
+		TabsModule,
+		TabCorreosDiaComponent,
+		TabCorreoIndividualComponent,
+		EmailDeferFailBannerComponent,
+	],
 	templateUrl: './email-outbox-diagnostico.component.html',
 	styleUrl: './email-outbox-diagnostico.component.scss',
 	changeDetection: ChangeDetectionStrategy.OnPush,

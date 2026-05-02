@@ -1,9 +1,18 @@
-# Plan 39 Chat D FE — Banner B9 cross-páginas + tile "Aceptado vs Entregado" + alineación listener Plan 38
+# Plan 39 Chat D FE — Banner B9 cross-páginas + alineación listener Plan 38
 
 > **Repo destino**: `educa-web` (main)
-> **Plan**: 39 · **Chat**: D · **Fase**: F2.Execute · **Estado**: ⏳ pendiente arrancar — prioridad alta
-> **Creado**: 2026-04-29 · **Modo sugerido**: `/execute`
-> **Pre-req**: Chat B (078) + Chat C (079) deployados. Plan 38 Chat 6 (076) deployado.
+> **Plan**: 39 · **Chat**: D · **Fase**: F2.Execute · **Estado**: ⏳ awaiting-prod (cerrado local 2026-05-02)
+> **Creado**: 2026-04-29 · **Cerrado local**: 2026-05-02 · **Modo aplicado**: `/execute`
+> **Pre-req post-deploy**: Plan 39 Chat B BE (`awaiting-prod/078`) live para que `/hubs/email-alerts` exista. Plan 39 Chat C FE (`awaiting-prod/079`) ya provee `EmailMonitoreoFacade` localmente.
+>
+> **Scope efectivo**:
+>
+> 1. Banner B9 reusable: nuevo `app-email-defer-fail-banner` (smart) en `email-outbox-dashboard-dia/components/`. Consume `EmailMonitoreoFacade.vm()` (defer-fail status + `lastBlacklistEventAt`), llama `startHub()` idempotente al montar, render B9 con severity warn/danger, contador `actual/threshold` + label "Bloqueo automático recibido hace X min" + hint contextual.
+> 2. Mounted en 5 páginas admin: `email-outbox` (bandeja), `email-outbox-dashboard-dia`, `email-outbox-diagnostico`, `auditoria-correos`, `monitoreo-hub`. En las 5 el render es directo bajo el header — el banner se autogestiona.
+> 3. Refactor de `email-outbox.component`: removí el banner local efímero (Plan 38 Chat 6) y la signal-state `bannerState`/`_deferFailEvent`/`_recentBlacklist`/`recentBlacklistTimeout`. La page conserva los toasts (`MessageService` con key `email-outbox-alerts`) ante `BlacklistEntryCreated` y `CandidatoBlacklistDetectado` — siguen siendo específicos de la bandeja admin.
+> 4. Cleanup del banner local de Plan 38 Chat 6: 4 archivos eliminados (`defer-fail-banner.component.{ts,html,scss,spec}`) — superseded por el shared.
+> 5. **Tile "Aceptado vs Entregado" en auditoria — pospuesto**: la métrica gap requiere confirm-delivery que solo se obtiene con Plan 39 Chat E (importador SSH Exim, en HOLD). Sin confirm, el "gap" sería una inferencia engañosa. Anotado en el cierre, no se entregó tile placeholder.
+> 6. 6 tests del banner (`email-defer-fail-banner.component.spec.ts`) verdes; suite admin de email/monitoreo 195/195.
 
 ## CONTEXTO INMEDIATO
 

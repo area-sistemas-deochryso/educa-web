@@ -1,0 +1,32 @@
+@if (visible()) {
+	<div
+		class="email-defer-fail-banner"
+		[class.email-defer-fail-banner--warn]="severity() === 'warn'"
+		[class.email-defer-fail-banner--danger]="severity() === 'danger'"
+		role="alert"
+		[attr.aria-live]="severity() === 'danger' ? 'assertive' : 'polite'"
+	>
+		<i [class]="'email-defer-fail-banner__icon ' + icon()" aria-hidden="true"></i>
+		<div class="email-defer-fail-banner__body">
+			<strong class="email-defer-fail-banner__title">{{ title() }}</strong>
+			<p class="email-defer-fail-banner__message">
+				@if (contadorLabel()) {
+					<span class="email-defer-fail-banner__counter">{{ contadorLabel() }}</span>
+				}
+				@if (recentLabel()) {
+					<span class="email-defer-fail-banner__recent">{{ recentLabel() }}</span>
+				}
+				@if (severity() === 'danger') {
+					<span class="email-defer-fail-banner__hint">
+						El hosting puede descartar correos del dominio durante ~60 min hasta que el contador
+						baje. Revisá la blacklist y el dashboard de monitoreo.
+					</span>
+				} @else {
+					<span class="email-defer-fail-banner__hint">
+						Pausá los reintentos sobre destinatarios fallidos para no agotar el cupo del dominio.
+					</span>
+				}
+			</p>
+		</div>
+	</div>
+}

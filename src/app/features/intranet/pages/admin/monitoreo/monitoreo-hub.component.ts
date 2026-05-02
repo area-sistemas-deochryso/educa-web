@@ -7,6 +7,7 @@ import { UserPermissionsService } from '@core/services';
 import { PERMISOS, PermisoPath } from '@shared/constants';
 import { environment } from '@config/environment';
 import { EmailMonitoreoFacade } from '../email-outbox-dashboard-dia/services';
+import { EmailDeferFailBannerComponent } from '../email-outbox-dashboard-dia/components/email-defer-fail-banner/email-defer-fail-banner.component';
 // #endregion
 
 // #region Types
@@ -105,7 +106,7 @@ const ALL_CARDS: MonitoreoCard[] = [
 @Component({
 	selector: 'app-monitoreo-hub',
 	standalone: true,
-	imports: [RouterLink, PageHeaderComponent],
+	imports: [RouterLink, PageHeaderComponent, EmailDeferFailBannerComponent],
 	templateUrl: './monitoreo-hub.component.html',
 	styleUrl: './monitoreo-hub.component.scss',
 	changeDetection: ChangeDetectionStrategy.OnPush,

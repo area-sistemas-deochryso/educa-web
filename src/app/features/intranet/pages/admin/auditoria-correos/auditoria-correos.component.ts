@@ -11,6 +11,7 @@ import { AuditoriaCorreosTableComponent } from './components/auditoria-correos-t
 import { AuditoriaCorreosSkeletonComponent } from './components/auditoria-correos-skeleton/auditoria-correos-skeleton.component';
 import { AuditoriaCorreosFacade } from './services';
 import { AuditoriaCorreoAsistenciaDto, TipoOrigenAuditoria } from './models';
+import { EmailDeferFailBannerComponent } from '@features/intranet/pages/admin/email-outbox-dashboard-dia/components/email-defer-fail-banner/email-defer-fail-banner.component';
 
 @Component({
 	selector: 'app-auditoria-correos',
@@ -23,6 +24,7 @@ import { AuditoriaCorreoAsistenciaDto, TipoOrigenAuditoria } from './models';
 		AuditoriaCorreosFiltersComponent,
 		AuditoriaCorreosTableComponent,
 		AuditoriaCorreosSkeletonComponent,
+		EmailDeferFailBannerComponent,
 	],
 	templateUrl: './auditoria-correos.component.html',
 	styleUrl: './auditoria-correos.component.scss',
