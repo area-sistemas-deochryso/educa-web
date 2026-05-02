@@ -3,6 +3,7 @@ import { ChangeDetectionStrategy, Component, effect, inject } from '@angular/cor
 
 import { CommonModule } from '@angular/common';
 import { ErrorHandlerService } from '@core/services/error';
+import type { ErrorNotificationAction } from '@core/services/error/error.models';
 import { MessageService } from 'primeng/api';
 import { ToastModule } from 'primeng/toast';
 
@@ -32,10 +33,18 @@ export class ToastContainerComponent {
 					detail: notification.detail,
 					life: notification.life ?? 5000,
 					sticky: notification.sticky ?? false,
+					data: notification.action ? { action: notification.action } : undefined,
 				});
 				this.errorHandler.clearNotification();
 			}
 		});
+	}
+
+	onAction(message: { data?: { action?: ErrorNotificationAction } }): void {
+		const action = message.data?.action;
+		if (!action) return;
+		action.callback();
+		this.messageService.clear();
 	}
 }
 // #endregion

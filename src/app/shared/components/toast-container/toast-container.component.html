@@ -1,4 +1,21 @@
 <!-- #region Template -->
 <!-- * Central toast host for app-wide notifications. -->
-<p-toast position="top-right" [life]="5000"></p-toast>
+<p-toast position="top-right" [life]="5000">
+	<ng-template let-message pTemplate="message">
+		<div class="p-toast-message-text">
+			<div class="p-toast-summary">{{ message.summary }}</div>
+			<div class="p-toast-detail">{{ message.detail }}</div>
+			@if (message.data?.action) {
+				<button
+					type="button"
+					class="p-button p-button-sm p-button-text"
+					style="margin-top: 0.5rem"
+					(click)="onAction(message)"
+				>
+					{{ message.data.action.label }}
+				</button>
+			}
+		</div>
+	</ng-template>
+</p-toast>
 <!-- #endregion -->

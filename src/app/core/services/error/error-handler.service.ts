@@ -175,15 +175,25 @@ export class ErrorHandlerService {
 	/**
 	 * Muestra notificacion de advertencia
 	 */
-	showWarning(summary: string, detail: string, life = 4000): void {
-		this.showNotification({ severity: 'warn', summary, detail, life });
+	showWarning(
+		summary: string,
+		detail: string,
+		life = 4000,
+		action?: import('./error.models').ErrorNotificationAction,
+	): void {
+		this.showNotification({ severity: 'warn', summary, detail, life, action });
 	}
 
 	/**
 	 * Muestra notificacion de error
 	 */
-	showError(summary: string, detail: string, life = 5000): void {
-		this.showNotification({ severity: 'error', summary, detail, life });
+	showError(
+		summary: string,
+		detail: string,
+		life = 5000,
+		action?: import('./error.models').ErrorNotificationAction,
+	): void {
+		this.showNotification({ severity: 'error', summary, detail, life, action });
 	}
 
 	/**

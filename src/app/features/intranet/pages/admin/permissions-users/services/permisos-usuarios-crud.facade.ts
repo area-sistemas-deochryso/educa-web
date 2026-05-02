@@ -1,4 +1,5 @@
 import { Injectable, inject } from '@angular/core';
+import { HttpErrorResponse } from '@angular/common/http';
 
 import { facadeErrorHandler } from '@core/helpers';
 import {
@@ -6,20 +7,24 @@ import {
 	ErrorHandlerService,
 	WalFacadeHelper,
 } from '@core/services';
+import { UI_ERROR_CODES, UI_SUMMARIES } from '@app/shared/constants';
 import { environment } from '@config';
 import { PermissionsUsersStore } from './permisos-usuarios.store';
 import { PermissionsUsersDataFacade } from './permisos-usuarios-data.facade';
+import { PermissionsUsersUiFacade } from './permisos-usuarios-ui.facade';
 
 @Injectable({ providedIn: 'root' })
 export class PermissionsUsersCrudFacade {
 	private store = inject(PermissionsUsersStore);
 	private permisosService = inject(PermissionsService);
 	private dataFacade = inject(PermissionsUsersDataFacade);
+	private uiFacade = inject(PermissionsUsersUiFacade);
 	private wal = inject(WalFacadeHelper);
+	private errorHandler = inject(ErrorHandlerService);
 	private readonly apiUrl = `${environment.apiUrl}/api/sistema/permisos`;
 	private readonly errHandler = facadeErrorHandler({
 		tag: 'PermisosUsuariosCrudFacade',
-		errorHandler: inject(ErrorHandlerService),
+		errorHandler: this.errorHandler,
 	});
 
 	// #region Save (Create + Update)
@@ -66,9 +71,39 @@ export class PermissionsUsersCrudFacade {
 					rollback: () => {},
 				},
 				onCommit: () => this.dataFacade.loadData(),
-				onError: (err) => this.errHandler.handle(err, 'guardar el permiso'),
+				onError: (err) => this.handleSaveError(err, usuarioId, rol, hideDialog),
 			});
 		}
+	}
+
+	private handleSaveError(
+		err: unknown,
+		usuarioId: number,
+		rol: string,
+		hideDialog: () => void,
+	): void {
+		if (err instanceof HttpErrorResponse && err.status === 409) {
+			const code = err.error?.errorCode as string | undefined;
+			if (code === 'PERMISO_USUARIO_DUPLICADO') {
+				const existing = this.store
+					.permisosUsuario()
+					.find((p) => p.usuarioId === usuarioId && p.rol === rol);
+				const message =
+					UI_ERROR_CODES['PERMISO_USUARIO_DUPLICADO'] ??
+					'Este usuario ya tiene un permiso para ese rol.';
+				if (existing) {
+					this.errorHandler.showError(UI_SUMMARIES.conflict, message, 8000, {
+						label: 'Editar permiso existente',
+						callback: () => {
+							hideDialog();
+							this.uiFacade.editPermiso(existing);
+						},
+					});
+					return;
+				}
+			}
+		}
+		this.errHandler.handle(err, 'guardar el permiso');
 	}
 	// #endregion
 

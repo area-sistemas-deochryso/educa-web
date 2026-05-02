@@ -6,6 +6,7 @@ export const UI_SUMMARIES = {
 	accessDenied: 'Acceso denegado',
 	scheduleConflict: 'Conflicto de horario',
 	validationError: 'Error de validación',
+	conflict: 'Conflicto',
 } as const;
 
 export const UI_ERROR_SUMMARIES = {
@@ -152,9 +153,10 @@ export const UI_ERROR_CODES: Record<string, string> = {
 	VISTA_RUTA_DUPLICADA: 'Ya existe una vista con esta ruta.',
 	PERMISO_USUARIO_NOT_FOUND: 'No se encontró el permiso de usuario.',
 	PERMISO_USUARIO_DUPLICADO:
-		'Ya existe un permiso configurado para este usuario con este rol.',
+		'Este usuario ya tiene un permiso configurado para ese rol. Edítalo desde la fila correspondiente en la tabla en lugar de crear uno nuevo.',
 	PERMISO_ROL_NOT_FOUND: 'No se encontró el permiso de rol.',
-	PERMISO_ROL_DUPLICADO: 'Ya existe un permiso configurado para este rol.',
+	PERMISO_ROL_DUPLICADO:
+		'Este rol ya tiene un permiso configurado. Edítalo desde la fila correspondiente en la tabla en lugar de crear uno nuevo.',
 
 	// Asistencia
 	ASISTENCIA_HORARIO_NOT_FOUND: 'No se encontró el horario de asistencia.',

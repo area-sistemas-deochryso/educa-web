@@ -81,8 +81,9 @@ export const DEFAULT_ERROR_POLICY: ErrorPolicy = {
 	},
 
 	resolveSummary(err: unknown): string {
-		if (err instanceof HttpErrorResponse && err.status === 0) {
-			return 'Error de conexión';
+		if (err instanceof HttpErrorResponse) {
+			if (err.status === 0) return 'Error de conexión';
+			if (err.status === 409) return UI_SUMMARIES.conflict;
 		}
 		return UI_SUMMARIES.error;
 	},

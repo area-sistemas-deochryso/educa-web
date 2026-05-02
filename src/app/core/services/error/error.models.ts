@@ -27,12 +27,18 @@ export interface HttpErrorDetails {
 	body?: unknown;
 }
 
+export interface ErrorNotificationAction {
+	label: string;
+	callback: () => void;
+}
+
 export interface ErrorNotification {
 	severity: ErrorSeverity;
 	summary: string;
 	detail: string;
 	life?: number;
 	sticky?: boolean;
+	action?: ErrorNotificationAction;
 }
 
 /**
