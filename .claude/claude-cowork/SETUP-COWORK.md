@@ -75,7 +75,7 @@ educa-web
 
 ## 7. Hallazgos abiertos — cierre 2026-04-29
 
-**Resumen**: 0 críticos · 2 altos · 4 medios · 11 bajos
+**Resumen**: 0 críticos · 1 alto · 4 medios · 11 bajos · _F-003 verificado, ver §8_
 
 ### F-001 · Bajo · Jerarquía visual ambigua entre items y subgrupos del menú
 
@@ -121,38 +121,6 @@ En viewport móvil (probado a 400×477), al abrir el drawer con la hamburguesa, 
 
 **Sugerencia para Claude Code**:
 Ocultar `.feedback-fab` mientras el drawer móvil esté abierto, vía `[class.fab-hidden]="menuOpen()"` consumiendo un signal del store de la intranet. Alternativa: bajar `z-index` del FAB a 150 (menor que el drawer).
-
----
-
-### F-003 · Alto · SignalR `/asistenciahub` falla con 404 en cada navegación de Seguimiento
-
-**Capa**: BE (probable mismatch de mapeo + proxy FE)
-**Componente / archivo**: `Educa.API/Program.cs` (mapeo del hub) + `educa-web/proxy.conf.json` (forward del WebSocket)
-
-**Síntoma**:
-Al entrar a cualquier vista de asistencia (`/intranet/asistencia`, `/admin/asistencias`, `/admin/permisos-salud`), la consola muestra dos errores rojos por intento de conexión SignalR:
-```
-POST /asistenciahub/negotiate → 404
-"Cannot POST /asistenciahub/negotiate"
-Failed to start the connection
-```
-
-**Datos medidos**:
-- El backend tiene `ChatHub` y `AsistenciaHub` en `Educa.API/Hubs/`.
-- La ruta `/asistenciahub` no responde — 404 en cada intento.
-- Cada nueva navegación dentro del módulo dispara los 2 errores otra vez.
-
-**Pasos para reproducir**:
-1. Login como Director.
-2. Navegar a `localhost:4201/intranet/asistencia`.
-3. Abrir DevTools → Console: aparecen 2 errores SignalR.
-
-**Sugerencia para Claude Code**:
-- Verificar en `Educa.API/Program.cs`: `app.MapHub<AsistenciaHub>("/asistenciahub")`.
-- Verificar `educa-web/proxy.conf.json` reenvía `/asistenciahub` al puerto 7102 con `ws: true`.
-- Confirmar URL del hub que pide el cliente: `core/services/signalr/asistencia-signalr.service.ts`.
-
-**Por qué importa**: el Director (y profesores) NO ven actualizaciones en tiempo real de marcaciones biométricas CrossChex. Página queda con datos estáticos hasta refresh manual.
 
 ---
 
@@ -422,7 +390,36 @@ Quitar `SkeletonLoaderComponent` del array `imports` del decorator (o agregar el
 
 ## 8. Hallazgos verificados
 
-*Aún ninguno. Cuando Claude Code corrija un hallazgo y Cowork verifique el fix, mover la sub-sección desde §7 hasta acá agregando:*
+### F-003 · Alto · SignalR `/asistenciahub` falla con 404 en cada navegación de Seguimiento ✅
+
+**Capa**: FE (dev only — Netlify ya tenía el wiring de prod)
+**Componente / archivo**: `educa-web/proxy.conf.json`
+
+**Síntoma original**:
+Al entrar a `/intranet/asistencia`, `/admin/asistencias` o `/admin/permisos-salud`, la consola mostraba:
+```
+POST /asistenciahub/negotiate → 404
+"Cannot POST /asistenciahub/negotiate"
+Failed to start the connection
+```
+
+**Causa raíz** (descubierta en `/investigate` chat 083):
+El BE `MapHub<AsistenciaHub>("/asistenciahub")` ya existía en `Educa.API/Extensions/PipelineExtensions.cs:131`. Netlify `netlify.toml` y `_redirects` ya tenían los redirects de prod. La única falla era que `proxy.conf.json` del dev server solo tenía `/chathub` y le faltaba la entry `/asistenciahub` con `ws: true`. **Bug dev-only — prod nunca estuvo afectado**.
+
+**Fix aplicado**: agregada entry `/asistenciahub` en `proxy.conf.json` (6 líneas).
+
+**Verificación** (smoke local 2026-05-02):
+- `/asistenciahub/negotiate` → 200 con response completo (`negotiateVersion: 1`, `connectionId`, `connectionToken`).
+- Transports disponibles: `WebSockets`, `ServerSentEvents`, `LongPolling`.
+- Navegación `/intranet/asistencia` (5TO PRIMARIA - A) sin errores rojos en consola.
+
+**Commit**: `17208f2` — `fix(proxy): add /asistenciahub entry to dev proxy config`
+
+**Aprendizaje**: re-evaluar severidad de hallazgos SignalR en local — verificar primero si afectan prod (Netlify) antes de marcar como pre-deploy crítico. Diferenciar dev-proxy vs prod-redirects es la pregunta clave.
+
+---
+
+*Pendientes de verificar. Cuando Claude Code corrija un hallazgo y Cowork verifique el fix, mover la sub-sección desde §7 hasta acá agregando:*
 
 ```markdown
 **Verificación**: {cómo se confirmó el fix — re-test, network limpia, captura}
