@@ -75,7 +75,7 @@ educa-web
 
 ## 7. Hallazgos abiertos — cierre 2026-04-29
 
-**Resumen**: 0 críticos · 2 altos · 3 medios · 6 bajos
+**Resumen**: 0 críticos · 2 altos · 4 medios · 11 bajos
 
 ### F-001 · Bajo · Jerarquía visual ambigua entre items y subgrupos del menú
 
@@ -304,6 +304,119 @@ GET /api/asistencia-admin/dia?fecha=...&tipoPersona=P&search=763        → 0 �
 - Test: agregar test de integración con `search` = DNI exacto, DNI parcial, nombre+apellido.
 
 **Por qué importa**: el flujo principal de corrección admin se rompe. El Director ve una tardanza/falta en cross-role, hace clic para editarla en admin, y la vista admin le dice "no existe". La única forma de encontrarla es escribiendo el nombre completo manualmente.
+
+---
+
+### F-012 · Bajo · Eje X del chart "Serie temporal" (Mapa de envío) renderiza etiquetas pegadas
+
+**Capa**: FE
+**Componente / archivo**: `src/app/features/intranet/pages/admin/email-outbox-dashboard-dia/components/...` (tile "Serie temporal", ventana 24h)
+
+**Síntoma**:
+En el tab "Mapa de envío" del Dashboard del día (`/intranet/admin/monitoreo/correos/dashboard`), las etiquetas horarias del eje X del chart "Serie temporal" se imprimen sin separación: `14:0015:0016:0017:0018:00`. Lo correcto sería "14:00 15:00 16:00 17:00 18:00" con espaciado proporcional al ancho del contenedor.
+
+**Pasos para reproducir**:
+1. Login Director.
+2. Navegar a `/intranet/admin/monitoreo/correos/dashboard`.
+3. Click en sub-tab "Mapa de envío".
+4. Scroll hasta el tile "Serie temporal" — observar el eje X.
+
+**Sugerencia para Claude Code**:
+Configurar `tickInterval` / `autoSkip: true` en la config de Chart.js (o el wrapper que use el proyecto), o establecer `min-width` por tick. Validar también con ventana "30d".
+
+---
+
+### F-013 · Bajo · Eje X del chart "Tendencia de envíos (últimos 30 días)" en Bandeja de Correos pega los días
+
+**Capa**: FE
+**Componente / archivo**: `/intranet/admin/email-outbox` → tab "Bandeja" — chart resumen 30d
+
+**Síntoma**:
+Mismo síntoma que F-012 pero en el chart de Bandeja: `07/008/009/040/041/043/044/045/046/047/020/041/042/043/044/047/028…`. Días sin separación. Probable raíz común con F-012 (config compartida o wrapper de chart sin auto-skip).
+
+**Pasos para reproducir**:
+1. Login Director.
+2. Navegar a `/intranet/admin/email-outbox` (redirige a `/monitoreo/correos/bandeja`).
+3. Observar el chart "Tendencia de envíos (últimos 30 días)".
+
+**Sugerencia para Claude Code**:
+Si F-012 y F-013 comparten config de chart, fixar uno arregla ambos. Considerar abstraer la config base en un util.
+
+---
+
+### F-014 · Bajo · Placeholder del filtro Blacklist expone sintaxis SQL al usuario
+
+**Capa**: FE
+**Componente / archivo**: `src/app/features/intranet/pages/admin/email-outbox-blacklist/...` (tab Blacklist)
+
+**Síntoma**:
+El input de búsqueda en `/intranet/admin/monitoreo/correos/blacklist` tiene placeholder `Buscar por correo (LIKE %q%)...`. La parte `(LIKE %q%)` es jerga SQL que no aporta al usuario final y desentona con el resto de placeholders del proyecto.
+
+**Sugerencia para Claude Code**:
+Cambiar a `Buscar por correo...` o `Buscar por correo (coincidencia parcial)...` si se quiere comunicar el comportamiento sin filtrar implementación.
+
+---
+
+### F-015 · Medio · Toast engañoso al crear override duplicado en Permisos
+
+**Capa**: FE
+**Componente / archivo**: `src/app/features/intranet/pages/admin/permisos-usuarios/...`
+
+**Síntoma**:
+En `/intranet/admin/permisos/usuarios`, al click en "Nuevo Permiso" para un par usuario+rol que ya tiene override, el backend responde 409 (o equivalente) y el FE muestra toast `Error de conexión: Ya existe un permiso configurado para este usuario con este rol`. Dos problemas:
+1. **Mensaje incorrecto** — no es error de conexión, es conflicto de unicidad.
+2. **No ofrece acción** — debería redirigir a "Editar permisos" del override existente, o al menos mencionar dónde está.
+
+**Pasos para reproducir**:
+1. Login Director.
+2. Ir a `/intranet/admin/permisos/usuarios`.
+3. Click "Nuevo Permiso".
+4. Seleccionar rol Director y un usuario que ya tenga override (por ejemplo `EL DIRECTOR ADMINISTRADOR`).
+5. Marcar cualquier vista y "Guardar Cambios".
+6. Aparece toast `Error de conexión...`.
+
+**Sugerencia para Claude Code**:
+- Detectar el código de error específico (probablemente 409 Conflict o status custom) y diferenciar del genérico de red.
+- Mensaje sugerido: `Este usuario ya tiene un override para el rol {rol}. Editá ese permiso desde la fila correspondiente.` con CTA "Editar permisos" que abra el drawer del usuario en modo edición.
+
+---
+
+### F-016 · Bajo · Buscador de usuario en form Permisos no tolera orden de tokens
+
+**Capa**: FE
+**Componente / archivo**: `src/app/features/intranet/pages/admin/permisos-usuarios/...` (combo de búsqueda de usuario en dialog "Nuevo Permiso")
+
+**Síntoma**:
+El combo "Usuario" en el dialog de Permisos hace match por substring contiguo. Para el usuario cuyo nombre real es `EL DIRECTOR ADMINISTRADOR`, escribir `ADMINISTRADOR EL DIRECTOR` (orden invertido, intuitivo) devuelve "No results found". Solo `DIRECTOR` o `EL DIRECTOR` matchean. El avatar del header dice `ADMINISTRADOR DIRECTOR` lo que invita a teclear ese orden.
+
+**Sugerencia para Claude Code**:
+Tokenizar la query y aplicar AND sobre los tokens contra `Nombres + " " + Apellidos`. Patrón:
+
+```ts
+const tokens = q.toLowerCase().split(/\s+/).filter(Boolean);
+const haystack = `${u.nombres} ${u.apellidos}`.toLowerCase();
+return tokens.every(t => haystack.includes(t));
+```
+
+---
+
+### F-017 · Bajo · Import muerto: SkeletonLoaderComponent en SenderStatsTileComponent
+
+**Capa**: FE
+**Componente / archivo**: `src/app/features/intranet/pages/admin/email-outbox-dashboard-dia/components/sender-stats-tile/sender-stats-tile.component.ts:29`
+
+**Síntoma**:
+El compilador Angular emite warning en `bun run start`:
+```
+NG8113: SkeletonLoaderComponent is not used within the template of SenderStatsTileComponent
+```
+
+**Sugerencia para Claude Code**:
+Quitar `SkeletonLoaderComponent` del array `imports` del decorator (o agregar el skeleton al template si era la intención).
+
+---
+
+> **Nota operativa SignalR `/hubs/email-alerts`**: la consola registra 404 en `POST /hubs/email-alerts/negotiate` al cargar `/intranet/admin/monitoreo/correos/dashboard`. Es esperado hasta deploy de **Plan 39 Chat B (`awaiting-prod/078`)** que registra el `EmailHub` server-side. El FE 079 ya tiene listener pero falla negociación; el polling de fallback a `/email-outbox/defer-fail-status` cubre la funcionalidad. No abrir hallazgo nuevo — tracking en plan 078.
 
 ---
 
