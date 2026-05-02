@@ -79,7 +79,7 @@
 
 <!-- Reporte de usuario: dialog SIEMPRE en el DOM (regla dialogs-sync.md) + launcher flotante -->
 @if (showFeedbackReport()) {
-	<app-feedback-report-launcher />
+	<app-feedback-report-launcher [suppressed]="mobileMenuOpen()" />
 }
 <app-feedback-report-dialog />
 

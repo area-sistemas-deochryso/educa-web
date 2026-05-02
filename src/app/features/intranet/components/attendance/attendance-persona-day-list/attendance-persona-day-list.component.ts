@@ -260,7 +260,11 @@ export class AttendancePersonaDayListComponent {
 			horaSalida: asistencia?.horaSalida || null,
 			estadoCodigo: asistencia?.estadoCodigo || 'X',
 			observacion: asistencia?.observacion || null,
-			puedeJustificar: asistencia?.puedeJustificar ?? true,
+			// Cowork F-008: estado 'A' (Asistió) no admite justificación — el flag del BE
+			// puede venir true por defecto pero no tiene sentido invitar a justificar a
+			// quien asistió correctamente.
+			puedeJustificar:
+				(asistencia?.puedeJustificar ?? true) && asistencia?.estadoCodigo !== 'A',
 			esJustificado: asistencia?.esJustificado ?? false,
 		};
 	}

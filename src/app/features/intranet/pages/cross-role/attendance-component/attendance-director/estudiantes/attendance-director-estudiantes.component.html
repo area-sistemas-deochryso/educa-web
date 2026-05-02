@@ -12,6 +12,11 @@
 		/>
 	</div>
 
+	<!-- Cowork F-004 · INV-C11 — banner cuando el grado seleccionado está fuera del alcance biométrico -->
+	@if (gradoFueraAlcance()) {
+		<app-attendance-scope-banner />
+	}
+
 	@if (view.viewMode() === 'mes') {
 		<!-- * PDF actions below selector (always "Reporte por Salón") -->
 		<div class="pdf-section">

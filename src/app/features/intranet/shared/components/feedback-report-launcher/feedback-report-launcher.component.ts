@@ -1,5 +1,5 @@
 // #region Imports
-import { ChangeDetectionStrategy, Component, computed, inject } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, inject, input } from '@angular/core';
 import { CommonModule } from '@angular/common';
 
 import { FeedbackReportFacade } from '@core/services/feedback';
@@ -9,7 +9,8 @@ import { FeedbackReportFacade } from '@core/services/feedback';
 /**
  * Botón flotante persistente para abrir el dialog de reporte de usuario.
  * Visible en toda la intranet, tanto en desktop como en móvil.
- * Se oculta mientras el dialog está abierto para no solapar.
+ * Se oculta mientras el dialog está abierto o el drawer móvil está abierto
+ * para no solapar el footer del menú (Cowork F-002).
  */
 @Component({
 	selector: 'app-feedback-report-launcher',
@@ -35,7 +36,9 @@ import { FeedbackReportFacade } from '@core/services/feedback';
 export class FeedbackReportLauncherComponent {
 	private readonly facade = inject(FeedbackReportFacade);
 
-	readonly visible = computed(() => !this.facade.vm().dialogVisible);
+	readonly suppressed = input<boolean>(false);
+
+	readonly visible = computed(() => !this.facade.vm().dialogVisible && !this.suppressed());
 
 	open(): void {
 		this.facade.open();

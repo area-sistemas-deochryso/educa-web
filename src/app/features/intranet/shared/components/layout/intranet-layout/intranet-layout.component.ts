@@ -72,6 +72,10 @@ export class IntranetLayoutComponent implements OnInit, OnDestroy {
 	private feedbackFacade = inject(FeedbackReportFacade);
 	readonly favoritesService = inject(QuickAccessFavoritesService);
 	private readonly moduleSelector = viewChild(ModuleSelectorComponent);
+	private readonly mobileMenu = viewChild(MobileMenuComponent);
+
+	// Cowork F-002: ocultar el FAB Reportar mientras el drawer móvil está abierto.
+	readonly mobileMenuOpen = computed(() => this.mobileMenu()?.isOpen() ?? false);
 
 	// #region Estado del menú
 	private readonly _modulos = signal<ModuloMenu[]>([]);
