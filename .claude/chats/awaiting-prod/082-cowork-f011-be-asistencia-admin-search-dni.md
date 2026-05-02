@@ -1,6 +1,6 @@
 > **Repo destino**: BE (`Educa.API`, branch `master`).
 > **Plan**: — (hallazgo Cowork pre-deploy 2026-04-29, no asociado a plan formal).
-> **Creado**: 2026-04-30 · **Chat**: 1 · **Estado**: ⏳ pendiente arrancar.
+> **Creado**: 2026-04-30 · **Chat**: 1 · **Estado**: ✅ cerrado local 2026-04-30 (`Educa.API master`, commit `c4eb865`). Awaiting prod.
 > **Origen**: `educa-web/.claude/claude-cowork/SETUP-COWORK.md` §7 F-011 (Alto).
 
 ---
