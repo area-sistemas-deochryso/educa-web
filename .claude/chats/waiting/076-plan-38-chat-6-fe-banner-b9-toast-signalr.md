@@ -1,7 +1,8 @@
 > **Repo destino**: `educa-web` (frontend, branch `main`) + `Educa.API` (backend, branch `master`).
 > **Plan**: 38 · **Chat**: 6 · **Fase**: F6.FE+BE · **Modo sugerido**: `/execute`
-> **Creado**: 2026-04-29 · **Estado**: ⏳ pendiente arrancar.
+> **Creado**: 2026-04-29 · **Estado**: 🟡 waiting (bloqueado externo).
 > **Pre-requisito**: Chat 5 (075) mergeado + Plan 37 Chat 3 (068) deployado (tab blacklist y cuarentena visibles).
+> **Movido a waiting/ 2026-05-02**: liberado el slot de `running/` para arrancar 083 (F-003 SignalR `/asistenciahub` 404, Alto crítico pre-deploy de Cowork). Reanudar cuando Plan 39 Chat B (078) esté deployado y verificado en prod (hub server-side `EmailHub` registrado).
 >
 > **🔗 Cross-link Plan 39 (D5/D13 del brief 071)**: el ownership del `EmailHub` server-side se movió a Plan 39 Chat B (078) — este chat NO crea `Hubs/EmailHub.cs`. Este chat **solo** registra el listener FE para los **3 eventos** del hub (no solo `BlacklistEntryCreated`):
 >

@@ -9,5 +9,11 @@
 		"secure": false,
 		"changeOrigin": true,
 		"ws": true
+	},
+	"/asistenciahub": {
+		"target": "https://localhost:7102",
+		"secure": false,
+		"changeOrigin": true,
+		"ws": true
 	}
 }
