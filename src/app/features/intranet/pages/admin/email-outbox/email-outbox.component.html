@@ -2,6 +2,13 @@
 <app-email-outbox-header (refresh)="onRefresh()" (exportExcel)="onExportExcel()" />
 <!-- #endregion -->
 
+<!-- #region Defer/fail SignalR banner + toast (Plan 38 Chat 6, feature flag) -->
+@if (deferAlertsEnabled) {
+	<app-defer-fail-banner [state]="bannerState()" />
+	<p-toast position="top-right" key="email-outbox-alerts" />
+}
+<!-- #endregion -->
+
 <!-- #region Stats + Chart en grid -->
 <section class="overview-grid">
 	<div class="overview-stats">

@@ -33,6 +33,7 @@ export const environment = {
 		emailOutboxDiagnostico: true,
 		auditoriaCorreos: true,
 		emailBlacklistTab: true,
+		emailDeferAlerts: false,
 	},
 
 	// Debug panels (siempre false en producción)

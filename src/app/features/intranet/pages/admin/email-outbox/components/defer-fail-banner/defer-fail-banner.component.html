@@ -1,0 +1,37 @@
+@if (visible()) {
+	<div
+		class="defer-fail-banner"
+		[class.defer-fail-banner--warn]="severity() === 'warn'"
+		[class.defer-fail-banner--danger]="severity() === 'danger'"
+		role="alert"
+		[attr.aria-live]="severity() === 'danger' ? 'assertive' : 'polite'"
+	>
+		<i [class]="'defer-fail-banner__icon ' + icon()" aria-hidden="true"></i>
+		<div class="defer-fail-banner__body">
+			<div class="defer-fail-banner__header">
+				<strong class="defer-fail-banner__title">{{ title() }}</strong>
+			</div>
+			<p class="defer-fail-banner__message">
+				@if (contadorLabel()) {
+					<span class="defer-fail-banner__counter">{{ contadorLabel() }}</span>
+				}
+				@if (recentBlacklistLabel()) {
+					<span class="defer-fail-banner__recent">
+						Bloqueo automático reciente: <strong>{{ recentBlacklistLabel() }}</strong>
+					</span>
+				}
+				@if (severity() === 'danger') {
+					<span class="defer-fail-banner__hint">
+						El hosting puede descartar correos del dominio durante ~60 min hasta que el contador
+						baje. Verificá la lista de blacklist y el dashboard de monitoreo.
+					</span>
+				} @else if (severity() === 'warn') {
+					<span class="defer-fail-banner__hint">
+						Faltan pocos fallos para que el hosting bloquee al dominio. Revisá la cola para
+						evitar reintentos sobre destinatarios fallidos.
+					</span>
+				}
+			</p>
+		</div>
+	</div>
+}
