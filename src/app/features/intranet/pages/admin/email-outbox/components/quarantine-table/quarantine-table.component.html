@@ -1,0 +1,109 @@
+<section class="table-section">
+	<p-table
+		[value]="items()"
+		[lazy]="true"
+		[paginator]="true"
+		[rows]="pageSize()"
+		[first]="(page() - 1) * pageSize()"
+		[totalRecords]="total()"
+		[rowsPerPageOptions]="[10, 25, 50]"
+		[showCurrentPageReport]="true"
+		currentPageReportTemplate="Mostrando {first} a {last} de {totalRecords} cuarentenas"
+		[loading]="loading()"
+		(onLazyLoad)="onLazyLoad($event)"
+		class="p-datatable-sm"
+	>
+		<ng-template #header>
+			<tr>
+				<th style="width: 60px">#</th>
+				<th>DESTINATARIO</th>
+				<th style="width: 200px">MOTIVO</th>
+				<th style="width: 100px">CUARENTENAS</th>
+				<th style="width: 170px">RETRY AFTER</th>
+				<th style="width: 110px">ESTADO</th>
+				<th style="width: 110px">ACCIONES</th>
+			</tr>
+		</ng-template>
+
+		<ng-template #body let-item>
+			<tr [class.row-inactive]="!item.estado">
+				<td>
+					<span class="id-badge">{{ item.id }}</span>
+				</td>
+				<td>
+					<div class="recipient">
+						<span class="recipient-email">{{ item.destinatario }}</span>
+						<span class="recipient-meta">{{ domainOf(item.destinatario) }}</span>
+					</div>
+				</td>
+				<td>
+					<p-tag
+						[value]="uiMapping.getQuarantineMotivoLabel(item.motivo)"
+						[severity]="uiMapping.getQuarantineMotivoSeverity(item.motivo)"
+					/>
+				</td>
+				<td>
+					<p-tag
+						[value]="item.quarantineCount + ' / 3'"
+						[severity]="countSeverity(item.quarantineCount)"
+					/>
+				</td>
+				<td>
+					@if (item.retryAfter) {
+						{{ item.retryAfter | date: 'dd/MM/yyyy HH:mm' }}
+					} @else {
+						<span class="muted">—</span>
+					}
+				</td>
+				<td>
+					<p-tag
+						[value]="estadoLabel(item.estado)"
+						[severity]="estadoSeverity(item.estado)"
+						styleClass="tag-neutral"
+					/>
+				</td>
+				<td>
+					<div class="actions">
+						<button
+							pButton
+							icon="pi pi-eye"
+							class="p-button-rounded p-button-text p-button-secondary"
+							pTooltip="Ver detalles"
+							tooltipPosition="top"
+							(click)="onViewDetail(item)"
+							[pt]="{ root: { 'aria-label': 'Ver detalles' } }"
+						></button>
+						@if (item.estado) {
+							<button
+								pButton
+								icon="pi pi-unlock"
+								class="p-button-rounded p-button-text p-button-warning"
+								pTooltip="Liberar manualmente"
+								tooltipPosition="top"
+								(click)="onRelease(item)"
+								[pt]="{ root: { 'aria-label': 'Liberar cuarentena' } }"
+							></button>
+						}
+					</div>
+				</td>
+			</tr>
+		</ng-template>
+
+		<ng-template #emptymessage>
+			<tr>
+				<td colspan="7" class="empty-message">
+					<div class="empty-state">
+						<i class="pi pi-shield"></i>
+						@if (hasActiveFilters()) {
+							<p>No se encontraron cuarentenas con esos filtros</p>
+							<span>Probá limpiando los filtros para ver todo el universo.</span>
+						} @else {
+							<p>No hay cuarentenas activas</p>
+							<span>Las cuarentenas se crean automáticamente cuando se detecta soft-bounce repetido o buzón lleno crónico.</span>
+						}
+					</div>
+				</td>
+			</tr>
+		</ng-template>
+	</p-table>
+</section>

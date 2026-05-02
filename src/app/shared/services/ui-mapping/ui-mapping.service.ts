@@ -9,6 +9,12 @@ import type {
 	TipoPersona,
 } from '@data/models';
 import type { EmailBlacklistMotivo } from '@data/models/email-blacklist.models';
+import type {
+	MotivoLiberacion,
+	QuarantineMotivo,
+} from '@data/models/email-quarantine.models';
+import type { DomainPauseMotivo } from '@data/models/email-domain-pause.models';
+import type { DeferEventTipo } from '@data/models/email-defer-event.models';
 
 // #endregion
 // #region Implementation
@@ -78,6 +84,67 @@ const NOTIFICACION_PRIORIDAD_LABEL: Record<NotificacionPrioridad, string> = {
 const TIPO_PERSONA_LABEL: Record<TipoPersona, string> = {
 	E: 'Estudiante',
 	P: 'Profesor',
+};
+// #endregion
+
+// #region Quarantine mappings (Plan 37 Chat 3)
+const QUARANTINE_MOTIVO_SEVERITY: Record<QuarantineMotivo, Severity> = {
+	MAILBOX_FULL: 'warn',
+	SOFT_BOUNCE_REPEATED: 'danger',
+	DELAY_72H: 'warn',
+	MANUAL: 'info',
+};
+
+const QUARANTINE_MOTIVO_LABEL: Record<QuarantineMotivo, string> = {
+	MAILBOX_FULL: 'Buzón lleno (4.2.2)',
+	SOFT_BOUNCE_REPEATED: 'Soft-bounce repetido',
+	DELAY_72H: 'Retraso > 72h',
+	MANUAL: 'Cuarentena manual',
+};
+
+const MOTIVO_LIBERACION_LABEL: Record<MotivoLiberacion, string> = {
+	CONTACTO_DIRECTO: 'Contacto directo',
+	BUZON_LIBERADO: 'Buzón liberado',
+	FALSO_POSITIVO: 'Falso positivo',
+	OTRO: 'Otro',
+};
+// #endregion
+
+// #region Domain pause mappings (Plan 37 Chat 3)
+const DOMAIN_PAUSE_MOTIVO_SEVERITY: Record<DomainPauseMotivo, Severity> = {
+	DEFER_BURST: 'warn',
+	DOMAIN_BLOCKED_NDR: 'danger',
+	MANUAL: 'info',
+};
+
+const DOMAIN_PAUSE_MOTIVO_LABEL: Record<DomainPauseMotivo, string> = {
+	DEFER_BURST: 'Burst de defers',
+	DOMAIN_BLOCKED_NDR: 'NDR de bloqueo',
+	MANUAL: 'Pausa manual',
+};
+// #endregion
+
+// #region Defer event mappings (Plan 37 Chat 3)
+const DEFER_EVENT_TIPO_SEVERITY: Record<DeferEventTipo, Severity> = {
+	DEFER_4XX: 'warn',
+	BOUNCE_5XX: 'danger',
+	MAILBOX_FULL: 'warn',
+	DOMAIN_BLOCKED: 'danger',
+	AUTH_FAILURE: 'danger',
+	TLS_FAILURE: 'danger',
+	TIMEOUT: 'secondary',
+	OTHER: 'secondary',
+};
+
+const DEFER_EVENT_TIPO_LABEL: Record<DeferEventTipo, string> = {
+	DEFER_4XX: 'Defer 4.x.x',
+	BOUNCE_5XX: 'Bounce 5.x.x',
+	MAILBOX_FULL: 'Buzón lleno',
+	DOMAIN_BLOCKED: 'Dominio bloqueado',
+	AUTH_FAILURE: 'Auth fail',
+	TLS_FAILURE: 'TLS fail',
+	TIMEOUT: 'Timeout',
+	OTHER: 'Otro',
 };
 // #endregion
 
@@ -192,6 +259,40 @@ export class UiMappingService {
 
 	getBlacklistMotivoLabel(motivo: EmailBlacklistMotivo): string {
 		return BLACKLIST_MOTIVO_LABEL[motivo] ?? motivo;
+	}
+	// #endregion
+
+	// #region Quarantine motivo (Plan 37 Chat 3)
+	getQuarantineMotivoSeverity(motivo: QuarantineMotivo): Severity {
+		return QUARANTINE_MOTIVO_SEVERITY[motivo] ?? 'secondary';
+	}
+
+	getQuarantineMotivoLabel(motivo: QuarantineMotivo): string {
+		return QUARANTINE_MOTIVO_LABEL[motivo] ?? motivo;
+	}
+
+	getMotivoLiberacionLabel(motivo: MotivoLiberacion): string {
+		return MOTIVO_LIBERACION_LABEL[motivo] ?? motivo;
+	}
+	// #endregion
+
+	// #region Domain pause motivo (Plan 37 Chat 3)
+	getDomainPauseMotivoSeverity(motivo: DomainPauseMotivo): Severity {
+		return DOMAIN_PAUSE_MOTIVO_SEVERITY[motivo] ?? 'secondary';
+	}
+
+	getDomainPauseMotivoLabel(motivo: DomainPauseMotivo): string {
+		return DOMAIN_PAUSE_MOTIVO_LABEL[motivo] ?? motivo;
+	}
+	// #endregion
+
+	// #region Defer event tipo (Plan 37 Chat 3)
+	getDeferEventTipoSeverity(tipo: DeferEventTipo): Severity {
+		return DEFER_EVENT_TIPO_SEVERITY[tipo] ?? 'secondary';
+	}
+
+	getDeferEventTipoLabel(tipo: DeferEventTipo): string {
+		return DEFER_EVENT_TIPO_LABEL[tipo] ?? tipo;
 	}
 	// #endregion
 }

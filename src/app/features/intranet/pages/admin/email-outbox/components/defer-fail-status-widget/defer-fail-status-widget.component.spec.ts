@@ -208,6 +208,28 @@ describe('DeferFailStatusWidgetComponent', () => {
 		expect(spy).toHaveBeenCalledWith(true);
 	});
 
+	it('Plan 37 Chat 3 — emite goToEvents al click cuando status es WARNING', () => {
+		const spy = vi.fn();
+		fixture.componentRef.setInput('status', withLevel('WARNING', 80));
+		fixture.detectChanges();
+		component.goToEvents.subscribe(spy);
+
+		component.onGoToEventsClick();
+
+		expect(spy).toHaveBeenCalledTimes(1);
+	});
+
+	it('Plan 37 Chat 3 — NO emite goToEvents cuando status es OK', () => {
+		const spy = vi.fn();
+		fixture.componentRef.setInput('status', withLevel('OK', 20));
+		fixture.detectChanges();
+		component.goToEvents.subscribe(spy);
+
+		component.onGoToEventsClick();
+
+		expect(spy).not.toHaveBeenCalled();
+	});
+
 	it('emite collapsedChange invirtiendo el valor actual', () => {
 		const spy = vi.fn();
 		fixture.componentRef.setInput('collapsed', false);

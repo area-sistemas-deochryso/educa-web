@@ -1,0 +1,39 @@
+:host {
+	display: block;
+}
+
+.domain-blocked-banner {
+	display: flex;
+	align-items: center;
+	gap: 0.75rem;
+	padding: 0.85rem 1rem;
+	margin-bottom: 1rem;
+	border-radius: 8px;
+	background: color-mix(in srgb, var(--red-500) 15%, transparent);
+	border: 1px solid var(--red-500);
+	color: var(--text-color);
+	font-size: 0.9rem;
+
+	i {
+		font-size: 1.25rem;
+		color: var(--red-600);
+	}
+
+	&__content {
+		display: flex;
+		flex-direction: column;
+		gap: 0.2rem;
+
+		strong {
+			color: var(--red-600);
+		}
+
+		code {
+			background: color-mix(in srgb, var(--surface-200) 60%, transparent);
+			padding: 0.05rem 0.35rem;
+			border-radius: 4px;
+			font-family: 'JetBrains Mono', monospace;
+			font-size: 0.825rem;
+		}
+	}
+}

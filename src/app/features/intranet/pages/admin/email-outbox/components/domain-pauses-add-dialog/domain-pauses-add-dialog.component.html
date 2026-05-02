@@ -1,0 +1,87 @@
+<p-dialog
+	[visible]="visible()"
+	(visibleChange)="onVisibleChange($event)"
+	header="Pausar dominio receptor"
+	[modal]="true"
+	[style]="{ width: '520px' }"
+	[draggable]="false"
+	[resizable]="false"
+	class="domain-pauses-add-dialog"
+>
+	<div class="dialog-content">
+		<div class="form-grid">
+			<div class="field full-width">
+				<label for="dp-dominio">Dominio *</label>
+				<input
+					id="dp-dominio"
+					pInputText
+					autocomplete="off"
+					[ngModel]="formData().dominio"
+					(ngModelChange)="onDominioChange($event)"
+					placeholder="ejemplo.com"
+					[disabled]="submitting()"
+				/>
+				@if (touched() && dominioError()) {
+					<small class="p-error">{{ dominioError() }}</small>
+				}
+			</div>
+
+			<div class="field full-width">
+				<label for="dp-duration">Duración *</label>
+				<p-select
+					inputId="dp-duration"
+					[options]="durationOptions"
+					optionLabel="label"
+					optionValue="value"
+					[ngModel]="formData().durationHours"
+					(ngModelChange)="onDurationChange($event)"
+					appendTo="body"
+					[disabled]="submitting()"
+				/>
+			</div>
+
+			<div class="field full-width">
+				<label for="dp-observacion">Observación *</label>
+				<textarea
+					id="dp-observacion"
+					pTextarea
+					rows="3"
+					maxlength="500"
+					autocomplete="off"
+					[ngModel]="formData().observacion"
+					(ngModelChange)="onObservacionChange($event)"
+					placeholder="Razón de la pausa manual"
+					[disabled]="submitting()"
+				></textarea>
+				@if (touched() && observacionError()) {
+					<small class="p-error">{{ observacionError() }}</small>
+				} @else {
+					<small class="hint">Mínimo 5 caracteres. Máx. 500.</small>
+				}
+			</div>
+		</div>
+	</div>
+
+	<ng-template #footer>
+		<div class="dialog-footer">
+			<button
+				pButton
+				label="Cancelar"
+				icon="pi pi-times"
+				class="p-button-text"
+				(click)="onCancel()"
+				[disabled]="submitting()"
+				[pt]="{ root: { 'aria-label': 'Cancelar' } }"
+			></button>
+			<button
+				pButton
+				label="Pausar"
+				icon="pi pi-pause"
+				class="p-button-success"
+				(click)="onConfirm()"
+				[disabled]="!canSubmit()"
+				[pt]="{ root: { 'aria-label': 'Pausar dominio' } }"
+			></button>
+		</div>
+	</ng-template>
+</p-dialog>

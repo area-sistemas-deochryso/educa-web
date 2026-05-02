@@ -52,6 +52,24 @@ const ALL_TABS: ShellTab[] = [
 		icon: 'pi pi-shield',
 		featureFlag: 'emailBlacklistTab',
 	},
+	{
+		value: 'quarantine',
+		label: 'Cuarentena',
+		icon: 'pi pi-clock',
+		featureFlag: 'emailQuarantineTab',
+	},
+	{
+		value: 'domain-pauses',
+		label: 'Dominios pausados',
+		icon: 'pi pi-pause',
+		featureFlag: 'emailDomainPausesTab',
+	},
+	{
+		value: 'defer-events',
+		label: 'Eventos defer',
+		icon: 'pi pi-history',
+		featureFlag: 'emailDeferEventsTab',
+	},
 ];
 // #endregion
 

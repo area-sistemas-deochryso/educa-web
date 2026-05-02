@@ -28,6 +28,18 @@
 		</button>
 
 		<div class="defer-fail-widget__actions">
+			@if (status()?.status === 'WARNING' || status()?.status === 'CRITICAL') {
+				<button
+					pButton
+					icon="pi pi-history"
+					label="Ver eventos"
+					class="p-button-outlined p-button-sm p-button-warning"
+					(click)="onGoToEventsClick()"
+					pTooltip="Ir al timeline de eventos defer"
+					tooltipPosition="top"
+					[pt]="{ root: { 'aria-label': 'Ir a eventos defer' } }"
+				></button>
+			}
 			<label class="defer-fail-widget__autorefresh">
 				<span>Auto-refresh 60s</span>
 				<p-toggleswitch

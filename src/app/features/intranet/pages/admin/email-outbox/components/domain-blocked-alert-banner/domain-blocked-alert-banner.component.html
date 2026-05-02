@@ -1,0 +1,16 @@
+@if (hasEvents() && latest(); as event) {
+	<div class="domain-blocked-banner" role="alert">
+		<i class="pi pi-ban"></i>
+		<div class="domain-blocked-banner__content">
+			<strong>Dominio bloqueado por cPanel</strong>
+			<span>
+				@if (event.dominio) {
+					<code>{{ event.dominio }}</code>
+				}
+				reportado el {{ event.fecha | date: 'dd/MM/yyyy HH:mm' }} — el contador
+				<code>max_defer_fail</code> puede haberse agotado. Revisá el widget defer/fail
+				y los eventos recientes.
+			</span>
+		</div>
+	</div>
+}

@@ -1,0 +1,93 @@
+<p-drawer
+	[visible]="visible()"
+	(visibleChange)="onVisibleChange($event)"
+	position="right"
+	[style]="{ width: '450px' }"
+	[modal]="true"
+	header="Detalle de cuarentena"
+>
+	@if (entry(); as item) {
+		<div class="detail-content">
+			<div class="detail-avatar">
+				<i class="pi pi-shield"></i>
+			</div>
+			<div class="detail-name">{{ item.destinatario }}</div>
+
+			<p-tag
+				[value]="uiMapping.getQuarantineMotivoLabel(item.motivo)"
+				[severity]="uiMapping.getQuarantineMotivoSeverity(item.motivo)"
+			/>
+
+			<div class="detail-info">
+				<div class="info-item">
+					<span class="info-label">ID</span>
+					<span class="info-value">#{{ item.id }}</span>
+				</div>
+				<div class="info-item">
+					<span class="info-label">Estado</span>
+					<p-tag
+						[value]="item.estado ? 'Activa' : 'Liberada'"
+						[severity]="item.estado ? 'success' : 'danger'"
+						styleClass="tag-neutral"
+					/>
+				</div>
+				<div class="info-item">
+					<span class="info-label">Cuarentena</span>
+					<span class="info-value">{{ item.quarantineCount }} de 3</span>
+				</div>
+				<div class="info-item">
+					<span class="info-label">Retry After</span>
+					<span class="info-value">{{ item.retryAfter | date: 'dd/MM/yyyy HH:mm' }}</span>
+				</div>
+				<div class="info-item">
+					<span class="info-label">Creada por</span>
+					<span class="info-value">{{ item.usuarioReg }}</span>
+				</div>
+				<div class="info-item">
+					<span class="info-label">Creada el</span>
+					<span class="info-value">{{ item.fechaReg | date: 'dd/MM/yyyy HH:mm' }}</span>
+				</div>
+				@if (item.usuarioMod && !item.estado) {
+					<div class="info-item">
+						<span class="info-label">Liberada por</span>
+						<span class="info-value">{{ item.usuarioMod }}</span>
+					</div>
+				}
+				@if (item.fechaMod && !item.estado) {
+					<div class="info-item">
+						<span class="info-label">Liberada el</span>
+						<span class="info-value">{{ item.fechaMod | date: 'dd/MM/yyyy HH:mm' }}</span>
+					</div>
+				}
+			</div>
+
+			@if (item.observacion) {
+				<div class="detail-error">
+					<span class="info-label">Observación</span>
+					<pre class="error-text">{{ item.observacion }}</pre>
+				</div>
+			}
+		</div>
+
+		<div class="drawer-footer">
+			<button
+				pButton
+				label="Cerrar"
+				icon="pi pi-times"
+				class="p-button-text"
+				(click)="onClose()"
+				[pt]="{ root: { 'aria-label': 'Cerrar' } }"
+			></button>
+			@if (item.estado) {
+				<button
+					pButton
+					label="Liberar"
+					icon="pi pi-unlock"
+					class="p-button-warning"
+					(click)="onRelease()"
+					[pt]="{ root: { 'aria-label': 'Liberar cuarentena' } }"
+				></button>
+			}
+		</div>
+	}
+</p-drawer>

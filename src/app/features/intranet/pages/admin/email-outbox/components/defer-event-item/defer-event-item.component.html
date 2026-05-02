@@ -1,0 +1,47 @@
+<div class="event-item">
+	<div class="event-item__header">
+		<p-tag
+			[value]="uiMapping.getDeferEventTipoLabel(event().tipo)"
+			[severity]="uiMapping.getDeferEventTipoSeverity(event().tipo)"
+		/>
+		<span class="event-item__date">{{ event().fecha | date: 'dd/MM/yyyy HH:mm:ss' }}</span>
+	</div>
+
+	<div class="event-item__body">
+		@if (event().destinatario) {
+			<div class="event-item__row">
+				<span class="event-item__label">Destinatario</span>
+				<code>{{ event().destinatario }}</code>
+			</div>
+		}
+		@if (event().dominio) {
+			<div class="event-item__row">
+				<span class="event-item__label">Dominio</span>
+				<code>{{ event().dominio }}</code>
+			</div>
+		}
+		@if (event().statusCode) {
+			<div class="event-item__row">
+				<span class="event-item__label">Status</span>
+				<code>{{ event().statusCode }}</code>
+			</div>
+		}
+		@if (event().diagnosticCode) {
+			<div class="event-item__row">
+				<span class="event-item__label">Diagnóstico</span>
+				<code [pTooltip]="event().diagnosticCode!" tooltipPosition="top">
+					{{ truncate(event().diagnosticCode) }}
+				</code>
+			</div>
+		}
+		@if (event().emailOutboxId) {
+			<div class="event-item__row">
+				<span class="event-item__label">EmailOutbox</span>
+				<a [routerLink]="['/intranet/admin/monitoreo/correos/diagnostico']"
+					[queryParams]="{ id: event().emailOutboxId }">
+					#{{ event().emailOutboxId }}
+				</a>
+			</div>
+		}
+	</div>
+</div>

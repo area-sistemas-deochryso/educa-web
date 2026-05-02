@@ -55,6 +55,7 @@ export class DeferFailStatusWidgetComponent {
 	readonly refresh = output<void>();
 	readonly autoRefreshChange = output<boolean>();
 	readonly collapsedChange = output<boolean>();
+	readonly goToEvents = output<void>();
 	// #endregion
 
 	// #region Computed
@@ -123,6 +124,17 @@ export class DeferFailStatusWidgetComponent {
 
 	onCollapseToggle(): void {
 		this.collapsedChange.emit(!this.collapsed());
+	}
+
+	/**
+	 * Plan 37 Chat 3 — cross-link al tab "Eventos defer". Solo emite si el
+	 * estado actual es WARNING o CRITICAL (en OK no tiene sentido investigar).
+	 */
+	onGoToEventsClick(): void {
+		const level = this.status()?.status;
+		if (level === 'WARNING' || level === 'CRITICAL') {
+			this.goToEvents.emit();
+		}
 	}
 	// #endregion
 }

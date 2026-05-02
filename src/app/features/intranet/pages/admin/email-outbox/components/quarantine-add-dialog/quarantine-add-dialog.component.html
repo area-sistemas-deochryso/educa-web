@@ -1,0 +1,88 @@
+<p-dialog
+	[visible]="visible()"
+	(visibleChange)="onVisibleChange($event)"
+	header="Agregar cuarentena manual"
+	[modal]="true"
+	[style]="{ width: '520px' }"
+	[draggable]="false"
+	[resizable]="false"
+	class="quarantine-add-dialog"
+>
+	<div class="dialog-content">
+		<div class="form-grid">
+			<div class="field full-width">
+				<label for="qt-destinatario">Destinatario *</label>
+				<input
+					id="qt-destinatario"
+					pInputText
+					type="email"
+					autocomplete="off"
+					[ngModel]="formData().destinatario"
+					(ngModelChange)="onDestinatarioChange($event)"
+					placeholder="ejemplo@dominio.com"
+					[disabled]="submitting()"
+				/>
+				@if (touched() && destinatarioError()) {
+					<small class="p-error">{{ destinatarioError() }}</small>
+				}
+			</div>
+
+			<div class="field full-width">
+				<label for="qt-duration">Duración *</label>
+				<p-select
+					inputId="qt-duration"
+					[options]="durationOptions"
+					optionLabel="label"
+					optionValue="value"
+					[ngModel]="formData().durationHours"
+					(ngModelChange)="onDurationChange($event)"
+					appendTo="body"
+					[disabled]="submitting()"
+				/>
+			</div>
+
+			<div class="field full-width">
+				<label for="qt-observacion">Observación *</label>
+				<textarea
+					id="qt-observacion"
+					pTextarea
+					rows="3"
+					maxlength="500"
+					autocomplete="off"
+					[ngModel]="formData().observacion"
+					(ngModelChange)="onObservacionChange($event)"
+					placeholder="Razón explícita (apoderado pidió pausa, dispositivo de prueba, etc.)"
+					[disabled]="submitting()"
+				></textarea>
+				@if (touched() && observacionError()) {
+					<small class="p-error">{{ observacionError() }}</small>
+				} @else {
+					<small class="hint">Mínimo 5 caracteres. Máx. 500.</small>
+				}
+			</div>
+		</div>
+	</div>
+
+	<ng-template #footer>
+		<div class="dialog-footer">
+			<button
+				pButton
+				label="Cancelar"
+				icon="pi pi-times"
+				class="p-button-text"
+				(click)="onCancel()"
+				[disabled]="submitting()"
+				[pt]="{ root: { 'aria-label': 'Cancelar' } }"
+			></button>
+			<button
+				pButton
+				label="Cuarentena"
+				icon="pi pi-shield"
+				class="p-button-success"
+				(click)="onConfirm()"
+				[disabled]="!canSubmit()"
+				[pt]="{ root: { 'aria-label': 'Crear cuarentena manual' } }"
+			></button>
+		</div>
+	</ng-template>
+</p-dialog>

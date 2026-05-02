@@ -70,6 +70,48 @@ const CORREOS_CHILDREN: Routes = [
 				},
 			]
 		: []),
+	...(environment.features.emailQuarantineTab
+		? [
+				{
+					path: 'quarantine',
+					loadComponent: () =>
+						import(
+							'../email-outbox/components/quarantine-tab/quarantine-tab.component'
+						).then((m) => m.QuarantineTabComponent),
+					canActivate: [authGuard, permissionsGuard],
+					data: { permissionPath: 'intranet/admin/monitoreo/correos/quarantine' },
+					title: 'Intranet - Cuarentena de Correos',
+				},
+			]
+		: []),
+	...(environment.features.emailDomainPausesTab
+		? [
+				{
+					path: 'domain-pauses',
+					loadComponent: () =>
+						import(
+							'../email-outbox/components/domain-pauses-tab/domain-pauses-tab.component'
+						).then((m) => m.DomainPausesTabComponent),
+					canActivate: [authGuard, permissionsGuard],
+					data: { permissionPath: 'intranet/admin/monitoreo/correos/domain-pauses' },
+					title: 'Intranet - Dominios Pausados',
+				},
+			]
+		: []),
+	...(environment.features.emailDeferEventsTab
+		? [
+				{
+					path: 'defer-events',
+					loadComponent: () =>
+						import(
+							'../email-outbox/components/defer-events-tab/defer-events-tab.component'
+						).then((m) => m.DeferEventsTabComponent),
+					canActivate: [authGuard, permissionsGuard],
+					data: { permissionPath: 'intranet/admin/monitoreo/correos/defer-events' },
+					title: 'Intranet - Eventos Defer',
+				},
+			]
+		: []),
 ];
 // #endregion
 

@@ -1,0 +1,111 @@
+.table-section {
+	background: transparent;
+	border: 1px solid var(--surface-300);
+	border-radius: 12px;
+	overflow: hidden;
+}
+
+.id-badge {
+	display: inline-block;
+	padding: 0.15rem 0.5rem;
+	border-radius: 6px;
+	background: var(--surface-200);
+	color: var(--text-color);
+	font-size: 0.8rem;
+	font-weight: 500;
+}
+
+.recipient {
+	display: flex;
+	flex-direction: column;
+	gap: 0.15rem;
+
+	&-email {
+		font-family: 'JetBrains Mono', 'Fira Code', monospace;
+		font-size: 0.875rem;
+		word-break: break-all;
+		color: var(--text-color);
+	}
+
+	&-meta {
+		font-size: 0.75rem;
+		color: var(--text-color-secondary);
+	}
+}
+
+.muted {
+	color: var(--text-color-secondary);
+}
+
+.actions {
+	display: flex;
+	gap: 0.25rem;
+	justify-content: center;
+}
+
+.empty-message {
+	padding: 2rem 1rem;
+	text-align: center;
+}
+
+.empty-state {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	gap: 0.5rem;
+
+	i {
+		font-size: 2rem;
+		color: var(--text-color-secondary);
+	}
+
+	p {
+		margin: 0;
+		font-weight: 500;
+		color: var(--text-color);
+	}
+
+	span {
+		max-width: 30rem;
+		font-size: 0.85rem;
+		color: var(--text-color-secondary);
+	}
+}
+
+:host ::ng-deep {
+	.p-datatable {
+		.p-datatable-thead > tr > th {
+			font-weight: 600;
+			font-size: 0.8rem;
+			text-transform: uppercase;
+			letter-spacing: 0.5px;
+			color: var(--text-color);
+			border-color: var(--surface-300);
+		}
+
+		.p-datatable-tbody > tr {
+			> td {
+				vertical-align: middle;
+				color: var(--text-color);
+				border-color: var(--surface-300);
+			}
+
+			&:hover > td {
+				background: var(--surface-100);
+			}
+
+			&.row-inactive {
+				opacity: 0.55;
+
+				&:hover > td {
+					opacity: 1;
+				}
+			}
+		}
+
+		.p-paginator {
+			padding: 1rem;
+			border-top: 1px solid var(--surface-300);
+		}
+	}
+}

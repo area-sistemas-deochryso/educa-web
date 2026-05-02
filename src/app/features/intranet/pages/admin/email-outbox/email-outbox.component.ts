@@ -5,7 +5,7 @@ import {
 	OnInit,
 	inject,
 } from '@angular/core';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { DrawerModule } from 'primeng/drawer';
 import { ToastModule } from 'primeng/toast';
@@ -62,6 +62,7 @@ export class EmailOutboxComponent implements OnInit {
 	private uiFacade = inject(EmailOutboxUiFacade);
 	private excelService = inject(ExcelService);
 	private route = inject(ActivatedRoute);
+	private router = inject(Router);
 	private destroyRef = inject(DestroyRef);
 	private hub = inject(EmailHubService);
 	private messageService = inject(MessageService);
@@ -198,6 +199,17 @@ export class EmailOutboxComponent implements OnInit {
 
 	onDeferFailCollapsedChange(collapsed: boolean): void {
 		this.dataFacade.setDeferFailCollapsed(collapsed);
+	}
+
+	/**
+	 * Plan 37 Chat 3 — cross-link desde el widget defer-fail a "Eventos defer".
+	 * Pasa `?desde=hoy` para acotar el timeline al día actual.
+	 */
+	onDeferFailGoToEvents(): void {
+		void this.router.navigate(
+			['/intranet/admin/monitoreo/correos/defer-events'],
+			{ queryParams: { desde: 'hoy' } },
+		);
 	}
 
 	async onExportExcel(): Promise<void> {

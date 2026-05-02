@@ -1,0 +1,97 @@
+<app-domain-blocked-alert-banner />
+
+<div class="filters-bar">
+	<p-select
+		[options]="tipoOptions"
+		optionLabel="label"
+		optionValue="value"
+		[ngModel]="filterTipo()"
+		(ngModelChange)="onTipoChange($event)"
+		placeholder="Tipo de evento"
+		[showClear]="true"
+		appendTo="body"
+	/>
+	<input
+		type="text"
+		pInputText
+		placeholder="Dominio (ej: gmail.com)"
+		[ngModel]="filterDominio()"
+		(ngModelChange)="onDominioChange($event)"
+		(blur)="onDominioApply()"
+		(keyup.enter)="onDominioApply()"
+	/>
+	<p-datepicker
+		[ngModel]="filterDesde()"
+		(ngModelChange)="onDesdeChange($event)"
+		placeholder="Desde"
+		[showIcon]="true"
+		[showClear]="true"
+		appendTo="body"
+	/>
+	<p-datepicker
+		[ngModel]="filterHasta()"
+		(ngModelChange)="onHastaChange($event)"
+		placeholder="Hasta"
+		[showIcon]="true"
+		[showClear]="true"
+		appendTo="body"
+	/>
+
+	<button
+		pButton
+		icon="pi pi-filter-slash"
+		class="p-button-text p-button-sm btn-clear"
+		pTooltip="Limpiar filtros"
+		tooltipPosition="top"
+		(click)="onClearFilters()"
+		[pt]="{ root: { 'aria-label': 'Limpiar filtros' } }"
+	></button>
+
+	<button
+		pButton
+		icon="pi pi-refresh"
+		class="p-button-text p-button-sm"
+		pTooltip="Refrescar"
+		tooltipPosition="top"
+		(click)="onRefresh()"
+		[pt]="{ root: { 'aria-label': 'Refrescar' } }"
+	></button>
+
+	<button
+		pButton
+		label="Exportar CSV"
+		icon="pi pi-download"
+		class="p-button-outlined p-button-sm"
+		(click)="onExportCsv()"
+		[disabled]="!hasEvents()"
+		[pt]="{ root: { 'aria-label': 'Exportar a CSV' } }"
+	></button>
+</div>
+
+@if (loading()) {
+	<div class="timeline-loading">
+		<i class="pi pi-spin pi-spinner"></i>
+		<span>Cargando eventos…</span>
+	</div>
+} @else if (!hasEvents()) {
+	<div class="timeline-empty">
+		<i class="pi pi-inbox"></i>
+		<p>Sin eventos en el rango seleccionado</p>
+		<span>Probá ampliar el rango de fechas o limpiar los filtros.</span>
+	</div>
+} @else {
+	<section class="timeline">
+		@for (event of events(); track event.id) {
+			<app-defer-event-item [event]="event" />
+		}
+	</section>
+
+	<p-paginator
+		[rows]="pageSize"
+		[first]="first()"
+		[totalRecords]="total()"
+		[showCurrentPageReport]="true"
+		currentPageReportTemplate="Mostrando {first} a {last} de {totalRecords} eventos"
+		(onPageChange)="onPageChange($event)"
+	/>
+}

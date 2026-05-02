@@ -34,6 +34,9 @@ export const environment = {
 		auditoriaCorreos: true,
 		emailBlacklistTab: true,
 		emailDeferAlerts: true,
+		emailQuarantineTab: true,
+		emailDomainPausesTab: true,
+		emailDeferEventsTab: true,
 	},
 
 	// Debug panels (solo development)
