@@ -138,6 +138,16 @@
 
 ---
 
+## 🔧 Hallazgos Cowork pre-deploy 2026-04-29
+
+Hallazgos detectados en navegador asistido (Cowork) antes del deploy formal. No están atados a un plan numerado.
+
+- 🟢 **F-011 BE ✅ cerrado local 2026-04-30** (`Educa.API master`, commit `c4eb865`). Filtro `search` de `GET /api/asistencia-admin/dia` extendido en las 3 ramas (E/P/AA): match contra `*_DNI_Hash` cuando `term` son 8 dígitos + concatenación `Nombres+" "+Apellidos` y `Apellidos+" "+Nombres`. Resuelve el deep-link cross-role → admin (`?dni=...`) que devolvía "No hay registros" aunque la fila existiera. Limitación documentada: DNI parcial criptográficamente imposible (SHA-256 no preserva subcadenas) — el deep-link real pasa DNI completo. **+5 tests** F-011 + ctor migration en Plan27 tests (9/9 verdes en filtro). Smoke local 4/4 OK con DNI `76357038` profesor RAMIREZ. Brief en `awaiting-prod/082` esperando smoke prod del usuario tras deploy. Patrón replicado de `UsuariosRepository.ListarPorRolAsync` (líneas 75-76).
+- ⏳ **F-010 FE pendiente** — auto-abrir dialog de edición admin desde el deep-link cross-role. Depende de F-011 desplegado y verificado.
+- 🟢 **F-003 cerrado** chat 083 (`awaiting-prod`) — SignalR `/asistenciahub` 404 en navegación Seguimiento.
+
+---
+
 ## 🚨 Restricción crítica — Límites SMTP del hosting (cPanel)
 
 > **Origen**: Dato confirmado por el usuario 2026-04-21 (cuotas de envío) y 2026-04-22 (bloqueo por defer/fail). Estos son los **techos duros reales** que aplica el hosting (cPanel) al envío saliente para evitar que el dominio entre en listas negras por spam. Superarlos significa que el servidor **descarta silenciosamente** los correos excedentes dentro de la ventana de una hora — sin bounce, sin error, sin log.
