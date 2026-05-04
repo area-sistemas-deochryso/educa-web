@@ -1,0 +1,29 @@
+@if (isVisible()) {
+	<div class="migration-banner" role="alert" aria-live="assertive">
+		<div class="migration-banner__content">
+			<i class="pi pi-exclamation-triangle migration-banner__icon" aria-hidden="true"></i>
+			<span>
+				<strong>{{ migrationCount() }} entrada(s) pendiente(s) de migración</strong>
+				— hay operaciones offline con esquema desactualizado que no pueden sincronizarse.
+			</span>
+		</div>
+		<div class="migration-banner__actions">
+			<button
+				pButton
+				label="Descartar entradas"
+				icon="pi pi-trash"
+				class="p-button-warning p-button-sm p-button-outlined"
+				[loading]="discarding()"
+				(click)="discardEntries()"
+			></button>
+			<button
+				type="button"
+				class="migration-banner__dismiss"
+				aria-label="Cerrar aviso de migración pendiente"
+				(click)="dismiss()"
+			>
+				<i class="pi pi-times" aria-hidden="true"></i>
+			</button>
+		</div>
+	</div>
+}

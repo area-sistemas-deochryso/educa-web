@@ -13,5 +13,6 @@ export * from './stats-skeleton';
 export * from './table-skeleton';
 export * from './attendance-scope-banner';
 export * from './attendance-scope-student-notice';
+export * from './wal-migration-banner';
 export * from './layout/intranet-layout';
 // #endregion

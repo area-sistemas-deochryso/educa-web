@@ -22,6 +22,7 @@ import { ModuloId } from '@shared/constants/module-registry';
 import { FeatureFlagsFacade } from '@core/services/feature-flags';
 import { QuickAccessFavoritesService } from '@intranet-shared/services';
 import { AccessDeniedModalComponent } from '@intranet-shared/components/access-denied-modal';
+import { WalMigrationBannerComponent } from '@intranet-shared/components/wal-migration-banner';
 
 // #endregion
 
@@ -58,6 +59,7 @@ function circularSlice<T>(items: T[], center: number, count: number): T[] {
 		MobileMenuComponent,
 		ModuleSelectorComponent,
 		AccessDeniedModalComponent,
+		WalMigrationBannerComponent,
 	],
 	templateUrl: './intranet-layout.component.html',
 	styleUrl: './intranet-layout.component.scss',
