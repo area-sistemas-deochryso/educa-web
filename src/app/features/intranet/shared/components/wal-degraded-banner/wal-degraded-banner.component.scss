@@ -1,0 +1,42 @@
+// #region WAL Resilience M2 — degraded banner
+.wal-degraded-banner {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	gap: 1rem;
+	padding: 0.6rem 1rem;
+	background: color-mix(in srgb, var(--yellow-500) 15%, transparent);
+	border-bottom: 1px solid var(--yellow-500);
+	color: var(--text-color);
+	font-size: 0.875rem;
+
+	&--ephemeral {
+		background: color-mix(in srgb, var(--blue-500) 15%, transparent);
+		border-bottom-color: var(--blue-500);
+	}
+
+	&__content {
+		display: flex;
+		align-items: center;
+		gap: 0.5rem;
+		flex: 1;
+	}
+
+	&__icon {
+		font-size: 1.1rem;
+		color: var(--yellow-700);
+		flex-shrink: 0;
+	}
+
+	&--ephemeral &__icon {
+		color: var(--blue-800);
+	}
+
+	&__actions {
+		display: flex;
+		align-items: center;
+		gap: 0.5rem;
+		flex-shrink: 0;
+	}
+}
+// #endregion

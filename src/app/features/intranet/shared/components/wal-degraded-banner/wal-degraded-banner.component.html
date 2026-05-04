@@ -1,0 +1,46 @@
+@if (vm().isDegraded) {
+	<div
+		class="wal-degraded-banner"
+		[class.wal-degraded-banner--ephemeral]="vm().mode !== 'persistent'"
+		role="status"
+		aria-live="polite"
+	>
+		<div class="wal-degraded-banner__content">
+			@switch (vm().bannerMessage) {
+				@case ('circuit-open') {
+					<i
+						class="pi pi-pause-circle wal-degraded-banner__icon"
+						aria-hidden="true"
+					></i>
+					<span>
+						<strong>Sincronización pausada</strong> — el servidor no responde.
+						Reintentando en breve.
+					</span>
+				}
+				@case ('ephemeral') {
+					<i
+						class="pi pi-database wal-degraded-banner__icon"
+						aria-hidden="true"
+					></i>
+					<span>
+						<strong>Modo reducido</strong> — tus cambios se guardan en
+						memoria. Si recargás antes de que se sincronicen, podrían
+						perderse.
+					</span>
+				}
+			}
+		</div>
+		<div class="wal-degraded-banner__actions">
+			@if (vm().bannerMessage === 'circuit-open') {
+				<button
+					pButton
+					label="Reintentar ahora"
+					icon="pi pi-refresh"
+					class="p-button-warning p-button-sm p-button-outlined"
+					[loading]="retrying()"
+					(click)="onForceRetry()"
+				></button>
+			}
+		</div>
+	</div>
+}

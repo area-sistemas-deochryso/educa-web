@@ -1,5 +1,11 @@
 import { Injectable, signal, computed } from '@angular/core';
-import { WalEntry } from './models';
+import { WalCircuitState, WalEntry, WalMode } from './models';
+
+/**
+ * Banner message variant rendered by `WalDegradedBanner`.
+ * `null` means the banner is hidden.
+ */
+export type WalBannerMessage = 'circuit-open' | 'ephemeral' | null;
 
 /**
  * Pure reactive state container for WAL status indicators.
@@ -17,6 +23,12 @@ export class WalStatusStore {
 	private readonly _failedEntries = signal<WalEntry[]>([]);
 	private readonly _migrationCount = signal(0);
 
+	// M2/M3: resilience signals
+	private readonly _mode = signal<WalMode>('persistent');
+	private readonly _circuitState = signal<WalCircuitState>('closed');
+	private readonly _consecutiveFailures = signal(0);
+	private readonly _circuitOpenedAt = signal<number | null>(null);
+
 	// #endregion
 
 	// #region Public Readonly
@@ -28,6 +40,11 @@ export class WalStatusStore {
 	readonly failedEntries = this._failedEntries.asReadonly();
 	readonly migrationCount = this._migrationCount.asReadonly();
 
+	readonly mode = this._mode.asReadonly();
+	readonly circuitState = this._circuitState.asReadonly();
+	readonly consecutiveFailures = this._consecutiveFailures.asReadonly();
+	readonly circuitOpenedAt = this._circuitOpenedAt.asReadonly();
+
 	// #endregion
 
 	// #region Computed
@@ -38,6 +55,21 @@ export class WalStatusStore {
 		() => this._pendingCount() > 0 || this._inFlightCount() > 0,
 	);
 	readonly hasMigrations = computed(() => this._migrationCount() > 0);
+
+	/**
+	 * True when the WAL is operating in a non-nominal state (M2/M3).
+	 * Drives visibility of `WalDegradedBanner`.
+	 */
+	readonly isDegraded = computed(
+		() => this._mode() !== 'persistent' || this._circuitState() === 'open',
+	);
+
+	/** Banner variant to render (null = hidden). */
+	readonly bannerMessage = computed<WalBannerMessage>(() => {
+		if (this._mode() === 'ephemeral' || this._mode() === 'frozen') return 'ephemeral';
+		if (this._circuitState() === 'open') return 'circuit-open';
+		return null;
+	});
 
 	readonly vm = computed(() => ({
 		pendingCount: this._pendingCount(),
@@ -51,6 +83,12 @@ export class WalStatusStore {
 		hasFailures: this.hasFailures(),
 		hasActivity: this.hasActivity(),
 		hasMigrations: this.hasMigrations(),
+		mode: this._mode(),
+		circuitState: this._circuitState(),
+		consecutiveFailures: this._consecutiveFailures(),
+		circuitOpenedAt: this._circuitOpenedAt(),
+		isDegraded: this.isDegraded(),
+		bannerMessage: this.bannerMessage(),
 	}));
 
 	// #endregion
@@ -83,6 +121,22 @@ export class WalStatusStore {
 
 	setMigrationCount(value: number): void {
 		this._migrationCount.set(value);
+	}
+
+	setMode(value: WalMode): void {
+		this._mode.set(value);
+	}
+
+	setCircuitState(value: WalCircuitState): void {
+		this._circuitState.set(value);
+	}
+
+	setConsecutiveFailures(value: number): void {
+		this._consecutiveFailures.set(value);
+	}
+
+	setCircuitOpenedAt(value: number | null): void {
+		this._circuitOpenedAt.set(value);
 	}
 
 	// #endregion

@@ -20,6 +20,8 @@ import { WalMetricsService } from './wal-metrics.service';
 import { WalCacheInvalidator } from './wal-cache-invalidator.service';
 import { WalCoalescer } from './wal-coalescer.service';
 import { WalSyncRecovery } from './wal-sync-recovery.service';
+import { WalReconciler } from './wal-reconciler.service';
+import { WalCircuitBreaker } from './wal-circuit-breaker.service';
 import { classifyWalError } from './wal-error.utils';
 import {
 	WalEntry,
@@ -42,6 +44,8 @@ export class WalSyncEngine {
 	private cacheInvalidator = inject(WalCacheInvalidator);
 	private coalescer = inject(WalCoalescer);
 	private recovery = inject(WalSyncRecovery);
+	private reconciler = inject(WalReconciler);
+	private circuitBreaker = inject(WalCircuitBreaker);
 	private destroyRef = inject(DestroyRef);
 
 	// #endregion
@@ -200,6 +204,7 @@ export class WalSyncEngine {
 	 */
 	async processAllPending(): Promise<void> {
 		if (this._isProcessing || !this.sw.isOnline || !this.leader.isLeader) return;
+		if (!this.circuitBreaker.canProcess()) return;
 
 		this._isProcessing = true;
 		try {
@@ -235,6 +240,7 @@ export class WalSyncEngine {
 	 */
 	async processRetryable(): Promise<void> {
 		if (this._isProcessing || !this.sw.isOnline || !this.leader.isLeader) return;
+		if (!this.circuitBreaker.canProcess()) return;
 
 		this._isProcessing = true;
 		try {
@@ -271,8 +277,16 @@ export class WalSyncEngine {
 				// Success: commit, invalidate cache, then notify
 				await this.wal.commitAndClean(entry.id);
 				await this.cacheInvalidator.invalidateForEntry(entry);
-				cb?.onCommit(result);
+				if (cb) {
+					cb.onCommit(result);
+				} else {
+					// Orphaned commit (M1): callbacks lost on reload. Force SWR
+					// components to refetch so the optimistic snapshot is replaced
+					// by server data (INV-WAL-RES01).
+					await this.reconciler.notifyOrphanedCommit(entry);
+				}
 				this.callbacks.delete(entry.id);
+				this.circuitBreaker.recordSuccess();
 
 				// Record latency metric (development only)
 				if (!environment.production) {
@@ -365,6 +379,8 @@ export class WalSyncEngine {
 		}
 
 		// Retryable error (network, timeout, 5xx) → increment retry
+		// Only retryable failures count toward the circuit breaker (INV-WAL-RES04).
+		this.circuitBreaker.recordFailure();
 		const updated = await this.wal.incrementRetry(entry.id);
 
 		if (!updated || updated.status === 'FAILED') {

@@ -221,7 +221,29 @@ export const WAL_DEFAULTS = {
 	IDEMPOTENCY_HEADER: 'X-Idempotency-Key',
 	/** Clock skew threshold in ms (5 minutes) */
 	CLOCK_SKEW_THRESHOLD_MS: 5 * 60 * 1_000,
+	/** Circuit breaker: consecutive retryable failures to open. */
+	CIRCUIT_FAILURE_THRESHOLD: 5,
+	/** Circuit breaker: cooldown ms before half-open probe. */
+	CIRCUIT_COOLDOWN_MS: 30_000,
 } as const;
+// #endregion
+
+// #region Resilience Types
+/**
+ * Storage mode for the WAL backend.
+ * - `persistent`: IndexedDB is healthy and entries survive reload.
+ * - `ephemeral`: in-memory fallback (M3) — entries lost on reload.
+ * - `frozen`: storage initialized but unusable for new writes.
+ */
+export type WalMode = 'persistent' | 'ephemeral' | 'frozen';
+
+/**
+ * Circuit breaker state for the WAL sync pipeline (M2).
+ * - `closed`: normal processing.
+ * - `open`: paused after N consecutive retryable failures.
+ * - `half-open`: probing one entry to check if the server recovered.
+ */
+export type WalCircuitState = 'closed' | 'open' | 'half-open';
 // #endregion
 
 // #region Migration Types

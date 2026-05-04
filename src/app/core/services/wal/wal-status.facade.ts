@@ -3,6 +3,7 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { WalService } from './wal.service';
 import { WalSyncEngine } from './wal-sync-engine.service';
 import { WalStatusStore } from './wal-status.store';
+import { WalCircuitBreaker } from './wal-circuit-breaker.service';
 
 /**
  * Facade for WAL status. Owns the subscription to the sync engine stream and
@@ -15,6 +16,7 @@ export class WalStatusFacade {
 	private wal = inject(WalService);
 	private syncEngine = inject(WalSyncEngine);
 	private store = inject(WalStatusStore);
+	private circuitBreaker = inject(WalCircuitBreaker);
 	private destroyRef = inject(DestroyRef);
 
 	// #endregion
@@ -32,6 +34,10 @@ export class WalStatusFacade {
 	readonly hasFailures = this.store.hasFailures;
 	readonly hasActivity = this.store.hasActivity;
 	readonly hasMigrations = this.store.hasMigrations;
+	readonly mode = this.store.mode;
+	readonly circuitState = this.store.circuitState;
+	readonly isDegraded = this.store.isDegraded;
+	readonly bannerMessage = this.store.bannerMessage;
 
 	// #endregion
 
@@ -99,6 +105,17 @@ export class WalStatusFacade {
 		const count = await this.wal.discardMigrationEntries();
 		await this.refresh();
 		return count;
+	}
+
+	/**
+	 * Force the circuit breaker into half-open immediately and trigger
+	 * processing of pending entries. Bound to the "Reintentar ahora" button
+	 * of `WalDegradedBanner` (INV-WAL-RES06).
+	 */
+	async forceRetry(): Promise<void> {
+		this.circuitBreaker.forceProbe();
+		await this.syncEngine.processAllPending();
+		await this.refresh();
 	}
 
 	// #endregion

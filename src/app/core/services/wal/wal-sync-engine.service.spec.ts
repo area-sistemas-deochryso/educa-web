@@ -14,6 +14,8 @@ import { WalMetricsService } from './wal-metrics.service';
 import { WalCacheInvalidator } from './wal-cache-invalidator.service';
 import { WalCoalescer } from './wal-coalescer.service';
 import { WalSyncRecovery } from './wal-sync-recovery.service';
+import { WalReconciler } from './wal-reconciler.service';
+import { WalCircuitBreaker } from './wal-circuit-breaker.service';
 import { SwService } from '@features/intranet/services/sw/sw.service';
 import { WalEntry, WalProcessResult, WAL_DEFAULTS } from './models';
 
@@ -73,6 +75,13 @@ interface EngineMocks {
 	};
 	coalescer: { coalesce: ReturnType<typeof vi.fn> };
 	recovery: { run: ReturnType<typeof vi.fn> };
+	reconciler: { notifyOrphanedCommit: ReturnType<typeof vi.fn> };
+	breaker: {
+		canProcess: ReturnType<typeof vi.fn>;
+		recordFailure: ReturnType<typeof vi.fn>;
+		recordSuccess: ReturnType<typeof vi.fn>;
+		forceProbe: ReturnType<typeof vi.fn>;
+	};
 }
 
 interface SetupOptions {
@@ -139,6 +148,15 @@ function setupEngine(opts: SetupOptions = {}): {
 					migrationEntries: opts.migrationEntries ?? [],
 				}),
 		},
+		reconciler: {
+			notifyOrphanedCommit: vi.fn().mockResolvedValue(undefined),
+		},
+		breaker: {
+			canProcess: vi.fn().mockReturnValue(true),
+			recordFailure: vi.fn(),
+			recordSuccess: vi.fn(),
+			forceProbe: vi.fn(),
+		},
 	};
 
 	TestBed.configureTestingModule({
@@ -151,6 +169,8 @@ function setupEngine(opts: SetupOptions = {}): {
 			{ provide: WalCacheInvalidator, useValue: mocks.invalidator },
 			{ provide: WalCoalescer, useValue: mocks.coalescer },
 			{ provide: WalSyncRecovery, useValue: mocks.recovery },
+			{ provide: WalReconciler, useValue: mocks.reconciler },
+			{ provide: WalCircuitBreaker, useValue: mocks.breaker },
 			{ provide: SwService, useValue: mocks.sw },
 		],
 	});
@@ -652,6 +672,126 @@ describe('WalSyncEngine', () => {
 			sendSpy.mockResolvedValueOnce({});
 			await engine.processEntry(entry);
 			expect(onCommit).not.toHaveBeenCalled();
+		});
+	});
+
+	// #endregion
+
+	// #region Resilience M1+M2
+
+	describe('resilience M1 — orphaned commit reconciliation', () => {
+		it('invokes reconciler.notifyOrphanedCommit when commit succeeds without callback', async () => {
+			const { engine, mocks } = setupEngine();
+			await flushAsync();
+
+			const entry = makeEntry({ id: 'orphan-1' });
+			sendSpy.mockResolvedValueOnce({ id: 1 });
+			await engine.processEntry(entry);
+
+			expect(mocks.reconciler.notifyOrphanedCommit).toHaveBeenCalledWith(entry);
+		});
+
+		it('does NOT invoke reconciler when callback is registered', async () => {
+			const { engine, mocks } = setupEngine();
+			await flushAsync();
+
+			const entry = makeEntry({ id: 'with-cb' });
+			engine.registerCallbacks(entry.id, {
+				http$: () => of({}),
+				onCommit: vi.fn(),
+				onError: vi.fn(),
+			});
+			sendSpy.mockResolvedValueOnce({});
+			await engine.processEntry(entry);
+
+			expect(mocks.reconciler.notifyOrphanedCommit).not.toHaveBeenCalled();
+		});
+	});
+
+	describe('resilience M2 — circuit breaker integration', () => {
+		it('skips processAllPending when canProcess() returns false', async () => {
+			const { engine, mocks } = setupEngine({
+				online: true,
+				pendingQueue: [[makeEntry()]],
+			});
+			await flushAsync();
+			mocks.wal.getRetryableEntries.mockClear();
+			mocks.breaker.canProcess.mockReturnValue(false);
+
+			await engine.processAllPending();
+
+			expect(mocks.wal.getRetryableEntries).not.toHaveBeenCalled();
+		});
+
+		it('skips processRetryable when canProcess() returns false', async () => {
+			const { engine, mocks } = setupEngine();
+			await flushAsync();
+			mocks.wal.getRetryableEntries.mockClear();
+			mocks.wal.recoverInFlight.mockClear();
+			mocks.breaker.canProcess.mockReturnValue(false);
+
+			await engine.processRetryable();
+
+			expect(mocks.wal.recoverInFlight).not.toHaveBeenCalled();
+			expect(mocks.wal.getRetryableEntries).not.toHaveBeenCalled();
+		});
+
+		it('records success on commit', async () => {
+			const { engine, mocks } = setupEngine();
+			await flushAsync();
+			const entry = makeEntry({ id: 'breaker-ok' });
+			sendSpy.mockResolvedValueOnce({});
+
+			await engine.processEntry(entry);
+
+			expect(mocks.breaker.recordSuccess).toHaveBeenCalled();
+			expect(mocks.breaker.recordFailure).not.toHaveBeenCalled();
+		});
+
+		it('records failure on retryable error (5xx)', async () => {
+			const { engine, mocks } = setupEngine();
+			await flushAsync();
+			mocks.wal.incrementRetry.mockResolvedValueOnce({
+				retries: 1,
+				nextRetryAt: Date.now() + 1000,
+				status: 'PENDING',
+			});
+
+			const entry = makeEntry({ id: 'breaker-5xx' });
+			sendSpy.mockRejectedValueOnce(
+				new HttpErrorResponse({ status: 503, statusText: 'Service Unavailable' }),
+			);
+
+			await engine.processEntry(entry);
+
+			expect(mocks.breaker.recordFailure).toHaveBeenCalledTimes(1);
+			expect(mocks.breaker.recordSuccess).not.toHaveBeenCalled();
+		});
+
+		it('does NOT record failure on permanent 4xx', async () => {
+			const { engine, mocks } = setupEngine();
+			await flushAsync();
+			const entry = makeEntry({ id: 'breaker-4xx' });
+			sendSpy.mockRejectedValueOnce(
+				new HttpErrorResponse({ status: 422, statusText: 'Unprocessable' }),
+			);
+
+			await engine.processEntry(entry);
+
+			expect(mocks.breaker.recordFailure).not.toHaveBeenCalled();
+		});
+
+		it('does NOT record failure on 409 conflict', async () => {
+			const { engine, mocks } = setupEngine();
+			await flushAsync();
+			const entry = makeEntry({ id: 'breaker-conflict' });
+			sendSpy.mockRejectedValueOnce(
+				new HttpErrorResponse({ status: 409, statusText: 'Conflict' }),
+			);
+
+			await engine.processEntry(entry);
+
+			expect(mocks.breaker.recordFailure).not.toHaveBeenCalled();
 		});
 	});
 

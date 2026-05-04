@@ -226,6 +226,48 @@ export class SwService {
 		});
 	}
 
+	/**
+	 * PROPÓSITO: Re-fetch contra red para todas las URLs cacheadas que matchean
+	 * el patrón, emitiendo `cacheUpdated$` por cada URL cuyo dato cambió.
+	 *
+	 * USO (WAL M1): tras un commit huérfano (recuperado de sesión previa), el
+	 * engine no tiene callbacks que disparen el refresh. Este método fuerza al
+	 * SW a refetchear las URLs del recurso para que los componentes SWR
+	 * montados se actualicen contra el servidor.
+	 *
+	 * NO-OP cuando el SW no está registrado (ej: usuario fuera de /intranet/
+	 * o navegador sin Service Workers — INV-WAL-RES02). No falla nunca; la
+	 * promesa resuelve a `0`.
+	 *
+	 * @param pattern - substring buscado en las URLs cacheadas
+	 * @returns número de URLs que emitieron `cacheUpdated$`
+	 */
+	async refetchByPattern(pattern: string): Promise<number> {
+		if (!this._isRegistered() || !this.registration?.active) return 0;
+
+		return new Promise((resolve) => {
+			const messageChannel = new MessageChannel();
+			messageChannel.port1.onmessage = (event) => {
+				const count = event.data?.count || 0;
+				if (event.data?.success) {
+					logger.log(`[SwService] Refetch por patrón "${pattern}": ${count} URLs actualizadas`);
+				}
+				resolve(count);
+			};
+
+			this.registration!.active!.postMessage(
+				{
+					type: 'REFETCH_BY_PATTERN',
+					payload: { pattern },
+				},
+				[messageChannel.port2],
+			);
+
+			// Timeout fallback
+			setTimeout(() => resolve(0), 2000);
+		});
+	}
+
 	async update(): Promise<void> {
 		if (this.registration) {
 			await this.registration.update();

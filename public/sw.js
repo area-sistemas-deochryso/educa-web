@@ -311,6 +311,74 @@ async function invalidateCacheByPattern(pattern) {
 	}
 }
 
+/**
+ * REFETCH_BY_PATTERN helper — refetches every cached URL whose key matches
+ * the given pattern, updates the cache, and emits CACHE_UPDATED for each
+ * URL whose data actually changed.
+ *
+ * Used by the WAL reconciler (M1) after an orphaned commit (post-reload)
+ * to wake mounted SWR components that still hold the optimistic snapshot.
+ *
+ * @param {string} pattern - substring matched against cached URL keys
+ * @returns {Promise<number>} number of URLs that emitted CACHE_UPDATED
+ */
+async function refetchCacheByPattern(pattern) {
+	try {
+		const db = await openDB();
+		const transaction = db.transaction(STORE_NAME, 'readonly');
+		const store = transaction.objectStore(STORE_NAME);
+		const request = store.getAll();
+
+		const entries = await new Promise((resolve) => {
+			request.onsuccess = () => {
+				db.close();
+				resolve(
+					(request.result || []).filter(
+						(entry) => entry.url && entry.url.includes(pattern),
+					),
+				);
+			};
+			request.onerror = () => {
+				db.close();
+				console.error('[SW] Error obteniendo entries para refetch:', request.error);
+				resolve([]);
+			};
+		});
+
+		if (entries.length === 0) return 0;
+
+		let notified = 0;
+		await Promise.all(
+			entries.map(async (entry) => {
+				const targetUrl = entry.originalUrl || entry.url;
+				try {
+					const response = await fetch(targetUrl);
+					if (!response.ok) return;
+					const data = await response.json();
+					if (!hasDataChanged(entry.data, data)) return;
+					await saveToCache(targetUrl, data);
+					notifyClients({
+						type: 'CACHE_UPDATED',
+						payload: {
+							url: normalizeUrl(targetUrl),
+							originalUrl: targetUrl,
+							data,
+						},
+					});
+					notified++;
+				} catch (e) {
+					console.warn('[SW] refetch fallo para', targetUrl, e);
+				}
+			}),
+		);
+		console.log(`[SW] Refetch por patron "${pattern}": ${notified}/${entries.length} actualizados`);
+		return notified;
+	} catch (error) {
+		console.error('[SW] Error en refetchCacheByPattern:', error);
+		return 0;
+	}
+}
+
 // Verificar si la URL debe ser cacheada
 function shouldCache(url) {
 	// Primero verificar si esta en la lista de exclusion
@@ -549,6 +617,20 @@ self.addEventListener('message', (event) => {
 		if (pattern) {
 			event.waitUntil(
 				invalidateCacheByPattern(pattern).then((count) => {
+					event.ports[0]?.postMessage({ success: true, count });
+				}),
+			);
+		}
+	}
+
+	// REFETCH_BY_PATTERN: Re-fetch URLs cacheadas que matchean un patron
+	// Uso: WAL M1 — reconciliar componentes SWR montados tras commit huerfano
+	// Llamado desde: SwService.refetchByPattern(pattern)
+	if (event.data && event.data.type === 'REFETCH_BY_PATTERN') {
+		const pattern = event.data.payload?.pattern;
+		if (pattern) {
+			event.waitUntil(
+				refetchCacheByPattern(pattern).then((count) => {
 					event.ports[0]?.postMessage({ success: true, count });
 				}),
 			);
