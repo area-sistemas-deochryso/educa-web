@@ -280,12 +280,21 @@ export class ErrorHandlerService {
 			return UI_ERROR_CODES[errorCode];
 		}
 
-		// 2. Fallback: mensaje directo del backend
+		// 2. ApiResponse: mensaje directo del backend
 		if (error.error?.message) {
 			return error.error.message;
 		}
 
-		// 3. Fallback: mensaje predefinido por HTTP status
+		// 3. ASP.NET Core ValidationProblemDetails: { errors: { fieldName: ["msg"] } }
+		const validationErrors = error.error?.errors;
+		if (validationErrors && typeof validationErrors === 'object') {
+			const firstField = Object.values(validationErrors as Record<string, unknown>)[0];
+			if (Array.isArray(firstField) && firstField.length > 0 && typeof firstField[0] === 'string') {
+				return firstField[0];
+			}
+		}
+
+		// 4. Fallback: mensaje predefinido por HTTP status
 		return (
 			HTTP_ERROR_MESSAGES[error.status] ??
 			`Error ${error.status}: ${error.statusText || UI_GENERIC_MESSAGES.unknownError}`

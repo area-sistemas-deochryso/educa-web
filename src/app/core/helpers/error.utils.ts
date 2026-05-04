@@ -12,7 +12,20 @@ import { HttpErrorResponse } from '@angular/common/http';
  */
 export function extractErrorMessage(err: unknown, fallback = 'Error desconocido'): string {
 	if (err instanceof HttpErrorResponse) {
-		return err.error?.mensaje ?? err.error?.message ?? err.message ?? fallback;
+		// ApiResponse: mensaje / message
+		if (err.error?.mensaje) return err.error.mensaje;
+		if (err.error?.message) return err.error.message;
+
+		// ASP.NET Core ValidationProblemDetails: { errors: { fieldName: ["msg"] } }
+		const validationErrors = err.error?.errors;
+		if (validationErrors && typeof validationErrors === 'object') {
+			const firstField = Object.values(validationErrors as Record<string, unknown>)[0];
+			if (Array.isArray(firstField) && firstField.length > 0 && typeof firstField[0] === 'string') {
+				return firstField[0];
+			}
+		}
+
+		return err.message || fallback;
 	}
 
 	if (err instanceof Error) {
