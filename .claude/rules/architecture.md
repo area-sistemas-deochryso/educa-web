@@ -82,7 +82,7 @@ src/app/
 
 ---
 
-## Taxonomia de Servicios (5 tipos)
+## Taxonomia de Servicios (6 tipos)
 
 ### 1. Utility / Helper — *Hace cosas, no guarda cosas.*
 
@@ -175,6 +175,65 @@ export class WizardComponent { }
 | ✅ Scope controlado | Providers en componente |
 | ✅ Preferible reactivo | Si renderiza datos |
 | 📍 Ubicacion | Inline o `@features/*/services/` |
+
+### 6. Boundary / Stateless — *Decide qué pasó, no aplica los efectos.*
+
+Patrón para extraer **flujos de borde** (boot-time recovery, parseo de logs, validación cross-cutting) de un service grande sin trasladar las dependencias del caller. El boundary service es **stateless**, su método público devuelve un **plain object con el resultado**, y el caller (típicamente el "engine" que coordina el subsistema) aplica los efectos según ese resultado.
+
+```typescript
+// Boundary service: stateless, devuelve resultado plain
+export interface WalRecoveryResult {
+  migrationEntries: WalEntry[];
+}
+
+@Injectable({ providedIn: 'root' })
+export class WalSyncRecovery {
+  private wal = inject(WalService);
+
+  async run(): Promise<WalRecoveryResult> {
+    try {
+      // ... purgar, recuperar, calcular ...
+      return { migrationEntries };
+    } catch (e) {
+      logger.error('[WAL-Sync] Recovery error:', e);
+      return { migrationEntries: [] };
+    }
+  }
+}
+
+// Engine consume el resultado y orquesta efectos sobre SU propio estado
+private async init(): Promise<void> {
+  const { migrationEntries } = await this.recovery.run();
+  for (const entry of migrationEntries) {
+    this._entryProcessed$.next({ status: 'REQUIRES_MIGRATION', entryId: entry.id });
+  }
+  if (this.sw.isOnline) await this.processAllPending();
+}
+```
+
+| Regla | Descripcion |
+|-------|-------------|
+| ❌ No estado mutable | Sin propiedades, sin subjects propios |
+| ✅ Resultado como plain object | Tipo `XxxResult` exportado, el caller lo consume |
+| ❌ NO emite a subjects del caller | El caller emite si lo necesita; el boundary service no conoce los subjects del engine |
+| ✅ Fail-safe interno | try/catch que devuelve resultado neutro si IO falla — el caller no maneja excepciones del boundary |
+| ✅ Una sola responsabilidad de borde | Boot-time recovery, parseo, validación. NO el hot loop |
+| 📍 Ubicacion | Junto al engine que lo consume (`@core/services/wal/wal-sync-recovery.service.ts`) |
+| 📍 Visibilidad | NO se exporta del barrel salvo que tenga consumidores externos |
+
+**Cuándo extraer un boundary service**:
+
+- Un service grande tiene un sub-flujo que **corre una vez** (boot, init, setup) o **fuera del hot loop**.
+- Ese sub-flujo se siente "lógico para extraer pero acoplado": tiene try/catch propio, llama varios métodos del mismo servicio externo, y el resultado se consume puntualmente.
+- Pasar el cierre/contexto al helper resultaría en un contrato gordo (4+ deps, subjects, callbacks) → señal de que el helper sería un mini-engine disfrazado.
+
+**Solución**: que el boundary devuelva el **resultado de la decisión** (qué archivos migrar, qué cuentas blacklistear, qué eventos de log parseados) y deje al caller la **aplicación del efecto**.
+
+**Anti-patrón**: pasar el `Subject`/`Map`/`signal` del engine al boundary service para que emita por su cuenta. Eso convierte al boundary en mini-engine, propaga acoplamiento de estado privado, y rompe la testeabilidad — el spec del boundary tiene que mockear los subjects del engine.
+
+**Casos canónicos en el proyecto**:
+
+- `WalSyncRecovery` (`@core/services/wal/wal-sync-recovery.service.ts`) — boot-time recovery del WAL: purga resource types migrados, recupera IN_FLIGHT stale, identifica esquemas pendientes de migrar. Devuelve `{ migrationEntries }` para que el engine emita los `REQUIRES_MIGRATION` y dispare `processAllPending` por su cuenta.
 
 ---
 
