@@ -3,8 +3,9 @@
 > **Repo destino**: `educa-web` (main)
 > **Plan**: WAL Resilience · **Chat**: M3 · **Fase**: F2.Execute
 > **Creado**: 2026-05-04 · **Modo sugerido**: `/execute`
-> **Estado**: ⏳ pendiente arrancar
-> **Bloqueado por**: chat 092 (M1+M2) — depende de `WalStatusStore.mode` agregado allí.
+> **Estado**: ✅ implementado · ⏳ pendiente smokes post-deploy
+> **Validación prod**: ⏳ pendiente desde 2026-05-04 (Firefox modo privado · quota lleno simulado)
+> **Bloqueado por**: chat 092 (M1+M2) — depende de `WalStatusStore.mode` agregado allí. ✅ ya cerrado.
 
 ## CONTEXTO INMEDIATO
 

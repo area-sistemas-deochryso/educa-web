@@ -3,6 +3,7 @@ import { logger } from '@core/helpers';
 import { environment } from '@config';
 import { WalService } from './wal.service';
 import { WalClockService } from './wal-clock.service';
+import { WalStatusStore } from './wal-status.store';
 import { WalMetrics, WalProcessResult } from './models';
 
 /** Max latency samples to keep for rolling average. */
@@ -22,6 +23,7 @@ export class WalMetricsService {
 
 	private wal = inject(WalService);
 	private clockService = inject(WalClockService);
+	private statusStore = inject(WalStatusStore);
 
 	// #endregion
 
@@ -49,6 +51,7 @@ export class WalMetricsService {
 		estimatedSizeBytes: 0, // Updated async via refresh
 		clockSkewMs: this.clockService.skewMs(),
 		totalCoalesced: this._totalCoalesced(),
+		mode: this.statusStore.mode(),
 	}));
 
 	// Async-updated values exposed as individual signals

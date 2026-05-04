@@ -1,6 +1,8 @@
 import { Injectable, inject } from '@angular/core';
 import { logger } from '@core/helpers';
 import { WalService } from './wal.service';
+import { WalDbService } from './wal-db.service';
+import { WalStatusStore } from './wal-status.store';
 import { WalEntry } from './models';
 
 /**
@@ -21,6 +23,8 @@ export interface WalRecoveryResult {
 @Injectable({ providedIn: 'root' })
 export class WalSyncRecovery {
 	private wal = inject(WalService);
+	private db = inject(WalDbService);
+	private statusStore = inject(WalStatusStore);
 
 	/**
 	 * Resource types that should never have WAL entries (migrated to
@@ -30,6 +34,17 @@ export class WalSyncRecovery {
 	private static readonly RESOURCE_TYPES_TO_PURGE = ['reporte-usuario'];
 
 	async run(): Promise<WalRecoveryResult> {
+		// Wait for the storage facade to settle on a strategy so that
+		// `WalStatusStore.mode` reflects the real backend before we decide.
+		await this.db.isAvailable();
+
+		// Ephemeral mode means in-memory storage — nothing survived the reload,
+		// so there's nothing to recover, purge or migrate (INV-WAL-RES08).
+		if (this.statusStore.mode() === 'ephemeral') {
+			logger.log('[WAL-Sync] Recovery skipped — storage is ephemeral');
+			return { migrationEntries: [] };
+		}
+
 		try {
 			for (const rt of WalSyncRecovery.RESOURCE_TYPES_TO_PURGE) {
 				await this.wal.purgeByResourceType(rt);

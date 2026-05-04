@@ -312,6 +312,18 @@ private async initIndexedDB(): Promise<boolean> {
 3. **Unit**: `WalStatusStore.mode === 'ephemeral'` tras fallo de init.
 4. **Manual**: abrir intranet en Firefox modo privado → verificar banner "Modo reducido".
 
+### Estado de implementación (chat 093, 2026-05-04)
+
+- ✅ `storage/wal-storage.strategy.ts` — interface + `WAL_STORAGE_INIT_TIMEOUT_MS`.
+- ✅ `storage/wal-storage-indexeddb.strategy.ts` — extracción de la lógica IndexedDB original.
+- ✅ `storage/wal-storage-memory.strategy.ts` — `Map<string, WalEntry>` con `WAL_MEMORY_CAP = 500`. Al exceder, evicción FIFO con `logger.error`.
+- ✅ `wal-db.service.ts` — fachada que arranca con la strategy memoria, intenta IndexedDB con `Promise.race(init, timeout 5s)`, swap a memory + `WalStatusStore.setMode('ephemeral')` ante cualquier falla.
+- ✅ `wal-sync-recovery.service.ts` — corta temprano si `mode === 'ephemeral'` tras esperar a `db.isAvailable()` para asegurar que el modo esté settled.
+- ✅ `wal-metrics.service.ts` + `WalMetrics` interface — incluyen `mode` en el snapshot.
+- ✅ Specs de strategies + facade. La spec de IndexedDB cubre solo el init failure path porque jsdom no tiene IndexedDB; el contrato real está cubierto vía la spec de memoria + integración a través del facade.
+
+Diferencia menor con el diseño original: el contrato estable del proyecto usa `put` (upsert) en lugar de `add` + `update` separados — heredado del API IndexedDB. El resto coincide.
+
 ---
 
 ## M4 — Schema fingerprint en cache

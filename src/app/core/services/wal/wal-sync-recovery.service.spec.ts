@@ -5,6 +5,8 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { WalSyncRecovery } from './wal-sync-recovery.service';
 import { WalService } from './wal.service';
+import { WalDbService } from './wal-db.service';
+import { WalStatusStore } from './wal-status.store';
 import { WalEntry } from './models';
 
 // #endregion
@@ -37,10 +39,19 @@ function setupSpy(overrides: Partial<Record<string, () => Promise<unknown>>> = {
 		getMigrationEntries: vi.fn().mockResolvedValue([] as WalEntry[]),
 		...overrides,
 	};
+	const dbMock = {
+		isAvailable: vi.fn().mockResolvedValue(true),
+	};
 	TestBed.configureTestingModule({
-		providers: [WalSyncRecovery, { provide: WalService, useValue: walMock }],
+		providers: [
+			WalSyncRecovery,
+			WalStatusStore,
+			{ provide: WalService, useValue: walMock },
+			{ provide: WalDbService, useValue: dbMock },
+		],
 	});
-	return { walMock, recovery: TestBed.inject(WalSyncRecovery) };
+	const store = TestBed.inject(WalStatusStore);
+	return { walMock, dbMock, store, recovery: TestBed.inject(WalSyncRecovery) };
 }
 
 // #endregion
@@ -97,6 +108,17 @@ describe('WalSyncRecovery', () => {
 			getMigrationEntries: vi.fn().mockRejectedValue(new Error('boom')),
 		});
 		const result = await recovery.run();
+		expect(result.migrationEntries).toEqual([]);
+	});
+
+	it('skipea recovery cuando el storage está en modo ephemeral (INV-WAL-RES08)', async () => {
+		const { walMock, store, recovery } = setupSpy();
+		store.setMode('ephemeral');
+		const result = await recovery.run();
+		expect(walMock.purgeByResourceType).not.toHaveBeenCalled();
+		expect(walMock.recoverInFlight).not.toHaveBeenCalled();
+		expect(walMock.cleanup).not.toHaveBeenCalled();
+		expect(walMock.checkSchemaMigrations).not.toHaveBeenCalled();
 		expect(result.migrationEntries).toEqual([]);
 	});
 });

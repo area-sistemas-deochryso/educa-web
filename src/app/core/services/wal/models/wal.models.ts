@@ -281,5 +281,7 @@ export interface WalMetrics {
 	clockSkewMs: number;
 	/** Number of coalesced (merged) entries since app start. */
 	totalCoalesced: number;
+	/** Active storage backend. `ephemeral` means data is lost on reload (M3). */
+	mode: WalMode;
 }
 // #endregion

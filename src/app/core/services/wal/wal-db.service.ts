@@ -2,393 +2,184 @@ import { Injectable, inject, PLATFORM_ID } from '@angular/core';
 import { isPlatformBrowser } from '@angular/common';
 import { logger } from '@core/helpers';
 import { WalEntry, WalEntryStatus } from './models';
-
-const DB_NAME = 'educa-wal-db';
-const DB_VERSION = 1;
-const STORE_NAME = 'wal-entries';
+import { WalStatusStore } from './wal-status.store';
+import {
+	WAL_STORAGE_INIT_TIMEOUT_MS,
+	WalStorageStrategy,
+} from './storage/wal-storage.strategy';
+import { WalStorageIndexedDbStrategy } from './storage/wal-storage-indexeddb.strategy';
+import { WalStorageMemoryStrategy } from './storage/wal-storage-memory.strategy';
 
 /**
- * Low level IndexedDB access for WAL entries.
+ * Low level WAL storage facade.
+ *
+ * Selects between {@link WalStorageIndexedDbStrategy} (default) and
+ * {@link WalStorageMemoryStrategy} (fallback) at boot. The IndexedDB
+ * strategy has {@link WAL_STORAGE_INIT_TIMEOUT_MS} to initialize; if it
+ * times out or resolves `false` (private browsing, quota, permission),
+ * we degrade to the in-memory strategy and mark
+ * {@link WalStatusStore.setMode | mode = 'ephemeral'} (INV-WAL-RES08/09/10).
+ *
+ * The public contract is identical to the previous direct-IndexedDB
+ * implementation — no consumer should change.
  */
 @Injectable({ providedIn: 'root' })
 export class WalDbService {
 	private platformId = inject(PLATFORM_ID);
-	private db: IDBDatabase | null = null;
-	private dbReady: Promise<boolean> | null = null;
+	private indexedDb = inject(WalStorageIndexedDbStrategy);
+	private memory = inject(WalStorageMemoryStrategy);
+	private statusStore = inject(WalStatusStore);
 
-	// #region Initialization
+	private strategy: WalStorageStrategy = this.memory;
+	private readyPromise: Promise<boolean> | null = null;
 
-	/**
-	 * True when running in the browser.
-	 */
 	private get isBrowser(): boolean {
 		return isPlatformBrowser(this.platformId);
 	}
 
 	constructor() {
 		if (this.isBrowser) {
-			this.dbReady = this.initDB();
+			this.readyPromise = this.bootstrap();
 		}
 	}
 
+	// #region Bootstrap
+
 	/**
-	 * Initialize IndexedDB database and object store.
+	 * Try IndexedDB first with a hard timeout. On any failure (false, throw,
+	 * or timeout) swap to the memory strategy and broadcast `ephemeral`.
 	 */
-	private initDB(): Promise<boolean> {
-		return new Promise((resolve) => {
-			if (!this.isBrowser || !('indexedDB' in window)) {
-				logger.warn('[WAL-DB] IndexedDB not available');
+	private async bootstrap(): Promise<boolean> {
+		const indexedDbReady = await this.tryIndexedDb();
+
+		if (indexedDbReady) {
+			this.strategy = this.indexedDb;
+			this.statusStore.setMode('persistent');
+			return true;
+		}
+
+		await this.memory.init();
+		this.strategy = this.memory;
+		this.statusStore.setMode('ephemeral');
+		logger.warn('[WAL-DB] Degraded to in-memory storage (ephemeral mode)');
+		return true;
+	}
+
+	private async tryIndexedDb(): Promise<boolean> {
+		const timeoutPromise = new Promise<boolean>((resolve) => {
+			setTimeout(() => {
+				logger.error(
+					`[WAL-DB] IndexedDB init timed out after ${WAL_STORAGE_INIT_TIMEOUT_MS}ms`,
+				);
 				resolve(false);
-				return;
-			}
-
-			const request = indexedDB.open(DB_NAME, DB_VERSION);
-
-			request.onerror = () => {
-				logger.error('[WAL-DB] Error opening database:', request.error);
-				resolve(false);
-			};
-
-			request.onsuccess = () => {
-				this.db = request.result;
-				resolve(true);
-			};
-
-			request.onupgradeneeded = (event) => {
-				const db = (event.target as IDBOpenDBRequest).result;
-
-				if (!db.objectStoreNames.contains(STORE_NAME)) {
-					const store = db.createObjectStore(STORE_NAME, { keyPath: 'id' });
-					store.createIndex('status', 'status', { unique: false });
-					store.createIndex('resourceType', 'resourceType', { unique: false });
-					store.createIndex('timestamp', 'timestamp', { unique: false });
-					store.createIndex('nextRetryAt', 'nextRetryAt', { unique: false });
-				}
-
-				logger.log('[WAL-DB] Database created/upgraded to version', DB_VERSION);
-			};
+			}, WAL_STORAGE_INIT_TIMEOUT_MS);
 		});
-	}
-	/**
-	 * Ensure database is ready and return the instance.
-	 */
-	private async ensureDB(): Promise<IDBDatabase | null> {
-		if (this.dbReady) {
-			await this.dbReady;
+
+		try {
+			return await Promise.race([this.indexedDb.init(), timeoutPromise]);
+		} catch (e) {
+			logger.error('[WAL-DB] IndexedDB init threw:', e);
+			return false;
 		}
-		return this.db;
+	}
+
+	private async ensureReady(): Promise<void> {
+		if (this.readyPromise) {
+			await this.readyPromise;
+		}
 	}
 
 	// #endregion
 
 	// #region Write Operations
-	/**
-	 * Persist or update a WAL entry.
-	 * Rejects on QuotaExceededError so callers can fall back to direct HTTP.
-	 *
-	 * @param entry WAL entry.
-	 */
+
 	async put(entry: WalEntry): Promise<void> {
-		const db = await this.ensureDB();
-		if (!db) return;
-
-		return new Promise((resolve, reject) => {
-			try {
-				const tx = db.transaction(STORE_NAME, 'readwrite');
-				tx.objectStore(STORE_NAME).put(entry);
-				tx.oncomplete = () => resolve();
-				tx.onerror = () => {
-					const error = tx.error;
-					if (error?.name === 'QuotaExceededError') {
-						logger.error('[WAL-DB] Storage quota exceeded — entry will use direct HTTP fallback');
-						reject(error);
-						return;
-					}
-					logger.error('[WAL-DB] Error writing entry:', error);
-					resolve();
-				};
-			} catch (e) {
-				if (e instanceof DOMException && e.name === 'QuotaExceededError') {
-					logger.error('[WAL-DB] Storage quota exceeded — entry will use direct HTTP fallback');
-					reject(e);
-					return;
-				}
-				logger.error('[WAL-DB] Transaction error:', e);
-				resolve();
-			}
-		});
+		await this.ensureReady();
+		return this.strategy.put(entry);
 	}
-	/**
-	 * Delete an entry by id.
-	 *
-	 * @param id Entry id.
-	 */
+
 	async delete(id: string): Promise<void> {
-		const db = await this.ensureDB();
-		if (!db) return;
-
-		return new Promise((resolve) => {
-			try {
-				const tx = db.transaction(STORE_NAME, 'readwrite');
-				tx.objectStore(STORE_NAME).delete(id);
-				tx.oncomplete = () => resolve();
-				tx.onerror = () => resolve();
-			} catch {
-				resolve();
-			}
-		});
+		await this.ensureReady();
+		return this.strategy.delete(id);
 	}
 
-	/**
-	 * Delete COMMITTED entries older than a timestamp.
-	 *
-	 * @param timestamp Cutoff timestamp.
-	 * @returns Number of entries deleted.
-	 */
 	async deleteCommittedOlderThan(timestamp: number): Promise<number> {
-		const db = await this.ensureDB();
-		if (!db) return 0;
-
-		return new Promise((resolve) => {
-			try {
-				const tx = db.transaction(STORE_NAME, 'readwrite');
-				const store = tx.objectStore(STORE_NAME);
-				const index = store.index('status');
-				const request = index.openCursor(IDBKeyRange.only('COMMITTED'));
-				let deleted = 0;
-
-				request.onsuccess = (event) => {
-					const cursor = (event.target as IDBRequest<IDBCursorWithValue>).result;
-					if (cursor) {
-						const entry = cursor.value as WalEntry;
-						if (entry.committedAt && entry.committedAt < timestamp) {
-							cursor.delete();
-							deleted++;
-						}
-						cursor.continue();
-					}
-				};
-
-				tx.oncomplete = () => resolve(deleted);
-				tx.onerror = () => resolve(deleted);
-			} catch {
-				resolve(0);
-			}
-		});
+		await this.ensureReady();
+		return this.strategy.deleteCommittedOlderThan(timestamp);
 	}
 
-	/**
-	 * Delete all entries matching a specific resourceType, regardless of status.
-	 * Used for one-time cleanup of entries that should never have been in the WAL
-	 * (e.g., after changing a facade from optimistic to server-confirmed).
-	 */
 	async purgeByResourceType(resourceType: string): Promise<number> {
-		const db = await this.ensureDB();
-		if (!db) return 0;
-
-		return new Promise((resolve) => {
-			try {
-				const tx = db.transaction(STORE_NAME, 'readwrite');
-				const store = tx.objectStore(STORE_NAME);
-				const request = store.openCursor();
-				let deleted = 0;
-
-				request.onsuccess = (event) => {
-					const cursor = (event.target as IDBRequest<IDBCursorWithValue>).result;
-					if (cursor) {
-						const entry = cursor.value as WalEntry;
-						if (entry.resourceType === resourceType) {
-							cursor.delete();
-							deleted++;
-						}
-						cursor.continue();
-					}
-				};
-
-				tx.oncomplete = () => resolve(deleted);
-				tx.onerror = () => resolve(deleted);
-			} catch {
-				resolve(0);
-			}
-		});
+		await this.ensureReady();
+		return this.strategy.purgeByResourceType(resourceType);
 	}
 
-	/**
-	 * Clear all WAL entries.
-	 */
 	async clear(): Promise<void> {
-		const db = await this.ensureDB();
-		if (!db) return;
-
-		return new Promise((resolve) => {
-			try {
-				const tx = db.transaction(STORE_NAME, 'readwrite');
-				tx.objectStore(STORE_NAME).clear();
-				tx.oncomplete = () => resolve();
-				tx.onerror = () => resolve();
-			} catch {
-				resolve();
-			}
-		});
+		await this.ensureReady();
+		return this.strategy.clear();
 	}
 
 	// #endregion
 
 	// #region Read Operations
-	/**
-	 * Get a WAL entry by id.
-	 *
-	 * @param id Entry id.
-	 */
+
 	async get(id: string): Promise<WalEntry | undefined> {
-		const db = await this.ensureDB();
-		if (!db) return undefined;
-
-		return new Promise((resolve) => {
-			try {
-				const tx = db.transaction(STORE_NAME, 'readonly');
-				const request = tx.objectStore(STORE_NAME).get(id);
-				request.onsuccess = () => resolve(request.result as WalEntry | undefined);
-				request.onerror = () => resolve(undefined);
-			} catch {
-				resolve(undefined);
-			}
-		});
+		await this.ensureReady();
+		return this.strategy.get(id);
 	}
-	/**
-	 * Get entries by status ordered by timestamp.
-	 *
-	 * @param status Entry status.
-	 */
+
 	async getByStatus(status: WalEntryStatus): Promise<WalEntry[]> {
-		const db = await this.ensureDB();
-		if (!db) return [];
-
-		return new Promise((resolve) => {
-			try {
-				const tx = db.transaction(STORE_NAME, 'readonly');
-				const index = tx.objectStore(STORE_NAME).index('status');
-				const request = index.getAll(IDBKeyRange.only(status));
-				request.onsuccess = () => {
-					const entries = (request.result as WalEntry[]) ?? [];
-					// Sort by timestamp ASC (FIFO)
-					entries.sort((a, b) => a.timestamp - b.timestamp);
-					resolve(entries);
-				};
-				request.onerror = () => resolve([]);
-			} catch {
-				resolve([]);
-			}
-		});
+		await this.ensureReady();
+		return this.strategy.getByStatus(status);
 	}
 
-	/**
-	 * Get PENDING entries ordered by timestamp.
-	 */
 	async getPending(): Promise<WalEntry[]> {
 		return this.getByStatus('PENDING');
 	}
-	/**
-	 * Get FAILED entries.
-	 */
+
 	async getFailed(): Promise<WalEntry[]> {
 		return this.getByStatus('FAILED');
 	}
 
-	/**
-	 * Get PENDING entries ready for retry.
-	 */
 	async getRetryable(): Promise<WalEntry[]> {
 		const pending = await this.getPending();
 		const now = Date.now();
 		return pending.filter((e) => !e.nextRetryAt || e.nextRetryAt <= now);
 	}
-	/**
-	 * Count entries by status or all entries.
-	 *
-	 * @param status Optional status filter.
-	 */
+
 	async count(status?: WalEntryStatus): Promise<number> {
-		const db = await this.ensureDB();
-		if (!db) return 0;
-
-		return new Promise((resolve) => {
-			try {
-				const tx = db.transaction(STORE_NAME, 'readonly');
-				const store = tx.objectStore(STORE_NAME);
-
-				if (status) {
-					const index = store.index('status');
-					const request = index.count(IDBKeyRange.only(status));
-					request.onsuccess = () => resolve(request.result);
-					request.onerror = () => resolve(0);
-				} else {
-					const request = store.count();
-					request.onsuccess = () => resolve(request.result);
-					request.onerror = () => resolve(0);
-				}
-			} catch {
-				resolve(0);
-			}
-		});
+		await this.ensureReady();
+		return this.strategy.count(status);
 	}
-	/**
-	 * Check if there are PENDING or IN_FLIGHT entries for a resourceType.
-	 * Uses the resourceType index for efficient lookup.
-	 */
+
 	async hasActiveByResourceType(resourceType: string): Promise<boolean> {
-		const db = await this.ensureDB();
-		if (!db) return false;
-
-		return new Promise((resolve) => {
-			try {
-				const tx = db.transaction(STORE_NAME, 'readonly');
-				const index = tx.objectStore(STORE_NAME).index('resourceType');
-				const request = index.getAll(IDBKeyRange.only(resourceType));
-				request.onsuccess = () => {
-					const entries = (request.result as WalEntry[]) ?? [];
-					const hasActive = entries.some(
-						(e) => e.status === 'PENDING' || e.status === 'IN_FLIGHT',
-					);
-					resolve(hasActive);
-				};
-				request.onerror = () => resolve(false);
-			} catch {
-				resolve(false);
-			}
-		});
+		await this.ensureReady();
+		return this.strategy.hasActiveByResourceType(resourceType);
 	}
 
-	/**
-	 * Get all WAL entries.
-	 */
 	async getAll(): Promise<WalEntry[]> {
-		const db = await this.ensureDB();
-		if (!db) return [];
-
-		return new Promise((resolve) => {
-			try {
-				const tx = db.transaction(STORE_NAME, 'readonly');
-				const request = tx.objectStore(STORE_NAME).getAll();
-				request.onsuccess = () => resolve((request.result as WalEntry[]) ?? []);
-				request.onerror = () => resolve([]);
-			} catch {
-				resolve([]);
-			}
-		});
+		await this.ensureReady();
+		return this.strategy.getAll();
 	}
 
 	// #endregion
 
-	// #region Availability
+	// #region Availability / Diagnostics
+
 	/**
-	 * Check if IndexedDB is available and initialized.
+	 * True once the facade has selected a strategy (either persistent or
+	 * ephemeral). Returns false in non-browser environments.
 	 */
 	async isAvailable(): Promise<boolean> {
-		if (this.dbReady) {
-			return await this.dbReady;
-		}
-		return false;
+		if (!this.readyPromise) return false;
+		return this.readyPromise;
+	}
+
+	/**
+	 * Current storage mode. Useful for diagnostics — UI consumers should
+	 * read {@link WalStatusStore.mode} instead.
+	 */
+	getMode(): WalStorageStrategy['mode'] {
+		return this.strategy.mode;
 	}
 
 	// #endregion
