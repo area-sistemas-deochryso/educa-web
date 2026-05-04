@@ -3,8 +3,9 @@
 > **Repo destino**: `educa-web` (main)
 > **Plan**: WAL Resilience · **Chat**: M1+M2 · **Fase**: F2.Execute
 > **Creado**: 2026-05-04 · **Modo sugerido**: `/execute`
-> **Estado**: ⏳ pendiente arrancar
-> **Bloqueado por**: chat 085 (split engine) debe cerrar primero — toca los mismos archivos.
+> **Estado**: ✅ implementado · ⏳ pendiente smokes post-deploy
+> **Validación prod**: ⏳ pendiente desde 2026-05-04
+> **Bloqueado por**: chat 085 (split engine) debe cerrar primero — toca los mismos archivos. ✅ ya cerrado.
 
 ## CONTEXTO INMEDIATO
 
