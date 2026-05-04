@@ -38,10 +38,12 @@ educa-web
 
 ## 3. Navegador y credenciales
 
-- **Browser**: Chrome perfil `Sistemas` (`area.sistemas.min@gmail.com`)
-- **Extensión**: "Claude in Chrome" (Anthropic, Beta) autenticada con la misma cuenta
-- Vivaldi tiene la extensión pero atada a una cuenta personal — NO usar Vivaldi para Cowork de trabajo
-- **Credenciales test**: DNI `74125896` / pwd `12349898` / rol `Director`
+- **Browser laboral**: Chrome perfil `Sistemas` (`area.sistemas.min@gmail.com`), nombre en el listado del MCP: **`work aqui m`** (deviceId `30baf13d`). Cuando `list_connected_browsers` devuelva varios, **siempre elegir este**.
+- **NO usar**: el browser `tu papi mas naki` (deviceId `a87b2f3a`) es personal — preguntar al usuario si por error solo aparece ese.
+- **Vivaldi**: tiene la extensión pero atada a cuenta personal — NO usar para Cowork de trabajo.
+- **Extensión**: "Claude in Chrome" (Anthropic, Beta) autenticada con `area.sistemas.min@gmail.com`.
+- **Credenciales test**: DNI `74125896` / pwd `12349898` / rol `Director`. Hay sesión guardada en el login screen — un click en el item "ADMINISTRADOR EL DIRECTOR" basta, sin tipear credenciales.
+- **Cómo opera Claude en Chrome**: vía DOM events (DevTools Protocol), NO con cursor del SO. No verás un puntero animado moverse — los cambios suceden directos. Para auditar en tiempo real: tener DevTools abierto en Network (filtro `Fetch/XHR`) y Console.
 
 ---
 
@@ -67,9 +69,53 @@ educa-web
 
 ## 6. Limitaciones técnicas específicas del proyecto
 
+### 6.1 Componentes y framework
+
 - **PrimeNG `p-select`**: `form_input` MCP a veces falla con "SPAN is not a supported form input". Workaround: usar `javascript_tool` con `dispatchEvent('change')` sobre el `<select>` nativo si está expuesto, o click en el trigger por coordenadas.
 - **Two-way binding en dialogs PrimeNG**: nunca usar `[(visible)]`; siempre `[visible]` + `(visibleChange)` (regla del proyecto en `rules/dialogs-sync.md`).
-- **MCPs útiles para este stack**: Microsoft Learn (`89a7ddf5-2a6b-410c-be11-aa0e1a1b35a6`) para .NET 9 docs y Exa (`91408932-1110-4350-97c7-2d6b3a6d9694`) para búsqueda web.
+- **HttpClient usa `withFetch`**: Angular 21 está bootstrapeado con `provideHttpClient(withFetch())`. Para interceptar requests desde JS inyectado, sobreescribir `window.fetch` — sobreescribir `XMLHttpRequest.prototype.send` NO funciona, no se invoca.
+
+### 6.2 Patrones reutilizables para Claude (probados en WAL smoke)
+
+- **Inspeccionar IndexedDB sin destruirla** (`deleteDatabase` devuelve `blocked` mientras la app la tiene abierta):
+  ```js
+  new Promise(res => {
+    const r = indexedDB.open('educa-wal-db');
+    r.onsuccess = () => {
+      const db = r.result;
+      const tx = db.transaction(['wal-entries'], 'readonly');
+      const all = tx.objectStore('wal-entries').getAll();
+      all.onsuccess = () => { db.close(); res(all.result); };
+    };
+  })
+  ```
+- **Limpiar IndexedDB sin destruirla**: usar `tx.objectStore(name).clear()` con transacción `readwrite`. Más rápido y no se bloquea.
+- **Simular offline real (afecta WAL engine)**: `window.dispatchEvent(new Event('offline'))`. Solo cambia `SwService.isOnline` — el `fetch` real sigue funcionando. Para que un POST falle también hay que interceptar `window.fetch` y devolver `new Response(body, {status: 503})`.
+- **Volver online**: `window.dispatchEvent(new Event('online'))`.
+- **CSRF para fetch directo desde consola**: el header `X-XSRF-TOKEN` se obtiene del cookie `XSRF-TOKEN`:
+  ```js
+  const csrf = document.cookie.split(';').map(c=>c.trim()).find(c=>c.startsWith('XSRF-TOKEN='))?.split('=')[1];
+  fetch(url, { method:'PUT', headers:{'Content-Type':'application/json', 'X-XSRF-TOKEN': csrf}, credentials:'include', body: JSON.stringify(payload) })
+  ```
+
+### 6.3 Quirks del MCP Claude in Chrome
+
+- **`tabs_create_mcp` NO hereda sesión**: el tab nuevo aterriza en `/intranet/login`. Hay que clickear la sesión guardada o re-loguearse manualmente. Probable causa: sessionStorage por-tab en estado fresh.
+- **`read_console_messages` y `read_network_requests` arrancan tracking en la primera llamada**: los logs y requests previos se pierden. Llamarlos al inicio del flujo si interesa capturar logs de page load.
+- **`F5` mata todo JS inyectado**: interceptores de `window.fetch`, listeners, variables globales — todo se borra. Re-inyectar después de cada reload.
+- **`computer-use` sobre Chrome está en tier `read`**: clicks y typing bloqueados a nivel SO (política de Anthropic, no negociable). Toda interacción con el navegador debe pasar por `mcp__Claude_in_Chrome__*`. Para apps nativas (Notes, Finder, Explorer, etc.) sí funciona tier `full`.
+
+### 6.4 Comportamientos del proyecto fáciles de malinterpretar
+
+- **DELETE en `/api/sistema/cursos/{id}/eliminar` es soft delete**: BE devuelve 200 pero la fila persiste con `CUR_Estado=false`. NO es bug — la baja lógica preserva historial. Para limpieza física del entorno de pruebas, hay que pedir SQL directo al usuario.
+- **`commitAndClean` borra la entry WAL inmediatamente al commit**: NO espera `COMMITTED_TTL_MS` (24h). Si pruebas un caso happy y el IDB queda en 0 entries, es lo esperado, no que falló persistir.
+- **Las entries WAL `FAILED` quedan persistidas hasta que algo las limpie**: si haces un caso 4 (permanent error), la entry FAILED queda en IDB y aparece en `WalStatusFacade` como warning. Limpiar manualmente con `clear()` antes de seguir con otros casos.
+- **`invalidateForCrossTab` solo invalida SW cache, NO refetcha el store del componente**: el follower no actualiza UI hasta el siguiente GET manual. By-design del `cursos.facade` actual.
+
+### 6.5 MCPs útiles para este stack
+
+- **Microsoft Learn** (`89a7ddf5-2a6b-410c-be11-aa0e1a1b35a6`): .NET 9 / EF Core 9 docs.
+- **Exa** (`91408932-1110-4350-97c7-2d6b3a6d9694`): búsqueda web general.
 
 ---
 
