@@ -133,6 +133,99 @@ Features que NO son CRUD estándar (chat, batch imports, wizards) usan
 
 ---
 
+## Refetch cross-tab tras commit del leader
+
+Cuando hay múltiples tabs abiertas, solo el tab leader procesa la cola WAL.
+Cuando el leader commitea una entry encolada por otro tab (follower), el
+follower invalida la SW cache vía `WalSyncEngine.handleCrossTabCommit` —
+pero **eso no actualiza el estado del store del componente**. Sin un
+refetch explícito, la fila en el follower aparece consistente solo cuando
+el usuario refresca o navega.
+
+### Política — refetch automático en `BaseCrudFacade` (default ON)
+
+`BaseCrudFacade` se suscribe al observable `WalLeaderService.entryCommittedByOtherTab$`
+y dispara `silentRefreshAfterCrud()` cuando el `resourceType` del evento
+matchea el del facade. El facade concreto activa el wiring llamando a
+`initCrossTabRefetch()` en su constructor:
+
+```typescript
+constructor() {
+  super();
+  this.initErrorHandler();
+  this.initCrossTabRefetch();   // suscribe al observable cross-tab
+}
+```
+
+### Opt-out por facade
+
+Cuando el refetch automático no se justifica (paginación server-side
+pesada donde el evento cross-tab típicamente no afecta el viewport actual,
+o listas muy grandes donde el costo del GET supera el beneficio),
+declarar `crossTabRefetch: false` en el `BaseCrudFacadeConfig`:
+
+```typescript
+protected readonly config: BaseCrudFacadeConfig = {
+  tag: 'XxxFacade',
+  resourceType: 'Xxx',
+  apiUrl: `${environment.apiUrl}/api/sistema/xxx`,
+  loadErrorMessage: '...',
+  crossTabRefetch: false,   // opt-out explícito + comentario con motivo
+};
+```
+
+### Por qué default ON
+
+- El refetch usa `silentRefreshAfterCrud()` → `refreshItemsOnly(silent=true)`,
+  sin loading flicker. Costo bajo en CRUDs admin chicos.
+- La UX cross-tab inmediata es lo esperado por el usuario; descubrir
+  inconsistencias por refresh manual es señal de bug, no de feature.
+- Casos donde no aplica son la excepción y son fáciles de declarar.
+
+### Alternativa para facades que no extienden `BaseCrudFacade`
+
+Inyectar `WalCrossTabRefetchService` (`@core/services`) y suscribirse en
+el constructor con el `resourceType` del facade y el método de refetch
+del feature:
+
+```typescript
+import { WalCrossTabRefetchService } from '@core/services';
+
+@Injectable({ providedIn: 'root' })
+export class XxxFacade {
+  private crossTabRefetch = inject(WalCrossTabRefetchService);
+  private destroyRef = inject(DestroyRef);
+
+  constructor() {
+    this.crossTabRefetch.subscribe({
+      resourceType: 'Xxx',                          // mismo string que pasa a wal.execute
+      refetch: () => this.silentRefreshAfterCrud(), // o el método de refetch del feature
+      destroyRef: this.destroyRef,
+    });
+  }
+}
+```
+
+El helper filtra por `resourceType` y cancela la subscripción al
+destruirse el `DestroyRef`. Aplica a single-facades, multi-facades
+(suscribir en el `*-data.facade.ts` que es dueño del listado) y
+features ad-hoc con su propio refetch.
+
+### Cuándo NO suscribir
+
+- **Mensajería / chat**: SignalR ya provee tiempo real cross-tab; el
+  WAL solo cubre la queue offline.
+- **Modales/dialogs ephemeral**: el componente vive corto, no tiene
+  listado persistente que necesite refetch.
+- **Archivos lazy** (e.g. `estudiante-cursos.facade` cargando archivos
+  por semana): el patrón de carga ya es bajo demanda; refetch automático
+  no aporta.
+- **Multi-facade con CRUD sin lista propia**: si el `*-crud.facade.ts`
+  no tiene listado y delega en `*-data.facade.ts`, suscribir solo en
+  el data facade.
+
+---
+
 ## Checklist para una nueva mutación
 
 ```

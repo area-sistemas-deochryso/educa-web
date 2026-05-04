@@ -37,6 +37,7 @@ export class VistasFacade extends BaseCrudFacade<Vista, { ruta: string; nombre: 
 	constructor() {
 		super();
 		this.initErrorHandler();
+		this.initCrossTabRefetch();
 	}
 
 	// #region API calls (abstract implementations)

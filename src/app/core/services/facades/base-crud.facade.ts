@@ -1,3 +1,4 @@
+/* eslint-disable max-lines -- Razón: base class cohesiva (dialog delegation + WAL CRUD + paginación + cross-tab refetch). Partir por concerns rompería la herencia única que extienden los facades concretos. */
 import { DestroyRef, inject, Injectable } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { forkJoin, Observable } from 'rxjs';
@@ -12,6 +13,7 @@ import { ActivityTrackerService } from '@core/services/error/activity-tracker.se
 import { ErrorHandlerService } from '@core/services/error/error-handler.service';
 import { SwService } from '@features/intranet/services/sw/sw.service';
 import { WalFacadeHelper } from '@core/services/wal/wal-facade-helper.service';
+import { WalCrossTabRefetchService } from '@core/services/wal/wal-cross-tab-refetch.service';
 import type { BaseCrudStore } from '@core/store/base/base-crud.store';
 import type {
 	BaseCrudFacadeConfig,
@@ -58,6 +60,7 @@ export abstract class BaseCrudFacade<
 	protected readonly errorHandler = inject(ErrorHandlerService);
 	protected readonly swService = inject(SwService);
 	protected readonly wal = inject(WalFacadeHelper);
+	protected readonly crossTabRefetch = inject(WalCrossTabRefetchService);
 	protected readonly destroyRef = inject(DestroyRef);
 	protected readonly errHandler: FacadeErrorHandler;
 	private readonly _activityTracker = inject(ActivityTrackerService);
@@ -80,6 +83,16 @@ export abstract class BaseCrudFacade<
 		(this as unknown as { errHandler: FacadeErrorHandler }).errHandler = facadeErrorHandler({
 			tag: this.config.tag,
 			errorHandler: this.errorHandler,
+		});
+	}
+
+	/** Llamar tras `initErrorHandler()`. Ver `rules/optimistic-ui.md` § "Refetch cross-tab". */
+	protected initCrossTabRefetch(): void {
+		if (this.config.crossTabRefetch === false) return;
+		this.crossTabRefetch.subscribe({
+			resourceType: this.config.resourceType,
+			refetch: () => this.silentRefreshAfterCrud(),
+			destroyRef: this.destroyRef,
 		});
 	}
 

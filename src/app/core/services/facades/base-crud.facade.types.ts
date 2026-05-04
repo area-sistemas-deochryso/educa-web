@@ -12,6 +12,16 @@ export interface BaseCrudFacadeConfig {
 	apiUrl: string;
 	/** Mensaje para error de carga inicial */
 	loadErrorMessage: string;
+	/**
+	 * Si el facade debe refetchear el listado cuando otro tab (leader) commitea
+	 * una entry WAL del mismo `resourceType`. Default `true`.
+	 *
+	 * Setear `false` para listas con paginación server-side pesada donde el
+	 * refetch automático es costo neto y la UX cross-tab no lo justifica.
+	 *
+	 * Ver `rules/optimistic-ui.md` § "Refetch cross-tab tras commit del leader".
+	 */
+	crossTabRefetch?: boolean;
 }
 
 /** Resultado paginado de la API */

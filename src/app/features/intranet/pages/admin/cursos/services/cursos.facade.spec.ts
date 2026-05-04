@@ -9,6 +9,8 @@ import { CursosStore } from './cursos.store';
 import { CursosService } from './cursos.service';
 import { GradosService } from './grados.service';
 import { ErrorHandlerService, WalFacadeHelper } from '@core/services';
+import { WalCrossTabRefetchService } from '@core/services/wal/wal-cross-tab-refetch.service';
+import type { DestroyRef } from '@angular/core';
 import { Curso, Grado, CursosEstadisticas } from '../models';
 
 // #endregion
@@ -43,6 +45,22 @@ function createMockWal() {
 		}),
 	};
 }
+
+function createMockCrossTabRefetch() {
+	const subscribers: { resourceType: string; refetch: () => void }[] = [];
+	return {
+		subscribe: vi.fn(
+			(opts: { resourceType: string; refetch: () => void; destroyRef: DestroyRef }) => {
+				subscribers.push({ resourceType: opts.resourceType, refetch: opts.refetch });
+			},
+		),
+		emitCrossTabCommit: (resourceType: string) => {
+			for (const s of subscribers) {
+				if (s.resourceType === resourceType) s.refetch();
+			}
+		},
+	};
+}
 // #endregion
 
 // #region Tests
@@ -51,10 +69,12 @@ describe('CursosFacade', () => {
 	let store: CursosStore;
 	let api: ReturnType<typeof createMockApi>;
 	let wal: ReturnType<typeof createMockWal>;
+	let crossTab: ReturnType<typeof createMockCrossTabRefetch>;
 
 	beforeEach(() => {
 		api = createMockApi();
 		wal = createMockWal();
+		crossTab = createMockCrossTabRefetch();
 
 		TestBed.configureTestingModule({
 			providers: [
@@ -64,6 +84,7 @@ describe('CursosFacade', () => {
 				{ provide: GradosService, useValue: { getGrados: vi.fn().mockReturnValue(of(mockGrados)) } },
 				{ provide: ErrorHandlerService, useValue: { showError: vi.fn(), showSuccess: vi.fn() } },
 				{ provide: WalFacadeHelper, useValue: wal },
+				{ provide: WalCrossTabRefetchService, useValue: crossTab },
 			],
 		});
 
@@ -255,6 +276,36 @@ describe('CursosFacade', () => {
 			expect(store.searchTerm()).toBe('');
 			expect(store.filterEstado()).toBeNull();
 			expect(store.filterNivel()).toBeNull();
+		});
+	});
+	// #endregion
+
+	// #region Cross-tab refetch (F-S06)
+	describe('cross-tab refetch on leader commit', () => {
+		it('refetches items when another tab commits an entry of the same resourceType', () => {
+			api.getCursosPaginated.mockClear();
+
+			crossTab.emitCrossTabCommit('Curso');
+
+			expect(api.getCursosPaginated).toHaveBeenCalledTimes(1);
+		});
+
+		it('ignores commits of other resourceTypes', () => {
+			api.getCursosPaginated.mockClear();
+
+			crossTab.emitCrossTabCommit('Salon');
+			crossTab.emitCrossTabCommit('Vista');
+
+			expect(api.getCursosPaginated).not.toHaveBeenCalled();
+		});
+
+		it('does not toggle global loading flag (silent refetch)', () => {
+			store.setLoading(false);
+			api.getCursosPaginated.mockClear();
+
+			crossTab.emitCrossTabCommit('Curso');
+
+			expect(store.loading()).toBe(false);
 		});
 	});
 	// #endregion

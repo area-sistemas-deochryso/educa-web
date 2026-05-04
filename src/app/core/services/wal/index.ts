@@ -7,5 +7,6 @@ export { WalClockService } from './wal-clock.service';
 export { WalStatusStore } from './wal-status.store';
 export { WalStatusFacade } from './wal-status.facade';
 export { WalFacadeHelper } from './wal-facade-helper.service';
+export { WalCrossTabRefetchService } from './wal-cross-tab-refetch.service';
 export { isConflictError, isPermanentError } from './wal-error.utils';
 // #endregion

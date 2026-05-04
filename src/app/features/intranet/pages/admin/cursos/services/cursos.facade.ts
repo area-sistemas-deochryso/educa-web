@@ -40,6 +40,7 @@ export class CursosFacade extends BaseCrudFacade<Curso, CursoFormData, CursosEst
 	constructor() {
 		super();
 		this.initErrorHandler();
+		this.initCrossTabRefetch();
 	}
 
 	// #region API calls (abstract implementations)
