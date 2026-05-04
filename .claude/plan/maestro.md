@@ -1467,7 +1467,7 @@ Ver [history/planes-cerrados.md](../history/planes-cerrados.md#plan-11).
 
 > **Origen**: Auditoría modo Validar (2026-04-16). Hallazgos en `tasks/wal-cache-audit-fixes.md` (pendiente crear).
 
-- [ ] **H1** — Bug interceptor PascalCase + H8/H9 módulos incompletos y versiones (P0, 1 chat)
+- [x] **H1+H8+H9** ✅ (2026-05-04) — Interceptor PascalCase corregido (regla posicional `i===1` controller / `i>1` discriminador), 6 módulos faltantes agregados a `CACHE_VERSIONS` + `MODULE_URL_PATTERNS`, bump de versiones para asistencias/usuarios/salones (Plan 6/21/27/28), 3 patterns corregidos a `/api/sistema/*` reales. Lint+tsc EXIT 0, 31/31 tests interceptors verdes.
 - [ ] **H7** — Normalizar naming `WAL_CACHE_MAP` (P1, 1 chat)
 - [ ] **H2-H6, H10** — Fixes cosméticos y duplicación de patrones (P2, 1 chat)
 

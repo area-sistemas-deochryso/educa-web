@@ -68,13 +68,19 @@ function extractResourcePattern(url: string): string | null {
 		// or:       ['api', 'sistema', 'permisos', 'rol', 'crear']
 
 		const resourceSegments: string[] = [];
-		for (const segment of segments) {
-			// Parar antes de IDs numéricos, acciones CRUD, o discriminadores PascalCase
-			// (ej: /api/sistema/usuarios/Profesor/24 → el segmento "Profesor" es un rol,
-			// no parte del recurso base — la lista paginada vive en /api/sistema/usuarios).
+		for (let i = 0; i < segments.length; i++) {
+			const segment = segments[i];
 			if (/^\d+$/.test(segment)) break;
 			if (isActionSegment(segment)) break;
-			if (/^[A-Z]/.test(segment)) break;
+			if (/^[A-Z]/.test(segment)) {
+				// PascalCase justo después de `api` (i===1) es nombre de controller
+				// (ConsultaAsistencia, CursoContenido, AsistenciaCurso, etc.) → tomarlo
+				// como base. Más profundo es un discriminador (Estudiante, Profesor) → cortar.
+				if (i === 1) {
+					resourceSegments.push(segment);
+				}
+				break;
+			}
 			resourceSegments.push(segment);
 		}
 

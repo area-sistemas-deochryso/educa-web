@@ -8,7 +8,7 @@
 
 ## Hallazgos
 
-### H1 — Bug: Interceptor no invalida endpoints PascalCase (CRÍTICO)
+### H1 — Bug: Interceptor no invalida endpoints PascalCase (CRÍTICO) ✅ Resuelto 2026-05-04
 
 **Archivo**: `src/app/core/interceptors/sw-cache-invalidation/sw-cache-invalidation.interceptor.ts:77`
 
@@ -16,7 +16,7 @@
 
 **Impacto**: Después de POST/PUT/DELETE a estos endpoints, el siguiente GET sirve datos stale del SW cache. El WAL compensa parcialmente vía `WAL_CACHE_MAP`, pero mutaciones sin WAL (server-confirmed, directas) no se invalidan.
 
-**Fix**: Cambiar la heurística para distinguir entre discriminadores de rol (`Profesor`, `Estudiante`) y nombres de controller PascalCase. Opción: mantener una allowlist de controllers conocidos, o solo hacer break en PascalCase cuando el segmento anterior ya es un controller válido.
+**Fix aplicado**: regla posicional en el loop. PascalCase en `i === 1` (justo después de `api`) se trata como nombre de controller → empuja y corta (pattern `/api/<Controller>`). PascalCase en `i > 1` sigue siendo discriminador → corta sin empujar (pattern queda `/api/<...>/<...>`). Cubre los 5 controllers PascalCase del proyecto sin romper los discriminadores `Estudiante`/`Profesor` en `/api/sistema/usuarios/...`.
 
 ---
 
@@ -84,7 +84,7 @@
 
 ---
 
-### H8 — `MODULE_URL_PATTERNS` incompleto vs `WAL_CACHE_MAP`
+### H8 — `MODULE_URL_PATTERNS` incompleto vs `WAL_CACHE_MAP` ✅ Resuelto 2026-05-04
 
 **Archivos**:
 - `src/app/config/cache-versions.config.ts` — 6 módulos
@@ -96,7 +96,7 @@
 
 ---
 
-### H9 — Fechas de versión posiblemente desactualizadas
+### H9 — Fechas de versión posiblemente desactualizadas ✅ Resuelto 2026-05-04
 
 **Archivo**: `src/app/config/cache-versions.config.ts:40-76`
 
