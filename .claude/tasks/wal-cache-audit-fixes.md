@@ -131,3 +131,13 @@
 | **P3** | H5 (subscribe sin takeUntil) | Decisión de diseño | Definir en regla |
 
 **Estimado**: 3 chats para cerrar todo. H1 es urgente (afecta producción).
+
+---
+
+## Findings menores 1ra ronda smoke (2026-05-04)
+
+Detectados durante la 1ra ronda del WAL Integration Smoke (`claude-cowork/wal-integration-smoke.md`, commit `478df42`). No bloquean la ronda; son polish UX/diagnóstico que sumarse al backlog de polish del WAL.
+
+- **F-S04 (Caso 4)** — Toast en errores 4xx no extrae el mensaje específico del payload del BE. Cliente muestra "La solicitud contiene datos inválidos" cuando el BE devolvió "El nombre no puede exceder 50 caracteres". `WalFacadeHelper.execute().onError` o el error handler global debería intentar `error.error?.message` antes del fallback genérico.
+- **F-S06 (Caso 6)** — Follower cross-tab solo invalida SW cache vía `invalidateForCrossTab`, no dispara refetch automático del store del componente. Resultado: la fila final aparece consistente solo cuando el follower hace GET nuevo (refrescar manual o navegación). Decisión de diseño actual del facade — si se quiere visibilidad inmediata cross-tab, falta cablear `entryCommittedByOtherTab$` a `silentRefreshAfterCrud` en cada CRUD facade que lo necesite.
+- **F-S08 (Caso 8)** — `REQUIRES_MIGRATION` se emite correctamente y la entry queda en ese estado en IDB, pero ningún componente top-level consume `walStatus()` con un visual prominente (banner). El usuario no se entera de que tiene migraciones pendientes. Falta wiring de `WalStatusFacade` en `intranet-layout` o equivalente.
