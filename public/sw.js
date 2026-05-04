@@ -44,6 +44,90 @@ const NO_CACHE_PATTERNS = [
 	'/api/Auth/sessions',
 ];
 
+// #region SCHEMA FINGERPRINT (Plan WAL Resilience M4)
+//
+// Mapa embebido de versiones de schema por endpoint, espejo de
+// `src/app/shared/constants/api-schema-versions.ts` y de
+// `Educa.API/Constants/Sistema/ApiSchemaVersions.cs`. Las claves son
+// prefijos de path en lowercase. La búsqueda en runtime es longest-prefix.
+//
+// Bumpear el número acá invalida selectivamente el endpoint sin afectar
+// el resto del cache. DB_VERSION sigue siendo el escape hatch nuclear.
+//
+// TODO: build step que genere este map automáticamente desde el .ts.
+const SCHEMA_VERSIONS = {
+	'/api/horario': 1,
+	'/api/profesor': 1,
+	'/api/profesorsalon': 1,
+	'/api/profesorcurso': 1,
+	'/api/cursocontenido': 1,
+	'/api/grupocontenido': 1,
+	'/api/calificacion': 1,
+	'/api/estudiantecurso': 1,
+	'/api/asistenciacurso': 1,
+	'/api/boletanotas': 1,
+	'/api/aprobacionestudiante': 1,
+	'/api/permisos-salud': 1,
+	'/api/consultaasistencia': 1,
+	'/api/asistencia-admin': 1,
+	'/api/cierre-asistencia': 1,
+	'/api/reportesasistencia': 1,
+	'/api/conversaciones': 1,
+	'/api/campus': 1,
+	'/api/blobstorage': 1,
+	'/api/servertime': 1,
+	'/api/sistema/usuarios': 1,
+	'/api/sistema/cursos': 1,
+	'/api/sistema/salones': 1,
+	'/api/sistema/grados': 1,
+	'/api/sistema/permisos': 1,
+	'/api/sistema/notificaciones': 1,
+	'/api/sistema/eventoscalendario': 1,
+	'/api/sistema/reportes-usuario': 1,
+	'/api/sistema/correlation': 1,
+	'/api/sistema/auditoria-correos-asistencia': 1,
+	'/api/sistema/error-groups': 1,
+	'/api/sistema/errors': 1,
+	'/api/sistema/rate-limit-events': 1,
+	'/api/sistema/asistencia': 1,
+	'/api/sistema/email-outbox': 1,
+	'/api/sistema/email-blacklist': 1,
+};
+
+// Devuelve la versión esperada para un path, o null si no está mapeado.
+// Endpoint no mapeado → no se cachea (INV-WAL-RES11).
+function getSchemaVersionForPath(path) {
+	const lower = path.toLowerCase();
+	let bestKey = null;
+	for (const key of Object.keys(SCHEMA_VERSIONS)) {
+		if (lower === key || lower.startsWith(key + '/') || lower.startsWith(key + '?')) {
+			if (bestKey === null || key.length > bestKey.length) bestKey = key;
+		}
+	}
+	return bestKey === null ? null : SCHEMA_VERSIONS[bestKey];
+}
+
+// Lee el header X-Schema-Version de una Response y lo parsea a número.
+// Retorna `null` si está ausente o no es un entero válido — saveToCache
+// usará `1` como default por compatibilidad (ver brief test plan).
+function parseSchemaHeader(response) {
+	const raw = response.headers.get('X-Schema-Version');
+	if (raw === null) return null;
+	const parsed = parseInt(raw, 10);
+	return Number.isFinite(parsed) ? parsed : null;
+}
+
+// Extrae el path sin query de una URL.
+function pathnameOf(url) {
+	try {
+		return new URL(url).pathname;
+	} catch (e) {
+		const qIdx = url.indexOf('?');
+		return qIdx >= 0 ? url.substring(0, qIdx) : url;
+	}
+}
+// #endregion
+
 // Abrir/crear la base de datos IndexedDB
 function openDB() {
 	return new Promise((resolve, reject) => {
@@ -81,9 +165,23 @@ function normalizeUrl(url) {
 	}
 }
 
-// Guardar respuesta en IndexedDB
-async function saveToCache(url, data) {
+// Guardar respuesta en IndexedDB.
+// `responseSchemaVersion` viene del header X-Schema-Version del BE
+// (Plan WAL Resilience M4). Si el BE no lo envió, por compatibilidad
+// asumimos 1. Si el endpoint no está mapeado en el FE, NO se cachea
+// (INV-WAL-RES11) — el SW prefiere ir a la red cada vez antes que
+// guardar JSON sin schema validable.
+async function saveToCache(url, data, responseSchemaVersion) {
 	try {
+		// INV-WAL-RES11: si el endpoint no está en SCHEMA_VERSIONS, no se cachea.
+		const expectedVersion = getSchemaVersionForPath(pathnameOf(url));
+		if (expectedVersion === null) {
+			console.log('[SW] Endpoint no mapeado en SCHEMA_VERSIONS, skip cache:', url);
+			return;
+		}
+		const persistedVersion = typeof responseSchemaVersion === 'number'
+			? responseSchemaVersion
+			: 1;
 		const normalizedUrl = normalizeUrl(url);
 		const db = await openDB();
 		const transaction = db.transaction(STORE_NAME, 'readwrite');
@@ -94,6 +192,7 @@ async function saveToCache(url, data) {
 			originalUrl: url,
 			data: data,
 			timestamp: Date.now(),
+			schemaVersion: persistedVersion,
 		};
 
 		store.put(cacheEntry);
@@ -135,6 +234,27 @@ async function getFromCache(url) {
 						'[SW] Encontrado en cache, timestamp:',
 						new Date(result.timestamp).toISOString(),
 					);
+					// INV-WAL-RES12: schema mismatch → discard + log info para diagnóstico de deploys.
+					const expectedVersion = getSchemaVersionForPath(pathnameOf(url));
+					if (
+						expectedVersion !== null &&
+						result.schemaVersion !== undefined &&
+						result.schemaVersion !== expectedVersion
+					) {
+						console.info(
+							'[SW] Schema mismatch en cache: esperado',
+							expectedVersion,
+							'recibido',
+							result.schemaVersion,
+							'→ descartando entrada',
+							normalizedUrl,
+						);
+						// Borrar la entrada obsoleta. No await — fire-and-forget; el get
+						// de esta request va a network.
+						invalidateCacheByUrl(url);
+						resolve(null);
+						return;
+					}
 					// Verificar si el cache ha expirado
 					const isExpired = Date.now() - result.timestamp > CACHE_EXPIRY;
 					if (!isExpired) {
@@ -356,7 +476,7 @@ async function refetchCacheByPattern(pattern) {
 					if (!response.ok) return;
 					const data = await response.json();
 					if (!hasDataChanged(entry.data, data)) return;
-					await saveToCache(targetUrl, data);
+					await saveToCache(targetUrl, data, parseSchemaHeader(response));
 					notifyClients({
 						type: 'CACHE_UPDATED',
 						payload: {
@@ -509,11 +629,12 @@ async function handleFetch(request) {
 		const networkResponse = await fetch(request.clone());
 
 		if (networkResponse.ok) {
+			const schemaVersion = parseSchemaHeader(networkResponse);
 			networkResponse
 				.clone()
 				.json()
 				.then((data) => {
-					saveToCache(url, data);
+					saveToCache(url, data, schemaVersion);
 				});
 		}
 
@@ -529,9 +650,10 @@ function revalidateInBackground(request, url, cachedData) {
 	fetch(request.clone())
 		.then((response) => {
 			if (response.ok) {
+				const schemaVersion = parseSchemaHeader(response);
 				response.json().then(async (data) => {
 					if (hasDataChanged(cachedData, data)) {
-						await saveToCache(url, data);
+						await saveToCache(url, data, schemaVersion);
 						console.log('[SW] Cache actualizado - notificando a la app');
 						notifyClients({
 							type: 'CACHE_UPDATED',

@@ -17,6 +17,7 @@ import {
 	errorInterceptor,
 	rateLimitInterceptor,
 	requestTraceInterceptor,
+	schemaVersionInterceptor,
 	swCacheInvalidationInterceptor,
 } from '@core/interceptors';
 import { provideClientHydration, withEventReplay } from '@angular/platform-browser';
@@ -53,6 +54,7 @@ export const appConfig: ApplicationConfig = {
 				rateLimitInterceptor, // Throttle concurrent API requests + 429 backoff
 				clockSyncInterceptor, // Detect clock skew from server Date headers
 				requestTraceInterceptor,
+				schemaVersionInterceptor, // Plan WAL Resilience M4 — fingerprint en cache
 				swCacheInvalidationInterceptor, // Auto-invalidate SW cache after mutations
 				apiResponseInterceptor,
 				errorInterceptor,

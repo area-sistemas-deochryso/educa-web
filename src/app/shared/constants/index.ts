@@ -4,4 +4,5 @@ export * from './app-roles';
 export * from './permission-registry';
 export * from './module-registry';
 export * from './attendance-scope';
+export * from './api-schema-versions';
 // #endregion
