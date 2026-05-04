@@ -28,7 +28,7 @@
 
 ---
 
-## WAL — resilience M1-M4 + cross-tab + banner migración (briefs 091×2, 092, 093, 094)
+## WAL — resilience M1-M4 + cross-tab + banner migración (briefs 091, 092, 093, 094, 097)
 
 > **Antes de arrancar este bloque**: los 5 briefs WAL tocan los mismos archivos del WAL engine. Validarlos en el orden listado evita falsos positivos por estado residual de IDB. Empezar con IDB limpia: `Application → IndexedDB → educa-wal-db → tx.objectStore('wal-entries').clear()` (no `deleteDatabase` — devuelve `blocked` mientras la app la tiene abierta).
 
@@ -56,7 +56,7 @@
 
 ---
 
-### Caso WAL-2 — Banner REQUIRES_MIGRATION visible (091 banner-migration)
+### Caso WAL-2 — Banner REQUIRES_MIGRATION visible (097 banner-migration)
 
 > **Cubre**: `WalMigrationBannerComponent` montado en `IntranetLayout`. Banner B9 yellow que aparece cuando hay entries con `schemaVersion` viejo.
 
@@ -546,14 +546,14 @@ Tipear secuencialmente (orden libre):
 /verify 080
 /verify 082
 /verify 088
-/verify 091   # banner-requires-migration
-/verify 091   # cross-tab-wire-remaining-facades  ⚠️ mismo NNN — coordinar con usuario
+/verify 091   # cross-tab-wire-remaining-facades
+/verify 097   # banner-requires-migration (renumerado de 091 → 097 el 2026-05-04)
 /verify 092
 /verify 093
 /verify 094
 ```
 
-⚠️ **Conflicto NNN 091**: hay dos briefs distintos con NNN=091. El comando `/verify 091` no puede distinguirlos. Pedir al usuario que renumere uno de ellos a `097` antes de cerrar (095 y 096 ya están tomados por los briefs BE runtime-health + load-control en `open/`).
+✅ **Conflicto NNN 091 resuelto** (2026-05-04): `091-fe-wal-banner-requires-migration.md` renumerado a `097-fe-wal-banner-requires-migration.md`. El cross-tab brief mantiene `091` (más antiguo, commit `49d0c7d`). Ya se puede `/verify 091` y `/verify 097` sin ambigüedad.
 
 ### Si algún caso falla ❌
 

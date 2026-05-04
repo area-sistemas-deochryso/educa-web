@@ -1,6 +1,8 @@
 > **Creado**: 2026-05-04 · **Estado**: ⏳ pendiente arrancar.
 
-# 091 · FE · WAL banner REQUIRES_MIGRATION
+# 097 · FE · WAL banner REQUIRES_MIGRATION
+
+> **Renumerado**: originalmente 091, movido a 097 el 2026-05-04 por colisión con `091-fe-wal-cross-tab-wire-remaining-facades` (que mantuvo el 091 por antigüedad).
 
 ## Contexto
 
