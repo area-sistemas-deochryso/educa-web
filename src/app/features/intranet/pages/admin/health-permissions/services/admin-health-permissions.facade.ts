@@ -4,7 +4,7 @@ import { forkJoin, Subject, EMPTY } from 'rxjs';
 import { switchMap, debounceTime, distinctUntilChanged, catchError, tap } from 'rxjs/operators';
 
 import { logger } from '@core/helpers';
-import { WalFacadeHelper } from '@core/services';
+import { WalFacadeHelper, WalCrossTabRefetchService } from '@core/services';
 import { environment } from '@config';
 // eslint-disable-next-line layer-enforcement/imports-error -- Razón: API service de health-permissions es cross-role (admin supervisa lo mismo que profesor gestiona); migración física a @intranet-shared diferida (ver maestro F3.5.C).
 import { HealthPermissionsApiService } from '@features/intranet/pages/profesor/classrooms/services/health-permissions-api.service';
@@ -19,6 +19,7 @@ export class AdminHealthPermissionsFacade {
 	private store = inject(AdminHealthPermissionsStore);
 	private destroyRef = inject(DestroyRef);
 	private wal = inject(WalFacadeHelper);
+	private crossTabRefetch = inject(WalCrossTabRefetchService);
 	private readonly apiUrl = `${environment.apiUrl}/api/permisos-salud`;
 	// #endregion
 
@@ -46,6 +47,21 @@ export class AdminHealthPermissionsFacade {
 				takeUntilDestroyed(this.destroyRef),
 			)
 			.subscribe((result) => this.store.setFechasValidacion(result));
+
+		const reloadCurrent = () => {
+			const salonId = this.store.selectedSalonId();
+			if (salonId !== null) this.loadResumen(salonId);
+		};
+		this.crossTabRefetch.subscribe({
+			resourceType: 'permisos-salud-salida',
+			refetch: reloadCurrent,
+			destroyRef: this.destroyRef,
+		});
+		this.crossTabRefetch.subscribe({
+			resourceType: 'permisos-salud-justificacion',
+			refetch: reloadCurrent,
+			destroyRef: this.destroyRef,
+		});
 	}
 	// #endregion
 

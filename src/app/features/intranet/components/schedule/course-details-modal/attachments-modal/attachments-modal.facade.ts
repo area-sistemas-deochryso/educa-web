@@ -40,6 +40,9 @@ const CONTENIDO_URL = `${environment.apiUrl}/api/CursoContenido`;
  * const facade = inject(AttachmentsModalFacade);
  * facade.uploadFile(semanaId, file);
  */
+// WAL cross-tab refetch: NO aplica. Modal ephemeral, sin lista propia. El
+// `CursoContenidoDataFacade` ya está suscripto a los resourceTypes de archivos
+// (`CursoContenidoArchivo`, `TareaArchivo`). Ver brief 091 §E.
 @Injectable()
 export class AttachmentsModalFacade {
 	// #region Dependencies

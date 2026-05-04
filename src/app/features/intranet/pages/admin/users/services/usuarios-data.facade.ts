@@ -3,7 +3,7 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { catchError, debounceTime, distinctUntilChanged, filter, switchMap, tap } from 'rxjs/operators';
 import { forkJoin, from, of, Subject } from 'rxjs';
 
-import { ErrorHandlerService, SwService, WalService } from '@core/services';
+import { ErrorHandlerService, SwService, WalService, WalCrossTabRefetchService } from '@core/services';
 import { logger, withRetry } from '@core/helpers';
 import { UI_ADMIN_ERROR_DETAILS, UI_SUMMARIES } from '@app/shared/constants';
 import { RolUsuarioAdmin, UsuarioLista, UsuariosEstadisticas } from '../models';
@@ -24,6 +24,7 @@ export class UsersDataFacade {
 	private errorHandler = inject(ErrorHandlerService);
 	private swService = inject(SwService);
 	private walService = inject(WalService);
+	private crossTabRefetch = inject(WalCrossTabRefetchService);
 	private destroyRef = inject(DestroyRef);
 	private readonly searchTrigger$ = new Subject<string>();
 	// Timestamp de última mutación CRUD para ignorar cache updates stale
@@ -37,6 +38,11 @@ export class UsersDataFacade {
 		this.setupSearchPipeline();
 		this.setupCacheRefresh();
 		this.setupRefreshOnCrudCommit();
+		this.crossTabRefetch.subscribe({
+			resourceType: 'usuarios',
+			refetch: () => this.refreshUsuariosOnly(true),
+			destroyRef: this.destroyRef,
+		});
 	}
 
 	// #region Data Loading

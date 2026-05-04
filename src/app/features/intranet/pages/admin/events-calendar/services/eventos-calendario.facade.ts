@@ -3,7 +3,7 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { forkJoin } from 'rxjs';
 
 import { logger, withRetry, getEstadoToggleDeltas, getEstadoRollbackDeltas } from '@core/helpers';
-import { ErrorHandlerService, SwService, WalFacadeHelper } from '@core/services';
+import { ErrorHandlerService, SwService, WalFacadeHelper, WalCrossTabRefetchService } from '@core/services';
 import { environment } from '@env/environment';
 import {
 	EventoCalendarioLista,
@@ -26,12 +26,21 @@ export class EventsCalendarFacade {
 	private swService = inject(SwService);
 	private errorHandler = inject(ErrorHandlerService);
 	private wal = inject(WalFacadeHelper);
+	private crossTabRefetch = inject(WalCrossTabRefetchService);
 	private destroyRef = inject(DestroyRef);
 	// #endregion
 
 	// #region Estado expuesto
 	readonly vm = this.store.vm;
 	// #endregion
+
+	constructor() {
+		this.crossTabRefetch.subscribe({
+			resourceType: RESOURCE,
+			refetch: () => this.refreshItemsOnly(),
+			destroyRef: this.destroyRef,
+		});
+	}
 
 	// #region Comandos CRUD
 

@@ -2,6 +2,7 @@ import { DestroyRef, Injectable, computed, inject } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
 import { logger } from '@core/helpers';
+import { WalCrossTabRefetchService } from '@core/services';
 import { DomainPauseMotivo } from '@data/models/email-domain-pause.models';
 
 import { EmailDomainPauseService } from './email-domain-pause.service';
@@ -11,7 +12,16 @@ import { EmailDomainPauseStore } from './email-domain-pause.store';
 export class EmailDomainPauseDataFacade {
 	private readonly api = inject(EmailDomainPauseService);
 	private readonly store = inject(EmailDomainPauseStore);
+	private readonly crossTabRefetch = inject(WalCrossTabRefetchService);
 	private readonly destroyRef = inject(DestroyRef);
+
+	constructor() {
+		this.crossTabRefetch.subscribe({
+			resourceType: 'email-domain-pause',
+			refetch: () => this.loadData(),
+			destroyRef: this.destroyRef,
+		});
+	}
 
 	readonly vm = computed(() => ({
 		items: this.filteredItems(),

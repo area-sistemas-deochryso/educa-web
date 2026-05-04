@@ -23,6 +23,9 @@ import {
  * const facade = inject(CursoContenidoCrudFacade);
  * facade.crearTarea(semanaId, request);
  */
+// WAL cross-tab refetch: NO suscribir aquí. El `CursoContenidoDataFacade` hermano
+// es dueño del listado y ya está suscripto a los 5 resourceTypes del subsistema
+// (CursoContenido + Semana + Tarea + Archivo + TareaArchivo). Ver brief 091 §E.
 @Injectable({ providedIn: 'root' })
 export class CursoContenidoCrudFacade {
 	// #region Dependencias

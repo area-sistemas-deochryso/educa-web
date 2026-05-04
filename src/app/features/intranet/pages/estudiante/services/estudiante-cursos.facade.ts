@@ -12,6 +12,10 @@ import { RegistrarEstudianteArchivoRequest, RegistrarEstudianteTareaArchivoReque
 
 const ESTUDIANTE_CURSO_URL = `${environment.apiUrl}/api/EstudianteCurso`;
 
+// WAL cross-tab refetch: NO aplica por ahora. Archivos cargan lazy por semana —
+// patrón ya bajo demanda. Si en el futuro se quiere consistency cross-tab para
+// archivos sube/borrados desde otro tab, evaluar suscripción a `CursoContenidoArchivo`
+// + `TareaArchivo` con refetch granular. Ver brief 091 §E.
 @Injectable({ providedIn: 'root' })
 export class EstudianteCursosFacade {
 	// #region Dependencias

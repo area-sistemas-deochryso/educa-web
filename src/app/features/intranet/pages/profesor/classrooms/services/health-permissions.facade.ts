@@ -4,7 +4,7 @@ import { forkJoin, Subject, EMPTY } from 'rxjs';
 import { switchMap, debounceTime, distinctUntilChanged, catchError, tap } from 'rxjs/operators';
 
 import { logger } from '@core/helpers';
-import { WalFacadeHelper } from '@core/services';
+import { WalFacadeHelper, WalCrossTabRefetchService } from '@core/services';
 import { environment } from '@config';
 import { HealthPermissionsApiService } from './health-permissions-api.service';
 import { HealthPermissionsStore } from './health-permissions.store';
@@ -17,6 +17,7 @@ export class HealthPermissionsFacade {
 	private store = inject(HealthPermissionsStore);
 	private destroyRef = inject(DestroyRef);
 	private wal = inject(WalFacadeHelper);
+	private crossTabRefetch = inject(WalCrossTabRefetchService);
 	private readonly apiUrl = `${environment.apiUrl}/api/permisos-salud`;
 	// #endregion
 
@@ -44,6 +45,20 @@ export class HealthPermissionsFacade {
 				takeUntilDestroyed(this.destroyRef),
 			)
 			.subscribe((result) => this.store.setFechasValidacion(result));
+
+		const reloadCurrent = () => {
+			if (this._salonId !== null) this.loadResumen(this._salonId);
+		};
+		this.crossTabRefetch.subscribe({
+			resourceType: 'permisos-salud-salida',
+			refetch: reloadCurrent,
+			destroyRef: this.destroyRef,
+		});
+		this.crossTabRefetch.subscribe({
+			resourceType: 'permisos-salud-justificacion',
+			refetch: reloadCurrent,
+			destroyRef: this.destroyRef,
+		});
 	}
 	// #endregion
 

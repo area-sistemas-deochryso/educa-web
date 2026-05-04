@@ -16,6 +16,8 @@ import { SalonMensajeriaStore } from './mensajeria.store';
 
 const FORO_PREFIX = 'Foro:';
 
+// WAL cross-tab refetch: NO aplica. SignalR provee tiempo real cross-tab para mensajes;
+// el WAL solo cubre la queue offline. Ver brief 091 §E y rules/optimistic-ui.md.
 @Injectable({ providedIn: 'root' })
 export class SalonMensajeriaFacade {
 	// #region Dependencias

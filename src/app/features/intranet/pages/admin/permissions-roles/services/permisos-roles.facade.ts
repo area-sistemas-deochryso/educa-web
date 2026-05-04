@@ -10,6 +10,7 @@ import {
 	RolTipoAdmin,
 	ROLES_DISPONIBLES_ADMIN,
 	SwService,
+	WalCrossTabRefetchService,
 	WalFacadeHelper,
 } from '@core/services';
 import { environment } from '@config';
@@ -27,6 +28,7 @@ export class PermissionsRolesFacade {
 	private wal = inject(WalFacadeHelper);
 	private swService = inject(SwService);
 	private errorHandler = inject(ErrorHandlerService);
+	private crossTabRefetch = inject(WalCrossTabRefetchService);
 	private destroyRef = inject(DestroyRef);
 	readonly uiMapping = inject(UiMappingService);
 	private readonly apiUrl = `${environment.apiUrl}/api/sistema/permisos`;
@@ -35,6 +37,14 @@ export class PermissionsRolesFacade {
 		errorHandler: this.errorHandler,
 	});
 	// #endregion
+
+	constructor() {
+		this.crossTabRefetch.subscribe({
+			resourceType: 'permisos-rol',
+			refetch: () => this.silentRefreshAfterCrud(),
+			destroyRef: this.destroyRef,
+		});
+	}
 
 	// #region Estado expuesto
 	readonly vm = this.store.vm;

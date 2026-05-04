@@ -3,6 +3,7 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { Subject, debounceTime, distinctUntilChanged } from 'rxjs';
 
 import { logger } from '@core/helpers';
+import { WalCrossTabRefetchService } from '@core/services';
 import {
 	EmailQuarantineFiltroEstado,
 	EmailQuarantineFiltros,
@@ -16,6 +17,7 @@ import { EmailQuarantineStore } from './email-quarantine.store';
 export class EmailQuarantineDataFacade {
 	private readonly api = inject(EmailQuarantineService);
 	private readonly store = inject(EmailQuarantineStore);
+	private readonly crossTabRefetch = inject(WalCrossTabRefetchService);
 	private readonly destroyRef = inject(DestroyRef);
 
 	// #region ViewModel
@@ -52,6 +54,12 @@ export class EmailQuarantineDataFacade {
 				this.store.setPage(1);
 				this.loadData();
 			});
+
+		this.crossTabRefetch.subscribe({
+			resourceType: 'email-quarantine',
+			refetch: () => this.loadData(),
+			destroyRef: this.destroyRef,
+		});
 	}
 	// #endregion
 

@@ -1,9 +1,10 @@
+/* eslint-disable max-lines -- Razón: facade de grupos cohesivo (CRUD + asignación + UI + cross-tab refetch). 301 líneas — 1 sobre el límite por wiring del helper cross-tab. */
 import { Injectable, inject, DestroyRef } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { switchMap } from 'rxjs/operators';
 import { of } from 'rxjs';
 import { facadeErrorHandler } from '@core/helpers';
-import { ErrorHandlerService, WalFacadeHelper } from '@core/services';
+import { ErrorHandlerService, WalFacadeHelper, WalCrossTabRefetchService } from '@core/services';
 import { environment } from '@config';
 import { ProfesorApiService } from '../../services/profesor-api.service';
 import { GruposStore } from './grupos.store';
@@ -22,6 +23,7 @@ export class GruposFacade {
 	private readonly store = inject(GruposStore);
 	private readonly errorHandler = inject(ErrorHandlerService);
 	private readonly wal = inject(WalFacadeHelper);
+	private readonly crossTabRefetch = inject(WalCrossTabRefetchService);
 	private readonly destroyRef = inject(DestroyRef);
 	private readonly grupoUrl = `${environment.apiUrl}/api/GrupoContenido`;
 	private readonly errHandler = facadeErrorHandler({
@@ -33,6 +35,10 @@ export class GruposFacade {
 	// #region Estado expuesto
 	readonly vm = this.store.vm;
 	// #endregion
+
+	constructor() {
+		this.crossTabRefetch.subscribe({ resourceType: 'GrupoContenido', refetch: () => this.refetchGrupos(), destroyRef: this.destroyRef });
+	}
 
 	// #region Comandos de carga
 

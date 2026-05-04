@@ -12,6 +12,7 @@ import {
 	ReporteUsuarioListaDto,
 } from '@core/services/feedback';
 import { WalFacadeHelper } from '@core/services/wal/wal-facade-helper.service';
+import { WalCrossTabRefetchService } from '@core/services/wal/wal-cross-tab-refetch.service';
 
 import { FeedbackReportsStore } from './feedback-reports.store';
 
@@ -29,10 +30,19 @@ export class FeedbackReportsFacade {
 	private readonly store = inject(FeedbackReportsStore);
 	private readonly wal = inject(WalFacadeHelper);
 	private readonly errorHandler = inject(ErrorHandlerService);
+	private readonly crossTabRefetch = inject(WalCrossTabRefetchService);
 	private readonly destroyRef = inject(DestroyRef);
 	private readonly apiUrl = `${environment.apiUrl}/api/sistema/reportes-usuario`;
 
 	readonly vm = this.store.vm;
+
+	constructor() {
+		this.crossTabRefetch.subscribe({
+			resourceType: 'reporte-usuario',
+			refetch: () => this.loadItems(),
+			destroyRef: this.destroyRef,
+		});
+	}
 
 	// #region Carga inicial
 	loadAll(): void {

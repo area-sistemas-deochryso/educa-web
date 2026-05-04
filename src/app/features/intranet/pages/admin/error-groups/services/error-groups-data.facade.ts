@@ -3,6 +3,7 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { Subject, debounceTime, distinctUntilChanged } from 'rxjs';
 
 import { logger } from '@core/helpers';
+import { WalCrossTabRefetchService } from '@core/services';
 
 import { ErrorGroupsService } from './error-groups.service';
 import { ErrorGroupsStore } from './error-groups.store';
@@ -12,6 +13,7 @@ export class ErrorGroupsDataFacade {
 	// #region Dependencias
 	private readonly api = inject(ErrorGroupsService);
 	private readonly store = inject(ErrorGroupsStore);
+	private readonly crossTabRefetch = inject(WalCrossTabRefetchService);
 	private readonly destroyRef = inject(DestroyRef);
 	// #endregion
 
@@ -30,6 +32,12 @@ export class ErrorGroupsDataFacade {
 				this.store.setPage(1);
 				this.loadData();
 			});
+
+		this.crossTabRefetch.subscribe({
+			resourceType: 'error-groups',
+			refetch: () => this.loadData(),
+			destroyRef: this.destroyRef,
+		});
 	}
 	// #endregion
 

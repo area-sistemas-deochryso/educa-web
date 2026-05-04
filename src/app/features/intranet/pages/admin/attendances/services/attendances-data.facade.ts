@@ -3,6 +3,7 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { HttpErrorResponse } from '@angular/common/http';
 
 import { logger } from '@core/helpers';
+import { WalCrossTabRefetchService } from '@core/services';
 import {
 	CrossChexSyncAceptadoDto,
 	CrossChexSyncStatusService,
@@ -22,12 +23,26 @@ export class AttendancesDataFacade {
 	private api = inject(AttendancesAdminService);
 	private store = inject(AttendancesAdminStore);
 	private syncService = inject(CrossChexSyncStatusService);
+	private crossTabRefetch = inject(WalCrossTabRefetchService);
 	private destroyRef = inject(DestroyRef);
 	// #endregion
 
 	// #region Estado expuesto
 	readonly vm = this.store.vm;
 	// #endregion
+
+	constructor() {
+		this.crossTabRefetch.subscribe({
+			resourceType: 'asistencia-admin',
+			refetch: () => this.refreshItemsOnly(),
+			destroyRef: this.destroyRef,
+		});
+		this.crossTabRefetch.subscribe({
+			resourceType: 'cierre-asistencia',
+			refetch: () => this.loadCierres(),
+			destroyRef: this.destroyRef,
+		});
+	}
 
 	// #region Carga de datos
 

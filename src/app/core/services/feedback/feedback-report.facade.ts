@@ -22,6 +22,9 @@ import { FeedbackReportStore } from './feedback-report.store';
  * retries y reloads. El doble-click rápido se bloquea con el guard
  * `store.submitting()`.
  */
+// WAL cross-tab refetch: NO aplica. Dialog ephemeral (botón flotante de reporte).
+// La página admin que sí lista reportes (FeedbackReportsFacade) ya está suscripta
+// a `reporte-usuario`. Ver brief 091 §E.
 @Injectable({ providedIn: 'root' })
 export class FeedbackReportFacade {
 	private readonly service = inject(FeedbackReportService);

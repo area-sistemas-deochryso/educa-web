@@ -8,6 +8,7 @@ import {
 	RolTipoAdmin,
 	ErrorHandlerService,
 	SwService,
+	WalCrossTabRefetchService,
 } from '@core/services';
 import { UI_ADMIN_ERROR_DETAILS, UI_SUMMARIES } from '@app/shared/constants';
 import { UiMappingService } from '@shared/services';
@@ -21,12 +22,21 @@ export class PermissionsUsersDataFacade {
 	private helperService = inject(PermissionsUsersHelperService);
 	private errorHandler = inject(ErrorHandlerService);
 	private swService = inject(SwService);
+	private crossTabRefetch = inject(WalCrossTabRefetchService);
 	private destroyRef = inject(DestroyRef);
 	readonly uiMapping = inject(UiMappingService);
 	private readonly errHandler = facadeErrorHandler({
 		tag: 'PermisosUsuariosDataFacade',
 		errorHandler: this.errorHandler,
 	});
+
+	constructor() {
+		this.crossTabRefetch.subscribe({
+			resourceType: 'PermisoUsuario',
+			refetch: () => this.loadData(),
+			destroyRef: this.destroyRef,
+		});
+	}
 
 	// #region Estado expuesto
 	readonly vm = this.store.vm;

@@ -3,7 +3,7 @@ import { Injectable, inject, DestroyRef } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { forkJoin } from 'rxjs';
 import { withRetry, facadeErrorHandler } from '@core/helpers';
-import { ErrorHandlerService, WalFacadeHelper } from '@core/services';
+import { ErrorHandlerService, WalFacadeHelper, WalCrossTabRefetchService } from '@core/services';
 import { environment } from '@config';
 import { ProfesorApiService } from '../../services/profesor-api.service';
 import { CursoContenidoStore } from './curso-contenido.store';
@@ -28,6 +28,7 @@ export class CalificacionesFacade {
 	private readonly contenidoStore = inject(CursoContenidoStore);
 	private readonly errorHandler = inject(ErrorHandlerService);
 	private readonly wal = inject(WalFacadeHelper);
+	private readonly crossTabRefetch = inject(WalCrossTabRefetchService);
 	private readonly destroyRef = inject(DestroyRef);
 	private readonly calificacionUrl = `${environment.apiUrl}/api/Calificacion`;
 	private readonly errHandler = facadeErrorHandler({
@@ -36,6 +37,17 @@ export class CalificacionesFacade {
 	});
 	private readonly grupoUrl = `${environment.apiUrl}/api/GrupoContenido`;
 	// #endregion
+
+	constructor() {
+		this.crossTabRefetch.subscribe({
+			resourceType: 'Calificacion',
+			refetch: () => {
+				const id = this.contenidoStore.contenido()?.id;
+				if (id != null) this.refreshCalificaciones(id);
+			},
+			destroyRef: this.destroyRef,
+		});
+	}
 
 	// #region Estado expuesto
 	readonly vm = this.store.vm;

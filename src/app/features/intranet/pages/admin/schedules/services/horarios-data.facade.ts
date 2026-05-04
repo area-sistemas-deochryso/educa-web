@@ -1,9 +1,10 @@
+/* eslint-disable max-lines -- Razón: data facade de horarios cohesivo (carga + filtros + paginación + cross-tab refetch). 302 líneas — 2 sobre el límite por wiring del helper cross-tab. */
 import { DestroyRef, inject, Injectable } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { forkJoin } from 'rxjs';
 
 import { logger, withRetry } from '@core/helpers';
-import { ErrorHandlerService, SwService } from '@core/services';
+import { ErrorHandlerService, SwService, WalCrossTabRefetchService } from '@core/services';
 import {
   UI_ADMIN_ERROR_DETAILS,
   UI_SUMMARIES,
@@ -30,12 +31,18 @@ export class SchedulesDataFacade {
   private store = inject(SchedulesStore);
   private swService = inject(SwService);
   private errorHandler = inject(ErrorHandlerService);
+  private crossTabRefetch = inject(WalCrossTabRefetchService);
   private destroyRef = inject(DestroyRef);
 
   // #region Exponer estado del store
   readonly vm = this.store.vm;
 
   // #endregion
+
+  constructor() {
+    this.crossTabRefetch.subscribe({ resourceType: 'horarios', refetch: () => this.silentRefreshAfterCrud(), destroyRef: this.destroyRef });
+  }
+
   // #region Comandos de carga
 
   /**

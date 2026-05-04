@@ -1,7 +1,7 @@
 import { Injectable, inject, DestroyRef } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { logger, withRetry, facadeErrorHandler } from '@core/helpers';
-import { ErrorHandlerService, WalFacadeHelper } from '@core/services';
+import { ErrorHandlerService, WalFacadeHelper, WalCrossTabRefetchService } from '@core/services';
 import { UI_SUMMARIES, UI_ADMIN_ERROR_DETAILS } from '@shared/constants';
 import { environment } from '@config';
 import { ProfesorApiService } from '../../services/profesor-api.service';
@@ -22,6 +22,7 @@ export class CursoContenidoDataFacade {
 	private readonly store = inject(CursoContenidoStore);
 	private readonly errorHandler = inject(ErrorHandlerService);
 	private readonly wal = inject(WalFacadeHelper);
+	private readonly crossTabRefetch = inject(WalCrossTabRefetchService);
 	private readonly destroyRef = inject(DestroyRef);
 	private readonly contenidoUrl = `${environment.apiUrl}/api/CursoContenido`;
 	private readonly errHandler = facadeErrorHandler({
@@ -33,6 +34,24 @@ export class CursoContenidoDataFacade {
 	// #region Estado expuesto
 	readonly vm = this.store.vm;
 	// #endregion
+
+	constructor() {
+		// Cubrir todas las mutaciones del subsistema curso-contenido (data + crud hermano).
+		const refetch = () => this.refreshContenido();
+		for (const resourceType of [
+			'CursoContenido',
+			'CursoContenidoSemana',
+			'CursoContenidoTarea',
+			'CursoContenidoArchivo',
+			'TareaArchivo',
+		]) {
+			this.crossTabRefetch.subscribe({
+				resourceType,
+				refetch,
+				destroyRef: this.destroyRef,
+			});
+		}
+	}
 
 	// #region Comandos de carga
 
