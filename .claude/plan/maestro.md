@@ -1516,9 +1516,9 @@ Ver [history/planes-cerrados.md](../history/planes-cerrados.md#plan-11).
 
 ## Deuda estructural diferida (chat dedicado)
 
-- [ ] **DS1 — Split estructural de `wal-sync-engine.service.ts`** — ver `tasks/wal-sync-engine-split.md` (pendiente crear)
-  - **Origen**: F3.5.B (2026-04-15). Archivo en 303 líneas efectivas (límite 300). Fix temporal con `eslint-disable max-lines` justificado en el encabezado del archivo. No es quick-win: requiere entender el loop del engine + tests mínimos previos + extracción cohesiva (candidato principal: Error Handling como helper puro).
-  - **Por qué diferido**: preexistente al F3.5.B, no bloquea ninguna tarea activa, y el escape hatch honesto es preferible a un refactor cosmético que colapse comentarios para pasar el umbral sin resolver el fondo.
+- [x] **DS1 — Split estructural de `wal-sync-engine.service.ts`** ✅ cerrado 2026-05-04 (brief `closed/085-wal-sync-engine-split.md`)
+  - **Origen**: F3.5.B (2026-04-15). Archivo en 303 líneas efectivas (límite 300). Fix temporal con `eslint-disable max-lines` justificado en el encabezado del archivo.
+  - **Cierre**: extraído `WalSyncRecovery` (boot-time recovery service stateless con `run(): WalRecoveryResult`) + agregado `classifyWalError()` puro a `wal-error.utils.ts` (discriminated union `'conflict' | 'permanent' | 'retryable'`). Engine pasó de 303 → **274 líneas efectivas** (margen 26 al cap, sin escape hatch). Hallazgo durante diagnóstico que pisó la propuesta inicial: `wal-error.utils.ts` ya extraía las funciones puras de clasificación; lo que vivía en `handleError` era orquestación de efectos, no clasificación — por eso la extracción final fue Recovery (no Error Handling). +14 specs nuevos (8 classifier + 6 recovery) → **1798/1798 verdes** (baseline 1784).
 
 ---
 

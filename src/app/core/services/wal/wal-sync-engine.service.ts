@@ -1,4 +1,3 @@
-/* eslint-disable max-lines -- Razón: WalSyncEngine es el loop central de procesamiento del WAL. Las 8 regiones (dependencies, state, lifecycle, callback registration, processing, error handling, recovery, cross-tab coordination) son cohesivas y comparten estado privado (queue, inFlight, leader election). Separarlas crearía coupling cruzado sin ganancia. Split estructural planeado en .claude/tasks/wal-sync-engine-split.md cuando haya bandwidth — requiere chat dedicado. */
 import { Injectable, inject, DestroyRef } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { HttpClient } from '@angular/common/http';
@@ -20,11 +19,8 @@ import { WalLeaderService } from './wal-leader.service';
 import { WalMetricsService } from './wal-metrics.service';
 import { WalCacheInvalidator } from './wal-cache-invalidator.service';
 import { WalCoalescer } from './wal-coalescer.service';
-import {
-	isConflictError,
-	isPermanentError,
-	extractErrorMessage,
-} from './wal-error.utils';
+import { WalSyncRecovery } from './wal-sync-recovery.service';
+import { classifyWalError } from './wal-error.utils';
 import {
 	WalEntry,
 	WalProcessResult,
@@ -45,6 +41,7 @@ export class WalSyncEngine {
 	private walMetrics = inject(WalMetricsService);
 	private cacheInvalidator = inject(WalCacheInvalidator);
 	private coalescer = inject(WalCoalescer);
+	private recovery = inject(WalSyncRecovery);
 	private destroyRef = inject(DestroyRef);
 
 	// #endregion
@@ -104,7 +101,17 @@ export class WalSyncEngine {
 			});
 
 		// Phase 1: Recover stale entries and cleanup
-		await this.initRecovery();
+		const { migrationEntries } = await this.recovery.run();
+		for (const entry of migrationEntries) {
+			this._entryProcessed$.next({
+				status: 'REQUIRES_MIGRATION',
+				entryId: entry.id,
+				fromVersion: entry.schemaVersion ?? 0,
+			});
+		}
+		if (this.sw.isOnline) {
+			await this.processAllPending();
+		}
 
 		// Phase 2: Start listeners (only after recovery completes)
 		this.startListeners();
@@ -330,32 +337,28 @@ export class WalSyncEngine {
 			rollback?: () => void;
 		},
 	): Promise<WalProcessResult> {
+		const classified = classifyWalError(error);
+
 		// 409 Conflict → mark conflict, no retry
-		if (isConflictError(error)) {
+		if (classified.kind === 'conflict') {
 			await this.wal.markConflict(entry.id);
 			this.callbacks.delete(entry.id);
-
-			const result: WalProcessResult = {
-				status: 'CONFLICT',
-				entryId: entry.id,
-			};
+			const result: WalProcessResult = { status: 'CONFLICT', entryId: entry.id };
 			this._entryProcessed$.next(result);
 			return result;
 		}
 
 		// Permanent error (4xx except 409) → mark failed, rollback
-		if (isPermanentError(error)) {
-			const errorMsg = extractErrorMessage(error);
-			await this.wal.markFailed(entry.id, errorMsg);
+		if (classified.kind === 'permanent') {
+			await this.wal.markFailed(entry.id, classified.message);
 			await this.cacheInvalidator.invalidateForEntry(entry);
 			cb?.rollback?.();
 			cb?.onError(error);
 			this.callbacks.delete(entry.id);
-
 			const result: WalProcessResult = {
 				status: 'FAILED',
 				entryId: entry.id,
-				error: errorMsg,
+				error: classified.message,
 			};
 			this._entryProcessed$.next(result);
 			return result;
@@ -388,58 +391,6 @@ export class WalSyncEngine {
 		};
 		this._entryProcessed$.next(result);
 		return result;
-	}
-
-	// #endregion
-
-	// #region Recovery
-
-	/**
-	 * Resource types that should never have WAL entries (migrated to server-confirmed).
-	 * Purged on startup to prevent stuck retry loops from past sessions.
-	 */
-	private static readonly RESOURCE_TYPES_TO_PURGE = ['reporte-usuario'];
-
-	private async initRecovery(): Promise<void> {
-		try {
-			// Phase 0: Purge entries for resource types that migrated to server-confirmed.
-			// These should never retry — they were created before the facade change.
-			for (const rt of WalSyncEngine.RESOURCE_TYPES_TO_PURGE) {
-				await this.wal.purgeByResourceType(rt);
-			}
-
-			const [recovered, cleaned, migrationNeeded] = await Promise.all([
-				this.wal.recoverInFlight(),
-				this.wal.cleanup(),
-				this.wal.checkSchemaMigrations(),
-			]);
-
-			if (recovered > 0 || cleaned > 0 || migrationNeeded > 0) {
-				logger.log(
-					`[WAL-Sync] Recovery: ${recovered} in-flight recovered, ${cleaned} old committed cleaned, ${migrationNeeded} need migration`,
-				);
-			}
-
-			// Emit migration results so UI can show them
-			if (migrationNeeded > 0) {
-				const migrationEntries = await this.wal.getMigrationEntries();
-				for (const entry of migrationEntries) {
-					const result: WalProcessResult = {
-						status: 'REQUIRES_MIGRATION',
-						entryId: entry.id,
-						fromVersion: entry.schemaVersion ?? 0,
-					};
-					this._entryProcessed$.next(result);
-				}
-			}
-
-			// Process any pending entries after recovery
-			if (this.sw.isOnline) {
-				await this.processAllPending();
-			}
-		} catch (e) {
-			logger.error('[WAL-Sync] Recovery error:', e);
-		}
 	}
 
 	// #endregion

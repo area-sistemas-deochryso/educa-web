@@ -41,3 +41,24 @@ export function extractErrorMessage(error: unknown): string {
 	if (error instanceof Error) return error.message;
 	return String(error);
 }
+
+/**
+ * Classification of a WAL processing error.
+ * Drives the dispatch in the engine's error orchestration step.
+ */
+export type WalErrorClassification =
+	| { kind: 'conflict' }
+	| { kind: 'permanent'; message: string }
+	| { kind: 'retryable' };
+
+/**
+ * Pure classifier: maps an arbitrary error to one of the three WAL outcomes.
+ * Side-effect free — the engine applies effects according to the result.
+ */
+export function classifyWalError(error: unknown): WalErrorClassification {
+	if (isConflictError(error)) return { kind: 'conflict' };
+	if (isPermanentError(error)) {
+		return { kind: 'permanent', message: extractErrorMessage(error) };
+	}
+	return { kind: 'retryable' };
+}
