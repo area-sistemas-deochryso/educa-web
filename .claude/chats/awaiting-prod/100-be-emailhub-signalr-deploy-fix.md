@@ -75,3 +75,39 @@ grep -rn "email-alerts\|EmailHub" educa-web/src/app/core/services/
 - Brief original: `awaiting-prod/078-plan-39-chat-b-be-emailhub-signalr-push.md` (mantener en awaiting-prod hasta resolver el fix).
 - INV-MAIL04 (`rules/business-rules.md` §15.14): "push SignalR vía EmailHub cuando el contador o el handler 4.2.2 disparan".
 - Patrón de hubs: `Hubs/ChatHub.cs`, `Hubs/AsistenciaHub.cs` como referencias de wiring correcto.
+
+---
+
+## Resolución (2026-05-05, cerrado local)
+
+**Causa raíz**: `EmailHub` (Plan 39 Chat B 078) se mapeó en `PipelineExtensions.cs:141` sin agregar `/hubs/email-alerts` a las **5 listas paralelas** que ya cubrían `/chathub` + `/asistenciahub`. Cada omisión genera un síntoma distinto en una capa distinta — bug en cascada, no un único punto.
+
+**Cascada de bugs encontrados** (todos del mismo patrón omisión-de-paridad):
+
+| Capa | Archivo | Síntoma observable | Fix |
+| --- | --- | --- | --- |
+| 1. CSRF middleware (BE) | `Educa.API/Middleware/CsrfValidationMiddleware.cs:35` | POST negotiate con cookie auth → **403 "CSRF token requerido"** (probe PowerShell 2026-05-05) | `+ "/hubs/email-alerts"` en `ExcludedPaths` |
+| 2. JWT query fallback (BE) | `Educa.API/Extensions/AuthenticationExtensions.cs:59-60` | WebSocket sin cookie (mobile/Capacitor) → 401 al hub | `+ path.StartsWithSegments("/hubs/email-alerts")` en el fallback `?access_token=` |
+| 3. Proxy dev local (FE) | `proxy.conf.json` | FE en localhost:4201 no podía testear el fix BE — proxy no ruteaba `/hubs/*` a localhost:7102 | `+ "/hubs"` proxy con `ws: true` |
+| 4. Netlify SPA fallback (FE) | `src/_redirects:6` | En prod, `/hubs/email-alerts/negotiate` caía al SPA fallback `/loader.html` → cliente SignalR ve HTML como **404** (síntoma original que reportó Cowork EM-9) | `+ /hubs/* → educa1.azurewebsites.net/hubs/:splat` |
+| 5. Netlify build redirects (FE) | `netlify.toml:78` | Misma causa que (4), capa de `force = true` | `+ /hubs/* redirect` con `force = true` |
+
+**Capas 4 y 5 explican el "404" original de Cowork**: la request en prod ni siquiera llegaba al backend. Capa 1 (el 403 del probe PowerShell) era un bug distinto que solo se vio cuando el probe pegó directo a Azure saltándose Netlify. Sin las 5 capas alineadas, la app vivía en alguno de esos dos errores según ruta.
+
+**Validación local**: `dotnet build` 0 errores · 1616/1616 tests BE verdes (sin regresión). FE no requiere cambios en el código del cliente — `EmailHubService` ya estaba correcto, el problema era 100% routing/middleware.
+
+**Pendiente post-deploy** (`/verify 100`):
+1. DevTools en `/intranet/admin/monitoreo/correos/dashboard` (tab "Mapa de envío"): `POST /hubs/email-alerts/negotiate` debe retornar **200** con `connectionToken`.
+2. Console: log `[EmailHub:Service] connected`.
+3. `EmailMonitoreoFacade` debe llamar `stopDeferFailPolling()` (signal de que el push está activo y el polling fallback de 60s se desactivó).
+4. Si el contador defer/fail dispara WARNING/CRITICAL durante el smoke, el banner B9 debe actualizarse instantáneamente (no esperar 60s).
+
+**Aprendizaje transferible**: cuando se agrega un hub SignalR con un path nuevo, hay **5 listas paralelas** que necesitan la entrada. Documentado como receta en este brief — la próxima vez que se agregue un hub, replicar ChatHub/AsistenciaHub en las 5 capas, no solo en `MapHub<>()`.
+
+**Scope creep descubierto al validar localmente** (Cowork 2026-05-05, NO parte de este brief):
+- Sub-tab Cuarentena: FE pide `/api/sistema/email-outbox/quarantine`, BE expone `/api/sistema/email-quarantine` → 404.
+- Sub-tab Dominios pausados: misma desalineación de prefix.
+- Sub-tab Eventos defer: FE pide `/api/sistema/email-outbox/defer-events`, **BE no tiene controller** → 404.
+
+→ Reformular brief `099-fe-email-quarantine-tab-not-mounted-fix.md` con estos 3 findings reales en el siguiente chat (la hipótesis original "tab no monta" era imprecisa — las tabs sí montan, fallan las requests HTTP).
+

@@ -4,4 +4,5 @@
 /chathub/*          https://educa1.azurewebsites.net/chathub/:splat            200
 /asistenciahub      https://educa1.azurewebsites.net/asistenciahub             200
 /asistenciahub/*    https://educa1.azurewebsites.net/asistenciahub/:splat      200
+/hubs/*             https://educa1.azurewebsites.net/hubs/:splat               200
 /*                  /loader.html                                                200

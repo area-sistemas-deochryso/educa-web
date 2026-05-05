@@ -76,6 +76,13 @@
   status = 200
   force = true
 
+# Plan 39 Chat B (brief 078) — EmailHub admin (alertas SMTP).
+[[redirects]]
+  from = "/hubs/*"
+  to = "https://educa1.azurewebsites.net/hubs/:splat"
+  status = 200
+  force = true
+
 # Redirección SPA - fallback para rutas de Angular
 [[redirects]]
   from = "/*"
