@@ -5,11 +5,29 @@
 El proyecto tiene un **rateLimitInterceptor** en `@core/interceptors/rate-limit/` que:
 
 - Limita requests concurrentes a la API (`MAX_CONCURRENT = 10`)
-- Encola requests excedentes (hasta `MAX_QUEUE_SIZE = 30`)
-- En 429: espera 2s y reintenta una vez
-- Rechaza inmediatamente si la cola esta llena
+- Encola requests excedentes hasta que se libere un slot
+- **NO** sintetiza 429s ni activa cooldowns globales
+- Propaga 429/503 del BE tal cual al caller (cada feature decide cómo mostrarlo)
 
 **No requiere configuracion por feature** — se aplica automaticamente a todas las requests `/api/*`.
+
+---
+
+## Semántica 429 vs 503 (BE Plan 40)
+
+El backend distingue dos tipos de rechazo. El FE debe tratarlos diferente:
+
+| Status | Origen | `Retry-After` | Significado | Manejo recomendado |
+|--------|--------|---------------|-------------|--------------------|
+| **429** Too Many Requests | Capa 1: rate limiter por ventana (FixedWindow) | Ventana restante (≤ 60s) | El usuario/IP excedió su cuota por minuto. Es abuso o bug. | Mostrar mensaje claro al usuario. NO reintentar automáticamente — escala el problema. |
+| **503** Service Unavailable | Capa 2/3: bulkhead de concurrencia | Dinámico = `max(1, ceil(p95 × 1.5))` (típico 1-5s) | El servidor está saturado momentáneamente. NO es abuso del cliente. | Reintentar UNA vez tras `Retry-After`. NO escalar a cooldown global. |
+
+**Body de ambos**:
+```json
+{ "mensaje": "...", "retryAfterSeconds": 3, "policy": "concurrency:reports" }
+```
+
+El header `Retry-After` y `Access-Control-Expose-Headers: Retry-After` son confiables y se exponen vía CORS.
 
 ---
 
@@ -53,7 +71,9 @@ loadMisArchivos(semanaId: number): void {
 
 El helper `withRetry` esta configurado para **no reintentar 429** (Too Many Requests). Reintentar empeora el rate limiting.
 
-Solo reintenta: timeouts de red, 5xx del servidor, 408 Request Timeout.
+Reintenta con backoff exponencial: timeouts de red, 408, 500 (1 vez con delay extendido), 502/503/504 (transient infra).
+
+> **Pendiente** (sub-task de Plan 40 F4): refinar `withRetry` para respetar el header `Retry-After` cuando el BE devuelve 503 con valor dinámico, en lugar del backoff fijo. Mientras tanto el backoff del helper (5s, 10s, 20s) suele ser ≥ al `Retry-After` real (1-5s típico), así que sobrecubre.
 
 ---
 
@@ -69,4 +89,6 @@ PREVENCION
 GLOBAL
 [ ] rateLimitInterceptor esta en app.config.ts?
 [ ] withRetry NO reintenta 429?
+[ ] Errores 429 se muestran al usuario sin reintento automatico?
+[ ] Errores 503 se reintentan UNA vez (sin cooldown global)?
 ```
