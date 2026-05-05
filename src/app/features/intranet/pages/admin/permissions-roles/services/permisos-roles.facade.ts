@@ -41,7 +41,7 @@ export class PermissionsRolesFacade {
 	constructor() {
 		this.crossTabRefetch.subscribe({
 			resourceType: 'permisos-rol',
-			refetch: () => this.silentRefreshAfterCrud(),
+			refetchItems: () => this.silentRefreshAfterCrud(),
 			destroyRef: this.destroyRef,
 		});
 	}

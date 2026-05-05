@@ -56,7 +56,7 @@ export class BlacklistDataFacade {
 
 		this.crossTabRefetch.subscribe({
 			resourceType: 'email-blacklist',
-			refetch: () => this.loadData(),
+			refetchItems: () => this.loadData(),
 			destroyRef: this.destroyRef,
 		});
 	}

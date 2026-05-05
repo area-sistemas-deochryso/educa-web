@@ -35,7 +35,7 @@ export class NotificacionesAdminFacade {
 	// #endregion
 
 	constructor() {
-		this.crossTabRefetch.subscribe({ resourceType: RESOURCE, refetch: () => this.refreshItemsOnly(), destroyRef: this.destroyRef });
+		this.crossTabRefetch.subscribe({ resourceType: RESOURCE, refetchItems: () => this.refreshItemsOnly(), destroyRef: this.destroyRef });
 	}
 
 	// #region Comandos CRUD

@@ -57,7 +57,7 @@ export class EmailQuarantineDataFacade {
 
 		this.crossTabRefetch.subscribe({
 			resourceType: 'email-quarantine',
-			refetch: () => this.loadData(),
+			refetchItems: () => this.loadData(),
 			destroyRef: this.destroyRef,
 		});
 	}

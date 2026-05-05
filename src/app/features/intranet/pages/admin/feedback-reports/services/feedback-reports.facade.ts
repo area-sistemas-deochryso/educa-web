@@ -39,7 +39,8 @@ export class FeedbackReportsFacade {
 	constructor() {
 		this.crossTabRefetch.subscribe({
 			resourceType: 'reporte-usuario',
-			refetch: () => this.loadItems(),
+			refetchItems: () => this.loadItems(),
+			refetchStats: () => this.loadEstadisticas(),
 			destroyRef: this.destroyRef,
 		});
 	}

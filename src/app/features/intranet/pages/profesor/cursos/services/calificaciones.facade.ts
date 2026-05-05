@@ -41,7 +41,7 @@ export class CalificacionesFacade {
 	constructor() {
 		this.crossTabRefetch.subscribe({
 			resourceType: 'Calificacion',
-			refetch: () => {
+			refetchItems: () => {
 				const id = this.contenidoStore.contenido()?.id;
 				if (id != null) this.refreshCalificaciones(id);
 			},

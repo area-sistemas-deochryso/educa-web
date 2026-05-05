@@ -110,7 +110,9 @@ educa-web
 - **DELETE en `/api/sistema/cursos/{id}/eliminar` es soft delete**: BE devuelve 200 pero la fila persiste con `CUR_Estado=false`. NO es bug — la baja lógica preserva historial. Para limpieza física del entorno de pruebas, hay que pedir SQL directo al usuario.
 - **`commitAndClean` borra la entry WAL inmediatamente al commit**: NO espera `COMMITTED_TTL_MS` (24h). Si pruebas un caso happy y el IDB queda en 0 entries, es lo esperado, no que falló persistir.
 - **Las entries WAL `FAILED` quedan persistidas hasta que algo las limpie**: si haces un caso 4 (permanent error), la entry FAILED queda en IDB y aparece en `WalStatusFacade` como warning. Limpiar manualmente con `clear()` antes de seguir con otros casos.
-- **`invalidateForCrossTab` solo invalida SW cache, NO refetcha el store del componente**: el follower no actualiza UI hasta el siguiente GET manual. By-design del `cursos.facade` actual.
+- **Cross-tab refetch tras commit del leader** (resuelto en chat 098, 2026-05-05): el follower SÍ refresca UI automáticamente vía `WalCrossTabRefetchService` con callbacks `refetchItems` (obligatorio) + `refetchStats` (opcional). Si ves un counter stale en otra tab tras CRUD, verificá en `core/services/wal/wal-cross-tab-refetch.service.ts` que el feature pase `refetchStats` cuando tiene endpoint de estadísticas. Ver `rules/optimistic-ui.md` § "Asimetría items vs stats".
+- **SW agresivo con bundle stale en dev** (chat 098): después de `npm run start`, si tus logs nuevos no aparecen en consola y el código nuevo no corre, lo más probable es que el SW está sirviendo chunks viejos. Workaround: F12 → Application → Service Workers → Unregister TODOS + Clear site data + tab nuevo. Ver `rules/service-worker.md` § "SW activo en dev — bundle stale al iterar código".
+- **`logger.log` y `logger.warn` no emiten en `ng serve`** (Angular 21 + esbuild): `isDevMode()` retorna `false` porque `ngDevMode` no se setea como global. Para debugging puntual usar `console.log` directo con tag prefijado y comentario `// TEMP debug <NNN>`. Ver `rules/debug.md` § "Quirk: Angular 21 + esbuild".
 
 ### 6.5 MCPs útiles para este stack
 

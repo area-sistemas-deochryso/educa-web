@@ -134,6 +134,43 @@ Sin reconciliación, el usuario guarda algo, recarga, y ve el estado viejo porqu
 
 ---
 
+## 7.1 Reconciliación cross-tab (multi-tab + leader election)
+
+Cuando hay múltiples pestañas abiertas, **solo el tab leader** procesa el log. Las pestañas follower observan el mismo dataset pero no ejecutan operaciones — necesitan saber cuándo el leader commitea para refrescar su UI.
+
+### Reglas
+
+- Leader election por `BroadcastChannel` con heartbeat. Solo un tab procesa el log; los otros esperan.
+- Tras commit exitoso, el leader broadcastea `ENTRY_COMMITTED { entryId, resourceType }` por el canal compartido.
+- El follower recibe el broadcast, filtra por su `resourceType` de interés, y dispara su refetch local.
+- **El broadcast no echa al sender**: el leader no recibe su propio mensaje. El leader actualiza SU UI vía el callback local del WAL (`onCommit`), no por el canal cross-tab.
+
+### Asimetría de refetch — items y estadísticas separados
+
+> **El callback registrado en el canal cross-tab debe cubrir TODO lo que el feature presenta al usuario, no solo la lista. Si el feature tiene endpoint de estadísticas separado del listado, el follower necesita refrescar AMBOS.**
+
+#### Razón de la asimetría
+
+El leader (tab donde el usuario muta) tiene el callback `onCommit` del WAL que típicamente refresca items + stats por separado. El follower solo ejecuta el callback del canal cross-tab — si ese callback omite stats, el contador queda stale aunque la lista se actualice.
+
+Esta asimetría es invisible al programador si el contrato del canal acepta un callback genérico `refetch`. La solución arquitectónica es **separar los dos refrescos en el contrato del canal**:
+
+- `refetchItems` (obligatorio) — refresca la lista visible.
+- `refetchStats` (opcional) — refresca contadores/estadísticas. Solo aplica si el feature tiene un endpoint dedicado.
+
+Cualquier feature que no expone stats agregadas omite el segundo. Cualquier feature que sí expone stats está obligado por el typing a pasar ambos — el compilador convierte la asimetría en error explícito.
+
+### Casos donde no aplica
+
+- Features con tiempo real propio (chat con SignalR): el canal cross-tab del WAL es redundante; el SignalR ya cubre la sincronización.
+- Lecturas puramente bajo demanda (modales efímeros, archivos lazy): no hay listado persistente que mantener consistente.
+
+### Por qué importa
+
+Sin reconciliación cross-tab, el usuario que tenga 2 pestañas abiertas del mismo feature ve inconsistencias hasta que recargue manualmente. Con reconciliación parcial (solo items, sin stats), ve la lista correcta pero contadores mintiendo. Esa media-implementación es **peor** que no tener cross-tab refetch — porque se ve "casi funcionando" y el bug pasa desapercibido en code review.
+
+---
+
 ## 8. Fallback graceful
 
 Si el storage local no está disponible (QuotaExceeded, modo privado del browser, bug del engine), la mutación no debe fallar.

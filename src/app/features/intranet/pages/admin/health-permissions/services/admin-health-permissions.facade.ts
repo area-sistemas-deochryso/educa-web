@@ -54,12 +54,12 @@ export class AdminHealthPermissionsFacade {
 		};
 		this.crossTabRefetch.subscribe({
 			resourceType: 'permisos-salud-salida',
-			refetch: reloadCurrent,
+			refetchItems: reloadCurrent,
 			destroyRef: this.destroyRef,
 		});
 		this.crossTabRefetch.subscribe({
 			resourceType: 'permisos-salud-justificacion',
-			refetch: reloadCurrent,
+			refetchItems: reloadCurrent,
 			destroyRef: this.destroyRef,
 		});
 	}

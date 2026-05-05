@@ -89,6 +89,69 @@ const PARAMS_TO_STRIP = ['_', 't', 'timestamp', 'cacheBust', 'nocache', 'cb', 'v
 
 Los params se ordenan alfabéticamente para generar cache keys determinísticas. **No es necesario agregar params nuevos** — solo se eliminan los de cache-busting.
 
+## SW activo en dev — bundle stale al iterar código
+
+> **`SwService.registerServiceWorker()` registra el SW siempre que `location.pathname.startsWith('/intranet/')`, sin guard de modo desarrollo. Esto significa que `npm run start` (`ng serve --port=4201`) tiene el SW prod-style activo igual que prod, cacheando chunks JS agresivamente.**
+
+### Síntoma típico
+
+Tocás un archivo TS, esperás el hot-reload (`vite` muestra `connected`), refrescás el browser → **el código nuevo NO corre**. Logs nuevos no aparecen, breakpoints en líneas nuevas no disparan, comportamiento sigue como antes del cambio.
+
+Indicios:
+
+- `fetch()` directo del chunk (ej `chunk-XXXXX.js`) desde DevTools → tiene el código nuevo (porque `fetch()` directo bypasa el SW si la URL no está cacheada).
+- El runtime sigue ejecutando un chunk con un hash distinto, cacheado por el SW desde la sesión anterior.
+- En `Application → Service Workers` aparecen 1-2 SWs activos (scope `/` residuo de versión vieja + scope `/intranet/` actual).
+
+### Causa
+
+1. `public/sw.js` se sirve como asset estático por `ng serve` igual que en build de prod.
+2. `SwService.registerServiceWorker()` en `core/services/sw/sw.service.ts:67-69` registra el SW sin distinguir entorno.
+3. El SW cachea `/loader.html` (app shell) y los chunks JS. Al recargar, el SW devuelve el shell viejo que apunta a chunks viejos. Los chunks nuevos quedan en disco pero nadie los pide.
+4. Múltiples scopes residuales sobreviven porque el SW viejo nunca se desregistró cuando se cambió el scope.
+
+### Workaround para iterar código en dev
+
+En cada tab que tenga sesión activa:
+
+1. **F12 → Application → Service Workers** → para CADA worker activo (usualmente 2: scope `/` y scope `/intranet/`) clic **Unregister**.
+2. **F12 → Application → Storage** → botón **Clear site data** con todas las opciones marcadas (Cookies + Cache Storage + IndexedDB + Service Workers).
+3. Cerrar el tab. Reabrir con un tab limpio (no `Ctrl+R`, **abrir tab nuevo**).
+4. Volver a loguearse.
+
+Mientras estés iterando código, mantener marcadas:
+
+- ✅ **Bypass for network** en panel Service Workers — fuerza al browser a saltar el SW para cada request.
+- ✅ **Update on reload** — re-fetch del SW en cada reload (más lento pero detecta cambios).
+- ✅ **Disable cache** en panel Network — saltea el HTTP cache del browser.
+
+### Cuándo aparece este problema
+
+| Caso | Aparece |
+|---|---|
+| Primer load del día (SW recién registrado) | ❌ No, todo fresco |
+| Tras hot-reload de archivo TS | ✅ Sí — el SW sirve chunks viejos |
+| Tras cambio de schema BD / DTO breaking | ✅ Sí — el cache vieja deserializa mal |
+| Tras desplegar nuevo build a Netlify | ⚠️ Depende del `DB_VERSION` (ver sección anterior) |
+| Tras cambio en `public/sw.js` | ⚠️ El browser detecta cambio en el archivo SW pero requiere reload |
+
+### Por qué no se desactiva el SW en dev
+
+Decisión del proyecto (no documentada explícitamente): mantener el SW activo en dev para reproducir bugs de cache invalidation, SWR, offline. Si bloquea el debug puntual, **NO desregistrar permanentemente** — usar el workaround temporal.
+
+Si el costo de iterar con SW activo se vuelve alto, considerar agregar un guard en `SwService.registerServiceWorker()`:
+
+```typescript
+// Propuesta — NO aplicar sin discusión
+if (!location.pathname.startsWith('/intranet/')) return;
+if (location.hostname === 'localhost' && !environment.production) {
+  logger.log('[SwService] SW skip en dev local');
+  return;
+}
+```
+
+Tradeoff: bugs de cache solo aparecen en prod si se hace eso. Hoy aceptamos el costo de "limpiar SW al iterar" a cambio de no enmascarar bugs reales.
+
 ## Auto-refresh en componentes (solo para SWR inicial)
 
 El `CACHE_UPDATED` solo se emite en la primera visita (SWR). En navegación activa el componente ya recibe data fresca directamente del HTTP response.

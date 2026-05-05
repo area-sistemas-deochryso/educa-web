@@ -47,7 +47,7 @@ export class CursoContenidoDataFacade {
 		]) {
 			this.crossTabRefetch.subscribe({
 				resourceType,
-				refetch,
+				refetchItems: refetch,
 				destroyRef: this.destroyRef,
 			});
 		}

@@ -40,7 +40,7 @@ export class SchedulesDataFacade {
   // #endregion
 
   constructor() {
-    this.crossTabRefetch.subscribe({ resourceType: 'horarios', refetch: () => this.silentRefreshAfterCrud(), destroyRef: this.destroyRef });
+    this.crossTabRefetch.subscribe({ resourceType: 'horarios', refetchItems: () => this.silentRefreshAfterCrud(), destroyRef: this.destroyRef });
   }
 
   // #region Comandos de carga

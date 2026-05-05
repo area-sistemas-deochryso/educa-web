@@ -35,7 +35,7 @@ export class ErrorGroupsDataFacade {
 
 		this.crossTabRefetch.subscribe({
 			resourceType: 'error-groups',
-			refetch: () => this.loadData(),
+			refetchItems: () => this.loadData(),
 			destroyRef: this.destroyRef,
 		});
 	}

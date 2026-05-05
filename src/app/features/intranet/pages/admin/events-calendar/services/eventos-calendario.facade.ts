@@ -37,7 +37,7 @@ export class EventsCalendarFacade {
 	constructor() {
 		this.crossTabRefetch.subscribe({
 			resourceType: RESOURCE,
-			refetch: () => this.refreshItemsOnly(),
+			refetchItems: () => this.refreshItemsOnly(),
 			destroyRef: this.destroyRef,
 		});
 	}

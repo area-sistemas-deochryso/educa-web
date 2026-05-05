@@ -37,7 +37,7 @@ export class GruposFacade {
 	// #endregion
 
 	constructor() {
-		this.crossTabRefetch.subscribe({ resourceType: 'GrupoContenido', refetch: () => this.refetchGrupos(), destroyRef: this.destroyRef });
+		this.crossTabRefetch.subscribe({ resourceType: 'GrupoContenido', refetchItems: () => this.refetchGrupos(), destroyRef: this.destroyRef });
 	}
 
 	// #region Comandos de carga

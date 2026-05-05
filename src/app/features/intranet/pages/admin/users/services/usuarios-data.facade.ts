@@ -40,7 +40,8 @@ export class UsersDataFacade {
 		this.setupRefreshOnCrudCommit();
 		this.crossTabRefetch.subscribe({
 			resourceType: 'usuarios',
-			refetch: () => this.refreshUsuariosOnly(true),
+			refetchItems: () => this.refreshUsuariosOnly(true),
+			refetchStats: () => this.refreshEstadisticasOnly(),
 			destroyRef: this.destroyRef,
 		});
 	}
@@ -214,6 +215,26 @@ export class UsersDataFacade {
 				if (!silent) {
 					this.store.setLoading(false);
 				}
+			});
+	}
+
+	/**
+	 * Refresh solo el contador de estadísticas (para refetch cross-tab tras
+	 * commit del leader, que cambió count en otras pestañas).
+	 */
+	refreshEstadisticasOnly(): void {
+		this.usuariosService
+			.obtenerEstadisticas()
+			.pipe(
+				withRetry({ tag: 'UsuariosDataFacade:refreshEstadisticasOnly' }),
+				catchError((err) => {
+					logger.error('Error refrescando estadisticas:', err);
+					return of(null);
+				}),
+				takeUntilDestroyed(this.destroyRef),
+			)
+			.subscribe((stats) => {
+				if (stats) this.store.setEstadisticas(stats as UsuariosEstadisticas);
 			});
 	}
 

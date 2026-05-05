@@ -34,12 +34,13 @@ export class AttendancesDataFacade {
 	constructor() {
 		this.crossTabRefetch.subscribe({
 			resourceType: 'asistencia-admin',
-			refetch: () => this.refreshItemsOnly(),
+			refetchItems: () => this.refreshItemsOnly(),
+			refetchStats: () => this.loadEstadisticas(),
 			destroyRef: this.destroyRef,
 		});
 		this.crossTabRefetch.subscribe({
 			resourceType: 'cierre-asistencia',
-			refetch: () => this.loadCierres(),
+			refetchItems: () => this.loadCierres(),
 			destroyRef: this.destroyRef,
 		});
 	}

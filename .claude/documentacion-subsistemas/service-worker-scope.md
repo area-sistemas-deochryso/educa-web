@@ -64,6 +64,19 @@ Si location.pathname no está dentro del scope → no registrar
 
 Registrar un SW en una página fuera de su scope crea un registro "huérfano" que nunca controla nada. Gasta recursos del browser y confunde al debugging.
 
+### Decisión: SW activo también en desarrollo
+
+El registro **no** distingue entre `localhost` y producción. El mismo SW corre con `npm run start` (dev server) y con el bundle desplegado.
+
+**Tradeoff aceptado**:
+
+- ✅ Bugs de cache invalidation, SWR y comportamiento offline aparecen en dev y se cazan antes del deploy.
+- ❌ Iterar código en dev requiere desregistrar el SW + clear caches cuando el SW empieza a servir chunks JS viejos. El hot-reload del bundler no rompe la cache del SW.
+
+Si el costo de "limpiar SW al iterar" se vuelve insostenible, hay un escape hatch: agregar guard `localhost && !production → no registrar` en el registro. **No aplicar sin discusión** — saltearlo en dev hace que ciertos bugs solo aparezcan en producción.
+
+Ver `rules/service-worker.md` § "SW activo en dev" para el workaround operativo.
+
 ---
 
 ## 4. Ciclo de vida: installing → waiting → active

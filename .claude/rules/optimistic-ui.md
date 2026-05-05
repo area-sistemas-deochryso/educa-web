@@ -198,8 +198,9 @@ export class XxxFacade {
 
   constructor() {
     this.crossTabRefetch.subscribe({
-      resourceType: 'Xxx',                          // mismo string que pasa a wal.execute
-      refetch: () => this.silentRefreshAfterCrud(), // o el método de refetch del feature
+      resourceType: 'Xxx',                                  // mismo string que pasa a wal.execute
+      refetchItems: () => this.silentRefreshAfterCrud(),    // OBLIGATORIO — refresca la lista
+      refetchStats: () => this.refreshEstadisticas(),       // OPCIONAL — solo si el feature tiene endpoint de stats
       destroyRef: this.destroyRef,
     });
   }
@@ -210,6 +211,100 @@ El helper filtra por `resourceType` y cancela la subscripción al
 destruirse el `DestroyRef`. Aplica a single-facades, multi-facades
 (suscribir en el `*-data.facade.ts` que es dueño del listado) y
 features ad-hoc con su propio refetch.
+
+### Asimetría items vs stats — contrato endurecido tras chat 098
+
+> **`refetchItems` es obligatorio. `refetchStats` es opcional pero requerido si el feature tiene endpoint de estadísticas separado del listado.**
+
+#### Por qué
+
+El leader (tab donde el usuario muta) refresca SU UI vía `cb.onCommit` del WAL — y por convención del proyecto, ese callback dispara items + stats por separado:
+
+```typescript
+// walCreate en BaseCrudFacade
+onCommit: () => {
+  this.silentRefreshAfterCrud();   // refresca items
+  this.refreshEstadisticas();      // refresca contadores
+}
+```
+
+El follower (otros tabs observando) recibe el broadcast cross-tab y SOLO ejecuta el callback registrado en `crossTabRefetch.subscribe`. Si ese callback se llamaba `refetch: () => silentRefreshAfterCrud()`, refrescaba items pero **omitía silenciosamente** el refresh de stats.
+
+**Síntoma del bug (chat 098)**: Tab A crea un curso → Tab A counter "Total Cursos" 24 → 25 ✅. Tab B (observador) la lista se refrescaba pero el counter quedaba en 24 ❌. Asimetría invisible al programador porque el typing del callback `refetch` no obligaba a pensar en stats.
+
+#### Solución — TypeScript fuerza la decisión
+
+La firma de `WalCrossTabRefetchService.subscribe` exige los dos callbacks separados:
+
+```typescript
+subscribe(opts: {
+  resourceType: string;
+  refetchItems: () => void;        // OBLIGATORIO
+  refetchStats?: () => void;       // OPCIONAL — solo si el feature tiene stats
+  destroyRef: DestroyRef;
+}): void
+```
+
+Si el feature tiene endpoint de stats y omitís `refetchStats`, **es decisión consciente** — no un olvido. Si no tiene endpoint de stats (lecturas puras, modales efímeros, features sin contadores), omitir es correcto.
+
+#### Patrón correcto en cada tipo de facade
+
+**1. BaseCrudFacade (auto-wireado)**:
+
+`initCrossTabRefetch()` ya pasa ambos:
+```typescript
+this.crossTabRefetch.subscribe({
+  resourceType: this.config.resourceType,
+  refetchItems: () => this.silentRefreshAfterCrud(),
+  refetchStats: () => this.refreshEstadisticas(),
+  destroyRef: this.destroyRef,
+});
+```
+
+**2. Facade manual con composite `loadData()`** (carga items+stats juntos):
+
+```typescript
+this.crossTabRefetch.subscribe({
+  resourceType: 'XxxResource',
+  refetchItems: () => this.loadData(),  // loadData ya refresca todo
+  destroyRef: this.destroyRef,
+  // refetchStats omitido — loadData lo hace internamente
+});
+```
+
+**3. Facade manual con métodos separados** (items y stats por endpoints distintos):
+
+```typescript
+this.crossTabRefetch.subscribe({
+  resourceType: 'XxxResource',
+  refetchItems: () => this.refreshItemsOnly(),
+  refetchStats: () => this.loadEstadisticas(),  // explícito porque silentRefreshAfterCrud no lo cubre
+  destroyRef: this.destroyRef,
+});
+```
+
+**4. Feature sin estadísticas** (calificaciones, grupos, mensajes, archivos):
+
+```typescript
+this.crossTabRefetch.subscribe({
+  resourceType: 'Calificacion',
+  refetchItems: () => this.refreshCalificaciones(id),
+  destroyRef: this.destroyRef,
+  // refetchStats omitido — el feature no tiene contadores globales
+});
+```
+
+#### Aplicación al añadir features nuevas
+
+Antes de cerrar un brief que agregue un facade nuevo con cross-tab subscribe:
+
+```
+[ ] El facade tiene endpoint de estadísticas (loadEstadisticas, obtenerEstadisticas, getStats)?
+    [ ] SÍ → pasar refetchStats explícito
+    [ ] NO → omitir y dejar comentario "// no tiene stats"
+[ ] refetchItems es siempre obligatorio
+[ ] El método pasado a refetchItems realmente refresca la lista (no es un placeholder)
+```
 
 ### Cuándo NO suscribir
 

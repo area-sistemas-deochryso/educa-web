@@ -91,7 +91,8 @@ export abstract class BaseCrudFacade<
 		if (this.config.crossTabRefetch === false) return;
 		this.crossTabRefetch.subscribe({
 			resourceType: this.config.resourceType,
-			refetch: () => this.silentRefreshAfterCrud(),
+			refetchItems: () => this.silentRefreshAfterCrud(),
+			refetchStats: () => this.refreshEstadisticas(),
 			destroyRef: this.destroyRef,
 		});
 	}

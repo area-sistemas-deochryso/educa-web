@@ -47,16 +47,28 @@ function createMockWal() {
 }
 
 function createMockCrossTabRefetch() {
-	const subscribers: { resourceType: string; refetch: () => void }[] = [];
+	const subscribers: { resourceType: string; refetchItems: () => void; refetchStats?: () => void }[] = [];
 	return {
 		subscribe: vi.fn(
-			(opts: { resourceType: string; refetch: () => void; destroyRef: DestroyRef }) => {
-				subscribers.push({ resourceType: opts.resourceType, refetch: opts.refetch });
+			(opts: {
+				resourceType: string;
+				refetchItems: () => void;
+				refetchStats?: () => void;
+				destroyRef: DestroyRef;
+			}) => {
+				subscribers.push({
+					resourceType: opts.resourceType,
+					refetchItems: opts.refetchItems,
+					refetchStats: opts.refetchStats,
+				});
 			},
 		),
 		emitCrossTabCommit: (resourceType: string) => {
 			for (const s of subscribers) {
-				if (s.resourceType === resourceType) s.refetch();
+				if (s.resourceType === resourceType) {
+					s.refetchItems();
+					s.refetchStats?.();
+				}
 			}
 		},
 	};

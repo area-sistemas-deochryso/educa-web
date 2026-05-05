@@ -18,7 +18,7 @@ export class EmailDomainPauseDataFacade {
 	constructor() {
 		this.crossTabRefetch.subscribe({
 			resourceType: 'email-domain-pause',
-			refetch: () => this.loadData(),
+			refetchItems: () => this.loadData(),
 			destroyRef: this.destroyRef,
 		});
 	}
