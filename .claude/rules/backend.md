@@ -325,6 +325,85 @@ Decorador: `[EnableRateLimiting("heavy")]` en el controller action.
 
 ---
 
+## Clasificación de endpoints por bulkhead (capa 3)
+
+> Plan 40 F2 — los **bulkheads** son una segunda capa de control: además del rate limit por minuto (capa 1), cada endpoint puede ir a un *cap concurrente* por categoría. Si la categoría se satura (N requests in-flight simultáneas), el resto recibe **503 con Retry-After** sin afectar a otras categorías. Detalle en [ADR-0005](../../../Educa.API/.claude/decisions/0005-bulkhead-categories.md).
+
+### Las 5 categorías + Default implícito
+
+| Bulkhead | N (default) | Configurable como | Aplicar cuando… |
+|---|---:|---|---|
+| `concurrency:pagos` | 15 | `ConcurrencyLimits:Pagos` | Operación irreversible (cierre, aprobación masiva, pago) |
+| `concurrency:reports` | 8 | `ConcurrencyLimits:Reports` | Endpoint con response > 1s típico (PDF, Excel, dashboard agregado) |
+| `concurrency:notif` | 15 | `ConcurrencyLimits:Notif` | Persiste/distribuye mensajes, notificaciones, push masivo |
+| `concurrency:uploads` | 10 | `ConcurrencyLimits:Uploads` | Recibe `multipart/form-data` y persiste en Blob Storage |
+| `concurrency:bio` | 20 | `ConcurrencyLimits:Bio` | Webhook desde dispositivo externo (CrossChex) |
+| **Default** (resto) | implícito | — | Nada de lo anterior — solo capa 2 global aplica |
+
+### Árbol de decisión (al crear un endpoint nuevo)
+
+```
+¿Operación irreversible o crítica del negocio?
+  → SÍ: concurrency:pagos
+  → NO ↓
+¿Response > 1s típico (PDF/Excel/dashboard)?
+  → SÍ: concurrency:reports + EnableRateLimiting("reports") o "batch"
+  → NO ↓
+¿Persiste/notifica a múltiples destinatarios?
+  → SÍ: concurrency:notif
+  → NO ↓
+¿Recibe multipart y guarda en Blob?
+  → SÍ: concurrency:uploads
+  → NO ↓
+¿Webhook desde dispositivo externo?
+  → SÍ: concurrency:bio (o ADR nuevo si no es CrossChex)
+  → NO ↓
+→ Default (sin cap propio)
+```
+
+### Composición de policies (.NET 9 quirk)
+
+`EnableRateLimitingAttribute` tiene `AllowMultiple = false` — **no se pueden stackear dos `[EnableRateLimiting]` en el mismo método**. Para componer rate (capa 1) + bulkhead (capa 3) hay dos opciones legales:
+
+1. **Class-level + method-level** (recomendado cuando todos los métodos del controller pertenecen al mismo bulkhead):
+
+   ```csharp
+   [Route("api/[controller]")]
+   [EnableRateLimiting("concurrency:reports")]      // ← capa 3 a la clase
+   public class BoletaNotasController : ControllerBase
+   {
+       [HttpGet("pdf")]
+       [EnableRateLimiting("reports")]              // ← capa 1 al método
+       public async Task<IActionResult> Pdf() { … }
+   }
+   ```
+
+2. **Method-level único** (cuando solo algunos métodos van al bulkhead):
+
+   ```csharp
+   [HttpPost("masivo")]
+   [EnableRateLimiting("concurrency:pagos")]        // ← bulkhead sin rate base
+   public async Task<IActionResult> AprobarMasivo(...) { … }
+   ```
+
+Si necesitás rate + concurrency en un solo método y ambos viven en method-level → mover el bulkhead a class-level (forma 1) o pedir un ADR nuevo para una policy compuesta.
+
+### SignalR Hubs (deuda técnica)
+
+`[EnableRateLimiting]` no aplica directo a `OnConnectedAsync` ni a métodos `On<X>` de un `Hub`. Para los hubs (`ChatHub`, `AsistenciaHub`, `EmailHub`), el cap `concurrency:notif` se aplicará vía middleware o `RateLimiter` directo en cada handler — pendiente del Plan 40 F3 cuando los hubs se cubran. Mientras tanto, los hubs pasan solo por capa 2 (global N=140).
+
+### Endpoints actualmente clasificados (Plan 40 F2)
+
+| Bulkhead | Controllers / endpoints |
+|---|---|
+| `concurrency:pagos` | `CierreAsistenciaController.{CrearCierre,RevertirCierre}`, `AprobacionEstudianteController.AprobarMasivo` |
+| `concurrency:reports` | class-level en `ReportesAsistenciaController`, `BoletaNotasController`, `ConsultaAsistenciaController` |
+| `concurrency:notif` | class-level en `EmailOutboxController`, `NotificacionesController`, `EmailMonitoreoController` |
+| `concurrency:uploads` | class-level en `BlobStorageController` |
+| `concurrency:bio` | class-level en `AsistenciaController` (webhook + registro manual) |
+
+---
+
 ## Manejo de Errores
 
 > **"Nunca silenciar, siempre propagar con contexto. Nunca exponer detalles internos al cliente."**

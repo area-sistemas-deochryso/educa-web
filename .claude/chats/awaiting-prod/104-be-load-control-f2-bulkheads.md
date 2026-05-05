@@ -1,10 +1,40 @@
 # BE — Load Control F2: Bulkheads por categoría
 
 > **Repo destino**: `Educa.API` (master)
-> **Estado**: ⏳ pendiente arrancar
+> **Estado**: ✅ cerrado local 2026-05-05 — esperando deploy + validación prod.
 > **Creado**: 2026-05-05 · **Modo sugerido**: `/execute` → `/validate`
 > **Bloqueado por**: F1 (chat 103) cerrado.
 > **Bloquea a**: F6a (calibración sintética).
+> **Validación prod**: ⏳ pendiente desde 2026-05-05.
+
+## RESULTADO (cerrado 2026-05-05)
+
+- 5 policies `concurrency:{pagos,reports,notif,uploads,bio}` en `RateLimitingExtensions.cs` con caps 15/8/15/10/20 (ADR-0005), configurables vía `ConcurrencyLimits:*` sin redeploy.
+- Helper privado `AddBulkhead` para registro uniforme. Stash `kind=concurrency` + `policy` para que `OnRejected` (F1) emita 503 con `Retry-After`.
+- 8 controllers anotados:
+  - **pagos** (method-level): `CierreAsistenciaController.{CrearCierre,RevertirCierre}`, `AprobacionEstudianteController.AprobarMasivo`.
+  - **reports** (class-level): `BoletaNotasController`, `ReportesAsistenciaController`, `ConsultaAsistenciaController`.
+  - **notif** (class-level): `EmailOutboxController`, `NotificacionesController`, `EmailMonitoreoController`.
+  - **uploads** (class-level): `BlobStorageController`.
+  - **bio** (class-level): `AsistenciaController` (cubre webhook + registro manual; ambos comparten dominio bio).
+- 6 tests integración (`Plan40F2BulkheadIntegrationTests`): saturación por bulkhead (Theory × 5) + aislamiento reports↔pagos. Suite full **1647/1647 ✅**.
+- Doc: sección "Clasificación de endpoints por bulkhead" en `educa-web/.claude/rules/backend.md` con tabla, árbol de decisión, quirk `AllowMultiple=false` y deuda SignalR Hubs anotada.
+
+### Aprendizaje transferible
+
+`EnableRateLimitingAttribute` tiene `AllowMultiple=false` — el "Plan B" del brief (policy combinada por categoría) **no fue necesario** porque class-level y method-level son targets distintos del CLR y .NET acumula ambos atributos en runtime. La regla práctica que F2 valida: si un endpoint requiere rate (capa 1) + bulkhead (capa 3) y todos los métodos del controller pertenecen al mismo bulkhead, poner el bulkhead a class-level y dejar el rate por método. Si el controller es mixto, queda solo method-level con un atributo único; cubrir el resto con un ADR si surgen casos. Documentado en `backend.md` § "Composición de policies (.NET 9 quirk)".
+
+### Pendiente para F3 / sub-chat
+
+SignalR Hubs (`ChatHub`, `AsistenciaHub`, `EmailHub`) — `[EnableRateLimiting]` no aplica a `OnConnectedAsync` ni a métodos `On<X>`. Hoy pasan solo por capa 2 global N=140; el cap `concurrency:notif` se aplicará vía middleware o `RateLimiter` directo cuando F3 toque hubs. Anotado como deuda en `backend.md`.
+
+### Validación prod (pendiente)
+
+Después del deploy del BE a Azure:
+
+1. Saturar `POST /api/AprobacionEstudiante/masivo` con N+ε requests simultáneos en sandbox/staging — los excedentes deben recibir 503 + `Retry-After` (no 429, no 500).
+2. Verificar que `RateLimitTelemetryMiddleware` persiste eventos de la nueva policy (`concurrency:pagos|reports|notif|uploads|bio`) en `RateLimitEvents` con `kind = concurrency`.
+3. Confirmar que `ConcurrencyLimits:Reports` ajustable en Azure App Configuration aplica sin redeploy (subir de 8 a 12 y validar que un 9º request entra).
 
 ## CONTEXTO
 
