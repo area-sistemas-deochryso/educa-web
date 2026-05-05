@@ -1,25 +1,31 @@
-# 100 · BE · EmailHub SignalR `/hubs/email-alerts` 404 en prod (fix de 078)
+# 100 · BE · EmailHub SignalR `/hubs/email-alerts` 403 en prod (fix de 078)
 
 > **Repo destino**: `Educa.API` (master)
 > **Estado**: ⏳ pendiente arrancar
-> **Creado**: 2026-05-04 · **Modo sugerido**: `/investigate` → `/execute`
-> **Origen**: smoke Cowork 2026-05-04 caso EM-9 🟡 push roto + brief 078 ❌
+> **Creado**: 2026-05-04 · **Actualizado**: 2026-05-05 — el código real es **403, no 404** · **Modo sugerido**: `/investigate` → `/execute`
+> **Origen**: smoke Cowork 2026-05-04 caso EM-9 🟡 push roto + probe PowerShell 2026-05-05
 
 ## Hallazgo
 
-`POST /hubs/email-alerts/negotiate` → **404** en producción Azure App Service.
+`POST /hubs/email-alerts/negotiate` → **403 Forbidden** en producción Azure App Service (PowerShell con cookie auth válida 2026-05-05). Cowork había reportado 404 — fue impreciso.
 
 Resultado: `app-email-defer-fail-banner` (FE 076 + 080) cae a **polling 60s** y nunca recibe el push instantáneo de `DeferFailStatusUpdated`. INV-MAIL04 documenta el push como mecanismo activo, polling como fallback — actualmente solo el fallback está vivo.
 
-El brief 078 (Plan 39 Chat B) se cerró local y se subió a master, pero el hub no responde en prod.
+**Implicancia del 403 vs 404**: el hub **SÍ está mapeado** (`MapHub<EmailHub>("/hubs/email-alerts")` quedó en `Program.cs`). El problema es **auth del negotiate**, no deploy faltante. Esto descarta las hipótesis 1, 2 y 5 del análisis original.
 
-## Hipótesis a investigar
+## Hipótesis a investigar (revisadas tras probe 2026-05-05)
 
-1. **`MapHub` faltante en Program.cs**: el hub se registró en DI (`AddSignalR().AddHubOptions<EmailHub>(...)`) pero la línea `app.MapHub<EmailHub>("/hubs/email-alerts");` no se agregó o se agregó en una rama distinta a `master`.
-2. **Build de Azure no incluye el hub**: el `.csproj` no incluyó el archivo `EmailHub.cs` (`*.cs` glob debería capturarlo, pero verificar).
-3. **CORS/Auth bloqueando antes de matchear la ruta**: el middleware de CORS o `AuthorizeAttribute` rechaza el negotiate antes de llegar al routing. 404 vs 401/403 importa para diagnóstico — Cowork reportó 404 → probable que la ruta no esté mapeada.
-4. **Path mismatch**: el FE manda a `/hubs/email-alerts` pero el BE registró `/hub/email-alerts` (singular) o `/api/hubs/email-alerts`.
-5. **Deploy parcial**: el binario actual en Azure es de un commit anterior al de 078 (verificar timestamp del deploy slot).
+Con el 403 confirmado, las hipótesis restantes son:
+
+1. ⭐ **CSRF rechaza el POST**: `CsrfValidationMiddleware` (registrado en `Program.cs`, ver `Middleware/CsrfValidationMiddleware.cs`) exige header `X-CSRF-Token` en POST/PUT/DELETE. El SignalR JS client en el FE manda el negotiate como POST normal. Si el cliente FE no agrega el header, el middleware corta antes del hub. **Hipótesis principal**.
+2. **AuthorizeAttribute en EmailHub más restrictivo de lo esperado**: el hub puede tener `[Authorize(Roles = "Director")]` o policy custom. Si el JWT no matchea, devuelve 403. Verificar `Hubs/EmailHub.cs`.
+3. **CORS preflight**: el OPTIONS antes del POST falla en CORS y el navegador termina recibiendo 403. (Menos probable desde PowerShell que no hace preflight, pero el síntoma del browser podría ser distinto.)
+
+**Hipótesis ya descartadas** (eran del análisis pre-probe, ya no aplican):
+- ~~MapHub faltante~~ — el 403 implica routing OK.
+- ~~Build no incluye el hub~~ — mismo razonamiento.
+- ~~Path mismatch~~ — la ruta sí matchea.
+- ~~Deploy parcial~~ — el binario tiene el hub.
 
 ## Diagnóstico inicial
 

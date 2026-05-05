@@ -2,6 +2,9 @@
 > **Plan**: 37 · **Chat**: 1 · **Fase**: F1.BE · **Estado**: ✅ implementado local — pendiente commit + verificación post-deploy.
 > **Creado**: 2026-04-28 · **Trabajado**: 2026-04-29 · **Modo sugerido**: `/execute` con `/design` corto inicial.
 
+
+> **Probe prod 2026-05-05**: ❌ `GET https://educa1.azurewebsites.net/api/sistema/email-outbox/defer-events` → **404** (con cookie auth Director válida). El controller real solo expone `defer-fail-status`. Decisión pendiente: (a) agregar el endpoint listado en este brief, (b) confirmar que el contrato cambió post-implementación, o (c) descartar y cerrar como abandoned. Investigar en otro chat.
+
 ---
 
 ## RESUMEN DE EJECUCIÓN (2026-04-29)
