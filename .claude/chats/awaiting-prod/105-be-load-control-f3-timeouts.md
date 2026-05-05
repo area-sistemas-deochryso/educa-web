@@ -1,10 +1,28 @@
-# BE — Load Control F3: Timeouts sistemáticos + CancellationToken
+# BE — Load Control F3a: HttpClient timeouts + ReporteAsistenciaRepository CT
 
 > **Repo destino**: `Educa.API` (master)
-> **Estado**: ⏳ pendiente arrancar
+> **Estado**: 🟢 ejecutado parcial 2026-05-05 — split en 105a (este) + 110 F3b (cascada CT en repos restantes)
 > **Creado**: 2026-05-05 · **Modo sugerido**: `/execute` → `/validate`
 > **Bloqueado por**: F1 (chat 103) cerrado. F2 (chat 104) puede correr en paralelo (no hay overlap de archivos).
-> **Bloquea a**: F5 (Polly extiende timeouts en HttpClient externos).
+> **Bloquea a**: F5 (Polly extiende timeouts en HttpClient externos). 110 F3b completa el resto del IN antes de F5.
+
+## ESTADO AL CIERRE (105a)
+
+**Entregado**:
+- ✅ HttpClient timeouts consolidados a 30s vía `AddHttpClient<>(client => client.Timeout = ...)` en `Extensions/ServiceExtensions.cs` para los 2 named clients (`WhatsAppService`, `CrossChexApiService`). Línea redundante `_httpClient.Timeout = TimeSpan.FromSeconds(30)` removida del constructor de `CrossChexApiService`.
+- ✅ `BlobStorageService` y `JaaSTokenService` auditados — no usan `HttpClient` directo (Azure SDK + JWT respectivamente). Sin cambios.
+- ✅ `ReporteAsistenciaRepository` (interface + impl) con `CancellationToken cancellationToken = default` propagado en las 4 firmas + `.ToListAsync()` / `.FirstOrDefaultAsync()` reciben el token.
+- ✅ `SetCommandTimeout(60)` aplicado en las 2 queries pesadas: `ObtenerEstudiantesConAsistenciaDiaAsync` (joins + 3 subqueries correlacionadas) y `ObtenerEstudiantesConAsistenciaRangoAsync` (joins + subquery de rango fechas). Constante privada `HeavyReportTimeoutSeconds = 60` en el repo.
+
+**Diferido a 110 F3b**:
+- ⏳ `CancellationToken` en `ConsultaAsistenciaRepository`, `AsistenciaAdminRepository`, `UsuariosRepository`, `EmailMonitoreoService`.
+- ⏳ Propagación desde controllers (parámetro `CancellationToken cancellationToken` en actions críticas).
+- ⏳ Test de cancelación (query con `CommandTimeout=60` cancelada a los 2s libera conexión).
+- ⏳ Sección "Timeouts y CancellationToken" en `educa-web/.claude/rules/backend.md`.
+
+**Razón del split**: scope original asumía ejecución mecánica pero el cascade interface↔impl × 5 repos × 200-700 LOC + test sumaban ~25 ediciones. Mid-chat el peso acumulado entró a zona de riesgo de error 500. 105a entrega un commit atómico válido (HttpClient + reportes pesados de asistencia con timeout 60s + cancelación) que ya cubre el caso de mayor latencia conocido. 110 F3b completa la red de seguridad antes de F5.
+
+**Aprendizaje transferible**: cuando un brief de F-fase asume "patrón mecánico replicable", auditar `N archivos × LOC` antes de aceptar el modo. Si supera ~1500, pre-split en el `/next-chat` que genera el brief.
 
 ## CONTEXTO
 
