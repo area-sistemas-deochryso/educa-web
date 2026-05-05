@@ -171,7 +171,9 @@
 		<input
 			type="text"
 			pInputText
-			placeholder="Buscar por nombre o DNI..."
+			placeholder="Buscar por nombre/apellido o DNI completo (8 dígitos)"
+			pTooltip="Por seguridad, el DNI está encriptado: la búsqueda parcial por DNI no es posible. Use los 8 dígitos exactos o busque por nombre/apellido."
+			tooltipPosition="bottom"
 			[value]="vm().searchTerm"
 			(input)="onSearch($event)"
 		/>
