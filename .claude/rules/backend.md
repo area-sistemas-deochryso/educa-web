@@ -404,6 +404,85 @@ Si necesitás rate + concurrency en un solo método y ambos viven en method-leve
 
 ---
 
+## Timeouts y CancellationToken
+
+> Plan 40 F3 — capa 5 del modelo de load-control (ver [ADR-0006 §1](../../../Educa.API/.claude/decisions/0006-timeouts-and-backpressure.md)). Las capas 1-3 (rate, concurrency, bulkheads) limitan cuántas requests entran; los timeouts limitan **cuánto puede colgarse** una request adentro y liberan el pool cuando el cliente se va.
+
+### Política
+
+| Recurso | Default | Override (override solo con justificación) |
+|---|---|---|
+| HttpClient (named clients) | **30s** vía `AddHttpClient<>(c => c.Timeout = TimeSpan.FromSeconds(30))` en `ServiceExtensions.cs` | Subir si la integración lo requiere (uploads grandes, scrape lento). Documentar en el `AddHttpClient`. |
+| EF Core (default global) | **30s** del pool de SQL Server | — |
+| EF Core (reportes pesados) | **60s** vía `_context.Database.SetCommandTimeout(60)` con constante `HeavyReportTimeoutSeconds = 60` por archivo | Subir solo si una query individual lo justifica + comentario `// Plan 40 F3 — <razón>`. |
+
+### `CancellationToken cancellationToken = default` propagado en lecturas pesadas
+
+Repos cubiertos por F3a + F3b:
+
+- `ReporteAsistenciaRepository` (F3a)
+- `ConsultaAsistenciaRepository` (F3b — 11 firmas)
+- `AsistenciaAdminRepository` (F3b — partial classes, ya CT-aware desde Plan 23)
+- `UsuariosRepository` (F3b — lecturas; mutaciones quedan sin CT por ahora)
+- `EmailMonitoreoService` (F3b — los 5 `Load*Async` ya CT-aware desde Plan 39)
+
+Patrón en repo:
+
+```csharp
+public async Task<List<XxxDto>> ObtenerAlgoAsync(int sedeId, CancellationToken cancellationToken = default)
+{
+    // Si la query es pesada (joins masivos, subqueries correlacionadas, agregados):
+    _context.Database.SetCommandTimeout(HeavyReportTimeoutSeconds);
+
+    return await _context.Algo
+        .Where(...)
+        .ToListAsync(cancellationToken);  // SIEMPRE pasar el token al método terminal de EF.
+}
+```
+
+### Controllers — propagar `CancellationToken`
+
+ASP.NET Core wirea automáticamente el parámetro a `HttpContext.RequestAborted`. El cliente que cierra la conexión libera la query EF en cascade.
+
+```csharp
+[HttpGet("dia")]
+public async Task<IActionResult> ListarDelDia(
+    [FromQuery] DateTime fecha,
+    [FromQuery] string? search,
+    CancellationToken ct)  // ← inyectado por ASP.NET
+{
+    var resultado = await _service.ListarDelDiaAsync(fecha, search, ct);
+    return Ok(ApiResponse<List<XxxDto>>.Ok(resultado));
+}
+```
+
+Estado actual de cobertura por controller:
+
+| Controller | CT-aware | Notas |
+|---|---|---|
+| `AsistenciaAdminController` | ✅ Todos los endpoints | — |
+| `ReportesAsistenciaController` | ⏳ Parcial | El controller acepta CT a partir de F3b; el cascade hacia el service queda pendiente. |
+| `ConsultaAsistenciaController` | ❌ Ninguno | Pendiente — `IConsultaAsistenciaService` requiere modificación de cascade. |
+
+### Reglas operativas
+
+1. **Propagación incremental, no big-bang**. `CancellationToken cancellationToken = default` en repos NO rompe callers existentes. Cuando se toca un service/controller, propagar al siguiente layer si es trivial.
+2. **`SetCommandTimeout` solo para queries que lo necesitan**. Joins masivos, subqueries correlacionadas, agregados con groupby. NO para queries triviales (FindByIdAsync, ExisteAsync).
+3. **`SetCommandTimeout` se setea por método, no por contexto**. Al inicio del método público que va a la query pesada. EF reusa el timeout en la siguiente query del mismo contexto si no se resetea — preferible resetear al final si el contexto se reusa para algo simple.
+4. **Tests con InMemory provider**: `SetCommandTimeout` lanza `InvalidOperationException` con InMemory (es Relational-specific). Tests de cancelación deben usar métodos sin timeout o cambiar a SQLite InMemory si necesitan probar el plumbing del timeout.
+5. **Nunca catch + tragar `OperationCanceledException`**. Es señal legítima del cliente. Dejar que propague hasta el middleware (que lo loggea como `Information`, no `Error`).
+
+### Test de cancelación
+
+`Educa.API.Tests/Integration/Plan40F3CancellationTests.cs` valida:
+
+- Una query con `cts.Cancel()` antes de invocar lanza `OperationCanceledException`.
+- El `ApplicationDbContext` queda usable después del cancel — una query posterior con CT default funciona.
+
+Anti-flaky: `cts.Cancel()` explícito (no `CancelAfter`), assert sobre la excepción + sobre la operación posterior, no sobre tiempo absoluto.
+
+---
+
 ## Manejo de Errores
 
 > **"Nunca silenciar, siempre propagar con contexto. Nunca exponer detalles internos al cliente."**
