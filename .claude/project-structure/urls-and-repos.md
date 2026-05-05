@@ -5,7 +5,7 @@
 | Ambiente | Frontend | Backend API |
 | --- | --- | --- |
 | **Development** | `http://localhost:4201` | `https://localhost:7102` |
-| **Production** | `https://educaweb.com` | `https://educacom.azurewebsites.net` |
+| **Production** | `https://educa.com.pe` | `https://educa1.azurewebsites.net` |
 
 ## Repositorios
 
