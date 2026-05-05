@@ -3,6 +3,7 @@
 > **Creado**: 2026-04-28 · **Cerrado local**: 2026-05-02 · **Commit**: `Educa.API@e32153f`.
 > **Modo sugerido**: `/design` corto + `/execute`.
 
+> **Validación prod**: ✅ verificada 2026-05-04 — verde indirecto: BE responde 200 (cubierto por smoke FE 075). EM-5 SQL Azure 2026-05-05 confirmó CHECK constraints exactos al brief: `CK_EmailQuarantine_Motivo` = {MANUAL, DELAY_72H, SOFT_BOUNCE_REPEATED, MAILBOX_FULL} y `CK_EmailQuarantine_MotivoLib` = {NULL, PROMOTED_BLACKLIST, MANUAL_RELEASE, AUTO_EXPIRED}.
 ---
 
 ## RESULTADO
