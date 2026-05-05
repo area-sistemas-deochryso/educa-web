@@ -37,6 +37,7 @@ export const environment = {
 		emailQuarantineTab: false,
 		emailDomainPausesTab: false,
 		emailDeferEventsTab: false,
+		runtimeHealth: false,
 	},
 
 	// Debug panels (siempre false en producción)

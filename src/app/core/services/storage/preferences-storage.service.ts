@@ -40,6 +40,10 @@ const PREFERENCES_KEYS = {
 
 	// Plan 34 Chat 5 — error-groups view mode (kanban vs table)
 	ERROR_GROUPS_VIEW_MODE: 'educa_pref_error_groups_view_mode',
+
+	// Brief 102 — runtime health widget
+	RUNTIME_HEALTH_WIDGET_AUTO_REFRESH: 'educa_pref_runtime_health_widget_auto_refresh',
+	RUNTIME_HEALTH_WIDGET_COLLAPSED: 'educa_pref_runtime_health_widget_collapsed',
 } as const;
 
 export type ErrorGroupsViewMode = 'kanban' | 'table';
@@ -496,6 +500,27 @@ export class PreferencesStorageService {
 
 	setDeferFailWidgetCollapsed(collapsed: boolean): void {
 		this.setItem(PREFERENCES_KEYS.DEFER_FAIL_WIDGET_COLLAPSED, collapsed.toString());
+	}
+
+	// #endregion
+	// #region RUNTIME HEALTH WIDGET (brief 102)
+
+	getRuntimeHealthWidgetAutoRefresh(): boolean {
+		// Default true — el panel sirve mejor con polling activo (60s, snapshot cacheado 10s en BE).
+		const stored = this.getItem(PREFERENCES_KEYS.RUNTIME_HEALTH_WIDGET_AUTO_REFRESH);
+		return stored === null ? true : stored === 'true';
+	}
+
+	setRuntimeHealthWidgetAutoRefresh(enabled: boolean): void {
+		this.setItem(PREFERENCES_KEYS.RUNTIME_HEALTH_WIDGET_AUTO_REFRESH, enabled.toString());
+	}
+
+	getRuntimeHealthWidgetCollapsed(): boolean {
+		return this.getItem(PREFERENCES_KEYS.RUNTIME_HEALTH_WIDGET_COLLAPSED) === 'true';
+	}
+
+	setRuntimeHealthWidgetCollapsed(collapsed: boolean): void {
+		this.setItem(PREFERENCES_KEYS.RUNTIME_HEALTH_WIDGET_COLLAPSED, collapsed.toString());
 	}
 
 	// #endregion

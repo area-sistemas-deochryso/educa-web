@@ -347,6 +347,24 @@ export class StorageService {
 	}
 	// #endregion
 
+	// #region RUNTIME HEALTH WIDGET (brief 102)
+	getRuntimeHealthWidgetAutoRefresh(): boolean {
+		return this.preferences.getRuntimeHealthWidgetAutoRefresh();
+	}
+
+	setRuntimeHealthWidgetAutoRefresh(enabled: boolean): void {
+		this.preferences.setRuntimeHealthWidgetAutoRefresh(enabled);
+	}
+
+	getRuntimeHealthWidgetCollapsed(): boolean {
+		return this.preferences.getRuntimeHealthWidgetCollapsed();
+	}
+
+	setRuntimeHealthWidgetCollapsed(collapsed: boolean): void {
+		this.preferences.setRuntimeHealthWidgetCollapsed(collapsed);
+	}
+	// #endregion
+
 	// #region ERROR GROUPS VIEW MODE (Plan 34 Chat 5)
 	getErrorGroupsViewMode(): ErrorGroupsViewMode {
 		return this.preferences.getErrorGroupsViewMode();

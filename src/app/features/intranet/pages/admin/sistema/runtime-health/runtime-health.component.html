@@ -1,0 +1,22 @@
+<app-page-header
+	icon="pi pi-server"
+	title="Salud del runtime"
+	subtitle="Snapshot en vivo del proceso ASP.NET (ThreadPool, Requests, BD, GC) con clasificación de patrón de saturación."
+/>
+
+<app-runtime-health-widget
+	[snapshot]="vm().snapshot"
+	[loading]="vm().loading"
+	[autoRefresh]="vm().autoRefresh"
+	[collapsed]="vm().collapsed"
+	(refresh)="onRefresh()"
+	(autoRefreshChange)="onAutoRefreshChange($event)"
+	(collapsedChange)="onCollapsedChange($event)"
+/>
+
+@if (vm().error) {
+	<div class="error-banner">
+		<i class="pi pi-exclamation-triangle"></i>
+		<span>{{ vm().error }}</span>
+	</div>
+}

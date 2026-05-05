@@ -179,6 +179,18 @@ const experimentalRoutes: Route[] = [
 				},
 			]
 		: []),
+	...(environment.features.runtimeHealth
+		? [
+				{
+					path: 'admin/sistema/runtime-health',
+					loadComponent: () =>
+						import('./pages/admin/sistema/runtime-health/runtime-health.component').then(
+							(m) => m.RuntimeHealthPageComponent,
+						),
+					title: 'Intranet - Salud del runtime',
+				},
+			]
+		: []),
 ];
 
 /**

@@ -1,0 +1,173 @@
+<section class="runtime-health-widget" [class.runtime-health-widget--collapsed]="collapsed()">
+	<header class="widget-header">
+		<div class="widget-title">
+			<button
+				pButton
+				type="button"
+				class="p-button-text p-button-sm btn-collapse"
+				[icon]="collapsed() ? 'pi pi-chevron-down' : 'pi pi-chevron-up'"
+				(click)="onCollapsedToggle()"
+				[pt]="{ root: { 'aria-label': collapsed() ? 'Expandir widget' : 'Colapsar widget' } }"
+			></button>
+			<h3>Salud del runtime</h3>
+			@if (hasData()) {
+				<p-tag
+					[value]="patternLabel()"
+					[severity]="patternSeverity()"
+					[icon]="patternIcon()"
+				/>
+			}
+		</div>
+
+		<div class="widget-actions">
+			<label class="auto-refresh-toggle">
+				<p-toggleSwitch
+					[ngModel]="autoRefresh()"
+					(ngModelChange)="onAutoRefreshChange($event)"
+				/>
+				<span>Auto 60s</span>
+			</label>
+			<button
+				pButton
+				icon="pi pi-refresh"
+				class="p-button-text p-button-sm"
+				[loading]="loading()"
+				(click)="onRefreshClick()"
+				pTooltip="Refrescar ahora"
+				tooltipPosition="bottom"
+				[pt]="{ root: { 'aria-label': 'Refrescar' } }"
+			></button>
+		</div>
+	</header>
+
+	@if (!collapsed()) {
+		@if (showTelemetryWarning()) {
+			<div class="telemetry-warning">
+				<i class="pi pi-exclamation-circle"></i>
+				<span>
+					El backend devolvió un snapshot vacío. Probable error interno
+					del servicio de telemetría (INV-S07). Reintentá en unos
+					segundos.
+				</span>
+			</div>
+		}
+
+		@if (!hasData() && !loading()) {
+			<div class="empty-state">
+				<i class="pi pi-info-circle"></i>
+				<p>Sin datos. Apretá refrescar para cargar el snapshot.</p>
+			</div>
+		}
+
+		@if (hasData()) {
+			<div class="cards-grid">
+				<!-- ThreadPool -->
+				<div class="info-card">
+					<div class="info-card__title">
+						<i class="pi pi-server"></i>
+						<span>ThreadPool</span>
+					</div>
+					<dl class="info-card__list">
+						<dt>Workers ocupados</dt>
+						<dd>
+							{{ snapshot()!.threadPool.workerThreadsBusy }}
+							<span class="info-card__sub"
+								>/ {{ snapshot()!.threadPool.workerThreadsMax }}</span
+							>
+						</dd>
+						<dt>I/O ocupados</dt>
+						<dd>
+							{{ snapshot()!.threadPool.completionPortBusy }}
+							<span class="info-card__sub"
+								>/ {{ snapshot()!.threadPool.completionPortMax }}</span
+							>
+						</dd>
+						<dt>Cola pendiente</dt>
+						<dd>{{ snapshot()!.threadPool.queueLength }}</dd>
+						<dt>Total completados</dt>
+						<dd>
+							{{ snapshot()!.threadPool.completedItemsCount | number }}
+						</dd>
+					</dl>
+				</div>
+
+				<!-- Requests -->
+				<div class="info-card">
+					<div class="info-card__title">
+						<i class="pi pi-bolt"></i>
+						<span>Requests</span>
+					</div>
+					<dl class="info-card__list">
+						<dt>En vuelo</dt>
+						<dd>{{ snapshot()!.requests.inFlight }}</dd>
+						<dt>p50 / p95 / p99</dt>
+						<dd>
+							{{ snapshot()!.requests.p50Ms | number: '1.0-0' }}
+							/ {{ snapshot()!.requests.p95Ms | number: '1.0-0' }}
+							/ {{ snapshot()!.requests.p99Ms | number: '1.0-0' }}
+							<span class="info-card__sub">ms</span>
+						</dd>
+						<dt>Últimos 5 min</dt>
+						<dd>{{ snapshot()!.requests.countLast5Min | number }}</dd>
+					</dl>
+				</div>
+
+				<!-- DB -->
+				<div class="info-card">
+					<div class="info-card__title">
+						<i class="pi pi-database"></i>
+						<span>BD</span>
+					</div>
+					<dl class="info-card__list">
+						<dt>Conexiones activas</dt>
+						<dd>{{ snapshot()!.db.activeConnections }}</dd>
+						<dt>Conexiones en pool</dt>
+						<dd>{{ snapshot()!.db.pooledConnections }}</dd>
+						<dt>p95 latencia</dt>
+						<dd>
+							{{ snapshot()!.db.p95LatencyMs | number: '1.0-0' }}
+							<span class="info-card__sub">ms</span>
+						</dd>
+					</dl>
+				</div>
+
+				<!-- GC -->
+				<div class="info-card">
+					<div class="info-card__title">
+						<i class="pi pi-chart-bar"></i>
+						<span>GC</span>
+					</div>
+					<dl class="info-card__list">
+						<dt>Gen0 / Gen1 / Gen2</dt>
+						<dd>
+							{{ snapshot()!.gc.gen0Collections }} /
+							{{ snapshot()!.gc.gen1Collections }} /
+							{{ snapshot()!.gc.gen2Collections }}
+						</dd>
+						<dt>Heap actual</dt>
+						<dd>
+							{{ heapMb() | number: '1.1-1' }}
+							<span class="info-card__sub">MB</span>
+						</dd>
+						<dt>Total alocado</dt>
+						<dd>
+							{{ totalAllocatedMb() | number: '1.0-0' }}
+							<span class="info-card__sub">MB</span>
+						</dd>
+					</dl>
+				</div>
+			</div>
+
+			<footer class="widget-footer">
+				<span class="reason"
+					><strong>Razón:</strong>
+					{{ snapshot()!.patternReason }}</span
+				>
+				<span class="generated-at">
+					Snapshot:
+					{{ snapshot()!.generatedAt | date: 'short' }}
+				</span>
+			</footer>
+		}
+	}
+</section>

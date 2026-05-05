@@ -119,6 +119,8 @@ export const MENU_ITEMS: MenuItemDef[] = [
 	// Monitoreo — Plan 35: 7 entradas planas colapsadas en 1 hub.
 	// El hub `/admin/monitoreo` filtra cards por permiso individual del usuario.
 	{ route: '/intranet/admin/monitoreo', label: 'Monitoreo', icon: 'pi pi-chart-bar', permiso: PERMISOS.ADMIN_MONITOREO, modulo: 'sistema', preview: 'admin-table', description: 'Hub de monitoreo: correos, incidencias y seguridad' },
+	// Brief 102 — runtime health (entrada propia bajo Monitoreo)
+	{ route: '/intranet/admin/sistema/runtime-health', label: 'Salud del runtime', icon: 'pi pi-server', permiso: PERMISOS.ADMIN_SISTEMA_RUNTIME_HEALTH, modulo: 'sistema', featureFlag: 'runtimeHealth', group: { label: 'Monitoreo', icon: 'pi pi-chart-bar' }, preview: 'admin-table', description: 'Snapshot del runtime ASP.NET (ThreadPool, Requests, BD, GC)' },
 	// Herramientas — utilidades dev/admin (no son observabilidad)
 	{ route: '/intranet/admin/campus', label: 'Campus', icon: 'pi pi-map', permiso: PERMISOS.ADMIN_CAMPUS, modulo: 'sistema', featureFlag: 'campusNavigation', group: { label: 'Herramientas', icon: 'pi pi-wrench' }, preview: 'admin-table', description: 'Navegar el campus virtual' },
 	{ route: '/intranet/ctest-k6', label: 'Test k6', icon: 'pi pi-bolt', permiso: PERMISOS.CTEST_K6, modulo: 'sistema', featureFlag: 'ctestK6', group: { label: 'Herramientas', icon: 'pi pi-wrench' }, preview: 'admin-table', description: 'Herramienta de testing de carga' },
