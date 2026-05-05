@@ -3,6 +3,7 @@
 > **Creado**: 2026-04-29 · **Estado**: ⏳ pendiente arrancar.
 > **Pre-requisito**: Chat 2 (072) mergeado (motivo `BOUNCE_MAILBOX_FULL` válido en BD).
 
+> **Validación prod**: ✅ verificada 2026-05-05 — Hangfire prod confirmó job registrado: BlacklistAutoCleanupJob.EjecutarAsync, cron 0 3 * * * (SA Pacific), last execution 2026-05-05 12:01:51, next 2026-05-06 03:00. Registrado 2026-04-30.
 ---
 
 # Plan 38 Chat 4 BE — `BlacklistAutoCleanupJob` (Hangfire diario)

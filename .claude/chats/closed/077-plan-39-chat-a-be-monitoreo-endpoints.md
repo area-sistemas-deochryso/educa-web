@@ -1,5 +1,6 @@
 # Plan 39 Chat A BE — Endpoints de monitoreo + service + caché + tests + índice SQL
 
+> **Validación prod**: ✅ verificada 2026-05-04 — verde indirecto: 5 endpoints monitoreo respondiendo (cubierto por smoke FE 079)
 > **Repo destino**: `Educa.API` (master)
 > **Plan**: 39 · **Chat**: A · **Fase**: F2.Execute · **Estado**: ⏳ awaiting-prod desde 2026-04-29 — local commit `Educa.API@17099d1`
 > **Creado**: 2026-04-29 · **Modo sugerido**: `/execute`

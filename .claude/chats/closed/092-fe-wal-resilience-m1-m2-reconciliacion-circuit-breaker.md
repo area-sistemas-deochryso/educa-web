@@ -1,5 +1,6 @@
 # FE WAL Resilience M1+M2 — Reconciliación post-reload + Circuit breaker
 
+> **Validación prod**: ✅ verificada 2026-05-04 — verde: recoverInFlight (entry IN_FLIGHT -10min → PENDING) + circuit OPEN tras 6 fallos 5xx
 > **Repo destino**: `educa-web` (main)
 > **Plan**: WAL Resilience · **Chat**: M1+M2 · **Fase**: F2.Execute
 > **Creado**: 2026-05-04 · **Modo sugerido**: `/execute`

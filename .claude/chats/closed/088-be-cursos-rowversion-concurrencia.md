@@ -1,5 +1,6 @@
 # 088 · BE Cursos rowVersion no enforce concurrencia (409)
 
+> **Validación prod**: ✅ verificada 2026-05-04 — verde: 2 tabs con rowVersion stale → 409 Conflict + WAL entry CONFLICT confirmado
 > **Creado**: 2026-05-04 · **Estado**: ⏳ pendiente arrancar.
 > **Repo**: `Educa.API` (master) · cross-repo desde educa-web.
 > **Origen**: Caso 3 del WAL smoke (chat 087, commit `9c39d40`) quedó bloqueado por bug BE.

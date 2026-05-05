@@ -5,6 +5,7 @@
 >
 > **🔗 Cross-link Plan 39 (D11/D13 del brief 071)**: el dialog "Agregar a blacklist" debe leer query param `?correo=...` y prellenar el campo. Plan 39 Chat C (079) genera CTAs "Bloquear" desde los tiles "Top destinatarios" y "Candidatos" del dashboard de monitoreo, navegando a `/intranet/admin/email-outbox?tab=blacklist&action=add&correo=...`. Implementación: en el `OnInit` del componente padre, leer `route.snapshot.queryParamMap.get('correo')` y `get('action')`, y si `action === 'add'` con correo presente, abrir el dialog con form prefilled.
 
+> **Validación prod**: ✅ verificada 2026-05-04 — verde: tab Blacklist con 3 activos + filtros + CRUD funcionando
 ---
 
 # Plan 38 Chat 5 FE — Tab "Blacklist" en `/intranet/admin/email-outbox`

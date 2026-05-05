@@ -1,5 +1,6 @@
 # FE+BE WAL Resilience M4 — Schema fingerprint en cache
 
+> **Validación prod**: ✅ verificada 2026-05-04 — verde happy path: X-Schema-Version: 1 en endpoints mapeados (/permisos, /notificaciones); ausente en no-mapeados. Mismatch real diferido al próximo deploy con bump.
 > **Repo destino**: `educa-web` (main) + `Educa.API` (master) — coordinado
 > **Plan**: WAL Resilience · **Chat**: M4 · **Fase**: F2.Execute
 > **Creado**: 2026-05-04 · **Modo sugerido**: `/execute`

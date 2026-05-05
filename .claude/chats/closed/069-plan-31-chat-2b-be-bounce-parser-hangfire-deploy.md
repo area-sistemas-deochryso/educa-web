@@ -2,6 +2,7 @@
 > **Plan**: 31 · **Chat**: 2b · **Fase**: F2.BE · **Estado**: ⏳ pendiente arrancar — bloqueado hasta que 038 (Chat 2a) cierre.
 > **Creado**: 2026-04-28 · **Modo sugerido**: `/execute` directo (scope chico).
 
+> **Validación prod**: ✅ verificada 2026-05-05 — Hangfire prod confirmó job registrado: BounceParserJob.EjecutarAsync, cron */5 * * * * (SA Pacific), last execution 2026-05-05 13:15:08, next 13:20. Registrado 2026-04-29.
 ---
 
 # Plan 31 Chat 2b — Wiring Hangfire del bounce parser + smoke prod

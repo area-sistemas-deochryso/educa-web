@@ -19,6 +19,7 @@
 >
 > El listener vive en un service compartido `email-hub.service.ts` que crea Plan 39 Chat C (079). Plan 39 Chat D (080) reusa ese service para alinear el banner B9 cross-páginas. **Pre-req actualizado**: además del Chat 5 + Plan 37 Chat 3, este chat necesita Plan 39 Chat B (078) BE deployado para que el hub server-side exista. Si Plan 39 Chat C (079) llega antes, el service `email-hub.service.ts` ya está creado y este chat solo agrega el banner B9 + toast.
 
+> **Validación prod**: 🟡 verificada parcial 2026-05-04 — banner B9 + polling 60s OK; **push SignalR roto**: POST /hubs/email-alerts/negotiate → 404 (hub 078 no deployado en BE Azure). Fix tracked en open/100
 ---
 
 # Plan 38 Chat 6 — Banner B9 + toast SignalR (`EmailHub`) en admin/email-outbox

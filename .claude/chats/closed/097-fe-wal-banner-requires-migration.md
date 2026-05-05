@@ -1,5 +1,6 @@
 > **Creado**: 2026-05-04 · **Estado**: ⏳ pendiente arrancar.
 
+> **Validación prod**: ✅ verificada 2026-05-04 — verde: banner aparece + dismiss + reaparición tras reload + 'Descartar entradas' funcional
 # 097 · FE · WAL banner REQUIRES_MIGRATION
 
 > **Renumerado**: originalmente 091, movido a 097 el 2026-05-04 por colisión con `091-fe-wal-cross-tab-wire-remaining-facades` (que mantuvo el 091 por antigüedad).

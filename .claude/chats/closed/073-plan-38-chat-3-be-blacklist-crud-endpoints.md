@@ -3,6 +3,7 @@
 > **Creado**: 2026-04-29 · **Estado**: ⏳ pendiente arrancar.
 > **Pre-requisito**: Chat 2 (072) mergeado en `master` y migración SQL ejecutada en Azure (motivo `BOUNCE_MAILBOX_FULL` válido).
 
+> **Validación prod**: ✅ verificada 2026-05-04 — verde: filtros Estado/Motivo + dropdown 4 motivos + CRUD /api/sistema/email-blacklist 200
 ---
 
 # Plan 38 Chat 3 BE — `POST` + `GET` paginado + DTOs + tests controller

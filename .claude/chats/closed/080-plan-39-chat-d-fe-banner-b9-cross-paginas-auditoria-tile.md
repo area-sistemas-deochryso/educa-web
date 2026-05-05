@@ -1,5 +1,6 @@
 # Plan 39 Chat D FE — Banner B9 cross-páginas + alineación listener Plan 38
 
+> **Validación prod**: 🟡 verificada parcial 2026-05-04 — banner en 5 páginas + polling OK; **push SignalR roto** (mismo issue que 076 — hub 078). Tile auditoría 'Aceptado vs Entregado' diferido (Plan 39 Chat E HOLD).
 > **Repo destino**: `educa-web` (main)
 > **Plan**: 39 · **Chat**: D · **Fase**: F2.Execute · **Estado**: ⏳ awaiting-prod (cerrado local 2026-05-02)
 > **Creado**: 2026-04-29 · **Cerrado local**: 2026-05-02 · **Modo aplicado**: `/execute`

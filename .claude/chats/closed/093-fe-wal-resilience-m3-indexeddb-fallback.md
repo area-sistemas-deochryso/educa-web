@@ -1,5 +1,6 @@
 # FE WAL Resilience M3 — Strategy pattern + InMemory fallback
 
+> **Validación prod**: 🟡 verificada parcial 2026-05-04 — código deployeado: app-wal-degraded-banner + bootstrap fallback presentes en DOM. Trigger end-to-end requiere override de indexedDB.open pre-bundle, **no factible desde MCP browser**. Aceptar telemetry monitoring 30d.
 > **Repo destino**: `educa-web` (main)
 > **Plan**: WAL Resilience · **Chat**: M3 · **Fase**: F2.Execute
 > **Creado**: 2026-05-04 · **Modo sugerido**: `/execute`

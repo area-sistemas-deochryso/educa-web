@@ -1,5 +1,6 @@
 # Plan 39 Chat C FE — Tab "Mapa de envío" en Dashboard del día con 6 tiles
 
+> **Validación prod**: ✅ verificada 2026-05-04 — verde: 5 tiles en DOM cargando datos (sender-stats, top-destinatarios, serie-temporal, dominios-receptores, candidatos-blacklist)
 > **Repo destino**: `educa-web` (main)
 > **Plan**: 39 · **Chat**: C · **Fase**: F2.Execute · **Estado**: ✅ cerrado local 2026-04-30 — `awaiting-prod/079`
 > **Creado**: 2026-04-29 · **Modo sugerido**: `/execute`

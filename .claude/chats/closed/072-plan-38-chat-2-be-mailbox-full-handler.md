@@ -5,6 +5,7 @@
 >
 > **🔗 Cross-link Plan 39 (D5/D13 del brief 071)**: registrar `IEmailHubNotifier` con implementación `NullEmailHubNotifier` (loggea, no pushea) en este chat. Plan 39 Chat B (078) reemplaza la registration por la implementación SignalR real. El handler `MailboxFullBlacklistHandler` invoca `notifier.NotifyBlacklistEntryCreatedAsync(...)` y, cuando `hits == thresholdHits - 1` (early warning antes de auto-blacklist), `notifier.NotifyCandidatoBlacklistDetectadoAsync(...)`. El interface define los 3 métodos (`NotifyBlacklistEntryCreatedAsync`, `NotifyDeferFailStatusUpdatedAsync`, `NotifyCandidatoBlacklistDetectadoAsync`) — coordinar con Chat A (077) para no duplicar el archivo si llega primero.
 
+> **Validación prod**: ✅ verificada 2026-05-04 — verde indirecto: tabla EmailBlacklist accesible vía CRUD (cubierto por smoke FE 075)
 ---
 
 # Plan 38 Chat 2 BE — `MailboxFullBlacklistHandler` + refactor de `EmailBounceBlacklistHandler` + nuevo motivo
