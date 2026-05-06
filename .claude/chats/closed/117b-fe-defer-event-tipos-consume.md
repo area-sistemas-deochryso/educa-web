@@ -1,5 +1,6 @@
 # FE — Consumir catálogo dinámico de tipos de `EmailDeferEvent`
 
+> **Validación prod**: ✅ verificada 2026-05-06 — smoke Cowork ronda 2.
 > **Repo destino**: `educa-web` main.
 > **Estado**: ✅ cerrado local 2026-05-06 — `awaiting-prod/` esperando deploy de `117a` BE a Azure + deploy FE.
 > **Creado**: 2026-05-06 · **Modo sugerido**: `/execute` → `/validate`

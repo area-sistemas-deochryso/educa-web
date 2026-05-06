@@ -1,5 +1,6 @@
 # BE — Endpoint catálogo de tipos de `EmailDeferEvent` (`GET /defer-events/tipos`)
 
+> **Validación prod**: ✅ verificada 2026-05-06 — smoke Cowork ronda 2.
 > **Repo destino**: `Educa.API` master.
 > **Estado**: ✅ cerrado local 2026-05-06 — `awaiting-prod/` esperando deploy Azure
 > **Creado**: 2026-05-06 · **Modo sugerido**: `/investigate` → `/design` → `/execute` → `/validate`

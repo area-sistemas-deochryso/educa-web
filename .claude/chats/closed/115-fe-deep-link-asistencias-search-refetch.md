@@ -1,5 +1,6 @@
 # FE — Deep-link `/admin/asistencias?dni=...` no dispara refetch server-side
 
+> **Validación prod**: ✅ verificada 2026-05-06 — smoke Cowork ronda 2.
 > **Repo destino**: `educa-web` (main)
 > **Estado**: ⏳ pendiente arrancar
 > **Creado**: 2026-05-06 · **Modo sugerido**: `/execute` → `/validate`

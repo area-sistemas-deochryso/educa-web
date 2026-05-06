@@ -1,4 +1,6 @@
 > **Repo destino**: `Educa.API` (backend, branch `master`).
+
+> **Validación prod**: ✅ verificada 2026-05-06 — smoke Cowork ronda 2.
 > **Plan**: 37 · **Chat**: 1 · **Fase**: F1.BE · **Estado**: ✅ implementado local — pendiente commit + verificación post-deploy.
 > **Creado**: 2026-04-28 · **Trabajado**: 2026-04-29 · **Modo sugerido**: `/execute` con `/design` corto inicial.
 

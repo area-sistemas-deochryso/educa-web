@@ -1,5 +1,6 @@
 # BE — Enriquecer `EmailDeferEventListaDto.CorrelationId` con join a `EmailOutbox`
 
+> **Validación prod**: ✅ verificada 2026-05-06 — smoke Cowork ronda 2.
 > **Repo destino**: `Educa.API` (master)
 > **Estado**: ⏳ pendiente arrancar
 > **Creado**: 2026-05-06 · **Modo sugerido**: `/design` → `/execute` → `/validate`

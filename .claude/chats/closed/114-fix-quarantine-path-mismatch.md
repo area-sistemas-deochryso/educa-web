@@ -1,5 +1,6 @@
 # Fix path mismatch FE↔BE en quarantine — `email-outbox/quarantine` vs `email-quarantine`
 
+> **Validación prod**: ✅ verificada 2026-05-06 — smoke Cowork ronda 2.
 > **Repo destino**: `Educa.API` (master) **o** `educa-web` (main) — decisión a tomar al arrancar
 > **Estado**: ⏳ pendiente arrancar
 > **Creado**: 2026-05-06 · **Modo sugerido**: `/ask` (decidir naming canónico) → `/execute`

@@ -1,4 +1,6 @@
 > **Repo destino**: `educa-web` (frontend, branch `main`).
+
+> **Validación prod**: ✅ verificada 2026-05-06 — smoke Cowork ronda 2.
 > **Plan**: 37 · **Chat**: 3 · **Fase**: F3.FE · **Estado**: ✅ cerrado local 2026-05-02 — esperando deploy del FE.
 > **Creado**: 2026-04-28 · **Cerrado local**: 2026-05-02 · **Commit**: `educa-web@b8dd4d5`.
 > **Modo sugerido**: `/design` corto + `/execute`.
