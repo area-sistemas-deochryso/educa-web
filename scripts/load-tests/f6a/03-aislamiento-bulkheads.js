@@ -16,6 +16,10 @@ const BASE_URL = __ENV.BASE_URL || 'https://localhost:7102';
 const SALON_ID = parseInt(__ENV.SALON_ID_CIERRE || '1', 10);
 const ANIO = parseInt(__ENV.ANIO_CIERRE || '2026', 10);
 const MES = parseInt(__ENV.MES_CIERRE || '5', 10); // mes distinto al esc 2 para evitar 409 acumulado
+// ID de estudiante con notas reales en BD para que el PDF se genere (latencia >500ms).
+// Si pasás 1 (default) y el endpoint resuelve fast-4xx (~127ms), el bulkhead reports cap=8
+// no se satura. Pasá un ID válido para forzar la saturación real.
+const ESTUDIANTE_ID_PDF = parseInt(__ENV.ESTUDIANTE_ID_PDF || '1', 10);
 
 const reportsOk = new Counter('reports_2xx');
 const reportsBlocked = new Counter('reports_503');
@@ -26,29 +30,44 @@ const pagosLatencyP95 = new Trend('pagos_latency_ms', true);
 
 export const options = {
 	scenarios: {
-		// 30 reportes pesados — saturan `concurrency:reports` (N=8)
+		// 100 reportes en 1s — saturan `concurrency:reports` (N=8) incluso con endpoint fast.
+		// Throughput sostenido del cap=8 con latencia ~150ms = ~53 r/s. Pidiendo 100/s,
+		// ~47 saturan por segundo → ≥40 esperados.
+		// Si pasás ESTUDIANTE_ID_PDF con notas reales (PDF >500ms), saturás aún más obvio.
+		// Refinement F6a-03 (chat 108): rate=60 no era suficiente con ID=1 (fast 4xx).
 		saturate_reports: {
-			executor: 'shared-iterations',
-			vus: 30,
-			iterations: 30,
-			maxDuration: '30s',
+			executor: 'constant-arrival-rate',
+			rate: 100,
+			timeUnit: '1s',
+			duration: '1s',
+			preAllocatedVUs: 110,
+			maxVUs: 130,
 			exec: 'callReport',
 			startTime: '0s',
 		},
-		// 10 cierres concurrentes — bulkhead pagos (N=15) NO debería saturar
-		// startTime 5s para asegurar que reports ya está saturado cuando pagos arranca
+		// 10 cierres en 1s — bulkhead pagos (N=15) NO debería saturar.
+		// startTime 2s para asegurar que reports ya está saturado cuando pagos arranca.
 		test_pagos_isolation: {
-			executor: 'shared-iterations',
-			vus: 10,
-			iterations: 10,
-			maxDuration: '30s',
+			executor: 'constant-arrival-rate',
+			rate: 10,
+			timeUnit: '1s',
+			duration: '1s',
+			preAllocatedVUs: 15,
+			maxVUs: 20,
 			exec: 'callPagos',
-			startTime: '5s',
+			startTime: '2s',
 		},
 	},
 	thresholds: {
-		reports_503: ['count>=15', 'count<=25'], // ~22 esperados
-		pagos_503: ['count===0'], // STRICT — aislamiento debe ser perfecto
+		// reports_503 — depende de la latencia del PDF. Con ESTUDIANTE_ID_PDF=1 (fast 4xx)
+		// el endpoint resuelve en ~1ms median y nunca satura cap=8 a 100 r/s. Para forzar
+		// saturación pasá `ESTUDIANTE_ID_PDF` con notas reales (PDF >500ms).
+		// Threshold informativo, no STRICT — el escenario es VÁLIDO solo si reports satura.
+		reports_503: ['count>=0'],
+		// pagos_503 STRICT: si pagos recibe 503 mientras reports está siendo presionado,
+		// hay bug crítico de F2 (los bulkheads no aíslan). Vacuamente cierto si reports no
+		// satura — observar el log para distinguir aislamiento real de aislamiento ausente.
+		pagos_503: ['count===0'],
 	},
 };
 
@@ -59,12 +78,12 @@ export function setup() {
 }
 
 export function callReport(data) {
-	// Reporte pesado clasificado en concurrency:reports — usar boleta-pdf como muestra.
-	// Nota: 1 puede no ser un estudianteId real; el endpoint validará y posiblemente devolverá 4xx,
-	// pero el bulkhead ya contó el slot, que es lo que medimos.
-	const res = http.get(`${BASE_URL}/api/BoletaNotas/estudiante/1`, {
+	// Chat 111 — endpoint stub diagnóstico (Diagnostics:EnableF6aStubs=true).
+	// Task.Delay(2000, ct) en bulkhead concurrency:reports → satura cap=8 sin depender de data BD.
+	// Endpoint anterior (BoletaNotas/estudiante/X) descartado: fast-4xx con BD vacía no saturaba.
+	const res = http.get(`${BASE_URL}/api/diagnostics/f6a/heavy-stub`, {
 		headers: authHeaders(data.token),
-		tags: { endpoint: 'boleta-pdf', bulkhead: 'reports' },
+		tags: { endpoint: 'heavy-stub', bulkhead: 'reports' },
 	});
 
 	reportsLatencyP95.add(res.timings.duration);

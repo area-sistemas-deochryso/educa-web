@@ -58,21 +58,23 @@ export function setup() {
 }
 
 export function heavyCancelled(data) {
-	// Reporte que típicamente toma > 2s (boleta consolidada de salón con muchos estudiantes).
-	// k6 timeout=2s cancela la conexión antes de que el server termine.
-	const res = http.get(`${BASE_URL}/api/BoletaNotas/salon/1`, {
+	// Chat 111 — stub cancellable (Diagnostics:EnableF6aStubs=true).
+	// Task.Delay(60_000, ct) → con k6 timeout=2s, CT propaga, server libera slot inmediato.
+	// Endpoint anterior (BoletaNotas/salon/1) descartado: BD vacía no genera latencia >2s.
+	const res = http.get(`${BASE_URL}/api/diagnostics/f6a/cancellable-stub`, {
 		headers: authHeaders(data.token),
 		timeout: '2s',
 		tags: { endpoint: 'heavy-cancelled' },
 	});
-	// Si k6 cancela por timeout, res.error suele estar lleno; res.status puede ser 0
 	if (res.status === 0 || res.error) {
 		cancelledRequests.add(1);
 	}
 }
 
 export function followupRequest(data) {
-	const res = http.get(`${BASE_URL}/api/BoletaNotas/estudiante/1`, {
+	// Chat 111 — follow-up al mismo bulkhead :reports vía heavy-stub (delay 2s, completa OK).
+	// Si los slots no se liberaron tras los cancelados, recibirá 503.
+	const res = http.get(`${BASE_URL}/api/diagnostics/f6a/heavy-stub`, {
 		headers: authHeaders(data.token),
 		tags: { endpoint: 'followup' },
 	});

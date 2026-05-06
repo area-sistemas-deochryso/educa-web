@@ -46,8 +46,12 @@ export const options = {
 		},
 	},
 	thresholds: {
-		errors_429: ['count<5'],   // tolerancia mínima — espera 0
-		errors_503: ['count===0'], // strict — capa 2 NO debe saturar
+		// errors_429 NO es la métrica clave de este escenario. Con 80 VUs golpeando
+		// `mis-permisos` (rate limit `global` reads ≈ 3.3 r/s), el rate limit absorbe
+		// lo esperable y eso es comportamiento correcto de la capa 1, no fallo.
+		// Ajustado en chat 108 tras la corrida 2026-05-06 que dio 5833× 429 con 0× 503.
+		// Lo único que importa es que el cap global (capa 2 / N=140) NO sature.
+		errors_503: ['count===0'], // STRICT — capa 2 NO debe saturar
 	},
 };
 

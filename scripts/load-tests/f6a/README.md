@@ -28,31 +28,9 @@
      - `concurrency:global` N=140
      - `concurrency:pagos` N=15, `:reports` N=8, `:notif` N=15, `:uploads` N=10, `:bio` N=20
 
-3. **Credenciales locales** en archivo `.env-f6a` (no commitear; está gitignoreado):
-
-   ```ini
-   BASE_URL=https://localhost:7102
-   DIRECTOR_DNI=12345678
-   DIRECTOR_PWD=tu-pwd-local
-   PROFESOR_DNI=87654321
-   PROFESOR_PWD=tu-pwd-local
-   ESTUDIANTE_DNI=11223344
-   ESTUDIANTE_PWD=tu-pwd-local
-   CROSSCHEX_WEBHOOK_SECRET=tu-secret-local
-   ```
-
-   k6 lee env vía `__ENV.NOMBRE`; cargalas al invocar:
-
-   ```pwsh
-   # opción 1 — cargar a la sesión
-   Get-Content .\scripts\load-tests\f6a\.env-f6a | ForEach-Object {
-     $k,$v = $_.Split('=',2); [System.Environment]::SetEnvironmentVariable($k,$v,'Process')
-   }
-   k6 run scripts\load-tests\f6a\01-pico-matutino.js
-
-   # opción 2 — inline
-   $env:DIRECTOR_DNI='12345678'; $env:DIRECTOR_PWD='xxx'; ...
-   ```
+3. **Credenciales locales** en archivo `.env-f6a` (no commitear; está gitignoreado).
+   Copialo desde `.env-f6a.example` y completalo. **El `CROSSCHEX_WEBHOOK_SECRET` NO va
+   en el archivo** — lo pide el wrapper `run.ps1` por terminal cada vez (ver más abajo).
 
 4. **Certificado HTTPS dev confiado** (si usás `localhost:7102`):
 
@@ -64,17 +42,34 @@
 
 ## Cómo correr
 
-Ejecutar **3 corridas** de cada escenario y tomar **mediana** de los valores observados (regla del brief, mitiga ruido de SQL).
+### Recomendado — `run.ps1` (wrapper que pide el secret en terminal)
+
+`run.ps1` carga `.env-f6a`, pide `CROSSCHEX_WEBHOOK_SECRET` con `Read-Host -AsSecureString`
+sólo cuando el script lo necesita (01 y 04), y pasa todo a k6 vía `-e` flags. El secret
+nunca queda en disco ni en historial de shell.
 
 ```pwsh
-# script puntual
-k6 run --insecure-skip-tls-verify scripts\load-tests\f6a\01-pico-matutino.js
+cd scripts\load-tests\f6a
 
-# guardar resultados a JSON para análisis posterior
-k6 run --insecure-skip-tls-verify --out json=results\f6a-01-run1.json scripts\load-tests\f6a\01-pico-matutino.js
+# Escenarios 01 y 04 — pedirá el secret
+.\run.ps1 01-pico-matutino.js
+.\run.ps1 04-saturacion-combinada.js
 
-# verbose para ver requests detalladas
-k6 run --insecure-skip-tls-verify --verbose scripts\load-tests\f6a\01-pico-matutino.js
+# Escenarios 02, 03, 05, 06 — sin secret (no pregunta)
+.\run.ps1 02-saturacion-pagos.js
+.\run.ps1 03-aislamiento-bulkheads.js
+
+# Pasar args extra a k6 (ej: guardar JSON)
+.\run.ps1 02-saturacion-pagos.js -ExtraArgs '--out json=..\..\..\results\f6a-02-run1.json'
+```
+
+Ejecutar **3 corridas** de cada escenario y tomar **mediana** de los valores observados
+(regla del brief, mitiga ruido de SQL).
+
+### Sin wrapper (escenarios sin secret)
+
+```pwsh
+k6 run --insecure-skip-tls-verify scripts\load-tests\f6a\02-saturacion-pagos.js
 ```
 
 Después de cada corrida, anotar en el reporte `.claude/diagnostic/load-control-f6a-report.md`:
@@ -89,8 +84,8 @@ Después de cada corrida, anotar en el reporte `.claude/diagnostic/load-control-
 | # | Script | Bulkhead | Carga | Esperado |
 |---|---|---|---|---|
 | 1 | `01-pico-matutino.js` | global + bio | 80 logins concurrentes + 100 webhooks bio en 60s | 0× 503, 0× 429. Capa 2 cubre 180 con holgura. |
-| 2 | `02-saturacion-pagos.js` | pagos N=15 | 25 cierres mensuales concurrentes | 15 OK, 10× 503 con `Retry-After` calibrado. |
-| 3 | `03-aislamiento-bulkheads.js` | reports + pagos | 30 reportes + 10 cierres simultáneos | reports: 8 OK + 22 saturados. pagos: 10/10 OK (no afectado). |
+| 2 | `02-saturacion-pagos.js` | pagos N=15 | 25 cierres en burst de 100ms (constant-arrival-rate) | 15 OK, 10× 503 con `Retry-After` calibrado. |
+| 3 | `03-aislamiento-bulkheads.js` | reports + pagos | 60 reportes + 10 cierres en burst | reports: 8 OK + ~52 saturados. pagos: 10/10 OK (no afectado). Pasá `ESTUDIANTE_ID_PDF` con ID válido. |
 | 4 | `04-saturacion-combinada.js` | global + 3 bulkheads | pico matutino + reportes + push notif simultáneos | bulkheads saturados independientemente, login y dashboard responden. |
 | 5 | `05-cancelacion-efectiva.js` | reports | query pesada con client-abort a 2s | pool stats reflejan liberación inmediata, no espera 60s del CommandTimeout. |
 | 6 | `06-resilience-blob-mock.js` | uploads + Polly | upload con mock Blob 503 | 3 retries con jitter, breaker abre tras 10 fallos, requests subsiguientes 503 inmediato. |

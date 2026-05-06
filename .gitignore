@@ -41,8 +41,14 @@ bun.lock
 # ======================
 .env
 .env.*
+.env-*
 !*.env.example
+!.env-*.example
 tokens
+
+# k6 / load-test outputs
+results/
+scripts/load-tests/**/results/
 
 # ======================
 # IDEs / Editors
