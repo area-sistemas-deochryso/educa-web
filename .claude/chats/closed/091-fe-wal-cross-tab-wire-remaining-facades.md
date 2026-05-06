@@ -1,5 +1,6 @@
 > **Creado**: 2026-05-04 · **Estado**: ⏳ pendiente arrancar — handoff desde chat 090.
 
+> **Validación prod**: ✅ verificada 2026-05-06 — smoke Cowork ronda 2 CASO 091/098 (tab A creó curso, tab B follower vio Total Cursos 28→29 sin F5 en ~2s).
 # 091 · FE: WAL — wirear cross-tab refetch en los facades restantes
 
 ## Contexto

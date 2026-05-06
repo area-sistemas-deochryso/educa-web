@@ -1,5 +1,6 @@
 # 098 · FE · WAL cross-tab refetch — end-to-end no actualiza Tab B (fix de 091)
 
+> **Validación prod**: ✅ verificada 2026-05-06 — smoke Cowork ronda 2 CASO 091/098 (tab A creó curso, tab B follower vio Total Cursos 28→29 sin F5 en ~2s).
 > **Repo destino**: `educa-web` (main)
 > **Estado**: ⏳ pendiente arrancar
 > **Creado**: 2026-05-04 · **Modo sugerido**: `/investigate` → `/design` → `/execute`
