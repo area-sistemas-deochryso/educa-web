@@ -79,3 +79,46 @@ Exponer `GET /api/sistema/email-outbox/defer-events` (paginado server-side, con 
 - Modelo: `Educa.API/Educa.API/Models/Sistema/EmailDeferEvent.cs`.
 - Tipos válidos: `Educa.API/Educa.API/Constants/Sistema/EmailDeferEventTipos.cs`.
 - Patrón de pagination con count separado: `educa-web/.claude/rules/pagination.md` §Variante B (referencia: `error-logs admin`).
+
+---
+
+## 🏁 CIERRE 2026-05-06 (estado: awaiting-prod)
+
+### Entregables
+
+- 8 archivos creados en BE (`Educa.API`):
+  - `DTOs/Sistema/EmailDeferEventDtos.cs` — `EmailDeferEventFiltro` + `EmailDeferEventListaDto`.
+  - `Interfaces/Repositories/Sistema/IEmailDeferEventRepository.cs` + `Repositories/Sistema/EmailDeferEventRepository.cs`.
+  - `Interfaces/Services/Sistema/IEmailDeferEventQueryService.cs` + `Services/Sistema/EmailDeferEventQueryService.cs`.
+  - `Controllers/Sistema/DeferEventController.cs` — `GET /api/sistema/email-outbox/defer-events`.
+  - `Tests/Controllers/Sistema/DeferEventControllerAuthorizationTests.cs` — reflection-based auth (INV-AD06 análogo).
+  - `Tests/Repositories/Sistema/EmailDeferEventRepositoryTests.cs` — filtros, orden y paginación.
+- 1 archivo modificado (`Extensions/ServiceExtensions.cs`) — DI scope para repo + service.
+
+### Validación
+
+- ✅ `dotnet build` limpio (warnings de XML doc preexistentes, no introducidos).
+- ✅ 13 tests nuevos verde.
+- ✅ Suite total 1672 (1664 verde + 8 fallas pre-existentes en Plan 40 / RuntimeHealth — confirmado pre-existentes vía `git stash` sobre baseline limpio).
+
+### Decisiones tomadas mid-flow
+
+1. **Variante A wrapper en lugar de variante B con `/count` separado**: el FE consumer (`email-defer-events.service.ts`) ya pide `PaginatedResult<EmailDeferEventDto>` directamente. El brief mencionaba variante B pero habría sido dead code. Sin trabajo derivado.
+2. **`CorrelationId = null` placeholder**: el modelo `EmailDeferEvent` no lleva `EDE_CorrelationId` físico — la correlación pasa por `EDE_EmailOutboxId` → `EmailOutbox.EO_CorrelationId`. Quedó null en este chat. → **Brief 116 abierto** para enriquecer con join.
+3. **Tipos FE divergen del BE**: FE declara 8 valores (`DEFER_4XX`, `BOUNCE_5XX`, ...) mientras el BE solo emite 5 (`WARNING_DELAYED_24H`, `WARNING_DELAYED_72H`, `DOMAIN_BLOCKED`, `MAILBOX_FULL_TRANSIENT`, `SOFT_BOUNCE_RECURRENT`). El BE devuelve la verdad operacional; UX del filtro queda con dropdown irrelevante. → **Brief 117 abierto** para alinear vía endpoint de catálogo.
+4. **Service split read/write**: `EmailDeferEventQueryService` separado del `DeferEventService` (write path). Alineado con `ConsultaAsistenciaRepository` vs `AsistenciaRepository`.
+5. **Enmascarado de destinatario**: `EmailHelper.Mask()` aplicado en el mapper del DTO (privacidad — INV de Reportes de Usuario aplica análogo a NDRs).
+
+### Aprendizajes transferibles
+
+- **FE-first DTO contract**: cuando el FE consumer ya está mergeado, leer su shape (`*.service.ts` + `*.models.ts`) ANTES de decidir el shape del DTO BE evita inventar variantes que no se consumen. El brief decía "variante B" pero la verdad estaba en el FE.
+- **Constantes cross-repo sin sync** son deuda silenciosa: cuando dos repos declaran constantes paralelas sin endpoint de catálogo, el drift es cuestión de tiempo. Default future: catálogo dinámico desde el primer día.
+- **Reflection-based authorization tests** (patrón `EmailBlacklistControllerAuthorizationTests`) son el mecanismo barato para enforcar `[Authorize(Roles = Roles.Administrativos)]` sin levantar la suite de integración. Reusar.
+
+### Gate post-deploy
+
+Bloquea a `/verify 066` (chat closed previo de smoke Cowork). La validación post-deploy es:
+
+- Deploy BE Azure (`Educa.API` master).
+- Smoke: `/intranet/admin/monitoreo/correos/defer-events` carga sin 404, paginación responde, filtros aplican.
+- Si verde → `/verify 113 ✅` mueve a `closed/` y reabre `/verify 066 ✅`.
