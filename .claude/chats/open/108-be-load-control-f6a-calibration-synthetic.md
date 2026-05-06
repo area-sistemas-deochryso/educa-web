@@ -1,12 +1,43 @@
 # BE — Load Control F6a: Calibración sintética con k6
 
 > **Repo destino**: `Educa.API` (master) + `educa-web` (puede tocar test-k6 setup)
-> **Estado**: 🟡 preparación shipped, **awaiting operational session** del usuario.
-> **Creado**: 2026-05-05 · **Modo aplicado**: `/investigate` → preparador (camino A del chat 108).
-> **Bloqueado por**: F2 (chat 104) cerrado.
+> **Estado**: 🟢 destrabado — F6a-02 y F6a-03 ejecutados parcialmente. Faltan 01/04/05 + refinar thresholds.
+> **Creado**: 2026-05-05 · **Modo aplicado**: `/investigate` → preparador (camino A del chat 108) → `/execute` parcial (2026-05-06).
+> **Bloqueos previos resueltos**: chat 110 decouple-usetest-flags cerrado (`b7cd9a2`); 3 bugs BE descubiertos en sesión Cowork 2026-05-06 fixados en `Educa.API@cee1ef2`.
 > **Bloquea a**: F6b (datos reales).
 
-## ESTADO ACTUAL (2026-05-06)
+## Sesión 2026-05-06 — bugs BE resueltos + corridas parciales
+
+Sesión Cowork del usuario 2026-05-06 destapó 3 blockers BE para F6a; se atacaron en este chat:
+
+| Bug | Archivo | Fix | Estado |
+|---|---|---|---|
+| 1: `runtime-health` 500 por policy "global" no registrada | `Educa.API/Controllers/Sistema/RuntimeHealthController.cs` | `[EnableRateLimiting("global")]` → `[DisableRateLimiting]` (GlobalLimiter chained ya cubre) | ✅ fixed |
+| 2: `CrearCierreAsync` race en check-then-insert (SqlException 2601/2627 → 500) | `Educa.API/Services/Asistencias/CierreAsistenciaService.cs` | try/catch `DbUpdateException`+SqlException 2601/2627 con re-fetch idempotente | ✅ fixed |
+| 3: `Retry-After` "absurdo" 4ms | `BackpressureRetryAfterCalculator.cs` | falso positivo — calculator correcto, p95 inflado por Bug 2 | ✅ falso positivo |
+
+Commit BE: `Educa.API/master@cee1ef2`. Fix scripts F6a (`SalonId`→`SedeId`): `educa-web/main@<pendiente>`.
+
+### Corridas validadas
+
+| Escenario | 2xx | 503 | 500 (SqlException) | Threshold |
+|---|---|---|---|---|
+| **F6a-02** saturación-pagos (25 VUs, cap=15) | 15 | 5-7 (`policy=concurrency:pagos`) | **0** ✅ (era 14 antes del fix) | `blocked_503 ≥ 8` falla por 1-3 — ramp-up de `shared-iterations` ⚠️ |
+| **F6a-03** aislamiento-bulkheads (30 reports + 10 pagos) | 30 + 10 | `pagos_503=0` ✅ (CRÍTICO) | 0 | `reports_503 ≥ 15` falla — endpoint `BoletaNotas/estudiante/1` retorna fast 4xx (~127ms) sin saturar cap=8 ⚠️ |
+
+`Retry-After` observado: 4s entero (no fallback de 5s) — el calculator está leyendo p95 real.
+
+### Pendiente para próxima sesión
+
+- **Refinar threshold F6a-02**: cambiar `executor` de `shared-iterations` a `constant-arrival-rate` con `rate=25, timeUnit=100ms` para forzar simultaneidad real.
+- **Refinar threshold F6a-03**: usar endpoint con latencia > 500ms (PDF real con ID válido) o subir `iterations` a 60+ para acumular concurrencia con cap=8.
+- **Correr F6a-01** (pico matutino): requiere `CROSSCHEX_WEBHOOK_SECRET` real en `.env-f6a`.
+- **Correr F6a-04** (combinado): requiere webhook secret + datos reales.
+- **Correr F6a-05** (cancelación): no tiene blockers conocidos.
+- **Diferir F6a-06** a F6b (requiere wiremock para Blob).
+- **Llenar reporte** `.claude/diagnostic/load-control-f6a-report.md` con las 5 corridas.
+
+## ESTADO ACTUAL (2026-05-05 — preparación inicial)
 
 Camino A elegido: yo preparo scripts + plantillas, vos ejecutás cuando tengas BE local + k6.
 
