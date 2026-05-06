@@ -235,9 +235,9 @@ Con endpoint resolviendo en 1ms median, throughput sostenido teórico del cap=8 
 
 ---
 
-## Escenario 6 — Resilience HTTP externo (Polly)
+## Escenario 6 — Resilience HTTP externo (Polly sobre CrossChex)
 
-### Estado: ⏭️ DIFERIDO a chat 112 (handoff del chat 111, 2026-05-06)
+### Re-purpose (chat 111 → chat 112, 2026-05-06)
 
 **Hallazgo de scope (chat 111)**: el script original asumía Polly retries + breaker sobre `BlobStorageService`. Revisión del código reveló que **Polly NO envuelve Blob** — el ADR-0002 / `Educa.API/Educa.API/Extensions/ServiceExtensions.cs:202-209` excluye explícitamente `BlobStorageService` de la pipeline `AddStandardResilienceHandler`:
 
@@ -248,22 +248,63 @@ Polly solo wraps los named HttpClients de **CrossChex y WhatsApp** (`ServiceExte
 - `WhatsApp`: attemptTimeout=10s, totalTimeout=30s, maxRetries=2
 - Breaker compartido: FailureRatio=0.5, MinimumThroughput=10
 
-Con el hook A original (`Diagnostics:ForceBlobFailure=true` que el chat 111 implementó pero **no commiteó**), el throw ocurre antes del SDK call → no hay Polly que retry-e ni breaker que abra. Test inválido en su scope original.
+Esc 06 re-purposed a verificar la pipeline sobre **CrossChex**.
 
-### Decisión del operador (chat 111)
+### Setup (chat 112)
 
-> **Opción F2 — re-purpose esc 06 a Polly sobre CrossChex** + handoff a chat nuevo.
-
-Brief de continuación creado en `.claude/chats/open/112-be-load-control-f6a-esc06-polly-crosschex.md`. Define:
-
-- Endpoint stub `/api/diagnostics/f6a/crosschex-trigger` que dispare `CrossChexApiService` (que sí tiene Polly).
-- Flag `Diagnostics:ForceCrossChexFailure=true` que apunte a URL inválida o devuelva 503 sintético.
+- Stub `GET /api/diagnostics/f6a/crosschex-trigger` (en `F6aStubController.cs`, no commit) que invoca `IHttpClientFactory.CreateClient("CrossChexApiService")` — mismo HttpClient typed con la pipeline Polly attached.
+- Flag `Diagnostics:ForceCrossChexFailure=true` redirige `BaseAddress` del client del stub a `http://localhost:9999` (puerto cerrado) → connection refused → triggerea retries. El factory crea instancias nuevas por llamada — la mutación no afecta llamadas concurrentes del service real.
 - Script renombrado a `06-resilience-crosschex.js`.
-- 3 runs + sección 6 de este reporte completada en el chat 112.
+- Threshold STRICT: `p(50)<300ms` post-breaker + `breaker_open_503: count>=20` (NO `p(95)` — el breaker cicla `OPEN→HALF-OPENED` cada `BreakDuration` y los probes hacen retry, lo cual es comportamiento correcto).
 
-### Veredicto chat 111: ⏭️ DIFERIDO
+### Resultados
 
-Hook A en `BlobStorageService` se reverteó al cierre del chat 111. El esc 06 cierra cuando el chat 112 complete F2.
+3 runs ejecutados 2026-05-06 con flags `EnableF6aStubs=true`, `ForceCrossChexFailure=true`, `SendCorreo=false`, `MarkCrosschex=false`:
+
+| Métrica | Run 1 | Run 2 | Run 3 | **Mediana** |
+|---|---|---|---|---|
+| `breaker_open_503` (count fast sub-300ms) | 35 | 27 | 48 | **35** |
+| `polly_5xx_after_retries` (probes con retry) | 13 | 12 | 4 | **12** |
+| p(50) `{phase:breaker_open}` | 41.5ms | 69ms | 29ms | **42ms** |
+| p(95) `{phase:breaker_open}` | 6.74s | 10.73s | 5.65s | 6.74s |
+| `dropped_iterations` | 4 | 13 | 0 | 4 |
+| Threshold `p(50)<300` | ✅ | ✅ | ✅ | ✅ |
+| Threshold `breaker_open_503≥20` | ✅ | ✅ | ✅ | ✅ |
+
+### Logs del BE — Polly visible
+
+Fase 1 (warmup, 0–~7s) — retries por iteración de `crosschex-trigger`:
+
+```text
+[HttpResilience.CrossChex] Retry attempt 1/2 after Xms — outcome: HttpRequestException
+[HttpResilience.CrossChex] Retry attempt 2/2 after Yms — outcome: HttpRequestException
+```
+
+Cada iteración del warmup tarda ~17s en Run 1 (3 intentos × ~6s connection-refused TCP timeout en Windows). Tras ~10 fallos (`MinimumThroughput=10`):
+
+```text
+[HttpResilience.CrossChex] Circuit breaker OPENED — break duration: 00:00:05, trigger: HttpRequestException
+```
+
+Fase 2 (35–55s) — la mayoría de requests rebotan inmediato con `BrokenCircuitException`. Cada `BreakDuration=5s` (default), el breaker pasa a `HALF-OPENED`, deja un probe que sigue fallando → vuelve a `OPENED`:
+
+```text
+[HttpResilience.CrossChex] Circuit breaker HALF-OPENED (testing recovery)
+[HttpResilience.CrossChex] Circuit breaker OPENED — break duration: 00:00:05, trigger: HttpRequestException
+```
+
+### Análisis del outlier (Run 2)
+
+Run 2 mostró p(95) de 10.7s (vs 6.7s mediana) y `dropped_iterations=13`. Causa: k6 no pudo sostener el rate `2 iter/s` durante los probes lentos, las iteraciones se encolaron. Cuando varias quedan en cola y un probe entra en `HALF-OPENED`, ese probe agota los retries antes de abortar — sumando latencia adicional al p95. Comportamiento esperado bajo congestión del cliente — **no** falla del BE.
+
+### Veredicto: ✅ OK
+
+- ✅ Polly retries activos y loggeados (capa 6 — ADR-0002 §"AddStandardResilienceHandler").
+- ✅ Circuit breaker abre tras `MinimumThroughput=10` fallos.
+- ✅ Cicla `OPEN ↔ HALF-OPENED` cada `BreakDuration=5s` (default standard resilience).
+- ✅ Fast responses dominan post-breaker (mediana=42ms en 3/3 runs).
+
+`Retry-After` observado en 503 fase 2: `null` (vienen del catch del stub que traduce `BrokenCircuitException` → 503, no del backpressure calculator del BE) — coherente con que el rechazo es de la pipeline Polly, no de capa 1/2/3.
 
 ---
 
@@ -278,7 +319,7 @@ Hook A en `BlobStorageService` se reverteó al cierre del chat 111. El esc 06 ci
 | 3 | Aislamiento bulkheads | ✅ OK (pagos_503=0 en 3/3 runs con stub) | 111 |
 | 4 | Saturación combinada | ✅ OK (dashboard_503=0 en 3/3 runs) | 111 |
 | 5 | Cancelación efectiva | ✅ OK (followup_503=0, CT propaga end-to-end) | 111 |
-| 6 | Resilience HTTP | ⏭️ DIFERIDO a chat 112 (re-purpose Polly sobre CrossChex) | 111 → 112 |
+| 6 | Resilience HTTP (Polly sobre CrossChex) | ✅ OK (retries + breaker abren; mediana p50 post-breaker = 42ms en 3/3 runs) | 112 |
 
 ### Ajustes propuestos
 

@@ -1,7 +1,8 @@
 # BE — Load Control F6a Esc 06: Re-purpose para verificar Polly sobre CrossChex
 
 > **Repo destino**: `educa-web` (script k6) + `Educa.API` (stub trigger + flag de fallo CrossChex)
-> **Estado**: 🟢 listo para arrancar — pre-work del chat 111 completado.
+> **Estado**: ✅ cerrado local 2026-05-06 — 3 runs OK, sección 6 del reporte F6a completa.
+> **Validación prod**: ⏳ pendiente desde 2026-05-06 — alineado con F1-F5 (`awaiting-prod/103-107`) que ya despliegan la pipeline Polly real.
 > **Creado**: 2026-05-06 · **Modo sugerido**: `/execute`.
 > **Continúa**: chat 111 cerró F6a esc 03/04/05 ✅; esc 06 quedó re-purposed por hallazgo de scope.
 > **Bloquea a**: cierre completo de Plan 40 F6a → habilita F6b (chat 109, hoy en HOLD).
