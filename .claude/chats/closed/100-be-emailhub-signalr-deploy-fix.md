@@ -111,3 +111,9 @@ grep -rn "email-alerts\|EmailHub" educa-web/src/app/core/services/
 
 → Reformular brief `099-fe-email-quarantine-tab-not-mounted-fix.md` con estos 3 findings reales en el siguiente chat (la hipótesis original "tab no monta" era imprecisa — las tabs sí montan, fallan las requests HTTP).
 
+
+---
+
+## ✅ Verificado en producción 2026-05-06
+
+Mismo caso que 078 (smoke Cowork CASO 078/100). El 403 reportado el 2026-05-05 ya no se reproduce post-deploy. `negotiate` devuelve 200 y el transport negocia correctamente con SSE/LongPolling (Netlify no soporta WebSocket).

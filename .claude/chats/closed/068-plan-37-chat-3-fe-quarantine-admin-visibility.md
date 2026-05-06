@@ -229,3 +229,19 @@ consuming the cap and what should I do?".
 1. **Notificación push vs banner-only** — ¿el evento `DOMAIN_BLOCKED` debe mandar email al Director además de SignalR? Recomendación: SignalR + banner alcanza; correo solo si Chat 2 lo agregó (esquema fire-and-forget).
 2. **¿Cuarentena manual con dominio receptor?** — el endpoint `POST /domain-pauses` ya lo permite. Confirmar si UI lo expone como caso de uso esperado o dejar fuera (admin lo puede hacer vía Postman si es excepcional).
 3. **¿Tab eventos paginado o "infinite scroll"?** — Recomendación: paginado server-side, 25 filas por página. Infinite scroll complica filtrado.
+
+---
+
+## ❌ Verificado en producción 2026-05-06 — addressed by chat 114
+
+Smoke Cowork (`claude-cowork/post-deploy-2026-05-06.md` CASO 068):
+
+Tab UI monta ✅ desde `/intranet/admin/monitoreo/correos/quarantine`. Tabla server-paginated, filtros, dialog "+ Agregar", drawer detalle — todo construido y desplegado.
+
+Pero `GET /api/sistema/email-outbox/quarantine?...` → **404**. Diagnóstico en código:
+- FE consume `${apiUrl}/api/sistema/email-outbox/quarantine` (`email-quarantine.service.ts:28`).
+- BE expone `[Route("api/sistema/email-quarantine")]` (`EmailQuarantineController.cs:19`).
+
+**Path mismatch FE↔BE**, no bug de UI. Las mutaciones (agregar manual, liberar) no se ejecutaron en el smoke por el mismo motivo.
+
+**Fix pendiente**: brief nuevo `114-fix-quarantine-path-mismatch.md` en `open/`. Decisión de naming canónico al arrancar (recomendación: renombrar BE a `email-outbox/quarantine` para coherencia con el agrupamiento del shell).

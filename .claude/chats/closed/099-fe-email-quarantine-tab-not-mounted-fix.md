@@ -70,3 +70,15 @@ GET /api/sistema/email-quarantine 200 OK
 - Brief original: `closed/068-plan-37-chat-3-fe-quarantine-admin-visibility.md`.
 - Shell: `src/app/features/intranet/pages/admin/monitoreo/correos-shell/` (ubicación tentativa).
 - Reglas: `rules/feature-flags.md`, `rules/permissions.md`.
+
+---
+
+## ✅ Cerrado como falso positivo 2026-05-06
+
+Smoke Cowork (`claude-cowork/post-deploy-2026-05-06.md` CASO 099):
+
+La URL canónica del tab Cuarentena es `/intranet/admin/monitoreo/correos/quarantine` (EN), declarada en `monitoreo.routes.ts:76` con `path: 'quarantine'`. **Nunca existió alias `/cuarentena` (ES)** en el routing FE. Que `/cuarentena` redirija a home es comportamiento correcto (404 → fallback).
+
+El tab monta correctamente desde la URL `/quarantine` y desde el shell de pestañas internas. El backend tiene un bug separado de path mismatch (`email-quarantine` vs `email-outbox/quarantine`) que se aborda en el brief 114.
+
+No hay acción correctiva sobre 099. Se cierra sin cambios.

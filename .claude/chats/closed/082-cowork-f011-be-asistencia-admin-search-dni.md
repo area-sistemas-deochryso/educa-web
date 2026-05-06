@@ -116,3 +116,19 @@ Pedir al usuario:
 1. Confirmar smoke en producción tras el deploy: cross-role → click pencil profesor → admin muestra la fila.
 2. Si DNI estaba encriptado y hubo que escalar, validar que la decisión adoptada (hash, columna plain, o restricción) cumple con la auditoría de seguridad del proyecto.
 3. Mover el hallazgo F-011 desde §7 a §8 ("Hallazgos verificados") en `claude-cowork/SETUP-COWORK.md` con hash del commit.
+
+---
+
+## ✅ Verificado parcial en producción 2026-05-06
+
+Smoke Cowork (`claude-cowork/post-deploy-2026-05-06.md` CASO 082):
+
+API directa `/api/asistencia-admin/dia?fecha=2026-04-29&tipoPersona=P&search=...`:
+- DNI exacto `76357038` → 1 fila ✅
+- Nombre+apellido `ramirez bernardo` → 1 fila ✅
+- Apellido `RAMIREZ` → 1 fila ✅
+- DNI parcial `763` → 0 filas ❌ — **limitación AES-256 sobre `Contains` en `PRO_DNI`** documentada en memoria global `project_encrypted_fields_in_queries.md`. NO es bug del fix 082; el predicado SQL es correcto, la columna está encriptada. Resolver requiere denormalización (brief separado, fuera de scope).
+
+Deep-link cross-role end-to-end **falla por bug FE** distinto al fix 082: `attendances-data.facade.ts:228` `onSearch()` no dispara refetch server-side, solo filtra client-side la lista ya cargada. Cubierto por brief nuevo `115-fe-deep-link-asistencias-search-refetch.md`.
+
+Cierre formal del fix BE 082. Bug FE residual continúa en chat 115.

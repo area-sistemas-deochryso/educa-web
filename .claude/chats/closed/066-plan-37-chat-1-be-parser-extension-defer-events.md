@@ -222,3 +222,15 @@ Foundation for Chat 2 quarantine + recipient-domain throttle.
 1. **¿El parser del Plan 31 Chat 2 está verificado en prod?** Si no, hacer `/verify 038` primero. Si nunca se desplegó, este chat se bloquea.
 2. **Fixtures de NDRs reales** — pedir 3-4 archivos `.eml` de la bandeja `sistemas6@`: uno de cada tipo (delayed 24h, delayed 72h, exceeded max defers, mailbox out of storage). Sin fixtures reales, los tests se quedan heurísticos.
 3. **Heurística de subject vs diagnostic-code** — algunos NDRs traen el motivo en `Subject` (`Warning: message ... delayed 72 hours`) y otros en `Diagnostic-Code`. Confirmar con fixtures que ambas rutas funcionan.
+
+---
+
+## ❌ Verificado en producción 2026-05-06 — addressed by chat 113
+
+Smoke Cowork (`claude-cowork/post-deploy-2026-05-06.md` CASO 066):
+
+Tab UI monta ✅ (filtros tipo + dominio + rango fecha + Exportar CSV + empty state).
+
+Pero `GET /api/sistema/email-outbox/defer-events?page=1&pageSize=25` → **404**. Diagnóstico en código: el BE tiene `DeferEventService`, `DeferEventDetector`, modelo `EmailDeferEvent` + configuración + constants — **pero NO existe `DeferEventController`**. El servicio solo lo consume `BounceParserService` IMAP para persistir. La UI quedó huérfana sin endpoint de listado.
+
+**Fix pendiente**: brief nuevo `113-be-defer-event-controller.md` en `open/`. Cierra el FE 066 al deployarse el controller.

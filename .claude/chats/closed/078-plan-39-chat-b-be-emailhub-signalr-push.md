@@ -131,3 +131,15 @@ public class SignalREmailHubNotifier : IEmailHubNotifier
 - Brief design: `.claude/chats/closed/071-plan-39-chat-1-monitoreo-empirico-design.md` (D5 + D13).
 - Patrón heredado: `Hubs/AsistenciaHub.cs` (Plan 21+22).
 - Reglas: `backend.md` §autorización en SignalR.
+
+---
+
+## ✅ Verificado en producción 2026-05-06
+
+Smoke Cowork (`claude-cowork/post-deploy-2026-05-06.md` CASO 078/100):
+
+- `POST /hubs/email-alerts/negotiate?negotiateVersion=1` → **200**, `connectionId` presente.
+- Transports negociados: `ServerSentEvents`, `LongPolling` (sin WebSocket — esperado en Netlify).
+- `/api/sistema/email-outbox/defer-fail-status` → 200 con `level=OK`. El FE no abre el hub al cargar `/email-outbox` porque solo lo conecta cuando hay WARNING/CRITICAL — comportamiento consistente con el diseño del banner.
+
+Cierre formal del Plan 39 Chat B.

@@ -256,3 +256,15 @@ features/intranet/pages/admin/sistema/runtime-health/
 - **OTel runtime instrumentation NO es lectura in-process**. `AddRuntimeInstrumentation()` exporta a AppInsights pero no permite leer back desde el meter propio. Para consultas en-vivo desde un endpoint propio, usar APIs estándar de .NET (`ThreadPool`, `GC`, `EventListener`).
 - **Histogramas OTel custom no son consultables desde el meter propio**. El sliding window in-process es complementario, no duplicado: el primero alimenta dashboards externos, el segundo alimenta endpoints internos.
 - **Clasificador de saturación A/B/C es función pura** — no depende de DI, no toca BD, no toca tiempo. Cualquier feature de health monitoring debe extraer esta capa para que sea trivialmente testeable.
+
+---
+
+## ✅ Verificado en producción 2026-05-06
+
+Smoke Cowork (`claude-cowork/post-deploy-2026-05-06.md` CASO 102):
+
+- `GET /api/sistema/runtime-health` → 200 (no 500 — bug 1 del chat 108 NO regresó).
+- Métricas reales observadas: `requests.p50Ms=32, p95Ms=512, p99Ms=512, inFlight=1`, `db.activeConnections=15, p95LatencyMs=0`, `threadPool.queueLength=0`.
+- **Desviación de plan vs implementación**: el shape devuelto es `{ generatedAt, pattern, patternReason, threadPool, requests, db, gc }`, no `{ classification, metrics: { p50, p95, p99, inFlight, sqlPool } }` como decía la sección "DECISIONES CERRADAS" del brief. La equivalencia funcional: `pattern: 0 + patternReason: "all metrics within thresholds"` corresponde a clasificación A. La doc del brief quedó desactualizada respecto a la implementación final ganadora; no es bug — solo registro histórico.
+
+Cierre formal del Plan 102.
