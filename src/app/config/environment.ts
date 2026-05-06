@@ -22,7 +22,7 @@ export const environment = {
 		voiceRecognition: false,
 		profesor: true, //? provisional de momento
 		estudiante: true,
-		ctestK6: false,
+		ctestK6: true,
 		videoconferencias: true,
 		campusNavigation: false,
 		feedbackReport: true,
