@@ -1,10 +1,62 @@
 # BE — Load Control F6a: Calibración sintética con k6
 
 > **Repo destino**: `Educa.API` (master) + `educa-web` (puede tocar test-k6 setup)
-> **Estado**: ⏳ pendiente arrancar
-> **Creado**: 2026-05-05 · **Modo sugerido**: `/investigate` → `/execute` (ajustes finos) → `/validate`
+> **Estado**: 🟡 preparación shipped, **awaiting operational session** del usuario.
+> **Creado**: 2026-05-05 · **Modo aplicado**: `/investigate` → preparador (camino A del chat 108).
 > **Bloqueado por**: F2 (chat 104) cerrado.
 > **Bloquea a**: F6b (datos reales).
+
+## ESTADO ACTUAL (2026-05-06)
+
+Camino A elegido: yo preparo scripts + plantillas, vos ejecutás cuando tengas BE local + k6.
+
+### Shipped (sin commit aún — pendiente decisión del usuario en `/end`)
+
+| Archivo | Rol |
+|---|---|
+| `scripts/load-tests/f6a/README.md` | instrucciones, prerequisitos, comandos exactos |
+| `scripts/load-tests/f6a/.env-f6a.example` | template de credenciales locales (gitignored) |
+| `scripts/load-tests/f6a/_lib/auth.js` | helper login compartido |
+| `scripts/load-tests/f6a/_lib/payloads.js` | fixtures CrossChex |
+| `scripts/load-tests/f6a/01-pico-matutino.js` | 80 logins (token reusado) + 100 webhooks bio |
+| `scripts/load-tests/f6a/02-saturacion-pagos.js` | 25 cierres concurrentes — verifica cap Pagos N=15 |
+| `scripts/load-tests/f6a/03-aislamiento-bulkheads.js` | reports + pagos simultáneos — verifica aislamiento |
+| `scripts/load-tests/f6a/04-saturacion-combinada.js` | pico + reports + notif + bio + dashboard director |
+| `scripts/load-tests/f6a/05-cancelacion-efectiva.js` | follow-up tras cancelar 8 reportes a 2s |
+| `scripts/load-tests/f6a/06-resilience-blob-mock.js` | Polly retries + breaker (requiere mock setup) |
+| `.claude/diagnostic/load-control-f6a-report.md` | plantilla del reporte para llenar al ejecutar |
+
+### Decisiones tomadas durante la preparación
+
+- **Login en escenario 1 reusa un único token** (estudiante o profesor). Evita falso positivo con rate limit `login=10/min/IP` cuando k6 corre desde una sola IP. El brief habla de "logins concurrentes" pero lo medible bajo k6 es "sesiones autenticadas haciendo home requests" — equivalente desde el punto de vista del cap global.
+- **Endpoint clasificado en `:reports`** elegido para escenarios 3+5: `GET /api/BoletaNotas/estudiante/{id}` (decoración heredada via class-level `[EnableRateLimiting("concurrency:reports")]` en `BoletaNotasController`).
+- **Endpoint clasificado en `:notif`** para escenario 4: `POST /api/Notificaciones`.
+- **Escenario 6 (Blob mock) NO es auto-ejecutable hoy** sin uno de:
+  - Wiremock local en :9090 + override de `appsettings.Development.json:AzureBlobStorage:Endpoint`.
+  - Hook de diagnóstico `Diagnostics:ForceBlobFailure=true` (requiere PR a `Educa.API`, ~30 líneas).
+  - Diferir a F6b cuando el deploy a Azure permita simular falla real.
+  Documentado en header del script. **Recomendación**: opción C (hook de diagnóstico) en un sub-chat aparte si F6a quiere ser hermético, o aceptar diferimiento a F6b.
+
+### Lo que falta — sesión operativa del usuario
+
+1. Instalar k6 (`scoop install k6`).
+2. Levantar `dotnet run` en `Educa.API` con master actual (F1-F5 mergeados).
+3. Copiar `.env-f6a.example` → `.env-f6a` y completar credenciales locales reales.
+4. Ejecutar 5 escenarios × 3 runs = 15 corridas (~30-45 min).
+5. Decidir qué hacer con escenario 6 (mock setup vs diferir).
+6. Llenar `.claude/diagnostic/load-control-f6a-report.md` con observaciones.
+7. Si hay ajustes evidentes (>50% off), commit con justificación; si no, commit del reporte y mover brief a `awaiting-prod/` cuando F1-F5 deployen y el reporte se cierre.
+
+### Referencia rápida de caps esperados (ADR-0005)
+
+| Bulkhead | Cap | Endpoints clave |
+| --- | ---: | --- |
+| `concurrency:global` | 140 | todos los requests autenticados |
+| `concurrency:pagos` | 15 | `cierre-asistencia/*`, `PagoMatricula*`, `Aprobacion*/masivo` |
+| `concurrency:reports` | 8 | `BoletaNotas*`, `ConsultaAsistencia*` (clase con `[EnableRateLimiting("concurrency:reports")]`) |
+| `concurrency:notif` | 15 | `Notificaciones*`, `EmailOutbox*`, hubs |
+| `concurrency:uploads` | 10 | multipart/form-data hacia Blob |
+| `concurrency:bio` | 20 | `POST /api/Asistencia/webhook` |
 
 ## CONTEXTO
 
