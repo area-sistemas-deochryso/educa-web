@@ -81,5 +81,9 @@ ios/
 # Claude drift-check reports (generated, not tracked)
 .claude/reporte-drift-check/
 
+# Daily report (skill personal — no se commitea)
+.claude/commands/daily-report.md
+.claude/daily-reports/
+
 # Codex
 .codex/
