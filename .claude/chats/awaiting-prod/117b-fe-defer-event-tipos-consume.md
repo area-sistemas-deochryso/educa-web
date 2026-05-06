@@ -1,7 +1,7 @@
 # FE — Consumir catálogo dinámico de tipos de `EmailDeferEvent`
 
 > **Repo destino**: `educa-web` main.
-> **Estado**: ⏸️ bloqueado por deploy de `117a` a Azure.
+> **Estado**: ✅ cerrado local 2026-05-06 — `awaiting-prod/` esperando deploy de `117a` BE a Azure + deploy FE.
 > **Creado**: 2026-05-06 · **Modo sugerido**: `/execute` → `/validate`
 > **Origen**: chat 113 cierre, decisión 3 mid-flow. Split de brief 117 cross-repo (Opción 2 — FE después).
 > **Depende de**: `117a-be-defer-event-tipos-endpoint.md` desplegado a producción y verificado.

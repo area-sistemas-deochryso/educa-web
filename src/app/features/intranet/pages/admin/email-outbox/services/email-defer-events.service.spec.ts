@@ -67,4 +67,39 @@ describe('EmailDeferEventsService', () => {
 		expect(req.request.params.has('dominio')).toBe(false);
 		req.flush({ data: [], page: 2, pageSize: 10, total: 0 });
 	});
+
+	describe('getCatalogoTipos', () => {
+		it('llama al endpoint /tipos y retorna el array', () => {
+			let received: string[] | undefined;
+			service.getCatalogoTipos().subscribe((tipos) => {
+				received = tipos;
+			});
+
+			const req = httpMock.expectOne((r) =>
+				r.url.endsWith('/api/sistema/email-outbox/defer-events/tipos'),
+			);
+			expect(req.request.method).toBe('GET');
+			req.flush(['WARNING_DELAYED_24H', 'DOMAIN_BLOCKED']);
+
+			expect(received).toEqual(['WARNING_DELAYED_24H', 'DOMAIN_BLOCKED']);
+		});
+
+		it('cachea el resultado: la segunda subscripción no dispara una nueva request', () => {
+			service.getCatalogoTipos().subscribe();
+
+			const req = httpMock.expectOne((r) =>
+				r.url.endsWith('/api/sistema/email-outbox/defer-events/tipos'),
+			);
+			req.flush(['WARNING_DELAYED_24H']);
+
+			let received: string[] | undefined;
+			service.getCatalogoTipos().subscribe((tipos) => {
+				received = tipos;
+			});
+
+			// shareReplay sirve el valor cacheado — no hay nueva request HTTP.
+			httpMock.expectNone((r) => r.url.endsWith('/defer-events/tipos'));
+			expect(received).toEqual(['WARNING_DELAYED_24H']);
+		});
+	});
 });

@@ -20,10 +20,10 @@ import { TooltipModule } from 'primeng/tooltip';
 import { logger } from '@core/helpers';
 import {
 	DeferEventTipo,
-	EMAIL_DEFER_EVENT_TIPOS,
 	EmailDeferEventDto,
 	EmailDeferEventFiltros,
 } from '@data/models/email-defer-event.models';
+import { UiMappingService } from '@shared/services';
 
 import { EmailDeferEventsService } from '../../services';
 import { DeferEventItemComponent } from '../defer-event-item/defer-event-item.component';
@@ -33,22 +33,6 @@ interface SelectOption<T> {
 	label: string;
 	value: T;
 }
-
-const TIPO_LABELS: Record<DeferEventTipo, string> = {
-	DEFER_4XX: 'Defer 4.x.x',
-	BOUNCE_5XX: 'Bounce 5.x.x',
-	MAILBOX_FULL: 'Buzón lleno',
-	DOMAIN_BLOCKED: 'Dominio bloqueado',
-	AUTH_FAILURE: 'Auth fail',
-	TLS_FAILURE: 'TLS fail',
-	TIMEOUT: 'Timeout',
-	OTHER: 'Otro',
-};
-
-const TIPO_OPTIONS: SelectOption<DeferEventTipo>[] = EMAIL_DEFER_EVENT_TIPOS.map((t) => ({
-	label: TIPO_LABELS[t],
-	value: t,
-}));
 
 const PAGE_SIZE = 25;
 
@@ -74,9 +58,14 @@ export class DeferEventsTabComponent implements OnInit {
 	private readonly api = inject(EmailDeferEventsService);
 	private readonly route = inject(ActivatedRoute);
 	private readonly destroyRef = inject(DestroyRef);
+	private readonly uiMapping = inject(UiMappingService);
 
-	readonly tipoOptions = TIPO_OPTIONS;
 	readonly pageSize = PAGE_SIZE;
+
+	private readonly _tipoOptions = signal<SelectOption<DeferEventTipo>[]>([]);
+	private readonly _tipoOptionsLoading = signal(true);
+	readonly tipoOptions = this._tipoOptions.asReadonly();
+	readonly tipoOptionsLoading = this._tipoOptionsLoading.asReadonly();
 
 	private readonly _events = signal<EmailDeferEventDto[]>([]);
 	private readonly _loading = signal(false);
@@ -100,21 +89,48 @@ export class DeferEventsTabComponent implements OnInit {
 	readonly hasEvents = computed(() => this._events().length > 0);
 
 	ngOnInit(): void {
-		// Cross-link from defer-fail widget: ?desde=hoy
+		this.loadCatalogoTipos();
+
+		// Cross-link from defer-fail widget: ?desde=hoy&tipo=<tipo>
 		this.route.queryParamMap
 			.pipe(takeUntilDestroyed(this.destroyRef))
 			.subscribe((params) => {
 				const desde = params.get('desde');
-				const tipo = params.get('tipo') as DeferEventTipo | null;
+				const tipo = params.get('tipo');
 				if (desde === 'hoy') {
 					const today = new Date();
 					today.setHours(0, 0, 0, 0);
 					this._filterDesde.set(today);
 				}
-				if (tipo && EMAIL_DEFER_EVENT_TIPOS.includes(tipo)) {
+				if (tipo) {
+					// String libre — el BE valida; si es desconocido, devuelve tabla vacía.
 					this._filterTipo.set(tipo);
 				}
 				this.loadData();
+			});
+	}
+
+	private loadCatalogoTipos(): void {
+		this.api
+			.getCatalogoTipos()
+			.pipe(takeUntilDestroyed(this.destroyRef))
+			.subscribe({
+				next: (tipos) => {
+					this._tipoOptions.set(
+						tipos.map((t) => ({
+							label: this.uiMapping.getDeferEventTipoLabel(t),
+							value: t,
+						})),
+					);
+					this._tipoOptionsLoading.set(false);
+				},
+				error: (err) => {
+					logger.error('[DeferEventsTab] Error loading catálogo tipos', err);
+					// Fallback: dropdown vacío. El filtro tipo es string libre, sigue
+					// funcionando vía URL (?tipo=...). Ver brief 117b.
+					this._tipoOptions.set([]);
+					this._tipoOptionsLoading.set(false);
+				},
 			});
 	}
 

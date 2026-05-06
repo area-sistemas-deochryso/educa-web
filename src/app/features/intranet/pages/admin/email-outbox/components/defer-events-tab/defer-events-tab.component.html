@@ -2,12 +2,13 @@
 
 <div class="filters-bar">
 	<p-select
-		[options]="tipoOptions"
+		[options]="tipoOptions()"
 		optionLabel="label"
 		optionValue="value"
 		[ngModel]="filterTipo()"
 		(ngModelChange)="onTipoChange($event)"
-		placeholder="Tipo de evento"
+		[placeholder]="tipoOptionsLoading() ? 'Cargando…' : 'Tipo de evento'"
+		[disabled]="tipoOptionsLoading()"
 		[showClear]="true"
 		appendTo="body"
 	/>

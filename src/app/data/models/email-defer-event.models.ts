@@ -2,21 +2,15 @@
  * Plan 37 Chat 3 — DTOs y tipos semánticos del dominio `EmailDeferEvent`.
  * Espejo del DTO BE expuesto por `EmailDeferEventsController`.
  *
- * Tipos derivados de `Constants/Notifications/EmailDeferEventTipos.cs`.
+ * Plan 37 Chat 117b — el catálogo dinámico de tipos vive ahora en el endpoint
+ * `GET /api/sistema/email-outbox/defer-events/tipos` (consumido por
+ * `EmailDeferEventsService.getCatalogoTipos()`). El FE no hardcodea valores —
+ * el BE es la única fuente de verdad de los `EDE_TipoEvento` válidos.
  */
 
 // #region Semantic types
-export const EMAIL_DEFER_EVENT_TIPOS = [
-	'DEFER_4XX',
-	'BOUNCE_5XX',
-	'MAILBOX_FULL',
-	'DOMAIN_BLOCKED',
-	'AUTH_FAILURE',
-	'TLS_FAILURE',
-	'TIMEOUT',
-	'OTHER',
-] as const;
-export type DeferEventTipo = (typeof EMAIL_DEFER_EVENT_TIPOS)[number];
+/** Tipo de evento de defer/bounce. String libre — BE define el catálogo válido. */
+export type DeferEventTipo = string;
 // #endregion
 
 // #region DTOs

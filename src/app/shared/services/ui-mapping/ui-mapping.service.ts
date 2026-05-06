@@ -124,27 +124,24 @@ const DOMAIN_PAUSE_MOTIVO_LABEL: Record<DomainPauseMotivo, string> = {
 };
 // #endregion
 
-// #region Defer event mappings (Plan 37 Chat 3)
-const DEFER_EVENT_TIPO_SEVERITY: Record<DeferEventTipo, Severity> = {
-	DEFER_4XX: 'warn',
-	BOUNCE_5XX: 'danger',
-	MAILBOX_FULL: 'warn',
+// #region Defer event mappings (Plan 37 Chat 3 + Chat 117b)
+// El catálogo viene del BE (ver `EmailDeferEventsService.getCatalogoTipos`).
+// Estos mapas cubren los valores que `DeferEventDetector` emite hoy; valores
+// nuevos del BE que no estén acá caen al fallback (`?? 'secondary'` / `?? tipo`).
+const DEFER_EVENT_TIPO_SEVERITY: Record<string, Severity> = {
+	WARNING_DELAYED_24H: 'warn',
+	WARNING_DELAYED_72H: 'danger',
 	DOMAIN_BLOCKED: 'danger',
-	AUTH_FAILURE: 'danger',
-	TLS_FAILURE: 'danger',
-	TIMEOUT: 'secondary',
-	OTHER: 'secondary',
+	MAILBOX_FULL_TRANSIENT: 'warn',
+	SOFT_BOUNCE_RECURRENT: 'warn',
 };
 
-const DEFER_EVENT_TIPO_LABEL: Record<DeferEventTipo, string> = {
-	DEFER_4XX: 'Defer 4.x.x',
-	BOUNCE_5XX: 'Bounce 5.x.x',
-	MAILBOX_FULL: 'Buzón lleno',
+const DEFER_EVENT_TIPO_LABEL: Record<string, string> = {
+	WARNING_DELAYED_24H: 'Retraso 24h',
+	WARNING_DELAYED_72H: 'Retraso 72h',
 	DOMAIN_BLOCKED: 'Dominio bloqueado',
-	AUTH_FAILURE: 'Auth fail',
-	TLS_FAILURE: 'TLS fail',
-	TIMEOUT: 'Timeout',
-	OTHER: 'Otro',
+	MAILBOX_FULL_TRANSIENT: 'Buzón lleno (transient)',
+	SOFT_BOUNCE_RECURRENT: 'Soft bounce recurrente',
 };
 // #endregion
 
