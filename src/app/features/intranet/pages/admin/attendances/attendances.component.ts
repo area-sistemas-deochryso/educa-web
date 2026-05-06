@@ -166,11 +166,14 @@ export class AttendancesComponent implements OnInit {
 
 	// #region Lifecycle
 	ngOnInit(): void {
-		this.dataFacade.loadData();
 		this.dataFacade.loadEstudiantes();
 		// Plan 24 Chat 3 — recuperar sync activo tras refresh F5 + listener terminal.
 		void this.syncService.rehydrate();
 		this.subscribeToSyncTerminal();
+		// `subscribeToQueryParams` aplica los queryParams al store y dispara
+		// `loadData()` una sola vez con todos los filtros (incluido el deep-link
+		// `?dni=...`). Evita el race que tenía `loadData()` en ngOnInit + handlers
+		// individuales (cada uno bloqueado por el guard `loading()`).
 		this.subscribeToQueryParams();
 	}
 
@@ -200,6 +203,11 @@ export class AttendancesComponent implements OnInit {
 
 	// Cross-link desde `AttendanceDirectorComponent` tab profesores (Plan 23 Chat 5).
 	// Query params soportados: `tab`, `tipoPersona`, `dni`, `fecha` (YYYY-MM-DD).
+	//
+	// Aplica los params al store y dispara UN solo `loadData()` al final con
+	// todos los filtros ya seteados (fecha + tipoPersona + search). Sin el
+	// batch, los handlers individuales corrían en cascada y el guard `loading()`
+	// bloqueaba los subsiguientes — solo el primer GET salía con filtros stale.
 	private subscribeToQueryParams(): void {
 		this.route.queryParamMap
 			.pipe(takeUntilDestroyed(this.destroyRef))
@@ -210,16 +218,20 @@ export class AttendancesComponent implements OnInit {
 				const fecha = params.get('fecha');
 				if (fecha && isValidDateIso(fecha)) {
 					this.fechaCalendar.set(parseIsoDate(fecha));
-					this.dataFacade.onFechaChange(fecha);
+					this.store.setFecha(fecha);
 				}
 
 				const tipo = params.get('tipoPersona');
 				if (tipo === 'E' || tipo === 'P' || tipo === 'todos') {
-					this.dataFacade.onTipoPersonaChange(tipo);
+					this.store.setTipoPersonaFilter(tipo);
 				}
 
 				const dni = params.get('dni');
-				if (dni) this.dataFacade.onSearch(dni);
+				if (dni) this.store.setSearchTerm(dni);
+
+				this.store.setStatsReady(false);
+				this.store.setTableReady(false);
+				this.dataFacade.loadData();
 			});
 	}
 	// #endregion

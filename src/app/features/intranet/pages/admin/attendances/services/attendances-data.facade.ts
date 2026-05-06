@@ -1,6 +1,7 @@
 import { DestroyRef, Injectable, inject } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { HttpErrorResponse } from '@angular/common/http';
+import { Subject, debounceTime, distinctUntilChanged } from 'rxjs';
 
 import { logger } from '@core/helpers';
 import { WalCrossTabRefetchService } from '@core/services';
@@ -31,6 +32,10 @@ export class AttendancesDataFacade {
 	readonly vm = this.store.vm;
 	// #endregion
 
+	// Trigger debounced para input search del usuario (300ms). Deep-links
+	// usan `setSearchAndReload` que salta el debounce.
+	private readonly _searchTrigger$ = new Subject<string>();
+
 	constructor() {
 		this.crossTabRefetch.subscribe({
 			resourceType: 'asistencia-admin',
@@ -43,6 +48,17 @@ export class AttendancesDataFacade {
 			refetchItems: () => this.loadCierres(),
 			destroyRef: this.destroyRef,
 		});
+
+		this._searchTrigger$
+			.pipe(
+				debounceTime(300),
+				distinctUntilChanged(),
+				takeUntilDestroyed(this.destroyRef),
+			)
+			.subscribe(() => {
+				this.store.setTableReady(false);
+				this.loadItems();
+			});
 	}
 
 	// #region Carga de datos
@@ -77,9 +93,10 @@ export class AttendancesDataFacade {
 		const fecha = this.store.fecha();
 		const sedeId = this.store.sedeId() ?? undefined;
 		const tipoPersona = toApiTipoPersona(this.store.tipoPersonaFilter());
+		const search = this.store.searchTerm()?.trim() || undefined;
 
 		this.api
-			.listarDelDia(fecha, sedeId, undefined, tipoPersona)
+			.listarDelDia(fecha, sedeId, search, tipoPersona)
 			.pipe(takeUntilDestroyed(this.destroyRef))
 			.subscribe({
 				next: (items) => {
@@ -99,9 +116,10 @@ export class AttendancesDataFacade {
 		const fecha = this.store.fecha();
 		const sedeId = this.store.sedeId() ?? undefined;
 		const tipoPersona = toApiTipoPersona(this.store.tipoPersonaFilter());
+		const search = this.store.searchTerm()?.trim() || undefined;
 
 		this.api
-			.listarDelDia(fecha, sedeId, undefined, tipoPersona)
+			.listarDelDia(fecha, sedeId, search, tipoPersona)
 			.pipe(takeUntilDestroyed(this.destroyRef))
 			.subscribe({
 				next: (items) => {
@@ -227,6 +245,18 @@ export class AttendancesDataFacade {
 
 	onSearch(term: string): void {
 		this.store.setSearchTerm(term);
+		this._searchTrigger$.next(term);
+	}
+
+	/**
+	 * Setea el término de búsqueda y dispara refetch inmediato (sin debounce).
+	 * Pensado para deep-links (`?dni=...`) donde el valor viene de queryParam,
+	 * no de input del usuario.
+	 */
+	setSearchAndReload(term: string): void {
+		this.store.setSearchTerm(term);
+		this.store.setTableReady(false);
+		this.loadItems();
 	}
 
 	onTipoPersonaChange(tipo: TipoPersonaFilter): void {
