@@ -61,3 +61,37 @@ Enriquecer la query de `EmailDeferEventRepository.ListarPaginadoAsync` con un `J
 - `EmailOutbox.EO_CorrelationId`: definido en Plan 31 Chat 1.
 - `CorrelationController`: Plan 32 hub.
 - Service consumer FE (read-only): `educa-web/src/app/features/intranet/pages/admin/email-outbox/services/email-defer-events.service.ts`.
+
+---
+
+## CIERRE — 2026-05-06
+
+**Estado**: ✅ shipped local · `awaiting-prod` esperando deploy BE.
+**Commit BE**: `Educa.API master 34274b3` (`feat(email-defer-events): resolve CorrelationId via left-join on EmailOutbox`).
+
+### Implementación
+
+- Nuevo `Models/Sistema/EmailDeferEventRow.cs` (proyección row con `Event` + `CorrelationId`).
+- `IEmailDeferEventRepository.ListarPaginadoAsync` ahora retorna `IReadOnlyList<EmailDeferEventRow>`.
+- `EmailDeferEventRepository`: `GroupJoin` + `SelectMany(DefaultIfEmpty)` contra `EmailOutbox` por `EDE_EmailOutboxId == EO_CodID`. Left-join semantics preservan filas con FK null o FK purgada.
+- `EmailDeferEventQueryService.MapLista(EmailDeferEventRow)` extrae `CorrelationId` de la fila proyectada (antes hardcoded a null).
+
+### Tests
+
+- 5 tests existentes adaptados (`items[0].EDE_*` → `items[0].Event.EDE_*`).
+- 3 tests nuevos:
+  - `Listar_ConEmailOutboxIdValido_ResuelveCorrelationId` — FK válida → CorrelationId del outbox.
+  - `Listar_ConEmailOutboxIdNull_DevuelveCorrelationIdNull` — FK null → null sin crash.
+  - `Listar_ConEmailOutboxIdInexistente_DevuelveCorrelationIdNullSinRomper` — FK stale (outbox purgado) → null, no filtra la fila.
+- Suite repo: 8/8 verde · suite email completa: 317/317 verde.
+
+### Verify post-deploy
+
+1. Ir a `/intranet/admin/monitoreo/correos/defer-events`.
+2. Confirmar que algunas filas (las que tengan FK a outbox vivo) muestran `correlationId` no-null.
+3. Click en `correlationId` debería deep-linkear al hub `/intranet/admin/correlation/{id}` (Plan 32).
+
+### Aprendizaje transferible
+
+- EF Core InMemory provider tolera `GroupJoin + DefaultIfEmpty` con proyección a sealed class no-tracked sin issues. No requiere navigation property en el modelo.
+- Mantener la verdad de `CorrelationId` en `EmailOutbox` (sin duplicar columna en `EmailDeferEvent`) preserva la semántica del Plan 32: el hub es la única fuente; los satélites linkean por id.
