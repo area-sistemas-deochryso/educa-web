@@ -74,7 +74,7 @@ export function callReport(data) {
 
 export function callPagos(data) {
 	const payload = {
-		SalonId: SALON_ID,
+		SedeId: SALON_ID,
 		Anio: ANIO,
 		Mes: MES,
 		Observacion: `F6a-isolation-${__VU}-${Date.now()}`,
