@@ -27,7 +27,7 @@
 }
 // #endregion
 
-// #region Stats
+// #region Stats — B3 canonical (content-left + icon-right 48×48)
 .stats-grid {
 	display: grid;
 	grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
@@ -37,49 +37,74 @@
 	.stat-card {
 		display: flex;
 		align-items: center;
-		gap: 1rem;
-		padding: 1rem 1.25rem;
+		justify-content: space-between;
+		padding: 1.25rem;
 		border-radius: 12px;
-		background: var(--surface-card);
-		border: 1px solid var(--surface-border);
 
-		i {
-			font-size: 1.5rem;
-			color: #4f46e5;
-		}
-
-		.stat-info {
+		.stat-content {
 			display: flex;
 			flex-direction: column;
-
-			.stat-value {
-				font-size: 1.25rem;
-				font-weight: 600;
-				color: var(--text-color);
-			}
+			gap: 0.25rem;
 
 			.stat-label {
-				font-size: 0.8rem;
+				font-size: 0.85rem;
 				color: var(--text-color-secondary);
+				font-weight: 500;
+			}
+
+			.stat-value {
+				font-size: 1.75rem;
+				font-weight: 700;
+				color: var(--text-color);
 			}
 
 			.stat-sublabel {
 				font-size: 0.75rem;
 				color: var(--text-color-secondary);
-				margin-top: 0.25rem;
+			}
+		}
+
+		.stat-icon {
+			width: 48px;
+			height: 48px;
+			display: flex;
+			align-items: center;
+			justify-content: center;
+			border-radius: 12px;
+			background: var(--surface-200);
+
+			i {
+				font-size: 1.25rem;
+				color: var(--text-color);
 			}
 		}
 	}
 }
+
+@media (max-width: 768px) {
+	.stats-grid {
+		grid-template-columns: 1fr 1fr;
+	}
+}
+
+@media (max-width: 480px) {
+	.stats-grid {
+		grid-template-columns: 1fr;
+	}
+}
 // #endregion
 
-// #region Filtros
-.filters {
+// #region Filtros — B6 canonical (border + border-radius, sin background)
+.filters-bar {
 	display: flex;
-	gap: 1rem;
-	margin-bottom: 1rem;
-	flex-wrap: wrap;
 	align-items: center;
+	gap: 0.5rem;
+	margin-bottom: 1rem;
+	padding: 0.75rem 1rem;
+	background: transparent;
+	border: 1px solid var(--surface-300);
+	border-radius: 10px;
+	flex-wrap: wrap;
 }
 
 .tipo-persona-bar {

@@ -23,7 +23,7 @@ import { Tab, TabList, TabPanel, Tabs } from 'primeng/tabs';
 import { ToastModule } from 'primeng/toast';
 
 import { logger } from '@core/helpers';
-import { SkeletonColumnDef, TableSkeletonComponent, StatsSkeletonComponent } from '@shared/components';
+import { SkeletonColumnDef, TableSkeletonComponent, StatsSkeletonComponent, PageHeaderComponent } from '@shared/components';
 import { AttendanceScopeBannerComponent } from '@intranet-shared/components/attendance-scope-banner';
 import { AttendanceReportsComponent } from '../../cross-role/attendance-reports';
 import { CrossChexSyncStatusService } from '@core/services/signalr';
@@ -80,6 +80,7 @@ import {
 		AttendanceScopeBannerComponent,
 		AttendanceReportsComponent,
 		CrossChexSyncBannerComponent,
+		PageHeaderComponent,
 	],
 	providers: [ConfirmationService, MessageService],
 	templateUrl: './attendances.component.html',

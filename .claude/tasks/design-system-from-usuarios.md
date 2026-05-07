@@ -271,7 +271,7 @@ Si se neutraliza globalmente, esas páginas pierden el color-coding visual (la s
 
 - [ ] **F5.3 — Migración** (1 chat por página del backlog F5.2, en orden)
   - [x] F5.3.1 `feedback-reports` ✅ (2026-05-07, brief 120) — `<app-page-header>` (B2) + `.filters-bar` canónica (B6: filter-dropdowns + btn-clear con margin-left:auto y opacity 0.5→1) + tokens hardcoded migrados (`#d97706` → `var(--yellow-700)`, `#fef3c7` → `color-mix(yellow-500 15%)`, `#78350f` → `var(--yellow-800)`, `rgba(220,38,38,...)` → `color-mix(red-600)`). Lint+build OK.
-  - [ ] F5.3.2 `attendances`
+  - [x] F5.3.2 `attendances` ✅ (2026-05-07, brief 121) — `<app-page-header>` (B2) a nivel página (encima de tabs, no reemplaza el header tab-level que tiene acciones específicas de gestión: Enviar correos / Sincronizar CrossChex / Cerrar mes / Nueva asistencia) + stat-cards refactor a B3 canónico (`.stat-content` + `.stat-icon` 48×48, valor 1.75rem/700, fondo del icon `--surface-200`, removido `background: var(--surface-card)` y `#4f46e5` hardcoded del icon) + responsive grid 768/480 + `.filters` → `.filters-bar` con border + border-radius B6. El header tab-level interno y `.tipo-persona-bar` (selector pre-filtro semántico) se conservan intencionalmente. Lint+build OK.
   - [ ] F5.3.3 `email-outbox`
   - [ ] F5.3.4 `vistas`
   - [ ] F5.3.5 `cursos`
