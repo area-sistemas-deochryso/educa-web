@@ -1,5 +1,5 @@
 import { Injectable, inject } from '@angular/core';
-import { Observable, filter, map } from 'rxjs';
+import { Observable, filter, firstValueFrom, map } from 'rxjs';
 import { logger } from '@core/helpers';
 import { ActivityTrackerService } from '@core/services/error/activity-tracker.service';
 import { ErrorHandlerService } from '@core/services/error/error-handler.service';
@@ -155,7 +155,7 @@ export class WalFacadeHelper {
 	 * Used for 'server-confirmed' and 'serialized' consistency levels.
 	 * Does NOT use WAL — if offline, shows error immediately.
 	 */
-	private executeServerConfirmed<T>(config: WalMutationConfig<T>): void {
+	private async executeServerConfirmed<T>(config: WalMutationConfig<T>): Promise<void> {
 		if (!this.sw.isOnline) {
 			this.errorHandler.showWarning(
 				'Sin conexion',
@@ -164,10 +164,12 @@ export class WalFacadeHelper {
 			return;
 		}
 
-		config.http$().subscribe({
-			next: (result) => config.onCommit(result),
-			error: (err) => config.onError(err),
-		});
+		try {
+			const result = await firstValueFrom(config.http$());
+			config.onCommit(result);
+		} catch (err) {
+			config.onError(err);
+		}
 	}
 
 	// #endregion
@@ -180,14 +182,14 @@ export class WalFacadeHelper {
 	 *
 	 * @param config Mutation configuration.
 	 */
-	private executeFallback<T>(config: WalMutationConfig<T>): void {
-		config.http$().subscribe({
-			next: (result) => config.onCommit(result),
-			error: (err) => {
-				config.optimistic?.rollback();
-				config.onError(err);
-			},
-		});
+	private async executeFallback<T>(config: WalMutationConfig<T>): Promise<void> {
+		try {
+			const result = await firstValueFrom(config.http$());
+			config.onCommit(result);
+		} catch (err) {
+			config.optimistic?.rollback();
+			config.onError(err);
+		}
 	}
 
 	// #endregion

@@ -1,5 +1,6 @@
 import { Injectable, signal, inject, PLATFORM_ID, computed, effect } from '@angular/core';
 import { isPlatformBrowser } from '@angular/common';
+import { firstValueFrom } from 'rxjs';
 import {
 	SeasonalNotification,
 	NotificationType,
@@ -111,16 +112,15 @@ export class NotificationsService {
 
 	// #region Notification checks
 	checkNotifications(): void {
-		this.api.getActivas().subscribe({
-			next: (response) => {
+		firstValueFrom(this.api.getActivas())
+			.then((response) => {
 				const apiNotifications = (response ?? []).map((n) => this.mapApiToSeasonal(n));
 				this.applyNotifications(apiNotifications);
-			},
-			error: () => {
+			})
+			.catch(() => {
 				// Si la API falla, continuar solo con smart notifications
 				this.applyNotifications([]);
-			},
-		});
+			});
 	}
 
 	private mapApiToSeasonal(n: NotificacionActiva): SeasonalNotification {

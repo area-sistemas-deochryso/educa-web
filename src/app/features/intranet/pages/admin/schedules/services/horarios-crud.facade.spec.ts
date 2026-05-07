@@ -373,10 +373,11 @@ describe('SchedulesCrudFacade', () => {
 
 	// #region importarHorarios
 	describe('importarHorarios', () => {
-		it('success con creados>0 refresca y muestra mensaje', () => {
+		it('success con creados>0 refresca y muestra mensaje', async () => {
 			api.importarHorarios.mockReturnValue(of({ creados: 5, errores: [] }));
 
 			facade.importarHorarios([{ diaSemana: 1 } as Partial<ImportarHorarioItem> as ImportarHorarioItem]);
+			await Promise.resolve();
 
 			expect(store.importLoading()).toBe(false);
 			expect(store.importResult()).toEqual({ creados: 5, errores: [] });
@@ -384,10 +385,11 @@ describe('SchedulesCrudFacade', () => {
 			expect(errorHandler.showSuccess).toHaveBeenCalled();
 		});
 
-		it('success con creados=0 no refresca ni notifica éxito', () => {
+		it('success con creados=0 no refresca ni notifica éxito', async () => {
 			api.importarHorarios.mockReturnValue(of({ creados: 0, errores: [{ fila: 1, mensaje: 'dup' }] }));
 
 			facade.importarHorarios([{ diaSemana: 1 } as Partial<ImportarHorarioItem> as ImportarHorarioItem]);
+			await Promise.resolve();
 
 			expect(dataFacade.silentRefreshAfterCrud).not.toHaveBeenCalled();
 			expect(errorHandler.showSuccess).not.toHaveBeenCalled();

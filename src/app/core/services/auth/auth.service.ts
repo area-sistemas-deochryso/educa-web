@@ -1,6 +1,6 @@
 // #region Imports
 import { AuthUser, CambiarContrasenaRequest, LoginResponse, StoredSession, UserRole } from './auth.models';
-import { EMPTY, Observable, catchError, map, of, tap, timeout } from 'rxjs';
+import { EMPTY, Observable, catchError, firstValueFrom, map, of, tap, timeout } from 'rxjs';
 import { Injectable, inject, signal } from '@angular/core';
 import { toObservable } from '@angular/core/rxjs-interop';
 
@@ -232,7 +232,9 @@ export class AuthService {
 
 		// Fire-and-forget: despierta el pool de conexiones de Azure SQL para que
 		// las primeras paginas de datos no sufran el cold start de ~12s.
-		this.api.warmup().subscribe();
+		firstValueFrom(this.api.warmup()).catch(() => {
+			// Best-effort: si el warmup falla, la primera request paga el cold start.
+		});
 	}
 
 	/**

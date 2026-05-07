@@ -216,7 +216,7 @@ export class CursosStore extends BaseCrudStore<CursoListaDto, CursoFormData, Cur
 **Fix**: Agrupar en sub-ViewModels por responsabilidad.
 
 ### 10. `.subscribe()` sin `takeUntilDestroyed`
-**Fix**: Todo `.subscribe()` en components y facades DEBE tener `.pipe(takeUntilDestroyed(this.destroyRef))`. Inyectar `DestroyRef` si no existe.
+**Fix**: Todo `.subscribe()` en components y facades scoped DEBE tener `.pipe(takeUntilDestroyed(this.destroyRef))`. Inyectar `DestroyRef` si no existe. En services `providedIn: 'root'` (sin `DestroyRef` natural) no usar `subscribe()` desnudo para HTTP one-shots — convertir a `firstValueFrom` con `.then/.catch` (ver `code-style.md` §"HTTP one-shots en services providedIn: 'root'").
 
 ---
 

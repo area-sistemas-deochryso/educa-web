@@ -99,3 +99,37 @@ logger.tagged('MiService', 'log', 'mensaje con prefijo');
 6. Signals para estado local, NgRx Signals para estado global.
 7. Barrel exports (`index.ts`) para agrupar exports.
 8. No `Subject`/`BehaviorSubject` en stores — usar `signal` + método de trigger.
+
+## HTTP one-shots en services `providedIn: 'root'`
+
+Los services singleton (`@Injectable({ providedIn: 'root' })`) y facades root no tienen `DestroyRef` natural. Para HTTP one-shots (observables que completan al recibir respuesta) **no usar `subscribe()` desnudo** — convertir a Promise con `firstValueFrom` y manejar el éxito/error explícitamente.
+
+```typescript
+// ✅ Fire-and-forget — error silenciado intencional
+firstValueFrom(this.api.warmup()).catch(() => {
+  // Best-effort: si falla, la siguiente request paga el cold start.
+});
+
+// ✅ Con manejo de éxito y error
+firstValueFrom(this.api.getActivas())
+  .then((response) => this.applyNotifications(response))
+  .catch(() => this.applyNotifications([]));
+
+// ✅ En método async existente
+private async executeServerConfirmed(config: WalMutationConfig): Promise<void> {
+  try {
+    const result = await firstValueFrom(config.http$());
+    config.onCommit(result);
+  } catch (err) {
+    config.onError(err);
+  }
+}
+
+// ❌ subscribe() desnudo en service root — viola la regla 2
+this.api.warmup().subscribe();
+this.api.getActivas().subscribe({ next, error });
+```
+
+**Por qué**: el `subscribe` desnudo en service root no es leak (HTTP completa solo), pero rompe la regla universal "siempre `takeUntilDestroyed`" sin necesidad de excepción. `firstValueFrom` deja el código alineado con `async/await` y obliga al dev a decidir explícitamente qué hacer en error (fire-and-forget se vuelve `.catch(() => {})` con comentario, no callback olvidado).
+
+**Cuándo NO aplicar**: streams continuos (`Subject`, `BehaviorSubject`, observables que emiten múltiples veces). Esos siguen requiriendo `takeUntilDestroyed` cuando hay scope que muere.

@@ -52,7 +52,7 @@
 
 ---
 
-### H5 — `.subscribe()` sin `takeUntilDestroyed`
+### H5 — `.subscribe()` sin `takeUntilDestroyed` ✅ Resuelto 2026-05-07 (chat 122)
 
 **Archivos**:
 - `src/app/core/services/wal/wal-facade-helper.service.ts:167` (`executeServerConfirmed`)
@@ -60,7 +60,7 @@
 
 **Regla violada**: `code-style.md` ("Siempre usar takeUntilDestroyed para subscripciones").
 
-**Contexto**: Ambos son HTTP one-shots que se auto-completan (no hay leak real). Decisión: eximir HTTP one-shots explícitamente en la regla, o agregar `take(1)` por consistencia.
+**Decisión (Opción C)**: refactor a `firstValueFrom` para no introducir excepción en la regla universal. Aplicado a 5 callsites: los 2 del WAL helper + `auth.service.ts:235` (`api.warmup`) + `notifications.service.ts:114` (`api.getActivas`) + `horarios-crud.facade.ts:263` (`api.importarHorarios`) — los 5 viven en services/facades `providedIn: 'root'` sin `DestroyRef` natural. Patrón documentado en `rules/code-style.md` §"HTTP one-shots en services providedIn: 'root'" + nota agregada en `rules/crud-patterns.md` anti-patrón #10. La regla "siempre `takeUntilDestroyed`" queda sin excepción — los services root usan `firstValueFrom + .then/.catch`.
 
 ---
 

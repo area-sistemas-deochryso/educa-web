@@ -1,4 +1,5 @@
 import { inject, Injectable } from '@angular/core';
+import { firstValueFrom } from 'rxjs';
 
 import { getEstadoToggleDeltas, getEstadoRollbackDeltas, facadeErrorHandler } from '@core/helpers';
 import { ErrorHandlerService, WalFacadeHelper } from '@core/services';
@@ -260,8 +261,8 @@ export class SchedulesCrudFacade {
   importarHorarios(items: ImportarHorarioItem[]): void {
     this.store.setImportLoading(true);
 
-    this.api.importarHorarios(items).subscribe({
-      next: (result) => {
+    firstValueFrom(this.api.importarHorarios(items))
+      .then((result) => {
         this.store.setImportResult(result);
         this.store.setImportLoading(false);
 
@@ -272,12 +273,11 @@ export class SchedulesCrudFacade {
             `${result.creados} horario(s) importado(s) correctamente`,
           );
         }
-      },
-      error: (err) => {
+      })
+      .catch((err) => {
         this.store.setImportLoading(false);
         this.errHandler.handle(err, 'importar horarios');
-      },
-    });
+      });
   }
 
   // #endregion
