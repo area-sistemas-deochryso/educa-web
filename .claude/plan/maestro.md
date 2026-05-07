@@ -1540,9 +1540,9 @@ Ver [history/planes-cerrados.md](../history/planes-cerrados.md#plan-11).
 - [x] **F5.1-F5.2 — Auditoría + priorización de páginas admin** ✅ (2026-04-18) — 14 páginas admin inspeccionadas contra B1/B2/B3/B6. Backlog de 8 migraciones priorizado en `tasks/design-system-from-usuarios.md § F5`. Divergencias principales: 4 páginas sin `<app-page-header>` (feedback-reports, attendances, email-outbox, campus), 1 página con `bg: #fff` literal (email-outbox L57), ~8 componentes con residuo anti-B1 (`bg: surface-card` + `box-shadow`). Subcomponentes con shadows decorativos legítimos (drag & drop, canvas) marcados como excepción.
 
 - [ ] **F5.3 — Migración 1 página por chat** (8 chats, en orden de backlog F5.2)
-  - [ ] F5.3.1 `feedback-reports` (falta app-page-header)
-  - [ ] F5.3.2 `attendances` (falta app-page-header)
-  - [ ] F5.3.3 `email-outbox` (falta app-page-header + `bg: #fff`)
+  - [x] F5.3.1 `feedback-reports` ✅ (2026-05-07, brief 120)
+  - [x] F5.3.2 `attendances` ✅ (2026-05-07, brief 121)
+  - [x] F5.3.3 `email-outbox` ✅ (2026-05-07, brief 122) — scope reducido a tokens (8 hex → vars del tema); B2/B3/B6 ya alineados desde commits previos
   - [ ] F5.3.4 `vistas` (remover `bg: surface-card` + shadow de stat-card)
   - [ ] F5.3.5 `cursos` (remover shadow de filters-bar)
   - [ ] F5.3.6 Stats residuales (permisos-roles, permisos-stats-cards, usuarios-stats)
