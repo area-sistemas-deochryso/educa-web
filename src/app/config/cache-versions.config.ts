@@ -55,8 +55,26 @@ export const CACHE_VERSIONS = {
 export type CacheModule = keyof typeof CACHE_VERSIONS;
 
 /**
- * Mapeo de módulos a patrones de URL para invalidación.
- * Debe quedar alineado con `WAL_CACHE_MAP` (ver `core/services/wal/models/wal.models.ts`).
+ * Mapeo de módulos a patrones de URL para invalidación basada en versión.
+ *
+ * Consumido por `CacheVersionManager` cuando detecta que `CACHE_VERSIONS[mod]`
+ * cambió respecto a la versión guardada en localStorage: invalida el SW cache
+ * matcheando este patrón.
+ *
+ * Relación con `WAL_CACHE_MAP` (ver `core/services/wal/models/wal.models.ts`):
+ *   - `MODULE_URL_PATTERNS`: keys = módulos de versionado (incluye lecturas
+ *     puras como `asistencias`, `reportes`, `sistema`). Disparado por bumps
+ *     manuales de `CACHE_VERSIONS`.
+ *   - `WAL_CACHE_MAP`: keys = `resourceType` de entities con mutaciones WAL
+ *     (incluye `Vista`, `permisos-rol`, `CursoContenidoArchivo`, etc.).
+ *     Disparado automáticamente por el sync engine post-commit/rollback.
+ *
+ * Solo se solapan parcialmente — no derivar uno del otro. Si un módulo nuevo
+ * tiene mutaciones, agregar a ambos con patrón consistente.
+ *
+ * Nunca consumir desde un service de "invalidación manual" — ese patrón está
+ * cubierto por los dos flujos de arriba; un tercer punto de entrada hardcodea
+ * URLs que se desactualizan silenciosamente.
  */
 export const MODULE_URL_PATTERNS: Record<CacheModule, string> = {
 	asistencias: '/api/ConsultaAsistencia',

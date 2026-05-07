@@ -178,6 +178,13 @@ export interface WalStats {
  * Maps WAL resourceType to SW cache patterns for automatic invalidation.
  * After a WAL entry commits or fails (rollback), the sync engine
  * invalidates all matching cache patterns so subsequent GETs hit the network.
+ *
+ * Relación con `MODULE_URL_PATTERNS` (ver `config/cache-versions.config.ts`):
+ * son taxonomías distintas que se solapan parcialmente. Este mapa cubre
+ * resourceTypes con mutaciones (entities); el otro cubre módulos de
+ * versionado de cache (incluye lecturas puras). Si un módulo nuevo tiene
+ * mutaciones, agregar a ambos con patrón consistente — pero NO derivar
+ * uno del otro.
  */
 export const WAL_CACHE_MAP: Record<string, string[]> = {
 	usuarios: ['/api/sistema/usuarios'],

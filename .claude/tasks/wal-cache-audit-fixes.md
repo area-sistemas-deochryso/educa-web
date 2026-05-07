@@ -99,16 +99,28 @@
 
 ---
 
-### H10 — Triple duplicación de patrones de módulo
+### H10 — Triple duplicación de patrones de módulo ✅ Resuelto 2026-05-07
 
 **Archivos**:
 - `CacheInvalidationService` — patrones hardcodeados en métodos
 - `MODULE_URL_PATTERNS` — config declarativa
 - `WAL_CACHE_MAP` — config del WAL
 
-**Problema**: Si un patrón cambia, hay que actualizarlo en 3 lugares.
+**Hallazgo del audit**: `CacheInvalidationService` era código muerto — 0 consumidores fuera de su propia declaración. Además contenía 3 patrones desactualizados post-migración a `/api/sistema/*` (`/api/usuarios`, `/api/salones`, `/api/cursos`) que no habrían invalidado nada si alguien los hubiera usado.
 
-**Fix**: `CacheInvalidationService` debería leer de `MODULE_URL_PATTERNS` en lugar de hardcodear. Evaluar si `WAL_CACHE_MAP` puede también derivarse de `MODULE_URL_PATTERNS` donde coincidan.
+`MODULE_URL_PATTERNS` y `WAL_CACHE_MAP` son taxonomías distintas con propósitos distintos:
+
+- `MODULE_URL_PATTERNS`: módulos de versionado de cache (incluye lecturas puras como `asistencias`, `reportes`, `sistema`). Disparado por bumps manuales de `CACHE_VERSIONS`.
+- `WAL_CACHE_MAP`: `resourceType` de entities con mutaciones WAL. Disparado por sync engine post-commit/rollback.
+
+Solo se solapan parcialmente — derivar uno del otro forzaría meter conceptos ajenos en cada uno.
+
+**Fix aplicado**:
+
+1. Eliminado `cache-invalidation.service.ts` y su export en `core/services/cache/index.ts`.
+2. Agregado JSDoc en `MODULE_URL_PATTERNS` y `WAL_CACHE_MAP` explicando su relación y advirtiendo contra reintroducir un service de invalidación manual con URLs hardcodeadas.
+
+Resultado: 3 fuentes → 2, drift eliminado, taxonomías documentadas.
 
 ---
 
@@ -120,10 +132,10 @@
 | **P1** | H8+H9 (módulos incompletos + versiones) ✅ | Bajo | Resuelto 2026-05-04 |
 | **P1** | H7 (naming WAL_CACHE_MAP) | Medio-alto (muchos facades) | 1 chat dedicado |
 | **P2** | H2+H3+H4+H6 (cosmético + reglas) ✅ | Bajo | Resuelto 2026-05-07 |
-| **P2** | H10 (duplicación patrones) | Bajo | 1 chat dedicado |
+| **P2** | H10 (duplicación patrones) ✅ | Bajo | Resuelto 2026-05-07 |
 | **P3** | H5 (subscribe sin takeUntil) ✅ | Decisión de diseño | Resuelto 2026-05-07 |
 
-**Estado**: 7/10 hallazgos cerrados. Quedan **H7** (naming, alto esfuerzo) y **H10** (refactor `CacheInvalidationService` para leer `MODULE_URL_PATTERNS`).
+**Estado**: 8/10 hallazgos cerrados. Queda solo **H7** (naming `WAL_CACHE_MAP`, alto esfuerzo — toca muchos facades).
 
 ---
 
