@@ -277,7 +277,7 @@ Si se neutraliza globalmente, esas páginas pierden el color-coding visual (la s
   - [x] F5.3.5 `cursos` ✅ (2026-05-07) — auditoría reveló que `.filters-section` ya estaba alineada con B6 (transparent + border + sin shadow); la divergencia real estaba en `.stat-card` (anti-B1: `background: var(--surface-card)` + `box-shadow: 0 1px 3px rgba(0,0,0,0.1)`, mismo patrón que F5.3.4 vistas). Removidas ambas propiedades — el fondo plano del global respeta `--surface-ground` y el border-radius solo aplica al icon box. Lint+tsc OK.
   - [x] F5.3.6 Stats residuales ✅ (2026-05-07) — removidas `background: var(--surface-card)` + `box-shadow: 0 1px 3px rgba(0,0,0,0.1)` en los 3 componentes (`usuarios-stats`, `permisos-stats-cards` y el bloque inline de `permisos-roles`); el global ya da transparencia y los shadows quedaban huérfanos sobre fondo plano (anti-B1/B3, mismo patrón que F5.3.4/F5.3.5). Lint OK.
   - [x] F5.3.7 `horarios/schedules` root ✅ (2026-05-07) — removidos `bg surface-card` + `box-shadow` de `.stat-card` (admin) y `.weekly-scroll-wrapper` (estudiante + profesor), dark-mode shadows asociados. Event cards (`.horario-block`, `.mobile-card`) y subcomponentes `curso-picker`/`weekly-view` intactos (shadows decorativos legítimos)
-  - [ ] F5.3.8 `campus` (header solo, documentar excepción canvas)
+  - [x] F5.3.8 `campus` ✅ (2026-05-07) — removido bloque `:host ::ng-deep .p-inputtext/.p-select` redundante (cubierto por A2 global; el local usaba `--primary-color` celeste, A2 usa `--text-color` por a11y). Header + toolbar ya alineados al estándar. Excepción canvas formalizada en `design-system.md` § "Canvas / editores imperativos". Cierra Plan 20 F5.3 (8/8) y Plan 20 al 100%.
 
 ---
 

@@ -1149,6 +1149,17 @@ Si una tabla/card/input específica requiere fondo propio (ej: enfatizar un pane
 
 El escape hatch exige comentario con la razón específica del negocio — "lo necesito" no es razón suficiente.
 
+### Canvas / editores imperativos
+
+Las páginas que renderizan sobre `<canvas>` o usan layout imperativo no se rigen por las pautas B1-B11. La página `/intranet/admin/campus` (editor 2D/3D del campus) es el caso canónico:
+
+- Header + toolbar siguen el estándar (B2/B7, A2 vía global).
+- El área del editor (canvas + tooltips de selección + overlays decorativos) usa shadows y backgrounds propios porque el feedback visual depende del depth (selección flotante, drag previews, overlays sobre el grid).
+- Los subcomponentes `campus-editor`, `horarios-curso-picker`, `horarios-weekly-view`, `permisos-edit-dialog` están listados como excepciones (Plan 20 F5.2).
+- `campus-minimap.service.ts` usa `ctx.fillStyle = '#dc2626'` literal porque Canvas API no resuelve `var()`.
+
+No abrir excepciones nuevas para "componentes con animación" o "páginas complejas" — el listado vive en la task `design-system-from-usuarios.md` y se actualiza con justificación.
+
 ---
 
 ## Historial

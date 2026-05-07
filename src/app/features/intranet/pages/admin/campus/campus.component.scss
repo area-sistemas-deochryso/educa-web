@@ -243,30 +243,3 @@
 }
 // #endregion
 
-// #region Overrides PrimeNG
-:host ::ng-deep {
-	.p-inputtext,
-	.p-select {
-		background: transparent;
-		color: var(--text-color);
-		border-color: var(--surface-300);
-
-		&::placeholder {
-			color: var(--text-color-secondary);
-		}
-
-		&:enabled:focus {
-			border-color: var(--primary-color);
-			box-shadow: 0 0 0 1px color-mix(in srgb, var(--primary-color) 30%, transparent);
-		}
-	}
-
-	.p-select-label {
-		color: var(--text-color);
-	}
-
-	.p-select-dropdown {
-		color: var(--text-color);
-	}
-}
-// #endregion
