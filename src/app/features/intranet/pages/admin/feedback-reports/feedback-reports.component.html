@@ -1,25 +1,21 @@
 <!-- #region Template -->
 <div class="feedback-reports-page">
 	<!-- #region Header -->
-	<header class="page-header">
-		<div>
-			<h1>Reportes de Usuarios</h1>
-			<p class="subtitle">
-				Problemas y propuestas enviadas manualmente desde la intranet.
-			</p>
-		</div>
-		<div class="header-actions">
-			<button
-				pButton
-				type="button"
-				icon="pi pi-refresh"
-				label="Refrescar"
-				class="p-button-outlined"
-				(click)="onRefresh()"
-				[pt]="{ root: { 'aria-label': 'Refrescar listado' } }"
-			></button>
-		</div>
-	</header>
+	<app-page-header
+		icon="pi pi-comments"
+		title="Reportes de Usuarios"
+		subtitle="Problemas y propuestas enviadas manualmente desde la intranet."
+	>
+		<button
+			pButton
+			type="button"
+			icon="pi pi-refresh"
+			label="Refrescar"
+			class="p-button-outlined p-button-sm"
+			(click)="onRefresh()"
+			[pt]="{ root: { 'aria-label': 'Refrescar listado' } }"
+		></button>
+	</app-page-header>
 	<!-- #endregion -->
 
 	<!-- #region Stats -->
@@ -80,52 +76,55 @@
 	<!-- #endregion -->
 
 	<!-- #region Filtros -->
-	<section class="filters">
-		<p-select
-			[options]="tipoOptions"
-			optionLabel="label"
-			optionValue="value"
-			placeholder="Todos los tipos"
-			[showClear]="true"
-			appendTo="body"
-			[ngModel]="vm().filterTipo"
-			(ngModelChange)="onFilterTipoChange($event)"
-		></p-select>
-		<p-select
-			[options]="estadoOptions"
-			optionLabel="label"
-			optionValue="value"
-			placeholder="Todos los estados"
-			[showClear]="true"
-			appendTo="body"
-			[ngModel]="vm().filterEstado"
-			(ngModelChange)="onFilterEstadoChange($event)"
-		></p-select>
-		<p-datepicker
-			[ngModel]="vm().filterDesde"
-			(ngModelChange)="onFilterDesdeChange($event)"
-			placeholder="Desde"
-			appendTo="body"
-			[showIcon]="true"
-			dateFormat="dd/mm/yy"
-		></p-datepicker>
-		<p-datepicker
-			[ngModel]="vm().filterHasta"
-			(ngModelChange)="onFilterHastaChange($event)"
-			placeholder="Hasta"
-			appendTo="body"
-			[showIcon]="true"
-			dateFormat="dd/mm/yy"
-		></p-datepicker>
+	<div class="filters-bar">
+		<div class="filter-dropdowns">
+			<p-select
+				[options]="tipoOptions"
+				optionLabel="label"
+				optionValue="value"
+				placeholder="Todos los tipos"
+				[showClear]="true"
+				appendTo="body"
+				[ngModel]="vm().filterTipo"
+				(ngModelChange)="onFilterTipoChange($event)"
+			></p-select>
+			<p-select
+				[options]="estadoOptions"
+				optionLabel="label"
+				optionValue="value"
+				placeholder="Todos los estados"
+				[showClear]="true"
+				appendTo="body"
+				[ngModel]="vm().filterEstado"
+				(ngModelChange)="onFilterEstadoChange($event)"
+			></p-select>
+			<p-datepicker
+				[ngModel]="vm().filterDesde"
+				(ngModelChange)="onFilterDesdeChange($event)"
+				placeholder="Desde"
+				appendTo="body"
+				[showIcon]="true"
+				dateFormat="dd/mm/yy"
+			></p-datepicker>
+			<p-datepicker
+				[ngModel]="vm().filterHasta"
+				(ngModelChange)="onFilterHastaChange($event)"
+				placeholder="Hasta"
+				appendTo="body"
+				[showIcon]="true"
+				dateFormat="dd/mm/yy"
+			></p-datepicker>
+		</div>
 		<button
 			pButton
 			type="button"
 			icon="pi pi-filter-slash"
-			label="Limpiar"
-			class="p-button-text"
+			class="p-button-text p-button-sm btn-clear"
+			pTooltip="Limpiar filtros"
 			(click)="onClearFilters()"
+			[pt]="{ root: { 'aria-label': 'Limpiar filtros' } }"
 		></button>
-	</section>
+	</div>
 	<!-- #endregion -->
 
 	<!-- #region Tabla -->

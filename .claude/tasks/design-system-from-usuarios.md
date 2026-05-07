@@ -270,7 +270,7 @@ Si se neutraliza globalmente, esas páginas pierden el color-coding visual (la s
   **Sin prisa operativa**: todas estas migraciones son cosméticas, no bloquean features ni confiabilidad. Se ejecutan 1 por chat conforme el proyecto lo requiera o al tocar cada página por otra razón (regla "cleanup gradual al tocar archivo").
 
 - [ ] **F5.3 — Migración** (1 chat por página del backlog F5.2, en orden)
-  - [ ] F5.3.1 `feedback-reports`
+  - [x] F5.3.1 `feedback-reports` ✅ (2026-05-07, brief 120) — `<app-page-header>` (B2) + `.filters-bar` canónica (B6: filter-dropdowns + btn-clear con margin-left:auto y opacity 0.5→1) + tokens hardcoded migrados (`#d97706` → `var(--yellow-700)`, `#fef3c7` → `color-mix(yellow-500 15%)`, `#78350f` → `var(--yellow-800)`, `rgba(220,38,38,...)` → `color-mix(red-600)`). Lint+build OK.
   - [ ] F5.3.2 `attendances`
   - [ ] F5.3.3 `email-outbox`
   - [ ] F5.3.4 `vistas`

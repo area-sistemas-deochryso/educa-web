@@ -24,6 +24,7 @@ import {
 	ReporteUsuarioListaDto,
 } from '@core/services/feedback';
 import { CorrelationIdPillComponent } from '@shared/components/correlation-id-pill';
+import { PageHeaderComponent } from '@shared/components';
 
 import { FeedbackReportsFacade } from './services';
 
@@ -51,6 +52,7 @@ interface EstadoOption {
 		TextareaModule,
 		TooltipModule,
 		CorrelationIdPillComponent,
+		PageHeaderComponent,
 	],
 	providers: [ConfirmationService],
 	templateUrl: './feedback-reports.component.html',
