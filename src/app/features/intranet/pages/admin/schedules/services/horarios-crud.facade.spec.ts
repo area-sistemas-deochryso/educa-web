@@ -262,35 +262,40 @@ describe('SchedulesCrudFacade', () => {
 	});
 	// #endregion
 
-	// #region DELETE
+	// #region DELETE (soft — BE hace `HorEstado=false`)
 	describe('delete', () => {
-		it('apply remueve del store y decrementa total + activos (si estaba activo)', () => {
+		it('apply marca el horario como inactivo, mantiene total y ajusta activos/inactivos', () => {
 			// id=1 activo con profesor
 			const before = store.estadisticas()!;
 			facade.delete(1);
 
-			expect(store.horarios().find((h) => h.id === 1)).toBeUndefined();
+			const item = store.horarios().find((h) => h.id === 1);
+			expect(item).toBeDefined();
+			expect(item!.estado).toBe(false);
 			const after = store.estadisticas()!;
-			expect(after.totalHorarios).toBe(before.totalHorarios - 1);
+			expect(after.totalHorarios).toBe(before.totalHorarios);
 			expect(after.horariosActivos).toBe(before.horariosActivos - 1);
+			expect(after.horariosInactivos).toBe(before.horariosInactivos + 1);
 		});
 
-		it('apply decrementa horariosSinProfesor cuando el horario no tenía profesor', () => {
-			// id=2 sin profesor
+		it('apply decrementa horariosSinProfesor cuando el horario era activo y sin profesor', () => {
+			// id=2 sin profesor (debe estar activo en el seed para que decremente)
 			const before = store.estadisticas()!.horariosSinProfesor;
 			facade.delete(2);
 			expect(store.estadisticas()!.horariosSinProfesor).toBe(before - 1);
 		});
 
-		it('rollback re-añade el horario y restaura stats', () => {
-			const beforeHorarios = store.horarios();
+		it('rollback restaura el estado del horario y las stats', () => {
+			const beforeHorarios = store.horarios().map((h) => ({ ...h }));
 			const beforeStats = { ...store.estadisticas()! };
 
 			facade.delete(1);
 			wal.fail(new Error('server'));
 
 			expect(store.horarios()).toHaveLength(beforeHorarios.length);
-			expect(store.horarios().find((h) => h.id === 1)).toBeDefined();
+			const item = store.horarios().find((h) => h.id === 1);
+			expect(item).toBeDefined();
+			expect(item!.estado).toBe(true);
 			expect(store.estadisticas()).toEqual(beforeStats);
 		});
 	});

@@ -219,16 +219,16 @@ export class NotificacionesAdminFacade {
 			http$: () => this.api.eliminar(item.id),
 			optimistic: {
 				apply: () => {
-					const { activosDelta, inactivosDelta } = getEstadoToggleDeltas(item.estado, 'delete');
-					this.store.removeItem(item.id);
-					this.store.incrementarEstadistica('total', -1);
+					// BE hace soft delete (`NOT_Estado=false`): item queda en lista como inactivo.
+					// `total` no cambia.
+					const { activosDelta, inactivosDelta } = getEstadoToggleDeltas(item.estado, 'delete-soft');
+					this.store.updateItem(item.id, { estado: false } as Partial<NotificacionLista>);
 					this.store.incrementarEstadistica('activas', activosDelta);
 					this.store.incrementarEstadistica('inactivas', inactivosDelta);
 				},
 				rollback: () => {
-					const { activosDelta, inactivosDelta } = getEstadoRollbackDeltas(item.estado, 'delete');
-					this.store.addItem(item);
-					this.store.incrementarEstadistica('total', 1);
+					const { activosDelta, inactivosDelta } = getEstadoRollbackDeltas(item.estado, 'delete-soft');
+					this.store.updateItem(item.id, { estado: item.estado } as Partial<NotificacionLista>);
 					this.store.incrementarEstadistica('activas', activosDelta);
 					this.store.incrementarEstadistica('inactivas', inactivosDelta);
 				},

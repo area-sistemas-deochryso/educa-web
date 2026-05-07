@@ -173,12 +173,17 @@ describe('NotificacionesAdminFacade', () => {
 			store.setEstadisticas(mockStats);
 		});
 
-		it('should remove item and decrement stats', () => {
+		it('should soft-delete item (mark inactive) and update stats without changing total', () => {
 			facade.delete(mockItems[0]);
 
-			expect(store.items()).toHaveLength(0);
-			expect(store.estadisticas()!.total).toBe(0);
-			expect(store.estadisticas()!.activas).toBe(0);
+			// Soft delete: BE hace `NOT_Estado=false`. El item queda en lista como inactivo.
+			expect(store.items()).toHaveLength(mockItems.length);
+			const deleted = store.items().find((i) => i.id === mockItems[0].id);
+			expect(deleted).toBeDefined();
+			expect(deleted!.estado).toBe(false);
+			expect(store.estadisticas()!.total).toBe(mockStats.total);
+			expect(store.estadisticas()!.activas).toBe(mockStats.activas - 1);
+			expect(store.estadisticas()!.inactivas).toBe(mockStats.inactivas + 1);
 		});
 	});
 	// #endregion

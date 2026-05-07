@@ -226,25 +226,26 @@ export class SchedulesCrudFacade {
       },
       optimistic: {
         apply: () => {
-          this.store.removeHorario(id);
-          this.store.incrementarEstadistica('totalHorarios', -1);
+          // BE hace soft delete (`HorEstado=false`): horario queda en lista como inactivo.
+          // `totalHorarios` no cambia. `horariosSinProfesor` decrementa solo si era activo
+          // y sin profesor (el contador refleja activos-sin-profesor).
           if (horario) {
-            const { activosDelta, inactivosDelta } = getEstadoToggleDeltas(horario.estado, 'delete');
+            const { activosDelta, inactivosDelta } = getEstadoToggleDeltas(horario.estado, 'delete-soft');
+            this.store.updateHorario(id, { estado: false });
             this.store.incrementarEstadistica('horariosActivos', activosDelta);
             this.store.incrementarEstadistica('horariosInactivos', inactivosDelta);
-            if (horario.profesorId === null) {
+            if (horario.estado && horario.profesorId === null) {
               this.store.incrementarEstadistica('horariosSinProfesor', -1);
             }
           }
         },
         rollback: () => {
           if (horario) {
-            const { activosDelta, inactivosDelta } = getEstadoRollbackDeltas(horario.estado, 'delete');
-            this.store.addHorario(horario);
-            this.store.incrementarEstadistica('totalHorarios', 1);
+            const { activosDelta, inactivosDelta } = getEstadoRollbackDeltas(horario.estado, 'delete-soft');
+            this.store.updateHorario(id, { estado: horario.estado });
             this.store.incrementarEstadistica('horariosActivos', activosDelta);
             this.store.incrementarEstadistica('horariosInactivos', inactivosDelta);
-            if (horario.profesorId === null) {
+            if (horario.estado && horario.profesorId === null) {
               this.store.incrementarEstadistica('horariosSinProfesor', 1);
             }
           }
