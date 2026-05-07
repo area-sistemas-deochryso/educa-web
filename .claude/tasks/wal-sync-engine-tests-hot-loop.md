@@ -1,6 +1,8 @@
-# Task — Tests directos del hot loop de `WalSyncEngine`
+# Task — Tests directos del hot loop de `WalSyncEngine` ✅ Retro-validado 2026-05-07
 
 > **Creado**: 2026-05-04
+> **Cerrado**: 2026-05-07 (chat 125 — silent merge detectado y retro-validado).
+> **Resolución**: el spec `src/app/core/services/wal/wal-sync-engine.service.spec.ts` se implementó en commit `478df42` (`test(wal): cover WalSyncEngine hot loop with direct specs`) y se reforzó en `ae20a33` (`feat(wal): resilience M1+M2 — orphan reconcile + circuit breaker`). 32 tests cubren los 22 sub-criterios listados abajo. F6 verificado: spec aislado 32/32 ✅, suite WAL completa 112/112 ✅. Bonus de cobertura: M1 (orphan reconcile), M2 (circuit breaker), coalescer ordering, register/unregister callbacks, SYNC_INTERVAL_MS — 10 tests adicionales fuera del scope original.
 > **Origen**: Cierre de DS1 (chat 085, brief `closed/085-wal-sync-engine-split.md`). Durante F1 (diagnóstico) se confirmó que el engine **no tiene specs directos**. El único spec que lo importa (`wal-facade-helper.service.spec.ts`) lo mockea — no ejercita su loop. Tras el split DS1, el código extraído (recovery + classifier) sí tiene specs nuevos, pero el engine en sí sigue sin red de seguridad.
 > **Scope**: chat dedicado, medio día.
 
