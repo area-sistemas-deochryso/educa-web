@@ -101,7 +101,7 @@ describe('GruposFacade', () => {
 			facade.crearGrupo('Nuevo Grupo');
 
 			expect(wal.execute).toHaveBeenCalledWith(
-				expect.objectContaining({ operation: 'CREATE', resourceType: 'GrupoContenido' }),
+				expect.objectContaining({ operation: 'CREATE', resourceType: 'grupoContenido' }),
 			);
 		});
 

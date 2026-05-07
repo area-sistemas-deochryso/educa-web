@@ -35,7 +35,7 @@ export class WalFacadeHelper {
 	 * @example
 	 * wal.execute({
 	 *   operation: 'CREATE',
-	 *   resourceType: 'CursoContenido',
+	 *   resourceType: 'cursoContenido',
 	 *   endpoint: '/api/CursoContenido',
 	 *   method: 'POST',
 	 *   payload: request,

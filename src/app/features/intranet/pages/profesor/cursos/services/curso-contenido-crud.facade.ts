@@ -58,7 +58,7 @@ export class CursoContenidoCrudFacade {
 
 		this.wal.execute({
 			operation: 'UPDATE',
-			resourceType: 'CursoContenidoSemana',
+			resourceType: 'cursoContenidoSemana',
 			resourceId: semanaId,
 			endpoint: `${this.contenidoUrl}/semana/${semanaId}`,
 			method: 'PUT',
@@ -110,7 +110,7 @@ export class CursoContenidoCrudFacade {
 
 					this.wal.execute({
 						operation: 'CREATE',
-						resourceType: 'CursoContenidoArchivo',
+						resourceType: 'cursoContenidoArchivo',
 						endpoint: `${this.contenidoUrl}/semana/${semanaId}/archivo`,
 						method: 'POST',
 						payload: request,
@@ -147,7 +147,7 @@ export class CursoContenidoCrudFacade {
 
 		this.wal.execute({
 			operation: 'DELETE',
-			resourceType: 'CursoContenidoArchivo',
+			resourceType: 'cursoContenidoArchivo',
 			resourceId: archivoId,
 			endpoint: `${this.contenidoUrl}/archivo/${archivoId}`,
 			method: 'DELETE',
@@ -190,7 +190,7 @@ export class CursoContenidoCrudFacade {
 
 					this.wal.execute({
 						operation: 'CREATE',
-						resourceType: 'TareaArchivo',
+						resourceType: 'tareaArchivo',
 						endpoint: `${this.contenidoUrl}/tarea/${tareaId}/archivo`,
 						method: 'POST',
 						payload: request,
@@ -223,7 +223,7 @@ export class CursoContenidoCrudFacade {
 
 		this.wal.execute({
 			operation: 'DELETE',
-			resourceType: 'TareaArchivo',
+			resourceType: 'tareaArchivo',
 			resourceId: archivoId,
 			endpoint: `${this.contenidoUrl}/tarea-archivo/${archivoId}`,
 			method: 'DELETE',
@@ -255,7 +255,7 @@ export class CursoContenidoCrudFacade {
 	crearTarea(semanaId: number, request: CrearTareaRequest): void {
 		this.wal.execute({
 			operation: 'CREATE',
-			resourceType: 'CursoContenidoTarea',
+			resourceType: 'cursoContenidoTarea',
 			endpoint: `${this.contenidoUrl}/semana/${semanaId}/tarea`,
 			method: 'POST',
 			payload: request,
@@ -292,7 +292,7 @@ export class CursoContenidoCrudFacade {
 
 		this.wal.execute({
 			operation: 'UPDATE',
-			resourceType: 'CursoContenidoTarea',
+			resourceType: 'cursoContenidoTarea',
 			resourceId: tareaId,
 			endpoint: `${this.contenidoUrl}/tarea/${tareaId}`,
 			method: 'PUT',
@@ -332,7 +332,7 @@ export class CursoContenidoCrudFacade {
 
 		this.wal.execute({
 			operation: 'DELETE',
-			resourceType: 'CursoContenidoTarea',
+			resourceType: 'cursoContenidoTarea',
 			resourceId: tareaId,
 			endpoint: `${this.contenidoUrl}/tarea/${tareaId}`,
 			method: 'DELETE',

@@ -40,7 +40,7 @@ export class CalificacionesFacade {
 
 	constructor() {
 		this.crossTabRefetch.subscribe({
-			resourceType: 'Calificacion',
+			resourceType: 'calificacion',
 			refetchItems: () => {
 				const id = this.contenidoStore.contenido()?.id;
 				if (id != null) this.refreshCalificaciones(id);
@@ -100,7 +100,7 @@ export class CalificacionesFacade {
 
 		this.wal.execute<CalificacionConNotasDto>({
 			operation: 'CREATE',
-			resourceType: 'Calificacion',
+			resourceType: 'calificacion',
 			endpoint: this.calificacionUrl,
 			method: 'POST',
 			payload: dto,
@@ -136,7 +136,7 @@ export class CalificacionesFacade {
 
 		this.wal.execute({
 			operation: 'UPDATE',
-			resourceType: 'Calificacion',
+			resourceType: 'calificacion',
 			resourceId: calificacionId,
 			endpoint: `${this.calificacionUrl}/${calificacionId}/calificar`,
 			method: 'POST',
@@ -167,7 +167,7 @@ export class CalificacionesFacade {
 
 		this.wal.execute({
 			operation: 'UPDATE',
-			resourceType: 'Calificacion',
+			resourceType: 'calificacion',
 			resourceId: calificacionId,
 			endpoint: `${this.grupoUrl}/${calificacionId}/calificar-grupos`,
 			method: 'POST',
@@ -198,7 +198,7 @@ export class CalificacionesFacade {
 
 		this.wal.execute({
 			operation: 'UPDATE',
-			resourceType: 'Calificacion',
+			resourceType: 'calificacion',
 			resourceId: notaId,
 			endpoint: `${this.calificacionUrl}/nota/${notaId}`,
 			method: 'PUT',
@@ -226,7 +226,7 @@ export class CalificacionesFacade {
 
 		this.wal.execute({
 			operation: 'DELETE',
-			resourceType: 'Calificacion',
+			resourceType: 'calificacion',
 			resourceId: calificacionId,
 			endpoint: `${this.calificacionUrl}/${calificacionId}`,
 			method: 'DELETE',
@@ -260,7 +260,7 @@ export class CalificacionesFacade {
 
 		this.wal.execute<CalificacionConNotasDto>({
 			operation: 'UPDATE',
-			resourceType: 'Calificacion',
+			resourceType: 'calificacion',
 			resourceId: calificacionId,
 			endpoint: `${this.calificacionUrl}/${calificacionId}/tipo`,
 			method: 'PUT',
@@ -291,7 +291,7 @@ export class CalificacionesFacade {
 
 		this.wal.execute({
 			operation: 'CREATE',
-			resourceType: 'Calificacion',
+			resourceType: 'calificacion',
 			endpoint: `${this.calificacionUrl}/periodo`,
 			method: 'POST',
 			payload: dto,
@@ -313,7 +313,7 @@ export class CalificacionesFacade {
 
 		this.wal.execute({
 			operation: 'DELETE',
-			resourceType: 'Calificacion',
+			resourceType: 'calificacion',
 			resourceId: periodoId,
 			endpoint: `${this.calificacionUrl}/periodo/${periodoId}`,
 			method: 'DELETE',

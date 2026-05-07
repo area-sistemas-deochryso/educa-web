@@ -216,7 +216,7 @@ export class SalonMensajeriaFacade {
 
 		this.wal.execute({
 			operation: 'CREATE',
-			resourceType: 'Conversacion',
+			resourceType: 'conversaciones',
 			endpoint: `${this.conversacionUrl}/crear`,
 			method: 'POST',
 			payload: dto,
@@ -268,7 +268,7 @@ export class SalonMensajeriaFacade {
 
 		this.wal.execute<EnviarMensajeResponseDto>({
 			operation: 'CREATE',
-			resourceType: 'Conversacion',
+			resourceType: 'conversaciones',
 			endpoint: `${this.conversacionUrl}/mensaje`,
 			method: 'POST',
 			payload: dto,
@@ -316,7 +316,7 @@ export class SalonMensajeriaFacade {
 
 		this.wal.execute({
 			operation: 'CREATE',
-			resourceType: 'Conversacion',
+			resourceType: 'conversaciones',
 			endpoint: `${this.conversacionUrl}/crear`,
 			method: 'POST',
 			payload: dto,

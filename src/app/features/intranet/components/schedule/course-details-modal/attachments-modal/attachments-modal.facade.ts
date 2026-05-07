@@ -103,7 +103,7 @@ export class AttachmentsModalFacade {
 
 					this.wal.execute({
 						operation: 'CREATE',
-						resourceType: 'CursoContenidoArchivo',
+						resourceType: 'cursoContenidoArchivo',
 						endpoint: `${CONTENIDO_URL}/semana/${semanaId}/archivo`,
 						method: 'POST',
 						payload: request,
@@ -174,7 +174,7 @@ export class AttachmentsModalFacade {
 
 		this.wal.execute({
 			operation: 'DELETE',
-			resourceType: 'CursoContenidoArchivo',
+			resourceType: 'cursoContenidoArchivo',
 			resourceId: attachment.id,
 			endpoint: `${CONTENIDO_URL}/archivo/${attachment.id}`,
 			method: 'DELETE',

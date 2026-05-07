@@ -39,7 +39,7 @@ export class PermissionsUsersCrudFacade {
 
 			this.wal.execute({
 				operation: 'UPDATE',
-				resourceType: 'PermisoUsuario',
+				resourceType: 'permisosUsuario',
 				resourceId: permiso.id,
 				endpoint: `${this.apiUrl}/usuario/${permiso.id}/actualizar`,
 				method: 'PUT',
@@ -61,7 +61,7 @@ export class PermissionsUsersCrudFacade {
 
 			this.wal.execute({
 				operation: 'CREATE',
-				resourceType: 'PermisoUsuario',
+				resourceType: 'permisosUsuario',
 				endpoint: `${this.apiUrl}/usuario/crear`,
 				method: 'POST',
 				payload,
@@ -113,7 +113,7 @@ export class PermissionsUsersCrudFacade {
 
 		this.wal.execute({
 			operation: 'DELETE',
-			resourceType: 'PermisoUsuario',
+			resourceType: 'permisosUsuario',
 			resourceId: id,
 			endpoint: `${this.apiUrl}/usuario/${id}/eliminar`,
 			method: 'DELETE',

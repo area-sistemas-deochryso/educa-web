@@ -67,13 +67,11 @@
 
 ---
 
-### H7 — `WAL_CACHE_MAP` mezcla convenciones de naming
+### H7 — `WAL_CACHE_MAP` mezcla convenciones de naming ✅ Resuelto 2026-05-07
 
-**Archivo**: `src/app/core/services/wal/models/wal.models.ts:182-198`
+**Archivo**: `src/app/core/services/wal/models/wal.models.ts:189-205`
 
-**Problema**: `resourceType` usa camelCase (`usuarios`), kebab-case (`permisos-rol`) y PascalCase (`Curso`, `CursoContenido`) sin convención definida.
-
-**Fix**: Normalizar a camelCase (alineado con frontend). Requiere actualizar todos los facades que pasan `resourceType` + las keys de `WAL_CACHE_MAP`.
+**Fix aplicado**: 13 keys renombradas a camelCase. Mapeo: `Curso → cursos`, `Vista → vistas`, `permisos-rol → permisosRol`, `PermisoUsuario → permisosUsuario`, `CursoContenido → cursoContenido`, `CursoContenidoArchivo → cursoContenidoArchivo`, `CursoContenidoSemana → cursoContenidoSemana`, `CursoContenidoTarea → cursoContenidoTarea`, `TareaArchivo → tareaArchivo`, `AsistenciaCurso → asistenciaCurso`, `Calificacion → calificacion`, `GrupoContenido → grupoContenido`, `Conversacion → conversaciones`. URL patterns dentro del map (strings `/api/...`) NO se renombran — siguen siendo PascalCase porque corresponden a controllers BE. 14 archivos tocados (1 model + 2 helpers WAL + 11 facades/specs). Lint ✅, suite WAL ✅ (112 tests), grupos spec ✅ (5 tests).
 
 ---
 
@@ -130,12 +128,12 @@ Resultado: 3 fuentes → 2, drift eliminado, taxonomías documentadas.
 |-----------|----------|----------|------|
 | **P0** | H1 (interceptor PascalCase) ✅ | Medio | Resuelto 2026-05-04 |
 | **P1** | H8+H9 (módulos incompletos + versiones) ✅ | Bajo | Resuelto 2026-05-04 |
-| **P1** | H7 (naming WAL_CACHE_MAP) | Medio-alto (muchos facades) | 1 chat dedicado |
+| **P1** | H7 (naming WAL_CACHE_MAP) ✅ | Medio-alto (muchos facades) | Resuelto 2026-05-07 (chat 124) |
 | **P2** | H2+H3+H4+H6 (cosmético + reglas) ✅ | Bajo | Resuelto 2026-05-07 |
 | **P2** | H10 (duplicación patrones) ✅ | Bajo | Resuelto 2026-05-07 |
 | **P3** | H5 (subscribe sin takeUntil) ✅ | Decisión de diseño | Resuelto 2026-05-07 |
 
-**Estado**: 8/10 hallazgos cerrados. Queda solo **H7** (naming `WAL_CACHE_MAP`, alto esfuerzo — toca muchos facades).
+**Estado**: 10/10 hallazgos cerrados.
 
 ---
 

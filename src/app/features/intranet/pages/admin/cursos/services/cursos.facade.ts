@@ -27,7 +27,7 @@ export class CursosFacade extends BaseCrudFacade<Curso, CursoFormData, CursosEst
 	protected readonly store = inject(CursosStore);
 	protected readonly config: BaseCrudFacadeConfig = {
 		tag: 'CursosFacade',
-		resourceType: 'Curso',
+		resourceType: 'cursos',
 		apiUrl: `${environment.apiUrl}/api/sistema/cursos`,
 		loadErrorMessage: 'No se pudieron cargar los cursos',
 	};

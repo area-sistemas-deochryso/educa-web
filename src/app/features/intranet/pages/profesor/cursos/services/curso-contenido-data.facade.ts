@@ -134,7 +134,7 @@ export class CursoContenidoDataFacade {
 	crearContenido(request: CrearCursoContenidoRequest): void {
 		this.wal.execute({
 			operation: 'CREATE',
-			resourceType: 'CursoContenido',
+			resourceType: 'cursoContenido',
 			endpoint: this.contenidoUrl,
 			method: 'POST',
 			payload: request,
@@ -164,7 +164,7 @@ export class CursoContenidoDataFacade {
 	eliminarContenido(contenidoId: number): void {
 		this.wal.execute({
 			operation: 'DELETE',
-			resourceType: 'CursoContenido',
+			resourceType: 'cursoContenido',
 			resourceId: contenidoId,
 			endpoint: `${this.contenidoUrl}/${contenidoId}`,
 			method: 'DELETE',

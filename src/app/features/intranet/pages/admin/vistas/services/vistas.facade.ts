@@ -24,7 +24,7 @@ export class VistasFacade extends BaseCrudFacade<Vista, { ruta: string; nombre: 
 	protected readonly store = inject(VistasStore);
 	protected readonly config: BaseCrudFacadeConfig = {
 		tag: 'VistasFacade',
-		resourceType: 'Vista',
+		resourceType: 'vistas',
 		apiUrl: `${environment.apiUrl}/api/sistema/permisos`,
 		loadErrorMessage: 'No se pudieron cargar las vistas',
 	};

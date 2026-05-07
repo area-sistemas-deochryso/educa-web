@@ -21,7 +21,7 @@ import { WalLeaderService } from './wal-leader.service';
  * ```typescript
  * constructor() {
  *   this.crossTabRefetch.subscribe({
- *     resourceType: 'Curso',
+ *     resourceType: 'cursos',
  *     refetchItems: () => this.refreshItemsOnly(true),
  *     refetchStats: () => this.refreshEstadisticas(),
  *     destroyRef: this.destroyRef,

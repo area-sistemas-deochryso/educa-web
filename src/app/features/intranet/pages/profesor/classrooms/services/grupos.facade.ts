@@ -37,7 +37,7 @@ export class GruposFacade {
 	// #endregion
 
 	constructor() {
-		this.crossTabRefetch.subscribe({ resourceType: 'GrupoContenido', refetchItems: () => this.refetchGrupos(), destroyRef: this.destroyRef });
+		this.crossTabRefetch.subscribe({ resourceType: 'grupoContenido', refetchItems: () => this.refetchGrupos(), destroyRef: this.destroyRef });
 	}
 
 	// #region Comandos de carga
@@ -115,7 +115,7 @@ export class GruposFacade {
 
 		this.wal.execute<GrupoContenidoDto>({
 			operation: 'CREATE',
-			resourceType: 'GrupoContenido',
+			resourceType: 'grupoContenido',
 			endpoint: this.grupoUrl,
 			method: 'POST',
 			payload: dto,
@@ -142,7 +142,7 @@ export class GruposFacade {
 
 		this.wal.execute({
 			operation: 'UPDATE',
-			resourceType: 'GrupoContenido',
+			resourceType: 'grupoContenido',
 			resourceId: grupoId,
 			endpoint: `${this.grupoUrl}/${grupoId}`,
 			method: 'PUT',
@@ -173,7 +173,7 @@ export class GruposFacade {
 
 		this.wal.execute({
 			operation: 'DELETE',
-			resourceType: 'GrupoContenido',
+			resourceType: 'grupoContenido',
 			resourceId: grupoId,
 			endpoint: `${this.grupoUrl}/${grupoId}`,
 			method: 'DELETE',
@@ -199,7 +199,7 @@ export class GruposFacade {
 
 		this.wal.execute({
 			operation: 'UPDATE',
-			resourceType: 'GrupoContenido',
+			resourceType: 'grupoContenido',
 			resourceId: grupoId,
 			endpoint: `${this.grupoUrl}/${grupoId}/estudiantes`,
 			method: 'POST',
@@ -226,7 +226,7 @@ export class GruposFacade {
 
 		this.wal.execute({
 			operation: 'UPDATE',
-			resourceType: 'GrupoContenido',
+			resourceType: 'grupoContenido',
 			resourceId: grupoId,
 			endpoint: `${this.grupoUrl}/${grupoId}/estudiantes/${estudianteId}`,
 			method: 'DELETE',
@@ -255,7 +255,7 @@ export class GruposFacade {
 
 		this.wal.execute({
 			operation: 'CUSTOM',
-			resourceType: 'GrupoContenido',
+			resourceType: 'grupoContenido',
 			endpoint: request.endpoint,
 			method: request.method,
 			payload: request.payload,
@@ -321,7 +321,7 @@ export class GruposFacade {
 
 		this.wal.execute({
 			operation: 'UPDATE',
-			resourceType: 'GrupoContenido',
+			resourceType: 'grupoContenido',
 			resourceId: contenidoId,
 			endpoint: `${this.grupoUrl}/contenido/${contenidoId}/max-estudiantes`,
 			method: 'PUT',

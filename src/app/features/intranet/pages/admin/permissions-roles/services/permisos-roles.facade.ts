@@ -40,7 +40,7 @@ export class PermissionsRolesFacade {
 
 	constructor() {
 		this.crossTabRefetch.subscribe({
-			resourceType: 'permisos-rol',
+			resourceType: 'permisosRol',
 			refetchItems: () => this.silentRefreshAfterCrud(),
 			destroyRef: this.destroyRef,
 		});
@@ -109,7 +109,7 @@ export class PermissionsRolesFacade {
 
 			this.wal.execute({
 				operation: 'UPDATE',
-				resourceType: 'permisos-rol',
+				resourceType: 'permisosRol',
 				resourceId: permiso.id,
 				endpoint: `${this.apiUrl}/rol/${permiso.id}/actualizar`,
 				method: 'PUT',
@@ -131,7 +131,7 @@ export class PermissionsRolesFacade {
 
 			this.wal.execute({
 				operation: 'CREATE',
-				resourceType: 'permisos-rol',
+				resourceType: 'permisosRol',
 				endpoint: `${this.apiUrl}/rol/crear`,
 				method: 'POST',
 				payload: { rol, vistas },
@@ -155,7 +155,7 @@ export class PermissionsRolesFacade {
 	delete(permiso: PermisoRol): void {
 		this.wal.execute({
 			operation: 'DELETE',
-			resourceType: 'permisos-rol',
+			resourceType: 'permisosRol',
 			resourceId: permiso.id,
 			endpoint: `${this.apiUrl}/rol/${permiso.id}/eliminar`,
 			method: 'DELETE',

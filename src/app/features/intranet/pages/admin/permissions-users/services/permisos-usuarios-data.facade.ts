@@ -32,7 +32,7 @@ export class PermissionsUsersDataFacade {
 
 	constructor() {
 		this.crossTabRefetch.subscribe({
-			resourceType: 'PermisoUsuario',
+			resourceType: 'permisosUsuario',
 			refetchItems: () => this.loadData(),
 			destroyRef: this.destroyRef,
 		});
