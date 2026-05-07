@@ -1543,7 +1543,7 @@ Ver [history/planes-cerrados.md](../history/planes-cerrados.md#plan-11).
   - [x] F5.3.1 `feedback-reports` ✅ (2026-05-07, brief 120)
   - [x] F5.3.2 `attendances` ✅ (2026-05-07, brief 121)
   - [x] F5.3.3 `email-outbox` ✅ (2026-05-07, brief 122) — scope reducido a tokens (8 hex → vars del tema); B2/B3/B6 ya alineados desde commits previos
-  - [ ] F5.3.4 `vistas` (remover `bg: surface-card` + shadow de stat-card)
+  - [x] F5.3.4 `vistas` ✅ (2026-05-07, brief 123) — removidas `bg: surface-card` + `box-shadow` de `.stat-card` (anti-B1); el global ya da transparencia
   - [ ] F5.3.5 `cursos` (remover shadow de filters-bar)
   - [ ] F5.3.6 Stats residuales (permisos-roles, permisos-stats-cards, usuarios-stats)
   - [ ] F5.3.7 `horarios/schedules` root shadows
