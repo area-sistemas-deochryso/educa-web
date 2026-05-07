@@ -232,18 +232,27 @@ describe('CursosFacade', () => {
 			expect(store.estadisticas()!.cursosInactivos).toBe(2);
 		});
 
-		it('should remove item and update stats (optimistic)', () => {
-			facade.delete(mockCursos[0]); // active curso
+		it('should soft-delete: keep item as inactive, total unchanged, activos→inactivos', () => {
+			// Cursos BE hace soft-delete (CUR_Estado = false). El registro persiste.
+			// totalCursos no cambia. activos -1, inactivos +1.
+			facade.delete(mockCursos[0]); // estado: true (curso 1)
 
-			expect(store.items()).toHaveLength(1);
-			expect(store.estadisticas()!.totalCursos).toBe(1);
-			expect(store.estadisticas()!.cursosActivos).toBe(0);
+			expect(store.items()).toHaveLength(2); // item NO se quita
+			const c1 = store.items().find((c) => c.id === 1);
+			expect(c1?.estado).toBe(false); // marcado como inactivo
+			expect(store.estadisticas()!.totalCursos).toBe(2); // sin cambio
+			expect(store.estadisticas()!.cursosActivos).toBe(0); // 1 → 0
+			expect(store.estadisticas()!.cursosInactivos).toBe(2); // 1 → 2
 		});
 
-		it('should decrement inactivos on delete inactive curso', () => {
-			facade.delete(mockCursos[1]); // inactive curso
+		it('should soft-delete inactive curso as no-op on counters', () => {
+			// Si ya estaba inactivo, soft-delete no altera contadores ni list.
+			facade.delete(mockCursos[1]); // estado: false (curso 2)
 
-			expect(store.estadisticas()!.cursosInactivos).toBe(0);
+			expect(store.items()).toHaveLength(2);
+			expect(store.estadisticas()!.totalCursos).toBe(2);
+			expect(store.estadisticas()!.cursosActivos).toBe(1);
+			expect(store.estadisticas()!.cursosInactivos).toBe(1);
 		});
 	});
 	// #endregion

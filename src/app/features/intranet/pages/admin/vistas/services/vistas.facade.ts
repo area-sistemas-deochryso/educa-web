@@ -86,10 +86,12 @@ export class VistasFacade extends BaseCrudFacade<Vista, { ruta: string; nombre: 
 	}
 
 	delete(vista: Vista): void {
+		// Vistas: BE hace DELETE físico (RemoveAndSaveAsync). Mode 'hard' explícito.
 		this.walDelete(vista,
 			() => this.api.eliminarVista(vista.id),
 			STATS_KEYS,
 			`vistas/${vista.id}/eliminar`,
+			'hard',
 		);
 	}
 	// #endregion

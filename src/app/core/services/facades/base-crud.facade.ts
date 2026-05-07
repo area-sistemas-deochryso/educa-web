@@ -341,36 +341,70 @@ export abstract class BaseCrudFacade<
 	// #region WAL CRUD — Delete
 
 	/**
-	 * ELIMINAR: WAL → optimistic remove + stats → rollback re-adds.
+	 * ELIMINAR: WAL → optimistic update + stats → rollback restaura.
+	 *
+	 * El comportamiento depende del contrato de delete del backend:
+	 *
+	 * - `mode: 'soft'` (DEFAULT, alineado con INV-D03): el BE hace baja lógica
+	 *   (`_Estado = false`). El registro persiste como inactivo. El optimistic
+	 *   update muta `estado` del item a inactivo (queda visible si el listado
+	 *   trae soft-deleted), `total` no cambia, y `activos`/`inactivos` se
+	 *   ajustan reflejando la transición a inactivo.
+	 *
+	 * - `mode: 'hard'`: el BE hace DELETE físico. El item se quita del store
+	 *   (`removeItem`), `total -= 1`, y `activos`/`inactivos` decrementan en
+	 *   el lado correspondiente al estado previo del registro.
+	 *
+	 * Casos del proyecto:
+	 *   - Soft (default): Curso (`CUR_Estado = false`).
+	 *   - Hard (explícito): Vista (`RemoveAndSaveAsync` físico).
 	 */
 	protected walDelete(
 		item: T,
 		http$: () => Observable<unknown>,
 		statsKeys: EstadisticaKeys,
-		endpointSuffix = `${item.id}/eliminar`,
+		endpointSuffix?: string,
+		mode: 'soft' | 'hard' = 'soft',
 	): void {
+		const suffix = endpointSuffix ?? `${item.id}/eliminar`;
 		const isActivo = this.resolveEstadoActivo(item);
+		const op = mode === 'soft' ? 'delete-soft' : 'delete-hard';
+		// Snapshot del valor crudo de estado para preservar el tipo (boolean vs number).
+		const estadoPrevio = (item as HasEstado).estado;
+		const estadoInactivoTyped = typeof estadoPrevio === 'number' ? 0 : false;
 
 		this.wal.execute({
 			operation: 'DELETE',
 			resourceType: this.config.resourceType,
 			resourceId: item.id,
-			endpoint: `${this.config.apiUrl}/${endpointSuffix}`,
+			endpoint: `${this.config.apiUrl}/${suffix}`,
 			method: 'DELETE',
 			payload: null,
 			http$,
 			optimistic: {
 				apply: () => {
-					const { activosDelta, inactivosDelta } = getEstadoToggleDeltas(isActivo, 'delete');
-					this.store.removeItem(item.id);
-					this.store.incrementarEstadistica(statsKeys.total as keyof TStats, -1);
+					const { activosDelta, inactivosDelta } = getEstadoToggleDeltas(isActivo, op);
+					if (mode === 'soft') {
+						// Baja lógica: el item queda en lista marcado como inactivo.
+						// `total` no cambia (BE incluye soft-deleted en el total).
+						this.store.updateItem(item.id, { estado: estadoInactivoTyped } as Partial<T>);
+					} else {
+						// Baja física: el item desaparece y total decrementa.
+						this.store.removeItem(item.id);
+						this.store.incrementarEstadistica(statsKeys.total as keyof TStats, -1);
+					}
 					this.store.incrementarEstadistica(statsKeys.activos as keyof TStats, activosDelta);
 					this.store.incrementarEstadistica(statsKeys.inactivos as keyof TStats, inactivosDelta);
 				},
 				rollback: () => {
-					const { activosDelta, inactivosDelta } = getEstadoRollbackDeltas(isActivo, 'delete');
-					this.store.addItem(item);
-					this.store.incrementarEstadistica(statsKeys.total as keyof TStats, 1);
+					const { activosDelta, inactivosDelta } = getEstadoRollbackDeltas(isActivo, op);
+					if (mode === 'soft') {
+						// Restaurar el estado previo crudo (preserva boolean/number).
+						this.store.updateItem(item.id, { estado: estadoPrevio } as Partial<T>);
+					} else {
+						this.store.addItem(item);
+						this.store.incrementarEstadistica(statsKeys.total as keyof TStats, 1);
+					}
 					this.store.incrementarEstadistica(statsKeys.activos as keyof TStats, activosDelta);
 					this.store.incrementarEstadistica(statsKeys.inactivos as keyof TStats, inactivosDelta);
 				},
