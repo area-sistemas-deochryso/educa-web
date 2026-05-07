@@ -137,10 +137,10 @@ Resultado: 3 fuentes → 2, drift eliminado, taxonomías documentadas.
 
 ---
 
-## Findings menores 1ra ronda smoke (2026-05-04)
+## Findings menores 1ra ronda smoke (2026-05-04) ✅ Todos resueltos
 
-Detectados durante la 1ra ronda del WAL Integration Smoke (`claude-cowork/wal-integration-smoke.md`, commit `478df42`). No bloquean la ronda; son polish UX/diagnóstico que sumarse al backlog de polish del WAL.
+Detectados durante la 1ra ronda del WAL Integration Smoke (`claude-cowork/wal-integration-smoke.md`, commit `478df42`).
 
-- **F-S04 (Caso 4)** — Toast en errores 4xx no extrae el mensaje específico del payload del BE. Cliente muestra "La solicitud contiene datos inválidos" cuando el BE devolvió "El nombre no puede exceder 50 caracteres". `WalFacadeHelper.execute().onError` o el error handler global debería intentar `error.error?.message` antes del fallback genérico.
-- **F-S06 (Caso 6)** — Follower cross-tab solo invalida SW cache vía `invalidateForCrossTab`, no dispara refetch automático del store del componente. Resultado: la fila final aparece consistente solo cuando el follower hace GET nuevo (refrescar manual o navegación). Decisión de diseño actual del facade — si se quiere visibilidad inmediata cross-tab, falta cablear `entryCommittedByOtherTab$` a `silentRefreshAfterCrud` en cada CRUD facade que lo necesite.
-- **F-S08 (Caso 8)** — `REQUIRES_MIGRATION` se emite correctamente y la entry queda en ese estado en IDB, pero ningún componente top-level consume `walStatus()` con un visual prominente (banner). El usuario no se entera de que tiene migraciones pendientes. Falta wiring de `WalStatusFacade` en `intranet-layout` o equivalente.
+- **F-S04 (Caso 4)** ✅ Resuelto — `core/services/error/error-handler.service.ts:276-302` (`getHttpErrorMessage`) ya implementa cadena de prioridades: `error.error.errorCode` → `error.error.message` → `ValidationProblemDetails.errors[]` → fallback HTTP. El mensaje específico del BE se muestra antes del genérico.
+- **F-S06 (Caso 6)** ✅ Resuelto — commits `49d0c7d` (helper `WalCrossTabRefetchService` + auto-wiring vía `initCrossTabRefetch()` en `BaseCrudFacade`) y `f5e73f9` (contrato endurecido `refetchItems` obligatorio + `refetchStats` opcional). Documentado en `rules/optimistic-ui.md` §"Refetch cross-tab tras commit del leader".
+- **F-S08 (Caso 8)** ✅ Resuelto — `WalMigrationBannerComponent` (`features/intranet/shared/components/wal-migration-banner/`) renderizado en `intranet-layout.component.html:69`. Consume `WalStatusFacade` para mostrar banner cuando hay entries en `REQUIRES_MIGRATION`.
