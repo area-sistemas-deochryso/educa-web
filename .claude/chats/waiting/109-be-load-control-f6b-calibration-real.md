@@ -1,9 +1,9 @@
 # BE — Load Control F6b: Calibración con datos reales de producción
 
 > **Repo destino**: `Educa.API` (master)
-> **Estado**: 🔒 **HOLD** — espera 30 días de datos de prod tras deploy de F1-F5
+> **Estado**: ⏸️ **WAITING** — movido a waiting/ el 2026-05-07 por dependencia externa
 > **Creado**: 2026-05-05 · **Modo sugerido**: `/investigate` (read-only métricas) → `/adr` si requiere cambio estructural → `/execute` si solo ajuste de valores
-> **Bloqueado por**: F6a cerrado + F1-F5 en `closed/` y desplegados en producción + 30 días de telemetría acumulada.
+> **Bloqueado por**: F6a cerrado + F1-F5 en `closed/` y desplegados en producción + 30 días de telemetría acumulada (revisar tras 2026-06-07 si F1-F5 ya en prod).
 > **Bloquea a**: cierre del chat 096 (load control fully calibrated).
 
 ## CONTEXTO
