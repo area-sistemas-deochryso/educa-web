@@ -5,37 +5,39 @@ Namespace de **Cowork** dentro de `.claude/`. Cowork es QA asistido en navegador
 para no mezclarse con `commands/`, `hooks/`, `settings.json` y demás infra que
 Claude Code autodescubre desde rutas fijas.
 
-## Archivos
+## Archivos vigentes
 
 | Archivo | Rol | Cuándo leerlo |
-|---|---|---|
+| --- | --- | --- |
 | [SETUP-COWORK.md](SETUP-COWORK.md) | Setup del proyecto + hallazgos abiertos/verificados | **Siempre primero**. Login, browser MCP a usar, limitaciones técnicas (PrimeNG `p-select`, `withFetch`, IndexedDB). |
-| [test-now-awaiting-prod.md](test-now-awaiting-prod.md) | **Punto de entrada para validación inmediata**: curaduría de los casos de `awaiting-prod/` que se pueden testear ahora sin esperar (deploy ya en prod). | **Lee este apenas el usuario pide validar awaiting-prod**. Indica el orden, agrupa por bloques (WAL, Email FE, Otros), marca cada caso 🟢 NOW / 🟡 NOW-partial / 🔴 WAIT. |
-| [post-deploy-awaiting-prod.md](post-deploy-awaiting-prod.md) | Pasos completos por caso (WAL-1, EM-10, etc.). Incluye casos `🔴 WAIT` para corridas posteriores. | **Después de leer `test-now-awaiting-prod.md`**: cuando arranques un caso, abrí este archivo y buscá el ID para ver Precondición / Pasos / Confirmación. |
 | [wal-integration-smoke.md](wal-integration-smoke.md) | Checklist canónico del subsistema WAL (8 casos). Política de merge: corre el smoke ante cualquier PR que toque `core/services/wal/`. | Si el contexto es **WAL específicamente** (PR que toca el engine, regression a investigar). Independiente del flujo de awaiting-prod. |
-| [reporte-claude-cowork.md](reporte-claude-cowork.md) | Reporte de la primera sesión Cowork (referencia histórica). | Solo si necesitás contexto de cómo se reportó un hallazgo previo. |
+| [f6a-k6-calibration.md](f6a-k6-calibration.md) | Brief de Cowork para la calibración sintética k6 del Plan 40 F6a. División de trabajo usuario/Cowork. | Cuando arranques un round de calibración k6 — el chat brief base es `awaiting-prod/108`. |
+| [reporte-claude-cowork.md](reporte-claude-cowork.md) | Diario append-only de sesiones QA. Cada cierre anexa un bloque (no sobreescribe). | Al cerrar una sesión Cowork — anexar bloque con resumen + hallazgos. Para auditar sesiones previas. |
 | [README.md](README.md) | Este archivo (índice + flujo de lectura). | Punto de entrada al namespace. |
+| [history/](history/) | Checklists de rounds de awaiting-prod ya cerrados. Referencia de formato para reusar. | Solo al armar el próximo checklist post-deploy o auditar cómo se validó un brief específico. |
 
 ## Flujo de lectura para Cowork
 
 > Cuando el usuario pida una validación browser, leé en este orden:
 
 1. **`SETUP-COWORK.md`** — qué browser MCP, qué credenciales, qué limitaciones evitar.
-2. **`test-now-awaiting-prod.md`** — qué casos validar ahora, en qué orden, qué marcar como 🔴 WAIT para humano.
-3. Por cada caso 🟢 / 🟡 que arranques, **`post-deploy-awaiting-prod.md`** sección correspondiente para los pasos exactos.
-4. Reportá usando el formato del final de `test-now-awaiting-prod.md`.
+2. Si el round actual de `awaiting-prod/` ya tiene checklist armado, leé ese (vivirá como hermano de este README cuando se arme). Si no, mirar `history/` como template y armar uno nuevo basado en los briefs vivos de `.claude/chats/awaiting-prod/`.
+3. Por cada caso que arranques, leé el brief original en `.claude/chats/awaiting-prod/<NNN>` para los pasos exactos.
+4. Reportá usando el formato del final de `SETUP-COWORK.md`.
 
 ## Convenciones
 
 - **Hallazgos**: se anexan al `SETUP-COWORK.md` por sesión, en la sección
   correspondiente (§7 abiertos, §8 verificados). No crear archivos sueltos
   por hallazgo — todo va al SETUP.
+- **Reportes de sesión**: se anexan a `reporte-claude-cowork.md` (append-only,
+  no sobreescribir).
+- **Checklists post-deploy**: cuando un round de `awaiting-prod/` se valida,
+  el archivo guía vive temporalmente como hermano de este README. Al cerrar
+  el round, mover a `history/<archivo>-YYYY-MM-DD.md`.
 - **Paths a infra del proyecto**: relativos a `../rules/`, `../docs/`,
   `../systems/`. El `.claude/` raíz es la infra de Claude Code y queda en
   su ruta convencional.
-- **Reportes crudos** de sesiones de Cowork (si los hubiera) entran como
-  archivos hermanos de `SETUP-COWORK.md` dentro de este namespace, no en
-  la raíz del repo.
 
 ## Playbook genérico
 

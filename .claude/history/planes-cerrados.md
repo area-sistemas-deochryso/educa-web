@@ -205,3 +205,59 @@ Plan 6 (Asignación Profesor-Salón-Curso) completado: BD + Domain + Backend + F
 3. **Plan 12 F1.C** ✅ (2026-04-18) — Regla "no testear delegación pura" documentada en `Educa.API.Tests/Controllers/README.md` con definición operativa (4 criterios), ejemplos positivos (F1.B) y negativos (controllers pass-through enteros).
 
 *Gate Ola 1*: ✅ Plan 12 F1 al 100% · infraestructura de controller tests documentada y replicable · 23 tests en 4 archivos de controller (Auth 6 + Asistencia 5 + Aprobación 4 + ConsultaAsistencia 8).
+
+---
+
+## Plan 20 — Design System (estándar desde `usuarios`)
+
+**Repo**: FE · **Cerrado**: 2026-05-07
+
+**Resumen**: Estándar canónico extraído de `/intranet/admin/usuarios` y aplicado al resto de la intranet. F1 globales (inputs/selects/buttons reset + `.label-uppercase`), F2 convención `p-tag` opción C (`tag-neutral` informativo / `severity` crítico, ~50 archivos migrados), F3 pautas B1-B11 documentadas en `rules/design-system.md`, F4 tokens de color (~30 archivos: `#e24c4c→--red-500`, `#dc2626→--red-600`, `#1e40af→--blue-800` + `p-button-success` blanco global), F5.3 migración página por página de las 8 admin priorizadas. Sin regresiones funcionales — refactor presentacional puro.
+
+---
+
+## Plan 22 — Endurecimiento de correos de asistencia
+
+**Repo**: BE+FE · **Cerrado**: 2026-04-23 · **Plan base**: `Educa.API/.claude/plan/asistencia-correos-endurecimiento.md`
+
+**Resumen**: Subió el techo efectivo SMTP de 50/h (1 buzón) a 200/h (7 buzones round-robin con sliding window 60min) + telemetría defer/fail + auditoría preventiva. Chats: F1+F2+F3.BE (validación + clasificación + re-enqueue jitter) · Chat A (F5+F6 multi-sender, `EO_IntentosPorCuota`, `FAILED_QUOTA_EXCEEDED`) · Chat B throttle-widget + defer-fail-widget (consume `/throttle-status` y `/defer-fail-status`, polling 30/60s, semáforo OK/WARNING/CRITICAL) · Chat 5 F4.BE (endpoint `/auditoria-correos-asistencia` admin-only con `EmailValidator` + DNI/correo enmascarados) · Chat 6 F4.FE (pantalla `/intranet/admin/auditoria-correos` read-only con feature flag). INV-AD05 sin BCC. Tests: 1535 FE + 1295 BE verdes.
+
+---
+
+## Plan 27 — Filtro temporal de asistencia diaria por grado (5to Primaria +)
+
+**Repo**: BE+FE · **Cerrado**: 2026-04-22 (pendiente solo validación del jefe post-deploy)
+
+**Resumen**: Marcaciones CrossChex de estudiantes con `GRA_Orden < 8` se descartan silenciosamente (webhook + admin queries + reportes PDF/Excel + correos masivos). Profesores intactos. Constante `UmbralGradoAsistenciaDiaria=8` en BE + mirror `UMBRAL_GRADO_ASISTENCIA_DIARIA=8` en FE — revertir = bajar ambos y redeployar (data loss = 0). Chats: 1 `/design` + 2 BE webhook/admin/correos + 3 BE reportes + 4 BE+FE self-service/banner/widget + 5 docs `INV-C11` (§1.11 + §15.4 business-rules) + 5b fix gap consultas profesor/director + 5c fix gap bulk email admin (subquery `GraOrden` en `AsistenciaEmailDataRow`). Tests: 1167 BE + 1509 FE verdes.
+
+---
+
+## Plan 32 — Centralización de errores vía Correlation ID
+
+**Repo**: BE+FE · **Cerrado**: 2026-04-25
+
+**Resumen**: Hub admin `/intranet/admin/correlation/:id` que agrega 4 fuentes (`ErrorLog` + `RateLimitEvent` + `REU_ReporteUsuario` + `EmailOutbox`) en una vista por correlationId. Endpoint `GET /api/sistema/correlation/{id}` con 4 queries `AsNoTracking()` secuenciales + try/catch independiente por fuente (INV-S07) + caps defensivos (100 filas, 200 chars). Pill reusable `<app-correlation-id-pill>` (standalone, OnPush, click→Router) wireada en los 4 dashboards admin (error-logs, rate-limit-events, feedback-reports, email-outbox). Permiso reusado vía `data.permissionPath` override en `permisos.guard.ts`. Tests: 1397 BE + 1600 FE verdes.
+
+---
+
+## Plan 34 — Saneamiento de errores con `ErrorGroup`
+
+**Repo**: BE+FE · **Cerrado**: 2026-04-27
+
+**Resumen**: Modelo `ErrorGroup` con huella SHA-256 (`ErrorFingerprintCalculator` con normalización GUID/ISO date/long-id + URL collapse) agrupa ocurrencias `ErrorLog` por bug. Máquina de estados `NUEVO/VISTO/EN_PROGRESO/RESUELTO/IGNORADO` (INV-ET07 con `StateTransitionValidator`). UPSERT atómico en cada insert auto-reabre `RESUELTO→NUEVO` con `ContadorPostResolucion++`; `IGNORADO` no se reabre. Purga selectiva por estado (7d/30d/180d desde `UltimaFecha`). Frontend con vista Kanban (drag-drop CDK con predicate espejo INV-ET07, `cdkDropListConnectedTo`, top 20 por columna + "Cargar más" client-side) + tabla coexistente, toggle persistido vía `PreferencesStorageService`, optimistic update + rollback exacto en 409. Invariantes nuevos: `INV-ET03/04/05/06/07`. Tests: 1466 BE + 1648 FE verdes.
+
+---
+
+## Plan 35 — Rediseño UX/UI submódulo Monitoreo (hub + shells)
+
+**Repo**: FE · **Cerrado**: 2026-04-27
+
+**Resumen**: 7 entradas planas del dropdown "Sistema → Monitoreo" colapsadas en 1 entrada → hub `/intranet/admin/monitoreo` con 3 cards (Correos / Incidencias / Seguridad) filtradas por permiso individual + feature flag. Shells minimalistas con `<p-tabs>` controlado por signal derivado de `route.firstChild`, navegación vía `router.navigate` relativa. 7 redirects legacy con `pathMatch: 'full'` conservan bookmarks. Lógica interna de las 6 páginas existentes intacta (refactor estructural puro). Tests: 1683/1683 verdes.
+
+---
+
+## Plan 36 — Rediseño UX/UI páginas internas de Monitoreo
+
+**Repo**: FE+BE · **Cerrado**: 2026-04-28
+
+**Resumen**: Continuación del Plan 35. 9 chats migraron las 7 sub-páginas al patrón B3 del design-system y agregaron features visuales: Chat 2 bandeja (overrides p-tabs transparente global, stats con tokens, Excel a `p-button-success`, layout grid stats+chart side-by-side), Chat 3 dashboard tab Detalle con 4 KPI cards, Chat 4b BE endpoint `/diagnostico/buscar-personas` (lookup polimórfico Estudiante/Profesor/Director/Apoderado por nombre/apellido/DNI hash, INV-S07 fail-safe) + Chat 4 FE typeahead `p-autoComplete` con debounce 300ms + autosubmit, Chat 6 toggle Kanban default 5 columnas, Chat 7 stat cards reportes-usuarios B3, Chat 8 columna "Intentos/Umbral" en rate-limit con highlight rojo y tooltip. Restricción dura: ningún chat tocó funcionalidad — solo HTML/SCSS y refactor presentacional. Tests: 1482 BE + 1694 FE verdes.
