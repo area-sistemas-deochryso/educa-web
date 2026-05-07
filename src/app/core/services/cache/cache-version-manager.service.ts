@@ -10,27 +10,8 @@ import {
 import { SwService } from '@features/intranet/services/sw/sw.service';
 
 /**
- * ============================================================================
- * GESTOR AUTOMÁTICO DE VERSIONES DE CACHE
- * ============================================================================
- *
- * RESPONSABILIDAD ÚNICA:
- * Detectar automáticamente cambios de versión y invalidar cache sin intervención manual.
- *
- * PROBLEMA QUE RESUELVE:
- * Los desarrolladores olvidan invalidar cache manualmente cuando cambian el backend.
- * Esto causa errores de deserialización intermitentes en producción.
- *
- * SOLUCIÓN:
- * Sistema automático que:
- * 1. Al iniciar la app, compara versiones configuradas vs guardadas en localStorage
- * 2. Si una versión cambió → invalida automáticamente el cache de ese módulo
- * 3. Guarda las nuevas versiones
- * 4. Todo es invisible para el usuario final
- *
- * PARA EL DESARROLLADOR:
- * Solo cambiar el número de versión en cache-versions.config.ts cuando hay cambios breaking.
- * El resto es automático.
+ * Detecta cambios de versión configuradas y dispara invalidación automática del SW cache
+ * por módulo. El desarrollador solo cambia la versión en `cache-versions.config.ts`.
  */
 // #endregion
 // #region Implementation
@@ -154,9 +135,9 @@ export class CacheVersionManagerService {
 	showVersionStatus(): void {
 		const stored = this.getStoredVersions();
 
-		console.table({
-			Current: CACHE_VERSIONS,
-			Stored: stored,
+		logger.log('[CacheVersionManager] Version status', {
+			current: CACHE_VERSIONS,
+			stored,
 		});
 	}
 }

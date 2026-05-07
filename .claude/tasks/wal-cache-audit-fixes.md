@@ -20,35 +20,30 @@
 
 ---
 
-### H2 — Bug menor: Region duplicado en facade helper
+### H2 — Bug menor: Region duplicado en facade helper ✅ Resuelto 2026-05-07
 
 **Archivo**: `src/app/core/services/wal/wal-facade-helper.service.ts:120-122`
 
-**Problema**: Dos `// #endregion` consecutivos. El segundo no tiene region abierta correspondiente.
-
-**Fix**: Eliminar la línea 122.
+**Fix aplicado**: Eliminado el `#endregion` duplicado en línea 122.
 
 ---
 
-### H3 — `console.table()` directo
+### H3 — `console.table()` directo ✅ Resuelto 2026-05-07
 
 **Archivo**: `src/app/core/services/cache/cache-version-manager.service.ts:157`
 
-**Regla violada**: `code-style.md` ("SIEMPRE usar logger, NUNCA console.log") + ESLint `no-console`.
-
-**Fix**: Reemplazar con `logger.log` o `debug.dbg('CACHE:VersionManager')`.
+**Fix aplicado**: Reemplazado por `logger.log('[CacheVersionManager] Version status', { current, stored })`.
 
 ---
 
-### H4 — Separadores `============` en lugar de `#region`
+### H4 — Separadores `============` en lugar de `#region` ✅ Resuelto 2026-05-07
 
 **Archivos**:
-- `src/app/core/services/cache/cache-invalidation.service.ts:7-9`
-- `src/app/core/services/cache/cache-version-manager.service.ts:13-15`
 
-**Regla violada**: `regions.md` ("Las regiones reemplazan los separadores `============`. No mezclar ambos estilos.")
+- `src/app/core/services/cache/cache-invalidation.service.ts`
+- `src/app/core/services/cache/cache-version-manager.service.ts`
 
-**Fix**: Reemplazar bloques `============` por `// #region` / `// #endregion`.
+**Fix aplicado**: Removidos los bloques `============` del JSDoc header de ambos archivos. Reescritos como JSDoc breve de 2 líneas. Las `// #region` existentes se preservan.
 
 ---
 
@@ -64,13 +59,11 @@
 
 ---
 
-### H6 — Comentarios excesivamente verbosos
+### H6 — Comentarios excesivamente verbosos ✅ Resuelto 2026-05-07
 
 **Archivo**: `src/app/core/services/cache/cache-invalidation.service.ts`
 
-**Regla violada**: `comments.md` ("Comentarios mínimos pero útiles", "NO describir lo obvio").
-
-**Fix**: Reducir JSDoc de métodos wrapper a 1-2 líneas. Eliminar ejemplos de uso que replican lo que el nombre del método ya dice.
+**Fix aplicado**: Reducidos los 9 JSDoc de los métodos `invalidate*` a una línea o eliminados (los métodos por módulo no llevan JSDoc — el nombre ya lo dice). Eliminados los bloques de ejemplo de uso (`CUÁNDO USAR` / `EFECTO` / `EJEMPLO`).
 
 ---
 
@@ -123,14 +116,14 @@
 
 | Prioridad | Hallazgo | Esfuerzo | Chat |
 |-----------|----------|----------|------|
-| **P0** | H1 (interceptor PascalCase) | Medio | 1 chat |
-| **P1** | H8+H9 (módulos incompletos + versiones) | Bajo | Mismo chat que H1 |
+| **P0** | H1 (interceptor PascalCase) ✅ | Medio | Resuelto 2026-05-04 |
+| **P1** | H8+H9 (módulos incompletos + versiones) ✅ | Bajo | Resuelto 2026-05-04 |
 | **P1** | H7 (naming WAL_CACHE_MAP) | Medio-alto (muchos facades) | 1 chat dedicado |
-| **P2** | H2+H3+H4+H6 (cosmético + reglas) | Bajo | 1 chat |
-| **P2** | H10 (duplicación patrones) | Bajo | Mismo chat que H2-H6 |
-| **P3** | H5 (subscribe sin takeUntil) | Decisión de diseño | Definir en regla |
+| **P2** | H2+H3+H4+H6 (cosmético + reglas) ✅ | Bajo | Resuelto 2026-05-07 |
+| **P2** | H10 (duplicación patrones) | Bajo | 1 chat dedicado |
+| **P3** | H5 (subscribe sin takeUntil) ✅ | Decisión de diseño | Resuelto 2026-05-07 |
 
-**Estimado**: 3 chats para cerrar todo. H1 es urgente (afecta producción).
+**Estado**: 7/10 hallazgos cerrados. Quedan **H7** (naming, alto esfuerzo) y **H10** (refactor `CacheInvalidationService` para leer `MODULE_URL_PATTERNS`).
 
 ---
 

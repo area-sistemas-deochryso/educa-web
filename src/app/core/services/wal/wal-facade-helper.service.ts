@@ -119,8 +119,6 @@ export class WalFacadeHelper {
 
 	// #endregion
 
-	// #endregion
-
 	// #region Post-reload Reconciliation
 
 	/**
