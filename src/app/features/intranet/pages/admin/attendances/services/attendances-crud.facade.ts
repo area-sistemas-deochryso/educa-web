@@ -52,11 +52,11 @@ export class AttendancesCrudFacade {
 	}
 
 	/**
-	 * Plan 23 Chat 4: toast de éxito diferenciado por tipoPersona — INV-AD05 ampliado.
-	 * `tipo==='P'` → "Profesor <verbo>"; en cualquier otro caso → "Estudiante <verbo>".
+	 * Plan 23 Chat 4 + Plan 28 Chat 4b: toast de éxito diferenciado por tipoPersona — INV-AD05 ampliado.
+	 * `'P'` → "Profesor"; `'A'` → "Asistente Administrativo"; default → "Estudiante".
 	 */
-	private notificarExito(tipo: 'E' | 'P' | null | undefined, verbo: string, detalle: string): void {
-		const persona = tipo === 'P' ? 'Profesor' : 'Estudiante';
+	private notificarExito(tipo: 'E' | 'P' | 'A' | null | undefined, verbo: string, detalle: string): void {
+		const persona = tipo === 'P' ? 'Profesor' : tipo === 'A' ? 'Asistente Administrativo' : 'Estudiante';
 		this.errorHandler.showSuccess(`${persona} ${verbo}`, detalle);
 	}
 

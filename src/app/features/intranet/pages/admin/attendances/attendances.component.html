@@ -131,8 +131,10 @@
 			<div class="stat-content">
 				<span class="stat-label">Total registros</span>
 				<span class="stat-value">{{ stats.totalRegistros }}</span>
-				@if (vm().tipoPersonaFilter === 'todos' && stats.totalProfesores > 0) {
-					<span class="stat-sublabel">de los cuales {{ stats.totalProfesores }} son profesores</span>
+				@if (vm().tipoPersonaFilter === 'todos' && (stats.totalProfesores > 0 || stats.totalAsistentesAdmin > 0)) {
+					<span class="stat-sublabel">
+						{{ stats.totalProfesores }} profesores · {{ stats.totalAsistentesAdmin }} asistentes admin.
+					</span>
 				}
 			</div>
 			<div class="stat-icon">
@@ -361,7 +363,7 @@
 			@if (vm().formData.tipoOperacion !== 'salida') {
 				<!-- Persona -->
 				<div class="form-field">
-					<label>{{ vm().formData.tipoPersona === 'P' ? 'Profesor' : 'Estudiante' }}</label>
+					<label>{{ getTipoPersonaLabel(vm().formData.tipoPersona) }}</label>
 					<p-select
 						[options]="vm().personas"
 						optionLabel="nombreCompleto"
@@ -370,7 +372,7 @@
 						(ngModelChange)="store.updateFormData({ estudianteId: $event })"
 						[filter]="true"
 						filterBy="nombreCompleto,dni"
-						[placeholder]="vm().formData.tipoPersona === 'P' ? 'Seleccionar profesor...' : 'Seleccionar estudiante...'"
+						[placeholder]="'Seleccionar ' + getTipoPersonaLabel(vm().formData.tipoPersona).toLowerCase() + '...'"
 						appendTo="body"
 					/>
 				</div>

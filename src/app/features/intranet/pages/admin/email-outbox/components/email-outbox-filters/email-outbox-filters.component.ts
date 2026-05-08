@@ -8,6 +8,7 @@ import { InputIconModule } from 'primeng/inputicon';
 
 import {
 	EMAIL_OUTBOX_ESTADOS,
+	EMAIL_OUTBOX_TIPO_LABELS,
 	EMAIL_OUTBOX_TIPOS,
 	EmailOutboxEstado,
 	EmailOutboxTipo,
@@ -55,7 +56,7 @@ export class EmailOutboxFiltersComponent {
 	// #region Opciones
 	readonly tipoOptions: SelectOption[] = [
 		{ label: 'Todos', value: null },
-		...EMAIL_OUTBOX_TIPOS.map((t) => ({ label: t, value: t })),
+		...EMAIL_OUTBOX_TIPOS.map((t) => ({ label: EMAIL_OUTBOX_TIPO_LABELS[t], value: t })),
 	];
 
 	readonly estadoOptions: SelectOption[] = [

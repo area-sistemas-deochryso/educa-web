@@ -19,9 +19,16 @@ export function origenSeverity(item: AsistenciaAdminLista): 'warn' | 'info' | 's
 	return 'secondary';
 }
 
-/** "E" → "Estudiante" · "P" → "Profesor". */
+/** "E" → "Estudiante" · "P" → "Profesor" · "A" → "Asistente Administrativo". */
 export function tipoPersonaLabel(tipo: TipoPersonaAsistencia): string {
-	return tipo === 'P' ? 'Profesor' : 'Estudiante';
+	switch (tipo) {
+		case 'P':
+			return 'Profesor';
+		case 'A':
+			return 'Asistente Administrativo';
+		default:
+			return 'Estudiante';
+	}
 }
 
 /** ISO "yyyy-MM-dd" → "dd/MM/yyyy". Tolera strings cortos devolviéndolos sin tocar. */

@@ -5,7 +5,11 @@ import { TagModule } from 'primeng/tag';
 import { ButtonModule } from 'primeng/button';
 import { TooltipModule } from 'primeng/tooltip';
 
-import { EmailOutboxLista } from '@data/models/email-outbox.models';
+import {
+	EMAIL_OUTBOX_TIPO_LABELS,
+	EmailOutboxLista,
+	EmailOutboxTipo,
+} from '@data/models/email-outbox.models';
 import type { SkeletonColumnDef } from '@shared/components';
 import { CorrelationIdPillComponent } from '@shared/components/correlation-id-pill';
 
@@ -85,6 +89,11 @@ export class EmailOutboxTableComponent {
 
 	esPermanente(tipoFallo: string | null): boolean {
 		return esPermanente(tipoFallo);
+	}
+
+	/** Label corto del tipo (Plan 28 Chat 4c — distingue corrección AA/profesor/estudiante). */
+	getTipoLabel(tipo: string): string {
+		return EMAIL_OUTBOX_TIPO_LABELS[tipo as EmailOutboxTipo] ?? tipo;
 	}
 	// #endregion
 }

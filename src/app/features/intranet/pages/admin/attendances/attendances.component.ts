@@ -1,3 +1,4 @@
+/* eslint-disable max-lines -- Razón: orchestrador del módulo admin de asistencias (filtros + tabs + form CRUD + cierres mensuales + sync CrossChex + queryParams cross-link). 8 dominios coordinados; partir aumenta indirección sin reducir complejidad real. */
 // #region Imports
 import { ChangeDetectionStrategy, Component, computed, inject, OnInit, signal, DestroyRef } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
@@ -119,11 +120,13 @@ export class AttendancesComponent implements OnInit {
 	readonly tipoPersonaOptions = signal<{ label: string; value: TipoPersonaFilter }[]>([
 		{ label: 'Estudiantes', value: 'E' },
 		{ label: 'Profesores', value: 'P' },
+		{ label: 'Asistentes Administrativos', value: 'A' },
 		{ label: 'Todos', value: 'todos' },
 	]);
 	readonly tipoPersonaFormOptions = signal<{ label: string; value: TipoPersonaAsistencia }[]>([
 		{ label: 'Estudiante', value: 'E' },
 		{ label: 'Profesor', value: 'P' },
+		{ label: 'Asistente Admin.', value: 'A' },
 	]);
 	readonly cierreAnio = signal(new Date().getFullYear());
 	readonly cierreMes = signal(new Date().getMonth() + 1);
@@ -223,7 +226,7 @@ export class AttendancesComponent implements OnInit {
 				}
 
 				const tipo = params.get('tipoPersona');
-				if (tipo === 'E' || tipo === 'P' || tipo === 'todos') {
+				if (tipo === 'E' || tipo === 'P' || tipo === 'A' || tipo === 'todos') {
 					this.store.setTipoPersonaFilter(tipo);
 				}
 

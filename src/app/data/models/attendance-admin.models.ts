@@ -1,6 +1,7 @@
 // Modelos compartidos para el modulo admin de asistencia diaria.
 
-export type TipoPersonaAsistencia = 'E' | 'P';
+// 'A' agregado en Plan 28 Chat 4b — Asistente Administrativo (INV-AD08/AD09).
+export type TipoPersonaAsistencia = 'E' | 'P' | 'A';
 export type TipoPersonaFilter = TipoPersonaAsistencia | 'todos';
 
 export interface AsistenciaAdminLista {
@@ -34,8 +35,10 @@ export interface AsistenciaAdminEstadisticas {
 	registrosWebhook: number;
 	totalEstudiantes: number;
 	totalProfesores: number;
+	totalAsistentesAdmin: number;
 	completasEstudiantes: number;
 	completasProfesores: number;
+	completasAsistentesAdmin: number;
 }
 
 export interface CrearEntradaManualRequest {
