@@ -18,6 +18,7 @@ export const RANGO_OPTIONS: SelectOption<RangoTipo>[] = [
 export const TIPO_PERSONA_OPTIONS: SelectOption<TipoPersonaReporte>[] = [
 	{ label: 'Estudiantes', value: 'E' },
 	{ label: 'Profesores', value: 'P' },
+	{ label: 'Asist. Admin.', value: 'A' },
 	{ label: 'Todos', value: 'todos' },
 ];
 

@@ -108,6 +108,15 @@ describe('AttendanceReportsFacade — eje tipoPersona', () => {
 			expect(api.getReporte).toHaveBeenCalledOnce();
 		});
 
+		it('skippea validación de salones cuando tipoPersona = "A" (Asist. Admin. sin salones)', () => {
+			store.updateFilters({ tipoPersona: 'A', salonesSeleccionados: [] });
+
+			facade.generarReporte();
+
+			expect(store.error()).toBeNull();
+			expect(api.getReporte).toHaveBeenCalledOnce();
+		});
+
 		it('exige al menos un salón cuando tipoPersona = "E"', () => {
 			store.updateFilters({ tipoPersona: 'E', salonesSeleccionados: [] });
 

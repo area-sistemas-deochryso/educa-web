@@ -1,12 +1,35 @@
-<!-- #region Tabla por salón -->
+<!-- #region Estudiantes — un salón a la vez con dropdown selector -->
 @if (hasEstudiantes()) {
-	@for (salon of salones(); track salon.grado + '-' + salon.seccion) {
-		<div class="salon-section">
-			<div class="salon-header">
+	<section class="result-section">
+		<div class="result-section__header">
+			<div class="result-section__title">
 				<i class="pi pi-building"></i>
-				<strong>{{ salon.grado }} "{{ salon.seccion }}"</strong>
-				<span class="salon-count">— {{ salon.totalFiltrados }} de {{ salon.totalEstudiantes }}</span>
+				<strong>Estudiantes por salón</strong>
 			</div>
+
+			@if (hasMultipleSalones()) {
+				<div class="result-section__selector">
+					<label for="salon-selector" class="selector-label">Sal&oacute;n:</label>
+					<p-select
+						inputId="salon-selector"
+						[options]="salonOptions()"
+						[ngModel]="effectiveSalonKey()"
+						(ngModelChange)="onSelectSalon($event)"
+						optionLabel="label"
+						optionValue="value"
+						appendTo="body"
+						styleClass="salon-selector"
+					/>
+				</div>
+			} @else if (selectedSalon()) {
+				<span class="result-section__salon-pill">
+					{{ selectedSalon()!.grado }} "{{ selectedSalon()!.seccion }}" —
+					{{ selectedSalon()!.totalFiltrados }} de {{ selectedSalon()!.totalEstudiantes }}
+				</span>
+			}
+		</div>
+
+		@if (selectedSalon(); as salon) {
 			<p-table
 				[value]="salon.estudiantes"
 				[paginator]="true"
@@ -46,18 +69,21 @@
 					</tr>
 				</ng-template>
 			</p-table>
-		</div>
-	}
+		}
+	</section>
 }
 <!-- #endregion -->
 
-<!-- #region Tabla de profesores (lista plana, sin columna salón) -->
+<!-- #region Profesores (lista plana, sin columna salón) -->
 @if (hasProfesores()) {
-	<div class="salon-section">
-		<div class="salon-header">
-			<i class="pi pi-user-edit"></i>
-			<strong>{{ profesoresHeader() }}</strong>
+	<section class="result-section">
+		<div class="result-section__header">
+			<div class="result-section__title">
+				<i class="pi pi-user-edit"></i>
+				<strong>{{ profesoresHeader() }}</strong>
+			</div>
 		</div>
+
 		<p-table
 			[value]="profesores()"
 			[paginator]="true"
@@ -97,6 +123,59 @@
 				</tr>
 			</ng-template>
 		</p-table>
-	</div>
+	</section>
+}
+<!-- #endregion -->
+
+<!-- #region Asistentes administrativos (lista plana, sin salón) -->
+@if (hasAsistentesAdmin()) {
+	<section class="result-section">
+		<div class="result-section__header">
+			<div class="result-section__title">
+				<i class="pi pi-id-card"></i>
+				<strong>{{ asistentesAdminHeader() }}</strong>
+			</div>
+		</div>
+
+		<p-table
+			[value]="asistentesAdmin()"
+			[paginator]="true"
+			[rows]="10"
+			[rowsPerPageOptions]="[5, 10, 25, 50]"
+			[showCurrentPageReport]="true"
+			currentPageReportTemplate="Mostrando {first} a {last} de {totalRecords}"
+			styleClass="p-datatable-sm"
+		>
+			<ng-template #header>
+				<tr>
+					<th style="width: 70px">#</th>
+					<th style="width: 100px">DNI</th>
+					<th>Nombre</th>
+					@if (esDia()) {
+						<th style="width: 80px">Entrada</th>
+						<th style="width: 80px">Salida</th>
+					} @else {
+						<th style="width: 70px">Días</th>
+					}
+					<th style="width: 180px">Observación</th>
+				</tr>
+			</ng-template>
+
+			<ng-template #body let-asist let-i="rowIndex">
+				<tr>
+					<td>{{ i + 1 }}</td>
+					<td>{{ asist.dni }}</td>
+					<td class="nombre-cell">{{ asist.nombreCompleto }}</td>
+					@if (esDia()) {
+						<td>{{ asist.horaLlegada ? (asist.horaLlegada | date: 'HH:mm') : '—' }}</td>
+						<td>{{ asist.horaSalida ? (asist.horaSalida | date: 'HH:mm') : '—' }}</td>
+					} @else {
+						<td class="dias-cell">{{ asist.cantidadDias }}</td>
+					}
+					<td class="obs-cell">{{ asist.observacion ?? '' }}</td>
+				</tr>
+			</ng-template>
+		</p-table>
+	</section>
 }
 <!-- #endregion -->

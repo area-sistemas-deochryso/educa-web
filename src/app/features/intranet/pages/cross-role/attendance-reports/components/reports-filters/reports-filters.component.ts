@@ -53,9 +53,15 @@ export class ReportsFiltersComponent {
 	// #endregion
 
 	// #region Computed
-	readonly showSalones = computed(() => this.selectedTipoPersona() !== 'P');
-	readonly disableGenerar = computed(
-		() => this.selectedTipoPersona() !== 'P' && this.selectedSalones().length === 0,
-	);
+	readonly showSalones = computed(() => {
+		const t = this.selectedTipoPersona();
+		return t !== 'P' && t !== 'A';
+	});
+	readonly disableGenerar = computed(() => {
+		const t = this.selectedTipoPersona();
+		// Profesores y Asist. Admin. no requieren salones (universos sin agrupación por salón)
+		if (t === 'P' || t === 'A') return false;
+		return this.selectedSalones().length === 0;
+	});
 	// #endregion
 }

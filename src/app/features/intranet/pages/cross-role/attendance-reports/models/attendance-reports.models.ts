@@ -7,7 +7,7 @@ export type EstadoFiltro = (typeof ESTADO_FILTROS)[number];
 export const RANGO_TIPOS = ['dia', 'semana', 'mes'] as const;
 export type RangoTipo = (typeof RANGO_TIPOS)[number];
 
-export const TIPOS_PERSONA = ['E', 'P', 'todos'] as const;
+export const TIPOS_PERSONA = ['E', 'P', 'A', 'todos'] as const;
 export type TipoPersonaReporte = (typeof TIPOS_PERSONA)[number];
 // #endregion
 
@@ -37,6 +37,9 @@ export interface ReporteFiltrado {
 	profesores?: PersonaProfesorReporte[] | null;
 	totalProfesoresGeneral?: number;
 	totalProfesoresFiltrados?: number;
+	asistentesAdmin?: PersonaAsistenteAdminReporte[] | null;
+	totalAsistentesAdminGeneral?: number;
+	totalAsistentesAdminFiltrados?: number;
 }
 
 export interface SalonReporteFiltrado {
@@ -61,6 +64,17 @@ export interface EstudianteReporteFiltrado {
 }
 
 export interface PersonaProfesorReporte {
+	dni: string;
+	nombreCompleto: string;
+	cantidadDias: number;
+	horaLlegada: string | null;
+	horaSalida: string | null;
+	observacion: string | null;
+	estadoCodigo: string;
+	estadoDescripcion: string;
+}
+
+export interface PersonaAsistenteAdminReporte {
 	dni: string;
 	nombreCompleto: string;
 	cantidadDias: number;

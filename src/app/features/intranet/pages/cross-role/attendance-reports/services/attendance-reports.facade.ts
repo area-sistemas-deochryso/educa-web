@@ -70,8 +70,10 @@ export class AttendanceReportsFacade {
 	generarReporte(): void {
 		const filters = this.store.filters();
 
-		// Profesores no tienen salón asociado — BE ignora el selector
-		if (filters.tipoPersona !== 'P' && filters.salonesSeleccionados.length === 0) {
+		// Profesores y Asistentes administrativos no se agrupan por salón — BE ignora el selector
+		const requiereSalones =
+			filters.tipoPersona !== 'P' && filters.tipoPersona !== 'A';
+		if (requiereSalones && filters.salonesSeleccionados.length === 0) {
 			this.store.setError('Debe seleccionar al menos un salón.');
 			return;
 		}

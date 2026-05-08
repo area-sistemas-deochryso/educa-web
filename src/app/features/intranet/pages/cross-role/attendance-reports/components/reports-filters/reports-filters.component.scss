@@ -1,82 +1,116 @@
-// #region Layout
-.filtros-container {
-	margin-bottom: 1.5rem;
-}
-
-.filtros-row {
+// #region Layout — barra agrupada por intención
+.filters-bar {
 	display: flex;
 	flex-wrap: wrap;
-	gap: 1rem;
+	align-items: stretch;
+	gap: 0.75rem;
+	margin-bottom: 1.5rem;
+	padding: 1rem;
+	background: transparent;
+	border: 1px solid var(--surface-300);
+	border-radius: 10px;
+}
+
+.filter-group {
+	display: flex;
+	flex-direction: column;
+	gap: 0.5rem;
+	padding: 0.5rem 1rem;
+	border-radius: 8px;
+	background: var(--surface-50);
+	min-width: 0;
+
+	&--persona {
+		flex: 0 0 auto;
+	}
+
+	&--alcance {
+		flex: 1 1 280px;
+		min-width: 240px;
+	}
+
+	&:not(&--persona):not(&--alcance) {
+		flex: 1 1 460px;
+	}
+}
+
+.group-label {
+	font-size: 0.7rem;
+	font-weight: 700;
+	text-transform: uppercase;
+	letter-spacing: 0.5px;
+	color: var(--text-color-secondary);
+}
+
+.filter-fields {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 0.75rem;
 	align-items: flex-end;
 }
 
-.filtro-item {
+.filter-item {
 	display: flex;
 	flex-direction: column;
 	gap: 0.25rem;
 	min-width: 140px;
 
 	label {
-		font-size: 0.85rem;
-		font-weight: 600;
-		color: var(--text-color-secondary);
+		font-size: 0.8rem;
+		font-weight: 500;
+		color: var(--text-color);
+	}
+
+	&--persona {
+		min-width: auto;
+	}
+
+	&--salones {
+		flex: 1 1 100%;
+		min-width: 200px;
 	}
 }
 
-.filtro-salones {
-	flex: 1;
-	min-width: 200px;
-}
-
-.filtro-action {
-	min-width: auto;
+.filter-action {
+	display: flex;
+	align-items: center;
+	margin-left: auto;
+	padding: 0 0.25rem;
 }
 // #endregion
 
-// #region Overrides PrimeNG
+// #region Overrides PrimeNG — selectButton compacto
 :host ::ng-deep {
-	.p-inputtext,
-	.p-select {
-		background: transparent;
-		color: var(--text-color);
-		border-color: var(--surface-300);
-
-		&::placeholder {
-			color: var(--text-color-secondary);
-		}
-
-		&:enabled:focus {
-			border-color: var(--text-color);
-			box-shadow: 0 0 0 1px var(--text-color);
-		}
-	}
-
-	.p-select-label {
-		color: var(--text-color);
-	}
-
-	.p-select-dropdown {
-		color: var(--text-color);
-	}
-
 	.p-multiselect {
-		background: transparent;
-		border-color: var(--surface-300);
+		width: 100%;
 	}
 
-	.p-multiselect-label {
-		color: var(--text-color);
+	// SelectButton: variantes de color por opción para distinguir Estudiante / Profesor / Asist. / Todos
+	.p-selectbutton {
+		flex-wrap: wrap;
 	}
 }
 // #endregion
 
 // #region Responsive
-@media (max-width: 768px) {
-	.filtros-row {
+@media (max-width: 900px) {
+	.filters-bar {
 		flex-direction: column;
+		align-items: stretch;
 	}
 
-	.filtro-item {
+	.filter-action {
+		margin-left: 0;
+	}
+}
+
+@media (max-width: 600px) {
+	.filter-fields {
+		flex-direction: column;
+		align-items: stretch;
+	}
+
+	.filter-item {
 		width: 100%;
 	}
 }

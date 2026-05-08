@@ -1,91 +1,105 @@
-<!-- #region Barra de filtros -->
-<div class="filtros-container">
-	<div class="filtros-row">
-		<!-- Estado -->
-		<div class="filtro-item">
-			<label for="estado">Tipo de reporte</label>
-			<p-select
-				inputId="estado"
-				[options]="estadoOptions"
-				[ngModel]="selectedEstado()"
-				(ngModelChange)="estadoChange.emit($event)"
-				optionLabel="label"
-				optionValue="value"
-				appendTo="body"
-			/>
-		</div>
+<!-- #region Barra de filtros (agrupada por intención) -->
+<div class="filters-bar">
+	<!-- Grupo 1: Configuración del reporte -->
+	<div class="filter-group">
+		<span class="group-label">Configuración</span>
 
-		<!-- Rango -->
-		<div class="filtro-item">
-			<label for="rango">Rango</label>
-			<p-select
-				inputId="rango"
-				[options]="rangoOptions"
-				[ngModel]="selectedRango()"
-				(ngModelChange)="rangoChange.emit($event)"
-				optionLabel="label"
-				optionValue="value"
-				appendTo="body"
-			/>
-		</div>
-
-		<!-- Tipo de persona -->
-		<div class="filtro-item filtro-tipo-persona">
-			<label>Tipo de persona</label>
-			<p-selectButton
-				[options]="tipoPersonaOptions"
-				[ngModel]="selectedTipoPersona()"
-				(ngModelChange)="tipoPersonaChange.emit($event)"
-				optionLabel="label"
-				optionValue="value"
-				[allowEmpty]="false"
-			/>
-		</div>
-
-		<!-- Fecha -->
-		<div class="filtro-item">
-			<label for="fecha">Fecha</label>
-			<p-datepicker
-				inputId="fecha"
-				[ngModel]="selectedFecha()"
-				(ngModelChange)="fechaChange.emit($event)"
-				dateFormat="dd/mm/yy"
-				appendTo="body"
-				[showIcon]="true"
-			/>
-		</div>
-
-		<!-- Salones (ocultos cuando tipo = Profesores) -->
-		@if (showSalones()) {
-			<div class="filtro-item filtro-salones">
-				<label for="salones">Salones</label>
-				<p-multiselect
-					inputId="salones"
-					[options]="salonOptions()"
-					[ngModel]="selectedSalones()"
-					(ngModelChange)="salonesChange.emit($event)"
+		<div class="filter-fields">
+			<div class="filter-item">
+				<label for="estado">Tipo de reporte</label>
+				<p-select
+					inputId="estado"
+					[options]="estadoOptions"
+					[ngModel]="selectedEstado()"
+					(ngModelChange)="estadoChange.emit($event)"
 					optionLabel="label"
 					optionValue="value"
-					placeholder="Seleccionar salones"
 					appendTo="body"
-					[loading]="loadingSalones()"
-					[maxSelectedLabels]="3"
-					selectedItemsLabel="{0} salones"
 				/>
 			</div>
-		}
 
-		<!-- Botón generar -->
-		<div class="filtro-item filtro-action">
-			<button
-				pButton
-				label="Visualizar tabla"
-				icon="pi pi-table"
-				(click)="generar.emit()"
-				[loading]="loading()"
-				[disabled]="disableGenerar()"
-			></button>
+			<div class="filter-item">
+				<label for="rango">Rango</label>
+				<p-select
+					inputId="rango"
+					[options]="rangoOptions"
+					[ngModel]="selectedRango()"
+					(ngModelChange)="rangoChange.emit($event)"
+					optionLabel="label"
+					optionValue="value"
+					appendTo="body"
+				/>
+			</div>
+
+			<div class="filter-item">
+				<label for="fecha">Fecha</label>
+				<p-datepicker
+					inputId="fecha"
+					[ngModel]="selectedFecha()"
+					(ngModelChange)="fechaChange.emit($event)"
+					dateFormat="dd/mm/yy"
+					appendTo="body"
+					[showIcon]="true"
+				/>
+			</div>
 		</div>
+	</div>
+
+	<!-- Grupo 2: Sujeto del reporte -->
+	<div class="filter-group filter-group--persona">
+		<span class="group-label">Reportar sobre</span>
+
+		<div class="filter-fields">
+			<div class="filter-item filter-item--persona">
+				<p-selectButton
+					[options]="tipoPersonaOptions"
+					[ngModel]="selectedTipoPersona()"
+					(ngModelChange)="tipoPersonaChange.emit($event)"
+					optionLabel="label"
+					optionValue="value"
+					[allowEmpty]="false"
+				/>
+			</div>
+		</div>
+	</div>
+
+	<!-- Grupo 3: Alcance (solo cuando aplica) -->
+	@if (showSalones()) {
+		<div class="filter-group filter-group--alcance">
+			<span class="group-label">Alcance</span>
+
+			<div class="filter-fields">
+				<div class="filter-item filter-item--salones">
+					<label for="salones">Salones</label>
+					<p-multiselect
+						inputId="salones"
+						[options]="salonOptions()"
+						[ngModel]="selectedSalones()"
+						(ngModelChange)="salonesChange.emit($event)"
+						optionLabel="label"
+						optionValue="value"
+						placeholder="Seleccionar salones"
+						appendTo="body"
+						[loading]="loadingSalones()"
+						[maxSelectedLabels]="3"
+						selectedItemsLabel="{0} salones"
+					/>
+				</div>
+			</div>
+		</div>
+	}
+
+	<!-- Acción -->
+	<div class="filter-action">
+		<button
+			pButton
+			label="Visualizar tabla"
+			icon="pi pi-table"
+			class="p-button-success"
+			(click)="generar.emit()"
+			[loading]="loading()"
+			[disabled]="disableGenerar()"
+		></button>
 	</div>
 </div>
 <!-- #endregion -->
