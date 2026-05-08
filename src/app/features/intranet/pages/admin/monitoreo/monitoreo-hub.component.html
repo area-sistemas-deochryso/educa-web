@@ -19,89 +19,114 @@
 </app-page-header>
 <!-- #endregion -->
 
-<!-- Plan 39 Chat D — Banner B9 cross-páginas (defer-fail / mailbox-full) -->
 <app-email-defer-fail-banner />
 
-<!-- #region Cards -->
-@if (hasAnyCard()) {
-	<section class="cards-grid">
-		@for (card of cards(); track card.id) {
-			<article class="monitoreo-card" [attr.data-tone]="card.tone">
-				<header class="card-header">
-					<span class="card-icon">
-						<i [class]="card.icon"></i>
-					</span>
-					<div class="card-title-stack">
-						<h3>{{ card.title }}</h3>
-						<p class="card-description">{{ card.description }}</p>
-					</div>
-					<span class="card-badge">{{ card.links.length }}</span>
-					@if (card.id === 'correos-operacion' && deferFailCritical()) {
-						<span
-							class="card-alert-badge"
-							[attr.aria-label]="'Defer/Fail ' + deferFailLevel()"
-							title="Defer/Fail crítico — revisar"
-						>
-							<i class="pi pi-exclamation-circle"></i>
-						</span>
-					}
-				</header>
-
-				@if (card.summary) {
-					<div class="card-summary" [attr.data-level]="card.summary.headlineLevel">
-						<div class="summary-headline">
-							<span class="headline-value" [attr.data-level]="card.summary.headlineLevel">
-								{{ card.summary.headline }}
+<!-- #region Tabs -->
+@if (hasAnyDomain()) {
+	<p-tabs [value]="activeDomain()" (valueChange)="setActiveDomain($event)">
+		<p-tablist>
+			@for (domain of domains(); track domain.id) {
+				<p-tab [value]="domain.id">
+					<span class="tab-trigger" [attr.data-tone]="domain.tone">
+						<i [class]="domain.icon"></i>
+						<span class="tab-label">{{ domain.label }}</span>
+						<span class="tab-count">{{ domain.tiles.length }}</span>
+						@if (domain.hasAlert) {
+							<span class="tab-alert" aria-label="Hay alertas en esta sección">
+								<i class="pi pi-circle-fill"></i>
 							</span>
-							<span class="headline-label">{{ card.summary.headlineLabel }}</span>
+						}
+					</span>
+				</p-tab>
+			}
+		</p-tablist>
+
+		<p-tabpanels>
+			@for (domain of domains(); track domain.id) {
+				<p-tabpanel [value]="domain.id">
+					<!-- Hero del dominio -->
+					<section class="domain-hero" [attr.data-tone]="domain.tone">
+						<div class="hero-icon-wrap">
+							<i [class]="domain.icon"></i>
 						</div>
-						@if (card.summary.stats.length > 0) {
-							<div class="summary-stats">
-								@for (stat of card.summary.stats; track stat.label) {
-									<div class="stat-chip" [attr.data-level]="stat.level ?? 'ok'">
-										<span class="stat-value">{{ stat.value }}</span>
-										<span class="stat-label">{{ stat.label }}</span>
+						<div class="hero-content">
+							<p class="hero-description">{{ domain.description }}</p>
+							@if (domain.headline; as h) {
+								<div class="hero-headline">
+									<i [class]="h.icon + ' hero-headline-icon'" [attr.data-level]="h.level"></i>
+									<span class="hero-value" [attr.data-level]="h.level">{{ h.value }}</span>
+									<span class="hero-label">{{ h.label }}</span>
+								</div>
+								@if (h.sublabel) {
+									<p class="hero-sublabel">{{ h.sublabel }}</p>
+								}
+							}
+						</div>
+
+						@if (domain.stats.length > 0) {
+							<div class="hero-stats">
+								@for (stat of domain.stats; track stat.label) {
+									<div class="hero-stat" [attr.data-level]="stat.level">
+										<i [class]="stat.icon + ' hero-stat-icon'"></i>
+										<span class="hero-stat-value">{{ stat.value }}</span>
+										<span class="hero-stat-label">{{ stat.label }}</span>
 									</div>
 								}
 							</div>
 						}
-					</div>
-				}
+					</section>
 
-				<ul class="card-links">
-					@for (link of card.links; track link.route) {
-						<li>
-							<a [routerLink]="link.route" class="link-pill" [attr.data-badge-level]="link.badge?.level ?? null">
-								<span class="link-label">{{ link.label }}</span>
-								<span class="link-meta">
-									@if (hasBadge(link.badge)) {
-										<span
-											class="link-badge"
-											[attr.data-level]="link.badge!.level"
-											[attr.aria-label]="link.badge!.label"
-											[title]="link.badge!.label"
-										>
-											@if (link.badge!.level === 'critical') {
-												<i class="pi pi-exclamation-circle"></i>
-											} @else if (link.badge!.level === 'warn') {
-												<i class="pi pi-exclamation-triangle"></i>
-											} @else if (link.badge!.level === 'ok') {
-												<i class="pi pi-check"></i>
+					<!-- Tiles del dominio -->
+					<section class="tiles-grid">
+						@for (tile of domain.tiles; track tile.route) {
+							<a [routerLink]="tile.route" class="tile" [attr.data-level]="tile.badge?.level ?? 'unknown'" [attr.data-tone]="domain.tone">
+								<div class="tile-icon">
+									<i [class]="tile.icon"></i>
+								</div>
+
+								<div class="tile-body">
+									<span class="tile-label">{{ tile.label }}</span>
+
+									@if (tile.badge && tile.badge.level !== 'unknown') {
+										<div class="tile-metric">
+											@if (tile.badge.count !== null) {
+												<span class="tile-value" [attr.data-level]="tile.badge.level">{{ tile.badge.count }}</span>
+												<span class="tile-meta">
+													@if (tile.badge.level === 'critical') {
+														<i class="pi pi-exclamation-circle"></i>
+													} @else if (tile.badge.level === 'warn') {
+														<i class="pi pi-exclamation-triangle"></i>
+													} @else {
+														<i class="pi pi-check-circle"></i>
+													}
+												</span>
+											} @else {
+												<!-- Para Dashboard que devuelve nivel sin count -->
+												<span class="tile-value-icon" [attr.data-level]="tile.badge.level">
+													@if (tile.badge.level === 'critical') {
+														<i class="pi pi-exclamation-circle"></i>
+													} @else if (tile.badge.level === 'warn') {
+														<i class="pi pi-exclamation-triangle"></i>
+													} @else {
+														<i class="pi pi-check-circle"></i>
+													}
+												</span>
 											}
-											@if (link.badge!.count !== null) {
-												<span class="link-badge-count">{{ link.badge!.count }}</span>
-											}
-										</span>
+										</div>
+										<span class="tile-hint">{{ tile.badge.label }}</span>
+									} @else {
+										<span class="tile-hint tile-hint-muted">Ver detalle</span>
 									}
-									<i class="pi pi-arrow-right"></i>
-								</span>
+								</div>
+
+								<i class="pi pi-arrow-right tile-arrow"></i>
 							</a>
-						</li>
-					}
-				</ul>
-			</article>
-		}
-	</section>
+						}
+					</section>
+				</p-tabpanel>
+			}
+		</p-tabpanels>
+	</p-tabs>
 } @else {
 	<div class="empty-state">
 		<i class="pi pi-lock"></i>
