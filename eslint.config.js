@@ -253,6 +253,151 @@ const structurePlugin = {
 };
 // #endregion
 
+// #region Plugin local: api-shape — anti-pattern del unwrap doble (Plan brief 130)
+// Detecta el patrón: `http.get<X[]>(this.apiBase, ...)` cuando `apiBase` apunta a un endpoint
+// BE que devuelve `ApiResponse<PaginatedResult<X>>`. Tras el `apiResponseInterceptor`, el body
+// es `{ data, page, pageSize, total }` (PaginatedResult), NO `X[]`. Tipar como array engaña al
+// compilador y rompe en runtime cuando el caller hace `.filter(...)` sobre el wrapper.
+//
+// Manifest hardcoded — 5 endpoints actuales con `PaginatedResult<T>`. Agregar uno nuevo es una
+// línea. Cuando crezca >15, migrar a JSON regenerado desde controllers C#.
+const PAGINATED_ENDPOINTS = [
+	'/api/sistema/email-outbox/defer-events',
+	'/api/sistema/email-outbox/quarantine',
+	'/api/sistema/email-outbox/domain-pauses',
+	'/api/sistema/email-blacklist',
+	'/api/sistema/usuarios/listar',
+];
+
+const apiShapePlugin = {
+	rules: {
+		'unwrap-paginated': {
+			meta: {
+				type: 'problem',
+				docs: {
+					description:
+						'Prohibe tipar como array (T[] o Array<T>) un http.get cuyo endpoint BE devuelve ApiResponse<PaginatedResult<T>>. El body tras el apiResponseInterceptor es PaginatedResult<T>, no T[].',
+				},
+				messages: {
+					arrayTypeOnPaginatedEndpoint:
+						"Endpoint '{{endpoint}}' devuelve `ApiResponse<PaginatedResult<{{inner}}>>`. Tras el apiResponseInterceptor el body es `PaginatedResult<{{inner}}>`, no `{{inner}}[]`. Opciones: (a) tipar `http.get<PaginatedResult<{{inner}}>>(...)` y devolver el wrapper para que el caller lea `.data`; (b) tipar igual y agregar `.pipe(map(res => res.data ?? []))` para devolver `{{inner}}[]`. Ver `rules/pagination.md` § 'Variante A wrapper'.",
+				},
+				schema: [],
+			},
+			create(context) {
+				const sourceCode = context.sourceCode ?? context.getSourceCode();
+				const classStack = [];
+
+				function extractStringFromInit(init) {
+					if (!init) return null;
+					if (init.type === 'Literal' && typeof init.value === 'string') return init.value;
+					if (init.type === 'TemplateLiteral') {
+						// Concatenar quasis (las expressions tipo ${env.apiUrl} se ignoran — solo nos
+						// importa la parte literal del path para matchear el manifest).
+						return init.quasis.map((q) => q.value.cooked || '').join('');
+					}
+					return null;
+				}
+
+				function findPaginatedApiBase(classNode) {
+					const body = classNode.body?.body || [];
+					for (const member of body) {
+						if (member.type !== 'PropertyDefinition') continue;
+						const keyName = member.key?.name;
+						if (!keyName) continue;
+						// Capturar `apiBase`, `apiUrl`, `baseUrl`, `apiBlacklist`, etc.
+						if (!/^(api|base)\w*(Base|Url)$|^apiBase$|^apiUrl$/i.test(keyName)) continue;
+						const path = extractStringFromInit(member.value);
+						if (!path) continue;
+						for (const endpoint of PAGINATED_ENDPOINTS) {
+							if (path.includes(endpoint)) return { endpoint, propertyName: keyName };
+						}
+					}
+					return null;
+				}
+
+				function getInnerArrayType(typeArg) {
+					if (!typeArg) return null;
+					// `X[]` → TSArrayType
+					if (typeArg.type === 'TSArrayType') {
+						return sourceCode.getText(typeArg.elementType);
+					}
+					// `Array<X>` → TSTypeReference
+					if (
+						typeArg.type === 'TSTypeReference' &&
+						typeArg.typeName?.name === 'Array'
+					) {
+						const params = typeArg.typeArguments?.params || typeArg.typeParameters?.params;
+						if (params?.[0]) return sourceCode.getText(params[0]);
+					}
+					return null;
+				}
+
+				function isThisProperty(node, propertyName) {
+					return (
+						node?.type === 'MemberExpression' &&
+						node.object?.type === 'ThisExpression' &&
+						node.property?.name === propertyName
+					);
+				}
+
+				return {
+					ClassDeclaration(node) {
+						classStack.push({ node, match: findPaginatedApiBase(node) });
+					},
+					'ClassDeclaration:exit'() {
+						classStack.pop();
+					},
+					ClassExpression(node) {
+						classStack.push({ node, match: findPaginatedApiBase(node) });
+					},
+					'ClassExpression:exit'() {
+						classStack.pop();
+					},
+
+					CallExpression(node) {
+						const top = classStack[classStack.length - 1];
+						if (!top || !top.match) return;
+
+						// callee: this.http.get(...) — clase canónica del proyecto.
+						const callee = node.callee;
+						if (callee?.type !== 'MemberExpression') return;
+						if (callee.property?.name !== 'get') return;
+						const httpReceiver = callee.object;
+						if (
+							httpReceiver?.type !== 'MemberExpression' ||
+							httpReceiver.property?.name !== 'http' ||
+							httpReceiver.object?.type !== 'ThisExpression'
+						) {
+							return;
+						}
+
+						// Type argument <X[]> o <Array<X>>
+						const typeArg =
+							node.typeArguments?.params?.[0] ?? node.typeParameters?.params?.[0];
+						const inner = getInnerArrayType(typeArg);
+						if (!inner) return;
+
+						// Filtro de precisión: el primer arg debe ser this.<apiBase> exactamente
+						// (no `this.apiBase + '/' + id`). El manifest cubre el endpoint base, no
+						// sub-rutas tipo `/{id}/release` que no paginan.
+						const firstArg = node.arguments[0];
+						if (!firstArg) return;
+						if (!isThisProperty(firstArg, top.match.propertyName)) return;
+
+						context.report({
+							node: typeArg,
+							messageId: 'arrayTypeOnPaginatedEndpoint',
+							data: { endpoint: top.match.endpoint, inner },
+						});
+					},
+				};
+			},
+		},
+	},
+};
+// #endregion
+
 // #region Plugin local: layer-enforcement — fix G10 (override de no-restricted-imports)
 // Problema: ESLint flat config reemplaza (no mergea) `no-restricted-imports` entre bloques
 // que matchean el mismo archivo. El bloque de barrel enforcement (último) invalida las reglas
@@ -742,6 +887,25 @@ module.exports = tseslint.config(
 		},
 		rules: {
 			'wal/no-direct-mutation-subscribe': 'error',
+		},
+	},
+	// #endregion
+
+	// #region api-shape — anti-pattern del unwrap doble en services FE (Plan brief 130)
+	// Aplica a *.service.ts en features/ y shared/ y al gateway de core/services/permissions.
+	// Tests excluidos.
+	{
+		files: [
+			'src/app/features/**/*.service.ts',
+			'src/app/shared/**/*.service.ts',
+			'src/app/core/services/**/*.service.ts',
+		],
+		ignores: ['**/*.spec.ts'],
+		plugins: {
+			'api-shape': apiShapePlugin,
+		},
+		rules: {
+			'api-shape/unwrap-paginated': 'error',
 		},
 	},
 	// #endregion

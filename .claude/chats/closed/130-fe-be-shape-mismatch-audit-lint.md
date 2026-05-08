@@ -139,3 +139,64 @@ Agregar el nuevo plugin `api-shape` con la regla `unwrap-paginated`. Seguir el p
 - **R1 — Manifest desincronizado**: si el lint depende de un JSON mantenido a mano, se queda viejo. Mitigación: script BE que regenera el manifest desde los controllers C# (parsing simple del retorno `ApiResponse<PaginatedResult<...>>`).
 - **R2 — Falsos positivos**: endpoints que devuelven `T[]` plano legítimamente disparan la regla. Mitigación: heurística H4 con helper explícito.
 - **R3 — Scope creep**: la auditoría descubre bugs cross-subsistema y tienta fixearlos acá. Mitigación: criterio de cierre estricto = audit + lint, fixes en briefs hijos.
+
+---
+
+## Resultado de la auditoría (2026-05-08)
+
+### F1 — Mapeo BE↔FE
+
+5 endpoints BE con `ApiResponse<PaginatedResult<T>>` identificados:
+
+| # | Endpoint BE | DTO | Service FE | Tipo declarado | Bug latente |
+| --- | --- | --- | --- | --- | --- |
+| 1 | `GET /api/sistema/email-outbox/defer-events` | `EmailDeferEventListaDto` | `email-defer-events.service.ts:38` | `PaginatedResult<EmailDeferEventDto>` | ❌ no |
+| 2 | `GET /api/sistema/email-outbox/quarantine` | `EmailQuarantineListaDto` | `email-quarantine.service.ts:41` | `PaginatedResult<EmailQuarantineListaDto>` | ❌ no |
+| 3 | `GET /api/sistema/email-outbox/domain-pauses` | `EmailRecipientDomainPauseListaDto` | `email-domain-pause.service.ts:29` | `PaginatedResult<...>` + `map(.data)` (post-fix `bfa96f0`) | ❌ no |
+| 4 | `GET /api/sistema/email-blacklist` | `EmailBlacklistListadoDto` | `blacklist.service.ts:43` | `PaginatedResult<EmailBlacklistEntry>` | ❌ no |
+| 5 | `GET /api/sistema/usuarios/listar?page=N` | `UsuarioListaDto` | `usuarios.service.ts:68` | `PaginatedResponse<UsuarioLista>` (alias estructural) | ❌ no |
+
+**Conclusión**: el bug `bfa96f0` era el único caso vivo. No hay bugs latentes adicionales — ningún brief hijo necesario. Los otros 4 services ya estaban tipados correctamente desde su creación.
+
+Deuda menor identificada (out-of-scope, no se actuó):
+
+- **D1**: coexisten dos tipos estructurales idénticos: `PaginatedResult<T>` (`@core/services/facades`) y `PaginatedResponse<T>` (`@shared/models`). Confunde el tipado canónico pero no es bug.
+- **D2**: patrón inconsistente de unwrap en services (3 devuelven `PaginatedResult<T>`, 1 hace `map(res => res.data)` y devuelve `T[]`). Ambos válidos pero la conversión entre patrones es trivial sin verificación → silueta del bug original.
+
+### F2 — Decisión y lint
+
+**Heurística elegida: H2 simplificada** (manifest hardcoded en plugin local). Justificación: 5 endpoints reales, agregar uno nuevo = 1 línea, 0 falsos positivos, 0 acoplamiento cross-repo.
+
+Plugin nuevo `api-shape` agregado a `eslint.config.js` (sigue el patrón de los 3 plugins locales existentes: `wal`, `structure`, `layer-enforcement`). Una sola regla: `api-shape/unwrap-paginated`.
+
+**Detección**: clase `*.service.ts` con `private readonly apiBase = '...'` que matchea uno de los 5 endpoints + `this.http.get<X[]>(this.apiBase, ...)` en la misma clase.
+
+**Mensaje** sugiere las dos opciones canónicas (devolver wrapper completo, o `.pipe(map(res => res.data ?? []))`).
+
+**Aplica a**: `src/app/{features,shared,core/services}/**/*.service.ts` (excepto `*.spec.ts`).
+
+### F2 — Validación
+
+- `npx eslint .` → 0 errores nuevos, 1 warning preexistente sin relación.
+- Test sintético (archivo temporal con `http.get<FakeDto[]>(this.apiBase)` sobre endpoint del manifest) → 2 errores `api-shape/unwrap-paginated` ✅. Test eliminado tras verificar.
+- Los 5 services del manifest pasan limpio (todos correctos post-`bfa96f0`).
+
+### F3 — Documentación y memoria
+
+- `rules/pagination.md` actualizado con sección "Anti-pattern: doble unwrap mal hecho" + descripción del lint enforcement.
+- Memoria `feedback_api_response_unwrap.md` updateada — ahora cubre los dos casos (single + double wrapper) con tabla de los cuatro estados.
+- **No se generan briefs hijos** — la auditoría no encontró bugs latentes a fixear.
+
+### Mantenimiento futuro
+
+Cuando se agregue un endpoint BE nuevo con `ApiResponse<PaginatedResult<T>>`:
+
+1. Agregar la URL al array `PAGINATED_ENDPOINTS` en `eslint.config.js` (sección `api-shape`).
+2. Verificar que el service FE consumidor tipe `PaginatedResult<T>` (o haga `.pipe(map(res => res.data))`).
+3. Si el manifest crece >15 entradas, considerar migrar a JSON regenerado desde controllers C# por un script BE.
+
+### Archivos tocados
+
+- `eslint.config.js` — agregado plugin `apiShapePlugin` (~110 líneas) + sección `files` para `*.service.ts`.
+- `.claude/rules/pagination.md` — sección anti-pattern + lista de servicios paginados actualizada.
+- `~/.claude/projects/.../memory/feedback_api_response_unwrap.md` — actualizado con caso double-wrapper.

@@ -211,8 +211,67 @@ CLIENT-SIDE
 
 ---
 
+## Anti-pattern: doble unwrap mal hecho
+
+> **"El interceptor desempaca `ApiResponse<T>` (un wrapper). El service FE debe desempacar `PaginatedResult<T>` (el segundo wrapper) — o tipar el response correctamente."**
+
+El stack tiene **dos wrappers anidados** cuando un endpoint pagina con variante A:
+
+```
+Body crudo HTTP:        { success, data: { data: [...], page, pageSize, total } }
+Tras apiResponseInterceptor: { data: [...], page, pageSize, total }   ← PaginatedResult<T>
+Lo que el service debe entregar al store:  T[] (extraído de .data) o PaginatedResult<T> completo si la UI necesita totales.
+```
+
+El bug clásico (commit `bfa96f0`) fue tipar el segundo nivel como `T[]` plano:
+
+```typescript
+// ❌ BUG: el body es PaginatedResult<T>, no T[]
+return this.http.get<EmailDomainPauseListaDto[]>(this.apiBase, { params });
+// ...después un .filter() en el caller revienta con "filter is not a function"
+```
+
+Las dos opciones correctas (ambas válidas, elegir según necesidad):
+
+```typescript
+// ✅ A — Devolver el wrapper completo, el caller lee .data y .total
+getPaginado(...): Observable<PaginatedResult<EmailQuarantineListaDto>> {
+  return this.http.get<PaginatedResult<EmailQuarantineListaDto>>(this.apiBase, { params });
+}
+
+// ✅ B — Devolver solo el array (cuando la UI no necesita total)
+getActivas(...): Observable<EmailDomainPauseListaDto[]> {
+  return this.http
+    .get<PaginatedResult<EmailDomainPauseListaDto>>(this.apiBase, { params })
+    .pipe(map((res) => res?.data ?? []));
+}
+```
+
+### Lint enforcement: `api-shape/unwrap-paginated`
+
+Plugin local en `eslint.config.js` que detecta el anti-pattern. Manifest hardcoded de endpoints paginados (el dev agrega 1 línea cuando crea un endpoint nuevo con `PaginatedResult<T>`):
+
+```javascript
+const PAGINATED_ENDPOINTS = [
+  '/api/sistema/email-outbox/defer-events',
+  '/api/sistema/email-outbox/quarantine',
+  '/api/sistema/email-outbox/domain-pauses',
+  '/api/sistema/email-blacklist',
+  '/api/sistema/usuarios/listar',
+];
+```
+
+La regla dispara cuando:
+
+1. Una clase `*.service.ts` tiene `private readonly apiBase = '...'` cuyo path matchea un endpoint del manifest.
+2. La misma clase hace `this.http.get<X[]>(this.apiBase, ...)` o `this.http.get<Array<X>>(this.apiBase, ...)`.
+
+Sugiere las dos opciones A/B descritas arriba. Al agregar un endpoint paginado nuevo en BE, **actualizar `PAGINATED_ENDPOINTS` en el mismo PR**. Cuando crezca >15, migrar a JSON regenerado desde controllers C# (script BE).
+
+---
+
 ## Referencias del proyecto
 
-- **Server-side variante A (wrapper)**: `usuarios admin`, `horarios admin`, `vistas admin`, `permisos-roles admin`
+- **Server-side variante A (wrapper)**: `usuarios admin`, `horarios admin`, `vistas admin`, `permisos-roles admin`, `email-blacklist admin`, `email-quarantine admin`, `email-defer-events admin`
 - **Server-side variante B (`/count` separado)**: `error-logs admin` (Educa.API master `7e9d10b` + educa-web main `1a13062`)
 - **Client-side**: `cursos`, `salones`, `events-calendar`, `notificaciones-admin`, `email-outbox`, `rate-limit-events`, `feedback-reports`
