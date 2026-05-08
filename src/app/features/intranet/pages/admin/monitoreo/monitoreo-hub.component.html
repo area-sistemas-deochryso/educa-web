@@ -86,6 +86,14 @@
 								[attr.data-tone]="domain.tone"
 								[attr.aria-label]="tile.label + (tile.badge?.label ? ' — ' + tile.badge!.label : '')"
 							>
+								@if (tile.badge?.level === 'critical' || tile.badge?.level === 'warn') {
+									<span
+										class="tile-alert-dot"
+										[attr.data-level]="tile.badge!.level"
+										[attr.aria-label]="'Atención: ' + tile.badge!.label"
+									></span>
+								}
+
 								<div class="tile-inner">
 									<!-- FRONT — métrica destacada -->
 									<div class="tile-face tile-front">
