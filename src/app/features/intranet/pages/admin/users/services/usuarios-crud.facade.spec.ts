@@ -18,7 +18,7 @@ import type { ImportarEstudiantesResponse, UsuarioDetalle, UsuarioLista, Usuario
 // #region Fixtures
 const mockStats: UsuariosEstadisticas = {
 	totalUsuarios: 3, totalDirectores: 1, totalAsistentesAdministrativos: 0,
-	totalPromotores: 0, totalProfesores: 1, totalApoderados: 0, totalEstudiantes: 1,
+	totalPromotores: 0, totalCoordinadoresAcademicos: 0, totalProfesores: 1, totalApoderados: 0, totalEstudiantes: 1,
 	usuariosActivos: 2, usuariosInactivos: 1,
 };
 

@@ -293,6 +293,7 @@ export class UsersCrudFacade {
 		Apoderado: 'totalApoderados',
 		'Asistente Administrativo': 'totalAsistentesAdministrativos',
 		Promotor: 'totalPromotores',
+		'Coordinador Académico': 'totalCoordinadoresAcademicos',
 	};
 
 	private updateRolEstadistica(rol: string, delta: number): void {
