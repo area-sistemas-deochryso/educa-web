@@ -16,6 +16,13 @@ export interface CorrelationErrorLogDto {
 	usuarioRol: string | null;
 	plataforma: string;
 	fecha: string;
+	/**
+	 * Plan 41 F2 — primeros 12 caracteres del fingerprint del ErrorGroup
+	 * (mismo formato que `FingerprintCorto` del Kanban admin). `null` cuando
+	 * la ocurrencia es legacy huérfana o el LEFT JOIN no resuelve grupo.
+	 * Opcional para compatibilidad con BEs pre-Plan 41 F2.
+	 */
+	errorGroupCode?: string | null;
 }
 
 /**
@@ -84,6 +91,14 @@ export interface CorrelationSnapshot {
 	rateLimitEvents: CorrelationRateLimitEventDto[];
 	reportesUsuario: CorrelationReporteUsuarioDto[];
 	emailOutbox: CorrelationEmailOutboxDto[];
+	/**
+	 * Plan 41 F2 — últimos 5 correlationIds distintos del mismo usuario
+	 * (matched por últimos 4 dígitos del DNI) en las últimas 2h, excluyendo
+	 * el id consultado. Vacío si ningún evento del snapshot trae DNI o si la
+	 * query fail-safe falló (INV-S07). Opcional para compatibilidad con BEs
+	 * pre-Plan 41 F2.
+	 */
+	relatedCorrelationIds?: string[];
 }
 // #endregion
 

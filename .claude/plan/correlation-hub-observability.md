@@ -3,7 +3,7 @@
 > **Fecha**: 2026-05-08
 > **Origen**: Petición del usuario tras revisar `/intranet/admin/correlation/:id` shipped por Plan 32. La página funciona pero deja al admin reconstruyendo eventos mentalmente: 4 listas planas independientes, sin timeline, sin enlaces laterales a otras vistas, sin contexto de la request principal, sin breadcrumbs del cliente. La meta es **cerrar las 12 brechas identificadas** para que el hub sea lo primero que el admin abre cuando hay un incidente y lo único que necesita ver.
 > **Decisión del usuario**: cerrar TODAS las brechas, aceptando >10 chats si hace falta.
-> **Estado**: ⏳ en progreso. F1 ✅ awaiting-prod (chat 131). F2 lista para arrancar.
+> **Estado**: ⏳ en progreso. F1 ✅ awaiting-prod (chat 131). F2 BE ✅ awaiting-prod (chat 132). F2 FE Chat 3 listo para arrancar — espera smoke + `/verify` de Chat 2 BE.
 
 ---
 
@@ -58,7 +58,7 @@
 
 | Chat | Repo | Scope | Salida |
 |---|---|---|---|
-| **Chat 2 — F2 BE DTO ampliado** | `Educa.API` | `CorrelationSnapshotDto` agrega: (a) `errorGroupCode?` por cada `ErrorLog` (resuelto vía `LEFT JOIN ErrorGroup` en el service); (b) `entidadOrigen` ya existe en `EmailOutbox` pero confirmar que llega serializado; (c) `relatedCorrelationIds: string[]` — los últimos 5 distinct correlationIds del mismo `usuarioDni` (cualquiera de las 4 tablas) en las últimas 2h, exclusivo del id consultado. Cap 5. INV-S07 fail-safe por sub-query. | DTO ampliado + tests. Endpoint mantiene shape — campos opcionales. |
+| **Chat 2 — F2 BE DTO ampliado** ✅ awaiting-prod (brief 132, 2026-05-08) | `Educa.API` | `CorrelationSnapshotDto` agregó: (a) `errorGroupCode?` por cada `ErrorLog` (LEFT JOIN ErrorGroup vía navegacional `Include`, primeros 12 chars del `ERG_Fingerprint` = `FingerprintCorto`); (b) `entidadOrigen` ya estaba mapeado desde Plan 32 — solo se agregó test contract; (c) `relatedCorrelationIds: string[]` — UNION de 3 tablas con DNI (Error/RateLimit/Reporte; EmailOutbox no tiene DNI) cap 5, ventana 2h, match por últimos 4 dígitos del DNI con `EndsWith` (cubre storage mixto masked/raw). | **Boundary extraction**: `CorrelationRelatedResolver` (119 líneas, stateless, INV-S07 fail-safe interno) + interfaz `ICorrelationRelatedResolver` registrada en DI; `CorrelationService` quedó en 253 líneas. Sin migración SQL. **+8 tests** → 1689/1697 verdes (8 fallos preexistentes Plan 40 F2). FE espejo opcional actualizado. Pendiente smoke + `/verify`. |
 | **Chat 3 — F2 FE enlaces salientes** | `educa-web` | Botones en cada fila del timeline / sección: "Ver grupo de errores" (→ `/intranet/admin/error-groups?fingerprint=X`), "Ver bandeja del destinatario" (→ `/intranet/admin/email-outbox?destinatario=Y`), "Ver reporte de usuario" (→ `/intranet/admin/feedback-reports/Z`). Sección lateral "Otros correlation IDs de este usuario (últimas 2h)" si `relatedCorrelationIds.length > 0` — chips con `<app-correlation-id-pill>`. | Hub navegable como grafo. Tests del computed que arma los links. |
 
 ---
