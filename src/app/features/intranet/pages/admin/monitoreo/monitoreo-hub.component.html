@@ -79,47 +79,74 @@
 					<!-- Tiles del dominio -->
 					<section class="tiles-grid">
 						@for (tile of domain.tiles; track tile.route) {
-							<a [routerLink]="tile.route" class="tile" [attr.data-level]="tile.badge?.level ?? 'unknown'" [attr.data-tone]="domain.tone">
-								<div class="tile-icon">
-									<i [class]="tile.icon"></i>
-								</div>
+							<a
+								[routerLink]="tile.route"
+								class="tile"
+								[attr.data-level]="tile.badge?.level ?? 'unknown'"
+								[attr.data-tone]="domain.tone"
+								[attr.aria-label]="tile.label + (tile.badge?.label ? ' — ' + tile.badge!.label : '')"
+							>
+								<div class="tile-inner">
+									<!-- FRONT — métrica destacada -->
+									<div class="tile-face tile-front">
+										<div class="tile-icon">
+											<i [class]="tile.icon"></i>
+										</div>
 
-								<div class="tile-body">
-									<span class="tile-label">{{ tile.label }}</span>
+										<div class="tile-body">
+											<span class="tile-label">{{ tile.label }}</span>
 
-									@if (tile.badge && tile.badge.level !== 'unknown') {
-										<div class="tile-metric">
-											@if (tile.badge.count !== null) {
-												<span class="tile-value" [attr.data-level]="tile.badge.level">{{ tile.badge.count }}</span>
-												<span class="tile-meta">
-													@if (tile.badge.level === 'critical') {
-														<i class="pi pi-exclamation-circle"></i>
-													} @else if (tile.badge.level === 'warn') {
-														<i class="pi pi-exclamation-triangle"></i>
+											@if (tile.badge && tile.badge.level !== 'unknown') {
+												<div class="tile-metric">
+													@if (tile.badge.count !== null) {
+														<span class="tile-value" [attr.data-level]="tile.badge.level">{{ tile.badge.count }}</span>
+														<span class="tile-meta">
+															@if (tile.badge.level === 'critical') {
+																<i class="pi pi-exclamation-circle"></i>
+															} @else if (tile.badge.level === 'warn') {
+																<i class="pi pi-exclamation-triangle"></i>
+															} @else {
+																<i class="pi pi-check-circle"></i>
+															}
+														</span>
 													} @else {
-														<i class="pi pi-check-circle"></i>
+														<span class="tile-value-icon" [attr.data-level]="tile.badge.level">
+															@if (tile.badge.level === 'critical') {
+																<i class="pi pi-exclamation-circle"></i>
+															} @else if (tile.badge.level === 'warn') {
+																<i class="pi pi-exclamation-triangle"></i>
+															} @else {
+																<i class="pi pi-check-circle"></i>
+															}
+														</span>
 													}
-												</span>
+												</div>
+												<span class="tile-hint">{{ tile.badge.label }}</span>
 											} @else {
-												<!-- Para Dashboard que devuelve nivel sin count -->
-												<span class="tile-value-icon" [attr.data-level]="tile.badge.level">
-													@if (tile.badge.level === 'critical') {
-														<i class="pi pi-exclamation-circle"></i>
-													} @else if (tile.badge.level === 'warn') {
-														<i class="pi pi-exclamation-triangle"></i>
-													} @else {
-														<i class="pi pi-check-circle"></i>
-													}
-												</span>
+												<span class="tile-hint tile-hint-muted">Pasá el cursor para ver más</span>
 											}
 										</div>
-										<span class="tile-hint">{{ tile.badge.label }}</span>
-									} @else {
-										<span class="tile-hint tile-hint-muted">Ver detalle</span>
-									}
-								</div>
 
-								<i class="pi pi-arrow-right tile-arrow"></i>
+										<i class="pi pi-arrow-right tile-arrow"></i>
+									</div>
+
+									<!-- BACK — descripción y CTA -->
+									<div class="tile-face tile-back">
+										<div class="tile-back-header">
+											<div class="tile-icon tile-icon-sm">
+												<i [class]="tile.icon"></i>
+											</div>
+											<span class="tile-label">{{ tile.label }}</span>
+										</div>
+
+										<p class="tile-description">{{ tile.description }}</p>
+
+										<span class="tile-cta">
+											<i class="pi pi-arrow-right"></i>
+											Abrir
+										</span>
+									</div>
+								</div>
 							</a>
 						}
 					</section>

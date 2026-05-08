@@ -20,6 +20,8 @@ export interface DomainTile {
 	permiso: PermisoPath;
 	featureFlag?: FeatureFlagKey;
 	badgeKey?: HubBadgeKey;
+	/** Texto que se ve al voltear la card (back face). 1-2 líneas. */
+	description: string;
 }
 
 export interface DomainDef {
@@ -47,6 +49,7 @@ export const DOMAINS: DomainDef[] = [
 				icon: 'pi pi-inbox',
 				permiso: PERMISOS.ADMIN_EMAIL_OUTBOX,
 				badgeKey: 'bandeja',
+				description: 'Trazabilidad completa del outbox: filtros por tipo, estado y rango — con HTML del cuerpo y exportación.',
 			},
 			{
 				label: 'Dashboard del día',
@@ -55,6 +58,7 @@ export const DOMAINS: DomainDef[] = [
 				permiso: PERMISOS.ADMIN_EMAIL_OUTBOX_DASHBOARD_DIA,
 				featureFlag: 'emailOutboxDashboardDia',
 				badgeKey: 'dashboard',
+				description: 'Métricas en vivo: throttle, sender stats, dominios receptores y mapa de envío.',
 			},
 			{
 				label: 'Diagnóstico',
@@ -63,6 +67,7 @@ export const DOMAINS: DomainDef[] = [
 				permiso: PERMISOS.ADMIN_EMAIL_OUTBOX_DIAGNOSTICO,
 				featureFlag: 'emailOutboxDiagnostico',
 				badgeKey: 'diagnostico',
+				description: 'Candidatos a blacklistear y dominios con tasa de fallo elevada.',
 			},
 			{
 				label: 'Auditoría',
@@ -70,6 +75,7 @@ export const DOMAINS: DomainDef[] = [
 				icon: 'pi pi-history',
 				permiso: PERMISOS.ADMIN_AUDITORIA_CORREOS,
 				featureFlag: 'auditoriaCorreos',
+				description: 'Búsqueda histórica con paginación server-side y exportación.',
 			},
 			{
 				label: 'Blacklist',
@@ -78,6 +84,7 @@ export const DOMAINS: DomainDef[] = [
 				permiso: PERMISOS.ADMIN_EMAIL_BLACKLIST,
 				featureFlag: 'emailBlacklistTab',
 				badgeKey: 'blacklist',
+				description: 'Destinatarios bloqueados permanentemente, con motivo y fecha.',
 			},
 			{
 				label: 'Cuarentena',
@@ -85,6 +92,7 @@ export const DOMAINS: DomainDef[] = [
 				icon: 'pi pi-clock',
 				permiso: PERMISOS.ADMIN_EMAIL_QUARANTINE,
 				featureFlag: 'emailQuarantineTab',
+				description: 'Pausas temporales con auto-release. Promueve a blacklist al 3.er hit.',
 			},
 			{
 				label: 'Dominios pausados',
@@ -92,6 +100,7 @@ export const DOMAINS: DomainDef[] = [
 				icon: 'pi pi-pause',
 				permiso: PERMISOS.ADMIN_EMAIL_DOMAIN_PAUSES,
 				featureFlag: 'emailDomainPausesTab',
+				description: 'Dominios receptores pausados con timeout y auto-resume.',
 			},
 			{
 				label: 'Eventos defer',
@@ -99,6 +108,7 @@ export const DOMAINS: DomainDef[] = [
 				icon: 'pi pi-replay',
 				permiso: PERMISOS.ADMIN_EMAIL_DEFER_EVENTS,
 				featureFlag: 'emailDeferEventsTab',
+				description: 'Historial de defers/fails sincrónicos del MTA por destinatario.',
 			},
 		],
 	},
@@ -115,6 +125,7 @@ export const DOMAINS: DomainDef[] = [
 				icon: 'pi pi-exclamation-circle',
 				permiso: PERMISOS.ADMIN_ERROR_LOGS,
 				badgeKey: 'errores',
+				description: 'Bugs agrupados por fingerprint con kanban de estados (NUEVO → RESUELTO).',
 			},
 			{
 				label: 'Reportes de Usuarios',
@@ -122,6 +133,7 @@ export const DOMAINS: DomainDef[] = [
 				icon: 'pi pi-comment',
 				permiso: PERMISOS.ADMIN_REPORTES_USUARIO,
 				badgeKey: 'reportes',
+				description: 'Feedback manual: tipo, descripción y propuesta enviada por usuarios.',
 			},
 		],
 	},
@@ -139,6 +151,7 @@ export const DOMAINS: DomainDef[] = [
 				permiso: PERMISOS.ADMIN_RATE_LIMIT_EVENTS,
 				featureFlag: 'rateLimitMonitoring',
 				badgeKey: 'rateLimit',
+				description: 'Eventos 429 con policy, partition, top endpoints y top roles afectados.',
 			},
 		],
 	},
