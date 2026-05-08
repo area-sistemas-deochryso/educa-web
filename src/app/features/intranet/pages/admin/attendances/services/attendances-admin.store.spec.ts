@@ -51,6 +51,28 @@ const mockProfesorItem: AsistenciaAdminLista = {
 	tipoPersona: 'P',
 	contextoPersona: 'Matemáticas — Secundaria',
 };
+
+const mockAsistenteAdminItem: AsistenciaAdminLista = {
+	asistenciaId: 3,
+	estudianteId: 303,
+	dni: '11223344',
+	nombreCompleto: 'Ricardo Rey',
+	grado: '',
+	seccion: '',
+	sede: 'Sede Central',
+	sedeId: 1,
+	fecha: '2026-04-20',
+	horaEntrada: '2026-04-20T07:20:00',
+	horaSalida: null,
+	estado: 'Incompleta',
+	observacion: null,
+	origenManual: false,
+	editadoManualmente: false,
+	estadoCodigo: 'A',
+	rowVersion: 'v1',
+	tipoPersona: 'A',
+	contextoPersona: 'Asistente Administrativo · Sede Central',
+};
 // #endregion
 
 describe('AttendancesAdminStore — tipoPersona filter', () => {
@@ -69,6 +91,9 @@ describe('AttendancesAdminStore — tipoPersona filter', () => {
 		it('setTipoPersonaFilter actualiza el signal', () => {
 			store.setTipoPersonaFilter('P');
 			expect(store.tipoPersonaFilter()).toBe('P');
+
+			store.setTipoPersonaFilter('A');
+			expect(store.tipoPersonaFilter()).toBe('A');
 
 			store.setTipoPersonaFilter('todos');
 			expect(store.tipoPersonaFilter()).toBe('todos');
@@ -97,6 +122,12 @@ describe('AttendancesAdminStore — tipoPersona filter', () => {
 			expect(store.formData().tipoPersona).toBe('P');
 		});
 
+		it('openNewDialog hereda tipo "A" cuando filtro es "A" (Plan 28 Chat 4b)', () => {
+			store.setTipoPersonaFilter('A');
+			store.openNewDialog();
+			expect(store.formData().tipoPersona).toBe('A');
+		});
+
 		it('openEditDialog copia el tipo del item', () => {
 			store.openEditDialog(mockProfesorItem);
 			expect(store.formData().tipoPersona).toBe('P');
@@ -104,12 +135,20 @@ describe('AttendancesAdminStore — tipoPersona filter', () => {
 
 			store.openEditDialog(mockEstudianteItem);
 			expect(store.formData().tipoPersona).toBe('E');
+
+			store.openEditDialog(mockAsistenteAdminItem);
+			expect(store.formData().tipoPersona).toBe('A');
+			expect(store.formData().estudianteId).toBe(303);
 		});
 
 		it('openSalidaDialog copia el tipo del item', () => {
 			store.openSalidaDialog(mockProfesorItem);
 			expect(store.formData().tipoPersona).toBe('P');
 			expect(store.formData().asistenciaId).toBe(2);
+
+			store.openSalidaDialog(mockAsistenteAdminItem);
+			expect(store.formData().tipoPersona).toBe('A');
+			expect(store.formData().asistenciaId).toBe(3);
 		});
 	});
 
