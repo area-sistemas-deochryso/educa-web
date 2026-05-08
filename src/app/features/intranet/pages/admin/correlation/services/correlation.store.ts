@@ -1,6 +1,10 @@
 import { Injectable, computed, signal } from '@angular/core';
 
-import { CorrelationSnapshot } from '../models';
+import {
+	CorrelationSnapshot,
+	SECTION_DEFENSIVE_CAP,
+	TimelineEvent,
+} from '../models';
 
 @Injectable({ providedIn: 'root' })
 export class CorrelationStore {
@@ -31,6 +35,39 @@ export class CorrelationStore {
 			this.reportesUsuario().length +
 			this.emailOutbox().length,
 	);
+
+	/**
+	 * Plan 41 F1 — mezcla los 4 arrays en un único `TimelineEvent[]` ordenado
+	 * por fecha descendente (más reciente primero). Outbox prefiere `fechaEnvio`
+	 * y cae a `fechaReg` cuando el correo todavía no se envió.
+	 */
+	readonly timelineEvents = computed<TimelineEvent[]>(() => {
+		const events: TimelineEvent[] = [];
+
+		for (const e of this.errorLogs()) {
+			events.push({ kind: 'error', fecha: e.fecha, payload: e });
+		}
+		for (const e of this.rateLimitEvents()) {
+			events.push({ kind: 'rate-limit', fecha: e.fecha, payload: e });
+		}
+		for (const e of this.reportesUsuario()) {
+			events.push({ kind: 'reporte', fecha: e.fechaReg, payload: e });
+		}
+		for (const e of this.emailOutbox()) {
+			events.push({ kind: 'outbox', fecha: e.fechaEnvio ?? e.fechaReg, payload: e });
+		}
+
+		return events.sort((a, b) => (a.fecha < b.fecha ? 1 : a.fecha > b.fecha ? -1 : 0));
+	});
+
+	/** Plan 41 F1 — true si alguna sección llegó al cap defensivo (100 filas). */
+	readonly hasDefensiveCap = computed(
+		() =>
+			this.errorLogs().length >= SECTION_DEFENSIVE_CAP ||
+			this.rateLimitEvents().length >= SECTION_DEFENSIVE_CAP ||
+			this.reportesUsuario().length >= SECTION_DEFENSIVE_CAP ||
+			this.emailOutbox().length >= SECTION_DEFENSIVE_CAP,
+	);
 	// #endregion
 
 	// #region ViewModel
@@ -44,6 +81,8 @@ export class CorrelationStore {
 		reportesUsuario: this.reportesUsuario(),
 		emailOutbox: this.emailOutbox(),
 		totalEvents: this.totalEvents(),
+		timelineEvents: this.timelineEvents(),
+		hasDefensiveCap: this.hasDefensiveCap(),
 	}));
 	// #endregion
 

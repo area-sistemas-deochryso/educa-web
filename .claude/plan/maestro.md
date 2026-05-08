@@ -81,7 +81,7 @@
 
 ### 🟢 Media — mejoras de UX y deuda técnica con dueño claro
 
-4. **[Plan 41 · Chat 1 · `educa-web` · FE]** — F1 timeline cronológico unificado en `/intranet/admin/correlation/:id`. Solo FE, 1 chat, alto valor / bajo costo. Resuelve brechas #1 (sin timeline) y #12 (cap defensivo invisible). Brief próximo en `chats/open/`. Punto de entrada del Plan 41 (14 chats totales).
+4. **[Plan 41 · Chat 1 · `educa-web` · FE]** ✅ awaiting-prod (brief 131, 2026-05-08) — F1 timeline cronológico unificado shipped. Resuelve brechas #1 y #12. Pendiente smoke manual + `/verify`. Siguiente: **Chat 2 BE** (DTO ampliado con `errorGroupCode`, `entidadOrigen`, `relatedCorrelationIds` para F2).
 5. **[Plan 26 · F3 · `Educa.API` · BE]** — Time-of-day modifier para rate limiting. F2.6 ya cumplió ventana de observación post-deploy (~2026-05-06). Diseño aprobado: margen suave fuera de franja escolar (ej: x1.5 dentro / x1.2 fuera), no corte duro. Calibración con telemetría real `RateLimitEvent`.
 6. **[Plan 33 · Chat 1 · BE+FE]** — Auditoría de paginación de tablas. Clasificar 8 features candidatas (`attendances admin`, `attendance-reports cross-role`, `email-outbox-diagnostico`, `email-outbox-dashboard-dia`, `attendance-day-list`, `responsive-table`, `student-attendance-tab`, `attendance-summary-panel`) y aplicar fix tipo `error-logs admin` donde corresponda. Plan a 5%.
 7. **[WAL Cache Audit · H7 · `educa-web` · FE]** — Normalizar naming `WAL_CACHE_MAP` a camelCase. P1, 1 chat dedicado, riesgo medio-alto (rename cross-archivo).

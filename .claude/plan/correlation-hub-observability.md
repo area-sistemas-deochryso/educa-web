@@ -3,7 +3,7 @@
 > **Fecha**: 2026-05-08
 > **Origen**: Petición del usuario tras revisar `/intranet/admin/correlation/:id` shipped por Plan 32. La página funciona pero deja al admin reconstruyendo eventos mentalmente: 4 listas planas independientes, sin timeline, sin enlaces laterales a otras vistas, sin contexto de la request principal, sin breadcrumbs del cliente. La meta es **cerrar las 12 brechas identificadas** para que el hub sea lo primero que el admin abre cuando hay un incidente y lo único que necesita ver.
 > **Decisión del usuario**: cerrar TODAS las brechas, aceptando >10 chats si hace falta.
-> **Estado**: ⏳ planificado. F1 lista para arrancar.
+> **Estado**: ⏳ en progreso. F1 ✅ awaiting-prod (chat 131). F2 lista para arrancar.
 
 ---
 
@@ -165,7 +165,7 @@ Plan 41 cierra al 100% cuando:
 
 | # | Brecha | Estado |
 |---|---|---|
-| 1 | Timeline cronológico | ⏳ F1 |
+| 1 | Timeline cronológico | ✅ F1 (chat 131, awaiting-prod) |
 | 2 | Request lifecycle | ⏳ F3 |
 | 3 | Breadcrumbs cliente | ⏳ F4 |
 | 4 | Grafo de relaciones | ⏳ F2 |
@@ -176,4 +176,4 @@ Plan 41 cierra al 100% cuando:
 | 9 | SignalR correlation | ⏳ F6 |
 | 10 | Export / share | ⏳ F5 |
 | 11 | Auto-refresh | ⏳ F5 |
-| 12 | Cap awareness UI | ⏳ F1 |
+| 12 | Cap awareness UI | ✅ F1 (chat 131, awaiting-prod) |

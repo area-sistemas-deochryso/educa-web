@@ -1,5 +1,5 @@
 // #region Imports
-import { ChangeDetectionStrategy, Component, DestroyRef, OnInit, inject } from '@angular/core';
+import { ChangeDetectionStrategy, Component, DestroyRef, OnInit, inject, signal } from '@angular/core';
 import { CommonModule, DatePipe } from '@angular/common';
 import { ActivatedRoute, Router } from '@angular/router';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
@@ -8,6 +8,7 @@ import { ButtonModule } from 'primeng/button';
 import { TooltipModule } from 'primeng/tooltip';
 
 import { logger } from '@core/helpers';
+import { StorageService, type CorrelationViewMode } from '@core/services';
 
 import { PageHeaderComponent } from '@intranet-shared/components';
 
@@ -16,6 +17,7 @@ import { CorrelationErrorsSectionComponent } from './components/correlation-erro
 import { CorrelationRateLimitSectionComponent } from './components/correlation-rate-limit-section';
 import { CorrelationReportsSectionComponent } from './components/correlation-reports-section';
 import { CorrelationEmailsSectionComponent } from './components/correlation-emails-section';
+import { CorrelationTimelineSectionComponent } from './components/correlation-timeline-section';
 // #endregion
 
 /**
@@ -24,6 +26,9 @@ import { CorrelationEmailsSectionComponent } from './components/correlation-emai
  * Lee el `:id` del paramMap y dispara `loadSnapshot`. Renderiza siempre las
  * 4 secciones (errors / rate-limit / reportes / outbox) con su empty state
  * si vienen vacías. No hay paginación (el BE caprea a 100 filas por sección).
+ *
+ * Plan 41 F1 — agrega toggle entre vista timeline cronológica unificada
+ * (default) y vista por sección, persistido en `PreferencesStorageService`.
  *
  * No tiene entrada de menú — es deep-link admin. La pill `<app-correlation-id-pill>`
  * desde los 4 dashboards es la única forma de llegar acá.
@@ -37,6 +42,7 @@ import { CorrelationEmailsSectionComponent } from './components/correlation-emai
 		ButtonModule,
 		TooltipModule,
 		PageHeaderComponent,
+		CorrelationTimelineSectionComponent,
 		CorrelationErrorsSectionComponent,
 		CorrelationRateLimitSectionComponent,
 		CorrelationReportsSectionComponent,
@@ -52,10 +58,12 @@ export class CorrelationComponent implements OnInit {
 	private readonly route = inject(ActivatedRoute);
 	private readonly router = inject(Router);
 	private readonly destroyRef = inject(DestroyRef);
+	private readonly storage = inject(StorageService);
 	// #endregion
 
 	// #region Estado
 	readonly vm = this.facade.vm;
+	readonly viewMode = signal<CorrelationViewMode>(this.storage.getCorrelationViewMode());
 	// #endregion
 
 	// #region Lifecycle
@@ -91,6 +99,12 @@ export class CorrelationComponent implements OnInit {
 		} else {
 			void this.router.navigate(['/intranet']);
 		}
+	}
+
+	onToggleView(mode: CorrelationViewMode): void {
+		if (this.viewMode() === mode) return;
+		this.viewMode.set(mode);
+		this.storage.setCorrelationViewMode(mode);
 	}
 	// #endregion
 }

@@ -41,12 +41,17 @@ const PREFERENCES_KEYS = {
 	// Plan 34 Chat 5 — error-groups view mode (kanban vs table)
 	ERROR_GROUPS_VIEW_MODE: 'educa_pref_error_groups_view_mode',
 
+	// Plan 41 F1 — correlation hub view mode (timeline vs section)
+	CORRELATION_VIEW_MODE: 'educa_pref_correlation_view_mode',
+
 	// Brief 102 — runtime health widget
 	RUNTIME_HEALTH_WIDGET_AUTO_REFRESH: 'educa_pref_runtime_health_widget_auto_refresh',
 	RUNTIME_HEALTH_WIDGET_COLLAPSED: 'educa_pref_runtime_health_widget_collapsed',
 } as const;
 
 export type ErrorGroupsViewMode = 'kanban' | 'table';
+
+export type CorrelationViewMode = 'timeline' | 'section';
 
 /**
  * Theme preference for the UI.
@@ -537,6 +542,23 @@ export class PreferencesStorageService {
 
 	setErrorGroupsViewMode(mode: ErrorGroupsViewMode): void {
 		this.setItem(PREFERENCES_KEYS.ERROR_GROUPS_VIEW_MODE, mode);
+	}
+
+	// #endregion
+	// #region CORRELATION HUB VIEW MODE (Plan 41 F1)
+
+	/**
+	 * View mode for the admin "correlation" hub (timeline vs section).
+	 * Defaults to 'timeline' first time — la vista cronológica unificada
+	 * resuelve la brecha #1 del Plan 41.
+	 */
+	getCorrelationViewMode(): CorrelationViewMode {
+		const stored = this.getItem(PREFERENCES_KEYS.CORRELATION_VIEW_MODE);
+		return stored === 'section' ? 'section' : 'timeline';
+	}
+
+	setCorrelationViewMode(mode: CorrelationViewMode): void {
+		this.setItem(PREFERENCES_KEYS.CORRELATION_VIEW_MODE, mode);
 	}
 
 	// #endregion

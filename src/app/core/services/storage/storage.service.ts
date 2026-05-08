@@ -9,10 +9,14 @@ import {
 	PermisosStorageData,
 } from './storage.models';
 import { SessionStorageService } from './session-storage.service';
-import { ErrorGroupsViewMode, PreferencesStorageService } from './preferences-storage.service';
+import {
+	CorrelationViewMode,
+	ErrorGroupsViewMode,
+	PreferencesStorageService,
+} from './preferences-storage.service';
 import { NotificationStorageService } from './notification-storage.service';
 
-export type { ErrorGroupsViewMode } from './preferences-storage.service';
+export type { CorrelationViewMode, ErrorGroupsViewMode } from './preferences-storage.service';
 
 /**
  * Storage facade for auth, permissions, notifications, and preferences.
@@ -372,6 +376,16 @@ export class StorageService {
 
 	setErrorGroupsViewMode(mode: ErrorGroupsViewMode): void {
 		this.preferences.setErrorGroupsViewMode(mode);
+	}
+	// #endregion
+
+	// #region CORRELATION HUB VIEW MODE (Plan 41 F1)
+	getCorrelationViewMode(): CorrelationViewMode {
+		return this.preferences.getCorrelationViewMode();
+	}
+
+	setCorrelationViewMode(mode: CorrelationViewMode): void {
+		this.preferences.setCorrelationViewMode(mode);
 	}
 	// #endregion
 

@@ -1,0 +1,113 @@
+<section class="correlation-section timeline-section">
+	<header class="correlation-section__header">
+		<div class="correlation-section__title">
+			<i class="pi pi-clock"></i>
+			<h3>Timeline cronológico</h3>
+			<span class="correlation-section__count">{{ count() }}</span>
+		</div>
+	</header>
+
+	@if (count() === 0) {
+		<div class="correlation-section__empty">
+			<i class="pi pi-check-circle"></i>
+			<p>Sin eventos registrados con este correlation id.</p>
+		</div>
+	} @else {
+		<ol class="timeline">
+			@for (event of events(); track trackEvent($index, event)) {
+				<li class="timeline-event" [class]="kindClassMap[event.kind]">
+					<div class="timeline-event__icon">
+						<i [class]="iconMap[event.kind]"></i>
+					</div>
+					<div class="timeline-event__body">
+						<div class="timeline-event__header">
+							<span class="timeline-event__kind">{{ kindLabelMap[event.kind] }}</span>
+							<span class="timeline-event__date">{{ event.fecha | date: 'dd/MM/yyyy HH:mm:ss' }}</span>
+						</div>
+
+						@switch (event.kind) {
+							@case ('error') {
+								<div class="timeline-event__detail">
+									<p-tag
+										[value]="asError(event.payload).severidad"
+										[severity]="getErrorSeverity(asError(event.payload).severidad)"
+									/>
+									@if (asError(event.payload).httpStatus !== null) {
+										<span class="cell-mono">
+											{{ asError(event.payload).httpMethod ?? '—' }}
+											{{ asError(event.payload).httpStatus }}
+										</span>
+									}
+									<span class="timeline-event__msg" [pTooltip]="asError(event.payload).mensaje" tooltipPosition="top">
+										{{ asError(event.payload).mensaje }}
+									</span>
+								</div>
+								<div class="timeline-event__meta">
+									<span class="cell-mono cell-url" [pTooltip]="asError(event.payload).url" tooltipPosition="top">
+										{{ asError(event.payload).url }}
+									</span>
+									@if (asError(event.payload).usuarioDniMasked; as dni) {
+										<span class="cell-mono">· {{ dni }}</span>
+									}
+								</div>
+							}
+							@case ('rate-limit') {
+								<div class="timeline-event__detail">
+									<p-tag
+										[value]="asRateLimit(event.payload).fueRechazado ? 'Rechazado' : 'OK'"
+										[severity]="asRateLimit(event.payload).fueRechazado ? 'danger' : 'success'"
+									/>
+									<span class="cell-mono">
+										{{ asRateLimit(event.payload).httpMethod }} {{ asRateLimit(event.payload).endpoint }}
+									</span>
+								</div>
+								<div class="timeline-event__meta">
+									@if (asRateLimit(event.payload).policy; as p) {
+										<span>policy: <code>{{ p }}</code></span>
+									}
+									@if (asRateLimit(event.payload).limiteEfectivo !== null) {
+										<span>· límite: {{ asRateLimit(event.payload).limiteEfectivo }}</span>
+									}
+									@if (asRateLimit(event.payload).usuarioDniMasked; as dni) {
+										<span class="cell-mono">· {{ dni }}</span>
+									}
+								</div>
+							}
+							@case ('reporte') {
+								<div class="timeline-event__detail">
+									<p-tag
+										[value]="asReporte(event.payload).estado"
+										[severity]="getReporteSeverity(asReporte(event.payload).estado)"
+									/>
+									<span class="timeline-event__msg">{{ asReporte(event.payload).tipo }}</span>
+								</div>
+								<div class="timeline-event__meta">
+									<span [pTooltip]="asReporte(event.payload).descripcionResumen" tooltipPosition="top">
+										{{ asReporte(event.payload).descripcionResumen }}
+									</span>
+								</div>
+							}
+							@case ('outbox') {
+								<div class="timeline-event__detail">
+									<p-tag
+										[value]="asOutbox(event.payload).estado"
+										[severity]="getOutboxSeverity(asOutbox(event.payload).estado)"
+									/>
+									<span class="timeline-event__msg" [pTooltip]="asOutbox(event.payload).asunto" tooltipPosition="top">
+										{{ asOutbox(event.payload).asunto }}
+									</span>
+								</div>
+								<div class="timeline-event__meta">
+									<span class="cell-mono">{{ asOutbox(event.payload).destinatarioMasked }}</span>
+									@if (asOutbox(event.payload).intentos > 1) {
+										<span>· intentos: {{ asOutbox(event.payload).intentos }}</span>
+									}
+								</div>
+							}
+						}
+					</div>
+				</li>
+			}
+		</ol>
+	}
+</section>

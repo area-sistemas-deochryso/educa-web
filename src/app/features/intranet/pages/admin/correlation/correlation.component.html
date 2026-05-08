@@ -12,6 +12,34 @@
 			(click)="onBack()"
 			[pt]="{ root: { 'aria-label': 'Volver' } }"
 		></button>
+
+		<div class="view-toggle" role="group" aria-label="Modo de vista">
+			<button
+				pButton
+				type="button"
+				icon="pi pi-clock"
+				label="Timeline"
+				class="p-button-sm"
+				[class.p-button-text]="viewMode() !== 'timeline'"
+				[class.p-button-outlined]="viewMode() === 'timeline'"
+				(click)="onToggleView('timeline')"
+				[attr.aria-pressed]="viewMode() === 'timeline'"
+				[pt]="{ root: { 'aria-label': 'Vista timeline cronológica' } }"
+			></button>
+			<button
+				pButton
+				type="button"
+				icon="pi pi-th-large"
+				label="Por sección"
+				class="p-button-sm"
+				[class.p-button-text]="viewMode() !== 'section'"
+				[class.p-button-outlined]="viewMode() === 'section'"
+				(click)="onToggleView('section')"
+				[attr.aria-pressed]="viewMode() === 'section'"
+				[pt]="{ root: { 'aria-label': 'Vista por sección' } }"
+			></button>
+		</div>
+
 		<button
 			pButton
 			icon="pi pi-refresh"
@@ -67,22 +95,36 @@
 		></button>
 	</div>
 } @else {
-	<div class="correlation-grid">
-		<app-correlation-errors-section
-			[items]="vm().errorLogs"
-			[correlationId]="vm().correlationId"
-		/>
-		<app-correlation-rate-limit-section
-			[items]="vm().rateLimitEvents"
-			[correlationId]="vm().correlationId"
-		/>
-		<app-correlation-reports-section
-			[items]="vm().reportesUsuario"
-			[correlationId]="vm().correlationId"
-		/>
-		<app-correlation-emails-section
-			[items]="vm().emailOutbox"
-			[correlationId]="vm().correlationId"
-		/>
-	</div>
+	@if (vm().hasDefensiveCap) {
+		<div class="cap-banner" role="status">
+			<i class="pi pi-info-circle"></i>
+			<p>
+				Una o más secciones llegaron al cap defensivo de 100 filas. Hay datos truncados —
+				usá filtros más específicos en la fuente original o búsqueda futura (Plan 41 F5).
+			</p>
+		</div>
+	}
+
+	@if (viewMode() === 'timeline') {
+		<app-correlation-timeline-section [events]="vm().timelineEvents" />
+	} @else {
+		<div class="correlation-grid">
+			<app-correlation-errors-section
+				[items]="vm().errorLogs"
+				[correlationId]="vm().correlationId"
+			/>
+			<app-correlation-rate-limit-section
+				[items]="vm().rateLimitEvents"
+				[correlationId]="vm().correlationId"
+			/>
+			<app-correlation-reports-section
+				[items]="vm().reportesUsuario"
+				[correlationId]="vm().correlationId"
+			/>
+			<app-correlation-emails-section
+				[items]="vm().emailOutbox"
+				[correlationId]="vm().correlationId"
+			/>
+		</div>
+	}
 }

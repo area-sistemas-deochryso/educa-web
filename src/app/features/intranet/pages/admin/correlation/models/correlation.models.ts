@@ -113,3 +113,54 @@ export const OUTBOX_ESTADO_SEVERITY_MAP: Record<string, 'info' | 'warn' | 'succe
 /** Cap defensivo del BE — si una sección llega con 100 filas, mostrar nota informativa. */
 export const SECTION_DEFENSIVE_CAP = 100;
 // #endregion
+
+// #region Timeline (Plan 41 F1)
+/** Tipo discriminado del evento en la vista timeline cronológica. */
+export type TimelineEventKind = 'error' | 'rate-limit' | 'reporte' | 'outbox';
+
+/** Vista activa del hub correlation: timeline cronológico unificado o secciones separadas. */
+export type CorrelationViewMode = 'timeline' | 'section';
+
+/**
+ * Evento mezclado en la vista timeline. La fecha se extrae según el tipo:
+ * - error / rate-limit: `payload.fecha`
+ * - reporte: `payload.fechaReg`
+ * - outbox: `payload.fechaEnvio ?? payload.fechaReg`
+ */
+export interface TimelineEvent {
+	kind: TimelineEventKind;
+	fecha: string;
+	payload:
+		| CorrelationErrorLogDto
+		| CorrelationRateLimitEventDto
+		| CorrelationReporteUsuarioDto
+		| CorrelationEmailOutboxDto;
+}
+
+/** Icono PrimeNG por tipo de evento. */
+export const TIMELINE_ICON_MAP: Record<TimelineEventKind, string> = {
+	error: 'pi pi-exclamation-circle',
+	'rate-limit': 'pi pi-shield',
+	reporte: 'pi pi-comment',
+	outbox: 'pi pi-envelope',
+};
+
+/**
+ * Clase CSS por tipo de evento. El color real se aplica vía variable CSS del
+ * design-system (rules/design-system.md §8) en el SCSS del componente.
+ */
+export const TIMELINE_KIND_CLASS_MAP: Record<TimelineEventKind, string> = {
+	error: 'timeline-event--error',
+	'rate-limit': 'timeline-event--rate-limit',
+	reporte: 'timeline-event--reporte',
+	outbox: 'timeline-event--outbox',
+};
+
+/** Label humano por tipo de evento (para badges). */
+export const TIMELINE_KIND_LABEL_MAP: Record<TimelineEventKind, string> = {
+	error: 'Error',
+	'rate-limit': 'Rate limit',
+	reporte: 'Reporte',
+	outbox: 'Correo',
+};
+// #endregion
