@@ -48,6 +48,7 @@
 | 36 | Rediseño UX/UI páginas internas de Monitoreo | FE+BE | ✅ **archivado 2026-04-28** en [history/planes-cerrados.md](../history/planes-cerrados.md#plan-36--rediseño-uxui-páginas-internas-de-monitoreo) | — | — |
 | **40** | **🟡 Load Control Layers (concurrency + bulkheads + timeouts + backpressure)** | **BE** | **(inline en maestro — chat 096 cerró `/adr+/design`)** | **🟡 F1-F5 ✅ cerrados local 2026-05-05 (`awaiting-prod/103-107`). F6a sintético ✅ cerrado (chats 108+111+112 cubrieron esc 01-06 con thresholds STRICT). 6 ADRs en `Educa.API/.claude/decisions/0001-0006`. Stack: handcrafted in-process (capa 2-3 con `RateLimiter`/`SemaphoreSlim`) + Polly 8 (`Microsoft.Extensions.Http.Resilience`) sobre HttpClients CrossChex/WhatsApp. N global = 140, 5 bulkheads (`pagos=15`, `reports=8`, `notif=15`, `uploads=10`, `bio=20`). Backpressure 503 con `Retry-After=max(1,ceil(p95×1.5))` desde Plan 102 RuntimeHealth. **Pendiente**: F6b real prod 30d (en HOLD esperando datos). Test fixture deuda menor: 7 tests pre-existentes de F1/F2 fallan por `IBackpressureRetryAfterCalculator` no registrado en sus fixtures.** | **~85%** |
 | 35 | Rediseño UX/UI submódulo "Monitoreo" (hub + shells) | FE | ✅ **archivado 2026-04-27** en [history/planes-cerrados.md](../history/planes-cerrados.md#plan-35--rediseño-uxui-submódulo-monitoreo-hub--shells) | — | — |
+| **41** | **🟢 Trazabilidad y observabilidad del Hub de Correlación** | **BE+FE** | **[plan/correlation-hub-observability.md](./correlation-hub-observability.md)** | **🟢 Plan abierto 2026-05-08. 12 brechas identificadas tras revisión de `/intranet/admin/correlation/:id` (Plan 32 shipped). 14 chats en 6 fases: F1 timeline FE · F2 enlaces laterales BE+FE · F3 RequestMetric persistido (solo `status>=400`) · F4 breadcrumbs cliente (ADR + BE + FE) · F5 search/export/auto-refresh · F6 SignalR/WAL correlation (alto blast radius — al final). Decisión usuario: cerrar TODAS las brechas. Chat 1 F1 listo para arrancar (brief próximo en `chats/open/`).** | **0%** |
 
 **Semáforo de readiness**:
 
@@ -80,10 +81,11 @@
 
 ### 🟢 Media — mejoras de UX y deuda técnica con dueño claro
 
-4. **[Plan 26 · F3 · `Educa.API` · BE]** — Time-of-day modifier para rate limiting. F2.6 ya cumplió ventana de observación post-deploy (~2026-05-06). Diseño aprobado: margen suave fuera de franja escolar (ej: x1.5 dentro / x1.2 fuera), no corte duro. Calibración con telemetría real `RateLimitEvent`.
-5. **[Plan 33 · Chat 1 · BE+FE]** — Auditoría de paginación de tablas. Clasificar 8 features candidatas (`attendances admin`, `attendance-reports cross-role`, `email-outbox-diagnostico`, `email-outbox-dashboard-dia`, `attendance-day-list`, `responsive-table`, `student-attendance-tab`, `attendance-summary-panel`) y aplicar fix tipo `error-logs admin` donde corresponda. Plan a 5%.
-6. **[WAL Cache Audit · H7 · `educa-web` · FE]** — Normalizar naming `WAL_CACHE_MAP` a camelCase. P1, 1 chat dedicado, riesgo medio-alto (rename cross-archivo).
-7. **[WAL Cache Audit · H2-H6+H10 · `educa-web` · FE]** — Cleanup cosmético + duplicación de patrones. P2, 1 chat, bajo riesgo.
+4. **[Plan 41 · Chat 1 · `educa-web` · FE]** — F1 timeline cronológico unificado en `/intranet/admin/correlation/:id`. Solo FE, 1 chat, alto valor / bajo costo. Resuelve brechas #1 (sin timeline) y #12 (cap defensivo invisible). Brief próximo en `chats/open/`. Punto de entrada del Plan 41 (14 chats totales).
+5. **[Plan 26 · F3 · `Educa.API` · BE]** — Time-of-day modifier para rate limiting. F2.6 ya cumplió ventana de observación post-deploy (~2026-05-06). Diseño aprobado: margen suave fuera de franja escolar (ej: x1.5 dentro / x1.2 fuera), no corte duro. Calibración con telemetría real `RateLimitEvent`.
+6. **[Plan 33 · Chat 1 · BE+FE]** — Auditoría de paginación de tablas. Clasificar 8 features candidatas (`attendances admin`, `attendance-reports cross-role`, `email-outbox-diagnostico`, `email-outbox-dashboard-dia`, `attendance-day-list`, `responsive-table`, `student-attendance-tab`, `attendance-summary-panel`) y aplicar fix tipo `error-logs admin` donde corresponda. Plan a 5%.
+7. **[WAL Cache Audit · H7 · `educa-web` · FE]** — Normalizar naming `WAL_CACHE_MAP` a camelCase. P1, 1 chat dedicado, riesgo medio-alto (rename cross-archivo).
+8. **[WAL Cache Audit · H2-H6+H10 · `educa-web` · FE]** — Cleanup cosmético + duplicación de patrones. P2, 1 chat, bajo riesgo.
 
 ### 🔵 Baja — postpuestos / esperan datos
 
