@@ -3,7 +3,20 @@
 	icon="pi pi-chart-bar"
 	title="Monitoreo"
 	subtitle="Visibilidad de operación del sistema"
-/>
+>
+	<div class="header-actions">
+		<button
+			type="button"
+			class="refresh-btn"
+			(click)="refreshBadges()"
+			[disabled]="badgesLoading()"
+			[attr.aria-label]="'Refrescar métricas'"
+			title="Refrescar métricas"
+		>
+			<i class="pi" [class.pi-refresh]="!badgesLoading()" [class.pi-spinner]="badgesLoading()" [class.pi-spin]="badgesLoading()"></i>
+		</button>
+	</div>
+</app-page-header>
 <!-- #endregion -->
 
 <!-- Plan 39 Chat D — Banner B9 cross-páginas (defer-fail / mailbox-full) -->
@@ -23,7 +36,7 @@
 						<p class="card-description">{{ card.description }}</p>
 					</div>
 					<span class="card-badge">{{ card.links.length }}</span>
-					@if (card.id === 'correos' && deferFailCritical()) {
+					@if (card.id === 'correos-operacion' && deferFailCritical()) {
 						<span
 							class="card-alert-badge"
 							[attr.aria-label]="'Defer/Fail ' + deferFailLevel()"
@@ -37,9 +50,30 @@
 				<ul class="card-links">
 					@for (link of card.links; track link.route) {
 						<li>
-							<a [routerLink]="link.route" class="link-pill">
+							<a [routerLink]="link.route" class="link-pill" [attr.data-badge-level]="link.badge?.level ?? null">
 								<span class="link-label">{{ link.label }}</span>
-								<i class="pi pi-arrow-right"></i>
+								<span class="link-meta">
+									@if (hasBadge(link.badge)) {
+										<span
+											class="link-badge"
+											[attr.data-level]="link.badge!.level"
+											[attr.aria-label]="link.badge!.label"
+											[title]="link.badge!.label"
+										>
+											@if (link.badge!.level === 'critical') {
+												<i class="pi pi-exclamation-circle"></i>
+											} @else if (link.badge!.level === 'warn') {
+												<i class="pi pi-exclamation-triangle"></i>
+											} @else if (link.badge!.level === 'ok') {
+												<i class="pi pi-check"></i>
+											}
+											@if (link.badge!.count !== null) {
+												<span class="link-badge-count">{{ link.badge!.count }}</span>
+											}
+										</span>
+									}
+									<i class="pi pi-arrow-right"></i>
+								</span>
 							</a>
 						</li>
 					}

@@ -8,6 +8,12 @@ import { PERMISOS, PermisoPath } from '@shared/constants';
 import { environment } from '@config/environment';
 import { EmailMonitoreoFacade } from '../email-outbox-dashboard-dia/services';
 import { EmailDeferFailBannerComponent } from '../email-outbox-dashboard-dia/components/email-defer-fail-banner/email-defer-fail-banner.component';
+import { MonitoreoHubBadgesFacade } from './services/monitoreo-hub-badges.facade';
+import {
+	HubBadgeKey,
+	LinkBadge,
+	UNKNOWN_BADGE,
+} from './models/monitoreo-hub-badges.models';
 // #endregion
 
 // #region Types
@@ -18,51 +24,114 @@ interface MonitoreoLink {
 	route: string;
 	permiso: PermisoPath;
 	featureFlag?: FeatureFlagKey;
+	/** Asocia el link con una métrica del badge. Si falta, no se muestra badge. */
+	badgeKey?: HubBadgeKey;
 }
 
 type MonitoreoTone = 'blue' | 'amber' | 'green';
 
+type MonitoreoCardId =
+	| 'correos-operacion'
+	| 'correos-investigacion'
+	| 'correos-defensas'
+	| 'incidencias'
+	| 'seguridad';
+
 interface MonitoreoCard {
-	id: 'correos' | 'incidencias' | 'seguridad';
+	id: MonitoreoCardId;
 	icon: string;
 	title: string;
 	description: string;
 	tone: MonitoreoTone;
 	links: MonitoreoLink[];
 }
+
+interface RenderedLink extends MonitoreoLink {
+	badge: LinkBadge | null;
+}
+
+interface RenderedCard extends Omit<MonitoreoCard, 'links'> {
+	links: RenderedLink[];
+}
 // #endregion
 
 // #region Catálogo declarativo
 const ALL_CARDS: MonitoreoCard[] = [
 	{
-		id: 'correos',
+		id: 'correos-operacion',
 		icon: 'pi pi-envelope',
-		title: 'Correos',
-		description: 'Bandeja, salud del envío, diagnóstico y auditoría del canal SMTP.',
+		title: 'Correos · Operación',
+		description: 'Qué pasó hoy con el envío de correos.',
 		tone: 'blue',
 		links: [
 			{
 				label: 'Bandeja',
 				route: '/intranet/admin/monitoreo/correos/bandeja',
 				permiso: PERMISOS.ADMIN_EMAIL_OUTBOX,
+				badgeKey: 'bandeja',
 			},
 			{
 				label: 'Dashboard del día',
 				route: '/intranet/admin/monitoreo/correos/dashboard',
 				permiso: PERMISOS.ADMIN_EMAIL_OUTBOX_DASHBOARD_DIA,
 				featureFlag: 'emailOutboxDashboardDia',
+				badgeKey: 'dashboard',
 			},
+		],
+	},
+	{
+		id: 'correos-investigacion',
+		icon: 'pi pi-search',
+		title: 'Correos · Investigación',
+		description: 'Análisis post-mortem y forense del canal SMTP.',
+		tone: 'blue',
+		links: [
 			{
 				label: 'Diagnóstico',
 				route: '/intranet/admin/monitoreo/correos/diagnostico',
 				permiso: PERMISOS.ADMIN_EMAIL_OUTBOX_DIAGNOSTICO,
 				featureFlag: 'emailOutboxDiagnostico',
+				badgeKey: 'diagnostico',
 			},
 			{
 				label: 'Auditoría',
 				route: '/intranet/admin/monitoreo/correos/auditoria',
 				permiso: PERMISOS.ADMIN_AUDITORIA_CORREOS,
 				featureFlag: 'auditoriaCorreos',
+			},
+			{
+				label: 'Eventos defer',
+				route: '/intranet/admin/monitoreo/correos/defer-events',
+				permiso: PERMISOS.ADMIN_EMAIL_DEFER_EVENTS,
+				featureFlag: 'emailDeferEventsTab',
+			},
+		],
+	},
+	{
+		id: 'correos-defensas',
+		icon: 'pi pi-shield',
+		title: 'Correos · Defensas',
+		description: 'Destinatarios y dominios bloqueados o pausados.',
+		tone: 'blue',
+		links: [
+			{
+				label: 'Blacklist',
+				route: '/intranet/admin/monitoreo/correos/blacklist',
+				permiso: PERMISOS.ADMIN_EMAIL_BLACKLIST,
+				featureFlag: 'emailBlacklistTab',
+				badgeKey: 'blacklist',
+			},
+			{
+				label: 'Cuarentena',
+				route: '/intranet/admin/monitoreo/correos/quarantine',
+				permiso: PERMISOS.ADMIN_EMAIL_QUARANTINE,
+				featureFlag: 'emailQuarantineTab',
+			},
+			{
+				label: 'Dominios pausados',
+				route: '/intranet/admin/monitoreo/correos/domain-pauses',
+				permiso: PERMISOS.ADMIN_EMAIL_DOMAIN_PAUSES,
+				featureFlag: 'emailDomainPausesTab',
 			},
 		],
 	},
@@ -77,11 +146,13 @@ const ALL_CARDS: MonitoreoCard[] = [
 				label: 'Errores',
 				route: '/intranet/admin/monitoreo/incidencias/errores',
 				permiso: PERMISOS.ADMIN_ERROR_LOGS,
+				badgeKey: 'errores',
 			},
 			{
 				label: 'Reportes de Usuarios',
 				route: '/intranet/admin/monitoreo/incidencias/reportes',
 				permiso: PERMISOS.ADMIN_REPORTES_USUARIO,
+				badgeKey: 'reportes',
 			},
 		],
 	},
@@ -97,6 +168,7 @@ const ALL_CARDS: MonitoreoCard[] = [
 				route: '/intranet/admin/monitoreo/seguridad/rate-limit',
 				permiso: PERMISOS.ADMIN_RATE_LIMIT_EVENTS,
 				featureFlag: 'rateLimitMonitoring',
+				badgeKey: 'rateLimit',
 			},
 		],
 	},
@@ -115,6 +187,7 @@ export class MonitoreoHubComponent {
 	// #region Dependencies
 	private readonly userPermisos = inject(UserPermissionsService);
 	private readonly emailMonitoreo = inject(EmailMonitoreoFacade);
+	private readonly badgesFacade = inject(MonitoreoHubBadgesFacade);
 	// #endregion
 
 	// #region Defer/Fail badge — Plan 39 Chat C
@@ -127,28 +200,49 @@ export class MonitoreoHubComponent {
 	readonly deferFailLevel = computed(() => this.emailMonitoreo.vm().deferFailStatus?.status ?? 'OK');
 	// #endregion
 
+	// #region Badges vivos por sub-link
+	readonly badgesLoading = this.badgesFacade.loading;
+	// #endregion
+
 	constructor() {
 		this.emailMonitoreo.loadDeferFailStatus();
+		void this.badgesFacade.loadAll();
 	}
 
-	// #region Cards visibles (filtradas por permiso + feature flag)
-	readonly cards = computed<MonitoreoCard[]>(() => {
+	// #region Cards visibles (filtradas por permiso + feature flag) con badges resueltos
+	readonly cards = computed<RenderedCard[]>(() => {
 		// Touch the signal to make this reactive when permissions load.
 		this.userPermisos.loaded();
+		const badges = this.badgesFacade.badges();
 
 		return ALL_CARDS.map((card) => ({
 			...card,
-			links: card.links.filter((link) => this.linkVisible(link)),
+			links: card.links
+				.filter((link) => this.linkVisible(link))
+				.map<RenderedLink>((link) => ({
+					...link,
+					badge: link.badgeKey ? badges[link.badgeKey] : null,
+				})),
 		})).filter((card) => card.links.length > 0);
 	});
 
 	readonly hasAnyCard = computed(() => this.cards().length > 0);
 	// #endregion
 
+	// #region Acciones
+	refreshBadges(): void {
+		void this.badgesFacade.refresh();
+	}
+	// #endregion
+
 	// #region Helpers
 	private linkVisible(link: MonitoreoLink): boolean {
 		if (link.featureFlag && !environment.features[link.featureFlag]) return false;
 		return this.userPermisos.tienePermiso(link.permiso);
+	}
+
+	hasBadge(badge: LinkBadge | null): badge is LinkBadge {
+		return !!badge && badge !== UNKNOWN_BADGE;
 	}
 	// #endregion
 }
