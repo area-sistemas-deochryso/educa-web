@@ -189,6 +189,8 @@ Toda mutación sobre la tabla `Asistencia` debe pasar por una de estas dos vías
 
 **INV-AD05 ampliado a profesores (Plan 23 Chat 4, 2026-04-20)**: cuando la persona editada tiene `TipoPersona = 'P'`, el correo de corrección se envía al propio **profesor** (`Profesor.PRO_Correo`) como destinatario único; nunca al apoderado. El outbox se etiqueta como `"ASISTENCIA_CORRECCION_PROFESOR"` / `TipoEntidadOrigen = "AsistenciaProfesor"` para separar bandejas admin. Misma plantilla azul administrativa que para estudiante, con saludo "Estimado/a profesor/a".
 
+**Self-service AA es read-only (Plan 28 Chat 3d, 2026-05-08)**: los endpoints `GET /api/asistente-administrativo/me/dia` y `/me/mes` permiten al Asistente Administrativo consultar **su propia** asistencia (DNI extraído del claim, no de query/route). NO mutan. Toda corrección formal sobre `TipoPersona='A'` sigue pasando por `AsistenciaAdminController` con jurisdicción `Roles.SupervisoresAsistenteAdmin = {Director, Promotor, Coordinador Académico}` (INV-AD08). Análogamente, el endpoint `GET /api/ConsultaAsistencia/director/asistentes-admin-asistencia-dia` da visibilidad agregada al área administrativa (también read-only).
+
 ### 1.9 Precedencia manual sobre biométrica (INV-AD02)
 
 Si ya existe un registro con `ASI_OrigenManual = true` para un estudiante en una fecha, el webhook de CrossChex **descarta silenciosamente** la marcación biométrica de ese día. La validación está en `AsistenciaService.RegistrarAsistencia()`.
