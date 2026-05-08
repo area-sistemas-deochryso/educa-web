@@ -1,8 +1,9 @@
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Injectable, inject } from '@angular/core';
-import { Observable } from 'rxjs';
+import { Observable, map } from 'rxjs';
 
 import { environment } from '@config/environment';
+import { PaginatedResult } from '@core/services/facades/base-crud.facade.types';
 import {
 	CrearEmailDomainPauseDto,
 	EmailDomainPauseListaDto,
@@ -24,7 +25,9 @@ export class EmailDomainPauseService {
 
 	getActivas(activas = true): Observable<EmailDomainPauseListaDto[]> {
 		const params = new HttpParams().set('activas', String(activas));
-		return this.http.get<EmailDomainPauseListaDto[]>(this.apiBase, { params });
+		return this.http
+			.get<PaginatedResult<EmailDomainPauseListaDto>>(this.apiBase, { params })
+			.pipe(map((res) => res?.data ?? []));
 	}
 
 	crear(request: CrearEmailDomainPauseDto): Observable<EmailDomainPauseListaDto> {
