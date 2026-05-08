@@ -20,6 +20,61 @@ export type HubBadgeKey =
 
 export type HubBadges = Record<HubBadgeKey, LinkBadge> & { loading: boolean };
 
+// #region Stat strip — datos visuales prominentes por card
+export interface StatPoint {
+	label: string;
+	value: string | number;
+	level?: BadgeLevel;
+}
+
+export interface CardSummary {
+	/** Métrica destacada en grande (ej: "14"). */
+	headline: string | number;
+	/** Texto pequeño bajo el headline (ej: "pendientes o fallidos hoy"). */
+	headlineLabel: string;
+	/** Nivel del headline → color del número. */
+	headlineLevel: BadgeLevel;
+	/** Hasta 3 stats secundarios en strip horizontal. */
+	stats: StatPoint[];
+}
+
+/** Datos crudos de las métricas; el componente los proyecta a `CardSummary` por card. */
+export interface HubExtras {
+	outbox: {
+		total: number;
+		enviados: number;
+		pendientes: number;
+		fallidos: number;
+	} | null;
+	deferFail: {
+		current: number;
+		threshold: number;
+		percentUsed: number;
+		blacklistActivos: number;
+		last24hTotal: number;
+		last24hSent: number;
+		last24hFailedOther: number;
+	} | null;
+	candidatosBlacklist: number | null;
+	errorsNuevos: number | null;
+	reportesNuevos: number | null;
+	reportesEnProgreso: number | null;
+	rateLimitRechazados: number | null;
+}
+
+export function initialHubExtras(): HubExtras {
+	return {
+		outbox: null,
+		deferFail: null,
+		candidatosBlacklist: null,
+		errorsNuevos: null,
+		reportesNuevos: null,
+		reportesEnProgreso: null,
+		rateLimitRechazados: null,
+	};
+}
+// #endregion
+
 export const UNKNOWN_BADGE: LinkBadge = {
 	count: null,
 	level: 'unknown',

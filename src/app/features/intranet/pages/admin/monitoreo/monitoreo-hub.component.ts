@@ -10,7 +10,10 @@ import { EmailMonitoreoFacade } from '../email-outbox-dashboard-dia/services';
 import { EmailDeferFailBannerComponent } from '../email-outbox-dashboard-dia/components/email-defer-fail-banner/email-defer-fail-banner.component';
 import { MonitoreoHubBadgesFacade } from './services/monitoreo-hub-badges.facade';
 import {
+	BadgeLevel,
+	CardSummary,
 	HubBadgeKey,
+	HubExtras,
 	LinkBadge,
 	UNKNOWN_BADGE,
 } from './models/monitoreo-hub-badges.models';
@@ -52,6 +55,7 @@ interface RenderedLink extends MonitoreoLink {
 
 interface RenderedCard extends Omit<MonitoreoCard, 'links'> {
 	links: RenderedLink[];
+	summary: CardSummary | null;
 }
 // #endregion
 
@@ -209,11 +213,12 @@ export class MonitoreoHubComponent {
 		void this.badgesFacade.loadAll();
 	}
 
-	// #region Cards visibles (filtradas por permiso + feature flag) con badges resueltos
+	// #region Cards visibles (filtradas por permiso + feature flag) con badges + summary
 	readonly cards = computed<RenderedCard[]>(() => {
 		// Touch the signal to make this reactive when permissions load.
 		this.userPermisos.loaded();
 		const badges = this.badgesFacade.badges();
+		const extras = this.badgesFacade.extras();
 
 		return ALL_CARDS.map((card) => ({
 			...card,
@@ -223,10 +228,85 @@ export class MonitoreoHubComponent {
 					...link,
 					badge: link.badgeKey ? badges[link.badgeKey] : null,
 				})),
+			summary: this.buildSummary(card.id, extras),
 		})).filter((card) => card.links.length > 0);
 	});
 
 	readonly hasAnyCard = computed(() => this.cards().length > 0);
+	// #endregion
+
+	// #region Builders de summary por card
+	private buildSummary(id: MonitoreoCardId, x: HubExtras): CardSummary | null {
+		switch (id) {
+			case 'correos-operacion': {
+				if (!x.outbox) return null;
+				const pendFall = x.outbox.pendientes + x.outbox.fallidos;
+				return {
+					headline: pendFall,
+					headlineLabel: 'pendientes o fallidos hoy',
+					headlineLevel: pendFall > 20 ? 'critical' : pendFall >= 5 ? 'warn' : 'ok',
+					stats: [
+						{ label: 'Enviados', value: x.outbox.enviados, level: 'ok' },
+						{ label: 'Pendientes', value: x.outbox.pendientes, level: x.outbox.pendientes > 0 ? 'warn' : 'ok' },
+						{ label: 'Fallidos', value: x.outbox.fallidos, level: x.outbox.fallidos > 0 ? 'critical' : 'ok' },
+					],
+				};
+			}
+			case 'correos-investigacion': {
+				if (!x.deferFail) return null;
+				const pct = Math.round(x.deferFail.percentUsed);
+				return {
+					headline: `${pct}%`,
+					headlineLabel: `del techo cPanel (${x.deferFail.current}/${x.deferFail.threshold} h)`,
+					headlineLevel: pct >= 100 ? 'critical' : pct >= 60 ? 'warn' : 'ok',
+					stats: [
+						{
+							label: 'Candidatos',
+							value: x.candidatosBlacklist ?? '—',
+							level: (x.candidatosBlacklist ?? 0) >= 3 ? 'critical' : (x.candidatosBlacklist ?? 0) >= 1 ? 'warn' : 'ok',
+						},
+						{ label: 'Fallidos 24h', value: x.deferFail.last24hFailedOther, level: x.deferFail.last24hFailedOther > 0 ? 'warn' : 'ok' },
+					],
+				};
+			}
+			case 'correos-defensas': {
+				if (!x.deferFail) return null;
+				const total = x.deferFail.blacklistActivos;
+				return {
+					headline: total,
+					headlineLabel: 'destinatarios bloqueados',
+					headlineLevel: total >= 50 ? 'critical' : total >= 10 ? 'warn' : 'ok',
+					stats: [],
+				};
+			}
+			case 'incidencias': {
+				if (x.errorsNuevos === null && x.reportesNuevos === null) return null;
+				const errs = x.errorsNuevos ?? 0;
+				const reps = x.reportesNuevos ?? 0;
+				return {
+					headline: errs + reps,
+					headlineLabel: 'incidencias requieren atención',
+					headlineLevel: errs + reps >= 5 ? 'critical' : errs + reps >= 1 ? 'warn' : 'ok',
+					stats: [
+						{ label: 'Errores nuevos', value: errs, level: errs >= 3 ? 'critical' : errs >= 1 ? 'warn' : 'ok' },
+						{ label: 'Reportes nuevos', value: reps, level: reps >= 4 ? 'critical' : reps >= 1 ? 'warn' : 'ok' },
+						{ label: 'En progreso', value: x.reportesEnProgreso ?? 0 },
+					],
+				};
+			}
+			case 'seguridad': {
+				if (x.rateLimitRechazados === null) return null;
+				const total = x.rateLimitRechazados;
+				const level: BadgeLevel = total > 10 ? 'critical' : total >= 1 ? 'warn' : 'ok';
+				return {
+					headline: total,
+					headlineLabel: 'rechazos en última hora',
+					headlineLevel: level,
+					stats: [],
+				};
+			}
+		}
+	}
 	// #endregion
 
 	// #region Acciones

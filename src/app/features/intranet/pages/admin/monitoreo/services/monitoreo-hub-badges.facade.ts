@@ -12,9 +12,11 @@ import { RateLimitEventsService } from '@features/intranet/pages/admin/rate-limi
 
 import {
 	HubBadges,
+	HubExtras,
 	LinkBadge,
 	UNKNOWN_BADGE,
 	initialHubBadges,
+	initialHubExtras,
 } from '../models/monitoreo-hub-badges.models';
 // #endregion
 
@@ -41,7 +43,9 @@ export class MonitoreoHubBadgesFacade {
 
 	// #region Estado
 	private readonly _badges = signal<HubBadges>(initialHubBadges());
+	private readonly _extras = signal<HubExtras>(initialHubExtras());
 	readonly badges = this._badges.asReadonly();
+	readonly extras = this._extras.asReadonly();
 	readonly loading = computed(() => this._badges().loading);
 
 	private lastLoadAt = 0;
@@ -90,6 +94,45 @@ export class MonitoreoHubBadgesFacade {
 			loading: false,
 		};
 		this._badges.set(next);
+		this._extras.set(this.collectExtras(
+			bandejaRes, dashboardRes, diagnosticoRes, erroresRes, reportesRes, rateLimitRes,
+		));
+	}
+
+	private collectExtras(
+		bandeja: PromiseSettledResult<{ total: number; enviados: number; pendientes: number; fallidos: number }>,
+		dashboard: PromiseSettledResult<DeferFailStatus | null>,
+		diagnostico: PromiseSettledResult<unknown[]>,
+		errores: PromiseSettledResult<number>,
+		reportes: PromiseSettledResult<{ nuevos: number; enProgreso: number }>,
+		rateLimit: PromiseSettledResult<{ totalRechazados: number }>,
+	): HubExtras {
+		return {
+			outbox: bandeja.status === 'fulfilled'
+				? {
+					total: bandeja.value.total,
+					enviados: bandeja.value.enviados,
+					pendientes: bandeja.value.pendientes,
+					fallidos: bandeja.value.fallidos,
+				}
+				: null,
+			deferFail: dashboard.status === 'fulfilled' && dashboard.value
+				? {
+					current: dashboard.value.currentHour.deferFailCount,
+					threshold: dashboard.value.currentHour.threshold,
+					percentUsed: dashboard.value.currentHour.percentUsed,
+					blacklistActivos: dashboard.value.blacklist.totalActivos,
+					last24hTotal: dashboard.value.last24h.total,
+					last24hSent: dashboard.value.last24h.sent,
+					last24hFailedOther: dashboard.value.last24h.failedOther,
+				}
+				: null,
+			candidatosBlacklist: diagnostico.status === 'fulfilled' ? diagnostico.value.length : null,
+			errorsNuevos: errores.status === 'fulfilled' ? errores.value : null,
+			reportesNuevos: reportes.status === 'fulfilled' ? (reportes.value.nuevos ?? 0) : null,
+			reportesEnProgreso: reportes.status === 'fulfilled' ? (reportes.value.enProgreso ?? 0) : null,
+			rateLimitRechazados: rateLimit.status === 'fulfilled' ? (rateLimit.value.totalRechazados ?? 0) : null,
+		};
 	}
 	// #endregion
 

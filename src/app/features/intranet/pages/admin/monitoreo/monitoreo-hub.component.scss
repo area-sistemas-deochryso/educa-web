@@ -34,17 +34,33 @@
 }
 // #endregion
 
-// #region Layout — grid auto-fit con cards de altura natural
-// Cada card toma altura intrínseca según su contenido (2-3 sub-links).
-// `align-items: start` evita que se estiren todas a la altura del más alto,
-// dando look más balanceado tipo masonry sin las quirks de `column-count`.
+// #region Layout — masonry CSS columns (Pinterest-like)
+// Las cards fluyen top-bottom, llenando columnas. Cero huecos.
+// Trade-off conocido: el orden visual es columnar (1↓3↓5, 2↓4) y no row-first.
+// Aceptable acá porque el contenido de cada card es autocontenido y el orden
+// no implica jerarquía estricta.
 .cards-grid {
-	display: grid;
-	grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-	grid-auto-rows: min-content;
-	align-items: start;
-	gap: 1.25rem;
+	column-gap: 1.25rem;
 	margin-top: 1.5rem;
+	column-count: 3;
+}
+
+// Reglas adicionales para que las cards funcionen dentro de columnas CSS.
+// El `display: flex` ya viene del bloque `.monitoreo-card` original — acá
+// solo agregamos lo de break + el margin que reemplaza al `gap` del grid.
+.monitoreo-card {
+	break-inside: avoid;
+	-webkit-column-break-inside: avoid;
+	page-break-inside: avoid;
+	margin-bottom: 1.25rem;
+	width: 100%;
+}
+
+@media (max-width: 1100px) {
+	.cards-grid { column-count: 2; }
+}
+@media (max-width: 720px) {
+	.cards-grid { column-count: 1; }
 }
 // #endregion
 
@@ -52,8 +68,8 @@
 .monitoreo-card {
 	display: flex;
 	flex-direction: column;
-	gap: 1.25rem;
-	padding: 1.5rem;
+	gap: 1rem;
+	padding: 1.25rem;
 	border: 1px solid var(--surface-300);
 	border-radius: 14px;
 	background: var(--surface-0, #ffffff);
@@ -318,6 +334,98 @@
 			}
 		}
 		// #endregion
+	}
+}
+// #endregion
+
+// #region Card summary — headline + stat strip
+.card-summary {
+	display: flex;
+	flex-direction: column;
+	gap: 0.85rem;
+	padding: 1rem 1.1rem;
+	border-radius: 12px;
+	background: color-mix(in srgb, var(--card-accent) 8%, var(--surface-0, #fff));
+	border: 1px solid color-mix(in srgb, var(--card-accent) 18%, var(--surface-300));
+
+	.summary-headline {
+		display: flex;
+		align-items: baseline;
+		gap: 0.6rem;
+		flex-wrap: wrap;
+
+		.headline-value {
+			font-size: 2rem;
+			font-weight: 700;
+			line-height: 1;
+			color: var(--text-color);
+			letter-spacing: -0.02em;
+
+			&[data-level='warn'] {
+				color: var(--yellow-700, #a16207);
+			}
+
+			&[data-level='critical'] {
+				color: var(--red-700, #b91c1c);
+			}
+
+			&[data-level='ok'] {
+				color: var(--green-700, #15803d);
+			}
+		}
+
+		.headline-label {
+			font-size: 0.85rem;
+			color: var(--text-color-secondary);
+			line-height: 1.3;
+			flex: 1;
+			min-width: 0;
+		}
+	}
+
+	.summary-stats {
+		display: grid;
+		grid-template-columns: repeat(auto-fit, minmax(70px, 1fr));
+		gap: 0.5rem;
+
+		.stat-chip {
+			display: flex;
+			flex-direction: column;
+			align-items: center;
+			gap: 0.15rem;
+			padding: 0.55rem 0.5rem;
+			border-radius: 8px;
+			background: var(--surface-0, #fff);
+			border: 1px solid var(--surface-300);
+			text-align: center;
+
+			.stat-value {
+				font-size: 1.05rem;
+				font-weight: 700;
+				line-height: 1;
+				color: var(--text-color);
+			}
+
+			.stat-label {
+				font-size: 0.7rem;
+				color: var(--text-color-secondary);
+				text-transform: uppercase;
+				letter-spacing: 0.04em;
+				line-height: 1.1;
+			}
+
+			&[data-level='warn'] {
+				border-color: color-mix(in srgb, var(--yellow-500) 50%, transparent);
+				.stat-value { color: var(--yellow-800, #854d0e); }
+			}
+			&[data-level='critical'] {
+				border-color: color-mix(in srgb, var(--red-600) 55%, transparent);
+				.stat-value { color: var(--red-700, #b91c1c); }
+			}
+			&[data-level='ok'] {
+				.stat-value { color: var(--green-700, #15803d); }
+			}
+		}
 	}
 }
 // #endregion

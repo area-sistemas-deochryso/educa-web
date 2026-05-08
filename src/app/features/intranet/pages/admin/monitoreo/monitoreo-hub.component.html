@@ -47,6 +47,27 @@
 					}
 				</header>
 
+				@if (card.summary) {
+					<div class="card-summary" [attr.data-level]="card.summary.headlineLevel">
+						<div class="summary-headline">
+							<span class="headline-value" [attr.data-level]="card.summary.headlineLevel">
+								{{ card.summary.headline }}
+							</span>
+							<span class="headline-label">{{ card.summary.headlineLabel }}</span>
+						</div>
+						@if (card.summary.stats.length > 0) {
+							<div class="summary-stats">
+								@for (stat of card.summary.stats; track stat.label) {
+									<div class="stat-chip" [attr.data-level]="stat.level ?? 'ok'">
+										<span class="stat-value">{{ stat.value }}</span>
+										<span class="stat-label">{{ stat.label }}</span>
+									</div>
+								}
+							</div>
+						}
+					</div>
+				}
+
 				<ul class="card-links">
 					@for (link of card.links; track link.route) {
 						<li>
