@@ -290,7 +290,6 @@
 	display: block;
 	position: relative;
 	min-height: 158px;
-	perspective: 1200px;
 	color: var(--text-color);
 	text-decoration: none;
 
@@ -303,21 +302,14 @@
 	&[data-level='ok']       { --tile-stripe: var(--green-500, #22c55e); }
 }
 
-// #region 3D flip
+// #region Crossfade — sin dead-zone del rotateY 3D
+// La face activa hace fade-in con un sutil scale up; la inactiva fade-out
+// con scale down. Nunca hay un momento donde no se vea nada.
 .tile-inner {
 	position: relative;
 	width: 100%;
 	height: 100%;
 	min-height: inherit;
-	transform-style: preserve-3d;
-	// Curve "standard" de Material — entra y sale suave, sin overshoot.
-	transition: transform 0.75s cubic-bezier(0.4, 0, 0.2, 1);
-	will-change: transform;
-}
-
-.tile:hover .tile-inner,
-.tile:focus-visible .tile-inner {
-	transform: rotateY(180deg);
 }
 
 .tile-face {
@@ -328,9 +320,12 @@
 	background: var(--surface-0, #fff);
 	box-shadow: 0 1px 2px rgba(0, 0, 0, 0.03);
 	overflow: hidden;
-	-webkit-backface-visibility: hidden;
-	backface-visibility: hidden;
-	transition: border-color 0.18s ease, box-shadow 0.18s ease;
+	will-change: opacity, transform;
+	transition:
+		opacity 0.32s cubic-bezier(0.4, 0, 0.2, 1),
+		transform 0.42s cubic-bezier(0.4, 0, 0.2, 1),
+		border-color 0.18s ease,
+		box-shadow 0.18s ease;
 
 	// Stripe lateral común a ambas caras.
 	&::before {
@@ -342,6 +337,33 @@
 		width: 4px;
 		background: var(--tile-stripe);
 	}
+}
+
+// Estado por defecto: front visible, back oculto a la derecha.
+.tile-front {
+	opacity: 1;
+	transform: translateX(0) scale(1);
+}
+
+.tile-back {
+	opacity: 0;
+	transform: translateX(8%) scale(0.96);
+	pointer-events: none;
+}
+
+// Hover/focus: front sale a la izquierda + fade, back entra desde su pos + fade.
+.tile:hover .tile-front,
+.tile:focus-visible .tile-front {
+	opacity: 0;
+	transform: translateX(-8%) scale(0.96);
+	pointer-events: none;
+}
+
+.tile:hover .tile-back,
+.tile:focus-visible .tile-back {
+	opacity: 1;
+	transform: translateX(0) scale(1);
+	pointer-events: auto;
 }
 
 .tile[data-level='critical'] .tile-face {
@@ -467,7 +489,6 @@
 
 // #region Back face — descripción + CTA
 .tile-back {
-	transform: rotateY(180deg);
 	display: flex;
 	flex-direction: column;
 	gap: 0.5rem;
@@ -562,20 +583,19 @@
 }
 // #endregion
 
-// #region Reduced motion — sin flip si el usuario lo prefiere
+// #region Reduced motion — fade simple sin slide ni scale
 @media (prefers-reduced-motion: reduce) {
-	.tile-inner {
-		transition: none;
+	.tile-face {
+		transition: opacity 0.2s ease;
 	}
-	.tile:hover .tile-inner,
-	.tile:focus-visible .tile-inner {
-		// Sin flip; usar opacity crossfade en su lugar.
+	.tile-front,
+	.tile-back,
+	.tile:hover .tile-front,
+	.tile:hover .tile-back,
+	.tile:focus-visible .tile-front,
+	.tile:focus-visible .tile-back {
 		transform: none;
-		.tile-front { opacity: 0; }
-		.tile-back  { opacity: 1; transform: none; }
 	}
-	.tile-back { opacity: 0; transition: opacity 0.2s ease; transform: none; }
-	.tile-front { opacity: 1; transition: opacity 0.2s ease; }
 }
 // #endregion
 
