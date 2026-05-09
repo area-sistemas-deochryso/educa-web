@@ -1,7 +1,5 @@
 # FE — Plan 42 Fase 2-FE: Endurecer recepción de casing en contratos REST
 
-<!-- minimal-from-go -->
-
 > **Repo destino**: `educa-web` (main)
 > **Estado**: 🟡 F1 ✅ cerrada 2026-05-09 (Rama A confirmada) · F2-FE pendiente arrancar
 > **Creado**: 2026-05-09 · **Modo sugerido**: `/investigate` → `/execute` → `/validate`
@@ -78,3 +76,37 @@ Auditoría `/investigate` 2026-05-09 reveló que:
 - Plan padre: [`plan/case-drift.md`](../../plan/case-drift.md)
 - Hallazgo CORS Expose-Headers: probable bug latente que Plan 41 ya está pagando (BE F2-BE.4 lo desbloquea).
 - Convención WAL endpoint paths: [`api-schema-versions.ts`](../../../src/app/shared/constants/api-schema-versions.ts)
+
+## RESULTADO (2026-05-09)
+
+### Audits
+
+- **F2-FE.1** (`grep "obj\.[A-Z]"` en `src/app/`): **0 hallazgos**. Confirma Rama A — el código FE no accede a fields PascalCase en runtime.
+- **F2-FE.4** (`HttpParams` keys): 100% camelCase consistente en los 13 services con `HttpParams`. Hallazgo lateral: `health-justification-dialog.component.ts:242-262` usa **FormData PascalCase** (`EstudianteId`, `SalonId`, `Fechas`, `Observacion`). Funciona por model binding case-insensitive de ASP.NET Core, pero rompe convención FE. **Deuda menor** — fuera del scope del brief, candidato a follow-up si se prioriza.
+- **F2-FE.5** (headers `X-*`): consistentes en formato `X-Pascal-Case`. Sin drift. (HTTP headers son case-insensitive de todos modos.)
+
+### Cambio aplicado (F2-FE.3)
+
+- [`wal.service.ts`](../../../src/app/core/services/wal/wal.service.ts) — `WalService.normalizeEndpoint()` (helper estático): lowercase del path + preserva query string. Aplicado en `append()` antes de persistir. Comentario referencia INV-CONTRACT03.
+- [`wal.service.spec.ts`](../../../src/app/core/services/wal/wal.service.spec.ts) — nuevo. 7 tests (5 normalizeEndpoint + 2 append integration).
+- Decisión de diseño: **preservar query string** porque puede llevar valores case-sensitive (ej: `correlationId=ABC123`).
+
+### Validación
+
+- Lint: limpio. 1 warning pre-existente no relacionado (`crosschex-sync-banner.component.spec.ts`).
+- WAL specs: **119/119 ✅** (10 archivos).
+- Suite full: **1953/1955 ✅**. 2 fallos pre-existentes confirmados con `git stash` (`cursos.facade.spec` cross-tab + `home.component.spec` rol Asistente Administrativo). No relacionados con este brief.
+
+### Aprendizajes
+
+- La normalización `.toLowerCase()` ingenua del endpoint completo rompe valores case-sensitive en query string. **Patrón correcto**: split por `?`, lowercase solo el path, preservar la query.
+- `WAL_CACHE_MAP` keys (`@core/services/wal/models/wal.models.ts`) usa nombres de resource camelCase (`'usuarios'`, `'horarios'`) — consistente con la nueva normalización del path.
+- F2-FE.4 reveló que el ámbito "casing en contratos REST" excede `HttpParams`: FormData multipart también es vector. El plan original no lo cubría — registrar para F4 si se hace pass barrida.
+
+### Criterios de salida
+
+- ✅ F2-FE.1 reporta 0 bugs Rama C.
+- ✅ F2-FE.3 commit con WAL endpoint normalize + 7 tests verdes.
+- ✅ F2-FE.4-5 cierran sin drift en scope del brief; drift colateral (FormData) documentado para follow-up.
+- ✅ Lint + tests verdes (excepto 2 fallos pre-existentes ajenos).
+- N/A F1 ya cerrada antes de arrancar este brief.
