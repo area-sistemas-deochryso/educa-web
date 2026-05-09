@@ -8,6 +8,7 @@ import { ChangeDetectionStrategy, Component, ViewChild, AfterViewInit, computed,
 import { ActivatedRoute } from '@angular/router';
 
 import { AttendanceApoderadoComponent } from './attendance-apoderado/attendance-apoderado.component';
+import { AttendanceAsistenteAdminPropiaComponent } from './attendance-asistente-admin/propia/attendance-asistente-admin-propia.component';
 import { AttendanceDirectorComponent } from './attendance-director/attendance-director.component';
 import { AttendanceEstudianteComponent } from './attendance-estudiante/attendance-estudiante.component';
 import { AttendanceProfesorComponent } from './attendance-profesor/attendance-profesor.component';
@@ -36,6 +37,7 @@ import { APP_USER_ROLES } from '@app/shared/constants';
 		AttendanceProfesorComponent,
 		AttendanceDirectorComponent,
 		AttendanceEstudianteComponent,
+		AttendanceAsistenteAdminPropiaComponent,
 	],
 	templateUrl: './attendance.component.html',
 	styleUrl: './attendance.component.scss',
@@ -49,6 +51,8 @@ export class AttendanceComponent implements AfterViewInit {
 	@ViewChild(AttendanceProfesorComponent) profesorComponent?: AttendanceProfesorComponent;
 	@ViewChild(AttendanceDirectorComponent) directorComponent?: AttendanceDirectorComponent;
 	@ViewChild(AttendanceEstudianteComponent) estudianteComponent?: AttendanceEstudianteComponent;
+	@ViewChild(AttendanceAsistenteAdminPropiaComponent)
+	asistenteAdminComponent?: AttendanceAsistenteAdminPropiaComponent;
 
 	// * Local state mirrors the profile signal to drive header + role switch.
 	readonly userRole = this.userProfile.userRole;
@@ -56,13 +60,15 @@ export class AttendanceComponent implements AfterViewInit {
 	readonly selectedMode = signal<ViewMode>(VIEW_MODE.Dia);
 
 	// * El pill día/mes aplica solo cuando el usuario mira a otros (no a sí mismo).
-	//   - Admin: siempre aplica.
-	//   - Profesor: solo cuando tab "Mis estudiantes" está activa (reportado vía output del shell).
-	//   - Estudiante / Apoderado: nunca aplica — su vista propia es mensual pura.
+	//   - Director / Promotor / Coordinador Académico: siempre aplica (panel admin).
+	//   - Asistente Administrativo: NO aplica — viendo /intranet/asistencia ve su
+	//     propia asistencia (mensual pura). Plan 28 Chat 4a.
+	//   - Profesor: solo cuando tab "Mis estudiantes" está activa.
+	//   - Estudiante / Apoderado: nunca aplica — vista propia mensual.
 	private readonly profesorShowModeSelector = signal(false);
 	readonly showModeSelector = computed(() => {
 		const role = this.userRole();
-		if (this.isAdminRole(role)) return true;
+		if (this.isDirectorPanelRole(role)) return true;
 		if (role === APP_USER_ROLES.Profesor) return this.profesorShowModeSelector();
 		return false;
 	});
@@ -88,7 +94,7 @@ export class AttendanceComponent implements AfterViewInit {
 		const role = this.userRole();
 		if (role === APP_USER_ROLES.Profesor) {
 			this.profesorComponent?.setViewMode(mode);
-		} else if (this.isAdminRole(role)) {
+		} else if (this.isDirectorPanelRole(role)) {
 			this.directorComponent?.setViewMode(mode);
 		}
 	}
@@ -100,17 +106,24 @@ export class AttendanceComponent implements AfterViewInit {
 			this.apoderadoComponent?.reload();
 		} else if (role === APP_USER_ROLES.Profesor) {
 			this.profesorComponent?.reload();
-		} else if (this.isAdminRole(role)) {
+		} else if (this.isDirectorPanelRole(role)) {
 			this.directorComponent?.reload();
+		} else if (role === APP_USER_ROLES.AsistenteAdministrativo) {
+			this.asistenteAdminComponent?.reload();
 		} else if (role === APP_USER_ROLES.Estudiante) {
 			this.estudianteComponent?.reload();
 		}
 	}
 
-	private isAdminRole(role: string): boolean {
+	/**
+	 * Roles que ven el panel admin de asistencia (estudiantes + profesores agregados).
+	 * Excluye al Asistente Administrativo: bajo Plan 28 Chat 4a el AA viendo
+	 * /intranet/asistencia ve SU PROPIA asistencia. Las correcciones formales sobre
+	 * 'A' las hacen los supervisores vía /intranet/admin/asistencias (INV-AD08).
+	 */
+	private isDirectorPanelRole(role: string): boolean {
 		return (
 			role === APP_USER_ROLES.Director ||
-			role === APP_USER_ROLES.AsistenteAdministrativo ||
 			role === APP_USER_ROLES.Promotor ||
 			role === APP_USER_ROLES.CoordinadorAcademico
 		);

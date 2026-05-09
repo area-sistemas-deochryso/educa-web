@@ -4,22 +4,25 @@ import { SelectButton } from 'primeng/selectbutton';
 
 import { ViewMode } from '@features/intranet/components/attendance/attendance-header/attendance-header.component';
 
+import { AttendanceDirectorAsistentesAdminComponent } from './asistentes-admin/attendance-director-asistentes-admin.component';
 import { AttendanceDirectorEstudiantesComponent } from './estudiantes/attendance-director-estudiantes.component';
 import { AttendanceDirectorProfesoresComponent } from './profesores/attendance-director-profesores.component';
 
 /**
- * Shell del panel admin de asistencia (Director + 3 administrativos no-Director).
- * Expone un submenú Estudiantes/Profesores (Plan 21 Chat 3) que delega la lógica
- * a dos componentes hermanos especializados.
+ * Shell del panel admin de asistencia (Director + Promotor + Coordinador Académico
+ * tras Plan 28 Chat 4a — el Asistente Administrativo va a self-service propia,
+ * no a este panel). Expone un submenú Estudiantes/Profesores/AsistentesAdmin que
+ * delega la lógica a tres componentes hermanos especializados.
  *
- * Tras Plan 21 Chat 7, ambos sub-componentes responden al pill día/mes del header
- * cross-role — `setViewMode` y `reload` se delegan al componente activo.
+ * Tras Plan 21 Chat 7 + Plan 28 Chat 4b-tab, los tres sub-componentes responden
+ * al pill día/mes del header cross-role (mes degradado en AAs hasta endpoint BE).
  */
-type SubMenu = 'estudiantes' | 'profesores';
+type SubMenu = 'estudiantes' | 'profesores' | 'asistentes-admin';
 
 const SUBMENU_OPTIONS: { label: string; value: SubMenu; icon: string }[] = [
 	{ label: 'Estudiantes', value: 'estudiantes', icon: 'pi pi-graduation-cap' },
 	{ label: 'Profesores', value: 'profesores', icon: 'pi pi-user' },
+	{ label: 'Asistentes Admin', value: 'asistentes-admin', icon: 'pi pi-id-card' },
 ];
 
 @Component({
@@ -30,6 +33,7 @@ const SUBMENU_OPTIONS: { label: string; value: SubMenu; icon: string }[] = [
 		FormsModule,
 		AttendanceDirectorEstudiantesComponent,
 		AttendanceDirectorProfesoresComponent,
+		AttendanceDirectorAsistentesAdminComponent,
 	],
 	templateUrl: './attendance-director.component.html',
 	styleUrl: './attendance-director.component.scss',
@@ -41,6 +45,9 @@ export class AttendanceDirectorComponent {
 
 	@ViewChild(AttendanceDirectorProfesoresComponent)
 	profesoresComponent?: AttendanceDirectorProfesoresComponent;
+
+	@ViewChild(AttendanceDirectorAsistentesAdminComponent)
+	asistentesAdminComponent?: AttendanceDirectorAsistentesAdminComponent;
 
 	readonly selectedSubMenu = signal<SubMenu>('estudiantes');
 	readonly submenuOptions = SUBMENU_OPTIONS;
@@ -68,20 +75,32 @@ export class AttendanceDirectorComponent {
 	}
 
 	reload(): void {
-		if (this.selectedSubMenu() === 'estudiantes') {
-			this.estudiantesComponent?.reload();
-		} else {
-			this.profesoresComponent?.reload();
+		switch (this.selectedSubMenu()) {
+			case 'estudiantes':
+				this.estudiantesComponent?.reload();
+				break;
+			case 'profesores':
+				this.profesoresComponent?.reload();
+				break;
+			case 'asistentes-admin':
+				this.asistentesAdminComponent?.reload();
+				break;
 		}
 	}
 
 	private applyPendingViewMode(): void {
 		const mode = this.pendingViewMode;
 		if (!mode) return;
-		if (this.selectedSubMenu() === 'estudiantes') {
-			this.estudiantesComponent?.setViewMode(mode);
-		} else {
-			this.profesoresComponent?.setViewMode(mode);
+		switch (this.selectedSubMenu()) {
+			case 'estudiantes':
+				this.estudiantesComponent?.setViewMode(mode);
+				break;
+			case 'profesores':
+				this.profesoresComponent?.setViewMode(mode);
+				break;
+			case 'asistentes-admin':
+				this.asistentesAdminComponent?.setViewMode(mode);
+				break;
 		}
 	}
 }

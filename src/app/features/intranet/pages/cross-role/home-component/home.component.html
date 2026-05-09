@@ -10,6 +10,10 @@
 		<app-profesor-attendance-widget />
 	}
 
+	@if (showAsistenteAdminWidget()) {
+		<app-asistente-admin-attendance-widget />
+	}
+
 	@if (showQuickAccess()) {
 		<section class="quick-access">
 			<div class="quick-access-header">

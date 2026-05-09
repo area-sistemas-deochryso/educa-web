@@ -1,0 +1,16 @@
+<!-- #region Template -->
+<!-- * Plan 28 Chat 4b-tab: día-only para AAs (mes pendiente de endpoint paginado en BE). -->
+<app-attendance-legend />
+
+<app-attendance-persona-day-list
+	[personas]="personasDia()"
+	[fecha]="fechaDia()"
+	[estadisticas]="estadisticasDia()"
+	[loading]="loading()"
+	[showPdfButton]="false"
+	[allowJustify]="false"
+	[showEditAdminAction]="true"
+	(fechaChange)="onFechaDiaChange($event)"
+	(editAdmin)="onEditarEnAdminDia($event)"
+/>
+<!-- #endregion -->

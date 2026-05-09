@@ -23,7 +23,11 @@
 			<app-attendance-director />
 		}
 		@case ('Asistente Administrativo') {
-			<app-attendance-director />
+			<!-- * Plan 28 Chat 4a: AA viendo /intranet/asistencia ve su propia asistencia,
+			     no el panel admin. Las correcciones formales sobre 'A' las hacen los
+			     supervisores (Director, Promotor, Coordinador Académico) vía
+			     /intranet/admin/asistencias — INV-AD08. -->
+			<app-attendance-asistente-admin-propia />
 		}
 		@case ('Promotor') {
 			<app-attendance-director />
