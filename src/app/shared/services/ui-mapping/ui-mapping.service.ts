@@ -80,10 +80,11 @@ const NOTIFICACION_PRIORIDAD_LABEL: Record<NotificacionPrioridad, string> = {
 };
 // #endregion
 
-// #region Tipo Persona (Plan 21)
+// #region Tipo Persona (Plan 21 + Plan 28 — 'A' Asistente Administrativo)
 const TIPO_PERSONA_LABEL: Record<TipoPersona, string> = {
 	E: 'Estudiante',
 	P: 'Profesor',
+	A: 'Asistente Administrativo',
 };
 // #endregion
 

@@ -108,9 +108,9 @@ export type AttendanceStatus = 'A' | 'T' | 'F' | 'J' | '-' | 'X';
 
 /**
  * Discriminador polimórfico de `AsistenciaPersona` (backend):
- * 'E' = Estudiante, 'P' = Profesor.
+ * 'E' = Estudiante, 'P' = Profesor, 'A' = Asistente Administrativo (Plan 28).
  */
-export const TIPO_PERSONA = ['E', 'P'] as const;
+export const TIPO_PERSONA = ['E', 'P', 'A'] as const;
 export type TipoPersona = (typeof TIPO_PERSONA)[number];
 
 // #endregion
@@ -122,6 +122,23 @@ export type TipoPersona = (typeof TIPO_PERSONA)[number];
  */
 export interface AsistenciaProfesorDto {
 	profesorId: number;
+	dni: string;
+	nombreCompleto: string;
+	sede: string;
+	sedeId: number;
+	tipoPersona: TipoPersona;
+	asistencias: AsistenciaDetalle[];
+}
+// #endregion
+
+// #region DTO Asistente Administrativo (Plan 28 Chat 4 backend)
+
+/**
+ * Espejo frontend de `AsistenciaAsistenteAdminDto` (backend).
+ * Vista de un Asistente Administrativo con sus asistencias en un rango dado.
+ */
+export interface AsistenciaAsistenteAdminDto {
+	asistenteAdminId: number;
 	dni: string;
 	nombreCompleto: string;
 	sede: string;
@@ -195,6 +212,15 @@ export interface AsistenciaDiaProfesoresConEstadisticas {
 	profesores: AsistenciaProfesorDto[];
 	estadisticas: EstadisticasAsistenciaDia;
 }
+
+/**
+ * Respuesta del endpoint de asistencia del día de Asistentes Administrativos (Plan 28 Chat 3d).
+ * GET /api/ConsultaAsistencia/director/asistentes-admin-asistencia-dia
+ */
+export interface AsistenciaDiaAsistentesAdminConEstadisticas {
+	asistentesAdmin: AsistenciaAsistenteAdminDto[];
+	estadisticas: EstadisticasAsistenciaDia;
+}
 // #endregion
 
 // #region Persona polimórfica para day-list compartido (Plan 21 Chat 7)
@@ -224,6 +250,19 @@ export function profesorToPersonaAsistencia(profesor: AsistenciaProfesorDto): Pe
 		dni: profesor.dni,
 		nombreCompleto: profesor.nombreCompleto,
 		asistencias: profesor.asistencias,
+	};
+}
+
+/** Adapter: asistente administrativo → persona (preserva tipoPersona='A'). */
+export function asistenteAdminToPersonaAsistencia(
+	aa: AsistenciaAsistenteAdminDto,
+): PersonaAsistencia {
+	return {
+		personaId: aa.asistenteAdminId,
+		tipoPersona: aa.tipoPersona,
+		dni: aa.dni,
+		nombreCompleto: aa.nombreCompleto,
+		asistencias: aa.asistencias,
 	};
 }
 
