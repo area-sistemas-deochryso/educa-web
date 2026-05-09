@@ -3,11 +3,25 @@
 <!-- minimal-from-go -->
 
 > **Repo destino**: `educa-web` (main)
-> **Estado**: ⏳ pendiente arrancar (depende de F1 común — ver abajo)
+> **Estado**: 🟡 F1 ✅ cerrada 2026-05-09 (Rama A confirmada) · F2-FE pendiente arrancar
 > **Creado**: 2026-05-09 · **Modo sugerido**: `/investigate` → `/execute` → `/validate`
-> **Plan padre**: [`plan/case-drift.md`](../../plan/case-drift.md)
+> **Plan padre**: [`plan/case-drift.md`](../../plan/case-drift.md) · ver §"Resultado F1"
 > **Brief par cross-repo**: `Educa.API/.claude/chats/open/004-be-case-drift-normalization.md`
 > **Origen**: creado por `/go` 2026-05-09 tras auditoría dual que detectó mito documental en `Educa.API/Program.cs:74` + 4 políticas de serialización distintas en BE.
+
+## ACTUALIZACIÓN 2026-05-09 — F1 cerrada, scope F2-FE reducido
+
+F1 ejecutada vía análisis estático exhaustivo + inspección binaria de `Microsoft.AspNetCore.Mvc.NewtonsoftJson.dll`. Resultado: **Rama A** — BE ya emite camelCase consistente (convención implícita de `AddNewtonsoftJson()` vía `NewtonsoftJsonMvcOptionsSetup` interno del package).
+
+**Tareas F2-FE actualizadas** (recortadas tras F1):
+
+- ✅ **F2-FE.1 audit `obj.PascalCase`**: pendiente, esperable 0 hallazgos por evidencia indirecta (1535+ tests verdes + producción operativa).
+- ❌ **F2-FE.2 `normalizeKeys()` defensivo**: descartado — BE ya consistente, agregar normalización es coste sin beneficio.
+- ✅ **F2-FE.3 WAL endpoint `.toLowerCase()`**: sigue siendo válido, alinea persistencia con `api-schema-versions.ts`.
+- ✅ **F2-FE.4 audit query params (`HttpParams`)**: pendiente, auditoría preventiva.
+- ✅ **F2-FE.5 audit headers custom (`X-Request-Id`, `X-Schema-Version`)**: pendiente, auditoría preventiva.
+
+F2-BE puede arrancar en paralelo (commit del brief 004 BE).
 
 ## CONTEXTO
 

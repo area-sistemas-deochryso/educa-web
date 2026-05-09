@@ -40,6 +40,67 @@ Hipótesis a verificar empíricamente:
 
 ---
 
+## Resultado F1 (2026-05-09, chat 138 educa-web)
+
+**🟢 Rama A — BE ya emite camelCase consistente. El "mito documental" denunciado por el plan inicial era falso mito.**
+
+### Cómo se verificó
+
+Sin acceso a internet ni BE corriendo, se descartaron las hipótesis vía análisis estático exhaustivo + inspección binaria:
+
+1. **Hipótesis (d) descartada** — grep exhaustivo en `Educa.API/**` por `ContractResolver`, `CamelCasePropertyNames`, `JsonNamingPolicy`, `PropertyNamingPolicy`, `DefaultContractResolver`: 0 ocurrencias en código fuente. Las únicas referencias a camelCase explícitas son `System.Text.Json` (SignalR/`Program.cs:78`, `GlobalExceptionMiddleware`, `PayloadSanitizer`), no Newtonsoft.
+2. **Hipótesis (e) descartada** — grep por `IConfigureOptions<MvcOptions>`, `MvcNewtonsoftJsonOptions`, `IConfigureNamedOptions`, `JsonSerializerSettings`, `UseMemberCasing`, `AddJsonOptions`: 0 ocurrencias.
+3. **Hipótesis (b) descartada** — todas las `JsonProperty`/`JsonPropertyName` del proyecto están en payloads de **integraciones externas** (`DTOs/Asistencia/Record.cs`, `Models/External/AttendanceRecord.cs` — CrossChex), no en DTOs REST FE↔BE.
+4. **Hipótesis (c) altamente improbable** — el FE TS tiene 1535+ tests verdes consumiendo BE y producción opera con apoderados/profesores recibiendo datos. Si BE emitiera PascalCase, los accesos `response.success` en FE serían `undefined` y todo estaría roto.
+5. **Hipótesis (a) confirmada vía inspección binaria del package** — `grep -ao` sobre `bin/Debug/net9.0/Microsoft.AspNetCore.Mvc.NewtonsoftJson.dll` extrae los strings:
+   - `NewtonsoftJsonMvcOptionsSetup` (clase interna `IConfigureOptions<MvcOptions>` de Microsoft)
+   - `CamelCaseNamingStrategy`
+   - `DefaultContractResolver`
+   - `NamingStrategy`
+   - `ContractResolver`
+   Match exacto con la implementación oficial de Microsoft: cuando se invoca `AddNewtonsoftJson()`, el package registra automáticamente vía un `IConfigureOptions<MvcOptions>` interno: `JsonSerializerSettings.ContractResolver = new DefaultContractResolver { NamingStrategy = new CamelCaseNamingStrategy() }`. Es invisible a grep en código del proyecto porque vive en el package, no en `Program.cs`.
+
+### Implicancia para F2/F3/F4
+
+- **F2-BE.1** (setear `CamelCasePropertyNamesContractResolver` explícito en `Program.cs:32-38`): **opcional, pero recomendado como defensa en profundidad**. Si Microsoft cambia el default en .NET 10+, el contrato no rompe. **Coste**: 1 línea + comentario citando este plan.
+- **F2-BE.2** (audit DTOs sensibles): puede recortarse a un grep rápido de `[JsonProperty]` en DTOs no externos — esperable 0 hallazgos fuera de `DTOs/Asistencia/Record.cs` y `Models/External/*`.
+- **F2-BE.3** (overrides explícitos en DTOs externos): aplicar solo a payloads CrossChex/JaaS si no los tienen ya. Hoy todos los payloads externos usan `[JsonProperty(...)]` o `[JsonPropertyName(...)]` con casing explícito.
+- **F2-BE.4** (CORS Expose-Headers `X-Correlation-Id, X-Schema-Version`): **sigue siendo crítica**. El hallazgo lateral del Plan 41 (correlation hub potencialmente roto en navegador real) sigue vivo y es el riesgo prioritario.
+- **F2-BE.5** (snapshot test de contrato): **sigue siendo recomendable**. Convierte la convención implícita en garantía explícita verificada en CI.
+- **F2-FE.1** (audit `obj.PascalCase`): probablemente 0 hallazgos (Rama C descartada por evidencia operativa). Mantener el grep como confirmación.
+- **F2-FE.2** (`normalizeKeys()` defensivo en interceptor): **descartado**. BE ya es consistente; agregar normalización agrega coste sin beneficio.
+- **F2-FE.3** (WAL endpoint normalize lowercase): **sigue siendo válido** — mejora consistencia interna entre `WalService.add()` y `api-schema-versions.ts`.
+- **F2-FE.4-5** (audit query params + headers custom): siguen siendo valiosos como auditoría preventiva.
+- **F4 docs** (INV-CONTRACT01/02/03): **sigue siendo crítica**. Convierte el contrato en invariante documentado y elimina el riesgo de "comentario aspiracional".
+
+### Comentarios sobre `Program.cs:74`
+
+El comentario fue mal interpretado por la auditoría inicial:
+
+```csharp
+// SignalR (camelCase para que coincida con los controllers HTTP)
+builder.Services.AddSignalR()
+    .AddJsonProtocol(options =>
+    {
+        options.PayloadSerializerOptions.PropertyNamingPolicy = System.Text.Json.JsonNamingPolicy.CamelCase;
+    });
+```
+
+La afirmación "para que coincida con los controllers HTTP" es **correcta** — los controllers HTTP sí emiten camelCase vía la convención implícita. SignalR usa un protocolo distinto (`System.Text.Json` vs Newtonsoft) y necesita configuración explícita; HTTP REST no la necesita por convención del package. El comentario dejaría de ser ambiguo si se reescribiera como `// SignalR (alinear casing con los controllers HTTP que ya usan CamelCaseNamingStrategy por convención de AddNewtonsoftJson)`.
+
+### Hallazgos secundarios validados como reales
+
+- **Hallazgo #6 (CORS Expose-Headers incompleto)** — sigue siendo bug real. Plan 41 puede estar pagando este costo en navegador real.
+- **Hallazgo #7 (WAL endpoint paths sin normalize en persistencia)** — bug real menor, fix simple en F2-FE.3.
+- **Hallazgo #2 (4 políticas distintas)** — relativamente cosmético: HTTP REST y SignalR ya están alineados en camelCase aunque por mecanismos distintos (Newtonsoft convención vs `System.Text.Json` explícito). `GlobalExceptionMiddleware` y `PayloadSanitizer` también emiten camelCase. La crítica del plan inicial ("4 políticas distintas") era estilística, no funcional.
+- **Hallazgo #1 (mito documental)** — **falso positivo de la auditoría inicial**. El comentario es correcto.
+
+### Decisión
+
+**Avanzar a Rama A reducida**: F2-BE recortado a CORS + tests + override defensivo opcional. F2-FE recortado a WAL normalize + audits preventivos (sin interceptor defensivo). F4 sigue intacto. F2-BE y F2-FE pueden correr en paralelo sin riesgo de Rama C.
+
+---
+
 ## Estrategia: Plan dual coordinado
 
 ```
