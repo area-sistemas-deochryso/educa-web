@@ -70,6 +70,10 @@
 
 ### 🔴 Crítico — afecta producción hoy
 
+> **Agendado lunes 2026-05-11**: Cowork re-valida brief 131 (timeline cronológico Plan 41 F1). Verificar primero que commit `b9543ed` esté en bundle Netlify prod — Cowork detectó 2026-05-09 que la UI prod sigue mostrando versión vieja agrupada por fuente. Si el commit no llegó al deploy: escalar merge / redeploy manual. Luego re-correr PROD-11 del handoff.
+>
+> **Próximo chat BE (Plan 40 F4 backpressure)**: brief 106 quedó en verificación parcial — el queue del bulkhead absorbió 12 PDFs concurrentes sin emitir 503. Tarea: agregar test integración server-side que sature `concurrency:reports` con `cap_max + queue_max + 1` requests sintéticos contra `WebApplicationFactory` y verifique 503 con header `Retry-After` numérico + body `retryAfterSeconds`. Verificar primero si ya existe en `Plan40F2BulkheadIntegrationTests.cs` o vecinos. Repo: `Educa.API`.
+
 1. **[Plan 29 · Chat 3 · OPS]** — Negociar con hosting cPanel para subir `max_defer_fail_percentage` de 5/h a 25-30/h o ~50 absoluto + decidir política CrossChex SMTP (desactivar / migrar / esperar Plan 24). **Razón**: hoy un solo correo inválido puede bloquear el dominio entero 60 min. Las defensas FE/BE están en producción pero el techo sigue bajo. Sin brief — lo ejecuta el usuario en el admin cPanel. Cierra Plan 29 al 100%.
 
 ### 🟡 Alta — desbloquea features pedidas

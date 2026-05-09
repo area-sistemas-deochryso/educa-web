@@ -5,6 +5,8 @@
 > **Creado**: 2026-05-05 · **Modo sugerido**: `/execute` → `/validate`
 > **Bloqueado por**: F1 (chat 103) cerrado. Plan 102 (`be-runtime-health-execute`) en `closed/` (necesitamos `RuntimeHealth` con p95 expuesto).
 > **Bloquea a**: F6a, F6b.
+> **Validación prod 2026-05-09 (sábado)**: ⚠️ parcial — Cowork no pudo disparar 503 + `Retry-After` sin sobrecargar prod (queue del bulkhead absorbió 12 PDFs concurrentes). Telemetría histórica `rate-limit-events` con 48 eventos `policy=reports` corresponden a rate-limit/min, NO al bulkhead. Contrato verificado en código (`BackpressureRetryAfterCalculatorTests.cs`).
+> **Próximo chat (BE)**: agregar test integración server-side que sature `concurrency:reports` con `cap_max + queue_max + 1` requests sintéticos contra `WebApplicationFactory` y verifique 503 con header `Retry-After` numérico + body `retryAfterSeconds`. Verificar primero si ya existe en `Plan40F2BulkheadIntegrationTests.cs` o vecinos. Si existe → referenciar y `/verify 106`. Si no → crear test, deploy, re-validar.
 
 ## CONTEXTO
 
