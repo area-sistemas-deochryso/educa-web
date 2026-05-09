@@ -1,6 +1,6 @@
 # Enforcement de Reglas — De Documentación a Restricción Técnica
 
-> **Estado**: Fase 1 completada (2026-04-09), Fase 2 completada (2026-04-13), Fases 3-5 pendientes
+> **Estado**: F1 ✅ (2026-04-09) · F2 ✅ (2026-04-13) · F3 ✅ · F4 parcial ✅ (CI pipeline corre lint+build+test) · **F5 ⏳ promocionada 2026-05-09 a [`plan/enforcement-fase-5-wrappers.md`](../plan/enforcement-fase-5-wrappers.md)** (brief en `chats/open/137-fe-enforcement-f5-wrapper-hardening.md`)
 > **Prioridad**: Alta (fundacional — mejora la calidad de todo lo demás)
 > **Origen**: Análisis Codex + Claude (2026-04-08)
 > **Principio**: "Una regla buena no solo se explica, se diseña para resistir mal uso"
