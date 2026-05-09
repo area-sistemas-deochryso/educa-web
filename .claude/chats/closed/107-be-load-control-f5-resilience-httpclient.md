@@ -5,6 +5,7 @@
 > **Creado**: 2026-05-05 · **Modo sugerido**: `/execute` → `/validate`
 > **Bloqueado por**: F3 (chat 105) cerrado — F5 extiende los `HttpClient` con `Timeout=30s` ya configurado.
 > **Bloquea a**: F6b (calibración con datos reales).
+> **Validación prod**: ✅ verificada 2026-05-09 — Cowork: single PDF mes Profesores 388ms (<<30s timeout). `AbortController.abort()` canceló fetch en 201ms (`AbortError`). Cancelación cliente OK; cascada server-side queda para PROD-6/110.
 
 ## CONTEXTO
 

@@ -5,6 +5,7 @@
 > **Creado**: 2026-05-05 · **Modo sugerido**: `/execute` → `/validate`
 > **Bloqueado por**: F1 (chat 103) cerrado. F2 (chat 104) puede correr en paralelo (no hay overlap de archivos).
 > **Bloquea a**: F5 (Polly extiende timeouts en HttpClient externos). 110 F3b completa el resto del IN antes de F5.
+> **Validación prod**: ✅ verificada 2026-05-09 — Cowork (junto con F2/104): PDFs reales completaron sin timeout, queries pesadas con `SetCommandTimeout(60)` no abortaron. Latencias escalonadas dentro de límites HttpClient 30s.
 
 ## ESTADO AL CIERRE (105a)
 

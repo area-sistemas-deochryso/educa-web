@@ -2,6 +2,7 @@
 
 > **Creado**: 2026-05-07 · **Estado**: ⏳ pendiente arrancar · **Repo**: `Educa.API` (master)
 > **Split**: parte 1 de 3 del Chat 3 (3a reportes / 3b correos+dispatcher / 3c bandeja+notif).
+> **Validación prod**: ✅ verificada 2026-05-09 — Cowork: `/api/ReportesAsistencia/datos?tipoPersona=A` retorna `asistentesAdmin[]` con 4 AAs + totales separados (`totalAsistentesAdmin*` ≠ `totalProfesores*`). PDF 120030 bytes / Excel 7695 bytes con MIME correcto.
 
 ## Modo sugerido
 

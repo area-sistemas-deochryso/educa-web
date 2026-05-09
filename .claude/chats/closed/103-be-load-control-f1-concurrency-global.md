@@ -6,6 +6,7 @@
 > **Commit BE**: `Educa.API@8aa99ec` (feat(ratelimit) Plan 40 F1).
 > **Bloqueado por**: ADRs 0001-0006 cerrados (chat 096) — ya están en `Educa.API/.claude/decisions/`.
 > **Bloquea a**: F2 (bulkheads), F3, F4, F5, F6a, F6b.
+> **Validación prod**: ✅ verificada 2026-05-09 — Cowork: 10 fetches concurrentes a `/api/Auth/perfil` 200/200 en 2.9s wall-clock, sin 503. Cap global ≥10 confirmado.
 
 ## RESULTADO DEL CHAT (cierre 2026-05-05)
 

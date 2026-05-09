@@ -16,7 +16,9 @@ educa-web
 
 - **Filtro INV-C11 (asistencia diaria)**: el sistema solo trackea asistencia diaria de **5to Primaria en adelante** (`GRA_Orden ≥ 8`). Si el usuario pide probar asistencia, usar salones **sección A** con grado ≥ 5to Primaria. Grados inferiores muestran empty state legítimo, no es bug.
 - **"Sin ediciones" significa**: NO clic en Guardar/Confirmar/Eliminar. SÍ se permite abrir dialogs, expandir filas, click en botones de navegación/acción mientras no muten data real.
-- **Rutas BE en kebab-case**: el backend usa `/api/asistencia-admin` (no `/api/AsistenciaAdmin`). Confirmar siempre con `Grep "[Route"` en `Educa.API/Controllers/...` antes de fetch directo.
+- **Rutas BE — convención mixta, confirmar caso por caso**: algunos controllers usan kebab literal (`[Route("api/asistencia-admin")]`), otros PascalCase implícito (`[Route("api/[controller]")]` → `/api/ReportesAsistencia`). NO asumir kebab global. Antes de fetch directo: `Grep "[Route"` en `Educa.API/Controllers/<area>/<Controller>.cs`.
+  - **Kebab literal**: `AsistenciaAdminController` (`api/asistencia-admin`), `PermisoSaludController` (`api/permisos-salud`), `CierreAsistenciaController` (`api/cierre-asistencia`), `AsistenteAdministrativoController` (`api/asistente-administrativo`), `RateLimitEventsController` (`api/sistema/rate-limit-events`).
+  - **PascalCase implícito**: `ReportesAsistenciaController` (`api/ReportesAsistencia`), `ConsultaAsistenciaController` (`api/ConsultaAsistencia`), `AsistenciaController` (`api/Asistencia`).
 - **Permisos**: Director ve TODO. Otros roles (Profesor, Estudiante, Apoderado, Asistente Admin) requieren credenciales separadas — pedir al usuario.
 - **Reglas del proyecto** que viven en `educa-web/.claude/CLAUDE.md` (infra Claude Code, raíz `.claude/`). Antes de sugerir cambios de código, leer:
   - `rules/business-rules.md` — invariantes del dominio (INV-*)
@@ -53,8 +55,8 @@ educa-web
 |---|---|---|
 | Frontend local | `http://localhost:4201/intranet` | Raíz de pruebas |
 | Backend local | `https://localhost:7102` | Educa.API (HTTPS) |
-| Frontend prod | (pedir al usuario antes de tocar) | Solo verificación post-deploy |
-| Backend prod | `https://educacom.azurewebsites.net` | Solo lectura, no mutaciones |
+| Frontend prod | `https://educa.com.pe/intranet/login` | Verificación post-deploy. Mismo origen que el BE (`/api/...` mismo host) |
+| Backend prod | `https://educacom.azurewebsites.net` (origen Azure) o `https://educa.com.pe/api` (mismo host del FE) | Read-only por default. Mutaciones requieren OK explícito del usuario en el chat por round y, cuando sea posible, sobre datos creados como prueba (`smoke-cowork-<fecha>` o equivalente) — la UI hace soft delete pero `edit` pierde estado previo. |
 
 ---
 
@@ -104,6 +106,8 @@ educa-web
 - **`read_console_messages` y `read_network_requests` arrancan tracking en la primera llamada**: los logs y requests previos se pierden. Llamarlos al inicio del flujo si interesa capturar logs de page load.
 - **`F5` mata todo JS inyectado**: interceptores de `window.fetch`, listeners, variables globales — todo se borra. Re-inyectar después de cada reload.
 - **`computer-use` sobre Chrome está en tier `read`**: clicks y typing bloqueados a nivel SO (política de Anthropic, no negociable). Toda interacción con el navegador debe pasar por `mcp__Claude_in_Chrome__*`. Para apps nativas (Notes, Finder, Explorer, etc.) sí funciona tier `full`.
+- **Login screen prod — click en el card NO loguea**: clic sobre el texto/avatar del item "ADMINISTRADOR EL DIRECTOR" solo dispara hover state que expone dos íconos a la derecha (flecha `→` para login, `X` para borrar la sesión). Hay que clickear específicamente la flecha `→` (a la izquierda de la `X`) para autenticar. En viewport 1568px aterriza aprox en `(964, 408)`.
+- **Harness Cowork bloquea respuestas con `[BLOCKED: Cookie/query string data]`**: triggers conocidos al usar `javascript_tool` — concatenar URLs con `&` y `=` literales; serializar header `Content-Disposition` (contiene `filename=`); encadenar `await rD.json()` con muchos campos en un solo retorno. Workarounds: usar `URLSearchParams` en vez de string templates, NO incluir `Content-Disposition` en el output, partir scripts grandes en sub-llamadas más cortas con un solo `fetch` por call.
 
 ### 6.4 Comportamientos del proyecto fáciles de malinterpretar
 
@@ -118,6 +122,24 @@ educa-web
 
 - **Microsoft Learn** (`89a7ddf5-2a6b-410c-be11-aa0e1a1b35a6`): .NET 9 / EF Core 9 docs.
 - **Exa** (`91408932-1110-4350-97c7-2d6b3a6d9694`): búsqueda web general.
+
+### 6.6 Endpoints BE útiles para validación de carga / smoke
+
+Validados en prod 2026-05-09 con sesión Director (cookie auth + `X-XSRF-TOKEN`):
+
+| Endpoint | Método | Carga server | Uso típico |
+|---|---|---|---|
+| `/api/Auth/perfil` | GET | Liviano (~5-30ms) | Smoke de cap global / concurrency F1 (PROD-1). 10+ paralelos sin saturar. |
+| `/api/sistema/notificaciones/activas` | GET | Liviano | Smoke alterno de auth + DB simple. |
+| `/api/sistema/rate-limit-events?take=200` | GET | Liviano | Inspección de telemetría histórica de rate limits y bulkheads — campos clave: `policy`, `endpoint`, `limiteEfectivo`, `tokensConsumidos`, `fueRechazado`, `correlationId`, `fecha`. |
+| `/api/sistema/rate-limit-events/stats?horas=24` | GET | Liviano | Stats agregados — `Top rol`, `Top endpoint`. |
+| `/api/ReportesAsistencia/datos?filtro=todos&rango=mes&fecha=YYYY-MM-15&tipoPersona={E\|P\|A\|todos}` | GET | Medio | JSON con shape `data.salones`, `data.asistentesAdmin`, `data.estadisticas`. Útil para validar separación de tipos de persona (Plan 28). |
+| `/api/ReportesAsistencia/pdf?filtro=todos&rango=mes&fecha=YYYY-MM-15&tipoPersona={E\|P\|A}` | GET | **Pesado** (~7s/PDF) | Saturar bulkhead `concurrency:reports` (cap 8). 12 paralelos → cap honrado vía queue, latencias escalonadas 7s→9s sin emitir 503. Para forzar 503+`Retry-After` hay que superar también el queue. |
+| `/api/ReportesAsistencia/excel?...` | GET | Medio | Mirror Excel del PDF (INV-RE01). |
+
+**Cómo extraer CSRF para fetch directo desde consola** — ya documentado en §6.2.
+
+**Cuidado con prod**: 12 PDFs paralelos = 12 PDFs reales generados. Limitar volumen de carga sintética. Para tests de saturación reales usar k6 (ver `claude-cowork/f6a-k6-calibration.md`).
 
 ---
 

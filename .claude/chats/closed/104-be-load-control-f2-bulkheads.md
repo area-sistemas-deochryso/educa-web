@@ -5,7 +5,7 @@
 > **Creado**: 2026-05-05 · **Modo sugerido**: `/execute` → `/validate`
 > **Bloqueado por**: F1 (chat 103) cerrado.
 > **Bloquea a**: F6a (calibración sintética).
-> **Validación prod**: ⏳ pendiente desde 2026-05-05.
+> **Validación prod**: ✅ verificada 2026-05-09 — Cowork: 12 PDFs concurrentes a `/api/ReportesAsistencia/pdf` 12/12 status 200, latencias escalonadas 6942→8810ms (cap `concurrency:reports`=8 + queue absorbió los 4 restantes).
 
 ## RESULTADO (cerrado 2026-05-05)
 
