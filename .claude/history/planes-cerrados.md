@@ -261,3 +261,28 @@ Plan 6 (Asignación Profesor-Salón-Curso) completado: BD + Domain + Backend + F
 **Repo**: FE+BE · **Cerrado**: 2026-04-28
 
 **Resumen**: Continuación del Plan 35. 9 chats migraron las 7 sub-páginas al patrón B3 del design-system y agregaron features visuales: Chat 2 bandeja (overrides p-tabs transparente global, stats con tokens, Excel a `p-button-success`, layout grid stats+chart side-by-side), Chat 3 dashboard tab Detalle con 4 KPI cards, Chat 4b BE endpoint `/diagnostico/buscar-personas` (lookup polimórfico Estudiante/Profesor/Director/Apoderado por nombre/apellido/DNI hash, INV-S07 fail-safe) + Chat 4 FE typeahead `p-autoComplete` con debounce 300ms + autosubmit, Chat 6 toggle Kanban default 5 columnas, Chat 7 stat cards reportes-usuarios B3, Chat 8 columna "Intentos/Umbral" en rate-limit con highlight rojo y tooltip. Restricción dura: ningún chat tocó funcionalidad — solo HTML/SCSS y refactor presentacional. Tests: 1482 BE + 1694 FE verdes.
+
+---
+
+## Plan 33 — Auditoría de paginación de tablas
+
+**Repo**: BE + FE · **Cerrado**: 2026-05-09 · **Plan base**: `plan/pagination-audit.md`
+
+**Resumen**: cierre tipo retro-validación. El plan se abrió 2026-04-25 tras el fix puntual de `error-logs admin` (paginador mostraba "Página 1 de 2" hasta avanzar manualmente, total real 30 páginas). Inventario inicial separó las features ya correctas (4 con wrapper paginado + 1 con `/count`) y dejó **8 features 🔍** a auditar. Chat 135 (2026-05-09) clasificó las 8 con el test rápido de la regla `pagination.md` y confirmó que **ninguna paga BE con paginación real** — todas son client-side (PrimeNG pagina el array completo) o componentes presentacionales que delegan al consumidor. Cero fixes requeridos.
+
+### Inventario final de las 8 features
+
+| # | Feature | Clasificación |
+| --- | --- | --- |
+| 1 | `attendances admin` | ✅ Client-side (BE devuelve día completo) |
+| 2 | `attendance-reports cross-role` | ✅ Client-side (reporte sin paginación) |
+| 3 | `email-outbox-diagnostico` (correos-día) | ✅ Client-side (`length > 5`) |
+| 4 | `email-outbox-diagnostico` (correo-individual) | ✅ Client-side (`length > 10`) |
+| 5 | `email-outbox-dashboard-dia` | ✅ Client-side (Top 50 hardcoded, sin paginador) |
+| 6 | `attendance-day-list` | ✅ No aplica (presentacional) |
+| 7 | `responsive-table` | ✅ Client-side (wrapper genérico, slice local) |
+| 8 | `student-attendance-tab` | ✅ No aplica (presentacional) |
+
+### Riesgo latente
+
+Si alguno de estos datasets crece (>500 filas en producción), habrá que migrar a server-side desde un plan dedicado. Hoy todos están dentro de límites operativos. La regla `pagination.md` documenta el patrón a seguir cuando eso pase.
