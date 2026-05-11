@@ -99,13 +99,10 @@ describe('HomeComponent (Intranet)', () => {
 	});
 
 	describe('showAttendanceWidget gate', () => {
+		// Asistente Administrativo queda fuera intencionalmente (Plan 28 Chat 4a):
+		// el AA no tiene salón, así que tiene su widget propio (showAsistenteAdminWidget).
 		const adminRoles = [
 			{ label: 'Director', flag: 'isDirector' as const, role: APP_USER_ROLES.Director },
-			{
-				label: 'Asistente Administrativo',
-				flag: 'isAsistenteAdministrativo' as const,
-				role: APP_USER_ROLES.AsistenteAdministrativo,
-			},
 			{ label: 'Promotor', flag: 'isPromotor' as const, role: APP_USER_ROLES.Promotor },
 			{
 				label: 'Coordinador Académico',

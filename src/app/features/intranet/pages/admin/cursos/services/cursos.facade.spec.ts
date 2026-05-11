@@ -306,7 +306,7 @@ describe('CursosFacade', () => {
 		it('refetches items when another tab commits an entry of the same resourceType', () => {
 			api.getCursosPaginated.mockClear();
 
-			crossTab.emitCrossTabCommit('Curso');
+			crossTab.emitCrossTabCommit('cursos');
 
 			expect(api.getCursosPaginated).toHaveBeenCalledTimes(1);
 		});
@@ -324,7 +324,7 @@ describe('CursosFacade', () => {
 			store.setLoading(false);
 			api.getCursosPaginated.mockClear();
 
-			crossTab.emitCrossTabCommit('Curso');
+			crossTab.emitCrossTabCommit('cursos');
 
 			expect(store.loading()).toBe(false);
 		});
