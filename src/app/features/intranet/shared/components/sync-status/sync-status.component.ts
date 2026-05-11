@@ -8,7 +8,7 @@ import {
 } from '@angular/core';
 import { DatePipe } from '@angular/common';
 import { WalStatusFacade } from '@core/services';
-import { WalEntry } from '@core/services/wal/models';
+import { WalEntry } from '@core/services/wal';
 import { DrawerModule } from 'primeng/drawer';
 import { ButtonModule } from 'primeng/button';
 import { TooltipModule } from 'primeng/tooltip';

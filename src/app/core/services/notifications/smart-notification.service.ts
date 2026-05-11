@@ -1,9 +1,8 @@
 import { Injectable, inject, signal, computed, PLATFORM_ID } from '@angular/core';
 import { isPlatformBrowser } from '@angular/common';
 import { logger, Duration } from '@core/helpers';
-import { SmartDataStorageService } from '@core/services/storage/smart-data-storage.service';
-import { StorageService } from '@core/services/storage';
-import { WalClockService } from '@core/services/wal/wal-clock.service';
+import { SmartDataStorageService, StorageService } from '@core/services/storage';
+import { WalClockService } from '@core/services/wal';
 import { TimerManager } from '@core/services/destroy';
 import {
 	SmartNotification,

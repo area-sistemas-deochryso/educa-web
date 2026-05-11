@@ -1,7 +1,7 @@
 import { HttpInterceptorFn, HttpResponse } from '@angular/common/http';
 import { inject } from '@angular/core';
 import { tap } from 'rxjs';
-import { WalClockService } from '@core/services/wal/wal-clock.service';
+import { WalClockService } from '@core/services/wal';
 
 /**
  * Reads the `Date` header from API responses to detect clock skew.

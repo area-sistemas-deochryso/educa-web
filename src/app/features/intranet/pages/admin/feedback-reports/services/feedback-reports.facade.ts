@@ -11,8 +11,7 @@ import {
 	ReporteEstado,
 	ReporteUsuarioListaDto,
 } from '@core/services/feedback';
-import { WalFacadeHelper } from '@core/services/wal/wal-facade-helper.service';
-import { WalCrossTabRefetchService } from '@core/services/wal/wal-cross-tab-refetch.service';
+import { WalFacadeHelper, WalCrossTabRefetchService } from '@core/services/wal';
 
 import { FeedbackReportsStore } from './feedback-reports.store';
 

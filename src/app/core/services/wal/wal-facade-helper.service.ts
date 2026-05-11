@@ -191,4 +191,16 @@ export class WalFacadeHelper {
 	}
 
 	// #endregion
+
+	// #region Queries
+
+	/**
+	 * Whether the WAL has pending entries for a given resource type.
+	 * Exposes WalService.hasPendingForResource() so consumers don't bypass the facade.
+	 */
+	async hasPendingForResource(resourceType: string): Promise<boolean> {
+		return this.wal.hasPendingForResource(resourceType);
+	}
+
+	// #endregion
 }

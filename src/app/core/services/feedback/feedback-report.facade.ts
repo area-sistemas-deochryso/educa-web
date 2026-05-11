@@ -5,7 +5,7 @@ import { Injectable, inject } from '@angular/core';
 import { environment } from '@config/environment';
 import { logger } from '@core/helpers';
 import { RequestTraceFacade } from '@core/services/trace';
-import { WalFacadeHelper } from '@core/services/wal/wal-facade-helper.service';
+import { WalFacadeHelper } from '@core/services/wal';
 
 import { CrearReporteRequest, ReporteFormData } from './feedback-report.models';
 import { FeedbackReportService } from './feedback-report.service';

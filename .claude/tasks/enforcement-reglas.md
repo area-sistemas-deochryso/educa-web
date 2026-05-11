@@ -1,6 +1,6 @@
 # Enforcement de Reglas — De Documentación a Restricción Técnica
 
-> **Estado**: F1 ✅ (2026-04-09) · F2 ✅ (2026-04-13) · F3 ✅ · F4 parcial ✅ (CI pipeline corre lint+build+test) · **F5 ⏳ promocionada 2026-05-09 a [`plan/enforcement-fase-5-wrappers.md`](../plan/enforcement-fase-5-wrappers.md)** (brief en `chats/open/137-fe-enforcement-f5-wrapper-hardening.md`)
+> **Estado**: F1 ✅ (2026-04-09) · F2 ✅ (2026-04-13) · F3 ✅ · F4 parcial ✅ (CI pipeline corre lint+build+test) · **F5 ✅ (2026-05-11)** — wrappers críticos (storage/wal/session) con barrel-only enforcement vía 3 reglas en `LAYER_RULES` + `WalFacadeHelper.hasPendingForResource()` para cerrar el último consumer de `WalService` desde features. Brief cerrado: [`chats/closed/137-fe-enforcement-f5-wrapper-hardening.md`](../chats/closed/137-fe-enforcement-f5-wrapper-hardening.md).
 > **Prioridad**: Alta (fundacional — mejora la calidad de todo lo demás)
 > **Origen**: Análisis Codex + Claude (2026-04-08)
 > **Principio**: "Una regla buena no solo se explica, se diseña para resistir mal uso"

@@ -3,7 +3,7 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { forkJoin } from 'rxjs';
 
 import { ErrorHandlerService } from '@core/services/error/error-handler.service';
-import { StorageService } from '@core/services/storage/storage.service';
+import { StorageService } from '@core/services/storage';
 
 import { EmailOutboxApiService } from './email-outbox.service';
 import { EmailOutboxStore } from './email-outbox.store';

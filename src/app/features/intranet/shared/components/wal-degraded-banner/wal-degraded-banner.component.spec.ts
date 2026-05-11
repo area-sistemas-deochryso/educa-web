@@ -4,8 +4,7 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { provideZonelessChangeDetection, signal, computed } from '@angular/core';
 import { WalStatusFacade } from '@core/services';
 import { WalDegradedBannerComponent } from './wal-degraded-banner.component';
-import type { WalCircuitState, WalMode } from '@core/services/wal/models';
-import type { WalBannerMessage } from '@core/services/wal/wal-status.store';
+import type { WalBannerMessage, WalCircuitState, WalMode } from '@core/services/wal';
 // #endregion
 
 interface BannerVm {

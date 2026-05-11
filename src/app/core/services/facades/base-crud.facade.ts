@@ -12,8 +12,7 @@ import { UI_ADMIN_ERROR_DETAILS, UI_SUMMARIES } from '@shared/constants';
 import { ActivityTrackerService } from '@core/services/error/activity-tracker.service';
 import { ErrorHandlerService } from '@core/services/error/error-handler.service';
 import { SwService } from '@features/intranet/services/sw/sw.service';
-import { WalFacadeHelper } from '@core/services/wal/wal-facade-helper.service';
-import { WalCrossTabRefetchService } from '@core/services/wal/wal-cross-tab-refetch.service';
+import { WalFacadeHelper, WalCrossTabRefetchService } from '@core/services/wal';
 import type { BaseCrudStore } from '@core/store/base/base-crud.store';
 import type {
 	BaseCrudFacadeConfig,

@@ -4,7 +4,7 @@ import { TestBed } from '@angular/core/testing';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { of, throwError } from 'rxjs';
 
-import { StorageService } from '@core/services/storage/storage.service';
+import { StorageService } from '@core/services/storage';
 
 import { RuntimeHealthFacade } from './runtime-health.facade';
 import { RuntimeHealthService } from './runtime-health.service';

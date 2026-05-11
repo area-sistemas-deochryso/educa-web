@@ -5,7 +5,7 @@ import { Subject } from 'rxjs';
 
 import { logger } from '@core/helpers';
 import { environment } from '@config/environment';
-import { StorageService } from '@core/services/storage/storage.service';
+import { StorageService } from '@core/services/storage';
 import { AttendanceSignalRService } from './attendance-signalr.service';
 import {
 	CrossChexSyncStatusDto,

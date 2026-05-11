@@ -8,8 +8,7 @@ import { CursosFacade } from './cursos.facade';
 import { CursosStore } from './cursos.store';
 import { CursosService } from './cursos.service';
 import { GradosService } from './grados.service';
-import { ErrorHandlerService, WalFacadeHelper } from '@core/services';
-import { WalCrossTabRefetchService } from '@core/services/wal/wal-cross-tab-refetch.service';
+import { ErrorHandlerService, WalFacadeHelper, WalCrossTabRefetchService } from '@core/services';
 import type { DestroyRef } from '@angular/core';
 import { Curso, Grado, CursosEstadisticas } from '../models';
 

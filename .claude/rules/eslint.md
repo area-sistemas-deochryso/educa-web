@@ -116,6 +116,7 @@ toggleExpanded(): void { this._expanded.update(v => !v); }
 | `layer-enforcement/imports-error` — cross-facade | error | Facades no importan otros facades — evitar acoplamiento |
 | `layer-enforcement/imports-error` — admin/estudiante cross-feature | error | `admin/` y `estudiante/` no importan de otras features de rol |
 | `layer-enforcement/imports-warn` — profesor cross-feature | warn | `profesor/` no importa de `admin/` ni `estudiante/` (warn durante migración) |
+| `layer-enforcement/imports-error` — storage/wal/session barrel-only (Plan 1 F5) | error | Consumir wrappers críticos vía barrel (`@core/services/<x>`), no via path interno a impls. Cierra el escape hatch dentro del propio módulo. |
 
 ### Principio de las reglas de capa
 

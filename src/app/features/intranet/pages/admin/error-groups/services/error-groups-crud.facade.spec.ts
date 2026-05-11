@@ -3,7 +3,7 @@ import { HttpErrorResponse } from '@angular/common/http';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { ErrorHandlerService } from '@core/services/error/error-handler.service';
-import { WalFacadeHelper } from '@core/services/wal/wal-facade-helper.service';
+import { WalFacadeHelper } from '@core/services/wal';
 
 import {
 	CambiarEstadoErrorGroup,

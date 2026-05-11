@@ -552,6 +552,45 @@ const LAYER_RULES = [
 			},
 		],
 	},
+	// Plan 1 F5 — barrel-only public API para wrappers críticos. Consumidores externos
+	// deben importar desde el barrel (@core/services/<x>), no de paths internos a la impl.
+	// El barrel filtra qué se expone, eso es la facade.
+	{
+		id: 'storage-barrel-only',
+		severity: 'error',
+		match: (f) => !/\/src\/app\/core\/services\/storage\//.test(f),
+		restrictions: [
+			{
+				sourcePattern: /^@core\/services\/storage\/.+/,
+				message:
+					'Importar desde @core/services/storage (barrel), no del path interno. Las impls (Session/Preferences/IndexedDB/etc) son privadas — usar StorageService.',
+			},
+		],
+	},
+	{
+		id: 'wal-barrel-only',
+		severity: 'error',
+		match: (f) => !/\/src\/app\/core\/services\/wal\//.test(f),
+		restrictions: [
+			{
+				sourcePattern: /^@core\/services\/wal\/.+/,
+				message:
+					'Importar desde @core/services/wal (barrel), no del path interno. Las impls (WalService/Db/SyncEngine/Leader/etc) son privadas — usar WalFacadeHelper.',
+			},
+		],
+	},
+	{
+		id: 'session-barrel-only',
+		severity: 'error',
+		match: (f) => !/\/src\/app\/core\/services\/session\//.test(f),
+		restrictions: [
+			{
+				sourcePattern: /^@core\/services\/session\/.+/,
+				message:
+					'Importar desde @core/services/session (barrel), no del path interno. SessionCoordinator/SessionRefresh son privados — usar SessionActivityService.',
+			},
+		],
+	},
 ];
 
 function createImportChecker(severityFilter) {
