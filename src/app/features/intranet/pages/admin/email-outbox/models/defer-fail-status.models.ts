@@ -44,6 +44,14 @@ export interface DeferFailWindowStats {
 	failedThrottleHost: number;
 	/** Catch-all: FAILED_UNKNOWN, FAILED_MAILBOX_FULL, FAILED_REJECTED, etc. */
 	failedOther: number;
+	/** Plan 43 Chat 1.1 — identificador de origen para chip UI ("Outbox24h"). */
+	source?: string;
+	/** Plan 43 Chat 1.1 — etiqueta legible ("Últimas 24 h"). */
+	timeWindowLabel?: string;
+	/** Plan 43 Chat 1.1 — inicio de la ventana en hora Perú. */
+	windowStart?: string;
+	/** Plan 43 Chat 1.1 — fin de la ventana en hora Perú. */
+	windowEnd?: string;
 }
 
 /**

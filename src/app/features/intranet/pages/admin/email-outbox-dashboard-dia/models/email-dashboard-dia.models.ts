@@ -20,6 +20,14 @@ export interface EmailDashboardResumen {
 	throttleHost: number;
 	otrosFallos: number;
 	deferFailContadorCpanel: number;
+	/** Plan 43 Chat 1.1 — identificador de origen para chip UI ("OutboxDia"). */
+	source?: string;
+	/** Plan 43 Chat 1.1 — etiqueta legible ("Hoy (Lima)"). */
+	timeWindowLabel?: string;
+	/** Plan 43 Chat 1.1 — inicio del día Lima (00:00:00). */
+	windowStart?: string;
+	/** Plan 43 Chat 1.1 — fin del día Lima. */
+	windowEnd?: string;
 }
 
 export interface EmailDashboardPorHora {

@@ -3,6 +3,8 @@ import { ChangeDetectionStrategy, Component, computed, inject, signal } from '@a
 import { RouterLink } from '@angular/router';
 
 import { TabsModule } from 'primeng/tabs';
+import { TagModule } from 'primeng/tag';
+import { TooltipModule } from 'primeng/tooltip';
 
 import { PageHeaderComponent } from '@intranet-shared/components/page-header/page-header.component';
 import { UserPermissionsService } from '@core/services';
@@ -45,7 +47,14 @@ interface RenderedDomain {
 @Component({
 	selector: 'app-monitoreo-hub',
 	standalone: true,
-	imports: [RouterLink, TabsModule, PageHeaderComponent, EmailDeferFailBannerComponent],
+	imports: [
+		RouterLink,
+		TabsModule,
+		TagModule,
+		TooltipModule,
+		PageHeaderComponent,
+		EmailDeferFailBannerComponent,
+	],
 	templateUrl: './monitoreo-hub.component.html',
 	styleUrl: './monitoreo-hub.component.scss',
 	changeDetection: ChangeDetectionStrategy.OnPush,

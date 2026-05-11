@@ -20,6 +20,10 @@ export interface DomainStat {
 	label: string;
 	value: string | number;
 	level: BadgeLevel;
+	/** Plan 43 Chat 1.1 — chip "tag-neutral" con origen del contador. */
+	sourceChip?: string;
+	/** Plan 43 Chat 1.1 — tooltip con ventana temporal legible. */
+	windowTooltip?: string;
 }
 // #endregion
 
@@ -69,30 +73,43 @@ export function buildStats(id: DomainId, x: HubExtras): DomainStat[] {
 			if (!x.outbox) return [];
 			const fallidos = x.outbox.fallidos;
 			const pendientes = x.outbox.pendientes;
+			// Plan 43 Chat 1.1 — etiqueta de origen visible en cada contador para
+			// que el usuario distinga "Outbox total" (estadisticas) de "Últimas 24 h"
+			// (defer-fail) y "Hoy (Lima)" (dashboard).
+			const outboxChip = x.outbox.source ?? 'Outbox';
+			const outboxTip = x.outbox.timeWindowLabel ?? 'Histórico completo';
 			return [
 				{
 					icon: 'pi pi-check-circle',
-					label: 'Enviados hoy',
+					label: 'Enviados',
 					value: x.outbox.enviados,
 					level: 'ok',
+					sourceChip: outboxChip,
+					windowTooltip: outboxTip,
 				},
 				{
 					icon: 'pi pi-hourglass',
 					label: 'Pendientes',
 					value: pendientes,
 					level: pendientes > 0 ? 'warn' : 'ok',
+					sourceChip: outboxChip,
+					windowTooltip: outboxTip,
 				},
 				{
 					icon: 'pi pi-times-circle',
 					label: 'Fallidos',
 					value: fallidos,
 					level: fallidos > 0 ? 'critical' : 'ok',
+					sourceChip: outboxChip,
+					windowTooltip: outboxTip,
 				},
 				{
 					icon: 'pi pi-ban',
 					label: 'En blacklist',
 					value: x.deferFail?.blacklistActivos ?? '—',
 					level: (x.deferFail?.blacklistActivos ?? 0) >= 10 ? 'warn' : 'ok',
+					sourceChip: 'Blacklist',
+					windowTooltip: 'Activos actualmente',
 				},
 			];
 		}

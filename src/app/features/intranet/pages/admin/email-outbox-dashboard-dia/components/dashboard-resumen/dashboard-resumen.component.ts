@@ -1,5 +1,8 @@
 import { ChangeDetectionStrategy, Component, computed, input } from '@angular/core';
 
+import { TagModule } from 'primeng/tag';
+import { TooltipModule } from 'primeng/tooltip';
+
 import { EmailDashboardResumen } from '../../models/email-dashboard-dia.models';
 
 // * Threshold del techo cPanel defer/fail (5 fails+defers por hora por dominio, política hosting).
@@ -90,12 +93,19 @@ const BREAKDOWN_CARDS: StatCardDef[] = [
 @Component({
 	selector: 'app-dashboard-resumen',
 	standalone: true,
+	imports: [TagModule, TooltipModule],
 	templateUrl: './dashboard-resumen.component.html',
 	styleUrl: './dashboard-resumen.component.scss',
 	changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class DashboardResumenComponent {
 	readonly resumen = input.required<EmailDashboardResumen>();
+
+	/** Plan 43 Chat 1.1 — chip de origen del contador ("OutboxDia"). */
+	readonly sourceChip = computed(() => this.resumen().source ?? null);
+
+	/** Plan 43 Chat 1.1 — ventana legible para tooltip ("Hoy (Lima)"). */
+	readonly windowTooltip = computed(() => this.resumen().timeWindowLabel ?? '');
 
 	readonly generalCards = computed(() => {
 		const r = this.resumen();

@@ -1,3 +1,14 @@
+<!-- #region Plan 43 Chat 1.1 — chip de origen + ventana legible -->
+@if (sourceChip(); as chip) {
+	<p-tag
+		[value]="chip"
+		styleClass="tag-neutral source-chip"
+		[pTooltip]="windowTooltip()"
+		tooltipPosition="top"
+	/>
+}
+<!-- #endregion -->
+
 <!-- #region Zona 1: Estado general (3 cards grandes) -->
 <section class="stats-general" aria-label="Estado general del día">
 	@for (card of generalCards(); track card.key) {

@@ -50,6 +50,10 @@ export interface HubExtras {
 		enviados: number;
 		pendientes: number;
 		fallidos: number;
+		/** Plan 43 Chat 1.1 — origen del contador para chip UI. */
+		source?: string;
+		/** Plan 43 Chat 1.1 — etiqueta legible de la ventana. */
+		timeWindowLabel?: string;
 	} | null;
 	deferFail: {
 		current: number;
@@ -59,6 +63,10 @@ export interface HubExtras {
 		last24hTotal: number;
 		last24hSent: number;
 		last24hFailedOther: number;
+		/** Plan 43 Chat 1.1 — origen del contador para chip UI. */
+		source?: string;
+		/** Plan 43 Chat 1.1 — etiqueta legible de la ventana 24h. */
+		timeWindowLabel?: string;
 	} | null;
 	candidatosBlacklist: number | null;
 	errorsNuevos: number | null;

@@ -54,6 +54,14 @@ export interface EmailOutboxEstadisticas {
 	pendientes: number;
 	enProceso: number;
 	porcentajeExito: number;
+	/** Plan 43 Chat 1.1 — origen del contador para chip UI. */
+	source?: string;
+	/** Plan 43 Chat 1.1 — etiqueta legible de la ventana ("Histórico completo"). */
+	timeWindowLabel?: string;
+	/** Plan 43 Chat 1.1 — inicio de la ventana cuando aplica. */
+	windowStart?: string | null;
+	/** Plan 43 Chat 1.1 — fin de la ventana cuando aplica. */
+	windowEnd?: string | null;
 }
 
 export interface EmailOutboxTendencia {

@@ -70,6 +70,14 @@
 										<i [class]="stat.icon + ' hero-stat-icon'"></i>
 										<span class="hero-stat-value">{{ stat.value }}</span>
 										<span class="hero-stat-label">{{ stat.label }}</span>
+										@if (stat.sourceChip) {
+											<p-tag
+												[value]="stat.sourceChip"
+												styleClass="tag-neutral hero-stat-source"
+												[pTooltip]="stat.windowTooltip ?? ''"
+												tooltipPosition="top"
+											/>
+										}
 									</div>
 								}
 							</div>

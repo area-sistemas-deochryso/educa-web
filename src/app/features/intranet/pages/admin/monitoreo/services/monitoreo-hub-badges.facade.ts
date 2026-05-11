@@ -100,7 +100,14 @@ export class MonitoreoHubBadgesFacade {
 	}
 
 	private collectExtras(
-		bandeja: PromiseSettledResult<{ total: number; enviados: number; pendientes: number; fallidos: number }>,
+		bandeja: PromiseSettledResult<{
+			total: number;
+			enviados: number;
+			pendientes: number;
+			fallidos: number;
+			source?: string;
+			timeWindowLabel?: string;
+		}>,
 		dashboard: PromiseSettledResult<DeferFailStatus | null>,
 		diagnostico: PromiseSettledResult<unknown[]>,
 		errores: PromiseSettledResult<number>,
@@ -114,6 +121,8 @@ export class MonitoreoHubBadgesFacade {
 					enviados: bandeja.value.enviados,
 					pendientes: bandeja.value.pendientes,
 					fallidos: bandeja.value.fallidos,
+					source: bandeja.value.source,
+					timeWindowLabel: bandeja.value.timeWindowLabel,
 				}
 				: null,
 			deferFail: dashboard.status === 'fulfilled' && dashboard.value
@@ -125,6 +134,8 @@ export class MonitoreoHubBadgesFacade {
 					last24hTotal: dashboard.value.last24h.total,
 					last24hSent: dashboard.value.last24h.sent,
 					last24hFailedOther: dashboard.value.last24h.failedOther,
+					source: dashboard.value.last24h.source,
+					timeWindowLabel: dashboard.value.last24h.timeWindowLabel,
 				}
 				: null,
 			candidatosBlacklist: diagnostico.status === 'fulfilled' ? diagnostico.value.length : null,
