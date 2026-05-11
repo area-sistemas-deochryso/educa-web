@@ -17,7 +17,15 @@ import { ButtonModule } from 'primeng/button';
 import { ProgressSpinnerModule } from 'primeng/progressspinner';
 import { logger } from '@core/helpers';
 import { VideoconferenciasFacade } from '../../services/videoconferencias.facade';
-import { JitsiApi, ParticipantInfo, normalizeName } from './jitsi-api.types';
+import {
+	JitsiApi,
+	MODERATOR_TOOLBAR_BUTTONS,
+	PARTICIPANT_TOOLBAR_BUTTONS,
+	ParticipantInfo,
+	countStaff,
+	countTeachers,
+	normalizeName,
+} from './jitsi-api.types';
 
 // #endregion
 
@@ -65,31 +73,21 @@ export class VideoconferenciaSalaComponent implements OnInit, OnDestroy {
 
 	private readonly profesorNormalized = computed(() => normalizeName(this.profesorNombreCompleto()));
 
-	/** Profesores reales: moderador en Jitsi Y nombre matchea con el profesor del horario. */
-	readonly teacherCount = computed(() => {
-		const profesor = this.profesorNormalized();
-		let count = 0;
-		for (const p of this._participants().values()) {
-			if (p.isModerator && profesor && normalizeName(p.displayName) === profesor) {
-				count++;
-			}
-		}
-		if (this._selfJoined() && this.facade.isProfesor()) count++;
-		return count;
-	});
+	readonly teacherCount = computed(() =>
+		countTeachers(
+			this._participants(),
+			this.profesorNormalized(),
+			this._selfJoined() && this.facade.isProfesor(),
+		),
+	);
 
-	/** Moderadores no-docentes: admin/director/asistente administrativo. */
-	readonly staffCount = computed(() => {
-		const profesor = this.profesorNormalized();
-		let count = 0;
-		for (const p of this._participants().values()) {
-			if (p.isModerator && (!profesor || normalizeName(p.displayName) !== profesor)) {
-				count++;
-			}
-		}
-		if (this._selfJoined() && this.facade.isModerator() && !this.facade.isProfesor()) count++;
-		return count;
-	});
+	readonly staffCount = computed(() =>
+		countStaff(
+			this._participants(),
+			this.profesorNormalized(),
+			this._selfJoined() && this.facade.isModerator() && !this.facade.isProfesor(),
+		),
+	);
 
 	readonly studentCount = computed(
 		() => this.totalParticipants() - this.teacherCount() - this.staffCount(),
@@ -204,29 +202,7 @@ export class VideoconferenciaSalaComponent implements OnInit, OnDestroy {
 		const isModerator = this.facade.isModerator();
 		const displayName = this.facade.displayName();
 
-		const toolbarButtons = isModerator
-			? [
-					'microphone',
-					'camera',
-					'desktop',
-					'chat',
-					'recording',
-					'participants-pane',
-					'toggle-camera',
-					'fullscreen',
-					'raisehand',
-					'tileview',
-					'settings',
-				]
-			: [
-					'microphone',
-					'camera',
-					'chat',
-					'raisehand',
-					'tileview',
-					'fullscreen',
-					'settings',
-				];
+		const toolbarButtons = isModerator ? MODERATOR_TOOLBAR_BUTTONS : PARTICIPANT_TOOLBAR_BUTTONS;
 
 		try {
 			// JaaS requiere roomName con formato: appId/roomName
@@ -298,6 +274,8 @@ export class VideoconferenciaSalaComponent implements OnInit, OnDestroy {
 				next.set(id, { displayName: displayName || '', isModerator: false });
 				return next;
 			});
+			// Re-sync diferido: displayName puede llegar vacío y resolverse con un getParticipantsInfo posterior
+			this.syncParticipantRoles(800);
 		});
 
 		this.jitsiApi.addEventListener('participantLeft', (data: unknown) => {
@@ -320,6 +298,19 @@ export class VideoconferenciaSalaComponent implements OnInit, OnDestroy {
 				return next;
 			});
 		});
+
+		// Cubre el caso de displayName tardío o renombrado
+		this.jitsiApi.addEventListener('displayNameChange', (data: unknown) => {
+			const { id, displayname } = data as { id: string; displayname: string };
+			if (!id || !displayname) return;
+			this._participants.update((map) => {
+				const current = map.get(id);
+				if (!current) return map;
+				const next = new Map(map);
+				next.set(id, { ...current, displayName: displayname });
+				return next;
+			});
+		});
 	}
 
 	/** Consulta roles reales de participantes ya presentes en la sala */
@@ -337,8 +328,14 @@ export class VideoconferenciaSalaComponent implements OnInit, OnDestroy {
 					for (const p of participants) {
 						const current = next.get(p.participantId);
 						if (current) {
+							// Reconciliar displayName si llegó vacío en participantJoined — clave para el match docente por nombre
 							next.set(p.participantId, {
-								...current,
+								displayName: p.displayName || current.displayName,
+								isModerator: p.role === 'moderator',
+							});
+						} else if (p.displayName) {
+							next.set(p.participantId, {
+								displayName: p.displayName,
 								isModerator: p.role === 'moderator',
 							});
 						}
