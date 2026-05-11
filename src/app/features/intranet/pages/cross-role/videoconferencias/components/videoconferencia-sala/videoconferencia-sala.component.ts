@@ -17,39 +17,11 @@ import { ButtonModule } from 'primeng/button';
 import { ProgressSpinnerModule } from 'primeng/progressspinner';
 import { logger } from '@core/helpers';
 import { VideoconferenciasFacade } from '../../services/videoconferencias.facade';
+import { JitsiApi, ParticipantInfo, normalizeName } from './jitsi-api.types';
 
 // #endregion
 
 declare const JitsiMeetExternalAPI: new (domain: string, options: Record<string, unknown>) => JitsiApi;
-
-interface JitsiParticipantInfo {
-	participantId: string;
-	displayName: string;
-	role: string;
-}
-
-interface JitsiApi {
-	dispose(): void;
-	addEventListener(event: string, handler: (data: unknown) => void): void;
-	executeCommand(command: string, ...args: unknown[]): void;
-	getParticipantsInfo(): JitsiParticipantInfo[];
-}
-
-interface ParticipantInfo {
-	displayName: string;
-	isModerator: boolean;
-}
-
-/** Normaliza un nombre para comparación: trim, lowercase, sin acentos, colapsa espacios. */
-function normalizeName(name: string | null | undefined): string {
-	if (!name) return '';
-	return name
-		.normalize('NFD')
-		.replace(/[̀-ͯ]/g, '')
-		.toLowerCase()
-		.trim()
-		.replace(/\s+/g, ' ');
-}
 
 @Component({
 	selector: 'app-videoconferencia-sala',
