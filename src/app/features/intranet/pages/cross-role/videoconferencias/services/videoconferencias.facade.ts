@@ -48,6 +48,7 @@ export class VideoconferenciasFacade {
 	readonly displayName = this.userProfile.displayName;
 
 	readonly isModerator = computed(() => canModerateVideoconference(this.userProfile.userRole()));
+	readonly isProfesor = this.userProfile.isProfesor;
 	// #endregion
 
 	// #region Comandos de carga

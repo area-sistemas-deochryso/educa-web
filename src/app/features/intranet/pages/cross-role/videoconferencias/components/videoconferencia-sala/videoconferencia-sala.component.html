@@ -41,10 +41,17 @@
 				<span>{{ studentCount() }} {{ studentCount() === 1 ? 'estudiante' : 'estudiantes' }}</span>
 			</div>
 			<span class="participant-separator">|</span>
-			<div class="participant-stat" title="Docentes / Administrativos">
+			<div class="participant-stat" title="Docentes">
 				<i class="pi pi-briefcase"></i>
-				<span>{{ moderatorCount() }} {{ moderatorCount() === 1 ? 'docente' : 'docentes' }}</span>
+				<span>{{ teacherCount() }} {{ teacherCount() === 1 ? 'docente' : 'docentes' }}</span>
 			</div>
+			@if (staffCount() > 0) {
+				<span class="participant-separator">|</span>
+				<div class="participant-stat" title="Moderadores administrativos">
+					<i class="pi pi-shield"></i>
+					<span>{{ staffCount() }} {{ staffCount() === 1 ? 'moderador' : 'moderadores' }}</span>
+				</div>
+			}
 			<button
 				pButton
 				icon="pi pi-refresh"

@@ -32,12 +32,23 @@ interface JitsiApi {
 	dispose(): void;
 	addEventListener(event: string, handler: (data: unknown) => void): void;
 	executeCommand(command: string, ...args: unknown[]): void;
-	getParticipantsInfo(): Promise<JitsiParticipantInfo[]>;
+	getParticipantsInfo(): JitsiParticipantInfo[];
 }
 
 interface ParticipantInfo {
 	displayName: string;
 	isModerator: boolean;
+}
+
+/** Normaliza un nombre para comparación: trim, lowercase, sin acentos, colapsa espacios. */
+function normalizeName(name: string | null | undefined): string {
+	if (!name) return '';
+	return name
+		.normalize('NFD')
+		.replace(/[̀-ͯ]/g, '')
+		.toLowerCase()
+		.trim()
+		.replace(/\s+/g, ' ');
 }
 
 @Component({
@@ -57,6 +68,7 @@ export class VideoconferenciaSalaComponent implements OnInit, OnDestroy {
 	// #region Inputs
 	readonly roomName = input.required<string>();
 	readonly cursoNombre = input.required<string>();
+	readonly profesorNombreCompleto = input<string | null>(null);
 	// #endregion
 
 	// #region Estado local
@@ -79,16 +91,37 @@ export class VideoconferenciaSalaComponent implements OnInit, OnDestroy {
 		return this._selfJoined() ? count + 1 : count;
 	});
 
-	readonly moderatorCount = computed(() => {
+	private readonly profesorNormalized = computed(() => normalizeName(this.profesorNombreCompleto()));
+
+	/** Profesores reales: moderador en Jitsi Y nombre matchea con el profesor del horario. */
+	readonly teacherCount = computed(() => {
+		const profesor = this.profesorNormalized();
 		let count = 0;
 		for (const p of this._participants().values()) {
-			if (p.isModerator) count++;
+			if (p.isModerator && profesor && normalizeName(p.displayName) === profesor) {
+				count++;
+			}
 		}
-		if (this._selfJoined() && this.facade.isModerator()) count++;
+		if (this._selfJoined() && this.facade.isProfesor()) count++;
 		return count;
 	});
 
-	readonly studentCount = computed(() => this.totalParticipants() - this.moderatorCount());
+	/** Moderadores no-docentes: admin/director/asistente administrativo. */
+	readonly staffCount = computed(() => {
+		const profesor = this.profesorNormalized();
+		let count = 0;
+		for (const p of this._participants().values()) {
+			if (p.isModerator && (!profesor || normalizeName(p.displayName) !== profesor)) {
+				count++;
+			}
+		}
+		if (this._selfJoined() && this.facade.isModerator() && !this.facade.isProfesor()) count++;
+		return count;
+	});
+
+	readonly studentCount = computed(
+		() => this.totalParticipants() - this.teacherCount() - this.staffCount(),
+	);
 	// #endregion
 
 	// #region Lifecycle
@@ -324,29 +357,27 @@ export class VideoconferenciaSalaComponent implements OnInit, OnDestroy {
 		this.syncingParticipants.set(true);
 
 		const doSync = (): void => {
-			this.jitsiApi
-				?.getParticipantsInfo()
-				.then((participants) => {
-					this._participants.update((map) => {
-						const next = new Map(map);
-						for (const p of participants) {
-							const current = next.get(p.participantId);
-							if (current) {
-								next.set(p.participantId, {
-									...current,
-									isModerator: p.role === 'moderator',
-								});
-							}
+			try {
+				// getParticipantsInfo() del IframeAPI de Jitsi es sincrono — retorna Array, no Promise
+				const participants = this.jitsiApi?.getParticipantsInfo() ?? [];
+				this._participants.update((map) => {
+					const next = new Map(map);
+					for (const p of participants) {
+						const current = next.get(p.participantId);
+						if (current) {
+							next.set(p.participantId, {
+								...current,
+								isModerator: p.role === 'moderator',
+							});
 						}
-						return next;
-					});
-				})
-				.catch(() => {
-					// Silencioso: el conteo seguirá basándose en los eventos
-				})
-				.finally(() => {
-					this.syncingParticipants.set(false);
+					}
+					return next;
 				});
+			} catch {
+				// Silencioso: el conteo seguirá basándose en los eventos
+			} finally {
+				this.syncingParticipants.set(false);
+			}
 		};
 
 		if (delay > 0) {
