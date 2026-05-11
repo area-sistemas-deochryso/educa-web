@@ -321,24 +321,21 @@ export class VideoconferenciaSalaComponent implements OnInit, OnDestroy {
 
 		const doSync = (): void => {
 			try {
-				// getParticipantsInfo() del IframeAPI de Jitsi es sincrono — retorna Array, no Promise
+				// getParticipantsInfo() del IframeAPI de Jitsi es sincrono — retorna Array, no Promise.
+				// SOLO reconciliamos entries ya conocidas (alta y baja vienen exclusivamente de
+				// participantJoined / participantLeft). El participantId de Jitsi puede tener
+				// formato distinto entre el evento (short id) y getParticipantsInfo() (JID full),
+				// así que agregar entries nuevas desde acá duplicaría participantes.
 				const participants = this.jitsiApi?.getParticipantsInfo() ?? [];
 				this._participants.update((map) => {
 					const next = new Map(map);
 					for (const p of participants) {
 						const current = next.get(p.participantId);
-						if (current) {
-							// Reconciliar displayName si llegó vacío en participantJoined — clave para el match docente por nombre
-							next.set(p.participantId, {
-								displayName: p.displayName || current.displayName,
-								isModerator: p.role === 'moderator',
-							});
-						} else if (p.displayName) {
-							next.set(p.participantId, {
-								displayName: p.displayName,
-								isModerator: p.role === 'moderator',
-							});
-						}
+						if (!current) continue;
+						next.set(p.participantId, {
+							displayName: p.displayName || current.displayName,
+							isModerator: p.role === 'moderator',
+						});
 					}
 					return next;
 				});
