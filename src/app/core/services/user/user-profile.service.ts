@@ -42,6 +42,16 @@ export class UserProfileService {
 		() => this._userRole() === APP_USER_ROLES.CoordinadorAcademico,
 	);
 
+	// Roles administrativos: los 4 viven en la tabla Director del BE y comparten
+	// vista/endpoints. INV-AD06/AD08 siguen aplicando a mutaciones server-side.
+	readonly isAdministrativo = computed(
+		() =>
+			this.isDirector() ||
+			this.isAsistenteAdministrativo() ||
+			this.isPromotor() ||
+			this.isCoordinadorAcademico(),
+	);
+
 	readonly displayName = computed(() => this._userName());
 
 	/** Nombre corto para el header: primer apellido + primer nombre (ej: "SANCHEZ MARIA"). */

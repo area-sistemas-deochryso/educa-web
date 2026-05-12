@@ -9,7 +9,6 @@ import { UserProfileService } from '@core/services/user/user-profile.service';
 import { QuickAccessFavoritesService } from '@intranet-shared/services';
 import { WelcomeSectionComponent } from '@features/intranet/components/welcome-section/welcome-section';
 import { AttendanceSummaryWidgetComponent } from './components/attendance-summary-widget/attendance-summary-widget.component';
-import { AsistenteAdminAttendanceWidgetComponent } from './components/asistente-admin-attendance-widget/asistente-admin-attendance-widget.component';
 import { ProfesorAttendanceWidgetComponent } from './components/profesor-attendance-widget/profesor-attendance-widget.component';
 import { QUICK_ACCESS_BY_ROLE, MAX_QUICK_ACCESS, QuickAccessItem } from './quick-access.config';
 
@@ -23,7 +22,6 @@ import { QUICK_ACCESS_BY_ROLE, MAX_QUICK_ACCESS, QuickAccessItem } from './quick
 		WelcomeSectionComponent,
 		AttendanceSummaryWidgetComponent,
 		ProfesorAttendanceWidgetComponent,
-		AsistenteAdminAttendanceWidgetComponent,
 	],
 	templateUrl: './home.component.html',
 	styleUrl: './home.component.scss',
@@ -39,17 +37,11 @@ export class HomeComponent {
 	// #endregion
 
 	// #region Estado
-	// * Plan 28 Chat 4a: el AA queda fuera del summary widget (que muestra agregados
-	//   de estudiantes del salón) — el AA no tiene salón. Tiene su propio widget
-	//   simplificado con solo "Mi asistencia de hoy".
-	readonly showAttendanceWidget = computed(
-		() =>
-			this.userProfile.isDirector() ||
-			this.userProfile.isPromotor() ||
-			this.userProfile.isCoordinadorAcademico(),
-	);
+	// Los 4 roles administrativos ven el mismo summary agregado del colegio.
+	// Reversión de Plan 28 Chat 4a (decisión de jefatura 2026-05-12, brief 143).
+	// TODO Plan 28 Chat 4a reversion — revisar INV-AD05/AD08 en business-rules.md.
+	readonly showAttendanceWidget = computed(() => this.userProfile.isAdministrativo());
 	readonly showProfesorWidget = computed(() => this.userProfile.isProfesor());
-	readonly showAsistenteAdminWidget = computed(() => this.userProfile.isAsistenteAdministrativo());
 	readonly showQuickAccess = computed(() => this.flags.isEnabled('quickAccess'));
 
 	readonly welcomeTitle = computed(() => {

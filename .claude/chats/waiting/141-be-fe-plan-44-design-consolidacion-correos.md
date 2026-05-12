@@ -2,9 +2,11 @@
 
 > ⚠️ Renombrado: el "Plan 42" original del prompt de creación colisionaba con el Plan 42 vigente (Normalización de casing FE↔BE). Asignado **Plan 44** (siguiente libre tras 43 = Monitoreo Cowork).
 >
-> **Creado**: 2026-05-12 · **Estado**: ⏳ pendiente arrancar · **Repo**: ambos (`Educa.API` + `educa-web`)
+> **Creado**: 2026-05-12 · **Estado**: ⏸ waiting (`/block-chat` 2026-05-12: pausa externa por orden de jefatura — abrir chat 143 con prioridad mayor para uniformizar vista de asistencia entre los 4 roles administrativos) · **Repo**: ambos (`Educa.API` + `educa-web`)
 > **Modo sugerido**: `/design` (ADR + plan de ejecución por fases). NO ejecutar todavía.
 > **Origen**: 2026-05-12 jefe confirmó que el hosting denegó subir el techo `max_defer_fail_percentage`. Las defensas reactivas del Plan 22/29/37/38/39 ya están en prod o awaiting-prod. Para no agotar la cuota de 5 defers+fails/h por dominio, el siguiente paso es **reducir el volumen real** de correos salientes, no solo defenderse cuando rompen.
+>
+> **🆕 2026-05-12 — Absorbe scope residual de Plan 29 Chat 3 (WONTDO)**: la decisión CrossChex SMTP (desactivar su SMTP / migrar a remitente propio / esperar Plan 24 que consuma directo el biométrico) entra como sub-decisión de la línea **E** (push/canal alterno) o como nueva línea **F** según resulte del análisis. Hosting denegó subir techo — CrossChex pasa de "trámite OPS independiente" a "palanca técnica del Plan 44".
 
 ## Contexto y motivación
 

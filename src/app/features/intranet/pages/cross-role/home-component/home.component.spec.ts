@@ -7,7 +7,7 @@ import { StorageService } from '@core/services';
 import { FeatureFlagsFacade } from '@core/services/feature-flags';
 import { UserPermissionsService } from '@core/services/permissions/user-permisos.service';
 import { UserProfileService } from '@core/services/user/user-profile.service';
-import { signal, WritableSignal } from '@angular/core';
+import { computed, signal, Signal, WritableSignal } from '@angular/core';
 import { APP_USER_ROLES } from '@shared/constants';
 
 // #endregion
@@ -22,6 +22,7 @@ describe('HomeComponent (Intranet)', () => {
 		isPromotor: WritableSignal<boolean>;
 		isCoordinadorAcademico: WritableSignal<boolean>;
 		isProfesor: WritableSignal<boolean>;
+		isAdministrativo: Signal<boolean>;
 	};
 
 	beforeEach(async () => {
@@ -43,12 +44,23 @@ describe('HomeComponent (Intranet)', () => {
 			tienePermiso: vi.fn().mockReturnValue(false),
 		};
 
+		const isDirector = signal(false);
+		const isAsistenteAdministrativo = signal(false);
+		const isPromotor = signal(false);
+		const isCoordinadorAcademico = signal(false);
 		userProfileMock = {
-			isDirector: signal(false),
-			isAsistenteAdministrativo: signal(false),
-			isPromotor: signal(false),
-			isCoordinadorAcademico: signal(false),
+			isDirector,
+			isAsistenteAdministrativo,
+			isPromotor,
+			isCoordinadorAcademico,
 			isProfesor: signal(false),
+			isAdministrativo: computed(
+				() =>
+					isDirector() ||
+					isAsistenteAdministrativo() ||
+					isPromotor() ||
+					isCoordinadorAcademico(),
+			),
 		};
 
 		await TestBed.configureTestingModule({
@@ -99,8 +111,8 @@ describe('HomeComponent (Intranet)', () => {
 	});
 
 	describe('showAttendanceWidget gate', () => {
-		// Asistente Administrativo queda fuera intencionalmente (Plan 28 Chat 4a):
-		// el AA no tiene salón, así que tiene su widget propio (showAsistenteAdminWidget).
+		// Brief 143 (2026-05-12, jefatura): los 4 roles administrativos comparten
+		// el mismo summary widget. Revierte Plan 28 Chat 4a (AA con widget propio).
 		const adminRoles = [
 			{ label: 'Director', flag: 'isDirector' as const, role: APP_USER_ROLES.Director },
 			{ label: 'Promotor', flag: 'isPromotor' as const, role: APP_USER_ROLES.Promotor },
@@ -108,6 +120,11 @@ describe('HomeComponent (Intranet)', () => {
 				label: 'Coordinador Académico',
 				flag: 'isCoordinadorAcademico' as const,
 				role: APP_USER_ROLES.CoordinadorAcademico,
+			},
+			{
+				label: 'Asistente Administrativo',
+				flag: 'isAsistenteAdministrativo' as const,
+				role: APP_USER_ROLES.AsistenteAdministrativo,
 			},
 		];
 

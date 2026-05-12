@@ -23,11 +23,11 @@
 			<app-attendance-director />
 		}
 		@case ('Asistente Administrativo') {
-			<!-- * Plan 28 Chat 4a: AA viendo /intranet/asistencia ve su propia asistencia,
-			     no el panel admin. Las correcciones formales sobre 'A' las hacen los
-			     supervisores (Director, Promotor, Coordinador Académico) vía
-			     /intranet/admin/asistencias — INV-AD08. -->
-			<app-attendance-asistente-admin-propia />
+			<!-- * Brief 143 (2026-05-12, jefatura): los 4 roles administrativos comparten
+			     el mismo panel director. Revierte Plan 28 Chat 4a (AA con vista propia).
+			     Las mutaciones sobre 'A' siguen gateadas por INV-AD06/AD08 server-side.
+			     TODO Plan 28 Chat 4a reversion — revisar invariantes en business-rules.md. -->
+			<app-attendance-director />
 		}
 		@case ('Promotor') {
 			<app-attendance-director />
