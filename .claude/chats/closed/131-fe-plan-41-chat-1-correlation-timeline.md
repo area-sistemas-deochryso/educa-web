@@ -1,8 +1,7 @@
 # 131 · Plan 41 Chat 1 — F1 Timeline cronológico unificado en Hub Correlation
 
 > **Creado**: 2026-05-08 · **Estado**: ⏳ pendiente arrancar · **Repo**: `educa-web` (main) — solo FE
-> **Validación prod 2026-05-09 (sábado)**: ❌ bloqueada — Cowork verificó que `/intranet/admin/correlation/:id` en prod sigue mostrando versión vieja agrupada por fuente (4 secciones). Commit `b9543ed` (timeline unificado) NO está en bundle Netlify prod. Reintentar lunes 2026-05-11 tras confirmar deploy.
-> **Acciones lunes**: (1) `git log origin/main --oneline | grep b9543ed` para confirmar merge a deploy branch. (2) Si está mergeado, pedir log Netlify para descartar fallo. (3) Re-run validación PROD-11 del handoff.
+> **Validación prod**: ✅ verificada 2026-05-12 (Cowork: toggle "Timeline ↔ Por sección" presente, vista Timeline renderiza eventos cronológicos con badges identificando fuente. correlationId `fa79eaa86335bdb1bf38f19123813849` con 1 evento RATE LIMIT mostrado correctamente).
 > **Plan**: [Plan 41 — Trazabilidad y Observabilidad del Hub de Correlación](../../plan/correlation-hub-observability.md)
 > **Origen**: F1 del Plan 41. Página `/intranet/admin/correlation/:id` (Plan 32 shipped) renderiza 4 secciones independientes ordenadas cada una por su `Fecha`. El admin tiene que cruzar mentalmente 4 timestamps para reconstruir qué pasó primero. Resuelve **brecha #1** (sin timeline cronológico) y **brecha #12** (cap defensivo de 100 filas invisible en la UI).
 

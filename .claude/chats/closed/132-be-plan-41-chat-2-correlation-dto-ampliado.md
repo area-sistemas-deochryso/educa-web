@@ -1,6 +1,7 @@
 # 132 · Plan 41 Chat 2 — F2 BE DTO ampliado del snapshot correlation
 
 > **Creado**: 2026-05-08 · **Estado**: ⏳ pendiente arrancar · **Repo**: `Educa.API` (master) — solo BE
+> **Validación prod**: ✅ verificada 2026-05-12 (Cowork: GET /api/sistema/correlation/{id} retorna los 4 arrays + campos nuevos `generatedAt` y `relatedCorrelationIds`).
 > **Plan**: [Plan 41 — Trazabilidad y Observabilidad del Hub de Correlación](../../plan/correlation-hub-observability.md)
 > **Origen**: F2 del Plan 41. Chat 1 (brief 131) dejó el FE con timeline cronológico y banner de cap. F2 abre la página como **grafo navegable**: cada fila debe poder saltar al detalle del agrupador (ErrorGroup, bandeja del destinatario, reporte de usuario), y el admin debe ver "otros correlation IDs del mismo usuario" para reconstruir contexto sesional. Resuelve **brecha #4** (sin grafo de relaciones), **brecha #5** parcial (vista por usuario) y **brecha #7** (outbox-chain visible).
 

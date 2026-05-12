@@ -1,6 +1,6 @@
 # BE/FE — Audit filtrado soft-delete en endpoints `/estadisticas` + fix walDelete optimistic
 
-> **Validación prod**: ⏳ pendiente smoke en prod (eliminar curso descartable, verificar `cursosInactivos` sube).
+> **Validación prod**: ✅ verificada 2026-05-12 (Cowork: crear curso QA-2026-05-12-curso-test → Total 29→30, Activos 29→30; eliminar → Activos 30→29, Inactivos 0→1, Total 30, sin F5. Curso ID 44 queda soft-deleted en BD para limpieza manual con SQL).
 
 > **Repo destino**: `educa-web` (main) — pivot tras audit BE
 > **Estado**: ✅ trabajo completado local, awaiting prod validation

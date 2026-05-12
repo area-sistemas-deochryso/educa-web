@@ -10,7 +10,7 @@ hot-paths: []
 ---
 
 > **Creado**: 2026-05-08 · **Estado**: ⏳ pendiente arrancar.
-> **Validación prod**: ⏳ pendiente desde 2026-05-08
+> **Validación prod**: ✅ verificada 2026-05-12 (Cowork: filtro de rol con 8 opciones incluyendo Coord Académico, dialog Nuevo Usuario con la opción, stat card "Coord. Académicos: 1" visible)
 
 ## Contexto
 

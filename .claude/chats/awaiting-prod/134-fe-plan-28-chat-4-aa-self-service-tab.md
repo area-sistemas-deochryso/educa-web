@@ -2,6 +2,7 @@
 
 > **Creado**: 2026-05-09 · **Estado**: ✅ awaiting-prod 2026-05-09 · **Repo**: `educa-web` (main)
 > **Bloquea**: Plan 28 al 100% (cierra Chat 4 FE — pendiente deploy BE 3d para validación funcional).
+> **Validación prod**: ✅ 4a verificada 2026-05-12 (Cowork: login AA DNI 72884913 → widget home "Mi asistencia de hoy", `/intranet/asistencia` con leyenda y empty state legítimo, GET `/api/asistente-administrativo/me/mes` y `/me/dia` responden 200, sin botones edición). ⚠️ 4b-tab director-profesores tab AA bloqueada por bug FE F-018 (botón "Registrar" disabled en dialog asistencia manual AA — ver brief F-018 en open/).
 
 ## Modo sugerido
 
