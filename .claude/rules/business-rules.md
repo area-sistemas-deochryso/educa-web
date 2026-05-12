@@ -687,7 +687,10 @@ Las siguientes operaciones **deben** ejecutarse en una sola transacción:
 
 ### 10.3 Idempotencia
 
-**Regla**: Mutaciones desde el frontend incluyen `X-Idempotency-Key`. El backend **debe** rechazar duplicados con 409 Conflict en lugar de procesar dos veces.
+**Regla**: Mutaciones desde el frontend incluyen `X-Idempotency-Key`. El backend persiste la respuesta original (status + body + content-type) bajo un scope `route:userId:idempotencyKey` con TTL de 24h. Una nueva request con la misma combinación dentro del TTL **replay** la respuesta original sin re-ejecutar la operación — el cliente recibe el mismo resultado del primer submit. Aplica solo a métodos de mutación (`POST`, `PUT`, `DELETE`, `PATCH`). Requests sin el header pasan transparentemente (backward compatible). Si el insert al persistir cachea falla por inserción concurrente (`DbUpdateException`), el primer ganador prevalece y la segunda inserción se descarta silenciosamente con `LogWarning`.
+
+> **Historial**:
+> - 2026-05-12 — Corregido. Anterior versión decía "rechazar duplicados con 409 Conflict", pero el `IdempotencyMiddleware` implementa replay desde su origen y el FE (`FeedbackReportFacade`, ver §16.5 e INV-RU04) ya depende de ese contrato. La versión 409 era deuda documental contradictoria con §16.5 / INV-RU04. Verificado por `IdempotencyMiddlewareTests` (Plan 12 F3.IDEMPOTENCY).
 
 ---
 
@@ -1170,7 +1173,7 @@ Este registro consolida TODAS las invariantes del sistema en una tabla indexable
 | `INV-S03` | Permisos | Permisos personalizados REEMPLAZAN (no se suman a) permisos del rol | `PermisosService` | 8.1 |
 | `INV-S04` | Permisos | Permiso a ruta padre NO implica permiso a rutas hijas | Comparación exacta | 8.2 |
 | `INV-S05` | Concurrencia | Conflicto de RowVersion → `ApplicationDbContext.SaveChangesAsync` propaga `DbUpdateConcurrencyException` al caller sin reintentar. `GlobalExceptionMiddleware` lo mapea a HTTP 409 y el WAL del FE marca la entry `CONFLICT` y hace rollback al snapshot pre-mutación. **No hay retry server-side** | `ApplicationDbContext.SaveChangesAsync` override + `GlobalExceptionMiddleware` + `WalFacadeHelper` rollback. Verificado por `ApplicationDbContextConcurrencyTests` | 10.1 |
-| `INV-S06` | Idempotencia | `X-Idempotency-Key` duplicado → 409 Conflict (no reprocesar) | `IdempotencyMiddleware` | 10.3 |
+| `INV-S06` | Idempotencia | Mutación (`POST`/`PUT`/`DELETE`/`PATCH`) con `X-Idempotency-Key` repetido dentro de TTL 24h bajo scope `route:userId:idempotencyKey` → **replay del status + body + content-type cacheados** (NO 409). Requests sin header pasan transparentes (backward compatible). `DbUpdateException` en insert concurrente → swallowed con `LogWarning` (primer ganador prevalece) | `IdempotencyMiddleware`. Verificado por `IdempotencyMiddlewareTests` | 10.3, 16.5 |
 | `INV-S07` | Notificación | Error en notificación NUNCA falla la operación principal | Fire-and-forget pattern | 11.1 |
 | `INV-S08` | Timezone | CrossChex webhook UTC+0 → convertir a UTC-5 antes de almacenar | `DateTimeOffset.Parse().ToOffset()` | 1.7 |
 
