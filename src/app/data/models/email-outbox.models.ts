@@ -45,6 +45,8 @@ export interface EmailOutboxLista {
 	fechaReg: string;
 	/** Plan 32 Chat 2 BE — id de correlación inyectado en el outbox para tracing cross-fuente. */
 	correlationId: string | null;
+	/** Plan 43 Chat 2.1 BE — último error 4.x.x transiente sin promover a FAILED (badge "Pendiente reintento" en PROCESSING). */
+	ultimoErrorTransiente?: string | null;
 }
 
 export interface EmailOutboxEstadisticas {

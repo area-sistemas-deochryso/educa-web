@@ -46,7 +46,9 @@
 			</div>
 
 			<div class="field full-width">
-				<label for="bl-observacion">Observación</label>
+				<label for="bl-observacion">
+					Observación{{ motivoIsManual() ? ' *' : '' }}
+				</label>
 				<textarea
 					id="bl-observacion"
 					pTextarea
@@ -55,10 +57,23 @@
 					autocomplete="off"
 					[ngModel]="formData().observacion"
 					(ngModelChange)="onObservacionChange($event)"
-					placeholder="Notas opcionales (motivo de la decisión, contexto, etc.)"
+					[placeholder]="
+						motivoIsManual()
+							? 'Explicá la razón del bloqueo (mínimo ' + observacionMin + ' caracteres)'
+							: 'Notas opcionales (motivo de la decisión, contexto, etc.)'
+					"
 					[disabled]="submitting()"
 				></textarea>
-				<small class="hint">Máx. 500 caracteres.</small>
+				@if (motivoIsManual()) {
+					<small class="hint">
+						{{ observacionLength() }}/{{ observacionMin }} mín. — Máx. 500 caracteres.
+					</small>
+					@if (touched() && observacionError()) {
+						<small class="p-error">{{ observacionError() }}</small>
+					}
+				} @else {
+					<small class="hint">Máx. 500 caracteres.</small>
+				}
 			</div>
 		</div>
 	</div>

@@ -47,6 +47,14 @@
 					[value]="getEstadoLabel(item.estado)"
 					[severity]="getEstadoSeverity(item.estado)"
 				/>
+				@if (item.estado === 'PROCESSING' && item.ultimoErrorTransiente) {
+					<p-tag
+						value="Pendiente reintento"
+						styleClass="tag-neutral"
+						[pTooltip]="(item.ultimoErrorTransiente || '') | slice: 0 : 80"
+						tooltipPosition="top"
+					/>
+				}
 			</td>
 			<td>
 				<p-tag

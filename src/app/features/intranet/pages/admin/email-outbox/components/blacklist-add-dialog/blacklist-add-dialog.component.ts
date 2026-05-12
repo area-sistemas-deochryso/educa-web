@@ -35,6 +35,9 @@ const MOTIVO_LABELS: Record<EmailBlacklistMotivo, string> = {
 
 const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
+/** Plan 43 Chat 2.1 — contrato BE 422 `BLACKLIST_MOTIVO_REQUERIDO` para motivo=MANUAL. */
+export const BLACKLIST_OBSERVACION_MIN_MANUAL = 20;
+
 /**
  * Plan 38 Chat 5 (D17.8) — dialog "Agregar a blacklist".
  * Solo expone `MANUAL` y `BULK_IMPORT` en el `<p-select>` — los demás motivos
@@ -93,8 +96,24 @@ export class BlacklistAddDialogComponent {
 		this.formData().motivo === null ? 'El motivo es obligatorio' : null,
 	);
 
+	/** Plan 43 Chat 2.1 — motivo MANUAL exige observación ≥20 chars (contrato BE). */
+	readonly observacionError = computed(() => {
+		if (this.formData().motivo !== 'MANUAL') return null;
+		const len = this.formData().observacion.trim().length;
+		return len < BLACKLIST_OBSERVACION_MIN_MANUAL
+			? `Mínimo ${BLACKLIST_OBSERVACION_MIN_MANUAL} caracteres requeridos cuando el motivo es manual`
+			: null;
+	});
+
+	readonly observacionLength = computed(() => this.formData().observacion.trim().length);
+	readonly observacionMin = BLACKLIST_OBSERVACION_MIN_MANUAL;
+	readonly motivoIsManual = computed(() => this.formData().motivo === 'MANUAL');
+
 	readonly canSubmit = computed(() =>
-		!this.correoError() && !this.motivoError() && !this.submitting(),
+		!this.correoError() &&
+		!this.motivoError() &&
+		!this.observacionError() &&
+		!this.submitting(),
 	);
 	// #endregion
 

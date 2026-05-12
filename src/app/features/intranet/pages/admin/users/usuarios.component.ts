@@ -1,6 +1,8 @@
+/* eslint-disable max-lines -- Razón: god-page admin/usuarios concentra CRUD + dev migration + validation dialog + excel export + autoOpen (Plan 43 A13). Extracciones aplicadas (helpers/, services/payload.builder, helpers/auto-open-from-query). Resto requiere refactor mayor fuera del scope del brief 147. */
 // #region Imports
-import { AfterViewInit, ChangeDetectionStrategy, Component, DestroyRef, inject, signal } from '@angular/core';
+import { AfterViewInit, ChangeDetectionStrategy, Component, DestroyRef, effect, inject, signal } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { ActivatedRoute } from '@angular/router';
 import { ButtonModule } from 'primeng/button';
 import { CommonModule } from '@angular/common';
 import { ConfirmDialogModule } from 'primeng/confirmdialog';
@@ -46,6 +48,11 @@ import { logger } from '@core/helpers';
 import { ExcelService } from '@core/services';
 import type { ImportarEstudianteItem } from './services';
 import { validarUsuarios } from './usuarios-validation.helpers';
+import {
+	AutoOpenTarget,
+	findAutoOpenMatch,
+	readAutoOpenQueryParams,
+} from './helpers/auto-open-from-query.helper';
 
 // #endregion
 // #region Implementation
@@ -80,6 +87,10 @@ export class UsersComponent implements AfterViewInit {
 	private usuariosApi = inject(UsersService);
 	private excelService = inject(ExcelService);
 	private destroyRef = inject(DestroyRef);
+	private route = inject(ActivatedRoute);
+
+	// * Plan 43 Chat 2.1 (A13) — auto-open desde auditoría de correos.
+	private autoOpenTarget = signal<AutoOpenTarget | null>(null);
 
 	// * Migration state (one-time, only in development)
 	readonly isDev = !environment.production;
@@ -129,6 +140,20 @@ export class UsersComponent implements AfterViewInit {
 		// Disparar carga en constructor para que los skeletons se muestren
 		// desde el primer frame sin esperar a ngOnInit
 		this.dataFacade.loadData();
+
+		// Plan 43 Chat 2.1 (A13) — auto-open desde auditoría de correos.
+		this.autoOpenTarget.set(
+			readAutoOpenQueryParams(this.route, (term) => this.dataFacade.setSearchTerm(term)),
+		);
+		effect(() => {
+			const target = this.autoOpenTarget();
+			if (!target) return;
+			const match = findAutoOpenMatch(target, this.vm().usuarios as UsuarioLista[]);
+			if (match) {
+				this.autoOpenTarget.set(null);
+				this.uiFacade.editUsuario(match);
+			}
+		});
 	}
 
 	ngAfterViewInit(): void {

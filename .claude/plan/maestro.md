@@ -100,7 +100,7 @@
 
 4. **[Plan 43 · Chat 1.2 · BE+FE]** — Fingerprint correcto (quitar duración del hash) + merge idempotente de duplicados + sparkline 30d en `ErrorGroup`. Cierra A8+B2. Razón: hoy 340 ocurrencias de 1 bug se ven como 340 grupos — bloquea cualquier filtro/trend/acción que F4/F5 agreguen sobre Errores. Riesgo: job de merge sobre prod, validar idempotencia en staging primero.
 5. **[Plan 43 · Chat 1.3 · BE+FE+E2E]** — Propagación correlation id end-to-end (front → BE → outbox → SMTP → hubs SignalR + RateLimitEvent). Cierra A11+B3. Razón: F3 (diagnóstico SMTP) y F6 (vista unificada) y B10 (bundle telemetría) **dependen** de esto. Hoy el hub correlacionado existe pero llega vacío. Coordinar con Plan 41 F6.
-6. **[Plan 43 · Chat 2.1 · BE thin + FE]** — Quick wins empacados: A3 (TipoFallo en PROCESSING), A7+B7 (motivo obligatorio en blacklist manual), A12 (quitar enmascaramiento inconsistente), A13 (link auditoría → usuarios). 5 puntos sin riesgo en 1 chat. Sin dependencias, puede correr en paralelo con 1.1/1.2/1.3.
+6. ✅ **[Plan 43 · Chat 2.1 · BE thin + FE]** — Quick wins empacados: A3 (TipoFallo en PROCESSING), A7+B7 (motivo obligatorio en blacklist manual), A12 (quitar enmascaramiento), A13 (link auditoría → usuarios). **Shipped local 2026-05-12**: BE en chat 142 + FE en chat 147 (ambos awaiting-prod). 5 puntos cerrados, esperan deploy + verify.
 
 ### 🟢 Media — Plan 43 capas siguientes (esperan F1)
 

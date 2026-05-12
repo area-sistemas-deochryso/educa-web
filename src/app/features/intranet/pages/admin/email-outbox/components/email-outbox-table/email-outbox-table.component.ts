@@ -1,5 +1,5 @@
 import { ChangeDetectionStrategy, Component, input, output } from '@angular/core';
-import { DatePipe } from '@angular/common';
+import { DatePipe, SlicePipe } from '@angular/common';
 import { TableModule } from 'primeng/table';
 import { TagModule } from 'primeng/tag';
 import { ButtonModule } from 'primeng/button';
@@ -26,6 +26,7 @@ import { TipoFalloSeverityPipe } from '../../pipes/tipo-fallo-severity.pipe';
 		ButtonModule,
 		TooltipModule,
 		DatePipe,
+		SlicePipe,
 		TipoFalloLabelPipe,
 		TipoFalloSeverityPipe,
 		CorrelationIdPillComponent,

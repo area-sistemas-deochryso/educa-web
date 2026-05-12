@@ -70,20 +70,29 @@ export class AuditoriaCorreosFacade {
 
 	// #region Navegación
 	/**
-	 * El DNI del DTO ya viene enmascarado ("***1234") — no sirve para prefiltrar
-	 * `/admin/usuarios` por búsqueda. Como ese page tampoco acepta query params
-	 * hoy, copiamos el nombre al clipboard y mostramos toast guiando al admin.
-	 * Es la opción B del brief (trade-off: no extender scope de usuarios).
+	 * Plan 43 Chat 2.1 (A13): navega a `/admin/usuarios` con queryParams para
+	 * auto-abrir el dialog de edición del usuario afectado. El DNI viene
+	 * enmascarado del BE, así que pasamos `entidadId + tipoOrigen + nombreCompleto`
+	 * para que el page destino haga el lookup y abra el form.
+	 * Mantenemos el copy-to-clipboard como fallback si el lookup no encuentra
+	 * el usuario (paginación, filtros, etc.).
 	 */
 	async navegarAUsuario(item: AuditoriaCorreoAsistenciaDto): Promise<void> {
 		const ok = await this.copyToClipboard(item.nombreCompleto);
 		if (ok) {
 			this.errorHandler.showInfo(
 				'Nombre copiado',
-				`Pégalo en el buscador de Usuarios para ubicar "${item.nombreCompleto}".`,
+				`Abriendo "${item.nombreCompleto}". Si no se abre el formulario, pega el nombre en el buscador.`,
 			);
 		}
-		this.router.navigate(['/intranet/admin/usuarios']);
+		this.router.navigate(['/intranet/admin/usuarios'], {
+			queryParams: {
+				autoOpen: 'true',
+				openUserId: item.entidadId,
+				openUserRol: item.tipoOrigen,
+				openUserName: item.nombreCompleto,
+			},
+		});
 	}
 
 	private async copyToClipboard(text: string): Promise<boolean> {

@@ -338,24 +338,24 @@ Cuando cada chat ship, marcar los puntos del feedback original que cierra:
 |-------|-----------|--------|
 | A1 — contadores inconsistentes | Chat 1.1 | ✅ ship 2026-05-11 (chat 139) |
 | A2 — bandeja sin filtro/orden estado | Chat 4.1 | ⏳ |
-| A3 — TipoFallo "Sin clasificar" en PROCESSING | Chat 2.1 | ⏳ |
+| A3 — TipoFallo "Sin clasificar" en PROCESSING | Chat 2.1 | ✅ BE chat 142 (awaiting-prod) + FE chat 147 (awaiting-prod) |
 | A4 — buscador no encuentra outbox huérfanos | Chat 3.2 | ⏳ |
 | A5 — detalle correo sin SMTP/remitente/origen | Chat 3.2 | ⏳ |
 | A6 — blacklist sin SMTP real | Chat 3.1 | ⏳ |
-| A7 — bloqueo manual sin motivo | Chat 2.1 | ⏳ |
+| A7 — bloqueo manual sin motivo | Chat 2.1 | ✅ BE chat 142 (awaiting-prod) + FE chat 147 (awaiting-prod) |
 | A8 — fingerprint variable (340 grupos = 1 bug) | Chat 1.2 | ⏳ |
 | A9 — filtros pobres en errores | Chat 4.2 | ⏳ |
 | A10 — breadcrumbs limitados a 5 | Chat 4.2 | ⏳ |
 | A11 — correlation id no se propaga | Chat 1.3 | ⏳ |
-| A12 — enmascaramiento inconsistente | Chat 2.1 | ⏳ |
-| A13 — auditoría sin "ir a corregir" | Chat 2.1 | ⏳ |
+| A12 — enmascaramiento inconsistente | Chat 2.1 | ✅ BE chat 142 (awaiting-prod) — FE n/a |
+| A13 — auditoría sin "ir a corregir" | Chat 2.1 | ✅ FE chat 147 (awaiting-prod) |
 | B1 — vista por destinatario | Chat 6.1 | ⏳ |
 | B2 — fingerprint + trend + percentiles | Chat 1.2 | ⏳ |
 | B3 — correlation id end-to-end | Chat 1.3 | ⏳ |
 | B4 — SMTP visible donde corresponde | Chat 3.1 | ⏳ |
 | B5 — filtros consolidados | Chat 4.1 + 4.2 | ⏳ |
 | B6 — acciones inline | Chat 4.3 | ⏳ |
-| B7 — notas obligatorias en blacklist manual | Chat 2.1 | ⏳ |
+| B7 — notas obligatorias en blacklist manual | Chat 2.1 | ✅ BE chat 142 (awaiting-prod) + FE chat 147 (awaiting-prod) |
 | B8 — trend 30d en contadores | Chat 5.1 | ⏳ |
 | B9 — heatmap latencia | Chat 5.2 | ⏳ |
 | B10 — bundle telemetría en reportes | Chat 5.2 | ⏳ |

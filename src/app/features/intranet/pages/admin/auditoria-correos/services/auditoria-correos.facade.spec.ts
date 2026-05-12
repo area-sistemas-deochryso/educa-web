@@ -105,10 +105,20 @@ describe('AuditoriaCorreosFacade', () => {
 		expect(store.searchTerm()).toBe('');
 	});
 
-	it('navegarAUsuario siempre navega a /admin/usuarios', async () => {
+	it('navegarAUsuario navega con queryParams autoOpen+entidadId+rol+nombre (Plan 43 A13)', async () => {
 		setup();
 		await facade.navegarAUsuario(mockItems[0]);
-		expect(router.navigate).toHaveBeenCalledWith(['/intranet/admin/usuarios']);
+		expect(router.navigate).toHaveBeenCalledWith(
+			['/intranet/admin/usuarios'],
+			{
+				queryParams: {
+					autoOpen: 'true',
+					openUserId: 1,
+					openUserRol: 'Estudiante',
+					openUserName: 'Perez Lucia',
+				},
+			},
+		);
 	});
 
 	it('no dispara carga concurrente si loading=true', () => {
