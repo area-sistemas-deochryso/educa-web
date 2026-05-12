@@ -64,3 +64,62 @@ Combinaciones útiles:
 
 - Hosting compartido tiene techos no negociables. Diseñar para **reducir demanda**, no solo para **resistir el techo**, escala mejor.
 - Los planes 22/29/37/38/39 son defensivos. Plan 42 es ofensivo. Ambos modos son necesarios.
+
+---
+
+## 🏁 Conclusión del `/design` — Plan 44 DESCARTADO (2026-05-12)
+
+### Restricciones finales del usuario
+
+1. **CrossChex se queda** — funcional, sin reemplazo aprobado. Línea F (corte SMTP CrossChex) descartada.
+2. **Sin aprobación adicional** — sin SMTP relay externo (línea J), sin subdominio dedicado (línea I), sin costo, sin fricción.
+3. **Mínimo viable, menor riesgo** — descartadas líneas A (consolidación, fricción al apoderado), C (opt-out, UI nueva), D (drop salida regular, ack del jefe), E (push, bloqueado por Plan 19).
+
+### Insight clave del análisis
+
+**El contador `max_defer_fail_percentage` mira FAILED, no SENT.** Educa hoy: 14 FAILED / 5208 SENT = **0.27% FAILED rate**. Las defensas INV-MAIL01/02/07/09 ya cubren la métrica relevante del contador. Reducir volumen total NO mueve la aguja del contador — mueve UX del apoderado.
+
+Consecuencia: el "Plan 44 ofensivo" original (líneas A/B/C/D/E) ataca un problema que la métrica del techo NO mide. Bajo las restricciones del usuario, la única acción que mueve la aguja sin fricción es **ceder automáticamente cuando el contador compartido con CrossChex está caliente**.
+
+### Decisión
+
+**Plan 44 descartado. Scope mínimo viable absorbido por Plan 22 ampliado**:
+
+| Chat | Repo | Scope | Estado |
+|---|---|---|---|
+| **Plan 22 Chat 5 (F4.BE)** | BE | Auditoría destinatarios inválidos (endpoint admin) | ✅ Ya planificado (cola del Plan 22) |
+| **Plan 22 Chat 6 (F4.FE)** | FE | UI admin de la auditoría | ✅ Ya planificado (cola del Plan 22) |
+| **Plan 22 Chat 7 (F5.BE)** 🆕 | BE | Guard de cesión automática en `EmailOutboxWorker` cuando contador ≥80% — pausa correos informativos (`Asistencia`, `AsistenciaProfesor`), mantiene críticos administrativos. Sin UI, sin opt-in, transparente. Formaliza **INV-MAIL10**. | 🆕 Brief en `chats/open/146` |
+
+### Entregables ejecutados en este chat
+
+1. ✅ **Maestro actualizado** — Plan 44 marcado DESCARTADO; Plan 22 con Chat 7 nuevo en cola; nota operativa actualizada.
+2. ✅ **`business-rules.md §15.14`** — agregada **INV-MAIL10** documentando el guard de cesión automática + referencia desde §18.5.
+3. ✅ **Brief Plan 22 Chat 7** creado en `chats/open/146-be-plan-22-chat-7-defer-fail-cession-guard.md` con scope concreto, decisiones tomadas, pre-work y tests esperados.
+4. ✅ **Sin ADR nuevo** — la estrategia ya vive implícita en `business-rules.md §18 + INV-MAIL01-10`. ADR-0007 no necesario.
+
+### Líneas explícitamente descartadas (registro para futuro)
+
+| Línea | Razón descarte |
+|---|---|
+| A — Consolidación diaria | Fricción percibida por apoderado; no mueve métrica del contador (FAILED no SENT) |
+| B — Scheduling fuera de pico | Redundante si A entra; sin A, complejidad sin ganancia clara |
+| C — Opt-out granular | UI nueva, requiere apoderados configurar, default sigue como hoy |
+| D — Drop salida regular | Ack del jefe (fricción política), no técnica |
+| E — Push canal alterno | Bloqueado por Plan 19 F1+F2 sin cerrar |
+| F — Corte CrossChex SMTP | **Restricción explícita del usuario** (2026-05-12): CrossChex funcional, sin reemplazo aprobado |
+| I — Subdominio dedicado | Sin aprobación adicional disponible |
+| J — SMTP relay externo | Sin aprobación adicional + costo recurrente $10-20/mes |
+
+### Si la situación empeora en el futuro
+
+Si crece la matrícula y los FAILED suben proporcionalmente, o si el contador del hosting se vuelve crónicamente saturado por CrossChex, revisar en este orden:
+
+1. **G (auditoría + cleanup BD)** — Plan 22 Chat 5/6 — barrido manual al pico de FAILED.
+2. **H ampliado** — bajar `DeferFailCessionThresholdPercentage` de 80 a 60 si el guard del Chat 7 no se está disparando lo suficiente.
+3. **A (consolidación diaria)** — si la presión del usuario hace que la fricción ya no sea bloqueante.
+4. **J (SMTP relay externo)** — escalar a empresa con datos reales de bloqueos del dominio post-Chat 7.
+
+### Estado del chat
+
+🏁 `/design` completado. **Siguiente paso**: `/end` para commit + mover brief 141 a `closed/`. El próximo `/start-chat` debería tomar el brief 146 (Plan 22 Chat 7) o cualquiera de la cola priorizada del maestro.
