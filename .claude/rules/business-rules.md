@@ -668,9 +668,15 @@ DNI + Rol seleccionado → switch(rol) → query directa a tabla del rol
 ### 10.1 Optimistic concurrency (RowVersion)
 
 **Regla**: Todas las entidades principales tienen `RowVersion`. En conflicto de concurrencia:
-1. Detectar `DbUpdateConcurrencyException`
-2. Reintentar hasta **3 veces** (con reload de datos)
-3. Si falla después de 3 intentos, propagar el error
+
+1. EF Core detecta el conflicto y lanza `DbUpdateConcurrencyException` en `SaveChangesAsync`.
+2. `ApplicationDbContext.SaveChangesAsync` **propaga** la excepción al caller sin reintentar.
+3. `GlobalExceptionMiddleware` la mapea a `HTTP 409 Conflict`.
+4. El WAL del FE recibe el 409, marca la entry como `CONFLICT` y hace rollback al snapshot pre-mutación.
+
+**No hay retry server-side**. La decisión de reintentar (o no) la toma el caller, típicamente el FE tras refrescar el `rowVersion` con un GET y reintentar la mutación con el valor actualizado.
+
+> **Historial**: hasta brief 088 (WAL smoke case 3), el override capturaba la excepción, refrescaba `OriginalValues` y reintentaba hasta 3 veces ("last write wins"). Esto deshabilitaba la concurrency check del WAL del FE — que necesita ver el 409 para detectar el conflicto y hacer rollback al snapshot. El fix eliminó el try/catch + retry. Verificado por `ApplicationDbContextConcurrencyTests`.
 
 ### 10.2 Operaciones transaccionales
 
@@ -1163,7 +1169,7 @@ Este registro consolida TODAS las invariantes del sistema en una tabla indexable
 | `INV-S02` | Auth | Contraseña legacy se rehashea a BCrypt en login exitoso | `TryRehashAsync` transparente | 7.3 |
 | `INV-S03` | Permisos | Permisos personalizados REEMPLAZAN (no se suman a) permisos del rol | `PermisosService` | 8.1 |
 | `INV-S04` | Permisos | Permiso a ruta padre NO implica permiso a rutas hijas | Comparación exacta | 8.2 |
-| `INV-S05` | Concurrencia | Conflicto de RowVersion → reintentar hasta 3 veces, luego propagar | `DbUpdateConcurrencyException` handler | 10.1 |
+| `INV-S05` | Concurrencia | Conflicto de RowVersion → `ApplicationDbContext.SaveChangesAsync` propaga `DbUpdateConcurrencyException` al caller sin reintentar. `GlobalExceptionMiddleware` lo mapea a HTTP 409 y el WAL del FE marca la entry `CONFLICT` y hace rollback al snapshot pre-mutación. **No hay retry server-side** | `ApplicationDbContext.SaveChangesAsync` override + `GlobalExceptionMiddleware` + `WalFacadeHelper` rollback. Verificado por `ApplicationDbContextConcurrencyTests` | 10.1 |
 | `INV-S06` | Idempotencia | `X-Idempotency-Key` duplicado → 409 Conflict (no reprocesar) | `IdempotencyMiddleware` | 10.3 |
 | `INV-S07` | Notificación | Error en notificación NUNCA falla la operación principal | Fire-and-forget pattern | 11.1 |
 | `INV-S08` | Timezone | CrossChex webhook UTC+0 → convertir a UTC-5 antes de almacenar | `DateTimeOffset.Parse().ToOffset()` | 1.7 |
@@ -1635,7 +1641,7 @@ REGLAS DE NEGOCIO
 CONSISTENCIA
 [ ] ¿Se respeta soft-delete? (toggle estado, no DELETE) — INV-D03
 [ ] ¿Se audita? (UsuarioReg/Mod, FechaReg/Mod) — INV-D02
-[ ] ¿Se maneja concurrencia? (RowVersion, retry) — INV-S05
+[ ] ¿Se maneja concurrencia? (RowVersion, propaga 409 sin retry server-side) — INV-S05
 [ ] ¿Es idempotente? (X-Idempotency-Key) — INV-S06
 
 BATCH
