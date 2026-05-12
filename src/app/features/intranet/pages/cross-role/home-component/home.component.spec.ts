@@ -111,8 +111,7 @@ describe('HomeComponent (Intranet)', () => {
 	});
 
 	describe('showAttendanceWidget gate', () => {
-		// Brief 143 (2026-05-12, jefatura): los 4 roles administrativos comparten
-		// el mismo summary widget. Revierte Plan 28 Chat 4a (AA con widget propio).
+		// Los 4 roles administrativos comparten el mismo summary widget.
 		const adminRoles = [
 			{ label: 'Director', flag: 'isDirector' as const, role: APP_USER_ROLES.Director },
 			{ label: 'Promotor', flag: 'isPromotor' as const, role: APP_USER_ROLES.Promotor },

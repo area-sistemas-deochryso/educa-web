@@ -56,10 +56,9 @@ export class AttendanceComponent implements AfterViewInit {
 	readonly selectedMode = signal<ViewMode>(VIEW_MODE.Dia);
 
 	// * El pill día/mes aplica cuando el usuario mira el panel admin o sus estudiantes.
-	//   - Los 4 roles administrativos (brief 143): siempre aplica (panel director).
+	//   - Los 4 roles administrativos: siempre aplica (panel director).
 	//   - Profesor: solo cuando tab "Mis estudiantes" está activa.
 	//   - Estudiante / Apoderado: nunca aplica — vista propia mensual.
-	// TODO Plan 28 Chat 4a reversion — revisar INV-AD05/AD08 en business-rules.md.
 	private readonly profesorShowModeSelector = signal(false);
 	readonly showModeSelector = computed(() => {
 		const role = this.userRole();
@@ -111,9 +110,6 @@ export class AttendanceComponent implements AfterViewInit {
 	/**
 	 * Los 4 roles administrativos (Director, Asistente Administrativo, Promotor,
 	 * Coordinador Académico) comparten el mismo panel admin de asistencia.
-	 * Brief 143 (2026-05-12, jefatura) revirtió Plan 28 Chat 4a — el AA dejó de
-	 * tener vista propia. Las mutaciones server-side siguen gateadas por
-	 * INV-AD06/AD08 cuando aplique.
 	 */
 	private isAdministrativeRole(role: string): boolean {
 		return (

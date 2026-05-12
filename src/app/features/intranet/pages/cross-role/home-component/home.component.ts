@@ -37,9 +37,7 @@ export class HomeComponent {
 	// #endregion
 
 	// #region Estado
-	// Los 4 roles administrativos ven el mismo summary agregado del colegio.
-	// Reversión de Plan 28 Chat 4a (decisión de jefatura 2026-05-12, brief 143).
-	// TODO Plan 28 Chat 4a reversion — revisar INV-AD05/AD08 en business-rules.md.
+	// Los 4 roles administrativos comparten el mismo summary agregado del colegio.
 	readonly showAttendanceWidget = computed(() => this.userProfile.isAdministrativo());
 	readonly showProfesorWidget = computed(() => this.userProfile.isProfesor());
 	readonly showQuickAccess = computed(() => this.flags.isEnabled('quickAccess'));
