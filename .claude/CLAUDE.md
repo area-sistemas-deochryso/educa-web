@@ -73,7 +73,7 @@ Cada línea: `- ruta/archivo.md — <trigger>`. Leé el archivo cuando el trigge
 
 ### Dominio y tipos
 
-- [.claude/rules/business-rules.md](rules/business-rules.md) — **BIG (1213 ln)** tocás dominio: asistencia, calificaciones, horarios, aprobación, vacacional, matrícula, periodos, permisos. Listado completo de invariantes `INV-*`
+- [.claude/rules/business-rules.md](rules/business-rules.md) — **BIG (1213 ln)** tocás dominio: asistencia, calificaciones, horarios, aprobación, vacacional, matrícula, periodos, permisos. Listado completo de invariantes `INV-*`. **Trigger por path**: si tocás cualquier archivo bajo `features/intranet/pages/{cross-role,profesor,estudiante,admin}/{attendance*,asistencia*,grades*,calificacion*,horario*,schedule*,aprobacion*,matricula*,salones*,kardex*}/**` o `core/services/{asistencia,facades}/**`, leelo aunque el chat parezca solo UI — esos componentes calculan/muestran datos sujetos a invariantes
 - [.claude/rules/domain-modeling.md](rules/domain-modeling.md) — definís interface/DTO/tipo de dominio y necesitás decidir capa (data/shared/feature/component)
 - [.claude/rules/semantic-types.md](rules/semantic-types.md) — reemplazás `string`/`number` genérico por tipo del dominio (const + type)
 - [.claude/rules/permissions.md](rules/permissions.md) — tocás guards / `permisosService` / roles / vistas
@@ -81,9 +81,9 @@ Cada línea: `- ruta/archivo.md — <trigger>`. Leé el archivo cuando el trigge
 
 ### UI / PrimeNG / estilos
 
-- [.claude/rules/design-system.md](rules/design-system.md) — **BIG (946 ln)** estilás página intranet: overrides globales (A1-A5), pautas estructurales por componente (B1-B11), tokens de color
+- [.claude/rules/design-system.md](rules/design-system.md) — **BIG (946 ln)** estilás página intranet: overrides globales (A1-A5), pautas estructurales por componente (B1-B11), tokens de color. **Trigger por path**: si editás cualquier `.scss` o `.html` bajo `features/intranet/**` o `shared/components/**`, leelo. Cualquier hex literal (`#...`) que pongas debería pasar primero por la sección 7 (tokens)
 - [.claude/rules/primeng.md](rules/primeng.md) — usás componente PrimeNG nuevo (cómo importar, `appendTo="body"`, `pt` para a11y)
-- [.claude/rules/a11y.md](rules/a11y.md) — agregás botón/icono con PrimeNG (aria-label vía `pt`, contraste WCAG, azul oscuro)
+- [.claude/rules/a11y.md](rules/a11y.md) — agregás botón/icono con PrimeNG (aria-label vía `pt`, contraste WCAG, azul oscuro). **Trigger por path/sintaxis**: si tu diff de `.html` contiene `pButton`, `p-button`, `<button`, `<img`, `<input`, `<h1..h6`, o cualquier elemento interactivo sin texto visible, leelo antes de cerrar el cambio
 - [.claude/rules/dialogs-sync.md](rules/dialogs-sync.md) — agregás `p-dialog` / `p-drawer` / `p-confirmDialog` (sync de visible, NUNCA dentro de `@if`)
 - [.claude/rules/skeletons.md](rules/skeletons.md) — agregás skeleton a tabla/stats/cards (3 niveles shared)
 - [.claude/rules/lazy-rendering.md](rules/lazy-rendering.md) — necesitás renderizado progresivo multi-fase con `<app-lazy-content>`

@@ -90,7 +90,7 @@ app-intranet-layout {
 
 **Focus**: `--text-color` en lugar de `--primary-color` — evita el ring celeste del tema Aura, que sobre fondo claro pierde contraste (ver `rules/a11y.md`).
 
-**Supersede**: esto reemplaza el patrón per-component de inputs/selects transparentes que vivía antes en `rules/filter-transparency.md` (borrada 2026-05-12, contenido absorbido acá en A2). Al tocar un componente con el override local viejo, eliminarlo para no duplicar.
+**Supersede**: el override global de esta sección §2 (A2) **reemplaza** el patrón per-component que vivía en `rules/filter-transparency.md` (archivo borrado 2026-05-12). Antes había que repetir `:host ::ng-deep { .p-inputtext, .p-select { background: transparent; ... } }` en cada `.scss` de la intranet; ahora basta con el override global de A2 y todos los inputs/selects dentro de `app-intranet-layout` heredan el reset. Al tocar un componente con el override local viejo, eliminarlo para no duplicar.
 
 ---
 
