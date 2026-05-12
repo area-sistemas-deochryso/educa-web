@@ -57,3 +57,19 @@ Hipótesis específicas a verificar (ordenadas por probabilidad):
 
 - Patrón Plan 21 (extender flujo polimórfico Estudiante→Profesor a un tercer tipo `'A'`) tiene una superficie FE que el flujo BE solo no cubre — necesita check de paridad en cada dialog/form.
 - F-018 confirma que **diseño con un solo `tipoPersona`** (rama única con switch) es más resistente que **copiar ramas** (las nuevas se olvidan de algún campo).
+- **Bug latente expuesto por nueva rama**: el fix real no era específico de AA. `isFormValid` exigía `sedeId !== null` pero `/intranet/admin/asistencias` nunca tuvo sede picker — `formData.sedeId` vivía en `null` permanente para E/P/A. Cowork lo encontró con AA porque era el flujo recién testeado por Plan 28 TEST 4.2; nadie había validado end-to-end el botón en esta página post-rename a English. Cuando una rama nueva expone un bug, siempre revisar si las ramas viejas tenían el mismo bug enmascarado.
+
+## Cierre (2026-05-12)
+
+**Diagnóstico**: `isFormValid` exigía `sedeId !== null` pero la página no tenía manera de setearlo. Bug latente para los 3 tipos (E/P/A) — Cowork lo hizo visible con AA por ser el flujo recién agregado.
+
+**Fix**: nuevo handler `onPersonaSelected()` en `attendances.component.ts` que al seleccionar persona copia `sedeId` desde el objeto `PersonaParaSeleccion` (que ya lo trae desde BE) al `formData`. `onFormTipoPersonaChange` también limpia `sedeId` al resetear persona.
+
+**Archivos**:
+- `attendances.component.ts` — handler `onPersonaSelected` + clear de `sedeId` en `onFormTipoPersonaChange`.
+- `attendances.component.html` — p-select de persona llama al handler nuevo.
+- `attendances-admin.store.spec.ts` — 2 tests nuevos como regression guard F-018.
+
+**Validación local**: lint ✅ · vitest 11/11 ✅ (incluye 2 nuevos) · build prod ✅.
+
+**Pendiente post-deploy**: Cowork repite TEST 4.2 (Director → admin/asistencias → tab AA → "+ Nueva asistencia" → solo entrada → seleccionar AA → hora → click Registrar). Verificar fila en `AsistenciaPersona` con `ASP_TipoPersona='A'`, `ASP_OrigenManual=true`. Idealmente también probar E y P para confirmar que la unificación no rompió la paridad. Si verifica ok → desbloquea cierre Plan 28 (brief 127 en `awaiting-prod/`).

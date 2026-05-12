@@ -318,9 +318,26 @@ export class AttendancesComponent implements OnInit {
 
 	onFormTipoPersonaChange(tipo: TipoPersonaAsistencia): void {
 		if (!tipo) return;
-		// Cambiar tipo resetea selección de persona y recarga el selector.
-		this.store.updateFormData({ tipoPersona: tipo, estudianteId: null });
+		// Cambiar tipo resetea selección de persona (y su sedeId derivada) y recarga el selector.
+		this.store.updateFormData({ tipoPersona: tipo, estudianteId: null, sedeId: null });
 		this.dataFacade.loadPersonas(tipo);
+	}
+
+	/**
+	 * F-018 fix: el form no tiene sede picker propio en esta página, así que `formData.sedeId`
+	 * vivía en `null` y `isFormValid` quedaba bloqueado para los 3 tipos (E/P/A). La persona
+	 * seleccionada ya trae su `sedeId` desde BE; lo copiamos al form para destrabar la validación.
+	 */
+	onPersonaSelected(personaId: number | null): void {
+		if (personaId === null) {
+			this.store.updateFormData({ estudianteId: null, sedeId: null });
+			return;
+		}
+		const persona = this.store.personas().find((p) => p.estudianteId === personaId);
+		this.store.updateFormData({
+			estudianteId: personaId,
+			sedeId: persona?.sedeId ?? null,
+		});
 	}
 
 	onAgregarSalida(item: AsistenciaAdminLista): void {

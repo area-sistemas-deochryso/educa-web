@@ -369,7 +369,7 @@
 						optionLabel="nombreCompleto"
 						optionValue="estudianteId"
 						[ngModel]="vm().formData.estudianteId"
-						(ngModelChange)="store.updateFormData({ estudianteId: $event })"
+						(ngModelChange)="onPersonaSelected($event)"
 						[filter]="true"
 						filterBy="nombreCompleto,dni"
 						[placeholder]="'Seleccionar ' + getTipoPersonaLabel(vm().formData.tipoPersona).toLowerCase() + '...'"

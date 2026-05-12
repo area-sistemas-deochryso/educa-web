@@ -152,6 +152,26 @@ describe('AttendancesAdminStore — tipoPersona filter', () => {
 		});
 	});
 
+	describe('isFormValid — F-018 regression guard', () => {
+		it('queda en false si sedeId es null (form recién abierto sin sede picker en la página)', () => {
+			store.setTipoPersonaFilter('A');
+			store.openNewDialog('entrada');
+			// _sedeId nunca se setea en /admin/asistencias → arrastra null al form.
+			store.updateFormData({ estudianteId: 303, horaEntrada: new Date() });
+			expect(store.formData().sedeId).toBeNull();
+			expect(store.isFormValid()).toBe(false);
+		});
+
+		it('habilita Registrar cuando se actualiza sedeId desde la persona seleccionada (E/P/A)', () => {
+			for (const tipo of ['E', 'P', 'A'] as const) {
+				store.setTipoPersonaFilter(tipo);
+				store.openNewDialog('entrada');
+				store.updateFormData({ estudianteId: 100, sedeId: 1, horaEntrada: new Date() });
+				expect(store.isFormValid()).toBe(true);
+			}
+		});
+	});
+
 	describe('personas alias', () => {
 		it('setPersonas y setEstudiantes mantienen la misma colección', () => {
 			store.setPersonas([
