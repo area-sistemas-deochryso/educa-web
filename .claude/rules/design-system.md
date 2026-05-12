@@ -90,7 +90,7 @@ app-intranet-layout {
 
 **Focus**: `--text-color` en lugar de `--primary-color` — evita el ring celeste del tema Aura, que sobre fondo claro pierde contraste (ver `rules/a11y.md`).
 
-**Supersede**: esto reemplaza el patrón per-component de `rules/filter-transparency.md`. Esa regla queda como referencia histórica — al tocar un componente con el override local, eliminarlo para no duplicar.
+**Supersede**: esto reemplaza el patrón per-component de inputs/selects transparentes que vivía antes en `rules/filter-transparency.md` (borrada 2026-05-12, contenido absorbido acá en A2). Al tocar un componente con el override local viejo, eliminarlo para no duplicar.
 
 ---
 
