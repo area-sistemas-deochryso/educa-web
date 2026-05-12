@@ -18,7 +18,14 @@
 ```
 [ ] SQL ejecutado en staging Azure SQL
 [ ] SQL ejecutado en prod Azure SQL
-[ ] Smoke: encolar correo de prueba, capturar 4.x.x transiente, verificar EO_UltimoErrorTransiente poblado en bandeja admin
+[ ] A3 (esperar evento natural — no forzar): monitorear vía
+    `SELECT TOP 20 EO_CodID, EO_Estado, EO_UltimoErrorTransiente, EO_FechaReg
+     FROM EmailOutbox WHERE EO_UltimoErrorTransiente IS NOT NULL
+     ORDER BY EO_FechaReg DESC`
+    El path se activa cuando entre un defer 4.x.x transiente real (handler
+    no promueve a FAILED y el correo sigue PENDING/PROCESSING). Si en 7d
+    post-deploy no aparece ninguna fila → abrir hallazgo (probable bug en
+    el catch path del worker)
 [ ] Smoke: POST /api/sistema/email-blacklist con motivo MANUAL + observacion="x" → 422 BLACKLIST_MOTIVO_REQUERIDO
 [ ] Smoke: GET /api/sistema/email-defer-events → verificar destinatario raw (sin ***)
 [ ] FE follow-up brief 147 arrancado y shipped (A3 badge + A7+B7 textarea + A13 link)
