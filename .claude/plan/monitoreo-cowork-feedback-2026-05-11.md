@@ -85,28 +85,48 @@ FE: `EmailOutboxEstadisticas`, `DeferFailWindowStats`, `EmailDashboardResumen`, 
 
 ---
 
-### Chat 1.3 — Propagación correlation id end-to-end (A11, B3)
+### Chat 1.3 — Unificación de formato del correlation id (A11, B3) — **REWORKED 2026-05-13**
 
-**Repo**: BE + FE + test E2E
-**Tipo**: cross-cutting (afecta interceptor FE, controllers BE, `IEmailOutboxService`, `RateLimitEvent`, `SignalR hubs`)
-**Estimación**: 1 chat denso
+**Repo**: BE thin (Educa.API master)
+**Tipo**: fix de drift de formato — 2 archivos editados, ~5 líneas
+**Estimación**: 30-60 min
 
-**Por qué tercero**: F3 (diagnóstico SMTP) y F6 (vista unificada) y B10 (bundle telemetría en reportes) **dependen** de que el correlation id viaje del front al BE al servicio SMTP. Hoy el hub correlacionado existe pero llega vacío.
+**Diagnóstico inicial (auditoría chat 153, 2026-05-13)**: el plan original asumía que el correlation id "se perdía en algún hop". **Falso**. La auditoría revela que el id se persiste correctamente en cada carril, pero existen **dos formatos paralelos** en BD por una decisión de fallback en `CorrelationIdMiddleware`:
 
-**Plan**:
-1. Auditar la cadena: `requestTraceInterceptor` (FE) → `CorrelationIdMiddleware` (BE) → controller action → `IEmailOutboxService.EnqueueAsync` → `EmailOutboxWorker.SendAsync` → `EmailHub` SignalR → `RateLimitEvent`. Identificar dónde se pierde el id.
-2. Garantizar que el `X-Correlation-Id` HTTP entrante se propaga a:
-   - `EO_CorrelationId` al encolar correo
-   - `RLE_CorrelationId` cuando se rechaza por rate limit (ya cubierto INV-ET02 — verificar)
-   - `ERL_CorrelationId` en errores (ya cubierto)
-   - `REU_CorrelationId` en reportes (ya cubierto INV-RU03)
-   - `EmailHub` push SignalR
-3. Para SignalR hubs (que no tienen pipeline HTTP estándar), usar `Items["CorrelationId"]` del `HubCallerContext` con interceptor propio.
-4. Test de integración por carril (4 tests: error → correlation id en ErrorLog; rate limit → en RateLimitEvent; email → en EmailOutbox; report → en ReporteUsuario).
-5. Test E2E Cowork: disparar un request fallido, capturar correlation id del response, verificar que aparece en los 4 carriles consultando el hub.
-6. **Hecho cuando**: abrir un correlation id en `/intranet/admin/correlation/:id` muestra ≥2 carriles para casos normales (no vacío).
+| Carril | Formato real en prod | Origen |
+|---|---|---|
+| `ErrorLog.ERL_CorrelationId` | **GUID-36** con guiones (`fc79f7c0-8721-...`) | `dto.CorrelationId` (body POST del FE) o middleware con `X-Request-Id` del FE |
+| `REU_ReporteUsuario.REU_CorrelationId` | **GUID-36** | `dto.CorrelationId` (body del FE) |
+| `EmailOutbox.EO_CorrelationId` | **32 hex sin guiones** (`a259b96c00220...`) | Middleware fallback a `Activity.Current.TraceId` (W3C trace) cuando NO viene `X-Request-Id` (webhooks externos, CrossChex, background jobs) |
+| `RateLimitEvent.REL_CorrelationId` | **32 hex** | Idem — además leía del response header en vez de Items |
 
-> **Nota**: Plan 41 ya empezó a tocar este terreno (chat 1 timeline FE + chat 2 BE related). Este Chat 1.3 cierra los huecos que Plan 41 dejó abiertos. Coordinar con `plan/correlation-hub-observability.md`.
+El FE `requestTraceInterceptor` ya manda `X-Request-Id` con `crypto.randomUUID()` (GUID-36) en todos los requests browser. El bug está en el BE.
+
+**Fix aplicado**:
+
+1. `CorrelationIdMiddleware.cs`: cambiar fallback `Activity.Current?.TraceId.ToString() ?? Guid.NewGuid().ToString("N")` (32 hex) → `Guid.NewGuid().ToString()` (D format, 36 con guiones). OTel `Activity` sigue capturando trace id por su cuenta para Azure Monitor — son canales separados.
+2. `RateLimitTelemetryMiddleware.cs`: leer correlation id de `HttpContext.Items[CorrelationIdMiddleware.CorrelationIdItemKey]` en vez de `Response.Headers["X-Correlation-Id"]`. Alinea con cómo `EmailOutboxService.ResolveCorrelationId` ya lo consume.
+
+**Limitación arquitectónica documentada** (no es un bug, es una propiedad de HTTP):
+
+> El correlation id correlaciona eventos dentro del **mismo request HTTP del servidor**. Requests independientes (admin action vía FE vs webhook CrossChex que encola correo) tienen ids distintos por diseño. El hub `/intranet/admin/correlation/:id` solo cruza carriles cuando los eventos se originaron en la misma request HTTP — típico caso: admin aprueba matrícula (encola correo) → mismo id en ErrorLog (si hubo error), EmailOutbox y RateLimitEvent. Caso NO cruzable: correo automático de asistencia (webhook CrossChex) y action posterior del padre en intranet → son dos requests separados al servidor, dos ids distintos.
+
+Esto **se registra como `INV-CORR01`** en `business-rules.md` del BE.
+
+**Scope explícitamente reducido**:
+
+- ✅ Alinear formato (A11+B3 honestamente).
+- ❌ SignalR hubs (Plan 41 brecha #9 — sigue abierto). Mover a Plan 41 F6 que tiene la decisión arquitectónica completa (hub filter custom + query param + `HubCallerContext.Items`).
+- ❌ No requiere migración de datos. Registros viejos quedan con su formato (forensic value); nuevos van en GUID-36.
+- ❌ Sin cambios FE.
+
+**Hecho cuando**:
+
+1. SELECT post-deploy sobre los 4 carriles muestra **100% de filas nuevas en GUID-36** (regex match).
+2. Tests verdes: nuevo `CorrelationIdMiddlewareTests` (6 cases incluyendo regresión OTel fallback) + nuevos cases en `RateLimitTelemetryMiddlewareTests` (Items propagation).
+3. Smoke browser: navegar `/intranet/admin/correlation/<id-real>` con un id de admin action que encoló correo → ≥2 carriles cruzados.
+
+> **Nota**: Plan 41 sigue con su agenda independiente (timeline + lifecycle + grafo + sesión). Este chat NO modifica nada de Plan 41 — solo limpia la fuente. Si Plan 41 F6 retoma SignalR, hereda formato GUID-36 limpio.
 
 ---
 
