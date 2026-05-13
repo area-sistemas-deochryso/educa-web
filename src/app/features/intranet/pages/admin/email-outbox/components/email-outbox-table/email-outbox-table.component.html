@@ -51,7 +51,7 @@
 					<p-tag
 						value="Pendiente reintento"
 						styleClass="tag-neutral"
-						[pTooltip]="(item.ultimoErrorTransiente || '') | slice: 0 : 80"
+						[pTooltip]="(item.ultimoErrorTransiente || '').slice(0, 80)"
 						tooltipPosition="top"
 					/>
 				}

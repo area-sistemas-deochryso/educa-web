@@ -39,27 +39,5 @@
       "c:\\Users\\Asus Ryzen 9\\EducaWeb\\Educa.API\\Educa.API\\DTOs"
     ]
   },
-  "hooks": {
-    "SessionStart": [
-      {
-        "matcher": "startup|resume",
-        "hooks": [
-          {
-            "type": "command",
-            "command": "bash .claude/hooks/backlog-check.sh"
-          }
-        ]
-      }
-    ],
-    "UserPromptSubmit": [
-      {
-        "hooks": [
-          {
-            "type": "command",
-            "command": "bash .claude/hooks/backlog-check.sh --wrap-system-reminder"
-          }
-        ]
-      }
-    ]
-  }
+  "hooks": {}
 }

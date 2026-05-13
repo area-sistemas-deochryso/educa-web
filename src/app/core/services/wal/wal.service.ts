@@ -19,22 +19,6 @@ import {
 export class WalService {
 	private db = inject(WalDbService);
 
-	// #region Endpoint Normalization
-
-	/**
-	 * Normalize the endpoint path to lowercase, preserving the query string casing.
-	 * Aligns persistence with `api-schema-versions.ts` lookup (also lowercased).
-	 *
-	 * @param endpoint Raw endpoint (path with optional query).
-	 */
-	static normalizeEndpoint(endpoint: string): string {
-		const queryIdx = endpoint.indexOf('?');
-		if (queryIdx === -1) return endpoint.toLowerCase();
-		return endpoint.slice(0, queryIdx).toLowerCase() + endpoint.slice(queryIdx);
-	}
-
-	// #endregion
-
 	// #region Append
 
 	/**
@@ -59,11 +43,7 @@ export class WalService {
 			maxRetries: config.maxRetries ?? WAL_DEFAULTS.MAX_RETRIES,
 			schemaVersion: CURRENT_WAL_SCHEMA_VERSION,
 			consistencyLevel: config.consistencyLevel ?? 'optimistic',
-			// Plan 42 F2-FE.3 / INV-CONTRACT03: el path se persiste en lowercase para
-			// matchear `api-schema-versions.ts` (que ya normaliza con .toLowerCase()).
-			// La query string se preserva tal cual porque puede llevar valores
-			// case-sensitive (ej: correlationId=ABC123).
-			endpoint: WalService.normalizeEndpoint(config.endpoint),
+			endpoint: config.endpoint,
 		};
 
 		await this.db.put(entry);

@@ -5,32 +5,6 @@ import { WalDbService } from './wal-db.service';
 import { WalEntry } from './models';
 
 describe('WalService', () => {
-	describe('normalizeEndpoint (static)', () => {
-		it('lowercases the path when no query string is present', () => {
-			expect(WalService.normalizeEndpoint('/api/Usuarios/123')).toBe('/api/usuarios/123');
-		});
-
-		it('lowercases the path and preserves the query string casing', () => {
-			expect(
-				WalService.normalizeEndpoint('/api/Sistema/Usuarios?correlationId=ABC123'),
-			).toBe('/api/sistema/usuarios?correlationId=ABC123');
-		});
-
-		it('preserves a path that is already lowercase', () => {
-			expect(WalService.normalizeEndpoint('/api/horario/45')).toBe('/api/horario/45');
-		});
-
-		it('handles absolute URLs by lowercasing the entire prefix up to the query', () => {
-			expect(
-				WalService.normalizeEndpoint('https://api.educacom.pe/api/Cursos/7?Search=Foo'),
-			).toBe('https://api.educacom.pe/api/cursos/7?Search=Foo');
-		});
-
-		it('handles empty query gracefully', () => {
-			expect(WalService.normalizeEndpoint('/api/Foo?')).toBe('/api/foo?');
-		});
-	});
-
 	describe('append', () => {
 		let service: WalService;
 		let putSpy: ReturnType<typeof vi.fn>;
@@ -51,7 +25,7 @@ describe('WalService', () => {
 			service = TestBed.inject(WalService);
 		});
 
-		it('persists the endpoint with lowercase path', async () => {
+		it('persists the endpoint preserving the original casing', async () => {
 			const entry = await service.append({
 				operation: 'UPDATE',
 				resourceType: 'usuarios',
@@ -60,17 +34,32 @@ describe('WalService', () => {
 				payload: { id: 42 },
 			});
 
-			expect(entry.endpoint).toBe('/api/sistema/usuarios/42');
+			expect(entry.endpoint).toBe('/api/Sistema/Usuarios/42');
 			expect(putSpy).toHaveBeenCalledTimes(1);
 			const persisted = putSpy.mock.calls[0][0] as WalEntry;
-			expect(persisted.endpoint).toBe('/api/sistema/usuarios/42');
+			expect(persisted.endpoint).toBe('/api/Sistema/Usuarios/42');
 		});
 
-		it('preserves query string casing while lowercasing the path', async () => {
+		it('preserves casing in path segments that are case-sensitive in the backend (e.g. role parameters)', async () => {
+			// Regression: the WAL used to lowercase the entire path before persisting,
+			// which broke /api/sistema/usuarios/{rol}/{id} because the BE compares
+			// rol === "Estudiante" case-sensitive in IUsuarioRolStrategy.SoportaRol.
+			const entry = await service.append({
+				operation: 'UPDATE',
+				resourceType: 'usuarios',
+				endpoint: '/api/sistema/usuarios/Estudiante/240',
+				method: 'PUT',
+				payload: { dni: '79474395' },
+			});
+
+			expect(entry.endpoint).toBe('/api/sistema/usuarios/Estudiante/240');
+		});
+
+		it('preserves query string casing as well', async () => {
 			const entry = await service.append({
 				operation: 'CREATE',
 				resourceType: 'errors',
-				endpoint: '/api/Sistema/Errors?correlationId=ABC123',
+				endpoint: '/api/sistema/errors?correlationId=ABC123',
 				method: 'POST',
 				payload: { msg: 'x' },
 			});
