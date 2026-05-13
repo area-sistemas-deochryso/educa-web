@@ -239,3 +239,48 @@
 	}
 }
 // #endregion
+
+// #region Tendencia 30d (Plan 43 Chat 1.2)
+.col-sparkline {
+	width: 110px;
+	cursor: pointer;
+
+	.sparkline-cell-btn {
+		background: transparent;
+		border: none;
+		padding: 0.15rem 0.25rem;
+		margin: 0;
+		border-radius: 4px;
+		cursor: pointer;
+		display: block;
+		width: 100%;
+
+		&:hover {
+			background: var(--surface-100);
+		}
+
+		&:focus-visible {
+			outline: 2px solid var(--text-color);
+			outline-offset: 1px;
+		}
+	}
+}
+
+.trend-dialog-content {
+	display: flex;
+	flex-direction: column;
+	gap: 1rem;
+	padding: 0.25rem 0;
+
+	app-mini-sparkline {
+		display: block;
+		width: 100%;
+	}
+
+	.trend-dialog-hint {
+		margin: 0;
+		font-size: 0.85rem;
+		color: var(--text-color-secondary);
+	}
+}
+// #endregion

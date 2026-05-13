@@ -133,7 +133,9 @@
 	<app-error-groups-kanban-board
 		[groups]="items()"
 		[hideResolvedIgnored]="hideResolvedIgnored()"
+		[trendCache]="trendCache()"
 		(cardClick)="onRowClick($event)"
+		(sparklineClick)="onSparklineClick($event)"
 		(cardDropped)="onKanbanCardDropped($event)"
 	/>
 } @else {
@@ -149,6 +151,7 @@
 					<th>Estado</th>
 					<th>Mensaje</th>
 					<th>Ocurrencias</th>
+					<th>Tendencia 30d</th>
 					<th>Origen</th>
 					<th>Última fecha</th>
 					<th>Acciones</th>
@@ -186,6 +189,21 @@
 							}
 						</span>
 					</td>
+					<td class="col-sparkline" (click)="$event.stopPropagation(); onSparklineClick(item)">
+						<button
+							type="button"
+							class="sparkline-cell-btn"
+							pTooltip="Ver tendencia 30 días ampliada"
+							tooltipPosition="top"
+							[attr.aria-label]="'Ver tendencia 30 días ampliada de ' + item.mensajeRepresentativo"
+						>
+							<app-mini-sparkline
+								[data]="trendCache().get(item.id)?.data ?? []"
+								[height]="24"
+								[ariaLabel]="'Tendencia 30 días de ' + item.mensajeRepresentativo"
+							/>
+						</button>
+					</td>
 					<td>
 						<p-tag [value]="item.origen" [icon]="getOrigenIcon(item.origen)" severity="info" />
 					</td>
@@ -214,7 +232,7 @@
 			</ng-template>
 			<ng-template #emptymessage>
 				<tr>
-					<td colspan="7" class="empty-message">
+					<td colspan="8" class="empty-message">
 						<i class="pi pi-check-circle"></i>
 						<span>No se encontraron grupos con los filtros seleccionados</span>
 					</td>
@@ -269,4 +287,30 @@
 	(confirmStatus)="onDialogConfirm($event)"
 	(cancelStatus)="onDialogCancel()"
 />
+<!-- #endregion -->
+
+<!-- #region Dialog trend ampliado (siempre en DOM — Plan 43 Chat 1.2) -->
+<p-dialog
+	[visible]="trendDialogVisible()"
+	(visibleChange)="onTrendDialogVisibleChange($event)"
+	[modal]="true"
+	[draggable]="false"
+	[resizable]="false"
+	[style]="{ width: '720px', maxWidth: '95vw' }"
+	[header]="trendDialogGroup() ? 'Tendencia 30 días — ' + trendDialogGroup()!.mensajeRepresentativo : 'Tendencia 30 días'"
+>
+	@if (trendDialogGroup()) {
+		<div class="trend-dialog-content">
+			<app-mini-sparkline
+				[data]="trendDialogData()"
+				[height]="200"
+				color="var(--p-primary-color)"
+				[ariaLabel]="'Tendencia 30 días ampliada de ' + trendDialogGroup()!.mensajeRepresentativo"
+			/>
+			<p class="trend-dialog-hint">
+				Ocurrencias por día — últimos 30 días. El último punto destacado corresponde a hoy.
+			</p>
+		</div>
+	}
+</p-dialog>
 <!-- #endregion -->

@@ -9,6 +9,7 @@ import {
 	ErrorGroupDetalle,
 	ErrorGroupEstado,
 	ErrorGroupLista,
+	ErrorGroupTrendDto,
 	ErrorLogCompleto,
 	ErrorOrigen,
 	ErrorSeveridad,
@@ -69,6 +70,15 @@ export class ErrorGroupsService {
 	 */
 	getOcurrenciaCompleta(errorId: number): Observable<ErrorLogCompleto> {
 		return this.http.get<ErrorLogCompleto>(`${this.apiUrlOcurrencia}/${errorId}`);
+	}
+
+	/**
+	 * Trend 30d para sparkline (Plan 43 Chat 1.2). Endpoint BE pendiente —
+	 * mientras tanto la response 404/500 cae a array vacío vía catchError en
+	 * el caller, y el componente renderiza el placeholder "sin actividad".
+	 */
+	getTrend(grupoId: number): Observable<ErrorGroupTrendDto[]> {
+		return this.http.get<ErrorGroupTrendDto[]>(`${this.apiUrl}/${grupoId}/trend`);
 	}
 
 	// #endregion

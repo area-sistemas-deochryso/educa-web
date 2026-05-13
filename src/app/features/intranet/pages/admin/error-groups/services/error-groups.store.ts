@@ -4,10 +4,21 @@ import {
 	ErrorGroupDetalle,
 	ErrorGroupEstado,
 	ErrorGroupLista,
+	ErrorGroupTrendDto,
 	ErrorOrigen,
 	ErrorSeveridad,
 	OcurrenciaLista,
 } from '../models';
+
+/**
+ * Estado de la carga del trend por grupo. `loaded` con `data: []` significa
+ * que el endpoint respondió pero no hay actividad reciente — distinto de
+ * `loading` o `error` (en error caemos al placeholder pero NO reintentamos).
+ */
+export interface TrendCacheEntry {
+	status: 'loading' | 'loaded' | 'error';
+	data: number[];
+}
 
 @Injectable({ providedIn: 'root' })
 export class ErrorGroupsStore {
@@ -51,6 +62,12 @@ export class ErrorGroupsStore {
 	private readonly _dialogGroup = signal<ErrorGroupLista | null>(null);
 	// #endregion
 
+	// #region Estado privado — trend 30d (Plan 43 Chat 1.2)
+	private readonly _trendCache = signal<ReadonlyMap<number, TrendCacheEntry>>(new Map());
+	private readonly _trendDialogVisible = signal(false);
+	private readonly _trendDialogGroup = signal<ErrorGroupLista | null>(null);
+	// #endregion
+
 	// #region Lecturas públicas — listado
 	readonly items = this._items.asReadonly();
 	readonly loading = this._loading.asReadonly();
@@ -84,6 +101,12 @@ export class ErrorGroupsStore {
 
 	readonly dialogVisible = this._dialogVisible.asReadonly();
 	readonly dialogGroup = this._dialogGroup.asReadonly();
+	// #endregion
+
+	// #region Lecturas públicas — trend
+	readonly trendCache = this._trendCache.asReadonly();
+	readonly trendDialogVisible = this._trendDialogVisible.asReadonly();
+	readonly trendDialogGroup = this._trendDialogGroup.asReadonly();
 	// #endregion
 
 	// #region Computed
@@ -266,6 +289,30 @@ export class ErrorGroupsStore {
 	closeDialog(): void {
 		this._dialogVisible.set(false);
 		this._dialogGroup.set(null);
+	}
+	// #endregion
+
+	// #region Comandos — Trend cache + dialog ampliado
+	setTrendStatus(grupoId: number, status: TrendCacheEntry['status'], data: number[] = []): void {
+		this._trendCache.update((map) => {
+			const next = new Map(map);
+			next.set(grupoId, { status, data });
+			return next;
+		});
+	}
+
+	getTrendEntry(grupoId: number): TrendCacheEntry | undefined {
+		return this._trendCache().get(grupoId);
+	}
+
+	openTrendDialog(group: ErrorGroupLista): void {
+		this._trendDialogGroup.set(group);
+		this._trendDialogVisible.set(true);
+	}
+
+	closeTrendDialog(): void {
+		this._trendDialogVisible.set(false);
+		this._trendDialogGroup.set(null);
 	}
 	// #endregion
 }

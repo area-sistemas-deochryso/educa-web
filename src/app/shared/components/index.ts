@@ -3,6 +3,7 @@ export * from './toast-container';
 export * from './skeleton-loader';
 export * from './devtools';
 export * from './correlation-id-pill';
+export * from './mini-sparkline';
 // #endregion
 
 // #region Re-exports temporales (migrados a @intranet-shared)

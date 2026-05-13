@@ -36,7 +36,9 @@
 					>
 						<app-error-group-card
 							[group]="group"
+							[trend]="trendOf(group)"
 							(cardClick)="onCardClick($event)"
+							(sparklineClick)="onSparklineClick($event)"
 						/>
 					</div>
 				}

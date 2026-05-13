@@ -43,4 +43,14 @@ export class ErrorGroupsUiFacade {
 		this.store.closeDialog();
 	}
 	// #endregion
+
+	// #region Dialog trend ampliado (Plan 43 Chat 1.2)
+	openTrendDialog(group: ErrorGroupLista): void {
+		this.store.openTrendDialog(group);
+	}
+
+	closeTrendDialog(): void {
+		this.store.closeTrendDialog();
+	}
+	// #endregion
 }

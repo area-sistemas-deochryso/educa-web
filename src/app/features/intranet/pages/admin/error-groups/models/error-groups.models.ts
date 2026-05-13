@@ -84,6 +84,20 @@ export interface CambiarEstadoErrorGroup {
 	observacion?: string | null;
 	rowVersion: string;
 }
+
+/**
+ * Punto diario del trend 30d (Plan 43 Chat 1.2).
+ * Espejo del DTO BE `ErrorGroupTrendDto` cuando el endpoint
+ * `GET /api/sistema/error-groups/{id}/trend` esté disponible.
+ *
+ * Contrato esperado: array de exactamente 30 elementos en orden cronológico
+ * ascendente (día 1 = hace 29 días, día 30 = hoy). Si el endpoint todavía no
+ * existe, el componente cae al placeholder "sin actividad".
+ */
+export interface ErrorGroupTrendDto {
+	fecha: string;
+	count: number;
+}
 // #endregion
 
 // #region Matriz de transiciones (espejo BE INV-ET07)

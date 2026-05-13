@@ -24,6 +24,7 @@ import {
 	ErrorGroupEstado,
 	ErrorGroupLista,
 } from '../../models';
+import type { TrendCacheEntry } from '../../services/error-groups.store';
 
 interface KanbanColumn {
 	estado: ErrorGroupEstado;
@@ -72,8 +73,10 @@ const PAGE_SIZE_INCREMENT = 20;
 export class ErrorGroupsKanbanBoardComponent {
 	readonly groups = input.required<ErrorGroupLista[]>();
 	readonly hideResolvedIgnored = input(false);
+	readonly trendCache = input<ReadonlyMap<number, TrendCacheEntry>>(new Map());
 
 	readonly cardClick = output<ErrorGroupLista>();
+	readonly sparklineClick = output<ErrorGroupLista>();
 	readonly cardDropped = output<{
 		group: ErrorGroupLista;
 		fromEstado: ErrorGroupEstado;
@@ -135,6 +138,14 @@ export class ErrorGroupsKanbanBoardComponent {
 
 	onCardClick(group: ErrorGroupLista): void {
 		this.cardClick.emit(group);
+	}
+
+	trendOf(group: ErrorGroupLista): TrendCacheEntry | undefined {
+		return this.trendCache().get(group.id);
+	}
+
+	onSparklineClick(group: ErrorGroupLista): void {
+		this.sparklineClick.emit(group);
 	}
 
 	onDragStarted(group: ErrorGroupLista): void {

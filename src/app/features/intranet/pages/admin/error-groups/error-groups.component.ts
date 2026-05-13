@@ -4,6 +4,7 @@ import {
 	DestroyRef,
 	OnInit,
 	computed,
+	effect,
 	inject,
 	signal,
 } from '@angular/core';
@@ -14,6 +15,7 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
 import { ButtonModule } from 'primeng/button';
 import { CheckboxModule } from 'primeng/checkbox';
+import { DialogModule } from 'primeng/dialog';
 import { IconFieldModule } from 'primeng/iconfield';
 import { InputIconModule } from 'primeng/inputicon';
 import { InputTextModule } from 'primeng/inputtext';
@@ -24,6 +26,7 @@ import { TagModule } from 'primeng/tag';
 import { TooltipModule } from 'primeng/tooltip';
 
 import { ErrorGroupsViewMode } from '@core/services/storage';
+import { MiniSparklineComponent } from '@shared/components/mini-sparkline';
 import { PageHeaderComponent } from '@intranet-shared/components';
 import { TableSkeletonComponent } from '@intranet-shared/components/table-skeleton';
 
@@ -67,6 +70,7 @@ import {
 		FormsModule,
 		ButtonModule,
 		CheckboxModule,
+		DialogModule,
 		IconFieldModule,
 		InputIconModule,
 		InputTextModule,
@@ -75,6 +79,7 @@ import {
 		TableModule,
 		TagModule,
 		TooltipModule,
+		MiniSparklineComponent,
 		PageHeaderComponent,
 		TableSkeletonComponent,
 		ErrorGroupDetailDrawerComponent,
@@ -125,6 +130,17 @@ export class ErrorGroupsComponent implements OnInit {
 	readonly dialogVisible = this.store.dialogVisible;
 	readonly dialogGroup = this.store.dialogGroup;
 
+	readonly trendCache = this.store.trendCache;
+	readonly trendDialogVisible = this.store.trendDialogVisible;
+	readonly trendDialogGroup = this.store.trendDialogGroup;
+	readonly trendDialogEntry = computed(() => {
+		const g = this.trendDialogGroup();
+		return g ? this.trendCache().get(g.id) : undefined;
+	});
+	readonly trendDialogData = computed<readonly number[]>(
+		() => this.trendDialogEntry()?.data ?? [],
+	);
+
 	readonly page = this.store.page;
 	readonly pageSize = this.store.pageSize;
 	readonly totalCount = this.store.totalCount;
@@ -143,6 +159,21 @@ export class ErrorGroupsComponent implements OnInit {
 
 	/** Vista activa: 'kanban' o 'table'. Persistida en PreferencesStorage. */
 	readonly viewMode = signal<ErrorGroupsViewMode>('kanban');
+	// #endregion
+
+	// #region Trend lazy-load (Plan 43 Chat 1.2)
+	/**
+	 * Cada vez que cambia la lista de items renderizados, disparar `requestTrend`
+	 * para los ids nuevos. `requestTrend` es idempotente: si ya hay cache (loading,
+	 * loaded o error) descarta el pedido sin hacer HTTP. Concurrencia limitada a
+	 * 3 in-flight en el facade.
+	 */
+	private readonly _trendDispatcher = effect(() => {
+		const items = this.store.items();
+		for (const item of items) {
+			this.dataFacade.requestTrend(item.id);
+		}
+	});
 	// #endregion
 
 	// #region Configuraciones estáticas
@@ -324,6 +355,16 @@ export class ErrorGroupsComponent implements OnInit {
 		toEstado: ErrorGroupEstado;
 	}): void {
 		this.crudFacade.moveCardOptimistic(payload.group, payload.toEstado);
+	}
+	// #endregion
+
+	// #region Event handlers — Trend dialog ampliado
+	onSparklineClick(group: ErrorGroupLista): void {
+		this.uiFacade.openTrendDialog(group);
+	}
+
+	onTrendDialogVisibleChange(visible: boolean): void {
+		if (!visible) this.uiFacade.closeTrendDialog();
 	}
 	// #endregion
 

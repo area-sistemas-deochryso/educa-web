@@ -11,6 +11,8 @@ import { CommonModule, DatePipe } from '@angular/common';
 import { TagModule } from 'primeng/tag';
 import { TooltipModule } from 'primeng/tooltip';
 
+import { MiniSparklineComponent } from '@shared/components/mini-sparkline';
+
 import {
 	ErrorGroupLista,
 	ErrorOrigen,
@@ -18,6 +20,7 @@ import {
 	ORIGEN_ICON_MAP,
 	SEVERIDAD_SEVERITY_MAP,
 } from '../../models';
+import type { TrendCacheEntry } from '../../services/error-groups.store';
 
 /**
  * Card presentacional para la vista Kanban del feature `error-groups`.
@@ -28,7 +31,7 @@ import {
 	selector: 'app-error-group-card',
 	standalone: true,
 	changeDetection: ChangeDetectionStrategy.OnPush,
-	imports: [CommonModule, DatePipe, TagModule, TooltipModule],
+	imports: [CommonModule, DatePipe, TagModule, TooltipModule, MiniSparklineComponent],
 	templateUrl: './error-group-card.component.html',
 	styleUrl: './error-group-card.component.scss',
 	host: {
@@ -39,8 +42,16 @@ import {
 })
 export class ErrorGroupCardComponent {
 	readonly group = input.required<ErrorGroupLista>();
+	/**
+	 * Entry de cache del trend 30d (Plan 43 Chat 1.2). `undefined` significa
+	 * "todavía no se solicitó"; el contenedor padre dispara `requestTrend` al
+	 * renderizar la card. Si el endpoint BE no existe aún, el status caerá a
+	 * `error` y la sparkline mostrará "sin actividad".
+	 */
+	readonly trend = input<TrendCacheEntry | undefined>(undefined);
 
 	readonly cardClick = output<ErrorGroupLista>();
+	readonly sparklineClick = output<ErrorGroupLista>();
 
 	readonly severidadSeverity = computed<'danger' | 'warn' | 'info'>(
 		() => SEVERIDAD_SEVERITY_MAP[this.group().severidad as ErrorSeveridad] ?? 'info',
@@ -51,6 +62,9 @@ export class ErrorGroupCardComponent {
 	);
 
 	readonly hasPostResolucion = computed(() => this.group().contadorPostResolucion > 0);
+
+	readonly trendData = computed<readonly number[]>(() => this.trend()?.data ?? []);
+	readonly trendLoading = computed(() => this.trend()?.status === 'loading');
 
 	readonly ariaLabel = computed(() => {
 		const g = this.group();
@@ -67,5 +81,10 @@ export class ErrorGroupCardComponent {
 	onKeyboardActivate(event: Event): void {
 		event.preventDefault();
 		this.cardClick.emit(this.group());
+	}
+
+	onSparklineClick(event: MouseEvent): void {
+		event.stopPropagation();
+		this.sparklineClick.emit(this.group());
 	}
 }

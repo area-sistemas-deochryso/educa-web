@@ -5,8 +5,11 @@ import { Subject, debounceTime, distinctUntilChanged } from 'rxjs';
 import { logger } from '@core/helpers';
 import { WalCrossTabRefetchService } from '@core/services';
 
+import { ErrorGroupTrendDto } from '../models';
 import { ErrorGroupsService } from './error-groups.service';
 import { ErrorGroupsStore } from './error-groups.store';
+
+const TREND_MAX_CONCURRENT = 3;
 
 @Injectable({ providedIn: 'root' })
 export class ErrorGroupsDataFacade {
@@ -203,6 +206,54 @@ export class ErrorGroupsDataFacade {
 	// #region Search trigger
 	onSearchChange(term: string): void {
 		this.searchTrigger$.next(term);
+	}
+	// #endregion
+
+	// #region Trend 30d (Plan 43 Chat 1.2)
+	private readonly trendQueue: number[] = [];
+	private trendInFlight = 0;
+
+	/**
+	 * Solicita el trend de un grupo. Idempotente: si ya hay cache (loading,
+	 * loaded o error), no relanza. Limita concurrencia a `TREND_MAX_CONCURRENT`
+	 * para no saturar BE — el resto entra a cola y se despacha al liberar slot.
+	 */
+	requestTrend(grupoId: number): void {
+		if (this.store.getTrendEntry(grupoId)) return;
+		this.store.setTrendStatus(grupoId, 'loading');
+		this.trendQueue.push(grupoId);
+		this.drainTrendQueue();
+	}
+
+	private drainTrendQueue(): void {
+		while (this.trendInFlight < TREND_MAX_CONCURRENT && this.trendQueue.length > 0) {
+			const grupoId = this.trendQueue.shift()!;
+			this.fetchTrendNow(grupoId);
+		}
+	}
+
+	private fetchTrendNow(grupoId: number): void {
+		this.trendInFlight++;
+		this.api
+			.getTrend(grupoId)
+			.pipe(takeUntilDestroyed(this.destroyRef))
+			.subscribe({
+				next: (trend: ErrorGroupTrendDto[]) => {
+					this.store.setTrendStatus(
+						grupoId,
+						'loaded',
+						(trend ?? []).map((p) => p.count),
+					);
+					this.trendInFlight--;
+					this.drainTrendQueue();
+				},
+				error: (err) => {
+					logger.warn(`[ErrorGroupsDataFacade] Trend ${grupoId} no disponible`, err);
+					this.store.setTrendStatus(grupoId, 'error', []);
+					this.trendInFlight--;
+					this.drainTrendQueue();
+				},
+			});
 	}
 	// #endregion
 }
