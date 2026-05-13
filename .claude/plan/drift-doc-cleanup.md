@@ -1,7 +1,8 @@
-# Plan — Limpieza de drift documental en `.claude/`
+# Plan 46 — Limpieza de drift documental en `.claude/`
 
 > **Repo**: `educa-web` (FE) · **Tipo**: docs · **Riesgo**: bajo (sólo docs/rules)
-> **Creado**: 2026-05-13 · **Estado**: ⏳ pendiente arrancar.
+> **Creado**: 2026-05-13 · **Última revisión**: 2026-05-13 (chat 156)
+> **Estado global**: 🟡 en progreso — F1 ✅ · F2 parcial · F3 ⏳.
 
 ## Contexto
 
@@ -9,37 +10,62 @@ Auditoría externa (codex, 2026-05-13) detectó que partes del `drift-report.md`
 
 ## Hallazgos confirmados
 
-1. **`@data/repositories` ya no existe** (alias removido de `tsconfig.json`), pero sigue mencionado en:
-   - `.claude/rules/architecture.md:118` (taxonomía Gateway)
-   - `.claude/rules/architecture.md:398` (bloque "Capa de Datos")
-   - `.claude/rules/code-style.md:24` (ejemplo de import alias)
-2. **`[(visible)]` ya no aparece en templates HTML reales** — sólo en ejemplos de `dialogs-sync.md`. Verificar que los ejemplos no induzcan a copiarlo.
-3. **`feedbackReport` flag ya está documentado y usado** en `intranet-layout`. Confirmar que el `drift-report.md` no lo siga listando como pendiente.
-4. **`drift-report.md` general** — varias secciones describen "violaciones pendientes" que ya fueron resueltas en commits posteriores. Necesita audit completo o archivado.
+1. **`@data/repositories` ya no existe** (alias removido de `tsconfig.json`), pero seguía mencionado en:
+   - `.claude/rules/architecture.md` (taxonomía Gateway + bloque "Capa de Datos")
+   - `.claude/rules/code-style.md` (ejemplo de import alias)
+   - `.claude/CLAUDE.md` (índice on-demand)
+   - `.claude/project-structure/architecture.md` (tree + tabla layer)
+2. **`[(visible)]` ya no aparece en templates HTML activos** — solo en JSDoc comments y en ejemplos de `dialogs-sync.md`.
+3. **`feedbackReport` flag** ya documentado en `feature-flags.md` (resuelto).
+4. **`drift-report.md` (2026-04-16)** describe violaciones que en su mayoría ya fueron resueltas.
 
 ## Fases
 
-### F1 — Borrar refs a `@data/repositories` (quick win, 30 min)
+### F1 — Borrar refs a `@data/repositories` ✅ (chat 156, 2026-05-13)
 
-- `rules/architecture.md`: quitar `@data/repositories/` de la taxonomía Gateway (línea 118). Reemplazar bloque "Capa de Datos" (línea 396-402) por nota corta: "Patrón actual: feature service con `HttpClient` directo. `BaseRepository` eliminado por código muerto (ver `history/revision-codigo-muerto.md`)."
-- `rules/code-style.md`: cambiar ejemplo de import (línea 24) — usar `@shared/models` o un alias vivo.
-- No tocar `history/*.md` ni `reporte-drift-check/*` (son archivo histórico).
+- ✅ `rules/architecture.md`: removido del tree (`data/`), de la taxonomía Gateway, y reescrito el bloque "Capa de Datos".
+- ✅ `rules/code-style.md`: ejemplo de import migrado a `@data/models`.
+- ✅ `CLAUDE.md`: trigger del índice on-demand limpiado.
+- ✅ `project-structure/architecture.md`: bloque `repositories/` removido + fila layer + párrafo reescrito.
 
-### F2 — Auditar `drift-report.md` (medio, 1-2h)
+### F2 — Auditar `drift-report.md` 🟡 parcial (chat 156, 2026-05-13)
 
-- Releer las 11 secciones contra estado actual del código.
-- Marcar cada hallazgo: `✅ resuelto` / `⏳ pendiente` / `❌ obsoleto (no aplica)`.
-- Mover el archivo a `.claude/history/drift-report-2026-04.md` si >70% obsoleto. Si no, dejarlo con nota de fecha de última verificación.
+**Estado**: 15/28 ✅ resueltos · 2 ❌ drift activo · 1 ⚠️ parcial · 10 ⏳ no re-verificados.
 
-### F3 — Limpiar ejemplos `[(visible)]` en `dialogs-sync.md` (opcional)
+- ✅ Audit overlay agregado al inicio del reporte con tabla de 28 filas + decisión "no archivar" (54% < 70%).
+- ✅ Drift real C3.1 detectado y corregido en el mismo chat (`asistencia/`→`attendance/`, `permisos/`→`permissions/`, agregadas filas `capacitor/` y `feedback/`).
+- ⏳ **Pendiente F2.b**: re-verificar los 10 items `⏳ no re-verificado` (todos eran PASS originalmente — baja probabilidad de regresión, pero el ejercicio es honesto).
+   - C1.4 Links en MEMORY.md
+   - C2.1 Feature flags sync entre envs
+   - C2.3 Module registry
+   - C3.2 Features sin doc
+   - C4.1 INV-* fantasma
+   - C4.2 Tipos semánticos
+   - C5.9 AsNoTracking ratio
+   - C5.10 Filtro `_Estado` soft-delete
+   - C6.1 Endpoints FE vs Controllers BE
 
-- Si los ejemplos de "incorrecto" muestran `[(visible)]` sólo como contraste, conservar. Si están mezclados con código presentado como bueno, separar claramente.
+### F3 — Separar ejemplos `[(visible)]` en `dialogs-sync.md` ⏳
 
-## Criterio de cierre
+- Verificar que los ejemplos de "incorrecto" muestren `[(visible)]` solo como contraste, no mezclados con código presentado como bueno.
+- Opcional. Scope FE chico (~15 min).
 
-- `grep -rn "@data/repositories" .claude/rules/` retorna 0 líneas activas (sólo dentro de `history/`).
-- `drift-report.md` tiene fecha de verificación reciente o está archivado.
+## Follow-ups detectados (chats separados)
+
+Los siguientes ítems se desprendieron del audit F2 y van a planes/chats dedicados, no a este plan:
+
+1. **18 links rotos en `maestro.md`** (C1.2) → **Plan 47** (`maestro-links-cleanup.md`).
+2. **7 `p-select` sin `appendTo="body"`** (C5.3) → **Plan 48** (`appendto-barrido.md`).
+3. **10 archivos BE >300 ln** (C5.5) → sugerencia para crear plan en `Educa.API/.claude/plan/` (no FE).
+4. **`_emailService` inyectado pero no usado en `PasswordRecoveryService.cs`** (C5.7) → agrupar con Plan 45 BE (drift cleanup).
+
+## Criterio de cierre del Plan 46
+
+- `grep -rn "@data/repositories" .claude/rules/` retorna 0 líneas activas (sólo dentro de `history/`). ✅
+- `drift-report.md` tiene audit overlay con fecha reciente. ✅
+- F2.b re-verificada o explícitamente descartada como deuda menor.
+- F3 ejecutada o explícitamente cerrada como "no aplica".
 
 ## Prioridad
 
-**Baja**. No bloquea features. Hacer cuando haya rato libre o cuando se toque alguna de las reglas afectadas por otro motivo (regla de oportunismo).
+**Baja**. Hacer oportunísticamente al tocar las reglas afectadas o cuando haya rato libre.

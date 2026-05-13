@@ -23,8 +23,7 @@ src/app/
 │   └── utils/       # Utilidades generales
 ├── data/            # Capa de datos
 │   ├── adapters/    # Transformación: base, date, grade-scale
-│   ├── models/      # Modelos del dominio compartidos (user, salon, horario, calificacion, etc.)
-│   └── repositories/# BaseRepository, CRUDs (user, notification, asistencia)
+│   └── models/      # Modelos del dominio compartidos (user, salon, horario, calificacion, etc.)
 ├── shared/          # Código reutilizable cross-feature (public + intranet)
 │   ├── components/  # layout (header, footer, main-layout), skeleton-loader, toast, devtools
 │   ├── constants/   # Constantes compartidas (app-roles, etc.)
@@ -55,20 +54,22 @@ src/app/
 
 | Dominio | Contenido |
 |---------|-----------|
-| `asistencia/` | API, store, facade de asistencia |
+| `attendance/` | API, store, facade de asistencia |
 | `auth/` | AuthService, AuthApiService, auth.models |
 | `blob/` | BlobStorageService |
 | `cache/` | CacheInvalidationService, CacheVersionManager |
+| `capacitor/` | CapacitorService (wrapper de plugins nativos) |
 | `destroy/` | Utilidades de lifecycle |
 | `error/` | ErrorHandlerService, GlobalErrorHandler, error.models |
 | `excel/` | ExcelService (exportación) |
 | `facades/` | BaseCrudFacade (base class) |
 | `feature-flags/` | FeatureFlagsStore, FeatureFlagsFacade |
+| `feedback/` | FeedbackReportFacade + tipos de feedback manual |
 | `http/` | BaseHttpService (wrapper HTTP) |
 | `keyboard/` | KeyboardShortcutsService + config |
 | `modal/` | ModalManagerService |
 | `notifications/` | NotificationsService, SmartNotificationService, NotificationsApiService |
-| `permisos/` | PermisosService, UserPermisosService |
+| `permissions/` | PermisosService, UserPermisosService |
 | `preloading/` | AdaptivePreloadingStrategy |
 | `rate-limit-countdown/` | RateLimitCountdownService (toast informativo no-bloqueante ante 429 del BE) |
 | `session/` | SessionActivityService, SessionCoordinator, SessionRefresh |
@@ -115,7 +116,7 @@ export class AsistenciaApiService {
 |-------|-------------|
 | ✅ Devuelve Observables/Promises | Comunicacion asincrona |
 | ❌ No expone estado a UI | Solo operaciones IO |
-| 📍 Ubicacion | `@data/repositories/` o `@core/services/` |
+| 📍 Ubicacion | `@core/services/` (feature services con `HttpClient` directo) |
 
 ### 3. State / Store — *Un servicio no es estado. Es una fuente de estado.*
 
@@ -395,9 +396,7 @@ readonly derivado = computed(() => this.data().filter(d => d.active));
 
 **Patrón estándar**: Feature service (`*.service.ts`) con `HttpClient` directo para API específica del feature.
 
-**`@data/repositories/`**: Existe `BaseRepository` para CRUD genérico compartido, pero actualmente sin consumidores activos. Sus 2 implementaciones (`UserRepository`, `NotificationRepository`) no se inyectan en ningún servicio. Solo `PaginatedResponse` se importa como tipo. Ver task `revision-codigo-muerto.md` para decisión pendiente.
-
-Los 21+ feature services usan `HttpClient` directo — es el patrón de facto del proyecto.
+El subpath `@data/repositories/` fue eliminado del código — `src/app/data/` hoy solo contiene `adapters/` y `models/`. El alias `@data/*` sigue mapeado en `tsconfig.json` para esos dos subpaths. Los 21+ feature services usan `HttpClient` directo — es el patrón de facto del proyecto.
 
 ---
 
@@ -410,6 +409,6 @@ Asistencia tiene 4 subdominios con ~5,600 líneas TS:
 | **Diaria** (CrossChex) | `pages/cross-role/attendance-component/` + `components/attendance/` | Cross-role — vista de asistencia por biométrico |
 | **Curso** (en clase) | `components/schedule/` (embebido en horarios) | Profesor marca P/T/F |
 | **Admin** (edición formal) | `pages/admin/asistencias/` | Director edita/corrige registros |
-| **Reportes** | `pages/cross-role/reportes-asistencia/` | Cross-role — estadísticas y exportación |
+| **Reportes** | `pages/cross-role/attendance-reports/` | Cross-role — estadísticas y exportación |
 
 La separación física actual es parcial — admin y reportes tienen carpetas propias, diaria y curso están mezclados con componentes del rol. Inconsistencia idiomática (`asistencia-*` vs `attendance-*`) documentada en task `normalizacion-idiomatica.md`.

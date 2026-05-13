@@ -21,7 +21,7 @@ Acá viven sólo las convenciones específicas del stack Angular + NgRx + PrimeN
 // ✅
 import { AuthService, StorageService } from '@core/services';
 import { logger } from '@core/helpers';
-import { BaseRepository } from '@data/repositories';
+import { UsuarioListaDto } from '@data/models';
 import { environment } from '@config';
 
 // ❌

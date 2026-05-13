@@ -80,16 +80,10 @@ data/
 │   ├── asistencia/              # Transforma respuestas de asistencia
 │   ├── base/                    # Adaptadores base reutilizables
 │   └── date/                    # Transformación de fechas
-├── models/                      # Interfaces del dominio
-└── repositories/
-    ├── base/                    # BaseRepository con CRUD genérico
-    ├── asistencia/              # Repository de asistencia
-    ├── auth/                    # Repository de autenticación
-    ├── notification/            # Repository de notificaciones
-    └── user/                    # Repository de usuarios
+└── models/                      # Interfaces del dominio
 ```
 
-**Patrón**: `BaseRepository` provee CRUD genérico; repositorios específicos lo extienden.
+**Patrón**: feature service (`*.service.ts`) con `HttpClient` directo. El subpath `repositories/` con `BaseRepository` fue eliminado por falta de consumidores — los 21+ feature services consumen `HttpClient` directamente.
 
 ---
 
@@ -276,7 +270,6 @@ save(data) {
 | `core/guards/` | Protección de rutas |
 | `core/interceptors/` | Transformación de HTTP requests/responses |
 | `core/store/` | Estado global de la app (auth, base-crud) |
-| `data/repositories/` | Acceso a datos con Repository Pattern |
 | `data/adapters/` | Transformación API response → modelo de dominio |
 | `data/models/` | Interfaces del dominio compartidas |
 | `shared/components/` | UI genérica sin lógica de negocio |

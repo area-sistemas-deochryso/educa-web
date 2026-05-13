@@ -51,7 +51,7 @@ Cada línea: `- ruta/archivo.md — <trigger>`. Leé el archivo cuando el trigge
 
 - [.claude/context/domain.md](context/domain.md) — discutís roles, módulos del colegio, reglas del dominio educativo o necesitás glosario
 - [.claude/context/api-endpoints.md](context/api-endpoints.md) — llamás un endpoint, agregás uno nuevo o necesitás ver el catálogo de rutas BE
-- [.claude/context/data-conventions.md](context/data-conventions.md) — tocás `@data/` (adapters, models, repositories) o necesitás convenciones de naming de campos BD
+- [.claude/context/data-conventions.md](context/data-conventions.md) — tocás `@data/` (adapters, models) o necesitás convenciones de naming de campos BD
 - [.claude/context/integrations.md](context/integrations.md) — tocás CrossChex / JaaS / Firebase / SignalR / Azure Blob
 
 ### Estructura del proyecto
