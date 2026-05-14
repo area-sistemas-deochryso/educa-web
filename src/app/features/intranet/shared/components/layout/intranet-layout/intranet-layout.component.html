@@ -59,7 +59,11 @@
 				/>
 			</picture>
 		</a>
-		<app-mobile-menu [modulos]="modulos()" (logoutClick)="logout()" />
+		<app-mobile-menu
+			[modulos]="modulos()"
+			[selectedModuloId]="selectedModuloId()"
+			(logoutClick)="logout()"
+		/>
 	</div>
 	<!-- #endregion -->
 </header>

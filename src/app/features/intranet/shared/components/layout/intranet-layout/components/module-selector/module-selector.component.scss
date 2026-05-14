@@ -159,28 +159,113 @@
 	display: flex;
 	align-items: center;
 	gap: 0.375rem;
-	padding: 0.625rem 1rem 0.25rem;
+	width: 100%;
+	padding: 0.625rem 1rem;
+	border: none;
+	background: transparent;
+	cursor: pointer;
+	font-family: inherit;
 	font-size: 0.7rem;
 	font-weight: 700;
 	text-transform: uppercase;
 	letter-spacing: 0.04em;
-	color: #5c7a28;
+	color: var(--text-color);
+	text-align: left;
+	transition: background 0.1s ease;
 
 	i {
 		font-size: 0.75rem;
 	}
+
+	&:hover {
+		background: rgba(0, 0, 0, 0.04);
+	}
+}
+
+.panel-section-caret {
+	font-size: 0.65rem !important;
+	transition: transform 0.15s ease;
+	color: var(--text-color-secondary);
+
+	&.open {
+		transform: rotate(90deg);
+	}
+}
+
+.panel-section-title {
+	flex: 1;
+}
+
+.panel-section-count {
+	font-size: 0.7rem;
+	font-weight: 600;
+	color: var(--text-color-secondary);
+	letter-spacing: 0;
+	text-transform: none;
 }
 
 .panel-section-star {
 	color: #d97706;
 }
 
-.panel-group-label {
-	padding: 0.25rem 1rem 0.125rem 2.5rem;
+// Acordeón: bloque del módulo. Borde-bottom separa módulos.
+.panel-module {
+	border-bottom: 1px solid var(--surface-200, #e5e7eb);
+
+	&:last-child {
+		border-bottom: none;
+	}
+
+	// El módulo activo (la página actual cae adentro) → solo su header en verde.
+	// El grupo que contiene el item activo y el item mismo se pintan vía :has() abajo.
+	&--active {
+		> .panel-section-header,
+		> .panel-section-header .panel-section-caret,
+		> .panel-section-header .panel-section-count {
+			color: #5c7a28;
+		}
+
+		> .panel-section-header:hover {
+			background: rgba(92, 122, 40, 0.06);
+		}
+	}
+}
+
+// Cascadeo desde el item activo hacia afuera: el grupo que lo contiene se pinta verde.
+.panel-group:has(.panel-item.is-current) {
+	border-color: #5c7a28;
+
+	> .panel-group-legend {
+		color: #5c7a28;
+	}
+}
+
+.panel-module-body {
+	padding-bottom: 0.5rem;
+}
+
+// Grupo (Administración, Asistencia, Calendario...) con marco ┌─ label ─┐
+// usando un div + label absoluto que "rompe" el borde superior.
+.panel-group {
+	position: relative;
+	margin: 0.85rem 1rem 0.5rem 1.5rem;
+	padding: 0.5rem 0 0.25rem;
+	border: 1px solid var(--surface-300, #d1d5db);
+	border-radius: 8px;
+}
+
+.panel-group-legend {
+	position: absolute;
+	top: -0.55rem;
+	left: 0.75rem;
+	padding: 0 0.4rem;
+	background: var(--intranet-background-color, #ffffff);
 	font-size: 0.65rem;
 	font-weight: 600;
 	color: var(--text-color-secondary);
 	letter-spacing: 0.02em;
+	text-transform: none;
+	line-height: 1;
 }
 
 .panel-divider {
@@ -203,6 +288,12 @@
 	text-align: left;
 	transition: background 0.1s ease;
 
+	// Items dentro de un grupo (.panel-group) — el grupo ya indenta, mantenemos solo padding interno.
+	&--nested {
+		padding-left: 0.75rem;
+		padding-right: 0.75rem;
+	}
+
 	&:hover,
 	&.active {
 		background: rgba(92, 122, 40, 0.08);
@@ -212,22 +303,22 @@
 		background: rgba(92, 122, 40, 0.12);
 	}
 
-	// Current route — the page the user is on. Shows even when not focused.
+	// Current route — la página en que está el usuario. Pintada en verde, no azul.
 	&.is-current {
-		background: color-mix(in srgb, var(--blue-500) 12%, transparent);
-		box-shadow: inset 3px 0 0 0 var(--blue-600);
+		background: color-mix(in srgb, #5c7a28 14%, transparent);
+		box-shadow: inset 3px 0 0 0 #5c7a28;
 
 		.panel-item-label {
 			font-weight: 600;
-			color: var(--blue-800);
+			color: #5c7a28;
 		}
 
 		.panel-item-icon {
-			color: var(--blue-700);
+			color: #5c7a28;
 		}
 
 		&.active {
-			background: color-mix(in srgb, var(--blue-500) 18%, transparent);
+			background: color-mix(in srgb, #5c7a28 22%, transparent);
 		}
 	}
 }

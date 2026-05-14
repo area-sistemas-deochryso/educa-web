@@ -51,8 +51,10 @@ interface MobileSearchResult {
 }
 
 interface MobileTreeGroup {
+	moduloId: ModuloId;
 	moduloLabel: string;
 	moduloIcon: string;
+	itemCount: number;
 	sections: { label: string; items: MobileSearchResult[] }[];
 }
 // #endregion
@@ -73,12 +75,15 @@ export class MobileMenuComponent {
 	readonly favorites = inject(QuickAccessFavoritesService);
 
 	readonly modulos = input.required<ModuloMenu[]>();
+	readonly selectedModuloId = input<ModuloId | null>(null);
 	logoutClick = output<void>();
 
 	// #region Estado local
 	readonly isOpen = signal(false);
 	readonly searchTerm = signal('');
 	readonly searchInputRef = viewChild<ElementRef<HTMLInputElement>>('mobileSearchInput');
+	/** Módulos expandidos en el acordeón. Por default todos colapsados al abrir. */
+	private readonly _expandedModulos = signal<ReadonlySet<ModuloId>>(new Set());
 
 	/** Reactive current URL — used to highlight the page the user is on. */
 	private readonly currentUrl = toSignal(
@@ -96,8 +101,6 @@ export class MobileMenuComponent {
 		const results: MobileSearchResult[] = [];
 
 		for (const modulo of this.modulos()) {
-			if (modulo.id === 'inicio') continue;
-
 			for (const item of modulo.items) {
 				if (item.route) {
 					results.push(this.toResult(item, modulo, ''));
@@ -131,12 +134,12 @@ export class MobileMenuComponent {
 
 	readonly treeGroups = computed((): MobileTreeGroup[] => {
 		const all = this.allResults();
-		const moduloMap = new Map<ModuloId, { label: string; icon: string; sections: Map<string, MobileSearchResult[]> }>();
+		const moduloMap = new Map<ModuloId, { id: ModuloId; label: string; icon: string; sections: Map<string, MobileSearchResult[]> }>();
 
 		for (const r of all) {
 			let entry = moduloMap.get(r.moduloId);
 			if (!entry) {
-				entry = { label: r.moduloLabel, icon: r.moduloIcon, sections: new Map() };
+				entry = { id: r.moduloId, label: r.moduloLabel, icon: r.moduloIcon, sections: new Map() };
 				moduloMap.set(r.moduloId, entry);
 			}
 			const key = r.groupLabel || '(General)';
@@ -145,11 +148,17 @@ export class MobileMenuComponent {
 			entry.sections.set(key, items);
 		}
 
-		return Array.from(moduloMap.values()).map((e) => ({
-			moduloLabel: e.label,
-			moduloIcon: e.icon,
-			sections: Array.from(e.sections.entries()).map(([label, items]) => ({ label, items })),
-		}));
+		return Array.from(moduloMap.values()).map((e) => {
+			const sections = Array.from(e.sections.entries()).map(([label, items]) => ({ label, items }));
+			const itemCount = sections.reduce((acc, s) => acc + s.items.length, 0);
+			return {
+				moduloId: e.id,
+				moduloLabel: e.label,
+				moduloIcon: e.icon,
+				itemCount,
+				sections,
+			};
+		});
 	});
 
 	readonly favoriteResults = computed((): MobileSearchResult[] => {
@@ -171,9 +180,26 @@ export class MobileMenuComponent {
 		if (this.isOpen()) {
 			this.lockBodyScroll();
 			this.searchTerm.set('');
+			this._expandedModulos.set(new Set());
 		} else {
 			this.unlockBodyScroll();
 		}
+	}
+
+	toggleModulo(id: ModuloId): void {
+		this._expandedModulos.update((set) => {
+			const next = new Set(set);
+			if (next.has(id)) {
+				next.delete(id);
+			} else {
+				next.add(id);
+			}
+			return next;
+		});
+	}
+
+	isModuloExpanded(id: ModuloId): boolean {
+		return this._expandedModulos().has(id);
 	}
 
 	close(): void {
@@ -188,11 +214,6 @@ export class MobileMenuComponent {
 
 	selectResult(result: MobileSearchResult): void {
 		this.router.navigate([result.route], { queryParams: result.queryParams });
-		this.close();
-	}
-
-	goHome(): void {
-		this.router.navigate(['/intranet']);
 		this.close();
 	}
 
@@ -217,10 +238,6 @@ export class MobileMenuComponent {
 		return url === r || url.startsWith(r + '/');
 	}
 
-	/** Same check, but for the home button (no result wrapper). */
-	isHomeCurrent(): boolean {
-		return this.currentUrl().split('?')[0] === '/intranet';
-	}
 	// #endregion
 
 	// #region Helpers privados

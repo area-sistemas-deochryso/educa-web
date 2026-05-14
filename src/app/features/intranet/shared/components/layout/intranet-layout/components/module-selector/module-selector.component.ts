@@ -36,8 +36,10 @@ export interface SearchResult {
 
 /** Tree group — module or section header with its items. */
 export interface TreeGroup {
+	moduloId: ModuloId;
 	moduloLabel: string;
 	moduloIcon: string;
+	itemCount: number;
 	sections: TreeSection[];
 }
 
@@ -72,6 +74,9 @@ export class ModuleSelectorComponent {
 	readonly searchTerm = signal('');
 	readonly activeIndex = signal(0);
 	readonly searchInput = viewChild<ElementRef<HTMLInputElement>>('searchInput');
+	/** Módulos expandidos en el acordeón. Por default solo el módulo activo. */
+	private readonly _expandedModulos = signal<ReadonlySet<ModuloId>>(new Set());
+	readonly expandedModulos = this._expandedModulos.asReadonly();
 
 	/** Reactive current URL — used to highlight the page the user is on. */
 	private readonly currentUrl = toSignal(
@@ -121,10 +126,12 @@ export class ModuleSelectorComponent {
 			.map((r) => r.result);
 	});
 
-	/** Flat list of all panel items in visual order (for keyboard nav). */
+	/** Flat list of all panel items in visual order (for keyboard nav). Solo módulos expandidos. */
 	private readonly panelFlat = computed((): SearchResult[] => {
 		const flat: SearchResult[] = [...this.favoriteResults()];
+		const expanded = this._expandedModulos();
 		for (const col of this.megaColumns()) {
+			if (!expanded.has(col.moduloId)) continue;
 			for (const section of col.sections) {
 				flat.push(...section.items);
 			}
@@ -152,17 +159,16 @@ export class ModuleSelectorComponent {
 	/** Whether the user is actively searching (shows flat results instead of mega menu). */
 	readonly isSearching = computed(() => this.searchTerm().trim().length > 0);
 
-	/** Mega menu columns: modules excluding 'inicio' (it has no pages). */
+	/** Mega menu columns: todos los módulos, incluyendo 'inicio' (que tiene la página /intranet). */
 	readonly megaColumns = computed((): TreeGroup[] => {
 		const all = this.allResults();
-		const moduloMap = new Map<ModuloId, { label: string; icon: string; sections: Map<string, SearchResult[]> }>();
+		const moduloMap = new Map<ModuloId, { id: ModuloId; label: string; icon: string; sections: Map<string, SearchResult[]> }>();
 
 		for (const r of all) {
-			if (r.moduloId === 'inicio') continue;
 			let modEntry = moduloMap.get(r.moduloId);
 			if (!modEntry) {
 				const mod = this.modulos().find((m) => m.id === r.moduloId);
-				modEntry = { label: r.moduloLabel, icon: mod?.icon ?? 'pi pi-folder', sections: new Map() };
+				modEntry = { id: r.moduloId, label: r.moduloLabel, icon: mod?.icon ?? 'pi pi-folder', sections: new Map() };
 				moduloMap.set(r.moduloId, modEntry);
 			}
 			const sectionKey = r.groupLabel || '(General)';
@@ -171,11 +177,17 @@ export class ModuleSelectorComponent {
 			modEntry.sections.set(sectionKey, sectionItems);
 		}
 
-		return Array.from(moduloMap.values()).map((entry) => ({
-			moduloLabel: entry.label,
-			moduloIcon: entry.icon,
-			sections: Array.from(entry.sections.entries()).map(([label, items]) => ({ label, items })),
-		}));
+		return Array.from(moduloMap.values()).map((entry) => {
+			const sections = Array.from(entry.sections.entries()).map(([label, items]) => ({ label, items }));
+			const itemCount = sections.reduce((acc, s) => acc + s.items.length, 0);
+			return {
+				moduloId: entry.id,
+				moduloLabel: entry.label,
+				moduloIcon: entry.icon,
+				itemCount,
+				sections,
+			};
+		});
 	});
 	// #endregion
 
@@ -193,6 +205,8 @@ export class ModuleSelectorComponent {
 		this.isOpen.set(true);
 		this.searchTerm.set('');
 		this.activeIndex.set(0);
+		// Por default, expandir solo el módulo activo (acordeón estilo C).
+		this._expandedModulos.set(new Set([this.selectedModuloId()]));
 		setTimeout(() => this.searchInput()?.nativeElement.focus(), 0);
 	}
 
@@ -200,6 +214,23 @@ export class ModuleSelectorComponent {
 		this.isOpen.set(false);
 		this.searchTerm.set('');
 		this.activeIndex.set(0);
+	}
+
+	toggleModulo(id: ModuloId): void {
+		this._expandedModulos.update((set) => {
+			const next = new Set(set);
+			if (next.has(id)) {
+				next.delete(id);
+			} else {
+				next.add(id);
+			}
+			return next;
+		});
+		this.activeIndex.set(0);
+	}
+
+	isModuloExpanded(id: ModuloId): boolean {
+		return this._expandedModulos().has(id);
 	}
 
 	toggle(): void {

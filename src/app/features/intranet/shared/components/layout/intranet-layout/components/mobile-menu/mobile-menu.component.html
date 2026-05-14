@@ -63,18 +63,6 @@
 					</div>
 				}
 			} @else {
-				<!-- Home -->
-				<button
-					type="button"
-					class="nav-result-item home-item"
-					[class.is-current]="isHomeCurrent()"
-					[attr.aria-current]="isHomeCurrent() ? 'page' : null"
-					(click)="goHome()"
-				>
-					<i class="pi pi-home result-icon"></i>
-					<span class="result-label">Inicio</span>
-				</button>
-
 				<!-- Favorites -->
 				@if (favoriteResults().length > 0) {
 					<div class="section-header">
@@ -96,40 +84,85 @@
 					<div class="section-divider"></div>
 				}
 
-				<!-- Module groups -->
-				@for (group of treeGroups(); track group.moduloLabel) {
-					<div class="section-header">
-						<i [class]="group.moduloIcon"></i>
-						<span>{{ group.moduloLabel }}</span>
-					</div>
-					@for (section of group.sections; track section.label) {
-						@if (section.label !== '(General)') {
-							<div class="group-label">{{ section.label }}</div>
+				<!-- Module groups (acordeón colapsable) -->
+				@for (group of treeGroups(); track group.moduloId) {
+					@let mExpanded = isModuloExpanded(group.moduloId);
+					@let mIsActive = selectedModuloId() === group.moduloId;
+					<section class="nav-module" [class.nav-module--active]="mIsActive">
+						<button
+							type="button"
+							class="section-header section-header--button"
+							[attr.aria-expanded]="mExpanded"
+							(click)="toggleModulo(group.moduloId)"
+						>
+							<i class="pi pi-chevron-right section-caret" [class.open]="mExpanded"></i>
+							<i [class]="group.moduloIcon"></i>
+							<span class="section-title">{{ group.moduloLabel }}</span>
+							<span class="section-count">({{ group.itemCount }})</span>
+						</button>
+
+						@if (mExpanded) {
+							<div class="nav-module-body">
+								@for (section of group.sections; track section.label) {
+									@let hasGroupLabel = section.label !== '(General)';
+									@if (hasGroupLabel) {
+										<div class="nav-group">
+											<span class="nav-group-legend">{{ section.label }}</span>
+											@for (item of section.items; track item.route) {
+												<button
+													type="button"
+													class="nav-result-item tree-item"
+													[class.is-current]="isCurrentRoute(item)"
+													[attr.aria-current]="isCurrentRoute(item) ? 'page' : null"
+													(click)="selectResult(item)"
+												>
+													<i [class]="item.icon" class="result-icon"></i>
+													<span class="result-label">{{ item.label }}</span>
+													<button
+														type="button"
+														class="star-btn"
+														[class.starred]="favorites.isFavorite(item.route)"
+														[disabled]="!favorites.isFavorite(item.route) && !favorites.canAddMore()"
+														(click)="onStarClick($event, item.route)"
+														[attr.aria-label]="favorites.isFavorite(item.route) ? 'Quitar de accesos rápidos' : 'Agregar a accesos rápidos'"
+													>
+														<i [class]="favorites.isFavorite(item.route) ? 'pi pi-star-fill' : 'pi pi-star'"></i>
+													</button>
+												</button>
+											}
+										</div>
+									} @else {
+										<!-- Items sueltos: cada uno en su propio marco con su label como legend. -->
+										@for (item of section.items; track item.route) {
+											<div class="nav-group nav-group--solo">
+												<span class="nav-group-legend">{{ item.label }}</span>
+												<button
+													type="button"
+													class="nav-result-item tree-item"
+													[class.is-current]="isCurrentRoute(item)"
+													[attr.aria-current]="isCurrentRoute(item) ? 'page' : null"
+													(click)="selectResult(item)"
+												>
+													<i [class]="item.icon" class="result-icon"></i>
+													<span class="result-label">{{ item.label }}</span>
+													<button
+														type="button"
+														class="star-btn"
+														[class.starred]="favorites.isFavorite(item.route)"
+														[disabled]="!favorites.isFavorite(item.route) && !favorites.canAddMore()"
+														(click)="onStarClick($event, item.route)"
+														[attr.aria-label]="favorites.isFavorite(item.route) ? 'Quitar de accesos rápidos' : 'Agregar a accesos rápidos'"
+													>
+														<i [class]="favorites.isFavorite(item.route) ? 'pi pi-star-fill' : 'pi pi-star'"></i>
+													</button>
+												</button>
+											</div>
+										}
+									}
+								}
+							</div>
 						}
-						@for (item of section.items; track item.route) {
-							<button
-								type="button"
-								class="nav-result-item tree-item"
-								[class.is-current]="isCurrentRoute(item)"
-								[attr.aria-current]="isCurrentRoute(item) ? 'page' : null"
-								(click)="selectResult(item)"
-							>
-								<i [class]="item.icon" class="result-icon"></i>
-								<span class="result-label">{{ item.label }}</span>
-								<button
-									type="button"
-									class="star-btn"
-									[class.starred]="favorites.isFavorite(item.route)"
-									[disabled]="!favorites.isFavorite(item.route) && !favorites.canAddMore()"
-									(click)="onStarClick($event, item.route)"
-									[attr.aria-label]="favorites.isFavorite(item.route) ? 'Quitar de accesos rápidos' : 'Agregar a accesos rápidos'"
-								>
-									<i [class]="favorites.isFavorite(item.route) ? 'pi pi-star-fill' : 'pi pi-star'"></i>
-								</button>
-							</button>
-						}
-					}
-					<div class="section-divider"></div>
+					</section>
 				}
 			}
 		</div>
