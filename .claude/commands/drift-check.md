@@ -130,7 +130,7 @@ Verificar que cada ID de invariante referenciado en código exista en `.claude/r
 ls ../Educa.API/Educa.API/Controllers/**/*.cs 2>/dev/null
 ```
 
-Comparar con endpoints documentados en `.claude/context/api-endpoints.md`.
+Comparar con endpoints documentados en `../educa-coord/contracts/api-catalog.md`.
 
 ### C3.5 Services BE sin registro DI (moderado) — solo si `-back` o sin args
 
@@ -250,7 +250,7 @@ Buscar URLs de API en services del frontend (`/api/...`). Verificar que existe u
 
 ### C6.2 api-endpoints.md vs controllers reales (moderado)
 
-Comparar endpoints documentados en `.claude/context/api-endpoints.md` con los `[Http*]` reales en controllers.
+Comparar endpoints documentados en `../educa-coord/contracts/api-catalog.md` con los `[Http*]` reales en controllers.
 
 ### C6.3 Tipos semánticos FE vs constantes BE (informativo)
 

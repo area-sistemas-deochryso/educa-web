@@ -11,7 +11,7 @@ Mapa de qué documentación revisar cuando un área del código cambia (o viceve
 | Carpeta código | Documentación dependiente |
 |----------------|--------------------------|
 | `core/services/wal/` | `rules/optimistic-ui.md` |
-| `core/services/auth/` | `rules/permissions.md`, `context/api-endpoints.md` |
+| `core/services/auth/` | `rules/permissions.md`, `../../educa-coord/contracts/auth.md`, `../../educa-coord/contracts/api-catalog.md` |
 | `core/services/storage/` | `rules/storage.md` |
 | `core/services/sw/` | `rules/service-worker.md` |
 | `core/services/cache/` | `rules/service-worker.md` |
@@ -23,7 +23,7 @@ Mapa de qué documentación revisar cuando un área del código cambia (o viceve
 | `core/services/capacitor/` | `rules/capacitor.md` |
 | `core/services/feedback/` | `rules/business-rules.md` (sección 16) |
 | `core/store/` | `rules/state-management.md`, `rules/crud-patterns.md` |
-| `core/interceptors/` | `rules/rate-limiting.md`, `context/api-endpoints.md` |
+| `core/interceptors/` | `rules/rate-limiting.md`, `../../educa-coord/contracts/rate-limiting.md`, `../../educa-coord/contracts/api-protocol.md` |
 
 ### Shared
 
@@ -60,16 +60,16 @@ Mapa de qué documentación revisar cuando un área del código cambia (o viceve
 
 | Carpeta código | Documentación dependiente |
 |----------------|--------------------------|
-| `Controllers/` | `context/api-endpoints.md`, `rules/backend.md` |
-| `Services/` | `rules/backend.md` |
-| `Repositories/` | `rules/backend.md` |
-| `Models/` | `rules/backend.md`, `rules/business-rules.md` |
-| `DTOs/` | `rules/backend.md` |
-| `Constants/` | `rules/business-rules.md`, `rules/semantic-types.md` |
-| `Middleware/` | `rules/backend.md` |
-| `Exceptions/` | `rules/backend.md` |
-| `Hubs/` | `context/integrations.md` |
-| `Helpers/Auth/` | `rules/backend.md`, `rules/business-rules.md` (sección 7) |
+| `Controllers/` | `../../educa-coord/contracts/api-catalog.md`, `../../educa-coord/contracts/api-protocol.md` |
+| `Services/` | `../../educa-coord/invariants/*.md` (según dominio) |
+| `Repositories/` | `../../educa-coord/glossary/db-fields.md` (prefijos, soft-delete) |
+| `Models/` | `../../educa-coord/glossary/db-fields.md`, `../../educa-coord/invariants/*.md` |
+| `DTOs/` | `../../educa-coord/contracts/api-protocol.md`, `../../educa-coord/contracts/api-catalog.md` |
+| `Constants/` | `rules/semantic-types.md` |
+| `Middleware/` | `../../educa-coord/contracts/api-protocol.md` (correlation-id, idempotency) |
+| `Exceptions/` | `../../educa-coord/contracts/api-protocol.md` (status mapping) |
+| `Hubs/` | `context/integrations.md`, `../../educa-coord/contracts/auth.md` (SignalR token) |
+| `Helpers/Auth/` | `../../educa-coord/contracts/auth.md`, `../../educa-coord/invariants/permisos.md` |
 
 ---
 
@@ -83,7 +83,7 @@ Mapa de qué documentación revisar cuando un área del código cambia (o viceve
 | `rules/eslint.md` | `eslint.config.js` |
 | `rules/architecture.md` | Estructura real de `src/app/` |
 | `rules/business-rules.md` | Código BE que implementa invariantes |
-| `context/api-endpoints.md` | Controllers BE reales |
+| `../../educa-coord/contracts/api-catalog.md` | Controllers BE reales (cross-repo) |
 
 ---
 
