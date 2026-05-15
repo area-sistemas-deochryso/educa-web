@@ -87,3 +87,6 @@ ios/
 
 # Codex
 .codex/
+
+# Dev-log local (skill personal — no se commitea)
+track-dev-log/
