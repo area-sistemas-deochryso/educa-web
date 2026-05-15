@@ -309,12 +309,18 @@ Criterio: cualquier plan cuyo brief original mencione "FE+BE", "Educa.API y educ
 
 Renumerar bajo numeración global `educa-coord` o conservar el número original con prefijo `xrepo-` (decisión a tomar en F1).
 
-### F4 — Saneamiento de reglas cruzadas
+### F4 — Saneamiento de reglas cruzadas ✅ (brief 164, 2026-05-15)
 
-- `educa-web/.claude/rules/backend.md` (~600 ln) → revisar: ¿es referencia para chats FE que necesitan saber cómo es el BE, o es duplicado de lo que vive en `Educa.API/.claude/rules/`?
-  - Si es duplicado → borrar; los chats FE que necesiten saber de BE consultan `educa-coord/contracts/api-catalog.md` (qué endpoints existen) y nada más.
-  - Si es síntesis "FE-friendly" del BE → mover a `educa-coord/contracts/backend-overview-for-frontend.md` y referenciar on-demand.
-- `Educa.API/.claude/context/api-endpoints.md` y `educa-web/.claude/context/api-endpoints.md` → consolidar en `educa-coord/contracts/api-catalog.md`. Ambos repos lo referencian on-demand.
+Resuelto en 1 chat. Resultado:
+
+- `educa-web/.claude/rules/backend.md` (659 ln) **borrado** — 90% duplicaba reglas BE locales; las 4 secciones "síntesis FE-friendly" (`ApiResponse<T>` shape, excepciones tipadas, rate-limiting, auth) migraron a `educa-coord/contracts/`.
+- `educa-web/.claude/context/api-endpoints.md` (191 ln) + `Educa.API/.claude/context/api-endpoints.md` (68 ln) **borrados** — consolidados en `educa-coord/contracts/api-catalog.md` (tomó el FE, más completo y actualizado).
+- `educa-web/.claude/context/domain.md` (-38 ln) y `Educa.API/.claude/context/domain.md` (-30 ln) **adelgazados** — entidades + jerarquía + flujo CrossChex movidos a `educa-coord/glossary/domain.md`; prefijos BD y convenciones a `educa-coord/glossary/db-fields.md`.
+- `Educa.API/.claude/rules/frontend.md` **no existía** (tarea 2 del brief era no-op).
+- Punteros on-demand en ambos `CLAUDE.md` reapuntados a `educa-coord/contracts/` y `glossary/`.
+- Drift bonus: `drift-map.md` + `drift-check.md` del FE también reapuntados (commit fix follow-up).
+
+Total: **-997 ln duplicadas** (-899 FE, -98 BE) + **+681 ln** en coord (single source). Neto cross-repo: **-316 ln**. 4 commits separados (1 coord + 2 FE + 1 BE) + 1 commit aparte de WIP del chat 157.
 
 ### F5 — Adelgazar índices on-demand
 
@@ -371,7 +377,7 @@ Renumerar bajo numeración global `educa-coord` o conservar el número original 
 | F1b — `principles/` claude.md mínimos + human.md skeletons | 2 chats | bajo |
 | F2 — partir invariantes | 2-3 chats | medio (volumen + cuidado con anchors) |
 | F3 — mover planes cross-repo ✅ | 1 chat (brief 163, 2026-05-15) | bajo |
-| F4 — saneamiento reglas cruzadas | 2 chats | medio |
+| F4 — saneamiento reglas cruzadas ✅ | 1 chat (brief 164, 2026-05-15) | medio — resuelto en 1 chat |
 | F5 — adelgazar índices on-demand | 1 chat | bajo |
 | F6 — protocolo cross-repo | 1 chat | bajo |
 | F7 — auditoría final | 0.5 chat | bajo |
