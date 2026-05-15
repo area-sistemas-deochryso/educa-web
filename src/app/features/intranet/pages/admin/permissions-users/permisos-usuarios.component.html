@@ -28,6 +28,7 @@
 		</div>
 
 		<p-select
+			appendTo="body"
 			[options]="rolesOptions"
 			[ngModel]="filterRol()"
 			(ngModelChange)="onFilterRolChange($event)"

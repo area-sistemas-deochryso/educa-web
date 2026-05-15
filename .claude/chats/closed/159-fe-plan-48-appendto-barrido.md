@@ -1,8 +1,19 @@
 # 159 — Plan 48: barrido `appendTo="body"` en 7 `p-select`
 
 > **Repo destino**: `educa-web`
-> **Creado**: 2026-05-13 · **Estado**: ⏳ pendiente arrancar.
+> **Creado**: 2026-05-13 · **Cerrado**: 2026-05-15 · **Estado**: ✅ shipped.
 > **MODO SUGERIDO**: `/execute`
+
+## Cierre
+
+- **Inventario real**: 4 archivos (drift bajó de 7 → 4 desde 2026-05-13).
+- **Tags modificados**: 5
+  - `attendance-table.component.html` — 2 (`hijosOptions`, `monthOptions`)
+  - `permisos-usuarios.component.html` — 1 (filter rol)
+  - `usuario-form-dialog.component.html` — 1 (campo rol)
+  - `login-intranet.component.html` — 1 (selector rol)
+- **Verificación**: re-grep retorna 0 instancias de `<p-select` sin `appendTo` en `src/**/*.html`. Lint limpio.
+- **Aprendizaje transferible**: el inventario oportunístico al arrancar (no al planificar) evita trabajar sobre números viejos. Drift natural cerró 3 archivos entre 2026-05-13 y 2026-05-15 sin acción explícita.
 
 ## Scope
 

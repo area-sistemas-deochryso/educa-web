@@ -7,6 +7,7 @@
 					<!-- * Inline selector when multiple children are available -->
 					{{ table().title.split(' de ')[0] }} de
 					<p-select
+						appendTo="body"
 						[options]="hijosOptions()"
 						[ngModel]="selectedHijoId()"
 						(ngModelChange)="onHijoChange($event)"
@@ -67,6 +68,7 @@
 		</div>
 		<!-- * Month selector for the current table -->
 		<p-select
+			appendTo="body"
 			[options]="monthOptions"
 			[ngModel]="table().selectedMonth"
 			(ngModelChange)="onMonthChange($event)"
