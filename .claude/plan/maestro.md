@@ -8,51 +8,53 @@
 
 ---
 
-## Inventario de planes (14)
+## Inventario de planes FE
+
+> **2026-05-15 (brief 172, ADR-0002 ejecución)**: filas migradas a `Educa.API/.claude/plan/maestro.md` o `educa-coord/plans/maestro.md` quedan con puntero `→ ver maestro <repo>`. Planes BE-only (4, 12, 16, 17, 40, 45) y cross-repo (10, 14, 15, 18, 19, 22, 24, 26, 28, 29, 30, 32, 33, 34, 38, 39, 41, 42, 43, 44) salen del scope de este maestro. Quedan FE-only: P1 F5, P5, P11 (archivado), P13, P20 (archivado), P35-36 (archivado), P46-48 (archivado).
 
 | # | Plan | Repo | Ruta | Estado | % |
 |---|------|------|------|--------|---|
 | 1 | Enforcement de Reglas | FE | `tasks/enforcement-reglas.md` + [`plan/enforcement-fase-5-wrappers.md`](./enforcement-fase-5-wrappers.md) | F1-F3 ✅ · F4 parcial ✅ (F4.4-F4.5 🔒) · **F5 ✅ awaiting-prod 2026-05-11** (brief 137) — barrel-only enforcement para 3 wrappers críticos (storage/wal/session). 3 reglas nuevas en `LAYER_RULES` + `WalFacadeHelper.hasPendingForResource()` + barrels reducidos (storage exports `StorageService` + `SmartDataStorageService`; wal quita `WalService`/`WalReconciler`/`WalCircuitBreaker`). 14 archivos prod + 6 specs migrados a barrel. Lint 0 err · 67/67 specs touched ✅ · build prod ✅. | ~90% |
-| 2 | Arquitectura Backend — Opciones A/B/C | BE | `Educa.API/.claude/plan/arquitectura-backend-opciones.md` (pendiente crear) | A ✅ · B 🔄 (5/8) · C ⏳ | ~33% |
-| 3 | Domain Layer (Opción A) | BE | `Educa.API/.claude/plan/domain-layer.md` (pendiente crear) | Fases 1-3,5-6 ✅ · F4 🔒 (bloqueada por Matrícula) | ~85% |
-| 4 | Consolidación Backend | FE | `plan/consolidacion-backend.md` (pendiente crear) | ⏳ | 0% |
+| 2 | Arquitectura Backend — Opciones A/B/C | BE | → [`Educa.API/.claude/plan/maestro.md`](../../../Educa.API/.claude/plan/maestro.md) | (BE-only) | — |
+| 3 | Domain Layer (Opción A) | BE | → [`Educa.API/.claude/plan/maestro.md`](../../../Educa.API/.claude/plan/maestro.md) | (BE-only) | — |
+| 4 | Consolidación Backend | BE | → [`Educa.API/.claude/plan/maestro.md`](../../../Educa.API/.claude/plan/maestro.md) | (BE-only, migrado 2026-05-15) | — |
 | 5 | Consolidación Frontend | FE | `plan/consolidacion-frontend.md` (pendiente crear) | ⏳ | 0% |
 | 6 | Asignación Profesor-Salón-Curso | BE+FE | → [`educa-coord/plans/xrepo-asignacion-profesor-salon-curso.md`](../../../educa-coord/plans/xrepo-asignacion-profesor-salon-curso.md) | ✅ **100% — archivado 2026-04-22** en [history/planes-cerrados.md](../history/planes-cerrados.md#plan-6) | — |
-| 7 | Error Trace Backend | BE | `Educa.API/.claude/plan/error-trace-backend.md` (pendiente crear) | ⏳ | 0% |
+| 7 | Error Trace Backend | BE | → [`Educa.API/.claude/plan/maestro.md`](../../../Educa.API/.claude/plan/maestro.md) | (BE-only) | — |
 | 8 | Design Patterns Backend | FE | `tasks/design-patterns-backend.md` (pendiente crear) | Incremental | N/A |
 | 9 | Design Patterns Frontend | FE | `tasks/design-patterns-frontend.md` (pendiente crear) | Incremental | N/A |
-| 10 | Flujos Alternos (resiliencia) | FE | `plan/flujos-alternos.md` (pendiente crear) | ⏳ (bloqueado) | 0% |
+| 10 | Flujos Alternos (resiliencia) | xrepo | → [`educa-coord/plans/maestro.md`](../../../educa-coord/plans/maestro.md) | (cross-repo, migrado 2026-05-15) | — |
 | 11 | Refactor `eslint.config.js` (fix G10) | FE | `plan/eslint-config-refactor.md` | ✅ **100% — archivado 2026-04-22** en [history/planes-cerrados.md](../history/planes-cerrados.md#plan-11) | — |
-| 12 | Backend Test Gaps | BE | `Educa.API/.claude/plan/test-backend-gaps.md` | F1 ✅ (A+B+C, 23 tests en 4 archivos) · F2-F5 ⏳ | ~30% |
+| 12 | Backend Test Gaps | BE | → [`Educa.API/.claude/plan/maestro.md`](../../../Educa.API/.claude/plan/maestro.md) | (BE-only) | — |
 | 13 | Frontend Test Gaps | FE | `plan/test-frontend-gaps.md` (pendiente crear) | ⏳ | 0% |
 | 14 | Contratos FE-BE | FE+BE | → [`educa-coord/plans/xrepo-14-contratos-fe-be.md`](../../../educa-coord/plans/xrepo-14-contratos-fe-be.md) | ⏳ | 0% |
 | 15 | Release Protocol y Operaciones | FE+BE | → [`educa-coord/plans/xrepo-15-release-operations.md`](../../../educa-coord/plans/xrepo-15-release-operations.md) | F1 ✅ · F2 ✅ · F3-F5 ⏳ | ~40% |
-| 16 | Auditoría de Seguridad | BE | `Educa.API/.claude/plan/security-audit.md` | F1 ✅ · F2-F5 ⏳ | ~20% |
-| 17 | Enforcement max-lines BE (CI) | BE | (inline en maestro) | ⏳ | 0% |
-| 18 | Tests de flujo de negocio E2E | BE+FE | (inline en maestro) | ⏳ | 0% |
-| 19 | Comunicación: foro + mensajería + push | FE+BE | (pendiente planificar) | ⏳ | 0% |
+| 16 | Auditoría de Seguridad | BE | → [`Educa.API/.claude/plan/maestro.md`](../../../Educa.API/.claude/plan/maestro.md) | (BE-only) | — |
+| 17 | Enforcement max-lines BE (CI) | BE | → [`Educa.API/.claude/plan/maestro.md`](../../../Educa.API/.claude/plan/maestro.md) | (BE-only, extraído 2026-05-15) | — |
+| 18 | Tests de flujo de negocio E2E | xrepo | → [`educa-coord/plans/maestro.md`](../../../educa-coord/plans/maestro.md) | (cross-repo, extraído 2026-05-15) | — |
+| 19 | Comunicación: foro + mensajería + push | xrepo | → [`educa-coord/plans/maestro.md`](../../../educa-coord/plans/maestro.md) | (cross-repo, extraído 2026-05-15) | — |
 | 20 | Design System — Estándar desde `usuarios` | FE | ✅ **archivado 2026-05-07** en [history/planes-cerrados.md](../history/planes-cerrados.md#plan-20--design-system-estándar-desde-usuarios) | — | — |
 | 21 | Asistencia de Profesores en CrossChex | BE+FE | `plan/asistencia-profesores.md` | ✅ **100% — archivado 2026-04-22** en [history/planes-cerrados.md](../history/planes-cerrados.md#plan-21). Deuda lateral pendiente: `PermisoSaludAuthorizationHelper.cs:63`; cols `ERL_*` en BD prueba; DROP `Asistencia_deprecated_2026_04` ~2026-06-20 | — |
 | 22 | Endurecimiento correos de asistencia | BE+FE | ✅ **archivado 2026-04-23** en [history/planes-cerrados.md](../history/planes-cerrados.md#plan-22--endurecimiento-de-correos-de-asistencia) | — | — |
 | 23 | Extensión `/intranet/admin/asistencias` a Profesores | BE+FE | `plan/asistencia-admin-profesores.md` | ✅ **100% — archivado 2026-04-22** en [history/planes-cerrados.md](../history/planes-cerrados.md#plan-23) | — |
-| 24 | 🟡 Sync CrossChex en Background Job | BE+FE | (inline en maestro) | ⏳ Chats 1-3 ✅ + Chat 4 (A') ✅ cerrado 2026-04-24 (commit `862d4ca`, +2 tests → 1373 BE verdes): `CrossChexPollingOptions` con `IOptions` + telemetría Stopwatch (ConfiguredMs/ElapsedMs/Drift). Default 30000ms preservado. **Pendiente**: subfase B Chat 4 — medir 48-72h en prod + bajar delay vía config sin redeploy. | ~85% |
+| 24 | Sync CrossChex en Background Job | xrepo | → [`educa-coord/plans/maestro.md`](../../../educa-coord/plans/maestro.md) | (cross-repo, extraído 2026-05-15) | — |
 | 25 | Paridad Excel para reportes PDF | BE+FE | (archivado en historial) | ✅ **100% — archivado 2026-04-22** en [history/planes-cerrados.md](../history/planes-cerrados.md#plan-25). Regla §17 en `business-rules.md` con INV-RE01/02/03 | — |
-| **26** | **🟡 Rate limiting flexible** | **BE+FE** | **(inline en maestro)** | **🟡 F1 ✅ cerrada 2026-04-21 + F2 Chat 1+2 ✅ cerrados 2026-04-22 + F3 ✅ awaiting-prod 2026-05-09 (brief 136). F3 calibración: x1.5 dentro / x1.2 fuera de franja escolar (L-V 7am-5pm Lima); `SchoolHoursResolver` + `TimeProvider` BCL, fallback 1.0 si DI ausente, +22 tests, RateLimiting 52/52. F2 Chat 1: `RateLimitOverrideAttribute` + `RoleMultipliers` (Director 3.0 / Asistente Admin / Promotor / Coordinador Académico 2.5 / Profesor 2.0 / resto 1.0) + `RateLimitPartitionResolver` (cache reflection, cap 5x acumulado) + nuevas policies `reports` y `batch` con base 5/min + resolver. F2 Chat 2: 39 instancias de `[EnableRateLimiting("heavy")]` migradas a `reports`/`batch` en 10 controllers + `[RateLimitOverride("reports", 2.0)]` en 28 endpoints de reportes + `[RateLimitOverride(3.0)]` en `/api/sistema/errors` y `/api/sistema/rate-limit-events` (motivado por top endpoint `/api/sistema/errors` con 5/16 rechazos visto en telemetría F1). `heavy` queda registrada sin consumidores (comentario "eliminar en F5"). Telemetría viva en prod desde F1 (RateLimitEvent, INV-S07/ET02). FE intacto: la vista admin `/intranet/admin/rate-limit-events` ya rotula por rol. Tests acumulados: 28 unit + 6 integración (Chat 1) + 22 contract tests por reflection (Chat 2) → Suite BE **1119 verdes**. Plan ~30%. **Decisión de calibración F3** (2026-04-23, usuario): la franja escolar 7am-5pm L-V es el rango normal, NO el único posible — se permiten casos anormales (reuniones, trabajo tarde). Diseño F3 debe dar margen suave fuera de franja (ej: multiplier x1.5 dentro → x1.2 fuera), NO corte duro. Valor exacto definir con telemetría real. **Siguiente**: smoke `/intranet/admin/rate-limit-events` 1-2 semanas post-deploy de F3 → si 429 fuera de franja persisten, subir `SchoolHoursOut` a 1.3. F4 (burst+sustained) cuando F3 valide.** | **50%** |
-| **28** | **🟢 Inclusión de Asistentes Administrativos en reportes de profesores** | **BE+FE** | **(inline en maestro — decisión confirmada post-Chat 1: 6 chats no justifican archivo dedicado)** | **🟢 Chat 5 docs ✅ ship 2026-05-07 — INV-AD08 (principio general anti-conflicto-de-interés con jurisdicción `SupervisoresAsistenteAdmin`) + INV-AD09 (correo correctivo AA con etiquetas outbox + plantilla) formalizados en `business-rules.md §15.9`. INV-AD05 ampliado a destinatario `'A'` → `Director.DIR_Correo`. INV-AD06 con nota cruzada "instancia profesor del principio general formalizado en INV-AD08". §1.1 ventanas: "Profesor (P) o Asistente Admin (A)" en regular, "E/P/A" en verano + nota Chat 1 decisión 6. §15.4 INV-C11: "Profesores y AAs no aplican (exentos por construcción — no tienen `GRA_Orden`)". §17.3: entrada Plan 28 Chat 3a (paridad PDF/Excel a `tipoPersona='A'`). Único archivo tocado: `educa-web/.claude/rules/business-rules.md` (+12/-6 líneas). **Hallazgo**: `Roles.SupervisoresAsistenteAdmin` ya existía en `Educa.API/Constants/Auth/Roles.cs:34` (Chat 2 BE la dejó preparada) — cero cambios C# en este chat. Brief 129 ship sin requerir deploy. ◆ 🟢 Chat 3b BE ✅ awaiting-prod 2026-05-07 — correos diferenciados + dispatcher AA (INV-AD05 ampliado tercera vez). 14 archivos BE tocados (8 prod + 2 partial mutate/helpers + 2 templates/notif + 2 tests): `PersonaAsistenciaContext.AsistenteAdmin: Director?`, `IAsistenciaAdminRepository.GetAsistenteAdminConSedeAsync` (filtra `DIR_UsuarioReg='Asistente Administrativo'`), `IAsistenciaAdminValidator.ValidarAsistenteAdminActivoAsync`, 3ra rama de `ResolverPersonaAsync` con manejo de `'A'` + actualizado mensaje `TIPO_PERSONA_INVALIDO` → "'E', 'P' o 'A'", switch en `ContextoPersona` con etiqueta "Asistente Administrativo · {Sede}", 3ra rama de `NotificarCorreccionAsync` (helpers) + `NotificarEliminacionAsync` (mutate), `IEmailNotificationService.EnviarNotificacionAsistenciaCorreccionAsistenteAdmin` + template (saludo "Estimado/a {nombre}" + descripción "su asistencia administrativa fue {operacion} manualmente por la direccion del colegio", banner azul reusado), outbox tag `"ASISTENCIA_CORRECCION_ASISTENTE_ADMIN"` + `TipoEntidadOrigen="AsistenciaAsistenteAdmin"`, `IAsistenciaAdminEmailNotifier.NotificarCorreccionAsistenteAdminAsync` + `NotificarEliminacionAsistenteAdminAsync` (silent skip si `DIR_Correo` vacío + try/catch INV-S07). **+6 tests** (4 notifier dispatch AA + 2 outbox contract) → **1681 ✅ / 8 ❌** (los mismos 8 Bulkhead/RuntimeHealth preexistentes documentados en 3a). Smoke local pendiente: crear/editar registro `'A'` desde admin UI → fila en `EmailOutbox` con `EO_TipoEntidadOrigen='AsistenciaAsistenteAdmin'` y destinatario igual a `Director.DIR_Correo`. Chat 3c BE destrabado. Commit pendiente push junto con 3a (`2e9bc77`). ◆ 🟢 Chat 3a BE ✅ awaiting-prod 2026-05-07 (commit `2e9bc77` en Educa.API/master) — reportes PDF/Excel extendidos a `tipoPersona='A'`. 13 archivos toaledos (7 nuevos + 6 modificados): nuevo `ListarAsistentesAdminPorFechaRangoAsync` en `ConsultaAsistenciaRepository` (split queries vs Director + AsistenciaPersona, mirror profesores), wrapper `IReporteFiltradoAsistentesAdminService` (thin delegate), partial `ReporteFiltradoAsistenciaService.AsistentesAdmin.cs` (poblar + procesar día/rango), partials PDF/Excel con sección "ASISTENTES ADMINISTRATIVOS", DTO extendido (`AsistentesAdmin` + 2 contadores), `TiposPersonaValidos=[E,P,A,todos]` en controller, INV-C11 nota Plan 27 excluye 'A' (Chat 1 decisión 6 — AA reusa ventanas Profesor en regular). **+4 tests verdes** (3 endpoint contract paridad PDF/Excel + 1 dispatch). Suite **1675 ✅ / 10 ❌** preexistentes (8 Bulkhead + Plan40F1 + RuntimeHealth — todos por `IBackpressureRetryAfterCalculator` no registrado en DI test, deuda Plan 40 F2/F4 fuera de scope). Smoke local pendiente: `GET /api/ReportesAsistencia/datos?tipoPersona=A&filtro=todos&rango=dia&fecha=...` debe poblar 4 AAs (Vivian dual cae como `'P'` por dispatch first-match; AA puros: Ricardo/Ray/Diana). Chat 3b BE arranca sobre suite estable. ◆ 🟢 Chat 2 BE ✅ cerrado 2026-04-22 — modelo + dispatch + queries. Migración SQL ejecutada (CHECK expandido a `('E','P','A')`). 14 archivos prod tocados: constante `TipoPersona.AsistenteAdmin = "A"`, lookup `GetAsistenteAdminActivoConSedeByDniAsync` filtrando `DIR_UsuarioReg='Asistente Administrativo'` (discriminador del rol es `DIR_UsuarioReg`, no `DIR_Rol` — convención pre-existente del proyecto), dispatch `Profesor → AsistenteAdmin → Estudiante → rechazar` en `AsistenciaService.ResolverPersonaAsync`, rama 'A' en 3 queries de `AsistenciaRepository` + nuevo método `ListarAsistentesAdminDelDiaAsync` en `AsistenciaAdminQueryRepository` + selector admin extendido + helper `ContextoAsistenteAdmin` + DTO estadísticas con campos AA + tupla `(E,P,A)` en `ContarEditados` + log sync service. Colisión real resuelta por dispatch: Vivian Canchari existe dual (AA+Profesor) → cae como `'P'` por first-match-wins (3 AAs puros: Ricardo/Ray/Diana). **+18 tests** (6 lookup, 6 dispatch, 6 `TardanzaRegular`) → **1185 BE verdes**. Commit en Educa.API branch master. **🟢 Chat 1 `/design` ✅ cerrado 2026-04-22 con 8 decisiones: (1) alcance B-amplio acotado al rol "Asistente Administrativo" (4 personas hoy: RICARDO REY, VIVIAN CANCHARI, RAY ORTIZ, DIANA TUESTA — rol = "Asistente Administrativo" explícito, se excluyen Director/Promotor/Coord Académico); filas IN del inventario 11 = {1-3 asistencia admin + 9-10 comunicación (correos + notificaciones)}; filas OUT = {4-5 filtros rol usuarios/tutores, 6-8 horarios/cursos/salones tutoreados, 11 permisos} — criterio: si no es reporte de asistencia o función que el AA no cumple, no entra; (2) `TipoPersona='A'` en `AsistenciaPersona` con `ASP_PersonaCodID` → `Director.DIR_CodID` (extiende dispatch polimórfico Plan 21 con 3er tipo); (3) dispatch webhook `Profesor → Director(rol=AA) → Estudiante → rechazar` — **modifica el orden del Plan 21** (hoy `Profesor → Estudiante`) por regla §7.1 "menor a mayor volumen"; (4) correos diferenciados: helper nuevo `EnviarNotificacionAsistenciaCorreccionAsistenteAdmin` reusa plantilla azul administrativa con saludo propio, destinatario `Director.DIR_Correo`, `TipoEntidadOrigen='AsistenciaAsistenteAdmin'`; (5) self-service "Mi asistencia" generalizado — componente `attendance-profesor-personal` se renombra a `attendance-personal` parametrizado por `TipoPersona` (reusa tabla mensual + día puntual + widget home); (6) horarios = profesor (periodo regular 07:31 tardanza / 09:30 falta, apertura INV-C10 sí aplica, INV-C09 salida temprana no aplica — es `'E'`-only); (7) `INV-AD08` principio general "ningún rol administrativo corrige asistencia de su propio rol" → AA no puede mutar `TipoPersona='A'`; jurisdicción `Roles.SupervisoresAsistenteAdmin = {Director, Promotor, Coordinador Académico}`; (8) alcance persona acotado al rol "Asistente Administrativo" específicamente (Director, Promotor, Coord Académico NO entran al scope — son roles distintos con funciones no operativas-auxiliares). **Plan inline, 6 chats confirmados**: Chat 1 ✅ + Chat 2 BE (modelo + dispatch + queries) + Chat 3 BE (reportes PDF/Excel + correos + bandeja + notificaciones) + Chat 4 FE (admin UI + badge + self-service generalizado + widget home) + Chat 5 cierre docs (INV-AD08/09 en business-rules.md §15.9 + §17 Excel paridad) + Chat 6 gap fix reservado (patrón probado Plan 27). **Chat 2 bloqueado hasta validación del jefe Plan 27 post-deploy** (evita PRs simultáneos sobre `AsistenciaPersona` + `EmailNotificationService`). Invariantes a formalizar en Chat 5: `INV-AD08`, `INV-AD09`, nota cruzada en `INV-AD06`.** | **~30%** |
-| **29** | **✅ Corte de cascada SMTP (`max_defer_fail_percentage`)** | **BE+OPS** | **(inline en maestro)** | **✅ **100% cerrado 2026-05-12** — Chats 1 + 2 + 2.5 + 2.6 + 4 docs cerrados 2026-04-22/23 con defensas en producción (pre-filtro `EnqueueAsync` + auto-blacklist `BOUNCE_5XX` 3 hits + endpoint `/defer-fail-status` + widget admin Plan 22 Chat B + docs §18 + INV-MAIL01/02/03/04). **Chat 3 OPS marcado WONTDO 2026-05-12**: hosting denegó subir `max_defer_fail_percentage`. Decisión CrossChex SMTP migrada al scope del Plan 44 (línea "opt-out / canal alterno"). Eventual swap de threshold post-OPS queda registrado en 5 marcadores `<!-- TBD post-OPS -->` para activarse si el hosting reabre negociación.** | **100%** |
+| 26 | Rate limiting flexible | xrepo | → [`educa-coord/plans/maestro.md`](../../../educa-coord/plans/maestro.md) | (cross-repo, extraído 2026-05-15) | — |
+| 28 | Inclusión Asistentes Administrativos en reportes | xrepo | → [`educa-coord/plans/maestro.md`](../../../educa-coord/plans/maestro.md) | (cross-repo, extraído 2026-05-15) | — |
+| 29 | Corte cascada SMTP (`max_defer_fail_percentage`) | xrepo | → [`educa-coord/plans/maestro.md`](../../../educa-coord/plans/maestro.md) | (cross-repo, extraído 2026-05-15, cerrado 2026-05-12) | — |
 | 27 | Filtro temporal asistencia diaria por grado (5to Primaria +) | BE+FE | ✅ **archivado 2026-04-22** en [history/planes-cerrados.md](../history/planes-cerrados.md#plan-27--filtro-temporal-de-asistencia-diaria-por-grado-5to-primaria-) (pendiente solo validación post-deploy del jefe) | — | — |
 | 33 | Auditoría de paginación de tablas (count real) | BE+FE | ✅ **100% — archivado 2026-05-09** en [history/planes-cerrados.md](../history/planes-cerrados.md#plan-33--auditoría-de-paginación-de-tablas) (chat 135 retro-validación: las 8 features 🔍 son client-side o presentacionales, ninguna paga BE con paginación) | — | — |
 | 34 | Saneamiento de errores con `ErrorGroup` | BE+FE | ✅ **archivado 2026-04-27** en [history/planes-cerrados.md](../history/planes-cerrados.md#plan-34--saneamiento-de-errores-con-errorgroup) | — | — |
 | 32 | Centralización de errores vía Correlation ID | BE+FE | ✅ **archivado 2026-04-25** en [history/planes-cerrados.md](../history/planes-cerrados.md#plan-32--centralización-de-errores-vía-correlation-id) | — | — |
 
 | 36 | Rediseño UX/UI páginas internas de Monitoreo | FE+BE | ✅ **archivado 2026-04-28** en [history/planes-cerrados.md](../history/planes-cerrados.md#plan-36--rediseño-uxui-páginas-internas-de-monitoreo) | — | — |
-| **40** | **🟡 Load Control Layers (concurrency + bulkheads + timeouts + backpressure)** | **BE** | **(inline en maestro — chat 096 cerró `/adr+/design`)** | **🟡 F1-F5 ✅ cerrados local 2026-05-05 (`awaiting-prod/103-107`). F6a sintético ✅ cerrado (chats 108+111+112 cubrieron esc 01-06 con thresholds STRICT). 6 ADRs en `Educa.API/.claude/decisions/0001-0006`. Stack: handcrafted in-process (capa 2-3 con `RateLimiter`/`SemaphoreSlim`) + Polly 8 (`Microsoft.Extensions.Http.Resilience`) sobre HttpClients CrossChex/WhatsApp. N global = 140, 5 bulkheads (`pagos=15`, `reports=8`, `notif=15`, `uploads=10`, `bio=20`). Backpressure 503 con `Retry-After=max(1,ceil(p95×1.5))` desde Plan 102 RuntimeHealth. **F4 cobertura integración ✅ shipped 2026-05-09 (Educa.API master)** — `Plan40F4BackpressureIntegrationTests.cs` con 3 tests verdes que saturan `concurrency:reports` con cap=2, mockean `IRuntimeHealthService` con p95=4000ms, y validan `Retry-After: 6` exacto + body JSON `retryAfterSeconds=6/policy="concurrency:reports"` + fallback 5s cuando RuntimeHealth lanza. Cubre el gap entre unit del calculator y observación end-to-end (Cowork sábado 2026-05-09 no observó 503 en prod por connection pool del cliente). **Pendiente**: F6b real prod 30d (en HOLD esperando datos). Test fixture deuda menor: 7 tests pre-existentes de F1/F2 fallan por `IBackpressureRetryAfterCalculator` no registrado en sus fixtures (no-bloqueante).** | **~88%** |
+| 40 | Load Control Layers (concurrency + bulkheads + timeouts + backpressure) | BE | → [`Educa.API/.claude/plan/maestro.md`](../../../Educa.API/.claude/plan/maestro.md) | (BE-only, extraído 2026-05-15) | — |
 | 35 | Rediseño UX/UI submódulo "Monitoreo" (hub + shells) | FE | ✅ **archivado 2026-04-27** en [history/planes-cerrados.md](../history/planes-cerrados.md#plan-35--rediseño-uxui-submódulo-monitoreo-hub--shells) | — | — |
 | **41** | **🟢 Trazabilidad y observabilidad del Hub de Correlación** | **BE+FE** | **→ [`educa-coord/plans/xrepo-41-correlation-hub-observability.md`](../../../educa-coord/plans/xrepo-41-correlation-hub-observability.md)** | **🟢 Plan abierto 2026-05-08. 12 brechas identificadas tras revisión de `/intranet/admin/correlation/:id` (Plan 32 shipped). 14 chats en 6 fases: F1 timeline FE · F2 enlaces laterales BE+FE · F3 RequestMetric persistido (solo `status>=400`) · F4 breadcrumbs cliente (ADR + BE + FE) · F5 search/export/auto-refresh · F6 SignalR/WAL correlation (alto blast radius — al final). Decisión usuario: cerrar TODAS las brechas. Chat 1 F1 listo para arrancar (brief próximo en `chats/open/`).** | **0%** |
 | **42** | **🟢 Normalización de casing en contratos REST FE↔BE** | **BE+FE** | **→ [`educa-coord/plans/xrepo-42-case-drift.md`](../../../educa-coord/plans/xrepo-42-case-drift.md)** | **🟢 F1 ✅ + F2-FE ✅ cerradas 2026-05-09 (chat 138 closed). F2-FE: audits F2-FE.1/4/5 ejecutados — 0 hallazgos `obj.PascalCase`, `HttpParams` 100% camelCase, headers `X-*` consistentes. F2-FE.3 ✅ implementado: `WalService.normalizeEndpoint()` (lowercase path + preserve query) aplicado en `append()`, +7 tests verdes (suite WAL 119/119). Hallazgo lateral: `health-justification-dialog.component.ts` usa FormData PascalCase (deuda menor, candidato follow-up). F2-BE pendiente (brief par 004 BE running). El "mito documental" denunciado por la auditoría inicial era falso positivo: ASP.NET Core 9 `AddNewtonsoftJson()` registra `CamelCaseNamingStrategy` por convención implícita vía `NewtonsoftJsonMvcOptionsSetup` interno del package (visible en `bin/.../Microsoft.AspNetCore.Mvc.NewtonsoftJson.dll` con strings `CamelCaseNamingStrategy`/`DefaultContractResolver`/`NewtonsoftJsonMvcOptionsSetup`). El comentario `Program.cs:74` ("camelCase para coincidir con HTTP") es **correcto** — los controllers HTTP sí emiten camelCase de facto. Hipótesis (d)/(e)/(b)/(c) descartadas vía grep exhaustivo + 1535+ tests FE verdes en prod. **F2 reducido**: F2-BE.4 (CORS Expose-Headers `X-Correlation-Id, X-Schema-Version`) sigue siendo crítica — Plan 41 puede estar pagando este bug. F2-BE.5 (snapshot tests contrato) sigue siendo recomendable. F2-BE.1 (override explícito `CamelCasePropertyNamesContractResolver`) opcional como defensa en profundidad. F2-FE.2 (interceptor defensivo) descartado. F2-FE.3 (WAL endpoint normalize) sigue válido. F4 INV-CONTRACT01/02/03 intacto. Resultado completo en [`educa-coord/plans/xrepo-42-case-drift.md` §Resultado F1](../../../educa-coord/plans/xrepo-42-case-drift.md). Briefs F2-BE/F2-FE pueden correr en paralelo sin riesgo Rama C.** | **35%** |
 | **43** | **🟢 Monitoreo: feedback Cowork producción 2026-05-11** | **BE+FE** | **→ [`educa-coord/plans/xrepo-43-monitoreo-cowork-feedback-2026-05-11.md`](../../../educa-coord/plans/xrepo-43-monitoreo-cowork-feedback-2026-05-11.md)** | **🟢 Plan abierto 2026-05-11. 24 hallazgos clasificados (A1-A13 bugs/huecos + B1-B12 mejoras estructurales) tras revisión Cowork de `/intranet/admin/monitoreo` con datos reales de producción. 13 chats en 6 fases. **Principio rector**: foundations primero (correlation id propagado + fingerprint correcto + contadores reconciliados) → diagnóstico real (SMTP visible) → operatividad (filtros + acciones inline) → visualizaciones → vista unificada. Muchos hallazgos comparten causa raíz: resolver de raíz cierra 3-5 puntos al mismo tiempo. F1 desbloquea F3/F5/F6. F2 paralelo sin dependencias. Coordinar Chat 1.3 (correlation id end-to-end) con Plan 41 F6 que también lo tiene en cola. **Chat 1.1 ✅ ship 2026-05-11** (chat 139, A1+B11 cerrados — los 3 widgets etiquetados con `Source`/`TimeWindowLabel`; los 3 endpoints miden ventanas legítimamente distintas, no fuentes distintas como decía la hipótesis original). Tabla de cierre por punto en el plan dedicado.** | **8%** |
-| **44** | **❌ Reducción de volumen SMTP (DESCARTADO 2026-05-12 — scope absorbido por Plan 22 Chat 7)** | **BE+FE** | **(brief 141 design closed — `tasks/email-volume-reduction-deferred.md` opcional para futuro)** | **❌ **DESCARTADO 2026-05-12** tras `/design` (brief 141). Conclusión clave: **el contador `max_defer_fail_percentage` mira FAILED, no SENT**. Educa hoy tiene 14 FAILED / 5208 SENT = 0.27% — las defensas INV-MAIL01/02/07/09 ya lo cubren. Reducir volumen (líneas A/D/C/E) introduce fricción al apoderado y/o requiere ack del jefe sin mover la métrica relevante del contador. Línea F (corte CrossChex) descartada por restricción explícita del usuario: CrossChex es funcional, sin aprobación de alternativa. Líneas I/J (subdominio / SMTP relay externo) descartadas por restricción "sin aprobación adicional, sin costo, sin fricción". Camino mínimo viable: **acelerar Plan 22 Chat 5/6 F4 (auditoría destinatarios inválidos, ya en cola)** + **nuevo Plan 22 Chat 7** (guard de cesión automática en `EmailOutboxWorker` cuando contador ≥80% del techo — pausa informativos, mantiene críticos administrativos).** | **N/A (descartado)** |
-| **45** | **🟢 Limpieza de drifts BE (logging structured + DateTime.Now + inyección muerta)** | **BE** | **[`Educa.API/.claude/plan/be-rules-drift-cleanup.md`](../../../Educa.API/.claude/plan/be-rules-drift-cleanup.md)** | **🟢 Plan abierto 2026-05-13 tras auditoría codex. 3 fases mecánicas (F1 logging interpolado en `CrossChexApiService` + `NotificacionFaltasService`; F2 `DateTime.Now` en `ReporteAsistenciaProfesorPdfService`; F3 inyección huérfana `IEmailService` en `PasswordRecoveryService` — codex la reportó como violación de outbox pero es dead injection, el outbox ya funciona). Prioridad **media-alta**: viola reglas activas pero no afecta prod hoy. Empaquetable en un chat de limpieza BE.** | **0%** |
+| 44 | Reducción de volumen SMTP — DESCARTADO 2026-05-12 | xrepo | → [`educa-coord/plans/maestro.md`](../../../educa-coord/plans/maestro.md) | (cross-repo memoria, extraído 2026-05-15) | — |
+| 45 | Limpieza drifts BE | BE | → [`Educa.API/.claude/plan/maestro.md`](../../../Educa.API/.claude/plan/maestro.md) | (BE-only) | — |
 | **46** | **🟢 Limpieza de drift documental en `.claude/` FE** | **FE** | **[plan/drift-doc-cleanup.md](./drift-doc-cleanup.md)** | **✅ cerrado 100% (chat 157, 2026-05-15) — F1 + F2 + F2.b + F3 completos. F2.b re-verificó los 10 items pendientes (8 ✅ PASS + 2 ⚪ N/A FE). F3: `dialogs-sync.md` ya estaba limpia (anti-patrón solo en prosa, sin ejemplo malo). Stats finales: 22/28 ✅ + 2 ⚪ + 2 ❌ activos (Plan 47 maestro links ✅ shipped + Plan 45 BE drift) + 1 ⚠️ parcial (Plan 48 appendTo ✅ shipped) = 86% cerrado. Drift-report archivado a `history/drift-report-2026-04.md`.** | **100%** |
 | **47** | **✅ Limpieza de links rotos en `maestro.md`** | **FE** | **[plan/maestro-links-cleanup.md](./maestro-links-cleanup.md)** | **✅ **cerrado 2026-05-15** (brief 158). Audit confirmó que de los "18 links rotos" reportados, solo 1 era markdown link real: `./case-drift.md` → fix a `../../../educa-coord/plans/xrepo-42-case-drift.md` (Plan 42 cross-repo). Los otros 17 eran rutas en backticks (notación informativa, no clickeable). Criterio de cierre cumple: `grep -E ']\([^)]+\.md\)' .claude/plan/maestro.md` retorna 0 broken. Deuda menor lateral: anchors cortos `#plan-6`, `#plan-11`, etc. apuntan a headings con texto extendido — VSCode preview los resuelve por prefijo, GitHub strict no. Candidato a follow-up oportunístico.** | **100%** |
 | **48** | **✅ Barrido `appendTo="body"` en `p-select`** | **FE** | **[plan/appendto-barrido.md](./appendto-barrido.md)** | **✅ Cerrado 2026-05-15 — brief 159. Inventario al arrancar: 4 archivos (drift bajó de 7 → 4 desde 2026-05-13). 5 tags `appendTo="body"` agregados en: `attendance-table` (2), `permisos-usuarios`, `usuario-form-dialog`, `login-intranet`. Re-grep confirma 0 instancias restantes. Lint limpio.** | **100%** |
@@ -243,145 +245,11 @@ Cuellos de botella efectivos para el sistema:
 
 ## Plan 29 — Corte de cascada SMTP (`max_defer_fail_percentage`)
 
-> **Origen**: 2026-04-22 — investigación de correos fallidos descubrió techo cPanel `max_defer_fail_percentage = 5/h por dominio`. Cuando se agota, el hosting descarta silenciosamente todo correo del dominio durante 60 min.
->
-> **Estado**: 5/6 chats cerrados. Defensas en producción.
+→ Migrado a [`educa-coord/plans/xrepo-29-smtp-corte-cascada.md`](../../../educa-coord/plans/xrepo-29-smtp-corte-cascada.md) (cross-repo, cerrado 100% 2026-05-12). Body extraído 2026-05-15 (brief 172, ADR-0002).
 
-### Lo entregado (Chats 1 + 2 + 2.5 + 2.6 + 4 cerrados 2026-04-22/23)
+## Plan 28 — Inclusión de Asistentes Administrativos en reportes de profesores
 
-- `EmailBlacklist` + `EmailValidator.Normalize` + pre-filtro en `EmailOutboxService.EnqueueAsync` (rechaza inválidos y blacklisted sin crear fila).
-- `EmailBounceBlacklistHandler` en `ProcessSingleEmailAsync.catch`: 3er bounce 5.x.x → INSERT blacklist + `FAILED_BLACKLISTED` atómico. SSL/auth/max-defers NO cuentan.
-- Fix TLS estricto (`SslProtocols.Tls12 | Tls13` forzado en SmtpClient, flag `Email:TlsStrictMode` default `true`).
-- Endpoint `GET /api/sistema/email-outbox/defer-fail-status` con threshold configurable `Email:DeferFailThresholdPerHour` (default 5).
-- Validación universal: cualquier `EmailOutboxService.EnqueueAsync` corre `EmailValidator.Validate(email.To)` sin condicional (Chat 2.5 eliminó el whitelist).
-- Docs: `§18 Correos Salientes y Protección del Canal SMTP` en `business-rules.md` + `INV-MAIL01/02/03/04` en `§15.14`. 5 marcadores `<!-- TBD post-OPS -->` para swap del threshold.
-
-### Chat 3 OPS — ✅ WONTDO 2026-05-12 (Plan 29 al 100%)
-
-**Resolución**: el hosting (cPanel) denegó subir `max_defer_fail_percentage`. La negociación no procede. Scope técnico residual absorbido por **Plan 44 Chat 1** (reducción de volumen SMTP — brief 141).
-
-**Por qué cierra sin ejecutar**:
-
-- Las defensas reactivas del Plan 29 (INV-MAIL01/02/03/04) y de Planes 22/37/38/39 ya están en producción o awaiting-prod. Cubren el techo bajo del hosting.
-- La decisión CrossChex SMTP (desactivar / migrar / esperar Plan 24) ya no es OPS independiente — es una de las 5 líneas que Plan 44 Chat 1 (`/design`) evalúa como parte de la estrategia de reducción ofensiva (línea "opt-out / canal alterno").
-- Validación post-deploy de defensas existentes sigue cubierta por los `/verify` individuales de los planes 22/29/37/38/39 ya en `awaiting-prod`.
-- 5 marcadores `<!-- TBD post-OPS -->` en `business-rules.md §18` quedan como deuda documental fría — se activan solo si el hosting reabre negociación.
-
-**Reversibilidad**: si el hosting cambia de postura, reabrir Plan 29 como Plan 29.1 con micro-chat dedicado para swap de threshold.
-
-### Dependencias
-
-- **Plan 22 Chat B** desbloqueado (widget defer-fail-status consume el endpoint).
-- **Plan 28 Chat 3** desbloqueado (sin PRs simultáneos sobre `EmailOutboxService`).
-- **Plan 24** habilitador futuro — si Educa consume CrossChex biométrico directamente, podemos cortar su SMTP.
-
----
-
-## 🟢 Plan 28 — Inclusión de Asistentes Administrativos en reportes de profesores
-
-> **Origen**: Requerimiento del usuario 2026-04-22. **MÁXIMA PRIORIDAD nueva**.
-> **Plan**: **inline en este maestro** — decisión confirmada post-Chat 1. 6 chats totales no justifican archivo dedicado (mismo criterio que Plan 27).
-> **Estado**: 🟢 **Chat 1 `/design` ✅ cerrado 2026-04-22** con 8 decisiones resueltas. Chat 2 BE **bloqueado hasta validación del jefe del Plan 27 post-deploy**.
-> **Validación**: diseño validado por el usuario en Chat 1. Resultado final post-deploy requiere OK explícito antes de archivar.
-
-### Qué se quiere
-
-> Cita literal del usuario (2026-04-22): *"En reportes donde aparezcan profesores ahora también saldrán de director los que sean asistentes administrativos."*
-
-Los **Asistentes Administrativos** comparten login y tabla con los Directores (`Director`, ver business-rules.md §7.1 y `Roles.Administrativos`). Hoy aparecen en pantalla bajo "Director" o "Asistente Administrativo" según el campo de rol, pero **no figuran** en los reportes/listados que muestran profesores — pese a que operativamente cumplen funciones cercanas a docentes auxiliares (acompañamiento académico, suplencias, etc.).
-
-El requerimiento (acotado en Chat 1 decisión 8): **donde el sistema muestra "profesores" en un reporte de asistencia o comunicación relacionada, también debe incluir a los Director cuyo rol = "Asistente Administrativo"** (explícitamente — NO Director, Promotor ni Coordinador Académico, que cumplen funciones no operativas-auxiliares). Hoy existen **4 AAs** activos en producción: RICARDO REY YARUPAITA MALASQUEZ, VIVIAN COLET CANCHARI RIVAS, RAY ORTIZ PEREZ, DIANA PATRICIA TUESTA MOYOHURA.
-
-### Por qué importa ahora
-
-- **Plan 21** (asistencia polimórfica `TipoPersona = 'E' | 'P'`) cerró 2026-04-22 — habilitó que profesores tengan registros propios en `AsistenciaPersona`.
-- **Plan 23** (extensión de `/intranet/admin/asistencias` a profesores) cerró 2026-04-22 — admin ya gestiona asistencia de profesores en la misma UI que estudiantes.
-- Plan 28 es la **3ra extensión natural**: incluir a los asistentes admin en el mismo flujo. Sin esto, los reportes recién extendidos a profesores quedan **incompletos** desde el punto de vista del Director (le falta visibilidad de su propio personal auxiliar).
-- Los AAs ya marcan en CrossChex físicamente hoy — sus marcaciones caen en el dispatch como **rechazadas silenciosamente** (DNI no encontrado en `Profesor` ni en `Estudiante`). Hay marcaciones **perdidas** que el webhook devuelve HTTP 200 pero nunca registra. Confirmado por el usuario en pre-work Chat 1 (P3).
-
-### Las 8 decisiones (Chat 1 cerrado 2026-04-22)
-
-| # | Tema | Decisión | Justificación |
-|---|------|----------|---------------|
-| **1** | **Alcance del término "reportes"** | **Opción B (amplio) con P5 extendido**. Aplica a **todo reporte de asistencia** que hoy lista profesores Y a **comunicación relacionada** (correos + notificaciones), pero **acotado al rol "Asistente Administrativo"** (ver decisión 8). Filas IN del inventario 11 = {1-3 asistencia admin, 9-10 comunicación}. Filas OUT = {4-5, 6-8, 11}. Principio operativo del usuario: *"si hay algo relacionado a un reporte de asistencia, priorizar implementarlo sin inconsistencias"*. | El alcance literal del requerimiento apunta a "reportes que listan profesores" — asistencia cubre la mayoría. Académico (horarios, cursos, salones tutoreados), filtros por rol en usuarios/permisos NO aplican porque el AA no cumple esas funciones estructuralmente. |
-| **2** | **Modelo de datos `AsistenciaPersona`** | **Opción A**: `TipoPersona = 'A'` agregado al CHECK constraint. `ASP_PersonaCodID` apunta a `Director.DIR_CodID` cuando `TipoPersona = 'A'`. | Continuación natural del patrón polimórfico del Plan 21 (ya estable). CHECK constraint reversible con PR + script SQL. Queries de Plan 21/23 ya tocadas solo necesitan agregar contemplar `'A'`. Requiere validación cross-tabla DNI antes del deploy (Estudiante + Profesor + Director activos no pueden compartir DNI). |
-| **3** | **Dispatch webhook CrossChex** | **Opción A con orden custom**: `Profesor → Director(rol=AA) → Estudiante → rechazar`. **Modifica el orden del Plan 21** (hoy `Profesor → Estudiante`). | Regla de `business-rules.md §7.1` ("menor a mayor volumen"): Profesor (~decenas) → AA (4) → Estudiante (miles). Cambio al Plan 21 documentado explícitamente en Chat 5. Consecuencia: las marcaciones hoy rechazadas silenciosamente de los 4 AAs empiezan a registrarse tras el deploy. |
-| **4** | **Correos (INV-AD05)** | **Opción B**: helper nuevo `EnviarNotificacionAsistenciaCorreccionAsistenteAdmin` reusa plantilla azul administrativa con saludo propio *"Estimado/a asistente administrativo/a"*. Destinatario = `Director.DIR_Correo`. Etiqueta outbox: `TipoEntidadOrigen = "AsistenciaAsistenteAdmin"` (bandeja admin separada). | Simetría con lo que Plan 23 sentó para profesor. Volumen despreciable (4 AAs × N correcciones/mes ≪ 200/h). Saludo genérico mentiría — P5 extendido exige trato diferenciado correcto. |
-| **5** | **Self-service "Mi asistencia"** | **Opción A + sub-decisión (i) generalizar**: componente `attendance-profesor-personal` se renombra a `attendance-personal` parametrizado por input `TipoPersona`. El AA usa tabla mensual + día puntual + widget home idénticos al profesor. Sin botones de autojustificación (read-only por INV-AD06/08). | P5 extendido (pre-work) exige simetría con profesor. Generalizar evita duplicación de ~3 componentes FE. Nueva ruta `/intranet/asistente-administrativo/me/*` o reuso parametrizado con guard de rol. |
-| **6** | **Ventanas horarias §1.1** | **Opción A**: idéntico a profesor. Periodo regular: tardanza `[07:31, 09:30)`, falta `≥ 09:30`. Apertura `< 05:00` (INV-C10) sí aplica. Salida temprana `< 13:55` (INV-C09) **NO aplica** (es `'E'`-only). Verano: fórmula inicio+delta común. | Confirmado por el usuario en pre-work P4. Zero branch nuevo en `EstadoAsistenciaCalculator` ni `CoherenciaHorariaValidator` — `'A'` cae en el branch de `'P'`. Tabla §1.1 de business-rules.md muestra "P o A" en Chat 5. |
-| **7** | **Permisos e INV-AD06 / AD08** | **Opción B refinada por el usuario con principio general**: *"ningún rol administrativo corrige asistencia de su propio rol"*. El AA NO puede mutar `TipoPersona = 'A'` (propia ni colega). Jurisdicción sobre `'A'` = `Roles.SupervisoresAsistenteAdmin = {Director, Promotor, Coordinador Académico}`. El AA conserva jurisdicción sobre `'E'` y `'P'` (hereda Plan 21/23). | Principio anti conflicto de interés. Generaliza el patrón ya establecido para profesor (INV-AD06). Enforcement controller-level con autorización condicional por `TipoPersona` del target. Formaliza `INV-AD08` con texto del principio general. |
-| **8** | **Alcance persona acotado** | **Solo rol "Asistente Administrativo"**. Director puro, Promotor y Coordinador Académico **NO** entran al scope del Plan 28. | Aclaración detectada por asistente en Chat 1. El pedido literal dice *"asistentes administrativos"* — los otros 3 roles administrativos cumplen funciones distintas (jefatura, relaciones externas, supervisión académica) y su asistencia formal no es parte del requerimiento. Puede extenderse en un Plan futuro si el usuario lo pide. |
-
-### Alcance confirmado post-Chat 1 — inventario 11 vistas
-
-| # | Categoría | Vista/endpoint | ¿Incluir AA? | Razón |
-|---|-----------|----------------|-------------|-------|
-| 1 | Asistencia (Plan 21+23) | `attendance-director-profesores` + tab "Profesores" admin | ✅ SÍ | Corazón del requerimiento. Tab se renombra o agrega filtro de tipo persona. |
-| 2 | Asistencia (Plan 21+23) | Reportes mensual / día puntual / filtrado / consolidado PDF+Excel profesor | ✅ SÍ | Incluye `ReporteFiltradoAsistenciaService` y todos los exportables del inventario §17 que tocan profesores. Badge visible para distinguir AA de Profesor. |
-| 3 | Asistencia (Plan 21+23) | Widget home director "Asistencia profesores" | ✅ SÍ | Visibilidad del personal operativo. |
-| 4 | Administración | `/intranet/admin/usuarios` filtro `rol = Profesor` | ❌ NO | Filtro por rol de usuario, no reporte. El AA ya se filtra con su propio rol "Asistente Administrativo". Mezclar rompería la semántica. |
-| 5 | Administración | Listado de tutores en `/intranet/admin/salones` | ❌ NO | Tutor = profesor con `PRS_EsTutor = true`. El AA no es tutor por definición (Plan 6). Incluirlo mentiría. |
-| 6 | Académico | Horarios por profesor | ❌ NO | El AA no dicta horarios formales. Si en el futuro lo hace, aparece naturalmente via `Horario`. |
-| 7 | Académico | `ProfesorCurso` (Plan 6) — dicta qué cursos | ❌ NO | El AA no está en `ProfesorCurso`. |
-| 8 | Académico | Salones tutoreados | ❌ NO | Mismo criterio que #5. |
-| 9 | Comunicación | Bandeja admin de correos — filtro destinatario | ✅ SÍ | Correos de corrección al AA (INV-AD09) deben aparecer. Filtro ampliado o `TipoEntidadOrigen = "AsistenciaAsistenteAdmin"` para separar. |
-| 10 | Comunicación | Notificaciones admin enviadas a profesores | ✅ SÍ | Si se envía "a todos los profesores", el AA recibe también (simetría P5 extendido). Filtro `rol = Profesor` se amplía a `rol IN {Profesor, Asistente Administrativo}` en el composer de destinatarios. |
-| 11 | Permisos | `/intranet/admin/permisos-usuario` filtro rol Profesor | ❌ NO | Filtro por rol — mismo criterio que #4. |
-
-**Auto-inclusión por P5 = A**: Self-service "Mi asistencia" del AA (tabla mensual + día puntual + widget home). Es reporte de asistencia del propio AA — entra vía generalización del componente profesor (decisión 5).
-
-### Plan de ejecución post-Chat 1 (6 chats confirmados)
-
-| Chat | Alcance | Repo | Tamaño |
-|------|---------|------|--------|
-| **Chat 1 — `/design`** | ✅ **Cerrado 2026-04-22** — 8 decisiones resueltas. Plan queda inline. | N/A | 1 chat |
-| **Chat 2 — BE: modelo + dispatch + queries** | ✅ **Cerrado 2026-04-22** — Migración SQL ejecutada en BD desarrollo (CHECK `('E','P')` → `('E','P','A')`, constraint `CK_AsistenciaPersona_TipoPersona`). 14 archivos de producción tocados: constante `TipoPersona.AsistenteAdmin = "A"` + `Roles.SupervisoresAsistenteAdmin` (subset de Administrativos sin AA) + `AsistenciaRules.TardanzaRegular` extendido a rama P ("A" reutiliza 7:31) + lookup nuevo `GetAsistenteAdminActivoConSedeByDniAsync` en `IAsistenciaRepository`/`AsistenciaRepository` filtrando por `DIR_UsuarioReg = 'Asistente Administrativo'` + `DIR_Estado = 1` + `DIR_DNI_Hash` (discriminador del rol via `DIR_UsuarioReg` confirmado como convención pre-existente del proyecto, no hay columna dedicada `DIR_Rol`) + dispatch extendido en `AsistenciaService.ResolverPersonaAsync` con 3er paso `Profesor → AsistenteAdmin → Estudiante → rechazar` (record `ResolucionPersona` gana campo `Director? AsistenteAdmin`) + rama 'A' en `GetDnisConAsistenciaCompleta/EditadaAsync` + fallback AA en `GetAsistenciaPendientePorDniAsync` + `ListarAsistentesAdminDelDiaAsync` en `AsistenciaAdminQueryRepository` (partial AsistenciaAdminRepository) + `ListarAsistentesAdminParaSeleccionInternalAsync` en `AsistenciaAdminSeleccionRepository` + helper `ContextoAsistenteAdmin` + `AsistenciaAdminEstadisticasDto.TotalAsistentesAdmin/CompletasAsistentesAdmin` + `ContarEditadosDelDiaPorTipoAsync` tupla `(E, P, A)` + log `PreservadosA` en `AsistenciaSyncService`. **Colisión cross-table detectada y resuelta por diseño**: Vivian Canchari existe activa como `DIR_CodID=3` (AA) + `PRO_CodID=4` (Profesor). First-match-wins del dispatch la asigna como `'P'` (Profesor cae primero); los otros 3 AAs (Ricardo/Ray/Diana) son puros. Deuda técnica documentada: `DIR_UsuarioReg` dual-uso (auditoría + discriminador de rol); CodIDs 9-10 duplicados en Director (Medalith Trejo mismo DNI Hash); `AsistenciaService.cs` 456 líneas y `AsistenciaAdminQueryRepository.cs` 346 líneas sobre cap 300 (pre-existente + deuda nueva del chat). **+18 tests BE nuevos** (6 lookup AA, 6 dispatch incluyendo dual Profesor+AA, 6 `TardanzaRegular` con P/A → 7:31 y E/null → 7:46). Baseline 1167 → **1185 verdes**. Commit `feat(asistencia): Plan 28 Chat 2 — add "TipoPersona='A'" for Asistente Admin` en Educa.API branch master. | BE | 1 chat |
-| **Chat 3 — BE: reportes + correos + bandeja + notificaciones** | Paridad PDF/Excel extendida a `'A'` (§17 Plan 25): los 14 endpoints pdf/excel que tocan profesores ahora incluyen AA cuando hay data. Badge textual *"Asistente Admin"* en celdas de reportes. Nuevo helper `EnviarNotificacionAsistenciaCorreccionAsistenteAdmin` en `EmailNotificationService`. Bandeja admin: filtro por `TipoEntidadOrigen`. `INotificacionesAdminService` — composer de destinatarios cuando rol filtro = "Profesor" expande a `{Profesor, AsistenteAdmin}`. Tests contract + paridad Excel. | BE | 1 chat |
-| **Chat 4 — FE: admin + badge + self-service + widget + notificaciones** | Generalización `attendance-profesor-personal` → `attendance-personal` parametrizado (Input `TipoPersona`). Widget home generalizado. Badge `tag-neutral` para AA (design-system §6). `attendance-director-profesores` incluye tab o filtro para AA. Bandeja admin FE muestra correos AA con tag distinto. Notificaciones admin — composer FE incluye chip "Asistente Administrativo" junto a "Profesor". Nueva ruta `/intranet/asistente-administrativo/me/*` o reuso con guard de rol. Menú `intranet-menu.config.ts` — módulo "Seguimiento" visible para AA. Tests vitest. | FE | 1 chat |
-| **Chat 5 — Cierre docs + invariantes** | Formalizar `INV-AD08` e `INV-AD09` en `business-rules.md §15.9`. Ampliar nota cruzada en `INV-AD06` ("principio general que se instancia por rol"). Actualizar tabla §1.1 ventanas horarias con "P o A" en periodo regular. Actualizar §17 (paridad Excel) con referencia a `'A'`. Actualizar `Roles.cs` con constante `SupervisoresAsistenteAdmin`. Mover chat files a `closed/`. | docs | 1 chat |
-| **Chat 6 — Gap fix reservado** | Reservado como patrón probado (Plan 27 tuvo Chat 5b y 5c post-cierre para queries/proyecciones que escaparon). Si no se usa, se cierra sin trabajo. | BE+FE | 1 chat (opcional) |
-
-**Total**: 5 chats de trabajo activo + 1 reservado. El Chat 6 es opcional — se abre solo si aparece gap post-cierre Chat 5.
-
-### Reversibilidad
-
-- **`TipoPersona = 'A'`** (decisión 2): revertir CHECK a `('E','P')` + PR que deshace dispatch + queries. Registros `'A'` históricos permanecen en BD (no se eliminan); las queries dejan de mostrarlos. Reversible vía PR + script SQL simétrico.
-- **Orden del dispatch** (decisión 3): revertir a `Profesor → Estudiante → rechazar` (orden Plan 21 original). Las marcaciones futuras de AAs vuelven a rechazarse silenciosamente (HTTP 200). Sin data loss.
-- **Correos diferenciados** (decisión 4): desactivar helper `EnviarNotificacionAsistenciaCorreccionAsistenteAdmin`. Si se necesita continuar enviando, migrar a helper de profesor o genérico. Sin data loss.
-- **Self-service generalizado** (decisión 5): el componente generalizado sigue sirviendo a profesor — no hay que des-generalizar. El AA simplemente deja de verlo si se le revoca permiso.
-- **`INV-AD08`** (decisión 7): desactivar la autorización condicional deja a los 4 roles administrativos con poder simétrico sobre `'A'`. Sin data loss, aunque se pierde gobernanza anti-conflicto-de-interés.
-
-### Dependencias y coordinación
-
-- **🔒 Bloqueo duro — Plan 27**: Chat 2 BE no arranca hasta validación del jefe Plan 27 post-deploy. Ambos planes tocan `AsistenciaPersona` + `EmailNotificationService`. PRs simultáneos generarían merge conflicts asegurados. El Chat 1 `/design` ya cerró sin tocar código (no entró en el bloqueo).
-- **Coordinación con Plan 22 (cuotas SMTP)**: correos de corrección al AA (INV-AD09) = 4 AAs × N correcciones/mes → despreciable contra el techo 200/h. No requiere ajuste del throttle ni nuevos senders.
-- **Coordinación con Plan 26 (rate limit flexible)**: el rol "Asistente Administrativo" ya tiene multiplier 2.5 en `RoleMultipliers` (Chat 1 F2 cerrado 2026-04-22) — no hay riesgo de 429 cuando empiece a usar reportes pesados ni self-service.
-- **Coordinación con Plan 27 (INV-C11)**: el filtro `GRA_Orden >= 8` aplica solo a `TipoPersona = 'E'`; `'A'` queda fuera del filtro por construcción. Cubierto en `business-rules.md §1.11` ("OUT: Profesores").
-- **Base estable**: Plan 21 (polimórfico) y Plan 23 (admin extensión profesores) ya cerrados. La migración aditiva (CHECK expandido a `'A'`) no rompe registros históricos.
-
-### Checklist pre-Chat 2 `/execute`
-
-```text
-[ ] Validación del jefe Plan 27 post-deploy recibida (desbloquea Chat 2)
-[ ] Script SQL de verificación cross-tabla DNI preparado: confirmar que ningún DNI activo coexiste en Estudiante + Profesor + Director simultáneamente (heredar de Plan 21 Chat 1 + agregar 3er bucket Director)
-[ ] Los 4 DNIs de AAs cargados y activos en tabla Director con rol = "Asistente Administrativo"
-[ ] Script SQL migración CHECK constraint preparado: ALTER TABLE AsistenciaPersona + constraint rename + CHECK nuevo ('E','P','A')
-[ ] Constante nueva Roles.SupervisoresAsistenteAdmin definida en backend (Director + Promotor + Coordinador Académico)
-[ ] Chat file 023-plan-28-chat-2-be-modelo-dispatch-queries.md creado con /next-chat
-[ ] Branch feature/plan-28-chat-2-tipo-persona-a creada desde master en Educa.API
-[ ] README de Chat 2 con contexto: decisiones 2/3/6/7, archivos esperados, tests esperados
-```
-
-### Invariantes a formalizar en Chat 5
-
-| ID | Invariante (texto final) | Enforcement |
-|----|--------------------------|-------------|
-| `INV-AD08` | **Principio general**: *"ningún rol administrativo corrige asistencia de su propio rol"*. Instancia concreta Plan 28: un usuario con rol "Asistente Administrativo" no puede mutar (crear / editar / justificar / eliminar) registros de `AsistenciaPersona` con `TipoPersona = 'A'`, ya sea la propia o la de un colega AA. Solo los roles administrativos distintos al propio pueden corregir `'A'`: Director, Promotor, Coordinador Académico (`Roles.SupervisoresAsistenteAdmin`). Este principio generaliza `INV-AD06` (profesor no corrige profesor) — extensible a nuevos roles en el futuro. | `AsistenciaAdminController` con autorización condicional por `TipoPersona` del target + tests por reflection (~2 tests: "AA corrige profesor ✓", "AA corrige AA ✗") |
-| `INV-AD09` | El correo de corrección de asistencia sobre un registro con `TipoPersona = 'A'` se envía al propio AA (`Director.DIR_Correo` del Director cuyo rol = "Asistente Administrativo"), **nunca al apoderado**. Helper dedicado `EnviarNotificacionAsistenciaCorreccionAsistenteAdmin` con saludo *"Estimado/a asistente administrativo/a"* + `TipoEntidadOrigen = "AsistenciaAsistenteAdmin"` en outbox. Fire-and-forget (hereda INV-S07). | `EmailNotificationService.EnviarNotificacionAsistenciaCorreccionAsistenteAdmin` + `IAsistenciaAdminEmailNotifier` polimórfico por `TipoPersona` |
-| Nota cruzada en `INV-AD06` | Agregar al final: *"Este invariante es una instancia del principio general de `INV-AD08`: ningún rol administrativo corrige asistencia de su propio rol."* | Doc-only (business-rules.md §15.9) |
-| Extensión §17 Plan 25 | Los 14 reportes PDF/Excel que hoy muestran profesores también deben mostrar AAs cuando haya data. Paridad fila-a-fila preservada (INV-RE01). Badge textual en celda distingue "Profesor" de "Asistente Admin". | Tests `*ExcelEndpointTests.cs` + tests de presencia de fila AA en el inventario §17 |
-
----
+→ Migrado a [`educa-coord/plans/xrepo-28-asistentes-admin.md`](../../../educa-coord/plans/xrepo-28-asistentes-admin.md) (cross-repo, ~30%). Body extraído 2026-05-15 (brief 172, ADR-0002).
 
 ## ⚠️ Pendientes para el próximo deploy
 
@@ -470,122 +338,13 @@ El requerimiento (acotado en Chat 1 decisión 8): **donde el sistema muestra "pr
 
 ---
 
-## 🟡 Plan 24 — Sincronización CrossChex en Background Job
+## Plan 24 — Sincronización CrossChex en Background Job
 
-> **Origen**: Conversación 2026-04-20. En `/intranet/admin/asistencias?tab=gestion`, "Sincronizar CrossChex" bloquea al usuario 2+ minutos sin feedback granular. Si el usuario navega, pierde el resultado (subscripción cancelada, request sigue viva en server).
-> **Plan**: inline en este maestro (sin archivo separado — hacer otro día).
-> **Estado**: 🟢 **Chat 1 ✅ cerrado 2026-04-23** (commit `299db24` en `Educa.API master`, +7 tests → 1302 BE verdes). 🟢 **Chat 2 ✅ cerrado 2026-04-23** (commit `513c6cc` en `Educa.API master`, +14 tests → 1316 BE verdes). 🟢 **Chat 3 ✅ cerrado 2026-04-24** (commit pendiente en `educa-web main`, +29 tests → 1583 FE verdes). Plan al **~75%**. Falta Chat 4 (validar `Task.Delay` + deploy BE+FE).
+→ Migrado a [`educa-coord/plans/xrepo-24-crosschex-sync.md`](../../../educa-coord/plans/xrepo-24-crosschex-sync.md) (cross-repo, ~85%). Body extraído 2026-05-15 (brief 172, ADR-0002).
 
-### Diagnóstico
+## Plan 30 — Dashboard Visibilidad Admin (correos + asistencia)
 
-- **Backend (culpa principal)**: `CrossChexApiService.GetDayRecordsAsync:231` hace `await Task.Delay(30000)` **entre cada página** (páginas de 100 registros). Con ~500 personas/día → ~5 páginas → 4 delays = 2 min de espera pura entre páginas.
-- **Por qué cada sync del mismo día tarda más**: las marcaciones se acumulan intradiariamente (8 AM = solo entradas, 6 PM = entradas + salidas + reentradas). A más tarde, más páginas, más delays. No es acumulación histórica — es acumulación del día en curso.
-- **Frontend**: `AttendancesDataFacade.sincronizarDesdeCrossChex:129-154` usa `.subscribe()` directo con `takeUntilDestroyed`. Si el usuario navega, la suscripción muere pero la request HTTP sigue viva en el server — resultado perdido. Único feedback: signal `syncing()` → spinner en botón + toast al final.
-
-### Qué diseñar (4 chats)
-
-- **Chat 1 ✅ cerrado 2026-04-23** (commit `299db24` en `Educa.API master`). Resumen del cierre:
-  - Tabla nueva `CrossChexSyncJob` (decisión 1 — SQL en Azure, no memoria). 8 archivos nuevos BE + 6 modificados + 2 archivos de tests (7 nuevos) → 1302 BE verdes.
-  - `POST /api/asistencia-admin/sync` devuelve `202 Accepted { jobId, estado: "QUEUED" }` con Location header al status endpoint. `[RateLimitOverride("batch", 3.0)]` (15/min efectivo para admins).
-  - `GET /api/asistencia-admin/sync/{jobId}/status` devuelve `CrossChexSyncStatusDto` expresivo (jobId, estado, pagina/totalPaginas, fase, mensaje, error). Policy `reads`.
-  - `409 Conflict` si ya hay un job `QUEUED`/`RUNNING` (decisión 3 — no concurrentes).
-  - JobId GUID format `"N"` (32 chars, sin guiones) desacoplado del id interno de Hangfire (reservado en `CSJ_HangfireJobId` para cancelación futura).
-  - `CrossChexSyncJobRunner` corre el sync con callback async de progreso `Func<int,int,Task>` que persiste cada página. `CancellationToken` propagado Hangfire → runner → service → CrossChex API.
-  - Correo resumen al disparador tanto en `COMPLETED` como `FAILED` (decisiones 7.a.i + 7.b.ii), fire-and-forget por INV-S07, tipo outbox `"CROSSCHEX_SYNC"`.
-  - `Task.Delay(30000)` conservado con comentario explicando por qué (decisión 6) — Chat 4 valida si puede bajar.
-  - **Deuda identificada para Chat 2**: el contrato `CrossChexSyncStatusDto` ya está definido; el Chat 2 (SignalR) emite el MISMO shape via hub y el FE del Chat 3 elige entre polling o push sin romper contrato.
-- **Chat 2 ✅ cerrado 2026-04-23** (commit `513c6cc` en `Educa.API master`). Resumen del cierre:
-  - `AsistenciaHub` gana 2 métodos: `SubscribeToSyncJob(jobId)` y `UnsubscribeFromSyncJob(jobId)` con validación regex `^[a-f0-9]{32}$` (rechaza inputs arbitrarios con `HubException` antes de tocar el grupo SignalR). Const `SyncGroupPrefix` + método `SyncGroupName(jobId)` estático comparten el formato canónico del grupo entre hub, runner y controller.
-  - Grupo SignalR: `"crosschex-sync-{jobId}"` (decisión 1-B del chat — prefijo largo explícito sobre `"sync-{jobId}"` corto).
-  - Runner emite evento `"SyncProgress"` al grupo en 4 transiciones persistidas: tras marcar `RUNNING`, en cada página del callback `onPageProgress`, en `COMPLETED` y en `FAILED`. Helper privado `EmitirProgresoAsync` envuelve cada emisión en try/catch con `LogWarning` — un fallo del hub NUNCA falla el job (INV-S07). Payload: `CrossChexSyncStatusDto` sin modificar.
-  - Controller emite `"SyncProgress"` con `Estado = "QUEUED"` justo tras persistir el registro (decisión 3-A del chat), cerrando el gap 0-500ms entre `202 Accepted` y el primer `RUNNING` del runner. Fire-and-forget con `LogWarning` idéntico al runner.
-  - Nuevo `CrossChexSyncStatusDtoMapper` estático centraliza la proyección `CrossChexSyncJob → CrossChexSyncStatusDto`. Usado por runner (4 broadcasts), controller `QUEUED` broadcast y `GET /sync/{jobId}/status`. Garantiza shape bit-a-bit idéntico entre GET y hub — un cliente puede alternar polling y push sin reshaping.
-  - Auto-emisión del estado actual al suscribir **NO implementada** (decisión 2-B del chat). Un admin que entra tarde al sync (ej: ya va por página 3) espera el próximo evento del runner. Feedback visual extra (timer, barra %, mensaje contextual) queda para Chat 3 FE usando los campos `Pagina/TotalPaginas`, `IniciadoEn` y `Fase` que ya están en el DTO.
-  - `Task.Delay(30000)` intocado (Chat 4 lo valida).
-  - **+14 tests** (9 hub: subscribe válido/7 inputs inválidos/unsubscribe/SyncGroupName; 3 runner: happy path 5 broadcasts/FAILED emite payload/INV-S07 resiliencia cuando hub `SendAsync` lanza; 2 controller: setup con mocks `IHubContext` + `ILogger`) → **1316 BE verdes** (baseline 1302).
-  - **Deuda identificada para Chat 3 FE**: el feedback visual extra que pidió el usuario durante este chat se construye aquí. Todos los campos ya existen en el DTO — no hace falta modificar contrato.
-- **Chat 3 ✅ cerrado 2026-04-24** (`educa-web main`). Resumen del cierre:
-  - Nuevo `CrossChexSyncStatusService` singleton (`providedIn: 'root'`) en `@core/services/signalr/`. Signal privado `_status` + `hasActiveJob`/`isActive` computed. API: `startTracking(jobId)` / `stopTracking()` / `rehydrate()`. Subject `terminal$` para COMPLETED/FAILED. Reutiliza la `HubConnection` del `AttendanceSignalRService` vía nuevo método `ensureConnected()` — no abre segunda conexión.
-  - Persistencia del jobId en `sessionStorage` via nuevo par `StorageService.get/setCrossChexJobId()` + métodos equivalentes en `SessionStorageService` (key `educa_crosschex_sync_job`). Respeta la regla ESLint `no-restricted-globals` (no `sessionStorage` directo fuera del wrapper).
-  - `rehydrate()` en refresh F5: lee storage → `GET /sync/{jobId}/status` → si sigue activo re-suscribe al hub, si terminó emite terminal + limpia storage, si inválido limpia silenciosamente.
-  - Nuevo `CrossChexSyncBannerComponent` standalone OnPush (`components/crosschex-sync-banner/`). Imports `ProgressBarModule` + `ButtonModule`. 3 estados visibles: QUEUED indeterminate "Encolando…"; RUNNING con `pagina/totalPaginas` → bar % + "Descargando página X/Y…" (sin páginas → indeterminate "Iniciando…"); FAILED banner rojo con `color-mix(in srgb, var(--red-500) 12%, transparent)` + botón "Reintentar" + error del DTO. COMPLETED se oculta (toast global). `aria-live="polite"` + `[pt]` aria-labels en botones.
-  - `AttendancesDataFacade.sincronizarDesdeCrossChex` refactorizado: ya no hace `.subscribe()` bloqueante. POST `/sync` devuelve `CrossChexSyncAceptadoDto` (Plan 24 Chat 1). En 202 delega a `syncService.startTracking(jobId)`. En 409 Conflict extrae `data.jobId` del body del error (interceptor no unwrappea `success:false`) y re-suscribe al jobId existente — UX conveniente. En otros errores propaga a `onError`.
-  - `AttendancesComponent`: import del banner, botón sync con `[disabled]="syncActive()"` + tooltip "Hay un sync en curso", `ngOnInit` llama `rehydrate()` + suscribe `terminal$` → toast success + `loadData()` en COMPLETED, toast error + banner rojo en FAILED. Nuevo `onSyncRetry()` (llama `stopTracking` + dispatch) y `onSyncDismiss()`. Handlers de onToggle* eliminados y consumidos directo desde template (`store.toggleSelection()`, `crudFacade.enviarCorreos()`) para respetar cap de 300 líneas.
-  - Helpers puros (estadoSeverity, origenLabel, origenSeverity, tipoPersonaLabel, formatFechaIso) extraídos a `services/attendances-template-helpers.ts`.
-  - **+29 tests FE** (15 service: startTracking idempotencia/swap + SyncProgress RUNNING/COMPLETED/FAILED/jobId ajeno/PascalCase + rehydrate vacío/RUNNING/COMPLETED/jobId inválido + stopTracking / 12 banner: null/COMPLETED/QUEUED/RUNNING sin páginas/RUNNING con % / FAILED botón Reintentar/emit retry/fase/aria-live/.each estados / 2 netos en facade spec por migración al nuevo contrato) → **1583 FE verdes** (baseline 1554). Lint global + build limpios.
-  - **Deuda identificada para Chat 4**: polling fallback para caso de caída de SignalR (INV-S07 — el job sigue aunque el hub caiga). Chip global cross-página fuera de alcance (toast success/error cubre la mayoría del caso).
-- **Chat 4 — Validar rate limit real + deploy**: investigar si los 30s de `Task.Delay` vienen de documentación de CrossChex o son paranoia del autor original. Si se puede reducir a 5-10s (o eliminarlo si el dispositivo soporta llamadas consecutivas), fix en la misma PR — es el mayor acelerador percibido. Deploy BE + FE.
-
-### Por qué importa — UX bloqueante
-
-El Director pierde 2+ minutos bloqueado cada vez que sincroniza (operación frecuente porque CrossChex entrega datos con delay). La UX actual desincentiva el uso del feature y genera la percepción de "cada vez más lento" aunque no haya degradación real del sistema.
-
-### Dependencias
-
-- **Ninguna dura**: puede arrancar después del deploy de Plan 21 para validar con marcaciones reales (profesores + estudiantes en la misma sincronización — mayor volumen por página).
-- **Plan 26 F1 ✅ cerrada** — el riesgo de "429 invisibles" del job CrossChex (mencionado en el checklist pre-inicio del Plan 26) está **mitigado**: la telemetría está viva en prod, cualquier 429 que dispare el job aparecerá en `/intranet/admin/rate-limit-events` con `rol = "Anónimo"` o `null` (el job corre server-side sin `ClaimsPrincipal`). El middleware persiste igual — el Chat 4 de Plan 24 puede validar con datos reales post-deploy.
-- **Relacionado con Plan 22** (endurecimiento correos): si Plan 22 cierra antes, el background job puede encolar correos de resumen al finalizar en el outbox consolidado.
-- **No toca reglas de negocio**: INV-AD02 (precedencia manual), INV-AD03 (cierre mensual), INV-AD05 (correos diferenciados) se preservan tal cual. Cambio puramente infraestructural — mismo flujo, movido a background con progreso visible.
-
-### Referencias clave
-
-- BE: `Educa.API/Services/Integraciones/CrossChexApiService.cs:231` — el `Task.Delay(30000)` entre páginas
-- BE: `Educa.API/Controllers/Asistencias/AsistenciaAdminController.cs:104-111` — endpoint actual síncrono
-- BE: `Educa.API/Services/Asistencias/AsistenciaSyncService.cs:118-199` — `SobreescribirDesdeCrossChexAsync` (mover a job)
-- FE: `src/app/features/intranet/pages/admin/attendances/services/attendances-data.facade.ts:129-154` — `.subscribe()` directo
-- FE: `src/app/features/intranet/pages/admin/attendances/attendances.component.ts:209-225` — `onSincronizar` (reemplazar spinner por progress)
-
----
-
-## 🟡 Plan 30 — Dashboard Visibilidad Admin (correos + asistencia)
-
-> **Origen**: 2026-04-23, sesión de cierre del Plan 24 Chat 2. El admin hoy depende de 25+ queries SQL manuales en SSMS para verificar el estado diario de correos y asistencia. Declarado "altamente impráctico" — bloquea autonomía del admin y consume tiempo del desarrollador que arma las queries cada día.
-> **Plan**: inline en este maestro (sin archivo separado).
-> **Estado**: 🟢 **100% 2026-04-24** — los 4 chats BE cerrados + FE consumers cerrados (Chat 3+4 combinados en commit `b7f2f60`, `educa-web main`) + refactor UX post-cierre (commit de este chat 041, sub-tabs "Resumen | Detalle" en el Tab "Gap del día" con badge numérico = total gap). La pantalla `/intranet/admin/email-outbox/diagnostico` queda consolidada: Tab "Gap del día" con sub-tabs anidados (patrón canónico de `email-outbox-dashboard-dia`), Tab "Diagnóstico por correo" lineal. `totalGap` movido al store como fuente única (consumido por el contenedor para el badge; el `CorreosDiaResumenComponent` mantiene su computed interno por cohesión — misma fórmula derivada del mismo input `resumen`). **Anterior estado**: 🟢 **~95% 2026-04-24** — los 4 chats del backend cerrados (Chat 1 BE + Chat 2 FE + Chat 3 BE + Chat 4 BE). Solo queda el FE consumer del Chat 3 + Chat 4 como tarea posterior (combinables en un chat liviano). Chat 4 F4.BE cerrado 2026-04-24 con commit `3c316a2` en Educa.API `master` — endpoint `GET /api/sistema/email-outbox/diagnostico?correo={email}` con DTO compuesto (Resumen + Historia[50] + Blacklist? + PersonasAsociadas[]). Reemplaza set manual M1-M8. Input normalizado trim+lower, DNI enmascarado, UltimoError truncado 200 chars, cap fijo 50 filas, fail-safe INV-S07, lookup polimórfico extraído a `EmailDiagnosticoPersonaLookup`. Validación input: `CORREO_REQUERIDO`/`CORREO_INVALIDO`. **+16 tests** → **1371 BE verdes** (baseline 1355). Chat 3 F3.BE cerrado 2026-04-24 con commit `eb92ec2` en Educa.API `master` — endpoint `GET /api/sistema/asistencia/diagnostico-correos-dia?fecha={yyyy-MM-dd}&sedeId={n}` con DTO compuesto (Resumen + EstudiantesSinCorreo[] + ApoderadosBlacklisteados[] + EntradasSinCorreoEnviado[]). Reasons tipadas vía constante `DiagnosticoRazones` (`SIN_CORREO`/`BLACKLISTED`/`FALLIDO`/`PENDIENTE`/`SIN_RASTRO`). Correlación outbox ↔ entrada por `EO_Destinatario = EST_CorreoApoderado` + ventana temporal del día (el sistema NO persiste `EO_EntidadId` para correos ASISTENCIA). INV-C11 (`GRA_Orden >= 8`) aplicado in-memory post-join con contador separado `EstudiantesFueraDeAlcance`. Precedencia de estado outbox: SENT > PENDING/RETRYING > FAILED (un retry exitoso neutraliza FAILED previo). DNI + correos enmascarados (`DniHelper.Mask` + `EmailHelper.Mask`). INV-S07 fail-safe vía `DiagnosticoCorreosDiaSnapshotFactory.BuildEmpty` (catch global → DTO ceros + LogWarning, nunca 500). Lógica pura extraída a `DiagnosticoCorreosDiaCorrelator` (261 líneas) para respetar cap 300 del service principal (167 líneas). DI registrado en `ServiceExtensions` + authz `[Authorize(Roles = Roles.Administrativos)]` a nivel clase. **+19 tests** (13 service con `TestDbContextFactory` cubriendo las 5 razones + INV-C11 split + filtro sedeId + SENT-over-FAILED + INV-S07 context disposed; 6 authz por reflection) → **1355 BE verdes** (baseline 1336). Chat 1 F1.BE cerrado con commit `c8a0360` en Educa.API (1316 → 1330 tests). Chat 2 F2.FE cerrado 2026-04-23 en `educa-web main` — pantalla `/intranet/admin/email-outbox/dashboard-dia` consumiendo el endpoint de F1 (1535 → 1549 FE verdes, +14 tests). Brief del Chat 2 en `.claude/chats/closed/035-plan-30-chat-2-fe-dashboard-correos-dia-page.md`.
-
-### Diagnóstico
-
-El admin necesita verificar 3 cosas cada día, ninguna tiene pantalla hoy:
-
-1. **Estado general de correos del día**: cuántos salieron, cuántos fallaron, por qué tipo de fallo, distribución por hora, contador defer/fail cPanel. Hoy: 8 queries SQL (Q1-Q8).
-2. **Gap asistencia-vs-correos**: "marcaron entrada 62 estudiantes pero solo se enviaron 56 correos — ¿quiénes son los 6?". Hoy: 4 queries cruzadas (verificación INV-C11 + D2/D3/D4/D5).
-3. **Búsqueda/diagnóstico de un correo específico** cuando hay NDR o queja del apoderado ("¿qué pasó con `rey.ichigo@hotmail.com`?"). Hoy: 8 queries (M1-M8).
-
-Pantallas admin ya existentes (**no cubren este dolor**):
-- `/intranet/admin/auditoria-correos` (Plan 22 Chat 6) — solo formato inválido en BD, no histórico del día.
-- Widget defer-fail (Plan 22 Chat B + Plan 29 Chat 2.6) — realtime, no histórico ni drill-down.
-- `/intranet/admin/email-outbox` — listado crudo de filas, no agregación.
-
-### Qué diseñar (4 chats)
-
-- **Chat 1 · F1.BE — Dashboard correos del día** ✅ **Cerrado 2026-04-23** (commit `c8a0360` en Educa.API): endpoint `GET /api/sistema/email-outbox/dashboard-dia?fecha={yyyy-MM-dd}` con DTO compuesto (Resumen + PorHora[] + PorTipo[] + BouncesAcumulados[]). Reemplaza Q1/Q3/Q4/Q8 + D1/D4.
-- **Chat 2 · F2.BE — Gap asistencia-vs-correos**: endpoint `GET /api/sistema/asistencia/diagnostico-correos-dia?fecha={yyyy-MM-dd}&sedeId={n}` que cruza `AsistenciaPersona` + `Estudiante` + `EmailOutbox` + `EmailBlacklist`. Responde: entradas marcadas, correos enviados, estudiantes sin correo apoderado, apoderados blacklisteados. Reemplaza verificación INV-C11 + D2/D3/D5.
-- **Chat 3 · F3.BE — Búsqueda diagnóstico por correo**: endpoint `GET /api/sistema/email-outbox/diagnostico?correo={email}` que retorna historia completa: últimos N intentos en outbox (+ archive), estado blacklist, a qué persona(s) pertenece (Estudiante/Profesor/Director). Reemplaza M1-M8.
-- **Chat 2 (reordenado) · F2.FE — Pantalla `dashboard-dia`** ✅ **Cerrado 2026-04-23** (`educa-web main`): pantalla `/intranet/admin/email-outbox/dashboard-dia` consume el endpoint de F1. 4 secciones: Resumen (10 stat cards), PorHora (barras apiladas 24 buckets · Enviados/Fallidos/LlegaronSMTP), PorTipo (tabla agregada), BouncesAcumulados (top 50 + row-warning/critical + copy-to-clipboard). Header con `p-datepicker` (maxDate=hoy, minDate=hoy-90d, `yy-mm-dd`) + botón refresh + label `Actualizado hace X min`. Error codes del BE (`FECHA_FORMATO_INVALIDO` / `FECHA_FUTURA_INVALIDA` / `FECHA_DEMASIADO_ANTIGUA`) mapeados a toast localizados en facade. No auto-polling (decisión 3). Gated por feature flag `emailOutboxDashboardDia` (OFF prod / ON dev) + permiso nuevo `ADMIN_EMAIL_OUTBOX_DASHBOARD_DIA`. Menú "Dashboard del día" en **Sistema > Monitoreo**. **+14 tests** (4 store + 7 facade + 1 resumen + 2 bouncers) → **1549 FE verdes** (baseline 1535). Lint + build OK.
-- **Chat 3 · F3.BE — Gap asistencia-vs-correos (antes Chat 2)**: endpoint `GET /api/sistema/asistencia/diagnostico-correos-dia?fecha={yyyy-MM-dd}&sedeId={n}` que cruza `AsistenciaPersona` + `Estudiante` + `EmailOutbox` + `EmailBlacklist`. Responde: entradas marcadas, correos enviados, estudiantes sin correo apoderado, apoderados blacklisteados. Reemplaza verificación INV-C11 + D2/D3/D5.
-- **Chat 4 · F4.BE — Búsqueda diagnóstico por correo (antes Chat 3)** ✅ **Cerrado 2026-04-24** (commit `3c316a2` en Educa.API `master`): endpoint `GET /api/sistema/email-outbox/diagnostico?correo={email}` con DTO compuesto (`CorreoConsultado` normalizado + `Resumen` + `Historia[50]` + `Blacklist?` + `PersonasAsociadas[]`). Últimas 50 filas del outbox ordenadas DESC (cap fijo, no paginación), `UltimoError` truncado 200 chars, sin `CuerpoHtml`/`Bcc`. Blacklist devuelve la fila más reciente con `Estado` "ACTIVO"/"DESPEJADO" (nullable). Lookup polimórfico cruzando 4 tablas (`Estudiante.EST_CorreoApoderado`/`Profesor.PRO_Correo`/`Director.DIR_Correo`/`Apoderado.APO_Correo`) con `_Estado = true` + DNI enmascarado vía `DniHelper.Mask`. Input normalizado trim+lower antes de cualquier query. Tabla `EmailOutboxArchive` **no existe** — scope solo sobre outbox vigente. Lookup de personas extraído a `EmailDiagnosticoPersonaLookup` (133 líneas) para mantener `EmailDiagnosticoService` bajo cap 300 (289 líneas). Validación rudimentaria en controller (`CORREO_REQUERIDO`/`CORREO_INVALIDO` por vacío/null/sin @/>200 chars). Authz hereda `[Authorize(Roles.Administrativos)]` del controller. Fail-safe INV-S07 vía `EmailDiagnosticoSnapshotFactory.BuildEmpty`. **+16 tests** (10 service + 5 controller + 1 authz marker) → **1371 BE verdes** (baseline 1355). FE consumer posterior (combinable con el del Chat 3).
-
-### Priorización
-
-- **F1 ✅ cerrado 2026-04-23**, commit `c8a0360` en Educa.API (1316 → 1330 tests).
-- **F2 FE ✅ cerrado 2026-04-23** en `educa-web main` (pantalla dashboard-dia).
-- **F3 BE ✅ cerrado 2026-04-24**, commit `eb92ec2` en Educa.API (1336 → 1355 tests).
-- **F4 BE ✅ cerrado 2026-04-24**, commit `3c316a2` en Educa.API (1355 → 1371 tests). Cierra el frente del backend al 100%.
-- **FE consumer pendiente**: pantallas admin que consumen `diagnostico-correos-dia` (Chat 3) y `email-outbox/diagnostico?correo=` (Chat 4) — combinables en un chat liviano. Se prioriza cuando el admin pida la UI.
-
-### Dependencias
-
-- **Ninguna dura**. Los 3 endpoints BE son independientes, consumen tablas que ya existen (`EmailOutbox`, `EmailBlacklist`, `AsistenciaPersona`, `Estudiante`, `Profesor`).
-- **Relacionado con Plan 22** (endurecimiento correos): el dashboard muestra los efectos de Plan 22 F5/F6 (throttle per-sender, round-robin multi-sender) y Plan 29 Chat 2 (auto-blacklist INV-MAIL02). Valor inmediato post-deploy de este plan.
-- **Relacionado con Plan 27** (filtro INV-C11): el gap asistencia-vs-correos (F2) respeta el filtro `GRA_Orden >= 8` automáticamente — no suma estudiantes excluidos.
-
-### Riesgos / limitaciones conocidas
-
-- **Shape del DTO puede cambiar en F4 FE**: al construir la pantalla real, el usuario puede pedir campos extra. Contrato flexible — agregar al DTO afecta ambos canales (GET + eventual caché FE).
-- **Queries pesadas si no hay índices adecuados**: `EmailOutbox.EO_FechaReg` + `EO_Estado` ya están indexadas (Plan 22), pero si se agregan filtros por `EO_Destinatario` (F3) puede faltar índice. Validar con plan de ejecución antes de mergear.
-- **Histórico > 90 días**: rechazado en F1. Casos raros de auditoría profunda siguen pasando por SSMS. Si el admin reclama, agregar endpoint separado `/historico-profundo` con paginación + rate limit `heavy`.
-
----
+→ Migrado a [`educa-coord/plans/xrepo-30-dashboard-visibilidad.md`](../../../educa-coord/plans/xrepo-30-dashboard-visibilidad.md) (cross-repo, diseñado). Body extraído 2026-05-15 (brief 172, ADR-0002).
 
 ## Bloqueos activos (qué desbloquea qué)
 
@@ -963,36 +722,11 @@ CARRIL C — DIFERIDO
 
 #### Plan 17 — Enforcement max-lines .cs en CI
 
-> **Origen**: Auditoría de investigación (2026-04-16). El frontend tiene `max-lines` en ESLint que bloquea el build. El backend tiene la regla en `backend.md` pero nada la enforcea — resultado: 23 archivos la violan. Plan 2/C arregla los actuales, pero sin gate en CI volverán a aparecer.
-
-- [ ] **F1 — Script o Roslyn analyzer** (1 chat, BE)
-  - [ ] F1.1 Crear script (`scripts/check-max-lines.sh` o `.ps1`) que cuente líneas por archivo .cs y falle si alguno > 300
-  - [ ] F1.2 Excepción explícita: `ApplicationDbContext.cs` (DbSets crecen linealmente)
-  - [ ] F1.3 Integrar en CI (GitHub Actions o pre-push hook) — falla el build si viola
-  - [ ] F1.4 Verificar que los 23 archivos actuales están exentos con `TODO` o que Plan 2/C ya los resolvió
+→ Migrado a [`Educa.API/.claude/plan/enforcement-max-lines.md`](../../../Educa.API/.claude/plan/enforcement-max-lines.md) (BE-only). Body extraído 2026-05-15 (brief 172, ADR-0002).
 
 #### Plan 18 — Tests de flujo de negocio E2E (cross-layer)
 
-> **Origen**: Auditoría de investigación (2026-04-16). Plan 12 y 13 testan piezas aisladas. Nadie testa flujos completos como "profesor pasa lista → apoderado recibe correo → estadística se actualiza". Estos tests cruzan Controller → Service → Repository → SignalR/Email y verifican que el flujo de negocio funciona de punta a punta.
-> **Dependencia**: ejecutar DESPUÉS de Plan 12 F1 y Plan 13 F1 (necesita infra de tests ya montada).
-
-- [ ] **F1 — Flujo de asistencia completo** (1 chat, BE)
-  - [ ] F1.1 Webhook CrossChex → AsistenciaService → estado calculado → EmailOutbox encolado → SignalR notificado
-  - [ ] F1.2 Admin corrige asistencia → correo diferenciado → estado actualizado
-
-- [ ] **F2 — Flujo de calificación → aprobación** (1 chat, BE)
-  - [ ] F2.1 Profesor registra notas → promedio calculado → periodo se cierra → aprobación habilitada
-  - [ ] F2.2 Aprobación masiva → progresión (siguiente grado, sección V, egreso)
-
-- [ ] **F3 — Flujo de login → permisos → navegación** (1 chat, FE)
-  - [ ] F3.1 Login → JWT cookie → guard permite ruta → permissionsGuard filtra por rol → UI muestra solo lo permitido
-  - [ ] F3.2 Token expira → 401 → refresh → retry transparente
-
----
-
-### Carril B — Deuda técnica (cuando Carril D tenga base sólida)
-
-> Estas tareas se ejecutan después de que el Carril D provea red de seguridad mínima.
+→ Migrado a [`educa-coord/plans/xrepo-18-e2e-flujos-negocio.md`](../../../educa-coord/plans/xrepo-18-e2e-flujos-negocio.md) (cross-repo). Body extraído 2026-05-15 (brief 172, ADR-0002).
 
 #### Plan 11 — Refactor `eslint.config.js` ✅ 100% (archivado 2026-04-22)
 
@@ -1092,15 +826,7 @@ Ver [history/planes-cerrados.md](../history/planes-cerrados.md#plan-11).
 
 #### Plan 19 — Comunicación: foro + mensajería directa + push notifications
 
-> **Origen**: Auditoría de investigación (2026-04-16). Chat (SignalR) y calendario/eventos funcionan. Pero foro, mensajería directa y push notifications están parcialmente implementados o con feature flags apagados. Ningún plan del maestro los cubría.
-
-- [ ] **F1 — Planificación** (1 chat, modo `/design`)
-  - [ ] F1.1 Inventario: qué existe hoy (código, feature flags, endpoints, plugins Capacitor)
-  - [ ] F1.2 Priorizar: ¿qué necesita el colegio primero? (push > mensajería > foro probablemente)
-  - [ ] F1.3 Definir fases con dependencias (push requiere Firebase config, mensajería requiere UI, foro requiere moderación)
-  - [ ] F1.4 Estimar esfuerzo por fase
-
-- [ ] **F2+ — Ejecución** (según lo que defina F1)
+→ Migrado a [`educa-coord/plans/xrepo-19-comunicacion.md`](../../../educa-coord/plans/xrepo-19-comunicacion.md) (cross-repo). Body extraído 2026-05-15 (brief 172, ADR-0002).
 
 #### Planes 8-9 — Design Patterns
 
@@ -1124,102 +850,9 @@ Ver [history/planes-cerrados.md](../history/planes-cerrados.md#plan-11).
 
 ---
 
-## 🔵 Plan 26 — Rate limiting flexible (rol × endpoint × contexto + telemetría)
+## Plan 26 — Rate limiting flexible (rol × endpoint × contexto + telemetría)
 
-> **Origen**: Conversación 2026-04-21. El uso admin normal dispara 429 "Demasiadas solicitudes" con frecuencia — caso testigo: exportar 4-5 reportes de asistencia seguidos agota la política `heavy` (5/min por usuario). Las 6 políticas actuales (`global` reads/writes, `login`, `refresh`, `biometric`, `heavy`) son demasiado gruesas: no distinguen rol, no permiten override por endpoint, no aprovechan contexto (horario escolar vs fuera de horario, ráfaga legítima vs sostenido) y no hay visibilidad de quién/qué está hitting 429.
->
-> **Plan**: inline en maestro. Si al iniciar el primer chat el diseño crece, mover a `Educa.API/.claude/plan/rate-limit-flexible.md`.
->
-> **Estado**: 🔵 Pendiente diseño. Ejes aprobados (2026-04-21): **B + C + D + E**. A (config externa) diferido a F5 sin prerrequisito duro.
->
-> **Precede a Plan 24**: sin telemetría (F1) el job CrossChex en background puede disparar rate limits invisibles. Conviene cerrar F1 antes o junto con Plan 24.
-
-### Decisiones de diseño aprobadas
-
-- **B. Multiplier por rol** — Diccionario `roleMultipliers` (inicial en código, luego appsettings en F5): `{ Director: 3.0, AsistenteAdmin: 2.5, Profesor: 2.0, Apoderado: 1.0, Estudiante: 1.0 }`. Refleja que roles administrativos tienen patrón de uso masivo legítimo (reportes, imports, batch).
-- **C. Modifier por endpoint** — Attribute custom `[RateLimitOverride(policy: "reports", multiplier: 2.0)]` que ajusta la cuota base sin crear policy nueva. Complementa (no reemplaza) `[EnableRateLimiting]`.
-- **D.1 Time-of-day** — Franja escolar (**7am-5pm Lima, L-V**) aplica multiplier global `x1.5`. Fuera de horario queda en cuota base. Leer con `IClock` inyectable (no `DateTime.Now` directo).
-- **D.2 Burst + sustained** — Token bucket con dos ventanas concéntricas: **burst** (10 tokens / 30s refill) permite ráfagas legítimas; **sustained** (200 tokens / 5min refill) corta abuso prolongado. Request consume ambos.
-- **E. Telemetría** — Tabla `RateLimitEvent` (userId, rol, endpoint, policy, límiteEfectivo, fueRechazado, correlationId, timestamp). Vista admin con top usuarios/endpoints rechazados últimas 24h y timeline.
-
-### Guardrails
-
-- **Cap máximo de multiplier acumulado**: `5x` sobre cuota base. Rol × endpoint × franja no puede superarlo.
-- **Policies de auth/biometric NO se tocan**: `login`, `refresh`, `biometric` ya están calibradas y son sensibles a abuso. D.2 aplica solo a `reports`, `batch`, `global`.
-- **Testing obligatorio en F4**: integración con `TestServer` + `TestClock` manipulable. La combinatoria rol × endpoint × franja × burst/sustained es grande y los 429 son difíciles de reproducir en QA.
-- **Retención `RateLimitEvent`**: 90 días con purge nocturno (job Hangfire). INV-S07 (fire-and-forget) — un error al escribir el log NO falla la request.
-- **Reemplazo de `heavy`**: F2 introduce `reports` (reportes PDF/Excel — lectura pesada) y `batch` (imports y aprobación masiva — escritura pesada). `heavy` se deprecia gradualmente.
-
-### Fases
-
-- [x] **F1 — Telemetría sobre policies actuales** ✅ 2026-04-21 (Chat 1 BE + Chat 2 FE + stats BE)
-  - [x] F1.1 Tabla `RateLimitEvent` + modelo EF + script SQL ejecutado en BD de prueba y producción ✅ 2026-04-21
-  - [x] F1.2 Middleware `RateLimitTelemetryMiddleware` que intercepta respuestas 429 y persiste fire-and-forget (INV-S07 + INV-ET02) ✅ 2026-04-21
-  - [~] F1.3 También loguear requests que pasaron pero consumieron >80% de la cuota — **diferido a F2**: ASP.NET Core 9 `RateLimiter` nativo no expone tokens restantes. El método `LogEarlyWarningAsync` queda implementado pero sin llamador; se activa en F2 con custom limiter
-  - [x] F1.4 Endpoint `GET /api/sistema/rate-limit-events` con filtros (dni/rol/endpoint/policy/rango/soloRechazados) + `[Authorize(Roles = Roles.Administrativos)]` + DNI enmascarado en DTO ✅ 2026-04-21
-  - [x] F1.5 Vista admin FE `/intranet/admin/rate-limit-events` — stats cards (total/rechazados/top-rol/top-endpoint), tabla con filtros (endpoint/rol/policy/rango/soloRechazados), drawer detalle con copy de correlationId ✅ 2026-04-21 (Chat 2)
-  - [x] F1.6 Feature flag `rateLimitMonitoring` (on en prod + dev) + menú módulo Sistema submenú Monitoreo + endpoint BE `/stats?horas=24` (opción B — agregados server-side) ✅ 2026-04-21 (Chat 2)
-  - **Estado**: F1 100%. BE Chat 1: 9 archivos nuevos + 3 modificados. Chat 2 BE: +1 DTO (`RateLimitStatsDto`) + 3 interfaces/repo/service modificados + 5 tests nuevos (28 totales en módulo, suite 1034 verdes). Chat 2 FE: 17 archivos nuevos (models + services + 4 sub-componentes + page + tests) + 4 modificados (environment x2, routes, menu, permisos). 26 tests FE nuevos (suite 1460 verdes). Cap 300 líneas respetado. Plan 26 pasa a ~20% con F1 completo.
-
-- [~] **F2 — B + C (multiplier por rol + modifier por endpoint)** (2 chats, BE) — **Chat 1 ✅ cerrado 2026-04-22 (máquina del multiplier). Chat 2 ✅ cerrado 2026-04-22 (overrides aplicados en 10 controllers). F2.6 ⏳ observación post-deploy.**
-  - [x] F2.0 ✅ 2026-04-22 — Parche C del Chat 2 revertido: `heavy` vuelve a 5/min, comentario citando Plan 26 F2 Chat 1 reemplaza el "parche temporal". Sigue funcional sin resolver para no alterar los 14 controllers de Plan 25 que aún la usan; F2 Chat 2 los migra a `reports`/`batch`.
-  - [x] F2.1 ✅ 2026-04-22 — `[RateLimitOverride(policyName, multiplier)]` (`Educa.API/Attributes/`) + lectura por reflection con cache `ConcurrentDictionary<Endpoint, RateLimitOverrideAttribute?>` en el resolver.
-  - [x] F2.2 ✅ 2026-04-22 — `RateLimitPartitionResolver` (`Educa.API/RateLimiting/`) extrae `rol` (`ClaimTypes.Role`) + `userId` (`EntityId`) del `ClaimsPrincipal`, aplica `RoleMultipliers.GetMultiplier(rol)`, combina con override de endpoint, clampa a Cap 5x y devuelve `RateLimitPartition.GetFixedWindowLimiter` con partition key `policy:rol:userId:effective` (incluir `effective` separa ventanas cuando dos endpoints tienen overrides distintos).
-  - [x] F2.3 ✅ 2026-04-22 — `RoleMultipliers.cs` con valores aprobados: Director 3.0 · Asistente Admin / Promotor / Coordinador Académico 2.5 · Profesor 2.0 · Apoderado / Estudiante / anónimo 1.0. `Cap = 5.0` aplicado en `ResolveEffectiveLimit` (no espera a F3). Lookup case-insensitive vía `Roles` constants.
-  - [x] F2.4 ✅ 2026-04-22 — **39 instancias** de `[EnableRateLimiting("heavy")]` migradas a `reports` (31) / `batch` (8) en 10 controllers. `[RateLimitOverride("reports", 2.0)]` aplicado en **28 endpoints** de reportes (`ConsultaAsistencia` 22 + `BoletaNotas` 4 + `ReportesAsistencia` 2 — cubre los 14 del Plan 25 + los nuevos desde entonces). `[RateLimitOverride("reports", 3.0)]` aplicado en `ReportarError` de `/api/sistema/errors` (`[AllowAnonymous]` POST sobrecargado según F1: 5/16 rechazos) y en `Listar` + `Stats` de `/api/sistema/rate-limit-events`. `UsuariosController.ExportarCredenciales` → `reports` sin override (15/min para Director es suficiente). `heavy` queda registrada en `RateLimitingExtensions.cs` sin consumidores — comentario actualizado a "eliminar en F5". **Cap a considerar en F5**: dividir `ConsultaAsistenciaController` (863 líneas, excede 300) como deuda técnica.
-  - [x] F2.5 ✅ 2026-04-22 — Tests: 28 unit (`RoleMultipliersTests`, `RateLimitPartitionResolverTests`) + 6 de integración con `TestServer` real + `TestAuthHandler` reusable (`Educa.API.Tests/Helpers/Auth/`). Casos cubiertos: cuota base por rol, override por endpoint, cap 5x al exceder, anónimo por IP, regresión de `heavy` (sigue 5/min plano sin resolver). Suite completa BE: **1097/1097 verdes** (baseline 1063 + 34 nuevos). **Chat 2 agrega** `Plan26F2Chat2RateLimitContractTests.cs` con **22 tests por reflection** que validan que cada controller migrado tiene la policy + override correctos (override 3.0 en `/api/sistema/errors`, `/api/sistema/rate-limit-events`; override 2.0 en los endpoints de reportes; `batch` en imports/uploads/batch ops; regresión: ningún controller usa ya `heavy`). Suite completa BE post-Chat 2: **1119/1119 verdes**.
-  - [~] F2.6 Verificar con telemetría F1 que las 429 caen en los roles/endpoints esperados. **Dato ya capturado** (Chat 2, primera sesión admin): top endpoint `/api/sistema/errors` con 5/16 rechazos — motivó el override 3.0 en F2.4. **Pendiente**: revisar `/intranet/admin/rate-limit-events` 1-2 semanas post-deploy para confirmar que los 429 restantes corresponden a roles sin holgura (Estudiante, Apoderado) y no a Director/Admin en flujos normales.
-  - **Entregable Chat 1**: máquina del multiplier lista (atributo + resolver + policies `reports` y `batch`). Aún no aplicada a endpoints reales. **Entregable Chat 2**: Director/Asistente Admin ya no chocan con límite en uso normal (ej: exportar 8-10 reportes seguidos) gracias a `[RateLimitOverride]` aplicado en los 28 endpoints de reportes + 3 endpoints de observabilidad admin.
-
-- [x] **F3 — D.1 Time-of-day modifier** ✅ 2026-05-09 awaiting-prod (brief 136). Calibración aplicada: **×1.5 dentro de franja (L-V 7am-5pm Lima) / ×1.2 fuera**. `SchoolHoursResolver` consume `TimeProvider` BCL (sin `IClock` propio). Overload de 4 factores en `RoleMultipliers.ResolveEffectiveLimit` con cap 5x clampeando. Integrado en `RateLimitPartitionResolver` vía `RequestServices` con fallback 1.0 (preserva 1097 tests legacy sin tocarlos). **+22 tests** verdes, suite RateLimiting 52/52.
-  - [x] F3.1 ✅ `SchoolHoursResolver` (`Educa.API/RateLimiting/`) — inyectable + variante estática pura. Frontera inclusiva `[7, 17)` Lima. Sat/Dom siempre fuera.
-  - [x] F3.2 ✅ Multiplier compuesto en `ResolveEffectiveLimit(base, role, endpoint, schoolHours)` aplicado antes del cap.
-  - [x] F3.3 ✅ Tests con `FakeTimeProvider`/`FrozenTimeProvider` minimal (subclase de `TimeProvider` BCL, sin paquete extra) — fronteras 7:00 / 17:00, weekend, fuera-franja.
-  - **🔸 Calibración aplicada** (2026-05-09): valores tentativos del 2026-04-23 confirmados sin cambios — `SchoolHoursIn=1.5` / `SchoolHoursOut=1.2`. Si la observación post-deploy 1-2 semanas muestra 429 fuera de franja persistentes, subir `SchoolHoursOut` a 1.3 (sigue por debajo del cap acumulado).
-  - **Entregable** ✅: ventana de tolerancia extra en horario de uso intensivo administrativo + margen suave fuera para trabajo legítimo. Cap 5x sigue clampeando explosiones del compuesto.
-
-- [ ] **F4 — D.2 Burst + sustained** (2 chats, BE)
-  - [ ] F4.1 Custom `PartitionedRateLimiter` con dos buckets concéntricos (token bucket biventana). Request consume 1 token de cada bucket
-  - [ ] F4.2 Migrar `reports` y `batch` al limiter biventana. `global` reads se evalúa caso por caso
-  - [ ] F4.3 Tests de ráfaga: 10 requests en 10s → OK; 20 requests en 10s → throttled; burst recuperado en 30s
-  - [ ] F4.4 Tests de sustained: 200 requests distribuidos en 5min → OK; 210 → throttled
-  - [ ] F4.5 Monitorear con F1 que las 429 bajan sin explosión de uso indebido (comparar métricas pre vs post)
-  - **Entregable**: ráfagas legítimas permitidas sin abrir boquete para bots.
-
-- [ ] **F5 — A Config externa** 🔒 (diferido, sin prerrequisito duro)
-  - [ ] F5.1 Migrar `roleMultipliers`, franja escolar, parámetros de token bucket a `appsettings.json`
-  - [ ] F5.2 Integrar Azure App Configuration para cambio sin redeploy
-  - [ ] F5.3 Hot reload de config (o graceful restart)
-  - **Cuándo**: cuando el equipo necesite tunear en prod sin ciclo de release. No bloquea F1-F4.
-
-### Dudas a resolver durante el diseño
-
-- ¿Profesor con import de notas en bulk necesita multiplier `x2` o más? (responder con datos de F1 tras 1-2 semanas)
-- ¿`biometric` (webhook CrossChex) necesita ajuste? Hoy 30/min IP; en colegios grandes con 1000+ marcaciones en 10min puede chocar. **Tentativamente NO se toca** — usar telemetría para confirmar
-- ¿Multipliers por rol son fijos o varían por tipo de endpoint? (ej: Director `x3` en reports pero `x1.5` en writes). F2 comienza con fijo; escalar a matriz solo si telemetría lo pide
-- ¿La vista admin de F1 permite *acción* (ej: "bloquear este user 1h") o solo *observación*? Arrancar con observación; acciones son otro plan
-- ¿Qué hacer cuando un usuario anónimo (pre-login) hitting 429 en `/api/sistema/reportes-usuario` (Plan §16)? Hoy parte de IP — mantener sin multiplier de rol (rol = "Anónimo")
-
-### Relaciones con otros planes
-
-- **Plan 22 (Correos)**: independiente. Ambos tocan telemetría pero dominios distintos (correos vs requests HTTP)
-- **Plan 7 (Error Trace BE)**: complementario. `RateLimitEvent` es paralelo a `ErrorLog` — 429 no es error, no debe mezclarse
-- **Plan 24 (Sync CrossChex en Background)**: el job opera server-side sin userId → partición por "system" con cuota propia. **F1 ✅ cerrada** — Plan 24 ya puede arrancar con la red de telemetría puesta; cualquier 429 del job aparecerá en la vista admin con `rol = "Anónimo"`
-- **Plan 16 (Auditoría de seguridad)**: rate limit es capa de defensa. F1 aporta visibilidad que el audit puede requerir para recomendaciones
-- **Plan 25 (Paridad Excel)**: fue el detonante — 14 endpoints `/pdf` + 14 `/excel` duplican el consumo potencial de `heavy`. F2 los marca con `[RateLimitOverride("reports", 2.0)]`
-
-### Checklist pre-inicio
-
-```
-[ ] ¿Usuario confirma multipliers iniciales por rol (3.0 / 2.5 / 2.0 / 1.0 / 1.0)?
-[ ] ¿Usuario confirma franja escolar 7am-5pm L-V?
-[ ] ¿Usuario confirma burst 10/30s + sustained 200/5min como punto de partida?
-[ ] ¿Usuario confirma retención 90 días de RateLimitEvent?
-[x] ¿Usuario confirma que F1 (telemetría) va primero — 1-2 semanas de datos antes de tocar policies? ✅ 2026-04-21 (F1 cerrada; recolección de datos en curso)
-[x] Si se arranca Plan 24 antes que Plan 26 F1, ¿se acepta el riesgo de 429 invisibles del job CrossChex? ✅ 2026-04-21 (ya no aplica — F1 cerrada antes de que Plan 24 arranque)
-```
-
----
+→ Migrado a [`educa-coord/plans/xrepo-26-rate-limiting-flexible.md`](../../../educa-coord/plans/xrepo-26-rate-limiting-flexible.md) (cross-repo, 50%). Body extraído 2026-05-15 (brief 172, ADR-0002).
 
 ## Auditoría WAL + Cache (standalone, 3 chats)
 
