@@ -290,7 +290,11 @@ Salida verificable: `educa-coord/` existe con README + COORD + `principles/` esq
 
 Salida verificable: `grep -r "business-rules.md"` en ambos repos solo encuentra menciones en commits/history, no en config viva.
 
-### F3 — Mover planes cross-repo
+### F3 — Mover planes cross-repo ✅ (cerrado 2026-05-15, brief 163)
+
+**Resultado**: 11 planes migrados a `educa-coord/plans/` con prefijo `xrepo-` (9 desde FE: 14, 15, 32, 34, 39, 41, 42, 43, migracion-smtp-acs; 2 desde BE: 22, asignacion-profesor-salon-curso). `educa-coord/plans/README.md` creado con índice + estado. Maestro FE actualizado con punteros relativos en planes activos (14, 15, 41, 42, 43, 22 detalle + 6 archivado). Cross-plan refs actualizados en `consolidacion-{backend,frontend}.md`, `blacklist-detection-admin.md` (FE), `arquitectura-backend-opciones.md`, `domain-layer.md` (BE). 3 commits independientes (coord + educa-web + Educa.API).
+
+
 
 Inventario inicial (a confirmar al ejecutar — `educa-coord/plans/`):
 
@@ -366,7 +370,7 @@ Renumerar bajo numeración global `educa-coord` o conservar el número original 
 | F1 — esqueleto coord | 1 chat (≤30 min) | bajo |
 | F1b — `principles/` claude.md mínimos + human.md skeletons | 2 chats | bajo |
 | F2 — partir invariantes | 2-3 chats | medio (volumen + cuidado con anchors) |
-| F3 — mover planes cross-repo | 1 chat | bajo |
+| F3 — mover planes cross-repo ✅ | 1 chat (brief 163, 2026-05-15) | bajo |
 | F4 — saneamiento reglas cruzadas | 2 chats | medio |
 | F5 — adelgazar índices on-demand | 1 chat | bajo |
 | F6 — protocolo cross-repo | 1 chat | bajo |
