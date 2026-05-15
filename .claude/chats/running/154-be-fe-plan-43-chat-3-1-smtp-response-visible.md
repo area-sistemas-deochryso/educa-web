@@ -82,6 +82,53 @@ Después de este chat, ningún caso de blacklist o cuarentena debe requerir abri
 - [ ] Tests FE verdes + lint.
 - [ ] Smoke browser: abrir 1 blacklist real y 1 quarantine real, validar que el SMTP code aparece.
 
+## Decisiones de `/design` (chat 168 · 2026-05-15)
+
+### Hallazgos de `/investigate`
+
+- **Causa raíz del bug UX**: `EmailBlacklist.EBL_UltimoError` (NVARCHAR 500) está sobrecargado. `EmailBounceBlacklistHandler` y `MailboxFullBlacklistHandler` lo escriben con `errorMessage` (= `EmailOutbox.EO_UltimoError`, que es el SMTP code real). Pero cuando una cuarentena se promueve a blacklist, `QuarantinePromotionEvaluator.cs:94` setea `blacklistReason = "Promoted from quarantine, hit #N (event=...)"` — narrativa interna que termina como `UltimoError` en la UI.
+- **`EmailQuarantine` no tiene NINGÚN campo de error/SMTP** — solo motivo/retryAfter/count/fechas.
+- **`EmailOutbox.EO_UltimoError`** (string?) es la fuente de verdad del SMTP response. No hay columna dedicada `EO_LastSmtpMessage`.
+- Columnas auxiliares relevantes en outbox: `EO_TipoFallo`, `EO_BounceSource`, `EO_BounceDetectedAt`, `EO_CorrelationId`.
+
+### Decisión
+
+Persistir columnas nuevas + LEFT JOIN como fallback para legacy. No reutilizar `EBL_UltimoError`/`EQU_*` existentes — separar concerns:
+
+| Tabla | Columna nueva | Tipo | Notas |
+|---|---|---|---|
+| `EmailBlacklist` | `EBL_OriginalSmtpResponse` | `NVARCHAR(500) NULL` | Snapshot del SMTP code que disparó el blacklisteo. `EBL_UltimoError` pasa a ser "causa interna". |
+| `EmailQuarantine` | `EQU_OriginalSmtpResponse` | `NVARCHAR(500) NULL` | SMTP code del hit que abrió la cuarentena. |
+| `EmailQuarantine` | `EQU_RecentHits` | `NVARCHAR(2000) NULL` | JSON `[{smtpCode, smtpMessage, occurredAt}, ...]` últimos 3 hits. Append-only en handler. |
+
+### Source priority por DTO
+
+`originalSmtpResponseSource` = `stored` si la columna nueva no es NULL · `reconstructed` si vino de LEFT JOIN a outbox · `unavailable` si ninguno.
+
+LEFT JOIN match: `EmailOutbox.EO_Destinatario = EBL_Correo/EQU_Destinatario AND ABS(DATEDIFF(MINUTE, EO_FechaReg, EBL_FechaUltimoFallo)) <= 120`. Tomar la fila outbox más cercana en tiempo.
+
+### Puntos de captura BE
+
+- `EmailBounceBlacklistHandler.PrepareBlacklistInsertOrReactivateAsync` → poblar `EBL_OriginalSmtpResponse = errorTruncado` (mismo valor que `EBL_UltimoError`, pero queda inmutable si después una promoción de cuarentena pisa `UltimoError`).
+- `MailboxFullBlacklistHandler.PrepareBlacklistInsertOrReactivateAsync` → idem.
+- `QuarantinePromotionEvaluator.EvaluateQuarantine` → cuando `promoteToBlacklist=true`, devolver `OriginalSmtpResponse` extra (input nuevo con el SMTP del evento que dispara la promoción) para que el caller (`DeferEventService`) lo pase al insert de blacklist.
+- `EmailQuarantineService` (o donde se inserta `EmailQuarantine` desde un defer event) → poblar `EQU_OriginalSmtpResponse` + append a `EQU_RecentHits`.
+
+### Naming en DTOs
+
+- `EmailBlacklistListadoDto`: agregar `OriginalSmtpResponse`, `OriginalSmtpResponseSource`, dejar `UltimoError` como "causa interna" en la UI.
+- `EmailQuarantineDetalleDto`: agregar `OriginalSmtpResponse`, `OriginalSmtpResponseSource`, `RecentHits: List<QuarantineHitDto>`.
+- Nuevo `QuarantineHitDto { SmtpCode, SmtpMessage, OccurredAt }`.
+
+### Estado de cierre del chat actual
+
+- `/investigate` ✅ + `/design` ✅ documentado arriba.
+- `/execute` BE pendiente: SQL migration + 4 puntos de captura + 3 DTOs + 6+ tests.
+- `/execute` FE pendiente: drawer blacklist + drawer cuarentena + badge `(reconstruido)`.
+- `/validate` pendiente.
+
+Recomendación: cerrar este chat con `/end` (commit del design en brief) y arrancar `/execute` en chat fresco — el alcance BE+FE (~20+ archivos) supera lo que conviene meter en un solo chat ya cargado con la fase de investigación.
+
 ## Aprendizajes transferibles
 
 > A poblar al cerrar.
