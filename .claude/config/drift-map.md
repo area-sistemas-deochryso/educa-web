@@ -21,7 +21,7 @@ Mapa de qué documentación revisar cuando un área del código cambia (o viceve
 | `core/services/permisos/` | `rules/permissions.md` |
 | `core/services/feature-flags/` | `rules/feature-flags.md` |
 | `core/services/capacitor/` | `rules/capacitor.md` |
-| `core/services/feedback/` | `rules/business-rules.md` (sección 16) |
+| `core/services/feedback/` | `../../educa-coord/invariants/feedback.md` |
 | `core/store/` | `rules/state-management.md`, `rules/crud-patterns.md` |
 | `core/interceptors/` | `rules/rate-limiting.md`, `../../educa-coord/contracts/rate-limiting.md`, `../../educa-coord/contracts/api-protocol.md` |
 
@@ -39,8 +39,8 @@ Mapa de qué documentación revisar cuando un área del código cambia (o viceve
 | Carpeta código | Documentación dependiente |
 |----------------|--------------------------|
 | `features/intranet/pages/admin/` | `rules/crud-patterns.md`, `rules/architecture.md` |
-| `features/intranet/pages/cross-role/attendance*/` | `rules/business-rules.md` (sección 1) |
-| `features/intranet/pages/cross-role/reportes-asistencia/` | `rules/business-rules.md` (sección 1) |
+| `features/intranet/pages/cross-role/attendance*/` | `../../educa-coord/invariants/asistencia.md` |
+| `features/intranet/pages/cross-role/reportes-asistencia/` | `../../educa-coord/invariants/asistencia.md` |
 | `features/intranet/shared/config/intranet-menu.config.ts` | `rules/menu-modules.md` |
 
 ### Configuración
@@ -82,7 +82,7 @@ Mapa de qué documentación revisar cuando un área del código cambia (o viceve
 | `rules/menu-modules.md` | `shared/constants/module-registry.ts` |
 | `rules/eslint.md` | `eslint.config.js` |
 | `rules/architecture.md` | Estructura real de `src/app/` |
-| `rules/business-rules.md` | Código BE que implementa invariantes |
+| `../../educa-coord/invariants/` | Código BE+FE que implementa invariantes |
 | `../../educa-coord/contracts/api-catalog.md` | Controllers BE reales (cross-repo) |
 
 ---

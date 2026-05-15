@@ -55,7 +55,7 @@ Buscar archivos `.md` en `.claude/plan/`. Verificar links internos a archivos.
 
 ### C1.6 Refs BE (moderado) — solo si `-back` o sin args
 
-Verificar que paths mencionados en `backend.md` (estructura de carpetas) correspondan a carpetas reales en `../Educa.API/Educa.API/`.
+Verificar que paths mencionados en `backend.md` (estructura de carpetas) correspondan a carpetas reales en `../Educa.API/`.
 
 ---
 
@@ -114,7 +114,7 @@ ls -d src/app/features/intranet/pages/estudiante/*/
 
 Verificar que cada feature tenga al menos una mención en algún doc de `.claude/`.
 
-### C3.3 INV-* en código sin business-rules.md (moderado)
+### C3.3 INV-* en código sin catálogo coord (moderado)
 
 ```bash
 # Buscar INV-* en código TypeScript y C#
@@ -122,12 +122,12 @@ grep -rn "INV-[A-Z]*[0-9]" src/app/ --include="*.ts"
 grep -rn "INV-[A-Z]*[0-9]" ../Educa.API/ --include="*.cs" 2>/dev/null
 ```
 
-Verificar que cada ID de invariante referenciado en código exista en `.claude/rules/business-rules.md`.
+Verificar que cada ID de invariante referenciado en código exista en `../../educa-coord/invariants/README.md` (o el archivo de dominio correspondiente).
 
 ### C3.4 Controllers BE sin api-endpoints.md (moderado) — solo si `-back` o sin args
 
 ```bash
-ls ../Educa.API/Educa.API/Controllers/**/*.cs 2>/dev/null
+ls ../Educa.API/Controllers/**/*.cs 2>/dev/null
 ```
 
 Comparar con endpoints documentados en `../educa-coord/contracts/api-catalog.md`.
@@ -135,7 +135,7 @@ Comparar con endpoints documentados en `../educa-coord/contracts/api-catalog.md`
 ### C3.5 Services BE sin registro DI (moderado) — solo si `-back` o sin args
 
 ```bash
-grep -rn "AddScoped\|AddTransient\|AddSingleton" ../Educa.API/Educa.API/Program.cs 2>/dev/null
+grep -rn "AddScoped\|AddTransient\|AddSingleton" ../Educa.API/Program.cs 2>/dev/null
 ```
 
 Comparar con services en la carpeta `Services/`.
@@ -148,7 +148,7 @@ Detectar documentación que referencia código que ya no existe.
 
 ### C4.1 INV-* documentados pero no referenciados en código (informativo)
 
-Extraer todos los `INV-*` de `business-rules.md`. Verificar cuáles no aparecen en ningún archivo `.ts` o `.cs`.
+Extraer todos los `INV-*` de `../../educa-coord/invariants/`. Verificar cuáles no aparecen en ningún archivo `.ts` o `.cs`.
 
 ### C4.2 Tipos semánticos documentados vs definidos (informativo)
 
@@ -199,7 +199,7 @@ grep -B2 '<p-dialog\|<p-drawer\|<p-sidebar\|<p-confirmDialog' src/app/ --include
 ### C5.5 Archivos BE > 300 líneas (moderado) — solo si `-back` o sin args
 
 ```bash
-find ../Educa.API/Educa.API/ -name "*.cs" -exec wc -l {} + 2>/dev/null | awk '$1 > 300' | sort -rn
+find ../Educa.API/ -name "*.cs" -exec wc -l {} + 2>/dev/null | awk '$1 > 300' | sort -rn
 ```
 
 Excepción: `ApplicationDbContext.cs`.
@@ -207,7 +207,7 @@ Excepción: `ApplicationDbContext.cs`.
 ### C5.6 DateTime.Now en BE (CRÍTICO) — solo si `-back` o sin args
 
 ```bash
-grep -rn "DateTime\.Now\b" ../Educa.API/Educa.API/ --include="*.cs" 2>/dev/null | grep -v "// OK" | grep -v "PeruNow"
+grep -rn "DateTime\.Now\b" ../Educa.API/ --include="*.cs" 2>/dev/null | grep -v "// OK" | grep -v "PeruNow"
 ```
 
 Regla: Usar `DateTimeHelper.PeruNow()`.
@@ -215,7 +215,7 @@ Regla: Usar `DateTimeHelper.PeruNow()`.
 ### C5.7 IEmailService directo en BE (moderado) — solo si `-back` o sin args
 
 ```bash
-grep -rn "IEmailService" ../Educa.API/Educa.API/Services/ --include="*.cs" 2>/dev/null | grep -v "IEmailOutboxService\|IEmailNotificationService\|EmailOutboxWorker"
+grep -rn "IEmailService" ../Educa.API/Services/ --include="*.cs" 2>/dev/null | grep -v "IEmailOutboxService\|IEmailNotificationService\|EmailOutboxWorker"
 ```
 
 Regla: Usar `IEmailOutboxService.EnqueueAsync()`.
@@ -223,7 +223,7 @@ Regla: Usar `IEmailOutboxService.EnqueueAsync()`.
 ### C5.8 String interpolation en logger BE (moderado) — solo si `-back` o sin args
 
 ```bash
-grep -rn 'Log\(Information\|Warning\|Error\|Debug\).*\$"' ../Educa.API/Educa.API/ --include="*.cs" 2>/dev/null
+grep -rn 'Log\(Information\|Warning\|Error\|Debug\).*\$"' ../Educa.API/ --include="*.cs" 2>/dev/null
 ```
 
 Regla: Structured logging con placeholders.
@@ -235,7 +235,7 @@ Buscar métodos `Listar*`, `Obtener*`, `Get*` en repositories que no usen `AsNoT
 ### C5.10 Filtro _Estado faltante en tablas de relación BE (CRÍTICO) — solo si `-back` o sin args
 
 ```bash
-grep -rn "ProfesorSalon\|EstudianteSalon\|CursoGrado" ../Educa.API/Educa.API/ --include="*.cs" 2>/dev/null | grep -v "_Estado\|Estado\|ListarTodas\|IncludeInactive"
+grep -rn "ProfesorSalon\|EstudianteSalon\|CursoGrado" ../Educa.API/ --include="*.cs" 2>/dev/null | grep -v "_Estado\|Estado\|ListarTodas\|IncludeInactive"
 ```
 
 ---
