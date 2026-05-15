@@ -2,7 +2,7 @@
 
 > **Fecha**: 2026-05-13
 > **Objetivo**: Romper el acoplamiento bidireccional entre `educa-web/.claude/` y `Educa.API/.claude/`. Cada repo solo carga lo suyo. La coordinación (invariantes de dominio, contratos, planes cross-repo, principios) vive en una carpeta hermana neutral.
-> **Estado**: PLAN — no ejecutado. Diseño listo para revisión.
+> **Estado**: ✅ **CERRADO 2026-05-15** — F1…F7 ejecutadas y verificadas. Decisión congelada en [`educa-coord/decisions/0001-arquitectura-coord-folder.md`](../../../educa-coord/decisions/0001-arquitectura-coord-folder.md). Drift residual menor documentado como follow-up no bloqueante.
 
 ---
 
