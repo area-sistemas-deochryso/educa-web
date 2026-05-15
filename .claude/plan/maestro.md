@@ -113,7 +113,7 @@
 
 ### 🟢 Media — Plan 43 capas siguientes (esperan F1)
 
-8. **[Plan 43 · Chat 3.1 · BE+FE]** — SMTP response visible en Detalle blacklist + Detalle cuarentena (no solo en pestaña defer-events). Cierra A6+B4. Depende parcialmente de Chat 1.3.
+8. **[Plan 43 · Chat 3.1 · BE+FE]** — SMTP response visible en Detalle blacklist + Detalle cuarentena. Cierra A6+B4. **`/investigate` + `/design` ✅ 2026-05-15** (brief 154 closed, decisiones en `closed/154-be-fe-plan-43-chat-3-1-smtp-response-visible.md`: persistir `EBL/EQU_OriginalSmtpResponse` + `EQU_RecentHits` JSON + LEFT JOIN fallback a outbox). Split en dos chats de `/execute`: **Chat 3.1a · BE** (brief `open/168-be-plan-43-chat-3-1a-smtp-response-execute.md`) — SQL migration + handlers + DTOs + tests. **Chat 3.1b · FE** (brief `open/169-fe-plan-43-chat-3-1b-smtp-response-execute.md`) — drawers blacklist/cuarentena con sección SMTP + histórico hits + badge `(reconstruido)`. Depende parcialmente de Chat 1.3.
 9. **[Plan 43 · Chat 3.2 · BE+FE]** — Detalle correo completo (remitente, SMTP code, próximo intento, origen) + buscador inclusivo con destinatarios huérfanos del outbox. Cierra A4+A5.
 10. **[Plan 43 · Chat 4.1 · BE+FE]** — Filtros combinables + paginación real en Bandeja (estado, destinatario, tipoFallo, correlation id, rango fecha). Cierra A2 + parte de B5.
 11. **[Plan 43 · Chat 4.2 · BE+FE]** — Filtros server-side en Errores (fecha, dni, rol, plataforma, urlPattern, ocurrenciasMin) + breadcrumbs ilimitados con modal timeline. Cierra A9+A10 + parte de B5. Depende de Chat 1.2 (fingerprint correcto) para filtros por errorCode.
