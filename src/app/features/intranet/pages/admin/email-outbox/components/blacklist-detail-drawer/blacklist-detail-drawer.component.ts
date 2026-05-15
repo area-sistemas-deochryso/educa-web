@@ -9,6 +9,7 @@ import {
 import { ButtonModule } from 'primeng/button';
 import { DrawerModule } from 'primeng/drawer';
 import { TagModule } from 'primeng/tag';
+import { TooltipModule } from 'primeng/tooltip';
 
 import { UiMappingService } from '@shared/services';
 import { EmailBlacklistEntry } from '@data/models/email-blacklist.models';
@@ -20,7 +21,7 @@ import { EmailBlacklistEntry } from '@data/models/email-blacklist.models';
 @Component({
 	selector: 'app-blacklist-detail-drawer',
 	standalone: true,
-	imports: [DrawerModule, ButtonModule, TagModule, DatePipe],
+	imports: [DrawerModule, ButtonModule, TagModule, TooltipModule, DatePipe],
 	templateUrl: './blacklist-detail-drawer.component.html',
 	styleUrl: './blacklist-detail-drawer.component.scss',
 	changeDetection: ChangeDetectionStrategy.OnPush,

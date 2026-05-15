@@ -62,7 +62,18 @@ Ver `closed/154-be-fe-plan-43-chat-3-1-smtp-response-visible.md` líneas 85-130.
 
 ## Aprendizajes transferibles
 
-> A poblar al cerrar.
+- **Brief decía "paths probables" — los reales son `email-outbox/components/blacklist-detail-drawer/` y `quarantine-detail-drawer/`** (no `monitoreo/email-blacklist/...`). Verificar paths antes de creer al brief.
+- **`OriginalSmtpResponseSource` extraído como `const` + `type` en `email-blacklist.models.ts`** y reimportado desde `email-quarantine.models.ts`. Evita duplicar la unión literal en dos archivos del mismo dominio.
+- **Quarantine drawer ahora recibe dos inputs**: `entry` (Lista — pinta base inmediato al abrir) + `detalle` (Detalle — pinta SMTP/hits cuando llega del fetch). El store mantiene ambos. La fetch del detalle vive en `EmailQuarantineUiFacade.openDetailDrawer` con guard `drawerItem()?.id === item.id` antes de setear el detalle — evita race si el usuario cierra antes que llegue la response.
+- **Blacklist drawer sin store nuevo**: los campos `originalSmtpResponse`/`originalSmtpResponseSource` viajan ya en `EmailBlacklistEntry` (el listado paginado), así que el drawer renderiza directo desde `entry()` sin fetch extra.
+- **Badge "reconstruido" con `tag-neutral`** según design-system §6 opción C (categoría informativa, no severidad). `pTooltip` + `aria-label` vía `pt` para a11y.
+- **Token `var(--blue-800)`** en lugar de hex `#1e40af` para el texto SMTP, alineado con design-system §7 D (tokens).
+
+## Resultado
+
+- 11 archivos FE tocados (2 DTOs + 6 drawer files + 1 store + 2 facades + 1 tab template).
+- Lint ✅ · tsc ✅ · vitest 213/213 email-outbox verdes.
+- Pendiente: smoke browser cuando BE (brief 168) shipee → `/verify 169`.
 
 ## Referencias
 

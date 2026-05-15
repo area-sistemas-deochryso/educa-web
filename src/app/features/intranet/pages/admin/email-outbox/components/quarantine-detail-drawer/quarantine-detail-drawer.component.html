@@ -61,6 +61,60 @@
 				}
 			</div>
 
+			<div class="detail-smtp">
+				<div class="smtp-header">
+					<span class="info-label">SMTP response</span>
+					@if (detalle()?.originalSmtpResponseSource === 'reconstructed') {
+						<p-tag
+							value="reconstruido"
+							styleClass="tag-neutral"
+							[pt]="{ root: { 'aria-label': 'Valor reconstruido desde EmailOutbox' } }"
+						/>
+					}
+				</div>
+				@if (
+					!detalle() ||
+					detalle()?.originalSmtpResponseSource === 'unavailable' ||
+					!detalle()?.originalSmtpResponse
+				) {
+					<span
+						class="smtp-empty"
+						pTooltip="Sin trazas disponibles"
+						tooltipPosition="top"
+						>—</span
+					>
+				} @else {
+					<pre class="smtp-text">{{ detalle()?.originalSmtpResponse }}</pre>
+				}
+			</div>
+
+			<div class="detail-hits">
+				<span class="info-label">Histórico de hits</span>
+				@if (detalle()?.recentHits?.length) {
+					<p-table
+						[value]="detalle()!.recentHits!"
+						styleClass="p-datatable-sm hits-table"
+					>
+						<ng-template #header>
+							<tr>
+								<th class="label-uppercase">Fecha</th>
+								<th class="label-uppercase">Código SMTP</th>
+								<th class="label-uppercase">Mensaje</th>
+							</tr>
+						</ng-template>
+						<ng-template #body let-hit>
+							<tr>
+								<td>{{ hit.occurredAt | date: 'dd/MM/yyyy HH:mm' }}</td>
+								<td class="hit-code">{{ hit.smtpCode }}</td>
+								<td class="hit-message">{{ hit.smtpMessage }}</td>
+							</tr>
+						</ng-template>
+					</p-table>
+				} @else {
+					<span class="hits-empty">Sin hits previos registrados</span>
+				}
+			</div>
+
 			@if (item.observacion) {
 				<div class="detail-error">
 					<span class="info-label">Observación</span>

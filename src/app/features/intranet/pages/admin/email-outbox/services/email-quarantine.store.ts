@@ -2,6 +2,7 @@ import { Injectable, computed, signal } from '@angular/core';
 
 import { BaseCrudStore } from '@core/store/base/base-crud.store';
 import {
+	EmailQuarantineDetalleDto,
 	EmailQuarantineEstadisticas,
 	EmailQuarantineFiltroEstado,
 	EmailQuarantineFormData,
@@ -34,6 +35,7 @@ export class EmailQuarantineStore extends BaseCrudStore<
 	private readonly _filterEstadoQ = signal<EmailQuarantineFiltroEstado | null>('activa');
 	private readonly _drawerVisible = signal(false);
 	private readonly _drawerItem = signal<EmailQuarantineListaDto | null>(null);
+	private readonly _drawerDetalle = signal<EmailQuarantineDetalleDto | null>(null);
 	private readonly _tableReady = signal(false);
 	// #endregion
 
@@ -42,6 +44,7 @@ export class EmailQuarantineStore extends BaseCrudStore<
 	readonly filterEstadoQuarantine = this._filterEstadoQ.asReadonly();
 	readonly drawerVisible = this._drawerVisible.asReadonly();
 	readonly drawerItem = this._drawerItem.asReadonly();
+	readonly drawerDetalle = this._drawerDetalle.asReadonly();
 	readonly tableReady = this._tableReady.asReadonly();
 
 	readonly hasActiveFilters = computed(
@@ -75,12 +78,18 @@ export class EmailQuarantineStore extends BaseCrudStore<
 	// #region Drawer
 	openDrawer(item: EmailQuarantineListaDto): void {
 		this._drawerItem.set(item);
+		this._drawerDetalle.set(null);
 		this._drawerVisible.set(true);
+	}
+
+	setDrawerDetalle(detalle: EmailQuarantineDetalleDto | null): void {
+		this._drawerDetalle.set(detalle);
 	}
 
 	closeDrawer(): void {
 		this._drawerVisible.set(false);
 		this._drawerItem.set(null);
+		this._drawerDetalle.set(null);
 	}
 	// #endregion
 

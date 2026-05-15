@@ -32,6 +32,15 @@ export const EMAIL_BLACKLIST_MOTIVOS_MANUALES: readonly EmailBlacklistMotivo[] =
 /** Filtro estado del listado (`activa` = `EBL_Estado=true`). */
 export const EMAIL_BLACKLIST_ESTADOS = ['activa', 'inactiva'] as const;
 export type EmailBlacklistFiltroEstado = (typeof EMAIL_BLACKLIST_ESTADOS)[number];
+
+/**
+ * Plan 43 Chat 3.1 — origen del `originalSmtpResponse` mostrado en drawers de
+ * monitoreo. `stored` = persistido en columna dedicada del BE.
+ * `reconstructed` = LEFT JOIN fallback al outbox (mostrar badge "reconstruido").
+ * `unavailable` = sin trazas (render "—" + tooltip).
+ */
+export const ORIGINAL_SMTP_RESPONSE_SOURCES = ['stored', 'reconstructed', 'unavailable'] as const;
+export type OriginalSmtpResponseSource = (typeof ORIGINAL_SMTP_RESPONSE_SOURCES)[number];
 // #endregion
 
 // #region DTOs (BE → FE)
@@ -50,6 +59,9 @@ export interface EmailBlacklistEntry {
 	fechaMod: string | null;
 	usuarioReg: string;
 	usuarioMod: string | null;
+	/** Plan 43 Chat 3.1 — respuesta SMTP original que motivó el bloqueo. */
+	originalSmtpResponse?: string | null;
+	originalSmtpResponseSource?: OriginalSmtpResponseSource;
 }
 
 /** Espejo de `DespejarBlacklistResponseDto`. */

@@ -112,6 +112,7 @@
 <app-quarantine-detail-drawer
 	[visible]="vm().drawerVisible"
 	[entry]="vm().drawerItem"
+	[detalle]="vm().drawerDetalle"
 	(visibleChange)="onDrawerVisibleChange($event)"
 	(closeDrawer)="onDrawerClose()"
 	(release)="onDrawerRelease($event)"

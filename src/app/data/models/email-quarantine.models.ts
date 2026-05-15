@@ -4,6 +4,8 @@
  * (`Educa.API/Controllers/Sistema/EmailQuarantineController.cs`).
  */
 
+import type { OriginalSmtpResponseSource } from './email-blacklist.models';
+
 // #region Semantic types
 /**
  * Motivos válidos de cuarentena. Alineado con el enum BE
@@ -62,6 +64,18 @@ export interface EmailQuarantineDetalleDto extends EmailQuarantineListaDto {
 	eventoOrigenTipo: string | null;
 	eventoOrigenDiagnostic: string | null;
 	historial: EmailQuarantineListaDto[];
+	/** Plan 43 Chat 3.1 — respuesta SMTP original que motivó la cuarentena. */
+	originalSmtpResponse?: string | null;
+	originalSmtpResponseSource?: OriginalSmtpResponseSource;
+	/** Últimos 3 hits (ordenados del más reciente al más viejo). */
+	recentHits?: QuarantineHitDto[];
+}
+
+/** Plan 43 Chat 3.1 — hit individual del histórico mostrado en drawer de cuarentena. */
+export interface QuarantineHitDto {
+	smtpCode: string;
+	smtpMessage: string;
+	occurredAt: string;
 }
 // #endregion
 

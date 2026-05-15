@@ -36,6 +36,7 @@ export class EmailQuarantineDataFacade {
 		dialogVisible: this.store.dialogVisible(),
 		drawerVisible: this.store.drawerVisible(),
 		drawerItem: this.store.drawerItem(),
+		drawerDetalle: this.store.drawerDetalle(),
 		formData: this.store.formData(),
 	}));
 	// #endregion

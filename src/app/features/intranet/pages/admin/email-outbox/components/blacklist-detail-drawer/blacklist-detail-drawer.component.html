@@ -69,9 +69,32 @@
 				}
 			</div>
 
+			<div class="detail-smtp">
+				<div class="smtp-header">
+					<span class="info-label">SMTP response</span>
+					@if (item.originalSmtpResponseSource === 'reconstructed') {
+						<p-tag
+							value="reconstruido"
+							styleClass="tag-neutral"
+							[pt]="{ root: { 'aria-label': 'Valor reconstruido desde EmailOutbox' } }"
+						/>
+					}
+				</div>
+				@if (item.originalSmtpResponseSource === 'unavailable' || !item.originalSmtpResponse) {
+					<span
+						class="smtp-empty"
+						pTooltip="Sin trazas disponibles"
+						tooltipPosition="top"
+						>—</span
+					>
+				} @else {
+					<pre class="smtp-text">{{ item.originalSmtpResponse }}</pre>
+				}
+			</div>
+
 			@if (item.ultimoError) {
 				<div class="detail-error">
-					<span class="info-label">Último error SMTP</span>
+					<span class="info-label">Causa interna</span>
 					<pre class="error-text">{{ item.ultimoError }}</pre>
 				</div>
 			}
