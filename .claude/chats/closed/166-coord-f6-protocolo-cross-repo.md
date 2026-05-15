@@ -3,7 +3,21 @@
 > **Repo destino**: `educa-coord/` (escribe).
 > **Plan**: [migracion-arquitectura-claude.md §F6](../../plan/migracion-arquitectura-claude.md)
 > **Depende de**: chats 160-165 cerrados.
-> **Creado**: 2026-05-14 · **Estado**: ⏳ pendiente arrancar.
+> **Creado**: 2026-05-14 · **Estado**: ✅ ejecutado 2026-05-15, listo para /end.
+
+## Resultado de ejecución (2026-05-15)
+
+- `educa-coord/chats/_template.md` — plantilla cross-repo con frontmatter `repos`/`touches`/`exclusive`.
+- `educa-coord/chats/README.md` — buckets, WIP, flujo canónico, links.
+- `educa-coord/COORD.md`:
+  - §3 reemplazada por puntero al `_template.md` (single source).
+  - §7 nueva — deuda de scripts (move-brief, hook /end, manifest) con criterio de "cuándo vale la pena".
+  - §8 nueva — excepción a `one-repo-one-chat`.
+- `educa-web/.claude/rules/one-repo-one-chat.md` — override local con la excepción cross-repo.
+- Decisión awaiting-prod cross-repo: ya estaba tomada en §4.3 de COORD.md (Sí). Sin cambios necesarios.
+
+Pendientes que dejo a F7:
+- Override simétrico en `Educa.API/.claude/rules/one-repo-one-chat.md` (auditoría final).
 > **MODO SUGERIDO**: `/design` + `/execute`.
 
 ## Scope
