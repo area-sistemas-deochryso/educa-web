@@ -1,8 +1,8 @@
 # Plan 46 — Limpieza de drift documental en `.claude/`
 
 > **Repo**: `educa-web` (FE) · **Tipo**: docs · **Riesgo**: bajo (sólo docs/rules)
-> **Creado**: 2026-05-13 · **Última revisión**: 2026-05-13 (chat 156)
-> **Estado global**: 🟡 en progreso — F1 ✅ · F2 parcial · F3 ⏳.
+> **Creado**: 2026-05-13 · **Última revisión**: 2026-05-15 (chat 157)
+> **Estado global**: ✅ **cerrado 100%** — F1 ✅ · F2 ✅ · F2.b ✅ · F3 ✅ (no aplica). Reporte archivado a `history/drift-report-2026-04.md`.
 
 ## Contexto
 
@@ -28,27 +28,30 @@ Auditoría externa (codex, 2026-05-13) detectó que partes del `drift-report.md`
 - ✅ `CLAUDE.md`: trigger del índice on-demand limpiado.
 - ✅ `project-structure/architecture.md`: bloque `repositories/` removido + fila layer + párrafo reescrito.
 
-### F2 — Auditar `drift-report.md` 🟡 parcial (chat 156, 2026-05-13)
+### F2 — Auditar `drift-report.md` ✅ (chat 156, 2026-05-13)
 
-**Estado**: 15/28 ✅ resueltos · 2 ❌ drift activo · 1 ⚠️ parcial · 10 ⏳ no re-verificados.
+- ✅ Audit overlay agregado con tabla de 28 filas.
+- ✅ Drift real C3.1 detectado y corregido (`asistencia/`→`attendance/`, `permisos/`→`permissions/`, agregadas filas `capacitor/` y `feedback/`).
 
-- ✅ Audit overlay agregado al inicio del reporte con tabla de 28 filas + decisión "no archivar" (54% < 70%).
-- ✅ Drift real C3.1 detectado y corregido en el mismo chat (`asistencia/`→`attendance/`, `permisos/`→`permissions/`, agregadas filas `capacitor/` y `feedback/`).
-- ⏳ **Pendiente F2.b**: re-verificar los 10 items `⏳ no re-verificado` (todos eran PASS originalmente — baja probabilidad de regresión, pero el ejercicio es honesto).
-   - C1.4 Links en MEMORY.md
-   - C2.1 Feature flags sync entre envs
-   - C2.3 Module registry
-   - C3.2 Features sin doc
-   - C4.1 INV-* fantasma
-   - C4.2 Tipos semánticos
-   - C5.9 AsNoTracking ratio
-   - C5.10 Filtro `_Estado` soft-delete
-   - C6.1 Endpoints FE vs Controllers BE
+### F2.b — Re-verificar 10 items ⏳ ✅ (chat 157, 2026-05-15)
 
-### F3 — Separar ejemplos `[(visible)]` en `dialogs-sync.md` ⏳
+Los 10 items pendientes fueron re-verificados:
 
-- Verificar que los ejemplos de "incorrecto" muestren `[(visible)]` solo como contraste, no mezclados con código presentado como bueno.
-- Opcional. Scope FE chico (~15 min).
+- C1.4 ✅ PASS — 31 links válidos en MEMORY.md.
+- C2.1 ✅ PASS — 19 keys sincronizadas entre `environment.ts` y `environment.development.ts` (creció de 11, sigue sincronizado).
+- C2.3 ✅ PASS — los 5 módulos coinciden entre `module-registry.ts` y `menu-modules.md`.
+- C3.2 ✅ PASS informativo — 99 dirs de feature, cobertura aceptable.
+- C4.1 ✅ PASS informativo — 93 `INV-*` documentados en `educa-coord/invariants/` vs 34 referenciados en código FE (diferencia esperada).
+- C4.2 ✅ PASS — los 13 tipos semánticos de `semantic-types.md` existen en código.
+- C5.9 ⚪ N/A FE — BE puro, no auditable desde este repo.
+- C5.10 ⚪ N/A FE — BE puro.
+- C6.1 ✅ PASS smoke — 182 endpoints únicos llamados; full cross-repo fuera de scope, smoke en deploy captura dead controllers.
+
+Stats finales: 22 ✅ + 2 ⚪ + 2 ❌ activos (con plan dueño) + 1 ⚠️ parcial (con plan dueño) = **86% cerrado**. Reporte archivado a `history/drift-report-2026-04.md`.
+
+### F3 — Separar ejemplos `[(visible)]` en `dialogs-sync.md` ✅ no aplica (chat 157, 2026-05-15)
+
+Verificado: `dialogs-sync.md` solo menciona `[(visible)]` como anti-patrón en prosa (líneas 25 y 126). Ningún bloque de código lo presenta como buena práctica. **No requiere cambio**.
 
 ## Follow-ups detectados (chats separados)
 
