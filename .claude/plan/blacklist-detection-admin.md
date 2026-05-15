@@ -83,7 +83,7 @@
 
 ### OUT
 
-- Migración a ACS (sigue su propio plan `migracion-smtp-acs.md`) — este plan opera sobre cPanel
+- Migración a ACS (sigue su propio plan → [`educa-coord/plans/xrepo-migracion-smtp-acs.md`](../../../educa-coord/plans/xrepo-migracion-smtp-acs.md)) — este plan opera sobre cPanel
 - Importación masiva desde CSV/Excel (puede ser chat futuro si surge necesidad)
 - Whitelist (ningún caso lo justifica hoy)
 - Sincronización con quarantine de Plan 37 (son dominios distintos: blacklist = destinatario permanente, quarantine = pausa temporal con expiry)

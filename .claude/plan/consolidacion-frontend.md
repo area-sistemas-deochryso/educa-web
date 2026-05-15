@@ -4,7 +4,7 @@
 > **Objetivo**: Elevar el frontend al nivel de solidez del backend
 > **Principio rector**: "Reducir la distancia entre lo declarado y lo real"
 >
-> **Coordinación cross-plan**: `Educa.API/.claude/plan/asignacion-profesor-salon-curso.md` Fase 4 agrega `modoAsignacion` computed en `SchedulesOptionsStore` (ya existente tras Fase 2 de este plan) y ramifica la UI de horarios según `GRA_Orden`. Fase 6 (tests pre-matrícula) **debe** incluir cobertura de salones tutor pleno (≤8) y por curso (≥9).
+> **Coordinación cross-plan**: → [`educa-coord/plans/xrepo-asignacion-profesor-salon-curso.md`](../../../educa-coord/plans/xrepo-asignacion-profesor-salon-curso.md) Fase 4 agrega `modoAsignacion` computed en `SchedulesOptionsStore` (ya existente tras Fase 2 de este plan) y ramifica la UI de horarios según `GRA_Orden`. Fase 6 (tests pre-matrícula) **debe** incluir cobertura de salones tutor pleno (≤8) y por curso (≥9).
 > **Horizonte**: 3-6 meses, trabajo incremental
 
 ---
