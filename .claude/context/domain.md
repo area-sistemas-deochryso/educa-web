@@ -1,30 +1,6 @@
-# Dominio del Negocio
+# Dominio (perspectiva FE)
 
-## Entidades Principales
-
-```text
-Director / AsistenteAdministrativo (admin completo)
-    └── Sedes (instituciones educativas)
-        ├── Grados (1°, 2°, 3°, etc.)
-        │   └── Secciones (A, B, C)
-        │       └── Salones (aulas físicas)
-        │           ├── Estudiantes (alumnos)
-        │           │   ├── Apoderados (padres/tutores)
-        │           │   └── Asistencias (entrada/salida)
-        │           ├── Profesores (docentes asignados)
-        │           └── Cursos (materias)
-        └── Dispositivos CrossChex (control biométrico)
-```
-
-## Jerarquía de Usuarios
-
-| Rol | Acceso | Permisos Principales |
-| --- | --- | --- |
-| **Director** | Total | CRUD completo de usuarios, salones, cursos, asistencias |
-| **AsistenteAdministrativo** | Administrativo limitado | Gestión de salones, consultas, reportes |
-| **Profesor** | Gestión de aula | Ver estudiantes de sus salones, marcar asistencia |
-| **Apoderado** | Consulta | Ver asistencias de sus hijos, recibir notificaciones |
-| **Estudiante** | Consulta mínima | Ver su propia información |
+> Entidades, jerarquía de usuarios y flujo CrossChex viven en `educa-coord/glossary/domain.md` (cross-repo). Este archivo cubre lo específico del FE: módulos por rol intranet, patrón CRUD optimista, flujo de permisos.
 
 ## Módulos por Rol (Intranet)
 
@@ -56,64 +32,48 @@ Director / AsistenteAdministrativo (admin completo)
 
 ---
 
-## Flujos Principales
-
-### 1. Asistencia Automática (CrossChex Cloud)
-
-> **Polimórfica desde Plan 21 (2026-04-20)**: registra marcaciones tanto de estudiantes como de profesores en la tabla `AsistenciaPersona` (discriminador `TipoPersona = 'E' | 'P'`). Ver `../../educa-coord/invariants/asistencia.md` (sección "Modelo polimórfico").
+## Flujo CRUD Optimista (Usuarios, Salones, Cursos, etc.)
 
 ```text
-Persona (Estudiante o Profesor) marca biométrico en dispositivo CrossChex
+Admin selecciona "Nuevo" / "Editar" / "Eliminar" en módulo
     ↓
-CrossChex Cloud API registra evento
-    ↓
-Hangfire Job (cada 5 min, 8:00-10:59 AM)
-    ↓
-Backend: SincronizarAsistenciaDelDia()
-    ├── Obtiene registros del día desde CrossChex API
-    ├── Dispatch por DNI: Profesor → Estudiante → rechazar
-    ├── Filtra DNIs ya registrados (por persona + fecha)
-    ├── Registra entrada/salida en AsistenciaPersona
-    └── Envía notificaciones
-        ├── Estudiante → Push + Email al apoderado + BCC al colegio
-        ├── Profesor   → Email al profesor + BCC al colegio (sin push)
-        ├── SignalR (AsistenciaHub) → UI en tiempo real
-        └── (Futuro) WhatsApp → Teléfono del apoderado
-```
-
-### 2. CRUD Administrativo (Usuarios, Salones, Cursos)
-
-```text
-Admin selecciona "Nuevo" en módulo
-    ↓
-Dialog se abre con formulario
+Dialog se abre con formulario (o confirm para eliminar)
     ↓
 Admin completa datos y presiona "Guardar"
     ↓
-Facade → API → Backend
-    ├── CREAR: Refetch items only (necesita ID del servidor) + actualizar stats
+Facade → wal.execute({ optimistic: { apply, rollback }, http$, onCommit })
+    ├── apply: muta el store INMEDIATO (UI no espera al server)
+    ├── http$: dispara request al BE
+    ├── onCommit: reconcilia campos derivados del server (rowVersion, ID real)
+    └── onError: el engine llama rollback() automático
+    ↓
+Estrategia por operación:
+    ├── CREAR: Refetch items only (necesita ID del servidor) + stats incremental
     ├── EDITAR: Mutación quirúrgica local (no refetch) + actualizar fila
-    ├── TOGGLE: Mutación quirúrgica local + actualizar stats incrementales
-    └── ELIMINAR: Mutación quirúrgica local + actualizar stats incrementales
+    ├── TOGGLE: Mutación quirúrgica local + stats incremental
+    └── ELIMINAR: Mutación quirúrgica local + stats incremental
     ↓
 Tabla actualiza solo el registro afectado (mantiene paginación/ordenamiento)
 ```
 
-### 3. Permisos Granulares
+Detalle completo en `rules/optimistic-ui.md` y `rules/crud-patterns.md`.
+
+---
+
+## Flujo de Permisos Granulares (FE)
 
 ```text
 Usuario inicia sesión
     ↓
-Backend: AuthService.Login()
-    ├── Valida credenciales
-    ├── Obtiene permisos (VistaRol + VistaUsuario)
-    └── Retorna token + permisos
+Backend retorna token + permisos (VistaRol + VistaUsuario)
     ↓
-Frontend: AuthStore guarda en SessionStorage
+Frontend: AuthStore guarda permisos en SessionStorage
     ↓
-Router: permisosGuard verifica ruta exacta
+Router: permisosGuard verifica ruta exacta antes de activar
     ├── Tener "intranet" NO da acceso a "intranet/admin"
     └── Tener "intranet/admin/usuarios" SÍ da acceso a "intranet/admin/usuarios/nuevo"
     ↓
-UI: UserPermisosService controla visibilidad de botones/secciones
+UI: UserPermisosService.tienePermiso(ruta) controla visibilidad de botones/secciones
 ```
+
+Detalle completo en `rules/permissions.md`.

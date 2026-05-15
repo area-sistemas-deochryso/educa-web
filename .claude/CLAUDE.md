@@ -49,10 +49,18 @@ Cada línea: `- ruta/archivo.md — <trigger>`. Leé el archivo cuando el trigge
 
 ### Contexto del negocio
 
-- [.claude/context/domain.md](context/domain.md) — discutís roles, módulos del colegio, reglas del dominio educativo o necesitás glosario
-- [.claude/context/api-endpoints.md](context/api-endpoints.md) — llamás un endpoint, agregás uno nuevo o necesitás ver el catálogo de rutas BE
+- [.claude/context/domain.md](context/domain.md) — discutís módulos por rol intranet o flujo CRUD/permisos del FE (entidades + jerarquía + CrossChex viven en `educa-coord/glossary/domain.md`)
+- [../educa-coord/glossary/domain.md](../../educa-coord/glossary/domain.md) — necesitás glosario cross-repo: jerarquía de usuarios, entidades core, flujo CrossChex canónico, español↔inglés del dominio
 - [.claude/context/data-conventions.md](context/data-conventions.md) — tocás `@data/` (adapters, models) o necesitás convenciones de naming de campos BD
 - [.claude/context/integrations.md](context/integrations.md) — tocás CrossChex / JaaS / Firebase / SignalR / Azure Blob
+
+### Contratos cross-repo (educa-coord)
+
+- [../educa-coord/contracts/api-catalog.md](../../educa-coord/contracts/api-catalog.md) — llamás un endpoint, agregás uno nuevo o necesitás ver el catálogo de rutas BE (qué dominios, qué rutas, qué SignalR hubs)
+- [../educa-coord/contracts/api-protocol.md](../../educa-coord/contracts/api-protocol.md) — necesitás saber el shape del wire HTTP (`ApiResponse<T>`, excepciones tipadas → status, headers `X-Correlation-Id`/`X-Idempotency-Key`)
+- [../educa-coord/contracts/rate-limiting.md](../../educa-coord/contracts/rate-limiting.md) — ves 429/503, tocás interceptors, o necesitás manejar `Retry-After` (complementa `rules/rate-limiting.md` que cubre el FE)
+- [../educa-coord/contracts/auth.md](../../educa-coord/contracts/auth.md) — tocás cookies de auth, refresh flow, o el query string fallback para SignalR
+- [../educa-coord/glossary/db-fields.md](../../educa-coord/glossary/db-fields.md) — tocás `@data/models`, mapeás campos BD con prefijos `EST_/PRO_/ASI_`, o consultás convenciones DNI/RowVersion/auditoría
 
 ### Estructura del proyecto
 
@@ -93,7 +101,6 @@ Cada línea: `- ruta/archivo.md — <trigger>`. Leé el archivo cuando el trigge
 - [.claude/rules/domain-modeling.md](rules/domain-modeling.md) — definís interface/DTO/tipo de dominio y necesitás decidir capa (data/shared/feature/component)
 - [.claude/rules/semantic-types.md](rules/semantic-types.md) — reemplazás `string`/`number` genérico por tipo del dominio (const + type)
 - [.claude/rules/permissions.md](rules/permissions.md) — tocás guards / `permisosService` / roles / vistas
-- [.claude/rules/backend.md](rules/backend.md) — necesitás contexto del BE Educa.API desde un chat FE (raro — el BE tiene su propio `.claude/` en `../Educa.API/.claude/`)
 
 ### UI / PrimeNG / estilos
 
