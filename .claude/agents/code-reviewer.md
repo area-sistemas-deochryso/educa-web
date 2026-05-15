@@ -49,7 +49,7 @@ All imports MUST use path aliases (`@core`, `@shared`, `@features/*`, `@config`,
 - `UPDATE`/`DELETE`/`TOGGLE` without `optimistic` block: rejected by the
   TypeScript union discriminant, should never compile — flag if bypassed.
 - `consistencyLevel: 'server-confirmed'` or higher MUST have a comment
-  citing the `INV-*` invariant from `business-rules.md` that justifies it.
+  citing the `INV-*` invariant from `../../educa-coord/invariants/` that justifies it.
   Missing justification = WARNING.
 - ESLint rule `wal/no-direct-mutation-subscribe` must pass; any
   `eslint-disable` for this rule requires written justification with either
@@ -119,7 +119,7 @@ Controller → Service → Repository → DbContext
 - [ ] Visible change lives in `optimistic.apply`, not `onCommit` (no disguised pessimism)
 - [ ] `rollback` restores a captured snapshot (not a refetch)
 - [ ] `UPDATE`/`DELETE`/`TOGGLE` declare `optimistic` (enforced by TS union)
-- [ ] Any `server-confirmed` consistency level cites an `INV-*` from business-rules.md
+- [ ] Any `server-confirmed` consistency level cites an `INV-*` from `educa-coord/invariants/`
 - [ ] ESLint rule `wal/no-direct-mutation-subscribe` passes (or disables have written justification)
 
 ### ASP.NET Core

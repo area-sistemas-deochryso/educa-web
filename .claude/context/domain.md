@@ -60,7 +60,7 @@ Director / AsistenteAdministrativo (admin completo)
 
 ### 1. Asistencia Automática (CrossChex Cloud)
 
-> **Polimórfica desde Plan 21 (2026-04-20)**: registra marcaciones tanto de estudiantes como de profesores en la tabla `AsistenciaPersona` (discriminador `TipoPersona = 'E' | 'P'`). Ver `rules/business-rules.md` § 1.0.
+> **Polimórfica desde Plan 21 (2026-04-20)**: registra marcaciones tanto de estudiantes como de profesores en la tabla `AsistenciaPersona` (discriminador `TipoPersona = 'E' | 'P'`). Ver `../../educa-coord/invariants/asistencia.md` (sección "Modelo polimórfico").
 
 ```text
 Persona (Estudiante o Profesor) marca biométrico en dispositivo CrossChex

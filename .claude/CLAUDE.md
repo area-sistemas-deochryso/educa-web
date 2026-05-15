@@ -71,9 +71,25 @@ Cada línea: `- ruta/archivo.md — <trigger>`. Leé el archivo cuando el trigge
 - [.claude/rules/eslint.md](rules/eslint.md) — ESLint te tira error de capa/import/duplicación o configurás rule nueva
 - [.claude/rules/testing.md](rules/testing.md) — escribís test nuevo o configurás Vitest
 
-### Dominio y tipos
+### Dominio y tipos — Invariantes `INV-*` (vivienen en `educa-coord/invariants/`)
 
-- [.claude/rules/business-rules.md](rules/business-rules.md) — **BIG (1213 ln)** tocás dominio: asistencia, calificaciones, horarios, aprobación, vacacional, matrícula, periodos, permisos. Listado completo de invariantes `INV-*`. **Trigger por path**: si tocás cualquier archivo bajo `features/intranet/pages/{cross-role,profesor,estudiante,admin}/{attendance*,asistencia*,grades*,calificacion*,horario*,schedule*,aprobacion*,matricula*,salones*,kardex*}/**` o `core/services/{asistencia,facades}/**`, leelo aunque el chat parezca solo UI — esos componentes calculan/muestran datos sujetos a invariantes
+> Los invariantes de dominio viven en la carpeta hermana `educa-coord/invariants/` (single source of truth cross-repo). Cada archivo cubre un dominio ≤300 ln. Los IDs `INV-*` son estables — citados desde código, commits y briefs.
+
+- [../educa-coord/invariants/README.md](../../educa-coord/invariants/README.md) — índice cruzado de todos los `INV-*` y mapa de dominios. Leelo si necesitás navegar por ID o entender qué archivo aplica a un cambio
+- [../educa-coord/invariants/asistencia.md](../../educa-coord/invariants/asistencia.md) — **Trigger por path**: si tocás `features/intranet/pages/{cross-role,profesor,estudiante,admin}/{attendance*,asistencia*}/**` o `core/services/asistencia/**`, leelo. Cubre asistencia diaria CrossChex (polimórfico E/P/A), por curso, edición admin formal (INV-C01..C11, AD01..AD09, AC01..AC03, S08)
+- [../educa-coord/invariants/calificaciones.md](../../educa-coord/invariants/calificaciones.md) — **Trigger por path**: tocás `features/intranet/pages/{profesor,estudiante,admin}/{grades*,calificacion*}/**`. Cubre escalas, pesos, ventana de edición, state machine (INV-U06, C04, T04)
+- [../educa-coord/invariants/aprobacion.md](../../educa-coord/invariants/aprobacion.md) — **Trigger por path**: tocás `features/intranet/pages/admin/{aprobacion*,kardex*}/**`. Cubre aprobación/desaprobación, progresión, vacacional, state machine estudiante (INV-T01..T06, V01..V03, C05)
+- [../educa-coord/invariants/horarios.md](../../educa-coord/invariants/horarios.md) — **Trigger por path**: tocás `features/intranet/pages/{profesor,estudiante,admin}/{horario*,schedule*,salones*}/**`. Cubre validación de tiempos, conflictos, asignación profesor-curso (INV-U03..U05, C06..C08, AS01..AS05)
+- [../educa-coord/invariants/matricula.md](../../educa-coord/invariants/matricula.md) — **Trigger por path**: tocás `features/intranet/pages/admin/{matricula*}/**`. Cubre state machine matrícula, pago manual (INV-M01..M04)
+- [../educa-coord/invariants/estructura-academica.md](../../educa-coord/invariants/estructura-academica.md) — necesitás contexto del Salón como núcleo, niveles/grados, modelo tutor pleno vs por curso (INV-D06, D07)
+- [../educa-coord/invariants/periodos.md](../../educa-coord/invariants/periodos.md) — tocás cierre/apertura de periodos académicos
+- [../educa-coord/invariants/permisos.md](../../educa-coord/invariants/permisos.md) — tocás guards, login, jurisdicción sobre asistencia (INV-S01..S04)
+- [../educa-coord/invariants/concurrencia.md](../../educa-coord/invariants/concurrencia.md) — tocás RowVersion, idempotencia, transacciones, Command Pattern batch (INV-S05..S06)
+- [../educa-coord/invariants/correos.md](../../educa-coord/invariants/correos.md) — tocás envío de correos, defensas SMTP, blacklist, monitoreo defer/fail (INV-S07, MAIL01..MAIL10)
+- [../educa-coord/invariants/feedback.md](../../educa-coord/invariants/feedback.md) — tocás reportes de usuario (Ctrl+Alt+F, FeedbackReportDialog) (INV-RU01..RU08)
+- [../educa-coord/invariants/error-tracing.md](../../educa-coord/invariants/error-tracing.md) — tocás `ErrorLog` / `ErrorGroup` / correlación cross-carril (INV-ET01..ET07, CORR01)
+- [../educa-coord/invariants/reportes.md](../../educa-coord/invariants/reportes.md) — agregás endpoint de reporte PDF/Excel (INV-RE01..RE03)
+- [../educa-coord/invariants/dni-y-auditoria.md](../../educa-coord/invariants/dni-y-auditoria.md) — invariantes transversales (DNI, auditoría, soft-delete, INV-D09) — leelo si tocás cualquier modelo o query nueva
 - [.claude/rules/domain-modeling.md](rules/domain-modeling.md) — definís interface/DTO/tipo de dominio y necesitás decidir capa (data/shared/feature/component)
 - [.claude/rules/semantic-types.md](rules/semantic-types.md) — reemplazás `string`/`number` genérico por tipo del dominio (const + type)
 - [.claude/rules/permissions.md](rules/permissions.md) — tocás guards / `permisosService` / roles / vistas

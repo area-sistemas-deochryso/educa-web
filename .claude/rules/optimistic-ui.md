@@ -368,6 +368,6 @@ ESLINT
 - Principios del WAL: `@.claude/documentacion-subsistemas/wal-write-ahead-log.md`
 - Arquitectura de facades y stores: `@.claude/rules/architecture.md`
 - Patrones CRUD (BaseCrudFacade, multi-facade): `@.claude/rules/crud-patterns.md`
-- Reglas de negocio (invariantes INV-*): `@.claude/rules/business-rules.md`
+- Reglas de negocio (invariantes INV-*): `../../educa-coord/invariants/README.md` (índice cross-repo de IDs `INV-*`)
 - Estado y signals: `@.claude/rules/state-management.md`
 - ESLint config: `@.claude/rules/eslint.md`
