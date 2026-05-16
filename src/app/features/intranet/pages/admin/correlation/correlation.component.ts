@@ -12,7 +12,7 @@ import { StorageService, type CorrelationViewMode } from '@core/services';
 
 import { PageHeaderComponent } from '@intranet-shared/components';
 
-import { CorrelationFacade } from './services';
+import { CorrelationExportService, CorrelationFacade } from './services';
 import { CorrelationErrorsSectionComponent } from './components/correlation-errors-section';
 import { CorrelationRateLimitSectionComponent } from './components/correlation-rate-limit-section';
 import { CorrelationReportsSectionComponent } from './components/correlation-reports-section';
@@ -59,6 +59,7 @@ export class CorrelationComponent implements OnInit {
 	private readonly router = inject(Router);
 	private readonly destroyRef = inject(DestroyRef);
 	private readonly storage = inject(StorageService);
+	private readonly exporter = inject(CorrelationExportService);
 	// #endregion
 
 	// #region Estado
@@ -105,6 +106,13 @@ export class CorrelationComponent implements OnInit {
 		if (this.viewMode() === mode) return;
 		this.viewMode.set(mode);
 		this.storage.setCorrelationViewMode(mode);
+	}
+
+	onExport(): void {
+		const snapshot = this.vm().snapshot;
+		const id = this.vm().correlationId;
+		if (!snapshot || !id) return;
+		this.exporter.exportSnapshot(snapshot, id);
 	}
 	// #endregion
 }

@@ -42,6 +42,17 @@
 
 		<button
 			pButton
+			icon="pi pi-download"
+			label="Exportar JSON"
+			class="p-button-outlined p-button-sm"
+			[disabled]="vm().loading || !vm().snapshot"
+			(click)="onExport()"
+			pTooltip="Descargar snapshot como JSON"
+			[pt]="{ root: { 'aria-label': 'Exportar snapshot como JSON' } }"
+		></button>
+
+		<button
+			pButton
 			icon="pi pi-refresh"
 			class="p-button-text p-button-sm btn-icon"
 			[disabled]="vm().loading || !vm().correlationId"
