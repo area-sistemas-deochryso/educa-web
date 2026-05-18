@@ -49,13 +49,13 @@
 
 	&.stat-success {
 		background: rgba(16, 185, 129, 0.1);
-		color: #059669;
+		color: var(--green-600);
 		border: 1px solid rgba(16, 185, 129, 0.2);
 	}
 
 	&.stat-warn {
 		background: rgba(245, 158, 11, 0.1);
-		color: #d97706;
+		color: var(--orange-600);
 		border: 1px solid rgba(245, 158, 11, 0.2);
 	}
 
@@ -67,7 +67,7 @@
 
 	&.stat-info {
 		background: rgba(59, 130, 246, 0.1);
-		color: #2563eb;
+		color: var(--blue-600);
 		border: 1px solid rgba(59, 130, 246, 0.2);
 	}
 }
@@ -76,10 +76,10 @@
 // #region Dark mode
 :host-context(.dark-mode) {
 	.stat-card {
-		&.stat-success { color: #34d399; }
-		&.stat-warn { color: #fbbf24; }
-		&.stat-danger { color: #f87171; }
-		&.stat-info { color: #60a5fa; }
+		&.stat-success { color: var(--green-400); }
+		&.stat-warn { color: var(--yellow-400); }
+		&.stat-danger { color: var(--red-400); }
+		&.stat-info { color: var(--blue-400); }
 	}
 }
 // #endregion

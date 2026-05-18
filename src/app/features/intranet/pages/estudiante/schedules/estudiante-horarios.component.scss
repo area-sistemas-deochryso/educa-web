@@ -146,7 +146,7 @@
 	transition: all 0.2s ease;
 	box-shadow: 0 2px 6px rgba(0, 0, 0, 0.12);
 	overflow: hidden;
-	color: #ffffff;
+	color: var(--white-color);
 
 	&:hover {
 		transform: scale(1.03);
@@ -214,18 +214,18 @@
 		}
 
 		&.countdown-warning {
-			background: #eab308;
-			color: #422006;
+			background: var(--yellow-500);
+			color: var(--yellow-950);
 		}
 
 		&.countdown-danger-low {
-			background: #f97316;
-			color: #431407;
+			background: var(--orange-500);
+			color: var(--orange-950);
 		}
 
 		&.countdown-danger {
-			background: #ef4444;
-			color: #ffffff;
+			background: var(--red-500);
+			color: var(--white-color);
 			animation: pulse-countdown 1.5s ease-in-out infinite;
 		}
 	}
@@ -266,7 +266,7 @@
 
 		&.active {
 			background: var(--primary-color);
-			color: #ffffff;
+			color: var(--white-color);
 			border-color: var(--primary-color);
 			box-shadow: 0 2px 8px rgba(79, 70, 229, 0.3);
 		}
@@ -366,18 +366,18 @@
 		}
 
 		&.countdown-warning {
-			background: #eab308;
-			color: #422006;
+			background: var(--yellow-500);
+			color: var(--yellow-950);
 		}
 
 		&.countdown-danger-low {
-			background: #f97316;
-			color: #431407;
+			background: var(--orange-500);
+			color: var(--orange-950);
 		}
 
 		&.countdown-danger {
-			background: #ef4444;
-			color: #ffffff;
+			background: var(--red-500);
+			color: var(--white-color);
 			animation: pulse-countdown 1.5s ease-in-out infinite;
 		}
 	}

@@ -35,6 +35,9 @@ interface CountdownInfo {
 
 // #endregion
 // #region Helpers
+// Excepción legítima a `rules/design-system.md` §8: paleta rotativa decorativa
+// consumida por `darkenColor()` que opera con parseInt(hex) bitwise — requiere
+// literales hex, no resuelve `var()`.
 const CURSO_COLORS = [
 	'#3B82F6', '#10B981', '#F59E0B', '#EF4444',
 	'#8B5CF6', '#EC4899', '#14B8A6', '#F97316',
