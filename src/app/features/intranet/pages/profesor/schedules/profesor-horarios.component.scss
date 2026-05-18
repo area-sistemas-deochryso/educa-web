@@ -41,11 +41,20 @@
 }
 
 // #endregion
-// #region Debug panel (TEMPORARY)
+// #region Debug panel (dev-only — gated by environment.debug.horarioSync)
+// Paleta IDE-like (Catppuccin Mocha) intencional para que el panel sea visualmente
+// distinto del UI productivo. Excepción justificada al token policy del design-system §8
+// (mismo criterio que paletas decorativas / Canvas).
+$debug-bg: #1e1e2e;
+$debug-text: #cdd6f4;
+$debug-border: #45475a;
+$debug-accent-title: #f9e2af;
+$debug-accent-label: #89b4fa;
+
 .debug-panel {
-	background: #1e1e2e;
-	color: #cdd6f4;
-	border: 1px solid #45475a;
+	background: $debug-bg;
+	color: $debug-text;
+	border: 1px solid $debug-border;
 	border-radius: 8px;
 	padding: 0.75rem 1rem;
 	margin-bottom: 1rem;
@@ -54,7 +63,7 @@
 	line-height: 1.5;
 
 	strong {
-		color: #f9e2af;
+		color: $debug-accent-title;
 		font-size: 0.85rem;
 		display: block;
 		margin-bottom: 0.5rem;
@@ -66,9 +75,22 @@
 		gap: 0.25rem 0.75rem;
 
 		> span:nth-child(odd) {
-			color: #89b4fa;
+			color: $debug-accent-label;
 			font-weight: 500;
 		}
+	}
+
+	.debug-ok {
+		color: var(--green-500);
+		font-weight: bold;
+	}
+
+	.debug-error {
+		color: var(--red-500);
+	}
+
+	.debug-break {
+		word-break: break-all;
 	}
 }
 
@@ -178,7 +200,7 @@
 	transition: all 0.2s ease;
 	box-shadow: 0 2px 6px rgba(0, 0, 0, 0.12);
 	overflow: hidden;
-	color: #ffffff;
+	color: var(--white-color);
 
 	&:hover {
 		transform: scale(1.03);
@@ -245,18 +267,18 @@
 		}
 
 		&.countdown-warning {
-			background: #eab308;
-			color: #422006;
+			background: var(--yellow-500);
+			color: var(--yellow-950, #422006);
 		}
 
 		&.countdown-danger-low {
-			background: #f97316;
-			color: #431407;
+			background: var(--orange-500);
+			color: var(--orange-950, #431407);
 		}
 
 		&.countdown-danger {
-			background: #ef4444;
-			color: #ffffff;
+			background: var(--red-500);
+			color: var(--white-color);
 			animation: pulse-countdown 1.5s ease-in-out infinite;
 		}
 	}
@@ -297,7 +319,7 @@
 
 		&.active {
 			background: var(--primary-color);
-			color: #ffffff;
+			color: var(--white-color);
 			border-color: var(--primary-color);
 			box-shadow: 0 2px 8px rgba(79, 70, 229, 0.3);
 		}
@@ -397,18 +419,18 @@
 		}
 
 		&.countdown-warning {
-			background: #eab308;
-			color: #422006;
+			background: var(--yellow-500);
+			color: var(--yellow-950, #422006);
 		}
 
 		&.countdown-danger-low {
-			background: #f97316;
-			color: #431407;
+			background: var(--orange-500);
+			color: var(--orange-950, #431407);
 		}
 
 		&.countdown-danger {
-			background: #ef4444;
-			color: #ffffff;
+			background: var(--red-500);
+			color: var(--white-color);
 			animation: pulse-countdown 1.5s ease-in-out infinite;
 		}
 	}
