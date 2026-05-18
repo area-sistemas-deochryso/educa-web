@@ -77,7 +77,8 @@
 
 ### 🟢 Pullable FE-only
 
-1. **[Plan 41 · Chat 3 · FE]** — Botones "Ver grupo de errores / Ver bandeja / Ver reporte" en `<correlation-detail>` + chips `<app-correlation-id-pill>` para `relatedCorrelationIds`. Chat 2 BE ✅ verified 2026-05-12 (brief 132, campos `errorGroupCode` + `relatedCorrelationIds` ya en DTO). Cierra brechas Plan 41 #4/#5/#7. Sin dependencia BE adicional.
+1. **[Plan 41 · Chat 3b · FE]** — `chats/open/185-fe-plan41-chat3b-related-correlation-ids.md` — Sección "Otros correlation IDs (últimas 2h)" en hub con chips `<app-correlation-id-pill>` consumiendo `relatedCorrelationIds`. Pill component ya existe (Plan 32 Chat 4). Cierra brecha #5 (parcial). Sin dependencia.
+2. **[Plan 41 · Chat 3a · FE]** — `chats/open/186-fe-plan41-chat3a-cross-links-buttons.md` — Botones "Ver grupo/bandeja/reporte" en cada fila de las 3 sub-secciones (errors/emails/reports) del hub. Cierra brechas #4 y #7. Independiente de 3b. Subdivisión 2026-05-18 del Chat 3 monolítico original (BE Chat 2 brief 132 ya awaiting-prod desde 2026-05-12).
 
 ### 🔗 Referencias cross-repo (sub-chats FE de planes cross-repo)
 
