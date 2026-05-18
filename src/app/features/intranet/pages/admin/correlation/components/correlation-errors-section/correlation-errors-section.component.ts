@@ -1,6 +1,6 @@
-import { ChangeDetectionStrategy, Component, computed, input } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, inject, input } from '@angular/core';
 import { CommonModule, DatePipe } from '@angular/common';
-import { RouterLink } from '@angular/router';
+import { Router, RouterLink } from '@angular/router';
 
 import { ButtonModule } from 'primeng/button';
 import { TableModule } from 'primeng/table';
@@ -22,6 +22,8 @@ import {
 	changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class CorrelationErrorsSectionComponent {
+	private router = inject(Router);
+
 	readonly items = input.required<CorrelationErrorLogDto[]>();
 	readonly correlationId = input.required<string | null>();
 
@@ -38,5 +40,16 @@ export class CorrelationErrorsSectionComponent {
 		if (httpStatus >= 500) return 'danger';
 		if (httpStatus >= 400) return 'warn';
 		return 'info';
+	}
+
+	canGoToGroup(row: CorrelationErrorLogDto): boolean {
+		return !!row.errorGroupCode;
+	}
+
+	onGoToGroup(row: CorrelationErrorLogDto): void {
+		if (!row.errorGroupCode) return;
+		this.router.navigate(['/intranet/admin/trazabilidad-errores'], {
+			queryParams: { fingerprint: row.errorGroupCode },
+		});
 	}
 }

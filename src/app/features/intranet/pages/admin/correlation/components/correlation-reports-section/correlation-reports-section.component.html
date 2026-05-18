@@ -32,6 +32,7 @@
 					<th>URL</th>
 					<th style="width: 160px">Usuario</th>
 					<th style="width: 160px">Fecha</th>
+					<th style="width: 150px">Acciones</th>
 				</tr>
 			</ng-template>
 			<ng-template #body let-row>
@@ -74,6 +75,17 @@
 						}
 					</td>
 					<td>{{ row.fechaReg | date: 'dd/MM/yyyy HH:mm:ss' }}</td>
+					<td>
+						<button
+							pButton
+							type="button"
+							label="Ver reporte"
+							icon="pi pi-external-link"
+							class="p-button-text p-button-sm"
+							(click)="onGoToReport(row)"
+							[pt]="{ root: { 'aria-label': 'Ver reporte' } }"
+						></button>
+					</td>
 				</tr>
 			</ng-template>
 		</p-table>

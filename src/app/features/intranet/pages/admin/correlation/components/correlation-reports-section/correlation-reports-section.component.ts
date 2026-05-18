@@ -1,6 +1,6 @@
-import { ChangeDetectionStrategy, Component, computed, input } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, inject, input } from '@angular/core';
 import { CommonModule, DatePipe } from '@angular/common';
-import { RouterLink } from '@angular/router';
+import { Router, RouterLink } from '@angular/router';
 
 import { ButtonModule } from 'primeng/button';
 import { TableModule } from 'primeng/table';
@@ -22,6 +22,8 @@ import {
 	changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class CorrelationReportsSectionComponent {
+	private router = inject(Router);
+
 	readonly items = input.required<CorrelationReporteUsuarioDto[]>();
 	readonly correlationId = input.required<string | null>();
 
@@ -30,5 +32,11 @@ export class CorrelationReportsSectionComponent {
 
 	getEstadoSeverity(estado: string): 'info' | 'warn' | 'success' | 'secondary' {
 		return REPORTE_ESTADO_SEVERITY_MAP[estado] ?? 'info';
+	}
+
+	onGoToReport(row: CorrelationReporteUsuarioDto): void {
+		this.router.navigate(['/intranet/admin/reportes-usuario'], {
+			queryParams: { id: row.id },
+		});
 	}
 }

@@ -32,6 +32,7 @@
 					<th style="width: 80px">Intentos</th>
 					<th>Último error</th>
 					<th style="width: 160px">Fecha envío</th>
+					<th style="width: 200px">Acciones</th>
 				</tr>
 			</ng-template>
 			<ng-template #body let-row>
@@ -60,6 +61,17 @@
 						} @else {
 							<span class="muted">No enviado</span>
 						}
+					</td>
+					<td>
+						<button
+							pButton
+							type="button"
+							label="Ver bandeja"
+							icon="pi pi-inbox"
+							class="p-button-text p-button-sm"
+							(click)="onGoToOutbox(row)"
+							[pt]="{ root: { 'aria-label': 'Ver bandeja del destinatario' } }"
+						></button>
 					</td>
 				</tr>
 			</ng-template>

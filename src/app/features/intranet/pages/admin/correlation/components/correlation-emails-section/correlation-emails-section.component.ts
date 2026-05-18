@@ -1,6 +1,6 @@
-import { ChangeDetectionStrategy, Component, computed, input } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, inject, input } from '@angular/core';
 import { CommonModule, DatePipe } from '@angular/common';
-import { RouterLink } from '@angular/router';
+import { Router, RouterLink } from '@angular/router';
 
 import { ButtonModule } from 'primeng/button';
 import { TableModule } from 'primeng/table';
@@ -22,6 +22,8 @@ import {
 	changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class CorrelationEmailsSectionComponent {
+	private router = inject(Router);
+
 	readonly items = input.required<CorrelationEmailOutboxDto[]>();
 	readonly correlationId = input.required<string | null>();
 
@@ -30,5 +32,11 @@ export class CorrelationEmailsSectionComponent {
 
 	getEstadoSeverity(estado: string): 'info' | 'warn' | 'success' | 'danger' | 'secondary' {
 		return OUTBOX_ESTADO_SEVERITY_MAP[estado] ?? 'info';
+	}
+
+	onGoToOutbox(row: CorrelationEmailOutboxDto): void {
+		this.router.navigate(['/intranet/admin/email-outbox'], {
+			queryParams: { destinatario: row.destinatarioMasked },
+		});
 	}
 }

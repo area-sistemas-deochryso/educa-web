@@ -1,6 +1,7 @@
 # Brief 186 — Plan 41 Chat 3a · Botones de navegación cruzada en secciones del hub
 
-> **Creado**: 2026-05-18 · **Estado**: ⏳ pendiente arrancar.
+> **Creado**: 2026-05-18 · **Estado**: ✅ cerrado local 2026-05-18, awaiting-prod.
+> **Resultado**: 3 sub-components con botón "Acciones" + handler `Router.navigate` con queryParams (`fingerprint`, `destinatario`, `id`). 3 specs vitest nuevos: 8 tests propios + 3 timeline existente = 11/11 verdes. Lint ✅, build prod ✅. `rate-limit-section` sin botón (confirmado: no hay vista admin filtrable por evento individual). Aria-label vía `pt` passthrough (a11y.md). Desviación documentada: rutas destino usan los redirects legacy `/trazabilidad-errores`, `/email-outbox`, `/reportes-usuario` (el codebase no tiene `/error-groups` ni `/feedback-reports/<id>` como rutas directas); reports usa `?id=` queryParam ya que no existe ruta detalle. **Pendiente smoke browser tras deploy** — verificar que los 3 botones navegan correctamente y que las páginas destino filtran por los queryParams enviados (`fingerprint`, `destinatario`, `id`).
 > **Plan padre**: [`educa-coord/plans/xrepo-41-correlation-hub-observability.md`](../../../../educa-coord/plans/xrepo-41-correlation-hub-observability.md) — F2 Chat 3 (sub-pieza a)
 > **MODO SUGERIDO**: `/execute` → `/validate`
 > **Esfuerzo estimado**: medio (~60 min — patrón repetido en 3 sub-components)

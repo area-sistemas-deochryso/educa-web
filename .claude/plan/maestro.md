@@ -78,7 +78,6 @@
 ### 🟢 Pullable FE-only
 
 1. **[Plan 41 · Chat 3b · FE]** — `chats/open/185-fe-plan41-chat3b-related-correlation-ids.md` — Sección "Otros correlation IDs (últimas 2h)" en hub con chips `<app-correlation-id-pill>` consumiendo `relatedCorrelationIds`. Pill component ya existe (Plan 32 Chat 4). Cierra brecha #5 (parcial). Sin dependencia.
-2. **[Plan 41 · Chat 3a · FE]** — `chats/open/186-fe-plan41-chat3a-cross-links-buttons.md` — Botones "Ver grupo/bandeja/reporte" en cada fila de las 3 sub-secciones (errors/emails/reports) del hub. Cierra brechas #4 y #7. Independiente de 3b. Subdivisión 2026-05-18 del Chat 3 monolítico original (BE Chat 2 brief 132 ya awaiting-prod desde 2026-05-12).
 
 ### 🔗 Referencias cross-repo (sub-chats FE de planes cross-repo)
 
@@ -100,12 +99,13 @@
 
 Briefs en `awaiting-prod/` esperando deploy + smoke. NO requieren chat de ejecución — solo `/verify` cuando el deploy se haga:
 
-- **FE puros**: Plan 1 F5 (`137`), Plan 28 Chat 4 (`134`), Plan 41 F5 Chat 10 (`180`), Plan 43 Chat 1.2 FE sparkline (`152`), Plan 43 Chat 2.1 FE (`147`), Plan 43 Chat 3.1b FE drawer SMTP (`169`), WAL hard/soft delete audit (`118, 119`).
+- **FE puros**: Plan 1 F5 (`137`), Plan 28 Chat 4 (`134`), Plan 41 Chat 3a (`186`), Plan 41 F5 Chat 10 (`180`), Plan 43 Chat 1.2 FE sparkline (`152`), Plan 43 Chat 2.1 FE (`147`), Plan 43 Chat 3.1b FE drawer SMTP (`169`), WAL hard/soft delete audit (`118, 119`).
 - **BE residentes en repo FE** (no migrados retroactivamente, [ADR-0002](../../../educa-coord/decisions/0002-maestros-y-planes.md) §Out-of-scope): Plan 40 F1-F5+F3b+F6a (`106, 108, 110, 111, 112`), Plan 26 F3 (`136`), Plan 43 Chat 2.1 BE (`142`).
 
 ### Notas operativas
 
 - **Chat activo en `running/`**: ninguno.
+- **Plan 41 Chat 3a FE ✅ awaiting-prod 2026-05-18** (brief `186`) — Botones de navegación cruzada en las 3 sub-secciones del hub de correlación: errors → `/trazabilidad-errores?fingerprint=`, emails → `/email-outbox?destinatario=`, reports → `/reportes-usuario?id=`. Cada sección con handler `Router.navigate` (errors con `[disabled]` cuando `errorGroupCode` nullish). Aria-label vía `pt` passthrough. +8 tests vitest verdes (11/11 spec total en components/). `rate-limit-section` sin botón (no hay destino admin sensato por evento individual). Desviación: rutas destino usan redirects legacy ya que codebase no tiene `/error-groups` ni `/feedback-reports/<id>` como rutas directas. Pendiente smoke browser post-deploy → `/verify 186`.
 - **Plan 43 Chat 4.1b FE ✅ awaiting-prod 2026-05-18** (brief `184`) — Paginación server-side variante B (`/count` separado) en `/intranet/admin/email-outbox`. Service extendido (`tipoFallo`, `correlationId`, `page`, `pageSize` + endpoint `/count` fail-safe), store con `_page`/`_pageSize`/`_totalCount` + `totalRecordsEstimate` con fallback progresivo, facade dispatcha `loadData` paralelo en `forkJoin` y `loadPage` solo items (no recarga count), filtro UI `correlationId` + btn-clear §B6, tabla `[lazy]` con `[totalRecords]` real y guard idempotente para el bounce inicial de PrimeNG. Bug fix: `onFilterTipoFalloChange` ahora dispara refetch. +8 tests vitest verdes (14/14 spec total). Lint ✅ · tsc ✅. Pendiente smoke browser post-deploy BE 183 → `/verify 184`.
 - **Saneamiento de cola 2026-05-16** — quitados ítems BE-only (Plan 26 F4, Plan 45, Plan 40 F6b, Plan 39 Chat E, Plan 24 Chat 4 B → maestro BE) y sub-chats cross-repo BE+FE de Plan 43 (3.2/4.1/4.2/4.3/5.1/5.2/6.1/6.2 → maestro coord). Las narrativas históricas de cierres (Plan 22, 28, 29, 44, 46) viven ahora en `history/` o en los planes base; esta cola solo trackea trabajo accionable.
 - Cualquier hallazgo nuevo (Cowork, browser smoke, telemetría) que requiera chat dedicado entra al final de la sección que corresponda por criticidad. Si el hallazgo es BE-only o cross-repo, entra al maestro correspondiente, **no acá**.
