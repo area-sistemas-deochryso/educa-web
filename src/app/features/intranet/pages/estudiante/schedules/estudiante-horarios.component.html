@@ -24,6 +24,7 @@
 						type="button"
 						class="day-btn"
 						[class.active]="selectedDay() === dia.value"
+						[attr.aria-label]="'Ver horario del ' + dia.label"
 						(click)="selectDay(dia.value)"
 					>
 						{{ dia.short }}
