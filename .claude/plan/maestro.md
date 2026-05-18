@@ -77,7 +77,7 @@
 
 ### 🟢 Pullable FE-only
 
-- **Brújula W21 — Pulido intranet académica (2026-05-18 → 2026-05-24)** → sub-plan FE [`intranet-fe-polish-W21.md`](intranet-fe-polish-W21.md). **F1 ✅ closed 2026-05-18 (brief 187)** — matriz `F1.Resultados` poblada con 10 pages auditadas (5 🟢 + 5 🟡, 0 🔴). 5 tasks `polish-W21-*` creadas en `.claude/tasks/` (tokens-colors 🔴, aria-labels-estudiante 🔴, skeletons-shared 🔴, appendto-calendars 🟡, schedules-debug-panel 🟡). Drift dominante: rol estudiante > profesor en tokens+skeletons+aria. F3 `profesor/grades` confirmado prioritario (290 ln monolito). Próximo accionable: **F2** (priorizar tasks en briefs ordenados) o **F3** directo (refactor `profesor/grades`). Brújula coord en [`brujula-W21-intranet-polish.md`](../../../educa-coord/plans/brujula-W21-intranet-polish.md). BE corre en paralelo con su propio sub-plan de tests.
+- **Brújula W21 — Pulido intranet académica (2026-05-18 → 2026-05-24)** → sub-plan FE [`intranet-fe-polish-W21.md`](intranet-fe-polish-W21.md). **F1 ✅ closed 2026-05-18 (brief 187)** — matriz `F1.Resultados` poblada con 10 pages auditadas. **F2 ✅ 2026-05-18** — 5 briefs materializados en `chats/open/` ordenados chico→grande: `188` appendTo calendars (trivial, ~15min), `189` tokens colors (~1-2h, mecánico), `190` schedules debug panel (~1h, decisión A/B), `191` aria-labels estudiante (~1h), `192` skeletons shared (~3-4h). F3 (refactor `profesor/grades` 290 ln monolito) sigue ⏳ — invocar `/start-chat` directamente sobre el plan W21 §F3 cuando se decida arrancar. Brújula coord en [`brujula-W21-intranet-polish.md`](../../../educa-coord/plans/brujula-W21-intranet-polish.md). BE corre en paralelo con su propio sub-plan de tests.
 
 ### 🔗 Referencias cross-repo (sub-chats FE de planes cross-repo)
 
