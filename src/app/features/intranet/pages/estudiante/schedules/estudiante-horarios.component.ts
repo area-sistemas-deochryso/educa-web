@@ -3,7 +3,7 @@ import { Component, ChangeDetectionStrategy, inject, OnInit, computed, signal, D
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
 import { TooltipModule } from 'primeng/tooltip';
-import { PageHeaderComponent } from '@shared/components';
+import { PageHeaderComponent, SkeletonLoaderComponent } from '@shared/components';
 import { StudentSchedulesFacade } from './services/estudiante-horarios.facade';
 import { EstudianteFacade } from '../services/estudiante.facade';
 import { HorarioProfesorDto } from '../models';
@@ -163,7 +163,7 @@ function buildCountdownMap(blocks: HorarioBlock[], now: Date): Map<number, Count
 @Component({
 	selector: 'app-student-schedules',
 	standalone: true,
-	imports: [CommonModule, TooltipModule, PageHeaderComponent],
+	imports: [CommonModule, TooltipModule, PageHeaderComponent, SkeletonLoaderComponent],
 	changeDetection: ChangeDetectionStrategy.OnPush,
 	templateUrl: './estudiante-horarios.component.html',
 	styleUrl: './estudiante-horarios.component.scss',
@@ -178,6 +178,7 @@ export class StudentSchedulesComponent implements OnInit {
 	// #endregion
 	// #region Estado
 	readonly vm = this.facade.vm;
+	readonly skeletonColumns = Array(6);
 
 	readonly weeklyBlocks = computed<HorarioBlock[]>(() =>
 		buildBlocks(this.vm().horarios),

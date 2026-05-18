@@ -1,7 +1,12 @@
 <!-- #region Loading -->
 @if (vm().loading) {
-	<div class="flex justify-content-center p-5">
-		<p-progressSpinner strokeWidth="4" />
+	<div class="notas-skeleton" style="min-height: 320px">
+		<app-skeleton-loader variant="rect" width="240px" height="32px" />
+		<div class="notas-skeleton-filters">
+			<app-skeleton-loader variant="rect" width="220px" height="40px" />
+			<app-skeleton-loader variant="rect" width="160px" height="40px" />
+		</div>
+		<app-skeleton-loader variant="card" height="220px" />
 	</div>
 } @else if (vm().error) {
 	<div class="flex flex-column align-items-center p-5 text-color-secondary">

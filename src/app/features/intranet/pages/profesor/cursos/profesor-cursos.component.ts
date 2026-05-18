@@ -6,9 +6,8 @@ import { TableModule } from 'primeng/table';
 import { TagModule } from 'primeng/tag';
 import { ButtonModule } from 'primeng/button';
 import { TooltipModule } from 'primeng/tooltip';
-import { ProgressSpinnerModule } from 'primeng/progressspinner';
 import { filter, take } from 'rxjs';
-import { PageHeaderComponent } from '@shared/components';
+import { PageHeaderComponent, TableSkeletonComponent, type SkeletonColumnDef } from '@shared/components';
 import { ProfesorFacade } from '../services/profesor.facade';
 import { CursoContenidoDataFacade } from './services/curso-contenido-data.facade';
 import { CursoContenidoUiFacade } from './services/curso-contenido-ui.facade';
@@ -25,9 +24,9 @@ import { HorarioProfesorDto, CrearCursoContenidoRequest } from '../models';
 		TagModule,
 		ButtonModule,
 		TooltipModule,
-		ProgressSpinnerModule,
 		RouterLink,
 		PageHeaderComponent,
+		TableSkeletonComponent,
 		CursoContentDialogComponent,
 		CursoBuilderDialogComponent,
 	],
@@ -40,8 +39,8 @@ import { HorarioProfesorDto, CrearCursoContenidoRequest } from '../models';
 	`,
 	template: `
 		@if (vm().loading) {
-			<div class="flex justify-content-center p-5">
-				<p-progressSpinner strokeWidth="4" />
+			<div class="p-4 pt-0">
+				<app-table-skeleton [columns]="tableColumns" [rows]="6" minHeight="320px" />
 			</div>
 		} @else if (vm().horarios.length === 0) {
 			<div class="flex flex-column align-items-center p-5 text-color-secondary">
@@ -122,6 +121,14 @@ export class ProfesorCursosComponent implements OnInit {
 
 	readonly vm = this.facade.vm;
 	readonly contenidoVm = this.contenidoDataFacade.vm;
+
+	readonly tableColumns: SkeletonColumnDef[] = [
+		{ width: 'flex', cellType: 'text-subtitle' },
+		{ width: '110px', cellType: 'badge' },
+		{ width: '100px', cellType: 'text' },
+		{ width: '120px', cellType: 'text' },
+		{ width: '100px', cellType: 'actions' },
+	];
 
 	ngOnInit(): void {
 		this.facade.loadData();

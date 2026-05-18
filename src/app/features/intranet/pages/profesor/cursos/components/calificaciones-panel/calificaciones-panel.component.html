@@ -27,9 +27,11 @@
 
 <!-- #region Content -->
 @if (loading()) {
-	<div class="loading-container">
-		<i class="pi pi-spin pi-spinner"></i>
-		<span>Cargando calificaciones...</span>
+	<div class="calificaciones-skeleton" style="min-height: 320px; display: flex; flex-direction: column; gap: 0.75rem;">
+		<app-skeleton-loader variant="rect" width="100%" height="60px" />
+		<app-skeleton-loader variant="rect" width="100%" height="60px" />
+		<app-skeleton-loader variant="rect" width="100%" height="60px" />
+		<app-skeleton-loader variant="rect" width="100%" height="60px" />
 	</div>
 } @else if (semanaKeys().length === 0) {
 	<div class="empty-state">

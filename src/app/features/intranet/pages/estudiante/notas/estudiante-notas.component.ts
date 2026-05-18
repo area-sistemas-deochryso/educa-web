@@ -5,9 +5,8 @@ import { Select } from 'primeng/select';
 import { SelectButtonModule } from 'primeng/selectbutton';
 import { ButtonModule } from 'primeng/button';
 import { TagModule } from 'primeng/tag';
-import { ProgressSpinnerModule } from 'primeng/progressspinner';
 import { CardModule } from 'primeng/card';
-import { PageHeaderComponent } from '@shared/components';
+import { PageHeaderComponent, SkeletonLoaderComponent } from '@shared/components';
 import { VistaPromedio } from '../models';
 import { EstudianteNotasFacade } from './services/estudiante-notas.facade';
 import { NotasCursoCardComponent } from './components/notas-curso-card/notas-curso-card.component';
@@ -23,9 +22,9 @@ import { SimuladorNotasComponent } from './components/simulador-notas/simulador-
 		SelectButtonModule,
 		ButtonModule,
 		TagModule,
-		ProgressSpinnerModule,
 		CardModule,
 		PageHeaderComponent,
+		SkeletonLoaderComponent,
 		NotasCursoCardComponent,
 		SimuladorNotasComponent,
 	],

@@ -4,14 +4,14 @@ import { DialogModule } from 'primeng/dialog';
 import { ButtonModule } from 'primeng/button';
 import { TooltipModule } from 'primeng/tooltip';
 import { TagModule } from 'primeng/tag';
-import { ProgressSpinnerModule } from 'primeng/progressspinner';
 import { EstudianteTareaArchivosGroupDto, CursoContenidoTareaDto } from '@features/intranet/pages/profesor/models';
 import { FormatFileSizePipe } from '@shared/pipes';
+import { SkeletonLoaderComponent } from '@shared/components';
 
 @Component({
 	selector: 'app-student-task-submissions-dialog',
 	standalone: true,
-	imports: [CommonModule, DialogModule, ButtonModule, TooltipModule, TagModule, ProgressSpinnerModule, FormatFileSizePipe],
+	imports: [CommonModule, DialogModule, ButtonModule, TooltipModule, TagModule, SkeletonLoaderComponent, FormatFileSizePipe],
 	changeDetection: ChangeDetectionStrategy.OnPush,
 	templateUrl: './student-task-submissions-dialog.component.html',
 	styleUrl: './student-task-submissions-dialog.component.scss',

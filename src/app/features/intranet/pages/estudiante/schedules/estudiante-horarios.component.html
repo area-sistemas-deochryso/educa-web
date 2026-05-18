@@ -1,8 +1,17 @@
 <!-- #region Loading / Empty -->
 @if (vm().loading) {
-	<div class="loading-overlay">
-		<i class="pi pi-spin pi-spinner" style="font-size: 2rem"></i>
-		<p>Cargando horario...</p>
+	<div class="horario-skeleton" style="min-height: 420px">
+		<app-skeleton-loader variant="rect" width="220px" height="32px" />
+		<div class="horario-skeleton-grid">
+			@for (col of skeletonColumns; track col) {
+				<div class="horario-skeleton-col">
+					<app-skeleton-loader variant="rect" width="100%" height="24px" />
+					<app-skeleton-loader variant="rect" width="100%" height="80px" />
+					<app-skeleton-loader variant="rect" width="100%" height="60px" />
+					<app-skeleton-loader variant="rect" width="100%" height="100px" />
+				</div>
+			}
+		</div>
 	</div>
 } @else if (vm().isEmpty) {
 	<div class="empty-state">

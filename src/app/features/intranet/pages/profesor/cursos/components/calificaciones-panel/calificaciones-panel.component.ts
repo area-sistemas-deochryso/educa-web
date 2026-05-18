@@ -11,11 +11,12 @@ import {
 } from '@features/intranet/pages/profesor/models';
 import { formatNotaConConfig } from '@intranet-shared/services/calificacion-config';
 import type { ConfiguracionCalificacionListDto } from '@data/models';
+import { SkeletonLoaderComponent } from '@shared/components';
 
 @Component({
 	selector: 'app-calificaciones-panel',
 	standalone: true,
-	imports: [CommonModule, ButtonModule, TooltipModule, TagModule],
+	imports: [CommonModule, ButtonModule, TooltipModule, TagModule, SkeletonLoaderComponent],
 	changeDetection: ChangeDetectionStrategy.OnPush,
 	templateUrl: './calificaciones-panel.component.html',
 	styleUrl: './calificaciones-panel.component.scss',

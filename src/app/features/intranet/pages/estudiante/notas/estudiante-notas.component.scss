@@ -4,6 +4,21 @@
 	margin: 0 auto;
 }
 
+.notas-skeleton {
+	display: flex;
+	flex-direction: column;
+	gap: 1rem;
+	padding: 1.5rem;
+	max-width: 900px;
+	margin: 0 auto;
+}
+
+.notas-skeleton-filters {
+	display: flex;
+	gap: 0.75rem;
+	flex-wrap: wrap;
+}
+
 .notas-filters {
 	display: flex;
 	align-items: center;

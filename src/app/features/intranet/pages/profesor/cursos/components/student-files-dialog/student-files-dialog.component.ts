@@ -4,16 +4,16 @@ import { DialogModule } from 'primeng/dialog';
 import { ButtonModule } from 'primeng/button';
 import { TooltipModule } from 'primeng/tooltip';
 import { TagModule } from 'primeng/tag';
-import { ProgressSpinnerModule } from 'primeng/progressspinner';
 import { SemanaEstudianteArchivosDto, CalificacionConNotasDto } from '@features/intranet/pages/profesor/models';
 import { getNotaSeverity } from '@intranet-shared/services/calificacion-config';
 import type { ConfiguracionCalificacionListDto } from '@data/models';
 import { FormatFileSizePipe } from '@shared/pipes';
+import { SkeletonLoaderComponent } from '@shared/components';
 
 @Component({
 	selector: 'app-student-files-dialog',
 	standalone: true,
-	imports: [CommonModule, DialogModule, ButtonModule, TooltipModule, TagModule, ProgressSpinnerModule, FormatFileSizePipe],
+	imports: [CommonModule, DialogModule, ButtonModule, TooltipModule, TagModule, SkeletonLoaderComponent, FormatFileSizePipe],
 	changeDetection: ChangeDetectionStrategy.OnPush,
 	templateUrl: './student-files-dialog.component.html',
 	styleUrl: './student-files-dialog.component.scss',
