@@ -1,6 +1,6 @@
 import { ChangeDetectionStrategy, Component, input, output } from '@angular/core';
 import { DatePipe } from '@angular/common';
-import { TableModule } from 'primeng/table';
+import { TableLazyLoadEvent, TableModule } from 'primeng/table';
 import { TagModule } from 'primeng/tag';
 import { ButtonModule } from 'primeng/button';
 import { TooltipModule } from 'primeng/tooltip';
@@ -38,8 +38,29 @@ export class EmailOutboxTableComponent {
 	// #region Inputs/Outputs
 	readonly items = input.required<EmailOutboxLista[]>();
 	readonly loading = input(false);
+	// Plan 43 Chat 4.1b — paginación server-side variante B
+	readonly page = input(1);
+	readonly pageSize = input(25);
+	readonly totalRecords = input(0);
 	readonly viewDetail = output<EmailOutboxLista>();
 	readonly retry = output<EmailOutboxLista>();
+	readonly lazyLoad = output<{ page: number; pageSize: number }>();
+	// #endregion
+
+	// #region Computed
+	/** Offset que PrimeNG espera en `[first]` (0-based). */
+	get firstRecord(): number {
+		return (this.page() - 1) * this.pageSize();
+	}
+	// #endregion
+
+	// #region Handlers
+	onLazyLoad(event: TableLazyLoadEvent): void {
+		const first = event.first ?? 0;
+		const rows = event.rows ?? this.pageSize();
+		const nextPage = Math.floor(first / rows) + 1;
+		this.lazyLoad.emit({ page: nextPage, pageSize: rows });
+	}
 	// #endregion
 
 	// #region Skeleton config

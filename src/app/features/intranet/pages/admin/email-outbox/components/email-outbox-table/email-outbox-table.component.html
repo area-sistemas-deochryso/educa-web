@@ -2,11 +2,15 @@
 <p-table
 	[value]="items()"
 	[paginator]="true"
-	[rows]="5"
-	[rowsPerPageOptions]="[5, 10, 15]"
+	[lazy]="true"
+	[rows]="pageSize()"
+	[first]="firstRecord"
+	[totalRecords]="totalRecords()"
+	[rowsPerPageOptions]="[10, 25, 50, 100]"
 	[loading]="loading()"
 	[showCurrentPageReport]="true"
-	currentPageReportTemplate="Mostrando {first} a {last} de {totalRecords}"
+	currentPageReportTemplate="Mostrando {first} a {last} de {totalRecords} registros"
+	(onLazyLoad)="onLazyLoad($event)"
 	styleClass="p-datatable-sm"
 	[scrollable]="true"
 >

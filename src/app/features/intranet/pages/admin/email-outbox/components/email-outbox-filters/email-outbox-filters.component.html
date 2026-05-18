@@ -81,5 +81,34 @@
 			[showClear]="true"
 		/>
 	</div>
+
+	<div class="field">
+		<label class="label-uppercase" for="filter-correlation">Correlation ID</label>
+		<input
+			id="filter-correlation"
+			pInputText
+			type="text"
+			placeholder="ID de correlación"
+			[ngModel]="filterCorrelationId()"
+			(ngModelChange)="onCorrelationIdInput($event)"
+		/>
+	</div>
+
+	<div class="field field--clear">
+		<button
+			pButton
+			type="button"
+			icon="pi pi-filter-slash"
+			class="p-button-text btn-clear"
+			pTooltip="Limpiar filtros"
+			tooltipPosition="top"
+			(click)="onClearFilters()"
+			[pt]="{
+				root: {
+					'aria-label': 'Limpiar filtros',
+				},
+			}"
+		></button>
+	</div>
 </div>
 <!-- #endregion -->

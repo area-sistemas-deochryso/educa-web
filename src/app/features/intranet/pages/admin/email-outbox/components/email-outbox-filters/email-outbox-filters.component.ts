@@ -5,6 +5,8 @@ import { Select } from 'primeng/select';
 import { DatePicker } from 'primeng/datepicker';
 import { IconFieldModule } from 'primeng/iconfield';
 import { InputIconModule } from 'primeng/inputicon';
+import { ButtonModule } from 'primeng/button';
+import { TooltipModule } from 'primeng/tooltip';
 
 import {
 	EMAIL_OUTBOX_ESTADOS,
@@ -32,6 +34,8 @@ interface SelectOption {
 		DatePicker,
 		IconFieldModule,
 		InputIconModule,
+		ButtonModule,
+		TooltipModule,
 	],
 	templateUrl: './email-outbox-filters.component.html',
 	styleUrl: './email-outbox-filters.component.scss',
@@ -42,6 +46,7 @@ export class EmailOutboxFiltersComponent {
 	readonly filterTipo = input<EmailOutboxTipo | null>(null);
 	readonly filterEstado = input<EmailOutboxEstado | null>(null);
 	readonly filterTipoFallo = input<string | null>(null);
+	readonly filterCorrelationId = input<string | null>(null);
 	// #endregion
 
 	// #region Outputs
@@ -49,8 +54,10 @@ export class EmailOutboxFiltersComponent {
 	readonly filterTipoChange = output<string | null>();
 	readonly filterEstadoChange = output<string | null>();
 	readonly filterTipoFalloChange = output<string | null>();
+	readonly filterCorrelationIdChange = output<string | null>();
 	readonly filterDesdeChange = output<string | null>();
 	readonly filterHastaChange = output<string | null>();
+	readonly clearFiltersChange = output<void>();
 	// #endregion
 
 	// #region Opciones
@@ -80,6 +87,15 @@ export class EmailOutboxFiltersComponent {
 
 	onHastaChange(date: Date | null): void {
 		this.filterHastaChange.emit(date ? date.toISOString().split('T')[0] : null);
+	}
+
+	onCorrelationIdInput(value: string): void {
+		const trimmed = value.trim();
+		this.filterCorrelationIdChange.emit(trimmed.length === 0 ? null : trimmed);
+	}
+
+	onClearFilters(): void {
+		this.clearFiltersChange.emit();
 	}
 	// #endregion
 }

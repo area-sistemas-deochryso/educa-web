@@ -26,6 +26,11 @@ export class EmailOutboxStore {
 	private readonly _statsReady = signal(false);
 	private readonly _tableReady = signal(false);
 
+	// Plan 43 Chat 4.1b — paginación server-side (variante B per rules/pagination.md)
+	private readonly _page = signal(1);
+	private readonly _pageSize = signal(25);
+	private readonly _totalCount = signal<number | null>(null);
+
 	// Filtros
 	private readonly _searchTerm = signal('');
 	private readonly _filterTipo = signal<EmailOutboxTipo | null>(null);
@@ -64,6 +69,9 @@ export class EmailOutboxStore {
 	readonly loading = this._loading.asReadonly();
 	readonly statsReady = this._statsReady.asReadonly();
 	readonly tableReady = this._tableReady.asReadonly();
+	readonly page = this._page.asReadonly();
+	readonly pageSize = this._pageSize.asReadonly();
+	readonly totalCount = this._totalCount.asReadonly();
 	readonly searchTerm = this._searchTerm.asReadonly();
 	readonly filterTipo = this._filterTipo.asReadonly();
 	readonly filterEstado = this._filterEstado.asReadonly();
@@ -88,23 +96,24 @@ export class EmailOutboxStore {
 	// #endregion
 
 	// #region Computed
-	readonly filteredItems = computed(() => {
-		const items = this._items();
-		const search = this._searchTerm().toLowerCase();
-		const tipoFallo = this._filterTipoFallo();
-		const correlationId = this._filterCorrelationId();
+	/**
+	 * Plan 43 Chat 4.1b — los filtros ahora van al BE (paginación server-side
+	 * variante B). El store solo expone el array tal cual lo devuelve el server.
+	 */
+	readonly filteredItems = computed(() => this._items());
 
-		return items.filter((i) => {
-			if (tipoFallo && i.tipoFallo !== tipoFallo) return false;
-			// Plan 32 Chat 4 — filter por correlationId aplicado client-side
-			// (BE de email-outbox no expone el filtro hoy).
-			if (correlationId && i.correlationId !== correlationId) return false;
-			if (!search) return true;
-			return (
-				i.destinatario.toLowerCase().includes(search) ||
-				i.asunto.toLowerCase().includes(search)
-			);
-		});
+	/**
+	 * Total real cuando `/count` respondió; cae al estimate progresivo si
+	 * count=null por fallo (per `rules/pagination.md` §"Fail-safe del count").
+	 */
+	readonly totalRecordsEstimate = computed(() => {
+		const total = this._totalCount();
+		if (total !== null) return total;
+		const page = this._page();
+		const pageSize = this._pageSize();
+		const items = this._items();
+		const offset = (page - 1) * pageSize;
+		return items.length < pageSize ? offset + items.length : offset + pageSize + 1;
 	});
 	// #endregion
 
@@ -115,6 +124,10 @@ export class EmailOutboxStore {
 		loading: this._loading(),
 		statsReady: this._statsReady(),
 		tableReady: this._tableReady(),
+		page: this._page(),
+		pageSize: this._pageSize(),
+		totalCount: this._totalCount(),
+		totalRecordsEstimate: this.totalRecordsEstimate(),
 		searchTerm: this._searchTerm(),
 		filterTipo: this._filterTipo(),
 		filterEstado: this._filterEstado(),
@@ -166,6 +179,33 @@ export class EmailOutboxStore {
 
 	setTendenciasReady(ready: boolean): void {
 		this._tendenciasReady.set(ready);
+	}
+
+	// Plan 43 Chat 4.1b — paginación
+	setPage(page: number): void {
+		this._page.set(page);
+	}
+
+	setPageSize(pageSize: number): void {
+		this._pageSize.set(pageSize);
+	}
+
+	setPaginationState(page: number, pageSize: number): void {
+		this._page.set(page);
+		this._pageSize.set(pageSize);
+	}
+
+	setTotalCount(count: number | null): void {
+		this._totalCount.set(count);
+	}
+
+	/**
+	 * Mutación quirúrgica: elimina un item de la lista y decrementa el total
+	 * para mantener coherencia con el paginador (per `rules/pagination.md`).
+	 */
+	removeItem(id: number): void {
+		this._items.update((list) => list.filter((i) => i.id !== id));
+		this._totalCount.update((c) => (c !== null && c > 0 ? c - 1 : c));
 	}
 
 	/** Mutación quirúrgica: marca item como PENDING tras reintento */
@@ -237,6 +277,21 @@ export class EmailOutboxStore {
 
 	setFilterCorrelationId(correlationId: string | null): void {
 		this._filterCorrelationId.set(correlationId);
+	}
+
+	/**
+	 * Plan 43 Chat 4.1b — resetea todos los filtros + page=1. El facade ejecuta
+	 * el refetch tras llamar a este método.
+	 */
+	clearFilters(): void {
+		this._searchTerm.set('');
+		this._filterTipo.set(null);
+		this._filterEstado.set(null);
+		this._filterTipoFallo.set(null);
+		this._filterDesde.set(null);
+		this._filterHasta.set(null);
+		this._filterCorrelationId.set(null);
+		this._page.set(1);
 	}
 	// #endregion
 

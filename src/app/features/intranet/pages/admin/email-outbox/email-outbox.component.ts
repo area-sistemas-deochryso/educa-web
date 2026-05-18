@@ -155,12 +155,24 @@ export class EmailOutboxComponent implements OnInit {
 		this.dataFacade.onFilterTipoFalloChange(tipoFallo);
 	}
 
+	onFilterCorrelationIdChange(correlationId: string | null): void {
+		this.dataFacade.onFilterCorrelationIdChange(correlationId);
+	}
+
 	onFilterDesdeChange(desde: string | null): void {
 		this.dataFacade.onFilterDesdeChange(desde);
 	}
 
 	onFilterHastaChange(hasta: string | null): void {
 		this.dataFacade.onFilterHastaChange(hasta);
+	}
+
+	onClearFilters(): void {
+		this.dataFacade.clearFilters();
+	}
+
+	onLazyLoad(event: { page: number; pageSize: number }): void {
+		this.dataFacade.loadPage(event.page, event.pageSize);
 	}
 
 	onViewDetail(item: EmailOutboxLista): void {

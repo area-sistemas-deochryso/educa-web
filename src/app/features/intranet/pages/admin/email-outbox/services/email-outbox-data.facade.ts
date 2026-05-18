@@ -40,25 +40,30 @@ export class EmailOutboxDataFacade {
 	}
 
 	// #region Carga de datos
+	/**
+	 * Plan 43 Chat 4.1b — paginación server-side variante B. Al aplicar filtros
+	 * o refrescar, dispatch en paralelo: items (página actual) + count (total
+	 * real) + stats + tendencias. El count se omite al cambiar de página
+	 * (`loadPage`) porque los filtros no cambiaron — solo el offset.
+	 */
 	loadData(): void {
 		this.store.setLoading(true);
 
-		const filtros = {
-			tipo: this.store.filterTipo() ?? undefined,
-			estado: this.store.filterEstado() ?? undefined,
-			desde: this.store.filterDesde() ?? undefined,
-			hasta: this.store.filterHasta() ?? undefined,
-		};
+		const filtros = this.currentFiltros();
+		const page = this.store.page();
+		const pageSize = this.store.pageSize();
 
 		forkJoin({
-			items: this.api.listar(filtros),
+			items: this.api.listar({ ...filtros, page, pageSize }),
+			count: this.api.count(filtros),
 			stats: this.api.estadisticas(filtros.desde, filtros.hasta),
 			tendencias: this.api.tendencias(filtros.desde, filtros.hasta),
 		})
 			.pipe(takeUntilDestroyed(this.destroyRef))
 			.subscribe({
-				next: ({ items, stats, tendencias }) => {
+				next: ({ items, count, stats, tendencias }) => {
 					this.store.setItems(items);
+					this.store.setTotalCount(count);
 					this.store.setEstadisticas(stats);
 					this.store.setTendencias(tendencias);
 					this.store.setStatsReady(true);
@@ -75,47 +80,128 @@ export class EmailOutboxDataFacade {
 			});
 	}
 
+	/**
+	 * Refetch solo del listado para una página dada — NO recarga el count
+	 * (los filtros no cambiaron, el total tampoco; ahorra requests).
+	 * Per `rules/pagination.md` §"loadPage no recarga el count".
+	 *
+	 * Guard idempotente: PrimeNG `[lazy]` dispara `onLazyLoad` al montar la
+	 * tabla con el state inicial. Si los parámetros pedidos coinciden con el
+	 * state actual del store y ya cargamos (loading o tableReady), ignoramos
+	 * para evitar el doble fetch que de otro modo ocurriría tras `loadData()`.
+	 */
+	loadPage(page: number, pageSize: number): void {
+		if (
+			this.store.page() === page &&
+			this.store.pageSize() === pageSize &&
+			(this.store.loading() || this.store.tableReady())
+		) {
+			return;
+		}
+
+		this.store.setPaginationState(page, pageSize);
+		this.store.setLoading(true);
+
+		this.api
+			.listar({ ...this.currentFiltros(), page, pageSize })
+			.pipe(takeUntilDestroyed(this.destroyRef))
+			.subscribe({
+				next: (items) => {
+					this.store.setItems(items);
+					this.store.setLoading(false);
+				},
+				error: () => this.store.setLoading(false),
+			});
+	}
+
 	refresh(): void {
+		this.store.setPage(1);
 		this.loadData();
+	}
+
+	private currentFiltros(): {
+		tipo: string | undefined;
+		estado: string | undefined;
+		tipoFallo: string | undefined;
+		correlationId: string | undefined;
+		desde: string | undefined;
+		hasta: string | undefined;
+		search: string | undefined;
+	} {
+		return {
+			tipo: this.store.filterTipo() ?? undefined,
+			estado: this.store.filterEstado() ?? undefined,
+			tipoFallo: this.store.filterTipoFallo() ?? undefined,
+			correlationId: this.store.filterCorrelationId() ?? undefined,
+			desde: this.store.filterDesde() ?? undefined,
+			hasta: this.store.filterHasta() ?? undefined,
+			search: this.store.searchTerm() || undefined,
+		};
 	}
 	// #endregion
 
 	// #region Filtros
 	onSearchChange(term: string): void {
 		this.store.setSearchTerm(term);
+		this.store.setPage(1);
+		this.loadData();
 	}
 
 	onFilterTipoChange(tipo: string | null): void {
 		this.store.setFilterTipo(tipo as ReturnType<typeof this.store.filterTipo>);
+		this.store.setPage(1);
 		this.loadData();
 	}
 
 	onFilterEstadoChange(estado: string | null): void {
 		this.store.setFilterEstado(estado as ReturnType<typeof this.store.filterEstado>);
+		this.store.setPage(1);
 		this.loadData();
 	}
 
+	/**
+	 * Plan 43 Chat 4.1b — bug fix: el handler dejaba el signal seteado pero no
+	 * refetcheaba, así el filtro `tipoFallo` quedaba inerte en la UI.
+	 */
 	onFilterTipoFalloChange(tipoFallo: string | null): void {
 		this.store.setFilterTipoFallo(tipoFallo);
+		this.store.setPage(1);
+		this.loadData();
+	}
+
+	onFilterCorrelationIdChange(correlationId: string | null): void {
+		this.store.setFilterCorrelationId(correlationId);
+		this.store.setPage(1);
+		this.loadData();
 	}
 
 	onFilterDesdeChange(desde: string | null): void {
 		this.store.setFilterDesde(desde);
+		this.store.setPage(1);
 		this.loadData();
 	}
 
 	onFilterHastaChange(hasta: string | null): void {
 		this.store.setFilterHasta(hasta);
+		this.store.setPage(1);
 		this.loadData();
 	}
 
 	/**
-	 * Plan 32 Chat 4 — el hub linkea acá con `?correlationId=<id>`. El page
-	 * setea el filter en init; el filter es client-side (computed `filteredItems`),
-	 * así que no se requiere un nuevo fetch — basta con setear el signal.
+	 * Plan 32 Chat 4 — deep-link desde el hub con `?correlationId=<id>`. Solo
+	 * setea el signal (el caller decide cuándo refetchear; en init, dataFacade
+	 * llama a `loadData()` después de setear el deep-link).
 	 */
 	setFilterCorrelationId(correlationId: string | null): void {
 		this.store.setFilterCorrelationId(correlationId);
+	}
+
+	/**
+	 * Plan 43 Chat 4.1b — resetea todos los filtros + page=1 + refetch.
+	 */
+	clearFilters(): void {
+		this.store.clearFilters();
+		this.loadData();
 	}
 	// #endregion
 

@@ -273,5 +273,5 @@ Sugiere las dos opciones A/B descritas arriba. Al agregar un endpoint paginado n
 ## Referencias del proyecto
 
 - **Server-side variante A (wrapper)**: `usuarios admin`, `horarios admin`, `vistas admin`, `permisos-roles admin`, `email-blacklist admin`, `email-quarantine admin`, `email-defer-events admin`
-- **Server-side variante B (`/count` separado)**: `error-logs admin` (Educa.API master `7e9d10b` + educa-web main `1a13062`)
-- **Client-side**: `cursos`, `salones`, `events-calendar`, `notificaciones-admin`, `email-outbox`, `rate-limit-events`, `feedback-reports`
+- **Server-side variante B (`/count` separado)**: `error-logs admin` (Educa.API master `7e9d10b` + educa-web main `1a13062`), `error-groups admin`, `email-outbox admin` (Plan 43 Chat 4.1a BE + 4.1b FE)
+- **Client-side**: `cursos`, `salones`, `events-calendar`, `notificaciones-admin`, `rate-limit-events`, `feedback-reports`

@@ -20,6 +20,11 @@
 		grid-column: span 2;
 	}
 
+	&--clear {
+		justify-content: flex-end;
+		align-items: flex-end;
+	}
+
 	label {
 		color: var(--text-color-secondary);
 	}
@@ -28,6 +33,15 @@
 	p-select,
 	p-datepicker {
 		width: 100%;
+	}
+}
+
+.btn-clear {
+	opacity: 0.5;
+	transition: opacity 0.15s ease-in;
+
+	&:hover {
+		opacity: 1;
 	}
 }
 // #endregion

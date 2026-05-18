@@ -22,20 +22,64 @@ export class EmailOutboxApiService {
 	listar(filtros?: {
 		tipo?: string;
 		estado?: string;
+		tipoFallo?: string;
+		correlationId?: string;
 		desde?: string;
 		hasta?: string;
 		search?: string;
+		page?: number;
+		pageSize?: number;
 	}): Observable<EmailOutboxLista[]> {
-		let params = new HttpParams();
-		if (filtros?.tipo) params = params.set('tipo', filtros.tipo);
-		if (filtros?.estado) params = params.set('estado', filtros.estado);
-		if (filtros?.desde) params = params.set('desde', filtros.desde);
-		if (filtros?.hasta) params = params.set('hasta', filtros.hasta);
-		if (filtros?.search) params = params.set('search', filtros.search);
+		let params = this.buildFiltrosParams(filtros);
+		if (filtros?.page !== undefined) params = params.set('page', String(filtros.page));
+		if (filtros?.pageSize !== undefined)
+			params = params.set('pageSize', String(filtros.pageSize));
 
 		return this.http
 			.get<EmailOutboxLista[]>(`${this.baseUrl}/listar`, { params })
 			.pipe(catchError(() => of([])));
+	}
+
+	/**
+	 * Plan 43 Chat 4.1b — total real para alimentar [totalRecords] del paginador
+	 * server-side. Mismos filtros que `/listar` salvo page/pageSize. Fail-safe:
+	 * si el endpoint falla, devolvemos null y el componente cae al estimate
+	 * progresivo (per `rules/pagination.md` §"Fail-safe del count").
+	 */
+	count(filtros?: {
+		tipo?: string;
+		estado?: string;
+		tipoFallo?: string;
+		correlationId?: string;
+		desde?: string;
+		hasta?: string;
+		search?: string;
+	}): Observable<number | null> {
+		const params = this.buildFiltrosParams(filtros);
+		return this.http
+			.get<number>(`${this.baseUrl}/count`, { params })
+			.pipe(catchError(() => of(null)));
+	}
+
+	private buildFiltrosParams(filtros?: {
+		tipo?: string;
+		estado?: string;
+		tipoFallo?: string;
+		correlationId?: string;
+		desde?: string;
+		hasta?: string;
+		search?: string;
+	}): HttpParams {
+		let params = new HttpParams();
+		if (filtros?.tipo) params = params.set('tipo', filtros.tipo);
+		if (filtros?.estado) params = params.set('estado', filtros.estado);
+		if (filtros?.tipoFallo) params = params.set('tipoFallo', filtros.tipoFallo);
+		if (filtros?.correlationId)
+			params = params.set('correlationId', filtros.correlationId);
+		if (filtros?.desde) params = params.set('desde', filtros.desde);
+		if (filtros?.hasta) params = params.set('hasta', filtros.hasta);
+		if (filtros?.search) params = params.set('search', filtros.search);
+		return params;
 	}
 
 	estadisticas(desde?: string, hasta?: string): Observable<EmailOutboxEstadisticas> {

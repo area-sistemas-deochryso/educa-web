@@ -1,11 +1,34 @@
 # 184 — Plan 43 Chat 4.1b · FE bandeja paginación server-side + filtros
 
-<!-- minimal-from-go -->
-
 > **Repo**: `educa-web` (FE)
 > **Plan**: [`../../../educa-coord/plans/xrepo-43-monitoreo-cowork-feedback-2026-05-11.md`](../../../../educa-coord/plans/xrepo-43-monitoreo-cowork-feedback-2026-05-11.md) §Chat 4.1
-> **Creado**: 2026-05-16 · **Estado**: ⏳ pendiente arrancar — **bloqueado por BE brief 183** (`educa-coord/chats/open/183-be-plan43-chat41a-bandeja-paginacion-filtros.md`).
+> **Creado**: 2026-05-16 · **Estado**: ✅ FE shipped local 2026-05-18 — awaiting-prod hasta deploy BE 183.
 > **MODO SUGERIDO**: `/execute` → `/validate`
+
+## Resultado (2026-05-18)
+
+- **Service** (`email-outbox.service.ts`): `listar()` extendido con `tipoFallo`, `correlationId`, `page`, `pageSize`. Nuevo método `count(filtros)` con fail-safe `catchError → of(null)`. Builder privado `buildFiltrosParams` reutilizado entre los dos endpoints.
+- **Store** (`email-outbox.store.ts`): signals `_page`, `_pageSize`, `_totalCount` + `totalRecordsEstimate` computed con fallback progresivo (per `rules/pagination.md` §"Fail-safe del count"). `filteredItems` deja de filtrar client-side (todo va al BE). Nuevo `clearFilters()` + `removeItem` decrementa `_totalCount`.
+- **Facade** (`email-outbox-data.facade.ts`): `loadData` dispatcha items+count+stats+tendencias en `forkJoin`; `loadPage(page, pageSize)` solo refetch del listado (no recarga count); `clearFilters` resetea todos + `page=1` + refetch. Bug fix: `onFilterTipoFalloChange` ahora dispara `loadData`. Nuevo `onFilterCorrelationIdChange`. Guard idempotente en `loadPage` para absorber el bounce inicial de PrimeNG `[lazy]`.
+- **UI**: filtro `correlationId` (input text) + btn-clear con design-system §B6 (opacity 0.5→1, `pTooltip` + `[pt]` aria-label). Tabla con `[lazy]`, `[totalRecords]` real, `[rowsPerPageOptions]=[10,25,50,100]`, `currentPageReportTemplate`.
+- **Tests**: +8 nuevos en `email-outbox-data.facade.spec.ts` cubriendo dispatch paralelo, filtros enviados al BE, fail-safe count=null, `loadPage` sin count, guard idempotente, `clearFilters`, bug fix tipoFallo, nuevo correlationId. **14/14 verdes**.
+
+### Validación
+
+- ESLint `email-outbox/`: ✅ clean.
+- `tsc --noEmit`: ✅ exit 0.
+- Vitest spec del facade: ✅ 14/14.
+
+### Aprendizajes transferibles
+
+- Variante B (`/count` separado) deja el shape de `listar` intacto — no fuerza wrapper. Útil cuando el endpoint ya existe con consumers.
+- PrimeNG `[lazy]` dispara `onLazyLoad` al montar la tabla con el state inicial. Si el facade ya ejecutó `loadData()` antes, el bounce duplica fetch. Guard idempotente: ignorar si `page`+`pageSize` coinciden con state actual **y** ya hay loading o tableReady=true.
+- `filteredItems` client-side se eliminó (era `computed(() => items.filter(...))`). Mover los filtros al BE evita inconsistencia entre lo que el BE pagina y lo que el UI mostraba.
+- `removeItem` quirúrgico debe decrementar `_totalCount` para mantener paginator coherente (per `rules/pagination.md`).
+
+### Pendiente fuera de scope FE
+
+- Smoke browser con `estado=FAILED` esperando deploy BE 183 (`Educa.API@listar` + `/count`).
 
 ## Contexto
 

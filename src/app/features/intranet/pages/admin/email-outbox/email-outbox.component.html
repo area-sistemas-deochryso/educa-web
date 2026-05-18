@@ -60,12 +60,15 @@
 	[filterTipo]="vm().filterTipo"
 	[filterEstado]="vm().filterEstado"
 	[filterTipoFallo]="vm().filterTipoFallo"
+	[filterCorrelationId]="vm().filterCorrelationId"
 	(searchChange)="onSearchChange($event)"
 	(filterTipoChange)="onFilterTipoChange($event)"
 	(filterEstadoChange)="onFilterEstadoChange($event)"
 	(filterTipoFalloChange)="onFilterTipoFalloChange($event)"
+	(filterCorrelationIdChange)="onFilterCorrelationIdChange($event)"
 	(filterDesdeChange)="onFilterDesdeChange($event)"
 	(filterHastaChange)="onFilterHastaChange($event)"
+	(clearFiltersChange)="onClearFilters()"
 />
 <!-- #endregion -->
 
@@ -74,8 +77,12 @@
 	<app-email-outbox-table
 		[items]="vm().items"
 		[loading]="vm().loading"
+		[page]="vm().page"
+		[pageSize]="vm().pageSize"
+		[totalRecords]="vm().totalRecordsEstimate"
 		(viewDetail)="onViewDetail($event)"
 		(retry)="onRetry($event)"
+		(lazyLoad)="onLazyLoad($event)"
 	/>
 } @else {
 	<app-table-skeleton [columns]="tableSkeletonColumns" [rows]="10" />
