@@ -1,5 +1,5 @@
 // #region Imports
-import { ChangeDetectionStrategy, Component, DestroyRef, OnInit, inject, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, DestroyRef, OnInit, computed, inject, signal } from '@angular/core';
 import { CommonModule, DatePipe } from '@angular/common';
 import { ActivatedRoute, Router } from '@angular/router';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
@@ -11,6 +11,7 @@ import { logger } from '@core/helpers';
 import { StorageService, type CorrelationViewMode } from '@core/services';
 
 import { PageHeaderComponent } from '@intranet-shared/components';
+import { CorrelationIdPillComponent } from '@shared/components';
 
 import { CorrelationExportService, CorrelationFacade } from './services';
 import { CorrelationErrorsSectionComponent } from './components/correlation-errors-section';
@@ -47,6 +48,7 @@ import { CorrelationTimelineSectionComponent } from './components/correlation-ti
 		CorrelationRateLimitSectionComponent,
 		CorrelationReportsSectionComponent,
 		CorrelationEmailsSectionComponent,
+		CorrelationIdPillComponent,
 	],
 	templateUrl: './correlation.component.html',
 	styleUrl: './correlation.component.scss',
@@ -65,6 +67,12 @@ export class CorrelationComponent implements OnInit {
 	// #region Estado
 	readonly vm = this.facade.vm;
 	readonly viewMode = signal<CorrelationViewMode>(this.storage.getCorrelationViewMode());
+
+	// Plan 41 Chat 3b — sección "Otros correlation IDs de este usuario (últimas 2h)".
+	readonly relatedIds = computed<readonly string[]>(
+		() => this.vm().snapshot?.relatedCorrelationIds ?? [],
+	);
+	readonly hasRelatedIds = computed(() => this.relatedIds().length > 0);
 	// #endregion
 
 	// #region Lifecycle

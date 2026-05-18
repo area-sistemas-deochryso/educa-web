@@ -77,7 +77,7 @@
 
 ### 🟢 Pullable FE-only
 
-1. **[Plan 41 · Chat 3b · FE]** — `chats/open/185-fe-plan41-chat3b-related-correlation-ids.md` — Sección "Otros correlation IDs (últimas 2h)" en hub con chips `<app-correlation-id-pill>` consumiendo `relatedCorrelationIds`. Pill component ya existe (Plan 32 Chat 4). Cierra brecha #5 (parcial). Sin dependencia.
+- _Vacío — siguiente FE-only espera deploy o nuevo trabajo._
 
 ### 🔗 Referencias cross-repo (sub-chats FE de planes cross-repo)
 
@@ -99,7 +99,7 @@
 
 Briefs en `awaiting-prod/` esperando deploy + smoke. NO requieren chat de ejecución — solo `/verify` cuando el deploy se haga:
 
-- **FE puros**: Plan 1 F5 (`137`), Plan 28 Chat 4 (`134`), Plan 41 Chat 3a (`186`), Plan 41 F5 Chat 10 (`180`), Plan 43 Chat 1.2 FE sparkline (`152`), Plan 43 Chat 2.1 FE (`147`), Plan 43 Chat 3.1b FE drawer SMTP (`169`), WAL hard/soft delete audit (`118, 119`).
+- **FE puros**: Plan 1 F5 (`137`), Plan 28 Chat 4 (`134`), Plan 41 Chat 3a (`186`), Plan 41 Chat 3b (`185`), Plan 41 F5 Chat 10 (`180`), Plan 43 Chat 1.2 FE sparkline (`152`), Plan 43 Chat 2.1 FE (`147`), Plan 43 Chat 3.1b FE drawer SMTP (`169`), WAL hard/soft delete audit (`118, 119`).
 - **BE residentes en repo FE** (no migrados retroactivamente, [ADR-0002](../../../educa-coord/decisions/0002-maestros-y-planes.md) §Out-of-scope): Plan 40 F1-F5+F3b+F6a (`106, 108, 110, 111, 112`), Plan 26 F3 (`136`), Plan 43 Chat 2.1 BE (`142`).
 
 ### Notas operativas

@@ -138,4 +138,17 @@
 			/>
 		</div>
 	}
+
+	@if (hasRelatedIds()) {
+		<section class="related-correlation-ids" aria-labelledby="related-ids-title">
+			<h3 id="related-ids-title" class="related-correlation-ids__title">
+				Otros correlation IDs de este usuario (últimas 2h)
+			</h3>
+			<div class="related-correlation-ids__list">
+				@for (id of relatedIds(); track id) {
+					<app-correlation-id-pill [id]="id" [compact]="true" />
+				}
+			</div>
+		</section>
+	}
 }

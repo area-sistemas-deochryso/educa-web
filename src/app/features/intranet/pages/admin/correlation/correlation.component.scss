@@ -21,6 +21,29 @@
 	margin: 0 0.25rem;
 }
 
+.related-correlation-ids {
+	margin-top: 1.5rem;
+	padding: 1rem 1.25rem;
+	border: 1px solid var(--surface-300);
+	border-radius: 10px;
+	background: transparent;
+
+	&__title {
+		margin: 0 0 0.75rem;
+		font-size: 0.8rem;
+		font-weight: 600;
+		text-transform: uppercase;
+		letter-spacing: 0.5px;
+		color: var(--text-color-secondary);
+	}
+
+	&__list {
+		display: flex;
+		flex-wrap: wrap;
+		gap: 0.5rem;
+	}
+}
+
 .cap-banner {
 	display: flex;
 	align-items: flex-start;

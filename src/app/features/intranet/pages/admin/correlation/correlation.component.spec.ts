@@ -44,16 +44,18 @@ describe('CorrelationComponent', () => {
 	let paramMap$: BehaviorSubject<FakeParamMap>;
 	let getCorrelationViewMode: ReturnType<typeof vi.fn>;
 	let setCorrelationViewMode: ReturnType<typeof vi.fn>;
+	let currentSnapshot: CorrelationSnapshot | null;
 
 	beforeEach(async () => {
 		loadSnapshot = vi.fn();
 		paramMap$ = new BehaviorSubject(new FakeParamMap({ id: 'abc-1' }));
 		getCorrelationViewMode = vi.fn().mockReturnValue('timeline');
 		setCorrelationViewMode = vi.fn();
+		currentSnapshot = createSnapshot();
 
 		const facadeMock = {
 			vm: () => ({
-				snapshot: createSnapshot(),
+				snapshot: currentSnapshot,
 				loading: false,
 				error: null,
 				correlationId: 'abc-1',
@@ -146,5 +148,37 @@ describe('CorrelationComponent', () => {
 
 		component.onToggleView('timeline'); // already timeline by default
 		expect(setCorrelationViewMode).not.toHaveBeenCalled();
+	});
+
+	describe('Plan 41 Chat 3b — related correlation ids', () => {
+		it('does not render the section when relatedCorrelationIds is undefined', () => {
+			currentSnapshot = createSnapshot();
+			fixture.detectChanges();
+
+			const html = fixture.nativeElement.innerHTML as string;
+			expect(component.hasRelatedIds()).toBe(false);
+			expect(html).not.toContain('related-correlation-ids');
+		});
+
+		it('does not render the section when relatedCorrelationIds is empty', () => {
+			currentSnapshot = createSnapshot({ relatedCorrelationIds: [] });
+			fixture.detectChanges();
+
+			const html = fixture.nativeElement.innerHTML as string;
+			expect(component.hasRelatedIds()).toBe(false);
+			expect(html).not.toContain('related-correlation-ids');
+		});
+
+		it('renders N pills (compact) when relatedCorrelationIds has N ids', () => {
+			currentSnapshot = createSnapshot({
+				relatedCorrelationIds: ['a1b2c3d4-1', 'a1b2c3d4-2', 'a1b2c3d4-3'],
+			});
+			fixture.detectChanges();
+
+			expect(component.hasRelatedIds()).toBe(true);
+			expect(component.relatedIds()).toHaveLength(3);
+			const pills = fixture.nativeElement.querySelectorAll('app-correlation-id-pill');
+			expect(pills.length).toBe(3);
+		});
 	});
 });

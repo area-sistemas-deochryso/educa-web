@@ -1,6 +1,6 @@
 # Brief 185 — Plan 41 Chat 3b · Sección "Otros correlation IDs" en hub
 
-> **Creado**: 2026-05-18 · **Estado**: ⏳ pendiente arrancar.
+> **Creado**: 2026-05-18 · **Cerrado local**: 2026-05-18 · **Estado**: ⏳ awaiting-prod — pendiente smoke browser tras deploy.
 > **Plan padre**: [`educa-coord/plans/xrepo-41-correlation-hub-observability.md`](../../../../educa-coord/plans/xrepo-41-correlation-hub-observability.md) — F2 Chat 3 (sub-pieza b)
 > **MODO SUGERIDO**: `/execute` → `/validate`
 > **Esfuerzo estimado**: bajo (~30 min — un solo componente, lógica chica)
