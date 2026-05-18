@@ -77,7 +77,7 @@
 
 ### 🟢 Pullable FE-only
 
-- _Vacío — siguiente FE-only espera deploy o nuevo trabajo._
+- **Brújula W21 — Pulido intranet académica (2026-05-18 → 2026-05-24)** → sub-plan FE [`intranet-fe-polish-W21.md`](intranet-fe-polish-W21.md). **F1 ✅ closed 2026-05-18 (brief 187)** — matriz `F1.Resultados` poblada con 10 pages auditadas (5 🟢 + 5 🟡, 0 🔴). 5 tasks `polish-W21-*` creadas en `.claude/tasks/` (tokens-colors 🔴, aria-labels-estudiante 🔴, skeletons-shared 🔴, appendto-calendars 🟡, schedules-debug-panel 🟡). Drift dominante: rol estudiante > profesor en tokens+skeletons+aria. F3 `profesor/grades` confirmado prioritario (290 ln monolito). Próximo accionable: **F2** (priorizar tasks en briefs ordenados) o **F3** directo (refactor `profesor/grades`). Brújula coord en [`brujula-W21-intranet-polish.md`](../../../educa-coord/plans/brujula-W21-intranet-polish.md). BE corre en paralelo con su propio sub-plan de tests.
 
 ### 🔗 Referencias cross-repo (sub-chats FE de planes cross-repo)
 
