@@ -23,18 +23,11 @@ Si dudás entre ambos bloques: dudar significa que es on-demand. Una regla siemp
 
 @.claude/commands/dev.md
 
-### Reglas de código universales
-
-@.claude/rules/reading-optimization.md
-
 ### Metodología operativa
 
 @.claude/rules/chat-modes.md
-@.claude/rules/chat-shortcuts.md
 
-### Comunicación con el usuario
-
-@.claude/rules/communication.md
+> `chat-shortcuts.md` y `reading-optimization.md` fueron promovidos a `claude-config` y ahora son always-on globales (xrepo-47 Fase 1, ADR-0001). `communication.md` también se promovió pero quedó on-demand en el índice global. Las tres se cargan/consultan desde `~/.claude/rules/`.
 
 ---
 
@@ -110,6 +103,6 @@ Cada línea: `- ruta/archivo.md — <trigger>`. Leé el archivo cuando el trigge
 
 | Carpeta                              | Rol                                                                                                                                                                          |
 | ------------------------------------ | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| [claude-cowork/](claude-cowork/)     | Namespace de Cowork (QA asistido en navegador). Setup, reportes y hallazgos. No es Claude Code — vive separado para no mezclarse con commands/hooks/settings.                |
+| [claude-cowork/](claude-cowork/)     | **Pointer** al namespace canónico de Cowork. El contenido vive en `educa-coord/.claude/claude-cowork/` (Cowork valida cross-repo front + back, vive en el repo de coordinación). Acá queda solo el README que indica adónde ir.                |
 
-Convención de namespacing: el resto de `.claude/` (raíz + carpetas de la tabla, salvo `claude-cowork/`) es infra de Claude Code y queda en su ruta convencional porque commands, hooks, settings y CLAUDE.md se autodescubren desde rutas fijas. Cualquier herramienta IA adicional entra como subcarpeta hermana de `claude-cowork/`.
+Convención de namespacing: el resto de `.claude/` (raíz + carpetas de la tabla) es infra de Claude Code y queda en su ruta convencional porque commands, hooks, settings y CLAUDE.md se autodescubren desde rutas fijas. Herramientas IA adicionales cross-repo entran como subcarpeta hermana en `educa-coord/.claude/`.

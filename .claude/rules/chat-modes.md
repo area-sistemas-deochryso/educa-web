@@ -1,6 +1,6 @@
-# chat-modes (override de educa-web)
+# chat-modes — educa-web override
 
-> Política universal: ver `~/.claude/rules/chat-modes.md`.
+> Override of @rules/chat-modes.md global
 
 ## Específico de educa-web
 
