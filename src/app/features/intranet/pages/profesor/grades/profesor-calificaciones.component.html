@@ -36,7 +36,7 @@
 			</div>
 			<!-- #endregion -->
 		} @else if (contenido()) {
-			<!-- #region Panel + dialogs (requieren contenido() no-null) -->
+			<!-- #region Panel — requiere contenido() no-null -->
 			<app-calificaciones-panel
 				[calificacionesPorSemana]="calVm().calificacionesPorSemana"
 				[periodos]="calVm().periodos"
@@ -50,40 +50,42 @@
 				(cambiarTipo)="onCambiarTipo($event)"
 				(configurarPeriodos)="calFacade.openPeriodosDialog()"
 			/>
-
-			<app-evaluacion-form-dialog
-				[visible]="calVm().calificacionDialogVisible"
-				[saving]="calVm().saving"
-				[editing]="calVm().editingCalificacion"
-				[semanas]="contenido()!.semanas"
-				[contenidoId]="contenido()!.id"
-				(visibleChange)="onEvalDialogVisibleChange($event)"
-				(save)="onCrearCalificacion($event)"
-			/>
-
-			<app-calificar-dialog
-				[visible]="calVm().calificarDialogVisible"
-				[saving]="calVm().saving"
-				[calificacion]="calVm().selectedCalificacion"
-				[estudiantes]="estudiantesForCalificar()"
-				[grupos]="calVm().gruposForCalificar"
-				(visibleChange)="onCalificarDialogVisibleChange($event)"
-				(save)="onCalificarLote($event)"
-				(saveGrupos)="onCalificarGruposLote($event)"
-			/>
-
-			<app-periodos-config-dialog
-				[visible]="calVm().periodosDialogVisible"
-				[saving]="calVm().saving"
-				[periodos]="calVm().periodos"
-				[contenidoId]="contenido()!.id"
-				[totalSemanas]="contenido()!.numeroSemanas"
-				(visibleChange)="onPeriodosDialogVisibleChange($event)"
-				(crearPeriodo)="calFacade.crearPeriodo($event)"
-				(eliminarPeriodo)="calFacade.eliminarPeriodo($event)"
-			/>
 			<!-- #endregion -->
 		}
+
+		<!-- #region Dialogs — siempre en el DOM (dialogs-sync.md) -->
+		<app-evaluacion-form-dialog
+			[visible]="calVm().calificacionDialogVisible"
+			[saving]="calVm().saving"
+			[editing]="calVm().editingCalificacion"
+			[semanas]="contenido()?.semanas ?? []"
+			[contenidoId]="contenido()?.id ?? null"
+			(visibleChange)="onEvalDialogVisibleChange($event)"
+			(save)="onCrearCalificacion($event)"
+		/>
+
+		<app-calificar-dialog
+			[visible]="calVm().calificarDialogVisible"
+			[saving]="calVm().saving"
+			[calificacion]="calVm().selectedCalificacion"
+			[estudiantes]="estudiantesForCalificar()"
+			[grupos]="calVm().gruposForCalificar"
+			(visibleChange)="onCalificarDialogVisibleChange($event)"
+			(save)="onCalificarLote($event)"
+			(saveGrupos)="onCalificarGruposLote($event)"
+		/>
+
+		<app-periodos-config-dialog
+			[visible]="calVm().periodosDialogVisible"
+			[saving]="calVm().saving"
+			[periodos]="calVm().periodos"
+			[contenidoId]="contenido()?.id ?? null"
+			[totalSemanas]="contenido()?.numeroSemanas ?? 16"
+			(visibleChange)="onPeriodosDialogVisibleChange($event)"
+			(crearPeriodo)="calFacade.crearPeriodo($event)"
+			(eliminarPeriodo)="calFacade.eliminarPeriodo($event)"
+		/>
+		<!-- #endregion -->
 	}
 
 	<!-- #region ConfirmDialog — siempre en el DOM (dialogs-sync.md) -->
