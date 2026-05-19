@@ -45,7 +45,7 @@
 			icon="pi pi-download"
 			label="Exportar JSON"
 			class="p-button-outlined p-button-sm"
-			[disabled]="vm().loading || !vm().snapshot"
+			[disabled]="vm().loading || isSnapshotEmpty()"
 			(click)="onExport()"
 			pTooltip="Descargar snapshot como JSON"
 			[pt]="{ root: { 'aria-label': 'Exportar snapshot como JSON' } }"

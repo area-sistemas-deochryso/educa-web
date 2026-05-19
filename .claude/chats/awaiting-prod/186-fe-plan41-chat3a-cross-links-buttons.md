@@ -18,7 +18,7 @@ Cada fila de las 3 sub-secciones (errors / emails / reports) debe tener un botó
 
 | Sección | Botón | Ruta destino | Disabled cuando |
 | --- | --- | --- | --- |
-| `correlation-errors-section` | "Ver grupo de errores" (icon `pi pi-sitemap`) | `/intranet/admin/error-groups?fingerprint=<errorGroupCode>` | `errorGroupCode` nullish |
+| `correlation-errors-section` | "Ver grupo de errores" (icon `pi pi-sitemap`) | `/intranet/admin/monitoreo/incidencias/errores?fingerprint=<errorGroupCode>` | `errorGroupCode` nullish |
 | `correlation-emails-section` | "Ver bandeja del destinatario" (icon `pi pi-inbox`) | `/intranet/admin/email-outbox?destinatario=<destinatarioMasked>` | nunca (siempre hay destinatario) |
 | `correlation-reports-section` | "Ver reporte" (icon `pi pi-external-link`) | `/intranet/admin/feedback-reports/<id>` | nunca (id always present) |
 
@@ -88,7 +88,7 @@ npm run build
 
 - **NO** tocar `correlation.component` ni la sección "Otros correlation IDs" — eso es brief 185 (Chat 3b).
 - **NO** modificar el DTO ni el endpoint BE — los campos ya están.
-- **NO** crear vistas filtradas nuevas — las páginas destino (`/intranet/admin/error-groups`, `/email-outbox`, `/feedback-reports/:id`) ya existen y aceptan los query params. Si una no aceptara, documentar y reportar en lugar de implementar el filtro en la página destino (fuera de scope).
+- **NO** crear vistas filtradas nuevas — las páginas destino (`/intranet/admin/monitoreo/incidencias/errores`, `/email-outbox`, `/feedback-reports/:id`) ya existen y aceptan los query params. Si una no aceptara, documentar y reportar en lugar de implementar el filtro en la página destino (fuera de scope).
 
 ## Dependencias
 

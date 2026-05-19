@@ -79,6 +79,21 @@ export class CorrelationComponent implements OnInit {
 		() => this.vm().snapshot?.relatedCorrelationIds ?? [],
 	);
 	readonly hasRelatedIds = computed(() => this.relatedIds().length > 0);
+
+	// F-018 — gate del botón Exportar JSON: además de loading/sin snapshot,
+	// deshabilitar cuando el snapshot existe pero todas las secciones están vacías
+	// (típico de correlation IDs inexistentes).
+	readonly isSnapshotEmpty = computed(() => {
+		const s = this.vm().snapshot;
+		if (!s) return true;
+		return (
+			(s.errorLogs?.length ?? 0) +
+				(s.rateLimitEvents?.length ?? 0) +
+				(s.reportesUsuario?.length ?? 0) +
+				(s.emailOutbox?.length ?? 0) ===
+			0
+		);
+	});
 	// #endregion
 
 	// #region Lifecycle
