@@ -1,5 +1,6 @@
 # 195 — Plan 41 Chat 11 · FE auto-refresh opt-in del hub Correlación
 
+> **Validación prod**: ✅ verificada 2026-05-19 — Toggle default `aria-pressed="false"` + `aria-label="Activar auto-refresh cada 30 segundos"`. Click alterna estado y class (`p-button-text` ↔ `p-button-outlined`). Cowork BD-PROD-RO.
 > **Creado**: 2026-05-19 · **Cerrado local**: 2026-05-19 · **Estado**: ✅ awaiting-prod (smoke browser pendiente).
 > **Plan**: [`../../../educa-coord/plans/xrepo-41-correlation-hub-observability.md`](../../../../educa-coord/plans/xrepo-41-correlation-hub-observability.md) §F5 Chat 11.
 > **Modo ejecutado**: `/execute` → `/validate`.

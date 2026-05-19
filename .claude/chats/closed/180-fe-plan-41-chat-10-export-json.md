@@ -1,5 +1,6 @@
 # Brief 180 — Plan 41 Chat 10 · F5 Export JSON
 
+> **Validación prod**: ✅ verificada 2026-05-19 — Blob 855B, shape `{correlationId, generatedAt, hubUrl, snapshot}` con sub-objetos por sección. Cowork BD-PROD-RO.
 > **Creado**: 2026-05-16 · **Cerrado**: 2026-05-16 (awaiting-prod) · **Modo**: `/execute` → `/validate`
 > **Repo**: educa-web (FE puro, sin BE)
 > **Plan**: [`../../../../../educa-coord/plans/xrepo-41-correlation-hub-observability.md`](../../../../educa-coord/plans/xrepo-41-correlation-hub-observability.md) F5 Chat 10

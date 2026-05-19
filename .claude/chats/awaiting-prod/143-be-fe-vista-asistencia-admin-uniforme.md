@@ -1,5 +1,6 @@
 # 143 · BE+FE — Vista de asistencia uniforme para los 4 roles administrativos
 
+> **Validación prod**: ⚠️ regresión 2026-05-19 (Cowork local BD prueba) — 3/4 roles OK uniformes en `/intranet` widget + `/intranet/asistencia` panel admin (Director, Promotor MEDINA, Coord.Académico TREJO). **AA YARUPAITA rompe**: en `/intranet/asistencia` ve panel admin completo (tabs Estudiantes/Profesores/AA + filtro INV-C11 + dropdowns grado/sección) cuando el brief 134 parte 4a definió que AA debe ver self-service. Ver hallazgo F-022 en `chats/open/`.
 > **Creado**: 2026-05-12 · **Estado**: 🚢 awaiting-prod (commit `329500f` pusheado a `origin/main` 2026-05-12, Netlify deployando; pendiente smoke del usuario logueado como AA — confirmar widget en `/intranet` + panel director en `/intranet/asistencia`) · **Repo**: solo `educa-web` (BE sin cambios)
 > **Modo sugerido**: `/execute`. Diseño y alcance ya acordados con el usuario.
 > **Origen**: Orden de jefatura (2026-05-12). El usuario reporta que los 4 roles administrativos (Director, Asistente Administrativo, Promotor, Coordinador Académico) deben ver y consumir lo mismo en `/intranet` (home) y `/intranet/asistencia`. La división actual entre "Director/Promotor/Coordinador" y "Asistente Administrativo" introducida por Plan 28 Chat 4a queda revertida por decisión de negocio.

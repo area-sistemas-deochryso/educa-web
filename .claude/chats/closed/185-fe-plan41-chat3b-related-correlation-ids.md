@@ -1,5 +1,6 @@
 # Brief 185 — Plan 41 Chat 3b · Sección "Otros correlation IDs" en hub
 
+> **Validación prod**: ✅ verificada 2026-05-19 — Key `relatedCorrelationIds` viaja en `/api/sistema/correlation/{id}`. En IDs probados llegó vacía → sección oculta como espera el brief. Caso "visible con chips" no validable sin tráfico orgánico. Cowork BD-PROD-RO.
 > **Creado**: 2026-05-18 · **Cerrado local**: 2026-05-18 · **Estado**: ⏳ awaiting-prod — pendiente smoke browser tras deploy.
 > **Plan padre**: [`educa-coord/plans/xrepo-41-correlation-hub-observability.md`](../../../../educa-coord/plans/xrepo-41-correlation-hub-observability.md) — F2 Chat 3 (sub-pieza b)
 > **MODO SUGERIDO**: `/execute` → `/validate`

@@ -1,5 +1,6 @@
 # Plan 43 · Chat 3.1b — `/execute` FE: SMTP response en drawers monitoreo
 
+> **Validación prod**: ⚠️ parcial 2026-05-19 (Cowork BD-PROD-RO) — Blacklist drawer OK (secciones "SMTP response" arriba + "Causa interna" abajo). Quarantine vacío en prod (0 registros) → tabla "Histórico de hits" no validable. Badge "(reconstruido)" no validable (ningún item con `source === 'reconstructed'`). Pendientes esperan tráfico real.
 > **Repo destino**: `educa-web` (main) — chat exclusivamente FE.
 > **Plan**: 43 · **Chat**: 3.1b · **Fase**: F3 · **Creado**: 2026-05-15 · **Estado**: ⏳ pendiente arrancar.
 > **Modo sugerido**: `/execute` → `/validate`.

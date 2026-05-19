@@ -1,3 +1,4 @@
+> **Validación prod**: ✅ verificada 2026-05-19 — 20 SVGs con `aria-label="Tendencia 30 días de ..."` en vista Tabla y Kanban. Placeholder sin actividad no validable (todos los grupos con data). Cowork BD-PROD-RO.
 > **Repo destino**: `educa-web` (frontend, branch `main`). Abrir el chat nuevo en este repo.
 > **Plan**: 43 · **Chat**: 1.2 (ejecución FE) · **Fase**: F1 · **Creado**: 2026-05-13 · **Estado**: ⏳ pendiente arrancar (BLOQUEADO por brief 149).
 > **Modo sugerido**: `/execute` → `/validate`. Diseño cerrado en chat 148 + ADR-0007.

@@ -1,3 +1,4 @@
+> **Validación prod**: ✅ verificada 2026-05-19 — 7 stat-cards renderizadas (Total=273, Directores=2, Asist.Adm=3, Promotores=1, Coord.Académicos=1, Profesores=21, Estudiantes=245). `/api/sistema/usuarios/estadisticas` devuelve `totalPromotores` y `totalCoordinadoresAcademicos`. Cowork BD-PROD-RO.
 > **Repo destino**: `educa-web` (frontend, branch `main`).
 > **Origen**: handoff cross-repo del task BE `educa.API/.claude/tasks/sp-estadisticas-usuarios-promotor-mismatch.md` (cerrado en commit `d850026`, retro-validado 2026-05-13).
 > **Creado**: 2026-05-13 · **Estado**: ⏳ pendiente arrancar.

@@ -1,5 +1,6 @@
 # 184 — Plan 43 Chat 4.1b · FE bandeja paginación server-side + filtros
 
+> **Validación prod**: ✅ verificada 2026-05-19 — UI muestra "Mostrando 1-25 de 6101", page 2 → "26-50". Total real desde `/api/sistema/email-outbox/count`. Filtros viajan como query params. Cowork BD-PROD-RO.
 > **Repo**: `educa-web` (FE)
 > **Plan**: [`../../../educa-coord/plans/xrepo-43-monitoreo-cowork-feedback-2026-05-11.md`](../../../../educa-coord/plans/xrepo-43-monitoreo-cowork-feedback-2026-05-11.md) §Chat 4.1
 > **Creado**: 2026-05-16 · **Estado**: ✅ FE shipped local 2026-05-18 — awaiting-prod hasta deploy BE 183.

@@ -1,5 +1,6 @@
 # 147 · FE — Plan 43 Chat 2.1 (FE remaining): badge transiente + textarea blacklist + link auditoría
 
+> **Validación prod**: ❌ G.3 falla 2026-05-19 (Cowork BD-PROD-RO). Deep-link `/intranet/admin/usuarios?dni=X&autoOpen=true` no consume query params: tabla aterriza sin filtrar, drawer no abre. Ver hallazgo F-021 en `chats/open/`. G.1 (badge transiente) no validable sin tráfico orgánico (todos los PROCESSING legacy con `EO_UltimoErrorTransiente IS NULL`; además `NullValueHandling=Ignore` global oculta la key cuando es null — ver §5.3 del reporte Cowork). G.2 (textarea blacklist) pendiente próxima sesión Cowork local con BD prueba.
 > **Creado**: 2026-05-12 · **Estado**: ⏳ pendiente arrancar · **Repo**: `educa-web`
 > **Modo sugerido**: `/execute` (3 puntos scoped + tests)
 > **Plan base**: [plan/monitoreo-cowork-feedback-2026-05-11.md §Chat 2.1](../../plan/monitoreo-cowork-feedback-2026-05-11.md)

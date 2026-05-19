@@ -1,5 +1,6 @@
 # Brief 197 — Plan 45 F2.1 · Tabs en `error-occurrence-drawer` (UI rework parte 1/2)
 
+> **Validación prod**: ✅ verificada 2026-05-19 — 5 tabs confirmadas (General, Trace, Breadcrumbs, Group, Req/Res). Fix "Anónimo" (`360aa28`) no validable (ocurrencia probada con Director, no nulo). Cowork BD-PROD-RO.
 > **Creado**: 2026-05-19 · **Cerrado local**: 2026-05-19 (awaiting-prod) · **Modo**: /investigate → /design (micro) → /execute → /validate
 > **Repo destino**: `educa-web` (frontend, branch `main`).
 > **Plan padre**: [`educa-coord/plans/xrepo-45-monitoreo-incidencias-rework.md`](../../../../educa-coord/plans/xrepo-45-monitoreo-incidencias-rework.md) §F2 — UI rework `/incidencias/errores`. Diseño F2-F6 ✅ en [brief 196](../../../../educa-coord/chats/closed/196-plan45-design-f2-f6.md).
