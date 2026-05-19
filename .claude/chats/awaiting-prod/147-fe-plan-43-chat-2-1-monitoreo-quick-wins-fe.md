@@ -90,3 +90,57 @@ Total: 5-6 specs nuevos.
 
 - Si el dialog `usuarios.component` no soporta `autoFocus` en un campo específico, requiere agregar `ViewChild` + `nativeElement.focus()` post-open. Si bloquea, dejar TODO y abrir hallazgo en `claude-cowork/`.
 - Si `autoOpen` se invoca con un DNI fuera del viewport actual de la tabla paginada, requiere pre-filtrar — coordinar con el patrón de paginación existente.
+
+## Notas para `/verify` post-deploy (Cowork 2026-05-19)
+
+> Diagnóstico de la sesión Cowork 2026-05-19: el handoff inicial reportó "`hasTransientField: false` en el JSON del endpoint" tanto en local como en BD prod. Investigación posterior confirmó:
+>
+> - ✅ Columna `EmailOutbox.EO_UltimoErrorTransiente` existe en ambas BD (`NVARCHAR(200)`, nullable, idéntica al script `plan43_chat21_A3_*.sql`).
+> - ✅ Datos: 66 PROCESSING en local con `EO_UltimoErrorTransiente = NULL` (esperado — son legacy o nunca fallaron con error transitorio). FAILED tienen `EO_UltimoError` con auth errors `535: Incorrect authentication data`, no entran al campo transiente.
+> - ✅ Código BE completo en `master` commit `6960f24` (Plan 43 Chat 2.1 BE): entity, DTO `EmailOutboxListaDto.UltimoErrorTransiente`, `EmailOutboxService.ListarAsync` proyecta el campo, `EmailOutboxWorker` lo popula en línea 270 cuando hay defer transitorio sin promover a FAILED.
+> - ✅ `Program.cs` no tiene `DefaultIgnoreCondition`/`IgnoreNullValues` global — descartada la causa "JSON omite null keys".
+>
+> **Veredicto**: la ausencia de la key se explica únicamente porque el binary BE deployado (tanto en prod como el local que Cowork verificó) es **anterior al commit `6960f24`**. No hay bug — falta deploy.
+
+**Plan de verificación al ejecutar `/verify 147`** (después del deploy del binary BE):
+
+1. **Shape del JSON (verificación inmediata, no requiere defers reales)**
+
+   ```bash
+   # Desde DevTools en /intranet/admin/monitoreo/correos/bandeja:
+   # GET /api/sistema/email-outbox/listar?estado=PROCESSING&pageSize=5
+   # Confirmar que cada item del array `data` incluye la key:
+   #   "ultimoErrorTransiente": null
+   # (la KEY debe estar — el VALOR puede ser null hasta que ocurra defer real)
+   ```
+
+2. **Tipo FE alineado**
+
+   ```bash
+   grep -n "ultimoErrorTransiente" src/app/data/models/email-outbox.models.ts \
+       src/app/features/intranet/pages/admin/monitoreo/correos/**/*.ts 2>/dev/null
+   ```
+
+   Debe aparecer en el modelo como `ultimoErrorTransiente?: string | null` y en el componente de tabla con el `@if` que renderiza el badge.
+
+3. **Badge G.1 — verificación orgánica (puede tardar horas/días)**
+
+   El badge "Pendiente reintento" solo renderiza cuando un correo PROCESSING tiene `ultimoErrorTransiente != null`. Esto ocurre cuando el worker se topa con un defer SMTP reintenable (códigos 4.x.x, timeout, mailbox full transitorio). Con el binary nuevo deployado:
+
+   ```sql
+   -- Re-correr periódicamente hasta que aparezca un caso real:
+   SELECT TOP 5 EO_CodID, EO_Estado, EO_UltimoErrorTransiente, EO_FechaActualizacion
+   FROM dbo.EmailOutbox
+   WHERE EO_Estado = 'PROCESSING'
+     AND EO_UltimoErrorTransiente IS NOT NULL
+   ORDER BY EO_FechaActualizacion DESC;
+   ```
+
+   Cuando aparezca al menos una fila, smoke browser: refrescar la bandeja → confirmar que la fila correspondiente muestra el badge gris `Pendiente reintento` con tooltip que contiene el `ultimoErrorTransiente` truncado.
+
+4. **Si tras 1 semana de deploy no aparece ningún caso orgánico**, considerar inyectar un defer artificial en staging (apuntar el worker a un MX que devuelva 4.7.0 transitorio) para validar end-to-end. No es bloqueante para cerrar el brief — el cierre solo exige que la key viaje correctamente en el JSON; el badge en sí es comportamiento ya cubierto por los specs vitest.
+
+**Notas relacionadas:**
+
+- El script SQL `plan43_chat21_A3_EmailOutboxUltimoErrorTransiente.sql` ya está aplicado en ambas BD (idempotente, devuelve no-op). No requiere re-ejecutarse.
+- A7+B7 (textarea blacklist) y A13 (link autoOpen) NO fueron reproducibles orgánicamente en la sesión Cowork 2026-05-19 por falta de data (0 cuarentenas, 0 correos inválidos en email-audit). Sus checks se completan post-deploy cuando entre actividad real, o vía test sintético en staging.
