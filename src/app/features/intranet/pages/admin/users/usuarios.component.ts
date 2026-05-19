@@ -148,10 +148,18 @@ export class UsersComponent implements AfterViewInit {
 		effect(() => {
 			const target = this.autoOpenTarget();
 			if (!target) return;
-			const match = findAutoOpenMatch(target, this.vm().usuarios as UsuarioLista[]);
+			const snapshot = this.vm();
+			const items = snapshot.usuarios as UsuarioLista[] | undefined;
+			const match = findAutoOpenMatch(target, items);
 			if (match) {
 				this.autoOpenTarget.set(null);
 				this.uiFacade.editUsuario(match);
+				return;
+			}
+			// Rama DNI: si la lista terminó de cargar y no hubo match único, abandonar
+			// para no reabrir el target en refetches futuros (0 matches o ambigüedad).
+			if (target.kind === 'dni' && snapshot.loading === false && items !== undefined) {
+				this.autoOpenTarget.set(null);
 			}
 		});
 	}
