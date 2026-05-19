@@ -26,16 +26,11 @@ Si dudás entre ambos bloques: dudar significa que es on-demand. Una regla siemp
 ### Reglas de código universales
 
 @.claude/rules/reading-optimization.md
-@.claude/rules/code-language.md
-@.claude/rules/code-style.md
-@.claude/rules/comments.md
-@.claude/rules/git.md
 
 ### Metodología operativa
 
 @.claude/rules/chat-modes.md
 @.claude/rules/chat-shortcuts.md
-@.claude/rules/backlog-hygiene.md
 
 ### Comunicación con el usuario
 
@@ -46,6 +41,14 @@ Si dudás entre ambos bloques: dudar significa que es on-demand. Una regla siemp
 ## ÍNDICE BAJO DEMANDA
 
 Cada línea: `- ruta/archivo.md — <trigger>`. Leé el archivo cuando el trigger aplique al chat actual.
+
+### Reglas de código transversales
+
+- [.claude/rules/code-style.md](rules/code-style.md) — vas a editar TS/Angular: aliases de import (`@core`/`@shared`/...), `inject()`, signals privados con `asReadonly()`, `logger` vs `console`, OnPush por taxonomía, `firstValueFrom` en services root
+- [.claude/rules/code-language.md](rules/code-language.md) — vas a renombrar identificadores/archivos, escribir strings de UI, o dudás del glosario ES↔EN del dominio (asistencia→attendance, etc.)
+- [.claude/rules/comments.md](rules/comments.md) — vas a escribir comentarios nuevos o revisar comentarios existentes (formato `#region`, qué/cuándo comentar por tipo de archivo)
+- [.claude/rules/git.md](rules/git.md) — vas a commitear y necesitás recordar ramas (`main` FE / `master` BE) o el formato Conventional Commits
+- [.claude/rules/backlog-hygiene.md](rules/backlog-hygiene.md) — vas a ejecutar `/start-chat`, `/end`, `/next-chat`, `/triage`, `/verify` o necesitás chequear WIP limits de los buckets (`running/`, `open/`, `awaiting-prod/`, etc.)
 
 ### Contexto del negocio
 
