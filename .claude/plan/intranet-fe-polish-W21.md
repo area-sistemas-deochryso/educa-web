@@ -105,13 +105,15 @@ Pulido UX en los 5 módulos compartidos con BE, vistos desde la perspectiva del 
 
 **Done cuando**: archivo monolítico partido, lint+build verdes, flujo manual smoke OK.
 
-### F4 — Execute · Otros briefs según F2
+### F4 — Execute · Otros briefs según F2 ✅ 2026-05-19
 
 **Objetivo**: ejecutar los briefs priorizados de F2 en orden, uno por chat dedicado.
 
 Cada brief sigue su propio ciclo `/start-chat → /execute → /validate → /end`. Esta fase es el agregador — se considera "✅" cuando ≥50% de los briefs F2 cerraron como `awaiting-prod/` o `closed/`.
 
-### F5 — Cierre · Consolidación semanal
+**Cierre**: 6/6 briefs F2 cerrados (188, 189, 190, 191, 192, 193) = 100% — supera el gate del 50%.
+
+### F5 — Cierre · Consolidación semanal ✅ 2026-05-19 (brief 194)
 
 **Objetivo**: cerrar la semana sin deuda silenciosa.
 
@@ -207,3 +209,16 @@ Bugs/hallazgos agrupados por afinidad para alimentar F2 (priorización):
 | `polish-W21-schedules-debug-panel.md` | Quitar/ocultar panel debug con hex literales (gate por env flag) | 🟡 | profesor/schedules |
 
 > `profesor/grades` refactor (F3 del plan W21) **no** se loguea como task — ya es fase explícita del plan paraguas. Los hallazgos D+E de `profesor/grades` se absorben en el refactor F3.
+
+### Cierre de tasks F2 → briefs F4 (F5, 2026-05-19)
+
+| Task F2 | Brief F4 | Estado |
+|---|---|---|
+| `polish-W21-appendto-calendars.md` | 188 | ✅ closed (no-op: `appendTo="body"` ya estaba presente) |
+| `polish-W21-tokens-colors.md` | 189 | ✅ closed (19 hex → tokens Aura en 4 archivos) |
+| `polish-W21-schedules-debug-panel.md` | 190 | ✅ closed (gate visual via `environment.debug.horarioSync` + tokens + SCSS vars) |
+| `polish-W21-aria-labels-estudiante.md` | 191 | ✅ closed (`pt` aria-label en day selector + p-inputNumber) |
+| `polish-W21-skeletons-shared.md` | 192 | ✅ closed (4 pages + 3 sub-components migrados a shared) |
+| `profesor/grades` F3 | 193 | ✅ closed (split monolito + dialogs-sync parcial) |
+
+**Deuda residual capturada**: `tasks/polish-post-W21-grades-dialogs-sync.md` — 3 custom dialogs de `profesor/grades` requieren aceptar `null` en inputs para salir del `@if (contenido())`. No se priorizó porque el costo del cambio es arquitectural (3 sub-components con guards internos).
