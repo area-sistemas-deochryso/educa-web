@@ -273,6 +273,7 @@
 <app-error-occurrence-drawer
 	[visible]="occurrenceDrawerVisible()"
 	[errorId]="selectedOcurrenciaId()"
+	[parentGroup]="selectedGroup()"
 	(visibleChange)="onOccurrenceDrawerVisibleChange($event)"
 	(staleDataDetected)="onOccurrenceStaleData($event)"
 />

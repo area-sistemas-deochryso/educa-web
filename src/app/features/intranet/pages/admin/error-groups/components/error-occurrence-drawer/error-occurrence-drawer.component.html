@@ -21,7 +21,7 @@
 		</div>
 	} @else if (vm().errorCompleto; as err) {
 		<div class="detail-content">
-			<!-- Banner de origen + severidad -->
+			<!-- Banner de origen + severidad (siempre visible, fuera de tabs) -->
 			<div class="origin-banner" [class]="'origin-banner--' + err.severidad.toLowerCase()">
 				<div class="origin-banner-icon">
 					<i [class]="getOrigenIcon(err.origen)"></i>
@@ -46,7 +46,7 @@
 				</div>
 			</div>
 
-			<!-- Cadena de llamadas -->
+			<!-- Cadena de llamadas (siempre visible, fuera de tabs) -->
 			@if (formatSourceLocation(err.sourceLocation); as callChain) {
 				<div class="source-location-card">
 					<i class="pi pi-sitemap"></i>
@@ -57,154 +57,284 @@
 				</div>
 			}
 
-			<!-- Mensaje -->
-			<div class="detail-section">
-				<h4><i class="pi pi-comment"></i> Mensaje</h4>
-				<pre class="detail-pre">{{ err.mensaje }}</pre>
-			</div>
+			<!-- Tabs -->
+			<p-tabs value="general" class="occurrence-tabs">
+				<p-tablist>
+					<p-tab value="general">
+						<i class="pi pi-info-circle"></i>
+						<span>General</span>
+					</p-tab>
+					<p-tab value="trace">
+						<i class="pi pi-code"></i>
+						<span>Trace</span>
+					</p-tab>
+					<p-tab value="breadcrumbs">
+						<i class="pi pi-history"></i>
+						<span>Breadcrumbs</span>
+						@if (err.breadcrumbs.length > 0) {
+							<span class="tab-count">{{ err.breadcrumbs.length }}</span>
+						}
+					</p-tab>
+					<p-tab value="group">
+						<i class="pi pi-sitemap"></i>
+						<span>Group</span>
+					</p-tab>
+					<p-tab value="reqres">
+						<i class="pi pi-replay"></i>
+						<span>Req/Res</span>
+					</p-tab>
+				</p-tablist>
 
-			<!-- Stack Trace -->
-			@if (err.stackTrace) {
-				<div class="detail-section">
-					<h4><i class="pi pi-code"></i> Stack Trace</h4>
-					<pre class="detail-pre detail-pre--stack">{{ err.stackTrace }}</pre>
-				</div>
-			}
-
-			<!-- Contexto técnico -->
-			<div class="detail-section">
-				<h4><i class="pi pi-info-circle"></i> Contexto</h4>
-				<div class="detail-grid">
-					<div class="detail-row">
-						<span class="detail-label">URL</span>
-						<span class="detail-value detail-value--mono">{{ err.url }}</span>
-					</div>
-					@if (err.errorCode) {
-						<div class="detail-row">
-							<span class="detail-label">Error Code</span>
-							<span class="detail-value detail-value--mono">{{ err.errorCode }}</span>
+				<p-tabpanels>
+					<!-- Tab General: Mensaje + Contexto técnico -->
+					<p-tabpanel value="general">
+						<div class="detail-section">
+							<h4><i class="pi pi-comment"></i> Mensaje</h4>
+							<pre class="detail-pre">{{ err.mensaje }}</pre>
 						</div>
-					}
-					@if (err.correlationId) {
-						<div class="detail-row">
-							<span class="detail-label">Correlation ID</span>
-							<span class="detail-value detail-value--correlation">
-								<app-correlation-id-pill [id]="err.correlationId" />
+
+						<div class="detail-section">
+							<h4><i class="pi pi-info-circle"></i> Contexto</h4>
+							<div class="detail-grid">
+								<div class="detail-row">
+									<span class="detail-label">URL</span>
+									<span class="detail-value detail-value--mono">{{ err.url }}</span>
+								</div>
+								@if (err.errorCode) {
+									<div class="detail-row">
+										<span class="detail-label">Error Code</span>
+										<span class="detail-value detail-value--mono">{{ err.errorCode }}</span>
+									</div>
+								}
+								@if (err.usuarioRol) {
+									<div class="detail-row">
+										<span class="detail-label">Usuario</span>
+										<span class="detail-value">
+											{{ err.usuarioRol }}
+											{{ err.usuarioDni ? '(' + err.usuarioDni + ')' : '' }}
+										</span>
+									</div>
+								}
+								<div class="detail-row">
+									<span class="detail-label">Plataforma</span>
+									<span class="detail-value">{{ err.plataforma }}</span>
+								</div>
+								@if (err.userAgent) {
+									<div class="detail-row">
+										<span class="detail-label">User Agent</span>
+										<span class="detail-value detail-value--mono detail-value--small">
+											{{ err.userAgent }}
+										</span>
+									</div>
+								}
+							</div>
+						</div>
+					</p-tabpanel>
+
+					<!-- Tab Trace: Stack textual + nota Layer Trace (F2.2) -->
+					<p-tabpanel value="trace">
+						@if (err.stackTrace) {
+							<div class="detail-section">
+								<h4><i class="pi pi-code"></i> Stack Trace</h4>
+								<pre class="detail-pre detail-pre--stack">{{ err.stackTrace }}</pre>
+							</div>
+						} @else {
+							<div class="tab-empty">
+								<i class="pi pi-info-circle"></i>
+								<p>Sin stack trace registrado para esta ocurrencia.</p>
+							</div>
+						}
+						<div class="tab-future-hint">
+							<i class="pi pi-clock"></i>
+							<span>
+								El trace por capa (Controller → Service → Repository, con duración por
+								capa) estará disponible cuando F5 BE (ProblemDetails + endpoint
+								<code>/full</code>) se despliegue.
+							</span>
+						</div>
+					</p-tabpanel>
+
+					<!-- Tab Breadcrumbs: Flujo del usuario (FE) o empty (BE) -->
+					<p-tabpanel value="breadcrumbs">
+						@if (err.breadcrumbs.length > 0) {
+							<div class="detail-section detail-section--flush">
+								<h4>
+									<i class="pi pi-history"></i>
+									Flujo del usuario ({{ err.breadcrumbs.length }} acciones previas al
+									error)
+								</h4>
+								<div class="breadcrumbs-timeline">
+									@for (detalle of err.breadcrumbs; track detalle.id) {
+										<div
+											class="breadcrumb-item"
+											[class]="'breadcrumb-item--' + detalle.tipoAccion.toLowerCase()"
+										>
+											<div class="breadcrumb-icon">
+												<i [class]="getTipoAccionIcon(detalle.tipoAccion)"></i>
+											</div>
+											<div class="breadcrumb-content">
+												<div class="breadcrumb-header">
+													<span class="breadcrumb-tipo">{{ detalle.tipoAccion }}</span>
+													<span class="breadcrumb-time">
+														{{ detalle.timestamp | date: 'HH:mm:ss.SSS' }}
+													</span>
+												</div>
+												<span class="breadcrumb-desc">{{ detalle.descripcion }}</span>
+												@if (detalle.ruta) {
+													<span class="breadcrumb-ruta">{{ detalle.ruta }}</span>
+												}
+											</div>
+										</div>
+									}
+									<div class="breadcrumb-item breadcrumb-item--error-marker">
+										<div class="breadcrumb-icon">
+											<i class="pi pi-bolt"></i>
+										</div>
+										<div class="breadcrumb-content">
+											<span class="breadcrumb-desc breadcrumb-desc--error">
+												⚡ Error ocurrió aquí
+											</span>
+										</div>
+									</div>
+								</div>
+							</div>
+						} @else {
+							<div class="tab-empty">
+								<i class="pi pi-info-circle"></i>
+								<p>
+									Sin breadcrumbs registrados. Los breadcrumbs se capturan en el
+									frontend; los errores de backend no exponen flujo de usuario en este
+									tab.
+								</p>
+							</div>
+						}
+					</p-tabpanel>
+
+					<!-- Tab Group: ErrorGroup padre + CorrelationId -->
+					<p-tabpanel value="group">
+						@if (parentGroup(); as grp) {
+							<div class="detail-section">
+								<h4><i class="pi pi-sitemap"></i> Grupo padre</h4>
+								<div class="detail-grid">
+									<div class="detail-row">
+										<span class="detail-label">Estado</span>
+										<span class="detail-value">
+											<p-tag
+												[value]="getEstadoLabel(grp.estado)"
+												[severity]="getEstadoSeverity(grp.estado)"
+											/>
+										</span>
+									</div>
+									<div class="detail-row">
+										<span class="detail-label">Ocurrencias</span>
+										<span class="detail-value detail-value--mono">
+											{{ grp.contadorTotal }}
+										</span>
+									</div>
+									<div class="detail-row">
+										<span class="detail-label">Primera vez</span>
+										<span class="detail-value">
+											{{ grp.primeraFecha | date: 'dd/MM/yyyy HH:mm:ss' }}
+										</span>
+									</div>
+									<div class="detail-row">
+										<span class="detail-label">Última vez</span>
+										<span class="detail-value">
+											{{ grp.ultimaFecha | date: 'dd/MM/yyyy HH:mm:ss' }}
+										</span>
+									</div>
+									@if (grp.fingerprintCorto) {
+										<div class="detail-row">
+											<span class="detail-label">Fingerprint</span>
+											<span class="detail-value detail-value--mono detail-value--small">
+												{{ grp.fingerprintCorto }}
+											</span>
+										</div>
+									}
+								</div>
+							</div>
+						} @else {
+							<div class="tab-empty">
+								<i class="pi pi-info-circle"></i>
+								<p>
+									Grupo padre no disponible en esta vista. Cerrá el sub-drawer para
+									volver al grupo.
+								</p>
+							</div>
+						}
+
+						@if (err.correlationId) {
+							<div class="detail-section">
+								<h4><i class="pi pi-share-alt"></i> Correlation ID</h4>
+								<div class="detail-grid">
+									<div class="detail-row">
+										<span class="detail-label">ID</span>
+										<span class="detail-value detail-value--correlation">
+											<app-correlation-id-pill [id]="err.correlationId" />
+										</span>
+									</div>
+								</div>
 								<a
 									[routerLink]="['/intranet/admin/correlation', err.correlationId]"
 									pButton
 									type="button"
 									label="Ver eventos correlacionados"
 									icon="pi pi-share-alt"
-									class="p-button-text p-button-sm"
+									class="p-button-text p-button-sm correlation-link"
 								></a>
-							</span>
-						</div>
-					}
-					@if (err.usuarioRol) {
-						<div class="detail-row">
-							<span class="detail-label">Usuario</span>
-							<span class="detail-value">
-								{{ err.usuarioRol }}
-								{{ err.usuarioDni ? '(' + err.usuarioDni + ')' : '' }}
-							</span>
-						</div>
-					}
-					<div class="detail-row">
-						<span class="detail-label">Plataforma</span>
-						<span class="detail-value">{{ err.plataforma }}</span>
-					</div>
-					@if (err.userAgent) {
-						<div class="detail-row">
-							<span class="detail-label">User Agent</span>
-							<span class="detail-value detail-value--mono detail-value--small">
-								{{ err.userAgent }}
-							</span>
-						</div>
-					}
-				</div>
-			</div>
-
-			<!-- Datos de reproducción -->
-			@if (hasReproductionData(err)) {
-				<div class="detail-section">
-					<h4>
-						<i class="pi pi-replay"></i> Datos de Reproducción
-						<button
-							type="button"
-							class="copy-btn"
-							(click)="copyForReproduction(err)"
-							aria-label="Copiar para reproducir"
-							pTooltip="Copiar para Postman/curl"
-							tooltipPosition="left"
-						>
-							<i class="pi pi-copy"></i>
-						</button>
-					</h4>
-					@if (err.requestHeaders) {
-						<div class="reproduction-block">
-							<span class="reproduction-label">Request Headers</span>
-							<pre class="detail-pre detail-pre--json">{{ formatJson(err.requestHeaders) }}</pre>
-						</div>
-					}
-					@if (err.requestBody) {
-						<div class="reproduction-block">
-							<span class="reproduction-label">Request Body</span>
-							<pre class="detail-pre detail-pre--json">{{ formatJson(err.requestBody) }}</pre>
-						</div>
-					}
-					@if (err.responseBody) {
-						<div class="reproduction-block">
-							<span class="reproduction-label">Response Body</span>
-							<pre class="detail-pre detail-pre--json">{{ formatJson(err.responseBody) }}</pre>
-						</div>
-					}
-				</div>
-			}
-
-			<!-- Breadcrumbs timeline -->
-			@if (err.breadcrumbs.length > 0) {
-				<div class="detail-section">
-					<h4>
-						<i class="pi pi-history"></i>
-						Flujo del usuario ({{ err.breadcrumbs.length }} acciones previas al error)
-					</h4>
-					<div class="breadcrumbs-timeline">
-						@for (detalle of err.breadcrumbs; track detalle.id) {
-							<div
-								class="breadcrumb-item"
-								[class]="'breadcrumb-item--' + detalle.tipoAccion.toLowerCase()"
-							>
-								<div class="breadcrumb-icon">
-									<i [class]="getTipoAccionIcon(detalle.tipoAccion)"></i>
-								</div>
-								<div class="breadcrumb-content">
-									<div class="breadcrumb-header">
-										<span class="breadcrumb-tipo">{{ detalle.tipoAccion }}</span>
-										<span class="breadcrumb-time">
-											{{ detalle.timestamp | date: 'HH:mm:ss.SSS' }}
-										</span>
-									</div>
-									<span class="breadcrumb-desc">{{ detalle.descripcion }}</span>
-									@if (detalle.ruta) {
-										<span class="breadcrumb-ruta">{{ detalle.ruta }}</span>
-									}
-								</div>
 							</div>
 						}
-						<div class="breadcrumb-item breadcrumb-item--error-marker">
-							<div class="breadcrumb-icon">
-								<i class="pi pi-bolt"></i>
+					</p-tabpanel>
+
+					<!-- Tab Req/Res: Datos de reproducción (BE) o empty (FE) -->
+					<p-tabpanel value="reqres">
+						@if (hasReproductionData(err)) {
+							<div class="detail-section detail-section--flush">
+								<h4>
+									<i class="pi pi-replay"></i> Datos de Reproducción
+									<button
+										type="button"
+										class="copy-btn"
+										(click)="copyForReproduction(err)"
+										aria-label="Copiar para reproducir"
+										pTooltip="Copiar para Postman/curl"
+										tooltipPosition="left"
+									>
+										<i class="pi pi-copy"></i>
+									</button>
+								</h4>
+								@if (err.requestHeaders) {
+									<div class="reproduction-block">
+										<span class="reproduction-label">Request Headers</span>
+										<pre class="detail-pre detail-pre--json">{{ formatJson(err.requestHeaders) }}</pre>
+									</div>
+								}
+								@if (err.requestBody) {
+									<div class="reproduction-block">
+										<span class="reproduction-label">Request Body</span>
+										<pre class="detail-pre detail-pre--json">{{ formatJson(err.requestBody) }}</pre>
+									</div>
+								}
+								@if (err.responseBody) {
+									<div class="reproduction-block">
+										<span class="reproduction-label">Response Body</span>
+										<pre class="detail-pre detail-pre--json">{{ formatJson(err.responseBody) }}</pre>
+									</div>
+								}
 							</div>
-							<div class="breadcrumb-content">
-								<span class="breadcrumb-desc breadcrumb-desc--error">
-									⚡ Error ocurrió aquí
-								</span>
+						} @else {
+							<div class="tab-empty">
+								<i class="pi pi-info-circle"></i>
+								<p>
+									Sin datos de reproducción. Los errores de frontend no exponen
+									request/response body; usá el tab Breadcrumbs para reconstruir el
+									flujo.
+								</p>
 							</div>
-						</div>
-					</div>
-				</div>
-			}
+						}
+					</p-tabpanel>
+				</p-tabpanels>
+			</p-tabs>
 		</div>
 	}
 </p-drawer>

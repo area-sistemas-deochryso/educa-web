@@ -17,6 +17,7 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
 import { ButtonModule } from 'primeng/button';
 import { DrawerModule } from 'primeng/drawer';
+import { TabsModule } from 'primeng/tabs';
 import { TagModule } from 'primeng/tag';
 import { TooltipModule } from 'primeng/tooltip';
 
@@ -26,9 +27,13 @@ import { CorrelationIdPillComponent } from '@shared/components/correlation-id-pi
 import { ErrorGroupsService } from '../../services';
 import {
 	BreadcrumbTipoAccion,
+	ErrorGroupEstado,
+	ErrorGroupLista,
 	ErrorLogCompleto,
 	ErrorOrigen,
 	ErrorSeveridad,
+	ESTADO_LABEL_MAP,
+	ESTADO_SEVERITY_MAP,
 	ORIGEN_ICON_MAP,
 	ORIGEN_LABEL_MAP,
 	SEVERIDAD_SEVERITY_MAP,
@@ -60,6 +65,7 @@ import {
 		RouterLink,
 		ButtonModule,
 		DrawerModule,
+		TabsModule,
 		TagModule,
 		TooltipModule,
 		CorrelationIdPillComponent,
@@ -77,6 +83,13 @@ export class ErrorOccurrenceDrawerComponent {
 	readonly visible = input<boolean>(false);
 	readonly errorId = input<number | null>(null);
 	readonly correlationId = input<string | null>(null);
+	/**
+	 * Grupo padre del que viene esta ocurrencia. Pasado por el componente
+	 * page para llenar el tab "Group" sin pegarle a un endpoint nuevo.
+	 * `null` cuando el sub-drawer se abre desde un contexto sin grupo
+	 * conocido (no existe hoy, pero es defensivo).
+	 */
+	readonly parentGroup = input<ErrorGroupLista | null>(null);
 	readonly visibleChange = output<boolean>();
 	/**
 	 * Se emite cuando el drawer recibe 404 al cargar un errorId que venía de la
@@ -108,6 +121,8 @@ export class ErrorOccurrenceDrawerComponent {
 	readonly origenIcon = ORIGEN_ICON_MAP;
 	readonly origenLabel = ORIGEN_LABEL_MAP;
 	readonly tipoAccionIcon = TIPO_ACCION_ICON_MAP;
+	readonly estadoLabel = ESTADO_LABEL_MAP;
+	readonly estadoSeverity = ESTADO_SEVERITY_MAP;
 	// #endregion
 
 	constructor() {
@@ -211,6 +226,16 @@ export class ErrorOccurrenceDrawerComponent {
 
 	hasReproductionData(err: ErrorLogCompleto): boolean {
 		return !!(err.requestBody || err.responseBody || err.requestHeaders);
+	}
+
+	getEstadoLabel(estado: string): string {
+		return this.estadoLabel[estado as ErrorGroupEstado] ?? estado;
+	}
+
+	getEstadoSeverity(
+		estado: string,
+	): 'danger' | 'warn' | 'info' | 'success' | 'secondary' {
+		return this.estadoSeverity[estado as ErrorGroupEstado] ?? 'secondary';
 	}
 
 	copyForReproduction(err: ErrorLogCompleto): void {
