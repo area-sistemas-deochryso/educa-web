@@ -324,6 +324,16 @@ export class AttendancesComponent implements OnInit {
 	}
 
 	/**
+	 * Brief 204 — el filtro del `p-select` de personas dispara búsqueda
+	 * server-side. PrimeNG emite `{ originalEvent, filter }`; delegamos al
+	 * trigger debounced del facade para evitar 1 request por tecla.
+	 */
+	onPersonaFilter(event: { filter: string }): void {
+		const tipo = this.store.formData().tipoPersona;
+		this.dataFacade.searchPersonas(tipo, event?.filter ?? '');
+	}
+
+	/**
 	 * F-018 fix: el form no tiene sede picker propio en esta página, así que `formData.sedeId`
 	 * vivía en `null` y `isFormValid` quedaba bloqueado para los 3 tipos (E/P/A). La persona
 	 * seleccionada ya trae su `sedeId` desde BE; lo copiamos al form para destrabar la validación.

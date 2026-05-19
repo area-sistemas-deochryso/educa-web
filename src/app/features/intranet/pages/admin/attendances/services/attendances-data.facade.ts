@@ -1,7 +1,7 @@
 import { DestroyRef, Injectable, inject } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { HttpErrorResponse } from '@angular/common/http';
-import { Subject, debounceTime, distinctUntilChanged } from 'rxjs';
+import { Subject, debounceTime, distinctUntilChanged, switchMap, of, catchError } from 'rxjs';
 
 import { logger } from '@core/helpers';
 import { WalCrossTabRefetchService } from '@core/services';
@@ -36,6 +36,14 @@ export class AttendancesDataFacade {
 	// usan `setSearchAndReload` que salta el debounce.
 	private readonly _searchTrigger$ = new Subject<string>();
 
+	// Trigger debounced para búsqueda server-side de personas en el modal
+	// "Registrar asistencia manual" (brief 204). Cambiar de tipo (E/P/A) o
+	// tipear en el dropdown emite acá; switchMap cancela la request anterior.
+	private readonly _personasSearchTrigger$ = new Subject<{
+		tipo: TipoPersonaAsistencia;
+		search: string;
+	}>();
+
 	constructor() {
 		this.crossTabRefetch.subscribe({
 			resourceType: 'asistencia-admin',
@@ -58,6 +66,24 @@ export class AttendancesDataFacade {
 			.subscribe(() => {
 				this.store.setTableReady(false);
 				this.loadItems();
+			});
+
+		this._personasSearchTrigger$
+			.pipe(
+				debounceTime(250),
+				distinctUntilChanged((a, b) => a.tipo === b.tipo && a.search === b.search),
+				switchMap(({ tipo, search }) => {
+					this.store.setPersonasLoading(true);
+					const sedeId = this.store.sedeId() ?? undefined;
+					return this.api
+						.listarPersonas(sedeId, search || undefined, tipo)
+						.pipe(catchError(() => of([])));
+				}),
+				takeUntilDestroyed(this.destroyRef),
+			)
+			.subscribe((personas) => {
+				this.store.setPersonas(personas ?? []);
+				this.store.setPersonasLoading(false);
 			});
 	}
 
@@ -130,6 +156,7 @@ export class AttendancesDataFacade {
 
 	loadPersonas(tipoPersona: TipoPersonaAsistencia, search?: string): void {
 		const sedeId = this.store.sedeId() ?? undefined;
+		this.store.setPersonasLoading(true);
 
 		this.api
 			.listarPersonas(sedeId, search, tipoPersona)
@@ -137,8 +164,22 @@ export class AttendancesDataFacade {
 			.subscribe({
 				next: (personas) => {
 					this.store.setPersonas(personas ?? []);
+					this.store.setPersonasLoading(false);
+				},
+				error: () => {
+					this.store.setPersonasLoading(false);
 				},
 			});
+	}
+
+	/**
+	 * Brief 204 — búsqueda server-side de personas para el modal "Registrar
+	 * asistencia manual". Emite al trigger debounced (250ms) con switchMap
+	 * para cancelar requests en vuelo. Llamar desde el evento `onFilter` del
+	 * `p-select` de personas.
+	 */
+	searchPersonas(tipo: TipoPersonaAsistencia, search: string): void {
+		this._personasSearchTrigger$.next({ tipo, search: search?.trim() ?? '' });
 	}
 
 	/** Alias retrocompat — carga personas del tipo configurado (default `E`). */

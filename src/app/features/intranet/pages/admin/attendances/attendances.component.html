@@ -371,7 +371,9 @@
 						[ngModel]="vm().formData.estudianteId"
 						(ngModelChange)="onPersonaSelected($event)"
 						[filter]="true"
-						filterBy="nombreCompleto,dni"
+						[showClear]="false"
+						[loading]="vm().personasLoading"
+						(onFilter)="onPersonaFilter($event)"
 						[placeholder]="'Seleccionar ' + getTipoPersonaLabel(vm().formData.tipoPersona).toLowerCase() + '...'"
 						appendTo="body"
 					/>

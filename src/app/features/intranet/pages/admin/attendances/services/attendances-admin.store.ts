@@ -17,6 +17,7 @@ export class AttendancesAdminStore {
 	private readonly _items = signal<AsistenciaAdminLista[]>([]);
 	private readonly _estadisticas = signal<AsistenciaAdminEstadisticas | null>(null);
 	private readonly _personas = signal<PersonaParaSeleccion[]>([]);
+	private readonly _personasLoading = signal(false);
 	private readonly _cierres = signal<CierreMensualLista[]>([]);
 	private readonly _loading = signal(false);
 	private readonly _error = signal<string | null>(null);
@@ -62,6 +63,7 @@ export class AttendancesAdminStore {
 	readonly items = this._items.asReadonly();
 	readonly estadisticas = this._estadisticas.asReadonly();
 	readonly personas = this._personas.asReadonly();
+	readonly personasLoading = this._personasLoading.asReadonly();
 	/** Alias retrocompat — los consumidores viejos usan `estudiantes`. */
 	readonly estudiantes = this._personas.asReadonly();
 	readonly cierres = this._cierres.asReadonly();
@@ -126,6 +128,7 @@ export class AttendancesAdminStore {
 		allItems: this._items(),
 		estadisticas: this._estadisticas(),
 		personas: this._personas(),
+		personasLoading: this._personasLoading(),
 		estudiantes: this._personas(),
 		cierres: this._cierres(),
 		isEmpty: this._items().length === 0,
@@ -193,6 +196,10 @@ export class AttendancesAdminStore {
 
 	setPersonas(personas: PersonaParaSeleccion[]): void {
 		this._personas.set(personas);
+	}
+
+	setPersonasLoading(v: boolean): void {
+		this._personasLoading.set(v);
 	}
 
 	/** Alias retrocompat. */
