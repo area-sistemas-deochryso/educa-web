@@ -11,10 +11,10 @@ Claude Code autodescubre desde rutas fijas.
 | --- | --- | --- |
 | [SETUP-COWORK.md](SETUP-COWORK.md) | Setup del proyecto + hallazgos abiertos/verificados | **Siempre primero**. Login, browser MCP a usar, limitaciones técnicas (PrimeNG `p-select`, `withFetch`, IndexedDB). |
 | [wal-integration-smoke.md](wal-integration-smoke.md) | Checklist canónico del subsistema WAL (8 casos). Política de merge: corre el smoke ante cualquier PR que toque `core/services/wal/`. | Si el contexto es **WAL específicamente** (PR que toca el engine, regression a investigar). Independiente del flujo de awaiting-prod. |
-| [f6a-k6-calibration.md](f6a-k6-calibration.md) | Brief de Cowork para la calibración sintética k6 del Plan 40 F6a. División de trabajo usuario/Cowork. | Cuando arranques un round de calibración k6 — el chat brief base es `awaiting-prod/108`. |
+| [verify-awaiting-prod-2026-05-18.md](verify-awaiting-prod-2026-05-18.md) | Checklist activo de validación post-deploy 2026-05-18 (8 briefs verificables por Cowork solo, sesión Director). | Round actual de awaiting-prod. Cuando se cierre, mover a `history/`. |
 | [reporte-claude-cowork.md](reporte-claude-cowork.md) | Diario append-only de sesiones QA. Cada cierre anexa un bloque (no sobreescribe). | Al cerrar una sesión Cowork — anexar bloque con resumen + hallazgos. Para auditar sesiones previas. |
 | [README.md](README.md) | Este archivo (índice + flujo de lectura). | Punto de entrada al namespace. |
-| [history/](history/) | Checklists de rounds de awaiting-prod ya cerrados. Referencia de formato para reusar. | Solo al armar el próximo checklist post-deploy o auditar cómo se validó un brief específico. |
+| [history/](history/) | Checklists y handoffs de rounds ya cerrados. Referencia de formato para reusar. | Solo al armar el próximo checklist post-deploy o auditar cómo se validó un brief específico. |
 
 ## Flujo de lectura para Cowork
 
