@@ -11,12 +11,11 @@ import {
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Select } from 'primeng/select';
-import { ProgressSpinnerModule } from 'primeng/progressspinner';
 import { ConfirmDialogModule } from 'primeng/confirmdialog';
 import { ConfirmationService } from 'primeng/api';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { logger, withRetry } from '@core/helpers';
-import { PageHeaderComponent } from '@shared/components';
+import { PageHeaderComponent, SkeletonLoaderComponent } from '@shared/components';
 import { ProfesorFacade } from '../services/profesor.facade';
 import { CalificacionesFacade } from '../cursos/services/calificaciones.facade';
 import { CalificacionesPanelComponent } from '../cursos/components/calificaciones-panel/calificaciones-panel.component';
@@ -39,9 +38,9 @@ import {
 		CommonModule,
 		FormsModule,
 		Select,
-		ProgressSpinnerModule,
 		ConfirmDialogModule,
 		PageHeaderComponent,
+		SkeletonLoaderComponent,
 		CalificacionesPanelComponent,
 		CalificarDialogComponent,
 		EvaluacionFormDialogComponent,
@@ -49,98 +48,8 @@ import {
 	],
 	providers: [ConfirmationService],
 	changeDetection: ChangeDetectionStrategy.OnPush,
-	styles: `
-		:host {
-			display: block;
-		}
-		.filters-row {
-			display: flex;
-			align-items: center;
-			gap: 1rem;
-			flex-wrap: wrap;
-		}
-	`,
-	template: `
-		<app-page-header icon="pi pi-chart-bar" title="Calificaciones" />
-		<div class="p-4 pt-0">
-
-			@if (pageLoading()) {
-				<div class="flex justify-content-center p-5">
-					<p-progressSpinner strokeWidth="4" />
-				</div>
-			} @else if (cursoOptions().length === 0) {
-				<div class="flex flex-column align-items-center p-5 text-color-secondary">
-					<i class="pi pi-chart-bar text-4xl mb-3"></i>
-					<p>No tienes cursos asignados</p>
-				</div>
-			} @else {
-				<div class="filters-row mb-3">
-					<p-select
-						[options]="cursoOptions()"
-						[(ngModel)]="selectedHorarioId"
-						placeholder="Seleccionar curso"
-						appendTo="body"
-						(ngModelChange)="onCursoChange($event)"
-					/>
-				</div>
-
-				@if (contenidoLoading()) {
-					<div class="flex justify-content-center p-5">
-						<p-progressSpinner strokeWidth="4" />
-					</div>
-				} @else if (contenido()) {
-					<app-calificaciones-panel
-						[calificacionesPorSemana]="calVm().calificacionesPorSemana"
-						[periodos]="calVm().periodos"
-						[loading]="calVm().loading"
-						[saving]="calVm().saving"
-						[totalEvaluaciones]="calVm().totalEvaluaciones"
-						(crearEvaluacion)="calFacade.openCalificacionDialog()"
-						(editarEvaluacion)="calFacade.openCalificacionDialog($event)"
-						(calificarEstudiantes)="calFacade.openCalificarDialog($event)"
-						(eliminarEvaluacion)="onEliminar($event)"
-						(cambiarTipo)="onCambiarTipo($event)"
-						(configurarPeriodos)="calFacade.openPeriodosDialog()"
-					/>
-
-					<!-- Dialogs -->
-					<app-evaluacion-form-dialog
-						[visible]="calVm().calificacionDialogVisible"
-						[saving]="calVm().saving"
-						[editing]="calVm().editingCalificacion"
-						[semanas]="contenido()!.semanas"
-						[contenidoId]="contenido()!.id"
-						(visibleChange)="onEvalDialogVisibleChange($event)"
-						(save)="onCrearCalificacion($event)"
-					/>
-
-					<app-calificar-dialog
-						[visible]="calVm().calificarDialogVisible"
-						[saving]="calVm().saving"
-						[calificacion]="calVm().selectedCalificacion"
-						[estudiantes]="estudiantesForCalificar()"
-						[grupos]="calVm().gruposForCalificar"
-						(visibleChange)="onCalificarDialogVisibleChange($event)"
-						(save)="onCalificarLote($event)"
-						(saveGrupos)="onCalificarGruposLote($event)"
-					/>
-
-					<app-periodos-config-dialog
-						[visible]="calVm().periodosDialogVisible"
-						[saving]="calVm().saving"
-						[periodos]="calVm().periodos"
-						[contenidoId]="contenido()!.id"
-						[totalSemanas]="contenido()!.numeroSemanas"
-						(visibleChange)="onPeriodosDialogVisibleChange($event)"
-						(crearPeriodo)="calFacade.crearPeriodo($event)"
-						(eliminarPeriodo)="calFacade.eliminarPeriodo($event)"
-					/>
-
-					<p-confirmDialog (onHide)="onConfirmDialogHide()" />
-				}
-			}
-		</div>
-	`,
+	templateUrl: './profesor-calificaciones.component.html',
+	styleUrl: './profesor-calificaciones.component.scss',
 })
 export class TeacherGradesComponent implements OnInit, OnDestroy {
 	// #region Dependencias
