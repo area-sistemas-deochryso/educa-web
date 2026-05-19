@@ -1,8 +1,24 @@
 # 198 — FE fix F-020 (dependiente): path del service de reportes-usuario
 
-> **Creado**: 2026-05-19 · **Estado**: ⏳ pendiente · **Depende de**: [`Educa.API/202-be-fix-f020-reportes-usuario-listar.md`](../../../Educa.API/.claude/chats/open/202-be-fix-f020-reportes-usuario-listar.md)
+> **Creado**: 2026-05-19 · **Estado**: ✅ cerrado no-op · **Depende de**: [`Educa.API/202-be-fix-f020-reportes-usuario-listar.md`](../../../Educa.API/.claude/chats/closed/202-be-fix-f020-reportes-usuario-listar.md)
 > **Modo sugerido**: `/execute → /validate` (decisión la toma el chat BE 202)
 > **Origen**: Cowork session 2026-05-19 — hallazgo F-020 medio.
+
+## Resolución (2026-05-19)
+
+**No-op FE**. BE 202 cerró como no-op tras `/investigate`: el FE ya llama root sin `/listar`, y `ReportesUsuarioController` nunca tuvo `[HttpGet("listar")]`. F-020 no se reproduce contra HEAD actual — probable build viejo en cache del Cowork tester.
+
+Verificación local pre-cierre:
+
+```bash
+$ grep -rn "reportes-usuario/listar" src/
+(0 matches)
+
+$ grep -n "apiUrl" src/app/core/services/feedback/feedback-report.service.ts
+25:    private readonly apiUrl = `${environment.apiUrl}/api/sistema/reportes-usuario`;
+```
+
+Acción adicional sugerida (no en este brief): pedir al QA Cowork hard-reload + repro contra HEAD `cf03e15` antes de re-abrir F-020. El síntoma secundario `data:[]` con `Total=4` es otro problema (filtros del store o discrepancia `ListarAsync`/`ContarAsync`) — abrir brief aparte si reaparece.
 
 ## Contexto
 
