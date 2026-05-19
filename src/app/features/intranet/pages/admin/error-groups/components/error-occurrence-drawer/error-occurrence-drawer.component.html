@@ -106,15 +106,17 @@
 										<span class="detail-value detail-value--mono">{{ err.errorCode }}</span>
 									</div>
 								}
-								@if (err.usuarioRol) {
-									<div class="detail-row">
-										<span class="detail-label">Usuario</span>
-										<span class="detail-value">
+								<div class="detail-row">
+									<span class="detail-label">Usuario</span>
+									<span class="detail-value">
+										@if (err.usuarioRol) {
 											{{ err.usuarioRol }}
 											{{ err.usuarioDni ? '(' + err.usuarioDni + ')' : '' }}
-										</span>
-									</div>
-								}
+										} @else {
+											Anónimo
+										}
+									</span>
+								</div>
 								<div class="detail-row">
 									<span class="detail-label">Plataforma</span>
 									<span class="detail-value">{{ err.plataforma }}</span>
