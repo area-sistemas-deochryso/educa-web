@@ -68,6 +68,12 @@ export class CorrelationComponent implements OnInit {
 	readonly vm = this.facade.vm;
 	readonly viewMode = signal<CorrelationViewMode>(this.storage.getCorrelationViewMode());
 
+	// Plan 41 Chat 11 — auto-refresh opt-in cada 30s con pausa por visibilitychange.
+	readonly autoRefresh = signal<boolean>(this.storage.getCorrelationAutoRefresh());
+	private pollHandle: ReturnType<typeof setInterval> | null = null;
+	private visibilityListener: (() => void) | null = null;
+	private readonly POLL_INTERVAL_MS = 30_000;
+
 	// Plan 41 Chat 3b — sección "Otros correlation IDs de este usuario (últimas 2h)".
 	readonly relatedIds = computed<readonly string[]>(
 		() => this.vm().snapshot?.relatedCorrelationIds ?? [],
@@ -84,6 +90,15 @@ export class CorrelationComponent implements OnInit {
 			} else {
 				logger.warn('[CorrelationComponent] Sin :id en la ruta');
 			}
+		});
+
+		if (this.autoRefresh()) {
+			this.startPolling();
+		}
+		this.attachVisibilityListener();
+		this.destroyRef.onDestroy(() => {
+			this.stopPolling();
+			this.detachVisibilityListener();
 		});
 	}
 	// #endregion
@@ -121,6 +136,61 @@ export class CorrelationComponent implements OnInit {
 		const id = this.vm().correlationId;
 		if (!snapshot || !id) return;
 		this.exporter.exportSnapshot(snapshot, id);
+	}
+
+	onToggleAutoRefresh(): void {
+		const next = !this.autoRefresh();
+		this.autoRefresh.set(next);
+		this.storage.setCorrelationAutoRefresh(next);
+		if (next) {
+			this.startPolling();
+		} else {
+			this.stopPolling();
+		}
+	}
+	// #endregion
+
+	// #region Polling — Plan 41 Chat 11
+	private startPolling(): void {
+		if (this.pollHandle !== null) return;
+		this.pollHandle = setInterval(() => this.refreshIfVisible(), this.POLL_INTERVAL_MS);
+	}
+
+	private stopPolling(): void {
+		if (this.pollHandle !== null) {
+			clearInterval(this.pollHandle);
+			this.pollHandle = null;
+		}
+	}
+
+	private refreshIfVisible(): void {
+		if (typeof document !== 'undefined' && document.hidden) return;
+		const id = this.vm().correlationId;
+		if (id) {
+			this.facade.loadSnapshot(id);
+		}
+	}
+
+	private attachVisibilityListener(): void {
+		if (typeof document === 'undefined') return;
+		this.visibilityListener = () => {
+			// Al volver a visible con auto-refresh ON, disparar un refresh inmediato
+			// para que el admin no espere hasta los próximos 30s.
+			if (!document.hidden && this.autoRefresh()) {
+				const id = this.vm().correlationId;
+				if (id) {
+					this.facade.loadSnapshot(id);
+				}
+			}
+		};
+		document.addEventListener('visibilitychange', this.visibilityListener);
+	}
+
+	private detachVisibilityListener(): void {
+		if (this.visibilityListener && typeof document !== 'undefined') {
+			document.removeEventListener('visibilitychange', this.visibilityListener);
+			this.visibilityListener = null;
+		}
 	}
 	// #endregion
 }

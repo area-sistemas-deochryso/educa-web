@@ -92,7 +92,7 @@
   - Chat 5.2 (Heatmap latencia + bundle telemetría B9+B10) — depende Chat 1.2+1.3.
   - Chat 6.1 (Vista unificada por destinatario B1) — depende F1+F3+F4.
   - Chat 6.2 (Links bidireccionales + Gap accionable B12) — depende 6.1+4.3.
-- **Plan 41 — Correlation Hub** → [`educa-coord/plans/xrepo-41-correlation-hub-observability.md`](../../../educa-coord/plans/xrepo-41-correlation-hub-observability.md). Próximo FE-only: Chat 3 (arriba como Pullable). Chats 9 (search global), 11 (auto-refresh) ⏳.
+- **Plan 41 — Correlation Hub** → [`educa-coord/plans/xrepo-41-correlation-hub-observability.md`](../../../educa-coord/plans/xrepo-41-correlation-hub-observability.md). Próximo FE-only: Chat 9 (search global) ⏳ requiere BE. **Chat 11 ✅ awaiting-prod 2026-05-19** (brief `195`).
 - **Plan 42 — Casing contratos REST** → [`educa-coord/plans/xrepo-42-case-drift.md`](../../../educa-coord/plans/xrepo-42-case-drift.md). F2-FE ✅. Sin trabajo FE pendiente; F2-BE en cola BE.
 
 ### 🟣 Verificaciones post-deploy pendientes (`/verify <NNN>`)

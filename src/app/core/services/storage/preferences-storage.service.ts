@@ -44,6 +44,9 @@ const PREFERENCES_KEYS = {
 	// Plan 41 F1 — correlation hub view mode (timeline vs section)
 	CORRELATION_VIEW_MODE: 'educa_pref_correlation_view_mode',
 
+	// Plan 41 Chat 11 — correlation hub auto-refresh opt-in
+	CORRELATION_AUTO_REFRESH: 'educa_pref_correlation_auto_refresh',
+
 	// Brief 102 — runtime health widget
 	RUNTIME_HEALTH_WIDGET_AUTO_REFRESH: 'educa_pref_runtime_health_widget_auto_refresh',
 	RUNTIME_HEALTH_WIDGET_COLLAPSED: 'educa_pref_runtime_health_widget_collapsed',
@@ -559,6 +562,22 @@ export class PreferencesStorageService {
 
 	setCorrelationViewMode(mode: CorrelationViewMode): void {
 		this.setItem(PREFERENCES_KEYS.CORRELATION_VIEW_MODE, mode);
+	}
+
+	// #endregion
+	// #region CORRELATION HUB AUTO-REFRESH (Plan 41 Chat 11)
+
+	/**
+	 * Whether the correlation hub auto-refreshes the snapshot every 30 seconds.
+	 * Default `false` — opt-in para admins que necesitan ver actualizaciones
+	 * en vivo durante un incidente.
+	 */
+	getCorrelationAutoRefresh(): boolean {
+		return this.getItem(PREFERENCES_KEYS.CORRELATION_AUTO_REFRESH) === 'true';
+	}
+
+	setCorrelationAutoRefresh(enabled: boolean): void {
+		this.setItem(PREFERENCES_KEYS.CORRELATION_AUTO_REFRESH, enabled.toString());
 	}
 
 	// #endregion

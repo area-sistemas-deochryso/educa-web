@@ -44,6 +44,8 @@ describe('CorrelationComponent', () => {
 	let paramMap$: BehaviorSubject<FakeParamMap>;
 	let getCorrelationViewMode: ReturnType<typeof vi.fn>;
 	let setCorrelationViewMode: ReturnType<typeof vi.fn>;
+	let getCorrelationAutoRefresh: ReturnType<typeof vi.fn>;
+	let setCorrelationAutoRefresh: ReturnType<typeof vi.fn>;
 	let currentSnapshot: CorrelationSnapshot | null;
 
 	beforeEach(async () => {
@@ -51,6 +53,8 @@ describe('CorrelationComponent', () => {
 		paramMap$ = new BehaviorSubject(new FakeParamMap({ id: 'abc-1' }));
 		getCorrelationViewMode = vi.fn().mockReturnValue('timeline');
 		setCorrelationViewMode = vi.fn();
+		getCorrelationAutoRefresh = vi.fn().mockReturnValue(false);
+		setCorrelationAutoRefresh = vi.fn();
 		currentSnapshot = createSnapshot();
 
 		const facadeMock = {
@@ -74,6 +78,8 @@ describe('CorrelationComponent', () => {
 		const storageMock = {
 			getCorrelationViewMode,
 			setCorrelationViewMode,
+			getCorrelationAutoRefresh,
+			setCorrelationAutoRefresh,
 		};
 
 		await TestBed.configureTestingModule({
@@ -148,6 +154,92 @@ describe('CorrelationComponent', () => {
 
 		component.onToggleView('timeline'); // already timeline by default
 		expect(setCorrelationViewMode).not.toHaveBeenCalled();
+	});
+
+	describe('Plan 41 Chat 11 — auto-refresh opt-in', () => {
+		it('initializes autoRefresh from storage (default off)', () => {
+			fixture.detectChanges();
+			expect(getCorrelationAutoRefresh).toHaveBeenCalled();
+			expect(component.autoRefresh()).toBe(false);
+		});
+
+		it('toggle persists the new value and updates the signal', () => {
+			fixture.detectChanges();
+			component.onToggleAutoRefresh();
+			expect(component.autoRefresh()).toBe(true);
+			expect(setCorrelationAutoRefresh).toHaveBeenCalledWith(true);
+
+			component.onToggleAutoRefresh();
+			expect(component.autoRefresh()).toBe(false);
+			expect(setCorrelationAutoRefresh).toHaveBeenLastCalledWith(false);
+		});
+
+		it('starts polling and fires loadSnapshot every 30s when enabled', () => {
+			vi.useFakeTimers();
+			try {
+				fixture.detectChanges();
+				loadSnapshot.mockClear();
+
+				component.onToggleAutoRefresh();
+				expect(loadSnapshot).not.toHaveBeenCalled();
+
+				vi.advanceTimersByTime(30_000);
+				expect(loadSnapshot).toHaveBeenCalledWith('abc-1');
+				expect(loadSnapshot).toHaveBeenCalledTimes(1);
+
+				vi.advanceTimersByTime(30_000);
+				expect(loadSnapshot).toHaveBeenCalledTimes(2);
+			} finally {
+				vi.useRealTimers();
+			}
+		});
+
+		it('stops polling when toggled off', () => {
+			vi.useFakeTimers();
+			try {
+				fixture.detectChanges();
+				component.onToggleAutoRefresh(); // ON
+				loadSnapshot.mockClear();
+
+				component.onToggleAutoRefresh(); // OFF
+				vi.advanceTimersByTime(60_000);
+				expect(loadSnapshot).not.toHaveBeenCalled();
+			} finally {
+				vi.useRealTimers();
+			}
+		});
+
+		it('does not fire loadSnapshot when document is hidden', () => {
+			vi.useFakeTimers();
+			const hiddenSpy = vi.spyOn(document, 'hidden', 'get').mockReturnValue(true);
+			try {
+				fixture.detectChanges();
+				component.onToggleAutoRefresh(); // ON
+				loadSnapshot.mockClear();
+
+				vi.advanceTimersByTime(30_000);
+				expect(loadSnapshot).not.toHaveBeenCalled();
+			} finally {
+				vi.useRealTimers();
+				hiddenSpy.mockRestore();
+			}
+		});
+
+		it('starts polling on init when storage returns true', async () => {
+			getCorrelationAutoRefresh.mockReturnValue(true);
+			vi.useFakeTimers();
+			try {
+				// Reconstruir el fixture para que la signal se inicialice con true
+				const newFixture = TestBed.createComponent(CorrelationComponent);
+				newFixture.detectChanges();
+				loadSnapshot.mockClear();
+
+				vi.advanceTimersByTime(30_000);
+				expect(loadSnapshot).toHaveBeenCalledWith('abc-1');
+			} finally {
+				vi.useRealTimers();
+			}
+		});
 	});
 
 	describe('Plan 41 Chat 3b — related correlation ids', () => {

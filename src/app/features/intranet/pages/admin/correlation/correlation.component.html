@@ -53,6 +53,30 @@
 
 		<button
 			pButton
+			type="button"
+			[icon]="autoRefresh() ? 'pi pi-pause' : 'pi pi-play'"
+			label="Auto-refresh (30s)"
+			class="p-button-sm"
+			[class.p-button-text]="!autoRefresh()"
+			[class.p-button-outlined]="autoRefresh()"
+			(click)="onToggleAutoRefresh()"
+			[attr.aria-pressed]="autoRefresh()"
+			[pTooltip]="
+				autoRefresh()
+					? 'Auto-refresh activo: recarga cada 30s (pausa al cambiar de pestaña)'
+					: 'Activar recarga automática cada 30s'
+			"
+			[pt]="{
+				root: {
+					'aria-label': autoRefresh()
+						? 'Desactivar auto-refresh'
+						: 'Activar auto-refresh cada 30 segundos',
+				},
+			}"
+		></button>
+
+		<button
+			pButton
 			icon="pi pi-refresh"
 			class="p-button-text p-button-sm btn-icon"
 			[disabled]="vm().loading || !vm().correlationId"

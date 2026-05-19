@@ -1,3 +1,4 @@
+/* eslint-disable max-lines -- Razón: facade thin que delega en 4 servicios específicos (session/preferences/notifications/indexeddb). Cada nueva preferencia agrega 2 passthroughs; refactorizar implicaría romper el contrato de un single entry-point para storage. */
 import { Injectable, inject, PLATFORM_ID } from '@angular/core';
 import { isPlatformBrowser } from '@angular/common';
 import { logger } from '@app/core/helpers';
@@ -386,6 +387,16 @@ export class StorageService {
 
 	setCorrelationViewMode(mode: CorrelationViewMode): void {
 		this.preferences.setCorrelationViewMode(mode);
+	}
+	// #endregion
+
+	// #region CORRELATION HUB AUTO-REFRESH (Plan 41 Chat 11)
+	getCorrelationAutoRefresh(): boolean {
+		return this.preferences.getCorrelationAutoRefresh();
+	}
+
+	setCorrelationAutoRefresh(enabled: boolean): void {
+		this.preferences.setCorrelationAutoRefresh(enabled);
 	}
 	// #endregion
 
