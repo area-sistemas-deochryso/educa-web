@@ -11,7 +11,7 @@ Aplicacion Angular 21 para gestion educativa con portal publico e intranet priva
 > **`rules/`** es directorio mágico — todo `.md` ahí se auto-carga en cada chat.
 > **`reference/`** no es mágico — se lee on-demand con `Read` cuando el trigger aplica.
 
-**Always-on** (en `rules/`): `code-style`, `code-language`, `comments`, `git`, `chat-modes`, `backlog-hygiene`, `one-repo-one-chat`, `state-management`.
+**Always-on** (en `rules/`): `code-style`, `code-language`, `git`, `chat-modes`, `backlog-hygiene`, `one-repo-one-chat`.
 
 ---
 
@@ -21,7 +21,7 @@ Cada línea: `- ruta/archivo.md — <trigger>`. Leé el archivo cuando el trigge
 
 ### Reglas always-on (en `rules/`, se auto-cargan)
 
-`code-style`, `code-language`, `comments`, `git`, `chat-modes`, `backlog-hygiene`, `one-repo-one-chat`, `state-management` — no necesitan trigger, siempre disponibles.
+`code-style`, `code-language`, `git`, `chat-modes`, `backlog-hygiene`, `one-repo-one-chat` — no necesitan trigger, siempre disponibles.
 
 ### Contexto del negocio
 
@@ -40,6 +40,11 @@ Cada línea: `- ruta/archivo.md — <trigger>`. Leé el archivo cuando el trigge
 - [../educa-coord/fitness/README.md](../../educa-coord/fitness/README.md) — sospechás drift arquitectónico, vas a agregar un chequeo medible nuevo, o querés saber qué FIT-* observa un cambio. Catálogo de 27 funciones (`FIT-01..FIT-61`) ancladas al CHARTER, clasificadas por estado (`enforced` / `monitored` / `manual` / `aspirational`)
 - [../educa-coord/principles/README.md](../../educa-coord/principles/README.md) — vas a tomar una decisión arquitectónica no trivial (tradeoffs, boundaries, abstracción, dependencias). El README rutea a los 17 elementos del marco; cada uno tiene su `claude.md` con regla operativa ≤40 ln
 - [../educa-coord/invariants/README.md](../../educa-coord/invariants/README.md) — vas a tocar dominio educativo (asistencia, calificaciones, aprobación, horarios, matrícula, periodos, permisos, concurrencia, correos, feedback, error-tracing, reportes, estructura académica, DNI/auditoría). El README rutea al `INV-*` específico por dominio
+
+### Código Angular (estilo y patrones)
+
+- [.claude/reference/comments.md](reference/comments.md) — vas a escribir comentarios en código Angular (formato `#region`, reglas por tipo de archivo store/component/facade/template/SCSS)
+- [.claude/reference/state-management.md](reference/state-management.md) — vas a crear/editar stores, facades, signals, computed, o tocar la frontera RxJS↔Signals
 
 ### Estructura y arquitectura
 

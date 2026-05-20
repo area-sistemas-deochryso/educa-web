@@ -16,7 +16,7 @@ let isRefreshing = false;
 let refreshResult$ = new Subject<boolean>();
 
 /** URLs that should never trigger a refresh-on-401 (prevents infinite loops). */
-const SKIP_REFRESH_URLS = ['/login', '/verificar', '/logout', '/refresh'];
+const SKIP_REFRESH_URLS = ['/login', '/verificar', '/logout', '/refresh', '/sessions', '/switch-session'];
 
 /** Max time (ms) to wait for a pending refresh before giving up. */
 const REFRESH_WAIT_TIMEOUT = 10_000;

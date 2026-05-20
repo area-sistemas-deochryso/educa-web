@@ -219,7 +219,11 @@ export class AuthService {
 		};
 
 		// Only store user info — token is in HttpOnly cookie
-		this.storage.setUser(user, rememberMe);
+		try {
+			this.storage.setUser(user, rememberMe);
+		} catch (e) {
+			logger.error('[Auth] Failed to persist user session:', e);
+		}
 
 		this._isAuthenticated.set(true);
 		this._currentUser.set(user);
