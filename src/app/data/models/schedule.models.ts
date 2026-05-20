@@ -44,6 +44,7 @@ export interface HorarioDetalleResponseDto {
   profesorNombreCompleto: string | null;
   profesorDni: string | null;
   cantidadEstudiantes: number;
+  estudiantesDisponiblesSalon: number;
   estudiantes: EstudianteHorarioDto[];
   tutorNombre: string | null;
   usuarioReg: string;

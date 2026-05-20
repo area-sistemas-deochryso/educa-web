@@ -285,7 +285,10 @@
 								label="Asignar Todos"
 								class="p-button-text p-button-sm"
 								(click)="onAsignarTodosEstudiantes()"
-								pTooltip="Asignar todos los estudiantes del salón"
+								[disabled]="detalle()!.estudiantesDisponiblesSalon === 0"
+								[pTooltip]="detalle()!.estudiantesDisponiblesSalon === 0
+									? 'No hay estudiantes matriculados en este salón'
+									: 'Asignar todos los estudiantes del salón'"
 								tooltipPosition="top"
 							></button>
 						</div>
@@ -320,6 +323,11 @@
 								}
 							</div>
 						}
+					</div>
+				} @else if (detalle()!.estudiantesDisponiblesSalon === 0) {
+					<div class="no-assignment">
+						<i class="pi pi-info-circle"></i>
+						<p>No hay estudiantes matriculados en el salón {{ detalle()!.salonDescripcion }}. Matricula estudiantes primero.</p>
 					</div>
 				} @else {
 					<div class="no-assignment">

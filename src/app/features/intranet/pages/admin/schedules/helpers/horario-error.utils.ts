@@ -18,6 +18,11 @@ export const HORARIO_ERROR_POLICY: ErrorPolicy = {
 		const message = (err.error?.message ?? '') as string;
 		const errorCode = (err.error?.errorCode ?? '') as string;
 
+		// No students available in salon
+		if (errorCode === 'HORARIO_SIN_ESTUDIANTES') {
+			return 'Sin estudiantes disponibles';
+		}
+
 		// Conflict: HORARIO_OVERLAP or message includes conflict keywords
 		if (
 			errorCode === 'HORARIO_OVERLAP' ||
