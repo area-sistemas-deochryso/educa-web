@@ -4,7 +4,7 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { Subject, catchError, debounceTime, distinctUntilChanged, of, switchMap, tap } from 'rxjs';
 
 import { ErrorHandlerService } from '@core/services/error';
-import { logger } from '@core/helpers/logs/logger';
+import { logger } from '@core/helpers';
 
 import {
 	CorreoIndividualErrorCode,

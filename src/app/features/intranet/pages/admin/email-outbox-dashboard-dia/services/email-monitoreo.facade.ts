@@ -2,7 +2,7 @@ import { DestroyRef, inject, Injectable } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { catchError, Observable, of, Subscription, timer } from 'rxjs';
 
-import { logger } from '@core/helpers/logs/logger';
+import { logger } from '@core/helpers';
 
 import { DeferFailStatus } from '@features/intranet/pages/admin/email-outbox/models/defer-fail-status.models';
 import { EmailOutboxApiService } from '@features/intranet/pages/admin/email-outbox/services/email-outbox.service';
