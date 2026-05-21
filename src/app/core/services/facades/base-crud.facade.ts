@@ -15,7 +15,7 @@ import { ActivityTrackerService, ErrorHandlerService } from '@core/services/erro
 // eslint-disable-next-line layer-enforcement/imports-error -- DEBT: xrepo-50-F3a
 import { SwService } from '@features/intranet/services/sw/sw.service';
 import { WalFacadeHelper, WalCrossTabRefetchService } from '@core/services/wal';
-import type { BaseCrudStore } from '@core/store/base/base-crud.store';
+import type { BaseCrudStore } from '@core/store';
 import type {
 	BaseCrudFacadeConfig,
 	EstadisticaKeys,
