@@ -1,5 +1,5 @@
 import { AttendanceService, SalonProfesor, StorageService, UserProfileService } from '@core/services';
-import { esGradoAsistenciaDiaria } from '@shared/constants/attendance-scope';
+import { esGradoAsistenciaDiaria } from '@shared/constants';
 import { periodoEnMes, filtrarPorPeriodoAcademico } from '@shared/models';
 import { JustificacionEvent } from '@features/intranet/components/attendance/attendance-day-list/attendance-day-list.component';
 import { ChangeDetectionStrategy, Component, DestroyRef, OnInit, ViewChild, computed, inject, output, signal } from '@angular/core';

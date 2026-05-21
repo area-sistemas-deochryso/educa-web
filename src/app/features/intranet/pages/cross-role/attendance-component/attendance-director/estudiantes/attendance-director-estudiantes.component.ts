@@ -8,7 +8,7 @@ import { ChangeDetectionStrategy, Component, DestroyRef, OnInit, ViewChild, comp
 import { AttendanceDayListComponent } from '@features/intranet/components/attendance/attendance-day-list/attendance-day-list.component';
 import { AttendanceLegendComponent } from '@app/features/intranet/components/attendance/attendance-legend/attendance-legend.component';
 import { AttendanceScopeBannerComponent } from '@intranet-shared/components/attendance-scope-banner';
-import { esGradoAsistenciaDiaria } from '@shared/constants/attendance-scope';
+import { esGradoAsistenciaDiaria } from '@shared/constants';
 import { AttendanceTableComponent } from '@features/intranet/components/attendance/attendance-table/attendance-table.component';
 import { AttendanceTableSkeletonComponent } from '@features/intranet/components/attendance/attendance-table-skeleton/attendance-table-skeleton.component';
 import { AttendanceViewController } from '@features/intranet/services/attendance/attendance-view.service';

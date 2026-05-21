@@ -1,11 +1,6 @@
 // #region Imports
 import { Component } from '@angular/core';
-import { HeroSectionComponent } from '@shared/components/sections/hero';
-import { AboutSectionComponent } from '@shared/components/sections/about';
-import { CoursesSectionComponent } from '@shared/components/sections/courses';
-import { CounterSectionComponent } from '@shared/components/sections/counter';
-import { TestimonialsSectionComponent } from '@shared/components/sections/testimonials';
-import { CtaSectionComponent } from '@shared/components/sections/cta';
+import { AboutSectionComponent, CoursesSectionComponent, CounterSectionComponent, CtaSectionComponent, HeroSectionComponent, TestimonialsSectionComponent } from '@shared/components';
 
 // #endregion
 // #region Implementation

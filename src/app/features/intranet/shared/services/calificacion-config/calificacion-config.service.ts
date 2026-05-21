@@ -23,7 +23,7 @@ export {
 	convertToLiteral,
 	formatNotaConConfig,
 	type NotaClasificacion,
-} from '@shared/utils/calificacion-config.utils';
+} from '@shared/utils';
 // #endregion
 
 // #region Servicio con cache HTTP

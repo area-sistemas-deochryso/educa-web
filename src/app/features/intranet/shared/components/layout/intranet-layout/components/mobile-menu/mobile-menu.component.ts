@@ -16,7 +16,7 @@ import { FormsModule } from '@angular/forms';
 import { NavigationEnd, Router, RouterLink } from '@angular/router';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { filter, map, startWith } from 'rxjs/operators';
-import { ModuloId } from '@shared/constants/module-registry';
+import { ModuloId } from '@shared/constants';
 import { QuickAccessFavoritesService } from '@intranet-shared/services';
 import { UserProfileMenuComponent } from '../user-profile-menu';
 // #endregion

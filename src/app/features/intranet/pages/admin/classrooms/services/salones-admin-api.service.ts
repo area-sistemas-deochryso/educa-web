@@ -4,7 +4,7 @@ import { Observable, of } from 'rxjs';
 import { catchError, map } from 'rxjs/operators';
 
 import { environment } from '@config/environment';
-import { EstudianteAsistencia } from '@shared/services/attendance';
+import { EstudianteAsistencia } from '@shared/services';
 import { HorarioResponseDto, SalonNotasResumenDto } from '@data/models';
 
 import {

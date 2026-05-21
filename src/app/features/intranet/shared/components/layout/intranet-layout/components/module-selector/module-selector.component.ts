@@ -17,7 +17,7 @@ import { toSignal } from '@angular/core/rxjs-interop';
 import { filter, map, startWith } from 'rxjs/operators';
 
 import { ModuloMenu } from '../../intranet-menu.config';
-import { ModuloId } from '@shared/constants/module-registry';
+import { ModuloId } from '@shared/constants';
 import { QuickAccessFavoritesService } from '@intranet-shared/services';
 // #endregion
 

@@ -2,9 +2,7 @@
 import { Component, inject } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
 import { CacheVersionManagerService, CapacitorService, SwService } from '@core/services';
-import { DevtoolsPanelComponent } from '@shared/components/devtools';
-import { RateLimitCountdownToastComponent } from '@shared/components/rate-limit-countdown-toast';
-import { ToastContainerComponent } from '@shared/components/toast-container';
+import { DevtoolsPanelComponent, RateLimitCountdownToastComponent, ToastContainerComponent } from '@shared/components';
 
 // #endregion
 // #region Implementation

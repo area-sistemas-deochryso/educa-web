@@ -13,7 +13,7 @@ import { forkJoin, of, catchError, Observable } from 'rxjs';
 import {
 	AttendanceService,
 	AsistenciaProfesorApiService,
-} from '@shared/services/attendance';
+} from '@shared/services';
 import {
 	SalonProfesor,
 	EstadisticasAsistenciaDia,
@@ -21,9 +21,9 @@ import {
 	AsistenciaDiaConEstadisticas,
 	AttendanceStatus,
 } from '@data/models';
-import { esGradoAsistenciaDiaria } from '@shared/constants/attendance-scope';
+import { esGradoAsistenciaDiaria } from '@shared/constants';
 import { AttendanceScopeStudentNoticeComponent } from '@intranet-shared/components/attendance-scope-student-notice';
-import { SkeletonLoaderComponent } from '@shared/components/skeleton-loader/skeleton-loader.component';
+import { SkeletonLoaderComponent } from '@shared/components';
 
 @Component({
 	selector: 'app-profesor-attendance-widget',

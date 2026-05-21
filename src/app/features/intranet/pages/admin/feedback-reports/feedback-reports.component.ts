@@ -23,8 +23,7 @@ import {
 	ReporteEstado,
 	ReporteUsuarioListaDto,
 } from '@core/services/feedback';
-import { CorrelationIdPillComponent } from '@shared/components/correlation-id-pill';
-import { PageHeaderComponent } from '@shared/components';
+import { CorrelationIdPillComponent, PageHeaderComponent } from '@shared/components';
 
 import { FeedbackReportsFacade } from './services';
 

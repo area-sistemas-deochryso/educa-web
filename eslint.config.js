@@ -879,6 +879,116 @@ const LAYER_RULES = [
 			},
 		],
 	},
+
+	// ── @shared/* barrel-only ──────────────────────────────────────────
+	{
+		id: 'shared-components-barrel-only',
+		severity: 'error',
+		match: (f) => !/\/src\/app\/shared\//.test(f),
+		restrictions: [
+			{
+				sourcePattern: /^@shared\/components\/.+/,
+				message:
+					'Importar desde @shared/components (barrel), no del path interno.',
+			},
+		],
+	},
+	{
+		id: 'shared-constants-barrel-only',
+		severity: 'error',
+		match: (f) => !/\/src\/app\/shared\//.test(f),
+		restrictions: [
+			{
+				sourcePattern: /^@shared\/constants\/.+/,
+				message:
+					'Importar desde @shared/constants (barrel), no del path interno.',
+			},
+		],
+	},
+	{
+		id: 'shared-directives-barrel-only',
+		severity: 'error',
+		match: (f) => !/\/src\/app\/shared\//.test(f),
+		restrictions: [
+			{
+				sourcePattern: /^@shared\/directives\/.+/,
+				message:
+					'Importar desde @shared/directives (barrel), no del path interno.',
+			},
+		],
+	},
+	{
+		id: 'shared-interfaces-barrel-only',
+		severity: 'error',
+		match: (f) => !/\/src\/app\/shared\//.test(f),
+		restrictions: [
+			{
+				sourcePattern: /^@shared\/interfaces\/.+/,
+				message:
+					'Importar desde @shared/interfaces (barrel), no del path interno.',
+			},
+		],
+	},
+	{
+		id: 'shared-models-barrel-only',
+		severity: 'error',
+		match: (f) => !/\/src\/app\/shared\//.test(f),
+		restrictions: [
+			{
+				sourcePattern: /^@shared\/models\/.+/,
+				message:
+					'Importar desde @shared/models (barrel), no del path interno.',
+			},
+		],
+	},
+	{
+		id: 'shared-pipes-barrel-only',
+		severity: 'error',
+		match: (f) => !/\/src\/app\/shared\//.test(f),
+		restrictions: [
+			{
+				sourcePattern: /^@shared\/pipes\/.+/,
+				message:
+					'Importar desde @shared/pipes (barrel), no del path interno.',
+			},
+		],
+	},
+	{
+		id: 'shared-services-barrel-only',
+		severity: 'error',
+		match: (f) => !/\/src\/app\/shared\//.test(f),
+		restrictions: [
+			{
+				sourcePattern: /^@shared\/services\/.+/,
+				message:
+					'Importar desde @shared/services (barrel), no del path interno.',
+			},
+		],
+	},
+	{
+		id: 'shared-utils-barrel-only',
+		severity: 'error',
+		match: (f) => !/\/src\/app\/shared\//.test(f),
+		restrictions: [
+			{
+				sourcePattern: /^@shared\/utils\/.+/,
+				message:
+					'Importar desde @shared/utils (barrel), no del path interno.',
+			},
+		],
+	},
+	{
+		id: 'shared-validators-barrel-only',
+		severity: 'error',
+		match: (f) => !/\/src\/app\/shared\//.test(f),
+		restrictions: [
+			{
+				sourcePattern: /^@shared\/validators\/.+/,
+				message:
+					'Importar desde @shared/validators (barrel), no del path interno.',
+			},
+		],
+	},
 ];
 
 function createImportChecker(severityFilter) {

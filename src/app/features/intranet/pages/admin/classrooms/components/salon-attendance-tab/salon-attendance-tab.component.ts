@@ -6,7 +6,7 @@ import { TableModule } from 'primeng/table';
 import { SelectModule } from 'primeng/select';
 import { TagModule } from 'primeng/tag';
 
-import { EstudianteAsistencia, AttendanceStatus } from '@shared/services/attendance';
+import { EstudianteAsistencia, AttendanceStatus } from '@shared/services';
 import {
 	ATTENDANCE_STATUS_CONFIGS,
 	getSalonStatusClass,

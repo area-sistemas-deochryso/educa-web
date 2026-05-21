@@ -18,7 +18,7 @@ import {
 	NavMenuItem,
 } from './components';
 import { ModuloMenu, buildModuloMenus, detectModuloFromUrl } from './intranet-menu.config';
-import { ModuloId } from '@shared/constants/module-registry';
+import { ModuloId } from '@shared/constants';
 import { FeatureFlagsFacade } from '@core/services/feature-flags';
 import { QuickAccessFavoritesService } from '@intranet-shared/services';
 import { AccessDeniedModalComponent } from '@intranet-shared/components/access-denied-modal';

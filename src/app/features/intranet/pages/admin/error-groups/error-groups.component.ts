@@ -26,7 +26,7 @@ import { TagModule } from 'primeng/tag';
 import { TooltipModule } from 'primeng/tooltip';
 
 import { ErrorGroupsViewMode } from '@core/services/storage';
-import { MiniSparklineComponent } from '@shared/components/mini-sparkline';
+import { MiniSparklineComponent } from '@shared/components';
 import { PageHeaderComponent } from '@intranet-shared/components';
 import { TableSkeletonComponent } from '@intranet-shared/components/table-skeleton';
 

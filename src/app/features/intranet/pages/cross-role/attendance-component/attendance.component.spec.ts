@@ -7,7 +7,7 @@ import { AttendanceComponent } from './attendance.component';
 import { UserProfileService } from '@core/services';
 import { AttendanceApoderadoComponent } from './attendance-apoderado/attendance-apoderado.component';
 import { AttendanceEstudianteComponent } from './attendance-estudiante/attendance-estudiante.component';
-import { AppUserRole } from '@shared/constants/app-roles';
+import { AppUserRole } from '@shared/constants';
 
 // #endregion
 // #region Implementation

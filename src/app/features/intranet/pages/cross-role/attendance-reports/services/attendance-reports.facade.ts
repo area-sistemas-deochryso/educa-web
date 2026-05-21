@@ -5,8 +5,8 @@ import { downloadBlob, logger } from '@core/helpers';
 import {
 	DirectorAttendanceApiService,
 	TeacherAttendanceApiService,
-} from '@shared/services/attendance';
-import { isAdminRole } from '@shared/utils/role-policies.utils';
+} from '@shared/services';
+import { isAdminRole } from '@shared/utils';
 import { forkJoin } from 'rxjs';
 import { AttendanceReportsApiService } from './attendance-reports-api.service';
 import { AttendanceReportsStore } from './attendance-reports.store';

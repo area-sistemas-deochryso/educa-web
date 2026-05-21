@@ -1,7 +1,7 @@
 // #region Imports
 import { ChangeDetectionStrategy, Component, computed, input } from '@angular/core';
 
-import { SkeletonLoaderComponent } from '@shared/components/skeleton-loader/skeleton-loader.component';
+import { SkeletonLoaderComponent } from '@shared/components';
 // #endregion
 
 // #region Implementation

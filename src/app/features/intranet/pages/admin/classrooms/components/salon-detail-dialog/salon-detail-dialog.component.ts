@@ -5,7 +5,7 @@ import { DialogModule } from 'primeng/dialog';
 import { TabsModule } from 'primeng/tabs';
 import { ButtonModule } from 'primeng/button';
 
-import { EstudianteAsistencia } from '@shared/services/attendance';
+import { EstudianteAsistencia } from '@shared/services';
 import { HorarioResponseDto, SalonNotasResumenDto, resolveModoAsignacion } from '@data/models';
 import { TagModule } from 'primeng/tag';
 import { TooltipModule } from 'primeng/tooltip';

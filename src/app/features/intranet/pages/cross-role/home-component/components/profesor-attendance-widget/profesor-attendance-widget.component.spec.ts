@@ -7,7 +7,7 @@ import { ProfesorAttendanceWidgetComponent } from './profesor-attendance-widget.
 import {
 	AttendanceService,
 	AsistenciaProfesorApiService,
-} from '@shared/services/attendance';
+} from '@shared/services';
 import {
 	SalonProfesor,
 	AsistenciaDiaConEstadisticas,

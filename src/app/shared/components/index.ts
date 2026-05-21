@@ -4,6 +4,9 @@ export * from './skeleton-loader';
 export * from './devtools';
 export * from './correlation-id-pill';
 export * from './mini-sparkline';
+export * from './rate-limit-countdown-toast';
+export * from './sections';
+export * from './layout';
 // #endregion
 
 // #region Re-exports temporales (migrados a @intranet-shared)

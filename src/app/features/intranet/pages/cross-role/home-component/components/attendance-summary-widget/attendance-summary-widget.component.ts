@@ -13,12 +13,12 @@ import { forkJoin, of, catchError } from 'rxjs';
 import {
 	AttendanceService,
 	AsistenciaProfesorApiService,
-} from '@shared/services/attendance';
+} from '@shared/services';
 import {
 	EstadisticasDia,
 	EstadisticasAsistenciaDia,
 } from '@data/models';
-import { SkeletonLoaderComponent } from '@shared/components/skeleton-loader/skeleton-loader.component';
+import { SkeletonLoaderComponent } from '@shared/components';
 
 @Component({
 	selector: 'app-attendance-summary-widget',

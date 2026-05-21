@@ -11,8 +11,7 @@ import { DrawerModule } from 'primeng/drawer';
 import { ToastModule } from 'primeng/toast';
 import { MessageService } from 'primeng/api';
 
-import { StatsSkeletonComponent, TableSkeletonComponent } from '@shared/components';
-import { CorrelationIdPillComponent } from '@shared/components/correlation-id-pill';
+import { CorrelationIdPillComponent, StatsSkeletonComponent, TableSkeletonComponent } from '@shared/components';
 import { ExcelService } from '@core/services/excel';
 import { environment } from '@config/environment';
 import { EmailHubService } from '@features/intranet/pages/admin/email-outbox-dashboard-dia/services';

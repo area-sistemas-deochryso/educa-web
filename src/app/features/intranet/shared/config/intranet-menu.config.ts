@@ -1,8 +1,7 @@
 // #region Imports
 import { NavMenuItem } from '@intranet-shared/components/layout/intranet-layout/components';
 import { environment } from '@config/environment';
-import { PERMISOS, PermisoPath } from '@shared/constants';
-import { ModuloId, MODULOS } from '@shared/constants/module-registry';
+import { PERMISOS, PermisoPath, ModuloId, MODULOS } from '@shared/constants';
 
 // #endregion
 

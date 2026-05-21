@@ -10,7 +10,7 @@ import { testProviders } from '@test';
 import { AttendanceService, StorageService } from '@core/services';
 
 import { AttendanceDirectorComponent } from './attendance-director.component';
-import { AsistenciaProfesorApiService } from '@shared/services/attendance/asistencia-profesor-api.service';
+import { AsistenciaProfesorApiService } from '@shared/services';
 // #endregion
 
 describe('AttendanceDirectorComponent (shell)', () => {

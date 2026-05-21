@@ -4,7 +4,7 @@ import { TableModule } from 'primeng/table';
 import { TagModule } from 'primeng/tag';
 import { TooltipModule } from 'primeng/tooltip';
 
-import { CorrelationIdPillComponent } from '@shared/components/correlation-id-pill';
+import { CorrelationIdPillComponent } from '@shared/components';
 
 import { EntradaConCorreoEnviado } from '../../models/correos-dia.models';
 
