@@ -552,6 +552,38 @@ const LAYER_RULES = [
 			},
 		],
 	},
+	// Plan 50 F1 — core cannot import from features, shared, or intranet-shared.
+	// Core is the lowest app layer; upward dependencies break the architecture.
+	// Existing violations suppressed with `// DEBT: xrepo-50-F3a` — F3a moves files to fix them.
+	{
+		id: 'core-no-features',
+		severity: 'error',
+		match: (f) => /\/src\/app\/core\//.test(f),
+		restrictions: [
+			{
+				sourcePattern: /^@features\//,
+				message:
+					'core/ no puede importar de features/ — dependencia invertida. Mover el servicio a core/ o extraer interfaz. DEBT: xrepo-50-F3a.',
+			},
+			{
+				sourcePattern: /^@intranet-shared(\/|$)/,
+				message:
+					'core/ no puede importar de @intranet-shared — dependencia invertida. Mover a core/ o shared/. DEBT: xrepo-50-F3a.',
+			},
+		],
+	},
+	{
+		id: 'core-no-shared',
+		severity: 'error',
+		match: (f) => /\/src\/app\/core\//.test(f),
+		restrictions: [
+			{
+				sourcePattern: /^@shared\//,
+				message:
+					'core/ no puede importar de shared/ — dependencia invertida. Mover tipos a @data/ o helpers a @core/. DEBT: xrepo-50-F3a.',
+			},
+		],
+	},
 	// Plan 1 F5 — barrel-only public API para wrappers críticos. Consumidores externos
 	// deben importar desde el barrel (@core/services/<x>), no de paths internos a la impl.
 	// El barrel filtra qué se expone, eso es la facade.

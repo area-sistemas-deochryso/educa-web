@@ -1,5 +1,6 @@
 // #region Imports
 import { HttpInterceptorFn } from '@angular/common/http';
+// eslint-disable-next-line layer-enforcement/imports-error -- DEBT: xrepo-50-F3a
 import { extractPathname, getSchemaVersion } from '@shared/constants';
 // #endregion
 
