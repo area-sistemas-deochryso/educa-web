@@ -41,18 +41,18 @@ import {
 	SEARCH_MAX,
 	SEVERIDAD_OPTIONS,
 	TABLE_SKELETON_COLUMNS,
+	getEstadoLabel,
+	getEstadoSeverity,
+	getOrigenIcon,
+	getSeveridadSeverity,
 } from './config';
 import {
 	CambiarEstadoErrorGroup,
-	ESTADO_LABEL_MAP,
-	ESTADO_SEVERITY_MAP,
 	ErrorGroupEstado,
 	ErrorGroupLista,
 	ErrorOrigen,
 	ErrorSeveridad,
-	ORIGEN_ICON_MAP,
 	OcurrenciaLista,
-	SEVERIDAD_SEVERITY_MAP,
 } from './models';
 import {
 	ErrorGroupsCrudFacade,
@@ -93,7 +93,6 @@ import {
 	changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ErrorGroupsComponent implements OnInit {
-	// #region Dependencias
 	private readonly store = inject(ErrorGroupsStore);
 	private readonly dataFacade = inject(ErrorGroupsDataFacade);
 	private readonly crudFacade = inject(ErrorGroupsCrudFacade);
@@ -101,9 +100,7 @@ export class ErrorGroupsComponent implements OnInit {
 	private readonly route = inject(ActivatedRoute);
 	private readonly router = inject(Router);
 	private readonly destroyRef = inject(DestroyRef);
-	// #endregion
 
-	// #region Estado expuesto al template
 	readonly items = this.store.visibleItems;
 	readonly stats = this.store.stats;
 	readonly loading = this.store.loading;
@@ -137,9 +134,7 @@ export class ErrorGroupsComponent implements OnInit {
 		const g = this.trendDialogGroup();
 		return g ? this.trendCache().get(g.id) : undefined;
 	});
-	readonly trendDialogData = computed<readonly number[]>(
-		() => this.trendDialogEntry()?.data ?? [],
-	);
+	readonly trendDialogData = computed<readonly number[]>(() => this.trendDialogEntry()?.data ?? []);
 
 	readonly page = this.store.page;
 	readonly pageSize = this.store.pageSize;
@@ -157,38 +152,25 @@ export class ErrorGroupsComponent implements OnInit {
 
 	readonly paginatorFirst = computed(() => (this.page() - 1) * this.pageSize());
 
-	/** Vista activa: 'kanban' o 'table'. Persistida en PreferencesStorage. */
 	readonly viewMode = signal<ErrorGroupsViewMode>('kanban');
-	// #endregion
 
-	// #region Trend lazy-load (Plan 43 Chat 1.2)
-	/**
-	 * Cada vez que cambia la lista de items renderizados, disparar `requestTrend`
-	 * para los ids nuevos. `requestTrend` es idempotente: si ya hay cache (loading,
-	 * loaded o error) descarta el pedido sin hacer HTTP. Concurrencia limitada a
-	 * 3 in-flight en el facade.
-	 */
 	private readonly _trendDispatcher = effect(() => {
 		const items = this.store.items();
 		for (const item of items) {
 			this.dataFacade.requestTrend(item.id);
 		}
 	});
-	// #endregion
 
-	// #region Configuraciones estáticas
 	readonly estadoOptions = ESTADO_OPTIONS;
 	readonly severidadOptions = SEVERIDAD_OPTIONS;
 	readonly origenOptions = ORIGEN_OPTIONS;
 	readonly tableSkeletonColumns = TABLE_SKELETON_COLUMNS;
 	readonly searchMax = SEARCH_MAX;
-	readonly severidadSeverity = SEVERIDAD_SEVERITY_MAP;
-	readonly estadoLabel = ESTADO_LABEL_MAP;
-	readonly estadoSeverity = ESTADO_SEVERITY_MAP;
-	readonly origenIcon = ORIGEN_ICON_MAP;
-	// #endregion
+	readonly getSeveridadSeverity = getSeveridadSeverity;
+	readonly getEstadoLabel = getEstadoLabel;
+	readonly getEstadoSeverity = getEstadoSeverity;
+	readonly getOrigenIcon = getOrigenIcon;
 
-	// #region Lifecycle + URL sync
 	ngOnInit(): void {
 		this.route.queryParamMap
 			.pipe(takeUntilDestroyed(this.destroyRef))
@@ -229,9 +211,7 @@ export class ErrorGroupsComponent implements OnInit {
 			replaceUrl: true,
 		});
 	}
-	// #endregion
 
-	// #region Event handlers — Header + filtros
 	onRefresh(): void {
 		this.dataFacade.refresh();
 	}
@@ -273,9 +253,7 @@ export class ErrorGroupsComponent implements OnInit {
 		this.dataFacade.loadData();
 		this.syncUrl();
 	}
-	// #endregion
 
-	// #region Event handlers — Tabla + drawer del grupo
 	onPageChange(event: PaginatorState): void {
 		const currentPageSize = this.pageSize();
 		const newPageSize = event.rows ?? currentPageSize;
@@ -301,9 +279,7 @@ export class ErrorGroupsComponent implements OnInit {
 	onDrawerVisibleChange(visible: boolean): void {
 		if (!visible) this.uiFacade.closeDrawer();
 	}
-	// #endregion
 
-	// #region Event handlers — Sub-drawer ocurrencia + dialog cambio estado
 	onOccurrenceSelected(item: OcurrenciaLista): void {
 		this.uiFacade.openOccurrenceDrawer(item.id);
 	}
@@ -342,9 +318,7 @@ export class ErrorGroupsComponent implements OnInit {
 	onDialogCancel(): void {
 		this.uiFacade.closeDialog();
 	}
-	// #endregion
 
-	// #region Event handlers — Kanban + view toggle
 	onViewModeChange(mode: ErrorGroupsViewMode): void {
 		this.viewMode.set(mode);
 	}
@@ -356,9 +330,7 @@ export class ErrorGroupsComponent implements OnInit {
 	}): void {
 		this.crudFacade.moveCardOptimistic(payload.group, payload.toEstado);
 	}
-	// #endregion
 
-	// #region Event handlers — Trend dialog ampliado
 	onSparklineClick(group: ErrorGroupLista): void {
 		this.uiFacade.openTrendDialog(group);
 	}
@@ -366,23 +338,6 @@ export class ErrorGroupsComponent implements OnInit {
 	onTrendDialogVisibleChange(visible: boolean): void {
 		if (!visible) this.uiFacade.closeTrendDialog();
 	}
-	// #endregion
 
-	// #region Helpers visuales
-	getSeveridadSeverity(severidad: string): 'danger' | 'warn' | 'info' {
-		return this.severidadSeverity[severidad as ErrorSeveridad] ?? 'info';
-	}
 
-	getEstadoLabel(estado: string): string {
-		return this.estadoLabel[estado as ErrorGroupEstado] ?? estado;
-	}
-
-	getEstadoSeverity(estado: string): 'danger' | 'warn' | 'info' | 'success' | 'secondary' {
-		return this.estadoSeverity[estado as ErrorGroupEstado] ?? 'secondary';
-	}
-
-	getOrigenIcon(origen: string): string {
-		return this.origenIcon[origen as ErrorOrigen] ?? 'pi pi-question';
-	}
-	// #endregion
 }

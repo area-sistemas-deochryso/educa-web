@@ -20,7 +20,7 @@ import {
 	ORIGEN_ICON_MAP,
 	SEVERIDAD_SEVERITY_MAP,
 } from '../../models';
-import type { TrendCacheEntry } from '../../services/error-groups.store';
+import type { TrendCacheEntry } from '../../services';
 
 /**
  * Card presentacional para la vista Kanban del feature `error-groups`.

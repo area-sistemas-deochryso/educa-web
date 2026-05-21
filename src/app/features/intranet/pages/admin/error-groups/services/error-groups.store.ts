@@ -4,7 +4,6 @@ import {
 	ErrorGroupDetalle,
 	ErrorGroupEstado,
 	ErrorGroupLista,
-	ErrorGroupTrendDto,
 	ErrorOrigen,
 	ErrorSeveridad,
 	OcurrenciaLista,

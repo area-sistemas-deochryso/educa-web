@@ -24,7 +24,7 @@ import {
 	ErrorGroupEstado,
 	ErrorGroupLista,
 } from '../../models';
-import type { TrendCacheEntry } from '../../services/error-groups.store';
+import type { TrendCacheEntry } from '../../services';
 
 interface KanbanColumn {
 	estado: ErrorGroupEstado;

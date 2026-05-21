@@ -1,6 +1,14 @@
 import { SkeletonColumnDef } from '@intranet-shared/components/table-skeleton';
 
-import { ErrorGroupEstado, ErrorOrigen, ErrorSeveridad } from '../models';
+import {
+	ESTADO_LABEL_MAP,
+	ESTADO_SEVERITY_MAP,
+	ErrorGroupEstado,
+	ErrorOrigen,
+	ErrorSeveridad,
+	ORIGEN_ICON_MAP,
+	SEVERIDAD_SEVERITY_MAP,
+} from '../models';
 
 export const SEARCH_MAX = 200;
 
@@ -36,3 +44,19 @@ export const TABLE_SKELETON_COLUMNS: SkeletonColumnDef[] = [
 	{ width: '120px', cellType: 'text' },
 	{ width: '100px', cellType: 'actions' },
 ];
+
+export function getSeveridadSeverity(severidad: string): 'danger' | 'warn' | 'info' {
+	return SEVERIDAD_SEVERITY_MAP[severidad as ErrorSeveridad] ?? 'info';
+}
+
+export function getEstadoLabel(estado: string): string {
+	return ESTADO_LABEL_MAP[estado as ErrorGroupEstado] ?? estado;
+}
+
+export function getEstadoSeverity(estado: string): 'danger' | 'warn' | 'info' | 'success' | 'secondary' {
+	return ESTADO_SEVERITY_MAP[estado as ErrorGroupEstado] ?? 'secondary';
+}
+
+export function getOrigenIcon(origen: string): string {
+	return ORIGEN_ICON_MAP[origen as ErrorOrigen] ?? 'pi pi-question';
+}
