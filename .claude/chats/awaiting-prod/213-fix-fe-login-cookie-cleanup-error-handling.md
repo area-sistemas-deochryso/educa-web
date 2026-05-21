@@ -1,7 +1,8 @@
 # 213 — Fix FE: pre-login cookie cleanup + error handling hardening
 
 > **Plan**: `educa-coord/plans/xrepo-48-login-auth-resilience.md` (F3 FE)
-> **Creado**: 2026-05-20 · **Estado**: ⏳ pendiente arrancar.
+> **Creado**: 2026-05-20 · **Estado**: ✅ completado (commit `5471fdc`, 2026-05-20).
+> **Validación prod**: ⏳ pendiente desde 2026-05-20
 > **MODO SUGERIDO**: `/execute`
 > **Depende de**: 210 (investigate — completado)
 > **touches**: `core/interceptors/error/error.interceptor.ts`, `core/interceptors/credentials/credentials.interceptor.ts`, `features/intranet/pages/login/login-intranet.component.ts`, `core/services/auth/auth.service.ts`
