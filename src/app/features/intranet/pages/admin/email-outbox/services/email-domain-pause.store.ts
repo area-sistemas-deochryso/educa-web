@@ -6,7 +6,7 @@ import {
 	EmailDomainPauseEstadisticas,
 	EmailDomainPauseFormData,
 	EmailDomainPauseListaDto,
-} from '@data/models/email-domain-pause.models';
+} from '@data/models';
 
 const DEFAULT_FORM: EmailDomainPauseFormData = {
 	dominio: '',

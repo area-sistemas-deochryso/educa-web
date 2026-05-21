@@ -8,7 +8,7 @@ import {
 	BlacklistFiltros,
 	EmailBlacklistFiltroEstado,
 	EmailBlacklistMotivo,
-} from '@data/models/email-blacklist.models';
+} from '@data/models';
 
 import { BlacklistService } from './blacklist.service';
 import { BlacklistStore } from './blacklist.store';

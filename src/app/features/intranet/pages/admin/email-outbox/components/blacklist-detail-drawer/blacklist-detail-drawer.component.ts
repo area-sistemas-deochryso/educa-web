@@ -12,7 +12,7 @@ import { TagModule } from 'primeng/tag';
 import { TooltipModule } from 'primeng/tooltip';
 
 import { UiMappingService } from '@shared/services';
-import { EmailBlacklistEntry } from '@data/models/email-blacklist.models';
+import { EmailBlacklistEntry } from '@data/models';
 
 /**
  * Plan 38 Chat 5 — drawer detalle (B10 de `design-system.md`).

@@ -8,7 +8,7 @@ import {
 	EmailQuarantineFiltroEstado,
 	EmailQuarantineFiltros,
 	QuarantineMotivo,
-} from '@data/models/email-quarantine.models';
+} from '@data/models';
 
 import { EmailQuarantineService } from './email-quarantine.service';
 import { EmailQuarantineStore } from './email-quarantine.store';

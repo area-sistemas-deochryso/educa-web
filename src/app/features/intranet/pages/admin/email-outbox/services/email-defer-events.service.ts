@@ -8,7 +8,7 @@ import {
 	DeferEventTipo,
 	EmailDeferEventDto,
 	EmailDeferEventFiltros,
-} from '@data/models/email-defer-event.models';
+} from '@data/models';
 
 /**
  * Plan 37 Chat 3 — gateway HTTP del timeline EmailDeferEvent.

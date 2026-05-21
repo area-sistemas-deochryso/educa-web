@@ -1,4 +1,4 @@
-import type { SalonProfesor } from '@data/models/attendance.models';
+import type { SalonProfesor } from '@data/models';
 
 // #region Tipos semánticos
 export const ESTADO_FILTROS = ['todos', 'faltando', 'viniendo', 'tarde', 'temprano'] as const;

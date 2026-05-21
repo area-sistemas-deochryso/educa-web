@@ -1,7 +1,7 @@
 import { TestBed } from '@angular/core/testing';
 import { beforeEach, describe, expect, it } from 'vitest';
 
-import { EmailQuarantineListaDto } from '@data/models/email-quarantine.models';
+import { EmailQuarantineListaDto } from '@data/models';
 
 import { EmailQuarantineStore } from './email-quarantine.store';
 

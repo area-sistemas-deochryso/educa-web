@@ -31,7 +31,7 @@ import { EmailOutboxChartComponent } from './components/email-outbox-chart/email
 import { ThrottleStatusWidgetComponent } from './components/throttle-status-widget/throttle-status-widget.component';
 import { DeferFailStatusWidgetComponent } from './components/defer-fail-status-widget/defer-fail-status-widget.component';
 
-import { EmailOutboxLista } from '@data/models/email-outbox.models';
+import { EmailOutboxLista } from '@data/models';
 
 @Component({
 	selector: 'app-email-outbox',

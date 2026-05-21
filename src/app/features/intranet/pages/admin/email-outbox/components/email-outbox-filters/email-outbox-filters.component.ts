@@ -14,7 +14,7 @@ import {
 	EMAIL_OUTBOX_TIPOS,
 	EmailOutboxEstado,
 	EmailOutboxTipo,
-} from '@data/models/email-outbox.models';
+} from '@data/models';
 
 import { TIPOS_FALLO } from '../../models/tipo-fallo.models';
 import { TipoFalloLabelPipe } from '../../pipes/tipo-fallo-label.pipe';

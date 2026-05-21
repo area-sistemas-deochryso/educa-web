@@ -8,7 +8,7 @@ import {
 	CrearEmailDomainPauseDto,
 	EmailDomainPauseListaDto,
 	LiberarEmailDomainPauseDto,
-} from '@data/models/email-domain-pause.models';
+} from '@data/models';
 
 /**
  * Plan 37 Chat 3 — gateway HTTP del dominio EmailRecipientDomainPause.

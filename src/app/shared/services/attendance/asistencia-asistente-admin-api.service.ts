@@ -3,7 +3,7 @@ import { Injectable, inject } from '@angular/core';
 import { Observable } from 'rxjs';
 
 import { environment } from '@config/environment';
-import { AsistenciaDiaAsistentesAdminConEstadisticas } from '@data/models/attendance.models';
+import { AsistenciaDiaAsistentesAdminConEstadisticas } from '@data/models';
 
 /**
  * Gateway HTTP para la vista admin de asistencia de Asistentes Administrativos

@@ -18,7 +18,7 @@ import {
 	EmailQuarantineFormData,
 	QUARANTINE_DURATION_HOURS_OPTIONS,
 	QuarantineDurationHours,
-} from '@data/models/email-quarantine.models';
+} from '@data/models';
 
 interface DurationOption {
 	label: string;

@@ -8,7 +8,7 @@ import {
 	EstadisticasAsistenciaDia,
 	EstudianteAsistencia,
 	SalonProfesor,
-} from '@data/models/attendance.models';
+} from '@data/models';
 
 @Injectable({ providedIn: 'root' })
 export class TeacherAttendanceApiService {

@@ -4,7 +4,7 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { ErrorHandlerService } from '@core/services/error';
 import { WalFacadeHelper } from '@core/services/wal';
-import { EmailDomainPauseListaDto } from '@data/models/email-domain-pause.models';
+import { EmailDomainPauseListaDto } from '@data/models';
 
 import { EmailDomainPauseCrudFacade } from './email-domain-pause-crud.facade';
 import { EmailDomainPauseDataFacade } from './email-domain-pause-data.facade';

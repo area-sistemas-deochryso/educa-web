@@ -1,6 +1,6 @@
 import { Injectable, inject } from '@angular/core';
 
-import { EmailBlacklistEntry } from '@data/models/email-blacklist.models';
+import { EmailBlacklistEntry } from '@data/models';
 
 import { BlacklistStore } from './blacklist.store';
 

@@ -7,7 +7,7 @@ import {
 	EmailBlacklistEntry,
 	EmailBlacklistFiltroEstado,
 	EmailBlacklistMotivo,
-} from '@data/models/email-blacklist.models';
+} from '@data/models';
 
 /**
  * Plan 38 Chat 5 — store del tab Blacklist.

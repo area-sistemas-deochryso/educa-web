@@ -18,7 +18,7 @@ import {
 	DOMAIN_PAUSE_DURATION_HOURS_OPTIONS,
 	DomainPauseDurationHours,
 	EmailDomainPauseFormData,
-} from '@data/models/email-domain-pause.models';
+} from '@data/models';
 
 interface DurationOption {
 	label: string;

@@ -1,6 +1,6 @@
 import { computed, Injectable, signal } from '@angular/core';
 
-import { EmailOutboxLista } from '@data/models/email-outbox.models';
+import { EmailOutboxLista } from '@data/models';
 
 import { EmailDashboardDiaDto } from '../models/email-dashboard-dia.models';
 

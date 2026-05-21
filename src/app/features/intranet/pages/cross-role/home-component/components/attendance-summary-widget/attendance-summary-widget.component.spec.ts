@@ -11,7 +11,7 @@ import {
 import {
 	EstadisticasDia,
 	AsistenciaDiaProfesoresConEstadisticas,
-} from '@data/models/attendance.models';
+} from '@data/models';
 
 // #endregion
 // #region Fixtures

@@ -13,7 +13,7 @@ import { TooltipModule } from 'primeng/tooltip';
 
 import type { SkeletonColumnDef } from '@shared/components';
 import { UiMappingService } from '@shared/services';
-import { EmailBlacklistEntry } from '@data/models/email-blacklist.models';
+import { EmailBlacklistEntry } from '@data/models';
 
 /**
  * Plan 38 Chat 5 — tabla server-paginated de entradas en `EmailBlacklist`.

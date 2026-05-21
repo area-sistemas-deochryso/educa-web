@@ -16,7 +16,7 @@ import { UiMappingService } from '@shared/services';
 import {
 	EmailQuarantineDetalleDto,
 	EmailQuarantineListaDto,
-} from '@data/models/email-quarantine.models';
+} from '@data/models';
 
 /**
  * Plan 37 Chat 3 — drawer detalle de cuarentena (B10).

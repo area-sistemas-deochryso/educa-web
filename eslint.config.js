@@ -584,6 +584,34 @@ const LAYER_RULES = [
 			},
 		],
 	},
+	// Barrel-only enforcement for @data/*. Consumers must import from @data/models or
+	// @data/adapters, not from internal paths like @data/models/attendance.models.
+	{
+		id: 'data-models-barrel-only',
+		severity: 'error',
+		match: (f) =>
+			!/\/src\/app\/data\/models\//.test(f) &&
+			!/\/shared\/services\/attendance\/attendance\.models\.ts$/.test(f),
+		restrictions: [
+			{
+				sourcePattern: /^@data\/models\/.+/,
+				message:
+					'Importar desde @data/models (barrel), no del path interno.',
+			},
+		],
+	},
+	{
+		id: 'data-adapters-barrel-only',
+		severity: 'error',
+		match: (f) => !/\/src\/app\/data\/adapters\//.test(f),
+		restrictions: [
+			{
+				sourcePattern: /^@data\/adapters\/.+/,
+				message:
+					'Importar desde @data/adapters (barrel), no del path interno.',
+			},
+		],
+	},
 	// Barrel-only enforcement for @core/services/*. Consumers must import from the barrel
 	// (@core/services/<group>), not from internal paths. The barrel defines the public API.
 	// Plan 1 F5: storage, wal, session. Plan 50 F2a: remaining 19 groups.

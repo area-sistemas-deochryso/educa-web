@@ -5,7 +5,7 @@ import { TagModule } from 'primeng/tag';
 import { TooltipModule } from 'primeng/tooltip';
 
 import { ErrorHandlerService } from '@core/services/error';
-import { EmailOutboxLista } from '@data/models/email-outbox.models';
+import { EmailOutboxLista } from '@data/models';
 
 import { TipoFalloLabelPipe } from '@features/intranet/pages/admin/email-outbox/pipes/tipo-fallo-label.pipe';
 

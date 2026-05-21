@@ -13,7 +13,7 @@ import { TooltipModule } from 'primeng/tooltip';
 
 import type { SkeletonColumnDef } from '@shared/components';
 import { UiMappingService } from '@shared/services';
-import { EmailDomainPauseListaDto } from '@data/models/email-domain-pause.models';
+import { EmailDomainPauseListaDto } from '@data/models';
 
 /**
  * Plan 37 Chat 3 — tabla client-side de dominios pausados

@@ -4,7 +4,7 @@ import { DecimalPipe } from '@angular/common';
 import { TagModule } from 'primeng/tag';
 import { TooltipModule } from 'primeng/tooltip';
 
-import { EmailOutboxEstadisticas } from '@data/models/email-outbox.models';
+import { EmailOutboxEstadisticas } from '@data/models';
 
 @Component({
 	selector: 'app-email-outbox-stats',

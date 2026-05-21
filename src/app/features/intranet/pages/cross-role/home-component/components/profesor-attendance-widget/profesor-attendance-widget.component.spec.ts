@@ -13,7 +13,7 @@ import {
 	AsistenciaDiaConEstadisticas,
 	AsistenciaProfesorDto,
 	AsistenciaDetalle,
-} from '@data/models/attendance.models';
+} from '@data/models';
 
 // #endregion
 // #region Fixtures

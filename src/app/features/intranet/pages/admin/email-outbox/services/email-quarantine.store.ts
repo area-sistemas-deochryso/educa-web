@@ -8,7 +8,7 @@ import {
 	EmailQuarantineFormData,
 	EmailQuarantineListaDto,
 	QuarantineMotivo,
-} from '@data/models/email-quarantine.models';
+} from '@data/models';
 
 const DEFAULT_FORM: EmailQuarantineFormData = {
 	destinatario: '',

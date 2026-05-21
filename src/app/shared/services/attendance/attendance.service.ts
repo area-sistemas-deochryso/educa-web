@@ -14,7 +14,7 @@ import {
 	ProfesorSede,
 	ResumenAsistencia,
 	SalonProfesor,
-} from '@data/models/attendance.models';
+} from '@data/models';
 
 import { StudentAttendanceApiService } from './student-attendance-api.service';
 import { GuardianAttendanceApiService } from './guardian-attendance-api.service';

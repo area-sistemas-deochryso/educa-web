@@ -13,7 +13,7 @@ import { TooltipModule } from 'primeng/tooltip';
 
 import type { SkeletonColumnDef } from '@shared/components';
 import { UiMappingService } from '@shared/services';
-import { EmailQuarantineListaDto } from '@data/models/email-quarantine.models';
+import { EmailQuarantineListaDto } from '@data/models';
 
 /**
  * Plan 37 Chat 3 — tabla server-paginated de cuarentenas activas/liberadas.

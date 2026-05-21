@@ -7,14 +7,12 @@ import type {
 	NotificacionTipo,
 	NotificacionPrioridad,
 	TipoPersona,
-} from '@data/models';
-import type { EmailBlacklistMotivo } from '@data/models/email-blacklist.models';
-import type {
+	EmailBlacklistMotivo,
 	MotivoLiberacion,
 	QuarantineMotivo,
-} from '@data/models/email-quarantine.models';
-import type { DomainPauseMotivo } from '@data/models/email-domain-pause.models';
-import type { DeferEventTipo } from '@data/models/email-defer-event.models';
+	DomainPauseMotivo,
+	DeferEventTipo,
+} from '@data/models';
 
 // #endregion
 // #region Implementation

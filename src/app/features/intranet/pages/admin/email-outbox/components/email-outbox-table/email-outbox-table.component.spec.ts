@@ -2,7 +2,7 @@ import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { NoopAnimationsModule } from '@angular/platform-browser/animations';
 import { beforeEach, describe, expect, it } from 'vitest';
 
-import { EmailOutboxLista } from '@data/models/email-outbox.models';
+import { EmailOutboxLista } from '@data/models';
 
 import { EmailOutboxTableComponent } from './email-outbox-table.component';
 

@@ -26,7 +26,7 @@ import {
 	EstadisticasAsistenciaDia,
 	PersonaAsistencia,
 	asistenteAdminToPersonaAsistencia,
-} from '@data/models/attendance.models';
+} from '@data/models';
 import { AsistenciaAsistenteAdminApiService } from '@shared/services/attendance';
 import { formatDateLocalIso } from '@core/helpers';
 import { ErrorHandlerService } from '@core/services';

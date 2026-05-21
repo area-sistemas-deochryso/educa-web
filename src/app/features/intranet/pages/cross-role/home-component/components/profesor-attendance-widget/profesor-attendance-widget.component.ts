@@ -20,7 +20,7 @@ import {
 	AsistenciaDetalle,
 	AsistenciaDiaConEstadisticas,
 	AttendanceStatus,
-} from '@data/models/attendance.models';
+} from '@data/models';
 import { esGradoAsistenciaDiaria } from '@shared/constants/attendance-scope';
 import { AttendanceScopeStudentNoticeComponent } from '@intranet-shared/components/attendance-scope-student-notice';
 import { SkeletonLoaderComponent } from '@shared/components/skeleton-loader/skeleton-loader.component';

@@ -10,7 +10,7 @@ import {
 	EmailQuarantineFiltros,
 	EmailQuarantineListaDto,
 	LiberarEmailQuarantineDto,
-} from '@data/models/email-quarantine.models';
+} from '@data/models';
 
 /**
  * Plan 37 Chat 3 — gateway HTTP del dominio EmailQuarantine.

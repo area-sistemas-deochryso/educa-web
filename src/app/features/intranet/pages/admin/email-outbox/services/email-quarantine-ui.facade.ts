@@ -2,7 +2,7 @@ import { Injectable, inject } from '@angular/core';
 import { firstValueFrom } from 'rxjs';
 
 import { logger } from '@core/helpers';
-import { EmailQuarantineListaDto } from '@data/models/email-quarantine.models';
+import { EmailQuarantineListaDto } from '@data/models';
 
 import { EmailQuarantineService } from './email-quarantine.service';
 import { EmailQuarantineStore } from './email-quarantine.store';

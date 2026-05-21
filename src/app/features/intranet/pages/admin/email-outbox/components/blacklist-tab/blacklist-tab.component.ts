@@ -22,7 +22,7 @@ import {
 	EmailBlacklistEntry,
 	EmailBlacklistFiltroEstado,
 	EmailBlacklistMotivo,
-} from '@data/models/email-blacklist.models';
+} from '@data/models';
 
 import {
 	BlacklistCrudFacade,

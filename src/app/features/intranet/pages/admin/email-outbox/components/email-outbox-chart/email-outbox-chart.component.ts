@@ -1,6 +1,6 @@
 import { ChangeDetectionStrategy, Component, computed, input } from '@angular/core';
 
-import { EmailOutboxTendencia } from '@data/models/email-outbox.models';
+import { EmailOutboxTendencia } from '@data/models';
 
 @Component({
 	selector: 'app-email-outbox-chart',

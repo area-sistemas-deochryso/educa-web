@@ -17,9 +17,9 @@ export type {
 	TipoPersonaFilter,
 	SincronizarResultado,
 	SincronizarTipoResultado,
-} from '@data/models/attendance-admin.models';
+} from '@data/models';
 
-import type { TipoPersonaAsistencia } from '@data/models/attendance-admin.models';
+import type { TipoPersonaAsistencia } from '@data/models';
 
 // Form data local al feature.
 export interface AsistenciaFormData {

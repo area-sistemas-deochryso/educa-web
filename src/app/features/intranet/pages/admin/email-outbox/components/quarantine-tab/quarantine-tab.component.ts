@@ -21,7 +21,7 @@ import {
 	EmailQuarantineListaDto,
 	QuarantineDurationHours,
 	QuarantineMotivo,
-} from '@data/models/email-quarantine.models';
+} from '@data/models';
 
 import {
 	EmailQuarantineCrudFacade,

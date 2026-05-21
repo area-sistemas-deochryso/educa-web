@@ -11,7 +11,7 @@ import {
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
 import { logger } from '@core/helpers';
-import { EmailDeferEventDto } from '@data/models/email-defer-event.models';
+import { EmailDeferEventDto } from '@data/models';
 
 import { EmailDeferEventsService } from '../../services';
 

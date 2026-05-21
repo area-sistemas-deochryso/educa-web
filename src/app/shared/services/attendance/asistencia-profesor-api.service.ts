@@ -6,7 +6,7 @@ import { environment } from '@config/environment';
 import {
 	AsistenciaDiaProfesoresConEstadisticas,
 	AsistenciaProfesorDto,
-} from '@data/models/attendance.models';
+} from '@data/models';
 import { PaginatedResponse } from '@shared/models';
 
 /**

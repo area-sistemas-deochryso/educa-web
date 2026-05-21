@@ -1,7 +1,7 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
-import { BlacklistFormData } from '@data/models/email-blacklist.models';
+import { BlacklistFormData } from '@data/models';
 
 import { BlacklistAddDialogComponent } from './blacklist-add-dialog.component';
 

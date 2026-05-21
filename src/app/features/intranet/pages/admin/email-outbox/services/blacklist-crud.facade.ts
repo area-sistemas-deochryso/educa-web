@@ -8,7 +8,7 @@ import { WalFacadeHelper } from '@core/services/wal';
 import {
 	CrearBlacklistRequest,
 	EmailBlacklistEntry,
-} from '@data/models/email-blacklist.models';
+} from '@data/models';
 
 import { BlacklistDataFacade } from './blacklist-data.facade';
 import { BlacklistService } from './blacklist.service';

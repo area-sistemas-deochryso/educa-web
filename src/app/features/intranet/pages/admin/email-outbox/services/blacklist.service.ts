@@ -9,7 +9,7 @@ import {
 	CrearBlacklistRequest,
 	DespejarBlacklistResponse,
 	EmailBlacklistEntry,
-} from '@data/models/email-blacklist.models';
+} from '@data/models';
 
 /**
  * Plan 38 Chat 5 — gateway HTTP del dominio blacklist.

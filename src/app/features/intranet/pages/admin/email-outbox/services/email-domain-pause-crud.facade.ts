@@ -9,7 +9,7 @@ import {
 	CrearEmailDomainPauseDto,
 	EmailDomainPauseListaDto,
 	LiberarEmailDomainPauseDto,
-} from '@data/models/email-domain-pause.models';
+} from '@data/models';
 
 import { EmailDomainPauseDataFacade } from './email-domain-pause-data.facade';
 import { EmailDomainPauseService } from './email-domain-pause.service';

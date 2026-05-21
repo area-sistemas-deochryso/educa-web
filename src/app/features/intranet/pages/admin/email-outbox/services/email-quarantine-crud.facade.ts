@@ -9,7 +9,7 @@ import {
 	CrearEmailQuarantineDto,
 	EmailQuarantineListaDto,
 	LiberarEmailQuarantineDto,
-} from '@data/models/email-quarantine.models';
+} from '@data/models';
 
 import { EmailQuarantineDataFacade } from './email-quarantine-data.facade';
 import { EmailQuarantineService } from './email-quarantine.service';

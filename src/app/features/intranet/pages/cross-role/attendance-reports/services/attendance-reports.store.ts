@@ -1,5 +1,5 @@
 import { computed, Injectable, signal } from '@angular/core';
-import type { SalonProfesor } from '@data/models/attendance.models';
+import type { SalonProfesor } from '@data/models';
 import {
 	getDefaultFilters,
 	type ReporteFiltrado,

@@ -22,7 +22,7 @@ import {
 	DeferEventTipo,
 	EmailDeferEventDto,
 	EmailDeferEventFiltros,
-} from '@data/models/email-defer-event.models';
+} from '@data/models';
 import { UiMappingService } from '@shared/services';
 
 import { EmailDeferEventsService } from '../../services';

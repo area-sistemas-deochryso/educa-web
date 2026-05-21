@@ -3,7 +3,7 @@ import { inject, Injectable } from '@angular/core';
 import { catchError, Observable, of } from 'rxjs';
 
 import { environment } from '@config/environment';
-import { EmailOutboxLista } from '@data/models/email-outbox.models';
+import { EmailOutboxLista } from '@data/models';
 
 import { EmailDashboardDiaDto } from '../models/email-dashboard-dia.models';
 

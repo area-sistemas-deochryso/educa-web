@@ -4,7 +4,7 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { ErrorHandlerService } from '@core/services/error';
 import { WalFacadeHelper } from '@core/services/wal';
-import { EmailBlacklistEntry } from '@data/models/email-blacklist.models';
+import { EmailBlacklistEntry } from '@data/models';
 
 import { BlacklistCrudFacade } from './blacklist-crud.facade';
 import { BlacklistDataFacade } from './blacklist-data.facade';

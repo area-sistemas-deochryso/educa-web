@@ -20,7 +20,7 @@ import {
 	DomainPauseMotivo,
 	EMAIL_DOMAIN_PAUSE_MOTIVOS,
 	EmailDomainPauseListaDto,
-} from '@data/models/email-domain-pause.models';
+} from '@data/models';
 
 import {
 	EmailDomainPauseCrudFacade,

@@ -17,7 +17,7 @@ import {
 import {
 	EstadisticasDia,
 	EstadisticasAsistenciaDia,
-} from '@data/models/attendance.models';
+} from '@data/models';
 import { SkeletonLoaderComponent } from '@shared/components/skeleton-loader/skeleton-loader.component';
 
 @Component({

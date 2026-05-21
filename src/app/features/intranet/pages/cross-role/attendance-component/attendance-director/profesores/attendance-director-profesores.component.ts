@@ -33,7 +33,7 @@ import {
 	HijoApoderado,
 	PersonaAsistencia,
 	profesorToPersonaAsistencia,
-} from '@data/models/attendance.models';
+} from '@data/models';
 import { APP_USER_ROLES } from '@shared/constants';
 import { AsistenciaProfesorApiService } from '@shared/services/attendance';
 import { downloadBlob, formatDateLocalIso, viewBlobInNewTab } from '@core/helpers';

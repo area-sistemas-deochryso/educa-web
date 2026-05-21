@@ -10,7 +10,7 @@ import { TagModule } from 'primeng/tag';
 import { TooltipModule } from 'primeng/tooltip';
 
 import { UiMappingService } from '@shared/services';
-import { EmailDeferEventDto } from '@data/models/email-defer-event.models';
+import { EmailDeferEventDto } from '@data/models';
 
 /**
  * Plan 37 Chat 3 — item presentacional del timeline de eventos.

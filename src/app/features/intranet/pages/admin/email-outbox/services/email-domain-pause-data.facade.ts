@@ -3,7 +3,7 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
 import { logger } from '@core/helpers';
 import { WalCrossTabRefetchService } from '@core/services';
-import { DomainPauseMotivo } from '@data/models/email-domain-pause.models';
+import { DomainPauseMotivo } from '@data/models';
 
 import { EmailDomainPauseService } from './email-domain-pause.service';
 import { EmailDomainPauseStore } from './email-domain-pause.store';

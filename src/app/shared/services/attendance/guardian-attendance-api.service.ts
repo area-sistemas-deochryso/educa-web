@@ -3,7 +3,7 @@ import { HttpClient } from '@angular/common/http';
 import { Observable, catchError, of } from 'rxjs';
 
 import { environment } from '@config/environment';
-import { HijoApoderado, ResumenAsistencia } from '@data/models/attendance.models';
+import { HijoApoderado, ResumenAsistencia } from '@data/models';
 
 @Injectable({ providedIn: 'root' })
 export class GuardianAttendanceApiService {

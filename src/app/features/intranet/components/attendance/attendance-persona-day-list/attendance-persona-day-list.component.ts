@@ -26,7 +26,7 @@ import {
 	EstadisticasAsistenciaDia,
 	PersonaAsistencia,
 	TipoPersona,
-} from '@data/models/attendance.models';
+} from '@data/models';
 import {
 	ResponsiveTableComponent,
 	SkeletonLoaderComponent,

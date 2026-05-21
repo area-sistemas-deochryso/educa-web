@@ -6,7 +6,7 @@ import {
 	EmailOutboxLista,
 	EmailOutboxTendencia,
 	EmailOutboxTipo,
-} from '@data/models/email-outbox.models';
+} from '@data/models';
 import { DeferFailStatus } from '../models/defer-fail-status.models';
 import { ThrottleStatus } from '../models/throttle-status.models';
 

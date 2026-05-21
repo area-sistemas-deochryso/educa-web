@@ -18,7 +18,7 @@ import {
 	CrearBlacklistRequest,
 	EMAIL_BLACKLIST_MOTIVOS_MANUALES,
 	EmailBlacklistMotivo,
-} from '@data/models/email-blacklist.models';
+} from '@data/models';
 
 interface MotivoOption {
 	label: string;

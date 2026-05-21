@@ -4,7 +4,7 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { ErrorHandlerService } from '@core/services/error';
 import { WalFacadeHelper } from '@core/services/wal';
-import { EmailQuarantineListaDto } from '@data/models/email-quarantine.models';
+import { EmailQuarantineListaDto } from '@data/models';
 
 import { EmailQuarantineCrudFacade } from './email-quarantine-crud.facade';
 import { EmailQuarantineDataFacade } from './email-quarantine-data.facade';

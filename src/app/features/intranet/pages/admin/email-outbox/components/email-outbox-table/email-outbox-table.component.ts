@@ -9,7 +9,7 @@ import {
 	EMAIL_OUTBOX_TIPO_LABELS,
 	EmailOutboxLista,
 	EmailOutboxTipo,
-} from '@data/models/email-outbox.models';
+} from '@data/models';
 import type { SkeletonColumnDef } from '@shared/components';
 import { CorrelationIdPillComponent } from '@shared/components/correlation-id-pill';
 
