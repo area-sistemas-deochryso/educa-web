@@ -4,7 +4,7 @@ import { SalonListDto } from '@features/intranet/pages/admin/schedules/models/sa
 import { CursoListaDto } from '@features/intranet/pages/admin/schedules/models/curso.interface';
 import { APP_USER_ROLES } from '@shared/constants';
 import { DebugService } from '@core/helpers';
-import { BaseCrudStore } from '@core/store/base/base-crud.store';
+import { BaseCrudStore } from '@core/store';
 import { type ProfesorCursoListaDto } from '@data/models';
 import {
 	ActualizarUsuarioRequest,

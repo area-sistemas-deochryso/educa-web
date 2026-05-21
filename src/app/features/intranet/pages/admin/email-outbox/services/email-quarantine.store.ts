@@ -1,6 +1,6 @@
 import { Injectable, computed, signal } from '@angular/core';
 
-import { BaseCrudStore } from '@core/store/base/base-crud.store';
+import { BaseCrudStore } from '@core/store';
 import {
 	EmailQuarantineDetalleDto,
 	EmailQuarantineEstadisticas,

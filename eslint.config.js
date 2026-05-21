@@ -868,6 +868,18 @@ const LAYER_RULES = [
 		],
 	},
 	{
+		id: 'core-store-barrel-only',
+		severity: 'error',
+		match: (f) => !/\/src\/app\/core\/store\//.test(f),
+		restrictions: [
+			{
+				sourcePattern: /^@core\/store\/.+/,
+				message:
+					'Importar desde @core/store (barrel), no del path interno.',
+			},
+		],
+	},
+	{
 		id: 'session-barrel-only',
 		severity: 'error',
 		match: (f) => !/\/src\/app\/core\/services\/session\//.test(f),
