@@ -1,3 +1,4 @@
 // Re-export from shared — attendance is a cross-feature domain service, not core infrastructure.
 // Barrel kept here for backwards compatibility with existing @core/services imports.
+// eslint-disable-next-line layer-enforcement/imports-error -- DEBT: xrepo-50-F3a
 export * from '@shared/services/attendance';

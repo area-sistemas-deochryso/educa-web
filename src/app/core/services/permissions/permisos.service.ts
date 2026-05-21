@@ -12,12 +12,14 @@ import {
 	Vista,
 	VistasEstadisticas,
 } from './permisos.models';
+// eslint-disable-next-line layer-enforcement/imports-error -- DEBT: xrepo-50-F3a
 import { ApiResponse } from '@shared/models';
 import { Injectable, inject } from '@angular/core';
 import { Observable, catchError, of } from 'rxjs';
 import { logger } from '@core/helpers';
 
 import { HttpClient } from '@angular/common/http';
+// eslint-disable-next-line layer-enforcement/imports-error -- DEBT: xrepo-50-F3a
 import { PaginatedResponse } from '@shared/models';
 import { environment } from '@env/environment';
 

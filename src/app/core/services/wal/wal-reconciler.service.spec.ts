@@ -3,6 +3,7 @@ import { TestBed } from '@angular/core/testing';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { WalReconciler } from './wal-reconciler.service';
+// eslint-disable-next-line layer-enforcement/imports-error -- DEBT: xrepo-50-F3a
 import { SwService } from '@features/intranet/services/sw/sw.service';
 import { WalEntry, WAL_CACHE_MAP } from './models';
 

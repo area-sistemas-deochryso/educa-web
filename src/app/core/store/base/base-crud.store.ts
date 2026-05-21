@@ -1,5 +1,6 @@
 import { Injectable, Signal, WritableSignal, computed, signal } from '@angular/core';
 
+// eslint-disable-next-line layer-enforcement/imports-error -- DEBT: xrepo-50-F3a
 import { HasId } from '@shared/interfaces';
 
 // #region Types

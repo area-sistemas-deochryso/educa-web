@@ -7,6 +7,7 @@ import {
 	MODULE_URL_PATTERNS,
 	type CacheModule,
 } from '@config/cache-versions.config';
+// eslint-disable-next-line layer-enforcement/imports-error -- DEBT: xrepo-50-F3a
 import { SwService } from '@features/intranet/services/sw/sw.service';
 
 /**
