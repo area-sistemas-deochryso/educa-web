@@ -4,7 +4,7 @@
 
 Sistema genérico para mejorar **Speed Index** de Lighthouse usando skeleton screens y renderizado progresivo.
 
-> **Regla complementaria**: Ver `@.claude/rules/skeletons.md` para los componentes shared de skeleton disponibles.
+> **Regla complementaria**: Ver `@.claude/reference/skeletons.md` para los componentes shared de skeleton disponibles.
 
 ---
 
@@ -118,7 +118,7 @@ app-skeleton-loader           <- Primitiva base (text, circle, rect, card)
   |-- app-stats-skeleton      <- Cards de estadísticas configurables
 ```
 
-Ver `@.claude/rules/skeletons.md` para documentación completa.
+Ver `@.claude/reference/skeletons.md` para documentación completa.
 
 ---
 

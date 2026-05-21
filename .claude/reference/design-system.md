@@ -88,9 +88,9 @@ app-intranet-layout {
 
 **Scope**: `app-intranet-layout` — no afecta formularios del portal público (contacto, landing, etc.).
 
-**Focus**: `--text-color` en lugar de `--primary-color` — evita el ring celeste del tema Aura, que sobre fondo claro pierde contraste (ver `rules/a11y.md`).
+**Focus**: `--text-color` en lugar de `--primary-color` — evita el ring celeste del tema Aura, que sobre fondo claro pierde contraste (ver `reference/a11y.md`).
 
-**Supersede**: el override global de esta sección §2 (A2) **reemplaza** el patrón per-component que vivía en `rules/filter-transparency.md` (archivo borrado 2026-05-12). Antes había que repetir `:host ::ng-deep { .p-inputtext, .p-select { background: transparent; ... } }` en cada `.scss` de la intranet; ahora basta con el override global de A2 y todos los inputs/selects dentro de `app-intranet-layout` heredan el reset. Al tocar un componente con el override local viejo, eliminarlo para no duplicar.
+**Supersede**: el override global de esta sección §2 (A2) **reemplaza** el patrón per-component que vivía en `esta misma sección §2 (A2)` (archivo borrado 2026-05-12). Antes había que repetir `:host ::ng-deep { .p-inputtext, .p-select { background: transparent; ... } }` en cada `.scss` de la intranet; ahora basta con el override global de A2 y todos los inputs/selects dentro de `app-intranet-layout` heredan el reset. Al tocar un componente con el override local viejo, eliminarlo para no duplicar.
 
 ---
 
@@ -536,7 +536,7 @@ Tres botones icon-only `p-button-rounded p-button-text`, centrados. Severities:
 }
 ```
 
-**Requisito de accesibilidad**: los 3 botones son icon-only, así que `pTooltip` NO basta — siempre incluir `[pt]="{ root: { 'aria-label': '...' } }"` (ver `rules/a11y.md`).
+**Requisito de accesibilidad**: los 3 botones son icon-only, así que `pTooltip` NO basta — siempre incluir `[pt]="{ root: { 'aria-label': '...' } }"` (ver `reference/a11y.md`).
 
 **Pipes estándar** disponibles en `@intranet-shared/pipes`: `estadoLabel`, `estadoSeverity`, `estadoToggleIcon`, `estadoToggleLabel`. Reusar antes de crear nuevos.
 
@@ -631,7 +631,7 @@ Flex horizontal con **search-box (relative, icono absolute dentro) + filter-drop
 
 **Por qué `opacity: 0.5 → 1` en `.btn-clear`**: el "limpiar filtros" es una acción secundaria, NO debe competir visualmente con los filtros mismos. El hover la "ilumina" cuando el usuario se acerca.
 
-**Requisito de PrimeNG**: los `p-select` SIEMPRE con `appendTo="body"` (ver `rules/primeng.md`).
+**Requisito de PrimeNG**: los `p-select` SIEMPRE con `appendTo="body"` (ver `reference/primeng.md`).
 
 ---
 
@@ -762,7 +762,7 @@ Estructura canónica: **header tipado según modo + content con `.form-grid` de 
 }
 ```
 
-**Regla de DialogsSync**: NUNCA poner el `<p-dialog>` dentro de `@if`. Siempre en el DOM con `[visible]` + `(visibleChange)`. Ver `rules/dialogs-sync.md`.
+**Regla de DialogsSync**: NUNCA poner el `<p-dialog>` dentro de `@if`. Siempre en el DOM con `[visible]` + `(visibleChange)`. Ver `reference/dialogs-sync.md`.
 
 **Fields obligatorios marcados con `*` en el label** (convención de UX, no una regla de PrimeNG).
 

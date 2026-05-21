@@ -1,10 +1,10 @@
 # comments (override de educa-web)
 
-> Filosofía universal: ver `~/.claude/rules/comments.md`. Acá viven el formato `#region` y las reglas por tipo de archivo del stack Angular + NgRx Signals.
+> Filosofía universal: ver `~/.claude/reference/comments.md`. Acá viven el formato `#region` y las reglas por tipo de archivo del stack Angular + NgRx Signals.
 
 ## Formato preferido
 
-**`// #region` / `// #endregion`** en lugar de separadores tipo `// ============`. Ver `@.claude/rules/regions.md` para la convención completa.
+**`// #region` / `// #endregion`** en lugar de separadores tipo `// ============`. Ver `@.claude/reference/regions.md` para la convención completa.
 
 ## Reglas por tipo de archivo
 
@@ -76,5 +76,5 @@ export class UsersStore {
 
 ## Ver también
 
-- `@.claude/rules/regions.md` — convención `#region` completa.
-- `~/.claude/rules/comments.md` — filosofía universal.
+- `@.claude/reference/regions.md` — convención `#region` completa.
+- `~/.claude/reference/comments.md` — filosofía universal.
