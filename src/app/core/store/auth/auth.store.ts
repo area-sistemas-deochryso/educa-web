@@ -1,5 +1,5 @@
 // #region Imports
-import { AuthUser } from '@core/services/auth/auth.models';
+import { AuthUser } from '@core/services/auth';
 import { computed, inject } from '@angular/core';
 import {
 	patchState,

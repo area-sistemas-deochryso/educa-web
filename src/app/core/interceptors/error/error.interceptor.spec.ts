@@ -12,8 +12,8 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { of, throwError } from 'rxjs';
 
 import { errorInterceptor } from './error.interceptor';
-import { ErrorHandlerService } from '@core/services/error';
-import { ErrorReporterService } from '@core/services/error/error-reporter.service';
+import { ErrorHandlerService, ErrorReporterService } from '@core/services/error';
+// eslint-disable-next-line layer-enforcement/imports-error -- DEBT: AuthApiService is internal to auth/
 import { AuthApiService } from '@core/services/auth/auth-api.service';
 import { SessionActivityService } from '@core/services/session';
 

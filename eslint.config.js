@@ -584,9 +584,213 @@ const LAYER_RULES = [
 			},
 		],
 	},
-	// Plan 1 F5 — barrel-only public API para wrappers críticos. Consumidores externos
-	// deben importar desde el barrel (@core/services/<x>), no de paths internos a la impl.
-	// El barrel filtra qué se expone, eso es la facade.
+	// Barrel-only enforcement for @core/services/*. Consumers must import from the barrel
+	// (@core/services/<group>), not from internal paths. The barrel defines the public API.
+	// Plan 1 F5: storage, wal, session. Plan 50 F2a: remaining 19 groups.
+	{
+		id: 'auth-barrel-only',
+		severity: 'error',
+		match: (f) => !/\/src\/app\/core\/services\/auth\//.test(f),
+		restrictions: [
+			{
+				sourcePattern: /^@core\/services\/auth\/.+/,
+				message:
+					'Importar desde @core/services/auth (barrel), no del path interno.',
+			},
+		],
+	},
+	{
+		id: 'cache-barrel-only',
+		severity: 'error',
+		match: (f) => !/\/src\/app\/core\/services\/cache\//.test(f),
+		restrictions: [
+			{
+				sourcePattern: /^@core\/services\/cache\/.+/,
+				message:
+					'Importar desde @core/services/cache (barrel), no del path interno.',
+			},
+		],
+	},
+	{
+		id: 'capacitor-barrel-only',
+		severity: 'error',
+		match: (f) => !/\/src\/app\/core\/services\/capacitor\//.test(f),
+		restrictions: [
+			{
+				sourcePattern: /^@core\/services\/capacitor\/.+/,
+				message:
+					'Importar desde @core/services/capacitor (barrel), no del path interno.',
+			},
+		],
+	},
+	{
+		id: 'destroy-barrel-only',
+		severity: 'error',
+		match: (f) => !/\/src\/app\/core\/services\/destroy\//.test(f),
+		restrictions: [
+			{
+				sourcePattern: /^@core\/services\/destroy\/.+/,
+				message:
+					'Importar desde @core/services/destroy (barrel), no del path interno.',
+			},
+		],
+	},
+	{
+		id: 'error-barrel-only',
+		severity: 'error',
+		match: (f) => !/\/src\/app\/core\/services\/error\//.test(f),
+		restrictions: [
+			{
+				sourcePattern: /^@core\/services\/error\/.+/,
+				message:
+					'Importar desde @core/services/error (barrel), no del path interno.',
+			},
+		],
+	},
+	{
+		id: 'excel-barrel-only',
+		severity: 'error',
+		match: (f) => !/\/src\/app\/core\/services\/excel\//.test(f),
+		restrictions: [
+			{
+				sourcePattern: /^@core\/services\/excel\/.+/,
+				message:
+					'Importar desde @core/services/excel (barrel), no del path interno.',
+			},
+		],
+	},
+	{
+		id: 'facades-barrel-only',
+		severity: 'error',
+		match: (f) => !/\/src\/app\/core\/services\/facades\//.test(f),
+		restrictions: [
+			{
+				sourcePattern: /^@core\/services\/facades\/.+/,
+				message:
+					'Importar desde @core/services/facades (barrel), no del path interno.',
+			},
+		],
+	},
+	{
+		id: 'feature-flags-barrel-only',
+		severity: 'error',
+		match: (f) => !/\/src\/app\/core\/services\/feature-flags\//.test(f),
+		restrictions: [
+			{
+				sourcePattern: /^@core\/services\/feature-flags\/.+/,
+				message:
+					'Importar desde @core/services/feature-flags (barrel), no del path interno.',
+			},
+		],
+	},
+	{
+		id: 'feedback-barrel-only',
+		severity: 'error',
+		match: (f) => !/\/src\/app\/core\/services\/feedback\//.test(f),
+		restrictions: [
+			{
+				sourcePattern: /^@core\/services\/feedback\/.+/,
+				message:
+					'Importar desde @core/services/feedback (barrel), no del path interno.',
+			},
+		],
+	},
+	{
+		id: 'http-barrel-only',
+		severity: 'error',
+		match: (f) => !/\/src\/app\/core\/services\/http\//.test(f),
+		restrictions: [
+			{
+				sourcePattern: /^@core\/services\/http\/.+/,
+				message:
+					'Importar desde @core/services/http (barrel), no del path interno.',
+			},
+		],
+	},
+	{
+		id: 'keyboard-barrel-only',
+		severity: 'error',
+		match: (f) => !/\/src\/app\/core\/services\/keyboard\//.test(f),
+		restrictions: [
+			{
+				sourcePattern: /^@core\/services\/keyboard\/.+/,
+				message:
+					'Importar desde @core/services/keyboard (barrel), no del path interno.',
+			},
+		],
+	},
+	{
+		id: 'modal-barrel-only',
+		severity: 'error',
+		match: (f) => !/\/src\/app\/core\/services\/modal\//.test(f),
+		restrictions: [
+			{
+				sourcePattern: /^@core\/services\/modal\/.+/,
+				message:
+					'Importar desde @core/services/modal (barrel), no del path interno.',
+			},
+		],
+	},
+	{
+		id: 'notifications-barrel-only',
+		severity: 'error',
+		match: (f) => !/\/src\/app\/core\/services\/notifications\//.test(f),
+		restrictions: [
+			{
+				sourcePattern: /^@core\/services\/notifications\/.+/,
+				message:
+					'Importar desde @core/services/notifications (barrel), no del path interno.',
+			},
+		],
+	},
+	{
+		id: 'permissions-barrel-only',
+		severity: 'error',
+		match: (f) => !/\/src\/app\/core\/services\/permissions\//.test(f),
+		restrictions: [
+			{
+				sourcePattern: /^@core\/services\/permissions\/.+/,
+				message:
+					'Importar desde @core/services/permissions (barrel), no del path interno.',
+			},
+		],
+	},
+	{
+		id: 'rate-limit-countdown-barrel-only',
+		severity: 'error',
+		match: (f) => !/\/src\/app\/core\/services\/rate-limit-countdown\//.test(f),
+		restrictions: [
+			{
+				sourcePattern: /^@core\/services\/rate-limit-countdown\/.+/,
+				message:
+					'Importar desde @core/services/rate-limit-countdown (barrel), no del path interno.',
+			},
+		],
+	},
+	{
+		id: 'signalr-barrel-only',
+		severity: 'error',
+		match: (f) => !/\/src\/app\/core\/services\/signalr\//.test(f),
+		restrictions: [
+			{
+				sourcePattern: /^@core\/services\/signalr\/.+/,
+				message:
+					'Importar desde @core/services/signalr (barrel), no del path interno.',
+			},
+		],
+	},
+	{
+		id: 'speech-barrel-only',
+		severity: 'error',
+		match: (f) => !/\/src\/app\/core\/services\/speech\//.test(f),
+		restrictions: [
+			{
+				sourcePattern: /^@core\/services\/speech\/.+/,
+				message:
+					'Importar desde @core/services/speech (barrel), no del path interno.',
+			},
+		],
+	},
 	{
 		id: 'storage-barrel-only',
 		severity: 'error',
@@ -596,6 +800,30 @@ const LAYER_RULES = [
 				sourcePattern: /^@core\/services\/storage\/.+/,
 				message:
 					'Importar desde @core/services/storage (barrel), no del path interno. Las impls (Session/Preferences/IndexedDB/etc) son privadas — usar StorageService.',
+			},
+		],
+	},
+	{
+		id: 'trace-barrel-only',
+		severity: 'error',
+		match: (f) => !/\/src\/app\/core\/services\/trace\//.test(f),
+		restrictions: [
+			{
+				sourcePattern: /^@core\/services\/trace\/.+/,
+				message:
+					'Importar desde @core/services/trace (barrel), no del path interno.',
+			},
+		],
+	},
+	{
+		id: 'user-barrel-only',
+		severity: 'error',
+		match: (f) => !/\/src\/app\/core\/services\/user\//.test(f),
+		restrictions: [
+			{
+				sourcePattern: /^@core\/services\/user\/.+/,
+				message:
+					'Importar desde @core/services/user (barrel), no del path interno.',
 			},
 		],
 	},

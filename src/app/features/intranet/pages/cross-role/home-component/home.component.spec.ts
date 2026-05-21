@@ -5,8 +5,8 @@ import { testProviders } from '@test';
 import { HomeComponent } from './home.component';
 import { StorageService } from '@core/services';
 import { FeatureFlagsFacade } from '@core/services/feature-flags';
-import { UserPermissionsService } from '@core/services/permissions/user-permisos.service';
-import { UserProfileService } from '@core/services/user/user-profile.service';
+import { UserPermissionsService } from '@core/services/permissions';
+import { UserProfileService } from '@core/services/user';
 import { computed, signal, Signal, WritableSignal } from '@angular/core';
 import { APP_USER_ROLES } from '@shared/constants';
 

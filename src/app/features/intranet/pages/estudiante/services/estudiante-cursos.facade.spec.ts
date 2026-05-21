@@ -8,7 +8,7 @@ import { EstudianteCursosFacade } from './estudiante-cursos.facade';
 import { EstudianteCursosStore } from './estudiante-cursos.store';
 import { EstudianteApiService } from './estudiante-api.service';
 import { ErrorHandlerService } from '@core/services';
-import { SmartNotificationService } from '@core/services/notifications/smart-notification.service';
+import { SmartNotificationService } from '@core/services/notifications';
 
 // #endregion
 

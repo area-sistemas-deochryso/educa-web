@@ -2,7 +2,7 @@ import { TestBed } from '@angular/core/testing';
 import { HttpErrorResponse } from '@angular/common/http';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
-import { ErrorHandlerService } from '@core/services/error/error-handler.service';
+import { ErrorHandlerService } from '@core/services/error';
 import { WalFacadeHelper } from '@core/services/wal';
 import { EmailQuarantineListaDto } from '@data/models/email-quarantine.models';
 

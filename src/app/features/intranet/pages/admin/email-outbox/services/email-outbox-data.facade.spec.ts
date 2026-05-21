@@ -5,7 +5,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { of, throwError } from 'rxjs';
 
 // * Imports directos (no el barrel @core/services) para evitar side effects al montar TestBed.
-import { ErrorHandlerService } from '@core/services/error/error-handler.service';
+import { ErrorHandlerService } from '@core/services/error';
 import { StorageService } from '@core/services/storage';
 
 import { EmailOutboxApiService } from './email-outbox.service';

@@ -3,7 +3,7 @@ import { ChangeDetectionStrategy, Component, effect, inject } from '@angular/cor
 
 import { CommonModule } from '@angular/common';
 import { ErrorHandlerService } from '@core/services/error';
-import type { ErrorNotificationAction } from '@core/services/error/error.models';
+import type { ErrorNotificationAction } from '@core/services/error';
 import { MessageService } from 'primeng/api';
 import { ToastModule } from 'primeng/toast';
 

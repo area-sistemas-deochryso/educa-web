@@ -2,7 +2,7 @@ import { DestroyRef, inject, Injectable } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { forkJoin } from 'rxjs';
 
-import { ErrorHandlerService } from '@core/services/error/error-handler.service';
+import { ErrorHandlerService } from '@core/services/error';
 import { StorageService } from '@core/services/storage';
 
 import { EmailOutboxApiService } from './email-outbox.service';

@@ -5,7 +5,7 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { AuthStore, AuthStoreType } from './auth.store';
 import { StorageService } from '@core/services/storage';
-import { AuthUser } from '@core/services/auth/auth.models';
+import { AuthUser } from '@core/services/auth';
 
 // #endregion
 

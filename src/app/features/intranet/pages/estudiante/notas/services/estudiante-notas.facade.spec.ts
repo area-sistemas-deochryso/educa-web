@@ -8,7 +8,7 @@ import { EstudianteNotasFacade } from './estudiante-notas.facade';
 import { EstudianteNotasStore } from './estudiante-notas.store';
 import { EstudianteMisNotasDto } from '../../models';
 import { EstudianteApiService } from '../../services/estudiante-api.service';
-import { SmartNotificationService } from '@core/services/notifications/smart-notification.service';
+import { SmartNotificationService } from '@core/services/notifications';
 
 // #endregion
 

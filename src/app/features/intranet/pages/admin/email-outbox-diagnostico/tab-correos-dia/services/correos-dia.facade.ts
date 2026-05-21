@@ -2,7 +2,7 @@ import { HttpErrorResponse } from '@angular/common/http';
 import { DestroyRef, inject, Injectable } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
-import { ErrorHandlerService } from '@core/services/error/error-handler.service';
+import { ErrorHandlerService } from '@core/services/error';
 import { logger } from '@core/helpers/logs/logger';
 
 import { CorreosDiaErrorCode } from '../models/correos-dia.models';

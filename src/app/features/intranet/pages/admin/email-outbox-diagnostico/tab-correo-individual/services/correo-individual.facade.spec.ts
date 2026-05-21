@@ -3,7 +3,7 @@ import { TestBed } from '@angular/core/testing';
 import { of, throwError } from 'rxjs';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
-import { ErrorHandlerService } from '@core/services/error/error-handler.service';
+import { ErrorHandlerService } from '@core/services/error';
 
 import {
 	BuscarPersonasResponseDto,

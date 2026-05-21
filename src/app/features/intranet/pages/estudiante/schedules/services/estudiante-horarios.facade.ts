@@ -3,7 +3,7 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { StudentSchedulesStore } from './estudiante-horarios.store';
 import { EstudianteApiService } from '../../services/estudiante-api.service';
 import { logger } from '@core/helpers';
-import { SmartNotificationService } from '@core/services/notifications/smart-notification.service';
+import { SmartNotificationService } from '@core/services/notifications';
 
 @Injectable({ providedIn: 'root' })
 export class StudentSchedulesFacade {

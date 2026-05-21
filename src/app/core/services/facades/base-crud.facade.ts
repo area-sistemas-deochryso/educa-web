@@ -11,8 +11,7 @@ import {
 import { HasId } from '@shared/interfaces';
 // eslint-disable-next-line layer-enforcement/imports-error -- DEBT: xrepo-50-F3a
 import { UI_ADMIN_ERROR_DETAILS, UI_SUMMARIES } from '@shared/constants';
-import { ActivityTrackerService } from '@core/services/error/activity-tracker.service';
-import { ErrorHandlerService } from '@core/services/error/error-handler.service';
+import { ActivityTrackerService, ErrorHandlerService } from '@core/services/error';
 // eslint-disable-next-line layer-enforcement/imports-error -- DEBT: xrepo-50-F3a
 import { SwService } from '@features/intranet/services/sw/sw.service';
 import { WalFacadeHelper, WalCrossTabRefetchService } from '@core/services/wal';

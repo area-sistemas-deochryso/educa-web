@@ -6,8 +6,7 @@ import {
 } from '@angular/common/http';
 import { finalize, tap } from 'rxjs';
 
-import { ActivityTrackerService } from '@core/services/error/activity-tracker.service';
-import { ErrorReporterService } from '@core/services/error/error-reporter.service';
+import { ActivityTrackerService, ErrorReporterService } from '@core/services/error';
 import { RequestTraceFacade } from '@core/services/trace';
 import { inject } from '@angular/core';
 

@@ -4,9 +4,9 @@ import { inject } from '@angular/core';
 import { Observable, Subject, catchError, filter, switchMap, take, throwError, timeout } from 'rxjs';
 
 import { logger } from '@core/helpers';
+// eslint-disable-next-line layer-enforcement/imports-error -- DEBT: AuthApiService is internal to auth/
 import { AuthApiService } from '@core/services/auth/auth-api.service';
-import { ErrorHandlerService } from '@core/services/error';
-import { ErrorReporterService } from '@core/services/error/error-reporter.service';
+import { ErrorHandlerService, ErrorReporterService } from '@core/services/error';
 import { SessionActivityService } from '@core/services/session';
 
 // * Centralizes HTTP error handling and reporting.

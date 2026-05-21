@@ -7,7 +7,7 @@ import { of, throwError } from 'rxjs';
 import { StudentSchedulesFacade } from './estudiante-horarios.facade';
 import { StudentSchedulesStore } from './estudiante-horarios.store';
 import { EstudianteApiService } from '../../services/estudiante-api.service';
-import { SmartNotificationService } from '@core/services/notifications/smart-notification.service';
+import { SmartNotificationService } from '@core/services/notifications';
 
 // #endregion
 

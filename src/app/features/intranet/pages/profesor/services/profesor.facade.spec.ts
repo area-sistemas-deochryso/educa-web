@@ -8,8 +8,8 @@ import { ProfesorFacade } from './profesor.facade';
 import { ProfesorStore, ProfesorSalonConEstudiantes } from './profesor.store';
 import { ErrorHandlerService } from '@core/services';
 import { ProfesorApiService } from './profesor-api.service';
-import { UserProfileService } from '@core/services/user/user-profile.service';
-import { SmartNotificationService } from '@core/services/notifications/smart-notification.service';
+import { UserProfileService } from '@core/services/user';
+import { SmartNotificationService } from '@core/services/notifications';
 
 // #endregion
 

@@ -4,8 +4,8 @@ import { ChangeDetectionStrategy, Component, computed, inject } from '@angular/c
 import { QuickAccessCardComponent } from '@features/intranet/components/quick-access-card/quick-access-card';
 import { FeatureFlagsFacade } from '@core/services/feature-flags';
 import { StorageService } from '@core/services';
-import { UserPermissionsService } from '@core/services/permissions/user-permisos.service';
-import { UserProfileService } from '@core/services/user/user-profile.service';
+import { UserPermissionsService } from '@core/services/permissions';
+import { UserProfileService } from '@core/services/user';
 import { QuickAccessFavoritesService } from '@intranet-shared/services';
 import { WelcomeSectionComponent } from '@features/intranet/components/welcome-section/welcome-section';
 import { AttendanceSummaryWidgetComponent } from './components/attendance-summary-widget/attendance-summary-widget.component';

@@ -1,8 +1,7 @@
 import { Injectable, inject, DestroyRef } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { logger, withRetry } from '@core/helpers';
-import { SmartNotificationService } from '@core/services/notifications/smart-notification.service';
-import { CalificacionSnapshot, ActividadSnapshot } from '@core/services/notifications/smart-notification.models';
+import { SmartNotificationService, CalificacionSnapshot, ActividadSnapshot } from '@core/services/notifications';
 import { VistaPromedio } from '../../models';
 import { EstudianteApiService } from '../../services/estudiante-api.service';
 import { EstudianteNotasStore } from './estudiante-notas.store';

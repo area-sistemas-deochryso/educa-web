@@ -4,8 +4,8 @@ import { isPlatformBrowser } from '@angular/common';
 import { Router } from '@angular/router';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
-import { AuthService } from '@core/services/auth/auth.service';
-import { UserPermissionsService } from '@core/services/permissions/user-permisos.service';
+import { AuthService } from '@core/services/auth';
+import { UserPermissionsService } from '@core/services/permissions';
 import { SwService } from '@core/services/sw';
 import { StorageService } from '@core/services/storage';
 import { SessionRefreshService } from './session-refresh.service';

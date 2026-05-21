@@ -3,7 +3,7 @@ import { Injectable, inject } from '@angular/core';
 
 import { Subject } from 'rxjs';
 
-import { AuthService } from '@core/services/auth/auth.service';
+import { AuthService } from '@core/services/auth';
 import { logger } from '@core/helpers';
 // #endregion
 

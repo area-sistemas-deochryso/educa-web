@@ -1,5 +1,5 @@
 // #region Types
-import { UserRole } from '@core/services/auth/auth.models';
+import { UserRole } from '@core/services/auth';
 import { PreviewLayout } from '@intranet-shared/config/intranet-menu.config';
 import { PERMISOS } from '@shared/constants';
 

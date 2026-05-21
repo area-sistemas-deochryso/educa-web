@@ -7,7 +7,7 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { VideoconferenciasFacade } from './videoconferencias.facade';
 import { VideoconferenciasStore, VideoconferenciaItem } from './videoconferencias.store';
-import { UserProfileService } from '@core/services/user/user-profile.service';
+import { UserProfileService } from '@core/services/user';
 import { ErrorHandlerService } from '@core/services';
 
 // #endregion

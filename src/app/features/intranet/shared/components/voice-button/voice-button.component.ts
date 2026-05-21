@@ -12,7 +12,7 @@ import {
 	OnInit,
 	OnDestroy,
 } from '@angular/core';
-import { VOICE_COMMANDS, VoiceCommandCategory } from '@core/services/speech/voice-commands.config';
+import { VOICE_COMMANDS, VoiceCommandCategory } from '@core/services/speech';
 import { CommonModule } from '@angular/common';
 import { VoiceRecognitionService, KeyboardShortcutsService } from '@core/services';
 import { logger } from '@core/helpers';

@@ -3,13 +3,12 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { Observable, forkJoin } from 'rxjs';
 import { logger, withRetry, downloadBlob } from '@core/helpers';
 import { ErrorHandlerService } from '@core/services';
-import { SmartNotificationService } from '@core/services/notifications/smart-notification.service';
+import { SmartNotificationService } from '@core/services/notifications';
 import { UI_ADMIN_ERROR_DETAILS, UI_SUMMARIES } from '@app/shared/constants';
-import { UserProfileService } from '@core/services/user/user-profile.service';
-import { CursoContenidoDetalleDto, VistaPromedio } from '../models';
+import { UserProfileService } from '@core/services/user';
+import { CursoContenidoDetalleDto, VistaPromedio, ProfesorSalonConEstudiantes } from '../models';
 import { ProfesorApiService } from './profesor-api.service';
 import { ProfesorStore } from './profesor.store';
-import { ProfesorSalonConEstudiantes } from '../models';
 
 @Injectable({ providedIn: 'root' })
 export class ProfesorFacade {

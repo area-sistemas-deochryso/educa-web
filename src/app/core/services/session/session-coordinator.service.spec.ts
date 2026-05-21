@@ -4,8 +4,7 @@ import { TestBed } from '@angular/core/testing';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { SessionCoordinatorService, SessionMessage } from './session-coordinator.service';
-import { AuthService } from '@core/services/auth/auth.service';
-import { AuthUser } from '@core/services/auth/auth.models';
+import { AuthService, AuthUser } from '@core/services/auth';
 // #endregion
 
 // #region Mock BroadcastChannel controllable

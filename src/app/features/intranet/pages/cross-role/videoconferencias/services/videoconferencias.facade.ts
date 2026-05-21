@@ -6,7 +6,7 @@ import { Observable, of } from 'rxjs';
 import { catchError } from 'rxjs/operators';
 import { logger, withRetry } from '@core/helpers';
 import { ErrorHandlerService } from '@core/services';
-import { UserProfileService } from '@core/services/user/user-profile.service';
+import { UserProfileService } from '@core/services/user';
 import { environment } from '@config/environment';
 import { canModerateVideoconference, getHorarioEndpoint } from '@shared/models';
 import { VideoconferenciasStore } from './videoconferencias.store';

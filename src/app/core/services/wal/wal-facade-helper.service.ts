@@ -1,8 +1,7 @@
 import { Injectable, inject } from '@angular/core';
 import { Observable, filter, firstValueFrom, map } from 'rxjs';
 import { logger } from '@core/helpers';
-import { ActivityTrackerService } from '@core/services/error/activity-tracker.service';
-import { ErrorHandlerService } from '@core/services/error/error-handler.service';
+import { ActivityTrackerService, ErrorHandlerService } from '@core/services/error';
 // eslint-disable-next-line layer-enforcement/imports-error -- DEBT: xrepo-50-F3a
 import { SwService } from '@features/intranet/services/sw/sw.service';
 import { WalService } from './wal.service';

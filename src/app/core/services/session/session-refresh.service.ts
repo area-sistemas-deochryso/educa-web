@@ -4,6 +4,7 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
 import { filter, Subject, take, takeUntil } from 'rxjs';
 
+// eslint-disable-next-line layer-enforcement/imports-error -- DEBT: AuthApiService is internal to auth/
 import { AuthApiService } from '@core/services/auth/auth-api.service';
 import { SwService } from '@core/services/sw';
 import { TimerManager } from '@core/services/destroy';

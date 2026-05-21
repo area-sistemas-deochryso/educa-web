@@ -1,6 +1,6 @@
 import { HttpErrorResponse } from '@angular/common/http';
 
-import { ErrorHandlerService } from '@core/services/error/error-handler.service';
+import { ErrorHandlerService } from '@core/services/error';
 import { UI_ERROR_CODES, UI_SUMMARIES } from '@app/shared/constants';
 import { logger } from './logs/logger';
 import { extractErrorMessage } from './error.utils';

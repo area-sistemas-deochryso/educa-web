@@ -3,7 +3,7 @@ import { Injectable, inject } from '@angular/core';
 import { Observable, map } from 'rxjs';
 
 import { environment } from '@config/environment';
-import { PaginatedResult } from '@core/services/facades/base-crud.facade.types';
+import { PaginatedResult } from '@core/services/facades';
 import {
 	CrearEmailDomainPauseDto,
 	EmailDomainPauseListaDto,

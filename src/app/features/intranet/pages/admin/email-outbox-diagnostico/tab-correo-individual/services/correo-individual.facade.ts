@@ -1,10 +1,9 @@
 import { HttpErrorResponse } from '@angular/common/http';
 import { DestroyRef, inject, Injectable } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import { Subject } from 'rxjs';
-import { catchError, debounceTime, distinctUntilChanged, of, switchMap, tap } from 'rxjs';
+import { Subject, catchError, debounceTime, distinctUntilChanged, of, switchMap, tap } from 'rxjs';
 
-import { ErrorHandlerService } from '@core/services/error/error-handler.service';
+import { ErrorHandlerService } from '@core/services/error';
 import { logger } from '@core/helpers/logs/logger';
 
 import {

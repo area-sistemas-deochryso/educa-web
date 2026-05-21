@@ -9,8 +9,7 @@ import { WalService } from './wal.service';
 import { WalSyncEngine } from './wal-sync-engine.service';
 import { WalStatusFacade } from './wal-status.facade';
 import { WalEntry, WalProcessResult } from './models';
-import { ErrorHandlerService } from '@core/services/error/error-handler.service';
-import { ActivityTrackerService } from '@core/services/error/activity-tracker.service';
+import { ErrorHandlerService, ActivityTrackerService } from '@core/services/error';
 // eslint-disable-next-line layer-enforcement/imports-error -- DEBT: xrepo-50-F3a
 import { SwService } from '@features/intranet/services/sw/sw.service';
 

@@ -4,7 +4,7 @@ import { AutoCompleteCompleteEvent, AutoCompleteModule, AutoCompleteSelectEvent 
 import { ButtonModule } from 'primeng/button';
 import { TooltipModule } from 'primeng/tooltip';
 
-import { ErrorHandlerService } from '@core/services/error/error-handler.service';
+import { ErrorHandlerService } from '@core/services/error';
 import { PageHeaderComponent } from '@intranet-shared/components/page-header';
 
 import { PersonaConCorreoDto, TipoPersona } from '../../models/correo-individual.models';
