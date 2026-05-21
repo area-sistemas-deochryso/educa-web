@@ -3,7 +3,7 @@ import * as signalR from '@microsoft/signalr';
 import { Subject } from 'rxjs';
 
 import { environment } from '@config/environment';
-import { logger } from '@core/helpers/logs/logger';
+import { logger } from '@core/helpers';
 
 import {
 	BlacklistEntryCreatedEvent,

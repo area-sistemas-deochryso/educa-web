@@ -612,6 +612,20 @@ const LAYER_RULES = [
 			},
 		],
 	},
+	// Barrel-only enforcement for @core/helpers. Consumers must import from @core/helpers,
+	// not from internal paths like @core/helpers/logs/logger.
+	{
+		id: 'core-helpers-barrel-only',
+		severity: 'error',
+		match: (f) => !/\/src\/app\/core\/helpers\//.test(f),
+		restrictions: [
+			{
+				sourcePattern: /^@core\/helpers\/.+/,
+				message:
+					'Importar desde @core/helpers (barrel), no del path interno.',
+			},
+		],
+	},
 	// Barrel-only enforcement for @core/services/*. Consumers must import from the barrel
 	// (@core/services/<group>), not from internal paths. The barrel defines the public API.
 	// Plan 1 F5: storage, wal, session. Plan 50 F2a: remaining 19 groups.
