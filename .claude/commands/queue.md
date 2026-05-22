@@ -65,10 +65,10 @@ Sección vacía → omitirla (no listar "Ninguno"). Si el repo no tiene ninguna 
 
 ## Argumentos
 
-- `/queue` — todas las secciones, sin tope.
-- `/queue --top N` — sólo primeros N pullables.
-- `/queue --kind <waiting|pullable|future|deferred>` — filtra a un kind.
-- `/queue --json` — output JSON con schema `{kind, priority, id, title, flow, planRef, briefRef, agingDays, estimate, tags, notes}`.
+- `/queue` — todas las secciones, top 5 pullables.
+- `/queue --top N` — primeros N pullables (default 5).
+- `/queue --kind <waiting|pullable|future|running>` — filtra a un kind.
+- `/queue info <KEY>` — detalle de un plan por key (ej: `/queue info F1`, `/queue info xP45`). Muestra INDEX, INV, posición en cola, y briefs relacionados.
 
 ## Cuándo correrlo
 

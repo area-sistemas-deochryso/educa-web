@@ -44,31 +44,58 @@ Planes cross-repo con sub-chats FE pendientes: **41** (Correlation Hub), **42** 
 
 ## 📋 Cola priorizada (qué arrancar próximo)
 
-> Formato: `N. [Plan · Chat · Tipo] — scope — razón de prioridad`.
+> **Política de orden**: la cola se ordena por **impacto de desbloqueo** — cuántas tareas downstream libera cada ítem. Consolida Carriles + Hallazgos + WAL audit.
 
-### 🟢 Pullable FE-only
+### 🔽 Orden de ejecución (por impacto de desbloqueo)
 
-- **[xP45] P45:F2.2:FE — UI rework `/incidencias/errores`** — JOIN endpoint `/full` + vista por evento `ErrorLog` + tab Trace real. Libre (P45:F5:BE ✅ shipped). Sub-plan en [`educa-coord/plans/xrepo-45-monitoreo-incidencias-rework.md`](../../../educa-coord/plans/xrepo-45-monitoreo-incidencias-rework.md) §F2.
+> **Columna `Desbloquea`**: número de tareas/fases downstream que dependen de que este ítem se complete. Score más alto = ejecutar primero.
 
-### ⏸️ Future FE-only (bloqueado por BE u otro)
+#### Tier 1 — Alto impacto (desbloquean ≥3 ítems)
 
-_(Vacía — todos los ítems desbloqueados movidos a Pullable.)_
+| Pos | Key | Plan | Próximo paso concreto | Repo | Desbloquea | Gate |
+|---|---|---|---|---|---|---|
+| 1 | F1 | Enforcement de Reglas | F5.3 — re-exports `@shared` → `@intranet-shared` (48 archivos, 3-4 chats) | local | ~4 (xP43 Chats 3.2, 4.1, 6.1+) | libre |
+| 2 | xP41 | Correlation Hub | F1 timeline FE + F2-F6 — prioridad en coord | xrepo | 5 (Chat 9 + F2-F6) | libre |
 
-### 🔗 Referencias cross-repo (sub-chats FE de planes cross-repo)
+#### Tier 2 — Impacto medio (desbloquean 1-2 ítems o alto valor)
 
-> Prioridad global en [`educa-coord/plans/maestro.md`](../../../educa-coord/plans/maestro.md). Acá solo para visibilidad.
+| Pos | Key | Plan | Próximo paso concreto | Repo | Desbloquea | Gate |
+|---|---|---|---|---|---|---|
+| 3 | xP45 | Monitoreo incidencias | F2.2:FE — JOIN endpoint `/full` + vista por evento + tabla Trace | xrepo | 0 (leaf, alto valor usuario) | libre (P45:F5:BE ✅) |
+| 4 | P10 | Fallbacks críticos | P0.1-P0.3 FE | local | 1 (Plan 10 F1+) | libre |
 
-- **[xP43] Monitoreo Cowork** → [`xrepo-43`](../../../educa-coord/plans/xrepo-43-monitoreo-cowork-feedback-2026-05-11.md). Sub-chats FE pendientes:
-  - Chat 3.2 (Detalle correo + buscador A4+A5) — espera F1
-  - Chat 4.1 (Filtros + paginación Bandeja A2+B5) — espera F1
-  - Chat 4.2 (Filtros server-side Errores A9+A10+B5) — depende Chat 1.2
-  - Chat 4.3 (Acciones inline reintentar/blacklist/export B6) — depende F3
-  - Chat 5.1 (Sparklines KPI B8) — depende Chat 1.1
-  - Chat 5.2 (Heatmap latencia + bundle telemetría B9+B10) — depende Chat 1.2+1.3
-  - Chat 6.1 (Vista unificada por destinatario B1) — depende F1+F3+F4
-  - Chat 6.2 (Links bidireccionales + Gap accionable B12) — depende 6.1+4.3
-- **[xP41] Correlation Hub** → [`xrepo-41`](../../../educa-coord/plans/xrepo-41-correlation-hub-observability.md). Próximo FE: Chat 9 (search global) ⏳ requiere BE.
-- **[xP42] Casing contratos** → [`xrepo-42`](../../../educa-coord/plans/xrepo-42-case-drift.md). Sin trabajo FE pendiente; P42:F2:BE en cola BE.
+#### Tier 3 — Closers (cierran un plan completo)
+
+| Pos | Key | Plan | Próximo paso concreto | Cierra | Gate |
+|---|---|---|---|---|---|
+| 5 | H7 | WAL audit | Normalizar naming `WAL_CACHE_MAP` (P1, 1 chat) | WAL audit | libre |
+| 6 | H2-H6 | WAL audit | Fixes cosméticos (P2, 1 chat) | WAL audit | libre |
+
+#### Tier 4 — Independientes (sin downstream)
+
+| Pos | Key | Plan | Próximo paso concreto | Gate |
+|---|---|---|---|---|
+| 7 | F13 | FE Test Gaps | F1-F5 (interceptores, páginas admin, flujos, WAL, shared) | libre |
+| 8 | P15 | Release ops | F3-F5 (post-deploy + rollback + runbook) — puntero coord | libre |
+
+#### Tier 5 — Bloqueados / baja prioridad
+
+| Pos | Key | Plan | Próximo paso concreto | Gate |
+|---|---|---|---|---|
+| 9 | xP43 | Monitoreo Cowork | Sub-chats FE (3.2→6.2) — prioridad en coord | ⏸️ espera F1 F5.3 + otros |
+| 10 | F5 | Consolidación FE | Completa tras Plan 4 BE | ⏸️ tras Plan 4 BE |
+| 11 | P3 | Matrícula | F3.5 → F4 diseño + implementación UI | 🔒 diseño UI pendiente |
+| 12 | P10 | Flujos alternos | F1+ completo (tras Carril B sustancialmente) | 🔒 Carril B |
+| 13 | F-010 | Hallazgo Cowork | Auto-abrir dialog edición admin deep-link cross-role | ⏸️ F-011 BE |
+
+#### Tier 6 — Incrementales (al tocar módulos)
+
+| Pos | Key | Plan | Próximo paso concreto | Gate |
+|---|---|---|---|---|
+| 14 | F8 | Design Patterns BE | Aplicar al tocar módulos BE | incremental |
+| 15 | F9 | Design Patterns FE | Aplicar al tocar módulos FE | incremental |
+
+**Siguiente accionable**: **F1 F5.3** (pos 1) — re-exports, desbloquea xP43 sub-chats. **xP45 F2.2:FE** (pos 3) — JOIN `/full` + vista por evento.
 
 ### 🟣 Verificaciones post-deploy (`/verify <NNN>`)
 
@@ -113,43 +140,33 @@ Hallazgos cerrados y Cowork 2026-05-19: ver [history/planes-cerrados.md](../hist
 
 ## Carriles
 
+> Ítems activos consolidados en §Cola priorizada. Carriles preservados como contexto histórico.
+
 ### Carril A — Features ✅ CERRADO (2026-04-16)
 
 Plan 6 completado. 1321 tests. Detalle en [history/planes-cerrados.md](../history/planes-cerrados.md).
 
 ### Carril D — Confiabilidad sistémica
 
-> Checklist ejecutable. Una subfase por chat. Al cerrar: actualizar plan base + maestro.
+→ En cola: F13 (pos 7), P15 F3-F5 (pos 8), P10 P0 (pos 4).
+Cerrados: Plan 15 F1 ✅ · F2 ✅. Plan 16 F1 ✅ (BE-only). Plan 12 F1 ✅ (BE-only).
+BE-only (no en cola FE): Plan 16 F2-F5, Plan 12 F2-F5, Plan 7 F1-F2. Cross-repo: Plan 14 F1-F6.
 
-**Plan 15 — Release Protocol**: F1 ✅ · F2 ✅ · F3-F5 ⏳
-**Plan 16 — Auditoría Seguridad**: F1 ✅ · F2-F5 ⏳ (BE-only, vive en maestro BE)
-**Plan 12 — BE Test Gaps**: F1 ✅ (764 tests) · F2-F5 ⏳ (BE-only)
-**Plan 13 — FE Test Gaps**: F1-F5 ⏳
-**Plan 14 — Contratos FE-BE**: F1-F6 ⏳ (cross-repo)
-**Plan 7 — Error Trace**: F1-F2 ⏳ (BE-only) · F3+ diferido
-**Plan 10 P0 — Fallbacks críticos**: P0.1-P0.3 ⏳ (FE)
+### Carril B — Deuda técnica
 
-### Carril B — Deuda técnica (tras Carril D base)
-
-- Plan 1 F5.3 — re-exports `@shared` → `@intranet-shared` (48 archivos, 3-4 chats)
-- Plan 2/B — State Machines (3 faltantes, BE) — desbloquea Plan 1 F4.4
-- Plan 2/C — Split archivos >300 ln BE
-- Plan 4 — Consolidación BE
-- Plan 5 — Consolidación FE
+→ En cola: F1 F5.3 (pos 1), F5 (pos 10).
+BE-only (no en cola FE): Plan 2/B (state machines), Plan 2/C (split >300 ln), Plan 4 (consolidación BE).
 
 ### Carril C — Diferido
 
-- Plan 3 F3.5 → F4 — Matrícula (🔒 diseño UI pendiente)
-- Plan 10 F1+ — Flujos alternos completo (🔒 Carril B)
-- Planes 8-9 — Design Patterns (incrementales)
+→ En cola: Plan 3 F3.5→F4 (pos 11), Plan 10 F1+ (pos 12), F8/F9 (pos 14-15).
 
 ---
 
 ## Auditoría WAL + Cache (standalone)
 
 - [x] H1+H8+H9 ✅ (2026-05-04)
-- [ ] H7 — Normalizar naming `WAL_CACHE_MAP` (P1, 1 chat)
-- [ ] H2-H6, H10 — Fixes cosméticos (P2, 1 chat)
+- → En cola: H7 (pos 5), H2-H6/H10 (pos 6).
 
 ---
 
