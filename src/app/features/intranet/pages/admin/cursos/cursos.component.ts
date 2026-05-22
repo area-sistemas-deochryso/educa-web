@@ -17,7 +17,7 @@ import { ConfirmationService } from 'primeng/api';
 
 import { UiMappingService } from '@shared/services';
 import { PageHeaderComponent } from '@shared/components';
-import { EstadoLabelPipe, EstadoSeverityPipe, EstadoToggleIconPipe, EstadoToggleLabelPipe } from '@shared/pipes';
+import { EstadoLabelPipe, EstadoSeverityPipe, EstadoToggleIconPipe, EstadoToggleLabelPipe } from '@intranet-shared/pipes';
 import { buildDeleteCursoMessage } from '@app/shared/constants';
 
 import { CursosFacade } from './services';

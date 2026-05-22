@@ -6,7 +6,8 @@ import { DrawerModule } from 'primeng/drawer';
 import { TagModule } from 'primeng/tag';
 import { UsuarioDetalle } from '../../services';
 import { UiMappingService } from '@shared/services';
-import { EstadoLabelPipe, EstadoSeverityPipe, FullNamePipe } from '@shared/pipes';
+import { EstadoLabelPipe, EstadoSeverityPipe } from '@intranet-shared/pipes';
+import { FullNamePipe } from '@shared/pipes';
 
 /**
  * Componente presentacional para el drawer de detalles de usuario

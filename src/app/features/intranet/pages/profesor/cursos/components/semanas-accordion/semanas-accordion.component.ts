@@ -9,7 +9,7 @@ import { CursoContenidoDataFacade } from '../../services/curso-contenido-data.fa
 import { CursoContenidoCrudFacade } from '../../services/curso-contenido-crud.facade';
 import { CursoContenidoUiFacade } from '../../services/curso-contenido-ui.facade';
 import { CursoContenidoSemanaDto, CursoContenidoTareaDto } from '@features/intranet/pages/profesor/models';
-import { FormatFileSizePipe } from '@shared/pipes';
+import { FormatFileSizePipe } from '@intranet-shared/pipes';
 
 @Component({
 	selector: 'app-semanas-accordion',

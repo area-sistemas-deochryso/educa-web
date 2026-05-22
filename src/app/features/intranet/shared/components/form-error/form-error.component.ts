@@ -1,6 +1,6 @@
 // #region Imports
 import { ChangeDetectionStrategy, Component, DestroyRef, Input, OnInit, inject, signal } from '@angular/core';
-import { ValidationMessageConfig, getValidationMessage } from '@shared/validators';
+import { ValidationMessageConfig, getValidationMessage } from '@intranet-shared/validators';
 
 import { AbstractControl } from '@angular/forms';
 import { CommonModule } from '@angular/common';

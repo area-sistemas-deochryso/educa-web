@@ -28,7 +28,7 @@ import {
 	TableSkeletonComponent,
 } from '@shared/components';
 import type { SkeletonColumnDef } from '@shared/components';
-import { FormatTimePipe } from '@shared/pipes';
+import { FormatTimePipe } from '@intranet-shared/pipes';
 import { getStatusClass } from '@features/intranet/pages/cross-role/attendance-component/config/attendance.constants';
 import { AttendanceStatus } from '@features/intranet/pages/cross-role/attendance-component/models/attendance.types';
 

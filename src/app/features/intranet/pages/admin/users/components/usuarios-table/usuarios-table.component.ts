@@ -8,8 +8,9 @@ import { TagModule } from 'primeng/tag';
 import { TooltipModule } from 'primeng/tooltip';
 import { UsuarioLista } from '../../services';
 import { UiMappingService } from '@shared/services';
-import { EstadoLabelPipe, EstadoSeverityPipe, EstadoToggleIconPipe, EstadoToggleLabelPipe, FullNamePipe } from '@shared/pipes';
-import { TableLoadingDirective } from '@app/shared';
+import { EstadoLabelPipe, EstadoSeverityPipe, EstadoToggleIconPipe, EstadoToggleLabelPipe } from '@intranet-shared/pipes';
+import { FullNamePipe } from '@shared/pipes';
+import { TableLoadingDirective } from '@intranet-shared/directives';
 
 /**
  * Componente presentacional para la tabla de usuarios

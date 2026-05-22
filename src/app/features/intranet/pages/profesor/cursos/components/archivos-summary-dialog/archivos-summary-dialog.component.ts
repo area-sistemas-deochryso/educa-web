@@ -2,7 +2,7 @@ import { Component, ChangeDetectionStrategy, input, output, computed } from '@an
 import { CommonModule } from '@angular/common';
 import { DialogModule } from 'primeng/dialog';
 import { CursoContenidoSemanaDto } from '@features/intranet/pages/profesor/models';
-import { FormatFileSizePipe } from '@shared/pipes';
+import { FormatFileSizePipe } from '@intranet-shared/pipes';
 
 @Component({
 	selector: 'app-archivos-summary-dialog',

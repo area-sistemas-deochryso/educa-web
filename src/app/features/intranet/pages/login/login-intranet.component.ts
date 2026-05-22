@@ -1,4 +1,4 @@
-import { AppValidators, LoginFormGroup } from '@shared/validators';
+import { AppValidators, LoginFormGroup } from '@intranet-shared/validators';
 import {
 	AuthService,
 	StoredSession,
@@ -25,8 +25,8 @@ import { Router } from '@angular/router';
 import { Select } from 'primeng/select';
 import { ToggleSwitch } from 'primeng/toggleswitch';
 import { Tooltip } from 'primeng/tooltip';
-import { UppercaseInputDirective } from '@app/shared';
-import { InitialsPipe } from '@shared/pipes';
+import { UppercaseInputDirective } from '@intranet-shared/directives';
+import { InitialsPipe } from '@intranet-shared/pipes';
 import { logger } from '@core/helpers';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { UI_LOGIN_MESSAGES } from '@app/shared/constants';

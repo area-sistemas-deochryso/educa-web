@@ -19,7 +19,7 @@ import { IconFieldModule } from 'primeng/iconfield';
 import { InputIconModule } from 'primeng/inputicon';
 
 import { PageHeaderComponent } from '@shared/components';
-import { EstadoLabelPipe, EstadoSeverityPipe, EstadoToggleLabelPipe } from '@shared/pipes';
+import { EstadoLabelPipe, EstadoSeverityPipe, EstadoToggleLabelPipe } from '@intranet-shared/pipes';
 import { UiMappingService } from '@shared/services';
 import { EventsCalendarFacade, EventsCalendarStore } from './services';
 import type { EventoFormData } from './services';

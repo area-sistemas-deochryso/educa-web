@@ -5,7 +5,7 @@ import { ButtonModule } from 'primeng/button';
 import { TooltipModule } from 'primeng/tooltip';
 import { TagModule } from 'primeng/tag';
 import { EstudianteTareaArchivosGroupDto, CursoContenidoTareaDto } from '@features/intranet/pages/profesor/models';
-import { FormatFileSizePipe } from '@shared/pipes';
+import { FormatFileSizePipe } from '@intranet-shared/pipes';
 import { SkeletonLoaderComponent } from '@shared/components';
 
 @Component({

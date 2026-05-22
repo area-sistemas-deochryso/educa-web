@@ -3,7 +3,7 @@ import { ChangeDetectionStrategy, Component, input, output } from '@angular/core
 
 import { FormsModule } from '@angular/forms';
 import { GradoSeccion } from '@core/services';
-import { SeccionLabelPipe } from '@shared/pipes';
+import { SeccionLabelPipe } from '@intranet-shared/pipes';
 
 /**
  * Componente presentacional para la selección de grado/sección.

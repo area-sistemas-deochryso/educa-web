@@ -7,7 +7,7 @@ import { TagModule } from 'primeng/tag';
 import { SemanaEstudianteArchivosDto, CalificacionConNotasDto } from '@features/intranet/pages/profesor/models';
 import { getNotaSeverity } from '@intranet-shared/services/calificacion-config';
 import type { ConfiguracionCalificacionListDto } from '@data/models';
-import { FormatFileSizePipe } from '@shared/pipes';
+import { FormatFileSizePipe } from '@intranet-shared/pipes';
 import { SkeletonLoaderComponent } from '@shared/components';
 
 @Component({

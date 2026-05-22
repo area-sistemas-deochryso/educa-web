@@ -38,8 +38,8 @@ import { SelectModule } from 'primeng/select';
 import { TableModule } from 'primeng/table';
 import { TagModule } from 'primeng/tag';
 import { ToggleSwitch } from 'primeng/toggleswitch';
-import { UppercaseInputDirective } from '@shared/directives';
-import { EstadoLabelPipe } from '@shared/pipes';
+import { UppercaseInputDirective } from '@intranet-shared/directives';
+import { EstadoLabelPipe } from '@intranet-shared/pipes';
 
 export type UsuarioFormData = Partial<CrearUsuarioRequest & ActualizarUsuarioRequest>;
 
