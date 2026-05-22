@@ -4,22 +4,39 @@
 > **Principio rector**: "Features primero — el enforcement y la arquitectura son valiosos solo si soportan funcionalidad real."
 > **Scope**: solo trabajo FE-only. BE-only → [`Educa.API/.claude/plan/maestro.md`](../../../Educa.API/.claude/plan/maestro.md). Cross-repo → [`educa-coord/plans/maestro.md`](../../../educa-coord/plans/maestro.md).
 
+<!-- INDEX:START -->
+| Key | Plan | Estado | Notas |
+|-----|------|--------|-------|
+| F1 | Enforcement de Reglas | ~90% | F1-F3 ✅ · F4 parcial · F5 awaiting-prod |
+| F5 | Consolidación Frontend | ⏳ 0% | Tras Plan 4 BE |
+| F8 | Design Patterns Backend | Incremental | Al tocar módulos |
+| F9 | Design Patterns Frontend | Incremental | Al tocar módulos |
+| F13 | Frontend Test Gaps | ⏳ 0% | F1-F5 pendientes |
+| F46 | Drift documental `.claude/` FE | ✅ archived | Cerrado 2026-05-15 |
+| F47 | Links rotos maestro | ✅ archived | Cerrado 2026-05-15 |
+| F48 | Barrido `appendTo="body"` | ✅ archived | Cerrado 2026-05-15 |
+| xP41 | → Correlation Hub (coord) | F1 timeline FE ⏳ | ver P41 |
+| xP42 | → Casing contratos (coord) | Sin trabajo FE pendiente | ver P42 |
+| xP43 | → Monitoreo Cowork (coord) | Sub-chats FE pendientes | ver P43 |
+| xP45 | → Monitoreo incidencias (coord) | P45:F2.2:FE ⏳ | ver P45 |
+<!-- INDEX:END -->
+
 ---
 
-## Inventario de planes FE
+## [INV] Inventario de planes FE
 
 > Planes BE-only y cross-repo migrados 2026-05-15 (ADR-0002). Archivados en [history/planes-cerrados.md](../history/planes-cerrados.md).
 
-| # | Plan | Estado | Notas |
-|---|------|--------|-------|
-| 1 | Enforcement de Reglas | ~90% | F1-F3 ✅ · F4 parcial (F4.4-F4.5 🔒) · F5 awaiting-prod (brief 137). F5.3 re-exports pendiente |
-| 5 | Consolidación Frontend | ⏳ 0% | Tras Plan 4 BE |
-| 8 | Design Patterns Backend | Incremental | Al tocar módulos |
-| 9 | Design Patterns Frontend | Incremental | Al tocar módulos |
-| 13 | Frontend Test Gaps | ⏳ 0% | F1 interceptores, F2 páginas admin, F3 flujos, F4 WAL, F5 shared |
-| 46 | Drift documental `.claude/` FE | ✅ 100% | Cerrado 2026-05-15 |
-| 47 | Links rotos maestro | ✅ 100% | Cerrado 2026-05-15 |
-| 48 | Barrido `appendTo="body"` | ✅ 100% | Cerrado 2026-05-15 |
+| Key | # | Plan | Estado | Notas |
+|-----|---|------|--------|-------|
+| F1 | 1 | Enforcement de Reglas | ~90% | F1-F3 ✅ · F4 parcial (F4.4-F4.5 🔒) · F5 awaiting-prod (brief 137). F5.3 re-exports pendiente |
+| F5 | 5 | Consolidación Frontend | ⏳ 0% | Tras Plan 4 BE |
+| F8 | 8 | Design Patterns Backend | Incremental | Al tocar módulos |
+| F9 | 9 | Design Patterns Frontend | Incremental | Al tocar módulos |
+| F13 | 13 | Frontend Test Gaps | ⏳ 0% | F1 interceptores, F2 páginas admin, F3 flujos, F4 WAL, F5 shared |
+| F46 | 46 | Drift documental `.claude/` FE | ✅ 100% | Cerrado 2026-05-15 |
+| F47 | 47 | Links rotos maestro | ✅ 100% | Cerrado 2026-05-15 |
+| F48 | 48 | Barrido `appendTo="body"` | ✅ 100% | Cerrado 2026-05-15 |
 
 Planes cross-repo con sub-chats FE pendientes: **41** (Correlation Hub), **42** (Casing contratos), **43** (Monitoreo Cowork). Detalle en sección Referencias cross-repo.
 
@@ -35,13 +52,13 @@ _(Vacía — no hay trabajo FE-only desbloqueado en este momento.)_
 
 ### ⏸️ Future FE-only (bloqueado por BE u otro)
 
-- **Plan 45 F2.2 FE — UI rework `/incidencias/errores`** — JOIN endpoint `/full` + vista por evento `ErrorLog` + tab Trace real. Libre (F5 BE ✅ shipped). Sub-plan en [`educa-coord/plans/xrepo-45-monitoreo-incidencias-rework.md`](../../../educa-coord/plans/xrepo-45-monitoreo-incidencias-rework.md) §F2.
+- **[xP45] P45:F2.2:FE — UI rework `/incidencias/errores`** — JOIN endpoint `/full` + vista por evento `ErrorLog` + tab Trace real. Libre (P45:F5:BE ✅ shipped). Sub-plan en [`educa-coord/plans/xrepo-45-monitoreo-incidencias-rework.md`](../../../educa-coord/plans/xrepo-45-monitoreo-incidencias-rework.md) §F2.
 
 ### 🔗 Referencias cross-repo (sub-chats FE de planes cross-repo)
 
 > Prioridad global en [`educa-coord/plans/maestro.md`](../../../educa-coord/plans/maestro.md). Acá solo para visibilidad.
 
-- **Plan 43 — Monitoreo Cowork** → [`xrepo-43`](../../../educa-coord/plans/xrepo-43-monitoreo-cowork-feedback-2026-05-11.md). Sub-chats FE pendientes:
+- **[xP43] Monitoreo Cowork** → [`xrepo-43`](../../../educa-coord/plans/xrepo-43-monitoreo-cowork-feedback-2026-05-11.md). Sub-chats FE pendientes:
   - Chat 3.2 (Detalle correo + buscador A4+A5) — espera F1
   - Chat 4.1 (Filtros + paginación Bandeja A2+B5) — espera F1
   - Chat 4.2 (Filtros server-side Errores A9+A10+B5) — depende Chat 1.2
@@ -50,8 +67,8 @@ _(Vacía — no hay trabajo FE-only desbloqueado en este momento.)_
   - Chat 5.2 (Heatmap latencia + bundle telemetría B9+B10) — depende Chat 1.2+1.3
   - Chat 6.1 (Vista unificada por destinatario B1) — depende F1+F3+F4
   - Chat 6.2 (Links bidireccionales + Gap accionable B12) — depende 6.1+4.3
-- **Plan 41 — Correlation Hub** → [`xrepo-41`](../../../educa-coord/plans/xrepo-41-correlation-hub-observability.md). Próximo FE: Chat 9 (search global) ⏳ requiere BE.
-- **Plan 42 — Casing contratos** → [`xrepo-42`](../../../educa-coord/plans/xrepo-42-case-drift.md). Sin trabajo FE pendiente; F2-BE en cola BE.
+- **[xP41] Correlation Hub** → [`xrepo-41`](../../../educa-coord/plans/xrepo-41-correlation-hub-observability.md). Próximo FE: Chat 9 (search global) ⏳ requiere BE.
+- **[xP42] Casing contratos** → [`xrepo-42`](../../../educa-coord/plans/xrepo-42-case-drift.md). Sin trabajo FE pendiente; P42:F2:BE en cola BE.
 
 ### 🟣 Verificaciones post-deploy (`/verify <NNN>`)
 
