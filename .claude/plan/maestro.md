@@ -77,7 +77,7 @@
 
 ### 🟢 Pullable FE-only
 
-- **xrepo-50 F1 — ESLint rule: core cannot import features or shared (brief `216`)** — primer fase del refactor de cohesión/acoplamiento FE. ESLint plugin config + suppression comments en 18 archivos. Plan: [`educa-coord/plans/xrepo-50-fe-cohesion-coupling-refactor.md`](../../../educa-coord/plans/xrepo-50-fe-cohesion-coupling-refactor.md) §F1.
+- ~~**xrepo-50 F1 (brief `216`)**~~ ✅ closed 2026-05-22. 2 reglas ESLint (`core-no-features`, `core-no-shared`) en `LAYER_RULES`. 18 violaciones ya suprimidas (de F2 previo). F2 desbloqueado.
 
 ### ⏸️ Future FE-only (bloqueado por BE u otro)
 

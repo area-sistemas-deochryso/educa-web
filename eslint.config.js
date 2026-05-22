@@ -1015,6 +1015,35 @@ const LAYER_RULES = [
 			},
 		],
 	},
+	{
+		id: 'core-no-features',
+		severity: 'error',
+		match: (f) => /\/src\/app\/core\//.test(f),
+		restrictions: [
+			{
+				sourcePattern: /^@features\//,
+				message:
+					'core/ no puede importar de features/ — core debe ser independiente de features.',
+			},
+			{
+				sourcePattern: /^@intranet-shared(\/|$)/,
+				message:
+					'core/ no puede importar de @intranet-shared — core debe ser independiente de features.',
+			},
+		],
+	},
+	{
+		id: 'core-no-shared',
+		severity: 'error',
+		match: (f) => /\/src\/app\/core\//.test(f),
+		restrictions: [
+			{
+				sourcePattern: /^@shared(\/|$)/,
+				message:
+					'core/ no puede importar de shared/ — core no debe depender de shared.',
+			},
+		],
+	},
 ];
 
 function createImportChecker(severityFilter) {
