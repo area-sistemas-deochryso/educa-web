@@ -48,11 +48,11 @@ Planes cross-repo con sub-chats FE pendientes: **41** (Correlation Hub), **42** 
 
 ### 🟢 Pullable FE-only
 
-_(Vacía — no hay trabajo FE-only desbloqueado en este momento.)_
+- **[xP45] P45:F2.2:FE — UI rework `/incidencias/errores`** — JOIN endpoint `/full` + vista por evento `ErrorLog` + tab Trace real. Libre (P45:F5:BE ✅ shipped). Sub-plan en [`educa-coord/plans/xrepo-45-monitoreo-incidencias-rework.md`](../../../educa-coord/plans/xrepo-45-monitoreo-incidencias-rework.md) §F2.
 
 ### ⏸️ Future FE-only (bloqueado por BE u otro)
 
-- **[xP45] P45:F2.2:FE — UI rework `/incidencias/errores`** — JOIN endpoint `/full` + vista por evento `ErrorLog` + tab Trace real. Libre (P45:F5:BE ✅ shipped). Sub-plan en [`educa-coord/plans/xrepo-45-monitoreo-incidencias-rework.md`](../../../educa-coord/plans/xrepo-45-monitoreo-incidencias-rework.md) §F2.
+_(Vacía — todos los ítems desbloqueados movidos a Pullable.)_
 
 ### 🔗 Referencias cross-repo (sub-chats FE de planes cross-repo)
 
