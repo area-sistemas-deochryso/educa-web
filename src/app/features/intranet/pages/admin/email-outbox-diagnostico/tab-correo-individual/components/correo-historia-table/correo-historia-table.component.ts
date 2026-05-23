@@ -1,9 +1,11 @@
 import { DatePipe } from '@angular/common';
-import { ChangeDetectionStrategy, Component, input, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, input, output, signal } from '@angular/core';
 import { ButtonModule } from 'primeng/button';
 import { TableModule } from 'primeng/table';
 import { TagModule } from 'primeng/tag';
 import { TooltipModule } from 'primeng/tooltip';
+
+import { CorrelationIdPillComponent } from '@shared/components';
 
 import { EmailDiagnosticoHistoriaItem } from '../../models/correo-individual.models';
 
@@ -20,13 +22,14 @@ const ESTADO_SEVERITY: Record<string, Severity> = {
 @Component({
 	selector: 'app-correo-historia-table',
 	standalone: true,
-	imports: [TableModule, TagModule, ButtonModule, TooltipModule, DatePipe],
+	imports: [TableModule, TagModule, ButtonModule, TooltipModule, DatePipe, CorrelationIdPillComponent],
 	templateUrl: './correo-historia-table.component.html',
 	styleUrl: './correo-historia-table.component.scss',
 	changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class CorreoHistoriaTableComponent {
 	readonly data = input.required<EmailDiagnosticoHistoriaItem[]>();
+	readonly viewDetail = output<EmailDiagnosticoHistoriaItem>();
 
 	// * Set de IDs expandidos para mostrar detalles de la fila (error/remitente/bounce).
 	private readonly _expanded = signal<Set<number>>(new Set());
@@ -56,5 +59,9 @@ export class CorreoHistoriaTableComponent {
 			item.bounceSource ||
 			item.bounceDetectedAt
 		);
+	}
+
+	onViewDetail(item: EmailDiagnosticoHistoriaItem): void {
+		this.viewDetail.emit(item);
 	}
 }

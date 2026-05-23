@@ -27,28 +27,40 @@
 			aria-label="Buscar por correo, nombre, apellido o DNI"
 		>
 			<ng-template let-persona pTemplate="item">
-				<div class="suggestion">
-					<div class="suggestion__avatar" [attr.data-tipo]="persona.tipoPersona">
-						<i [class]="tipoPersonaIcon(persona.tipoPersona)"></i>
+				<div class="suggestion" [class.suggestion--orphan]="persona.esHuerfano">
+					<div class="suggestion__avatar" [attr.data-tipo]="persona.esHuerfano ? 'orphan' : persona.tipoPersona">
+						<i [class]="persona.esHuerfano ? 'pi pi-question-circle' : tipoPersonaIcon(persona.tipoPersona)"></i>
 					</div>
 					<div class="suggestion__body">
 						<div class="suggestion__line-1">
-							<span class="suggestion__name">{{ persona.nombreCompleto }}</span>
-							<span
-								class="suggestion__tipo"
-								[attr.data-tipo]="persona.tipoPersona"
-							>{{ tipoPersonaLabel(persona.tipoPersona) }}</span>
+							@if (persona.esHuerfano) {
+								<code class="suggestion__name">{{ persona.correo }}</code>
+								<span class="suggestion__tipo suggestion__tipo--orphan">Sin dueño en personas</span>
+							} @else {
+								<span class="suggestion__name">{{ persona.nombreCompleto }}</span>
+								<span
+									class="suggestion__tipo"
+									[attr.data-tipo]="persona.tipoPersona"
+								>{{ tipoPersonaLabel(persona.tipoPersona) }}</span>
+							}
 						</div>
-						<div class="suggestion__line-2">
-							<i class="pi pi-envelope"></i>
-							<code class="suggestion__correo">{{ persona.correoMasked }}</code>
-						</div>
-						<div class="suggestion__line-3">
-							<span class="suggestion__dni">
-								<i class="pi pi-id-card"></i>{{ persona.dniMasked }}
-							</span>
-							<span class="suggestion__campo">{{ persona.campo | campoCorreoLabel }}</span>
-						</div>
+						@if (!persona.esHuerfano) {
+							<div class="suggestion__line-2">
+								<i class="pi pi-envelope"></i>
+								<code class="suggestion__correo">{{ persona.correoMasked }}</code>
+							</div>
+							<div class="suggestion__line-3">
+								<span class="suggestion__dni">
+									<i class="pi pi-id-card"></i>{{ persona.dniMasked }}
+								</span>
+								<span class="suggestion__campo">{{ persona.campo | campoCorreoLabel }}</span>
+							</div>
+						} @else {
+							<div class="suggestion__line-2">
+								<i class="pi pi-inbox"></i>
+								<span class="suggestion__hint">Ver historial outbox de este correo</span>
+							</div>
+						}
 					</div>
 				</div>
 			</ng-template>

@@ -27,10 +27,33 @@ export interface EmailDiagnosticoHistoriaItem {
 	estado: string;
 	tipoFallo: string | null;
 	intentos: number;
+	maxIntentos: number;
 	ultimoError: string | null;
+	ultimoErrorTransiente: string | null;
 	remitente: string | null;
 	bounceSource: string | null;
 	bounceDetectedAt: string | null;
+	correlationId: string | null;
+	destinatario: string;
+	fechaEnvio: string | null;
+	duracionMs: number | null;
+	usuarioReg: string;
+	fechaReg: string;
+	proximoIntento: string | null;
+	lastSmtpCode: number | null;
+	lastSmtpMessage: string | null;
+	lastAttemptAt: string | null;
+	intentosPorCuota: number;
+	bcc: string | null;
+	entidadOrigen: string | null;
+	entidadId: number | null;
+	owner: EmailDiagnosticoOwner | null;
+}
+
+export interface EmailDiagnosticoOwner {
+	tipoPersona: string;
+	id: number;
+	nombreCompleto: string;
 }
 
 export interface EmailDiagnosticoBlacklist {
@@ -64,6 +87,7 @@ export interface PersonaConCorreoDto {
 	campo: string;
 	correo: string;
 	correoMasked: string;
+	esHuerfano: boolean;
 }
 
 export interface BuscarPersonasResponseDto {

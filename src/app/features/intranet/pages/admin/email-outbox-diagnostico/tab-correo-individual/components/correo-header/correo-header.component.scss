@@ -42,6 +42,7 @@
 		&[data-tipo='P'] { background: color-mix(in srgb, var(--green-500) 14%, transparent); color: var(--green-700); }
 		&[data-tipo='D'] { background: color-mix(in srgb, var(--purple-500) 14%, transparent); color: var(--purple-700); }
 		&[data-tipo='APO'] { background: color-mix(in srgb, var(--yellow-500) 16%, transparent); color: var(--yellow-800); }
+		&[data-tipo='orphan'] { background: color-mix(in srgb, var(--orange-500) 14%, transparent); color: var(--orange-700); }
 	}
 
 	&__body {
@@ -131,6 +132,22 @@
 		padding: 1px 5px;
 		border-radius: 3px;
 		background: var(--surface-100);
+	}
+
+	&__hint {
+		font-size: 0.78rem;
+		color: var(--text-color-secondary);
+		font-style: italic;
+	}
+
+	&__tipo--orphan {
+		background: color-mix(in srgb, var(--orange-500) 14%, transparent);
+		color: var(--orange-700);
+	}
+
+	&--orphan {
+		border-left: 3px solid var(--orange-500);
+		padding-left: calc(0.3rem + 3px);
 	}
 }
 

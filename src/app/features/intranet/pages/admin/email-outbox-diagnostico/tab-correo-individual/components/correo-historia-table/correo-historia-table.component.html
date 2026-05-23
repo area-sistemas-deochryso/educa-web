@@ -3,7 +3,7 @@
 		<h3>Historial de intentos</h3>
 		<span class="section-subtitle">
 			Últimas {{ data().length }} filas de <code>EmailOutbox</code> (ordenadas DESC
-			por el BE) — click en la flecha para ver error, remitente y bounce
+			por el BE) — click en el ojo para ver detalle completo
 		</span>
 	</header>
 
@@ -24,6 +24,8 @@
 				<th class="label-uppercase col-tipofallo">Estado</th>
 				<th class="label-uppercase col-tipofallo">Tipo fallo</th>
 				<th class="label-uppercase col-num">Intentos</th>
+				<th class="label-uppercase col-correlation">Correlation</th>
+				<th class="label-uppercase col-actions"></th>
 			</tr>
 		</ng-template>
 		<ng-template #body let-row>
@@ -56,12 +58,26 @@
 					}
 				</td>
 				<td class="col-num">{{ row.intentos }}</td>
+				<td class="col-correlation">
+					<app-correlation-id-pill [id]="row.correlationId" [compact]="true" />
+				</td>
+				<td class="col-actions">
+					<button
+						pButton
+						icon="pi pi-eye"
+						class="p-button-rounded p-button-text p-button-sm"
+						pTooltip="Ver detalle completo"
+						tooltipPosition="top"
+						(click)="onViewDetail(row)"
+						[pt]="{ root: { 'aria-label': 'Ver detalle completo' } }"
+					></button>
+				</td>
 			</tr>
 
 			@if (isExpanded(row.id) && hasDetalle(row)) {
 				<tr class="row-detail">
 					<td></td>
-					<td colspan="6">
+					<td colspan="8">
 						<div class="detail-grid">
 							@if (row.ultimoError) {
 								<div class="detail-item detail-item--wide">
@@ -94,7 +110,7 @@
 		</ng-template>
 		<ng-template #emptymessage>
 			<tr>
-				<td colspan="7" class="empty-message">
+				<td colspan="9" class="empty-message">
 					<div class="empty-state">
 						<i class="pi pi-inbox"></i>
 						<p>Sin intentos registrados para este correo</p>

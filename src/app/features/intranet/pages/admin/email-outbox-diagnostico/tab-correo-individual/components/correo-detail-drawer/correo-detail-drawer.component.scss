@@ -1,0 +1,128 @@
+.detail-content {
+	display: flex;
+	flex-direction: column;
+	gap: 1.25rem;
+	padding: 0.5rem 0;
+}
+
+.detail-section {
+	.section-title {
+		font-size: 0.85rem;
+		font-weight: 600;
+		color: var(--text-color-secondary);
+		text-transform: uppercase;
+		letter-spacing: 0.05em;
+		margin: 0 0 0.75rem;
+		padding-bottom: 0.35rem;
+		border-bottom: 1px solid var(--surface-200);
+	}
+}
+
+.info-grid {
+	display: flex;
+	flex-direction: column;
+	gap: 0.75rem;
+
+	.info-item {
+		display: flex;
+		justify-content: space-between;
+		align-items: center;
+		gap: 0.5rem;
+
+		&--wide {
+			flex-direction: column;
+			align-items: flex-start;
+		}
+
+		.info-label {
+			font-weight: 500;
+			color: var(--text-color-secondary);
+			font-size: 0.85rem;
+			flex-shrink: 0;
+		}
+
+		.info-value {
+			font-weight: 500;
+			color: var(--text-color);
+			text-align: right;
+			word-break: break-all;
+
+			&--error {
+				color: var(--red-600);
+			}
+		}
+	}
+}
+
+.smtp-code {
+	font-family: 'JetBrains Mono', 'Fira Code', monospace;
+	color: var(--blue-800);
+	font-size: 1.1rem;
+	font-weight: 700;
+}
+
+.smtp-text,
+.error-text {
+	margin: 0;
+	padding: 0.75rem;
+	border-radius: 6px;
+	font-family: 'JetBrains Mono', 'Fira Code', monospace;
+	font-size: 0.8rem;
+	white-space: pre-wrap;
+	word-break: break-word;
+	max-height: 8rem;
+	overflow-y: auto;
+	width: 100%;
+}
+
+.smtp-text {
+	background: var(--surface-50);
+	border: 1px solid var(--surface-300);
+	color: var(--blue-800);
+}
+
+.error-text {
+	background: color-mix(in srgb, var(--red-500) 8%, transparent);
+	border: 1px solid color-mix(in srgb, var(--red-500) 25%, transparent);
+	color: var(--text-color);
+}
+
+.html-loading {
+	display: flex;
+	align-items: center;
+	gap: 0.5rem;
+	color: var(--text-color-secondary);
+	font-style: italic;
+	padding: 0.5rem 0;
+}
+
+.html-preview {
+	padding: 1rem;
+	border-radius: 6px;
+	background: var(--surface-0);
+	border: 1px solid var(--surface-300);
+	max-height: 20rem;
+	overflow-y: auto;
+	font-size: 0.85rem;
+}
+
+.drawer-footer {
+	display: flex;
+	justify-content: flex-end;
+	gap: 0.5rem;
+	padding-top: 1rem;
+	border-top: 1px solid var(--surface-200);
+	margin-top: 1rem;
+}
+
+:host ::ng-deep .p-drawer {
+	.p-drawer-content {
+		padding: 1.5rem;
+		background: var(--surface-ground);
+	}
+	.p-drawer-header {
+		background: var(--surface-ground);
+		color: var(--text-color);
+		border-bottom: 1px solid var(--surface-300);
+	}
+}

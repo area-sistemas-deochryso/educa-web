@@ -1,0 +1,226 @@
+<p-drawer
+	[visible]="visible()"
+	(visibleChange)="onVisibleChange($event)"
+	position="right"
+	[style]="{ width: '500px' }"
+	[modal]="true"
+	header="Detalle del correo"
+>
+	@if (item(); as row) {
+		<div class="detail-content">
+			<!-- #region Sección: Envío -->
+			<section class="detail-section" aria-label="Envío">
+				<h4 class="section-title">Envío</h4>
+				<div class="info-grid">
+					<div class="info-item">
+						<span class="info-label">Destinatario</span>
+						<code class="info-value">{{ row.destinatario }}</code>
+					</div>
+					@if (row.remitente) {
+						<div class="info-item">
+							<span class="info-label">Remitente</span>
+							<code class="info-value">{{ row.remitente }}</code>
+						</div>
+					}
+					<div class="info-item">
+						<span class="info-label">Asunto</span>
+						<span class="info-value">{{ row.asunto }}</span>
+					</div>
+					<div class="info-item">
+						<span class="info-label">Tipo</span>
+						<p-tag [value]="row.tipo" styleClass="tag-neutral" />
+					</div>
+					@if (row.bcc) {
+						<div class="info-item">
+							<span class="info-label">BCC</span>
+							<code class="info-value">{{ row.bcc }}</code>
+						</div>
+					}
+					<div class="info-item">
+						<span class="info-label">Creado</span>
+						<span class="info-value">{{ row.fechaReg | date: 'dd/MM/yyyy HH:mm' }}</span>
+					</div>
+					@if (row.fechaEnvio) {
+						<div class="info-item">
+							<span class="info-label">Enviado</span>
+							<span class="info-value">{{ row.fechaEnvio | date: 'dd/MM/yyyy HH:mm' }}</span>
+						</div>
+					}
+					@if (row.duracionMs) {
+						<div class="info-item">
+							<span class="info-label">Duración</span>
+							<span class="info-value">{{ row.duracionMs }} ms</span>
+						</div>
+					}
+				</div>
+			</section>
+			<!-- #endregion -->
+
+			<!-- #region Sección: Estado -->
+			<section class="detail-section" aria-label="Estado">
+				<h4 class="section-title">Estado</h4>
+				<div class="info-grid">
+					<div class="info-item">
+						<span class="info-label">Estado</span>
+						<p-tag [value]="row.estado" [severity]="estadoSeverity()" />
+					</div>
+					@if (row.tipoFallo) {
+						<div class="info-item">
+							<span class="info-label">Tipo fallo</span>
+							<code class="info-value info-value--error">{{ row.tipoFallo }}</code>
+						</div>
+					}
+					<div class="info-item">
+						<span class="info-label">Intentos</span>
+						<span class="info-value">{{ intentosLabel() }}</span>
+					</div>
+					@if (row.intentosPorCuota) {
+						<div class="info-item">
+							<span class="info-label">Intentos por cuota</span>
+							<span class="info-value">{{ row.intentosPorCuota }}</span>
+						</div>
+					}
+					@if (row.lastAttemptAt) {
+						<div class="info-item">
+							<span class="info-label">Último intento</span>
+							<span class="info-value">{{ row.lastAttemptAt | date: 'dd/MM/yyyy HH:mm:ss' }}</span>
+						</div>
+					}
+					@if (row.proximoIntento) {
+						<div class="info-item">
+							<span class="info-label">Próximo intento</span>
+							<span class="info-value">{{ row.proximoIntento | date: 'dd/MM/yyyy HH:mm:ss' }}</span>
+						</div>
+					}
+				</div>
+			</section>
+			<!-- #endregion -->
+
+			<!-- #region Sección: SMTP -->
+			@if (hasSmtp()) {
+				<section class="detail-section" aria-label="SMTP">
+					<h4 class="section-title">SMTP</h4>
+					<div class="info-grid">
+						@if (row.lastSmtpCode) {
+							<div class="info-item">
+								<span class="info-label">Código</span>
+								<code class="info-value smtp-code">{{ row.lastSmtpCode }}</code>
+							</div>
+						}
+						@if (row.lastSmtpMessage) {
+							<div class="info-item info-item--wide">
+								<span class="info-label">Mensaje</span>
+								<pre class="smtp-text">{{ row.lastSmtpMessage }}</pre>
+							</div>
+						}
+					</div>
+				</section>
+			}
+			<!-- #endregion -->
+
+			<!-- #region Sección: Errores -->
+			@if (row.ultimoError || row.ultimoErrorTransiente || row.bounceSource) {
+				<section class="detail-section" aria-label="Errores">
+					<h4 class="section-title">Errores</h4>
+					<div class="info-grid">
+						@if (row.ultimoError) {
+							<div class="info-item info-item--wide">
+								<span class="info-label">Último error</span>
+								<pre class="error-text">{{ row.ultimoError }}</pre>
+							</div>
+						}
+						@if (row.ultimoErrorTransiente) {
+							<div class="info-item info-item--wide">
+								<span class="info-label">Error transiente</span>
+								<pre class="error-text">{{ row.ultimoErrorTransiente }}</pre>
+							</div>
+						}
+						@if (row.bounceSource) {
+							<div class="info-item">
+								<span class="info-label">Bounce source</span>
+								<code class="info-value">{{ row.bounceSource }}</code>
+							</div>
+						}
+						@if (row.bounceDetectedAt) {
+							<div class="info-item">
+								<span class="info-label">Bounce detectado</span>
+								<span class="info-value">{{ row.bounceDetectedAt | date: 'dd/MM/yyyy HH:mm' }}</span>
+							</div>
+						}
+					</div>
+				</section>
+			}
+			<!-- #endregion -->
+
+			<!-- #region Sección: Origen -->
+			<section class="detail-section" aria-label="Origen">
+				<h4 class="section-title">Origen</h4>
+				<div class="info-grid">
+					@if (row.entidadOrigen) {
+						<div class="info-item">
+							<span class="info-label">Evento origen</span>
+							<code class="info-value">{{ row.entidadOrigen }}</code>
+						</div>
+					}
+					@if (row.entidadId) {
+						<div class="info-item">
+							<span class="info-label">Entidad ID</span>
+							<span class="info-value">#{{ row.entidadId }}</span>
+						</div>
+					}
+					@if (ownerLabel(); as label) {
+						<div class="info-item">
+							<span class="info-label">Dueño</span>
+							<span class="info-value">{{ label }}</span>
+						</div>
+					}
+					<div class="info-item">
+						<span class="info-label">Creado por</span>
+						<span class="info-value">{{ row.usuarioReg }}</span>
+					</div>
+					@if (row.correlationId) {
+						<div class="info-item">
+							<span class="info-label">Correlation</span>
+							<app-correlation-id-pill [id]="row.correlationId" [compact]="true" />
+						</div>
+					}
+				</div>
+			</section>
+			<!-- #endregion -->
+
+			<!-- #region Sección: Vista previa -->
+			<section class="detail-section" aria-label="Vista previa">
+				<h4 class="section-title">Vista previa</h4>
+				@if (loadingHtml()) {
+					<div class="html-loading">
+						<i class="pi pi-spin pi-spinner"></i>
+						Cargando contenido…
+					</div>
+				} @else if (htmlBody(); as body) {
+					<div class="html-preview" [innerHTML]="body"></div>
+				} @else {
+					<button
+						pButton
+						label="Cargar vista previa"
+						icon="pi pi-eye"
+						class="p-button-outlined p-button-sm"
+						(click)="onLoadHtml()"
+						[pt]="{ root: { 'aria-label': 'Cargar vista previa del correo' } }"
+					></button>
+				}
+			</section>
+			<!-- #endregion -->
+		</div>
+
+		<div class="drawer-footer">
+			<button
+				pButton
+				label="Cerrar"
+				icon="pi pi-times"
+				class="p-button-text"
+				(click)="onClose()"
+				[pt]="{ root: { 'aria-label': 'Cerrar' } }"
+			></button>
+		</div>
+	}
+</p-drawer>

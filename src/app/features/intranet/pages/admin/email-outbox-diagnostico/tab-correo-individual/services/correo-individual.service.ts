@@ -34,5 +34,9 @@ export class CorreoIndividualService {
 			{ params },
 		);
 	}
+
+	obtenerCuerpoHtml(id: number): Observable<{ html: string }> {
+		return this.http.get<{ html: string }>(`${this.baseUrl}/${id}/html`);
+	}
 	// #endregion
 }

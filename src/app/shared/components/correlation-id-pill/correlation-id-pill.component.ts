@@ -53,7 +53,7 @@ export class CorrelationIdPillComponent {
 	readonly ariaLabel = computed(() => {
 		const value = this.id();
 		return value
-			? `Ver eventos del correlation id ${value}`
+			? `Abrir hub correlacionado ${value}`
 			: 'Sin correlation id disponible';
 	});
 
