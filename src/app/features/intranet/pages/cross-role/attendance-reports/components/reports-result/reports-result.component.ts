@@ -36,6 +36,33 @@ export class ReportsResultComponent {
 	// #region Computed
 	readonly esDia = computed(() => this.resultado().rangoTipo === 'dia');
 
+	readonly esMatrizMensual = computed(() => {
+		const r = this.resultado();
+		return r.rangoTipo === 'mes' && r.salones.some(s =>
+			s.estudiantes.some(e => e.asistenciasDiarias != null));
+	});
+
+	readonly diasColumnas = computed<number[]>(() => {
+		const salon = this.selectedSalon();
+		if (!salon?.diasEnMes) return [];
+		return Array.from({ length: salon.diasEnMes }, (_, i) => i + 1);
+	});
+
+	readonly diasSemanaLabels = computed<string[]>(() => {
+		const salon = this.selectedSalon();
+		if (!salon?.diasEnMes) return [];
+		const fecha = new Date(this.resultado().fechaInicio);
+		const labels = ['D', 'L', 'M', 'M', 'J', 'V', 'S'];
+		return Array.from({ length: salon.diasEnMes }, (_, i) => {
+			const d = new Date(fecha.getFullYear(), fecha.getMonth(), i + 1);
+			return labels[d.getDay()];
+		});
+	});
+
+	readonly feriadosSet = computed<Set<number>>(() =>
+		new Set(this.resultado().diasFeriados ?? []),
+	);
+
 	readonly salones = computed<SalonReporteFiltrado[]>(() =>
 		this.resultado().salones.filter((s) => s.totalFiltrados > 0),
 	);
@@ -101,6 +128,10 @@ export class ReportsResultComponent {
 	// #region Helpers
 	private salonKey(s: SalonReporteFiltrado): string {
 		return `${s.grado}|${s.seccion}`;
+	}
+
+	esFeriado(dia: number): boolean {
+		return this.feriadosSet().has(dia);
 	}
 	// #endregion
 }

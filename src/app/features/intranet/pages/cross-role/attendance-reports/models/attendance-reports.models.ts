@@ -40,6 +40,7 @@ export interface ReporteFiltrado {
 	asistentesAdmin?: PersonaAsistenteAdminReporte[] | null;
 	totalAsistentesAdminGeneral?: number;
 	totalAsistentesAdminFiltrados?: number;
+	diasFeriados?: number[] | null;
 }
 
 export interface SalonReporteFiltrado {
@@ -50,6 +51,14 @@ export interface SalonReporteFiltrado {
 	estudiantes: EstudianteReporteFiltrado[];
 	estadisticas: EstadisticasAsistenciaDia;
 	porcentajeAsistencia: number;
+	diasEnMes?: number | null;
+	nombreMes?: string | null;
+}
+
+export interface AsistenciaDiaMatriz {
+	dia: number;
+	estadoCodigo: string;
+	esFeriado: boolean;
 }
 
 export interface EstudianteReporteFiltrado {
@@ -61,6 +70,11 @@ export interface EstudianteReporteFiltrado {
 	observacion: string | null;
 	estadoCodigo: string;
 	estadoDescripcion: string;
+	asistenciasDiarias?: AsistenciaDiaMatriz[] | null;
+	totalAsistencias?: number | null;
+	totalFaltas?: number | null;
+	totalTardanzas?: number | null;
+	totalJustificados?: number | null;
 }
 
 export interface PersonaProfesorReporte {
