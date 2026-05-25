@@ -1,9 +1,21 @@
 # 140 · FE — Fix F-018: botón "Registrar" disabled en dialog asistencia manual (tipoPersona=A)
 
-> **Creado**: 2026-05-12 · **Estado**: ⏳ pendiente arrancar · **Repo**: `educa-web` (main)
+> **Creado**: 2026-05-12 · **Reabierto**: 2026-05-25 · **Estado**: 🔴 troubles (2 regresiones post-deploy) · **Repo**: `educa-web` (main)
 > **Modo sugerido**: `/investigate` → `/execute` → `/validate`
 > **Origen**: Cowork 2026-05-12 reportó F-018 al ejecutar TEST 4.2 del bloque Plan 28 AA. Brief 127 (BE dispatcher AA correos) queda bloqueado en `awaiting-prod/` hasta que este fix llegue a prod.
 > **Bloquea**: cierre del Plan 28 al 100% (brief 127 + parte 4b-tab del brief 134 que sigue en `awaiting-prod/`).
+
+## ❌ Regresiones detectadas en prod (2026-05-25)
+
+### R1 — "Solo salida" no deja seleccionar persona → botón Registrar bloqueado permanentemente
+
+- **Repro**: Dialog asistencia manual → Tipo registro: "Solo salida" → no permite elegir estudiante/AA → botón queda disabled.
+- **Hipótesis**: el fix de `sedeId` resolvió el caso "Solo entrada" pero la rama "Solo salida" tiene una dependencia adicional no cubierta (posiblemente el selector de persona se deshabilita o no aparece cuando `tipoRegistro === 'S'`).
+
+### R2 — Asistencia manual creada desaparece al recargar (POST OK, GET no la trae)
+
+- **Repro**: Registrar asistencia manual → POST responde 200 sin errores → recargar página → la fila no aparece.
+- **Diagnóstico pendiente**: investigar qué trae el GET. El POST se ejecutó sin errores, así que el dato debería existir en BD. Posible filtro en el GET (fecha, estado, tipo) que excluye el registro recién creado.
 
 ## Síntoma reproducible
 

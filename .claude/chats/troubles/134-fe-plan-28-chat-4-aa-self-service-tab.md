@@ -1,8 +1,19 @@
 # 134 · Plan 28 Chat 4a + 4b-tab FE — Self-service AA + tab director-profesores
 
-> **Creado**: 2026-05-09 · **Estado**: ✅ awaiting-prod 2026-05-09 · **Repo**: `educa-web` (main)
+> **Creado**: 2026-05-09 · **Reabierto**: 2026-05-25 · **Estado**: 🔴 troubles (4a dudoso, 4b-tab ✅) · **Repo**: `educa-web` (main)
 > **Bloquea**: Plan 28 al 100% (cierra Chat 4 FE — pendiente deploy BE 3d para validación funcional).
 > **Validación prod**: ✅ 4a verificada 2026-05-12 (Cowork: login AA DNI 72884913 → widget home "Mi asistencia de hoy", `/intranet/asistencia` con leyenda y empty state legítimo, GET `/api/asistente-administrativo/me/mes` y `/me/dia` responden 200, sin botones edición). ⚠️ 4b-tab director-profesores tab AA bloqueada por bug FE F-018 (botón "Registrar" disabled en dialog asistencia manual AA — ver brief F-018 en open/).
+
+## ❌ Verificación parcial localhost (2026-05-25)
+
+### ✅ 4b-tab — Director ve tab "Asistentes Administrativos"
+- Tab existe, lista AAs con estado de asistencia del día. Tabs Estudiantes/Profesores sin regresión.
+
+### ⚠️ 4a — Self-service AA (dudoso)
+- Login AA → `/intranet/asistencia`: la vista se ve igual que desde otro rol admin. No queda claro si el AA está viendo **su propia asistencia** o el panel admin.
+- Widget home: no parece estar como se espera.
+- GET `/api/asistente-administrativo/me/dia`: pendiente de verificar (sin tiempo).
+- **Acción siguiente**: investigar si la ruta AA cae en la vista self-service o en la admin. Comparar con la experiencia del Profesor en `/intranet/asistencia`.
 
 ## Modo sugerido
 
