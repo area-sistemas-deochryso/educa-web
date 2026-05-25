@@ -1,5 +1,7 @@
 # Plan 1 — F5.3: Re-exports `@shared` → `@intranet-shared`
 
+> ⚠️ **Legacy plan (pre-ADR-0006).** This plan may contain implementation detail (file paths, DTOs, counts) that could be stale. Per [ADR-0006 D5](../../educa-coord/decisions/0006-plan-authoring-contract-not-blueprint.md), extract intent + decisions only — ignore concrete paths, signatures, and counts. Investigate current code before executing.
+
 > **Estado**: 🔄 en curso (2026-05-22)
 > **Plan padre**: F1 Enforcement de Reglas
 > **Scope total**: ~107 archivos en 3 batches

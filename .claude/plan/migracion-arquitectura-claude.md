@@ -1,5 +1,7 @@
 # Plan — Migración de arquitectura `.claude/` (FE + BE + carpeta hermana de coordinación)
 
+> ⚠️ **Legacy plan (pre-ADR-0006).** This plan may contain implementation detail (file paths, DTOs, counts) that could be stale. Per [ADR-0006 D5](../../educa-coord/decisions/0006-plan-authoring-contract-not-blueprint.md), extract intent + decisions only — ignore concrete paths, signatures, and counts. Investigate current code before executing.
+
 > **Fecha**: 2026-05-13
 > **Objetivo**: Romper el acoplamiento bidireccional entre `educa-web/.claude/` y `Educa.API/.claude/`. Cada repo solo carga lo suyo. La coordinación (invariantes de dominio, contratos, planes cross-repo, principios) vive en una carpeta hermana neutral.
 > **Estado**: ✅ **CERRADO 2026-05-15** — F1…F7 ejecutadas y verificadas. Decisión congelada en [`educa-coord/decisions/0001-arquitectura-coord-folder.md`](../../../educa-coord/decisions/0001-arquitectura-coord-folder.md). Drift residual menor documentado como follow-up no bloqueante.

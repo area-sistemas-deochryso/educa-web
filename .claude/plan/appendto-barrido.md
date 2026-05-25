@@ -1,5 +1,7 @@
 # Plan 48 — Barrido `appendTo="body"` en `p-select`
 
+> ⚠️ **Legacy plan (pre-ADR-0006).** This plan may contain implementation detail (file paths, DTOs, counts) that could be stale. Per [ADR-0006 D5](../../educa-coord/decisions/0006-plan-authoring-contract-not-blueprint.md), extract intent + decisions only — ignore concrete paths, signatures, and counts. Investigate current code before executing.
+
 > **Repo**: `educa-web` (FE) · **Tipo**: chore(ui) · **Riesgo**: bajo
 > **Creado**: 2026-05-13 · **Estado**: ⏳ pendiente arrancar.
 

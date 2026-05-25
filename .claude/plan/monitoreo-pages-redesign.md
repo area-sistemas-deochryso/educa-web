@@ -1,3 +1,5 @@
+> ⚠️ **Legacy plan (pre-ADR-0006).** This plan may contain implementation detail (file paths, DTOs, counts) that could be stale. Per [ADR-0006 D5](../../educa-coord/decisions/0006-plan-authoring-contract-not-blueprint.md), extract intent + decisions only — ignore concrete paths, signatures, and counts. Investigate current code before executing.
+
 > **Plan**: 36 · Fecha creación: 2026-04-27 · Estado: ⏳ pendiente arrancar
 > **Repo**: `educa-web` (main) — FE-only
 > **Prioridad**: media. No bloquea ni es bloqueado por otros planes activos. Continuación natural de Plan 35 (hub Monitoreo).

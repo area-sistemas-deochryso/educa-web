@@ -1,5 +1,7 @@
 # Plan de Consolidacion Frontend
 
+> ⚠️ **Legacy plan (pre-ADR-0006).** This plan may contain implementation detail (file paths, DTOs, counts) that could be stale. Per [ADR-0006 D5](../../educa-coord/decisions/0006-plan-authoring-contract-not-blueprint.md), extract intent + decisions only — ignore concrete paths, signatures, and counts. Investigate current code before executing.
+
 > **Fecha**: 2026-04-13
 > **Objetivo**: Elevar el frontend al nivel de solidez del backend
 > **Principio rector**: "Reducir la distancia entre lo declarado y lo real"

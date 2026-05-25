@@ -1,5 +1,7 @@
 # Plan 1 — Fase 5: Hardening de Wrappers (cerrar escape hatches)
 
+> ⚠️ **Legacy plan (pre-ADR-0006).** This plan may contain implementation detail (file paths, DTOs, counts) that could be stale. Per [ADR-0006 D5](../../educa-coord/decisions/0006-plan-authoring-contract-not-blueprint.md), extract intent + decisions only — ignore concrete paths, signatures, and counts. Investigate current code before executing.
+
 > **Estado**: ⏳ pendiente arrancar (promocionado desde `tasks/enforcement-reglas.md` el 2026-05-09 vía `/go`).
 > **Plan padre**: Plan 1 — Enforcement de Reglas (F1-F3 ✅ · F4 parcial ✅ · F5 ⏳).
 > **Prioridad**: 🟢 Media — deuda técnica con dueño claro, scope acotado.

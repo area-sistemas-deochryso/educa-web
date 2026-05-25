@@ -1,5 +1,7 @@
 # Plan 46 — Limpieza de drift documental en `.claude/`
 
+> ⚠️ **Legacy plan (pre-ADR-0006).** This plan may contain implementation detail (file paths, DTOs, counts) that could be stale. Per [ADR-0006 D5](../../educa-coord/decisions/0006-plan-authoring-contract-not-blueprint.md), extract intent + decisions only — ignore concrete paths, signatures, and counts. Investigate current code before executing.
+
 > **Repo**: `educa-web` (FE) · **Tipo**: docs · **Riesgo**: bajo (sólo docs/rules)
 > **Creado**: 2026-05-13 · **Última revisión**: 2026-05-15 (chat 157)
 > **Estado global**: ✅ **cerrado 100%** — F1 ✅ · F2 ✅ · F2.b ✅ · F3 ✅ (no aplica). Reporte archivado a `history/drift-report-2026-04.md`.

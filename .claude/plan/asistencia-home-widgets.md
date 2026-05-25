@@ -1,5 +1,7 @@
 # Widgets de Asistencia del Día en /intranet (Plan 22)
 
+> ⚠️ **Legacy plan (pre-ADR-0006).** This plan may contain implementation detail (file paths, DTOs, counts) that could be stale. Per [ADR-0006 D5](../../educa-coord/decisions/0006-plan-authoring-contract-not-blueprint.md), extract intent + decisions only — ignore concrete paths, signatures, and counts. Investigate current code before executing.
+
 > **Estado**: ✅ Diseño cerrado 2026-04-20. Listo para `/execute` en Chat 2.
 > **Origen**: Plan 21 (Asistencia de Profesores en CrossChex) cerró el backend y la vista `/intranet/asistencia`. Queda pendiente el **resumen del día en el home** (`/intranet`) para roles por encima de estudiante.
 > **Capa en el maestro**: Plan #22 — solo frontend, sin backend.

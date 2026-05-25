@@ -1,5 +1,7 @@
 # Plan 13 — Frontend: Test Gaps Críticos
 
+> ⚠️ **Legacy plan (pre-ADR-0006).** This plan may contain implementation detail (file paths, DTOs, counts) that could be stale. Per [ADR-0006 D5](../../educa-coord/decisions/0006-plan-authoring-contract-not-blueprint.md), extract intent + decisions only — ignore concrete paths, signatures, and counts. Investigate current code before executing.
+
 > **Fecha**: 2026-04-16
 > **Objetivo**: Cubrir las áreas del frontend sin tests: páginas admin críticas, flujos de integración UI, interceptores nuevos, y resiliencia WAL/offline/cache.
 > **Estado actual**: 129 spec files. Buenos tests de stores/facades/guards. Gaps: muchas páginas sin spec, 0 tests de flujo completo, interceptores nuevos sin cobertura, WAL/offline parcial.
