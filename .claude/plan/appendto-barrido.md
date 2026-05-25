@@ -1,48 +1,50 @@
 # Plan 48 — Barrido `appendTo="body"` en `p-select`
 
-> ⚠️ **Legacy plan (pre-ADR-0006).** This plan may contain implementation detail (file paths, DTOs, counts) that could be stale. Per [ADR-0006 D5](../../educa-coord/decisions/0006-plan-authoring-contract-not-blueprint.md), extract intent + decisions only — ignore concrete paths, signatures, and counts. Investigate current code before executing.
+> ✅ **Rewritten to ADR-0006 D1 format** (2026-05-25). Contract only — no implementation detail.
 
 > **Repo**: `educa-web` (FE) · **Tipo**: chore(ui) · **Riesgo**: bajo
 > **Creado**: 2026-05-13 · **Estado**: ⏳ pendiente arrancar.
 
-## Contexto
+---
 
-La regla `primeng.md` exige que todos los `p-select`, `p-multiselect`, `p-dropdown` y `p-calendar` lleven `appendTo="body"` para evitar problemas de z-index y overflow cuando viven dentro de diálogos o contenedores con `overflow: hidden`.
+## Problem
 
-El audit del Plan 46 F2 (chat 156, 2026-05-13) confirmó que el drift bajó de ~30 a **7 instancias** de `p-select` sin `appendTo`. Un barrido oportunístico puede cerrar el último gap.
+The rule `primeng.md` requires all `p-select`, `p-multiselect`, `p-dropdown`, and `p-calendar` to have `appendTo="body"` to avoid z-index/overflow issues inside dialogs or containers with `overflow: hidden`. An audit confirmed remaining instances without the attribute.
 
-## Hallazgos
+---
 
-`grep -L 'appendTo' src/**/*.html | xargs grep -l '<p-select'` retornó 7 archivos (re-verificar lista exacta al arrancar — la cifra puede haber cambiado).
+## Decisions
 
-## Fases
+| Decision | Choice | Why |
+|----------|--------|-----|
+| Fix approach | Add `appendTo="body"` to all instances missing it | Trivial, mechanical fix aligned with existing rule |
+| Exception handling | If `appendTo="body"` breaks a specific layout, document inline with comment | Rare case; preserves intent while noting the exception |
 
-### F1 — Inventario exacto (~5 min)
+---
 
-Listar los 7 archivos con `Grep`:
+## Phases
 
-```
-Grep "<p-select" en src/**/*.html con output_mode=files_with_matches
-```
+### Phase 1 — Inventory
 
-Luego filtrar los que NO incluyen `appendTo`.
+List all template files with `p-select`/`p-multiselect`/`p-dropdown`/`p-calendar` that lack `appendTo`.
 
-### F2 — Aplicar fix (~15 min)
+### Phase 2 — Apply fix
 
-Para cada `<p-select` sin `appendTo`, agregar `appendTo="body"`. Edits triviales.
+Add `appendTo="body"` to each instance. Trivial edits.
 
-Si alguno está en contexto donde `appendTo="body"` rompe diseño (raro), documentar la excepción inline con comentario.
+### Phase 3 — Verify
 
-### F3 — Verificación (~5 min)
+Re-grep to confirm 0 remaining instances. Lint passes.
 
-- Re-grep para confirmar 0 instancias restantes.
-- Smoke visual en 1-2 dialogs del frontend que usen los archivos tocados.
+---
 
-## Criterio de cierre
+## Done-when
 
-- `grep -L 'appendTo' src/**/*.html | xargs grep -l '<p-select'` retorna 0 archivos.
-- Lint pasa.
+- Zero instances of `p-select`/`p-multiselect`/`p-dropdown`/`p-calendar` without `appendTo="body"` (excluding documented exceptions).
+- Lint passes.
 
-## Prioridad
+---
 
-**Baja**. Hacer oportunísticamente al tocar cualquiera de los 7 archivos por otro motivo, o como sesión dedicada de ~30 min.
+## Out of scope
+
+- Other PrimeNG compliance issues (covered by separate plans/tasks).

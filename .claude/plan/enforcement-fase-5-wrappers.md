@@ -1,8 +1,8 @@
 # Plan 1 — Fase 5: Hardening de Wrappers (cerrar escape hatches)
 
-> ⚠️ **Legacy plan (pre-ADR-0006).** This plan may contain implementation detail (file paths, DTOs, counts) that could be stale. Per [ADR-0006 D5](../../educa-coord/decisions/0006-plan-authoring-contract-not-blueprint.md), extract intent + decisions only — ignore concrete paths, signatures, and counts. Investigate current code before executing.
+> ✅ **Rewritten to ADR-0006 D1 format** (2026-05-25). Contract only — no implementation detail.
 
-> **Estado**: ⏳ pendiente arrancar (promocionado desde `tasks/enforcement-reglas.md` el 2026-05-09 vía `/go`).
+> **Estado**: ⏳ pendiente arrancar
 > **Plan padre**: Plan 1 — Enforcement de Reglas (F1-F3 ✅ · F4 parcial ✅ · F5 ⏳).
 > **Prioridad**: 🟢 Media — deuda técnica con dueño claro, scope acotado.
 > **Estimación**: ~2-3h, un solo chat.
@@ -10,130 +10,60 @@
 
 ---
 
-## Contexto
+## Problem
 
-Las fases anteriores del Plan 1 ya están en producción:
+Los wrappers existen y los lints prohíben bypass cross-capa, pero los barrel exports siguen exponiendo implementaciones internas. Un dev que importa una impl directamente desde el barrel compila sin error — el lint solo bloquea imports desde fuera de la carpeta. Cerrar el escape hatch significa que el barrel solo exponga la facade pública.
 
-- **F1 (Lint de arquitectura)** ✅ — `eslint.config.js` con plugin local `layer-enforcement` (reglas `imports-error` / `imports-warn`). Cubre cross-imports entre capas + APIs prohibidas (`localStorage`, `sessionStorage`, `console`, `HttpClient` directo en components/stores). Ver `rules/eslint.md`.
-- **F2 (Tests de contrato)** ✅ — 101 tests P1-P2 (Auth, Storage, Permisos, WAL, Guards, Utils).
-- **F3 (Tipos semánticos)** ✅ — patrón `const + type` aplicado a 13 dominios (`AppUserRoleValue`, `NivelEducativo`, `AprobacionEstado`, etc.). Ver `rules/semantic-types.md`.
-- **F4 (CI Pipeline)** ✅ parcial — `.github/workflows/ci.yml` corre `lint + build + test` en cada push/PR.
+---
 
-Lo pendiente de F5: los wrappers existen y los lints prohíben bypass cross-capa, pero **los barrel exports siguen exponiendo implementaciones internas**. Un dev que importa `SessionStorageService` directo desde `@core/services/storage` actualmente compila — el lint solo lo bloquea si está fuera de `@core/services/storage/`. Cerrar el escape hatch significa que el barrel solo exponga la facade, así no hay forma de saltearla ni siquiera dentro de su propia carpeta.
+## Decisions
 
-## Objetivo
+| Decision | Choice | Why |
+|----------|--------|-----|
+| Zones to harden | storage, wal, session (3 zones with stable wrappers) | These have clear public facades; others (cache, auth) need separate audit |
+| Barrel reduction | Only export the public facade from each zone's index.ts | Prevents accidental import of internals even within the same layer |
+| ESLint enforcement | Add layer-enforcement rule prohibiting direct imports to internal files from outside their folder | Makes the restriction compile-time, not just convention |
+| Consumer migration | Migrate existing consumers to public facade before reducing barrel | Avoid breaking existing code |
+| Exceptions | eslint-disable with documented reason for rare legitimate cases | Wrapper may not cover 100% of use cases initially |
 
-Reducir los barrel exports (`index.ts`) de las 3 zonas críticas para que solo expongan el wrapper público, y agregar regla ESLint que prohíba imports directos a archivos internos.
+---
 
-## Scope
+## Phases
 
-### IN — Zonas críticas con wrapper estable
+### Phase 1 — Audit
 
-| Módulo | Exportar públicamente | Mantener interno (no exportar del barrel) |
-|---|---|---|
-| `@core/services/storage/` | `StorageService` | `SessionStorageService`, `PreferencesStorageService`, `IndexedDBService`, demás impls |
-| `@core/services/wal/` | `WalFacadeHelper`, `WalStatusStore` | `WalService`, `WalSyncEngine`, `WalDbService`, `WalSyncRecovery`, `WalLeaderService`, `WalCrossTabRefetchService`, etc. |
-| `@core/services/session/` | `SessionCoordinatorService` | `SessionActivityService`, `SessionRefreshService` |
+Grep all imports from the 3 zones across `src/app/`. Classify each: public facade (OK) vs internal impl (migrate or document exception).
 
-### OUT (no aplica esta fase)
+### Phase 2 — Migrate consumers
 
-- `@core/services/cache/` y `@core/services/auth/` — wrappers presentes pero el inventario de impls internas requiere revisión separada. Si tras audit caben en el patrón, se incluyen; si no, queda para F5.2.
-- Migración de `tasks/` (`design-patterns-frontend.md`, `design-patterns-backend.md`) — son roadmaps incrementales separados, no entran.
-- Backend (`Educa.API/`) — esta fase es 100% FE.
+For each import of an internal impl outside its folder, migrate to the public wrapper. If wrapper doesn't cover the case, add the method (preferred) or document exception.
 
-## Plan de ejecución (una sola fase, un solo chat)
+### Phase 3 — Reduce barrel exports
 
-### Paso 1 — Audit (`/audit`)
+Replace each zone's `index.ts` to only re-export the public facade.
 
-Leer cada `index.ts` y listar **qué se exporta hoy**. Cruzar con grep de imports reales en `src/app/`:
+### Phase 4 — ESLint rule
 
-```bash
-# Para cada wrapper, ver qué se importa fuera de su propia carpeta
-grep -rn "from '@core/services/storage'" src/app --include="*.ts"
-grep -rn "from '@core/services/wal'" src/app --include="*.ts"
-grep -rn "from '@core/services/session'" src/app --include="*.ts"
-```
+Add entries in `eslint.config.js` (layer-enforcement plugin) prohibiting direct imports to internal files from outside their respective folder.
 
-Producir tabla `[archivo, símbolo importado, ¿es wrapper público o interno?, acción]`. Acciones posibles:
+### Phase 5 — Validate
 
-| Caso | Acción |
-|---|---|
-| Importa el wrapper público (`StorageService`, `WalFacadeHelper`, etc.) | OK, no cambiar |
-| Importa una impl interna (ej: `SessionStorageService`) | Migrar a wrapper o documentar excepción |
-| Importa una impl interna porque el wrapper no expone esa función | Decidir: agregar al wrapper o dejar el import directo (debería ser raro) |
+Lint, test suite, and production build must all pass green.
 
-### Paso 2 — Migrar consumidores (`/execute`)
+---
 
-Para cada import de impl interna fuera de su carpeta, migrar a wrapper público. Si el wrapper no cubre el caso, agregar el método (preferido) o dejar como excepción documentada con `// eslint-disable-next-line ... -- Razón: <invariante>`.
+## Done-when
 
-### Paso 3 — Reducir exports del barrel (`/execute`)
+- Barrel exports of storage/, wal/, session/ only expose their public facade.
+- ESLint rule prevents importing internal files from outside each zone's folder.
+- All existing consumers migrated to public facade (or documented exception).
+- `rules/eslint.md` updated documenting the new rule.
+- Lint, tests, and build pass.
 
-Reemplazar el `index.ts` de cada zona crítica para que solo re-exporte el wrapper público. Las impls quedan importables solo via path completo (`@core/services/storage/session-storage.service.ts`), nunca desde `@core/services/storage`.
+---
 
-### Paso 4 — Agregar regla ESLint (`/execute`)
+## Out of scope
 
-En `eslint.config.js`, agregar entradas en `LAYER_RULES` (plugin `layer-enforcement`) que prohíban imports al path completo de impls internas desde fuera de su carpeta:
-
-```js
-{
-  selector: "ImportDeclaration[source.value=/^@core\\/services\\/storage\\/(?!index|storage\\.service$).*/]",
-  scope: { except: ["**/core/services/storage/**"] },
-  message: "Importar StorageService desde @core/services/storage. Las impls internas no son API pública."
-}
-```
-
-(El detalle exacto del selector depende del API del plugin local — confirmar leyendo `eslint-plugin-layer-enforcement` antes de editar.)
-
-### Paso 5 — Validar (`/validate`)
-
-```bash
-npm run lint   # Sin errores
-npx vitest run # Suite verde (baseline ~1934)
-ng build --configuration production  # Sin errores
-```
-
-## Archivos a tocar (estimación)
-
-- 3 barrel `index.ts` (storage, wal, session)
-- 0-15 archivos consumidores migrados a facade (depende del audit)
-- 1 entrada nueva en `eslint.config.js` con 3 reglas
-- 0 tests nuevos (la suite existente cubre — F2 ya tiene 50+ tests sobre estos wrappers)
-- 1 actualización a `rules/eslint.md` documentando la regla nueva
-
-## Riesgos
-
-| Riesgo | Mitigación |
-|---|---|
-| Romper imports existentes al reducir el barrel | Audit grep exhaustivo antes de editar el `index.ts`. Migrar consumidores primero. |
-| Wrapper no cubre 100% del API interno | Documentar excepción puntual con escape hatch + `-- Razón:` |
-| Tests fallan porque mockean impls internas | Migrar mocks a la facade o documentar como excepción de test |
-
-## Checklist final
-
-```
-[ ] Audit completado (tabla [archivo, símbolo, acción])
-[ ] Consumidores migrados a wrapper público
-[ ] Barrel exports reducidos: storage/index.ts, wal/index.ts, session/index.ts
-[ ] Regla ESLint agregada en LAYER_RULES (3 entradas)
-[ ] rules/eslint.md actualizado documentando la regla nueva
-[ ] npm run lint sin errores
-[ ] npx vitest run verde
-[ ] ng build --configuration production sin errores
-[ ] Commit semantic con scope `core/wrappers` + reseña en `tasks/enforcement-reglas.md` (F5 ✅)
-```
-
-## Reversibilidad
-
-Si la regla nueva descubre que un consumidor legítimo necesita una impl interna que no encaja en el wrapper, dos opciones:
-
-1. **Agregar el método al wrapper** (preferido — el wrapper crece con casos reales).
-2. **Documentar excepción con escape hatch**: `// eslint-disable-next-line layer-enforcement/imports-error -- Razón: <caso real>`.
-
-Si tras 1-2 semanas la regla genera más fricción que valor, revertir el barrel y la regla. Tests y consumidores migrados se mantienen — el cambio incremental sigue siendo positivo.
-
-## Referencias cruzadas
-
-- `tasks/enforcement-reglas.md` — task de origen, contiene F1-F4 hechas.
-- `rules/eslint.md` — convenciones del plugin `layer-enforcement` y escape hatch.
-- `rules/architecture.md` — capas y wrappers documentados.
-- `documentacion-subsistemas/wal-write-ahead-log.md` — convención del wrapper WAL.
+- `@core/services/cache/` and `@core/services/auth/` (need separate audit).
+- Backend wrappers.
+- Other enforcement tasks from `tasks/`.

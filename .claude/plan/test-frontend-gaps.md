@@ -1,119 +1,70 @@
 # Plan 13 — Frontend: Test Gaps Críticos
 
-> ⚠️ **Legacy plan (pre-ADR-0006).** This plan may contain implementation detail (file paths, DTOs, counts) that could be stale. Per [ADR-0006 D5](../../educa-coord/decisions/0006-plan-authoring-contract-not-blueprint.md), extract intent + decisions only — ignore concrete paths, signatures, and counts. Investigate current code before executing.
+> ✅ **Rewritten to ADR-0006 D1 format** (2026-05-25). Contract only — no implementation detail.
 
 > **Fecha**: 2026-04-16
 > **Objetivo**: Cubrir las áreas del frontend sin tests: páginas admin críticas, flujos de integración UI, interceptores nuevos, y resiliencia WAL/offline/cache.
-> **Estado actual**: 129 spec files. Buenos tests de stores/facades/guards. Gaps: muchas páginas sin spec, 0 tests de flujo completo, interceptores nuevos sin cobertura, WAL/offline parcial.
 > **Coordinación**: Complementa Plan 10 (Flujos Alternos) y Plan 1 F4 (Invariantes).
 
 ---
 
-## Diagnóstico
+## Problem
 
-| Área | Tests existentes | Riesgo sin cobertura |
-|------|-----------------|---------------------|
-| **Páginas admin sin spec** | 0 para: asistencias admin, email-outbox, error-logs, feedback-reports, health-permissions | CRUD completo sin validación de comportamiento |
-| **Interceptores nuevos** | 0 para: api-response, clock-sync, sw-cache-invalidation, request-trace | Unwrap roto → toda la app falla; clock drift → tokens inválidos |
-| **Flujos de integración** | 0 | Login → permisos → navegación → CRUD sin validar end-to-end en FE |
-| **WAL/Offline/Cache** | Parcial (wal-facade-helper) | Cola offline, reconciliación, liderazgo tabs, corrupción IndexedDB |
-| **Componentes shared sin spec** | 0 para: skeleton-loader, lazy-content, toast, intranet-layout | Regresiones visuales silenciosas |
+El frontend tiene 129+ spec files con buena cobertura de stores/facades/guards, pero gaps significativos en: interceptores core (invisibles al fallar), páginas admin sin ningún spec, flujos de integración no validados end-to-end en FE, y resiliencia WAL/offline parcial.
 
 ---
 
-## Fases
+## Decisions
 
-### F1 — Interceptores Core Sin Cobertura (CRÍTICO)
+| Decision | Choice | Why |
+|----------|--------|-----|
+| Test scope for interceptors | Behavior tests (unwrap, header handling, cache invalidation) | Interceptors are invisible — if they break, the whole app degrades without clear error |
+| Admin page testing approach | Store + facade tests only (not template) | Sufficient to catch CRUD regressions without brittle DOM assertions |
+| Integration test strategy | TestBed + real providers where possible | Validates the chain login→permisos→guard→navigation→data load as a unit |
+| WAL test focus | Optimistic apply, server-fail rollback, offline queue, IndexedDB corruption fallback | WAL is the heart of optimistic UX — rollback failures show inconsistent data |
+| Shared component test scope | High-use components (10+ pages) only | Regression in these impacts the whole app |
 
-> Los interceptores son invisibles: si fallan, toda la app se degrada sin error claro.
+---
 
-| Interceptor | Archivo | Qué testear |
-|------------|---------|-------------|
-| `api-response` | `api-response.interceptor.ts` | Unwrap `ApiResponse<T>` → devuelve `.data`. Error no-ApiResponse → pasa tal cual. Response null → manejo seguro |
-| `clock-sync` | `clock-sync.interceptor.ts` | Calcula offset con header `Date` del server. Sin header → no falla. Offset se aplica a requests subsecuentes |
-| `sw-cache-invalidation` | `sw-cache-invalidation.interceptor.ts` | Mutación exitosa → invalida cache SW del recurso. GET → no invalida. Error → no invalida |
-| `request-trace` | `request-trace.interceptor.ts` | Agrega `X-Request-Id`. Excluye endpoint de reportes (INV-RU03). `trackLastRequestId()` se actualiza |
+## Phases
 
-**Entregable**: 4 archivos spec, ~30 tests.
+### F1 — Interceptores Core (CRÍTICO) ✅
 
-### F2 — Páginas Admin Críticas Sin Spec
+Cover all interceptors without specs: API response unwrap, clock sync, SW cache invalidation, request trace. Each interceptor gets a dedicated spec validating its behavior contract.
 
-> Estas páginas manejan datos sensibles y operaciones irreversibles.
+### F2 — Páginas Admin Críticas
 
-| Página | Riesgo | Qué testear |
-|--------|--------|-------------|
-| `admin/asistencias` | Edición formal + cierre mensual (INV-AD03/04) | CRUD facade, cierre/revertir, validaciones de mes cerrado |
-| `admin/feedback-reports` | Reportes de usuario + estados (INV-RU*) | Store mutations, transiciones de estado, filtros |
-| `admin/health-permissions` | Permisos de salud | Store + facade (ya migrado a WAL) — spec de smoke |
-| `admin/email-outbox` | Bandeja de correos | Facade load + filtros + stats |
-| `admin/error-logs` | Logs de errores | Facade load + filtros |
-
-**Enfoque**: Tests de store + facade (no de template). Un spec por página cubriendo operaciones principales.
-
-**Entregable**: 5 archivos spec, ~40 tests.
+One spec per critical admin page (asistencias, feedback-reports, health-permissions, email-outbox, error-logs) covering store + facade operations.
 
 ### F3 — Flujos de Integración UI
 
-> Hoy cada pieza se testea aislada. Nadie verifica que login → permisos → guard → navegación → carga de datos funcione como cadena.
-
-**Flujos críticos a testear** (tests de integración con TestBed + providers reales donde sea posible):
-
-| Flujo | Componentes involucrados | Qué validar |
-|-------|-------------------------|-------------|
-| Login completo | LoginComponent → AuthService → AuthStore → Router | Credenciales válidas → navega a intranet. Inválidas → error. Cuenta inactiva → bloqueado |
-| Guard + Permisos | permisosGuard → UserPermisosService → Router | Sin permiso → redirect. Con permiso → pasa. Permiso exacto (INV-S04) |
-| CRUD admin tipo | Page → Facade → Store → Template signals | Load → muestra datos. Create → refetch. Edit → mutación quirúrgica. Delete → confirm + remove |
-| Error recovery | Interceptor → ErrorHandler → Toast | 401 → logout. 422 → toast con mensaje. 500 → toast genérico. 429 → retry |
-
-**Entregable**: 4 archivos spec, ~30 tests.
+Integration tests for 4 critical chains: login flow, guard+permisos, CRUD admin pattern, error recovery. Validates end-to-end data flow within FE.
 
 ### F4 — WAL / Offline / Cache
 
-> El WAL es el corazón de la UX optimista. Si falla el rollback, el usuario ve datos inconsistentes.
-
-| Escenario | Qué testear |
-|-----------|-------------|
-| Optimistic update OK | `apply` → UI cambia → server OK → `onCommit` reconcilia |
-| Optimistic update FAIL | `apply` → UI cambia → server error → `rollback` restaura snapshot exacto |
-| Create con ID del server | `apply` cierra dialog → `onCommit` agrega item con ID real |
-| Cola offline | Operación sin red → encola → reconecta → dequeue + envía |
-| Cache SW stale | SWR devuelve cache → `cacheUpdated$` emite datos frescos → signal se actualiza |
-| IndexedDB corrupto | Open falla → fallback graceful (no crash) |
-
-**Entregable**: 3 archivos spec, ~25 tests. Amplía los tests existentes de `wal-facade-helper.service.spec.ts`.
+Extend existing WAL specs to cover: optimistic update success/fail, create with server ID, offline queue, SWR cache stale refresh, IndexedDB corruption fallback.
 
 ### F5 — Componentes Shared de Alto Uso
 
-> Componentes que se usan en 10+ páginas. Una regresión aquí impacta toda la app.
+Specs for high-use shared components (skeleton-loader, table-skeleton, stats-skeleton, lazy-content, intranet-layout) verifying render variants and responsive behavior.
 
-| Componente | Qué testear |
-|-----------|-------------|
-| `skeleton-loader` | Renderiza variantes (text, circle, rect, card). Acepta width/height. |
-| `table-skeleton` | Genera columnas según `SkeletonColumnDef[]`. Renderiza N rows. |
-| `stats-skeleton` | Genera N cards. Acepta iconPosition. |
-| `lazy-content` | Loading=true → muestra skeleton. Loading=false → muestra content. Transition con hideDelay. |
-| `intranet-layout` | Renderiza header + sidebar + content. Responsive. |
-
-**Entregable**: 5 archivos spec, ~25 tests.
+**Ordering rationale**: F1 first (invisible base), F2 (admin CRUD unprotected), F4 (optimistic UX), F3+F5 (general robustness).
 
 ---
 
-## Orden de ejecución
+## Done-when
 
-```
-F1 (Interceptores) → F2 (Páginas admin) → F4 (WAL/Offline) → F3 (Flujos integración) → F5 (Shared)
-```
-
-Razón: F1 interceptores son la base invisible. F2 son CRUD admin sin red de seguridad. F4 protege la UX optimista. F3 y F5 son robustez general.
+- All interceptors have behavior specs covering success, error, and edge-case paths.
+- Every critical admin page has at least one spec covering its primary store+facade operations.
+- Integration flow tests validate the 4 critical chains without regressions.
+- WAL specs cover all 6 documented scenarios (apply-ok, apply-fail, create-with-id, offline-queue, SWR-stale, IndexedDB-corrupt).
+- Shared high-use components have render-variant specs.
+- Full test suite passes green with no regressions.
 
 ---
 
-## Métricas de éxito
+## Out of scope
 
-| Métrica | Antes | Después |
-|---------|-------|---------|
-| Interceptor tests | 4 de 8 | 8 de 8 |
-| Admin pages con spec | ~12 de 17 | 17 de 17 |
-| Integration flow tests | 0 | ~4 suites |
-| WAL/offline tests | 1 parcial | ~3 suites completas |
-| Shared component tests | ~8 | ~13 |
+- E2E tests (Playwright/Cypress) — separate plan.
+- Backend test coverage.
+- Template/DOM-level assertions for admin pages.

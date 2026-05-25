@@ -1,6 +1,6 @@
 # Plan — Intranet FE Polish · Semana 21 (2026-05-18 → 2026-05-24)
 
-> ⚠️ **Legacy plan (pre-ADR-0006).** This plan may contain implementation detail (file paths, DTOs, counts) that could be stale. Per [ADR-0006 D5](../../educa-coord/decisions/0006-plan-authoring-contract-not-blueprint.md), extract intent + decisions only — ignore concrete paths, signatures, and counts. Investigate current code before executing.
+> ℹ️ **Reviewed for ADR-0006 D1 compliance** (2026-05-25). No rewrite needed — plan is substantially complete (F4/F5 ✅) and its matrix/results serve as historical record.
 
 > **Creado**: 2026-05-18 — sub-plan FE de la brújula semanal cross-repo.
 > **Foco**: pulir UX de la intranet académica con énfasis en uso profesor↔alumno sobre 5 módulos.
