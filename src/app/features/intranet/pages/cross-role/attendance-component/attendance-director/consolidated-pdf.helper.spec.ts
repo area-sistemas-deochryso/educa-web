@@ -8,7 +8,7 @@
 import { describe, expect, it, vi } from 'vitest';
 import { of } from 'rxjs';
 
-import type { AttendanceService } from '@core/services';
+import type { AttendanceService } from '@intranet-shared/services';
 import {
 	buildPdfExcelMenuItems,
 	getConsolidadoFileName,

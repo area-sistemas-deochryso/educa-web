@@ -15,7 +15,7 @@ import { ToggleSwitch } from 'primeng/toggleswitch';
 import { ConfirmDialogModule } from 'primeng/confirmdialog';
 import { ConfirmationService } from 'primeng/api';
 
-import { UiMappingService } from '@shared/services';
+import { UiMappingService } from '@intranet-shared/services';
 import { PageHeaderComponent } from '@intranet-shared/components';
 import { EstadoSeverityPipe, EstadoToggleIconPipe, EstadoToggleLabelPipe } from '@intranet-shared/pipes';
 import { buildDeleteVistaMessage } from '@app/shared/constants';

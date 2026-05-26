@@ -1,5 +1,7 @@
 // #region Imports
-import { AttendanceService, HijoApoderado, StorageService } from '@core/services';
+import { StorageService } from '@core/services';
+import { HijoApoderado } from '@data/models';
+import { AttendanceService } from '@intranet-shared/services';
 import { ChangeDetectionStrategy, Component, DestroyRef, OnInit, computed, inject, signal } from '@angular/core';
 
 import { AttendanceDataService } from '@features/intranet/services/attendance/attendance-data.service';

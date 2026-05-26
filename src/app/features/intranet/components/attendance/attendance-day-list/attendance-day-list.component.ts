@@ -21,7 +21,7 @@ import { DialogModule } from 'primeng/dialog';
 import { Textarea } from 'primeng/textarea';
 import { Select } from 'primeng/select';
 import { MenuItem } from 'primeng/api';
-import { EstudianteAsistencia, EstadisticasAsistenciaDia } from '@core/services';
+import { EstudianteAsistencia, EstadisticasAsistenciaDia } from '@data/models';
 import { ResponsiveTableComponent, TableSkeletonComponent } from '@intranet-shared/components';
 import type { SkeletonColumnDef } from '@intranet-shared/components';
 import { SkeletonLoaderComponent } from '@shared/components';

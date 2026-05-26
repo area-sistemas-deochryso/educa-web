@@ -2,11 +2,8 @@ import { Injectable, DestroyRef, computed, inject, signal } from '@angular/core'
 import { finalize } from 'rxjs';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
-import {
-	EstudianteAsistencia,
-	HijoApoderado,
-	AttendanceSignalRService,
-} from '@core/services';
+import { AttendanceSignalRService } from '@core/services';
+import { EstudianteAsistencia, HijoApoderado } from '@data/models';
 import { SwService } from '@features/intranet/services/sw/sw.service';
 import { logger } from '@core/helpers';
 import { AttendanceDataService } from './attendance-data.service';

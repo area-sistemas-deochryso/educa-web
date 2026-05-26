@@ -11,7 +11,7 @@ import {
 	WalCrossTabRefetchService,
 } from '@core/services';
 import { UI_ADMIN_ERROR_DETAILS, UI_SUMMARIES } from '@app/shared/constants';
-import { UiMappingService } from '@shared/services';
+import { UiMappingService } from '@intranet-shared/services';
 import { PermissionsUsersStore } from './permisos-usuarios.store';
 import { PermissionsUsersHelperService } from './permisos-usuarios-helper.service';
 

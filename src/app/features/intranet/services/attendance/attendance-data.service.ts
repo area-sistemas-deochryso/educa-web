@@ -1,6 +1,6 @@
 // #region Imports
 import { Injectable, inject } from '@angular/core';
-import { AsistenciaDetalle, ConteoEstados, ConteoEstadosMensual } from '@core/services';
+import { AsistenciaDetalle, ConteoEstados, ConteoEstadosMensual } from '@data/models';
 import {
 	AttendanceDay,
 	AttendanceWeek,

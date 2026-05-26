@@ -2,7 +2,7 @@ import { Injectable, DestroyRef, inject, signal } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { Observable, finalize } from 'rxjs';
 
-import { AttendanceService } from '@core/services';
+import { AttendanceService } from '@intranet-shared/services';
 import { viewBlobInNewTab, downloadBlob } from '@core/helpers';
 import { SelectorContext } from './attendance-view.models';
 

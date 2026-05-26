@@ -4,7 +4,7 @@ import { DatePipe, DecimalPipe } from '@angular/common';
 import { Menu, MenuModule } from 'primeng/menu';
 
 import { ButtonModule } from 'primeng/button';
-import { EstadisticasDia } from '@core/services';
+import { EstadisticasDia } from '@data/models';
 import { MenuItem } from 'primeng/api';
 import { TooltipModule } from 'primeng/tooltip';
 

@@ -5,7 +5,7 @@ import { FormsModule } from '@angular/forms';
 import { TableModule } from 'primeng/table';
 import { Select } from 'primeng/select';
 import { Tooltip } from 'primeng/tooltip';
-import { HijoApoderado } from '@core/services';
+import { HijoApoderado } from '@data/models';
 import {
 	AttendanceTable,
 	AttendanceDay,

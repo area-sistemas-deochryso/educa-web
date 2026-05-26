@@ -2,7 +2,6 @@
 // * Core services re-exports.
 export * from './auth';
 export * from './storage';
-export * from './attendance';
 export * from './cache';
 export * from './keyboard';
 export * from './notifications';

@@ -10,10 +10,10 @@ import { AttendanceDataService } from './attendance-data.service';
 import { AttendancePdfService } from './attendance-pdf.service';
 import { AttendanceStatsService } from './attendance-stats.service';
 import { AttendanceSignalRService } from '@core/services';
+import { EstudianteAsistencia } from '@data/models';
 import { SwService } from '@features/intranet/services/sw/sw.service';
 import { AttendanceViewConfig, SelectorContext } from './attendance-view.models';
 import { VIEW_MODE } from '@features/intranet/components/attendance/attendance-header/attendance-header.component';
-import { EstudianteAsistencia } from '@core/services';
 // #endregion
 
 // #region Helpers / mocks

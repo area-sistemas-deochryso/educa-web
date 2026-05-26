@@ -14,7 +14,7 @@ import { AttendanceLegendComponent } from '@features/intranet/components/attenda
 import { AttendanceTableComponent } from '@features/intranet/components/attendance/attendance-table/attendance-table.component';
 import { EmptyStateComponent } from '@features/intranet/components/attendance/empty-state/empty-state.component';
 import { AttendanceTable } from '@features/intranet/pages/cross-role/attendance-component/models/attendance.types';
-import { AsistenciaProfesorApiService } from '@shared/services';
+import { AsistenciaProfesorApiService } from '@intranet-shared/services';
 import { logger } from '@core/helpers';
 
 /**

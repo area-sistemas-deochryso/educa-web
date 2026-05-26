@@ -1,5 +1,6 @@
 // #region Imports
-import { AttendanceService, AttendanceSignalRService } from '@core/services';
+import { AttendanceSignalRService } from '@core/services';
+import { AttendanceService } from '@intranet-shared/services';
 import { ChangeDetectionStrategy, Component, DestroyRef, OnInit, computed, inject, signal } from '@angular/core';
 import { logger } from '@core/helpers';
 

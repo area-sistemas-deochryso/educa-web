@@ -11,7 +11,7 @@ import { DrawerModule } from 'primeng/drawer';
 import { TagModule } from 'primeng/tag';
 import { TooltipModule } from 'primeng/tooltip';
 
-import { UiMappingService } from '@shared/services';
+import { UiMappingService } from '@intranet-shared/services';
 import { EmailBlacklistEntry } from '@data/models';
 
 /**

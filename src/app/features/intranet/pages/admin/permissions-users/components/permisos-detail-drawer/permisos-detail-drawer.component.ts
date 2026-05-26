@@ -5,7 +5,7 @@ import { DrawerModule } from 'primeng/drawer';
 import { TagModule } from 'primeng/tag';
 
 import { PermisoUsuario } from '@core/services';
-import { UiMappingService } from '@shared/services';
+import { UiMappingService } from '@intranet-shared/services';
 import { ModuloVistas } from '../../services/permisos-usuarios.models';
 
 

@@ -5,7 +5,7 @@ import { beforeEach, describe, expect, it } from 'vitest';
 
 import { PermissionsRolesStore } from './permisos-roles.store';
 import { PermisoRol, Vista } from '@core/services';
-import { UiMappingService } from '@shared/services';
+import { UiMappingService } from '@intranet-shared/services';
 
 // #endregion
 

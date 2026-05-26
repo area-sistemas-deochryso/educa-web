@@ -7,7 +7,7 @@ import { TableLazyLoadEvent, TableModule } from 'primeng/table';
 import { TagModule } from 'primeng/tag';
 import { TooltipModule } from 'primeng/tooltip';
 import { UsuarioLista } from '../../services';
-import { UiMappingService } from '@shared/services';
+import { UiMappingService } from '@intranet-shared/services';
 import { EstadoLabelPipe, EstadoSeverityPipe, EstadoToggleIconPipe, EstadoToggleLabelPipe } from '@intranet-shared/pipes';
 import { FullNamePipe } from '@shared/pipes';
 import { TableLoadingDirective } from '@intranet-shared/directives';

@@ -13,7 +13,7 @@ import { forkJoin, of, catchError } from 'rxjs';
 import {
 	AttendanceService,
 	AsistenciaProfesorApiService,
-} from '@shared/services';
+} from '@intranet-shared/services';
 import {
 	EstadisticasDia,
 	EstadisticasAsistenciaDia,

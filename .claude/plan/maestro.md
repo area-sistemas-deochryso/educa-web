@@ -7,7 +7,7 @@
 <!-- INDEX:START -->
 | Key | Plan | Estado | Notas |
 |-----|------|--------|-------|
-| F1 | Enforcement de Reglas | ~95% | F1-F3 ✅ · F4 parcial · F5 awaiting-prod · F5.3 batch 2/3 ✅ |
+| F1 | Enforcement de Reglas | ~95% | F1-F3 ✅ · F4 parcial · F5 awaiting-prod · F5.3 ✅ (3/3 batches) |
 | P51 | Reporte Mensual Asistencia | ✅ 100% | UI matrix mensual — commit `86bab2e0` |
 | F5 | Consolidación Frontend | ⏳ 0% | Tras Plan 4 BE |
 | F8 | Design Patterns Backend | Incremental | Al tocar módulos |
@@ -30,7 +30,7 @@
 
 | Key | # | Plan | Estado | Notas |
 |-----|---|------|--------|-------|
-| F1 | 1 | Enforcement de Reglas | ~95% | F1-F3 ✅ · F4 parcial (F4.4-F4.5 🔒) · F5 awaiting-prod (brief 137). F5.3 batch 1/3 ✅ (brief 217) · batch 2/3 ✅ (brief 218) — batch 3 services pendiente |
+| F1 | 1 | Enforcement de Reglas | ~95% | F1-F3 ✅ · F4 parcial (F4.4-F4.5 🔒) · F5 awaiting-prod (brief 137). F5.3 ✅ batch 1/3 (brief 217) · batch 2/3 (brief 218) · batch 3/3 (brief 220) |
 | P51 | 51 | Reporte Mensual Asistencia | ✅ 100% | UI matrix mensual de asistencia — commit `86bab2e0` (2026-05-25) |
 | F5 | 5 | Consolidación Frontend | ⏳ 0% | Tras Plan 4 BE |
 | F8 | 8 | Design Patterns Backend | Incremental | Al tocar módulos |
@@ -56,7 +56,7 @@ Planes cross-repo con sub-chats FE pendientes: **41** (Correlation Hub), **42** 
 
 | Pos | Key | Plan | Próximo paso concreto | Repo | Desbloquea | Gate |
 |---|---|---|---|---|---|---|
-| 1 | F1 | Enforcement de Reglas | F5.3 batch 3 — services re-exports | local | ~3 (xP43 Chats 4.1, 6.1+) | libre |
+| ~~1~~ | F1 | Enforcement de Reglas | ~~F5.3 batch 3~~ ✅ (brief 220) | local | ~3 (xP43 Chats 4.1, 6.1+) | ✅ |
 | 2 | xP41 | Correlation Hub | F1 timeline FE + F2-F6 — prioridad en coord | xrepo | 5 (Chat 9 + F2-F6) | libre |
 
 #### Tier 2 — Impacto medio (desbloquean 1-2 ítems o alto valor)

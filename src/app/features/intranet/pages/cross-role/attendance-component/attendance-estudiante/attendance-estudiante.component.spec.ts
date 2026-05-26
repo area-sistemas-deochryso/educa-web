@@ -8,7 +8,8 @@ import { provideHttpClient } from '@angular/common/http';
 import { provideHttpClientTesting } from '@angular/common/http/testing';
 
 import { AttendanceEstudianteComponent } from './attendance-estudiante.component';
-import { AttendanceService, AttendanceSignalRService } from '@core/services';
+import { AttendanceSignalRService } from '@core/services';
+import { AttendanceService } from '@intranet-shared/services';
 import { AttendanceDataService } from '@features/intranet/services/attendance/attendance-data.service';
 import { AuthStore } from '@core/store';
 

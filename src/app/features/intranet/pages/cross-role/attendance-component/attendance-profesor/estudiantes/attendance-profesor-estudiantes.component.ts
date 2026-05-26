@@ -1,4 +1,6 @@
-import { AttendanceService, SalonProfesor, StorageService, UserProfileService } from '@core/services';
+import { StorageService, UserProfileService } from '@core/services';
+import { SalonProfesor } from '@data/models';
+import { AttendanceService } from '@intranet-shared/services';
 import { esGradoAsistenciaDiaria } from '@shared/constants';
 import { periodoEnMes, filtrarPorPeriodoAcademico } from '@shared/models';
 import { JustificacionEvent } from '@features/intranet/components/attendance/attendance-day-list/attendance-day-list.component';

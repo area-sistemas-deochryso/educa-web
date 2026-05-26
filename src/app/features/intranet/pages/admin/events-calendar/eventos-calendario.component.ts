@@ -20,7 +20,7 @@ import { InputIconModule } from 'primeng/inputicon';
 
 import { PageHeaderComponent } from '@intranet-shared/components';
 import { EstadoLabelPipe, EstadoSeverityPipe, EstadoToggleLabelPipe } from '@intranet-shared/pipes';
-import { UiMappingService } from '@shared/services';
+import { UiMappingService } from '@intranet-shared/services';
 import { EventsCalendarFacade, EventsCalendarStore } from './services';
 import type { EventoFormData } from './services';
 import { EventoCalendarioLista } from '@data/models';

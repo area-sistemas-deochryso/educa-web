@@ -6,7 +6,8 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { of } from 'rxjs';
 
 import { testProviders } from '@test';
-import { AttendanceService, StorageService } from '@core/services';
+import { StorageService } from '@core/services';
+import { AttendanceService } from '@intranet-shared/services';
 import { AttendanceDataService } from '@features/intranet/services/attendance/attendance-data.service';
 
 import { AttendanceDirectorEstudiantesComponent } from './attendance-director-estudiantes.component';

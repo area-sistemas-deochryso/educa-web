@@ -27,7 +27,7 @@ import {
 	PersonaAsistencia,
 	asistenteAdminToPersonaAsistencia,
 } from '@data/models';
-import { AsistenciaAsistenteAdminApiService } from '@shared/services';
+import { AsistenciaAsistenteAdminApiService } from '@intranet-shared/services';
 import { formatDateLocalIso } from '@core/helpers';
 import { ErrorHandlerService } from '@core/services';
 

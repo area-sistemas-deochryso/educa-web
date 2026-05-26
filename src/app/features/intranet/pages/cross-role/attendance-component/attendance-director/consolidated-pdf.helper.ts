@@ -1,6 +1,6 @@
 import { Observable } from 'rxjs';
 import { MenuItem } from 'primeng/api';
-import { AttendanceService } from '@core/services';
+import { AttendanceService } from '@intranet-shared/services';
 
 export type TipoReporte =
 	| 'salon-dia'

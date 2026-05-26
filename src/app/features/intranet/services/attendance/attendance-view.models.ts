@@ -1,6 +1,6 @@
 import { Observable } from 'rxjs';
 
-import { AsistenciaDiaConEstadisticas, EstudianteAsistencia } from '@core/services';
+import { AsistenciaDiaConEstadisticas, EstudianteAsistencia } from '@data/models';
 
 /** Contexto del selector actualmente activo (grado/salon → campos compartidos). */
 export interface SelectorContext {

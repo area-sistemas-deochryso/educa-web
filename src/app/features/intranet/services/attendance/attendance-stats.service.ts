@@ -1,6 +1,6 @@
 import { Injectable, computed, signal } from '@angular/core';
 
-import { EstadisticasAsistenciaDia } from '@core/services';
+import { EstadisticasAsistenciaDia } from '@data/models';
 
 type MonthSubMode = 'mes' | 'periodo';
 

@@ -14,7 +14,7 @@ import {
 	WalFacadeHelper,
 } from '@core/services';
 import { environment } from '@config';
-import { UiMappingService } from '@shared/services';
+import { UiMappingService } from '@intranet-shared/services';
 import { UI_ADMIN_ERROR_DETAILS, UI_SUMMARIES, UI_PERMISOS_SUCCESS_DETAILS } from '@app/shared/constants';
 import { buildModulosVistas } from '../helpers/permisos-modulos.utils';
 

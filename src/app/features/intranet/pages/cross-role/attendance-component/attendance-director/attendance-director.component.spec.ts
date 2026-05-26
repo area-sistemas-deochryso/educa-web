@@ -7,10 +7,10 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { of } from 'rxjs';
 
 import { testProviders } from '@test';
-import { AttendanceService, StorageService } from '@core/services';
+import { StorageService } from '@core/services';
 
 import { AttendanceDirectorComponent } from './attendance-director.component';
-import { AsistenciaProfesorApiService } from '@shared/services';
+import { AsistenciaProfesorApiService, AttendanceService } from '@intranet-shared/services';
 // #endregion
 
 describe('AttendanceDirectorComponent (shell)', () => {

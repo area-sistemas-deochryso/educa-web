@@ -2,7 +2,7 @@
 import { Injectable, inject } from '@angular/core';
 import { Vista } from '@core/services';
 import { capitalize, groupBy, sortedEntries } from '@core/helpers';
-import { UiMappingService } from '@shared/services';
+import { UiMappingService } from '@intranet-shared/services';
 import { ModuloVistas } from './permisos-usuarios.models';
 
 

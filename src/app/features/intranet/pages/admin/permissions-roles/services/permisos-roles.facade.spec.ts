@@ -8,7 +8,7 @@ import { PermissionsRolesFacade } from './permisos-roles.facade';
 import { PermissionsRolesStore } from './permisos-roles.store';
 import { PermissionsService, PermisoRol } from '@core/services';
 import { ErrorHandlerService, WalFacadeHelper } from '@core/services';
-import { UiMappingService } from '@shared/services';
+import { UiMappingService } from '@intranet-shared/services';
 
 // #endregion
 

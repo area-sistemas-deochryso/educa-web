@@ -9,7 +9,7 @@ import { UserProfileService } from '@core/services';
 import {
 	DirectorAttendanceApiService,
 	TeacherAttendanceApiService,
-} from '@shared/services';
+} from '@intranet-shared/services';
 
 import { AttendanceReportsApiService } from './attendance-reports-api.service';
 import { AttendanceReportsFacade } from './attendance-reports.facade';

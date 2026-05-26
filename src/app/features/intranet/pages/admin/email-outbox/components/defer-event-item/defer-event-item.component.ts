@@ -9,7 +9,7 @@ import { RouterLink } from '@angular/router';
 import { TagModule } from 'primeng/tag';
 import { TooltipModule } from 'primeng/tooltip';
 
-import { UiMappingService } from '@shared/services';
+import { UiMappingService } from '@intranet-shared/services';
 import { EmailDeferEventDto } from '@data/models';
 
 /**

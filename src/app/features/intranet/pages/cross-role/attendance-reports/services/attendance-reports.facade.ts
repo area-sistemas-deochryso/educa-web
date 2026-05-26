@@ -5,7 +5,7 @@ import { downloadBlob, logger } from '@core/helpers';
 import {
 	DirectorAttendanceApiService,
 	TeacherAttendanceApiService,
-} from '@shared/services';
+} from '@intranet-shared/services';
 import { isAdminRole } from '@shared/utils';
 import { forkJoin } from 'rxjs';
 import { AttendanceReportsApiService } from './attendance-reports-api.service';

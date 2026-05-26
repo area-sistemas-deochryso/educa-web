@@ -23,7 +23,7 @@ import {
 	EmailDeferEventDto,
 	EmailDeferEventFiltros,
 } from '@data/models';
-import { UiMappingService } from '@shared/services';
+import { UiMappingService } from '@intranet-shared/services';
 
 import { EmailDeferEventsService } from '../../services';
 import { DeferEventItemComponent } from '../defer-event-item/defer-event-item.component';

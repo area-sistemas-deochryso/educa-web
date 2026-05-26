@@ -35,7 +35,7 @@ import {
 	profesorToPersonaAsistencia,
 } from '@data/models';
 import { APP_USER_ROLES } from '@shared/constants';
-import { AsistenciaProfesorApiService } from '@shared/services';
+import { AsistenciaProfesorApiService } from '@intranet-shared/services';
 import { downloadBlob, formatDateLocalIso, viewBlobInNewTab } from '@core/helpers';
 import { ErrorHandlerService } from '@core/services';
 

@@ -2,7 +2,7 @@ import { Injectable, signal, computed } from '@angular/core';
 
 import { determinarNivelPorOrden } from '@core/helpers';
 import { periodoActual, esVerano } from '@shared/models';
-import { EstudianteAsistencia } from '@shared/services';
+import { EstudianteAsistencia } from '@intranet-shared/services';
 import { HorarioResponseDto, SalonNotasResumenDto } from '@data/models';
 
 import {

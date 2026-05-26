@@ -14,7 +14,7 @@ import {
 } from 'primeng/autocomplete';
 
 import { ROLES_DISPONIBLES_ADMIN, RolTipoAdmin, UsuarioBusqueda } from '@core/services';
-import { UiMappingService } from '@shared/services';
+import { UiMappingService } from '@intranet-shared/services';
 import { PermissionsUsersDataFacade, PermissionsUsersCrudFacade, PermissionsUsersUiFacade } from '../../services';
 
 @Component({

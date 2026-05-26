@@ -2,7 +2,7 @@ import { Injectable, signal, computed, inject } from '@angular/core';
 
 import { searchMatchAny } from '@core/helpers';
 import { PermisoRol, Vista, ROLES_DISPONIBLES_ADMIN, RolTipoAdmin } from '@core/services';
-import { UiMappingService } from '@shared/services';
+import { UiMappingService } from '@intranet-shared/services';
 import { buildModulosVistasForDetail, type ModuloVistas } from '../helpers/permisos-modulos.utils';
 
 export type { ModuloVistas } from '../helpers/permisos-modulos.utils';

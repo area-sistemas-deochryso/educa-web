@@ -2,7 +2,7 @@
 
 > ✅ **Rewritten to ADR-0006 D1 format** (2026-05-25). Contract only — no implementation detail.
 
-> **Estado**: 🔄 en curso (2026-05-22)
+> **Estado**: ✅ completado (2026-05-26)
 > **Plan padre**: F1 Enforcement de Reglas
 > **Principio**: "`@shared` solo contiene lo genuinamente compartido entre portal público e intranet."
 
@@ -35,7 +35,7 @@ Migrate consumers of intranet-only pipes, directives, validators, and utils from
 
 Migrate consumers of re-exported components from `@shared/components` to `@intranet-shared/components`. Leave genuinely shared components (skeleton, toast, devtools) in `@shared`.
 
-### Batch 3 — services + cleanup + ESLint
+### Batch 3 — services + cleanup + ESLint ✅
 
 Evaluate services 1×1. Reduce `@shared` barrel to genuinely shared items only. Add ESLint rule preventing future re-exports of intranet-only code from `@shared`.
 

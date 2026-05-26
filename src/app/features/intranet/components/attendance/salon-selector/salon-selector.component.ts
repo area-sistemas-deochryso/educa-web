@@ -2,7 +2,7 @@
 import { ChangeDetectionStrategy, Component, input, output } from '@angular/core';
 
 import { FormsModule } from '@angular/forms';
-import { SalonProfesor } from '@core/services';
+import { SalonProfesor } from '@data/models';
 import { SeccionLabelPipe } from '@intranet-shared/pipes';
 
 /**

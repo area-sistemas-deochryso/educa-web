@@ -1,5 +1,7 @@
 /* eslint-disable max-lines -- Razón: componente orquesta 6 variantes de descarga (día/mes/periodo × salón/consolidado) × 2 formatos (PDF/Excel) + selector grado-sección + justificación. Dispersar en helpers externos fragmentaría la lógica cohesiva del componente. */
-import { AttendanceService, GradoSeccion, StorageService } from '@core/services';
+import { StorageService } from '@core/services';
+import { GradoSeccion } from '@data/models';
+import { AttendanceService } from '@intranet-shared/services';
 import { downloadBlob, viewBlobInNewTab } from '@core/helpers';
 import { periodoEnMes, filtrarPorPeriodoAcademico } from '@shared/models';
 import { JustificacionEvent } from '@features/intranet/components/attendance/attendance-day-list/attendance-day-list.component';

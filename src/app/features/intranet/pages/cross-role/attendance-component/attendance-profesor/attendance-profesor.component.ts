@@ -5,7 +5,8 @@ import { DestroyRef } from '@angular/core';
 
 import { TabsModule } from 'primeng/tabs';
 
-import { AttendanceService, SalonProfesor } from '@core/services';
+import { SalonProfesor } from '@data/models';
+import { AttendanceService } from '@intranet-shared/services';
 import { ViewMode } from '@features/intranet/components/attendance/attendance-header/attendance-header.component';
 
 import { AttendanceProfesorPropiaComponent } from './propia/attendance-profesor-propia.component';
