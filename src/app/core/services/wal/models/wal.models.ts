@@ -232,6 +232,8 @@ export const WAL_DEFAULTS = {
 	CIRCUIT_FAILURE_THRESHOLD: 5,
 	/** Circuit breaker: cooldown ms before half-open probe. */
 	CIRCUIT_COOLDOWN_MS: 30_000,
+	/** HTTP timeout for WAL sync-engine requests (15 seconds) */
+	HTTP_TIMEOUT_MS: 15_000,
 } as const;
 // #endregion
 

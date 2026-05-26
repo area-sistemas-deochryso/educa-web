@@ -54,6 +54,10 @@ export interface FacadeErrorHandler {
  */
 export const DEFAULT_ERROR_POLICY: ErrorPolicy = {
 	resolveMessage(err: unknown, fallback: string): string {
+		if (err instanceof Error && err.name === 'TimeoutError') {
+			return 'La operación tardó demasiado. Intente nuevamente.';
+		}
+
 		if (err instanceof HttpErrorResponse) {
 			// 1. Resolver por errorCode estable del backend
 			const errorCode = err.error?.errorCode as string | undefined;
@@ -81,6 +85,7 @@ export const DEFAULT_ERROR_POLICY: ErrorPolicy = {
 	},
 
 	resolveSummary(err: unknown): string {
+		if (err instanceof Error && err.name === 'TimeoutError') return 'Timeout';
 		if (err instanceof HttpErrorResponse) {
 			if (err.status === 0) return 'Error de conexión';
 			if (err.status === 409) return UI_SUMMARIES.conflict;

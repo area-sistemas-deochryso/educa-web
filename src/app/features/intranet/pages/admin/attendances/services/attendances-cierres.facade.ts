@@ -1,7 +1,7 @@
 import { Injectable, inject } from '@angular/core';
 
 import { ErrorHandlerService, WalFacadeHelper } from '@core/services';
-import { logger } from '@core/helpers';
+import { facadeErrorHandler, type FacadeErrorHandler } from '@core/helpers';
 import { environment } from '@env/environment';
 import {
 	CrearCierreMensualRequest,
@@ -31,6 +31,10 @@ export class AttendancesCierresFacade {
 	private store = inject(AttendancesAdminStore);
 	private errorHandler = inject(ErrorHandlerService);
 	private wal = inject(WalFacadeHelper);
+	private errHandler: FacadeErrorHandler = facadeErrorHandler({
+		tag: 'AttendancesCierresFacade',
+		errorHandler: this.errorHandler,
+	});
 	// #endregion
 
 	// #region Comandos
@@ -47,10 +51,7 @@ export class AttendancesCierresFacade {
 			onCommit: (cierre) => {
 				if (cierre) this.store.addCierre(cierre);
 			},
-			onError: (err) => {
-				logger.error('Error al crear cierre:', err);
-				this.errorHandler.showError('Error', 'No se pudo cerrar el mes');
-			},
+			onError: (err) => this.errHandler.handle(err, 'cerrar el mes'),
 		});
 	}
 
@@ -69,10 +70,7 @@ export class AttendancesCierresFacade {
 					this.store.updateCierre(cierreId, { activo: false, observacion: result.observacion });
 				}
 			},
-			onError: (err) => {
-				logger.error('Error al revertir cierre:', err);
-				this.errorHandler.showError('Error', 'No se pudo revertir el cierre');
-			},
+			onError: (err) => this.errHandler.handle(err, 'revertir el cierre'),
 		});
 	}
 

@@ -2,7 +2,7 @@ import { DestroyRef, Injectable, inject } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
 import { ErrorHandlerService, WalFacadeHelper } from '@core/services';
-import { logger } from '@core/helpers';
+import { facadeErrorHandler, type FacadeErrorHandler } from '@core/helpers';
 import { environment } from '@env/environment';
 import {
 	CrearAsistenciaCompletaRequest,
@@ -32,6 +32,10 @@ export class AttendancesCrudFacade {
 	private errorHandler = inject(ErrorHandlerService);
 	private wal = inject(WalFacadeHelper);
 	private destroyRef = inject(DestroyRef);
+	private errHandler: FacadeErrorHandler = facadeErrorHandler({
+		tag: 'AttendancesCrudFacade',
+		errorHandler: this.errorHandler,
+	});
 	// #endregion
 
 	// #region Save (create/update dispatcher)
@@ -93,10 +97,7 @@ export class AttendancesCrudFacade {
 				applyItemStatsDelta(this.store,created, 1);
 				this.notificarExito(fd.tipoPersona, 'registrado', 'Entrada registrada correctamente');
 			},
-			onError: (err) => {
-				logger.error('Error al crear entrada:', err);
-				this.errorHandler.showError('Error', 'No se pudo registrar la entrada');
-			},
+			onError: (err) => this.errHandler.handle(err, 'registrar la entrada'),
 		});
 	}
 
@@ -157,10 +158,7 @@ export class AttendancesCrudFacade {
 				});
 				this.notificarExito(fd.tipoPersona, 'actualizado', 'Salida registrada correctamente');
 			},
-			onError: (err) => {
-				logger.error('Error al crear salida:', err);
-				this.errorHandler.showError('Error', 'No se pudo registrar la salida');
-			},
+			onError: (err) => this.errHandler.handle(err, 'registrar la salida'),
 		});
 	}
 
@@ -198,10 +196,7 @@ export class AttendancesCrudFacade {
 				applyItemStatsDelta(this.store,created, 1);
 				this.notificarExito(fd.tipoPersona, 'registrado', 'Asistencia completa registrada correctamente');
 			},
-			onError: (err) => {
-				logger.error('Error al crear asistencia completa:', err);
-				this.errorHandler.showError('Error', 'No se pudo registrar la asistencia');
-			},
+			onError: (err) => this.errHandler.handle(err, 'registrar la asistencia'),
 		});
 	}
 
@@ -285,10 +280,7 @@ export class AttendancesCrudFacade {
 				});
 				this.notificarExito(selected.tipoPersona, 'actualizado', 'Horas actualizadas correctamente');
 			},
-			onError: (err) => {
-				logger.error('Error al actualizar horas:', err);
-				this.errorHandler.showError('Error', 'No se pudo actualizar las horas');
-			},
+			onError: (err) => this.errHandler.handle(err, 'actualizar las horas'),
 		});
 	}
 
@@ -318,10 +310,7 @@ export class AttendancesCrudFacade {
 			onCommit: () => {
 				this.notificarExito(item.tipoPersona, 'eliminado', 'Registro de asistencia eliminado correctamente');
 			},
-			onError: (err) => {
-				logger.error('Error al eliminar asistencia:', err);
-				this.errorHandler.showError('Error', 'No se pudo eliminar el registro');
-			},
+			onError: (err) => this.errHandler.handle(err, 'eliminar el registro'),
 		});
 	}
 
@@ -347,11 +336,9 @@ export class AttendancesCrudFacade {
 						(result.sinCorreo > 0 ? `. ${result.sinCorreo} sin correo de apoderado` : '');
 					this.errorHandler.showSuccess('Correos enviados', msg);
 				},
-				error: (err) => {
+				error: (err) => this.errHandler.handle(err, 'enviar los correos', () => {
 					this.store.setEnviandoCorreos(false);
-					logger.error('Error al enviar correos masivos:', err);
-					this.errorHandler.showError('Error', 'No se pudieron enviar los correos');
-				},
+				}),
 			});
 	}
 

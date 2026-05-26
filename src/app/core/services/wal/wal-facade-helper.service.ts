@@ -1,5 +1,5 @@
 import { Injectable, inject } from '@angular/core';
-import { Observable, filter, firstValueFrom, map } from 'rxjs';
+import { Observable, filter, firstValueFrom, map, timeout } from 'rxjs';
 import { logger } from '@core/helpers';
 import { ActivityTrackerService, ErrorHandlerService } from '@core/services/error';
 // eslint-disable-next-line layer-enforcement/imports-error -- DEBT: xrepo-50-F3a
@@ -7,7 +7,7 @@ import { SwService } from '@features/intranet/services/sw/sw.service';
 import { WalService } from './wal.service';
 import { WalSyncEngine } from './wal-sync-engine.service';
 import { WalStatusFacade } from './wal-status.facade';
-import { WalMutationConfig } from './models';
+import { WAL_DEFAULTS, WalMutationConfig } from './models';
 
 /**
  * Facade integration point for WAL protected mutations.
@@ -163,7 +163,9 @@ export class WalFacadeHelper {
 		}
 
 		try {
-			const result = await firstValueFrom(config.http$());
+			const result = await firstValueFrom(config.http$().pipe(
+				timeout(WAL_DEFAULTS.HTTP_TIMEOUT_MS),
+			));
 			config.onCommit(result);
 		} catch (err) {
 			config.onError(err);
@@ -182,7 +184,9 @@ export class WalFacadeHelper {
 	 */
 	private async executeFallback<T>(config: WalMutationConfig<T>): Promise<void> {
 		try {
-			const result = await firstValueFrom(config.http$());
+			const result = await firstValueFrom(config.http$().pipe(
+				timeout(WAL_DEFAULTS.HTTP_TIMEOUT_MS),
+			));
 			config.onCommit(result);
 		} catch (err) {
 			config.optimistic?.rollback();
