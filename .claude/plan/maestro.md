@@ -12,7 +12,7 @@
 | F5 | Consolidación Frontend | ⏳ 0% | Tras Plan 4 BE |
 | F8 | Design Patterns Backend | Incremental | Al tocar módulos |
 | F9 | Design Patterns Frontend | Incremental | Al tocar módulos |
-| F13 | Frontend Test Gaps | ⏳ 0% | F1-F5 pendientes |
+| F13 | Frontend Test Gaps | ~20% | F1 ✅ interceptores · F2 ✅ páginas admin · F3-F5 pendientes |
 | F46 | Drift documental `.claude/` FE | ✅ archived | Cerrado 2026-05-15 |
 | F47 | Links rotos maestro | ✅ archived | Cerrado 2026-05-15 |
 | F48 | Barrido `appendTo="body"` | ✅ archived | Cerrado 2026-05-15 |
@@ -70,8 +70,8 @@ Planes cross-repo con sub-chats FE pendientes: **41** (Correlation Hub), **42** 
 
 | Pos | Key | Plan | Próximo paso concreto | Cierra | Gate |
 |---|---|---|---|---|---|
-| 5 | H7 | WAL audit | Normalizar naming `WAL_CACHE_MAP` (P1, 1 chat) | WAL audit | libre |
-| 6 | H2-H6 | WAL audit | Fixes cosméticos (P2, 1 chat) | WAL audit | libre |
+| ~~5~~ | H7 | WAL audit | ~~Normalizar naming `WAL_CACHE_MAP`~~ ✅ (brief 124) | WAL audit | ✅ |
+| ~~6~~ | H2-H6 | WAL audit | ~~Fixes cosméticos~~ 🗑️ archivado (sin spec ni task file) | WAL audit | archivado |
 
 #### Tier 4 — Independientes (sin downstream)
 
@@ -97,7 +97,7 @@ Planes cross-repo con sub-chats FE pendientes: **41** (Correlation Hub), **42** 
 | 14 | F8 | Design Patterns BE | Aplicar al tocar módulos BE | incremental |
 | 15 | F9 | Design Patterns FE | Aplicar al tocar módulos FE | incremental |
 
-**Siguiente accionable**: **F1 F5.3** (pos 1) — re-exports, desbloquea xP43 sub-chats. **xP45 F2.2:FE** (pos 3) — JOIN `/full` + vista por evento.
+**Siguiente accionable**: **xP41** (pos 2) — Correlation Hub F1 timeline FE, desbloquea Chat 9 + F2-F6. **xP45 F2.2:FE** (pos 3) — JOIN `/full` + vista por evento.
 
 ### 🟣 Verificaciones post-deploy (`/verify <NNN>`)
 
@@ -116,8 +116,8 @@ Planes cross-repo con sub-chats FE pendientes: **41** (Correlation Hub), **42** 
 
 ### Notas operativas
 
-- **`running/`**: 0 · **`open/`**: vacío · **`waiting/`**: 2 briefs BE (081, 109)
-- **Último saneamiento**: 2026-05-26
+- **`running/`**: 1 (brief 242 meta-refresh) · **`open/`**: vacío · **`waiting/`**: 2 briefs BE (081, 109)
+- **Último saneamiento**: 2026-05-26 (meta-refresh: H7 ✅, H2-H6 archivado, INDEX F13 ~20%, puntero actualizado)
 
 ---
 
@@ -168,7 +168,8 @@ BE-only (no en cola FE): Plan 2/B (state machines), Plan 2/C (split >300 ln), Pl
 ## Auditoría WAL + Cache (standalone)
 
 - [x] H1+H8+H9 ✅ (2026-05-04)
-- → En cola: H7 (pos 5), H2-H6/H10 (pos 6).
+- [x] H7 ✅ (brief 124)
+- [x] H2-H6 🗑️ archivado sin spec (2026-05-26)
 
 ---
 
