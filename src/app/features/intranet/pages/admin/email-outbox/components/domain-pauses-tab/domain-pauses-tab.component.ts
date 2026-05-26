@@ -13,7 +13,7 @@ import { SelectModule } from 'primeng/select';
 import { ToggleSwitchModule } from 'primeng/toggleswitch';
 import { TooltipModule } from 'primeng/tooltip';
 
-import { TableSkeletonComponent } from '@shared/components';
+import { TableSkeletonComponent } from '@intranet-shared/components';
 import {
 	CrearEmailDomainPauseDto,
 	DomainPauseDurationHours,

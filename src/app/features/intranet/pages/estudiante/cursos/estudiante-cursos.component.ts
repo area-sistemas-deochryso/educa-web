@@ -7,7 +7,7 @@ import { TableModule } from 'primeng/table';
 import { TagModule } from 'primeng/tag';
 import { ButtonModule } from 'primeng/button';
 import { TooltipModule } from 'primeng/tooltip';
-import { PageHeaderComponent, TableSkeletonComponent, type SkeletonColumnDef } from '@shared/components';
+import { PageHeaderComponent, TableSkeletonComponent, type SkeletonColumnDef } from '@intranet-shared/components';
 import { EstudianteCursosFacade } from '../services/estudiante-cursos.facade';
 import { CursoContentReadonlyDialogComponent } from './components/curso-content-readonly-dialog/curso-content-readonly-dialog.component';
 import { HorarioProfesorDto } from '../models';

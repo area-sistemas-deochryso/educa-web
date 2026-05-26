@@ -3,7 +3,8 @@ import { Component, ChangeDetectionStrategy, inject, OnInit, computed, signal, D
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
 import { TooltipModule } from 'primeng/tooltip';
-import { PageHeaderComponent, SkeletonLoaderComponent } from '@shared/components';
+import { PageHeaderComponent } from '@intranet-shared/components';
+import { SkeletonLoaderComponent } from '@shared/components';
 import { StudentSchedulesFacade } from './services/estudiante-horarios.facade';
 import { EstudianteFacade } from '../services/estudiante.facade';
 import { HorarioProfesorDto } from '../models';

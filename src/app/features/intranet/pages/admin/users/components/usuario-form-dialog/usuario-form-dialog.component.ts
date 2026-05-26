@@ -29,7 +29,7 @@ import { Checkbox } from 'primeng/checkbox';
 import { CommonModule } from '@angular/common';
 import { DatePickerModule } from 'primeng/datepicker';
 import { DialogModule } from 'primeng/dialog';
-import { FormFieldErrorComponent } from '@shared/components';
+import { FormFieldErrorComponent } from '@intranet-shared/components';
 import { FormsModule } from '@angular/forms';
 import { InputTextModule } from 'primeng/inputtext';
 import { MultiSelectModule } from 'primeng/multiselect';

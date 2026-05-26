@@ -27,12 +27,9 @@ import {
 	PersonaAsistencia,
 	TipoPersona,
 } from '@data/models';
-import {
-	ResponsiveTableComponent,
-	SkeletonLoaderComponent,
-	TableSkeletonComponent,
-} from '@shared/components';
-import type { SkeletonColumnDef } from '@shared/components';
+import { ResponsiveTableComponent, TableSkeletonComponent } from '@intranet-shared/components';
+import type { SkeletonColumnDef } from '@intranet-shared/components';
+import { SkeletonLoaderComponent } from '@shared/components';
 import { FormatTimePipe } from '@intranet-shared/pipes';
 import { getStatusClass } from '@features/intranet/pages/cross-role/attendance-component/config/attendance.constants';
 

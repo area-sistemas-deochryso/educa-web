@@ -5,7 +5,7 @@ import { TableModule } from 'primeng/table';
 import { TagModule } from 'primeng/tag';
 import { TooltipModule } from 'primeng/tooltip';
 
-import { CorrelationIdPillComponent } from '@shared/components';
+import { CorrelationIdPillComponent } from '@intranet-shared/components';
 
 import { EmailDiagnosticoHistoriaItem } from '../../models/correo-individual.models';
 

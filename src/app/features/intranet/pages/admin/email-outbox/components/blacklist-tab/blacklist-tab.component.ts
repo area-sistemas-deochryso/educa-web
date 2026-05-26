@@ -16,7 +16,7 @@ import { SelectModule } from 'primeng/select';
 import { TableLazyLoadEvent } from 'primeng/table';
 import { TooltipModule } from 'primeng/tooltip';
 
-import { TableSkeletonComponent } from '@shared/components';
+import { TableSkeletonComponent } from '@intranet-shared/components';
 import {
 	CrearBlacklistRequest,
 	EmailBlacklistEntry,

@@ -11,7 +11,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Select } from 'primeng/select';
 import { ProgressSpinnerModule } from 'primeng/progressspinner';
-import { PageHeaderComponent } from '@shared/components';
+import { PageHeaderComponent } from '@intranet-shared/components';
 import { ProfesorFacade } from '../services/profesor.facade';
 import { SalonMensajeriaFacade } from '@features/intranet/pages/cross-role/mensajeria/services/mensajeria.facade';
 import { SalonForoTabComponent } from '@features/intranet/pages/cross-role/mensajeria/components/foro-tab/foro-tab.component';

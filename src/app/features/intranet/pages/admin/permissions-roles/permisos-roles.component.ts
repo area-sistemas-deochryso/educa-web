@@ -17,7 +17,7 @@ import { ConfirmDialogModule } from 'primeng/confirmdialog';
 import { ConfirmationService } from 'primeng/api';
 
 import { UiMappingService } from '@shared/services';
-import { PageHeaderComponent } from '@shared/components';
+import { PageHeaderComponent } from '@intranet-shared/components';
 import { buildDeletePermisoRolMessage } from '@app/shared/constants';
 
 import { PermissionsRolesFacade } from './services';

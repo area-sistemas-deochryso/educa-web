@@ -8,7 +8,7 @@ import { HorarioProfesorDto } from '../models/estudiante.models';
 import { signal, DestroyRef } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { logger, withRetry } from '@core/helpers';
-import { PageHeaderComponent } from '@shared/components';
+import { PageHeaderComponent } from '@intranet-shared/components';
 
 @Component({
 	selector: 'app-estudiante-mensajeria',

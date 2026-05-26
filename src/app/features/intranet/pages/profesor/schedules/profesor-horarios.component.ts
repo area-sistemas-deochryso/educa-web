@@ -3,7 +3,7 @@ import { Component, ChangeDetectionStrategy, inject, OnInit, computed, signal, D
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
 import { TooltipModule } from 'primeng/tooltip';
-import { PageHeaderComponent } from '@shared/components';
+import { PageHeaderComponent } from '@intranet-shared/components';
 import { environment } from '@config/environment';
 import { ProfesorFacade } from '../services/profesor.facade';
 import {

@@ -14,5 +14,7 @@ export * from './table-skeleton';
 export * from './attendance-scope-banner';
 export * from './attendance-scope-student-notice';
 export * from './wal-migration-banner';
+export * from './correlation-id-pill';
+export * from './mini-sparkline';
 export * from './layout/intranet-layout';
 // #endregion

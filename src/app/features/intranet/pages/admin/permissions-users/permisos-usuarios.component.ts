@@ -22,7 +22,7 @@ import {
 	UI_CONFIRM_LABELS,
 	buildDeletePermisosUsuarioMessage,
 } from '@app/shared/constants';
-import { PageHeaderComponent } from '@shared/components';
+import { PageHeaderComponent } from '@intranet-shared/components';
 import { withAllOption } from '@shared/models';
 import { PermissionsUsersDataFacade, PermissionsUsersCrudFacade, PermissionsUsersUiFacade } from './services';
 import { PermissionsStatsCardsComponent } from './components/permisos-stats-cards/permisos-stats-cards.component';

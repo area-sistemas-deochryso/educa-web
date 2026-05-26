@@ -9,8 +9,8 @@ import { ButtonModule } from 'primeng/button';
 import { TagModule } from 'primeng/tag';
 import { TooltipModule } from 'primeng/tooltip';
 
-import { TableSkeletonComponent } from '@shared/components';
-import type { SkeletonColumnDef } from '@shared/components';
+import { TableSkeletonComponent } from '@intranet-shared/components';
+import type { SkeletonColumnDef } from '@intranet-shared/components';
 
 import { DashboardTopDestinatario } from '../../models/email-monitoreo.models';
 

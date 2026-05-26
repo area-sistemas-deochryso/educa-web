@@ -9,7 +9,7 @@ import { InputNumberModule } from 'primeng/inputnumber';
 import { ToastModule } from 'primeng/toast';
 import { MessageService } from 'primeng/api';
 
-import { PageHeaderComponent } from '@shared/components';
+import { PageHeaderComponent } from '@intranet-shared/components';
 // eslint-disable-next-line layer-enforcement/imports-warn -- Razón: pendiente mover SalonesAdminTable y SalonDetailDialog a @intranet-shared (Plan maestro Carril B)
 import { ClassroomsAdminTableComponent } from '@features/intranet/pages/admin/classrooms/components/salones-admin-table/salones-admin-table.component';
 // eslint-disable-next-line layer-enforcement/imports-warn -- Razón: pendiente mover SalonesAdminTable y SalonDetailDialog a @intranet-shared (Plan maestro Carril B)

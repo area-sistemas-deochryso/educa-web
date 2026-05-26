@@ -1,8 +1,8 @@
 // #region Imports
 import { ChangeDetectionStrategy, Component } from '@angular/core';
 
-import { TableSkeletonComponent } from '@shared/components';
-import type { SkeletonColumnDef } from '@shared/components';
+import { TableSkeletonComponent } from '@intranet-shared/components';
+import type { SkeletonColumnDef } from '@intranet-shared/components';
 // #endregion
 
 // #region Implementation

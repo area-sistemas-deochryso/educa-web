@@ -9,8 +9,8 @@ import { RouterLink } from '@angular/router';
 import { ButtonModule } from 'primeng/button';
 import { TooltipModule } from 'primeng/tooltip';
 
-import { TableSkeletonComponent } from '@shared/components';
-import type { SkeletonColumnDef } from '@shared/components';
+import { TableSkeletonComponent } from '@intranet-shared/components';
+import type { SkeletonColumnDef } from '@intranet-shared/components';
 
 import { DashboardCandidatoBlacklist } from '../../models/email-monitoreo.models';
 

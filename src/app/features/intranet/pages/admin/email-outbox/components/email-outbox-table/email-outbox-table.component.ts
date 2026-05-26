@@ -10,7 +10,8 @@ import {
 	EmailOutboxLista,
 	EmailOutboxTipo,
 } from '@data/models';
-import { CorrelationIdPillComponent, type SkeletonColumnDef } from '@shared/components';
+import type { SkeletonColumnDef } from '@intranet-shared/components';
+import { CorrelationIdPillComponent } from '@intranet-shared/components';
 
 import { esPermanente } from '../../models/tipo-fallo.models';
 import { TipoFalloLabelPipe } from '../../pipes/tipo-fallo-label.pipe';

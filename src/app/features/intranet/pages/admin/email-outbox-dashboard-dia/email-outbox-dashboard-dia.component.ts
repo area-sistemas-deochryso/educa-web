@@ -1,8 +1,8 @@
 import { ChangeDetectionStrategy, Component, computed, inject } from '@angular/core';
 import { TabsModule } from 'primeng/tabs';
 
-import { StatsSkeletonComponent, TableSkeletonComponent } from '@shared/components';
-import type { SkeletonColumnDef } from '@shared/components';
+import { StatsSkeletonComponent, TableSkeletonComponent } from '@intranet-shared/components';
+import type { SkeletonColumnDef } from '@intranet-shared/components';
 
 import { DashboardBouncersTableComponent } from './components/dashboard-bouncers-table/dashboard-bouncers-table.component';
 import { DashboardChartHoraComponent } from './components/dashboard-chart-hora/dashboard-chart-hora.component';

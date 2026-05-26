@@ -1,13 +1,14 @@
 # Plan Maestro — Orden y Dependencias
 
-> **Inicio**: 2026-04-14 · **Última limpieza**: 2026-05-22
+> **Inicio**: 2026-04-14 · **Última limpieza**: 2026-05-25
 > **Principio rector**: "Features primero — el enforcement y la arquitectura son valiosos solo si soportan funcionalidad real."
 > **Scope**: solo trabajo FE-only. BE-only → [`Educa.API/.claude/plan/maestro.md`](../../../Educa.API/.claude/plan/maestro.md). Cross-repo → [`educa-coord/plans/maestro.md`](../../../educa-coord/plans/maestro.md).
 
 <!-- INDEX:START -->
 | Key | Plan | Estado | Notas |
 |-----|------|--------|-------|
-| F1 | Enforcement de Reglas | ~92% | F1-F3 ✅ · F4 parcial · F5 awaiting-prod · F5.3 batch 1/3 ✅ |
+| F1 | Enforcement de Reglas | ~95% | F1-F3 ✅ · F4 parcial · F5 awaiting-prod · F5.3 batch 2/3 ✅ |
+| P51 | Reporte Mensual Asistencia | ✅ 100% | UI matrix mensual — commit `86bab2e0` |
 | F5 | Consolidación Frontend | ⏳ 0% | Tras Plan 4 BE |
 | F8 | Design Patterns Backend | Incremental | Al tocar módulos |
 | F9 | Design Patterns Frontend | Incremental | Al tocar módulos |
@@ -17,7 +18,7 @@
 | F48 | Barrido `appendTo="body"` | ✅ archived | Cerrado 2026-05-15 |
 | xP41 | → Correlation Hub (coord) | F1 timeline FE ⏳ | ver P41 |
 | xP42 | → Casing contratos (coord) | Sin trabajo FE pendiente | ver P42 |
-| xP43 | → Monitoreo Cowork (coord) | Sub-chats FE pendientes | ver P43 |
+| xP43 | → Monitoreo Cowork (coord) | Chat 3.2 ✅ · 4.1→6.2 pendientes | ver P43 |
 | xP45 | → Monitoreo incidencias (coord) | P45:F2.2:FE ⏳ | ver P45 |
 <!-- INDEX:END -->
 
@@ -29,7 +30,8 @@
 
 | Key | # | Plan | Estado | Notas |
 |-----|---|------|--------|-------|
-| F1 | 1 | Enforcement de Reglas | ~92% | F1-F3 ✅ · F4 parcial (F4.4-F4.5 🔒) · F5 awaiting-prod (brief 137). F5.3 batch 1/3 ✅ (brief 217) — batch 2 components + batch 3 services pendientes |
+| F1 | 1 | Enforcement de Reglas | ~95% | F1-F3 ✅ · F4 parcial (F4.4-F4.5 🔒) · F5 awaiting-prod (brief 137). F5.3 batch 1/3 ✅ (brief 217) · batch 2/3 ✅ (brief 218) — batch 3 services pendiente |
+| P51 | 51 | Reporte Mensual Asistencia | ✅ 100% | UI matrix mensual de asistencia — commit `86bab2e0` (2026-05-25) |
 | F5 | 5 | Consolidación Frontend | ⏳ 0% | Tras Plan 4 BE |
 | F8 | 8 | Design Patterns Backend | Incremental | Al tocar módulos |
 | F9 | 9 | Design Patterns Frontend | Incremental | Al tocar módulos |
@@ -38,7 +40,7 @@
 | F47 | 47 | Links rotos maestro | ✅ 100% | Cerrado 2026-05-15 |
 | F48 | 48 | Barrido `appendTo="body"` | ✅ 100% | Cerrado 2026-05-15 |
 
-Planes cross-repo con sub-chats FE pendientes: **41** (Correlation Hub), **42** (Casing contratos), **43** (Monitoreo Cowork). Detalle en sección Referencias cross-repo.
+Planes cross-repo con sub-chats FE pendientes: **41** (Correlation Hub), **42** (Casing contratos), **43** (Monitoreo Cowork — Chat 3.2 ✅, quedan 4.1→6.2). Detalle en sección Referencias cross-repo.
 
 ---
 
@@ -54,7 +56,7 @@ Planes cross-repo con sub-chats FE pendientes: **41** (Correlation Hub), **42** 
 
 | Pos | Key | Plan | Próximo paso concreto | Repo | Desbloquea | Gate |
 |---|---|---|---|---|---|---|
-| 1 | F1 | Enforcement de Reglas | F5.3 batch 2 — components re-exports (~20-30 archivos) | local | ~4 (xP43 Chats 3.2, 4.1, 6.1+) | libre |
+| 1 | F1 | Enforcement de Reglas | F5.3 batch 3 — services re-exports | local | ~3 (xP43 Chats 4.1, 6.1+) | libre |
 | 2 | xP41 | Correlation Hub | F1 timeline FE + F2-F6 — prioridad en coord | xrepo | 5 (Chat 9 + F2-F6) | libre |
 
 #### Tier 2 — Impacto medio (desbloquean 1-2 ítems o alto valor)
@@ -82,7 +84,7 @@ Planes cross-repo con sub-chats FE pendientes: **41** (Correlation Hub), **42** 
 
 | Pos | Key | Plan | Próximo paso concreto | Gate |
 |---|---|---|---|---|
-| 9 | xP43 | Monitoreo Cowork | Sub-chats FE (3.2→6.2) — prioridad en coord | ⏸️ espera F1 F5.3 + otros |
+| 9 | xP43 | Monitoreo Cowork | Sub-chats FE (4.1→6.2) — Chat 3.2 ✅ | ⏸️ espera F1 F5.3 + otros |
 | 10 | F5 | Consolidación FE | Completa tras Plan 4 BE | ⏸️ tras Plan 4 BE |
 | 11 | P3 | Matrícula | F3.5 → F4 diseño + implementación UI | 🔒 diseño UI pendiente |
 | 12 | P10 | Flujos alternos | F1+ completo (tras Carril B sustancialmente) | 🔒 Carril B |
@@ -114,8 +116,8 @@ Planes cross-repo con sub-chats FE pendientes: **41** (Correlation Hub), **42** 
 
 ### Notas operativas
 
-- **`running/`**: vacío · **`open/`**: vacío · **`waiting/`**: 2 briefs BE (081, 109)
-- **Último saneamiento**: 2026-05-22
+- **`running/`**: 1 (brief 218 — F1 F5.3 batch 2) · **`open/`**: vacío · **`waiting/`**: 2 briefs BE (081, 109)
+- **Último saneamiento**: 2026-05-25
 
 ---
 

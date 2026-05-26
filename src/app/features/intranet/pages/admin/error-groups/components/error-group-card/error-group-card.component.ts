@@ -11,7 +11,7 @@ import { CommonModule, DatePipe } from '@angular/common';
 import { TagModule } from 'primeng/tag';
 import { TooltipModule } from 'primeng/tooltip';
 
-import { MiniSparklineComponent } from '@shared/components';
+import { MiniSparklineComponent } from '@intranet-shared/components';
 
 import {
 	ErrorGroupLista,

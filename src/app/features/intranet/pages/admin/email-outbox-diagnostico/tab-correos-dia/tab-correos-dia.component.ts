@@ -1,8 +1,8 @@
 import { ChangeDetectionStrategy, Component, computed, inject } from '@angular/core';
 import { TabsModule } from 'primeng/tabs';
 
-import { StatsSkeletonComponent, TableSkeletonComponent } from '@shared/components';
-import type { SkeletonColumnDef } from '@shared/components';
+import { StatsSkeletonComponent, TableSkeletonComponent } from '@intranet-shared/components';
+import type { SkeletonColumnDef } from '@intranet-shared/components';
 
 import { ApoderadosBlacklisteadosTableComponent } from './components/apoderados-blacklisteados-table/apoderados-blacklisteados-table.component';
 import { CorreosDiaHeaderComponent } from './components/correos-dia-header/correos-dia-header.component';

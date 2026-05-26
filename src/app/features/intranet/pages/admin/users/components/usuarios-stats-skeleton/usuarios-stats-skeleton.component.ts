@@ -1,7 +1,7 @@
 // #region Imports
 import { ChangeDetectionStrategy, Component } from '@angular/core';
 
-import { StatsSkeletonComponent } from '@shared/components';
+import { StatsSkeletonComponent } from '@intranet-shared/components';
 // #endregion
 
 // #region Implementation

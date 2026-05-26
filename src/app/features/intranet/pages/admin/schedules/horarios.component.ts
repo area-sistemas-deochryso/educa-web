@@ -8,7 +8,7 @@ import { ScheduleDetailDrawerComponent } from './components/horario-detail-drawe
 import { SchedulesCoursePickerComponent } from './components/horarios-curso-picker/horarios-curso-picker.component';
 import { SchedulesFormDialogComponent } from './components/horarios-form-dialog/horarios-form-dialog.component';
 import { SchedulesImportDialogComponent } from './components/horarios-import-dialog/horarios-import-dialog.component';
-import { PageHeaderComponent } from '@shared/components';
+import { PageHeaderComponent } from '@intranet-shared/components';
 import { type ImportarHorarioItem } from './helpers/horario-import.config';
 import { type DiaSemana, HorarioResponseDto, type HorarioVistaType } from './models/horario.interface';
 import { SchedulesCrudFacade, SchedulesDataFacade, SchedulesUiFacade } from './services';

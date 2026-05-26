@@ -22,12 +22,9 @@ import { Textarea } from 'primeng/textarea';
 import { Select } from 'primeng/select';
 import { MenuItem } from 'primeng/api';
 import { EstudianteAsistencia, EstadisticasAsistenciaDia } from '@core/services';
-import {
-	ResponsiveTableComponent,
-	SkeletonLoaderComponent,
-	TableSkeletonComponent,
-} from '@shared/components';
-import type { SkeletonColumnDef } from '@shared/components';
+import { ResponsiveTableComponent, TableSkeletonComponent } from '@intranet-shared/components';
+import type { SkeletonColumnDef } from '@intranet-shared/components';
+import { SkeletonLoaderComponent } from '@shared/components';
 import { FormatTimePipe } from '@intranet-shared/pipes';
 import { getStatusClass } from '@features/intranet/pages/cross-role/attendance-component/config/attendance.constants';
 import { AttendanceStatus } from '@features/intranet/pages/cross-role/attendance-component/models/attendance.types';

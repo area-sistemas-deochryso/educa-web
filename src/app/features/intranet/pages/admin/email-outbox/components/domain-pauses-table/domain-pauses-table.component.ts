@@ -11,7 +11,7 @@ import { TableModule } from 'primeng/table';
 import { TagModule } from 'primeng/tag';
 import { TooltipModule } from 'primeng/tooltip';
 
-import type { SkeletonColumnDef } from '@shared/components';
+import type { SkeletonColumnDef } from '@intranet-shared/components';
 import { UiMappingService } from '@shared/services';
 import { EmailDomainPauseListaDto } from '@data/models';
 

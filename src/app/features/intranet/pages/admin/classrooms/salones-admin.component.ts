@@ -10,7 +10,7 @@ import { SelectButtonModule } from 'primeng/selectbutton';
 import { ToastModule } from 'primeng/toast';
 import { MessageService } from 'primeng/api';
 
-import { PageHeaderComponent } from '@shared/components';
+import { PageHeaderComponent } from '@intranet-shared/components';
 import { ClassroomsAdminFacade } from './services';
 import { ClassroomsAdminTableComponent } from './components/salones-admin-table/salones-admin-table.component';
 import { ConfigGradeDialogComponent } from './components/config-calificacion-dialog/config-calificacion-dialog.component';

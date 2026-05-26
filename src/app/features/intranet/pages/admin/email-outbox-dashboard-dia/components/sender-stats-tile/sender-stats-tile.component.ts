@@ -6,8 +6,9 @@ import {
 } from '@angular/core';
 import { DatePipe, DecimalPipe } from '@angular/common';
 
-import { SkeletonLoaderComponent, TableSkeletonComponent } from '@shared/components';
-import type { SkeletonColumnDef } from '@shared/components';
+import { TableSkeletonComponent } from '@intranet-shared/components';
+import type { SkeletonColumnDef } from '@intranet-shared/components';
+import { SkeletonLoaderComponent } from '@shared/components';
 
 import { DashboardSenderStat } from '../../models/email-monitoreo.models';
 

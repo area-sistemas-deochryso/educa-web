@@ -7,7 +7,7 @@ import { TagModule } from 'primeng/tag';
 import { ButtonModule } from 'primeng/button';
 import { TooltipModule } from 'primeng/tooltip';
 import { filter, take } from 'rxjs';
-import { PageHeaderComponent, TableSkeletonComponent, type SkeletonColumnDef } from '@shared/components';
+import { PageHeaderComponent, TableSkeletonComponent, type SkeletonColumnDef } from '@intranet-shared/components';
 import { ProfesorFacade } from '../services/profesor.facade';
 import { CursoContenidoDataFacade } from './services/curso-contenido-data.facade';
 import { CursoContenidoUiFacade } from './services/curso-contenido-ui.facade';

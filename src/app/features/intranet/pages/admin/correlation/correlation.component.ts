@@ -11,7 +11,7 @@ import { logger } from '@core/helpers';
 import { StorageService, type CorrelationViewMode } from '@core/services';
 
 import { PageHeaderComponent } from '@intranet-shared/components';
-import { CorrelationIdPillComponent } from '@shared/components';
+import { CorrelationIdPillComponent } from '@intranet-shared/components';
 
 import { CorrelationExportService, CorrelationFacade } from './services';
 import { CorrelationErrorsSectionComponent } from './components/correlation-errors-section';

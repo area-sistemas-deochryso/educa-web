@@ -9,7 +9,7 @@ import { TagModule } from 'primeng/tag';
 import { TooltipModule } from 'primeng/tooltip';
 
 import { logger } from '@core/helpers';
-import { CorrelationIdPillComponent } from '@shared/components';
+import { CorrelationIdPillComponent } from '@intranet-shared/components';
 
 import { RateLimitEventListaDto, displayPolicy } from '../../models';
 
