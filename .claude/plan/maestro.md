@@ -12,7 +12,7 @@
 | F5 | Consolidación Frontend | ⏳ 0% | Tras Plan 4 BE |
 | F8 | Design Patterns Backend | Incremental | Al tocar módulos |
 | F9 | Design Patterns Frontend | Incremental | Al tocar módulos |
-| F13 | Frontend Test Gaps | ~40% | F1 ✅ interceptores · F2 ✅ páginas admin · F3 ✅ flujos integración · F4-F5 pendientes |
+| F13 | Frontend Test Gaps | ~60% | F1 ✅ interceptores · F2 ✅ páginas admin · F3 ✅ flujos integración · F4 ✅ WAL/cache · F5 pendiente |
 | F46 | Drift documental `.claude/` FE | ✅ archived | Cerrado 2026-05-15 |
 | F47 | Links rotos maestro | ✅ archived | Cerrado 2026-05-15 |
 | F48 | Barrido `appendTo="body"` | ✅ archived | Cerrado 2026-05-15 |
@@ -35,7 +35,7 @@
 | F5 | 5 | Consolidación Frontend | ⏳ 0% | Tras Plan 4 BE |
 | F8 | 8 | Design Patterns Backend | Incremental | Al tocar módulos |
 | F9 | 9 | Design Patterns Frontend | Incremental | Al tocar módulos |
-| F13 | 13 | Frontend Test Gaps | ~40% | F1 ✅ interceptores · F2 ✅ páginas admin (brief 241) · F3 ✅ flujos integración (brief 243) · F4 WAL · F5 shared |
+| F13 | 13 | Frontend Test Gaps | ~60% | F1 ✅ interceptores · F2 ✅ páginas admin (brief 241) · F3 ✅ flujos integración (brief 243) · F4 ✅ WAL/cache (brief 245) · F5 shared |
 | F46 | 46 | Drift documental `.claude/` FE | ✅ 100% | Cerrado 2026-05-15 |
 | F47 | 47 | Links rotos maestro | ✅ 100% | Cerrado 2026-05-15 |
 | F48 | 48 | Barrido `appendTo="body"` | ✅ 100% | Cerrado 2026-05-15 |
@@ -117,7 +117,7 @@ Planes cross-repo con sub-chats FE pendientes: **41** (Correlation Hub), **42** 
 ### Notas operativas
 
 - **`running/`**: vacío · **`open/`**: vacío · **`waiting/`**: 2 briefs BE (081, 109)
-- **Último saneamiento**: 2026-05-26 (F13 F3 ✅ brief 243, INDEX F13 ~40%)
+- **Último saneamiento**: 2026-05-26 (F13 F4 ✅ brief 245, INDEX F13 ~60%)
 
 ---
 
