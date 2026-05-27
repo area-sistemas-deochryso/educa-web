@@ -50,6 +50,18 @@ Si después hay 2+ briefs **exactamente empatados** (mismo plan en cola, misma f
 
 Fuera de estas 4, **actuar sin preguntar**.
 
+### Worktree-awareness
+
+Si estamos dentro de un worktree (detectar con `git rev-parse --git-common-dir` ≠ `.git`):
+
+1. **Resolver main repo**: `$mainRepo = (git rev-parse --git-common-dir | resolve to parent)`.
+2. **Leer manifest**: `$mainRepo/.claude/.locks/worktrees.json`.
+3. **Buscar entry para este worktree** (matchear por `path` o `branch` actual).
+4. **Si hay entry** → solo trabajar el brief lockeado en esa entry. No buscar en `open/` ni en cola. El brief es el que dice `briefRef` del manifest.
+5. **Si no hay entry** → avisar: "Este worktree no está registrado en el manifest. Usá `/wt-new` desde el repo principal para registrarlo."
+
+En main (no worktree), el flujo es el mismo de siempre — pero antes de pickup, **consultar manifest** para excluir briefs ya lockeados por worktrees activos.
+
 ### Multi-repo (educa-web + Educa.API)
 
 Cada brief lleva en su header:

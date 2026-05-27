@@ -40,7 +40,12 @@ Complementa a [`/progress`](progress.md) (tendencia por flujo) y [`/triage`](tri
 ## Formato de salida
 
 ```
-## 🚦 Queue — <repo> · <YYYY-MM-DD>
+## 🚦 Queue — <repo> · <YYYY-MM-DD> · branch: <branch>
+
+### 🔒 Active worktrees (N) — lockeados en manifest
+| Chat | Branch | Brief | Started |
+|---|---|---|---|
+| NNN | `chat/<NNN>-<slug>` | `<briefRef>` | YYYY-MM-DD |
 
 ### 🟡 Waiting (N)
 - [chat NNN] <title> — <aging>d — flow: <flow>
@@ -60,6 +65,8 @@ Complementa a [`/progress`](progress.md) (tendencia por flujo) y [`/triage`](tri
 ### ⚠️ Drift (si hay)
 - <descripción 1 línea>
 ```
+
+Items lockeados por worktrees activos se excluyen de Pullable y se muestran en la sección Active worktrees. Si el manifest no existe o está vacío, omitir la sección.
 
 Sección vacía → omitirla (no listar "Ninguno"). Si el repo no tiene ninguna estructura detectable, output corto con sugerencia (`ROADMAP.md` o `.claude/plans/maestro.md`).
 

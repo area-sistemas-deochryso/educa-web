@@ -27,6 +27,14 @@ A diferencia de app-fgame, educa-web **no usa la convención `plans/<flow>/<step
 
 - `/progress --weeks 4` — ventana custom de 4 semanas (el script acepta `--weeks N`). Default 12.
 
+### Multi-branch aggregation
+
+Si hay worktrees activos (manifest en `.claude/.locks/worktrees.json`):
+
+- **Sección extra: Active branches** — listar branches activas con commits ahead de main.
+- Para cada branch `chat/<NNN>-<slug>`, reportar: `git rev-list --count main..<branch>` commits ahead.
+- El sparkline de volumen general agrega commits de **todas** las branches activas, no solo main.
+
 ### Limitaciones específicas
 
 - **Solo mide el repo `educa-web` (FE)**. El BE (`Educa.API/`) tiene su propia historia git, fuera del alcance de este reporte.

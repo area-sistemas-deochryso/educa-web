@@ -90,3 +90,6 @@ ios/
 
 # Dev-log local (skill personal — no se commitea)
 track-dev-log/
+
+# Worktree manifest (local coordination state — ephemeral)
+.claude/.locks/

@@ -70,6 +70,22 @@ bash .claude/scripts/progress.sh
 |---|---|
 | Verificar chat en `awaiting-prod/` post-deploy | `/verify <NNN>` |
 
+## Worktree-awareness
+
+Si estamos en un worktree (detectar con `git rev-parse --git-common-dir` ≠ `.git`):
+
+- **El commit va a la branch del worktree** (`chat/<NNN>-<slug>`), no a main.
+- **Brief se mueve a `closed/`** dentro del worktree (el commit queda en la branch).
+- **No mergear a main** desde `/end` — eso es `/wt-merge` (paso separado).
+- **Actualizar `lastHeartbeat`** en el manifest del main repo.
+- **Post-ship hint obligatorio**:
+
+```
+> 💡 `/wt-merge <NNN>-<slug>` — worktree cerrado, integrá a trunk.
+```
+
+En **caso pausa**: dejar todo intacto, el worktree y la entry en manifest persisten.
+
 ## Referencias locales
 
 - [go.md](go.md) — contraparte.

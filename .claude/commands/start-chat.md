@@ -35,6 +35,17 @@ Si el brief dice `Repo destino: Educa.API` pero estás en `educa-web` (o vicever
 
 Mensaje sugerido: *"Este brief ya está activo en `chats/running/`. Continuá con el modo sugerido en su sección `## MODO SUGERIDO` o usá `/retomar`."*
 
+### Worktree-awareness
+
+Si el brief tiene `isolation: worktree` en su frontmatter (o si el plan indica fases paralelas):
+
+1. **Consultar manifest** (`<mainRepo>/.claude/.locks/worktrees.json`) antes de aplicar el gate `running/ ≤ 1`.
+2. **Si estamos en un worktree** → el gate se evalúa contra el manifest (¿hay otra entry con este `chatId`?), no contra el directorio `running/`.
+3. **Si estamos en main** → el gate `running/ ≤ 1` sigue normal. Briefs lockeados en worktrees no cuentan contra este cupo.
+4. **Excluir briefs lockeados** — si un brief está registrado en el manifest por otro worktree, no es elegible para pickup.
+
+Sin manifest o sin entries activas, el flujo default aplica sin cambios.
+
 ## Referencias locales
 
 - [../rules/backlog-hygiene.md](../rules/backlog-hygiene.md) — gate `running/` ≤ 1.
