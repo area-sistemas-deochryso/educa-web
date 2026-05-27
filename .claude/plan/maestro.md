@@ -101,22 +101,27 @@ Planes cross-repo con sub-chats FE pendientes: **41** (Correlation Hub), **42** 
 
 ### 🟣 Verificaciones post-deploy (`/verify <NNN>`)
 
-8 briefs en `awaiting-prod/`:
+6 briefs en `awaiting-prod/`:
 
 | Brief | Scope |
 |-------|-------|
 | `119` | WAL DELETE audit soft vs hard |
-| `134` | Plan 28 Chat 4a+4b: self-service AA + tab director-profesores |
 | `137` | Plan 1 F5: hardening de wrappers (barrel + lint) |
-| `140` | Fix F-018: botón "Registrar" disabled en asistencia manual (tipoPersona=A) |
 | `147` | Plan 43 Chat 2.1 FE: badge transiente + textarea blacklist + link auditoría |
 | `169` | Plan 43 Chat 3.1b FE: SMTP response en drawers monitoreo |
 | `199` | F-021: deep-link `/intranet/admin/usuarios?dni=X&autoOpen=true` |
 | `213` | Fix FE: pre-login cookie cleanup + error handling hardening |
 
+2 briefs en `troubles/` (reabiertos 2026-05-25):
+
+| Brief | Scope |
+|-------|-------|
+| `134` | Plan 28 Chat 4a+4b: self-service AA + tab director-profesores |
+| `140` | Fix F-018: botón "Registrar" disabled en asistencia manual (tipoPersona=A) |
+
 ### Notas operativas
 
-- **`running/`**: vacío · **`open/`**: vacío · **`waiting/`**: 2 briefs BE (081, 109)
+- **`running/`**: vacío · **`open/`**: vacío · **`waiting/`**: vacío (081, 109 migrados a Educa.API)
 - **Último saneamiento**: 2026-05-26 (P10 P0.1 ✅ brief 249 — WAL timeout + error UX)
 
 ---
