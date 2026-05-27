@@ -84,7 +84,7 @@ Si estamos en un worktree (detectar con `git rev-parse --git-common-dir` ≠ `.g
 > 💡 `/wt-merge <NNN>-<slug>` — worktree cerrado, integrá a trunk.
 ```
 
-En **caso pausa**: dejar todo intacto, el worktree y la entry en manifest persisten.
+En **caso pausa**: dejar todo intacto, el worktree y la entry en manifest persisten. Además, actualizar `lastHeartbeat` en el manifest para reflejar la última actividad real.
 
 ## Referencias locales
 
