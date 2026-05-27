@@ -95,6 +95,7 @@
 		[hasActiveFilters]="vm().hasActiveFilters"
 		(viewDetail)="onViewDetail($event)"
 		(despejar)="onDespejar($event)"
+		(unblock)="onUnblock($event)"
 		(lazyLoad)="onLazyLoad($event)"
 	/>
 } @else {
@@ -122,7 +123,55 @@
 	(visibleChange)="onDrawerVisibleChange($event)"
 	(closeDrawer)="onDrawerClose()"
 	(despejar)="onDrawerDespejar($event)"
+	(unblock)="onUnblock($event)"
 />
+<!-- #endregion -->
+
+<!-- #region Unblock Dialog -->
+<p-dialog
+	header="Desbloquear correo"
+	[visible]="unblockDialogVisible()"
+	(visibleChange)="onUnblockDialogVisibleChange($event)"
+	[modal]="true"
+	[style]="{ width: '28rem' }"
+	appendTo="body"
+>
+	<div class="unblock-dialog-content">
+		<p class="unblock-dialog-message">
+			Explicá por qué se desbloquea este correo. Mínimo {{ MIN_MOTIVO_LENGTH }} caracteres.
+		</p>
+		<textarea
+			pTextarea
+			[ngModel]="unblockMotivo()"
+			(ngModelChange)="onUnblockMotivoChange($event)"
+			[rows]="3"
+			placeholder="Motivo del desbloqueo..."
+			class="w-full"
+			[attr.aria-label]="'Motivo del desbloqueo'"
+		></textarea>
+		<div class="unblock-dialog-counter" [class.invalid]="unblockMotivo().length < MIN_MOTIVO_LENGTH">
+			{{ unblockMotivo().length }} / {{ MIN_MOTIVO_LENGTH }} caracteres mínimos
+		</div>
+	</div>
+	<ng-template pTemplate="footer">
+		<button
+			pButton
+			label="Cancelar"
+			class="p-button-text"
+			(click)="onUnblockCancel()"
+			[pt]="{ root: { 'aria-label': 'Cancelar desbloqueo' } }"
+		></button>
+		<button
+			pButton
+			label="Desbloquear"
+			icon="pi pi-lock-open"
+			class="p-button-warning"
+			[disabled]="unblockMotivo().length < MIN_MOTIVO_LENGTH"
+			(click)="onUnblockConfirm()"
+			[pt]="{ root: { 'aria-label': 'Confirmar desbloqueo' } }"
+		></button>
+	</ng-template>
+</p-dialog>
 <!-- #endregion -->
 
 <p-confirmDialog />

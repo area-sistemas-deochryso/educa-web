@@ -82,6 +82,7 @@
 		[totalRecords]="vm().totalRecordsEstimate"
 		(viewDetail)="onViewDetail($event)"
 		(retry)="onRetry($event)"
+		(exportCaso)="onExportCaso($event)"
 		(lazyLoad)="onLazyLoad($event)"
 	/>
 } @else {
@@ -171,4 +172,13 @@
 		</div>
 	}
 </p-drawer>
+<!-- #endregion -->
+
+<!-- #region Export Drawer -->
+<app-email-outbox-export-drawer
+	[visible]="vm().exportDrawerVisible"
+	[data]="vm().exportData"
+	[loading]="vm().exportLoading"
+	(visibleChange)="onExportDrawerVisibleChange($event)"
+/>
 <!-- #endregion -->

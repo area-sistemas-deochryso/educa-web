@@ -9,6 +9,7 @@ import {
 	EmailOutboxTendencia,
 } from '@data/models';
 import { DeferFailStatus } from '../models/defer-fail-status.models';
+import { EmailOutboxExportDto } from '../models/email-outbox-export.models';
 import { ThrottleStatus } from '../models/throttle-status.models';
 
 @Injectable({ providedIn: 'root' })
@@ -136,11 +137,12 @@ export class EmailOutboxApiService {
 	// #endregion
 
 	// #region Comandos (POST)
-	reintentar(id: number): Observable<boolean> {
-		return this.http.post(`${this.baseUrl}/${id}/reintentar`, {}).pipe(
-			map(() => true),
-			catchError(() => of(false)),
-		);
+	reintentar(id: number): Observable<void> {
+		return this.http.post<void>(`${this.baseUrl}/${id}/reintentar`, {});
+	}
+
+	exportarCaso(id: number): Observable<EmailOutboxExportDto> {
+		return this.http.get<EmailOutboxExportDto>(`${this.baseUrl}/${id}/export`);
 	}
 	// #endregion
 }

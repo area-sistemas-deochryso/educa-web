@@ -44,6 +44,7 @@ export class EmailOutboxTableComponent {
 	readonly totalRecords = input(0);
 	readonly viewDetail = output<EmailOutboxLista>();
 	readonly retry = output<EmailOutboxLista>();
+	readonly exportCaso = output<EmailOutboxLista>();
 	readonly lazyLoad = output<{ page: number; pageSize: number }>();
 	// #endregion
 

@@ -43,6 +43,7 @@ export class BlacklistTableComponent {
 	// #region Outputs
 	readonly viewDetail = output<EmailBlacklistEntry>();
 	readonly despejar = output<EmailBlacklistEntry>();
+	readonly unblock = output<EmailBlacklistEntry>();
 	readonly lazyLoad = output<TableLazyLoadEvent>();
 	// #endregion
 
@@ -65,6 +66,10 @@ export class BlacklistTableComponent {
 
 	onDespejar(item: EmailBlacklistEntry): void {
 		this.despejar.emit(item);
+	}
+
+	onUnblock(item: EmailBlacklistEntry): void {
+		this.unblock.emit(item);
 	}
 
 	onLazyLoad(event: TableLazyLoadEvent): void {

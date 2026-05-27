@@ -112,3 +112,27 @@
 	}
 }
 // #endregion
+
+// #region Unblock dialog
+.unblock-dialog-content {
+	display: flex;
+	flex-direction: column;
+	gap: 0.5rem;
+}
+
+.unblock-dialog-message {
+	margin: 0;
+	font-size: 0.875rem;
+	color: var(--text-color-secondary);
+}
+
+.unblock-dialog-counter {
+	font-size: 0.75rem;
+	color: var(--text-color-secondary);
+	text-align: right;
+
+	&.invalid {
+		color: var(--red-500);
+	}
+}
+// #endregion

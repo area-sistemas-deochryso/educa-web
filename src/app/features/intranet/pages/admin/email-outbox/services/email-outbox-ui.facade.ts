@@ -1,6 +1,9 @@
+import { HttpErrorResponse } from '@angular/common/http';
 import { DestroyRef, inject, Injectable } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
+import { ErrorHandlerService } from '@core/services/error';
+import { logger } from '@core/helpers';
 import { EmailOutboxLista } from '@data/models';
 
 import { EmailOutboxApiService } from './email-outbox.service';
@@ -11,10 +14,11 @@ export class EmailOutboxUiFacade {
 	// #region Dependencias
 	private api = inject(EmailOutboxApiService);
 	private store = inject(EmailOutboxStore);
+	private errorHandler = inject(ErrorHandlerService);
 	private destroyRef = inject(DestroyRef);
 	// #endregion
 
-	// #region Drawer
+	// #region Drawer detalle
 	openDetail(item: EmailOutboxLista): void {
 		this.store.openDrawer(item);
 		this.loadPreview(item.id);
@@ -44,11 +48,70 @@ export class EmailOutboxUiFacade {
 		this.api
 			.reintentar(item.id)
 			.pipe(takeUntilDestroyed(this.destroyRef))
-			.subscribe((ok) => {
-				if (ok) {
+			.subscribe({
+				next: () => {
 					this.store.markAsRetrying(item.id);
-				}
+					this.errorHandler.showSuccess(
+						'Correo reencolado',
+						`El correo a ${item.destinatario} se reintentará.`,
+					);
+				},
+				error: (err) => this.handleRetryError(err, item),
 			});
+	}
+
+	private handleRetryError(err: unknown, item: EmailOutboxLista): void {
+		if (err instanceof HttpErrorResponse && err.status === 409) {
+			const body = err.error as { message?: string; errorCode?: string } | null;
+			const reason = body?.errorCode === 'DESTINATARIO_BLACKLISTED'
+				? 'El destinatario está en blacklist.'
+				: body?.errorCode === 'DESTINATARIO_QUARANTINED'
+					? 'El destinatario está en cuarentena activa.'
+					: (body?.message ?? 'No se puede reintentar este correo.');
+			this.errorHandler.showWarning('Reintento bloqueado', reason);
+			return;
+		}
+		if (err instanceof HttpErrorResponse && err.status === 404) {
+			this.errorHandler.showWarning('Correo no encontrado', 'El registro ya no existe.');
+			return;
+		}
+		logger.error('[EmailOutboxUiFacade] Error en reintentar', err);
+		this.errorHandler.showError(
+			'Error al reintentar',
+			`No se pudo reencolar el correo a ${item.destinatario}.`,
+		);
+	}
+	// #endregion
+
+	// #region Export caso
+	openExportDrawer(item: EmailOutboxLista): void {
+		this.store.setExportLoading(true);
+		this.store.setExportDrawerVisible(true);
+		this.store.setExportData(null);
+
+		this.api
+			.exportarCaso(item.id)
+			.pipe(takeUntilDestroyed(this.destroyRef))
+			.subscribe({
+				next: (data) => {
+					this.store.setExportData(data);
+					this.store.setExportLoading(false);
+				},
+				error: (err) => {
+					logger.error('[EmailOutboxUiFacade] Error en exportarCaso', err);
+					this.store.setExportLoading(false);
+					this.errorHandler.showError(
+						'Error al exportar',
+						'No se pudo obtener los datos del caso.',
+					);
+					this.store.setExportDrawerVisible(false);
+				},
+			});
+	}
+
+	closeExportDrawer(): void {
+		this.store.setExportDrawerVisible(false);
+		this.store.setExportData(null);
 	}
 	// #endregion
 }

@@ -38,6 +38,7 @@ export class BlacklistDetailDrawerComponent {
 	readonly visibleChange = output<boolean>();
 	readonly closeDrawer = output<void>();
 	readonly despejar = output<EmailBlacklistEntry>();
+	readonly unblock = output<EmailBlacklistEntry>();
 	// #endregion
 
 	onVisibleChange(visible: boolean): void {
@@ -51,5 +52,10 @@ export class BlacklistDetailDrawerComponent {
 	onDespejar(): void {
 		const entry = this.entry();
 		if (entry?.estado) this.despejar.emit(entry);
+	}
+
+	onUnblock(): void {
+		const entry = this.entry();
+		if (entry?.estado) this.unblock.emit(entry);
 	}
 }

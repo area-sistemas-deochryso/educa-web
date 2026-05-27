@@ -27,6 +27,7 @@ import { EmailOutboxHeaderComponent } from './components/email-outbox-header/ema
 import { EmailOutboxStatsComponent } from './components/email-outbox-stats/email-outbox-stats.component';
 import { EmailOutboxFiltersComponent } from './components/email-outbox-filters/email-outbox-filters.component';
 import { EmailOutboxTableComponent } from './components/email-outbox-table/email-outbox-table.component';
+import { EmailOutboxExportDrawerComponent } from './components/email-outbox-export-drawer/email-outbox-export-drawer.component';
 import { EmailOutboxChartComponent } from './components/email-outbox-chart/email-outbox-chart.component';
 import { ThrottleStatusWidgetComponent } from './components/throttle-status-widget/throttle-status-widget.component';
 import { DeferFailStatusWidgetComponent } from './components/defer-fail-status-widget/defer-fail-status-widget.component';
@@ -45,6 +46,7 @@ import { EmailOutboxLista } from '@data/models';
 		EmailOutboxStatsComponent,
 		EmailOutboxFiltersComponent,
 		EmailOutboxTableComponent,
+		EmailOutboxExportDrawerComponent,
 		EmailOutboxChartComponent,
 		ThrottleStatusWidgetComponent,
 		DeferFailStatusWidgetComponent,
@@ -181,6 +183,14 @@ export class EmailOutboxComponent implements OnInit {
 
 	onRetry(item: EmailOutboxLista): void {
 		this.uiFacade.reintentar(item);
+	}
+
+	onExportCaso(item: EmailOutboxLista): void {
+		this.uiFacade.openExportDrawer(item);
+	}
+
+	onExportDrawerVisibleChange(visible: boolean): void {
+		if (!visible) this.uiFacade.closeExportDrawer();
 	}
 
 	onDrawerVisibleChange(visible: boolean): void {

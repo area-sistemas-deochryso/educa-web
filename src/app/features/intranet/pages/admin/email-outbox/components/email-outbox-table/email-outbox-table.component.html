@@ -110,6 +110,15 @@
 							}"
 						></button>
 					}
+					<button
+						pButton
+						icon="pi pi-file-export"
+						class="p-button-rounded p-button-text p-button-sm p-button-secondary"
+						pTooltip="Exportar caso"
+						tooltipPosition="top"
+						(click)="exportCaso.emit(item)"
+						[pt]="{ root: { 'aria-label': 'Exportar caso completo' } }"
+					></button>
 				</div>
 			</td>
 		</tr>

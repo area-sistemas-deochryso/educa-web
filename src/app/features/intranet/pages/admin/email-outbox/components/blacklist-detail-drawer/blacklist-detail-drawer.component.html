@@ -112,11 +112,11 @@
 			@if (item.estado) {
 				<button
 					pButton
-					label="Despejar"
-					icon="pi pi-check"
+					label="Desbloquear"
+					icon="pi pi-lock-open"
 					class="p-button-warning"
-					(click)="onDespejar()"
-					[pt]="{ root: { 'aria-label': 'Despejar bloqueo' } }"
+					(click)="onUnblock()"
+					[pt]="{ root: { 'aria-label': 'Desbloquear correo' } }"
 				></button>
 			}
 		</div>

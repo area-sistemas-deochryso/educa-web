@@ -76,6 +76,67 @@ export class BlacklistCrudFacade {
 	}
 	// #endregion
 
+	// #region UNBLOCK (desbloqueo con motivo)
+	unblock(entry: EmailBlacklistEntry, motivo: string): void {
+		const snapshot = entry;
+		const previousIndex = this.store.items().findIndex((i) => i.id === entry.id);
+
+		this.walHelper.execute({
+			operation: 'UPDATE',
+			resourceType: 'email-blacklist',
+			resourceId: entry.id,
+			endpoint: `${this.apiBase}/${entry.id}/unblock`,
+			method: 'POST',
+			payload: { motivo },
+			http$: () => this.api.unblock(entry.id, motivo),
+			optimistic: {
+				apply: () => {
+					this.store.removeItem(entry.id);
+					this.store.onDespejado();
+					this.store.closeDrawer();
+				},
+				rollback: () => {
+					const items = this.store.items();
+					const restored = [...items];
+					if (previousIndex >= 0 && previousIndex <= restored.length) {
+						restored.splice(previousIndex, 0, snapshot);
+					} else {
+						restored.unshift(snapshot);
+					}
+					this.store.setItems(restored);
+					this.store.incrementarEstadistica('activas', 1);
+					this.store.incrementarEstadistica('inactivas', -1);
+				},
+			},
+			onCommit: () => {
+				this.errorHandler.showSuccess(
+					'Bloqueo desbloqueado',
+					`${entry.correo} ya no está bloqueado.`,
+				);
+			},
+			onError: (err) => {
+				logger.error('[BlacklistCrudFacade] Error al desbloquear', err);
+				this.handleUnblockError(err, entry);
+			},
+		});
+	}
+
+	private handleUnblockError(err: unknown, entry: EmailBlacklistEntry): void {
+		if (this.extractStatus(err) === 404) {
+			this.errorHandler.showWarning(
+				'Bloqueo no encontrado',
+				`${entry.correo} ya no estaba bloqueado.`,
+			);
+			this.dataFacade.refresh();
+			return;
+		}
+		this.errorHandler.showError(
+			'No se pudo desbloquear',
+			`Error al desbloquear ${entry.correo}. Intenta de nuevo.`,
+		);
+	}
+	// #endregion
+
 	// #region DELETE (despeje)
 	despejar(entry: EmailBlacklistEntry): void {
 		const snapshot = entry;

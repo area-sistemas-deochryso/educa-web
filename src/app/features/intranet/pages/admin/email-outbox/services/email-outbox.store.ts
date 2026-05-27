@@ -8,6 +8,7 @@ import {
 	EmailOutboxTipo,
 } from '@data/models';
 import { DeferFailStatus } from '../models/defer-fail-status.models';
+import { EmailOutboxExportDto } from '../models/email-outbox-export.models';
 import { ThrottleStatus } from '../models/throttle-status.models';
 
 @Injectable({ providedIn: 'root' })
@@ -61,6 +62,11 @@ export class EmailOutboxStore {
 	private readonly _deferFailLoading = signal(false);
 	private readonly _deferFailAutoRefresh = signal(false);
 	private readonly _deferFailCollapsed = signal(false);
+
+	// Export caso drawer
+	private readonly _exportDrawerVisible = signal(false);
+	private readonly _exportData = signal<EmailOutboxExportDto | null>(null);
+	private readonly _exportLoading = signal(false);
 	// #endregion
 
 	// #region Lecturas públicas
@@ -93,6 +99,9 @@ export class EmailOutboxStore {
 	readonly deferFailLoading = this._deferFailLoading.asReadonly();
 	readonly deferFailAutoRefresh = this._deferFailAutoRefresh.asReadonly();
 	readonly deferFailCollapsed = this._deferFailCollapsed.asReadonly();
+	readonly exportDrawerVisible = this._exportDrawerVisible.asReadonly();
+	readonly exportData = this._exportData.asReadonly();
+	readonly exportLoading = this._exportLoading.asReadonly();
 	// #endregion
 
 	// #region Computed
@@ -149,6 +158,9 @@ export class EmailOutboxStore {
 		deferFailLoading: this._deferFailLoading(),
 		deferFailAutoRefresh: this._deferFailAutoRefresh(),
 		deferFailCollapsed: this._deferFailCollapsed(),
+		exportDrawerVisible: this._exportDrawerVisible(),
+		exportData: this._exportData(),
+		exportLoading: this._exportLoading(),
 	}));
 	// #endregion
 
@@ -314,6 +326,18 @@ export class EmailOutboxStore {
 
 	setPreviewLoading(loading: boolean): void {
 		this._previewLoading.set(loading);
+	}
+
+	setExportDrawerVisible(visible: boolean): void {
+		this._exportDrawerVisible.set(visible);
+	}
+
+	setExportData(data: EmailOutboxExportDto | null): void {
+		this._exportData.set(data);
+	}
+
+	setExportLoading(loading: boolean): void {
+		this._exportLoading.set(loading);
 	}
 	// #endregion
 }

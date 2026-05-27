@@ -4,14 +4,17 @@ import {
 	DestroyRef,
 	OnInit,
 	inject,
+	signal,
 } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute } from '@angular/router';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { ButtonModule } from 'primeng/button';
 import { ConfirmDialogModule } from 'primeng/confirmdialog';
+import { DialogModule } from 'primeng/dialog';
 import { ConfirmationService } from 'primeng/api';
 import { InputTextModule } from 'primeng/inputtext';
+import { TextareaModule } from 'primeng/textarea';
 import { SelectModule } from 'primeng/select';
 import { TableLazyLoadEvent } from 'primeng/table';
 import { TooltipModule } from 'primeng/tooltip';
@@ -64,9 +67,11 @@ const MOTIVO_OPTIONS: SelectOption<EmailBlacklistMotivo>[] = [
 		FormsModule,
 		ButtonModule,
 		InputTextModule,
+		TextareaModule,
 		SelectModule,
 		TooltipModule,
 		ConfirmDialogModule,
+		DialogModule,
 		TableSkeletonComponent,
 		BlacklistTableComponent,
 		BlacklistAddDialogComponent,
@@ -92,6 +97,12 @@ export class BlacklistTabComponent implements OnInit {
 	readonly skeletonColumns = BlacklistTableComponent.skeletonColumns;
 	readonly estadoOptions = ESTADO_OPTIONS;
 	readonly motivoOptions = MOTIVO_OPTIONS;
+
+	readonly unblockDialogVisible = signal(false);
+	readonly unblockMotivo = signal('');
+	private unblockTarget: EmailBlacklistEntry | null = null;
+
+	readonly MIN_MOTIVO_LENGTH = 20;
 	// #endregion
 
 	ngOnInit(): void {
@@ -158,6 +169,37 @@ export class BlacklistTabComponent implements OnInit {
 			icon: 'pi pi-exclamation-triangle',
 			accept: () => this.crudFacade.despejar(item),
 		});
+	}
+	// #endregion
+
+	// #region Desbloquear (con motivo)
+	onUnblock(item: EmailBlacklistEntry): void {
+		this.unblockTarget = item;
+		this.unblockMotivo.set('');
+		this.unblockDialogVisible.set(true);
+	}
+
+	onUnblockDialogVisibleChange(visible: boolean): void {
+		if (!visible) {
+			this.unblockDialogVisible.set(false);
+			this.unblockTarget = null;
+		}
+	}
+
+	onUnblockMotivoChange(value: string): void {
+		this.unblockMotivo.set(value);
+	}
+
+	onUnblockConfirm(): void {
+		if (!this.unblockTarget || this.unblockMotivo().length < this.MIN_MOTIVO_LENGTH) return;
+		this.crudFacade.unblock(this.unblockTarget, this.unblockMotivo());
+		this.unblockDialogVisible.set(false);
+		this.unblockTarget = null;
+	}
+
+	onUnblockCancel(): void {
+		this.unblockDialogVisible.set(false);
+		this.unblockTarget = null;
 	}
 	// #endregion
 

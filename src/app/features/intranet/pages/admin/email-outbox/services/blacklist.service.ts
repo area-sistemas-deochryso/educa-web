@@ -53,5 +53,12 @@ export class BlacklistService {
 		const encoded = encodeURIComponent(correo);
 		return this.http.delete<DespejarBlacklistResponse>(`${this.apiBase}/${encoded}`);
 	}
+
+	unblock(id: number, motivo: string): Observable<DespejarBlacklistResponse> {
+		return this.http.post<DespejarBlacklistResponse>(
+			`${this.apiBase}/${id}/unblock`,
+			{ motivo },
+		);
+	}
 	// #endregion
 }
