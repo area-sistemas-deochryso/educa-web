@@ -58,6 +58,7 @@ Si estamos dentro de un worktree (detectar con `git rev-parse --git-common-dir` 
 2. **Leer manifest**: `$mainRepo/.claude/.locks/worktrees.json`.
 3. **Buscar entry para este worktree** (matchear por `path` o `branch` actual).
 4. **Si hay entry** → solo trabajar el brief lockeado en esa entry. No buscar en `open/` ni en cola. El brief es el que dice `briefRef` del manifest.
+   **Heartbeat**: actualizar `lastHeartbeat` en esta entry con el timestamp ISO actual (`git branch --show-current` para confirmar branch). Esto mantiene vivo el heartbeat para que el hint #13 (stale >7d) no dispare falsos positivos.
 5. **Si no hay entry** → avisar: "Este worktree no está registrado en el manifest. Usá `/wt-new` desde el repo principal para registrarlo."
 
 En main (no worktree), el flujo es el mismo de siempre — pero antes de pickup, **consultar manifest** para excluir briefs ya lockeados por worktrees activos.

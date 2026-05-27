@@ -98,6 +98,18 @@ Siempre referenciar el maestro `educa-web/.claude/plan/maestro.md` con path rela
    - Opción B: abrir chat nuevo y pegar el contenido del archivo directo.
 4. **NO** commitear archivos de `chats/` salvo pedido explícito.
 
+## Worktree-awareness
+
+Si el plan del brief tiene fases paralelas (marcadas con `parallel: true` o equivalente en el plan), agregar al frontmatter del brief generado:
+
+```yaml
+isolation: worktree
+```
+
+Esto señala a `/go` que el brief debe ejecutarse en un worktree dedicado vía `/wt-new`, no en main.
+
+**Heurística**: una fase es "paralela" cuando el plan lista ≥2 fases con el mismo `depends_on` (hermanas), o cuando el plan marca explícitamente `parallel: true`.
+
 ## Referencias locales
 
 - [../rules/backlog-hygiene.md](../rules/backlog-hygiene.md) — límites + edades.
