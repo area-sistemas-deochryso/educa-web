@@ -14,6 +14,18 @@
 			<span class="stat-pill-label">Liberadas</span>
 			<span class="stat-pill-value">{{ stats.liberadas }}</span>
 		</div>
+		@if (vm().trend.length > 0) {
+			<div class="stat-sparkline-inline">
+				<app-mini-sparkline
+					[data]="vm().trend"
+					color="var(--orange-400)"
+					ariaLabel="Tendencia últimos 30 días: cuarentena"
+				/>
+				<span class="stat-trend-summary">
+					promedio 7d: {{ trendSummaryValue().avg7d | number }} · máx 30d: {{ trendSummaryValue().max30d | number }}
+				</span>
+			</div>
+		}
 	</section>
 }
 

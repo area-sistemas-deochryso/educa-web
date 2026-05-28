@@ -17,15 +17,19 @@ import { PaginatorModule, PaginatorState } from 'primeng/paginator';
 import { SelectModule } from 'primeng/select';
 import { TooltipModule } from 'primeng/tooltip';
 
+import { DecimalPipe } from '@angular/common';
+
 import { logger } from '@core/helpers';
 import {
 	DeferEventTipo,
 	EmailDeferEventDto,
 	EmailDeferEventFiltros,
 } from '@data/models';
+import { MiniSparklineComponent } from '@intranet-shared/components';
 import { UiMappingService } from '@intranet-shared/services';
 
 import { EmailDeferEventsService } from '../../services';
+import { trendSummary, TrendSummary } from '../../utils/trend-summary';
 import { DeferEventItemComponent } from '../defer-event-item/defer-event-item.component';
 import { DomainBlockedAlertBannerComponent } from '../domain-blocked-alert-banner/domain-blocked-alert-banner.component';
 
@@ -40,6 +44,7 @@ const PAGE_SIZE = 25;
 	selector: 'app-defer-events-tab',
 	standalone: true,
 	imports: [
+		DecimalPipe,
 		FormsModule,
 		ButtonModule,
 		DatePickerModule,
@@ -47,6 +52,7 @@ const PAGE_SIZE = 25;
 		PaginatorModule,
 		SelectModule,
 		TooltipModule,
+		MiniSparklineComponent,
 		DeferEventItemComponent,
 		DomainBlockedAlertBannerComponent,
 	],
@@ -85,11 +91,20 @@ export class DeferEventsTabComponent implements OnInit {
 	readonly filterDesde = this._filterDesde.asReadonly();
 	readonly filterHasta = this._filterHasta.asReadonly();
 
+	private readonly _trend = signal<readonly number[]>([]);
+	private readonly _trendLoading = signal(false);
+	readonly trend = this._trend.asReadonly();
+	readonly trendLoading = this._trendLoading.asReadonly();
+	readonly trendSummaryValue = computed<TrendSummary>(() => trendSummary(this._trend()));
+	readonly trendTotal = computed(() => this._trend().reduce((a, b) => a + b, 0));
+	readonly hasTrend = computed(() => this._trend().length > 0);
+
 	readonly first = computed(() => (this._page() - 1) * PAGE_SIZE);
 	readonly hasEvents = computed(() => this._events().length > 0);
 
 	ngOnInit(): void {
 		this.loadCatalogoTipos();
+		this.loadTrend();
 
 		// Cross-link from defer-fail widget: ?desde=hoy&tipo=<tipo>
 		this.route.queryParamMap
@@ -107,6 +122,22 @@ export class DeferEventsTabComponent implements OnInit {
 					this._filterTipo.set(tipo);
 				}
 				this.loadData();
+			});
+	}
+
+	private loadTrend(): void {
+		this._trendLoading.set(true);
+		this.api
+			.getTrend()
+			.pipe(takeUntilDestroyed(this.destroyRef))
+			.subscribe({
+				next: (data) => {
+					this._trend.set(data);
+					this._trendLoading.set(false);
+				},
+				error: () => {
+					this._trendLoading.set(false);
+				},
 			});
 	}
 

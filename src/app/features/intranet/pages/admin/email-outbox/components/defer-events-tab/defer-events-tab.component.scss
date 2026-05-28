@@ -2,6 +2,52 @@
 	display: block;
 }
 
+.defer-stats-section {
+	display: flex;
+	align-items: center;
+	gap: 0.75rem;
+	margin-bottom: 1rem;
+	flex-wrap: wrap;
+}
+
+.stat-pill {
+	display: flex;
+	align-items: center;
+	gap: 0.5rem;
+	padding: 0.5rem 0.85rem;
+	border-radius: 999px;
+	background: transparent;
+	border: 1px solid var(--surface-300);
+	color: var(--text-color);
+
+	&-label {
+		font-size: 0.75rem;
+		font-weight: 600;
+		text-transform: uppercase;
+		letter-spacing: 0.5px;
+		color: var(--text-color-secondary);
+	}
+
+	&-value {
+		font-size: 0.95rem;
+		font-weight: 700;
+		color: var(--text-color);
+	}
+}
+
+.stat-sparkline-inline {
+	display: flex;
+	align-items: center;
+	gap: 0.5rem;
+	min-width: 120px;
+}
+
+.stat-trend-summary {
+	font-size: 0.65rem;
+	color: var(--text-color-secondary);
+	white-space: nowrap;
+}
+
 .filters-bar {
 	display: flex;
 	align-items: center;

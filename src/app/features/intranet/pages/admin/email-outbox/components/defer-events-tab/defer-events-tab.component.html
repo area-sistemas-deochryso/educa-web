@@ -1,5 +1,26 @@
 <app-domain-blocked-alert-banner />
 
+<!-- #region Stats + sparkline 30d -->
+@if (hasTrend()) {
+	<section class="defer-stats-section">
+		<div class="stat-pill">
+			<span class="stat-pill-label">Total 30d</span>
+			<span class="stat-pill-value">{{ trendTotal() | number }}</span>
+		</div>
+		<div class="stat-sparkline-inline">
+			<app-mini-sparkline
+				[data]="trend()"
+				color="var(--yellow-500)"
+				ariaLabel="Tendencia últimos 30 días: defer events"
+			/>
+			<span class="stat-trend-summary">
+				promedio 7d: {{ trendSummaryValue().avg7d | number }} · máx 30d: {{ trendSummaryValue().max30d | number }}
+			</span>
+		</div>
+	</section>
+}
+<!-- #endregion -->
+
 <div class="filters-bar">
 	<p-select
 		[options]="tipoOptions()"

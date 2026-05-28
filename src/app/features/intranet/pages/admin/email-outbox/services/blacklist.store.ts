@@ -35,6 +35,8 @@ export class BlacklistStore extends BaseCrudStore<
 	private readonly _drawerVisible = signal(false);
 	private readonly _drawerItem = signal<EmailBlacklistEntry | null>(null);
 	private readonly _tableReady = signal(false);
+	private readonly _trend = signal<readonly number[]>([]);
+	private readonly _trendLoading = signal(false);
 	// #endregion
 
 	// #region Lecturas públicas adicionales
@@ -43,6 +45,8 @@ export class BlacklistStore extends BaseCrudStore<
 	readonly drawerVisible = this._drawerVisible.asReadonly();
 	readonly drawerItem = this._drawerItem.asReadonly();
 	readonly tableReady = this._tableReady.asReadonly();
+	readonly trend = this._trend.asReadonly();
+	readonly trendLoading = this._trendLoading.asReadonly();
 
 	/**
 	 * Indica si hay filtros activos (search, estado, motivo) — usado por la
@@ -92,6 +96,16 @@ export class BlacklistStore extends BaseCrudStore<
 	// #region Table ready
 	setTableReady(ready: boolean): void {
 		this._tableReady.set(ready);
+	}
+	// #endregion
+
+	// #region Trend
+	setTrend(data: readonly number[]): void {
+		this._trend.set(data);
+	}
+
+	setTrendLoading(loading: boolean): void {
+		this._trendLoading.set(loading);
 	}
 	// #endregion
 

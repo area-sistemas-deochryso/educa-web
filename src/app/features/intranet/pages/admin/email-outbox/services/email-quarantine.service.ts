@@ -60,5 +60,10 @@ export class EmailQuarantineService {
 			request,
 		);
 	}
+
+	getTrend(days = 30): Observable<number[]> {
+		const params = new HttpParams().set('days', days);
+		return this.http.get<number[]>(`${this.apiBase}/trend`, { params });
+	}
 	// #endregion
 }

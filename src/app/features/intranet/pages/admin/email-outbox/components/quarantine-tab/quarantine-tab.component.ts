@@ -1,9 +1,11 @@
 import {
 	ChangeDetectionStrategy,
 	Component,
+	computed,
 	OnInit,
 	inject,
 } from '@angular/core';
+import { DecimalPipe } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ButtonModule } from 'primeng/button';
 import { ConfirmDialogModule } from 'primeng/confirmdialog';
@@ -13,7 +15,7 @@ import { SelectModule } from 'primeng/select';
 import { TableLazyLoadEvent } from 'primeng/table';
 import { TooltipModule } from 'primeng/tooltip';
 
-import { TableSkeletonComponent } from '@intranet-shared/components';
+import { MiniSparklineComponent, TableSkeletonComponent } from '@intranet-shared/components';
 import {
 	CrearEmailQuarantineDto,
 	EMAIL_QUARANTINE_MOTIVOS,
@@ -28,6 +30,7 @@ import {
 	EmailQuarantineDataFacade,
 	EmailQuarantineUiFacade,
 } from '../../services';
+import { trendSummary, TrendSummary } from '../../utils/trend-summary';
 import { QuarantineTableComponent } from '../quarantine-table/quarantine-table.component';
 import { QuarantineAddDialogComponent } from '../quarantine-add-dialog/quarantine-add-dialog.component';
 import { QuarantineDetailDrawerComponent } from '../quarantine-detail-drawer/quarantine-detail-drawer.component';
@@ -58,6 +61,7 @@ const MOTIVO_OPTIONS: SelectOption<QuarantineMotivo>[] = EMAIL_QUARANTINE_MOTIVO
 	selector: 'app-quarantine-tab',
 	standalone: true,
 	imports: [
+		DecimalPipe,
 		FormsModule,
 		ButtonModule,
 		InputTextModule,
@@ -65,6 +69,7 @@ const MOTIVO_OPTIONS: SelectOption<QuarantineMotivo>[] = EMAIL_QUARANTINE_MOTIVO
 		TooltipModule,
 		ConfirmDialogModule,
 		TableSkeletonComponent,
+		MiniSparklineComponent,
 		QuarantineTableComponent,
 		QuarantineAddDialogComponent,
 		QuarantineDetailDrawerComponent,
@@ -86,8 +91,11 @@ export class QuarantineTabComponent implements OnInit {
 	readonly estadoOptions = ESTADO_OPTIONS;
 	readonly motivoOptions = MOTIVO_OPTIONS;
 
+	readonly trendSummaryValue = computed<TrendSummary>(() => trendSummary(this.vm().trend));
+
 	ngOnInit(): void {
 		this.dataFacade.loadData();
+		this.dataFacade.loadTrend();
 	}
 
 	onSearchChange(term: string): void {

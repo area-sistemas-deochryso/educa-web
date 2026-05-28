@@ -39,6 +39,8 @@ export class BlacklistDataFacade {
 		drawerVisible: this.store.drawerVisible(),
 		drawerItem: this.store.drawerItem(),
 		formData: this.store.formData(),
+		trend: this.store.trend(),
+		trendLoading: this.store.trendLoading(),
 	}));
 	// #endregion
 
@@ -151,6 +153,25 @@ export class BlacklistDataFacade {
 		const ratio = items.length > 0 ? activasEnPagina / items.length : 0;
 		const activas = Math.round(total * ratio);
 		return { total, activas, inactivas: Math.max(0, total - activas) };
+	}
+	// #endregion
+
+	// #region Trend (30d sparkline)
+	loadTrend(): void {
+		if (this.store.trendLoading()) return;
+		this.store.setTrendLoading(true);
+		this.api
+			.getTrend()
+			.pipe(takeUntilDestroyed(this.destroyRef))
+			.subscribe({
+				next: (data) => {
+					this.store.setTrend(data);
+					this.store.setTrendLoading(false);
+				},
+				error: () => {
+					this.store.setTrendLoading(false);
+				},
+			});
 	}
 	// #endregion
 

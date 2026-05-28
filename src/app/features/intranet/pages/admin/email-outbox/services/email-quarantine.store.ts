@@ -37,6 +37,8 @@ export class EmailQuarantineStore extends BaseCrudStore<
 	private readonly _drawerItem = signal<EmailQuarantineListaDto | null>(null);
 	private readonly _drawerDetalle = signal<EmailQuarantineDetalleDto | null>(null);
 	private readonly _tableReady = signal(false);
+	private readonly _trend = signal<readonly number[]>([]);
+	private readonly _trendLoading = signal(false);
 	// #endregion
 
 	// #region Lecturas adicionales
@@ -46,6 +48,8 @@ export class EmailQuarantineStore extends BaseCrudStore<
 	readonly drawerItem = this._drawerItem.asReadonly();
 	readonly drawerDetalle = this._drawerDetalle.asReadonly();
 	readonly tableReady = this._tableReady.asReadonly();
+	readonly trend = this._trend.asReadonly();
+	readonly trendLoading = this._trendLoading.asReadonly();
 
 	readonly hasActiveFilters = computed(
 		() => !!this.searchTerm() || !!this._filterMotivo() || !!this._filterEstadoQ(),
@@ -96,6 +100,16 @@ export class EmailQuarantineStore extends BaseCrudStore<
 	// #region Skeleton
 	setTableReady(ready: boolean): void {
 		this._tableReady.set(ready);
+	}
+	// #endregion
+
+	// #region Trend
+	setTrend(data: readonly number[]): void {
+		this._trend.set(data);
+	}
+
+	setTrendLoading(loading: boolean): void {
+		this._trendLoading.set(loading);
 	}
 	// #endregion
 

@@ -47,6 +47,20 @@
 		opacity: 0.85;
 	}
 }
+
+.stat-sparkline-inline {
+	display: flex;
+	align-items: center;
+	gap: 0.5rem;
+	margin-left: auto;
+	min-width: 120px;
+}
+
+.stat-trend-summary {
+	font-size: 0.65rem;
+	color: var(--text-color-secondary);
+	white-space: nowrap;
+}
 // #endregion
 
 // #region Filter bar

@@ -1,11 +1,13 @@
 import {
 	ChangeDetectionStrategy,
 	Component,
+	computed,
 	DestroyRef,
 	OnInit,
 	inject,
 	signal,
 } from '@angular/core';
+import { DecimalPipe } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute } from '@angular/router';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
@@ -19,7 +21,7 @@ import { SelectModule } from 'primeng/select';
 import { TableLazyLoadEvent } from 'primeng/table';
 import { TooltipModule } from 'primeng/tooltip';
 
-import { TableSkeletonComponent } from '@intranet-shared/components';
+import { MiniSparklineComponent, TableSkeletonComponent } from '@intranet-shared/components';
 import {
 	CrearBlacklistRequest,
 	EmailBlacklistEntry,
@@ -32,6 +34,7 @@ import {
 	BlacklistDataFacade,
 	BlacklistUiFacade,
 } from '../../services';
+import { trendSummary, TrendSummary } from '../../utils/trend-summary';
 import { BlacklistTableComponent } from '../blacklist-table/blacklist-table.component';
 import { BlacklistAddDialogComponent } from '../blacklist-add-dialog/blacklist-add-dialog.component';
 import { BlacklistDetailDrawerComponent } from '../blacklist-detail-drawer/blacklist-detail-drawer.component';
@@ -64,6 +67,7 @@ const MOTIVO_OPTIONS: SelectOption<EmailBlacklistMotivo>[] = [
 	selector: 'app-blacklist-tab',
 	standalone: true,
 	imports: [
+		DecimalPipe,
 		FormsModule,
 		ButtonModule,
 		InputTextModule,
@@ -73,6 +77,7 @@ const MOTIVO_OPTIONS: SelectOption<EmailBlacklistMotivo>[] = [
 		ConfirmDialogModule,
 		DialogModule,
 		TableSkeletonComponent,
+		MiniSparklineComponent,
 		BlacklistTableComponent,
 		BlacklistAddDialogComponent,
 		BlacklistDetailDrawerComponent,
@@ -103,10 +108,13 @@ export class BlacklistTabComponent implements OnInit {
 	private unblockTarget: EmailBlacklistEntry | null = null;
 
 	readonly MIN_MOTIVO_LENGTH = 20;
+
+	readonly trendSummaryValue = computed<TrendSummary>(() => trendSummary(this.vm().trend));
 	// #endregion
 
 	ngOnInit(): void {
 		this.dataFacade.loadData();
+		this.dataFacade.loadTrend();
 
 		// Cross-link Plan 39 Chat C: prefill del dialog cuando se navega
 		// con `?action=add&correo=...` desde el dashboard.

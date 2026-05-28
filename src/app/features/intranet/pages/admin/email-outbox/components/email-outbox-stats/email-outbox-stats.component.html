@@ -29,6 +29,18 @@
 			<span class="stat-value">{{ stats().enviados | number }}</span>
 			<span class="stat-label">Enviados</span>
 		</div>
+		@if (hasTrend()) {
+			<div class="stat-sparkline">
+				<app-mini-sparkline
+					[data]="sentTrend()"
+					color="var(--green-500)"
+					[ariaLabel]="'Tendencia últimos 30 días: enviados'"
+				/>
+				<span class="stat-trend-summary">
+					promedio 7d: {{ sentSummary().avg7d | number }} · máx 30d: {{ sentSummary().max30d | number }}
+				</span>
+			</div>
+		}
 	</div>
 
 	<div class="stat-card">
@@ -39,6 +51,18 @@
 			<span class="stat-value">{{ stats().fallidos | number }}</span>
 			<span class="stat-label">Fallidos</span>
 		</div>
+		@if (hasTrend()) {
+			<div class="stat-sparkline">
+				<app-mini-sparkline
+					[data]="failedTrend()"
+					color="var(--red-500)"
+					[ariaLabel]="'Tendencia últimos 30 días: fallidos'"
+				/>
+				<span class="stat-trend-summary">
+					promedio 7d: {{ failedSummary().avg7d | number }} · máx 30d: {{ failedSummary().max30d | number }}
+				</span>
+			</div>
+		}
 	</div>
 
 	<div class="stat-card">

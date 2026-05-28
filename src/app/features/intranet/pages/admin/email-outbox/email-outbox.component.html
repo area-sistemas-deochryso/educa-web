@@ -15,7 +15,7 @@
 		@if (!vm().statsReady) {
 			<app-stats-skeleton [count]="4" iconPosition="left" />
 		} @else {
-			<app-email-outbox-stats [stats]="vm().estadisticas" />
+			<app-email-outbox-stats [stats]="vm().estadisticas" [tendencias]="vm().tendencias" />
 		}
 	</div>
 	@if (vm().tendenciasReady && vm().tendencias.length > 0) {
