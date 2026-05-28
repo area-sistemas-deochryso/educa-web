@@ -24,6 +24,7 @@ export class ErrorGroupsStore {
 	// #region Estado privado — listado
 	private readonly _items = signal<ErrorGroupLista[]>([]);
 	private readonly _loading = signal(false);
+	private readonly _error = signal<string | null>(null);
 	private readonly _tableReady = signal(false);
 	private readonly _totalCount = signal<number | null>(null);
 	private readonly _page = signal(1);
@@ -70,6 +71,7 @@ export class ErrorGroupsStore {
 	// #region Lecturas públicas — listado
 	readonly items = this._items.asReadonly();
 	readonly loading = this._loading.asReadonly();
+	readonly error = this._error.asReadonly();
 	readonly tableReady = this._tableReady.asReadonly();
 	readonly totalCount = this._totalCount.asReadonly();
 	readonly page = this._page.asReadonly();
@@ -142,6 +144,10 @@ export class ErrorGroupsStore {
 
 	setLoading(loading: boolean): void {
 		this._loading.set(loading);
+	}
+
+	setError(error: string | null): void {
+		this._error.set(error);
 	}
 
 	setTableReady(ready: boolean): void {

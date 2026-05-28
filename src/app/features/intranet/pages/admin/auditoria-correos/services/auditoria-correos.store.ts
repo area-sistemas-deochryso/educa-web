@@ -7,6 +7,7 @@ export class AuditoriaCorreosStore {
 	// #region Estado privado
 	private readonly _items = signal<AuditoriaCorreoAsistenciaDto[]>([]);
 	private readonly _loading = signal(false);
+	private readonly _error = signal<string | null>(null);
 	private readonly _tableReady = signal(false);
 
 	private readonly _filterTipo = signal<TipoOrigenAuditoria | null>(null);
@@ -16,6 +17,7 @@ export class AuditoriaCorreosStore {
 	// #region Lecturas públicas
 	readonly items = this._items.asReadonly();
 	readonly loading = this._loading.asReadonly();
+	readonly error = this._error.asReadonly();
 	readonly tableReady = this._tableReady.asReadonly();
 	readonly filterTipo = this._filterTipo.asReadonly();
 	readonly searchTerm = this._searchTerm.asReadonly();
@@ -62,6 +64,7 @@ export class AuditoriaCorreosStore {
 		items: this.filteredItems(),
 		universeTotal: this._items().length,
 		loading: this._loading(),
+		error: this._error(),
 		tableReady: this._tableReady(),
 		filterTipo: this._filterTipo(),
 		searchTerm: this._searchTerm(),
@@ -77,6 +80,10 @@ export class AuditoriaCorreosStore {
 
 	setLoading(loading: boolean): void {
 		this._loading.set(loading);
+	}
+
+	setError(error: string | null): void {
+		this._error.set(error);
 	}
 
 	setTableReady(ready: boolean): void {

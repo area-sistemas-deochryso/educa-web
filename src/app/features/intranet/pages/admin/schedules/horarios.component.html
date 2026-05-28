@@ -39,6 +39,13 @@
 	}
 </app-page-header>
 
+@if (vm().error) {
+	<div class="error-banner">
+		<i class="pi pi-exclamation-triangle"></i>
+		<span>{{ vm().error }}</span>
+	</div>
+}
+
 <!-- * Estadisticas -->
 @if (vm().statsReady) {
 	<div class="stats-grid">

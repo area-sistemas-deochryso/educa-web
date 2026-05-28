@@ -20,6 +20,7 @@ export class CampusAdminStore {
 	private readonly _selectedPisoId = signal<number | null>(null);
 	private readonly _pisoCompleto = signal<CampusPisoCompletoDto | null>(null);
 	private readonly _loading = signal(false);
+	private readonly _error = signal<string | null>(null);
 	private readonly _editorLoading = signal(false);
 	private readonly _saving = signal(false);
 
@@ -53,6 +54,7 @@ export class CampusAdminStore {
 	readonly selectedPisoId = this._selectedPisoId.asReadonly();
 	readonly pisoCompleto = this._pisoCompleto.asReadonly();
 	readonly loading = this._loading.asReadonly();
+	readonly error = this._error.asReadonly();
 	readonly editorLoading = this._editorLoading.asReadonly();
 	readonly saving = this._saving.asReadonly();
 
@@ -129,6 +131,7 @@ export class CampusAdminStore {
 		selectedPiso: this.selectedPiso(),
 		pisoCompleto: this._pisoCompleto(),
 		loading: this._loading(),
+		error: this._error(),
 		editorLoading: this._editorLoading(),
 		saving: this._saving(),
 		hasPisos: this.hasPisos(),
@@ -179,6 +182,9 @@ export class CampusAdminStore {
 	}
 	setLoading(loading: boolean): void {
 		this._loading.set(loading);
+	}
+	setError(error: string | null): void {
+		this._error.set(error);
 	}
 	setEditorLoading(loading: boolean): void {
 		this._editorLoading.set(loading);

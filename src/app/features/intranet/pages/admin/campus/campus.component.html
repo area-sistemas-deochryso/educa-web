@@ -74,6 +74,13 @@
 		}
 		<!-- #endregion -->
 
+		@if (vm().error) {
+			<div class="error-banner">
+				<i class="pi pi-exclamation-triangle"></i>
+				<span>{{ vm().error }}</span>
+			</div>
+		}
+
 		<!-- #region Editor canvas -->
 		@if (vm().selectedPisoId) {
 			<app-campus-editor

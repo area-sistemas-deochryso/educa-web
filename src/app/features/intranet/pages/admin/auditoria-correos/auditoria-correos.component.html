@@ -19,6 +19,13 @@
 <!-- Plan 39 Chat D — Banner B9 cross-páginas (defer-fail / mailbox-full) -->
 <app-email-defer-fail-banner />
 
+@if (vm().error) {
+	<div class="error-banner">
+		<i class="pi pi-exclamation-triangle"></i>
+		<span>{{ vm().error }}</span>
+	</div>
+}
+
 @if (!vm().tableReady) {
 	<app-auditoria-correos-skeleton />
 } @else {

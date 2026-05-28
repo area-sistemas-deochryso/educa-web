@@ -27,6 +27,13 @@
 		</div>
 	}
 
+	@if (vm().error) {
+		<div class="error-banner">
+			<i class="pi pi-exclamation-triangle"></i>
+			<span>{{ vm().error }}</span>
+		</div>
+	}
+
 	@if (!vm().statsReady) {
 		<app-users-stats-skeleton />
 	} @else if (vm().hasEstadisticas) {

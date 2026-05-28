@@ -72,6 +72,11 @@
 					<td>{{ row.fecha | date: 'dd/MM/yyyy HH:mm:ss' }}</td>
 				</tr>
 			</ng-template>
+			<ng-template pTemplate="emptymessage">
+				<tr>
+					<td colspan="7" class="text-center p-4">No hay eventos de rate-limit asociados a esta correlación.</td>
+				</tr>
+			</ng-template>
 		</p-table>
 
 		@if (cappedRows()) {

@@ -109,6 +109,11 @@
 								<td class="hit-message">{{ hit.smtpMessage }}</td>
 							</tr>
 						</ng-template>
+						<ng-template pTemplate="emptymessage">
+							<tr>
+								<td colspan="3" class="text-center p-4">Sin hits registrados.</td>
+							</tr>
+						</ng-template>
 					</p-table>
 				} @else {
 					<span class="hits-empty">Sin hits previos registrados</span>

@@ -20,6 +20,15 @@ import {
  */
 @Injectable({ providedIn: 'root' })
 export class EmailMonitoreoStore {
+	// #region Error global
+	private readonly _error = signal<string | null>(null);
+	readonly error = this._error.asReadonly();
+
+	setError(error: string | null): void {
+		this._error.set(error);
+	}
+	// #endregion
+
 	// #region Filtros
 	private readonly _filters = signal<MapaEnvioFilters>({ ...MAPA_ENVIO_DEFAULTS });
 	readonly filters = this._filters.asReadonly();
@@ -143,6 +152,7 @@ export class EmailMonitoreoStore {
 
 	// #region ViewModel agregado
 	readonly vm = computed(() => ({
+		error: this._error(),
 		filters: this._filters(),
 		deferFailStatus: this._deferFailStatus(),
 		deferFailLoading: this._deferFailLoading(),

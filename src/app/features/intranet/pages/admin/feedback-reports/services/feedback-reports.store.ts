@@ -19,6 +19,7 @@ export class FeedbackReportsStore {
 	private readonly _items = signal<ReporteUsuarioListaDto[]>([]);
 	private readonly _estadisticas = signal<ReporteUsuarioEstadisticasDto | null>(null);
 	private readonly _loading = signal(false);
+	private readonly _error = signal<string | null>(null);
 	private readonly _statsReady = signal(false);
 	private readonly _tableReady = signal(false);
 
@@ -41,6 +42,7 @@ export class FeedbackReportsStore {
 	readonly items = this._items.asReadonly();
 	readonly estadisticas = this._estadisticas.asReadonly();
 	readonly loading = this._loading.asReadonly();
+	readonly error = this._error.asReadonly();
 	readonly statsReady = this._statsReady.asReadonly();
 	readonly tableReady = this._tableReady.asReadonly();
 	readonly filterTipo = this._filterTipo.asReadonly();
@@ -64,6 +66,7 @@ export class FeedbackReportsStore {
 		items: this._items(),
 		estadisticas: this._estadisticas(),
 		loading: this._loading(),
+		error: this._error(),
 		statsReady: this._statsReady(),
 		tableReady: this._tableReady(),
 		filterTipo: this._filterTipo(),
@@ -89,6 +92,9 @@ export class FeedbackReportsStore {
 	}
 	setLoading(v: boolean): void {
 		this._loading.set(v);
+	}
+	setError(error: string | null): void {
+		this._error.set(error);
 	}
 	setStatsReady(v: boolean): void {
 		this._statsReady.set(v);

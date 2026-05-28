@@ -104,6 +104,7 @@ export class ErrorGroupsComponent implements OnInit {
 	readonly items = this.store.visibleItems;
 	readonly stats = this.store.stats;
 	readonly loading = this.store.loading;
+	readonly error = this.store.error;
 	readonly tableReady = this.store.tableReady;
 
 	readonly filterEstado = this.store.filterEstado;

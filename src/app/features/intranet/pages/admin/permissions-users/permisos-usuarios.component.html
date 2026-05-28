@@ -13,6 +13,13 @@
 		></button>
 	</app-page-header>
 
+	@if (vm().error) {
+		<div class="error-banner">
+			<i class="pi pi-exclamation-triangle"></i>
+			<span>{{ vm().error }}</span>
+		</div>
+	}
+
 	<!-- * Filters -->
 	<section class="filters-section">
 		<div class="search-box">

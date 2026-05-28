@@ -88,6 +88,11 @@
 					</td>
 				</tr>
 			</ng-template>
+			<ng-template pTemplate="emptymessage">
+				<tr>
+					<td colspan="8" class="text-center p-4">No hay reportes asociados a esta correlación.</td>
+				</tr>
+			</ng-template>
 		</p-table>
 
 		@if (cappedRows()) {

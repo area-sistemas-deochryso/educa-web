@@ -18,6 +18,13 @@
 	</app-page-header>
 	<!-- #endregion -->
 
+	@if (vm().error) {
+		<div class="error-banner">
+			<i class="pi pi-exclamation-triangle"></i>
+			<span>{{ vm().error }}</span>
+		</div>
+	}
+
 	<!-- #region Stats -->
 	@if (vm().statsReady && vm().estadisticas; as stats) {
 		<section class="stats-section">

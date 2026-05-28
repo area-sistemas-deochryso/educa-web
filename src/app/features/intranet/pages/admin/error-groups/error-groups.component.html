@@ -18,6 +18,13 @@
 </app-page-header>
 <!-- #endregion -->
 
+@if (error()) {
+	<div class="error-banner">
+		<i class="pi pi-exclamation-triangle"></i>
+		<span>{{ error() }}</span>
+	</div>
+}
+
 <!-- #region Stats -->
 <section class="stats-section">
 	<div class="stat-card">

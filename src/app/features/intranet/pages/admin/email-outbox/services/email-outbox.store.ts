@@ -24,6 +24,7 @@ export class EmailOutboxStore {
 		porcentajeExito: 0,
 	});
 	private readonly _loading = signal(false);
+	private readonly _error = signal<string | null>(null);
 	private readonly _statsReady = signal(false);
 	private readonly _tableReady = signal(false);
 
@@ -73,6 +74,7 @@ export class EmailOutboxStore {
 	readonly items = this._items.asReadonly();
 	readonly estadisticas = this._estadisticas.asReadonly();
 	readonly loading = this._loading.asReadonly();
+	readonly error = this._error.asReadonly();
 	readonly statsReady = this._statsReady.asReadonly();
 	readonly tableReady = this._tableReady.asReadonly();
 	readonly page = this._page.asReadonly();
@@ -131,6 +133,7 @@ export class EmailOutboxStore {
 		items: this.filteredItems(),
 		estadisticas: this._estadisticas(),
 		loading: this._loading(),
+		error: this._error(),
 		statsReady: this._statsReady(),
 		tableReady: this._tableReady(),
 		page: this._page(),
@@ -175,6 +178,10 @@ export class EmailOutboxStore {
 
 	setLoading(loading: boolean): void {
 		this._loading.set(loading);
+	}
+
+	setError(error: string | null): void {
+		this._error.set(error);
 	}
 
 	setStatsReady(ready: boolean): void {
