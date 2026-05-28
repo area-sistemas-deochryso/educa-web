@@ -1,4 +1,4 @@
-import { Injectable, signal } from '@angular/core';
+import { Injectable, computed, signal } from '@angular/core';
 import * as signalR from '@microsoft/signalr';
 import { Subject } from 'rxjs';
 import { logger } from '@core/helpers';
@@ -27,12 +27,14 @@ export class SignalRService {
 	private connection: signalR.HubConnection | null = null;
 	private readonly _connected = signal(false);
 	private readonly _reconnecting = signal(false);
+	private readonly _wasConnected = signal(false);
 	private readonly joinedGroups = new Set<number>();
 	// #endregion
 
 	// #region Lecturas públicas
 	readonly connected = this._connected.asReadonly();
 	readonly reconnecting = this._reconnecting.asReadonly();
+	readonly disconnected = computed(() => this._wasConnected() && !this._connected() && !this._reconnecting());
 	// #endregion
 
 	// #region Event subjects
@@ -66,6 +68,7 @@ export class SignalRService {
 		try {
 			await this.connection.start();
 			this._connected.set(true);
+			this._wasConnected.set(true);
 			logger.log('SignalR: Conectado al hub');
 		} catch (err) {
 			logger.error('SignalR: Error al conectar', err);
@@ -86,6 +89,7 @@ export class SignalRService {
 		}
 		this.connection = null;
 		this._connected.set(false);
+		this._wasConnected.set(false);
 		logger.log('SignalR: Desconectado');
 	}
 	// #endregion

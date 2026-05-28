@@ -6,6 +6,7 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
 import { AuthService } from '@core/services/auth';
 import { UserPermissionsService } from '@core/services/permissions';
+import { ErrorHandlerService } from '@core/services/error';
 import { SwService } from '@core/services/sw';
 import { StorageService } from '@core/services/storage';
 import { SessionRefreshService } from './session-refresh.service';
@@ -43,6 +44,7 @@ export class SessionActivityService {
 	private coordinator = inject(SessionCoordinatorService);
 	private authService = inject(AuthService);
 	private userPermissionsService = inject(UserPermissionsService);
+	private errorHandler = inject(ErrorHandlerService);
 	private swService = inject(SwService);
 	private storage = inject(StorageService);
 	private router = inject(Router);
@@ -143,6 +145,12 @@ export class SessionActivityService {
 	forceLogout(): void {
 		if (this._isLoggingOut) return;
 		this._isLoggingOut = true;
+
+		this.errorHandler.showWarning(
+			'Sesión expirada',
+			'Tu sesión expiró. Iniciá sesión de nuevo.',
+			5000,
+		);
 
 		this.coordinator.broadcast({ type: 'logout' });
 		this.stop();

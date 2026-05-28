@@ -1,4 +1,4 @@
-import { Injectable, signal } from '@angular/core';
+import { Injectable, computed, signal } from '@angular/core';
 import * as signalR from '@microsoft/signalr';
 import { Subject } from 'rxjs';
 
@@ -33,12 +33,14 @@ export class EmailHubService {
 	private connection: signalR.HubConnection | null = null;
 	private readonly _connected = signal(false);
 	private readonly _reconnecting = signal(false);
+	private readonly _wasConnected = signal(false);
 	private joined = false;
 	// #endregion
 
 	// #region Lecturas públicas
 	readonly connected = this._connected.asReadonly();
 	readonly reconnecting = this._reconnecting.asReadonly();
+	readonly disconnected = computed(() => this._wasConnected() && !this._connected() && !this._reconnecting());
 	// #endregion
 
 	// #region Event subjects
@@ -74,6 +76,7 @@ export class EmailHubService {
 		try {
 			await this.connection.start();
 			this._connected.set(true);
+			this._wasConnected.set(true);
 			logger.tagged(LOG_TAG, 'log', 'connected');
 			await this.joinAlerts();
 		} catch (err) {
@@ -96,6 +99,7 @@ export class EmailHubService {
 		}
 		this.connection = null;
 		this._connected.set(false);
+		this._wasConnected.set(false);
 		this.joined = false;
 		logger.tagged(LOG_TAG, 'log', 'disconnected');
 	}

@@ -12,13 +12,13 @@
 - WAL HTTP timeout — `sendWalEntryRequest` cuelga indefinidamente sin timeout.
 - Mutation error UX — toast genérico sin distinción de causa ni botón "Reintentar".
 
-### P0.2 — Resiliencia de sesión y red
+### P0.2 — Resiliencia de sesión y red ✅
 
 **Intent**: el usuario debe saber si está offline, si el servidor cayó, y si su sesión expiró, con acciones claras en cada caso.
 
-- Error interceptor — distinguir status 0 (offline) vs 5xx (server) vs timeout.
-- Token refresh offline — logout silencioso → feedback + reintento al reconectar.
-- SignalR UI — exponer estado de conexión en la UI (badge/banner).
+- ✅ Error interceptor — `classifyError()` distingue offline/timeout/server-unreachable/server-error/client-error (brief 262).
+- ✅ Token refresh offline — toast "Sesión expirada" antes de forceLogout (brief 262).
+- ✅ SignalR UI — signal `disconnected` + banner rojo en connection-status-indicator (brief 262).
 
 ### P0.3 — UI defensiva en páginas admin
 

@@ -11,10 +11,15 @@ import { SwService } from '@app/features/intranet/services/sw/sw.service';
 	standalone: true,
 	changeDetection: ChangeDetectionStrategy.OnPush,
 	template: `
-		@if (showBanner()) {
-			<div class="connection-banner" role="status">
+		@if (showReconnecting()) {
+			<div class="connection-banner reconnecting" role="status">
 				<i class="pi pi-spin pi-spinner"></i>
 				<span>Reconectando actualizaciones en tiempo real...</span>
+			</div>
+		} @else if (showDisconnected()) {
+			<div class="connection-banner disconnected" role="alert">
+				<i class="pi pi-exclamation-triangle"></i>
+				<span>Conexión perdida — las actualizaciones en tiempo real no están disponibles</span>
 			</div>
 		}
 	`,
@@ -25,12 +30,19 @@ import { SwService } from '@app/features/intranet/services/sw/sw.service';
 			justify-content: center;
 			gap: 0.5rem;
 			padding: 0.5rem 1rem;
-			background: var(--yellow-500);
 			color: #fff;
 			font-size: 0.85rem;
 			font-weight: 500;
 			z-index: 1000;
 			text-align: center;
+		}
+
+		.reconnecting {
+			background: var(--yellow-500);
+		}
+
+		.disconnected {
+			background: var(--red-500);
 		}
 	`,
 })
@@ -49,5 +61,10 @@ export class ConnectionStatusIndicatorComponent {
 		() => this.chatHub.reconnecting() || this.attendanceHub.reconnecting() || this.emailHub.reconnecting(),
 	);
 
-	readonly showBanner = computed(() => !this.isOffline() && this.anyReconnecting());
+	private readonly anyDisconnected = computed(
+		() => this.chatHub.disconnected() || this.attendanceHub.disconnected() || this.emailHub.disconnected(),
+	);
+
+	readonly showReconnecting = computed(() => !this.isOffline() && this.anyReconnecting());
+	readonly showDisconnected = computed(() => !this.isOffline() && !this.anyReconnecting() && this.anyDisconnected());
 }

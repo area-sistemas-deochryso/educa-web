@@ -55,7 +55,7 @@ Planes cross-repo con sub-chats FE pendientes: **41** (Correlation Hub), **42** 
 | Pos | Key | Plan | Próximo paso concreto | Repo | Desbloquea | Gate |
 |---|---|---|---|---|---|---|
 | 2 | xP45 | Monitoreo incidencias | F2.2:FE — JOIN endpoint `/full` + vista por evento + tabla Trace | xrepo | 0 (leaf, alto valor usuario) | libre (P45:F5:BE ✅) |
-| 3 | P10 | Fallbacks críticos | P0.2-P0.3 FE (P0.1 ✅ brief 249) | local | 1 (Plan 10 F1+) | libre |
+| 3 | P10 | Fallbacks críticos | P0.3 FE (P0.1 ✅ brief 249, P0.2 ✅ brief 262) | local | 1 (Plan 10 F1+) | libre |
 
 #### Tier 3 — Independientes (sin downstream)
 
@@ -105,7 +105,7 @@ Planes cross-repo con sub-chats FE pendientes: **41** (Correlation Hub), **42** 
 ### Notas operativas
 
 - **`running/`**: vacío · **`open/`**: vacío · **`waiting/`**: vacío
-- **Último cierre**: 261 (P41 F2 FE lateral navigation) → closed/ 2026-05-28
+- **Último cierre**: 262 (P10 P0.2 session resilience) → closed/ 2026-05-28
 - **Último saneamiento**: 2026-05-28 — archivados P51, F13, F46-F48, WAL audit cerrada, cola renumerada
 
 ---

@@ -21,6 +21,21 @@ const SKIP_REFRESH_URLS = ['/login', '/verificar', '/logout', '/refresh', '/sess
 /** Max time (ms) to wait for a pending refresh before giving up. */
 const REFRESH_WAIT_TIMEOUT = 10_000;
 
+type HttpErrorClass = 'offline' | 'timeout' | 'server-unreachable' | 'server-error' | 'client-error';
+
+function classifyError(error: unknown): HttpErrorClass {
+	if (!(error instanceof HttpErrorResponse)) {
+		// RxJS TimeoutError from timeout interceptor
+		if (error instanceof Error && error.name === 'TimeoutError') return 'timeout';
+		return 'client-error';
+	}
+	if (error.status === 0) {
+		return navigator.onLine ? 'server-unreachable' : 'offline';
+	}
+	if (error.status >= 500) return 'server-error';
+	return 'client-error';
+}
+
 // #endregion
 // #region Implementation
 export const errorInterceptor: HttpInterceptorFn = (req, next) => {
@@ -31,46 +46,74 @@ export const errorInterceptor: HttpInterceptorFn = (req, next) => {
 	const requestId = req.headers.get('X-Request-Id') ?? undefined;
 
 	return next(req).pipe(
-		catchError((error: HttpErrorResponse) => {
+		catchError((error: HttpErrorResponse | Error) => {
+			const errorClass = classifyError(error);
+
+			// Timeout from RxJS — not an HttpErrorResponse, handle before any status checks
+			if (errorClass === 'timeout') {
+				logger.warn('[ErrorInterceptor] Request timeout:', req.url);
+				if (!req.headers.has('X-Skip-Error-Toast')) {
+					errorHandler.showWarning('Timeout', 'La operación tardó demasiado. Intentá nuevamente.');
+				}
+				return throwError(() => error);
+			}
+
+			// Offline — suppress toasts (offline-indicator banner handles this)
+			if (errorClass === 'offline') {
+				logger.warn('[ErrorInterceptor] Request failed (offline):', req.url);
+				return throwError(() => error);
+			}
+
+			// From here on, error is HttpErrorResponse (timeout and offline already handled)
+			const httpError = error as HttpErrorResponse;
+
 			// Never process errors from the error reporter itself (prevents infinite loop)
 			if (req.url.includes('/api/sistema/errors')) {
-				return throwError(() => error);
+				return throwError(() => httpError);
 			}
 
 			// Skip URLs handled locally (login form, token verification, refresh).
 			// BUT still report 500+ errors silently — those are backend bugs, not user errors.
 			if (SKIP_REFRESH_URLS.some((url) => req.url.includes(url))) {
-				if (error.status >= 500 || error.status === 0) {
+				if (httpError.status >= 500 || httpError.status === 0) {
 					errorReporter.reportHttpError(
-						error.status, req.url, req.method, undefined, requestId,
-						undefined, req.body, error.error);
+						httpError.status, req.url, req.method, undefined, requestId,
+						undefined, req.body, httpError.error);
 				}
-				return throwError(() => error);
+				return throwError(() => httpError);
 			}
 
 			// 401 — access token expired. Attempt refresh before forcing logout.
 			// Must run BEFORE X-Skip-Error-Toast check: silent requests still need token refresh.
-			if (error.status === 401) {
+			if (httpError.status === 401) {
 				return handle401(req, next, authApi, sessionActivity);
 			}
 
 			// Skip error toast for requests that handle their own errors locally.
 			// Still report 500+ silently for trazability.
 			if (req.headers.has('X-Skip-Error-Toast')) {
-				if (error.status >= 500 || error.status === 0) {
+				if (httpError.status >= 500 || httpError.status === 0) {
 					errorReporter.reportHttpError(
-						error.status, req.url, req.method, undefined, requestId,
-						undefined, req.body, error.error);
+						httpError.status, req.url, req.method, undefined, requestId,
+						undefined, req.body, httpError.error);
 				}
-				return throwError(() => error);
+				return throwError(() => httpError);
 			}
 
-			logger.error('[ErrorInterceptor] HTTP Error:', error.status, req.url);
+			// Server unreachable (status 0 but online) — specific message
+			if (errorClass === 'server-unreachable') {
+				logger.error('[ErrorInterceptor] Server unreachable:', req.url);
+				errorHandler.showError('Sin respuesta', 'El servidor no está disponible. Reintentá en unos minutos.');
+				errorReporter.reportHttpError(0, req.url, req.method, undefined, requestId, undefined, req.body, undefined);
+				return throwError(() => httpError);
+			}
+
+			logger.error('[ErrorInterceptor] HTTP Error:', httpError.status, req.url);
 
 			// Extract traceId and errorCode from response body
-			const errorBody = error.error as Record<string, unknown> | null;
+			const errorBody = httpError.error as Record<string, unknown> | null;
 			const traceId =
-				error.headers?.get('X-Correlation-Id') ??
+				httpError.headers?.get('X-Correlation-Id') ??
 				errorBody?.['traceId'] ??
 				undefined;
 			const errorCode = (errorBody?.['errorCode'] as string) ?? undefined;
@@ -79,7 +122,7 @@ export const errorInterceptor: HttpInterceptorFn = (req, next) => {
 			// No special-case here — the generic flow uses UI_ERROR_CODES for the message,
 			// which keeps it aligned with facade error policies (dedup relies on same detail).
 
-			errorHandler.handleHttpError(error, {
+			errorHandler.handleHttpError(httpError, {
 				url: req.url,
 				method: req.method,
 				body: req.body,
@@ -89,7 +132,7 @@ export const errorInterceptor: HttpInterceptorFn = (req, next) => {
 			});
 
 			// Re-lanzar para que los callers puedan reaccionar si lo necesitan.
-			return throwError(() => error);
+			return throwError(() => httpError);
 		}),
 	);
 };
