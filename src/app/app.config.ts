@@ -19,6 +19,7 @@ import {
 	requestTraceInterceptor,
 	schemaVersionInterceptor,
 	swCacheInvalidationInterceptor,
+	timeoutInterceptor,
 } from '@core/interceptors';
 import { provideClientHydration, withEventReplay } from '@angular/platform-browser';
 import { provideHttpClient, withFetch, withInterceptors, withXsrfConfiguration } from '@angular/common/http';
@@ -56,6 +57,7 @@ export const appConfig: ApplicationConfig = {
 				requestTraceInterceptor,
 				schemaVersionInterceptor, // Plan WAL Resilience M4 — fingerprint en cache
 				swCacheInvalidationInterceptor, // Auto-invalidate SW cache after mutations
+				timeoutInterceptor, // 30s default — opt out with X-No-Timeout header
 				apiResponseInterceptor,
 				errorInterceptor,
 			]),

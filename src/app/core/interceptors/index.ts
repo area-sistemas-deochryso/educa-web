@@ -8,5 +8,6 @@ export * from './error/error.interceptor';
 export * from './rate-limit/rate-limit.interceptor';
 export * from './schema-version/schema-version.interceptor';
 export * from './sw-cache-invalidation/sw-cache-invalidation.interceptor';
+export * from './timeout/timeout.interceptor';
 export * from './trace/request-trace.interceptor';
 // #endregion

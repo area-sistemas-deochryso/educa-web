@@ -32,11 +32,13 @@ export class EmailHubService {
 	// #region Estado privado
 	private connection: signalR.HubConnection | null = null;
 	private readonly _connected = signal(false);
+	private readonly _reconnecting = signal(false);
 	private joined = false;
 	// #endregion
 
 	// #region Lecturas públicas
 	readonly connected = this._connected.asReadonly();
+	readonly reconnecting = this._reconnecting.asReadonly();
 	// #endregion
 
 	// #region Event subjects
@@ -165,6 +167,7 @@ export class EmailHubService {
 
 		this.connection.onclose((err) => {
 			this._connected.set(false);
+			this._reconnecting.set(false);
 			this.joined = false;
 			if (err) {
 				const msg = String(err);
@@ -179,12 +182,14 @@ export class EmailHubService {
 
 		this.connection.onreconnecting(() => {
 			this._connected.set(false);
+			this._reconnecting.set(true);
 			this.joined = false;
 			logger.tagged(LOG_TAG, 'log', 'reconnecting');
 		});
 
 		this.connection.onreconnected(async () => {
 			this._connected.set(true);
+			this._reconnecting.set(false);
 			logger.tagged(LOG_TAG, 'log', 'reconnected');
 			await this.joinAlerts();
 		});

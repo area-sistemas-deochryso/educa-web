@@ -19,10 +19,12 @@ export class AttendanceSignalRService {
 	// #region Estado privado
 	private connection: signalR.HubConnection | null = null;
 	private readonly _connected = signal(false);
+	private readonly _reconnecting = signal(false);
 	// #endregion
 
 	// #region Lecturas públicas
 	readonly connected = this._connected.asReadonly();
+	readonly reconnecting = this._reconnecting.asReadonly();
 	// #endregion
 
 	// #region Event subjects
@@ -108,6 +110,7 @@ export class AttendanceSignalRService {
 
 		this.connection.onclose((err) => {
 			this._connected.set(false);
+			this._reconnecting.set(false);
 			if (err) {
 				const msg = String(err);
 				if (msg.includes('401') || msg.includes('Unauthorized')) {
@@ -121,11 +124,13 @@ export class AttendanceSignalRService {
 
 		this.connection.onreconnecting(() => {
 			this._connected.set(false);
+			this._reconnecting.set(true);
 			logger.log('AsistenciaSignalR: Reconectando...');
 		});
 
 		this.connection.onreconnected(() => {
 			this._connected.set(true);
+			this._reconnecting.set(false);
 			logger.log('AsistenciaSignalR: Reconectado');
 		});
 	}

@@ -26,11 +26,13 @@ export class SignalRService {
 	// #region Estado privado
 	private connection: signalR.HubConnection | null = null;
 	private readonly _connected = signal(false);
+	private readonly _reconnecting = signal(false);
 	private readonly joinedGroups = new Set<number>();
 	// #endregion
 
 	// #region Lecturas públicas
 	readonly connected = this._connected.asReadonly();
+	readonly reconnecting = this._reconnecting.asReadonly();
 	// #endregion
 
 	// #region Event subjects
@@ -150,6 +152,7 @@ export class SignalRService {
 
 		this.connection.onclose((err) => {
 			this._connected.set(false);
+			this._reconnecting.set(false);
 			if (err) {
 				const msg = String(err);
 				// Stop reconnecting on auth failures — session expired
@@ -164,11 +167,13 @@ export class SignalRService {
 
 		this.connection.onreconnecting(() => {
 			this._connected.set(false);
+			this._reconnecting.set(true);
 			logger.log('SignalR: Reconectando...');
 		});
 
 		this.connection.onreconnected(async () => {
 			this._connected.set(true);
+			this._reconnecting.set(false);
 			logger.log('SignalR: Reconectado');
 
 			// Re-join groups after reconnection

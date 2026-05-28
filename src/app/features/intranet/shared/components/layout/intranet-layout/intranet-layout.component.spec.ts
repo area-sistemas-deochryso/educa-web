@@ -17,6 +17,7 @@ import { OfflineIndicatorComponent } from '@intranet-shared/components/offline-i
 import { AccessDeniedModalComponent } from '@intranet-shared/components/access-denied-modal';
 import { WalMigrationBannerComponent } from '@intranet-shared/components/wal-migration-banner';
 import { WalDegradedBannerComponent } from '@intranet-shared/components/wal-degraded-banner';
+import { ConnectionStatusIndicatorComponent } from '@intranet-shared/components/connection-status-indicator/connection-status-indicator.component';
 
 @Component({ selector: 'app-feedback-report-dialog', standalone: true, template: '', changeDetection: ChangeDetectionStrategy.OnPush })
 class StubFeedbackReportDialogComponent {}
@@ -44,6 +45,9 @@ class StubWalMigrationBannerComponent {}
 
 @Component({ selector: 'app-wal-degraded-banner', standalone: true, template: '', changeDetection: ChangeDetectionStrategy.OnPush })
 class StubWalDegradedBannerComponent {}
+
+@Component({ selector: 'app-connection-status-indicator', standalone: true, template: '', changeDetection: ChangeDetectionStrategy.OnPush })
+class StubConnectionStatusIndicatorComponent {}
 
 function mockUserPermissionsService() {
 	return {
@@ -96,7 +100,7 @@ describe('IntranetLayoutComponent', () => {
 					FeedbackReportDialogComponent, FeedbackReportLauncherComponent,
 					VoiceButtonComponent, FloatingNotificationBellComponent,
 					SyncStatusComponent, OfflineIndicatorComponent,
-					AccessDeniedModalComponent, WalMigrationBannerComponent, WalDegradedBannerComponent,
+					AccessDeniedModalComponent, WalMigrationBannerComponent, WalDegradedBannerComponent, ConnectionStatusIndicatorComponent,
 				],
 			},
 			add: {
@@ -104,7 +108,7 @@ describe('IntranetLayoutComponent', () => {
 					StubFeedbackReportDialogComponent, StubFeedbackReportLauncherComponent,
 					StubVoiceButtonComponent, StubFloatingNotificationBellComponent,
 					StubSyncStatusComponent, StubOfflineIndicatorComponent,
-					StubAccessDeniedModalComponent, StubWalMigrationBannerComponent, StubWalDegradedBannerComponent,
+					StubAccessDeniedModalComponent, StubWalMigrationBannerComponent, StubWalDegradedBannerComponent, StubConnectionStatusIndicatorComponent,
 				],
 			},
 		});

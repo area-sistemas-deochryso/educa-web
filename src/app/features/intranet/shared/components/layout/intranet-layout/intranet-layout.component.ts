@@ -24,6 +24,7 @@ import { QuickAccessFavoritesService } from '@intranet-shared/services';
 import { AccessDeniedModalComponent } from '@intranet-shared/components/access-denied-modal';
 import { WalMigrationBannerComponent } from '@intranet-shared/components/wal-migration-banner';
 import { WalDegradedBannerComponent } from '@intranet-shared/components/wal-degraded-banner';
+import { ConnectionStatusIndicatorComponent } from '@intranet-shared/components/connection-status-indicator/connection-status-indicator.component';
 
 // #endregion
 
@@ -62,6 +63,7 @@ function circularSlice<T>(items: T[], center: number, count: number): T[] {
 		AccessDeniedModalComponent,
 		WalMigrationBannerComponent,
 		WalDegradedBannerComponent,
+		ConnectionStatusIndicatorComponent,
 	],
 	templateUrl: './intranet-layout.component.html',
 	styleUrl: './intranet-layout.component.scss',
