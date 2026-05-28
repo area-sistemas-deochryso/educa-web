@@ -16,6 +16,8 @@ export class TipoFalloLabelPipe implements PipeTransform {
 				return 'Bandeja llena';
 			case 'FAILED_REJECTED':
 				return 'Rechazado por servidor';
+			case 'FAILED_AUTH':
+				return 'Autenticación SMTP fallida';
 			case 'FAILED_UNKNOWN':
 				return 'Error desconocido';
 			case 'FAILED_TRANSIENT':

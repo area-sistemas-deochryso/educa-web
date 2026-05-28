@@ -44,6 +44,10 @@ describe('TipoFalloLabelPipe', () => {
 		expect(pipe.transform(undefined)).toBe('Sin clasificar');
 	});
 
+	it('should return "Autenticación SMTP fallida" for FAILED_AUTH', () => {
+		expect(pipe.transform('FAILED_AUTH')).toBe('Autenticación SMTP fallida');
+	});
+
 	it('should return the raw value for unknown strings (forward-compat)', () => {
 		expect(pipe.transform('BOGUS_VALUE')).toBe('BOGUS_VALUE');
 	});
