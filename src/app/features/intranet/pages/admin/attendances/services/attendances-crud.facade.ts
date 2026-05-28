@@ -2,7 +2,7 @@ import { DestroyRef, Injectable, inject } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
 import { ErrorHandlerService, WalFacadeHelper } from '@core/services';
-import { facadeErrorHandler, type FacadeErrorHandler } from '@core/helpers';
+import { facadeErrorHandler, toLocalIso, type FacadeErrorHandler } from '@core/helpers';
 import { environment } from '@env/environment';
 import {
 	CrearAsistenciaCompletaRequest,
@@ -22,6 +22,7 @@ import {
 
 const RESOURCE = 'asistencia-admin';
 const API_BASE = `${environment.apiUrl}/api/asistencia-admin`;
+
 
 @Injectable({ providedIn: 'root' })
 export class AttendancesCrudFacade {
@@ -75,7 +76,7 @@ export class AttendancesCrudFacade {
 		const dto: CrearEntradaManualRequest = {
 			estudianteId: fd.estudianteId,
 			sedeId: fd.sedeId,
-			horaEntrada: fd.horaEntrada.toISOString(),
+			horaEntrada: toLocalIso(fd.horaEntrada),
 			observacion: fd.observacion || undefined,
 			tipoPersona: fd.tipoPersona,
 		};
@@ -111,7 +112,7 @@ export class AttendancesCrudFacade {
 
 		const asistenciaId = fd.asistenciaId;
 		const snapshot = this.store.items().find((i) => i.asistenciaId === asistenciaId);
-		const horaSalidaIso = fd.horaSalida.toISOString();
+		const horaSalidaIso = toLocalIso(fd.horaSalida);
 		const observacion = fd.observacion || undefined;
 
 		const dto: CrearSalidaManualRequest = {
@@ -173,8 +174,8 @@ export class AttendancesCrudFacade {
 		const dto: CrearAsistenciaCompletaRequest = {
 			estudianteId: fd.estudianteId,
 			sedeId: fd.sedeId,
-			horaEntrada: fd.horaEntrada.toISOString(),
-			horaSalida: fd.horaSalida.toISOString(),
+			horaEntrada: toLocalIso(fd.horaEntrada),
+			horaSalida: toLocalIso(fd.horaSalida),
 			observacion: fd.observacion || undefined,
 			tipoPersona: fd.tipoPersona,
 		};
@@ -212,18 +213,19 @@ export class AttendancesCrudFacade {
 		const asistenciaId = selected.asistenciaId;
 		const snapshot = this.store.items().find((i) => i.asistenciaId === asistenciaId) ?? selected;
 
-		// Si tenía salida y ahora no, indicar al backend que la limpie
+		const teniaHoraEntrada = !!selected.horaEntrada;
 		const teniaHoraSalida = !!selected.horaSalida;
+		const limpiarEntrada = teniaHoraEntrada && !fd.horaEntrada;
 		const limpiarSalida = teniaHoraSalida && !fd.horaSalida;
 
 		// En edición, timeOnly=true devuelve Date con fecha de hoy.
-		// Combinar la hora editada con la fecha original del registro.
+		// Combinar la hora editada con la fecha original del registro (hora local Perú).
 		const fechaBase = new Date(selected.fecha);
 		const combinarFechaHora = (hora: Date | null): string | undefined => {
 			if (!hora) return undefined;
 			const combined = new Date(fechaBase);
 			combined.setHours(hora.getHours(), hora.getMinutes(), 0, 0);
-			return combined.toISOString();
+			return toLocalIso(combined);
 		};
 
 		const horaEntradaIso = combinarFechaHora(fd.horaEntrada);
@@ -233,6 +235,7 @@ export class AttendancesCrudFacade {
 		const dto: ActualizarHorasRequest = {
 			horaEntrada: horaEntradaIso,
 			horaSalida: horaSalidaIso,
+			limpiarEntrada: limpiarEntrada || undefined,
 			limpiarSalida: limpiarSalida || undefined,
 			observacion,
 			rowVersion: selected.rowVersion,
@@ -252,7 +255,7 @@ export class AttendancesCrudFacade {
 			optimistic: {
 				apply: () => {
 					this.store.updateItem(asistenciaId, {
-						horaEntrada: horaEntradaIso ?? snapshot.horaEntrada,
+						horaEntrada: limpiarEntrada ? null : horaEntradaIso ?? snapshot.horaEntrada,
 						horaSalida: limpiarSalida ? null : horaSalidaIso ?? snapshot.horaSalida,
 						estado: nuevoEstado,
 						observacion: observacion ?? snapshot.observacion,

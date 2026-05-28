@@ -386,16 +386,37 @@
 			<div class="form-field">
 				<label>Hora de entrada</label>
 				@if (vm().isEditing) {
-					<p-datepicker
-						[ngModel]="vm().formData.horaEntrada"
-						(ngModelChange)="store.updateFormData({ horaEntrada: $event })"
-						[timeOnly]="true"
-						[inline]="true"
-						[showTime]="true"
-						[showSeconds]="false"
-						[hourFormat]="'24'"
-						placeholder="HH:mm"
-					/>
+					<div class="field-with-action">
+						@if (vm().formData.horaEntrada) {
+							<p-datepicker
+								[ngModel]="vm().formData.horaEntrada"
+								(ngModelChange)="store.updateFormData({ horaEntrada: $event })"
+								[timeOnly]="true"
+								[inline]="true"
+								[showTime]="true"
+								[showSeconds]="false"
+								[hourFormat]="'24'"
+								placeholder="HH:mm"
+							/>
+							<button
+								pButton
+								icon="pi pi-times"
+								class="p-button-danger p-button-text p-button-sm"
+								(click)="store.updateFormData({ horaEntrada: null })"
+								[pt]="{ root: { 'aria-label': 'Quitar hora de entrada' } }"
+								pTooltip="Quitar entrada"
+								tooltipPosition="top"
+							></button>
+						} @else {
+							<button
+								pButton
+								icon="pi pi-plus"
+								label="Agregar hora de entrada"
+								class="p-button-outlined p-button-sm"
+								(click)="setHoraEntradaNow()"
+							></button>
+						}
+					</div>
 				} @else {
 					<p-datepicker
 						[ngModel]="vm().formData.horaEntrada"
@@ -417,16 +438,35 @@
 				<label>Hora de salida</label>
 				<div class="field-with-action">
 					@if (vm().isEditing) {
-						<p-datepicker
-							[ngModel]="vm().formData.horaSalida"
-							(ngModelChange)="store.updateFormData({ horaSalida: $event })"
-							[timeOnly]="true"
-							[inline]="true"
-							[showTime]="true"
-							[showSeconds]="false"
-							[hourFormat]="'24'"
-							placeholder="HH:mm"
-						/>
+						@if (vm().formData.horaSalida) {
+							<p-datepicker
+								[ngModel]="vm().formData.horaSalida"
+								(ngModelChange)="store.updateFormData({ horaSalida: $event })"
+								[timeOnly]="true"
+								[inline]="true"
+								[showTime]="true"
+								[showSeconds]="false"
+								[hourFormat]="'24'"
+								placeholder="HH:mm"
+							/>
+							<button
+								pButton
+								icon="pi pi-times"
+								class="p-button-danger p-button-text p-button-sm"
+								(click)="store.updateFormData({ horaSalida: null })"
+								[pt]="{ root: { 'aria-label': 'Quitar hora de salida' } }"
+								pTooltip="Quitar salida"
+								tooltipPosition="top"
+							></button>
+						} @else {
+							<button
+								pButton
+								icon="pi pi-plus"
+								label="Agregar hora de salida"
+								class="p-button-outlined p-button-sm"
+								(click)="setHoraSalidaNow()"
+							></button>
+						}
 					} @else {
 						<p-datepicker
 							[ngModel]="vm().formData.horaSalida"
@@ -438,21 +478,6 @@
 							placeholder="Seleccionar fecha y hora..."
 							appendTo="body"
 						/>
-					}
-					@if (vm().isEditing && vm().formData.horaSalida) {
-						<button
-							pButton
-							icon="pi pi-times"
-							class="p-button-danger p-button-text p-button-sm"
-							(click)="store.updateFormData({ horaSalida: null })"
-							[pt]="{
-								root: {
-									'aria-label': 'Quitar hora de salida',
-								},
-							}"
-							pTooltip="Quitar salida"
-							tooltipPosition="top"
-						></button>
 					}
 				</div>
 			</div>

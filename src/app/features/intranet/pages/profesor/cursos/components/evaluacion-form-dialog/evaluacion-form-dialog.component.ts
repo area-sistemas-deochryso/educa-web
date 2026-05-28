@@ -8,6 +8,7 @@ import { InputNumberModule } from 'primeng/inputnumber';
 import { Select } from 'primeng/select';
 import { DatePickerModule } from 'primeng/datepicker';
 import { TooltipModule } from 'primeng/tooltip';
+import { toLocalIso } from '@core/helpers';
 import { ToggleSwitchModule } from 'primeng/toggleswitch';
 import {
 	CalificacionDto,
@@ -154,7 +155,7 @@ export class EvaluacionFormDialogComponent {
 			semanaId: data.semanaId!,
 			titulo: data.titulo.trim(),
 			peso: data.peso,
-			fechaEvaluacion: data.fechaEvaluacion!.toISOString(),
+			fechaEvaluacion: toLocalIso(data.fechaEvaluacion!),
 			tipo: data.tipo,
 			esGrupal: data.esGrupal,
 		};

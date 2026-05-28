@@ -3,6 +3,7 @@ import { Injectable, inject } from '@angular/core';
 import { Observable } from 'rxjs';
 
 import { environment } from '@config/environment';
+import { toLocalIso } from '@core/helpers';
 
 import {
 	DEFAULT_TAKE,
@@ -25,8 +26,8 @@ export class RateLimitEventsService {
 		if (filtro.endpoint) params = params.set('endpoint', filtro.endpoint);
 		if (filtro.policy) params = params.set('policy', filtro.policy);
 		if (filtro.soloRechazados) params = params.set('soloRechazados', 'true');
-		if (filtro.desde) params = params.set('desde', filtro.desde.toISOString());
-		if (filtro.hasta) params = params.set('hasta', filtro.hasta.toISOString());
+		if (filtro.desde) params = params.set('desde', toLocalIso(filtro.desde));
+		if (filtro.hasta) params = params.set('hasta', toLocalIso(filtro.hasta));
 		// Plan 32 Chat 4 — el query param correlationId se envía al BE igualmente.
 		// Hoy el BE lo ignora (no está en RateLimitEventFiltroDto); el filter
 		// efectivo se aplica client-side en el facade. Cuando el BE lo soporte,

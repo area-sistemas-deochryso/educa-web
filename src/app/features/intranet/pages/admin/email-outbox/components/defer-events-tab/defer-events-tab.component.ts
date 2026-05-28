@@ -10,6 +10,7 @@ import {
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute } from '@angular/router';
+import { toLocalIso } from '@core/helpers';
 import { ButtonModule } from 'primeng/button';
 import { DatePickerModule } from 'primeng/datepicker';
 import { InputTextModule } from 'primeng/inputtext';
@@ -167,8 +168,8 @@ export class DeferEventsTabComponent implements OnInit {
 
 	private getFiltros(): EmailDeferEventFiltros {
 		return {
-			desde: this._filterDesde()?.toISOString() ?? null,
-			hasta: this._filterHasta()?.toISOString() ?? null,
+			desde: this._filterDesde() ? toLocalIso(this._filterDesde()!) : null,
+			hasta: this._filterHasta() ? toLocalIso(this._filterHasta()!) : null,
 			tipo: this._filterTipo(),
 			dominio: this._filterDominio() || null,
 		};

@@ -3,7 +3,7 @@ import { DestroyRef, Injectable, inject } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
 import { environment } from '@config/environment';
-import { logger } from '@core/helpers';
+import { logger, toLocalIso } from '@core/helpers';
 import { ErrorHandlerService } from '@core/services/error';
 import {
 	ActualizarEstadoReporteRequest,
@@ -259,7 +259,7 @@ export class FeedbackReportsFacade {
 	// #region Helpers
 	private toIso(date: Date | null): string | null {
 		if (!date) return null;
-		return date.toISOString();
+		return toLocalIso(date);
 	}
 	// #endregion
 }

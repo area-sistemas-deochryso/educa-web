@@ -68,6 +68,7 @@ export interface CrearAsistenciaCompletaRequest {
 export interface ActualizarHorasRequest {
 	horaEntrada?: string;
 	horaSalida?: string;
+	limpiarEntrada?: boolean;
 	limpiarSalida?: boolean;
 	observacion?: string;
 	rowVersion: string;

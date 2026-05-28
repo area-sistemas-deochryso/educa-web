@@ -8,6 +8,7 @@ import { InputTextModule } from 'primeng/inputtext';
 import { TextareaModule } from 'primeng/textarea';
 import { DatePickerModule } from 'primeng/datepicker';
 import { ToggleSwitch } from 'primeng/toggleswitch';
+import { toLocalIso } from '@core/helpers';
 import { CursoContenidoTareaDto, CrearTareaRequest, ActualizarTareaRequest } from '@features/intranet/pages/profesor/models';
 
 // #endregion
@@ -219,7 +220,7 @@ export class TareaDialogComponent implements OnChanges {
 	onSave(): void {
 		if (!this.titulo.trim()) return;
 
-		const fechaStr = this.fechaLimite ? this.fechaLimite.toISOString() : null;
+		const fechaStr = this.fechaLimite ? toLocalIso(this.fechaLimite) : null;
 
 		if (this.tarea()) {
 			this.updateTarea.emit({

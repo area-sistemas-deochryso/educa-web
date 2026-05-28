@@ -350,6 +350,14 @@ export class AttendancesComponent implements OnInit {
 		});
 	}
 
+	setHoraEntradaNow(): void {
+		this.store.updateFormData({ horaEntrada: new Date() });
+	}
+
+	setHoraSalidaNow(): void {
+		this.store.updateFormData({ horaSalida: new Date() });
+	}
+
 	onAgregarSalida(item: AsistenciaAdminLista): void {
 		this.uiFacade.openSalidaDialog(item);
 	}

@@ -6,10 +6,14 @@
  * Estos helpers operan sobre la fecha *local* del `Date`.
  */
 
+const pad = (n: number) => String(n).padStart(2, '0');
+
 /** Formatea un `Date` como `YYYY-MM-DD` usando los componentes locales. */
 export function formatDateLocalIso(fecha: Date): string {
-	const y = fecha.getFullYear();
-	const m = String(fecha.getMonth() + 1).padStart(2, '0');
-	const d = String(fecha.getDate()).padStart(2, '0');
-	return `${y}-${m}-${d}`;
+	return `${fecha.getFullYear()}-${pad(fecha.getMonth() + 1)}-${pad(fecha.getDate())}`;
+}
+
+/** Formatea un `Date` como `YYYY-MM-DDTHH:mm:ss.000` usando los componentes locales (sin sufijo Z). */
+export function toLocalIso(fecha: Date): string {
+	return `${formatDateLocalIso(fecha)}T${pad(fecha.getHours())}:${pad(fecha.getMinutes())}:00.000`;
 }
