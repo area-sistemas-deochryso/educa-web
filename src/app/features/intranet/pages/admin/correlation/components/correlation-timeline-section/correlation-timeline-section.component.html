@@ -50,6 +50,18 @@
 										<span class="cell-mono">· {{ dni }}</span>
 									}
 								</div>
+								<div class="timeline-event__actions">
+									<button
+										pButton
+										type="button"
+										label="Ver grupo"
+										icon="pi pi-sitemap"
+										class="p-button-text p-button-sm"
+										[disabled]="!canGoToGroup(asError(event.payload))"
+										(click)="onGoToGroup(asError(event.payload))"
+										[pt]="{ root: { 'aria-label': 'Ver grupo de errores' } }"
+									></button>
+								</div>
 							}
 							@case ('rate-limit') {
 								<div class="timeline-event__detail">
@@ -86,6 +98,17 @@
 										{{ asReporte(event.payload).descripcionResumen }}
 									</span>
 								</div>
+								<div class="timeline-event__actions">
+									<button
+										pButton
+										type="button"
+										label="Ver reporte"
+										icon="pi pi-external-link"
+										class="p-button-text p-button-sm"
+										(click)="onGoToReport(asReporte(event.payload))"
+										[pt]="{ root: { 'aria-label': 'Ver detalle del reporte' } }"
+									></button>
+								</div>
 							}
 							@case ('outbox') {
 								<div class="timeline-event__detail">
@@ -102,6 +125,17 @@
 									@if (asOutbox(event.payload).intentos > 1) {
 										<span>· intentos: {{ asOutbox(event.payload).intentos }}</span>
 									}
+								</div>
+								<div class="timeline-event__actions">
+									<button
+										pButton
+										type="button"
+										label="Ver en bandeja"
+										icon="pi pi-envelope"
+										class="p-button-text p-button-sm"
+										(click)="onGoToOutbox(asOutbox(event.payload))"
+										[pt]="{ root: { 'aria-label': 'Ver correos del destinatario en bandeja' } }"
+									></button>
 								</div>
 							}
 						}

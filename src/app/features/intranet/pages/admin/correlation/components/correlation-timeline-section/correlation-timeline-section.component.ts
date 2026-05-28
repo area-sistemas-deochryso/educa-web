@@ -1,6 +1,8 @@
-import { ChangeDetectionStrategy, Component, computed, input } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, inject, input } from '@angular/core';
 import { CommonModule, DatePipe } from '@angular/common';
+import { Router } from '@angular/router';
 
+import { ButtonModule } from 'primeng/button';
 import { TagModule } from 'primeng/tag';
 import { TooltipModule } from 'primeng/tooltip';
 
@@ -18,22 +20,17 @@ import {
 	TimelineEvent,
 } from '../../models';
 
-/**
- * Plan 41 F1 — vista timeline cronológica unificada del hub correlation.
- *
- * Recibe los `TimelineEvent[]` ya ordenados por fecha descendente desde el
- * store y los renderiza como steps verticales con icono + color por tipo.
- * No hace IO ni decide ordenamiento — solo presenta.
- */
 @Component({
 	selector: 'app-correlation-timeline-section',
 	standalone: true,
-	imports: [CommonModule, DatePipe, TagModule, TooltipModule],
+	imports: [CommonModule, DatePipe, ButtonModule, TagModule, TooltipModule],
 	templateUrl: './correlation-timeline-section.component.html',
 	styleUrl: './correlation-timeline-section.component.scss',
 	changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class CorrelationTimelineSectionComponent {
+	private readonly router = inject(Router);
+
 	readonly events = input.required<TimelineEvent[]>();
 
 	readonly count = computed(() => this.events().length);
@@ -71,8 +68,32 @@ export class CorrelationTimelineSectionComponent {
 	}
 
 	trackEvent(_index: number, event: TimelineEvent): string {
-		// payload.id es number en los 4 DTOs
 		const id = (event.payload as { id: number }).id;
 		return `${event.kind}:${id}:${event.fecha}`;
 	}
+
+	// #region Navigation anchors (Plan 41 F2)
+	canGoToGroup(row: CorrelationErrorLogDto): boolean {
+		return !!row.errorGroupCode;
+	}
+
+	onGoToGroup(row: CorrelationErrorLogDto): void {
+		if (!row.errorGroupCode) return;
+		void this.router.navigate(['/intranet/admin/trazabilidad-errores'], {
+			queryParams: { fingerprint: row.errorGroupCode },
+		});
+	}
+
+	onGoToReport(row: CorrelationReporteUsuarioDto): void {
+		void this.router.navigate(['/intranet/admin/reportes-usuario'], {
+			queryParams: { id: row.id },
+		});
+	}
+
+	onGoToOutbox(row: CorrelationEmailOutboxDto): void {
+		void this.router.navigate(['/intranet/admin/email-outbox'], {
+			queryParams: { destinatario: row.destinatarioMasked },
+		});
+	}
+	// #endregion
 }

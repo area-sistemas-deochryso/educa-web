@@ -11,7 +11,7 @@
 | F5 | Consolidación Frontend | ⏳ 0% | Tras Plan 4 BE |
 | F8 | Design Patterns Backend | Incremental | Al tocar módulos |
 | F9 | Design Patterns Frontend | Incremental | Al tocar módulos |
-| xP41 | → Correlation Hub (coord) | F1 timeline FE ⏳ | ver P41 |
+| xP41 | → Correlation Hub (coord) | F1 ✅ · F2 FE ✅ · F3 BE next | ver P41 |
 | xP42 | → Casing contratos (coord) | Sin trabajo FE pendiente | ver P42 |
 | xP43 | → Monitoreo Cowork (coord) | Chat 5.1 FE ✅ · 4.1→6.2 pendientes | ver P43 |
 | xP45 | → Monitoreo incidencias (coord) | P45:F2.2:FE ⏳ | ver P45 |
@@ -48,7 +48,7 @@ Planes cross-repo con sub-chats FE pendientes: **41** (Correlation Hub), **42** 
 
 | Pos | Key | Plan | Próximo paso concreto | Repo | Desbloquea | Gate |
 |---|---|---|---|---|---|---|
-| 1 | xP41 | Correlation Hub | F1 timeline FE + F2-F6 — prioridad en coord | xrepo | 5 (Chat 9 + F2-F6) | libre |
+| 1 | xP41 | Correlation Hub | F3 BE (persist request lifecycle) — prioridad en coord | xrepo | 4 (F3-F6) | libre |
 
 #### Tier 2 — Impacto medio (desbloquean 1-2 ítems o alto valor)
 
@@ -80,7 +80,7 @@ Planes cross-repo con sub-chats FE pendientes: **41** (Correlation Hub), **42** 
 | 10 | F8 | Design Patterns BE | Aplicar al tocar módulos BE | incremental |
 | 11 | F9 | Design Patterns FE | Aplicar al tocar módulos FE | incremental |
 
-**Siguiente accionable**: **xP41** (pos 1) — Correlation Hub F1 timeline FE, desbloquea Chat 9 + F2-F6. **xP45 F2.2:FE** (pos 2) — JOIN `/full` + vista por evento.
+**Siguiente accionable**: **xP41** (pos 1) — Correlation Hub F3 BE (persist request lifecycle). **xP45 F2.2:FE** (pos 2) — JOIN `/full` + vista por evento.
 
 ### 🟣 Verificaciones post-deploy (`/verify <NNN>`)
 
@@ -105,7 +105,7 @@ Planes cross-repo con sub-chats FE pendientes: **41** (Correlation Hub), **42** 
 ### Notas operativas
 
 - **`running/`**: vacío · **`open/`**: vacío · **`waiting/`**: vacío
-- **Último cierre**: 259 (P43 Chat 5.1 FE sparklines) → closed/ 2026-05-28
+- **Último cierre**: 261 (P41 F2 FE lateral navigation) → closed/ 2026-05-28
 - **Último saneamiento**: 2026-05-28 — archivados P51, F13, F46-F48, WAL audit cerrada, cola renumerada
 
 ---

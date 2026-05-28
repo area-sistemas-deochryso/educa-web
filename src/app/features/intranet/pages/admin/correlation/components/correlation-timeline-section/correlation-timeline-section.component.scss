@@ -125,3 +125,10 @@
 		font-size: 0.8rem;
 	}
 }
+
+.timeline-event__actions {
+	display: flex;
+	align-items: center;
+	gap: 0.25rem;
+	margin-top: 0.125rem;
+}
