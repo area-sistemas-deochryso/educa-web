@@ -158,7 +158,7 @@
 								<td class="matrix-frozen matrix-col-name nombre-cell">{{ prof.nombreCompleto }}</td>
 								@for (dia of prof.asistenciasDiarias ?? []; track dia.dia) {
 									<td class="matrix-col-day" [class.holiday-col]="dia.esFeriado">
-										<span class="matrix-badge" [class.matrix-cell-pending]="dia.estadoCodigo === '-' || dia.estadoCodigo === 'X'">{{ dia.estadoCodigo }}</span>
+										<span class="matrix-badge matrix-hora">{{ dia.horaEntrada ? (dia.horaEntrada | date: 'H:mm') : '' }}</span>
 									</td>
 								}
 								<td class="matrix-col-total matrix-total">{{ prof.totalAsistencias ?? 0 }}</td>
@@ -256,7 +256,7 @@
 								<td class="matrix-frozen matrix-col-name nombre-cell">{{ asist.nombreCompleto }}</td>
 								@for (dia of asist.asistenciasDiarias ?? []; track dia.dia) {
 									<td class="matrix-col-day" [class.holiday-col]="dia.esFeriado">
-										<span class="matrix-badge" [class.matrix-cell-pending]="dia.estadoCodigo === '-' || dia.estadoCodigo === 'X'">{{ dia.estadoCodigo }}</span>
+										<span class="matrix-badge matrix-hora">{{ dia.horaEntrada ? (dia.horaEntrada | date: 'H:mm') : '' }}</span>
 									</td>
 								}
 								<td class="matrix-col-total matrix-total">{{ asist.totalAsistencias ?? 0 }}</td>

@@ -61,6 +61,7 @@ export interface AsistenciaDiaMatriz {
 	dia: number;
 	estadoCodigo: string;
 	esFeriado: boolean;
+	horaEntrada?: string | null;
 }
 
 export interface EstudianteReporteFiltrado {
