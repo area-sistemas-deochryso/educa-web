@@ -21,6 +21,10 @@ function buildDto(over: Partial<CrossChexSyncStatusDto> = {}): CrossChexSyncStat
 		estado: 'RUNNING',
 		pagina: null,
 		totalPaginas: null,
+		diaActual: null,
+		totalDias: null,
+		fechaInicio: null,
+		fechaFin: null,
 		fase: null,
 		mensaje: null,
 		iniciadoEn: '2026-04-24T10:00:00',
@@ -156,5 +160,73 @@ describe('CrossChexSyncBannerComponent', () => {
 		const { component } = setupFixture(buildDto({ estado }));
 		const flag = component[prop as keyof CrossChexSyncBannerComponent] as () => boolean;
 		expect(flag()).toBe(true);
+	});
+
+	describe('range sync progress (P24C F3)', () => {
+		it('isRangeSync true when totalDias > 1', () => {
+			const { component } = setupFixture(
+				buildDto({ estado: 'RUNNING', diaActual: 2, totalDias: 5 }),
+			);
+			expect(component.isRangeSync()).toBe(true);
+		});
+
+		it('isRangeSync false when totalDias is null (single-day sync)', () => {
+			const { component } = setupFixture(
+				buildDto({ estado: 'RUNNING', pagina: 1, totalPaginas: 3 }),
+			);
+			expect(component.isRangeSync()).toBe(false);
+		});
+
+		it('isRangeSync false when totalDias is 1', () => {
+			const { component } = setupFixture(
+				buildDto({ estado: 'RUNNING', diaActual: 1, totalDias: 1 }),
+			);
+			expect(component.isRangeSync()).toBe(false);
+		});
+
+		it('range sync: percent based on diaActual/totalDias', () => {
+			const { component } = setupFixture(
+				buildDto({ estado: 'RUNNING', diaActual: 3, totalDias: 10 }),
+			);
+			expect(component.percent()).toBe(30);
+		});
+
+		it('range sync: dayProgress shows "Día X/N"', () => {
+			const { component } = setupFixture(
+				buildDto({ estado: 'RUNNING', diaActual: 2, totalDias: 7 }),
+			);
+			expect(component.dayProgress()).toBe('Día 2/7');
+		});
+
+		it('range sync: pageProgress shows inner page when available', () => {
+			const { component } = setupFixture(
+				buildDto({ estado: 'RUNNING', diaActual: 2, totalDias: 7, pagina: 3, totalPaginas: 5 }),
+			);
+			expect(component.pageProgress()).toContain('Página 3/5');
+		});
+
+		it('range sync: mensaje combines day + page', () => {
+			const { component } = setupFixture(
+				buildDto({ estado: 'RUNNING', diaActual: 2, totalDias: 7, pagina: 3, totalPaginas: 5 }),
+			);
+			expect(component.mensaje()).toContain('Día 2/7');
+			expect(component.mensaje()).toContain('Página 3/5');
+		});
+
+		it('range sync: mensaje shows only day when no page yet', () => {
+			const { component } = setupFixture(
+				buildDto({ estado: 'RUNNING', diaActual: 1, totalDias: 7 }),
+			);
+			expect(component.mensaje()).toBe('Día 1/7');
+		});
+
+		it('range sync: sub-progress element rendered when page info available', () => {
+			const { fixture } = setupFixture(
+				buildDto({ estado: 'RUNNING', diaActual: 2, totalDias: 5, pagina: 1, totalPaginas: 3 }),
+			);
+			const subProgress = fixture.nativeElement.querySelector('.sync-banner__sub-progress');
+			expect(subProgress).not.toBeNull();
+			expect(subProgress.textContent).toContain('Página 1/3');
+		});
 	});
 });

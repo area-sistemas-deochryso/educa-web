@@ -17,6 +17,7 @@ export type {
 	TipoPersonaFilter,
 	SincronizarResultado,
 	SincronizarTipoResultado,
+	SyncRangoRequest,
 } from '@data/models';
 
 import type { TipoPersonaAsistencia } from '@data/models';

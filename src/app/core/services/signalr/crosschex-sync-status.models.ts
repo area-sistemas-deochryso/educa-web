@@ -13,6 +13,10 @@ export interface CrossChexSyncStatusDto {
 	estado: SyncEstado;
 	pagina: number | null;
 	totalPaginas: number | null;
+	diaActual: number | null;
+	totalDias: number | null;
+	fechaInicio: string | null;
+	fechaFin: string | null;
 	fase: string | null;
 	mensaje: string | null;
 	iniciadoEn: string;

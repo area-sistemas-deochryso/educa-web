@@ -25,7 +25,12 @@
 			<p class="sync-banner__message">{{ mensaje() }}</p>
 
 			@if (!isFailed()) {
-				@if (indeterminate()) {
+				@if (isRangeSync() && dayProgress()) {
+					<p-progressBar [value]="percent()" [style]="{ height: '6px' }" />
+					@if (pageProgress()) {
+						<p class="sync-banner__sub-progress">{{ pageProgress() }}</p>
+					}
+				} @else if (indeterminate()) {
 					<p-progressBar mode="indeterminate" [style]="{ height: '6px' }" />
 				} @else {
 					<p-progressBar [value]="percent()" [style]="{ height: '6px' }" />

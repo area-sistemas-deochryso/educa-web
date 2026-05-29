@@ -50,7 +50,7 @@
 		<button
 			pButton
 			icon="pi pi-sync"
-			[label]="'Sincronizar CrossChex · ' + fechaLabel()"
+			label="Sincronizar asistencias del día"
 			class="p-button-outlined"
 			[loading]="vm().syncing"
 			[disabled]="syncActive()"
@@ -65,6 +65,21 @@
 					? 'Hay un sync en curso. Espera a que termine.'
 					: 'Sincroniza ambos tipos (estudiantes y profesores). El filtro de tipo solo afecta la visualización.'
 			"
+			tooltipPosition="bottom"
+		></button>
+		<button
+			pButton
+			icon="pi pi-history"
+			label="Sincronizar rango"
+			class="p-button-outlined"
+			[disabled]="syncActive()"
+			(click)="onSincronizarRango()"
+			[pt]="{
+				root: {
+					'aria-label': 'Abrir diálogo para sincronizar un rango de fechas desde CrossChex',
+				},
+			}"
+			pTooltip="Sincronizar un rango de fechas con filtro opcional de personas"
 			tooltipPosition="bottom"
 		></button>
 		<button
@@ -602,3 +617,9 @@
 	</p-tabpanel>
 </p-tabs>
 <!-- #endregion -->
+
+<!-- Dialog: Sync rango -->
+<app-sync-range-dialog
+	[(visible)]="syncRangeDialogVisible"
+	(confirm)="onSyncRangeConfirm($event)"
+/>

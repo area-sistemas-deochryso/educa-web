@@ -65,6 +65,11 @@ export class CrossChexSyncBannerComponent {
 	 *   - RUNNING sin totalPaginas todavía
 	 *   - FAILED (no se muestra bar)
 	 */
+	readonly isRangeSync = computed(() => {
+		const s = this.status();
+		return !!s && s.totalDias != null && s.totalDias > 1;
+	});
+
 	readonly indeterminate = computed(() => {
 		const s = this.status();
 		if (!s) return false;
@@ -75,8 +80,24 @@ export class CrossChexSyncBannerComponent {
 
 	readonly percent = computed(() => {
 		const s = this.status();
-		if (!s || !s.pagina || !s.totalPaginas) return 0;
+		if (!s) return 0;
+		if (this.isRangeSync() && s.diaActual && s.totalDias) {
+			return Math.round((s.diaActual / s.totalDias) * 100);
+		}
+		if (!s.pagina || !s.totalPaginas) return 0;
 		return Math.round((s.pagina / s.totalPaginas) * 100);
+	});
+
+	readonly dayProgress = computed(() => {
+		const s = this.status();
+		if (!this.isRangeSync() || !s?.diaActual || !s.totalDias) return '';
+		return `Día ${s.diaActual}/${s.totalDias}`;
+	});
+
+	readonly pageProgress = computed(() => {
+		const s = this.status();
+		if (!s?.pagina || !s.totalPaginas) return '';
+		return `Página ${s.pagina}/${s.totalPaginas} — esperando CrossChex…`;
 	});
 
 	readonly mensaje = computed(() => {
@@ -87,6 +108,12 @@ export class CrossChexSyncBannerComponent {
 			case 'QUEUED':
 				return 'Encolando sincronización…';
 			case 'RUNNING':
+				if (this.isRangeSync()) {
+					const day = this.dayProgress();
+					const page = this.pageProgress();
+					if (day && page) return `${day} · ${page}`;
+					if (day) return day;
+				}
 				if (s.pagina && s.totalPaginas) {
 					return `Descargando página ${s.pagina}/${s.totalPaginas} — esperando CrossChex…`;
 				}

@@ -29,6 +29,7 @@ import { AttendanceScopeBannerComponent } from '@intranet-shared/components/atte
 import { AttendanceReportsComponent } from '../../cross-role/attendance-reports';
 import { CrossChexSyncStatusService } from '@core/services/signalr';
 import { CrossChexSyncBannerComponent } from './components/crosschex-sync-banner';
+import { SyncRangeDialogComponent, SyncRangePayload } from './components/sync-range-dialog';
 
 import {
 	AttendancesDataFacade,
@@ -81,6 +82,7 @@ import {
 		AttendanceScopeBannerComponent,
 		AttendanceReportsComponent,
 		CrossChexSyncBannerComponent,
+		SyncRangeDialogComponent,
 		PageHeaderComponent,
 	],
 	providers: [ConfirmationService, MessageService],
@@ -132,6 +134,7 @@ export class AttendancesComponent implements OnInit {
 	readonly cierreMes = signal(new Date().getMonth() + 1);
 	readonly cierreObservacion = signal('');
 	readonly revertirObservacion = signal('');
+	readonly syncRangeDialogVisible = signal(false);
 	// #endregion
 
 	// #region Skeleton config
@@ -290,6 +293,39 @@ export class AttendancesComponent implements OnInit {
 			});
 			logger.error('[AttendancesComponent] Sync dispatch error', err);
 		});
+	}
+
+	onSincronizarRango(): void {
+		this.syncRangeDialogVisible.set(true);
+	}
+
+	onSyncRangeConfirm(payload: SyncRangePayload): void {
+		this.confirmationService.confirm({
+			message: `Se sincronizarán ${this.calcDays(payload.fechaInicio, payload.fechaFin)} día(s) desde CrossChex. ${payload.dnis ? `Filtrado a ${payload.dnis.length} persona(s).` : 'Todos los usuarios.'} ¿Continuar?`,
+			header: 'Sincronizar rango',
+			icon: 'pi pi-sync',
+			acceptLabel: 'Sincronizar',
+			rejectLabel: 'Cancelar',
+			accept: () => {
+				this.dataFacade.sincronizarRango(
+					{ fechaInicio: payload.fechaInicio, fechaFin: payload.fechaFin, dnis: payload.dnis },
+					(err) => {
+						this.messageService.add({
+							severity: 'error',
+							summary: 'Error al sincronizar rango',
+							detail: 'No se pudo iniciar la sincronización del rango.',
+							life: 5000,
+						});
+						logger.error('[AttendancesComponent] Sync range dispatch error', err);
+					},
+				);
+			},
+		});
+	}
+
+	private calcDays(start: string, end: string): number {
+		const diff = new Date(end).getTime() - new Date(start).getTime();
+		return Math.floor(diff / (1000 * 60 * 60 * 24)) + 1;
 	}
 
 	// #endregion

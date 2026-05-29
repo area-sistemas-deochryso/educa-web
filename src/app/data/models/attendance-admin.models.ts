@@ -102,6 +102,12 @@ export interface SincronizarResultado {
 	profesores: SincronizarTipoResultado;
 }
 
+export interface SyncRangoRequest {
+	fechaInicio: string;
+	fechaFin: string;
+	dnis?: string[];
+}
+
 export interface CierreMensualLista {
 	cierreId: number;
 	sedeId: number;

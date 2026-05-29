@@ -1,0 +1,92 @@
+<p-dialog
+	header="Sincronizar rango / historial"
+	[modal]="true"
+	[visible]="visible()"
+	(visibleChange)="visible.set($event)"
+	[style]="{ width: '520px' }"
+	[closable]="true"
+	appendTo="body"
+>
+	<div class="sync-range-form">
+		<div class="sync-range-form__dates">
+			<div class="sync-range-form__field">
+				<label for="syncFechaInicio">Fecha inicio</label>
+				<p-datepicker
+					inputId="syncFechaInicio"
+					[ngModel]="fechaInicio()"
+					(ngModelChange)="fechaInicio.set($event)"
+					dateFormat="dd/mm/yy"
+					[showIcon]="true"
+					appendTo="body"
+				/>
+			</div>
+			<div class="sync-range-form__field">
+				<label for="syncFechaFin">Fecha fin</label>
+				<p-datepicker
+					inputId="syncFechaFin"
+					[ngModel]="fechaFin()"
+					(ngModelChange)="fechaFin.set($event)"
+					dateFormat="dd/mm/yy"
+					[showIcon]="true"
+					appendTo="body"
+				/>
+			</div>
+		</div>
+
+		@if (rangeError(); as err) {
+			<p class="sync-range-form__error">{{ err }}</p>
+		} @else if (rangeDays() > 0) {
+			<p class="sync-range-form__info">{{ rangeDays() }} día(s) seleccionado(s)</p>
+		}
+
+		<div class="sync-range-form__toggle">
+			<p-toggleSwitch
+				[ngModel]="todosUsuarios()"
+				(ngModelChange)="todosUsuarios.set($event)"
+				inputId="syncTodos"
+			/>
+			<label for="syncTodos">Todos los usuarios</label>
+		</div>
+
+		@if (!todosUsuarios()) {
+			<div class="sync-range-form__field">
+				<label>Filtrar personas</label>
+				<p-multiselect
+					[options]="personas()"
+					[ngModel]="selectedPersonIds()"
+					(ngModelChange)="selectedPersonIds.set($event)"
+					optionLabel="nombreCompleto"
+					optionValue="estudianteId"
+					[filter]="true"
+					filterBy="nombreCompleto,dni"
+					placeholder="Buscar por nombre o DNI…"
+					[showClear]="true"
+					[display]="'chip'"
+					appendTo="body"
+					[pt]="{ root: { 'aria-label': 'Seleccionar personas para sincronizar' } }"
+				/>
+			</div>
+		}
+	</div>
+
+	<ng-template #footer>
+		<div class="sync-range-form__actions">
+			<button
+				pButton
+				type="button"
+				label="Cancelar"
+				class="p-button-text"
+				(click)="onHide()"
+			></button>
+			<button
+				pButton
+				type="button"
+				label="Sincronizar"
+				icon="pi pi-sync"
+				[disabled]="!isValid()"
+				(click)="onConfirm()"
+				[pt]="{ root: { 'aria-label': 'Iniciar sincronización del rango seleccionado' } }"
+			></button>
+		</div>
+	</ng-template>
+</p-dialog>

@@ -13,6 +13,7 @@ import {
 	PersonaParaSeleccion,
 	RevertirCierreMensualRequest,
 	TipoPersonaAsistencia,
+	SyncRangoRequest,
 } from '../models';
 import { Injectable, inject } from '@angular/core';
 import { Observable, catchError, of } from 'rxjs';
@@ -136,6 +137,10 @@ export class AttendancesAdminService {
 		return this.http.post<CrossChexSyncAceptadoDto>(`${this.apiUrl}/sync`, null, {
 			params: { fecha },
 		});
+	}
+
+	sincronizarRango(body: SyncRangoRequest): Observable<CrossChexSyncAceptadoDto> {
+		return this.http.post<CrossChexSyncAceptadoDto>(`${this.apiUrl}/sync-range`, body);
 	}
 
 	enviarCorreos(dto: EnviarCorreosAsistenciaRequest): Observable<EnviarCorreosResultado> {
