@@ -1,7 +1,8 @@
 import { Injectable, inject, DestroyRef } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { withRetry, facadeErrorHandler } from '@core/helpers';
-import { ErrorHandlerService } from '@core/services';
+import { ErrorHandlerService, WalFacadeHelper, WalCrossTabRefetchService } from '@core/services';
+import { environment } from '@config';
 import { UI_SUMMARIES, UI_ASISTENCIA_SUCCESS_MESSAGES } from '@shared/constants';
 import { ProfesorApiService } from '../../services/profesor-api.service';
 import { CursoContenidoStore } from './curso-contenido.store';
@@ -16,15 +17,30 @@ export class AttendanceCourseFacade {
 	private readonly contenidoStore = inject(CursoContenidoStore);
 	private readonly errorHandler = inject(ErrorHandlerService);
 	private readonly destroyRef = inject(DestroyRef);
+	private readonly wal = inject(WalFacadeHelper);
+	private readonly crossTabRefetch = inject(WalCrossTabRefetchService);
 	private readonly errHandler = facadeErrorHandler({
 		tag: 'AttendanceCourseFacade',
 		errorHandler: this.errorHandler,
 	});
+	private readonly apiUrl = `${environment.apiUrl}/api/AsistenciaCurso`;
 	// #endregion
 
 	// #region Estado expuesto
 	readonly vm = this.store.vm;
 	// #endregion
+
+	constructor() {
+		this.crossTabRefetch.subscribe({
+			resourceType: 'asistenciaCurso',
+			refetchItems: () => {
+				const horarioId = this.getHorarioId();
+				const data = this.store.registroData();
+				if (horarioId && data) this.loadRegistro(data.fecha, horarioId);
+			},
+			destroyRef: this.destroyRef,
+		});
+	}
 
 	// #region Helpers privados
 	private getHorarioId(): number | null {
@@ -84,16 +100,10 @@ export class AttendanceCourseFacade {
 
 	// #region Comandos de registro
 
-	/**
-	 * Registrar asistencia con protección WAL.
-	 * Si está offline, el batch se guarda en IndexedDB y se envía al reconectar.
-	 */
 	registrar(overrideHorarioId?: number): void {
 		const horarioId = overrideHorarioId ?? this.getHorarioId();
 		const data = this.store.registroData();
 		if (!horarioId || !data) return;
-
-		this.store.setRegistroSaving(true);
 
 		const dto: RegistrarAsistenciaCursoDto = {
 			fecha: data.fecha,
@@ -104,15 +114,22 @@ export class AttendanceCourseFacade {
 			})),
 		};
 
-		this.api
-			.registrarAsistenciaCurso(horarioId, dto)
-			.pipe(takeUntilDestroyed(this.destroyRef))
-			.subscribe({
-			next: () => {
+		this.wal.execute({
+			operation: 'CREATE',
+			resourceType: 'asistenciaCurso',
+			endpoint: `${this.apiUrl}/horario/${horarioId}/registrar`,
+			method: 'POST',
+			payload: dto,
+			http$: () => this.api.registrarAsistenciaCurso(horarioId, dto),
+			optimistic: {
+				apply: () => this.store.setRegistroSaving(true),
+				rollback: () => this.store.setRegistroSaving(false),
+			},
+			onCommit: () => {
 				this.store.setRegistroSaving(false);
 				this.errorHandler.showSuccess(UI_SUMMARIES.success, UI_ASISTENCIA_SUCCESS_MESSAGES.registered);
 			},
-			error: (err) => {
+			onError: (err) => {
 				this.errHandler.handle(err, 'registrar asistencia');
 				this.store.setRegistroSaving(false);
 			},

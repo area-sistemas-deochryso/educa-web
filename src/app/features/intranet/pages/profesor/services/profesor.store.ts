@@ -282,6 +282,12 @@ export class ProfesorStore {
 		this._state.update((s) => ({ ...s, notasVistaActual: vista }));
 	}
 
+	getNotaEstudiante(estudianteId: number, calificacionId: number): number | null {
+		const est = this._state().notasSalon?.estudiantes.find((e) => e.estudianteId === estudianteId);
+		if (!est) return null;
+		return est.notas.find((n) => n.calificacionId === calificacionId)?.nota ?? null;
+	}
+
 	/** Quirurgical update: update/delete a single nota and recalculate promedios */
 	updateNotaEstudiante(estudianteId: number, calificacionId: number, nota: number | null): void {
 		this._state.update((s) => {

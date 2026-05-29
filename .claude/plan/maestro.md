@@ -84,7 +84,7 @@ Planes cross-repo con sub-chats FE pendientes: **41** (Correlation Hub), **42** 
 
 ### 🟣 Verificaciones post-deploy (`/verify <NNN>`)
 
-6 briefs en `awaiting-prod/`:
+7 briefs en `awaiting-prod/`:
 
 | Brief | Scope |
 |-------|-------|
@@ -94,6 +94,7 @@ Planes cross-repo con sub-chats FE pendientes: **41** (Correlation Hub), **42** 
 | `169` | Plan 43 Chat 3.1b FE: SMTP response en drawers monitoreo |
 | `199` | F-021: deep-link `/intranet/admin/usuarios?dni=X&autoOpen=true` |
 | `213` | Fix FE: pre-login cookie cleanup + error handling hardening |
+| `268` | WAL migration: 6 mutaciones profesor (academico) |
 
 2 briefs en `troubles/` (reabiertos 2026-05-25):
 
@@ -104,8 +105,8 @@ Planes cross-repo con sub-chats FE pendientes: **41** (Correlation Hub), **42** 
 
 ### Notas operativas
 
-- **`running/`**: vacío · **`open/`**: vacío · **`waiting/`**: vacío
-- **Último cierre**: 262 (P10 P0.2 session resilience) → closed/ 2026-05-28
+- **`running/`**: vacío · **`open/`**: 2 briefs (262 heatmap) · **`waiting/`**: vacío
+- **Último cierre**: 268 (WAL migration profesor) → awaiting-prod/ 2026-05-29
 - **Último saneamiento**: 2026-05-28 — archivados P51, F13, F46-F48, WAL audit cerrada, cola renumerada
 
 ---

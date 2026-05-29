@@ -2,7 +2,8 @@ import { Injectable, inject, DestroyRef } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { Observable, forkJoin } from 'rxjs';
 import { logger, withRetry, downloadBlob } from '@core/helpers';
-import { ErrorHandlerService } from '@core/services';
+import { ErrorHandlerService, WalFacadeHelper, WalCrossTabRefetchService } from '@core/services';
+import { environment } from '@config';
 import { SmartNotificationService } from '@core/services/notifications';
 import { UI_ADMIN_ERROR_DETAILS, UI_SUMMARIES } from '@app/shared/constants';
 import { UserProfileService } from '@core/services/user';
@@ -18,11 +19,26 @@ export class ProfesorFacade {
 	private readonly errorHandler = inject(ErrorHandlerService);
 	private readonly smartNotif = inject(SmartNotificationService);
 	private readonly destroyRef = inject(DestroyRef);
+	private readonly wal = inject(WalFacadeHelper);
+	private readonly crossTabRefetch = inject(WalCrossTabRefetchService);
+	private readonly calificacionUrl = `${environment.apiUrl}/api/Calificacion`;
 
 	// #region Estado expuesto
 	readonly vm = this.store.vm;
-
 	// #endregion
+
+	constructor() {
+		this.crossTabRefetch.subscribe({
+			resourceType: 'calificacionSalon',
+			refetchItems: () => {
+				const salonId = this.store.selectedSalon()?.salonId;
+				const cursoId = this.store.notasCursoId();
+				if (salonId && cursoId) this.loadNotasSalon(salonId, cursoId);
+			},
+			destroyRef: this.destroyRef,
+		});
+	}
+
 	// #region Comandos
 	loadData(): void {
 		const profesorId = this.userProfile.entityId();
@@ -136,27 +152,31 @@ export class ProfesorFacade {
 		this.store.setNotasVistaActual(vista);
 	}
 
-	/**
-	 * Save or delete an individual nota.
-	 * null = delete the nota, number = save/update via calificarLote.
-	 */
 	saveNotaSalon(calificacionId: number, estudianteId: number, nota: number | null): void {
 		const salonId = this.store.selectedSalon()?.salonId;
 		const cursoId = this.store.notasCursoId();
 		if (!salonId || !cursoId) return;
 
-		const apiCall =
-			nota === null
-				? this.api.eliminarNotaEstudiante(calificacionId, estudianteId)
-				: this.api.calificarLote(calificacionId, {
-						notas: [{ estudianteId, nota, observacion: null }],
-					});
+		const previousNota = this.store.getNotaEstudiante(estudianteId, calificacionId);
 
-		apiCall.pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
-			next: () => {
-				this.store.updateNotaEstudiante(estudianteId, calificacionId, nota);
+		this.wal.execute({
+			operation: nota === null ? 'DELETE' : 'UPDATE',
+			resourceType: 'calificacionSalon',
+			resourceId: calificacionId,
+			endpoint: nota === null
+				? `${this.calificacionUrl}/${calificacionId}/estudiante/${estudianteId}`
+				: `${this.calificacionUrl}/${calificacionId}/calificar`,
+			method: nota === null ? 'DELETE' : 'POST',
+			payload: nota === null ? null : { notas: [{ estudianteId, nota, observacion: null }] },
+			http$: () => nota === null
+				? this.api.eliminarNotaEstudiante(calificacionId, estudianteId)
+				: this.api.calificarLote(calificacionId, { notas: [{ estudianteId, nota, observacion: null }] }),
+			optimistic: {
+				apply: () => this.store.updateNotaEstudiante(estudianteId, calificacionId, nota),
+				rollback: () => this.store.updateNotaEstudiante(estudianteId, calificacionId, previousNota),
 			},
-			error: (err) => {
+			onCommit: () => {},
+			onError: (err) => {
 				logger.error('ProfesorFacade: Error al guardar/eliminar nota', err);
 				this.errorHandler.showError(
 					UI_SUMMARIES.error,

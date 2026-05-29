@@ -1,15 +1,10 @@
-/* eslint-disable wal/no-direct-mutation-subscribe --
-   Justificación: aprobarEstudiante/aprobarMasivo son operaciones críticas
-   del dominio académico (INV-T02 + INV-V01..03). El backend es la fuente
-   de verdad de la progresión entre años; un rollback local dejaría al
-   profesor viendo un estado que no existe en la BD. Server-confirmed
-   justificado por invariante de negocio. */
 import { Injectable, inject, DestroyRef } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { forkJoin } from 'rxjs';
 
 import { logger, withRetry } from '@core/helpers';
-import { ErrorHandlerService } from '@core/services';
+import { ErrorHandlerService, WalFacadeHelper, WalCrossTabRefetchService } from '@core/services';
+import { environment } from '@config';
 
 import { TeacherFinalClassroomsApiService } from './profesor-final-salones-api.service';
 import { TeacherFinalClassroomsStore } from './profesor-final-salones.store';
@@ -22,11 +17,22 @@ export class TeacherFinalClassroomsFacade {
 	private store = inject(TeacherFinalClassroomsStore);
 	private errorHandler = inject(ErrorHandlerService);
 	private destroyRef = inject(DestroyRef);
+	private wal = inject(WalFacadeHelper);
+	private crossTabRefetch = inject(WalCrossTabRefetchService);
+	private readonly apiUrl = `${environment.apiUrl}/api/AprobacionEstudiante`;
 	// #endregion
 
 	// #region Estado expuesto
 	readonly vm = this.store.vm;
 	// #endregion
+
+	constructor() {
+		this.crossTabRefetch.subscribe({
+			resourceType: 'aprobacionEstudiante',
+			refetchItems: () => this.loadAll(),
+			destroyRef: this.destroyRef,
+		});
+	}
 
 	// #region Comandos de carga
 
@@ -117,55 +123,72 @@ export class TeacherFinalClassroomsFacade {
 	}
 
 	aprobarEstudiante(dto: AprobarEstudianteDto): void {
-		this.api
-			.aprobarEstudiante(dto)
-			.pipe(takeUntilDestroyed(this.destroyRef))
-			.subscribe({
-				next: (ok) => {
-					if (ok) {
-						this.store.updateAprobacion(dto.estudianteId, {
-							estado: dto.estado,
-							esVacacional: dto.esVacacional,
-							promedioFinal: dto.promedioFinal,
-							observacion: dto.observacion,
-						});
-						this.refreshSalones();
-					} else {
-						this.errorHandler.showError('Error', 'No se pudo aprobar/desaprobar al estudiante');
-					}
-				},
-				error: () => {
+		this.wal.execute<boolean>({
+			operation: 'UPDATE',
+			resourceType: 'aprobacionEstudiante',
+			resourceId: dto.estudianteId,
+			endpoint: this.apiUrl,
+			method: 'POST',
+			payload: dto,
+			consistencyLevel: 'server-confirmed',
+			http$: () => this.api.aprobarEstudiante(dto),
+			optimistic: {
+				apply: () => {},
+				rollback: () => {},
+			},
+			onCommit: (ok) => {
+				if (ok) {
+					this.store.updateAprobacion(dto.estudianteId, {
+						estado: dto.estado,
+						esVacacional: dto.esVacacional,
+						promedioFinal: dto.promedioFinal,
+						observacion: dto.observacion,
+					});
+					this.refreshSalones();
+				} else {
 					this.errorHandler.showError('Error', 'No se pudo aprobar/desaprobar al estudiante');
-				},
-			});
+				}
+			},
+			onError: () => {
+				this.errorHandler.showError('Error', 'No se pudo aprobar/desaprobar al estudiante');
+			},
+		});
 	}
 
 	aprobarMasivo(dto: AprobacionMasivaDto): void {
 		this.store.setAprobacionesLoading(true);
 
-		this.api
-			.aprobarMasivo(dto)
-			.pipe(takeUntilDestroyed(this.destroyRef))
-			.subscribe({
-				next: (resultado) => {
-					if (resultado) {
-						const detail = resultado.failed > 0
-							? `${resultado.succeeded} exitosos, ${resultado.failed} fallidos de ${resultado.total}`
-							: `${resultado.succeeded} de ${resultado.total} procesados correctamente`;
-						this.errorHandler.showSuccess('Aprobación masiva completada', detail, 5000);
-						const salonId = this.store.selectedSalonId();
-						if (salonId) this.loadAprobaciones(salonId);
-						this.refreshSalones();
-					} else {
-						this.errorHandler.showError('Error', 'No se pudo completar la aprobación masiva');
-					}
-					this.store.setAprobacionesLoading(false);
-				},
-				error: () => {
+		this.wal.execute({
+			operation: 'CREATE',
+			resourceType: 'aprobacionEstudiante',
+			endpoint: `${this.apiUrl}/masivo`,
+			method: 'POST',
+			payload: dto,
+			consistencyLevel: 'server-confirmed',
+			http$: () => this.api.aprobarMasivo(dto),
+			optimistic: {
+				apply: () => {},
+				rollback: () => {},
+			},
+			onCommit: (resultado) => {
+				if (resultado) {
+					const detail = resultado.failed > 0
+						? `${resultado.succeeded} exitosos, ${resultado.failed} fallidos de ${resultado.total}`
+						: `${resultado.succeeded} de ${resultado.total} procesados correctamente`;
+					this.errorHandler.showSuccess('Aprobación masiva completada', detail, 5000);
+					const salonId = this.store.selectedSalonId();
+					if (salonId) this.loadAprobaciones(salonId);
+					this.refreshSalones();
+				} else {
 					this.errorHandler.showError('Error', 'No se pudo completar la aprobación masiva');
-					this.store.setAprobacionesLoading(false);
-				},
-			});
+				}
+				this.store.setAprobacionesLoading(false);
+			},
+			onError: () => {
+				this.errorHandler.showError('Error', 'No se pudo completar la aprobación masiva');
+				this.store.setAprobacionesLoading(false);
+			},
+		});
 	}
 	// #endregion
 

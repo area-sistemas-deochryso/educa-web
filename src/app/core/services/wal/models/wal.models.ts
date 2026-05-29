@@ -202,6 +202,8 @@ export const WAL_CACHE_MAP: Record<string, string[]> = {
 	calificacion: ['/api/Calificacion'],
 	grupoContenido: ['/api/GrupoContenido'],
 	conversaciones: ['/api/conversaciones'],
+	aprobacionEstudiante: ['/api/AprobacionEstudiante'],
+	calificacionSalon: ['/api/Calificacion'],
 };
 // #endregion
 

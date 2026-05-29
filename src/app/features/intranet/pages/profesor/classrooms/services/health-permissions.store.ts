@@ -103,6 +103,16 @@ export class HealthPermissionsStore {
 	}
 	// #endregion
 
+	// #region Getters por ID (para rollback WAL)
+	getPermisoSalidaById(id: number): HealthExitPermissionDto | undefined {
+		return this._permisosSalida().find((p) => p.id === id);
+	}
+
+	getJustificacionById(id: number): HealthJustificationDto | undefined {
+		return this._justificaciones().find((j) => j.id === id);
+	}
+	// #endregion
+
 	// #region Comandos de UI
 	openExitDialog(): void {
 		this._saving.set(false);

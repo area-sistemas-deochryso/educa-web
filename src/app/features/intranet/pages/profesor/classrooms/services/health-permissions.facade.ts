@@ -121,16 +121,23 @@ export class HealthPermissionsFacade {
 	}
 
 	anularPermisoSalida(id: number): void {
-		this.api
-			.anularPermisoSalida(id)
-			.pipe(takeUntilDestroyed(this.destroyRef))
-			.subscribe({
-				next: () => {
-					this.store.removePermisoSalida(id);
-					logger.log('Permiso de salida anulado');
-				},
-				error: (err) => logger.error('Error anulando permiso', err),
-			});
+		const cached = this.store.getPermisoSalidaById(id);
+
+		this.wal.execute({
+			operation: 'DELETE',
+			resourceType: 'permisos-salud-salida',
+			resourceId: id,
+			endpoint: `${this.apiUrl}/salida/${id}`,
+			method: 'DELETE',
+			payload: null,
+			http$: () => this.api.anularPermisoSalida(id),
+			optimistic: {
+				apply: () => this.store.removePermisoSalida(id),
+				rollback: () => { if (cached) this.store.addPermisoSalida(cached); },
+			},
+			onCommit: () => logger.log('Permiso de salida anulado'),
+			onError: (err) => logger.error('Error anulando permiso', err),
+		});
 	}
 	// #endregion
 
@@ -156,16 +163,23 @@ export class HealthPermissionsFacade {
 	}
 
 	anularJustificacion(id: number): void {
-		this.api
-			.anularJustificacion(id)
-			.pipe(takeUntilDestroyed(this.destroyRef))
-			.subscribe({
-				next: () => {
-					this.store.removeJustificacion(id);
-					logger.log('Justificación médica anulada');
-				},
-				error: (err) => logger.error('Error anulando justificación', err),
-			});
+		const cached = this.store.getJustificacionById(id);
+
+		this.wal.execute({
+			operation: 'DELETE',
+			resourceType: 'permisos-salud-justificacion',
+			resourceId: id,
+			endpoint: `${this.apiUrl}/justificacion/${id}`,
+			method: 'DELETE',
+			payload: null,
+			http$: () => this.api.anularJustificacion(id),
+			optimistic: {
+				apply: () => this.store.removeJustificacion(id),
+				rollback: () => { if (cached) this.store.addJustificacion(cached); },
+			},
+			onCommit: () => logger.log('Justificación médica anulada'),
+			onError: (err) => logger.error('Error anulando justificación', err),
+		});
 	}
 
 	validarFechas(estudianteId: number, fechas: Date[]): void {
