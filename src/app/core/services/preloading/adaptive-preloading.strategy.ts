@@ -16,12 +16,14 @@ export class AdaptivePreloadingStrategy implements PreloadingStrategy {
 	}
 
 	private shouldPreload(): boolean {
+		if (typeof navigator === 'undefined') return true;
+
 		const nav = navigator as Navigator & {
 			connection?: { saveData?: boolean; effectiveType?: string };
 		};
 
 		const conn = nav.connection;
-		if (!conn) return true; // API not available — preload by default
+		if (!conn) return true;
 
 		if (conn.saveData) return false;
 		if (conn.effectiveType === '2g' || conn.effectiveType === 'slow-2g') return false;

@@ -1,8 +1,10 @@
 # Brief 199 — F-021 · Deep-link `/intranet/admin/usuarios?dni=X&autoOpen=true` no filtra ni abre drawer
 
-> **Creado**: 2026-05-19 · **Estado**: ⏳ pendiente arrancar · **Modo sugerido**: `/execute`
+> **Creado**: 2026-05-19 · **Estado**: ✅ closed 2026-05-28 (prod verified) · **Modo sugerido**: cerrado
 > **Repo**: `educa-web` (FE)
-> **Severidad**: Alto
+> **Severidad**: Alto (resuelto)
+>
+> **Verification (2026-05-28 pilot)**: `?dni=X&autoOpen=true` filtra + abre drawer ✅. DNI inexistente filtra sin abrir ✅. Sin params = default ✅.
 > **Origen**: Cowork BD-PROD-RO 2026-05-19 — brief 147 G.3 verificación post-deploy. Ver `claude-cowork/reporte-cowork-2026-05-19.md` §2 F-021.
 
 ## Síntoma

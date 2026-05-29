@@ -1,14 +1,12 @@
 import { TestBed } from '@angular/core/testing';
 import { provideHttpClient } from '@angular/common/http';
 import { HttpTestingController, provideHttpClientTesting } from '@angular/common/http/testing';
-import { provideRouter, Router } from '@angular/router';
+import { provideRouter } from '@angular/router';
 import { provideZonelessChangeDetection, Component } from '@angular/core';
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 
-import { AuthService } from '@core/services/auth/auth.service';
-import { AuthApiService } from '@core/services/auth/auth-api.service';
+import { AuthService, LoginResponse, UserRole } from '@core/services/auth';
 import { StorageService } from '@core/services/storage';
-import { LoginResponse, UserRole } from '@core/services/auth/auth.models';
 
 @Component({ template: '', standalone: true })
 class DummyComponent {}
@@ -26,7 +24,6 @@ const MOCK_LOGIN_RESPONSE: LoginResponse = {
 describe('Login Flow Integration', () => {
 	let authService: AuthService;
 	let httpMock: HttpTestingController;
-	let router: Router;
 	let mockStorage: Record<string, ReturnType<typeof vi.fn>>;
 
 	beforeEach(() => {
@@ -55,7 +52,7 @@ describe('Login Flow Integration', () => {
 
 		authService = TestBed.inject(AuthService);
 		httpMock = TestBed.inject(HttpTestingController);
-		router = TestBed.inject(Router);
+
 	});
 
 	afterEach(() => {

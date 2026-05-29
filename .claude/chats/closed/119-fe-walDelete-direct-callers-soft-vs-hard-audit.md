@@ -1,9 +1,9 @@
 # FE — Audit DELETE optimistic en facades que llaman `wal.execute` directo
 
-> **Validación prod**: ⏳ pendiente.
+> **Validación prod**: n/a (never started).
 
 > **Repo destino**: `educa-web` (main)
-> **Estado**: ⏳ pendiente arrancar
+> **Estado**: ❌ closed 2026-05-29 — misplaced in awaiting-prod (was never executed). Core fix (brief 118) shipped and works. Remaining scope (soft/hard mismatch audit of ~15 facades) demoted to opportunistic — address per-facade when touching each file. Partial overlap with WAL optimistic audit (brief 267).
 > **Creado**: 2026-05-07 · **Modo sugerido**: `/audit` → `/design` corto → `/execute` → `/validate`
 > **Origen**: derivado del cierre del brief 118 (`fix(crud): walDelete defaults to soft-delete optimistic update`). El fix de `BaseCrudFacade.walDelete` solo cubre cursos.facade (soft) + vistas.facade (hard). Hay ~15 facades adicionales que llaman `wal.execute` con `operation: 'DELETE'` directo, sin pasar por el helper. Cada uno define su propio `optimistic.apply/rollback` y puede tener el mismo mismatch hard/soft que disparó el bug original del curso 42.
 

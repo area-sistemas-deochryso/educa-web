@@ -6,8 +6,8 @@ import { provideZonelessChangeDetection } from '@angular/core';
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 
 import { errorInterceptor } from '@core/interceptors/error/error.interceptor';
-import { ErrorHandlerService } from '@core/services/error/error-handler.service';
-import { SessionActivityService } from '@core/services/session/session-activity.service';
+import { ErrorHandlerService } from '@core/services/error';
+import { SessionActivityService } from '@core/services/session';
 
 describe('Error Recovery Integration', () => {
 	let httpClient: HttpClient;

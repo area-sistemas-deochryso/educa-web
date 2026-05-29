@@ -1,15 +1,13 @@
 import { TestBed } from '@angular/core/testing';
 import { provideHttpClient } from '@angular/common/http';
 import { HttpTestingController, provideHttpClientTesting } from '@angular/common/http/testing';
-import { provideRouter, Router, ActivatedRouteSnapshot, RouterStateSnapshot } from '@angular/router';
+import { provideRouter, Router } from '@angular/router';
 import { provideZonelessChangeDetection, Component } from '@angular/core';
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 
-import { authGuard } from '@core/guards/auth/auth.guard';
-import { permissionsGuard } from '@core/guards/permissions/permisos.guard';
-import { AuthService } from '@core/services/auth/auth.service';
-import { UserPermissionsService } from '@core/services/permissions/user-permisos.service';
-import { AccessDeniedService } from '@core/services/permissions/access-denied.service';
+import { authGuard, permissionsGuard } from '@core/guards';
+import { AuthService } from '@core/services/auth';
+import { UserPermissionsService, AccessDeniedService } from '@core/services/permissions';
 
 @Component({ template: '', standalone: true })
 class DummyComponent {}
@@ -64,7 +62,7 @@ describe('Guard + Permisos Integration', () => {
 	it('should redirect to login when not authenticated', async () => {
 		vi.spyOn(authService, 'isAuthenticated', 'get').mockReturnValue(false);
 
-		const result = await router.navigateByUrl('/intranet');
+		await router.navigateByUrl('/intranet');
 
 		expect(router.url).toBe('/intranet/login');
 	});

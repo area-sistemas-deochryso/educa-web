@@ -1,6 +1,6 @@
 # 140 · FE — Fix F-018: botón "Registrar" disabled en dialog asistencia manual (tipoPersona=A)
 
-> **Creado**: 2026-05-12 · **Reabierto**: 2026-05-25 · **Estado**: 🔴 troubles (2 regresiones post-deploy) · **Repo**: `educa-web` (main)
+> **Creado**: 2026-05-12 · **Reabierto**: 2026-05-25 · **Estado**: ❌ closed 2026-05-29 — consolidated into brief 269 (pilot session). Original fix shipped; R1+R2 regressions handled in 269. · **Repo**: `educa-web` (main)
 > **Modo sugerido**: `/investigate` → `/execute` → `/validate`
 > **Origen**: Cowork 2026-05-12 reportó F-018 al ejecutar TEST 4.2 del bloque Plan 28 AA. Brief 127 (BE dispatcher AA correos) queda bloqueado en `awaiting-prod/` hasta que este fix llegue a prod.
 > **Bloquea**: cierre del Plan 28 al 100% (brief 127 + parte 4b-tab del brief 134 que sigue en `awaiting-prod/`).

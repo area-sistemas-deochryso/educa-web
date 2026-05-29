@@ -1,7 +1,7 @@
 # FE — Plan 1 Fase 5: Hardening de wrappers (barrel + lint)
 
 > **Repo destino**: `educa-web` (main)
-> **Estado**: ⏳ pendiente arrancar
+> **Estado**: ❌ closed 2026-05-29 — misplaced in awaiting-prod (was never executed). Barrel hardening is nice-to-have enforcement, not a shipping blocker. Demoted to opportunistic — pick up when touching storage/wal/session barrels. Partial overlap with P50 F2 (violation migration).
 > **Creado**: 2026-05-09 · **Modo sugerido**: `/audit` → `/execute` → `/validate`
 > **Plan padre**: [`plan/enforcement-fase-5-wrappers.md`](../../plan/enforcement-fase-5-wrappers.md)
 > **Origen**: promocionado desde `tasks/enforcement-reglas.md` el 2026-05-09 vía `/go`. F1-F4 del Plan 1 ya en producción; este chat cierra F5.
