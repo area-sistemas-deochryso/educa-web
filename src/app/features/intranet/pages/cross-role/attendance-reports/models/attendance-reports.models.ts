@@ -93,6 +93,7 @@ export interface PersonaProfesorReporte {
 	totalFaltas?: number | null;
 	totalTardanzas?: number | null;
 	totalJustificados?: number | null;
+	minutosTardanzaTotal?: number | null;
 }
 
 export interface PersonaAsistenteAdminReporte {
@@ -109,6 +110,7 @@ export interface PersonaAsistenteAdminReporte {
 	totalFaltas?: number | null;
 	totalTardanzas?: number | null;
 	totalJustificados?: number | null;
+	minutosTardanzaTotal?: number | null;
 }
 // #endregion
 

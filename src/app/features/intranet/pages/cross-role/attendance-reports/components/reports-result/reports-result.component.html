@@ -138,7 +138,7 @@
 							@for (dia of diasColumnas(); track dia) {
 								<th class="matrix-col-day" [class.holiday-col]="esFeriado(dia)">{{ dia }}</th>
 							}
-							<th class="matrix-col-total matrix-total-header" colspan="4">Resultados</th>
+							<th class="matrix-col-total matrix-total-header" colspan="5">Resultados</th>
 						</tr>
 						<tr>
 							@for (label of diasSemanaLabels(); track $index) {
@@ -148,6 +148,7 @@
 							<th class="matrix-col-total total-F">F</th>
 							<th class="matrix-col-total total-T">T</th>
 							<th class="matrix-col-total total-J">J</th>
+							<th class="matrix-col-total">Min.</th>
 						</tr>
 					</thead>
 					<tbody>
@@ -164,6 +165,7 @@
 								<td class="matrix-col-total matrix-total">{{ prof.totalFaltas ?? 0 }}</td>
 								<td class="matrix-col-total matrix-total">{{ prof.totalTardanzas ?? 0 }}</td>
 								<td class="matrix-col-total matrix-total">{{ prof.totalJustificados ?? 0 }}</td>
+								<td class="matrix-col-total matrix-total">{{ prof.minutosTardanzaTotal ?? 0 }}</td>
 							</tr>
 						}
 					</tbody>
@@ -234,7 +236,7 @@
 							@for (dia of diasColumnas(); track dia) {
 								<th class="matrix-col-day" [class.holiday-col]="esFeriado(dia)">{{ dia }}</th>
 							}
-							<th class="matrix-col-total matrix-total-header" colspan="4">Resultados</th>
+							<th class="matrix-col-total matrix-total-header" colspan="5">Resultados</th>
 						</tr>
 						<tr>
 							@for (label of diasSemanaLabels(); track $index) {
@@ -244,6 +246,7 @@
 							<th class="matrix-col-total total-F">F</th>
 							<th class="matrix-col-total total-T">T</th>
 							<th class="matrix-col-total total-J">J</th>
+							<th class="matrix-col-total">Min.</th>
 						</tr>
 					</thead>
 					<tbody>
@@ -260,6 +263,7 @@
 								<td class="matrix-col-total matrix-total">{{ asist.totalFaltas ?? 0 }}</td>
 								<td class="matrix-col-total matrix-total">{{ asist.totalTardanzas ?? 0 }}</td>
 								<td class="matrix-col-total matrix-total">{{ asist.totalJustificados ?? 0 }}</td>
+								<td class="matrix-col-total matrix-total">{{ asist.minutosTardanzaTotal ?? 0 }}</td>
 							</tr>
 						}
 					</tbody>
