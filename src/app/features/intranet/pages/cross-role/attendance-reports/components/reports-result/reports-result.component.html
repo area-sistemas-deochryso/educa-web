@@ -118,7 +118,7 @@
 }
 <!-- #endregion -->
 
-<!-- #region Profesores (lista plana, sin columna salón) -->
+<!-- #region Profesores -->
 @if (hasProfesores()) {
 	<section class="result-section">
 		<div class="result-section__header">
@@ -128,50 +128,93 @@
 			</div>
 		</div>
 
-		<p-table
-			[value]="profesores()"
-			[paginator]="true"
-			[rows]="10"
-			[rowsPerPageOptions]="[5, 10, 25, 50]"
-			[showCurrentPageReport]="true"
-			currentPageReportTemplate="Mostrando {first} a {last} de {totalRecords}"
-			styleClass="p-datatable-sm"
-		>
-			<ng-template #header>
-				<tr>
-					<th style="width: 70px">#</th>
-					<th style="width: 100px">DNI</th>
-					<th>Nombre</th>
-					@if (esDia()) {
-						<th style="width: 80px">Entrada</th>
-						<th style="width: 80px">Salida</th>
-					} @else {
-						<th style="width: 70px">Días</th>
-					}
-					<th style="width: 180px">Observación</th>
-				</tr>
-			</ng-template>
+		@if (esMatrizMensual()) {
+			<div class="matrix-container">
+				<table class="matrix-table">
+					<thead>
+						<tr>
+							<th class="matrix-frozen matrix-col-num" rowspan="2">#</th>
+							<th class="matrix-frozen matrix-col-name" rowspan="2">Nombre Completo</th>
+							@for (dia of diasColumnas(); track dia) {
+								<th class="matrix-col-day" [class.holiday-col]="esFeriado(dia)">{{ dia }}</th>
+							}
+							<th class="matrix-col-total matrix-total-header" colspan="4">Resultados</th>
+						</tr>
+						<tr>
+							@for (label of diasSemanaLabels(); track $index) {
+								<th class="matrix-col-day matrix-weekday" [class.holiday-col]="esFeriado($index + 1)">{{ label }}</th>
+							}
+							<th class="matrix-col-total total-A">A</th>
+							<th class="matrix-col-total total-F">F</th>
+							<th class="matrix-col-total total-T">T</th>
+							<th class="matrix-col-total total-J">J</th>
+						</tr>
+					</thead>
+					<tbody>
+						@for (prof of profesores(); track prof.dni; let i = $index) {
+							<tr>
+								<td class="matrix-frozen matrix-col-num">{{ i + 1 }}</td>
+								<td class="matrix-frozen matrix-col-name nombre-cell">{{ prof.nombreCompleto }}</td>
+								@for (dia of prof.asistenciasDiarias ?? []; track dia.dia) {
+									<td class="matrix-col-day" [class.holiday-col]="dia.esFeriado">
+										<span class="matrix-badge" [class.matrix-cell-pending]="dia.estadoCodigo === '-' || dia.estadoCodigo === 'X'">{{ dia.estadoCodigo }}</span>
+									</td>
+								}
+								<td class="matrix-col-total matrix-total">{{ prof.totalAsistencias ?? 0 }}</td>
+								<td class="matrix-col-total matrix-total">{{ prof.totalFaltas ?? 0 }}</td>
+								<td class="matrix-col-total matrix-total">{{ prof.totalTardanzas ?? 0 }}</td>
+								<td class="matrix-col-total matrix-total">{{ prof.totalJustificados ?? 0 }}</td>
+							</tr>
+						}
+					</tbody>
+				</table>
+			</div>
+		} @else {
+			<p-table
+				[value]="profesores()"
+				[paginator]="true"
+				[rows]="10"
+				[rowsPerPageOptions]="[5, 10, 25, 50]"
+				[showCurrentPageReport]="true"
+				currentPageReportTemplate="Mostrando {first} a {last} de {totalRecords}"
+				styleClass="p-datatable-sm"
+			>
+				<ng-template #header>
+					<tr>
+						<th style="width: 70px">#</th>
+						<th style="width: 100px">DNI</th>
+						<th>Nombre</th>
+						@if (esDia()) {
+							<th style="width: 80px">Entrada</th>
+							<th style="width: 80px">Salida</th>
+						} @else {
+							<th style="width: 70px">Días</th>
+						}
+						<th style="width: 180px">Observación</th>
+					</tr>
+				</ng-template>
 
-			<ng-template #body let-prof let-i="rowIndex">
-				<tr>
-					<td>{{ i + 1 }}</td>
-					<td>{{ prof.dni }}</td>
-					<td class="nombre-cell">{{ prof.nombreCompleto }}</td>
-					@if (esDia()) {
-						<td>{{ prof.horaLlegada ? (prof.horaLlegada | date: 'HH:mm') : '—' }}</td>
-						<td>{{ prof.horaSalida ? (prof.horaSalida | date: 'HH:mm') : '—' }}</td>
-					} @else {
-						<td class="dias-cell">{{ prof.cantidadDias }}</td>
-					}
-					<td class="obs-cell">{{ prof.observacion ?? '' }}</td>
-				</tr>
-			</ng-template>
-		</p-table>
+				<ng-template #body let-prof let-i="rowIndex">
+					<tr>
+						<td>{{ i + 1 }}</td>
+						<td>{{ prof.dni }}</td>
+						<td class="nombre-cell">{{ prof.nombreCompleto }}</td>
+						@if (esDia()) {
+							<td>{{ prof.horaLlegada ? (prof.horaLlegada | date: 'HH:mm') : '—' }}</td>
+							<td>{{ prof.horaSalida ? (prof.horaSalida | date: 'HH:mm') : '—' }}</td>
+						} @else {
+							<td class="dias-cell">{{ prof.cantidadDias }}</td>
+						}
+						<td class="obs-cell">{{ prof.observacion ?? '' }}</td>
+					</tr>
+				</ng-template>
+			</p-table>
+		}
 	</section>
 }
 <!-- #endregion -->
 
-<!-- #region Asistentes administrativos (lista plana, sin salón) -->
+<!-- #region Asistentes administrativos -->
 @if (hasAsistentesAdmin()) {
 	<section class="result-section">
 		<div class="result-section__header">
@@ -181,45 +224,88 @@
 			</div>
 		</div>
 
-		<p-table
-			[value]="asistentesAdmin()"
-			[paginator]="true"
-			[rows]="10"
-			[rowsPerPageOptions]="[5, 10, 25, 50]"
-			[showCurrentPageReport]="true"
-			currentPageReportTemplate="Mostrando {first} a {last} de {totalRecords}"
-			styleClass="p-datatable-sm"
-		>
-			<ng-template #header>
-				<tr>
-					<th style="width: 70px">#</th>
-					<th style="width: 100px">DNI</th>
-					<th>Nombre</th>
-					@if (esDia()) {
-						<th style="width: 80px">Entrada</th>
-						<th style="width: 80px">Salida</th>
-					} @else {
-						<th style="width: 70px">Días</th>
-					}
-					<th style="width: 180px">Observación</th>
-				</tr>
-			</ng-template>
+		@if (esMatrizMensual()) {
+			<div class="matrix-container">
+				<table class="matrix-table">
+					<thead>
+						<tr>
+							<th class="matrix-frozen matrix-col-num" rowspan="2">#</th>
+							<th class="matrix-frozen matrix-col-name" rowspan="2">Nombre Completo</th>
+							@for (dia of diasColumnas(); track dia) {
+								<th class="matrix-col-day" [class.holiday-col]="esFeriado(dia)">{{ dia }}</th>
+							}
+							<th class="matrix-col-total matrix-total-header" colspan="4">Resultados</th>
+						</tr>
+						<tr>
+							@for (label of diasSemanaLabels(); track $index) {
+								<th class="matrix-col-day matrix-weekday" [class.holiday-col]="esFeriado($index + 1)">{{ label }}</th>
+							}
+							<th class="matrix-col-total total-A">A</th>
+							<th class="matrix-col-total total-F">F</th>
+							<th class="matrix-col-total total-T">T</th>
+							<th class="matrix-col-total total-J">J</th>
+						</tr>
+					</thead>
+					<tbody>
+						@for (asist of asistentesAdmin(); track asist.dni; let i = $index) {
+							<tr>
+								<td class="matrix-frozen matrix-col-num">{{ i + 1 }}</td>
+								<td class="matrix-frozen matrix-col-name nombre-cell">{{ asist.nombreCompleto }}</td>
+								@for (dia of asist.asistenciasDiarias ?? []; track dia.dia) {
+									<td class="matrix-col-day" [class.holiday-col]="dia.esFeriado">
+										<span class="matrix-badge" [class.matrix-cell-pending]="dia.estadoCodigo === '-' || dia.estadoCodigo === 'X'">{{ dia.estadoCodigo }}</span>
+									</td>
+								}
+								<td class="matrix-col-total matrix-total">{{ asist.totalAsistencias ?? 0 }}</td>
+								<td class="matrix-col-total matrix-total">{{ asist.totalFaltas ?? 0 }}</td>
+								<td class="matrix-col-total matrix-total">{{ asist.totalTardanzas ?? 0 }}</td>
+								<td class="matrix-col-total matrix-total">{{ asist.totalJustificados ?? 0 }}</td>
+							</tr>
+						}
+					</tbody>
+				</table>
+			</div>
+		} @else {
+			<p-table
+				[value]="asistentesAdmin()"
+				[paginator]="true"
+				[rows]="10"
+				[rowsPerPageOptions]="[5, 10, 25, 50]"
+				[showCurrentPageReport]="true"
+				currentPageReportTemplate="Mostrando {first} a {last} de {totalRecords}"
+				styleClass="p-datatable-sm"
+			>
+				<ng-template #header>
+					<tr>
+						<th style="width: 70px">#</th>
+						<th style="width: 100px">DNI</th>
+						<th>Nombre</th>
+						@if (esDia()) {
+							<th style="width: 80px">Entrada</th>
+							<th style="width: 80px">Salida</th>
+						} @else {
+							<th style="width: 70px">Días</th>
+						}
+						<th style="width: 180px">Observación</th>
+					</tr>
+				</ng-template>
 
-			<ng-template #body let-asist let-i="rowIndex">
-				<tr>
-					<td>{{ i + 1 }}</td>
-					<td>{{ asist.dni }}</td>
-					<td class="nombre-cell">{{ asist.nombreCompleto }}</td>
-					@if (esDia()) {
-						<td>{{ asist.horaLlegada ? (asist.horaLlegada | date: 'HH:mm') : '—' }}</td>
-						<td>{{ asist.horaSalida ? (asist.horaSalida | date: 'HH:mm') : '—' }}</td>
-					} @else {
-						<td class="dias-cell">{{ asist.cantidadDias }}</td>
-					}
-					<td class="obs-cell">{{ asist.observacion ?? '' }}</td>
-				</tr>
-			</ng-template>
-		</p-table>
+				<ng-template #body let-asist let-i="rowIndex">
+					<tr>
+						<td>{{ i + 1 }}</td>
+						<td>{{ asist.dni }}</td>
+						<td class="nombre-cell">{{ asist.nombreCompleto }}</td>
+						@if (esDia()) {
+							<td>{{ asist.horaLlegada ? (asist.horaLlegada | date: 'HH:mm') : '—' }}</td>
+							<td>{{ asist.horaSalida ? (asist.horaSalida | date: 'HH:mm') : '—' }}</td>
+						} @else {
+							<td class="dias-cell">{{ asist.cantidadDias }}</td>
+						}
+						<td class="obs-cell">{{ asist.observacion ?? '' }}</td>
+					</tr>
+				</ng-template>
+			</p-table>
+		}
 	</section>
 }
 <!-- #endregion -->

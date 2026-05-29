@@ -41,6 +41,8 @@ export interface ReporteFiltrado {
 	totalAsistentesAdminGeneral?: number;
 	totalAsistentesAdminFiltrados?: number;
 	diasFeriados?: number[] | null;
+	diasEnMes?: number | null;
+	nombreMes?: string | null;
 }
 
 export interface SalonReporteFiltrado {
@@ -86,6 +88,11 @@ export interface PersonaProfesorReporte {
 	observacion: string | null;
 	estadoCodigo: string;
 	estadoDescripcion: string;
+	asistenciasDiarias?: AsistenciaDiaMatriz[] | null;
+	totalAsistencias?: number | null;
+	totalFaltas?: number | null;
+	totalTardanzas?: number | null;
+	totalJustificados?: number | null;
 }
 
 export interface PersonaAsistenteAdminReporte {
@@ -97,6 +104,11 @@ export interface PersonaAsistenteAdminReporte {
 	observacion: string | null;
 	estadoCodigo: string;
 	estadoDescripcion: string;
+	asistenciasDiarias?: AsistenciaDiaMatriz[] | null;
+	totalAsistencias?: number | null;
+	totalFaltas?: number | null;
+	totalTardanzas?: number | null;
+	totalJustificados?: number | null;
 }
 // #endregion
 

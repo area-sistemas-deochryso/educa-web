@@ -38,22 +38,26 @@ export class ReportsResultComponent {
 
 	readonly esMatrizMensual = computed(() => {
 		const r = this.resultado();
-		return r.rangoTipo === 'mes' && r.salones.some(s =>
-			s.estudiantes.some(e => e.asistenciasDiarias != null));
+		if (r.rangoTipo !== 'mes') return false;
+		return r.salones.some(s => s.estudiantes.some(e => e.asistenciasDiarias != null))
+			|| r.profesores?.some(p => p.asistenciasDiarias != null) === true
+			|| r.asistentesAdmin?.some(a => a.asistenciasDiarias != null) === true;
 	});
 
 	readonly diasColumnas = computed<number[]>(() => {
-		const salon = this.selectedSalon();
-		if (!salon?.diasEnMes) return [];
-		return Array.from({ length: salon.diasEnMes }, (_, i) => i + 1);
+		const r = this.resultado();
+		const dias = this.selectedSalon()?.diasEnMes ?? r.diasEnMes ?? 0;
+		if (!dias) return [];
+		return Array.from({ length: dias }, (_, i) => i + 1);
 	});
 
 	readonly diasSemanaLabels = computed<string[]>(() => {
-		const salon = this.selectedSalon();
-		if (!salon?.diasEnMes) return [];
-		const fecha = new Date(this.resultado().fechaInicio);
+		const r = this.resultado();
+		const dias = this.selectedSalon()?.diasEnMes ?? r.diasEnMes ?? 0;
+		if (!dias) return [];
+		const fecha = new Date(r.fechaInicio);
 		const labels = ['D', 'L', 'M', 'M', 'J', 'V', 'S'];
-		return Array.from({ length: salon.diasEnMes }, (_, i) => {
+		return Array.from({ length: dias }, (_, i) => {
 			const d = new Date(fecha.getFullYear(), fecha.getMonth(), i + 1);
 			return labels[d.getDay()];
 		});
