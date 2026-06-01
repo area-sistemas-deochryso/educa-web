@@ -1,5 +1,6 @@
-import { DestroyRef, Injectable, inject } from '@angular/core';
+import { DestroyRef, Injectable, inject, signal } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { HttpErrorResponse } from '@angular/common/http';
 
 import { environment } from '@config';
 import { ErrorHandlerService, WalFacadeHelper } from '@core/services';
@@ -9,6 +10,7 @@ import { formatFullName } from '@shared/pipes';
 import {
 	ActualizarUsuarioRequest,
 	CrearUsuarioRequest,
+	DuplicateNameMatch,
 	ImportarEstudianteItem,
 	UsuarioDetalle,
 	UsuarioLista,
@@ -21,6 +23,12 @@ import {
 	buildCrearUsuarioPayload,
 	buildActualizarUsuarioPayload,
 } from './usuarios-payload.builder';
+
+export interface PendingDuplicateConfirmation {
+	nombres: string;
+	apellidos: string;
+	match: DuplicateNameMatch;
+}
 
 /**
  * Facade for CRUD operations on usuarios.
@@ -39,6 +47,25 @@ export class UsersCrudFacade {
 	private log = this.debug.dbg('FACADE:UsuariosCrud');
 	private readonly apiUrl = `${environment.apiUrl}/api/sistema/usuarios`;
 
+	private readonly _pendingDuplicate = signal<PendingDuplicateConfirmation | null>(null);
+	readonly pendingDuplicate = this._pendingDuplicate.asReadonly();
+	private pendingRetryFn: (() => void) | null = null;
+
+	// #region Duplicate Confirmation
+
+	confirmDuplicate(): void {
+		const retryFn = this.pendingRetryFn;
+		this._pendingDuplicate.set(null);
+		this.pendingRetryFn = null;
+		retryFn?.();
+	}
+
+	cancelDuplicate(): void {
+		this._pendingDuplicate.set(null);
+		this.pendingRetryFn = null;
+	}
+
+	// #endregion
 	// #region CRUD Operations
 
 	/**
@@ -199,6 +226,18 @@ export class UsersCrudFacade {
 				this.updateRolEstadistica(data.rol!, 1);
 			},
 			onError: (err) => {
+				const match = this.extractDuplicateMatch(err);
+				if (match) {
+					this._pendingDuplicate.set({
+						nombres: data.nombres!,
+						apellidos: data.apellidos!,
+						match,
+					});
+					this.pendingRetryFn = () => {
+						this.createUsuario({ ...data, confirmarDuplicado: true });
+					};
+					return;
+				}
 				logger.error('Error:', err);
 				this.errorHandler.showError(
 					UI_SUMMARIES.error,
@@ -252,6 +291,18 @@ export class UsersCrudFacade {
 			// WAL: onCommit no debe disparar refetch — el cambio visible ya ocurrió en apply.
 			onCommit: () => {},
 			onError: (err) => {
+				const match = this.extractDuplicateMatch(err);
+				if (match) {
+					this._pendingDuplicate.set({
+						nombres: data.nombres!,
+						apellidos: data.apellidos!,
+						match,
+					});
+					this.pendingRetryFn = () => {
+						this.updateUsuario({ ...data, confirmarDuplicado: true }, selectedUsuario);
+					};
+					return;
+				}
 				logger.error('Error:', err);
 				this.errorHandler.showError(
 					UI_SUMMARIES.error,
@@ -327,6 +378,14 @@ export class UsersCrudFacade {
 			return firstSalon ? formatSalon(firstSalon.salonId) : undefined;
 		}
 		return selectedUsuario.salonNombre;
+	}
+
+	private extractDuplicateMatch(err: unknown): DuplicateNameMatch | null {
+		if (!(err instanceof HttpErrorResponse) || err.status !== 409) return null;
+		if (err.error?.errorCode !== 'DUPLICATE_NAME_MATCH') return null;
+		const match = err.error?.duplicateMatch;
+		if (!match || typeof match.dniPartial !== 'string') return null;
+		return match as DuplicateNameMatch;
 	}
 
 	// #endregion

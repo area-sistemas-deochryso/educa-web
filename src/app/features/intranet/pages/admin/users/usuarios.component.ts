@@ -40,6 +40,7 @@ import {
 import {
 	UI_CONFIRM_HEADERS,
 	UI_CONFIRM_LABELS,
+	buildDuplicateNameMessage,
 	buildToggleUsuarioMessage,
 } from '@app/shared/constants';
 import { environment } from '@env/environment';
@@ -161,6 +162,28 @@ export class UsersComponent implements AfterViewInit {
 			if (target.kind === 'dni' && snapshot.loading === false && items !== undefined) {
 				this.autoOpenTarget.set(null);
 			}
+		});
+
+		effect(() => {
+			const pending = this.crudFacade.pendingDuplicate();
+			if (!pending) return;
+
+			const { nombres, apellidos, match } = pending;
+			const fullName = `${nombres} ${apellidos}`;
+			const header = UI_CONFIRM_HEADERS.duplicateName;
+
+			this.uiFacade.openConfirmDialog();
+			this.confirmationService.confirm({
+				message: buildDuplicateNameMessage(fullName, match.dniPartial, match.grado, match.seccion),
+				header,
+				icon: 'pi pi-exclamation-triangle',
+				acceptLabel: UI_CONFIRM_LABELS.yesContinue,
+				rejectLabel: UI_CONFIRM_LABELS.cancel,
+				acceptButtonStyleClass: 'p-button-warning',
+				accept: () => this.crudFacade.confirmDuplicate(),
+				reject: () => this.crudFacade.cancelDuplicate(),
+			});
+			this.fixConfirmDialogAria(header);
 		});
 	}
 

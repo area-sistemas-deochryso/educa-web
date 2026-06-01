@@ -92,6 +92,7 @@ export interface CrearUsuarioRequest {
 	salonId?: number;
 	// Teacher salons (multiple with tutor flag)
 	salones?: SalonAsignacion[];
+	confirmarDuplicado?: boolean;
 }
 
 /**
@@ -117,6 +118,7 @@ export interface ActualizarUsuarioRequest {
 	salonId?: number;
 	// Teacher salons (multiple with tutor flag)
 	salones?: SalonAsignacion[];
+	confirmarDuplicado?: boolean;
 	// Optimistic concurrency
 	rowVersion?: string;
 }
@@ -185,6 +187,16 @@ export interface ImportarEstudiantesResponse {
 	actualizados: number;
 	rechazados: number;
 	errores: { fila: number; nombre: string; dni: string; razon: string }[];
+}
+
+/**
+ * Duplicate name match returned by BE in 409 response (extensions.duplicateMatch).
+ */
+export interface DuplicateNameMatch {
+	codID: number;
+	dniPartial: string;
+	grado: string | null;
+	seccion: string | null;
 }
 
 // #endregion
