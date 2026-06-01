@@ -36,10 +36,12 @@ Intercept the duplicate error response and show a confirmation dialog in all per
 
 ## Acceptance criteria
 
-- [ ] Duplicate name triggers confirmation dialog with existing record details
-- [ ] Confirming resends with `confirmarDuplicado: true` and succeeds
-- [ ] Cancelling returns to form preserving user input
-- [ ] Works for all 3 entity types (Estudiante, Profesor, Director)
+- [x] Duplicate name triggers confirmation dialog with existing record details
+- [x] Confirming resends with `confirmarDuplicado: true` and succeeds
+- [x] Cancelling returns to form preserving user input
+- [x] Works for all 3 entity types (Estudiante, Profesor, Director)
+
+> **Validación prod**: ⏳ pendiente desde 2026-06-01
 
 ## Out of scope
 
