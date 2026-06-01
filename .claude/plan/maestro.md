@@ -105,7 +105,7 @@ Planes cross-repo con sub-chats FE pendientes: **41** (Correlation Hub), **42** 
 
 ### Notas operativas
 
-- **`running/`**: vacío · **`open/`**: 2 briefs (262 heatmap) · **`waiting/`**: vacío
+- **`running/`**: vacío · **`open/`**: 4 briefs (262×2 heatmap, 269 P28 regressions, 272 P53-F3 FE) · **`waiting/`**: vacío
 - **Último cierre**: 268 (WAL migration profesor) → awaiting-prod/ 2026-05-29
 - **Último saneamiento**: 2026-05-28 — archivados P51, F13, F46-F48, WAL audit cerrada, cola renumerada
 
