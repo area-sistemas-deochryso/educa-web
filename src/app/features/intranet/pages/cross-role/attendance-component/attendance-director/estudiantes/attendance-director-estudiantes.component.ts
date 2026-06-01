@@ -89,7 +89,7 @@ export class AttendanceDirectorEstudiantesComponent implements OnInit {
 	// #region Grados y secciones
 	private readonly allGradosSecciones = signal<GradoSeccion[]>([]);
 	readonly gradosSecciones = computed(() => {
-		const all = this.allGradosSecciones();
+		const all = this.allGradosSecciones().filter((gs) => esGradoAsistenciaDiaria(gs.grado));
 		const month = this.view.ingresos().selectedMonth;
 		const periodo = periodoEnMes(month);
 		return filtrarPorPeriodoAcademico(all, periodo, (gs) => gs.seccion);

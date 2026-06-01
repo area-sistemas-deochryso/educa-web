@@ -7,6 +7,7 @@ import {
 	TeacherAttendanceApiService,
 } from '@intranet-shared/services';
 import { isAdminRole } from '@shared/utils';
+import { esGradoAsistenciaDiaria } from '@shared/constants';
 import { forkJoin } from 'rxjs';
 import { AttendanceReportsApiService } from './attendance-reports-api.service';
 import { AttendanceReportsStore } from './attendance-reports.store';
@@ -40,7 +41,7 @@ export class AttendanceReportsFacade {
 				.pipe(takeUntilDestroyed(this.destroyRef))
 				.subscribe({
 					next: (salones) => {
-						this.store.setSalonesDisponibles(salones);
+						this.store.setSalonesDisponibles(salones.filter((s) => esGradoAsistenciaDiaria(s.graOrden)));
 						this.store.setLoadingSalones(false);
 					},
 					error: () => this.store.setLoadingSalones(false),
@@ -57,7 +58,7 @@ export class AttendanceReportsFacade {
 						[...tutoria, ...horario].forEach((s) => {
 							unique.set(`${s.grado}-${s.seccion}`, s);
 						});
-						this.store.setSalonesDisponibles([...unique.values()]);
+						this.store.setSalonesDisponibles([...unique.values()].filter((s) => esGradoAsistenciaDiaria(s.graOrden)));
 						this.store.setLoadingSalones(false);
 					},
 					error: () => this.store.setLoadingSalones(false),

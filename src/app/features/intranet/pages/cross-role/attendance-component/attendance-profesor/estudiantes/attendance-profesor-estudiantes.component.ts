@@ -89,7 +89,7 @@ export class AttendanceProfesorEstudiantesComponent implements OnInit {
 	private _pendingSalonId: number | null = null;
 	private readonly allSalones = signal<SalonProfesor[]>([]);
 	readonly salones = computed(() => {
-		const all = this.allSalones().filter((s) => s.totalEstudiantes > 0);
+		const all = this.allSalones().filter((s) => s.totalEstudiantes > 0 && esGradoAsistenciaDiaria(s.graOrden));
 		const month = this.view.ingresos().selectedMonth;
 		const periodo = periodoEnMes(month);
 		return filtrarPorPeriodoAcademico(all, periodo, (s) => s.seccion);
