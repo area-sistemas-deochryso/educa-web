@@ -106,8 +106,8 @@ Planes cross-repo con sub-chats FE pendientes: **41** (Correlation Hub), **42** 
 
 ### Notas operativas
 
-- **`running/`**: vacío · **`open/`**: 4 briefs (272 P53-F3, 276 P54-F3, 280 P52-F4) · **`waiting/`**: vacío
-- **Último cierre**: 279 (P52 F5 FE attendance gap tile) → awaiting-prod/ 2026-06-01
+- **`running/`**: vacío · **`open/`**: 7 briefs (262, 269, 272 P53-F3, 276 P54-F3, 280 P52-F4, 281 P53-F3) · **`waiting/`**: vacío
+- **Último cierre**: 282 (P54 F3 FE attendance grade filter alignment) → closed/ 2026-06-01
 - **Último saneamiento**: 2026-05-28 — archivados P51, F13, F46-F48, WAL audit cerrada, cola renumerada
 
 ---
