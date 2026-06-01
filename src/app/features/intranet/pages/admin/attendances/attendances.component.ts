@@ -296,6 +296,7 @@ export class AttendancesComponent implements OnInit {
 	}
 
 	onSincronizarRango(): void {
+		this.dataFacade.loadAllPersonas();
 		this.syncRangeDialogVisible.set(true);
 	}
 

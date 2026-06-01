@@ -158,7 +158,7 @@ export class AttendancesDataFacade {
 			});
 	}
 
-	loadPersonas(tipoPersona: TipoPersonaAsistencia, search?: string): void {
+	loadPersonas(tipoPersona: TipoPersonaAsistencia | null, search?: string): void {
 		const sedeId = this.store.sedeId() ?? undefined;
 		this.store.setPersonasLoading(true);
 
@@ -189,8 +189,12 @@ export class AttendancesDataFacade {
 	/** Alias retrocompat — carga personas del tipo configurado (default `E`). */
 	loadEstudiantes(search?: string): void {
 		const filter = this.store.tipoPersonaFilter();
-		const tipo: TipoPersonaAsistencia = filter === 'P' ? 'P' : 'E';
-		this.loadPersonas(tipo, search);
+		this.loadPersonas(toApiTipoPersona(filter), search);
+	}
+
+	/** Carga personas de todos los tipos — para el dialog de sync por rango. */
+	loadAllPersonas(search?: string): void {
+		this.loadPersonas(null, search);
 	}
 
 	loadCierres(): void {
