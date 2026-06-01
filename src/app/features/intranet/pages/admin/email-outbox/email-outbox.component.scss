@@ -61,6 +61,148 @@
 }
 // #endregion
 
+// #region Collapsible sections
+.collapsible-section {
+	border: 1px solid var(--surface-border);
+	border-radius: 8px;
+	overflow: hidden;
+
+	.section-toggle {
+		display: flex;
+		align-items: center;
+		gap: 0.5rem;
+		padding: 0.75rem 1rem;
+		font-weight: 600;
+		font-size: 0.875rem;
+		color: var(--text-color);
+		cursor: pointer;
+		background: var(--surface-50);
+		user-select: none;
+		list-style: none;
+
+		&::-webkit-details-marker {
+			display: none;
+		}
+
+		&::before {
+			content: '▸';
+			font-size: 0.75rem;
+			transition: transform 0.15s ease;
+		}
+
+		i {
+			font-size: 0.875rem;
+			color: var(--text-color-secondary);
+		}
+	}
+
+	&[open] > .section-toggle::before {
+		transform: rotate(90deg);
+	}
+
+	.section-body {
+		padding: 0.75rem 1rem;
+		display: flex;
+		flex-direction: column;
+		gap: 0.75rem;
+	}
+}
+// #endregion
+
+// #region Retry action
+.retry-action {
+	padding-top: 0.5rem;
+}
+// #endregion
+
+// #region Attempts table
+.attempts-table {
+	font-size: 0.8rem;
+	overflow-x: auto;
+}
+
+.attempts-header,
+.attempts-row {
+	display: grid;
+	grid-template-columns: 2rem 1fr 1fr auto auto auto 1fr auto 1fr;
+	gap: 0.5rem;
+	padding: 0.4rem 0;
+	align-items: center;
+}
+
+.attempts-header {
+	font-weight: 600;
+	color: var(--text-color-secondary);
+	text-transform: uppercase;
+	font-size: 0.7rem;
+	letter-spacing: 0.5px;
+	border-bottom: 1px solid var(--surface-border);
+}
+
+.attempts-row {
+	border-bottom: 1px solid var(--surface-100);
+
+	&:last-child {
+		border-bottom: none;
+	}
+}
+
+.truncate {
+	overflow: hidden;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+}
+
+.smtp-code {
+	font-family: var(--font-family-mono, monospace);
+	font-size: 0.8rem;
+}
+// #endregion
+
+// #region Retry dialog
+.retry-dialog-content {
+	display: flex;
+	flex-direction: column;
+	gap: 0.75rem;
+}
+
+.retry-sender-field {
+	display: flex;
+	flex-direction: column;
+	gap: 0.25rem;
+	margin-top: 0.5rem;
+
+	p-select {
+		width: 100%;
+	}
+}
+
+.retry-result {
+	display: flex;
+	align-items: center;
+	gap: 0.75rem;
+	padding: 0.75rem;
+	border-radius: 6px;
+	margin-top: 0.5rem;
+
+	&.success {
+		background: var(--green-50);
+		border: 1px solid var(--green-200);
+	}
+
+	&.failed {
+		background: var(--red-50);
+		border: 1px solid var(--red-200);
+	}
+
+	.retry-duration {
+		color: var(--text-color-secondary);
+		font-size: 0.8rem;
+		margin-left: auto;
+	}
+}
+// #endregion
+
 // #region Preview
 .preview-section {
 	margin-top: 1rem;

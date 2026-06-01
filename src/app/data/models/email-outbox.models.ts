@@ -47,6 +47,11 @@ export interface EmailOutboxLista {
 	correlationId: string | null;
 	/** Plan 43 Chat 2.1 BE — último error 4.x.x transiente sin promover a FAILED (badge "Pendiente reintento" en PROCESSING). */
 	ultimoErrorTransiente?: string | null;
+	remitente?: string | null;
+	lastSmtpCode?: number | null;
+	lastSmtpMessage?: string | null;
+	lastAttemptAt?: string | null;
+	bounceSource?: string | null;
 }
 
 export interface EmailOutboxEstadisticas {

@@ -10,6 +10,7 @@ import {
 } from '@data/models';
 import { DeferFailStatus } from '../models/defer-fail-status.models';
 import { EmailOutboxExportDto } from '../models/email-outbox-export.models';
+import { EmailOutboxManualAttemptDto, ManualRetryResultDto } from '../models/manual-retry.models';
 import { ThrottleStatus } from '../models/throttle-status.models';
 
 @Injectable({ providedIn: 'root' })
@@ -139,6 +140,17 @@ export class EmailOutboxApiService {
 	// #region Comandos (POST)
 	reintentar(id: number): Observable<void> {
 		return this.http.post<void>(`${this.baseUrl}/${id}/reintentar`, {});
+	}
+
+	manualRetry(id: number, senderAddress?: string): Observable<ManualRetryResultDto> {
+		const body = senderAddress ? { senderAddress } : {};
+		return this.http.post<ManualRetryResultDto>(`${this.baseUrl}/${id}/manual-retry`, body);
+	}
+
+	getManualAttempts(id: number): Observable<EmailOutboxManualAttemptDto[]> {
+		return this.http
+			.get<EmailOutboxManualAttemptDto[]>(`${this.baseUrl}/${id}/manual-attempts`)
+			.pipe(catchError(() => of([])));
 	}
 
 	exportarCaso(id: number): Observable<EmailOutboxExportDto> {

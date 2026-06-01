@@ -9,6 +9,7 @@ import {
 } from '@data/models';
 import { DeferFailStatus } from '../models/defer-fail-status.models';
 import { EmailOutboxExportDto } from '../models/email-outbox-export.models';
+import { EmailOutboxManualAttemptDto, ManualRetryResultDto } from '../models/manual-retry.models';
 import { ThrottleStatus } from '../models/throttle-status.models';
 
 @Injectable({ providedIn: 'root' })
@@ -64,6 +65,13 @@ export class EmailOutboxStore {
 	private readonly _deferFailAutoRefresh = signal(false);
 	private readonly _deferFailCollapsed = signal(false);
 
+	// Manual retry dialog + attempts
+	private readonly _manualRetryDialogVisible = signal(false);
+	private readonly _manualRetryLoading = signal(false);
+	private readonly _manualRetryResult = signal<ManualRetryResultDto | null>(null);
+	private readonly _manualAttempts = signal<EmailOutboxManualAttemptDto[]>([]);
+	private readonly _manualAttemptsLoading = signal(false);
+
 	// Export caso drawer
 	private readonly _exportDrawerVisible = signal(false);
 	private readonly _exportData = signal<EmailOutboxExportDto | null>(null);
@@ -101,6 +109,11 @@ export class EmailOutboxStore {
 	readonly deferFailLoading = this._deferFailLoading.asReadonly();
 	readonly deferFailAutoRefresh = this._deferFailAutoRefresh.asReadonly();
 	readonly deferFailCollapsed = this._deferFailCollapsed.asReadonly();
+	readonly manualRetryDialogVisible = this._manualRetryDialogVisible.asReadonly();
+	readonly manualRetryLoading = this._manualRetryLoading.asReadonly();
+	readonly manualRetryResult = this._manualRetryResult.asReadonly();
+	readonly manualAttempts = this._manualAttempts.asReadonly();
+	readonly manualAttemptsLoading = this._manualAttemptsLoading.asReadonly();
 	readonly exportDrawerVisible = this._exportDrawerVisible.asReadonly();
 	readonly exportData = this._exportData.asReadonly();
 	readonly exportLoading = this._exportLoading.asReadonly();
@@ -161,6 +174,11 @@ export class EmailOutboxStore {
 		deferFailLoading: this._deferFailLoading(),
 		deferFailAutoRefresh: this._deferFailAutoRefresh(),
 		deferFailCollapsed: this._deferFailCollapsed(),
+		manualRetryDialogVisible: this._manualRetryDialogVisible(),
+		manualRetryLoading: this._manualRetryLoading(),
+		manualRetryResult: this._manualRetryResult(),
+		manualAttempts: this._manualAttempts(),
+		manualAttemptsLoading: this._manualAttemptsLoading(),
 		exportDrawerVisible: this._exportDrawerVisible(),
 		exportData: this._exportData(),
 		exportLoading: this._exportLoading(),
@@ -325,6 +343,9 @@ export class EmailOutboxStore {
 		this._drawerVisible.set(false);
 		this._selectedItem.set(null);
 		this._previewHtml.set(null);
+		this._manualRetryDialogVisible.set(false);
+		this._manualRetryResult.set(null);
+		this._manualAttempts.set([]);
 	}
 
 	setPreviewHtml(html: string | null): void {
@@ -333,6 +354,33 @@ export class EmailOutboxStore {
 
 	setPreviewLoading(loading: boolean): void {
 		this._previewLoading.set(loading);
+	}
+
+	// Manual retry
+	openManualRetryDialog(): void {
+		this._manualRetryDialogVisible.set(true);
+		this._manualRetryResult.set(null);
+	}
+
+	closeManualRetryDialog(): void {
+		this._manualRetryDialogVisible.set(false);
+		this._manualRetryResult.set(null);
+	}
+
+	setManualRetryLoading(loading: boolean): void {
+		this._manualRetryLoading.set(loading);
+	}
+
+	setManualRetryResult(result: ManualRetryResultDto | null): void {
+		this._manualRetryResult.set(result);
+	}
+
+	setManualAttempts(attempts: EmailOutboxManualAttemptDto[]): void {
+		this._manualAttempts.set(attempts);
+	}
+
+	setManualAttemptsLoading(loading: boolean): void {
+		this._manualAttemptsLoading.set(loading);
 	}
 
 	setExportDrawerVisible(visible: boolean): void {

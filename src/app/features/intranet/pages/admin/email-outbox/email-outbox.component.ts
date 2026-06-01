@@ -6,8 +6,13 @@ import {
 	inject,
 } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
+import { FormsModule } from '@angular/forms';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { DrawerModule } from 'primeng/drawer';
+import { DialogModule } from 'primeng/dialog';
+import { SelectModule } from 'primeng/select';
+import { ButtonModule } from 'primeng/button';
+import { TagModule } from 'primeng/tag';
 import { ToastModule } from 'primeng/toast';
 import { MessageService } from 'primeng/api';
 
@@ -38,7 +43,12 @@ import { EmailOutboxLista } from '@data/models';
 	selector: 'app-email-outbox',
 	standalone: true,
 	imports: [
+		FormsModule,
 		DrawerModule,
+		DialogModule,
+		SelectModule,
+		ButtonModule,
+		TagModule,
 		ToastModule,
 		StatsSkeletonComponent,
 		TableSkeletonComponent,
@@ -76,6 +86,14 @@ export class EmailOutboxComponent implements OnInit {
 	readonly throttleWidgetEnabled = environment.features.emailOutboxThrottleWidget;
 	readonly deferFailWidgetEnabled = environment.features.emailOutboxDeferFailWidget;
 	readonly deferAlertsEnabled = environment.features.emailDeferAlerts;
+
+	selectedSender: string | null = null;
+
+	get senderOptions(): { label: string; value: string }[] {
+		const status = this.vm().throttleStatus;
+		if (!status) return [];
+		return status.senders.map((s) => ({ label: s.address, value: s.address }));
+	}
 	// #endregion
 
 	// #region Lifecycle
@@ -197,6 +215,22 @@ export class EmailOutboxComponent implements OnInit {
 		if (!visible) {
 			this.uiFacade.closeDrawer();
 		}
+	}
+
+	onOpenManualRetry(): void {
+		this.selectedSender = null;
+		this.uiFacade.openManualRetryDialog();
+		if (this.throttleWidgetEnabled) {
+			this.dataFacade.loadThrottleStatus();
+		}
+	}
+
+	onConfirmManualRetry(): void {
+		this.uiFacade.confirmManualRetry(this.selectedSender ?? undefined);
+	}
+
+	onCloseManualRetryDialog(): void {
+		this.uiFacade.closeManualRetryDialog();
 	}
 
 	onThrottleRefresh(): void {

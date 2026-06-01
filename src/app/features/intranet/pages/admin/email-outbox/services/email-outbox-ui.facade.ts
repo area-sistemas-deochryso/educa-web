@@ -22,6 +22,7 @@ export class EmailOutboxUiFacade {
 	openDetail(item: EmailOutboxLista): void {
 		this.store.openDrawer(item);
 		this.loadPreview(item.id);
+		this.loadManualAttempts(item.id);
 	}
 
 	closeDrawer(): void {
@@ -43,7 +44,78 @@ export class EmailOutboxUiFacade {
 	}
 	// #endregion
 
-	// #region Reintento
+	private loadManualAttempts(id: number): void {
+		this.store.setManualAttemptsLoading(true);
+		this.api
+			.getManualAttempts(id)
+			.pipe(takeUntilDestroyed(this.destroyRef))
+			.subscribe({
+				next: (attempts) => {
+					this.store.setManualAttempts(attempts);
+					this.store.setManualAttemptsLoading(false);
+				},
+				error: () => this.store.setManualAttemptsLoading(false),
+			});
+	}
+	// #endregion
+
+	// #region Manual retry
+	openManualRetryDialog(): void {
+		this.store.openManualRetryDialog();
+	}
+
+	closeManualRetryDialog(): void {
+		this.store.closeManualRetryDialog();
+	}
+
+	confirmManualRetry(senderAddress?: string): void {
+		const item = this.store.selectedItem();
+		if (!item) return;
+
+		this.store.setManualRetryLoading(true);
+		this.api
+			.manualRetry(item.id, senderAddress)
+			.pipe(takeUntilDestroyed(this.destroyRef))
+			.subscribe({
+				next: (result) => {
+					this.store.setManualRetryLoading(false);
+					this.store.setManualRetryResult(result);
+					if (result.resultado === 'SENT') {
+						this.store.markAsRetrying(item.id);
+						this.errorHandler.showSuccess(
+							'Reintento exitoso',
+							`El correo a ${item.destinatario} fue enviado.`,
+						);
+					}
+					this.loadManualAttempts(item.id);
+				},
+				error: (err) => {
+					this.store.setManualRetryLoading(false);
+					this.handleManualRetryError(err, item);
+				},
+			});
+	}
+
+	private handleManualRetryError(err: unknown, item: EmailOutboxLista): void {
+		if (err instanceof HttpErrorResponse && err.status === 409) {
+			const body = err.error as { message?: string; errorCode?: string } | null;
+			const reason = body?.errorCode === 'DESTINATARIO_BLACKLISTED'
+				? 'El destinatario está en blacklist.'
+				: body?.errorCode === 'DESTINATARIO_QUARANTINED'
+					? 'El destinatario está en cuarentena activa.'
+					: (body?.message ?? 'No se puede reintentar este correo.');
+			this.errorHandler.showWarning('Reintento bloqueado', reason);
+			return;
+		}
+		logger.error('[EmailOutboxUiFacade] Error en manual retry', err);
+		this.errorHandler.showError(
+			'Error al reintentar',
+			`No se pudo reintentar el correo a ${item.destinatario}.`,
+		);
+	}
+	// #endregion
+
+	// #region Reintento (queue)
 	reintentar(item: EmailOutboxLista): void {
 		this.api
 			.reintentar(item.id)

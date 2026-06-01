@@ -3,6 +3,7 @@
 > **Created**: 2026-06-01 · **Plan**: [P52](../../../../educa-coord/plans/xrepo-52-email-outbox-manual-retry-diagnostics.md) · **Phase**: F3
 > **Repo**: educa-web · **Type**: FE feature
 > **Suggested mode**: `/execute`
+> **Validación prod**: ⏳ pendiente desde 2026-06-01
 > **Design**: completed in coord brief 274 (pilot session 2026-06-01)
 
 ## Context
