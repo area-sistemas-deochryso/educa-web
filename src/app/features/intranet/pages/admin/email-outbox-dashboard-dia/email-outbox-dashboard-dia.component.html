@@ -118,6 +118,11 @@
 				@if (hasData()) {
 					<app-dashboard-fallos-por-sender-table [data]="vm().fallosPorSender" />
 				}
+
+				<!-- Asistencias sin correo confirmado (P52 F5) -->
+				@if (hasData()) {
+					<app-attendance-gap-tile [data]="vm().attendanceGaps" />
+				}
 			</div>
 		</p-tabpanel>
 

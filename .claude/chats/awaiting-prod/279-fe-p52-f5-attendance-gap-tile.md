@@ -15,7 +15,9 @@
 
 ## Acceptance criteria
 
-- [ ] Tile shows attendance gaps for selected day
-- [ ] FAILED vs "No generado" visually distinct (different tag colors)
-- [ ] Row click navigates to bandeja filtered by recipient
-- [ ] "Cobertura completa" shown when no gaps
+- [x] Tile shows attendance gaps for selected day
+- [x] FAILED vs "No generado" visually distinct (different tag colors)
+- [x] Row click navigates to bandeja filtered by recipient
+- [x] "Cobertura completa" shown when no gaps
+
+> **Validación prod**: ⏳ pendiente desde 2026-06-01 — requiere brief 278 BE deployado

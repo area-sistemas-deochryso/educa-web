@@ -1,0 +1,46 @@
+<!-- #region AttendanceGap tile -->
+<section class="table-section" aria-label="Asistencias sin correo confirmado">
+	<header class="section-header">
+		<h3>Asistencias sin correo confirmado</h3>
+		<span class="section-subtitle">Registros del día sin correo SENT asociado</span>
+	</header>
+
+	@if (isEmpty()) {
+		<div class="empty-state empty-state--success">
+			<i class="pi pi-check-circle"></i>
+			<span>Cobertura completa</span>
+		</div>
+	} @else {
+		<p-table
+			[value]="data()"
+			class="p-datatable-sm"
+			styleClass="p-datatable-gridlines"
+			[rowHover]="true"
+		>
+			<ng-template #header>
+				<tr>
+					<th class="label-uppercase">Alumno</th>
+					<th class="label-uppercase">Grado</th>
+					<th class="label-uppercase col-tipo">Tipo</th>
+					<th class="label-uppercase col-hora">Hora registro</th>
+					<th class="label-uppercase col-estado">Estado correo</th>
+				</tr>
+			</ng-template>
+			<ng-template #body let-row>
+				<tr class="row-clickable" (click)="onRowClick(row)">
+					<td>{{ row.alumno }}</td>
+					<td>{{ row.grado }}</td>
+					<td class="col-tipo">{{ row.tipo }}</td>
+					<td class="col-hora">{{ row.horaRegistro }}</td>
+					<td class="col-estado">
+						<p-tag
+							[value]="getEstadoLabel(row)"
+							[severity]="getEstadoSeverity(row)"
+						/>
+					</td>
+				</tr>
+			</ng-template>
+		</p-table>
+	}
+</section>
+<!-- #endregion -->

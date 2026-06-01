@@ -11,6 +11,7 @@ import { DashboardHeaderComponent } from './components/dashboard-header/dashboar
 import { DashboardPorTipoTableComponent } from './components/dashboard-por-tipo-table/dashboard-por-tipo-table.component';
 import { DashboardResumenComponent } from './components/dashboard-resumen/dashboard-resumen.component';
 import { DashboardFallosPorSenderTableComponent } from './components/dashboard-fallos-por-sender-table/dashboard-fallos-por-sender-table.component';
+import { AttendanceGapTileComponent } from './components/attendance-gap-tile/attendance-gap-tile.component';
 import { MapaEnvioTabComponent } from './components/mapa-envio-tab/mapa-envio-tab.component';
 import { EmailDeferFailBannerComponent } from './components/email-defer-fail-banner/email-defer-fail-banner.component';
 import { EmailOutboxDashboardDiaFacade } from './services';
@@ -65,6 +66,7 @@ interface DetalleKpiCard {
 		DashboardBouncersTableComponent,
 		DashboardFallosTableComponent,
 		DashboardFallosPorSenderTableComponent,
+		AttendanceGapTileComponent,
 		MapaEnvioTabComponent,
 		EmailDeferFailBannerComponent,
 	],

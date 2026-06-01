@@ -2,7 +2,7 @@ import { computed, Injectable, signal } from '@angular/core';
 
 import { EmailOutboxLista } from '@data/models';
 
-import { EmailDashboardDiaDto, EmailDashboardFallosPorSender } from '../models/email-dashboard-dia.models';
+import { AttendanceGapRow, EmailDashboardDiaDto, EmailDashboardFallosPorSender } from '../models/email-dashboard-dia.models';
 
 @Injectable({ providedIn: 'root' })
 export class EmailOutboxDashboardDiaStore {
@@ -16,6 +16,7 @@ export class EmailOutboxDashboardDiaStore {
 	// * Registros crudos FAILED del día (reusa endpoint /listar).
 	private readonly _fallosDia = signal<EmailOutboxLista[]>([]);
 	private readonly _fallosPorSender = signal<EmailDashboardFallosPorSender[]>([]);
+	private readonly _attendanceGaps = signal<AttendanceGapRow[]>([]);
 	// #endregion
 
 	// #region Lecturas públicas
@@ -25,6 +26,7 @@ export class EmailOutboxDashboardDiaStore {
 	readonly fechaConsulta = this._fechaConsulta.asReadonly();
 	readonly fallosDia = this._fallosDia.asReadonly();
 	readonly fallosPorSender = this._fallosPorSender.asReadonly();
+	readonly attendanceGaps = this._attendanceGaps.asReadonly();
 	// #endregion
 
 	// #region Computed
@@ -50,6 +52,7 @@ export class EmailOutboxDashboardDiaStore {
 		fecha: this.fecha(),
 		fallosDia: this._fallosDia(),
 		fallosPorSender: this._fallosPorSender(),
+		attendanceGaps: this._attendanceGaps(),
 	}));
 	// #endregion
 
@@ -76,6 +79,10 @@ export class EmailOutboxDashboardDiaStore {
 
 	setFallosPorSender(items: EmailDashboardFallosPorSender[]): void {
 		this._fallosPorSender.set(items);
+	}
+
+	setAttendanceGaps(items: AttendanceGapRow[]): void {
+		this._attendanceGaps.set(items);
 	}
 	// #endregion
 }

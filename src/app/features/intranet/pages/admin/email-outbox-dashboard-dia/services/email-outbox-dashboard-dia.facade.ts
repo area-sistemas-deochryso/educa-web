@@ -46,13 +46,15 @@ export class EmailOutboxDashboardDiaFacade {
 				.listarFallosDia(fechaParaFallos)
 				.pipe(catchError(() => of([]))),
 			fallosPorSender: this.api.obtenerFallosPorSender(fecha),
+			attendanceGaps: this.api.obtenerAsistenciasSinCorreo(fecha),
 		})
 			.pipe(takeUntilDestroyed(this.destroyRef))
 			.subscribe({
-				next: ({ dto, fallosDia, fallosPorSender }) => {
+				next: ({ dto, fallosDia, fallosPorSender, attendanceGaps }) => {
 					this.store.setDto(dto);
 					this.store.setFallosDia(fallosDia);
 					this.store.setFallosPorSender(fallosPorSender);
+					this.store.setAttendanceGaps(attendanceGaps);
 					this.store.setLoading(false);
 				},
 				error: (err: unknown) => {

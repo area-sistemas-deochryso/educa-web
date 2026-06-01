@@ -5,7 +5,7 @@ import { catchError, Observable, of } from 'rxjs';
 import { environment } from '@config/environment';
 import { EmailOutboxLista } from '@data/models';
 
-import { EmailDashboardDiaDto, EmailDashboardFallosPorSender } from '../models/email-dashboard-dia.models';
+import { AttendanceGapRow, EmailDashboardDiaDto, EmailDashboardFallosPorSender } from '../models/email-dashboard-dia.models';
 
 @Injectable({ providedIn: 'root' })
 export class EmailOutboxDashboardDiaService {
@@ -38,6 +38,14 @@ export class EmailOutboxDashboardDiaService {
 			.get<EmailOutboxLista[]>(`${this.baseUrl}/listar`, { params })
 			.pipe(catchError(() => of([])));
 	}
+	obtenerAsistenciasSinCorreo(fecha?: string): Observable<AttendanceGapRow[]> {
+		let params = new HttpParams();
+		if (fecha) params = params.set('fecha', fecha);
+		return this.http
+			.get<AttendanceGapRow[]>(`${this.baseUrl}/asistencias-sin-correo`, { params })
+			.pipe(catchError(() => of([])));
+	}
+
 	obtenerFallosPorSender(fecha?: string): Observable<EmailDashboardFallosPorSender[]> {
 		let params = new HttpParams();
 		if (fecha) params = params.set('fecha', fecha);

@@ -1,0 +1,88 @@
+// #region AttendanceGap tile
+.table-section {
+	border: 1px solid var(--surface-300);
+	border-radius: 12px;
+	overflow: hidden;
+	background: transparent;
+
+	.section-header {
+		padding: 0.7rem 1rem;
+		border-bottom: 1px solid var(--surface-300);
+
+		h3 {
+			margin: 0;
+			font-size: 0.95rem;
+			font-weight: 600;
+			color: var(--text-color);
+		}
+
+		.section-subtitle {
+			font-size: 0.8rem;
+			color: var(--text-color-secondary);
+		}
+	}
+
+	.col-tipo {
+		width: 90px;
+	}
+
+	.col-hora {
+		width: 110px;
+		font-variant-numeric: tabular-nums;
+	}
+
+	.col-estado {
+		width: 120px;
+	}
+
+	:host ::ng-deep .p-datatable {
+		.p-datatable-table-container,
+		.p-datatable-wrapper,
+		&.p-datatable {
+			overflow-x: hidden !important;
+			width: 100%;
+		}
+
+		table {
+			table-layout: fixed;
+			width: 100%;
+		}
+
+		td {
+			vertical-align: middle !important;
+			word-break: break-all;
+			overflow-wrap: anywhere;
+			white-space: normal;
+		}
+	}
+}
+
+.row-clickable {
+	cursor: pointer;
+
+	&:hover {
+		background: var(--surface-100);
+	}
+}
+
+.empty-state {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	gap: 0.5rem;
+	padding: 2rem 1rem;
+	color: var(--text-color-secondary);
+
+	&--success {
+		i {
+			color: var(--green-600);
+			font-size: 1.1rem;
+		}
+
+		span {
+			color: var(--green-700);
+			font-weight: 600;
+		}
+	}
+}
+// #endregion

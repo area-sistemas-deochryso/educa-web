@@ -57,6 +57,15 @@ export interface EmailDashboardFallosPorSender {
 	cantidad: number;
 }
 
+export interface AttendanceGapRow {
+	alumno: string;
+	grado: string;
+	tipo: string;
+	horaRegistro: string;
+	outboxId: number | null;
+	outboxEstado: string | null;
+}
+
 // #endregion
 
 // #region Error codes del BE (400)

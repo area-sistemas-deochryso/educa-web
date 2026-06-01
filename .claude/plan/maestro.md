@@ -95,6 +95,7 @@ Planes cross-repo con sub-chats FE pendientes: **41** (Correlation Hub), **42** 
 | `199` | F-021: deep-link `/intranet/admin/usuarios?dni=X&autoOpen=true` |
 | `213` | Fix FE: pre-login cookie cleanup + error handling hardening |
 | `268` | WAL migration: 6 mutaciones profesor (academico) |
+| `279` | P52 F5 FE: attendance gap tile in dashboard día |
 
 2 briefs en `troubles/` (reabiertos 2026-05-25):
 
@@ -105,8 +106,8 @@ Planes cross-repo con sub-chats FE pendientes: **41** (Correlation Hub), **42** 
 
 ### Notas operativas
 
-- **`running/`**: vacío · **`open/`**: 4 briefs (262×2 heatmap, 269 P28 regressions, 272 P53-F3 FE) · **`waiting/`**: vacío
-- **Último cierre**: 268 (WAL migration profesor) → awaiting-prod/ 2026-05-29
+- **`running/`**: vacío · **`open/`**: 4 briefs (272 P53-F3, 276 P54-F3, 280 P52-F4) · **`waiting/`**: vacío
+- **Último cierre**: 279 (P52 F5 FE attendance gap tile) → awaiting-prod/ 2026-06-01
 - **Último saneamiento**: 2026-05-28 — archivados P51, F13, F46-F48, WAL audit cerrada, cola renumerada
 
 ---
