@@ -1,0 +1,34 @@
+<!-- #region FallosPorSender table -->
+<section class="table-section" aria-label="Fallos por remitente">
+	<header class="section-header">
+		<h3>Fallos por remitente</h3>
+		<span class="section-subtitle">Pivot sender × tipo de fallo del día</span>
+	</header>
+
+	@if (isEmpty()) {
+		<div class="empty-state">
+			<i class="pi pi-check-circle"></i>
+			<span>Sin fallos en el día</span>
+		</div>
+	} @else {
+		<p-table [value]="data()" class="p-datatable-sm" styleClass="p-datatable-gridlines">
+			<ng-template #header>
+				<tr>
+					<th class="label-uppercase">Remitente</th>
+					<th class="label-uppercase">Tipo de fallo</th>
+					<th class="label-uppercase col-num">Cantidad</th>
+				</tr>
+			</ng-template>
+			<ng-template #body let-row>
+				<tr>
+					<td class="cell-sender">{{ row.remitente || 'Desconocido' }}</td>
+					<td>
+						<p-tag [value]="row.tipoFallo | tipoFalloLabel" styleClass="tag-neutral" />
+					</td>
+					<td class="col-num val-failed">{{ row.cantidad }}</td>
+				</tr>
+			</ng-template>
+		</p-table>
+	}
+</section>
+<!-- #endregion -->

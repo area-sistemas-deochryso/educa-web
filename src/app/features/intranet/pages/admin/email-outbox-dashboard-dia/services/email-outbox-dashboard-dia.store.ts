@@ -2,7 +2,7 @@ import { computed, Injectable, signal } from '@angular/core';
 
 import { EmailOutboxLista } from '@data/models';
 
-import { EmailDashboardDiaDto } from '../models/email-dashboard-dia.models';
+import { EmailDashboardDiaDto, EmailDashboardFallosPorSender } from '../models/email-dashboard-dia.models';
 
 @Injectable({ providedIn: 'root' })
 export class EmailOutboxDashboardDiaStore {
@@ -15,6 +15,7 @@ export class EmailOutboxDashboardDiaStore {
 	private readonly _fechaConsulta = signal<string | null>(null);
 	// * Registros crudos FAILED del día (reusa endpoint /listar).
 	private readonly _fallosDia = signal<EmailOutboxLista[]>([]);
+	private readonly _fallosPorSender = signal<EmailDashboardFallosPorSender[]>([]);
 	// #endregion
 
 	// #region Lecturas públicas
@@ -23,6 +24,7 @@ export class EmailOutboxDashboardDiaStore {
 	readonly error = this._error.asReadonly();
 	readonly fechaConsulta = this._fechaConsulta.asReadonly();
 	readonly fallosDia = this._fallosDia.asReadonly();
+	readonly fallosPorSender = this._fallosPorSender.asReadonly();
 	// #endregion
 
 	// #region Computed
@@ -47,6 +49,7 @@ export class EmailOutboxDashboardDiaStore {
 		generatedAt: this.generatedAt(),
 		fecha: this.fecha(),
 		fallosDia: this._fallosDia(),
+		fallosPorSender: this._fallosPorSender(),
 	}));
 	// #endregion
 
@@ -69,6 +72,10 @@ export class EmailOutboxDashboardDiaStore {
 
 	setFallosDia(items: EmailOutboxLista[]): void {
 		this._fallosDia.set(items);
+	}
+
+	setFallosPorSender(items: EmailDashboardFallosPorSender[]): void {
+		this._fallosPorSender.set(items);
 	}
 	// #endregion
 }

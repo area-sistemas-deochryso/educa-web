@@ -41,6 +41,7 @@ export class EmailOutboxStore {
 	private readonly _filterTipoFallo = signal<string | null>(null);
 	private readonly _filterDesde = signal<string | null>(null);
 	private readonly _filterHasta = signal<string | null>(null);
+	private readonly _filterLastSmtpCode = signal<string | null>(null);
 	private readonly _filterCorrelationId = signal<string | null>(null);
 
 	// UI
@@ -94,6 +95,7 @@ export class EmailOutboxStore {
 	readonly filterTipoFallo = this._filterTipoFallo.asReadonly();
 	readonly filterDesde = this._filterDesde.asReadonly();
 	readonly filterHasta = this._filterHasta.asReadonly();
+	readonly filterLastSmtpCode = this._filterLastSmtpCode.asReadonly();
 	readonly filterCorrelationId = this._filterCorrelationId.asReadonly();
 	readonly drawerVisible = this._drawerVisible.asReadonly();
 	readonly selectedItem = this._selectedItem.asReadonly();
@@ -120,16 +122,6 @@ export class EmailOutboxStore {
 	// #endregion
 
 	// #region Computed
-	/**
-	 * Plan 43 Chat 4.1b — los filtros ahora van al BE (paginación server-side
-	 * variante B). El store solo expone el array tal cual lo devuelve el server.
-	 */
-	readonly filteredItems = computed(() => this._items());
-
-	/**
-	 * Total real cuando `/count` respondió; cae al estimate progresivo si
-	 * count=null por fallo (per `rules/pagination.md` §"Fail-safe del count").
-	 */
 	readonly totalRecordsEstimate = computed(() => {
 		const total = this._totalCount();
 		if (total !== null) return total;
@@ -143,7 +135,7 @@ export class EmailOutboxStore {
 
 	// #region ViewModel
 	readonly vm = computed(() => ({
-		items: this.filteredItems(),
+		items: this._items(),
 		estadisticas: this._estadisticas(),
 		loading: this._loading(),
 		error: this._error(),
@@ -159,6 +151,7 @@ export class EmailOutboxStore {
 		filterTipoFallo: this._filterTipoFallo(),
 		filterDesde: this._filterDesde(),
 		filterHasta: this._filterHasta(),
+		filterLastSmtpCode: this._filterLastSmtpCode(),
 		filterCorrelationId: this._filterCorrelationId(),
 		drawerVisible: this._drawerVisible(),
 		selectedItem: this._selectedItem(),
@@ -189,40 +182,27 @@ export class EmailOutboxStore {
 	setItems(items: EmailOutboxLista[]): void {
 		this._items.set(items);
 	}
-
 	setEstadisticas(stats: EmailOutboxEstadisticas): void {
 		this._estadisticas.set(stats);
 	}
-
 	setLoading(loading: boolean): void {
 		this._loading.set(loading);
 	}
-
 	setError(error: string | null): void {
 		this._error.set(error);
 	}
-
-	setStatsReady(ready: boolean): void {
+	setDataReady(ready: boolean): void {
 		this._statsReady.set(ready);
-	}
-
-	setTableReady(ready: boolean): void {
 		this._tableReady.set(ready);
 	}
-
 	setTendencias(tendencias: EmailOutboxTendencia[]): void {
 		this._tendencias.set(tendencias);
+		this._tendenciasReady.set(true);
 	}
 
-	setTendenciasReady(ready: boolean): void {
-		this._tendenciasReady.set(ready);
-	}
-
-	// Plan 43 Chat 4.1b — paginación
 	setPage(page: number): void {
 		this._page.set(page);
 	}
-
 	setPageSize(pageSize: number): void {
 		this._pageSize.set(pageSize);
 	}
@@ -231,57 +211,42 @@ export class EmailOutboxStore {
 		this._page.set(page);
 		this._pageSize.set(pageSize);
 	}
-
 	setTotalCount(count: number | null): void {
 		this._totalCount.set(count);
 	}
 
-	/**
-	 * Mutación quirúrgica: elimina un item de la lista y decrementa el total
-	 * para mantener coherencia con el paginador (per `rules/pagination.md`).
-	 */
 	removeItem(id: number): void {
 		this._items.update((list) => list.filter((i) => i.id !== id));
 		this._totalCount.update((c) => (c !== null && c > 0 ? c - 1 : c));
 	}
-
-	/** Mutación quirúrgica: marca item como PENDING tras reintento */
 	markAsRetrying(id: number): void {
 		this._items.update((list) =>
 			list.map((i) => (i.id === id ? { ...i, estado: 'PENDING' as const, intentos: 0 } : i)),
 		);
 	}
 
-	// * Plan 22 Chat B — throttle status
 	setThrottleStatus(status: ThrottleStatus | null): void {
 		this._throttleStatus.set(status);
 	}
-
 	setThrottleLoading(loading: boolean): void {
 		this._throttleLoading.set(loading);
 	}
-
 	setThrottleAutoRefresh(enabled: boolean): void {
 		this._throttleAutoRefresh.set(enabled);
 	}
-
 	setThrottleCollapsed(collapsed: boolean): void {
 		this._throttleCollapsed.set(collapsed);
 	}
 
-	// * Plan 22 Chat B / Plan 29 Chat 2.6 — defer/fail status
 	setDeferFailStatus(status: DeferFailStatus | null): void {
 		this._deferFailStatus.set(status);
 	}
-
 	setDeferFailLoading(loading: boolean): void {
 		this._deferFailLoading.set(loading);
 	}
-
 	setDeferFailAutoRefresh(enabled: boolean): void {
 		this._deferFailAutoRefresh.set(enabled);
 	}
-
 	setDeferFailCollapsed(collapsed: boolean): void {
 		this._deferFailCollapsed.set(collapsed);
 	}
@@ -291,27 +256,24 @@ export class EmailOutboxStore {
 	setSearchTerm(term: string): void {
 		this._searchTerm.set(term);
 	}
-
 	setFilterTipo(tipo: EmailOutboxTipo | null): void {
 		this._filterTipo.set(tipo);
 	}
-
 	setFilterEstado(estado: EmailOutboxEstado | null): void {
 		this._filterEstado.set(estado);
 	}
-
 	setFilterTipoFallo(tipoFallo: string | null): void {
 		this._filterTipoFallo.set(tipoFallo);
 	}
-
 	setFilterDesde(desde: string | null): void {
 		this._filterDesde.set(desde);
 	}
-
 	setFilterHasta(hasta: string | null): void {
 		this._filterHasta.set(hasta);
 	}
-
+	setFilterLastSmtpCode(code: string | null): void {
+		this._filterLastSmtpCode.set(code);
+	}
 	setFilterCorrelationId(correlationId: string | null): void {
 		this._filterCorrelationId.set(correlationId);
 	}
@@ -325,6 +287,7 @@ export class EmailOutboxStore {
 		this._filterTipo.set(null);
 		this._filterEstado.set(null);
 		this._filterTipoFallo.set(null);
+		this._filterLastSmtpCode.set(null);
 		this._filterDesde.set(null);
 		this._filterHasta.set(null);
 		this._filterCorrelationId.set(null);
@@ -351,34 +314,27 @@ export class EmailOutboxStore {
 	setPreviewHtml(html: string | null): void {
 		this._previewHtml.set(html);
 	}
-
 	setPreviewLoading(loading: boolean): void {
 		this._previewLoading.set(loading);
 	}
 
-	// Manual retry
 	openManualRetryDialog(): void {
 		this._manualRetryDialogVisible.set(true);
 		this._manualRetryResult.set(null);
 	}
-
 	closeManualRetryDialog(): void {
 		this._manualRetryDialogVisible.set(false);
 		this._manualRetryResult.set(null);
 	}
-
 	setManualRetryLoading(loading: boolean): void {
 		this._manualRetryLoading.set(loading);
 	}
-
 	setManualRetryResult(result: ManualRetryResultDto | null): void {
 		this._manualRetryResult.set(result);
 	}
-
 	setManualAttempts(attempts: EmailOutboxManualAttemptDto[]): void {
 		this._manualAttempts.set(attempts);
 	}
-
 	setManualAttemptsLoading(loading: boolean): void {
 		this._manualAttemptsLoading.set(loading);
 	}
@@ -386,11 +342,9 @@ export class EmailOutboxStore {
 	setExportDrawerVisible(visible: boolean): void {
 		this._exportDrawerVisible.set(visible);
 	}
-
 	setExportData(data: EmailOutboxExportDto | null): void {
 		this._exportData.set(data);
 	}
-
 	setExportLoading(loading: boolean): void {
 		this._exportLoading.set(loading);
 	}

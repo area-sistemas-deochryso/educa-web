@@ -113,6 +113,11 @@
 						}
 					</div>
 				</div>
+
+				<!-- Fallos por sender (pivot remitente × tipoFallo) -->
+				@if (hasData()) {
+					<app-dashboard-fallos-por-sender-table [data]="vm().fallosPorSender" />
+				}
 			</div>
 		</p-tabpanel>
 

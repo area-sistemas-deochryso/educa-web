@@ -1,6 +1,7 @@
 # 277 — P52 F4 FE: Sender failure dashboard tile + SMTP code filter
 
 > **Created**: 2026-06-01 · **Plan**: [P52](../../../../educa-coord/plans/xrepo-52-email-outbox-manual-retry-diagnostics.md) · **Phase**: F4 (FE portion)
+> **Validación prod**: ⏳ pendiente desde 2026-06-01
 > **Repo**: educa-web · **Type**: FE feature
 > **Suggested mode**: `/execute`
 > **Depends on**: brief 276 (P52 F4 BE — SMTP filter + sender dashboard endpoint)

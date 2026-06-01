@@ -25,6 +25,7 @@ export class EmailOutboxApiService {
 		tipo?: string;
 		estado?: string;
 		tipoFallo?: string;
+		lastSmtpCode?: string;
 		correlationId?: string;
 		desde?: string;
 		hasta?: string;
@@ -52,6 +53,7 @@ export class EmailOutboxApiService {
 		tipo?: string;
 		estado?: string;
 		tipoFallo?: string;
+		lastSmtpCode?: string;
 		correlationId?: string;
 		desde?: string;
 		hasta?: string;
@@ -67,6 +69,7 @@ export class EmailOutboxApiService {
 		tipo?: string;
 		estado?: string;
 		tipoFallo?: string;
+		lastSmtpCode?: string;
 		correlationId?: string;
 		desde?: string;
 		hasta?: string;
@@ -76,6 +79,7 @@ export class EmailOutboxApiService {
 		if (filtros?.tipo) params = params.set('tipo', filtros.tipo);
 		if (filtros?.estado) params = params.set('estado', filtros.estado);
 		if (filtros?.tipoFallo) params = params.set('tipoFallo', filtros.tipoFallo);
+		if (filtros?.lastSmtpCode) params = params.set('lastSmtpCode', filtros.lastSmtpCode);
 		if (filtros?.correlationId)
 			params = params.set('correlationId', filtros.correlationId);
 		if (filtros?.desde) params = params.set('desde', filtros.desde);

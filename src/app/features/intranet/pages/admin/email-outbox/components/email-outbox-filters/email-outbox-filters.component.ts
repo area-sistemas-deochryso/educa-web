@@ -46,6 +46,7 @@ export class EmailOutboxFiltersComponent {
 	readonly filterTipo = input<EmailOutboxTipo | null>(null);
 	readonly filterEstado = input<EmailOutboxEstado | null>(null);
 	readonly filterTipoFallo = input<string | null>(null);
+	readonly filterLastSmtpCode = input<string | null>(null);
 	readonly filterCorrelationId = input<string | null>(null);
 	// #endregion
 
@@ -54,6 +55,7 @@ export class EmailOutboxFiltersComponent {
 	readonly filterTipoChange = output<string | null>();
 	readonly filterEstadoChange = output<string | null>();
 	readonly filterTipoFalloChange = output<string | null>();
+	readonly filterLastSmtpCodeChange = output<string | null>();
 	readonly filterCorrelationIdChange = output<string | null>();
 	readonly filterDesdeChange = output<string | null>();
 	readonly filterHastaChange = output<string | null>();
@@ -78,6 +80,12 @@ export class EmailOutboxFiltersComponent {
 			...TIPOS_FALLO.map((t) => ({ label: labelPipe.transform(t), value: t })),
 		];
 	})();
+	readonly smtpCodeOptions: SelectOption[] = [
+		{ label: 'Todos', value: null },
+		{ label: '421 — Rate limit', value: '421' },
+		{ label: '535 — Auth failure', value: '535' },
+		{ label: '550 — Mailbox not found', value: '550' },
+	];
 	// #endregion
 
 	// #region Handlers

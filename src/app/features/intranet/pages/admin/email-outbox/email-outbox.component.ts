@@ -175,6 +175,10 @@ export class EmailOutboxComponent implements OnInit {
 		this.dataFacade.onFilterTipoFalloChange(tipoFallo);
 	}
 
+	onFilterLastSmtpCodeChange(code: string | null): void {
+		this.dataFacade.onFilterLastSmtpCodeChange(code);
+	}
+
 	onFilterCorrelationIdChange(correlationId: string | null): void {
 		this.dataFacade.onFilterCorrelationIdChange(correlationId);
 	}

@@ -45,12 +45,14 @@ export class EmailOutboxDashboardDiaFacade {
 			fallosDia: this.api
 				.listarFallosDia(fechaParaFallos)
 				.pipe(catchError(() => of([]))),
+			fallosPorSender: this.api.obtenerFallosPorSender(fecha),
 		})
 			.pipe(takeUntilDestroyed(this.destroyRef))
 			.subscribe({
-				next: ({ dto, fallosDia }) => {
+				next: ({ dto, fallosDia, fallosPorSender }) => {
 					this.store.setDto(dto);
 					this.store.setFallosDia(fallosDia);
+					this.store.setFallosPorSender(fallosPorSender);
 					this.store.setLoading(false);
 				},
 				error: (err: unknown) => {

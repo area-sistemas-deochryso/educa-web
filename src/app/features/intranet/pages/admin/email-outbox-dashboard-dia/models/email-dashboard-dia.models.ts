@@ -51,6 +51,12 @@ export interface EmailBouncesAcumulados {
 	ultimoError: string;
 }
 
+export interface EmailDashboardFallosPorSender {
+	remitente: string;
+	tipoFallo: string;
+	cantidad: number;
+}
+
 // #endregion
 
 // #region Error codes del BE (400)

@@ -57,6 +57,20 @@
 	</div>
 
 	<div class="field">
+		<label class="label-uppercase" for="filter-smtp-code">Código SMTP</label>
+		<p-select
+			inputId="filter-smtp-code"
+			[options]="smtpCodeOptions"
+			[ngModel]="filterLastSmtpCode()"
+			(ngModelChange)="filterLastSmtpCodeChange.emit($event)"
+			optionLabel="label"
+			optionValue="value"
+			placeholder="Cualquier código"
+			appendTo="body"
+		/>
+	</div>
+
+	<div class="field">
 		<label class="label-uppercase">Desde</label>
 		<p-datepicker
 			placeholder="dd/mm/yyyy"

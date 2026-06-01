@@ -66,16 +66,13 @@ export class EmailOutboxDataFacade {
 					this.store.setTotalCount(count);
 					this.store.setEstadisticas(stats);
 					this.store.setTendencias(tendencias);
-					this.store.setStatsReady(true);
-					this.store.setTableReady(true);
-					this.store.setTendenciasReady(true);
+					this.store.setDataReady(true);
 					this.store.setLoading(false);
 				},
 				error: () => {
 					this.store.setLoading(false);
-					this.store.setStatsReady(true);
-					this.store.setTableReady(true);
-					this.store.setTendenciasReady(true);
+					this.store.setDataReady(true);
+					this.store.setTendencias([]);
 				},
 			});
 	}
@@ -123,6 +120,7 @@ export class EmailOutboxDataFacade {
 		tipo: string | undefined;
 		estado: string | undefined;
 		tipoFallo: string | undefined;
+		lastSmtpCode: string | undefined;
 		correlationId: string | undefined;
 		desde: string | undefined;
 		hasta: string | undefined;
@@ -132,6 +130,7 @@ export class EmailOutboxDataFacade {
 			tipo: this.store.filterTipo() ?? undefined,
 			estado: this.store.filterEstado() ?? undefined,
 			tipoFallo: this.store.filterTipoFallo() ?? undefined,
+			lastSmtpCode: this.store.filterLastSmtpCode() ?? undefined,
 			correlationId: this.store.filterCorrelationId() ?? undefined,
 			desde: this.store.filterDesde() ?? undefined,
 			hasta: this.store.filterHasta() ?? undefined,
@@ -165,6 +164,12 @@ export class EmailOutboxDataFacade {
 	 */
 	onFilterTipoFalloChange(tipoFallo: string | null): void {
 		this.store.setFilterTipoFallo(tipoFallo);
+		this.store.setPage(1);
+		this.loadData();
+	}
+
+	onFilterLastSmtpCodeChange(code: string | null): void {
+		this.store.setFilterLastSmtpCode(code);
 		this.store.setPage(1);
 		this.loadData();
 	}
