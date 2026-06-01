@@ -36,6 +36,20 @@ export const buildToggleHorarioMessage = (accion: string): string => {
 	return `¿Está seguro de ${accion} este horario?`;
 };
 
+export const buildDuplicateNameMessage = (
+	nombre: string,
+	dniPartial: string,
+	grado: string | null,
+	seccion: string | null,
+): string => {
+	const ubicacion = grado && seccion ? ` (${grado} ${seccion})` : '';
+	return [
+		`Ya existe una persona con el nombre "${nombre}" en esta sede${ubicacion}.`,
+		`DNI parcial: ...${dniPartial}`,
+		'¿Desea continuar con el registro de todas formas?',
+	].join('\n\n');
+};
+
 // #endregion
 
 // #region Confirm dialog constants
@@ -47,6 +61,7 @@ export const UI_CONFIRM_HEADERS = {
 	deactivateUser: 'Desactivar Usuario',
 	activateHorario: 'Activar Horario',
 	deactivateHorario: 'Desactivar Horario',
+	duplicateName: 'Posible Duplicado',
 } as const;
 
 export const UI_CONFIRM_LABELS = {
@@ -55,6 +70,7 @@ export const UI_CONFIRM_LABELS = {
 	cancel: 'Cancelar',
 	yesDelete: 'Sí, eliminar',
 	yesAssignAll: 'Sí, asignar todos',
+	yesContinue: 'Sí, continuar',
 } as const;
 
 export const UI_HORARIOS_CONFIRM_MESSAGES = {
