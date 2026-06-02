@@ -28,8 +28,10 @@ In `/intranet/admin/bandeja-correos` (email outbox admin page):
 
 ## Acceptance criteria
 
-- [ ] TipoFallo badge visible on each outbox row
-- [ ] Filter by TipoFallo works
-- [ ] Retry button disabled for permanent failures
-- [ ] Existing tests green + new specs for badge/filter logic
-- [ ] Build + lint clean
+- [x] TipoFallo badge visible on each outbox row
+- [x] Filter by TipoFallo works
+- [x] Retry button disabled for permanent failures
+- [x] Existing tests green + new specs for badge/filter logic
+- [x] Build + lint clean
+
+> **Validación prod**: ⏳ pendiente desde 2026-06-02 — confirmar que badges TipoFallo se muestran correctamente con datos reales en prod

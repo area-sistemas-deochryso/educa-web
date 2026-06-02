@@ -12,7 +12,7 @@
 | F8 | Design Patterns Backend | Incremental | Al tocar módulos |
 | F9 | Design Patterns Frontend | Incremental | Al tocar módulos |
 | xP41 | → Correlation Hub (coord) | F1 ✅ · F2 FE ✅ · F3 BE next | ver P41 |
-| xP22 | → Endurecimiento correos (coord) | **F3.FE brief 284** (TipoFallo UI) | ver P22 |
+| xP22 | → Endurecimiento correos (coord) | F3.FE ✅ awaiting-prod (284) | ver P22 |
 | xP42 | → Casing contratos (coord) | Sin trabajo FE pendiente | ver P42 |
 | xP43 | → Monitoreo Cowork (coord) | **F5:5.2 FE brief 285** (heatmap + bundle) · 4.1→6.2 pendientes | ver P43 |
 | xP45 | → Monitoreo incidencias (coord) | P45:F2.2:FE ⏳ | ver P45 |
