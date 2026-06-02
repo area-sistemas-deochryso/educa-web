@@ -1,23 +1,20 @@
-# 288 — P45 F2.2: Event view + Trace JOIN + full endpoint
+# 288 — P45 F2.2 FE: Event view + Trace JOIN
 
 > **Created**: 2026-06-02
 > **Plan**: [xrepo-45](../../../../../educa-coord/plans/xrepo-45-monitoreo-incidencias-rework.md) §F2
-> **Phase**: F2.2 — UI rework part 2/2
-> **Repo**: educa-web (+ Educa.API for the new endpoint)
+> **Phase**: F2.2 FE — UI rework part 2/2
+> **Repo**: educa-web
 > **Predecessor**: brief 197 (F2.1 ✅ — occurrence drawer tabs shipped)
-> **Mode**: `/design` (micro, scope already defined in 197) → `/execute` → `/validate`
+> **Depends on**: brief 290 (P45 F2.2 BE — endpoint `/error-logs/{id}/full`)
+> **Mode**: `/execute` → `/validate`
 
 ---
 
 ## Objective
 
-Complete the incident detail rework started in F2.1. Three deliverables:
+Complete the incident detail rework started in F2.1. Two FE deliverables (BE endpoint delivered by brief 290):
 
-### 1. BE endpoint: full occurrence payload
-
-New `GET /api/sistema/error-logs/{id}/full` (or `?includeContraparte=true`) that returns `ErrorLog + ErrorLogTrace[] + ErrorLogDetalle[] + ErrorGroup` in a single response. This feeds the Trace and Group tabs that F2.1 left as empty states.
-
-### 2. FE: Trace tab — populate with real data
+### 1. FE: Trace tab — populate with real data
 
 Fill the Trace tab (currently empty state from F2.1) with `ErrorLogTrace[]` from the full endpoint. Show step list ordered by timestamp with layer, component, method, duration, and error snippet. Add FE↔BE JOIN by `CorrelationId` — show the counterpart entry (FE error that triggered the BE error, or vice versa) as a linked block within the tab.
 
@@ -36,12 +33,13 @@ The event view lists individual log entries. Clicking one opens the occurrence d
 - Read brief 197 closed to understand exactly what F2.1 shipped and component structure
 - Read current `error-occurrence-drawer` component to see the empty-state tabs
 - Read `ErrorGroupsViewToggle` component for the view switch integration point
-- Check Educa.API `ErrorLogController` / `ErrorGroupController` for existing endpoints
+- Verify brief 290 BE endpoint is deployed/available
 
 ## Dependencies
 
 - F2.1 ✅ (occurrence drawer tabs — shipped)
-- F5 BE (ProblemDetails) — **NOT a dependency** for F2.2. F2.2 surfaces existing data; F3 depends on F5.
+- **Brief 290 BE** (endpoint `/error-logs/{id}/full`) — must be deployed first
+- F5 BE (ProblemDetails) — NOT a dependency for F2.2. F2.2 surfaces existing data; F3 depends on F5.
 
 ## Validation
 
