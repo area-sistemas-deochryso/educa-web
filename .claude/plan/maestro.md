@@ -1,6 +1,6 @@
 # Plan Maestro — Orden y Dependencias
 
-> **Inicio**: 2026-04-14 · **Última limpieza**: 2026-05-28
+> **Inicio**: 2026-04-14 · **Última limpieza**: 2026-06-02
 > **Principio rector**: "Features primero — el enforcement y la arquitectura son valiosos solo si soportan funcionalidad real."
 > **Scope**: solo trabajo FE-only. BE-only → [`Educa.API/.claude/plan/maestro.md`](../../../Educa.API/.claude/plan/maestro.md). Cross-repo → [`educa-coord/plans/maestro.md`](../../../educa-coord/plans/maestro.md).
 
@@ -12,9 +12,13 @@
 | F8 | Design Patterns Backend | Incremental | Al tocar módulos |
 | F9 | Design Patterns Frontend | Incremental | Al tocar módulos |
 | xP41 | → Correlation Hub (coord) | F1 ✅ · F2 FE ✅ · F3 BE next | ver P41 |
+| xP22 | → Endurecimiento correos (coord) | **F3.FE brief 284** (TipoFallo UI) | ver P22 |
 | xP42 | → Casing contratos (coord) | Sin trabajo FE pendiente | ver P42 |
-| xP43 | → Monitoreo Cowork (coord) | Chat 5.1 FE ✅ · 4.1→6.2 pendientes | ver P43 |
+| xP43 | → Monitoreo Cowork (coord) | **F5:5.2 FE brief 285** (heatmap + bundle) · 4.1→6.2 pendientes | ver P43 |
 | xP45 | → Monitoreo incidencias (coord) | P45:F2.2:FE ⏳ | ver P45 |
+| xP52 | → Email outbox retry + diagnostics (coord) | F3-F5 FE ✅ awaiting-prod (275, 277, 279) | ver P52 |
+| xP53 | → Duplicate person validation (coord) | F3 FE ✅ awaiting-prod (281) | ver P53 |
+| xP54 | → Attendance grade filter (coord) | F3 FE ✅ closed (282) | ver P54 |
 <!-- INDEX:END -->
 
 ---
@@ -32,7 +36,7 @@
 
 **Archivados**: P51 (Reporte Mensual ✅ `86bab2e0`), F13 (Test Gaps ✅ brief 247), F46/F47/F48 (barridos ✅ 2026-05-15).
 
-Planes cross-repo con sub-chats FE pendientes: **41** (Correlation Hub), **42** (Casing contratos), **43** (Monitoreo Cowork — Chat 5.1 FE ✅, quedan 4.1→6.2). Detalle en sección Referencias cross-repo.
+Planes cross-repo con sub-chats FE pendientes: **41** (Correlation Hub), **42** (Casing contratos), **43** (Monitoreo Cowork — Chat 5.1 FE ✅, quedan 4.1→6.2). Completados recientemente: **P52** (F3-F5 FE awaiting-prod), **P53** (F3 FE awaiting-prod), **P54** (F3 FE closed). Detalle en sección Referencias cross-repo.
 
 ---
 
@@ -84,31 +88,24 @@ Planes cross-repo con sub-chats FE pendientes: **41** (Correlation Hub), **42** 
 
 ### 🟣 Verificaciones post-deploy (`/verify <NNN>`)
 
-7 briefs en `awaiting-prod/`:
+6 briefs en `awaiting-prod/`:
 
 | Brief | Scope |
 |-------|-------|
-| `119` | WAL DELETE audit soft vs hard |
-| `137` | Plan 1 F5: hardening de wrappers (barrel + lint) |
-| `147` | Plan 43 Chat 2.1 FE: badge transiente + textarea blacklist + link auditoría |
 | `169` | Plan 43 Chat 3.1b FE: SMTP response en drawers monitoreo |
-| `199` | F-021: deep-link `/intranet/admin/usuarios?dni=X&autoOpen=true` |
-| `213` | Fix FE: pre-login cookie cleanup + error handling hardening |
 | `268` | WAL migration: 6 mutaciones profesor (academico) |
+| `275` | P52 F3 FE: retry UI + diagnostic drawer |
+| `277` | P52 F4 FE: SMTP code filter + sender failure tile |
 | `279` | P52 F5 FE: attendance gap tile in dashboard día |
+| `281` | P53 F3 FE: duplicate person confirmation dialog |
 
-2 briefs en `troubles/` (reabiertos 2026-05-25):
-
-| Brief | Scope |
-|-------|-------|
-| `134` | Plan 28 Chat 4a+4b: self-service AA + tab director-profesores |
-| `140` | Fix F-018: botón "Registrar" disabled en asistencia manual (tipoPersona=A) |
+Movidos a `closed/` (sync 2026-06-01): 119 (WAL DELETE audit), 137 (F5 wrappers), 147 (P43 Chat 2.1 FE), 199 (F-021 deep-link), 213 (login cookie), 134 (P28 Chat 4), 140 (F-018 botón).
 
 ### Notas operativas
 
-- **`running/`**: vacío · **`open/`**: 7 briefs (262, 269, 272 P53-F3, 276 P54-F3, 280 P52-F4, 281 P53-F3) · **`waiting/`**: vacío
+- **`running/`**: vacío · **`open/`**: 2 briefs (284, 285) · **`waiting/`**: vacío · **`troubles/`**: vacío
 - **Último cierre**: 282 (P54 F3 FE attendance grade filter alignment) → closed/ 2026-06-01
-- **Último saneamiento**: 2026-05-28 — archivados P51, F13, F46-F48, WAL audit cerrada, cola renumerada
+- **Último saneamiento**: 2026-06-02 — pilot session: materialized briefs 284 (P22 F3.FE) + 285 (P43 F5:5.2 FE). Old briefs 281/282 cleaned from open/ (already in awaiting-prod/closed).
 
 ---
 
