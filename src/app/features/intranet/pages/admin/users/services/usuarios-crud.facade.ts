@@ -1,6 +1,5 @@
 import { DestroyRef, Injectable, inject, signal } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import { HttpErrorResponse } from '@angular/common/http';
 
 import { environment } from '@config';
 import { ErrorHandlerService, WalFacadeHelper } from '@core/services';
@@ -10,25 +9,20 @@ import { formatFullName } from '@shared/pipes';
 import {
 	ActualizarUsuarioRequest,
 	CrearUsuarioRequest,
-	DuplicateNameMatch,
 	ImportarEstudianteItem,
 	UsuarioDetalle,
 	UsuarioLista,
-	UsuariosEstadisticas,
 } from '../models';
 import { UsersService } from './usuarios.service';
 import { UsersStore } from './usuarios.store';
 import { UsersDataFacade } from './usuarios-data.facade';
+import { buildCrearUsuarioPayload, buildActualizarUsuarioPayload } from './usuarios-payload.builder';
 import {
-	buildCrearUsuarioPayload,
-	buildActualizarUsuarioPayload,
-} from './usuarios-payload.builder';
-
-export interface PendingDuplicateConfirmation {
-	nombres: string;
-	apellidos: string;
-	match: DuplicateNameMatch;
-}
+	PendingDuplicateConfirmation,
+	ROL_STAT_KEY,
+	extractDuplicateMatch,
+	resolveSalonNombre,
+} from './usuarios-crud.helpers';
 
 /**
  * Facade for CRUD operations on usuarios.
@@ -226,7 +220,7 @@ export class UsersCrudFacade {
 				this.updateRolEstadistica(data.rol!, 1);
 			},
 			onError: (err) => {
-				const match = this.extractDuplicateMatch(err);
+				const match = extractDuplicateMatch(err);
 				if (match) {
 					this._pendingDuplicate.set({
 						nombres: data.nombres!,
@@ -291,7 +285,7 @@ export class UsersCrudFacade {
 			// WAL: onCommit no debe disparar refetch — el cambio visible ya ocurrió en apply.
 			onCommit: () => {},
 			onError: (err) => {
-				const match = this.extractDuplicateMatch(err);
+				const match = extractDuplicateMatch(err);
 				if (match) {
 					this._pendingDuplicate.set({
 						nombres: data.nombres!,
@@ -313,7 +307,7 @@ export class UsersCrudFacade {
 			optimistic: {
 				apply: () => {
 					this.dataFacade.markCrudMutation();
-					const salonNombre = this.resolveSalonNombre(data, selectedUsuario);
+					const salonNombre = resolveSalonNombre(data, selectedUsuario, this.store.salones());
 					this.store.updateItem(id, {
 						dni: data.dni!,
 						nombreCompleto: formatFullName(data.apellidos!, data.nombres!),
@@ -336,56 +330,11 @@ export class UsersCrudFacade {
 		});
 	}
 
-	/** Mapeo rol → campo de estadística. Agregar aquí si se crea un nuevo rol. */
-	private readonly ROL_STAT_KEY: Record<string, keyof UsuariosEstadisticas> = {
-		Director: 'totalDirectores',
-		Profesor: 'totalProfesores',
-		Estudiante: 'totalEstudiantes',
-		Apoderado: 'totalApoderados',
-		'Asistente Administrativo': 'totalAsistentesAdministrativos',
-		Promotor: 'totalPromotores',
-		'Coordinador Académico': 'totalCoordinadoresAcademicos',
-	};
-
 	private updateRolEstadistica(rol: string, delta: number): void {
-		const key = this.ROL_STAT_KEY[rol];
+		const key = ROL_STAT_KEY[rol];
 		if (key) {
 			this.store.incrementarEstadistica(key, delta);
 		}
-	}
-
-	/**
-	 * Resuelve el nombre del salón a mostrar en la tabla tras editar.
-	 * Formato backend: "{grado} {seccion}" (ej: "5° A"), ver ProfesorQueryStrategy / EstudianteQueryStrategy.
-	 * - Estudiante: salón único por salonId.
-	 * - Profesor: primer salón del array salones (FirstOrDefault del backend).
-	 * - Otros roles: null (sin salón).
-	 */
-	private resolveSalonNombre(
-		data: Partial<CrearUsuarioRequest & ActualizarUsuarioRequest>,
-		selectedUsuario: UsuarioDetalle,
-	): string | undefined {
-		const formatSalon = (salonId: number): string | undefined => {
-			const salon = this.store.salones().find((s) => s.salonId === salonId);
-			return salon ? `${salon.grado} ${salon.seccion}` : undefined;
-		};
-
-		if (data.rol === 'Estudiante') {
-			return data.salonId ? formatSalon(data.salonId) : undefined;
-		}
-		if (data.rol === 'Profesor') {
-			const firstSalon = data.salones?.[0];
-			return firstSalon ? formatSalon(firstSalon.salonId) : undefined;
-		}
-		return selectedUsuario.salonNombre;
-	}
-
-	private extractDuplicateMatch(err: unknown): DuplicateNameMatch | null {
-		if (!(err instanceof HttpErrorResponse) || err.status !== 409) return null;
-		if (err.error?.errorCode !== 'DUPLICATE_NAME_MATCH') return null;
-		const match = err.error?.duplicateMatch;
-		if (!match || typeof match.dniPartial !== 'string') return null;
-		return match as DuplicateNameMatch;
 	}
 
 	// #endregion
