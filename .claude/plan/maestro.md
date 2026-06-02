@@ -15,7 +15,7 @@
 | xP22 | → Endurecimiento correos (coord) | F3.FE ✅ awaiting-prod (284) | ver P22 |
 | xP42 | → Casing contratos (coord) | Sin trabajo FE pendiente | ver P42 |
 | xP43 | → Monitoreo Cowork (coord) | F5:5.2 FE ✅ awaiting-prod (285) · F6 pendiente | ver P43 |
-| xP45 | → Monitoreo incidencias (coord) | P45:F2.2:FE ⏳ | ver P45 |
+| xP45 | → Monitoreo incidencias (coord) | P45:F2.2:FE ✅ closed (288) · heatmap blocked by BE BT2-F5 | ver P45 |
 | xP52 | → Email outbox retry + diagnostics (coord) | F3-F5 FE ✅ awaiting-prod (275, 277, 279) | ver P52 |
 | xP53 | → Duplicate person validation (coord) | F3 FE ✅ awaiting-prod (281) | ver P53 |
 | xP54 | → Attendance grade filter (coord) | F3 FE ✅ closed (282) | ver P54 |
@@ -58,7 +58,7 @@ Planes cross-repo con sub-chats FE pendientes: **41** (Correlation Hub), **42** 
 
 | Pos | Key | Plan | Próximo paso concreto | Repo | Desbloquea | Gate |
 |---|---|---|---|---|---|---|
-| 2 | xP45 | Monitoreo incidencias | F2.2:FE — JOIN endpoint `/full` + vista por evento + tabla Trace | xrepo | 0 (leaf, alto valor usuario) | libre (P45:F5:BE ✅) |
+| 2 | xP45 | Monitoreo incidencias | F2.2:FE — JOIN endpoint `/full` + vista por evento + tabla Trace | xrepo | 0 (leaf, alto valor usuario) | 🟡 brief 288 |
 | 3 | P10 | Fallbacks críticos | P0.4+ FE (P0.1 ✅ brief 249, P0.2 ✅ brief 262, P0.3 ✅ brief 263) | local | 1 (Plan 10 F1+) | libre |
 
 #### Tier 3 — Independientes (sin downstream)

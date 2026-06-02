@@ -205,6 +205,29 @@
 	}
 }
 
+.col-url {
+	max-width: 200px;
+
+	.url-text {
+		display: block;
+		overflow: hidden;
+		text-overflow: ellipsis;
+		white-space: nowrap;
+		font-family: monospace;
+		font-size: 0.8rem;
+		color: var(--text-color-secondary);
+	}
+}
+
+.user-text {
+	font-size: 0.85rem;
+
+	&--anon {
+		color: var(--text-color-secondary);
+		font-style: italic;
+	}
+}
+
 .empty-message {
 	text-align: center;
 	padding: 3rem 1rem !important;

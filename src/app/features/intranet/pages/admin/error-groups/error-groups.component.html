@@ -137,9 +137,93 @@
 </div>
 <!-- #endregion -->
 
-<!-- #region Vista (Kanban o Tabla) -->
-@if (!tableReady()) {
+<!-- #region Vista (Kanban, Tabla o Eventos) -->
+@if (!tableReady() && viewMode() !== 'events') {
 	<app-table-skeleton [columns]="tableSkeletonColumns" [rows]="10" />
+} @else if (viewMode() === 'events') {
+	<!-- Vista por eventos individuales (Plan 45 F2.2) -->
+	@if (eventLoading()) {
+		<app-table-skeleton [columns]="tableSkeletonColumns" [rows]="10" />
+	} @else {
+		<section class="table-section">
+			<p-table
+				[value]="eventItems()"
+				[rowHover]="true"
+				styleClass="p-datatable-sm"
+			>
+				<ng-template #header>
+					<tr>
+						<th>Severidad</th>
+						<th>Origen</th>
+						<th>Mensaje</th>
+						<th>URL</th>
+						<th>HTTP</th>
+						<th>Usuario</th>
+						<th>Fecha</th>
+					</tr>
+				</ng-template>
+				<ng-template #body let-item>
+					<tr (click)="onEventRowClick(item)" class="group-row">
+						<td>
+							<p-tag
+								[value]="item.severidad"
+								[severity]="getSeveridadSeverity(item.severidad)"
+							/>
+						</td>
+						<td>
+							<p-tag [value]="item.origen" [icon]="getOrigenIcon(item.origen)" severity="info" />
+						</td>
+						<td class="col-mensaje">
+							<span class="mensaje-text" [pTooltip]="item.mensaje" tooltipPosition="top">
+								{{ item.mensaje }}
+							</span>
+							@if (item.errorCode) {
+								<span class="error-code">{{ item.errorCode }}</span>
+							}
+						</td>
+						<td class="col-url">
+							<span class="url-text" [pTooltip]="item.url" tooltipPosition="top">
+								{{ item.url }}
+							</span>
+						</td>
+						<td>
+							@if (item.httpStatus) {
+								<p-tag
+									[value]="'' + item.httpStatus"
+									[severity]="item.httpStatus >= 500 ? 'danger' : 'warn'"
+								/>
+							}
+						</td>
+						<td>
+							@if (item.usuarioRol) {
+								<span class="user-text">{{ item.usuarioRol }}</span>
+							} @else {
+								<span class="user-text user-text--anon">Anónimo</span>
+							}
+						</td>
+						<td class="col-fecha">{{ item.fecha | date: 'dd/MM HH:mm' }}</td>
+					</tr>
+				</ng-template>
+				<ng-template #emptymessage>
+					<tr>
+						<td colspan="7" class="empty-message">
+							<i class="pi pi-check-circle"></i>
+							<span>No se encontraron eventos con los filtros seleccionados</span>
+						</td>
+					</tr>
+				</ng-template>
+			</p-table>
+			<p-paginator
+				[rows]="eventPageSize()"
+				[first]="eventPaginatorFirst()"
+				[totalRecords]="eventTotalEstimate()"
+				[rowsPerPageOptions]="[10, 20, 50]"
+				[showCurrentPageReport]="true"
+				currentPageReportTemplate="Página {currentPage}"
+				(onPageChange)="onEventPageChange($event)"
+			/>
+		</section>
+	}
 } @else if (viewMode() === 'kanban') {
 	<app-error-groups-kanban-board
 		[groups]="items()"

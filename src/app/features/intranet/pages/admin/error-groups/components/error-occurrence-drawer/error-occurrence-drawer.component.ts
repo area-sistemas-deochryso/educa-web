@@ -27,18 +27,23 @@ import { CorrelationIdPillComponent } from '@intranet-shared/components';
 import { ErrorGroupsService } from '../../services';
 import {
 	BreadcrumbTipoAccion,
+	ErrorGroupContext,
 	ErrorGroupEstado,
 	ErrorGroupLista,
 	ErrorLogCompleto,
+	ErrorLogCounterpart,
 	ErrorOrigen,
 	ErrorSeveridad,
 	ESTADO_LABEL_MAP,
 	ESTADO_SEVERITY_MAP,
+	OcurrenciaLista,
 	ORIGEN_ICON_MAP,
 	ORIGEN_LABEL_MAP,
 	SEVERIDAD_SEVERITY_MAP,
 	TelemetryBundle,
 	TIPO_ACCION_ICON_MAP,
+	TRACE_CAPA_ICON_MAP,
+	TRACE_CAPA_LABEL_MAP,
 	parseSourceLocation,
 } from '../../models';
 
@@ -102,14 +107,22 @@ export class ErrorOccurrenceDrawerComponent {
 
 	// #region Estado interno
 	private readonly _errorCompleto = signal<ErrorLogCompleto | null>(null);
+	private readonly _groupContext = signal<ErrorGroupContext | null>(null);
+	private readonly _counterpart = signal<ErrorLogCounterpart | null>(null);
 	private readonly _loading = signal(false);
 	private readonly _notFound = signal(false);
 	private readonly _telemetryBundle = signal<TelemetryBundle | null>(null);
+	private readonly _groupOcurrencias = signal<OcurrenciaLista[]>([]);
+	private readonly _groupOcurrenciasLoading = signal(false);
 
 	readonly errorCompleto = this._errorCompleto.asReadonly();
+	readonly groupContext = this._groupContext.asReadonly();
+	readonly counterpart = this._counterpart.asReadonly();
 	readonly loading = this._loading.asReadonly();
 	readonly notFound = this._notFound.asReadonly();
 	readonly telemetryBundle = this._telemetryBundle.asReadonly();
+	readonly groupOcurrencias = this._groupOcurrencias.asReadonly();
+	readonly groupOcurrenciasLoading = this._groupOcurrenciasLoading.asReadonly();
 
 	readonly vm = computed(() => ({
 		visible: this.visible(),
@@ -126,6 +139,8 @@ export class ErrorOccurrenceDrawerComponent {
 	readonly tipoAccionIcon = TIPO_ACCION_ICON_MAP;
 	readonly estadoLabel = ESTADO_LABEL_MAP;
 	readonly estadoSeverity = ESTADO_SEVERITY_MAP;
+	readonly traceCapaIcon = TRACE_CAPA_ICON_MAP;
+	readonly traceCapaLabel = TRACE_CAPA_LABEL_MAP;
 	// #endregion
 
 	constructor() {
@@ -136,6 +151,9 @@ export class ErrorOccurrenceDrawerComponent {
 
 			if (!isVisible) {
 				this._errorCompleto.set(null);
+				this._groupContext.set(null);
+				this._counterpart.set(null);
+				this._groupOcurrencias.set([]);
 				this._notFound.set(false);
 				this._telemetryBundle.set(null);
 				return;
@@ -158,12 +176,17 @@ export class ErrorOccurrenceDrawerComponent {
 		this._loading.set(true);
 		this._notFound.set(false);
 		this.service
-			.getOcurrenciaCompleta(id)
+			.getOcurrenciaFull(id)
 			.pipe(takeUntilDestroyed(this.destroyRef))
 			.subscribe({
-				next: (err) => {
-					this._errorCompleto.set(err);
+				next: (full) => {
+					this._errorCompleto.set(full.error);
+					this._groupContext.set(full.group);
+					this._counterpart.set(full.counterpart);
 					this._loading.set(false);
+					if (full.group?.id) {
+						this.loadGroupOcurrencias(full.group.id);
+					}
 				},
 				error: (e) => {
 					logger.error('[ErrorOccurrenceDrawer] Error cargando por id', e);
@@ -172,6 +195,23 @@ export class ErrorOccurrenceDrawerComponent {
 					if (e instanceof HttpErrorResponse && e.status === 404) {
 						this.staleDataDetected.emit(id);
 					}
+				},
+			});
+	}
+
+	private loadGroupOcurrencias(groupId: number): void {
+		this._groupOcurrenciasLoading.set(true);
+		this.service
+			.getOcurrencias(groupId, 1, 10)
+			.pipe(takeUntilDestroyed(this.destroyRef))
+			.subscribe({
+				next: (items) => {
+					this._groupOcurrencias.set(items);
+					this._groupOcurrenciasLoading.set(false);
+				},
+				error: () => {
+					this._groupOcurrencias.set([]);
+					this._groupOcurrenciasLoading.set(false);
 				},
 			});
 	}
@@ -242,6 +282,14 @@ export class ErrorOccurrenceDrawerComponent {
 		estado: string,
 	): 'danger' | 'warn' | 'info' | 'success' | 'secondary' {
 		return this.estadoSeverity[estado as ErrorGroupEstado] ?? 'secondary';
+	}
+
+	getTraceCapaIcon(capa: string): string {
+		return this.traceCapaIcon[capa] ?? 'pi pi-question';
+	}
+
+	getTraceCapaLabel(capa: string): string {
+		return this.traceCapaLabel[capa] ?? capa;
 	}
 
 	private captureTelemetry(): TelemetryBundle {

@@ -52,7 +52,7 @@ const PREFERENCES_KEYS = {
 	RUNTIME_HEALTH_WIDGET_COLLAPSED: 'educa_pref_runtime_health_widget_collapsed',
 } as const;
 
-export type ErrorGroupsViewMode = 'kanban' | 'table';
+export type ErrorGroupsViewMode = 'kanban' | 'table' | 'events';
 
 export type CorrelationViewMode = 'timeline' | 'section';
 

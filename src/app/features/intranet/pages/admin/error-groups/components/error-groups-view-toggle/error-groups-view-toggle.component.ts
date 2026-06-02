@@ -41,6 +41,7 @@ export class ErrorGroupsViewToggleComponent implements OnInit {
 	readonly options: ToggleOption[] = [
 		{ label: 'Kanban', value: 'kanban', icon: 'pi pi-th-large' },
 		{ label: 'Tabla', value: 'table', icon: 'pi pi-list' },
+		{ label: 'Eventos', value: 'events', icon: 'pi pi-bolt' },
 	];
 
 	ngOnInit(): void {

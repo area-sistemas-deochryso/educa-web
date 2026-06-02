@@ -4,6 +4,7 @@ import {
 	ErrorGroupDetalle,
 	ErrorGroupEstado,
 	ErrorGroupLista,
+	ErrorLogCompleto,
 	ErrorOrigen,
 	ErrorSeveridad,
 	HeatmapCell,
@@ -69,6 +70,14 @@ export class ErrorGroupsStore {
 	private readonly _trendDialogGroup = signal<ErrorGroupLista | null>(null);
 	// #endregion
 
+	// #region Estado privado — event view (Plan 45 F2.2)
+	private readonly _eventItems = signal<ErrorLogCompleto[]>([]);
+	private readonly _eventLoading = signal(false);
+	private readonly _eventTotalCount = signal<number | null>(null);
+	private readonly _eventPage = signal(1);
+	private readonly _eventPageSize = signal(20);
+	// #endregion
+
 	// #region Estado privado — heatmap (Plan 43 F5:5.2)
 	private readonly _heatmapCells = signal<HeatmapCell[]>([]);
 	private readonly _heatmapLoading = signal(false);
@@ -114,6 +123,14 @@ export class ErrorGroupsStore {
 	readonly trendCache = this._trendCache.asReadonly();
 	readonly trendDialogVisible = this._trendDialogVisible.asReadonly();
 	readonly trendDialogGroup = this._trendDialogGroup.asReadonly();
+	// #endregion
+
+	// #region Lecturas públicas — event view
+	readonly eventItems = this._eventItems.asReadonly();
+	readonly eventLoading = this._eventLoading.asReadonly();
+	readonly eventTotalCount = this._eventTotalCount.asReadonly();
+	readonly eventPage = this._eventPage.asReadonly();
+	readonly eventPageSize = this._eventPageSize.asReadonly();
 	// #endregion
 
 	// #region Lecturas públicas — heatmap
@@ -339,6 +356,28 @@ export class ErrorGroupsStore {
 
 	setHeatmapLoading(loading: boolean): void {
 		this._heatmapLoading.set(loading);
+	}
+	// #endregion
+
+	// #region Comandos — Event view
+	setEventItems(items: ErrorLogCompleto[]): void {
+		this._eventItems.set(items);
+	}
+
+	setEventLoading(loading: boolean): void {
+		this._eventLoading.set(loading);
+	}
+
+	setEventTotalCount(count: number | null): void {
+		this._eventTotalCount.set(count);
+	}
+
+	setEventPage(page: number): void {
+		this._eventPage.set(page);
+	}
+
+	setEventPageSize(pageSize: number): void {
+		this._eventPageSize.set(pageSize);
 	}
 	// #endregion
 }

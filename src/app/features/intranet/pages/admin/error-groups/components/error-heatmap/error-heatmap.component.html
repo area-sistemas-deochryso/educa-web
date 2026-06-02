@@ -1,8 +1,10 @@
 <section class="heatmap-container">
-	<h3 class="heatmap-title">
-		<i class="pi pi-calendar"></i>
-		Mapa de calor — errores por hora y día
-	</h3>
+	<div class="heatmap-header">
+		<h3 class="heatmap-title">
+			<i class="pi pi-calendar"></i>
+			Mapa de calor — últimos {{ totalDays() }} días
+		</h3>
+	</div>
 
 	@if (loading()) {
 		<div class="heatmap-loading">
@@ -40,7 +42,7 @@
 		<!-- Legend -->
 		<div class="heatmap-legend">
 			<span class="heatmap-legend-label">Menos</span>
-			<span class="heatmap-legend-cell" [style.background-color]="'var(--p-surface-100)'"></span>
+			<span class="heatmap-legend-cell heatmap-legend-cell--empty"></span>
 			<span class="heatmap-legend-cell" [style.background-color]="getCellColor(0.25)"></span>
 			<span class="heatmap-legend-cell" [style.background-color]="getCellColor(0.5)"></span>
 			<span class="heatmap-legend-cell" [style.background-color]="getCellColor(0.75)"></span>

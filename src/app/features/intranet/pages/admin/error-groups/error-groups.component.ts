@@ -42,6 +42,7 @@ import {
 	CambiarEstadoErrorGroup,
 	ErrorGroupEstado,
 	ErrorGroupLista,
+	ErrorLogCompleto,
 	ErrorOrigen,
 	ErrorSeveridad,
 	OcurrenciaLista,
@@ -143,6 +144,22 @@ export class ErrorGroupsComponent implements OnInit {
 
 	readonly viewMode = signal<ErrorGroupsViewMode>('kanban');
 
+	readonly eventItems = this.store.eventItems;
+	readonly eventLoading = this.store.eventLoading;
+	readonly eventTotalCount = this.store.eventTotalCount;
+	readonly eventPage = this.store.eventPage;
+	readonly eventPageSize = this.store.eventPageSize;
+	readonly eventPaginatorFirst = computed(() => (this.eventPage() - 1) * this.eventPageSize());
+	readonly eventTotalEstimate = computed(() => {
+		const total = this.eventTotalCount();
+		if (total !== null) return total;
+		const items = this.eventItems();
+		const p = this.eventPage();
+		const ps = this.eventPageSize();
+		const offset = (p - 1) * ps;
+		return items.length < ps ? offset + items.length : offset + ps + 1;
+	});
+
 	private readonly _trendDispatcher = effect(() => {
 		const items = this.store.items();
 		for (const item of items) {
@@ -220,12 +237,20 @@ export class ErrorGroupsComponent implements OnInit {
 		this.store.setFilterSeveridad(severidad);
 		this.store.setPage(1);
 		this.dataFacade.loadData();
+		if (this.viewMode() === 'events') {
+			this.store.setEventPage(1);
+			this.dataFacade.loadEventData();
+		}
 		this.syncUrl();
 	}
 	onFilterOrigenChange(origen: ErrorOrigen | null): void {
 		this.store.setFilterOrigen(origen);
 		this.store.setPage(1);
 		this.dataFacade.loadData();
+		if (this.viewMode() === 'events') {
+			this.store.setEventPage(1);
+			this.dataFacade.loadEventData();
+		}
 		this.syncUrl();
 	}
 
@@ -303,6 +328,9 @@ export class ErrorGroupsComponent implements OnInit {
 	}
 	onViewModeChange(mode: ErrorGroupsViewMode): void {
 		this.viewMode.set(mode);
+		if (mode === 'events' && this.eventItems().length === 0) {
+			this.dataFacade.loadEventData();
+		}
 	}
 	onKanbanCardDropped(payload: {
 		group: ErrorGroupLista;
@@ -316,5 +344,25 @@ export class ErrorGroupsComponent implements OnInit {
 	}
 	onTrendDialogVisibleChange(visible: boolean): void {
 		if (!visible) this.uiFacade.closeTrendDialog();
+	}
+
+	onEventRowClick(event: ErrorLogCompleto): void {
+		this.uiFacade.openOccurrenceDrawer(event.id);
+	}
+
+	onEventPageChange(event: PaginatorState): void {
+		const currentPageSize = this.eventPageSize();
+		const newPageSize = event.rows ?? currentPageSize;
+		const newPage = (event.page ?? 0) + 1;
+
+		if (newPageSize !== currentPageSize) {
+			this.store.setEventPageSize(newPageSize);
+			this.store.setEventPage(1);
+			this.dataFacade.loadEventData();
+			return;
+		}
+		if (newPage !== this.eventPage()) {
+			this.dataFacade.loadEventPage(newPage);
+		}
 	}
 }

@@ -214,7 +214,7 @@ export class ErrorGroupsDataFacade {
 		if (this.store.heatmapLoading()) return;
 		this.store.setHeatmapLoading(true);
 		this.api
-			.getHeatmap()
+			.getHeatmap(30)
 			.pipe(takeUntilDestroyed(this.destroyRef))
 			.subscribe({
 				next: (cells) => {
@@ -225,6 +225,70 @@ export class ErrorGroupsDataFacade {
 					logger.warn('[ErrorGroupsDataFacade] Heatmap no disponible', err);
 					this.store.setHeatmapCells([]);
 					this.store.setHeatmapLoading(false);
+				},
+			});
+	}
+	// #endregion
+
+	// #region Event view (Plan 45 F2.2)
+	loadEventData(): void {
+		if (this.store.eventLoading()) return;
+		this.store.setEventLoading(true);
+
+		this.api
+			.getErrorList(
+				this.store.filterOrigen(),
+				this.store.filterSeveridad(),
+				null,
+				this.store.eventPage(),
+				this.store.eventPageSize(),
+			)
+			.pipe(takeUntilDestroyed(this.destroyRef))
+			.subscribe({
+				next: (items) => {
+					this.store.setEventItems(items);
+					this.store.setEventLoading(false);
+				},
+				error: (err) => {
+					logger.error('[ErrorGroupsDataFacade] Error al cargar eventos:', err);
+					this.store.setEventLoading(false);
+				},
+			});
+
+		this.api
+			.getErrorCount(
+				this.store.filterOrigen(),
+				this.store.filterSeveridad(),
+				null,
+			)
+			.pipe(takeUntilDestroyed(this.destroyRef))
+			.subscribe({
+				next: (count) => this.store.setEventTotalCount(count),
+				error: () => this.store.setEventTotalCount(null),
+			});
+	}
+
+	loadEventPage(page: number): void {
+		this.store.setEventPage(page);
+		if (this.store.eventLoading()) return;
+		this.store.setEventLoading(true);
+		this.api
+			.getErrorList(
+				this.store.filterOrigen(),
+				this.store.filterSeveridad(),
+				null,
+				this.store.eventPage(),
+				this.store.eventPageSize(),
+			)
+			.pipe(takeUntilDestroyed(this.destroyRef))
+			.subscribe({
+				next: (items) => {
+					this.store.setEventItems(items);
+					this.store.setEventLoading(false);
+				},
+				error: (err) => {
+					logger.error('[ErrorGroupsDataFacade] Error al cargar eventos página:', err);
+					this.store.setEventLoading(false);
 				},
 			});
 	}

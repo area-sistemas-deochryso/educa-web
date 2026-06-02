@@ -137,27 +137,118 @@
 						</div>
 					</p-tabpanel>
 
-					<!-- Tab Trace: Stack textual + nota Layer Trace (F2.2) -->
+					<!-- Tab Trace: Layer trace + stack textual + counterpart -->
 					<p-tabpanel value="trace">
-						@if (err.stackTrace) {
+						@if (err.trace && err.trace.length > 0) {
 							<div class="detail-section">
-								<h4><i class="pi pi-code"></i> Stack Trace</h4>
-								<pre class="detail-pre detail-pre--stack">{{ err.stackTrace }}</pre>
+								<h4><i class="pi pi-arrows-v"></i> Trace por capa</h4>
+								<div class="trace-timeline">
+									@for (step of err.trace; track step.id) {
+										<div class="trace-step" [class.trace-step--error]="step.errorSnippet">
+											<div class="trace-step-icon">
+												<i [class]="getTraceCapaIcon(step.capa)"></i>
+											</div>
+											<div class="trace-step-content">
+												<div class="trace-step-header">
+													<span class="trace-step-capa">{{ getTraceCapaLabel(step.capa) }}</span>
+													<span class="trace-step-duration">{{ step.duracionMs }}ms</span>
+												</div>
+												<span class="trace-step-method">
+													{{ step.componente }}.{{ step.metodo }}
+												</span>
+												@if (step.parametros) {
+													<span class="trace-step-params">{{ step.parametros }}</span>
+												}
+												<span class="trace-step-result">{{ step.resultado }}</span>
+												@if (step.errorSnippet) {
+													<pre class="trace-step-error">{{ step.errorSnippet }}</pre>
+												}
+											</div>
+										</div>
+									}
+								</div>
 							</div>
 						} @else {
-							<div class="tab-empty">
+							<div class="trace-empty-note">
 								<i class="pi pi-info-circle"></i>
-								<p>Sin stack trace registrado para esta ocurrencia.</p>
+								<div>
+									<strong>Sin trace por capa</strong>
+									<p>
+										@if (err.origen === 'FRONTEND' || err.origen === 'NETWORK') {
+											Los errores capturados desde el frontend no generan trace por capa
+											(Controller → Service → Repository). Usá el tab
+											<strong>Breadcrumbs</strong> para reconstruir el flujo del usuario.
+										} @else {
+											Este error fue reportado al BE como fallo HTTP, no como excepción
+											interna del servidor. El trace por capa se genera solo cuando el
+											backend atrapa la excepción internamente.
+										}
+									</p>
+								</div>
 							</div>
 						}
-						<div class="tab-future-hint">
-							<i class="pi pi-clock"></i>
-							<span>
-								El trace por capa (Controller → Service → Repository, con duración por
-								capa) estará disponible cuando F5 BE (ProblemDetails + endpoint
-								<code>/full</code>) se despliegue.
-							</span>
-						</div>
+						@if (err.stackTrace) {
+							<div class="detail-section">
+								<h4><i class="pi pi-code"></i> Stack Trace (cliente)</h4>
+								<pre class="detail-pre detail-pre--stack">{{ err.stackTrace }}</pre>
+							</div>
+						}
+						@if (!err.trace?.length && !err.stackTrace) {
+							<div class="tab-empty">
+								<i class="pi pi-info-circle"></i>
+								<p>Sin trace ni stack trace registrado para esta ocurrencia.</p>
+							</div>
+						}
+						@if (counterpart(); as cp) {
+							<div class="detail-section counterpart-section">
+								<h4>
+									<i class="pi pi-arrow-right-arrow-left"></i>
+									Contraparte {{ cp.origen === 'BACKEND' ? 'BE' : 'FE' }}
+								</h4>
+								<div class="detail-grid">
+									<div class="detail-row">
+										<span class="detail-label">Origen</span>
+										<span class="detail-value">
+											<p-tag [value]="cp.origen" [severity]="getOrigenSeverity(cp.origen)" />
+										</span>
+									</div>
+									<div class="detail-row">
+										<span class="detail-label">Severidad</span>
+										<span class="detail-value">
+											<p-tag
+												[value]="cp.severidad"
+												[severity]="getSeveridadSeverity(cp.severidad)"
+											/>
+										</span>
+									</div>
+									<div class="detail-row">
+										<span class="detail-label">Mensaje</span>
+										<span class="detail-value">{{ cp.mensaje }}</span>
+									</div>
+									@if (cp.httpStatus) {
+										<div class="detail-row">
+											<span class="detail-label">HTTP</span>
+											<span class="detail-value detail-value--mono">{{ cp.httpStatus }}</span>
+										</div>
+									}
+									<div class="detail-row">
+										<span class="detail-label">Fecha</span>
+										<span class="detail-value">
+											{{ cp.fecha | date: 'dd/MM/yyyy HH:mm:ss' }}
+										</span>
+									</div>
+								</div>
+								<a
+									[routerLink]="['/intranet/admin/monitoreo/incidencias/errores']"
+									[queryParams]="{ errorId: cp.id }"
+									pButton
+									type="button"
+									label="Ver ocurrencia contraparte"
+									icon="pi pi-external-link"
+									class="p-button-text p-button-sm counterpart-link"
+								></a>
+							</div>
+						}
 					</p-tabpanel>
 
 					<!-- Tab Breadcrumbs: Flujo del usuario (FE) o empty (BE) -->
@@ -218,68 +309,104 @@
 
 					<!-- Tab Group: ErrorGroup padre + CorrelationId -->
 					<p-tabpanel value="group">
-						@if (parentGroup(); as grp) {
-							<div class="detail-section">
-								<h4><i class="pi pi-sitemap"></i> Grupo padre</h4>
-								<div class="detail-grid">
-									<div class="detail-row">
-										<span class="detail-label">Estado</span>
-										<span class="detail-value">
-											<p-tag
-												[value]="getEstadoLabel(grp.estado)"
-												[severity]="getEstadoSeverity(grp.estado)"
-											/>
-										</span>
+						@if (groupContext(); as grp) {
+							<div class="group-card">
+								<div class="group-card-header">
+									<div class="group-card-tags">
+										<p-tag
+											[value]="getEstadoLabel(grp.estado)"
+											[severity]="getEstadoSeverity(grp.estado)"
+										/>
+										<p-tag
+											[value]="grp.severidad"
+											[severity]="getSeveridadSeverity(grp.severidad)"
+										/>
 									</div>
-									<div class="detail-row">
-										<span class="detail-label">Ocurrencias</span>
-										<span class="detail-value detail-value--mono">
-											{{ grp.contadorTotal }}
-										</span>
-									</div>
-									<div class="detail-row">
-										<span class="detail-label">Primera vez</span>
-										<span class="detail-value">
-											{{ grp.primeraFecha | date: 'dd/MM/yyyy HH:mm:ss' }}
-										</span>
-									</div>
-									<div class="detail-row">
-										<span class="detail-label">Última vez</span>
-										<span class="detail-value">
-											{{ grp.ultimaFecha | date: 'dd/MM/yyyy HH:mm:ss' }}
-										</span>
-									</div>
-									@if (grp.fingerprintCorto) {
-										<div class="detail-row">
-											<span class="detail-label">Fingerprint</span>
-											<span class="detail-value detail-value--mono detail-value--small">
-												{{ grp.fingerprintCorto }}
-											</span>
-										</div>
-									}
+									<span class="group-card-count">
+										{{ grp.contadorTotal }} ocurrencia{{ grp.contadorTotal === 1 ? '' : 's' }}
+										@if (grp.contadorPostResolucion > 0) {
+											<span class="post-res">(+{{ grp.contadorPostResolucion }} post-resolución)</span>
+										}
+									</span>
 								</div>
+								<p class="group-card-message">{{ grp.mensajeRepresentativo }}</p>
+								<div class="group-card-dates">
+									<div class="group-card-date">
+										<i class="pi pi-calendar-plus"></i>
+										<span>{{ grp.primeraFecha | date: 'dd/MM/yyyy HH:mm' }}</span>
+									</div>
+									<div class="group-card-date">
+										<i class="pi pi-calendar-clock"></i>
+										<span>{{ grp.ultimaFecha | date: 'dd/MM/yyyy HH:mm' }}</span>
+									</div>
+								</div>
+								@if (grp.observacion) {
+									<p class="group-card-obs">
+										<i class="pi pi-comment"></i> {{ grp.observacion }}
+									</p>
+								}
+							</div>
+
+							<!-- Ocurrencias del grupo -->
+							<div class="detail-section">
+								<h4>
+									<i class="pi pi-list"></i>
+									Ocurrencias del grupo
+									<span class="tab-count">{{ grp.contadorTotal }}</span>
+								</h4>
+								@if (groupOcurrenciasLoading()) {
+									<div class="group-ocurrencias-loading">
+										<i class="pi pi-spinner pi-spin"></i>
+										Cargando ocurrencias...
+									</div>
+								} @else {
+									<div class="group-ocurrencias-list">
+										@for (oc of groupOcurrencias(); track oc.id) {
+											<div
+												class="group-ocurrencia-item"
+												[class.group-ocurrencia-item--current]="oc.id === vm().errorCompleto?.id"
+											>
+												<div class="group-ocurrencia-header">
+													<span class="group-ocurrencia-date">
+														{{ oc.fecha | date: 'dd/MM HH:mm:ss' }}
+													</span>
+													@if (oc.httpStatus) {
+														<p-tag
+															[value]="'' + oc.httpStatus"
+															[severity]="oc.httpStatus >= 500 ? 'danger' : 'warn'"
+														/>
+													}
+													@if (oc.id === vm().errorCompleto?.id) {
+														<p-tag value="Actual" severity="info" />
+													}
+												</div>
+												<span class="group-ocurrencia-msg">{{ oc.mensaje }}</span>
+												@if (oc.usuarioRol) {
+													<span class="group-ocurrencia-user">
+														{{ oc.usuarioRol }}{{ oc.usuarioDni ? ' (' + oc.usuarioDni + ')' : '' }}
+													</span>
+												}
+											</div>
+										}
+										@if (grp.contadorTotal > groupOcurrencias().length) {
+											<div class="group-ocurrencias-more">
+												+{{ grp.contadorTotal - groupOcurrencias().length }} ocurrencias más
+											</div>
+										}
+									</div>
+								}
 							</div>
 						} @else {
 							<div class="tab-empty">
 								<i class="pi pi-info-circle"></i>
-								<p>
-									Grupo padre no disponible en esta vista. Cerrá el sub-drawer para
-									volver al grupo.
-								</p>
+								<p>Este error no está asociado a ningún grupo.</p>
 							</div>
 						}
 
 						@if (err.correlationId) {
-							<div class="detail-section">
+							<div class="detail-section correlation-section">
 								<h4><i class="pi pi-share-alt"></i> Correlation ID</h4>
-								<div class="detail-grid">
-									<div class="detail-row">
-										<span class="detail-label">ID</span>
-										<span class="detail-value detail-value--correlation">
-											<app-correlation-id-pill [id]="err.correlationId" />
-										</span>
-									</div>
-								</div>
+								<app-correlation-id-pill [id]="err.correlationId" />
 								<a
 									[routerLink]="['/intranet/admin/correlation', err.correlationId]"
 									pButton

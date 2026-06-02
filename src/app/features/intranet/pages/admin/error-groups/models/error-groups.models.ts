@@ -170,6 +170,22 @@ export const ESTADO_SEVERITY_MAP: Record<
 	IGNORADO: 'secondary',
 };
 
+export const TRACE_CAPA_ICON_MAP: Record<string, string> = {
+	CONTROLLER: 'pi pi-globe',
+	SERVICE: 'pi pi-cog',
+	REPOSITORY: 'pi pi-database',
+	SQL: 'pi pi-server',
+	EXTERNAL: 'pi pi-cloud',
+};
+
+export const TRACE_CAPA_LABEL_MAP: Record<string, string> = {
+	CONTROLLER: 'Controller',
+	SERVICE: 'Service',
+	REPOSITORY: 'Repository',
+	SQL: 'SQL',
+	EXTERNAL: 'Externo',
+};
+
 export const TIPO_ACCION_ICON_MAP: Record<BreadcrumbTipoAccion, string> = {
 	NAVIGATION: 'pi pi-arrow-right',
 	API_CALL: 'pi pi-cloud-upload',
@@ -189,6 +205,18 @@ export interface ErrorLogDetalle {
 	ruta: string;
 	timestamp: string;
 	metadata: string | null;
+}
+
+export interface ErrorLogTrace {
+	id: number;
+	orden: number;
+	capa: string;
+	componente: string;
+	metodo: string;
+	parametros: string | null;
+	duracionMs: number;
+	resultado: string;
+	errorSnippet: string | null;
 }
 
 export interface ErrorLogCompleto {
@@ -213,6 +241,35 @@ export interface ErrorLogCompleto {
 	responseBody: string | null;
 	requestHeaders: string | null;
 	breadcrumbs: ErrorLogDetalle[];
+	trace: ErrorLogTrace[];
+}
+
+export interface ErrorGroupContext {
+	id: number;
+	estado: ErrorGroupEstado;
+	observacion: string | null;
+	contadorTotal: number;
+	contadorPostResolucion: number;
+	primeraFecha: string;
+	ultimaFecha: string;
+	severidad: ErrorSeveridad;
+	mensajeRepresentativo: string;
+}
+
+export interface ErrorLogCounterpart {
+	id: number;
+	origen: ErrorOrigen;
+	severidad: ErrorSeveridad;
+	mensaje: string;
+	url: string;
+	httpStatus: number | null;
+	fecha: string;
+}
+
+export interface ErrorLogFull {
+	error: ErrorLogCompleto;
+	group: ErrorGroupContext | null;
+	counterpart: ErrorLogCounterpart | null;
 }
 
 export interface SourceLocation {
