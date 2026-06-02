@@ -1,0 +1,51 @@
+<section class="heatmap-container">
+	<h3 class="heatmap-title">
+		<i class="pi pi-calendar"></i>
+		Mapa de calor — errores por hora y día
+	</h3>
+
+	@if (loading()) {
+		<div class="heatmap-loading">
+			<i class="pi pi-spinner pi-spin"></i>
+			<span>Cargando heatmap...</span>
+		</div>
+	} @else {
+		<div class="heatmap-grid" role="table" aria-label="Mapa de calor de errores por hora y día de la semana">
+			<!-- Hour headers -->
+			<div class="heatmap-row heatmap-row--header" role="row">
+				<span class="heatmap-day-label"></span>
+				@for (h of hours; track h) {
+					<span class="heatmap-hour-label" role="columnheader">{{ h }}</span>
+				}
+			</div>
+
+			<!-- Data rows -->
+			@for (row of grid(); track $index) {
+				<div class="heatmap-row" role="row">
+					<span class="heatmap-day-label" role="rowheader">{{ dayLabels[$index] }}</span>
+					@for (cell of row; track cell.hour) {
+						<span
+							class="heatmap-cell"
+							role="cell"
+							[style.background-color]="getCellColor(cell.intensity)"
+							[pTooltip]="cell.tooltip"
+							tooltipPosition="top"
+							[attr.aria-label]="cell.tooltip"
+						></span>
+					}
+				</div>
+			}
+		</div>
+
+		<!-- Legend -->
+		<div class="heatmap-legend">
+			<span class="heatmap-legend-label">Menos</span>
+			<span class="heatmap-legend-cell" [style.background-color]="'var(--p-surface-100)'"></span>
+			<span class="heatmap-legend-cell" [style.background-color]="getCellColor(0.25)"></span>
+			<span class="heatmap-legend-cell" [style.background-color]="getCellColor(0.5)"></span>
+			<span class="heatmap-legend-cell" [style.background-color]="getCellColor(0.75)"></span>
+			<span class="heatmap-legend-cell" [style.background-color]="getCellColor(1)"></span>
+			<span class="heatmap-legend-label">Más</span>
+		</div>
+	}
+</section>

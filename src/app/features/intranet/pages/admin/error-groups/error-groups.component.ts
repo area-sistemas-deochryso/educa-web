@@ -1,13 +1,4 @@
-import {
-	ChangeDetectionStrategy,
-	Component,
-	DestroyRef,
-	OnInit,
-	computed,
-	effect,
-	inject,
-	signal,
-} from '@angular/core';
+import { ChangeDetectionStrategy, Component, DestroyRef, OnInit, computed, effect, inject, signal } from '@angular/core';
 import { CommonModule, DatePipe } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
@@ -34,6 +25,7 @@ import { ChangeGroupStatusDialogComponent } from './components/change-group-stat
 import { ErrorGroupDetailDrawerComponent } from './components/error-group-detail-drawer';
 import { ErrorGroupsKanbanBoardComponent } from './components/error-groups-kanban-board';
 import { ErrorGroupsViewToggleComponent } from './components/error-groups-view-toggle';
+import { ErrorHeatmapComponent } from './components/error-heatmap';
 import { ErrorOccurrenceDrawerComponent } from './components/error-occurrence-drawer';
 import {
 	ESTADO_OPTIONS,
@@ -87,13 +79,14 @@ import {
 		ChangeGroupStatusDialogComponent,
 		ErrorGroupsKanbanBoardComponent,
 		ErrorGroupsViewToggleComponent,
+		ErrorHeatmapComponent,
 	],
 	templateUrl: './error-groups.component.html',
 	styleUrl: './error-groups.component.scss',
 	changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ErrorGroupsComponent implements OnInit {
-	private readonly store = inject(ErrorGroupsStore);
+	protected readonly store = inject(ErrorGroupsStore);
 	private readonly dataFacade = inject(ErrorGroupsDataFacade);
 	private readonly crudFacade = inject(ErrorGroupsCrudFacade);
 	private readonly uiFacade = inject(ErrorGroupsUiFacade);
@@ -106,13 +99,11 @@ export class ErrorGroupsComponent implements OnInit {
 	readonly loading = this.store.loading;
 	readonly error = this.store.error;
 	readonly tableReady = this.store.tableReady;
-
 	readonly filterEstado = this.store.filterEstado;
 	readonly filterSeveridad = this.store.filterSeveridad;
 	readonly filterOrigen = this.store.filterOrigen;
 	readonly searchTerm = this.store.searchTerm;
 	readonly hideResolvedIgnored = this.store.hideResolvedIgnored;
-
 	readonly drawerVisible = this.store.drawerVisible;
 	readonly selectedGroup = this.store.selectedGroup;
 	readonly selectedDetalle = this.store.selectedDetalle;
@@ -121,13 +112,10 @@ export class ErrorGroupsComponent implements OnInit {
 	readonly ocurrenciasLoading = this.store.ocurrenciasLoading;
 	readonly ocurrenciasPage = this.store.ocurrenciasPage;
 	readonly ocurrenciasPageSize = this.store.ocurrenciasPageSize;
-
 	readonly occurrenceDrawerVisible = this.store.occurrenceDrawerVisible;
 	readonly selectedOcurrenciaId = this.store.selectedOcurrenciaId;
-
 	readonly dialogVisible = this.store.dialogVisible;
 	readonly dialogGroup = this.store.dialogGroup;
-
 	readonly trendCache = this.store.trendCache;
 	readonly trendDialogVisible = this.store.trendDialogVisible;
 	readonly trendDialogGroup = this.store.trendDialogGroup;
@@ -181,6 +169,7 @@ export class ErrorGroupsComponent implements OnInit {
 					this.dataFacade.loadData();
 				}
 			});
+		this.dataFacade.loadHeatmap();
 	}
 
 	private hydrateFromUrl(params: { get(name: string): string | null }): void {
@@ -216,27 +205,23 @@ export class ErrorGroupsComponent implements OnInit {
 	onRefresh(): void {
 		this.dataFacade.refresh();
 	}
-
 	onSearchChange(term: string): void {
 		const truncated = term.length > SEARCH_MAX ? term.slice(0, SEARCH_MAX) : term;
 		this.dataFacade.onSearchChange(truncated);
 		this.syncUrl();
 	}
-
 	onFilterEstadoChange(estado: ErrorGroupEstado | null): void {
 		this.store.setFilterEstado(estado);
 		this.store.setPage(1);
 		this.dataFacade.loadData();
 		this.syncUrl();
 	}
-
 	onFilterSeveridadChange(severidad: ErrorSeveridad | null): void {
 		this.store.setFilterSeveridad(severidad);
 		this.store.setPage(1);
 		this.dataFacade.loadData();
 		this.syncUrl();
 	}
-
 	onFilterOrigenChange(origen: ErrorOrigen | null): void {
 		this.store.setFilterOrigen(origen);
 		this.store.setPage(1);
@@ -307,23 +292,18 @@ export class ErrorGroupsComponent implements OnInit {
 	onStatusChangeRequested(group: ErrorGroupLista): void {
 		this.uiFacade.openDialog(group);
 	}
-
 	onDialogVisibleChange(visible: boolean): void {
 		if (!visible) this.uiFacade.closeDialog();
 	}
-
 	onDialogConfirm(payload: { group: ErrorGroupLista; dto: CambiarEstadoErrorGroup }): void {
 		this.crudFacade.cambiarEstado(payload.group.id, payload.dto, payload.group);
 	}
-
 	onDialogCancel(): void {
 		this.uiFacade.closeDialog();
 	}
-
 	onViewModeChange(mode: ErrorGroupsViewMode): void {
 		this.viewMode.set(mode);
 	}
-
 	onKanbanCardDropped(payload: {
 		group: ErrorGroupLista;
 		fromEstado: ErrorGroupEstado;
@@ -331,14 +311,10 @@ export class ErrorGroupsComponent implements OnInit {
 	}): void {
 		this.crudFacade.moveCardOptimistic(payload.group, payload.toEstado);
 	}
-
 	onSparklineClick(group: ErrorGroupLista): void {
 		this.uiFacade.openTrendDialog(group);
 	}
-
 	onTrendDialogVisibleChange(visible: boolean): void {
 		if (!visible) this.uiFacade.closeTrendDialog();
 	}
-
-
 }

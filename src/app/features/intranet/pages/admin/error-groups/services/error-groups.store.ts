@@ -6,6 +6,7 @@ import {
 	ErrorGroupLista,
 	ErrorOrigen,
 	ErrorSeveridad,
+	HeatmapCell,
 	OcurrenciaLista,
 } from '../models';
 
@@ -68,6 +69,11 @@ export class ErrorGroupsStore {
 	private readonly _trendDialogGroup = signal<ErrorGroupLista | null>(null);
 	// #endregion
 
+	// #region Estado privado — heatmap (Plan 43 F5:5.2)
+	private readonly _heatmapCells = signal<HeatmapCell[]>([]);
+	private readonly _heatmapLoading = signal(false);
+	// #endregion
+
 	// #region Lecturas públicas — listado
 	readonly items = this._items.asReadonly();
 	readonly loading = this._loading.asReadonly();
@@ -108,6 +114,11 @@ export class ErrorGroupsStore {
 	readonly trendCache = this._trendCache.asReadonly();
 	readonly trendDialogVisible = this._trendDialogVisible.asReadonly();
 	readonly trendDialogGroup = this._trendDialogGroup.asReadonly();
+	// #endregion
+
+	// #region Lecturas públicas — heatmap
+	readonly heatmapCells = this._heatmapCells.asReadonly();
+	readonly heatmapLoading = this._heatmapLoading.asReadonly();
 	// #endregion
 
 	// #region Computed
@@ -318,6 +329,16 @@ export class ErrorGroupsStore {
 	closeTrendDialog(): void {
 		this._trendDialogVisible.set(false);
 		this._trendDialogGroup.set(null);
+	}
+	// #endregion
+
+	// #region Comandos — Heatmap
+	setHeatmapCells(cells: HeatmapCell[]): void {
+		this._heatmapCells.set(cells);
+	}
+
+	setHeatmapLoading(loading: boolean): void {
+		this._heatmapLoading.set(loading);
 	}
 	// #endregion
 }

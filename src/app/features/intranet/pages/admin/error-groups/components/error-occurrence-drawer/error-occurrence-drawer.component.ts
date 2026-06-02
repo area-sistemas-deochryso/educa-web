@@ -37,6 +37,7 @@ import {
 	ORIGEN_ICON_MAP,
 	ORIGEN_LABEL_MAP,
 	SEVERIDAD_SEVERITY_MAP,
+	TelemetryBundle,
 	TIPO_ACCION_ICON_MAP,
 	parseSourceLocation,
 } from '../../models';
@@ -103,10 +104,12 @@ export class ErrorOccurrenceDrawerComponent {
 	private readonly _errorCompleto = signal<ErrorLogCompleto | null>(null);
 	private readonly _loading = signal(false);
 	private readonly _notFound = signal(false);
+	private readonly _telemetryBundle = signal<TelemetryBundle | null>(null);
 
 	readonly errorCompleto = this._errorCompleto.asReadonly();
 	readonly loading = this._loading.asReadonly();
 	readonly notFound = this._notFound.asReadonly();
+	readonly telemetryBundle = this._telemetryBundle.asReadonly();
 
 	readonly vm = computed(() => ({
 		visible: this.visible(),
@@ -134,8 +137,11 @@ export class ErrorOccurrenceDrawerComponent {
 			if (!isVisible) {
 				this._errorCompleto.set(null);
 				this._notFound.set(false);
+				this._telemetryBundle.set(null);
 				return;
 			}
+
+			this._telemetryBundle.set(this.captureTelemetry());
 
 			if (errId) {
 				this.loadByErrorId(errId);
@@ -236,6 +242,19 @@ export class ErrorOccurrenceDrawerComponent {
 		estado: string,
 	): 'danger' | 'warn' | 'info' | 'success' | 'secondary' {
 		return this.estadoSeverity[estado as ErrorGroupEstado] ?? 'secondary';
+	}
+
+	private captureTelemetry(): TelemetryBundle {
+		const nav = navigator as Navigator & { connection?: { effectiveType?: string } };
+		return {
+			viewportWidth: window.innerWidth,
+			viewportHeight: window.innerHeight,
+			screenWidth: window.screen.width,
+			screenHeight: window.screen.height,
+			devicePixelRatio: window.devicePixelRatio,
+			connectionType: nav.connection?.effectiveType ?? null,
+			capturedAt: new Date().toISOString(),
+		};
 	}
 
 	copyForReproduction(err: ErrorLogCompleto): void {

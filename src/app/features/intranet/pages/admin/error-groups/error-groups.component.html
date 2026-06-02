@@ -70,6 +70,10 @@
 </section>
 <!-- #endregion -->
 
+<!-- #region Heatmap -->
+<app-error-heatmap [cells]="store.heatmapCells()" [loading]="store.heatmapLoading()" />
+<!-- #endregion -->
+
 <!-- #region Filtros -->
 <div class="filters-bar">
 	<p-iconfield class="search-box">

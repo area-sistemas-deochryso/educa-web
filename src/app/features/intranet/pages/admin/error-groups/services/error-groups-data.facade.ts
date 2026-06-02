@@ -209,6 +209,27 @@ export class ErrorGroupsDataFacade {
 	}
 	// #endregion
 
+	// #region Heatmap (Plan 43 F5:5.2)
+	loadHeatmap(): void {
+		if (this.store.heatmapLoading()) return;
+		this.store.setHeatmapLoading(true);
+		this.api
+			.getHeatmap()
+			.pipe(takeUntilDestroyed(this.destroyRef))
+			.subscribe({
+				next: (cells) => {
+					this.store.setHeatmapCells(cells);
+					this.store.setHeatmapLoading(false);
+				},
+				error: (err) => {
+					logger.warn('[ErrorGroupsDataFacade] Heatmap no disponible', err);
+					this.store.setHeatmapCells([]);
+					this.store.setHeatmapLoading(false);
+				},
+			});
+	}
+	// #endregion
+
 	// #region Trend 30d (Plan 43 Chat 1.2)
 	private readonly trendQueue: number[] = [];
 	private trendInFlight = 0;
