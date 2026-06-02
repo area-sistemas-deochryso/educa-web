@@ -4,11 +4,13 @@ import { TestBed } from '@angular/core/testing';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { of } from 'rxjs';
 
+import { firstValueFrom } from 'rxjs';
+
 import { AttendanceCourseFacade } from './attendance-course.facade';
 import { AttendanceCourseStore } from './attendance-course.store';
 import { CursoContenidoStore } from './curso-contenido.store';
 import { ProfesorApiService } from '../../services/profesor-api.service';
-import { ErrorHandlerService } from '@core/services';
+import { ErrorHandlerService, WalFacadeHelper, WalCrossTabRefetchService } from '@core/services';
 
 // #endregion
 
@@ -28,6 +30,29 @@ function createMockApi() {
 		getAsistenciaCursoResumen: vi.fn().mockReturnValue(of({ totalClases: 20 })),
 		registrarAsistenciaCurso: vi.fn().mockReturnValue(of({ mensaje: 'ok' })),
 	};
+}
+
+function createMockWal() {
+	return {
+		execute: vi.fn().mockImplementation(async (config: Record<string, unknown>) => {
+			const http$ = config['http$'] as () => import('rxjs').Observable<unknown>;
+			const onCommit = config['onCommit'] as ((r: unknown) => void) | undefined;
+			const onError = config['onError'] as ((e: unknown) => void) | undefined;
+			const optimistic = config['optimistic'] as { apply: () => void; rollback: () => void } | undefined;
+			optimistic?.apply();
+			try {
+				const result = await firstValueFrom(http$());
+				onCommit?.(result);
+			} catch (err) {
+				optimistic?.rollback();
+				onError?.(err);
+			}
+		}),
+	};
+}
+
+function createMockCrossTabRefetch() {
+	return { subscribe: vi.fn() };
 }
 // #endregion
 
@@ -50,6 +75,8 @@ describe('AttendanceCourseFacade', () => {
 				CursoContenidoStore,
 				{ provide: ProfesorApiService, useValue: api },
 				{ provide: ErrorHandlerService, useValue: errorHandler },
+				{ provide: WalFacadeHelper, useValue: createMockWal() },
+				{ provide: WalCrossTabRefetchService, useValue: createMockCrossTabRefetch() },
 			],
 		});
 
@@ -102,17 +129,18 @@ describe('AttendanceCourseFacade', () => {
 
 	// #region registrar
 	describe('registrar', () => {
-		it('should register attendance', () => {
+		it('should register attendance', async () => {
 			store.setRegistroData(mockRegistroData as never);
 			facade.registrar(1);
-
-			expect(api.registrarAsistenciaCurso).toHaveBeenCalledWith(1, expect.objectContaining({
-				fecha: '2026-03-21',
-				asistencias: expect.arrayContaining([
-					expect.objectContaining({ estudianteId: 1, estado: 'P', justificacion: null }),
-					expect.objectContaining({ estudianteId: 2, estado: 'F', justificacion: 'Enfermedad' }),
-				]),
-			}));
+			await vi.waitFor(() => {
+				expect(api.registrarAsistenciaCurso).toHaveBeenCalledWith(1, expect.objectContaining({
+					fecha: '2026-03-21',
+					asistencias: expect.arrayContaining([
+						expect.objectContaining({ estudianteId: 1, estado: 'P', justificacion: null }),
+						expect.objectContaining({ estudianteId: 2, estado: 'F', justificacion: 'Enfermedad' }),
+					]),
+				}));
+			});
 			expect(store.registroSaving()).toBe(false);
 			expect(errorHandler.showSuccess).toHaveBeenCalled();
 		});

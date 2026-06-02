@@ -37,6 +37,8 @@ function createMockApi() {
 	return {
 		obtenerDashboardDia: vi.fn().mockReturnValue(of(makeDto())),
 		listarFallosDia: vi.fn().mockReturnValue(of([])),
+		obtenerFallosPorSender: vi.fn().mockReturnValue(of([])),
+		obtenerAsistenciasSinCorreo: vi.fn().mockReturnValue(of([])),
 	};
 }
 

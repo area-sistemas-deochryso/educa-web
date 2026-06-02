@@ -34,7 +34,7 @@ describe('CorrelationIdPillComponent', () => {
 		fixture.detectChanges();
 
 		expect(component.displayValue()).toBe('abc-12345');
-		expect(component.ariaLabel()).toBe('Ver eventos del correlation id abc-12345');
+		expect(component.ariaLabel()).toBe('Abrir hub correlacionado abc-12345');
 		expect(component.tooltip()).toBe('');
 	});
 
