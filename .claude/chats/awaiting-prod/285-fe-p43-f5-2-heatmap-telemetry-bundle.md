@@ -26,9 +26,11 @@ Design decisions (from brief 260):
 
 ## Acceptance criteria
 
-- [ ] Heatmap renders 168 cells with color intensity proportional to error count
-- [ ] Tooltip shows count + avg duration per cell
-- [ ] Telemetry bundle captured and displayed in error detail view
-- [ ] Responsive (collapses gracefully on mobile)
+- [x] Heatmap renders 168 cells with color intensity proportional to error count
+- [x] Tooltip shows count + avg duration per cell
+- [x] Telemetry bundle captured and displayed in error detail view
+- [x] Responsive (collapses gracefully on mobile)
 - [ ] Tests for heatmap rendering + bundle capture
-- [ ] Build + lint clean
+- [x] Build + lint clean
+
+> **Validación prod**: ⏳ pendiente desde 2026-06-02 — smoke test visual del heatmap contra BE real + telemetry tab en occurrence drawer

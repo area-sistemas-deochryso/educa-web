@@ -98,6 +98,23 @@ export interface ErrorGroupTrendDto {
 	fecha: string;
 	count: number;
 }
+
+export interface HeatmapCell {
+	dayOfWeek: number;
+	hour: number;
+	count: number;
+	avgDuration: number;
+}
+
+export interface TelemetryBundle {
+	viewportWidth: number;
+	viewportHeight: number;
+	screenWidth: number;
+	screenHeight: number;
+	devicePixelRatio: number;
+	connectionType: string | null;
+	capturedAt: string;
+}
 // #endregion
 
 // #region Matriz de transiciones (espejo BE INV-ET07)

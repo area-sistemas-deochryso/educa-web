@@ -13,6 +13,7 @@ import {
 	ErrorLogCompleto,
 	ErrorOrigen,
 	ErrorSeveridad,
+	HeatmapCell,
 	OcurrenciaLista,
 } from '../models';
 
@@ -79,6 +80,13 @@ export class ErrorGroupsService {
 	 */
 	getTrend(grupoId: number): Observable<ErrorGroupTrendDto[]> {
 		return this.http.get<ErrorGroupTrendDto[]>(`${this.apiUrl}/${grupoId}/trend`);
+	}
+
+	getHeatmap(days = 7): Observable<HeatmapCell[]> {
+		return this.http.get<HeatmapCell[]>(
+			`${environment.apiUrl}/api/sistema/error-monitoreo/heatmap`,
+			{ params: { days } },
+		);
 	}
 
 	// #endregion
