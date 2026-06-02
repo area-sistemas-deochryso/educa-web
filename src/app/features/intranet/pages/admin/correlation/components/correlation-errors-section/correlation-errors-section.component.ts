@@ -48,7 +48,7 @@ export class CorrelationErrorsSectionComponent {
 
 	onGoToGroup(row: CorrelationErrorLogDto): void {
 		if (!row.errorGroupCode) return;
-		this.router.navigate(['/intranet/admin/trazabilidad-errores'], {
+		this.router.navigate(['/intranet/admin/monitoreo/incidencias/errores'], {
 			queryParams: { fingerprint: row.errorGroupCode },
 		});
 	}

@@ -35,7 +35,7 @@ export class CorrelationReportsSectionComponent {
 	}
 
 	onGoToReport(row: CorrelationReporteUsuarioDto): void {
-		this.router.navigate(['/intranet/admin/reportes-usuario'], {
+		this.router.navigate(['/intranet/admin/monitoreo/incidencias/reportes'], {
 			queryParams: { id: row.id },
 		});
 	}

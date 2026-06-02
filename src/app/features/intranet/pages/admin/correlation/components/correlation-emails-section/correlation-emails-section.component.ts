@@ -35,7 +35,7 @@ export class CorrelationEmailsSectionComponent {
 	}
 
 	onGoToOutbox(row: CorrelationEmailOutboxDto): void {
-		this.router.navigate(['/intranet/admin/email-outbox'], {
+		this.router.navigate(['/intranet/admin/monitoreo/correos/bandeja'], {
 			queryParams: { destinatario: row.destinatarioMasked },
 		});
 	}
