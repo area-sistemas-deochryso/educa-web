@@ -3,7 +3,7 @@
 import { TestBed } from '@angular/core/testing';
 import { HttpErrorResponse } from '@angular/common/http';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
-import { of, throwError } from 'rxjs';
+import { of } from 'rxjs';
 
 import { CrossChexSyncStatusService } from '@core/services/signalr';
 import { WalFacadeHelper } from '@core/services/wal';

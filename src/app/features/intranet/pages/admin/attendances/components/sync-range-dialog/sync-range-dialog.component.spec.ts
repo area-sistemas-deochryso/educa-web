@@ -1,6 +1,6 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { signal } from '@angular/core';
-import { describe, expect, it, vi, beforeEach } from 'vitest';
+import { describe, expect, it, beforeEach } from 'vitest';
 
 import { AttendancesAdminStore } from '../../services';
 import { SyncRangeDialogComponent, SyncRangePayload } from './sync-range-dialog.component';
