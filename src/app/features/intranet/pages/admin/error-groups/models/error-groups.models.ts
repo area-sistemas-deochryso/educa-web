@@ -106,6 +106,12 @@ export interface HeatmapCell {
 	avgDuration: number;
 }
 
+export interface HeatmapCalendarCell {
+	date: string;
+	count: number;
+	avgDurationMs: number;
+}
+
 export interface TelemetryBundle {
 	viewportWidth: number;
 	viewportHeight: number;

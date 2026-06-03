@@ -216,20 +216,40 @@ export class ErrorGroupsDataFacade {
 		const days = this.store.heatmapDays();
 		const endDate = this.store.heatmapEndDate();
 		const endDateParam = endDate ? endDate.toISOString().slice(0, 10) : undefined;
-		this.api
-			.getHeatmap(days, endDateParam)
-			.pipe(takeUntilDestroyed(this.destroyRef))
-			.subscribe({
-				next: (cells) => {
-					this.store.setHeatmapCells(cells);
-					this.store.setHeatmapLoading(false);
-				},
-				error: (err) => {
-					logger.warn('[ErrorGroupsDataFacade] Heatmap no disponible', err);
-					this.store.setHeatmapCells([]);
-					this.store.setHeatmapLoading(false);
-				},
-			});
+
+		if (days === 30) {
+			this.api
+				.getHeatmapCalendar(days, endDateParam)
+				.pipe(takeUntilDestroyed(this.destroyRef))
+				.subscribe({
+					next: (cells) => {
+						this.store.setHeatmapCalendarCells(cells);
+						this.store.setHeatmapCells([]);
+						this.store.setHeatmapLoading(false);
+					},
+					error: (err) => {
+						logger.warn('[ErrorGroupsDataFacade] Heatmap calendar no disponible', err);
+						this.store.setHeatmapCalendarCells([]);
+						this.store.setHeatmapLoading(false);
+					},
+				});
+		} else {
+			this.api
+				.getHeatmap(days, endDateParam)
+				.pipe(takeUntilDestroyed(this.destroyRef))
+				.subscribe({
+					next: (cells) => {
+						this.store.setHeatmapCells(cells);
+						this.store.setHeatmapCalendarCells([]);
+						this.store.setHeatmapLoading(false);
+					},
+					error: (err) => {
+						logger.warn('[ErrorGroupsDataFacade] Heatmap no disponible', err);
+						this.store.setHeatmapCells([]);
+						this.store.setHeatmapLoading(false);
+					},
+				});
+		}
 	}
 
 	setHeatmapPeriod(days: 7 | 30): void {

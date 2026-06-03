@@ -7,6 +7,7 @@ import {
 	ErrorLogCompleto,
 	ErrorOrigen,
 	ErrorSeveridad,
+	HeatmapCalendarCell,
 	HeatmapCell,
 	OcurrenciaLista,
 } from '../models';
@@ -83,6 +84,7 @@ export class ErrorGroupsStore {
 	private readonly _heatmapLoading = signal(false);
 	private readonly _heatmapDays = signal<7 | 30>(30);
 	private readonly _heatmapEndDate = signal<Date | null>(null);
+	private readonly _heatmapCalendarCells = signal<HeatmapCalendarCell[]>([]);
 	// #endregion
 
 	// #region Lecturas públicas — listado
@@ -140,6 +142,7 @@ export class ErrorGroupsStore {
 	readonly heatmapLoading = this._heatmapLoading.asReadonly();
 	readonly heatmapDays = this._heatmapDays.asReadonly();
 	readonly heatmapEndDate = this._heatmapEndDate.asReadonly();
+	readonly heatmapCalendarCells = this._heatmapCalendarCells.asReadonly();
 	// #endregion
 
 	// #region Computed
@@ -368,6 +371,10 @@ export class ErrorGroupsStore {
 
 	setHeatmapEndDate(date: Date | null): void {
 		this._heatmapEndDate.set(date);
+	}
+
+	setHeatmapCalendarCells(cells: HeatmapCalendarCell[]): void {
+		this._heatmapCalendarCells.set(cells);
 	}
 	// #endregion
 

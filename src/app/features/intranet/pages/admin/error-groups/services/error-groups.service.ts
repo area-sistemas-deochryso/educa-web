@@ -14,6 +14,7 @@ import {
 	ErrorLogFull,
 	ErrorOrigen,
 	ErrorSeveridad,
+	HeatmapCalendarCell,
 	HeatmapCell,
 	OcurrenciaLista,
 } from '../models';
@@ -126,6 +127,15 @@ export class ErrorGroupsService {
 		if (endDate) params['endDate'] = endDate;
 		return this.http.get<HeatmapCell[]>(
 			`${environment.apiUrl}/api/sistema/error-monitoreo/heatmap`,
+			{ params },
+		);
+	}
+
+	getHeatmapCalendar(days = 30, endDate?: string): Observable<HeatmapCalendarCell[]> {
+		const params: Record<string, string | number> = { days };
+		if (endDate) params['endDate'] = endDate;
+		return this.http.get<HeatmapCalendarCell[]>(
+			`${environment.apiUrl}/api/sistema/error-monitoreo/heatmap/calendar`,
 			{ params },
 		);
 	}

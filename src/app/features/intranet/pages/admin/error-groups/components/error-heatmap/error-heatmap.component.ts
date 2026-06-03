@@ -6,7 +6,7 @@ import { DatePickerModule } from 'primeng/datepicker';
 import { SelectButtonModule } from 'primeng/selectbutton';
 import { TooltipModule } from 'primeng/tooltip';
 
-import { HeatmapCell } from '../../models';
+import { HeatmapCalendarCell, HeatmapCell } from '../../models';
 
 const DAY_LABELS = ['Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb', 'Dom'];
 
@@ -19,6 +19,15 @@ interface GridCell {
 	avgDuration: number;
 	intensity: number;
 	tooltip: string;
+}
+
+interface CalendarGridCell {
+	date: Date | null;
+	count: number;
+	avgDuration: number;
+	intensity: number;
+	tooltip: string;
+	dayLabel: string;
 }
 
 export interface HeatmapPeriodOption {
@@ -36,6 +45,7 @@ export interface HeatmapPeriodOption {
 })
 export class ErrorHeatmapComponent {
 	readonly cells = input<HeatmapCell[]>([]);
+	readonly calendarCells = input<HeatmapCalendarCell[]>([]);
 	readonly loading = input(false);
 	readonly totalDays = input<7 | 30>(30);
 	readonly endDate = input<Date | null>(null);
@@ -49,6 +59,8 @@ export class ErrorHeatmapComponent {
 	];
 
 	readonly today = new Date();
+
+	readonly isWeekMode = computed(() => this.totalDays() === 7);
 
 	readonly calendarTooltip = computed(() =>
 		`Últimos ${this.totalDays()} días hasta la fecha elegida`,
@@ -65,15 +77,7 @@ export class ErrorHeatmapComponent {
 	readonly dayLabels = DAY_LABELS;
 	readonly hours = Array.from({ length: 24 }, (_, i) => i);
 
-	onPeriodChange(value: 7 | 30): void {
-		this.periodChange.emit(value);
-	}
-
-	onEndDateChange(date: Date | null): void {
-		this.endDateChange.emit(date);
-	}
-
-	readonly grid = computed(() => {
+	readonly hourlyGrid = computed(() => {
 		const raw = this.cells();
 
 		const isoLookup = new Map<string, HeatmapCell>();
@@ -101,6 +105,72 @@ export class ErrorHeatmapComponent {
 		}
 		return result;
 	});
+
+	readonly calendarGrid = computed(() => {
+		const raw = this.calendarCells();
+		if (!raw.length) return [];
+
+		const lookup = new Map<string, HeatmapCalendarCell>();
+		for (const c of raw) {
+			lookup.set(c.date.slice(0, 10), c);
+		}
+
+		const maxCount = Math.max(1, ...raw.map((c) => c.count));
+
+		const days = this.totalDays();
+		const end = this.endDate() ?? new Date();
+		const start = new Date(end);
+		start.setDate(start.getDate() - days);
+		start.setDate(start.getDate() + 1);
+
+		const firstDow = (start.getDay() + 6) % 7;
+
+		const allDays: CalendarGridCell[] = [];
+		for (let i = 0; i < firstDow; i++) {
+			allDays.push({ date: null, count: 0, avgDuration: 0, intensity: 0, tooltip: '', dayLabel: '' });
+		}
+
+		const cursor = new Date(start);
+		while (cursor <= end) {
+			const dateStr = cursor.toISOString().slice(0, 10);
+			const cell = lookup.get(dateStr);
+			const count = cell?.count ?? 0;
+			const avgDuration = cell?.avgDurationMs ?? 0;
+			const intensity = count / maxCount;
+			const dayNum = cursor.getDate();
+			const tooltip = count > 0
+				? `${dayNum} — ${count} error${count !== 1 ? 'es' : ''}, ${Math.round(avgDuration)}ms prom.`
+				: `${dayNum} — sin errores`;
+			allDays.push({
+				date: new Date(cursor),
+				count,
+				avgDuration,
+				intensity,
+				tooltip,
+				dayLabel: String(dayNum),
+			});
+			cursor.setDate(cursor.getDate() + 1);
+		}
+
+		const weeks: CalendarGridCell[][] = [];
+		for (let i = 0; i < allDays.length; i += 7) {
+			weeks.push(allDays.slice(i, i + 7));
+		}
+		const lastWeek = weeks[weeks.length - 1];
+		while (lastWeek.length < 7) {
+			lastWeek.push({ date: null, count: 0, avgDuration: 0, intensity: 0, tooltip: '', dayLabel: '' });
+		}
+
+		return weeks;
+	});
+
+	onPeriodChange(value: 7 | 30): void {
+		this.periodChange.emit(value);
+	}
+
+	onEndDateChange(date: Date | null): void {
+		this.endDateChange.emit(date);
+	}
 
 	getCellColor(intensity: number): string {
 		if (intensity === 0) return 'transparent';
