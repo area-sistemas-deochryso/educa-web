@@ -26,6 +26,7 @@
 								tooltipPosition="top"
 								[disabled]="isLoading()"
 								(click)="quickLogin(session)"
+								appTrackClick="Login: quick-login sesión guardada"
 							>
 								<i class="pi pi-sign-in"></i>
 							</button>
@@ -57,7 +58,8 @@
 
 		<!-- #region Login Form -->
 		@if (storedSessions().length === 0 || showLoginForm()) {
-			<form class="login-form" [formGroup]="loginForm" (ngSubmit)="onLogin()" autocomplete="on">
+			<form class="login-form" [formGroup]="loginForm" (ngSubmit)="onLogin()" autocomplete="on"
+				appTrackSubmit="Login: enviar formulario">
 				<!-- ! Error summary -->
 				<app-login-error-message [message]="errorMessage()" [show]="showError()" />
 

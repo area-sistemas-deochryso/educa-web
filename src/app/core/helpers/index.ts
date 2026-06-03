@@ -18,6 +18,7 @@ export * from './array.utils';
 export * from './stats.utils';
 export * from './error.utils';
 export * from './error-policy';
+export * from './problem-details.adapter';
 export * from './estado.utils';
 export * from './jwt.utils';
 // #endregion

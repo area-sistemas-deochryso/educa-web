@@ -420,7 +420,7 @@ export abstract class BaseCrudFacade<
 	// #region Dialog delegation
 
 	openNewDialog(): void {
-		this._activityTracker.track('USER_ACTION', `Abrir dialog: Crear ${this.config.resourceType}`);
+		this._activityTracker.track('USER_ACTION', `Abrir dialog: Crear ${this.config.resourceType}`, { action: 'click' });
 		this.store.closeDialog();
 		this.store.openDialog();
 	}
@@ -430,7 +430,7 @@ export abstract class BaseCrudFacade<
 	}
 
 	openConfirmDialog(): void {
-		this._activityTracker.track('USER_ACTION', `Confirmar eliminación: ${this.config.resourceType}`);
+		this._activityTracker.track('USER_ACTION', `Confirmar eliminación: ${this.config.resourceType}`, { action: 'click' });
 		this.store.openConfirmDialog();
 	}
 
