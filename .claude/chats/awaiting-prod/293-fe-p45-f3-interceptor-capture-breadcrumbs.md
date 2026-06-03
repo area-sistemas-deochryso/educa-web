@@ -6,6 +6,7 @@
 > **Repo**: educa-web
 > **Depends on**: brief 288 (P45 F2.2 FE ✅) + P45 F5 BE ✅ (ProblemDetails already shipped)
 > **Mode**: `/investigate` → `/execute` → `/validate`
+> **Validación prod**: ⏳ pendiente desde 2026-06-03
 
 ---
 
