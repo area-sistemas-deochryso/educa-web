@@ -339,6 +339,14 @@ export class ErrorGroupsComponent implements OnInit {
 	}): void {
 		this.crudFacade.moveCardOptimistic(payload.group, payload.toEstado);
 	}
+	onHeatmapPeriodChange(days: 7 | 30): void {
+		this.dataFacade.setHeatmapPeriod(days);
+	}
+
+	onHeatmapEndDateChange(date: Date | null): void {
+		this.dataFacade.setHeatmapEndDate(date);
+	}
+
 	onSparklineClick(group: ErrorGroupLista): void {
 		this.uiFacade.openTrendDialog(group);
 	}

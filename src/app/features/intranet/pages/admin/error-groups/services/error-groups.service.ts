@@ -121,10 +121,12 @@ export class ErrorGroupsService {
 		return this.http.get<ErrorGroupTrendDto[]>(`${this.apiUrl}/${grupoId}/trend`);
 	}
 
-	getHeatmap(days = 7): Observable<HeatmapCell[]> {
+	getHeatmap(days = 7, endDate?: string): Observable<HeatmapCell[]> {
+		const params: Record<string, string | number> = { days };
+		if (endDate) params['endDate'] = endDate;
 		return this.http.get<HeatmapCell[]>(
 			`${environment.apiUrl}/api/sistema/error-monitoreo/heatmap`,
-			{ params: { days } },
+			{ params },
 		);
 	}
 

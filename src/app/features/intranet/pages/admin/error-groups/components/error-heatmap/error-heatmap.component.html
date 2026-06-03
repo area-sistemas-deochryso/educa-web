@@ -2,8 +2,34 @@
 	<div class="heatmap-header">
 		<h3 class="heatmap-title">
 			<i class="pi pi-calendar"></i>
-			Mapa de calor — últimos {{ totalDays() }} días
+			Mapa de calor
 		</h3>
+		<div class="heatmap-controls">
+			<p-selectbutton
+				[options]="periodOptions"
+				[ngModel]="totalDays()"
+				(ngModelChange)="onPeriodChange($event)"
+				optionLabel="label"
+				optionValue="value"
+				[pt]="{ root: { 'aria-label': 'Periodo del heatmap' } }"
+			/>
+			<p-datepicker
+				[ngModel]="endDate()"
+				(ngModelChange)="onEndDateChange($event)"
+				[maxDate]="today"
+				[showIcon]="true"
+				[readonlyInput]="true"
+				dateFormat="dd/mm/yy"
+				placeholder="Hasta hoy"
+				appendTo="body"
+				[pTooltip]="calendarTooltip()"
+				tooltipPosition="top"
+				[pt]="{ root: { 'aria-label': 'Fecha final del rango del heatmap' } }"
+			/>
+			<span class="heatmap-range-label">
+				{{ rangeLabel().start | date: 'dd MMM' }} – {{ rangeLabel().end | date: 'dd MMM' }}
+			</span>
+		</div>
 	</div>
 
 	@if (loading()) {

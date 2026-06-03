@@ -213,8 +213,11 @@ export class ErrorGroupsDataFacade {
 	loadHeatmap(): void {
 		if (this.store.heatmapLoading()) return;
 		this.store.setHeatmapLoading(true);
+		const days = this.store.heatmapDays();
+		const endDate = this.store.heatmapEndDate();
+		const endDateParam = endDate ? endDate.toISOString().slice(0, 10) : undefined;
 		this.api
-			.getHeatmap(30)
+			.getHeatmap(days, endDateParam)
 			.pipe(takeUntilDestroyed(this.destroyRef))
 			.subscribe({
 				next: (cells) => {
@@ -227,6 +230,16 @@ export class ErrorGroupsDataFacade {
 					this.store.setHeatmapLoading(false);
 				},
 			});
+	}
+
+	setHeatmapPeriod(days: 7 | 30): void {
+		this.store.setHeatmapDays(days);
+		this.loadHeatmap();
+	}
+
+	setHeatmapEndDate(date: Date | null): void {
+		this.store.setHeatmapEndDate(date);
+		this.loadHeatmap();
 	}
 	// #endregion
 

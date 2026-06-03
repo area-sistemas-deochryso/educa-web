@@ -71,7 +71,14 @@
 <!-- #endregion -->
 
 <!-- #region Heatmap -->
-<app-error-heatmap [cells]="store.heatmapCells()" [loading]="store.heatmapLoading()" />
+<app-error-heatmap
+	[cells]="store.heatmapCells()"
+	[loading]="store.heatmapLoading()"
+	[totalDays]="store.heatmapDays()"
+	[endDate]="store.heatmapEndDate()"
+	(periodChange)="onHeatmapPeriodChange($event)"
+	(endDateChange)="onHeatmapEndDateChange($event)"
+/>
 <!-- #endregion -->
 
 <!-- #region Filtros -->

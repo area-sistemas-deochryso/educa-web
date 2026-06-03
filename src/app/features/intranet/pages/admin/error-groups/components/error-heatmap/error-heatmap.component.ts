@@ -1,14 +1,15 @@
-import { ChangeDetectionStrategy, Component, computed, input } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import { ChangeDetectionStrategy, Component, computed, input, output } from '@angular/core';
+import { CommonModule, DatePipe } from '@angular/common';
+import { FormsModule } from '@angular/forms';
 
+import { DatePickerModule } from 'primeng/datepicker';
+import { SelectButtonModule } from 'primeng/selectbutton';
 import { TooltipModule } from 'primeng/tooltip';
 
 import { HeatmapCell } from '../../models';
 
 const DAY_LABELS = ['Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb', 'Dom'];
 
-// BE sends .NET DayOfWeek: Sunday=0, Monday=1...Saturday=6
-// FE uses ISO: Monday=0...Sunday=6
 const DOTNET_TO_ISO: Record<number, number> = { 0: 6, 1: 0, 2: 1, 3: 2, 4: 3, 5: 4, 6: 5 };
 
 interface GridCell {
@@ -20,10 +21,15 @@ interface GridCell {
 	tooltip: string;
 }
 
+export interface HeatmapPeriodOption {
+	label: string;
+	value: 7 | 30;
+}
+
 @Component({
 	selector: 'app-error-heatmap',
 	standalone: true,
-	imports: [CommonModule, TooltipModule],
+	imports: [CommonModule, DatePipe, FormsModule, DatePickerModule, SelectButtonModule, TooltipModule],
 	templateUrl: './error-heatmap.component.html',
 	styleUrl: './error-heatmap.component.scss',
 	changeDetection: ChangeDetectionStrategy.OnPush,
@@ -31,10 +37,41 @@ interface GridCell {
 export class ErrorHeatmapComponent {
 	readonly cells = input<HeatmapCell[]>([]);
 	readonly loading = input(false);
-	readonly totalDays = input(30);
+	readonly totalDays = input<7 | 30>(30);
+	readonly endDate = input<Date | null>(null);
+
+	readonly periodChange = output<7 | 30>();
+	readonly endDateChange = output<Date | null>();
+
+	readonly periodOptions: HeatmapPeriodOption[] = [
+		{ label: 'Semana', value: 7 },
+		{ label: 'Mes', value: 30 },
+	];
+
+	readonly today = new Date();
+
+	readonly calendarTooltip = computed(() =>
+		`Últimos ${this.totalDays()} días hasta la fecha elegida`,
+	);
+
+	readonly rangeLabel = computed(() => {
+		const days = this.totalDays();
+		const end = this.endDate() ?? new Date();
+		const start = new Date(end);
+		start.setDate(start.getDate() - days);
+		return { start, end };
+	});
 
 	readonly dayLabels = DAY_LABELS;
 	readonly hours = Array.from({ length: 24 }, (_, i) => i);
+
+	onPeriodChange(value: 7 | 30): void {
+		this.periodChange.emit(value);
+	}
+
+	onEndDateChange(date: Date | null): void {
+		this.endDateChange.emit(date);
+	}
 
 	readonly grid = computed(() => {
 		const raw = this.cells();

@@ -81,6 +81,8 @@ export class ErrorGroupsStore {
 	// #region Estado privado — heatmap (Plan 43 F5:5.2)
 	private readonly _heatmapCells = signal<HeatmapCell[]>([]);
 	private readonly _heatmapLoading = signal(false);
+	private readonly _heatmapDays = signal<7 | 30>(30);
+	private readonly _heatmapEndDate = signal<Date | null>(null);
 	// #endregion
 
 	// #region Lecturas públicas — listado
@@ -136,6 +138,8 @@ export class ErrorGroupsStore {
 	// #region Lecturas públicas — heatmap
 	readonly heatmapCells = this._heatmapCells.asReadonly();
 	readonly heatmapLoading = this._heatmapLoading.asReadonly();
+	readonly heatmapDays = this._heatmapDays.asReadonly();
+	readonly heatmapEndDate = this._heatmapEndDate.asReadonly();
 	// #endregion
 
 	// #region Computed
@@ -356,6 +360,14 @@ export class ErrorGroupsStore {
 
 	setHeatmapLoading(loading: boolean): void {
 		this._heatmapLoading.set(loading);
+	}
+
+	setHeatmapDays(days: 7 | 30): void {
+		this._heatmapDays.set(days);
+	}
+
+	setHeatmapEndDate(date: Date | null): void {
+		this._heatmapEndDate.set(date);
 	}
 	// #endregion
 
