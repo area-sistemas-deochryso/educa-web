@@ -3,7 +3,7 @@ import { HttpErrorResponse, HttpEvent, HttpHandlerFn, HttpInterceptorFn, HttpReq
 import { inject } from '@angular/core';
 import { Observable, Subject, catchError, filter, switchMap, take, throwError, timeout } from 'rxjs';
 
-import { logger } from '@core/helpers';
+import { logger, parseProblemDetails } from '@core/helpers';
 // eslint-disable-next-line layer-enforcement/imports-error -- DEBT: AuthApiService is internal to auth/
 import { AuthApiService } from '@core/services/auth/auth-api.service';
 import { ErrorHandlerService, ErrorReporterService } from '@core/services/error';
@@ -110,25 +110,15 @@ export const errorInterceptor: HttpInterceptorFn = (req, next) => {
 
 			logger.error('[ErrorInterceptor] HTTP Error:', httpError.status, req.url);
 
-			// Extract traceId and errorCode from response body
-			const errorBody = httpError.error as Record<string, unknown> | null;
-			const traceId =
-				httpError.headers?.get('X-Correlation-Id') ??
-				errorBody?.['traceId'] ??
-				undefined;
-			const errorCode = (errorBody?.['errorCode'] as string) ?? undefined;
-
-			// * 409 Conflict: let handleHttpError resolve via errorCode (CONCURRENCY_CONFLICT, etc.)
-			// No special-case here — the generic flow uses UI_ERROR_CODES for the message,
-			// which keeps it aligned with facade error policies (dedup relies on same detail).
+			const problem = parseProblemDetails(httpError);
 
 			errorHandler.handleHttpError(httpError, {
 				url: req.url,
 				method: req.method,
 				body: req.body,
 				requestId,
-				traceId,
-				errorCode,
+				traceId: problem.traceId ?? undefined,
+				errorCode: problem.errorCode ?? undefined,
 			});
 
 			// Re-lanzar para que los callers puedan reaccionar si lo necesitan.

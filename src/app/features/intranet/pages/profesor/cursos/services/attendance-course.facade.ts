@@ -1,6 +1,7 @@
 import { Injectable, inject, DestroyRef } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { withRetry, facadeErrorHandler } from '@core/helpers';
+import { ActivityTrackerService } from '@core/services/error';
 import { ErrorHandlerService, WalFacadeHelper, WalCrossTabRefetchService } from '@core/services';
 import { environment } from '@config';
 import { UI_SUMMARIES, UI_ASISTENCIA_SUCCESS_MESSAGES } from '@shared/constants';
@@ -19,6 +20,7 @@ export class AttendanceCourseFacade {
 	private readonly destroyRef = inject(DestroyRef);
 	private readonly wal = inject(WalFacadeHelper);
 	private readonly crossTabRefetch = inject(WalCrossTabRefetchService);
+	private readonly activityTracker = inject(ActivityTrackerService);
 	private readonly errHandler = facadeErrorHandler({
 		tag: 'AttendanceCourseFacade',
 		errorHandler: this.errorHandler,
@@ -104,6 +106,8 @@ export class AttendanceCourseFacade {
 		const horarioId = overrideHorarioId ?? this.getHorarioId();
 		const data = this.store.registroData();
 		if (!horarioId || !data) return;
+
+		this.activityTracker.track('USER_ACTION', `Registrar asistencia: ${data.estudiantes.length} estudiantes`, { action: 'form_submit' });
 
 		const dto: RegistrarAsistenciaCursoDto = {
 			fecha: data.fecha,

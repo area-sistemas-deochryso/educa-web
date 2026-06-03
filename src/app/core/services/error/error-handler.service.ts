@@ -11,7 +11,7 @@ import { Injectable, computed, inject, signal } from '@angular/core';
 
 import { ErrorReporterService } from './error-reporter.service';
 import { HttpErrorResponse } from '@angular/common/http';
-import { logger } from '@core/helpers';
+import { logger, parseProblemDetails } from '@core/helpers';
 import { RateLimitCountdownService } from '@core/services/rate-limit-countdown';
 import { RequestTraceFacade } from '@core/services/trace';
 import {
@@ -274,27 +274,23 @@ export class ErrorHandlerService {
 	}
 
 	private getHttpErrorMessage(error: HttpErrorResponse): string {
-		// 1. Resolver por errorCode del backend (contrato estable)
-		const errorCode = error.error?.errorCode as string | undefined;
-		if (errorCode && UI_ERROR_CODES[errorCode]) {
-			return UI_ERROR_CODES[errorCode];
+		const problem = parseProblemDetails(error);
+
+		if (problem.errorCode && UI_ERROR_CODES[problem.errorCode]) {
+			return UI_ERROR_CODES[problem.errorCode];
 		}
 
-		// 2. ApiResponse: mensaje directo del backend
-		if (error.error?.message) {
-			return error.error.message;
+		if (problem.detail) {
+			return problem.detail;
 		}
 
-		// 3. ASP.NET Core ValidationProblemDetails: { errors: { fieldName: ["msg"] } }
-		const validationErrors = error.error?.errors;
-		if (validationErrors && typeof validationErrors === 'object') {
-			const firstField = Object.values(validationErrors as Record<string, unknown>)[0];
-			if (Array.isArray(firstField) && firstField.length > 0 && typeof firstField[0] === 'string') {
-				return firstField[0];
+		if (problem.validationErrors) {
+			const firstMessages = Object.values(problem.validationErrors)[0];
+			if (firstMessages?.length) {
+				return firstMessages[0];
 			}
 		}
 
-		// 4. Fallback: mensaje predefinido por HTTP status
 		return (
 			HTTP_ERROR_MESSAGES[error.status] ??
 			`Error ${error.status}: ${error.statusText || UI_GENERIC_MESSAGES.unknownError}`

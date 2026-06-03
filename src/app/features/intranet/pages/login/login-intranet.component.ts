@@ -27,6 +27,7 @@ import { ToggleSwitch } from 'primeng/toggleswitch';
 import { Tooltip } from 'primeng/tooltip';
 import { UppercaseInputDirective } from '@intranet-shared/directives';
 import { InitialsPipe } from '@intranet-shared/pipes';
+import { TrackClickDirective, TrackSubmitDirective } from '@shared/directives';
 import { logger } from '@core/helpers';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { UI_LOGIN_MESSAGES } from '@app/shared/constants';
@@ -50,6 +51,8 @@ import { UI_LOGIN_MESSAGES } from '@app/shared/constants';
 		LoginButtonComponent,
 		UppercaseInputDirective,
 		InitialsPipe,
+		TrackClickDirective,
+		TrackSubmitDirective,
 	],
 	templateUrl: './login-intranet.component.html',
 	styleUrl: './login-intranet.component.scss',
