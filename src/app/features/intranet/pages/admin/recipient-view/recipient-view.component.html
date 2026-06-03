@@ -1,0 +1,275 @@
+<!-- #region Header -->
+<app-page-header
+	icon="pi pi-envelope"
+	[title]="correo()"
+	subtitle="Vista unificada del destinatario"
+>
+	<div class="header-actions">
+		<button
+			pButton
+			icon="pi pi-arrow-left"
+			class="p-button-text p-button-sm btn-icon"
+			pTooltip="Volver"
+			(click)="goBack()"
+		></button>
+		<button
+			pButton
+			icon="pi pi-refresh"
+			class="p-button-text p-button-sm btn-icon"
+			pTooltip="Actualizar"
+			[loading]="loading()"
+			(click)="refresh()"
+		></button>
+	</div>
+</app-page-header>
+<!-- #endregion -->
+
+<!-- #region Status badges -->
+@if (summary(); as s) {
+	<section class="status-badges">
+		@if (blacklistActive()) {
+			<p-tag severity="danger" value="Blacklisted" icon="pi pi-ban" />
+		}
+		@if (quarantineActive()) {
+			<p-tag severity="warn" value="En cuarentena" icon="pi pi-clock" />
+		}
+		@if (hasAuditProblem()) {
+			<p-tag severity="warn" [value]="'Auditoría: ' + (s.audit.tipoFallo ?? 'problema detectado')" icon="pi pi-exclamation-triangle" />
+		}
+		@if (!blacklistActive() && !quarantineActive() && !hasAuditProblem()) {
+			<p-tag severity="success" value="Sin problemas" icon="pi pi-check" />
+		}
+	</section>
+}
+<!-- #endregion -->
+
+<!-- #region Loading -->
+@if (loading()) {
+	<div class="loading-container">
+		<i class="pi pi-spin pi-spinner" style="font-size: 2rem"></i>
+		<p>Cargando información del destinatario...</p>
+	</div>
+}
+<!-- #endregion -->
+
+<!-- #region Error -->
+@if (error() && !loading()) {
+	<div class="error-container">
+		<i class="pi pi-exclamation-circle" style="font-size: 2rem; color: var(--red-500)"></i>
+		<p>No se pudo cargar la información del destinatario.</p>
+		<button pButton label="Reintentar" icon="pi pi-refresh" class="p-button-outlined p-button-sm" (click)="refresh()"></button>
+	</div>
+}
+<!-- #endregion -->
+
+<!-- #region Content -->
+@if (summary(); as s) {
+	<!-- #region Stats -->
+	<section class="stats-section">
+		<div class="stat-card">
+			<div class="stat-content">
+				<span class="stat-label">Enviados</span>
+				<span class="stat-value">{{ s.outbox.total }}</span>
+				<span class="stat-sublabel">correos totales</span>
+			</div>
+			<div class="stat-icon">
+				<i class="pi pi-send"></i>
+			</div>
+		</div>
+
+		<div class="stat-card" [class.stat--critical]="s.outbox.fallidos > 0">
+			<div class="stat-content">
+				<span class="stat-label">Fallidos</span>
+				<span class="stat-value">{{ s.outbox.fallidos }}</span>
+				<span class="stat-sublabel">
+					@if (s.outbox.ultimoEstado) {
+						Último: {{ s.outbox.ultimoEstado }}
+					} @else {
+						sin fallos recientes
+					}
+				</span>
+			</div>
+			<div class="stat-icon">
+				<i class="pi pi-times-circle"></i>
+			</div>
+		</div>
+
+		<div class="stat-card" [class.stat--critical]="s.defer.total7d > 0">
+			<div class="stat-content">
+				<span class="stat-label">Defers (7d)</span>
+				<span class="stat-value">{{ s.defer.total7d }}</span>
+				<span class="stat-sublabel">
+					@if (s.defer.ultimoEvento) {
+						Último: {{ s.defer.ultimoEvento | date: 'dd/MM HH:mm' }}
+					} @else {
+						sin eventos recientes
+					}
+				</span>
+			</div>
+			<div class="stat-icon">
+				<i class="pi pi-history"></i>
+			</div>
+		</div>
+
+		<div class="stat-card">
+			<div class="stat-content">
+				<span class="stat-label">Último envío</span>
+				<span class="stat-value stat-value--date">
+					@if (s.outbox.ultimoEnvio) {
+						{{ s.outbox.ultimoEnvio | date: 'dd/MM/yyyy' }}
+					} @else {
+						—
+					}
+				</span>
+				<span class="stat-sublabel">
+					@if (s.outbox.ultimoEnvio) {
+						{{ s.outbox.ultimoEnvio | date: 'HH:mm' }}
+					}
+				</span>
+			</div>
+			<div class="stat-icon">
+				<i class="pi pi-calendar"></i>
+			</div>
+		</div>
+	</section>
+	<!-- #endregion -->
+
+	<!-- #region Tabs -->
+	<p-tabs value="outbox">
+		<p-tablist>
+			<p-tab value="outbox">
+				<i class="pi pi-inbox mr-2"></i>
+				Envíos
+			</p-tab>
+			<p-tab value="blacklist">
+				<i class="pi pi-shield mr-2"></i>
+				Blacklist
+			</p-tab>
+			<p-tab value="quarantine">
+				<i class="pi pi-clock mr-2"></i>
+				Cuarentena
+			</p-tab>
+			<p-tab value="defer">
+				<i class="pi pi-history mr-2"></i>
+				Defer
+			</p-tab>
+			<p-tab value="audit">
+				<i class="pi pi-exclamation-triangle mr-2"></i>
+				Auditoría
+			</p-tab>
+		</p-tablist>
+
+		<p-tabpanels>
+			<p-tabpanel value="outbox">
+				<div class="tab-content">
+					<div class="detail-row">
+						<span class="detail-label">Total enviados</span>
+						<span class="detail-value">{{ s.outbox.total }}</span>
+					</div>
+					<div class="detail-row">
+						<span class="detail-label">Fallidos</span>
+						<span class="detail-value">{{ s.outbox.fallidos }}</span>
+					</div>
+					<div class="detail-row">
+						<span class="detail-label">Último envío</span>
+						<span class="detail-value">{{ s.outbox.ultimoEnvio ? (s.outbox.ultimoEnvio | date: 'dd/MM/yyyy HH:mm') : '—' }}</span>
+					</div>
+					<div class="detail-row">
+						<span class="detail-label">Último estado</span>
+						<span class="detail-value">{{ s.outbox.ultimoEstado ?? '—' }}</span>
+					</div>
+				</div>
+			</p-tabpanel>
+
+			<p-tabpanel value="blacklist">
+				<div class="tab-content">
+					<div class="detail-row">
+						<span class="detail-label">Estado</span>
+						<span class="detail-value">
+							@if (s.blacklist.activo) {
+								<p-tag severity="danger" value="Activo" />
+							} @else {
+								<p-tag severity="success" value="No bloqueado" />
+							}
+						</span>
+					</div>
+					@if (s.blacklist.motivo) {
+						<div class="detail-row">
+							<span class="detail-label">Motivo</span>
+							<span class="detail-value">{{ s.blacklist.motivo }}</span>
+						</div>
+					}
+					@if (s.blacklist.fechaBloqueo) {
+						<div class="detail-row">
+							<span class="detail-label">Fecha de bloqueo</span>
+							<span class="detail-value">{{ s.blacklist.fechaBloqueo | date: 'dd/MM/yyyy HH:mm' }}</span>
+						</div>
+					}
+				</div>
+			</p-tabpanel>
+
+			<p-tabpanel value="quarantine">
+				<div class="tab-content">
+					<div class="detail-row">
+						<span class="detail-label">Estado</span>
+						<span class="detail-value">
+							@if (s.quarantine.activo) {
+								<p-tag severity="warn" value="En cuarentena" />
+							} @else {
+								<p-tag severity="success" value="Sin cuarentena" />
+							}
+						</span>
+					</div>
+					@if (s.quarantine.motivo) {
+						<div class="detail-row">
+							<span class="detail-label">Motivo</span>
+							<span class="detail-value">{{ s.quarantine.motivo }}</span>
+						</div>
+					}
+					@if (s.quarantine.retryAfter) {
+						<div class="detail-row">
+							<span class="detail-label">Reintento programado</span>
+							<span class="detail-value">{{ s.quarantine.retryAfter | date: 'dd/MM/yyyy HH:mm' }}</span>
+						</div>
+					}
+				</div>
+			</p-tabpanel>
+
+			<p-tabpanel value="defer">
+				<div class="tab-content">
+					<div class="detail-row">
+						<span class="detail-label">Eventos (últimos 7 días)</span>
+						<span class="detail-value">{{ s.defer.total7d }}</span>
+					</div>
+					<div class="detail-row">
+						<span class="detail-label">Último evento</span>
+						<span class="detail-value">{{ s.defer.ultimoEvento ? (s.defer.ultimoEvento | date: 'dd/MM/yyyy HH:mm') : '—' }}</span>
+					</div>
+				</div>
+			</p-tabpanel>
+
+			<p-tabpanel value="audit">
+				<div class="tab-content">
+					<div class="detail-row">
+						<span class="detail-label">Problemas detectados</span>
+						<span class="detail-value">
+							@if (s.audit.tieneProblema) {
+								<p-tag severity="warn" [value]="s.audit.tipoFallo ?? 'Problema detectado'" />
+							} @else {
+								<p-tag severity="success" value="Sin problemas" />
+							}
+						</span>
+					</div>
+					@if (s.audit.tipoFallo) {
+						<div class="detail-row">
+							<span class="detail-label">Tipo de fallo</span>
+							<span class="detail-value">{{ s.audit.tipoFallo }}</span>
+						</div>
+					}
+				</div>
+			</p-tabpanel>
+		</p-tabpanels>
+	</p-tabs>
+	<!-- #endregion -->
+}
+<!-- #endregion -->
