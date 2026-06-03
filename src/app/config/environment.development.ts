@@ -37,6 +37,7 @@ export const environment = {
 		emailQuarantineTab: true,
 		emailDomainPausesTab: true,
 		emailDeferEventsTab: true,
+		emailRecipientView: true,
 		runtimeHealth: true,
 	},
 

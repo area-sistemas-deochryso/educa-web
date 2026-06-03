@@ -145,6 +145,18 @@ export default [
 			import('./monitoreo-hub.component').then((m) => m.MonitoreoHubComponent),
 		title: 'Intranet - Monitoreo',
 	},
+	...(environment.features.emailRecipientView
+		? [
+				{
+					path: 'correos/persona/:correo',
+					loadComponent: () =>
+						import('../recipient-view').then((m) => m.RecipientViewComponent),
+					canActivate: [authGuard, permissionsGuard],
+					data: { permissionPath: 'intranet/admin/monitoreo/correos/persona' },
+					title: 'Intranet - Vista de Destinatario',
+				},
+			]
+		: []),
 	{
 		path: 'correos',
 		loadComponent: () =>

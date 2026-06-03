@@ -8,6 +8,7 @@ export * from './email-defer-event.models';
 export * from './email-domain-pause.models';
 export * from './email-outbox.models';
 export * from './email-quarantine.models';
+export * from './recipient-summary.models';
 export * from './events-calendar.models';
 export * from './mensajeria.models';
 export * from './notification.models';
