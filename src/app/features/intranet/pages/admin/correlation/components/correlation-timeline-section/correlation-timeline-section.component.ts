@@ -79,19 +79,19 @@ export class CorrelationTimelineSectionComponent {
 
 	onGoToGroup(row: CorrelationErrorLogDto): void {
 		if (!row.errorGroupCode) return;
-		void this.router.navigate(['/intranet/admin/trazabilidad-errores'], {
+		void this.router.navigate(['/intranet/admin/monitoreo/incidencias/errores'], {
 			queryParams: { fingerprint: row.errorGroupCode },
 		});
 	}
 
 	onGoToReport(row: CorrelationReporteUsuarioDto): void {
-		void this.router.navigate(['/intranet/admin/reportes-usuario'], {
+		void this.router.navigate(['/intranet/admin/monitoreo/incidencias/reportes'], {
 			queryParams: { id: row.id },
 		});
 	}
 
 	onGoToOutbox(row: CorrelationEmailOutboxDto): void {
-		void this.router.navigate(['/intranet/admin/email-outbox'], {
+		void this.router.navigate(['/intranet/admin/monitoreo/correos/bandeja'], {
 			queryParams: { destinatario: row.destinatarioMasked },
 		});
 	}

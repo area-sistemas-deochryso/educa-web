@@ -46,7 +46,7 @@ describe('CorrelationEmailsSectionComponent', () => {
 	it('onGoToOutbox navigates with destinatario queryParam', () => {
 		const spy = vi.spyOn(router, 'navigate').mockResolvedValue(true);
 		component.onGoToOutbox(makeRow({ destinatarioMasked: 'a***@b.com' }));
-		expect(spy).toHaveBeenCalledWith(['/intranet/admin/email-outbox'], {
+		expect(spy).toHaveBeenCalledWith(['/intranet/admin/monitoreo/correos/bandeja'], {
 			queryParams: { destinatario: 'a***@b.com' },
 		});
 	});

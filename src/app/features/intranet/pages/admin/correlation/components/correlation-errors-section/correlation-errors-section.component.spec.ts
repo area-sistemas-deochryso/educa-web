@@ -55,7 +55,7 @@ describe('CorrelationErrorsSectionComponent', () => {
 	it('onGoToGroup navigates with fingerprint queryParam', () => {
 		const spy = vi.spyOn(router, 'navigate').mockResolvedValue(true);
 		component.onGoToGroup(makeRow({ errorGroupCode: 'abc123def456' }));
-		expect(spy).toHaveBeenCalledWith(['/intranet/admin/trazabilidad-errores'], {
+		expect(spy).toHaveBeenCalledWith(['/intranet/admin/monitoreo/incidencias/errores'], {
 			queryParams: { fingerprint: 'abc123def456' },
 		});
 	});

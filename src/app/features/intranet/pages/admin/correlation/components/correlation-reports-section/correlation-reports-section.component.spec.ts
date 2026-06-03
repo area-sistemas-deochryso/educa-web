@@ -45,7 +45,7 @@ describe('CorrelationReportsSectionComponent', () => {
 	it('onGoToReport navigates with id queryParam', () => {
 		const spy = vi.spyOn(router, 'navigate').mockResolvedValue(true);
 		component.onGoToReport(makeRow({ id: 99 }));
-		expect(spy).toHaveBeenCalledWith(['/intranet/admin/reportes-usuario'], {
+		expect(spy).toHaveBeenCalledWith(['/intranet/admin/monitoreo/incidencias/reportes'], {
 			queryParams: { id: 99 },
 		});
 	});
