@@ -3,7 +3,7 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { Router } from '@angular/router';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
-import { of } from 'rxjs';
+import { EMPTY, of } from 'rxjs';
 
 import { LoginIntranetComponent } from './login-intranet.component';
 import { AuthService, SwService, UserPermissionsService } from '@core/services';
@@ -41,6 +41,7 @@ describe('LoginIntranetComponent', () => {
 
 		routerMock = {
 			navigate: vi.fn(),
+			events: EMPTY,
 		};
 
 		await TestBed.configureTestingModule({
