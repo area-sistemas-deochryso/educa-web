@@ -1,6 +1,6 @@
 # Plan Maestro — Orden y Dependencias
 
-> **Inicio**: 2026-04-14 · **Última limpieza**: 2026-06-02
+> **Inicio**: 2026-04-14 · **Última limpieza**: 2026-06-03
 > **Principio rector**: "Features primero — el enforcement y la arquitectura son valiosos solo si soportan funcionalidad real."
 > **Scope**: solo trabajo FE-only. BE-only → [`Educa.API/.claude/plan/maestro.md`](../../../Educa.API/.claude/plan/maestro.md). Cross-repo → [`educa-coord/plans/maestro.md`](../../../educa-coord/plans/maestro.md).
 
@@ -14,7 +14,7 @@
 | xP41 | → Correlation Hub (coord) | F1 ✅ · F2 FE ✅ · F3 BE next | ver P41 |
 | xP22 | → Endurecimiento correos (coord) | F3.FE ✅ awaiting-prod (284) | ver P22 |
 | xP42 | → Casing contratos (coord) | Sin trabajo FE pendiente | ver P42 |
-| xP43 | → Monitoreo Cowork (coord) | F5:5.2 FE ✅ awaiting-prod (285) · F6 pendiente | ver P43 |
+| xP43 | → Monitoreo Cowork (coord) | F5:5.2 FE ✅ awaiting-prod (285) · F6.1 FE ✅ awaiting-prod (296) · F6.2 pendiente | ver P43 |
 | xP45 | → Monitoreo incidencias (coord) | P45:F2.2:FE ✅ closed (288) · heatmap blocked by BE BT2-F5 | ver P45 |
 | xP52 | → Email outbox retry + diagnostics (coord) | F3-F5 FE ✅ awaiting-prod (275, 277, 279) | ver P52 |
 | xP53 | → Duplicate person validation (coord) | F3 FE ✅ awaiting-prod (281) | ver P53 |
@@ -88,7 +88,7 @@ Planes cross-repo con sub-chats FE pendientes: **41** (Correlation Hub), **42** 
 
 ### 🟣 Verificaciones post-deploy (`/verify <NNN>`)
 
-8 briefs en `awaiting-prod/`:
+9 briefs en `awaiting-prod/`:
 
 | Brief | Scope |
 |-------|-------|
@@ -100,14 +100,15 @@ Planes cross-repo con sub-chats FE pendientes: **41** (Correlation Hub), **42** 
 | `281` | P53 F3 FE: duplicate person confirmation dialog |
 | `284` | P22 F3.FE: outbox tipo fallo UI |
 | `285` | P43 F5.2 FE: error heatmap + telemetry bundle |
+| `298` | Heatmap: period selector week/month + calendar grid |
 
 Movidos a `closed/` (sync 2026-06-01): 119 (WAL DELETE audit), 137 (F5 wrappers), 147 (P43 Chat 2.1 FE), 199 (F-021 deep-link), 213 (login cookie), 134 (P28 Chat 4), 140 (F-018 botón).
 
 ### Notas operativas
 
-- **`running/`**: vacío · **`open/`**: 3 briefs (262×2, 269) · **`awaiting-prod/`**: 8 briefs · **`waiting/`**: vacío · **`troubles/`**: vacío
-- **Último cierre**: 285 (P43 F5.2 FE heatmap + telemetry) → awaiting-prod/ 2026-06-02
-- **Último saneamiento**: 2026-06-02 — sync-maestro: 284/285 moved to awaiting-prod, verificaciones updated (8 items). Brief 269 (P28 F018) may be stale — P28 shipped 2026-05-30.
+- **`running/`**: vacío · **`open/`**: 8 briefs (262×2, 269, 292, 293, 296, 297, 301) · **`awaiting-prod/`**: 9 briefs · **`waiting/`**: vacío · **`troubles/`**: vacío
+- **Último cierre**: 289 (P41 F1 timeline hub) → closed/ 2026-06-03. Also 287 (P56 F1) + 288 (P45 F2.2 FE) closed.
+- **Último saneamiento**: 2026-06-03 — sync-maestro: 287/288/289 confirmed closed, 298 added to awaiting-prod, notas updated. Brief 269 (P28 F018) still stale — P28 shipped 2026-05-30.
 
 ---
 
