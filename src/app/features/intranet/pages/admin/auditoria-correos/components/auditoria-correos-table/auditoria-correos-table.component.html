@@ -12,7 +12,7 @@
 				<th style="width: 220px">CORREO ACTUAL</th>
 				<th style="width: 150px">FALLO</th>
 				<th>RAZÓN</th>
-				<th style="width: 80px">ACCIONES</th>
+				<th style="width: 110px">ACCIONES</th>
 			</tr>
 		</ng-template>
 
@@ -44,15 +44,28 @@
 					</span>
 				</td>
 				<td class="col-actions">
-					<button
-						pButton
-						icon="pi pi-external-link"
-						class="p-button-rounded p-button-text p-button-info"
-						pTooltip="Ir a Usuarios (copia el nombre al portapapeles)"
-						tooltipPosition="top"
-						(click)="onNavegar(item)"
-						[pt]="{ root: { 'aria-label': 'Ir al registro en Usuarios' } }"
-					></button>
+					<div class="actions">
+						<button
+							pButton
+							icon="pi pi-external-link"
+							class="p-button-rounded p-button-text p-button-info"
+							pTooltip="Ir a Usuarios (copia el nombre al portapapeles)"
+							tooltipPosition="top"
+							(click)="onNavegar(item)"
+							[pt]="{ root: { 'aria-label': 'Ir al registro en Usuarios' } }"
+						></button>
+						@if (item.correoActual) {
+							<a
+								[routerLink]="['/intranet/admin/monitoreo/correos/persona', item.correoActual]"
+								class="p-button p-button-rounded p-button-text p-button-secondary"
+								pTooltip="Ver historial de correo"
+								tooltipPosition="top"
+								[attr.aria-label]="'Ver historial de ' + item.correoActual"
+							>
+								<i class="pi pi-history"></i>
+							</a>
+						}
+					</div>
 				</td>
 			</tr>
 		</ng-template>

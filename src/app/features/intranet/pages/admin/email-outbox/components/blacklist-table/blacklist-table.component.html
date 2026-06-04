@@ -70,6 +70,15 @@
 							(click)="onViewDetail(item)"
 							[pt]="{ root: { 'aria-label': 'Ver detalles' } }"
 						></button>
+						<a
+							[routerLink]="['/intranet/admin/monitoreo/correos/persona', item.correo]"
+							class="p-button p-button-rounded p-button-text p-button-info"
+							pTooltip="Ver historial"
+							tooltipPosition="top"
+							[attr.aria-label]="'Ver historial de ' + item.correo"
+						>
+							<i class="pi pi-history"></i>
+						</a>
 						@if (item.estado) {
 							<button
 								pButton

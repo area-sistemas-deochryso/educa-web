@@ -64,6 +64,13 @@
 
 .col-actions {
 	text-align: center;
+
+	.actions {
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		gap: 0.25rem;
+	}
 }
 
 .empty-message {
