@@ -5,6 +5,7 @@
 > **Repo**: educa-web (FE-only si hay endpoint, xrepo si no)
 > **Depends on**: brief 303 (gap panel UI — deployed)
 > **Mode**: `/design` → `/execute` → `/validate`
+> **Validación prod**: ⏳ pendiente desde 2026-06-04
 
 ---
 

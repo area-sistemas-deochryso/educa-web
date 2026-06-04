@@ -7,12 +7,93 @@
 			(onClick)="goBack()"
 			[pt]="{ root: { 'aria-label': 'Volver al dashboard de correos' } }"
 		/>
-		<h2>Perfil del estudiante</h2>
-		<span class="student-id">ID: {{ estudianteId() }}</span>
+
+		@if (loading()) {
+			<p-skeleton width="60%" height="1.5rem" />
+			<p-skeleton width="40%" height="1rem" />
+		} @else if (identity(); as student) {
+			<h2>{{ student.alumno }}</h2>
+			<div class="student-meta">
+				<span>{{ student.grado }}</span>
+				@if (student.salonNombre) {
+					<span>·</span>
+					<span>{{ student.salonNombre }}</span>
+				}
+			</div>
+		} @else {
+			<h2>Estudiante #{{ estudianteId() }}</h2>
+		}
 	</header>
 
-	<div class="placeholder-content">
-		<i class="pi pi-user placeholder-icon"></i>
-		<p>Vista de perfil del estudiante — próximamente con datos de asistencia y correos.</p>
-	</div>
+	<!-- Gaps de asistencia -->
+	<section class="profile-section">
+		<h3>Gaps de asistencia (hoy)</h3>
+
+		@if (loading()) {
+			<p-skeleton width="100%" height="8rem" />
+		} @else if (gaps().length === 0) {
+			<div class="empty-state">
+				<i class="pi pi-check-circle"></i>
+				<p>Sin gaps de asistencia registrados hoy.</p>
+			</div>
+		} @else {
+			<p-table [value]="gaps()" [rows]="10" styleClass="p-datatable-sm">
+				<ng-template #header>
+					<tr>
+						<th>Tipo</th>
+						<th>Hora registro</th>
+						<th>Estado correo</th>
+					</tr>
+				</ng-template>
+				<ng-template #body let-row>
+					<tr>
+						<td>{{ row.tipo }}</td>
+						<td>{{ row.horaRegistro }}</td>
+						<td>
+							@if (row.outboxEstado) {
+								<p-tag [value]="row.outboxEstado" [severity]="getEstadoSeverity(row.outboxEstado)" />
+							} @else {
+								<span class="text-secondary">No generado</span>
+							}
+						</td>
+					</tr>
+				</ng-template>
+			</p-table>
+		}
+	</section>
+
+	<!-- Historial de correos -->
+	<section class="profile-section">
+		<h3>Historial de correos</h3>
+
+		@if (loading()) {
+			<p-skeleton width="100%" height="8rem" />
+		} @else if (emails().length === 0) {
+			<div class="empty-state">
+				<i class="pi pi-inbox"></i>
+				<p>Sin correos registrados para este estudiante.</p>
+			</div>
+		} @else {
+			<p-table [value]="emails()" [rows]="10" [paginator]="emails().length > 10" styleClass="p-datatable-sm">
+				<ng-template #header>
+					<tr>
+						<th>Asunto</th>
+						<th>Estado</th>
+						<th>Fecha</th>
+						<th>Intentos</th>
+					</tr>
+				</ng-template>
+				<ng-template #body let-row>
+					<tr>
+						<td class="text-truncate">{{ row.asunto }}</td>
+						<td>
+							<p-tag [value]="row.estado" [severity]="getEstadoSeverity(row.estado)" />
+						</td>
+						<td>{{ row.fechaReg | date: 'dd/MM/yyyy HH:mm' }}</td>
+						<td>{{ row.intentos }}/{{ row.maxIntentos }}</td>
+					</tr>
+				</ng-template>
+			</p-table>
+		}
+	</section>
 </section>

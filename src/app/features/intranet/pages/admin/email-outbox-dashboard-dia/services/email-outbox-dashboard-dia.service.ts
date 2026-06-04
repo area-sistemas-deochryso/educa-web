@@ -38,11 +38,19 @@ export class EmailOutboxDashboardDiaService {
 			.get<EmailOutboxLista[]>(`${this.baseUrl}/listar`, { params })
 			.pipe(catchError(() => of([])));
 	}
-	obtenerAsistenciasSinCorreo(fecha?: string): Observable<AttendanceGapRow[]> {
+	obtenerAsistenciasSinCorreo(fecha?: string, estudianteId?: number): Observable<AttendanceGapRow[]> {
 		let params = new HttpParams();
 		if (fecha) params = params.set('fecha', fecha);
+		if (estudianteId != null) params = params.set('estudianteId', estudianteId);
 		return this.http
 			.get<AttendanceGapRow[]>(`${this.baseUrl}/asistencias-sin-correo`, { params })
+			.pipe(catchError(() => of([])));
+	}
+
+	listarPorEstudiante(estudianteId: number): Observable<EmailOutboxLista[]> {
+		const params = new HttpParams().set('estudianteId', estudianteId);
+		return this.http
+			.get<EmailOutboxLista[]>(`${this.baseUrl}/listar`, { params })
 			.pipe(catchError(() => of([])));
 	}
 

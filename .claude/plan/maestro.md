@@ -71,7 +71,7 @@ Planes cross-repo con sub-chats FE pendientes: **41** (Correlation Hub), **42** 
 
 | Pos | Key | Plan | Próximo paso concreto | Gate |
 |---|---|---|---|---|
-| 5 | xP43 | Monitoreo Cowork | F6.3 FE ✅ awaiting-prod (303) · student profile page pendiente | ⏸️ brief pendiente |
+| 5 | xP43 | Monitoreo Cowork | F6.3 FE ✅ awaiting-prod (303) · student profile page ✅ awaiting-prod (304) | ⏸️ awaiting-prod |
 | 6 | F5 | Consolidación FE | Completa tras Plan 4 BE | ⏸️ tras Plan 4 BE |
 | 7 | P3 | Matrícula | F3.5 → F4 diseño + implementación UI | 🔒 diseño UI pendiente |
 | 8 | P10 | Flujos alternos | F1+ completo (tras Carril B sustancialmente) | 🔒 Carril B |

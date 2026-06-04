@@ -69,7 +69,9 @@ export class AttendanceGapTileComponent {
 	onStudentClick(event: Event, row: AttendanceGapRow): void {
 		event.stopPropagation();
 		if (row.estudianteId != null) {
-			this.router.navigate(['/intranet/admin/monitoreo/correos/estudiante', row.estudianteId]);
+			this.router.navigate(['/intranet/admin/monitoreo/correos/estudiante', row.estudianteId], {
+				state: { alumno: row.alumno, grado: row.grado, salonNombre: row.salonNombre },
+			});
 		}
 	}
 
