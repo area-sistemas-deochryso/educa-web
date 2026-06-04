@@ -14,14 +14,22 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { ButtonModule } from 'primeng/button';
 import { ConfirmDialogModule } from 'primeng/confirmdialog';
 import { DialogModule } from 'primeng/dialog';
-import { ConfirmationService } from 'primeng/api';
+import { ConfirmationService, MessageService } from 'primeng/api';
 import { InputTextModule } from 'primeng/inputtext';
 import { TextareaModule } from 'primeng/textarea';
 import { SelectModule } from 'primeng/select';
 import { TableLazyLoadEvent } from 'primeng/table';
+import { ToastModule } from 'primeng/toast';
 import { TooltipModule } from 'primeng/tooltip';
 
 import { MiniSparklineComponent, TableSkeletonComponent } from '@intranet-shared/components';
+import { environment } from '@config/environment';
+import { EmailHubService } from '@features/intranet/pages/admin/email-outbox-dashboard-dia/services';
+import { EmailDeferFailBannerComponent } from '@features/intranet/pages/admin/email-outbox-dashboard-dia/components/email-defer-fail-banner/email-defer-fail-banner.component';
+import {
+	BlacklistEntryCreatedEvent,
+	CandidatoBlacklistDetectadoEvent,
+} from '@features/intranet/pages/admin/email-outbox-dashboard-dia/models/email-monitoreo.models';
 import {
 	CrearBlacklistRequest,
 	EmailBlacklistEntry,
@@ -74,15 +82,17 @@ const MOTIVO_OPTIONS: SelectOption<EmailBlacklistMotivo>[] = [
 		TextareaModule,
 		SelectModule,
 		TooltipModule,
+		ToastModule,
 		ConfirmDialogModule,
 		DialogModule,
 		TableSkeletonComponent,
 		MiniSparklineComponent,
+		EmailDeferFailBannerComponent,
 		BlacklistTableComponent,
 		BlacklistAddDialogComponent,
 		BlacklistDetailDrawerComponent,
 	],
-	providers: [ConfirmationService],
+	providers: [ConfirmationService, MessageService],
 	templateUrl: './blacklist-tab.component.html',
 	styleUrl: './blacklist-tab.component.scss',
 	changeDetection: ChangeDetectionStrategy.OnPush,
@@ -95,6 +105,8 @@ export class BlacklistTabComponent implements OnInit {
 	private readonly route = inject(ActivatedRoute);
 	private readonly destroyRef = inject(DestroyRef);
 	private readonly confirmationService = inject(ConfirmationService);
+	private readonly hub = inject(EmailHubService);
+	private readonly messageService = inject(MessageService);
 	// #endregion
 
 	// #region Estado
@@ -102,6 +114,7 @@ export class BlacklistTabComponent implements OnInit {
 	readonly skeletonColumns = BlacklistTableComponent.skeletonColumns;
 	readonly estadoOptions = ESTADO_OPTIONS;
 	readonly motivoOptions = MOTIVO_OPTIONS;
+	readonly deferAlertsEnabled = environment.features.emailDeferAlerts;
 
 	readonly unblockDialogVisible = signal(false);
 	readonly unblockMotivo = signal('');
@@ -127,6 +140,16 @@ export class BlacklistTabComponent implements OnInit {
 					this.uiFacade.openAddDialog(correo);
 				}
 			});
+
+		if (!this.deferAlertsEnabled) return;
+
+		this.hub.blacklistEntryCreated$
+			.pipe(takeUntilDestroyed(this.destroyRef))
+			.subscribe((evt) => this.onBlacklistEntryCreated(evt));
+
+		this.hub.candidatoBlacklistDetectado$
+			.pipe(takeUntilDestroyed(this.destroyRef))
+			.subscribe((evt) => this.onCandidatoDetectado(evt));
 	}
 
 	// #region Search / filtros
@@ -251,8 +274,65 @@ export class BlacklistTabComponent implements OnInit {
 	}
 
 	onDrawerDespejar(item: EmailBlacklistEntry): void {
-		// Cierra drawer (lo hace el rollback/commit) y delega al confirm.
 		this.onDespejar(item);
+	}
+	// #endregion
+
+	// #region Export CSV
+	onExportCsv(): void {
+		const items = this.vm().items;
+		if (items.length === 0) return;
+
+		const rows = [
+			['id', 'correo', 'motivo', 'motivoLabel', 'estado', 'intentosFallidos', 'ultimoError', 'fechaPrimerFallo', 'fechaUltimoFallo', 'fechaReg', 'usuarioReg'].join(','),
+			...items.map((e) =>
+				[
+					e.id,
+					e.correo,
+					e.motivo,
+					e.motivoLabel,
+					e.estado ? 'Activa' : 'Despejada',
+					e.intentosFallidos,
+					(e.ultimoError ?? '').replace(/[\r\n,]/g, ' '),
+					e.fechaPrimerFallo ?? '',
+					e.fechaUltimoFallo ?? '',
+					e.fechaReg,
+					e.usuarioReg,
+				]
+					.map((v) => `"${String(v).replace(/"/g, '""')}"`)
+					.join(','),
+			),
+		];
+		const blob = new Blob([rows.join('\n')], { type: 'text/csv;charset=utf-8;' });
+		const url = URL.createObjectURL(blob);
+		const a = document.createElement('a');
+		a.href = url;
+		a.download = `blacklist-${Date.now()}.csv`;
+		a.click();
+		URL.revokeObjectURL(url);
+	}
+	// #endregion
+
+	// #region SignalR toasts
+	private onBlacklistEntryCreated(evt: BlacklistEntryCreatedEvent): void {
+		this.messageService.add({
+			key: 'blacklist-alerts',
+			severity: 'warn',
+			summary: 'Bloqueo automático',
+			detail: `${evt.correoEnmascarado} agregado a la blacklist (${evt.motivo}).`,
+			life: 8000,
+		});
+		this.dataFacade.refresh();
+	}
+
+	private onCandidatoDetectado(evt: CandidatoBlacklistDetectadoEvent): void {
+		this.messageService.add({
+			key: 'blacklist-alerts',
+			severity: 'info',
+			summary: 'Candidato a blacklist',
+			detail: `${evt.correoEnmascarado} acumula ${evt.hitsActuales}/${evt.thresholdHits} hits.`,
+			life: 6000,
+		});
 	}
 	// #endregion
 }

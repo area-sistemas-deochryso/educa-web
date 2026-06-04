@@ -1,3 +1,10 @@
+<!-- #region Banner + toast -->
+<app-email-defer-fail-banner />
+@if (deferAlertsEnabled) {
+	<p-toast position="top-right" key="blacklist-alerts" />
+}
+<!-- #endregion -->
+
 <!-- #region Stats inline -->
 @if (vm().estadisticas; as stats) {
 	<section class="stats-inline">
@@ -83,6 +90,17 @@
 		tooltipPosition="top"
 		(click)="onRefresh()"
 		[pt]="{ root: { 'aria-label': 'Refrescar' } }"
+	></button>
+
+	<button
+		pButton
+		icon="pi pi-download"
+		class="p-button-text p-button-sm"
+		pTooltip="Exportar CSV (página actual)"
+		tooltipPosition="top"
+		[disabled]="vm().items.length === 0"
+		(click)="onExportCsv()"
+		[pt]="{ root: { 'aria-label': 'Exportar blacklist a CSV' } }"
 	></button>
 
 	<button

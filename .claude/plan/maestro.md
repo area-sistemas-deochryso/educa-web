@@ -106,8 +106,8 @@ Movidos a `closed/` (sync 2026-06-01): 119 (WAL DELETE audit), 137 (F5 wrappers)
 
 ### Notas operativas
 
-- **`running/`**: vacío · **`open/`**: 8 briefs (262×2, 269, 292, 293, 296, 297, 301) · **`awaiting-prod/`**: 9 briefs · **`waiting/`**: vacío · **`troubles/`**: vacío
-- **Último cierre**: 289 (P41 F1 timeline hub) → closed/ 2026-06-03. Also 287 (P56 F1) + 288 (P45 F2.2 FE) closed.
+- **`running/`**: vacío · **`open/`**: 7 briefs (262×2, 269, 293, 296, 297, 301) · **`awaiting-prod/`**: 9 briefs · **`waiting/`**: vacío · **`troubles/`**: vacío
+- **Último cierre**: 292 (P38 FE blacklist tab CSV + banner) → closed/ 2026-06-04.
 - **Último saneamiento**: 2026-06-03 — sync-maestro: 287/288/289 confirmed closed, 298 added to awaiting-prod, notas updated. Brief 269 (P28 F018) still stale — P28 shipped 2026-05-30.
 
 ---
