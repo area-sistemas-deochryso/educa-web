@@ -65,4 +65,12 @@
 			text-decoration: underline;
 		}
 	}
+
+	.history-link {
+		font-size: 0.78rem;
+		display: inline-flex;
+		align-items: center;
+		gap: 0.25rem;
+		margin-left: 0.5rem;
+	}
 }

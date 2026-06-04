@@ -12,6 +12,13 @@
 			<div class="event-item__row">
 				<span class="event-item__label">Destinatario</span>
 				<code>{{ event().destinatario }}</code>
+				<a
+					[routerLink]="['/intranet/admin/monitoreo/correos/persona', event().destinatario]"
+					class="history-link"
+					[attr.aria-label]="'Ver historial de ' + event().destinatario"
+				>
+					<i class="pi pi-history"></i> Ver historial
+				</a>
 			</div>
 		}
 		@if (event().dominio) {

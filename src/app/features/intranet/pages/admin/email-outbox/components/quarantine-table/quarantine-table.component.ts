@@ -7,6 +7,7 @@ import {
 	output,
 } from '@angular/core';
 import { ButtonModule } from 'primeng/button';
+import { RouterLink } from '@angular/router';
 import { TableLazyLoadEvent, TableModule } from 'primeng/table';
 import { TagModule } from 'primeng/tag';
 import { TooltipModule } from 'primeng/tooltip';
@@ -22,7 +23,7 @@ import { EmailQuarantineListaDto } from '@data/models';
 @Component({
 	selector: 'app-quarantine-table',
 	standalone: true,
-	imports: [TableModule, TagModule, ButtonModule, TooltipModule, DatePipe],
+	imports: [TableModule, TagModule, ButtonModule, TooltipModule, DatePipe, RouterLink],
 	templateUrl: './quarantine-table.component.html',
 	styleUrl: './quarantine-table.component.scss',
 	changeDetection: ChangeDetectionStrategy.OnPush,

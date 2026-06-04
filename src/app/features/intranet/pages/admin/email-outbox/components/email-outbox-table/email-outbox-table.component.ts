@@ -1,5 +1,6 @@
 import { ChangeDetectionStrategy, Component, input, output } from '@angular/core';
 import { DatePipe } from '@angular/common';
+import { RouterLink } from '@angular/router';
 import { TableLazyLoadEvent, TableModule } from 'primeng/table';
 import { TagModule } from 'primeng/tag';
 import { ButtonModule } from 'primeng/button';
@@ -26,6 +27,7 @@ import { TipoFalloSeverityPipe } from '../../pipes/tipo-fallo-severity.pipe';
 		ButtonModule,
 		TooltipModule,
 		DatePipe,
+		RouterLink,
 		TipoFalloLabelPipe,
 		TipoFalloSeverityPipe,
 		CorrelationIdPillComponent,
