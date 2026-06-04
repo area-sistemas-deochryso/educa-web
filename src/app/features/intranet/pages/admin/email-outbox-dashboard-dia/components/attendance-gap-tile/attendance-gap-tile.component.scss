@@ -9,6 +9,13 @@
 		padding: 0.7rem 1rem;
 		border-bottom: 1px solid var(--surface-300);
 
+		&__top {
+			display: flex;
+			align-items: flex-start;
+			justify-content: space-between;
+			gap: 1rem;
+		}
+
 		h3 {
 			margin: 0;
 			font-size: 0.95rem;
@@ -19,6 +26,33 @@
 		.section-subtitle {
 			font-size: 0.8rem;
 			color: var(--text-color-secondary);
+		}
+	}
+
+	.salon-filter {
+		display: flex;
+		align-items: center;
+		gap: 0.75rem;
+		margin-top: 0.5rem;
+
+		.filter-count {
+			font-size: 0.8rem;
+			color: var(--text-color-secondary);
+			white-space: nowrap;
+		}
+	}
+
+	:host ::ng-deep .salon-multiselect {
+		min-width: 220px;
+		max-width: 400px;
+	}
+
+	:host ::ng-deep .btn-export-excel {
+		color: var(--green-600);
+
+		&:hover {
+			background: var(--green-50);
+			color: var(--green-700);
 		}
 	}
 
@@ -33,6 +67,15 @@
 
 	.col-estado {
 		width: 120px;
+	}
+
+	.col-salon {
+		width: 100px;
+	}
+
+	.col-acciones {
+		width: 110px;
+		text-align: center;
 	}
 
 	:host ::ng-deep .p-datatable {

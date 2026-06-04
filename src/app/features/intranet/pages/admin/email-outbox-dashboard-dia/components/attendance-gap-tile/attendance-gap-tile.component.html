@@ -1,8 +1,46 @@
 <!-- #region AttendanceGap tile -->
 <section class="table-section" aria-label="Asistencias sin correo confirmado">
 	<header class="section-header">
-		<h3>Asistencias sin correo confirmado</h3>
-		<span class="section-subtitle">Registros del día sin correo SENT asociado</span>
+		<div class="section-header__top">
+			<div>
+				<h3>Asistencias sin correo confirmado</h3>
+				<span class="section-subtitle">Registros del día sin correo SENT asociado</span>
+			</div>
+			@if (!isEmpty()) {
+				<p-button
+					label="Exportar Excel"
+					icon="pi pi-file-excel"
+					[text]="true"
+					size="small"
+					(onClick)="exportExcel()"
+					styleClass="btn-export-excel"
+					[pt]="{ root: { 'aria-label': 'Exportar tabla a Excel' } }"
+				/>
+			}
+		</div>
+
+		@if (!isEmpty() && hasSalonData()) {
+			<div class="salon-filter">
+				<p-multiselect
+					[options]="salonOptions()"
+					[(ngModel)]="selectedSalonIds"
+					optionLabel="nombre"
+					optionValue="id"
+					placeholder="Filtrar por salón"
+					display="chip"
+					[showClear]="true"
+					[filter]="salonOptions().length > 8"
+					appendTo="body"
+					styleClass="salon-multiselect"
+					[pt]="{ root: { 'aria-label': 'Filtrar por salón' } }"
+				/>
+				@if (selectedSalonIds().length > 0) {
+					<span class="filter-count">
+						{{ filteredData().length }} de {{ data().length }} registros
+					</span>
+				}
+			</div>
+		}
 	</header>
 
 	@if (isEmpty()) {
@@ -12,24 +50,43 @@
 		</div>
 	} @else {
 		<p-table
-			[value]="data()"
+			[value]="filteredData()"
 			class="p-datatable-sm"
 			styleClass="p-datatable-gridlines"
 			[rowHover]="true"
+			[paginator]="filteredData().length > 10"
+			[rows]="10"
+			[rowsPerPageOptions]="[10, 20, 50]"
 		>
 			<ng-template #header>
 				<tr>
 					<th class="label-uppercase">Alumno</th>
 					<th class="label-uppercase">Grado</th>
+					@if (hasSalonData()) {
+						<th class="label-uppercase col-salon">Salón</th>
+					}
 					<th class="label-uppercase col-tipo">Tipo</th>
 					<th class="label-uppercase col-hora">Hora registro</th>
 					<th class="label-uppercase col-estado">Estado correo</th>
+					@if (hasSalonData()) {
+						<th class="label-uppercase col-acciones">Acciones</th>
+					}
 				</tr>
 			</ng-template>
 			<ng-template #body let-row>
-				<tr class="row-clickable" (click)="onRowClick(row)">
+				<tr
+					class="row-clickable"
+					(click)="onRowClick(row)"
+					pTooltip="Ver en bandeja de correos"
+					tooltipPosition="left"
+				>
 					<td>{{ row.alumno }}</td>
 					<td>{{ row.grado }}</td>
+					@if (hasSalonData()) {
+						<td class="col-salon">
+							<p-tag [value]="row.salonNombre ?? '—'" styleClass="tag-neutral" />
+						</td>
+					}
 					<td class="col-tipo">{{ row.tipo }}</td>
 					<td class="col-hora">{{ row.horaRegistro }}</td>
 					<td class="col-estado">
@@ -37,6 +94,30 @@
 							[value]="getEstadoLabel(row)"
 							[severity]="getEstadoSeverity(row)"
 						/>
+					</td>
+					@if (hasSalonData()) {
+						<td class="col-acciones">
+							@if (row.estudianteId != null) {
+								<p-button
+									label="Ver perfil"
+									icon="pi pi-user"
+									[text]="true"
+									size="small"
+									(onClick)="onStudentClick($event, row)"
+									[pt]="{ root: { 'aria-label': 'Ver perfil de ' + row.alumno } }"
+								/>
+							}
+						</td>
+					}
+				</tr>
+			</ng-template>
+			<ng-template #emptymessage>
+				<tr>
+					<td [attr.colspan]="hasSalonData() ? 7 : 5" class="empty-message">
+						<div class="empty-state">
+							<i class="pi pi-filter-slash"></i>
+							<p>Sin registros para los salones seleccionados</p>
+						</div>
 					</td>
 				</tr>
 			</ng-template>

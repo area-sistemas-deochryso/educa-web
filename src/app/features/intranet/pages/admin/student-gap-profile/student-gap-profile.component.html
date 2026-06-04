@@ -1,0 +1,18 @@
+<section class="profile-container">
+	<header class="profile-header">
+		<p-button
+			icon="pi pi-arrow-left"
+			label="Volver al dashboard"
+			[text]="true"
+			(onClick)="goBack()"
+			[pt]="{ root: { 'aria-label': 'Volver al dashboard de correos' } }"
+		/>
+		<h2>Perfil del estudiante</h2>
+		<span class="student-id">ID: {{ estudianteId() }}</span>
+	</header>
+
+	<div class="placeholder-content">
+		<i class="pi pi-user placeholder-icon"></i>
+		<p>Vista de perfil del estudiante — próximamente con datos de asistencia y correos.</p>
+	</div>
+</section>

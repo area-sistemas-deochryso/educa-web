@@ -158,6 +158,14 @@ export default [
 			]
 		: []),
 	{
+		path: 'correos/estudiante/:id',
+		loadComponent: () =>
+			import('../student-gap-profile').then((m) => m.StudentGapProfileComponent),
+		canActivate: [authGuard, permissionsGuard],
+		data: { permissionPath: 'intranet/admin/monitoreo/correos/dashboard' },
+		title: 'Intranet - Perfil Estudiante (Gap)',
+	},
+	{
 		path: 'correos',
 		loadComponent: () =>
 			import('./shells/correos-shell.component').then((m) => m.CorreosShellComponent),

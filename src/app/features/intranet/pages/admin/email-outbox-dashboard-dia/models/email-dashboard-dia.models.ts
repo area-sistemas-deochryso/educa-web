@@ -64,6 +64,9 @@ export interface AttendanceGapRow {
 	horaRegistro: string;
 	outboxId: number | null;
 	outboxEstado: string | null;
+	estudianteId?: number;
+	salonId?: number;
+	salonNombre?: string;
 }
 
 // #endregion

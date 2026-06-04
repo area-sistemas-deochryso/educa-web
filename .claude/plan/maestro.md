@@ -14,7 +14,7 @@
 | xP41 | → Correlation Hub (coord) | F1 ✅ · F2 FE ✅ · F3 BE next | ver P41 |
 | xP22 | → Endurecimiento correos (coord) | F3.FE ✅ awaiting-prod (284) | ver P22 |
 | xP42 | → Casing contratos (coord) | Sin trabajo FE pendiente | ver P42 |
-| xP43 | → Monitoreo Cowork (coord) | F5:5.2 FE ✅ awaiting-prod (285) · F6.1 FE ✅ awaiting-prod (296) · F6.2 FE ✅ awaiting-prod (297) | ver P43 |
+| xP43 | → Monitoreo Cowork (coord) | F5:5.2 FE ✅ awaiting-prod (285) · F6.1 FE ✅ awaiting-prod (296) · F6.2 FE ✅ awaiting-prod (297) · F6.3 FE ✅ awaiting-prod (303) | ver P43 |
 | xP45 | → Monitoreo incidencias (coord) | P45:F2.2:FE ✅ closed (288) · heatmap blocked by BE BT2-F5 | ver P45 |
 | xP52 | → Email outbox retry + diagnostics (coord) | F3-F5 FE ✅ awaiting-prod (275, 277, 279) | ver P52 |
 | xP53 | → Duplicate person validation (coord) | F3 FE ✅ awaiting-prod (281) | ver P53 |
@@ -71,7 +71,7 @@ Planes cross-repo con sub-chats FE pendientes: **41** (Correlation Hub), **42** 
 
 | Pos | Key | Plan | Próximo paso concreto | Gate |
 |---|---|---|---|---|
-| 5 | xP43 | Monitoreo Cowork | F6.2 FE ✅ awaiting-prod (297) · gap panel BE pendiente | ⏸️ gap panel requiere BE |
+| 5 | xP43 | Monitoreo Cowork | F6.3 FE ✅ awaiting-prod (303) · student profile page pendiente | ⏸️ brief pendiente |
 | 6 | F5 | Consolidación FE | Completa tras Plan 4 BE | ⏸️ tras Plan 4 BE |
 | 7 | P3 | Matrícula | F3.5 → F4 diseño + implementación UI | 🔒 diseño UI pendiente |
 | 8 | P10 | Flujos alternos | F1+ completo (tras Carril B sustancialmente) | 🔒 Carril B |

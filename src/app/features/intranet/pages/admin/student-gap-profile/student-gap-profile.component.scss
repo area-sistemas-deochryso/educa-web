@@ -1,0 +1,46 @@
+.profile-container {
+	max-width: 800px;
+	margin: 0 auto;
+	padding: 1.5rem;
+}
+
+.profile-header {
+	display: flex;
+	flex-direction: column;
+	gap: 0.5rem;
+	margin-bottom: 2rem;
+
+	h2 {
+		margin: 0;
+		font-size: 1.25rem;
+		font-weight: 600;
+		color: var(--text-color);
+	}
+
+	.student-id {
+		font-size: 0.85rem;
+		color: var(--text-color-secondary);
+		font-variant-numeric: tabular-nums;
+	}
+}
+
+.placeholder-content {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	gap: 1rem;
+	padding: 3rem 1rem;
+	border: 1px dashed var(--surface-300);
+	border-radius: 12px;
+	text-align: center;
+
+	.placeholder-icon {
+		font-size: 2.5rem;
+		color: var(--surface-400);
+	}
+
+	p {
+		color: var(--text-color-secondary);
+		max-width: 400px;
+	}
+}
