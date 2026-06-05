@@ -1,7 +1,6 @@
 import { HttpClient } from '@angular/common/http';
 import { inject, Injectable } from '@angular/core';
 import { Observable, of } from 'rxjs';
-import { catchError } from 'rxjs/operators';
 
 import { environment } from '@config/environment';
 import { PaginatedResponse } from '@shared/models';
@@ -25,9 +24,7 @@ export class SchedulesApiService {
   // #region CRUD Básico
 
   getAll(): Observable<HorarioResponseDto[]> {
-    return this.http
-      .get<HorarioResponseDto[]>(`${this.apiUrl}`)
-      .pipe(catchError(() => of([])));
+    return this.http.get<HorarioResponseDto[]>(`${this.apiUrl}`);
   }
 
   getAllPaginated(
@@ -41,9 +38,7 @@ export class SchedulesApiService {
   }
 
   getById(id: number): Observable<HorarioDetalleResponseDto | null> {
-    return this.http
-      .get<HorarioDetalleResponseDto>(`${this.apiUrl}/${id}`)
-      .pipe(catchError(() => of(null)));
+    return this.http.get<HorarioDetalleResponseDto>(`${this.apiUrl}/${id}`);
   }
 
   create(data: HorarioCreateDto): Observable<HorarioDetalleResponseDto> {
@@ -66,21 +61,15 @@ export class SchedulesApiService {
   // #region Consultas Especializadas
 
   getBySalon(salonId: number): Observable<HorarioResponseDto[]> {
-    return this.http
-      .get<HorarioResponseDto[]>(`${this.apiUrl}/salon/${salonId}`)
-      .pipe(catchError(() => of([])));
+    return this.http.get<HorarioResponseDto[]>(`${this.apiUrl}/salon/${salonId}`);
   }
 
   getByProfesor(profesorId: number): Observable<HorarioResponseDto[]> {
-    return this.http
-      .get<HorarioResponseDto[]>(`${this.apiUrl}/profesor/${profesorId}`)
-      .pipe(catchError(() => of([])));
+    return this.http.get<HorarioResponseDto[]>(`${this.apiUrl}/profesor/${profesorId}`);
   }
 
   getByDiaSemana(diaSemana: DiaSemana): Observable<HorarioResponseDto[]> {
-    return this.http
-      .get<HorarioResponseDto[]>(`${this.apiUrl}/dia/${diaSemana}`)
-      .pipe(catchError(() => of([])));
+    return this.http.get<HorarioResponseDto[]>(`${this.apiUrl}/dia/${diaSemana}`);
   }
 
   // #endregion

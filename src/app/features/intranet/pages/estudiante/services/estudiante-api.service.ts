@@ -1,7 +1,6 @@
 import { Injectable, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { Observable, of } from 'rxjs';
-import { catchError } from 'rxjs/operators';
+import { Observable } from 'rxjs';
 import { environment } from '@config/environment';
 import { FileUploadBuilder } from '@core/helpers';
 import {
@@ -25,9 +24,7 @@ export class EstudianteApiService {
 	// #region Consultas
 
 	getMisHorarios(): Observable<HorarioProfesorDto[]> {
-		return this.http
-			.get<HorarioProfesorDto[]>(`${this.baseUrl}/mis-horarios`)
-			.pipe(catchError(() => of([])));
+		return this.http.get<HorarioProfesorDto[]>(`${this.baseUrl}/mis-horarios`);
 	}
 
 	getContenido(horarioId: number): Observable<CursoContenidoDetalleDto | null> {
@@ -37,21 +34,15 @@ export class EstudianteApiService {
 	}
 
 	getMisArchivos(semanaId: number): Observable<EstudianteArchivoDto[]> {
-		return this.http
-			.get<EstudianteArchivoDto[]>(`${this.baseUrl}/semana/${semanaId}/mis-archivos`)
-			.pipe(catchError(() => of([])));
+		return this.http.get<EstudianteArchivoDto[]>(`${this.baseUrl}/semana/${semanaId}/mis-archivos`);
 	}
 
 	getMisNotas(): Observable<EstudianteMisNotasDto[]> {
-		return this.http
-			.get<EstudianteMisNotasDto[]>(`${this.baseUrl}/mis-notas`)
-			.pipe(catchError(() => of([])));
+		return this.http.get<EstudianteMisNotasDto[]>(`${this.baseUrl}/mis-notas`);
 	}
 
 	getServerTime(): Observable<string | null> {
-		return this.http
-			.get<string>(`${environment.apiUrl}/api/ServerTime`)
-			.pipe(catchError(() => of(null)));
+		return this.http.get<string>(`${environment.apiUrl}/api/ServerTime`);
 	}
 
 	// #endregion
@@ -80,9 +71,7 @@ export class EstudianteApiService {
 	// #region Student task file commands
 
 	getMisTareaArchivos(tareaId: number): Observable<EstudianteTareaArchivoDto[]> {
-		return this.http
-			.get<EstudianteTareaArchivoDto[]>(`${this.baseUrl}/tarea/${tareaId}/mis-archivos`)
-			.pipe(catchError(() => of([])));
+		return this.http.get<EstudianteTareaArchivoDto[]>(`${this.baseUrl}/tarea/${tareaId}/mis-archivos`);
 	}
 
 	registrarTareaArchivo(tareaId: number, request: RegistrarEstudianteTareaArchivoRequest): Observable<EstudianteTareaArchivoDto> {
@@ -101,15 +90,11 @@ export class EstudianteApiService {
 	// #region Salon endpoints
 
 	getMiAsistencia(horarioId: number): Observable<MiAsistenciaCursoResumenDto | null> {
-		return this.http
-			.get<MiAsistenciaCursoResumenDto>(`${this.baseUrl}/horario/${horarioId}/mi-asistencia`)
-			.pipe(catchError(() => of(null)));
+		return this.http.get<MiAsistenciaCursoResumenDto>(`${this.baseUrl}/horario/${horarioId}/mi-asistencia`);
 	}
 
 	getGruposHorario(horarioId: number): Observable<GruposResumenDto | null> {
-		return this.http
-			.get<GruposResumenDto>(`${this.baseUrl}/horario/${horarioId}/grupos`)
-			.pipe(catchError(() => of(null)));
+		return this.http.get<GruposResumenDto>(`${this.baseUrl}/horario/${horarioId}/grupos`);
 	}
 
 	// #endregion

@@ -1,7 +1,6 @@
 import { Injectable, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { Observable, of } from 'rxjs';
-import { catchError } from 'rxjs/operators';
+import { Observable } from 'rxjs';
 import { environment } from '@config/environment';
 import {
 	HorarioProfesorDto,
@@ -26,29 +25,21 @@ export class ProfesorSalonesApiService {
 
 	// #region Horarios
 	getHorarios(profesorId: number): Observable<HorarioProfesorDto[]> {
-		return this.http
-			.get<HorarioProfesorDto[]>(`${this.horarioUrl}/profesor/${profesorId}`)
-			.pipe(catchError(() => of([])));
+		return this.http.get<HorarioProfesorDto[]>(`${this.horarioUrl}/profesor/${profesorId}`);
 	}
 	// #endregion
 
 	// #region Salones
 	getSalonTutoria(profesorId: number): Observable<SalonTutoriaDto | null> {
-		return this.http
-			.get<SalonTutoriaDto>(`${this.profesorSalonUrl}/profesor/${profesorId}`)
-			.pipe(catchError(() => of(null)));
+		return this.http.get<SalonTutoriaDto>(`${this.profesorSalonUrl}/profesor/${profesorId}`);
 	}
 
 	getMisEstudiantes(): Observable<ProfesorMisSalonesConEstudiantesDto> {
-		return this.http
-			.get<ProfesorMisSalonesConEstudiantesDto>(`${this.profesorUrl}/mis-estudiantes`)
-			.pipe(catchError(() => of({ salones: [], totalEstudiantes: 0, totalSalones: 0 })));
+		return this.http.get<ProfesorMisSalonesConEstudiantesDto>(`${this.profesorUrl}/mis-estudiantes`);
 	}
 
 	getEstudiantesSalon(salonId: number): Observable<ProfesorSalonConEstudiantesDto | null> {
-		return this.http
-			.get<ProfesorSalonConEstudiantesDto>(`${this.profesorUrl}/estudiantes-salon/${salonId}`)
-			.pipe(catchError(() => of(null)));
+		return this.http.get<ProfesorSalonConEstudiantesDto>(`${this.profesorUrl}/estudiantes-salon/${salonId}`);
 	}
 	// #endregion
 
@@ -70,9 +61,7 @@ export class ProfesorSalonesApiService {
 	// #region Server Time
 	/** Lightweight call to get UTC server time for clock sync. Returns null if unavailable. */
 	getServerTime(): Observable<string | null> {
-		return this.http
-			.get<string>(`${environment.apiUrl}/api/ServerTime`)
-			.pipe(catchError(() => of(null)));
+		return this.http.get<string>(`${environment.apiUrl}/api/ServerTime`);
 	}
 	// #endregion
 }
