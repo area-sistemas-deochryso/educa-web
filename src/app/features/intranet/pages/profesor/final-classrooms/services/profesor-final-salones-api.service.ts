@@ -62,10 +62,11 @@ export class TeacherFinalClassroomsApiService {
 	// #endregion
 
 	// #region Aprobaciones
-	getEstudiantesPorSalon(salonId: number): Observable<AprobacionEstudianteListDto[]> {
+	getEstudiantesPorSalon(salonId: number, periodoId?: number): Observable<AprobacionEstudianteListDto[]> {
+		const params = periodoId ? `?periodoId=${periodoId}` : '';
 		return this.http
 			.get<AprobacionEstudianteListDto[]>(
-				`${this.baseUrl}/api/AprobacionEstudiante/salon/${salonId}/estudiantes`,
+				`${this.baseUrl}/api/AprobacionEstudiante/salon/${salonId}/estudiantes${params}`,
 			)
 			.pipe(
 				map((data) => (Array.isArray(data) ? data : [])),

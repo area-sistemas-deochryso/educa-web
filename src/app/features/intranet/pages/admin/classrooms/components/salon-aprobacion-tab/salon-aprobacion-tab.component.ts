@@ -16,6 +16,9 @@ import {
 	AprobacionEstado,
 } from '../../models';
 
+const PROMEDIO_MIN = 0;
+const PROMEDIO_MAX = 20;
+
 @Component({
 	selector: 'app-classroom-approval-tab',
 	standalone: true,
@@ -96,6 +99,7 @@ export class ClassroomApprovalTabComponent {
 	onAprobarIndividual(aprobacion: AprobacionEstudianteListDto, estado: AprobacionEstado): void {
 		const pid = this.periodoId();
 		if (!pid) return;
+		if (!this.isPromedioValid(aprobacion.promedioFinal)) return;
 
 		const dto: AprobarEstudianteDto = {
 			estudianteId: aprobacion.estudianteId,
@@ -118,6 +122,9 @@ export class ClassroomApprovalTabComponent {
 		const seleccionados = this.aprobaciones().filter((a) => ids.has(a.estudianteId));
 		if (seleccionados.length === 0) return;
 
+		const invalid = seleccionados.filter((a) => !this.isPromedioValid(a.promedioFinal));
+		if (invalid.length > 0) return;
+
 		const dto: AprobacionMasivaDto = {
 			salonId: s.id,
 			periodoId: pid,
@@ -135,6 +142,10 @@ export class ClassroomApprovalTabComponent {
 	// #endregion
 
 	// #region Helpers
+	private isPromedioValid(promedio: number | null): boolean {
+		return promedio === null || (promedio >= PROMEDIO_MIN && promedio <= PROMEDIO_MAX);
+	}
+
 	getEstadoSeverity(estado: AprobacionEstado): 'success' | 'danger' | 'warn' | 'secondary' {
 		switch (estado) {
 			case 'APROBADO':

@@ -106,9 +106,10 @@ export class TeacherFinalClassroomsFacade {
 
 	loadAprobaciones(salonId: number): void {
 		this.store.setAprobacionesLoading(true);
+		const periodoId = this.store.periodoActual()?.id;
 
 		this.api
-			.getEstudiantesPorSalon(salonId)
+			.getEstudiantesPorSalon(salonId, periodoId ?? undefined)
 			.pipe(takeUntilDestroyed(this.destroyRef))
 			.subscribe({
 				next: (estudiantes) => {

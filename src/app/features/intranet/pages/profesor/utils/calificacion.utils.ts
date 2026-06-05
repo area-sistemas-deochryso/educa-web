@@ -1,18 +1,14 @@
 import type { CalificacionDto, NotaResumenDto, PeriodoCalificacionDto, PromedioDto } from '@data/models';
 import { MESES_LIMITE_EDICION } from '../models';
 
-/**
- * Promedio ponderado: sum(nota * peso).
- * Los pesos son fracciones absolutas (ej: 0.2 = 20%) que suman ~1.0
- * cuando todas las evaluaciones están presentes, por lo que NO se
- * normaliza dividiendo por la suma de pesos.
- */
 export function calcularPromedioPonderado(
 	notas: { nota: number; peso: number }[],
 ): number | null {
 	if (notas.length === 0) return null;
+	const sumaPesos = notas.reduce((acc, n) => acc + n.peso, 0);
+	if (sumaPesos === 0) return null;
 	const suma = notas.reduce((acc, n) => acc + n.nota * n.peso, 0);
-	return Math.round(suma * 10) / 10;
+	return Math.round((suma / sumaPesos) * 10) / 10;
 }
 
 /**
