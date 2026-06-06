@@ -26,19 +26,16 @@ export class LiteralScale implements GradeScale {
 	}
 
 	classify(nota: number): GradeClassification {
-		for (const literal of this.sortedLiterales) {
-			if (literal.notaMinima !== null && literal.notaMaxima !== null) {
-				if (nota >= literal.notaMinima && nota <= literal.notaMaxima) {
-					return {
-						severity: literal.esAprobatoria ? (literal.orden <= 1 ? 'success' : 'warn') : 'danger',
-						cssClass: literal.esAprobatoria ? 'grade-green' : 'grade-red',
-						label: `${literal.letra} - ${literal.descripcion}`,
-						esAprobatoria: literal.esAprobatoria,
-					};
-				}
-			}
+		const literal = this.findLiteral(nota);
+		if (!literal) {
+			return { severity: 'secondary', cssClass: '', label: '-', esAprobatoria: false };
 		}
-		return { severity: 'secondary', cssClass: '', label: '-', esAprobatoria: false };
+		return {
+			severity: literal.esAprobatoria ? (literal.orden <= 1 ? 'success' : 'warn') : 'danger',
+			cssClass: literal.esAprobatoria ? 'grade-green' : 'grade-red',
+			label: `${literal.letra} - ${literal.descripcion}`,
+			esAprobatoria: literal.esAprobatoria,
+		};
 	}
 
 	format(nota: number): string {
@@ -56,7 +53,6 @@ export class LiteralScale implements GradeScale {
 		return targetScale.min + normalized * (targetScale.max - targetScale.min);
 	}
 
-	/** Encuentra el literal correspondiente a una nota numérica */
 	findLiteral(nota: number): ConfiguracionLiteralDto | null {
 		for (const literal of this.sortedLiterales) {
 			if (literal.notaMinima !== null && literal.notaMaxima !== null) {
@@ -65,6 +61,6 @@ export class LiteralScale implements GradeScale {
 				}
 			}
 		}
-		return this.sortedLiterales[this.sortedLiterales.length - 1] ?? null;
+		return null;
 	}
 }
