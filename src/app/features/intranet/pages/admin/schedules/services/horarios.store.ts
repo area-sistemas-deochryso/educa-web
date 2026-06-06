@@ -345,10 +345,8 @@ export class SchedulesStore {
 	// #endregion
 
 	// #region Helpers privados
-	/** Sincroniza horarios hacia filterStore (filtros) y optionsStore (conflictos) */
 	private syncHorariosDownstream(): void {
 		this.filterStore.setHorariosSource(this._horarios());
-		this.optionsStore.setHorariosSource(this._horarios());
 	}
 	// #endregion
 }
