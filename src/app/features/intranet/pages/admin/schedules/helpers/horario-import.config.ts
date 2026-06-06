@@ -1,4 +1,5 @@
 import type { DiaSemana } from '@data/models';
+import { timeRangesOverlap } from '@shared/models';
 
 // #region Tipos de importacion
 
@@ -155,6 +156,46 @@ const DIA_LABELS: Record<number, string> = {
 
 export function getDiaLabel(dia: DiaSemana | null): string {
 	return dia ? DIA_LABELS[dia] ?? `Día ${dia}` : '—';
+}
+
+// #endregion
+
+// #region Intra-batch conflict detection
+
+export function markIntraBatchConflicts(rows: HorarioImportRow[]): HorarioImportRow[] {
+	const validRows = rows.filter((r) => r.valido);
+
+	const conflictIndices = new Set<number>();
+
+	for (let i = 0; i < validRows.length; i++) {
+		for (let j = i + 1; j < validRows.length; j++) {
+			const a = validRows[i];
+			const b = validRows[j];
+			if (a.salonId !== b.salonId || a.diaSemana !== b.diaSemana) continue;
+			if (timeRangesOverlap(
+				{ horaInicio: a.horaInicio, horaFin: a.horaFin },
+				{ horaInicio: b.horaInicio, horaFin: b.horaFin },
+			)) {
+				conflictIndices.add(i);
+				conflictIndices.add(j);
+			}
+		}
+	}
+
+	if (conflictIndices.size === 0) return rows;
+
+	const validIndexMap = new Map<HorarioImportRow, number>();
+	validRows.forEach((r, i) => validIndexMap.set(r, i));
+
+	return rows.map((row) => {
+		const idx = validIndexMap.get(row);
+		if (idx === undefined || !conflictIndices.has(idx)) return row;
+		return {
+			...row,
+			valido: false,
+			error: [row.error, 'Conflicto con otra fila del archivo'].filter(Boolean).join(', '),
+		};
+	});
 }
 
 // #endregion

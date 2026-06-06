@@ -14,6 +14,7 @@ import {
 	type ImportarHorariosResult,
 	findColumnKey,
 	getDiaLabel,
+	markIntraBatchConflicts,
 	parseDiaSemana,
 	parseHora,
 	parseId,
@@ -86,7 +87,7 @@ export class SchedulesImportDialogComponent {
 					);
 					this.filas.set([]);
 				} else {
-					this.filas.set(parsed);
+					this.filas.set(markIntraBatchConflicts(parsed));
 					this.step.set('preview');
 				}
 			} catch {
