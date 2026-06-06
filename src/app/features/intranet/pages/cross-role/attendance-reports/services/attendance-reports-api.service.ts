@@ -2,6 +2,7 @@ import { HttpClient, HttpParams } from '@angular/common/http';
 import { inject, Injectable } from '@angular/core';
 import { environment } from '@config';
 import type { Observable } from 'rxjs';
+import { formatDateLocalIso } from '@core/helpers';
 import type { ReporteFiltrado, ReporteFilters } from '../models';
 
 @Injectable({ providedIn: 'root' })
@@ -34,7 +35,7 @@ export class AttendanceReportsApiService {
 
 	// #region Helpers
 	private buildParams(filters: ReporteFilters): HttpParams {
-		const fecha = filters.fecha.toISOString().split('T')[0];
+		const fecha = formatDateLocalIso(filters.fecha);
 		let params = new HttpParams()
 			.set('filtro', filters.estado)
 			.set('rango', filters.rango)

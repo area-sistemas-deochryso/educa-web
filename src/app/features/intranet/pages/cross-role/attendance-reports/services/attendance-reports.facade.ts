@@ -1,7 +1,7 @@
 import { DestroyRef, inject, Injectable } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { UserProfileService } from '@core/services';
-import { downloadBlob, logger } from '@core/helpers';
+import { downloadBlob, formatDateLocalIso, logger } from '@core/helpers';
 import {
 	DirectorAttendanceApiService,
 	TeacherAttendanceApiService,
@@ -138,7 +138,7 @@ export class AttendanceReportsFacade {
 			.pipe(takeUntilDestroyed(this.destroyRef))
 			.subscribe({
 				next: (blob) => {
-					const fechaStr = filters.fecha.toISOString().split('T')[0];
+					const fechaStr = formatDateLocalIso(filters.fecha);
 					downloadBlob(blob, `Reporte_${resultado.filtroEstado}_${fechaStr}.xlsx`);
 					this.store.setExportingExcel(false);
 				},
