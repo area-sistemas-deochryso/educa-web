@@ -185,6 +185,7 @@ export class DirectorAttendanceApiService {
 							grado: s.grado,
 							gradoCodigo: s.gradoCodigo,
 							seccion: s.seccion,
+							graOrden: s.graOrden ?? 0,
 						});
 					}
 				});

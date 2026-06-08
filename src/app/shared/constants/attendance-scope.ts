@@ -37,9 +37,13 @@ export const GRADO_ORDEN_MAP: Readonly<Record<string, number>> = {
  * Retorna `null` si el nombre no existe en el catálogo (defensivo: no asume
  * alcance para grados desconocidos — el backend decide).
  */
+const GRADO_ORDEN_MAP_LOWER: Readonly<Record<string, number>> = Object.fromEntries(
+	Object.entries(GRADO_ORDEN_MAP).map(([k, v]) => [k.toLowerCase(), v]),
+);
+
 export function resolverGraOrden(gradoNombre: string | null | undefined): number | null {
 	if (!gradoNombre) return null;
-	const orden = GRADO_ORDEN_MAP[gradoNombre];
+	const orden = GRADO_ORDEN_MAP_LOWER[gradoNombre.toLowerCase()];
 	return typeof orden === 'number' ? orden : null;
 }
 

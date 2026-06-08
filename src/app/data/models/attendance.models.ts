@@ -163,6 +163,7 @@ export interface GradoSeccion {
 	grado: string;
 	gradoCodigo: string;
 	seccion: string;
+	graOrden: number;
 }
 
 // Director: Profesor de la sede

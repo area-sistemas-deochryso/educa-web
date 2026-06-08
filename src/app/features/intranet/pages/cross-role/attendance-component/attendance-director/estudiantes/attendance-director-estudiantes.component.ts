@@ -89,7 +89,7 @@ export class AttendanceDirectorEstudiantesComponent implements OnInit {
 	// #region Grados y secciones
 	private readonly allGradosSecciones = signal<GradoSeccion[]>([]);
 	readonly gradosSecciones = computed(() => {
-		const all = this.allGradosSecciones().filter((gs) => esGradoAsistenciaDiaria(gs.grado));
+		const all = this.allGradosSecciones().filter((gs) => esGradoAsistenciaDiaria(gs.graOrden));
 		const month = this.view.ingresos().selectedMonth;
 		const periodo = periodoEnMes(month);
 		return filtrarPorPeriodoAcademico(all, periodo, (gs) => gs.seccion);
@@ -101,7 +101,7 @@ export class AttendanceDirectorEstudiantesComponent implements OnInit {
 	readonly gradoFueraAlcance = computed(() => {
 		const gs = this.selectedGradoSeccion();
 		if (!gs) return false;
-		return !esGradoAsistenciaDiaria(gs.grado);
+		return !esGradoAsistenciaDiaria(gs.graOrden);
 	});
 
 	ngOnInit(): void {
