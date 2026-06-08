@@ -3,4 +3,5 @@ export * from './date-range.utils';
 export * from './periodo-academico.utils';
 export * from './role-policies.utils';
 export * from './select-option.utils';
+export * from './safe-lookup';
 export * from './time-range.utils';

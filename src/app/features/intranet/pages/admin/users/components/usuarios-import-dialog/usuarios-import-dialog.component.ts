@@ -10,6 +10,7 @@ import { SelectModule } from 'primeng/select';
 import { TableModule } from 'primeng/table';
 import { TagModule } from 'primeng/tag';
 import { ExcelService } from '@core/services';
+import { safeLookup } from '@app/shared/utils';
 import { ImportarEstudianteItem, ImportarEstudiantesResponse } from '../../services';
 import {
 	EstudianteImportRow,
@@ -165,7 +166,7 @@ export class UsersImportDialogComponent {
 		const rows: EstudianteImportRow[] = [];
 
 		for (const sheet of sheets) {
-			const grado = SHEET_TO_GRADO[sheet.sheetName.trim()];
+			const grado = safeLookup(SHEET_TO_GRADO, sheet.sheetName.trim(), 'SHEET_TO_GRADO');
 			if (!grado) continue;
 
 			for (const raw of sheet.data) {

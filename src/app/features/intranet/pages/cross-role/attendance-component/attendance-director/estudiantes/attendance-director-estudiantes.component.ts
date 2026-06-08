@@ -4,6 +4,7 @@ import { GradoSeccion } from '@data/models';
 import { AttendanceService } from '@intranet-shared/services';
 import { downloadBlob, viewBlobInNewTab } from '@core/helpers';
 import { periodoEnMes, filtrarPorPeriodoAcademico } from '@shared/models';
+import { guardedFilter } from '@app/shared/utils';
 import { JustificacionEvent } from '@features/intranet/components/attendance/attendance-day-list/attendance-day-list.component';
 import { ChangeDetectionStrategy, Component, DestroyRef, OnInit, ViewChild, computed, inject, signal } from '@angular/core';
 
@@ -89,7 +90,11 @@ export class AttendanceDirectorEstudiantesComponent implements OnInit {
 	// #region Grados y secciones
 	private readonly allGradosSecciones = signal<GradoSeccion[]>([]);
 	readonly gradosSecciones = computed(() => {
-		const all = this.allGradosSecciones().filter((gs) => esGradoAsistenciaDiaria(gs.graOrden));
+		const all = guardedFilter(
+			this.allGradosSecciones(),
+			(gs) => esGradoAsistenciaDiaria(gs.graOrden),
+			'gradosSecciones.esGradoAsistenciaDiaria',
+		);
 		const month = this.view.ingresos().selectedMonth;
 		const periodo = periodoEnMes(month);
 		return filtrarPorPeriodoAcademico(all, periodo, (gs) => gs.seccion);

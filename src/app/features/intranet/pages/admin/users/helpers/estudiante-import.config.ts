@@ -1,3 +1,7 @@
+// #region Imports
+import { buildNormalizedMap } from '@app/shared/utils';
+// #endregion
+
 // #region Interfaces
 
 export interface EstudianteImportRow {
@@ -14,23 +18,23 @@ export interface EstudianteImportRow {
 // #endregion
 // #region Constants
 
-/** Mapeo nombre de hoja Excel → grado en BD */
-export const SHEET_TO_GRADO: Record<string, string> = {
-	'3 AÑOS': 'INICIAL 3 AÑOS',
-	'4 AÑOS': 'INICIAL 4 AÑOS',
-	'5 AÑOS': 'INICIAL 5 AÑOS',
-	'1ER G': '1RO PRIMARIA',
-	'2DO G': '2DO PRIMARIA',
-	'3ER G': '3RO PRIMARIA',
-	'4TO G': '4TO PRIMARIA',
-	'5TO G': '5TO PRIMARIA',
-	'6TO G': '6TO PRIMARIA',
-	'1ERO SEC': '1RO SECUNDARIA',
-	'2DO SEC': '2DO SECUNDARIA',
-	'3ERO SEC': '3RO SECUNDARIA',
-	'4TO SEC': '4TO SECUNDARIA',
-	'5TO SEC': '5TO SECUNDARIA',
-};
+/** Mapeo nombre de hoja Excel → grado en BD (keys normalized to uppercase) */
+export const SHEET_TO_GRADO: ReadonlyMap<string, string> = buildNormalizedMap([
+	['3 AÑOS', 'INICIAL 3 AÑOS'],
+	['4 AÑOS', 'INICIAL 4 AÑOS'],
+	['5 AÑOS', 'INICIAL 5 AÑOS'],
+	['1ER G', '1RO PRIMARIA'],
+	['2DO G', '2DO PRIMARIA'],
+	['3ER G', '3RO PRIMARIA'],
+	['4TO G', '4TO PRIMARIA'],
+	['5TO G', '5TO PRIMARIA'],
+	['6TO G', '6TO PRIMARIA'],
+	['1ERO SEC', '1RO SECUNDARIA'],
+	['2DO SEC', '2DO SECUNDARIA'],
+	['3ERO SEC', '3RO SECUNDARIA'],
+	['4TO SEC', '4TO SECUNDARIA'],
+	['5TO SEC', '5TO SECUNDARIA'],
+]);
 
 export const SECCIONES_IMPORT: { label: string; value: string }[] = [
 	{ label: 'A — Sección A', value: 'A' },
