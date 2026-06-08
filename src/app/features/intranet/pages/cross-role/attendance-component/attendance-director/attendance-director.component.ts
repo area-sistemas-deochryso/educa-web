@@ -7,6 +7,7 @@ import { ViewMode } from '@features/intranet/components/attendance/attendance-he
 import { AttendanceDirectorAsistentesAdminComponent } from './asistentes-admin/attendance-director-asistentes-admin.component';
 import { AttendanceDirectorEstudiantesComponent } from './estudiantes/attendance-director-estudiantes.component';
 import { AttendanceDirectorProfesoresComponent } from './profesores/attendance-director-profesores.component';
+import { AttendanceDirectorStaffComponent } from './staff/attendance-director-staff.component';
 
 /**
  * Shell del panel admin de asistencia (Director + Promotor + Coordinador Académico
@@ -17,12 +18,15 @@ import { AttendanceDirectorProfesoresComponent } from './profesores/attendance-d
  * Tras Plan 21 Chat 7 + Plan 28 Chat 4b-tab, los tres sub-componentes responden
  * al pill día/mes del header cross-role (mes degradado en AAs hasta endpoint BE).
  */
-type SubMenu = 'estudiantes' | 'profesores' | 'asistentes-admin';
+type SubMenu = 'estudiantes' | 'profesores' | 'asistentes-admin' | 'coordinadores' | 'promotores' | 'directores';
 
 const SUBMENU_OPTIONS: { label: string; value: SubMenu; icon: string }[] = [
 	{ label: 'Estudiantes', value: 'estudiantes', icon: 'pi pi-graduation-cap' },
 	{ label: 'Profesores', value: 'profesores', icon: 'pi pi-user' },
 	{ label: 'Asistentes Admin', value: 'asistentes-admin', icon: 'pi pi-id-card' },
+	{ label: 'Coordinadores', value: 'coordinadores', icon: 'pi pi-briefcase' },
+	{ label: 'Promotores', value: 'promotores', icon: 'pi pi-megaphone' },
+	{ label: 'Directores', value: 'directores', icon: 'pi pi-building' },
 ];
 
 @Component({
@@ -34,6 +38,7 @@ const SUBMENU_OPTIONS: { label: string; value: SubMenu; icon: string }[] = [
 		AttendanceDirectorEstudiantesComponent,
 		AttendanceDirectorProfesoresComponent,
 		AttendanceDirectorAsistentesAdminComponent,
+		AttendanceDirectorStaffComponent,
 	],
 	templateUrl: './attendance-director.component.html',
 	styleUrl: './attendance-director.component.scss',
@@ -48,6 +53,15 @@ export class AttendanceDirectorComponent {
 
 	@ViewChild(AttendanceDirectorAsistentesAdminComponent)
 	asistentesAdminComponent?: AttendanceDirectorAsistentesAdminComponent;
+
+	@ViewChild('coordinadoresStaff')
+	coordinadoresComponent?: AttendanceDirectorStaffComponent;
+
+	@ViewChild('promotoresStaff')
+	promotoresComponent?: AttendanceDirectorStaffComponent;
+
+	@ViewChild('directoresStaff')
+	directoresComponent?: AttendanceDirectorStaffComponent;
 
 	readonly selectedSubMenu = signal<SubMenu>('estudiantes');
 	readonly submenuOptions = SUBMENU_OPTIONS;
@@ -85,6 +99,15 @@ export class AttendanceDirectorComponent {
 			case 'asistentes-admin':
 				this.asistentesAdminComponent?.reload();
 				break;
+			case 'coordinadores':
+				this.coordinadoresComponent?.reload();
+				break;
+			case 'promotores':
+				this.promotoresComponent?.reload();
+				break;
+			case 'directores':
+				this.directoresComponent?.reload();
+				break;
 		}
 	}
 
@@ -100,6 +123,15 @@ export class AttendanceDirectorComponent {
 				break;
 			case 'asistentes-admin':
 				this.asistentesAdminComponent?.setViewMode(mode);
+				break;
+			case 'coordinadores':
+				this.coordinadoresComponent?.setViewMode(mode);
+				break;
+			case 'promotores':
+				this.promotoresComponent?.setViewMode(mode);
+				break;
+			case 'directores':
+				this.directoresComponent?.setViewMode(mode);
 				break;
 		}
 	}

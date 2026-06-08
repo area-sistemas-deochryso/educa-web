@@ -1,0 +1,13 @@
+<app-attendance-legend />
+
+<app-attendance-persona-day-list
+	[personas]="personasDia()"
+	[fecha]="fechaDia()"
+	[estadisticas]="estadisticasDia()"
+	[loading]="loading()"
+	[showPdfButton]="false"
+	[allowJustify]="false"
+	[showEditAdminAction]="true"
+	(fechaChange)="onFechaDiaChange($event)"
+	(editAdmin)="onEditarEnAdminDia($event)"
+/>

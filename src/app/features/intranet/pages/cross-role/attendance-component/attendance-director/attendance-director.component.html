@@ -26,5 +26,14 @@
 	@case ('asistentes-admin') {
 		<app-attendance-director-asistentes-admin />
 	}
+	@case ('coordinadores') {
+		<app-attendance-director-staff #coordinadoresStaff tipoPersona="C" />
+	}
+	@case ('promotores') {
+		<app-attendance-director-staff #promotoresStaff tipoPersona="M" />
+	}
+	@case ('directores') {
+		<app-attendance-director-staff #directoresStaff tipoPersona="D" />
+	}
 }
 <!-- #endregion -->

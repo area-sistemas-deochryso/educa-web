@@ -146,6 +146,15 @@ export interface AsistenciaAsistenteAdminDto {
 	tipoPersona: TipoPersona;
 	asistencias: AsistenciaDetalle[];
 }
+/**
+ * Generic staff daily attendance response (C/M/D roles).
+ * GET /api/ConsultaAsistencia/director/staff-asistencia-dia?tipoPersona={C|M|D}
+ */
+export interface AsistenciaDiaStaffConEstadisticas {
+	staff: AsistenciaAsistenteAdminDto[];
+	estadisticas: EstadisticasAsistenciaDia;
+}
+
 // #endregion
 
 // Director: Estadísticas del día
