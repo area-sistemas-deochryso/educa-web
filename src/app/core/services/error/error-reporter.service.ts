@@ -105,7 +105,7 @@ export class ErrorReporterService {
 			correlationId: correlationId ?? null,
 			sourceLocation,
 			requestBody: sanitizePayload(requestBody),
-			responseBody: sanitizePayload(responseBody, 2000),
+			responseBody: sanitizePayload(responseBody, 1900),
 			breadcrumbCount: maxBreadcrumbs,
 		});
 

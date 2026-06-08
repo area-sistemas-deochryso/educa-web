@@ -26,6 +26,12 @@ export function tipoPersonaLabel(tipo: TipoPersonaAsistencia): string {
 			return 'Profesor';
 		case 'A':
 			return 'Asistente Administrativo';
+		case 'C':
+			return 'Coordinador Académico';
+		case 'M':
+			return 'Promotor';
+		case 'D':
+			return 'Director';
 		default:
 			return 'Estudiante';
 	}

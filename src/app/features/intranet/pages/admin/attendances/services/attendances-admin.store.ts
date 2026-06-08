@@ -293,7 +293,7 @@ export class AttendancesAdminStore {
 	openNewDialog(tipo: TipoOperacionAsistencia = 'entrada'): void {
 		const filter = this._tipoPersonaFilter();
 		// El form por defecto toma el tipo del filtro; 'todos' cae en 'E' como default seguro.
-		const tipoPersona: TipoPersonaAsistencia = filter === 'P' || filter === 'A' ? filter : 'E';
+		const tipoPersona: TipoPersonaAsistencia = filter === 'P' || filter === 'A' || filter === 'C' || filter === 'M' ? filter : 'E';
 		this._selectedItem.set(null);
 		this._formData.set({
 			tipoOperacion: tipo,

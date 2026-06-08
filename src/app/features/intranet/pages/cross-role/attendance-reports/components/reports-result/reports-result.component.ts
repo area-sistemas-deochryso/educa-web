@@ -41,7 +41,9 @@ export class ReportsResultComponent {
 		if (r.rangoTipo !== 'mes') return false;
 		return r.salones.some(s => s.estudiantes.some(e => e.asistenciasDiarias != null))
 			|| r.profesores?.some(p => p.asistenciasDiarias != null) === true
-			|| r.asistentesAdmin?.some(a => a.asistenciasDiarias != null) === true;
+			|| r.asistentesAdmin?.some(a => a.asistenciasDiarias != null) === true
+			|| r.coordinadores?.some(a => a.asistenciasDiarias != null) === true
+			|| r.promotores?.some(a => a.asistenciasDiarias != null) === true;
 	});
 
 	readonly diasColumnas = computed<number[]>(() => {
@@ -79,8 +81,18 @@ export class ReportsResultComponent {
 		() => this.resultado().asistentesAdmin ?? [],
 	);
 
+	readonly coordinadores = computed<PersonaAsistenteAdminReporte[]>(
+		() => this.resultado().coordinadores ?? [],
+	);
+
+	readonly promotores = computed<PersonaAsistenteAdminReporte[]>(
+		() => this.resultado().promotores ?? [],
+	);
+
 	readonly hasProfesores = computed(() => this.profesores().length > 0);
 	readonly hasAsistentesAdmin = computed(() => this.asistentesAdmin().length > 0);
+	readonly hasCoordinadores = computed(() => this.coordinadores().length > 0);
+	readonly hasPromotores = computed(() => this.promotores().length > 0);
 	readonly hasEstudiantes = computed(() => this.salones().length > 0);
 
 	readonly salonOptions = computed<SalonSelectOption[]>(() =>
@@ -120,6 +132,20 @@ export class ReportsResultComponent {
 		return `Asistentes administrativos — ${
 			r.totalAsistentesAdminFiltrados ?? this.asistentesAdmin().length
 		} de ${r.totalAsistentesAdminGeneral ?? this.asistentesAdmin().length}`;
+	});
+
+	readonly coordinadoresHeader = computed(() => {
+		const r = this.resultado();
+		return `Coordinadores académicos — ${
+			r.totalCoordinadoresFiltrados ?? this.coordinadores().length
+		} de ${r.totalCoordinadoresGeneral ?? this.coordinadores().length}`;
+	});
+
+	readonly promotoresHeader = computed(() => {
+		const r = this.resultado();
+		return `Promotores — ${
+			r.totalPromotoresFiltrados ?? this.promotores().length
+		} de ${r.totalPromotoresGeneral ?? this.promotores().length}`;
 	});
 	// #endregion
 

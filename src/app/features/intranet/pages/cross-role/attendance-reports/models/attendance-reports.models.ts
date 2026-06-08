@@ -7,7 +7,7 @@ export type EstadoFiltro = (typeof ESTADO_FILTROS)[number];
 export const RANGO_TIPOS = ['dia', 'semana', 'mes'] as const;
 export type RangoTipo = (typeof RANGO_TIPOS)[number];
 
-export const TIPOS_PERSONA = ['E', 'P', 'A', 'todos'] as const;
+export const TIPOS_PERSONA = ['E', 'P', 'A', 'C', 'M', 'todos'] as const;
 export type TipoPersonaReporte = (typeof TIPOS_PERSONA)[number];
 // #endregion
 
@@ -40,6 +40,12 @@ export interface ReporteFiltrado {
 	asistentesAdmin?: PersonaAsistenteAdminReporte[] | null;
 	totalAsistentesAdminGeneral?: number;
 	totalAsistentesAdminFiltrados?: number;
+	coordinadores?: PersonaAsistenteAdminReporte[] | null;
+	totalCoordinadoresGeneral?: number;
+	totalCoordinadoresFiltrados?: number;
+	promotores?: PersonaAsistenteAdminReporte[] | null;
+	totalPromotoresGeneral?: number;
+	totalPromotoresFiltrados?: number;
 	diasFeriados?: number[] | null;
 	diasEnMes?: number | null;
 	nombreMes?: string | null;

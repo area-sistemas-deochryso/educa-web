@@ -73,7 +73,8 @@ export class AttendanceReportsFacade {
 
 		// Profesores y Asistentes administrativos no se agrupan por salón — BE ignora el selector
 		const requiereSalones =
-			filters.tipoPersona !== 'P' && filters.tipoPersona !== 'A';
+			filters.tipoPersona !== 'P' && filters.tipoPersona !== 'A'
+			&& filters.tipoPersona !== 'C' && filters.tipoPersona !== 'M';
 		if (requiereSalones && filters.salonesSeleccionados.length === 0) {
 			this.store.setError('Debe seleccionar al menos un salón.');
 			return;

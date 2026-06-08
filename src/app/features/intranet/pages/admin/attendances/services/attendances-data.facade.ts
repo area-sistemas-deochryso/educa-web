@@ -5,12 +5,10 @@ import { Subject, debounceTime, distinctUntilChanged, switchMap, of, catchError 
 
 import { logger } from '@core/helpers';
 import { WalCrossTabRefetchService } from '@core/services';
-import { WalFacadeHelper } from '@core/services/wal';
 import {
 	CrossChexSyncAceptadoDto,
 	CrossChexSyncStatusService,
 } from '@core/services/signalr';
-import { environment } from '@config/environment';
 import { SyncRangoRequest, TipoPersonaAsistencia, TipoPersonaFilter } from '../models';
 import { AttendancesAdminService } from './attendances-admin.service';
 import { AttendancesAdminStore } from './attendances-admin.store';
@@ -26,10 +24,8 @@ export class AttendancesDataFacade {
 	private api = inject(AttendancesAdminService);
 	private store = inject(AttendancesAdminStore);
 	private syncService = inject(CrossChexSyncStatusService);
-	private wal = inject(WalFacadeHelper);
 	private crossTabRefetch = inject(WalCrossTabRefetchService);
 	private destroyRef = inject(DestroyRef);
-	private readonly apiUrl = `${environment.apiUrl}/api/asistencia-admin`;
 	// #endregion
 
 	// #region Estado expuesto
@@ -227,36 +223,30 @@ export class AttendancesDataFacade {
 	sincronizarDesdeCrossChex(onError?: (err: unknown) => void): void {
 		if (this.syncService.isActive()) return;
 		if (this.store.syncing()) return;
+		this.store.setSyncing(true);
 
 		const fecha = this.store.fecha();
 
-		void this.wal.execute<CrossChexSyncAceptadoDto>({
-			operation: 'CUSTOM',
-			resourceType: 'crosschexSync',
-			endpoint: `${this.apiUrl}/sync`,
-			method: 'POST',
-			payload: { fecha },
-			http$: () => this.api.sincronizarDesdeCrossChex(fecha),
-			optimistic: {
-				apply: () => this.store.setSyncing(true),
-				rollback: () => this.store.setSyncing(false),
-			},
-			onCommit: (dto) => {
-				this.store.setSyncing(false);
-				void this.syncService.startTracking(dto.jobId);
-			},
-			onError: (err) => {
-				this.store.setSyncing(false);
-				const conflict = this.tryExtractConflict(err);
-				if (conflict) {
-					logger.log('[Sync] 409 con job activo — re-suscribiendo', conflict);
-					void this.syncService.startTracking(conflict.jobId);
-					return;
-				}
-				logger.error('Error al sincronizar:', err);
-				onError?.(err);
-			},
-		});
+		this.api
+			.sincronizarDesdeCrossChex(fecha)
+			.pipe(takeUntilDestroyed(this.destroyRef))
+			.subscribe({
+				next: (dto) => {
+					this.store.setSyncing(false);
+					void this.syncService.startTracking(dto.jobId);
+				},
+				error: (err) => {
+					this.store.setSyncing(false);
+					const conflict = this.tryExtractConflict(err);
+					if (conflict) {
+						logger.log('[Sync] 409 con job activo — re-suscribiendo', conflict);
+						void this.syncService.startTracking(conflict.jobId);
+						return;
+					}
+					logger.error('Error al sincronizar:', err);
+					onError?.(err);
+				},
+			});
 	}
 
 	sincronizarRango(
@@ -265,34 +255,28 @@ export class AttendancesDataFacade {
 	): void {
 		if (this.syncService.isActive()) return;
 		if (this.store.syncing()) return;
+		this.store.setSyncing(true);
 
-		void this.wal.execute<CrossChexSyncAceptadoDto>({
-			operation: 'CUSTOM',
-			resourceType: 'crosschexSync',
-			endpoint: `${this.apiUrl}/sync-range`,
-			method: 'POST',
-			payload: body,
-			http$: () => this.api.sincronizarRango(body),
-			optimistic: {
-				apply: () => this.store.setSyncing(true),
-				rollback: () => this.store.setSyncing(false),
-			},
-			onCommit: (dto) => {
-				this.store.setSyncing(false);
-				void this.syncService.startTracking(dto.jobId);
-			},
-			onError: (err) => {
-				this.store.setSyncing(false);
-				const conflict = this.tryExtractConflict(err);
-				if (conflict) {
-					logger.log('[SyncRange] 409 con job activo — re-suscribiendo', conflict);
-					void this.syncService.startTracking(conflict.jobId);
-					return;
-				}
-				logger.error('Error al sincronizar rango:', err);
-				onError?.(err);
-			},
-		});
+		this.api
+			.sincronizarRango(body)
+			.pipe(takeUntilDestroyed(this.destroyRef))
+			.subscribe({
+				next: (dto) => {
+					this.store.setSyncing(false);
+					void this.syncService.startTracking(dto.jobId);
+				},
+				error: (err) => {
+					this.store.setSyncing(false);
+					const conflict = this.tryExtractConflict(err);
+					if (conflict) {
+						logger.log('[SyncRange] 409 con job activo — re-suscribiendo', conflict);
+						void this.syncService.startTracking(conflict.jobId);
+						return;
+					}
+					logger.error('Error al sincronizar rango:', err);
+					onError?.(err);
+				},
+			});
 	}
 
 	/**

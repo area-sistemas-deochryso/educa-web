@@ -122,13 +122,17 @@ export class AttendancesComponent implements OnInit {
 	readonly tipoPersonaOptions = signal<{ label: string; value: TipoPersonaFilter }[]>([
 		{ label: 'Estudiantes', value: 'E' },
 		{ label: 'Profesores', value: 'P' },
-		{ label: 'Asistentes Administrativos', value: 'A' },
+		{ label: 'Asist. Admin.', value: 'A' },
+		{ label: 'Coordinadores', value: 'C' },
+		{ label: 'Promotores', value: 'M' },
 		{ label: 'Todos', value: 'todos' },
 	]);
 	readonly tipoPersonaFormOptions = signal<{ label: string; value: TipoPersonaAsistencia }[]>([
 		{ label: 'Estudiante', value: 'E' },
 		{ label: 'Profesor', value: 'P' },
 		{ label: 'Asistente Admin.', value: 'A' },
+		{ label: 'Coordinador', value: 'C' },
+		{ label: 'Promotor', value: 'M' },
 	]);
 	readonly cierreAnio = signal(new Date().getFullYear());
 	readonly cierreMes = signal(new Date().getMonth() + 1);
@@ -229,7 +233,7 @@ export class AttendancesComponent implements OnInit {
 				}
 
 				const tipo = params.get('tipoPersona');
-				if (tipo === 'E' || tipo === 'P' || tipo === 'A' || tipo === 'todos') {
+				if (tipo === 'E' || tipo === 'P' || tipo === 'A' || tipo === 'C' || tipo === 'M' || tipo === 'todos') {
 					this.store.setTipoPersonaFilter(tipo);
 				}
 

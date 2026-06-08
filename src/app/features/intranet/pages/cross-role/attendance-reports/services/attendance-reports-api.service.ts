@@ -41,8 +41,8 @@ export class AttendanceReportsApiService {
 			.set('rango', filters.rango)
 			.set('fecha', fecha)
 			.set('tipoPersona', filters.tipoPersona);
-		// BE ignora salones cuando tipoPersona = 'P' o 'A'; no enviarlos evita ruido en el query
-		if (filters.tipoPersona !== 'P' && filters.tipoPersona !== 'A') {
+		if (filters.tipoPersona !== 'P' && filters.tipoPersona !== 'A'
+			&& filters.tipoPersona !== 'C' && filters.tipoPersona !== 'M') {
 			params = params.set('salones', filters.salonesSeleccionados.join(','));
 		}
 		return params;

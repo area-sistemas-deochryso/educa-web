@@ -19,6 +19,8 @@ export const TIPO_PERSONA_OPTIONS: SelectOption<TipoPersonaReporte>[] = [
 	{ label: 'Estudiantes', value: 'E' },
 	{ label: 'Profesores', value: 'P' },
 	{ label: 'Asist. Admin.', value: 'A' },
+	{ label: 'Coordinadores', value: 'C' },
+	{ label: 'Promotores', value: 'M' },
 	{ label: 'Todos', value: 'todos' },
 ];
 

@@ -10,10 +10,12 @@ import {
 	CrearSalidaManualRequest,
 	ActualizarHorasRequest,
 	AsistenciaAdminLista,
+	TipoPersonaAsistencia,
 } from '../models';
 import { AttendancesAdminService } from './attendances-admin.service';
 import { AttendancesAdminStore } from './attendances-admin.store';
 import { AttendancesDataFacade } from './attendances-data.facade';
+import { tipoPersonaLabel } from './attendances-template-helpers';
 import {
 	applyActualizarHorasDelta,
 	applyItemStatsDelta,
@@ -60,8 +62,8 @@ export class AttendancesCrudFacade {
 	 * Plan 23 Chat 4 + Plan 28 Chat 4b: toast de éxito diferenciado por tipoPersona — INV-AD05 ampliado.
 	 * `'P'` → "Profesor"; `'A'` → "Asistente Administrativo"; default → "Estudiante".
 	 */
-	private notificarExito(tipo: 'E' | 'P' | 'A' | null | undefined, verbo: string, detalle: string): void {
-		const persona = tipo === 'P' ? 'Profesor' : tipo === 'A' ? 'Asistente Administrativo' : 'Estudiante';
+	private notificarExito(tipo: TipoPersonaAsistencia | null | undefined, verbo: string, detalle: string): void {
+		const persona = tipoPersonaLabel(tipo ?? 'E');
 		this.errorHandler.showSuccess(`${persona} ${verbo}`, detalle);
 	}
 
