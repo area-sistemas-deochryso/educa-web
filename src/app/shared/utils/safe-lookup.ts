@@ -61,11 +61,11 @@ export function buildNormalizedMap<V>(entries: [string, V][]): ReadonlyMap<strin
  * @param source The array to filter.
  * @param predicate The filter predicate.
  * @param context Optional label for the warning.
- * @returns The filtered array (same reference semantics as Array.filter).
+ * @returns The filtered array (same semantics as Array.filter).
  */
 export function guardedFilter<T>(
 	source: T[],
-	predicate: (item: T) => boolean,
+	predicate: (item: T, index: number, array: T[]) => boolean,
 	context?: string,
 ): T[] {
 	const result = source.filter(predicate);
