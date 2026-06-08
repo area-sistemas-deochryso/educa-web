@@ -5,7 +5,6 @@ import { Subject } from 'rxjs';
 
 import { logger } from '@core/helpers';
 import { environment } from '@config/environment';
-import { StorageService } from '@core/services/storage';
 import { AttendanceSignalRService } from './attendance-signalr.service';
 import {
 	CrossChexSyncStatusDto,
@@ -59,7 +58,6 @@ export class CrossChexSyncStatusService {
 	// #region Dependencias
 	private hubService = inject(AttendanceSignalRService);
 	private http = inject(HttpClient);
-	private storage = inject(StorageService);
 	private readonly apiUrl = `${environment.apiUrl}/api/asistencia-admin`;
 	// #endregion
 
@@ -111,7 +109,6 @@ export class CrossChexSyncStatusService {
 		}
 
 		this._trackingJobId.set(jobId);
-		this.persistJobId(jobId);
 
 		try {
 			const hub = await this.hubService.ensureConnected();
@@ -120,9 +117,7 @@ export class CrossChexSyncStatusService {
 			logger.log('[CrossChexSync] Suscrito al job', { jobId });
 		} catch (err) {
 			logger.error('[CrossChexSync] Error al suscribir al hub', err);
-			// Reset defensivo — el consumer puede reintentar más tarde.
 			this._trackingJobId.set(null);
-			this.clearPersistedJobId();
 		}
 	}
 
@@ -137,49 +132,25 @@ export class CrossChexSyncStatusService {
 		await this.unsubscribeFrom(jobId);
 		this._trackingJobId.set(null);
 		this._status.set(null);
-		this.clearPersistedJobId();
 	}
 
 	/**
-	 * Recupera un job activo tras refresh del navegador. Lee el jobId de
-	 * sessionStorage, consulta `GET /sync/{id}/status` y:
-	 *   - Si sigue activo → re-suscribe al hub.
-	 *   - Si ya terminó → emite evento terminal y limpia storage.
-	 *   - Si no existe → limpia storage silenciosamente.
+	 * Checks the server for any active sync job (QUEUED/RUNNING) and starts
+	 * tracking it. Works for any user on the page, not just the one who
+	 * launched the sync. Called on page init.
 	 */
 	async rehydrate(): Promise<void> {
-		const jobId = this.readPersistedJobId();
-		if (!jobId) return;
-
-		if (!this.isValidJobId(jobId)) {
-			this.clearPersistedJobId();
-			return;
-		}
-
 		this.http
-			.get<CrossChexSyncStatusDto>(`${this.apiUrl}/sync/${jobId}/status`)
+			.get<CrossChexSyncStatusDto>(`${this.apiUrl}/sync/active`)
 			.subscribe({
 				next: (dto) => {
-					if (!dto) {
-						this.clearPersistedJobId();
-						return;
-					}
+					if (!dto) return;
 
 					this._status.set(dto);
-
-					if (this.isTerminal(dto.estado)) {
-						this.terminalSubject.next({ status: dto });
-						this._trackingJobId.set(null);
-						this.clearPersistedJobId();
-						return;
-					}
-
-					// Job aún activo — re-suscribir al hub.
-					void this.startTracking(jobId);
+					void this.startTracking(dto.jobId);
 				},
 				error: (err) => {
-					logger.warn('[CrossChexSync] rehydrate falló — limpiando storage', err);
-					this.clearPersistedJobId();
+					logger.warn('[CrossChexSync] rehydrate falló', err);
 				},
 			});
 	}
@@ -206,7 +177,6 @@ export class CrossChexSyncStatusService {
 				this.terminalSubject.next({ status: dto });
 				void this.unsubscribeFrom(dto.jobId);
 				this._trackingJobId.set(null);
-				this.clearPersistedJobId();
 			}
 		};
 
@@ -255,18 +225,6 @@ export class CrossChexSyncStatusService {
 			error: (raw['error'] ?? raw['Error']) as string | null,
 			delayEntrePasosSegundos: (raw['delayEntrePasosSegundos'] ?? raw['DelayEntrePasosSegundos']) as number | null,
 		};
-	}
-
-	private persistJobId(jobId: string): void {
-		this.storage.setCrossChexJobId(jobId);
-	}
-
-	private readPersistedJobId(): string | null {
-		return this.storage.getCrossChexJobId();
-	}
-
-	private clearPersistedJobId(): void {
-		this.storage.setCrossChexJobId(null);
 	}
 
 	// #endregion
