@@ -147,5 +147,12 @@ export class AttendancesAdminService {
 		return this.http.post<EnviarCorreosResultado>(`${this.apiUrl}/enviar-correos`, dto);
 	}
 
+	/** DEBUG — temporary endpoint to diagnose CrossChex pagination. Remove after fix. */
+	debugCrossChexPagination(fecha: string): Observable<unknown> {
+		return this.http.post(`${this.apiUrl}/debug-crosschex-pagination`, null, {
+			params: { fecha },
+		});
+	}
+
 	// #endregion
 }

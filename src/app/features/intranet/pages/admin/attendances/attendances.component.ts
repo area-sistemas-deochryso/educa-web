@@ -32,6 +32,7 @@ import { CrossChexSyncBannerComponent } from './components/crosschex-sync-banner
 import { SyncRangeDialogComponent, SyncRangePayload } from './components/sync-range-dialog';
 
 import {
+	AttendancesAdminService,
 	AttendancesDataFacade,
 	AttendancesCrudFacade,
 	AttendancesCierresFacade,
@@ -92,6 +93,7 @@ import {
 })
 export class AttendancesComponent implements OnInit {
 	// #region Dependencias
+	private adminApi = inject(AttendancesAdminService);
 	private dataFacade = inject(AttendancesDataFacade);
 	protected crudFacade = inject(AttendancesCrudFacade);
 	private cierresFacade = inject(AttendancesCierresFacade);
@@ -302,6 +304,30 @@ export class AttendancesComponent implements OnInit {
 	onSincronizarRango(): void {
 		this.dataFacade.loadAllPersonas();
 		this.syncRangeDialogVisible.set(true);
+	}
+
+	/** DEBUG — remove after pagination fix */
+	onDebugPagination(): void {
+		const fecha = this.vm().fecha;
+		this.adminApi.debugCrossChexPagination(fecha).subscribe({
+			next: (res) => {
+				console.log('[DEBUG CrossChex Pagination]', res);
+				this.messageService.add({
+					severity: 'info',
+					summary: 'Debug pagination',
+					detail: JSON.stringify(res, null, 2),
+					life: 30000,
+				});
+			},
+			error: (err) => {
+				console.error('[DEBUG CrossChex Pagination] Error', err);
+				this.messageService.add({
+					severity: 'error',
+					summary: 'Debug pagination error',
+					detail: err?.message ?? 'Error desconocido',
+				});
+			},
+		});
 	}
 
 	onSyncRangeConfirm(payload: SyncRangePayload): void {
