@@ -22,6 +22,7 @@ export interface CrossChexSyncStatusDto {
 	iniciadoEn: string;
 	finalizadoEn: string | null;
 	error: string | null;
+	delayEntrePasosSegundos: number | null;
 }
 
 /**

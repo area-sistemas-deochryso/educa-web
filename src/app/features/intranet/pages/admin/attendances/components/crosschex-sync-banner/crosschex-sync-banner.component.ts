@@ -2,14 +2,19 @@ import {
 	ChangeDetectionStrategy,
 	Component,
 	computed,
+	DestroyRef,
+	effect,
 	inject,
 	output,
+	signal,
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ButtonModule } from 'primeng/button';
 import { ProgressBarModule } from 'primeng/progressbar';
 
 import { CrossChexSyncStatusService } from '@core/services/signalr';
+
+const DEFAULT_DELAY_S = 16;
 
 /**
  * Plan 24 Chat 3 — Banner full-width que muestra el progreso del sync
@@ -34,13 +39,77 @@ import { CrossChexSyncStatusService } from '@core/services/signalr';
 export class CrossChexSyncBannerComponent {
 	// #region Dependencias
 	private syncService = inject(CrossChexSyncStatusService);
+	private destroyRef = inject(DestroyRef);
 	// #endregion
 
 	// #region Outputs
-	/** Emite cuando el usuario clickea "Reintentar" tras un FAILED. */
 	readonly retry = output<void>();
-	/** Emite cuando el usuario clickea "Cerrar" tras un FAILED (clear del banner). */
 	readonly dismiss = output<void>();
+	// #endregion
+
+	// #region Countdown
+	private readonly _countdownSeconds = signal(0);
+	private countdownInterval: ReturnType<typeof setInterval> | null = null;
+
+	readonly countdownDisplay = computed(() => {
+		const s = this._countdownSeconds();
+		if (s <= 0) return '';
+		const min = Math.floor(s / 60);
+		const sec = s % 60;
+		return min > 0
+			? `~${min}m ${sec.toString().padStart(2, '0')}s restantes`
+			: `~${sec}s restantes`;
+	});
+
+	constructor() {
+		effect(() => {
+			const s = this.status();
+			if (!s || s.estado !== 'RUNNING') {
+				this.stopCountdown();
+				return;
+			}
+			const remaining = this.estimateRemainingSeconds(s);
+			if (remaining > 0) this.startCountdown(remaining);
+		});
+
+		this.destroyRef.onDestroy(() => this.stopCountdown());
+	}
+
+	private estimateRemainingSeconds(s: {
+		diaActual: number | null;
+		totalDias: number | null;
+		pagina: number | null;
+		totalPaginas: number | null;
+		delayEntrePasosSegundos: number | null;
+	}): number {
+		const delay = s.delayEntrePasosSegundos ?? DEFAULT_DELAY_S;
+		const pagesLeft =
+			s.pagina && s.totalPaginas ? Math.max(0, s.totalPaginas - s.pagina) : 0;
+		const daysLeft =
+			s.diaActual && s.totalDias ? Math.max(0, s.totalDias - s.diaActual) : 0;
+		return (pagesLeft + daysLeft) * delay;
+	}
+
+	private startCountdown(seconds: number): void {
+		this.stopCountdown();
+		this._countdownSeconds.set(seconds);
+		this.countdownInterval = setInterval(() => {
+			this._countdownSeconds.update((v) => {
+				if (v <= 1) {
+					this.stopCountdown();
+					return 0;
+				}
+				return v - 1;
+			});
+		}, 1000);
+	}
+
+	private stopCountdown(): void {
+		if (this.countdownInterval) {
+			clearInterval(this.countdownInterval);
+			this.countdownInterval = null;
+		}
+	}
 	// #endregion
 
 	// #region Estado derivado

@@ -253,6 +253,7 @@ export class CrossChexSyncStatusService {
 			iniciadoEn: (raw['iniciadoEn'] ?? raw['IniciadoEn']) as string,
 			finalizadoEn: (raw['finalizadoEn'] ?? raw['FinalizadoEn']) as string | null,
 			error: (raw['error'] ?? raw['Error']) as string | null,
+			delayEntrePasosSegundos: (raw['delayEntrePasosSegundos'] ?? raw['DelayEntrePasosSegundos']) as number | null,
 		};
 	}
 

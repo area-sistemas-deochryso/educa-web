@@ -22,7 +22,12 @@
 				}
 			</div>
 
-			<p class="sync-banner__message">{{ mensaje() }}</p>
+			<p class="sync-banner__message">
+				{{ mensaje() }}
+				@if (countdownDisplay(); as cd) {
+					<span class="sync-banner__countdown"> · {{ cd }}</span>
+				}
+			</p>
 
 			@if (!isFailed()) {
 				@if (isRangeSync() && dayProgress()) {
