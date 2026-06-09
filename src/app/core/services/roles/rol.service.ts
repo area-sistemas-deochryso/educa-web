@@ -37,10 +37,10 @@ export class RolService {
 
 	async refresh(): Promise<void> {
 		try {
-			const response = await firstValueFrom(
-				this.http.get<{ data: Rol[] }>(this.apiUrl),
+			const roles = await firstValueFrom(
+				this.http.get<Rol[]>(this.apiUrl),
 			);
-			this._roles.set(response.data);
+			this._roles.set(roles);
 			if (!this.initialized) {
 				this.initialized = true;
 				this.listenForChanges();
