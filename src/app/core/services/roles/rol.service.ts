@@ -1,27 +1,38 @@
-import { Injectable, PLATFORM_ID, inject, signal } from '@angular/core';
+import { Injectable, PLATFORM_ID, inject, signal, effect } from '@angular/core';
 import { isPlatformBrowser } from '@angular/common';
 import { HttpClient } from '@angular/common/http';
 import { firstValueFrom } from 'rxjs';
 import { environment } from '@config/environment';
 import { type Rol, registerRolLookup } from '@data/models';
+import { AuthService } from '@core/services/auth';
 import { SignalRService } from '@core/services/signalr';
 import { logger } from '@core/helpers';
 
 @Injectable({ providedIn: 'root' })
 export class RolService {
 	private readonly http = inject(HttpClient);
+	private readonly auth = inject(AuthService);
 	private readonly signalr = inject(SignalRService);
 	private readonly platformId = inject(PLATFORM_ID);
 	private readonly apiUrl = `${environment.apiUrl}/api/roles`;
 
 	private readonly _roles = signal<Rol[]>([]);
+	private initialized = false;
 	readonly roles = this._roles.asReadonly();
 
-	async init(): Promise<void> {
+	constructor() {
 		registerRolLookup(this);
 		if (!isPlatformBrowser(this.platformId)) return;
-		await this.refresh();
-		this.listenForChanges();
+
+		effect(() => {
+			const authenticated = this.auth.isAuthenticated;
+			if (authenticated && this._roles().length === 0) {
+				this.refresh();
+			}
+			if (!authenticated) {
+				this._roles.set([]);
+			}
+		});
 	}
 
 	async refresh(): Promise<void> {
@@ -30,6 +41,10 @@ export class RolService {
 				this.http.get<{ data: Rol[] }>(this.apiUrl),
 			);
 			this._roles.set(response.data);
+			if (!this.initialized) {
+				this.initialized = true;
+				this.listenForChanges();
+			}
 		} catch (err) {
 			logger.error('RolService: failed to load roles', err);
 		}
@@ -55,8 +70,6 @@ export class RolService {
 	}
 
 	private listenForChanges(): void {
-		// Wire-up for future BE SignalR event 'RolesChanged'.
-		// Today BE does not emit it — when it does, the FE auto-refreshes.
 		this.signalr.onEvent('RolesChanged', () => {
 			logger.log('RolService: RolesChanged event received, refreshing');
 			this.refresh();
