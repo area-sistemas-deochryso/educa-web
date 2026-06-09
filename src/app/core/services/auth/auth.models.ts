@@ -5,6 +5,7 @@
 
 /**
  * Available user roles in the system.
+ * @deprecated 2026-06-08 — use Rol from @shared/models/rol.models. Remove after 2026-07-08.
  */
 export type UserRole =
 	| 'Estudiante'

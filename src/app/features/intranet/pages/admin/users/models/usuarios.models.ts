@@ -139,20 +139,16 @@ export interface UsuariosEstadisticas {
 	usuariosInactivos: number;
 }
 
-/**
- * User role type values.
- */
+/** @deprecated 2026-06-08 — use Rol from @shared/models/rol.models. Remove after 2026-07-08. */
 export type RolUsuario = AppUserRoleValue;
 
+/** @deprecated 2026-06-08 — use RolService.all(). Remove after 2026-07-08. */
 export const ROLES_USUARIOS: RolUsuario[] = APP_USER_ROLE_LIST;
 
-/**
- * User role type values for admin management.
- * Incluye todos los roles porque el form de admin permite crear usuarios
- * de cualquier rol.
- */
+/** @deprecated 2026-06-08 — use Rol from @shared/models/rol.models. Remove after 2026-07-08. */
 export type RolUsuarioAdmin = AppUserRoleValue;
 
+/** @deprecated 2026-06-08 — use RolService.all(). Remove after 2026-07-08. */
 export const ROLES_USUARIOS_ADMIN: RolUsuarioAdmin[] = APP_USER_ROLE_LIST;
 
 /**

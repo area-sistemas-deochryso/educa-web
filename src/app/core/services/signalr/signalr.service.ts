@@ -131,6 +131,23 @@ export class SignalRService {
 	}
 	// #endregion
 
+	// #region Public event API
+
+	private readonly pendingHandlers: { event: string; callback: (...args: unknown[]) => void }[] = [];
+
+	/**
+	 * Register a handler for a named SignalR event. If the connection is not yet
+	 * established, the handler is queued and attached on next connect/reconnect.
+	 */
+	onEvent(event: string, callback: (...args: unknown[]) => void): void {
+		this.pendingHandlers.push({ event, callback });
+		if (this.connection?.state === signalR.HubConnectionState.Connected) {
+			this.connection.on(event, callback);
+		}
+	}
+
+	// #endregion
+
 	// #region Helpers privados
 	private registerHandlers(): void {
 		if (!this.connection) return;
@@ -138,6 +155,12 @@ export class SignalRService {
 		// Prevent handler duplication on reconnect
 		this.connection.off('NuevoMensaje');
 		this.connection.off('UserTyping');
+
+		// Re-attach dynamic handlers registered via onEvent()
+		for (const { event, callback } of this.pendingHandlers) {
+			this.connection.off(event);
+			this.connection.on(event, callback);
+		}
 
 		this.connection.on('NuevoMensaje', (raw: Record<string, unknown>) => {
 			const mensaje = this.normalizeMensaje(raw);
