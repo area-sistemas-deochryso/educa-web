@@ -32,7 +32,9 @@ import { provideAnimationsAsync } from '@angular/platform-browser/animations/asy
 import { providePrimeNG } from 'primeng/config';
 import { provideRouter } from '@angular/router';
 import { registerLocaleData } from '@angular/common';
+import { APP_INITIALIZER } from '@angular/core';
 import { AdaptivePreloadingStrategy } from '@core/services/preloading/adaptive-preloading.strategy';
+import { RolService } from '@core/services/roles';
 import { routes } from './app.routes';
 
 // #endregion
@@ -78,6 +80,12 @@ export const appConfig: ApplicationConfig = {
 		{ provide: ErrorHandler, useClass: GlobalErrorHandler },
 		{ provide: LOCALE_ID, useValue: 'es-PE' },
 		provideClientHydration(withEventReplay()),
+		{
+			provide: APP_INITIALIZER,
+			useFactory: (rolService: RolService) => () => rolService.init(),
+			deps: [RolService],
+			multi: true,
+		},
 		{
 			provide: DEBUG_CONFIG,
 			useValue: {

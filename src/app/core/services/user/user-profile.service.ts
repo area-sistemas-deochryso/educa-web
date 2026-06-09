@@ -3,6 +3,8 @@ import { Injectable, inject, signal, computed, effect } from '@angular/core';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { AuthService } from '../auth';
 import { APP_USER_ROLES, AppUserRole } from '@app/shared/constants';
+import { RolService } from '@core/services/roles';
+import { type Rol } from '@data/models';
 
 // #endregion
 // #region Implementation
@@ -10,8 +12,8 @@ import { APP_USER_ROLES, AppUserRole } from '@app/shared/constants';
 	providedIn: 'root',
 })
 export class UserProfileService {
-	// * Derives user identity details from AuthService.
 	private authService = inject(AuthService);
+	private rolService = inject(RolService);
 
 	private readonly _userRole = signal<AppUserRole>('');
 	private readonly _userName = signal('');
@@ -25,25 +27,33 @@ export class UserProfileService {
 	readonly sedeId = this._sedeId.asReadonly();
 	readonly dni = this._dni.asReadonly();
 
+	/** Rol object resolved from the endpoint cache. Undefined if not authenticated or cache empty. */
+	readonly rol = computed<Rol | undefined>(() => this.rolService.byNombre(this._userRole()));
+
 	readonly isAuthenticated = toSignal(this.authService.isAuthenticated$, { initialValue: false });
 
-	// Signal del usuario actual - debe crearse en contexto de inyección
 	private readonly currentUser = toSignal(this.authService.currentUser$, { initialValue: null });
 
+	/** @deprecated 2026-06-08 — use rol()?.nombre or behavioral flags (esStaff, esPasivo, requiereSalon). Remove after 2026-07-08. */
 	readonly isEstudiante = computed(() => this._userRole() === APP_USER_ROLES.Estudiante);
+	/** @deprecated 2026-06-08 — use rol()?.nombre or behavioral flags. Remove after 2026-07-08. */
 	readonly isApoderado = computed(() => this._userRole() === APP_USER_ROLES.Apoderado);
+	/** @deprecated 2026-06-08 — use rol()?.nombre or behavioral flags. Remove after 2026-07-08. */
 	readonly isProfesor = computed(() => this._userRole() === APP_USER_ROLES.Profesor);
+	/** @deprecated 2026-06-08 — use rol()?.nombre or behavioral flags. Remove after 2026-07-08. */
 	readonly isDirector = computed(() => this._userRole() === APP_USER_ROLES.Director);
+	/** @deprecated 2026-06-08 — use rol()?.nombre or behavioral flags. Remove after 2026-07-08. */
 	readonly isAsistenteAdministrativo = computed(
 		() => this._userRole() === APP_USER_ROLES.AsistenteAdministrativo,
 	);
+	/** @deprecated 2026-06-08 — use rol()?.nombre or behavioral flags. Remove after 2026-07-08. */
 	readonly isPromotor = computed(() => this._userRole() === APP_USER_ROLES.Promotor);
+	/** @deprecated 2026-06-08 — use rol()?.nombre or behavioral flags. Remove after 2026-07-08. */
 	readonly isCoordinadorAcademico = computed(
 		() => this._userRole() === APP_USER_ROLES.CoordinadorAcademico,
 	);
 
-	// Roles administrativos: los 4 viven en la tabla Director del BE y comparten
-	// vista/endpoints. INV-AD06/AD08 siguen aplicando a mutaciones server-side.
+	/** @deprecated 2026-06-08 — use rol()?.esStaff. Remove after 2026-07-08. */
 	readonly isAdministrativo = computed(
 		() =>
 			this.isDirector() ||

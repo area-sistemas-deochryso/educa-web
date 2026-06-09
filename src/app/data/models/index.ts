@@ -15,4 +15,6 @@ export * from './notification.models';
 export * from './notificaciones-admin.models';
 export * from './profesor-curso.models';
 export * from './schedule.models';
+export * from './rol.models';
+export * from './rol-lookup.token';
 export * from './user.models';

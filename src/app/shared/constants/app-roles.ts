@@ -1,4 +1,5 @@
 // #region Implementation
+/** @deprecated 2026-06-08 — use RolService.byNombre() or Rol behavioral flags. Remove after 2026-07-08. */
 export const APP_USER_ROLES = {
 	Director: 'Director',
 	Profesor: 'Profesor',
@@ -9,7 +10,9 @@ export const APP_USER_ROLES = {
 	CoordinadorAcademico: 'Coordinador Académico',
 } as const;
 
+/** @deprecated 2026-06-08 — use Rol from @shared/models/rol.models. Remove after 2026-07-08. */
 export type AppUserRole = (typeof APP_USER_ROLES)[keyof typeof APP_USER_ROLES] | '';
+/** @deprecated 2026-06-08 — use Rol from @shared/models/rol.models. Remove after 2026-07-08. */
 export type AppUserRoleValue = Exclude<AppUserRole, ''>;
 
 /**

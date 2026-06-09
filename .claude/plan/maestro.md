@@ -14,8 +14,8 @@
 | xP41 | → Correlation Hub (coord) | F1 ✅ · F2 FE ✅ · F3 BE next | ver P41 |
 | xP22 | → Endurecimiento correos (coord) | F3.FE ✅ awaiting-prod (284) | ver P22 |
 | xP42 | → Casing contratos (coord) | Sin trabajo FE pendiente | ver P42 |
-| xP43 | → Monitoreo Cowork (coord) | F5:5.2 FE ✅ awaiting-prod (285) · F6.1 FE ✅ awaiting-prod (296) · F6.2 FE ✅ awaiting-prod (297) · F6.3 FE ✅ awaiting-prod (303) | ver P43 |
-| xP45 | → Monitoreo incidencias (coord) | P45:F2.2:FE ✅ closed (288) · heatmap blocked by BE BT2-F5 | ver P45 |
+| xP43 | → Monitoreo Cowork (coord) | F5:5.2 FE ✅ awaiting-prod (285) · F6.1 FE ✅ awaiting-prod (296) · F6.2 FE ✅ awaiting-prod (297) · F6.3 FE ✅ awaiting-prod (303) · F6.3 follow-up ✅ awaiting-prod (304) | ver P43 |
+| xP45 | → Monitoreo incidencias (coord) | **All phases ✅ closed** · heatmap split → P46 | ver P45 |
 | xP52 | → Email outbox retry + diagnostics (coord) | F3-F5 FE ✅ awaiting-prod (275, 277, 279) | ver P52 |
 | xP53 | → Duplicate person validation (coord) | F3 FE ✅ awaiting-prod (281) | ver P53 |
 | xP54 | → Attendance grade filter (coord) | F3 FE ✅ closed (282) | ver P54 |
@@ -58,8 +58,7 @@ Planes cross-repo con sub-chats FE pendientes: **41** (Correlation Hub), **42** 
 
 | Pos | Key | Plan | Próximo paso concreto | Repo | Desbloquea | Gate |
 |---|---|---|---|---|---|---|
-| 2 | xP45 | Monitoreo incidencias | F2.2:FE — JOIN endpoint `/full` + vista por evento + tabla Trace | xrepo | 0 (leaf, alto valor usuario) | 🟡 brief 288 |
-| 3 | P10 | Fallbacks críticos | P0.4+ FE (P0.1 ✅ brief 249, P0.2 ✅ brief 262, P0.3 ✅ brief 263) | local | 1 (Plan 10 F1+) | libre |
+| 2 | P10 | Fallbacks críticos | P0.4+ FE (P0.1 ✅ brief 249, P0.2 ✅ brief 262, P0.3 ✅ brief 263) | local | 1 (Plan 10 F1+) | libre |
 
 #### Tier 3 — Independientes (sin downstream)
 
@@ -88,7 +87,7 @@ Planes cross-repo con sub-chats FE pendientes: **41** (Correlation Hub), **42** 
 
 ### 🟣 Verificaciones post-deploy (`/verify <NNN>`)
 
-9 briefs en `awaiting-prod/`:
+13 briefs en `awaiting-prod/`:
 
 | Brief | Scope |
 |-------|-------|
@@ -100,15 +99,19 @@ Planes cross-repo con sub-chats FE pendientes: **41** (Correlation Hub), **42** 
 | `281` | P53 F3 FE: duplicate person confirmation dialog |
 | `284` | P22 F3.FE: outbox tipo fallo UI |
 | `285` | P43 F5.2 FE: error heatmap + telemetry bundle |
+| `296` | P43 F6.1 FE: unified recipient view page |
+| `297` | P43 F6.2 FE: bidirectional links + gap panel |
 | `298` | Heatmap: period selector week/month + calendar grid |
+| `303` | P43 F6.3 FE: gap panel salon filter + export + profile link |
+| `304` | P43 F6.3 FE: student gap profile page |
 
-Movidos a `closed/` (sync 2026-06-01): 119 (WAL DELETE audit), 137 (F5 wrappers), 147 (P43 Chat 2.1 FE), 199 (F-021 deep-link), 213 (login cookie), 134 (P28 Chat 4), 140 (F-018 botón).
+Movidos a `closed/` (sync 2026-06-05): 293 (P45 F3 interceptor), 292 (P38 blacklist tab). Previous (sync 2026-06-01): 119, 137, 147, 199, 213, 134, 140.
 
 ### Notas operativas
 
-- **`running/`**: vacío · **`open/`**: 7 briefs (262×2, 269, 293, 296, 297, 301) · **`awaiting-prod/`**: 9 briefs · **`waiting/`**: vacío · **`troubles/`**: vacío
+- **`running/`**: vacío · **`open/`**: 4 briefs (262×2, 269, 301) · **`awaiting-prod/`**: 13 briefs · **`waiting/`**: vacío · **`troubles/`**: vacío
 - **Último cierre**: 292 (P38 FE blacklist tab CSV + banner) → closed/ 2026-06-04.
-- **Último saneamiento**: 2026-06-03 — sync-maestro: 287/288/289 confirmed closed, 298 added to awaiting-prod, notas updated. Brief 269 (P28 F018) still stale — P28 shipped 2026-05-30.
+- **Último saneamiento**: 2026-06-05 — sync-maestro: 293 confirmed closed, 296/297/303/304 added to awaiting-prod, xP45 removed from cola (✅ done), open count corrected 7→4. Brief 269 (P28 F018) still stale — P28 shipped 2026-05-30.
 
 ---
 

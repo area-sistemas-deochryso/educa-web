@@ -106,20 +106,16 @@ export interface PermisosUsuarioResultado {
 	permisosToken?: string;
 }
 
-/**
- * Role type values.
- */
+/** @deprecated 2026-06-08 — use Rol from @shared/models/rol.models. Remove after 2026-07-08. */
 export type RolTipo = AppUserRoleValue;
 
+/** @deprecated 2026-06-08 — use RolService.all(). Remove after 2026-07-08. */
 export const ROLES_DISPONIBLES: RolTipo[] = APP_USER_ROLE_LIST;
 
-/**
- * Role type values for admin management.
- * Incluye todos los roles porque los UIs de gestión (permisos, usuarios)
- * deben poder asignar permisos/crear usuarios de cualquier rol.
- */
+/** @deprecated 2026-06-08 — use Rol from @shared/models/rol.models. Remove after 2026-07-08. */
 export type RolTipoAdmin = AppUserRoleValue;
 
+/** @deprecated 2026-06-08 — use RolService.all() filtered by esStaff. Remove after 2026-07-08. */
 export const ROLES_DISPONIBLES_ADMIN: RolTipoAdmin[] = APP_USER_ROLE_LIST;
 
 /**
