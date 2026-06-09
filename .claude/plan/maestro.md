@@ -1,6 +1,6 @@
 # Plan Maestro — Orden y Dependencias
 
-> **Inicio**: 2026-04-14 · **Última limpieza**: 2026-06-03
+> **Inicio**: 2026-04-14 · **Última limpieza**: 2026-06-09
 > **Principio rector**: "Features primero — el enforcement y la arquitectura son valiosos solo si soportan funcionalidad real."
 > **Scope**: solo trabajo FE-only. BE-only → [`Educa.API/.claude/plan/maestro.md`](../../../Educa.API/.claude/plan/maestro.md). Cross-repo → [`educa-coord/plans/maestro.md`](../../../educa-coord/plans/maestro.md).
 
@@ -13,12 +13,8 @@
 | F9 | Design Patterns Frontend | Incremental | Al tocar módulos |
 | xP41 | → Correlation Hub (coord) | F1 ✅ · F2 FE ✅ · F3 BE next | ver P41 |
 | xP22 | → Endurecimiento correos (coord) | F3.FE ✅ awaiting-prod (284) | ver P22 |
-| xP42 | → Casing contratos (coord) | Sin trabajo FE pendiente | ver P42 |
 | xP43 | → Monitoreo Cowork (coord) | F5:5.2 FE ✅ awaiting-prod (285) · F6.1 FE ✅ awaiting-prod (296) · F6.2 FE ✅ awaiting-prod (297) · F6.3 FE ✅ awaiting-prod (303) · F6.3 follow-up ✅ awaiting-prod (304) | ver P43 |
-| xP45 | → Monitoreo incidencias (coord) | **All phases ✅ closed** · heatmap split → P46 | ver P45 |
-| xP52 | → Email outbox retry + diagnostics (coord) | F3-F5 FE ✅ awaiting-prod (275, 277, 279) | ver P52 |
 | xP53 | → Duplicate person validation (coord) | F3 FE ✅ awaiting-prod (281) | ver P53 |
-| xP54 | → Attendance grade filter (coord) | F3 FE ✅ closed (282) | ver P54 |
 <!-- INDEX:END -->
 
 ---
@@ -36,7 +32,7 @@
 
 **Archivados**: P51 (Reporte Mensual ✅ `86bab2e0`), F13 (Test Gaps ✅ brief 247), F46/F47/F48 (barridos ✅ 2026-05-15).
 
-Planes cross-repo con sub-chats FE pendientes: **41** (Correlation Hub), **42** (Casing contratos), **43** (Monitoreo Cowork — Chat 5.1 FE ✅, quedan 4.1→6.2). Completados recientemente: **P52** (F3-F5 FE awaiting-prod), **P53** (F3 FE awaiting-prod), **P54** (F3 FE closed). Detalle en sección Referencias cross-repo.
+Planes cross-repo con sub-chats FE pendientes: **41** (Correlation Hub F3-F6), **43** (all phases ✅ awaiting-prod), **50** (F2 brief 305 + F3-F4). Archivados en coord (sync 2026-06-09): P42, P45, P52, P54, P28, P38, P56.
 
 ---
 
@@ -83,7 +79,7 @@ Planes cross-repo con sub-chats FE pendientes: **41** (Correlation Hub), **42** 
 | 10 | F8 | Design Patterns BE | Aplicar al tocar módulos BE | incremental |
 | 11 | F9 | Design Patterns FE | Aplicar al tocar módulos FE | incremental |
 
-**Siguiente accionable**: **xP41** (pos 1) — Correlation Hub F3 BE (persist request lifecycle). **xP45 F2.2:FE** (pos 2) — JOIN `/full` + vista por evento.
+**Siguiente accionable**: **P50 F2** — Barrel-only enforcement (brief 305, coord top priority). Alternativa: **xP41** F3 BE (persist request lifecycle).
 
 ### 🟣 Verificaciones post-deploy (`/verify <NNN>`)
 
@@ -105,13 +101,11 @@ Planes cross-repo con sub-chats FE pendientes: **41** (Correlation Hub), **42** 
 | `303` | P43 F6.3 FE: gap panel salon filter + export + profile link |
 | `304` | P43 F6.3 FE: student gap profile page |
 
-Movidos a `closed/` (sync 2026-06-05): 293 (P45 F3 interceptor), 292 (P38 blacklist tab). Previous (sync 2026-06-01): 119, 137, 147, 199, 213, 134, 140.
-
 ### Notas operativas
 
-- **`running/`**: vacío · **`open/`**: 4 briefs (262×2, 269, 301) · **`awaiting-prod/`**: 13 briefs · **`waiting/`**: vacío · **`troubles/`**: vacío
-- **Último cierre**: 292 (P38 FE blacklist tab CSV + banner) → closed/ 2026-06-04.
-- **Último saneamiento**: 2026-06-05 — sync-maestro: 293 confirmed closed, 296/297/303/304 added to awaiting-prod, xP45 removed from cola (✅ done), open count corrected 7→4. Brief 269 (P28 F018) still stale — P28 shipped 2026-05-30.
+- **`running/`**: vacío · **`open/`**: 4 briefs (262×2, 301, 306) · **`awaiting-prod/`**: 13 briefs · **`waiting/`**: vacío · **`troubles/`**: vacío
+- **Último cierre**: 308 (formal roles consume endpoint) → closed/ 2026-06-09.
+- **Último saneamiento**: 2026-06-09 — cross-repo sync: purged 66 closed briefs (≤129, >30d). Moved 269 to closed (P28 stale). Removed xP42/xP45/xP52/xP54 from INDEX (archived in coord).
 
 ---
 
