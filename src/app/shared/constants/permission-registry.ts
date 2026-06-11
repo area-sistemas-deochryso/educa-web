@@ -38,7 +38,7 @@ export const PERMISOS = {
 	ADMIN_ERROR_LOGS: 'intranet/admin/monitoreo/incidencias/errores',
 	ADMIN_REPORTES_USUARIO: 'intranet/admin/monitoreo/incidencias/reportes',
 	ADMIN_RATE_LIMIT_EVENTS: 'intranet/admin/monitoreo/seguridad/rate-limit',
-	ADMIN_SISTEMA_RUNTIME_HEALTH: 'intranet/admin/monitoreo/sistema/runtime-health',
+	ADMIN_SISTEMA_RUNTIME_HEALTH: 'intranet/admin/sistema/runtime-health',
 	ADMIN_CAMPUS: 'intranet/admin/campus',
 	ADMIN_CURSOS: 'intranet/admin/cursos',
 	ADMIN_EVENTOS_CALENDARIO: 'intranet/admin/eventos-calendario',
