@@ -1,8 +1,7 @@
-import { Vista } from '@core/services';
+import { CapabilityCatalogItem } from '@core/services';
 
-export interface ModuloVistas {
+export interface ModuloCapabilities {
 	nombre: string;
-	vistas: Vista[];
-	seleccionadas: number;
+	capabilities: CapabilityCatalogItem[];
 	total: number;
 }

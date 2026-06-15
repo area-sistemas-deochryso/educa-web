@@ -1,145 +1,129 @@
 import { Injectable, computed, signal } from '@angular/core';
 import { searchMatchAny } from '@core/helpers';
-import { PermisoUsuario, PermisoRol, Vista, RolTipoAdmin, UsuarioBusqueda } from '@core/services';
-import { ModuloVistas } from './permisos-usuarios.models';
+import {
+	CapabilityCatalogItem,
+	RolCapabilityMatrixRow,
+	UsuarioBusqueda,
+	UsuarioCapabilityOverview,
+} from '@core/services';
+import { capitalize, groupBy, sortedEntries } from '@core/helpers';
+import type { ModuloCapabilities } from './permisos-usuarios.models';
 
 @Injectable({ providedIn: 'root' })
 export class PermissionsUsersStore {
-	// #region Estado privado
-	private readonly _permisosUsuario = signal<PermisoUsuario[]>([]);
-	private readonly _permisosRol = signal<PermisoRol[]>([]);
-	private readonly _vistas = signal<Vista[]>([]);
+	// #region Private state
+	private readonly _catalog = signal<CapabilityCatalogItem[]>([]);
+	private readonly _matrixRows = signal<RolCapabilityMatrixRow[]>([]);
 
 	private readonly _loading = signal(false);
 	private readonly _error = signal<string | null>(null);
-	private readonly _searchTerm = signal('');
-	private readonly _filterRol = signal<RolTipoAdmin | null>(null);
-
-	private readonly _dialogVisible = signal(false);
-	private readonly _detailDrawerVisible = signal(false);
-	private readonly _isEditing = signal(false);
-
-	private readonly _selectedPermiso = signal<PermisoUsuario | null>(null);
-	private readonly _selectedUsuarioId = signal<number | null>(null);
-	private readonly _selectedRol = signal<RolTipoAdmin | null>(null);
-	private readonly _selectedVistas = signal<string[]>([]);
 
 	private readonly _usuariosSugeridos = signal<UsuarioBusqueda[]>([]);
+	private readonly _selectedUsuario = signal<UsuarioBusqueda | null>(null);
+	private readonly _selectedRolId = signal<number | null>(null);
+	private readonly _overview = signal<UsuarioCapabilityOverview | null>(null);
 
-	private readonly _modulosVistas = signal<ModuloVistas[]>([]);
+	private readonly _dialogVisible = signal(false);
+	private readonly _grantIds = signal<number[]>([]);
+	private readonly _denyIds = signal<number[]>([]);
+
 	private readonly _activeModuloIndex = signal(0);
-	private readonly _vistasBusqueda = signal('');
+	private readonly _capBusqueda = signal('');
 	// #endregion
 
-	// #region Lecturas públicas (readonly)
-	readonly permisosUsuario = this._permisosUsuario.asReadonly();
-	readonly permisosRol = this._permisosRol.asReadonly();
-	readonly vistas = this._vistas.asReadonly();
-
+	// #region Public readonly
+	readonly catalog = this._catalog.asReadonly();
+	readonly matrixRows = this._matrixRows.asReadonly();
 	readonly loading = this._loading.asReadonly();
 	readonly error = this._error.asReadonly();
-	readonly searchTerm = this._searchTerm.asReadonly();
-	readonly filterRol = this._filterRol.asReadonly();
-
-	readonly dialogVisible = this._dialogVisible.asReadonly();
-	readonly detailDrawerVisible = this._detailDrawerVisible.asReadonly();
-	readonly isEditing = this._isEditing.asReadonly();
-
-	readonly selectedPermiso = this._selectedPermiso.asReadonly();
-	readonly selectedUsuarioId = this._selectedUsuarioId.asReadonly();
-	readonly selectedRol = this._selectedRol.asReadonly();
-	readonly selectedVistas = this._selectedVistas.asReadonly();
-
 	readonly usuariosSugeridos = this._usuariosSugeridos.asReadonly();
-
-	readonly modulosVistas = this._modulosVistas.asReadonly();
+	readonly selectedUsuario = this._selectedUsuario.asReadonly();
+	readonly selectedRolId = this._selectedRolId.asReadonly();
+	readonly overview = this._overview.asReadonly();
+	readonly dialogVisible = this._dialogVisible.asReadonly();
+	readonly grantIds = this._grantIds.asReadonly();
+	readonly denyIds = this._denyIds.asReadonly();
 	readonly activeModuloIndex = this._activeModuloIndex.asReadonly();
-	readonly vistasBusqueda = this._vistasBusqueda.asReadonly();
+	readonly capBusqueda = this._capBusqueda.asReadonly();
 	// #endregion
 
 	// #region Computed
-	readonly vm = computed(() => ({
-		permisosUsuario: this._permisosUsuario(),
-		loading: this._loading(),
-		error: this._error(),
-		searchTerm: this._searchTerm(),
-		filterRol: this._filterRol(),
-		dialogVisible: this._dialogVisible(),
-		detailDrawerVisible: this._detailDrawerVisible(),
-		isEditing: this._isEditing(),
-		selectedPermiso: this._selectedPermiso(),
-		filteredPermisos: this.filteredPermisos(),
-	}));
+	readonly roles = computed(() =>
+		this._matrixRows().map((r) => ({ label: r.rolNombre, value: r.rolId })),
+	);
 
-	readonly filteredPermisos = computed(() => {
-		let permisos = this._permisosUsuario();
-		const search = this._searchTerm();
-		const filtroRol = this._filterRol();
+	readonly moduloCapabilities = computed<ModuloCapabilities[]>(() => {
+		const catalog = this._catalog();
+		if (!catalog.length) return [];
 
-		if (search) {
-			permisos = permisos.filter((p) =>
-				searchMatchAny([p.nombreUsuario, p.usuarioId.toString()], search),
-			);
-		}
-
-		if (filtroRol) {
-			permisos = permisos.filter((p) => p.rol === filtroRol);
-		}
-
-		return permisos;
+		const grouped = groupBy(catalog, (c) => capitalize(c.modulo));
+		return sortedEntries(grouped).map(([nombre, caps]) => ({
+			nombre,
+			capabilities: caps.sort((a, b) => a.orden - b.orden || a.nombre.localeCompare(b.nombre)),
+			total: caps.length,
+		}));
 	});
 
-	// Computed - Vistas filtradas por búsqueda en modal de edición
-	readonly vistasFiltradas = computed(() => {
-		const modulos = this._modulosVistas();
-		const busqueda = this._vistasBusqueda();
+	readonly capsFiltradas = computed(() => {
+		const modulos = this.moduloCapabilities();
+		const busqueda = this._capBusqueda();
 		const activeIndex = this._activeModuloIndex();
 
 		if (activeIndex >= modulos.length) return [];
-
 		const modulo = modulos[activeIndex];
-		if (!busqueda) return modulo.vistas;
+		if (!busqueda) return modulo.capabilities;
 
-		return modulo.vistas.filter((v) => searchMatchAny([v.nombre, v.ruta], busqueda));
+		return modulo.capabilities.filter((c) =>
+			searchMatchAny([c.nombre, c.codigo, c.descripcion ?? ''], busqueda),
+		);
 	});
 
-	// Computed - Check if all module vistas are selected
-	readonly isAllModuloSelected = computed(() => {
-		const modulos = this._modulosVistas();
-		const activeIndex = this._activeModuloIndex();
-		if (activeIndex >= modulos.length) return false;
-
-		const modulo = modulos[activeIndex];
-		const current = this._selectedVistas();
-		return modulo.vistas.every((v) => current.includes(v.ruta));
+	readonly effectiveCaps = computed(() => {
+		const overview = this._overview();
+		if (!overview) return new Set<number>();
+		const effective = new Set(overview.inheritedCapabilityIds);
+		for (const id of this._grantIds()) effective.add(id);
+		for (const id of this._denyIds()) effective.delete(id);
+		return effective;
 	});
+
+	readonly overrideSummary = computed(() => ({
+		inherited: this._overview()?.inheritedCapabilityIds.length ?? 0,
+		grants: this._grantIds().length,
+		denies: this._denyIds().length,
+		effective: this.effectiveCaps().size,
+	}));
+
+	readonly vm = computed(() => ({
+		catalog: this._catalog(),
+		loading: this._loading(),
+		error: this._error(),
+		usuariosSugeridos: this._usuariosSugeridos(),
+		selectedUsuario: this._selectedUsuario(),
+		selectedRolId: this._selectedRolId(),
+		overview: this._overview(),
+		dialogVisible: this._dialogVisible(),
+		grantIds: this._grantIds(),
+		denyIds: this._denyIds(),
+		roles: this.roles(),
+		moduloCapabilities: this.moduloCapabilities(),
+		activeModuloIndex: this._activeModuloIndex(),
+		capBusqueda: this._capBusqueda(),
+		capsFiltradas: this.capsFiltradas(),
+		effectiveCaps: this.effectiveCaps(),
+		overrideSummary: this.overrideSummary(),
+	}));
 	// #endregion
 
-	// #region Comandos de mutación
-	setPermisosUsuario(permisos: PermisoUsuario[]): void {
-		this._permisosUsuario.set(permisos);
+	// #region Data commands
+	setCatalog(catalog: CapabilityCatalogItem[]): void {
+		this._catalog.set(catalog);
 	}
 
-	/** Mutación quirúrgica: eliminar 1 permiso usuario */
-	removePermisoUsuario(id: number): void {
-		this._permisosUsuario.update((list) => list.filter((p) => p.id !== id));
+	setMatrixRows(rows: RolCapabilityMatrixRow[]): void {
+		this._matrixRows.set(rows);
 	}
 
-	/** Mutación quirúrgica: re-agregar 1 permiso usuario (rollback de delete) */
-	addPermisoUsuario(permiso: PermisoUsuario): void {
-		this._permisosUsuario.update((list) => [permiso, ...list]);
-	}
-
-	setPermisosRol(permisos: PermisoRol[]): void {
-		this._permisosRol.set(permisos);
-	}
-
-	setVistas(vistas: Vista[]): void {
-		this._vistas.set(vistas);
-	}
-	// #endregion
-
-	// #region Comandos de UI
 	setLoading(loading: boolean): void {
 		this._loading.set(loading);
 	}
@@ -152,124 +136,77 @@ export class PermissionsUsersStore {
 		this._error.set(null);
 	}
 
-	setSearchTerm(term: string): void {
-		this._searchTerm.set(term);
-	}
-
-	setFilterRol(rol: RolTipoAdmin | null): void {
-		this._filterRol.set(rol);
-	}
-
-	clearFilters(): void {
-		this._searchTerm.set('');
-		this._filterRol.set(null);
-	}
-	// #endregion
-
-	// #region Comandos de diálogos
-	setDialogVisible(visible: boolean): void {
-		this._dialogVisible.set(visible);
-	}
-
-	setDetailDrawerVisible(visible: boolean): void {
-		this._detailDrawerVisible.set(visible);
-	}
-
-	setIsEditing(editing: boolean): void {
-		this._isEditing.set(editing);
-	}
-	// #endregion
-
-	// #region Comandos de formulario
-	setSelectedPermiso(permiso: PermisoUsuario | null): void {
-		this._selectedPermiso.set(permiso);
-	}
-
-	setSelectedUsuarioId(id: number | null): void {
-		this._selectedUsuarioId.set(id);
-	}
-
-	setSelectedRol(rol: RolTipoAdmin | null): void {
-		this._selectedRol.set(rol);
-	}
-
-	setSelectedVistas(vistas: string[]): void {
-		this._selectedVistas.set(vistas);
-	}
-
-	toggleVista(ruta: string): void {
-		const current = this._selectedVistas();
-		if (current.includes(ruta)) {
-			this._selectedVistas.set(current.filter((v) => v !== ruta));
-		} else {
-			this._selectedVistas.set([...current, ruta]);
-		}
-	}
-
-	toggleAllVistasModulo(): void {
-		const modulos = this._modulosVistas();
-		const activeIndex = this._activeModuloIndex();
-		if (activeIndex >= modulos.length) return;
-
-		const modulo = modulos[activeIndex];
-		const moduloRutas = modulo.vistas.map((v) => v.ruta);
-		const current = this._selectedVistas();
-
-		const allSelected = moduloRutas.every((r) => current.includes(r));
-
-		if (allSelected) {
-			// Deseleccionar todas
-			this._selectedVistas.set(current.filter((r) => !moduloRutas.includes(r)));
-		} else {
-			// Seleccionar todas
-			const nuevas = moduloRutas.filter((r) => !current.includes(r));
-			this._selectedVistas.set([...current, ...nuevas]);
-		}
-	}
-	// #endregion
-
-	// #region Comandos de autocompletado y módulos
 	setUsuariosSugeridos(usuarios: UsuarioBusqueda[]): void {
 		this._usuariosSugeridos.set(usuarios);
 	}
 
-	// Comandos - Module tabs
-	setModulosVistas(modulos: ModuloVistas[]): void {
-		this._modulosVistas.set(modulos);
+	setSelectedUsuario(usuario: UsuarioBusqueda | null): void {
+		this._selectedUsuario.set(usuario);
 	}
 
-	updateModuloCount(): void {
-		const modulos = this._modulosVistas();
-		const selected = this._selectedVistas();
+	setSelectedRolId(rolId: number | null): void {
+		this._selectedRolId.set(rolId);
+	}
 
-		const updated = modulos.map((m) => ({
-			...m,
-			seleccionadas: m.vistas.filter((v) => selected.includes(v.ruta)).length,
-		}));
+	setOverview(overview: UsuarioCapabilityOverview | null): void {
+		this._overview.set(overview);
+		if (overview) {
+			this._grantIds.set([...overview.grantIds]);
+			this._denyIds.set([...overview.denyIds]);
+		}
+	}
+	// #endregion
 
-		this._modulosVistas.set(updated);
+	// #region Dialog commands
+	openDialog(): void {
+		this._dialogVisible.set(true);
+	}
+
+	closeDialog(): void {
+		this._dialogVisible.set(false);
+		this._activeModuloIndex.set(0);
+		this._capBusqueda.set('');
 	}
 
 	setActiveModuloIndex(index: number): void {
 		this._activeModuloIndex.set(index);
 	}
 
-	setVistasBusqueda(term: string): void {
-		this._vistasBusqueda.set(term);
+	setCapBusqueda(term: string): void {
+		this._capBusqueda.set(term);
+	}
+	// #endregion
+
+	// #region Grant/Deny toggle
+	toggleGrant(capId: number): void {
+		const grants = this._grantIds();
+		if (grants.includes(capId)) {
+			this._grantIds.set(grants.filter((id) => id !== capId));
+		} else {
+			this._grantIds.set([...grants, capId]);
+			this._denyIds.update((d) => d.filter((id) => id !== capId));
+		}
+	}
+
+	toggleDeny(capId: number): void {
+		const denies = this._denyIds();
+		if (denies.includes(capId)) {
+			this._denyIds.set(denies.filter((id) => id !== capId));
+		} else {
+			this._denyIds.set([...denies, capId]);
+			this._grantIds.update((g) => g.filter((id) => id !== capId));
+		}
 	}
 	// #endregion
 
 	// #region Reset
-	resetDialogState(): void {
-		this._selectedPermiso.set(null);
-		this._selectedUsuarioId.set(null);
-		this._selectedRol.set(null);
-		this._selectedVistas.set([]);
+	resetSelection(): void {
+		this._selectedUsuario.set(null);
+		this._selectedRolId.set(null);
+		this._overview.set(null);
+		this._grantIds.set([]);
+		this._denyIds.set([]);
 		this._usuariosSugeridos.set([]);
-		this._modulosVistas.set([]);
-		this._activeModuloIndex.set(0);
-		this._vistasBusqueda.set('');
-		this._isEditing.set(false);
 	}
 	// #endregion
 }

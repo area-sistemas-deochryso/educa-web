@@ -1,27 +1,20 @@
-import { ChangeDetectionStrategy, Component, inject, OnInit, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, inject, OnInit } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
-import { calcPageFromLazyEvent } from '@core/helpers';
 
 import { TableModule } from 'primeng/table';
 import { ButtonModule } from 'primeng/button';
 import { DialogModule } from 'primeng/dialog';
 import { TooltipModule } from 'primeng/tooltip';
 import { TagModule } from 'primeng/tag';
-
 import { InputTextModule } from 'primeng/inputtext';
 import { CheckboxModule } from 'primeng/checkbox';
 import { DrawerModule } from 'primeng/drawer';
-import { SelectModule } from 'primeng/select';
-import { ConfirmDialogModule } from 'primeng/confirmdialog';
-import { ConfirmationService } from 'primeng/api';
 
-import { UiMappingService } from '@intranet-shared/services';
 import { PageHeaderComponent } from '@intranet-shared/components';
-import { buildDeletePermisoRolMessage } from '@app/shared/constants';
 
 import { PermissionsRolesFacade } from './services';
-import type { PermisoRol, RolTipoAdmin } from '@core/services';
+import type { RolCapabilityMatrixRow } from '@core/services';
 
 @Component({
 	selector: 'app-permissions-roles',
@@ -37,80 +30,34 @@ import type { PermisoRol, RolTipoAdmin } from '@core/services';
 		InputTextModule,
 		CheckboxModule,
 		DrawerModule,
-		SelectModule,
-		ConfirmDialogModule,
 		PageHeaderComponent,
 	],
-	providers: [ConfirmationService],
 	templateUrl: './permisos-roles.component.html',
 	styleUrl: './permisos-roles.component.scss',
 	changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class PermissionsRolesComponent implements OnInit {
-	// #region Dependencias
 	private facade = inject(PermissionsRolesFacade);
-	private confirmationService = inject(ConfirmationService);
-	readonly uiMapping = inject(UiMappingService);
-	// #endregion
-
-	// #region Estado del facade
 	readonly vm = this.facade.vm;
-	readonly rolesDisponibles = this.facade.rolesDisponibles;
-	// #endregion
 
-	// #region Estado local
-	/** Guard para ignorar el onLazyLoad inicial (ngOnInit ya carga los datos) */
-	private initialLoadDone = signal(false);
-	// #endregion
-
-	// #region Lifecycle
 	ngOnInit(): void {
 		this.facade.loadAll();
 	}
-	// #endregion
-
-	// #region Event handlers
-	onLazyLoad(event: { first?: number; rows?: number }): void {
-		if (!this.initialLoadDone()) {
-			this.initialLoadDone.set(true);
-			return;
-		}
-		const { page, rows } = calcPageFromLazyEvent(event);
-		this.facade.loadPage(page, rows);
-	}
 
 	refresh(): void {
-		this.facade.loadAll();
+		this.facade.refresh();
 	}
 
-	openNew(): void {
-		this.facade.openNewDialog();
+	editRole(row: RolCapabilityMatrixRow): void {
+		this.facade.openEditDialog(row);
 	}
 
-	editPermiso(permiso: PermisoRol): void {
-		this.facade.openEditDialog(permiso);
+	saveCapabilities(): void {
+		this.facade.saveCapabilities();
 	}
 
-	savePermiso(): void {
-		this.facade.savePermiso();
-	}
-
-	deletePermiso(permiso: PermisoRol): void {
-		this.facade.openConfirmDialog();
-
-		this.confirmationService.confirm({
-			message: buildDeletePermisoRolMessage(permiso.rol),
-			header: 'Confirmar Eliminación',
-			icon: 'pi pi-exclamation-triangle',
-			accept: () => {
-				if (this.vm().loading) return;
-				this.facade.delete(permiso);
-			},
-		});
-	}
-
-	openDetail(permiso: PermisoRol): void {
-		this.facade.openDetail(permiso);
+	openDetail(row: RolCapabilityMatrixRow): void {
+		this.facade.openDetail(row);
 	}
 
 	closeDetail(): void {
@@ -121,28 +68,22 @@ export class PermissionsRolesComponent implements OnInit {
 		this.facade.editFromDetail();
 	}
 
-	toggleVista(ruta: string): void {
-		this.facade.toggleVista(ruta);
+	toggleCapability(capId: number): void {
+		this.facade.toggleCapability(capId);
 	}
 
-	toggleAllVistasModulo(): void {
-		this.facade.toggleAllVistasModulo();
-	}
-
-	onSelectedRolChange(rol: RolTipoAdmin | null): void {
-		this.facade.setSelectedRol(rol);
+	toggleAllCapabilitiesModulo(): void {
+		this.facade.toggleAllCapabilitiesModulo();
 	}
 
 	onActiveModuloIndexChange(index: number): void {
 		this.facade.setActiveModuloIndex(index);
 	}
 
-	onVistasBusquedaChange(term: string): void {
-		this.facade.setVistasBusqueda(term);
+	onCapBusquedaChange(term: string): void {
+		this.facade.setCapBusqueda(term);
 	}
-	// #endregion
 
-	// #region Dialog sync handlers
 	onDialogVisibleChange(visible: boolean): void {
 		if (!visible) {
 			this.facade.closeDialog();
@@ -154,9 +95,4 @@ export class PermissionsRolesComponent implements OnInit {
 			this.facade.closeDetail();
 		}
 	}
-
-	onConfirmDialogHide(): void {
-		this.facade.closeConfirmDialog();
-	}
-	// #endregion
 }

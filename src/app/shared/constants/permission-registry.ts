@@ -76,9 +76,20 @@ export const PERMISOS = {
 } as const;
 
 export type PermisoPath = (typeof PERMISOS)[keyof typeof PERMISOS];
+export type PermisoKey = keyof typeof PERMISOS;
 
 /**
  * Todas las rutas de permiso como array.
  * Útil para validación o auditoría.
  */
 export const ALL_PERMISOS: PermisoPath[] = Object.values(PERMISOS);
+
+/** Capability code → route path. Codes without a route entry are BE-only (ignored by FE nav). */
+export const CAPABILITY_TO_ROUTE: ReadonlyMap<string, PermisoPath> = new Map(
+	Object.entries(PERMISOS).map(([key, route]) => [key, route]),
+);
+
+/** Route path → capability code. Used by the guard to reverse-lookup a route. */
+export const ROUTE_TO_CAPABILITY: ReadonlyMap<string, PermisoKey> = new Map(
+	Object.entries(PERMISOS).map(([key, route]) => [route, key as PermisoKey]),
+);

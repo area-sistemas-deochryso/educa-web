@@ -1,6 +1,5 @@
 ﻿// #region Imports
 import { AuthUser } from '../auth/auth.models';
-import { AppUserRoleValue } from '@app/shared/constants';
 
 /**
  * Storage models for local and session persisted data.
@@ -43,19 +42,13 @@ export interface AttendanceMonthData {
 }
 
 /**
- * Permissions data stored for a user.
+ * Permissions data stored for a user (capabilities format).
  */
 export interface PermisosStorageData {
-	/** User id. */
-	usuarioId: number;
-	/** Role name. */
-	rol: AppUserRoleValue;
-	/** Allowed view keys. */
-	vistasPermitidas: string[];
-	/** True when permissions are customized. */
-	tienePermisosPersonalizados: boolean;
-	/** JWT token that encodes permissions expiration. */
-	permisosToken?: string;
+	/** Effective capability codes from BE. */
+	capabilities: string[];
+	/** Epoch ms when capabilities were fetched — used for TTL refresh. */
+	timestamp: number;
 }
 
 /** Re-export AuthUser for convenience. */

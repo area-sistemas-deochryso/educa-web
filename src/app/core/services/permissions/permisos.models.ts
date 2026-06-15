@@ -120,6 +120,7 @@ export const ROLES_DISPONIBLES_ADMIN: RolTipoAdmin[] = APP_USER_ROLE_LIST;
 
 /**
  * Vistas stats DTO.
+ * @deprecated Legacy — vistas endpoints removed. Use capability catalog.
  */
 export interface VistasEstadisticas {
 	totalVistas: number;
@@ -128,6 +129,57 @@ export interface VistasEstadisticas {
 	totalModulos: number;
 	modulos: string[];
 }
+
+// #region Capability DTOs (P57)
+
+export interface CapabilityCatalogItem {
+	id: number;
+	codigo: string;
+	nombre: string;
+	modulo: string;
+	descripcion?: string;
+	orden: number;
+	estado: boolean | number | null;
+}
+
+export interface CreateCapabilityRequest {
+	codigo: string;
+	nombre: string;
+	modulo: string;
+	descripcion?: string;
+}
+
+export interface UpdateCapabilityRequest {
+	nombre: string;
+	modulo: string;
+	descripcion?: string;
+	orden?: number;
+}
+
+export interface RolCapabilityMatrixRow {
+	rolId: number;
+	rolNombre: string;
+	capabilityIds: number[];
+}
+
+export interface SetRolCapabilitiesRequest {
+	capabilityIds: number[];
+}
+
+export interface UsuarioCapabilityOverview {
+	entityId: number;
+	rolId: number;
+	inheritedCapabilityIds: number[];
+	grantIds: number[];
+	denyIds: number[];
+}
+
+export interface SetUsuarioCapabilitiesRequest {
+	grants: number[];
+	denies: number[];
+}
+
+// #endregion
 
 /**
  * User search result item.

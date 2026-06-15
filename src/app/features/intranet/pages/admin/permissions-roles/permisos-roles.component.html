@@ -3,8 +3,8 @@
 	<!-- #region Header -->
 	<app-page-header
 		icon="pi pi-id-card"
-		title="Permisos por Rol"
-		subtitle="Configure las vistas permitidas para cada rol del sistema"
+		title="Capabilities por Rol"
+		subtitle="Configure las capabilities permitidas para cada rol del sistema"
 	>
 		<button
 			pButton
@@ -12,16 +12,6 @@
 			icon="pi pi-refresh"
 			class="p-button-outlined"
 			(click)="refresh()"
-		></button>
-		<button
-			pButton
-			label="Nuevo Rol"
-			icon="pi pi-plus"
-			class="p-button-success"
-			(click)="openNew()"
-			[disabled]="vm().rolesNoConfigurados.length === 0"
-			pTooltip="Todos los roles ya tienen permisos configurados"
-			[tooltipDisabled]="vm().rolesNoConfigurados.length > 0"
 		></button>
 	</app-page-header>
 	<!-- #endregion -->
@@ -37,9 +27,9 @@
 	<section class="stats-section">
 		<div class="stat-card">
 			<div class="stat-content">
-				<span class="stat-label">Roles Configurados</span>
+				<span class="stat-label">Roles</span>
 				<span class="stat-value">{{ vm().estadisticas.totalRoles }}</span>
-				<span class="stat-sublabel">de {{ rolesDisponibles.length }} disponibles</span>
+				<span class="stat-sublabel">en el sistema</span>
 			</div>
 			<div class="stat-icon roles">
 				<i class="pi pi-id-card"></i>
@@ -48,20 +38,9 @@
 
 		<div class="stat-card">
 			<div class="stat-content">
-				<span class="stat-label">Roles Pendientes</span>
-				<span class="stat-value">{{ vm().rolesNoConfigurados.length }}</span>
-				<span class="stat-sublabel">sin configurar</span>
-			</div>
-			<div class="stat-icon pending">
-				<i class="pi pi-clock"></i>
-			</div>
-		</div>
-
-		<div class="stat-card">
-			<div class="stat-content">
-				<span class="stat-label">Modulos</span>
+				<span class="stat-label">Módulos</span>
 				<span class="stat-value">{{ vm().estadisticas.totalModulos }}</span>
-				<span class="stat-sublabel">modulos del sistema</span>
+				<span class="stat-sublabel">categorías</span>
 			</div>
 			<div class="stat-icon modules">
 				<i class="pi pi-th-large"></i>
@@ -70,12 +49,12 @@
 
 		<div class="stat-card">
 			<div class="stat-content">
-				<span class="stat-label">Vistas Totales</span>
-				<span class="stat-value">{{ vm().estadisticas.totalVistas }}</span>
-				<span class="stat-sublabel">vistas disponibles</span>
+				<span class="stat-label">Capabilities</span>
+				<span class="stat-value">{{ vm().estadisticas.totalCapabilities }}</span>
+				<span class="stat-sublabel">disponibles</span>
 			</div>
 			<div class="stat-icon views">
-				<i class="pi pi-eye"></i>
+				<i class="pi pi-shield"></i>
 			</div>
 		</div>
 	</section>
@@ -84,64 +63,44 @@
 	<!-- #region Table -->
 	<section class="table-section">
 		<p-table
-			[value]="vm().permisosRol"
-			[lazy]="true"
-			(onLazyLoad)="onLazyLoad($any($event))"
-			[paginator]="true"
-			[rows]="vm().pageSize"
-			[totalRecords]="vm().totalRecords"
-			[rowsPerPageOptions]="[5, 10, 25]"
-			[showCurrentPageReport]="true"
+			[value]="vm().matrixRows"
 			[loading]="vm().loading"
-			currentPageReportTemplate="Mostrando {first} a {last} de {totalRecords} roles"
 			class="p-datatable-sm"
 		>
 				<ng-template #header>
 					<tr>
-						<th style="width: 120px" pSortableColumn="rol">
-							ROL <p-sortIcon field="rol" />
-						</th>
-						<th style="width: 100px">VISTAS</th>
-						<th style="width: 100px">MODULOS</th>
-						<th style="width: 120px">PERMISOS</th>
-						<th>DESCRIPCION</th>
-						<th style="width: 140px">ACCIONES</th>
+						<th style="width: 160px">ROL</th>
+						<th style="width: 100px">CAPABILITIES</th>
+						<th>DESCRIPCIÓN</th>
+						<th style="width: 120px">ACCIONES</th>
 					</tr>
 				</ng-template>
 
-				<ng-template #body let-permiso>
+				<ng-template #body let-row>
 					<tr>
 						<td>
-							<p-tag [value]="permiso.rol" styleClass="tag-neutral" />
+							<p-tag [value]="row.rolNombre" styleClass="tag-neutral" />
 						</td>
 						<td class="text-center">
-							<span class="count-badge">{{ permiso.vistas.length }}</span>
-						</td>
-						<td class="text-center">
-							<span class="count-badge secondary">{{
-								uiMapping.getModulosCount(permiso.vistas)
-							}}</span>
-						</td>
-						<td class="text-center">
-							<span class="permisos-badge"> <i class="pi pi-id-card"></i> Rol </span>
+							<span class="count-badge">{{ row.capabilityIds.length }}</span>
 						</td>
 						<td>
 							<span class="role-description">
-								@switch (permiso.rol) {
+								@switch (row.rolNombre) {
 									@case ('Director') {
 										Acceso completo al sistema administrativo
 									}
 									@case ('Asistente Administrativo') {
-										Apoyo en gestion administrativa y operativa
+										Apoyo en gestión administrativa y operativa
 									}
 									@case ('Promotor') {
 										Promotor de la institución
 									}
 									@case ('Profesor') {
-										Gestion de clases, asistencia y calificaciones
+										Gestión de clases, asistencia y calificaciones
 									}
 									@case ('Estudiante') {
-										Acceso a informacion academica personal
+										Acceso a información académica personal
 									}
 									@default {
 										Rol del sistema
@@ -157,7 +116,7 @@
 									class="p-button-rounded p-button-text p-button-secondary"
 									pTooltip="Ver detalles"
 									aria-label="Ver detalles"
-									(click)="openDetail(permiso)"
+									(click)="openDetail(row)"
 								></button>
 								<button
 									pButton
@@ -165,15 +124,7 @@
 									class="p-button-rounded p-button-text p-button-info"
 									pTooltip="Editar"
 									aria-label="Editar"
-									(click)="editPermiso(permiso)"
-								></button>
-								<button
-									pButton
-									icon="pi pi-trash"
-									class="p-button-rounded p-button-text p-button-danger"
-									pTooltip="Eliminar"
-									aria-label="Eliminar"
-									(click)="deletePermiso(permiso)"
+									(click)="editRole(row)"
 								></button>
 							</div>
 						</td>
@@ -182,14 +133,10 @@
 
 				<ng-template #emptymessage>
 					<tr>
-						<td colspan="6" class="empty-message">
+						<td colspan="4" class="empty-message">
 							<div class="empty-state">
 								<i class="pi pi-inbox"></i>
-								<p>No hay permisos configurados</p>
-								<span
-									>Haga clic en "Nuevo Rol" para comenzar a configurar
-									permisos</span
-								>
+								<p>No se encontraron roles</p>
 							</div>
 						</td>
 					</tr>
@@ -209,47 +156,39 @@
 >
 	<ng-template pTemplate="header">
 		<div class="drawer-header">
-			<span>Permisos del Rol: {{ vm().selectedPermiso?.rol }}</span>
+			<span>Capabilities: {{ vm().selectedRow?.rolNombre }}</span>
 		</div>
 	</ng-template>
 
-	@if (vm().selectedPermiso) {
+	@if (vm().selectedRow) {
 		<div class="detail-content">
-			<!-- Info Summary -->
 			<div class="detail-summary">
 				<div class="summary-item">
 					<span class="summary-label">Rol</span>
-					<p-tag [value]="vm().selectedPermiso?.rol || ''" styleClass="tag-neutral" />
+					<p-tag [value]="vm().selectedRow?.rolNombre || ''" styleClass="tag-neutral" />
 				</div>
 				<div class="summary-item">
-					<span class="summary-label">Vistas Permitidas</span>
-					<span class="summary-value">{{ vm().selectedPermiso?.vistas?.length }}</span>
-				</div>
-				<div class="summary-item">
-					<span class="summary-label">Modulos</span>
-					<span class="summary-value">{{
-						uiMapping.getModulosCount(vm().selectedPermiso?.vistas || [])
-					}}</span>
+					<span class="summary-label">Capabilities</span>
+					<span class="summary-value">{{ vm().selectedRow?.capabilityIds?.length }}</span>
 				</div>
 			</div>
 
-			<!-- Modules and Views -->
 			<div class="detail-modules">
-				<h3>Modulos y Vistas</h3>
-				@for (modulo of vm().moduloVistasForDetail; track modulo.nombre) {
+				<h3>Módulos y Capabilities</h3>
+				@for (modulo of vm().moduloCapabilitiesForDetail; track modulo.nombre) {
 					<div class="module-group">
 						<div class="module-header">
 							<i class="pi pi-folder"></i>
 							<span class="module-name">{{ modulo.nombre }}</span>
-							<span class="module-count">{{ modulo.vistas.length }} vistas</span>
+							<span class="module-count">{{ modulo.capabilities.length }}</span>
 						</div>
 						<div class="module-vistas">
-							@for (vista of modulo.vistas; track vista.id) {
+							@for (cap of modulo.capabilities; track cap.id) {
 								<div class="vista-item">
 									<i class="pi pi-check-circle"></i>
 									<div class="vista-info">
-										<span class="vista-nombre">{{ vista.nombre }}</span>
-										<span class="vista-ruta">{{ vista.ruta }}</span>
+										<span class="vista-nombre">{{ cap.nombre }}</span>
+										<span class="vista-ruta">{{ cap.codigo }}</span>
 									</div>
 								</div>
 							}
@@ -269,7 +208,7 @@
 			></button>
 			<button
 				pButton
-				label="Editar Permisos"
+				label="Editar Capabilities"
 				icon="pi pi-pencil"
 				class="p-button-primary"
 				(click)="editFromDetail()"
@@ -283,7 +222,7 @@
 <p-dialog
 	[visible]="vm().dialogVisible"
 	(visibleChange)="onDialogVisibleChange($event)"
-	[header]="vm().isEditing ? 'Editar Permisos - ' + vm().selectedRol : 'Nuevo Permiso por Rol'"
+	[header]="'Editar Capabilities - ' + (vm().selectedRow?.rolNombre || '')"
 	[modal]="true"
 	[style]="{ width: '900px', maxHeight: '90vh' }"
 	[draggable]="false"
@@ -291,39 +230,20 @@
 	class="edit-permisos-dialog"
 >
 	<div class="dialog-content">
-		<!-- Role Info Header -->
-		@if (vm().isEditing) {
-			<div class="dialog-role-header">
-				<div class="role-info">
-					<i class="pi pi-id-card"></i>
-					<p-tag [value]="vm().selectedRol || ''" styleClass="tag-neutral" />
-				</div>
-				<div class="vistas-count">
-					<i class="pi pi-check"></i> {{ vm().vistasCountLabel }}
-				</div>
+		<div class="dialog-role-header">
+			<div class="role-info">
+				<i class="pi pi-id-card"></i>
+				<p-tag [value]="vm().selectedRow?.rolNombre || ''" styleClass="tag-neutral" />
 			</div>
-		} @else {
-			<div class="new-role-form">
-				<div class="field">
-					<label for="rol">Seleccione el Rol</label>
-					<p-select
-						id="rol"
-						[options]="vm().rolesSelectOptions"
-						[ngModel]="vm().selectedRol"
-						(ngModelChange)="onSelectedRolChange($event)"
-						placeholder="Seleccione un rol"
-						[style]="{ width: '100%' }"
-						appendTo="body"
-					/>
-				</div>
+			<div class="vistas-count">
+				<i class="pi pi-check"></i> {{ vm().capsCountLabel }}
 			</div>
-		}
+		</div>
 
-		<!-- Module Tabs -->
-		@if (vm().modulosVistas.length > 0) {
+		@if (vm().modulosCapabilities.length > 0) {
 			<div class="modules-tabs-container">
 				<div class="modules-tabs">
-					@for (modulo of vm().modulosVistas; track modulo.nombre; let i = $index) {
+					@for (modulo of vm().modulosCapabilities; track modulo.nombre; let i = $index) {
 						<button
 							class="module-tab"
 							[class.active]="vm().activeModuloIndex === i"
@@ -340,20 +260,19 @@
 					}
 				</div>
 
-				<!-- Vistas Content -->
 				<div class="vistas-content">
 					<div class="vistas-header">
 						<label class="select-all">
 							<p-checkbox
 								[ngModel]="vm().isAllModuloSelected"
-								(ngModelChange)="toggleAllVistasModulo()"
+								(ngModelChange)="toggleAllCapabilitiesModulo()"
 								[binary]="true"
 							/>
-							<span>Seleccionar todas las vistas</span>
+							<span>Seleccionar todas</span>
 						</label>
 						<span class="selection-count">
-							{{ vm().modulosVistas[vm().activeModuloIndex]?.seleccionadas }} de
-							{{ vm().modulosVistas[vm().activeModuloIndex]?.total }} seleccionadas
+							{{ vm().modulosCapabilities[vm().activeModuloIndex]?.seleccionadas }} de
+							{{ vm().modulosCapabilities[vm().activeModuloIndex]?.total }} seleccionadas
 						</span>
 					</div>
 
@@ -362,36 +281,31 @@
 						<input
 							type="text"
 							pInputText
-							placeholder="Buscar por ruta..."
-							[ngModel]="vm().vistasBusqueda"
-							(ngModelChange)="onVistasBusquedaChange($event)"
+							placeholder="Buscar por nombre o código..."
+							[ngModel]="vm().capBusqueda"
+							(ngModelChange)="onCapBusquedaChange($event)"
 						/>
 					</div>
 
 					<div class="vistas-grid">
-						@for (vista of vm().vistasFiltradas; track vista.id) {
+						@for (cap of vm().capsFiltradas; track cap.id) {
 							<div
 								class="vista-checkbox"
-								[class.selected]="vm().selectedVistas.includes(vista.ruta)"
+								[class.selected]="vm().selectedCapIds.includes(cap.id)"
 							>
 								<p-checkbox
-									[ngModel]="vm().selectedVistas.includes(vista.ruta)"
-									(ngModelChange)="toggleVista(vista.ruta)"
+									[ngModel]="vm().selectedCapIds.includes(cap.id)"
+									(ngModelChange)="toggleCapability(cap.id)"
 									[binary]="true"
 								/>
-								<div class="vista-details" (click)="toggleVista(vista.ruta)">
-									<span class="vista-name">{{ vista.nombre }}</span>
-									<span class="vista-path">{{ vista.ruta }}</span>
+								<div class="vista-details" (click)="toggleCapability(cap.id)">
+									<span class="vista-name">{{ cap.nombre }}</span>
+									<span class="vista-path">{{ cap.codigo }}</span>
 								</div>
 							</div>
 						}
 					</div>
 				</div>
-			</div>
-		} @else {
-			<div class="no-vistas">
-				<i class="pi pi-info-circle"></i>
-				<p>Seleccione un rol para configurar sus permisos</p>
 			</div>
 		}
 	</div>
@@ -410,14 +324,11 @@
 				label="Guardar Cambios"
 				icon="pi pi-check"
 				class="p-button-success"
-				(click)="savePermiso()"
-				[disabled]="(!vm().isEditing && !vm().selectedRol) || vm().selectedVistas.length === 0"
+				(click)="saveCapabilities()"
+				[disabled]="vm().selectedCapIds.length === 0"
 			></button>
 		</div>
 	</ng-template>
 </p-dialog>
 <!-- #endregion -->
-
-<!-- ConfirmDialog -->
-<p-confirmDialog (onHide)="onConfirmDialogHide()" />
 <!-- #endregion -->

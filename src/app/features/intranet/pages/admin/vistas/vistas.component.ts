@@ -7,21 +7,15 @@ import { TableModule } from 'primeng/table';
 import { ButtonModule } from 'primeng/button';
 import { DialogModule } from 'primeng/dialog';
 import { TooltipModule } from 'primeng/tooltip';
-import { TagModule } from 'primeng/tag';
-
 import { InputTextModule } from 'primeng/inputtext';
 import { SelectModule } from 'primeng/select';
-import { ToggleSwitch } from 'primeng/toggleswitch';
 import { ConfirmDialogModule } from 'primeng/confirmdialog';
 import { ConfirmationService } from 'primeng/api';
 
-import { UiMappingService } from '@intranet-shared/services';
 import { PageHeaderComponent } from '@intranet-shared/components';
-import { EstadoSeverityPipe, EstadoToggleIconPipe, EstadoToggleLabelPipe } from '@intranet-shared/pipes';
-import { buildDeleteVistaMessage } from '@app/shared/constants';
+import type { CapabilityCatalogItem } from '@core/services';
 
 import { VistasFacade } from './services';
-import type { Vista } from '@core/services';
 
 @Component({
 	selector: 'app-vistas',
@@ -33,15 +27,10 @@ import type { Vista } from '@core/services';
 		ButtonModule,
 		DialogModule,
 		TooltipModule,
-		TagModule,
 		InputTextModule,
 		SelectModule,
-		ToggleSwitch,
 		ConfirmDialogModule,
 		PageHeaderComponent,
-		EstadoSeverityPipe,
-		EstadoToggleIconPipe,
-		EstadoToggleLabelPipe,
 	],
 	providers: [ConfirmationService],
 	templateUrl: './vistas.component.html',
@@ -52,24 +41,11 @@ export class VistasComponent implements OnInit {
 	// #region Dependencias
 	private facade = inject(VistasFacade);
 	private confirmationService = inject(ConfirmationService);
-	readonly uiMapping = inject(UiMappingService);
 	// #endregion
 
-	// #region Estado del facade
+	// #region Estado
 	readonly vm = this.facade.vm;
-	// #endregion
-
-	// #region Estado local
-	/** Guard para ignorar el onLazyLoad inicial (ngOnInit ya carga los datos) */
 	private initialLoadDone = signal(false);
-	// #endregion
-
-	// #region Opciones estáticas
-	readonly estadoOptions = [
-		{ label: 'Todos', value: null },
-		{ label: 'Activas', value: 1 },
-		{ label: 'Inactivas', value: 0 },
-	];
 	// #endregion
 
 	// #region Lifecycle
@@ -96,33 +72,29 @@ export class VistasComponent implements OnInit {
 		this.facade.openNewDialog();
 	}
 
-	editVista(vista: Vista): void {
-		this.facade.openEditDialog(vista);
+	editCapability(cap: CapabilityCatalogItem): void {
+		this.facade.openEditDialog(cap);
 	}
 
-	saveVista(): void {
-		this.facade.saveVista();
+	saveCapability(): void {
+		this.facade.saveCapability();
 	}
 
-	toggleEstado(vista: Vista): void {
-		this.facade.toggleEstado(vista);
-	}
-
-	deleteVista(vista: Vista): void {
+	deleteCapability(cap: CapabilityCatalogItem): void {
 		this.facade.openConfirmDialog();
 
 		this.confirmationService.confirm({
-			message: buildDeleteVistaMessage(vista.nombre),
+			message: `¿Eliminar la capability "${cap.nombre}" (${cap.codigo})?`,
 			header: 'Confirmar Eliminación',
 			icon: 'pi pi-exclamation-triangle',
 			accept: () => {
 				if (this.vm().loading) return;
-				this.facade.delete(vista);
+				this.facade.delete(cap);
 			},
 		});
 	}
 
-	updateFormField(field: 'ruta' | 'nombre' | 'estado', value: string | number): void {
+	updateFormField(field: 'codigo' | 'nombre' | 'modulo' | 'descripcion', value: string): void {
 		this.facade.updateFormField(field, value);
 	}
 
@@ -137,13 +109,9 @@ export class VistasComponent implements OnInit {
 	onFilterModuloChange(modulo: string | null): void {
 		this.facade.setFilterModulo(modulo);
 	}
-
-	onFilterEstadoChange(estado: number | null): void {
-		this.facade.setFilterEstado(estado);
-	}
 	// #endregion
 
-	// #region Dialog sync handlers
+	// #region Dialog sync
 	onDialogVisibleChange(visible: boolean): void {
 		if (!visible) {
 			this.facade.closeDialog();

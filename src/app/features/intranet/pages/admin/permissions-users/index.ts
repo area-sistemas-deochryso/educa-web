@@ -1,11 +1,3 @@
-// #region Implementation
 export { PermissionsUsersComponent } from './permisos-usuarios.component';
-export {
-	PermissionsUsersStore,
-	PermissionsUsersDataFacade,
-	PermissionsUsersCrudFacade,
-	PermissionsUsersUiFacade,
-	PermissionsUsersHelperService,
-} from './services';
-export type { ModuloVistas } from './services';
-// #endregion
+export { PermissionsUsersStore, PermissionsUsersDataFacade } from './services';
+export type { ModuloCapabilities } from './services';
