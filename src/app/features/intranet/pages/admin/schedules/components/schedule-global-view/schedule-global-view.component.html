@@ -1,0 +1,43 @@
+<div class="global-view">
+  @if (loading()) {
+    <div class="global-loading">
+      <i class="pi pi-spin pi-spinner" style="font-size: 1.5rem"></i>
+      <p>Analizando horarios...</p>
+    </div>
+  } @else if (totalProblems() === 0) {
+    <div class="global-empty">
+      <i class="pi pi-check-circle" style="font-size: 3rem; color: var(--intranet-accent-color-green)"></i>
+      <h3>Sin problemas detectados</h3>
+      <p>Todos los horarios activos tienen profesor asignado y no hay conflictos de tiempo.</p>
+    </div>
+  } @else {
+    <div class="problems-summary">
+      <div class="summary-header">
+        <span class="summary-count">{{ totalProblems() }} problema(s) detectado(s)</span>
+      </div>
+
+      @for (group of problems(); track group.type) {
+        <div class="problem-group" [ngClass]="'severity-' + group.severity">
+          <div class="group-header">
+            <i [class]="group.icon"></i>
+            <span class="group-label">{{ group.label }}</span>
+            <span class="group-count">{{ group.items.length }}</span>
+          </div>
+
+          <div class="group-items">
+            @for (item of group.items; track item.horarioId) {
+              <div class="problem-item" (click)="onViewDetail(item.horarioId)">
+                <div class="item-main">
+                  <span class="item-curso">{{ item.curso }}</span>
+                  <span class="item-schedule">{{ item.dia }} · {{ item.hora }}</span>
+                </div>
+                <div class="item-detail">{{ item.detail }}</div>
+                <i class="pi pi-chevron-right item-arrow"></i>
+              </div>
+            }
+          </div>
+        </div>
+      }
+    </div>
+  }
+</div>

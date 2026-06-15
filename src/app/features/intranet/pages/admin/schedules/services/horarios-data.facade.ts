@@ -222,6 +222,10 @@ export class SchedulesDataFacade {
     this.store.filterStore.setVistaActual(vista);
   }
 
+  selectEntity(entityId: number): void {
+    this.store.filterStore.selectEntity(entityId);
+  }
+
   // #endregion
   // #region Refetch y estadísticas
 

@@ -1,0 +1,45 @@
+<div class="entity-list">
+  <div class="entity-list-header">
+    <span class="entity-list-title">{{ entityLabel() }}es</span>
+    <span class="entity-list-count">{{ entities().length }}</span>
+  </div>
+
+  @if (loading()) {
+    <div class="entity-list-loading">
+      <i class="pi pi-spin pi-spinner"></i>
+    </div>
+  } @else if (sortedEntities().length === 0) {
+    <div class="entity-list-empty">
+      <i class="pi pi-inbox"></i>
+      <span>Sin {{ entityLabel().toLowerCase() }}es</span>
+    </div>
+  } @else {
+    <div class="entity-items">
+      @for (entity of sortedEntities(); track entity.id) {
+        <div
+          class="entity-item"
+          [class.selected]="selectedId() === entity.id"
+          (click)="onSelect(entity)"
+        >
+          <div class="entity-status">
+            <i
+              [class]="getStatusIcon(entity)"
+              [ngClass]="getStatusClass(entity)"
+              [pTooltip]="getStatusTooltip(entity)"
+              tooltipPosition="right"
+            ></i>
+          </div>
+          <div class="entity-info">
+            <span class="entity-name">{{ entity.label }}</span>
+            @if (entity.subtitle) {
+              <span class="entity-subtitle">{{ entity.subtitle }}</span>
+            }
+          </div>
+          <div class="entity-badge">
+            <span class="badge-count">{{ entity.withProfesor }}/{{ entity.totalSchedules }}</span>
+          </div>
+        </div>
+      }
+    </div>
+  }
+</div>

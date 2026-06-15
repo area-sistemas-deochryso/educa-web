@@ -1,0 +1,98 @@
+<div class="grid-container">
+  <div class="weekly-grid">
+    <!-- Header row -->
+    <div class="grid-header time-header">Hora</div>
+    @for (dia of DIAS; track dia.value) {
+      <div class="grid-header day-header">{{ dia.label }}</div>
+    }
+
+    <!-- Time slots -->
+    @for (hora of HORAS; track hora; let i = $index) {
+      <!-- Time label -->
+      <div class="time-label">{{ hora }}</div>
+
+      <!-- Day cells for this hour -->
+      @for (dia of DIAS; track dia.value) {
+        @let slotBlocks = getBlocksForSlot(dia.value, hora);
+        <div
+          class="grid-cell"
+          [class.empty-slot]="slotBlocks.length === 0"
+          [class.clickable]="slotBlocks.length === 0 && isAdmin()"
+          (click)="slotBlocks.length === 0 && isAdmin() ? onEmptySlotClick(dia.value, hora) : null"
+        >
+          @if (slotBlocks.length === 0 && isAdmin()) {
+            <div class="empty-slot-hint">
+              <i class="pi pi-plus"></i>
+            </div>
+          }
+
+          @for (block of slotBlocks; track block.horario.id) {
+            <div
+              class="block-card"
+              [style.background]="block.color"
+              [style.border-left]="'4px solid ' + darkenColor(block.color)"
+              [class.inactive]="!block.horario.estado"
+              [class.no-profesor]="hasNoProfesor(block)"
+              [pTooltip]="getBlockTooltip(block)"
+              tooltipPosition="top"
+              (click)="onBlockClick(block); $event.stopPropagation()"
+            >
+              <div class="block-content">
+                <span class="block-curso">{{ block.horario.cursoNombre }}</span>
+                <span class="block-time">{{ block.horario.horaInicio }} - {{ block.horario.horaFin }}</span>
+                @if (block.horario.profesorNombreCompleto) {
+                  <span class="block-profesor">
+                    <i class="pi pi-user"></i>
+                    {{ block.horario.profesorNombreCompleto }}
+                  </span>
+                } @else {
+                  <span class="block-profesor warning">
+                    <i class="pi pi-exclamation-triangle"></i>
+                    Sin profesor
+                  </span>
+                }
+              </div>
+
+              <!-- Hover actions -->
+              <div class="block-actions">
+                <button
+                  pButton
+                  icon="pi pi-eye"
+                  class="p-button-rounded p-button-text p-button-sm action-btn"
+                  (click)="onViewDetailClick($event, block)"
+                  [pt]="{ root: { 'aria-label': 'Ver detalles' } }"
+                ></button>
+                @if (isAdmin()) {
+                  <button
+                    pButton
+                    icon="pi pi-pencil"
+                    class="p-button-rounded p-button-text p-button-sm action-btn"
+                    (click)="onEditClick($event, block)"
+                    [pt]="{ root: { 'aria-label': 'Editar' } }"
+                  ></button>
+                }
+              </div>
+            </div>
+          }
+        </div>
+      }
+    }
+  </div>
+
+  @if (loading()) {
+    <div class="loading-overlay">
+      <i class="pi pi-spin pi-spinner" style="font-size: 2rem"></i>
+      <p>Cargando horarios...</p>
+    </div>
+  }
+
+  @if (!loading() && blocks().length === 0) {
+    <div class="empty-overlay">
+      <i class="pi pi-calendar" style="font-size: 3rem; opacity: 0.3"></i>
+      <p>No hay horarios para esta entidad</p>
+      @if (isAdmin()) {
+        <p class="empty-hint">Haz clic en una celda vacía para crear un horario</p>
+      }
+    </div>
+  }
+</div>

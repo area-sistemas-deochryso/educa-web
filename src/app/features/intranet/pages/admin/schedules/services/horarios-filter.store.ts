@@ -4,13 +4,10 @@ import {
 	type DiaSemana,
 	type HorarioResponseDto,
 	type HorarioVistaType,
+	type ScheduleEntityItem,
 } from '../models/horario.interface';
 import { buildWeeklyBlocks } from '../helpers/horario-time.utils';
 
-/**
- * Sub-store para filtros, paginación y vista de horarios.
- * Recibe los horarios fuente via setHorariosSource() y calcula derivados filtrados.
- */
 @Injectable({ providedIn: 'root' })
 export class SchedulesFilterStore {
 	// #region Estado privado
@@ -18,15 +15,12 @@ export class SchedulesFilterStore {
 	private readonly _filtroProfesorId = signal<number | null>(null);
 	private readonly _filtroDiaSemana = signal<DiaSemana | null>(null);
 	private readonly _filtroEstadoActivo = signal<boolean | null>(null);
-	private readonly _vistaActual = signal<HorarioVistaType>('lista');
+	private readonly _vistaActual = signal<HorarioVistaType>('salon');
+	private readonly _selectedEntityId = signal<number | null>(null);
 	private readonly _page = signal(1);
 	private readonly _pageSize = signal(10);
 	private readonly _totalRecords = signal(0);
 
-	/**
-	 * Referencia a los horarios fuente (inyectada por el store principal).
-	 * Es un signal para que los computed dependan de él reactivamente.
-	 */
 	private readonly _horariosSource = signal<HorarioResponseDto[]>([]);
 	// #endregion
 
@@ -36,6 +30,7 @@ export class SchedulesFilterStore {
 	readonly filtroDiaSemana = this._filtroDiaSemana.asReadonly();
 	readonly filtroEstadoActivo = this._filtroEstadoActivo.asReadonly();
 	readonly vistaActual = this._vistaActual.asReadonly();
+	readonly selectedEntityId = this._selectedEntityId.asReadonly();
 	readonly page = this._page.asReadonly();
 	readonly pageSize = this._pageSize.asReadonly();
 	readonly totalRecords = this._totalRecords.asReadonly();
@@ -44,40 +39,91 @@ export class SchedulesFilterStore {
 	// #region Computed - Filtros
 	readonly horariosFiltrados = computed(() => {
 		const horarios = this._horariosSource();
-		const salonId = this._filtroSalonId();
-		const profesorId = this._filtroProfesorId();
-		const diaSemana = this._filtroDiaSemana();
 		const estadoActivo = this._filtroEstadoActivo();
-		const vistaActual = this._vistaActual();
 
 		return horarios.filter((h) => {
-			if (salonId !== null && h.salonId !== salonId) return false;
-			if (profesorId !== null && h.profesorId !== profesorId) return false;
-			// Si está en vista semanal, no filtrar por día
-			if (vistaActual !== 'semanal' && diaSemana !== null && h.diaSemana !== diaSemana) return false;
 			if (estadoActivo !== null && h.estado !== estadoActivo) return false;
 			return true;
 		});
 	});
 
-	/** La vista semanal solo está disponible cuando hay un salón o profesor seleccionado */
-	readonly vistaSemanalHabilitada = computed(() => {
-		return this._filtroSalonId() !== null || this._filtroProfesorId() !== null;
-	});
-
-	/** El filtro de día está habilitado solo en vista lista */
-	readonly filtroDiaSemanaHabilitado = computed(() => this._vistaActual() === 'lista');
-
-	readonly hasFilters = computed(() =>
-		this._filtroSalonId() !== null ||
-		this._filtroProfesorId() !== null ||
-		this._filtroDiaSemana() !== null ||
-		this._filtroEstadoActivo() !== null,
-	);
+	readonly hasFilters = computed(() => this._filtroEstadoActivo() !== null);
 	// #endregion
 
-	// #region Computed - Vista Semanal
+	// #region Computed - Entity lists
+	readonly salonEntities = computed<ScheduleEntityItem[]>(() => {
+		const horarios = this.horariosFiltrados();
+		const salonMap = new Map<number, { label: string; items: HorarioResponseDto[] }>();
+
+		for (const h of horarios) {
+			const existing = salonMap.get(h.salonId);
+			if (existing) {
+				existing.items.push(h);
+			} else {
+				salonMap.set(h.salonId, { label: h.salonDescripcion, items: [h] });
+			}
+		}
+
+		return Array.from(salonMap.entries()).map(([id, data]) => ({
+			id,
+			label: data.label,
+			totalSchedules: data.items.length,
+			withProfesor: data.items.filter((h) => h.profesorId !== null).length,
+			hasConflicts: this.hasSalonConflicts(data.items),
+		}));
+	});
+
+	readonly profesorEntities = computed<ScheduleEntityItem[]>(() => {
+		const horarios = this.horariosFiltrados();
+		const profMap = new Map<number, { label: string; items: HorarioResponseDto[] }>();
+
+		for (const h of horarios) {
+			if (h.profesorId === null) continue;
+			const existing = profMap.get(h.profesorId);
+			if (existing) {
+				existing.items.push(h);
+			} else {
+				profMap.set(h.profesorId, { label: h.profesorNombreCompleto || 'Sin nombre', items: [h] });
+			}
+		}
+
+		return Array.from(profMap.entries()).map(([id, data]) => ({
+			id,
+			label: data.label,
+			totalSchedules: data.items.length,
+			withProfesor: data.items.length,
+			hasConflicts: this.hasProfesorConflicts(data.items),
+		}));
+	});
+	// #endregion
+
+	// #region Computed - Entity-filtered blocks
+	readonly entityFilteredHorarios = computed(() => {
+		const vista = this._vistaActual();
+		const entityId = this._selectedEntityId();
+		const horarios = this.horariosFiltrados();
+
+		if (entityId === null) return [];
+		if (vista === 'salon') return horarios.filter((h) => h.salonId === entityId);
+		if (vista === 'profesor') return horarios.filter((h) => h.profesorId === entityId);
+		return horarios;
+	});
+
+	readonly entityWeeklyBlocks = computed(() => buildWeeklyBlocks(this.entityFilteredHorarios()));
+
+	/** Context salon ID for pre-filling creation form from empty slot clicks. */
+	readonly contextSalonId = computed(() => {
+		if (this._vistaActual() === 'salon') return this._selectedEntityId();
+		return null;
+	});
+	// #endregion
+
+	// #region Computed - Legacy compatibility
 	readonly horariosSemanales = computed(() => buildWeeklyBlocks(this.horariosFiltrados()));
+
+	readonly vistaSemanalHabilitada = computed(() => this._selectedEntityId() !== null);
+
+	readonly filtroDiaSemanaHabilitado = computed(() => false);
 	// #endregion
 
 	// #region Comandos - Fuente de datos
@@ -104,9 +150,6 @@ export class SchedulesFilterStore {
 	}
 
 	clearFiltros(): void {
-		this._filtroSalonId.set(null);
-		this._filtroProfesorId.set(null);
-		this._filtroDiaSemana.set(null);
 		this._filtroEstadoActivo.set(null);
 		this._page.set(1);
 	}
@@ -115,10 +158,11 @@ export class SchedulesFilterStore {
 	// #region Comandos - Vista
 	setVistaActual(vista: HorarioVistaType): void {
 		this._vistaActual.set(vista);
-		// Si cambia a vista semanal, limpiar filtro de día
-		if (vista === 'semanal') {
-			this._filtroDiaSemana.set(null);
-		}
+		this._selectedEntityId.set(null);
+	}
+
+	selectEntity(entityId: number): void {
+		this._selectedEntityId.set(entityId);
 	}
 	// #endregion
 
@@ -127,6 +171,34 @@ export class SchedulesFilterStore {
 		this._page.set(page);
 		this._pageSize.set(pageSize);
 		this._totalRecords.set(totalRecords);
+	}
+	// #endregion
+
+	// #region Helpers privados
+	private hasSalonConflicts(salonHorarios: HorarioResponseDto[]): boolean {
+		const active = salonHorarios.filter((h) => h.estado);
+		for (let i = 0; i < active.length; i++) {
+			for (let j = i + 1; j < active.length; j++) {
+				if (active[i].diaSemana !== active[j].diaSemana) continue;
+				if (active[i].horaInicio < active[j].horaFin && active[j].horaInicio < active[i].horaFin) {
+					return true;
+				}
+			}
+		}
+		return false;
+	}
+
+	private hasProfesorConflicts(profHorarios: HorarioResponseDto[]): boolean {
+		const active = profHorarios.filter((h) => h.estado);
+		for (let i = 0; i < active.length; i++) {
+			for (let j = i + 1; j < active.length; j++) {
+				if (active[i].diaSemana !== active[j].diaSemana) continue;
+				if (active[i].horaInicio < active[j].horaFin && active[j].horaInicio < active[i].horaFin) {
+					return true;
+				}
+			}
+		}
+		return false;
 	}
 	// #endregion
 }

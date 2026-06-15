@@ -11,5 +11,8 @@ export * from './services';
 
 // #endregion
 // #region Components
-export * from './components/horarios-weekly-view/horarios-weekly-view.component';
+export * from './components/schedule-grid-layout/schedule-grid-layout.component';
+export * from './components/schedule-weekly-grid/schedule-weekly-grid.component';
+export * from './components/schedule-entity-list/schedule-entity-list.component';
+export * from './components/schedule-global-view/schedule-global-view.component';
 // #endregion

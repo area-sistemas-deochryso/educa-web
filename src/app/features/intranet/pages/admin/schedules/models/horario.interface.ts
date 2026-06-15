@@ -50,7 +50,7 @@ export interface HorarioAsignarEstudiantesDto {
 // #endregion
 // #region Tipos semánticos
 
-export const HORARIO_VISTAS = ['semanal', 'lista'] as const;
+export const HORARIO_VISTAS = ['salon', 'profesor', 'global'] as const;
 export type HorarioVistaType = (typeof HORARIO_VISTAS)[number];
 
 // #endregion
@@ -105,6 +105,21 @@ export interface HorarioWeeklyBlock {
 
 export interface HorarioWeeklyData {
   dias: Record<number, HorarioWeeklyBlock[]>;
+}
+
+export interface ScheduleEntityItem {
+  id: number;
+  label: string;
+  subtitle?: string;
+  totalSchedules: number;
+  withProfesor: number;
+  hasConflicts: boolean;
+}
+
+export interface EmptySlotClickEvent {
+  dia: DiaSemana;
+  hora: string;
+  salonId?: number;
 }
 
 // #endregion
