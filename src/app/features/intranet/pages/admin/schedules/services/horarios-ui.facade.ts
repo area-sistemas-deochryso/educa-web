@@ -5,6 +5,7 @@ import {
   UI_ADMIN_ERROR_DETAILS,
   UI_SUMMARIES,
 } from '@app/shared/constants';
+import type { EmptySlotClickEvent } from '../models/horario.interface';
 import { SchedulesStore } from './horarios.store';
 
 /**
@@ -29,6 +30,22 @@ export class SchedulesUiFacade {
     this.store.formStore.clearFormData();
     this.store.formStore.setEditingId(null);
     this.store.formStore.resetWizard();
+    this.store.formStore.openDialog();
+  }
+
+  openNewDialogWithContext(context: EmptySlotClickEvent): void {
+    this.store.formStore.clearFormData();
+    this.store.formStore.setEditingId(null);
+    this.store.formStore.resetWizard();
+
+    const nextHour = String(parseInt(context.hora.substring(0, 2)) + 1).padStart(2, '0') + ':00';
+    this.store.formStore.setFormData({
+      diaSemana: context.dia,
+      horaInicio: context.hora,
+      horaFin: nextHour,
+      salonId: context.salonId ?? null,
+    });
+
     this.store.formStore.openDialog();
   }
 

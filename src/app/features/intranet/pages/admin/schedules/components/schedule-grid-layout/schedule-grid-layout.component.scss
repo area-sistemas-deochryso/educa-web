@@ -1,0 +1,52 @@
+:host {
+  display: block;
+}
+
+.grid-layout {
+  display: grid;
+  grid-template-columns: 280px 1fr;
+  gap: 1rem;
+  min-height: 600px;
+
+  @media (max-width: 1200px) {
+    grid-template-columns: 240px 1fr;
+  }
+
+  @media (max-width: 768px) {
+    grid-template-columns: 1fr;
+    min-height: auto;
+  }
+}
+
+.entity-panel {
+  min-height: 0;
+  max-height: 750px;
+}
+
+.grid-panel {
+  min-width: 0;
+  overflow: hidden;
+}
+
+.no-selection {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 400px;
+  gap: 1rem;
+  color: var(--text-color-secondary);
+  background: var(--surface-card);
+  border: 2px dashed var(--surface-border);
+  border-radius: 8px;
+
+  i {
+    font-size: 2rem;
+    opacity: 0.4;
+  }
+
+  p {
+    margin: 0;
+    font-size: 0.95rem;
+  }
+}

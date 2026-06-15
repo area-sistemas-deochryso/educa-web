@@ -1,0 +1,33 @@
+<div class="grid-layout">
+  <!-- Left panel: entity list -->
+  <aside class="entity-panel">
+    <app-schedule-entity-list
+      [entities]="entities()"
+      [selectedId]="selectedEntityId()"
+      [loading]="loading()"
+      [entityLabel]="entityLabel()"
+      (entitySelect)="entitySelect.emit($event)"
+    />
+  </aside>
+
+  <!-- Right panel: weekly grid -->
+  <main class="grid-panel">
+    @if (selectedEntityId() !== null) {
+      <app-schedule-weekly-grid
+        [blocks]="blocks()"
+        [loading]="loading()"
+        [isAdmin]="isAdmin()"
+        [contextSalonId]="contextSalonId()"
+        (blockClick)="blockClick.emit($event)"
+        (emptySlotClick)="emptySlotClick.emit($event)"
+        (editClick)="editClick.emit($event)"
+        (viewDetailClick)="viewDetailClick.emit($event)"
+      />
+    } @else {
+      <div class="no-selection">
+        <i class="pi pi-arrow-left"></i>
+        <p>Selecciona un {{ entityLabel().toLowerCase() }} para ver su horario semanal</p>
+      </div>
+    }
+  </main>
+</div>

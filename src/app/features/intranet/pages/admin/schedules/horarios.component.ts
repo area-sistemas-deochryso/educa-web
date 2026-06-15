@@ -4,19 +4,24 @@ import { ButtonModule } from 'primeng/button';
 import { CommonModule } from '@angular/common';
 import { ConfirmDialogModule } from 'primeng/confirmdialog';
 import { ConfirmationService } from 'primeng/api';
+import { FormsModule } from '@angular/forms';
+import { SelectModule } from 'primeng/select';
 import { ScheduleDetailDrawerComponent } from './components/horario-detail-drawer/horario-detail-drawer.component';
 import { SchedulesCoursePickerComponent } from './components/horarios-curso-picker/horarios-curso-picker.component';
 import { SchedulesFormDialogComponent } from './components/horarios-form-dialog/horarios-form-dialog.component';
 import { SchedulesImportDialogComponent } from './components/horarios-import-dialog/horarios-import-dialog.component';
 import { PageHeaderComponent } from '@intranet-shared/components';
 import { type ImportarHorarioItem } from './helpers/horario-import.config';
-import { type DiaSemana, HorarioResponseDto, type HorarioVistaType } from './models/horario.interface';
+import {
+	type DiaSemana,
+	type EmptySlotClickEvent,
+	HorarioResponseDto,
+	type HorarioVistaType,
+} from './models/horario.interface';
 import { SchedulesCrudFacade, SchedulesDataFacade, SchedulesUiFacade } from './services';
-import { SchedulesFiltersComponent } from './components/horarios-filters/horarios-filters.component';
-import { SchedulesListViewComponent } from './components/horarios-list-view/horarios-list-view.component';
 import { SchedulesStatsSkeletonComponent } from './components/horarios-stats-skeleton/horarios-stats-skeleton.component';
-import { SchedulesTableSkeletonComponent } from './components/horarios-table-skeleton/horarios-table-skeleton.component';
-import { SchedulesWeeklyViewComponent } from './components/horarios-weekly-view/horarios-weekly-view.component';
+import { ScheduleGridLayoutComponent } from './components/schedule-grid-layout/schedule-grid-layout.component';
+import { ScheduleGlobalViewComponent } from './components/schedule-global-view/schedule-global-view.component';
 import { TagModule } from 'primeng/tag';
 import { TooltipModule } from 'primeng/tooltip';
 import { logger } from '@core/helpers';
@@ -33,19 +38,19 @@ import {
 	standalone: true,
 	imports: [
 		CommonModule,
+		FormsModule,
 		ButtonModule,
 		ConfirmDialogModule,
+		SelectModule,
 		TagModule,
 		TooltipModule,
 		ScheduleDetailDrawerComponent,
 		SchedulesCoursePickerComponent,
-		SchedulesFiltersComponent,
 		SchedulesFormDialogComponent,
 		SchedulesImportDialogComponent,
-		SchedulesListViewComponent,
 		SchedulesStatsSkeletonComponent,
-		SchedulesTableSkeletonComponent,
-		SchedulesWeeklyViewComponent,
+		ScheduleGridLayoutComponent,
+		ScheduleGlobalViewComponent,
 		PageHeaderComponent,
 	],
 	templateUrl: './horarios.component.html',
@@ -59,8 +64,12 @@ export class SchedulesComponent implements OnInit {
 	private uiFacade = inject(SchedulesUiFacade);
 	private confirmationService = inject(ConfirmationService);
 
-	// * Store signals snapshot (all facades share the same store)
 	readonly vm = this.dataFacade.vm;
+
+	readonly estadoOptions = [
+		{ label: 'Activos', value: true },
+		{ label: 'Inactivos', value: false },
+	];
 
 	// #region Lifecycle
 	ngOnInit(): void {
@@ -76,10 +85,6 @@ export class SchedulesComponent implements OnInit {
 	refresh(): void {
 		logger.log('Refrescando horarios...');
 		this.loadData();
-	}
-
-	onLazyLoad(event: { page: number; pageSize: number }): void {
-		this.dataFacade.loadPage(event.page, event.pageSize);
 	}
 
 	// #endregion
@@ -139,19 +144,7 @@ export class SchedulesComponent implements OnInit {
 	}
 
 	// #endregion
-	// #region Event handlers - Filtros
-	onFiltroSalonChange(salonId: number | null): void {
-		this.dataFacade.setFiltroSalon(salonId);
-	}
-
-	onFiltroProfesorChange(profesorId: number | null): void {
-		this.dataFacade.setFiltroProfesor(profesorId);
-	}
-
-	onFiltroDiaSemanaChange(diaSemana: DiaSemana | null): void {
-		this.dataFacade.setFiltroDiaSemana(diaSemana);
-	}
-
+	// #region Event handlers - Filtros y vista
 	onFiltroEstadoChange(estadoActivo: boolean | null): void {
 		this.dataFacade.setFiltroEstadoActivo(estadoActivo);
 	}
@@ -160,16 +153,22 @@ export class SchedulesComponent implements OnInit {
 		this.dataFacade.clearFiltros();
 	}
 
+	onCambiarVista(vista: HorarioVistaType): void {
+		this.dataFacade.setVistaActual(vista);
+	}
+
+	onSelectEntity(entityId: number): void {
+		this.dataFacade.selectEntity(entityId);
+	}
+
+	// #endregion
+	// #region Event handlers - Grid
+	onEmptySlotClick(event: EmptySlotClickEvent): void {
+		this.uiFacade.openNewDialogWithContext(event);
+	}
+
 	// #endregion
 	// #region Event handlers - Wizard Dialog
-	onNextStep(): void {
-		this.uiFacade.nextWizardStep();
-	}
-
-	onPrevStep(): void {
-		this.uiFacade.prevWizardStep();
-	}
-
 	onSaveHorario(): void {
 		const formData = this.vm().formData;
 		const editingId = this.vm().editingId;
@@ -295,12 +294,6 @@ export class SchedulesComponent implements OnInit {
 
 	onImportarHorarios(items: ImportarHorarioItem[]): void {
 		this.crudFacade.importarHorarios(items);
-	}
-
-	// #endregion
-	// #region Event handlers - Vista
-	onCambiarVista(vista: HorarioVistaType): void {
-		this.dataFacade.setVistaActual(vista);
 	}
 
 	// #endregion

@@ -5,7 +5,6 @@
   min-height: 100vh;
 }
 
-
 // #region Stats Grid
 .stats-grid {
   display: grid;
@@ -56,18 +55,26 @@
 }
 
 // #endregion
-// #region View Tabs
+// #region View Toolbar
+.view-toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+  flex-wrap: wrap;
+}
+
 .view-tabs {
   display: flex;
-  gap: 0.5rem;
-  margin-bottom: 1.5rem;
+  gap: 0.25rem;
   border-bottom: 2px solid var(--surface-border);
   padding-bottom: 0.5rem;
 
   .tab-button {
     border-bottom: 3px solid transparent;
     border-radius: 0;
-    padding: 0.75rem 1.5rem;
+    padding: 0.75rem 1.25rem;
     transition: all 0.2s;
 
     &.active {
@@ -82,64 +89,32 @@
   }
 }
 
-// #endregion
-// #region Vista Semanal
-.weekly-view {
-  background: transparent;
-  border-radius: 8px;
-  box-shadow: none;
-  overflow: hidden;
+.view-filters-inline {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  flex-shrink: 0;
 
-  .weekly-header {
-    display: grid;
-    grid-template-columns: 80px repeat(5, 1fr);
-    background: var(--surface-50);
-    border-bottom: 2px solid var(--surface-border);
-    font-weight: 600;
-    font-size: 0.9rem;
-
-    .time-column,
-    .day-column {
-      padding: 1rem;
-      text-align: center;
-      border-right: 1px solid var(--surface-border);
-
-      &:last-child {
-        border-right: none;
-      }
-    }
-
-    .time-column {
-      background: var(--surface-100);
-    }
+  ::ng-deep .estado-filter-select {
+    min-width: 160px;
   }
+}
 
-  .weekly-grid {
-    min-height: 500px;
-    position: relative;
+// #endregion
+// #region Error banner
+.error-banner {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.75rem 1rem;
+  margin-bottom: 1rem;
+  background: var(--red-50);
+  border: 1px solid var(--red-200);
+  border-radius: 6px;
+  color: var(--red-700);
 
-    .weekly-placeholder {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      min-height: 500px;
-      padding: 2rem;
-
-      .loading-message,
-      .empty-message {
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        gap: 1rem;
-        text-align: center;
-        color: var(--text-color-secondary);
-
-        p {
-          margin: 0;
-          font-size: 1rem;
-        }
-      }
-    }
+  i {
+    font-size: 1.1rem;
   }
 }
 
@@ -153,33 +128,25 @@
   .stats-grid {
     grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
   }
+
+  .view-toolbar {
+    flex-direction: column;
+    align-items: stretch;
+  }
 }
 
 @media (max-width: 768px) {
   .stats-grid {
-    grid-template-columns: 1fr;
-  }
-
-  .weekly-view {
-    overflow-x: auto;
-
-    .weekly-header {
-      min-width: 600px;
-    }
-
-    .weekly-grid {
-      min-width: 600px;
-    }
+    grid-template-columns: 1fr 1fr;
   }
 
   .view-tabs {
     .tab-button {
       flex: 1;
-      padding: 0.625rem 1rem;
+      padding: 0.625rem 0.75rem;
       font-size: 0.85rem;
     }
   }
 }
 
-// #endregion
 // #endregion

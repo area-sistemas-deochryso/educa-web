@@ -82,22 +82,25 @@
 		</div>
 
 		<div class="stat-card">
-			<div class="stat-icon" style="background: var(--orange-100); color: var(--orange-600)">
-				<i class="pi pi-times-circle"></i>
+			<div
+				class="stat-icon"
+				style="background: var(--orange-100); color: var(--orange-600)"
+			>
+				<i class="pi pi-user-minus"></i>
 			</div>
 			<div class="stat-content">
-				<span class="stat-label">Inactivos</span>
-				<span class="stat-value">{{ vm().estadisticas!.horariosInactivos }}</span>
+				<span class="stat-label">Incompletos</span>
+				<span class="stat-value">{{ vm().estadisticas!.horariosSinProfesor }}</span>
 			</div>
 		</div>
 
 		<div class="stat-card">
 			<div class="stat-icon" style="background: var(--red-100); color: var(--red-600)">
-				<i class="pi pi-user-minus"></i>
+				<i class="pi pi-exclamation-circle"></i>
 			</div>
 			<div class="stat-content">
-				<span class="stat-label">Sin Profesor</span>
-				<span class="stat-value">{{ vm().estadisticas!.horariosSinProfesor }}</span>
+				<span class="stat-label">Conflictos</span>
+				<span class="stat-value">0</span>
 			</div>
 		</div>
 	</div>
@@ -105,84 +108,113 @@
 	<app-schedules-stats-skeleton />
 }
 
-<!-- #region Filtros -->
-<app-schedules-filters
-	[salonesOptions]="vm().salonesOptions"
-	[filtroSalonId]="vm().filtroSalonId"
-	[filtroDiaSemana]="vm().filtroDiaSemana"
-	[filtroEstadoActivo]="vm().filtroEstadoActivo"
-	[filtroDiaSemanaHabilitado]="vm().filtroDiaSemanaHabilitado"
-	[hasFilters]="vm().hasFilters"
-	(filtroSalonChange)="onFiltroSalonChange($event)"
-	(filtroDiaSemanaChange)="onFiltroDiaSemanaChange($event)"
-	(filtroEstadoChange)="onFiltroEstadoChange($event)"
-	(clearFiltros)="onClearFiltros()"
-/>
+<!-- #region View tabs + estado filter -->
+<div class="view-toolbar">
+	<div class="view-tabs">
+		<button
+			pButton
+			label="Por Salón"
+			icon="pi pi-building"
+			class="p-button-text tab-button"
+			[class.active]="vm().vistaActual === 'salon'"
+			(click)="onCambiarVista('salon')"
+			pTooltip="Ver horarios agrupados por salón"
+			tooltipPosition="top"
+		></button>
+		<button
+			pButton
+			label="Por Profesor"
+			icon="pi pi-user"
+			class="p-button-text tab-button"
+			[class.active]="vm().vistaActual === 'profesor'"
+			(click)="onCambiarVista('profesor')"
+			pTooltip="Ver horarios agrupados por profesor"
+			tooltipPosition="top"
+		></button>
+		<button
+			pButton
+			label="Vista Global"
+			icon="pi pi-exclamation-triangle"
+			class="p-button-text tab-button"
+			[class.active]="vm().vistaActual === 'global'"
+			(click)="onCambiarVista('global')"
+			pTooltip="Ver resumen de problemas"
+			tooltipPosition="top"
+		></button>
+	</div>
 
-<!-- #endregion -->
-<!-- #region Tabs: Vista Semanal / Vista Lista -->
-<div class="view-tabs">
-	<button
-		pButton
-		label="Vista Lista"
-		icon="pi pi-list"
-		class="p-button-text tab-button"
-		[class.active]="vm().vistaActual === 'lista'"
-		(click)="onCambiarVista('lista')"
-		pTooltip="Ver horarios en formato de tabla"
-		tooltipPosition="top"
-	></button>
-	<button
-		pButton
-		label="Vista Semanal"
-		icon="pi pi-table"
-		class="p-button-text tab-button"
-		[class.active]="vm().vistaActual === 'semanal'"
-		[disabled]="!vm().vistaSemanalHabilitada"
-		[pTooltip]="
-			!vm().vistaSemanalHabilitada
-				? 'Selecciona un salón o profesor para ver la vista semanal'
-				: 'Ver horarios en formato de calendario semanal'
-		"
-		tooltipPosition="top"
-		(click)="onCambiarVista('semanal')"
-	></button>
+	<div class="view-filters-inline">
+		<p-select
+			[options]="estadoOptions"
+			[ngModel]="vm().filtroEstadoActivo"
+			(ngModelChange)="onFiltroEstadoChange($event)"
+			placeholder="Todos los estados"
+			optionLabel="label"
+			optionValue="value"
+			appendTo="body"
+			[showClear]="true"
+			styleClass="estado-filter-select"
+		/>
+		@if (vm().hasFilters) {
+			<button
+				pButton
+				icon="pi pi-filter-slash"
+				class="p-button-text p-button-sm"
+				(click)="onClearFiltros()"
+				pTooltip="Limpiar filtros"
+				tooltipPosition="top"
+				[pt]="{ root: { 'aria-label': 'Limpiar filtros' } }"
+			></button>
+		}
+	</div>
 </div>
 
 <!-- #endregion -->
-<!-- #region Vista Semanal -->
-@if (vm().vistaActual === 'semanal') {
-	<div class="weekly-view">
-		<app-schedules-weekly-view
-			[blocks]="vm().horariosSemanales"
-			[loading]="vm().loading"
-			[isAdmin]="vm().isAdmin"
-			(blockClick)="onViewDetail($event)"
-			(editClick)="onEdit($event)"
-			(viewDetailClick)="onViewDetail($event)"
-		/>
-	</div>
+<!-- #region Vista Por Salón -->
+@if (vm().vistaActual === 'salon') {
+	<app-schedule-grid-layout
+		[entities]="vm().salonEntities"
+		[selectedEntityId]="vm().selectedEntityId"
+		[blocks]="vm().entityWeeklyBlocks"
+		[loading]="vm().loading"
+		[isAdmin]="vm().isAdmin"
+		entityLabel="Salón"
+		[contextSalonId]="vm().contextSalonId"
+		(entitySelect)="onSelectEntity($event)"
+		(blockClick)="onViewDetail($event)"
+		(emptySlotClick)="onEmptySlotClick($event)"
+		(editClick)="onEdit($event)"
+		(viewDetailClick)="onViewDetail($event)"
+	/>
 }
 
 <!-- #endregion -->
-<!-- #region Vista Lista -->
-@if (vm().vistaActual === 'lista') {
-	@if (vm().tableReady) {
-		<app-schedules-list-view
-			[horarios]="vm().horariosFiltrados"
-			[loading]="vm().loading"
-			[totalRecords]="vm().totalRecords"
-			[rows]="vm().pageSize"
-			[isAdmin]="vm().isAdmin"
-			(viewDetail)="onViewDetail($event)"
-			(edit)="onEdit($event)"
-			(toggleEstado)="onToggleEstado($event.id, $event.estadoActual)"
-			(delete)="onDelete($event)"
-			(lazyLoad)="onLazyLoad($event)"
-		/>
-	} @else {
-		<app-schedules-table-skeleton />
-	}
+<!-- #region Vista Por Profesor -->
+@if (vm().vistaActual === 'profesor') {
+	<app-schedule-grid-layout
+		[entities]="vm().profesorEntities"
+		[selectedEntityId]="vm().selectedEntityId"
+		[blocks]="vm().entityWeeklyBlocks"
+		[loading]="vm().loading"
+		[isAdmin]="vm().isAdmin"
+		entityLabel="Profesor"
+		[contextSalonId]="null"
+		(entitySelect)="onSelectEntity($event)"
+		(blockClick)="onViewDetail($event)"
+		(emptySlotClick)="onEmptySlotClick($event)"
+		(editClick)="onEdit($event)"
+		(viewDetailClick)="onViewDetail($event)"
+	/>
+}
+
+<!-- #endregion -->
+<!-- #region Vista Global -->
+@if (vm().vistaActual === 'global') {
+	<app-schedule-global-view
+		[horarios]="vm().horariosFiltrados"
+		[loading]="vm().loading"
+		(viewDetail)="onViewDetail($event)"
+	/>
 }
 
 <!-- #endregion -->
