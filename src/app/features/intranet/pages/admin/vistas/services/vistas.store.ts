@@ -1,32 +1,39 @@
 import { Injectable, computed, signal } from '@angular/core';
 
 import { BaseCrudStore } from '@core/store';
-import { Vista, VistasEstadisticas } from '@core/services';
+import { CapabilityCatalogItem } from '@core/services';
 import { capitalize } from '@core/helpers';
 import { withAllOption, SelectOption } from '@shared/models';
 
 // #region Interfaces
-interface VistaForm {
-	ruta: string;
+interface CapabilityForm {
+	codigo: string;
 	nombre: string;
-	estado: number;
+	modulo: string;
+	descripcion: string;
+}
+
+interface CapabilityStats {
+	total: number;
+	totalModulos: number;
+	modulos: string[];
 }
 // #endregion
 
 @Injectable({ providedIn: 'root' })
-export class VistasStore extends BaseCrudStore<Vista, VistaForm, VistasEstadisticas> {
+export class VistasStore extends BaseCrudStore<CapabilityCatalogItem, CapabilityForm, CapabilityStats> {
 	constructor() {
 		super(
-			{ ruta: '', nombre: '', estado: 1 },
-			{ totalVistas: 0, vistasActivas: 0, vistasInactivas: 0, totalModulos: 0, modulos: [] },
+			{ codigo: '', nombre: '', modulo: '', descripcion: '' },
+			{ total: 0, totalModulos: 0, modulos: [] },
 		);
 	}
 
-	protected override getDefaultFormData(): VistaForm {
-		return { ruta: '', nombre: '', estado: 1 };
+	protected override getDefaultFormData(): CapabilityForm {
+		return { codigo: '', nombre: '', modulo: '', descripcion: '' };
 	}
 
-	// #region Estado específico — Filtro módulo
+	// #region Filtro módulo
 	private readonly _filterModulo = signal<string | null>(null);
 	readonly filterModulo = this._filterModulo.asReadonly();
 
@@ -39,35 +46,25 @@ export class VistasStore extends BaseCrudStore<Vista, VistaForm, VistasEstadisti
 	}
 	// #endregion
 
-	// #region Computed específicos
+	// #region Computed
 	readonly modulosOptions = computed(() => {
 		const modulos = this.estadisticas()?.modulos ?? [];
 		const options: SelectOption<string>[] = modulos.map((m) => ({
 			label: capitalize(m),
 			value: m,
 		}));
-		return withAllOption(options, 'Todos los modulos');
+		return withAllOption(options, 'Todos los módulos');
 	});
 
 	readonly isFormValid = computed(() => {
 		const data = this.formData();
-		return !!(data.ruta?.trim() && data.nombre?.trim());
+		return !!(data.codigo?.trim() && data.nombre?.trim() && data.modulo?.trim());
 	});
-	// #endregion
-
-	// #region Mutaciones específicas — Toggle numérico (estado: 0/1)
-	/** Toggle numérico (0/1) — Vista usa estado numérico, no boolean */
-	toggleVistaEstado(id: number): void {
-		const vista = this.items().find((v) => v.id === id);
-		if (vista) {
-			this.updateItem(id, { estado: vista.estado === 1 ? 0 : 1 });
-		}
-	}
 	// #endregion
 
 	// #region ViewModel
 	readonly vm = computed(() => ({
-		vistas: this.items(),
+		items: this.items(),
 		loading: this.loading(),
 		error: this.error(),
 		estadisticas: this.estadisticas()!,
@@ -85,7 +82,6 @@ export class VistasStore extends BaseCrudStore<Vista, VistaForm, VistasEstadisti
 		modulosOptions: this.modulosOptions(),
 		searchTerm: this.searchTerm(),
 		filterModulo: this.filterModulo(),
-		filterEstado: this.filterEstado(),
 		confirmDialogVisible: this.confirmDialogVisible(),
 	}));
 	// #endregion

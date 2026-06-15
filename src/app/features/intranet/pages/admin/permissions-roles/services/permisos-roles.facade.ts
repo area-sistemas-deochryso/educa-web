@@ -6,23 +6,20 @@ import { logger, withRetry, facadeErrorHandler } from '@core/helpers';
 import {
 	ErrorHandlerService,
 	PermissionsService,
-	PermisoRol,
-	RolTipoAdmin,
-	ROLES_DISPONIBLES_ADMIN,
+	RolCapabilityMatrixRow,
 	SwService,
 	WalCrossTabRefetchService,
 	WalFacadeHelper,
 } from '@core/services';
 import { environment } from '@config';
-import { UiMappingService } from '@intranet-shared/services';
-import { UI_ADMIN_ERROR_DETAILS, UI_SUMMARIES, UI_PERMISOS_SUCCESS_DETAILS } from '@app/shared/constants';
-import { buildModulosVistas } from '../helpers/permisos-modulos.utils';
+import { UI_SUMMARIES } from '@app/shared/constants';
+import { buildModuloCapabilities } from '../helpers/permisos-modulos.utils';
 
 import { PermissionsRolesStore } from './permisos-roles.store';
 
 @Injectable({ providedIn: 'root' })
 export class PermissionsRolesFacade {
-	// #region Dependencias
+	// #region Dependencies
 	private api = inject(PermissionsService);
 	private store = inject(PermissionsRolesStore);
 	private wal = inject(WalFacadeHelper);
@@ -30,8 +27,7 @@ export class PermissionsRolesFacade {
 	private errorHandler = inject(ErrorHandlerService);
 	private crossTabRefetch = inject(WalCrossTabRefetchService);
 	private destroyRef = inject(DestroyRef);
-	readonly uiMapping = inject(UiMappingService);
-	private readonly apiUrl = `${environment.apiUrl}/api/sistema/permisos`;
+	private readonly apiUrl = `${environment.apiUrl}/api/admin/capabilities`;
 	private readonly errHandler = facadeErrorHandler({
 		tag: 'PermisosRolesFacade',
 		errorHandler: this.errorHandler,
@@ -40,214 +36,118 @@ export class PermissionsRolesFacade {
 
 	constructor() {
 		this.crossTabRefetch.subscribe({
-			resourceType: 'permisosRol',
-			refetchItems: () => this.silentRefreshAfterCrud(),
+			resourceType: 'rolCapabilities',
+			refetchItems: () => this.silentRefresh(),
 			destroyRef: this.destroyRef,
 		});
 	}
 
-	// #region Estado expuesto
 	readonly vm = this.store.vm;
-	readonly rolesDisponibles = ROLES_DISPONIBLES_ADMIN;
-	// #endregion
 
-	// #region Comandos CRUD
-
-	/** Carga inicial: vistas + permisos por rol (paginado) en paralelo */
+	// #region Load
 	loadAll(): void {
 		this.store.setLoading(true);
 		this.store.clearError();
 
 		forkJoin({
-			vistas: this.api.getVistas(),
-			permisosRol: this.api.getPermisosRolPaginated(1, this.store.pageSize(), 'Apoderado'),
+			catalog: this.api.getCapabilityCatalog(),
+			matrix: this.api.getRolCapabilityMatrix(),
 		})
 			.pipe(
 				withRetry({ tag: 'PermisosRolesFacade:loadAll' }),
 				takeUntilDestroyed(this.destroyRef),
 			)
 			.subscribe({
-				next: ({ vistas, permisosRol }) => {
-					this.store.setVistas(vistas.filter((v) => v.estado === 1));
-					this.store.setPermisosRol(permisosRol.data);
-					this.store.setPaginationData(
-						permisosRol.page,
-						permisosRol.pageSize,
-						permisosRol.total,
-					);
+				next: ({ catalog, matrix }) => {
+					this.store.setCatalog(catalog);
+					this.store.setMatrixRows(matrix);
 					this.store.setLoading(false);
 				},
 				error: (err) => {
-					logger.error('Error al cargar datos:', err);
-					this.errorHandler.showError(
-						UI_SUMMARIES.error,
-						UI_ADMIN_ERROR_DETAILS.loadPermisos,
-					);
-					this.store.setError(UI_ADMIN_ERROR_DETAILS.loadPermisos);
+					logger.error('Error loading role capabilities:', err);
+					this.errorHandler.showError(UI_SUMMARIES.error, 'No se pudieron cargar las capabilities por rol');
+					this.store.setError('No se pudieron cargar las capabilities por rol');
 					this.store.setLoading(false);
-				},
-			});
-	}
-
-	/** Cambiar de página (lazy loading) */
-	loadPage(page: number, pageSize: number): void {
-		this.store.setPage(page);
-		this.store.setPageSize(pageSize);
-		this.refreshPermisosRolOnly();
-	}
-
-	/**
-	 * CREAR/EDITAR: WAL-protegido + refetch (estructura de vistas compleja)
-	 */
-	savePermiso(): void {
-		const vistas = this.store.selectedVistas();
-		const isEditing = this.store.isEditing();
-
-		if (isEditing) {
-			const permiso = this.store.selectedPermiso();
-			if (!permiso) return;
-
-			this.wal.execute({
-				operation: 'UPDATE',
-				resourceType: 'permisosRol',
-				resourceId: permiso.id,
-				endpoint: `${this.apiUrl}/rol/${permiso.id}/actualizar`,
-				method: 'PUT',
-				payload: { vistas, rowVersion: permiso.rowVersion },
-				http$: () => this.api.actualizarPermisoRol(permiso.id, { vistas, rowVersion: permiso.rowVersion }),
-				onCommit: () => {
-					this.silentRefreshAfterCrud();
-					this.errorHandler.showSuccess(UI_SUMMARIES.success, UI_PERMISOS_SUCCESS_DETAILS.updated);
-				},
-				onError: (err) => this.errHandler.handle(err, 'actualizar permiso'),
-				optimistic: {
-					apply: () => this.store.closeDialog(),
-					rollback: () => {},
-				},
-			});
-		} else {
-			const rol = this.store.selectedRol();
-			if (!rol) return;
-
-			this.wal.execute({
-				operation: 'CREATE',
-				resourceType: 'permisosRol',
-				endpoint: `${this.apiUrl}/rol/crear`,
-				method: 'POST',
-				payload: { rol, vistas },
-				http$: () => this.api.crearPermisoRol({ rol, vistas }),
-				onCommit: () => {
-					this.silentRefreshAfterCrud();
-					this.errorHandler.showSuccess(UI_SUMMARIES.success, UI_PERMISOS_SUCCESS_DETAILS.created);
-				},
-				onError: (err) => this.errHandler.handle(err, 'crear permiso'),
-				optimistic: {
-					apply: () => this.store.closeDialog(),
-					rollback: () => {},
-				},
-			});
-		}
-	}
-
-	/**
-	 * ELIMINAR: WAL-protegido + mutación quirúrgica con rollback
-	 */
-	delete(permiso: PermisoRol): void {
-		this.wal.execute({
-			operation: 'DELETE',
-			resourceType: 'permisosRol',
-			resourceId: permiso.id,
-			endpoint: `${this.apiUrl}/rol/${permiso.id}/eliminar`,
-			method: 'DELETE',
-			payload: null,
-			http$: () => this.api.eliminarPermisoRol(permiso.id),
-			onCommit: () => {
-				this.errorHandler.showSuccess(UI_SUMMARIES.success, UI_PERMISOS_SUCCESS_DETAILS.deleted);
-			},
-			onError: (err) => this.errHandler.handle(err, 'eliminar permiso'),
-			optimistic: {
-				apply: () => {
-					this.store.removePermiso(permiso.id);
-				},
-				rollback: () => {
-					this.store.addPermiso(permiso);
-				},
-			},
-		});
-	}
-
-	/** Refresh manual (botón Actualizar): invalida cache SW + recarga completa. */
-	refresh(): void {
-		this.swService.invalidateCacheByPattern('/permisos').then(() => {
-			this.loadAll();
-		});
-	}
-
-	/** Refetch silencioso post-CRUD: el interceptor ya invalidó el cache del SW. */
-	private silentRefreshAfterCrud(): void {
-		this.refreshPermisosRolOnly(true);
-	}
-
-	/** @param silent - Si true, no muestra loading */
-	private refreshPermisosRolOnly(silent = false): void {
-		if (!silent) { this.store.setLoading(true); }
-		const page = this.store.page();
-		const pageSize = this.store.pageSize();
-
-		this.api
-			.getPermisosRolPaginated(page, pageSize, 'Apoderado')
-			.pipe(
-				withRetry({ tag: 'PermisosRolesFacade:refreshPermisosRolOnly' }),
-				takeUntilDestroyed(this.destroyRef),
-			)
-			.subscribe({
-				next: (result) => {
-					this.store.setPermisosRol(result.data);
-					this.store.setPaginationData(result.page, result.pageSize, result.total);
-					if (!silent) { this.store.setLoading(false); }
-				},
-				error: (err) => {
-					logger.error('Error al refrescar permisos:', err);
-					this.errorHandler.showError(UI_SUMMARIES.error, UI_ADMIN_ERROR_DETAILS.refreshData);
-					if (!silent) { this.store.setLoading(false); }
 				},
 			});
 	}
 
 	// #endregion
 
-	// #region Comandos de UI
+	// #region Save
+	saveCapabilities(): void {
+		const row = this.store.selectedRow();
+		if (!row) return;
 
-	openNewDialog(): void {
-		this.store.setSelectedPermiso(null);
-		this.store.setSelectedRol(null);
-		this.store.setSelectedVistas([]);
-		this.store.setIsEditing(false);
-		const modulos = buildModulosVistas(
-			this.store.vistas(),
-			[],
-			(ruta) => this.uiMapping.getModuloFromRuta(ruta),
-		);
-		this.store.setModulosVistas(modulos);
-		this.store.openDialog();
+		const capabilityIds = this.store.selectedCapIds();
+		const previousIds = [...row.capabilityIds];
+
+		this.wal.execute({
+			operation: 'UPDATE',
+			resourceType: 'rolCapabilities',
+			resourceId: row.rolId,
+			endpoint: `${this.apiUrl}/roles/${row.rolId}/capabilities`,
+			method: 'PUT',
+			payload: { capabilityIds },
+			http$: () => this.api.setRolCapabilities(row.rolId, { capabilityIds }),
+			onCommit: () => {
+				this.errorHandler.showSuccess(UI_SUMMARIES.success, 'Capabilities del rol actualizadas');
+				this.silentRefresh();
+			},
+			onError: (err) => this.errHandler.handle(err, 'actualizar capabilities del rol'),
+			optimistic: {
+				apply: () => {
+					this.store.updateRowCapabilities(row.rolId, capabilityIds);
+					this.store.closeDialog();
+				},
+				rollback: () => {
+					this.store.updateRowCapabilities(row.rolId, previousIds);
+				},
+			},
+		});
+	}
+	// #endregion
+
+	// #region Refresh
+	refresh(): void {
+		this.swService.invalidateCacheByPattern('/capabilities').then(() => {
+			this.loadAll();
+		});
 	}
 
-	openEditDialog(permiso: PermisoRol): void {
-		this.store.setSelectedPermiso(permiso);
-		this.store.setSelectedRol(permiso.rol as RolTipoAdmin);
-		this.store.setSelectedVistas([...permiso.vistas]);
+	private silentRefresh(): void {
+		forkJoin({
+			catalog: this.api.getCapabilityCatalog(),
+			matrix: this.api.getRolCapabilityMatrix(),
+		})
+			.pipe(
+				withRetry({ tag: 'PermisosRolesFacade:silentRefresh' }),
+				takeUntilDestroyed(this.destroyRef),
+			)
+			.subscribe({
+				next: ({ catalog, matrix }) => {
+					this.store.setCatalog(catalog);
+					this.store.setMatrixRows(matrix);
+				},
+				error: (err) => {
+					logger.error('Error refreshing role capabilities:', err);
+				},
+			});
+	}
+	// #endregion
+
+	// #region UI commands
+	openEditDialog(row: RolCapabilityMatrixRow): void {
+		this.store.setSelectedRow(row);
+		this.store.setSelectedCapIds([...row.capabilityIds]);
 		this.store.setIsEditing(true);
-		const modulos = buildModulosVistas(
-			this.store.vistas(),
-			permiso.vistas,
-			(ruta) => this.uiMapping.getModuloFromRuta(ruta),
-		);
-		this.store.setModulosVistas(modulos);
+		const modulos = buildModuloCapabilities(this.store.catalog(), row.capabilityIds);
+		this.store.setModulosCapabilities(modulos);
 		this.store.openDialog();
 	}
 
-	openDetail(permiso: PermisoRol): void {
-		this.store.openDetailDrawer(permiso);
+	openDetail(row: RolCapabilityMatrixRow): void {
+		this.store.openDetailDrawer(row);
 	}
 
 	closeDetail(): void {
@@ -258,43 +158,30 @@ export class PermissionsRolesFacade {
 		this.store.closeDialog();
 	}
 
-	openConfirmDialog(): void {
-		this.store.openConfirmDialog();
-	}
-
-	closeConfirmDialog(): void {
-		this.store.closeConfirmDialog();
-	}
-
 	editFromDetail(): void {
-		const permiso = this.store.selectedPermiso();
-		if (permiso) {
+		const row = this.store.selectedRow();
+		if (row) {
 			this.closeDetail();
-			this.openEditDialog(permiso);
+			this.openEditDialog(row);
 		}
 	}
-
 	// #endregion
 
-	// #region Comandos de formulario
-	setSelectedRol(rol: RolTipoAdmin | null): void {
-		this.store.setSelectedRol(rol);
-	}
-
+	// #region Form commands
 	setActiveModuloIndex(index: number): void {
 		this.store.setActiveModuloIndex(index);
 	}
 
-	setVistasBusqueda(term: string): void {
-		this.store.setVistasBusqueda(term);
+	setCapBusqueda(term: string): void {
+		this.store.setCapBusqueda(term);
 	}
 
-	toggleVista(ruta: string): void {
-		this.store.toggleVista(ruta);
+	toggleCapability(capId: number): void {
+		this.store.toggleCapability(capId);
 	}
 
-	toggleAllVistasModulo(): void {
-		this.store.toggleAllVistasModulo();
+	toggleAllCapabilitiesModulo(): void {
+		this.store.toggleAllCapabilitiesModulo();
 	}
 	// #endregion
 }

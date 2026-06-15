@@ -2,13 +2,20 @@ import {
 	ActualizarPermisoRolRequest,
 	ActualizarPermisoUsuarioRequest,
 	ActualizarVistaRequest,
+	CapabilityCatalogItem,
+	CreateCapabilityRequest,
 	CrearPermisoRolRequest,
 	CrearPermisoUsuarioRequest,
 	CrearVistaRequest,
 	PermisoRol,
 	PermisoUsuario,
 	PermisosUsuarioResultado,
+	RolCapabilityMatrixRow,
+	SetRolCapabilitiesRequest,
+	SetUsuarioCapabilitiesRequest,
+	UpdateCapabilityRequest,
 	UsuarioBusquedaResultado,
+	UsuarioCapabilityOverview,
 	Vista,
 	VistasEstadisticas,
 } from './permisos.models';
@@ -221,10 +228,31 @@ export class PermissionsService {
 	}
 
 	// #endregion
-	// #region CONSULTA DE PERMISOS
+	// #region CAPABILITIES
+
+	private readonly authApiUrl = `${environment.apiUrl}/api/auth`;
+
+	/**
+	 * Get effective capability codes for the current user.
+	 * Replaces getMisPermisos() — calls GET /api/auth/capabilities.
+	 */
+	getMyCapabilities(): Observable<string[]> {
+		return this.http
+			.get<string[]>(`${this.authApiUrl}/capabilities`)
+			.pipe(
+				catchError((err) => {
+					logger.warn('[PermissionsService] Error loading capabilities — fallback empty', err?.status);
+					return of([]);
+				}),
+			);
+	}
+
+	// #endregion
+	// #region CONSULTA DE PERMISOS (legacy — admin pages)
 
 	/**
 	 * Get permissions for a specific user and role.
+	 * @deprecated Legacy endpoint — admin pages only.
 	 */
 	consultarPermisosDeUsuario(
 		usuarioId: number,
@@ -238,7 +266,7 @@ export class PermissionsService {
 	}
 
 	/**
-	 * Get permissions for the current authenticated user.
+	 * @deprecated Use getMyCapabilities() instead. This endpoint no longer exists in BE.
 	 */
 	getMisPermisos(): Observable<PermisosUsuarioResultado | null> {
 		return this.http
@@ -269,6 +297,7 @@ export class PermissionsService {
 
 	/**
 	 * List users by role.
+	 * @deprecated Legacy — use searchUsers.
 	 */
 	listarUsuariosPorRol(rol: string): Observable<UsuarioBusquedaResultado> {
 		return this.http
@@ -277,5 +306,75 @@ export class PermissionsService {
 			)
 			.pipe(catchError(() => of({ usuarios: [], total: 0 })));
 	}
+	// #endregion
+
+	// #region CAPABILITY ADMIN (P57)
+
+	private readonly capAdminUrl = `${environment.apiUrl}/api/admin/capabilities`;
+
+	// -- Catalog --
+
+	getCapabilityCatalog(): Observable<CapabilityCatalogItem[]> {
+		return this.http
+			.get<CapabilityCatalogItem[]>(`${this.capAdminUrl}/roles/catalog`)
+			.pipe(catchError(() => of([])));
+	}
+
+	createCapability(request: CreateCapabilityRequest): Observable<CapabilityCatalogItem> {
+		return this.http.post<CapabilityCatalogItem>(`${this.capAdminUrl}/catalog`, request);
+	}
+
+	updateCapability(id: number, request: UpdateCapabilityRequest): Observable<CapabilityCatalogItem> {
+		return this.http.patch<CapabilityCatalogItem>(`${this.capAdminUrl}/catalog/${id}`, request);
+	}
+
+	deleteCapability(id: number): Observable<string> {
+		return this.http.delete<string>(`${this.capAdminUrl}/catalog/${id}`);
+	}
+
+	// -- Role capabilities --
+
+	getRolCapabilityMatrix(): Observable<RolCapabilityMatrixRow[]> {
+		return this.http
+			.get<RolCapabilityMatrixRow[]>(`${this.capAdminUrl}/roles/matrix`)
+			.pipe(catchError(() => of([])));
+	}
+
+	setRolCapabilities(rolId: number, request: SetRolCapabilitiesRequest): Observable<string> {
+		return this.http.put<string>(`${this.capAdminUrl}/roles/${rolId}/capabilities`, request);
+	}
+
+	// -- User capabilities --
+
+	getUsuarioCapabilityOverview(entityId: number, rolId: number): Observable<UsuarioCapabilityOverview | null> {
+		return this.http
+			.get<UsuarioCapabilityOverview>(`${this.capAdminUrl}/users/${entityId}/rol/${rolId}`)
+			.pipe(catchError(() => of(null)));
+	}
+
+	setUsuarioCapabilities(
+		entityId: number,
+		rolId: number,
+		request: SetUsuarioCapabilitiesRequest,
+	): Observable<string> {
+		return this.http.put<string>(`${this.capAdminUrl}/users/${entityId}/rol/${rolId}`, request);
+	}
+
+	getUsuarioEffectiveCapabilities(entityId: number, rolId: number): Observable<string[]> {
+		return this.http
+			.get<string[]>(`${this.capAdminUrl}/users/${entityId}/rol/${rolId}/effective`)
+			.pipe(catchError(() => of([])));
+	}
+
+	searchUsers(termino?: string, rol?: string): Observable<UsuarioBusquedaResultado> {
+		const params: Record<string, string> = {};
+		if (termino) params['termino'] = termino;
+		if (rol) params['rol'] = rol;
+
+		return this.http
+			.get<UsuarioBusquedaResultado>(`${this.capAdminUrl}/users/search`, { params })
+			.pipe(catchError(() => of({ usuarios: [], total: 0 })));
+	}
+
 	// #endregion
 }

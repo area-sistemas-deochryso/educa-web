@@ -1,10 +1,13 @@
 <!-- #region Template -->
 <div class="permisos-container">
-	<!-- * Header -->
-	<app-page-header icon="pi pi-shield" title="Administracion de Permisos" subtitle="Gestiona permisos personalizados por usuario">
+	<!-- #region Header -->
+	<app-page-header
+		icon="pi pi-shield"
+		title="Capabilities por Usuario"
+		subtitle="Configure overrides de capabilities por usuario (grants y denies sobre su rol)"
+	>
 		<button
 			pButton
-			type="button"
 			label="Refrescar"
 			icon="pi pi-refresh"
 			class="p-button-outlined"
@@ -12,6 +15,7 @@
 			(click)="refresh()"
 		></button>
 	</app-page-header>
+	<!-- #endregion -->
 
 	@if (vm().error) {
 		<div class="error-banner">
@@ -20,190 +24,312 @@
 		</div>
 	}
 
-	<!-- * Filters -->
-	<section class="filters-section">
-		<div class="search-box">
-			<i class="pi pi-search"></i>
-			<input
-				type="text"
-				pInputText
-				placeholder="Buscar por usuario..."
-				aria-label="Buscar usuario"
-				[ngModel]="searchTerm()"
-				(ngModelChange)="onSearchTermChange($event)"
-			/>
+	<!-- #region Search section -->
+	<section class="search-section">
+		<div class="search-row">
+			<div class="search-field">
+				<label for="rolSelect">Rol</label>
+				<p-select
+					id="rolSelect"
+					appendTo="body"
+					[options]="vm().roles"
+					[ngModel]="vm().selectedRolId"
+					(ngModelChange)="onRolChange($event)"
+					placeholder="Seleccione un rol"
+					aria-label="Seleccionar rol"
+					[style]="{ width: '100%' }"
+				/>
+			</div>
+
+			<div class="search-field search-field--wide">
+				<label for="userSearch">Usuario</label>
+				<p-autoComplete
+					id="userSearch"
+					[suggestions]="vm().usuariosSugeridos"
+					[ngModel]="vm().selectedUsuario"
+					(completeMethod)="onSearchUsers($event)"
+					(onSelect)="onSelectUsuario($event.value)"
+					field="nombreCompleto"
+					placeholder="Buscar por nombre o DNI..."
+					aria-label="Buscar usuario"
+					[minLength]="2"
+					[style]="{ width: '100%' }"
+					[inputStyle]="{ width: '100%' }"
+				>
+					<ng-template let-user pTemplate="item">
+						<div class="user-suggestion">
+							<i class="pi pi-user"></i>
+							<div class="user-suggestion-info">
+								<span class="user-suggestion-name">{{ user.nombreCompleto }}</span>
+								<span class="user-suggestion-detail">{{ user.rol }} &middot; {{ user.dni }}</span>
+							</div>
+						</div>
+					</ng-template>
+				</p-autoComplete>
+			</div>
+
+			@if (vm().selectedUsuario) {
+				<div class="search-actions">
+					<button
+						pButton
+						icon="pi pi-times"
+						class="p-button-text p-button-secondary"
+						pTooltip="Limpiar selección"
+						aria-label="Limpiar selección"
+						(click)="resetSelection()"
+					></button>
+				</div>
+			}
 		</div>
-
-		<p-select
-			appendTo="body"
-			[options]="rolesOptions"
-			[ngModel]="filterRol()"
-			(ngModelChange)="onFilterRolChange($event)"
-			placeholder="Todos los roles"
-			aria-label="Filtrar por rol"
-			[style]="{ minWidth: '180px' }"
-		/>
-
-		<button
-			pButton
-			type="button"
-			label="Limpiar filtros"
-			icon="pi pi-filter-slash"
-			class="p-button-text"
-			aria-label="Limpiar filtros"
-			(click)="clearFilters()"
-		></button>
-
-		<div class="filter-spacer"></div>
-
-		<button
-			pButton
-			type="button"
-			label="Nuevo Permiso"
-			icon="pi pi-plus"
-			class="p-button-success"
-			aria-label="Crear nuevo permiso"
-			(click)="openNew()"
-		></button>
 	</section>
+	<!-- #endregion -->
 
-	<!-- * Stats cards -->
-	<app-permissions-stats-cards
-		[totalUsuarios]="totalUsuarios()"
-		[rolesCount]="rolesDisponibles.length"
-		[totalModulos]="totalModulos()"
-		[vistasCount]="vistas().length"
-	/>
-
-	<!-- Table -->
-	@if (loading()) {
+	<!-- #region Overview -->
+	@if (vm().loading) {
 		<div class="loading-container">
-			<p-progressSpinner strokeWidth="4" />
+			<i class="pi pi-spin pi-spinner" style="font-size: 2rem"></i>
 		</div>
-	} @else {
-		<section class="table-section">
-			<p-table
-				[value]="filteredPermisos()"
-				[paginator]="true"
-				[rows]="10"
-				[rowsPerPageOptions]="[5, 10, 25, 50]"
-				[showCurrentPageReport]="true"
-				currentPageReportTemplate="Mostrando {first} a {last} de {totalRecords} usuarios"
-				class="p-datatable-sm"
-			>
-				<ng-template #header>
-					<tr>
-						<th style="width: 80px" pSortableColumn="usuarioId">
-							ID <p-sortIcon field="usuarioId" />
-						</th>
-						<th pSortableColumn="nombreUsuario">
-							USUARIO <p-sortIcon field="nombreUsuario" />
-						</th>
-						<th style="width: 140px" pSortableColumn="rol">
-							ROL <p-sortIcon field="rol" />
-						</th>
-						<th style="width: 100px">VISTAS</th>
-						<th style="width: 100px">MODULOS</th>
-						<th style="width: 120px">PERMISOS</th>
-						<th style="width: 140px">ACCIONES</th>
-					</tr>
-				</ng-template>
+	} @else if (vm().overview) {
+		<section class="overview-section">
+			<!-- #region Stats -->
+			<div class="stats-section">
+				<div class="stat-card">
+					<div class="stat-content">
+						<span class="stat-label">Heredadas</span>
+						<span class="stat-value">{{ vm().overrideSummary.inherited }}</span>
+						<span class="stat-sublabel">del rol</span>
+					</div>
+					<div class="stat-icon inherited">
+						<i class="pi pi-id-card"></i>
+					</div>
+				</div>
 
-				<ng-template #body let-permiso>
-					<tr>
-						<td class="text-center">
-							<span class="id-badge">{{ permiso.usuarioId }}</span>
-						</td>
-						<td>
-							<div class="user-cell">
-								<div class="user-avatar">
-									<i class="pi pi-user"></i>
-								</div>
-								<span class="user-name">{{
-									permiso.nombreUsuario || 'Usuario ' + permiso.usuarioId
-								}}</span>
-							</div>
-						</td>
-						<td>
-							<p-tag [value]="permiso.rol" styleClass="tag-neutral" />
-						</td>
-						<td class="text-center">
-							<span class="count-badge">{{ permiso.vistas.length }}</span>
-						</td>
-						<td class="text-center">
-							<span class="count-badge secondary">{{
-								uiMapping.getModulosCount(permiso.vistas)
-							}}</span>
-						</td>
-						<td class="text-center">
-							<span class="permisos-badge"> <i class="pi pi-user"></i> Usuario </span>
-						</td>
-						<td>
-							<div class="actions">
-								<button
-									pButton
-									type="button"
-									icon="pi pi-eye"
-									class="p-button-rounded p-button-text p-button-secondary"
-									pTooltip="Ver detalles"
-									aria-label="Ver detalles"
-									(click)="openDetail(permiso)"
-								></button>
-								<button
-									pButton
-									type="button"
-									icon="pi pi-pencil"
-									class="p-button-rounded p-button-text p-button-info"
-									pTooltip="Editar"
-									aria-label="Editar"
-									(click)="editPermiso(permiso)"
-								></button>
-								<button
-									pButton
-									type="button"
-									icon="pi pi-trash"
-									class="p-button-rounded p-button-text p-button-danger"
-									pTooltip="Eliminar"
-									aria-label="Eliminar"
-									(click)="deletePermiso(permiso)"
-								></button>
-							</div>
-						</td>
-					</tr>
-				</ng-template>
+				<div class="stat-card">
+					<div class="stat-content">
+						<span class="stat-label">Grants</span>
+						<span class="stat-value">{{ vm().overrideSummary.grants }}</span>
+						<span class="stat-sublabel">adicionales</span>
+					</div>
+					<div class="stat-icon grants">
+						<i class="pi pi-plus-circle"></i>
+					</div>
+				</div>
 
-				<ng-template #emptymessage>
-					<tr>
-						<td colspan="7" class="empty-message">
-							<div class="empty-state">
-								<i class="pi pi-inbox"></i>
-								<p>No hay permisos personalizados configurados</p>
-								<span>Los usuarios usaran los permisos de su rol por defecto</span>
+				<div class="stat-card">
+					<div class="stat-content">
+						<span class="stat-label">Denies</span>
+						<span class="stat-value">{{ vm().overrideSummary.denies }}</span>
+						<span class="stat-sublabel">restringidas</span>
+					</div>
+					<div class="stat-icon denies">
+						<i class="pi pi-minus-circle"></i>
+					</div>
+				</div>
+
+				<div class="stat-card">
+					<div class="stat-content">
+						<span class="stat-label">Efectivas</span>
+						<span class="stat-value">{{ vm().overrideSummary.effective }}</span>
+						<span class="stat-sublabel">resultado final</span>
+					</div>
+					<div class="stat-icon effective">
+						<i class="pi pi-shield"></i>
+					</div>
+				</div>
+			</div>
+			<!-- #endregion -->
+
+			<!-- #region Effective list -->
+			<div class="effective-section">
+				<div class="effective-header">
+					<h3>Capabilities efectivas</h3>
+					<button
+						pButton
+						label="Editar Overrides"
+						icon="pi pi-pencil"
+						class="p-button-outlined"
+						aria-label="Editar overrides del usuario"
+						(click)="openEditDialog()"
+					></button>
+				</div>
+
+				<div class="effective-grid">
+					@for (modulo of vm().moduloCapabilities; track modulo.nombre) {
+						<div class="module-group">
+							<div class="module-header">
+								<i class="pi pi-folder"></i>
+								<span class="module-name">{{ modulo.nombre }}</span>
 							</div>
-						</td>
-					</tr>
-				</ng-template>
-			</p-table>
+							<div class="module-caps">
+								@for (cap of modulo.capabilities; track cap.id) {
+									<div
+										class="cap-item"
+										[class.active]="vm().effectiveCaps.has(cap.id)"
+										[class.granted]="vm().grantIds.includes(cap.id)"
+										[class.denied]="vm().denyIds.includes(cap.id)"
+									>
+										@if (vm().denyIds.includes(cap.id)) {
+											<i class="pi pi-times-circle cap-icon cap-icon--deny"></i>
+										} @else if (vm().grantIds.includes(cap.id)) {
+											<i class="pi pi-plus-circle cap-icon cap-icon--grant"></i>
+										} @else if (vm().effectiveCaps.has(cap.id)) {
+											<i class="pi pi-check-circle cap-icon cap-icon--inherited"></i>
+										} @else {
+											<i class="pi pi-circle cap-icon cap-icon--off"></i>
+										}
+										<div class="cap-info">
+											<span class="cap-name">{{ cap.nombre }}</span>
+											<span class="cap-code">{{ cap.codigo }}</span>
+										</div>
+									</div>
+								}
+							</div>
+						</div>
+					}
+				</div>
+			</div>
+			<!-- #endregion -->
 		</section>
+	} @else if (!vm().selectedUsuario) {
+		<div class="empty-state-container">
+			<div class="empty-state">
+				<i class="pi pi-search"></i>
+				<p>Seleccione un rol y busque un usuario</p>
+				<span>para ver y editar sus overrides de capabilities</span>
+			</div>
+		</div>
 	}
+	<!-- #endregion -->
 </div>
 
-<!-- Detail Drawer -->
-<app-permissions-detail-drawer
-	[visible]="detailDrawerVisible()"
-	[permiso]="selectedPermiso()"
-	[moduloVistas]="moduloVistasForDetail()"
-	(visibleChange)="onDrawerVisibleChange($event)"
-	(edit)="editFromDetail()"
-/>
+<!-- #region Edit Dialog -->
+<p-dialog
+	[visible]="vm().dialogVisible"
+	(visibleChange)="onDialogVisibleChange($event)"
+	[header]="'Overrides - ' + (vm().selectedUsuario?.nombreCompleto || '')"
+	[modal]="true"
+	[style]="{ width: '900px', maxHeight: '90vh' }"
+	[draggable]="false"
+	[resizable]="false"
+	class="edit-permisos-dialog"
+>
+	<div class="dialog-content">
+		<div class="dialog-user-header">
+			<div class="user-info">
+				<i class="pi pi-user"></i>
+				<span>{{ vm().selectedUsuario?.nombreCompleto }}</span>
+				<p-tag [value]="vm().selectedUsuario?.rol || ''" styleClass="tag-neutral" />
+			</div>
+			<div class="override-count">
+				<span class="override-grants">
+					<i class="pi pi-plus-circle"></i> {{ vm().grantIds.length }} grants
+				</span>
+				<span class="override-denies">
+					<i class="pi pi-minus-circle"></i> {{ vm().denyIds.length }} denies
+				</span>
+			</div>
+		</div>
 
-<!-- Edit Dialog -->
-<app-permissions-edit-dialog
-	[visible]="dialogVisible()"
-	(visibleChange)="hideDialog()"
-	(save)="savePermiso()"
-/>
+		@if (vm().moduloCapabilities.length > 0) {
+			<div class="modules-tabs-container">
+				<div class="modules-tabs">
+					@for (modulo of vm().moduloCapabilities; track modulo.nombre; let i = $index) {
+						<button
+							class="module-tab"
+							[class.active]="vm().activeModuloIndex === i"
+							(click)="onActiveModuloIndexChange(i)"
+						>
+							<i class="pi pi-folder"></i>
+							{{ modulo.nombre }}
+							<span class="tab-count">{{ modulo.total }}</span>
+						</button>
+					}
+				</div>
 
-<!-- Confirm Dialog -->
-<p-confirmDialog />
+				<div class="caps-content">
+					<div class="caps-search">
+						<i class="pi pi-search"></i>
+						<input
+							type="text"
+							pInputText
+							placeholder="Buscar capability..."
+							[ngModel]="vm().capBusqueda"
+							(ngModelChange)="onCapBusquedaChange($event)"
+						/>
+					</div>
+
+					<div class="caps-legend">
+						<span class="legend-item legend-inherited"><i class="pi pi-check-circle"></i> Heredada del rol</span>
+						<span class="legend-item legend-grant"><i class="pi pi-plus-circle"></i> Grant (adicional)</span>
+						<span class="legend-item legend-deny"><i class="pi pi-minus-circle"></i> Deny (restringida)</span>
+					</div>
+
+					<div class="caps-grid">
+						@for (cap of vm().capsFiltradas; track cap.id) {
+							@let isInherited = vm().overview?.inheritedCapabilityIds?.includes(cap.id) ?? false;
+							@let isGranted = vm().grantIds.includes(cap.id);
+							@let isDenied = vm().denyIds.includes(cap.id);
+							<div
+								class="cap-override-row"
+								[class.inherited]="isInherited && !isDenied"
+								[class.granted]="isGranted"
+								[class.denied]="isDenied"
+							>
+								<div class="cap-override-info">
+									<span class="cap-override-name">{{ cap.nombre }}</span>
+									<span class="cap-override-code">{{ cap.codigo }}</span>
+								</div>
+								<div class="cap-override-actions">
+									@if (isInherited) {
+										<span class="inherited-badge">
+											<i class="pi pi-id-card"></i> Rol
+										</span>
+									}
+									<button
+										pButton
+										type="button"
+										[icon]="isGranted ? 'pi pi-check' : 'pi pi-plus'"
+										[class]="isGranted ? 'p-button-sm p-button-success' : 'p-button-sm p-button-outlined'"
+										pTooltip="Grant"
+										aria-label="Toggle grant"
+										(click)="toggleGrant(cap.id)"
+									></button>
+									<button
+										pButton
+										type="button"
+										[icon]="isDenied ? 'pi pi-check' : 'pi pi-minus'"
+										[class]="isDenied ? 'p-button-sm p-button-danger' : 'p-button-sm p-button-outlined'"
+										pTooltip="Deny"
+										aria-label="Toggle deny"
+										(click)="toggleDeny(cap.id)"
+									></button>
+								</div>
+							</div>
+						}
+					</div>
+				</div>
+			</div>
+		}
+	</div>
+
+	<ng-template #footer>
+		<div class="dialog-footer">
+			<button
+				pButton
+				label="Cancelar"
+				icon="pi pi-times"
+				class="p-button-text"
+				(click)="closeDialog()"
+			></button>
+			<button
+				pButton
+				label="Guardar Overrides"
+				icon="pi pi-check"
+				class="p-button-success"
+				(click)="saveOverrides()"
+			></button>
+		</div>
+	</ng-template>
+</p-dialog>
+<!-- #endregion -->
 <!-- #endregion -->

@@ -1,204 +1,190 @@
-import { Injectable, DestroyRef, inject, computed } from '@angular/core';
+import { Injectable, DestroyRef, inject } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { forkJoin } from 'rxjs';
 
 import { logger, withRetry, facadeErrorHandler } from '@core/helpers';
 import {
 	PermissionsService,
-	RolTipoAdmin,
 	ErrorHandlerService,
 	SwService,
 	WalCrossTabRefetchService,
+	WalFacadeHelper,
+	UsuarioBusqueda,
 } from '@core/services';
-import { UI_ADMIN_ERROR_DETAILS, UI_SUMMARIES } from '@app/shared/constants';
-import { UiMappingService } from '@intranet-shared/services';
+import { environment } from '@config';
+import { UI_SUMMARIES } from '@app/shared/constants';
+
 import { PermissionsUsersStore } from './permisos-usuarios.store';
-import { PermissionsUsersHelperService } from './permisos-usuarios-helper.service';
 
 @Injectable({ providedIn: 'root' })
 export class PermissionsUsersDataFacade {
 	private store = inject(PermissionsUsersStore);
-	private permisosService = inject(PermissionsService);
-	private helperService = inject(PermissionsUsersHelperService);
+	private api = inject(PermissionsService);
+	private wal = inject(WalFacadeHelper);
 	private errorHandler = inject(ErrorHandlerService);
 	private swService = inject(SwService);
 	private crossTabRefetch = inject(WalCrossTabRefetchService);
 	private destroyRef = inject(DestroyRef);
-	readonly uiMapping = inject(UiMappingService);
+	private readonly apiUrl = `${environment.apiUrl}/api/admin/capabilities`;
 	private readonly errHandler = facadeErrorHandler({
-		tag: 'PermisosUsuariosDataFacade',
+		tag: 'PermisosUsuariosFacade',
 		errorHandler: this.errorHandler,
 	});
 
 	constructor() {
 		this.crossTabRefetch.subscribe({
-			resourceType: 'permisosUsuario',
-			refetchItems: () => this.loadData(),
+			resourceType: 'usuarioCapabilities',
+			refetchItems: () => this.loadCatalogAndMatrix(),
 			destroyRef: this.destroyRef,
 		});
 	}
 
-	// #region Estado expuesto
 	readonly vm = this.store.vm;
-	readonly permisosUsuario = this.store.permisosUsuario;
-	readonly permisosRol = this.store.permisosRol;
-	readonly vistas = this.store.vistas;
-	readonly loading = this.store.loading;
-	readonly searchTerm = this.store.searchTerm;
-	readonly filterRol = this.store.filterRol;
-	readonly filteredPermisos = this.store.filteredPermisos;
-	readonly selectedPermiso = this.store.selectedPermiso;
-	readonly selectedRol = this.store.selectedRol;
-	readonly selectedVistas = this.store.selectedVistas;
-	readonly usuariosSugeridos = this.store.usuariosSugeridos;
-	// #endregion
 
-	// #region Computed
-	readonly totalUsuarios = computed(() => this.permisosUsuario().length);
-
-	readonly totalModulos = computed(() => {
-		const modulos = new Set<string>();
-		this.vistas().forEach((v) => {
-			const modulo = this.uiMapping.getModuloFromRuta(v.ruta);
-			modulos.add(modulo);
-		});
-		return modulos.size;
-	});
-
-	readonly moduloVistasForDetail = computed(() => {
-		const permiso = this.selectedPermiso();
-		if (!permiso) return [];
-		return this.helperService.buildModulosVistasForDetail(this.vistas(), permiso.vistas);
-	});
-
-	readonly vistasCountLabel = computed(() =>
-		this.helperService.getVistasCountLabel(this.selectedVistas().length),
-	);
-	// #endregion
-
-	// #region Data Loading
-	loadData(): void {
+	// #region Load
+	loadCatalogAndMatrix(): void {
 		this.store.setLoading(true);
 		this.store.clearError();
 
 		forkJoin({
-			vistas: this.permisosService.getVistas(),
-			permisosRol: this.permisosService.getPermisosRol(),
-			permisosUsuario: this.permisosService.getPermisosUsuario(),
+			catalog: this.api.getCapabilityCatalog(),
+			matrix: this.api.getRolCapabilityMatrix(),
 		})
 			.pipe(
-				withRetry({ tag: 'PermisosUsuariosDataFacade:loadData' }),
+				withRetry({ tag: 'PermisosUsuariosFacade:loadAll' }),
 				takeUntilDestroyed(this.destroyRef),
 			)
 			.subscribe({
-				next: ({ vistas, permisosRol, permisosUsuario }) => {
-					this.store.setVistas(vistas.filter((v) => v.estado === 1));
-					this.store.setPermisosRol(permisosRol.filter((p) => p.rol !== 'Apoderado'));
-					this.store.setPermisosUsuario(
-						permisosUsuario.filter((p) => p.rol !== 'Apoderado'),
-					);
+				next: ({ catalog, matrix }) => {
+					this.store.setCatalog(catalog);
+					this.store.setMatrixRows(matrix);
 					this.store.setLoading(false);
 				},
 				error: (err) => {
-					logger.error('Error al cargar datos:', err);
-					this.errorHandler.showError(
-						UI_SUMMARIES.error,
-						UI_ADMIN_ERROR_DETAILS.loadPermisos,
-					);
-					this.store.setError(UI_ADMIN_ERROR_DETAILS.loadPermisos);
+					logger.error('Error loading capabilities data:', err);
+					this.errorHandler.showError(UI_SUMMARIES.error, 'No se pudieron cargar los datos de capabilities');
+					this.store.setError('No se pudieron cargar los datos');
 					this.store.setLoading(false);
 				},
 			});
 	}
 
 	refresh(): void {
-		this.swService.invalidateCacheByPattern('/permisos').then(() => {
-			this.loadData();
+		this.swService.invalidateCacheByPattern('/capabilities').then(() => {
+			this.loadCatalogAndMatrix();
 		});
 	}
 	// #endregion
 
-	// #region Filters
-	setSearchTerm(term: string): void {
-		this.store.setSearchTerm(term);
+	// #region User search
+	searchUsers(termino: string, rol?: string): void {
+		this.api.searchUsers(termino || undefined, rol)
+			.pipe(
+				withRetry({ tag: 'PermisosUsuariosFacade:searchUsers' }),
+				takeUntilDestroyed(this.destroyRef),
+			)
+			.subscribe({
+				next: (result) => this.store.setUsuariosSugeridos(result.usuarios),
+				error: (err) => {
+					logger.error('Error searching users:', err);
+					this.store.setUsuariosSugeridos([]);
+				},
+			});
 	}
 
-	setFilterRol(rol: RolTipoAdmin | null): void {
-		this.store.setFilterRol(rol);
+	selectUsuario(usuario: UsuarioBusqueda): void {
+		this.store.setSelectedUsuario(usuario);
 	}
 
-	clearFilters(): void {
-		this.store.clearFilters();
+	setSelectedRolId(rolId: number | null): void {
+		this.store.setSelectedRolId(rolId);
+		if (rolId && this.store.selectedUsuario()) {
+			this.loadOverview();
+		}
 	}
 	// #endregion
 
-	// #region Rol & Vistas Loading
-	loadVistasFromRol(): void {
-		const rol = this.selectedRol();
-		if (!rol) return;
+	// #region Overview
+	loadOverview(): void {
+		const usuario = this.store.selectedUsuario();
+		const rolId = this.store.selectedRolId();
+		if (!usuario || !rolId) return;
 
-		this.store.setSelectedUsuarioId(null);
-		this.store.setUsuariosSugeridos([]);
-
-		this.permisosService
-			.listarUsuariosPorRol(rol)
-			.pipe(
-				withRetry({ tag: 'PermisosUsuariosDataFacade:loadVistasFromRol' }),
-				takeUntilDestroyed(this.destroyRef),
-			)
+		this.store.setLoading(true);
+		this.api.getUsuarioCapabilityOverview(usuario.id, rolId)
+			.pipe(takeUntilDestroyed(this.destroyRef))
 			.subscribe({
-				next: (resultado) => {
-					this.store.setUsuariosSugeridos(resultado.usuarios);
+				next: (overview) => {
+					this.store.setOverview(overview);
+					this.store.setLoading(false);
 				},
 				error: (err) => {
-					logger.error('Error al cargar usuarios por rol:', err);
-					this.errorHandler.showError(
-						UI_SUMMARIES.error,
-						UI_ADMIN_ERROR_DETAILS.loadVistasRol,
-					);
+					logger.error('Error loading user overview:', err);
+					this.store.setOverview(null);
+					this.store.setLoading(false);
 				},
 			});
+	}
+	// #endregion
 
-		const permisoRol = this.permisosRol().find((p) => p.rol === rol);
-		if (permisoRol) {
-			this.store.setSelectedVistas([...permisoRol.vistas]);
-			const modulos = this.helperService.buildModulosVistas(
-				this.vistas(),
-				permisoRol.vistas,
-			);
-			this.store.setModulosVistas(modulos);
-		} else {
-			this.store.setSelectedVistas([]);
-			const modulos = this.helperService.buildModulosVistas(this.vistas(), []);
-			this.store.setModulosVistas(modulos);
-		}
+	// #region Save
+	saveOverrides(): void {
+		const usuario = this.store.selectedUsuario();
+		const rolId = this.store.selectedRolId();
+		if (!usuario || !rolId) return;
+
+		const grants = this.store.grantIds();
+		const denies = this.store.denyIds();
+
+		this.wal.execute({
+			operation: 'UPDATE',
+			resourceType: 'usuarioCapabilities',
+			resourceId: usuario.id,
+			endpoint: `${this.apiUrl}/users/${usuario.id}/rol/${rolId}`,
+			method: 'PUT',
+			payload: { grants, denies },
+			http$: () => this.api.setUsuarioCapabilities(usuario.id, rolId, { grants, denies }),
+			onCommit: () => {
+				this.errorHandler.showSuccess(UI_SUMMARIES.success, 'Overrides del usuario actualizados');
+				this.store.closeDialog();
+				this.loadOverview();
+			},
+			onError: (err) => this.errHandler.handle(err, 'guardar overrides del usuario'),
+			optimistic: {
+				apply: () => this.store.closeDialog(),
+				rollback: () => this.store.openDialog(),
+			},
+		});
+	}
+	// #endregion
+
+	// #region UI
+	openEditDialog(): void {
+		this.store.openDialog();
 	}
 
-	searchUsuarios(termino: string): void {
-		const rol = this.selectedRol();
-		if (!rol) {
-			this.store.setUsuariosSugeridos([]);
-			return;
-		}
+	closeDialog(): void {
+		this.store.closeDialog();
+	}
 
-		this.permisosService
-			.buscarUsuarios(termino || undefined, rol)
-			.pipe(
-				withRetry({ tag: 'PermisosUsuariosDataFacade:searchUsuarios' }),
-				takeUntilDestroyed(this.destroyRef),
-			)
-			.subscribe({
-				next: (resultado) => {
-					this.store.setUsuariosSugeridos(resultado.usuarios);
-				},
-				error: (err) => {
-					logger.error('Error al buscar usuarios:', err);
-					this.errorHandler.showError(
-						UI_SUMMARIES.error,
-						UI_ADMIN_ERROR_DETAILS.searchUsuarios,
-					);
-				},
-			});
+	toggleGrant(capId: number): void {
+		this.store.toggleGrant(capId);
+	}
+
+	toggleDeny(capId: number): void {
+		this.store.toggleDeny(capId);
+	}
+
+	setActiveModuloIndex(index: number): void {
+		this.store.setActiveModuloIndex(index);
+	}
+
+	setCapBusqueda(term: string): void {
+		this.store.setCapBusqueda(term);
+	}
+
+	resetSelection(): void {
+		this.store.resetSelection();
 	}
 	// #endregion
 }

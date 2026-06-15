@@ -1,7 +1,7 @@
 <!-- #region Template -->
 <div class="vistas-container">
 	<!-- #region Header -->
-	<app-page-header icon="pi pi-eye" title="Administracion de Vistas" subtitle="Gestiona las vistas y rutas del sistema">
+	<app-page-header icon="pi pi-shield" title="Catálogo de Capabilities" subtitle="Gestiona las capabilities del sistema de permisos">
 		<button
 			pButton
 			label="Refrescar"
@@ -23,42 +23,20 @@
 	<section class="stats-section">
 		<div class="stat-card">
 			<div class="stat-content">
-				<span class="stat-label">Total Vistas</span>
-				<span class="stat-value">{{ vm().estadisticas.totalVistas }}</span>
-				<span class="stat-sublabel">rutas registradas</span>
+				<span class="stat-label">Total Capabilities</span>
+				<span class="stat-value">{{ vm().estadisticas.total }}</span>
+				<span class="stat-sublabel">registradas</span>
 			</div>
 			<div class="stat-icon">
-				<i class="pi pi-eye"></i>
+				<i class="pi pi-shield"></i>
 			</div>
 		</div>
 
 		<div class="stat-card">
 			<div class="stat-content">
-				<span class="stat-label">Vistas Activas</span>
-				<span class="stat-value">{{ vm().estadisticas.vistasActivas }}</span>
-				<span class="stat-sublabel">disponibles</span>
-			</div>
-			<div class="stat-icon">
-				<i class="pi pi-check-circle"></i>
-			</div>
-		</div>
-
-		<div class="stat-card">
-			<div class="stat-content">
-				<span class="stat-label">Vistas Inactivas</span>
-				<span class="stat-value">{{ vm().estadisticas.vistasInactivas }}</span>
-				<span class="stat-sublabel">deshabilitadas</span>
-			</div>
-			<div class="stat-icon">
-				<i class="pi pi-ban"></i>
-			</div>
-		</div>
-
-		<div class="stat-card">
-			<div class="stat-content">
-				<span class="stat-label">Modulos</span>
+				<span class="stat-label">Módulos</span>
 				<span class="stat-value">{{ vm().estadisticas.totalModulos }}</span>
-				<span class="stat-sublabel">categorias</span>
+				<span class="stat-sublabel">categorías</span>
 			</div>
 			<div class="stat-icon">
 				<i class="pi pi-folder"></i>
@@ -74,7 +52,7 @@
 			<input
 				type="text"
 				pInputText
-				placeholder="Buscar por nombre o ruta..."
+				placeholder="Buscar por nombre o código..."
 				[ngModel]="vm().searchTerm"
 				(ngModelChange)="onSearchTermChange($event)"
 			/>
@@ -84,17 +62,8 @@
 			[options]="vm().modulosOptions"
 			[ngModel]="vm().filterModulo"
 			(ngModelChange)="onFilterModuloChange($event)"
-			placeholder="Todos los modulos"
+			placeholder="Todos los módulos"
 			[style]="{ minWidth: '180px' }"
-			appendTo="body"
-		/>
-
-		<p-select
-			[options]="estadoOptions"
-			[ngModel]="vm().filterEstado"
-			(ngModelChange)="onFilterEstadoChange($event)"
-			placeholder="Estado"
-			[style]="{ minWidth: '140px' }"
 			appendTo="body"
 		/>
 
@@ -110,7 +79,7 @@
 
 		<button
 			pButton
-			label="Nueva Vista"
+			label="Nueva Capability"
 			icon="pi pi-plus"
 			class="p-button-success"
 			(click)="openNew()"
@@ -121,16 +90,16 @@
 	<!-- #region Table -->
 	<section class="table-section">
 		<p-table
-			[value]="vm().vistas"
+			[value]="vm().items"
 			[lazy]="true"
 			(onLazyLoad)="onLazyLoad($any($event))"
 			[paginator]="true"
 			[rows]="vm().pageSize"
 			[totalRecords]="vm().totalRecords"
-			[rowsPerPageOptions]="[5, 10, 25, 50]"
+			[rowsPerPageOptions]="[10, 25, 50]"
 			[showCurrentPageReport]="true"
 			[loading]="vm().loading"
-			currentPageReportTemplate="Mostrando {first} a {last} de {totalRecords} vistas"
+			currentPageReportTemplate="Mostrando {first} a {last} de {totalRecords} capabilities"
 			class="p-datatable-sm"
 		>
 				<ng-template #header>
@@ -138,38 +107,33 @@
 						<th style="width: 70px" pSortableColumn="id">
 							ID <p-sortIcon field="id" />
 						</th>
-						<th style="width: 120px">MODULO</th>
+						<th style="width: 120px">MÓDULO</th>
+						<th pSortableColumn="codigo">CÓDIGO <p-sortIcon field="codigo" /></th>
 						<th pSortableColumn="nombre">NOMBRE <p-sortIcon field="nombre" /></th>
-						<th pSortableColumn="ruta">RUTA <p-sortIcon field="ruta" /></th>
-						<th style="width: 100px" pSortableColumn="estado">
-							ESTADO <p-sortIcon field="estado" />
-						</th>
-						<th style="width: 140px">ACCIONES</th>
+						<th>DESCRIPCIÓN</th>
+						<th style="width: 100px">ACCIONES</th>
 					</tr>
 				</ng-template>
 
-				<ng-template #body let-vista>
-					<tr [class.row-inactive]="vista.estado !== 1">
+				<ng-template #body let-cap>
+					<tr>
 						<td class="text-center">
-							<span class="id-badge">{{ vista.id }}</span>
+							<span class="id-badge">{{ cap.id }}</span>
 						</td>
 						<td>
 							<span class="modulo-badge">
 								<i class="pi pi-folder"></i>
-								{{ uiMapping.getModuloFromRuta(vista.ruta) }}
+								{{ cap.modulo }}
 							</span>
 						</td>
 						<td>
-							<span class="nombre-text">{{ vista.nombre }}</span>
+							<span class="ruta-text">{{ cap.codigo }}</span>
 						</td>
 						<td>
-							<span class="ruta-text">{{ vista.ruta }}</span>
+							<span class="nombre-text">{{ cap.nombre }}</span>
 						</td>
-						<td class="text-center">
-							<p-tag
-								[value]="vista.estado === 1 ? 'Activa' : 'Inactiva'"
-								[severity]="vista.estado | estadoSeverity"
-							/>
+						<td>
+							<span class="nombre-text">{{ cap.descripcion }}</span>
 						</td>
 						<td>
 							<div class="actions">
@@ -179,17 +143,7 @@
 									class="p-button-rounded p-button-text p-button-info"
 									pTooltip="Editar"
 									aria-label="Editar"
-									(click)="editVista(vista)"
-								></button>
-								<button
-									pButton
-									[icon]="vista.estado | estadoToggleIcon"
-									class="p-button-rounded p-button-text"
-									[class.p-button-warning]="vista.estado === 1"
-									[class.p-button-success]="vista.estado !== 1"
-									[pTooltip]="vista.estado | estadoToggleLabel"
-									[attr.aria-label]="vista.estado | estadoToggleLabel"
-									(click)="toggleEstado(vista)"
+									(click)="editCapability(cap)"
 								></button>
 								<button
 									pButton
@@ -197,7 +151,7 @@
 									class="p-button-rounded p-button-text p-button-danger"
 									pTooltip="Eliminar"
 									aria-label="Eliminar"
-									(click)="deleteVista(vista)"
+									(click)="deleteCapability(cap)"
 								></button>
 							</div>
 						</td>
@@ -208,9 +162,9 @@
 					<tr>
 						<td colspan="6" class="empty-message">
 							<div class="empty-state">
-								<i class="pi pi-eye-slash"></i>
-								<p>No se encontraron vistas</p>
-								<span>Intenta ajustar los filtros de busqueda</span>
+								<i class="pi pi-shield"></i>
+								<p>No se encontraron capabilities</p>
+								<span>Intenta ajustar los filtros de búsqueda</span>
 							</div>
 						</td>
 					</tr>
@@ -224,7 +178,7 @@
 <p-dialog
 	[visible]="vm().dialogVisible"
 	(visibleChange)="onDialogVisibleChange($event)"
-	[header]="vm().isEditing ? 'Editar Vista' : 'Nueva Vista'"
+	[header]="vm().isEditing ? 'Editar Capability' : 'Nueva Capability'"
 	[modal]="true"
 	[style]="{ width: '500px' }"
 	[draggable]="false"
@@ -234,16 +188,17 @@
 	<div class="dialog-content">
 		<div class="form-fields">
 			<div class="field">
-				<label for="ruta">Ruta *</label>
+				<label for="codigo">Código *</label>
 				<input
-					id="ruta"
+					id="codigo"
 					type="text"
 					pInputText
-					[ngModel]="vm().formData.ruta"
-					(ngModelChange)="updateFormField('ruta', $event)"
-					placeholder="/intranet/modulo/vista"
+					[ngModel]="vm().formData.codigo"
+					(ngModelChange)="updateFormField('codigo', $event)"
+					placeholder="ADMIN_HORARIOS"
+					[disabled]="vm().isEditing"
 				/>
-				<small class="field-hint">Ejemplo: /intranet/admin/usuarios</small>
+				<small class="field-hint">Identificador único en UPPER_SNAKE_CASE</small>
 			</div>
 
 			<div class="field">
@@ -254,23 +209,33 @@
 					pInputText
 					[ngModel]="vm().formData.nombre"
 					(ngModelChange)="updateFormField('nombre', $event)"
-					placeholder="Nombre descriptivo de la vista"
+					placeholder="Nombre descriptivo"
 				/>
 			</div>
 
-			@if (vm().isEditing) {
-				<div class="field">
-					<label for="estado">Estado</label>
-					<div class="estado-switch">
-						<p-toggleswitch
-							id="estado"
-							[ngModel]="vm().formData.estado === 1"
-							(ngModelChange)="updateFormField('estado', $event ? 1 : 0)"
-						/>
-						<span>{{ vm().formData.estado === 1 ? 'Activa' : 'Inactiva' }}</span>
-					</div>
-				</div>
-			}
+			<div class="field">
+				<label for="modulo">Módulo *</label>
+				<input
+					id="modulo"
+					type="text"
+					pInputText
+					[ngModel]="vm().formData.modulo"
+					(ngModelChange)="updateFormField('modulo', $event)"
+					placeholder="admin"
+				/>
+			</div>
+
+			<div class="field">
+				<label for="descripcion">Descripción</label>
+				<input
+					id="descripcion"
+					type="text"
+					pInputText
+					[ngModel]="vm().formData.descripcion"
+					(ngModelChange)="updateFormField('descripcion', $event)"
+					placeholder="Descripción de la capability"
+				/>
+			</div>
 		</div>
 	</div>
 
@@ -288,7 +253,7 @@
 				label="Guardar"
 				icon="pi pi-check"
 				class="p-button-success"
-				(click)="saveVista()"
+				(click)="saveCapability()"
 				[disabled]="!vm().isFormValid"
 			></button>
 		</div>

@@ -1,56 +1,41 @@
-import type { Vista } from '@core/services';
+import type { CapabilityCatalogItem } from '@core/services';
 import { capitalize, groupBy, sortedEntries } from '@core/helpers';
 
-export interface ModuloVistas {
+export interface ModuloCapabilities {
 	nombre: string;
-	vistas: Vista[];
+	capabilities: CapabilityCatalogItem[];
 	seleccionadas: number;
 	total: number;
 }
 
-type GetModuloFn = (ruta: string) => string;
+export function buildModuloCapabilities(
+	catalog: CapabilityCatalogItem[],
+	selectedIds: number[],
+): ModuloCapabilities[] {
+	const grouped = groupBy(catalog, (c) => capitalize(c.modulo));
 
-/**
- * Agrupa todas las vistas activas por módulo, contando las seleccionadas.
- * Usado para construir el selector de módulos en el diálogo de crear/editar.
- */
-export function buildModulosVistas(
-	vistas: Vista[],
-	vistasSeleccionadas: string[],
-	getModulo: GetModuloFn,
-): ModuloVistas[] {
-	const grouped = groupBy(vistas, (v) => capitalize(getModulo(v.ruta)));
-
-	return sortedEntries(grouped).map(([nombre, vistas]) => ({
+	return sortedEntries(grouped).map(([nombre, caps]) => ({
 		nombre,
-		vistas: vistas.sort((a, b) => a.nombre.localeCompare(b.nombre)),
-		seleccionadas: vistas.filter((v) => vistasSeleccionadas.includes(v.ruta)).length,
-		total: vistas.length,
+		capabilities: caps.sort((a, b) => a.orden - b.orden || a.nombre.localeCompare(b.nombre)),
+		seleccionadas: caps.filter((c) => selectedIds.includes(c.id)).length,
+		total: caps.length,
 	}));
 }
 
-/**
- * Agrupa rutas de vistas seleccionadas por módulo para la vista de detalle.
- * Resuelve cada ruta contra las vistas activas del sistema.
- */
-export function buildModulosVistasForDetail(
-	vistasRutas: string[],
-	vistasActivas: Vista[],
-	getModulo: GetModuloFn,
-): ModuloVistas[] {
-	const resolvedVistas = vistasRutas
-		.map((ruta) => ({ ruta, vista: vistasActivas.find((v) => v.ruta === ruta) }))
-		.filter((entry): entry is { ruta: string; vista: Vista } => !!entry.vista);
+export function buildModuloCapabilitiesForDetail(
+	capabilityIds: number[],
+	catalog: CapabilityCatalogItem[],
+): ModuloCapabilities[] {
+	const resolved = capabilityIds
+		.map((id) => catalog.find((c) => c.id === id))
+		.filter((c): c is CapabilityCatalogItem => c !== undefined);
 
-	const grouped = groupBy(resolvedVistas, (entry) => capitalize(getModulo(entry.ruta)));
+	const grouped = groupBy(resolved, (c) => capitalize(c.modulo));
 
-	return sortedEntries(grouped).map(([nombre, entries]) => {
-		const vistas = entries.map((e) => e.vista);
-		return {
-			nombre,
-			vistas,
-			seleccionadas: vistas.length,
-			total: vistas.length,
-		};
-	});
+	return sortedEntries(grouped).map(([nombre, caps]) => ({
+		nombre,
+		capabilities: caps.sort((a, b) => a.orden - b.orden),
+		seleccionadas: caps.length,
+		total: caps.length,
+	}));
 }

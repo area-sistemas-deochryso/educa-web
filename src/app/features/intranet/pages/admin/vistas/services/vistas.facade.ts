@@ -1,38 +1,31 @@
 import { Injectable, inject } from '@angular/core';
-import { Observable } from 'rxjs';
+import { Observable, map } from 'rxjs';
 
 import {
 	BaseCrudFacade,
 	type BaseCrudFacadeConfig,
-	type EstadisticaKeys,
 	type PaginatedResult,
 	PermissionsService,
-	Vista,
+	CapabilityCatalogItem,
 } from '@core/services';
 import { environment } from '@config';
 
 import { VistasStore } from './vistas.store';
 
-interface VistasEstadisticas { totalVistas: number; vistasActivas: number; vistasInactivas: number }
-
-const STATS_KEYS: EstadisticaKeys = { total: 'totalVistas', activos: 'vistasActivas', inactivos: 'vistasInactivas' };
+interface CapabilityStats { total: number; totalModulos: number; modulos: string[] }
 
 @Injectable({ providedIn: 'root' })
-export class VistasFacade extends BaseCrudFacade<Vista, { ruta: string; nombre: string; estado: number }, VistasEstadisticas> {
-	// #region Dependencias específicas
+export class VistasFacade extends BaseCrudFacade<CapabilityCatalogItem, { codigo: string; nombre: string; modulo: string; descripcion: string }, CapabilityStats> {
 	private readonly api = inject(PermissionsService);
 	protected readonly store = inject(VistasStore);
 	protected readonly config: BaseCrudFacadeConfig = {
 		tag: 'VistasFacade',
-		resourceType: 'vistas',
-		apiUrl: `${environment.apiUrl}/api/sistema/permisos`,
-		loadErrorMessage: 'No se pudieron cargar las vistas',
+		resourceType: 'capabilities',
+		apiUrl: `${environment.apiUrl}/api/admin/capabilities`,
+		loadErrorMessage: 'No se pudieron cargar las capabilities',
 	};
-	// #endregion
 
-	// #region Estado expuesto
 	readonly vm = this.store.vm;
-	// #endregion
 
 	constructor() {
 		super();
@@ -40,76 +33,70 @@ export class VistasFacade extends BaseCrudFacade<Vista, { ruta: string; nombre: 
 		this.initCrossTabRefetch();
 	}
 
-	// #region API calls (abstract implementations)
-	protected fetchItems(): Observable<PaginatedResult<Vista>> {
-		return this.api.getVistasPaginated(
-			this.store.page(),
-			this.store.pageSize(),
-			this.store.searchTerm() || undefined,
-			this.store.filterModulo() || undefined,
-			this.store.filterEstado() as number | null,
+	// #region API calls
+	protected fetchItems(): Observable<PaginatedResult<CapabilityCatalogItem>> {
+		return this.api.getCapabilityCatalog().pipe(
+			map((items) => ({
+				data: items,
+				page: 1,
+				pageSize: items.length || 50,
+				total: items.length,
+			})),
 		);
 	}
 
-	protected fetchEstadisticas(): Observable<VistasEstadisticas> {
-		return this.api.getVistasEstadisticas();
+	protected fetchEstadisticas(): Observable<CapabilityStats> {
+		return this.api.getCapabilityCatalog().pipe(
+			map((items) => {
+				const modulos = [...new Set(items.map((c) => c.modulo))];
+				return { total: items.length, totalModulos: modulos.length, modulos };
+			}),
+		);
 	}
 	// #endregion
 
 	// #region CRUD commands
-	saveVista(): void {
+	saveCapability(): void {
 		const formData = this.store.formData();
 
 		if (this.store.isEditing()) {
-			const vista = this.store.selectedItem();
-			if (!vista) return;
-			const payload = { ruta: formData.ruta, nombre: formData.nombre, estado: formData.estado, rowVersion: vista.rowVersion };
-			this.walUpdate(vista.id, payload, { ruta: formData.ruta, nombre: formData.nombre, estado: formData.estado },
-				() => this.api.actualizarVista(vista.id, payload),
-				`vistas/${vista.id}/actualizar`,
+			const cap = this.store.selectedItem();
+			if (!cap) return;
+			const payload = { nombre: formData.nombre, modulo: formData.modulo, descripcion: formData.descripcion };
+			this.walUpdate(cap.id, payload, { ...formData },
+				() => this.api.updateCapability(cap.id, payload),
+				`catalog/${cap.id}`,
 			);
 		} else {
-			const payload = { ruta: formData.ruta, nombre: formData.nombre };
-			this.walCreate(payload, () => this.api.crearVista(payload), 'vistas/crear');
+			const payload = { codigo: formData.codigo, nombre: formData.nombre, modulo: formData.modulo, descripcion: formData.descripcion };
+			this.walCreate(payload, () => this.api.createCapability(payload), 'catalog');
 		}
 	}
 
-	toggleEstado(vista: Vista): void {
-		const nuevoEstado = vista.estado === 1 ? 0 : 1;
-		const payload = { ruta: vista.ruta, nombre: vista.nombre, estado: nuevoEstado, rowVersion: vista.rowVersion };
-		this.walToggle(vista, payload,
-			() => this.api.actualizarVista(vista.id, payload),
-			STATS_KEYS,
-			(id) => this.store.toggleVistaEstado(id),
-			`vistas/${vista.id}/actualizar`,
-		);
-	}
-
-	delete(vista: Vista): void {
-		// Vistas: BE hace DELETE físico (RemoveAndSaveAsync). Mode 'hard' explícito.
-		this.walDelete(vista,
-			() => this.api.eliminarVista(vista.id),
-			STATS_KEYS,
-			`vistas/${vista.id}/eliminar`,
+	delete(cap: CapabilityCatalogItem): void {
+		this.walDelete(cap,
+			() => this.api.deleteCapability(cap.id),
+			{ total: 'total', activos: 'total', inactivos: 'total' },
+			`catalog/${cap.id}`,
 			'hard',
 		);
 	}
 	// #endregion
 
-	// #region UI commands (specific)
-	openEditDialog(vista: Vista): void {
-		this.store.setSelectedItem(vista);
-		this.store.setFormData({ ruta: vista.ruta, nombre: vista.nombre, estado: vista.estado ?? 1 });
+	// #region UI commands
+	openEditDialog(cap: CapabilityCatalogItem): void {
+		this.store.setSelectedItem(cap);
+		this.store.setFormData({ codigo: cap.codigo, nombre: cap.nombre, modulo: cap.modulo, descripcion: cap.descripcion ?? '' });
 		this.store.setIsEditing(true);
 		this.store.openDialog();
 	}
 
-	updateFormField(field: 'ruta' | 'nombre' | 'estado', value: string | number): void {
+	updateFormField(field: 'codigo' | 'nombre' | 'modulo' | 'descripcion', value: string): void {
 		this.store.updateFormField(field, value as never);
 	}
 	// #endregion
 
-	// #region Filtros específicos
+	// #region Filtros
 	setFilterModulo(modulo: string | null): void {
 		this.store.setFilterModulo(modulo);
 		this.store.setPage(1);
@@ -118,8 +105,8 @@ export class VistasFacade extends BaseCrudFacade<Vista, { ruta: string; nombre: 
 	// #endregion
 
 	// #region Error labels
-	protected override getCreateErrorLabel(): string { return 'guardar la vista'; }
-	protected override getUpdateErrorLabel(): string { return 'guardar la vista'; }
-	protected override getDeleteErrorLabel(): string { return 'eliminar la vista'; }
+	protected override getCreateErrorLabel(): string { return 'crear la capability'; }
+	protected override getUpdateErrorLabel(): string { return 'actualizar la capability'; }
+	protected override getDeleteErrorLabel(): string { return 'eliminar la capability'; }
 	// #endregion
 }
