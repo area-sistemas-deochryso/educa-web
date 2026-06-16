@@ -218,6 +218,10 @@ export class SchedulesDataFacade {
     this.loadAll();
   }
 
+  setEsVerano(value: boolean): void {
+    this.store.setEsVerano(value);
+  }
+
   setVistaActual(vista: HorarioVistaType): void {
     this.store.filterStore.setVistaActual(vista);
   }

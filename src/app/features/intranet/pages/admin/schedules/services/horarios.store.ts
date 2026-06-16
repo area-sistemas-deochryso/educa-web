@@ -161,6 +161,7 @@ export class SchedulesStore {
 	}));
 
 	readonly optionsVm = computed(() => ({
+		esVerano: this.optionsStore.esVerano(),
 		salonesOptions: this.optionsStore.salonesOptions(),
 		cursosOptions: this.optionsStore.cursosOptions(),
 		cursosPorNivel: this.optionsStore.cursosPorNivel(),
@@ -217,6 +218,10 @@ export class SchedulesStore {
 
 	clearProfesoresCurso(): void {
 		this.optionsStore.clearProfesoresCurso();
+	}
+
+	setEsVerano(value: boolean): void {
+		this.optionsStore.setEsVerano(value);
 	}
 
 	/** Mutación quirúrgica: Actualizar un horario específico sin refetch */

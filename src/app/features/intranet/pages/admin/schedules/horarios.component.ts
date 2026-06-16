@@ -10,7 +10,7 @@ import { ScheduleDetailDrawerComponent } from './components/horario-detail-drawe
 import { SchedulesCoursePickerComponent } from './components/horarios-curso-picker/horarios-curso-picker.component';
 import { SchedulesFormDialogComponent } from './components/horarios-form-dialog/horarios-form-dialog.component';
 import { SchedulesImportDialogComponent } from './components/horarios-import-dialog/horarios-import-dialog.component';
-import { PageHeaderComponent } from '@intranet-shared/components';
+import { PageHeaderComponent, PeriodToggleComponent } from '@intranet-shared/components';
 import { type ImportarHorarioItem } from './helpers/horario-import.config';
 import {
 	type DiaSemana,
@@ -52,6 +52,7 @@ import {
 		ScheduleGridLayoutComponent,
 		ScheduleGlobalViewComponent,
 		PageHeaderComponent,
+		PeriodToggleComponent,
 	],
 	templateUrl: './horarios.component.html',
 	styleUrl: './horarios.component.scss',
@@ -85,6 +86,10 @@ export class SchedulesComponent implements OnInit {
 	refresh(): void {
 		logger.log('Refrescando horarios...');
 		this.loadData();
+	}
+
+	onPeriodoChange(esVerano: boolean): void {
+		this.dataFacade.setEsVerano(esVerano);
 	}
 
 	// #endregion

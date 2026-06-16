@@ -4,6 +4,10 @@
 	[title]="vm().isAdmin ? 'Gestión de Horarios' : 'Mis Horarios'"
 	[subtitle]="vm().isAdmin ? 'Administra los horarios de clases por salón' : 'Consulta tus horarios de clases asignados'"
 >
+	<app-period-toggle
+		[value]="vm().esVerano"
+		(valueChange)="onPeriodoChange($event)"
+	/>
 	<button
 		pButton
 		label="Refrescar"

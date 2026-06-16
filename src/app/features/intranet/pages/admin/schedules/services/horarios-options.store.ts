@@ -1,6 +1,7 @@
 import { computed, inject, Injectable, signal } from '@angular/core';
 
 import { type ModoAsignacion, type ProfesorCursoListaDto, resolveModoAsignacion } from '@data/models';
+import { esVerano, filtrarPorPeriodoAcademico, periodoActual } from '@shared/models';
 import { CursoListaDto, CursoOption, CursosPorNivel } from '../models/curso.interface';
 import {
 	mapSalonesToOptions,
@@ -25,12 +26,14 @@ export class SchedulesOptionsStore {
 	private readonly _cursosDisponibles = signal<CursoListaDto[]>([]);
 	private readonly _profesoresDisponibles = signal<ProfesorListDto[]>([]);
 	private readonly _optionsLoading = signal(false);
+	private readonly _esVerano = signal(esVerano(periodoActual()));
 	/** Asignaciones ProfesorCurso activas para el curso seleccionado en el form. */
 	private readonly _profesoresCurso = signal<ProfesorCursoListaDto[]>([]);
 	// #endregion
 
 	// #region Lecturas públicas
 	readonly optionsLoading = this._optionsLoading.asReadonly();
+	readonly esVerano = this._esVerano.asReadonly();
 	// #endregion
 
 	// #region Computed - Salones
@@ -38,8 +41,16 @@ export class SchedulesOptionsStore {
 		this._salonesDisponibles().filter((s) => s.estado),
 	);
 
+	private readonly periodFilteredSalones = computed(() =>
+		filtrarPorPeriodoAcademico(
+			this.activeSalones(),
+			{ tipo: this._esVerano() ? 'verano' : 'regular', anio: new Date().getFullYear() },
+			(s) => s.seccion,
+		),
+	);
+
 	private readonly activeSalonesAsOptions = computed<SalonOption[]>(() =>
-		mapSalonesToOptions(this.activeSalones()),
+		mapSalonesToOptions(this.periodFilteredSalones()),
 	);
 
 	readonly salonesOptions = computed<SalonOption[]>(() => this.activeSalonesAsOptions());
@@ -132,6 +143,10 @@ export class SchedulesOptionsStore {
 
 	setOptionsLoading(loading: boolean): void {
 		this._optionsLoading.set(loading);
+	}
+
+	setEsVerano(value: boolean): void {
+		this._esVerano.set(value);
 	}
 
 	/** Establece los ProfesorCurso activos para el curso seleccionado (modo PorCurso). */

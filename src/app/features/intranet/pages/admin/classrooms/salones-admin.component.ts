@@ -6,11 +6,10 @@ import { TabsModule } from 'primeng/tabs';
 import { ButtonModule } from 'primeng/button';
 import { TagModule } from 'primeng/tag';
 import { InputNumberModule } from 'primeng/inputnumber';
-import { SelectButtonModule } from 'primeng/selectbutton';
 import { ToastModule } from 'primeng/toast';
 import { MessageService } from 'primeng/api';
 
-import { PageHeaderComponent } from '@intranet-shared/components';
+import { PageHeaderComponent, PeriodToggleComponent } from '@intranet-shared/components';
 import { ClassroomsAdminFacade } from './services';
 import { ClassroomsAdminTableComponent } from './components/salones-admin-table/salones-admin-table.component';
 import { ConfigGradeDialogComponent } from './components/config-calificacion-dialog/config-calificacion-dialog.component';
@@ -35,9 +34,9 @@ import {
 		ButtonModule,
 		TagModule,
 		InputNumberModule,
-		SelectButtonModule,
 		ToastModule,
 		PageHeaderComponent,
+		PeriodToggleComponent,
 		ClassroomsAdminTableComponent,
 		ConfigGradeDialogComponent,
 		ClosePeriodDialogComponent,
@@ -64,10 +63,6 @@ export class ClassroomsAdminComponent implements OnInit {
 		Primaria: 1,
 		Secundaria: 2,
 	};
-	readonly periodoOptions = [
-		{ label: 'Regular', value: false },
-		{ label: 'Verano', value: true },
-	];
 	// #endregion
 
 	// #region Lifecycle
