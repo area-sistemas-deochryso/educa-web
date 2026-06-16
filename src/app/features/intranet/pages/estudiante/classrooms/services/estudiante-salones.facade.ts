@@ -62,6 +62,12 @@ export class StudentClassroomsFacade {
 	}
 	// #endregion
 
+	// #region Periodo
+	setEsVerano(esVerano: boolean): void {
+		this.store.setEsVerano(esVerano);
+	}
+	// #endregion
+
 	// #region Comandos de UI
 	openDialog(salonId: number): void {
 		this.store.openDialog(salonId);

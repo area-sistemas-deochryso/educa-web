@@ -342,6 +342,8 @@ export interface ProfesorSalon {
 	salonId: number;
 	/** Classroom label. */
 	salonDescripcion: string;
+	/** Section letter (e.g. "A", "V"). */
+	seccion: string;
 	/** Courses with navigation info. */
 	cursos: SalonCursoInfo[];
 	/** True when professor is tutor. */

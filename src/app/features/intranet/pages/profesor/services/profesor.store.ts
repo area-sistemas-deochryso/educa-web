@@ -1,4 +1,5 @@
 import { Injectable, computed, signal } from '@angular/core';
+import { periodoActual, esVerano, filtrarPorPeriodoAcademico } from '@shared/models';
 import {
 	HorarioProfesorDto,
 	SalonTutoriaDto,
@@ -19,6 +20,7 @@ interface ProfesorStoreState {
 	misEstudiantes: ProfesorMisSalonesConEstudiantesDto | null;
 	loading: boolean;
 	error: string | null;
+	esVerano: boolean;
 	// #region Dialog state
 	salonDialogVisible: boolean;
 	salonDialogLoading: boolean;
@@ -38,6 +40,7 @@ const initialState: ProfesorStoreState = {
 	misEstudiantes: null,
 	loading: false,
 	error: null,
+	esVerano: esVerano(periodoActual()),
 	salonDialogVisible: false,
 	salonDialogLoading: false,
 	selectedSalon: null,
@@ -59,6 +62,7 @@ export class ProfesorStore {
 	readonly misEstudiantes = computed(() => this._state().misEstudiantes);
 	readonly loading = computed(() => this._state().loading);
 	readonly error = computed(() => this._state().error);
+	readonly esVeranoSignal = computed(() => this._state().esVerano);
 	readonly salonDialogVisible = computed(() => this._state().salonDialogVisible);
 	readonly salonDialogLoading = computed(() => this._state().salonDialogLoading);
 	readonly selectedSalon = computed(() => this._state().selectedSalon);
@@ -103,6 +107,7 @@ export class ProfesorStore {
 			salonesMap.set(tutoria.salonId, {
 				salonId: tutoria.salonId,
 				salonDescripcion: `${tutoria.grado} - ${tutoria.seccion}`,
+				seccion: tutoria.seccion,
 				cursos: [],
 				esTutor: true,
 			});
@@ -121,6 +126,7 @@ export class ProfesorStore {
 				salonesMap.set(h.salonId, {
 					salonId: h.salonId,
 					salonDescripcion: h.salonDescripcion,
+					seccion: h.salonDescripcion.split(' ').pop() ?? '',
 					cursos: [cursoInfo],
 					esTutor: false,
 				});
@@ -148,10 +154,18 @@ export class ProfesorStore {
 			const data = estudiantesMap.get(s.salonId);
 			return {
 				...s,
+				seccion: data?.seccion ?? s.seccion,
 				cantidadEstudiantes: data?.cantidadEstudiantes ?? 0,
 				estudiantes: data?.estudiantes ?? [],
 			};
 		});
+	});
+
+	readonly salonesConEstudiantesFiltrados = computed(() => {
+		const periodo = this.esVeranoSignal()
+			? { tipo: 'verano' as const, anio: new Date().getFullYear() }
+			: { tipo: 'regular' as const, anio: new Date().getFullYear() };
+		return filtrarPorPeriodoAcademico(this.salonesConEstudiantes(), periodo, (s) => s.seccion);
 	});
 
 	// #endregion
@@ -198,9 +212,10 @@ export class ProfesorStore {
 		salonTutoria: this.salonTutoria(),
 		cursos: this.cursos(),
 		salones: this.salones(),
-		salonesConEstudiantes: this.salonesConEstudiantes(),
+		salonesConEstudiantes: this.salonesConEstudiantesFiltrados(),
 		loading: this.loading(),
 		error: this.error(),
+		esVerano: this.esVeranoSignal(),
 		isEmpty: this.horarios().length === 0,
 		salonDialogVisible: this.salonDialogVisible(),
 		salonDialogLoading: this.salonDialogLoading(),
@@ -236,6 +251,10 @@ export class ProfesorStore {
 
 	clearError(): void {
 		this._state.update((s) => ({ ...s, error: null }));
+	}
+
+	setEsVerano(esVerano: boolean): void {
+		this._state.update((s) => ({ ...s, esVerano }));
 	}
 
 	// #endregion
