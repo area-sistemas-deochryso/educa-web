@@ -148,6 +148,10 @@ export class ProfesorFacade {
 			});
 	}
 
+	setEsVerano(esVerano: boolean): void {
+		this.store.setEsVerano(esVerano);
+	}
+
 	setNotasVista(vista: VistaPromedio): void {
 		this.store.setNotasVistaActual(vista);
 	}

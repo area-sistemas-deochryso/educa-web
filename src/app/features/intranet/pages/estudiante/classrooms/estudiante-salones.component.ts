@@ -7,7 +7,7 @@ import { TagModule } from 'primeng/tag';
 import { ButtonModule } from 'primeng/button';
 import { TooltipModule } from 'primeng/tooltip';
 import { ProgressSpinnerModule } from 'primeng/progressspinner';
-import { PageHeaderComponent } from '@intranet-shared/components';
+import { PageHeaderComponent, PeriodToggleComponent } from '@intranet-shared/components';
 import { StudentClassroomsFacade } from './services/estudiante-salones.facade';
 import { EstudianteSalon, EstudianteSalonCurso } from '../models';
 import { EstudianteSalonDialogComponent } from './components/estudiante-salon-dialog/estudiante-salon-dialog.component';
@@ -24,6 +24,7 @@ import { EstudianteSalonDialogComponent } from './components/estudiante-salon-di
 		TooltipModule,
 		ProgressSpinnerModule,
 		PageHeaderComponent,
+		PeriodToggleComponent,
 		EstudianteSalonDialogComponent,
 	],
 	changeDetection: ChangeDetectionStrategy.OnPush,
@@ -47,7 +48,12 @@ import { EstudianteSalonDialogComponent } from './components/estudiante-salon-di
 				<p>No tienes salones asignados</p>
 			</div>
 		} @else {
-			<app-page-header icon="pi pi-building" title="Mis Salones" />
+			<app-page-header icon="pi pi-building" title="Mis Salones">
+				<app-period-toggle
+					[value]="vm().esVerano"
+					(valueChange)="onPeriodoChange($event)"
+				/>
+			</app-page-header>
 
 			<div class="p-4 pt-0">
 				<p-table
@@ -146,6 +152,10 @@ export class StudentClassroomsComponent implements OnInit {
 	// #endregion
 
 	// #region Event handlers
+	onPeriodoChange(esVerano: boolean): void {
+		this.facade.setEsVerano(esVerano);
+	}
+
 	onVerSalon(salon: EstudianteSalon): void {
 		this.facade.openDialog(salon.salonId);
 	}

@@ -1,4 +1,5 @@
 import { Injectable, signal, computed } from '@angular/core';
+import { periodoActual, esVerano, filtrarPorPeriodoAcademico } from '@shared/models';
 import {
 	HorarioProfesorDto,
 	EstudianteSalon,
@@ -13,6 +14,8 @@ export class StudentClassroomsStore {
 	private readonly _horarios = signal<HorarioProfesorDto[]>([]);
 	private readonly _loading = signal(false);
 	private readonly _error = signal<string | null>(null);
+
+	private readonly _esVerano = signal(esVerano(periodoActual()));
 
 	// Dialog
 	private readonly _dialogVisible = signal(false);
@@ -43,6 +46,7 @@ export class StudentClassroomsStore {
 				map.set(h.salonId, {
 					salonId: h.salonId,
 					salonDescripcion: h.salonDescripcion,
+					seccion: h.salonDescripcion.split(' ').pop() ?? '',
 					cantidadEstudiantes: h.cantidadEstudiantes,
 					cursos: [],
 				});
@@ -59,6 +63,11 @@ export class StudentClassroomsStore {
 		}
 
 		return [...map.values()];
+	});
+
+	readonly salonesFiltrados = computed(() => {
+		const periodo = this._esVerano() ? { tipo: 'verano' as const, anio: new Date().getFullYear() } : { tipo: 'regular' as const, anio: new Date().getFullYear() };
+		return filtrarPorPeriodoAcademico(this.salones(), periodo, (s) => s.seccion);
 	});
 
 	readonly selectedSalon = computed<EstudianteSalon | null>(() => {
@@ -80,6 +89,7 @@ export class StudentClassroomsStore {
 	// #region Lecturas publicas
 	readonly loading = this._loading.asReadonly();
 	readonly error = this._error.asReadonly();
+	readonly esVerano = this._esVerano.asReadonly();
 	readonly dialogVisible = this._dialogVisible.asReadonly();
 	readonly asistenciaData = this._asistenciaData.asReadonly();
 	readonly asistenciaLoading = this._asistenciaLoading.asReadonly();
@@ -89,14 +99,15 @@ export class StudentClassroomsStore {
 	readonly gruposCursoId = this._gruposCursoId.asReadonly();
 	readonly notasData = this._notasData.asReadonly();
 	readonly notasLoading = this._notasLoading.asReadonly();
-	readonly isEmpty = computed(() => this.salones().length === 0);
+	readonly isEmpty = computed(() => this.salones().length === 0 && !this._loading());
 	// #endregion
 
 	// #region ViewModel
 	readonly vm = computed(() => ({
-		salones: this.salones(),
+		salones: this.salonesFiltrados(),
 		loading: this.loading(),
 		error: this.error(),
+		esVerano: this.esVerano(),
 		isEmpty: this.isEmpty(),
 		dialogVisible: this.dialogVisible(),
 		selectedSalon: this.selectedSalon(),
@@ -123,6 +134,10 @@ export class StudentClassroomsStore {
 
 	setError(error: string | null): void {
 		this._error.set(error);
+	}
+
+	setEsVerano(esVerano: boolean): void {
+		this._esVerano.set(esVerano);
 	}
 
 	setNotasData(notas: EstudianteMisNotasDto[]): void {

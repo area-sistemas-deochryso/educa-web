@@ -8,7 +8,12 @@
 		<p>No tienes salones asignados</p>
 	</div>
 } @else {
-	<app-page-header icon="pi pi-building" title="Mis Salones" />
+	<app-page-header icon="pi pi-building" title="Mis Salones">
+		<app-period-toggle
+			[value]="vm().esVerano"
+			(valueChange)="onPeriodoChange($event)"
+		/>
+	</app-page-header>
 
 	<div class="p-4 pt-0">
 		<p-table

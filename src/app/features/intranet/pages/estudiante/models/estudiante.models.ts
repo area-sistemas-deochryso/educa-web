@@ -56,6 +56,7 @@ export interface RegistrarEstudianteTareaArchivoRequest {
 export interface EstudianteSalon {
 	salonId: number;
 	salonDescripcion: string;
+	seccion: string;
 	cantidadEstudiantes: number;
 	cursos: EstudianteSalonCurso[];
 }
