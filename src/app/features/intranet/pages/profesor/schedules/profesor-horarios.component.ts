@@ -249,8 +249,8 @@ export class TeacherSchedulesComponent implements OnInit {
 	// #endregion
 	// #region Event handlers
 	verAsistencia(block: HorarioBlock): void {
-		this.router.navigate(['/intranet/profesor/cursos'], {
-			queryParams: { horarioId: block.id, tab: '3' },
+		this.router.navigate(['/intranet/profesor/asistencia'], {
+			queryParams: { horarioId: block.id },
 		});
 	}
 	// #endregion

@@ -120,8 +120,12 @@ import { EstudianteSalonDialogComponent } from './components/estudiante-salon-di
 			[gruposData]="vm().gruposData"
 			[gruposLoading]="vm().gruposLoading"
 			[gruposCursoId]="vm().gruposCursoId"
+			[asistenciaData]="vm().asistenciaData"
+			[asistenciaLoading]="vm().asistenciaLoading"
+			[asistenciaCursoId]="vm().asistenciaCursoId"
 			(visibleChange)="onDialogVisibleChange($event)"
 			(gruposChange)="onGruposChange($event)"
+			(asistenciaChange)="onAsistenciaChange($event)"
 		/>
 	`,
 })
@@ -161,6 +165,10 @@ export class StudentClassroomsComponent implements OnInit {
 
 	onGruposChange(horarioId: number): void {
 		this.facade.loadGrupos(horarioId);
+	}
+
+	onAsistenciaChange(horarioId: number): void {
+		this.facade.loadAsistencia(horarioId);
 	}
 	// #endregion
 }

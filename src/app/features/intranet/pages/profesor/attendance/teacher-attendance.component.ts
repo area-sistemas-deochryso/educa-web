@@ -2,6 +2,7 @@ import {
 	Component,
 	ChangeDetectionStrategy,
 	computed,
+	effect,
 	inject,
 	signal,
 	OnInit,
@@ -9,6 +10,7 @@ import {
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { ActivatedRoute } from '@angular/router';
 import { Select } from 'primeng/select';
 import { TabsModule } from 'primeng/tabs';
 import { ProgressSpinnerModule } from 'primeng/progressspinner';
@@ -179,6 +181,7 @@ export class TeacherAttendanceComponent implements OnInit, OnDestroy {
 	// #region Dependencias
 	private readonly facade = inject(ProfesorFacade);
 	private readonly asistenciaFacade = inject(AttendanceCourseFacade);
+	private readonly route = inject(ActivatedRoute);
 	// #endregion
 
 	// #region Estado local
@@ -210,6 +213,23 @@ export class TeacherAttendanceComponent implements OnInit, OnDestroy {
 	// #endregion
 
 	// #region Lifecycle
+	private readonly pendingHorarioId = signal<number | null>(null);
+
+	constructor() {
+		const qpHorarioId = Number(this.route.snapshot.queryParamMap.get('horarioId'));
+		if (qpHorarioId > 0) this.pendingHorarioId.set(qpHorarioId);
+
+		effect(() => {
+			const opts = this.cursoOptions();
+			const pending = this.pendingHorarioId();
+			if (pending && opts.some((o) => o.value === pending)) {
+				this.pendingHorarioId.set(null);
+				this.selectedHorarioId.set(pending);
+				this.onCursoChange(pending);
+			}
+		});
+	}
+
 	ngOnInit(): void {
 		if (this.facade.vm().horarios.length === 0) {
 			this.facade.loadData();

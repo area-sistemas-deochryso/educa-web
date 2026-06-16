@@ -140,10 +140,9 @@ export class LoginIntranetComponent implements OnInit {
 			.pipe(takeUntilDestroyed(this.destroyRef))
 			.subscribe({
 				next: () => {
-					this.isLoading.set(false);
 					this.swService.clearCache();
 					this.userPermissionsService.clear();
-					this.router.navigate(['/intranet']);
+					window.location.href = '/intranet';
 				},
 				error: (err: HttpErrorResponse) => {
 					this.isLoading.set(false);
