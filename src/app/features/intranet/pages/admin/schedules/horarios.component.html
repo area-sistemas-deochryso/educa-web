@@ -50,6 +50,10 @@
 	</div>
 }
 
+@if (vm().isAdmin && !vm().optionsLoading) {
+	<app-dependency-guidance [checks]="dependencyChecks()" />
+}
+
 <!-- * Estadisticas -->
 @if (vm().statsReady) {
 	<div class="stats-grid">

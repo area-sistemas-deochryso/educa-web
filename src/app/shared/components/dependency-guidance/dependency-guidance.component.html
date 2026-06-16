@@ -1,0 +1,46 @@
+@if (hasMissing()) {
+	@if (isBannerMode()) {
+		<p-message severity="info" styleClass="dependency-guidance-banner">
+			<ng-template #messageContent>
+				<div class="dependency-checklist">
+					<span class="dependency-checklist-title">Para usar esta página necesitás:</span>
+					@for (check of satisfiedChecks(); track check.label) {
+						<div class="dependency-item satisfied">
+							<i class="pi pi-check-circle"></i>
+							<span>{{ check.label }}{{ check.count !== null && check.count !== undefined ? ' (' + check.count + ')' : '' }}</span>
+						</div>
+					}
+					@for (check of missingChecks(); track check.label) {
+						<div class="dependency-item missing">
+							<i class="pi pi-times-circle"></i>
+							<span>{{ check.label }}</span>
+							<button
+								pButton
+								[label]="check.targetLabel"
+								icon="pi pi-external-link"
+								class="p-button-sm p-button-text"
+								(click)="openInNewTab(check.targetUrl)"
+							></button>
+						</div>
+					}
+				</div>
+			</ng-template>
+		</p-message>
+	} @else {
+		@let single = missingChecks()[0];
+		<p-message severity="warn" styleClass="dependency-guidance-inline">
+			<ng-template #messageContent>
+				<div class="inline-guidance-content">
+					<span>No hay {{ single.label | lowercase }} registrados.</span>
+					<button
+						pButton
+						[label]="single.targetLabel"
+						icon="pi pi-external-link"
+						class="p-button-sm p-button-text"
+						(click)="openInNewTab(single.targetUrl)"
+					></button>
+				</div>
+			</ng-template>
+		</p-message>
+	}
+}

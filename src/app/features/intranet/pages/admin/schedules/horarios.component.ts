@@ -2,6 +2,7 @@ import { ChangeDetectionStrategy, Component, OnInit, computed, inject } from '@a
 
 import { ButtonModule } from 'primeng/button';
 import { CommonModule } from '@angular/common';
+import { type DependencyCheck, DependencyGuidanceComponent } from '@shared/components';
 import { ConfirmDialogModule } from 'primeng/confirmdialog';
 import { ConfirmationService } from 'primeng/api';
 import { FormsModule } from '@angular/forms';
@@ -53,6 +54,7 @@ import {
 		ScheduleGlobalViewComponent,
 		PageHeaderComponent,
 		PeriodToggleComponent,
+		DependencyGuidanceComponent,
 	],
 	templateUrl: './horarios.component.html',
 	styleUrl: './horarios.component.scss',
@@ -66,6 +68,30 @@ export class SchedulesComponent implements OnInit {
 	private confirmationService = inject(ConfirmationService);
 
 	readonly vm = this.dataFacade.vm;
+
+	readonly dependencyChecks = computed<DependencyCheck[]>(() => [
+		{
+			label: 'Salones',
+			satisfied: this.vm().salonesOptions.length > 0,
+			count: this.vm().salonesOptions.length || undefined,
+			targetUrl: '/intranet/admin/salones',
+			targetLabel: 'Ir a Salones',
+		},
+		{
+			label: 'Cursos',
+			satisfied: this.vm().cursosOptions.length > 0,
+			count: this.vm().cursosOptions.length || undefined,
+			targetUrl: '/intranet/admin/cursos',
+			targetLabel: 'Ir a Cursos',
+		},
+		{
+			label: 'Profesores',
+			satisfied: this.vm().profesoresOptions.length > 0,
+			count: this.vm().profesoresOptions.length || undefined,
+			targetUrl: '/intranet/admin/usuarios',
+			targetLabel: 'Ir a Usuarios',
+		},
+	]);
 
 	readonly estadoOptions = [
 		{ label: 'Activos', value: true },

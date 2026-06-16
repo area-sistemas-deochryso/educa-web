@@ -1,0 +1,45 @@
+:host {
+	display: block;
+}
+
+.dependency-guidance-banner {
+	width: 100%;
+	margin-bottom: 1rem;
+}
+
+.dependency-checklist {
+	display: flex;
+	flex-direction: column;
+	gap: 0.5rem;
+	padding: 0.25rem 0;
+}
+
+.dependency-checklist-title {
+	font-weight: 600;
+	margin-bottom: 0.25rem;
+}
+
+.dependency-item {
+	display: flex;
+	align-items: center;
+	gap: 0.5rem;
+
+	&.satisfied i {
+		color: var(--p-green-500);
+	}
+
+	&.missing i {
+		color: var(--p-red-500);
+	}
+}
+
+:host ::ng-deep .dependency-inline-message {
+	margin-bottom: 0.5rem;
+
+	.inline-guidance-content {
+		display: flex;
+		align-items: center;
+		gap: 0.5rem;
+		flex-wrap: wrap;
+	}
+}
