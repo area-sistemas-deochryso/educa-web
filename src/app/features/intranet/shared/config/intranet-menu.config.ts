@@ -122,6 +122,7 @@ export const MENU_ITEMS: MenuItemDef[] = [
 	// Herramientas — utilidades dev/admin (no son observabilidad)
 	{ route: '/intranet/admin/campus', label: 'Campus', icon: 'pi pi-map', permiso: PERMISOS.ADMIN_CAMPUS, modulo: 'sistema', featureFlag: 'campusNavigation', group: { label: 'Herramientas', icon: 'pi pi-wrench' }, preview: 'admin-table', description: 'Navegar el campus virtual' },
 	{ route: '/intranet/ctest-k6', label: 'Test k6', icon: 'pi pi-bolt', permiso: PERMISOS.CTEST_K6, modulo: 'sistema', featureFlag: 'ctestK6', group: { label: 'Herramientas', icon: 'pi pi-wrench' }, preview: 'admin-table', description: 'Herramienta de testing de carga' },
+	{ route: '/intranet/admin/registro-vistas', label: 'Registro de Vistas', icon: 'pi pi-list', permiso: PERMISOS.ADMIN_REGISTRO_VISTAS, modulo: 'sistema', group: { label: 'Herramientas', icon: 'pi pi-wrench' }, preview: 'admin-table', description: 'Listado de todas las vistas definidas en el frontend' },
 ];
 // #endregion
 

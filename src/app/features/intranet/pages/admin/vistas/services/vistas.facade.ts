@@ -84,7 +84,7 @@ export class VistasFacade extends BaseCrudFacade<CapabilityCatalogItem, { codigo
 	// #endregion
 
 	// #region UI commands
-	openEditDialog(cap: CapabilityCatalogItem): void {
+	override openEditDialog(cap: CapabilityCatalogItem): void {
 		this.store.setSelectedItem(cap);
 		this.store.setFormData({ codigo: cap.codigo, nombre: cap.nombre, modulo: cap.modulo, descripcion: cap.descripcion ?? '' });
 		this.store.setIsEditing(true);

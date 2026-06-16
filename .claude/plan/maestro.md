@@ -79,7 +79,7 @@ Planes cross-repo con sub-chats FE pendientes: **41** (Correlation Hub F3-F6), *
 | 10 | F8 | Design Patterns BE | Aplicar al tocar módulos BE | incremental |
 | 11 | F9 | Design Patterns FE | Aplicar al tocar módulos FE | incremental |
 
-**Siguiente accionable**: **P50 F2** — Barrel-only enforcement (brief 305, coord top priority). Alternativa: **xP41** F3 BE (persist request lifecycle).
+**Siguiente accionable**: coord bloque admin/academic (P63, P65, P66, P62 F2-F3). Alternativa FE-local: **xP41** F3 BE (persist request lifecycle). P50 F2 ✅ closed (305).
 
 ### 🟣 Verificaciones post-deploy (`/verify <NNN>`)
 
@@ -103,8 +103,8 @@ Planes cross-repo con sub-chats FE pendientes: **41** (Correlation Hub F3-F6), *
 
 ### Notas operativas
 
-- **`running/`**: vacío · **`open/`**: 4 briefs (262×2, 301, 306) · **`awaiting-prod/`**: 13 briefs · **`waiting/`**: vacío · **`troubles/`**: vacío
-- **Último cierre**: 308 (formal roles consume endpoint) → closed/ 2026-06-09.
+- **`running/`**: vacío · **`open/`**: 3 briefs (262×2, 301) · **`awaiting-prod/`**: 14 briefs (added 321 P64-F5) · **`waiting/`**: vacío · **`troubles/`**: vacío
+- **Último cierre**: 308 (formal roles consume endpoint) → closed/ 2026-06-09. P50 F2 brief 305 → closed/.
 - **Último saneamiento**: 2026-06-09 — cross-repo sync: purged 66 closed briefs (≤129, >30d). Moved 269 to closed (P28 stale). Removed xP42/xP45/xP52/xP54 from INDEX (archived in coord).
 
 ---

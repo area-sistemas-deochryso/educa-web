@@ -1,6 +1,7 @@
 import { ChangeDetectionStrategy, Component, inject, OnInit } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
+import { RouterLink } from '@angular/router';
 
 import { ButtonModule } from 'primeng/button';
 import { DialogModule } from 'primeng/dialog';
@@ -30,6 +31,7 @@ import { PermissionsUsersDataFacade } from './services';
 		InputTextModule,
 		CheckboxModule,
 		AutoCompleteModule,
+		RouterLink,
 		PageHeaderComponent,
 	],
 	templateUrl: './permisos-usuarios.component.html',

@@ -44,6 +44,7 @@ export const PERMISOS = {
 	ADMIN_HORARIOS: 'intranet/admin/horarios',
 	ADMIN_NOTIFICACIONES: 'intranet/admin/notificaciones',
 	ADMIN_SALONES: 'intranet/admin/salones',
+	ADMIN_REGISTRO_VISTAS: 'intranet/admin/registro-vistas',
 	// #endregion
 
 	// #region Estudiante

@@ -1,0 +1,21 @@
+.view-registry {
+	display: flex;
+	flex-direction: column;
+	gap: 1rem;
+	padding: 1.5rem;
+
+	&__filters {
+		display: flex;
+		gap: 0.75rem;
+		flex-wrap: wrap;
+	}
+
+	:host ::ng-deep .p-datatable-thead > tr > th {
+		background: transparent;
+		position: static;
+	}
+
+	.clickable-tag {
+		cursor: pointer;
+	}
+}

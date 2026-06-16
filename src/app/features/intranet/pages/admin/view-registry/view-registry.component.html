@@ -1,0 +1,89 @@
+<!-- #region Template -->
+<div class="view-registry">
+	<!-- #region Header -->
+	<app-page-header
+		icon="pi pi-list"
+		title="Registro de Vistas"
+		subtitle="Todas las vistas definidas en el frontend — {{ entries().length }} de {{ totalCount }}"
+	>
+		<button
+			pButton
+			label="Capabilities por Rol"
+			icon="pi pi-id-card"
+			class="p-button-outlined"
+			routerLink="/intranet/admin/permisos/roles"
+		></button>
+		<button
+			pButton
+			label="Capabilities por Usuario"
+			icon="pi pi-users"
+			class="p-button-outlined"
+			routerLink="/intranet/admin/permisos/usuarios"
+		></button>
+	</app-page-header>
+	<!-- #endregion -->
+
+	<!-- #region Filters -->
+	<div class="view-registry__filters">
+		<p-iconfield>
+			<p-inputicon styleClass="pi pi-search" />
+			<input
+				pInputText
+				type="text"
+				placeholder="Filtrar por key o path..."
+				[ngModel]="filterText()"
+				(ngModelChange)="filterText.set($event)"
+			/>
+		</p-iconfield>
+
+		<p-select
+			[options]="segmentOptions"
+			[ngModel]="selectedSegment()"
+			(ngModelChange)="selectedSegment.set($event)"
+			optionLabel="label"
+			optionValue="value"
+			placeholder="Todos los segmentos"
+			[showClear]="true"
+			appendTo="body"
+		/>
+	</div>
+	<!-- #endregion -->
+
+	<!-- #region Table -->
+	<p-table
+		[value]="entries()"
+		[paginator]="true"
+		[rows]="5"
+		[rowsPerPageOptions]="[5, 10, 20]"
+		styleClass="p-datatable-sm p-datatable-striped"
+	>
+		<ng-template #header>
+			<tr>
+				<th style="width: 30%">Key</th>
+				<th>Path</th>
+				<th style="width: 120px">Segmento</th>
+			</tr>
+		</ng-template>
+		<ng-template #body let-entry>
+			<tr>
+				<td><code>{{ entry.key }}</code></td>
+				<td><code>/{{ entry.path }}</code></td>
+				<td>
+					<p-tag
+						[value]="entry.segment"
+						[severity]="segmentSeverity(entry.segment)"
+						(click)="toggleSegment(entry.segment)"
+						class="clickable-tag"
+					/>
+				</td>
+			</tr>
+		</ng-template>
+		<ng-template #emptymessage>
+			<tr>
+				<td colspan="3" class="text-center">Sin resultados para el filtro.</td>
+			</tr>
+		</ng-template>
+	</p-table>
+	<!-- #endregion -->
+</div>
+<!-- #endregion -->
