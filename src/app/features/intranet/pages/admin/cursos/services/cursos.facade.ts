@@ -110,7 +110,7 @@ export class CursosFacade extends BaseCrudFacade<Curso, CursoFormData, CursosEst
 	// #endregion
 
 	// #region UI commands (specific)
-	openEditDialog(curso: Curso): void {
+	override openEditDialog(curso: Curso): void {
 		this.store.setSelectedItem(curso);
 		this.store.setFormData({ nombre: curso.nombre, estado: curso.estado ?? true });
 		this.store.setIsEditing(true);

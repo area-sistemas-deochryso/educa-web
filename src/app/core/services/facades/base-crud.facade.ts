@@ -1,10 +1,9 @@
-/* eslint-disable max-lines -- Razón: base class cohesiva (dialog delegation + WAL CRUD + paginación + cross-tab refetch). Partir por concerns rompería la herencia única que extienden los facades concretos. */
 import { DestroyRef, inject, Injectable } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { forkJoin, Observable } from 'rxjs';
 
 import {
-	logger, withRetry, getEstadoToggleDeltas, getEstadoRollbackDeltas,
+	logger, withRetry, getEstadoToggleDeltas,
 	facadeErrorHandler, type FacadeErrorHandler,
 } from '@core/helpers';
 // eslint-disable-next-line layer-enforcement/imports-error -- DEBT: xrepo-50-F3a
@@ -22,6 +21,7 @@ import type {
 	HasEstado,
 	PaginatedResult,
 } from './base-crud.facade.types';
+import { WalCrudOps } from './wal-crud-ops';
 
 export type {
 	BaseCrudFacadeConfig,
@@ -65,6 +65,7 @@ export abstract class BaseCrudFacade<
 	protected readonly destroyRef = inject(DestroyRef);
 	protected readonly errHandler: FacadeErrorHandler;
 	private readonly _activityTracker = inject(ActivityTrackerService);
+	protected crudOps!: WalCrudOps<T, TForm, TStats>;
 	// #endregion
 
 	// #region Configuración (provista por el concreto)
@@ -85,6 +86,11 @@ export abstract class BaseCrudFacade<
 			tag: this.config.tag,
 			errorHandler: this.errorHandler,
 		});
+		this.crudOps = new WalCrudOps(this.wal, this.store, {
+			tag: this.config.tag,
+			resourceType: this.config.resourceType,
+			apiUrl: this.config.apiUrl,
+		}, this.errorHandler);
 	}
 
 	/** Llamar tras `initErrorHandler()`. Ver `rules/optimistic-ui.md` § "Refetch cross-tab". */
@@ -225,43 +231,26 @@ export abstract class BaseCrudFacade<
 
 	// #endregion
 
-	// #region WAL CRUD — Create
+	// #region WAL CRUD — delegated to WalCrudOps
 
-	/**
-	 * CREAR: WAL → optimistic close dialog → refetch on commit.
-	 * El facade concreto llama a esto con el payload y la API call.
-	 */
 	protected walCreate(
 		payload: unknown,
 		http$: () => Observable<unknown>,
 		endpointSuffix = 'crear',
 	): void {
-		this.wal.execute({
-			operation: 'CREATE',
-			resourceType: this.config.resourceType,
-			endpoint: `${this.config.apiUrl}/${endpointSuffix}`,
-			method: 'POST',
-			payload,
-			http$,
-			optimistic: {
-				apply: () => this.store.closeDialog(),
-				rollback: () => {},
+		this.crudOps.walCreate(payload, http$, {
+			endpointSuffix,
+			callbacks: {
+				optimisticApply: () => this.store.closeDialog(),
+				onCommit: () => {
+					this.silentRefreshAfterCrud();
+					this.refreshEstadisticas();
+				},
+				errorLabel: this.getCreateErrorLabel(),
 			},
-			onCommit: () => {
-				this.silentRefreshAfterCrud();
-				this.refreshEstadisticas();
-			},
-			onError: (err) => this.errHandler.handle(err, this.getCreateErrorLabel()),
 		});
 	}
 
-	// #endregion
-
-	// #region WAL CRUD — Update
-
-	/**
-	 * EDITAR: WAL → optimistic update + close dialog → rollback to snapshot.
-	 */
 	protected walUpdate(
 		id: number,
 		payload: unknown,
@@ -269,97 +258,32 @@ export abstract class BaseCrudFacade<
 		http$: () => Observable<unknown>,
 		endpointSuffix = `${id}/actualizar`,
 	): void {
-		const snapshot = this.store.items().find((i) => i.id === id);
-
-		this.wal.execute({
-			operation: 'UPDATE',
-			resourceType: this.config.resourceType,
-			resourceId: id,
-			endpoint: `${this.config.apiUrl}/${endpointSuffix}`,
-			method: 'PUT',
-			payload,
-			http$,
-			optimistic: {
-				apply: () => {
-					this.store.updateItem(id, optimisticUpdates);
-					this.store.closeDialog();
-				},
-				rollback: () => {
-					if (snapshot) this.store.updateItem(id, snapshot);
-				},
+		this.crudOps.walUpdate(id, payload, optimisticUpdates, http$, {
+			endpointSuffix,
+			callbacks: {
+				onCommit: () => this.silentRefreshAfterCrud(),
+				errorLabel: this.getUpdateErrorLabel(),
 			},
-			onCommit: () => this.silentRefreshAfterCrud(),
-			onError: (err) => this.errHandler.handle(err, this.getUpdateErrorLabel()),
 		});
 	}
 
-	// #endregion
-
-	// #region WAL CRUD — Toggle Estado
-
-	/**
-	 * TOGGLE: WAL → optimistic toggle + stats incrementales → rollback reverses.
-	 */
 	protected walToggle(
 		item: T,
 		payload: unknown,
 		http$: () => Observable<unknown>,
 		statsKeys: EstadisticaKeys,
 		toggleFn: (id: number) => void,
-		endpointSuffix = `${item.id}/actualizar`,
 	): void {
 		const isActivo = this.resolveEstadoActivo(item);
-
-		this.wal.execute({
-			operation: 'UPDATE',
-			resourceType: this.config.resourceType,
-			resourceId: item.id,
-			endpoint: `${this.config.apiUrl}/${endpointSuffix}`,
-			method: 'PUT',
-			payload,
-			http$,
-			optimistic: {
-				apply: () => {
-					const { activosDelta, inactivosDelta } = getEstadoToggleDeltas(isActivo);
-					toggleFn(item.id);
-					this.store.incrementarEstadistica(statsKeys.activos as keyof TStats, activosDelta);
-					this.store.incrementarEstadistica(statsKeys.inactivos as keyof TStats, inactivosDelta);
-				},
-				rollback: () => {
-					const { activosDelta, inactivosDelta } = getEstadoRollbackDeltas(isActivo);
-					toggleFn(item.id);
-					this.store.incrementarEstadistica(statsKeys.activos as keyof TStats, activosDelta);
-					this.store.incrementarEstadistica(statsKeys.inactivos as keyof TStats, inactivosDelta);
-				},
+		this.crudOps.walToggle(item as T & HasEstado, payload, http$, toggleFn, {
+			statsDelta: (sign) => {
+				const d = getEstadoToggleDeltas(isActivo);
+				this.store.incrementarEstadistica(statsKeys.activos as keyof TStats, sign * d.activosDelta);
+				this.store.incrementarEstadistica(statsKeys.inactivos as keyof TStats, sign * d.inactivosDelta);
 			},
-			onCommit: () => {},
-			onError: (err) => this.errHandler.handle(err, 'cambiar el estado'),
 		});
 	}
 
-	// #endregion
-
-	// #region WAL CRUD — Delete
-
-	/**
-	 * ELIMINAR: WAL → optimistic update + stats → rollback restaura.
-	 *
-	 * El comportamiento depende del contrato de delete del backend:
-	 *
-	 * - `mode: 'soft'` (DEFAULT, alineado con INV-D03): el BE hace baja lógica
-	 *   (`_Estado = false`). El registro persiste como inactivo. El optimistic
-	 *   update muta `estado` del item a inactivo (queda visible si el listado
-	 *   trae soft-deleted), `total` no cambia, y `activos`/`inactivos` se
-	 *   ajustan reflejando la transición a inactivo.
-	 *
-	 * - `mode: 'hard'`: el BE hace DELETE físico. El item se quita del store
-	 *   (`removeItem`), `total -= 1`, y `activos`/`inactivos` decrementan en
-	 *   el lado correspondiente al estado previo del registro.
-	 *
-	 * Casos del proyecto:
-	 *   - Soft (default): Curso (`CUR_Estado = false`).
-	 *   - Hard (explícito): Vista (`RemoveAndSaveAsync` físico).
-	 */
 	protected walDelete(
 		item: T,
 		http$: () => Observable<unknown>,
@@ -367,57 +291,47 @@ export abstract class BaseCrudFacade<
 		endpointSuffix?: string,
 		mode: 'soft' | 'hard' = 'soft',
 	): void {
-		const suffix = endpointSuffix ?? `${item.id}/eliminar`;
 		const isActivo = this.resolveEstadoActivo(item);
 		const op = mode === 'soft' ? 'delete-soft' : 'delete-hard';
-		// Snapshot del valor crudo de estado para preservar el tipo (boolean vs number).
-		const estadoPrevio = (item as HasEstado).estado;
-		const estadoInactivoTyped = typeof estadoPrevio === 'number' ? 0 : false;
+		const statsDelta = (sign: 1 | -1): void => {
+			const d = getEstadoToggleDeltas(isActivo, op);
+			if (mode === 'hard') {
+				this.store.incrementarEstadistica(statsKeys.total as keyof TStats, sign * -1);
+			}
+			this.store.incrementarEstadistica(statsKeys.activos as keyof TStats, sign * d.activosDelta);
+			this.store.incrementarEstadistica(statsKeys.inactivos as keyof TStats, sign * d.inactivosDelta);
+		};
 
-		this.wal.execute({
-			operation: 'DELETE',
-			resourceType: this.config.resourceType,
-			resourceId: item.id,
-			endpoint: `${this.config.apiUrl}/${suffix}`,
-			method: 'DELETE',
-			payload: null,
-			http$,
-			optimistic: {
-				apply: () => {
-					const { activosDelta, inactivosDelta } = getEstadoToggleDeltas(isActivo, op);
-					if (mode === 'soft') {
-						// Baja lógica: el item queda en lista marcado como inactivo.
-						// `total` no cambia (BE incluye soft-deleted en el total).
-						this.store.updateItem(item.id, { estado: estadoInactivoTyped } as Partial<T>);
-					} else {
-						// Baja física: el item desaparece y total decrementa.
-						this.store.removeItem(item.id);
-						this.store.incrementarEstadistica(statsKeys.total as keyof TStats, -1);
-					}
-					this.store.incrementarEstadistica(statsKeys.activos as keyof TStats, activosDelta);
-					this.store.incrementarEstadistica(statsKeys.inactivos as keyof TStats, inactivosDelta);
-				},
-				rollback: () => {
-					const { activosDelta, inactivosDelta } = getEstadoRollbackDeltas(isActivo, op);
-					if (mode === 'soft') {
-						// Restaurar el estado previo crudo (preserva boolean/number).
-						this.store.updateItem(item.id, { estado: estadoPrevio } as Partial<T>);
-					} else {
-						this.store.addItem(item);
-						this.store.incrementarEstadistica(statsKeys.total as keyof TStats, 1);
-					}
-					this.store.incrementarEstadistica(statsKeys.activos as keyof TStats, activosDelta);
-					this.store.incrementarEstadistica(statsKeys.inactivos as keyof TStats, inactivosDelta);
-				},
-			},
-			onCommit: () => {},
-			onError: (err) => this.errHandler.handle(err, this.getDeleteErrorLabel()),
-		});
+		if (mode === 'soft') {
+			this.crudOps.walDeleteSoft(item as T & HasEstado, http$, {
+				endpointSuffix,
+				statsDelta,
+				callbacks: { errorLabel: this.getDeleteErrorLabel() },
+			});
+		} else {
+			this.crudOps.walDeleteHard(item, http$, {
+				endpointSuffix,
+				statsDelta,
+				callbacks: { errorLabel: this.getDeleteErrorLabel() },
+			});
+		}
 	}
 
 	// #endregion
 
 	// #region Dialog delegation
+
+	openEditDialog(item: T): void {
+		this._activityTracker.track('USER_ACTION', `Abrir dialog: Editar ${this.config.resourceType}`, { action: 'click' });
+		this.store.setSelectedItem(item);
+		this.store.setFormData(this.mapItemToFormData(item));
+		this.store.setIsEditing(true);
+		this.store.openDialog();
+	}
+
+	protected mapItemToFormData(item: T): TForm {
+		return item as unknown as TForm;
+	}
 
 	openNewDialog(): void {
 		this._activityTracker.track('USER_ACTION', `Abrir dialog: Crear ${this.config.resourceType}`, { action: 'click' });
@@ -479,9 +393,8 @@ export abstract class BaseCrudFacade<
 
 	// #endregion
 
-	// #region Helpers privados
+	// #region Helpers
 
-	/** Resuelve si el item está activo (soporta boolean y number). */
 	private resolveEstadoActivo(item: T): boolean {
 		const estado = (item as HasEstado).estado;
 		return typeof estado === 'number' ? estado === 1 : !!estado;
