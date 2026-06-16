@@ -109,9 +109,8 @@ export const MENU_ITEMS: MenuItemDef[] = [
 	{ route: '/intranet/estudiante/mensajeria', label: 'Mensajería', icon: 'pi pi-envelope', permiso: PERMISOS.ESTUDIANTE_MENSAJERIA, modulo: 'comunicacion', featureFlag: 'estudiante', group: { label: 'Mensajes', icon: 'pi pi-inbox' }, preview: 'messaging', description: 'Enviar y recibir mensajes' },
 
 	// --- Sistema: "Cómo se configura la plataforma?" ---
-	// Gestión — usuarios, vistas
+	// Gestión — usuarios
 	{ route: '/intranet/admin/usuarios', label: 'Usuarios', icon: 'pi pi-user-edit', permiso: PERMISOS.ADMIN_USUARIOS, modulo: 'sistema', group: { label: 'Gestión', icon: 'pi pi-cog' }, preview: 'admin-table', description: 'Gestionar cuentas de usuarios' },
-	{ route: '/intranet/admin/vistas', label: 'Vistas', icon: 'pi pi-eye', permiso: PERMISOS.ADMIN_VISTAS, modulo: 'sistema', group: { label: 'Gestión', icon: 'pi pi-cog' }, preview: 'admin-table', description: 'Configurar vistas del sistema' },
 	// Permisos — control de acceso (par conceptual separado de gestión de entidades)
 	{ route: '/intranet/admin/permisos/roles', label: 'Por Rol', icon: 'pi pi-id-card', permiso: PERMISOS.ADMIN_PERMISOS_ROLES, modulo: 'sistema', group: { label: 'Permisos', icon: 'pi pi-lock' }, preview: 'admin-table', description: 'Gestionar permisos por rol' },
 	{ route: '/intranet/admin/permisos/usuarios', label: 'Por Usuario', icon: 'pi pi-users', permiso: PERMISOS.ADMIN_PERMISOS_USUARIOS, modulo: 'sistema', group: { label: 'Permisos', icon: 'pi pi-lock' }, preview: 'admin-table', description: 'Gestionar permisos por usuario' },

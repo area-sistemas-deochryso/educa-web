@@ -20,7 +20,6 @@ export const PERMISOS = {
 	ADMIN_PERMISOS_ROLES: 'intranet/admin/permisos/roles',
 	ADMIN_PERMISOS_USUARIOS: 'intranet/admin/permisos/usuarios',
 	ADMIN_USUARIOS: 'intranet/admin/usuarios',
-	ADMIN_VISTAS: 'intranet/admin/vistas',
 	// #endregion
 
 	// #region Admin - Gestión Académica

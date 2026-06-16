@@ -2,9 +2,9 @@
 <div class="permisos-container">
 	<!-- #region Header -->
 	<app-page-header
-		icon="pi pi-id-card"
-		title="Capabilities por Rol"
-		subtitle="Configure las capabilities permitidas para cada rol del sistema"
+		icon="pi pi-lock"
+		title="Gestión de Permisos"
+		subtitle="Administre capabilities por rol y gestione el catálogo de capabilities del sistema"
 	>
 		<button
 			pButton
@@ -23,126 +23,147 @@
 		</div>
 	}
 
-	<!-- #region Stats cards -->
-	<section class="stats-section">
-		<div class="stat-card">
-			<div class="stat-content">
-				<span class="stat-label">Roles</span>
-				<span class="stat-value">{{ vm().estadisticas.totalRoles }}</span>
-				<span class="stat-sublabel">en el sistema</span>
-			</div>
-			<div class="stat-icon roles">
+	<!-- #region Tabs -->
+	<p-tabs [value]="'roles'">
+		<p-tablist>
+			<p-tab value="roles">
 				<i class="pi pi-id-card"></i>
-			</div>
-		</div>
-
-		<div class="stat-card">
-			<div class="stat-content">
-				<span class="stat-label">Módulos</span>
-				<span class="stat-value">{{ vm().estadisticas.totalModulos }}</span>
-				<span class="stat-sublabel">categorías</span>
-			</div>
-			<div class="stat-icon modules">
-				<i class="pi pi-th-large"></i>
-			</div>
-		</div>
-
-		<div class="stat-card">
-			<div class="stat-content">
-				<span class="stat-label">Capabilities</span>
-				<span class="stat-value">{{ vm().estadisticas.totalCapabilities }}</span>
-				<span class="stat-sublabel">disponibles</span>
-			</div>
-			<div class="stat-icon views">
+				Por Rol
+			</p-tab>
+			<p-tab value="catalogo">
 				<i class="pi pi-shield"></i>
-			</div>
-		</div>
-	</section>
-	<!-- #endregion -->
+				Catálogo
+			</p-tab>
+		</p-tablist>
 
-	<!-- #region Table -->
-	<section class="table-section">
-		<p-table
-			[value]="vm().matrixRows"
-			[loading]="vm().loading"
-			class="p-datatable-sm"
-		>
-				<ng-template #header>
-					<tr>
-						<th style="width: 160px">ROL</th>
-						<th style="width: 100px">CAPABILITIES</th>
-						<th>DESCRIPCIÓN</th>
-						<th style="width: 120px">ACCIONES</th>
-					</tr>
-				</ng-template>
+		<p-tabpanel value="roles">
+			<!-- #region Stats cards -->
+			<section class="stats-section">
+				<div class="stat-card">
+					<div class="stat-content">
+						<span class="stat-label">Roles</span>
+						<span class="stat-value">{{ vm().estadisticas.totalRoles }}</span>
+						<span class="stat-sublabel">en el sistema</span>
+					</div>
+					<div class="stat-icon roles">
+						<i class="pi pi-id-card"></i>
+					</div>
+				</div>
 
-				<ng-template #body let-row>
-					<tr>
-						<td>
-							<p-tag [value]="row.rolNombre" styleClass="tag-neutral" />
-						</td>
-						<td class="text-center">
-							<span class="count-badge">{{ row.capabilityIds.length }}</span>
-						</td>
-						<td>
-							<span class="role-description">
-								@switch (row.rolNombre) {
-									@case ('Director') {
-										Acceso completo al sistema administrativo
-									}
-									@case ('Asistente Administrativo') {
-										Apoyo en gestión administrativa y operativa
-									}
-									@case ('Promotor') {
-										Promotor de la institución
-									}
-									@case ('Profesor') {
-										Gestión de clases, asistencia y calificaciones
-									}
-									@case ('Estudiante') {
-										Acceso a información académica personal
-									}
-									@default {
-										Rol del sistema
-									}
-								}
-							</span>
-						</td>
-						<td>
-							<div class="actions">
-								<button
-									pButton
-									icon="pi pi-eye"
-									class="p-button-rounded p-button-text p-button-secondary"
-									pTooltip="Ver detalles"
-									aria-label="Ver detalles"
-									(click)="openDetail(row)"
-								></button>
-								<button
-									pButton
-									icon="pi pi-pencil"
-									class="p-button-rounded p-button-text p-button-info"
-									pTooltip="Editar"
-									aria-label="Editar"
-									(click)="editRole(row)"
-								></button>
-							</div>
-						</td>
-					</tr>
-				</ng-template>
+				<div class="stat-card">
+					<div class="stat-content">
+						<span class="stat-label">Módulos</span>
+						<span class="stat-value">{{ vm().estadisticas.totalModulos }}</span>
+						<span class="stat-sublabel">categorías</span>
+					</div>
+					<div class="stat-icon modules">
+						<i class="pi pi-th-large"></i>
+					</div>
+				</div>
 
-				<ng-template #emptymessage>
-					<tr>
-						<td colspan="4" class="empty-message">
-							<div class="empty-state">
-								<i class="pi pi-inbox"></i>
-								<p>No se encontraron roles</p>
-							</div>
-						</td>
-					</tr>
-				</ng-template>
-			</p-table>
-		</section>
+				<div class="stat-card">
+					<div class="stat-content">
+						<span class="stat-label">Capabilities</span>
+						<span class="stat-value">{{ vm().estadisticas.totalCapabilities }}</span>
+						<span class="stat-sublabel">disponibles</span>
+					</div>
+					<div class="stat-icon views">
+						<i class="pi pi-shield"></i>
+					</div>
+				</div>
+			</section>
+			<!-- #endregion -->
+
+			<!-- #region Table -->
+			<section class="table-section">
+				<p-table
+					[value]="vm().matrixRows"
+					[loading]="vm().loading"
+					class="p-datatable-sm"
+				>
+						<ng-template #header>
+							<tr>
+								<th style="width: 160px">ROL</th>
+								<th style="width: 100px">CAPABILITIES</th>
+								<th>DESCRIPCIÓN</th>
+								<th style="width: 120px">ACCIONES</th>
+							</tr>
+						</ng-template>
+
+						<ng-template #body let-row>
+							<tr>
+								<td>
+									<p-tag [value]="row.rolNombre" styleClass="tag-neutral" />
+								</td>
+								<td class="text-center">
+									<span class="count-badge">{{ row.capabilityIds.length }}</span>
+								</td>
+								<td>
+									<span class="role-description">
+										@switch (row.rolNombre) {
+											@case ('Director') {
+												Acceso completo al sistema administrativo
+											}
+											@case ('Asistente Administrativo') {
+												Apoyo en gestión administrativa y operativa
+											}
+											@case ('Promotor') {
+												Promotor de la institución
+											}
+											@case ('Profesor') {
+												Gestión de clases, asistencia y calificaciones
+											}
+											@case ('Estudiante') {
+												Acceso a información académica personal
+											}
+											@default {
+												Rol del sistema
+											}
+										}
+									</span>
+								</td>
+								<td>
+									<div class="actions">
+										<button
+											pButton
+											icon="pi pi-eye"
+											class="p-button-rounded p-button-text p-button-secondary"
+											pTooltip="Ver detalles"
+											aria-label="Ver detalles"
+											(click)="openDetail(row)"
+										></button>
+										<button
+											pButton
+											icon="pi pi-pencil"
+											class="p-button-rounded p-button-text p-button-info"
+											pTooltip="Editar"
+											aria-label="Editar"
+											(click)="editRole(row)"
+										></button>
+									</div>
+								</td>
+							</tr>
+						</ng-template>
+
+						<ng-template #emptymessage>
+							<tr>
+								<td colspan="4" class="empty-message">
+									<div class="empty-state">
+										<i class="pi pi-inbox"></i>
+										<p>No se encontraron roles</p>
+									</div>
+								</td>
+							</tr>
+						</ng-template>
+					</p-table>
+				</section>
+			<!-- #endregion -->
+		</p-tabpanel>
+
+		<p-tabpanel value="catalogo">
+			<app-vistas />
+		</p-tabpanel>
+	</p-tabs>
 	<!-- #endregion -->
 </div>
 

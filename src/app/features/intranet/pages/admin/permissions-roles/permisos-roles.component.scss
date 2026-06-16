@@ -514,6 +514,20 @@
 }
 
 // #endregion
+// #region TABS
+:host ::ng-deep {
+	.p-tabs {
+		.p-tablist {
+			border-bottom: 1px solid var(--surface-300);
+			margin-bottom: 1.5rem;
+		}
+
+		.p-tabpanel {
+			padding: 0;
+		}
+	}
+}
+// #endregion
 // #region NG-DEEP OVERRIDES
 :host ::ng-deep {
 	// Unificar fondo de la página

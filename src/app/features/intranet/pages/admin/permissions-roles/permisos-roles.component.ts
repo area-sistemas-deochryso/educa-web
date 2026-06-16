@@ -10,11 +10,13 @@ import { TagModule } from 'primeng/tag';
 import { InputTextModule } from 'primeng/inputtext';
 import { CheckboxModule } from 'primeng/checkbox';
 import { DrawerModule } from 'primeng/drawer';
+import { Tab, TabList, TabPanel, Tabs } from 'primeng/tabs';
 
 import { PageHeaderComponent } from '@intranet-shared/components';
 
 import { PermissionsRolesFacade } from './services';
 import type { RolCapabilityMatrixRow } from '@core/services';
+import { VistasComponent } from '../vistas';
 
 @Component({
 	selector: 'app-permissions-roles',
@@ -30,7 +32,9 @@ import type { RolCapabilityMatrixRow } from '@core/services';
 		InputTextModule,
 		CheckboxModule,
 		DrawerModule,
+		Tabs, TabList, Tab, TabPanel,
 		PageHeaderComponent,
+		VistasComponent,
 	],
 	templateUrl: './permisos-roles.component.html',
 	styleUrl: './permisos-roles.component.scss',
