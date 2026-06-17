@@ -59,28 +59,14 @@
 			/>
 			<p-menu #pdfMenu [model]="pdfMenuItems()" [popup]="true" appendTo="body" />
 		}
-		<div class="temporal-nav-wrapper">
-			<app-attendance-temporal-nav
-				mode="day"
-				[currentDate]="fechaValue()"
-				[maxDate]="today"
-				(previous)="onPreviousDay()"
-				(next)="onNextDay()"
-				(pickerOpen)="openDatepicker()"
-			/>
-			<p-datepicker
-				#hiddenDatepicker
-				[ngModel]="fechaValue()"
-				[maxDate]="today"
-				dateFormat="dd/mm/yy"
-				(ngModelChange)="onFechaChange($event)"
-				appendTo="body"
-				class="hidden-datepicker"
-				panelStyleClass="temporal-nav-datepicker-panel"
-				[inline]="false"
-				[showIcon]="false"
-			/>
-		</div>
+		<app-attendance-temporal-nav
+			mode="day"
+			[currentDate]="fechaValue()"
+			[maxDate]="today"
+			(previous)="onPreviousDay()"
+			(next)="onNextDay()"
+			(dateSelect)="onFechaChange($event)"
+		/>
 	</div>
 </div>
 <!-- #endregion -->

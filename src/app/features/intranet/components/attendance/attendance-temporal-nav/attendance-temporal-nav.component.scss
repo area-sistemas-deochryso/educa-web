@@ -36,6 +36,10 @@
 	}
 }
 
+.nav-label-wrapper {
+	position: relative;
+}
+
 .nav-label {
 	padding: 0.25rem 0.75rem;
 	border: none;
@@ -51,6 +55,19 @@
 	&:hover {
 		background: var(--surface-hover);
 	}
+}
+
+.datepicker-dropdown {
+	position: absolute;
+	top: 100%;
+	right: 0;
+	z-index: 1000;
+	margin-top: 0.25rem;
+	background: var(--surface-overlay);
+	border: 1px solid var(--surface-border);
+	border-radius: 8px;
+	box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12);
+	padding: 0.5rem;
 }
 
 @media (max-width: 480px) {

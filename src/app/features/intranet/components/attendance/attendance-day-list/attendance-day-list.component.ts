@@ -11,7 +11,6 @@ import {
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { TableModule } from 'primeng/table';
-import { DatePicker, DatePickerModule } from 'primeng/datepicker';
 import { SkeletonModule } from 'primeng/skeleton';
 import { ButtonModule } from 'primeng/button';
 import { Menu, MenuModule } from 'primeng/menu';
@@ -55,7 +54,6 @@ export interface JustificacionEvent {
 		CommonModule,
 		FormsModule,
 		TableModule,
-		DatePickerModule,
 		SkeletonModule,
 		SkeletonLoaderComponent,
 		TableSkeletonComponent,
@@ -96,7 +94,6 @@ export class AttendanceDayListComponent {
 
 	// * ViewChild
 	@ViewChild('pdfMenu') pdfMenu!: Menu;
-	@ViewChild('hiddenDatepicker') hiddenDatepicker!: DatePicker;
 
 	// * Constants
 	readonly today = new Date();
@@ -174,10 +171,6 @@ export class AttendanceDayListComponent {
 		if (next <= this.today) {
 			this.onFechaChange(next);
 		}
-	}
-
-	openDatepicker(): void {
-		this.hiddenDatepicker?.showOverlay();
 	}
 
 	togglePdfMenu(event: Event): void {

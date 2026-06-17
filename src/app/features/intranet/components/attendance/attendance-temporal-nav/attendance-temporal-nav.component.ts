@@ -1,6 +1,17 @@
-import { ChangeDetectionStrategy, Component, computed, input, output } from '@angular/core';
-import { DatePipe } from '@angular/common';
+import {
+	ChangeDetectionStrategy,
+	Component,
+	computed,
+	ElementRef,
+	HostListener,
+	inject,
+	input,
+	output,
+	signal,
+} from '@angular/core';
+import { FormsModule } from '@angular/forms';
 import { ButtonModule } from 'primeng/button';
+import { DatePickerModule } from 'primeng/datepicker';
 import { TooltipModule } from 'primeng/tooltip';
 
 export type TemporalNavMode = 'day' | 'month';
@@ -8,19 +19,31 @@ export type TemporalNavMode = 'day' | 'month';
 @Component({
 	selector: 'app-attendance-temporal-nav',
 	standalone: true,
-	imports: [DatePipe, ButtonModule, TooltipModule],
+	imports: [FormsModule, ButtonModule, DatePickerModule, TooltipModule],
 	templateUrl: './attendance-temporal-nav.component.html',
 	styleUrl: './attendance-temporal-nav.component.scss',
 	changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class AttendanceTemporalNavComponent {
+	private readonly elRef = inject(ElementRef);
+
 	readonly mode = input.required<TemporalNavMode>();
 	readonly currentDate = input.required<Date>();
 	readonly maxDate = input<Date>(new Date());
 
 	readonly previous = output<void>();
 	readonly next = output<void>();
+	readonly dateSelect = output<Date>();
 	readonly pickerOpen = output<void>();
+
+	readonly pickerVisible = signal(false);
+
+	@HostListener('document:click', ['$event'])
+	onDocumentClick(event: Event): void {
+		if (this.pickerVisible() && !this.elRef.nativeElement.contains(event.target)) {
+			this.pickerVisible.set(false);
+		}
+	}
 
 	readonly label = computed(() => {
 		const date = this.currentDate();
@@ -59,8 +82,20 @@ export class AttendanceTemporalNavComponent {
 		}
 	}
 
-	onLabelClick(): void {
-		this.pickerOpen.emit();
+	togglePicker(event: Event): void {
+		event.stopPropagation();
+		if (this.mode() === 'month') {
+			this.pickerOpen.emit();
+			return;
+		}
+		this.pickerVisible.update((v) => !v);
+	}
+
+	onDateSelect(date: Date | null): void {
+		if (date) {
+			this.pickerVisible.set(false);
+			this.dateSelect.emit(date);
+		}
 	}
 
 	private formatDayLabel(date: Date): string {

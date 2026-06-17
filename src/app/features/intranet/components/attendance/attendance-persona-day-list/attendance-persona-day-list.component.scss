@@ -69,21 +69,6 @@ $color-pendiente: #9e9e9e;
 	.pdf-button {
 		margin-right: -0.5rem;
 	}
-
-	.temporal-nav-wrapper {
-		position: relative;
-	}
-
-	.temporal-nav-wrapper .hidden-datepicker {
-		position: absolute;
-		right: 0;
-		top: 100%;
-		width: 1px;
-		height: 1px;
-		overflow: hidden;
-		opacity: 0;
-		pointer-events: none;
-	}
 }
 // #endregion
 

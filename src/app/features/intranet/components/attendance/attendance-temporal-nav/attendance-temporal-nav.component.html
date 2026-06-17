@@ -10,15 +10,27 @@
 		<i class="pi pi-chevron-left"></i>
 	</button>
 
-	<button
-		type="button"
-		class="nav-label"
-		(click)="onLabelClick()"
-		pTooltip="Abrir selector"
-		tooltipPosition="top"
-	>
-		{{ label() }}
-	</button>
+	<div class="nav-label-wrapper">
+		<button
+			type="button"
+			class="nav-label"
+			(click)="togglePicker($event)"
+			pTooltip="Abrir selector"
+			tooltipPosition="top"
+		>
+			{{ label() }}
+		</button>
+		@if (pickerVisible()) {
+			<div class="datepicker-dropdown" (click)="$event.stopPropagation()">
+				<p-datepicker
+					[ngModel]="currentDate()"
+					[maxDate]="maxDate()"
+					(ngModelChange)="onDateSelect($event)"
+					[inline]="true"
+				/>
+			</div>
+		}
+	</div>
 
 	<button
 		type="button"
