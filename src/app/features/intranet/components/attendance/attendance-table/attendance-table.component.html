@@ -44,23 +44,23 @@
 			</h2>
 			<!-- * Status summary badges -->
 			<div class="status-summary">
-				<div class="summary-item">
-					<span class="summary-color status-tardanza"></span>
-					<span class="summary-count">{{ table().counts.T }}T</span>
-				</div>
-				<div class="summary-item">
+				<div class="summary-item" pTooltip="Asistencias" tooltipPosition="top">
 					<span class="summary-color status-asistio"></span>
 					<span class="summary-count">{{ table().counts.A }}A</span>
 				</div>
-				<div class="summary-item">
+				<div class="summary-item" pTooltip="Tardanzas" tooltipPosition="top">
+					<span class="summary-color status-tardanza"></span>
+					<span class="summary-count">{{ table().counts.T }}T</span>
+				</div>
+				<div class="summary-item" pTooltip="Faltas" tooltipPosition="top">
 					<span class="summary-color status-falta"></span>
 					<span class="summary-count">{{ table().counts.F }}F</span>
 				</div>
-				<div class="summary-item">
+				<div class="summary-item" pTooltip="Justificadas" tooltipPosition="top">
 					<span class="summary-color status-justificado"></span>
 					<span class="summary-count">{{ table().counts.J }}J</span>
 				</div>
-				<div class="summary-item">
+				<div class="summary-item" pTooltip="Pendientes" tooltipPosition="top">
 					<span class="summary-color status-pendiente"></span>
 					<span class="summary-count">{{ table().counts['-'] }}-</span>
 				</div>

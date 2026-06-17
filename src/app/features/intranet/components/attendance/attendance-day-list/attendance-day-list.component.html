@@ -41,6 +41,7 @@
 					<span class="pdf-label"> Reporte de la fecha</span>
 				}
 				<!-- * Date picker (max = today) -->
+				<span class="fecha-label">Fecha</span>
 				<p-datepicker
 					[ngModel]="fechaValue()"
 					[showIcon]="true"
@@ -77,6 +78,54 @@
 			<p>No hay registros de asistencia para esta fecha</p>
 		</div>
 	} @else {
+		<!-- * Stats summary (above the table for immediate visibility) -->
+		<div class="resumen-header">
+			<div class="stat-badge total">
+				<div class="badge-icon">
+					<i class="pi pi-users"></i>
+				</div>
+				<div class="badge-content">
+					<span class="value">{{ estadisticas().total }}</span>
+					<span class="label">Total</span>
+				</div>
+			</div>
+			<div class="stat-badge asistio">
+				<span class="status-indicator status-asistio">A</span>
+				<div class="badge-content">
+					<span class="value">{{ estadisticas().asistio }}</span>
+					<span class="label">Asistió</span>
+				</div>
+			</div>
+			<div class="stat-badge tardanza">
+				<span class="status-indicator status-tardanza">T</span>
+				<div class="badge-content">
+					<span class="value">{{ estadisticas().tardanza }}</span>
+					<span class="label">Tardanza</span>
+				</div>
+			</div>
+			<div class="stat-badge falta">
+				<span class="status-indicator status-falta">F</span>
+				<div class="badge-content">
+					<span class="value">{{ estadisticas().falta }}</span>
+					<span class="label">Falta</span>
+				</div>
+			</div>
+			<div class="stat-badge justificado">
+				<span class="status-indicator status-justificado">J</span>
+				<div class="badge-content">
+					<span class="value">{{ estadisticas().justificado }}</span>
+					<span class="label">Justificado</span>
+				</div>
+			</div>
+			<div class="stat-badge pendiente">
+				<span class="status-indicator status-pendiente">-</span>
+				<div class="badge-content">
+					<span class="value">{{ estadisticas().pendiente }}</span>
+					<span class="label">Pendiente</span>
+				</div>
+			</div>
+		</div>
+
 		<!-- * Day list table + mobile cards -->
 		<app-responsive-table
 			[value]="estudiantesDelDia()"
@@ -203,53 +252,6 @@
 			<!-- #endregion -->
 		</app-responsive-table>
 
-		<!-- * Footer stats summary -->
-		<div class="resumen-footer">
-			<div class="stat-badge total">
-				<div class="badge-icon">
-					<i class="pi pi-users"></i>
-				</div>
-				<div class="badge-content">
-					<span class="value">{{ estadisticas().total }}</span>
-					<span class="label">Total</span>
-				</div>
-			</div>
-			<div class="stat-badge tardanza">
-				<span class="status-indicator status-tardanza">T</span>
-				<div class="badge-content">
-					<span class="value">{{ estadisticas().tardanza }}</span>
-					<span class="label">Tardanza</span>
-				</div>
-			</div>
-			<div class="stat-badge asistio">
-				<span class="status-indicator status-asistio">A</span>
-				<div class="badge-content">
-					<span class="value">{{ estadisticas().asistio }}</span>
-					<span class="label">Asistió</span>
-				</div>
-			</div>
-			<div class="stat-badge falta">
-				<span class="status-indicator status-falta">F</span>
-				<div class="badge-content">
-					<span class="value">{{ estadisticas().falta }}</span>
-					<span class="label">Falta</span>
-				</div>
-			</div>
-			<div class="stat-badge justificado">
-				<span class="status-indicator status-justificado">J</span>
-				<div class="badge-content">
-					<span class="value">{{ estadisticas().justificado }}</span>
-					<span class="label">Justificado</span>
-				</div>
-			</div>
-			<div class="stat-badge pendiente">
-				<span class="status-indicator status-pendiente">-</span>
-				<div class="badge-content">
-					<span class="value">{{ estadisticas().pendiente }}</span>
-					<span class="label">Pendiente</span>
-				</div>
-			</div>
-		</div>
 	}
 </p-card>
 
