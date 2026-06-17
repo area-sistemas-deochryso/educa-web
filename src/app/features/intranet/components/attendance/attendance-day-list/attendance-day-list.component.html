@@ -71,6 +71,15 @@
 </div>
 <!-- #endregion -->
 
+<!-- #region Pending closure banner (F7) -->
+@if (estadisticas().pendiente > 0 && isToday()) {
+	<div class="pending-closure-banner">
+		<i class="pi pi-exclamation-triangle"></i>
+		<span>Asistencia pendiente de cierre — {{ estadisticas().pendiente }} estudiantes sin registro</span>
+	</div>
+}
+<!-- #endregion -->
+
 <!-- #region Table content -->
 @if (loading()) {
 	<app-table-skeleton [columns]="diaColumns" [rows]="6" minHeight="300px" />
