@@ -1,0 +1,20 @@
+<!-- #region Template -->
+<div class="inline-detail">
+	@if (usuario().telefono) {
+		<div class="detail-field">
+			<i class="pi pi-phone"></i>
+			<span class="detail-field__value">{{ usuario().telefono }}</span>
+		</div>
+	}
+	@if (usuario().correoApoderado) {
+		<div class="detail-field">
+			<i class="pi pi-envelope"></i>
+			<span class="detail-field__label">Apoderado</span>
+			<span class="detail-field__value">{{ usuario().correoApoderado }}</span>
+		</div>
+	}
+	@if (!usuario().telefono && !usuario().correoApoderado) {
+		<span class="inline-detail__empty">Sin datos adicionales</span>
+	}
+</div>
+<!-- #endregion -->

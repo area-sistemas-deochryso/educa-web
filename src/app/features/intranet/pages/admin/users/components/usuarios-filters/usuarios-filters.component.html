@@ -5,21 +5,13 @@
 		<input
 			type="text"
 			pInputText
-			placeholder="Buscar por ID, nombre, DNI o correo..."
+			placeholder="Buscar por nombre, DNI o correo..."
 			[ngModel]="searchTerm()"
 			(ngModelChange)="onSearchChange($event)"
 		/>
 	</div>
 
 	<div class="filter-dropdowns">
-		<p-select
-			[options]="options().rolesOptions"
-			[ngModel]="filterRol()"
-			(ngModelChange)="onFilterRolChange($event)"
-			placeholder="Rol"
-			appendTo="body"
-		/>
-
 		<p-select
 			[options]="options().estadoOptions"
 			[ngModel]="filterEstado()"
@@ -28,23 +20,27 @@
 			appendTo="body"
 		/>
 
-		<p-select
-			[options]="salonOptions()"
-			[ngModel]="filterSalonId()"
-			(ngModelChange)="onFilterSalonIdChange($event)"
-			placeholder="Salón"
-			appendTo="body"
-		/>
+		@if (showSalonFilter()) {
+			<p-select
+				[options]="salonOptions()"
+				[ngModel]="filterSalonId()"
+				(ngModelChange)="onFilterSalonIdChange($event)"
+				placeholder="Salón"
+				appendTo="body"
+			/>
+		}
 	</div>
 
-	<button
-		pButton
-		icon="pi pi-filter-slash"
-		class="p-button-text p-button-sm btn-clear"
-		pTooltip="Limpiar filtros"
-		tooltipPosition="top"
-		(click)="onClearFilters()"
-		[pt]="{ root: { 'aria-label': 'Limpiar filtros' } }"
-	></button>
+	@if (hasActiveFilters()) {
+		<button
+			pButton
+			icon="pi pi-filter-slash"
+			class="p-button-text p-button-sm btn-clear"
+			pTooltip="Limpiar filtros"
+			tooltipPosition="top"
+			(click)="onClearFilters()"
+			[pt]="{ root: { 'aria-label': 'Limpiar filtros' } }"
+		></button>
+	}
 </div>
 <!-- #endregion -->

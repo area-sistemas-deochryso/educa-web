@@ -10,6 +10,7 @@ import {
 	ActualizarUsuarioRequest,
 	CrearUsuarioRequest,
 	ImportarEstudiantesResponse,
+	RoleTab,
 	RolUsuarioAdmin,
 	UsuarioDetalle,
 	UsuarioLista,
@@ -80,6 +81,7 @@ export class UsersStore extends BaseCrudStore<UsuarioLista, UsuarioFormData, Usu
 	private readonly _filterRol = signal<RolUsuarioAdmin | null>(null);
 	private readonly _filterSalonId = signal<number | null>(null);
 	private readonly _refreshCounter = signal(0);
+	private readonly _activeTab = signal<RoleTab>(null);
 
 	// ProfesorCurso — cursos asignados al profesor en edición
 	private readonly _profesorCursos = signal<ProfesorCursoListaDto[]>([]);
@@ -101,6 +103,7 @@ export class UsersStore extends BaseCrudStore<UsuarioLista, UsuarioFormData, Usu
 	readonly filterRol = this._filterRol.asReadonly();
 	readonly filterSalonId = this._filterSalonId.asReadonly();
 	readonly refreshCounter = this._refreshCounter.asReadonly();
+	readonly activeTab = this._activeTab.asReadonly();
 	readonly profesorCursos = this._profesorCursos.asReadonly();
 	readonly cursosDisponibles = this._cursosDisponibles.asReadonly();
 	readonly profesorCursosLoading = this._profesorCursosLoading.asReadonly();
@@ -161,6 +164,7 @@ export class UsersStore extends BaseCrudStore<UsuarioLista, UsuarioFormData, Usu
 		filterRol: this._filterRol(),
 		filterEstado: this.filterEstado() as boolean | null,
 		filterSalonId: this._filterSalonId(),
+		activeTab: this._activeTab(),
 		// Form
 		formData: this.formData(),
 		isEditing: this.isEditing(),
@@ -206,6 +210,10 @@ export class UsersStore extends BaseCrudStore<UsuarioLista, UsuarioFormData, Usu
 
 	setFilterSalonId(salonId: number | null): void {
 		this._filterSalonId.set(salonId);
+	}
+
+	setActiveTab(tab: RoleTab): void {
+		this._activeTab.set(tab);
 	}
 
 	setImportLoading(loading: boolean): void {

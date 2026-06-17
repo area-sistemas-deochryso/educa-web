@@ -1,0 +1,16 @@
+<!-- #region Template -->
+<nav class="role-tabs" aria-label="Filtro por rol">
+	@for (tab of tabs; track tab.key) {
+		<button
+			class="role-tab"
+			[class.active]="activeTab() === tab.key"
+			[attr.aria-current]="activeTab() === tab.key ? 'page' : null"
+			[attr.aria-label]="'Filtrar por ' + tab.label"
+			(click)="onTabClick(tab.key)"
+		>
+			<i [class]="tab.icon"></i>
+			<span>{{ tab.label }}</span>
+		</button>
+	}
+</nav>
+<!-- #endregion -->

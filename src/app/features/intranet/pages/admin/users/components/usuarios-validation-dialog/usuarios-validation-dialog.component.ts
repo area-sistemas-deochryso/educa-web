@@ -81,6 +81,28 @@ export class UsersValidationDialogComponent {
 
 	readonly filteredCount = computed(() => this.filteredItems().length);
 	readonly totalCount = computed(() => this.items().length);
+
+	readonly errorCounts = computed(() => {
+		const counts = new Map<string, number>();
+		for (const item of this.items()) {
+			for (const e of item.errores) {
+				counts.set(e, (counts.get(e) ?? 0) + 1);
+			}
+		}
+		return [...counts.entries()]
+			.sort((a, b) => b[1] - a[1])
+			.map(([label, count]) => ({ label, count }));
+	});
+	// #endregion
+
+	// #region Helpers
+	hasErrorCategory(item: UsuarioValidacionItem, category: string): boolean {
+		return item.errores.some((e) => e.startsWith(category));
+	}
+
+	toggleErrorFilter(errorLabel: string): void {
+		this.filterError.set(this.filterError() === errorLabel ? null : errorLabel);
+	}
 	// #endregion
 
 	// #region Handlers

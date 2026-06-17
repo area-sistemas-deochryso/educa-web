@@ -1,66 +1,68 @@
 // #region Styles
-.stats-section {
-	display: grid;
-	grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-	gap: 1rem;
-	margin-bottom: 1.5rem;
-
-	.stat-card {
-		display: flex;
-		align-items: center;
-		justify-content: space-between;
-		padding: 1.25rem;
-		border-radius: 12px;
-
-		.stat-content {
-			display: flex;
-			flex-direction: column;
-			gap: 0.25rem;
-
-			.stat-label {
-				font-size: 0.85rem;
-				color: var(--text-color-secondary);
-				font-weight: 500;
-			}
-
-			.stat-value {
-				font-size: 1.75rem;
-				font-weight: 700;
-				color: var(--text-color);
-			}
-
-			.stat-sublabel {
-				font-size: 0.75rem;
-				color: var(--text-color-secondary);
-			}
-		}
-
-		.stat-icon {
-			width: 48px;
-			height: 48px;
-			display: flex;
-			align-items: center;
-			justify-content: center;
-			border-radius: 12px;
-			background: var(--surface-200);
-
-			i {
-				font-size: 1.25rem;
-				color: var(--text-color);
-			}
-		}
-	}
+.stat-bar {
+	display: flex;
+	align-items: center;
+	gap: 0.5rem;
+	padding: 0.75rem 1rem;
+	margin-bottom: 1rem;
+	border-radius: 8px;
+	background: var(--surface-card);
+	border: 1px solid var(--surface-200);
+	flex-wrap: wrap;
 }
 
-@media (max-width: 768px) {
-	.stats-section {
-		grid-template-columns: 1fr 1fr;
+.stat-separator {
+	color: var(--text-color-secondary);
+	font-size: 1.25rem;
+	user-select: none;
+}
+
+.stat-badge {
+	display: inline-flex;
+	align-items: center;
+	gap: 0.375rem;
+	padding: 0.375rem 0.75rem;
+	border-radius: 20px;
+	border: 1px solid var(--surface-300);
+	background: transparent;
+	cursor: pointer;
+	transition: all 0.15s ease;
+	font-family: inherit;
+
+	&:hover {
+		background: var(--surface-100);
+	}
+
+	&.active {
+		background: #1e40af;
+		border-color: #1e40af;
+		color: #fff;
+
+		.stat-badge__value,
+		.stat-badge__label {
+			color: inherit;
+		}
+	}
+
+	&__value {
+		font-weight: 700;
+		font-size: 0.9rem;
+		color: var(--text-color);
+	}
+
+	&__label {
+		font-size: 0.8rem;
+		color: var(--text-color-secondary);
 	}
 }
 
 @media (max-width: 480px) {
-	.stats-section {
-		grid-template-columns: 1fr;
+	.stat-bar {
+		gap: 0.25rem;
+	}
+
+	.stat-separator {
+		display: none;
 	}
 }
 // #endregion

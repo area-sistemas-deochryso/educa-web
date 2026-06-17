@@ -3,6 +3,17 @@
 import { APP_USER_ROLE_LIST, AppUserRoleValue } from '@app/shared/constants';
 
 // #endregion
+// #region Role Tabs
+export type RoleTab = 'estudiantes' | 'profesores' | 'admin' | null;
+
+export const ROLE_TAB_CONFIG = [
+	{ key: null as RoleTab, label: 'Todos', icon: 'pi pi-users' },
+	{ key: 'estudiantes' as RoleTab, label: 'Estudiantes', icon: 'pi pi-book' },
+	{ key: 'profesores' as RoleTab, label: 'Profesores', icon: 'pi pi-graduation-cap' },
+	{ key: 'admin' as RoleTab, label: 'Personal Admin', icon: 'pi pi-shield' },
+] as const;
+// #endregion
+
 // #region Implementation
 
 /**

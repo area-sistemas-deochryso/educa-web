@@ -1,29 +1,35 @@
 <!-- #region Template -->
 <div class="usuarios-container">
-	<!-- * Header con acciones de página -->
+	<!-- * Header with search + contextual "Nuevo" + overflow menu -->
 	<app-users-header
-		(refresh)="onRefresh()"
+		[activeTab]="vm().activeTab"
+		[showMigration]="isDev && !migracionCompletada()"
+		[migrationLoading]="migracionLoading()"
+		[migrationSpotlight]="migrationPhase() === 'spotlight'"
 		(newUsuario)="onNewUsuario()"
 		(importUsuarios)="onImportUsuarios()"
 		(exportCredenciales)="onExportCredenciales($event.rol, $event.esVerano, $event.anio)"
+		(validarDatos)="onValidarDatos()"
+		(migratePasswords)="onMigrarContrasenas()"
+		(refresh)="onRefresh()"
 	/>
 
-	<!-- * One-time migration button (dev only, remove after use) -->
-	@if (isDev && !migracionCompletada()) {
-		<div class="migration-banner">
-			<span><i class="pi pi-info-circle"></i> Hay contraseñas en texto plano que pueden migrarse al campo encriptado.</span>
-			<button
-				pButton
-				label="Migrar Contraseñas"
-				icon="pi pi-shield"
-				class="p-button-warning p-button-sm"
-				[loading]="migracionLoading()"
-				(click)="onMigrarContrasenas()"
-			></button>
-		</div>
+	<!-- * One-time migration (dev only) -->
+	@if (isDev && migrationPhase() !== 'hidden' && !migracionCompletada()) {
+		@if (migrationPhase() === 'toast') {
+			<div class="migration-overlay" (click)="dismissMigration()"></div>
+			<div class="migration-toast">
+				<i class="pi pi-info-circle"></i>
+				<span>Hay contraseñas en texto plano que pueden migrarse al campo encriptado.</span>
+			</div>
+		}
+		@if (migrationPhase() === 'spotlight') {
+			<div class="migration-overlay migration-overlay--dim" (click)="dismissMigration()"></div>
+		}
 	} @else if (isDev && migracionCompletada()) {
-		<div class="migration-banner migration-success">
-			<span><i class="pi pi-check-circle"></i> {{ migracionMensaje() }}</span>
+		<div class="migration-success-toast">
+			<i class="pi pi-check-circle"></i>
+			<span>{{ migracionMensaje() }}</span>
 		</div>
 	}
 
@@ -34,27 +40,32 @@
 		</div>
 	}
 
+	<!-- * Compact stat bar with clickable role badges -->
 	@if (!vm().statsReady) {
 		<app-users-stats-skeleton />
 	} @else if (vm().hasEstadisticas) {
-		<app-users-stats [estadisticas]="vm().estadisticas!" />
+		<app-users-stats
+			[estadisticas]="vm().estadisticas!"
+			[activeTab]="vm().activeTab"
+			(tabChange)="onTabChange($event)"
+		/>
 	}
 
-	<!-- * Filtros de búsqueda -->
+	<!-- * Filters: search + estado + salón (visible when relevant) -->
 	<app-users-filters
 		[searchTerm]="vm().searchTerm"
-		[filterRol]="vm().filterRol"
 		[filterEstado]="vm().filterEstado"
 		[filterSalonId]="vm().filterSalonId"
 		[salones]="vm().salonesFilter"
 		[options]="filterOptions"
+		[activeTab]="vm().activeTab"
 		(searchChange)="onSearchChange($event)"
-		(filterRolChange)="onFilterRolChange($event)"
 		(filterEstadoChange)="onFilterEstadoChange($event)"
 		(filterSalonIdChange)="onFilterSalonIdChange($event)"
 		(clearFilters)="onClearFilters()"
 	/>
 
+	<!-- * Table with row expansion -->
 	@if (!vm().tableReady) {
 		<app-users-table-skeleton />
 	} @else {
@@ -64,33 +75,14 @@
 			[totalRecords]="vm().totalRecords"
 			[rows]="vm().pageSize"
 			[first]="(vm().page - 1) * vm().pageSize"
-			(viewDetail)="onViewDetail($event)"
+			[activeTab]="vm().activeTab"
 			(edit)="onEditUsuario($event)"
 			(toggleEstado)="onToggleEstado($event)"
 			(lazyLoad)="onLazyLoad($event)"
+			(copyDni)="onCopyDni($event)"
 		/>
 	}
-
-	<!-- * Botón de validación de datos -->
-	<div class="validation-action">
-		<button
-			pButton
-			label="Validar Datos"
-			icon="pi pi-check-circle"
-			class="p-button-outlined"
-			(click)="onValidarDatos()"
-		></button>
-	</div>
 </div>
-
-<!-- * Detail drawer -->
-<app-user-detail-drawer
-	[visible]="vm().detailDrawerVisible"
-	[usuario]="vm().selectedUsuario"
-	(visibleChange)="onDrawerVisibleChange($event)"
-	(closeDrawer)="onCloseDetail()"
-	(edit)="onEditFromDetail()"
-/>
 
 <!-- * Create/Edit form dialog -->
 <app-user-form-dialog

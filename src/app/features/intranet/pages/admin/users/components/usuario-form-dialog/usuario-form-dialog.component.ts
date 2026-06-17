@@ -35,6 +35,7 @@ import { InputTextModule } from 'primeng/inputtext';
 import { MultiSelectModule } from 'primeng/multiselect';
 import { PasswordModule } from 'primeng/password';
 import { SelectModule } from 'primeng/select';
+import { Tab, TabList, TabPanel, Tabs } from 'primeng/tabs';
 import { TableModule } from 'primeng/table';
 import { TagModule } from 'primeng/tag';
 import { ToggleSwitch } from 'primeng/toggleswitch';
@@ -66,6 +67,7 @@ export interface FormValidationErrors {
 		InputTextModule,
 		MultiSelectModule,
 		SelectModule,
+		Tabs, TabList, Tab, TabPanel,
 		TagModule,
 		ToggleSwitch,
 		PasswordModule,
@@ -107,12 +109,20 @@ export class UserFormDialogComponent {
 
 	// #region Estado local
 	readonly rolesSelectOptions = ROLES_USUARIOS_ADMIN.map((r) => ({ label: r, value: r }));
+	readonly activeFormTab = signal<string>('datos');
 
-	// Selector de salón en dos pasos: primero grado, luego sección
 	readonly _gradoSeleccionado = signal<string | null>(null);
 	readonly _seccionSeleccionada = signal<string | null>(null);
 
 	readonly canEditPassword = computed(() => canEditPassword(this.userProfile.userRole()));
+	readonly showAsignacionesTab = computed(() => this.needsSalon() || this.isProfesor());
+
+	private readonly _resetTabOnRoleChange = effect(() => {
+		const show = this.showAsignacionesTab();
+		if (!show && this.activeFormTab() === 'asignaciones') {
+			this.activeFormTab.set('datos');
+		}
+	});
 	// #endregion
 
 	// #region Computed — validaciones de contraseña
@@ -262,7 +272,12 @@ export class UserFormDialogComponent {
 	// #endregion
 
 	// #region Event handlers
+	onTabChange(value: unknown): void {
+		this.activeFormTab.set(value as string);
+	}
+
 	onVisibleChange(visible: boolean): void {
+		if (!visible) this.activeFormTab.set('datos');
 		this.visibleChange.emit(visible);
 	}
 

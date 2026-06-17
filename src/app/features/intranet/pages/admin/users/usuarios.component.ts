@@ -2,7 +2,7 @@
 // #region Imports
 import { AfterViewInit, ChangeDetectionStrategy, Component, DestroyRef, effect, inject, signal } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { ButtonModule } from 'primeng/button';
 import { CommonModule } from '@angular/common';
 import { ConfirmDialogModule } from 'primeng/confirmdialog';
@@ -11,10 +11,9 @@ import {
 	UsersCrudFacade,
 	UsersDataFacade,
 	UsersUiFacade,
-	ROLES_USUARIOS_ADMIN,
-	RolUsuarioAdmin,
 	UsuarioLista,
 } from './services';
+import { RoleTab } from './models';
 import { UsersService } from './services/usuarios.service';
 import { UsersHeaderComponent } from './components/usuarios-header/usuarios-header.component';
 import { UsersStatsComponent } from './components/usuarios-stats/usuarios-stats.component';
@@ -26,7 +25,6 @@ import {
 import { withAllOption } from '@shared/models';
 import { UsersTableComponent } from './components/usuarios-table/usuarios-table.component';
 import { UsersTableSkeletonComponent } from './components/usuarios-table-skeleton/usuarios-table-skeleton.component';
-import { UserDetailDrawerComponent } from './components/usuario-detail-drawer/usuario-detail-drawer.component';
 import {
 	FormValidationErrors,
 	UsuarioFormData,
@@ -70,7 +68,6 @@ import {
 		UsersFiltersComponent,
 		UsersTableComponent,
 		UsersTableSkeletonComponent,
-		UserDetailDrawerComponent,
 		UserFormDialogComponent,
 		UsersImportDialogComponent,
 		UsersValidationDialogComponent,
@@ -89,8 +86,8 @@ export class UsersComponent implements AfterViewInit {
 	private excelService = inject(ExcelService);
 	private destroyRef = inject(DestroyRef);
 	private route = inject(ActivatedRoute);
+	private router = inject(Router);
 
-	// * Plan 43 Chat 2.1 (A13) — auto-open desde auditoría de correos.
 	private autoOpenTarget = signal<AutoOpenTarget | null>(null);
 
 	// * Migration state (one-time, only in development)
@@ -98,6 +95,7 @@ export class UsersComponent implements AfterViewInit {
 	readonly migracionLoading = signal(false);
 	readonly migracionCompletada = signal(false);
 	readonly migracionMensaje = signal('');
+	readonly migrationPhase = signal<'toast' | 'spotlight' | 'hidden'>('toast');
 
 	// * Validation dialog state
 	readonly validationDialogVisible = signal(false);
@@ -106,15 +104,9 @@ export class UsersComponent implements AfterViewInit {
 	readonly validationAllValid = signal(false);
 	private validationUsuarios = signal<UsuarioLista[]>([]);
 
-	// * View-model snapshot from data facade (signals).
 	readonly vm = this.dataFacade.vm;
 
-	// * Static filter options for roles/estado.
 	readonly filterOptions: FilterOptions = {
-		rolesOptions: withAllOption(
-			ROLES_USUARIOS_ADMIN.map((r) => ({ label: r, value: r })),
-			'Todos los roles',
-		),
 		estadoOptions: withAllOption([
 			{ label: 'Activos', value: true },
 			{ label: 'Inactivos', value: false },
@@ -122,12 +114,10 @@ export class UsersComponent implements AfterViewInit {
 	};
 
 	get formData(): UsuarioFormData {
-		// * Form dialog reads from vm in a single place.
 		return this.vm().formData as UsuarioFormData;
 	}
 
 	get formErrors(): FormValidationErrors {
-		// * Map validation errors for the form dialog.
 		return {
 			dniError: this.vm().dniError,
 			correoError: this.vm().correoError,
@@ -138,31 +128,10 @@ export class UsersComponent implements AfterViewInit {
 	}
 
 	constructor() {
-		// Disparar carga en constructor para que los skeletons se muestren
-		// desde el primer frame sin esperar a ngOnInit
 		this.dataFacade.loadData();
-
-		// Plan 43 Chat 2.1 (A13) — auto-open desde auditoría de correos.
-		this.autoOpenTarget.set(
-			readAutoOpenQueryParams(this.route, (term) => this.dataFacade.setSearchTerm(term)),
-		);
-		effect(() => {
-			const target = this.autoOpenTarget();
-			if (!target) return;
-			const snapshot = this.vm();
-			const items = snapshot.usuarios as UsuarioLista[] | undefined;
-			const match = findAutoOpenMatch(target, items);
-			if (match) {
-				this.autoOpenTarget.set(null);
-				this.uiFacade.editUsuario(match);
-				return;
-			}
-			// Rama DNI: si la lista terminó de cargar y no hubo match único, abandonar
-			// para no reabrir el target en refetches futuros (0 matches o ambigüedad).
-			if (target.kind === 'dni' && snapshot.loading === false && items !== undefined) {
-				this.autoOpenTarget.set(null);
-			}
-		});
+		this.initAutoOpen();
+		this.initTabFromQueryParams();
+		this.initMigrationTimer();
 
 		effect(() => {
 			const pending = this.crudFacade.pendingDuplicate();
@@ -188,43 +157,46 @@ export class UsersComponent implements AfterViewInit {
 	}
 
 	ngAfterViewInit(): void {
-		// * Fix aria label after confirm dialog renders.
 		this.fixConfirmDialogAria('Confirmación');
 	}
 
-	// #region Data & Filter handlers
+	// #region Tab + Data & Filter handlers
+	onTabChange(tab: RoleTab): void {
+		this.dataFacade.setActiveTab(tab);
+		this.router.navigate([], {
+			relativeTo: this.route,
+			queryParams: { tab: tab ?? undefined },
+			queryParamsHandling: 'merge',
+		});
+	}
+
 	onRefresh(): void { this.dataFacade.refresh(); }
-	onSearchChange(value: string): void {
-		this.dataFacade.setSearchTerm(value);
-	}
-	onFilterRolChange(value: RolUsuarioAdmin | null): void {
-		this.dataFacade.setFilterRol(value);
-	}
-	onFilterEstadoChange(value: boolean | null): void {
-		this.dataFacade.setFilterEstado(value);
-	}
-	onFilterSalonIdChange(value: number | null): void {
-		this.dataFacade.setFilterSalonId(value);
-	}
+	onSearchChange(value: string): void { this.dataFacade.setSearchTerm(value); }
+	onFilterEstadoChange(value: boolean | null): void { this.dataFacade.setFilterEstado(value); }
+	onFilterSalonIdChange(value: number | null): void { this.dataFacade.setFilterSalonId(value); }
 	onClearFilters(): void { this.dataFacade.clearFilters(); }
 	onLazyLoad(event: { page: number; pageSize: number }): void { this.dataFacade.loadPage(event.page, event.pageSize); }
 	// #endregion
 
 	// #region UI handlers
-	onNewUsuario(): void { this.uiFacade.openNew(); }
-	onViewDetail(usuario: UsuarioLista): void {
-		this.uiFacade.openDetail(usuario);
+	onNewUsuario(): void {
+		this.uiFacade.openNew();
+		const tab = this.vm().activeTab;
+		if (tab === 'estudiantes') {
+			this.uiFacade.updateFormField('rol', APP_USER_ROLES.Estudiante);
+		} else if (tab === 'profesores') {
+			this.uiFacade.updateFormField('rol', APP_USER_ROLES.Profesor);
+		}
 	}
+
 	onEditUsuario(usuario: UsuarioLista): void {
 		this.uiFacade.editUsuario(usuario);
 	}
-	onCloseDetail(): void { this.uiFacade.closeDetail(); }
-	onEditFromDetail(): void { this.uiFacade.editFromDetail(); }
+
 	onCancelDialog(): void { this.uiFacade.hideDialog(); }
 	onImportUsuarios(): void { this.uiFacade.openImportDialog(); }
 	onConfirmDialogHide(): void { this.uiFacade.closeConfirmDialog(); }
 
-	onDrawerVisibleChange(visible: boolean): void { if (!visible) this.uiFacade.closeDetail(); }
 	onDialogVisibleChange(visible: boolean): void { if (!visible) this.uiFacade.hideDialog(); }
 	onImportDialogVisibleChange(visible: boolean): void { if (!visible) this.uiFacade.closeImportDialog(); }
 
@@ -242,11 +214,16 @@ export class UsersComponent implements AfterViewInit {
 	onDesasignarCurso(profesorCursoId: number): void {
 		this.uiFacade.desasignarCurso(profesorCursoId);
 	}
+
+	onCopyDni(dni: string): void {
+		navigator.clipboard.writeText(dni).catch(() => {
+			logger.warn('Failed to copy DNI to clipboard');
+		});
+	}
 	// #endregion
 
 	// #region CRUD handlers
 	onToggleEstado(usuario: UsuarioLista): void {
-		// ! Confirmation dialog before enabling/disabling a user.
 		const header = usuario.estado
 			? UI_CONFIRM_HEADERS.deactivateUser
 			: UI_CONFIRM_HEADERS.activateUser;
@@ -277,12 +254,6 @@ export class UsersComponent implements AfterViewInit {
 		this.crudFacade.importarEstudiantes(filas);
 	}
 
-	/**
-	 * Exporta credenciales a Excel.
-	 * - Estudiantes: filtra por año actual y periodo (regular = secciones A/B, verano = sección V),
-	 *   ordenado por grado → sección → nombre completo.
-	 * - Profesores: todos los activos ordenados alfabéticamente.
-	 */
 	onExportCredenciales(rol: string, esVerano = false, anio?: number): void {
 		this.usuariosApi
 			.exportarCredenciales(rol, anio, esVerano)
@@ -389,11 +360,51 @@ export class UsersComponent implements AfterViewInit {
 		if (!usuario) return;
 		this.uiFacade.editUsuario(usuario);
 	}
-
 	// #endregion
 
+	dismissMigration(): void {
+		this.migrationPhase.set('hidden');
+	}
+
+	// #region Private helpers
+	private initMigrationTimer(): void {
+		if (!this.isDev) return;
+		setTimeout(() => {
+			if (this.migrationPhase() === 'toast') {
+				this.migrationPhase.set('spotlight');
+			}
+		}, 3500);
+	}
+
+	private initAutoOpen(): void {
+		this.autoOpenTarget.set(
+			readAutoOpenQueryParams(this.route, (term) => this.dataFacade.setSearchTerm(term)),
+		);
+		effect(() => {
+			const target = this.autoOpenTarget();
+			if (!target) return;
+			const snapshot = this.vm();
+			const items = snapshot.usuarios as UsuarioLista[] | undefined;
+			const match = findAutoOpenMatch(target, items);
+			if (match) {
+				this.autoOpenTarget.set(null);
+				this.uiFacade.editUsuario(match);
+				return;
+			}
+			if (target.kind === 'dni' && snapshot.loading === false && items !== undefined) {
+				this.autoOpenTarget.set(null);
+			}
+		});
+	}
+
+	private initTabFromQueryParams(): void {
+		const tabParam = this.route.snapshot.queryParamMap.get('tab');
+		if (tabParam && ['estudiantes', 'profesores', 'admin'].includes(tabParam)) {
+			this.dataFacade.setActiveTab(tabParam as RoleTab);
+		}
+	}
+
 	private fixConfirmDialogAria(header: string): void {
-		// * PrimeNG dialog renders async; patch aria-label for a11y.
 		setTimeout(() => {
 			const dialog = document.querySelector('p-dialog[role="alertdialog"]');
 			if (dialog) {
@@ -401,5 +412,6 @@ export class UsersComponent implements AfterViewInit {
 			}
 		});
 	}
+	// #endregion
 }
 // #endregion

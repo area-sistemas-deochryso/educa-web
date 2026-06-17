@@ -66,6 +66,48 @@
 }
 // #endregion
 
+// #region Error summary chips
+.error-summary-chips {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 0.375rem;
+	margin-bottom: 0.75rem;
+}
+
+.error-chip {
+	display: inline-flex;
+	align-items: center;
+	gap: 0.375rem;
+	padding: 0.25rem 0.625rem;
+	border-radius: 16px;
+	border: 1px solid var(--red-200);
+	background: transparent;
+	color: var(--red-500);
+	font-size: 0.8rem;
+	font-family: inherit;
+	cursor: pointer;
+	transition: all 0.15s ease;
+
+	&:hover {
+		background: var(--red-50);
+	}
+
+	&.active {
+		background: var(--red-500);
+		border-color: var(--red-500);
+		color: #fff;
+
+		.error-chip__count {
+			color: inherit;
+		}
+	}
+
+	&__count {
+		font-weight: 700;
+	}
+}
+// #endregion
+
 // #region Summary
 .validation-summary {
 	margin: 0 0 1rem;

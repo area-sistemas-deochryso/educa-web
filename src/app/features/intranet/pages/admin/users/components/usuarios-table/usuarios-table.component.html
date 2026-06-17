@@ -7,7 +7,6 @@
 	[minHeightPx]="420"
 	[blurPx]="2"
 >
-	<!-- * Users table with server-side pagination -->
 	<p-table
 		[value]="usuarios()"
 		[lazy]="true"
@@ -19,136 +18,103 @@
 		[showCurrentPageReport]="true"
 		currentPageReportTemplate="Mostrando {first} a {last} de {totalRecords} usuarios"
 		(onLazyLoad)="onLazyLoad($event)"
+		dataKey="id"
 		class="p-datatable-sm"
 	>
 		<ng-template #header>
 			<tr>
-				<th style="width: 80px" pSortableColumn="id">ID <p-sortIcon field="id" /></th>
 				<th style="width: 100px" pSortableColumn="dni">DNI <p-sortIcon field="dni" /></th>
 				<th pSortableColumn="nombreCompleto">
 					NOMBRE <p-sortIcon field="nombreCompleto" />
 				</th>
-				<th style="width: 150px">SALÓN</th>
-				<th style="width: 120px" pSortableColumn="rol">ROL <p-sortIcon field="rol" /></th>
-				<th style="width: 100px" pSortableColumn="estado">
-					ESTADO <p-sortIcon field="estado" />
+				@if (activeTab() === null) {
+					<th style="width: 120px" pSortableColumn="rol">ROL <p-sortIcon field="rol" /></th>
+				}
+				@if (activeTab() === 'estudiantes') {
+					<th style="width: 180px">SALÓN</th>
+				}
+				<th style="width: 120px" pSortableColumn="fechaRegistro">
+					FECHA <p-sortIcon field="fechaRegistro" />
 				</th>
-				<th style="width: 140px">ACCIONES</th>
+				<th style="width: 110px" class="text-center">ACCIONES</th>
 			</tr>
 		</ng-template>
 
 		<ng-template #body let-usuario>
 			<tr [class.row-inactive]="!usuario.estado">
-				<!-- * Basic user info -->
-				<td class="text-center">
-					<span class="id-badge">{{ usuario.id }}</span>
-				</td>
 				<td>
 					<span class="dni-text">{{ usuario.dni }}</span>
 				</td>
 				<td>
 					<div class="user-cell">
-						<div class="user-avatar">
-							<i class="pi pi-user"></i>
-						</div>
+						<div class="user-avatar">{{ getInitials(usuario) }}</div>
 						<div class="user-info">
-							<span class="user-name">{{ usuario.apellidos | fullName: usuario.nombres }}</span>
+							<span
+								class="user-name"
+								[class.user-name--clickable]="hasMultipleSalones(usuario)"
+								(click)="hasMultipleSalones(usuario) && onShowSalones(usuario)"
+							>
+								{{ usuario.apellidos | fullName: usuario.nombres }}
+								@if (hasMultipleSalones(usuario)) {
+									<i class="pi pi-building salon-hint"></i>
+								}
+							</span>
 							@if (usuario.correo) {
 								<span class="user-email">{{ usuario.correo }}</span>
 							}
 						</div>
 					</div>
 				</td>
+				@if (activeTab() === null) {
+					<td>
+						<p-tag [value]="usuario.rol" [severity]="uiMapping.getRolSeverity(usuario.rol)" styleClass="tag-neutral" />
+					</td>
+				}
+				@if (activeTab() === 'estudiantes') {
+					<td>
+						<span class="salon-text">{{ usuario.salonNombre ?? '—' }}</span>
+					</td>
+				}
 				<td>
-					@if (usuario.salonNombre) {
-						<div class="salon-cell">
-							<span class="salon-text">{{ usuario.salonNombre }}</span>
-							@if (usuario.salonesNombres && usuario.salonesNombres.length > 1) {
-								<button
-									pButton
-									icon="pi pi-eye"
-									class="p-button-rounded p-button-text p-button-sm"
-									pTooltip="Ver todos los salones ({{ usuario.salonesNombres.length }})"
-									tooltipPosition="top"
-									(click)="openSalonesDialog(usuario)"
-									[pt]="{
-										root: {
-											'aria-label': 'Ver todos los salones',
-										},
-									}"
-								></button>
-							}
-						</div>
-					} @else {
-						<span class="text-muted">—</span>
-					}
+					<span class="date-text">{{ usuario.fechaRegistro | date: 'dd/MM/yyyy' }}</span>
 				</td>
-				<td>
-					<!-- * Role tag uses severity mapping -->
-					<p-tag [value]="usuario.rol" [severity]="uiMapping.getRolSeverity(usuario.rol)" styleClass="tag-neutral" />
-				</td>
-				<td class="text-center">
-					<!-- * Active/inactive status tag -->
-					<p-tag
-						[value]="usuario.estado | estadoLabel"
-						[severity]="usuario.estado | estadoSeverity"
-						styleClass="tag-neutral"
-					/>
-				</td>
-				<td>
-					<!-- * Row actions -->
-					<div class="actions">
-						<button
-							pButton
-							icon="pi pi-eye"
-							class="p-button-rounded p-button-text p-button-secondary"
-							pTooltip="Ver detalles"
-							aria-label="Ver detalles"
-							(click)="onViewDetail(usuario)"
-							[pt]="{
-								root: {
-									'aria-label': 'Ver detalles',
-								},
-							}"
-						></button>
-						<button
-							pButton
-							icon="pi pi-pencil"
-							class="p-button-rounded p-button-text p-button-info"
-							pTooltip="Editar"
-							aria-label="Editar"
-							(click)="onEdit(usuario)"
-							[pt]="{
-								root: {
-									'aria-label': 'Editar',
-								},
-							}"
-						></button>
-						<button
-							pButton
-							[icon]="usuario.estado | estadoToggleIcon"
-							class="p-button-rounded p-button-text"
-							[class.p-button-warning]="usuario.estado"
-							[class.p-button-success]="!usuario.estado"
-							[pTooltip]="usuario.estado | estadoToggleLabel"
-							tooltipPosition="left"
-							[attr.aria-label]="usuario.estado | estadoToggleLabel"
-							(click)="onToggleEstado(usuario)"
-							[pt]="{
-								root: {
-									'aria-label': usuario.estado | estadoToggleLabel,
-								},
-							}"
-						></button>
-					</div>
+				<td class="text-center actions-cell">
+					<button
+						pButton
+						icon="pi pi-pencil"
+						class="p-button-sm p-button-text action-icon"
+						pTooltip="Editar"
+						tooltipPosition="top"
+						(click)="onEdit(usuario)"
+						[pt]="{ root: { 'aria-label': 'Editar usuario' } }"
+					></button>
+					<button
+						pButton
+						[icon]="usuario.estado ? 'pi pi-ban' : 'pi pi-check'"
+						class="p-button-sm p-button-text action-icon"
+						[class.action-deactivate]="usuario.estado"
+						[class.action-activate]="!usuario.estado"
+						[pTooltip]="usuario.estado ? 'Desactivar' : 'Activar'"
+						tooltipPosition="top"
+						(click)="onToggleEstado(usuario)"
+						[pt]="{ root: { 'aria-label': usuario.estado ? 'Desactivar usuario' : 'Activar usuario' } }"
+					></button>
+					<button
+						pButton
+						icon="pi pi-copy"
+						class="p-button-sm p-button-text action-icon"
+						pTooltip="Copiar DNI"
+						tooltipPosition="top"
+						(click)="onCopyDni(usuario.dni)"
+						[pt]="{ root: { 'aria-label': 'Copiar DNI al portapapeles' } }"
+					></button>
 				</td>
 			</tr>
 		</ng-template>
 
 		<ng-template #emptymessage>
 			<tr>
-				<td colspan="7" class="empty-message">
-					<!-- ! Empty state when no results -->
+				<td [attr.colspan]="colCount()" class="empty-message">
 					<div class="empty-state">
 						<i class="pi pi-users"></i>
 						<p>No se encontraron usuarios</p>
@@ -158,33 +124,51 @@
 			</tr>
 		</ng-template>
 	</p-table>
-</section>
 
-<!-- #region Dialog salones profesor -->
-<p-dialog
-	[visible]="salonesDialogVisible()"
-	(visibleChange)="onSalonesDialogVisibleChange($event)"
-	[modal]="true"
-	[draggable]="false"
-	[resizable]="false"
-	[style]="{ width: '420px' }"
-	[header]="salonesDialogUsuario()?.nombreCompleto ?? 'Salones del profesor'"
->
-	@if (salonesDialogUsuario(); as u) {
-		<div class="salones-dialog-content">
-			<p class="salones-dialog-subtitle">
-				Salones asignados ({{ u.salonesNombres?.length ?? 0 }})
-			</p>
-			<ul class="salones-list">
-				@for (salon of u.salonesNombres; track salon) {
-					<li class="salones-list-item">
-						<i class="pi pi-book"></i>
-						<span>{{ salon }}</span>
-					</li>
+	<!-- Salon detail dialog (professors only) -->
+	<p-dialog
+		[visible]="salonDialogVisible()"
+		(visibleChange)="salonDialogVisible.set($event)"
+		[header]="salonDialogHeader()"
+		[modal]="true"
+		[dismissableMask]="true"
+		[style]="{ width: '600px' }"
+		appendTo="body"
+	>
+		@if (salonGroups(); as groups) {
+			<div class="salon-groups">
+				@if (groups.inicial.length) {
+					<div class="salon-group">
+						<h4 class="salon-group__title">Inicial</h4>
+						<ul class="salon-group__list">
+							@for (salon of groups.inicial; track salon) {
+								<li>{{ salon }}</li>
+							}
+						</ul>
+					</div>
 				}
-			</ul>
-		</div>
-	}
-</p-dialog>
-<!-- #endregion -->
+				@if (groups.primaria.length) {
+					<div class="salon-group">
+						<h4 class="salon-group__title">Primaria</h4>
+						<ul class="salon-group__list">
+							@for (salon of groups.primaria; track salon) {
+								<li>{{ salon }}</li>
+							}
+						</ul>
+					</div>
+				}
+				@if (groups.secundaria.length) {
+					<div class="salon-group">
+						<h4 class="salon-group__title">Secundaria</h4>
+						<ul class="salon-group__list">
+							@for (salon of groups.secundaria; track salon) {
+								<li>{{ salon }}</li>
+							}
+						</ul>
+					</div>
+				}
+			</div>
+		}
+	</p-dialog>
+</section>
 <!-- #endregion -->

@@ -6,7 +6,8 @@ import { forkJoin, from, of, Subject } from 'rxjs';
 import { ErrorHandlerService, SwService, WalFacadeHelper, WalCrossTabRefetchService } from '@core/services';
 import { logger, withRetry } from '@core/helpers';
 import { UI_ADMIN_ERROR_DETAILS, UI_SUMMARIES } from '@app/shared/constants';
-import { RolUsuarioAdmin, UsuarioLista, UsuariosEstadisticas } from '../models';
+import { APP_USER_ROLES } from '@shared/constants';
+import { RoleTab, RolUsuarioAdmin, UsuarioLista, UsuariosEstadisticas } from '../models';
 import { UsersService } from './usuarios.service';
 import { UsersStore } from './usuarios.store';
 import { ClassroomsApiService } from '@features/intranet/pages/admin/schedules/services/salones-api.service';
@@ -143,6 +144,17 @@ export class UsersDataFacade {
 	setSearchTerm(term: string): void {
 		this.store.setSearchTerm(term);
 		this.searchTrigger$.next(term);
+	}
+
+	setActiveTab(tab: RoleTab): void {
+		this.store.setActiveTab(tab);
+		const rolMap: Record<string, RolUsuarioAdmin | null> = {
+			estudiantes: APP_USER_ROLES.Estudiante as RolUsuarioAdmin,
+			profesores: APP_USER_ROLES.Profesor as RolUsuarioAdmin,
+		};
+		this.store.setFilterRol(tab ? (rolMap[tab] ?? null) : null);
+		this.store.setPage(1);
+		this.refreshUsuariosOnly();
 	}
 
 	setFilterRol(rol: string | null): void {

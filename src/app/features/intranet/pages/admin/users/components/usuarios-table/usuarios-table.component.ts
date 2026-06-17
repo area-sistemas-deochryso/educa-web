@@ -1,5 +1,4 @@
-// #region Imports
-import { ChangeDetectionStrategy, Component, inject, input, output, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, inject, input, output, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ButtonModule } from 'primeng/button';
 import { DialogModule } from 'primeng/dialog';
@@ -7,21 +6,15 @@ import { TableLazyLoadEvent, TableModule } from 'primeng/table';
 import { TagModule } from 'primeng/tag';
 import { TooltipModule } from 'primeng/tooltip';
 import { UsuarioLista } from '../../services';
+import { RoleTab } from '../../models';
 import { UiMappingService } from '@intranet-shared/services';
-import { EstadoLabelPipe, EstadoSeverityPipe, EstadoToggleIconPipe, EstadoToggleLabelPipe } from '@intranet-shared/pipes';
 import { FullNamePipe } from '@shared/pipes';
 import { TableLoadingDirective } from '@intranet-shared/directives';
 
-/**
- * Componente presentacional para la tabla de usuarios
- * Muestra listado con acciones y paginación server-side
- */
-// #endregion
-// #region Implementation
 @Component({
 	selector: 'app-users-table',
 	standalone: true,
-	imports: [CommonModule, TableModule, ButtonModule, DialogModule, TagModule, TooltipModule, TableLoadingDirective, EstadoLabelPipe, EstadoSeverityPipe, EstadoToggleIconPipe, EstadoToggleLabelPipe, FullNamePipe],
+	imports: [CommonModule, TableModule, ButtonModule, DialogModule, TagModule, TooltipModule, TableLoadingDirective, FullNamePipe],
 	templateUrl: './usuarios-table.component.html',
 	styleUrl: './usuarios-table.component.scss',
 	changeDetection: ChangeDetectionStrategy.OnPush,
@@ -29,40 +22,58 @@ import { TableLoadingDirective } from '@intranet-shared/directives';
 export class UsersTableComponent {
 	readonly uiMapping = inject(UiMappingService);
 
-	// * Inputs for table rows + loading overlay + pagination.
 	readonly usuarios = input.required<UsuarioLista[]>();
 	readonly loading = input.required<boolean>();
 	readonly totalRecords = input.required<number>();
 	readonly rows = input(10);
 	readonly first = input(0);
+	readonly activeTab = input<RoleTab>(null);
 
-	// * Outputs for row actions + pagination.
-	readonly viewDetail = output<UsuarioLista>();
 	readonly edit = output<UsuarioLista>();
 	readonly toggleEstado = output<UsuarioLista>();
 	readonly lazyLoad = output<{ page: number; pageSize: number }>();
+	readonly copyDni = output<string>();
 
-	// * Track first load to avoid duplicate initial fetch
+	readonly colCount = () => {
+		const tab = this.activeTab();
+		return (tab === null || tab === 'estudiantes') ? 5 : 4;
+	};
+
+	readonly salonDialogVisible = signal(false);
+	readonly salonDialogUser = signal<UsuarioLista | null>(null);
+	readonly salonDialogHeader = computed(() => {
+		const u = this.salonDialogUser();
+		return u ? `Salones — ${u.nombres} ${u.apellidos}` : 'Salones';
+	});
+	readonly salonGroups = computed(() => {
+		const u = this.salonDialogUser();
+		if (!u?.salonesNombres?.length) return null;
+		const inicial: string[] = [];
+		const primaria: string[] = [];
+		const secundaria: string[] = [];
+		for (const s of u.salonesNombres) {
+			if (s.includes('INICIAL')) inicial.push(s);
+			else if (s.includes('PRIMARIA')) primaria.push(s);
+			else if (s.includes('SECUNDARIA')) secundaria.push(s);
+		}
+		return { inicial, primaria, secundaria };
+	});
+
 	private initialLoadDone = false;
 
-	// * Dialog para mostrar salones múltiples de un profesor
-	readonly salonesDialogVisible = signal(false);
-	readonly salonesDialogUsuario = signal<UsuarioLista | null>(null);
-
-	openSalonesDialog(usuario: UsuarioLista): void {
-		this.salonesDialogUsuario.set(usuario);
-		this.salonesDialogVisible.set(true);
+	getInitials(usuario: UsuarioLista): string {
+		const first = usuario.nombres?.charAt(0) ?? '';
+		const last = usuario.apellidos?.charAt(0) ?? '';
+		return (first + last).toUpperCase();
 	}
 
-	onSalonesDialogVisibleChange(visible: boolean): void {
-		if (!visible) {
-			this.salonesDialogVisible.set(false);
-			this.salonesDialogUsuario.set(null);
-		}
+	hasMultipleSalones(usuario: UsuarioLista): boolean {
+		return !!(usuario.salonesNombres && usuario.salonesNombres.length > 0);
 	}
 
-	onViewDetail(usuario: UsuarioLista): void {
-		this.viewDetail.emit(usuario);
+	onShowSalones(usuario: UsuarioLista): void {
+		this.salonDialogUser.set(usuario);
+		this.salonDialogVisible.set(true);
 	}
 
 	onEdit(usuario: UsuarioLista): void {
@@ -73,17 +84,18 @@ export class UsersTableComponent {
 		this.toggleEstado.emit(usuario);
 	}
 
+	onCopyDni(dni: string): void {
+		this.copyDni.emit(dni);
+	}
+
 	onLazyLoad(event: TableLazyLoadEvent): void {
-		// Skip the initial lazy load event since facade.loadData() already fetches page 1
 		if (!this.initialLoadDone) {
 			this.initialLoadDone = true;
 			return;
 		}
-
 		const first = event.first ?? 0;
 		const rows = event.rows ?? this.rows();
 		const page = Math.floor(first / rows) + 1;
 		this.lazyLoad.emit({ page, pageSize: rows });
 	}
 }
-// #endregion
