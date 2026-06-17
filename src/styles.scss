@@ -865,3 +865,9 @@ app-intranet-layout {
 	}
 }
 // #endregion
+
+// Datepicker panel opened from temporal-nav: prevent overflow on right edge
+.temporal-nav-datepicker-panel {
+	right: 0.5rem !important;
+	left: auto !important;
+}

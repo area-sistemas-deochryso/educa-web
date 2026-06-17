@@ -1,9 +1,10 @@
-<app-attendance-legend />
+<app-attendance-legend-stats [estadisticas]="estadisticasDia()" [(activeStatus)]="activeStatus" />
 
 <app-attendance-persona-day-list
 	[personas]="personasDia()"
 	[fecha]="fechaDia()"
 	[estadisticas]="estadisticasDia()"
+	[activeStatus]="activeStatus()"
 	[loading]="loading()"
 	[showPdfButton]="false"
 	[allowJustify]="false"

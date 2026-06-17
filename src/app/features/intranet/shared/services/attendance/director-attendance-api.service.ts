@@ -6,6 +6,7 @@ import { environment } from '@config/environment';
 import { PaginatedResponse } from '@shared/models';
 import {
 	AsistenciaDiaConEstadisticas,
+	DashboardDirectorDia,
 	EstadisticasAsistenciaDia,
 	EstadisticasDia,
 	EstudianteAsistencia,
@@ -60,6 +61,20 @@ export class DirectorAttendanceApiService {
 
 		return this.http
 			.get<EstadisticasDia>(`${this.apiUrl}/director/estadisticas`, { params })
+			.pipe(catchError(() => of(null)));
+	}
+
+	/**
+	 * Dashboard enriquecido: stats base + cobertura de salones.
+	 * GET /api/ConsultaAsistencia/director/dashboard?fecha={fecha}
+	 */
+	getDashboard(fecha?: Date): Observable<DashboardDirectorDia | null> {
+		const params: Record<string, string> = {};
+		if (fecha) {
+			params['fecha'] = this.formatDateLocal(fecha);
+		}
+		return this.http
+			.get<DashboardDirectorDia>(`${this.apiUrl}/director/dashboard`, { params })
 			.pipe(catchError(() => of(null)));
 	}
 

@@ -11,8 +11,7 @@ import {
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { TableModule } from 'primeng/table';
-import { DatePickerModule } from 'primeng/datepicker';
-import { CardModule } from 'primeng/card';
+import { DatePicker, DatePickerModule } from 'primeng/datepicker';
 import { SkeletonModule } from 'primeng/skeleton';
 import { ButtonModule } from 'primeng/button';
 import { Menu, MenuModule } from 'primeng/menu';
@@ -28,6 +27,8 @@ import { SkeletonLoaderComponent } from '@shared/components';
 import { FormatTimePipe } from '@intranet-shared/pipes';
 import { getStatusClass } from '@features/intranet/pages/cross-role/attendance-component/config/attendance.constants';
 import { AttendanceStatus } from '@features/intranet/pages/cross-role/attendance-component/models/attendance.types';
+import { InputTextModule } from 'primeng/inputtext';
+import { AttendanceTemporalNavComponent } from '../attendance-temporal-nav/attendance-temporal-nav.component';
 
 export interface EstudianteAsistenciaDia {
 	estudianteId: number;
@@ -55,7 +56,6 @@ export interface JustificacionEvent {
 		FormsModule,
 		TableModule,
 		DatePickerModule,
-		CardModule,
 		SkeletonModule,
 		SkeletonLoaderComponent,
 		TableSkeletonComponent,
@@ -67,6 +67,8 @@ export interface JustificacionEvent {
 		Textarea,
 		Select,
 		FormatTimePipe,
+		InputTextModule,
+		AttendanceTemporalNavComponent,
 	],
 	templateUrl: './attendance-day-list.component.html',
 	styleUrl: './attendance-day-list.component.scss',
@@ -85,6 +87,7 @@ export class AttendanceDayListComponent {
 	readonly savingJustificacion = input<boolean>(false);
 	readonly tipoReporteOptions = input<{ label: string; items: { label: string; value: string }[] }[]>([]);
 	readonly tipoReporte = input<string>('salon');
+	readonly activeStatus = input<AttendanceStatus | null>(null);
 
 	// * Outputs
 	readonly fechaChange = output<Date>();
@@ -93,6 +96,7 @@ export class AttendanceDayListComponent {
 
 	// * ViewChild
 	@ViewChild('pdfMenu') pdfMenu!: Menu;
+	@ViewChild('hiddenDatepicker') hiddenDatepicker!: DatePicker;
 
 	// * Constants
 	readonly today = new Date();
@@ -108,6 +112,7 @@ export class AttendanceDayListComponent {
 
 	// * Local state for the datepicker model (signal for OnPush reactivity)
 	readonly fechaValue = signal<Date>(new Date());
+	readonly searchTerm = signal('');
 
 	// #region Estado del diálogo de justificación
 	readonly dialogVisible = signal(false);
@@ -121,6 +126,25 @@ export class AttendanceDayListComponent {
 	readonly estudiantesDelDia = computed<EstudianteAsistenciaDia[]>(() =>
 		this.estudiantes().map((e) => this.mapEstudianteAsistencia(e)),
 	);
+
+	readonly filteredEstudiantes = computed<EstudianteAsistenciaDia[]>(() => {
+		const all = this.estudiantesDelDia();
+		const status = this.activeStatus();
+		const term = this.searchTerm();
+		let result = all;
+		if (status) {
+			result = result.filter((e) => e.estadoCodigo === status);
+		}
+		if (term) {
+			const lower = term.toLowerCase();
+			result = result.filter(
+				(e) =>
+					e.nombreCompleto.toLowerCase().includes(lower) ||
+					e.dni.toLowerCase().includes(lower),
+			);
+		}
+		return result;
+	});
 
 	// ✅ NUEVO: Estadísticas ya no se calculan localmente, vienen del backend como input
 
@@ -136,6 +160,24 @@ export class AttendanceDayListComponent {
 			this.fechaValue.set(fecha);
 			this.fechaChange.emit(fecha);
 		}
+	}
+
+	onPreviousDay(): void {
+		const prev = new Date(this.fechaValue());
+		prev.setDate(prev.getDate() - 1);
+		this.onFechaChange(prev);
+	}
+
+	onNextDay(): void {
+		const next = new Date(this.fechaValue());
+		next.setDate(next.getDate() + 1);
+		if (next <= this.today) {
+			this.onFechaChange(next);
+		}
+	}
+
+	openDatepicker(): void {
+		this.hiddenDatepicker?.showOverlay();
 	}
 
 	togglePdfMenu(event: Event): void {

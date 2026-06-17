@@ -66,24 +66,33 @@
 				</div>
 			</div>
 		</div>
-		<!-- * Month selector for the current table -->
-		<p-select
-			appendTo="body"
-			[options]="monthOptions"
-			[ngModel]="table().selectedMonth"
-			(ngModelChange)="onMonthChange($event)"
-			optionLabel="label"
-			optionValue="value"
-			class="month-select"
-			[filter]="true"
-			filterBy="label"
-			filterPlaceholder="Buscar mes..."
-			[pt]="{
-				root: {
-					'aria-label': 'Seleccionar mes',
-				},
-			}"
+		<!-- * Month temporal navigation ◀ month ▶ -->
+		<app-attendance-temporal-nav
+			mode="month"
+			[currentDate]="currentMonthDate()"
+			(previous)="onPreviousMonth()"
+			(next)="onNextMonth()"
+			(pickerOpen)="monthSelectVisible = !monthSelectVisible"
 		/>
+		@if (monthSelectVisible) {
+			<p-select
+				appendTo="body"
+				[options]="monthOptions"
+				[ngModel]="table().selectedMonth"
+				(ngModelChange)="onMonthChange($event); monthSelectVisible = false"
+				optionLabel="label"
+				optionValue="value"
+				class="month-select-dropdown"
+				[filter]="true"
+				filterBy="label"
+				filterPlaceholder="Buscar mes..."
+				[pt]="{
+					root: {
+						'aria-label': 'Seleccionar mes',
+					},
+				}"
+			/>
+		}
 	</div>
 
 	<!-- * Double-entry attendance grid -->

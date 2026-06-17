@@ -1,23 +1,22 @@
 <!-- #region Template -->
-<!-- * Shared legend for attendance codes -->
-<app-attendance-legend />
+<!-- * Legend + live stats fused — clickeable para filtrar tabla -->
+<app-attendance-legend-stats
+	[estadisticas]="view.estadisticasDia()"
+	[(activeStatus)]="activeStatus"
+/>
 
 @if (gradosSecciones().length > 0) {
-	<div class="selector-row">
-		<!-- * Grade/section selector drives which group is loaded -->
-		<app-grado-seccion-selector
-			[gradosSecciones]="gradosSecciones()"
-			[selectedGradoSeccion]="selectedGradoSeccion()"
-			(gradoSeccionChange)="selectGradoSeccion($event)"
-		/>
-	</div>
-
 	<!-- Cowork F-004 · INV-C11 — banner cuando el grado seleccionado está fuera del alcance biométrico -->
 	@if (gradoFueraAlcance()) {
 		<app-attendance-scope-banner />
 	}
 
 	@if (view.viewMode() === 'mes') {
+		<app-grado-seccion-selector
+			[gradosSecciones]="gradosSecciones()"
+			[selectedGradoSeccion]="selectedGradoSeccion()"
+			(gradoSeccionChange)="selectGradoSeccion($event)"
+		/>
 		<!-- * PDF actions below selector (always "Reporte por Salón") -->
 		<div class="pdf-section">
 			<!-- Toggle mes/periodo -->
@@ -111,6 +110,7 @@
 			[estudiantes]="view.estudiantesDia()"
 			[fecha]="view.fechaDia()"
 			[estadisticas]="view.estadisticasDia()"
+			[activeStatus]="activeStatus()"
 			[loading]="view.loading()"
 			[showPdfButton]="true"
 			[downloadingPdf]="tipoReporte().startsWith('salon-') ? view.pdf.downloadingPdf() : downloadingPdfConsolidado()"
@@ -122,7 +122,14 @@
 			[savingJustificacion]="savingJustificacion()"
 			(fechaChange)="view.onFechaDiaChange($event)"
 			(justificar)="onJustificar($event)"
-		/>
+		>
+			<app-grado-seccion-selector
+				filtersSlot
+				[gradosSecciones]="gradosSecciones()"
+				[selectedGradoSeccion]="selectedGradoSeccion()"
+				(gradoSeccionChange)="selectGradoSeccion($event)"
+			/>
+		</app-attendance-day-list>
 	}
 } @else if (!view.loading()) {
 	<!-- ! No available grade/section data -->

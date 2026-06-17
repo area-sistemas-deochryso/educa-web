@@ -1,11 +1,12 @@
 <!-- #region Template -->
 <!-- * Plan 28 Chat 4b-tab: día-only para AAs (mes pendiente de endpoint paginado en BE). -->
-<app-attendance-legend />
+<app-attendance-legend-stats [estadisticas]="estadisticasDia()" [(activeStatus)]="activeStatus" />
 
 <app-attendance-persona-day-list
 	[personas]="personasDia()"
 	[fecha]="fechaDia()"
 	[estadisticas]="estadisticasDia()"
+	[activeStatus]="activeStatus()"
 	[loading]="loading()"
 	[showPdfButton]="false"
 	[allowJustify]="false"

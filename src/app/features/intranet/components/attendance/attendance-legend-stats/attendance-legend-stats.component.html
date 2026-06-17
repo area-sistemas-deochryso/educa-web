@@ -1,0 +1,19 @@
+<div class="legend-stats" role="group" aria-label="Leyenda y filtro por estado de asistencia">
+	@for (item of legendItems(); track item.codigo) {
+		<button
+			type="button"
+			class="legend-stats-item"
+			[class.active]="isActive(item.codigo)"
+			[attr.aria-pressed]="isActive(item.codigo)"
+			(click)="onItemClick(item.codigo)"
+		>
+			<span class="color-indicator" [class]="getStatusClass(item.codigo)"></span>
+			<span class="item-code">{{ item.codigo }}</span>
+			<span class="item-separator">=</span>
+			<span class="item-description">{{ item.descripcion }}</span>
+			@if (getCount(item.codigo) !== null) {
+				<span class="item-count">({{ getCount(item.codigo) }})</span>
+			}
+		</button>
+	}
+</div>

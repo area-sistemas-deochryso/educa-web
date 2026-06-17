@@ -1,26 +1,3 @@
-// #region Selector row con PDF
-.selector-row {
-	display: flex;
-	align-items: center;
-	justify-content: space-between;
-	flex-wrap: wrap;
-	gap: 1rem;
-	margin: 0 1rem 1rem 1rem;
-	padding-left: 1.5rem;
-
-	// Remover margin-bottom del selector dentro del row
-	::ng-deep app-grado-seccion-selector .grado-seccion-selector {
-		margin: 0;
-	}
-}
-
-@media (max-width: 768px) {
-	.selector-row {
-		padding-left: 0;
-	}
-}
-
-// #endregion
 // #region PDF section
 .pdf-section {
 	display: flex;

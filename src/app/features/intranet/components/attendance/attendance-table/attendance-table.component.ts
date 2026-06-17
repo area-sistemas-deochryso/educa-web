@@ -16,6 +16,7 @@ import {
 	DAY_HEADERS,
 	getStatusClass,
 } from '@features/intranet/pages/cross-role/attendance-component/config/attendance.constants';
+import { AttendanceTemporalNavComponent } from '../attendance-temporal-nav/attendance-temporal-nav.component';
 
 // #endregion
 // #region Implementation
@@ -29,7 +30,7 @@ export interface HijoOption {
 @Component({
 	selector: 'app-attendance-table',
 	standalone: true,
-	imports: [DatePipe, FormsModule, TableModule, Select, Tooltip],
+	imports: [DatePipe, FormsModule, TableModule, Select, Tooltip, AttendanceTemporalNavComponent],
 	templateUrl: './attendance-table.component.html',
 	styleUrl: './attendance-table.component.scss',
 	changeDetection: ChangeDetectionStrategy.OnPush,
@@ -48,6 +49,7 @@ export class AttendanceTableComponent {
 
 	monthOptions: MonthOption[] = MONTH_OPTIONS;
 	dayHeaders = DAY_HEADERS;
+	monthSelectVisible = false;
 
 	getStatusClass = getStatusClass;
 
@@ -62,6 +64,25 @@ export class AttendanceTableComponent {
 	);
 
 	readonly hasHijos = computed(() => this.hijos().length > 0);
+
+	readonly currentMonthDate = computed(() => {
+		const t = this.table();
+		return new Date(t.selectedYear, t.selectedMonth - 1, 1);
+	});
+
+	readonly showMonthSelector = computed(() => !this.hasHijos());
+
+	onPreviousMonth(): void {
+		const t = this.table();
+		const newMonth = t.selectedMonth === 1 ? 12 : t.selectedMonth - 1;
+		this.monthChange.emit(newMonth);
+	}
+
+	onNextMonth(): void {
+		const t = this.table();
+		const newMonth = t.selectedMonth === 12 ? 1 : t.selectedMonth + 1;
+		this.monthChange.emit(newMonth);
+	}
 
 	isDayValid(day: AttendanceDay): boolean {
 		return day.date !== null;
