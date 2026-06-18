@@ -1,0 +1,47 @@
+<div class="temporal-nav" role="navigation" [attr.aria-label]="ariaLabel()">
+	<button
+		type="button"
+		class="nav-btn"
+		(click)="onPrevious()"
+		pTooltip="Anterior"
+		tooltipPosition="top"
+		aria-label="Ir al anterior"
+	>
+		<i class="pi pi-chevron-left"></i>
+	</button>
+
+	<div class="nav-label-wrapper">
+		<button
+			type="button"
+			class="nav-label"
+			(click)="togglePicker($event)"
+			pTooltip="Abrir selector"
+			tooltipPosition="top"
+		>
+			{{ label() }}
+		</button>
+		@if (pickerVisible()) {
+			<div class="datepicker-dropdown" (click)="$event.stopPropagation()">
+				<p-datepicker
+					[ngModel]="currentDate()"
+					[maxDate]="maxDate()"
+					(ngModelChange)="onDateSelect($event)"
+					[inline]="true"
+				/>
+			</div>
+		}
+	</div>
+
+	<button
+		type="button"
+		class="nav-btn"
+		[class.disabled]="!canGoNext()"
+		[disabled]="!canGoNext()"
+		(click)="onNext()"
+		pTooltip="Siguiente"
+		tooltipPosition="top"
+		aria-label="Ir al siguiente"
+	>
+		<i class="pi pi-chevron-right"></i>
+	</button>
+</div>

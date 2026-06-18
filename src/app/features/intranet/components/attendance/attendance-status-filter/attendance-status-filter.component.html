@@ -1,0 +1,42 @@
+<div class="status-filter">
+	<div class="search-box">
+		<i class="pi pi-search"></i>
+		<input
+			type="text"
+			pInputText
+			[ngModel]="filterState().searchTerm"
+			(ngModelChange)="onSearchChange($event)"
+			placeholder="Buscar por nombre o DNI..."
+			class="search-input"
+			aria-label="Buscar persona por nombre o DNI"
+		/>
+		@if (filterState().searchTerm) {
+			<button
+				type="button"
+				class="clear-btn"
+				(click)="onSearchChange('')"
+				aria-label="Limpiar búsqueda"
+			>
+				<i class="pi pi-times"></i>
+			</button>
+		}
+	</div>
+
+	<div class="chips" role="group" aria-label="Filtrar por estado de asistencia">
+		@for (chip of chips(); track chip.code) {
+			<button
+				type="button"
+				class="status-chip"
+				[class]="getStatusClass(chip.code)"
+				[class.active]="isActive(chip.code)"
+				[attr.aria-pressed]="isActive(chip.code)"
+				(click)="onChipClick(chip.code)"
+				[pTooltip]="chip.label"
+				tooltipPosition="top"
+			>
+				<span class="chip-code">{{ chip.code === '-' ? '–' : chip.code }}</span>
+				<span class="chip-count">{{ chip.count }}</span>
+			</button>
+		}
+	</div>
+</div>

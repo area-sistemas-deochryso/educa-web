@@ -1,0 +1,57 @@
+<section class="slow-requests">
+	<header class="section-header">
+		<div class="section-title">
+			<i class="pi pi-stopwatch"></i>
+			<h3>Consultas lentas</h3>
+		</div>
+		<button
+			pButton
+			icon="pi pi-refresh"
+			class="p-button-text p-button-sm"
+			[loading]="loading()"
+			(click)="onRefresh()"
+		></button>
+	</header>
+
+	@if (slowRequests().length === 0 && !loading()) {
+		<div class="empty-state">
+			<i class="pi pi-check-circle"></i>
+			<span>No hay datos de consultas lentas.</span>
+		</div>
+	}
+
+	@if (slowRequests().length > 0) {
+		<p-table
+			[value]="slowRequests()"
+			[tableStyle]="{ 'min-width': '40rem' }"
+			[sortField]="'p95'"
+			[sortOrder]="-1"
+		>
+			<ng-template #header>
+				<tr>
+					<th pSortableColumn="path">Endpoint <p-sortIcon field="path" /></th>
+					<th pSortableColumn="p50" style="width: 6rem">p50 <p-sortIcon field="p50" /></th>
+					<th pSortableColumn="p95" style="width: 6rem">p95 <p-sortIcon field="p95" /></th>
+					<th pSortableColumn="p99" style="width: 6rem">p99 <p-sortIcon field="p99" /></th>
+					<th pSortableColumn="count" style="width: 6rem">Count <p-sortIcon field="count" /></th>
+				</tr>
+			</ng-template>
+			<ng-template #body let-row>
+				<tr>
+					<td class="endpoint-cell">
+						<code>{{ row.path }}</code>
+					</td>
+					<td>{{ row.p50 | number: '1.0-0' }} ms</td>
+					<td>
+						<p-tag
+							[value]="(row.p95 | number: '1.0-0') + ' ms'"
+							[severity]="getLatencySeverity(row.p95)"
+						/>
+					</td>
+					<td>{{ row.p99 | number: '1.0-0' }} ms</td>
+					<td>{{ row.count | number }}</td>
+				</tr>
+			</ng-template>
+		</p-table>
+	}
+</section>

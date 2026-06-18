@@ -1,0 +1,78 @@
+.temporal-nav {
+	display: inline-flex;
+	align-items: center;
+	gap: 0.25rem;
+	background: var(--surface-ground);
+	border: 1px solid var(--surface-border);
+	border-radius: 8px;
+	padding: 0.125rem;
+}
+
+.nav-btn {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	width: 2rem;
+	height: 2rem;
+	border: none;
+	border-radius: 6px;
+	background: transparent;
+	color: var(--text-color-secondary);
+	cursor: pointer;
+	transition: background 0.15s, color 0.15s;
+
+	&:hover:not(.disabled) {
+		background: var(--surface-hover);
+		color: var(--text-color);
+	}
+
+	&.disabled {
+		opacity: 0.35;
+		cursor: not-allowed;
+	}
+
+	i {
+		font-size: 0.85rem;
+	}
+}
+
+.nav-label-wrapper {
+	position: relative;
+}
+
+.nav-label {
+	padding: 0.25rem 0.75rem;
+	border: none;
+	border-radius: 6px;
+	background: transparent;
+	color: var(--text-color);
+	font-size: 0.875rem;
+	font-weight: 600;
+	cursor: pointer;
+	white-space: nowrap;
+	transition: background 0.15s;
+
+	&:hover {
+		background: var(--surface-hover);
+	}
+}
+
+.datepicker-dropdown {
+	position: absolute;
+	top: 100%;
+	right: 0;
+	z-index: 1000;
+	margin-top: 0.25rem;
+	background: var(--surface-overlay);
+	border: 1px solid var(--surface-border);
+	border-radius: 8px;
+	box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12);
+	padding: 0.5rem;
+}
+
+@media (max-width: 480px) {
+	.nav-label {
+		font-size: 0.8rem;
+		padding: 0.25rem 0.5rem;
+	}
+}

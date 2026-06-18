@@ -1,0 +1,63 @@
+<section class="alert-timeline">
+	<header class="section-header">
+		<div class="section-title">
+			<i class="pi pi-bell"></i>
+			<h3>Alertas recientes</h3>
+			@if (filteredAlerts().length > 0) {
+				<span class="badge">{{ filteredAlerts().length }}</span>
+			}
+		</div>
+		<div class="section-actions">
+			<p-selectButton
+				[options]="filterOptions"
+				[(ngModel)]="severityFilter"
+				optionLabel="label"
+				optionValue="value"
+				[allowEmpty]="false"
+			/>
+			<button
+				pButton
+				icon="pi pi-refresh"
+				class="p-button-text p-button-sm"
+				[loading]="loading()"
+				(click)="onRefresh()"
+			></button>
+		</div>
+	</header>
+
+	@if (filteredAlerts().length === 0 && !loading()) {
+		<div class="empty-state">
+			<i class="pi pi-check-circle"></i>
+			<span>Sin alertas recientes.</span>
+		</div>
+	}
+
+	@if (filteredAlerts().length > 0) {
+		<div class="timeline-list">
+			@for (alert of filteredAlerts(); track alert.timestamp + alert.metricKey) {
+				<div class="timeline-item" [class.timeline-item--critical]="alert.alertLevel === 'critical'">
+					<div class="timeline-item__header">
+						<p-tag
+							[value]="alert.alertLevel"
+							[severity]="getSeverityTag(alert.alertLevel)"
+						/>
+						<span class="metric-name">{{ getMetricLabel(alert.metricKey) }}</span>
+						<span class="timestamp">{{ alert.timestamp | date: 'short' }}</span>
+					</div>
+					<div class="timeline-item__body">
+						<span class="value-info">
+							Valor: <strong>{{ alert.value | number: '1.0-1' }}</strong>
+							(umbral: {{ alert.thresholdBreached | number: '1.0-1' }})
+						</span>
+						@if (getRecommendation(alert.metricKey); as rec) {
+							<div class="recommendation">
+								<i class="pi pi-lightbulb"></i>
+								<span>{{ rec }}</span>
+							</div>
+						}
+					</div>
+				</div>
+			}
+		</div>
+	}
+</section>

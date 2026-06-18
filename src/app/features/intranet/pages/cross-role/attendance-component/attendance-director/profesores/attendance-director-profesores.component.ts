@@ -12,7 +12,7 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { Router } from '@angular/router';
 import { Observable, finalize } from 'rxjs';
 
-import { AttendanceLegendComponent } from '@features/intranet/components/attendance/attendance-legend/attendance-legend.component';
+import { AttendanceLegendStatsComponent } from '@features/intranet/components/attendance/attendance-legend-stats/attendance-legend-stats.component';
 import {
 	AttendancePersonaDayListComponent,
 	PersonaAsistenciaDia,
@@ -29,6 +29,7 @@ import { AttendanceTable } from '@features/intranet/pages/cross-role/attendance-
 
 import {
 	AsistenciaProfesorDto,
+	AttendanceStatus,
 	EstadisticasAsistenciaDia,
 	HijoApoderado,
 	PersonaAsistencia,
@@ -55,7 +56,7 @@ import { buildPdfExcelMenuItems } from '../consolidated-pdf.helper';
 	selector: 'app-attendance-director-profesores',
 	standalone: true,
 	imports: [
-		AttendanceLegendComponent,
+		AttendanceLegendStatsComponent,
 		AttendancePersonaDayListComponent,
 		AttendanceTableComponent,
 		AttendanceTableSkeletonComponent,
@@ -77,6 +78,7 @@ export class AttendanceDirectorProfesoresComponent implements OnInit {
 
 	// #region Estado general
 	readonly loading = signal(false);
+	readonly activeStatus = signal<AttendanceStatus | null>(null);
 	readonly tableReady = signal(false);
 	readonly downloadingPdf = signal(false);
 	// #endregion

@@ -167,6 +167,19 @@ export interface EstadisticasDia {
 	porcentajeAsistencia: number;
 }
 
+// Director: Dashboard enriquecido (endpoint /director/dashboard)
+export interface DashboardDirectorDia {
+	fecha: string;
+	totalEstudiantes: number;
+	conEntrada: number;
+	asistenciasCompletas: number;
+	faltas: number;
+	porcentajeAsistencia: number;
+	totalSalones: number;
+	salonesConRegistro: number;
+	salonesSinRegistro: number;
+}
+
 // Director: Grado disponible para filtro
 export interface GradoSeccion {
 	grado: string;

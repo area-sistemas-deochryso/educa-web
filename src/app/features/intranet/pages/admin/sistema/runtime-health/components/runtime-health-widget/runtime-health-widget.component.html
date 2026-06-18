@@ -66,6 +66,15 @@
 					<div class="info-card__title">
 						<i class="pi pi-server"></i>
 						<span>ThreadPool</span>
+						@if (getAlertLevel('threadPool.queueLength'); as level) {
+							<p-tag
+								[value]="level"
+								[severity]="getAlertSeverity('threadPool.queueLength')"
+								class="alert-badge"
+							/>
+						} @else {
+							<p-tag value="OK" severity="success" class="alert-badge" />
+						}
 					</div>
 					<dl class="info-card__list">
 						<dt>Workers ocupados</dt>
@@ -91,11 +100,26 @@
 					</dl>
 				</div>
 
+				@if (getRecommendation('threadPool.queueLength'); as rec) {
+					<div class="recommendation-inline">
+						<i class="pi pi-lightbulb"></i> {{ rec }}
+					</div>
+				}
+
 				<!-- Requests -->
 				<div class="info-card">
 					<div class="info-card__title">
 						<i class="pi pi-bolt"></i>
 						<span>Requests</span>
+						@if (getAlertLevel('requests.p95'); as level) {
+							<p-tag
+								[value]="level"
+								[severity]="getAlertSeverity('requests.p95')"
+								class="alert-badge"
+							/>
+						} @else {
+							<p-tag value="OK" severity="success" class="alert-badge" />
+						}
 					</div>
 					<dl class="info-card__list">
 						<dt>En vuelo</dt>
@@ -112,11 +136,26 @@
 					</dl>
 				</div>
 
+				@if (getRecommendation('requests.p95'); as rec) {
+					<div class="recommendation-inline">
+						<i class="pi pi-lightbulb"></i> {{ rec }}
+					</div>
+				}
+
 				<!-- DB -->
 				<div class="info-card">
 					<div class="info-card__title">
 						<i class="pi pi-database"></i>
 						<span>BD</span>
+						@if (getAlertLevel('db.activeConnections'); as level) {
+							<p-tag
+								[value]="level"
+								[severity]="getAlertSeverity('db.activeConnections')"
+								class="alert-badge"
+							/>
+						} @else {
+							<p-tag value="OK" severity="success" class="alert-badge" />
+						}
 					</div>
 					<dl class="info-card__list">
 						<dt>Conexiones activas</dt>
@@ -131,11 +170,26 @@
 					</dl>
 				</div>
 
+				@if (getRecommendation('db.activeConnections'); as rec) {
+					<div class="recommendation-inline">
+						<i class="pi pi-lightbulb"></i> {{ rec }}
+					</div>
+				}
+
 				<!-- GC -->
 				<div class="info-card">
 					<div class="info-card__title">
 						<i class="pi pi-chart-bar"></i>
 						<span>GC</span>
+						@if (getAlertLevel('gc.heapMb'); as level) {
+							<p-tag
+								[value]="level"
+								[severity]="getAlertSeverity('gc.heapMb')"
+								class="alert-badge"
+							/>
+						} @else {
+							<p-tag value="OK" severity="success" class="alert-badge" />
+						}
 					</div>
 					<dl class="info-card__list">
 						<dt>Gen0 / Gen1 / Gen2</dt>
@@ -155,7 +209,24 @@
 							<span class="info-card__sub">MB</span>
 						</dd>
 					</dl>
+					<div class="info-card__actions">
+						<button
+							pButton
+							icon="pi pi-trash"
+							label="Force GC"
+							class="p-button-outlined p-button-sm p-button-warning"
+							pTooltip="Ejecutar Garbage Collection en el servidor"
+							tooltipPosition="bottom"
+							(click)="onForceGc()"
+							[pt]="{ root: { 'aria-label': 'Forzar garbage collection' } }"
+						></button>
+					</div>
 				</div>
+				@if (getRecommendation('gc.heapMb'); as rec) {
+					<div class="recommendation-inline">
+						<i class="pi pi-lightbulb"></i> {{ rec }}
+					</div>
+				}
 			</div>
 
 			<footer class="widget-footer">

@@ -44,46 +44,55 @@
 			</h2>
 			<!-- * Status summary badges -->
 			<div class="status-summary">
-				<div class="summary-item">
-					<span class="summary-color status-tardanza"></span>
-					<span class="summary-count">{{ table().counts.T }}T</span>
-				</div>
-				<div class="summary-item">
+				<div class="summary-item" pTooltip="Asistencias" tooltipPosition="top">
 					<span class="summary-color status-asistio"></span>
 					<span class="summary-count">{{ table().counts.A }}A</span>
 				</div>
-				<div class="summary-item">
+				<div class="summary-item" pTooltip="Tardanzas" tooltipPosition="top">
+					<span class="summary-color status-tardanza"></span>
+					<span class="summary-count">{{ table().counts.T }}T</span>
+				</div>
+				<div class="summary-item" pTooltip="Faltas" tooltipPosition="top">
 					<span class="summary-color status-falta"></span>
 					<span class="summary-count">{{ table().counts.F }}F</span>
 				</div>
-				<div class="summary-item">
+				<div class="summary-item" pTooltip="Justificadas" tooltipPosition="top">
 					<span class="summary-color status-justificado"></span>
 					<span class="summary-count">{{ table().counts.J }}J</span>
 				</div>
-				<div class="summary-item">
+				<div class="summary-item" pTooltip="Pendientes" tooltipPosition="top">
 					<span class="summary-color status-pendiente"></span>
 					<span class="summary-count">{{ table().counts['-'] }}-</span>
 				</div>
 			</div>
 		</div>
-		<!-- * Month selector for the current table -->
-		<p-select
-			appendTo="body"
-			[options]="monthOptions"
-			[ngModel]="table().selectedMonth"
-			(ngModelChange)="onMonthChange($event)"
-			optionLabel="label"
-			optionValue="value"
-			class="month-select"
-			[filter]="true"
-			filterBy="label"
-			filterPlaceholder="Buscar mes..."
-			[pt]="{
-				root: {
-					'aria-label': 'Seleccionar mes',
-				},
-			}"
+		<!-- * Month temporal navigation ◀ month ▶ -->
+		<app-attendance-temporal-nav
+			mode="month"
+			[currentDate]="currentMonthDate()"
+			(previous)="onPreviousMonth()"
+			(next)="onNextMonth()"
+			(pickerOpen)="monthSelectVisible = !monthSelectVisible"
 		/>
+		@if (monthSelectVisible) {
+			<p-select
+				appendTo="body"
+				[options]="monthOptions"
+				[ngModel]="table().selectedMonth"
+				(ngModelChange)="onMonthChange($event); monthSelectVisible = false"
+				optionLabel="label"
+				optionValue="value"
+				class="month-select-dropdown"
+				[filter]="true"
+				filterBy="label"
+				filterPlaceholder="Buscar mes..."
+				[pt]="{
+					root: {
+						'aria-label': 'Seleccionar mes',
+					},
+				}"
+			/>
+		}
 	</div>
 
 	<!-- * Double-entry attendance grid -->

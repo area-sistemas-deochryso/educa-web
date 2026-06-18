@@ -1,0 +1,244 @@
+.history-panel {
+	background: transparent;
+	border: 1px solid var(--surface-300);
+	border-radius: 12px;
+	padding: 1rem 1.25rem;
+}
+
+.history-header {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	gap: 1rem;
+	margin-bottom: 1rem;
+	flex-wrap: wrap;
+}
+
+.history-title {
+	display: flex;
+	align-items: center;
+	gap: 0.75rem;
+
+	i {
+		color: var(--blue-800);
+		font-size: 1.1rem;
+	}
+
+	h3 {
+		margin: 0;
+		font-size: 1rem;
+		font-weight: 600;
+		color: var(--text-color);
+	}
+}
+
+.history-actions {
+	display: flex;
+	align-items: center;
+	gap: 0.75rem;
+}
+
+.history-loading,
+.history-empty {
+	display: flex;
+	align-items: center;
+	gap: 0.75rem;
+	padding: 1.5rem 1rem;
+	color: var(--text-color-secondary);
+	font-size: 0.875rem;
+}
+
+.history-error {
+	display: flex;
+	align-items: center;
+	gap: 0.5rem;
+	padding: 0.75rem 1rem;
+	border-radius: 8px;
+	background: color-mix(in srgb, var(--red-500) 10%, transparent);
+	border: 1px solid var(--red-400);
+	color: var(--text-color);
+	font-size: 0.875rem;
+}
+
+.charts-grid {
+	display: grid;
+	grid-template-columns: repeat(2, 1fr);
+	gap: 1rem;
+}
+
+.chart-card {
+	background: transparent;
+	border: 1px solid var(--surface-300);
+	border-radius: 10px;
+	padding: 0.75rem 1rem;
+
+	&__title {
+		display: flex;
+		align-items: center;
+		gap: 0.5rem;
+		font-weight: 600;
+		font-size: 0.85rem;
+		text-transform: uppercase;
+		letter-spacing: 0.5px;
+		color: var(--text-color);
+		margin-bottom: 0.5rem;
+
+		i {
+			color: var(--blue-800);
+		}
+	}
+
+	&__canvas-container {
+		position: relative;
+		height: 200px;
+		margin-bottom: 0.75rem;
+	}
+
+	&__summary {
+		border-top: 1px solid var(--surface-300);
+		padding-top: 0.5rem;
+	}
+}
+
+.summary-row {
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+	padding: 0.15rem 0;
+	font-size: 0.8rem;
+}
+
+.summary-label {
+	color: var(--text-color-secondary);
+}
+
+.summary-value {
+	font-variant-numeric: tabular-nums;
+	font-weight: 600;
+	color: var(--text-color);
+}
+
+.summary-min {
+	color: var(--green-600);
+}
+
+.summary-avg {
+	color: var(--text-color);
+}
+
+.summary-max {
+	color: var(--red-500);
+}
+
+.summary-sep {
+	color: var(--text-color-secondary);
+	margin: 0 0.15rem;
+	font-weight: 400;
+}
+
+.summary-legend {
+	text-align: right;
+	font-size: 0.7rem;
+	color: var(--text-color-secondary);
+	margin-top: 0.25rem;
+	font-style: italic;
+}
+
+// #region Correlation panel
+.correlation-panel {
+	margin-top: 1rem;
+	border: 1px solid var(--surface-300);
+	border-radius: 10px;
+	padding: 0.75rem 1rem;
+	background: color-mix(in srgb, var(--primary-color) 3%, var(--surface-ground));
+}
+
+.correlation-header {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	margin-bottom: 0.5rem;
+}
+
+.correlation-title {
+	display: flex;
+	align-items: center;
+	gap: 0.5rem;
+	font-weight: 600;
+	font-size: 0.85rem;
+	color: var(--text-color);
+
+	i {
+		color: #1e40af;
+	}
+}
+
+.correlation-reason {
+	display: flex;
+	align-items: center;
+	gap: 0.5rem;
+	padding: 0.4rem 0.75rem;
+	margin-bottom: 0.75rem;
+	border-radius: 6px;
+	background: color-mix(in srgb, var(--yellow-500) 10%, transparent);
+	font-size: 0.8rem;
+	color: var(--text-color);
+
+	i {
+		color: var(--yellow-600);
+		font-size: 0.85rem;
+	}
+}
+
+.correlation-grid {
+	display: grid;
+	grid-template-columns: repeat(4, 1fr);
+	gap: 0.75rem;
+}
+
+.correlation-category {
+	h4 {
+		margin: 0 0 0.35rem;
+		font-size: 0.75rem;
+		font-weight: 700;
+		text-transform: uppercase;
+		letter-spacing: 0.5px;
+		color: #1e40af;
+	}
+}
+
+.correlation-metric {
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+	padding: 0.2rem 0;
+	font-size: 0.8rem;
+
+	&__label {
+		color: var(--text-color-secondary);
+	}
+
+	&__value {
+		font-weight: 600;
+		font-variant-numeric: tabular-nums;
+		color: var(--text-color);
+	}
+}
+// #endregion
+
+@media (max-width: 1024px) {
+	.charts-grid {
+		grid-template-columns: 1fr;
+	}
+
+	.correlation-grid {
+		grid-template-columns: repeat(2, 1fr);
+	}
+}
+
+@media (max-width: 768px) {
+	.history-header {
+		flex-direction: column;
+		align-items: flex-start;
+	}
+}

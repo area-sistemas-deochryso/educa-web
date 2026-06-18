@@ -4,19 +4,101 @@
 	subtitle="Snapshot en vivo del proceso ASP.NET (ThreadPool, Requests, BD, GC) con clasificación de patrón de saturación."
 />
 
-<app-runtime-health-widget
-	[snapshot]="vm().snapshot"
-	[loading]="vm().loading"
-	[autoRefresh]="vm().autoRefresh"
-	[collapsed]="vm().collapsed"
-	(refresh)="onRefresh()"
-	(autoRefreshChange)="onAutoRefreshChange($event)"
-	(collapsedChange)="onCollapsedChange($event)"
-/>
-
 @if (vm().error) {
 	<div class="error-banner">
 		<i class="pi pi-exclamation-triangle"></i>
 		<span>{{ vm().error }}</span>
 	</div>
 }
+
+@if (diagnosticsVm().forceGcResult; as gcResult) {
+	<div class="gc-result-banner">
+		<i class="pi pi-check-circle"></i>
+		<span>
+			GC completado
+			@if (gcResult.heapBeforeMB != null) {
+				— Heap antes: {{ gcResult.heapBeforeMB | number: '1.1-1' }} MB,
+				después: {{ gcResult.heapAfterMB | number: '1.1-1' }} MB,
+				liberado: {{ gcResult.collectedMB | number: '1.1-1' }} MB
+			}
+		</span>
+	</div>
+}
+
+<p-tabs [value]="'snapshot'">
+	<p-tablist>
+		<p-tab value="snapshot">
+			<i class="pi pi-server tab-icon"></i>
+			Snapshot
+		</p-tab>
+		<p-tab value="alerts">
+			<i class="pi pi-bell tab-icon"></i>
+			Alertas
+			@if (alertsVm().alerts.length > 0) {
+				<p-badge [value]="'' + alertsVm().alerts.length" severity="danger" />
+			}
+		</p-tab>
+		<p-tab value="thresholds">
+			<i class="pi pi-sliders-h tab-icon"></i>
+			Umbrales
+		</p-tab>
+		<p-tab value="history">
+			<i class="pi pi-chart-line tab-icon"></i>
+			Historial
+		</p-tab>
+		<p-tab value="slow">
+			<i class="pi pi-stopwatch tab-icon"></i>
+			Consultas lentas
+		</p-tab>
+	</p-tablist>
+
+	<p-tabpanel value="snapshot">
+		<app-runtime-health-widget
+			[snapshot]="vm().snapshot"
+			[loading]="vm().loading"
+			[autoRefresh]="vm().autoRefresh"
+			[collapsed]="vm().collapsed"
+			[thresholds]="thresholds()"
+			(refresh)="onRefresh()"
+			(autoRefreshChange)="onAutoRefreshChange($event)"
+			(collapsedChange)="onCollapsedChange($event)"
+			(forceGc)="onForceGc()"
+		/>
+	</p-tabpanel>
+
+	<p-tabpanel value="alerts">
+		<app-alert-timeline
+			[alerts]="alertsVm().alerts"
+			[loading]="alertsVm().loading"
+			(refresh)="onAlertsRefresh()"
+		/>
+	</p-tabpanel>
+
+	<p-tabpanel value="thresholds">
+		<app-threshold-config
+			[thresholds]="thresholdsVm().thresholds"
+			[loading]="thresholdsVm().loading"
+			[saving]="thresholdsVm().saving"
+			(save)="onThresholdsSave($event)"
+		/>
+	</p-tabpanel>
+
+	<p-tabpanel value="history">
+		<app-runtime-health-history
+			[data]="historyVm().data"
+			[loading]="historyVm().loading"
+			[error]="historyVm().error"
+			[timeRange]="historyVm().timeRange"
+			(timeRangeChange)="onTimeRangeChange($event)"
+			(refresh)="onHistoryRefresh()"
+		/>
+	</p-tabpanel>
+
+	<p-tabpanel value="slow">
+		<app-slow-requests-table
+			[slowRequests]="diagnosticsVm().slowRequests"
+			[loading]="diagnosticsVm().slowRequestsLoading"
+			(refresh)="onSlowRequestsRefresh()"
+		/>
+	</p-tabpanel>
+</p-tabs>

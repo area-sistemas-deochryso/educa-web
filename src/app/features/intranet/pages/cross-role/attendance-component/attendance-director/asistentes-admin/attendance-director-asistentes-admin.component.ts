@@ -11,7 +11,7 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { Router } from '@angular/router';
 import { finalize } from 'rxjs';
 
-import { AttendanceLegendComponent } from '@features/intranet/components/attendance/attendance-legend/attendance-legend.component';
+import { AttendanceLegendStatsComponent } from '@features/intranet/components/attendance/attendance-legend-stats/attendance-legend-stats.component';
 import {
 	AttendancePersonaDayListComponent,
 	PersonaAsistenciaDia,
@@ -23,6 +23,7 @@ import {
 
 import {
 	AsistenciaAsistenteAdminDto,
+	AttendanceStatus,
 	EstadisticasAsistenciaDia,
 	PersonaAsistencia,
 	asistenteAdminToPersonaAsistencia,
@@ -45,7 +46,7 @@ import { ErrorHandlerService } from '@core/services';
 @Component({
 	selector: 'app-attendance-director-asistentes-admin',
 	standalone: true,
-	imports: [AttendanceLegendComponent, AttendancePersonaDayListComponent],
+	imports: [AttendanceLegendStatsComponent, AttendancePersonaDayListComponent],
 	templateUrl: './attendance-director-asistentes-admin.component.html',
 	changeDetection: ChangeDetectionStrategy.OnPush,
 })
@@ -56,6 +57,7 @@ export class AttendanceDirectorAsistentesAdminComponent implements OnInit {
 	private destroyRef = inject(DestroyRef);
 
 	readonly loading = signal(false);
+	readonly activeStatus = signal<AttendanceStatus | null>(null);
 	readonly viewMode = signal<ViewMode>(VIEW_MODE.Dia);
 	readonly fechaDia = signal<Date>(new Date());
 

@@ -23,6 +23,26 @@
 	}
 }
 
+@media (max-width: 768px) {
+	:host ::ng-deep .submenu-toggle {
+		display: flex;
+		flex-wrap: wrap;
+		gap: 0.25rem;
+
+		.p-togglebutton {
+			flex: 1 1 auto;
+			min-width: 0;
+			justify-content: center;
+			padding: 0.4rem 0.6rem;
+			font-size: 0.8rem;
+
+			.submenu-label {
+				display: none;
+			}
+		}
+	}
+}
+
 @media (max-width: 480px) {
 	.submenu {
 		padding: 0.5rem 0.5rem 0;
@@ -32,7 +52,7 @@
 		width: 100%;
 
 		.p-togglebutton {
-			flex: 1;
+			flex: 1 1 calc(33.33% - 0.25rem);
 			justify-content: center;
 		}
 	}

@@ -1,0 +1,142 @@
+<section class="history-panel">
+	<header class="history-header">
+		<div class="history-title">
+			<i class="pi pi-chart-line"></i>
+			<h3>Tendencias históricas</h3>
+		</div>
+
+		<div class="history-actions">
+			<p-selectButton
+				[options]="rangeOptions"
+				[ngModel]="timeRange()"
+				(ngModelChange)="onTimeRangeChange($event)"
+				optionLabel="label"
+				optionValue="value"
+				size="small"
+			/>
+			<button
+				pButton
+				icon="pi pi-refresh"
+				class="p-button-text p-button-sm"
+				[loading]="loading()"
+				(click)="onRefresh()"
+				[pt]="{ root: { 'aria-label': 'Refrescar historial' } }"
+			></button>
+		</div>
+	</header>
+
+	@if (loading()) {
+		<div class="history-loading">
+			<p-progressSpinner
+				[style]="{ width: '2rem', height: '2rem' }"
+				strokeWidth="4"
+			/>
+			<span>Cargando historial...</span>
+		</div>
+	}
+
+	@if (error()) {
+		<div class="history-error">
+			<i class="pi pi-exclamation-triangle"></i>
+			<span>{{ error() }}</span>
+		</div>
+	}
+
+	@if (!loading() && !error() && data().length === 0) {
+		<div class="history-empty">
+			<i class="pi pi-info-circle"></i>
+			<span>Sin datos históricos para el rango seleccionado.</span>
+		</div>
+	}
+
+	@if (!loading() && data().length > 0) {
+		<div class="charts-grid">
+			@for (cfg of summaries(); track cfg.title) {
+				<div class="chart-card">
+					<div class="chart-card__title">
+						<i [class]="cfg.icon"></i>
+						<span>{{ cfg.title }}</span>
+					</div>
+
+					<div class="chart-card__canvas-container">
+						@switch (cfg.title) {
+							@case ('ThreadPool') {
+								<canvas #threadPoolChart></canvas>
+							}
+							@case ('Requests') {
+								<canvas #requestsChart></canvas>
+							}
+							@case ('BD') {
+								<canvas #dbChart></canvas>
+							}
+							@case ('GC') {
+								<canvas #gcChart></canvas>
+							}
+						}
+					</div>
+
+					<div class="chart-card__summary">
+						@for (s of cfg.summaries; track s.label) {
+							<div class="summary-row">
+								<span class="summary-label">{{ s.label }}</span>
+								<span class="summary-value">
+									<span class="summary-min" title="Mínimo">{{ s.min }}</span>
+									<span class="summary-sep">/</span>
+									<span class="summary-avg" title="Promedio">{{ s.avg }}</span>
+									<span class="summary-sep">/</span>
+									<span class="summary-max" title="Máximo">{{ s.max }}</span>
+								</span>
+							</div>
+						}
+						<div class="summary-legend">min / avg / max</div>
+					</div>
+				</div>
+			}
+		</div>
+
+		@if (selectedSnapshot(); as snap) {
+			<div class="correlation-panel">
+				<header class="correlation-header">
+					<div class="correlation-title">
+						<i class="pi pi-link"></i>
+						<span>Correlación en {{ snap.timestamp | date: 'dd/MM HH:mm:ss' }}</span>
+						@if (snap.saturationPattern) {
+							<p-tag
+								[value]="getPatternLabel(snap.saturationPattern)"
+								[severity]="getPatternSeverity(snap.saturationPattern)"
+							/>
+						}
+					</div>
+					<button
+						pButton
+						icon="pi pi-times"
+						class="p-button-text p-button-sm p-button-secondary"
+						(click)="dismissCorrelation()"
+						[pt]="{ root: { 'aria-label': 'Cerrar correlación' } }"
+					></button>
+				</header>
+
+				@if (snap.reason) {
+					<div class="correlation-reason">
+						<i class="pi pi-info-circle"></i>
+						<span>{{ snap.reason }}</span>
+					</div>
+				}
+
+				<div class="correlation-grid">
+					@for (cat of correlationCategories(); track cat.category) {
+						<div class="correlation-category">
+							<h4>{{ cat.category }}</h4>
+							@for (m of cat.metrics; track m.label) {
+								<div class="correlation-metric">
+									<span class="correlation-metric__label">{{ m.label }}</span>
+									<span class="correlation-metric__value">{{ m.value }}</span>
+								</div>
+							}
+						</div>
+					}
+				</div>
+			</div>
+		}
+	}
+</section>

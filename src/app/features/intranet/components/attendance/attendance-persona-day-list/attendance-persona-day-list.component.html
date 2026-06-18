@@ -1,284 +1,247 @@
-<p-card class="asistencia-dia-card">
-	<ng-template #header>
-		<div class="card-header">
-			<h2><i class="pi pi-calendar-clock"></i> Asistencia del día</h2>
-			<div class="header-actions">
-				@if (showPdfButton()) {
-					@if (tipoReporteOptions().length > 0) {
-						<p-select
-							[options]="tipoReporteOptions()"
-							[ngModel]="tipoReporte()"
-							(ngModelChange)="tipoReporteChange.emit($event)"
-							optionLabel="label"
-							optionValue="value"
-							[group]="true"
-							optionGroupLabel="label"
-							optionGroupChildren="items"
-							appendTo="body"
-							class="tipo-reporte-selector"
-						/>
-					}
-					<p-button
-						icon="pi pi-file-pdf"
-						[loading]="downloadingPdf()"
-						severity="danger"
-						[text]="true"
-						[rounded]="true"
-						(onClick)="togglePdfMenu($event)"
-						pTooltip="Opciones de PDF"
-						tooltipPosition="top"
-						class="pdf-button"
-						[pt]="{
-							root: {
-								'aria-label': 'Opciones de PDF',
-							},
-						}"
-					/>
-					<p-menu #pdfMenu [model]="pdfMenuItems()" [popup]="true" appendTo="body" />
-					<span class="pdf-label"> Reporte de la fecha</span>
-				}
-				<p-datepicker
-					[ngModel]="fechaValue()"
-					[showIcon]="true"
-					[maxDate]="today"
-					dateFormat="dd/mm/yy"
-					(ngModelChange)="onFechaChange($event)"
+<!-- #region Filters bar -->
+<div class="filters-bar">
+	<div class="search-box">
+		<i class="pi pi-search"></i>
+		<input
+			type="text"
+			pInputText
+			[ngModel]="searchTerm()"
+			(ngModelChange)="searchTerm.set($event)"
+			placeholder="Buscar por nombre o DNI..."
+			class="search-input"
+			aria-label="Buscar persona por nombre o DNI"
+		/>
+		@if (searchTerm()) {
+			<button
+				type="button"
+				class="clear-btn"
+				(click)="searchTerm.set('')"
+				aria-label="Limpiar búsqueda"
+			>
+				<i class="pi pi-times"></i>
+			</button>
+		}
+	</div>
+
+	<ng-content select="[filtersSlot]" />
+
+	<div class="filters-right">
+		@if (showPdfButton()) {
+			@if (tipoReporteOptions().length > 0) {
+				<p-select
+					[options]="tipoReporteOptions()"
+					[ngModel]="tipoReporte()"
+					(ngModelChange)="tipoReporteChange.emit($event)"
+					optionLabel="label"
+					optionValue="value"
+					[group]="true"
+					optionGroupLabel="label"
+					optionGroupChildren="items"
 					appendTo="body"
-					class="fecha-picker"
+					class="tipo-reporte-selector"
 				/>
-			</div>
-		</div>
-	</ng-template>
-
-	@if (loading()) {
-		<app-table-skeleton [columns]="diaColumns()" [rows]="6" minHeight="300px" />
-
-		<div class="skeleton-footer">
-			@for (_ of skeletonBadges; track $index) {
-				<div class="skeleton-badge">
-					<app-skeleton-loader variant="rect" width="52px" height="52px" />
-					<div class="skeleton-badge-content">
-						<app-skeleton-loader variant="text" width="28px" height="18px" />
-						<app-skeleton-loader variant="text" width="52px" height="10px" />
-					</div>
-				</div>
 			}
-		</div>
-	} @else if (personasDelDia().length === 0) {
-		<div class="empty-state">
-			<i class="pi pi-users"></i>
-			<p>No hay registros de asistencia para esta fecha</p>
-		</div>
-	} @else {
-		<app-responsive-table
-			[value]="personasDelDia()"
-			[paginator]="false"
-			emptyMessage="No hay registros de asistencia"
-			emptyIcon="pi pi-users"
-			ariaLabel="Lista de asistencia del día"
-		>
-			<!-- #region Desktop: tabla estándar -->
-			<ng-template #desktopView>
-				<p-table [value]="personasDelDia()" class="p-datatable-sm asistencia-table">
-					<ng-template #header>
-						<tr>
-							<th style="width: 50px">#</th>
-							<th>Persona</th>
-							<th style="width: 100px" class="text-center">Entrada</th>
-							<th style="width: 100px" class="text-center">Salida</th>
-							<th style="width: 80px" class="text-center">Estado</th>
-							@if (showEditAdminAction()) {
-								<th style="width: 70px" class="text-center">Acciones</th>
-							}
-						</tr>
-					</ng-template>
-					<ng-template #body let-persona let-i="rowIndex">
-						<tr
-							[class.row-clickable]="allowJustify() && persona.puedeJustificar"
-							[pTooltip]="
-								allowJustify() && persona.puedeJustificar
-									? persona.esJustificado
-										? 'Clic para editar/quitar justificación'
-										: 'Clic para justificar'
-									: ''
-							"
-							tooltipPosition="top"
-							[appendTo]="'body'"
-							[tooltipOptions]="{ showDelay: 300 }"
-							(click)="onPersonaClick(persona)"
-						>
-							<td class="row-number">{{ i + 1 }}</td>
-							<td>
-								<div class="estudiante-info">
-									<span class="nombre">{{ persona.nombreCompleto }}</span>
-									<span class="dni">DNI: {{ persona.dni }}</span>
-									@if (persona.observacion) {
-										<span
-											class="observacion"
-											pTooltip="{{ persona.observacion }}"
-											tooltipPosition="top"
-										>
-											<i class="pi pi-info-circle"></i>
-											{{ persona.observacion | slice: 0 : 30
-											}}{{ persona.observacion.length > 30 ? '...' : '' }}
-										</span>
-									}
-								</div>
-							</td>
-							<td class="text-center">
-								<span class="hora" [class.hora-empty]="!persona.horaEntrada">
-									@if (persona.horaEntrada) {
-										<i class="pi pi-sign-in"></i>
-									}
-									{{ persona.horaEntrada | formatTime }}
-								</span>
-							</td>
-							<td class="text-center">
-								<span class="hora" [class.hora-empty]="!persona.horaSalida">
-									@if (persona.horaSalida) {
-										<i class="pi pi-sign-out"></i>
-									}
-									{{ persona.horaSalida | formatTime }}
-								</span>
-							</td>
-							<td class="text-center">
-								<span class="estado-box" [class]="getStatusClass(persona.estadoCodigo)">
-									{{ persona.estadoCodigo }}
-								</span>
-							</td>
-							@if (showEditAdminAction()) {
-								<td class="text-center">
-									<button
-										pButton
-										type="button"
-										icon="pi pi-pencil"
-										class="p-button-rounded p-button-text p-button-info"
-										pTooltip="Editar asistencia del profesor"
+			<p-button
+				icon="pi pi-file-pdf"
+				[loading]="downloadingPdf()"
+				severity="danger"
+				[text]="true"
+				[rounded]="true"
+				(onClick)="togglePdfMenu($event)"
+				pTooltip="Opciones de PDF"
+				tooltipPosition="top"
+				class="pdf-button"
+				[pt]="{
+					root: {
+						'aria-label': 'Opciones de PDF',
+					},
+				}"
+			/>
+			<p-menu #pdfMenu [model]="pdfMenuItems()" [popup]="true" appendTo="body" />
+		}
+		<app-attendance-temporal-nav
+			mode="day"
+			[currentDate]="fechaValue()"
+			[maxDate]="today"
+			(previous)="onPreviousDay()"
+			(next)="onNextDay()"
+			(dateSelect)="onFechaChange($event)"
+		/>
+	</div>
+</div>
+<!-- #endregion -->
+
+<!-- #region Table content -->
+@if (loading()) {
+	<app-table-skeleton [columns]="diaColumns()" [rows]="6" minHeight="300px" />
+} @else if (personasDelDia().length === 0) {
+	<div class="empty-state">
+		<i class="pi pi-users"></i>
+		<p>No hay registros de asistencia para esta fecha</p>
+	</div>
+} @else {
+	<app-responsive-table
+		[value]="filteredPersonas()"
+		[paginator]="false"
+		emptyMessage="No hay registros de asistencia"
+		emptyIcon="pi pi-users"
+		ariaLabel="Lista de asistencia del día"
+	>
+		<!-- #region Desktop: tabla estándar -->
+		<ng-template #desktopView>
+			<p-table [value]="filteredPersonas()" class="p-datatable-sm asistencia-table">
+				<ng-template #header>
+					<tr>
+						<th style="width: 50px">#</th>
+						<th>Persona</th>
+						<th style="width: 100px" class="text-center">Entrada</th>
+						<th style="width: 100px" class="text-center">Salida</th>
+						<th style="width: 80px" class="text-center">Estado</th>
+						@if (showEditAdminAction()) {
+							<th style="width: 70px" class="text-center">Acciones</th>
+						}
+					</tr>
+				</ng-template>
+				<ng-template #body let-persona let-i="rowIndex">
+					<tr
+						[class.row-clickable]="allowJustify() && persona.puedeJustificar"
+						[pTooltip]="
+							allowJustify() && persona.puedeJustificar
+								? persona.esJustificado
+									? 'Clic para editar/quitar justificación'
+									: 'Clic para justificar'
+								: ''
+						"
+						tooltipPosition="top"
+						[appendTo]="'body'"
+						[tooltipOptions]="{ showDelay: 300 }"
+						(click)="onPersonaClick(persona)"
+					>
+						<td class="row-number">{{ i + 1 }}</td>
+						<td>
+							<div class="estudiante-info">
+								<span class="nombre">{{ persona.nombreCompleto }}</span>
+								<span class="dni">DNI: {{ persona.dni }}</span>
+								@if (persona.observacion) {
+									<span
+										class="observacion"
+										pTooltip="{{ persona.observacion }}"
 										tooltipPosition="top"
-										(click)="onEditAdminClick($event, persona)"
-										[pt]="{
-											root: {
-												'aria-label': 'Editar asistencia del profesor',
-											},
-										}"
-									></button>
-								</td>
-							}
-						</tr>
-					</ng-template>
-				</p-table>
-			</ng-template>
-			<!-- #endregion -->
-
-			<!-- #region Mobile: card por persona -->
-			<ng-template #mobileCard let-persona>
-				<div
-					class="mobile-card-inner"
-					[class.row-clickable]="allowJustify() && persona.puedeJustificar"
-					(click)="onPersonaClick(persona)"
-				>
-					<div class="rt-card__title mobile-card-title">
-						<div class="estudiante-info">
-							<span class="nombre">{{ persona.nombreCompleto }}</span>
-							<span class="dni">DNI: {{ persona.dni }}</span>
-						</div>
-						<span class="estado-box" [class]="getStatusClass(persona.estadoCodigo)">
-							{{ persona.estadoCodigo }}
-						</span>
-					</div>
-
-					<div class="rt-card__field">
-						<span class="rt-card__label"><i class="pi pi-sign-in"></i> Entrada</span>
-						<span class="hora" [class.hora-empty]="!persona.horaEntrada">
-							{{ persona.horaEntrada | formatTime }}
-						</span>
-					</div>
-					<div class="rt-card__field">
-						<span class="rt-card__label"><i class="pi pi-sign-out"></i> Salida</span>
-						<span class="hora" [class.hora-empty]="!persona.horaSalida">
-							{{ persona.horaSalida | formatTime }}
-						</span>
-					</div>
-
-					@if (persona.observacion) {
-						<div class="rt-card__field mobile-card-observacion">
-							<span class="observacion">
-								<i class="pi pi-info-circle"></i>
-								{{ persona.observacion }}
+									>
+										<i class="pi pi-info-circle"></i>
+										{{ persona.observacion | slice: 0 : 30
+										}}{{ persona.observacion.length > 30 ? '...' : '' }}
+									</span>
+								}
+							</div>
+						</td>
+						<td class="text-center">
+							<span class="hora" [class.hora-empty]="!persona.horaEntrada">
+								@if (persona.horaEntrada) {
+									<i class="pi pi-sign-in"></i>
+								}
+								{{ persona.horaEntrada | formatTime }}
 							</span>
-						</div>
-					}
+						</td>
+						<td class="text-center">
+							<span class="hora" [class.hora-empty]="!persona.horaSalida">
+								@if (persona.horaSalida) {
+									<i class="pi pi-sign-out"></i>
+								}
+								{{ persona.horaSalida | formatTime }}
+							</span>
+						</td>
+						<td class="text-center">
+							<span class="estado-box" [class]="getStatusClass(persona.estadoCodigo)">
+								{{ persona.estadoCodigo }}
+							</span>
+						</td>
+						@if (showEditAdminAction()) {
+							<td class="text-center">
+								<button
+									pButton
+									type="button"
+									icon="pi pi-pencil"
+									class="p-button-rounded p-button-text p-button-info"
+									pTooltip="Editar asistencia del profesor"
+									tooltipPosition="top"
+									(click)="onEditAdminClick($event, persona)"
+									[pt]="{
+										root: {
+											'aria-label': 'Editar asistencia del profesor',
+										},
+									}"
+								></button>
+							</td>
+						}
+					</tr>
+				</ng-template>
+			</p-table>
+		</ng-template>
+		<!-- #endregion -->
 
-					@if (showEditAdminAction()) {
-						<div class="rt-card__field mobile-card-actions">
-							<button
-								pButton
-								type="button"
-								icon="pi pi-pencil"
-								label="Editar en admin"
-								class="p-button-outlined p-button-info p-button-sm"
-								(click)="onEditAdminClick($event, persona)"
-								[pt]="{
-									root: {
-										'aria-label': 'Editar asistencia del profesor en admin',
-									},
-								}"
-							></button>
-						</div>
-					}
+		<!-- #region Mobile: card por persona -->
+		<ng-template #mobileCard let-persona>
+			<div
+				class="mobile-card-inner"
+				[class.row-clickable]="allowJustify() && persona.puedeJustificar"
+				(click)="onPersonaClick(persona)"
+			>
+				<div class="rt-card__title mobile-card-title">
+					<div class="estudiante-info">
+						<span class="nombre">{{ persona.nombreCompleto }}</span>
+						<span class="dni">DNI: {{ persona.dni }}</span>
+					</div>
+					<span class="estado-box" [class]="getStatusClass(persona.estadoCodigo)">
+						{{ persona.estadoCodigo }}
+					</span>
 				</div>
-			</ng-template>
-			<!-- #endregion -->
-		</app-responsive-table>
 
-		<div class="resumen-footer">
-			<div class="stat-badge total">
-				<div class="badge-icon">
-					<i class="pi pi-users"></i>
+				<div class="rt-card__field">
+					<span class="rt-card__label"><i class="pi pi-sign-in"></i> Entrada</span>
+					<span class="hora" [class.hora-empty]="!persona.horaEntrada">
+						{{ persona.horaEntrada | formatTime }}
+					</span>
 				</div>
-				<div class="badge-content">
-					<span class="value">{{ estadisticas().total }}</span>
-					<span class="label">Total</span>
+				<div class="rt-card__field">
+					<span class="rt-card__label"><i class="pi pi-sign-out"></i> Salida</span>
+					<span class="hora" [class.hora-empty]="!persona.horaSalida">
+						{{ persona.horaSalida | formatTime }}
+					</span>
 				</div>
+
+				@if (persona.observacion) {
+					<div class="rt-card__field mobile-card-observacion">
+						<span class="observacion">
+							<i class="pi pi-info-circle"></i>
+							{{ persona.observacion }}
+						</span>
+					</div>
+				}
+
+				@if (showEditAdminAction()) {
+					<div class="rt-card__field mobile-card-actions">
+						<button
+							pButton
+							type="button"
+							icon="pi pi-pencil"
+							label="Editar en admin"
+							class="p-button-outlined p-button-info p-button-sm"
+							(click)="onEditAdminClick($event, persona)"
+							[pt]="{
+								root: {
+									'aria-label': 'Editar asistencia del profesor en admin',
+								},
+							}"
+						></button>
+					</div>
+				}
 			</div>
-			<div class="stat-badge tardanza">
-				<span class="status-indicator status-tardanza">T</span>
-				<div class="badge-content">
-					<span class="value">{{ estadisticas().tardanza }}</span>
-					<span class="label">Tardanza</span>
-				</div>
-			</div>
-			<div class="stat-badge asistio">
-				<span class="status-indicator status-asistio">A</span>
-				<div class="badge-content">
-					<span class="value">{{ estadisticas().asistio }}</span>
-					<span class="label">Asistió</span>
-				</div>
-			</div>
-			<div class="stat-badge falta">
-				<span class="status-indicator status-falta">F</span>
-				<div class="badge-content">
-					<span class="value">{{ estadisticas().falta }}</span>
-					<span class="label">Falta</span>
-				</div>
-			</div>
-			<div class="stat-badge justificado">
-				<span class="status-indicator status-justificado">J</span>
-				<div class="badge-content">
-					<span class="value">{{ estadisticas().justificado }}</span>
-					<span class="label">Justificado</span>
-				</div>
-			</div>
-			<div class="stat-badge pendiente">
-				<span class="status-indicator status-pendiente">-</span>
-				<div class="badge-content">
-					<span class="value">{{ estadisticas().pendiente }}</span>
-					<span class="label">Pendiente</span>
-				</div>
-			</div>
-		</div>
-	}
-</p-card>
+		</ng-template>
+		<!-- #endregion -->
+	</app-responsive-table>
+}
+<!-- #endregion -->
 
 <!-- #region Diálogo de Justificación -->
 <p-dialog

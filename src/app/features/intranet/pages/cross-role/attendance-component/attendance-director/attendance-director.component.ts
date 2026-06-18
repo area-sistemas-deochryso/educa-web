@@ -8,6 +8,7 @@ import { AttendanceDirectorAsistentesAdminComponent } from './asistentes-admin/a
 import { AttendanceDirectorEstudiantesComponent } from './estudiantes/attendance-director-estudiantes.component';
 import { AttendanceDirectorProfesoresComponent } from './profesores/attendance-director-profesores.component';
 import { AttendanceDirectorStaffComponent } from './staff/attendance-director-staff.component';
+import { AttendanceDashboardComponent } from '@features/intranet/components/attendance/attendance-dashboard/attendance-dashboard.component';
 
 /**
  * Shell del panel admin de asistencia (Director + Promotor + Coordinador Académico
@@ -39,6 +40,7 @@ const SUBMENU_OPTIONS: { label: string; value: SubMenu; icon: string }[] = [
 		AttendanceDirectorProfesoresComponent,
 		AttendanceDirectorAsistentesAdminComponent,
 		AttendanceDirectorStaffComponent,
+		AttendanceDashboardComponent,
 	],
 	templateUrl: './attendance-director.component.html',
 	styleUrl: './attendance-director.component.scss',

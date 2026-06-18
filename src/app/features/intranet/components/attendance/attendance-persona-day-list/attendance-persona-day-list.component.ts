@@ -11,8 +11,6 @@ import {
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { TableModule } from 'primeng/table';
-import { DatePickerModule } from 'primeng/datepicker';
-import { CardModule } from 'primeng/card';
 import { SkeletonModule } from 'primeng/skeleton';
 import { ButtonModule } from 'primeng/button';
 import { Menu, MenuModule } from 'primeng/menu';
@@ -32,6 +30,8 @@ import type { SkeletonColumnDef } from '@intranet-shared/components';
 import { SkeletonLoaderComponent } from '@shared/components';
 import { FormatTimePipe } from '@intranet-shared/pipes';
 import { getStatusClass } from '@features/intranet/pages/cross-role/attendance-component/config/attendance.constants';
+import { InputTextModule } from 'primeng/inputtext';
+import { AttendanceTemporalNavComponent } from '../attendance-temporal-nav/attendance-temporal-nav.component';
 
 /**
  * Fila de asistencia del día — forma interna renderizada por la tabla.
@@ -80,8 +80,6 @@ export interface JustificacionPersonaEvent {
 		CommonModule,
 		FormsModule,
 		TableModule,
-		DatePickerModule,
-		CardModule,
 		SkeletonModule,
 		SkeletonLoaderComponent,
 		TableSkeletonComponent,
@@ -93,6 +91,8 @@ export interface JustificacionPersonaEvent {
 		Textarea,
 		Select,
 		FormatTimePipe,
+		InputTextModule,
+		AttendanceTemporalNavComponent,
 	],
 	templateUrl: './attendance-persona-day-list.component.html',
 	styleUrl: './attendance-persona-day-list.component.scss',
@@ -118,6 +118,7 @@ export class AttendancePersonaDayListComponent {
 	 * Gating a nivel padre: solo se activa desde la vista admin de profesores.
 	 */
 	readonly showEditAdminAction = input<boolean>(false);
+	readonly activeStatus = input<AttendanceStatus | null>(null);
 
 	// * Outputs
 	readonly fechaChange = output<Date>();
@@ -147,6 +148,7 @@ export class AttendancePersonaDayListComponent {
 
 	// * Local state for the datepicker model (signal for OnPush reactivity)
 	readonly fechaValue = signal<Date>(new Date());
+	readonly searchTerm = signal('');
 
 	// #region Estado del diálogo de justificación
 	readonly dialogVisible = signal(false);
@@ -161,6 +163,25 @@ export class AttendancePersonaDayListComponent {
 		this.personas().map((p) => this.mapPersonaAsistencia(p)),
 	);
 
+	readonly filteredPersonas = computed<PersonaAsistenciaDia[]>(() => {
+		const all = this.personasDelDia();
+		const status = this.activeStatus();
+		const term = this.searchTerm();
+		let result = all;
+		if (status) {
+			result = result.filter((p) => p.estadoCodigo === status);
+		}
+		if (term) {
+			const lower = term.toLowerCase();
+			result = result.filter(
+				(p) =>
+					p.nombreCompleto.toLowerCase().includes(lower) ||
+					p.dni.toLowerCase().includes(lower),
+			);
+		}
+		return result;
+	});
+
 	constructor() {
 		// * Sync datepicker model when parent updates the fecha input
 		effect(() => {
@@ -172,6 +193,20 @@ export class AttendancePersonaDayListComponent {
 		if (fecha) {
 			this.fechaValue.set(fecha);
 			this.fechaChange.emit(fecha);
+		}
+	}
+
+	onPreviousDay(): void {
+		const prev = new Date(this.fechaValue());
+		prev.setDate(prev.getDate() - 1);
+		this.onFechaChange(prev);
+	}
+
+	onNextDay(): void {
+		const next = new Date(this.fechaValue());
+		next.setDate(next.getDate() + 1);
+		if (next <= this.today) {
+			this.onFechaChange(next);
 		}
 	}
 

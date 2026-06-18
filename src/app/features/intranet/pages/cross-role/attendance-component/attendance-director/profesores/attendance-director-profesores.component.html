@@ -1,6 +1,6 @@
 <!-- #region Template -->
 <!-- * Leyenda compartida de estados -->
-<app-attendance-legend />
+<app-attendance-legend-stats [estadisticas]="estadisticasDia()" [(activeStatus)]="activeStatus" />
 
 @if (viewMode() === 'mes') {
 	<!-- * PDF actions — contextual al profesor seleccionado -->
@@ -75,6 +75,7 @@
 		[personas]="personasDia()"
 		[fecha]="fechaDia()"
 		[estadisticas]="estadisticasDia()"
+		[activeStatus]="activeStatus()"
 		[loading]="loading()"
 		[showPdfButton]="true"
 		[downloadingPdf]="downloadingPdf()"

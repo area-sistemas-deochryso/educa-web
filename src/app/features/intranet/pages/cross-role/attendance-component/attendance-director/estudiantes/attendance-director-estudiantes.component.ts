@@ -1,6 +1,6 @@
 /* eslint-disable max-lines -- Razón: componente orquesta 6 variantes de descarga (día/mes/periodo × salón/consolidado) × 2 formatos (PDF/Excel) + selector grado-sección + justificación. Dispersar en helpers externos fragmentaría la lógica cohesiva del componente. */
 import { StorageService } from '@core/services';
-import { GradoSeccion } from '@data/models';
+import { AttendanceStatus, GradoSeccion } from '@data/models';
 import { AttendanceService } from '@intranet-shared/services';
 import { downloadBlob, viewBlobInNewTab } from '@core/helpers';
 import { periodoEnMes, filtrarPorPeriodoAcademico } from '@shared/models';
@@ -9,7 +9,7 @@ import { JustificacionEvent } from '@features/intranet/components/attendance/att
 import { ChangeDetectionStrategy, Component, DestroyRef, OnInit, ViewChild, computed, inject, signal } from '@angular/core';
 
 import { AttendanceDayListComponent } from '@features/intranet/components/attendance/attendance-day-list/attendance-day-list.component';
-import { AttendanceLegendComponent } from '@app/features/intranet/components/attendance/attendance-legend/attendance-legend.component';
+import { AttendanceLegendStatsComponent } from '@features/intranet/components/attendance/attendance-legend-stats/attendance-legend-stats.component';
 import { AttendanceScopeBannerComponent } from '@intranet-shared/components/attendance-scope-banner';
 import { esGradoAsistenciaDiaria } from '@shared/constants';
 import { AttendanceTableComponent } from '@features/intranet/components/attendance/attendance-table/attendance-table.component';
@@ -57,7 +57,7 @@ import {
 		GradoSeccionSelectorComponent,
 		AttendanceDayListComponent,
 		EmptyStateComponent,
-		AttendanceLegendComponent,
+		AttendanceLegendStatsComponent,
 		AttendanceScopeBannerComponent,
 		ButtonModule,
 		TooltipModule,
@@ -83,6 +83,7 @@ export class AttendanceDirectorEstudiantesComponent implements OnInit {
 	// #region Tipo de reporte
 	readonly tipoReporteOptions: TipoReporteGroup[] = TIPO_REPORTE_OPTIONS;
 	readonly tipoReporte = signal<TipoReporte>('salon-dia');
+	readonly activeStatus = signal<AttendanceStatus | null>(null);
 	readonly downloadingPdfConsolidado = signal(false);
 	readonly savingJustificacion = signal(false);
 

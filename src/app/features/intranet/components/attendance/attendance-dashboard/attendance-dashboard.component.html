@@ -1,0 +1,47 @@
+@if (loading()) {
+	<div class="dashboard-skeleton">
+		<p-skeleton width="100%" height="4rem" borderRadius="12px" />
+	</div>
+} @else if (data(); as d) {
+	<div class="dashboard">
+		<!-- * Top row: label + percentage + alerts aligned on same baseline -->
+		<div class="progress-section">
+			<div class="progress-info">
+				<span class="progress-label">Asistencia del día</span>
+			</div>
+			<span class="progress-value" [style.color]="progressColor()">
+				{{ porcentaje() }}%
+			</span>
+			@if (alerts().length > 0) {
+				<div class="alerts">
+					@for (alert of alerts(); track alert.label) {
+						<div class="alert-badge" [class]="'severity-' + alert.severity">
+							<i [class]="alert.icon"></i>
+							<span>{{ alert.label }}</span>
+						</div>
+					}
+				</div>
+			}
+		</div>
+
+		<!-- * Progress bar -->
+		<div class="progress-bar-container">
+			<div
+				class="progress-bar-fill"
+				[style.width.%]="porcentaje()"
+				[style.background]="progressColor()"
+			></div>
+		</div>
+
+		<!-- * Detail line -->
+		<div class="progress-detail">
+			<span>{{ d.conEntrada }} de {{ d.totalEstudiantes }} estudiantes</span>
+			<span class="separator">·</span>
+			<span>{{ d.faltas }} faltas</span>
+			<span class="separator">·</span>
+			<span pTooltip="Salones con al menos 1 registro" tooltipPosition="top">
+				{{ d.salonesConRegistro }}/{{ d.totalSalones }} salones
+			</span>
+		</div>
+	</div>
+}
