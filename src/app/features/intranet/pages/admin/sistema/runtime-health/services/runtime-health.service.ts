@@ -1,10 +1,14 @@
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpParams } from '@angular/common/http';
 import { Injectable, inject } from '@angular/core';
 import { Observable } from 'rxjs';
 
 import { environment } from '@config/environment';
 
-import { RuntimeHealthSnapshot } from '../models/runtime-health.models';
+import {
+	HealthHistoryResolution,
+	RuntimeHealthHistoryResponse,
+	RuntimeHealthSnapshot,
+} from '../models/runtime-health.models';
 
 @Injectable({ providedIn: 'root' })
 export class RuntimeHealthService {
@@ -13,5 +17,21 @@ export class RuntimeHealthService {
 
 	getSnapshot(): Observable<RuntimeHealthSnapshot> {
 		return this.http.get<RuntimeHealthSnapshot>(this.endpoint);
+	}
+
+	getHistory(
+		from: Date,
+		to: Date,
+		resolution: HealthHistoryResolution,
+	): Observable<RuntimeHealthHistoryResponse> {
+		const params = new HttpParams()
+			.set('from', from.toISOString())
+			.set('to', to.toISOString())
+			.set('resolution', resolution);
+
+		return this.http.get<RuntimeHealthHistoryResponse>(
+			`${this.endpoint}/history`,
+			{ params },
+		);
 	}
 }

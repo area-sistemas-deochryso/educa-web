@@ -20,3 +20,12 @@
 		<span>{{ vm().error }}</span>
 	</div>
 }
+
+<app-runtime-health-history
+	[data]="historyVm().data"
+	[loading]="historyVm().loading"
+	[error]="historyVm().error"
+	[timeRange]="historyVm().timeRange"
+	(timeRangeChange)="onTimeRangeChange($event)"
+	(refresh)="onHistoryRefresh()"
+/>

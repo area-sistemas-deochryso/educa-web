@@ -1,0 +1,97 @@
+<section class="history-panel">
+	<header class="history-header">
+		<div class="history-title">
+			<i class="pi pi-chart-line"></i>
+			<h3>Tendencias históricas</h3>
+		</div>
+
+		<div class="history-actions">
+			<p-selectButton
+				[options]="rangeOptions"
+				[ngModel]="timeRange()"
+				(ngModelChange)="onTimeRangeChange($event)"
+				optionLabel="label"
+				optionValue="value"
+				size="small"
+			/>
+			<button
+				pButton
+				icon="pi pi-refresh"
+				class="p-button-text p-button-sm"
+				[loading]="loading()"
+				(click)="onRefresh()"
+				[pt]="{ root: { 'aria-label': 'Refrescar historial' } }"
+			></button>
+		</div>
+	</header>
+
+	@if (loading()) {
+		<div class="history-loading">
+			<p-progressSpinner
+				[style]="{ width: '2rem', height: '2rem' }"
+				strokeWidth="4"
+			/>
+			<span>Cargando historial...</span>
+		</div>
+	}
+
+	@if (error()) {
+		<div class="history-error">
+			<i class="pi pi-exclamation-triangle"></i>
+			<span>{{ error() }}</span>
+		</div>
+	}
+
+	@if (!loading() && !error() && data().length === 0) {
+		<div class="history-empty">
+			<i class="pi pi-info-circle"></i>
+			<span>Sin datos históricos para el rango seleccionado.</span>
+		</div>
+	}
+
+	@if (!loading() && data().length > 0) {
+		<div class="charts-grid">
+			@for (cfg of summaries(); track cfg.title) {
+				<div class="chart-card">
+					<div class="chart-card__title">
+						<i [class]="cfg.icon"></i>
+						<span>{{ cfg.title }}</span>
+					</div>
+
+					<div class="chart-card__canvas-container">
+						@switch (cfg.title) {
+							@case ('ThreadPool') {
+								<canvas #threadPoolChart></canvas>
+							}
+							@case ('Requests') {
+								<canvas #requestsChart></canvas>
+							}
+							@case ('BD') {
+								<canvas #dbChart></canvas>
+							}
+							@case ('GC') {
+								<canvas #gcChart></canvas>
+							}
+						}
+					</div>
+
+					<div class="chart-card__summary">
+						@for (s of cfg.summaries; track s.label) {
+							<div class="summary-row">
+								<span class="summary-label">{{ s.label }}</span>
+								<span class="summary-value">
+									<span class="summary-min" title="Mínimo">{{ s.min }}</span>
+									<span class="summary-sep">/</span>
+									<span class="summary-avg" title="Promedio">{{ s.avg }}</span>
+									<span class="summary-sep">/</span>
+									<span class="summary-max" title="Máximo">{{ s.max }}</span>
+								</span>
+							</div>
+						}
+						<div class="summary-legend">min / avg / max</div>
+					</div>
+				</div>
+			}
+		</div>
+	}
+</section>

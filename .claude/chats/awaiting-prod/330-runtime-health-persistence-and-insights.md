@@ -2,7 +2,8 @@
 
 > **Repos afectados**: `educa-web`, `Educa.API`
 > **Plan**: none (design defined in this brief)
-> **Creado**: 2026-06-17 · **Estado**: ⏳ pendiente arrancar.
+> **Creado**: 2026-06-17 · **Estado**: ✅ F2 shipped (FE history UI).
+> **Validación prod**: ⏳ pendiente desde 2026-06-18 — verificar charts con datos reales del endpoint `/history`.
 > **MODO SUGERIDO**: `/design` then `/execute`
 > **exclusive**: `false`
 > **modules**: `runtime-health`

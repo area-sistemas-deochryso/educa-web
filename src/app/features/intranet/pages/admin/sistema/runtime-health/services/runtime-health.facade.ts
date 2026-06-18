@@ -4,6 +4,12 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { logger } from '@core/helpers';
 import { StorageService } from '@core/services';
 
+import {
+	HistoryTimeRange,
+	resolveResolution,
+	resolveTimeRange,
+} from '../models/runtime-health.models';
+
 import { RuntimeHealthService } from './runtime-health.service';
 import { RuntimeHealthStore } from './runtime-health.store';
 
@@ -22,13 +28,14 @@ export class RuntimeHealthFacade {
 
 	// #region Estado expuesto
 	readonly vm = this.store.vm;
+	readonly historyVm = this.store.historyVm;
 	// #endregion
 
 	constructor() {
 		this.destroyRef.onDestroy(() => this.stopPolling());
 	}
 
-	// #region Comandos públicos
+	// #region Comandos públicos — live snapshot
 	init(): void {
 		const autoRefresh = this.storage.getRuntimeHealthWidgetAutoRefresh();
 		const collapsed = this.storage.getRuntimeHealthWidgetCollapsed();
@@ -67,6 +74,35 @@ export class RuntimeHealthFacade {
 	setCollapsed(collapsed: boolean): void {
 		this.store.setCollapsed(collapsed);
 		this.storage.setRuntimeHealthWidgetCollapsed(collapsed);
+	}
+	// #endregion
+
+	// #region Comandos públicos — history
+	loadHistory(): void {
+		const range = this.store.timeRange();
+		const { from, to } = resolveTimeRange(range);
+		const resolution = resolveResolution(range);
+
+		this.store.setHistoryLoading(true);
+		this.api
+			.getHistory(from, to, resolution)
+			.pipe(takeUntilDestroyed(this.destroyRef))
+			.subscribe({
+				next: (response) => {
+					this.store.setHistoryData(response.data);
+					this.store.setHistoryLoading(false);
+				},
+				error: (err) => {
+					logger.tagged('RuntimeHealthFacade', 'error', 'history load failed', err);
+					this.store.setHistoryError('No se pudo cargar el historial');
+					this.store.setHistoryLoading(false);
+				},
+			});
+	}
+
+	setTimeRange(range: HistoryTimeRange): void {
+		this.store.setTimeRange(range);
+		this.loadHistory();
 	}
 	// #endregion
 
