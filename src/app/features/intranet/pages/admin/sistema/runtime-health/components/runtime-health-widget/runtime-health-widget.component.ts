@@ -13,9 +13,12 @@ import { ToggleSwitchModule } from 'primeng/toggleswitch';
 import { TooltipModule } from 'primeng/tooltip';
 
 import {
+	ALERT_RECOMMENDATIONS,
+	AlertLevel,
 	PATTERN_LABEL,
 	PATTERN_SEVERITY,
 	RuntimeHealthSnapshot,
+	ThresholdConfig,
 	isProbableTelemetryFailure,
 } from '../../models/runtime-health.models';
 
@@ -41,10 +44,12 @@ export class RuntimeHealthWidgetComponent {
 	readonly loading = input<boolean>(false);
 	readonly autoRefresh = input<boolean>(false);
 	readonly collapsed = input<boolean>(false);
+	readonly thresholds = input<ThresholdConfig[]>([]);
 
 	readonly refresh = output<void>();
 	readonly autoRefreshChange = output<boolean>();
 	readonly collapsedChange = output<boolean>();
+	readonly forceGc = output<void>();
 	// #endregion
 
 	// #region Computed
@@ -88,6 +93,8 @@ export class RuntimeHealthWidgetComponent {
 		const snap = this.snapshot();
 		return snap ? snap.gc.totalAllocatedBytes / (1024 * 1024) : 0;
 	});
+
+	readonly metricAlerts = computed(() => this.evaluateThresholds());
 	// #endregion
 
 	// #region Event handlers
@@ -101,6 +108,60 @@ export class RuntimeHealthWidgetComponent {
 
 	onCollapsedToggle(): void {
 		this.collapsedChange.emit(!this.collapsed());
+	}
+
+	onForceGc(): void {
+		this.forceGc.emit();
+	}
+	// #endregion
+
+	// #region Threshold evaluation
+	getAlertLevel(metricKey: string): AlertLevel | null {
+		return this.metricAlerts()[metricKey] ?? null;
+	}
+
+	getAlertSeverity(metricKey: string): 'success' | 'warn' | 'danger' {
+		const level = this.getAlertLevel(metricKey);
+		if (level === 'critical') return 'danger';
+		if (level === 'warn') return 'warn';
+		return 'success';
+	}
+
+	getRecommendation(metricKey: string): string | null {
+		if (!this.getAlertLevel(metricKey)) return null;
+		return ALERT_RECOMMENDATIONS[metricKey] ?? null;
+	}
+
+	private evaluateThresholds(): Record<string, AlertLevel> {
+		const snap = this.snapshot();
+		const thresholdList = this.thresholds();
+		if (!snap || !Array.isArray(thresholdList) || thresholdList.length === 0) return {};
+
+		const metricsMap: Record<string, number> = {
+			'requests.p95': snap.requests.p95Ms,
+			'requests.p99': snap.requests.p99Ms,
+			'threadPool.queueLength': snap.threadPool.queueLength,
+			'db.activeConnections': snap.db.activeConnections,
+			'gc.heapMb': this.heapMb(),
+			'db.p95LatencyMs': snap.db.p95LatencyMs,
+		};
+
+		const result: Record<string, AlertLevel> = {};
+		for (const t of thresholdList) {
+			const value = metricsMap[t.metricKey];
+			if (value === undefined) continue;
+
+			const breachesCritical = t.direction === 'Above'
+				? value >= t.criticalValue
+				: value <= t.criticalValue;
+			const breachesWarn = t.direction === 'Above'
+				? value >= t.warnValue
+				: value <= t.warnValue;
+
+			if (breachesCritical) result[t.metricKey] = 'critical';
+			else if (breachesWarn) result[t.metricKey] = 'warn';
+		}
+		return result;
 	}
 	// #endregion
 }

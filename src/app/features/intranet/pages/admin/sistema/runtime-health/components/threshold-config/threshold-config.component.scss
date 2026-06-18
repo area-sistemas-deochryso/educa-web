@@ -1,0 +1,47 @@
+:host {
+	display: block;
+}
+
+.threshold-config {
+	background: var(--surface-card);
+	border: 1px solid var(--surface-border);
+	border-radius: var(--border-radius);
+	padding: 1.25rem;
+	margin-bottom: 1rem;
+}
+
+.section-header {
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+	margin-bottom: 1rem;
+}
+
+.section-title {
+	display: flex;
+	align-items: center;
+	gap: 0.5rem;
+
+	h3 {
+		margin: 0;
+		font-size: 1rem;
+		font-weight: 600;
+	}
+
+	i {
+		color: #1e40af;
+	}
+}
+
+.section-actions {
+	display: flex;
+	gap: 0.5rem;
+}
+
+.empty-state {
+	display: flex;
+	align-items: center;
+	gap: 0.5rem;
+	color: var(--text-color-secondary);
+	padding: 1rem 0;
+}

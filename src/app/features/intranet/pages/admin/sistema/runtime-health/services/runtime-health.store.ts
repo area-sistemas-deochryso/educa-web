@@ -1,9 +1,13 @@
 import { Injectable, computed, signal } from '@angular/core';
 
 import {
+	ForceGcResult,
 	HistoryTimeRange,
+	RuntimeHealthAlert,
 	RuntimeHealthHistoryDto,
 	RuntimeHealthSnapshot,
+	SlowRequestEntry,
+	ThresholdConfig,
 } from '../models/runtime-health.models';
 
 @Injectable({ providedIn: 'root' })
@@ -21,6 +25,21 @@ export class RuntimeHealthStore {
 	private readonly _historyLoading = signal(false);
 	private readonly _historyError = signal<string | null>(null);
 	private readonly _timeRange = signal<HistoryTimeRange>('1h');
+	// #endregion
+
+	// #region Estado privado — alerts & thresholds (F3)
+	private readonly _alerts = signal<RuntimeHealthAlert[]>([]);
+	private readonly _alertsLoading = signal(false);
+	private readonly _thresholds = signal<ThresholdConfig[]>([]);
+	private readonly _thresholdsLoading = signal(false);
+	private readonly _thresholdsSaving = signal(false);
+	// #endregion
+
+	// #region Estado privado — diagnostics (F4)
+	private readonly _slowRequests = signal<SlowRequestEntry[]>([]);
+	private readonly _slowRequestsLoading = signal(false);
+	private readonly _forceGcResult = signal<ForceGcResult | null>(null);
+	private readonly _forceGcLoading = signal(false);
 	// #endregion
 
 	// #region Lecturas públicas
@@ -48,6 +67,35 @@ export class RuntimeHealthStore {
 		loading: this._historyLoading(),
 		error: this._historyError(),
 		timeRange: this._timeRange(),
+	}));
+
+	readonly alerts = this._alerts.asReadonly();
+	readonly alertsLoading = this._alertsLoading.asReadonly();
+	readonly thresholds = this._thresholds.asReadonly();
+	readonly thresholdsLoading = this._thresholdsLoading.asReadonly();
+	readonly thresholdsSaving = this._thresholdsSaving.asReadonly();
+
+	readonly slowRequests = this._slowRequests.asReadonly();
+	readonly slowRequestsLoading = this._slowRequestsLoading.asReadonly();
+	readonly forceGcResult = this._forceGcResult.asReadonly();
+	readonly forceGcLoading = this._forceGcLoading.asReadonly();
+
+	readonly alertsVm = computed(() => ({
+		alerts: this._alerts(),
+		loading: this._alertsLoading(),
+	}));
+
+	readonly thresholdsVm = computed(() => ({
+		thresholds: this._thresholds(),
+		loading: this._thresholdsLoading(),
+		saving: this._thresholdsSaving(),
+	}));
+
+	readonly diagnosticsVm = computed(() => ({
+		slowRequests: this._slowRequests(),
+		slowRequestsLoading: this._slowRequestsLoading(),
+		forceGcResult: this._forceGcResult(),
+		forceGcLoading: this._forceGcLoading(),
 	}));
 	// #endregion
 
@@ -90,6 +138,46 @@ export class RuntimeHealthStore {
 
 	setTimeRange(range: HistoryTimeRange): void {
 		this._timeRange.set(range);
+	}
+	// #endregion
+
+	// #region Comandos — alerts & thresholds (F3)
+	setAlerts(alerts: RuntimeHealthAlert[]): void {
+		this._alerts.set(alerts);
+	}
+
+	setAlertsLoading(loading: boolean): void {
+		this._alertsLoading.set(loading);
+	}
+
+	setThresholds(thresholds: ThresholdConfig[]): void {
+		this._thresholds.set(thresholds);
+	}
+
+	setThresholdsLoading(loading: boolean): void {
+		this._thresholdsLoading.set(loading);
+	}
+
+	setThresholdsSaving(saving: boolean): void {
+		this._thresholdsSaving.set(saving);
+	}
+	// #endregion
+
+	// #region Comandos — diagnostics (F4)
+	setSlowRequests(entries: SlowRequestEntry[]): void {
+		this._slowRequests.set(entries);
+	}
+
+	setSlowRequestsLoading(loading: boolean): void {
+		this._slowRequestsLoading.set(loading);
+	}
+
+	setForceGcResult(result: ForceGcResult | null): void {
+		this._forceGcResult.set(result);
+	}
+
+	setForceGcLoading(loading: boolean): void {
+		this._forceGcLoading.set(loading);
 	}
 	// #endregion
 }

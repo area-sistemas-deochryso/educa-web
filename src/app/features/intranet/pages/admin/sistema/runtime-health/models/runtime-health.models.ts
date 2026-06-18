@@ -158,6 +158,65 @@ export function resolveTimeRange(range: HistoryTimeRange): { from: Date; to: Dat
 
 // #endregion
 
+// #region F3 — Alerts & Thresholds
+
+export type ThresholdDirection = 'Above' | 'Below';
+export type AlertLevel = 'warn' | 'critical';
+
+export interface ThresholdConfig {
+	metricKey: string;
+	warnValue: number;
+	criticalValue: number;
+	direction: ThresholdDirection;
+}
+
+export interface RuntimeHealthAlert {
+	timestamp: string;
+	metricKey: string;
+	value: number;
+	alertLevel: AlertLevel;
+	thresholdBreached: number;
+	snapshotPattern: SaturationPattern;
+}
+
+export const METRIC_LABELS: Record<string, string> = {
+	'requests.p95': 'Requests p95 (ms)',
+	'requests.p99': 'Requests p99 (ms)',
+	'threadPool.queueLength': 'Cola ThreadPool',
+	'db.activeConnections': 'Conexiones BD activas',
+	'gc.heapMb': 'Heap (MB)',
+	'db.p95LatencyMs': 'BD p95 latencia (ms)',
+};
+
+export const ALERT_RECOMMENDATIONS: Record<string, string> = {
+	'requests.p95': 'Verificar consultas lentas en la tabla de slow requests',
+	'requests.p99': 'Verificar consultas lentas — p99 elevado indica outliers',
+	'threadPool.queueLength': 'Posible starvation — revisar tareas bloqueantes',
+	'db.activeConnections': 'Revisar connection pool — posible leak',
+	'gc.heapMb': 'Presión de memoria alta — considerar Force GC',
+	'db.p95LatencyMs': 'Latencia BD alta — revisar queries pesadas',
+};
+
+// #endregion
+
+// #region F4 — Diagnostics
+
+export interface ForceGcResult {
+	heapBeforeMB: number;
+	heapAfterMB: number;
+	collectedMB: number;
+}
+
+export interface SlowRequestEntry {
+	path: string;
+	p50: number;
+	p95: number;
+	p99: number;
+	count: number;
+}
+
+// #endregion
+
 // #region Helpers para el widget (severity + label de patrón)
 
 export const PATTERN_LABEL: Record<SaturationPattern, string> = {

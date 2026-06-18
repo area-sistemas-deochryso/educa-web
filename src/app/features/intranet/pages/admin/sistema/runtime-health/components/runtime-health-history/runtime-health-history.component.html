@@ -93,5 +93,50 @@
 				</div>
 			}
 		</div>
+
+		@if (selectedSnapshot(); as snap) {
+			<div class="correlation-panel">
+				<header class="correlation-header">
+					<div class="correlation-title">
+						<i class="pi pi-link"></i>
+						<span>Correlación en {{ snap.timestamp | date: 'dd/MM HH:mm:ss' }}</span>
+						@if (snap.saturationPattern) {
+							<p-tag
+								[value]="getPatternLabel(snap.saturationPattern)"
+								[severity]="getPatternSeverity(snap.saturationPattern)"
+							/>
+						}
+					</div>
+					<button
+						pButton
+						icon="pi pi-times"
+						class="p-button-text p-button-sm p-button-secondary"
+						(click)="dismissCorrelation()"
+						[pt]="{ root: { 'aria-label': 'Cerrar correlación' } }"
+					></button>
+				</header>
+
+				@if (snap.reason) {
+					<div class="correlation-reason">
+						<i class="pi pi-info-circle"></i>
+						<span>{{ snap.reason }}</span>
+					</div>
+				}
+
+				<div class="correlation-grid">
+					@for (cat of correlationCategories(); track cat.category) {
+						<div class="correlation-category">
+							<h4>{{ cat.category }}</h4>
+							@for (m of cat.metrics; track m.label) {
+								<div class="correlation-metric">
+									<span class="correlation-metric__label">{{ m.label }}</span>
+									<span class="correlation-metric__value">{{ m.value }}</span>
+								</div>
+							}
+						</div>
+					}
+				</div>
+			</div>
+		}
 	}
 </section>

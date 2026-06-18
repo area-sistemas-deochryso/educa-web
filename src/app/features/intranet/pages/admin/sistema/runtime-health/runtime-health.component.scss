@@ -1,0 +1,59 @@
+:host {
+	display: block;
+}
+
+.error-banner {
+	display: flex;
+	align-items: center;
+	gap: 0.5rem;
+	padding: 0.5rem 0.75rem;
+	margin-bottom: 0.75rem;
+	border-radius: var(--border-radius);
+	background: color-mix(in srgb, var(--red-500) 15%, transparent);
+	border: 1px solid var(--red-500);
+	color: var(--text-color);
+	font-size: 0.85rem;
+}
+
+.gc-result-banner {
+	display: flex;
+	align-items: center;
+	gap: 0.5rem;
+	padding: 0.5rem 0.75rem;
+	margin-bottom: 0.75rem;
+	border-radius: var(--border-radius);
+	background: color-mix(in srgb, var(--green-500) 15%, transparent);
+	border: 1px solid var(--green-500);
+	color: var(--text-color);
+	font-size: 0.85rem;
+
+	i {
+		color: var(--green-500);
+	}
+}
+
+.tab-icon {
+	margin-right: 0.35rem;
+}
+
+::ng-deep p-tabs {
+	app-alert-timeline .alert-timeline,
+	app-threshold-config .threshold-config,
+	app-slow-requests-table .slow-requests,
+	app-runtime-health-widget .runtime-health-widget {
+		border: none;
+		padding: 0;
+		margin-bottom: 0;
+		background: transparent;
+	}
+
+	app-alert-timeline .section-header,
+	app-threshold-config .section-header,
+	app-slow-requests-table .section-header {
+		display: none;
+	}
+
+	app-runtime-health-widget .widget-title .btn-collapse {
+		display: none;
+	}
+}

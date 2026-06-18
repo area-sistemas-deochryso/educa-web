@@ -6,6 +6,7 @@ import { StorageService } from '@core/services';
 
 import {
 	HistoryTimeRange,
+	ThresholdConfig,
 	resolveResolution,
 	resolveTimeRange,
 } from '../models/runtime-health.models';
@@ -29,6 +30,10 @@ export class RuntimeHealthFacade {
 	// #region Estado expuesto
 	readonly vm = this.store.vm;
 	readonly historyVm = this.store.historyVm;
+	readonly alertsVm = this.store.alertsVm;
+	readonly thresholdsVm = this.store.thresholdsVm;
+	readonly diagnosticsVm = this.store.diagnosticsVm;
+	readonly thresholds = this.store.thresholds;
 	// #endregion
 
 	constructor() {
@@ -103,6 +108,97 @@ export class RuntimeHealthFacade {
 	setTimeRange(range: HistoryTimeRange): void {
 		this.store.setTimeRange(range);
 		this.loadHistory();
+	}
+	// #endregion
+
+	// #region Comandos públicos — alerts & thresholds (F3)
+	loadAlerts(): void {
+		this.store.setAlertsLoading(true);
+		this.api
+			.getAlerts()
+			.pipe(takeUntilDestroyed(this.destroyRef))
+			.subscribe({
+				next: (alerts) => {
+					this.store.setAlerts(alerts);
+					this.store.setAlertsLoading(false);
+				},
+				error: (err) => {
+					logger.tagged('RuntimeHealthFacade', 'error', 'alerts load failed', err);
+					this.store.setAlertsLoading(false);
+				},
+			});
+	}
+
+	loadThresholds(): void {
+		this.store.setThresholdsLoading(true);
+		this.api
+			.getThresholds()
+			.pipe(takeUntilDestroyed(this.destroyRef))
+			.subscribe({
+				next: (thresholds) => {
+						this.store.setThresholds(Array.isArray(thresholds) ? thresholds : []);
+					this.store.setThresholdsLoading(false);
+				},
+				error: (err) => {
+					logger.tagged('RuntimeHealthFacade', 'error', 'thresholds load failed', err);
+					this.store.setThresholdsLoading(false);
+				},
+			});
+	}
+
+	saveThresholds(thresholds: ThresholdConfig[]): void {
+		this.store.setThresholdsSaving(true);
+		// eslint-disable-next-line wal/no-direct-mutation-subscribe -- admin config, not domain data
+		this.api
+			.updateThresholds(thresholds)
+			.pipe(takeUntilDestroyed(this.destroyRef))
+			.subscribe({
+				next: (saved) => {
+					this.store.setThresholds(Array.isArray(saved) ? saved : thresholds);
+					this.store.setThresholdsSaving(false);
+				},
+				error: (err) => {
+					logger.tagged('RuntimeHealthFacade', 'error', 'thresholds save failed', err);
+					this.store.setThresholdsSaving(false);
+				},
+			});
+	}
+	// #endregion
+
+	// #region Comandos públicos — diagnostics (F4)
+	forceGc(): void {
+		this.store.setForceGcLoading(true);
+		this.store.setForceGcResult(null);
+		this.api
+			.forceGc()
+			.pipe(takeUntilDestroyed(this.destroyRef))
+			.subscribe({
+				next: (result) => {
+					this.store.setForceGcResult(result);
+					this.store.setForceGcLoading(false);
+				},
+				error: (err) => {
+					logger.tagged('RuntimeHealthFacade', 'error', 'force-gc failed', err);
+					this.store.setForceGcLoading(false);
+				},
+			});
+	}
+
+	loadSlowRequests(top = 10): void {
+		this.store.setSlowRequestsLoading(true);
+		this.api
+			.getSlowRequests(top)
+			.pipe(takeUntilDestroyed(this.destroyRef))
+			.subscribe({
+				next: (entries) => {
+					this.store.setSlowRequests(entries);
+					this.store.setSlowRequestsLoading(false);
+				},
+				error: (err) => {
+					logger.tagged('RuntimeHealthFacade', 'error', 'slow-requests load failed', err);
+					this.store.setSlowRequestsLoading(false);
+				},
+			});
 	}
 	// #endregion
 
