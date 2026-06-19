@@ -9,6 +9,7 @@ import {
 	DashboardDirectorDia,
 	EstadisticasAsistenciaDia,
 	EstadisticasDia,
+	EstadisticasMultiRolDia,
 	EstudianteAsistencia,
 	GradoSeccion,
 	ProfesorSede,
@@ -75,6 +76,22 @@ export class DirectorAttendanceApiService {
 		}
 		return this.http
 			.get<DashboardDirectorDia>(`${this.apiUrl}/director/dashboard`, { params })
+			.pipe(catchError(() => of(null)));
+	}
+
+	/**
+	 * Multi-role attendance stats in a single call.
+	 * GET /api/ConsultaAsistencia/director/estadisticas-multi-rol
+	 */
+	getEstadisticasMultiRol(
+		fecha?: Date,
+		incluirSalones = false,
+	): Observable<EstadisticasMultiRolDia | null> {
+		const params: Record<string, string> = {};
+		if (fecha) params['fecha'] = this.formatDateLocal(fecha);
+		if (incluirSalones) params['incluirSalones'] = 'true';
+		return this.http
+			.get<EstadisticasMultiRolDia>(`${this.apiUrl}/director/estadisticas-multi-rol`, { params })
 			.pipe(catchError(() => of(null)));
 	}
 

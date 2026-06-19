@@ -110,7 +110,7 @@ export type AttendanceStatus = 'A' | 'T' | 'F' | 'J' | '-' | 'X';
  * Discriminador polimórfico de `AsistenciaPersona` (backend):
  * 'E' = Estudiante, 'P' = Profesor, 'A' = Asistente Administrativo (Plan 28).
  */
-export const TIPO_PERSONA = ['E', 'P', 'A'] as const;
+export const TIPO_PERSONA = ['E', 'P', 'A', 'C', 'M', 'D'] as const;
 export type TipoPersona = (typeof TIPO_PERSONA)[number];
 
 // #endregion
@@ -287,6 +287,27 @@ export function asistenteAdminToPersonaAsistencia(
 		nombreCompleto: aa.nombreCompleto,
 		asistencias: aa.asistencias,
 	};
+}
+
+// #endregion
+
+// #region Multi-rol stats
+
+export interface EstadisticasRol {
+	tipoPersona: TipoPersona;
+	total: number;
+	conEntrada: number;
+	completas: number;
+	tardanza: number;
+	faltas: number;
+	porcentaje: number;
+}
+
+export interface EstadisticasMultiRolDia {
+	fecha: string;
+	roles: EstadisticasRol[];
+	totalSalones?: number | null;
+	salonesConRegistro?: number | null;
 }
 
 // #endregion

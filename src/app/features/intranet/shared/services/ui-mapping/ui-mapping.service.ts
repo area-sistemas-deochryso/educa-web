@@ -83,6 +83,9 @@ const TIPO_PERSONA_LABEL: Record<TipoPersona, string> = {
 	E: 'Estudiante',
 	P: 'Profesor',
 	A: 'Asistente Administrativo',
+	C: 'Coordinador',
+	M: 'Promotor',
+	D: 'Director',
 };
 // #endregion
 
