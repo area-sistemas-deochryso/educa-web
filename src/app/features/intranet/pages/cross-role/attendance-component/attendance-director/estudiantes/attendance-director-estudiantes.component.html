@@ -109,6 +109,12 @@
 				(cellClick)="onHeatmapCellClick($event)"
 			/>
 		} @else if (!view.loading()) {
+			<app-attendance-temporal-nav
+				mode="month"
+				[currentDate]="currentMonthDate()"
+				(previous)="onPreviousMonth()"
+				(next)="onNextMonth()"
+			/>
 			<app-empty-state message="Sin datos de asistencia en este mes." />
 		}
 	} @else {

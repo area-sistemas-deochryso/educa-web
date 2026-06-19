@@ -94,7 +94,12 @@
 			(hijoChange)="selectProfesor($event)"
 		/>
 	} @else if (!loading()) {
-		<!-- ! Empty state after load -->
+		<app-attendance-temporal-nav
+			mode="month"
+			[currentDate]="monthDate()"
+			(previous)="onPreviousMonth()"
+			(next)="onNextMonth()"
+		/>
 		<app-empty-state message="No se encontraron profesores en el mes seleccionado." />
 	}
 } @else {

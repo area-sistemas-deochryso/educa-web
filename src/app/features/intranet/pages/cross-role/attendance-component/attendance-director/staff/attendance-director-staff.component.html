@@ -93,6 +93,12 @@
 			(hijoChange)="selectPerson($event)"
 		/>
 	} @else {
+		<app-attendance-temporal-nav
+			mode="month"
+			[currentDate]="monthDate()"
+			(previous)="onPreviousMonth()"
+			(next)="onNextMonth()"
+		/>
 		<app-empty-state message="No se encontraron registros de asistencia." />
 	}
 } @else {
