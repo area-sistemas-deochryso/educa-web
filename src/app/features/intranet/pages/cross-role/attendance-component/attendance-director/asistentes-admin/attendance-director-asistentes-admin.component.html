@@ -1,17 +1,147 @@
 <!-- #region Template -->
-<!-- * Plan 28 Chat 4b-tab: día-only para AAs (mes pendiente de endpoint paginado en BE). -->
-<app-attendance-legend-stats [estadisticas]="estadisticasDia()" [(activeStatus)]="activeStatus" />
+@if (viewMode() === 'mes') {
+	<!-- * Unified filter bar for month view -->
+	<div class="filters-bar">
+		<div class="search-box">
+			<i class="pi pi-search"></i>
+			<input
+				type="text"
+				pInputText
+				[ngModel]="monthSearchTerm()"
+				(ngModelChange)="monthSearchTerm.set($event)"
+				(focus)="onMonthSearchFocus()"
+				(blur)="onMonthSearchBlur()"
+				placeholder="Buscar por nombre o DNI..."
+				class="search-input"
+				aria-label="Buscar persona por nombre o DNI"
+			/>
+			@if (monthSearchTerm()) {
+				<button
+					type="button"
+					class="clear-btn"
+					(click)="monthSearchTerm.set(''); onMonthSearchFocus()"
+					aria-label="Limpiar búsqueda"
+				>
+					<i class="pi pi-times"></i>
+				</button>
+			}
+			@if (monthShowSuggestions() && monthFilteredPeople().length > 0) {
+				<ul class="search-suggestions">
+					@for (person of monthFilteredPeople(); track person.estudianteId) {
+						<li
+							[class.active]="person.estudianteId === selectedPersonId()"
+							(mousedown)="selectPersonFromSearch(person.estudianteId)"
+						>
+							<span class="student-name">{{ person.nombreCompleto }}</span>
+							<span class="student-dni">{{ person.dni }}</span>
+						</li>
+					}
+				</ul>
+			}
+		</div>
 
-<app-attendance-persona-day-list
-	[personas]="personasDia()"
-	[fecha]="fechaDia()"
-	[estadisticas]="estadisticasDia()"
-	[activeStatus]="activeStatus()"
-	[loading]="loading()"
-	[showPdfButton]="false"
-	[allowJustify]="false"
-	[showEditAdminAction]="true"
-	(fechaChange)="onFechaDiaChange($event)"
-	(editAdmin)="onEditarEnAdminDia($event)"
-/>
+		@if (selectedPerson()) {
+			<p-button
+				icon="pi pi-pencil"
+				severity="info"
+				[text]="true"
+				[rounded]="true"
+				(onClick)="onEditarEnAdminMes()"
+				pTooltip="Editar asistencia en admin"
+				tooltipPosition="top"
+				[pt]="{ root: { 'aria-label': 'Editar asistencia en admin' } }"
+			/>
+		}
+		<p-button
+			icon="pi pi-chart-bar"
+			severity="secondary"
+			[text]="true"
+			[rounded]="true"
+			(onClick)="navigateToReportes()"
+			pTooltip="Reportes de asistencia"
+			tooltipPosition="top"
+			[pt]="{ root: { 'aria-label': 'Reportes de asistencia' } }"
+		/>
+	</div>
+
+	<app-attendance-legend-stats [estadisticas]="legendStats()" [(activeStatus)]="activeStatus" />
+
+	@if (!tableReady()) {
+		<app-attendance-table-skeleton />
+		<app-attendance-table-skeleton />
+	} @else if (asistentesMes().length > 0 && selectedPerson() && hasMonthData()) {
+		<app-attendance-heatmap
+			[table]="ingresos()"
+			icon="pi pi-sign-in"
+			[showSelector]="false"
+			[hidePersonName]="true"
+
+			[hijos]="peopleAsHijos()"
+			[selectedHijoId]="selectedPersonId()"
+			(monthChange)="onIngresosMonthChange($event)"
+			(hijoChange)="selectPerson($event)"
+		/>
+		<app-attendance-heatmap
+			[table]="salidas()"
+			icon="pi pi-sign-out"
+			[hidePersonName]="true"
+
+			[showSelector]="false"
+			[hijos]="peopleAsHijos()"
+			[selectedHijoId]="selectedPersonId()"
+			(monthChange)="onSalidasMonthChange($event)"
+			(hijoChange)="selectPerson($event)"
+		/>
+	} @else {
+		<app-empty-state message="No se encontraron registros de asistencia." />
+	}
+} @else {
+	<app-attendance-persona-day-list
+		[personas]="personasDia()"
+		[fecha]="fechaDia()"
+		[estadisticas]="legendStats()"
+		[activeStatus]="activeStatus()"
+		[loading]="loading()"
+		[showPdfButton]="false"
+		[hideTemporalNav]="true"
+		[allowJustify]="false"
+		[showEditAdminAction]="true"
+		(fechaChange)="onFechaDiaChange($event)"
+		(editAdmin)="onEditarEnAdminDia($event)"
+	>
+		<ng-container actionsSlot>
+			<p-button
+				icon="pi pi-pencil"
+				severity="info"
+				[text]="true"
+				[rounded]="true"
+				(onClick)="navigateToGestion()"
+				pTooltip="Gestión de asistencia"
+				tooltipPosition="top"
+				[pt]="{ root: { 'aria-label': 'Gestión de asistencia' } }"
+			/>
+			<p-button
+				icon="pi pi-chart-bar"
+				severity="secondary"
+				[text]="true"
+				[rounded]="true"
+				(onClick)="navigateToReportes()"
+				pTooltip="Reportes de asistencia"
+				tooltipPosition="top"
+				[pt]="{ root: { 'aria-label': 'Reportes de asistencia' } }"
+			/>
+		</ng-container>
+		<div subHeaderSlot class="legend-date-row">
+			<app-attendance-legend-stats [estadisticas]="legendStats()" [(activeStatus)]="activeStatus" />
+			<app-attendance-temporal-nav
+				mode="day"
+				[currentDate]="fechaDia()"
+				[maxDate]="today"
+				(previous)="onPreviousDayNav()"
+				(next)="onNextDayNav()"
+				(dateSelect)="onFechaDiaChange($event)"
+			/>
+		</div>
+	</app-attendance-persona-day-list>
+}
 <!-- #endregion -->

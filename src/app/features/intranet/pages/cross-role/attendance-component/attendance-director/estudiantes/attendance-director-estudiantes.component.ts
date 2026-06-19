@@ -1,29 +1,33 @@
 /* eslint-disable max-lines -- Razón: componente orquesta 6 variantes de descarga (día/mes/periodo × salón/consolidado) × 2 formatos (PDF/Excel) + selector grado-sección + justificación. Dispersar en helpers externos fragmentaría la lógica cohesiva del componente. */
 import { StorageService } from '@core/services';
-import { AttendanceStatus, GradoSeccion } from '@data/models';
+import { AttendanceStatus, GradoSeccion, computeStatsFromAsistencias } from '@data/models';
 import { AttendanceService } from '@intranet-shared/services';
 import { downloadBlob, viewBlobInNewTab } from '@core/helpers';
 import { periodoEnMes, filtrarPorPeriodoAcademico } from '@shared/models';
 import { guardedFilter } from '@app/shared/utils';
 import { JustificacionEvent } from '@features/intranet/components/attendance/attendance-day-list/attendance-day-list.component';
-import { ChangeDetectionStrategy, Component, DestroyRef, OnInit, ViewChild, computed, inject, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, DestroyRef, OnInit, ViewChild, computed, effect, inject, signal } from '@angular/core';
+import { Router } from '@angular/router';
 
 import { AttendanceDayListComponent } from '@features/intranet/components/attendance/attendance-day-list/attendance-day-list.component';
 import { AttendanceLegendStatsComponent } from '@features/intranet/components/attendance/attendance-legend-stats/attendance-legend-stats.component';
 import { AttendanceScopeBannerComponent } from '@intranet-shared/components/attendance-scope-banner';
 import { esGradoAsistenciaDiaria } from '@shared/constants';
-import { AttendanceTableComponent } from '@features/intranet/components/attendance/attendance-table/attendance-table.component';
+import { AttendanceHeatmapComponent, HeatmapCellClick } from '@features/intranet/components/attendance/attendance-heatmap/attendance-heatmap.component';
+import { AttendanceTemporalNavComponent } from '@features/intranet/components/attendance/attendance-temporal-nav/attendance-temporal-nav.component';
+import { JustificationDialogComponent, JustificationResult } from '@features/intranet/components/attendance/justification-dialog/justification-dialog.component';
 import { AttendanceTableSkeletonComponent } from '@features/intranet/components/attendance/attendance-table-skeleton/attendance-table-skeleton.component';
 import { AttendanceViewController } from '@features/intranet/services/attendance/attendance-view.service';
 import { SelectorContext } from '@features/intranet/services/attendance/attendance-view.models';
 import { AttendancePdfService } from '@features/intranet/services/attendance/attendance-pdf.service';
 import { AttendanceStatsService } from '@features/intranet/services/attendance/attendance-stats.service';
-import { ViewMode } from '@features/intranet/components/attendance/attendance-header/attendance-header.component';
+import { VIEW_MODE, ViewMode } from '@features/intranet/components/attendance/attendance-header/attendance-header.component';
 import { ButtonModule } from 'primeng/button';
 import { DatePipe } from '@angular/common';
 import { EmptyStateComponent } from '@features/intranet/components/attendance/empty-state/empty-state.component';
 import { FormsModule } from '@angular/forms';
 import { GradoSeccionSelectorComponent } from '@features/intranet/components/attendance/grado-seccion-selector/grado-seccion-selector.component';
+import { InputTextModule } from 'primeng/inputtext';
 import { Menu, MenuModule } from 'primeng/menu';
 import { MenuItem } from 'primeng/api';
 import { Select } from 'primeng/select';
@@ -52,16 +56,19 @@ import {
 	selector: 'app-attendance-director-estudiantes',
 	standalone: true,
 	imports: [
-		AttendanceTableComponent,
+		AttendanceHeatmapComponent,
+		AttendanceTemporalNavComponent,
 		AttendanceTableSkeletonComponent,
 		GradoSeccionSelectorComponent,
 		AttendanceDayListComponent,
 		EmptyStateComponent,
 		AttendanceLegendStatsComponent,
 		AttendanceScopeBannerComponent,
+		JustificationDialogComponent,
 		ButtonModule,
 		TooltipModule,
 		MenuModule,
+		InputTextModule,
 		Select,
 		SelectButton,
 		FormsModule,
@@ -74,18 +81,86 @@ import {
 })
 export class AttendanceDirectorEstudiantesComponent implements OnInit {
 	@ViewChild('pdfMenu') pdfMenu!: Menu;
+	@ViewChild(JustificationDialogComponent) justificationDialog!: JustificationDialogComponent;
 
 	private asistenciaService = inject(AttendanceService);
 	private storage = inject(StorageService);
 	private destroyRef = inject(DestroyRef);
+	private router = inject(Router);
 	readonly view = inject(AttendanceViewController);
 
 	// #region Tipo de reporte
 	readonly tipoReporteOptions: TipoReporteGroup[] = TIPO_REPORTE_OPTIONS;
 	readonly tipoReporte = signal<TipoReporte>('salon-dia');
 	readonly activeStatus = signal<AttendanceStatus | null>(null);
+	readonly legendStats = computed(() => {
+		if (this.view.viewMode() !== VIEW_MODE.Mes) return this.view.estadisticasDia();
+		const est = this.view.selectedEstudiante();
+		return est ? computeStatsFromAsistencias(est.asistencias) : this.view.estadisticasDia();
+	});
+	readonly hasMonthData = computed(() => {
+		const ing = this.view.ingresos().counts;
+		const sal = this.view.salidas().counts;
+		return (ing.A + ing.T + ing.F + ing.J) > 0 || (sal.A + sal.T + sal.F + sal.J) > 0;
+	});
+
+	readonly currentMonthDate = computed(() => {
+		const t = this.view.ingresos();
+		return new Date(t.selectedYear, t.selectedMonth - 1, 1);
+	});
+
 	readonly downloadingPdfConsolidado = signal(false);
 	readonly savingJustificacion = signal(false);
+
+	// #region Month search (unified filter bar)
+	readonly monthSearchTerm = signal('');
+	readonly monthShowSuggestions = signal(false);
+
+	readonly monthFilteredStudents = computed(() => {
+		const term = this.monthSearchTerm().toLowerCase().trim();
+		const hijos = this.view.estudiantesAsHijos();
+		if (!term) return hijos;
+		return hijos.filter(h =>
+			h.nombreCompleto.toLowerCase().includes(term) ||
+			(h.dni && h.dni.toLowerCase().includes(term)),
+		);
+	});
+
+	private readonly syncSearchWithSelection = effect(() => {
+		const est = this.view.selectedEstudiante();
+		if (est && !this.monthShowSuggestions()) {
+			this.monthSearchTerm.set(est.nombreCompleto);
+		}
+	});
+
+	onMonthSearchFocus(): void {
+		this.monthSearchTerm.set('');
+		this.monthShowSuggestions.set(true);
+	}
+
+	onMonthSearchBlur(): void {
+		setTimeout(() => {
+			this.monthShowSuggestions.set(false);
+			const est = this.view.selectedEstudiante();
+			if (est) this.monthSearchTerm.set(est.nombreCompleto);
+		}, 200);
+	}
+
+	selectStudentFromSearch(estudianteId: number): void {
+		this.view.selectEstudiante(estudianteId);
+		this.monthShowSuggestions.set(false);
+	}
+
+	onPreviousMonth(): void {
+		const t = this.view.ingresos();
+		this.view.onMonthChange(t.selectedMonth === 1 ? 12 : t.selectedMonth - 1);
+	}
+
+	onNextMonth(): void {
+		const t = this.view.ingresos();
+		this.view.onMonthChange(t.selectedMonth === 12 ? 1 : t.selectedMonth + 1);
+	}
+	// #endregion
 
 	// #endregion
 	// #region Grados y secciones
@@ -239,8 +314,46 @@ export class AttendanceDirectorEstudiantesComponent implements OnInit {
 		});
 	});
 
+	navigateToGestion(): void {
+		this.router.navigate(['/intranet/admin/asistencias'], {
+			queryParams: { tab: 'gestion' },
+		});
+	}
+
+	navigateToReportes(): void {
+		this.router.navigate(['/intranet/admin/asistencias'], {
+			queryParams: { tab: 'reportes' },
+		});
+	}
+
 	togglePdfMenu(event: Event): void {
 		this.pdfMenu.toggle(event);
+	}
+
+	onEditarEnAdminMes(): void {
+		const estudiante = this.view.selectedEstudiante();
+		if (!estudiante) return;
+		this.router.navigate(['/intranet/admin/asistencias'], {
+			queryParams: {
+				tab: 'gestion',
+				tipoPersona: 'E',
+				dni: estudiante.dni,
+			},
+		});
+	}
+
+	readonly today = new Date();
+
+	onPreviousDayNav(): void {
+		const prev = new Date(this.view.fechaDia());
+		prev.setDate(prev.getDate() - 1);
+		this.view.onFechaDiaChange(prev);
+	}
+
+	onNextDayNav(): void {
+		const next = new Date(this.view.fechaDia());
+		next.setDate(next.getDate() + 1);
+		if (next <= this.today) this.view.onFechaDiaChange(next);
 	}
 
 	// #endregion
@@ -251,6 +364,35 @@ export class AttendanceDirectorEstudiantesComponent implements OnInit {
 
 		this.asistenciaService
 			.justificarAsistencia(event.estudianteId, fecha, event.observacion, event.quitar)
+			.pipe(
+				takeUntilDestroyed(this.destroyRef),
+				finalize(() => this.savingJustificacion.set(false)),
+			)
+			.subscribe({
+				next: (response) => {
+					if (response.success) {
+						this.view.reload();
+					}
+				},
+			});
+	}
+
+	onHeatmapCellClick(event: HeatmapCellClick): void {
+		const estudiante = this.view.selectedEstudiante();
+		if (!estudiante) return;
+		this.justificationDialog.open({
+			personId: estudiante.estudianteId,
+			personName: estudiante.nombreCompleto,
+			personDni: estudiante.dni,
+			date: event.date,
+			isJustified: event.status === 'J',
+		});
+	}
+
+	onJustifyFromHeatmap(result: JustificationResult): void {
+		this.savingJustificacion.set(true);
+		this.asistenciaService
+			.justificarAsistencia(result.personId, result.date, result.observacion, result.quitar)
 			.pipe(
 				takeUntilDestroyed(this.destroyRef),
 				finalize(() => this.savingJustificacion.set(false)),

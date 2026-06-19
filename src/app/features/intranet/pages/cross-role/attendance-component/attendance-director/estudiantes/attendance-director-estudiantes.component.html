@@ -1,10 +1,4 @@
 <!-- #region Template -->
-<!-- * Legend + live stats fused — clickeable para filtrar tabla -->
-<app-attendance-legend-stats
-	[estadisticas]="view.estadisticasDia()"
-	[(activeStatus)]="activeStatus"
-/>
-
 @if (gradosSecciones().length > 0) {
 	<!-- Cowork F-004 · INV-C11 — banner cuando el grado seleccionado está fuera del alcance biométrico -->
 	@if (gradoFueraAlcance()) {
@@ -12,112 +6,120 @@
 	}
 
 	@if (view.viewMode() === 'mes') {
-		<app-grado-seccion-selector
-			[gradosSecciones]="gradosSecciones()"
-			[selectedGradoSeccion]="selectedGradoSeccion()"
-			(gradoSeccionChange)="selectGradoSeccion($event)"
-		/>
-		<!-- * PDF actions below selector (always "Reporte por Salón") -->
-		<div class="pdf-section">
-			<!-- Toggle mes/periodo -->
-			<p-selectButton
-				[options]="view.monthSubModeOptions"
-				[ngModel]="view.monthSubMode()"
-				(ngModelChange)="view.setMonthSubMode($event)"
-				optionLabel="label"
-				optionValue="value"
-				[allowEmpty]="false"
-				styleClass="pdf-mode-toggle"
+		<!-- * Unified filter bar for month view -->
+		<div class="filters-bar">
+			<div class="search-box">
+				<i class="pi pi-search"></i>
+				<input
+					type="text"
+					pInputText
+					[ngModel]="monthSearchTerm()"
+					(ngModelChange)="monthSearchTerm.set($event)"
+					(focus)="onMonthSearchFocus()"
+					(blur)="onMonthSearchBlur()"
+					placeholder="Buscar por nombre o DNI..."
+					class="search-input"
+					aria-label="Buscar estudiante por nombre o DNI"
+				/>
+				@if (monthSearchTerm()) {
+					<button
+						type="button"
+						class="clear-btn"
+						(click)="monthSearchTerm.set(''); onMonthSearchFocus()"
+						aria-label="Limpiar búsqueda"
+					>
+						<i class="pi pi-times"></i>
+					</button>
+				}
+				@if (monthShowSuggestions() && monthFilteredStudents().length > 0) {
+					<ul class="search-suggestions">
+						@for (est of monthFilteredStudents(); track est.estudianteId) {
+							<li
+								[class.active]="est.estudianteId === view.selectedEstudianteId()"
+								(mousedown)="selectStudentFromSearch(est.estudianteId)"
+							>
+								<span class="student-name">{{ est.nombreCompleto }}</span>
+								<span class="student-dni">{{ est.dni }}</span>
+							</li>
+						}
+					</ul>
+				}
+			</div>
+
+			<app-grado-seccion-selector
+				class="inline-selector"
+				[gradosSecciones]="gradosSecciones()"
+				[selectedGradoSeccion]="selectedGradoSeccion()"
+				(gradoSeccionChange)="selectGradoSeccion($event)"
 			/>
 
-			<!-- Grouped: label/selectors + PDF button wrap together -->
-			<div class="pdf-report-info">
-				@if (view.monthSubMode() === 'periodo') {
-					<span class="pdf-label">Periodo:</span>
-					<p-select
-						[options]="view.mesOptionsInicio()"
-						[ngModel]="view.periodoInicio()"
-						(ngModelChange)="view.setPeriodoInicio($event)"
-						optionLabel="label"
-						optionValue="value"
-						appendTo="body"
-						styleClass="periodo-select"
-					/>
-					<span class="periodo-separator">–</span>
-					<p-select
-						[options]="view.mesOptionsFin()"
-						[ngModel]="view.periodoFin()"
-						(ngModelChange)="view.setPeriodoFin($event)"
-						optionLabel="label"
-						optionValue="value"
-						appendTo="body"
-						styleClass="periodo-select"
-					/>
-					<span class="pdf-label">{{ view.periodoYear() }}</span>
-				} @else {
-					<span class="pdf-label">Reporte mensual: {{ view.pdfFecha() | date: 'MMMM yyyy' }}</span>
-				}
-
-				<p-button
-					icon="pi pi-file-pdf"
-					[loading]="view.pdf.downloadingPdf()"
-					[disabled]="!selectedGradoSeccion() || (view.monthSubMode() === 'periodo' && !view.isPeriodoValid())"
-					severity="danger"
-					[text]="true"
-					[rounded]="true"
-					(onClick)="togglePdfMenu($event)"
-					pTooltip="Opciones de PDF"
-					tooltipPosition="top"
-					[pt]="{
-						root: {
-							'aria-label': 'Opciones de PDF',
-						},
-					}"
-				/>
-				<p-menu #pdfMenu [model]="pdfMenuItems()" [popup]="true" appendTo="body" />
-			</div>
+			<p-button
+				icon="pi pi-pencil"
+				severity="info"
+				[text]="true"
+				[rounded]="true"
+				(onClick)="onEditarEnAdminMes()"
+				pTooltip="Editar asistencia en admin"
+				tooltipPosition="top"
+				[pt]="{ root: { 'aria-label': 'Editar asistencia en admin' } }"
+			/>
+			<p-button
+				icon="pi pi-chart-bar"
+				severity="secondary"
+				[text]="true"
+				[rounded]="true"
+				(onClick)="navigateToReportes()"
+				pTooltip="Reportes de asistencia"
+				tooltipPosition="top"
+				[pt]="{ root: { 'aria-label': 'Reportes de asistencia' } }"
+			/>
 		</div>
-	}
 
-	@if (view.viewMode() === 'mes') {
+		<app-attendance-legend-stats
+			[estadisticas]="legendStats()"
+			[(activeStatus)]="activeStatus"
+		/>
+
 		@if (view.showSkeletons() && !view.tableReady()) {
-			<!-- * Skeleton: reserve space while data loads -->
 			<app-attendance-table-skeleton />
 			<app-attendance-table-skeleton />
-		} @else if (view.estudiantes().length > 0) {
-			<!-- * Month tables: ingresos and salidas -->
-			<app-attendance-table
+		} @else if (view.estudiantes().length > 0 && hasMonthData()) {
+			<app-attendance-heatmap
 				[table]="view.ingresos()"
+				icon="pi pi-sign-in"
+				[allowCellClick]="true"
+				[showSelector]="false"
+				[hidePersonName]="true"
 				[hijos]="view.estudiantesAsHijos()"
 				[selectedHijoId]="view.selectedEstudianteId()"
 				(monthChange)="view.onIngresosMonthChange($event)"
 				(hijoChange)="view.selectEstudiante($event)"
+				(cellClick)="onHeatmapCellClick($event)"
 			/>
-			<app-attendance-table
+			<app-attendance-heatmap
 				[table]="view.salidas()"
+				icon="pi pi-sign-out"
+				[allowCellClick]="true"
+				[showSelector]="false"
+				[hidePersonName]="true"
 				[hijos]="view.estudiantesAsHijos()"
 				[selectedHijoId]="view.selectedEstudianteId()"
 				(monthChange)="view.onSalidasMonthChange($event)"
 				(hijoChange)="view.selectEstudiante($event)"
+				(cellClick)="onHeatmapCellClick($event)"
 			/>
 		} @else if (!view.loading()) {
-			<!-- ! Empty state after load -->
-			<app-empty-state message="No se encontraron estudiantes en este grado/sección." />
+			<app-empty-state message="Sin datos de asistencia en este mes." />
 		}
 	} @else {
-		<!-- * Day mode list with date picker + PDF options + tipo de reporte selector -->
 		<app-attendance-day-list
 			[estudiantes]="view.estudiantesDia()"
 			[fecha]="view.fechaDia()"
-			[estadisticas]="view.estadisticasDia()"
+			[estadisticas]="legendStats()"
 			[activeStatus]="activeStatus()"
 			[loading]="view.loading()"
-			[showPdfButton]="true"
-			[downloadingPdf]="tipoReporte().startsWith('salon-') ? view.pdf.downloadingPdf() : downloadingPdfConsolidado()"
-			[pdfMenuItems]="pdfMenuItems()"
-			[tipoReporteOptions]="tipoReporteOptions"
-			[tipoReporte]="tipoReporte()"
-			(tipoReporteChange)="tipoReporte.set($any($event))"
+			[showPdfButton]="false"
+			[hideTemporalNav]="true"
 			[allowJustify]="true"
 			[savingJustificacion]="savingJustificacion()"
 			(fechaChange)="view.onFechaDiaChange($event)"
@@ -129,10 +131,51 @@
 				[selectedGradoSeccion]="selectedGradoSeccion()"
 				(gradoSeccionChange)="selectGradoSeccion($event)"
 			/>
+			<ng-container actionsSlot>
+				<p-button
+					icon="pi pi-pencil"
+					severity="info"
+					[text]="true"
+					[rounded]="true"
+					(onClick)="navigateToGestion()"
+					pTooltip="Gestión de asistencia"
+					tooltipPosition="top"
+					[pt]="{ root: { 'aria-label': 'Gestión de asistencia' } }"
+				/>
+				<p-button
+					icon="pi pi-chart-bar"
+					severity="secondary"
+					[text]="true"
+					[rounded]="true"
+					(onClick)="navigateToReportes()"
+					pTooltip="Reportes de asistencia"
+					tooltipPosition="top"
+					[pt]="{ root: { 'aria-label': 'Reportes de asistencia' } }"
+				/>
+			</ng-container>
+			<div subHeaderSlot class="legend-date-row">
+				<app-attendance-legend-stats
+					[estadisticas]="legendStats()"
+					[(activeStatus)]="activeStatus"
+				/>
+				<app-attendance-temporal-nav
+					mode="day"
+					[currentDate]="view.fechaDia()"
+					[maxDate]="today"
+					(previous)="onPreviousDayNav()"
+					(next)="onNextDayNav()"
+					(dateSelect)="view.onFechaDiaChange($event)"
+				/>
+			</div>
 		</app-attendance-day-list>
 	}
 } @else if (!view.loading()) {
 	<!-- ! No available grade/section data -->
 	<app-empty-state message="No hay grados/secciones disponibles." />
 }
+
+<app-justification-dialog
+	[saving]="savingJustificacion()"
+	(justify)="onJustifyFromHeatmap($event)"
+/>
 <!-- #endregion -->

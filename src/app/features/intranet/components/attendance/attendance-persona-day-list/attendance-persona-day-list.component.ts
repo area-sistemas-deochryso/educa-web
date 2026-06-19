@@ -32,6 +32,7 @@ import { FormatTimePipe } from '@intranet-shared/pipes';
 import { getStatusClass } from '@features/intranet/pages/cross-role/attendance-component/config/attendance.constants';
 import { InputTextModule } from 'primeng/inputtext';
 import { AttendanceTemporalNavComponent } from '../attendance-temporal-nav/attendance-temporal-nav.component';
+import { EmptyStateComponent } from '../empty-state/empty-state.component';
 
 export interface PersonaAsistenciaDia {
 	personaId: number;
@@ -73,6 +74,7 @@ export interface JustificacionPersonaEvent {
 		FormatTimePipe,
 		InputTextModule,
 		AttendanceTemporalNavComponent,
+		EmptyStateComponent,
 	],
 	templateUrl: './attendance-persona-day-list.component.html',
 	styleUrl: './attendance-persona-day-list.component.scss',
@@ -95,6 +97,7 @@ export class AttendancePersonaDayListComponent {
 	readonly tipoReporte = input<string>('salon');
 	readonly showEditAdminAction = input<boolean>(false);
 	readonly activeStatus = input<AttendanceStatus | null>(null);
+	readonly hideTemporalNav = input(false);
 
 	// * Outputs
 	readonly fechaChange = output<Date>();
@@ -143,6 +146,10 @@ export class AttendancePersonaDayListComponent {
 	// * Computed: map raw personas to daily status rows
 	readonly personasDelDia = computed<PersonaAsistenciaDia[]>(() =>
 		this.personas().map((p) => this.mapPersonaAsistencia(p)),
+	);
+
+	readonly hasDayData = computed(() =>
+		this.personasDelDia().some((p) => p.estadoCodigo !== 'X' && p.estadoCodigo !== '-'),
 	);
 
 	readonly filteredPersonas = computed<PersonaAsistenciaDia[]>(() => {

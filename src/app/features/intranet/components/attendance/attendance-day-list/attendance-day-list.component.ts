@@ -28,6 +28,7 @@ import { getStatusClass } from '@features/intranet/pages/cross-role/attendance-c
 import { AttendanceStatus } from '@features/intranet/pages/cross-role/attendance-component/models/attendance.types';
 import { InputTextModule } from 'primeng/inputtext';
 import { AttendanceTemporalNavComponent } from '../attendance-temporal-nav/attendance-temporal-nav.component';
+import { EmptyStateComponent } from '../empty-state/empty-state.component';
 
 export interface EstudianteAsistenciaDia {
 	estudianteId: number;
@@ -67,6 +68,7 @@ export interface JustificacionEvent {
 		FormatTimePipe,
 		InputTextModule,
 		AttendanceTemporalNavComponent,
+		EmptyStateComponent,
 	],
 	templateUrl: './attendance-day-list.component.html',
 	styleUrl: './attendance-day-list.component.scss',
@@ -86,6 +88,7 @@ export class AttendanceDayListComponent {
 	readonly tipoReporteOptions = input<{ label: string; items: { label: string; value: string }[] }[]>([]);
 	readonly tipoReporte = input<string>('salon');
 	readonly activeStatus = input<AttendanceStatus | null>(null);
+	readonly hideTemporalNav = input(false);
 
 	// * Outputs
 	readonly fechaChange = output<Date>();
@@ -128,6 +131,10 @@ export class AttendanceDayListComponent {
 	// * Computed: map raw students to daily status rows
 	readonly estudiantesDelDia = computed<EstudianteAsistenciaDia[]>(() =>
 		this.estudiantes().map((e) => this.mapEstudianteAsistencia(e)),
+	);
+
+	readonly hasDayData = computed(() =>
+		this.estudiantesDelDia().some((e) => e.estadoCodigo !== 'X' && e.estadoCodigo !== '-'),
 	);
 
 	readonly filteredEstudiantes = computed<EstudianteAsistenciaDia[]>(() => {
