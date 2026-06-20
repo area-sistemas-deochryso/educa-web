@@ -27,8 +27,14 @@ import {
 // #endregion
 
 // #region Types — locales del componente
+interface HubQueryParams {
+	from: 'hub';
+	level?: string;
+}
+
 interface RenderedTile extends DomainTile {
 	badge: LinkBadge | null;
+	hubParams: HubQueryParams;
 }
 
 interface RenderedDomain {
@@ -85,10 +91,14 @@ export class MonitoreoHubComponent {
 		return DOMAINS.map((domain) => {
 			const tiles = domain.tiles
 				.filter((t) => this.tileVisible(t))
-				.map<RenderedTile>((t) => ({
-					...t,
-					badge: t.badgeKey ? badges[t.badgeKey] : null,
-				}));
+				.map<RenderedTile>((t) => {
+					const badge = t.badgeKey ? badges[t.badgeKey] : null;
+					const hubParams: HubQueryParams = { from: 'hub' };
+					if (badge?.level && badge.level !== 'ok' && badge.level !== 'unknown') {
+						hubParams.level = badge.level;
+					}
+					return { ...t, badge, hubParams };
+				});
 			const hasAlert = tiles.some(
 				(t) => t.badge?.level === 'critical' || t.badge?.level === 'warn',
 			);

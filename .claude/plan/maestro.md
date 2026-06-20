@@ -79,11 +79,11 @@ Planes cross-repo con sub-chats FE pendientes: **41** (Correlation Hub F3-F6), *
 | 10 | F8 | Design Patterns BE | Aplicar al tocar módulos BE | incremental |
 | 11 | F9 | Design Patterns FE | Aplicar al tocar módulos FE | incremental |
 
-**Siguiente accionable**: coord bloque admin/academic (P63, P65, P66, P62 F2-F3). Alternativa FE-local: **xP41** F3 BE (persist request lifecycle). P50 F2 ✅ closed (305).
+**Siguiente accionable**: **P50 F3a** (brief 331 — SwService move to @core). Alternativa: **xP41** F3 BE (persist request lifecycle). Admin block cerrado (P62-P66 ✅/descartado).
 
 ### 🟣 Verificaciones post-deploy (`/verify <NNN>`)
 
-13 briefs en `awaiting-prod/`:
+16 briefs en `awaiting-prod/`:
 
 | Brief | Scope |
 |-------|-------|
@@ -100,11 +100,15 @@ Planes cross-repo con sub-chats FE pendientes: **41** (Correlation Hub F3-F6), *
 | `298` | Heatmap: period selector week/month + calendar grid |
 | `303` | P43 F6.3 FE: gap panel salon filter + export + profile link |
 | `304` | P43 F6.3 FE: student gap profile page |
+| `321` | P64 F5: schedule grid redesign |
+| `330` | P67: runtime health alerts + diagnostics FE |
+| `330` | P67: runtime health persistence + insights |
 
 ### Notas operativas
 
-- **`running/`**: vacío · **`open/`**: 3 briefs (262×2, 301) · **`awaiting-prod/`**: 14 briefs (added 321 P64-F5) · **`waiting/`**: vacío · **`troubles/`**: vacío
+- **`running/`**: vacío · **`open/`**: 7 briefs (262×2, 301, 329, 330, 331, 332) · **`awaiting-prod/`**: 16 briefs · **`waiting/`**: 1 (328) · **`troubles/`**: vacío
 - **Último cierre**: 308 (formal roles consume endpoint) → closed/ 2026-06-09. P50 F2 brief 305 → closed/.
+- **⚠️ Brief 330 duplicado**: `330-fe-runtime-health-alerts-diagnostics.md` existe en `open/` Y `awaiting-prod/`. Verificar si el de `open/` es stale.
 - **Último saneamiento**: 2026-06-09 — cross-repo sync: purged 66 closed briefs (≤129, >30d). Moved 269 to closed (P28 stale). Removed xP42/xP45/xP52/xP54 from INDEX (archived in coord).
 
 ---
