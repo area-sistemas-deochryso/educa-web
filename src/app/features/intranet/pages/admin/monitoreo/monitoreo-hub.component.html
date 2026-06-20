@@ -89,6 +89,7 @@
 						@for (tile of domain.tiles; track tile.route) {
 							<a
 								[routerLink]="tile.route"
+								[queryParams]="tile.hubParams"
 								class="tile"
 								[attr.data-level]="tile.badge?.level ?? 'unknown'"
 								[attr.data-tone]="domain.tone"

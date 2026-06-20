@@ -1,140 +1,119 @@
 // #region Imports
-import { Routes } from '@angular/router';
+import { Route, Routes } from '@angular/router';
 
 import { authGuard, permissionsGuard } from '@core/guards';
 import { environment } from '@config/environment';
+
+import { DomainId } from './models/monitoreo-hub-badges.models';
+import { DOMAINS } from './monitoreo-hub.catalog';
 // #endregion
 
-// #region Children — Correos shell (4 tabs)
-const CORREOS_CHILDREN: Routes = [
-	{ path: '', redirectTo: 'bandeja', pathMatch: 'full' },
-	{
-		path: 'bandeja',
+// #region Route config per tab slug
+interface TabRouteConfig {
+	loadComponent: Route['loadComponent'];
+	title: string;
+}
+
+const CORREOS_TAB_ROUTES: Record<string, TabRouteConfig> = {
+	bandeja: {
 		loadComponent: () =>
 			import('../email-outbox').then((m) => m.EmailOutboxComponent),
-		canActivate: [authGuard, permissionsGuard],
-		data: { permissionPath: 'intranet/admin/monitoreo/correos/bandeja' },
 		title: 'Intranet - Bandeja de Correos',
 	},
-	...(environment.features.emailOutboxDashboardDia
-		? [
-				{
-					path: 'dashboard',
-					loadComponent: () =>
-						import('../email-outbox-dashboard-dia').then(
-							(m) => m.EmailOutboxDashboardDiaComponent,
-						),
-					canActivate: [authGuard, permissionsGuard],
-					data: { permissionPath: 'intranet/admin/monitoreo/correos/dashboard' },
-					title: 'Intranet - Dashboard de Correos',
-				},
-			]
-		: []),
-	...(environment.features.emailOutboxDiagnostico
-		? [
-				{
-					path: 'diagnostico',
-					loadComponent: () =>
-						import('../email-outbox-diagnostico').then(
-							(m) => m.EmailOutboxDiagnosticoComponent,
-						),
-					canActivate: [authGuard, permissionsGuard],
-					data: { permissionPath: 'intranet/admin/monitoreo/correos/diagnostico' },
-					title: 'Intranet - Diagnóstico de Correos',
-				},
-			]
-		: []),
-	...(environment.features.auditoriaCorreos
-		? [
-				{
-					path: 'auditoria',
-					loadComponent: () =>
-						import('../auditoria-correos').then((m) => m.AuditoriaCorreosComponent),
-					canActivate: [authGuard, permissionsGuard],
-					data: { permissionPath: 'intranet/admin/monitoreo/correos/auditoria' },
-					title: 'Intranet - Auditoría de Correos',
-				},
-			]
-		: []),
-	...(environment.features.emailBlacklistTab
-		? [
-				{
-					path: 'blacklist',
-					loadComponent: () =>
-						import('../email-outbox/components/blacklist-tab/blacklist-tab.component').then(
-							(m) => m.BlacklistTabComponent,
-						),
-					canActivate: [authGuard, permissionsGuard],
-					data: { permissionPath: 'intranet/admin/monitoreo/correos/blacklist' },
-					title: 'Intranet - Blacklist de Correos',
-				},
-			]
-		: []),
-	...(environment.features.emailQuarantineTab
-		? [
-				{
-					path: 'quarantine',
-					loadComponent: () =>
-						import(
-							'../email-outbox/components/quarantine-tab/quarantine-tab.component'
-						).then((m) => m.QuarantineTabComponent),
-					canActivate: [authGuard, permissionsGuard],
-					data: { permissionPath: 'intranet/admin/monitoreo/correos/quarantine' },
-					title: 'Intranet - Cuarentena de Correos',
-				},
-			]
-		: []),
-	...(environment.features.emailDomainPausesTab
-		? [
-				{
-					path: 'domain-pauses',
-					loadComponent: () =>
-						import(
-							'../email-outbox/components/domain-pauses-tab/domain-pauses-tab.component'
-						).then((m) => m.DomainPausesTabComponent),
-					canActivate: [authGuard, permissionsGuard],
-					data: { permissionPath: 'intranet/admin/monitoreo/correos/domain-pauses' },
-					title: 'Intranet - Dominios Pausados',
-				},
-			]
-		: []),
-	...(environment.features.emailDeferEventsTab
-		? [
-				{
-					path: 'defer-events',
-					loadComponent: () =>
-						import(
-							'../email-outbox/components/defer-events-tab/defer-events-tab.component'
-						).then((m) => m.DeferEventsTabComponent),
-					canActivate: [authGuard, permissionsGuard],
-					data: { permissionPath: 'intranet/admin/monitoreo/correos/defer-events' },
-					title: 'Intranet - Eventos Defer',
-				},
-			]
-		: []),
-];
-// #endregion
+	dashboard: {
+		loadComponent: () =>
+			import('../email-outbox-dashboard-dia').then(
+				(m) => m.EmailOutboxDashboardDiaComponent,
+			),
+		title: 'Intranet - Dashboard de Correos',
+	},
+	diagnostico: {
+		loadComponent: () =>
+			import('../email-outbox-diagnostico').then(
+				(m) => m.EmailOutboxDiagnosticoComponent,
+			),
+		title: 'Intranet - Diagnóstico de Correos',
+	},
+	auditoria: {
+		loadComponent: () =>
+			import('../auditoria-correos').then((m) => m.AuditoriaCorreosComponent),
+		title: 'Intranet - Auditoría de Correos',
+	},
+	blacklist: {
+		loadComponent: () =>
+			import('../email-outbox/components/blacklist-tab/blacklist-tab.component').then(
+				(m) => m.BlacklistTabComponent,
+			),
+		title: 'Intranet - Blacklist de Correos',
+	},
+	quarantine: {
+		loadComponent: () =>
+			import(
+				'../email-outbox/components/quarantine-tab/quarantine-tab.component'
+			).then((m) => m.QuarantineTabComponent),
+		title: 'Intranet - Cuarentena de Correos',
+	},
+	'domain-pauses': {
+		loadComponent: () =>
+			import(
+				'../email-outbox/components/domain-pauses-tab/domain-pauses-tab.component'
+			).then((m) => m.DomainPausesTabComponent),
+		title: 'Intranet - Dominios Pausados',
+	},
+	'defer-events': {
+		loadComponent: () =>
+			import(
+				'../email-outbox/components/defer-events-tab/defer-events-tab.component'
+			).then((m) => m.DeferEventsTabComponent),
+		title: 'Intranet - Eventos Defer',
+	},
+};
 
-// #region Children — Incidencias shell (2 tabs)
-const INCIDENCIAS_CHILDREN: Routes = [
-	{ path: '', redirectTo: 'errores', pathMatch: 'full' },
-	{
-		path: 'errores',
+const INCIDENCIAS_TAB_ROUTES: Record<string, TabRouteConfig> = {
+	errores: {
 		loadComponent: () =>
 			import('../error-groups').then((m) => m.ErrorGroupsComponent),
-		canActivate: [authGuard, permissionsGuard],
-		data: { permissionPath: 'intranet/admin/monitoreo/incidencias/errores' },
 		title: 'Intranet - Trazabilidad de Errores',
 	},
-	{
-		path: 'reportes',
+	reportes: {
 		loadComponent: () =>
 			import('../feedback-reports').then((m) => m.FeedbackReportsComponent),
-		canActivate: [authGuard, permissionsGuard],
-		data: { permissionPath: 'intranet/admin/monitoreo/incidencias/reportes' },
 		title: 'Intranet - Reportes de Usuarios',
 	},
-];
+};
+// #endregion
+
+// #region Builder — genera children desde catálogo + route configs
+function buildDomainChildren(
+	domainId: DomainId,
+	tabRoutes: Record<string, TabRouteConfig>,
+): Routes {
+	const domain = DOMAINS.find((d) => d.id === domainId);
+	if (!domain) return [];
+
+	const firstSlug = domain.tiles[0]?.route.split('/').pop() ?? '';
+	const children: Routes = [
+		{ path: '', redirectTo: firstSlug, pathMatch: 'full' },
+	];
+
+	for (const tile of domain.tiles) {
+		if (tile.featureFlag && !environment.features[tile.featureFlag]) continue;
+
+		const slug = tile.route.split('/').pop() ?? '';
+		const config = tabRoutes[slug];
+		if (!config) continue;
+
+		children.push({
+			path: slug,
+			loadComponent: config.loadComponent,
+			canActivate: [authGuard, permissionsGuard],
+			data: { permissionPath: `intranet/admin/monitoreo/${domainId}/${slug}` },
+			title: config.title,
+		});
+	}
+
+	return children;
+}
 // #endregion
 
 // #region Routes
@@ -168,16 +147,20 @@ export default [
 	{
 		path: 'correos',
 		loadComponent: () =>
-			import('./shells/correos-shell.component').then((m) => m.CorreosShellComponent),
-		children: CORREOS_CHILDREN,
+			import('./shells/monitoreo-shell.component').then(
+				(m) => m.MonitoreoShellComponent,
+			),
+		data: { domainId: 'correos' as DomainId, permissionPath: 'intranet/admin/monitoreo' },
+		children: buildDomainChildren('correos', CORREOS_TAB_ROUTES),
 	},
 	{
 		path: 'incidencias',
 		loadComponent: () =>
-			import('./shells/incidencias-shell.component').then(
-				(m) => m.IncidenciasShellComponent,
+			import('./shells/monitoreo-shell.component').then(
+				(m) => m.MonitoreoShellComponent,
 			),
-		children: INCIDENCIAS_CHILDREN,
+		data: { domainId: 'incidencias' as DomainId, permissionPath: 'intranet/admin/monitoreo' },
+		children: buildDomainChildren('incidencias', INCIDENCIAS_TAB_ROUTES),
 	},
 	...(environment.features.rateLimitMonitoring
 		? [
