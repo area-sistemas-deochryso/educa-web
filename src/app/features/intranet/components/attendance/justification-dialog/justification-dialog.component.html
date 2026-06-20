@@ -1,0 +1,65 @@
+<p-dialog
+	[visible]="visible()"
+	(visibleChange)="onVisibleChange($event)"
+	[modal]="true"
+	[draggable]="false"
+	[resizable]="false"
+	[closable]="true"
+	[header]="context()?.isJustified ? 'Editar Justificación' : 'Justificar Asistencia'"
+	styleClass="justificacion-dialog"
+	[style]="{ width: '450px' }"
+	appendTo="body"
+>
+	@if (context(); as ctx) {
+		<div class="dialog-content">
+			<div class="person-header">
+				<div class="avatar">
+					<i class="pi pi-user"></i>
+				</div>
+				<div class="info">
+					<span class="nombre">{{ ctx.personName }}</span>
+					<span class="fecha">{{ formatDate(ctx.date) }}</span>
+				</div>
+			</div>
+
+			<div class="field">
+				<label for="observacion">Motivo de la justificación <span class="required">*</span></label>
+				<textarea
+					pTextarea
+					id="observacion"
+					rows="4"
+					[ngModel]="observacionText()"
+					(ngModelChange)="observacionText.set($event)"
+					placeholder="Ingrese el motivo de la justificación (ej: Cita médica, motivo familiar, etc.)"
+					class="w-full"
+				></textarea>
+			</div>
+
+			<div class="dialog-footer">
+				@if (ctx.isJustified) {
+					<p-button
+						label="Quitar justificación"
+						severity="danger"
+						[text]="true"
+						icon="pi pi-trash"
+						[loading]="saving()"
+						(onClick)="quitar()"
+					/>
+				}
+				<p-button
+					label="Cancelar"
+					severity="secondary"
+					[text]="true"
+					(onClick)="close()"
+				/>
+				<p-button
+					label="Guardar"
+					icon="pi pi-check"
+					[loading]="saving()"
+					[disabled]="!observacionText().trim()"
+					(onClick)="guardar()"
+				/>
+			</div>
+		</div>
+	}
+</p-dialog>

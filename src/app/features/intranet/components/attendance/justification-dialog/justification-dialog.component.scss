@@ -1,0 +1,61 @@
+.dialog-content {
+	display: flex;
+	flex-direction: column;
+	gap: 1rem;
+}
+
+.person-header {
+	display: flex;
+	align-items: center;
+	gap: 0.75rem;
+	padding: 0.5rem;
+	background: var(--surface-ground);
+	border-radius: 8px;
+
+	.avatar {
+		width: 40px;
+		height: 40px;
+		border-radius: 50%;
+		background: var(--primary-color);
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		color: white;
+		font-size: 1.1rem;
+	}
+
+	.info {
+		display: flex;
+		flex-direction: column;
+
+		.nombre {
+			font-weight: 600;
+			font-size: 0.9rem;
+		}
+
+		.fecha {
+			font-size: 0.8rem;
+			color: var(--text-color-secondary);
+		}
+	}
+}
+
+.field {
+	label {
+		display: block;
+		margin-bottom: 0.5rem;
+		font-weight: 500;
+		font-size: 0.85rem;
+
+		.required {
+			color: var(--red-500);
+		}
+	}
+}
+
+.dialog-footer {
+	display: flex;
+	justify-content: flex-end;
+	gap: 0.5rem;
+	padding-top: 0.5rem;
+}
