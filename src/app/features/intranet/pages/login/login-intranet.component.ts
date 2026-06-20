@@ -88,10 +88,10 @@ export class LoginIntranetComponent implements OnInit {
 	roles: RolOption[] = [
 		{ label: 'Estudiante', value: 'Estudiante' },
 		{ label: 'Profesor', value: 'Profesor' },
-		{ label: 'Director', value: 'Director' },
 		{ label: 'Asistente Administrativo', value: 'Asistente Administrativo' },
-		{ label: 'Promotor', value: 'Promotor' },
 		{ label: 'Coordinador Académico', value: 'Coordinador Académico' },
+		{ label: 'Promotor', value: 'Promotor' },
+		{ label: 'Director', value: 'Director' },
 		{ label: 'Administrador', value: 'Administrador' },
 	];
 	// #endregion
