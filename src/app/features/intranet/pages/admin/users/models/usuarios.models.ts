@@ -143,6 +143,7 @@ export interface UsuariosEstadisticas {
 	totalAsistentesAdministrativos: number;
 	totalPromotores: number;
 	totalCoordinadoresAcademicos: number;
+	totalAdministradores: number;
 	totalProfesores: number;
 	totalApoderados: number;
 	totalEstudiantes: number;

@@ -3,7 +3,7 @@
 
 <nav class="submenu">
 	<p-selectButton
-		[options]="submenuOptions"
+		[options]="submenuOptions()"
 		[ngModel]="selectedSubMenu()"
 		(ngModelChange)="setSubMenu($event)"
 		optionLabel="label"
@@ -36,6 +36,9 @@
 	}
 	@case ('directores') {
 		<app-attendance-director-staff #directoresStaff tipoPersona="D" />
+	}
+	@case ('administradores') {
+		<app-attendance-director-staff #administradoresStaff tipoPersona="N" />
 	}
 }
 <!-- #endregion -->

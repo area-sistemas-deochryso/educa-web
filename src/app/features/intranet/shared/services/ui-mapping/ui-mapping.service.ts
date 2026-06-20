@@ -26,6 +26,7 @@ const ROLE_SEVERITY_BY_ROLE: Record<string, Severity> = {
 	[APP_USER_ROLES.Profesor]: 'warn',
 	[APP_USER_ROLES.Apoderado]: 'info',
 	[APP_USER_ROLES.Estudiante]: 'success',
+	[APP_USER_ROLES.Administrador]: 'danger',
 };
 
 // #region Evento Calendario mappings
@@ -79,10 +80,11 @@ const NOTIFICACION_PRIORIDAD_LABEL: Record<NotificacionPrioridad, string> = {
 // #endregion
 
 // #region Tipo Persona (Plan 21 + Plan 28 — 'A' Asistente Administrativo)
-const TIPO_PERSONA_LABEL: Record<TipoPersona, string> = {
+const TIPO_PERSONA_LABEL: Record<string, string> = {
 	E: 'Estudiante',
 	P: 'Profesor',
 	A: 'Asistente Administrativo',
+	N: 'Administrador',
 };
 // #endregion
 

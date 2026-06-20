@@ -1,6 +1,8 @@
-import { ChangeDetectionStrategy, Component, ViewChild, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, ViewChild, computed, inject, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { SelectButton } from 'primeng/selectbutton';
+import { APP_USER_ROLES } from '@app/shared/constants';
+import { UserProfileService } from '@core/services';
 
 import { ViewMode } from '@features/intranet/components/attendance/attendance-header/attendance-header.component';
 
@@ -19,15 +21,23 @@ import { AttendanceDashboardComponent } from '@features/intranet/components/atte
  * Tras Plan 21 Chat 7 + Plan 28 Chat 4b-tab, los tres sub-componentes responden
  * al pill día/mes del header cross-role (mes degradado en AAs hasta endpoint BE).
  */
-type SubMenu = 'estudiantes' | 'profesores' | 'asistentes-admin' | 'coordinadores' | 'promotores' | 'directores';
+type SubMenu = 'estudiantes' | 'profesores' | 'asistentes-admin' | 'coordinadores' | 'promotores' | 'directores' | 'administradores';
 
-const SUBMENU_OPTIONS: { label: string; value: SubMenu; icon: string }[] = [
+interface SubMenuOption {
+	label: string;
+	value: SubMenu;
+	icon: string;
+	visibleFor?: string[];
+}
+
+const SUBMENU_OPTIONS: SubMenuOption[] = [
 	{ label: 'Estudiantes', value: 'estudiantes', icon: 'pi pi-graduation-cap' },
 	{ label: 'Profesores', value: 'profesores', icon: 'pi pi-user' },
 	{ label: 'Asistentes Admin', value: 'asistentes-admin', icon: 'pi pi-id-card' },
 	{ label: 'Coordinadores', value: 'coordinadores', icon: 'pi pi-briefcase' },
 	{ label: 'Promotores', value: 'promotores', icon: 'pi pi-megaphone' },
-	{ label: 'Directores', value: 'directores', icon: 'pi pi-building' },
+	{ label: 'Directores', value: 'directores', icon: 'pi pi-building', visibleFor: [APP_USER_ROLES.Director, APP_USER_ROLES.Administrador] },
+	{ label: 'Administradores', value: 'administradores', icon: 'pi pi-cog', visibleFor: [APP_USER_ROLES.Administrador] },
 ];
 
 @Component({
@@ -47,6 +57,7 @@ const SUBMENU_OPTIONS: { label: string; value: SubMenu; icon: string }[] = [
 	changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class AttendanceDirectorComponent {
+	private readonly userProfile = inject(UserProfileService);
 	@ViewChild(AttendanceDirectorEstudiantesComponent)
 	estudiantesComponent?: AttendanceDirectorEstudiantesComponent;
 
@@ -65,8 +76,14 @@ export class AttendanceDirectorComponent {
 	@ViewChild('directoresStaff')
 	directoresComponent?: AttendanceDirectorStaffComponent;
 
+	@ViewChild('administradoresStaff')
+	administradoresComponent?: AttendanceDirectorStaffComponent;
+
 	readonly selectedSubMenu = signal<SubMenu>('estudiantes');
-	readonly submenuOptions = SUBMENU_OPTIONS;
+	readonly submenuOptions = computed(() => {
+		const role = this.userProfile.userRole();
+		return SUBMENU_OPTIONS.filter((o) => !o.visibleFor || o.visibleFor.includes(role));
+	});
 
 	// * Cache del último modo recibido del header — se reaplica al cambiar de submenú
 	//   para que el sub-componente recién montado respete la elección día/mes del usuario.
@@ -110,6 +127,9 @@ export class AttendanceDirectorComponent {
 			case 'directores':
 				this.directoresComponent?.reload();
 				break;
+			case 'administradores':
+				this.administradoresComponent?.reload();
+				break;
 		}
 	}
 
@@ -134,6 +154,9 @@ export class AttendanceDirectorComponent {
 				break;
 			case 'directores':
 				this.directoresComponent?.setViewMode(mode);
+				break;
+			case 'administradores':
+				this.administradoresComponent?.setViewMode(mode);
 				break;
 		}
 	}

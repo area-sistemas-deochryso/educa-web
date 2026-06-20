@@ -20,4 +20,5 @@ export type RolNombre =
 	| 'Director'
 	| 'Asistente Administrativo'
 	| 'Promotor'
-	| 'Coordinador Académico';
+	| 'Coordinador Académico'
+	| 'Administrador';

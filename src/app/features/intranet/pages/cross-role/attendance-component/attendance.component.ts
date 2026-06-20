@@ -116,7 +116,8 @@ export class AttendanceComponent implements AfterViewInit {
 			role === APP_USER_ROLES.Director ||
 			role === APP_USER_ROLES.AsistenteAdministrativo ||
 			role === APP_USER_ROLES.Promotor ||
-			role === APP_USER_ROLES.CoordinadorAcademico
+			role === APP_USER_ROLES.CoordinadorAcademico ||
+			role === APP_USER_ROLES.Administrador
 		);
 	}
 }

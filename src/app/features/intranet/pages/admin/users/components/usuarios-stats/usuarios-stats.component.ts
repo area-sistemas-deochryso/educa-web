@@ -16,7 +16,7 @@ export class UsersStatsComponent {
 
 	readonly adminTotal = computed(() => {
 		const s = this.estadisticas();
-		return s.totalDirectores + s.totalAsistentesAdministrativos + s.totalPromotores + s.totalCoordinadoresAcademicos;
+		return s.totalDirectores + s.totalAsistentesAdministrativos + s.totalPromotores + s.totalCoordinadoresAcademicos + (s.totalAdministradores ?? 0);
 	});
 
 	onBadgeClick(tab: RoleTab): void {

@@ -8,6 +8,7 @@ export const APP_USER_ROLES = {
 	AsistenteAdministrativo: 'Asistente Administrativo',
 	Promotor: 'Promotor',
 	CoordinadorAcademico: 'Coordinador Académico',
+	Administrador: 'Administrador',
 } as const;
 
 /** @deprecated 2026-06-08 — use Rol from @shared/models/rol.models. Remove after 2026-07-08. */
@@ -24,7 +25,8 @@ export type AppUserRoleAdmin =
 	| typeof APP_USER_ROLES.Director
 	| typeof APP_USER_ROLES.AsistenteAdministrativo
 	| typeof APP_USER_ROLES.Promotor
-	| typeof APP_USER_ROLES.CoordinadorAcademico;
+	| typeof APP_USER_ROLES.CoordinadorAcademico
+	| typeof APP_USER_ROLES.Administrador;
 
 export const APP_USER_ROLE_LIST: AppUserRoleValue[] = [
 	APP_USER_ROLES.Director,
@@ -34,6 +36,7 @@ export const APP_USER_ROLE_LIST: AppUserRoleValue[] = [
 	APP_USER_ROLES.AsistenteAdministrativo,
 	APP_USER_ROLES.Promotor,
 	APP_USER_ROLES.CoordinadorAcademico,
+	APP_USER_ROLES.Administrador,
 ];
 
 /**
@@ -47,5 +50,6 @@ export const APP_USER_ROLE_ADMIN_LIST: AppUserRoleAdmin[] = [
 	APP_USER_ROLES.AsistenteAdministrativo,
 	APP_USER_ROLES.Promotor,
 	APP_USER_ROLES.CoordinadorAcademico,
+	APP_USER_ROLES.Administrador,
 ];
 // #endregion
