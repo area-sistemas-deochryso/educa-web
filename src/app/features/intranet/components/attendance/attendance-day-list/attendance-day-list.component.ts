@@ -28,6 +28,7 @@ import { getStatusClass } from '@features/intranet/pages/cross-role/attendance-c
 import { AttendanceStatus } from '@features/intranet/pages/cross-role/attendance-component/models/attendance.types';
 import { InputTextModule } from 'primeng/inputtext';
 import { AttendanceTemporalNavComponent } from '../attendance-temporal-nav/attendance-temporal-nav.component';
+import { EmptyStateComponent } from '../empty-state/empty-state.component';
 
 export interface EstudianteAsistenciaDia {
 	estudianteId: number;
@@ -67,6 +68,7 @@ export interface JustificacionEvent {
 		FormatTimePipe,
 		InputTextModule,
 		AttendanceTemporalNavComponent,
+		EmptyStateComponent,
 	],
 	templateUrl: './attendance-day-list.component.html',
 	styleUrl: './attendance-day-list.component.scss',
@@ -76,7 +78,7 @@ export class AttendanceDayListComponent {
 	// * Inputs
 	readonly estudiantes = input.required<EstudianteAsistencia[]>();
 	readonly fecha = input.required<Date>();
-	readonly estadisticas = input.required<EstadisticasAsistenciaDia>(); // ✅ NUEVO: Estadísticas desde el backend
+	readonly estadisticas = input.required<EstadisticasAsistenciaDia>();
 	readonly loading = input<boolean>(false);
 	readonly showPdfButton = input<boolean>(false);
 	readonly downloadingPdf = input<boolean>(false);
@@ -86,6 +88,7 @@ export class AttendanceDayListComponent {
 	readonly tipoReporteOptions = input<{ label: string; items: { label: string; value: string }[] }[]>([]);
 	readonly tipoReporte = input<string>('salon');
 	readonly activeStatus = input<AttendanceStatus | null>(null);
+	readonly hideTemporalNav = input(false);
 
 	// * Outputs
 	readonly fechaChange = output<Date>();
@@ -119,9 +122,19 @@ export class AttendanceDayListComponent {
 	// * Expose getStatusClass for template
 	readonly getStatusClass = getStatusClass;
 
+	readonly isToday = computed(() => {
+		const f = this.fecha();
+		const t = this.today;
+		return f.getDate() === t.getDate() && f.getMonth() === t.getMonth() && f.getFullYear() === t.getFullYear();
+	});
+
 	// * Computed: map raw students to daily status rows
 	readonly estudiantesDelDia = computed<EstudianteAsistenciaDia[]>(() =>
 		this.estudiantes().map((e) => this.mapEstudianteAsistencia(e)),
+	);
+
+	readonly hasDayData = computed(() =>
+		this.estudiantesDelDia().some((e) => e.estadoCodigo !== 'X' && e.estadoCodigo !== '-'),
 	);
 
 	readonly filteredEstudiantes = computed<EstudianteAsistenciaDia[]>(() => {
@@ -143,10 +156,7 @@ export class AttendanceDayListComponent {
 		return result;
 	});
 
-	// ✅ NUEVO: Estadísticas ya no se calculan localmente, vienen del backend como input
-
 	constructor() {
-		// * Sync datepicker model when parent updates the fecha input
 		effect(() => {
 			this.fechaValue.set(this.fecha());
 		});
@@ -180,15 +190,10 @@ export class AttendanceDayListComponent {
 	// #endregion
 	// #region Justificación
 
-	/**
-	 * Abre el diálogo de justificación para un estudiante.
-	 * Solo se puede justificar si allowJustify está habilitado y el estudiante puede ser justificado.
-	 */
 	onEstudianteClick(estudiante: EstudianteAsistenciaDia): void {
 		if (!this.allowJustify() || !estudiante.puedeJustificar) return;
 
 		this.selectedEstudiante.set(estudiante);
-		// Si ya está justificado, extraer el motivo sin el prefijo "Justificado: "
 		const observacion = estudiante.observacion || '';
 		const sinPrefijo = observacion.startsWith(this.PREFIJO_JUSTIFICACION)
 			? observacion.replace(this.PREFIJO_JUSTIFICACION, '')
@@ -221,7 +226,6 @@ export class AttendanceDayListComponent {
 			quitar: false,
 		});
 
-		// Cerrar diálogo después de emitir - el padre recargará los datos
 		this.closeDialog();
 	}
 
@@ -235,14 +239,9 @@ export class AttendanceDayListComponent {
 			quitar: true,
 		});
 
-		// Cerrar diálogo después de emitir - el padre recargará los datos
 		this.closeDialog();
 	}
 
-	/**
-	 * Mapea un estudiante con sus asistencias a un registro de asistencia del día.
-	 * ✅ NUEVO: Usa estados calculados desde el backend en lugar de calcularlos localmente.
-	 */
 	private mapEstudianteAsistencia(estudiante: EstudianteAsistencia): EstudianteAsistenciaDia {
 		const asistencia = estudiante.asistencias[0];
 
@@ -252,12 +251,9 @@ export class AttendanceDayListComponent {
 			dni: estudiante.dni,
 			horaEntrada: asistencia?.horaEntrada || null,
 			horaSalida: asistencia?.horaSalida || null,
-			// ✅ Estados calculados desde el backend
 			estadoCodigo: asistencia?.estadoCodigo || 'X',
 			observacion: asistencia?.observacion || null,
-			// Cowork F-008: estado 'A' (Asistió) no admite justificación — el flag del BE
-			// puede venir true por defecto pero no tiene sentido invitar a justificar a
-			// alguien que asistió correctamente.
+			// Cowork F-008: estado 'A' (Asistió) no admite justificación
 			puedeJustificar:
 				(asistencia?.puedeJustificar ?? true) && asistencia?.estadoCodigo !== 'A',
 			esJustificado: asistencia?.esJustificado ?? false,

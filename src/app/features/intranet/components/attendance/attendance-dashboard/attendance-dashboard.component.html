@@ -4,7 +4,6 @@
 	</div>
 } @else if (data(); as d) {
 	<div class="dashboard">
-		<!-- * Top row: label + percentage + alerts aligned on same baseline -->
 		<div class="progress-section">
 			<div class="progress-info">
 				<span class="progress-label">Asistencia del día</span>
@@ -15,7 +14,7 @@
 			@if (alerts().length > 0) {
 				<div class="alerts">
 					@for (alert of alerts(); track alert.label) {
-						<div class="alert-badge" [class]="'severity-' + alert.severity">
+						<div class="alert-badge severity-{{ alert.severity }}">
 							<i [class]="alert.icon"></i>
 							<span>{{ alert.label }}</span>
 						</div>
@@ -24,7 +23,6 @@
 			}
 		</div>
 
-		<!-- * Progress bar -->
 		<div class="progress-bar-container">
 			<div
 				class="progress-bar-fill"
@@ -33,15 +31,19 @@
 			></div>
 		</div>
 
-		<!-- * Detail line -->
 		<div class="progress-detail">
-			<span>{{ d.conEntrada }} de {{ d.totalEstudiantes }} estudiantes</span>
-			<span class="separator">·</span>
-			<span>{{ d.faltas }} faltas</span>
-			<span class="separator">·</span>
-			<span pTooltip="Salones con al menos 1 registro" tooltipPosition="top">
-				{{ d.salonesConRegistro }}/{{ d.totalSalones }} salones
-			</span>
+			@for (rol of rolSummaries(); track rol.label; let last = $last) {
+				<span>{{ rol.conEntrada }}/{{ rol.total }} {{ rol.label }}</span>
+				@if (!last) {
+					<span class="separator">·</span>
+				}
+			}
+			@if (d.totalSalones != null && d.salonesConRegistro != null) {
+				<span class="separator">·</span>
+				<span pTooltip="Salones con al menos 1 registro" tooltipPosition="top">
+					{{ d.salonesConRegistro }}/{{ d.totalSalones }} salones
+				</span>
+			}
 		</div>
 	</div>
 }

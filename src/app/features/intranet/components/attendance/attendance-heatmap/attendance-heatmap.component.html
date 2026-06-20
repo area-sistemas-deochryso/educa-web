@@ -1,0 +1,138 @@
+<!-- #region Header -->
+<section class="attendance-heatmap">
+	<div class="section-header">
+		<div class="section-title-row">
+			<h2>
+				@if (icon()) {
+					<i [class]="icon()" aria-hidden="true"></i>
+				}
+				@if (hasHijos() && showSelector()) {
+					{{ table().title.split(' de ')[0] }} de
+					<p-select
+						appendTo="body"
+						[options]="hijosOptions()"
+						[ngModel]="selectedHijoId()"
+						(ngModelChange)="onHijoChange($event)"
+						optionLabel="label"
+						optionValue="value"
+						class="hijo-select"
+						[style]="{ minWidth: '200px' }"
+						[filter]="true"
+						filterBy="label"
+						filterPlaceholder="Buscar..."
+						[pt]="{
+							root: {
+								'aria-label': 'Seleccionar estudiante',
+							},
+						}"
+					>
+						<ng-template #selectedItem let-selectedOption>
+							<span
+								[pTooltip]="selectedOption.gradeInfo"
+								tooltipPosition="top"
+							>
+								{{ selectedOption.shortLabel }}
+							</span>
+						</ng-template>
+						<ng-template #item let-option>
+							{{ option.label }}
+						</ng-template>
+					</p-select>
+				} @else {
+					{{ hidePersonName() ? table().title.split(' de ')[0] : table().title }}
+				}
+			</h2>
+			@if (!hidePersonName()) {
+				<div class="status-chips">
+					<span class="status-chip status-asistio" pTooltip="Asistencias" tooltipPosition="top">
+						{{ table().counts.A }}A
+					</span>
+					<span class="status-chip status-tardanza" pTooltip="Tardanzas" tooltipPosition="top">
+						{{ table().counts.T }}T
+					</span>
+					<span class="status-chip status-falta" pTooltip="Faltas" tooltipPosition="top">
+						{{ table().counts.F }}F
+					</span>
+					<span class="status-chip status-justificado" pTooltip="Justificadas" tooltipPosition="top">
+						{{ table().counts.J }}J
+					</span>
+					<span class="status-chip status-pendiente" pTooltip="Pendientes" tooltipPosition="top">
+						{{ table().counts['-'] }}-
+					</span>
+				</div>
+			}
+		</div>
+		@if (!hideTemporalNav()) {
+			<app-attendance-temporal-nav
+				mode="month"
+				[currentDate]="currentMonthDate()"
+				(previous)="onPreviousMonth()"
+				(next)="onNextMonth()"
+				(pickerOpen)="monthSelectVisible = !monthSelectVisible"
+			/>
+			@if (monthSelectVisible) {
+				<p-select
+					appendTo="body"
+					[options]="monthOptions"
+					[ngModel]="table().selectedMonth"
+					(ngModelChange)="onMonthChange($event); monthSelectVisible = false"
+					optionLabel="label"
+					optionValue="value"
+					class="month-select-dropdown"
+					[filter]="true"
+					filterBy="label"
+					filterPlaceholder="Buscar mes..."
+					[pt]="{
+						root: {
+							'aria-label': 'Seleccionar mes',
+						},
+					}"
+				/>
+			}
+		}
+	</div>
+	<!-- #endregion -->
+
+	<!-- #region Calendar grid -->
+	<div class="calendar-grid">
+		<div class="calendar-row calendar-header-row">
+			<span class="week-label"></span>
+			@for (header of dayHeadersFull; track header) {
+				<span class="calendar-header-cell">{{ header }}</span>
+			}
+		</div>
+		@for (week of table().weeks; track week.week; let i = $index) {
+			<div class="calendar-row">
+				<span class="week-label">Semana {{ i + 1 }}</span>
+				@for (day of week.days; track $index) {
+					@if (day.date) {
+						<div
+							class="calendar-cell"
+							[ngClass]="getStatusClass(day.status)"
+							[class.has-data]="day.status !== '-' && day.status !== 'X'"
+							[class.cell-clickable]="isCellClickable(day)"
+							[pTooltip]="weekDayTooltip(day)"
+							tooltipPosition="top"
+							(click)="onCellClick(day)"
+						>
+							<span class="cell-day-number">{{ day.date.getDate() }}</span>
+							@if (day.status !== '-' && day.status !== 'X') {
+								<span class="cell-status-letter">{{ day.status }}</span>
+								@if (day.hora) {
+									<span class="cell-time">{{ day.hora }}</span>
+								}
+							}
+						</div>
+					} @else {
+						<div class="calendar-cell calendar-cell-empty">
+							<div class="cell-empty-inner"></div>
+						</div>
+					}
+				}
+			</div>
+		}
+	</div>
+	<!-- #endregion -->
+
+	<!-- #endregion -->
+</section>

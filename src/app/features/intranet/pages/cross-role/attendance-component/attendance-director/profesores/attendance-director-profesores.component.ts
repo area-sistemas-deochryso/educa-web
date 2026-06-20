@@ -4,11 +4,14 @@ import {
 	Component,
 	DestroyRef,
 	OnInit,
+	ViewChild,
 	computed,
+	effect,
 	inject,
 	signal,
 } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { Observable, finalize } from 'rxjs';
 
@@ -17,7 +20,8 @@ import {
 	AttendancePersonaDayListComponent,
 	PersonaAsistenciaDia,
 } from '@features/intranet/components/attendance/attendance-persona-day-list/attendance-persona-day-list.component';
-import { AttendanceTableComponent } from '@features/intranet/components/attendance/attendance-table/attendance-table.component';
+import { AttendanceHeatmapComponent } from '@features/intranet/components/attendance/attendance-heatmap/attendance-heatmap.component';
+import { AttendanceTemporalNavComponent } from '@features/intranet/components/attendance/attendance-temporal-nav/attendance-temporal-nav.component';
 import { AttendanceTableSkeletonComponent } from '@features/intranet/components/attendance/attendance-table-skeleton/attendance-table-skeleton.component';
 import { EmptyStateComponent } from '@features/intranet/components/attendance/empty-state/empty-state.component';
 import {
@@ -33,6 +37,7 @@ import {
 	EstadisticasAsistenciaDia,
 	HijoApoderado,
 	PersonaAsistencia,
+	computeStatsFromAsistencias,
 	profesorToPersonaAsistencia,
 } from '@data/models';
 import { APP_USER_ROLES } from '@shared/constants';
@@ -40,9 +45,11 @@ import { AsistenciaProfesorApiService } from '@intranet-shared/services';
 import { downloadBlob, formatDateLocalIso, viewBlobInNewTab } from '@core/helpers';
 import { ErrorHandlerService } from '@core/services';
 
+import { DatePipe } from '@angular/common';
 import { ButtonModule } from 'primeng/button';
+import { InputTextModule } from 'primeng/inputtext';
 import { MenuItem } from 'primeng/api';
-import { MenuModule } from 'primeng/menu';
+import { Menu, MenuModule } from 'primeng/menu';
 import { TooltipModule } from 'primeng/tooltip';
 
 import { buildPdfExcelMenuItems } from '../consolidated-pdf.helper';
@@ -58,10 +65,14 @@ import { buildPdfExcelMenuItems } from '../consolidated-pdf.helper';
 	imports: [
 		AttendanceLegendStatsComponent,
 		AttendancePersonaDayListComponent,
-		AttendanceTableComponent,
+		AttendanceHeatmapComponent,
+		AttendanceTemporalNavComponent,
 		AttendanceTableSkeletonComponent,
 		EmptyStateComponent,
 		ButtonModule,
+		DatePipe,
+		FormsModule,
+		InputTextModule,
 		MenuModule,
 		TooltipModule,
 	],
@@ -70,6 +81,8 @@ import { buildPdfExcelMenuItems } from '../consolidated-pdf.helper';
 	changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class AttendanceDirectorProfesoresComponent implements OnInit {
+	@ViewChild('pdfMenu') pdfMenu!: Menu;
+
 	private api = inject(AsistenciaProfesorApiService);
 	private dataService = inject(AttendanceDataService);
 	private errorHandler = inject(ErrorHandlerService);
@@ -101,6 +114,11 @@ export class AttendanceDirectorProfesoresComponent implements OnInit {
 	readonly personasDia = computed<PersonaAsistencia[]>(() =>
 		this.profesoresDia().map(profesorToPersonaAsistencia),
 	);
+	readonly legendStats = computed(() => {
+		if (this.viewMode() !== VIEW_MODE.Mes) return this.estadisticasDia();
+		const prof = this.selectedProfesor();
+		return prof ? computeStatsFromAsistencias(prof.asistencias) : this.estadisticasDia();
+	});
 	// #endregion
 
 	// #region Modo mes
@@ -126,6 +144,58 @@ export class AttendanceDirectorProfesoresComponent implements OnInit {
 	readonly salidas = signal<AttendanceTable>(
 		this.dataService.createEmptyTable('Salidas'),
 	);
+	readonly hasMonthData = computed(() => {
+		const ing = this.ingresos().counts;
+		const sal = this.salidas().counts;
+		return (ing.A + ing.T + ing.F + ing.J) > 0 || (sal.A + sal.T + sal.F + sal.J) > 0;
+	});
+	readonly monthDate = computed(() =>
+		new Date(this.ingresos().selectedYear, this.ingresos().selectedMonth - 1, 1),
+	);
+	// #endregion
+
+	// #region Month search (unified filter bar)
+	readonly monthSearchTerm = signal('');
+	readonly monthShowSuggestions = signal(false);
+
+	readonly monthFilteredProfesores = computed(() => {
+		const term = this.monthSearchTerm().toLowerCase().trim();
+		const hijos = this.profesoresAsHijos();
+		if (!term) return hijos;
+		return hijos.filter(h =>
+			h.nombreCompleto.toLowerCase().includes(term) ||
+			(h.dni && h.dni.toLowerCase().includes(term)),
+		);
+	});
+
+	private readonly syncSearchWithSelection = effect(() => {
+		const profesor = this.selectedProfesor();
+		if (profesor && !this.monthShowSuggestions()) {
+			this.monthSearchTerm.set(profesor.nombreCompleto);
+		}
+	});
+
+	onMonthSearchFocus(): void {
+		this.monthSearchTerm.set('');
+		this.monthShowSuggestions.set(true);
+	}
+
+	onMonthSearchBlur(): void {
+		setTimeout(() => {
+			this.monthShowSuggestions.set(false);
+			const profesor = this.selectedProfesor();
+			if (profesor) this.monthSearchTerm.set(profesor.nombreCompleto);
+		}, 200);
+	}
+
+	selectPersonFromSearch(profesorId: number): void {
+		this.selectProfesor(profesorId);
+		this.monthShowSuggestions.set(false);
+	}
+
+	togglePdfMenu(event: Event): void {
+		this.pdfMenu.toggle(event);
+	}
 	// #endregion
 
 	// #region PDF/Excel
@@ -192,6 +262,22 @@ export class AttendanceDirectorProfesoresComponent implements OnInit {
 		this.updateTablasMes();
 	}
 
+	onMonthChange(month: number): void {
+		this.ingresos.update((t) => ({ ...t, selectedMonth: month }));
+		this.salidas.update((t) => ({ ...t, selectedMonth: month }));
+		this.loadMes();
+	}
+
+	onPreviousMonth(): void {
+		const t = this.ingresos();
+		this.onMonthChange(t.selectedMonth === 1 ? 12 : t.selectedMonth - 1);
+	}
+
+	onNextMonth(): void {
+		const t = this.ingresos();
+		this.onMonthChange(t.selectedMonth === 12 ? 1 : t.selectedMonth + 1);
+	}
+
 	onIngresosMonthChange(month: number): void {
 		this.ingresos.update((t) => ({ ...t, selectedMonth: month }));
 		this.loadMes();
@@ -223,6 +309,32 @@ export class AttendanceDirectorProfesoresComponent implements OnInit {
 	 * Cross-link desde el mes: navega a admin con DNI del profesor pre-filtrado.
 	 * Sin fecha — el admin default es hoy y el usuario ajusta al día que quiere editar.
 	 */
+	readonly today = new Date();
+
+	onPreviousDayNav(): void {
+		const prev = new Date(this.fechaDia());
+		prev.setDate(prev.getDate() - 1);
+		this.onFechaDiaChange(prev);
+	}
+
+	onNextDayNav(): void {
+		const next = new Date(this.fechaDia());
+		next.setDate(next.getDate() + 1);
+		if (next <= this.today) this.onFechaDiaChange(next);
+	}
+
+	navigateToGestion(): void {
+		this.router.navigate(['/intranet/admin/asistencias'], {
+			queryParams: { tab: 'gestion' },
+		});
+	}
+
+	navigateToReportes(): void {
+		this.router.navigate(['/intranet/admin/asistencias'], {
+			queryParams: { tab: 'reportes' },
+		});
+	}
+
 	onEditarEnAdminMes(): void {
 		const profesor = this.selectedProfesor();
 		if (!profesor) return;

@@ -24,6 +24,7 @@
 	</div>
 
 	<ng-content select="[filtersSlot]" />
+	<ng-content select="[actionsSlot]" />
 
 	<div class="filters-right">
 		@if (showPdfButton()) {
@@ -59,26 +60,36 @@
 			/>
 			<p-menu #pdfMenu [model]="pdfMenuItems()" [popup]="true" appendTo="body" />
 		}
-		<app-attendance-temporal-nav
-			mode="day"
-			[currentDate]="fechaValue()"
-			[maxDate]="today"
-			(previous)="onPreviousDay()"
-			(next)="onNextDay()"
-			(dateSelect)="onFechaChange($event)"
-		/>
+		@if (!hideTemporalNav()) {
+			<app-attendance-temporal-nav
+				mode="day"
+				[currentDate]="fechaValue()"
+				[maxDate]="today"
+				(previous)="onPreviousDay()"
+				(next)="onNextDay()"
+				(dateSelect)="onFechaChange($event)"
+			/>
+		}
 	</div>
 </div>
+<!-- #endregion -->
+
+<ng-content select="[subHeaderSlot]" />
+
+<!-- #region Pending closure banner (F7) -->
+@if (estadisticas().pendiente > 0 && isToday() && hasDayData()) {
+	<div class="pending-closure-banner">
+		<i class="pi pi-exclamation-triangle"></i>
+		<span>Asistencia pendiente de cierre — {{ estadisticas().pendiente }} estudiantes sin registro</span>
+	</div>
+}
 <!-- #endregion -->
 
 <!-- #region Table content -->
 @if (loading()) {
 	<app-table-skeleton [columns]="diaColumns" [rows]="6" minHeight="300px" />
-} @else if (estudiantesDelDia().length === 0) {
-	<div class="empty-state">
-		<i class="pi pi-users"></i>
-		<p>No hay registros de asistencia para esta fecha</p>
-	</div>
+} @else if (estudiantesDelDia().length === 0 || !hasDayData()) {
+	<app-empty-state message="No hay registros de asistencia para esta fecha." />
 } @else {
 	<app-responsive-table
 		[value]="filteredEstudiantes()"

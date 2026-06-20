@@ -9,16 +9,36 @@ import {
 } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { RouterLink } from '@angular/router';
-import { forkJoin, of, catchError } from 'rxjs';
-import {
-	AttendanceService,
-	AsistenciaProfesorApiService,
-} from '@intranet-shared/services';
-import {
-	EstadisticasDia,
-	EstadisticasAsistenciaDia,
-} from '@data/models';
+import { DirectorAttendanceApiService } from '@intranet-shared/services';
+import { EstadisticasRol, TipoPersona } from '@data/models';
 import { SkeletonLoaderComponent } from '@shared/components';
+
+interface RolDisplay {
+	tipoPersona: TipoPersona;
+	label: string;
+	stats: EstadisticasRol;
+	bars: { label: string; value: number; class: string }[];
+}
+
+const ROL_LABELS: Record<string, string> = {
+	E: 'Estudiantes',
+	P: 'Profesores',
+	A: 'Asistentes Admin',
+	C: 'Coordinadores',
+	M: 'Promotores',
+	D: 'Directores',
+};
+
+const ROL_ORDER: TipoPersona[] = ['E', 'P', 'A', 'C', 'M', 'D'];
+
+const ROL_VISIBLE: Record<TipoPersona, boolean> = {
+	E: true,
+	P: true,
+	A: true,
+	C: true,
+	M: false,
+	D: false,
+};
 
 @Component({
 	selector: 'app-attendance-summary-widget',
@@ -30,99 +50,70 @@ import { SkeletonLoaderComponent } from '@shared/components';
 })
 export class AttendanceSummaryWidgetComponent implements OnInit {
 	// #region Dependencias
-	private attendance = inject(AttendanceService);
-	private profesorApi = inject(AsistenciaProfesorApiService);
+	private directorApi = inject(DirectorAttendanceApiService);
 	private destroyRef = inject(DestroyRef);
 	// #endregion
 
 	// #region Estado
 	readonly loading = signal(true);
-	readonly estStats = signal<EstadisticasDia | null>(null);
-	readonly profStats = signal<EstadisticasAsistenciaDia | null>(null);
+	readonly roles = signal<RolDisplay[]>([]);
 	// #endregion
 
-	// #region Computed — Estudiantes
-	readonly estSoloEntrada = computed(() => {
-		const s = this.estStats();
-		return s ? s.conEntrada - s.asistenciasCompletas : 0;
-	});
+	// #region Helpers
+	presentes(stats: EstadisticasRol): number {
+		return stats.conEntrada;
+	}
 
-	readonly estCompletasPercent = computed(() => {
-		const s = this.estStats();
-		return s && s.totalEstudiantes > 0
-			? (s.asistenciasCompletas / s.totalEstudiantes) * 100
-			: 0;
-	});
-
-	readonly estSoloEntradaPercent = computed(() => {
-		const s = this.estStats();
-		return s && s.totalEstudiantes > 0
-			? (this.estSoloEntrada() / s.totalEstudiantes) * 100
-			: 0;
-	});
-
-	readonly estFaltasPercent = computed(() => {
-		const s = this.estStats();
-		return s && s.totalEstudiantes > 0 ? (s.faltas / s.totalEstudiantes) * 100 : 0;
-	});
-
-	readonly estPercentageClass = computed(() => {
-		const p = this.estStats()?.porcentajeAsistencia ?? 0;
-		if (p >= 85) return 'high';
-		if (p >= 60) return 'medium';
+	percentageClass(porcentaje: number): string {
+		if (porcentaje >= 85) return 'high';
+		if (porcentaje >= 60) return 'medium';
 		return 'low';
-	});
-	// #endregion
+	}
 
-	// #region Computed — Profesores
-	readonly profPresentes = computed(() => {
-		const p = this.profStats();
-		if (!p) return 0;
-		return p.asistio + p.tardanza;
-	});
-
-	readonly profPorcentaje = computed(() => {
-		const p = this.profStats();
-		if (!p || p.total === 0) return 0;
-		return Math.round((this.profPresentes() / p.total) * 100);
-	});
-
-	readonly profPercentageClass = computed(() => {
-		const p = this.profPorcentaje();
-		if (p >= 85) return 'high';
-		if (p >= 60) return 'medium';
-		return 'low';
-	});
-
-	profBarPercent(value: number): number {
-		const p = this.profStats();
-		return p && p.total > 0 ? (value / p.total) * 100 : 0;
+	barPercent(value: number, total: number): number {
+		return total > 0 ? (value / total) * 100 : 0;
 	}
 	// #endregion
 
 	// #region Lifecycle
 	ngOnInit(): void {
-		const hoy = new Date();
-
-		// catchError por rama: si una call falla la otra sigue.
-		const est$ = this.attendance
-			.getEstadisticasDirector()
-			.pipe(catchError(() => of(null)));
-
-		const prof$ = this.profesorApi
-			.obtenerAsistenciaDiaProfesoresDirector(hoy)
-			.pipe(catchError(() => of(null)));
-
-		forkJoin({ est: est$, prof: prof$ })
+		this.directorApi
+			.getEstadisticasMultiRol(undefined, false)
 			.pipe(takeUntilDestroyed(this.destroyRef))
 			.subscribe({
-				next: ({ est, prof }) => {
-					this.estStats.set(est);
-					this.profStats.set(prof ? prof.estadisticas : null);
+				next: (data) => {
+					if (data) {
+						const sorted = [...data.roles].sort(
+							(a, b) =>
+								ROL_ORDER.indexOf(a.tipoPersona) - ROL_ORDER.indexOf(b.tipoPersona),
+						);
+						this.roles.set(
+							sorted
+								.filter((r) => r.total > 0 && ROL_VISIBLE[r.tipoPersona])
+								.map((r) => this.toRolDisplay(r)),
+						);
+					}
 					this.loading.set(false);
 				},
 				error: () => this.loading.set(false),
 			});
+	}
+	// #endregion
+
+	// #region Privado
+	private toRolDisplay(r: EstadisticasRol): RolDisplay {
+		const asistio = r.conEntrada - r.tardanza;
+
+		return {
+			tipoPersona: r.tipoPersona,
+			label: ROL_LABELS[r.tipoPersona] ?? r.tipoPersona,
+			stats: r,
+			bars: [
+				{ label: 'Asistió', value: asistio, class: 'bar-asistio' },
+				{ label: 'Tardanza', value: r.tardanza, class: 'bar-tardanza' },
+				{ label: 'Falta', value: r.faltas, class: 'bar-faltas' },
+			],
+		};
 	}
 	// #endregion
 }

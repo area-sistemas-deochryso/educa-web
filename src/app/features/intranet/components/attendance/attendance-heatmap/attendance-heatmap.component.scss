@@ -1,0 +1,370 @@
+$color-asistio: #77a02d;
+$color-tardanza: #ffcc0c;
+$color-falta: #f44336;
+$color-justificado: #9c27b0;
+
+.attendance-heatmap {
+	background: var(--surface-card);
+	border: 1px solid var(--surface-border);
+	border-radius: 12px;
+	padding: 1rem 1.25rem;
+	margin-bottom: 0.75rem;
+}
+
+// #region Header
+.section-header {
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+	flex-wrap: wrap;
+	gap: 0.75rem;
+	margin-bottom: 1rem;
+
+	h2 {
+		display: flex;
+		align-items: center;
+		gap: 0.5rem;
+		font-size: 0.95rem;
+		font-weight: 600;
+		color: var(--intranet-default-text-color);
+		margin: 0;
+		flex-wrap: wrap;
+
+		> i:first-child {
+			font-size: 1.1rem;
+			color: var(--text-color-secondary);
+		}
+	}
+}
+
+.section-title-row {
+	display: flex;
+	align-items: center;
+	flex-wrap: wrap;
+	gap: 1rem;
+	min-width: 0;
+}
+
+.status-chips {
+	display: flex;
+	align-items: center;
+	gap: 0.375rem;
+}
+
+.status-chip {
+	display: inline-flex;
+	align-items: center;
+	padding: 0.15rem 0.5rem;
+	border-radius: 6px;
+	font-size: 0.75rem;
+	font-weight: 600;
+	cursor: default;
+}
+// #endregion
+
+// #region Calendar grid
+.calendar-grid {
+	display: flex;
+	flex-direction: column;
+	gap: 4px;
+}
+
+.calendar-row {
+	display: grid;
+	grid-template-columns: 80px repeat(5, 1fr);
+	gap: 4px;
+}
+
+.calendar-header-row {
+	margin-bottom: 2px;
+}
+
+.calendar-header-cell {
+	text-align: center;
+	font-size: 0.8rem;
+	font-weight: 700;
+	color: var(--text-color);
+	padding: 0.375rem 0.25rem;
+}
+
+.week-label {
+	display: flex;
+	align-items: center;
+	font-size: 0.8rem;
+	font-weight: 500;
+	color: var(--text-color-secondary);
+	padding-right: 0.5rem;
+	white-space: nowrap;
+}
+
+.calendar-cell {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	justify-content: center;
+	padding: 0.5rem;
+	min-height: 68px;
+	position: relative;
+	border-radius: 8px;
+
+	&:not(.has-data):not(.calendar-cell-empty) {
+		color: var(--text-color-secondary);
+	}
+}
+
+.calendar-cell-empty {
+	.cell-empty-inner {
+		width: 100%;
+		height: 100%;
+		border: 1px dashed #ddd;
+		border-radius: 8px;
+		opacity: 0.4;
+	}
+}
+
+.has-data {
+	transition: transform 0.12s ease;
+
+	&:hover {
+		transform: scale(1.03);
+	}
+}
+
+.cell-clickable {
+	cursor: pointer;
+	outline: 2px solid transparent;
+	transition: outline-color 0.15s ease, transform 0.12s ease;
+
+	&:hover {
+		outline-color: var(--primary-color, #3b82f6);
+		transform: scale(1.06);
+	}
+}
+
+.cell-day-number {
+	position: absolute;
+	top: 4px;
+	left: 8px;
+	font-size: 0.65rem;
+	font-weight: 600;
+	line-height: 1;
+}
+
+.cell-status-letter {
+	font-size: 1.1rem;
+	font-weight: 700;
+	line-height: 1;
+}
+
+.cell-time {
+	font-size: 0.65rem;
+	margin-top: 2px;
+	opacity: 0.85;
+	line-height: 1;
+}
+// #endregion
+
+// #region Status colors
+.status-asistio {
+	background-color: $color-asistio;
+	color: white;
+
+	.cell-day-number { color: rgba(255, 255, 255, 0.8); }
+}
+
+.status-tardanza {
+	background-color: $color-tardanza;
+	color: #333;
+
+	.cell-day-number { color: rgba(0, 0, 0, 0.5); }
+}
+
+.status-falta {
+	background-color: $color-falta;
+	color: white;
+
+	.cell-day-number { color: rgba(255, 255, 255, 0.8); }
+}
+
+.status-justificado {
+	background-color: $color-justificado;
+	color: white;
+
+	.cell-day-number { color: rgba(255, 255, 255, 0.8); }
+}
+
+.status-pendiente {
+	background-color: #e8e8e8;
+	color: #888;
+
+	.cell-day-number { color: #999; }
+}
+
+.status-sin-registro {
+	background-color: transparent;
+	color: #aaa;
+}
+// #endregion
+
+
+// #region PrimeNG overrides
+:host ::ng-deep .hijo-select {
+	&.p-select {
+		background: transparent;
+		border: none;
+		border-bottom: 1px solid var(--intranet-soft-text-color, #5e5e5e);
+		min-width: 200px;
+		min-height: 32px;
+
+		.p-select-label {
+			padding: 0.15rem 0.25rem;
+			font-size: 0.95rem;
+			font-weight: 600;
+			color: var(--intranet-default-text-color);
+		}
+
+		.p-select-dropdown {
+			background: transparent;
+			color: var(--intranet-default-text-color);
+		}
+
+		&:hover {
+			border-bottom-color: var(--intranet-default-text-color);
+		}
+
+		&.p-focus {
+			border-bottom-color: var(--intranet-default-text-color);
+			box-shadow: none;
+		}
+	}
+}
+
+:host ::ng-deep .p-select-overlay {
+	background: var(--intranet-background-color) !important;
+	border: 1px solid var(--intranet-soft-text-color);
+	border-radius: 4px;
+
+	.p-select-filter-container {
+		padding: 0.5rem;
+		background: transparent;
+
+		.p-select-filter,
+		input.p-select-filter,
+		input.p-select-filter.p-inputtext {
+			width: 100%;
+			padding: 0.5rem 0.75rem;
+			border: none !important;
+			border-bottom: 1px solid var(--intranet-accent-color-green) !important;
+			border-radius: 0;
+			background: transparent !important;
+			color: var(--intranet-default-text-color);
+			font-size: 0.85rem;
+			box-shadow: none !important;
+
+			&:focus,
+			&:focus-visible {
+				outline: none !important;
+				border: none !important;
+				border-bottom: 1px solid var(--intranet-accent-color-green) !important;
+				box-shadow: none !important;
+			}
+
+			&::placeholder {
+				color: var(--intranet-soft-text-color);
+			}
+		}
+
+		.p-icon {
+			color: var(--intranet-accent-color-green) !important;
+		}
+	}
+
+	.p-select-list {
+		background: transparent;
+	}
+
+	.p-select-option {
+		color: var(--intranet-soft-text-color);
+
+		&:hover {
+			background: var(--intranet-accent-color-green);
+			color: white;
+		}
+
+		&.p-select-option-selected {
+			background: var(--intranet-accent-color-green);
+			color: white;
+		}
+	}
+}
+// #endregion
+
+// #region Responsive
+@media screen and (max-width: 768px) {
+	.section-header {
+		flex-direction: column;
+		align-items: flex-start;
+		gap: 0.75rem;
+	}
+
+	.section-title-row {
+		flex-direction: column;
+		align-items: flex-start;
+		gap: 0.5rem;
+	}
+
+	.week-label {
+		font-size: 0.7rem;
+	}
+
+	.calendar-row {
+		grid-template-columns: 60px repeat(5, 1fr);
+	}
+
+	.calendar-cell {
+		min-height: 52px;
+		padding: 0.375rem;
+	}
+
+	.cell-status-letter {
+		font-size: 0.9rem;
+	}
+
+	.cell-time {
+		display: none;
+	}
+
+	.calendar-header-cell {
+		font-size: 0.7rem;
+	}
+}
+
+@media screen and (max-width: 480px) {
+	.attendance-heatmap {
+		padding: 0.75rem;
+	}
+
+	.week-label {
+		display: none;
+	}
+
+	.calendar-row {
+		grid-template-columns: repeat(5, 1fr);
+	}
+
+	.calendar-cell {
+		min-height: 44px;
+		padding: 0.25rem;
+	}
+
+	.cell-status-letter {
+		font-size: 0.8rem;
+	}
+
+	.cell-day-number {
+		font-size: 0.55rem;
+		left: 4px;
+		top: 3px;
+	}
+}
+// #endregion

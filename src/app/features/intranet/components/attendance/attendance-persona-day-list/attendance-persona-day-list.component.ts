@@ -32,11 +32,8 @@ import { FormatTimePipe } from '@intranet-shared/pipes';
 import { getStatusClass } from '@features/intranet/pages/cross-role/attendance-component/config/attendance.constants';
 import { InputTextModule } from 'primeng/inputtext';
 import { AttendanceTemporalNavComponent } from '../attendance-temporal-nav/attendance-temporal-nav.component';
+import { EmptyStateComponent } from '../empty-state/empty-state.component';
 
-/**
- * Fila de asistencia del día — forma interna renderizada por la tabla.
- * Variante polimórfica de `EstudianteAsistenciaDia` (legacy).
- */
 export interface PersonaAsistenciaDia {
 	personaId: number;
 	tipoPersona: TipoPersona;
@@ -50,11 +47,6 @@ export interface PersonaAsistenciaDia {
 	esJustificado: boolean;
 }
 
-/**
- * Evento de justificación emitido por el day-list genérico.
- * Variante polimórfica de `JustificacionEvent` (legacy) — incluye tipoPersona
- * para que el caller decida el endpoint (estudiante vs profesor, INV-AD06).
- */
 export interface JustificacionPersonaEvent {
 	personaId: number;
 	tipoPersona: TipoPersona;
@@ -62,17 +54,6 @@ export interface JustificacionPersonaEvent {
 	quitar: boolean;
 }
 
-/**
- * Variante genérica del `AttendanceDayListComponent` legacy.
- *
- * Acepta cualquier persona (estudiante o profesor) vía `PersonaAsistencia[]`.
- * El caller adapta desde `EstudianteAsistencia` / `AsistenciaProfesorDto` usando
- * los helpers de `@data/models/attendance.models`.
- *
- * Plan 21 Chat 7 — habilita la vista admin "Profesores" con el mismo diseño
- * que la vista admin "Estudiantes" sin tocar los 3 consumidores vivos del
- * day-list legacy.
- */
 @Component({
 	selector: 'app-attendance-persona-day-list',
 	standalone: true,
@@ -93,6 +74,7 @@ export interface JustificacionPersonaEvent {
 		FormatTimePipe,
 		InputTextModule,
 		AttendanceTemporalNavComponent,
+		EmptyStateComponent,
 	],
 	templateUrl: './attendance-persona-day-list.component.html',
 	styleUrl: './attendance-persona-day-list.component.scss',
@@ -113,12 +95,9 @@ export class AttendancePersonaDayListComponent {
 		{ label: string; items: { label: string; value: string }[] }[]
 	>([]);
 	readonly tipoReporte = input<string>('salon');
-	/**
-	 * Muestra columna/botón "Editar en admin" por fila (Plan 23 Chat 5 — cross-link).
-	 * Gating a nivel padre: solo se activa desde la vista admin de profesores.
-	 */
 	readonly showEditAdminAction = input<boolean>(false);
 	readonly activeStatus = input<AttendanceStatus | null>(null);
+	readonly hideTemporalNav = input(false);
 
 	// * Outputs
 	readonly fechaChange = output<Date>();
@@ -158,9 +137,19 @@ export class AttendancePersonaDayListComponent {
 	// * Expose getStatusClass for template
 	readonly getStatusClass = getStatusClass;
 
+	readonly isToday = computed(() => {
+		const f = this.fecha();
+		const t = this.today;
+		return f.getDate() === t.getDate() && f.getMonth() === t.getMonth() && f.getFullYear() === t.getFullYear();
+	});
+
 	// * Computed: map raw personas to daily status rows
 	readonly personasDelDia = computed<PersonaAsistenciaDia[]>(() =>
 		this.personas().map((p) => this.mapPersonaAsistencia(p)),
+	);
+
+	readonly hasDayData = computed(() =>
+		this.personasDelDia().some((p) => p.estadoCodigo !== 'X' && p.estadoCodigo !== '-'),
 	);
 
 	readonly filteredPersonas = computed<PersonaAsistenciaDia[]>(() => {
@@ -183,7 +172,6 @@ export class AttendancePersonaDayListComponent {
 	});
 
 	constructor() {
-		// * Sync datepicker model when parent updates the fecha input
 		effect(() => {
 			this.fechaValue.set(this.fecha());
 		});
@@ -276,10 +264,6 @@ export class AttendancePersonaDayListComponent {
 		this.closeDialog();
 	}
 
-	/**
-	 * Mapea una persona con sus asistencias a un registro de asistencia del día.
-	 * Usa estados ya calculados por el backend (INV-C01, INV-C02).
-	 */
 	private mapPersonaAsistencia(persona: PersonaAsistencia): PersonaAsistenciaDia {
 		const asistencia = persona.asistencias[0];
 
@@ -292,9 +276,7 @@ export class AttendancePersonaDayListComponent {
 			horaSalida: asistencia?.horaSalida || null,
 			estadoCodigo: asistencia?.estadoCodigo || 'X',
 			observacion: asistencia?.observacion || null,
-			// Cowork F-008: estado 'A' (Asistió) no admite justificación — el flag del BE
-			// puede venir true por defecto pero no tiene sentido invitar a justificar a
-			// quien asistió correctamente.
+			// Cowork F-008: estado 'A' (Asistió) no admite justificación
 			puedeJustificar:
 				(asistencia?.puedeJustificar ?? true) && asistencia?.estadoCodigo !== 'A',
 			esJustificado: asistencia?.esJustificado ?? false,

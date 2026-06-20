@@ -1,89 +1,154 @@
 <!-- #region Template -->
-<!-- * Leyenda compartida de estados -->
-<app-attendance-legend-stats [estadisticas]="estadisticasDia()" [(activeStatus)]="activeStatus" />
-
 @if (viewMode() === 'mes') {
-	<!-- * PDF actions — contextual al profesor seleccionado -->
-	@if (selectedProfesor(); as profesor) {
-		<div class="pdf-section">
-			<div class="pdf-report-info">
-				<span class="pdf-label"
-					>Reporte mensual de {{ profesor.nombreCompleto }} —
-					{{ ingresos().selectedMonth }}/{{ ingresos().selectedYear }}</span
+	<!-- * Unified filter bar for month view -->
+	<div class="filters-bar">
+		<div class="search-box">
+			<i class="pi pi-search"></i>
+			<input
+				type="text"
+				pInputText
+				[ngModel]="monthSearchTerm()"
+				(ngModelChange)="monthSearchTerm.set($event)"
+				(focus)="onMonthSearchFocus()"
+				(blur)="onMonthSearchBlur()"
+				placeholder="Buscar por nombre o DNI..."
+				class="search-input"
+				aria-label="Buscar profesor por nombre o DNI"
+			/>
+			@if (monthSearchTerm()) {
+				<button
+					type="button"
+					class="clear-btn"
+					(click)="monthSearchTerm.set(''); onMonthSearchFocus()"
+					aria-label="Limpiar búsqueda"
 				>
-				<p-button
-					icon="pi pi-pencil"
-					severity="info"
-					[text]="true"
-					[rounded]="true"
-					(onClick)="onEditarEnAdminMes()"
-					pTooltip="Editar asistencia del profesor en admin"
-					tooltipPosition="top"
-					[pt]="{
-						root: {
-							'aria-label': 'Editar asistencia del profesor en admin',
-						},
-					}"
-				/>
-				<p-button
-					icon="pi pi-file-pdf"
-					[loading]="downloadingPdf()"
-					severity="danger"
-					[text]="true"
-					[rounded]="true"
-					(onClick)="pdfMenu.toggle($event)"
-					pTooltip="Opciones de PDF"
-					tooltipPosition="top"
-					[pt]="{
-						root: {
-							'aria-label': 'Opciones de PDF',
-						},
-					}"
-				/>
-				<p-menu #pdfMenu [model]="pdfMenuItems()" [popup]="true" appendTo="body" />
-			</div>
+					<i class="pi pi-times"></i>
+				</button>
+			}
+			@if (monthShowSuggestions() && monthFilteredProfesores().length > 0) {
+				<ul class="search-suggestions">
+					@for (prof of monthFilteredProfesores(); track prof.estudianteId) {
+						<li
+							[class.active]="prof.estudianteId === selectedProfesorId()"
+							(mousedown)="selectPersonFromSearch(prof.estudianteId)"
+						>
+							<span class="student-name">{{ prof.nombreCompleto }}</span>
+							<span class="student-dni">{{ prof.dni }}</span>
+						</li>
+					}
+				</ul>
+			}
 		</div>
-	}
+
+		@if (selectedProfesor()) {
+			<p-button
+				icon="pi pi-pencil"
+				severity="info"
+				[text]="true"
+				[rounded]="true"
+				(onClick)="onEditarEnAdminMes()"
+				pTooltip="Editar asistencia del profesor en admin"
+				tooltipPosition="top"
+				[pt]="{ root: { 'aria-label': 'Editar asistencia del profesor en admin' } }"
+			/>
+		}
+		<p-button
+			icon="pi pi-chart-bar"
+			severity="secondary"
+			[text]="true"
+			[rounded]="true"
+			(onClick)="navigateToReportes()"
+			pTooltip="Reportes de asistencia"
+			tooltipPosition="top"
+			[pt]="{ root: { 'aria-label': 'Reportes de asistencia' } }"
+		/>
+	</div>
+
+	<app-attendance-legend-stats [estadisticas]="legendStats()" [(activeStatus)]="activeStatus" />
 
 	@if (loading() && !tableReady()) {
 		<!-- * Skeleton: reserve space while data loads -->
 		<app-attendance-table-skeleton />
 		<app-attendance-table-skeleton />
-	} @else if (profesoresMes().length > 0 && selectedProfesor()) {
-		<!-- * Month tables: ingresos and salidas -->
-		<app-attendance-table
+	} @else if (profesoresMes().length > 0 && selectedProfesor() && hasMonthData()) {
+		<app-attendance-heatmap
 			[table]="ingresos()"
+			icon="pi pi-sign-in"
+			[showSelector]="false"
+			[hidePersonName]="true"
+
 			[hijos]="profesoresAsHijos()"
 			[selectedHijoId]="selectedProfesorId()"
 			(monthChange)="onIngresosMonthChange($event)"
 			(hijoChange)="selectProfesor($event)"
 		/>
-		<app-attendance-table
+		<app-attendance-heatmap
 			[table]="salidas()"
+			icon="pi pi-sign-out"
+			[hidePersonName]="true"
+
+			[showSelector]="false"
 			[hijos]="profesoresAsHijos()"
 			[selectedHijoId]="selectedProfesorId()"
 			(monthChange)="onSalidasMonthChange($event)"
 			(hijoChange)="selectProfesor($event)"
 		/>
 	} @else if (!loading()) {
-		<!-- ! Empty state after load -->
+		<app-attendance-temporal-nav
+			mode="month"
+			[currentDate]="monthDate()"
+			(previous)="onPreviousMonth()"
+			(next)="onNextMonth()"
+		/>
 		<app-empty-state message="No se encontraron profesores en el mes seleccionado." />
 	}
 } @else {
-	<!-- * Day mode: persona day list (lista + stat-cards + PDF) -->
 	<app-attendance-persona-day-list
 		[personas]="personasDia()"
 		[fecha]="fechaDia()"
-		[estadisticas]="estadisticasDia()"
+		[estadisticas]="legendStats()"
 		[activeStatus]="activeStatus()"
 		[loading]="loading()"
-		[showPdfButton]="true"
-		[downloadingPdf]="downloadingPdf()"
-		[pdfMenuItems]="pdfMenuItems()"
+		[showPdfButton]="false"
+		[hideTemporalNav]="true"
 		[allowJustify]="false"
 		[showEditAdminAction]="true"
 		(fechaChange)="onFechaDiaChange($event)"
 		(editAdmin)="onEditarEnAdminDia($event)"
-	/>
+	>
+		<ng-container actionsSlot>
+			<p-button
+				icon="pi pi-pencil"
+				severity="info"
+				[text]="true"
+				[rounded]="true"
+				(onClick)="navigateToGestion()"
+				pTooltip="Gestión de asistencia"
+				tooltipPosition="top"
+				[pt]="{ root: { 'aria-label': 'Gestión de asistencia' } }"
+			/>
+			<p-button
+				icon="pi pi-chart-bar"
+				severity="secondary"
+				[text]="true"
+				[rounded]="true"
+				(onClick)="navigateToReportes()"
+				pTooltip="Reportes de asistencia"
+				tooltipPosition="top"
+				[pt]="{ root: { 'aria-label': 'Reportes de asistencia' } }"
+			/>
+		</ng-container>
+		<div subHeaderSlot class="legend-date-row">
+			<app-attendance-legend-stats [estadisticas]="legendStats()" [(activeStatus)]="activeStatus" />
+			<app-attendance-temporal-nav
+				mode="day"
+				[currentDate]="fechaDia()"
+				[maxDate]="today"
+				(previous)="onPreviousDayNav()"
+				(next)="onNextDayNav()"
+				(dateSelect)="onFechaDiaChange($event)"
+			/>
+		</div>
+	</app-attendance-persona-day-list>
 }
 <!-- #endregion -->
