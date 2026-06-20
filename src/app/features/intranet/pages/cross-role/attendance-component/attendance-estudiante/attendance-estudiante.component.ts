@@ -8,7 +8,7 @@ import { AttendanceDataService } from '@features/intranet/services/attendance/at
 import { AttendanceLegendComponent } from '@app/features/intranet/components/attendance/attendance-legend/attendance-legend.component';
 import { AttendanceScopeStudentNoticeComponent } from '@intranet-shared/components/attendance-scope-student-notice';
 import { AttendanceTable } from '../models/attendance.types';
-import { AttendanceTableComponent } from '@features/intranet/components/attendance/attendance-table/attendance-table.component';
+import { AttendanceHeatmapComponent } from '@features/intranet/components/attendance/attendance-heatmap/attendance-heatmap.component';
 import { AuthStore } from '@core/store';
 import { EmptyStateComponent } from '@features/intranet/components/attendance/empty-state/empty-state.component';
 import { UMBRAL_GRADO_ASISTENCIA_DIARIA } from '@shared/constants';
@@ -21,7 +21,7 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 	selector: 'app-attendance-estudiante',
 	standalone: true,
 	imports: [
-		AttendanceTableComponent,
+		AttendanceHeatmapComponent,
 		EmptyStateComponent,
 		AttendanceLegendComponent,
 		AttendanceScopeStudentNoticeComponent,

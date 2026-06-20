@@ -110,7 +110,7 @@ export type AttendanceStatus = 'A' | 'T' | 'F' | 'J' | '-' | 'X';
  * Discriminador polimórfico de `AsistenciaPersona` (backend):
  * 'E' = Estudiante, 'P' = Profesor, 'A' = Asistente Administrativo (Plan 28).
  */
-export const TIPO_PERSONA = ['E', 'P', 'A', 'C', 'M', 'D'] as const;
+export const TIPO_PERSONA = ['E', 'P', 'A', 'C', 'M', 'D', 'N'] as const;
 export type TipoPersona = (typeof TIPO_PERSONA)[number];
 
 // #endregion
@@ -215,6 +215,23 @@ export interface EstadisticasAsistenciaDia {
 	falta: number;
 	justificado: number;
 	pendiente: number;
+}
+
+export function computeStatsFromAsistencias(
+	asistencias: AsistenciaDetalle[],
+	field: 'estadoCodigo' | 'estadoIngreso' | 'estadoSalida' = 'estadoCodigo',
+): EstadisticasAsistenciaDia {
+	let asistio = 0, tardanza = 0, falta = 0, justificado = 0, pendiente = 0;
+	for (const a of asistencias) {
+		switch (a[field]) {
+			case 'A': asistio++; break;
+			case 'T': tardanza++; break;
+			case 'F': falta++; break;
+			case 'J': justificado++; break;
+			case '-': pendiente++; break;
+		}
+	}
+	return { total: asistencias.length, asistio, tardanza, falta, justificado, pendiente };
 }
 
 /**

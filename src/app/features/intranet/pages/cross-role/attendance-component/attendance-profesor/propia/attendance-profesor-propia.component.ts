@@ -11,7 +11,7 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
 import { AttendanceDataService } from '@features/intranet/services/attendance/attendance-data.service';
 import { AttendanceLegendComponent } from '@features/intranet/components/attendance/attendance-legend/attendance-legend.component';
-import { AttendanceTableComponent } from '@features/intranet/components/attendance/attendance-table/attendance-table.component';
+import { AttendanceHeatmapComponent } from '@features/intranet/components/attendance/attendance-heatmap/attendance-heatmap.component';
 import { EmptyStateComponent } from '@features/intranet/components/attendance/empty-state/empty-state.component';
 import { AttendanceTable } from '@features/intranet/pages/cross-role/attendance-component/models/attendance.types';
 import { AsistenciaProfesorApiService } from '@intranet-shared/services';
@@ -31,7 +31,7 @@ import { logger } from '@core/helpers';
 @Component({
 	selector: 'app-attendance-profesor-propia',
 	standalone: true,
-	imports: [AttendanceLegendComponent, AttendanceTableComponent, EmptyStateComponent],
+	imports: [AttendanceLegendComponent, AttendanceHeatmapComponent, EmptyStateComponent],
 	templateUrl: './attendance-profesor-propia.component.html',
 	changeDetection: ChangeDetectionStrategy.OnPush,
 })

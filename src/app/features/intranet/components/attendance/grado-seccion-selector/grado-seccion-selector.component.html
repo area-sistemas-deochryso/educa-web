@@ -1,8 +1,11 @@
 <!-- #region Template -->
 <div class="grado-seccion-selector">
 	<!-- * Simple native select for grade/section -->
-	<label for="grado-seccion-select">Grado y Sección:</label>
-	<select id="grado-seccion-select" (change)="onGradoSeccionChange($event)">
+	<select
+		id="grado-seccion-select"
+		aria-label="Grado y Sección"
+		(change)="onGradoSeccionChange($event)"
+	>
 		@for (gs of gradosSecciones(); track gs.grado + '|' + gs.seccion) {
 			<option
 				[value]="gs.grado + '|' + gs.seccion"

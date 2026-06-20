@@ -3,7 +3,7 @@ import { Injectable, inject } from '@angular/core';
 import { Observable } from 'rxjs';
 
 import { environment } from '@config/environment';
-import { AsistenciaDiaStaffConEstadisticas } from '@data/models';
+import { AsistenciaAsistenteAdminDto, AsistenciaDiaStaffConEstadisticas } from '@data/models';
 
 @Injectable({ providedIn: 'root' })
 export class AsistenciaStaffApiService {
@@ -20,6 +20,22 @@ export class AsistenciaStaffApiService {
 		};
 		return this.http.get<AsistenciaDiaStaffConEstadisticas>(
 			`${this.consultaBaseUrl}/director/staff-asistencia-dia`,
+			{ params },
+		);
+	}
+
+	listarStaff(
+		tipoPersona: string,
+		fechaInicio: Date,
+		fechaFin: Date,
+	): Observable<AsistenciaAsistenteAdminDto[]> {
+		const params = {
+			tipoPersona,
+			fechaInicio: this.formatDateLocal(fechaInicio),
+			fechaFin: this.formatDateLocal(fechaFin),
+		};
+		return this.http.get<AsistenciaAsistenteAdminDto[]>(
+			`${this.consultaBaseUrl}/director/staff`,
 			{ params },
 		);
 	}

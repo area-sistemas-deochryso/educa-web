@@ -1,49 +1,61 @@
 @if (loading()) {
 	<div class="dashboard-skeleton">
-		<p-skeleton width="100%" height="4rem" borderRadius="12px" />
+		<p-skeleton width="100%" height="6rem" borderRadius="12px" />
 	</div>
 } @else if (data(); as d) {
 	<div class="dashboard">
-		<div class="progress-section">
-			<div class="progress-info">
+		@if (viewMode() === 'dia') {
+			<div class="progress-section">
 				<span class="progress-label">Asistencia del día</span>
-			</div>
-			<span class="progress-value" [style.color]="progressColor()">
-				{{ porcentaje() }}%
-			</span>
-			@if (alerts().length > 0) {
-				<div class="alerts">
-					@for (alert of alerts(); track alert.label) {
-						<div class="alert-badge severity-{{ alert.severity }}">
-							<i [class]="alert.icon"></i>
-							<span>{{ alert.label }}</span>
-						</div>
-					}
-				</div>
-			}
-		</div>
-
-		<div class="progress-bar-container">
-			<div
-				class="progress-bar-fill"
-				[style.width.%]="porcentaje()"
-				[style.background]="progressColor()"
-			></div>
-		</div>
-
-		<div class="progress-detail">
-			@for (rol of rolSummaries(); track rol.label; let last = $last) {
-				<span>{{ rol.conEntrada }}/{{ rol.total }} {{ rol.label }}</span>
-				@if (!last) {
-					<span class="separator">·</span>
+				<span class="progress-value" [style.color]="progressColor()">
+					{{ porcentaje() }}%
+				</span>
+				@if (alerts().length > 0) {
+					<div class="alerts">
+						@for (alert of alerts(); track alert.label) {
+							<div class="alert-badge severity-{{ alert.severity }}">
+								<i [class]="alert.icon"></i>
+								<span>{{ alert.label }}</span>
+							</div>
+						}
+					</div>
 				}
+			</div>
+
+			<div class="progress-bar-container">
+				<div
+					class="progress-bar-fill"
+					[style.width.%]="porcentaje()"
+					[style.background]="progressColor()"
+				></div>
+			</div>
+		}
+
+		<!-- #region Role chips -->
+		<div class="role-chips">
+			@for (chip of roleChips(); track chip.tipo) {
+				<button
+					type="button"
+					class="role-chip"
+					[class.active]="selectedRole() === chip.tipo"
+					[class.no-data]="!chip.hasData"
+					(click)="onRoleSelect(chip.tipo)"
+				>
+					<i [class]="chip.icon" aria-hidden="true"></i>
+					<span class="role-chip-label">{{ chip.label }}</span>
+					<span class="role-chip-count">{{ chip.count }}</span>
+				</button>
 			}
-			@if (d.totalSalones != null && d.salonesConRegistro != null) {
-				<span class="separator">·</span>
-				<span pTooltip="Salones con al menos 1 registro" tooltipPosition="top">
+			@if (viewMode() === 'dia' && d.totalSalones != null && d.salonesConRegistro != null) {
+				<span
+					class="salones-text"
+					pTooltip="Salones con al menos 1 registro"
+					tooltipPosition="top"
+				>
 					{{ d.salonesConRegistro }}/{{ d.totalSalones }} salones
 				</span>
 			}
 		</div>
+		<!-- #endregion -->
 	</div>
 }

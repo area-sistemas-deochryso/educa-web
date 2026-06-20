@@ -1,22 +1,9 @@
 <!-- #region Template -->
-<app-attendance-dashboard />
-
-<nav class="submenu">
-	<p-selectButton
-		[options]="submenuOptions()"
-		[ngModel]="selectedSubMenu()"
-		(ngModelChange)="setSubMenu($event)"
-		optionLabel="label"
-		optionValue="value"
-		[allowEmpty]="false"
-		styleClass="submenu-toggle"
-	>
-		<ng-template let-option pTemplate>
-			<i [class]="option.icon" aria-hidden="true"></i>
-			<span class="submenu-label">{{ option.label }}</span>
-		</ng-template>
-	</p-selectButton>
-</nav>
+<app-attendance-dashboard
+	[selectedRole]="selectedRoleTipo()"
+	[viewMode]="currentViewMode()"
+	(roleSelect)="onRoleSelect($event)"
+/>
 
 @switch (selectedSubMenu()) {
 	@case ('estudiantes') {

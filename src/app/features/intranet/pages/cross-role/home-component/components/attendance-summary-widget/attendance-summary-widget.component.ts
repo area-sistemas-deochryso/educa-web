@@ -38,6 +38,7 @@ const ROL_VISIBLE: Record<TipoPersona, boolean> = {
 	C: true,
 	M: false,
 	D: false,
+	N: false,
 };
 
 @Component({

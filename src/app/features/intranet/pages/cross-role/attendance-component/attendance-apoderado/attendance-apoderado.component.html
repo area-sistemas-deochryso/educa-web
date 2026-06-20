@@ -8,8 +8,9 @@
 			se renderiza vacía porque el BE devuelve detalle:[] para este hijo.
 			El aviso explica el por qué.
 		-->
-		<app-attendance-table
+		<app-attendance-heatmap
 			[table]="ingresos()"
+			icon="pi pi-sign-in"
 			[hijos]="hijos()"
 			[selectedHijoId]="selectedHijoId()"
 			(monthChange)="onIngresosMonthChange($event)"
@@ -21,15 +22,17 @@
 		<app-attendance-legend />
 
 		<!-- * Two tables: ingresos and salidas for the selected child -->
-		<app-attendance-table
+		<app-attendance-heatmap
 			[table]="ingresos()"
+			icon="pi pi-sign-in"
 			[hijos]="hijos()"
 			[selectedHijoId]="selectedHijoId()"
 			(monthChange)="onIngresosMonthChange($event)"
 			(hijoChange)="selectHijo($event)"
 		/>
-		<app-attendance-table
+		<app-attendance-heatmap
 			[table]="salidas()"
+			icon="pi pi-sign-out"
 			[hijos]="hijos()"
 			[selectedHijoId]="selectedHijoId()"
 			(monthChange)="onSalidasMonthChange($event)"

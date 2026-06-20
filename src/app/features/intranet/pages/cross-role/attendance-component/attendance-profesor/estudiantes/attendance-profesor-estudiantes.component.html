@@ -18,23 +18,57 @@
 		<app-attendance-scope-student-notice [nombre]="selectedSalon()!.nombreSalon" />
 	} @else {
 	@if (selectedSalon() && view.viewMode() === 'mes') {
-		<!-- * PDF actions below selector -->
-		<div class="pdf-section">
-			<!-- Toggle mes/periodo -->
-			<p-selectButton
-				[options]="view.monthSubModeOptions"
-				[ngModel]="view.monthSubMode()"
-				(ngModelChange)="view.setMonthSubMode($event)"
-				optionLabel="label"
-				optionValue="value"
-				[allowEmpty]="false"
-				styleClass="pdf-mode-toggle"
-			/>
+		<!-- * Unified filter bar for month view (mirrors day-list layout) -->
+		<div class="filters-bar">
+			<div class="search-box">
+				<i class="pi pi-search"></i>
+				<input
+					type="text"
+					pInputText
+					[ngModel]="monthSearchTerm()"
+					(ngModelChange)="monthSearchTerm.set($event)"
+					(focus)="onMonthSearchFocus()"
+					(blur)="onMonthSearchBlur()"
+					placeholder="Buscar por nombre o DNI..."
+					class="search-input"
+					aria-label="Buscar estudiante por nombre o DNI"
+				/>
+				@if (monthSearchTerm()) {
+					<button
+						type="button"
+						class="clear-btn"
+						(click)="monthSearchTerm.set(''); onMonthSearchFocus()"
+						aria-label="Limpiar búsqueda"
+					>
+						<i class="pi pi-times"></i>
+					</button>
+				}
+				@if (monthShowSuggestions() && monthFilteredStudents().length > 0) {
+					<ul class="search-suggestions">
+						@for (est of monthFilteredStudents(); track est.estudianteId) {
+							<li
+								[class.active]="est.estudianteId === view.selectedEstudianteId()"
+								(mousedown)="selectStudentFromSearch(est.estudianteId)"
+							>
+								<span class="student-name">{{ est.nombreCompleto }}</span>
+								<span class="student-dni">{{ est.dni }}</span>
+							</li>
+						}
+					</ul>
+				}
+			</div>
 
-			<!-- Grouped: label/selectors + PDF button wrap together -->
-			<div class="pdf-report-info">
+			<div class="filters-right">
+				<p-selectButton
+					[options]="view.monthSubModeOptions"
+					[ngModel]="view.monthSubMode()"
+					(ngModelChange)="view.setMonthSubMode($event)"
+					optionLabel="label"
+					optionValue="value"
+					[allowEmpty]="false"
+					styleClass="pdf-mode-toggle"
+				/>
 				@if (view.monthSubMode() === 'periodo') {
-					<span class="pdf-label">Periodo:</span>
 					<p-select
 						[options]="view.mesOptionsInicio()"
 						[ngModel]="view.periodoInicio()"
@@ -56,9 +90,8 @@
 					/>
 					<span class="pdf-label">{{ view.periodoYear() }}</span>
 				} @else {
-					<span class="pdf-label">Reporte mensual: {{ view.pdfFecha() | date: 'MMMM yyyy' }}</span>
+					<span class="pdf-label">{{ view.pdfFecha() | date: 'MMMM yyyy' }}</span>
 				}
-
 				<p-button
 					icon="pi pi-file-pdf"
 					[loading]="view.pdf.downloadingPdf()"
@@ -69,11 +102,7 @@
 					(onClick)="togglePdfMenu($event)"
 					pTooltip="Opciones de PDF"
 					tooltipPosition="top"
-					[pt]="{
-						root: {
-							'aria-label': 'Opciones de PDF',
-						},
-					}"
+					[pt]="{ root: { 'aria-label': 'Opciones de PDF' } }"
 				/>
 				<p-menu #pdfMenu [model]="pdfMenuItems()" [popup]="true" appendTo="body" />
 			</div>
@@ -82,27 +111,32 @@
 
 	@if (view.viewMode() === 'mes') {
 		@if (view.showSkeletons() && !view.tableReady()) {
-			<!-- * Skeleton: reserve space while data loads -->
 			<app-attendance-table-skeleton />
 			<app-attendance-table-skeleton />
 		} @else if (view.estudiantes().length > 0) {
-			<!-- * Month tables: ingresos and salidas -->
-			<app-attendance-table
+			<app-attendance-heatmap
 				[table]="view.ingresos()"
+				icon="pi pi-sign-in"
+				[allowCellClick]="true"
+				[showSelector]="false"
 				[hijos]="view.estudiantesAsHijos()"
 				[selectedHijoId]="view.selectedEstudianteId()"
 				(monthChange)="view.onIngresosMonthChange($event)"
 				(hijoChange)="view.selectEstudiante($event)"
+				(cellClick)="onHeatmapCellClick($event)"
 			/>
-			<app-attendance-table
+			<app-attendance-heatmap
 				[table]="view.salidas()"
+				icon="pi pi-sign-out"
+				[allowCellClick]="true"
+				[showSelector]="false"
 				[hijos]="view.estudiantesAsHijos()"
 				[selectedHijoId]="view.selectedEstudianteId()"
 				(monthChange)="view.onSalidasMonthChange($event)"
 				(hijoChange)="view.selectEstudiante($event)"
+				(cellClick)="onHeatmapCellClick($event)"
 			/>
 		} @else if (!view.loading()) {
-			<!-- ! Empty state after load -->
 			<app-empty-state message="No se encontraron estudiantes en este salón." />
 		}
 	} @else {
@@ -126,4 +160,9 @@
 	<!-- ! No assigned salons -->
 	<app-empty-state message="No tiene salones asignados." />
 }
+
+<app-justification-dialog
+	[saving]="savingJustificacion()"
+	(justify)="onJustifyFromHeatmap($event)"
+/>
 <!-- #endregion -->

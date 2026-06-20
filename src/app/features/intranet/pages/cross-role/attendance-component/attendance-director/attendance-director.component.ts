@@ -1,10 +1,7 @@
-import { ChangeDetectionStrategy, Component, ViewChild, computed, inject, signal } from '@angular/core';
-import { FormsModule } from '@angular/forms';
-import { SelectButton } from 'primeng/selectbutton';
-import { APP_USER_ROLES } from '@app/shared/constants';
-import { UserProfileService } from '@core/services';
+import { ChangeDetectionStrategy, Component, computed, ViewChild, signal } from '@angular/core';
 
 import { ViewMode } from '@features/intranet/components/attendance/attendance-header/attendance-header.component';
+import { TipoPersona } from '@data/models';
 
 import { AttendanceDirectorAsistentesAdminComponent } from './asistentes-admin/attendance-director-asistentes-admin.component';
 import { AttendanceDirectorEstudiantesComponent } from './estudiantes/attendance-director-estudiantes.component';
@@ -12,40 +9,32 @@ import { AttendanceDirectorProfesoresComponent } from './profesores/attendance-d
 import { AttendanceDirectorStaffComponent } from './staff/attendance-director-staff.component';
 import { AttendanceDashboardComponent } from '@features/intranet/components/attendance/attendance-dashboard/attendance-dashboard.component';
 
-/**
- * Shell del panel admin de asistencia (Director + Promotor + Coordinador Académico
- * tras Plan 28 Chat 4a — el Asistente Administrativo va a self-service propia,
- * no a este panel). Expone un submenú Estudiantes/Profesores/AsistentesAdmin que
- * delega la lógica a tres componentes hermanos especializados.
- *
- * Tras Plan 21 Chat 7 + Plan 28 Chat 4b-tab, los tres sub-componentes responden
- * al pill día/mes del header cross-role (mes degradado en AAs hasta endpoint BE).
- */
 type SubMenu = 'estudiantes' | 'profesores' | 'asistentes-admin' | 'coordinadores' | 'promotores' | 'directores' | 'administradores';
 
-interface SubMenuOption {
-	label: string;
-	value: SubMenu;
-	icon: string;
-	visibleFor?: string[];
-}
+const TIPO_TO_SUBMENU: Record<TipoPersona, SubMenu> = {
+	E: 'estudiantes',
+	P: 'profesores',
+	A: 'asistentes-admin',
+	C: 'coordinadores',
+	M: 'promotores',
+	D: 'directores',
+	N: 'administradores',
+};
 
-const SUBMENU_OPTIONS: SubMenuOption[] = [
-	{ label: 'Estudiantes', value: 'estudiantes', icon: 'pi pi-graduation-cap' },
-	{ label: 'Profesores', value: 'profesores', icon: 'pi pi-user' },
-	{ label: 'Asistentes Admin', value: 'asistentes-admin', icon: 'pi pi-id-card' },
-	{ label: 'Coordinadores', value: 'coordinadores', icon: 'pi pi-briefcase' },
-	{ label: 'Promotores', value: 'promotores', icon: 'pi pi-megaphone' },
-	{ label: 'Directores', value: 'directores', icon: 'pi pi-building', visibleFor: [APP_USER_ROLES.Director, APP_USER_ROLES.Administrador] },
-	{ label: 'Administradores', value: 'administradores', icon: 'pi pi-cog', visibleFor: [APP_USER_ROLES.Administrador] },
-];
+const SUBMENU_TO_TIPO: Record<SubMenu, TipoPersona> = {
+	'estudiantes': 'E',
+	'profesores': 'P',
+	'asistentes-admin': 'A',
+	'coordinadores': 'C',
+	'promotores': 'M',
+	'directores': 'D',
+	'administradores': 'N',
+};
 
 @Component({
 	selector: 'app-attendance-director',
 	standalone: true,
 	imports: [
-		SelectButton,
-		FormsModule,
 		AttendanceDirectorEstudiantesComponent,
 		AttendanceDirectorProfesoresComponent,
 		AttendanceDirectorAsistentesAdminComponent,
@@ -57,7 +46,6 @@ const SUBMENU_OPTIONS: SubMenuOption[] = [
 	changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class AttendanceDirectorComponent {
-	private readonly userProfile = inject(UserProfileService);
 	@ViewChild(AttendanceDirectorEstudiantesComponent)
 	estudiantesComponent?: AttendanceDirectorEstudiantesComponent;
 
@@ -80,29 +68,24 @@ export class AttendanceDirectorComponent {
 	administradoresComponent?: AttendanceDirectorStaffComponent;
 
 	readonly selectedSubMenu = signal<SubMenu>('estudiantes');
-	readonly submenuOptions = computed(() => {
-		const role = this.userProfile.userRole();
-		return SUBMENU_OPTIONS.filter((o) => !o.visibleFor || o.visibleFor.includes(role));
-	});
+	readonly selectedRoleTipo = computed<TipoPersona>(() => SUBMENU_TO_TIPO[this.selectedSubMenu()]);
+	readonly currentViewMode = signal<ViewMode>('dia');
 
-	// * Cache del último modo recibido del header — se reaplica al cambiar de submenú
-	//   para que el sub-componente recién montado respete la elección día/mes del usuario.
 	private pendingViewMode: ViewMode | null = null;
 
 	setSubMenu(sub: SubMenu): void {
 		if (this.selectedSubMenu() === sub) return;
 		this.selectedSubMenu.set(sub);
-		// El @switch del template destruye y crea el sub-componente. El ViewChild solo
-		// estará disponible después del próximo ciclo de render — usamos setTimeout
-		// para aplicar el mode pendiente entonces.
 		setTimeout(() => this.applyPendingViewMode(), 0);
 	}
 
-	/**
-	 * Delega `setViewMode` al sub-componente activo. Ambos soportan el toggle Día/Mes
-	 * del header desde Chat 7.
-	 */
+	onRoleSelect(tipo: TipoPersona): void {
+		const sub = TIPO_TO_SUBMENU[tipo];
+		if (sub) this.setSubMenu(sub);
+	}
+
 	setViewMode(mode: ViewMode): void {
+		this.currentViewMode.set(mode);
 		this.pendingViewMode = mode;
 		this.applyPendingViewMode();
 	}

@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, computed, inject, OnInit, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, inject, input, OnInit, output, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { TooltipModule } from 'primeng/tooltip';
 import { SkeletonModule } from 'primeng/skeleton';
@@ -7,30 +7,24 @@ import { EstadisticasMultiRolDia, EstadisticasRol, TipoPersona } from '@data/mod
 import { DirectorAttendanceApiService } from '@features/intranet/shared/services/attendance/director-attendance-api.service';
 import { logger } from '@core/helpers';
 
-const ROL_LABELS: Record<string, string> = {
-	E: 'estudiantes',
-	P: 'profesores',
-	A: 'asist. admin',
-	C: 'coordinadores',
-	M: 'promotores',
-	D: 'directores',
+const ROL_CONFIG: Record<TipoPersona, { label: string; icon: string }> = {
+	E: { label: 'Estudiantes', icon: 'pi pi-graduation-cap' },
+	P: { label: 'Profesores', icon: 'pi pi-user' },
+	A: { label: 'Asist. Admin', icon: 'pi pi-id-card' },
+	C: { label: 'Coordinadores', icon: 'pi pi-briefcase' },
+	M: { label: 'Promotores', icon: 'pi pi-megaphone' },
+	D: { label: 'Directores', icon: 'pi pi-building' },
+	N: { label: 'Administradores', icon: 'pi pi-cog' },
 };
 
-const ROL_ORDER: TipoPersona[] = ['E', 'P', 'A', 'C', 'M', 'D'];
+const ROL_ORDER: TipoPersona[] = ['E', 'P', 'A', 'C', 'M', 'D', 'N'];
 
-const ROL_VISIBLE: Record<TipoPersona, boolean> = {
-	E: true,
-	P: true,
-	A: true,
-	C: true,
-	M: false,
-	D: false,
-};
-
-interface RolSummary {
+export interface RoleChip {
+	tipo: TipoPersona;
 	label: string;
-	conEntrada: number;
-	total: number;
+	icon: string;
+	count: string;
+	hasData: boolean;
 }
 
 @Component({
@@ -44,6 +38,10 @@ interface RolSummary {
 export class AttendanceDashboardComponent implements OnInit {
 	private readonly api = inject(DirectorAttendanceApiService);
 
+	readonly selectedRole = input<TipoPersona>('E');
+	readonly viewMode = input<string>('dia');
+	readonly roleSelect = output<TipoPersona>();
+
 	readonly loading = signal(true);
 	readonly data = signal<EstadisticasMultiRolDia | null>(null);
 
@@ -51,17 +49,30 @@ export class AttendanceDashboardComponent implements OnInit {
 		const d = this.data();
 		if (!d) return [];
 		return [...d.roles]
-			.filter((r) => r.total > 0 && ROL_VISIBLE[r.tipoPersona])
+			.filter((r) => r.total > 0)
 			.sort((a, b) => ROL_ORDER.indexOf(a.tipoPersona) - ROL_ORDER.indexOf(b.tipoPersona));
 	});
 
-	readonly rolSummaries = computed<RolSummary[]>(() =>
-		this.visibleRoles().map((r) => ({
-			label: ROL_LABELS[r.tipoPersona] ?? r.tipoPersona,
-			conEntrada: r.conEntrada,
-			total: r.total,
-		})),
-	);
+	readonly roleChips = computed<RoleChip[]>(() => {
+		const d = this.data();
+		const isMonth = this.viewMode() === 'mes';
+		return ROL_ORDER.map((tipo) => {
+			const rol = d?.roles.find((r) => r.tipoPersona === tipo);
+			const config = ROL_CONFIG[tipo];
+			const hasData = !!rol && rol.total > 0;
+			return {
+				tipo,
+				label: config.label,
+				icon: config.icon,
+				count: hasData ? (isMonth ? `${rol!.total}` : `${rol!.conEntrada}/${rol!.total}`) : '—',
+				hasData,
+			};
+		});
+	});
+
+	onRoleSelect(tipo: TipoPersona): void {
+		this.roleSelect.emit(tipo);
+	}
 
 	readonly porcentaje = computed(() => {
 		const roles = this.visibleRoles();

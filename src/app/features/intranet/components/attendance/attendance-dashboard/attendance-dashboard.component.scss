@@ -10,18 +10,13 @@
 	margin-bottom: 0.75rem;
 }
 
+// #region Progress header
 .progress-section {
 	display: flex;
 	align-items: baseline;
-	justify-content: space-between;
-	gap: 1rem;
+	gap: 0.625rem;
 	flex-wrap: wrap;
 	margin-bottom: 0.375rem;
-}
-
-.progress-info {
-	flex: 1;
-	min-width: 200px;
 }
 
 .progress-label {
@@ -37,6 +32,10 @@
 	font-weight: 700;
 }
 
+.alerts {
+	margin-left: auto;
+}
+
 .progress-bar-container {
 	height: 6px;
 	background: var(--surface-ground);
@@ -50,19 +49,78 @@
 	border-radius: 3px;
 	transition: width 0.4s ease-out;
 }
+// #endregion
 
-.progress-detail {
+// #region Role chips
+.role-chips {
 	display: flex;
-	gap: 0.25rem;
-	margin-top: 0.375rem;
-	font-size: 0.775rem;
-	color: var(--text-color-secondary);
+	flex-wrap: wrap;
+	gap: 6px;
+	margin-top: 0.625rem;
+}
 
-	.separator {
-		opacity: 0.5;
+.role-chip {
+	display: inline-flex;
+	align-items: center;
+	gap: 0.375rem;
+	padding: 0.4rem 0.75rem;
+	border: 1px solid var(--surface-border);
+	border-radius: 8px;
+	background: transparent;
+	color: var(--text-color-secondary);
+	font-size: 0.8rem;
+	cursor: pointer;
+	transition: background-color 0.15s ease, color 0.15s ease, border-color 0.15s ease;
+
+	i {
+		font-size: 0.85rem;
+	}
+
+	&:hover:not(.role-chip-info) {
+		background: rgba(0, 0, 0, 0.04);
+		color: var(--text-color);
+		border-color: var(--text-color-secondary);
+	}
+
+	&.active {
+		background: var(--intranet-accent-color-green);
+		color: white;
+		border-color: var(--intranet-accent-color-green);
+
+		.role-chip-count {
+			background: rgba(255, 255, 255, 0.2);
+			color: white;
+		}
+	}
+
+	&.no-data:not(.active) {
+		opacity: 0.55;
 	}
 }
 
+.role-chip-label {
+	font-weight: 500;
+	white-space: nowrap;
+}
+
+.role-chip-count {
+	font-size: 0.7rem;
+	font-weight: 600;
+	padding: 0.1rem 0.4rem;
+	border-radius: 8px;
+	background: rgba(0, 0, 0, 0.06);
+}
+
+.salones-text {
+	font-size: 0.775rem;
+	color: var(--text-color-secondary);
+	align-self: center;
+	margin-left: 0.25rem;
+	cursor: default;
+}
+// #endregion
+
+// #region Alerts
 .alerts {
 	display: flex;
 	gap: 0.5rem;
@@ -94,10 +152,28 @@
 		border: 1px solid rgba(244, 67, 54, 0.2);
 	}
 }
+// #endregion
 
+// #region Responsive
 @media (max-width: 768px) {
 	.dashboard {
 		flex-direction: column;
 		align-items: stretch;
 	}
+
+	.role-chip-label {
+		display: none;
+	}
 }
+
+@media (max-width: 480px) {
+	.role-chips {
+		gap: 4px;
+	}
+
+	.role-chip {
+		padding: 0.35rem 0.5rem;
+		font-size: 0.75rem;
+	}
+}
+// #endregion

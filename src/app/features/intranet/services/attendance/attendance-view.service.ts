@@ -205,6 +205,14 @@ export class AttendanceViewController {
 	// #endregion
 	// #region Cambio de mes
 
+	onMonthChange(month: number): void {
+		this.ingresos.update((table) => ({ ...table, selectedMonth: month }));
+		this.salidas.update((table) => ({ ...table, selectedMonth: month }));
+		this.config.onMonthChange();
+		this.syncSelectedYear();
+		this.loadEstudianteAsistencias();
+	}
+
 	onIngresosMonthChange(month: number): void {
 		this.ingresos.update((table) => ({ ...table, selectedMonth: month }));
 		this.config.onMonthChange();

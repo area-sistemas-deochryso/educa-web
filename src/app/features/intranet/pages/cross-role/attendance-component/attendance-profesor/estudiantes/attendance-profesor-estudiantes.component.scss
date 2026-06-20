@@ -21,29 +21,120 @@
 }
 
 // #endregion
-// #region PDF section
-.pdf-section {
+// #region Unified filters bar (mirrors day-list layout)
+.filters-bar {
 	display: flex;
 	align-items: center;
 	gap: 0.75rem;
-	padding: 0.75rem 1.25rem;
+	padding: 0.5rem 0;
+	flex-wrap: wrap;
+	margin-bottom: 0.5rem;
+	position: relative;
+	z-index: 10;
+}
+
+.search-box {
+	position: relative;
+	z-index: 100;
+	display: flex;
+	align-items: center;
+	min-width: 180px;
+	max-width: 260px;
+
+	> .pi-search {
+		position: absolute;
+		left: 0.75rem;
+		color: var(--text-color-secondary);
+		font-size: 0.85rem;
+		pointer-events: none;
+		z-index: 1;
+	}
+
+	.search-input {
+		width: 100%;
+		padding-left: 2.25rem;
+		padding-right: 2rem;
+		font-size: 0.85rem;
+		height: 2rem;
+		background: var(--surface-card);
+	}
+
+	.clear-btn {
+		position: absolute;
+		right: 0.5rem;
+		background: none;
+		border: none;
+		cursor: pointer;
+		color: var(--text-color-secondary);
+		padding: 0.125rem;
+		display: flex;
+		z-index: 1;
+
+		&:hover { color: var(--text-color); }
+		i { font-size: 0.75rem; }
+	}
+}
+
+.search-suggestions {
+	position: absolute;
+	top: 100%;
+	left: 0;
+	min-width: 280px;
+	background: #ffffff !important;
+	border: 1px solid var(--surface-border);
+	border-top: none;
+	border-radius: 0 0 8px 8px;
+	max-height: 240px;
+	overflow-y: auto;
+	z-index: 100;
+	list-style: none;
+	padding: 0;
+	margin: 0;
+	box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+
+	li {
+		display: flex;
+		align-items: center;
+		justify-content: space-between;
+		gap: 0.5rem;
+		padding: 0.5rem 0.75rem;
+		cursor: pointer;
+		font-size: 0.85rem;
+		color: var(--text-color);
+		border-bottom: 1px solid var(--surface-50, #f8f9fa);
+
+		&:last-child { border-bottom: none; }
+		&:hover { background: var(--surface-hover); }
+		&.active { background: var(--primary-50, #eff6ff); font-weight: 600; }
+
+		.student-dni {
+			color: var(--text-color-secondary);
+			font-size: 0.75rem;
+			flex-shrink: 0;
+		}
+
+		.student-name {
+			overflow: hidden;
+			text-overflow: ellipsis;
+			white-space: nowrap;
+		}
+	}
+}
+
+.filters-right {
+	display: flex;
+	align-items: center;
+	gap: 0.5rem;
+	flex-shrink: 0;
+	margin-left: auto;
 	flex-wrap: wrap;
 
 	.pdf-label {
-		font-size: 0.95rem;
+		font-size: 0.85rem;
 		font-weight: 500;
 		color: var(--text-color);
 		white-space: nowrap;
 	}
-}
-
-// #endregion
-// #region Report info group
-.pdf-report-info {
-	display: flex;
-	align-items: center;
-	gap: 0.5rem;
-	flex-wrap: wrap;
 }
 
 .periodo-separator {

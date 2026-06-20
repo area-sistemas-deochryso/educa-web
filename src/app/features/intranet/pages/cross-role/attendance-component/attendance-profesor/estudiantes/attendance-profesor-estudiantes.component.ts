@@ -4,12 +4,13 @@ import { AttendanceService } from '@intranet-shared/services';
 import { esGradoAsistenciaDiaria } from '@shared/constants';
 import { periodoEnMes, filtrarPorPeriodoAcademico } from '@shared/models';
 import { JustificacionEvent } from '@features/intranet/components/attendance/attendance-day-list/attendance-day-list.component';
-import { ChangeDetectionStrategy, Component, DestroyRef, OnInit, ViewChild, computed, inject, output, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, DestroyRef, OnInit, ViewChild, computed, effect, inject, output, signal } from '@angular/core';
 
 import { AttendanceDayListComponent } from '@features/intranet/components/attendance/attendance-day-list/attendance-day-list.component';
 import { AttendanceLegendComponent } from '@app/features/intranet/components/attendance/attendance-legend/attendance-legend.component';
 import { AttendanceScopeStudentNoticeComponent } from '@intranet-shared/components/attendance-scope-student-notice';
-import { AttendanceTableComponent } from '@features/intranet/components/attendance/attendance-table/attendance-table.component';
+import { AttendanceHeatmapComponent, HeatmapCellClick } from '@features/intranet/components/attendance/attendance-heatmap/attendance-heatmap.component';
+import { JustificationDialogComponent, JustificationResult } from '@features/intranet/components/attendance/justification-dialog/justification-dialog.component';
 import { AttendanceTableSkeletonComponent } from '@features/intranet/components/attendance/attendance-table-skeleton/attendance-table-skeleton.component';
 import { AttendanceViewController } from '@features/intranet/services/attendance/attendance-view.service';
 import { SelectorContext } from '@features/intranet/services/attendance/attendance-view.models';
@@ -23,6 +24,7 @@ import { ButtonModule } from 'primeng/button';
 import { DatePipe } from '@angular/common';
 import { EmptyStateComponent } from '@features/intranet/components/attendance/empty-state/empty-state.component';
 import { FormsModule } from '@angular/forms';
+import { InputTextModule } from 'primeng/inputtext';
 import { Menu, MenuModule } from 'primeng/menu';
 import { MenuItem } from 'primeng/api';
 import { SalonSelectorComponent } from '@features/intranet/components/attendance/salon-selector/salon-selector.component';
@@ -46,16 +48,18 @@ import { buildPdfExcelMenuItems } from '../../attendance-director/consolidated-p
 	selector: 'app-attendance-profesor-estudiantes',
 	standalone: true,
 	imports: [
-		AttendanceTableComponent,
+		AttendanceHeatmapComponent,
 		AttendanceTableSkeletonComponent,
 		AttendanceScopeStudentNoticeComponent,
 		SalonSelectorComponent,
 		AttendanceDayListComponent,
 		EmptyStateComponent,
 		AttendanceLegendComponent,
+		JustificationDialogComponent,
 		ButtonModule,
 		TooltipModule,
 		MenuModule,
+		InputTextModule,
 		DatePipe,
 		FormsModule,
 		Select,
@@ -68,6 +72,7 @@ import { buildPdfExcelMenuItems } from '../../attendance-director/consolidated-p
 })
 export class AttendanceProfesorEstudiantesComponent implements OnInit {
 	@ViewChild('pdfMenu') pdfMenu!: Menu;
+	@ViewChild(JustificationDialogComponent) justificationDialog!: JustificationDialogComponent;
 
 	private asistenciaService = inject(AttendanceService);
 	private storage = inject(StorageService);
@@ -112,6 +117,46 @@ export class AttendanceProfesorEstudiantesComponent implements OnInit {
 		if (!salon) return false;
 		return !esGradoAsistenciaDiaria(salon.graOrden);
 	});
+
+	// #endregion
+	// #region Month search (unified filter bar)
+	readonly monthSearchTerm = signal('');
+	readonly monthShowSuggestions = signal(false);
+
+	readonly monthFilteredStudents = computed(() => {
+		const term = this.monthSearchTerm().toLowerCase().trim();
+		const hijos = this.view.estudiantesAsHijos();
+		if (!term) return hijos;
+		return hijos.filter(h =>
+			h.nombreCompleto.toLowerCase().includes(term) ||
+			(h.dni && h.dni.toLowerCase().includes(term)),
+		);
+	});
+
+	private readonly syncSearchWithSelection = effect(() => {
+		const est = this.view.selectedEstudiante();
+		if (est && !this.monthShowSuggestions()) {
+			this.monthSearchTerm.set(est.nombreCompleto);
+		}
+	});
+
+	onMonthSearchFocus(): void {
+		this.monthSearchTerm.set('');
+		this.monthShowSuggestions.set(true);
+	}
+
+	onMonthSearchBlur(): void {
+		setTimeout(() => {
+			this.monthShowSuggestions.set(false);
+			const est = this.view.selectedEstudiante();
+			if (est) this.monthSearchTerm.set(est.nombreCompleto);
+		}, 200);
+	}
+
+	selectStudentFromSearch(estudianteId: number): void {
+		this.view.selectEstudiante(estudianteId);
+		this.monthShowSuggestions.set(false);
+	}
 
 	// #endregion
 	// #region Justificación
@@ -300,7 +345,35 @@ export class AttendanceProfesorEstudiantesComponent implements OnInit {
 			.subscribe({
 				next: (response) => {
 					if (response.success) {
-						// Recargar datos del día para reflejar el cambio
+						this.view.reload();
+					}
+				},
+			});
+	}
+
+	onHeatmapCellClick(event: HeatmapCellClick): void {
+		const estudiante = this.view.selectedEstudiante();
+		if (!estudiante) return;
+		this.justificationDialog.open({
+			personId: estudiante.estudianteId,
+			personName: estudiante.nombreCompleto,
+			personDni: estudiante.dni,
+			date: event.date,
+			isJustified: event.status === 'J',
+		});
+	}
+
+	onJustifyFromHeatmap(result: JustificationResult): void {
+		this.savingJustificacion.set(true);
+		this.asistenciaService
+			.justificarAsistencia(result.personId, result.date, result.observacion, result.quitar)
+			.pipe(
+				takeUntilDestroyed(this.destroyRef),
+				finalize(() => this.savingJustificacion.set(false)),
+			)
+			.subscribe({
+				next: (response) => {
+					if (response.success) {
 						this.view.reload();
 					}
 				},
