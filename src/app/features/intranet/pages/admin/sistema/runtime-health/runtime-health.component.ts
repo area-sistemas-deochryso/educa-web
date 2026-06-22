@@ -1,7 +1,7 @@
 import { DecimalPipe } from '@angular/common';
 import { ChangeDetectionStrategy, Component, OnInit, inject } from '@angular/core';
 import { BadgeModule } from 'primeng/badge';
-import { Tab, TabList, TabPanel, TabPanels, Tabs } from 'primeng/tabs';
+import { Tab, TabList, TabPanel, Tabs } from 'primeng/tabs';
 
 import { PageHeaderComponent } from '@intranet-shared/components/page-header';
 
@@ -22,7 +22,6 @@ import { RuntimeHealthFacade } from './services/runtime-health.facade';
 		Tabs,
 		TabList,
 		Tab,
-		TabPanels,
 		TabPanel,
 		PageHeaderComponent,
 		RuntimeHealthWidgetComponent,

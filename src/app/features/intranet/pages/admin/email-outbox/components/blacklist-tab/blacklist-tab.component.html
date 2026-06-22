@@ -1,3 +1,11 @@
+@if (hubFiltered()) {
+	<app-hub-context-banner
+		level="critical"
+		[message]="hubFilterMessage()"
+		(clearFilter)="clearHubFilter()"
+	/>
+}
+
 <!-- #region Banner + toast -->
 <app-email-defer-fail-banner />
 @if (deferAlertsEnabled) {

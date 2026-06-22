@@ -23,15 +23,12 @@ import { AttendancePdfService } from '@features/intranet/services/attendance/att
 import { AttendanceStatsService } from '@features/intranet/services/attendance/attendance-stats.service';
 import { VIEW_MODE, ViewMode } from '@features/intranet/components/attendance/attendance-header/attendance-header.component';
 import { ButtonModule } from 'primeng/button';
-import { DatePipe } from '@angular/common';
 import { EmptyStateComponent } from '@features/intranet/components/attendance/empty-state/empty-state.component';
 import { FormsModule } from '@angular/forms';
 import { GradoSeccionSelectorComponent } from '@features/intranet/components/attendance/grado-seccion-selector/grado-seccion-selector.component';
 import { InputTextModule } from 'primeng/inputtext';
 import { Menu, MenuModule } from 'primeng/menu';
 import { MenuItem } from 'primeng/api';
-import { Select } from 'primeng/select';
-import { SelectButton } from 'primeng/selectbutton';
 import { TooltipModule } from 'primeng/tooltip';
 import { finalize } from 'rxjs';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
@@ -69,10 +66,7 @@ import {
 		TooltipModule,
 		MenuModule,
 		InputTextModule,
-		Select,
-		SelectButton,
 		FormsModule,
-		DatePipe,
 	],
 	providers: [AttendanceViewController, AttendancePdfService, AttendanceStatsService],
 	templateUrl: './attendance-director-estudiantes.component.html',

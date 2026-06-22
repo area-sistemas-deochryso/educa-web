@@ -1,5 +1,13 @@
 <!-- #region Template -->
 <div class="feedback-reports-page">
+	@if (hubFiltered()) {
+		<app-hub-context-banner
+			[level]="vm().filterEstado === 'NUEVO' ? 'critical' : 'warn'"
+			[message]="hubFilterMessage()"
+			(clearFilter)="clearHubFilter()"
+		/>
+	}
+
 	<!-- #region Header -->
 	<app-page-header
 		icon="pi pi-comments"

@@ -42,7 +42,6 @@ import {
 import { AsistenciaStaffApiService } from '@intranet-shared/services';
 import { formatDateLocalIso } from '@core/helpers';
 import { ErrorHandlerService } from '@core/services';
-import { DatePipe } from '@angular/common';
 import { ButtonModule } from 'primeng/button';
 import { InputTextModule } from 'primeng/inputtext';
 import { TooltipModule } from 'primeng/tooltip';
@@ -65,7 +64,6 @@ const TIPO_LABELS: Record<string, string> = {
 		AttendanceTableSkeletonComponent,
 		EmptyStateComponent,
 		ButtonModule,
-		DatePipe,
 		FormsModule,
 		InputTextModule,
 		TooltipModule,

@@ -193,7 +193,7 @@
 								<pre class="detail-pre detail-pre--stack">{{ err.stackTrace }}</pre>
 							</div>
 						}
-						@if (!err.trace?.length && !err.stackTrace) {
+						@if (!err.trace.length && !err.stackTrace) {
 							<div class="tab-empty">
 								<i class="pi pi-info-circle"></i>
 								<p>Sin trace ni stack trace registrado para esta ocurrencia.</p>

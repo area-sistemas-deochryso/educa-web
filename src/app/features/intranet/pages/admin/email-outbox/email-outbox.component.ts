@@ -4,6 +4,7 @@ import {
 	DestroyRef,
 	OnInit,
 	inject,
+	signal,
 } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { FormsModule } from '@angular/forms';
@@ -27,6 +28,7 @@ import {
 	CandidatoBlacklistDetectadoEvent,
 } from '@features/intranet/pages/admin/email-outbox-dashboard-dia/models/email-monitoreo.models';
 
+import { HubContextBannerComponent, readHubContext } from '../monitoreo/shared';
 import { EmailOutboxDataFacade, EmailOutboxUiFacade } from './services';
 import { EmailOutboxHeaderComponent } from './components/email-outbox-header/email-outbox-header.component';
 import { EmailOutboxStatsComponent } from './components/email-outbox-stats/email-outbox-stats.component';
@@ -62,6 +64,7 @@ import { EmailOutboxLista } from '@data/models';
 		DeferFailStatusWidgetComponent,
 		EmailDeferFailBannerComponent,
 		CorrelationIdPillComponent,
+		HubContextBannerComponent,
 	],
 	providers: [MessageService],
 	templateUrl: './email-outbox.component.html',
@@ -88,6 +91,8 @@ export class EmailOutboxComponent implements OnInit {
 	readonly deferAlertsEnabled = environment.features.emailDeferAlerts;
 
 	selectedSender: string | null = null;
+	readonly hubFiltered = signal(false);
+	readonly hubFilterMessage = signal('');
 
 	get senderOptions(): { label: string; value: string }[] {
 		const status = this.vm().throttleStatus;
@@ -98,9 +103,14 @@ export class EmailOutboxComponent implements OnInit {
 
 	// #region Lifecycle
 	constructor() {
-		// Plan 32 Chat 4 — leer correlationId del query param para deep-link desde
-		// el hub. El filter es client-side via computed; basta con setearlo antes
-		// del fetch para que la primera lista pintada ya esté filtrada.
+		const hubCtx = readHubContext(this.route);
+		if (hubCtx.fromHub && hubCtx.level) {
+			const estado = hubCtx.level === 'critical' ? 'FAILED' : 'PENDING';
+			this.dataFacade.onFilterEstadoChange(estado);
+			this.hubFiltered.set(true);
+			this.hubFilterMessage.set(`Filtrado desde el hub — mostrando correos en estado ${estado}`);
+		}
+
 		this.route.queryParamMap
 			.pipe(takeUntilDestroyed(this.destroyRef))
 			.subscribe((params) => {
@@ -193,6 +203,11 @@ export class EmailOutboxComponent implements OnInit {
 
 	onClearFilters(): void {
 		this.dataFacade.clearFilters();
+		this.hubFiltered.set(false);
+	}
+
+	clearHubFilter(): void {
+		this.onClearFilters();
 	}
 
 	onLazyLoad(event: { page: number; pageSize: number }): void {

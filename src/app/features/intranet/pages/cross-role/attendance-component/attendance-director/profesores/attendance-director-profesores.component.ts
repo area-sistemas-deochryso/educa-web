@@ -45,7 +45,6 @@ import { AsistenciaProfesorApiService } from '@intranet-shared/services';
 import { downloadBlob, formatDateLocalIso, viewBlobInNewTab } from '@core/helpers';
 import { ErrorHandlerService } from '@core/services';
 
-import { DatePipe } from '@angular/common';
 import { ButtonModule } from 'primeng/button';
 import { InputTextModule } from 'primeng/inputtext';
 import { MenuItem } from 'primeng/api';
@@ -70,7 +69,6 @@ import { buildPdfExcelMenuItems } from '../consolidated-pdf.helper';
 		AttendanceTableSkeletonComponent,
 		EmptyStateComponent,
 		ButtonModule,
-		DatePipe,
 		FormsModule,
 		InputTextModule,
 		MenuModule,

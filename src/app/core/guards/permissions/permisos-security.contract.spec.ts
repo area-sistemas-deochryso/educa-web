@@ -7,7 +7,9 @@ import { ActivatedRouteSnapshot, provideRouter, RouterStateSnapshot, UrlSegment,
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { permissionsGuard } from './permisos.guard';
-import { AuthService, ErrorHandlerService, UserPermissionsService } from '@core/services';
+import { AuthService } from '@core/services/auth';
+import { ErrorHandlerService } from '@core/services/error';
+import { UserPermissionsService } from '@core/services/permissions';
 
 // #endregion
 

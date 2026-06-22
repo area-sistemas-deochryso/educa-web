@@ -26,6 +26,7 @@ import {
 import { PageHeaderComponent } from '@intranet-shared/components';
 import { CorrelationIdPillComponent } from '@intranet-shared/components';
 
+import { HubContextBannerComponent, readHubContext } from '../monitoreo/shared';
 import { FeedbackReportsFacade } from './services';
 
 // #endregion
@@ -53,6 +54,7 @@ interface EstadoOption {
 		TooltipModule,
 		CorrelationIdPillComponent,
 		PageHeaderComponent,
+		HubContextBannerComponent,
 	],
 	providers: [ConfirmationService],
 	templateUrl: './feedback-reports.component.html',
@@ -76,10 +78,18 @@ export class FeedbackReportsComponent implements OnInit {
 	// Estado local del formulario de cambio de estado en el drawer
 	readonly nuevoEstado = signal<ReporteEstado | null>(null);
 	readonly observacionCambio = signal<string>('');
+	readonly hubFiltered = signal(false);
+	readonly hubFilterMessage = signal('');
 
 	ngOnInit(): void {
-		// Plan 32 Chat 4 — leer correlationId del query param para deep-link desde
-		// el hub. Si viene, se aplica como filtro client-side y dispara load.
+		const hubCtx = readHubContext(this.route);
+		if (hubCtx.fromHub && hubCtx.level) {
+			const estado: ReporteEstado = hubCtx.level === 'critical' ? 'NUEVO' : 'EN_PROGRESO';
+			this.facade.setFilterEstado(estado);
+			this.hubFiltered.set(true);
+			this.hubFilterMessage.set(`Filtrado desde el hub — mostrando reportes ${this.estadoLabel(estado)}`);
+		}
+
 		this.route.queryParamMap
 			.pipe(takeUntilDestroyed(this.destroyRef))
 			.subscribe((params) => {
@@ -112,6 +122,11 @@ export class FeedbackReportsComponent implements OnInit {
 
 	onClearFilters(): void {
 		this.facade.clearFilters();
+		this.hubFiltered.set(false);
+	}
+
+	clearHubFilter(): void {
+		this.onClearFilters();
 	}
 
 	onRefresh(): void {

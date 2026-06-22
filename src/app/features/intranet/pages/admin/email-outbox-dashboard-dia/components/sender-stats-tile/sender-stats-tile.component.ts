@@ -8,8 +8,6 @@ import { DatePipe, DecimalPipe } from '@angular/common';
 
 import { TableSkeletonComponent } from '@intranet-shared/components';
 import type { SkeletonColumnDef } from '@intranet-shared/components';
-import { SkeletonLoaderComponent } from '@shared/components';
-
 import { DashboardSenderStat } from '../../models/email-monitoreo.models';
 
 const SKELETON_COLUMNS: SkeletonColumnDef[] = [
@@ -27,7 +25,7 @@ const SKELETON_COLUMNS: SkeletonColumnDef[] = [
 @Component({
 	selector: 'app-sender-stats-tile',
 	standalone: true,
-	imports: [DatePipe, DecimalPipe, SkeletonLoaderComponent, TableSkeletonComponent],
+	imports: [DatePipe, DecimalPipe, TableSkeletonComponent],
 	templateUrl: './sender-stats-tile.component.html',
 	styleUrl: './sender-stats-tile.component.scss',
 	changeDetection: ChangeDetectionStrategy.OnPush,

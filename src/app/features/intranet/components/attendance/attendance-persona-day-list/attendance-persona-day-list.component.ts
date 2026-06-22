@@ -27,7 +27,6 @@ import {
 } from '@data/models';
 import { ResponsiveTableComponent, TableSkeletonComponent } from '@intranet-shared/components';
 import type { SkeletonColumnDef } from '@intranet-shared/components';
-import { SkeletonLoaderComponent } from '@shared/components';
 import { FormatTimePipe } from '@intranet-shared/pipes';
 import { getStatusClass } from '@features/intranet/pages/cross-role/attendance-component/config/attendance.constants';
 import { InputTextModule } from 'primeng/inputtext';
@@ -62,7 +61,6 @@ export interface JustificacionPersonaEvent {
 		FormsModule,
 		TableModule,
 		SkeletonModule,
-		SkeletonLoaderComponent,
 		TableSkeletonComponent,
 		ResponsiveTableComponent,
 		ButtonModule,

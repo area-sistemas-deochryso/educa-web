@@ -3,6 +3,7 @@ import {
 	Component,
 	OnInit,
 	inject,
+	signal,
 } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { ButtonModule } from 'primeng/button';
@@ -22,6 +23,9 @@ import {
 	EmailDomainPauseListaDto,
 } from '@data/models';
 
+import { ActivatedRoute } from '@angular/router';
+
+import { HubContextBannerComponent, readHubContext } from '../../../monitoreo/shared';
 import {
 	EmailDomainPauseCrudFacade,
 	EmailDomainPauseDataFacade,
@@ -61,6 +65,7 @@ const MOTIVO_OPTIONS: SelectOption<DomainPauseMotivo>[] = EMAIL_DOMAIN_PAUSE_MOT
 		DomainPausesTableComponent,
 		DomainPausesAddDialogComponent,
 		DomainBlockedAlertBannerComponent,
+		HubContextBannerComponent,
 	],
 	providers: [ConfirmationService],
 	templateUrl: './domain-pauses-tab.component.html',
@@ -72,12 +77,21 @@ export class DomainPausesTabComponent implements OnInit {
 	private readonly crudFacade = inject(EmailDomainPauseCrudFacade);
 	private readonly uiFacade = inject(EmailDomainPauseUiFacade);
 	private readonly confirmationService = inject(ConfirmationService);
+	private readonly route = inject(ActivatedRoute);
 
 	readonly vm = this.dataFacade.vm;
 	readonly skeletonColumns = DomainPausesTableComponent.skeletonColumns;
 	readonly motivoOptions = MOTIVO_OPTIONS;
+	readonly hubFiltered = signal(false);
+	readonly hubFilterMessage = signal('');
 
 	ngOnInit(): void {
+		const hubCtx = readHubContext(this.route);
+		if (hubCtx.fromHub && hubCtx.level) {
+			this.hubFiltered.set(true);
+			this.hubFilterMessage.set('Filtrado desde el hub — mostrando pausas activas');
+		}
+
 		this.dataFacade.loadData();
 	}
 
@@ -95,6 +109,11 @@ export class DomainPausesTabComponent implements OnInit {
 
 	onClearFiltros(): void {
 		this.dataFacade.clearFiltros();
+		this.hubFiltered.set(false);
+	}
+
+	clearHubFilter(): void {
+		this.onClearFiltros();
 	}
 
 	onRefresh(): void {

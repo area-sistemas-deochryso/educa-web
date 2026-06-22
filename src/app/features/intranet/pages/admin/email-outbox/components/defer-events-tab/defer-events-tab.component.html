@@ -1,3 +1,11 @@
+@if (hubFiltered()) {
+	<app-hub-context-banner
+		level="warn"
+		[message]="hubFilterMessage()"
+		(clearFilter)="clearHubFilter()"
+	/>
+}
+
 <app-domain-blocked-alert-banner />
 
 <!-- #region Stats + sparkline 30d -->

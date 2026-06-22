@@ -46,6 +46,19 @@
 						"browser": "src/main.ts",
 						"tsConfig": "tsconfig.app.json",
 						"inlineStyleLanguage": "scss",
+						"allowedCommonJsDependencies": [
+							"exceljs",
+							"archiver",
+							"readable-stream",
+							"unzipper",
+							"tmp",
+							"jszip",
+							"fast-csv",
+							"dayjs",
+							"dayjs/plugin/customParseFormat",
+							"dayjs/plugin/utc",
+							"saxes"
+						],
 						"assets": [
 							{
 								"glob": "**/*",
@@ -110,7 +123,10 @@
 						"development": {
 							"optimization": true,
 							"extractLicenses": false,
-							"sourceMap": true,
+							"sourceMap": {
+								"scripts": true,
+								"styles": true
+							},
 							"fileReplacements": [
 								{
 									"replace": "src/app/config/environment.ts",

@@ -10,7 +10,7 @@ import {
 	viewChild,
 	type ElementRef,
 } from '@angular/core';
-import { DecimalPipe, DatePipe } from '@angular/common';
+import { DatePipe } from '@angular/common';
 import { SelectButtonModule } from 'primeng/selectbutton';
 import { FormsModule } from '@angular/forms';
 import { ButtonModule } from 'primeng/button';
@@ -40,7 +40,7 @@ Chart.register(...registerables);
 @Component({
 	selector: 'app-runtime-health-history',
 	standalone: true,
-	imports: [DecimalPipe, DatePipe, SelectButtonModule, FormsModule, ButtonModule, ProgressSpinnerModule, TagModule],
+	imports: [DatePipe, SelectButtonModule, FormsModule, ButtonModule, ProgressSpinnerModule, TagModule],
 	templateUrl: './runtime-health-history.component.html',
 	styleUrl: './runtime-health-history.component.scss',
 	changeDetection: ChangeDetectionStrategy.OnPush,

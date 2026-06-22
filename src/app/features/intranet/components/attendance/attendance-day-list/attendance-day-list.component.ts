@@ -22,7 +22,6 @@ import { MenuItem } from 'primeng/api';
 import { EstudianteAsistencia, EstadisticasAsistenciaDia } from '@data/models';
 import { ResponsiveTableComponent, TableSkeletonComponent } from '@intranet-shared/components';
 import type { SkeletonColumnDef } from '@intranet-shared/components';
-import { SkeletonLoaderComponent } from '@shared/components';
 import { FormatTimePipe } from '@intranet-shared/pipes';
 import { getStatusClass } from '@features/intranet/pages/cross-role/attendance-component/config/attendance.constants';
 import { AttendanceStatus } from '@features/intranet/pages/cross-role/attendance-component/models/attendance.types';
@@ -56,7 +55,6 @@ export interface JustificacionEvent {
 		FormsModule,
 		TableModule,
 		SkeletonModule,
-		SkeletonLoaderComponent,
 		TableSkeletonComponent,
 		ResponsiveTableComponent,
 		ButtonModule,

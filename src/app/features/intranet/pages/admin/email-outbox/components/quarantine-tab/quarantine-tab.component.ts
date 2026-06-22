@@ -4,6 +4,7 @@ import {
 	computed,
 	OnInit,
 	inject,
+	signal,
 } from '@angular/core';
 import { DecimalPipe } from '@angular/common';
 import { FormsModule } from '@angular/forms';
@@ -25,6 +26,9 @@ import {
 	QuarantineMotivo,
 } from '@data/models';
 
+import { ActivatedRoute } from '@angular/router';
+
+import { HubContextBannerComponent, readHubContext } from '../../../monitoreo/shared';
 import {
 	EmailQuarantineCrudFacade,
 	EmailQuarantineDataFacade,
@@ -74,6 +78,7 @@ const MOTIVO_OPTIONS: SelectOption<QuarantineMotivo>[] = EMAIL_QUARANTINE_MOTIVO
 		QuarantineAddDialogComponent,
 		QuarantineDetailDrawerComponent,
 		DomainBlockedAlertBannerComponent,
+		HubContextBannerComponent,
 	],
 	providers: [ConfirmationService],
 	templateUrl: './quarantine-tab.component.html',
@@ -85,6 +90,7 @@ export class QuarantineTabComponent implements OnInit {
 	private readonly crudFacade = inject(EmailQuarantineCrudFacade);
 	private readonly uiFacade = inject(EmailQuarantineUiFacade);
 	private readonly confirmationService = inject(ConfirmationService);
+	private readonly route = inject(ActivatedRoute);
 
 	readonly vm = this.dataFacade.vm;
 	readonly skeletonColumns = QuarantineTableComponent.skeletonColumns;
@@ -92,8 +98,17 @@ export class QuarantineTabComponent implements OnInit {
 	readonly motivoOptions = MOTIVO_OPTIONS;
 
 	readonly trendSummaryValue = computed<TrendSummary>(() => trendSummary(this.vm().trend));
+	readonly hubFiltered = signal(false);
+	readonly hubFilterMessage = signal('');
 
 	ngOnInit(): void {
+		const hubCtx = readHubContext(this.route);
+		if (hubCtx.fromHub && hubCtx.level) {
+			this.dataFacade.onFilterEstadoChange('activa');
+			this.hubFiltered.set(true);
+			this.hubFilterMessage.set('Filtrado desde el hub — mostrando cuarentenas activas');
+		}
+
 		this.dataFacade.loadData();
 		this.dataFacade.loadTrend();
 	}
@@ -112,6 +127,11 @@ export class QuarantineTabComponent implements OnInit {
 
 	onClearFiltros(): void {
 		this.dataFacade.clearFiltros();
+		this.hubFiltered.set(false);
+	}
+
+	clearHubFilter(): void {
+		this.onClearFiltros();
 	}
 
 	onRefresh(): void {

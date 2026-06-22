@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, DestroyRef, OnInit, inject } from '@angular/core';
+import { ChangeDetectionStrategy, Component, DestroyRef, OnInit, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute } from '@angular/router';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
@@ -17,6 +17,7 @@ import { RateLimitDetailDrawerComponent } from './components/rate-limit-detail-d
 import { RateLimitFiltersComponent } from './components/rate-limit-filters';
 import { RateLimitStatsComponent } from './components/rate-limit-stats';
 import { RateLimitTableComponent } from './components/rate-limit-table';
+import { HubContextBannerComponent, readHubContext } from '../monitoreo/shared';
 import { RateLimitEventFiltro, RateLimitEventListaDto } from './models';
 import { RateLimitEventsFacade } from './services';
 
@@ -33,6 +34,7 @@ import { RateLimitEventsFacade } from './services';
 		RateLimitFiltersComponent,
 		RateLimitTableComponent,
 		RateLimitDetailDrawerComponent,
+		HubContextBannerComponent,
 	],
 	providers: [MessageService],
 	templateUrl: './rate-limit-events.component.html',
@@ -48,6 +50,8 @@ export class RateLimitEventsComponent implements OnInit {
 
 	// #region Estado
 	readonly vm = this.facade.vm;
+	readonly hubFiltered = signal(false);
+	readonly hubFilterMessage = signal('');
 	// #endregion
 
 	// #region Skeleton
@@ -68,8 +72,13 @@ export class RateLimitEventsComponent implements OnInit {
 
 	// #region Lifecycle
 	ngOnInit(): void {
-		// Plan 32 Chat 4 — leer correlationId del query param y aplicarlo como
-		// filtro inicial. Si no viene, carga normal.
+		const hubCtx = readHubContext(this.route);
+		if (hubCtx.fromHub && hubCtx.level) {
+			this.facade.updateFilter({ soloRechazados: true });
+			this.hubFiltered.set(true);
+			this.hubFilterMessage.set('Filtrado desde el hub — mostrando solo eventos rechazados');
+		}
+
 		this.route.queryParamMap
 			.pipe(takeUntilDestroyed(this.destroyRef))
 			.subscribe((params) => {
@@ -94,6 +103,11 @@ export class RateLimitEventsComponent implements OnInit {
 
 	onClearFilters(): void {
 		this.facade.clearFilters();
+		this.hubFiltered.set(false);
+	}
+
+	clearHubFilter(): void {
+		this.onClearFilters();
 	}
 
 	onRowSelected(item: RateLimitEventListaDto): void {

@@ -1,11 +1,6 @@
 // #region Imports
 import { Injectable, signal, computed } from '@angular/core';
 import { Capacitor } from '@capacitor/core';
-import { StatusBar, Style } from '@capacitor/status-bar';
-import { SplashScreen } from '@capacitor/splash-screen';
-import { Camera, CameraResultType, CameraSource, Photo } from '@capacitor/camera';
-import { Filesystem, Directory, Encoding } from '@capacitor/filesystem';
-import { LocalNotifications } from '@capacitor/local-notifications';
 import { logger } from '@core/helpers';
 // #endregion
 
@@ -20,7 +15,7 @@ import { logger } from '@core/helpers';
 export class CapacitorService {
 	// #region Platform detection
 	readonly isNative = Capacitor.isNativePlatform();
-	readonly platform = Capacitor.getPlatform(); // 'android' | 'ios' | 'web'
+	readonly platform = Capacitor.getPlatform();
 
 	private readonly _statusBarVisible = signal(true);
 	readonly statusBarVisible = this._statusBarVisible.asReadonly();
@@ -29,9 +24,6 @@ export class CapacitorService {
 	// #endregion
 
 	// #region Initialization
-	/**
-	 * Initialize native plugins. Call once from AppComponent constructor.
-	 */
 	async initialize(): Promise<void> {
 		if (!this.isNative) return;
 
@@ -48,28 +40,33 @@ export class CapacitorService {
 
 	// #region Status Bar
 	private async configureStatusBar(): Promise<void> {
+		const { StatusBar, Style } = await import('@capacitor/status-bar');
 		await StatusBar.setStyle({ style: Style.Light });
 		await StatusBar.setOverlaysWebView({ overlay: false });
 	}
 
 	async setStatusBarLight(): Promise<void> {
 		if (!this.isNative) return;
+		const { StatusBar, Style } = await import('@capacitor/status-bar');
 		await StatusBar.setStyle({ style: Style.Light });
 	}
 
 	async setStatusBarDark(): Promise<void> {
 		if (!this.isNative) return;
+		const { StatusBar, Style } = await import('@capacitor/status-bar');
 		await StatusBar.setStyle({ style: Style.Dark });
 	}
 
 	async hideStatusBar(): Promise<void> {
 		if (!this.isNative) return;
+		const { StatusBar } = await import('@capacitor/status-bar');
 		await StatusBar.hide();
 		this._statusBarVisible.set(false);
 	}
 
 	async showStatusBar(): Promise<void> {
 		if (!this.isNative) return;
+		const { StatusBar } = await import('@capacitor/status-bar');
 		await StatusBar.show();
 		this._statusBarVisible.set(true);
 	}
@@ -77,18 +74,16 @@ export class CapacitorService {
 
 	// #region Splash Screen
 	private async hideSplashScreen(): Promise<void> {
+		const { SplashScreen } = await import('@capacitor/splash-screen');
 		await SplashScreen.hide({ fadeOutDuration: 300 });
 	}
 	// #endregion
 
 	// #region Camera
-	/**
-	 * Take a photo or pick from gallery.
-	 * Returns base64 data URI or null if cancelled.
-	 */
 	async takePhoto(source: 'camera' | 'gallery' = 'camera'): Promise<string | null> {
 		try {
-			const photo: Photo = await Camera.getPhoto({
+			const { Camera, CameraResultType, CameraSource } = await import('@capacitor/camera');
+			const photo = await Camera.getPhoto({
 				quality: 80,
 				allowEditing: false,
 				resultType: CameraResultType.Base64,
@@ -102,26 +97,20 @@ export class CapacitorService {
 			}
 			return null;
 		} catch (error) {
-			// User cancelled
 			logger.debug('[Capacitor] Camera cancelled or error:', error);
 			return null;
 		}
 	}
 
-	/**
-	 * Pick a photo from gallery.
-	 */
 	async pickFromGallery(): Promise<string | null> {
 		return this.takePhoto('gallery');
 	}
 	// #endregion
 
 	// #region Filesystem
-	/**
-	 * Save a file to the device. Returns the saved file URI.
-	 */
 	async saveFile(fileName: string, data: string, isBase64 = false): Promise<string | null> {
 		try {
+			const { Filesystem, Directory, Encoding } = await import('@capacitor/filesystem');
 			const result = await Filesystem.writeFile({
 				path: fileName,
 				data,
@@ -136,11 +125,9 @@ export class CapacitorService {
 		}
 	}
 
-	/**
-	 * Read a file from the device.
-	 */
 	async readFile(fileName: string): Promise<string | null> {
 		try {
+			const { Filesystem, Directory, Encoding } = await import('@capacitor/filesystem');
 			const result = await Filesystem.readFile({
 				path: fileName,
 				directory: Directory.Documents,
@@ -153,11 +140,9 @@ export class CapacitorService {
 		}
 	}
 
-	/**
-	 * Delete a file from the device.
-	 */
 	async deleteFile(fileName: string): Promise<boolean> {
 		try {
+			const { Filesystem, Directory } = await import('@capacitor/filesystem');
 			await Filesystem.deleteFile({
 				path: fileName,
 				directory: Directory.Documents,
@@ -169,13 +154,11 @@ export class CapacitorService {
 		}
 	}
 
-	/**
-	 * Download a blob (e.g. from API) and save to device Downloads folder.
-	 */
 	async downloadBlob(blob: Blob, fileName: string): Promise<string | null> {
 		if (!this.isNative) return null;
 
 		try {
+			const { Filesystem, Directory } = await import('@capacitor/filesystem');
 			const base64 = await this.blobToBase64(blob);
 			const result = await Filesystem.writeFile({
 				path: fileName,
@@ -205,18 +188,17 @@ export class CapacitorService {
 
 	// #region Local Notifications
 	private async requestNotificationPermissions(): Promise<void> {
+		const { LocalNotifications } = await import('@capacitor/local-notifications');
 		const permission = await LocalNotifications.checkPermissions();
 		if (permission.display !== 'granted') {
 			await LocalNotifications.requestPermissions();
 		}
 	}
 
-	/**
-	 * Show a local notification on the device.
-	 */
 	async notify(title: string, body: string, id?: number): Promise<void> {
 		if (!this.isNative) return;
 
+		const { LocalNotifications } = await import('@capacitor/local-notifications');
 		await LocalNotifications.schedule({
 			notifications: [
 				{
@@ -232,11 +214,9 @@ export class CapacitorService {
 		});
 	}
 
-	/**
-	 * Cancel all pending local notifications.
-	 */
 	async cancelAllNotifications(): Promise<void> {
 		if (!this.isNative) return;
+		const { LocalNotifications } = await import('@capacitor/local-notifications');
 		const pending = await LocalNotifications.getPending();
 		if (pending.notifications.length > 0) {
 			await LocalNotifications.cancel(pending);

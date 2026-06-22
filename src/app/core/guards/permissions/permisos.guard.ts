@@ -1,6 +1,7 @@
 // #region Imports
 import { ActivatedRouteSnapshot, CanActivateFn, Router } from '@angular/router';
-import { AuthService, AccessDeniedService, UserPermissionsService } from '@core/services';
+import { AuthService } from '@core/services/auth';
+import { AccessDeniedService, UserPermissionsService } from '@core/services/permissions';
 
 import { inject } from '@angular/core';
 import { logger } from '@core/helpers';

@@ -37,6 +37,7 @@ import {
 	EmailBlacklistMotivo,
 } from '@data/models';
 
+import { HubContextBannerComponent, readHubContext } from '../../../monitoreo/shared';
 import {
 	BlacklistCrudFacade,
 	BlacklistDataFacade,
@@ -91,6 +92,7 @@ const MOTIVO_OPTIONS: SelectOption<EmailBlacklistMotivo>[] = [
 		BlacklistTableComponent,
 		BlacklistAddDialogComponent,
 		BlacklistDetailDrawerComponent,
+		HubContextBannerComponent,
 	],
 	providers: [ConfirmationService, MessageService],
 	templateUrl: './blacklist-tab.component.html',
@@ -123,9 +125,18 @@ export class BlacklistTabComponent implements OnInit {
 	readonly MIN_MOTIVO_LENGTH = 20;
 
 	readonly trendSummaryValue = computed<TrendSummary>(() => trendSummary(this.vm().trend));
+	readonly hubFiltered = signal(false);
+	readonly hubFilterMessage = signal('');
 	// #endregion
 
 	ngOnInit(): void {
+		const hubCtx = readHubContext(this.route);
+		if (hubCtx.fromHub && hubCtx.level) {
+			this.dataFacade.onFilterEstadoChange('activa');
+			this.hubFiltered.set(true);
+			this.hubFilterMessage.set('Filtrado desde el hub — mostrando entradas activas');
+		}
+
 		this.dataFacade.loadData();
 		this.dataFacade.loadTrend();
 
@@ -167,6 +178,11 @@ export class BlacklistTabComponent implements OnInit {
 
 	onClearFiltros(): void {
 		this.dataFacade.clearFiltros();
+		this.hubFiltered.set(false);
+	}
+
+	clearHubFilter(): void {
+		this.onClearFiltros();
 	}
 
 	onRefresh(): void {

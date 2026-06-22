@@ -1,3 +1,11 @@
+@if (hubFiltered()) {
+	<app-hub-context-banner
+		[level]="vm().filterEstado === 'FAILED' ? 'critical' : 'warn'"
+		[message]="hubFilterMessage()"
+		(clearFilter)="clearHubFilter()"
+	/>
+}
+
 <!-- #region Header -->
 <app-email-outbox-header (refresh)="onRefresh()" (exportExcel)="onExportExcel()" />
 <!-- #endregion -->

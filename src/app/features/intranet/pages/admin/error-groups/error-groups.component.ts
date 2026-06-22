@@ -21,6 +21,8 @@ import { MiniSparklineComponent } from '@intranet-shared/components';
 import { PageHeaderComponent } from '@intranet-shared/components';
 import { TableSkeletonComponent } from '@intranet-shared/components/table-skeleton';
 
+import { HubContextBannerComponent, readHubContext } from '../monitoreo/shared';
+
 import { ChangeGroupStatusDialogComponent } from './components/change-group-status-dialog';
 import { ErrorGroupDetailDrawerComponent } from './components/error-group-detail-drawer';
 import { ErrorGroupsKanbanBoardComponent } from './components/error-groups-kanban-board';
@@ -81,6 +83,7 @@ import {
 		ErrorGroupsKanbanBoardComponent,
 		ErrorGroupsViewToggleComponent,
 		ErrorHeatmapComponent,
+		HubContextBannerComponent,
 	],
 	templateUrl: './error-groups.component.html',
 	styleUrl: './error-groups.component.scss',
@@ -143,6 +146,8 @@ export class ErrorGroupsComponent implements OnInit {
 	readonly paginatorFirst = computed(() => (this.page() - 1) * this.pageSize());
 
 	readonly viewMode = signal<ErrorGroupsViewMode>('kanban');
+	readonly hubFiltered = signal(false);
+	readonly hubFilterMessage = signal('');
 
 	readonly eventItems = this.store.eventItems;
 	readonly eventLoading = this.store.eventLoading;
@@ -178,10 +183,20 @@ export class ErrorGroupsComponent implements OnInit {
 	readonly getOrigenIcon = getOrigenIcon;
 
 	ngOnInit(): void {
+		const hubCtx = readHubContext(this.route);
+		if (hubCtx.fromHub && hubCtx.level) {
+			const severidad: ErrorSeveridad = hubCtx.level === 'critical' ? 'CRITICAL' : 'WARNING';
+			this.store.setFilterSeveridad(severidad);
+			this.hubFiltered.set(true);
+			this.hubFilterMessage.set(`Filtrado desde el hub — mostrando errores ${severidad}`);
+		}
+
 		this.route.queryParamMap
 			.pipe(takeUntilDestroyed(this.destroyRef))
 			.subscribe((params) => {
-				this.hydrateFromUrl(params);
+				if (!this.hubFiltered()) {
+					this.hydrateFromUrl(params);
+				}
 				if (!this.tableReady()) {
 					this.dataFacade.loadData();
 				}
@@ -261,8 +276,13 @@ export class ErrorGroupsComponent implements OnInit {
 	onClearFilters(): void {
 		this.store.clearFilters();
 		this.store.setPage(1);
+		this.hubFiltered.set(false);
 		this.dataFacade.loadData();
 		this.syncUrl();
+	}
+
+	clearHubFilter(): void {
+		this.onClearFilters();
 	}
 
 	onPageChange(event: PaginatorState): void {

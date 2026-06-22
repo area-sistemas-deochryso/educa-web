@@ -906,6 +906,27 @@ const LAYER_RULES = [
 		],
 	},
 
+	// ── Eager-path: prohibir barrel raíz @core/services en guards/interceptors ──
+	// El barrel re-exporta 26 módulos (signalr, wal, excel, etc.). Un import
+	// desde código eager arrastra todo al initial bundle (~446 kB extra).
+	{
+		id: 'eager-no-core-services-barrel',
+		severity: 'error',
+		match: (f) => /\/src\/app\/core\/(guards|interceptors)\//.test(f) || /\/src\/app\/app\.ts$/.test(f),
+		restrictions: [
+			{
+				sourcePattern: /^@core\/services$/,
+				message:
+					'En código eager (guards/interceptors), importar del sub-path directo (@core/services/auth, @core/services/permissions, etc.), NO del barrel @core/services — arrastra ~446 kB de módulos lazy (SignalR, WAL, excel) al initial bundle.',
+			},
+			{
+				sourcePattern: /^@core\/services\/wal$/,
+				message:
+					'En código eager, importar del archivo directo (@core/services/wal/wal-clock.service), NO del barrel @core/services/wal — arrastra WalFacadeHelper → WalService → WalSyncEngine (~16 kB) al initial bundle.',
+			},
+		],
+	},
+
 	// ── @shared/* barrel-only ──────────────────────────────────────────
 	{
 		id: 'shared-components-barrel-only',

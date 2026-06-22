@@ -41,7 +41,6 @@ import {
 import { AsistenciaAsistenteAdminApiService } from '@intranet-shared/services';
 import { formatDateLocalIso } from '@core/helpers';
 import { ErrorHandlerService } from '@core/services';
-import { DatePipe } from '@angular/common';
 import { ButtonModule } from 'primeng/button';
 import { InputTextModule } from 'primeng/inputtext';
 import { TooltipModule } from 'primeng/tooltip';
@@ -57,7 +56,6 @@ import { TooltipModule } from 'primeng/tooltip';
 		AttendanceTableSkeletonComponent,
 		EmptyStateComponent,
 		ButtonModule,
-		DatePipe,
 		FormsModule,
 		InputTextModule,
 		TooltipModule,

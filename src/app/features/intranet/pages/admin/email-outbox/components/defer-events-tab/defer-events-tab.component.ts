@@ -29,6 +29,7 @@ import {
 import { MiniSparklineComponent } from '@intranet-shared/components';
 import { UiMappingService } from '@intranet-shared/services';
 
+import { HubContextBannerComponent, readHubContext } from '../../../monitoreo/shared';
 import { EmailDeferEventsService } from '../../services';
 import { trendSummary, TrendSummary } from '../../utils/trend-summary';
 import { DeferEventItemComponent } from '../defer-event-item/defer-event-item.component';
@@ -56,6 +57,7 @@ const PAGE_SIZE = 25;
 		MiniSparklineComponent,
 		DeferEventItemComponent,
 		DomainBlockedAlertBannerComponent,
+		HubContextBannerComponent,
 	],
 	templateUrl: './defer-events-tab.component.html',
 	styleUrl: './defer-events-tab.component.scss',
@@ -102,8 +104,19 @@ export class DeferEventsTabComponent implements OnInit {
 
 	readonly first = computed(() => (this._page() - 1) * PAGE_SIZE);
 	readonly hasEvents = computed(() => this._events().length > 0);
+	readonly hubFiltered = signal(false);
+	readonly hubFilterMessage = signal('');
 
 	ngOnInit(): void {
+		const hubCtx = readHubContext(this.route);
+		if (hubCtx.fromHub && hubCtx.level) {
+			const today = new Date();
+			today.setHours(0, 0, 0, 0);
+			this._filterDesde.set(today);
+			this.hubFiltered.set(true);
+			this.hubFilterMessage.set('Filtrado desde el hub — mostrando eventos de hoy');
+		}
+
 		this.loadCatalogoTipos();
 		this.loadTrend();
 
@@ -228,7 +241,12 @@ export class DeferEventsTabComponent implements OnInit {
 		this._filterDesde.set(null);
 		this._filterHasta.set(null);
 		this._page.set(1);
+		this.hubFiltered.set(false);
 		this.loadData();
+	}
+
+	clearHubFilter(): void {
+		this.onClearFilters();
 	}
 
 	onRefresh(): void {

@@ -1,7 +1,9 @@
 // #region Imports
 import { Component, inject } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
-import { CacheVersionManagerService, CapacitorService, SwService } from '@core/services';
+import { CacheVersionManagerService } from '@core/services/cache';
+import { CapacitorService } from '@core/services/capacitor';
+import { SwService } from '@core/services/sw';
 import { DevtoolsPanelComponent, RateLimitCountdownToastComponent, ToastContainerComponent } from '@shared/components';
 
 // #endregion
