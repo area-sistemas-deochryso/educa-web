@@ -11,6 +11,7 @@ import { SwService } from '@core/services/sw';
 import { StorageService } from '@core/services/storage';
 import { SessionRefreshService } from './session-refresh.service';
 import { SessionCoordinatorService } from './session-coordinator.service';
+import { ForceLogoutSignal } from './force-logout.signal';
 import { logger, Duration } from '@core/helpers';
 // #endregion
 
@@ -49,6 +50,7 @@ export class SessionActivityService {
 	private storage = inject(StorageService);
 	private router = inject(Router);
 	private platformId = inject(PLATFORM_ID);
+	private forceLogoutSignal = inject(ForceLogoutSignal);
 	private destroyRef = inject(DestroyRef);
 	// #endregion
 
@@ -66,6 +68,11 @@ export class SessionActivityService {
 	// #region Constructor — reactive listeners
 
 	constructor() {
+		// React to force-logout from error interceptor (401 + refresh failed)
+		this.forceLogoutSignal.logout$
+			.pipe(takeUntilDestroyed(this.destroyRef))
+			.subscribe(() => this.forceLogout());
+
 		// React to session expiry from the refresh service
 		this.refreshService.sessionExpired$
 			.pipe(takeUntilDestroyed(this.destroyRef))

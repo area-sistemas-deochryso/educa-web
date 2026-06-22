@@ -7,7 +7,7 @@ import { logger, parseProblemDetails } from '@core/helpers';
 // eslint-disable-next-line layer-enforcement/imports-error -- DEBT: AuthApiService is internal to auth/
 import { AuthApiService } from '@core/services/auth/auth-api.service';
 import { ErrorHandlerService, ErrorReporterService } from '@core/services/error';
-import { SessionActivityService } from '@core/services/session';
+import { ForceLogoutSignal } from '@core/services/session/force-logout.signal';
 
 // * Centralizes HTTP error handling and reporting.
 
@@ -41,7 +41,7 @@ function classifyError(error: unknown): HttpErrorClass {
 export const errorInterceptor: HttpInterceptorFn = (req, next) => {
 	const errorHandler = inject(ErrorHandlerService);
 	const errorReporter = inject(ErrorReporterService);
-	const sessionActivity = inject(SessionActivityService);
+	const forceLogout = inject(ForceLogoutSignal);
 	const authApi = inject(AuthApiService);
 	const requestId = req.headers.get('X-Request-Id') ?? undefined;
 
@@ -86,7 +86,7 @@ export const errorInterceptor: HttpInterceptorFn = (req, next) => {
 			// 401 — access token expired. Attempt refresh before forcing logout.
 			// Must run BEFORE X-Skip-Error-Toast check: silent requests still need token refresh.
 			if (httpError.status === 401) {
-				return handle401(req, next, authApi, sessionActivity);
+				return handle401(req, next, authApi, forceLogout);
 			}
 
 			// Skip error toast for requests that handle their own errors locally.
@@ -136,7 +136,7 @@ function handle401(
 	req: HttpRequest<unknown>,
 	next: HttpHandlerFn,
 	authApi: AuthApiService,
-	sessionActivity: SessionActivityService,
+	forceLogout: ForceLogoutSignal,
 ): Observable<HttpEvent<unknown>> {
 	if (isRefreshing) {
 		// Another request already triggered a refresh — wait for it (with timeout to avoid hanging)
@@ -171,7 +171,7 @@ function handle401(
 			refreshResult$.next(false);
 			refreshResult$.complete();
 			logger.warn('[ErrorInterceptor] 401 + refresh failed — forcing logout', req.url);
-			sessionActivity.forceLogout();
+			forceLogout.emit();
 			return throwError(() => refreshError);
 		}),
 	);

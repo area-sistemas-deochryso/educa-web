@@ -7,7 +7,7 @@ import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 
 import { errorInterceptor } from '@core/interceptors/error/error.interceptor';
 import { ErrorHandlerService } from '@core/services/error';
-import { SessionActivityService } from '@core/services/session';
+import { ForceLogoutSignal } from '@core/services/session/force-logout.signal';
 
 describe('Error Recovery Integration', () => {
 	let httpClient: HttpClient;
@@ -93,8 +93,8 @@ describe('Error Recovery Integration', () => {
 	});
 
 	it('should force logout when 401 refresh fails', () => {
-		const sessionActivity = TestBed.inject(SessionActivityService);
-		vi.spyOn(sessionActivity, 'forceLogout');
+		const forceLogout = TestBed.inject(ForceLogoutSignal);
+		vi.spyOn(forceLogout, 'emit');
 
 		httpClient.get('/api/protected').subscribe({ error: () => {} });
 
@@ -103,7 +103,7 @@ describe('Error Recovery Integration', () => {
 		const refreshReq = httpMock.match((r) => r.url.includes('/refresh'));
 		if (refreshReq.length > 0) {
 			refreshReq[0].flush(null, { status: 401, statusText: 'Unauthorized' });
-			expect(sessionActivity.forceLogout).toHaveBeenCalled();
+			expect(forceLogout.emit).toHaveBeenCalled();
 		}
 	});
 

@@ -15,7 +15,7 @@ import { errorInterceptor } from './error.interceptor';
 import { ErrorHandlerService, ErrorReporterService } from '@core/services/error';
 // eslint-disable-next-line layer-enforcement/imports-error -- DEBT: AuthApiService is internal to auth/
 import { AuthApiService } from '@core/services/auth/auth-api.service';
-import { SessionActivityService } from '@core/services/session';
+import { ForceLogoutSignal } from '@core/services/session/force-logout.signal';
 
 // #endregion
 
@@ -26,13 +26,13 @@ describe('errorInterceptor', () => {
 	let errorHandlerMock: Partial<ErrorHandlerService>;
 	let errorReporterMock: Partial<ErrorReporterService>;
 	let authApiMock: Partial<AuthApiService>;
-	let sessionActivityMock: Partial<SessionActivityService>;
+	let forceLogoutMock: Partial<ForceLogoutSignal>;
 
 	beforeEach(() => {
 		errorHandlerMock = { handleHttpError: vi.fn() };
 		errorReporterMock = { reportHttpError: vi.fn() };
 		authApiMock = { refresh: vi.fn().mockReturnValue(of({ rol: 'Director', nombreCompleto: 'Test', entityId: 1, sedeId: 1 })) };
-		sessionActivityMock = { forceLogout: vi.fn() };
+		forceLogoutMock = { emit: vi.fn() };
 
 		TestBed.configureTestingModule({
 			providers: [
@@ -41,7 +41,7 @@ describe('errorInterceptor', () => {
 				{ provide: ErrorHandlerService, useValue: errorHandlerMock },
 				{ provide: ErrorReporterService, useValue: errorReporterMock },
 				{ provide: AuthApiService, useValue: authApiMock },
-				{ provide: SessionActivityService, useValue: sessionActivityMock },
+				{ provide: ForceLogoutSignal, useValue: forceLogoutMock },
 			],
 		});
 
@@ -222,7 +222,7 @@ describe('errorInterceptor', () => {
 			retryReq.flush({ data: 'recovered' });
 
 			expect(responseData).toEqual({ data: 'recovered' });
-			expect(sessionActivityMock.forceLogout).not.toHaveBeenCalled();
+			expect(forceLogoutMock.emit).not.toHaveBeenCalled();
 		});
 
 		it('should force logout when refresh fails', () => {
@@ -237,7 +237,7 @@ describe('errorInterceptor', () => {
 				statusText: 'Unauthorized',
 			});
 
-			expect(sessionActivityMock.forceLogout).toHaveBeenCalled();
+			expect(forceLogoutMock.emit).toHaveBeenCalled();
 		});
 
 		it('should NOT attempt refresh for skip URLs', () => {
@@ -249,7 +249,7 @@ describe('errorInterceptor', () => {
 			});
 
 			expect(authApiMock.refresh).not.toHaveBeenCalled();
-			expect(sessionActivityMock.forceLogout).not.toHaveBeenCalled();
+			expect(forceLogoutMock.emit).not.toHaveBeenCalled();
 		});
 	});
 	// #endregion
