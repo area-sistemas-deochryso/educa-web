@@ -41,6 +41,10 @@ export class EstudianteApiService {
 		return this.http.get<EstudianteMisNotasDto[]>(`${this.baseUrl}/mis-notas`);
 	}
 
+	getMisNotasCurso(contenidoId: number): Observable<EstudianteMisNotasDto> {
+		return this.http.get<EstudianteMisNotasDto>(`${this.baseUrl}/mis-notas/${contenidoId}`);
+	}
+
 	getServerTime(): Observable<string | null> {
 		return this.http.get<string>(`${environment.apiUrl}/api/ServerTime`);
 	}

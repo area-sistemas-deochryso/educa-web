@@ -99,9 +99,6 @@ export class EstudianteCursosFacade {
 			});
 	}
 
-	/**
-	 * Load grades for the current course by matching cursoNombre + salonDescripcion.
-	 */
 	loadMisNotasCurso(): void {
 		const contenido = this.store.contenido();
 		if (!contenido) return;
@@ -110,14 +107,11 @@ export class EstudianteCursosFacade {
 		this.store.setMisNotasLoading(true);
 
 		this.api
-			.getMisNotas()
+			.getMisNotasCurso(contenido.id)
 			.pipe(takeUntilDestroyed(this.destroyRef))
 			.subscribe({
-				next: (allNotas) => {
-					const match = allNotas.find(
-						(n) => n.cursoContenidoId === contenido.id,
-					);
-					this.store.setMisNotasCurso(match ?? null);
+				next: (notas) => {
+					this.store.setMisNotasCurso(notas);
 					this.store.setMisNotasLoading(false);
 				},
 				error: (err) => {
