@@ -44,7 +44,10 @@ export class EmailOutboxDashboardDiaFacade {
 			dto: this.api.obtenerDashboardDia(fecha),
 			fallosDia: this.api
 				.listarFallosDia(fechaParaFallos)
-				.pipe(catchError(() => of([]))),
+				.pipe(catchError((err) => {
+					logger.warn('[DashboardDia] listarFallosDia failed:', err);
+					return of([]);
+				})),
 			fallosPorSender: this.api.obtenerFallosPorSender(fecha),
 			attendanceGaps: this.api.obtenerAsistenciasSinCorreo(fecha),
 		})

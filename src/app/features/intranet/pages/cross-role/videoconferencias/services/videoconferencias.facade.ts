@@ -121,7 +121,10 @@ export class VideoconferenciasFacade {
 
 		return this.http
 			.get<HorarioDto[]>(HORARIO_ENDPOINTS[endpoint])
-			.pipe(catchError(() => of([])));
+			.pipe(catchError((err) => {
+				logger.warn('[Videoconferencias] getHorarios failed:', err);
+				return of([]);
+			}));
 	}
 
 	private mapToItems(horarios: HorarioDto[]): VideoconferenciaItem[] {

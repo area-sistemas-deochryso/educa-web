@@ -77,7 +77,10 @@ export class AttendancesDataFacade {
 					const sedeId = this.store.sedeId() ?? undefined;
 					return this.api
 						.listarPersonas(sedeId, search || undefined, tipo)
-						.pipe(catchError(() => of([])));
+						.pipe(catchError((err) => {
+							logger.warn('[AttendancesData] listarPersonas failed:', err);
+							return of([]);
+						}));
 				}),
 				takeUntilDestroyed(this.destroyRef),
 			)
@@ -106,7 +109,8 @@ export class AttendancesDataFacade {
 					if (stats) this.store.setEstadisticas(stats);
 					this.store.setStatsReady(true);
 				},
-				error: () => {
+				error: (err) => {
+					logger.warn('[AttendancesData] obtenerEstadisticas failed:', err);
 					this.store.setStatsReady(true);
 				},
 			});
@@ -130,7 +134,8 @@ export class AttendancesDataFacade {
 					this.store.setTableReady(true);
 					this.store.setLoading(false);
 				},
-				error: () => {
+				error: (err) => {
+					logger.warn('[AttendancesData] listarDelDia failed:', err);
 					this.store.setItems([]);
 					this.store.setTableReady(true);
 					this.store.setLoading(false);
@@ -166,7 +171,8 @@ export class AttendancesDataFacade {
 					this.store.setPersonas(personas ?? []);
 					this.store.setPersonasLoading(false);
 				},
-				error: () => {
+				error: (err) => {
+					logger.warn('[AttendancesData] listarPersonas failed:', err);
 					this.store.setPersonasLoading(false);
 				},
 			});

@@ -212,10 +212,16 @@ export class UsersUiFacade {
 
 		forkJoin({
 			asignados: this.profesorCursoApi.listarPorProfesor(detalle.id, anio).pipe(
-				catchError(() => of([] as ProfesorCursoListaDto[])),
+				catchError((err) => {
+					logger.warn('[UsuariosUI] listarPorProfesor failed:', err);
+					return of([] as ProfesorCursoListaDto[]);
+				}),
 			),
 			cursos: this.cursosApi.listar().pipe(
-				catchError(() => of([] as CursoListaDto[])),
+				catchError((err) => {
+					logger.warn('[UsuariosUI] listar cursos failed:', err);
+					return of([] as CursoListaDto[]);
+				}),
 			),
 		})
 			.pipe(takeUntilDestroyed(this.destroyRef))
