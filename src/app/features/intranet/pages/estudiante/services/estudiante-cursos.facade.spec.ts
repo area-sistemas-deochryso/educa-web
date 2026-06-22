@@ -30,6 +30,7 @@ function createMockApi() {
 		getMisArchivos: vi.fn().mockReturnValue(of([])),
 		getMisTareaArchivos: vi.fn().mockReturnValue(of([])),
 		getMisNotas: vi.fn().mockReturnValue(of([])),
+		getMisNotasCurso: vi.fn().mockReturnValue(of(null)),
 		getMiAsistencia: vi.fn().mockReturnValue(of(null)),
 	};
 }
