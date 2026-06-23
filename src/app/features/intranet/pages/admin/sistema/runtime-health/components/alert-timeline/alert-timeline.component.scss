@@ -52,6 +52,11 @@
 	display: flex;
 	align-items: center;
 	gap: 0.5rem;
+	flex-wrap: wrap;
+
+	:host ::ng-deep .metric-filter {
+		min-width: 10rem;
+	}
 }
 
 .empty-state {
@@ -94,6 +99,15 @@
 			font-weight: 600;
 		}
 
+		.occurrence-badge {
+			background: var(--surface-200);
+			color: var(--text-color-secondary);
+			border-radius: var(--border-radius);
+			padding: 0.1rem 0.4rem;
+			font-size: 0.75rem;
+			font-weight: 700;
+		}
+
 		.timestamp {
 			margin-left: auto;
 			color: var(--text-color-secondary);
@@ -122,5 +136,22 @@
 				margin-top: 0.1rem;
 			}
 		}
+	}
+}
+
+.pagination {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	gap: 0.5rem;
+	margin-top: 0.75rem;
+	padding-top: 0.75rem;
+	border-top: 1px solid var(--surface-border);
+
+	.page-info {
+		font-size: 0.85rem;
+		color: var(--text-color-secondary);
+		min-width: 3rem;
+		text-align: center;
 	}
 }

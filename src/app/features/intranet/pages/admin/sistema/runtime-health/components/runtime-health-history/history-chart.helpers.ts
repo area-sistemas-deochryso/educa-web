@@ -20,9 +20,18 @@ export interface CorrelationMetric {
 	category: string;
 }
 
-export function buildDataset(label: string, data: number[], cssVar: string, yAxisID = 'y') {
-	const color = getComputedStyle(document.documentElement)
-		.getPropertyValue(cssVar).trim() || '#6366f1';
+export const CHART_COLORS = {
+	blue: '#3b82f6',
+	orange: '#f97316',
+	green: '#22c55e',
+	yellow: '#eab308',
+	red: '#ef4444',
+	purple: '#a855f7',
+	teal: '#14b8a6',
+	pink: '#ec4899',
+} as const;
+
+export function buildDataset(label: string, data: number[], color: string, yAxisID = 'y') {
 	return {
 		label,
 		data,

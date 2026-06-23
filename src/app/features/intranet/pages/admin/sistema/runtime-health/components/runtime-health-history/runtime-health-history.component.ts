@@ -28,6 +28,7 @@ import {
 } from '../../models/runtime-health.models';
 
 import {
+	CHART_COLORS,
 	type CorrelationMetric,
 	buildCorrelationMetrics,
 	buildDataset,
@@ -139,8 +140,8 @@ export class RuntimeHealthHistoryComponent implements AfterViewInit {
 				data: {
 					labels,
 					datasets: [
-						buildDataset('Workers busy', data.map(d => d.threadPool.workersBusy), '--blue-500'),
-						buildDataset('Cola pendiente', data.map(d => d.threadPool.queueLength), '--orange-500'),
+						buildDataset('Workers busy', data.map(d => d.threadPool.workersBusy), CHART_COLORS.blue),
+						buildDataset('Cola pendiente', data.map(d => d.threadPool.queueLength), CHART_COLORS.orange),
 					],
 				},
 				options: baseOpts,
@@ -154,9 +155,9 @@ export class RuntimeHealthHistoryComponent implements AfterViewInit {
 				data: {
 					labels,
 					datasets: [
-						buildDataset('p50', data.map(d => d.requests.p50Ms), '--green-500'),
-						buildDataset('p95', data.map(d => d.requests.p95Ms), '--yellow-500'),
-						buildDataset('p99', data.map(d => d.requests.p99Ms), '--red-500'),
+						buildDataset('p50', data.map(d => d.requests.p50Ms), CHART_COLORS.green),
+						buildDataset('p95', data.map(d => d.requests.p95Ms), CHART_COLORS.yellow),
+						buildDataset('p99', data.map(d => d.requests.p99Ms), CHART_COLORS.red),
 					],
 				},
 				options: {
@@ -176,8 +177,8 @@ export class RuntimeHealthHistoryComponent implements AfterViewInit {
 				data: {
 					labels,
 					datasets: [
-						buildDataset('Conexiones activas', data.map(d => d.db.activeConnections), '--blue-500', 'y'),
-						buildDataset('p95 latencia', data.map(d => d.db.dbP95LatencyMs), '--red-500', 'y1'),
+						buildDataset('Conexiones activas', data.map(d => d.db.activeConnections), CHART_COLORS.blue, 'y'),
+						buildDataset('p95 latencia', data.map(d => d.db.dbP95LatencyMs), CHART_COLORS.red, 'y1'),
 					],
 				},
 				options: {
@@ -202,10 +203,10 @@ export class RuntimeHealthHistoryComponent implements AfterViewInit {
 				data: {
 					labels,
 					datasets: [
-						buildDataset('Heap', data.map(d => d.gc.heapMb), '--blue-500', 'y'),
-						buildDataset('Gen0', data.map(d => d.gc.gen0), '--green-400', 'y1'),
-						buildDataset('Gen1', data.map(d => d.gc.gen1), '--yellow-400', 'y1'),
-						buildDataset('Gen2', data.map(d => d.gc.gen2), '--red-400', 'y1'),
+						buildDataset('Heap', data.map(d => d.gc.heapMb), CHART_COLORS.blue, 'y'),
+						buildDataset('Gen0', data.map(d => d.gc.gen0), CHART_COLORS.green, 'y1'),
+						buildDataset('Gen1', data.map(d => d.gc.gen1), CHART_COLORS.yellow, 'y1'),
+						buildDataset('Gen2', data.map(d => d.gc.gen2), CHART_COLORS.red, 'y1'),
 					],
 				},
 				options: {

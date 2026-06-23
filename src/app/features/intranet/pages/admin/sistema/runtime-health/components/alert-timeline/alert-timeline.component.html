@@ -3,17 +3,28 @@
 		<div class="section-title">
 			<i class="pi pi-bell"></i>
 			<h3>Alertas recientes</h3>
-			@if (filteredAlerts().length > 0) {
-				<span class="badge">{{ filteredAlerts().length }}</span>
+			@if (totalFilteredCount() > 0) {
+				<span class="badge">{{ totalFilteredCount() }}</span>
 			}
 		</div>
 		<div class="section-actions">
+			<p-select
+				[options]="metricOptions()"
+				[(ngModel)]="metricFilter"
+				optionLabel="label"
+				optionValue="value"
+				placeholder="Métrica"
+				[showClear]="false"
+				styleClass="metric-filter"
+				(onChange)="onMetricChange()"
+			/>
 			<p-selectButton
 				[options]="filterOptions"
 				[(ngModel)]="severityFilter"
 				optionLabel="label"
 				optionValue="value"
 				[allowEmpty]="false"
+				(onChange)="onSeverityChange()"
 			/>
 			<button
 				pButton
@@ -25,31 +36,45 @@
 		</div>
 	</header>
 
-	@if (filteredAlerts().length === 0 && !loading()) {
+	@if (pagedAlerts().length === 0 && !loading()) {
 		<div class="empty-state">
 			<i class="pi pi-check-circle"></i>
 			<span>Sin alertas recientes.</span>
 		</div>
 	}
 
-	@if (filteredAlerts().length > 0) {
+	@if (pagedAlerts().length > 0) {
 		<div class="timeline-list">
-			@for (alert of filteredAlerts(); track alert.timestamp + alert.metricKey) {
-				<div class="timeline-item" [class.timeline-item--critical]="alert.alertLevel === 'critical'">
+			@for (group of pagedAlerts(); track group.firstTimestamp + group.metricKey) {
+				<div class="timeline-item" [class.timeline-item--critical]="group.alertLevel === 'critical'">
 					<div class="timeline-item__header">
 						<p-tag
-							[value]="alert.alertLevel"
-							[severity]="getSeverityTag(alert.alertLevel)"
+							[value]="group.alertLevel"
+							[severity]="getSeverityTag(group.alertLevel)"
 						/>
-						<span class="metric-name">{{ getMetricLabel(alert.metricKey) }}</span>
-						<span class="timestamp">{{ alert.timestamp | date: 'short' }}</span>
+						<span class="metric-name">{{ getMetricLabel(group.metricKey) }}</span>
+						@if (group.count > 1) {
+							<span class="occurrence-badge">{{ group.count }}×</span>
+						}
+						<span class="timestamp">
+							@if (group.count > 1) {
+								{{ group.lastTimestamp | date: 'short' }} — {{ group.firstTimestamp | date: 'short' }}
+							} @else {
+								{{ group.firstTimestamp | date: 'short' }}
+							}
+						</span>
 					</div>
 					<div class="timeline-item__body">
 						<span class="value-info">
-							Valor: <strong>{{ alert.value | number: '1.0-1' }}</strong>
-							(umbral: {{ alert.thresholdBreached | number: '1.0-1' }})
+							@if (group.count > 1) {
+								Pico: <strong>{{ group.peakValue | number: '1.0-1' }}</strong>
+								(umbral: {{ group.thresholdBreached | number: '1.0-1' }})
+							} @else {
+								Valor: <strong>{{ group.peakValue | number: '1.0-1' }}</strong>
+								(umbral: {{ group.thresholdBreached | number: '1.0-1' }})
+							}
 						</span>
-						@if (getRecommendation(alert.metricKey); as rec) {
+						@if (getRecommendation(group.metricKey); as rec) {
 							<div class="recommendation">
 								<i class="pi pi-lightbulb"></i>
 								<span>{{ rec }}</span>
@@ -59,5 +84,25 @@
 				</div>
 			}
 		</div>
+
+		@if (totalPages() > 1) {
+			<div class="pagination">
+				<button
+					pButton
+					icon="pi pi-chevron-left"
+					class="p-button-text p-button-sm"
+					[disabled]="page() <= 1"
+					(click)="prevPage()"
+				></button>
+				<span class="page-info">{{ page() }} / {{ totalPages() }}</span>
+				<button
+					pButton
+					icon="pi pi-chevron-right"
+					class="p-button-text p-button-sm"
+					[disabled]="page() >= totalPages()"
+					(click)="nextPage()"
+				></button>
+			</div>
+		}
 	}
 </section>
