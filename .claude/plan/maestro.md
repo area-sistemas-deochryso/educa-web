@@ -106,8 +106,8 @@ Planes cross-repo con sub-chats FE pendientes: **41** (Correlation Hub F3-F6), *
 
 ### Notas operativas
 
-- **`running/`**: vacío · **`open/`**: 7 briefs (262×2, 301, 329, 330, 331, 332) · **`awaiting-prod/`**: 16 briefs · **`waiting/`**: 1 (328) · **`troubles/`**: vacío
-- **Último cierre**: 308 (formal roles consume endpoint) → closed/ 2026-06-09. P50 F2 brief 305 → closed/.
+- **`running/`**: vacío · **`open/`**: 7 briefs (262×2, 301, 330, 331, 332, 341) · **`awaiting-prod/`**: 16 briefs · **`waiting/`**: vacío · **`troubles/`**: vacío
+- **Último cierre**: 329 (attendance redesign F4-F7) + 328 (usuarios redesign + monitoreo hub redesign) → closed/. Previous: 308 → closed/ 2026-06-09.
 - **⚠️ Brief 330 duplicado**: `330-fe-runtime-health-alerts-diagnostics.md` existe en `open/` Y `awaiting-prod/`. Verificar si el de `open/` es stale.
 - **Último saneamiento**: 2026-06-09 — cross-repo sync: purged 66 closed briefs (≤129, >30d). Moved 269 to closed (P28 stale). Removed xP42/xP45/xP52/xP54 from INDEX (archived in coord).
 
