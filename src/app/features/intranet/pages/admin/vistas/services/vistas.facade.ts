@@ -10,14 +10,13 @@ import {
 } from '@core/services';
 import { searchMatchAny } from '@core/helpers';
 import { environment } from '@config';
-import { CAPABILITY_TO_ROUTE } from '@shared/constants';
 
 import { VistasStore } from './vistas.store';
 
 interface CapabilityStats { total: number; totalModulos: number; modulos: string[] }
 
 @Injectable({ providedIn: 'root' })
-export class VistasFacade extends BaseCrudFacade<CapabilityCatalogItem, { codigo: string; nombre: string; modulo: string; descripcion: string }, CapabilityStats> {
+export class VistasFacade extends BaseCrudFacade<CapabilityCatalogItem, { codigo: string; nombre: string; modulo: string; descripcion: string; ruta: string }, CapabilityStats> {
 	private readonly api = inject(PermissionsService);
 	protected readonly store = inject(VistasStore);
 	protected readonly config: BaseCrudFacadeConfig = {
@@ -48,15 +47,14 @@ export class VistasFacade extends BaseCrudFacade<CapabilityCatalogItem, { codigo
 					filtered = filtered.filter((c) => c.modulo === modulo);
 				}
 				if (rutaFilter === 'with') {
-					filtered = filtered.filter((c) => CAPABILITY_TO_ROUTE.has(c.codigo));
+					filtered = filtered.filter((c) => !!c.ruta);
 				} else if (rutaFilter === 'without') {
-					filtered = filtered.filter((c) => !CAPABILITY_TO_ROUTE.has(c.codigo));
+					filtered = filtered.filter((c) => !c.ruta);
 				}
 				if (term) {
-					filtered = filtered.filter((c) => {
-						const ruta = CAPABILITY_TO_ROUTE.get(c.codigo) ?? '';
-						return searchMatchAny([c.nombre, c.codigo, c.descripcion ?? '', ruta], term);
-					});
+					filtered = filtered.filter((c) =>
+						searchMatchAny([c.nombre, c.codigo, c.descripcion ?? '', c.ruta ?? ''], term),
+					);
 				}
 
 				return {
@@ -86,13 +84,13 @@ export class VistasFacade extends BaseCrudFacade<CapabilityCatalogItem, { codigo
 		if (this.store.isEditing()) {
 			const cap = this.store.selectedItem();
 			if (!cap) return;
-			const payload = { nombre: formData.nombre, modulo: formData.modulo, descripcion: formData.descripcion };
+			const payload = { nombre: formData.nombre, modulo: formData.modulo, descripcion: formData.descripcion, ruta: formData.ruta || undefined };
 			this.walUpdate(cap.id, payload, { ...formData },
 				() => this.api.updateCapability(cap.id, payload),
 				`catalog/${cap.id}`,
 			);
 		} else {
-			const payload = { codigo: formData.codigo, nombre: formData.nombre, modulo: formData.modulo, descripcion: formData.descripcion };
+			const payload = { codigo: formData.codigo, nombre: formData.nombre, modulo: formData.modulo, descripcion: formData.descripcion, ruta: formData.ruta || undefined };
 			this.walCreate(payload, () => this.api.createCapability(payload), 'catalog');
 		}
 	}
@@ -110,12 +108,12 @@ export class VistasFacade extends BaseCrudFacade<CapabilityCatalogItem, { codigo
 	// #region UI commands
 	override openEditDialog(cap: CapabilityCatalogItem): void {
 		this.store.setSelectedItem(cap);
-		this.store.setFormData({ codigo: cap.codigo, nombre: cap.nombre, modulo: cap.modulo, descripcion: cap.descripcion ?? '' });
+		this.store.setFormData({ codigo: cap.codigo, nombre: cap.nombre, modulo: cap.modulo, descripcion: cap.descripcion ?? '', ruta: cap.ruta ?? '' });
 		this.store.setIsEditing(true);
 		this.store.openDialog();
 	}
 
-	updateFormField(field: 'codigo' | 'nombre' | 'modulo' | 'descripcion', value: string): void {
+	updateFormField(field: 'codigo' | 'nombre' | 'modulo' | 'descripcion' | 'ruta', value: string): void {
 		this.store.updateFormField(field, value as never);
 	}
 	// #endregion

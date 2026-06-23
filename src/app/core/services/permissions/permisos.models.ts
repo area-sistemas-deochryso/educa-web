@@ -132,6 +132,11 @@ export interface VistasEstadisticas {
 
 // #region Capability DTOs (P57)
 
+export interface CapabilityAuth {
+	codigo: string;
+	ruta: string | null;
+}
+
 export interface CapabilityCatalogItem {
 	id: number;
 	codigo: string;
@@ -139,6 +144,7 @@ export interface CapabilityCatalogItem {
 	modulo: string;
 	descripcion?: string;
 	orden: number;
+	ruta?: string | null;
 	estado: boolean | number | null;
 }
 
@@ -147,6 +153,7 @@ export interface CreateCapabilityRequest {
 	nombre: string;
 	modulo: string;
 	descripcion?: string;
+	ruta?: string;
 }
 
 export interface UpdateCapabilityRequest {
@@ -154,6 +161,7 @@ export interface UpdateCapabilityRequest {
 	modulo: string;
 	descripcion?: string;
 	orden?: number;
+	ruta?: string;
 }
 
 export interface RolCapabilityMatrixRow {

@@ -20,6 +20,7 @@
 		"serve:ssr:educa-angular": "node dist/educa-angular/server/server.mjs",
 		"audit:deps": "node scripts/audit-deps.mjs",
 		"audit:deps:ci": "node scripts/audit-deps.mjs --ci",
+		"gen:caps": "node scripts/gen-capability-codes.mjs",
 		"build:cap": "node --max_old_space_size=16384 ./node_modules/@angular/cli/bin/ng build --configuration capacitor",
 		"cap:sync": "npx cap sync",
 		"cap:android": "npm run build:cap && npx cap sync android && npx cap open android",

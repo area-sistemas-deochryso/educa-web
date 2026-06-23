@@ -4,7 +4,6 @@ import { BaseCrudStore } from '@core/store';
 import { CapabilityCatalogItem } from '@core/services';
 import { capitalize } from '@core/helpers';
 import { withAllOption, SelectOption } from '@shared/models';
-import { CAPABILITY_TO_ROUTE } from '@shared/constants';
 
 // #region Interfaces
 interface CapabilityForm {
@@ -12,6 +11,7 @@ interface CapabilityForm {
 	nombre: string;
 	modulo: string;
 	descripcion: string;
+	ruta: string;
 }
 
 interface CapabilityStats {
@@ -21,7 +21,6 @@ interface CapabilityStats {
 }
 
 export interface CatalogItemWithRoute extends CapabilityCatalogItem {
-	ruta: string | null;
 	segmento: 'admin' | 'profesor' | 'estudiante' | 'compartido' | null;
 }
 // #endregion
@@ -30,13 +29,13 @@ export interface CatalogItemWithRoute extends CapabilityCatalogItem {
 export class VistasStore extends BaseCrudStore<CapabilityCatalogItem, CapabilityForm, CapabilityStats> {
 	constructor() {
 		super(
-			{ codigo: '', nombre: '', modulo: '', descripcion: '' },
+			{ codigo: '', nombre: '', modulo: '', descripcion: '', ruta: '' },
 			{ total: 0, totalModulos: 0, modulos: [] },
 		);
 	}
 
 	protected override getDefaultFormData(): CapabilityForm {
-		return { codigo: '', nombre: '', modulo: '', descripcion: '' };
+		return { codigo: '', nombre: '', modulo: '', descripcion: '', ruta: '' };
 	}
 
 	// #region Filtros
@@ -77,8 +76,7 @@ export class VistasStore extends BaseCrudStore<CapabilityCatalogItem, Capability
 	});
 
 	readonly editingRoute = computed(() => {
-		const code = this.formData().codigo;
-		return code ? (CAPABILITY_TO_ROUTE.get(code) ?? null) : null;
+		return this.formData().ruta || null;
 	});
 
 	readonly isFormValid = computed(() => {
@@ -88,7 +86,7 @@ export class VistasStore extends BaseCrudStore<CapabilityCatalogItem, Capability
 
 	readonly itemsWithRoute = computed<CatalogItemWithRoute[]>(() =>
 		this.items().map((item) => {
-			const ruta = CAPABILITY_TO_ROUTE.get(item.codigo) ?? null;
+			const ruta = item.ruta ?? null;
 			let segmento: CatalogItemWithRoute['segmento'] = null;
 			if (ruta) {
 				const parts = ruta.split('/');
@@ -97,7 +95,7 @@ export class VistasStore extends BaseCrudStore<CapabilityCatalogItem, Capability
 				else if (parts[1] === 'estudiante') segmento = 'estudiante';
 				else segmento = 'compartido';
 			}
-			return { ...item, ruta, segmento };
+			return { ...item, segmento };
 		}),
 	);
 	// #endregion

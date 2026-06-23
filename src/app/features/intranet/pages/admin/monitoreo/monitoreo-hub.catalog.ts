@@ -1,7 +1,6 @@
 // #region Imports
-import { PERMISOS, PermisoPath } from '@shared/constants';
-
 import { environment } from '@config/environment';
+import { CapabilityCode } from '@shared/types';
 
 import {
 	DomainId,
@@ -17,10 +16,9 @@ export interface DomainTile {
 	label: string;
 	route: string;
 	icon: string;
-	permiso: PermisoPath;
+	capability: CapabilityCode;
 	featureFlag?: FeatureFlagKey;
 	badgeKey?: HubBadgeKey;
-	/** Texto que se ve al voltear la card (back face). 1-2 líneas. */
 	description: string;
 }
 
@@ -47,7 +45,7 @@ export const DOMAINS: DomainDef[] = [
 				label: 'Bandeja',
 				route: '/intranet/admin/monitoreo/correos/bandeja',
 				icon: 'pi pi-inbox',
-				permiso: PERMISOS.ADMIN_EMAIL_OUTBOX,
+				capability: 'ADMIN_EMAIL_OUTBOX',
 				badgeKey: 'bandeja',
 				description: 'Trazabilidad completa del outbox: filtros por tipo, estado y rango — con HTML del cuerpo y exportación.',
 			},
@@ -55,7 +53,7 @@ export const DOMAINS: DomainDef[] = [
 				label: 'Dashboard del día',
 				route: '/intranet/admin/monitoreo/correos/dashboard',
 				icon: 'pi pi-chart-bar',
-				permiso: PERMISOS.ADMIN_EMAIL_OUTBOX_DASHBOARD_DIA,
+				capability: 'ADMIN_EMAIL_OUTBOX_DASHBOARD_DIA',
 				featureFlag: 'emailOutboxDashboardDia',
 				badgeKey: 'dashboard',
 				description: 'Métricas en vivo: throttle, sender stats, dominios receptores y mapa de envío.',
@@ -64,7 +62,7 @@ export const DOMAINS: DomainDef[] = [
 				label: 'Diagnóstico',
 				route: '/intranet/admin/monitoreo/correos/diagnostico',
 				icon: 'pi pi-search',
-				permiso: PERMISOS.ADMIN_EMAIL_OUTBOX_DIAGNOSTICO,
+				capability: 'ADMIN_EMAIL_OUTBOX_DIAGNOSTICO',
 				featureFlag: 'emailOutboxDiagnostico',
 				badgeKey: 'diagnostico',
 				description: 'Candidatos a blacklistear y dominios con tasa de fallo elevada.',
@@ -73,7 +71,7 @@ export const DOMAINS: DomainDef[] = [
 				label: 'Auditoría',
 				route: '/intranet/admin/monitoreo/correos/auditoria',
 				icon: 'pi pi-history',
-				permiso: PERMISOS.ADMIN_AUDITORIA_CORREOS,
+				capability: 'ADMIN_AUDITORIA_CORREOS',
 				featureFlag: 'auditoriaCorreos',
 				description: 'Búsqueda histórica con paginación server-side y exportación.',
 			},
@@ -81,7 +79,7 @@ export const DOMAINS: DomainDef[] = [
 				label: 'Blacklist',
 				route: '/intranet/admin/monitoreo/correos/blacklist',
 				icon: 'pi pi-ban',
-				permiso: PERMISOS.ADMIN_EMAIL_BLACKLIST,
+				capability: 'ADMIN_EMAIL_BLACKLIST',
 				featureFlag: 'emailBlacklistTab',
 				badgeKey: 'blacklist',
 				description: 'Destinatarios bloqueados permanentemente, con motivo y fecha.',
@@ -90,7 +88,7 @@ export const DOMAINS: DomainDef[] = [
 				label: 'Cuarentena',
 				route: '/intranet/admin/monitoreo/correos/quarantine',
 				icon: 'pi pi-clock',
-				permiso: PERMISOS.ADMIN_EMAIL_QUARANTINE,
+				capability: 'ADMIN_EMAIL_QUARANTINE',
 				featureFlag: 'emailQuarantineTab',
 				description: 'Pausas temporales con auto-release. Promueve a blacklist al 3.er hit.',
 			},
@@ -98,7 +96,7 @@ export const DOMAINS: DomainDef[] = [
 				label: 'Dominios pausados',
 				route: '/intranet/admin/monitoreo/correos/domain-pauses',
 				icon: 'pi pi-pause',
-				permiso: PERMISOS.ADMIN_EMAIL_DOMAIN_PAUSES,
+				capability: 'ADMIN_EMAIL_DOMAIN_PAUSES',
 				featureFlag: 'emailDomainPausesTab',
 				description: 'Dominios receptores pausados con timeout y auto-resume.',
 			},
@@ -106,7 +104,7 @@ export const DOMAINS: DomainDef[] = [
 				label: 'Eventos defer',
 				route: '/intranet/admin/monitoreo/correos/defer-events',
 				icon: 'pi pi-replay',
-				permiso: PERMISOS.ADMIN_EMAIL_DEFER_EVENTS,
+				capability: 'ADMIN_EMAIL_DEFER_EVENTS',
 				featureFlag: 'emailDeferEventsTab',
 				description: 'Historial de defers/fails sincrónicos del MTA por destinatario.',
 			},
@@ -123,7 +121,7 @@ export const DOMAINS: DomainDef[] = [
 				label: 'Errores',
 				route: '/intranet/admin/monitoreo/incidencias/errores',
 				icon: 'pi pi-exclamation-circle',
-				permiso: PERMISOS.ADMIN_ERROR_LOGS,
+				capability: 'ADMIN_ERROR_LOGS',
 				badgeKey: 'errores',
 				description: 'Bugs agrupados por fingerprint con kanban de estados (NUEVO → RESUELTO).',
 			},
@@ -131,7 +129,7 @@ export const DOMAINS: DomainDef[] = [
 				label: 'Reportes de Usuarios',
 				route: '/intranet/admin/monitoreo/incidencias/reportes',
 				icon: 'pi pi-comment',
-				permiso: PERMISOS.ADMIN_REPORTES_USUARIO,
+				capability: 'ADMIN_REPORTES_USUARIO',
 				badgeKey: 'reportes',
 				description: 'Feedback manual: tipo, descripción y propuesta enviada por usuarios.',
 			},
@@ -148,7 +146,7 @@ export const DOMAINS: DomainDef[] = [
 				label: 'Rate Limit',
 				route: '/intranet/admin/monitoreo/seguridad/rate-limit',
 				icon: 'pi pi-bolt',
-				permiso: PERMISOS.ADMIN_RATE_LIMIT_EVENTS,
+				capability: 'ADMIN_RATE_LIMIT_EVENTS',
 				featureFlag: 'rateLimitMonitoring',
 				badgeKey: 'rateLimit',
 				description: 'Eventos 429 con policy, partition, top endpoints y top roles afectados.',

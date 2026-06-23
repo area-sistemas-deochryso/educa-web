@@ -5,8 +5,9 @@ import { firstValueFrom } from 'rxjs';
 import { logger, Duration } from '@core/helpers';
 import { AuthService } from '../auth';
 import { StorageService } from '../storage';
+import { CapabilityAuthEntry } from '../storage/storage.models';
 import { PermissionsService } from './permisos.service';
-import { CAPABILITY_TO_ROUTE } from '@shared/constants/permission-registry';
+import { CapabilityAuth } from './permisos.models';
 
 const CAPABILITIES_TTL = Duration.minutes(30);
 const CAPABILITIES_REFRESH_INTERVAL = Duration.minutes(5);
@@ -24,7 +25,7 @@ export class UserPermissionsService {
 
 	// #region Private state
 	private refreshTimer: ReturnType<typeof setInterval> | null = null;
-	private readonly _capabilities = signal<string[]>([]);
+	private readonly _capabilities = signal<CapabilityAuth[]>([]);
 	private readonly _loading = signal(false);
 	private readonly _loaded = signal(false);
 	private readonly _loadFailed = signal(false);
@@ -39,12 +40,15 @@ export class UserPermissionsService {
 	readonly loadFailed = this._loadFailed.asReadonly();
 	readonly isAuthenticated = toSignal(this.authService.isAuthenticated$, { initialValue: false });
 
+	readonly userCapabilities = computed<Set<string>>(() => {
+		return new Set(this._capabilities().map((c) => c.codigo));
+	});
+
 	readonly vistasPermitidas = computed<string[]>(() => {
 		const caps = this._capabilities();
 		const routes: string[] = [];
-		for (const code of caps) {
-			const route = CAPABILITY_TO_ROUTE.get(code);
-			if (route) routes.push(route);
+		for (const cap of caps) {
+			if (cap.ruta) routes.push(cap.ruta);
 		}
 		return routes;
 	});
@@ -74,15 +78,15 @@ export class UserPermissionsService {
 	private loadFromStorage(): void {
 		const stored = this.storageService.getPermisos();
 		if (stored && Array.isArray(stored.capabilities)) {
-			this._capabilities.set(stored.capabilities);
+			this._capabilities.set(normalizeStoredCapabilities(stored.capabilities));
 			this._lastFetchTimestamp = stored.timestamp ?? 0;
 			this._loaded.set(true);
 		}
 	}
 
-	private saveToStorage(capabilities: string[]): void {
+	private saveToStorage(capabilities: CapabilityAuth[]): void {
 		this.storageService.setPermisos({
-			capabilities,
+			capabilities: capabilities.map((c) => ({ codigo: c.codigo, ruta: c.ruta })),
 			timestamp: Date.now(),
 		});
 	}
@@ -177,6 +181,10 @@ export class UserPermissionsService {
 		});
 	}
 
+	hasCapability(code: string): boolean {
+		return this.userCapabilities().has(code);
+	}
+
 	// #endregion
 
 	// #region Commands
@@ -245,4 +253,12 @@ export class UserPermissionsService {
 	}
 
 	// #endregion
+}
+
+function normalizeStoredCapabilities(stored: unknown[]): CapabilityAuth[] {
+	if (stored.length === 0) return [];
+	if (typeof stored[0] === 'string') {
+		return (stored as string[]).map((code) => ({ codigo: code, ruta: null }));
+	}
+	return stored as CapabilityAuthEntry[];
 }

@@ -113,9 +113,9 @@ export class IntranetLayoutComponent implements OnInit, OnDestroy {
 	constructor() {
 		effect(() => {
 			const loaded = this.userPermissionsService.loaded();
-			const vistasPermitidas = this.userPermissionsService.vistasPermitidas();
+			const caps = this.userPermissionsService.userCapabilities();
 			if (loaded) {
-				const modulos = buildModuloMenus(vistasPermitidas);
+				const modulos = buildModuloMenus(caps);
 				this._modulos.set(modulos);
 				const id = detectModuloFromUrl(this.router.url, modulos);
 				this.applySelection(id, modulos, this.router.url);
@@ -142,7 +142,7 @@ export class IntranetLayoutComponent implements OnInit, OnDestroy {
 		if (!this.userPermissionsService.loaded()) {
 			this.userPermissionsService.loadPermisos(this.destroyRef);
 		} else {
-			const modulos = buildModuloMenus(this.userPermissionsService.vistasPermitidas());
+			const modulos = buildModuloMenus(this.userPermissionsService.userCapabilities());
 			this._modulos.set(modulos);
 			const id = detectModuloFromUrl(this.router.url, modulos);
 			this.applySelection(id, modulos, this.router.url);

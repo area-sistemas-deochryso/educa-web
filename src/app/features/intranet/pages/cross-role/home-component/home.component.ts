@@ -59,13 +59,13 @@ export class HomeComponent {
 		if (this.favoritesService.hasFavorites()) {
 			return this.favoritesService
 				.resolveFavorites()
-				.filter((item) => this.userPermisos.tienePermiso(item.permiso));
+				.filter((item) => this.userPermisos.hasCapability(item.capability));
 		}
 
 		// Fallback: defaults por rol
 		const candidates = QUICK_ACCESS_BY_ROLE[user.rol] ?? [];
 		return candidates
-			.filter((item) => this.userPermisos.tienePermiso(item.permiso))
+			.filter((item) => this.userPermisos.hasCapability(item.capability))
 			.slice(0, MAX_QUICK_ACCESS);
 	});
 

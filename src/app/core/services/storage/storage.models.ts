@@ -41,13 +41,13 @@ export interface AttendanceMonthData {
 	year: number;
 }
 
-/**
- * Permissions data stored for a user (capabilities format).
- */
+export interface CapabilityAuthEntry {
+	codigo: string;
+	ruta: string | null;
+}
+
 export interface PermisosStorageData {
-	/** Effective capability codes from BE. */
-	capabilities: string[];
-	/** Epoch ms when capabilities were fetched — used for TTL refresh. */
+	capabilities: CapabilityAuthEntry[];
 	timestamp: number;
 }
 

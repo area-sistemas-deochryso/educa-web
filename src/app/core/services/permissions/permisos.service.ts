@@ -2,6 +2,7 @@ import {
 	ActualizarPermisoRolRequest,
 	ActualizarPermisoUsuarioRequest,
 	ActualizarVistaRequest,
+	CapabilityAuth,
 	CapabilityCatalogItem,
 	CreateCapabilityRequest,
 	CrearPermisoRolRequest,
@@ -22,7 +23,7 @@ import {
 // eslint-disable-next-line layer-enforcement/imports-error -- DEBT: xrepo-50-F3a
 import { ApiResponse } from '@shared/models';
 import { Injectable, inject } from '@angular/core';
-import { Observable, catchError, of } from 'rxjs';
+import { Observable, catchError, map, of } from 'rxjs';
 import { logger } from '@core/helpers';
 
 import { HttpClient } from '@angular/common/http';
@@ -232,14 +233,11 @@ export class PermissionsService {
 
 	private readonly authApiUrl = `${environment.apiUrl}/api/auth`;
 
-	/**
-	 * Get effective capability codes for the current user.
-	 * Replaces getMisPermisos() — calls GET /api/auth/capabilities.
-	 */
-	getMyCapabilities(): Observable<string[]> {
+	getMyCapabilities(): Observable<CapabilityAuth[]> {
 		return this.http
-			.get<string[]>(`${this.authApiUrl}/capabilities`)
+			.get<unknown>(`${this.authApiUrl}/capabilities`)
 			.pipe(
+				map((res) => normalizeCapabilitiesResponse(res)),
 				catchError((err) => {
 					logger.warn('[PermissionsService] Error loading capabilities — fallback empty', err?.status);
 					return of([]);
@@ -377,4 +375,15 @@ export class PermissionsService {
 	}
 
 	// #endregion
+}
+
+function normalizeCapabilitiesResponse(res: unknown): CapabilityAuth[] {
+	if (Array.isArray(res)) {
+		if (res.length === 0) return [];
+		if (typeof res[0] === 'string') return res.map((code: string) => ({ codigo: code, ruta: null }));
+		return res as CapabilityAuth[];
+	}
+	const wrapped = res as { data?: CapabilityAuth[] };
+	if (wrapped.data && Array.isArray(wrapped.data)) return wrapped.data;
+	return [];
 }

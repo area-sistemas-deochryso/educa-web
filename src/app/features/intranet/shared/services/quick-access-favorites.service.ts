@@ -2,7 +2,7 @@ import { computed, Injectable, inject, signal } from '@angular/core';
 
 import { StorageService } from '@core/services';
 import { MENU_ITEMS, PreviewLayout } from '@intranet-shared/config/intranet-menu.config';
-import { PermisoPath } from '@shared/constants';
+import { CapabilityCode } from '@shared/types';
 
 export const MAX_QUICK_ACCESS = 4;
 
@@ -10,7 +10,7 @@ export interface ResolvedFavorite {
 	route: string;
 	label: string;
 	icon: string;
-	permiso: PermisoPath;
+	capability: CapabilityCode;
 	description: string;
 	preview: PreviewLayout;
 }
@@ -62,7 +62,7 @@ export class QuickAccessFavoritesService {
 					route: menuItem.route,
 					label: menuItem.label,
 					icon: menuItem.icon.replace('pi ', ''),
-					permiso: menuItem.permiso,
+					capability: menuItem.capability,
 					description: menuItem.description ?? '',
 					preview: menuItem.preview ?? 'admin-table',
 				} satisfies ResolvedFavorite;

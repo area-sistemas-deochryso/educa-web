@@ -134,7 +134,7 @@ export class MonitoreoHubComponent {
 	// #region Helpers
 	private tileVisible(tile: DomainTile): boolean {
 		if (tile.featureFlag && !environment.features[tile.featureFlag]) return false;
-		return this.userPermisos.tienePermiso(tile.permiso);
+		return this.userPermisos.hasCapability(tile.capability);
 	}
 	// #endregion
 }
