@@ -4,6 +4,7 @@ import { BaseCrudStore } from '@core/store';
 import { CapabilityCatalogItem } from '@core/services';
 import { capitalize } from '@core/helpers';
 import { withAllOption, SelectOption } from '@shared/models';
+import { CAPABILITY_TO_ROUTE } from '@shared/constants';
 
 // #region Interfaces
 interface CapabilityForm {
@@ -17,6 +18,11 @@ interface CapabilityStats {
 	total: number;
 	totalModulos: number;
 	modulos: string[];
+}
+
+export interface CatalogItemWithRoute extends CapabilityCatalogItem {
+	ruta: string | null;
+	segmento: 'admin' | 'profesor' | 'estudiante' | 'compartido' | null;
 }
 // #endregion
 
@@ -33,17 +39,31 @@ export class VistasStore extends BaseCrudStore<CapabilityCatalogItem, Capability
 		return { codigo: '', nombre: '', modulo: '', descripcion: '' };
 	}
 
-	// #region Filtro módulo
+	// #region Filtros
 	private readonly _filterModulo = signal<string | null>(null);
 	readonly filterModulo = this._filterModulo.asReadonly();
+
+	private readonly _filterRuta = signal<'all' | 'with' | 'without'>('all');
+	readonly filterRuta = this._filterRuta.asReadonly();
 
 	setFilterModulo(modulo: string | null): void {
 		this._filterModulo.set(modulo);
 	}
 
+	setFilterRuta(value: 'all' | 'with' | 'without'): void {
+		this._filterRuta.set(value);
+	}
+
 	protected override onClearFiltros(): void {
 		this._filterModulo.set(null);
+		this._filterRuta.set('all');
 	}
+
+	readonly rutaFilterOptions = [
+		{ label: 'Todas', value: 'all' },
+		{ label: 'Con ruta', value: 'with' },
+		{ label: 'Sin ruta', value: 'without' },
+	];
 	// #endregion
 
 	// #region Computed
@@ -56,15 +76,35 @@ export class VistasStore extends BaseCrudStore<CapabilityCatalogItem, Capability
 		return withAllOption(options, 'Todos los módulos');
 	});
 
+	readonly editingRoute = computed(() => {
+		const code = this.formData().codigo;
+		return code ? (CAPABILITY_TO_ROUTE.get(code) ?? null) : null;
+	});
+
 	readonly isFormValid = computed(() => {
 		const data = this.formData();
 		return !!(data.codigo?.trim() && data.nombre?.trim() && data.modulo?.trim());
 	});
+
+	readonly itemsWithRoute = computed<CatalogItemWithRoute[]>(() =>
+		this.items().map((item) => {
+			const ruta = CAPABILITY_TO_ROUTE.get(item.codigo) ?? null;
+			let segmento: CatalogItemWithRoute['segmento'] = null;
+			if (ruta) {
+				const parts = ruta.split('/');
+				if (parts[1] === 'admin') segmento = 'admin';
+				else if (parts[1] === 'profesor') segmento = 'profesor';
+				else if (parts[1] === 'estudiante') segmento = 'estudiante';
+				else segmento = 'compartido';
+			}
+			return { ...item, ruta, segmento };
+		}),
+	);
 	// #endregion
 
 	// #region ViewModel
 	readonly vm = computed(() => ({
-		items: this.items(),
+		items: this.itemsWithRoute(),
 		loading: this.loading(),
 		error: this.error(),
 		estadisticas: this.estadisticas()!,
@@ -78,10 +118,13 @@ export class VistasStore extends BaseCrudStore<CapabilityCatalogItem, Capability
 
 		formData: this.formData(),
 		isFormValid: this.isFormValid(),
+		editingRoute: this.editingRoute(),
 
 		modulosOptions: this.modulosOptions(),
 		searchTerm: this.searchTerm(),
 		filterModulo: this.filterModulo(),
+		filterRuta: this.filterRuta(),
+		rutaFilterOptions: this.rutaFilterOptions,
 		confirmDialogVisible: this.confirmDialogVisible(),
 	}));
 	// #endregion

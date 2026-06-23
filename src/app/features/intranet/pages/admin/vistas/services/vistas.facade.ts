@@ -8,7 +8,9 @@ import {
 	PermissionsService,
 	CapabilityCatalogItem,
 } from '@core/services';
+import { searchMatchAny } from '@core/helpers';
 import { environment } from '@config';
+import { CAPABILITY_TO_ROUTE } from '@shared/constants';
 
 import { VistasStore } from './vistas.store';
 
@@ -36,12 +38,34 @@ export class VistasFacade extends BaseCrudFacade<CapabilityCatalogItem, { codigo
 	// #region API calls
 	protected fetchItems(): Observable<PaginatedResult<CapabilityCatalogItem>> {
 		return this.api.getCapabilityCatalog().pipe(
-			map((items) => ({
-				data: items,
-				page: 1,
-				pageSize: items.length || 50,
-				total: items.length,
-			})),
+			map((items) => {
+				const term = this.store.searchTerm();
+				const modulo = this.store.filterModulo();
+				const rutaFilter = this.store.filterRuta();
+
+				let filtered = items;
+				if (modulo) {
+					filtered = filtered.filter((c) => c.modulo === modulo);
+				}
+				if (rutaFilter === 'with') {
+					filtered = filtered.filter((c) => CAPABILITY_TO_ROUTE.has(c.codigo));
+				} else if (rutaFilter === 'without') {
+					filtered = filtered.filter((c) => !CAPABILITY_TO_ROUTE.has(c.codigo));
+				}
+				if (term) {
+					filtered = filtered.filter((c) => {
+						const ruta = CAPABILITY_TO_ROUTE.get(c.codigo) ?? '';
+						return searchMatchAny([c.nombre, c.codigo, c.descripcion ?? '', ruta], term);
+					});
+				}
+
+				return {
+					data: filtered,
+					page: 1,
+					pageSize: filtered.length || 50,
+					total: filtered.length,
+				};
+			}),
 		);
 	}
 
@@ -99,6 +123,12 @@ export class VistasFacade extends BaseCrudFacade<CapabilityCatalogItem, { codigo
 	// #region Filtros
 	setFilterModulo(modulo: string | null): void {
 		this.store.setFilterModulo(modulo);
+		this.store.setPage(1);
+		this.refreshItemsOnly();
+	}
+
+	setFilterRuta(value: 'all' | 'with' | 'without'): void {
+		this.store.setFilterRuta(value);
 		this.store.setPage(1);
 		this.refreshItemsOnly();
 	}

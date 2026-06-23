@@ -1,7 +1,6 @@
-import { ChangeDetectionStrategy, Component, inject, OnInit, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, inject, OnInit } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
-import { calcPageFromLazyEvent } from '@core/helpers';
 
 import { TableModule } from 'primeng/table';
 import { ButtonModule } from 'primeng/button';
@@ -9,6 +8,7 @@ import { DialogModule } from 'primeng/dialog';
 import { TooltipModule } from 'primeng/tooltip';
 import { InputTextModule } from 'primeng/inputtext';
 import { SelectModule } from 'primeng/select';
+import { TagModule } from 'primeng/tag';
 import { ConfirmDialogModule } from 'primeng/confirmdialog';
 import { ConfirmationService } from 'primeng/api';
 
@@ -29,6 +29,7 @@ import { VistasFacade } from './services';
 		TooltipModule,
 		InputTextModule,
 		SelectModule,
+		TagModule,
 		ConfirmDialogModule,
 		PageHeaderComponent,
 	],
@@ -45,7 +46,6 @@ export class VistasComponent implements OnInit {
 
 	// #region Estado
 	readonly vm = this.facade.vm;
-	private initialLoadDone = signal(false);
 	// #endregion
 
 	// #region Lifecycle
@@ -55,15 +55,6 @@ export class VistasComponent implements OnInit {
 	// #endregion
 
 	// #region Event handlers
-	onLazyLoad(event: { first?: number; rows?: number }): void {
-		if (!this.initialLoadDone()) {
-			this.initialLoadDone.set(true);
-			return;
-		}
-		const { page, rows } = calcPageFromLazyEvent(event);
-		this.facade.loadPage(page, rows);
-	}
-
 	refresh(): void {
 		this.facade.loadAll();
 	}
@@ -109,7 +100,20 @@ export class VistasComponent implements OnInit {
 	onFilterModuloChange(modulo: string | null): void {
 		this.facade.setFilterModulo(modulo);
 	}
+
+	onFilterRutaChange(value: 'all' | 'with' | 'without'): void {
+		this.facade.setFilterRuta(value);
+	}
 	// #endregion
+
+	segmentSeverity(segment: string): 'success' | 'info' | 'warn' | 'danger' | 'secondary' {
+		switch (segment) {
+			case 'admin': return 'danger';
+			case 'profesor': return 'info';
+			case 'estudiante': return 'success';
+			default: return 'secondary';
+		}
+	}
 
 	// #region Dialog sync
 	onDialogVisibleChange(visible: boolean): void {

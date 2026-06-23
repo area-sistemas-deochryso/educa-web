@@ -342,9 +342,8 @@ export const INTRANET_ROUTES: Routes = [
 			},
 			{
 				path: 'admin/registro-vistas',
-				loadComponent: () =>
-					import('./pages/admin/view-registry').then((m) => m.ViewRegistryComponent),
-				title: 'Intranet - Registro de Vistas',
+				redirectTo: 'admin/permisos/roles',
+				pathMatch: 'full' as const,
 			},
 			// Plan 35 — Submódulo "Monitoreo" reagrupado en hub + 3 dominios.
 			// Las 7 rutas viejas (email-outbox, trazabilidad-errores, reportes-usuario,

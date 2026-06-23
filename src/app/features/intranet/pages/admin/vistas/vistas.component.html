@@ -67,6 +67,14 @@
 			appendTo="body"
 		/>
 
+		<p-select
+			[options]="vm().rutaFilterOptions"
+			[ngModel]="vm().filterRuta"
+			(ngModelChange)="onFilterRutaChange($event)"
+			[style]="{ minWidth: '160px' }"
+			appendTo="body"
+		/>
+
 		<button
 			pButton
 			label="Limpiar"
@@ -91,15 +99,14 @@
 	<section class="table-section">
 		<p-table
 			[value]="vm().items"
-			[lazy]="true"
-			(onLazyLoad)="onLazyLoad($any($event))"
 			[paginator]="true"
-			[rows]="vm().pageSize"
-			[totalRecords]="vm().totalRecords"
+			[rows]="10"
 			[rowsPerPageOptions]="[10, 25, 50]"
 			[showCurrentPageReport]="true"
 			[loading]="vm().loading"
 			currentPageReportTemplate="Mostrando {first} a {last} de {totalRecords} capabilities"
+			sortField="id"
+			[sortOrder]="1"
 			class="p-datatable-sm"
 		>
 				<ng-template #header>
@@ -107,10 +114,10 @@
 						<th style="width: 70px" pSortableColumn="id">
 							ID <p-sortIcon field="id" />
 						</th>
-						<th style="width: 120px">MÓDULO</th>
+						<th style="width: 120px" pSortableColumn="modulo">MÓDULO <p-sortIcon field="modulo" /></th>
 						<th pSortableColumn="codigo">CÓDIGO <p-sortIcon field="codigo" /></th>
 						<th pSortableColumn="nombre">NOMBRE <p-sortIcon field="nombre" /></th>
-						<th>DESCRIPCIÓN</th>
+						<th pSortableColumn="ruta">RUTA / DESCRIPCIÓN <p-sortIcon field="ruta" /></th>
 						<th style="width: 100px">ACCIONES</th>
 					</tr>
 				</ng-template>
@@ -133,7 +140,16 @@
 							<span class="nombre-text">{{ cap.nombre }}</span>
 						</td>
 						<td>
-							<span class="nombre-text">{{ cap.descripcion }}</span>
+							@if (cap.ruta) {
+								<div class="ruta-cell">
+									<code class="ruta-text">/{{ cap.ruta }}</code>
+									<p-tag [value]="cap.segmento" [severity]="segmentSeverity(cap.segmento)" styleClass="tag-sm" />
+								</div>
+							} @else if (cap.descripcion) {
+								<span class="text-muted">{{ cap.descripcion }}</span>
+							} @else {
+								<span class="text-muted">—</span>
+							}
 						</td>
 						<td>
 							<div class="actions">

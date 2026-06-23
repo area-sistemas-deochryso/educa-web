@@ -1,7 +1,6 @@
 import { ChangeDetectionStrategy, Component, inject, OnInit } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
-import { RouterLink } from '@angular/router';
 
 import { TableModule } from 'primeng/table';
 import { ButtonModule } from 'primeng/button';
@@ -34,7 +33,6 @@ import { VistasComponent } from '../vistas';
 		CheckboxModule,
 		DrawerModule,
 		Tabs, TabList, Tab, TabPanel,
-		RouterLink,
 		PageHeaderComponent,
 		VistasComponent,
 	],
