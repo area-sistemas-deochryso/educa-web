@@ -14,6 +14,8 @@ import { MonitoreoHubBadgesFacade } from './services/monitoreo-hub-badges.facade
 import {
 	DomainId,
 	DomainTone,
+	HubBadgeKey,
+	HubDeltas,
 	LinkBadge,
 } from './models/monitoreo-hub-badges.models';
 import { DOMAINS, DomainTile } from './monitoreo-hub.catalog';
@@ -58,6 +60,8 @@ interface TriageItem {
 	badge: LinkBadge;
 	domainTone: DomainTone;
 	hubParams: HubQueryParams;
+	deltaAbs: number | null;
+	deltaUp: boolean;
 }
 // #endregion
 
@@ -151,20 +155,27 @@ export class MonitoreoHubComponent {
 
 	readonly hasAnyDomain = computed(() => this.domains().length > 0);
 
-	readonly triageItems = computed<TriageItem[]>(() =>
-		this.domains().flatMap((d) =>
+	readonly triageItems = computed<TriageItem[]>(() => {
+		const deltas = this.badgesFacade.extras().deltas;
+		return this.domains().flatMap((d) =>
 			d.tiles
 				.filter((t) => t.badge?.level === 'critical' || t.badge?.level === 'warn')
-				.map((t) => ({
-					label: t.label,
-					route: t.route,
-					icon: t.icon,
-					badge: t.badge!,
-					domainTone: d.tone,
-					hubParams: t.hubParams,
-				})),
-		),
-	);
+				.map((t) => {
+					const raw = this.lookupDelta(t.badgeKey, deltas);
+					const showDelta = raw !== null && raw !== 0;
+					return {
+						label: t.label,
+						route: t.route,
+						icon: t.icon,
+						badge: t.badge!,
+						domainTone: d.tone,
+						hubParams: t.hubParams,
+						deltaAbs: showDelta ? Math.abs(raw) : null,
+						deltaUp: (raw ?? 0) >= 0,
+					};
+				}),
+		);
+	});
 
 	readonly allOk = computed(() => !this.badgesLoading() && this.triageItems().length === 0);
 	// #endregion
@@ -185,6 +196,13 @@ export class MonitoreoHubComponent {
 	private tileVisible(tile: DomainTile): boolean {
 		if (tile.featureFlag && !environment.features[tile.featureFlag]) return false;
 		return this.userPermisos.hasCapability(tile.capability);
+	}
+
+	private lookupDelta(key: HubBadgeKey | undefined, deltas: HubDeltas | null): number | null {
+		if (!key || !deltas) return null;
+		if (key === 'bandeja') return deltas.bandeja;
+		if (key === 'errores') return deltas.errores;
+		return null;
 	}
 	// #endregion
 }

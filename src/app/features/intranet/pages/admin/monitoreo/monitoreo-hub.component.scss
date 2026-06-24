@@ -172,6 +172,14 @@
 	color: var(--text-color-secondary);
 }
 
+.triage-card-delta {
+	font-size: 0.72rem;
+	font-weight: 600;
+
+	&[data-direction='up'] { color: var(--red-600, #dc2626); }
+	&[data-direction='down'] { color: var(--green-600, #16a34a); }
+}
+
 .triage-card-cta {
 	display: inline-flex;
 	align-items: center;

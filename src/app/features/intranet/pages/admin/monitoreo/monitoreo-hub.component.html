@@ -82,6 +82,11 @@
 							<span class="triage-card-count">{{ item.badge.count }}</span>
 						}
 						<span class="triage-card-hint">{{ item.badge.label }}</span>
+						@if (item.deltaAbs !== null) {
+							<span class="triage-card-delta" [attr.data-direction]="item.deltaUp ? 'up' : 'down'">
+								{{ item.deltaUp ? '↑' : '↓' }}{{ item.deltaAbs }} vs ayer
+							</span>
+						}
 					</span>
 					<span class="triage-card-cta">
 						<i class="pi pi-arrow-right"></i>

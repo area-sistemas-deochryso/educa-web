@@ -12,6 +12,7 @@ import { RateLimitEventsService } from '@features/intranet/pages/admin/rate-limi
 
 import {
 	HubBadges,
+	HubDeltas,
 	HubExtras,
 	LinkBadge,
 	UNKNOWN_BADGE,
@@ -73,15 +74,24 @@ export class MonitoreoHubBadgesFacade {
 
 	// #region Carga concreta
 	private async runLoad(): Promise<void> {
-		const [bandejaRes, dashboardRes, diagnosticoRes, erroresRes, reportesRes, rateLimitRes] =
-			await Promise.allSettled([
-				firstValueFrom(this.outboxApi.estadisticas()),
-				firstValueFrom(this.outboxApi.deferFailStatus()),
-				firstValueFrom(this.monitoreoApi.getCandidatosBlacklist()),
-				firstValueFrom(this.errorGroups.getCount('NUEVO', null, null, null)),
-				firstValueFrom(this.feedback.obtenerEstadisticas()),
-				firstValueFrom(this.rateLimit.getStats(1)),
-			]);
+		const today = this.todayStr();
+		const yesterday = this.yesterdayStr();
+
+		const [
+			bandejaRes, dashboardRes, diagnosticoRes, erroresRes, reportesRes, rateLimitRes,
+			bandejaTodayRes, bandejaYesterdayRes, erroresTodayRes, erroresYesterdayRes,
+		] = await Promise.allSettled([
+			firstValueFrom(this.outboxApi.estadisticas()),
+			firstValueFrom(this.outboxApi.deferFailStatus()),
+			firstValueFrom(this.monitoreoApi.getCandidatosBlacklist()),
+			firstValueFrom(this.errorGroups.getCount('NUEVO', null, null, null)),
+			firstValueFrom(this.feedback.obtenerEstadisticas()),
+			firstValueFrom(this.rateLimit.getStats(1)),
+			firstValueFrom(this.outboxApi.estadisticas(today, today)),
+			firstValueFrom(this.outboxApi.estadisticas(yesterday, yesterday)),
+			firstValueFrom(this.errorGroups.getCount('NUEVO', null, null, null, today, today)),
+			firstValueFrom(this.errorGroups.getCount('NUEVO', null, null, null, yesterday, yesterday)),
+		]);
 
 		const next: HubBadges = {
 			bandeja: this.toBandejaBadge(bandejaRes),
@@ -96,6 +106,7 @@ export class MonitoreoHubBadgesFacade {
 		this._badges.set(next);
 		this._extras.set(this.collectExtras(
 			bandejaRes, dashboardRes, diagnosticoRes, erroresRes, reportesRes, rateLimitRes,
+			bandejaTodayRes, bandejaYesterdayRes, erroresTodayRes, erroresYesterdayRes,
 		));
 	}
 
@@ -113,6 +124,10 @@ export class MonitoreoHubBadgesFacade {
 		errores: PromiseSettledResult<number>,
 		reportes: PromiseSettledResult<{ nuevos: number; enProgreso: number }>,
 		rateLimit: PromiseSettledResult<{ totalRechazados: number }>,
+		bandejaTodayRes: PromiseSettledResult<{ pendientes: number; fallidos: number }>,
+		bandejaYesterdayRes: PromiseSettledResult<{ pendientes: number; fallidos: number }>,
+		erroresTodayRes: PromiseSettledResult<number>,
+		erroresYesterdayRes: PromiseSettledResult<number>,
 	): HubExtras {
 		return {
 			outbox: bandeja.status === 'fulfilled'
@@ -143,7 +158,38 @@ export class MonitoreoHubBadgesFacade {
 			reportesNuevos: reportes.status === 'fulfilled' ? (reportes.value.nuevos ?? 0) : null,
 			reportesEnProgreso: reportes.status === 'fulfilled' ? (reportes.value.enProgreso ?? 0) : null,
 			rateLimitRechazados: rateLimit.status === 'fulfilled' ? (rateLimit.value.totalRechazados ?? 0) : null,
+			deltas: this.computeDeltas(bandejaTodayRes, bandejaYesterdayRes, erroresTodayRes, erroresYesterdayRes),
 		};
+	}
+
+	private computeDeltas(
+		bandejaToday: PromiseSettledResult<{ pendientes: number; fallidos: number }>,
+		bandejaYesterday: PromiseSettledResult<{ pendientes: number; fallidos: number }>,
+		erroresToday: PromiseSettledResult<number>,
+		erroresYesterday: PromiseSettledResult<number>,
+	): HubDeltas {
+		const tBandeja = bandejaToday.status === 'fulfilled'
+			? (bandejaToday.value.pendientes ?? 0) + (bandejaToday.value.fallidos ?? 0) : null;
+		const yBandeja = bandejaYesterday.status === 'fulfilled'
+			? (bandejaYesterday.value.pendientes ?? 0) + (bandejaYesterday.value.fallidos ?? 0) : null;
+
+		const tErrores = erroresToday.status === 'fulfilled' ? erroresToday.value : null;
+		const yErrores = erroresYesterday.status === 'fulfilled' ? erroresYesterday.value : null;
+
+		return {
+			bandeja: tBandeja !== null && yBandeja !== null ? tBandeja - yBandeja : null,
+			errores: tErrores !== null && yErrores !== null ? tErrores - yErrores : null,
+		};
+	}
+
+	private todayStr(): string {
+		return new Date().toISOString().slice(0, 10);
+	}
+
+	private yesterdayStr(): string {
+		const d = new Date();
+		d.setDate(d.getDate() - 1);
+		return d.toISOString().slice(0, 10);
 	}
 	// #endregion
 

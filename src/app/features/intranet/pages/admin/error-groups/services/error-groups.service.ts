@@ -48,12 +48,16 @@ export class ErrorGroupsService {
 		severidad: ErrorSeveridad | null,
 		origen: ErrorOrigen | null,
 		q: string | null,
+		fechaDesde?: string | null,
+		fechaHasta?: string | null,
 	): Observable<number> {
 		const params: Record<string, string> = {};
 		if (estado) params['estado'] = estado;
 		if (severidad) params['severidad'] = severidad;
 		if (origen) params['origen'] = origen;
 		if (q) params['q'] = q;
+		if (fechaDesde) params['fechaDesde'] = fechaDesde;
+		if (fechaHasta) params['fechaHasta'] = fechaHasta;
 		return this.http.get<number>(`${this.apiUrl}/count`, { params });
 	}
 

@@ -43,6 +43,11 @@ export interface CardSummary {
 	stats: StatPoint[];
 }
 
+export interface HubDeltas {
+	bandeja: number | null;
+	errores: number | null;
+}
+
 /** Datos crudos de las métricas; el componente los proyecta a `CardSummary` por card. */
 export interface HubExtras {
 	outbox: {
@@ -73,6 +78,7 @@ export interface HubExtras {
 	reportesNuevos: number | null;
 	reportesEnProgreso: number | null;
 	rateLimitRechazados: number | null;
+	deltas: HubDeltas | null;
 }
 
 export function initialHubExtras(): HubExtras {
@@ -84,6 +90,7 @@ export function initialHubExtras(): HubExtras {
 		reportesNuevos: null,
 		reportesEnProgreso: null,
 		rateLimitRechazados: null,
+		deltas: null,
 	};
 }
 // #endregion
