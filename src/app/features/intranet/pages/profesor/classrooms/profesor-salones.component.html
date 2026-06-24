@@ -16,70 +16,39 @@
 	</app-page-header>
 
 	<div class="p-4 pt-0">
-		<p-table
-			[value]="vm().salonesConEstudiantes"
-			[rows]="10"
-			styleClass="p-datatable-sm"
-		>
-			<ng-template #header>
-				<tr>
-					<th>Salón</th>
-					<th>Cursos que dicta</th>
-					<th style="width: 120px" class="text-center">Estudiantes</th>
-					<th style="width: 80px" class="text-center">Acciones</th>
-				</tr>
-			</ng-template>
-			<ng-template #body let-salon>
-				<tr>
-					<td>
+		<div class="salon-grid">
+			@for (salon of vm().salonesConEstudiantes; track salon.salonId) {
+				<div class="salon-card" (click)="openSalonDialog(salon)">
+					<div class="flex align-items-center justify-content-between mb-2">
 						<div class="flex align-items-center gap-2">
-							<span class="font-semibold">{{ salon.salonDescripcion }}</span>
+							<span class="font-bold text-lg">{{ salon.salonDescripcion }}</span>
 							@if (salon.esTutor) {
 								<p-tag value="Tutor" styleClass="tag-neutral" icon="pi pi-star-fill" />
 							}
 						</div>
-					</td>
-					<td>
-						<div class="flex flex-wrap gap-1">
-							@for (curso of salon.cursos; track curso.horarioId) {
-								<p-tag
-									[value]="curso.nombre"
-									styleClass="tag-neutral cursor-pointer"
-									(click)="onVerCursoContenido(curso)"
-									pTooltip="Ver contenido"
-									tooltipPosition="top"
-								/>
-							}
-							@if (salon.cursos.length === 0) {
-								<span class="text-color-secondary text-sm">Sin cursos asignados</span>
-							}
-						</div>
-					</td>
-					<td class="text-center">
 						<p-tag
-							[value]="salon.cantidadEstudiantes.toString()"
+							[value]="salon.cantidadEstudiantes + ' estudiantes'"
 							styleClass="tag-neutral"
-							[rounded]="true"
 						/>
-					</td>
-					<td class="text-center">
-						<button
-							pButton
-							icon="pi pi-eye"
-							class="p-button-rounded p-button-text"
-							pTooltip="Ver estudiantes"
-							tooltipPosition="top"
-							(click)="openSalonDialog(salon)"
-							[pt]="{
-								root: {
-									'aria-label': 'Ver estudiantes',
-								},
-							}"
-						></button>
-					</td>
-				</tr>
-			</ng-template>
-		</p-table>
+					</div>
+
+					<div class="flex flex-wrap gap-1">
+						@for (curso of salon.cursos; track curso.horarioId) {
+							<p-tag
+								[value]="curso.nombre"
+								styleClass="tag-neutral cursor-pointer"
+								(click)="onVerCursoContenido(curso); $event.stopPropagation()"
+								pTooltip="Ver contenido"
+								tooltipPosition="top"
+							/>
+						}
+						@if (salon.cursos.length === 0) {
+							<span class="text-color-secondary text-sm">Sin cursos asignados</span>
+						}
+					</div>
+				</div>
+			}
+		</div>
 	</div>
 }
 

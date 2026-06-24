@@ -50,13 +50,6 @@
 					class="curso-select"
 				/>
 			}
-			<p-selectButton
-				[options]="vistaOptions"
-				[ngModel]="vm().vistaActual"
-				(ngModelChange)="onVistaChange($event)"
-				optionLabel="label"
-				optionValue="value"
-			/>
 		</div>
 		<!-- #endregion -->
 
@@ -64,7 +57,6 @@
 		@if (vm().selectedCurso; as curso) {
 			<app-notas-curso-card
 				[curso]="curso"
-				[vistaActual]="vm().vistaActual"
 			/>
 		}
 		<!-- #endregion -->

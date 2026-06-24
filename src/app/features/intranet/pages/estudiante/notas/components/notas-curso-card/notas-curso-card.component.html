@@ -1,68 +1,80 @@
-<!-- #region Header -->
 <div class="curso-card">
-	<div class="card-header">
-		<div class="card-title">
-			<h3>{{ curso().cursoNombre }}</h3>
-			<span class="text-sm text-color-secondary">{{ curso().salonDescripcion }}</span>
-		</div>
-		<div class="card-promedio">
-			<span class="text-sm text-color-secondary">Promedio General</span>
+	<!-- #region Hero promedio -->
+	<div class="hero-promedio">
+		<span class="hero-label">Promedio General</span>
+		<span class="hero-number" [class]="'severity-' + promedioSeverity()">
+			{{ formatNota(promedioGeneral()) }}
+		</span>
+		<span class="hero-curso">{{ curso().cursoNombre }}</span>
+		<span class="text-sm text-color-secondary">{{ curso().salonDescripcion }}</span>
+	</div>
+	<!-- #endregion -->
+
+	<!-- #region Periodos row -->
+	<div class="periodos-row">
+		@for (g of periodoGroups(); track g.periodo.id) {
+			<div class="periodo-chip" [class.empty]="g.promedio === null">
+				<span class="periodo-name">{{ g.periodo.nombre }}</span>
+				<p-tag
+					[value]="formatNota(g.promedio)"
+					[severity]="getNotaSeverity(g.promedio)"
+					[rounded]="true"
+				/>
+			</div>
+		}
+		<div class="periodo-chip periodo-general">
+			<span class="periodo-name">General</span>
 			<p-tag
 				[value]="formatNota(promedioGeneral())"
 				[severity]="promedioSeverity()"
 				[rounded]="true"
-				class="promedio-tag"
 			/>
 		</div>
 	</div>
 	<!-- #endregion -->
 
-	<!-- #region Promedios por vista -->
-	@if (promedios().length > 0) {
-		<div class="promedios-grid">
-			@for (p of promedios(); track p.label) {
-				<div class="promedio-item">
-					<span class="promedio-label">{{ p.label }}</span>
-					<p-tag
-						[value]="formatNota(p.value)"
-						[severity]="getNotaSeverity(p.value)"
-						[rounded]="true"
-					/>
-				</div>
-			}
-		</div>
-	}
-	<!-- #endregion -->
-
-	<p-divider />
-
-	<!-- #region Evaluaciones -->
-	<div class="evaluaciones-list">
-		<h4 class="mt-0 mb-2">Evaluaciones</h4>
-		@for (eval of curso().evaluaciones; track eval.id) {
-			<div class="eval-row">
-				<div class="eval-info">
-					<span class="eval-titulo">{{ eval.titulo }}</span>
-					<div class="eval-meta">
-						<p-tag [value]="getTipoLabel(eval.tipo)" styleClass="tag-neutral" [rounded]="true" />
-						<span class="text-xs text-color-secondary">Peso: {{ (eval.peso * 100).toFixed(0) }}%</span>
+	<!-- #region Evaluaciones accordion -->
+	<p-accordion [multiple]="true" [value]="openPanels()" (valueChange)="openPanels.set($any($event))">
+		@for (g of periodoGroups(); track g.periodo.id) {
+			<p-accordionpanel [value]="g.periodo.id">
+				<p-accordionheader>
+					<div class="accordion-header-content">
+						<span class="accordion-periodo-name">{{ g.periodo.nombre }}</span>
+						<span class="accordion-eval-count">{{ g.evaluaciones.length }} evaluación{{ g.evaluaciones.length !== 1 ? 'es' : '' }}</span>
 					</div>
-				</div>
-				<div class="eval-nota">
-					<p-tag
-						[value]="formatNota(eval.nota)"
-						[severity]="getNotaSeverity(eval.nota)"
-						[rounded]="true"
-						class="nota-tag"
-					/>
-				</div>
-			</div>
-		} @empty {
-			<div class="text-color-secondary text-sm p-2">
-				<i class="pi pi-info-circle mr-1"></i>
-				No hay evaluaciones registradas aún
-			</div>
+				</p-accordionheader>
+				<p-accordioncontent>
+					@if (g.evaluaciones.length > 0) {
+						<div class="evaluaciones-list">
+							@for (eval of g.evaluaciones; track eval.id) {
+								<div class="eval-row">
+									<div class="eval-info">
+										<span class="eval-titulo">{{ eval.titulo }}</span>
+										<div class="eval-meta">
+											<p-tag [value]="getTipoLabel(eval.tipo)" styleClass="tag-neutral" [rounded]="true" />
+											<span class="text-xs text-color-secondary">Peso: {{ (eval.peso * 100).toFixed(0) }}%</span>
+										</div>
+									</div>
+									<div class="eval-nota">
+										<p-tag
+											[value]="formatNota(eval.nota)"
+											[severity]="getNotaSeverity(eval.nota)"
+											[rounded]="true"
+											class="nota-tag"
+										/>
+									</div>
+								</div>
+							}
+						</div>
+					} @else {
+						<div class="empty-period">
+							<i class="pi pi-info-circle mr-1"></i>
+							Sin notas aún
+						</div>
+					}
+				</p-accordioncontent>
+			</p-accordionpanel>
 		}
-	</div>
+	</p-accordion>
 	<!-- #endregion -->
 </div>
