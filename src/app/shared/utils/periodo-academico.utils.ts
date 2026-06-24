@@ -55,7 +55,8 @@ export function esVerano(periodo: PeriodoAcademico): boolean {
  * ¿Una sección pertenece al periodo de verano?
  * Invariante: sección "V" o que empieza con "V" = verano.
  */
-export function esSeccionDeVerano(seccion: string): boolean {
+export function esSeccionDeVerano(seccion: string | null | undefined): boolean {
+	if (!seccion) return false;
 	return seccion.toUpperCase() === SECCION_VERANO;
 }
 
@@ -65,9 +66,10 @@ export function esSeccionDeVerano(seccion: string): boolean {
  * Invariante central: sección "V" solo en verano, no-"V" solo en regular.
  */
 export function seccionCompatibleConPeriodo(
-	seccion: string,
+	seccion: string | null | undefined,
 	periodo: PeriodoAcademico,
 ): boolean {
+	if (!seccion) return false;
 	const esSeccionV = esSeccionDeVerano(seccion);
 	return periodo.tipo === 'verano' ? esSeccionV : !esSeccionV;
 }
