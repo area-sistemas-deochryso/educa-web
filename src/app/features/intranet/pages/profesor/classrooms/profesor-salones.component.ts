@@ -1,9 +1,7 @@
 import { Component, ChangeDetectionStrategy, inject, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
-import { TableModule } from 'primeng/table';
 import { TagModule } from 'primeng/tag';
-import { ButtonModule } from 'primeng/button';
 import { TooltipModule } from 'primeng/tooltip';
 import { ProgressSpinnerModule } from 'primeng/progressspinner';
 import { PageHeaderComponent, PeriodToggleComponent } from '@intranet-shared/components';
@@ -21,9 +19,7 @@ import { NotaSaveEvent } from './components/salon-notas-estudiante-tab/salon-not
 	standalone: true,
 	imports: [
 		CommonModule,
-		TableModule,
 		TagModule,
-		ButtonModule,
 		TooltipModule,
 		ProgressSpinnerModule,
 		PageHeaderComponent,
