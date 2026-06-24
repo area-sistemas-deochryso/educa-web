@@ -1,9 +1,10 @@
-import { Component, ChangeDetectionStrategy, input, output, computed, effect } from '@angular/core';
+import { Component, ChangeDetectionStrategy, input, output, computed, effect, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { SelectModule } from 'primeng/select';
 import { TagModule } from 'primeng/tag';
-import { GruposResumenDto } from '@features/intranet/pages/estudiante/models';
+import { GruposResumenDto, GrupoContenidoDto } from '@features/intranet/pages/estudiante/models';
+import { AuthStore } from '@core/store/auth/auth.store';
 
 @Component({
 	selector: 'app-estudiante-grupos-tab',
@@ -14,23 +15,39 @@ import { GruposResumenDto } from '@features/intranet/pages/estudiante/models';
 	styleUrl: './estudiante-grupos-tab.component.scss',
 })
 export class EstudianteGruposTabComponent {
-	// #region Inputs/Outputs
+	private readonly authStore = inject(AuthStore);
+
 	readonly gruposData = input<GruposResumenDto | null>(null);
 	readonly loading = input<boolean>(false);
 	readonly cursoOptions = input<{ label: string; value: number }[]>([]);
 	readonly selectedCurso = input<number | null>(null);
 	readonly cursoChange = output<number>();
-	// #endregion
 
-	// #region Estado local
 	selectedCursoLocal: number | null = null;
-	// #endregion
 
-	// #region Computed
-	readonly grupos = computed(() => this.gruposData()?.grupos ?? []);
+	readonly currentEstudianteId = computed(() => this.authStore.user()?.entityId ?? null);
+
+	readonly myGroup = computed<GrupoContenidoDto | null>(() => {
+		const id = this.currentEstudianteId();
+		if (!id) return null;
+		const grupos = this.gruposData()?.grupos ?? [];
+		return grupos.find((g) => g.estudiantes.some((e) => e.estudianteId === id)) ?? null;
+	});
+
+	readonly otherGroups = computed<GrupoContenidoDto[]>(() => {
+		const my = this.myGroup();
+		const grupos = this.gruposData()?.grupos ?? [];
+		return my ? grupos.filter((g) => g.id !== my.id) : grupos;
+	});
+
 	readonly sinGrupo = computed(() => this.gruposData()?.estudiantesSinGrupo ?? []);
 	readonly hasData = computed(() => this.gruposData() !== null);
-	// #endregion
+
+	readonly isCurrentStudentUnassigned = computed(() => {
+		const id = this.currentEstudianteId();
+		if (!id) return false;
+		return !this.myGroup() && this.sinGrupo().some((e) => e.estudianteId === id);
+	});
 
 	constructor() {
 		effect(() => {
@@ -42,10 +59,12 @@ export class EstudianteGruposTabComponent {
 		});
 	}
 
-	// #region Handlers
 	onCursoChange(value: number): void {
 		this.selectedCursoLocal = value;
 		this.cursoChange.emit(value);
 	}
-	// #endregion
+
+	isMe(estudianteId: number): boolean {
+		return estudianteId === this.currentEstudianteId();
+	}
 }

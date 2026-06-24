@@ -18,22 +18,30 @@
 }
 // #endregion
 
-// #region Grupos
+// #region Grupos container
 .grupos-container {
-	display: grid;
-	grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-	gap: 1rem;
+	display: flex;
+	flex-direction: column;
+	gap: 0.75rem;
 }
+// #endregion
 
+// #region Mi Grupo (highlighted)
 .grupo-card {
 	border: 1px solid var(--surface-border);
 	border-radius: 10px;
 	padding: 1rem;
 	background: var(--surface-card);
 
-	&.sin-grupo {
-		border-color: var(--orange-200);
-		background: rgba(245, 158, 11, 0.03);
+	&.my-group {
+		border-color: var(--p-blue-300);
+		background: rgba(59, 130, 246, 0.04);
+		border-width: 2px;
+	}
+
+	&.no-group-banner {
+		border-color: var(--p-yellow-300);
+		background: rgba(245, 158, 11, 0.04);
 	}
 
 	.grupo-header {
@@ -57,34 +65,114 @@
 		flex-direction: column;
 		gap: 0.4rem;
 	}
+}
 
-	.member-item {
+.no-group-message {
+	margin: 0;
+	font-size: 0.85rem;
+	color: var(--text-color-secondary);
+}
+// #endregion
+
+// #region Member items
+.member-item {
+	display: flex;
+	align-items: center;
+	gap: 0.5rem;
+	padding: 0.35rem 0.5rem;
+	border-radius: 6px;
+	font-size: 0.85rem;
+	color: var(--text-color);
+
+	&.is-me {
+		background: rgba(59, 130, 246, 0.08);
+		font-weight: 600;
+
+		i { color: var(--p-blue-500); }
+	}
+
+	i {
+		font-size: 0.75rem;
+		color: var(--text-color-secondary);
+	}
+}
+
+.me-badge {
+	font-size: 0.7rem;
+	font-weight: 700;
+	color: var(--p-blue-500);
+	background: rgba(59, 130, 246, 0.12);
+	padding: 0.1rem 0.4rem;
+	border-radius: 4px;
+	text-transform: uppercase;
+	letter-spacing: 0.03em;
+}
+
+.member-empty {
+	font-size: 0.85rem;
+	color: var(--text-color-secondary);
+	font-style: italic;
+	padding: 0.35rem 0.5rem;
+}
+// #endregion
+
+// #region Collapsible groups
+.grupo-collapsible {
+	border: 1px solid var(--surface-border);
+	border-radius: 10px;
+	background: var(--surface-card);
+	overflow: hidden;
+
+	&[open] .grupo-card-summary {
+		border-bottom: 1px solid var(--surface-border);
+	}
+}
+
+.grupo-card-summary {
+	list-style: none;
+	padding: 1rem;
+	cursor: pointer;
+	user-select: none;
+
+	&::-webkit-details-marker { display: none; }
+	&::marker { display: none; }
+
+	&:hover {
+		background: var(--surface-hover);
+	}
+
+	.grupo-header {
 		display: flex;
 		align-items: center;
-		gap: 0.5rem;
-		padding: 0.35rem 0.5rem;
-		border-radius: 6px;
-		font-size: 0.85rem;
-		color: var(--text-color);
+		justify-content: space-between;
+		margin: 0;
 
-		i {
-			font-size: 0.75rem;
-			color: var(--text-color-secondary);
+		h4 {
+			margin: 0;
+			font-size: 0.95rem;
+			font-weight: 600;
+			display: flex;
+			align-items: center;
+			color: var(--text-color);
 		}
 	}
+}
 
-	.member-empty {
-		font-size: 0.85rem;
-		color: var(--text-color-secondary);
-		font-style: italic;
-		padding: 0.35rem 0.5rem;
-	}
+.grupo-members-collapsed {
+	display: flex;
+	flex-direction: column;
+	gap: 0.4rem;
+	padding: 0.75rem 1rem;
 }
 // #endregion
 
 // #region Dark mode
 :host-context(.dark-mode) {
-	.grupo-card.sin-grupo {
+	.grupo-card.my-group {
+		border-color: rgba(59, 130, 246, 0.4);
+	}
+
+	.grupo-card.no-group-banner {
 		border-color: rgba(245, 158, 11, 0.3);
 	}
 }

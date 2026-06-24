@@ -25,17 +25,52 @@
 		<p>Selecciona un curso para ver los grupos</p>
 	</div>
 } @else {
-	<!-- #region Grupos -->
 	<div class="grupos-container">
-		@for (grupo of grupos(); track grupo.id) {
-			<div class="grupo-card">
+		<!-- #region Mi Grupo -->
+		@if (myGroup(); as grupo) {
+			<div class="grupo-card my-group">
 				<div class="grupo-header">
 					<h4>
-						<i class="pi pi-users mr-2"></i>{{ grupo.nombre }}
+						<i class="pi pi-star-fill mr-2"></i>Mi Grupo — {{ grupo.nombre }}
 					</h4>
-					<p-tag [value]="grupo.estudiantes.length + ' integrantes'" styleClass="tag-neutral" />
+					<p-tag [value]="grupo.estudiantes.length + ' integrantes'" severity="info" />
 				</div>
 				<div class="grupo-members">
+					@for (est of grupo.estudiantes; track est.estudianteId) {
+						<div class="member-item" [class.is-me]="isMe(est.estudianteId)">
+							<i class="pi" [class.pi-user]="!isMe(est.estudianteId)" [class.pi-star-fill]="isMe(est.estudianteId)"></i>
+							<span>{{ est.estudianteNombre }}</span>
+							@if (isMe(est.estudianteId)) {
+								<span class="me-badge">Tú</span>
+							}
+						</div>
+					}
+				</div>
+			</div>
+		} @else if (isCurrentStudentUnassigned()) {
+			<div class="grupo-card no-group-banner">
+				<div class="grupo-header">
+					<h4>
+						<i class="pi pi-info-circle mr-2"></i>Sin grupo asignado
+					</h4>
+				</div>
+				<p class="no-group-message">Aún no tienes un grupo asignado para este curso.</p>
+			</div>
+		}
+		<!-- #endregion -->
+
+		<!-- #region Otros Grupos -->
+		@for (grupo of otherGroups(); track grupo.id) {
+			<details class="grupo-collapsible">
+				<summary class="grupo-card-summary">
+					<div class="grupo-header">
+						<h4>
+							<i class="pi pi-users mr-2"></i>{{ grupo.nombre }}
+						</h4>
+						<p-tag [value]="grupo.estudiantes.length + ' integrantes'" styleClass="tag-neutral" />
+					</div>
+				</summary>
+				<div class="grupo-members-collapsed">
 					@for (est of grupo.estudiantes; track est.estudianteId) {
 						<div class="member-item">
 							<i class="pi pi-user"></i>
@@ -46,31 +81,38 @@
 						<div class="member-empty">Sin integrantes</div>
 					}
 				</div>
-			</div>
+			</details>
 		}
+		<!-- #endregion -->
 
+		<!-- #region Sin grupo -->
 		@if (sinGrupo().length > 0) {
-			<div class="grupo-card sin-grupo">
-				<div class="grupo-header">
-					<h4>
-						<i class="pi pi-user-minus mr-2"></i>Sin grupo
-					</h4>
-					<p-tag [value]="sinGrupo().length + ' estudiantes'" severity="warn" />
-				</div>
-				<div class="grupo-members">
+			<details class="grupo-collapsible">
+				<summary class="grupo-card-summary">
+					<div class="grupo-header">
+						<h4>
+							<i class="pi pi-user-minus mr-2"></i>Sin grupo
+						</h4>
+						<p-tag [value]="sinGrupo().length + ' estudiantes'" severity="warn" />
+					</div>
+				</summary>
+				<div class="grupo-members-collapsed">
 					@for (est of sinGrupo(); track est.estudianteId) {
-						<div class="member-item">
+						<div class="member-item" [class.is-me]="isMe(est.estudianteId)">
 							<i class="pi pi-user"></i>
 							<span>{{ est.estudianteNombre }}</span>
+							@if (isMe(est.estudianteId)) {
+								<span class="me-badge">Tú</span>
+							}
 						</div>
 					}
 				</div>
-			</div>
+			</details>
 		}
+		<!-- #endregion -->
 	</div>
-	<!-- #endregion -->
 
-	@if (grupos().length === 0 && sinGrupo().length === 0) {
+	@if (!myGroup() && otherGroups().length === 0 && sinGrupo().length === 0) {
 		<div class="empty-state">
 			<i class="pi pi-users" style="font-size: 2rem; opacity: 0.3"></i>
 			<p>No hay grupos configurados para este curso</p>

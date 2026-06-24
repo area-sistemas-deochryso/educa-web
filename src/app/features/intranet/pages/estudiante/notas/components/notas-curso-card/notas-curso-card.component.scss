@@ -5,56 +5,94 @@
 	border-radius: 12px;
 	padding: 1.25rem;
 }
-
-.card-header {
-	display: flex;
-	align-items: flex-start;
-	justify-content: space-between;
-	gap: 1rem;
-	margin-bottom: 1rem;
-}
-
-.card-title {
-	h3 {
-		margin: 0 0 0.25rem;
-		font-size: 1.1rem;
-	}
-}
-
-.card-promedio {
-	display: flex;
-	flex-direction: column;
-	align-items: flex-end;
-	gap: 0.25rem;
-
-	.promedio-tag {
-		font-size: 1.1rem;
-	}
-}
 // #endregion
 
-// #region Promedios grid
-.promedios-grid {
-	display: flex;
-	flex-wrap: wrap;
-	gap: 0.5rem;
-	margin-bottom: 0.5rem;
-}
-
-.promedio-item {
+// #region Hero promedio
+.hero-promedio {
 	display: flex;
 	flex-direction: column;
 	align-items: center;
+	padding: 1rem 0 1.25rem;
 	gap: 0.25rem;
-	min-width: 50px;
-	padding: 0.5rem;
+}
+
+.hero-label {
+	font-size: 0.8rem;
+	font-weight: 600;
+	color: var(--text-color-secondary);
+	text-transform: uppercase;
+	letter-spacing: 0.05em;
+}
+
+.hero-number {
+	font-size: 2.5rem;
+	font-weight: 700;
+	line-height: 1;
+
+	&.severity-success { color: var(--p-green-500); }
+	&.severity-warn { color: var(--p-yellow-500); }
+	&.severity-danger { color: var(--p-red-500); }
+	&.severity-secondary { color: var(--text-color-secondary); }
+}
+
+.hero-curso {
+	font-size: 1rem;
+	font-weight: 600;
+	margin-top: 0.25rem;
+}
+// #endregion
+
+// #region Periodos row
+.periodos-row {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 0.5rem;
+	justify-content: center;
+	margin-bottom: 1.25rem;
+	padding: 0.75rem;
 	background: var(--surface-ground);
 	border-radius: 8px;
 }
 
-.promedio-label {
+.periodo-chip {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	gap: 0.25rem;
+	min-width: 56px;
+	padding: 0.5rem 0.75rem;
+
+	&.empty {
+		opacity: 0.5;
+	}
+}
+
+.periodo-general {
+	border-left: 2px solid var(--surface-border);
+	padding-left: 1rem;
+}
+
+.periodo-name {
 	font-size: 0.75rem;
 	font-weight: 600;
+	color: var(--text-color-secondary);
+}
+// #endregion
+
+// #region Accordion
+.accordion-header-content {
+	display: flex;
+	align-items: center;
+	gap: 0.75rem;
+	width: 100%;
+}
+
+.accordion-periodo-name {
+	font-weight: 600;
+}
+
+.accordion-eval-count {
+	font-size: 0.8rem;
 	color: var(--text-color-secondary);
 }
 // #endregion
@@ -105,17 +143,39 @@
 		font-weight: 600;
 	}
 }
+
+.empty-period {
+	color: var(--text-color-secondary);
+	font-size: 0.85rem;
+	padding: 0.75rem;
+	font-style: italic;
+}
 // #endregion
 
 // #region Responsive
 @media (max-width: 576px) {
-	.card-header {
-		flex-direction: column;
+	.hero-number {
+		font-size: 2rem;
 	}
 
-	.card-promedio {
+	.periodos-row {
+		gap: 0.25rem;
+	}
+
+	.periodo-chip {
+		min-width: 44px;
+		padding: 0.35rem 0.5rem;
+	}
+
+	.periodo-general {
+		border-left: none;
+		border-top: 2px solid var(--surface-border);
+		padding-left: 0.5rem;
+		padding-top: 0.5rem;
+		width: 100%;
 		flex-direction: row;
-		align-items: center;
+		justify-content: center;
+		gap: 0.5rem;
 	}
 }
 // #endregion

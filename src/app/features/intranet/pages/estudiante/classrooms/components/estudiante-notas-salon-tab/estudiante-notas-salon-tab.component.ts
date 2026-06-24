@@ -44,7 +44,6 @@ import { NotasCursoCardComponent } from '@features/intranet/pages/estudiante/not
 				@for (curso of filteredNotas(); track curso.cursoNombre) {
 					<app-notas-curso-card
 						[curso]="curso"
-						[vistaActual]="'periodo'"
 					/>
 				}
 			</div>
