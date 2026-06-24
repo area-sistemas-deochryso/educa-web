@@ -227,7 +227,8 @@ export class RuntimeHealthHistoryComponent implements AfterViewInit {
 	}
 
 	private updateCharts(data: RuntimeHealthHistoryDto[]): void {
-		if (this.charts.length === 0) {
+		const canvasStale = this.charts.length > 0 && !this.charts[0].canvas?.isConnected;
+		if (this.charts.length === 0 || canvasStale) {
 			this.createCharts(data);
 			return;
 		}
