@@ -123,7 +123,7 @@
 
 		.recommendation {
 			display: flex;
-			align-items: flex-start;
+			align-items: center;
 			gap: 0.5rem;
 			margin-top: 0.5rem;
 			padding: 0.5rem;
@@ -133,7 +133,22 @@
 
 			i {
 				color: var(--yellow-600);
-				margin-top: 0.1rem;
+			}
+
+			&--link {
+				cursor: pointer;
+				transition: background 0.15s, color 0.15s;
+
+				&:hover {
+					background: var(--surface-200);
+					color: var(--blue-700);
+					text-decoration: underline;
+				}
+			}
+
+			&__arrow {
+				margin-left: auto;
+				font-size: 0.75rem;
 			}
 		}
 	}

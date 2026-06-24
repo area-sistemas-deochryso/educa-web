@@ -17,6 +17,7 @@ import {
 	AlertLevel,
 	PATTERN_LABEL,
 	PATTERN_SEVERITY,
+	RECOMMENDATION_TAB_TARGETS,
 	RuntimeHealthSnapshot,
 	ThresholdConfig,
 	isProbableTelemetryFailure,
@@ -50,6 +51,7 @@ export class RuntimeHealthWidgetComponent {
 	readonly autoRefreshChange = output<boolean>();
 	readonly collapsedChange = output<boolean>();
 	readonly forceGc = output<void>();
+	readonly navigateTab = output<string>();
 	// #endregion
 
 	// #region Computed
@@ -130,6 +132,15 @@ export class RuntimeHealthWidgetComponent {
 	getRecommendation(metricKey: string): string | null {
 		if (!this.getAlertLevel(metricKey)) return null;
 		return ALERT_RECOMMENDATIONS[metricKey] ?? null;
+	}
+
+	getTabTarget(metricKey: string): string | null {
+		return RECOMMENDATION_TAB_TARGETS[metricKey] ?? null;
+	}
+
+	onRecommendationClick(metricKey: string): void {
+		const tab = RECOMMENDATION_TAB_TARGETS[metricKey];
+		if (tab) this.navigateTab.emit(tab);
 	}
 
 	private evaluateThresholds(): Record<string, AlertLevel> {

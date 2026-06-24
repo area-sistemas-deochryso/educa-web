@@ -191,10 +191,18 @@ export const METRIC_LABELS: Record<string, string> = {
 export const ALERT_RECOMMENDATIONS: Record<string, string> = {
 	'requests.p95': 'Verificar consultas lentas en la tabla de slow requests',
 	'requests.p99': 'Verificar consultas lentas — p99 elevado indica outliers',
-	'threadPool.queueLength': 'Posible starvation — revisar tareas bloqueantes',
-	'db.activeConnections': 'Revisar connection pool — posible leak',
+	'threadPool.queueLength': 'Posible starvation — revisar consultas lentas que retienen threads',
+	'db.activeConnections': 'Pool exhaustion — revisar consultas lentas que retienen conexiones',
 	'gc.heapMb': 'Presión de memoria alta — considerar Force GC',
 	'db.p95LatencyMs': 'Latencia BD alta — revisar queries pesadas',
+};
+
+export const RECOMMENDATION_TAB_TARGETS: Record<string, string> = {
+	'requests.p95': 'slow',
+	'requests.p99': 'slow',
+	'threadPool.queueLength': 'slow',
+	'db.activeConnections': 'slow',
+	'db.p95LatencyMs': 'slow',
 };
 
 // #endregion

@@ -1,5 +1,5 @@
 import { DecimalPipe } from '@angular/common';
-import { ChangeDetectionStrategy, Component, OnInit, inject } from '@angular/core';
+import { ChangeDetectionStrategy, Component, OnInit, inject, signal } from '@angular/core';
 import { BadgeModule } from 'primeng/badge';
 import { Tab, TabList, TabPanel, Tabs } from 'primeng/tabs';
 
@@ -44,6 +44,8 @@ export class RuntimeHealthPageComponent implements OnInit {
 	readonly diagnosticsVm = this.facade.diagnosticsVm;
 	readonly thresholds = this.facade.thresholds;
 
+	readonly activeTab = signal('alerts');
+
 	ngOnInit(): void {
 		this.facade.init();
 		this.facade.loadHistory();
@@ -86,5 +88,9 @@ export class RuntimeHealthPageComponent implements OnInit {
 
 	onSlowRequestsRefresh(): void {
 		this.facade.loadSlowRequests();
+	}
+
+	onNavigateTab(tab: string): void {
+		this.activeTab.set(tab);
 	}
 }

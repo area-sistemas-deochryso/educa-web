@@ -25,12 +25,8 @@
 	</div>
 }
 
-<p-tabs [value]="'snapshot'">
+<p-tabs [value]="activeTab()" (valueChange)="onNavigateTab($any($event))">
 	<p-tablist>
-		<p-tab value="snapshot">
-			<i class="pi pi-server tab-icon"></i>
-			Snapshot
-		</p-tab>
 		<p-tab value="alerts">
 			<i class="pi pi-bell tab-icon"></i>
 			Alertas
@@ -38,48 +34,30 @@
 				<p-badge [value]="'' + alertsVm().alerts.length" severity="danger" />
 			}
 		</p-tab>
-		<p-tab value="thresholds">
-			<i class="pi pi-sliders-h tab-icon"></i>
-			Umbrales
-		</p-tab>
 		<p-tab value="history">
 			<i class="pi pi-chart-line tab-icon"></i>
 			Historial
+		</p-tab>
+		<p-tab value="snapshot">
+			<i class="pi pi-server tab-icon"></i>
+			Snapshot
 		</p-tab>
 		<p-tab value="slow">
 			<i class="pi pi-stopwatch tab-icon"></i>
 			Consultas lentas
 		</p-tab>
+		<p-tab value="thresholds">
+			<i class="pi pi-sliders-h tab-icon"></i>
+			Umbrales
+		</p-tab>
 	</p-tablist>
-
-	<p-tabpanel value="snapshot">
-		<app-runtime-health-widget
-			[snapshot]="vm().snapshot"
-			[loading]="vm().loading"
-			[autoRefresh]="vm().autoRefresh"
-			[collapsed]="vm().collapsed"
-			[thresholds]="thresholds()"
-			(refresh)="onRefresh()"
-			(autoRefreshChange)="onAutoRefreshChange($event)"
-			(collapsedChange)="onCollapsedChange($event)"
-			(forceGc)="onForceGc()"
-		/>
-	</p-tabpanel>
 
 	<p-tabpanel value="alerts">
 		<app-alert-timeline
 			[alerts]="alertsVm().alerts"
 			[loading]="alertsVm().loading"
 			(refresh)="onAlertsRefresh()"
-		/>
-	</p-tabpanel>
-
-	<p-tabpanel value="thresholds">
-		<app-threshold-config
-			[thresholds]="thresholdsVm().thresholds"
-			[loading]="thresholdsVm().loading"
-			[saving]="thresholdsVm().saving"
-			(save)="onThresholdsSave($event)"
+			(navigateTab)="onNavigateTab($event)"
 		/>
 	</p-tabpanel>
 
@@ -94,11 +72,35 @@
 		/>
 	</p-tabpanel>
 
+	<p-tabpanel value="snapshot">
+		<app-runtime-health-widget
+			[snapshot]="vm().snapshot"
+			[loading]="vm().loading"
+			[autoRefresh]="vm().autoRefresh"
+			[collapsed]="vm().collapsed"
+			[thresholds]="thresholds()"
+			(refresh)="onRefresh()"
+			(autoRefreshChange)="onAutoRefreshChange($event)"
+			(collapsedChange)="onCollapsedChange($event)"
+			(forceGc)="onForceGc()"
+			(navigateTab)="onNavigateTab($event)"
+		/>
+	</p-tabpanel>
+
 	<p-tabpanel value="slow">
 		<app-slow-requests-table
 			[slowRequests]="diagnosticsVm().slowRequests"
 			[loading]="diagnosticsVm().slowRequestsLoading"
 			(refresh)="onSlowRequestsRefresh()"
+		/>
+	</p-tabpanel>
+
+	<p-tabpanel value="thresholds">
+		<app-threshold-config
+			[thresholds]="thresholdsVm().thresholds"
+			[loading]="thresholdsVm().loading"
+			[saving]="thresholdsVm().saving"
+			(save)="onThresholdsSave($event)"
 		/>
 	</p-tabpanel>
 </p-tabs>

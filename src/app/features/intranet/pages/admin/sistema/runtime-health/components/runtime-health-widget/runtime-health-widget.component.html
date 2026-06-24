@@ -98,13 +98,18 @@
 							{{ snapshot()!.threadPool.completedItemsCount | number }}
 						</dd>
 					</dl>
+					@if (getRecommendation('threadPool.queueLength'); as rec) {
+						<div class="info-card__rec"
+							[class.info-card__rec--link]="getTabTarget('threadPool.queueLength')"
+							(click)="onRecommendationClick('threadPool.queueLength')">
+							<i class="pi pi-lightbulb"></i>
+							<span>{{ rec }}</span>
+							@if (getTabTarget('threadPool.queueLength')) {
+								<i class="pi pi-arrow-right info-card__rec-arrow"></i>
+							}
+						</div>
+					}
 				</div>
-
-				@if (getRecommendation('threadPool.queueLength'); as rec) {
-					<div class="recommendation-inline">
-						<i class="pi pi-lightbulb"></i> {{ rec }}
-					</div>
-				}
 
 				<!-- Requests -->
 				<div class="info-card">
@@ -134,13 +139,15 @@
 						<dt>Últimos 5 min</dt>
 						<dd>{{ snapshot()!.requests.countLast5Min | number }}</dd>
 					</dl>
+					@if (getRecommendation('requests.p95'); as rec) {
+						<div class="info-card__rec info-card__rec--link"
+							(click)="onRecommendationClick('requests.p95')">
+							<i class="pi pi-lightbulb"></i>
+							<span>{{ rec }}</span>
+							<i class="pi pi-arrow-right info-card__rec-arrow"></i>
+						</div>
+					}
 				</div>
-
-				@if (getRecommendation('requests.p95'); as rec) {
-					<div class="recommendation-inline">
-						<i class="pi pi-lightbulb"></i> {{ rec }}
-					</div>
-				}
 
 				<!-- DB -->
 				<div class="info-card">
@@ -168,13 +175,18 @@
 							<span class="info-card__sub">ms</span>
 						</dd>
 					</dl>
+					@if (getRecommendation('db.activeConnections'); as rec) {
+						<div class="info-card__rec"
+							[class.info-card__rec--link]="getTabTarget('db.activeConnections')"
+							(click)="onRecommendationClick('db.activeConnections')">
+							<i class="pi pi-lightbulb"></i>
+							<span>{{ rec }}</span>
+							@if (getTabTarget('db.activeConnections')) {
+								<i class="pi pi-arrow-right info-card__rec-arrow"></i>
+							}
+						</div>
+					}
 				</div>
-
-				@if (getRecommendation('db.activeConnections'); as rec) {
-					<div class="recommendation-inline">
-						<i class="pi pi-lightbulb"></i> {{ rec }}
-					</div>
-				}
 
 				<!-- GC -->
 				<div class="info-card">
@@ -221,12 +233,18 @@
 							[pt]="{ root: { 'aria-label': 'Forzar garbage collection' } }"
 						></button>
 					</div>
+					@if (getRecommendation('gc.heapMb'); as rec) {
+						<div class="info-card__rec"
+							[class.info-card__rec--link]="getTabTarget('gc.heapMb')"
+							(click)="onRecommendationClick('gc.heapMb')">
+							<i class="pi pi-lightbulb"></i>
+							<span>{{ rec }}</span>
+							@if (getTabTarget('gc.heapMb')) {
+								<i class="pi pi-arrow-right info-card__rec-arrow"></i>
+							}
+						</div>
+					}
 				</div>
-				@if (getRecommendation('gc.heapMb'); as rec) {
-					<div class="recommendation-inline">
-						<i class="pi pi-lightbulb"></i> {{ rec }}
-					</div>
-				}
 			</div>
 
 			<footer class="widget-footer">

@@ -75,9 +75,14 @@
 							}
 						</span>
 						@if (getRecommendation(group.metricKey); as rec) {
-							<div class="recommendation">
+							<div class="recommendation"
+								[class.recommendation--link]="getTabTarget(group.metricKey)"
+								(click)="onRecommendationClick(group.metricKey)">
 								<i class="pi pi-lightbulb"></i>
 								<span>{{ rec }}</span>
+								@if (getTabTarget(group.metricKey)) {
+									<i class="pi pi-arrow-right recommendation__arrow"></i>
+								}
 							</div>
 						}
 					</div>

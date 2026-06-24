@@ -149,19 +149,34 @@
 	margin-left: auto;
 }
 
-.recommendation-inline {
+.info-card__rec {
 	display: flex;
 	align-items: center;
-	gap: 0.5rem;
-	padding: 0.5rem 0.75rem;
-	margin-bottom: 0.5rem;
-	background: color-mix(in srgb, var(--yellow-500) 10%, transparent);
-	border-radius: 6px;
-	font-size: 0.8rem;
-	color: var(--text-color);
+	gap: 0.4rem;
+	margin-top: 0.5rem;
+	padding-top: 0.5rem;
+	border-top: 1px dashed var(--surface-300);
+	font-size: 0.75rem;
+	color: var(--text-color-secondary);
 
-	i {
+	.pi-lightbulb {
 		color: var(--yellow-600);
+		font-size: 0.8rem;
+	}
+
+	&--link {
+		cursor: pointer;
+		transition: color 0.15s;
+
+		&:hover {
+			color: var(--blue-700);
+			text-decoration: underline;
+		}
+	}
+
+	&-arrow {
+		margin-left: auto;
+		font-size: 0.7rem;
 	}
 }
 
