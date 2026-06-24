@@ -21,6 +21,79 @@
 
 <app-email-defer-fail-banner />
 
+<!-- #region Triage strip -->
+<section class="triage-strip" [attr.data-state]="allOk() ? 'ok' : 'alert'">
+	@if (allOk()) {
+		<div class="triage-row">
+			<span class="triage-ok">
+				<i class="pi pi-check-circle"></i>
+				Todos los canales operativos
+			</span>
+			<span class="triage-meta">
+				<span class="triage-timestamp">Hace {{ timeSinceRefresh() }}</span>
+				<button
+					type="button"
+					class="triage-refresh-btn"
+					(click)="refreshBadges()"
+					[disabled]="badgesLoading()"
+					aria-label="Refrescar métricas"
+				>
+					<i class="pi" [class.pi-refresh]="!badgesLoading()" [class.pi-spinner]="badgesLoading()" [class.pi-spin]="badgesLoading()"></i>
+				</button>
+			</span>
+		</div>
+	} @else {
+		<div class="triage-row">
+			<span class="triage-title">
+				<i class="pi pi-bolt"></i>
+				Requieren atención
+			</span>
+			<span class="triage-meta">
+				<span class="triage-timestamp">Hace {{ timeSinceRefresh() }}</span>
+				<button
+					type="button"
+					class="triage-refresh-btn"
+					(click)="refreshBadges()"
+					[disabled]="badgesLoading()"
+					aria-label="Refrescar métricas"
+				>
+					<i class="pi" [class.pi-refresh]="!badgesLoading()" [class.pi-spinner]="badgesLoading()" [class.pi-spin]="badgesLoading()"></i>
+				</button>
+			</span>
+		</div>
+		<div class="triage-cards">
+			@for (item of triageItems(); track item.route) {
+				<a
+					class="triage-card"
+					[attr.data-level]="item.badge.level"
+					[routerLink]="item.route"
+					[queryParams]="item.hubParams"
+				>
+					<span class="triage-card-level">
+						@if (item.badge.level === 'critical') {
+							<i class="pi pi-exclamation-circle"></i>
+						} @else {
+							<i class="pi pi-exclamation-triangle"></i>
+						}
+					</span>
+					<span class="triage-card-body">
+						<span class="triage-card-label">{{ item.label }}</span>
+						@if (item.badge.count !== null) {
+							<span class="triage-card-count">{{ item.badge.count }}</span>
+						}
+						<span class="triage-card-hint">{{ item.badge.label }}</span>
+					</span>
+					<span class="triage-card-cta">
+						<i class="pi pi-arrow-right"></i>
+						Abrir
+					</span>
+				</a>
+			}
+		</div>
+	}
+</section>
+<!-- #endregion -->
+
 <!-- #region Tabs -->
 @if (hasAnyDomain()) {
 	<p-tabs [value]="activeDomain()" (valueChange)="setActiveDomain($event)">
@@ -30,11 +103,10 @@
 					<span class="tab-trigger" [attr.data-tone]="domain.tone">
 						<i [class]="domain.icon"></i>
 						<span class="tab-label">{{ domain.label }}</span>
-						<span class="tab-count">{{ domain.tiles.length }}</span>
-						@if (domain.hasAlert) {
-							<span class="tab-alert" aria-label="Hay alertas en esta sección">
-								<i class="pi pi-circle-fill"></i>
-							</span>
+						@if (domain.alertCount > 0) {
+							<span class="tab-count tab-count-alert">{{ domain.alertCount }}<i class="pi pi-exclamation-circle"></i></span>
+						} @else {
+							<span class="tab-count tab-count-ok"><i class="pi pi-check-circle"></i></span>
 						}
 					</span>
 				</p-tab>
