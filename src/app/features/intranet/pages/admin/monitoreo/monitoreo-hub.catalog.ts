@@ -115,7 +115,7 @@ export const DOMAINS: DomainDef[] = [
 		label: 'Incidencias',
 		icon: 'pi pi-megaphone',
 		description: 'Errores con contexto del runtime y reportes manuales de usuarios.',
-		tone: 'amber',
+		tone: 'red',
 		tiles: [
 			{
 				label: 'Errores',

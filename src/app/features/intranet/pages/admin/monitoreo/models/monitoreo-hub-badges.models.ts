@@ -1,6 +1,6 @@
 // #region Tipos del dominio (3 tabs)
 export type DomainId = 'correos' | 'incidencias' | 'seguridad';
-export type DomainTone = 'blue' | 'amber' | 'green';
+export type DomainTone = 'blue' | 'red' | 'amber' | 'green';
 // #endregion
 
 // #region Tipos del badge por sub-link del hub Monitoreo

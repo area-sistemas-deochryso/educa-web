@@ -3,7 +3,6 @@ import { ChangeDetectionStrategy, Component, computed, DestroyRef, inject, signa
 import { RouterLink } from '@angular/router';
 
 import { TabsModule } from 'primeng/tabs';
-import { TagModule } from 'primeng/tag';
 import { TooltipModule } from 'primeng/tooltip';
 
 import { PageHeaderComponent } from '@intranet-shared/components/page-header/page-header.component';
@@ -68,7 +67,6 @@ interface TriageItem {
 	imports: [
 		RouterLink,
 		TabsModule,
-		TagModule,
 		TooltipModule,
 		PageHeaderComponent,
 		EmailDeferFailBannerComponent,
