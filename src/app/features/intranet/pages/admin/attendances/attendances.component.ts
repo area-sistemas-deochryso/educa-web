@@ -306,12 +306,11 @@ export class AttendancesComponent implements OnInit {
 		this.syncRangeDialogVisible.set(true);
 	}
 
-	/** DEBUG — remove after pagination fix */
 	onDebugPagination(): void {
 		const fecha = this.vm().fecha;
 		this.adminApi.debugCrossChexPagination(fecha).subscribe({
 			next: (res) => {
-				console.log('[DEBUG CrossChex Pagination]', res);
+				logger.debug('[CrossChex Pagination]', res);
 				this.messageService.add({
 					severity: 'info',
 					summary: 'Debug pagination',
@@ -320,7 +319,7 @@ export class AttendancesComponent implements OnInit {
 				});
 			},
 			error: (err) => {
-				console.error('[DEBUG CrossChex Pagination] Error', err);
+				logger.error('[CrossChex Pagination] Error', err);
 				this.messageService.add({
 					severity: 'error',
 					summary: 'Debug pagination error',

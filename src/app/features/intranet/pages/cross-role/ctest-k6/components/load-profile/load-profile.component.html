@@ -168,7 +168,7 @@
 								}
 
 								<!-- Endpoints de esta fase -->
-								@for (ep of phaseEndpoints()[si]; track $index; let i = $index) {
+								@for (ep of phaseEndpoints()[si]; track ep.path; let i = $index) {
 									<div
 										class="flow-step"
 										[style.--step-index]="hasCredentials() ? i + 1 : i"
@@ -268,7 +268,7 @@
 				}
 
 				<!-- Endpoint steps -->
-				@for (ep of endpoints(); track $index; let i = $index) {
+				@for (ep of endpoints(); track ep.path; let i = $index) {
 					<div
 						class="flow-step"
 						[style.--step-index]="hasCredentials() ? i + 1 : i"

@@ -142,15 +142,11 @@ export type CorrelationViewMode = 'timeline' | 'section';
  * - reporte: `payload.fechaReg`
  * - outbox: `payload.fechaEnvio ?? payload.fechaReg`
  */
-export interface TimelineEvent {
-	kind: TimelineEventKind;
-	fecha: string;
-	payload:
-		| CorrelationErrorLogDto
-		| CorrelationRateLimitEventDto
-		| CorrelationReporteUsuarioDto
-		| CorrelationEmailOutboxDto;
-}
+export type TimelineEvent =
+	| { kind: 'error'; fecha: string; payload: CorrelationErrorLogDto }
+	| { kind: 'rate-limit'; fecha: string; payload: CorrelationRateLimitEventDto }
+	| { kind: 'reporte'; fecha: string; payload: CorrelationReporteUsuarioDto }
+	| { kind: 'outbox'; fecha: string; payload: CorrelationEmailOutboxDto };
 
 /** Icono PrimeNG por tipo de evento. */
 export const TIMELINE_ICON_MAP: Record<TimelineEventKind, string> = {

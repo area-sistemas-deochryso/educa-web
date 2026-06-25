@@ -37,7 +37,8 @@
 			@for (semana of data(); track semana.semanaId) {
 				@if (semana.estudiantes.length > 0) {
 					<div class="week-group">
-						<div class="week-group-header">
+						<div class="week-group-header" (click)="toggleWeek(semana.semanaId)" style="cursor: pointer;">
+							<i class="pi" [class.pi-chevron-down]="expandedWeek() === semana.semanaId" [class.pi-chevron-right]="expandedWeek() !== semana.semanaId"></i>
 							<span class="week-badge">{{ semana.numeroSemana }}</span>
 							<span class="week-group-title">
 								Semana {{ semana.numeroSemana }}
@@ -45,8 +46,10 @@
 									— {{ semana.titulo }}
 								}
 							</span>
+							<span class="week-group-count">{{ semana.estudiantes.length }} estudiante{{ semana.estudiantes.length !== 1 ? 's' : '' }}</span>
 						</div>
 
+						@if (expandedWeek() === semana.semanaId) {
 						@for (estudiante of semana.estudiantes; track estudiante.estudianteId) {
 							<div class="student-group">
 								<div class="student-header">
@@ -55,7 +58,8 @@
 									</div>
 									<span class="student-name">{{ estudiante.estudianteNombre }}</span>
 									<!-- Notas del estudiante para esta semana -->
-									@for (nota of getNotasEstudiante(semana.numeroSemana, estudiante.estudianteId); track nota.titulo) {
+									@let notas = getNotasEstudiante(semana.numeroSemana, estudiante.estudianteId);
+									@for (nota of notas; track nota.titulo) {
 										<p-tag
 											[value]="nota.titulo + ': ' + nota.nota"
 											[severity]="nota.severity"
@@ -89,6 +93,7 @@
 									}
 								</div>
 							</div>
+						}
 						}
 					</div>
 				}

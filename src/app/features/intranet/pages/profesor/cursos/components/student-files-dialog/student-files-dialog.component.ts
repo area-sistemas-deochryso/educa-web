@@ -1,4 +1,4 @@
-import { Component, ChangeDetectionStrategy, input, output } from '@angular/core';
+import { Component, ChangeDetectionStrategy, input, output, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { DialogModule } from 'primeng/dialog';
 import { ButtonModule } from 'primeng/button';
@@ -29,7 +29,15 @@ export class StudentFilesDialogComponent {
 	readonly irACalificaciones = output<void>();
 	// #endregion
 
+	// #region Estado local
+	readonly expandedWeek = signal<number | null>(null);
+	// #endregion
+
 	// #region Handlers
+	toggleWeek(semanaId: number): void {
+		this.expandedWeek.update(current => current === semanaId ? null : semanaId);
+	}
+
 	onVisibleChange(value: boolean): void {
 		if (!value) {
 			this.visibleChange.emit(false);

@@ -437,21 +437,24 @@
 									</button>
 								</h4>
 								@if (err.requestHeaders) {
+									@let headersJson = formatJson(err.requestHeaders);
 									<div class="reproduction-block">
 										<span class="reproduction-label">Request Headers</span>
-										<pre class="detail-pre detail-pre--json">{{ formatJson(err.requestHeaders) }}</pre>
+										<pre class="detail-pre detail-pre--json">{{ headersJson }}</pre>
 									</div>
 								}
 								@if (err.requestBody) {
+									@let bodyJson = formatJson(err.requestBody);
 									<div class="reproduction-block">
 										<span class="reproduction-label">Request Body</span>
-										<pre class="detail-pre detail-pre--json">{{ formatJson(err.requestBody) }}</pre>
+										<pre class="detail-pre detail-pre--json">{{ bodyJson }}</pre>
 									</div>
 								}
 								@if (err.responseBody) {
+									@let responseJson = formatJson(err.responseBody);
 									<div class="reproduction-block">
 										<span class="reproduction-label">Response Body</span>
-										<pre class="detail-pre detail-pre--json">{{ formatJson(err.responseBody) }}</pre>
+										<pre class="detail-pre detail-pre--json">{{ responseJson }}</pre>
 									</div>
 								}
 							</div>

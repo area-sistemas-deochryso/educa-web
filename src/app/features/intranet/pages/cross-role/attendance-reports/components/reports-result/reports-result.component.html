@@ -54,9 +54,9 @@
 							</tr>
 						</thead>
 						<tbody>
-							@for (est of salon.estudiantes; track est.dni; let i = $index) {
+							@for (est of paginatedEstudiantes(); track est.dni; let i = $index) {
 								<tr>
-									<td class="matrix-frozen matrix-col-num">{{ i + 1 }}</td>
+									<td class="matrix-frozen matrix-col-num">{{ matrixPageOffset() + i + 1 }}</td>
 									<td class="matrix-frozen matrix-col-name nombre-cell">{{ est.nombreCompleto }}</td>
 									@for (dia of est.asistenciasDiarias ?? []; track dia.dia) {
 										<td class="matrix-col-day" [class.holiday-col]="dia.esFeriado">
@@ -71,6 +71,19 @@
 							}
 						</tbody>
 					</table>
+					@if (totalEstudiantesPages() > 1) {
+						<div class="matrix-paginator">
+							<button class="matrix-paginator__btn" [disabled]="matrixPage() === 0" (click)="onMatrixPageChange(matrixPage() - 1)">
+								<i class="pi pi-chevron-left"></i>
+							</button>
+							<span class="matrix-paginator__info">
+								{{ matrixPageOffset() + 1 }}–{{ matrixPageOffset() + paginatedEstudiantes().length }} de {{ selectedSalon()!.estudiantes.length }}
+							</span>
+							<button class="matrix-paginator__btn" [disabled]="matrixPage() >= totalEstudiantesPages() - 1" (click)="onMatrixPageChange(matrixPage() + 1)">
+								<i class="pi pi-chevron-right"></i>
+							</button>
+						</div>
+					}
 				</div>
 			} @else {
 				<p-table

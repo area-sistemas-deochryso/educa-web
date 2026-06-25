@@ -1,5 +1,5 @@
 // #region Imports
-import { Component, inject } from '@angular/core';
+import { afterNextRender, Component, inject } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
 import { CacheVersionManagerService } from '@core/services/cache';
 import { CapacitorService } from '@core/services/capacitor';
@@ -27,8 +27,10 @@ export class AppComponent {
 	title = 'Educa.com.pe';
 
 	constructor() {
-		this.cacheVersionManager.initialize();
-		this.capacitor.initialize();
+		afterNextRender(() => {
+			this.cacheVersionManager.initialize();
+			this.capacitor.initialize();
+		});
 	}
 }
 // #endregion

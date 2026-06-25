@@ -109,7 +109,40 @@
 	border-radius: 8px;
 }
 
+.matrix-paginator {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	gap: 0.75rem;
+	padding: 0.5rem;
+	border-top: 1px solid var(--surface-border);
+	font-size: 0.8rem;
+
+	&__btn {
+		background: none;
+		border: 1px solid var(--surface-border);
+		border-radius: 4px;
+		padding: 0.25rem 0.5rem;
+		cursor: pointer;
+		color: var(--text-color);
+
+		&:disabled {
+			opacity: 0.4;
+			cursor: default;
+		}
+
+		&:hover:not(:disabled) {
+			background: var(--surface-hover);
+		}
+	}
+
+	&__info {
+		color: var(--text-color-secondary);
+	}
+}
+
 .matrix-table {
+	table-layout: fixed;
 	border-collapse: collapse;
 	font-size: 0.75rem;
 	white-space: nowrap;

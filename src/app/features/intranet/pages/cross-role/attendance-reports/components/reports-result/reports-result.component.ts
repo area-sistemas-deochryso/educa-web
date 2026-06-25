@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, computed, input, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, effect, input, signal } from '@angular/core';
 import { DatePipe } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { TableModule } from 'primeng/table';
@@ -29,8 +29,34 @@ export class ReportsResultComponent {
 	readonly resultado = input.required<ReporteFiltrado>();
 	// #endregion
 
-	// #region Estado local — selección del salón a visualizar
+	// #region Estado local
 	private readonly _selectedSalonKey = signal<string | null>(null);
+	private readonly _matrixPage = signal(0);
+	readonly matrixPageSize = 15;
+
+	constructor() {
+		effect(() => {
+			this.effectiveSalonKey();
+			this._matrixPage.set(0);
+		});
+	}
+
+	readonly matrixPage = this._matrixPage.asReadonly();
+
+	readonly paginatedEstudiantes = computed(() => {
+		const salon = this.selectedSalon();
+		if (!salon) return [];
+		const start = this._matrixPage() * this.matrixPageSize;
+		return salon.estudiantes.slice(start, start + this.matrixPageSize);
+	});
+
+	readonly totalEstudiantesPages = computed(() => {
+		const salon = this.selectedSalon();
+		if (!salon) return 0;
+		return Math.ceil(salon.estudiantes.length / this.matrixPageSize);
+	});
+
+	readonly matrixPageOffset = computed(() => this._matrixPage() * this.matrixPageSize);
 	// #endregion
 
 	// #region Computed
@@ -152,6 +178,10 @@ export class ReportsResultComponent {
 	// #region Handlers
 	onSelectSalon(key: string): void {
 		this._selectedSalonKey.set(key);
+	}
+
+	onMatrixPageChange(page: number): void {
+		this._matrixPage.set(page);
 	}
 	// #endregion
 

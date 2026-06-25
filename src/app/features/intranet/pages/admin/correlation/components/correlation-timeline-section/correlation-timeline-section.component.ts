@@ -9,7 +9,6 @@ import { TooltipModule } from 'primeng/tooltip';
 import {
 	CorrelationEmailOutboxDto,
 	CorrelationErrorLogDto,
-	CorrelationRateLimitEventDto,
 	CorrelationReporteUsuarioDto,
 	OUTBOX_ESTADO_SEVERITY_MAP,
 	REPORTE_ESTADO_SEVERITY_MAP,
@@ -17,7 +16,7 @@ import {
 	TIMELINE_ICON_MAP,
 	TIMELINE_KIND_CLASS_MAP,
 	TIMELINE_KIND_LABEL_MAP,
-	TimelineEvent,
+	type TimelineEvent,
 } from '../../models';
 
 @Component({
@@ -38,22 +37,6 @@ export class CorrelationTimelineSectionComponent {
 	readonly iconMap = TIMELINE_ICON_MAP;
 	readonly kindClassMap = TIMELINE_KIND_CLASS_MAP;
 	readonly kindLabelMap = TIMELINE_KIND_LABEL_MAP;
-
-	asError(payload: TimelineEvent['payload']): CorrelationErrorLogDto {
-		return payload as CorrelationErrorLogDto;
-	}
-
-	asRateLimit(payload: TimelineEvent['payload']): CorrelationRateLimitEventDto {
-		return payload as CorrelationRateLimitEventDto;
-	}
-
-	asReporte(payload: TimelineEvent['payload']): CorrelationReporteUsuarioDto {
-		return payload as CorrelationReporteUsuarioDto;
-	}
-
-	asOutbox(payload: TimelineEvent['payload']): CorrelationEmailOutboxDto {
-		return payload as CorrelationEmailOutboxDto;
-	}
 
 	getErrorSeverity(severidad: string): 'danger' | 'warn' | 'info' {
 		return SEVERIDAD_SEVERITY_MAP[severidad] ?? 'info';
