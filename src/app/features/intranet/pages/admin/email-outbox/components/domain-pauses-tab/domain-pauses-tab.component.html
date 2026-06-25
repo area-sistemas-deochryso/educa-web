@@ -49,6 +49,16 @@
 
 	<div class="filter-dropdowns">
 		<p-select
+			[options]="estadoOptions"
+			optionLabel="label"
+			optionValue="value"
+			[ngModel]="vm().filterEstado"
+			(ngModelChange)="onFilterEstadoChange($event)"
+			placeholder="Estado"
+			[showClear]="true"
+			appendTo="body"
+		/>
+		<p-select
 			[options]="motivoOptions"
 			optionLabel="label"
 			optionValue="value"
@@ -58,14 +68,6 @@
 			[showClear]="true"
 			appendTo="body"
 		/>
-		<label class="show-liberadas">
-			<span>Mostrar liberadas</span>
-			<p-toggleswitch
-				[ngModel]="vm().showLiberadas"
-				(ngModelChange)="onShowLiberadasChange($event)"
-				inputId="dp-liberadas"
-			/>
-		</label>
 	</div>
 
 	<button
@@ -86,6 +88,17 @@
 		tooltipPosition="top"
 		(click)="onRefresh()"
 		[pt]="{ root: { 'aria-label': 'Refrescar' } }"
+	></button>
+
+	<button
+		pButton
+		icon="pi pi-download"
+		class="p-button-text p-button-sm"
+		pTooltip="Exportar CSV (página actual)"
+		tooltipPosition="top"
+		(click)="onExportCsv()"
+		[disabled]="vm().items.length === 0"
+		[pt]="{ root: { 'aria-label': 'Exportar CSV' } }"
 	></button>
 
 	<button

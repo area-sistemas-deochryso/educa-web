@@ -4,6 +4,7 @@ import { BaseCrudStore } from '@core/store';
 import {
 	DomainPauseMotivo,
 	EmailDomainPauseEstadisticas,
+	EmailDomainPauseFiltroEstado,
 	EmailDomainPauseFormData,
 	EmailDomainPauseListaDto,
 } from '@data/models';
@@ -25,15 +26,15 @@ export class EmailDomainPauseStore extends BaseCrudStore<
 	EmailDomainPauseEstadisticas
 > {
 	private readonly _filterMotivo = signal<DomainPauseMotivo | null>(null);
-	private readonly _showLiberadas = signal(false);
+	private readonly _filterEstadoPausa = signal<EmailDomainPauseFiltroEstado | null>(null);
 	private readonly _tableReady = signal(false);
 
 	readonly filterMotivo = this._filterMotivo.asReadonly();
-	readonly showLiberadas = this._showLiberadas.asReadonly();
+	readonly filterEstadoPausa = this._filterEstadoPausa.asReadonly();
 	readonly tableReady = this._tableReady.asReadonly();
 
 	readonly hasActiveFilters = computed(
-		() => !!this.searchTerm() || !!this._filterMotivo() || this._showLiberadas(),
+		() => !!this.searchTerm() || !!this._filterMotivo() || !!this._filterEstadoPausa(),
 	);
 
 	readonly activeCount = computed(() => this.items().filter((i) => i.estado).length);
@@ -50,13 +51,13 @@ export class EmailDomainPauseStore extends BaseCrudStore<
 		this._filterMotivo.set(motivo);
 	}
 
-	setShowLiberadas(show: boolean): void {
-		this._showLiberadas.set(show);
+	setFilterEstadoPausa(estado: EmailDomainPauseFiltroEstado | null): void {
+		this._filterEstadoPausa.set(estado);
 	}
 
 	protected override onClearFiltros(): void {
 		this._filterMotivo.set(null);
-		this._showLiberadas.set(false);
+		this._filterEstadoPausa.set(null);
 	}
 
 	setTableReady(ready: boolean): void {

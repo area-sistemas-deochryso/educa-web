@@ -202,4 +202,35 @@ export class QuarantineTabComponent implements OnInit {
 	onDrawerRelease(item: EmailQuarantineListaDto): void {
 		this.onRelease(item);
 	}
+
+	onExportCsv(): void {
+		const items = this.vm().items;
+		if (items.length === 0) return;
+
+		const rows = [
+			['id', 'destinatario', 'motivo', 'quarantineCount', 'estado', 'retryAfter', 'observacion', 'fechaReg', 'usuarioReg'].join(','),
+			...items.map((e) =>
+				[
+					e.id,
+					e.destinatario,
+					e.motivo,
+					e.quarantineCount,
+					e.estado ? 'Activa' : 'Liberada',
+					e.retryAfter,
+					(e.observacion ?? '').replace(/[\r\n,]/g, ' '),
+					e.fechaReg,
+					e.usuarioReg,
+				]
+					.map((v) => `"${String(v).replace(/"/g, '""')}"`)
+					.join(','),
+			),
+		];
+		const blob = new Blob([rows.join('\n')], { type: 'text/csv;charset=utf-8;' });
+		const url = URL.createObjectURL(blob);
+		const a = document.createElement('a');
+		a.href = url;
+		a.download = `quarantine-${Date.now()}.csv`;
+		a.click();
+		URL.revokeObjectURL(url);
+	}
 }

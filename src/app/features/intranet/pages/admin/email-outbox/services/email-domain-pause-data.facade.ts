@@ -3,7 +3,7 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
 import { logger } from '@core/helpers';
 import { WalCrossTabRefetchService } from '@core/services';
-import { DomainPauseMotivo } from '@data/models';
+import { DomainPauseMotivo, EmailDomainPauseFiltroEstado } from '@data/models';
 
 import { EmailDomainPauseService } from './email-domain-pause.service';
 import { EmailDomainPauseStore } from './email-domain-pause.store';
@@ -30,7 +30,7 @@ export class EmailDomainPauseDataFacade {
 		tableReady: this.store.tableReady(),
 		searchTerm: this.store.searchTerm(),
 		filterMotivo: this.store.filterMotivo(),
-		showLiberadas: this.store.showLiberadas(),
+		filterEstado: this.store.filterEstadoPausa(),
 		hasActiveFilters: this.store.hasActiveFilters(),
 		activeCount: this.store.activeCount(),
 		estadisticas: this.store.estadisticas(),
@@ -42,9 +42,10 @@ export class EmailDomainPauseDataFacade {
 	private readonly filteredItems = computed(() => {
 		const term = this.store.searchTerm().toLowerCase();
 		const motivo = this.store.filterMotivo();
-		const showLiberadas = this.store.showLiberadas();
+		const estado = this.store.filterEstadoPausa();
 		return this.store.items().filter((i) => {
-			if (!showLiberadas && !i.estado) return false;
+			if (estado === 'activa' && !i.estado) return false;
+			if (estado === 'liberada' && i.estado) return false;
 			if (motivo && i.motivo !== motivo) return false;
 			if (term && !i.dominio.toLowerCase().includes(term)) return false;
 			return true;
@@ -54,10 +55,9 @@ export class EmailDomainPauseDataFacade {
 	loadData(): void {
 		if (this.store.loading()) return;
 		this.store.setLoading(true);
-		const showLiberadas = this.store.showLiberadas();
 
 		this.api
-			.getActivas(!showLiberadas)
+			.getActivas(false)
 			.pipe(takeUntilDestroyed(this.destroyRef))
 			.subscribe({
 				next: (items) => {
@@ -92,9 +92,8 @@ export class EmailDomainPauseDataFacade {
 		this.store.setFilterMotivo(motivo);
 	}
 
-	onShowLiberadasChange(show: boolean): void {
-		this.store.setShowLiberadas(show);
-		this.loadData();
+	onFilterEstadoChange(estado: EmailDomainPauseFiltroEstado | null): void {
+		this.store.setFilterEstadoPausa(estado);
 	}
 
 	clearFiltros(): void {

@@ -11,7 +11,6 @@ import { ConfirmDialogModule } from 'primeng/confirmdialog';
 import { ConfirmationService } from 'primeng/api';
 import { InputTextModule } from 'primeng/inputtext';
 import { SelectModule } from 'primeng/select';
-import { ToggleSwitchModule } from 'primeng/toggleswitch';
 import { TooltipModule } from 'primeng/tooltip';
 
 import { TableSkeletonComponent } from '@intranet-shared/components';
@@ -20,6 +19,7 @@ import {
 	DomainPauseDurationHours,
 	DomainPauseMotivo,
 	EMAIL_DOMAIN_PAUSE_MOTIVOS,
+	EmailDomainPauseFiltroEstado,
 	EmailDomainPauseListaDto,
 } from '@data/models';
 
@@ -50,6 +50,11 @@ const MOTIVO_OPTIONS: SelectOption<DomainPauseMotivo>[] = EMAIL_DOMAIN_PAUSE_MOT
 	(m) => ({ label: MOTIVO_LABELS[m], value: m }),
 );
 
+const ESTADO_OPTIONS: SelectOption<EmailDomainPauseFiltroEstado>[] = [
+	{ label: 'Activas', value: 'activa' },
+	{ label: 'Liberadas', value: 'liberada' },
+];
+
 @Component({
 	selector: 'app-domain-pauses-tab',
 	standalone: true,
@@ -58,7 +63,6 @@ const MOTIVO_OPTIONS: SelectOption<DomainPauseMotivo>[] = EMAIL_DOMAIN_PAUSE_MOT
 		ButtonModule,
 		InputTextModule,
 		SelectModule,
-		ToggleSwitchModule,
 		TooltipModule,
 		ConfirmDialogModule,
 		TableSkeletonComponent,
@@ -81,6 +85,7 @@ export class DomainPausesTabComponent implements OnInit {
 
 	readonly vm = this.dataFacade.vm;
 	readonly skeletonColumns = DomainPausesTableComponent.skeletonColumns;
+	readonly estadoOptions = ESTADO_OPTIONS;
 	readonly motivoOptions = MOTIVO_OPTIONS;
 	readonly hubFiltered = signal(false);
 	readonly hubFilterMessage = signal('');
@@ -103,8 +108,8 @@ export class DomainPausesTabComponent implements OnInit {
 		this.dataFacade.onFilterMotivoChange(value);
 	}
 
-	onShowLiberadasChange(show: boolean): void {
-		this.dataFacade.onShowLiberadasChange(show);
+	onFilterEstadoChange(value: EmailDomainPauseFiltroEstado | null): void {
+		this.dataFacade.onFilterEstadoChange(value);
 	}
 
 	onClearFiltros(): void {
@@ -159,5 +164,36 @@ export class DomainPausesTabComponent implements OnInit {
 
 	onDialogCancel(): void {
 		this.uiFacade.closeDialog();
+	}
+
+	onExportCsv(): void {
+		const items = this.vm().items;
+		if (items.length === 0) return;
+
+		const rows = [
+			['id', 'dominio', 'motivo', 'triggerEventCount', 'estado', 'pausedUntil', 'observacion', 'fechaReg', 'usuarioReg'].join(','),
+			...items.map((e) =>
+				[
+					e.id,
+					e.dominio,
+					e.motivo,
+					e.triggerEventCount,
+					e.estado ? 'Activa' : 'Liberada',
+					e.pausedUntil,
+					(e.observacion ?? '').replace(/[\r\n,]/g, ' '),
+					e.fechaReg,
+					e.usuarioReg,
+				]
+					.map((v) => `"${String(v).replace(/"/g, '""')}"`)
+					.join(','),
+			),
+		];
+		const blob = new Blob([rows.join('\n')], { type: 'text/csv;charset=utf-8;' });
+		const url = URL.createObjectURL(blob);
+		const a = document.createElement('a');
+		a.href = url;
+		a.download = `domain-pauses-${Date.now()}.csv`;
+		a.click();
+		URL.revokeObjectURL(url);
 	}
 }

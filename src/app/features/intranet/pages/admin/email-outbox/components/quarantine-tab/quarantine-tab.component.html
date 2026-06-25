@@ -94,6 +94,17 @@
 
 	<button
 		pButton
+		icon="pi pi-download"
+		class="p-button-text p-button-sm"
+		pTooltip="Exportar CSV (página actual)"
+		tooltipPosition="top"
+		(click)="onExportCsv()"
+		[disabled]="vm().items.length === 0"
+		[pt]="{ root: { 'aria-label': 'Exportar CSV' } }"
+	></button>
+
+	<button
+		pButton
 		label="Agregar"
 		icon="pi pi-plus"
 		class="p-button-success p-button-sm"
