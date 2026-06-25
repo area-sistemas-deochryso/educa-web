@@ -38,7 +38,7 @@ export class CorrelationTimelineSectionComponent {
 	readonly kindClassMap = TIMELINE_KIND_CLASS_MAP;
 	readonly kindLabelMap = TIMELINE_KIND_LABEL_MAP;
 
-getErrorSeverity(severidad: string): 'danger' | 'warn' | 'info' {
+	getErrorSeverity(severidad: string): 'danger' | 'warn' | 'info' {
 		return SEVERIDAD_SEVERITY_MAP[severidad] ?? 'info';
 	}
 
