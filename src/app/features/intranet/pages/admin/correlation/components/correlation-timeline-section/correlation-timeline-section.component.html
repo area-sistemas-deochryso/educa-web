@@ -27,27 +27,26 @@
 
 						@switch (event.kind) {
 							@case ('error') {
-								@let error = asError(event.payload);
 								<div class="timeline-event__detail">
 									<p-tag
-										[value]="error.severidad"
-										[severity]="getErrorSeverity(error.severidad)"
+										[value]="event.payload.severidad"
+										[severity]="getErrorSeverity(event.payload.severidad)"
 									/>
-									@if (error.httpStatus !== null) {
+									@if (event.payload.httpStatus !== null) {
 										<span class="cell-mono">
-											{{ error.httpMethod ?? '—' }}
-											{{ error.httpStatus }}
+											{{ event.payload.httpMethod ?? '—' }}
+											{{ event.payload.httpStatus }}
 										</span>
 									}
-									<span class="timeline-event__msg" [pTooltip]="error.mensaje" tooltipPosition="top">
-										{{ error.mensaje }}
+									<span class="timeline-event__msg" [pTooltip]="event.payload.mensaje" tooltipPosition="top">
+										{{ event.payload.mensaje }}
 									</span>
 								</div>
 								<div class="timeline-event__meta">
-									<span class="cell-mono cell-url" [pTooltip]="error.url" tooltipPosition="top">
-										{{ error.url }}
+									<span class="cell-mono cell-url" [pTooltip]="event.payload.url" tooltipPosition="top">
+										{{ event.payload.url }}
 									</span>
-									@if (error.usuarioDniMasked; as dni) {
+									@if (event.payload.usuarioDniMasked; as dni) {
 										<span class="cell-mono">· {{ dni }}</span>
 									}
 								</div>
@@ -58,47 +57,45 @@
 										label="Ver grupo"
 										icon="pi pi-sitemap"
 										class="p-button-text p-button-sm"
-										[disabled]="!canGoToGroup(error)"
-										(click)="onGoToGroup(error)"
+										[disabled]="!canGoToGroup(event.payload)"
+										(click)="onGoToGroup(event.payload)"
 										[pt]="{ root: { 'aria-label': 'Ver grupo de errores' } }"
 									></button>
 								</div>
 							}
 							@case ('rate-limit') {
-								@let rl = asRateLimit(event.payload);
 								<div class="timeline-event__detail">
 									<p-tag
-										[value]="rl.fueRechazado ? 'Rechazado' : 'OK'"
-										[severity]="rl.fueRechazado ? 'danger' : 'success'"
+										[value]="event.payload.fueRechazado ? 'Rechazado' : 'OK'"
+										[severity]="event.payload.fueRechazado ? 'danger' : 'success'"
 									/>
 									<span class="cell-mono">
-										{{ rl.httpMethod }} {{ rl.endpoint }}
+										{{ event.payload.httpMethod }} {{ event.payload.endpoint }}
 									</span>
 								</div>
 								<div class="timeline-event__meta">
-									@if (rl.policy; as p) {
+									@if (event.payload.policy; as p) {
 										<span>policy: <code>{{ p }}</code></span>
 									}
-									@if (rl.limiteEfectivo !== null) {
-										<span>· límite: {{ rl.limiteEfectivo }}</span>
+									@if (event.payload.limiteEfectivo !== null) {
+										<span>· límite: {{ event.payload.limiteEfectivo }}</span>
 									}
-									@if (rl.usuarioDniMasked; as dni) {
+									@if (event.payload.usuarioDniMasked; as dni) {
 										<span class="cell-mono">· {{ dni }}</span>
 									}
 								</div>
 							}
 							@case ('reporte') {
-								@let reporte = asReporte(event.payload);
 								<div class="timeline-event__detail">
 									<p-tag
-										[value]="reporte.estado"
-										[severity]="getReporteSeverity(reporte.estado)"
+										[value]="event.payload.estado"
+										[severity]="getReporteSeverity(event.payload.estado)"
 									/>
-									<span class="timeline-event__msg">{{ reporte.tipo }}</span>
+									<span class="timeline-event__msg">{{ event.payload.tipo }}</span>
 								</div>
 								<div class="timeline-event__meta">
-									<span [pTooltip]="reporte.descripcionResumen" tooltipPosition="top">
-										{{ reporte.descripcionResumen }}
+									<span [pTooltip]="event.payload.descripcionResumen" tooltipPosition="top">
+										{{ event.payload.descripcionResumen }}
 									</span>
 								</div>
 								<div class="timeline-event__actions">
@@ -108,26 +105,25 @@
 										label="Ver reporte"
 										icon="pi pi-external-link"
 										class="p-button-text p-button-sm"
-										(click)="onGoToReport(reporte)"
+										(click)="onGoToReport(event.payload)"
 										[pt]="{ root: { 'aria-label': 'Ver detalle del reporte' } }"
 									></button>
 								</div>
 							}
 							@case ('outbox') {
-								@let outbox = asOutbox(event.payload);
 								<div class="timeline-event__detail">
 									<p-tag
-										[value]="outbox.estado"
-										[severity]="getOutboxSeverity(outbox.estado)"
+										[value]="event.payload.estado"
+										[severity]="getOutboxSeverity(event.payload.estado)"
 									/>
-									<span class="timeline-event__msg" [pTooltip]="outbox.asunto" tooltipPosition="top">
-										{{ outbox.asunto }}
+									<span class="timeline-event__msg" [pTooltip]="event.payload.asunto" tooltipPosition="top">
+										{{ event.payload.asunto }}
 									</span>
 								</div>
 								<div class="timeline-event__meta">
-									<span class="cell-mono">{{ outbox.destinatarioMasked }}</span>
-									@if (outbox.intentos > 1) {
-										<span>· intentos: {{ outbox.intentos }}</span>
+									<span class="cell-mono">{{ event.payload.destinatarioMasked }}</span>
+									@if (event.payload.intentos > 1) {
+										<span>· intentos: {{ event.payload.intentos }}</span>
 									}
 								</div>
 								<div class="timeline-event__actions">
@@ -137,7 +133,7 @@
 										label="Ver en bandeja"
 										icon="pi pi-envelope"
 										class="p-button-text p-button-sm"
-										(click)="onGoToOutbox(outbox)"
+										(click)="onGoToOutbox(event.payload)"
 										[pt]="{ root: { 'aria-label': 'Ver correos del destinatario en bandeja' } }"
 									></button>
 								</div>

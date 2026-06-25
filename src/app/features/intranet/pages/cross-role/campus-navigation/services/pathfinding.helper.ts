@@ -24,6 +24,76 @@ interface AStarNode {
 	parent: string | null;
 }
 
+class MinHeap {
+	private heap: AStarNode[] = [];
+	private index = new Map<string, number>();
+
+	get size(): number {
+		return this.heap.length;
+	}
+
+	insert(node: AStarNode): void {
+		this.heap.push(node);
+		this.index.set(node.id, this.heap.length - 1);
+		this.siftUp(this.heap.length - 1);
+	}
+
+	extractMin(): AStarNode {
+		const min = this.heap[0];
+		const last = this.heap.pop()!;
+		this.index.delete(min.id);
+		if (this.heap.length > 0) {
+			this.heap[0] = last;
+			this.index.set(last.id, 0);
+			this.siftDown(0);
+		}
+		return min;
+	}
+
+	has(id: string): boolean {
+		return this.index.has(id);
+	}
+
+	decreaseKey(id: string, g: number, f: number, parent: string | null): void {
+		const i = this.index.get(id)!;
+		this.heap[i].g = g;
+		this.heap[i].f = f;
+		this.heap[i].parent = parent;
+		this.siftUp(i);
+	}
+
+	private siftUp(i: number): void {
+		while (i > 0) {
+			const p = (i - 1) >> 1;
+			if (this.heap[p].f <= this.heap[i].f) break;
+			this.swap(i, p);
+			i = p;
+		}
+	}
+
+	private siftDown(i: number): void {
+		const n = this.heap.length;
+		while (true) {
+			let smallest = i;
+			const l = 2 * i + 1;
+			const r = 2 * i + 2;
+			if (l < n && this.heap[l].f < this.heap[smallest].f) smallest = l;
+			if (r < n && this.heap[r].f < this.heap[smallest].f) smallest = r;
+			if (smallest === i) break;
+			this.swap(i, smallest);
+			i = smallest;
+		}
+	}
+
+	private swap(a: number, b: number): void {
+		const tmp = this.heap[a];
+		this.heap[a] = this.heap[b];
+		this.heap[b] = tmp;
+		this.index.set(this.heap[a].id, a);
+		this.index.set(this.heap[b].id, b);
+	}
+}
+
 interface Point {
 	x: number;
 	y: number;
@@ -88,21 +158,15 @@ export class PathfindingHelper {
 	): string[] | null {
 		const endNode = nodeMap.get(endId)!;
 
-		const openSet: AStarNode[] = [{ id: startId, g: 0, f: 0, parent: null }];
+		const openSet = new MinHeap();
+		openSet.insert({ id: startId, g: 0, f: 0, parent: null });
 		const closedSet = new Set<string>();
 		const cameFrom = new Map<string, string>();
 		const gScore = new Map<string, number>();
 		gScore.set(startId, 0);
 
-		while (openSet.length > 0) {
-			// Sacar nodo con menor f (min-heap extract)
-			let minIdx = 0;
-			for (let i = 1; i < openSet.length; i++) {
-				if (openSet[i].f < openSet[minIdx].f) minIdx = i;
-			}
-			const current = openSet[minIdx];
-			openSet[minIdx] = openSet[openSet.length - 1];
-			openSet.pop();
+		while (openSet.size > 0) {
+			const current = openSet.extractMin();
 
 			if (current.id === endId) {
 				return this.reconstructPath(cameFrom, endId);
@@ -124,13 +188,10 @@ export class PathfindingHelper {
 					const neighborNode = nodeMap.get(neighbor.nodeId);
 					const h = neighborNode ? this.heuristic(neighborNode, endNode) : 0;
 
-					const existing = openSet.find((n) => n.id === neighbor.nodeId);
-					if (existing) {
-						existing.g = tentativeG;
-						existing.f = tentativeG + h;
-						existing.parent = current.id;
+					if (openSet.has(neighbor.nodeId)) {
+						openSet.decreaseKey(neighbor.nodeId, tentativeG, tentativeG + h, current.id);
 					} else {
-						openSet.push({
+						openSet.insert({
 							id: neighbor.nodeId,
 							g: tentativeG,
 							f: tentativeG + h,
