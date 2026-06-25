@@ -30,11 +30,12 @@
 							(input)="updateTempGrade(evaluation, $any($event.target).value)"
 						/>
 					} @else {
+						@let grade = getDisplayGrade(evaluation);
 						<span
 							class="col-grade"
-							[class]="getGradeClass(getDisplayGrade(evaluation))"
+							[class]="getGradeClass(grade)"
 						>
-							{{ getDisplayGrade(evaluation) }}
+							{{ grade }}
 						</span>
 					}
 				</div>

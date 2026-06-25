@@ -11,8 +11,9 @@
 			<span class="item-code">{{ item.codigo }}</span>
 			<span class="item-separator">=</span>
 			<span class="item-description">{{ item.descripcion }}</span>
-			@if (getCount(item.codigo) !== null) {
-				<span class="item-count">({{ getCount(item.codigo) }})</span>
+			@let count = getCount(item.codigo);
+			@if (count !== null) {
+				<span class="item-count">({{ count }})</span>
 			}
 		</button>
 	}

@@ -27,26 +27,27 @@
 
 						@switch (event.kind) {
 							@case ('error') {
+								@let error = asError(event.payload);
 								<div class="timeline-event__detail">
 									<p-tag
-										[value]="asError(event.payload).severidad"
-										[severity]="getErrorSeverity(asError(event.payload).severidad)"
+										[value]="error.severidad"
+										[severity]="getErrorSeverity(error.severidad)"
 									/>
-									@if (asError(event.payload).httpStatus !== null) {
+									@if (error.httpStatus !== null) {
 										<span class="cell-mono">
-											{{ asError(event.payload).httpMethod ?? '—' }}
-											{{ asError(event.payload).httpStatus }}
+											{{ error.httpMethod ?? '—' }}
+											{{ error.httpStatus }}
 										</span>
 									}
-									<span class="timeline-event__msg" [pTooltip]="asError(event.payload).mensaje" tooltipPosition="top">
-										{{ asError(event.payload).mensaje }}
+									<span class="timeline-event__msg" [pTooltip]="error.mensaje" tooltipPosition="top">
+										{{ error.mensaje }}
 									</span>
 								</div>
 								<div class="timeline-event__meta">
-									<span class="cell-mono cell-url" [pTooltip]="asError(event.payload).url" tooltipPosition="top">
-										{{ asError(event.payload).url }}
+									<span class="cell-mono cell-url" [pTooltip]="error.url" tooltipPosition="top">
+										{{ error.url }}
 									</span>
-									@if (asError(event.payload).usuarioDniMasked; as dni) {
+									@if (error.usuarioDniMasked; as dni) {
 										<span class="cell-mono">· {{ dni }}</span>
 									}
 								</div>
@@ -57,45 +58,47 @@
 										label="Ver grupo"
 										icon="pi pi-sitemap"
 										class="p-button-text p-button-sm"
-										[disabled]="!canGoToGroup(asError(event.payload))"
-										(click)="onGoToGroup(asError(event.payload))"
+										[disabled]="!canGoToGroup(error)"
+										(click)="onGoToGroup(error)"
 										[pt]="{ root: { 'aria-label': 'Ver grupo de errores' } }"
 									></button>
 								</div>
 							}
 							@case ('rate-limit') {
+								@let rl = asRateLimit(event.payload);
 								<div class="timeline-event__detail">
 									<p-tag
-										[value]="asRateLimit(event.payload).fueRechazado ? 'Rechazado' : 'OK'"
-										[severity]="asRateLimit(event.payload).fueRechazado ? 'danger' : 'success'"
+										[value]="rl.fueRechazado ? 'Rechazado' : 'OK'"
+										[severity]="rl.fueRechazado ? 'danger' : 'success'"
 									/>
 									<span class="cell-mono">
-										{{ asRateLimit(event.payload).httpMethod }} {{ asRateLimit(event.payload).endpoint }}
+										{{ rl.httpMethod }} {{ rl.endpoint }}
 									</span>
 								</div>
 								<div class="timeline-event__meta">
-									@if (asRateLimit(event.payload).policy; as p) {
+									@if (rl.policy; as p) {
 										<span>policy: <code>{{ p }}</code></span>
 									}
-									@if (asRateLimit(event.payload).limiteEfectivo !== null) {
-										<span>· límite: {{ asRateLimit(event.payload).limiteEfectivo }}</span>
+									@if (rl.limiteEfectivo !== null) {
+										<span>· límite: {{ rl.limiteEfectivo }}</span>
 									}
-									@if (asRateLimit(event.payload).usuarioDniMasked; as dni) {
+									@if (rl.usuarioDniMasked; as dni) {
 										<span class="cell-mono">· {{ dni }}</span>
 									}
 								</div>
 							}
 							@case ('reporte') {
+								@let reporte = asReporte(event.payload);
 								<div class="timeline-event__detail">
 									<p-tag
-										[value]="asReporte(event.payload).estado"
-										[severity]="getReporteSeverity(asReporte(event.payload).estado)"
+										[value]="reporte.estado"
+										[severity]="getReporteSeverity(reporte.estado)"
 									/>
-									<span class="timeline-event__msg">{{ asReporte(event.payload).tipo }}</span>
+									<span class="timeline-event__msg">{{ reporte.tipo }}</span>
 								</div>
 								<div class="timeline-event__meta">
-									<span [pTooltip]="asReporte(event.payload).descripcionResumen" tooltipPosition="top">
-										{{ asReporte(event.payload).descripcionResumen }}
+									<span [pTooltip]="reporte.descripcionResumen" tooltipPosition="top">
+										{{ reporte.descripcionResumen }}
 									</span>
 								</div>
 								<div class="timeline-event__actions">
@@ -105,25 +108,26 @@
 										label="Ver reporte"
 										icon="pi pi-external-link"
 										class="p-button-text p-button-sm"
-										(click)="onGoToReport(asReporte(event.payload))"
+										(click)="onGoToReport(reporte)"
 										[pt]="{ root: { 'aria-label': 'Ver detalle del reporte' } }"
 									></button>
 								</div>
 							}
 							@case ('outbox') {
+								@let outbox = asOutbox(event.payload);
 								<div class="timeline-event__detail">
 									<p-tag
-										[value]="asOutbox(event.payload).estado"
-										[severity]="getOutboxSeverity(asOutbox(event.payload).estado)"
+										[value]="outbox.estado"
+										[severity]="getOutboxSeverity(outbox.estado)"
 									/>
-									<span class="timeline-event__msg" [pTooltip]="asOutbox(event.payload).asunto" tooltipPosition="top">
-										{{ asOutbox(event.payload).asunto }}
+									<span class="timeline-event__msg" [pTooltip]="outbox.asunto" tooltipPosition="top">
+										{{ outbox.asunto }}
 									</span>
 								</div>
 								<div class="timeline-event__meta">
-									<span class="cell-mono">{{ asOutbox(event.payload).destinatarioMasked }}</span>
-									@if (asOutbox(event.payload).intentos > 1) {
-										<span>· intentos: {{ asOutbox(event.payload).intentos }}</span>
+									<span class="cell-mono">{{ outbox.destinatarioMasked }}</span>
+									@if (outbox.intentos > 1) {
+										<span>· intentos: {{ outbox.intentos }}</span>
 									}
 								</div>
 								<div class="timeline-event__actions">
@@ -133,7 +137,7 @@
 										label="Ver en bandeja"
 										icon="pi pi-envelope"
 										class="p-button-text p-button-sm"
-										(click)="onGoToOutbox(asOutbox(event.payload))"
+										(click)="onGoToOutbox(outbox)"
 										[pt]="{ root: { 'aria-label': 'Ver correos del destinatario en bandeja' } }"
 									></button>
 								</div>

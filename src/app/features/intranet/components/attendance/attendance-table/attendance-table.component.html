@@ -109,7 +109,7 @@
 		<ng-template pTemplate="body" let-week>
 			<tr>
 				<td class="week-col header-cell">{{ week.week }}</td>
-				@for (day of week.days; track $index) {
+				@for (day of week.days; track day.date) {
 					<td class="day-col">
 						@if (isDayValid(day)) {
 							@if (day.status === 'X') {

@@ -275,35 +275,40 @@ export class ErrorReporterService {
 	private lastSwFailureReport = 0;
 	private static readonly SW_FAILURE_DEDUP_MS = 10_000;
 
+	private swMessageHandler = (event: MessageEvent): void => {
+		this.handleSwRevalidationFailure(event);
+	};
+
 	private listenSwRevalidationFailures(): void {
 		if (!this.isBrowser || !('serviceWorker' in navigator)) return;
 
-		navigator.serviceWorker.addEventListener('message', (event: MessageEvent) => {
-			if (event.data?.type !== 'REVALIDATION_FAILED') return;
+		navigator.serviceWorker.addEventListener('message', this.swMessageHandler);
+	}
 
-			const now = Date.now();
-			if (now - this.lastSwFailureReport < ErrorReporterService.SW_FAILURE_DEDUP_MS) return;
-			this.lastSwFailureReport = now;
+	private handleSwRevalidationFailure(event: MessageEvent): void {
+		if (event.data?.type !== 'REVALIDATION_FAILED') return;
 
-			const url = event.data.payload?.originalUrl ?? event.data.payload?.url ?? '';
+		const now = Date.now();
+		if (now - this.lastSwFailureReport < ErrorReporterService.SW_FAILURE_DEDUP_MS) return;
+		this.lastSwFailureReport = now;
 
-			const payload = this.buildPayload({
-				origen: 'NETWORK',
-				mensaje: `Red no disponible: ${sanitizeUrl(url, this.isBrowser)}`,
-				stackTrace: null,
-				url: sanitizeUrl(url, this.isBrowser),
-				httpMethod: 'GET',
-				httpStatus: 0,
-				errorCode: 'NETWORK_REVALIDATION_FAILED',
-				severidad: 'WARNING',
-				correlationId: null,
-				sourceLocation: null,
-				breadcrumbCount: 5,
-			});
+		const url = event.data.payload?.originalUrl ?? event.data.payload?.url ?? '';
 
-			// Guardar en outbox (no intentar enviar — no hay red)
-			this.savePending(payload);
+		const payload = this.buildPayload({
+			origen: 'NETWORK',
+			mensaje: `Red no disponible: ${sanitizeUrl(url, this.isBrowser)}`,
+			stackTrace: null,
+			url: sanitizeUrl(url, this.isBrowser),
+			httpMethod: 'GET',
+			httpStatus: 0,
+			errorCode: 'NETWORK_REVALIDATION_FAILED',
+			severidad: 'WARNING',
+			correlationId: null,
+			sourceLocation: null,
+			breadcrumbCount: 5,
 		});
+
+		this.savePending(payload);
 	}
 
 	/** Cuando vuelve la conexión, reintentar los pendientes */

@@ -40,18 +40,20 @@ export class SwService {
 		}
 	}
 
+	private onOnline = (): void => {
+		logger.log('[SwService] Conexión restaurada');
+		this._isOnline.set(true);
+	};
+
+	private onOffline = (): void => {
+		logger.log('[SwService] Sin conexión - usando cache');
+		this._isOnline.set(false);
+	};
+
 	private initOnlineStatus(): void {
 		this._isOnline.set(navigator.onLine);
-
-		window.addEventListener('online', () => {
-			logger.log('[SwService] Conexión restaurada');
-			this._isOnline.set(true);
-		});
-
-		window.addEventListener('offline', () => {
-			logger.log('[SwService] Sin conexión - usando cache');
-			this._isOnline.set(false);
-		});
+		window.addEventListener('online', this.onOnline);
+		window.addEventListener('offline', this.onOffline);
 	}
 
 	private async registerServiceWorker(): Promise<void> {

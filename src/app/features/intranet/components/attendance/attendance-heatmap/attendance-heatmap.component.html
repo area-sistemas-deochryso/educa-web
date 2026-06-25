@@ -104,7 +104,7 @@
 		@for (week of table().weeks; track week.week; let i = $index) {
 			<div class="calendar-row">
 				<span class="week-label">Semana {{ i + 1 }}</span>
-				@for (day of week.days; track $index) {
+				@for (day of week.days; track day.date) {
 					@if (day.date) {
 						<div
 							class="calendar-cell"

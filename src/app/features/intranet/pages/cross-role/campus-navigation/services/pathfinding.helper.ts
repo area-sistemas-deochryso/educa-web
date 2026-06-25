@@ -95,9 +95,14 @@ export class PathfindingHelper {
 		gScore.set(startId, 0);
 
 		while (openSet.length > 0) {
-			// Sacar nodo con menor f
-			openSet.sort((a, b) => a.f - b.f);
-			const current = openSet.shift()!;
+			// Sacar nodo con menor f (min-heap extract)
+			let minIdx = 0;
+			for (let i = 1; i < openSet.length; i++) {
+				if (openSet[i].f < openSet[minIdx].f) minIdx = i;
+			}
+			const current = openSet[minIdx];
+			openSet[minIdx] = openSet[openSet.length - 1];
+			openSet.pop();
 
 			if (current.id === endId) {
 				return this.reconstructPath(cameFrom, endId);
