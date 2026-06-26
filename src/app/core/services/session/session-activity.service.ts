@@ -9,6 +9,8 @@ import { UserPermissionsService } from '@core/services/permissions';
 import { ErrorHandlerService } from '@core/services/error';
 import { SwService } from '@core/services/sw';
 import { StorageService } from '@core/services/storage';
+import { SignalRService } from '@core/services/signalr';
+import { NotificationsService } from '@core/services/notifications';
 import { SessionRefreshService } from './session-refresh.service';
 import { SessionCoordinatorService } from './session-coordinator.service';
 import { ForceLogoutSignal } from './force-logout.signal';
@@ -47,6 +49,8 @@ export class SessionActivityService {
 	private userPermissionsService = inject(UserPermissionsService);
 	private errorHandler = inject(ErrorHandlerService);
 	private swService = inject(SwService);
+	private signalr = inject(SignalRService);
+	private notifications = inject(NotificationsService);
 	private storage = inject(StorageService);
 	private router = inject(Router);
 	private platformId = inject(PLATFORM_ID);
@@ -162,6 +166,8 @@ export class SessionActivityService {
 		this.coordinator.broadcast({ type: 'logout' });
 		this.stop();
 		this.userPermissionsService.clear();
+		this.notifications.cleanup();
+		this.signalr.disconnect();
 		this.swService.clearCache();
 		this.storage.clearAuth();
 		this.authService.logout();

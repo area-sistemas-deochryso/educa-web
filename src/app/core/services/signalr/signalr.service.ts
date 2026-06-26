@@ -139,11 +139,18 @@ export class SignalRService {
 	 * Register a handler for a named SignalR event. If the connection is not yet
 	 * established, the handler is queued and attached on next connect/reconnect.
 	 */
-	onEvent(event: string, callback: (...args: unknown[]) => void): void {
-		this.pendingHandlers.push({ event, callback });
+	onEvent(event: string, callback: (...args: unknown[]) => void): () => void {
+		const entry = { event, callback };
+		this.pendingHandlers.push(entry);
 		if (this.connection?.state === signalR.HubConnectionState.Connected) {
 			this.connection.on(event, callback);
 		}
+
+		return () => {
+			const idx = this.pendingHandlers.indexOf(entry);
+			if (idx !== -1) this.pendingHandlers.splice(idx, 1);
+			this.connection?.off(event, callback);
+		};
 	}
 
 	// #endregion
