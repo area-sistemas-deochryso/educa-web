@@ -1,7 +1,7 @@
 // #region Imports
 import { HttpErrorResponse, HttpEvent, HttpHandlerFn, HttpInterceptorFn, HttpRequest } from '@angular/common/http';
 import { inject } from '@angular/core';
-import { Observable, Subject, catchError, filter, switchMap, take, throwError, timeout } from 'rxjs';
+import { Observable, Subject, catchError, filter, finalize, switchMap, take, throwError, timeout } from 'rxjs';
 
 import { logger, parseProblemDetails } from '@core/helpers';
 // eslint-disable-next-line layer-enforcement/imports-error -- DEBT: AuthApiService is internal to auth/
@@ -14,6 +14,12 @@ import { ForceLogoutSignal } from '@core/services/session/force-logout.signal';
 // Refresh lock: prevents multiple concurrent refresh attempts from 401s.
 let isRefreshing = false;
 let refreshResult$ = new Subject<boolean>();
+
+export function resetErrorInterceptorState(): void {
+	isRefreshing = false;
+	refreshResult$.complete();
+	refreshResult$ = new Subject<boolean>();
+}
 
 /** URLs that should never trigger a refresh-on-401 (prevents infinite loops). */
 const SKIP_REFRESH_URLS = ['/login', '/verificar', '/logout', '/refresh', '/sessions', '/switch-session'];
@@ -160,19 +166,20 @@ function handle401(
 
 	return authApi.refresh().pipe(
 		switchMap(() => {
-			isRefreshing = false;
 			refreshResult$.next(true);
 			refreshResult$.complete();
 			logger.log('[ErrorInterceptor] 401 recovered via refresh — retrying', req.url);
 			return next(req);
 		}),
 		catchError((refreshError) => {
-			isRefreshing = false;
 			refreshResult$.next(false);
 			refreshResult$.complete();
 			logger.warn('[ErrorInterceptor] 401 + refresh failed — forcing logout', req.url);
 			forceLogout.emit();
 			return throwError(() => refreshError);
+		}),
+		finalize(() => {
+			isRefreshing = false;
 		}),
 	);
 }

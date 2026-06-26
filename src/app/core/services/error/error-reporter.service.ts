@@ -187,12 +187,22 @@ export class ErrorReporterService {
 	}
 
 	private cleanRecentReports(now: number): void {
-		if (this.recentReports.size > 20) {
-			for (const [key, ts] of this.recentReports) {
-				if (now - ts > ErrorReporterService.DEDUP_WINDOW_MS) {
-					this.recentReports.delete(key);
-				}
+		for (const [key, ts] of this.recentReports) {
+			if (now - ts > ErrorReporterService.DEDUP_WINDOW_MS) {
+				this.recentReports.delete(key);
 			}
+		}
+		if (this.recentReports.size > 100) {
+			this.recentReports.clear();
+		}
+	}
+
+	resetOnLogout(): void {
+		this.recentReports.clear();
+		this.reportCount = 0;
+		if (this.resetTimer) {
+			clearTimeout(this.resetTimer);
+			this.resetTimer = null;
 		}
 	}
 

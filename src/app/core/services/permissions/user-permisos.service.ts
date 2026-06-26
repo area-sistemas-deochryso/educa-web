@@ -1,6 +1,6 @@
 import { Injectable, inject, signal, computed, DestroyRef, effect } from '@angular/core';
-import { toSignal } from '@angular/core/rxjs-interop';
-import { firstValueFrom } from 'rxjs';
+import { toObservable, toSignal } from '@angular/core/rxjs-interop';
+import { firstValueFrom, filter } from 'rxjs';
 
 import { logger, Duration } from '@core/helpers';
 import { AuthService } from '../auth';
@@ -29,6 +29,7 @@ export class UserPermissionsService {
 	private readonly _loading = signal(false);
 	private readonly _loaded = signal(false);
 	private readonly _loadFailed = signal(false);
+	private readonly _doneLoading$ = toObservable(computed(() => this._loaded() || this._loadFailed()));
 	private _lastFetchTimestamp = 0;
 	private wasAuthenticated = false;
 	// #endregion
@@ -154,13 +155,7 @@ export class UserPermissionsService {
 	}
 
 	private waitForLoaded(): Promise<void> {
-		return new Promise((resolve) => {
-			const check = (): void => {
-				if (this._loaded() || this._loadFailed()) resolve();
-				else setTimeout(check, 50);
-			};
-			check();
-		});
+		return firstValueFrom(this._doneLoading$.pipe(filter(Boolean))).then(() => {});
 	}
 
 	// #endregion

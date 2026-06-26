@@ -21,6 +21,14 @@ const MAX_CONCURRENT = 10;
 let inFlight = 0;
 const waitQueue: Subject<void>[] = [];
 
+export function resetRateLimitState(): void {
+	inFlight = 0;
+	while (waitQueue.length > 0) {
+		const s = waitQueue.shift()!;
+		s.complete();
+	}
+}
+
 // #endregion
 
 // #region Helpers
@@ -53,11 +61,18 @@ function acquireSlot(): Observable<void> {
 
 	const slot$ = new Subject<void>();
 	waitQueue.push(slot$);
-	return slot$.pipe(take(1));
+	return new Observable<void>((subscriber) => {
+		const sub = slot$.pipe(take(1)).subscribe(subscriber);
+		return () => {
+			sub.unsubscribe();
+			const idx = waitQueue.indexOf(slot$);
+			if (idx !== -1) waitQueue.splice(idx, 1);
+		};
+	});
 }
 
 function releaseSlot(): void {
-	inFlight--;
+	inFlight = Math.max(0, inFlight - 1);
 
 	if (waitQueue.length > 0 && inFlight < MAX_CONCURRENT) {
 		inFlight++;

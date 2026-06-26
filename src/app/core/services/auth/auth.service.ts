@@ -8,9 +8,12 @@ import { toObservable } from '@angular/core/rxjs-interop';
 const SESSION_CHANNEL_NAME = 'educa-session';
 
 import { ActivityTrackerService } from '../error/activity-tracker.service';
+import { ErrorReporterService } from '../error/error-reporter.service';
 import { AuthApiService } from './auth-api.service';
 import { StorageService } from '../storage';
 import { logger, Duration } from '@core/helpers';
+import { resetErrorInterceptorState } from '@core/interceptors/error/error.interceptor';
+import { resetRateLimitState } from '@core/interceptors/rate-limit/rate-limit.interceptor';
 import { UI_AUTH_MESSAGES } from '@app/shared/constants';
 
 // #endregion
@@ -26,6 +29,7 @@ export class AuthService {
 	private api = inject(AuthApiService);
 	private storage = inject(StorageService);
 	private activityTracker = inject(ActivityTrackerService);
+	private errorReporter = inject(ErrorReporterService);
 
 	// #region Reactive state
 	private readonly _isAuthenticated = signal(this.storage.hasUserInfo());
@@ -138,6 +142,10 @@ export class AuthService {
 		// Clean local state immediately (don't wait for API)
 		this.storage.clearPermisos();
 		this.storage.clearAuth();
+
+		resetErrorInterceptorState();
+		resetRateLimitState();
+		this.errorReporter.resetOnLogout();
 
 		this._isAuthenticated.set(false);
 		this._currentUser.set(null);
