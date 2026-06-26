@@ -4,7 +4,7 @@ import { map } from 'rxjs';
 
 import { SignalRService, AttendanceSignalRService } from '@core/services/signalr';
 import { EmailHubService } from '@app/features/intranet/pages/admin/email-outbox-dashboard-dia/services/email-hub.service';
-import { SwService } from '@app/features/intranet/services/sw/sw.service';
+import { SwService } from '@core/services/sw';
 
 @Component({
 	selector: 'app-connection-status-indicator',

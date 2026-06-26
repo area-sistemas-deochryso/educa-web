@@ -1,7 +1,7 @@
 import { ChangeDetectionStrategy, Component, effect, inject, signal } from '@angular/core';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { map } from 'rxjs';
-import { SwService } from '@app/features/intranet/services/sw/sw.service';
+import { SwService } from '@core/services/sw';
 
 const RECONNECTED_DISPLAY_MS = 3_000;
 
