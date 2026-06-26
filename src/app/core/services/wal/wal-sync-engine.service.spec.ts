@@ -16,8 +16,7 @@ import { WalCoalescer } from './wal-coalescer.service';
 import { WalSyncRecovery } from './wal-sync-recovery.service';
 import { WalReconciler } from './wal-reconciler.service';
 import { WalCircuitBreaker } from './wal-circuit-breaker.service';
-// eslint-disable-next-line layer-enforcement/imports-error -- DEBT: xrepo-50-F3a
-import { SwService } from '@features/intranet/services/sw/sw.service';
+import { SwService } from '@core/services/sw';
 import { WalEntry, WalProcessResult, WAL_DEFAULTS } from './models';
 
 // Stub HTTP send so the engine never hits the network.

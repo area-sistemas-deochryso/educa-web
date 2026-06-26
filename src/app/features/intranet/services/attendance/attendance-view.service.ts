@@ -4,7 +4,7 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
 import { AttendanceSignalRService } from '@core/services';
 import { EstudianteAsistencia, HijoApoderado } from '@data/models';
-import { SwService } from '@features/intranet/services/sw/sw.service';
+import { SwService } from '@core/services/sw';
 import { logger } from '@core/helpers';
 import { AttendanceDataService } from './attendance-data.service';
 import { AttendancePdfService } from './attendance-pdf.service';

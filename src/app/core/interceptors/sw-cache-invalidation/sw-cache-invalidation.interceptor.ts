@@ -2,8 +2,7 @@ import { HttpInterceptorFn, HttpResponse } from '@angular/common/http';
 import { inject } from '@angular/core';
 import { tap } from 'rxjs/operators';
 
-// eslint-disable-next-line layer-enforcement/imports-error -- DEBT: xrepo-50-F3a
-import { SwService } from '@features/intranet/services/sw/sw.service';
+import { SwService } from '@core/services/sw';
 import { logger } from '@core/helpers';
 
 const MUTATION_METHODS = new Set(['POST', 'PUT', 'DELETE', 'PATCH']);

@@ -2,8 +2,7 @@ import { Injectable, inject } from '@angular/core';
 import { Observable, filter, firstValueFrom, map, timeout } from 'rxjs';
 import { logger } from '@core/helpers';
 import { ActivityTrackerService, ErrorHandlerService } from '@core/services/error';
-// eslint-disable-next-line layer-enforcement/imports-error -- DEBT: xrepo-50-F3a
-import { SwService } from '@features/intranet/services/sw/sw.service';
+import { SwService } from '@core/services/sw';
 import { WalService } from './wal.service';
 import { WalSyncEngine } from './wal-sync-engine.service';
 import { WalStatusFacade } from './wal-status.facade';

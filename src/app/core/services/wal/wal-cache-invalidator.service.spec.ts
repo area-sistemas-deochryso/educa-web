@@ -2,8 +2,7 @@ import { TestBed } from '@angular/core/testing';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { WalCacheInvalidator } from './wal-cache-invalidator.service';
 import { WalEntry } from './models';
-// eslint-disable-next-line layer-enforcement/imports-error -- DEBT: xrepo-50-F3a
-import { SwService } from '@features/intranet/services/sw/sw.service';
+import { SwService } from '@core/services/sw';
 
 function makeEntry(overrides: Partial<WalEntry> = {}): WalEntry {
 	return {
