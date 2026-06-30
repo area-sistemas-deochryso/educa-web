@@ -1,36 +1,47 @@
-// * Tests for PermissionsUsersStore — validates user permissions state management.
-// #region Imports
 import { TestBed } from '@angular/core/testing';
 import { beforeEach, describe, expect, it } from 'vitest';
 
 import { PermissionsUsersStore } from './permisos-usuarios.store';
-import { PermisoUsuario, Vista } from '@core/services';
+import {
+	CapabilityCatalogItem,
+	RolCapabilityMatrixRow,
+	UsuarioBusqueda,
+	UsuarioCapabilityOverview,
+} from '@core/services';
 
+// #region Fixtures
+const mockCatalog: CapabilityCatalogItem[] = [
+	{ id: 1, codigo: 'USR_CREATE', nombre: 'Crear usuario', modulo: 'usuarios', orden: 1 },
+	{ id: 2, codigo: 'USR_READ', nombre: 'Ver usuario', modulo: 'usuarios', orden: 2 },
+	{ id: 3, codigo: 'CRS_CREATE', nombre: 'Crear curso', modulo: 'cursos', orden: 1 },
+	{ id: 4, codigo: 'CRS_READ', nombre: 'Ver curso', modulo: 'cursos', descripcion: 'Lectura de cursos', orden: 2 },
+];
+
+const mockMatrixRows: RolCapabilityMatrixRow[] = [
+	{ rolId: 1, rolNombre: 'Director', capabilityIds: [1, 2, 3] },
+	{ rolId: 2, rolNombre: 'Profesor', capabilityIds: [2, 4] },
+];
+
+const mockUsuario: UsuarioBusqueda = {
+	id: 10,
+	nombreCompleto: 'Juan Pérez',
+	rol: 'Director' as any,
+};
+
+const mockUsuarios: UsuarioBusqueda[] = [
+	mockUsuario,
+	{ id: 20, nombreCompleto: 'María García', rol: 'Profesor' as any },
+];
+
+const mockOverview: UsuarioCapabilityOverview = {
+	entityId: 10,
+	rolId: 1,
+	inheritedCapabilityIds: [1, 2, 3],
+	grantIds: [4],
+	denyIds: [3],
+};
 // #endregion
 
-// #region Test fixtures
-const mockPermisos: PermisoUsuario[] = [
-	{ id: 1, usuarioId: 10, rol: 'Director', vistas: ['intranet/admin/usuarios'], nombreUsuario: 'Juan Pérez' },
-	{ id: 2, usuarioId: 20, rol: 'Profesor', vistas: ['intranet/profesor/horarios'], nombreUsuario: 'María García' },
-	{ id: 3, usuarioId: 30, rol: 'Profesor', vistas: ['intranet/profesor/asistencia'], nombreUsuario: 'Pedro López' },
-];
-
-const mockVistas: Vista[] = [
-	{ id: 1, ruta: 'intranet/admin/usuarios', nombre: 'Usuarios', estado: 1 },
-	{ id: 2, ruta: 'intranet/admin/cursos', nombre: 'Cursos', estado: 1 },
-];
-
-const mockModulosVistas = [
-	{
-		nombre: 'admin',
-		vistas: mockVistas,
-		seleccionadas: 0,
-		total: 2,
-	},
-];
-// #endregion
-
-// #region Tests
 describe('PermissionsUsersStore', () => {
 	let store: PermissionsUsersStore;
 
@@ -41,183 +52,321 @@ describe('PermissionsUsersStore', () => {
 		store = TestBed.inject(PermissionsUsersStore);
 	});
 
-	// #region Initial state
-	describe('initial state', () => {
-		it('should have empty data', () => {
-			expect(store.permisosUsuario()).toEqual([]);
-			expect(store.vistas()).toEqual([]);
+	// #region Estado inicial
+	describe('estado inicial', () => {
+		it('debería tener datos vacíos', () => {
+			expect(store.catalog()).toEqual([]);
+			expect(store.matrixRows()).toEqual([]);
 			expect(store.loading()).toBe(false);
 			expect(store.error()).toBeNull();
 		});
 
-		it('should have empty selections', () => {
-			expect(store.selectedPermiso()).toBeNull();
-			expect(store.selectedUsuarioId()).toBeNull();
-			expect(store.selectedRol()).toBeNull();
-			expect(store.selectedVistas()).toEqual([]);
+		it('debería tener selección vacía', () => {
+			expect(store.selectedUsuario()).toBeNull();
+			expect(store.selectedRolId()).toBeNull();
+			expect(store.overview()).toBeNull();
+			expect(store.usuariosSugeridos()).toEqual([]);
+		});
+
+		it('debería tener diálogo cerrado', () => {
+			expect(store.dialogVisible()).toBe(false);
+			expect(store.grantIds()).toEqual([]);
+			expect(store.denyIds()).toEqual([]);
+			expect(store.activeModuloIndex()).toBe(0);
+			expect(store.capBusqueda()).toBe('');
 		});
 	});
 	// #endregion
 
-	// #region Computed — filteredPermisos
-	describe('filteredPermisos', () => {
+	// #region Comandos de datos
+	describe('comandos de datos', () => {
+		it('setCatalog debería actualizar el catálogo', () => {
+			store.setCatalog(mockCatalog);
+			expect(store.catalog()).toEqual(mockCatalog);
+		});
+
+		it('setMatrixRows debería actualizar las filas de matriz', () => {
+			store.setMatrixRows(mockMatrixRows);
+			expect(store.matrixRows()).toEqual(mockMatrixRows);
+		});
+
+		it('setLoading debería cambiar el estado de carga', () => {
+			store.setLoading(true);
+			expect(store.loading()).toBe(true);
+		});
+
+		it('setError debería asignar el mensaje de error', () => {
+			store.setError('Falló la carga');
+			expect(store.error()).toBe('Falló la carga');
+		});
+
+		it('clearError debería limpiar el error', () => {
+			store.setError('error');
+			store.clearError();
+			expect(store.error()).toBeNull();
+		});
+
+		it('setUsuariosSugeridos debería actualizar sugerencias', () => {
+			store.setUsuariosSugeridos(mockUsuarios);
+			expect(store.usuariosSugeridos()).toEqual(mockUsuarios);
+		});
+
+		it('setSelectedUsuario debería seleccionar un usuario', () => {
+			store.setSelectedUsuario(mockUsuario);
+			expect(store.selectedUsuario()).toEqual(mockUsuario);
+		});
+
+		it('setSelectedRolId debería seleccionar un rol', () => {
+			store.setSelectedRolId(2);
+			expect(store.selectedRolId()).toBe(2);
+		});
+
+		it('setOverview debería asignar overview y copiar grants/denies', () => {
+			store.setOverview(mockOverview);
+
+			expect(store.overview()).toEqual(mockOverview);
+			expect(store.grantIds()).toEqual([4]);
+			expect(store.denyIds()).toEqual([3]);
+		});
+
+		it('setOverview con null no debería modificar grants/denies', () => {
+			store.setOverview(mockOverview);
+			store.setOverview(null);
+
+			expect(store.overview()).toBeNull();
+			expect(store.grantIds()).toEqual([4]);
+			expect(store.denyIds()).toEqual([3]);
+		});
+	});
+	// #endregion
+
+	// #region Comandos de diálogo
+	describe('comandos de diálogo', () => {
+		it('openDialog debería abrir el diálogo', () => {
+			store.openDialog();
+			expect(store.dialogVisible()).toBe(true);
+		});
+
+		it('closeDialog debería cerrar y resetear índice y búsqueda', () => {
+			store.openDialog();
+			store.setActiveModuloIndex(2);
+			store.setCapBusqueda('test');
+
+			store.closeDialog();
+
+			expect(store.dialogVisible()).toBe(false);
+			expect(store.activeModuloIndex()).toBe(0);
+			expect(store.capBusqueda()).toBe('');
+		});
+
+		it('setActiveModuloIndex debería cambiar el índice activo', () => {
+			store.setActiveModuloIndex(3);
+			expect(store.activeModuloIndex()).toBe(3);
+		});
+
+		it('setCapBusqueda debería cambiar el término de búsqueda', () => {
+			store.setCapBusqueda('crear');
+			expect(store.capBusqueda()).toBe('crear');
+		});
+	});
+	// #endregion
+
+	// #region Computed — roles
+	describe('computed: roles', () => {
+		it('debería derivar roles desde matrixRows', () => {
+			store.setMatrixRows(mockMatrixRows);
+			expect(store.roles()).toEqual([
+				{ label: 'Director', value: 1 },
+				{ label: 'Profesor', value: 2 },
+			]);
+		});
+
+		it('debería retornar vacío sin matrixRows', () => {
+			expect(store.roles()).toEqual([]);
+		});
+	});
+	// #endregion
+
+	// #region Computed — moduloCapabilities
+	describe('computed: moduloCapabilities', () => {
+		it('debería agrupar y ordenar por módulo', () => {
+			store.setCatalog(mockCatalog);
+			const modulos = store.moduloCapabilities();
+
+			expect(modulos).toHaveLength(2);
+			expect(modulos[0].nombre).toBe('Cursos');
+			expect(modulos[1].nombre).toBe('Usuarios');
+		});
+
+		it('debería ordenar capabilities por orden dentro del módulo', () => {
+			store.setCatalog(mockCatalog);
+			const usuarios = store.moduloCapabilities().find((m) => m.nombre === 'Usuarios')!;
+
+			expect(usuarios.capabilities[0].codigo).toBe('USR_CREATE');
+			expect(usuarios.capabilities[1].codigo).toBe('USR_READ');
+		});
+
+		it('debería tener total correcto', () => {
+			store.setCatalog(mockCatalog);
+			const cursos = store.moduloCapabilities().find((m) => m.nombre === 'Cursos')!;
+			expect(cursos.total).toBe(2);
+		});
+
+		it('debería retornar vacío sin catálogo', () => {
+			expect(store.moduloCapabilities()).toEqual([]);
+		});
+	});
+	// #endregion
+
+	// #region Computed — capsFiltradas
+	describe('computed: capsFiltradas', () => {
 		beforeEach(() => {
-			store.setPermisosUsuario(mockPermisos);
+			store.setCatalog(mockCatalog);
 		});
 
-		it('should return all without filters', () => {
-			expect(store.filteredPermisos()).toHaveLength(3);
-		});
-
-		it('should filter by search (nombreUsuario)', () => {
-			store.setSearchTerm('juan');
-			expect(store.filteredPermisos()).toHaveLength(1);
-			expect(store.filteredPermisos()[0].nombreUsuario).toBe('Juan Pérez');
-		});
-
-		it('should filter by rol', () => {
-			store.setFilterRol('Profesor');
-			expect(store.filteredPermisos()).toHaveLength(2);
-		});
-
-		it('should combine filters', () => {
-			store.setFilterRol('Profesor');
-			store.setSearchTerm('maría');
-			expect(store.filteredPermisos()).toHaveLength(1);
-		});
-	});
-	// #endregion
-
-	// #region Surgical mutations
-	describe('surgical mutations', () => {
-		it('should remove permiso', () => {
-			store.setPermisosUsuario(mockPermisos);
-			store.removePermisoUsuario(2);
-
-			expect(store.permisosUsuario()).toHaveLength(2);
-			expect(store.permisosUsuario().find((p) => p.id === 2)).toBeUndefined();
-		});
-
-		it('should add permiso at beginning', () => {
-			store.setPermisosUsuario([mockPermisos[1]]);
-			store.addPermisoUsuario(mockPermisos[0]);
-
-			expect(store.permisosUsuario()).toHaveLength(2);
-			expect(store.permisosUsuario()[0].id).toBe(1);
-		});
-	});
-	// #endregion
-
-	// #region Vista toggling
-	describe('toggleVista', () => {
-		it('should add vista', () => {
-			store.toggleVista('intranet/admin/usuarios');
-			expect(store.selectedVistas()).toContain('intranet/admin/usuarios');
-		});
-
-		it('should remove vista if already selected', () => {
-			store.setSelectedVistas(['intranet/admin/usuarios', 'intranet/admin/cursos']);
-			store.toggleVista('intranet/admin/usuarios');
-
-			expect(store.selectedVistas()).not.toContain('intranet/admin/usuarios');
-			expect(store.selectedVistas()).toContain('intranet/admin/cursos');
-		});
-	});
-	// #endregion
-
-	// #region toggleAllVistasModulo
-	describe('toggleAllVistasModulo', () => {
-		it('should select all when none selected', () => {
-			store.setModulosVistas(mockModulosVistas);
+		it('debería retornar todas las caps del módulo activo sin filtro', () => {
 			store.setActiveModuloIndex(0);
-
-			store.toggleAllVistasModulo();
-
-			expect(store.selectedVistas()).toContain('intranet/admin/usuarios');
-			expect(store.selectedVistas()).toContain('intranet/admin/cursos');
+			const caps = store.capsFiltradas();
+			expect(caps).toHaveLength(2);
 		});
 
-		it('should deselect all when all selected', () => {
-			store.setModulosVistas(mockModulosVistas);
+		it('debería filtrar por término de búsqueda', () => {
 			store.setActiveModuloIndex(0);
-			store.setSelectedVistas(['intranet/admin/usuarios', 'intranet/admin/cursos']);
-
-			store.toggleAllVistasModulo();
-
-			expect(store.selectedVistas()).toEqual([]);
+			store.setCapBusqueda('crear');
+			expect(store.capsFiltradas()).toHaveLength(1);
 		});
 
-		it('should do nothing for out-of-range index', () => {
-			store.setModulosVistas(mockModulosVistas);
-			store.setActiveModuloIndex(5);
-			store.toggleAllVistasModulo();
-			expect(store.selectedVistas()).toEqual([]);
+		it('debería retornar vacío para índice fuera de rango', () => {
+			store.setActiveModuloIndex(99);
+			expect(store.capsFiltradas()).toEqual([]);
 		});
 	});
 	// #endregion
 
-	// #region Computed — isAllModuloSelected
-	describe('isAllModuloSelected', () => {
-		it('should be false when none selected', () => {
-			store.setModulosVistas(mockModulosVistas);
-			expect(store.isAllModuloSelected()).toBe(false);
+	// #region Computed — effectiveCaps
+	describe('computed: effectiveCaps', () => {
+		it('debería combinar inherited + grants - denies', () => {
+			store.setOverview(mockOverview);
+			const effective = store.effectiveCaps();
+
+			expect(effective.has(1)).toBe(true);
+			expect(effective.has(2)).toBe(true);
+			expect(effective.has(3)).toBe(false);
+			expect(effective.has(4)).toBe(true);
 		});
 
-		it('should be true when all selected', () => {
-			store.setModulosVistas(mockModulosVistas);
-			store.setSelectedVistas(['intranet/admin/usuarios', 'intranet/admin/cursos']);
-			expect(store.isAllModuloSelected()).toBe(true);
-		});
-	});
-	// #endregion
-
-	// #region Filters
-	describe('filters', () => {
-		it('should clear filters', () => {
-			store.setSearchTerm('test');
-			store.setFilterRol('Director');
-
-			store.clearFilters();
-
-			expect(store.searchTerm()).toBe('');
-			expect(store.filterRol()).toBeNull();
+		it('debería retornar Set vacío sin overview', () => {
+			expect(store.effectiveCaps().size).toBe(0);
 		});
 	});
 	// #endregion
 
-	// #region Reset dialog state
-	describe('resetDialogState', () => {
-		it('should reset all dialog-related state', () => {
-			store.setSelectedPermiso(mockPermisos[0]);
-			store.setSelectedUsuarioId(10);
-			store.setSelectedRol('Director');
-			store.setSelectedVistas(['a', 'b']);
-			store.setIsEditing(true);
+	// #region Computed — overrideSummary
+	describe('computed: overrideSummary', () => {
+		it('debería calcular resumen con overview activo', () => {
+			store.setOverview(mockOverview);
+			const summary = store.overrideSummary();
 
-			store.resetDialogState();
+			expect(summary.inherited).toBe(3);
+			expect(summary.grants).toBe(1);
+			expect(summary.denies).toBe(1);
+			expect(summary.effective).toBe(3);
+		});
 
-			expect(store.selectedPermiso()).toBeNull();
-			expect(store.selectedUsuarioId()).toBeNull();
-			expect(store.selectedRol()).toBeNull();
-			expect(store.selectedVistas()).toEqual([]);
-			expect(store.isEditing()).toBe(false);
-			expect(store.modulosVistas()).toEqual([]);
-			expect(store.vistasBusqueda()).toBe('');
+		it('debería retornar ceros sin overview', () => {
+			const summary = store.overrideSummary();
+			expect(summary).toEqual({ inherited: 0, grants: 0, denies: 0, effective: 0 });
 		});
 	});
 	// #endregion
 
-	// #region updateModuloCount
-	describe('updateModuloCount', () => {
-		it('should update seleccionadas count per module', () => {
-			store.setModulosVistas(mockModulosVistas);
-			store.setSelectedVistas(['intranet/admin/usuarios']);
+	// #region Computed — vm
+	describe('computed: vm', () => {
+		it('debería agregar todos los campos del viewmodel', () => {
+			const vm = store.vm();
 
-			store.updateModuloCount();
+			expect(vm).toHaveProperty('catalog');
+			expect(vm).toHaveProperty('loading');
+			expect(vm).toHaveProperty('error');
+			expect(vm).toHaveProperty('roles');
+			expect(vm).toHaveProperty('moduloCapabilities');
+			expect(vm).toHaveProperty('capsFiltradas');
+			expect(vm).toHaveProperty('effectiveCaps');
+			expect(vm).toHaveProperty('overrideSummary');
+			expect(vm).toHaveProperty('dialogVisible');
+			expect(vm).toHaveProperty('grantIds');
+			expect(vm).toHaveProperty('denyIds');
+		});
+	});
+	// #endregion
 
-			expect(store.modulosVistas()[0].seleccionadas).toBe(1);
+	// #region Toggle grant/deny
+	describe('toggleGrant', () => {
+		beforeEach(() => {
+			store.setOverview(mockOverview);
+		});
+
+		it('debería agregar un grant nuevo', () => {
+			store.toggleGrant(5);
+			expect(store.grantIds()).toContain(5);
+		});
+
+		it('debería remover un grant existente', () => {
+			expect(store.grantIds()).toContain(4);
+			store.toggleGrant(4);
+			expect(store.grantIds()).not.toContain(4);
+		});
+
+		it('debería remover de denies al agregar a grants', () => {
+			expect(store.denyIds()).toContain(3);
+			store.toggleGrant(3);
+			expect(store.grantIds()).toContain(3);
+			expect(store.denyIds()).not.toContain(3);
+		});
+	});
+
+	describe('toggleDeny', () => {
+		beforeEach(() => {
+			store.setOverview(mockOverview);
+		});
+
+		it('debería agregar un deny nuevo', () => {
+			store.toggleDeny(5);
+			expect(store.denyIds()).toContain(5);
+		});
+
+		it('debería remover un deny existente', () => {
+			expect(store.denyIds()).toContain(3);
+			store.toggleDeny(3);
+			expect(store.denyIds()).not.toContain(3);
+		});
+
+		it('debería remover de grants al agregar a denies', () => {
+			expect(store.grantIds()).toContain(4);
+			store.toggleDeny(4);
+			expect(store.denyIds()).toContain(4);
+			expect(store.grantIds()).not.toContain(4);
+		});
+	});
+	// #endregion
+
+	// #region Reset
+	describe('resetSelection', () => {
+		it('debería limpiar toda la selección', () => {
+			store.setSelectedUsuario(mockUsuario);
+			store.setSelectedRolId(1);
+			store.setOverview(mockOverview);
+			store.setUsuariosSugeridos(mockUsuarios);
+
+			store.resetSelection();
+
+			expect(store.selectedUsuario()).toBeNull();
+			expect(store.selectedRolId()).toBeNull();
+			expect(store.overview()).toBeNull();
+			expect(store.grantIds()).toEqual([]);
+			expect(store.denyIds()).toEqual([]);
+			expect(store.usuariosSugeridos()).toEqual([]);
 		});
 	});
 	// #endregion
 });
-// #endregion

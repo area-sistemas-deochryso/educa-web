@@ -1,5 +1,5 @@
-// Tests for calificacion utils — invariante INV-C04 (promedio = Σ(nota × peso), redondeo 1 decimal,
-// pesos NO normalizados) y INV-T04 parcial (ventana de edición de 2 meses desde fechaCalificacion).
+// Tests for calificacion utils — invariante INV-C04 (promedio = Σ(nota × peso) / Σ(pesos), redondeo 1 decimal)
+// y INV-T04 parcial (ventana de edición de 2 meses desde fechaCalificacion).
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { calcularPromedioPonderado, esNotaEditable } from './calificacion.utils';
@@ -17,14 +17,13 @@ describe('calcularPromedioPonderado — INV-C04', () => {
 		expect(calcularPromedioPonderado(notas)).toBe(12.5);
 	});
 
-	it('NO normaliza pesos que no suman 1.0 (fiel al backend)', () => {
-		// Si normalizara, el promedio sería (15*0.2 + 10*0.2) / 0.4 = 12.5.
-		// Como no normaliza: 15*0.2 + 10*0.2 = 5.0.
+	it('normaliza pesos que no suman 1.0', () => {
+		// Σ(nota×peso) / Σ(pesos) = (15*0.2 + 10*0.2) / 0.4 = 12.5
 		const notas = [
 			{ nota: 15, peso: 0.2 },
 			{ nota: 10, peso: 0.2 },
 		];
-		expect(calcularPromedioPonderado(notas)).toBe(5.0);
+		expect(calcularPromedioPonderado(notas)).toBe(12.5);
 	});
 
 	it('redondea a 1 decimal (half-away-from-zero)', () => {
@@ -43,7 +42,7 @@ describe('calcularPromedioPonderado — INV-C04', () => {
 	});
 
 	it('acepta peso fraccionario mínimo', () => {
-		expect(calcularPromedioPonderado([{ nota: 20, peso: 0.01 }])).toBe(0.2);
+		expect(calcularPromedioPonderado([{ nota: 20, peso: 0.01 }])).toBe(20.0);
 	});
 });
 

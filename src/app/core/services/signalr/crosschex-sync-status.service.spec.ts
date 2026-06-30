@@ -19,7 +19,6 @@ import {
 
 const VALID_JOB_ID = 'a1b2c3d4e5f6a7b8c9d0e1f2a3b4c5d6';
 const OTHER_JOB_ID = 'f0e1d2c3b4a59687aabbccddeeff0011';
-const STORAGE_KEY = 'educa_crosschex_sync_job';
 
 interface FakeHubConnection {
 	state: HubConnectionState;
@@ -72,7 +71,6 @@ describe('CrossChexSyncStatusService', () => {
 	let httpMock: HttpTestingController;
 
 	beforeEach(() => {
-		sessionStorage.removeItem(STORAGE_KEY);
 		hub = createFakeHub();
 
 		TestBed.configureTestingModule({
@@ -95,10 +93,9 @@ describe('CrossChexSyncStatusService', () => {
 	// #region startTracking
 
 	describe('startTracking', () => {
-		it('persiste el jobId en sessionStorage y suscribe al hub', async () => {
+		it('suscribe al hub con el jobId', async () => {
 			await service.startTracking(VALID_JOB_ID);
 
-			expect(sessionStorage.getItem(STORAGE_KEY)).toBe(VALID_JOB_ID);
 			expect(hub.invoke).toHaveBeenCalledWith('SubscribeToSyncJob', VALID_JOB_ID);
 			expect(hub.on).toHaveBeenCalledWith('SyncProgress', expect.any(Function));
 		});
@@ -122,7 +119,6 @@ describe('CrossChexSyncStatusService', () => {
 			await service.startTracking('not-a-hex-32');
 
 			expect(hub.invoke).not.toHaveBeenCalled();
-			expect(sessionStorage.getItem(STORAGE_KEY)).toBeNull();
 		});
 	});
 
@@ -140,7 +136,7 @@ describe('CrossChexSyncStatusService', () => {
 			expect(service.hasActiveJob()).toBe(true);
 		});
 
-		it('COMPLETED emite terminal$, limpia storage y hasActiveJob=false', async () => {
+		it('COMPLETED emite terminal$ y hasActiveJob=false', async () => {
 			const terminalEvents: SyncEstado[] = [];
 			service.terminal$.subscribe(({ status }) => terminalEvents.push(status.estado));
 
@@ -150,7 +146,6 @@ describe('CrossChexSyncStatusService', () => {
 			expect(terminalEvents).toEqual(['COMPLETED']);
 			expect(service.status()?.estado).toBe('COMPLETED');
 			expect(service.hasActiveJob()).toBe(false);
-			expect(sessionStorage.getItem(STORAGE_KEY)).toBeNull();
 		});
 
 		it('FAILED emite terminal$ con el error del DTO', async () => {
@@ -199,48 +194,42 @@ describe('CrossChexSyncStatusService', () => {
 	// #region rehydrate
 
 	describe('rehydrate', () => {
-		it('sin jobId en storage → no-op', async () => {
-			await service.rehydrate();
-			httpMock.expectNone(() => true);
-			expect(service.status()).toBeNull();
-		});
-
-		it('con jobId + status RUNNING → re-suscribe al hub', async () => {
-			sessionStorage.setItem(STORAGE_KEY, VALID_JOB_ID);
+		it('llama GET /sync/active', async () => {
 			await service.rehydrate();
 
 			const req = httpMock.expectOne(
-				`${environment.apiUrl}/api/asistencia-admin/sync/${VALID_JOB_ID}/status`,
+				`${environment.apiUrl}/api/asistencia-admin/sync/active`,
+			);
+			req.flush(null);
+
+			expect(service.status()).toBeNull();
+		});
+
+		it('GET /sync/active retorna job activo → reanuda tracking', async () => {
+			await service.rehydrate();
+
+			const req = httpMock.expectOne(
+				`${environment.apiUrl}/api/asistencia-admin/sync/active`,
 			);
 			req.flush(buildDto({ estado: 'RUNNING' }));
 			await Promise.resolve();
 
 			expect(service.status()?.estado).toBe('RUNNING');
 			expect(service.hasActiveJob()).toBe(true);
+			expect(hub.invoke).toHaveBeenCalledWith('SubscribeToSyncJob', VALID_JOB_ID);
 		});
 
-		it('con jobId + status COMPLETED → emite terminal$ y limpia storage', async () => {
-			sessionStorage.setItem(STORAGE_KEY, VALID_JOB_ID);
-
-			const terminalEvents: SyncEstado[] = [];
-			service.terminal$.subscribe(({ status }) => terminalEvents.push(status.estado));
-
+		it('GET /sync/active retorna null → permanece idle', async () => {
 			await service.rehydrate();
+
 			const req = httpMock.expectOne(
-				`${environment.apiUrl}/api/asistencia-admin/sync/${VALID_JOB_ID}/status`,
+				`${environment.apiUrl}/api/asistencia-admin/sync/active`,
 			);
-			req.flush(buildDto({ estado: 'COMPLETED' }));
+			req.flush(null);
 
-			expect(terminalEvents).toEqual(['COMPLETED']);
-			expect(sessionStorage.getItem(STORAGE_KEY)).toBeNull();
-		});
-
-		it('con jobId inválido (no hex) → limpia storage sin llamar API', async () => {
-			sessionStorage.setItem(STORAGE_KEY, 'garbage');
-			await service.rehydrate();
-
-			httpMock.expectNone(() => true);
-			expect(sessionStorage.getItem(STORAGE_KEY)).toBeNull();
+			expect(service.status()).toBeNull();
+			expect(service.hasActiveJob()).toBe(false);
+			expect(hub.invoke).not.toHaveBeenCalled();
 		});
 	});
 
@@ -249,14 +238,13 @@ describe('CrossChexSyncStatusService', () => {
 	// #region stopTracking
 
 	describe('stopTracking', () => {
-		it('desuscribe, limpia storage y resetea signal', async () => {
+		it('desuscribe y resetea signals', async () => {
 			await service.startTracking(VALID_JOB_ID);
 			hub.trigger('SyncProgress', buildDto({ estado: 'RUNNING' }));
 
 			await service.stopTracking();
 
 			expect(hub.invoke).toHaveBeenCalledWith('UnsubscribeFromSyncJob', VALID_JOB_ID);
-			expect(sessionStorage.getItem(STORAGE_KEY)).toBeNull();
 			expect(service.status()).toBeNull();
 			expect(service.trackingJobId()).toBeNull();
 		});
