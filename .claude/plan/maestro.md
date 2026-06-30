@@ -79,7 +79,7 @@ Planes cross-repo con sub-chats FE pendientes: **41** (Correlation Hub F3-F6), *
 | 10 | F8 | Design Patterns BE | Aplicar al tocar módulos BE | incremental |
 | 11 | F9 | Design Patterns FE | Aplicar al tocar módulos FE | incremental |
 
-**Siguiente accionable**: **P50 F3a** (brief 331 — SwService move to @core). Alternativa: **xP41** F3 BE (persist request lifecycle). Admin block cerrado (P62-P66 ✅/descartado).
+**Siguiente accionable**: **xP41** F3 BE (persist request lifecycle). Admin block cerrado (P62-P66 ✅/descartado). P50 F3a ✅ (331 closed).
 
 ### 🟣 Verificaciones post-deploy (`/verify <NNN>`)
 
@@ -107,10 +107,9 @@ Planes cross-repo con sub-chats FE pendientes: **41** (Correlation Hub F3-F6), *
 
 ### Notas operativas
 
-- **`running/`**: vacío · **`open/`**: 6 briefs (262×2, 330, 331, 332, 341) · **`awaiting-prod/`**: 17 briefs · **`waiting/`**: vacío · **`troubles/`**: vacío
-- **Último cierre**: 329 (attendance redesign F4-F7) + 328 (usuarios redesign + monitoreo hub redesign) → closed/. Previous: 308 → closed/ 2026-06-09.
-- **⚠️ Brief 330 duplicado**: `330-fe-runtime-health-alerts-diagnostics.md` existe en `open/` Y `awaiting-prod/`. Verificar si el de `open/` es stale.
-- **Último saneamiento**: 2026-06-09 — cross-repo sync: purged 66 closed briefs (≤129, >30d). Moved 269 to closed (P28 stale). Removed xP42/xP45/xP52/xP54 from INDEX (archived in coord).
+- **`running/`**: vacío · **`open/`**: 1 brief (332) · **`awaiting-prod/`**: 18 briefs · **`waiting/`**: vacío · **`troubles/`**: vacío
+- **Último cierre**: 372 (P73 F2a template→signals, `52b2a85f`) + 370 (P72 F2 toggle) + 366 (P50 F3a + P69 F3) + 331 (P50 F3a SwService) + 341/330/262×2 → closed/.
+- **Último saneamiento**: 2026-06-30 — sync-maestro: updated open/ count (6→1), cleared stale claims.
 
 ---
 
