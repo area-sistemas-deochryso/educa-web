@@ -61,6 +61,23 @@
 	white-space: nowrap;
 }
 
+.heatmap-nav {
+	display: flex;
+	align-items: center;
+	gap: 0.25rem;
+}
+
+.heatmap-nav-btn {
+	padding: 0.25rem !important;
+	width: 1.75rem;
+	height: 1.75rem;
+	flex-shrink: 0;
+
+	:host ::ng-deep & .p-button-icon {
+		font-size: 0.75rem;
+	}
+}
+
 .heatmap-loading {
 	display: flex;
 	align-items: center;

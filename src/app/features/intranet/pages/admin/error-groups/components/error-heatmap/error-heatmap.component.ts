@@ -2,6 +2,7 @@ import { ChangeDetectionStrategy, Component, computed, input, output } from '@an
 import { CommonModule, DatePipe } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 
+import { ButtonModule } from 'primeng/button';
 import { DatePickerModule } from 'primeng/datepicker';
 import { SelectButtonModule } from 'primeng/selectbutton';
 import { TooltipModule } from 'primeng/tooltip';
@@ -38,7 +39,7 @@ export interface HeatmapPeriodOption {
 @Component({
 	selector: 'app-error-heatmap',
 	standalone: true,
-	imports: [CommonModule, DatePipe, FormsModule, DatePickerModule, SelectButtonModule, TooltipModule],
+	imports: [CommonModule, DatePipe, FormsModule, ButtonModule, DatePickerModule, SelectButtonModule, TooltipModule],
 	templateUrl: './error-heatmap.component.html',
 	styleUrl: './error-heatmap.component.scss',
 	changeDetection: ChangeDetectionStrategy.OnPush,
@@ -54,13 +55,23 @@ export class ErrorHeatmapComponent {
 	readonly endDateChange = output<Date | null>();
 
 	readonly periodOptions: HeatmapPeriodOption[] = [
-		{ label: 'Semana', value: 7 },
-		{ label: 'Mes', value: 30 },
+		{ label: 'Semanal', value: 7 },
+		{ label: 'Calendario', value: 30 },
 	];
 
 	readonly today = new Date();
 
 	readonly isWeekMode = computed(() => this.totalDays() === 7);
+
+	readonly canGoNext = computed(() => {
+		const end = this.endDate();
+		if (!end) return false;
+		const todayMidnight = new Date(this.today);
+		todayMidnight.setHours(0, 0, 0, 0);
+		const endMidnight = new Date(end);
+		endMidnight.setHours(0, 0, 0, 0);
+		return endMidnight < todayMidnight;
+	});
 
 	readonly calendarTooltip = computed(() =>
 		`Últimos ${this.totalDays()} días hasta la fecha elegida`,
@@ -170,6 +181,28 @@ export class ErrorHeatmapComponent {
 
 	onEndDateChange(date: Date | null): void {
 		this.endDateChange.emit(date);
+	}
+
+	onPrev(): void {
+		const days = this.totalDays();
+		const base = this.endDate() ?? new Date(this.today);
+		const next = new Date(base);
+		next.setDate(next.getDate() - days);
+		this.endDateChange.emit(next);
+	}
+
+	onNext(): void {
+		const days = this.totalDays();
+		const base = this.endDate() ?? new Date(this.today);
+		const next = new Date(base);
+		next.setDate(next.getDate() + days);
+		const todayMidnight = new Date(this.today);
+		todayMidnight.setHours(0, 0, 0, 0);
+		if (next > todayMidnight) {
+			this.endDateChange.emit(null);
+		} else {
+			this.endDateChange.emit(next);
+		}
 	}
 
 	getCellColor(intensity: number): string {

@@ -13,6 +13,30 @@
 				optionValue="value"
 				[pt]="{ root: { 'aria-label': 'Periodo del heatmap' } }"
 			/>
+			<div class="heatmap-nav">
+				<button
+					pButton
+					icon="pi pi-chevron-left"
+					class="p-button-text p-button-sm heatmap-nav-btn"
+					(click)="onPrev()"
+					[pTooltip]="isWeekMode() ? 'Semana anterior' : 'Mes anterior'"
+					tooltipPosition="top"
+					[pt]="{ root: { 'aria-label': isWeekMode() ? 'Semana anterior' : 'Mes anterior' } }"
+				></button>
+				<span class="heatmap-range-label">
+					{{ rangeLabel().start | date: 'dd MMM' }} – {{ rangeLabel().end | date: 'dd MMM' }}
+				</span>
+				<button
+					pButton
+					icon="pi pi-chevron-right"
+					class="p-button-text p-button-sm heatmap-nav-btn"
+					(click)="onNext()"
+					[disabled]="!canGoNext()"
+					[pTooltip]="isWeekMode() ? 'Semana siguiente' : 'Mes siguiente'"
+					tooltipPosition="top"
+					[pt]="{ root: { 'aria-label': isWeekMode() ? 'Semana siguiente' : 'Mes siguiente' } }"
+				></button>
+			</div>
 			<span [pTooltip]="calendarTooltip()" tooltipPosition="top">
 				<p-datepicker
 					[ngModel]="endDate()"
@@ -25,9 +49,6 @@
 					appendTo="body"
 					[pt]="{ root: { 'aria-label': 'Fecha final del rango del heatmap' } }"
 				/>
-			</span>
-			<span class="heatmap-range-label">
-				{{ rangeLabel().start | date: 'dd MMM' }} – {{ rangeLabel().end | date: 'dd MMM' }}
 			</span>
 		</div>
 	</div>

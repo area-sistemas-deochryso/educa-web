@@ -102,11 +102,12 @@ Planes cross-repo con sub-chats FE pendientes: **41** (Correlation Hub F3-F6), *
 | `304` | P43 F6.3 FE: student gap profile page |
 | `321` | P64 F5: schedule grid redesign |
 | `330` | P67: runtime health alerts + diagnostics FE |
+| `301` | xP75 FE: heatmap calendar endpoint + prev/next navigation |
 | `330` | P67: runtime health persistence + insights |
 
 ### Notas operativas
 
-- **`running/`**: vacío · **`open/`**: 7 briefs (262×2, 301, 330, 331, 332, 341) · **`awaiting-prod/`**: 16 briefs · **`waiting/`**: vacío · **`troubles/`**: vacío
+- **`running/`**: vacío · **`open/`**: 6 briefs (262×2, 330, 331, 332, 341) · **`awaiting-prod/`**: 17 briefs · **`waiting/`**: vacío · **`troubles/`**: vacío
 - **Último cierre**: 329 (attendance redesign F4-F7) + 328 (usuarios redesign + monitoreo hub redesign) → closed/. Previous: 308 → closed/ 2026-06-09.
 - **⚠️ Brief 330 duplicado**: `330-fe-runtime-health-alerts-diagnostics.md` existe en `open/` Y `awaiting-prod/`. Verificar si el de `open/` es stale.
 - **Último saneamiento**: 2026-06-09 — cross-repo sync: purged 66 closed briefs (≤129, >30d). Moved 269 to closed (P28 stale). Removed xP42/xP45/xP52/xP54 from INDEX (archived in coord).

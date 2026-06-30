@@ -1,8 +1,9 @@
 > **Origen**: Educa.API chat 300 · commit cb3652c1 · 2026-06-03
 > **Plan**: `educa-coord/plans/xrepo-75-heatmap-calendar-view.md`
-> **Creado**: 2026-06-03 · **Chat**: 1 · **Estado**: ⏳ pendiente arrancar.
+> **Creado**: 2026-06-03 · **Chat**: 1 · **Estado**: ✅ shippeado.
 > **MODO SUGERIDO**: `/execute` (design complete 2026-06-26)
 > **exclusive**: `false`
+> **Validación prod**: ⏳ pendiente desde 2026-06-30
 > **modules**: monitoreo/heatmap
 
 ---
