@@ -62,9 +62,9 @@ export class ReportsResultComponent {
 	// #region Computed
 	readonly esDia = computed(() => this.resultado().rangoTipo === 'dia');
 
-	readonly esMatrizMensual = computed(() => {
+	readonly esMatriz = computed(() => {
 		const r = this.resultado();
-		if (r.rangoTipo !== 'mes') return false;
+		if (r.rangoTipo !== 'mes' && r.rangoTipo !== 'semana') return false;
 		return r.salones.some(s => s.estudiantes.some(e => e.asistenciasDiarias != null))
 			|| r.profesores?.some(p => p.asistenciasDiarias != null) === true
 			|| r.asistentesAdmin?.some(a => a.asistenciasDiarias != null) === true
@@ -76,6 +76,14 @@ export class ReportsResultComponent {
 		const r = this.resultado();
 		const dias = this.selectedSalon()?.diasEnMes ?? r.diasEnMes ?? 0;
 		if (!dias) return [];
+		if (r.rangoTipo === 'semana') {
+			const start = new Date(r.fechaInicio + 'T00:00:00');
+			return Array.from({ length: dias }, (_, i) => {
+				const d = new Date(start);
+				d.setDate(start.getDate() + i);
+				return d.getDate();
+			});
+		}
 		return Array.from({ length: dias }, (_, i) => i + 1);
 	});
 
@@ -83,8 +91,16 @@ export class ReportsResultComponent {
 		const r = this.resultado();
 		const dias = this.selectedSalon()?.diasEnMes ?? r.diasEnMes ?? 0;
 		if (!dias) return [];
-		const fecha = new Date(r.fechaInicio);
 		const labels = ['D', 'L', 'M', 'M', 'J', 'V', 'S'];
+		if (r.rangoTipo === 'semana') {
+			const start = new Date(r.fechaInicio + 'T00:00:00');
+			return Array.from({ length: dias }, (_, i) => {
+				const d = new Date(start);
+				d.setDate(start.getDate() + i);
+				return labels[d.getDay()];
+			});
+		}
+		const fecha = new Date(r.fechaInicio);
 		return Array.from({ length: dias }, (_, i) => {
 			const d = new Date(fecha.getFullYear(), fecha.getMonth(), i + 1);
 			return labels[d.getDay()];

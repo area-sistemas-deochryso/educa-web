@@ -30,7 +30,7 @@
 		</div>
 
 		@if (selectedSalon(); as salon) {
-			@if (esMatrizMensual()) {
+			@if (esMatriz()) {
 				<!-- Matrix layout: one column per day -->
 				<div class="matrix-container">
 					<table class="matrix-table">
@@ -45,7 +45,7 @@
 							</tr>
 							<tr>
 								@for (label of diasSemanaLabels(); track $index) {
-									<th class="matrix-col-day matrix-weekday" [class.holiday-col]="esFeriado($index + 1)">{{ label }}</th>
+									<th class="matrix-col-day matrix-weekday" [class.holiday-col]="esFeriado(diasColumnas()[$index])">{{ label }}</th>
 								}
 								<th class="matrix-col-total total-A">A</th>
 								<th class="matrix-col-total total-F">F</th>
@@ -141,7 +141,7 @@
 			</div>
 		</div>
 
-		@if (esMatrizMensual()) {
+		@if (esMatriz()) {
 			<div class="matrix-container">
 				<table class="matrix-table">
 					<thead>
@@ -155,7 +155,7 @@
 						</tr>
 						<tr>
 							@for (label of diasSemanaLabels(); track $index) {
-								<th class="matrix-col-day matrix-weekday" [class.holiday-col]="esFeriado($index + 1)">{{ label }}</th>
+								<th class="matrix-col-day matrix-weekday" [class.holiday-col]="esFeriado(diasColumnas()[$index])">{{ label }}</th>
 							}
 							<th class="matrix-col-total total-A">A</th>
 							<th class="matrix-col-total total-F">F</th>
@@ -239,7 +239,7 @@
 			</div>
 		</div>
 
-		@if (esMatrizMensual()) {
+		@if (esMatriz()) {
 			<div class="matrix-container">
 				<table class="matrix-table">
 					<thead>
@@ -253,7 +253,7 @@
 						</tr>
 						<tr>
 							@for (label of diasSemanaLabels(); track $index) {
-								<th class="matrix-col-day matrix-weekday" [class.holiday-col]="esFeriado($index + 1)">{{ label }}</th>
+								<th class="matrix-col-day matrix-weekday" [class.holiday-col]="esFeriado(diasColumnas()[$index])">{{ label }}</th>
 							}
 							<th class="matrix-col-total total-A">A</th>
 							<th class="matrix-col-total total-F">F</th>
@@ -335,7 +335,7 @@
 			</div>
 		</div>
 
-		@if (esMatrizMensual()) {
+		@if (esMatriz()) {
 			<div class="matrix-container">
 				<table class="matrix-table">
 					<thead>
@@ -349,7 +349,7 @@
 						</tr>
 						<tr>
 							@for (label of diasSemanaLabels(); track $index) {
-								<th class="matrix-col-day matrix-weekday" [class.holiday-col]="esFeriado($index + 1)">{{ label }}</th>
+								<th class="matrix-col-day matrix-weekday" [class.holiday-col]="esFeriado(diasColumnas()[$index])">{{ label }}</th>
 							}
 							<th class="matrix-col-total total-A">A</th>
 							<th class="matrix-col-total total-F">F</th>
@@ -417,7 +417,7 @@
 			</div>
 		</div>
 
-		@if (esMatrizMensual()) {
+		@if (esMatriz()) {
 			<div class="matrix-container">
 				<table class="matrix-table">
 					<thead>
@@ -431,7 +431,7 @@
 						</tr>
 						<tr>
 							@for (label of diasSemanaLabels(); track $index) {
-								<th class="matrix-col-day matrix-weekday" [class.holiday-col]="esFeriado($index + 1)">{{ label }}</th>
+								<th class="matrix-col-day matrix-weekday" [class.holiday-col]="esFeriado(diasColumnas()[$index])">{{ label }}</th>
 							}
 							<th class="matrix-col-total total-A">A</th>
 							<th class="matrix-col-total total-F">F</th>
