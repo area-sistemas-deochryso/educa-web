@@ -60,16 +60,17 @@
 		}
 
 		@if (hasData()) {
+			@let alerts = alertDetails();
 			<div class="cards-grid">
 				<!-- ThreadPool -->
 				<div class="info-card">
 					<div class="info-card__title">
 						<i class="pi pi-server"></i>
 						<span>ThreadPool</span>
-						@if (getAlertLevel('threadPool.queueLength'); as level) {
+						@if (alerts['threadPool.queueLength']; as a) {
 							<p-tag
-								[value]="level"
-								[severity]="getAlertSeverity('threadPool.queueLength')"
+								[value]="a.level"
+								[severity]="a.severity"
 								class="alert-badge"
 							/>
 						} @else {
@@ -98,13 +99,13 @@
 							{{ snapshot()!.threadPool.completedItemsCount | number }}
 						</dd>
 					</dl>
-					@if (getRecommendation('threadPool.queueLength'); as rec) {
+					@if (alerts['threadPool.queueLength']?.recommendation; as rec) {
 						<div class="info-card__rec"
-							[class.info-card__rec--link]="getTabTarget('threadPool.queueLength')"
+							[class.info-card__rec--link]="alerts['threadPool.queueLength']?.tabTarget"
 							(click)="onRecommendationClick('threadPool.queueLength')">
 							<i class="pi pi-lightbulb"></i>
 							<span>{{ rec }}</span>
-							@if (getTabTarget('threadPool.queueLength')) {
+							@if (alerts['threadPool.queueLength']?.tabTarget) {
 								<i class="pi pi-arrow-right info-card__rec-arrow"></i>
 							}
 						</div>
@@ -116,10 +117,10 @@
 					<div class="info-card__title">
 						<i class="pi pi-bolt"></i>
 						<span>Requests</span>
-						@if (getAlertLevel('requests.p95'); as level) {
+						@if (alerts['requests.p95']; as a) {
 							<p-tag
-								[value]="level"
-								[severity]="getAlertSeverity('requests.p95')"
+								[value]="a.level"
+								[severity]="a.severity"
 								class="alert-badge"
 							/>
 						} @else {
@@ -139,7 +140,7 @@
 						<dt>Últimos 5 min</dt>
 						<dd>{{ snapshot()!.requests.countLast5Min | number }}</dd>
 					</dl>
-					@if (getRecommendation('requests.p95'); as rec) {
+					@if (alerts['requests.p95']?.recommendation; as rec) {
 						<div class="info-card__rec info-card__rec--link"
 							(click)="onRecommendationClick('requests.p95')">
 							<i class="pi pi-lightbulb"></i>
@@ -154,10 +155,10 @@
 					<div class="info-card__title">
 						<i class="pi pi-database"></i>
 						<span>BD</span>
-						@if (getAlertLevel('db.activeConnections'); as level) {
+						@if (alerts['db.activeConnections']; as a) {
 							<p-tag
-								[value]="level"
-								[severity]="getAlertSeverity('db.activeConnections')"
+								[value]="a.level"
+								[severity]="a.severity"
 								class="alert-badge"
 							/>
 						} @else {
@@ -175,13 +176,13 @@
 							<span class="info-card__sub">ms</span>
 						</dd>
 					</dl>
-					@if (getRecommendation('db.activeConnections'); as rec) {
+					@if (alerts['db.activeConnections']?.recommendation; as rec) {
 						<div class="info-card__rec"
-							[class.info-card__rec--link]="getTabTarget('db.activeConnections')"
+							[class.info-card__rec--link]="alerts['db.activeConnections']?.tabTarget"
 							(click)="onRecommendationClick('db.activeConnections')">
 							<i class="pi pi-lightbulb"></i>
 							<span>{{ rec }}</span>
-							@if (getTabTarget('db.activeConnections')) {
+							@if (alerts['db.activeConnections']?.tabTarget) {
 								<i class="pi pi-arrow-right info-card__rec-arrow"></i>
 							}
 						</div>
@@ -193,10 +194,10 @@
 					<div class="info-card__title">
 						<i class="pi pi-chart-bar"></i>
 						<span>GC</span>
-						@if (getAlertLevel('gc.heapMb'); as level) {
+						@if (alerts['gc.heapMb']; as a) {
 							<p-tag
-								[value]="level"
-								[severity]="getAlertSeverity('gc.heapMb')"
+								[value]="a.level"
+								[severity]="a.severity"
 								class="alert-badge"
 							/>
 						} @else {
@@ -233,13 +234,13 @@
 							[pt]="{ root: { 'aria-label': 'Forzar garbage collection' } }"
 						></button>
 					</div>
-					@if (getRecommendation('gc.heapMb'); as rec) {
+					@if (alerts['gc.heapMb']?.recommendation; as rec) {
 						<div class="info-card__rec"
-							[class.info-card__rec--link]="getTabTarget('gc.heapMb')"
+							[class.info-card__rec--link]="alerts['gc.heapMb']?.tabTarget"
 							(click)="onRecommendationClick('gc.heapMb')">
 							<i class="pi pi-lightbulb"></i>
 							<span>{{ rec }}</span>
-							@if (getTabTarget('gc.heapMb')) {
+							@if (alerts['gc.heapMb']?.tabTarget) {
 								<i class="pi pi-arrow-right info-card__rec-arrow"></i>
 							}
 						</div>

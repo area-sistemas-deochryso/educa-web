@@ -53,6 +53,10 @@ export class CursosService {
 		return this.http.put<ApiResponse>(`${this.apiUrl}/${id}/actualizar`, request);
 	}
 
+	toggleEstado(id: number, rowVersion: string): Observable<{ estado: boolean; rowVersion: string }> {
+		return this.http.patch<{ estado: boolean; rowVersion: string }>(`${this.apiUrl}/${id}/toggle-estado`, { rowVersion });
+	}
+
 	eliminarCurso(id: number): Observable<ApiResponse> {
 		return this.http.delete<ApiResponse>(`${this.apiUrl}/${id}/eliminar`);
 	}

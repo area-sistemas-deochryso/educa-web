@@ -47,12 +47,13 @@
 
 	<!-- #region Bloqueos (rendered first, behind everything) -->
 	@for (bloqueo of bloqueos(); track bloqueo.id) {
+		@let bp = bloqueoPositions().get(bloqueo.id);
 		<rect
 			class="bloqueo"
 			[class.selected]="bloqueo.id === selectedBloqueoId()"
 			[class.dragging]="dragBloqueoOffset()?.id === bloqueo.id"
-			[attr.x]="getBloqueoX(bloqueo)"
-			[attr.y]="getBloqueoY(bloqueo)"
+			[attr.x]="bp?.x ?? bloqueo.x"
+			[attr.y]="bp?.y ?? bloqueo.y"
 			[attr.width]="bloqueo.width"
 			[attr.height]="bloqueo.height"
 			rx="2"
@@ -70,13 +71,15 @@
 		@let origen = nodoMap().get(arista.nodoOrigenId);
 		@let destino = nodoMap().get(arista.nodoDestinoId);
 		@if (origen && destino) {
+			@let op = nodePositions().get(arista.nodoOrigenId);
+			@let dp = nodePositions().get(arista.nodoDestinoId);
 			<!-- Hit area -->
 			<line
 				class="arista-hitarea"
-				[attr.x1]="getNodeX(origen)"
-				[attr.y1]="getNodeY(origen)"
-				[attr.x2]="getNodeX(destino)"
-				[attr.y2]="getNodeY(destino)"
+				[attr.x1]="op?.x ?? origen.x"
+				[attr.y1]="op?.y ?? origen.y"
+				[attr.x2]="dp?.x ?? destino.x"
+				[attr.y2]="dp?.y ?? destino.y"
 				(click)="onAristaClick($event, arista.id)"
 				(mouseenter)="onAristaMouseEnter(arista.id)"
 				(mouseleave)="onElementMouseLeave()"
@@ -85,18 +88,18 @@
 			<line
 				class="arista"
 				[class.selected]="arista.id === selectedAristaId()"
-				[attr.x1]="getNodeX(origen)"
-				[attr.y1]="getNodeY(origen)"
-				[attr.x2]="getNodeX(destino)"
-				[attr.y2]="getNodeY(destino)"
+				[attr.x1]="op?.x ?? origen.x"
+				[attr.y1]="op?.y ?? origen.y"
+				[attr.x2]="dp?.x ?? destino.x"
+				[attr.y2]="dp?.y ?? destino.y"
 				(click)="onAristaClick($event, arista.id)"
 			/>
 			@if (arista.bidireccional) {
 				<circle
 					class="arista-midpoint"
 					[class.selected]="arista.id === selectedAristaId()"
-					[attr.cx]="(getNodeX(origen) + getNodeX(destino)) / 2"
-					[attr.cy]="(getNodeY(origen) + getNodeY(destino)) / 2"
+					[attr.cx]="((op?.x ?? origen.x) + (dp?.x ?? destino.x)) / 2"
+					[attr.cy]="((op?.y ?? origen.y) + (dp?.y ?? destino.y)) / 2"
 					r="3"
 				/>
 			}
@@ -124,6 +127,11 @@
 
 	<!-- #region Nodos -->
 	@for (nodo of nodos(); track nodo.id) {
+		@let np = nodePositions().get(nodo.id);
+		@let nx = np?.x ?? nodo.x;
+		@let ny = np?.y ?? nodo.y;
+		@let ncolor = nodeColorMap().get(nodo.id) ?? '';
+		@let nlabel = nodeLabelMap().get(nodo.id) ?? '';
 		<g
 			class="nodo"
 			[class.selected]="nodo.id === selectedNodeId()"
@@ -137,30 +145,30 @@
 			@if (nodo.width > 0 && nodo.height > 0) {
 				<!-- Rectangular node -->
 				<rect
-					[attr.x]="getNodeX(nodo) - nodo.width / 2"
-					[attr.y]="getNodeY(nodo) - nodo.height / 2"
+					[attr.x]="nx - nodo.width / 2"
+					[attr.y]="ny - nodo.height / 2"
 					[attr.width]="nodo.width"
 					[attr.height]="nodo.height"
-					[attr.fill]="getNodeColor(nodo.tipo)"
+					[attr.fill]="ncolor"
 					fill-opacity="0.12"
-					[attr.stroke]="getNodeColor(nodo.tipo)"
+					[attr.stroke]="ncolor"
 					stroke-width="1.5"
 					rx="6"
-					[attr.transform]="nodo.rotation ? 'rotate(' + nodo.rotation + ' ' + getNodeX(nodo) + ' ' + getNodeY(nodo) + ')' : null"
+					[attr.transform]="nodo.rotation ? 'rotate(' + nodo.rotation + ' ' + nx + ' ' + ny + ')' : null"
 				/>
-				@if (getNodeLabel(nodo)) {
+				@if (nlabel) {
 					<rect
-						[attr.x]="getNodeX(nodo) - getNodeLabel(nodo).length * 3.2"
-						[attr.y]="getNodeY(nodo) - 6"
-						[attr.width]="getNodeLabel(nodo).length * 6.4"
+						[attr.x]="nx - nlabel.length * 3.2"
+						[attr.y]="ny - 6"
+						[attr.width]="nlabel.length * 6.4"
 						height="12"
 						rx="3"
-						[attr.fill]="getNodeColor(nodo.tipo)"
+						[attr.fill]="ncolor"
 						fill-opacity="0.85"
 					/>
 					<text
-						[attr.x]="getNodeX(nodo)"
-						[attr.y]="getNodeY(nodo)"
+						[attr.x]="nx"
+						[attr.y]="ny"
 						text-anchor="middle"
 						dominant-baseline="central"
 						font-size="9"
@@ -168,25 +176,25 @@
 						font-weight="600"
 						letter-spacing="0.3"
 					>
-						{{ getNodeLabel(nodo) }}
+						{{ nlabel }}
 					</text>
 				}
 			} @else {
 				<!-- Point node (corridor waypoint) -->
 				<circle
-					[attr.cx]="getNodeX(nodo)"
-					[attr.cy]="getNodeY(nodo)"
+					[attr.cx]="nx"
+					[attr.cy]="ny"
 					r="5"
-					[attr.fill]="getNodeColor(nodo.tipo)"
+					[attr.fill]="ncolor"
 					fill-opacity="0.25"
-					[attr.stroke]="getNodeColor(nodo.tipo)"
+					[attr.stroke]="ncolor"
 					stroke-width="1.5"
 				/>
 				<circle
-					[attr.cx]="getNodeX(nodo)"
-					[attr.cy]="getNodeY(nodo)"
+					[attr.cx]="nx"
+					[attr.cy]="ny"
 					r="2"
-					[attr.fill]="getNodeColor(nodo.tipo)"
+					[attr.fill]="ncolor"
 				/>
 			}
 		</g>
@@ -196,18 +204,21 @@
 	<!-- #region Vertical connection indicators -->
 	@for (nodo of nodos(); track nodo.id) {
 		@if (nodosConConexionVertical().has(nodo.id)) {
+			@let vp = nodePositions().get(nodo.id);
+			@let vx = (vp?.x ?? nodo.x) + (nodo.width > 0 ? nodo.width / 2 - 6 : 8);
+			@let vy = (vp?.y ?? nodo.y) - (nodo.height > 0 ? nodo.height / 2 - 6 : 8);
 			<g class="vertical-indicator" pointer-events="none">
 				<circle
-					[attr.cx]="getNodeX(nodo) + (nodo.width > 0 ? nodo.width / 2 - 6 : 8)"
-					[attr.cy]="getNodeY(nodo) - (nodo.height > 0 ? nodo.height / 2 - 6 : 8)"
+					[attr.cx]="vx"
+					[attr.cy]="vy"
 					r="7"
 					fill="#f59e0b"
 					stroke="white"
 					stroke-width="1.5"
 				/>
 				<text
-					[attr.x]="getNodeX(nodo) + (nodo.width > 0 ? nodo.width / 2 - 6 : 8)"
-					[attr.y]="getNodeY(nodo) - (nodo.height > 0 ? nodo.height / 2 - 6 : 8)"
+					[attr.x]="vx"
+					[attr.y]="vy"
 					text-anchor="middle"
 					dominant-baseline="central"
 					font-size="8"

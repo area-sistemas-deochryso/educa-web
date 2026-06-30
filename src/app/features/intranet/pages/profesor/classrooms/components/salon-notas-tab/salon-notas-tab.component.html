@@ -138,9 +138,10 @@
 					@for (group of evaluacionesPorSemana(); track group.semana) {
 						@for (eval of group.evaluaciones; track eval.id) {
 							<td class="text-center">
+								@let nota = formattedNotas().get(est.estudianteId + '-' + eval.id);
 								<p-tag
-									[value]="formatNota(getNota(est.estudianteId, eval.id))"
-									[severity]="getNotaSeverity(getNota(est.estudianteId, eval.id))"
+									[value]="nota?.text ?? '—'"
+									[severity]="nota?.severity ?? 'secondary'"
 									[rounded]="true"
 								/>
 							</td>
@@ -153,19 +154,21 @@
 					@for (group of evaluacionesPorPeriodo(); track group.periodo.id) {
 						@for (eval of group.evaluaciones; track eval.id) {
 							<td class="text-center">
+								@let nota = formattedNotas().get(est.estudianteId + '-' + eval.id);
 								<p-tag
-									[value]="formatNota(getNota(est.estudianteId, eval.id))"
-									[severity]="getNotaSeverity(getNota(est.estudianteId, eval.id))"
+									[value]="nota?.text ?? '—'"
+									[severity]="nota?.severity ?? 'secondary'"
 									[rounded]="true"
 								/>
 							</td>
 						}
 						<td class="text-center promedio-col">
+							@let prom = formattedPromedios().get(est.estudianteId + '-' + group.periodo.nombre);
 							<span
 								class="promedio-value"
-								[class]="'promedio-' + getNotaSeverity(getPromedio(est.estudianteId, group.periodo.nombre))"
+								[class]="'promedio-' + (prom?.severity ?? 'secondary')"
 							>
-								{{ formatNota(getPromedio(est.estudianteId, group.periodo.nombre)) }}
+								{{ prom?.text ?? '—' }}
 							</span>
 						</td>
 					}
@@ -173,11 +176,12 @@
 
 				<!-- General (todas las vistas) -->
 				<td class="text-center general-col">
+					@let gen = formattedPromedios().get(est.estudianteId + '-General');
 					<span
 						class="promedio-value general-value"
-						[class]="'promedio-' + getNotaSeverity(getPromedio(est.estudianteId, 'General'))"
+						[class]="'promedio-' + (gen?.severity ?? 'secondary')"
 					>
-						{{ formatNota(getPromedio(est.estudianteId, 'General')) }}
+						{{ gen?.text ?? '—' }}
 					</span>
 				</td>
 			</tr>

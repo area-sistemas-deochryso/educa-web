@@ -92,12 +92,19 @@ export class CursosFacade extends BaseCrudFacade<Curso, CursoFormData, CursosEst
 	}
 
 	toggleEstado(curso: Curso): void {
-		const gradosIds = curso.grados?.map((g) => g.id) || [];
-		const payload = { nombre: curso.nombre, estado: !curso.estado, gradosIds, rowVersion: curso.rowVersion };
+		const payload = { rowVersion: curso.rowVersion };
 		this.walToggle(curso, payload,
-			() => this.api.actualizarCurso(curso.id, payload),
+			() => this.api.toggleEstado(curso.id, curso.rowVersion!),
 			STATS_KEYS,
 			(id) => this.store.toggleCursoEstado(id),
+			{
+				method: 'PATCH',
+				endpointSuffix: `${curso.id}/toggle-estado`,
+				onCommit: (result) => {
+					const { rowVersion } = result as { estado: boolean; rowVersion: string };
+					this.store.updateItem(curso.id, { rowVersion });
+				},
+			},
 		);
 	}
 

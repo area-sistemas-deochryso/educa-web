@@ -97,6 +97,25 @@ export class RuntimeHealthWidgetComponent {
 	});
 
 	readonly metricAlerts = computed(() => this.evaluateThresholds());
+
+	readonly alertDetails = computed(() => {
+		const alerts = this.metricAlerts();
+		const details: Record<string, {
+			level: AlertLevel;
+			severity: 'success' | 'warn' | 'danger';
+			recommendation: string | null;
+			tabTarget: string | null;
+		}> = {};
+		for (const [key, level] of Object.entries(alerts)) {
+			details[key] = {
+				level,
+				severity: level === 'critical' ? 'danger' : 'warn',
+				recommendation: ALERT_RECOMMENDATIONS[key] ?? null,
+				tabTarget: RECOMMENDATION_TAB_TARGETS[key] ?? null,
+			};
+		}
+		return details;
+	});
 	// #endregion
 
 	// #region Event handlers
@@ -115,34 +134,14 @@ export class RuntimeHealthWidgetComponent {
 	onForceGc(): void {
 		this.forceGc.emit();
 	}
-	// #endregion
-
-	// #region Threshold evaluation
-	getAlertLevel(metricKey: string): AlertLevel | null {
-		return this.metricAlerts()[metricKey] ?? null;
-	}
-
-	getAlertSeverity(metricKey: string): 'success' | 'warn' | 'danger' {
-		const level = this.getAlertLevel(metricKey);
-		if (level === 'critical') return 'danger';
-		if (level === 'warn') return 'warn';
-		return 'success';
-	}
-
-	getRecommendation(metricKey: string): string | null {
-		if (!this.getAlertLevel(metricKey)) return null;
-		return ALERT_RECOMMENDATIONS[metricKey] ?? null;
-	}
-
-	getTabTarget(metricKey: string): string | null {
-		return RECOMMENDATION_TAB_TARGETS[metricKey] ?? null;
-	}
 
 	onRecommendationClick(metricKey: string): void {
 		const tab = RECOMMENDATION_TAB_TARGETS[metricKey];
 		if (tab) this.navigateTab.emit(tab);
 	}
+	// #endregion
 
+	// #region Threshold evaluation
 	private evaluateThresholds(): Record<string, AlertLevel> {
 		const snap = this.snapshot();
 		const thresholdList = this.thresholds();

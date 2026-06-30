@@ -22,18 +22,19 @@
 	} @else if (vm().errorCompleto; as err) {
 		<div class="detail-content">
 			<!-- Banner de origen + severidad (siempre visible, fuera de tabs) -->
+			@let ed = errorDerived();
 			<div class="origin-banner" [class]="'origin-banner--' + err.severidad.toLowerCase()">
 				<div class="origin-banner-icon">
-					<i [class]="getOrigenIcon(err.origen)"></i>
+					<i [class]="ed?.origenIcon"></i>
 				</div>
 				<div class="origin-banner-content">
-					<span class="origin-banner-title">{{ getOrigenLabel(err.origen) }}</span>
+					<span class="origin-banner-title">{{ ed?.origenLabel }}</span>
 					<span class="origin-banner-subtitle">
 						{{ err.severidad }} · {{ err.fecha | date: 'dd/MM/yyyy HH:mm:ss' }}
 					</span>
 				</div>
 				<div class="origin-banner-tags">
-					<p-tag [value]="err.origen" [severity]="getOrigenSeverity(err.origen)" />
+					<p-tag [value]="err.origen" [severity]="ed?.origenSeverity ?? 'info'" />
 					@if (err.httpStatus) {
 						<p-tag
 							[value]="'' + err.httpStatus"
@@ -47,7 +48,7 @@
 			</div>
 
 			<!-- Cadena de llamadas (siempre visible, fuera de tabs) -->
-			@if (formatSourceLocation(err.sourceLocation); as callChain) {
+			@if (ed?.sourceLocation; as callChain) {
 				<div class="source-location-card">
 					<i class="pi pi-sitemap"></i>
 					<div class="source-location-content">
@@ -146,11 +147,11 @@
 									@for (step of err.trace; track step.id) {
 										<div class="trace-step" [class.trace-step--error]="step.errorSnippet">
 											<div class="trace-step-icon">
-												<i [class]="getTraceCapaIcon(step.capa)"></i>
+												<i [class]="traceCapaIcon[step.capa]"></i>
 											</div>
 											<div class="trace-step-content">
 												<div class="trace-step-header">
-													<span class="trace-step-capa">{{ getTraceCapaLabel(step.capa) }}</span>
+													<span class="trace-step-capa">{{ traceCapaLabel[step.capa] }}</span>
 													<span class="trace-step-duration">{{ step.duracionMs }}ms</span>
 												</div>
 												<span class="trace-step-method">
@@ -205,11 +206,12 @@
 									<i class="pi pi-arrow-right-arrow-left"></i>
 									Contraparte {{ cp.origen === 'BACKEND' ? 'BE' : 'FE' }}
 								</h4>
+								@let cpd = counterpartDerived();
 								<div class="detail-grid">
 									<div class="detail-row">
 										<span class="detail-label">Origen</span>
 										<span class="detail-value">
-											<p-tag [value]="cp.origen" [severity]="getOrigenSeverity(cp.origen)" />
+											<p-tag [value]="cp.origen" [severity]="cpd?.origenSeverity ?? 'info'" />
 										</span>
 									</div>
 									<div class="detail-row">
@@ -217,7 +219,7 @@
 										<span class="detail-value">
 											<p-tag
 												[value]="cp.severidad"
-												[severity]="getSeveridadSeverity(cp.severidad)"
+												[severity]="cpd?.severidadSeverity ?? 'info'"
 											/>
 										</span>
 									</div>
@@ -267,7 +269,7 @@
 											[class]="'breadcrumb-item--' + detalle.tipoAccion.toLowerCase()"
 										>
 											<div class="breadcrumb-icon">
-												<i [class]="getTipoAccionIcon(detalle.tipoAccion)"></i>
+												<i [class]="tipoAccionIcon[detalle.tipoAccion]"></i>
 											</div>
 											<div class="breadcrumb-content">
 												<div class="breadcrumb-header">
@@ -310,16 +312,17 @@
 					<!-- Tab Group: ErrorGroup padre + CorrelationId -->
 					<p-tabpanel value="group">
 						@if (groupContext(); as grp) {
+						@let gd = groupDerived();
 							<div class="group-card">
 								<div class="group-card-header">
 									<div class="group-card-tags">
 										<p-tag
-											[value]="getEstadoLabel(grp.estado)"
-											[severity]="getEstadoSeverity(grp.estado)"
+											[value]="gd?.estadoLabel ?? grp.estado"
+											[severity]="gd?.estadoSeverity ?? 'secondary'"
 										/>
 										<p-tag
 											[value]="grp.severidad"
-											[severity]="getSeveridadSeverity(grp.severidad)"
+											[severity]="gd?.severidadSeverity ?? 'info'"
 										/>
 									</div>
 									<span class="group-card-count">
@@ -421,7 +424,7 @@
 
 					<!-- Tab Req/Res: Datos de reproducción (BE) o empty (FE) -->
 					<p-tabpanel value="reqres">
-						@if (hasReproductionData(err)) {
+						@if (ed?.hasReproduction) {
 							<div class="detail-section detail-section--flush">
 								<h4>
 									<i class="pi pi-replay"></i> Datos de Reproducción
@@ -436,25 +439,22 @@
 										<i class="pi pi-copy"></i>
 									</button>
 								</h4>
-								@if (err.requestHeaders) {
-									@let headersJson = formatJson(err.requestHeaders);
+								@if (ed?.formattedHeaders) {
 									<div class="reproduction-block">
 										<span class="reproduction-label">Request Headers</span>
-										<pre class="detail-pre detail-pre--json">{{ headersJson }}</pre>
+										<pre class="detail-pre detail-pre--json">{{ ed?.formattedHeaders }}</pre>
 									</div>
 								}
-								@if (err.requestBody) {
-									@let bodyJson = formatJson(err.requestBody);
+								@if (ed?.formattedRequestBody) {
 									<div class="reproduction-block">
 										<span class="reproduction-label">Request Body</span>
-										<pre class="detail-pre detail-pre--json">{{ bodyJson }}</pre>
+										<pre class="detail-pre detail-pre--json">{{ ed?.formattedRequestBody }}</pre>
 									</div>
 								}
-								@if (err.responseBody) {
-									@let responseJson = formatJson(err.responseBody);
+								@if (ed?.formattedResponseBody) {
 									<div class="reproduction-block">
 										<span class="reproduction-label">Response Body</span>
-										<pre class="detail-pre detail-pre--json">{{ responseJson }}</pre>
+										<pre class="detail-pre detail-pre--json">{{ ed?.formattedResponseBody }}</pre>
 									</div>
 								}
 							</div>

@@ -272,14 +272,18 @@ export abstract class BaseCrudFacade<
 		http$: () => Observable<unknown>,
 		statsKeys: EstadisticaKeys,
 		toggleFn: (id: number) => void,
+		options?: { method?: 'PUT' | 'PATCH'; endpointSuffix?: string; onCommit?: (result: unknown) => void },
 	): void {
 		const isActivo = this.resolveEstadoActivo(item);
 		this.crudOps.walToggle(item as T & HasEstado, payload, http$, toggleFn, {
+			method: options?.method,
+			endpointSuffix: options?.endpointSuffix,
 			statsDelta: (sign) => {
 				const d = getEstadoToggleDeltas(isActivo);
 				this.store.incrementarEstadistica(statsKeys.activos as keyof TStats, sign * d.activosDelta);
 				this.store.incrementarEstadistica(statsKeys.inactivos as keyof TStats, sign * d.inactivosDelta);
 			},
+			callbacks: options?.onCommit ? { onCommit: options.onCommit } : undefined,
 		});
 	}
 

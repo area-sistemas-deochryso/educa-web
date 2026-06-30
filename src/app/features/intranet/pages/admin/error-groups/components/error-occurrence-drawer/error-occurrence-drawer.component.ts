@@ -233,35 +233,43 @@ export class ErrorOccurrenceDrawerComponent {
 	}
 	// #endregion
 
-	// #region Helpers visuales
-	getSeveridadSeverity(severidad: string): 'danger' | 'warn' | 'info' {
-		return this.severidadSeverity[severidad as ErrorSeveridad] ?? 'info';
-	}
+	// #region Computed (derived from error for template)
+	readonly errorDerived = computed(() => {
+		const err = this._errorCompleto();
+		if (!err) return null;
+		const origenSev = err.origen === 'BACKEND' ? 'warn' as const : err.origen === 'NETWORK' ? 'danger' as const : 'info' as const;
+		return {
+			origenIcon: this.origenIcon[err.origen as ErrorOrigen] ?? 'pi pi-question',
+			origenLabel: this.origenLabel[err.origen as ErrorOrigen] ?? err.origen,
+			origenSeverity: origenSev,
+			sourceLocation: parseSourceLocation(err.sourceLocation)?.funcion ?? '',
+			hasReproduction: !!(err.requestBody || err.responseBody || err.requestHeaders),
+			formattedHeaders: this.formatJsonValue(err.requestHeaders),
+			formattedRequestBody: this.formatJsonValue(err.requestBody),
+			formattedResponseBody: this.formatJsonValue(err.responseBody),
+		};
+	});
 
-	getOrigenIcon(origen: string): string {
-		return this.origenIcon[origen as ErrorOrigen] ?? 'pi pi-question';
-	}
+	readonly groupDerived = computed(() => {
+		const grp = this._groupContext();
+		if (!grp) return null;
+		return {
+			estadoLabel: this.estadoLabel[grp.estado as ErrorGroupEstado] ?? grp.estado,
+			estadoSeverity: this.estadoSeverity[grp.estado as ErrorGroupEstado] ?? ('secondary' as const),
+			severidadSeverity: this.severidadSeverity[grp.severidad as ErrorSeveridad] ?? ('info' as const),
+		};
+	});
 
-	getOrigenLabel(origen: string): string {
-		return this.origenLabel[origen as ErrorOrigen] ?? origen;
-	}
+	readonly counterpartDerived = computed(() => {
+		const cp = this._counterpart();
+		if (!cp) return null;
+		return {
+			origenSeverity: cp.origen === 'BACKEND' ? 'warn' as const : cp.origen === 'NETWORK' ? 'danger' as const : 'info' as const,
+			severidadSeverity: this.severidadSeverity[cp.severidad as ErrorSeveridad] ?? ('info' as const),
+		};
+	});
 
-	getOrigenSeverity(origen: string): 'info' | 'warn' | 'danger' | 'secondary' {
-		if (origen === 'BACKEND') return 'warn';
-		if (origen === 'NETWORK') return 'danger';
-		return 'info';
-	}
-
-	getTipoAccionIcon(tipo: string): string {
-		return this.tipoAccionIcon[tipo as BreadcrumbTipoAccion] ?? 'pi pi-circle';
-	}
-
-	formatSourceLocation(json: string | null): string {
-		const loc = parseSourceLocation(json);
-		return loc?.funcion ?? '';
-	}
-
-	formatJson(json: string | null): string {
+	formatJsonValue(json: string | null): string {
 		if (!json) return '';
 		try {
 			return JSON.stringify(JSON.parse(json), null, 2);
@@ -269,29 +277,9 @@ export class ErrorOccurrenceDrawerComponent {
 			return json;
 		}
 	}
+	// #endregion
 
-	hasReproductionData(err: ErrorLogCompleto): boolean {
-		return !!(err.requestBody || err.responseBody || err.requestHeaders);
-	}
-
-	getEstadoLabel(estado: string): string {
-		return this.estadoLabel[estado as ErrorGroupEstado] ?? estado;
-	}
-
-	getEstadoSeverity(
-		estado: string,
-	): 'danger' | 'warn' | 'info' | 'success' | 'secondary' {
-		return this.estadoSeverity[estado as ErrorGroupEstado] ?? 'secondary';
-	}
-
-	getTraceCapaIcon(capa: string): string {
-		return this.traceCapaIcon[capa] ?? 'pi pi-question';
-	}
-
-	getTraceCapaLabel(capa: string): string {
-		return this.traceCapaLabel[capa] ?? capa;
-	}
-
+	// #region Helpers visuales
 	private captureTelemetry(): TelemetryBundle {
 		const nav = navigator as Navigator & { connection?: { effectiveType?: string } };
 		return {
@@ -311,13 +299,13 @@ export class ErrorOccurrenceDrawerComponent {
 			parts.push(`${err.httpMethod} ${err.url}`);
 		}
 		if (err.requestHeaders) {
-			parts.push(`\nHeaders:\n${this.formatJson(err.requestHeaders)}`);
+			parts.push(`\nHeaders:\n${this.formatJsonValue(err.requestHeaders)}`);
 		}
 		if (err.requestBody) {
-			parts.push(`\nRequest Body:\n${this.formatJson(err.requestBody)}`);
+			parts.push(`\nRequest Body:\n${this.formatJsonValue(err.requestBody)}`);
 		}
 		if (err.responseBody) {
-			parts.push(`\nResponse Body:\n${this.formatJson(err.responseBody)}`);
+			parts.push(`\nResponse Body:\n${this.formatJsonValue(err.responseBody)}`);
 		}
 
 		const text = parts.join('\n');

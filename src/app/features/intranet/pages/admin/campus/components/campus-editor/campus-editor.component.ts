@@ -105,7 +105,7 @@ export class CampusEditorComponent {
 			if (!nodo) return null;
 			const size = nodo.width > 0 ? ` · ${nodo.width}×${nodo.height}` : '';
 			return {
-				color: this.getNodeColor(nodo.tipo),
+				color: this.nodeColorMap().get(info.id) ?? getNodeColorHelper(nodo.tipo),
 				type: this.nodeTypeLabelMap[nodo.tipo] || nodo.tipo,
 				label: nodo.etiqueta || nodo.salonDescripcion || '',
 				meta: `${Math.round(nodo.x)}, ${Math.round(nodo.y)}${size}`,
@@ -139,31 +139,47 @@ export class CampusEditorComponent {
 
 	// #endregion
 
+	// #region Computed (positions & labels for template)
+
+	readonly nodePositions = computed(() => {
+		const drag = this.dragOffset();
+		const map = new Map<number, { x: number; y: number }>();
+		for (const n of this.nodos()) {
+			map.set(n.id, {
+				x: drag && drag.id === n.id ? n.x + drag.dx : n.x,
+				y: drag && drag.id === n.id ? n.y + drag.dy : n.y,
+			});
+		}
+		return map;
+	});
+
+	readonly bloqueoPositions = computed(() => {
+		const drag = this.dragBloqueoOffset();
+		const map = new Map<number, { x: number; y: number }>();
+		for (const b of this.bloqueos()) {
+			map.set(b.id, {
+				x: drag && drag.id === b.id ? b.x + drag.dx : b.x,
+				y: drag && drag.id === b.id ? b.y + drag.dy : b.y,
+			});
+		}
+		return map;
+	});
+
+	readonly nodeColorMap = computed(() => {
+		const map = new Map<number, string>();
+		for (const n of this.nodos()) map.set(n.id, getNodeColorHelper(n.tipo));
+		return map;
+	});
+
+	readonly nodeLabelMap = computed(() => {
+		const map = new Map<number, string>();
+		for (const n of this.nodos()) map.set(n.id, getNodeLabelHelper(n));
+		return map;
+	});
+
+	// #endregion
+
 	// #region SVG helpers
-
-	getNodeColor(tipo: string): string { return getNodeColorHelper(tipo); }
-	getNodeLabel(nodo: CampusNodoDto): string { return getNodeLabelHelper(nodo); }
-
-	/** Posición de visualización considerando el offset de arrastre activo */
-	getNodeX(nodo: CampusNodoDto): number {
-		const drag = this.dragOffset();
-		return drag && drag.id === nodo.id ? nodo.x + drag.dx : nodo.x;
-	}
-
-	getNodeY(nodo: CampusNodoDto): number {
-		const drag = this.dragOffset();
-		return drag && drag.id === nodo.id ? nodo.y + drag.dy : nodo.y;
-	}
-
-	getBloqueoX(bloqueo: CampusBloqueoDto): number {
-		const drag = this.dragBloqueoOffset();
-		return drag && drag.id === bloqueo.id ? bloqueo.x + drag.dx : bloqueo.x;
-	}
-
-	getBloqueoY(bloqueo: CampusBloqueoDto): number {
-		const drag = this.dragBloqueoOffset();
-		return drag && drag.id === bloqueo.id ? bloqueo.y + drag.dy : bloqueo.y;
-	}
 
 	private clientToSvg(clientX: number, clientY: number) {
 		return clientToSvgHelper(this.svgRef()?.nativeElement, clientX, clientY);
@@ -238,8 +254,9 @@ export class CampusEditorComponent {
 		const nodo = this.nodoMap().get(nodeId);
 		if (!nodo) return;
 		this.hoverInfo.set({ type: 'node', id: nodeId });
-		const tipX = this.getNodeX(nodo) + (nodo.width > 0 ? nodo.width / 2 : 8);
-		const tipY = this.getNodeY(nodo) - (nodo.height > 0 ? nodo.height / 2 : 8);
+		const np = this.nodePositions().get(nodeId)!;
+		const tipX = np.x + (nodo.width > 0 ? nodo.width / 2 : 8);
+		const tipY = np.y - (nodo.height > 0 ? nodo.height / 2 : 8);
 		const pos = this.svgToScreen(tipX, tipY);
 		this.tooltipPos.set({ x: pos.x + 8, y: pos.y });
 	}
@@ -249,7 +266,8 @@ export class CampusEditorComponent {
 		const bloqueo = this.bloqueos().find((b) => b.id === bloqueoId);
 		if (!bloqueo) return;
 		this.hoverInfo.set({ type: 'bloqueo', id: bloqueoId });
-		const pos = this.svgToScreen(this.getBloqueoX(bloqueo) + bloqueo.width, this.getBloqueoY(bloqueo));
+		const bp = this.bloqueoPositions().get(bloqueoId)!;
+		const pos = this.svgToScreen(bp.x + bloqueo.width, bp.y);
 		this.tooltipPos.set({ x: pos.x + 8, y: pos.y });
 	}
 
@@ -261,9 +279,9 @@ export class CampusEditorComponent {
 		const destino = this.nodoMap().get(arista.nodoDestinoId);
 		if (!origen || !destino) return;
 		this.hoverInfo.set({ type: 'arista', id: aristaId });
-		const midX = (this.getNodeX(origen) + this.getNodeX(destino)) / 2;
-		const midY = (this.getNodeY(origen) + this.getNodeY(destino)) / 2;
-		const pos = this.svgToScreen(midX, midY);
+		const op = this.nodePositions().get(arista.nodoOrigenId)!;
+		const dp = this.nodePositions().get(arista.nodoDestinoId)!;
+		const pos = this.svgToScreen((op.x + dp.x) / 2, (op.y + dp.y) / 2);
 		this.tooltipPos.set({ x: pos.x + 8, y: pos.y - 8 });
 	}
 

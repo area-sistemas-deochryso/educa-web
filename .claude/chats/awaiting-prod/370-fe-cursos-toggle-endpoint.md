@@ -16,10 +16,12 @@ Backend added `PATCH /api/sistema/cursos/{id}/toggle-estado` to avoid `DbUpdateC
 
 ## Scope
 
-- [ ] Service method for toggle call.
-- [ ] Wire up in cursos list/detail component toggle button.
-- [ ] Update rowVersion from response.
+- [x] Service method for toggle call.
+- [x] Wire up in cursos list/detail component toggle button.
+- [x] Update rowVersion from response.
 
 ## Tiempo estimado
 
 ~30 min.
+
+> **Validación prod**: ⏳ pendiente desde 2026-06-27

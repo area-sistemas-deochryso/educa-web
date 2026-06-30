@@ -151,21 +151,33 @@ export class ClassroomGradesTabComponent {
 	});
 	// #endregion
 
-	// #region Helpers
-	getNota(estudianteId: number, calificacionId: number): number | null {
-		return this.notasLookup().get(estudianteId)?.get(calificacionId) ?? null;
-	}
+	readonly formattedNotas = computed(() => {
+		const lookup = this.notasLookup();
+		const config = this.calificacionConfig();
+		const map = new Map<string, { text: string; severity: 'success' | 'warn' | 'danger' | 'secondary' }>();
+		for (const [estId, inner] of lookup) {
+			for (const [calId, nota] of inner) {
+				map.set(`${estId}-${calId}`, {
+					text: formatNotaConConfig(nota, config),
+					severity: getNotaSeverity(nota, config),
+				});
+			}
+		}
+		return map;
+	});
 
-	getPromedio(estudianteId: number, periodoNombre: string): number | null {
-		return this.promediosLookup().get(estudianteId)?.get(periodoNombre) ?? null;
-	}
-
-	getNotaSeverity(nota: number | null): 'success' | 'warn' | 'danger' | 'secondary' {
-		return getNotaSeverity(nota, this.calificacionConfig());
-	}
-
-	formatNota(nota: number | null): string {
-		return formatNotaConConfig(nota, this.calificacionConfig());
-	}
-	// #endregion
+	readonly formattedPromedios = computed(() => {
+		const lookup = this.promediosLookup();
+		const config = this.calificacionConfig();
+		const map = new Map<string, { text: string; severity: 'success' | 'warn' | 'danger' | 'secondary' }>();
+		for (const [estId, inner] of lookup) {
+			for (const [periodo, promedio] of inner) {
+				map.set(`${estId}-${periodo}`, {
+					text: formatNotaConConfig(promedio, config),
+					severity: getNotaSeverity(promedio, config),
+				});
+			}
+		}
+		return map;
+	});
 }
