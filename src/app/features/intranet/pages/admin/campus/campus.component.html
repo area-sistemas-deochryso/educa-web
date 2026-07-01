@@ -75,10 +75,7 @@
 		<!-- #endregion -->
 
 		@if (vm().error) {
-			<div class="error-banner">
-				<i class="pi pi-exclamation-triangle"></i>
-				<span>{{ vm().error }}</span>
-			</div>
+			<app-error-state [message]="vm().error!" (retry)="facade.loadPisos()" />
 		}
 
 		<!-- #region Editor canvas -->

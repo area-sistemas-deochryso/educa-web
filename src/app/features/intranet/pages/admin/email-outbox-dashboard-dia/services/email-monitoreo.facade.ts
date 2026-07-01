@@ -1,19 +1,19 @@
 import { DestroyRef, inject, Injectable } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import { catchError, Observable, of, Subscription, timer } from 'rxjs';
+import { Subscription, timer } from 'rxjs';
 
-import { logger } from '@core/helpers';
+import { logger, facadeErrorHandler, type FacadeErrorHandler } from '@core/helpers';
+import { ErrorHandlerService } from '@core/services';
 
-import { DeferFailStatus } from '@features/intranet/pages/admin/email-outbox/models/defer-fail-status.models';
 import { EmailOutboxApiService } from '@features/intranet/pages/admin/email-outbox/services/email-outbox.service';
 
 import { SerieTemporalGranularidad } from '../models/email-monitoreo.models';
 
+const LOG_TAG = 'EmailMonitoreo:Facade';
+
 import { EmailHubService } from './email-hub.service';
 import { EmailMonitoreoApiService } from './email-monitoreo.api.service';
 import { EmailMonitoreoStore } from './email-monitoreo.store';
-
-const LOG_TAG = 'EmailMonitoreo:Facade';
 
 /** Polling fallback cuando SignalR no conecta — INV-MAIL04 (60s para defer-fail-status). */
 const DEFER_FAIL_POLL_MS = 30_000;
@@ -26,6 +26,10 @@ export class EmailMonitoreoFacade {
 	private hub = inject(EmailHubService);
 	private outboxApi = inject(EmailOutboxApiService);
 	private destroyRef = inject(DestroyRef);
+	private errHandler: FacadeErrorHandler = facadeErrorHandler({
+		tag: 'EmailMonitoreoFacade',
+		errorHandler: inject(ErrorHandlerService),
+	});
 	// #endregion
 
 	private deferFailPollSub: Subscription | null = null;
@@ -54,16 +58,20 @@ export class EmailMonitoreoFacade {
 	// #region Comandos: por-tile
 	loadDeferFailStatus(): void {
 		this.store.setDeferFailLoading(true);
-		const stream$: Observable<DeferFailStatus | null> = this.outboxApi.deferFailStatus().pipe(
-			catchError((err) => {
-				logger.tagged(LOG_TAG, 'warn', 'deferFailStatus_failed', err);
-				return of(null as DeferFailStatus | null);
-			}),
-		);
-		stream$.pipe(takeUntilDestroyed(this.destroyRef)).subscribe((status) => {
-			this.store.setDeferFailStatus(status);
-			this.store.setDeferFailLoading(false);
-		});
+		this.outboxApi
+			.deferFailStatus()
+			.pipe(takeUntilDestroyed(this.destroyRef))
+			.subscribe({
+				next: (status) => {
+					this.store.setDeferFailStatus(status);
+					this.store.setDeferFailLoading(false);
+				},
+				error: (err) => {
+					this.errHandler.handle(err, 'cargar estado defer/fail', () => {
+						this.store.setDeferFailLoading(false);
+					});
+				},
+			});
 	}
 
 	loadSenderStats(): void {
@@ -71,16 +79,17 @@ export class EmailMonitoreoFacade {
 		const { ventanaDias } = this.store.filters();
 		this.api
 			.getSenderStats(ventanaDias)
-			.pipe(
-				catchError((err) => {
-					logger.tagged(LOG_TAG, 'warn', 'senderStats_failed', err);
-					return of([]);
-				}),
-				takeUntilDestroyed(this.destroyRef),
-			)
-			.subscribe((items) => {
-				this.store.setSenderStats(items);
-				this.store.setSenderLoading(false);
+			.pipe(takeUntilDestroyed(this.destroyRef))
+			.subscribe({
+				next: (items) => {
+					this.store.setSenderStats(items);
+					this.store.setSenderLoading(false);
+				},
+				error: (err) => {
+					this.errHandler.handle(err, 'cargar estadísticas de remitentes', () => {
+						this.store.setSenderLoading(false);
+					});
+				},
 			});
 	}
 
@@ -89,16 +98,17 @@ export class EmailMonitoreoFacade {
 		const { ventanaDias, topLimit } = this.store.filters();
 		this.api
 			.getTopDestinatarios(ventanaDias, topLimit)
-			.pipe(
-				catchError((err) => {
-					logger.tagged(LOG_TAG, 'warn', 'topDestinatarios_failed', err);
-					return of([]);
-				}),
-				takeUntilDestroyed(this.destroyRef),
-			)
-			.subscribe((items) => {
-				this.store.setTopDestinatarios(items);
-				this.store.setTopLoading(false);
+			.pipe(takeUntilDestroyed(this.destroyRef))
+			.subscribe({
+				next: (items) => {
+					this.store.setTopDestinatarios(items);
+					this.store.setTopLoading(false);
+				},
+				error: (err) => {
+					this.errHandler.handle(err, 'cargar top destinatarios', () => {
+						this.store.setTopLoading(false);
+					});
+				},
 			});
 	}
 
@@ -107,16 +117,17 @@ export class EmailMonitoreoFacade {
 		const { granularidad } = this.store.filters();
 		this.api
 			.getSerieTemporal(granularidad)
-			.pipe(
-				catchError((err) => {
-					logger.tagged(LOG_TAG, 'warn', 'serieTemporal_failed', err);
-					return of([]);
-				}),
-				takeUntilDestroyed(this.destroyRef),
-			)
-			.subscribe((items) => {
-				this.store.setSerieTemporal(items);
-				this.store.setSerieLoading(false);
+			.pipe(takeUntilDestroyed(this.destroyRef))
+			.subscribe({
+				next: (items) => {
+					this.store.setSerieTemporal(items);
+					this.store.setSerieLoading(false);
+				},
+				error: (err) => {
+					this.errHandler.handle(err, 'cargar serie temporal', () => {
+						this.store.setSerieLoading(false);
+					});
+				},
 			});
 	}
 
@@ -125,16 +136,17 @@ export class EmailMonitoreoFacade {
 		const { ventanaDias } = this.store.filters();
 		this.api
 			.getDominiosReceptores(ventanaDias)
-			.pipe(
-				catchError((err) => {
-					logger.tagged(LOG_TAG, 'warn', 'dominios_failed', err);
-					return of([]);
-				}),
-				takeUntilDestroyed(this.destroyRef),
-			)
-			.subscribe((items) => {
-				this.store.setDominios(items);
-				this.store.setDominiosLoading(false);
+			.pipe(takeUntilDestroyed(this.destroyRef))
+			.subscribe({
+				next: (items) => {
+					this.store.setDominios(items);
+					this.store.setDominiosLoading(false);
+				},
+				error: (err) => {
+					this.errHandler.handle(err, 'cargar dominios receptores', () => {
+						this.store.setDominiosLoading(false);
+					});
+				},
 			});
 	}
 
@@ -142,16 +154,17 @@ export class EmailMonitoreoFacade {
 		this.store.setCandidatosLoading(true);
 		this.api
 			.getCandidatosBlacklist()
-			.pipe(
-				catchError((err) => {
-					logger.tagged(LOG_TAG, 'warn', 'candidatos_failed', err);
-					return of([]);
-				}),
-				takeUntilDestroyed(this.destroyRef),
-			)
-			.subscribe((items) => {
-				this.store.setCandidatos(items);
-				this.store.setCandidatosLoading(false);
+			.pipe(takeUntilDestroyed(this.destroyRef))
+			.subscribe({
+				next: (items) => {
+					this.store.setCandidatos(items);
+					this.store.setCandidatosLoading(false);
+				},
+				error: (err) => {
+					this.errHandler.handle(err, 'cargar candidatos a blacklist', () => {
+						this.store.setCandidatosLoading(false);
+					});
+				},
 			});
 	}
 	// #endregion

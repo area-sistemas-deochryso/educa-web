@@ -2,7 +2,7 @@ import { DestroyRef, inject, Injectable } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { catchError, EMPTY, Observable } from 'rxjs';
 
-import { logger, withRetry } from '@core/helpers';
+import { facadeErrorHandler, type FacadeErrorHandler, withRetry } from '@core/helpers';
 import { ErrorHandlerService } from '@core/services';
 
 import {
@@ -30,8 +30,11 @@ interface CrudOptions<T> {
 export class CampusAdminFacade {
 	private api = inject(CampusAdminApiService);
 	private store = inject(CampusAdminStore);
-	private errorHandler = inject(ErrorHandlerService);
 	private destroyRef = inject(DestroyRef);
+	private errHandler: FacadeErrorHandler = facadeErrorHandler({
+		tag: 'CampusAdminFacade',
+		errorHandler: inject(ErrorHandlerService),
+	});
 
 	// #region Exponer estado del store
 
@@ -52,10 +55,10 @@ export class CampusAdminFacade {
 		apiCall
 			.pipe(
 				catchError((err) => {
-					logger.error(`Error: ${errorMsg}`, err);
-					this.errorHandler.showError('Error', errorMsg);
-					if (saving) this.store.setSaving(false);
-					onError?.();
+					this.errHandler.handle(err, errorMsg.replace('No se pudo ', ''), () => {
+						if (saving) this.store.setSaving(false);
+						onError?.();
+					});
 					return EMPTY;
 				}),
 				takeUntilDestroyed(this.destroyRef),
@@ -73,27 +76,29 @@ export class CampusAdminFacade {
 	loadPisos(): void {
 		if (this.store.loading()) return;
 		this.store.setLoading(true);
+		this.store.setError(null);
 
 		this.api
 			.listarPisos()
 			.pipe(
 				withRetry({ tag: 'CampusAdmin:loadPisos' }),
-				catchError((err) => {
-					logger.error('Error cargando pisos:', err);
-					this.errorHandler.showError('Error', 'No se pudieron cargar los pisos');
-					this.store.setLoading(false);
-					return EMPTY;
-				}),
 				takeUntilDestroyed(this.destroyRef),
 			)
-			.subscribe((pisos) => {
-				this.store.setPisos(pisos);
-				this.store.setLoading(false);
+			.subscribe({
+				next: (pisos) => {
+					this.store.setPisos(pisos);
+					this.store.setLoading(false);
 
-				// Auto-seleccionar primer piso
-				if (pisos.length > 0 && !this.store.selectedPisoId()) {
-					this.selectPiso(pisos[0].id);
-				}
+					if (pisos.length > 0 && !this.store.selectedPisoId()) {
+						this.selectPiso(pisos[0].id);
+					}
+				},
+				error: (err) => {
+					this.errHandler.handle(err, 'cargar pisos', () => {
+						this.store.setError('No se pudieron cargar los pisos.');
+						this.store.setLoading(false);
+					});
+				},
 			});
 	}
 
@@ -110,17 +115,18 @@ export class CampusAdminFacade {
 			.getPisoCompleto(pisoId)
 			.pipe(
 				withRetry({ tag: 'CampusAdmin:loadPisoCompleto' }),
-				catchError((err) => {
-					logger.error('Error cargando piso completo:', err);
-					this.errorHandler.showError('Error', 'No se pudo cargar el piso');
-					this.store.setEditorLoading(false);
-					return EMPTY;
-				}),
 				takeUntilDestroyed(this.destroyRef),
 			)
-			.subscribe((piso) => {
-				this.store.setPisoCompleto(piso);
-				this.store.setEditorLoading(false);
+			.subscribe({
+				next: (piso) => {
+					this.store.setPisoCompleto(piso);
+					this.store.setEditorLoading(false);
+				},
+				error: (err) => {
+					this.errHandler.handle(err, 'cargar piso completo', () => {
+						this.store.setEditorLoading(false);
+					});
+				},
 			});
 	}
 
@@ -129,17 +135,17 @@ export class CampusAdminFacade {
 
 		this.api
 			.getPisoCompleto(pisoId)
-			.pipe(
-				catchError((err) => {
-					logger.error('Error cargando nodos del piso destino:', err);
+			.pipe(takeUntilDestroyed(this.destroyRef))
+			.subscribe({
+				next: (piso) => {
+					this.store.setDestPisoNodos(piso.nodos);
 					this.store.setDestPisoLoading(false);
-					return EMPTY;
-				}),
-				takeUntilDestroyed(this.destroyRef),
-			)
-			.subscribe((piso) => {
-				this.store.setDestPisoNodos(piso.nodos);
-				this.store.setDestPisoLoading(false);
+				},
+				error: (err) => {
+					this.errHandler.handle(err, 'cargar nodos del piso destino', () => {
+						this.store.setDestPisoLoading(false);
+					});
+				},
 			});
 	}
 

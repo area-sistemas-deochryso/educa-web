@@ -176,6 +176,11 @@ export const UI_ERROR_CODES: Record<string, string> = {
 	BLOB_TIPO_NO_PERMITIDO: 'Tipo de archivo no permitido.',
 	BLOB_TAMANO_EXCEDIDO: 'El archivo excede el tamaño máximo permitido.',
 
+	// Dashboard email
+	FECHA_FORMATO_INVALIDO: 'Formato de fecha inválido. Usa yyyy-MM-dd.',
+	FECHA_FUTURA_INVALIDA: 'La fecha no puede ser posterior a hoy.',
+	FECHA_DEMASIADO_ANTIGUA: 'Solo se pueden consultar los últimos 90 días.',
+
 	// Genéricos
 	ACCESS_DENIED: 'No tiene acceso a este recurso.',
 	VALIDATION_ERROR: 'Los datos enviados no son válidos.',

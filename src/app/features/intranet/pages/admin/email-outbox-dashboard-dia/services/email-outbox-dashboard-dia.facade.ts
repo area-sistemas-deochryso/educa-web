@@ -1,18 +1,15 @@
 import { HttpErrorResponse } from '@angular/common/http';
 import { DestroyRef, inject, Injectable } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import { forkJoin, of } from 'rxjs';
-import { catchError } from 'rxjs/operators';
+import { catchError, forkJoin, of } from 'rxjs';
 
+import { facadeErrorHandler, type FacadeErrorHandler } from '@core/helpers';
 import { ErrorHandlerService } from '@core/services/error';
-import { logger } from '@core/helpers';
 
 import { DashboardDiaErrorCode } from '../models/email-dashboard-dia.models';
 
 import { EmailOutboxDashboardDiaService } from './email-outbox-dashboard-dia.service';
 import { EmailOutboxDashboardDiaStore } from './email-outbox-dashboard-dia.store';
-
-const LOG_TAG = 'DashboardDia:Facade';
 
 @Injectable({ providedIn: 'root' })
 export class EmailOutboxDashboardDiaFacade {
@@ -20,7 +17,10 @@ export class EmailOutboxDashboardDiaFacade {
 	private api = inject(EmailOutboxDashboardDiaService);
 	private store = inject(EmailOutboxDashboardDiaStore);
 	private destroyRef = inject(DestroyRef);
-	private errorHandler = inject(ErrorHandlerService);
+	private errHandler: FacadeErrorHandler = facadeErrorHandler({
+		tag: 'DashboardDiaFacade',
+		errorHandler: inject(ErrorHandlerService),
+	});
 	// #endregion
 
 	// #region Estado expuesto
@@ -38,18 +38,11 @@ export class EmailOutboxDashboardDiaFacade {
 		// propio para el dashboard). Es consistente con el p-datepicker maxDate.
 		const fechaParaFallos = fecha ?? this.hoyLimaIso();
 
-		logger.tagged(LOG_TAG, 'info', 'load', { fecha: fechaParaFallos });
-
 		forkJoin({
 			dto: this.api.obtenerDashboardDia(fecha),
-			fallosDia: this.api
-				.listarFallosDia(fechaParaFallos)
-				.pipe(catchError((err) => {
-					logger.warn('[DashboardDia] listarFallosDia failed:', err);
-					return of([]);
-				})),
-			fallosPorSender: this.api.obtenerFallosPorSender(fecha),
-			attendanceGaps: this.api.obtenerAsistenciasSinCorreo(fecha),
+			fallosDia: this.api.listarFallosDia(fechaParaFallos).pipe(catchError(() => of([]))),
+			fallosPorSender: this.api.obtenerFallosPorSender(fecha).pipe(catchError(() => of([]))),
+			attendanceGaps: this.api.obtenerAsistenciasSinCorreo(fecha).pipe(catchError(() => of([]))),
 		})
 			.pipe(takeUntilDestroyed(this.destroyRef))
 			.subscribe({
@@ -61,8 +54,15 @@ export class EmailOutboxDashboardDiaFacade {
 					this.store.setLoading(false);
 				},
 				error: (err: unknown) => {
-					this.handleError(err);
-					this.store.setLoading(false);
+					const errorCode = this.extractErrorCode(err);
+					if (errorCode) {
+						this.store.setError(errorCode);
+					} else {
+						this.store.setError('UNKNOWN');
+					}
+					this.errHandler.handle(err, 'cargar dashboard del día', () => {
+						this.store.setLoading(false);
+					});
 				},
 			});
 	}
@@ -89,25 +89,6 @@ export class EmailOutboxDashboardDiaFacade {
 	// #endregion
 
 	// #region Error mapping
-	private handleError(err: unknown): void {
-		const errorCode = this.extractErrorCode(err);
-
-		if (errorCode) {
-			const message = this.getErrorMessage(errorCode);
-			this.errorHandler.showError('Dashboard de correos', message);
-			this.store.setError(errorCode);
-			logger.tagged(LOG_TAG, 'warn', 'error_code', { errorCode });
-			return;
-		}
-
-		this.errorHandler.showError(
-			'Dashboard de correos',
-			'No se pudo cargar el dashboard del día. Intenta refrescar.',
-		);
-		this.store.setError('UNKNOWN');
-		logger.tagged(LOG_TAG, 'error', 'unknown_error', err);
-	}
-
 	private extractErrorCode(err: unknown): DashboardDiaErrorCode | null {
 		if (!(err instanceof HttpErrorResponse)) return null;
 		if (err.status !== 400) return null;
@@ -122,15 +103,5 @@ export class EmailOutboxDashboardDiaFacade {
 		return null;
 	}
 
-	private getErrorMessage(code: DashboardDiaErrorCode): string {
-		switch (code) {
-			case 'FECHA_FORMATO_INVALIDO':
-				return 'Formato de fecha inválido. Usa yyyy-MM-dd.';
-			case 'FECHA_FUTURA_INVALIDA':
-				return 'La fecha no puede ser posterior a hoy.';
-			case 'FECHA_DEMASIADO_ANTIGUA':
-				return 'Solo se pueden consultar los últimos 90 días.';
-		}
-	}
 	// #endregion
 }

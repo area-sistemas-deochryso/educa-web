@@ -2,6 +2,7 @@ import { ChangeDetectionStrategy, Component, computed, inject } from '@angular/c
 import { TabsModule } from 'primeng/tabs';
 
 import { StatsSkeletonComponent, TableSkeletonComponent } from '@intranet-shared/components';
+import { ErrorStateComponent } from '@shared/components/error-state';
 import type { SkeletonColumnDef } from '@intranet-shared/components';
 
 import { DashboardBouncersTableComponent } from './components/dashboard-bouncers-table/dashboard-bouncers-table.component';
@@ -69,6 +70,7 @@ interface DetalleKpiCard {
 		AttendanceGapTileComponent,
 		MapaEnvioTabComponent,
 		EmailDeferFailBannerComponent,
+		ErrorStateComponent,
 	],
 	templateUrl: './email-outbox-dashboard-dia.component.html',
 	styleUrl: './email-outbox-dashboard-dia.component.scss',
@@ -152,6 +154,19 @@ export class EmailOutboxDashboardDiaComponent {
 
 	onFechaChange(fecha: string | null): void {
 		this.facade.setFecha(fecha);
+	}
+
+	getErrorMessage(code: string): string {
+		switch (code) {
+			case 'FECHA_FORMATO_INVALIDO':
+				return 'Formato de fecha inválido. Usa yyyy-MM-dd.';
+			case 'FECHA_FUTURA_INVALIDA':
+				return 'La fecha no puede ser posterior a hoy.';
+			case 'FECHA_DEMASIADO_ANTIGUA':
+				return 'Solo se pueden consultar los últimos 90 días.';
+			default:
+				return 'No se pudo cargar el dashboard del día.';
+		}
 	}
 	// #endregion
 }

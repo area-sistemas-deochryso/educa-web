@@ -110,7 +110,7 @@ describe('EmailOutboxDataFacade — throttle widget', () => {
 		expect(store.throttleStatus()).toBeNull();
 		expect(store.throttleLoading()).toBe(false);
 		expect(errorHandler.showError).toHaveBeenCalledWith(
-			'Throttle',
+			'Error',
 			expect.stringContaining('No se pudo'),
 		);
 	});
@@ -227,7 +227,7 @@ describe('EmailOutboxDataFacade — paginación + filtros server-side (Plan 43 C
 		);
 	});
 
-	it('loadData fail-safe: count=null cuando el endpoint devuelve null (catchError)', () => {
+	it('loadData fail-safe: count=null cuando el endpoint devuelve null', () => {
 		api.count.mockReturnValueOnce(of(null));
 
 		facade.loadData();

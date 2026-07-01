@@ -1,6 +1,6 @@
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { inject, Injectable } from '@angular/core';
-import { catchError, Observable, of } from 'rxjs';
+import { Observable } from 'rxjs';
 
 import { environment } from '@config/environment';
 import { EmailOutboxLista } from '@data/models';
@@ -34,32 +34,24 @@ export class EmailOutboxDashboardDiaService {
 			.set('estado', 'FAILED')
 			.set('desde', fecha)
 			.set('hasta', fecha);
-		return this.http
-			.get<EmailOutboxLista[]>(`${this.baseUrl}/listar`, { params })
-			.pipe(catchError(() => of([])));
+		return this.http.get<EmailOutboxLista[]>(`${this.baseUrl}/listar`, { params });
 	}
 	obtenerAsistenciasSinCorreo(fecha?: string, estudianteId?: number): Observable<AttendanceGapRow[]> {
 		let params = new HttpParams();
 		if (fecha) params = params.set('fecha', fecha);
 		if (estudianteId != null) params = params.set('estudianteId', estudianteId);
-		return this.http
-			.get<AttendanceGapRow[]>(`${this.baseUrl}/asistencias-sin-correo`, { params })
-			.pipe(catchError(() => of([])));
+		return this.http.get<AttendanceGapRow[]>(`${this.baseUrl}/asistencias-sin-correo`, { params });
 	}
 
 	listarPorEstudiante(estudianteId: number): Observable<EmailOutboxLista[]> {
 		const params = new HttpParams().set('estudianteId', estudianteId);
-		return this.http
-			.get<EmailOutboxLista[]>(`${this.baseUrl}/listar`, { params })
-			.pipe(catchError(() => of([])));
+		return this.http.get<EmailOutboxLista[]>(`${this.baseUrl}/listar`, { params });
 	}
 
 	obtenerFallosPorSender(fecha?: string): Observable<EmailDashboardFallosPorSender[]> {
 		let params = new HttpParams();
 		if (fecha) params = params.set('fecha', fecha);
-		return this.http
-			.get<EmailDashboardFallosPorSender[]>(`${this.baseUrl}/dashboard-dia/fallos-por-sender`, { params })
-			.pipe(catchError(() => of([])));
+		return this.http.get<EmailDashboardFallosPorSender[]>(`${this.baseUrl}/dashboard-dia/fallos-por-sender`, { params });
 	}
 	// #endregion
 }

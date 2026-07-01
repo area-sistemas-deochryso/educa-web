@@ -6,6 +6,7 @@ import { SelectModule } from 'primeng/select';
 import { TagModule } from 'primeng/tag';
 import { TooltipModule } from 'primeng/tooltip';
 
+import { ErrorStateComponent } from '@shared/components/error-state';
 import { CampusAdminFacade, CampusAdminUiFacade } from './services';
 import { CampusPisosPanelComponent } from './components/campus-pisos-panel/campus-pisos-panel.component';
 import { CampusEditorComponent } from './components/campus-editor/campus-editor.component';
@@ -43,6 +44,7 @@ import {
 		CampusNodeDialogComponent,
 		CampusBloqueoDialogComponent,
 		CampusVerticalConnectionDialogComponent,
+		ErrorStateComponent,
 	],
 	templateUrl: './campus.component.html',
 	styleUrl: './campus.component.scss',

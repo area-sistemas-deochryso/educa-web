@@ -1,10 +1,9 @@
 import { DestroyRef, inject, Injectable } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import { catchError, EMPTY, forkJoin } from 'rxjs';
+import { forkJoin } from 'rxjs';
 
-import { logger, withRetry } from '@core/helpers';
+import { facadeErrorHandler, type FacadeErrorHandler, withRetry } from '@core/helpers';
 import { ErrorHandlerService } from '@core/services';
-import { UI_SUMMARIES } from '@app/shared/constants';
 
 import {
 	CampusCompletoDto,
@@ -21,8 +20,11 @@ export class CampusNavigationFacade {
 	private api = inject(CampusNavigationApiService);
 	private store = inject(CampusNavigationStore);
 	private pathfinding = inject(PathfindingHelper);
-	private errorHandler = inject(ErrorHandlerService);
 	private destroyRef = inject(DestroyRef);
+	private errHandler: FacadeErrorHandler = facadeErrorHandler({
+		tag: 'CampusNavigationFacade',
+		errorHandler: inject(ErrorHandlerService),
+	});
 
 	// #region Exponer estado del store
 
@@ -47,46 +49,41 @@ export class CampusNavigationFacade {
 				withRetry({ tag: 'CampusNavigationFacade:loadSchedule' }),
 			),
 		})
-			.pipe(
-				catchError((err) => {
-					logger.error('Error cargando datos de navegación:', err);
-					this.errorHandler.showError(UI_SUMMARIES.error, 'No se pudo cargar los datos del campus');
-					this.store.setError('No se pudo cargar los datos del campus');
-					this.store.setLoading(false);
+			.pipe(takeUntilDestroyed(this.destroyRef))
+			.subscribe({
+				next: ({ campus, schedule }) => {
+					const { nodes, edges } = this.adaptCampusData(campus);
+					this.store.setNodes(nodes);
+					this.store.setEdges(edges);
+					this.store.setBlockedPaths([]);
 					this.store.setCampusReady(true);
-					this.store.setScheduleReady(true);
-					return EMPTY;
-				}),
-				takeUntilDestroyed(this.destroyRef),
-			)
-			.subscribe(({ campus, schedule }) => {
-				// Adaptar datos del campus
-				const { nodes, edges } = this.adaptCampusData(campus);
-				this.store.setNodes(nodes);
-				this.store.setEdges(edges);
-				this.store.setBlockedPaths([]);
-				this.store.setCampusReady(true);
 
-				// Auto-seleccionar primer piso
-				if (nodes.length > 0) {
-					const floors = [...new Set(nodes.map((n) => n.floor))].sort((a, b) => a - b);
-					this.store.setSelectedFloor(floors[0]);
-				}
-
-				// Setear horario
-				this.store.setScheduleItems(schedule);
-				this.store.setScheduleReady(true);
-				this.store.setLoading(false);
-
-				// Auto-seleccionar destino
-				if (overrideDestinationSalonId) {
-					this.navigateToSalon(overrideDestinationSalonId);
-				} else {
-					const current = this.store.currentOrNextClass();
-					if (current) {
-						this.navigateToSalon(current.salonId);
+					if (nodes.length > 0) {
+						const floors = [...new Set(nodes.map((n) => n.floor))].sort((a, b) => a - b);
+						this.store.setSelectedFloor(floors[0]);
 					}
-				}
+
+					this.store.setScheduleItems(schedule);
+					this.store.setScheduleReady(true);
+					this.store.setLoading(false);
+
+					if (overrideDestinationSalonId) {
+						this.navigateToSalon(overrideDestinationSalonId);
+					} else {
+						const current = this.store.currentOrNextClass();
+						if (current) {
+							this.navigateToSalon(current.salonId);
+						}
+					}
+				},
+				error: (err: unknown) => {
+					this.errHandler.handle(err, 'cargar datos del campus', () => {
+						this.store.setError('No se pudo cargar los datos del campus');
+						this.store.setLoading(false);
+						this.store.setCampusReady(true);
+						this.store.setScheduleReady(true);
+					});
+				},
 			});
 	}
 

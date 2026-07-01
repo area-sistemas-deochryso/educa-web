@@ -1,5 +1,6 @@
 import { ChangeDetectionStrategy, Component, inject, input, OnInit, signal, ViewChild } from '@angular/core';
 
+import { ErrorStateComponent } from '@shared/components/error-state';
 import { CampusNavigationFacade } from './services/campus-navigation.facade';
 import { CampusMapComponent } from './components/campus-map/campus-map.component';
 import { Campus3dViewComponent } from './components/campus-3d-view/campus-3d-view.component';
@@ -18,13 +19,14 @@ import { SchedulePanelComponent } from './components/schedule-panel/schedule-pan
 		LocationSelectorComponent,
 		NavigationStepsComponent,
 		SchedulePanelComponent,
+		ErrorStateComponent,
 	],
 	changeDetection: ChangeDetectionStrategy.OnPush,
 	templateUrl: './campus-navigation.component.html',
 	styleUrl: './campus-navigation.component.scss',
 })
 export class CampusNavigationComponent implements OnInit {
-	private facade = inject(CampusNavigationFacade);
+	readonly facade = inject(CampusNavigationFacade);
 
 	@ViewChild('locationSelector') locationSelector!: LocationSelectorComponent;
 

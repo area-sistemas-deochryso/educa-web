@@ -2,6 +2,7 @@ import { DestroyRef, inject, Injectable } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { forkJoin } from 'rxjs';
 
+import { facadeErrorHandler, type FacadeErrorHandler } from '@core/helpers';
 import { ErrorHandlerService } from '@core/services/error';
 import { StorageService } from '@core/services/storage';
 
@@ -17,8 +18,11 @@ export class EmailOutboxDataFacade {
 	private api = inject(EmailOutboxApiService);
 	private store = inject(EmailOutboxStore);
 	private destroyRef = inject(DestroyRef);
-	private errorHandler = inject(ErrorHandlerService);
 	private storage = inject(StorageService);
+	private errHandler: FacadeErrorHandler = facadeErrorHandler({
+		tag: 'EmailOutboxDataFacade',
+		errorHandler: inject(ErrorHandlerService),
+	});
 
 	// Handle del polling activo. null cuando no hay polling corriendo.
 	private pollHandle: ReturnType<typeof setInterval> | null = null;
@@ -48,6 +52,7 @@ export class EmailOutboxDataFacade {
 	 */
 	loadData(): void {
 		this.store.setLoading(true);
+		this.store.setError(null);
 
 		const filtros = this.currentFiltros();
 		const page = this.store.page();
@@ -69,10 +74,12 @@ export class EmailOutboxDataFacade {
 					this.store.setDataReady(true);
 					this.store.setLoading(false);
 				},
-				error: () => {
-					this.store.setLoading(false);
-					this.store.setDataReady(true);
-					this.store.setTendencias([]);
+				error: (err) => {
+					this.errHandler.handle(err, 'cargar bandeja de correos', () => {
+						this.store.setError('No se pudo cargar la bandeja de correos.');
+						this.store.setDataReady(true);
+						this.store.setLoading(false);
+					});
 				},
 			});
 	}
@@ -107,7 +114,11 @@ export class EmailOutboxDataFacade {
 					this.store.setItems(items);
 					this.store.setLoading(false);
 				},
-				error: () => this.store.setLoading(false),
+				error: (err) => {
+					this.errHandler.handle(err, 'cargar página de correos', () => {
+						this.store.setLoading(false);
+					});
+				},
 			});
 	}
 
@@ -236,12 +247,10 @@ export class EmailOutboxDataFacade {
 					this.store.setThrottleStatus(status);
 					this.store.setThrottleLoading(false);
 				},
-				error: () => {
-					this.store.setThrottleLoading(false);
-					this.errorHandler.showError(
-						'Throttle',
-						'No se pudo cargar el estado del throttle',
-					);
+				error: (err) => {
+					this.errHandler.handle(err, 'cargar estado del throttle', () => {
+						this.store.setThrottleLoading(false);
+					});
 				},
 			});
 	}
@@ -301,12 +310,10 @@ export class EmailOutboxDataFacade {
 					this.store.setDeferFailStatus(status);
 					this.store.setDeferFailLoading(false);
 				},
-				error: () => {
-					this.store.setDeferFailLoading(false);
-					this.errorHandler.showError(
-						'Defer/Fail',
-						'No se pudo cargar el estado defer/fail',
-					);
+				error: (err) => {
+					this.errHandler.handle(err, 'cargar estado defer/fail', () => {
+						this.store.setDeferFailLoading(false);
+					});
 				},
 			});
 	}

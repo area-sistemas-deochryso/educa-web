@@ -1,6 +1,6 @@
 import { inject, Injectable } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
-import { catchError, map, Observable, of } from 'rxjs';
+import { map, Observable } from 'rxjs';
 
 import { environment } from '@config/environment';
 import {
@@ -38,9 +38,7 @@ export class EmailOutboxApiService {
 		if (filtros?.pageSize !== undefined)
 			params = params.set('pageSize', String(filtros.pageSize));
 
-		return this.http
-			.get<EmailOutboxLista[]>(`${this.baseUrl}/listar`, { params })
-			.pipe(catchError(() => of([])));
+		return this.http.get<EmailOutboxLista[]>(`${this.baseUrl}/listar`, { params });
 	}
 
 	/**
@@ -60,9 +58,7 @@ export class EmailOutboxApiService {
 		search?: string;
 	}): Observable<number | null> {
 		const params = this.buildFiltrosParams(filtros);
-		return this.http
-			.get<number>(`${this.baseUrl}/count`, { params })
-			.pipe(catchError(() => of(null)));
+		return this.http.get<number>(`${this.baseUrl}/count`, { params });
 	}
 
 	private buildFiltrosParams(filtros?: {
@@ -93,18 +89,7 @@ export class EmailOutboxApiService {
 		if (desde) params = params.set('desde', desde);
 		if (hasta) params = params.set('hasta', hasta);
 
-		const defaultStats: EmailOutboxEstadisticas = {
-			total: 0,
-			enviados: 0,
-			fallidos: 0,
-			pendientes: 0,
-			enProceso: 0,
-			porcentajeExito: 0,
-		};
-
-		return this.http
-			.get<EmailOutboxEstadisticas>(`${this.baseUrl}/estadisticas`, { params })
-			.pipe(catchError(() => of(defaultStats)));
+		return this.http.get<EmailOutboxEstadisticas>(`${this.baseUrl}/estadisticas`, { params });
 	}
 
 	tendencias(desde?: string, hasta?: string): Observable<EmailOutboxTendencia[]> {
@@ -112,9 +97,7 @@ export class EmailOutboxApiService {
 		if (desde) params = params.set('desde', desde);
 		if (hasta) params = params.set('hasta', hasta);
 
-		return this.http
-			.get<EmailOutboxTendencia[]>(`${this.baseUrl}/tendencias`, { params })
-			.pipe(catchError(() => of([])));
+		return this.http.get<EmailOutboxTendencia[]>(`${this.baseUrl}/tendencias`, { params });
 	}
 
 	obtenerHtml(id: number): Observable<string | null> {
@@ -122,10 +105,7 @@ export class EmailOutboxApiService {
 		// desempaqueta hasta el objeto interno. Hay que extraer la propiedad.
 		return this.http
 			.get<{ html: string } | string | null>(`${this.baseUrl}/${id}/html`)
-			.pipe(
-				map((res) => (typeof res === 'string' ? res : (res?.html ?? null))),
-				catchError(() => of(null)),
-			);
+			.pipe(map((res) => (typeof res === 'string' ? res : (res?.html ?? null))));
 	}
 
 	// * Plan 22 Chat B — snapshot del throttle saliente (per-sender + dominio).
@@ -152,9 +132,7 @@ export class EmailOutboxApiService {
 	}
 
 	getManualAttempts(id: number): Observable<EmailOutboxManualAttemptDto[]> {
-		return this.http
-			.get<EmailOutboxManualAttemptDto[]>(`${this.baseUrl}/${id}/manual-attempts`)
-			.pipe(catchError(() => of([])));
+		return this.http.get<EmailOutboxManualAttemptDto[]>(`${this.baseUrl}/${id}/manual-attempts`);
 	}
 
 	exportarCaso(id: number): Observable<EmailOutboxExportDto> {
