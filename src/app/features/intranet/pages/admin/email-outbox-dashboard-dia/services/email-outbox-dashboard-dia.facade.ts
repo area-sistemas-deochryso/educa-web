@@ -3,7 +3,7 @@ import { DestroyRef, inject, Injectable } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { catchError, forkJoin, of } from 'rxjs';
 
-import { facadeErrorHandler, type FacadeErrorHandler } from '@core/helpers';
+import { facadeErrorHandler, logger, type FacadeErrorHandler } from '@core/helpers';
 import { ErrorHandlerService } from '@core/services/error';
 
 import { DashboardDiaErrorCode } from '../models/email-dashboard-dia.models';
@@ -40,9 +40,18 @@ export class EmailOutboxDashboardDiaFacade {
 
 		forkJoin({
 			dto: this.api.obtenerDashboardDia(fecha),
-			fallosDia: this.api.listarFallosDia(fechaParaFallos).pipe(catchError(() => of([]))),
-			fallosPorSender: this.api.obtenerFallosPorSender(fecha).pipe(catchError(() => of([]))),
-			attendanceGaps: this.api.obtenerAsistenciasSinCorreo(fecha).pipe(catchError(() => of([]))),
+			fallosDia: this.api.listarFallosDia(fechaParaFallos).pipe(catchError((err) => {
+				logger.warn('[DashboardDia] listarFallosDia failed — degraded', err?.status);
+				return of([]);
+			})),
+			fallosPorSender: this.api.obtenerFallosPorSender(fecha).pipe(catchError((err) => {
+				logger.warn('[DashboardDia] obtenerFallosPorSender failed — degraded', err?.status);
+				return of([]);
+			})),
+			attendanceGaps: this.api.obtenerAsistenciasSinCorreo(fecha).pipe(catchError((err) => {
+				logger.warn('[DashboardDia] obtenerAsistenciasSinCorreo failed — degraded', err?.status);
+				return of([]);
+			})),
 		})
 			.pipe(takeUntilDestroyed(this.destroyRef))
 			.subscribe({

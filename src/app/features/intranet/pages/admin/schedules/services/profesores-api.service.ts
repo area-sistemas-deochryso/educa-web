@@ -1,8 +1,7 @@
 // #region Imports
 import { HttpClient } from '@angular/common/http';
 import { inject, Injectable } from '@angular/core';
-import { Observable, of } from 'rxjs';
-import { catchError } from 'rxjs/operators';
+import { Observable } from 'rxjs';
 
 import { environment } from '@config/environment';
 import { ProfesorListDto } from '../models/profesor.interface';
@@ -18,9 +17,7 @@ export class ProfesoresApiService {
 	 * Listar todos los profesores activos
 	 */
 	listar(): Observable<ProfesorListDto[]> {
-		return this.http
-			.get<ProfesorListDto[]>(`${this.apiUrl}`)
-			.pipe(catchError(() => of([])));
+		return this.http.get<ProfesorListDto[]>(`${this.apiUrl}`);
 	}
 
 	/**
@@ -28,9 +25,7 @@ export class ProfesoresApiService {
 	 * Puede usarse para filtrar solo los que no tienen asignaciones en ciertos horarios
 	 */
 	listarDisponibles(): Observable<ProfesorListDto[]> {
-		return this.http
-			.get<ProfesorListDto[]>(`${this.apiUrl}/disponibles`)
-			.pipe(catchError(() => of([])));
+		return this.http.get<ProfesorListDto[]>(`${this.apiUrl}/disponibles`);
 	}
 }
 // #endregion

@@ -10,6 +10,7 @@ import {
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { RouterLink } from '@angular/router';
 import { forkJoin, of, catchError, Observable } from 'rxjs';
+import { logger } from '@core/helpers';
 import {
 	AttendanceService,
 	AsistenciaProfesorApiService,
@@ -141,21 +142,30 @@ export class ProfesorAttendanceWidgetComponent implements OnInit {
 
 		this.attendance
 			.getSalonesProfesor()
-			.pipe(catchError(() => of([] as SalonProfesor[])))
+			.pipe(catchError((err) => {
+				logger.warn('[ProfesorWidget] getSalonesProfesor failed — fallback empty', err?.status);
+				return of([] as SalonProfesor[]);
+			}))
 			.subscribe((salones) => {
 				// Preferir salón donde es tutor (INV-AS04). Sin tutor: no hay sección "Mi salón".
 				const tutor = salones.find((s) => s.esTutor) ?? null;
 				this.salon.set(tutor);
 
 				const salon$: Observable<AsistenciaDiaConEstadisticas | null> = tutor
-					? this.attendance
-							.getAsistenciaDia(tutor.grado, tutor.seccion, hoy)
-							.pipe(catchError(() => of(null)))
+					? this.attendance.getAsistenciaDia(tutor.grado, tutor.seccion, hoy).pipe(
+							catchError((err) => {
+								logger.warn('[ProfesorWidget] getAsistenciaDia failed — fallback null', err?.status);
+								return of(null);
+							}),
+						)
 					: of(null);
 
-				const mi$ = this.profesorApi
-					.obtenerMiAsistenciaDia(hoy)
-					.pipe(catchError(() => of(null)));
+				const mi$ = this.profesorApi.obtenerMiAsistenciaDia(hoy).pipe(
+					catchError((err) => {
+						logger.warn('[ProfesorWidget] obtenerMiAsistenciaDia failed — fallback null', err?.status);
+						return of(null);
+					}),
+				);
 
 				forkJoin({ mi: mi$, salon: salon$ })
 					.pipe(takeUntilDestroyed(this.destroyRef))

@@ -1,7 +1,6 @@
 import { HttpClient } from '@angular/common/http';
 import { inject, Injectable } from '@angular/core';
-import { Observable, of } from 'rxjs';
-import { catchError } from 'rxjs/operators';
+import { Observable } from 'rxjs';
 
 import { environment } from '@config/environment';
 import { type ProfesorCursoListaDto, type AsignarProfesorCursoRequest } from '@data/models';
@@ -13,16 +12,12 @@ export class ProfesorCursoApiService {
 
 	/** Profesores asignados a un curso en un año. */
 	listarPorCurso(cursoId: number, anio: number): Observable<ProfesorCursoListaDto[]> {
-		return this.http
-			.get<ProfesorCursoListaDto[]>(`${this.apiUrl}/curso/${cursoId}`, { params: { anio } })
-			.pipe(catchError(() => of([])));
+		return this.http.get<ProfesorCursoListaDto[]>(`${this.apiUrl}/curso/${cursoId}`, { params: { anio } });
 	}
 
 	/** Cursos asignados a un profesor en un año. */
 	listarPorProfesor(profesorId: number, anio: number): Observable<ProfesorCursoListaDto[]> {
-		return this.http
-			.get<ProfesorCursoListaDto[]>(`${this.apiUrl}/profesor/${profesorId}`, { params: { anio } })
-			.pipe(catchError(() => of([])));
+		return this.http.get<ProfesorCursoListaDto[]>(`${this.apiUrl}/profesor/${profesorId}`, { params: { anio } });
 	}
 
 	/** Asignar cursos a un profesor (batch, idempotente). */

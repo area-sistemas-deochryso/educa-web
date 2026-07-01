@@ -25,7 +25,6 @@ import { ApiResponse } from '@shared/models';
 import { Injectable, inject } from '@angular/core';
 import { Observable, catchError, map, of } from 'rxjs';
 import { logger } from '@core/helpers';
-
 import { HttpClient } from '@angular/common/http';
 // eslint-disable-next-line layer-enforcement/imports-error -- DEBT: xrepo-50-F3a
 import { PaginatedResponse } from '@shared/models';
@@ -48,9 +47,7 @@ export class PermissionsService {
 	 * List all vistas.
 	 */
 	getVistas(): Observable<Vista[]> {
-		return this.http
-			.get<Vista[]>(`${this.apiUrl}/vistas/listar`)
-			.pipe(catchError(() => of([])));
+		return this.http.get<Vista[]>(`${this.apiUrl}/vistas/listar`);
 	}
 
 	/**
@@ -81,8 +78,8 @@ export class PermissionsService {
 	/**
 	 * Get a vista by id.
 	 */
-	getVista(id: number): Observable<Vista | null> {
-		return this.http.get<Vista>(`${this.apiUrl}/vistas/${id}`).pipe(catchError(() => of(null)));
+	getVista(id: number): Observable<Vista> {
+		return this.http.get<Vista>(`${this.apiUrl}/vistas/${id}`);
 	}
 
 	/**
@@ -113,9 +110,7 @@ export class PermissionsService {
 	 * List all role permissions.
 	 */
 	getPermisosRol(): Observable<PermisoRol[]> {
-		return this.http
-			.get<PermisoRol[]>(`${this.apiUrl}/rol/listar`)
-			.pipe(catchError(() => of([])));
+		return this.http.get<PermisoRol[]>(`${this.apiUrl}/rol/listar`);
 	}
 
 	/**
@@ -135,19 +130,15 @@ export class PermissionsService {
 	/**
 	 * Get a role permission record by id.
 	 */
-	getPermisoRol(id: number): Observable<PermisoRol | null> {
-		return this.http
-			.get<PermisoRol>(`${this.apiUrl}/rol/${id}`)
-			.pipe(catchError(() => of(null)));
+	getPermisoRol(id: number): Observable<PermisoRol> {
+		return this.http.get<PermisoRol>(`${this.apiUrl}/rol/${id}`);
 	}
 
 	/**
 	 * Get role permissions by role name.
 	 */
-	getPermisoRolPorTabla(rol: string): Observable<PermisoRol | null> {
-		return this.http
-			.get<PermisoRol>(`${this.apiUrl}/rol/por-rol/${encodeURIComponent(rol)}`)
-			.pipe(catchError(() => of(null)));
+	getPermisoRolPorTabla(rol: string): Observable<PermisoRol> {
+		return this.http.get<PermisoRol>(`${this.apiUrl}/rol/por-rol/${encodeURIComponent(rol)}`);
 	}
 
 	/**
@@ -181,27 +172,21 @@ export class PermissionsService {
 	 * List all user permissions.
 	 */
 	getPermisosUsuario(): Observable<PermisoUsuario[]> {
-		return this.http
-			.get<PermisoUsuario[]>(`${this.apiUrl}/usuario/listar`)
-			.pipe(catchError(() => of([])));
+		return this.http.get<PermisoUsuario[]>(`${this.apiUrl}/usuario/listar`);
 	}
 
 	/**
 	 * Get a user permission record by id.
 	 */
-	getPermisoUsuario(id: number): Observable<PermisoUsuario | null> {
-		return this.http
-			.get<PermisoUsuario>(`${this.apiUrl}/usuario/${id}`)
-			.pipe(catchError(() => of(null)));
+	getPermisoUsuario(id: number): Observable<PermisoUsuario> {
+		return this.http.get<PermisoUsuario>(`${this.apiUrl}/usuario/${id}`);
 	}
 
 	/**
 	 * Get user permissions by role name.
 	 */
 	getPermisosUsuarioPorRol(rol: string): Observable<PermisoUsuario[]> {
-		return this.http
-			.get<PermisoUsuario[]>(`${this.apiUrl}/usuario/por-rol/${encodeURIComponent(rol)}`)
-			.pipe(catchError(() => of([])));
+		return this.http.get<PermisoUsuario[]>(`${this.apiUrl}/usuario/por-rol/${encodeURIComponent(rol)}`);
 	}
 
 	/**
@@ -255,26 +240,22 @@ export class PermissionsService {
 	consultarPermisosDeUsuario(
 		usuarioId: number,
 		rol: string,
-	): Observable<PermisosUsuarioResultado | null> {
-		return this.http
-			.get<PermisosUsuarioResultado>(
-				`${this.apiUrl}/usuario/consultar/${usuarioId}/${encodeURIComponent(rol)}`,
-			)
-			.pipe(catchError(() => of(null)));
+	): Observable<PermisosUsuarioResultado> {
+		return this.http.get<PermisosUsuarioResultado>(
+			`${this.apiUrl}/usuario/consultar/${usuarioId}/${encodeURIComponent(rol)}`,
+		);
 	}
 
 	/**
 	 * @deprecated Use getMyCapabilities() instead. This endpoint no longer exists in BE.
 	 */
 	getMisPermisos(): Observable<PermisosUsuarioResultado | null> {
-		return this.http
-			.get<PermisosUsuarioResultado>(`${this.apiUrl}/mis-permisos`)
-			.pipe(
-				catchError((err) => {
-					logger.warn('[PermissionsService] Error al cargar mis permisos — usando fallback vacío', err?.status);
-					return of(null);
-				}),
-			);
+		return this.http.get<PermisosUsuarioResultado>(`${this.apiUrl}/mis-permisos`).pipe(
+			catchError((err) => {
+				logger.warn('[PermissionsService] getMisPermisos failed — fallback null', err?.status);
+				return of(null);
+			}),
+		);
 	}
 
 	// #endregion
@@ -288,9 +269,7 @@ export class PermissionsService {
 		if (termino) params['termino'] = termino;
 		if (rol) params['rol'] = rol;
 
-		return this.http
-			.get<UsuarioBusquedaResultado>(`${this.apiUrl}/usuario/buscar-usuarios`, { params })
-			.pipe(catchError(() => of({ usuarios: [], total: 0 })));
+		return this.http.get<UsuarioBusquedaResultado>(`${this.apiUrl}/usuario/buscar-usuarios`, { params });
 	}
 
 	/**
@@ -298,11 +277,9 @@ export class PermissionsService {
 	 * @deprecated Legacy — use searchUsers.
 	 */
 	listarUsuariosPorRol(rol: string): Observable<UsuarioBusquedaResultado> {
-		return this.http
-			.get<UsuarioBusquedaResultado>(
-				`${this.apiUrl}/usuario/usuarios-por-rol/${encodeURIComponent(rol)}`,
-			)
-			.pipe(catchError(() => of({ usuarios: [], total: 0 })));
+		return this.http.get<UsuarioBusquedaResultado>(
+			`${this.apiUrl}/usuario/usuarios-por-rol/${encodeURIComponent(rol)}`,
+		);
 	}
 	// #endregion
 
@@ -313,9 +290,7 @@ export class PermissionsService {
 	// -- Catalog --
 
 	getCapabilityCatalog(): Observable<CapabilityCatalogItem[]> {
-		return this.http
-			.get<CapabilityCatalogItem[]>(`${this.capAdminUrl}/roles/catalog`)
-			.pipe(catchError(() => of([])));
+		return this.http.get<CapabilityCatalogItem[]>(`${this.capAdminUrl}/roles/catalog`);
 	}
 
 	createCapability(request: CreateCapabilityRequest): Observable<CapabilityCatalogItem> {
@@ -333,9 +308,7 @@ export class PermissionsService {
 	// -- Role capabilities --
 
 	getRolCapabilityMatrix(): Observable<RolCapabilityMatrixRow[]> {
-		return this.http
-			.get<RolCapabilityMatrixRow[]>(`${this.capAdminUrl}/roles/matrix`)
-			.pipe(catchError(() => of([])));
+		return this.http.get<RolCapabilityMatrixRow[]>(`${this.capAdminUrl}/roles/matrix`);
 	}
 
 	setRolCapabilities(rolId: number, request: SetRolCapabilitiesRequest): Observable<string> {
@@ -344,10 +317,8 @@ export class PermissionsService {
 
 	// -- User capabilities --
 
-	getUsuarioCapabilityOverview(entityId: number, rolId: number): Observable<UsuarioCapabilityOverview | null> {
-		return this.http
-			.get<UsuarioCapabilityOverview>(`${this.capAdminUrl}/users/${entityId}/rol/${rolId}`)
-			.pipe(catchError(() => of(null)));
+	getUsuarioCapabilityOverview(entityId: number, rolId: number): Observable<UsuarioCapabilityOverview> {
+		return this.http.get<UsuarioCapabilityOverview>(`${this.capAdminUrl}/users/${entityId}/rol/${rolId}`);
 	}
 
 	setUsuarioCapabilities(
@@ -359,9 +330,7 @@ export class PermissionsService {
 	}
 
 	getUsuarioEffectiveCapabilities(entityId: number, rolId: number): Observable<string[]> {
-		return this.http
-			.get<string[]>(`${this.capAdminUrl}/users/${entityId}/rol/${rolId}/effective`)
-			.pipe(catchError(() => of([])));
+		return this.http.get<string[]>(`${this.capAdminUrl}/users/${entityId}/rol/${rolId}/effective`);
 	}
 
 	searchUsers(termino?: string, rol?: string): Observable<UsuarioBusquedaResultado> {
@@ -369,9 +338,7 @@ export class PermissionsService {
 		if (termino) params['termino'] = termino;
 		if (rol) params['rol'] = rol;
 
-		return this.http
-			.get<UsuarioBusquedaResultado>(`${this.capAdminUrl}/users/search`, { params })
-			.pipe(catchError(() => of({ usuarios: [], total: 0 })));
+		return this.http.get<UsuarioBusquedaResultado>(`${this.capAdminUrl}/users/search`, { params });
 	}
 
 	// #endregion

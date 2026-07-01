@@ -4,36 +4,34 @@ import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { of, throwError } from 'rxjs';
 import { testProviders } from '@test';
 import { AttendanceSummaryWidgetComponent } from './attendance-summary-widget.component';
-import {
-	AttendanceService,
-	AsistenciaProfesorApiService,
-} from '@intranet-shared/services';
-import {
-	EstadisticasDia,
-	AsistenciaDiaProfesoresConEstadisticas,
-} from '@data/models';
+import { DirectorAttendanceApiService } from '@intranet-shared/services';
+import { EstadisticasMultiRolDia, EstadisticasRol } from '@data/models';
 
 // #endregion
 // #region Fixtures
-const estudiantesStats: EstadisticasDia = {
-	fecha: '2026-04-20',
-	totalEstudiantes: 100,
+const estudiantesRol: EstadisticasRol = {
+	tipoPersona: 'E',
+	total: 100,
 	conEntrada: 90,
-	asistenciasCompletas: 80,
+	completas: 80,
+	tardanza: 5,
 	faltas: 10,
-	porcentajeAsistencia: 90,
+	porcentaje: 90,
 };
 
-const profesoresResponse: AsistenciaDiaProfesoresConEstadisticas = {
-	profesores: [],
-	estadisticas: {
-		total: 20,
-		asistio: 15,
-		tardanza: 3,
-		falta: 2,
-		justificado: 0,
-		pendiente: 0,
-	},
+const profesoresRol: EstadisticasRol = {
+	tipoPersona: 'P',
+	total: 20,
+	conEntrada: 18,
+	completas: 15,
+	tardanza: 3,
+	faltas: 2,
+	porcentaje: 90,
+};
+
+const multiRolResponse: EstadisticasMultiRolDia = {
+	fecha: '2026-04-20',
+	roles: [estudiantesRol, profesoresRol],
 };
 
 // #endregion
@@ -41,16 +39,14 @@ const profesoresResponse: AsistenciaDiaProfesoresConEstadisticas = {
 describe('AttendanceSummaryWidgetComponent', () => {
 	let component: AttendanceSummaryWidgetComponent;
 	let fixture: ComponentFixture<AttendanceSummaryWidgetComponent>;
-	let attendanceMock: { getEstadisticasDirector: ReturnType<typeof vi.fn> };
-	let profesorApiMock: { obtenerAsistenciaDiaProfesoresDirector: ReturnType<typeof vi.fn> };
+	let directorApiMock: { getEstadisticasMultiRol: ReturnType<typeof vi.fn> };
 
 	const bootstrap = async () => {
 		await TestBed.configureTestingModule({
 			imports: [AttendanceSummaryWidgetComponent],
 			providers: [
 				...testProviders,
-				{ provide: AttendanceService, useValue: attendanceMock },
-				{ provide: AsistenciaProfesorApiService, useValue: profesorApiMock },
+				{ provide: DirectorAttendanceApiService, useValue: directorApiMock },
 			],
 		}).compileComponents();
 
@@ -61,91 +57,72 @@ describe('AttendanceSummaryWidgetComponent', () => {
 	};
 
 	beforeEach(() => {
-		attendanceMock = { getEstadisticasDirector: vi.fn() };
-		profesorApiMock = { obtenerAsistenciaDiaProfesoresDirector: vi.fn() };
+		directorApiMock = { getEstadisticasMultiRol: vi.fn() };
 	});
 
-	it('should populate both sections when both calls succeed', async () => {
-		attendanceMock.getEstadisticasDirector.mockReturnValue(of(estudiantesStats));
-		profesorApiMock.obtenerAsistenciaDiaProfesoresDirector.mockReturnValue(
-			of(profesoresResponse),
-		);
+	it('should populate roles when API succeeds', async () => {
+		directorApiMock.getEstadisticasMultiRol.mockReturnValue(of(multiRolResponse));
 
 		await bootstrap();
 
 		expect(component.loading()).toBe(false);
-		expect(component.estStats()).toEqual(estudiantesStats);
-		expect(component.profStats()).toEqual(profesoresResponse.estadisticas);
-		expect(component.profPresentes()).toBe(18);
-		expect(component.profPorcentaje()).toBe(90);
+		expect(component.roles().length).toBe(2);
+		expect(component.roles()[0].tipoPersona).toBe('E');
+		expect(component.roles()[0].label).toBe('Estudiantes');
+		expect(component.roles()[1].tipoPersona).toBe('P');
+		expect(component.roles()[1].label).toBe('Profesores');
 	});
 
-	it('should show estudiantes empty when that call fails but profesores succeeds', async () => {
-		attendanceMock.getEstadisticasDirector.mockReturnValue(
-			throwError(() => new Error('fail')),
-		);
-		profesorApiMock.obtenerAsistenciaDiaProfesoresDirector.mockReturnValue(
-			of(profesoresResponse),
-		);
-
-		await bootstrap();
-
-		expect(component.loading()).toBe(false);
-		expect(component.estStats()).toBeNull();
-		expect(component.profStats()).toEqual(profesoresResponse.estadisticas);
-	});
-
-	it('should show profesores empty when that call fails but estudiantes succeeds', async () => {
-		attendanceMock.getEstadisticasDirector.mockReturnValue(of(estudiantesStats));
-		profesorApiMock.obtenerAsistenciaDiaProfesoresDirector.mockReturnValue(
+	it('should set loading false and empty roles when API fails', async () => {
+		directorApiMock.getEstadisticasMultiRol.mockReturnValue(
 			throwError(() => new Error('fail')),
 		);
 
 		await bootstrap();
 
 		expect(component.loading()).toBe(false);
-		expect(component.estStats()).toEqual(estudiantesStats);
-		expect(component.profStats()).toBeNull();
+		expect(component.roles()).toEqual([]);
 	});
 
-	// #region Plan 27 · INV-C11 — widget respeta filtro del BE
-
-	it('INV-C11: consume getEstadisticasDirector (endpoint ya filtrado por GRA_Orden >= 8 en Chat 2)', async () => {
-		attendanceMock.getEstadisticasDirector.mockReturnValue(of(estudiantesStats));
-		profesorApiMock.obtenerAsistenciaDiaProfesoresDirector.mockReturnValue(
-			of(profesoresResponse),
-		);
+	it('should set loading false and empty roles when API returns null', async () => {
+		directorApiMock.getEstadisticasMultiRol.mockReturnValue(of(null));
 
 		await bootstrap();
 
-		// El widget NO debe llamar a otro endpoint que pudiera traer grados bajos —
-		// el contrato es "totalEstudiantes y conEntrada ya vienen filtrados por el BE".
-		expect(attendanceMock.getEstadisticasDirector).toHaveBeenCalledTimes(1);
+		expect(component.loading()).toBe(false);
+		expect(component.roles()).toEqual([]);
 	});
 
-	it('INV-C11: numerador y denominador del widget provienen del mismo stats filtrado', async () => {
-		// Si ambos vienen del mismo objeto EstadisticasDia, el ratio es consistente —
-		// no se puede mezclar "estudiantes con entrada (filtrado)" con "total sin filtro".
-		const statsFiltrado: EstadisticasDia = {
-			fecha: '2026-04-20',
-			totalEstudiantes: 50, // solo GRA_Orden >= 8
+	// #region INV-C11 — widget respects BE filter
+
+	it('INV-C11: calls getEstadisticasMultiRol exactly once', async () => {
+		directorApiMock.getEstadisticasMultiRol.mockReturnValue(of(multiRolResponse));
+
+		await bootstrap();
+
+		expect(directorApiMock.getEstadisticasMultiRol).toHaveBeenCalledTimes(1);
+	});
+
+	it('INV-C11: stats come from the same multi-rol response (consistent ratio)', async () => {
+		const filteredRol: EstadisticasRol = {
+			tipoPersona: 'E',
+			total: 50,
 			conEntrada: 40,
-			asistenciasCompletas: 35,
+			completas: 35,
+			tardanza: 3,
 			faltas: 10,
-			porcentajeAsistencia: 80,
+			porcentaje: 80,
 		};
-		attendanceMock.getEstadisticasDirector.mockReturnValue(of(statsFiltrado));
-		profesorApiMock.obtenerAsistenciaDiaProfesoresDirector.mockReturnValue(
-			of(profesoresResponse),
+		directorApiMock.getEstadisticasMultiRol.mockReturnValue(
+			of({ fecha: '2026-04-20', roles: [filteredRol, profesoresRol] }),
 		);
 
 		await bootstrap();
 
-		const stats = component.estStats();
-		expect(stats?.totalEstudiantes).toBe(50);
-		expect(stats?.conEntrada).toBe(40);
-		// El porcentaje refleja el universo filtrado, no el total del colegio.
-		expect(stats?.porcentajeAsistencia).toBe(80);
+		const estRole = component.roles().find((r) => r.tipoPersona === 'E');
+		expect(estRole?.stats.total).toBe(50);
+		expect(estRole?.stats.conEntrada).toBe(40);
+		expect(estRole?.stats.porcentaje).toBe(80);
 	});
 
 	// #endregion

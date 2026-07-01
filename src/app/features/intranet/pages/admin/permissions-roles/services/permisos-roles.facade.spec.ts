@@ -6,30 +6,34 @@ import { of } from 'rxjs';
 
 import { PermissionsRolesFacade } from './permisos-roles.facade';
 import { PermissionsRolesStore } from './permisos-roles.store';
-import { PermissionsService, PermisoRol } from '@core/services';
-import { ErrorHandlerService, WalFacadeHelper } from '@core/services';
-import { UiMappingService } from '@intranet-shared/services';
+import {
+	PermissionsService,
+	RolCapabilityMatrixRow,
+	CapabilityCatalogItem,
+	ErrorHandlerService,
+	WalFacadeHelper,
+	SwService,
+	WalCrossTabRefetchService,
+} from '@core/services';
 
 // #endregion
 
 // #region Mocks
-const mockVistas = [
-	{ id: 1, ruta: 'intranet/admin/usuarios', nombre: 'Usuarios', estado: 1 },
-	{ id: 2, ruta: 'intranet/admin/cursos', nombre: 'Cursos', estado: 1 },
-	{ id: 3, ruta: 'intranet/admin/salones', nombre: 'Salones', estado: 0 },
+const mockCatalog: CapabilityCatalogItem[] = [
+	{ id: 1, codigo: 'USR_VIEW', nombre: 'Ver usuarios', modulo: 'admin', orden: 1 } as CapabilityCatalogItem,
+	{ id: 2, codigo: 'USR_EDIT', nombre: 'Editar usuarios', modulo: 'admin', orden: 2 } as CapabilityCatalogItem,
+	{ id: 3, codigo: 'HOR_VIEW', nombre: 'Ver horarios', modulo: 'profesor', orden: 1 } as CapabilityCatalogItem,
 ];
 
-const mockPermisos: PermisoRol[] = [
-	{ id: 1, rol: 'Director', vistas: ['intranet/admin/usuarios', 'intranet/admin/cursos'] },
+const mockMatrixRows: RolCapabilityMatrixRow[] = [
+	{ rolId: 1, rolNombre: 'Director', capabilityIds: [1, 2] },
 ];
 
 function createMockApi() {
 	return {
-		getVistas: vi.fn().mockReturnValue(of(mockVistas)),
-		getPermisosRolPaginated: vi.fn().mockReturnValue(of({ data: mockPermisos, page: 1, pageSize: 10, total: 1 })),
-		crearPermisoRol: vi.fn().mockReturnValue(of({ mensaje: 'ok' })),
-		actualizarPermisoRol: vi.fn().mockReturnValue(of({ mensaje: 'ok' })),
-		eliminarPermisoRol: vi.fn().mockReturnValue(of({ mensaje: 'ok' })),
+		getCapabilityCatalog: vi.fn().mockReturnValue(of(mockCatalog)),
+		getRolCapabilityMatrix: vi.fn().mockReturnValue(of(mockMatrixRows)),
+		setRolCapabilities: vi.fn().mockReturnValue(of('ok')),
 	};
 }
 
@@ -57,10 +61,11 @@ describe('PermissionsRolesFacade', () => {
 			providers: [
 				PermissionsRolesFacade,
 				PermissionsRolesStore,
-				UiMappingService,
 				{ provide: PermissionsService, useValue: api },
 				{ provide: ErrorHandlerService, useValue: { showError: vi.fn(), showSuccess: vi.fn() } },
 				{ provide: WalFacadeHelper, useValue: wal },
+				{ provide: SwService, useValue: { invalidateCacheByPattern: vi.fn().mockResolvedValue(undefined) } },
+				{ provide: WalCrossTabRefetchService, useValue: { subscribe: vi.fn() } },
 			],
 		});
 
@@ -70,13 +75,11 @@ describe('PermissionsRolesFacade', () => {
 
 	// #region loadAll
 	describe('loadAll', () => {
-		it('should load vistas (active only) and permisos into store', () => {
+		it('should load catalog and matrix into store', () => {
 			facade.loadAll();
 
-			// Only estado=1 vistas should be stored
-			expect(store.vistas()).toHaveLength(2);
-			expect(store.vistas().every((v) => v.estado === 1)).toBe(true);
-			expect(store.permisosRol()).toEqual(mockPermisos);
+			expect(store.catalog()).toEqual(mockCatalog);
+			expect(store.matrixRows()).toEqual(mockMatrixRows);
 			expect(store.loading()).toBe(false);
 		});
 	});
@@ -84,31 +87,19 @@ describe('PermissionsRolesFacade', () => {
 
 	// #region UI commands — dialog
 	describe('dialog commands', () => {
-		beforeEach(() => {
-			store.setVistas(mockVistas.filter((v) => v.estado === 1) as never[]);
-		});
-
-		it('should open new dialog with empty selections', () => {
-			facade.openNewDialog();
-
-			expect(store.dialogVisible()).toBe(true);
-			expect(store.isEditing()).toBe(false);
-			expect(store.selectedVistas()).toEqual([]);
-			expect(store.selectedRol()).toBeNull();
-			expect(store.modulosVistas().length).toBeGreaterThan(0);
-		});
-
-		it('should open edit dialog with permiso data', () => {
-			facade.openEditDialog(mockPermisos[0]);
+		it('should open edit dialog with row data', () => {
+			store.setCatalog(mockCatalog);
+			facade.openEditDialog(mockMatrixRows[0]);
 
 			expect(store.dialogVisible()).toBe(true);
 			expect(store.isEditing()).toBe(true);
-			expect(store.selectedRol()).toBe('Director');
-			expect(store.selectedVistas()).toEqual(mockPermisos[0].vistas);
+			expect(store.selectedRow()).toEqual(mockMatrixRows[0]);
+			expect(store.selectedCapIds()).toEqual([1, 2]);
 		});
 
 		it('should close dialog', () => {
-			facade.openNewDialog();
+			store.setCatalog(mockCatalog);
+			facade.openEditDialog(mockMatrixRows[0]);
 			facade.closeDialog();
 			expect(store.dialogVisible()).toBe(false);
 		});
@@ -118,20 +109,20 @@ describe('PermissionsRolesFacade', () => {
 	// #region Detail drawer
 	describe('detail drawer', () => {
 		it('should open detail', () => {
-			facade.openDetail(mockPermisos[0]);
+			facade.openDetail(mockMatrixRows[0]);
 			expect(store.detailDrawerVisible()).toBe(true);
-			expect(store.selectedPermiso()).toEqual(mockPermisos[0]);
+			expect(store.selectedRow()).toEqual(mockMatrixRows[0]);
 		});
 
 		it('should close detail', () => {
-			facade.openDetail(mockPermisos[0]);
+			facade.openDetail(mockMatrixRows[0]);
 			facade.closeDetail();
 			expect(store.detailDrawerVisible()).toBe(false);
 		});
 
 		it('should edit from detail', () => {
-			store.setVistas(mockVistas.filter((v) => v.estado === 1) as never[]);
-			facade.openDetail(mockPermisos[0]);
+			store.setCatalog(mockCatalog);
+			facade.openDetail(mockMatrixRows[0]);
 			facade.editFromDetail();
 
 			expect(store.detailDrawerVisible()).toBe(false);
@@ -141,79 +132,64 @@ describe('PermissionsRolesFacade', () => {
 	});
 	// #endregion
 
-	// #region WAL operations — optimistic apply
+	// #region WAL operations — save capabilities
 	describe('WAL operations', () => {
-		beforeEach(() => {
-			store.setPermisosRol(mockPermisos);
-			store.setPaginationData(1, 10, 1);
-		});
+		it('should call WAL execute on save with UPDATE operation', () => {
+			store.setCatalog(mockCatalog);
+			facade.openEditDialog(mockMatrixRows[0]);
 
-		it('should close dialog on save create (optimistic)', () => {
-			store.setVistas(mockVistas.filter((v) => v.estado === 1) as never[]);
-			facade.openNewDialog();
-			store.setSelectedRol('Profesor');
-			store.setSelectedVistas(['intranet/admin/usuarios']);
-
-			facade.savePermiso();
-
-			expect(wal.execute).toHaveBeenCalledWith(
-				expect.objectContaining({ operation: 'CREATE' }),
-			);
-			expect(store.dialogVisible()).toBe(false);
-		});
-
-		it('should close dialog on save update (optimistic)', () => {
-			store.setVistas(mockVistas.filter((v) => v.estado === 1) as never[]);
-			facade.openEditDialog(mockPermisos[0]);
-
-			facade.savePermiso();
+			facade.saveCapabilities();
 
 			expect(wal.execute).toHaveBeenCalledWith(
 				expect.objectContaining({ operation: 'UPDATE' }),
 			);
+		});
+
+		it('should close dialog on save (optimistic)', () => {
+			store.setCatalog(mockCatalog);
+			facade.openEditDialog(mockMatrixRows[0]);
+
+			facade.saveCapabilities();
+
 			expect(store.dialogVisible()).toBe(false);
 		});
 
-		it('should remove permiso on delete (optimistic)', () => {
-			facade.delete(mockPermisos[0]);
+		it('should update row capabilities optimistically', () => {
+			store.setMatrixRows(mockMatrixRows);
+			store.setCatalog(mockCatalog);
+			facade.openEditDialog(mockMatrixRows[0]);
+			store.setSelectedCapIds([1, 2, 3]);
 
-			expect(store.permisosRol()).toHaveLength(0);
-			expect(store.totalRecords()).toBe(0);
+			facade.saveCapabilities();
+
+			const updated = store.matrixRows().find((r) => r.rolId === 1);
+			expect(updated?.capabilityIds).toEqual([1, 2, 3]);
 		});
 	});
 	// #endregion
 
 	// #region Form delegation
 	describe('form delegation', () => {
-		it('should delegate toggleVista', () => {
-			facade.toggleVista('intranet/admin/usuarios');
-			expect(store.selectedVistas()).toContain('intranet/admin/usuarios');
+		it('should delegate toggleCapability', () => {
+			const modulos = [{
+				nombre: 'Admin',
+				capabilities: [mockCatalog[0]],
+				seleccionadas: 0,
+				total: 1,
+			}];
+			store.setModulosCapabilities(modulos);
+			facade.toggleCapability(1);
+			expect(store.selectedCapIds()).toContain(1);
 		});
 
-		it('should delegate setSelectedRol', () => {
-			facade.setSelectedRol('Profesor');
-			expect(store.selectedRol()).toBe('Profesor');
-		});
-
-		it('should delegate setVistasBusqueda', () => {
-			facade.setVistasBusqueda('user');
-			expect(store.vistasBusqueda()).toBe('user');
+		it('should delegate setCapBusqueda', () => {
+			facade.setCapBusqueda('user');
+			expect(store.capBusqueda()).toBe('user');
 		});
 
 		it('should delegate setActiveModuloIndex', () => {
 			facade.setActiveModuloIndex(2);
 			expect(store.activeModuloIndex()).toBe(2);
-		});
-	});
-	// #endregion
-
-	// #region Confirm dialog
-	describe('confirm dialog', () => {
-		it('should manage confirm dialog', () => {
-			facade.openConfirmDialog();
-			expect(store.confirmDialogVisible()).toBe(true);
-			facade.closeConfirmDialog();
-			expect(store.confirmDialogVisible()).toBe(false);
 		});
 	});
 	// #endregion

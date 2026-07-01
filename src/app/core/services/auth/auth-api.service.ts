@@ -3,6 +3,7 @@ import { Injectable, inject } from '@angular/core';
 import { EMPTY, Observable, catchError, of } from 'rxjs';
 
 import { environment } from '@env/environment';
+import { logger } from '@core/helpers';
 import { CambiarContrasenaRequest, LoginRequest, LoginResponse, StoredSession, UserProfile, VerifyTokenResponse } from './auth.models';
 
 /**
@@ -50,9 +51,12 @@ export class AuthApiService {
 	 * Auth cookie is sent automatically by the browser.
 	 */
 	getProfile(): Observable<UserProfile | null> {
-		return this.http
-			.get<UserProfile>(`${this.apiUrl}/perfil`, { headers: this.silentHeaders })
-			.pipe(catchError(() => of(null)));
+		return this.http.get<UserProfile>(`${this.apiUrl}/perfil`, { headers: this.silentHeaders }).pipe(
+			catchError((err) => {
+				logger.warn('[AuthApi] getProfile failed — fallback null', err?.status);
+				return of(null);
+			}),
+		);
 	}
 
 	/**
@@ -71,7 +75,12 @@ export class AuthApiService {
 			.post<VerifyTokenResponse>(`${this.apiUrl}/verificar`, JSON.stringify(token), {
 				headers: { 'Content-Type': 'application/json' },
 			})
-			.pipe(catchError(() => of(null)));
+			.pipe(
+				catchError((err) => {
+					logger.warn('[AuthApi] verifyToken failed — fallback null', err?.status);
+					return of(null);
+				}),
+			);
 	}
 
 	// #endregion
@@ -83,9 +92,12 @@ export class AuthApiService {
 	 * Llamar fire-and-forget tras login exitoso. Nunca falla hacia el caller.
 	 */
 	warmup(): Observable<void> {
-		return this.http
-			.get<void>(`${this.sistemaUrl}/warmup`, { headers: this.silentHeaders })
-			.pipe(catchError(() => EMPTY));
+		return this.http.get<void>(`${this.sistemaUrl}/warmup`, { headers: this.silentHeaders }).pipe(
+			catchError((err) => {
+				logger.warn('[AuthApi] warmup failed — best-effort', err?.status);
+				return EMPTY;
+			}),
+		);
 	}
 
 	// #endregion
@@ -96,9 +108,12 @@ export class AuthApiService {
 	 * Get all stored sessions for the current device.
 	 */
 	getSessions(): Observable<StoredSession[]> {
-		return this.http
-			.get<StoredSession[]>(`${this.apiUrl}/sessions`, { headers: this.silentHeaders })
-			.pipe(catchError(() => of([])));
+		return this.http.get<StoredSession[]>(`${this.apiUrl}/sessions`, { headers: this.silentHeaders }).pipe(
+			catchError((err) => {
+				logger.warn('[AuthApi] getSessions failed — fallback empty', err?.status);
+				return of([]);
+			}),
+		);
 	}
 
 	/**

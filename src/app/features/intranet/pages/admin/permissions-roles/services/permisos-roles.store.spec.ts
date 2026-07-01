@@ -1,37 +1,25 @@
-// * Tests for PermissionsRolesStore — validates role permissions state management.
+// * Tests for PermissionsRolesStore — validates role-capability state management.
 // #region Imports
 import { TestBed } from '@angular/core/testing';
 import { beforeEach, describe, expect, it } from 'vitest';
 
-import { PermissionsRolesStore } from './permisos-roles.store';
-import { PermisoRol, Vista } from '@core/services';
-import { UiMappingService } from '@intranet-shared/services';
+import { PermissionsRolesStore, type ModuloCapabilities } from './permisos-roles.store';
+import { CapabilityCatalogItem, RolCapabilityMatrixRow } from '@core/services';
 
 // #endregion
 
 // #region Test fixtures
-const mockVistas: Vista[] = [
-	{ id: 1, ruta: 'intranet/admin/usuarios', nombre: 'Usuarios', estado: 1 },
-	{ id: 2, ruta: 'intranet/admin/cursos', nombre: 'Cursos', estado: 1 },
-	{ id: 3, ruta: 'intranet/profesor/horarios', nombre: 'Horarios', estado: 1 },
-	{ id: 4, ruta: 'intranet/profesor/asistencia', nombre: 'Asistencia', estado: 1 },
+const mockCatalog: CapabilityCatalogItem[] = [
+	{ id: 1, codigo: 'USR_VIEW', nombre: 'Ver usuarios', modulo: 'admin', descripcion: 'Ver lista de usuarios', orden: 1 } as CapabilityCatalogItem,
+	{ id: 2, codigo: 'USR_EDIT', nombre: 'Editar usuarios', modulo: 'admin', descripcion: 'Editar datos de usuario', orden: 2 } as CapabilityCatalogItem,
+	{ id: 3, codigo: 'HOR_VIEW', nombre: 'Ver horarios', modulo: 'profesor', descripcion: 'Ver horarios', orden: 1 } as CapabilityCatalogItem,
+	{ id: 4, codigo: 'ASI_VIEW', nombre: 'Ver asistencia', modulo: 'profesor', descripcion: 'Ver asistencia', orden: 2 } as CapabilityCatalogItem,
 ];
 
-const mockPermisos: PermisoRol[] = [
-	{ id: 1, rol: 'Director', vistas: ['intranet/admin/usuarios', 'intranet/admin/cursos'] },
-	{ id: 2, rol: 'Profesor', vistas: ['intranet/profesor/horarios', 'intranet/profesor/asistencia'] },
+const mockMatrixRows: RolCapabilityMatrixRow[] = [
+	{ rolId: 1, rolNombre: 'Director', capabilityIds: [1, 2] },
+	{ rolId: 2, rolNombre: 'Profesor', capabilityIds: [3, 4] },
 ];
-
-class MockUiMappingService {
-	getModuloFromRuta(ruta: string): string {
-		const parts = ruta.split('/');
-		return parts.length >= 2 ? parts[1] : ruta;
-	}
-
-	getVistasCountLabel(count: number): string {
-		return `${count} vista${count !== 1 ? 's' : ''}`;
-	}
-}
 // #endregion
 
 // #region Tests
@@ -40,19 +28,16 @@ describe('PermissionsRolesStore', () => {
 
 	beforeEach(() => {
 		TestBed.configureTestingModule({
-			providers: [
-				PermissionsRolesStore,
-				{ provide: UiMappingService, useClass: MockUiMappingService },
-			],
+			providers: [PermissionsRolesStore],
 		});
 		store = TestBed.inject(PermissionsRolesStore);
 	});
 
 	// #region Initial state
 	describe('initial state', () => {
-		it('should have empty permisos and vistas', () => {
-			expect(store.permisosRol()).toEqual([]);
-			expect(store.vistas()).toEqual([]);
+		it('should have empty matrix and catalog', () => {
+			expect(store.matrixRows()).toEqual([]);
+			expect(store.catalog()).toEqual([]);
 		});
 
 		it('should have default UI state', () => {
@@ -65,23 +50,22 @@ describe('PermissionsRolesStore', () => {
 		});
 
 		it('should have default selections', () => {
-			expect(store.selectedPermiso()).toBeNull();
-			expect(store.selectedRol()).toBeNull();
-			expect(store.selectedVistas()).toEqual([]);
+			expect(store.selectedRow()).toBeNull();
+			expect(store.selectedCapIds()).toEqual([]);
 		});
 	});
 	// #endregion
 
 	// #region Data commands
 	describe('data commands', () => {
-		it('should set permisos rol', () => {
-			store.setPermisosRol(mockPermisos);
-			expect(store.permisosRol()).toEqual(mockPermisos);
+		it('should set matrix rows', () => {
+			store.setMatrixRows(mockMatrixRows);
+			expect(store.matrixRows()).toEqual(mockMatrixRows);
 		});
 
-		it('should set vistas', () => {
-			store.setVistas(mockVistas);
-			expect(store.vistas()).toEqual(mockVistas);
+		it('should set catalog', () => {
+			store.setCatalog(mockCatalog);
+			expect(store.catalog()).toEqual(mockCatalog);
 		});
 
 		it('should set loading and error', () => {
@@ -94,74 +78,35 @@ describe('PermissionsRolesStore', () => {
 			store.clearError();
 			expect(store.error()).toBeNull();
 		});
-	});
-	// #endregion
 
-	// #region Mutaciones quirúrgicas
-	describe('surgical mutations', () => {
-		it('should remove permiso and decrement total', () => {
-			store.setPermisosRol(mockPermisos);
-			store.setPaginationData(1, 10, 2);
+		it('should update row capabilities by rolId', () => {
+			store.setMatrixRows(mockMatrixRows);
+			store.updateRowCapabilities(1, [1, 2, 3]);
 
-			store.removePermiso(1);
-
-			expect(store.permisosRol()).toHaveLength(1);
-			expect(store.permisosRol()[0].rol).toBe('Profesor');
-			expect(store.totalRecords()).toBe(1);
+			const updated = store.matrixRows().find((r) => r.rolId === 1);
+			expect(updated?.capabilityIds).toEqual([1, 2, 3]);
 		});
 
-		it('should add permiso and increment total', () => {
-			store.setPermisosRol([mockPermisos[1]]);
-			store.setPaginationData(1, 10, 1);
+		it('should not modify other rows on update', () => {
+			store.setMatrixRows(mockMatrixRows);
+			store.updateRowCapabilities(1, [1, 2, 3]);
 
-			store.addPermiso(mockPermisos[0]);
-
-			expect(store.permisosRol()).toHaveLength(2);
-			expect(store.permisosRol()[0].rol).toBe('Director');
-			expect(store.totalRecords()).toBe(2);
-		});
-
-		it('should not go below 0 on totalRecords', () => {
-			store.setPaginationData(1, 10, 0);
-			store.removePermiso(999);
-			expect(store.totalRecords()).toBe(0);
+			const other = store.matrixRows().find((r) => r.rolId === 2);
+			expect(other?.capabilityIds).toEqual([3, 4]);
 		});
 	});
 	// #endregion
 
 	// #region Computed — estadísticas
 	describe('estadísticas', () => {
-		it('should compute from vistas and totalRecords', () => {
-			store.setVistas(mockVistas);
-			store.setPaginationData(1, 10, 2);
+		it('should compute from catalog and matrix', () => {
+			store.setCatalog(mockCatalog);
+			store.setMatrixRows(mockMatrixRows);
 
 			const stats = store.estadisticas();
 			expect(stats.totalRoles).toBe(2);
-			expect(stats.totalVistas).toBe(4);
+			expect(stats.totalCapabilities).toBe(4);
 			expect(stats.totalModulos).toBe(2);
-		});
-	});
-	// #endregion
-
-	// #region Computed — rolesNoConfigurados
-	describe('rolesNoConfigurados', () => {
-		it('should return roles without permisos', () => {
-			store.setPermisosRol(mockPermisos);
-
-			const noConfigurados = store.rolesNoConfigurados();
-			expect(noConfigurados).not.toContain('Director');
-			expect(noConfigurados).not.toContain('Profesor');
-		});
-
-		it('should build select options from unconfigured roles', () => {
-			store.setPermisosRol(mockPermisos);
-
-			const options = store.rolesSelectOptions();
-			options.forEach((opt) => {
-				expect(opt).toHaveProperty('label');
-				expect(opt).toHaveProperty('value');
-				expect(opt.label).toBe(opt.value);
-			});
 		});
 	});
 	// #endregion
@@ -177,25 +122,25 @@ describe('PermissionsRolesStore', () => {
 		});
 
 		it('should reset search and index on close', () => {
-			store.setVistasBusqueda('test');
+			store.setCapBusqueda('test');
 			store.setActiveModuloIndex(2);
 			store.openDialog();
 
 			store.closeDialog();
 
-			expect(store.vistasBusqueda()).toBe('');
+			expect(store.capBusqueda()).toBe('');
 			expect(store.activeModuloIndex()).toBe(0);
 		});
 
-		it('should open detail drawer with permiso', () => {
-			store.openDetailDrawer(mockPermisos[0]);
+		it('should open detail drawer with row', () => {
+			store.openDetailDrawer(mockMatrixRows[0]);
 
 			expect(store.detailDrawerVisible()).toBe(true);
-			expect(store.selectedPermiso()).toEqual(mockPermisos[0]);
+			expect(store.selectedRow()).toEqual(mockMatrixRows[0]);
 		});
 
 		it('should close detail drawer', () => {
-			store.openDetailDrawer(mockPermisos[0]);
+			store.openDetailDrawer(mockMatrixRows[0]);
 			store.closeDetailDrawer();
 
 			expect(store.detailDrawerVisible()).toBe(false);
@@ -211,127 +156,117 @@ describe('PermissionsRolesStore', () => {
 	});
 	// #endregion
 
-	// #region Vista toggling
-	describe('toggleVista', () => {
-		it('should add vista when not selected', () => {
-			store.toggleVista('intranet/admin/usuarios');
-			expect(store.selectedVistas()).toContain('intranet/admin/usuarios');
+	// #region Capability toggling
+	describe('toggleCapability', () => {
+		const modulosVistas: ModuloCapabilities[] = [
+			{
+				nombre: 'Admin',
+				capabilities: [mockCatalog[0], mockCatalog[1]],
+				seleccionadas: 0,
+				total: 2,
+			},
+		];
+
+		it('should add capability when not selected', () => {
+			store.setModulosCapabilities(modulosVistas);
+			store.toggleCapability(1);
+			expect(store.selectedCapIds()).toContain(1);
 		});
 
-		it('should remove vista when already selected', () => {
-			store.setSelectedVistas(['intranet/admin/usuarios', 'intranet/admin/cursos']);
-			store.toggleVista('intranet/admin/usuarios');
+		it('should remove capability when already selected', () => {
+			store.setModulosCapabilities(modulosVistas);
+			store.setSelectedCapIds([1, 2]);
+			store.toggleCapability(1);
 
-			expect(store.selectedVistas()).not.toContain('intranet/admin/usuarios');
-			expect(store.selectedVistas()).toContain('intranet/admin/cursos');
+			expect(store.selectedCapIds()).not.toContain(1);
+			expect(store.selectedCapIds()).toContain(2);
 		});
 	});
 	// #endregion
 
-	// #region toggleAllVistasModulo
-	describe('toggleAllVistasModulo', () => {
-		const modulosVistas = [
+	// #region toggleAllCapabilitiesModulo
+	describe('toggleAllCapabilitiesModulo', () => {
+		const modulosVistas: ModuloCapabilities[] = [
 			{
-				nombre: 'admin',
-				vistas: [
-					{ ruta: 'intranet/admin/usuarios', nombre: 'Usuarios' },
-					{ ruta: 'intranet/admin/cursos', nombre: 'Cursos' },
-				],
+				nombre: 'Admin',
+				capabilities: [mockCatalog[0], mockCatalog[1]],
 				seleccionadas: 0,
+				total: 2,
 			},
 		];
 
-		it('should select all vistas in module when none selected', () => {
-			store.setModulosVistas(modulosVistas);
+		it('should select all capabilities in module when none selected', () => {
+			store.setModulosCapabilities(modulosVistas);
 			store.setActiveModuloIndex(0);
 
-			store.toggleAllVistasModulo();
+			store.toggleAllCapabilitiesModulo();
 
-			expect(store.selectedVistas()).toContain('intranet/admin/usuarios');
-			expect(store.selectedVistas()).toContain('intranet/admin/cursos');
+			expect(store.selectedCapIds()).toContain(1);
+			expect(store.selectedCapIds()).toContain(2);
 		});
 
-		it('should deselect all vistas in module when all selected', () => {
-			store.setModulosVistas(modulosVistas);
+		it('should deselect all capabilities in module when all selected', () => {
+			store.setModulosCapabilities(modulosVistas);
 			store.setActiveModuloIndex(0);
-			store.setSelectedVistas(['intranet/admin/usuarios', 'intranet/admin/cursos']);
+			store.setSelectedCapIds([1, 2]);
 
-			store.toggleAllVistasModulo();
+			store.toggleAllCapabilitiesModulo();
 
-			expect(store.selectedVistas()).not.toContain('intranet/admin/usuarios');
-			expect(store.selectedVistas()).not.toContain('intranet/admin/cursos');
+			expect(store.selectedCapIds()).not.toContain(1);
+			expect(store.selectedCapIds()).not.toContain(2);
 		});
 
 		it('should do nothing when activeIndex out of range', () => {
-			store.setModulosVistas(modulosVistas);
+			store.setModulosCapabilities(modulosVistas);
 			store.setActiveModuloIndex(5);
 
-			store.toggleAllVistasModulo();
+			store.toggleAllCapabilitiesModulo();
 
-			expect(store.selectedVistas()).toEqual([]);
+			expect(store.selectedCapIds()).toEqual([]);
 		});
 	});
 	// #endregion
 
 	// #region Computed — isAllModuloSelected
 	describe('isAllModuloSelected', () => {
-		const modulosVistas = [
+		const modulosVistas: ModuloCapabilities[] = [
 			{
-				nombre: 'admin',
-				vistas: [
-					{ ruta: 'intranet/admin/usuarios', nombre: 'Usuarios' },
-					{ ruta: 'intranet/admin/cursos', nombre: 'Cursos' },
-				],
+				nombre: 'Admin',
+				capabilities: [mockCatalog[0], mockCatalog[1]],
 				seleccionadas: 0,
+				total: 2,
 			},
 		];
 
-		it('should return false when no vistas selected', () => {
-			store.setModulosVistas(modulosVistas);
+		it('should return false when no capabilities selected', () => {
+			store.setModulosCapabilities(modulosVistas);
 			expect(store.isAllModuloSelected()).toBe(false);
 		});
 
 		it('should return false when partially selected', () => {
-			store.setModulosVistas(modulosVistas);
-			store.setSelectedVistas(['intranet/admin/usuarios']);
+			store.setModulosCapabilities(modulosVistas);
+			store.setSelectedCapIds([1]);
 			expect(store.isAllModuloSelected()).toBe(false);
 		});
 
 		it('should return true when all selected', () => {
-			store.setModulosVistas(modulosVistas);
-			store.setSelectedVistas(['intranet/admin/usuarios', 'intranet/admin/cursos']);
+			store.setModulosCapabilities(modulosVistas);
+			store.setSelectedCapIds([1, 2]);
 			expect(store.isAllModuloSelected()).toBe(true);
 		});
 	});
 	// #endregion
 
-	// #region Computed — vistasCountLabel
-	describe('vistasCountLabel', () => {
-		it('should show singular for 1 vista', () => {
-			store.setSelectedVistas(['intranet/admin/usuarios']);
-			expect(store.vistasCountLabel()).toBe('1 vista');
+	// #region Computed — capsCountLabel
+	describe('capsCountLabel', () => {
+		it('should show singular for 1 capability', () => {
+			store.setSelectedCapIds([1]);
+			expect(store.capsCountLabel()).toBe('1 capability seleccionada');
 		});
 
-		it('should show plural for multiple vistas', () => {
-			store.setSelectedVistas(['a', 'b', 'c']);
-			expect(store.vistasCountLabel()).toBe('3 vistas');
-		});
-	});
-	// #endregion
-
-	// #region Pagination
-	describe('pagination', () => {
-		it('should set pagination data', () => {
-			store.setPaginationData(2, 20, 50);
-
-			expect(store.page()).toBe(2);
-			expect(store.pageSize()).toBe(20);
-			expect(store.totalRecords()).toBe(50);
-		});
-
-		it('should set page independently', () => {
-			store.setPage(3);
-			expect(store.page()).toBe(3);
+		it('should show plural for multiple capabilities', () => {
+			store.setSelectedCapIds([1, 2, 3]);
+			expect(store.capsCountLabel()).toBe('3 capabilitys seleccionadas');
 		});
 	});
 	// #endregion
@@ -339,17 +274,16 @@ describe('PermissionsRolesStore', () => {
 	// #region ViewModel
 	describe('vm', () => {
 		it('should compose all state', () => {
-			store.setPermisosRol(mockPermisos);
-			store.setVistas(mockVistas);
-			store.setPaginationData(1, 10, 2);
+			store.setCatalog(mockCatalog);
+			store.setMatrixRows(mockMatrixRows);
 
 			const vm = store.vm();
 
-			expect(vm.permisosRol).toHaveLength(2);
+			expect(vm.matrixRows).toHaveLength(2);
+			expect(vm.catalog).toHaveLength(4);
 			expect(vm.loading).toBe(false);
 			expect(vm.estadisticas.totalRoles).toBe(2);
 			expect(vm.dialogVisible).toBe(false);
-			expect(vm.page).toBe(1);
 		});
 	});
 	// #endregion

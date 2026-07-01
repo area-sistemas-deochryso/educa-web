@@ -53,6 +53,7 @@ function mockUserPermissionsService() {
 	return {
 		loaded: signal(true),
 		vistasPermitidas: signal<string[]>([]),
+		userCapabilities: signal(new Set<string>()),
 		loadPermisos: vi.fn(),
 	};
 }

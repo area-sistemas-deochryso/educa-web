@@ -8,11 +8,11 @@ import { UserPermissionsService } from './user-permisos.service';
 import { AuthService } from '../auth';
 import { StorageService } from '../storage';
 import { PermissionsService } from './permisos.service';
-import { PermisosUsuarioResultado } from './permisos.models';
+import { CapabilityAuth } from './permisos.models';
 
 // Test-only type to access private signals for state setup
-interface PermissionsServiceTestAccess {
-	_permisos: { set: (v: PermisosUsuarioResultado | null) => void };
+interface ServiceTestAccess {
+	_capabilities: { set: (v: CapabilityAuth[]) => void };
 	_loaded: { set: (v: boolean) => void };
 	_loadFailed: { set: (v: boolean) => void };
 }
@@ -20,23 +20,12 @@ interface PermissionsServiceTestAccess {
 // #endregion
 
 // #region Mocks
-const mockPermisos: PermisosUsuarioResultado = {
-	usuarioId: 1,
-	rol: 'Director',
-	vistasPermitidas: [
-		'intranet/admin/usuarios',
-		'intranet/admin/cursos',
-		'intranet/profesor/horarios',
-	],
-	tienePermisosPersonalizados: false,
-};
-
-const mockPermisosPersonalizados: PermisosUsuarioResultado = {
-	usuarioId: 1,
-	rol: 'Profesor',
-	vistasPermitidas: ['intranet/profesor/horarios', 'intranet/admin/salones'],
-	tienePermisosPersonalizados: true,
-};
+const mockCapabilities: CapabilityAuth[] = [
+	{ codigo: 'admin.usuarios', ruta: 'intranet/admin/usuarios' },
+	{ codigo: 'admin.cursos', ruta: 'intranet/admin/cursos' },
+	{ codigo: 'profesor.horarios', ruta: 'intranet/profesor/horarios' },
+	{ codigo: 'reports.view', ruta: null },
+];
 
 function createMocks() {
 	const isAuthenticated$ = new Subject<boolean>();
@@ -52,7 +41,7 @@ function createMocks() {
 			clearPermisos: vi.fn(),
 		},
 		permisosService: {
-			getMisPermisos: vi.fn().mockReturnValue(of(mockPermisos)),
+			getMyCapabilities: vi.fn().mockReturnValue(of(mockCapabilities)),
 		},
 	};
 }
@@ -80,8 +69,8 @@ describe('UserPermissionsService', () => {
 
 	// #region Initial state
 	describe('initial state', () => {
-		it('should start without permisos', () => {
-			expect(service.permisos()).toBeNull();
+		it('should start without capabilities', () => {
+			expect(service.capabilities()).toEqual([]);
 			expect(service.loaded()).toBe(false);
 			expect(service.loading()).toBe(false);
 			expect(service.loadFailed()).toBe(false);
@@ -91,8 +80,8 @@ describe('UserPermissionsService', () => {
 			expect(service.vistasPermitidas()).toEqual([]);
 		});
 
-		it('should not have personalized permisos', () => {
-			expect(service.tienePermisosPersonalizados()).toBe(false);
+		it('should have empty userCapabilities set', () => {
+			expect(service.userCapabilities().size).toBe(0);
 		});
 	});
 	// #endregion
@@ -100,8 +89,8 @@ describe('UserPermissionsService', () => {
 	// #region tienePermiso — core authorization logic
 	describe('tienePermiso', () => {
 		beforeEach(() => {
-			(service as unknown as PermissionsServiceTestAccess)._permisos.set(mockPermisos);
-			(service as unknown as PermissionsServiceTestAccess)._loaded.set(true);
+			(service as unknown as ServiceTestAccess)._capabilities.set(mockCapabilities);
+			(service as unknown as ServiceTestAccess)._loaded.set(true);
 		});
 
 		it('should allow exact route match', () => {
@@ -130,7 +119,6 @@ describe('UserPermissionsService', () => {
 		});
 
 		it('should NOT grant partial path matches', () => {
-			// "intranet/admin/usuarios-admin" should NOT match "intranet/admin/usuarios"
 			expect(service.tienePermiso('intranet/admin/usuarios-admin')).toBe(false);
 		});
 	});
@@ -142,25 +130,46 @@ describe('UserPermissionsService', () => {
 			expect(service.tienePermiso('intranet/admin/usuarios')).toBe(false);
 		});
 
-		it('should allow all when loaded with empty vistas (no permissions configured)', () => {
-			(service as unknown as PermissionsServiceTestAccess)._permisos.set({ ...mockPermisos, vistasPermitidas: [] });
-			(service as unknown as PermissionsServiceTestAccess)._loaded.set(true);
+		it('should allow all when loaded with empty vistas (no route capabilities)', () => {
+			(service as unknown as ServiceTestAccess)._capabilities.set([]);
+			(service as unknown as ServiceTestAccess)._loaded.set(true);
 
 			expect(service.tienePermiso('any/route')).toBe(true);
 		});
 
 		it('should handle empty string route', () => {
-			(service as unknown as PermissionsServiceTestAccess)._permisos.set(mockPermisos);
-			(service as unknown as PermissionsServiceTestAccess)._loaded.set(true);
+			(service as unknown as ServiceTestAccess)._capabilities.set(mockCapabilities);
+			(service as unknown as ServiceTestAccess)._loaded.set(true);
 
 			expect(service.tienePermiso('')).toBe(false);
 		});
 
 		it('should handle route with only slashes', () => {
-			(service as unknown as PermissionsServiceTestAccess)._permisos.set(mockPermisos);
-			(service as unknown as PermissionsServiceTestAccess)._loaded.set(true);
+			(service as unknown as ServiceTestAccess)._capabilities.set(mockCapabilities);
+			(service as unknown as ServiceTestAccess)._loaded.set(true);
 
 			expect(service.tienePermiso('/')).toBe(false);
+		});
+	});
+	// #endregion
+
+	// #region hasCapability
+	describe('hasCapability', () => {
+		beforeEach(() => {
+			(service as unknown as ServiceTestAccess)._capabilities.set(mockCapabilities);
+			(service as unknown as ServiceTestAccess)._loaded.set(true);
+		});
+
+		it('should return true for existing capability code', () => {
+			expect(service.hasCapability('admin.usuarios')).toBe(true);
+		});
+
+		it('should return false for non-existing capability code', () => {
+			expect(service.hasCapability('admin.nonexistent')).toBe(false);
+		});
+
+		it('should return true for capability without ruta', () => {
+			expect(service.hasCapability('reports.view')).toBe(true);
 		});
 	});
 	// #endregion
@@ -175,15 +184,15 @@ describe('UserPermissionsService', () => {
 			expect(result).toBe(false);
 		});
 
-		it('should return true immediately when already loaded', async () => {
+		it('should return true immediately when already loaded with capabilities', async () => {
 			mocks.authService.isAuthenticated = true;
-			(service as unknown as PermissionsServiceTestAccess)._loaded.set(true);
-			(service as unknown as PermissionsServiceTestAccess)._permisos.set(mockPermisos);
+			(service as unknown as ServiceTestAccess)._loaded.set(true);
+			(service as unknown as ServiceTestAccess)._capabilities.set(mockCapabilities);
 
 			const result = await service.ensurePermisosLoaded();
 
 			expect(result).toBe(true);
-			expect(mocks.permisosService.getMisPermisos).not.toHaveBeenCalled();
+			expect(mocks.permisosService.getMyCapabilities).not.toHaveBeenCalled();
 		});
 
 		it('should fetch from API and return true on success', async () => {
@@ -192,8 +201,8 @@ describe('UserPermissionsService', () => {
 			const result = await service.ensurePermisosLoaded();
 
 			expect(result).toBe(true);
-			expect(mocks.permisosService.getMisPermisos).toHaveBeenCalled();
-			expect(service.permisos()).toEqual(mockPermisos);
+			expect(mocks.permisosService.getMyCapabilities).toHaveBeenCalled();
+			expect(service.capabilities()).toEqual(mockCapabilities);
 			expect(service.loaded()).toBe(true);
 		});
 
@@ -202,12 +211,17 @@ describe('UserPermissionsService', () => {
 
 			await service.ensurePermisosLoaded();
 
-			expect(mocks.storageService.setPermisos).toHaveBeenCalledWith(mockPermisos);
+			expect(mocks.storageService.setPermisos).toHaveBeenCalledWith(
+				expect.objectContaining({
+					capabilities: mockCapabilities.map((c) => ({ codigo: c.codigo, ruta: c.ruta })),
+					timestamp: expect.any(Number),
+				}),
+			);
 		});
 
 		it('should return false and set loadFailed on API error', async () => {
 			mocks.authService.isAuthenticated = true;
-			mocks.permisosService.getMisPermisos = vi.fn().mockReturnValue(
+			mocks.permisosService.getMyCapabilities = vi.fn().mockReturnValue(
 				throwError(() => new Error('Network error')),
 			);
 
@@ -220,20 +234,26 @@ describe('UserPermissionsService', () => {
 
 		it('should return false immediately if already failed', async () => {
 			mocks.authService.isAuthenticated = true;
-			(service as unknown as PermissionsServiceTestAccess)._loadFailed.set(true);
+			(service as unknown as ServiceTestAccess)._loadFailed.set(true);
 
 			const result = await service.ensurePermisosLoaded();
 
 			expect(result).toBe(false);
-			expect(mocks.permisosService.getMisPermisos).not.toHaveBeenCalled();
+			expect(mocks.permisosService.getMyCapabilities).not.toHaveBeenCalled();
 		});
 	});
 	// #endregion
 
 	// #region Storage restore
 	describe('storage restore', () => {
-		it('should restore permisos from storage on init', () => {
-			mocks.storageService.getPermisos.mockReturnValue(mockPermisos);
+		it('should restore capabilities from storage on init', () => {
+			const storedCaps: CapabilityAuth[] = [
+				{ codigo: 'admin.usuarios', ruta: 'intranet/admin/usuarios' },
+			];
+			mocks.storageService.getPermisos.mockReturnValue({
+				capabilities: storedCaps,
+				timestamp: Date.now(),
+			});
 
 			TestBed.resetTestingModule();
 			TestBed.configureTestingModule({
@@ -247,7 +267,7 @@ describe('UserPermissionsService', () => {
 
 			const freshService = TestBed.inject(UserPermissionsService);
 
-			expect(freshService.permisos()).toEqual(mockPermisos);
+			expect(freshService.capabilities()).toEqual(storedCaps);
 			expect(freshService.loaded()).toBe(true);
 		});
 
@@ -266,7 +286,7 @@ describe('UserPermissionsService', () => {
 
 			const freshService = TestBed.inject(UserPermissionsService);
 
-			expect(freshService.permisos()).toBeNull();
+			expect(freshService.capabilities()).toEqual([]);
 			expect(freshService.loaded()).toBe(false);
 		});
 	});
@@ -275,12 +295,12 @@ describe('UserPermissionsService', () => {
 	// #region clear
 	describe('clear', () => {
 		it('should reset state and clear storage', () => {
-			(service as unknown as PermissionsServiceTestAccess)._permisos.set(mockPermisos);
-			(service as unknown as PermissionsServiceTestAccess)._loaded.set(true);
+			(service as unknown as ServiceTestAccess)._capabilities.set(mockCapabilities);
+			(service as unknown as ServiceTestAccess)._loaded.set(true);
 
 			service.clear();
 
-			expect(service.permisos()).toBeNull();
+			expect(service.capabilities()).toEqual([]);
 			expect(service.loaded()).toBe(false);
 			expect(service.loading()).toBe(false);
 			expect(service.loadFailed()).toBe(false);
@@ -291,24 +311,28 @@ describe('UserPermissionsService', () => {
 
 	// #region computed signals
 	describe('computed signals', () => {
-		it('should derive vistasPermitidas from permisos', () => {
-			(service as unknown as PermissionsServiceTestAccess)._permisos.set(mockPermisos);
-			expect(service.vistasPermitidas()).toEqual(mockPermisos.vistasPermitidas);
+		it('should derive vistasPermitidas from capabilities with ruta', () => {
+			(service as unknown as ServiceTestAccess)._capabilities.set(mockCapabilities);
+			const expectedRoutes = mockCapabilities.filter((c) => c.ruta !== null).map((c) => c.ruta!);
+			expect(service.vistasPermitidas()).toEqual(expectedRoutes);
 		});
 
-		it('should derive tienePermisosPersonalizados', () => {
-			(service as unknown as PermissionsServiceTestAccess)._permisos.set(mockPermisosPersonalizados);
-			expect(service.tienePermisosPersonalizados()).toBe(true);
+		it('should derive userCapabilities set from capability codes', () => {
+			(service as unknown as ServiceTestAccess)._capabilities.set(mockCapabilities);
+			const codes = service.userCapabilities();
+			expect(codes.has('admin.usuarios')).toBe(true);
+			expect(codes.has('reports.view')).toBe(true);
+			expect(codes.has('nonexistent')).toBe(false);
 		});
 
-		it('should return empty array when permisos is null', () => {
-			(service as unknown as PermissionsServiceTestAccess)._permisos.set(null);
+		it('should return empty array when capabilities is empty', () => {
+			(service as unknown as ServiceTestAccess)._capabilities.set([]);
 			expect(service.vistasPermitidas()).toEqual([]);
 		});
 
-		it('should return false for personalizados when permisos is null', () => {
-			(service as unknown as PermissionsServiceTestAccess)._permisos.set(null);
-			expect(service.tienePermisosPersonalizados()).toBe(false);
+		it('should return empty set when capabilities is empty', () => {
+			(service as unknown as ServiceTestAccess)._capabilities.set([]);
+			expect(service.userCapabilities().size).toBe(0);
 		});
 	});
 	// #endregion

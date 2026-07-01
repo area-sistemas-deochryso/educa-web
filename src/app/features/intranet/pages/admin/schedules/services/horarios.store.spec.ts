@@ -84,8 +84,8 @@ describe('SchedulesStore', () => {
 			expect(formStore.formData().horaFin).toBe('08:00');
 		});
 
-		it('should default to lista view', () => {
-			expect(filterStore.vistaActual()).toBe('lista');
+		it('should default to salon view', () => {
+			expect(filterStore.vistaActual()).toBe('salon');
 		});
 
 		it('should have wizard at step 0', () => {
@@ -93,9 +93,6 @@ describe('SchedulesStore', () => {
 		});
 
 		it('should have no filters', () => {
-			expect(store.vm().filtroSalonId).toBeNull();
-			expect(store.vm().filtroProfesorId).toBeNull();
-			expect(store.vm().filtroDiaSemana).toBeNull();
 			expect(store.vm().filtroEstadoActivo).toBeNull();
 			expect(store.vm().hasFilters).toBe(false);
 		});
@@ -160,47 +157,23 @@ describe('SchedulesStore', () => {
 			expect(filterStore.horariosFiltrados()).toHaveLength(4);
 		});
 
-		it('should filter by salonId', () => {
-			filterStore.setFiltroSalon(10);
-			expect(filterStore.horariosFiltrados()).toHaveLength(2);
+		it('should filter by estadoActivo true', () => {
+			filterStore.setFiltroEstadoActivo(true);
+			expect(filterStore.horariosFiltrados()).toHaveLength(3);
 		});
 
-		it('should filter by profesorId', () => {
-			filterStore.setFiltroProfesor(30);
-			expect(filterStore.horariosFiltrados()).toHaveLength(2);
-		});
-
-		it('should filter by diaSemana in lista view', () => {
-			filterStore.setFiltroDiaSemana(1);
-			expect(filterStore.horariosFiltrados()).toHaveLength(2);
-		});
-
-		it('should NOT filter by diaSemana in semanal view', () => {
-			filterStore.setFiltroDiaSemana(1);
-			filterStore.setVistaActual('semanal');
-			expect(filterStore.horariosFiltrados()).toHaveLength(4);
-		});
-
-		it('should filter by estadoActivo', () => {
+		it('should filter by estadoActivo false', () => {
 			filterStore.setFiltroEstadoActivo(false);
 			expect(filterStore.horariosFiltrados()).toHaveLength(1);
 		});
 
-		it('should combine filters', () => {
-			filterStore.setFiltroSalon(10);
+		it('should clear filters and reset page', () => {
 			filterStore.setFiltroEstadoActivo(true);
-			expect(filterStore.horariosFiltrados()).toHaveLength(2);
-		});
-
-		it('should clear all filters', () => {
-			filterStore.setFiltroSalon(10);
-			filterStore.setFiltroProfesor(30);
 			filterStore.setPaginationData(3, 10, 100);
 
 			filterStore.clearFiltros();
 
-			expect(store.vm().filtroSalonId).toBeNull();
-			expect(store.vm().filtroProfesorId).toBeNull();
+			expect(store.vm().filtroEstadoActivo).toBeNull();
 			expect(store.vm().hasFilters).toBe(false);
 			expect(filterStore.page()).toBe(1);
 		});
@@ -347,32 +320,22 @@ describe('SchedulesStore', () => {
 
 	// #region Vista switching
 	describe('vista switching', () => {
-		it('should switch to semanal and clear dia filter', () => {
-			filterStore.setFiltroDiaSemana(1);
-			filterStore.setVistaActual('semanal');
+		it('should switch vista and clear selectedEntityId', () => {
+			filterStore.selectEntity(10);
+			filterStore.setVistaActual('profesor');
 
-			expect(filterStore.vistaActual()).toBe('semanal');
-			expect(store.vm().filtroDiaSemana).toBeNull();
+			expect(filterStore.vistaActual()).toBe('profesor');
+			expect(filterStore.selectedEntityId()).toBeNull();
 		});
 
-		it('should keep dia filter when switching to lista', () => {
-			filterStore.setFiltroDiaSemana(1);
-			filterStore.setVistaActual('lista');
-
-			expect(store.vm().filtroDiaSemana).toBe(1);
-		});
-
-		it('should enable semanal view when salon or profesor is filtered', () => {
+		it('should enable semanal view when entity is selected', () => {
 			expect(filterStore.vistaSemanalHabilitada()).toBe(false);
 
-			filterStore.setFiltroSalon(10);
+			filterStore.selectEntity(10);
 			expect(filterStore.vistaSemanalHabilitada()).toBe(true);
 		});
 
-		it('should enable dia filter only in lista view', () => {
-			expect(filterStore.filtroDiaSemanaHabilitado()).toBe(true);
-
-			filterStore.setVistaActual('semanal');
+		it('should always disable dia filter', () => {
 			expect(filterStore.filtroDiaSemanaHabilitado()).toBe(false);
 		});
 	});
@@ -427,7 +390,7 @@ describe('SchedulesStore', () => {
 			expect(vm.horarios).toHaveLength(4);
 			expect(vm.isEmpty).toBe(false);
 			expect(vm.salonesOptions).toHaveLength(2);
-			expect(vm.vistaActual).toBe('lista');
+			expect(vm.vistaActual).toBe('salon');
 			expect(vm.wizardStep).toBe(0);
 		});
 	});

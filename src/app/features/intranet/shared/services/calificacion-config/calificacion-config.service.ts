@@ -4,6 +4,7 @@ import { HttpClient } from '@angular/common/http';
 import { Observable, of, map, catchError, tap, shareReplay } from 'rxjs';
 
 import { environment } from '@config/environment';
+import { logger } from '@core/helpers';
 import type {
 	ConfiguracionCalificacionListDto,
 	NivelEducativo,
@@ -65,7 +66,10 @@ export class CalificacionConfigService {
 			)
 			.pipe(
 				map((data) => (data && typeof data === 'object' && !('success' in data) ? data : null)),
-				catchError(() => of(null)),
+				catchError((err) => {
+					logger.warn('[CalificacionConfig] getConfig failed — fallback null', err?.status);
+					return of(null);
+				}),
 				tap((config) => this.resolvedCache.set(key, config)),
 				shareReplay(1),
 			);
@@ -99,7 +103,10 @@ export class CalificacionConfigService {
 						this.cache.set(key, of(config));
 					}
 				}),
-				catchError(() => of([])),
+				catchError((err) => {
+					logger.warn('[CalificacionConfig] preloadConfigs failed — fallback empty', err?.status);
+					return of([]);
+				}),
 			);
 	}
 

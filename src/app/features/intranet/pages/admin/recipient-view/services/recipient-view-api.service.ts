@@ -1,6 +1,6 @@
 import { inject, Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { catchError, Observable, of } from 'rxjs';
+import { Observable } from 'rxjs';
 
 import { environment } from '@config/environment';
 import { RecipientSummary } from '@data/models';
@@ -10,9 +10,7 @@ export class RecipientViewApiService {
 	private http = inject(HttpClient);
 	private baseUrl = `${environment.apiUrl}/api/sistema/email-monitoreo`;
 
-	getSummary(correo: string): Observable<RecipientSummary | null> {
-		return this.http
-			.get<RecipientSummary>(`${this.baseUrl}/recipient/${encodeURIComponent(correo)}`)
-			.pipe(catchError(() => of(null)));
+	getSummary(correo: string): Observable<RecipientSummary> {
+		return this.http.get<RecipientSummary>(`${this.baseUrl}/recipient/${encodeURIComponent(correo)}`);
 	}
 }

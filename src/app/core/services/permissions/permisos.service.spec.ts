@@ -43,13 +43,14 @@ describe('PermissionsService', () => {
 			req.flush(mockVistas);
 		});
 
-		it('should return empty array on getVistas error', () => {
-			service.getVistas().subscribe((vistas) => {
-				expect(vistas).toEqual([]);
+		it('should propagate error on getVistas failure', () => {
+			let errorCaught = false;
+			service.getVistas().subscribe({
+				error: () => { errorCaught = true; },
 			});
 
-			const req = httpMock.expectOne((r) => r.url.includes('/vistas/listar'));
-			req.error(new ProgressEvent('error'));
+			httpMock.expectOne((r) => r.url.includes('/vistas/listar')).error(new ProgressEvent('error'));
+			expect(errorCaught).toBe(true);
 		});
 
 		it('should get paginated vistas with params', () => {
@@ -117,12 +118,14 @@ describe('PermissionsService', () => {
 			req.flush(mockPermisos);
 		});
 
-		it('should return empty on error', () => {
-			service.getPermisosRol().subscribe((permisos) => {
-				expect(permisos).toEqual([]);
+		it('should propagate error on getPermisosRol failure', () => {
+			let errorCaught = false;
+			service.getPermisosRol().subscribe({
+				error: () => { errorCaught = true; },
 			});
 
 			httpMock.expectOne((r) => r.url.includes('/rol/listar')).error(new ProgressEvent('error'));
+			expect(errorCaught).toBe(true);
 		});
 
 		it('should create permiso rol', () => {
@@ -162,7 +165,7 @@ describe('PermissionsService', () => {
 			req.flush({ usuarioId: 1, rol: 'Director', vistasPermitidas: [], tienePermisosPersonalizados: false });
 		});
 
-		it('should return null on getMisPermisos error', () => {
+		it('should return null on getMisPermisos error (auth-internal degradation)', () => {
 			service.getMisPermisos().subscribe((result) => {
 				expect(result).toBeNull();
 			});
@@ -183,13 +186,14 @@ describe('PermissionsService', () => {
 			req.flush({ usuarios: [], total: 0 });
 		});
 
-		it('should return empty on error', () => {
-			service.buscarUsuarios('test').subscribe((result) => {
-				expect(result.usuarios).toEqual([]);
-				expect(result.total).toBe(0);
+		it('should propagate error on buscarUsuarios failure', () => {
+			let errorCaught = false;
+			service.buscarUsuarios('test').subscribe({
+				error: () => { errorCaught = true; },
 			});
 
 			httpMock.expectOne((r) => r.url.includes('/buscar-usuarios')).error(new ProgressEvent('error'));
+			expect(errorCaught).toBe(true);
 		});
 	});
 	// #endregion

@@ -197,8 +197,8 @@ describe('LoginIntranetComponent', () => {
 	});
 
 	describe('roles', () => {
-		it('should have 6 available roles', () => {
-			expect(component.roles.length).toBe(6);
+		it('should have 7 available roles', () => {
+			expect(component.roles.length).toBe(7);
 		});
 
 		it('should include all user roles', () => {
@@ -209,6 +209,7 @@ describe('LoginIntranetComponent', () => {
 			expect(roleValues).toContain('Asistente Administrativo');
 			expect(roleValues).toContain('Promotor');
 			expect(roleValues).toContain('Coordinador Académico');
+			expect(roleValues).toContain('Administrador');
 		});
 	});
 	// #endregion

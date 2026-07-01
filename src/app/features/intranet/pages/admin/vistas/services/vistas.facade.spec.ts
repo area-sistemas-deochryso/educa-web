@@ -1,4 +1,4 @@
-// * Tests for VistasFacade — validates CRUD orchestration with WAL.
+// * Tests for VistasFacade — validates capability CRUD orchestration with WAL.
 // #region Imports
 import { TestBed } from '@angular/core/testing';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
@@ -6,27 +6,32 @@ import { of } from 'rxjs';
 
 import { VistasFacade } from './vistas.facade';
 import { VistasStore } from './vistas.store';
-import { PermissionsService, Vista, VistasEstadisticas, WalFacadeHelper, ErrorHandlerService } from '@core/services';
+import { PermissionsService, CapabilityCatalogItem } from '@core/services';
+import { ErrorHandlerService, ActivityTrackerService } from '@core/services/error';
+import { SwService } from '@core/services/sw';
+import { WalFacadeHelper, WalCrossTabRefetchService } from '@core/services/wal';
 
+vi.mock('@core/helpers', async (importOriginal) => {
+	const actual = await importOriginal<Record<string, unknown>>();
+	return {
+		...actual,
+		withRetry: () => <T>(source: import('rxjs').Observable<T>) => source,
+	};
+});
 // #endregion
 
 // #region Mocks
-const mockVistas: Vista[] = [
-	{ id: 1, ruta: 'intranet/admin/usuarios', nombre: 'Usuarios', estado: 1, rowVersion: 'v1' },
-	{ id: 2, ruta: 'intranet/admin/cursos', nombre: 'Cursos', estado: 0, rowVersion: 'v2' },
+const mockItems: CapabilityCatalogItem[] = [
+	{ id: 1, codigo: 'USR_VIEW', nombre: 'Ver Usuarios', modulo: 'admin', descripcion: 'Listar usuarios', orden: 1, ruta: 'intranet/admin/usuarios', estado: true },
+	{ id: 2, codigo: 'CRS_VIEW', nombre: 'Ver Cursos', modulo: 'admin', descripcion: 'Listar cursos', orden: 2, ruta: null, estado: true },
 ];
-
-const mockStats: VistasEstadisticas = {
-	totalVistas: 2, vistasActivas: 1, vistasInactivas: 1, totalModulos: 1, modulos: ['admin'],
-};
 
 function createMockApi() {
 	return {
-		getVistasPaginated: vi.fn().mockReturnValue(of({ data: mockVistas, page: 1, pageSize: 10, total: 2 })),
-		getVistasEstadisticas: vi.fn().mockReturnValue(of(mockStats)),
-		crearVista: vi.fn().mockReturnValue(of({ mensaje: 'ok' })),
-		actualizarVista: vi.fn().mockReturnValue(of({ mensaje: 'ok' })),
-		eliminarVista: vi.fn().mockReturnValue(of({ mensaje: 'ok' })),
+		getCapabilityCatalog: vi.fn().mockReturnValue(of(mockItems)),
+		createCapability: vi.fn().mockReturnValue(of(mockItems[0])),
+		updateCapability: vi.fn().mockReturnValue(of(mockItems[0])),
+		deleteCapability: vi.fn().mockReturnValue(of('ok')),
 	};
 }
 
@@ -57,6 +62,9 @@ describe('VistasFacade', () => {
 				{ provide: PermissionsService, useValue: api },
 				{ provide: ErrorHandlerService, useValue: { showError: vi.fn(), showSuccess: vi.fn() } },
 				{ provide: WalFacadeHelper, useValue: wal },
+				{ provide: SwService, useValue: { invalidateCacheByPattern: vi.fn().mockResolvedValue(0) } },
+				{ provide: WalCrossTabRefetchService, useValue: { subscribe: vi.fn() } },
+				{ provide: ActivityTrackerService, useValue: { track: vi.fn() } },
 			],
 		});
 
@@ -66,11 +74,12 @@ describe('VistasFacade', () => {
 
 	// #region loadAll
 	describe('loadAll', () => {
-		it('should load vistas and stats into store', () => {
+		it('should load capabilities and stats into store', () => {
 			facade.loadAll();
 
-			expect(store.items()).toEqual(mockVistas);
-			expect(store.estadisticas()).toEqual(mockStats);
+			expect(store.items()).toEqual(mockItems);
+			expect(store.estadisticas()).toBeDefined();
+			expect(store.estadisticas()!.total).toBe(2);
 			expect(store.loading()).toBe(false);
 		});
 	});
@@ -83,14 +92,15 @@ describe('VistasFacade', () => {
 			expect(store.dialogVisible()).toBe(true);
 		});
 
-		it('should open edit dialog with vista data', () => {
-			facade.openEditDialog(mockVistas[0]);
+		it('should open edit dialog with capability data', () => {
+			facade.openEditDialog(mockItems[0]);
 
 			expect(store.dialogVisible()).toBe(true);
 			expect(store.isEditing()).toBe(true);
-			expect(store.formData().ruta).toBe('intranet/admin/usuarios');
-			expect(store.formData().nombre).toBe('Usuarios');
-			expect(store.selectedItem()).toEqual(mockVistas[0]);
+			expect(store.formData().codigo).toBe('USR_VIEW');
+			expect(store.formData().nombre).toBe('Ver Usuarios');
+			expect(store.formData().modulo).toBe('admin');
+			expect(store.selectedItem()).toEqual(mockItems[0]);
 		});
 
 		it('should close dialog', () => {
@@ -108,23 +118,23 @@ describe('VistasFacade', () => {
 	});
 	// #endregion
 
-	// #region saveVista dispatch
-	describe('saveVista', () => {
-		it('should call create when not editing', () => {
+	// #region saveCapability dispatch
+	describe('saveCapability', () => {
+		it('should call WAL create when not editing', () => {
 			facade.openNewDialog();
-			store.setFormData({ ruta: 'test/new', nombre: 'New', estado: 1 });
+			store.setFormData({ codigo: 'NEW_CAP', nombre: 'New', modulo: 'admin', descripcion: '', ruta: '' });
 
-			facade.saveVista();
+			facade.saveCapability();
 
 			expect(wal.execute).toHaveBeenCalledWith(
 				expect.objectContaining({ operation: 'CREATE' }),
 			);
 		});
 
-		it('should call update when editing', () => {
-			facade.openEditDialog(mockVistas[0]);
+		it('should call WAL update when editing', () => {
+			facade.openEditDialog(mockItems[0]);
 
-			facade.saveVista();
+			facade.saveCapability();
 
 			expect(wal.execute).toHaveBeenCalledWith(
 				expect.objectContaining({ operation: 'UPDATE' }),
@@ -136,57 +146,31 @@ describe('VistasFacade', () => {
 	// #region WAL optimistic operations
 	describe('WAL optimistic', () => {
 		beforeEach(() => {
-			store.setItems(mockVistas);
-			store.setEstadisticas(mockStats);
+			store.setItems(mockItems);
+			store.setEstadisticas({ total: 2, totalModulos: 1, modulos: ['admin'] });
 		});
 
 		it('should close dialog on create', () => {
 			facade.openNewDialog();
-			store.setFormData({ ruta: 'test/path', nombre: 'Test', estado: 1 });
+			store.setFormData({ codigo: 'TEST', nombre: 'Test', modulo: 'admin', descripcion: '', ruta: '' });
 
-			facade.saveVista();
+			facade.saveCapability();
 
 			expect(store.dialogVisible()).toBe(false);
 		});
 
-		it('should update item and close dialog on update', () => {
-			facade.openEditDialog(mockVistas[0]);
-			store.setFormData({ ruta: 'new/path', nombre: 'Updated', estado: 1 });
+		it('should close dialog on update', () => {
+			facade.openEditDialog(mockItems[0]);
 
-			facade.saveVista();
+			facade.saveCapability();
 
-			expect(store.items()[0].ruta).toBe('new/path');
-			expect(store.items()[0].nombre).toBe('Updated');
 			expect(store.dialogVisible()).toBe(false);
 		});
 
-		it('should toggle estado and update stats', () => {
-			facade.toggleEstado(mockVistas[0]); // estado 1 → 0
-
-			expect(store.items()[0].estado).toBe(0);
-			expect(store.estadisticas()!.vistasActivas).toBe(0);
-			expect(store.estadisticas()!.vistasInactivas).toBe(2);
-		});
-
-		it('should toggle inactive to active', () => {
-			facade.toggleEstado(mockVistas[1]); // estado 0 → 1
-
-			expect(store.items()[1].estado).toBe(1);
-			expect(store.estadisticas()!.vistasActivas).toBe(2);
-			expect(store.estadisticas()!.vistasInactivas).toBe(0);
-		});
-
-		it('should remove item and decrement stats on delete (active)', () => {
-			facade.delete(mockVistas[0]);
+		it('should remove item on delete', () => {
+			facade.delete(mockItems[0]);
 
 			expect(store.items()).toHaveLength(1);
-			expect(store.estadisticas()!.totalVistas).toBe(1);
-			expect(store.estadisticas()!.vistasActivas).toBe(0);
-		});
-
-		it('should decrement inactivas on delete (inactive)', () => {
-			facade.delete(mockVistas[1]);
-			expect(store.estadisticas()!.vistasInactivas).toBe(0);
 		});
 	});
 	// #endregion
@@ -197,18 +181,19 @@ describe('VistasFacade', () => {
 			facade.setSearchTerm('admin');
 			expect(store.searchTerm()).toBe('admin');
 			expect(store.page()).toBe(1);
-			expect(api.getVistasPaginated).toHaveBeenCalled();
+			expect(api.getCapabilityCatalog).toHaveBeenCalled();
 		});
 
 		it('should set filter modulo and trigger refresh', () => {
 			facade.setFilterModulo('admin');
 			expect(store.filterModulo()).toBe('admin');
-			expect(api.getVistasPaginated).toHaveBeenCalled();
+			expect(api.getCapabilityCatalog).toHaveBeenCalled();
 		});
 
-		it('should set filter estado and trigger refresh', () => {
-			facade.setFilterEstado(1);
-			expect(store.filterEstado()).toBe(1);
+		it('should set filter ruta and trigger refresh', () => {
+			facade.setFilterRuta('with');
+			expect(store.filterRuta()).toBe('with');
+			expect(api.getCapabilityCatalog).toHaveBeenCalled();
 		});
 
 		it('should clear all filters', () => {
@@ -226,8 +211,16 @@ describe('VistasFacade', () => {
 	describe('loadPage', () => {
 		it('should call API with page params', () => {
 			facade.loadPage(3, 20);
-			// loadPage triggers refreshVistasOnly which overrides page from response
-			expect(api.getVistasPaginated).toHaveBeenCalled();
+			expect(api.getCapabilityCatalog).toHaveBeenCalled();
+		});
+	});
+	// #endregion
+
+	// #region updateFormField
+	describe('updateFormField', () => {
+		it('should update a single form field', () => {
+			facade.updateFormField('nombre', 'Updated');
+			expect(store.formData().nombre).toBe('Updated');
 		});
 	});
 	// #endregion
