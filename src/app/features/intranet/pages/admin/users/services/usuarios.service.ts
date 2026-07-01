@@ -10,7 +10,7 @@ import {
 	UsuariosEstadisticas,
 } from '../models';
 import { Injectable, inject } from '@angular/core';
-import { Observable, catchError, of } from 'rxjs';
+import { Observable } from 'rxjs';
 
 import { ApiResponse } from '@shared/models';
 import { HttpClient } from '@angular/common/http';
@@ -39,9 +39,7 @@ export class UsersService {
 		if (rol) params['rol'] = rol;
 		if (estado !== undefined) params['estado'] = estado.toString();
 
-		return this.http
-			.get<UsuarioLista[]>(`${this.apiUrl}/listar`, { params })
-			.pipe(catchError(() => of([])));
+		return this.http.get<UsuarioLista[]>(`${this.apiUrl}/listar`, { params });
 	}
 
 	/**
@@ -64,30 +62,14 @@ export class UsersService {
 		if (search) params['search'] = search;
 		if (salonId) params['salonId'] = salonId.toString();
 
-		return this.http
-			.get<PaginatedResponse<UsuarioLista>>(`${this.apiUrl}/listar`, { params })
-			.pipe(
-				catchError(() =>
-					of({
-						data: [],
-						total: 0,
-						page,
-						pageSize,
-						totalPages: 0,
-						hasNextPage: false,
-						hasPreviousPage: false,
-					}),
-				),
-			);
+		return this.http.get<PaginatedResponse<UsuarioLista>>(`${this.apiUrl}/listar`, { params });
 	}
 
 	/**
 	 * Get a user by role and id.
 	 */
 	obtenerUsuario(rol: string, id: number): Observable<UsuarioDetalle | null> {
-		return this.http
-			.get<UsuarioDetalle>(`${this.apiUrl}/${encodeURIComponent(rol)}/${id}`)
-			.pipe(catchError(() => of(null)));
+		return this.http.get<UsuarioDetalle>(`${this.apiUrl}/${encodeURIComponent(rol)}/${id}`);
 	}
 
 	/**
@@ -152,18 +134,14 @@ export class UsersService {
 		if (anio) params['anio'] = anio.toString();
 		if (esVerano) params['esVerano'] = 'true';
 
-		return this.http
-			.get<CredencialExport[]>(`${this.apiUrl}/exportar-credenciales/${encodeURIComponent(rol)}`, { params })
-			.pipe(catchError(() => of([])));
+		return this.http.get<CredencialExport[]>(`${this.apiUrl}/exportar-credenciales/${encodeURIComponent(rol)}`, { params });
 	}
 
 	/**
 	 * Get user statistics.
 	 */
 	obtenerEstadisticas(): Observable<UsuariosEstadisticas | null> {
-		return this.http
-			.get<UsuariosEstadisticas>(`${this.apiUrl}/estadisticas`)
-			.pipe(catchError(() => of(null)));
+		return this.http.get<UsuariosEstadisticas>(`${this.apiUrl}/estadisticas`);
 	}
 
 	/**
@@ -173,11 +151,7 @@ export class UsersService {
 		const params: Record<string, string> = {};
 		if (exceptoId) params['exceptoId'] = exceptoId.toString();
 
-		return this.http
-			.get<{
-				existe: boolean;
-			}>(`${this.apiUrl}/verificar-dni/${encodeURIComponent(rol)}/${dni}`, { params })
-			.pipe(catchError(() => of({ existe: false })));
+		return this.http.get<{ existe: boolean }>(`${this.apiUrl}/verificar-dni/${encodeURIComponent(rol)}/${dni}`, { params });
 	}
 }
 // #endregion

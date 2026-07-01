@@ -4,8 +4,8 @@ import { catchError, debounceTime, distinctUntilChanged, filter, switchMap, tap 
 import { forkJoin, from, of, Subject } from 'rxjs';
 
 import { ErrorHandlerService, SwService, WalFacadeHelper, WalCrossTabRefetchService } from '@core/services';
-import { logger, withRetry } from '@core/helpers';
-import { UI_ADMIN_ERROR_DETAILS, UI_SUMMARIES } from '@app/shared/constants';
+import { logger, withRetry, facadeErrorHandler, type FacadeErrorHandler } from '@core/helpers';
+import { UI_ADMIN_ERROR_DETAILS } from '@app/shared/constants';
 import { APP_USER_ROLES } from '@shared/constants';
 import { RoleTab, RolUsuarioAdmin, UsuarioLista, UsuariosEstadisticas } from '../models';
 import { UsersService } from './usuarios.service';
@@ -27,6 +27,10 @@ export class UsersDataFacade {
 	private walService = inject(WalFacadeHelper);
 	private crossTabRefetch = inject(WalCrossTabRefetchService);
 	private destroyRef = inject(DestroyRef);
+	private errHandler: FacadeErrorHandler = facadeErrorHandler({
+		tag: 'UsersDataFacade',
+		errorHandler: this.errorHandler,
+	});
 	private readonly searchTrigger$ = new Subject<string>();
 	// Timestamp de última mutación CRUD para ignorar cache updates stale
 	private lastCrudMutationTime = 0;
@@ -67,25 +71,21 @@ export class UsersDataFacade {
 			estadisticas: this.usuariosService.obtenerEstadisticas().pipe(
 				withRetry({ tag: 'UsuariosDataFacade:loadEstadisticas' }),
 				catchError((err) => {
-					logger.error('Error cargando estadisticas:', err);
+					this.errHandler.handle(err, 'cargar estadísticas de usuarios');
 					return of(null);
 				}),
 			),
 			salones: this.salonesApi.listar().pipe(
 				withRetry({ tag: 'UsuariosDataFacade:loadSalones' }),
 				catchError((err) => {
-					logger.error('Error cargando salones:', err);
+					this.errHandler.handle(err, 'cargar salones');
 					return of([] as SalonListDto[]);
 				}),
 			),
 			usuarios: this.usuariosService.listarUsuariosPaginado(page, pageSize, rol, estado, search, salonId).pipe(
 				withRetry({ tag: 'UsuariosDataFacade:loadUsuarios' }),
 				catchError((err) => {
-					logger.error('Error cargando usuarios:', err);
-					this.errorHandler.showError(
-						UI_SUMMARIES.error,
-						UI_ADMIN_ERROR_DETAILS.loadUsuarios,
-					);
+					this.errHandler.handle(err, 'cargar usuarios');
 					this.store.setError(UI_ADMIN_ERROR_DETAILS.loadUsuarios);
 					return of({
 						data: [] as UsuarioLista[],
@@ -204,11 +204,8 @@ export class UsersDataFacade {
 			.pipe(
 				withRetry({ tag: 'UsuariosDataFacade:refreshUsuariosOnly' }),
 				catchError((err) => {
-					logger.error('Error cargando usuarios:', err);
-					this.errorHandler.showError(
-						UI_SUMMARIES.error,
-						UI_ADMIN_ERROR_DETAILS.loadUsuarios,
-					);
+					this.errHandler.handle(err, 'cargar usuarios');
+					this.store.setError(UI_ADMIN_ERROR_DETAILS.loadUsuarios);
 					return of({
 						data: [] as UsuarioLista[],
 						total: 0,
@@ -240,7 +237,7 @@ export class UsersDataFacade {
 			.pipe(
 				withRetry({ tag: 'UsuariosDataFacade:refreshEstadisticasOnly' }),
 				catchError((err) => {
-					logger.error('Error refrescando estadisticas:', err);
+					this.errHandler.handle(err, 'refrescar estadísticas');
 					return of(null);
 				}),
 				takeUntilDestroyed(this.destroyRef),
@@ -300,11 +297,8 @@ export class UsersDataFacade {
 						.pipe(
 							withRetry({ tag: 'UsuariosDataFacade:searchUsuarios' }),
 							catchError((err) => {
-								logger.error('Error buscando usuarios:', err);
-								this.errorHandler.showError(
-									UI_SUMMARIES.error,
-									UI_ADMIN_ERROR_DETAILS.loadUsuarios,
-								);
+								this.errHandler.handle(err, 'buscar usuarios');
+								this.store.setError(UI_ADMIN_ERROR_DETAILS.loadUsuarios);
 								return of({
 									data: [] as UsuarioLista[],
 									total: 0,

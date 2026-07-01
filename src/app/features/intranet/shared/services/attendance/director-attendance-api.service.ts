@@ -1,13 +1,12 @@
 import { Injectable, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { Observable, catchError, map, of } from 'rxjs';
+import { Observable, map } from 'rxjs';
 
 import { environment } from '@config/environment';
 import { PaginatedResponse } from '@shared/models';
 import {
 	AsistenciaDiaConEstadisticas,
 	DashboardDirectorDia,
-	EstadisticasAsistenciaDia,
 	EstadisticasDia,
 	EstadisticasMultiRolDia,
 	EstudianteAsistencia,
@@ -44,9 +43,7 @@ export class DirectorAttendanceApiService {
 			params['seccion'] = seccion;
 		}
 
-		return this.http
-			.get<EstudianteAsistencia[]>(`${this.apiUrl}/director/reporte`, { params })
-			.pipe(catchError(() => of([])));
+		return this.http.get<EstudianteAsistencia[]>(`${this.apiUrl}/director/reporte`, { params });
 	}
 
 	/**
@@ -60,9 +57,7 @@ export class DirectorAttendanceApiService {
 			params['fecha'] = this.formatDateLocal(fecha);
 		}
 
-		return this.http
-			.get<EstadisticasDia>(`${this.apiUrl}/director/estadisticas`, { params })
-			.pipe(catchError(() => of(null)));
+		return this.http.get<EstadisticasDia>(`${this.apiUrl}/director/estadisticas`, { params });
 	}
 
 	/**
@@ -74,9 +69,7 @@ export class DirectorAttendanceApiService {
 		if (fecha) {
 			params['fecha'] = this.formatDateLocal(fecha);
 		}
-		return this.http
-			.get<DashboardDirectorDia>(`${this.apiUrl}/director/dashboard`, { params })
-			.pipe(catchError(() => of(null)));
+		return this.http.get<DashboardDirectorDia>(`${this.apiUrl}/director/dashboard`, { params });
 	}
 
 	/**
@@ -90,9 +83,7 @@ export class DirectorAttendanceApiService {
 		const params: Record<string, string> = {};
 		if (fecha) params['fecha'] = this.formatDateLocal(fecha);
 		if (incluirSalones) params['incluirSalones'] = 'true';
-		return this.http
-			.get<EstadisticasMultiRolDia>(`${this.apiUrl}/director/estadisticas-multi-rol`, { params })
-			.pipe(catchError(() => of(null)));
+		return this.http.get<EstadisticasMultiRolDia>(`${this.apiUrl}/director/estadisticas-multi-rol`, { params });
 	}
 
 	/**
@@ -110,13 +101,7 @@ export class DirectorAttendanceApiService {
 			fecha: this.formatDateLocal(fecha),
 		};
 
-		return this.http
-			.get<AsistenciaDiaConEstadisticas>(`${this.apiUrl}/director/asistencia-dia`, { params })
-			.pipe(
-				catchError(() =>
-					of({ estudiantes: [], estadisticas: this.getEstadisticasVacias() }),
-				),
-			);
+		return this.http.get<AsistenciaDiaConEstadisticas>(`${this.apiUrl}/director/asistencia-dia`, { params });
 	}
 
 	/**
@@ -124,9 +109,7 @@ export class DirectorAttendanceApiService {
 	 * GET /api/ConsultaAsistencia/director/salones
 	 */
 	getSalonesDirector(): Observable<SalonProfesor[]> {
-		return this.http
-			.get<SalonProfesor[]>(`${this.apiUrl}/director/salones`)
-			.pipe(catchError(() => of([])));
+		return this.http.get<SalonProfesor[]>(`${this.apiUrl}/director/salones`);
 	}
 
 	/**
@@ -134,9 +117,7 @@ export class DirectorAttendanceApiService {
 	 * GET /api/ConsultaAsistencia/director/profesores
 	 */
 	getProfesoresDirector(): Observable<ProfesorSede[]> {
-		return this.http
-			.get<ProfesorSede[]>(`${this.apiUrl}/director/profesores`)
-			.pipe(catchError(() => of([])));
+		return this.http.get<ProfesorSede[]>(`${this.apiUrl}/director/profesores`);
 	}
 
 	/**
@@ -161,9 +142,7 @@ export class DirectorAttendanceApiService {
 			params['anio'] = anio.toString();
 		}
 
-		return this.http
-			.get<EstudianteAsistencia[]>(`${this.apiUrl}/director/grado`, { params })
-			.pipe(catchError(() => of([])));
+		return this.http.get<EstudianteAsistencia[]>(`${this.apiUrl}/director/grado`, { params });
 	}
 
 	/**
@@ -366,17 +345,6 @@ export class DirectorAttendanceApiService {
 		const month = String(fecha.getMonth() + 1).padStart(2, '0');
 		const day = String(fecha.getDate()).padStart(2, '0');
 		return `${year}-${month}-${day}`;
-	}
-
-	private getEstadisticasVacias(): EstadisticasAsistenciaDia {
-		return {
-			total: 0,
-			tardanza: 0,
-			asistio: 0,
-			falta: 0,
-			justificado: 0,
-			pendiente: 0,
-		};
 	}
 
 	// #endregion

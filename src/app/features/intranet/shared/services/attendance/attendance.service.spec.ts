@@ -39,9 +39,11 @@ describe('AttendanceService', () => {
 			req.flush({ totalDias: 20 });
 		});
 
-		it('should return null on error', () => {
-			service.getMisAsistencias().subscribe((data) => {
-				expect(data).toBeNull();
+		it('should propagate error to subscriber', () => {
+			service.getMisAsistencias().subscribe({
+				error: (err) => {
+					expect(err.status).toBe(0);
+				},
 			});
 
 			httpMock.expectOne((r) => r.url.includes('/estudiante/mis-asistencias')).error(new ProgressEvent('error'));
@@ -59,9 +61,11 @@ describe('AttendanceService', () => {
 			httpMock.expectOne((r) => r.url.includes('/apoderado/hijos')).flush([{ id: 1 }]);
 		});
 
-		it('should return empty on error', () => {
-			service.getHijos().subscribe((hijos) => {
-				expect(hijos).toEqual([]);
+		it('should propagate error to subscriber', () => {
+			service.getHijos().subscribe({
+				error: (err) => {
+					expect(err.status).toBe(0);
+				},
 			});
 
 			httpMock.expectOne((r) => r.url.includes('/apoderado/hijos')).error(new ProgressEvent('error'));
@@ -175,9 +179,11 @@ describe('AttendanceService', () => {
 			req.flush({ success: true, message: 'ok' });
 		});
 
-		it('should handle error gracefully', () => {
-			service.justificarAsistencia(1, new Date(), 'test').subscribe((res) => {
-				expect(res.success).toBe(false);
+		it('should propagate error to subscriber', () => {
+			service.justificarAsistencia(1, new Date(), 'test').subscribe({
+				error: (err) => {
+					expect(err.status).toBe(0);
+				},
 			});
 
 			httpMock.expectOne((r) => r.url.includes('/justificar')).error(new ProgressEvent('error'));
@@ -198,9 +204,11 @@ describe('AttendanceService', () => {
 			]);
 		});
 
-		it('should return empty on error', () => {
-			service.getEstadosValidos().subscribe((estados) => {
-				expect(estados).toEqual([]);
+		it('should propagate error to subscriber', () => {
+			service.getEstadosValidos().subscribe({
+				error: (err) => {
+					expect(err.status).toBe(0);
+				},
 			});
 
 			httpMock.expectOne((r) => r.url.includes('/estados-validos')).error(new ProgressEvent('error'));

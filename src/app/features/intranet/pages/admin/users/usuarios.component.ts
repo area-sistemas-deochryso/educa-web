@@ -44,6 +44,7 @@ import {
 import { environment } from '@env/environment';
 import { APP_USER_ROLES } from '@shared/constants';
 import { logger } from '@core/helpers';
+import { ErrorStateComponent } from '@shared/components/error-state';
 import { ExcelService } from '@core/services';
 import type { ImportarEstudianteItem } from './services';
 import { validarUsuarios } from './usuarios-validation.helpers';
@@ -71,6 +72,7 @@ import {
 		UserFormDialogComponent,
 		UsersImportDialogComponent,
 		UsersValidationDialogComponent,
+		ErrorStateComponent,
 	],
 	providers: [ConfirmationService],
 	templateUrl: './usuarios.component.html',
@@ -78,7 +80,7 @@ import {
 	changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class UsersComponent implements AfterViewInit {
-	private dataFacade = inject(UsersDataFacade);
+	protected dataFacade = inject(UsersDataFacade);
 	private crudFacade = inject(UsersCrudFacade);
 	private uiFacade = inject(UsersUiFacade);
 	private confirmationService = inject(ConfirmationService);

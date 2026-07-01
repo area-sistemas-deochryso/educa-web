@@ -1,6 +1,6 @@
 import { Injectable, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { Observable, catchError, of } from 'rxjs';
+import { Observable } from 'rxjs';
 
 import { environment } from '@config/environment';
 import { ResumenAsistencia } from '@data/models';
@@ -26,9 +26,7 @@ export class StudentAttendanceApiService {
 			params['anio'] = anio.toString();
 		}
 
-		return this.http
-			.get<ResumenAsistencia>(`${this.apiUrl}/estudiante/mis-asistencias`, { params })
-			.pipe(catchError(() => of(null)));
+		return this.http.get<ResumenAsistencia>(`${this.apiUrl}/estudiante/mis-asistencias`, { params });
 	}
 
 	// #endregion

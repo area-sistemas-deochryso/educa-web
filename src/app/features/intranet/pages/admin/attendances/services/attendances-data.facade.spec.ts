@@ -3,8 +3,9 @@
 import { TestBed } from '@angular/core/testing';
 import { HttpErrorResponse } from '@angular/common/http';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
-import { of } from 'rxjs';
+import { of, throwError } from 'rxjs';
 
+import { ErrorHandlerService, WalCrossTabRefetchService } from '@core/services';
 import { CrossChexSyncStatusService } from '@core/services/signalr';
 import { WalFacadeHelper } from '@core/services/wal';
 import { AttendancesAdminService } from './attendances-admin.service';
@@ -20,8 +21,8 @@ function createMockApi() {
 		listarPersonas: vi.fn().mockReturnValue(of([])),
 		listarEstudiantes: vi.fn().mockReturnValue(of([])),
 		listarCierres: vi.fn().mockReturnValue(of([])),
-		sincronizarDesdeCrossChex: vi.fn(),
-		sincronizarRango: vi.fn(),
+		sincronizarDesdeCrossChex: vi.fn().mockReturnValue(of({ jobId: 'default-job-id', estado: 'QUEUED' })),
+		sincronizarRango: vi.fn().mockReturnValue(of({ jobId: 'default-job-id', estado: 'QUEUED' })),
 	};
 }
 
@@ -38,6 +39,14 @@ function createMockWal() {
 		hasPendingForResource: vi.fn().mockResolvedValue(false),
 		postReloadCommit$: vi.fn().mockReturnValue(of()),
 	};
+}
+
+function createMockErrorHandler() {
+	return { showError: vi.fn(), showWarning: vi.fn() };
+}
+
+function createMockCrossTabRefetch() {
+	return { subscribe: vi.fn() };
 }
 // #endregion
 
@@ -59,6 +68,8 @@ describe('AttendancesDataFacade', () => {
 				{ provide: AttendancesAdminService, useValue: api },
 				{ provide: CrossChexSyncStatusService, useValue: syncService },
 				{ provide: WalFacadeHelper, useValue: wal },
+				{ provide: ErrorHandlerService, useValue: createMockErrorHandler() },
+				{ provide: WalCrossTabRefetchService, useValue: createMockCrossTabRefetch() },
 			],
 		});
 		facade = TestBed.inject(AttendancesDataFacade);
@@ -148,36 +159,24 @@ describe('AttendancesDataFacade', () => {
 		});
 	});
 
-	describe('sincronizarDesdeCrossChex (WAL dispatch)', () => {
-		it('dispatches via WAL with CUSTOM operation and crosschexSync resourceType', () => {
-			facade.sincronizarDesdeCrossChex();
-
-			expect(wal.execute).toHaveBeenCalledOnce();
-			const config = wal.execute.mock.calls[0][0];
-			expect(config.operation).toBe('CUSTOM');
-			expect(config.resourceType).toBe('crosschexSync');
-			expect(config.method).toBe('POST');
-			expect(config.endpoint).toContain('/sync');
-		});
-
-		it('optimistic.apply sets syncing to true', () => {
-			facade.sincronizarDesdeCrossChex();
-			const config = wal.execute.mock.calls[0][0];
-			config.optimistic.apply();
-			expect(store.syncing()).toBe(true);
-		});
-
-		it('onCommit clears syncing and starts tracking', () => {
-			facade.sincronizarDesdeCrossChex();
-			const config = wal.execute.mock.calls[0][0];
+	describe('sincronizarDesdeCrossChex (direct HTTP)', () => {
+		it('calls api.sincronizarDesdeCrossChex and starts tracking on success', () => {
 			const VALID_JOB_ID = 'a1b2c3d4e5f6a7b8c9d0e1f2a3b4c5d6';
-			config.onCommit({ jobId: VALID_JOB_ID, estado: 'QUEUED' });
+			api.sincronizarDesdeCrossChex.mockReturnValue(of({ jobId: VALID_JOB_ID, estado: 'QUEUED' }));
+			facade.sincronizarDesdeCrossChex();
 
+			expect(api.sincronizarDesdeCrossChex).toHaveBeenCalledOnce();
 			expect(store.syncing()).toBe(false);
 			expect(syncService.startTracking).toHaveBeenCalledWith(VALID_JOB_ID);
 		});
 
-		it('onError with 409 Conflict re-subscribes to active jobId', () => {
+		it('sets syncing to true before call completes', () => {
+			api.sincronizarDesdeCrossChex.mockReturnValue(of({ jobId: 'job', estado: 'QUEUED' }));
+			facade.sincronizarDesdeCrossChex();
+			expect(api.sincronizarDesdeCrossChex).toHaveBeenCalled();
+		});
+
+		it('on 409 Conflict re-subscribes to active jobId', () => {
 			const VALID_JOB_ID = 'a1b2c3d4e5f6a7b8c9d0e1f2a3b4c5d6';
 			const conflictError = new HttpErrorResponse({
 				status: 409,
@@ -187,22 +186,18 @@ describe('AttendancesDataFacade', () => {
 					data: { jobId: VALID_JOB_ID, estado: 'RUNNING' },
 				},
 			});
+			api.sincronizarDesdeCrossChex.mockReturnValue(throwError(() => conflictError));
 			const onError = vi.fn();
 			facade.sincronizarDesdeCrossChex(onError);
-
-			const config = wal.execute.mock.calls[0][0];
-			config.onError(conflictError);
 
 			expect(syncService.startTracking).toHaveBeenCalledWith(VALID_JOB_ID);
 			expect(onError).not.toHaveBeenCalled();
 		});
 
-		it('onError with non-409 invokes onError callback', () => {
+		it('on non-409 error invokes onError callback', () => {
+			api.sincronizarDesdeCrossChex.mockReturnValue(throwError(() => new Error('boom')));
 			const onError = vi.fn();
 			facade.sincronizarDesdeCrossChex(onError);
-
-			const config = wal.execute.mock.calls[0][0];
-			config.onError(new Error('boom'));
 
 			expect(onError).toHaveBeenCalled();
 			expect(store.syncing()).toBe(false);
@@ -211,52 +206,50 @@ describe('AttendancesDataFacade', () => {
 		it('does not dispatch if syncService.isActive', () => {
 			syncService.isActive.mockReturnValue(true);
 			facade.sincronizarDesdeCrossChex();
-			expect(wal.execute).not.toHaveBeenCalled();
+			expect(api.sincronizarDesdeCrossChex).not.toHaveBeenCalled();
 		});
 
 		it('does not dispatch if store.syncing is already true', () => {
 			store.setSyncing(true);
 			facade.sincronizarDesdeCrossChex();
-			expect(wal.execute).not.toHaveBeenCalled();
+			expect(api.sincronizarDesdeCrossChex).not.toHaveBeenCalled();
 		});
 	});
 
-	describe('sincronizarRango (P24C F3 — range sync via WAL)', () => {
+	describe('sincronizarRango (direct HTTP)', () => {
 		const RANGE_BODY = { fechaInicio: '2026-01-01', fechaFin: '2026-01-15' };
 
-		it('dispatches via WAL with sync-range endpoint', () => {
+		it('calls api.sincronizarRango with body and starts tracking', () => {
+			const VALID_JOB_ID = 'a1b2c3d4e5f6a7b8c9d0e1f2a3b4c5d6';
+			api.sincronizarRango.mockReturnValue(of({ jobId: VALID_JOB_ID, estado: 'QUEUED' }));
 			facade.sincronizarRango(RANGE_BODY);
 
-			expect(wal.execute).toHaveBeenCalledOnce();
-			const config = wal.execute.mock.calls[0][0];
-			expect(config.operation).toBe('CUSTOM');
-			expect(config.resourceType).toBe('crosschexSync');
-			expect(config.endpoint).toContain('/sync-range');
-			expect(config.payload).toEqual(RANGE_BODY);
+			expect(api.sincronizarRango).toHaveBeenCalledWith(RANGE_BODY);
+			expect(syncService.startTracking).toHaveBeenCalledWith(VALID_JOB_ID);
+			expect(store.syncing()).toBe(false);
 		});
 
 		it('passes dnis filter when provided', () => {
 			const bodyWithDnis = { ...RANGE_BODY, dnis: ['12345678', '87654321'] };
+			api.sincronizarRango.mockReturnValue(of({ jobId: 'job', estado: 'QUEUED' }));
 			facade.sincronizarRango(bodyWithDnis);
 
-			const config = wal.execute.mock.calls[0][0];
-			expect(config.payload).toEqual(bodyWithDnis);
+			expect(api.sincronizarRango).toHaveBeenCalledWith(bodyWithDnis);
 		});
 
-		it('onCommit starts tracking with jobId', () => {
-			facade.sincronizarRango(RANGE_BODY);
-			const config = wal.execute.mock.calls[0][0];
-			const VALID_JOB_ID = 'a1b2c3d4e5f6a7b8c9d0e1f2a3b4c5d6';
-			config.onCommit({ jobId: VALID_JOB_ID, estado: 'QUEUED' });
+		it('on error invokes onError callback', () => {
+			api.sincronizarRango.mockReturnValue(throwError(() => new Error('boom')));
+			const onError = vi.fn();
+			facade.sincronizarRango(RANGE_BODY, onError);
 
-			expect(syncService.startTracking).toHaveBeenCalledWith(VALID_JOB_ID);
+			expect(onError).toHaveBeenCalled();
 			expect(store.syncing()).toBe(false);
 		});
 
 		it('does not dispatch if sync already active', () => {
 			syncService.isActive.mockReturnValue(true);
 			facade.sincronizarRango(RANGE_BODY);
-			expect(wal.execute).not.toHaveBeenCalled();
+			expect(api.sincronizarRango).not.toHaveBeenCalled();
 		});
 	});
 });

@@ -16,7 +16,7 @@ import {
 	SyncRangoRequest,
 } from '../models';
 import { Injectable, inject } from '@angular/core';
-import { Observable, catchError, of } from 'rxjs';
+import { Observable } from 'rxjs';
 
 import { ApiResponse } from '@shared/models';
 import { HttpClient } from '@angular/common/http';
@@ -46,9 +46,7 @@ export class AttendancesAdminService {
 		if (search) params['search'] = search;
 		if (tipoPersona) params['tipoPersona'] = tipoPersona;
 
-		return this.http
-			.get<AsistenciaAdminLista[]>(`${this.apiUrl}/dia`, { params })
-			.pipe(catchError(() => of([])));
+		return this.http.get<AsistenciaAdminLista[]>(`${this.apiUrl}/dia`, { params });
 	}
 
 	obtenerEstadisticas(
@@ -60,9 +58,7 @@ export class AttendancesAdminService {
 		if (sedeId) params['sedeId'] = sedeId.toString();
 		if (tipoPersona) params['tipoPersona'] = tipoPersona;
 
-		return this.http
-			.get<AsistenciaAdminEstadisticas>(`${this.apiUrl}/estadisticas`, { params })
-			.pipe(catchError(() => of(null)));
+		return this.http.get<AsistenciaAdminEstadisticas>(`${this.apiUrl}/estadisticas`, { params });
 	}
 
 	listarPersonas(
@@ -75,9 +71,7 @@ export class AttendancesAdminService {
 		if (search) params['search'] = search;
 		if (tipoPersona) params['tipoPersona'] = tipoPersona;
 
-		return this.http
-			.get<PersonaParaSeleccion[]>(`${this.apiUrl}/personas`, { params })
-			.pipe(catchError(() => of([])));
+		return this.http.get<PersonaParaSeleccion[]>(`${this.apiUrl}/personas`, { params });
 	}
 
 	/** Alias retrocompat — reenvía a `listarPersonas` con `tipoPersona='E'`. */
@@ -90,9 +84,7 @@ export class AttendancesAdminService {
 		if (sedeId) params['sedeId'] = sedeId.toString();
 		if (anio) params['anio'] = anio.toString();
 
-		return this.http
-			.get<CierreMensualLista[]>(this.cierreUrl, { params })
-			.pipe(catchError(() => of([])));
+		return this.http.get<CierreMensualLista[]>(this.cierreUrl, { params });
 	}
 
 	// #endregion

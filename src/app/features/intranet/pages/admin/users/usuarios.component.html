@@ -33,13 +33,6 @@
 		</div>
 	}
 
-	@if (vm().error) {
-		<div class="error-banner">
-			<i class="pi pi-exclamation-triangle"></i>
-			<span>{{ vm().error }}</span>
-		</div>
-	}
-
 	<!-- * Compact stat bar with clickable role badges -->
 	@if (!vm().statsReady) {
 		<app-users-stats-skeleton />
@@ -68,6 +61,8 @@
 	<!-- * Table with row expansion -->
 	@if (!vm().tableReady) {
 		<app-users-table-skeleton />
+	} @else if (vm().error) {
+		<app-error-state [message]="vm().error!" (retry)="dataFacade.loadData()" />
 	} @else {
 		<app-users-table
 			[usuarios]="vm().usuarios"

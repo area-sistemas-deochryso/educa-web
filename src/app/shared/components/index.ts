@@ -1,4 +1,5 @@
 export * from './dependency-guidance';
+export * from './error-state';
 export * from './toast-container';
 export * from './skeleton-loader';
 export * from './devtools';

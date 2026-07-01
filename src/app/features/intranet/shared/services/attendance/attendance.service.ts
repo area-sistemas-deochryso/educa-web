@@ -1,5 +1,5 @@
 import { Injectable, inject } from '@angular/core';
-import { Observable, catchError, of } from 'rxjs';
+import { Observable } from 'rxjs';
 
 import { environment } from '@config/environment';
 import { HttpClient } from '@angular/common/http';
@@ -271,13 +271,7 @@ export class AttendanceService {
 			quitar,
 		};
 
-		return this.http
-			.post<{ success: boolean; message: string }>(`${this.apiUrl}/justificar`, body)
-			.pipe(
-				catchError(() =>
-					of({ success: false, message: 'Error al guardar la justificación' }),
-				),
-			);
+		return this.http.post<{ success: boolean; message: string }>(`${this.apiUrl}/justificar`, body);
 	}
 
 	// #endregion
@@ -289,9 +283,7 @@ export class AttendanceService {
 	 * GET /api/ConsultaAsistencia/estados-validos
 	 */
 	getEstadosValidos(): Observable<EstadoAsistencia[]> {
-		return this.http
-			.get<EstadoAsistencia[]>(`${this.apiUrl}/estados-validos`)
-			.pipe(catchError(() => of([])));
+		return this.http.get<EstadoAsistencia[]>(`${this.apiUrl}/estados-validos`);
 	}
 
 	// #endregion

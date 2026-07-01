@@ -1,11 +1,10 @@
 import { Injectable, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { Observable, catchError, of } from 'rxjs';
+import { Observable } from 'rxjs';
 
 import { environment } from '@config/environment';
 import {
 	AsistenciaDiaConEstadisticas,
-	EstadisticasAsistenciaDia,
 	EstudianteAsistencia,
 	SalonProfesor,
 } from '@data/models';
@@ -22,9 +21,7 @@ export class TeacherAttendanceApiService {
 	 * GET /api/ConsultaAsistencia/profesor/salones
 	 */
 	getSalonesProfesor(): Observable<SalonProfesor[]> {
-		return this.http
-			.get<SalonProfesor[]>(`${this.apiUrl}/profesor/salones`)
-			.pipe(catchError(() => of([])));
+		return this.http.get<SalonProfesor[]>(`${this.apiUrl}/profesor/salones`);
 	}
 
 	/**
@@ -32,9 +29,7 @@ export class TeacherAttendanceApiService {
 	 * GET /api/ConsultaAsistencia/profesor/salones-horario
 	 */
 	getSalonesProfesorPorHorario(): Observable<SalonProfesor[]> {
-		return this.http
-			.get<SalonProfesor[]>(`${this.apiUrl}/profesor/salones-horario`)
-			.pipe(catchError(() => of([])));
+		return this.http.get<SalonProfesor[]>(`${this.apiUrl}/profesor/salones-horario`);
 	}
 
 	/**
@@ -59,9 +54,7 @@ export class TeacherAttendanceApiService {
 			params['anio'] = anio.toString();
 		}
 
-		return this.http
-			.get<EstudianteAsistencia[]>(`${this.apiUrl}/profesor/grado`, { params })
-			.pipe(catchError(() => of([])));
+		return this.http.get<EstudianteAsistencia[]>(`${this.apiUrl}/profesor/grado`, { params });
 	}
 
 	/**
@@ -79,13 +72,7 @@ export class TeacherAttendanceApiService {
 			fecha: this.formatDateLocal(fecha),
 		};
 
-		return this.http
-			.get<AsistenciaDiaConEstadisticas>(`${this.apiUrl}/profesor/asistencia-dia`, { params })
-			.pipe(
-				catchError(() =>
-					of({ estudiantes: [], estadisticas: this.getEstadisticasVacias() }),
-				),
-			);
+		return this.http.get<AsistenciaDiaConEstadisticas>(`${this.apiUrl}/profesor/asistencia-dia`, { params });
 	}
 
 	// #endregion
@@ -97,17 +84,6 @@ export class TeacherAttendanceApiService {
 		const month = String(fecha.getMonth() + 1).padStart(2, '0');
 		const day = String(fecha.getDate()).padStart(2, '0');
 		return `${year}-${month}-${day}`;
-	}
-
-	private getEstadisticasVacias(): EstadisticasAsistenciaDia {
-		return {
-			total: 0,
-			tardanza: 0,
-			asistio: 0,
-			falta: 0,
-			justificado: 0,
-			pendiente: 0,
-		};
 	}
 
 	// #endregion

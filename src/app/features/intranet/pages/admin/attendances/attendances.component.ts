@@ -24,6 +24,7 @@ import { Tab, TabList, TabPanel, Tabs } from 'primeng/tabs';
 import { ToastModule } from 'primeng/toast';
 
 import { logger } from '@core/helpers';
+import { ErrorStateComponent } from '@shared/components/error-state';
 import { SkeletonColumnDef, TableSkeletonComponent, StatsSkeletonComponent, PageHeaderComponent } from '@intranet-shared/components';
 import { AttendanceScopeBannerComponent } from '@intranet-shared/components/attendance-scope-banner';
 import { AttendanceReportsComponent } from '../../cross-role/attendance-reports';
@@ -85,6 +86,7 @@ import {
 		CrossChexSyncBannerComponent,
 		SyncRangeDialogComponent,
 		PageHeaderComponent,
+		ErrorStateComponent,
 	],
 	providers: [ConfirmationService, MessageService],
 	templateUrl: './attendances.component.html',
@@ -94,7 +96,7 @@ import {
 export class AttendancesComponent implements OnInit {
 	// #region Dependencias
 	private adminApi = inject(AttendancesAdminService);
-	private dataFacade = inject(AttendancesDataFacade);
+	protected dataFacade = inject(AttendancesDataFacade);
 	protected crudFacade = inject(AttendancesCrudFacade);
 	private cierresFacade = inject(AttendancesCierresFacade);
 	protected uiFacade = inject(AttendancesUiFacade);

@@ -1,6 +1,6 @@
 import { Injectable, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { Observable, catchError, of } from 'rxjs';
+import { Observable } from 'rxjs';
 
 import { environment } from '@config/environment';
 import { HijoApoderado, ResumenAsistencia } from '@data/models';
@@ -17,9 +17,7 @@ export class GuardianAttendanceApiService {
 	 * GET /api/ConsultaAsistencia/apoderado/hijos
 	 */
 	getHijos(): Observable<HijoApoderado[]> {
-		return this.http
-			.get<HijoApoderado[]>(`${this.apiUrl}/apoderado/hijos`)
-			.pipe(catchError(() => of([])));
+		return this.http.get<HijoApoderado[]>(`${this.apiUrl}/apoderado/hijos`);
 	}
 
 	/**
@@ -40,11 +38,9 @@ export class GuardianAttendanceApiService {
 			params['anio'] = anio.toString();
 		}
 
-		return this.http
-			.get<ResumenAsistencia>(`${this.apiUrl}/apoderado/hijo/${estudianteId}/asistencias`, {
-				params,
-			})
-			.pipe(catchError(() => of(null)));
+		return this.http.get<ResumenAsistencia>(`${this.apiUrl}/apoderado/hijo/${estudianteId}/asistencias`, {
+			params,
+		});
 	}
 
 	// #endregion

@@ -4,7 +4,7 @@ import { forkJoin, of } from 'rxjs';
 import { catchError } from 'rxjs/operators';
 
 import { ErrorHandlerService } from '@core/services';
-import { logger, withRetry } from '@core/helpers';
+import { logger, withRetry, facadeErrorHandler, type FacadeErrorHandler } from '@core/helpers';
 import { UI_ADMIN_ERROR_DETAILS, UI_SUMMARIES } from '@app/shared/constants';
 import { APP_USER_ROLES } from '@shared/constants';
 import { resolveModoAsignacion } from '@data/models';
@@ -28,6 +28,10 @@ export class UsersUiFacade {
 	private store = inject(UsersStore);
 	private errorHandler = inject(ErrorHandlerService);
 	private destroyRef = inject(DestroyRef);
+	private errHandler: FacadeErrorHandler = facadeErrorHandler({
+		tag: 'UsersUiFacade',
+		errorHandler: this.errorHandler,
+	});
 
 	// #region Detail View
 
@@ -213,13 +217,13 @@ export class UsersUiFacade {
 		forkJoin({
 			asignados: this.profesorCursoApi.listarPorProfesor(detalle.id, anio).pipe(
 				catchError((err) => {
-					logger.warn('[UsuariosUI] listarPorProfesor failed:', err);
+					this.errHandler.handle(err, 'cargar cursos del profesor');
 					return of([] as ProfesorCursoListaDto[]);
 				}),
 			),
 			cursos: this.cursosApi.listar().pipe(
 				catchError((err) => {
-					logger.warn('[UsuariosUI] listar cursos failed:', err);
+					this.errHandler.handle(err, 'cargar cursos disponibles');
 					return of([] as CursoListaDto[]);
 				}),
 			),

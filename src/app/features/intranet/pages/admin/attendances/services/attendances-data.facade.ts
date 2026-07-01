@@ -3,8 +3,8 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { HttpErrorResponse } from '@angular/common/http';
 import { Subject, debounceTime, distinctUntilChanged, switchMap, of, catchError } from 'rxjs';
 
-import { logger } from '@core/helpers';
-import { WalCrossTabRefetchService } from '@core/services';
+import { logger, facadeErrorHandler, type FacadeErrorHandler } from '@core/helpers';
+import { ErrorHandlerService, WalCrossTabRefetchService } from '@core/services';
 import {
 	CrossChexSyncAceptadoDto,
 	CrossChexSyncStatusService,
@@ -26,6 +26,10 @@ export class AttendancesDataFacade {
 	private syncService = inject(CrossChexSyncStatusService);
 	private crossTabRefetch = inject(WalCrossTabRefetchService);
 	private destroyRef = inject(DestroyRef);
+	private errHandler: FacadeErrorHandler = facadeErrorHandler({
+		tag: 'AttendancesDataFacade',
+		errorHandler: inject(ErrorHandlerService),
+	});
 	// #endregion
 
 	// #region Estado expuesto
@@ -78,7 +82,9 @@ export class AttendancesDataFacade {
 					return this.api
 						.listarPersonas(sedeId, search || undefined, tipo)
 						.pipe(catchError((err) => {
-							logger.warn('[AttendancesData] listarPersonas failed:', err);
+							this.errHandler.handle(err, 'buscar personas', () => {
+								this.store.setPersonasLoading(false);
+							});
 							return of([]);
 						}));
 				}),
@@ -100,7 +106,6 @@ export class AttendancesDataFacade {
 	loadEstadisticas(): void {
 		const fecha = this.store.fecha();
 		const sedeId = this.store.sedeId() ?? undefined;
-		// Stats siempre globales (E+P desglosado) — no dependen del filtro UI.
 		this.api
 			.obtenerEstadisticas(fecha, sedeId, null)
 			.pipe(takeUntilDestroyed(this.destroyRef))
@@ -110,8 +115,9 @@ export class AttendancesDataFacade {
 					this.store.setStatsReady(true);
 				},
 				error: (err) => {
-					logger.warn('[AttendancesData] obtenerEstadisticas failed:', err);
-					this.store.setStatsReady(true);
+					this.errHandler.handle(err, 'cargar estadísticas', () => {
+						this.store.setStatsReady(true);
+					});
 				},
 			});
 	}
@@ -119,6 +125,7 @@ export class AttendancesDataFacade {
 	loadItems(): void {
 		if (this.store.loading()) return;
 		this.store.setLoading(true);
+		this.store.setError(null);
 
 		const fecha = this.store.fecha();
 		const sedeId = this.store.sedeId() ?? undefined;
@@ -135,10 +142,11 @@ export class AttendancesDataFacade {
 					this.store.setLoading(false);
 				},
 				error: (err) => {
-					logger.warn('[AttendancesData] listarDelDia failed:', err);
-					this.store.setItems([]);
-					this.store.setTableReady(true);
-					this.store.setLoading(false);
+					this.errHandler.handle(err, 'cargar asistencias del día', () => {
+						this.store.setError('No se pudieron cargar las asistencias.');
+						this.store.setTableReady(true);
+						this.store.setLoading(false);
+					});
 				},
 			});
 	}
@@ -156,6 +164,9 @@ export class AttendancesDataFacade {
 				next: (items) => {
 					this.store.setItems(items ?? []);
 				},
+				error: (err) => {
+					this.errHandler.handle(err, 'refrescar asistencias');
+				},
 			});
 	}
 
@@ -172,8 +183,9 @@ export class AttendancesDataFacade {
 					this.store.setPersonasLoading(false);
 				},
 				error: (err) => {
-					logger.warn('[AttendancesData] listarPersonas failed:', err);
-					this.store.setPersonasLoading(false);
+					this.errHandler.handle(err, 'cargar personas', () => {
+						this.store.setPersonasLoading(false);
+					});
 				},
 			});
 	}
@@ -209,6 +221,9 @@ export class AttendancesDataFacade {
 			.subscribe({
 				next: (cierres) => {
 					this.store.setCierres(cierres ?? []);
+				},
+				error: (err) => {
+					this.errHandler.handle(err, 'cargar cierres mensuales');
 				},
 			});
 	}

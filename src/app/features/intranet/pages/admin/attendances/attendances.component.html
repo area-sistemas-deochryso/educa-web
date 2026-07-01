@@ -224,6 +224,8 @@
 <!-- #region Tabla -->
 @if (!vm().tableReady) {
 	<app-table-skeleton [columns]="tableColumns" [rows]="10" minHeight="420px" />
+} @else if (vm().error) {
+	<app-error-state [message]="vm().error!" (retry)="dataFacade.loadData()" />
 } @else {
 	<p-table
 		[value]="vm().items"
