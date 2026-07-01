@@ -64,6 +64,7 @@ export class WalCrudOps<
 		const suffix = options?.endpointSuffix ?? 'crear';
 		const cb = options?.callbacks;
 
+		this.store.setSaving(true);
 		this.wal.execute({
 			operation: 'CREATE',
 			resourceType: this.config.resourceType,
@@ -79,11 +80,18 @@ export class WalCrudOps<
 					} else {
 						this.store.closeDialog();
 					}
+					this.store.setSaving(false);
 				},
-				rollback: () => cb?.optimisticRollback?.(),
+				rollback: () => {
+					this.store.setSaving(false);
+					cb?.optimisticRollback?.();
+				},
 			},
 			onCommit: (result) => cb?.onCommit?.(result),
-			onError: (err) => cb?.onError ? cb.onError(err) : this._errHandler.handle(err, cb?.errorLabel ?? 'guardar'),
+			onError: (err) => {
+				this.store.setSaving(false);
+				cb?.onError ? cb.onError(err) : this._errHandler.handle(err, cb?.errorLabel ?? 'guardar');
+			},
 		});
 	}
 
@@ -103,6 +111,7 @@ export class WalCrudOps<
 		const suffix = options?.endpointSuffix ?? `${id}/actualizar`;
 		const cb = options?.callbacks;
 
+		this.store.setSaving(true);
 		this.wal.execute({
 			operation: 'UPDATE',
 			resourceType: this.config.resourceType,
@@ -120,14 +129,19 @@ export class WalCrudOps<
 					} else {
 						this.store.closeDialog();
 					}
+					this.store.setSaving(false);
 				},
 				rollback: () => {
+					this.store.setSaving(false);
 					if (snapshot) this.store.updateItem(id, snapshot);
 					cb?.optimisticRollback?.();
 				},
 			},
 			onCommit: (result) => cb?.onCommit?.(result),
-			onError: (err) => cb?.onError ? cb.onError(err) : this._errHandler.handle(err, cb?.errorLabel ?? 'guardar'),
+			onError: (err) => {
+				this.store.setSaving(false);
+				cb?.onError ? cb.onError(err) : this._errHandler.handle(err, cb?.errorLabel ?? 'guardar');
+			},
 		});
 	}
 

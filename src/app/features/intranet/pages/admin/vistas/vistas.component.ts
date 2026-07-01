@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, inject, OnInit } from '@angular/core';
+import { ChangeDetectionStrategy, Component, inject, OnInit, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 
@@ -46,6 +46,7 @@ export class VistasComponent implements OnInit {
 
 	// #region Estado
 	readonly vm = this.facade.vm;
+	showValidation = signal(false);
 	// #endregion
 
 	// #region Lifecycle
@@ -68,6 +69,7 @@ export class VistasComponent implements OnInit {
 	}
 
 	saveCapability(): void {
+		this.showValidation.set(true);
 		this.facade.saveCapability();
 	}
 

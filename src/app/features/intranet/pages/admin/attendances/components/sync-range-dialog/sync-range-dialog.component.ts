@@ -52,6 +52,7 @@ export class SyncRangeDialogComponent {
 	readonly fechaFin = signal<Date | null>(null);
 	readonly todosUsuarios = signal<boolean>(true);
 	readonly selectedPersonIds = signal<number[]>([]);
+	readonly saving = signal(false);
 
 	readonly personas = this.store.personas;
 
@@ -84,6 +85,8 @@ export class SyncRangeDialogComponent {
 		const end = this.fechaFin();
 		if (!start || !end) return;
 
+		this.saving.set(true);
+
 		const dnis = this.todosUsuarios()
 			? undefined
 			: this.selectedPersonIds()
@@ -100,6 +103,7 @@ export class SyncRangeDialogComponent {
 
 	onHide(): void {
 		this.visible.set(false);
+		this.saving.set(false);
 	}
 
 	personaLabel(persona: PersonaParaSeleccion): string {

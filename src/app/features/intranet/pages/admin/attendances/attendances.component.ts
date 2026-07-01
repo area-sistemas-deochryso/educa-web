@@ -141,6 +141,8 @@ export class AttendancesComponent implements OnInit {
 	readonly cierreObservacion = signal('');
 	readonly revertirObservacion = signal('');
 	readonly syncRangeDialogVisible = signal(false);
+	readonly cierreSaving = signal(false);
+	readonly revertSaving = signal(false);
 	// #endregion
 
 	// #region Skeleton config
@@ -464,14 +466,29 @@ export class AttendancesComponent implements OnInit {
 			mes: this.cierreMes(),
 			observacion: this.cierreObservacion() || undefined,
 		};
-		this.cierresFacade.crearCierre(dto);
-		this.cierreObservacion.set('');
+		this.confirmationService.confirm({
+			message: `¿Cerrar el mes ${this.cierreMes()}/${this.cierreAnio()}? Esta acción bloqueará las mutaciones de asistencia del período.`,
+			header: 'Confirmar cierre mensual',
+			icon: 'pi pi-lock',
+			acceptLabel: 'Cerrar mes',
+			rejectLabel: 'Cancelar',
+			accept: () => {
+				this.cierreSaving.set(true);
+				this.cierresFacade.crearCierre(dto, () => this.cierreSaving.set(false));
+				this.cierreObservacion.set('');
+			},
+		});
 	}
 
 	onRevertirCierre(cierreId: number, rowVersion: string): void {
 		const observacion = this.revertirObservacion();
 		if (observacion.length < 10) return;
-		this.cierresFacade.revertirCierre(cierreId, { observacion, rowVersion } satisfies RevertirCierreMensualRequest);
+		this.revertSaving.set(true);
+		this.cierresFacade.revertirCierre(
+			cierreId,
+			{ observacion, rowVersion } satisfies RevertirCierreMensualRequest,
+			() => this.revertSaving.set(false),
+		);
 		this.revertirObservacion.set('');
 	}
 

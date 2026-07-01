@@ -210,6 +210,9 @@
 				(ngModelChange)="updateField('titulo', $event)"
 				placeholder="Título del evento"
 			/>
+			@if (showValidation() && !vm().formData.titulo.trim()) {
+				<small class="error-msg">El título es obligatorio</small>
+			}
 		</div>
 
 		<div class="form-field full">
@@ -223,6 +226,9 @@
 				[rows]="3"
 				[autoResize]="true"
 			></textarea>
+			@if (showValidation() && !vm().formData.descripcion.trim()) {
+				<small class="error-msg">La descripción es obligatoria</small>
+			}
 		</div>
 
 		<div class="form-field">
@@ -269,6 +275,9 @@
 				dateFormat="yy-mm-dd"
 				appendTo="body"
 			/>
+			@if (showValidation() && !vm().formData.fechaInicio) {
+				<small class="error-msg">La fecha de inicio es obligatoria</small>
+			}
 		</div>
 
 		<div class="form-field">
@@ -322,7 +331,8 @@
 			[label]="vm().isEditing ? 'Actualizar' : 'Crear'"
 			icon="pi pi-check"
 			(click)="onSave()"
-			[disabled]="!vm().isFormValid || vm().loading"
+			[disabled]="!vm().isFormValid || vm().saving"
+			[loading]="vm().saving"
 		></button>
 	</ng-template>
 </p-dialog>

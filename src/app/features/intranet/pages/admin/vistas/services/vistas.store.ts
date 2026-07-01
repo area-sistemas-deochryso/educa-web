@@ -116,6 +116,7 @@ export class VistasStore extends BaseCrudStore<CapabilityCatalogItem, Capability
 
 		formData: this.formData(),
 		isFormValid: this.isFormValid(),
+		saving: this.saving(),
 		editingRoute: this.editingRoute(),
 
 		modulosOptions: this.modulosOptions(),

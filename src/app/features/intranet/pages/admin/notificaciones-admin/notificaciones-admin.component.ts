@@ -1,5 +1,5 @@
 // #region Imports
-import { ChangeDetectionStrategy, Component, OnInit, inject } from '@angular/core';
+import { ChangeDetectionStrategy, Component, OnInit, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ConfirmationService } from 'primeng/api';
@@ -66,6 +66,7 @@ export class NotificacionesAdminComponent implements OnInit {
 
 	// #region Estado del facade
 	readonly vm = this.facade.vm;
+	showValidation = signal(false);
 	// #endregion
 
 	// #region Opciones de filtros
@@ -199,6 +200,7 @@ export class NotificacionesAdminComponent implements OnInit {
 	}
 
 	onSave(): void {
+		this.showValidation.set(true);
 		if (this.vm().isEditing) {
 			this.facade.update();
 		} else {

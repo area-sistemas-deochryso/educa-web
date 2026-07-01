@@ -267,6 +267,9 @@
 					(ngModelChange)="updateFormField('nombre', $event)"
 					placeholder="Ejemplo: Matemática, Comunicación, etc."
 				/>
+				@if (showValidation() && !vm().formData.nombre.trim()) {
+					<small class="error-msg">El nombre es obligatorio</small>
+				}
 			</div>
 
 			<!-- Grados seleccionados — data-driven por nivel -->
@@ -365,6 +368,7 @@
 				icon="pi pi-times"
 				class="p-button-text"
 				(click)="onDialogVisibleChange(false)"
+				[disabled]="vm().saving"
 			></button>
 			<button
 				pButton
@@ -372,7 +376,8 @@
 				icon="pi pi-check"
 				class="p-button-success"
 				(click)="saveCurso()"
-				[disabled]="!vm().isFormValid"
+				[disabled]="!vm().isFormValid || vm().saving"
+				[loading]="vm().saving"
 			></button>
 		</div>
 	</ng-template>

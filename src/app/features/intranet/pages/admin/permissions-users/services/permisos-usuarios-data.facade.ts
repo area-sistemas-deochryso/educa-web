@@ -128,7 +128,7 @@ export class PermissionsUsersDataFacade {
 	// #endregion
 
 	// #region Save
-	saveOverrides(): void {
+	saveOverrides(onSettled?: () => void): void {
 		const usuario = this.store.selectedUsuario();
 		const rolId = this.store.selectedRolId();
 		if (!usuario || !rolId) return;
@@ -148,8 +148,12 @@ export class PermissionsUsersDataFacade {
 				this.errorHandler.showSuccess(UI_SUMMARIES.success, 'Overrides del usuario actualizados');
 				this.store.closeDialog();
 				this.loadOverview();
+				onSettled?.();
 			},
-			onError: (err) => this.errHandler.handle(err, 'guardar overrides del usuario'),
+			onError: (err) => {
+				this.errHandler.handle(err, 'guardar overrides del usuario');
+				onSettled?.();
+			},
 			optimistic: {
 				apply: () => this.store.closeDialog(),
 				rollback: () => this.store.openDialog(),

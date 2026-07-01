@@ -335,6 +335,8 @@
 				label="Guardar Overrides"
 				icon="pi pi-check"
 				class="p-button-success"
+				[loading]="saving()"
+				[disabled]="saving()"
 				(click)="saveOverrides()"
 			></button>
 		</div>

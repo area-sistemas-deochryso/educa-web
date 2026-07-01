@@ -114,6 +114,7 @@ export class EventsCalendarStore extends BaseCrudStore<
 		selectedItem: this.selectedItem(),
 		formData: this.formData(),
 		isFormValid: this.isFormValid(),
+		saving: this.saving(),
 
 		searchTerm: this.searchTerm(),
 		filterEstado: this.filterEstado(),

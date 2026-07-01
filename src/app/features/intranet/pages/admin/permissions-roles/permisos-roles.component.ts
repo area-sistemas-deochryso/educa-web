@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, inject, OnInit } from '@angular/core';
+import { ChangeDetectionStrategy, Component, inject, OnInit, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 
@@ -43,6 +43,7 @@ import { VistasComponent } from '../vistas';
 export class PermissionsRolesComponent implements OnInit {
 	private facade = inject(PermissionsRolesFacade);
 	readonly vm = this.facade.vm;
+	readonly saving = signal(false);
 
 	ngOnInit(): void {
 		this.facade.loadAll();
@@ -57,7 +58,8 @@ export class PermissionsRolesComponent implements OnInit {
 	}
 
 	saveCapabilities(): void {
-		this.facade.saveCapabilities();
+		this.saving.set(true);
+		this.facade.saveCapabilities(() => this.saving.set(false));
 	}
 
 	openDetail(row: RolCapabilityMatrixRow): void {

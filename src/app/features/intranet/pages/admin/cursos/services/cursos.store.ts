@@ -256,6 +256,7 @@ export class CursosStore extends BaseCrudStore<Curso, CursoFormData, CursosEstad
 	readonly formVm = computed(() => ({
 		formData: this.formData(),
 		isFormValid: this.isFormValid(),
+		saving: this.saving(),
 		niveles: this.niveles(),
 		cursoGradosNiveles: this.cursoGradosNiveles(),
 	}));

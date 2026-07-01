@@ -63,6 +63,7 @@ export class CursosComponent implements OnInit {
 	// #region Estado local
 	/** Guard para ignorar el onLazyLoad inicial (ngOnInit ya carga los datos) */
 	private initialLoadDone = signal(false);
+	showValidation = signal(false);
 	// #endregion
 
 	// #region Opciones estáticas
@@ -109,6 +110,7 @@ export class CursosComponent implements OnInit {
 	}
 
 	saveCurso(): void {
+		this.showValidation.set(true);
 		this.facade.saveCurso();
 	}
 

@@ -345,8 +345,9 @@
 				label="Guardar Cambios"
 				icon="pi pi-check"
 				class="p-button-success"
+				[loading]="saving()"
 				(click)="saveCapabilities()"
-				[disabled]="vm().selectedCapIds.length === 0"
+				[disabled]="vm().selectedCapIds.length === 0 || saving()"
 			></button>
 		</div>
 	</ng-template>

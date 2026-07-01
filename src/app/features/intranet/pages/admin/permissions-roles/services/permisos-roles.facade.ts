@@ -75,7 +75,7 @@ export class PermissionsRolesFacade {
 	// #endregion
 
 	// #region Save
-	saveCapabilities(): void {
+	saveCapabilities(onSettled?: () => void): void {
 		const row = this.store.selectedRow();
 		if (!row) return;
 
@@ -93,8 +93,12 @@ export class PermissionsRolesFacade {
 			onCommit: () => {
 				this.errorHandler.showSuccess(UI_SUMMARIES.success, 'Capabilities del rol actualizadas');
 				this.silentRefresh();
+				onSettled?.();
 			},
-			onError: (err) => this.errHandler.handle(err, 'actualizar capabilities del rol'),
+			onError: (err) => {
+				this.errHandler.handle(err, 'actualizar capabilities del rol');
+				onSettled?.();
+			},
 			optimistic: {
 				apply: () => {
 					this.store.updateRowCapabilities(row.rolId, capabilityIds);

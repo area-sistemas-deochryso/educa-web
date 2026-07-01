@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, inject, OnInit } from '@angular/core';
+import { ChangeDetectionStrategy, Component, inject, OnInit, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { RouterLink } from '@angular/router';
@@ -41,6 +41,7 @@ import { PermissionsUsersDataFacade } from './services';
 export class PermissionsUsersComponent implements OnInit {
 	private facade = inject(PermissionsUsersDataFacade);
 	readonly vm = this.facade.vm;
+	readonly saving = signal(false);
 
 	ngOnInit(): void {
 		this.facade.loadCatalogAndMatrix();
@@ -72,7 +73,8 @@ export class PermissionsUsersComponent implements OnInit {
 	}
 
 	saveOverrides(): void {
-		this.facade.saveOverrides();
+		this.saving.set(true);
+		this.facade.saveOverrides(() => this.saving.set(false));
 	}
 
 	closeDialog(): void {

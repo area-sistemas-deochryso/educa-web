@@ -83,7 +83,8 @@
 				type="button"
 				label="Sincronizar"
 				icon="pi pi-sync"
-				[disabled]="!isValid()"
+				[disabled]="!isValid() || saving()"
+				[loading]="saving()"
 				(click)="onConfirm()"
 				[pt]="{ root: { 'aria-label': 'Iniciar sincronización del rango seleccionado' } }"
 			></button>

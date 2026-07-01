@@ -573,6 +573,8 @@
 				icon="pi pi-lock"
 				label="Cerrar"
 				class="p-button-warning"
+				[loading]="cierreSaving()"
+				[disabled]="cierreSaving()"
 				(click)="onCrearCierre()"
 			></button>
 		</div>
@@ -602,7 +604,8 @@
 							icon="pi pi-undo"
 							label="Revertir"
 							class="p-button-outlined p-button-danger"
-							[disabled]="revertirObservacion().length < 10"
+							[loading]="revertSaving()"
+							[disabled]="revertirObservacion().length < 10 || revertSaving()"
 							(click)="onRevertirCierre(cierre.cierreId, cierre.rowVersion)"
 						></button>
 					</div>

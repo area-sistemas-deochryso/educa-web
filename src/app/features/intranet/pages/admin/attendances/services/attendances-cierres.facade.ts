@@ -39,7 +39,7 @@ export class AttendancesCierresFacade {
 
 	// #region Comandos
 
-	crearCierre(dto: CrearCierreMensualRequest): void {
+	crearCierre(dto: CrearCierreMensualRequest, onSettled?: () => void): void {
 		this.wal.execute({
 			operation: 'CUSTOM',
 			resourceType: 'cierre-asistencia',
@@ -50,12 +50,16 @@ export class AttendancesCierresFacade {
 			http$: () => this.api.crearCierre(dto),
 			onCommit: (cierre) => {
 				if (cierre) this.store.addCierre(cierre);
+				onSettled?.();
 			},
-			onError: (err) => this.errHandler.handle(err, 'cerrar el mes'),
+			onError: (err) => {
+				this.errHandler.handle(err, 'cerrar el mes');
+				onSettled?.();
+			},
 		});
 	}
 
-	revertirCierre(cierreId: number, dto: RevertirCierreMensualRequest): void {
+	revertirCierre(cierreId: number, dto: RevertirCierreMensualRequest, onSettled?: () => void): void {
 		this.wal.execute({
 			operation: 'CUSTOM',
 			resourceType: 'cierre-asistencia',
@@ -69,8 +73,12 @@ export class AttendancesCierresFacade {
 				if (result) {
 					this.store.updateCierre(cierreId, { activo: false, observacion: result.observacion });
 				}
+				onSettled?.();
 			},
-			onError: (err) => this.errHandler.handle(err, 'revertir el cierre'),
+			onError: (err) => {
+				this.errHandler.handle(err, 'revertir el cierre');
+				onSettled?.();
+			},
 		});
 	}
 

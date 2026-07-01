@@ -215,6 +215,9 @@
 					[disabled]="vm().isEditing"
 				/>
 				<small class="field-hint">Identificador único en UPPER_SNAKE_CASE</small>
+				@if (showValidation() && !vm().formData.codigo.trim()) {
+					<small class="error-msg">El código es obligatorio</small>
+				}
 			</div>
 
 			<div class="field">
@@ -227,6 +230,9 @@
 					(ngModelChange)="updateFormField('nombre', $event)"
 					placeholder="Nombre descriptivo"
 				/>
+				@if (showValidation() && !vm().formData.nombre.trim()) {
+					<small class="error-msg">El nombre es obligatorio</small>
+				}
 			</div>
 
 			<div class="field">
@@ -239,6 +245,9 @@
 					(ngModelChange)="updateFormField('modulo', $event)"
 					placeholder="admin"
 				/>
+				@if (showValidation() && !vm().formData.modulo.trim()) {
+					<small class="error-msg">El módulo es obligatorio</small>
+				}
 			</div>
 
 			<div class="field">
@@ -263,6 +272,7 @@
 				icon="pi pi-times"
 				class="p-button-text"
 				(click)="onDialogVisibleChange(false)"
+				[disabled]="vm().saving"
 			></button>
 			<button
 				pButton
@@ -270,7 +280,8 @@
 				icon="pi pi-check"
 				class="p-button-success"
 				(click)="saveCapability()"
-				[disabled]="!vm().isFormValid"
+				[disabled]="!vm().isFormValid || vm().saving"
+				[loading]="vm().saving"
 			></button>
 		</div>
 	</ng-template>

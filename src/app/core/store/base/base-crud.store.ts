@@ -63,6 +63,7 @@ export abstract class BaseCrudStore<
 	// #region Estado privado — UI
 	private readonly _dialogVisible = signal(false);
 	private readonly _confirmDialogVisible = signal(false);
+	private readonly _saving = signal(false);
 	// #endregion
 
 	// #region Estado privado — Pagination
@@ -86,6 +87,7 @@ export abstract class BaseCrudStore<
 	readonly estadisticas: Signal<TStats | null>;
 	readonly dialogVisible = this._dialogVisible.asReadonly();
 	readonly confirmDialogVisible = this._confirmDialogVisible.asReadonly();
+	readonly saving = this._saving.asReadonly();
 	readonly page = this._page.asReadonly();
 	readonly pageSize = this._pageSize.asReadonly();
 	readonly totalRecords = this._totalRecords.asReadonly();
@@ -164,6 +166,10 @@ export abstract class BaseCrudStore<
 
 	closeConfirmDialog(): void {
 		this._confirmDialogVisible.set(false);
+	}
+
+	setSaving(value: boolean): void {
+		this._saving.set(value);
 	}
 	// #endregion
 
