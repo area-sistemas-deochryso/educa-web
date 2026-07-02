@@ -8,112 +8,86 @@
 />
 <!-- #endregion -->
 
-<!-- #region Sub-tabs Resumen | Detalle -->
-<p-tabs value="resumen" class="gap-subtabs">
+<!-- #region Resumen (stat cards — always visible) -->
+@if (vm().loading && !hasData()) {
+	<app-stats-skeleton [count]="3" iconPosition="right" />
+} @else if (vm().resumen; as resumen) {
+	<app-correos-dia-resumen [resumen]="resumen" />
+}
+<!-- #endregion -->
+
+<!-- #region Detail tabs (flat — formerly 3rd-level sub-sub-tabs) -->
+<p-tabs value="entradas" class="detalle-tabs">
 	<p-tablist>
-		<p-tab value="resumen">
-			<i class="pi pi-th-large"></i>
-			<span>Resumen</span>
+		<p-tab value="entradas">
+			<i class="pi pi-sign-in"></i>
+			<span>Entradas sin correo</span>
+			@if (hasData() && vm().entradasSinCorreoEnviado.length > 0) {
+				<span class="tab-badge tab-badge--neutral">
+					{{ vm().entradasSinCorreoEnviado.length }}
+				</span>
+			}
 		</p-tab>
-		<p-tab value="detalle">
-			<i class="pi pi-list"></i>
-			<span>Detalle</span>
-			@if (vm().totalGap > 0) {
-				<span class="tab-badge">{{ vm().totalGap }}</span>
+		<p-tab value="estudiantes">
+			<i class="pi pi-user-minus"></i>
+			<span>Sin correo apoderado</span>
+			@if (hasData() && vm().estudiantesSinCorreo.length > 0) {
+				<span class="tab-badge tab-badge--neutral">
+					{{ vm().estudiantesSinCorreo.length }}
+				</span>
+			}
+		</p-tab>
+		<p-tab value="apoderados">
+			<i class="pi pi-ban"></i>
+			<span>Apoderados blacklisteados</span>
+			@if (hasData() && vm().apoderadosBlacklisteados.length > 0) {
+				<span class="tab-badge tab-badge--neutral">
+					{{ vm().apoderadosBlacklisteados.length }}
+				</span>
+			}
+		</p-tab>
+		<p-tab value="enviados">
+			<i class="pi pi-check-circle"></i>
+			<span>Entradas con correo</span>
+			@if (hasData() && vm().entradasConCorreoEnviado.length > 0) {
+				<span class="tab-badge tab-badge--success">
+					{{ vm().entradasConCorreoEnviado.length }}
+				</span>
 			}
 		</p-tab>
 	</p-tablist>
 
 	<p-tabpanels>
-		<!-- Sub-tab 1: Resumen (stat cards 3 + 6) -->
-		<p-tabpanel value="resumen">
+		<p-tabpanel value="entradas">
 			@if (vm().loading && !hasData()) {
-				<app-stats-skeleton [count]="3" iconPosition="right" />
-			} @else if (vm().resumen; as resumen) {
-				<app-correos-dia-resumen [resumen]="resumen" />
+				<app-table-skeleton [columns]="entradasColumns" [rows]="8" />
+			} @else if (hasData()) {
+				<app-entradas-sin-correo-table [data]="vm().entradasSinCorreoEnviado" />
 			}
 		</p-tabpanel>
 
-		<!-- Sub-tab 2: Detalle (3 sub-sub-tabs, una tabla por tab) -->
-		<p-tabpanel value="detalle">
-			<p-tabs value="entradas" class="detalle-subtabs">
-				<p-tablist>
-					<p-tab value="entradas">
-						<i class="pi pi-sign-in"></i>
-						<span>Entradas sin correo</span>
-						@if (hasData() && vm().entradasSinCorreoEnviado.length > 0) {
-							<span class="tab-badge tab-badge--neutral">
-								{{ vm().entradasSinCorreoEnviado.length }}
-							</span>
-						}
-					</p-tab>
-					<p-tab value="estudiantes">
-						<i class="pi pi-user-minus"></i>
-						<span>Sin correo apoderado</span>
-						@if (hasData() && vm().estudiantesSinCorreo.length > 0) {
-							<span class="tab-badge tab-badge--neutral">
-								{{ vm().estudiantesSinCorreo.length }}
-							</span>
-						}
-					</p-tab>
-					<p-tab value="apoderados">
-						<i class="pi pi-ban"></i>
-						<span>Apoderados blacklisteados</span>
-						@if (hasData() && vm().apoderadosBlacklisteados.length > 0) {
-							<span class="tab-badge tab-badge--neutral">
-								{{ vm().apoderadosBlacklisteados.length }}
-							</span>
-						}
-					</p-tab>
-					<p-tab value="enviados">
-						<i class="pi pi-check-circle"></i>
-						<span>Entradas con correo</span>
-						@if (hasData() && vm().entradasConCorreoEnviado.length > 0) {
-							<span class="tab-badge tab-badge--success">
-								{{ vm().entradasConCorreoEnviado.length }}
-							</span>
-						}
-					</p-tab>
-				</p-tablist>
+		<p-tabpanel value="estudiantes">
+			@if (vm().loading && !hasData()) {
+				<app-table-skeleton [columns]="listaSimpleColumns" [rows]="8" />
+			} @else if (hasData()) {
+				<app-estudiantes-sin-correo-table [data]="vm().estudiantesSinCorreo" />
+			}
+		</p-tabpanel>
 
-				<p-tabpanels>
-					<!-- Entradas sin correo enviado — la razón "raíz" del gap -->
-					<p-tabpanel value="entradas">
-						@if (vm().loading && !hasData()) {
-							<app-table-skeleton [columns]="entradasColumns" [rows]="8" />
-						} @else if (hasData()) {
-							<app-entradas-sin-correo-table [data]="vm().entradasSinCorreoEnviado" />
-						}
-					</p-tabpanel>
+		<p-tabpanel value="apoderados">
+			@if (vm().loading && !hasData()) {
+				<app-table-skeleton [columns]="blacklistColumns" [rows]="8" />
+			} @else if (hasData()) {
+				<app-apoderados-blacklisteados-table [data]="vm().apoderadosBlacklisteados" />
+			}
+		</p-tabpanel>
 
-					<!-- Estudiantes cuyo apoderado no tiene correo registrado -->
-					<p-tabpanel value="estudiantes">
-						@if (vm().loading && !hasData()) {
-							<app-table-skeleton [columns]="listaSimpleColumns" [rows]="8" />
-						} @else if (hasData()) {
-							<app-estudiantes-sin-correo-table [data]="vm().estudiantesSinCorreo" />
-						}
-					</p-tabpanel>
-
-					<!-- Apoderados blacklisteados por bounces acumulados -->
-					<p-tabpanel value="apoderados">
-						@if (vm().loading && !hasData()) {
-							<app-table-skeleton [columns]="blacklistColumns" [rows]="8" />
-						} @else if (hasData()) {
-							<app-apoderados-blacklisteados-table [data]="vm().apoderadosBlacklisteados" />
-						}
-					</p-tabpanel>
-
-					<!-- Plan 30b — lista simétrica positiva: entradas cuyo correo SÍ se envió -->
-					<p-tabpanel value="enviados">
-						@if (vm().loading && !hasData()) {
-							<app-table-skeleton [columns]="enviadosColumns" [rows]="8" />
-						} @else if (hasData()) {
-							<app-entradas-con-correo-table [data]="vm().entradasConCorreoEnviado" />
-						}
-					</p-tabpanel>
-				</p-tabpanels>
-			</p-tabs>
+		<p-tabpanel value="enviados">
+			@if (vm().loading && !hasData()) {
+				<app-table-skeleton [columns]="enviadosColumns" [rows]="8" />
+			} @else if (hasData()) {
+				<app-entradas-con-correo-table [data]="vm().entradasConCorreoEnviado" />
+			}
 		</p-tabpanel>
 	</p-tabpanels>
 </p-tabs>

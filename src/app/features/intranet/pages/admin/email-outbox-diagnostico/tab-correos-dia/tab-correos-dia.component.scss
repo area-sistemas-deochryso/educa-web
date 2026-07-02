@@ -1,6 +1,7 @@
-// #region Sub-tabs nivel 2 (Resumen | Detalle)
-:host ::ng-deep .gap-subtabs {
+// #region Detail tabs (flat — single level below summary)
+:host ::ng-deep .detalle-tabs {
 	background: transparent;
+	margin-top: 1rem;
 
 	.p-tabs,
 	.p-tablist,
@@ -12,69 +13,6 @@
 
 	.p-tablist {
 		border-bottom: 1px solid var(--surface-300);
-		margin-bottom: 1rem;
-	}
-
-	> .p-tabs > .p-tablist .p-tab,
-	> .p-tablist .p-tab {
-		display: inline-flex;
-		align-items: center;
-		gap: 0.5rem;
-		font-size: 0.9rem;
-		background: transparent;
-		padding: 0.6rem 1rem;
-
-		i {
-			font-size: 0.95rem;
-		}
-	}
-
-	// * Badge rojo del nivel 2 = total del gap (señal crítica).
-	// * Specificity alta + !important para ganar a los resets de PrimeNG.
-	// * El selector `>` aísla los badges del nivel 2 de los del nivel 3.
-	> .p-tabs > .p-tablist .p-tab .tab-badge,
-	> .p-tablist .p-tab .tab-badge {
-		display: inline-flex !important;
-		align-items: center;
-		justify-content: center;
-		min-width: 1.25rem;
-		height: 1.25rem;
-		padding: 0 0.45rem;
-		border-radius: 999px;
-		background: var(--red-600, #dc2626) !important;
-		color: #ffffff !important;
-		font-size: 0.7rem;
-		font-weight: 700;
-		font-variant-numeric: tabular-nums;
-		line-height: 1;
-		box-shadow: 0 1px 2px rgba(0, 0, 0, 0.12);
-	}
-
-	.p-tabpanels {
-		padding: 0;
-	}
-
-	.p-tabpanel {
-		padding: 0;
-	}
-}
-// #endregion
-
-// #region Sub-sub-tabs nivel 3 (Entradas | Sin correo apoderado | Apoderados blacklisteados)
-:host ::ng-deep .detalle-subtabs {
-	background: transparent;
-	margin-top: 0.5rem;
-
-	.p-tabs,
-	.p-tablist,
-	.p-tablist-tab-list,
-	.p-tabpanels,
-	.p-tabpanel {
-		background: transparent;
-	}
-
-	.p-tablist {
-		border-bottom: 1px solid var(--surface-200);
 		margin-bottom: 0.75rem;
 	}
 
@@ -82,20 +20,17 @@
 		display: inline-flex;
 		align-items: center;
 		gap: 0.5rem;
-		font-size: 0.82rem;
+		font-size: 0.88rem;
 		font-weight: 500;
 		background: transparent;
-		padding: 0.45rem 0.85rem;
+		padding: 0.55rem 0.95rem;
 
 		i {
-			font-size: 0.85rem;
+			font-size: 0.9rem;
 			opacity: 0.85;
 		}
 	}
 
-	// * Badge gris neutral (nivel 3) — solo indica volumen, NO severidad.
-	// * Selector directo `.tab-badge--neutral` sin .p-tab intermedio para
-	// * ganar specificity vs clases internas de PrimeNG.
 	.tab-badge--neutral {
 		display: inline-flex !important;
 		align-items: center;
@@ -114,10 +49,6 @@
 		line-height: 1;
 	}
 
-	// * Badge verde success (Plan 30b — lista simétrica positiva).
-	// * Mismo dimensionamiento que `.tab-badge--neutral` pero con tinte verde
-	// * via color-mix (design-system B9 / sección A1 Opción C: positivo crítico
-	// * = severity success). El color-mix respeta tema light/dark del tema.
 	.tab-badge--success {
 		display: inline-flex !important;
 		align-items: center;
