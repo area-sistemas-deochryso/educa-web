@@ -14,6 +14,23 @@ export interface ErrorReportPayload {
 	requestBody: string | null;
 	responseBody: string | null;
 	breadcrumbs: BreadcrumbPayload[];
+	clientEnvironment: string | null;
+}
+
+export interface ClientEnvironmentSnapshot {
+	viewport: { width: number; height: number };
+	screen: { width: number; height: number };
+	dpr: number;
+	connectionType: string | null;
+	capturedAt: string;
+	metricsBuffer: ClientMetricsSnapshot[] | null;
+}
+
+export interface ClientMetricsSnapshot {
+	ts: string;
+	heapUsedMB: number | null;
+	longTaskCount: number;
+	batteryLevel: number | null;
 }
 
 export interface BreadcrumbPayload {

@@ -112,15 +112,6 @@ export interface HeatmapCalendarCell {
 	avgDurationMs: number;
 }
 
-export interface TelemetryBundle {
-	viewportWidth: number;
-	viewportHeight: number;
-	screenWidth: number;
-	screenHeight: number;
-	devicePixelRatio: number;
-	connectionType: string | null;
-	capturedAt: string;
-}
 // #endregion
 
 // #region Matriz de transiciones (espejo BE INV-ET07)
@@ -246,6 +237,7 @@ export interface ErrorLogCompleto {
 	requestBody: string | null;
 	responseBody: string | null;
 	requestHeaders: string | null;
+	clientEnvironment: string | null;
 	breadcrumbs: ErrorLogDetalle[];
 	trace: ErrorLogTrace[];
 }

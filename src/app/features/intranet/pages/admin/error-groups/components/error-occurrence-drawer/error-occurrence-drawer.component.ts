@@ -25,8 +25,9 @@ import { logger } from '@core/helpers';
 import { CorrelationIdPillComponent } from '@intranet-shared/components';
 
 import { ErrorGroupsService } from '../../services';
+import type { ClientEnvironmentSnapshot, ClientMetricsSnapshot } from '@core/services/error';
+
 import {
-	BreadcrumbTipoAccion,
 	ErrorGroupContext,
 	ErrorGroupEstado,
 	ErrorGroupLista,
@@ -40,7 +41,6 @@ import {
 	ORIGEN_ICON_MAP,
 	ORIGEN_LABEL_MAP,
 	SEVERIDAD_SEVERITY_MAP,
-	TelemetryBundle,
 	TIPO_ACCION_ICON_MAP,
 	TRACE_CAPA_ICON_MAP,
 	TRACE_CAPA_LABEL_MAP,
@@ -111,7 +111,6 @@ export class ErrorOccurrenceDrawerComponent {
 	private readonly _counterpart = signal<ErrorLogCounterpart | null>(null);
 	private readonly _loading = signal(false);
 	private readonly _notFound = signal(false);
-	private readonly _telemetryBundle = signal<TelemetryBundle | null>(null);
 	private readonly _groupOcurrencias = signal<OcurrenciaLista[]>([]);
 	private readonly _groupOcurrenciasLoading = signal(false);
 
@@ -120,8 +119,18 @@ export class ErrorOccurrenceDrawerComponent {
 	readonly counterpart = this._counterpart.asReadonly();
 	readonly loading = this._loading.asReadonly();
 	readonly notFound = this._notFound.asReadonly();
-	readonly telemetryBundle = this._telemetryBundle.asReadonly();
 	readonly groupOcurrencias = this._groupOcurrencias.asReadonly();
+
+	readonly clientEnvironment = computed<ClientEnvironmentSnapshot | null>(() => {
+		const json = this._errorCompleto()?.clientEnvironment;
+		if (!json) return null;
+		try { return JSON.parse(json) as ClientEnvironmentSnapshot; }
+		catch { return null; }
+	});
+
+	readonly metricsBuffer = computed<ClientMetricsSnapshot[]>(() => {
+		return this.clientEnvironment()?.metricsBuffer ?? [];
+	});
 	readonly groupOcurrenciasLoading = this._groupOcurrenciasLoading.asReadonly();
 
 	readonly vm = computed(() => ({
@@ -155,11 +164,8 @@ export class ErrorOccurrenceDrawerComponent {
 				this._counterpart.set(null);
 				this._groupOcurrencias.set([]);
 				this._notFound.set(false);
-				this._telemetryBundle.set(null);
 				return;
 			}
-
-			this._telemetryBundle.set(this.captureTelemetry());
 
 			if (errId) {
 				this.loadByErrorId(errId);
@@ -280,19 +286,6 @@ export class ErrorOccurrenceDrawerComponent {
 	// #endregion
 
 	// #region Helpers visuales
-	private captureTelemetry(): TelemetryBundle {
-		const nav = navigator as Navigator & { connection?: { effectiveType?: string } };
-		return {
-			viewportWidth: window.innerWidth,
-			viewportHeight: window.innerHeight,
-			screenWidth: window.screen.width,
-			screenHeight: window.screen.height,
-			devicePixelRatio: window.devicePixelRatio,
-			connectionType: nav.connection?.effectiveType ?? null,
-			capturedAt: new Date().toISOString(),
-		};
-	}
-
 	copyForReproduction(err: ErrorLogCompleto): void {
 		const parts: string[] = [];
 		if (err.httpMethod && err.url) {

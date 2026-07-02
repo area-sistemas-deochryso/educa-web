@@ -6,6 +6,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { ErrorReporterService } from './error-reporter.service';
 import { ActivityTrackerService } from './activity-tracker.service';
+import { ClientMetricsBufferService } from './client-metrics-buffer.service';
 // #endregion
 
 // #region Mocks
@@ -15,6 +16,20 @@ vi.mock('./error-reporter-outbox.helper', () => ({
 	readPendingReports: vi.fn().mockResolvedValue([]),
 	removeReportFromOutbox: vi.fn().mockResolvedValue(undefined),
 	MAX_PENDING: 50,
+}));
+
+let swBuildPayload: ((opts: { url: string }) => unknown) | null = null;
+let swSavePending: ((payload: unknown) => void) | null = null;
+vi.mock('./error-reporter-sw.helper', () => ({
+	createSwRevalidationListener: vi.fn((
+		_isBrowser: boolean,
+		buildPayload: (opts: { url: string }) => unknown,
+		savePending: (payload: unknown) => void,
+	) => {
+		swBuildPayload = buildPayload;
+		swSavePending = savePending;
+		return () => {};
+	}),
 }));
 
 import {
@@ -54,6 +69,7 @@ describe('ErrorReporterService', () => {
 				provideHttpClientTesting(),
 				ErrorReporterService,
 				{ provide: ActivityTrackerService, useValue: activityMock },
+				{ provide: ClientMetricsBufferService, useValue: { drain: vi.fn().mockReturnValue([]), destroy: vi.fn() } },
 			],
 		});
 
@@ -393,66 +409,24 @@ describe('ErrorReporterService', () => {
 	});
 	// #endregion
 
-	// #region SW revalidation failure
+	// #region SW revalidation failure (via extracted helper)
 	describe('SW revalidation failure', () => {
-		it('handles REVALIDATION_FAILED message by saving to outbox', async () => {
-			const handler = (service as unknown as { swMessageHandler: (e: MessageEvent) => void }).swMessageHandler;
-
-			handler(new MessageEvent('message', {
-				data: {
-					type: 'REVALIDATION_FAILED',
-					payload: { originalUrl: '/api/cached-resource' },
-				},
-			}));
-
-			await vi.advanceTimersByTimeAsync(0);
-			expect(saveReportToOutbox).toHaveBeenCalledTimes(1);
-			const savedPayload = vi.mocked(saveReportToOutbox).mock.calls[0][0] as Record<string, unknown>;
-			expect(savedPayload['origen']).toBe('NETWORK');
-			expect(savedPayload['errorCode']).toBe('NETWORK_REVALIDATION_FAILED');
-			expect(savedPayload['severidad']).toBe('WARNING');
+		it('passes buildPayload and savePending to createSwRevalidationListener', () => {
+			expect(swBuildPayload).toBeTypeOf('function');
+			expect(swSavePending).toBeTypeOf('function');
 		});
 
-		it('deduplicates SW failures within 10 seconds', async () => {
-			const handler = (service as unknown as { swMessageHandler: (e: MessageEvent) => void }).swMessageHandler;
-			const event = new MessageEvent('message', {
-				data: { type: 'REVALIDATION_FAILED', payload: { url: '/api/res' } },
-			});
-
-			handler(event);
-			handler(event);
-			handler(event);
-
-			await vi.advanceTimersByTimeAsync(0);
-			expect(saveReportToOutbox).toHaveBeenCalledTimes(1);
+		it('buildPayload produces correct NETWORK_REVALIDATION_FAILED shape', () => {
+			const payload = swBuildPayload!({ url: '/api/cached-resource' }) as Record<string, unknown>;
+			expect(payload['origen']).toBe('NETWORK');
+			expect(payload['errorCode']).toBe('NETWORK_REVALIDATION_FAILED');
+			expect(payload['severidad']).toBe('WARNING');
 		});
 
-		it('allows SW failure report after 10 second window', async () => {
-			const handler = (service as unknown as { swMessageHandler: (e: MessageEvent) => void }).swMessageHandler;
-			const event = new MessageEvent('message', {
-				data: { type: 'REVALIDATION_FAILED', payload: { url: '/api/res2' } },
-			});
-
-			handler(event);
-			await vi.advanceTimersByTimeAsync(0);
-			expect(saveReportToOutbox).toHaveBeenCalledTimes(1);
-
-			vi.advanceTimersByTime(10_001);
-
-			handler(event);
-			await vi.advanceTimersByTimeAsync(0);
-			expect(saveReportToOutbox).toHaveBeenCalledTimes(2);
-		});
-
-		it('ignores non-REVALIDATION_FAILED messages', async () => {
-			const handler = (service as unknown as { swMessageHandler: (e: MessageEvent) => void }).swMessageHandler;
-
-			handler(new MessageEvent('message', {
-				data: { type: 'SOME_OTHER_TYPE', payload: {} },
-			}));
-
-			await vi.advanceTimersByTimeAsync(0);
-			expect(saveReportToOutbox).not.toHaveBeenCalled();
+		it('savePending delegates to saveReportToOutbox', () => {
+			const fakePayload = { test: true };
+			swSavePending!(fakePayload);
+			expect(saveReportToOutbox).toHaveBeenCalledWith(fakePayload);
 		});
 	});
 	// #endregion
