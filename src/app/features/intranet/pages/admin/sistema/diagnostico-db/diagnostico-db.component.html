@@ -26,6 +26,22 @@
 			<i class="pi pi-table tab-icon"></i>
 			Tamaño de tablas
 		</p-tab>
+		<p-tab value="missing-indexes">
+			<i class="pi pi-search-plus tab-icon"></i>
+			Índices sugeridos
+		</p-tab>
+		<p-tab value="index-fragmentation">
+			<i class="pi pi-percentage tab-icon"></i>
+			Fragmentación
+		</p-tab>
+		<p-tab value="unused-indexes">
+			<i class="pi pi-eye-slash tab-icon"></i>
+			Índices sin uso
+		</p-tab>
+		<p-tab value="identity-values">
+			<i class="pi pi-hashtag tab-icon"></i>
+			Valores identity
+		</p-tab>
 	</p-tablist>
 
 	<p-tabpanel value="resource-stats">
@@ -70,6 +86,42 @@
 			[loading]="tableSizesVm().loading"
 			[error]="tableSizesVm().error"
 			(refresh)="onTableSizesRefresh()"
+		/>
+	</p-tabpanel>
+
+	<p-tabpanel value="missing-indexes">
+		<app-missing-indexes-table
+			[indexes]="missingIndexesVm().data"
+			[loading]="missingIndexesVm().loading"
+			[error]="missingIndexesVm().error"
+			(refresh)="onMissingIndexesRefresh()"
+		/>
+	</p-tabpanel>
+
+	<p-tabpanel value="index-fragmentation">
+		<app-index-fragmentation-table
+			[indexes]="indexFragmentationVm().data"
+			[loading]="indexFragmentationVm().loading"
+			[error]="indexFragmentationVm().error"
+			(refresh)="onIndexFragmentationRefresh()"
+		/>
+	</p-tabpanel>
+
+	<p-tabpanel value="unused-indexes">
+		<app-unused-indexes-table
+			[indexes]="unusedIndexesVm().data"
+			[loading]="unusedIndexesVm().loading"
+			[error]="unusedIndexesVm().error"
+			(refresh)="onUnusedIndexesRefresh()"
+		/>
+	</p-tabpanel>
+
+	<p-tabpanel value="identity-values">
+		<app-identity-values-progress
+			[columns]="identityValuesVm().data"
+			[loading]="identityValuesVm().loading"
+			[error]="identityValuesVm().error"
+			(refresh)="onIdentityValuesRefresh()"
 		/>
 	</p-tabpanel>
 </p-tabs>

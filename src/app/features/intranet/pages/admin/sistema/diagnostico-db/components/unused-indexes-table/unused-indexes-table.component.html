@@ -1,0 +1,50 @@
+<section class="unused-indexes">
+	<header class="section-header">
+		<div class="section-title">
+			<i class="pi pi-eye-slash"></i>
+			<h3>Índices sin uso</h3>
+		</div>
+		<button
+			pButton
+			icon="pi pi-refresh"
+			class="p-button-text p-button-sm"
+			[loading]="loading()"
+			(click)="onRefresh()"
+		></button>
+	</header>
+
+	@if (error()) {
+		<div class="empty-state">
+			<i class="pi pi-exclamation-triangle"></i>
+			<span>{{ error() }}</span>
+		</div>
+	}
+
+	@if (indexes().length === 0 && !loading() && !error()) {
+		<div class="empty-state">
+			<i class="pi pi-info-circle"></i>
+			<span>Sin índices sin uso detectados.</span>
+		</div>
+	}
+
+	@if (indexes().length > 0) {
+		<p-table [value]="indexes()" [tableStyle]="{ 'min-width': '40rem' }" [sortField]="'totalWrites'" [sortOrder]="-1">
+			<ng-template #header>
+				<tr>
+					<th pSortableColumn="tableName">Tabla <p-sortIcon field="tableName" /></th>
+					<th pSortableColumn="indexName">Índice <p-sortIcon field="indexName" /></th>
+					<th pSortableColumn="totalWrites" style="width: 10rem">Escrituras <p-sortIcon field="totalWrites" /></th>
+					<th style="width: 8rem">Lecturas</th>
+				</tr>
+			</ng-template>
+			<ng-template #body let-row>
+				<tr>
+					<td><code>{{ row.tableName }}</code></td>
+					<td><code>{{ row.indexName }}</code></td>
+					<td>{{ row.totalWrites | number }}</td>
+					<td>{{ row.totalReads | number }}</td>
+				</tr>
+			</ng-template>
+		</p-table>
+	}
+</section>

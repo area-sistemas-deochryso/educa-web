@@ -1,0 +1,57 @@
+<section class="missing-indexes">
+	<header class="section-header">
+		<div class="section-title">
+			<i class="pi pi-search-plus"></i>
+			<h3>Índices sugeridos</h3>
+		</div>
+		<button
+			pButton
+			icon="pi pi-refresh"
+			class="p-button-text p-button-sm"
+			[loading]="loading()"
+			(click)="onRefresh()"
+		></button>
+	</header>
+
+	@if (error()) {
+		<div class="empty-state">
+			<i class="pi pi-exclamation-triangle"></i>
+			<span>{{ error() }}</span>
+		</div>
+	}
+
+	@if (indexes().length === 0 && !loading() && !error()) {
+		<div class="empty-state">
+			<i class="pi pi-info-circle"></i>
+			<span>Sin índices sugeridos pendientes.</span>
+		</div>
+	}
+
+	@if (indexes().length > 0) {
+		<p-table [value]="sorted()" [tableStyle]="{ 'min-width': '50rem' }">
+			<ng-template #header>
+				<tr>
+					<th>Tabla</th>
+					<th>Igualdad</th>
+					<th>Desigualdad</th>
+					<th>Incluidas</th>
+					<th style="width: 10rem">Impacto</th>
+				</tr>
+			</ng-template>
+			<ng-template #body let-row>
+				<tr>
+					<td><code>{{ row.tableName }}</code></td>
+					<td>{{ row.equalityColumns || '—' }}</td>
+					<td>{{ row.inequalityColumns || '—' }}</td>
+					<td>{{ row.includedColumns || '—' }}</td>
+					<td>
+						<p-tag
+							[value]="(row.estimatedImpact | number: '1.0-0') ?? ''"
+							[severity]="impactSeverity(row.estimatedImpact)"
+						/>
+					</td>
+				</tr>
+			</ng-template>
+		</p-table>
+	}
+</section>

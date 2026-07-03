@@ -7,9 +7,13 @@ import { environment } from '@config/environment';
 import {
 	ActiveBlockingSessionDto,
 	DatabaseFileStatsDto,
+	IdentityValueDto,
+	IndexFragmentationDto,
+	MissingIndexDto,
 	ResourceStatsSnapshotDto,
 	TableSizeDto,
 	TopQueryDto,
+	UnusedIndexDto,
 } from '../models/diagnostico-db.models';
 
 @Injectable({ providedIn: 'root' })
@@ -41,6 +45,22 @@ export class DiagnosticoDbService {
 
 	getTableSizes(): Observable<TableSizeDto[]> {
 		return this.http.get<TableSizeDto[]>(`${this.baseUrl}/table-sizes`);
+	}
+
+	getMissingIndexes(): Observable<MissingIndexDto[]> {
+		return this.http.get<MissingIndexDto[]>(`${this.baseUrl}/missing-indexes`);
+	}
+
+	getIndexFragmentation(): Observable<IndexFragmentationDto[]> {
+		return this.http.get<IndexFragmentationDto[]>(`${this.baseUrl}/index-fragmentation`);
+	}
+
+	getUnusedIndexes(): Observable<UnusedIndexDto[]> {
+		return this.http.get<UnusedIndexDto[]>(`${this.baseUrl}/unused-indexes`);
+	}
+
+	getIdentityValues(): Observable<IdentityValueDto[]> {
+		return this.http.get<IdentityValueDto[]>(`${this.baseUrl}/identity-values`);
 	}
 	// #endregion
 }

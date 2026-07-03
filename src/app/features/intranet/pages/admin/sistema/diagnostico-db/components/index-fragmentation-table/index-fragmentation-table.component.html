@@ -1,0 +1,61 @@
+<section class="index-fragmentation">
+	<header class="section-header">
+		<div class="section-title">
+			<i class="pi pi-percentage"></i>
+			<h3>Fragmentación de índices</h3>
+		</div>
+		<button
+			pButton
+			icon="pi pi-refresh"
+			class="p-button-text p-button-sm"
+			[loading]="loading()"
+			(click)="onRefresh()"
+		></button>
+	</header>
+
+	@if (error()) {
+		<div class="empty-state">
+			<i class="pi pi-exclamation-triangle"></i>
+			<span>{{ error() }}</span>
+		</div>
+	}
+
+	@if (indexes().length === 0 && !loading() && !error()) {
+		<div class="empty-state">
+			<i class="pi pi-info-circle"></i>
+			<span>Sin índices con fragmentación relevante.</span>
+		</div>
+	}
+
+	@if (indexes().length > 0) {
+		<p-table
+			[value]="indexes()"
+			[tableStyle]="{ 'min-width': '50rem' }"
+			[sortField]="'fragmentationPercent'"
+			[sortOrder]="-1"
+		>
+			<ng-template #header>
+				<tr>
+					<th pSortableColumn="tableName">Tabla <p-sortIcon field="tableName" /></th>
+					<th pSortableColumn="indexName">Índice <p-sortIcon field="indexName" /></th>
+					<th>Tipo</th>
+					<th pSortableColumn="pageCount">Páginas <p-sortIcon field="pageCount" /></th>
+					<th pSortableColumn="fragmentationPercent" style="width: 10rem">
+						Fragmentación <p-sortIcon field="fragmentationPercent" />
+					</th>
+				</tr>
+			</ng-template>
+			<ng-template #body let-row>
+				<tr [class.row-critical]="isHighlyFragmented(row.fragmentationPercent)">
+					<td><code>{{ row.tableName }}</code></td>
+					<td><code>{{ row.indexName }}</code></td>
+					<td>{{ row.indexType }}</td>
+					<td>{{ row.pageCount | number }}</td>
+					<td [class.text-critical]="isHighlyFragmented(row.fragmentationPercent)">
+						{{ row.fragmentationPercent | number: '1.0-1' }}%
+					</td>
+				</tr>
+			</ng-template>
+		</p-table>
+	}
+</section>

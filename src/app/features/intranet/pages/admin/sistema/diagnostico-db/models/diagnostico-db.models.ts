@@ -45,3 +45,44 @@ export interface TableSizeDto {
 	rowCount: number;
 }
 // #endregion
+
+// #region Missing indexes
+export interface MissingIndexDto {
+	tableName: string;
+	equalityColumns: string;
+	inequalityColumns: string;
+	includedColumns: string;
+	estimatedImpact: number;
+}
+// #endregion
+
+// #region Index fragmentation
+export interface IndexFragmentationDto {
+	tableName: string;
+	indexName: string;
+	indexType: string;
+	pageCount: number;
+	percentUsed: number;
+	percentEmpty: number;
+	fragmentationPercent: number;
+}
+// #endregion
+
+// #region Unused indexes
+export interface UnusedIndexDto {
+	tableName: string;
+	indexName: string;
+	totalWrites: number;
+	totalReads: number;
+}
+// #endregion
+
+// #region Identity values
+export interface IdentityValueDto {
+	tableName: string;
+	columnName: string;
+	currentValue: number;
+	maxValue: number;
+	percentConsumed: number;
+}
+// #endregion
