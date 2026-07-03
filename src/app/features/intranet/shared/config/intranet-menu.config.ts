@@ -101,6 +101,8 @@ export const MENU_ITEMS: MenuItemDef[] = [
 	{ route: '/intranet/admin/monitoreo', label: 'Monitoreo', icon: 'pi pi-chart-bar', capability: 'ADMIN_MONITOREO', modulo: 'sistema', preview: 'admin-table', description: 'Hub de monitoreo: correos, incidencias y seguridad' },
 	// Brief 102 — runtime health (entrada propia bajo Monitoreo)
 	{ route: '/intranet/admin/sistema/runtime-health', label: 'Salud del runtime', icon: 'pi pi-server', capability: 'ADMIN_SISTEMA_RUNTIME_HEALTH', modulo: 'sistema', featureFlag: 'runtimeHealth', group: { label: 'Monitoreo', icon: 'pi pi-chart-bar' }, preview: 'admin-table', description: 'Snapshot del runtime ASP.NET (ThreadPool, Requests, BD, GC)' },
+	// Brief 399 — diagnóstico de BD (entrada propia bajo Monitoreo, mismo patrón que runtime-health)
+	{ route: '/intranet/admin/sistema/db-diagnostics', label: 'Diagnóstico de BD', icon: 'pi pi-database', capability: 'ADMIN_SISTEMA_DB_DIAGNOSTICS', modulo: 'sistema', featureFlag: 'dbDiagnostics', group: { label: 'Monitoreo', icon: 'pi pi-chart-bar' }, preview: 'admin-table', description: 'Uso de recursos, consultas costosas, bloqueos activos y almacenamiento del motor SQL' },
 	// Herramientas — utilidades dev/admin (no son observabilidad)
 	{ route: '/intranet/admin/campus', label: 'Campus', icon: 'pi pi-map', capability: 'ADMIN_CAMPUS', modulo: 'sistema', featureFlag: 'campusNavigation', group: { label: 'Herramientas', icon: 'pi pi-wrench' }, preview: 'admin-table', description: 'Navegar el campus virtual' },
 	{ route: '/intranet/ctest-k6', label: 'Test k6', icon: 'pi pi-bolt', capability: 'CTEST_K6', modulo: 'sistema', featureFlag: 'ctestK6', group: { label: 'Herramientas', icon: 'pi pi-wrench' }, preview: 'admin-table', description: 'Herramienta de testing de carga' },

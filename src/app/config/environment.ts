@@ -39,6 +39,7 @@ export const environment = {
 		emailDeferEventsTab: true,
 		emailRecipientView: true,
 		runtimeHealth: true,
+		dbDiagnostics: true,
 	},
 
 	// Debug panels (siempre false en producción)

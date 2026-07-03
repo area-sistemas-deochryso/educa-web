@@ -1,0 +1,20 @@
+:host {
+	display: block;
+}
+
+.tab-icon {
+	margin-right: 0.35rem;
+}
+
+::ng-deep p-tabs {
+	app-resource-stats-chart .resource-stats,
+	app-top-queries-table .top-queries,
+	app-active-blocking-table .active-blocking,
+	app-storage-gauges .storage-gauges,
+	app-table-sizes-table .table-sizes {
+		border: none;
+		padding: 0;
+		margin-bottom: 0;
+		background: transparent;
+	}
+}

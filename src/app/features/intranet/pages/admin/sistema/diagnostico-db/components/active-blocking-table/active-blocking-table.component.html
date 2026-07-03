@@ -1,0 +1,54 @@
+<section class="active-blocking">
+	<header class="section-header">
+		<div class="section-title">
+			<i class="pi pi-lock"></i>
+			<h3>Bloqueos activos</h3>
+		</div>
+		<button
+			pButton
+			icon="pi pi-refresh"
+			class="p-button-text p-button-sm"
+			[loading]="loading()"
+			(click)="onRefresh()"
+		></button>
+	</header>
+
+	@if (error()) {
+		<div class="empty-state">
+			<i class="pi pi-exclamation-triangle"></i>
+			<span>{{ error() }}</span>
+		</div>
+	}
+
+	@if (sessions().length === 0 && !loading() && !error()) {
+		<div class="healthy-state">
+			<i class="pi pi-check-circle"></i>
+			<span>Sin bloqueos activos.</span>
+		</div>
+	}
+
+	@if (sessions().length > 0) {
+		<p-table [value]="sessions()" [tableStyle]="{ 'min-width': '45rem' }" [sortField]="'waitTimeMs'" [sortOrder]="-1">
+			<ng-template #header>
+				<tr>
+					<th pSortableColumn="sessionId" style="width: 7rem">Session <p-sortIcon field="sessionId" /></th>
+					<th pSortableColumn="blockingSessionId" style="width: 8rem">Bloqueado por <p-sortIcon field="blockingSessionId" /></th>
+					<th pSortableColumn="waitType" style="width: 10rem">Tipo de espera <p-sortIcon field="waitType" /></th>
+					<th pSortableColumn="waitTimeMs" style="width: 8rem">Tiempo de espera <p-sortIcon field="waitTimeMs" /></th>
+					<th pSortableColumn="sqlText">SQL <p-sortIcon field="sqlText" /></th>
+				</tr>
+			</ng-template>
+			<ng-template #body let-row>
+				<tr>
+					<td>{{ row.sessionId }}</td>
+					<td>{{ row.blockingSessionId ?? '—' }}</td>
+					<td>{{ row.waitType }}</td>
+					<td>{{ row.waitTimeMs | number }} ms</td>
+					<td class="sql-cell">
+						<code class="sql-text" [pTooltip]="row.sqlText" tooltipPosition="top">{{ row.sqlText }}</code>
+					</td>
+				</tr>
+			</ng-template>
+		</p-table>
+	}
+</section>

@@ -1,0 +1,71 @@
+:host {
+	display: block;
+}
+
+.active-blocking {
+	background: var(--surface-card);
+	border: 1px solid var(--surface-border);
+	border-radius: var(--border-radius);
+	padding: 1.25rem;
+	margin-bottom: 1rem;
+}
+
+.section-header {
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+	margin-bottom: 1rem;
+}
+
+.section-title {
+	display: flex;
+	align-items: center;
+	gap: 0.5rem;
+
+	h3 {
+		margin: 0;
+		font-size: 1rem;
+		font-weight: 600;
+	}
+
+	i {
+		color: #1e40af;
+	}
+}
+
+.empty-state {
+	display: flex;
+	align-items: center;
+	gap: 0.5rem;
+	color: var(--text-color-secondary);
+	padding: 1rem 0;
+}
+
+.healthy-state {
+	display: flex;
+	align-items: center;
+	gap: 0.5rem;
+	color: var(--green-600);
+	padding: 1rem 0;
+
+	i {
+		color: var(--green-500);
+	}
+}
+
+.sql-cell {
+	max-width: 22rem;
+}
+
+.sql-text {
+	display: inline-block;
+	max-width: 100%;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+	vertical-align: middle;
+	font-size: 0.85rem;
+	background: var(--surface-100);
+	padding: 0.15rem 0.4rem;
+	border-radius: 4px;
+}

@@ -1,0 +1,52 @@
+<section class="storage-gauges">
+	<header class="section-header">
+		<div class="section-title">
+			<i class="pi pi-hdd"></i>
+			<h3>Almacenamiento</h3>
+		</div>
+		<button
+			pButton
+			icon="pi pi-refresh"
+			class="p-button-text p-button-sm"
+			[loading]="loading()"
+			(click)="onRefresh()"
+		></button>
+	</header>
+
+	@if (error()) {
+		<div class="empty-state">
+			<i class="pi pi-exclamation-triangle"></i>
+			<span>{{ error() }}</span>
+		</div>
+	}
+
+	@if (files().length === 0 && !loading() && !error()) {
+		<div class="empty-state">
+			<i class="pi pi-info-circle"></i>
+			<span>Sin datos de almacenamiento disponibles.</span>
+		</div>
+	}
+
+	@if (files().length > 0) {
+		<div class="files-grid">
+			@for (file of files(); track file.fileName) {
+				<div class="file-card">
+					<div class="file-card__header">
+						<span class="file-card__name">{{ file.fileName }}</span>
+						<span class="file-card__type">{{ file.fileType }}</span>
+					</div>
+					<p-progressBar
+						[value]="file.fillPercent"
+						[showValue]="true"
+						[color]="getFillColor(file.fillPercent)"
+					/>
+					<div class="file-card__meta">
+						<span>{{ file.usedMb | number: '1.0-0' }} MB usados</span>
+						<span>{{ file.freeMb | number: '1.0-0' }} MB libres</span>
+						<span>{{ file.totalMb | number: '1.0-0' }} MB total</span>
+					</div>
+				</div>
+			}
+		</div>
+	}
+</section>

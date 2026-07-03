@@ -1,0 +1,33 @@
+<section class="resource-stats">
+	<header class="section-header">
+		<div class="section-title">
+			<i class="pi pi-chart-line"></i>
+			<h3>Uso de recursos (últimos 60 min)</h3>
+		</div>
+		<button
+			pButton
+			icon="pi pi-refresh"
+			class="p-button-text p-button-sm"
+			[loading]="loading()"
+			(click)="onRefresh()"
+		></button>
+	</header>
+
+	@if (error()) {
+		<div class="empty-state">
+			<i class="pi pi-exclamation-triangle"></i>
+			<span>{{ error() }}</span>
+		</div>
+	}
+
+	@if (data().length === 0 && !loading() && !error()) {
+		<div class="empty-state">
+			<i class="pi pi-info-circle"></i>
+			<span>Sin datos de recursos disponibles.</span>
+		</div>
+	}
+
+	<div class="chart-container" [class.chart-container--hidden]="data().length === 0">
+		<canvas #resourceChart></canvas>
+	</div>
+</section>

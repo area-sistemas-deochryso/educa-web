@@ -191,6 +191,18 @@ const experimentalRoutes: Route[] = [
 				},
 			]
 		: []),
+	...(environment.features.dbDiagnostics
+		? [
+				{
+					path: 'admin/sistema/db-diagnostics',
+					loadComponent: () =>
+						import('./pages/admin/sistema/diagnostico-db/diagnostico-db.component').then(
+							(m) => m.DiagnosticoDbPageComponent,
+						),
+					title: 'Intranet - Diagnóstico de base de datos',
+				},
+			]
+		: []),
 ];
 
 /**

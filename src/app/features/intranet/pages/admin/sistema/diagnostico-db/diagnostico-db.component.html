@@ -1,0 +1,75 @@
+<app-page-header
+	icon="pi pi-database"
+	title="Diagnóstico de base de datos"
+	subtitle="Uso de recursos, consultas costosas, bloqueos activos y estado de almacenamiento del motor SQL."
+/>
+
+<p-tabs [(value)]="activeTab">
+	<p-tablist>
+		<p-tab value="resource-stats">
+			<i class="pi pi-chart-line tab-icon"></i>
+			Recursos
+		</p-tab>
+		<p-tab value="top-queries">
+			<i class="pi pi-database tab-icon"></i>
+			Top consultas
+		</p-tab>
+		<p-tab value="active-blocking">
+			<i class="pi pi-lock tab-icon"></i>
+			Bloqueos activos
+		</p-tab>
+		<p-tab value="storage">
+			<i class="pi pi-hdd tab-icon"></i>
+			Almacenamiento
+		</p-tab>
+		<p-tab value="table-sizes">
+			<i class="pi pi-table tab-icon"></i>
+			Tamaño de tablas
+		</p-tab>
+	</p-tablist>
+
+	<p-tabpanel value="resource-stats">
+		<app-resource-stats-chart
+			[data]="resourceStatsVm().data"
+			[loading]="resourceStatsVm().loading"
+			[error]="resourceStatsVm().error"
+			(refresh)="onResourceStatsRefresh()"
+		/>
+	</p-tabpanel>
+
+	<p-tabpanel value="top-queries">
+		<app-top-queries-table
+			[queries]="topQueriesVm().data"
+			[loading]="topQueriesVm().loading"
+			[error]="topQueriesVm().error"
+			(refresh)="onTopQueriesRefresh()"
+		/>
+	</p-tabpanel>
+
+	<p-tabpanel value="active-blocking">
+		<app-active-blocking-table
+			[sessions]="activeBlockingVm().data"
+			[loading]="activeBlockingVm().loading"
+			[error]="activeBlockingVm().error"
+			(refresh)="onActiveBlockingRefresh()"
+		/>
+	</p-tabpanel>
+
+	<p-tabpanel value="storage">
+		<app-storage-gauges
+			[files]="storageVm().data"
+			[loading]="storageVm().loading"
+			[error]="storageVm().error"
+			(refresh)="onStorageRefresh()"
+		/>
+	</p-tabpanel>
+
+	<p-tabpanel value="table-sizes">
+		<app-table-sizes-table
+			[tables]="tableSizesVm().data"
+			[loading]="tableSizesVm().loading"
+			[error]="tableSizesVm().error"
+			(refresh)="onTableSizesRefresh()"
+		/>
+	</p-tabpanel>
+</p-tabs>
