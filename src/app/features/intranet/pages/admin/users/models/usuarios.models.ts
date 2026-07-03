@@ -45,6 +45,14 @@ export interface UsuarioLista {
 }
 
 /**
+ * Sede catalog entry (dropdown option).
+ */
+export interface SedeSimpleDto {
+	id: number;
+	nombre: string;
+}
+
+/**
  * Salon assignment for a professor (request payload).
  */
 export interface SalonAsignacion {

@@ -44,6 +44,18 @@
 						/>
 					</div>
 				}
+				<div class="field full-width">
+					<label for="sede">Sede *</label>
+					<p-select
+						appendTo="body"
+						id="sede"
+						[options]="sedeOptions()"
+						[ngModel]="formData().sedeId"
+						(ngModelChange)="onFieldChange('sedeId', $event)"
+						placeholder="Seleccione la sede"
+						[style]="{ width: '100%' }"
+					/>
+				</div>
 				<div class="field">
 					<label for="nombres">Nombres *</label>
 					<input

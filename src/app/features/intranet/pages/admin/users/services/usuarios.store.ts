@@ -12,6 +12,7 @@ import {
 	ImportarEstudiantesResponse,
 	RoleTab,
 	RolUsuarioAdmin,
+	SedeSimpleDto,
 	UsuarioDetalle,
 	UsuarioLista,
 	UsuariosEstadisticas,
@@ -67,6 +68,7 @@ export class UsersStore extends BaseCrudStore<UsuarioLista, UsuarioFormData, Usu
 	// #region Estado privado — Feature-specific
 	private readonly _salones = signal<SalonListDto[]>([]);
 	private readonly _salonesFilter = signal<SalonListDto[]>([]);
+	private readonly _sedes = signal<SedeSimpleDto[]>([]);
 
 	private readonly _showSkeletons = signal(true);
 	private readonly _statsReady = signal(false);
@@ -92,6 +94,7 @@ export class UsersStore extends BaseCrudStore<UsuarioLista, UsuarioFormData, Usu
 	// #region Lecturas públicas — Feature-specific
 	readonly salones = this._salones.asReadonly();
 	readonly salonesFilter = this._salonesFilter.asReadonly();
+	readonly sedes = this._sedes.asReadonly();
 	readonly showSkeletons = this._showSkeletons.asReadonly();
 	readonly statsReady = this._statsReady.asReadonly();
 	readonly tableReady = this._tableReady.asReadonly();
@@ -143,6 +146,7 @@ export class UsersStore extends BaseCrudStore<UsuarioLista, UsuarioFormData, Usu
 		estadisticas: this.estadisticas(),
 		salones: this._salones(),
 		salonesFilter: this._salonesFilter(),
+		sedes: this._sedes(),
 		isEmpty: this.isEmpty(),
 		hasEstadisticas: this.estadisticas() !== null,
 		page: this.page(),
@@ -190,6 +194,10 @@ export class UsersStore extends BaseCrudStore<UsuarioLista, UsuarioFormData, Usu
 
 	setSalonesFilter(salones: SalonListDto[]): void {
 		this._salonesFilter.set(salones);
+	}
+
+	setSedes(sedes: SedeSimpleDto[]): void {
+		this._sedes.set(sedes);
 	}
 
 	setShowSkeletons(show: boolean): void {

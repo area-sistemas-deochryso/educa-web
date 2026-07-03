@@ -1,3 +1,4 @@
+/* eslint-disable max-lines -- Razón: data facade de usuarios cohesivo (carga + filtros + búsqueda + cache refresh cross-tab). Partirlo fragmentaría el pipeline de forkJoin sin ganancia real. */
 import { DestroyRef, Injectable, effect, inject } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { catchError, debounceTime, distinctUntilChanged, filter, switchMap, tap } from 'rxjs/operators';
@@ -7,9 +8,10 @@ import { ErrorHandlerService, SwService, WalFacadeHelper, WalCrossTabRefetchServ
 import { logger, withRetry, facadeErrorHandler, type FacadeErrorHandler } from '@core/helpers';
 import { UI_ADMIN_ERROR_DETAILS } from '@app/shared/constants';
 import { APP_USER_ROLES } from '@shared/constants';
-import { RoleTab, RolUsuarioAdmin, UsuarioLista, UsuariosEstadisticas } from '../models';
+import { RoleTab, RolUsuarioAdmin, SedeSimpleDto, UsuarioLista, UsuariosEstadisticas } from '../models';
 import { UsersService } from './usuarios.service';
 import { UsersStore } from './usuarios.store';
+import { SedesApiService } from './sedes-api.service';
 import { ClassroomsApiService } from '@features/intranet/pages/admin/schedules/services/salones-api.service';
 import { SalonListDto } from '@features/intranet/pages/admin/schedules/models/salon.interface';
 
@@ -21,6 +23,7 @@ import { SalonListDto } from '@features/intranet/pages/admin/schedules/models/sa
 export class UsersDataFacade {
 	private usuariosService = inject(UsersService);
 	private salonesApi = inject(ClassroomsApiService);
+	private sedesApi = inject(SedesApiService);
 	private store = inject(UsersStore);
 	private errorHandler = inject(ErrorHandlerService);
 	private swService = inject(SwService);
@@ -82,6 +85,13 @@ export class UsersDataFacade {
 					return of([] as SalonListDto[]);
 				}),
 			),
+			sedes: this.sedesApi.listar().pipe(
+				withRetry({ tag: 'UsuariosDataFacade:loadSedes' }),
+				catchError((err) => {
+					this.errHandler.handle(err, 'cargar sedes');
+					return of([] as SedeSimpleDto[]);
+				}),
+			),
 			usuarios: this.usuariosService.listarUsuariosPaginado(page, pageSize, rol, estado, search, salonId).pipe(
 				withRetry({ tag: 'UsuariosDataFacade:loadUsuarios' }),
 				catchError((err) => {
@@ -100,7 +110,7 @@ export class UsersDataFacade {
 			),
 		})
 			.pipe(takeUntilDestroyed(this.destroyRef))
-			.subscribe(({ estadisticas, salones, usuarios }) => {
+			.subscribe(({ estadisticas, salones, sedes, usuarios }) => {
 				if (estadisticas) {
 					this.store.setEstadisticas(estadisticas);
 				}
@@ -108,6 +118,7 @@ export class UsersDataFacade {
 
 				this.store.setSalones(salones);
 				this.store.setSalonesFilter(salones);
+				this.store.setSedes(sedes);
 
 				this.store.setItems(usuarios.data);
 				this.store.setPaginationData(usuarios.page, usuarios.pageSize, usuarios.total);

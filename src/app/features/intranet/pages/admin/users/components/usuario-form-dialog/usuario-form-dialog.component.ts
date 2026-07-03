@@ -9,7 +9,15 @@ import {
 	ROLES_USUARIOS_ADMIN,
 	RolUsuarioAdmin,
 	SalonAsignacion,
+	SedeSimpleDto,
 } from '../../services';
+import {
+	computeGradosOptions,
+	computeSalonesAsignados,
+	computeSeccionesOptions,
+	findSalonSeleccionado,
+	isSalonYaAsignado,
+} from './usuario-form-dialog.helpers';
 import {
 	ChangeDetectionStrategy,
 	Component,
@@ -21,7 +29,7 @@ import {
 	signal,
 } from '@angular/core';
 import { generatePassword } from '@core/helpers';
-import { rolRequiereSalon, rolPermiteEsTutor, canEditPassword, esSeccionDeVerano } from '@shared/models';
+import { rolRequiereSalon, rolPermiteEsTutor, canEditPassword } from '@shared/models';
 import { APP_USER_ROLES } from '@shared/constants';
 
 import { ButtonModule } from 'primeng/button';
@@ -95,6 +103,7 @@ export class UserFormDialogComponent {
 	readonly isFormValid = input.required<boolean>();
 	readonly loading = input<boolean>(false);
 	readonly salones = input<SalonListDto[]>([]);
+	readonly sedes = input<SedeSimpleDto[]>([]);
 	readonly profesorCursos = input<ProfesorCursoListaDto[]>([]);
 	readonly cursosDisponibles = input<CursoListaDto[]>([]);
 	readonly profesorCursosLoading = input<boolean>(false);
@@ -167,66 +176,38 @@ export class UserFormDialogComponent {
 		return this.formData().rol as RolUsuarioAdmin | undefined;
 	}
 
-	private formatSeccion(seccion: string): string {
-		return esSeccionDeVerano(seccion) ? 'Verano' : seccion;
-	}
+	readonly gradosOptions = computed(() => computeGradosOptions(this.salones()));
 
-	readonly gradosOptions = computed(() => {
-		const salones = this.salones();
-		const gradosUnicos = new Set<string>();
-		const result: { label: string; value: string }[] = [];
+	readonly seccionesOptions = computed(() =>
+		computeSeccionesOptions(this.salones(), this._gradoSeleccionado()),
+	);
 
-		salones.forEach((s) => {
-			if (!gradosUnicos.has(s.grado)) {
-				gradosUnicos.add(s.grado);
-				result.push({ label: s.grado, value: s.grado });
-			}
-		});
-
-		return result;
-	});
-
-	readonly seccionesOptions = computed(() => {
-		const grado = this._gradoSeleccionado();
-		if (!grado) return [];
-
-		const salones = this.salones();
-		return salones
-			.filter((s) => s.grado === grado)
-			.map((s) => ({
-				label: this.formatSeccion(s.seccion),
-				value: s.seccion,
-			}));
-	});
-
-	readonly salonSeleccionado = computed(() => {
-		const grado = this._gradoSeleccionado();
-		const seccion = this._seccionSeleccionada();
-		if (!grado || !seccion) return null;
-
-		return this.salones().find((s) => s.grado === grado && s.seccion === seccion) || null;
-	});
+	readonly salonSeleccionado = computed(() =>
+		findSalonSeleccionado(this.salones(), this._gradoSeleccionado(), this._seccionSeleccionada()),
+	);
 
 	// Salones ya asignados al profesor — enriquecidos con nombre
-	readonly salonesAsignados = computed(() => {
-		const asignaciones = this.formData().salones ?? [];
-		const allSalones = this.salones();
-		return asignaciones.map((a) => {
-			const salon = allSalones.find((s) => s.salonId === a.salonId);
-			return {
-				salonId: a.salonId,
-				salonNombre: salon ? `${salon.grado} - ${this.formatSeccion(salon.seccion)}` : `Salón #${a.salonId}`,
-				esTutor: a.esTutor,
-			};
-		});
-	});
+	readonly salonesAsignados = computed(() =>
+		computeSalonesAsignados(this.formData().salones ?? [], this.salones()),
+	);
 
 	// Verificar si el salón seleccionado ya está asignado
-	readonly salonYaAsignado = computed(() => {
-		const salon = this.salonSeleccionado();
-		if (!salon) return false;
-		const asignaciones = this.formData().salones ?? [];
-		return asignaciones.some((a) => a.salonId === salon.salonId);
+	readonly salonYaAsignado = computed(() =>
+		isSalonYaAsignado(this.salonSeleccionado(), this.formData().salones ?? []),
+	);
+	// #endregion
+
+	// #region Computed — opciones de sede
+	readonly sedeOptions = computed(() =>
+		this.sedes().map((s) => ({ label: s.nombre, value: s.id })),
+	);
+
+	// Auto-selecciona la única sede disponible cuando el form no tiene sede asignada aún
+	private readonly _autoSelectSedeUnica = effect(() => {
+		const sedes = this.sedes();
+		if (sedes.length !== 1) return;
+		if (this.formData().sedeId != null) return;
+		this.fieldChange.emit({ field: 'sedeId', value: sedes[0].id });
 	});
 	// #endregion
 
