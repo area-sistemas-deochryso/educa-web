@@ -5,6 +5,8 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { ErrorHandlerService } from '@core/services/error';
 
+import { EmailOutboxDashboardDiaService } from '@features/intranet/pages/admin/email-outbox-dashboard-dia/services/email-outbox-dashboard-dia.service';
+
 import { DiagnosticoCorreosDiaDto } from '../models/correos-dia.models';
 
 import { CorreosDiaFacade } from './correos-dia.facade';
@@ -41,6 +43,12 @@ function createMockApi() {
 	};
 }
 
+function createMockEmailOutboxApi() {
+	return {
+		obtenerAsistenciasSinCorreo: vi.fn().mockReturnValue(of([])),
+	};
+}
+
 function createMockErrorHandler() {
 	return {
 		showError: vi.fn(),
@@ -54,16 +62,19 @@ describe('CorreosDiaFacade', () => {
 	let facade: CorreosDiaFacade;
 	let store: CorreosDiaStore;
 	let api: ReturnType<typeof createMockApi>;
+	let emailOutboxApi: ReturnType<typeof createMockEmailOutboxApi>;
 	let errorHandler: ReturnType<typeof createMockErrorHandler>;
 
 	beforeEach(() => {
 		api = createMockApi();
+		emailOutboxApi = createMockEmailOutboxApi();
 		errorHandler = createMockErrorHandler();
 		TestBed.configureTestingModule({
 			providers: [
 				CorreosDiaFacade,
 				CorreosDiaStore,
 				{ provide: CorreosDiaService, useValue: api },
+				{ provide: EmailOutboxDashboardDiaService, useValue: emailOutboxApi },
 				{ provide: ErrorHandlerService, useValue: errorHandler },
 			],
 		});
@@ -81,6 +92,37 @@ describe('CorreosDiaFacade', () => {
 		expect(store.dto()).toBe(dto);
 		expect(store.loading()).toBe(false);
 		expect(store.error()).toBeNull();
+	});
+
+	it('loadData: tambien carga attendanceGaps via EmailOutboxDashboardDiaService', () => {
+		const gaps = [
+			{
+				alumno: 'Juan Pérez',
+				grado: '3ro',
+				tipo: 'ENTRADA',
+				horaRegistro: '08:05',
+				outboxId: null,
+				outboxEstado: null,
+			},
+		];
+		emailOutboxApi.obtenerAsistenciasSinCorreo.mockReturnValueOnce(of(gaps));
+
+		facade.loadData();
+
+		expect(emailOutboxApi.obtenerAsistenciasSinCorreo).toHaveBeenCalledWith(undefined);
+		expect(store.attendanceGaps()).toEqual(gaps);
+	});
+
+	it('loadData: attendanceGaps degrada a lista vacia si el endpoint falla', () => {
+		emailOutboxApi.obtenerAsistenciasSinCorreo.mockReturnValueOnce(
+			throwError(() => new HttpErrorResponse({ status: 500 })),
+		);
+
+		facade.loadData();
+
+		expect(store.attendanceGaps()).toEqual([]);
+		expect(store.dto()).not.toBeNull();
+		expect(store.loading()).toBe(false);
 	});
 
 	it('loadData propaga fecha y sedeId del store al service', () => {

@@ -1,9 +1,12 @@
 import { HttpErrorResponse } from '@angular/common/http';
 import { DestroyRef, inject, Injectable } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { catchError, forkJoin, of } from 'rxjs';
 
 import { ErrorHandlerService } from '@core/services/error';
 import { logger } from '@core/helpers';
+
+import { EmailOutboxDashboardDiaService } from '@features/intranet/pages/admin/email-outbox-dashboard-dia/services/email-outbox-dashboard-dia.service';
 
 import { CorreosDiaErrorCode } from '../models/correos-dia.models';
 
@@ -16,6 +19,7 @@ const LOG_TAG = 'DiagnosticoCorreosDia:Facade';
 export class CorreosDiaFacade {
 	// #region Dependencias
 	private api = inject(CorreosDiaService);
+	private emailOutboxApi = inject(EmailOutboxDashboardDiaService);
 	private store = inject(CorreosDiaStore);
 	private destroyRef = inject(DestroyRef);
 	private errorHandler = inject(ErrorHandlerService);
@@ -35,12 +39,20 @@ export class CorreosDiaFacade {
 
 		logger.tagged(LOG_TAG, 'info', 'load', { fecha, sedeId });
 
-		this.api
-			.obtenerDiagnostico(fecha, sedeId)
+		forkJoin({
+			dto: this.api.obtenerDiagnostico(fecha, sedeId),
+			attendanceGaps: this.emailOutboxApi.obtenerAsistenciasSinCorreo(fecha).pipe(
+				catchError((err) => {
+					logger.tagged(LOG_TAG, 'warn', 'attendance_gaps_degraded', err?.status);
+					return of([]);
+				}),
+			),
+		})
 			.pipe(takeUntilDestroyed(this.destroyRef))
 			.subscribe({
-				next: (dto) => {
+				next: ({ dto, attendanceGaps }) => {
 					this.store.setDto(dto);
+					this.store.setAttendanceGaps(attendanceGaps);
 					this.store.setLoading(false);
 				},
 				error: (err: unknown) => {

@@ -9,7 +9,7 @@ import { TooltipModule } from 'primeng/tooltip';
 
 import { ExcelService } from '@core/services/excel';
 
-import { AttendanceGapRow } from '../../models/email-dashboard-dia.models';
+import { AttendanceGapRow } from '@features/intranet/pages/admin/email-outbox-dashboard-dia/models/email-dashboard-dia.models';
 
 interface SalonOption {
 	id: number;

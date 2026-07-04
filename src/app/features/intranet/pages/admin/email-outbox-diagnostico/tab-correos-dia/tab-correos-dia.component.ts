@@ -5,6 +5,7 @@ import { StatsSkeletonComponent, TableSkeletonComponent } from '@intranet-shared
 import type { SkeletonColumnDef } from '@intranet-shared/components';
 
 import { ApoderadosBlacklisteadosTableComponent } from './components/apoderados-blacklisteados-table/apoderados-blacklisteados-table.component';
+import { AttendanceGapTileComponent } from './components/attendance-gap-tile/attendance-gap-tile.component';
 import { CorreosDiaHeaderComponent } from './components/correos-dia-header/correos-dia-header.component';
 import { CorreosDiaResumenComponent } from './components/correos-dia-resumen/correos-dia-resumen.component';
 import { EntradasConCorreoTableComponent } from './components/entradas-con-correo-table/entradas-con-correo-table.component';
@@ -58,6 +59,7 @@ const ENVIADOS_COLUMNS: SkeletonColumnDef[] = [
 		ApoderadosBlacklisteadosTableComponent,
 		EntradasSinCorreoTableComponent,
 		EntradasConCorreoTableComponent,
+		AttendanceGapTileComponent,
 	],
 	templateUrl: './tab-correos-dia.component.html',
 	styleUrl: './tab-correos-dia.component.scss',

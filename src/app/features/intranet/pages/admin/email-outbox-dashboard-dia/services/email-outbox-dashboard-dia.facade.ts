@@ -48,18 +48,13 @@ export class EmailOutboxDashboardDiaFacade {
 				logger.warn('[DashboardDia] obtenerFallosPorSender failed — degraded', err?.status);
 				return of([]);
 			})),
-			attendanceGaps: this.api.obtenerAsistenciasSinCorreo(fecha).pipe(catchError((err) => {
-				logger.warn('[DashboardDia] obtenerAsistenciasSinCorreo failed — degraded', err?.status);
-				return of([]);
-			})),
 		})
 			.pipe(takeUntilDestroyed(this.destroyRef))
 			.subscribe({
-				next: ({ dto, fallosDia, fallosPorSender, attendanceGaps }) => {
+				next: ({ dto, fallosDia, fallosPorSender }) => {
 					this.store.setDto(dto);
 					this.store.setFallosDia(fallosDia);
 					this.store.setFallosPorSender(fallosPorSender);
-					this.store.setAttendanceGaps(attendanceGaps);
 					this.store.setLoading(false);
 				},
 				error: (err: unknown) => {

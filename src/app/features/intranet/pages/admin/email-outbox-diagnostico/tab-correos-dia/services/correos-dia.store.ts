@@ -1,5 +1,7 @@
 import { computed, Injectable, signal } from '@angular/core';
 
+import { AttendanceGapRow } from '@features/intranet/pages/admin/email-outbox-dashboard-dia/models/email-dashboard-dia.models';
+
 import { DiagnosticoCorreosDiaDto } from '../models/correos-dia.models';
 
 @Injectable({ providedIn: 'root' })
@@ -11,6 +13,8 @@ export class CorreosDiaStore {
 	// * fechaConsulta null = "hoy Lima" implícito del BE.
 	private readonly _fechaConsulta = signal<string | null>(null);
 	private readonly _sedeId = signal<number | null>(null);
+	// * Independiente del DTO principal — viene de un endpoint aparte (email-outbox), degradable.
+	private readonly _attendanceGaps = signal<AttendanceGapRow[]>([]);
 	// #endregion
 
 	// #region Lecturas públicas
@@ -19,6 +23,7 @@ export class CorreosDiaStore {
 	readonly error = this._error.asReadonly();
 	readonly fechaConsulta = this._fechaConsulta.asReadonly();
 	readonly sedeId = this._sedeId.asReadonly();
+	readonly attendanceGaps = this._attendanceGaps.asReadonly();
 	// #endregion
 
 	// #region Computed
@@ -66,6 +71,7 @@ export class CorreosDiaStore {
 		fecha: this.fecha(),
 		generatedAt: this.generatedAt(),
 		totalGap: this.totalGap(),
+		attendanceGaps: this._attendanceGaps(),
 	}));
 	// #endregion
 
@@ -88,6 +94,10 @@ export class CorreosDiaStore {
 
 	setSedeId(sedeId: number | null): void {
 		this._sedeId.set(sedeId);
+	}
+
+	setAttendanceGaps(items: AttendanceGapRow[]): void {
+		this._attendanceGaps.set(items);
 	}
 	// #endregion
 }

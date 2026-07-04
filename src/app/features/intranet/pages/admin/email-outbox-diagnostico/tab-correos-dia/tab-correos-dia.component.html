@@ -55,6 +55,15 @@
 				</span>
 			}
 		</p-tab>
+		<p-tab value="asistencias">
+			<i class="pi pi-calendar-times"></i>
+			<span>Asistencia sin correo confirmado</span>
+			@if (hasData() && vm().attendanceGaps.length > 0) {
+				<span class="tab-badge tab-badge--neutral">
+					{{ vm().attendanceGaps.length }}
+				</span>
+			}
+		</p-tab>
 	</p-tablist>
 
 	<p-tabpanels>
@@ -87,6 +96,14 @@
 				<app-table-skeleton [columns]="enviadosColumns" [rows]="8" />
 			} @else if (hasData()) {
 				<app-entradas-con-correo-table [data]="vm().entradasConCorreoEnviado" />
+			}
+		</p-tabpanel>
+
+		<p-tabpanel value="asistencias">
+			@if (vm().loading && !hasData()) {
+				<app-table-skeleton [columns]="entradasColumns" [rows]="8" />
+			} @else if (hasData()) {
+				<app-attendance-gap-tile [data]="vm().attendanceGaps" />
 			}
 		</p-tabpanel>
 	</p-tabpanels>
