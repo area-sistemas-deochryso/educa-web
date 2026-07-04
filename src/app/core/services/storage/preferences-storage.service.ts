@@ -38,6 +38,9 @@ const PREFERENCES_KEYS = {
 	DEFER_FAIL_WIDGET_AUTO_REFRESH: 'educa_pref_defer_fail_widget_auto_refresh',
 	DEFER_FAIL_WIDGET_COLLAPSED: 'educa_pref_defer_fail_widget_collapsed',
 
+	// Brief 386 — bandeja overview strip (stats + trend chart)
+	OVERVIEW_WIDGET_COLLAPSED: 'educa_pref_email_outbox_overview_collapsed',
+
 	// Plan 34 Chat 5 — error-groups view mode (kanban vs table)
 	ERROR_GROUPS_VIEW_MODE: 'educa_pref_error_groups_view_mode',
 
@@ -472,10 +475,11 @@ export class PreferencesStorageService {
 
 	/**
 	 * Whether the throttle status widget starts collapsed on page load.
-	 * Defaults to false (expanded) — el admin quiere ver el estado al entrar.
+	 * Defaults to true (collapsed) — brief 386: bandeja's actionable table was
+	 * pushed 3-4 folds down by widgets defaulting to expanded.
 	 */
 	getThrottleWidgetCollapsed(): boolean {
-		return this.getItem(PREFERENCES_KEYS.THROTTLE_WIDGET_COLLAPSED) === 'true';
+		return this.getItem(PREFERENCES_KEYS.THROTTLE_WIDGET_COLLAPSED) !== 'false';
 	}
 
 	setThrottleWidgetCollapsed(collapsed: boolean): void {
@@ -500,14 +504,30 @@ export class PreferencesStorageService {
 
 	/**
 	 * Whether the defer/fail widget starts collapsed on page load.
-	 * Defaults to false (expanded) — el admin quiere ver el estado al entrar.
+	 * Defaults to true (collapsed) — brief 386: bandeja's actionable table was
+	 * pushed 3-4 folds down by widgets defaulting to expanded.
 	 */
 	getDeferFailWidgetCollapsed(): boolean {
-		return this.getItem(PREFERENCES_KEYS.DEFER_FAIL_WIDGET_COLLAPSED) === 'true';
+		return this.getItem(PREFERENCES_KEYS.DEFER_FAIL_WIDGET_COLLAPSED) !== 'false';
 	}
 
 	setDeferFailWidgetCollapsed(collapsed: boolean): void {
 		this.setItem(PREFERENCES_KEYS.DEFER_FAIL_WIDGET_COLLAPSED, collapsed.toString());
+	}
+
+	// #endregion
+	// #region OVERVIEW STRIP — stats + trend chart (brief 386)
+
+	/**
+	 * Whether the stats+trend overview strip starts collapsed on page load.
+	 * Defaults to true (collapsed) — same rationale as throttle/defer-fail above.
+	 */
+	getOverviewWidgetCollapsed(): boolean {
+		return this.getItem(PREFERENCES_KEYS.OVERVIEW_WIDGET_COLLAPSED) !== 'false';
+	}
+
+	setOverviewWidgetCollapsed(collapsed: boolean): void {
+		this.setItem(PREFERENCES_KEYS.OVERVIEW_WIDGET_COLLAPSED, collapsed.toString());
 	}
 
 	// #endregion

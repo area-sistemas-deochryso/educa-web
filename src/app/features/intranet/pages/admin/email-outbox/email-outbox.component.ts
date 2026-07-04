@@ -7,6 +7,7 @@ import {
 	signal,
 } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
+import { DecimalPipe } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { DrawerModule } from 'primeng/drawer';
@@ -46,6 +47,7 @@ import { EmailOutboxLista } from '@data/models';
 	selector: 'app-email-outbox',
 	standalone: true,
 	imports: [
+		DecimalPipe,
 		FormsModule,
 		DrawerModule,
 		DialogModule,
@@ -120,6 +122,7 @@ export class EmailOutboxComponent implements OnInit {
 			});
 
 		this.dataFacade.loadData();
+		this.dataFacade.initOverviewWidget();
 		if (this.throttleWidgetEnabled) {
 			this.dataFacade.initThrottleWidget();
 		}
@@ -276,6 +279,10 @@ export class EmailOutboxComponent implements OnInit {
 
 	onDeferFailCollapsedChange(collapsed: boolean): void {
 		this.dataFacade.setDeferFailCollapsed(collapsed);
+	}
+
+	onOverviewCollapsedChange(collapsed: boolean): void {
+		this.dataFacade.setOverviewCollapsed(collapsed);
 	}
 
 	/**

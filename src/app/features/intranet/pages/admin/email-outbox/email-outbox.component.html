@@ -21,19 +21,40 @@
 	<app-error-state [message]="vm().error!" (retry)="onRefresh()" />
 }
 
-<!-- #region Stats + Chart en grid -->
-<section class="overview-grid">
-	<div class="overview-stats">
-		@if (!vm().statsReady) {
-			<app-stats-skeleton [count]="4" iconPosition="left" />
-		} @else {
-			<app-email-outbox-stats [stats]="vm().estadisticas" [tendencias]="vm().tendencias" />
+<!-- #region Stats + Chart — franja colapsable (brief 386, above-the-fold) -->
+<section class="overview-toggle-wrapper">
+	<button
+		type="button"
+		class="overview-toggle"
+		(click)="onOverviewCollapsedChange(!vm().overviewCollapsed)"
+		[attr.aria-expanded]="!vm().overviewCollapsed"
+		[attr.aria-label]="vm().overviewCollapsed ? 'Expandir resumen y tendencia' : 'Contraer resumen y tendencia'"
+	>
+		<i class="pi" [class.pi-chevron-down]="!vm().overviewCollapsed" [class.pi-chevron-right]="vm().overviewCollapsed"></i>
+		<span class="overview-toggle__title">Resumen y tendencia</span>
+		@if (vm().overviewCollapsed && vm().statsReady) {
+			<span class="overview-toggle__summary">
+				Total {{ vm().estadisticas.total | number }} · Enviados {{ vm().estadisticas.enviados | number }} ·
+				Fallidos {{ vm().estadisticas.fallidos | number }} · Pendientes {{ vm().estadisticas.pendientes | number }}
+			</span>
 		}
-	</div>
-	@if (vm().tendenciasReady && vm().tendencias.length > 0) {
-		<div class="overview-chart">
-			<app-email-outbox-chart [data]="vm().tendencias" />
-		</div>
+	</button>
+
+	@if (!vm().overviewCollapsed) {
+		<section class="overview-grid">
+			<div class="overview-stats">
+				@if (!vm().statsReady) {
+					<app-stats-skeleton [count]="4" iconPosition="left" />
+				} @else {
+					<app-email-outbox-stats [stats]="vm().estadisticas" [tendencias]="vm().tendencias" />
+				}
+			</div>
+			@if (vm().tendenciasReady && vm().tendencias.length > 0) {
+				<div class="overview-chart">
+					<app-email-outbox-chart [data]="vm().tendencias" />
+				</div>
+			}
+		</section>
 	}
 </section>
 <!-- #endregion -->

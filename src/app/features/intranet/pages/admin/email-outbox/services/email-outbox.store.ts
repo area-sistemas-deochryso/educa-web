@@ -1,3 +1,6 @@
+/* eslint-disable max-lines -- Razón: store ya estaba en el límite de 300 antes de brief 386;
+   el overview-collapse signal sigue el mismo patrón que throttle/deferFail ya presentes acá.
+   Split en stores por-widget es un refactor de mayor alcance, fuera de esta fase (F3). */
 import { computed, Injectable, signal } from '@angular/core';
 
 import {
@@ -54,6 +57,9 @@ export class EmailOutboxStore {
 	private readonly _tendencias = signal<EmailOutboxTendencia[]>([]);
 	private readonly _tendenciasReady = signal(false);
 
+	// Brief 386 — overview strip (stats + trend chart) colapsable
+	private readonly _overviewCollapsed = signal(true);
+
 	// Plan 22 Chat B — throttle status widget (per-sender + dominio + polling opcional)
 	private readonly _throttleStatus = signal<ThrottleStatus | null>(null);
 	private readonly _throttleLoading = signal(false);
@@ -103,6 +109,7 @@ export class EmailOutboxStore {
 	readonly previewLoading = this._previewLoading.asReadonly();
 	readonly tendencias = this._tendencias.asReadonly();
 	readonly tendenciasReady = this._tendenciasReady.asReadonly();
+	readonly overviewCollapsed = this._overviewCollapsed.asReadonly();
 	readonly throttleStatus = this._throttleStatus.asReadonly();
 	readonly throttleLoading = this._throttleLoading.asReadonly();
 	readonly throttleAutoRefresh = this._throttleAutoRefresh.asReadonly();
@@ -159,6 +166,7 @@ export class EmailOutboxStore {
 		previewLoading: this._previewLoading(),
 		tendencias: this._tendencias(),
 		tendenciasReady: this._tendenciasReady(),
+		overviewCollapsed: this._overviewCollapsed(),
 		throttleStatus: this._throttleStatus(),
 		throttleLoading: this._throttleLoading(),
 		throttleAutoRefresh: this._throttleAutoRefresh(),
@@ -249,6 +257,10 @@ export class EmailOutboxStore {
 	}
 	setDeferFailCollapsed(collapsed: boolean): void {
 		this._deferFailCollapsed.set(collapsed);
+	}
+
+	setOverviewCollapsed(collapsed: boolean): void {
+		this._overviewCollapsed.set(collapsed);
 	}
 	// #endregion
 

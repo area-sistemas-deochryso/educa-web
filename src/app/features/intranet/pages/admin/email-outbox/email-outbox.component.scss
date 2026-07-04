@@ -27,6 +27,43 @@
 .overview-stats {
 	min-width: 0;
 }
+
+.overview-toggle-wrapper {
+	margin-bottom: 1.5rem;
+}
+
+.overview-toggle {
+	display: flex;
+	align-items: center;
+	gap: 0.5rem;
+	width: 100%;
+	padding: 0.6rem 1rem;
+	border: 1px solid var(--surface-border);
+	border-radius: 8px;
+	background: var(--surface-50);
+	cursor: pointer;
+	text-align: left;
+
+	i {
+		font-size: 0.875rem;
+		color: var(--text-color-secondary);
+	}
+}
+
+.overview-toggle__title {
+	font-weight: 600;
+	font-size: 0.875rem;
+	color: var(--text-color);
+}
+
+.overview-toggle__summary {
+	color: var(--text-color-secondary);
+	font-size: 0.8rem;
+	margin-left: 0.5rem;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+}
 // #endregion
 
 // #region Detail Drawer

@@ -352,6 +352,16 @@ export class StorageService {
 	}
 	// #endregion
 
+	// #region OVERVIEW STRIP — stats + trend chart (brief 386)
+	getOverviewWidgetCollapsed(): boolean {
+		return this.preferences.getOverviewWidgetCollapsed();
+	}
+
+	setOverviewWidgetCollapsed(collapsed: boolean): void {
+		this.preferences.setOverviewWidgetCollapsed(collapsed);
+	}
+	// #endregion
+
 	// #region RUNTIME HEALTH WIDGET (brief 102)
 	getRuntimeHealthWidgetAutoRefresh(): boolean {
 		return this.preferences.getRuntimeHealthWidgetAutoRefresh();

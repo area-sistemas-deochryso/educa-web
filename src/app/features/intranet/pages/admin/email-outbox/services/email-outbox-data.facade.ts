@@ -346,4 +346,18 @@ export class EmailOutboxDataFacade {
 	}
 
 	// #endregion
+
+	// #region Overview strip — stats + trend chart (brief 386)
+
+	/** Hidrata el estado colapsado desde PreferencesStorage al montar el componente. */
+	initOverviewWidget(): void {
+		this.store.setOverviewCollapsed(this.storage.getOverviewWidgetCollapsed());
+	}
+
+	setOverviewCollapsed(collapsed: boolean): void {
+		this.store.setOverviewCollapsed(collapsed);
+		this.storage.setOverviewWidgetCollapsed(collapsed);
+	}
+
+	// #endregion
 }

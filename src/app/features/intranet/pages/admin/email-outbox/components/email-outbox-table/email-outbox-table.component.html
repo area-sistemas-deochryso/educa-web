@@ -17,20 +17,12 @@
 	<ng-template pTemplate="header">
 		<tr>
 			<th style="width: 50px">#</th>
-			<th pSortableColumn="tipo" style="width: 120px">
-				Tipo <p-sortIcon field="tipo" />
-			</th>
+			<th style="width: 120px">Tipo</th>
 			<th>Destinatario / Asunto</th>
-			<th pSortableColumn="estado" style="width: 110px">
-				Estado <p-sortIcon field="estado" />
-			</th>
-			<th pSortableColumn="tipoFallo" style="width: 150px">
-				Tipo de fallo <p-sortIcon field="tipoFallo" />
-			</th>
+			<th style="width: 110px">Estado</th>
+			<th style="width: 150px">Tipo de fallo</th>
 			<th style="width: 80px">Intentos</th>
-			<th pSortableColumn="fechaReg" style="width: 140px">
-				Fecha <p-sortIcon field="fechaReg" />
-			</th>
+			<th style="width: 140px">Fecha</th>
 			<th style="width: 110px">Correlation</th>
 			<th style="width: 100px">Acciones</th>
 		</tr>
@@ -38,7 +30,7 @@
 
 	<ng-template pTemplate="body" let-item let-i="rowIndex">
 		<tr>
-			<td>{{ i + 1 }}</td>
+			<td>{{ i + firstRecord + 1 }}</td>
 			<td>
 				<p-tag [value]="getTipoLabel(item.tipo)" styleClass="tag-neutral" />
 			</td>
