@@ -104,11 +104,50 @@
 }
 // #endregion
 
-// #region Tab content
-.tab-content {
-	padding: 1rem 0;
+// #region Profile (aplanado, antes 5 tabs)
+.profile {
+	max-height: calc(100vh - 22rem);
+	overflow-y: auto;
+	display: flex;
+	flex-direction: column;
+	gap: 1.5rem;
+	padding-right: 0.25rem;
 }
 
+.profile-section {
+	border: 1px solid var(--surface-300);
+	border-radius: 12px;
+	padding: 1rem 1.25rem;
+}
+
+.profile-section-header {
+	display: flex;
+	align-items: center;
+	gap: 0.5rem;
+	margin-bottom: 0.5rem;
+
+	h3 {
+		margin: 0;
+		font-size: 1rem;
+		flex: 1;
+	}
+}
+
+.cross-link {
+	font-size: 0.8rem;
+	color: var(--primary-color);
+	text-decoration: none;
+	display: inline-flex;
+	align-items: center;
+	gap: 0.25rem;
+
+	&:hover {
+		text-decoration: underline;
+	}
+}
+// #endregion
+
+// #region Detail rows
 .detail-row {
 	display: flex;
 	align-items: center;

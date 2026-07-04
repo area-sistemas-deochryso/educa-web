@@ -134,142 +134,171 @@
 	</section>
 	<!-- #endregion -->
 
-	<!-- #region Tabs -->
-	<p-tabs value="outbox">
-		<p-tablist>
-			<p-tab value="outbox">
+	<!-- #region Perfil (aplanado, antes 5 tabs) -->
+	<section class="profile">
+		<!-- #region Envíos -->
+		<div class="profile-section">
+			<div class="profile-section-header">
 				<i class="pi pi-inbox mr-2"></i>
-				Envíos
-			</p-tab>
-			<p-tab value="blacklist">
+				<h3>Envíos</h3>
+				<a
+					class="cross-link"
+					[routerLink]="['/intranet/admin/monitoreo/correos/bandeja']"
+					[queryParams]="{ correo: correo() }"
+				>
+					Ver historial completo <i class="pi pi-external-link"></i>
+				</a>
+			</div>
+			<div class="detail-row">
+				<span class="detail-label">Total enviados</span>
+				<span class="detail-value">{{ s.outbox.total }}</span>
+			</div>
+			<div class="detail-row">
+				<span class="detail-label">Fallidos</span>
+				<span class="detail-value">{{ s.outbox.fallidos }}</span>
+			</div>
+			<div class="detail-row">
+				<span class="detail-label">Último envío</span>
+				<span class="detail-value">{{ s.outbox.ultimoEnvio ? (s.outbox.ultimoEnvio | date: 'dd/MM/yyyy HH:mm') : '—' }}</span>
+			</div>
+			<div class="detail-row">
+				<span class="detail-label">Último estado</span>
+				<span class="detail-value">{{ s.outbox.ultimoEstado ?? '—' }}</span>
+			</div>
+		</div>
+		<!-- #endregion -->
+
+		<!-- #region Blacklist -->
+		<div class="profile-section">
+			<div class="profile-section-header">
 				<i class="pi pi-shield mr-2"></i>
-				Blacklist
-			</p-tab>
-			<p-tab value="quarantine">
+				<h3>Blacklist</h3>
+				<button
+					pButton
+					[label]="blacklistActive() ? 'Desbloquear' : 'Bloquear'"
+					[icon]="blacklistActive() ? 'pi pi-lock-open' : 'pi pi-ban'"
+					[class]="blacklistActive() ? 'p-button-outlined p-button-sm' : 'p-button-danger p-button-sm'"
+					[loading]="actionInFlight()"
+					(click)="toggleBlacklist()"
+				></button>
+			</div>
+			<div class="detail-row">
+				<span class="detail-label">Estado</span>
+				<span class="detail-value">
+					@if (s.blacklist.activo) {
+						<p-tag severity="danger" value="Activo" />
+					} @else {
+						<p-tag severity="success" value="No bloqueado" />
+					}
+				</span>
+			</div>
+			@if (s.blacklist.motivo) {
+				<div class="detail-row">
+					<span class="detail-label">Motivo</span>
+					<span class="detail-value">{{ s.blacklist.motivo }}</span>
+				</div>
+			}
+			@if (s.blacklist.fechaBloqueo) {
+				<div class="detail-row">
+					<span class="detail-label">Fecha de bloqueo</span>
+					<span class="detail-value">{{ s.blacklist.fechaBloqueo | date: 'dd/MM/yyyy HH:mm' }}</span>
+				</div>
+			}
+		</div>
+		<!-- #endregion -->
+
+		<!-- #region Cuarentena -->
+		<div class="profile-section">
+			<div class="profile-section-header">
 				<i class="pi pi-clock mr-2"></i>
-				Cuarentena
-			</p-tab>
-			<p-tab value="defer">
+				<h3>Cuarentena</h3>
+				@if (quarantineActive()) {
+					<button
+						pButton
+						label="Liberar"
+						icon="pi pi-unlock"
+						class="p-button-outlined p-button-sm"
+						[loading]="actionInFlight()"
+						(click)="releaseQuarantine()"
+					></button>
+				}
+			</div>
+			<div class="detail-row">
+				<span class="detail-label">Estado</span>
+				<span class="detail-value">
+					@if (s.quarantine.activo) {
+						<p-tag severity="warn" value="En cuarentena" />
+					} @else {
+						<p-tag severity="success" value="Sin cuarentena" />
+					}
+				</span>
+			</div>
+			@if (s.quarantine.motivo) {
+				<div class="detail-row">
+					<span class="detail-label">Motivo</span>
+					<span class="detail-value">{{ s.quarantine.motivo }}</span>
+				</div>
+			}
+			@if (s.quarantine.retryAfter) {
+				<div class="detail-row">
+					<span class="detail-label">Reintento programado</span>
+					<span class="detail-value">{{ s.quarantine.retryAfter | date: 'dd/MM/yyyy HH:mm' }}</span>
+				</div>
+			}
+		</div>
+		<!-- #endregion -->
+
+		<!-- #region Defer -->
+		<div class="profile-section">
+			<div class="profile-section-header">
 				<i class="pi pi-history mr-2"></i>
-				Defer
-			</p-tab>
-			<p-tab value="audit">
+				<h3>Defer</h3>
+				<a
+					class="cross-link"
+					[routerLink]="['/intranet/admin/monitoreo/correos/defer-events']"
+					[queryParams]="{ correo: correo() }"
+				>
+					Ver eventos <i class="pi pi-external-link"></i>
+				</a>
+			</div>
+			<div class="detail-row">
+				<span class="detail-label">Eventos (últimos 7 días)</span>
+				<span class="detail-value">{{ s.defer.total7d }}</span>
+			</div>
+			<div class="detail-row">
+				<span class="detail-label">Último evento</span>
+				<span class="detail-value">{{ s.defer.ultimoEvento ? (s.defer.ultimoEvento | date: 'dd/MM/yyyy HH:mm') : '—' }}</span>
+			</div>
+		</div>
+		<!-- #endregion -->
+
+		<!-- #region Auditoría -->
+		<div class="profile-section">
+			<div class="profile-section-header">
 				<i class="pi pi-exclamation-triangle mr-2"></i>
-				Auditoría
-			</p-tab>
-		</p-tablist>
-
-		<p-tabpanels>
-			<p-tabpanel value="outbox">
-				<div class="tab-content">
-					<div class="detail-row">
-						<span class="detail-label">Total enviados</span>
-						<span class="detail-value">{{ s.outbox.total }}</span>
-					</div>
-					<div class="detail-row">
-						<span class="detail-label">Fallidos</span>
-						<span class="detail-value">{{ s.outbox.fallidos }}</span>
-					</div>
-					<div class="detail-row">
-						<span class="detail-label">Último envío</span>
-						<span class="detail-value">{{ s.outbox.ultimoEnvio ? (s.outbox.ultimoEnvio | date: 'dd/MM/yyyy HH:mm') : '—' }}</span>
-					</div>
-					<div class="detail-row">
-						<span class="detail-label">Último estado</span>
-						<span class="detail-value">{{ s.outbox.ultimoEstado ?? '—' }}</span>
-					</div>
-				</div>
-			</p-tabpanel>
-
-			<p-tabpanel value="blacklist">
-				<div class="tab-content">
-					<div class="detail-row">
-						<span class="detail-label">Estado</span>
-						<span class="detail-value">
-							@if (s.blacklist.activo) {
-								<p-tag severity="danger" value="Activo" />
-							} @else {
-								<p-tag severity="success" value="No bloqueado" />
-							}
-						</span>
-					</div>
-					@if (s.blacklist.motivo) {
-						<div class="detail-row">
-							<span class="detail-label">Motivo</span>
-							<span class="detail-value">{{ s.blacklist.motivo }}</span>
-						</div>
+				<h3>Auditoría</h3>
+			</div>
+			<div class="detail-row">
+				<span class="detail-label">Problemas detectados</span>
+				<span class="detail-value">
+					@if (s.audit.tieneProblema) {
+						<p-tag severity="warn" [value]="s.audit.tipoFallo ?? 'Problema detectado'" />
+					} @else {
+						<p-tag severity="success" value="Sin problemas" />
 					}
-					@if (s.blacklist.fechaBloqueo) {
-						<div class="detail-row">
-							<span class="detail-label">Fecha de bloqueo</span>
-							<span class="detail-value">{{ s.blacklist.fechaBloqueo | date: 'dd/MM/yyyy HH:mm' }}</span>
-						</div>
-					}
+				</span>
+			</div>
+			@if (s.audit.tipoFallo) {
+				<div class="detail-row">
+					<span class="detail-label">Tipo de fallo</span>
+					<span class="detail-value">{{ s.audit.tipoFallo }}</span>
 				</div>
-			</p-tabpanel>
-
-			<p-tabpanel value="quarantine">
-				<div class="tab-content">
-					<div class="detail-row">
-						<span class="detail-label">Estado</span>
-						<span class="detail-value">
-							@if (s.quarantine.activo) {
-								<p-tag severity="warn" value="En cuarentena" />
-							} @else {
-								<p-tag severity="success" value="Sin cuarentena" />
-							}
-						</span>
-					</div>
-					@if (s.quarantine.motivo) {
-						<div class="detail-row">
-							<span class="detail-label">Motivo</span>
-							<span class="detail-value">{{ s.quarantine.motivo }}</span>
-						</div>
-					}
-					@if (s.quarantine.retryAfter) {
-						<div class="detail-row">
-							<span class="detail-label">Reintento programado</span>
-							<span class="detail-value">{{ s.quarantine.retryAfter | date: 'dd/MM/yyyy HH:mm' }}</span>
-						</div>
-					}
-				</div>
-			</p-tabpanel>
-
-			<p-tabpanel value="defer">
-				<div class="tab-content">
-					<div class="detail-row">
-						<span class="detail-label">Eventos (últimos 7 días)</span>
-						<span class="detail-value">{{ s.defer.total7d }}</span>
-					</div>
-					<div class="detail-row">
-						<span class="detail-label">Último evento</span>
-						<span class="detail-value">{{ s.defer.ultimoEvento ? (s.defer.ultimoEvento | date: 'dd/MM/yyyy HH:mm') : '—' }}</span>
-					</div>
-				</div>
-			</p-tabpanel>
-
-			<p-tabpanel value="audit">
-				<div class="tab-content">
-					<div class="detail-row">
-						<span class="detail-label">Problemas detectados</span>
-						<span class="detail-value">
-							@if (s.audit.tieneProblema) {
-								<p-tag severity="warn" [value]="s.audit.tipoFallo ?? 'Problema detectado'" />
-							} @else {
-								<p-tag severity="success" value="Sin problemas" />
-							}
-						</span>
-					</div>
-					@if (s.audit.tipoFallo) {
-						<div class="detail-row">
-							<span class="detail-label">Tipo de fallo</span>
-							<span class="detail-value">{{ s.audit.tipoFallo }}</span>
-						</div>
-					}
-				</div>
-			</p-tabpanel>
-		</p-tabpanels>
-	</p-tabs>
+			}
+		</div>
+		<!-- #endregion -->
+	</section>
 	<!-- #endregion -->
 }
 <!-- #endregion -->
+
+<p-confirmDialog />
