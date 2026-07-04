@@ -37,7 +37,7 @@ const CORREOS_TAB_ROUTES: Record<string, TabRouteConfig> = {
 	auditoria: {
 		loadComponent: () =>
 			import('../auditoria-correos').then((m) => m.AuditoriaCorreosComponent),
-		title: 'Intranet - Auditoría de Correos',
+		title: 'Intranet - Validación de Datos',
 	},
 	blacklist: {
 		loadComponent: () =>

@@ -68,12 +68,12 @@ export const DOMAINS: DomainDef[] = [
 				description: 'Candidatos a blacklistear y dominios con tasa de fallo elevada.',
 			},
 			{
-				label: 'Auditoría',
+				label: 'Validación de datos',
 				route: '/intranet/admin/monitoreo/correos/auditoria',
 				icon: 'pi pi-history',
 				capability: 'ADMIN_AUDITORIA_CORREOS',
 				featureFlag: 'auditoriaCorreos',
-				description: 'Búsqueda histórica con paginación server-side y exportación.',
+				description: 'Registros con correo inválido o ausente.',
 			},
 			{
 				label: 'Blacklist',

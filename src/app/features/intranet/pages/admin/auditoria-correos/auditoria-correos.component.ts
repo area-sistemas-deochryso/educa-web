@@ -56,6 +56,6 @@ export class AuditoriaCorreosComponent implements OnInit {
 	}
 
 	onNavegarUsuario(item: AuditoriaCorreoAsistenciaDto): void {
-		void this.facade.navegarAUsuario(item);
+		this.facade.navegarAUsuario(item);
 	}
 }

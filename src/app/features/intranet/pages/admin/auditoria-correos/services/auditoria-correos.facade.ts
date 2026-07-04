@@ -42,7 +42,7 @@ export class AuditoriaCorreosFacade {
 					this.store.setLoading(false);
 					this.store.setTableReady(true);
 					this.errorHandler.showError(
-						'No se pudo cargar la auditoría',
+						'No se pudo cargar la validación de datos',
 						'Intenta refrescar. Si el problema persiste, revisa la consola.',
 					);
 				},
@@ -70,21 +70,13 @@ export class AuditoriaCorreosFacade {
 
 	// #region Navegación
 	/**
-	 * Plan 43 Chat 2.1 (A13): navega a `/admin/usuarios` con queryParams para
-	 * auto-abrir el dialog de edición del usuario afectado. El DNI viene
+	 * Plan 43 Chat 2.1 (A13) / Brief 387: navega a `/admin/usuarios` con queryParams
+	 * para auto-abrir el dialog de edición del usuario afectado. El DNI viene
 	 * enmascarado del BE, así que pasamos `entidadId + tipoOrigen + nombreCompleto`
-	 * para que el page destino haga el lookup y abra el form.
-	 * Mantenemos el copy-to-clipboard como fallback si el lookup no encuentra
-	 * el usuario (paginación, filtros, etc.).
+	 * para que el page destino haga el lookup por id+rol y abra el form
+	 * (`openUserName` además pre-filtra el listado como ayuda visual).
 	 */
-	async navegarAUsuario(item: AuditoriaCorreoAsistenciaDto): Promise<void> {
-		const ok = await this.copyToClipboard(item.nombreCompleto);
-		if (ok) {
-			this.errorHandler.showInfo(
-				'Nombre copiado',
-				`Abriendo "${item.nombreCompleto}". Si no se abre el formulario, pega el nombre en el buscador.`,
-			);
-		}
+	navegarAUsuario(item: AuditoriaCorreoAsistenciaDto): void {
 		this.router.navigate(['/intranet/admin/usuarios'], {
 			queryParams: {
 				autoOpen: 'true',
@@ -93,20 +85,6 @@ export class AuditoriaCorreosFacade {
 				openUserName: item.nombreCompleto,
 			},
 		});
-	}
-
-	private async copyToClipboard(text: string): Promise<boolean> {
-		// Guard SSR/pre-render: `navigator` no existe en Node durante el build.
-		if (typeof navigator === 'undefined') return false;
-		try {
-			if (navigator.clipboard && typeof navigator.clipboard.writeText === 'function') {
-				await navigator.clipboard.writeText(text);
-				return true;
-			}
-		} catch (err) {
-			logger.warn('[AuditoriaCorreosFacade] Clipboard API falló:', err);
-		}
-		return false;
 	}
 	// #endregion
 }

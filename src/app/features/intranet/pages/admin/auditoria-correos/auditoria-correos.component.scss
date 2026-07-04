@@ -1,34 +1,43 @@
 // Banner informativo (design-system B9) — tinte azul suave
 // con color-mix para respetar tema light/dark
-.info-banner {
-	display: flex;
-	gap: 0.75rem;
-	align-items: flex-start;
-	padding: 1rem 1.25rem;
+.info-banner-collapsible {
 	margin-bottom: 1.5rem;
 	border-radius: 8px;
 	background: color-mix(in srgb, var(--blue-500) 12%, transparent);
 	border: 1px solid color-mix(in srgb, var(--blue-500) 35%, transparent);
 	color: var(--text-color);
 
-	i {
-		font-size: 1.25rem;
+	summary {
+		display: flex;
+		align-items: center;
+		gap: 0.6rem;
+		padding: 0.75rem 1.25rem;
+		font-size: 0.875rem;
+		font-weight: 600;
 		color: var(--blue-800);
-		margin-top: 0.15rem;
+		cursor: pointer;
+
+		i {
+			font-size: 1.1rem;
+		}
 	}
 
-	p {
-		margin: 0;
-		font-size: 0.875rem;
-		line-height: 1.45;
-		color: var(--text-color);
+	.info-banner-body {
+		padding: 0 1.25rem 1rem 2.6rem;
 
-		& + p {
-			margin-top: 0.4rem;
-		}
+		p {
+			margin: 0;
+			font-size: 0.875rem;
+			line-height: 1.45;
+			color: var(--text-color);
 
-		strong {
-			color: var(--blue-800);
+			& + p {
+				margin-top: 0.4rem;
+			}
+
+			strong {
+				color: var(--blue-800);
+			}
 		}
 	}
 }

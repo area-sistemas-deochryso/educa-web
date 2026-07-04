@@ -2,7 +2,7 @@
 <!-- subtitle ↓ refleja INV-MAIL01: rechazo silencioso pre-encolado en EmailOutboxService. -->
 <app-page-header
 	icon="pi pi-envelope"
-	title="Auditoría de Correos"
+	title="Validación de Datos"
 	subtitle="Correos activos con formato inválido que el sistema rechaza silenciosamente al encolar"
 >
 	<button
@@ -30,22 +30,24 @@
 	<app-auditoria-correos-skeleton />
 } @else {
 	<!-- #region Banner informativo sobre caracteres invisibles (B9) -->
-	<div class="info-banner">
-		<i class="pi pi-info-circle"></i>
-		<div>
+	<details class="info-banner-collapsible">
+		<summary>
+			<i class="pi pi-info-circle"></i>
+			¿Por qué aparecen estos registros?
+		</summary>
+		<div class="info-banner-body">
 			<p>
 				Estos correos existen en tus registros pero <strong>no pasan el validador</strong>.
 				El caso más común son <strong>caracteres invisibles</strong> (espacios no rompibles,
 				zero-width space) o tildes/ñ que el correo no ve pero el validador sí.
 			</p>
 			<p>
-				Al ir a Usuarios desde la tabla, copiamos el nombre al portapapeles —
-				pégalo en el buscador para ubicar el registro y corregir el dato en la fuente.
-				Tip: pega el correo viejo en Notepad++ o VS Code con whitespace visible
-				para detectar los caracteres invisibles.
+				Al ir a Usuarios desde la tabla, se abre directamente el registro del usuario afectado
+				para que corrijas el dato en la fuente. Tip: pega el correo viejo en Notepad++ o VS Code
+				con whitespace visible para detectar los caracteres invisibles.
 			</p>
 		</div>
-	</div>
+	</details>
 	<!-- #endregion -->
 
 	<!-- #region Stats + Filtros + Tabla -->
