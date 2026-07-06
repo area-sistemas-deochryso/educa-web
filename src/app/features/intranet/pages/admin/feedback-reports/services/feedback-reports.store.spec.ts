@@ -103,12 +103,33 @@ describe('FeedbackReportsStore', () => {
 		store.setFilterDesde(new Date());
 		store.setFilterHasta(new Date());
 		store.setFilterCorrelationId('x');
+		store.setSearchQuery('algo');
+		store.setPage(3);
 		store.clearFilters();
 		expect(store.filterTipo()).toBeNull();
 		expect(store.filterEstado()).toBeNull();
 		expect(store.filterDesde()).toBeNull();
 		expect(store.filterHasta()).toBeNull();
 		expect(store.filterCorrelationId()).toBeNull();
+		expect(store.searchQuery()).toBe('');
+		expect(store.page()).toBe(1);
+	});
+
+	it('setSearchQuery actualiza el término de búsqueda', () => {
+		store.setSearchQuery('bug crítico');
+		expect(store.searchQuery()).toBe('bug crítico');
+	});
+
+	it('setPage / setPageSize / setPaginationData actualizan la paginación', () => {
+		store.setPage(2);
+		store.setPageSize(50);
+		expect(store.page()).toBe(2);
+		expect(store.pageSize()).toBe(50);
+
+		store.setPaginationData(3, 10, 25);
+		expect(store.page()).toBe(3);
+		expect(store.pageSize()).toBe(10);
+		expect(store.total()).toBe(25);
 	});
 
 	it('openDrawer + closeDrawer sincronizan visibility y selectedItem', () => {

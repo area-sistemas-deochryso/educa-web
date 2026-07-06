@@ -57,6 +57,19 @@ function makeStats(): ReporteUsuarioEstadisticasDto {
 	return { total: 10, nuevos: 5, enProgreso: 2, resueltos: 2, descartados: 1 };
 }
 
+function makePage(items: ReporteUsuarioListaDto[], overrides: Partial<{
+	page: number;
+	pageSize: number;
+	total: number;
+}> = {}) {
+	return {
+		data: items,
+		page: overrides.page ?? 1,
+		pageSize: overrides.pageSize ?? 20,
+		total: overrides.total ?? items.length,
+	};
+}
+
 describe('FeedbackReportsFacade', () => {
 	let facade: FeedbackReportsFacade;
 	let store: FeedbackReportsStore;
@@ -75,7 +88,7 @@ describe('FeedbackReportsFacade', () => {
 
 	beforeEach(() => {
 		service = {
-			listar: vi.fn().mockReturnValue(of([])),
+			listar: vi.fn().mockReturnValue(of(makePage([]))),
 			obtenerEstadisticas: vi.fn().mockReturnValue(of(makeStats())),
 			obtenerDetalle: vi.fn().mockReturnValue(of(makeDetalle())),
 			actualizarEstado: vi.fn().mockReturnValue(of('OK')),
@@ -101,7 +114,7 @@ describe('FeedbackReportsFacade', () => {
 	describe('loadAll', () => {
 		it('carga estadísticas e items en paralelo', () => {
 			service.obtenerEstadisticas.mockReturnValue(of(makeStats()));
-			service.listar.mockReturnValue(of([makeItem()]));
+			service.listar.mockReturnValue(of(makePage([makeItem()])));
 
 			facade.loadAll();
 
@@ -116,13 +129,14 @@ describe('FeedbackReportsFacade', () => {
 	describe('loadItems', () => {
 		it('setea loading y popula items', () => {
 			const items = [makeItem({ id: 1 }), makeItem({ id: 2 })];
-			service.listar.mockReturnValue(of(items));
+			service.listar.mockReturnValue(of(makePage(items)));
 
 			facade.loadItems();
 
 			expect(store.loading()).toBe(false);
 			expect(store.items()).toEqual(items);
 			expect(store.tableReady()).toBe(true);
+			expect(store.total()).toBe(items.length);
 		});
 
 		it('en error setea loading=false y tableReady=true', () => {
@@ -163,14 +177,14 @@ describe('FeedbackReportsFacade', () => {
 
 	describe('filtros', () => {
 		it('setFilterTipo actualiza store y recarga items', () => {
-			service.listar.mockReturnValue(of([]));
+			service.listar.mockReturnValue(of(makePage([])));
 			facade.setFilterTipo('BUG');
 			expect(store.filterTipo()).toBe('BUG');
 			expect(service.listar).toHaveBeenCalled();
 		});
 
 		it('setFilterEstado actualiza store y recarga', () => {
-			service.listar.mockReturnValue(of([]));
+			service.listar.mockReturnValue(of(makePage([])));
 			facade.setFilterEstado('RESUELTO');
 			expect(store.filterEstado()).toBe('RESUELTO');
 			expect(service.listar).toHaveBeenCalled();
@@ -179,7 +193,7 @@ describe('FeedbackReportsFacade', () => {
 		it('clearFilters resetea filtros y recarga', () => {
 			store.setFilterTipo('BUG');
 			store.setFilterEstado('NUEVO');
-			service.listar.mockReturnValue(of([]));
+			service.listar.mockReturnValue(of(makePage([])));
 			facade.clearFilters();
 			expect(store.filterTipo()).toBeNull();
 			expect(store.filterEstado()).toBeNull();

@@ -29,6 +29,12 @@ export class FeedbackReportsStore {
 	private readonly _filterDesde = signal<Date | null>(null);
 	private readonly _filterHasta = signal<Date | null>(null);
 	private readonly _filterCorrelationId = signal<string | null>(null);
+	private readonly _searchQuery = signal<string>('');
+
+	// Paginación server-side
+	private readonly _page = signal(1);
+	private readonly _pageSize = signal(20);
+	private readonly _total = signal(0);
 
 	// Drawer
 	private readonly _drawerVisible = signal(false);
@@ -50,6 +56,10 @@ export class FeedbackReportsStore {
 	readonly filterDesde = this._filterDesde.asReadonly();
 	readonly filterHasta = this._filterHasta.asReadonly();
 	readonly filterCorrelationId = this._filterCorrelationId.asReadonly();
+	readonly searchQuery = this._searchQuery.asReadonly();
+	readonly page = this._page.asReadonly();
+	readonly pageSize = this._pageSize.asReadonly();
+	readonly total = this._total.asReadonly();
 	readonly drawerVisible = this._drawerVisible.asReadonly();
 	readonly selectedItem = this._selectedItem.asReadonly();
 	readonly detalle = this._detalle.asReadonly();
@@ -74,6 +84,10 @@ export class FeedbackReportsStore {
 		filterDesde: this._filterDesde(),
 		filterHasta: this._filterHasta(),
 		filterCorrelationId: this._filterCorrelationId(),
+		searchQuery: this._searchQuery(),
+		page: this._page(),
+		pageSize: this._pageSize(),
+		total: this._total(),
 		drawerVisible: this._drawerVisible(),
 		selectedItem: this._selectedItem(),
 		detalle: this._detalle(),
@@ -120,12 +134,31 @@ export class FeedbackReportsStore {
 	setFilterCorrelationId(v: string | null): void {
 		this._filterCorrelationId.set(v);
 	}
+	setSearchQuery(v: string): void {
+		this._searchQuery.set(v);
+	}
 	clearFilters(): void {
 		this._filterTipo.set(null);
 		this._filterEstado.set(null);
 		this._filterDesde.set(null);
 		this._filterHasta.set(null);
 		this._filterCorrelationId.set(null);
+		this._searchQuery.set('');
+		this._page.set(1);
+	}
+	// #endregion
+
+	// #region Comandos — Paginación
+	setPage(v: number): void {
+		this._page.set(v);
+	}
+	setPageSize(v: number): void {
+		this._pageSize.set(v);
+	}
+	setPaginationData(page: number, pageSize: number, total: number): void {
+		this._page.set(page);
+		this._pageSize.set(pageSize);
+		this._total.set(total);
 	}
 	// #endregion
 

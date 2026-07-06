@@ -10,8 +10,9 @@ import { ButtonModule } from 'primeng/button';
 import { ConfirmDialogModule } from 'primeng/confirmdialog';
 import { DatePickerModule } from 'primeng/datepicker';
 import { DrawerModule } from 'primeng/drawer';
+import { InputTextModule } from 'primeng/inputtext';
 import { SelectModule } from 'primeng/select';
-import { TableModule } from 'primeng/table';
+import { TableModule, TableLazyLoadEvent } from 'primeng/table';
 import { TagModule } from 'primeng/tag';
 import { TextareaModule } from 'primeng/textarea';
 import { TooltipModule } from 'primeng/tooltip';
@@ -50,6 +51,7 @@ interface EstadoOption {
 		SelectModule,
 		DatePickerModule,
 		DrawerModule,
+		InputTextModule,
 		TextareaModule,
 		TooltipModule,
 		CorrelationIdPillComponent,
@@ -131,6 +133,21 @@ export class FeedbackReportsComponent implements OnInit {
 
 	onRefresh(): void {
 		this.facade.loadAll();
+	}
+
+	onSearchChange(term: string): void {
+		this.facade.onSearchChange(term);
+	}
+
+	onLazyLoad(event: TableLazyLoadEvent): void {
+		const rows = event.rows ?? this.vm().pageSize;
+		const first = event.first ?? 0;
+		const page = Math.floor(first / rows) + 1;
+		this.facade.loadPage(page, rows);
+	}
+
+	onExportCsv(): void {
+		this.facade.exportarCsv();
 	}
 	// #endregion
 

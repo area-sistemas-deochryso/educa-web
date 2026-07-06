@@ -34,6 +34,7 @@ export interface ReporteUsuarioListaDto {
 	usuarioNombre: string | null;
 	estado: ReporteEstado;
 	fechaReg: string;
+	correlationId?: string | null;
 }
 
 /** DTO completo para el drawer de detalle admin. */

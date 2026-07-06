@@ -17,6 +17,15 @@
 		<button
 			pButton
 			type="button"
+			icon="pi pi-file-export"
+			label="Exportar CSV"
+			class="p-button-outlined p-button-sm"
+			(click)="onExportCsv()"
+			[pt]="{ root: { 'aria-label': 'Exportar reportes a CSV' } }"
+		></button>
+		<button
+			pButton
+			type="button"
 			icon="pi pi-refresh"
 			label="Refrescar"
 			class="p-button-outlined p-button-sm"
@@ -93,6 +102,17 @@
 	<!-- #region Filtros -->
 	<div class="filters-bar">
 		<div class="filter-dropdowns">
+			<span class="p-input-icon-left search-input">
+				<i class="pi pi-search"></i>
+				<input
+					pInputText
+					type="text"
+					placeholder="Buscar por descripción, usuario…"
+					[ngModel]="vm().searchQuery"
+					(ngModelChange)="onSearchChange($event)"
+					[attr.aria-label]="'Buscar reportes'"
+				/>
+			</span>
 			<p-select
 				[options]="tipoOptions"
 				optionLabel="label"
@@ -146,7 +166,11 @@
 	<section class="table-section">
 		<p-table
 			[value]="vm().items"
-			[rows]="20"
+			[lazy]="true"
+			(onLazyLoad)="onLazyLoad($event)"
+			[first]="(vm().page - 1) * vm().pageSize"
+			[rows]="vm().pageSize"
+			[totalRecords]="vm().total"
 			[paginator]="true"
 			[rowsPerPageOptions]="[10, 20, 50]"
 			[rowHover]="true"

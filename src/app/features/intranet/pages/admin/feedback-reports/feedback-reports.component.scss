@@ -106,6 +106,14 @@
 		gap: 0.5rem;
 		flex-wrap: wrap;
 		flex: 1;
+
+		.search-input {
+			min-width: 220px;
+
+			input {
+				width: 100%;
+			}
+		}
 	}
 
 	.btn-clear {

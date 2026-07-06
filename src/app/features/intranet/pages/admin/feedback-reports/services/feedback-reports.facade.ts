@@ -1,9 +1,10 @@
 // #region Imports
 import { DestroyRef, Injectable, inject } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { Subject, debounceTime, distinctUntilChanged } from 'rxjs';
 
 import { environment } from '@config/environment';
-import { logger, toLocalIso } from '@core/helpers';
+import { downloadBlob, logger, toLocalIso } from '@core/helpers';
 import { ErrorHandlerService } from '@core/services/error';
 import {
 	ActualizarEstadoReporteRequest,
@@ -35,7 +36,19 @@ export class FeedbackReportsFacade {
 
 	readonly vm = this.store.vm;
 
+	// #region Search debounce trigger
+	private readonly searchTrigger$ = new Subject<string>();
+	// #endregion
+
 	constructor() {
+		this.searchTrigger$
+			.pipe(debounceTime(300), distinctUntilChanged(), takeUntilDestroyed(this.destroyRef))
+			.subscribe((term) => {
+				this.store.setSearchQuery(term);
+				this.store.setPage(1);
+				this.loadItems();
+			});
+
 		this.crossTabRefetch.subscribe({
 			resourceType: 'reporte-usuario',
 			refetchItems: () => this.loadItems(),
@@ -76,18 +89,16 @@ export class FeedbackReportsFacade {
 				estado: s.filterEstado(),
 				desde: this.toIso(s.filterDesde()),
 				hasta: this.toIso(s.filterHasta()),
+				q: s.searchQuery() || null,
+				correlationId: s.filterCorrelationId(),
+				page: s.page(),
+				pageSize: s.pageSize(),
 			})
 			.pipe(takeUntilDestroyed(this.destroyRef))
 			.subscribe({
-				next: (items) => {
-					// Plan 32 Chat 4 — el BE no expone correlationId en
-					// ReporteUsuarioListaDto, así que el filter cliente-side por
-					// correlationId no es factible aquí (la lista no lo trae).
-					// El deep-link ?correlationId=X conserva el id en URL pero no
-					// filtra; el admin ve todos los reportes y abre el detalle del
-					// que aplique. Deuda lateral del Plan 32: agregar el campo al
-					// DTO de lista para habilitar el filter completo.
-					this.store.setItems(items);
+				next: (result) => {
+					this.store.setItems(result.data);
+					this.store.setPaginationData(result.page, result.pageSize, result.total);
 					this.store.setLoading(false);
 					this.store.setTableReady(true);
 				},
@@ -98,26 +109,42 @@ export class FeedbackReportsFacade {
 				},
 			});
 	}
+
+	/** Handler del `p-table` lazy — convierte `first`/`rows` de PrimeNG a `page`/`pageSize`. */
+	loadPage(page: number, pageSize: number): void {
+		this.store.setPageSize(pageSize);
+		this.store.setPage(page);
+		this.loadItems();
+	}
+
+	/** Búsqueda libre — debounced vía `searchTrigger$` (ver constructor). */
+	onSearchChange(term: string): void {
+		this.searchTrigger$.next(term);
+	}
 	// #endregion
 
 	// #region Filtros
 	setFilterTipo(tipo: string | null): void {
 		this.store.setFilterTipo(tipo);
+		this.store.setPage(1);
 		this.loadItems();
 	}
 
 	setFilterEstado(estado: string | null): void {
 		this.store.setFilterEstado(estado);
+		this.store.setPage(1);
 		this.loadItems();
 	}
 
 	setFilterDesde(desde: Date | null): void {
 		this.store.setFilterDesde(desde);
+		this.store.setPage(1);
 		this.loadItems();
 	}
 
 	setFilterHasta(hasta: Date | null): void {
 		this.store.setFilterHasta(hasta);
+		this.store.setPage(1);
 		this.loadItems();
 	}
 
@@ -127,13 +154,45 @@ export class FeedbackReportsFacade {
 	}
 
 	/**
-	 * Plan 32 Chat 4 — el hub linkea acá con `?correlationId=<id>`. El page
-	 * setea el filtro y dispara load; el facade aplica filter client-side
-	 * porque el BE de reportes-usuario no expone el filtro hoy.
+	 * El hub linkea acá con `?correlationId=<id>`. El page setea el filtro y
+	 * dispara load; el facade pasa `correlationId` como filtro real de la
+	 * query al BE (`GET /api/sistema/reportes-usuario?correlationId=...`),
+	 * que hace match exacto server-side. Ya no es deuda técnica: el DTO de
+	 * lista expone `correlationId` y el filtro filtra de verdad.
 	 */
 	setFilterCorrelationId(correlationId: string | null): void {
 		this.store.setFilterCorrelationId(correlationId);
+		this.store.setPage(1);
 		this.loadItems();
+	}
+	// #endregion
+
+	// #region Exportar CSV
+	exportarCsv(): void {
+		const s = this.store;
+		this.service
+			.exportarCsv({
+				tipo: s.filterTipo(),
+				estado: s.filterEstado(),
+				desde: this.toIso(s.filterDesde()),
+				hasta: this.toIso(s.filterHasta()),
+				q: s.searchQuery() || null,
+				correlationId: s.filterCorrelationId(),
+			})
+			.pipe(takeUntilDestroyed(this.destroyRef))
+			.subscribe({
+				next: (blob) => {
+					const fecha = new Date().toISOString().split('T')[0];
+					downloadBlob(blob, `reportes-usuario-${fecha}.csv`);
+				},
+				error: (err) => {
+					logger.error('[FeedbackReportsFacade] Error exportando CSV', err);
+					this.errorHandler.showError(
+						'No se pudo exportar',
+						'Ocurrió un error al generar el archivo CSV.',
+					);
+				},
+			});
 	}
 	// #endregion
 

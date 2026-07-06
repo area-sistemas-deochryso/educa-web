@@ -1,9 +1,10 @@
 // #region Imports
-import { HttpClient, HttpHeaders } from '@angular/common/http';
+import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
 import { Injectable, inject } from '@angular/core';
 import { Observable } from 'rxjs';
 
 import { environment } from '@config/environment';
+import { type PaginatedResult } from '@core/services/facades';
 
 import {
 	ActualizarEstadoReporteRequest,
@@ -46,13 +47,21 @@ export class FeedbackReportService {
 		estado?: string | null;
 		desde?: string | null;
 		hasta?: string | null;
-	}): Observable<ReporteUsuarioListaDto[]> {
+		q?: string | null;
+		correlationId?: string | null;
+		page?: number;
+		pageSize?: number;
+	}): Observable<PaginatedResult<ReporteUsuarioListaDto>> {
 		const httpParams: Record<string, string> = {};
 		if (params.tipo) httpParams['tipo'] = params.tipo;
 		if (params.estado) httpParams['estado'] = params.estado;
 		if (params.desde) httpParams['desde'] = params.desde;
 		if (params.hasta) httpParams['hasta'] = params.hasta;
-		return this.http.get<ReporteUsuarioListaDto[]>(this.apiUrl, { params: httpParams });
+		if (params.q) httpParams['q'] = params.q;
+		if (params.correlationId) httpParams['correlationId'] = params.correlationId;
+		httpParams['page'] = String(params.page ?? 1);
+		httpParams['pageSize'] = String(params.pageSize ?? 20);
+		return this.http.get<PaginatedResult<ReporteUsuarioListaDto>>(this.apiUrl, { params: httpParams });
 	}
 
 	obtenerEstadisticas(): Observable<ReporteUsuarioEstadisticasDto> {
@@ -61,6 +70,26 @@ export class FeedbackReportService {
 
 	obtenerDetalle(id: number): Observable<ReporteUsuarioDetalleDto> {
 		return this.http.get<ReporteUsuarioDetalleDto>(`${this.apiUrl}/${id}`);
+	}
+	// #endregion
+
+	// #region GET — Export CSV (admin)
+	exportarCsv(params: {
+		tipo?: string | null;
+		estado?: string | null;
+		desde?: string | null;
+		hasta?: string | null;
+		q?: string | null;
+		correlationId?: string | null;
+	}): Observable<Blob> {
+		let httpParams = new HttpParams();
+		if (params.tipo) httpParams = httpParams.set('tipo', params.tipo);
+		if (params.estado) httpParams = httpParams.set('estado', params.estado);
+		if (params.desde) httpParams = httpParams.set('desde', params.desde);
+		if (params.hasta) httpParams = httpParams.set('hasta', params.hasta);
+		if (params.q) httpParams = httpParams.set('q', params.q);
+		if (params.correlationId) httpParams = httpParams.set('correlationId', params.correlationId);
+		return this.http.get(`${this.apiUrl}/export`, { params: httpParams, responseType: 'blob' });
 	}
 	// #endregion
 
