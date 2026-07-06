@@ -1,6 +1,8 @@
 import { DecimalPipe } from '@angular/common';
 import { ChangeDetectionStrategy, Component, OnInit, inject, signal } from '@angular/core';
 import { BadgeModule } from 'primeng/badge';
+import { ConfirmationService } from 'primeng/api';
+import { ConfirmDialogModule } from 'primeng/confirmdialog';
 import { Tab, TabList, TabPanel, Tabs } from 'primeng/tabs';
 
 import { PageHeaderComponent } from '@intranet-shared/components/page-header';
@@ -19,6 +21,7 @@ import { RuntimeHealthFacade } from './services/runtime-health.facade';
 	imports: [
 		DecimalPipe,
 		BadgeModule,
+		ConfirmDialogModule,
 		Tabs,
 		TabList,
 		Tab,
@@ -33,9 +36,11 @@ import { RuntimeHealthFacade } from './services/runtime-health.facade';
 	templateUrl: './runtime-health.component.html',
 	styleUrl: './runtime-health.component.scss',
 	changeDetection: ChangeDetectionStrategy.OnPush,
+	providers: [ConfirmationService],
 })
 export class RuntimeHealthPageComponent implements OnInit {
 	private readonly facade = inject(RuntimeHealthFacade);
+	private readonly confirmationService = inject(ConfirmationService);
 
 	readonly vm = this.facade.vm;
 	readonly historyVm = this.facade.historyVm;
@@ -92,5 +97,18 @@ export class RuntimeHealthPageComponent implements OnInit {
 
 	onNavigateTab(tab: string): void {
 		this.activeTab.set(tab);
+	}
+
+	onDeleteAlerts(ids: number[]): void {
+		if (ids.length === 0) return;
+		this.confirmationService.confirm({
+			message: `¿Eliminar ${ids.length} alerta(s)? Esta acción no se puede deshacer.`,
+			header: 'Eliminar alertas',
+			icon: 'pi pi-exclamation-triangle',
+			acceptLabel: 'Sí, eliminar',
+			rejectLabel: 'Cancelar',
+			acceptButtonStyleClass: 'p-button-danger',
+			accept: () => this.facade.deleteAlerts(ids),
+		});
 	}
 }

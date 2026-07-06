@@ -33,6 +33,8 @@
 </app-page-header>
 <!-- #endregion -->
 
+<p-confirmDialog />
+
 @if (error()) {
 	<div class="error-banner">
 		<i class="pi pi-exclamation-triangle"></i>
@@ -258,6 +260,18 @@
 	/>
 } @else {
 	<section class="table-section">
+		@if (selectedCount() > 0) {
+			<div class="selection-toolbar">
+				<span>{{ selectedCount() }} seleccionado(s)</span>
+				<button
+					pButton
+					icon="pi pi-trash"
+					label="Eliminar seleccionados"
+					class="p-button-danger p-button-sm"
+					(click)="onDeleteSelectedRequested()"
+				></button>
+			</div>
+		}
 		<p-table
 			[value]="items()"
 			[rowHover]="true"
@@ -265,6 +279,13 @@
 		>
 			<ng-template #header>
 				<tr>
+					<th style="width: 3rem">
+						<p-checkbox
+							[binary]="true"
+							[ngModel]="allSelected()"
+							(onChange)="toggleSelectAll()"
+						/>
+					</th>
 					<th>Severidad</th>
 					<th>Estado</th>
 					<th>Mensaje</th>
@@ -277,6 +298,13 @@
 			</ng-template>
 			<ng-template #body let-item>
 				<tr (click)="onRowClick(item)" class="group-row">
+					<td (click)="$event.stopPropagation()">
+						<p-checkbox
+							[binary]="true"
+							[ngModel]="selectedIds().has(item.id)"
+							(onChange)="store.toggleSelected(item.id)"
+						/>
+					</td>
 					<td>
 						<p-tag
 							[value]="item.severidad"
@@ -345,12 +373,21 @@
 							(click)="onStatusChangeRequested(item)"
 							[pt]="{ root: { 'aria-label': 'Cambiar estado del grupo' } }"
 						></button>
+						<button
+							pButton
+							icon="pi pi-trash"
+							class="p-button-rounded p-button-text p-button-sm p-button-danger"
+							pTooltip="Eliminar"
+							tooltipPosition="left"
+							(click)="onDeleteRequested(item)"
+							[pt]="{ root: { 'aria-label': 'Eliminar grupo' } }"
+						></button>
 					</td>
 				</tr>
 			</ng-template>
 			<ng-template #emptymessage>
 				<tr>
-					<td colspan="8" class="empty-message">
+					<td colspan="9" class="empty-message">
 						<i class="pi pi-check-circle"></i>
 						<span>No se encontraron grupos con los filtros seleccionados</span>
 					</td>

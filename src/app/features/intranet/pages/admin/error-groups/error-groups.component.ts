@@ -1,3 +1,6 @@
+/* eslint-disable max-lines -- Razón: ya excedía el límite (367 líneas) antes de Plan 81 F4; la
+   deuda de tamaño es preexistente (kanban + tabla + eventos + heatmap + trend en un componente),
+   no introducida por el borrado/selección múltiple agregado acá. Split queda fuera de alcance. */
 import { ChangeDetectionStrategy, Component, DestroyRef, OnInit, computed, effect, inject, signal } from '@angular/core';
 import { CommonModule, DatePipe } from '@angular/common';
 import { FormsModule } from '@angular/forms';
@@ -6,6 +9,8 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
 import { ButtonModule } from 'primeng/button';
 import { CheckboxModule } from 'primeng/checkbox';
+import { ConfirmationService } from 'primeng/api';
+import { ConfirmDialogModule } from 'primeng/confirmdialog';
 import { DialogModule } from 'primeng/dialog';
 import { IconFieldModule } from 'primeng/iconfield';
 import { InputIconModule } from 'primeng/inputicon';
@@ -65,6 +70,7 @@ import {
 		FormsModule,
 		ButtonModule,
 		CheckboxModule,
+		ConfirmDialogModule,
 		DialogModule,
 		IconFieldModule,
 		InputIconModule,
@@ -88,6 +94,7 @@ import {
 	templateUrl: './error-groups.component.html',
 	styleUrl: './error-groups.component.scss',
 	changeDetection: ChangeDetectionStrategy.OnPush,
+	providers: [ConfirmationService],
 })
 export class ErrorGroupsComponent implements OnInit {
 	protected readonly store = inject(ErrorGroupsStore);
@@ -97,6 +104,7 @@ export class ErrorGroupsComponent implements OnInit {
 	private readonly route = inject(ActivatedRoute);
 	private readonly router = inject(Router);
 	private readonly destroyRef = inject(DestroyRef);
+	private readonly confirmationService = inject(ConfirmationService);
 
 	readonly items = this.store.visibleItems;
 	readonly stats = this.store.stats;
@@ -120,6 +128,13 @@ export class ErrorGroupsComponent implements OnInit {
 	readonly selectedOcurrenciaId = this.store.selectedOcurrenciaId;
 	readonly dialogVisible = this.store.dialogVisible;
 	readonly dialogGroup = this.store.dialogGroup;
+	readonly selectedIds = this.store.selectedIds;
+	readonly selectedCount = this.store.selectedCount;
+	readonly allSelected = computed(() => {
+		const visible = this.items();
+		const selected = this.selectedIds();
+		return visible.length > 0 && visible.every((g) => selected.has(g.id));
+	});
 	readonly trendCache = this.store.trendCache;
 	readonly trendDialogVisible = this.store.trendDialogVisible;
 	readonly trendDialogGroup = this.store.trendDialogGroup;
@@ -383,6 +398,43 @@ export class ErrorGroupsComponent implements OnInit {
 	onEventRowClick(event: ErrorLogCompleto): void {
 		this.uiFacade.openOccurrenceDrawer(event.id);
 	}
+
+	// #region Selección múltiple + borrado (Plan 81 F4)
+	toggleSelectAll(): void {
+		if (this.allSelected()) {
+			this.store.clearSelection();
+		} else {
+			this.store.setSelectedIds(new Set(this.items().map((g) => g.id)));
+		}
+	}
+
+	onDeleteRequested(group: ErrorGroupLista): void {
+		this.confirmationService.confirm({
+			message: `¿Eliminar el grupo "${group.mensajeRepresentativo}"? Esta acción no se puede deshacer.`,
+			header: 'Eliminar grupo de errores',
+			icon: 'pi pi-exclamation-triangle',
+			acceptLabel: 'Sí, eliminar',
+			rejectLabel: 'Cancelar',
+			acceptButtonStyleClass: 'p-button-danger',
+			accept: () => this.crudFacade.eliminar(group.id),
+		});
+	}
+
+	onDeleteSelectedRequested(): void {
+		const ids = [...this.selectedIds()];
+		if (ids.length === 0) return;
+
+		this.confirmationService.confirm({
+			message: `¿Eliminar ${ids.length} grupo(s) de errores seleccionado(s)? Esta acción no se puede deshacer.`,
+			header: 'Eliminar grupos en lote',
+			icon: 'pi pi-exclamation-triangle',
+			acceptLabel: 'Sí, eliminar',
+			rejectLabel: 'Cancelar',
+			acceptButtonStyleClass: 'p-button-danger',
+			accept: () => this.crudFacade.eliminarMasivo(ids),
+		});
+	}
+	// #endregion
 
 	onEventPageChange(event: PaginatorState): void {
 		const currentPageSize = this.eventPageSize();

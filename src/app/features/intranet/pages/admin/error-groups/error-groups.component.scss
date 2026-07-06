@@ -163,6 +163,16 @@
 	cursor: pointer;
 }
 
+.selection-toolbar {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	padding: 0.5rem 1rem;
+	background: var(--surface-100);
+	border-bottom: 1px solid var(--surface-300);
+	font-size: 0.9rem;
+}
+
 .col-mensaje {
 	max-width: 360px;
 

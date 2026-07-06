@@ -65,6 +65,10 @@ export class ErrorGroupsStore {
 	private readonly _dialogGroup = signal<ErrorGroupLista | null>(null);
 	// #endregion
 
+	// #region Estado privado — selección múltiple (Plan 81 F4)
+	private readonly _selectedIds = signal<ReadonlySet<number>>(new Set());
+	// #endregion
+
 	// #region Estado privado — trend 30d (Plan 43 Chat 1.2)
 	private readonly _trendCache = signal<ReadonlyMap<number, TrendCacheEntry>>(new Map());
 	private readonly _trendDialogVisible = signal(false);
@@ -121,6 +125,11 @@ export class ErrorGroupsStore {
 
 	readonly dialogVisible = this._dialogVisible.asReadonly();
 	readonly dialogGroup = this._dialogGroup.asReadonly();
+	// #endregion
+
+	// #region Lecturas públicas — selección múltiple
+	readonly selectedIds = this._selectedIds.asReadonly();
+	readonly selectedCount = computed(() => this._selectedIds().size);
 	// #endregion
 
 	// #region Lecturas públicas — trend
@@ -230,6 +239,37 @@ export class ErrorGroupsStore {
 	removeGroup(id: number): void {
 		this._items.update((list) => list.filter((g) => g.id !== id));
 		this._totalCount.update((c) => (c !== null && c > 0 ? c - 1 : c));
+		this.removeFromSelection([id]);
+	}
+
+	removeGroups(ids: readonly number[]): void {
+		const toRemove = new Set(ids);
+		this._items.update((list) => list.filter((g) => !toRemove.has(g.id)));
+		this._totalCount.update((c) => (c !== null ? Math.max(0, c - toRemove.size) : c));
+		this.removeFromSelection(ids);
+	}
+	// #endregion
+
+	// #region Comandos — selección múltiple (Plan 81 F4)
+	toggleSelected(id: number): void {
+		const next = new Set(this._selectedIds());
+		if (next.has(id)) next.delete(id);
+		else next.add(id);
+		this._selectedIds.set(next);
+	}
+
+	setSelectedIds(ids: ReadonlySet<number>): void {
+		this._selectedIds.set(new Set(ids));
+	}
+
+	clearSelection(): void {
+		this._selectedIds.set(new Set());
+	}
+
+	private removeFromSelection(ids: readonly number[]): void {
+		const next = new Set(this._selectedIds());
+		for (const id of ids) next.delete(id);
+		this._selectedIds.set(next);
 	}
 	// #endregion
 

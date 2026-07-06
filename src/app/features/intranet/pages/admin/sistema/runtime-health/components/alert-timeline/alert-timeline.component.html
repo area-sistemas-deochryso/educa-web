@@ -44,10 +44,32 @@
 	}
 
 	@if (pagedAlerts().length > 0) {
+		<div class="selection-toolbar">
+			<p-checkbox
+				[binary]="true"
+				[ngModel]="allPagedSelected()"
+				(onChange)="toggleSelectAllPaged()"
+			/>
+			@if (selectedCount() > 0) {
+				<span>{{ selectedCount() }} seleccionado(s)</span>
+				<button
+					pButton
+					icon="pi pi-trash"
+					label="Eliminar seleccionados"
+					class="p-button-danger p-button-sm"
+					(click)="deleteSelected()"
+				></button>
+			}
+		</div>
 		<div class="timeline-list">
-			@for (group of pagedAlerts(); track group.firstTimestamp + group.metricKey) {
+			@for (group of pagedAlerts(); track groupKey(group)) {
 				<div class="timeline-item" [class.timeline-item--critical]="group.alertLevel === 'critical'">
 					<div class="timeline-item__header">
+						<p-checkbox
+							[binary]="true"
+							[ngModel]="isGroupSelected(group)"
+							(onChange)="toggleGroupSelected(group)"
+						/>
 						<p-tag
 							[value]="group.alertLevel"
 							[severity]="getSeverityTag(group.alertLevel)"
@@ -63,6 +85,13 @@
 								{{ group.firstTimestamp | date: 'short' }}
 							}
 						</span>
+						<button
+							pButton
+							icon="pi pi-trash"
+							class="p-button-rounded p-button-text p-button-sm p-button-danger"
+							(click)="deleteGroup(group)"
+							[pt]="{ root: { 'aria-label': 'Eliminar alerta' } }"
+						></button>
 					</div>
 					<div class="timeline-item__body">
 						<span class="value-info">

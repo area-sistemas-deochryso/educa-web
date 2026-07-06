@@ -4,6 +4,8 @@
 	subtitle="Snapshot en vivo del proceso ASP.NET (ThreadPool, Requests, BD, GC) con clasificación de patrón de saturación."
 />
 
+<p-confirmDialog />
+
 @if (vm().error) {
 	<div class="error-banner">
 		<i class="pi pi-exclamation-triangle"></i>
@@ -58,6 +60,7 @@
 			[loading]="alertsVm().loading"
 			(refresh)="onAlertsRefresh()"
 			(navigateTab)="onNavigateTab($event)"
+			(deleteIds)="onDeleteAlerts($event)"
 		/>
 	</p-tabpanel>
 

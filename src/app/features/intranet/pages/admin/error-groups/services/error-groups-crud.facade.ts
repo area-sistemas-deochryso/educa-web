@@ -98,6 +98,61 @@ export class ErrorGroupsCrudFacade {
 	}
 	// #endregion
 
+	// #region Borrado (Plan 81 F4)
+	/**
+	 * Borrado individual/masivo — irreversible, server-confirmed (sin optimistic
+	 * apply/rollback): la fila solo sale de la lista una vez que el servidor
+	 * confirma el borrado.
+	 */
+	eliminar(id: number): void {
+		this.walHelper.execute({
+			operation: 'DELETE',
+			resourceType: 'error-groups',
+			resourceId: id,
+			endpoint: `${this.apiBase}/${id}`,
+			method: 'DELETE',
+			payload: null,
+			http$: () => this.api.eliminar(id),
+			consistencyLevel: 'server-confirmed',
+			optimistic: { apply: () => {}, rollback: () => {} },
+			onCommit: () => {
+				this.store.removeGroup(id);
+				this.store.closeDrawer();
+				this.errorHandler.showSuccess('Grupo eliminado', 'El grupo de errores se eliminó correctamente');
+			},
+			onError: (err) => {
+				logger.error('[ErrorGroupsCrudFacade] Error al eliminar grupo:', err);
+				this.handleError(err, id);
+			},
+		});
+	}
+
+	eliminarMasivo(ids: number[]): void {
+		this.walHelper.execute({
+			operation: 'DELETE',
+			resourceType: 'error-groups',
+			resourceId: ids.join(','),
+			endpoint: this.apiBase,
+			method: 'DELETE',
+			payload: ids,
+			http$: () => this.api.eliminarMasivo(ids),
+			consistencyLevel: 'server-confirmed',
+			optimistic: { apply: () => {}, rollback: () => {} },
+			onCommit: (deleted) => {
+				this.store.removeGroups(ids);
+				this.errorHandler.showSuccess(
+					'Grupos eliminados',
+					`Se eliminaron ${deleted} grupo(s) de errores`,
+				);
+			},
+			onError: (err) => {
+				logger.error('[ErrorGroupsCrudFacade] Error al eliminar grupos en lote:', err);
+				this.errorHandler.showError('Error al eliminar', 'Intenta de nuevo en unos segundos.');
+			},
+		});
+	}
+	// #endregion
+
 	// #region Error handling
 	private handleError(err: unknown, grupoId: number): void {
 		const errorCode = this.extractErrorCode(err);

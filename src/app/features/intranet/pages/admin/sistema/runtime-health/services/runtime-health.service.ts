@@ -51,6 +51,14 @@ export class RuntimeHealthService {
 	updateThresholds(thresholds: ThresholdConfig[]): Observable<ThresholdConfig[]> {
 		return this.http.put<ThresholdConfig[]>(`${this.endpoint}/thresholds`, thresholds);
 	}
+
+	deleteAlert(id: number): Observable<string> {
+		return this.http.delete<string>(`${this.endpoint}/alerts/${id}`);
+	}
+
+	deleteAlerts(ids: number[]): Observable<number> {
+		return this.http.delete<number>(`${this.endpoint}/alerts`, { body: ids });
+	}
 	// #endregion
 
 	// #region F4 — Diagnostics

@@ -174,5 +174,13 @@ export class ErrorGroupsService {
 		return this.http.patch<string>(`${this.apiUrl}/${id}/estado`, dto);
 	}
 
+	eliminar(id: number): Observable<string> {
+		return this.http.delete<string>(`${this.apiUrl}/${id}`);
+	}
+
+	eliminarMasivo(ids: number[]): Observable<number> {
+		return this.http.delete<number>(this.apiUrl, { body: ids });
+	}
+
 	// #endregion
 }

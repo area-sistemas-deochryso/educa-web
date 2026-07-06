@@ -171,6 +171,7 @@ export interface ThresholdConfig {
 }
 
 export interface RuntimeHealthAlert {
+	rhsCodId: number;
 	timestamp: string;
 	metricKey: string;
 	value: number;

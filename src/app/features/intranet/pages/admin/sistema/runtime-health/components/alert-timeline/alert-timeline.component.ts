@@ -8,6 +8,7 @@ import {
 	signal,
 } from '@angular/core';
 import { ButtonModule } from 'primeng/button';
+import { CheckboxModule } from 'primeng/checkbox';
 import { SelectButtonModule } from 'primeng/selectbutton';
 import { FormsModule } from '@angular/forms';
 import { TagModule } from 'primeng/tag';
@@ -32,6 +33,7 @@ export interface CollapsedAlert {
 	firstTimestamp: string;
 	lastTimestamp: string;
 	count: number;
+	rhsCodIds: number[];
 }
 
 const PAGE_SIZE = 15;
@@ -39,7 +41,16 @@ const PAGE_SIZE = 15;
 @Component({
 	selector: 'app-alert-timeline',
 	standalone: true,
-	imports: [DatePipe, DecimalPipe, FormsModule, ButtonModule, SelectModule, SelectButtonModule, TagModule],
+	imports: [
+		DatePipe,
+		DecimalPipe,
+		FormsModule,
+		ButtonModule,
+		CheckboxModule,
+		SelectModule,
+		SelectButtonModule,
+		TagModule,
+	],
 	templateUrl: './alert-timeline.component.html',
 	styleUrl: './alert-timeline.component.scss',
 	changeDetection: ChangeDetectionStrategy.OnPush,
@@ -50,10 +61,12 @@ export class AlertTimelineComponent {
 
 	readonly refresh = output<void>();
 	readonly navigateTab = output<string>();
+	readonly deleteIds = output<number[]>();
 
 	readonly severityFilter = signal<SeverityFilter>('all');
 	readonly metricFilter = signal<string | null>(null);
 	readonly page = signal(1);
+	readonly selectedGroupKeys = signal<Set<string>>(new Set());
 
 	readonly filterOptions: { label: string; value: SeverityFilter }[] = [
 		{ label: 'Todos', value: 'all' },
@@ -90,6 +103,7 @@ export class AlertTimelineComponent {
 				current.count++;
 				current.lastTimestamp = a.timestamp;
 				if (a.value > current.peakValue) current.peakValue = a.value;
+				current.rhsCodIds.push(a.rhsCodId);
 			} else {
 				current = {
 					metricKey: a.metricKey,
@@ -100,12 +114,25 @@ export class AlertTimelineComponent {
 					firstTimestamp: a.timestamp,
 					lastTimestamp: a.timestamp,
 					count: 1,
+					rhsCodIds: [a.rhsCodId],
 				};
 				groups.push(current);
 			}
 		}
 
 		return groups;
+	});
+
+	groupKey(group: CollapsedAlert): string {
+		return `${group.metricKey}|${group.alertLevel}|${group.firstTimestamp}`;
+	}
+
+	readonly selectedCount = computed(() => this.selectedGroupKeys().size);
+
+	readonly allPagedSelected = computed(() => {
+		const paged = this.pagedAlerts();
+		const selected = this.selectedGroupKeys();
+		return paged.length > 0 && paged.every((g) => selected.has(this.groupKey(g)));
 	});
 
 	readonly totalPages = computed(() => Math.max(1, Math.ceil(this.collapsedAlerts().length / PAGE_SIZE)));
@@ -158,5 +185,41 @@ export class AlertTimelineComponent {
 
 	nextPage(): void {
 		this.page.update(p => Math.min(this.totalPages(), p + 1));
+	}
+
+	isGroupSelected(group: CollapsedAlert): boolean {
+		return this.selectedGroupKeys().has(this.groupKey(group));
+	}
+
+	toggleGroupSelected(group: CollapsedAlert): void {
+		const key = this.groupKey(group);
+		this.selectedGroupKeys.update((current) => {
+			const next = new Set(current);
+			if (next.has(key)) next.delete(key);
+			else next.add(key);
+			return next;
+		});
+	}
+
+	toggleSelectAllPaged(): void {
+		if (this.allPagedSelected()) {
+			this.selectedGroupKeys.set(new Set());
+		} else {
+			this.selectedGroupKeys.set(new Set(this.pagedAlerts().map((g) => this.groupKey(g))));
+		}
+	}
+
+	deleteGroup(group: CollapsedAlert): void {
+		this.deleteIds.emit(group.rhsCodIds);
+	}
+
+	deleteSelected(): void {
+		const selected = this.selectedGroupKeys();
+		const ids = this.collapsedAlerts()
+			.filter((g) => selected.has(this.groupKey(g)))
+			.flatMap((g) => g.rhsCodIds);
+		if (ids.length === 0) return;
+		this.deleteIds.emit(ids);
+		this.selectedGroupKeys.set(new Set());
 	}
 }

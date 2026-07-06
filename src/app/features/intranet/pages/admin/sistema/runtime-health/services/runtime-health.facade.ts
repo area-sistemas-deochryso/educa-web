@@ -1,8 +1,11 @@
 import { DestroyRef, Injectable, inject } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
+import { environment } from '@config/environment';
 import { logger } from '@core/helpers';
 import { StorageService } from '@core/services';
+import { ErrorHandlerService } from '@core/services/error';
+import { WalFacadeHelper } from '@core/services/wal';
 
 import {
 	HistoryTimeRange,
@@ -23,6 +26,10 @@ export class RuntimeHealthFacade {
 	private readonly store = inject(RuntimeHealthStore);
 	private readonly storage = inject(StorageService);
 	private readonly destroyRef = inject(DestroyRef);
+	private readonly errorHandler = inject(ErrorHandlerService);
+	private readonly walHelper = inject(WalFacadeHelper);
+
+	private readonly alertsEndpoint = `${environment.apiUrl}/api/sistema/runtime-health/alerts`;
 
 	private pollHandle: ReturnType<typeof setInterval> | null = null;
 	// #endregion
@@ -162,6 +169,34 @@ export class RuntimeHealthFacade {
 					this.store.setThresholdsSaving(false);
 				},
 			});
+	}
+
+	/**
+	 * Borra un conjunto de filas de RuntimeHealthSnapshot (Plan 81 F3). Una fila
+	 * colapsada del timeline puede representar N snapshots consecutivos — se
+	 * borran todos los rhsCodId que agrupa, no solo el más reciente.
+	 */
+	deleteAlerts(ids: number[]): void {
+		if (ids.length === 0) return;
+		this.walHelper.execute({
+			operation: 'DELETE',
+			resourceType: 'runtime-health-alerts',
+			resourceId: ids.join(','),
+			endpoint: this.alertsEndpoint,
+			method: 'DELETE',
+			payload: ids,
+			http$: () => this.api.deleteAlerts(ids),
+			consistencyLevel: 'server-confirmed',
+			optimistic: { apply: () => {}, rollback: () => {} },
+			onCommit: (deleted) => {
+				this.errorHandler.showSuccess('Alertas eliminadas', `Se eliminaron ${deleted} alerta(s)`);
+				this.loadAlerts();
+			},
+			onError: (err) => {
+				logger.tagged('RuntimeHealthFacade', 'error', 'delete alerts failed', err);
+				this.errorHandler.showError('Error al eliminar', 'Intenta de nuevo en unos segundos.');
+			},
+		});
 	}
 	// #endregion
 
