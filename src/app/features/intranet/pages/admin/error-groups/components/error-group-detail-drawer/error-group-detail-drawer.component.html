@@ -133,6 +133,16 @@
 							<span>No hay ocurrencias para este grupo.</span>
 						</div>
 					} @else {
+						<div class="ocurrencias-toolbar">
+							<button
+								pButton
+								icon="pi pi-download"
+								label="Exportar CSV"
+								class="p-button-outlined p-button-sm"
+								(click)="onExportOcurrenciasClick()"
+								[pt]="{ root: { 'aria-label': 'Exportar ocurrencias a CSV' } }"
+							></button>
+						</div>
 						<p-table
 							[value]="vm().ocurrencias"
 							[rowHover]="true"

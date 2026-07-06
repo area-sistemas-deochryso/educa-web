@@ -146,6 +146,28 @@ export class ErrorGroupsService {
 
 	// #endregion
 
+	// #region Export CSV
+
+	exportarGrupos(
+		estado: ErrorGroupEstado | null,
+		severidad: ErrorSeveridad | null,
+		origen: ErrorOrigen | null,
+		q: string | null,
+	): Observable<Blob> {
+		const params: Record<string, string> = {};
+		if (estado) params['estado'] = estado;
+		if (severidad) params['severidad'] = severidad;
+		if (origen) params['origen'] = origen;
+		if (q) params['q'] = q;
+		return this.http.get(`${this.apiUrl}/export`, { params, responseType: 'blob' });
+	}
+
+	exportarOcurrencias(grupoId: number): Observable<Blob> {
+		return this.http.get(`${this.apiUrl}/${grupoId}/ocurrencias/export`, { responseType: 'blob' });
+	}
+
+	// #endregion
+
 	// #region Mutaciones
 
 	cambiarEstado(id: number, dto: CambiarEstadoErrorGroup): Observable<string> {

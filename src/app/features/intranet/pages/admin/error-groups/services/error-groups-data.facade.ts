@@ -2,7 +2,7 @@ import { DestroyRef, Injectable, inject } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { Subject, debounceTime, distinctUntilChanged } from 'rxjs';
 
-import { logger } from '@core/helpers';
+import { downloadBlob, logger } from '@core/helpers';
 import { WalCrossTabRefetchService } from '@core/services';
 
 import { ErrorGroupTrendDto } from '../models';
@@ -124,6 +124,26 @@ export class ErrorGroupsDataFacade {
 		this.store.setPage(1);
 		this.loadData();
 	}
+
+	exportarGrupos(): void {
+		this.api
+			.exportarGrupos(
+				this.store.filterEstado(),
+				this.store.filterSeveridad(),
+				this.store.filterOrigen(),
+				this.store.searchTerm() || null,
+			)
+			.pipe(takeUntilDestroyed(this.destroyRef))
+			.subscribe({
+				next: (blob) => {
+					const fecha = new Date().toISOString().split('T')[0];
+					downloadBlob(blob, `error-groups-${fecha}.csv`);
+				},
+				error: (err) => {
+					logger.error('[ErrorGroupsDataFacade] Error exportando grupos CSV', err);
+				},
+			});
+	}
 	// #endregion
 
 	// #region Detalle del grupo
@@ -200,6 +220,21 @@ export class ErrorGroupsDataFacade {
 		this.store.setOcurrenciasPageSize(pageSize);
 		this.store.setOcurrenciasPage(1);
 		this.loadOcurrencias(grupoId);
+	}
+
+	exportarOcurrencias(grupoId: number): void {
+		this.api
+			.exportarOcurrencias(grupoId)
+			.pipe(takeUntilDestroyed(this.destroyRef))
+			.subscribe({
+				next: (blob) => {
+					const fecha = new Date().toISOString().split('T')[0];
+					downloadBlob(blob, `error-group-${grupoId}-ocurrencias-${fecha}.csv`);
+				},
+				error: (err) => {
+					logger.error('[ErrorGroupsDataFacade] Error exportando ocurrencias CSV', err);
+				},
+			});
 	}
 	// #endregion
 

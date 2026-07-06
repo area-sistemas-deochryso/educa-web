@@ -18,6 +18,12 @@
 	flex-wrap: wrap;
 }
 
+.ocurrencias-toolbar {
+	display: flex;
+	justify-content: flex-end;
+	margin-bottom: 0.5rem;
+}
+
 .group-header-mensaje {
 	margin: 0;
 	font-size: 1rem;

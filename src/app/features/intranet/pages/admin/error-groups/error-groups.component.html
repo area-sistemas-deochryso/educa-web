@@ -16,6 +16,13 @@
 		<app-error-groups-view-toggle (modeChange)="onViewModeChange($event)" />
 		<button
 			pButton
+			icon="pi pi-download"
+			label="Exportar CSV"
+			class="p-button-outlined p-button-sm"
+			(click)="onExportGrupos()"
+		></button>
+		<button
+			pButton
 			icon="pi pi-refresh"
 			label="Refrescar"
 			class="p-button-outlined p-button-sm"
@@ -377,6 +384,7 @@
 	(occurrenceSelected)="onOccurrenceSelected($event)"
 	(statusChangeRequested)="onStatusChangeRequested($event)"
 	(ocurrenciasPageChange)="onOcurrenciasPageChange($event)"
+	(exportOcurrenciasRequested)="onExportOcurrencias($event)"
 />
 <!-- #endregion -->
 

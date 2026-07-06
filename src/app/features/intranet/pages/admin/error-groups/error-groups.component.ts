@@ -237,6 +237,12 @@ export class ErrorGroupsComponent implements OnInit {
 	onRefresh(): void {
 		this.dataFacade.refresh();
 	}
+	onExportGrupos(): void {
+		this.dataFacade.exportarGrupos();
+	}
+	onExportOcurrencias(grupoId: number): void {
+		this.dataFacade.exportarOcurrencias(grupoId);
+	}
 	onSearchChange(term: string): void {
 		const truncated = term.length > SEARCH_MAX ? term.slice(0, SEARCH_MAX) : term;
 		this.dataFacade.onSearchChange(truncated);

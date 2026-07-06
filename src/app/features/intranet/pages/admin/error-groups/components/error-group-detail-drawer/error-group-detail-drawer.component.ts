@@ -85,6 +85,7 @@ export class ErrorGroupDetailDrawerComponent {
 	readonly occurrenceSelected = output<OcurrenciaLista>();
 	readonly statusChangeRequested = output<ErrorGroupLista>();
 	readonly ocurrenciasPageChange = output<{ page: number; pageSize: number }>();
+	readonly exportOcurrenciasRequested = output<number>();
 	// #endregion
 
 	// #region Maps
@@ -147,6 +148,11 @@ export class ErrorGroupDetailDrawerComponent {
 			page: (event.page ?? 0) + 1,
 			pageSize: event.rows ?? this.ocurrenciasPageSize(),
 		});
+	}
+
+	onExportOcurrenciasClick(): void {
+		const grp = this.group();
+		if (grp) this.exportOcurrenciasRequested.emit(grp.id);
 	}
 	// #endregion
 
