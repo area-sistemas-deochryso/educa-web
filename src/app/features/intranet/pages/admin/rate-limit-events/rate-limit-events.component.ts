@@ -5,6 +5,7 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
 import { ButtonModule } from 'primeng/button';
 import { MessageService } from 'primeng/api';
+import { TableLazyLoadEvent } from 'primeng/table';
 import { ToastModule } from 'primeng/toast';
 
 import { PageHeaderComponent } from '@intranet-shared/components';
@@ -99,6 +100,17 @@ export class RateLimitEventsComponent implements OnInit {
 
 	onFilterChange(partial: Partial<RateLimitEventFiltro>): void {
 		this.facade.updateFilter(partial);
+	}
+
+	onLazyLoad(event: TableLazyLoadEvent): void {
+		const rows = event.rows ?? this.vm().pageSize;
+		const first = event.first ?? 0;
+		const page = Math.floor(first / rows) + 1;
+		this.facade.loadPage(page, rows);
+	}
+
+	onExportCsv(): void {
+		this.facade.exportarCsv();
 	}
 
 	onClearFilters(): void {

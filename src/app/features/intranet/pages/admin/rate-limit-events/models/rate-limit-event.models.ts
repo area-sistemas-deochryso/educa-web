@@ -54,8 +54,9 @@ export interface RateLimitEventFiltro {
 	 * Backend filtra por exact match.
 	 */
 	correlationId?: string | null;
-	/** Default 200 en el service. Backend clampa a máx 500. */
-	take?: number;
+	/** Paginación server-side. Default page 1 / pageSize 20 en el service. */
+	page?: number;
+	pageSize?: number;
 }
 
 export interface RateLimitBreakdownItem {
@@ -77,7 +78,8 @@ export interface RateLimitStats {
 // #region Helpers de UI
 export const POLICY_LABEL_FALLBACK = 'global';
 export const DEFAULT_STATS_HORAS = 24;
-export const DEFAULT_TAKE = 200;
+export const DEFAULT_PAGE = 1;
+export const DEFAULT_PAGE_SIZE = 20;
 
 /** Formato display para policy: `null` → "global". */
 export function displayPolicy(policy: string | null): string {

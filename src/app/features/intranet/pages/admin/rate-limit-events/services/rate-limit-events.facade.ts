@@ -1,7 +1,8 @@
 import { DestroyRef, Injectable, inject } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
-import { logger } from '@core/helpers';
+import { downloadBlob, logger } from '@core/helpers';
+import { ErrorHandlerService } from '@core/services/error';
 
 import {
 	DEFAULT_STATS_HORAS,
@@ -16,6 +17,7 @@ export class RateLimitEventsFacade {
 	// #region Dependencias
 	private readonly api = inject(RateLimitEventsService);
 	private readonly store = inject(RateLimitEventsStore);
+	private readonly errorHandler = inject(ErrorHandlerService);
 	private readonly destroyRef = inject(DestroyRef);
 	// #endregion
 
@@ -41,18 +43,15 @@ export class RateLimitEventsFacade {
 		this.store.setError(null);
 
 		const filter = this.store.filter();
+		const page = this.store.page();
+		const pageSize = this.store.pageSize();
 		this.api
-			.listar(filter)
+			.listar({ ...filter, page, pageSize })
 			.pipe(takeUntilDestroyed(this.destroyRef))
 			.subscribe({
-				next: (items) => {
-					// Plan 32 Chat 4 — el BE aún no soporta filtro correlationId; aplicamos
-					// el filter client-side. La cantidad de items por correlationId
-					// típicamente es 1-3, así que filtrar localmente es seguro.
-					const filtered = filter.correlationId
-						? items.filter((i) => i.correlationId === filter.correlationId)
-						: items;
-					this.store.setItems(filtered);
+				next: (result) => {
+					this.store.setItems(result.data);
+					this.store.setPaginationData(result.page, result.pageSize, result.total);
 					this.store.setTableReady(true);
 					this.store.setLoading(false);
 				},
@@ -63,6 +62,13 @@ export class RateLimitEventsFacade {
 					this.store.setLoading(false);
 				},
 			});
+	}
+
+	/** Handler del `p-table` lazy — convierte `first`/`rows` de PrimeNG a `page`/`pageSize`. */
+	loadPage(page: number, pageSize: number): void {
+		this.store.setPageSize(pageSize);
+		this.store.setPage(page);
+		this.loadEventos();
 	}
 	// #endregion
 
@@ -91,12 +97,35 @@ export class RateLimitEventsFacade {
 	// #region Filtros
 	updateFilter(partial: Partial<RateLimitEventFiltro>): void {
 		this.store.setFilter(partial);
+		this.store.setPage(1);
 		this.loadEventos();
 	}
 
 	clearFilters(): void {
 		this.store.resetFilter();
 		this.loadEventos();
+	}
+	// #endregion
+
+	// #region Exportar CSV
+	exportarCsv(): void {
+		const filter = this.store.filter();
+		this.api
+			.exportarCsv(filter)
+			.pipe(takeUntilDestroyed(this.destroyRef))
+			.subscribe({
+				next: (blob) => {
+					const fecha = new Date().toISOString().split('T')[0];
+					downloadBlob(blob, `rate-limit-events-${fecha}.csv`);
+				},
+				error: (err) => {
+					logger.error('[RateLimitEventsFacade] Error exportando CSV', err);
+					this.errorHandler.showError(
+						'No se pudo exportar',
+						'Ocurrió un error al generar el archivo CSV.',
+					);
+				},
+			});
 	}
 	// #endregion
 

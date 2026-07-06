@@ -18,7 +18,8 @@ describe('RateLimitEventsStore', () => {
 		expect(store.loading()).toBe(false);
 		expect(store.error()).toBeNull();
 		expect(store.drawerVisible()).toBe(false);
-		expect(store.filter().take).toBe(200);
+		expect(store.filter().page).toBe(1);
+		expect(store.filter().pageSize).toBe(20);
 		expect(store.filter().rol).toBeNull();
 		expect(store.filter().correlationId).toBeNull();
 	});
@@ -75,7 +76,7 @@ describe('RateLimitEventsStore', () => {
 
 		expect(store.filter().rol).toBe('Director');
 		expect(store.filter().soloRechazados).toBe(true);
-		expect(store.filter().take).toBe(200); // preservado
+		expect(store.filter().pageSize).toBe(20); // preservado
 	});
 
 	it('resetFilter restaura defaults', () => {
@@ -85,7 +86,15 @@ describe('RateLimitEventsStore', () => {
 		expect(store.filter().rol).toBeNull();
 		expect(store.filter().soloRechazados).toBe(false);
 		expect(store.filter().endpoint).toBeUndefined();
-		expect(store.filter().take).toBe(200);
+		expect(store.filter().pageSize).toBe(20);
+	});
+
+	it('setPaginationData actualiza page/pageSize/total', () => {
+		store.setPaginationData(2, 50, 137);
+
+		expect(store.page()).toBe(2);
+		expect(store.pageSize()).toBe(50);
+		expect(store.total()).toBe(137);
 	});
 
 	it('openDrawer setea selectedItem y visibilidad true', () => {

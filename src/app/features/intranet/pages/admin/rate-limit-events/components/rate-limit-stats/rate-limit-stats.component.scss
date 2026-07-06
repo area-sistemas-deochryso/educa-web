@@ -77,3 +77,59 @@
 	.stats-grid { grid-template-columns: 1fr; }
 }
 // #endregion
+
+// #region Breakdown — Top roles / Top endpoints
+.breakdown-grid {
+	display: grid;
+	grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+	gap: 1rem;
+	margin-top: 1rem;
+}
+
+.breakdown-card {
+	padding: 1rem 1.25rem;
+	border-radius: 12px;
+	border: 1px solid var(--surface-300);
+}
+
+.breakdown-title {
+	margin: 0 0 0.75rem;
+	font-size: 0.9rem;
+	font-weight: 600;
+	color: var(--text-color-secondary);
+	display: flex;
+	align-items: center;
+	gap: 0.5rem;
+}
+
+.breakdown-table {
+	width: 100%;
+	border-collapse: collapse;
+	font-size: 0.85rem;
+
+	th {
+		text-align: left;
+		font-weight: 500;
+		color: var(--text-color-secondary);
+		padding: 0.25rem 0.5rem;
+		border-bottom: 1px solid var(--surface-300);
+	}
+
+	td {
+		padding: 0.35rem 0.5rem;
+		border-bottom: 1px solid var(--surface-200);
+	}
+
+	.breakdown-key {
+		max-width: 220px;
+		overflow: hidden;
+		text-overflow: ellipsis;
+		white-space: nowrap;
+	}
+}
+
+.breakdown-empty {
+	font-size: 0.85rem;
+	color: var(--text-color-secondary);
+}
+// #endregion

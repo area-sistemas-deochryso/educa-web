@@ -2,7 +2,7 @@ import { TestBed } from '@angular/core/testing';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { of, throwError } from 'rxjs';
 
-import { RateLimitEventListaDto, RateLimitStats } from '../models';
+import { RateLimitEventFiltro, RateLimitEventListaDto, RateLimitStats } from '../models';
 import { RateLimitEventsFacade } from './rate-limit-events.facade';
 import { RateLimitEventsService } from './rate-limit-events.service';
 import { RateLimitEventsStore } from './rate-limit-events.store';
@@ -35,8 +35,11 @@ const mockStats: RateLimitStats = {
 
 function createApi() {
 	return {
-		listar: vi.fn().mockReturnValue(of(mockItems)),
+		listar: vi.fn((filtro: RateLimitEventFiltro) =>
+			of({ data: mockItems, page: filtro.page ?? 1, pageSize: filtro.pageSize ?? 20, total: mockItems.length }),
+		),
 		getStats: vi.fn().mockReturnValue(of(mockStats)),
+		exportarCsv: vi.fn().mockReturnValue(of(new Blob(['csv']))),
 	};
 }
 
@@ -97,7 +100,7 @@ describe('RateLimitEventsFacade', () => {
 
 		expect(store.filter().rol).toBe('Director');
 		expect(api.listar).toHaveBeenCalledWith(
-			expect.objectContaining({ rol: 'Director', take: 200 }),
+			expect.objectContaining({ rol: 'Director', page: 1, pageSize: 20 }),
 		);
 	});
 
@@ -110,6 +113,25 @@ describe('RateLimitEventsFacade', () => {
 		expect(store.filter().rol).toBeNull();
 		expect(store.filter().soloRechazados).toBe(false);
 		expect(api.listar).toHaveBeenCalledTimes(1);
+	});
+
+	it('loadPage actualiza page/pageSize y redispara listar', () => {
+		facade.loadData();
+		api.listar.mockClear();
+
+		facade.loadPage(3, 50);
+
+		expect(store.page()).toBe(3);
+		expect(store.pageSize()).toBe(50);
+		expect(api.listar).toHaveBeenCalledWith(
+			expect.objectContaining({ page: 3, pageSize: 50 }),
+		);
+	});
+
+	it('exportarCsv llama al service con el filtro actual', () => {
+		facade.exportarCsv();
+
+		expect(api.exportarCsv).toHaveBeenCalledTimes(1);
 	});
 
 	it('openDetail abre el drawer con el item seleccionado', () => {

@@ -25,44 +25,63 @@
 			</div>
 		</div>
 
-		<!-- Top rol -->
-		<div class="stat-card">
-			<i class="pi pi-users stat-icon"></i>
-			<div class="stat-content">
-				@if (stats()?.topRoles && stats()!.topRoles.length > 0) {
-					<span class="stat-value stat-value--text" [pTooltip]="stats()!.topRoles[0].key">
-						{{ stats()!.topRoles[0].key }}
-					</span>
-					<span class="stat-label">Top rol</span>
-					<span class="stat-sublabel">{{ stats()!.topRoles[0].total }} eventos</span>
-				} @else {
-					<span class="stat-value stat-value--text">—</span>
-					<span class="stat-label">Top rol</span>
-					<span class="stat-sublabel">sin datos</span>
-				}
-			</div>
+	</div>
+
+	<!-- #region Breakdown — Top roles / Top endpoints -->
+	<div class="breakdown-grid">
+		<!-- Top roles -->
+		<div class="breakdown-card">
+			<h4 class="breakdown-title"><i class="pi pi-users"></i> Top roles</h4>
+			@if (stats()?.topRoles && stats()!.topRoles.length > 0) {
+				<table class="breakdown-table">
+					<thead>
+						<tr>
+							<th>Rol</th>
+							<th>Total</th>
+							<th>Rechazados</th>
+						</tr>
+					</thead>
+					<tbody>
+						@for (item of stats()!.topRoles; track item.key) {
+							<tr>
+								<td class="breakdown-key" [pTooltip]="item.key">{{ item.key }}</td>
+								<td>{{ item.total }}</td>
+								<td>{{ item.rechazados }}</td>
+							</tr>
+						}
+					</tbody>
+				</table>
+			} @else {
+				<span class="breakdown-empty">sin datos</span>
+			}
 		</div>
 
-		<!-- Top endpoint -->
-		<div class="stat-card">
-			<i class="pi pi-link stat-icon"></i>
-			<div class="stat-content">
-				@if (stats()?.topEndpoints && stats()!.topEndpoints.length > 0) {
-					<span
-						class="stat-value stat-value--endpoint"
-						[pTooltip]="stats()!.topEndpoints[0].key"
-						tooltipPosition="top"
-					>
-						{{ stats()!.topEndpoints[0].key }}
-					</span>
-					<span class="stat-label">Top endpoint</span>
-					<span class="stat-sublabel">{{ stats()!.topEndpoints[0].total }} eventos</span>
-				} @else {
-					<span class="stat-value stat-value--text">—</span>
-					<span class="stat-label">Top endpoint</span>
-					<span class="stat-sublabel">sin datos</span>
-				}
-			</div>
+		<!-- Top endpoints -->
+		<div class="breakdown-card">
+			<h4 class="breakdown-title"><i class="pi pi-link"></i> Top endpoints</h4>
+			@if (stats()?.topEndpoints && stats()!.topEndpoints.length > 0) {
+				<table class="breakdown-table">
+					<thead>
+						<tr>
+							<th>Endpoint</th>
+							<th>Total</th>
+							<th>Rechazados</th>
+						</tr>
+					</thead>
+					<tbody>
+						@for (item of stats()!.topEndpoints; track item.key) {
+							<tr>
+								<td class="breakdown-key" [pTooltip]="item.key" tooltipPosition="top">{{ item.key }}</td>
+								<td>{{ item.total }}</td>
+								<td>{{ item.rechazados }}</td>
+							</tr>
+						}
+					</tbody>
+				</table>
+			} @else {
+				<span class="breakdown-empty">sin datos</span>
+			}
 		</div>
 	</div>
+	<!-- #endregion -->
 </section>

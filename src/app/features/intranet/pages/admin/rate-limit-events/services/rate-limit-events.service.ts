@@ -4,9 +4,11 @@ import { Observable } from 'rxjs';
 
 import { environment } from '@config/environment';
 import { toLocalIso } from '@core/helpers';
+import { type PaginatedResult } from '@core/services/facades';
 
 import {
-	DEFAULT_TAKE,
+	DEFAULT_PAGE,
+	DEFAULT_PAGE_SIZE,
 	RateLimitEventFiltro,
 	RateLimitEventListaDto,
 	RateLimitStats,
@@ -18,8 +20,30 @@ export class RateLimitEventsService {
 	private readonly apiUrl = `${environment.apiUrl}/api/sistema/rate-limit-events`;
 
 	// #region Consultas
-	listar(filtro: RateLimitEventFiltro): Observable<RateLimitEventListaDto[]> {
-		let params = new HttpParams().set('take', String(filtro.take ?? DEFAULT_TAKE));
+	listar(filtro: RateLimitEventFiltro): Observable<PaginatedResult<RateLimitEventListaDto>> {
+		let params = this.buildFilterParams(filtro);
+		params = params.set('page', String(filtro.page ?? DEFAULT_PAGE));
+		params = params.set('pageSize', String(filtro.pageSize ?? DEFAULT_PAGE_SIZE));
+
+		return this.http.get<PaginatedResult<RateLimitEventListaDto>>(this.apiUrl, { params });
+	}
+
+	getStats(horas: number): Observable<RateLimitStats> {
+		const params = new HttpParams().set('horas', String(horas));
+		return this.http.get<RateLimitStats>(`${this.apiUrl}/stats`, { params });
+	}
+	// #endregion
+
+	// #region Export CSV
+	exportarCsv(filtro: RateLimitEventFiltro): Observable<Blob> {
+		const params = this.buildFilterParams(filtro);
+		return this.http.get(`${this.apiUrl}/export`, { params, responseType: 'blob' });
+	}
+	// #endregion
+
+	// #region Helpers
+	private buildFilterParams(filtro: RateLimitEventFiltro): HttpParams {
+		let params = new HttpParams();
 
 		if (filtro.dni) params = params.set('dni', filtro.dni);
 		if (filtro.rol) params = params.set('rol', filtro.rol);
@@ -28,18 +52,9 @@ export class RateLimitEventsService {
 		if (filtro.soloRechazados) params = params.set('soloRechazados', 'true');
 		if (filtro.desde) params = params.set('desde', toLocalIso(filtro.desde));
 		if (filtro.hasta) params = params.set('hasta', toLocalIso(filtro.hasta));
-		// Plan 32 Chat 4 — el query param correlationId se envía al BE igualmente.
-		// Hoy el BE lo ignora (no está en RateLimitEventFiltroDto); el filter
-		// efectivo se aplica client-side en el facade. Cuando el BE lo soporte,
-		// el filtrado pasa a ser server-side sin tocar acá.
 		if (filtro.correlationId) params = params.set('correlationId', filtro.correlationId);
 
-		return this.http.get<RateLimitEventListaDto[]>(this.apiUrl, { params });
-	}
-
-	getStats(horas: number): Observable<RateLimitStats> {
-		const params = new HttpParams().set('horas', String(horas));
-		return this.http.get<RateLimitStats>(`${this.apiUrl}/stats`, { params });
+		return params;
 	}
 	// #endregion
 }

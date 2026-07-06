@@ -1,11 +1,16 @@
 <p-table
 	[value]="items()"
+	[lazy]="true"
 	[paginator]="true"
-	[rows]="20"
+	[rows]="pageSize()"
+	[first]="(page() - 1) * pageSize()"
+	[totalRecords]="total()"
 	[rowsPerPageOptions]="[10, 20, 50]"
 	[rowHover]="true"
+	[loading]="loading()"
 	[showCurrentPageReport]="true"
 	currentPageReportTemplate="Mostrando {first} a {last} de {totalRecords}"
+	(onLazyLoad)="onLazyLoad($event)"
 	styleClass="p-datatable-sm"
 >
 	<ng-template #header>

@@ -1,7 +1,8 @@
 import { Injectable, computed, signal } from '@angular/core';
 
 import {
-	DEFAULT_TAKE,
+	DEFAULT_PAGE,
+	DEFAULT_PAGE_SIZE,
 	RateLimitEventFiltro,
 	RateLimitEventListaDto,
 	RateLimitStats,
@@ -16,7 +17,8 @@ const DEFAULT_FILTER: RateLimitEventFiltro = {
 	desde: null,
 	hasta: null,
 	correlationId: null,
-	take: DEFAULT_TAKE,
+	page: DEFAULT_PAGE,
+	pageSize: DEFAULT_PAGE_SIZE,
 };
 
 @Injectable({ providedIn: 'root' })
@@ -30,6 +32,11 @@ export class RateLimitEventsStore {
 	private readonly _tableReady = signal(false);
 	private readonly _filter = signal<RateLimitEventFiltro>({ ...DEFAULT_FILTER });
 
+	// Paginación server-side
+	private readonly _page = signal(DEFAULT_PAGE);
+	private readonly _pageSize = signal(DEFAULT_PAGE_SIZE);
+	private readonly _total = signal(0);
+
 	private readonly _drawerVisible = signal(false);
 	private readonly _selectedItem = signal<RateLimitEventListaDto | null>(null);
 	// #endregion
@@ -42,6 +49,9 @@ export class RateLimitEventsStore {
 	readonly error = this._error.asReadonly();
 	readonly tableReady = this._tableReady.asReadonly();
 	readonly filter = this._filter.asReadonly();
+	readonly page = this._page.asReadonly();
+	readonly pageSize = this._pageSize.asReadonly();
+	readonly total = this._total.asReadonly();
 	readonly drawerVisible = this._drawerVisible.asReadonly();
 	readonly selectedItem = this._selectedItem.asReadonly();
 	// #endregion
@@ -55,6 +65,9 @@ export class RateLimitEventsStore {
 		error: this._error(),
 		tableReady: this._tableReady(),
 		filter: this._filter(),
+		page: this._page(),
+		pageSize: this._pageSize(),
+		total: this._total(),
 		drawerVisible: this._drawerVisible(),
 		selectedItem: this._selectedItem(),
 	}));
@@ -93,6 +106,23 @@ export class RateLimitEventsStore {
 
 	resetFilter(): void {
 		this._filter.set({ ...DEFAULT_FILTER });
+		this._page.set(DEFAULT_PAGE);
+	}
+	// #endregion
+
+	// #region Mutaciones — Paginación
+	setPage(page: number): void {
+		this._page.set(page);
+	}
+
+	setPageSize(pageSize: number): void {
+		this._pageSize.set(pageSize);
+	}
+
+	setPaginationData(page: number, pageSize: number, total: number): void {
+		this._page.set(page);
+		this._pageSize.set(pageSize);
+		this._total.set(total);
 	}
 	// #endregion
 

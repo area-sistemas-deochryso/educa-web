@@ -14,6 +14,15 @@
 >
 	<button
 		pButton
+		type="button"
+		icon="pi pi-file-export"
+		label="Exportar CSV"
+		class="p-button-outlined p-button-sm"
+		(click)="onExportCsv()"
+		[pt]="{ root: { 'aria-label': 'Exportar eventos a CSV' } }"
+	></button>
+	<button
+		pButton
 		icon="pi pi-refresh"
 		class="p-button-text p-button-sm"
 		(click)="onRefresh()"
@@ -52,7 +61,12 @@
 	<section class="table-section">
 		<app-rate-limit-table
 			[items]="vm().items"
+			[loading]="vm().loading"
+			[total]="vm().total"
+			[page]="vm().page"
+			[pageSize]="vm().pageSize"
 			(rowSelected)="onRowSelected($event)"
+			(lazyLoad)="onLazyLoad($event)"
 		/>
 	</section>
 } @else {
