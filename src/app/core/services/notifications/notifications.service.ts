@@ -1,6 +1,15 @@
-import { Injectable, signal, inject, PLATFORM_ID, computed, effect } from '@angular/core';
+import {
+	Injectable,
+	signal,
+	inject,
+	PLATFORM_ID,
+	computed,
+	effect,
+	DestroyRef,
+	OnDestroy,
+} from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { isPlatformBrowser } from '@angular/common';
-import { firstValueFrom } from 'rxjs';
 import {
 	SeasonalNotification,
 	NotificationType,
@@ -25,13 +34,14 @@ export interface PriorityCount {
 @Injectable({
 	providedIn: 'root',
 })
-export class NotificationsService {
+export class NotificationsService implements OnDestroy {
 	// #region Dependencies
 	private readonly platformId = inject(PLATFORM_ID);
 	private readonly api = inject(NotificationsApiService);
 	private readonly sound = inject(NotificationsSoundService);
 	private readonly storage = inject(StorageService);
 	private readonly smartService = inject(SmartNotificationService);
+	private readonly destroyRef = inject(DestroyRef);
 	private readonly timerManager = new TimerManager();
 	// #endregion
 
@@ -112,14 +122,18 @@ export class NotificationsService {
 
 	// #region Notification checks
 	checkNotifications(): void {
-		firstValueFrom(this.api.getActivas())
-			.then((response) => {
-				const apiNotifications = (response ?? []).map((n) => this.mapApiToSeasonal(n));
-				this.applyNotifications(apiNotifications);
-			})
-			.catch(() => {
-				// Si la API falla, continuar solo con smart notifications
-				this.applyNotifications([]);
+		this.api
+			.getActivas()
+			.pipe(takeUntilDestroyed(this.destroyRef))
+			.subscribe({
+				next: (response) => {
+					const apiNotifications = (response ?? []).map((n) => this.mapApiToSeasonal(n));
+					this.applyNotifications(apiNotifications);
+				},
+				error: () => {
+					// Si la API falla, continuar solo con smart notifications
+					this.applyNotifications([]);
+				},
 			});
 	}
 
@@ -340,6 +354,10 @@ export class NotificationsService {
 			navigator.serviceWorker.removeEventListener('message', this.swMessageHandler);
 			this.swMessageHandler = null;
 		}
+	}
+
+	ngOnDestroy(): void {
+		this.cleanup();
 	}
 	// #endregion
 }
