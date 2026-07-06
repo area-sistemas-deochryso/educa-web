@@ -17,7 +17,7 @@
 		</div>
 		<div class="stat-sparkline-inline">
 			<app-mini-sparkline
-				[data]="trend()"
+				[data]="vm().trend"
 				color="var(--yellow-500)"
 				ariaLabel="Tendencia últimos 30 días: defer events"
 			/>
@@ -31,13 +31,13 @@
 
 <div class="filters-bar">
 	<p-select
-		[options]="tipoOptions()"
+		[options]="vm().tipoOptions"
 		optionLabel="label"
 		optionValue="value"
-		[ngModel]="filterTipo()"
+		[ngModel]="vm().filterTipo"
 		(ngModelChange)="onTipoChange($event)"
-		[placeholder]="tipoOptionsLoading() ? 'Cargando…' : 'Tipo de evento'"
-		[disabled]="tipoOptionsLoading()"
+		[placeholder]="vm().tipoOptionsLoading ? 'Cargando…' : 'Tipo de evento'"
+		[disabled]="vm().tipoOptionsLoading"
 		[showClear]="true"
 		appendTo="body"
 	/>
@@ -45,13 +45,13 @@
 		type="text"
 		pInputText
 		placeholder="Dominio (ej: gmail.com)"
-		[ngModel]="filterDominio()"
+		[ngModel]="vm().filterDominio"
 		(ngModelChange)="onDominioChange($event)"
 		(blur)="onDominioApply()"
 		(keyup.enter)="onDominioApply()"
 	/>
 	<p-datepicker
-		[ngModel]="filterDesde()"
+		[ngModel]="vm().filterDesde"
 		(ngModelChange)="onDesdeChange($event)"
 		placeholder="Desde"
 		[showIcon]="true"
@@ -59,7 +59,7 @@
 		appendTo="body"
 	/>
 	<p-datepicker
-		[ngModel]="filterHasta()"
+		[ngModel]="vm().filterHasta"
 		(ngModelChange)="onHastaChange($event)"
 		placeholder="Hasta"
 		[showIcon]="true"
@@ -93,17 +93,17 @@
 		icon="pi pi-download"
 		class="p-button-outlined p-button-sm"
 		(click)="onExportCsv()"
-		[disabled]="!hasEvents()"
+		[disabled]="!vm().hasEvents"
 		[pt]="{ root: { 'aria-label': 'Exportar a CSV' } }"
 	></button>
 </div>
 
-@if (loading()) {
+@if (vm().loading) {
 	<div class="timeline-loading">
 		<i class="pi pi-spin pi-spinner"></i>
 		<span>Cargando eventos…</span>
 	</div>
-} @else if (!hasEvents()) {
+} @else if (!vm().hasEvents) {
 	<div class="timeline-empty">
 		<i class="pi pi-inbox"></i>
 		<p>Sin eventos en el rango seleccionado</p>
@@ -111,15 +111,15 @@
 	</div>
 } @else {
 	<section class="timeline">
-		@for (event of events(); track event.id) {
+		@for (event of vm().events; track event.id) {
 			<app-defer-event-item [event]="event" />
 		}
 	</section>
 
 	<p-paginator
 		[rows]="pageSize"
-		[first]="first()"
-		[totalRecords]="total()"
+		[first]="vm().first"
+		[totalRecords]="vm().total"
 		[showCurrentPageReport]="true"
 		currentPageReportTemplate="Mostrando {first} a {last} de {totalRecords} eventos"
 		(onPageChange)="onPageChange($event)"

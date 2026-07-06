@@ -18,3 +18,5 @@ export { EmailDomainPauseDataFacade } from './email-domain-pause-data.facade';
 export { EmailDomainPauseCrudFacade } from './email-domain-pause-crud.facade';
 export { EmailDomainPauseUiFacade } from './email-domain-pause-ui.facade';
 export { EmailDeferEventsService } from './email-defer-events.service';
+export { EmailDeferEventStore } from './email-defer-event.store';
+export { EmailDeferEventDataFacade } from './email-defer-event-data.facade';
