@@ -151,9 +151,7 @@ export class RuntimeHealthWidgetComponent {
 			'requests.p95': snap.requests.p95Ms,
 			'requests.p99': snap.requests.p99Ms,
 			'threadPool.queueLength': snap.threadPool.queueLength,
-			'db.activeConnections': snap.db.activeConnections,
 			'gc.heapMb': this.heapMb(),
-			'db.p95LatencyMs': snap.db.p95LatencyMs,
 		};
 
 		const result: Record<string, AlertLevel> = {};

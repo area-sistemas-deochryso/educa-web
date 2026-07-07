@@ -27,12 +27,6 @@ function makeSnapshot(): RuntimeHealthSnapshot {
 			completedItemsCount: 0,
 		},
 		requests: { inFlight: 0, p50Ms: 0, p95Ms: 0, p99Ms: 0, countLast5Min: 0 },
-		db: {
-			activeConnections: 0,
-			pooledConnections: 0,
-			avgLatencyMs: 0,
-			p95LatencyMs: 0,
-		},
 		gc: {
 			gen0Collections: 0,
 			gen1Collections: 0,

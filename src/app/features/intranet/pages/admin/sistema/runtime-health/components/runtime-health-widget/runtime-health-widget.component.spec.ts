@@ -30,12 +30,6 @@ function makeSnapshot(
 			p99Ms: 64,
 			countLast5Min: 250,
 		},
-		db: {
-			activeConnections: 3,
-			pooledConnections: 10,
-			avgLatencyMs: 0,
-			p95LatencyMs: 0,
-		},
 		gc: {
 			gen0Collections: 100,
 			gen1Collections: 20,
@@ -113,12 +107,6 @@ describe('RuntimeHealthWidgetComponent', () => {
 				completedItemsCount: 0,
 			},
 			requests: { inFlight: 0, p50Ms: 0, p95Ms: 0, p99Ms: 0, countLast5Min: 0 },
-			db: {
-				activeConnections: 0,
-				pooledConnections: 0,
-				avgLatencyMs: 0,
-				p95LatencyMs: 0,
-			},
 			gc: {
 				gen0Collections: 0,
 				gen1Collections: 0,

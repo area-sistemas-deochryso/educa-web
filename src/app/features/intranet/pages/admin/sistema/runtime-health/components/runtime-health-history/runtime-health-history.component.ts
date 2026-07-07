@@ -60,7 +60,6 @@ export class RuntimeHealthHistoryComponent implements AfterViewInit {
 	// #region Canvas refs
 	readonly threadPoolCanvas = viewChild<ElementRef<HTMLCanvasElement>>('threadPoolChart');
 	readonly requestsCanvas = viewChild<ElementRef<HTMLCanvasElement>>('requestsChart');
-	readonly dbCanvas = viewChild<ElementRef<HTMLCanvasElement>>('dbChart');
 	readonly gcCanvas = viewChild<ElementRef<HTMLCanvasElement>>('gcChart');
 	// #endregion
 
@@ -170,32 +169,6 @@ export class RuntimeHealthHistoryComponent implements AfterViewInit {
 			}));
 		}
 
-		const db = this.dbCanvas()?.nativeElement;
-		if (db) {
-			this.charts.push(new Chart(db, {
-				type: 'line',
-				data: {
-					labels,
-					datasets: [
-						buildDataset('Conexiones activas', data.map(d => d.db.activeConnections), CHART_COLORS.blue, 'y'),
-						buildDataset('p95 latencia', data.map(d => d.db.dbP95LatencyMs), CHART_COLORS.red, 'y1'),
-					],
-				},
-				options: {
-					...baseOpts,
-					scales: {
-						...baseOpts.scales,
-						y1: {
-							type: 'linear',
-							position: 'right',
-							grid: { drawOnChartArea: false },
-							title: { display: true, text: 'ms' },
-						},
-					},
-				},
-			}));
-		}
-
 		const gc = this.gcCanvas()?.nativeElement;
 		if (gc) {
 			this.charts.push(new Chart(gc, {
@@ -237,7 +210,6 @@ export class RuntimeHealthHistoryComponent implements AfterViewInit {
 		const dataGroups = [
 			[data.map(d => d.threadPool.workersBusy), data.map(d => d.threadPool.queueLength)],
 			[data.map(d => d.requests.p50Ms), data.map(d => d.requests.p95Ms), data.map(d => d.requests.p99Ms)],
-			[data.map(d => d.db.activeConnections), data.map(d => d.db.dbP95LatencyMs)],
 			[data.map(d => d.gc.heapMb), data.map(d => d.gc.gen0), data.map(d => d.gc.gen1), data.map(d => d.gc.gen2)],
 		];
 

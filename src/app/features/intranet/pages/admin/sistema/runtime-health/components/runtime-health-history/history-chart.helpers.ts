@@ -69,9 +69,6 @@ export function buildCorrelationMetrics(snap: RuntimeHealthHistoryDto): Correlat
 		{ category: 'Requests', label: 'p95', value: `${fmt(snap.requests.p95Ms)} ms` },
 		{ category: 'Requests', label: 'p99', value: `${fmt(snap.requests.p99Ms)} ms` },
 		{ category: 'Requests', label: 'Últimos 5 min', value: `${snap.requests.last5MinCount}` },
-		{ category: 'BD', label: 'Conexiones activas', value: `${snap.db.activeConnections}` },
-		{ category: 'BD', label: 'Pooled', value: `${snap.db.pooledConnections}` },
-		{ category: 'BD', label: 'p95 latencia', value: `${fmt(snap.db.dbP95LatencyMs)} ms` },
 		{ category: 'GC', label: 'Heap', value: `${fmt(snap.gc.heapMb)} MB` },
 		{ category: 'GC', label: 'Gen0', value: `${snap.gc.gen0}` },
 		{ category: 'GC', label: 'Gen1', value: `${snap.gc.gen1}` },
@@ -100,15 +97,6 @@ export function computeSummaries(data: RuntimeHealthHistoryDto[]): ChartConfig[]
 				metricSummary('p50', data.map(d => d.requests.p50Ms), 'ms'),
 				metricSummary('p95', data.map(d => d.requests.p95Ms), 'ms'),
 				metricSummary('p99', data.map(d => d.requests.p99Ms), 'ms'),
-			],
-		},
-		{
-			title: 'BD',
-			icon: 'pi pi-database',
-			canvasRef: 'dbChart',
-			summaries: [
-				metricSummary('Conexiones', data.map(d => d.db.activeConnections)),
-				metricSummary('p95 latencia', data.map(d => d.db.dbP95LatencyMs), 'ms'),
 			],
 		},
 		{

@@ -150,45 +150,6 @@
 					}
 				</div>
 
-				<!-- DB -->
-				<div class="info-card">
-					<div class="info-card__title">
-						<i class="pi pi-database"></i>
-						<span>BD</span>
-						@if (alerts['db.activeConnections']; as a) {
-							<p-tag
-								[value]="a.level"
-								[severity]="a.severity"
-								class="alert-badge"
-							/>
-						} @else {
-							<p-tag value="OK" severity="success" class="alert-badge" />
-						}
-					</div>
-					<dl class="info-card__list">
-						<dt>Conexiones activas</dt>
-						<dd>{{ snapshot()!.db.activeConnections }}</dd>
-						<dt>Conexiones en pool</dt>
-						<dd>{{ snapshot()!.db.pooledConnections }}</dd>
-						<dt>p95 latencia</dt>
-						<dd>
-							{{ snapshot()!.db.p95LatencyMs | number: '1.0-0' }}
-							<span class="info-card__sub">ms</span>
-						</dd>
-					</dl>
-					@if (alerts['db.activeConnections']?.recommendation; as rec) {
-						<div class="info-card__rec"
-							[class.info-card__rec--link]="alerts['db.activeConnections']?.tabTarget"
-							(click)="onRecommendationClick('db.activeConnections')">
-							<i class="pi pi-lightbulb"></i>
-							<span>{{ rec }}</span>
-							@if (alerts['db.activeConnections']?.tabTarget) {
-								<i class="pi pi-arrow-right info-card__rec-arrow"></i>
-							}
-						</div>
-					}
-				</div>
-
 				<!-- GC -->
 				<div class="info-card">
 					<div class="info-card__title">

@@ -24,13 +24,6 @@ export interface RequestsSnapshot {
 	countLast5Min: number;
 }
 
-export interface DbSnapshot {
-	activeConnections: number;
-	pooledConnections: number;
-	avgLatencyMs: number;
-	p95LatencyMs: number;
-}
-
 export interface GcSnapshot {
 	gen0Collections: number;
 	gen1Collections: number;
@@ -45,7 +38,6 @@ export interface RuntimeHealthSnapshot {
 	patternReason: string;
 	threadPool: ThreadPoolSnapshot;
 	requests: RequestsSnapshot;
-	db: DbSnapshot;
 	gc: GcSnapshot;
 }
 
@@ -77,12 +69,6 @@ export interface RequestsHistoryDto {
 	last5MinCount: number;
 }
 
-export interface DbHistoryDto {
-	activeConnections: number;
-	pooledConnections: number;
-	dbP95LatencyMs: number;
-}
-
 export interface GcHistoryDto {
 	gen0: number;
 	gen1: number;
@@ -95,7 +81,6 @@ export interface RuntimeHealthHistoryDto {
 	timestamp: string;
 	threadPool: ThreadPoolHistoryDto;
 	requests: RequestsHistoryDto;
-	db: DbHistoryDto;
 	gc: GcHistoryDto;
 	saturationPattern: string;
 	reason: string | null;
@@ -184,26 +169,20 @@ export const METRIC_LABELS: Record<string, string> = {
 	'requests.p95': 'Requests p95 (ms)',
 	'requests.p99': 'Requests p99 (ms)',
 	'threadPool.queueLength': 'Cola ThreadPool',
-	'db.activeConnections': 'Conexiones BD activas',
 	'gc.heapMb': 'Heap (MB)',
-	'db.p95LatencyMs': 'BD p95 latencia (ms)',
 };
 
 export const ALERT_RECOMMENDATIONS: Record<string, string> = {
 	'requests.p95': 'Verificar consultas lentas en la tabla de slow requests',
 	'requests.p99': 'Verificar consultas lentas — p99 elevado indica outliers',
 	'threadPool.queueLength': 'Posible starvation — revisar consultas lentas que retienen threads',
-	'db.activeConnections': 'Pool exhaustion — revisar consultas lentas que retienen conexiones',
 	'gc.heapMb': 'Presión de memoria alta — considerar Force GC',
-	'db.p95LatencyMs': 'Latencia BD alta — revisar queries pesadas',
 };
 
 export const RECOMMENDATION_TAB_TARGETS: Record<string, string> = {
 	'requests.p95': 'slow',
 	'requests.p99': 'slow',
 	'threadPool.queueLength': 'slow',
-	'db.activeConnections': 'slow',
-	'db.p95LatencyMs': 'slow',
 };
 
 // #endregion
