@@ -8,6 +8,7 @@ import {
 	EmailQuarantineFormData,
 	EmailQuarantineListaDto,
 	QuarantineMotivo,
+	TrendPunto,
 } from '@data/models';
 
 const DEFAULT_FORM: EmailQuarantineFormData = {
@@ -37,7 +38,7 @@ export class EmailQuarantineStore extends BaseCrudStore<
 	private readonly _drawerItem = signal<EmailQuarantineListaDto | null>(null);
 	private readonly _drawerDetalle = signal<EmailQuarantineDetalleDto | null>(null);
 	private readonly _tableReady = signal(false);
-	private readonly _trend = signal<readonly number[]>([]);
+	private readonly _trend = signal<readonly TrendPunto[]>([]);
 	private readonly _trendLoading = signal(false);
 	// #endregion
 
@@ -104,7 +105,7 @@ export class EmailQuarantineStore extends BaseCrudStore<
 	// #endregion
 
 	// #region Trend
-	setTrend(data: readonly number[]): void {
+	setTrend(data: readonly TrendPunto[]): void {
 		this._trend.set(data);
 	}
 

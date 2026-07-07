@@ -124,7 +124,8 @@ export class BlacklistTabComponent implements OnInit {
 
 	readonly MIN_MOTIVO_LENGTH = 20;
 
-	readonly trendSummaryValue = computed<TrendSummary>(() => trendSummary(this.vm().trend));
+	readonly trendNumbers = computed(() => this.vm().trend.map((t) => t.count));
+	readonly trendSummaryValue = computed<TrendSummary>(() => trendSummary(this.trendNumbers()));
 	readonly hubFiltered = signal(false);
 	readonly hubFilterMessage = signal('');
 	// #endregion

@@ -78,4 +78,10 @@ export interface EmailOutboxTendencia {
 	pendientes: number;
 	total: number;
 }
+
+/** Punto de una serie de tendencia diaria genérica (`BE: TrendPuntoDto`). */
+export interface TrendPunto {
+	fecha: string;
+	count: number;
+}
 // #endregion

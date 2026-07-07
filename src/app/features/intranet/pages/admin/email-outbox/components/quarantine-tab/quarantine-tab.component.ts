@@ -97,7 +97,8 @@ export class QuarantineTabComponent implements OnInit {
 	readonly estadoOptions = ESTADO_OPTIONS;
 	readonly motivoOptions = MOTIVO_OPTIONS;
 
-	readonly trendSummaryValue = computed<TrendSummary>(() => trendSummary(this.vm().trend));
+	readonly trendNumbers = computed(() => this.vm().trend.map((t) => t.count));
+	readonly trendSummaryValue = computed<TrendSummary>(() => trendSummary(this.trendNumbers()));
 	readonly hubFiltered = signal(false);
 	readonly hubFilterMessage = signal('');
 

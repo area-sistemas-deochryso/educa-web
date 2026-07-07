@@ -7,6 +7,7 @@ import {
 	EmailBlacklistEntry,
 	EmailBlacklistFiltroEstado,
 	EmailBlacklistMotivo,
+	TrendPunto,
 } from '@data/models';
 
 /**
@@ -35,7 +36,7 @@ export class BlacklistStore extends BaseCrudStore<
 	private readonly _drawerVisible = signal(false);
 	private readonly _drawerItem = signal<EmailBlacklistEntry | null>(null);
 	private readonly _tableReady = signal(false);
-	private readonly _trend = signal<readonly number[]>([]);
+	private readonly _trend = signal<readonly TrendPunto[]>([]);
 	private readonly _trendLoading = signal(false);
 	// #endregion
 
@@ -100,7 +101,7 @@ export class BlacklistStore extends BaseCrudStore<
 	// #endregion
 
 	// #region Trend
-	setTrend(data: readonly number[]): void {
+	setTrend(data: readonly TrendPunto[]): void {
 		this._trend.set(data);
 	}
 

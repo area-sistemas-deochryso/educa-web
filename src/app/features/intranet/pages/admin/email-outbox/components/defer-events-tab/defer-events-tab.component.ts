@@ -59,8 +59,9 @@ export class DeferEventsTabComponent implements OnInit {
 	readonly pageSize = PAGE_SIZE;
 	readonly vm = this.dataFacade.vm;
 
-	readonly trendSummaryValue = computed<TrendSummary>(() => trendSummary(this.vm().trend));
-	readonly trendTotal = computed(() => this.vm().trend.reduce((a, b) => a + b, 0));
+	readonly trendNumbers = computed(() => this.vm().trend.map((t) => t.count));
+	readonly trendSummaryValue = computed<TrendSummary>(() => trendSummary(this.trendNumbers()));
+	readonly trendTotal = computed(() => this.trendNumbers().reduce((a, b) => a + b, 0));
 	readonly hasTrend = computed(() => this.vm().trend.length > 0);
 
 	readonly hubFiltered = signal(false);

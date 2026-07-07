@@ -9,6 +9,7 @@ import {
 	CrearBlacklistRequest,
 	DespejarBlacklistResponse,
 	EmailBlacklistEntry,
+	TrendPunto,
 } from '@data/models';
 
 /**
@@ -61,9 +62,9 @@ export class BlacklistService {
 		);
 	}
 
-	getTrend(days = 30): Observable<number[]> {
+	getTrend(days = 30): Observable<TrendPunto[]> {
 		const params = new HttpParams().set('days', days);
-		return this.http.get<number[]>(`${this.apiBase}/trend`, { params });
+		return this.http.get<TrendPunto[]>(`${this.apiBase}/trend`, { params });
 	}
 	// #endregion
 }

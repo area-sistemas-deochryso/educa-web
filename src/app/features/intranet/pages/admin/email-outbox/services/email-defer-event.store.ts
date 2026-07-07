@@ -1,7 +1,7 @@
 import { Injectable, computed, signal } from '@angular/core';
 
 import { BaseReadStore } from '@core/store';
-import { DeferEventTipo, EmailDeferEventDto } from '@data/models';
+import { DeferEventTipo, EmailDeferEventDto, TrendPunto } from '@data/models';
 
 /**
  * Brief 392 — store del tab Defer Events (timeline read-only).
@@ -26,7 +26,7 @@ export class EmailDeferEventStore extends BaseReadStore<EmailDeferEventDto> {
 	private readonly _tipoOptions = signal<{ label: string; value: DeferEventTipo }[]>([]);
 	private readonly _tipoOptionsLoading = signal(true);
 
-	private readonly _trend = signal<readonly number[]>([]);
+	private readonly _trend = signal<readonly TrendPunto[]>([]);
 	private readonly _trendLoading = signal(false);
 	// #endregion
 
@@ -90,7 +90,7 @@ export class EmailDeferEventStore extends BaseReadStore<EmailDeferEventDto> {
 	// #endregion
 
 	// #region Trend
-	setTrend(data: readonly number[]): void {
+	setTrend(data: readonly TrendPunto[]): void {
 		this._trend.set(data);
 	}
 	setTrendLoading(loading: boolean): void {
