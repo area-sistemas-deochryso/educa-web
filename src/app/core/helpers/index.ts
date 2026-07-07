@@ -12,7 +12,6 @@ export * from './file-download.utils';
 export * from './rxjs';
 export * from './table.utils';
 export * from './search.utils';
-export * from './periodo.utils';
 export * from './string.utils';
 export * from './array.utils';
 export * from './stats.utils';

@@ -127,14 +127,6 @@ export interface AprobacionItemDto {
 	observacion: string | null;
 }
 
-/** @deprecated Reemplazado por BatchCommandResult */
-export interface AprobacionMasivaResultDto {
-	aprobados: number;
-	desaprobados: number;
-	errores: number;
-	mensajes: string[];
-}
-
 export interface CommandItemResult {
 	itemId: number;
 	success: boolean;

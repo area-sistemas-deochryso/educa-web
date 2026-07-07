@@ -56,7 +56,6 @@ import { SalonMensajeriaTabComponent } from '@features/intranet/pages/cross-role
 				<div class="tab-wrapper">
 					<app-salon-mensajeria-tab
 						[cursoOptions]="cursoOptions()"
-						[isFullscreen]="true"
 					/>
 				</div>
 			}

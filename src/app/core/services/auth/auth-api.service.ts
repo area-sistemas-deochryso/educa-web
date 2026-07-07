@@ -4,7 +4,7 @@ import { EMPTY, Observable, catchError, of } from 'rxjs';
 
 import { environment } from '@env/environment';
 import { logger } from '@core/helpers';
-import { CambiarContrasenaRequest, LoginRequest, LoginResponse, StoredSession, UserProfile, VerifyTokenResponse } from './auth.models';
+import { CambiarContrasenaRequest, LoginRequest, LoginResponse, StoredSession, UserProfile } from './auth.models';
 
 /**
  * Thin HTTP gateway for authentication endpoints.
@@ -64,23 +64,6 @@ export class AuthApiService {
 	 */
 	cambiarContrasena(dto: CambiarContrasenaRequest): Observable<{ mensaje: string }> {
 		return this.http.put<{ mensaje: string }>(`${this.apiUrl}/perfil/contrasena`, dto);
-	}
-
-	/**
-	 * Verify a token and return its metadata.
-	 * @deprecated Will be removed after full cookie migration.
-	 */
-	verifyToken(token: string): Observable<VerifyTokenResponse | null> {
-		return this.http
-			.post<VerifyTokenResponse>(`${this.apiUrl}/verificar`, JSON.stringify(token), {
-				headers: { 'Content-Type': 'application/json' },
-			})
-			.pipe(
-				catchError((err) => {
-					logger.warn('[AuthApi] verifyToken failed — fallback null', err?.status);
-					return of(null);
-				}),
-			);
 	}
 
 	// #endregion

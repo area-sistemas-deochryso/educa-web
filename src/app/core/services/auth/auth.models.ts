@@ -104,21 +104,4 @@ export interface CambiarContrasenaRequest {
 	/** New password to set. */
 	nuevaContrasena: string;
 }
-
-/**
- * Response payload for POST /api/Auth/verificar.
- * @deprecated Will be removed after full cookie migration.
- */
-export interface VerifyTokenResponse {
-	/** User DNI. */
-	dni: string;
-	/** User role. */
-	rol: UserRole;
-	/** Full name. */
-	nombreCompleto: string;
-	/** Entity id for the role context. */
-	entityId: number;
-	/** Sede id for the role context. */
-	sedeId: number;
-}
 // #endregion

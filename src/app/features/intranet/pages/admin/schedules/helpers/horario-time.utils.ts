@@ -21,22 +21,6 @@ export function calcularPosicionVertical(horaInicio: string): number {
 }
 
 /**
- * @deprecated Usar `timeRangesOverlap` de `@shared/models` en su lugar.
- */
-export function hasOverlap(
-	inicioA: string,
-	finA: string,
-	inicioB: string,
-	finB: string,
-): boolean {
-	return (
-		(inicioA >= inicioB && inicioA < finB) ||
-		(finA > inicioB && finA <= finB) ||
-		(inicioA <= inicioB && finA >= finB)
-	);
-}
-
-/**
  * Construye los bloques semanales para la vista de calendario.
  * Asigna un color por curso de forma determinística.
  */

@@ -204,15 +204,6 @@ export class AuthService {
 
 	// #endregion
 
-	// #region Deprecated (disabled — remove after cookie migration verified)
-
-	// [COOKIE_MIGRATION] Token-based session methods disabled.
-	// Sessions are now managed server-side via /api/Auth/sessions.
-	// verifyAllStoredTokens(): Observable<VerifyTokenResponse[]> { ... }
-	// verifyTokenForAutofill(): Observable<VerifyTokenResponse | null> { ... }
-
-	// #endregion
-
 	// #region Private helpers
 
 	/**

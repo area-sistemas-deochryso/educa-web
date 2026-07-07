@@ -155,23 +155,6 @@ describe('PermissionsService', () => {
 
 			httpMock.expectOne((r) => r.url.includes('/usuario/listar')).flush([]);
 		});
-
-		it('should get mis permisos', () => {
-			service.getMisPermisos().subscribe((result) => {
-				expect(result?.rol).toBe('Director');
-			});
-
-			const req = httpMock.expectOne((r) => r.url.includes('/mis-permisos'));
-			req.flush({ usuarioId: 1, rol: 'Director', vistasPermitidas: [], tienePermisosPersonalizados: false });
-		});
-
-		it('should return null on getMisPermisos error (auth-internal degradation)', () => {
-			service.getMisPermisos().subscribe((result) => {
-				expect(result).toBeNull();
-			});
-
-			httpMock.expectOne((r) => r.url.includes('/mis-permisos')).error(new ProgressEvent('error'));
-		});
 	});
 	// #endregion
 

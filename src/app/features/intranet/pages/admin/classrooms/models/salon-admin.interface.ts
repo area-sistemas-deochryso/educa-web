@@ -9,7 +9,6 @@ export type {
 	AprobarEstudianteDto,
 	AprobacionMasivaDto,
 	AprobacionItemDto,
-	AprobacionMasivaResultDto,
 	BatchCommandResult,
 	SalonesAdminEstadisticas,
 	AprobacionEstado,

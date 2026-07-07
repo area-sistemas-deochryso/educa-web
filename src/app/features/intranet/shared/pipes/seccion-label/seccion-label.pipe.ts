@@ -1,5 +1,5 @@
 import { Pipe, PipeTransform } from '@angular/core';
-import { esSeccionVerano } from '@core/helpers';
+import { esSeccionDeVerano } from '@shared/models';
 
 /**
  * Transforma el nombre de sección para display.
@@ -12,6 +12,6 @@ import { esSeccionVerano } from '@core/helpers';
 @Pipe({ name: 'seccionLabel', standalone: true, pure: true })
 export class SeccionLabelPipe implements PipeTransform {
 	transform(seccion: string): string {
-		return esSeccionVerano(seccion) ? 'Verano' : seccion.toUpperCase();
+		return esSeccionDeVerano(seccion) ? 'Verano' : seccion.toUpperCase();
 	}
 }

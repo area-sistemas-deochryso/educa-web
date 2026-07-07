@@ -10,7 +10,6 @@ import {
 	CrearVistaRequest,
 	PermisoRol,
 	PermisoUsuario,
-	PermisosUsuarioResultado,
 	RolCapabilityMatrixRow,
 	SetRolCapabilitiesRequest,
 	SetUsuarioCapabilitiesRequest,
@@ -231,34 +230,6 @@ export class PermissionsService {
 	}
 
 	// #endregion
-	// #region CONSULTA DE PERMISOS (legacy — admin pages)
-
-	/**
-	 * Get permissions for a specific user and role.
-	 * @deprecated Legacy endpoint — admin pages only.
-	 */
-	consultarPermisosDeUsuario(
-		usuarioId: number,
-		rol: string,
-	): Observable<PermisosUsuarioResultado> {
-		return this.http.get<PermisosUsuarioResultado>(
-			`${this.apiUrl}/usuario/consultar/${usuarioId}/${encodeURIComponent(rol)}`,
-		);
-	}
-
-	/**
-	 * @deprecated Use getMyCapabilities() instead. This endpoint no longer exists in BE.
-	 */
-	getMisPermisos(): Observable<PermisosUsuarioResultado | null> {
-		return this.http.get<PermisosUsuarioResultado>(`${this.apiUrl}/mis-permisos`).pipe(
-			catchError((err) => {
-				logger.warn('[PermissionsService] getMisPermisos failed — fallback null', err?.status);
-				return of(null);
-			}),
-		);
-	}
-
-	// #endregion
 	// #region USER SEARCH
 
 	/**
@@ -272,15 +243,6 @@ export class PermissionsService {
 		return this.http.get<UsuarioBusquedaResultado>(`${this.apiUrl}/usuario/buscar-usuarios`, { params });
 	}
 
-	/**
-	 * List users by role.
-	 * @deprecated Legacy — use searchUsers.
-	 */
-	listarUsuariosPorRol(rol: string): Observable<UsuarioBusquedaResultado> {
-		return this.http.get<UsuarioBusquedaResultado>(
-			`${this.apiUrl}/usuario/usuarios-por-rol/${encodeURIComponent(rol)}`,
-		);
-	}
 	// #endregion
 
 	// #region CAPABILITY ADMIN (P57)

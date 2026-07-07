@@ -60,7 +60,6 @@ import { PageHeaderComponent } from '@intranet-shared/components';
 				<div class="tab-wrapper">
 					<app-salon-mensajeria-tab
 						[cursoOptions]="cursoOptions()"
-						[isFullscreen]="true"
 					/>
 				</div>
 			}

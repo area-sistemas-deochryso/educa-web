@@ -94,18 +94,6 @@ export interface ActualizarPermisoUsuarioRequest {
 	rowVersion?: string;
 }
 
-/**
- * Result of permissions query for a user.
- */
-export interface PermisosUsuarioResultado {
-	usuarioId: number;
-	rol: AppUserRoleValue;
-	vistasPermitidas: string[];
-	tienePermisosPersonalizados: boolean;
-	/** JWT with exp that indicates when permissions expire. */
-	permisosToken?: string;
-}
-
 /** @deprecated 2026-06-08 — use Rol from @shared/models/rol.models. Remove after 2026-07-08. */
 export type RolTipo = AppUserRoleValue;
 

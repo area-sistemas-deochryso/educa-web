@@ -11,14 +11,3 @@ export interface Rol {
 	readonly requiereSalon: boolean;
 	readonly orden: number;
 }
-
-/** @deprecated 2026-06-08 — use Rol.nombre or Rol behavioral flags instead. Remove after 2026-07-08. */
-export type RolNombre =
-	| 'Estudiante'
-	| 'Apoderado'
-	| 'Profesor'
-	| 'Director'
-	| 'Asistente Administrativo'
-	| 'Promotor'
-	| 'Coordinador Académico'
-	| 'Administrador';
