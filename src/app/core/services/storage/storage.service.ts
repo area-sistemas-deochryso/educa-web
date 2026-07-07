@@ -1,4 +1,3 @@
-/* eslint-disable max-lines -- Razón: facade thin que delega en 4 servicios específicos (session/preferences/notifications/indexeddb). Cada nueva preferencia agrega 2 passthroughs; refactorizar implicaría romper el contrato de un single entry-point para storage. */
 import { Injectable, inject, PLATFORM_ID } from '@angular/core';
 import { isPlatformBrowser } from '@angular/common';
 import { logger } from '@app/core/helpers';
@@ -80,21 +79,10 @@ export class StorageService {
 
 	// #region NOTIFICATIONS — IndexedDB con fallback síncrono a localStorage
 
-	/** @deprecated Use getDismissedNotificationsAsync. */
-	getDismissedNotifications(): NotificationStorageData | null {
-		return this._getSyncFallback<NotificationStorageData>('educa_dismissed_notifications');
-	}
-
 	async getDismissedNotificationsAsync(): Promise<NotificationStorageData | null> {
 		const data = await this.notificationStorage.getDismissedNotifications();
 		if (data) return data;
 		return this._getSyncFallback<NotificationStorageData>('educa_dismissed_notifications');
-	}
-
-	/** @deprecated Use setDismissedNotificationsAsync. */
-	setDismissedNotifications(data: NotificationStorageData): void {
-		this._setSyncFallback('educa_dismissed_notifications', data);
-		this.notificationStorage.setDismissedNotifications(data);
 	}
 
 	async setDismissedNotificationsAsync(data: NotificationStorageData): Promise<void> {
@@ -106,21 +94,10 @@ export class StorageService {
 		this.notificationStorage.removeDismissedNotifications();
 	}
 
-	/** @deprecated Use getReadNotificationsAsync. */
-	getReadNotifications(): NotificationStorageData | null {
-		return this._getSyncFallback<NotificationStorageData>('educa_read_notifications');
-	}
-
 	async getReadNotificationsAsync(): Promise<NotificationStorageData | null> {
 		const data = await this.notificationStorage.getReadNotifications();
 		if (data) return data;
 		return this._getSyncFallback<NotificationStorageData>('educa_read_notifications');
-	}
-
-	/** @deprecated Use setReadNotificationsAsync. */
-	setReadNotifications(data: NotificationStorageData): void {
-		this._setSyncFallback('educa_read_notifications', data);
-		this.notificationStorage.setReadNotifications(data);
 	}
 
 	async setReadNotificationsAsync(data: NotificationStorageData): Promise<void> {
@@ -417,14 +394,6 @@ export class StorageService {
 			return value ? JSON.parse(value) : null;
 		} catch {
 			return null;
-		}
-	}
-
-	private _setSyncFallback<T>(key: string, value: T): void {
-		try {
-			localStorage.setItem(key, JSON.stringify(value));
-		} catch (e) {
-			logger.error(`[Storage] Fallback set error for ${key}:`, e);
 		}
 	}
 

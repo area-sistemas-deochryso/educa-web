@@ -96,13 +96,16 @@ export class NotificationsService implements OnDestroy {
 	// #region Initialization
 	constructor() {
 		if (isPlatformBrowser(this.platformId)) {
-			this.loadDismissedFromStorage();
-			this.loadReadFromStorage();
-			this.checkNotifications();
+			void this.initialize();
 			this.startPeriodicCheck();
 			this.listenToServiceWorker();
 			this.watchSmartInit();
 		}
+	}
+
+	private async initialize(): Promise<void> {
+		await Promise.all([this.loadDismissedFromStorage(), this.loadReadFromStorage()]);
+		this.checkNotifications();
 	}
 
 	// Runs every 5 min to keep smart notifications (upcoming classes) fresh.
@@ -329,20 +332,20 @@ export class NotificationsService implements OnDestroy {
 	// #endregion
 
 	// #region Storage I/O
-	private loadDismissedFromStorage(): void {
-		this._dismissedIds.set(loadDailyIdSet(this.storage, 'dismissed'));
+	private async loadDismissedFromStorage(): Promise<void> {
+		this._dismissedIds.set(await loadDailyIdSet(this.storage, 'dismissed'));
 	}
 
 	private saveDismissedToStorage(): void {
-		saveDailyIdSet(this.storage, 'dismissed', this._dismissedIds());
+		void saveDailyIdSet(this.storage, 'dismissed', this._dismissedIds());
 	}
 
-	private loadReadFromStorage(): void {
-		this._readIds.set(loadDailyIdSet(this.storage, 'read'));
+	private async loadReadFromStorage(): Promise<void> {
+		this._readIds.set(await loadDailyIdSet(this.storage, 'read'));
 	}
 
 	private saveReadToStorage(): void {
-		saveDailyIdSet(this.storage, 'read', this._readIds());
+		void saveDailyIdSet(this.storage, 'read', this._readIds());
 	}
 	// #endregion
 

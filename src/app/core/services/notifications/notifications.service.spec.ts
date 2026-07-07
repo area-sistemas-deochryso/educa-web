@@ -26,11 +26,11 @@ describe('NotificationsService', () => {
 
 	beforeEach(() => {
 		storageMock = {
-			getDismissedNotifications: vi.fn().mockReturnValue(null),
-			setDismissedNotifications: vi.fn(),
+			getDismissedNotificationsAsync: vi.fn().mockResolvedValue(null),
+			setDismissedNotificationsAsync: vi.fn().mockResolvedValue(undefined),
 			removeDismissedNotifications: vi.fn(),
-			getReadNotifications: vi.fn().mockReturnValue(null),
-			setReadNotifications: vi.fn(),
+			getReadNotificationsAsync: vi.fn().mockResolvedValue(null),
+			setReadNotificationsAsync: vi.fn().mockResolvedValue(undefined),
 			removeReadNotifications: vi.fn(),
 			getLastNotificationCheck: vi.fn().mockReturnValue(null),
 			setLastNotificationCheck: vi.fn(),

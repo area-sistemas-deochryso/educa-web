@@ -33,6 +33,14 @@ Es una migración viva de arquitectura, no código muerto: 14+ archivos con lóg
 2. Decidir el orden de migración (¿por módulo — admin/users primero, luego attendance? ¿o por símbolo — todos los `APP_USER_ROLES.Estudiante` primero?).
 3. Verificar en browser que selects, filtros y comparaciones de rol siguen funcionando igual tras cada cambio — alto riesgo de romper permisos/visibilidad si se apura.
 
+## Aprendizajes transferibles (de chat 380)
+
+- **Session-switcher ya existe** para probar con 2+ roles sin re-login: `AuthService.getSessions()`/`switchSession()` (`src/app/core/services/auth/auth.service.ts:173,181`), consumido en `login-intranet.component.ts`. Backend expone `GET /api/Auth/sessions` + `POST /api/Auth/switch-session/{deviceId}`. Buscar el selector en el dropdown del perfil de usuario (header) — evita loguear/desloguear manualmente para cada rol del criterio de cierre.
+- **CRUD de `admin/users` es soft-delete**: "eliminar" marca `Inactivo`, no borra la fila. Si se crean/borran usuarios de prueba durante la verificación en browser, no asumir que desaparecen del todo — van a quedar como inactivos.
+- **Feature flags en dev**: `src/app/config/environment.development.ts` → `features.*` puede tener módulos apagados en local (ej. `notifications: false` bloqueaba probar ese flujo). Si algún módulo tocado por esta migración (`attendance`, `admin/users`) no aparece en el browser, revisar ese archivo antes de asumir un bug.
+- **Levantar BE+FE local**: `dotnet run --launch-profile https` en `Educa.API/Educa.API` (puerto 7102) + `npm run start` en `educa-web` (puerto 4201, proxy ya configurado en `proxy.conf.json`). La sesión de Chrome del usuario ya queda autenticada entre reinicios (cookie persiste).
+- **IndexedDB**: si necesitás inspeccionar storage del navegador, listar con `indexedDB.databases()` primero — `indexedDB.open('<nombre-adivinado>')` crea silenciosamente una DB vacía si el nombre no existe. La DB real de la app es `EducaWebDB`.
+
 ## Deliverables
 
 ### Fase de diseño

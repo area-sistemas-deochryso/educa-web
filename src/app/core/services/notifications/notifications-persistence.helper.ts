@@ -9,8 +9,8 @@ function isToday(dateIso: string): boolean {
 
 function readDaily(storage: StorageService, kind: DailySetKind) {
 	return kind === 'dismissed'
-		? storage.getDismissedNotifications()
-		: storage.getReadNotifications();
+		? storage.getDismissedNotificationsAsync()
+		: storage.getReadNotificationsAsync();
 }
 
 function clearDaily(storage: StorageService, kind: DailySetKind): void {
@@ -22,17 +22,21 @@ function writeDaily(
 	storage: StorageService,
 	kind: DailySetKind,
 	payload: { ids: string[]; date: string },
-): void {
-	if (kind === 'dismissed') storage.setDismissedNotifications(payload);
-	else storage.setReadNotifications(payload);
+): Promise<void> {
+	return kind === 'dismissed'
+		? storage.setDismissedNotificationsAsync(payload)
+		: storage.setReadNotificationsAsync(payload);
 }
 
 /**
  * Load a persisted Set of ids that resets on date change.
  */
-export function loadDailyIdSet(storage: StorageService, kind: DailySetKind): Set<string> {
+export async function loadDailyIdSet(
+	storage: StorageService,
+	kind: DailySetKind,
+): Promise<Set<string>> {
 	try {
-		const data = readDaily(storage, kind);
+		const data = await readDaily(storage, kind);
 		if (data) {
 			if (isToday(data.date)) return new Set(data.ids);
 			clearDaily(storage, kind);
@@ -51,10 +55,10 @@ export function saveDailyIdSet(
 	storage: StorageService,
 	kind: DailySetKind,
 	ids: ReadonlySet<string>,
-): void {
-	try {
-		writeDaily(storage, kind, { ids: [...ids], date: new Date().toISOString() });
-	} catch (e) {
-		logger.error(`[Notifications] Error saving ${kind}:`, e);
-	}
+): Promise<void> {
+	return writeDaily(storage, kind, { ids: [...ids], date: new Date().toISOString() }).catch(
+		(e) => {
+			logger.error(`[Notifications] Error saving ${kind}:`, e);
+		},
+	);
 }

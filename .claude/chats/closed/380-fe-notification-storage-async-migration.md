@@ -36,12 +36,18 @@ A diferencia de otros casos `@deprecated` limpiados en esa misma sesión (que er
 2. Ajustar `notifications.service.ts` en los 10 call-sites según la decisión de diseño.
 3. Borrar los 4 métodos síncronos deprecados de `storage.service.ts` (`getDismissedNotifications`, `setDismissedNotifications`, `getReadNotifications`, `setReadNotifications`) y su fallback síncrono si queda huérfano (`_getSyncFallback`/`_setSyncFallback` — verificar otros usos antes de tocar).
 
+## Decisiones de diseño
+
+1. **Carga inicial**: `checkNotifications()` ya dispara una llamada HTTP (`api.getActivas()`), que siempre tarda más que una lectura IndexedDB. Se secuenció `await` de `loadDismissedFromStorage()` + `loadReadFromStorage()` (ahora async) dentro de un método `initialize()` invocado sin esperar desde el constructor, **antes** de llamar a `checkNotifications()`. Sin parpadeo: los signals de activas/descartadas quedan vacíos hasta que resuelve el fetch de todos modos.
+2. **Guardado (8 call-sites)**: se mantiene fire-and-forget (`void saveDailyIdSet(...)`) sin `await`. Verificado en `NotificationStorageService`: sus métodos async nunca rechazan (atrapan y loguean el error internamente, siempre resuelven) — no hay riesgo de unhandled rejection ni pérdida silenciosa de escritura.
+3. `_setSyncFallback` quedó huérfano tras borrar los 4 setters síncronos (únicos 2 call-sites) — se borró. `_getSyncFallback` se mantuvo: lo siguen usando los getters `Async` (fallback) y `migrateFromLegacyStorage()`.
+
 ## Criterio de cierre
 
-- [ ] `NotificationsService` usa las 4 versiones `Async` en todos los call-sites
-- [ ] Los 4 métodos síncronos deprecados están borrados de `storage.service.ts`
-- [ ] `ng build` pasa
-- [ ] Notificaciones (leídas/descartadas) se comportan igual en browser: persisten tras refresh, no hay parpadeo visible
+- [x] `NotificationsService` usa las 4 versiones `Async` en todos los call-sites
+- [x] Los 4 métodos síncronos deprecados están borrados de `storage.service.ts`
+- [x] `ng build` pasa (sin errores ni warnings)
+- [x] Notificaciones (leídas/descartadas) se comportan igual en browser: persisten tras refresh, no hay parpadeo visible — **verificado en browser**: se levantó BE + FE local, se activó temporalmente `features.notifications` (revertido al cerrar), se creó una notificación de prueba vigente hoy, se marcó como leída y se descartó. Confirmado en `EducaWebDB` (IndexedDB) que ambos estados (`read`/`dismissed`) persisten correctamente, y tras refresh el panel muestra "1 descartada" sin parpadeo ni errores de consola. Notificación de prueba borrada (soft-delete → Inactivo) al terminar.
 
 ## Tiempo estimado
 
