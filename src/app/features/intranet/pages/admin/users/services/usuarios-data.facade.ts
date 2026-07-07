@@ -7,8 +7,7 @@ import { forkJoin, from, of, Subject } from 'rxjs';
 import { ErrorHandlerService, SwService, WalFacadeHelper, WalCrossTabRefetchService } from '@core/services';
 import { logger, withRetry, facadeErrorHandler, type FacadeErrorHandler } from '@core/helpers';
 import { UI_ADMIN_ERROR_DETAILS } from '@app/shared/constants';
-import { APP_USER_ROLES } from '@shared/constants';
-import { RoleTab, RolUsuarioAdmin, SedeSimpleDto, UsuarioLista, UsuariosEstadisticas } from '../models';
+import { RoleTab, SedeSimpleDto, UsuarioLista, UsuariosEstadisticas } from '../models';
 import { UsersService } from './usuarios.service';
 import { UsersStore } from './usuarios.store';
 import { SedesApiService } from './sedes-api.service';
@@ -159,9 +158,9 @@ export class UsersDataFacade {
 
 	setActiveTab(tab: RoleTab): void {
 		this.store.setActiveTab(tab);
-		const rolMap: Record<string, RolUsuarioAdmin | null> = {
-			estudiantes: APP_USER_ROLES.Estudiante as RolUsuarioAdmin,
-			profesores: APP_USER_ROLES.Profesor as RolUsuarioAdmin,
+		const rolMap: Record<string, string | null> = {
+			estudiantes: 'Estudiante',
+			profesores: 'Profesor',
 		};
 		this.store.setFilterRol(tab ? (rolMap[tab] ?? null) : null);
 		this.store.setPage(1);
@@ -169,7 +168,7 @@ export class UsersDataFacade {
 	}
 
 	setFilterRol(rol: string | null): void {
-		this.store.setFilterRol(rol as RolUsuarioAdmin | null);
+		this.store.setFilterRol(rol);
 		this.store.setPage(1);
 		this.refreshUsuariosOnly();
 	}

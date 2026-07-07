@@ -2,7 +2,6 @@ import { Injectable, computed, inject, signal } from '@angular/core';
 
 import { SalonListDto } from '@features/intranet/pages/admin/schedules/models/salon.interface';
 import { CursoListaDto } from '@features/intranet/pages/admin/schedules/models/curso.interface';
-import { APP_USER_ROLES } from '@shared/constants';
 import { DebugService } from '@core/helpers';
 import { BaseCrudStore } from '@core/store';
 import { type ProfesorCursoListaDto } from '@data/models';
@@ -11,7 +10,6 @@ import {
 	CrearUsuarioRequest,
 	ImportarEstudiantesResponse,
 	RoleTab,
-	RolUsuarioAdmin,
 	SedeSimpleDto,
 	UsuarioDetalle,
 	UsuarioLista,
@@ -80,7 +78,7 @@ export class UsersStore extends BaseCrudStore<UsuarioLista, UsuarioFormData, Usu
 	private readonly _importResult = signal<ImportarEstudiantesResponse | null>(null);
 
 	private readonly _selectedUsuario = signal<UsuarioDetalle | null>(null);
-	private readonly _filterRol = signal<RolUsuarioAdmin | null>(null);
+	private readonly _filterRol = signal<string | null>(null);
 	private readonly _filterSalonId = signal<number | null>(null);
 	private readonly _refreshCounter = signal(0);
 	private readonly _activeTab = signal<RoleTab>(null);
@@ -125,8 +123,8 @@ export class UsersStore extends BaseCrudStore<UsuarioLista, UsuarioFormData, Usu
 		validateTelefonoApoderado(this.formData().telefonoApoderado, this.formData().rol),
 	);
 
-	readonly isEstudiante = computed(() => this.formData().rol === APP_USER_ROLES.Estudiante);
-	readonly isProfesor = computed(() => this.formData().rol === APP_USER_ROLES.Profesor);
+	readonly isEstudiante = computed(() => this.formData().rol === 'Estudiante');
+	readonly isProfesor = computed(() => this.formData().rol === 'Profesor');
 
 	readonly isFormValid = computed(() =>
 		isUsuarioFormValid(this.formData(), this.isEditing(), {
@@ -212,7 +210,7 @@ export class UsersStore extends BaseCrudStore<UsuarioLista, UsuarioFormData, Usu
 		this._tableReady.set(ready);
 	}
 
-	setFilterRol(rol: RolUsuarioAdmin | null): void {
+	setFilterRol(rol: string | null): void {
 		this._filterRol.set(rol);
 	}
 
@@ -314,7 +312,7 @@ export class UsersStore extends BaseCrudStore<UsuarioLista, UsuarioFormData, Usu
 			nombres: usuario.nombres,
 			apellidos: usuario.apellidos,
 			contrasena: usuario.contrasena ?? '',
-			rol: usuario.rol as RolUsuarioAdmin,
+			rol: usuario.rol,
 			estado: usuario.estado,
 			telefono: usuario.telefono,
 			correo: usuario.correo,

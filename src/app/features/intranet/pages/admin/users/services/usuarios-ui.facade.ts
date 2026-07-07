@@ -6,7 +6,6 @@ import { catchError } from 'rxjs/operators';
 import { ErrorHandlerService } from '@core/services';
 import { logger, withRetry, facadeErrorHandler, type FacadeErrorHandler } from '@core/helpers';
 import { UI_ADMIN_ERROR_DETAILS, UI_SUMMARIES } from '@app/shared/constants';
-import { APP_USER_ROLES } from '@shared/constants';
 import { resolveModoAsignacion } from '@data/models';
 import { UsuarioDetalle, UsuarioLista } from '../models';
 import { UsersService } from './usuarios.service';
@@ -193,7 +192,7 @@ export class UsersUiFacade {
 	 * salones en modo PorCurso (GRA_Orden ≥ 8).
 	 */
 	private loadProfesorCursosIfNeeded(detalle: UsuarioDetalle): void {
-		if (detalle.rol !== APP_USER_ROLES.Profesor) {
+		if (detalle.rol !== 'Profesor') {
 			this.store.clearProfesorCursos();
 			return;
 		}

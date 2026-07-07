@@ -6,8 +6,6 @@ import { resolveModoAsignacion } from '@data/models';
 import {
 	ActualizarUsuarioRequest,
 	CrearUsuarioRequest,
-	ROLES_USUARIOS_ADMIN,
-	RolUsuarioAdmin,
 	SalonAsignacion,
 	SedeSimpleDto,
 } from '../../services';
@@ -30,7 +28,7 @@ import {
 } from '@angular/core';
 import { generatePassword } from '@core/helpers';
 import { rolRequiereSalon, rolPermiteEsTutor, canEditPassword } from '@shared/models';
-import { APP_USER_ROLES } from '@shared/constants';
+import { RolService } from '@core/services/roles';
 
 import { ButtonModule } from 'primeng/button';
 import { Checkbox } from 'primeng/checkbox';
@@ -93,6 +91,7 @@ export interface FormValidationErrors {
 export class UserFormDialogComponent {
 	// #region Dependencias
 	private userProfile = inject(UserProfileService);
+	private rolService = inject(RolService);
 	// #endregion
 
 	// #region Inputs / Outputs
@@ -117,7 +116,9 @@ export class UserFormDialogComponent {
 	// #endregion
 
 	// #region Estado local
-	readonly rolesSelectOptions = ROLES_USUARIOS_ADMIN.map((r) => ({ label: r, value: r }));
+	readonly rolesSelectOptions = computed(() =>
+		this.rolService.all().map((r) => ({ label: r.nombre, value: r.nombre })),
+	);
 	readonly activeFormTab = signal<string>('datos');
 
 	readonly _gradoSeleccionado = signal<string | null>(null);
@@ -168,12 +169,12 @@ export class UserFormDialogComponent {
 	// #endregion
 
 	// #region Computed — opciones de salón
-	readonly isEstudiante = computed(() => this.formData().rol === APP_USER_ROLES.Estudiante);
+	readonly isEstudiante = computed(() => this.formData().rol === 'Estudiante');
 	readonly isProfesor = computed(() => rolPermiteEsTutor(this.formData().rol));
 	readonly needsSalon = computed(() => rolRequiereSalon(this.formData().rol));
 
-	get rolValue(): RolUsuarioAdmin | undefined {
-		return this.formData().rol as RolUsuarioAdmin | undefined;
+	get rolValue(): string | undefined {
+		return this.formData().rol;
 	}
 
 	readonly gradosOptions = computed(() => computeGradosOptions(this.salones()));

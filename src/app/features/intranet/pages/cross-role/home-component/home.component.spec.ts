@@ -8,7 +8,6 @@ import { FeatureFlagsFacade } from '@core/services/feature-flags';
 import { UserPermissionsService } from '@core/services/permissions';
 import { UserProfileService } from '@core/services/user';
 import { computed, signal, Signal, WritableSignal } from '@angular/core';
-import { APP_USER_ROLES } from '@shared/constants';
 
 // #endregion
 // #region Implementation
@@ -113,18 +112,10 @@ describe('HomeComponent (Intranet)', () => {
 	describe('showAttendanceWidget gate', () => {
 		// Los 4 roles administrativos comparten el mismo summary widget.
 		const adminRoles = [
-			{ label: 'Director', flag: 'isDirector' as const, role: APP_USER_ROLES.Director },
-			{ label: 'Promotor', flag: 'isPromotor' as const, role: APP_USER_ROLES.Promotor },
-			{
-				label: 'Coordinador Académico',
-				flag: 'isCoordinadorAcademico' as const,
-				role: APP_USER_ROLES.CoordinadorAcademico,
-			},
-			{
-				label: 'Asistente Administrativo',
-				flag: 'isAsistenteAdministrativo' as const,
-				role: APP_USER_ROLES.AsistenteAdministrativo,
-			},
+			{ label: 'Director', flag: 'isDirector' as const },
+			{ label: 'Promotor', flag: 'isPromotor' as const },
+			{ label: 'Coordinador Académico', flag: 'isCoordinadorAcademico' as const },
+			{ label: 'Asistente Administrativo', flag: 'isAsistenteAdministrativo' as const },
 		];
 
 		it.each(adminRoles)(

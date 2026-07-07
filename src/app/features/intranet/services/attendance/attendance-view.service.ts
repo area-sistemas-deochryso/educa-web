@@ -14,7 +14,6 @@ import {
 	VIEW_MODE,
 	ViewMode,
 } from '@app/features/intranet/components/attendance/attendance-header/attendance-header.component';
-import { APP_USER_ROLES } from '@app/shared/constants';
 import { AttendanceViewConfig } from './attendance-view.models';
 
 const ATTENDANCE_TABLE_LABELS = {
@@ -93,7 +92,7 @@ export class AttendanceViewController {
 			nombreCompleto: e.nombreCompleto,
 			grado: e.grado,
 			seccion: e.seccion,
-			relacion: APP_USER_ROLES.Estudiante,
+			relacion: 'Estudiante',
 		}));
 	});
 	// #endregion

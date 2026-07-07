@@ -1,6 +1,5 @@
 // #region Imports
 import { Injectable } from '@angular/core';
-import { APP_USER_ROLES } from '@app/shared/constants';
 import { getEstadoSeverity } from '@core/helpers';
 import type {
 	TipoEventoCalendario,
@@ -19,14 +18,14 @@ import type {
 type Severity = 'success' | 'info' | 'warn' | 'danger' | 'secondary' | 'contrast';
 
 const ROLE_SEVERITY_BY_ROLE: Record<string, Severity> = {
-	[APP_USER_ROLES.Director]: 'danger',
-	[APP_USER_ROLES.AsistenteAdministrativo]: 'contrast',
-	[APP_USER_ROLES.Promotor]: 'contrast',
-	[APP_USER_ROLES.CoordinadorAcademico]: 'contrast',
-	[APP_USER_ROLES.Profesor]: 'warn',
-	[APP_USER_ROLES.Apoderado]: 'info',
-	[APP_USER_ROLES.Estudiante]: 'success',
-	[APP_USER_ROLES.Administrador]: 'danger',
+	Director: 'danger',
+	'Asistente Administrativo': 'contrast',
+	Promotor: 'contrast',
+	'Coordinador Académico': 'contrast',
+	Profesor: 'warn',
+	Apoderado: 'info',
+	Estudiante: 'success',
+	Administrador: 'danger',
 };
 
 // #region Evento Calendario mappings

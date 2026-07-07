@@ -1,4 +1,3 @@
-import { APP_USER_ROLES, type AppUserRoleValue } from '@app/shared/constants';
 import { type RolPolicy } from '@shared/models/role-policies.models';
 import { getRolLookup } from '@data/models';
 
@@ -12,8 +11,8 @@ import { getRolLookup } from '@data/models';
  * FE-only flags (canModerateVideoconference, canEditPassword, canBeTutor, etc.)
  * remain hardcoded here until the BE exposes them.
  */
-const ROLE_POLICIES: Record<AppUserRoleValue, RolPolicy> = {
-	[APP_USER_ROLES.Director]: {
+const ROLE_POLICIES: Record<string, RolPolicy> = {
+	Director: {
 		canModerateVideoconference: true,
 		isAdmin: true,
 		canEditPassword: true,
@@ -23,7 +22,7 @@ const ROLE_POLICIES: Record<AppUserRoleValue, RolPolicy> = {
 		horarioEndpoint: 'all',
 		menuGroup: 'admin',
 	},
-	[APP_USER_ROLES.AsistenteAdministrativo]: {
+	'Asistente Administrativo': {
 		canModerateVideoconference: true,
 		isAdmin: true,
 		canEditPassword: true,
@@ -33,7 +32,7 @@ const ROLE_POLICIES: Record<AppUserRoleValue, RolPolicy> = {
 		horarioEndpoint: 'all',
 		menuGroup: 'admin',
 	},
-	[APP_USER_ROLES.Promotor]: {
+	Promotor: {
 		canModerateVideoconference: true,
 		isAdmin: true,
 		canEditPassword: true,
@@ -43,7 +42,7 @@ const ROLE_POLICIES: Record<AppUserRoleValue, RolPolicy> = {
 		horarioEndpoint: 'all',
 		menuGroup: 'admin',
 	},
-	[APP_USER_ROLES.CoordinadorAcademico]: {
+	'Coordinador Académico': {
 		canModerateVideoconference: true,
 		isAdmin: true,
 		canEditPassword: true,
@@ -53,7 +52,7 @@ const ROLE_POLICIES: Record<AppUserRoleValue, RolPolicy> = {
 		horarioEndpoint: 'all',
 		menuGroup: 'admin',
 	},
-	[APP_USER_ROLES.Administrador]: {
+	Administrador: {
 		canModerateVideoconference: true,
 		isAdmin: true,
 		canEditPassword: true,
@@ -63,7 +62,7 @@ const ROLE_POLICIES: Record<AppUserRoleValue, RolPolicy> = {
 		horarioEndpoint: 'all',
 		menuGroup: 'admin',
 	},
-	[APP_USER_ROLES.Profesor]: {
+	Profesor: {
 		canModerateVideoconference: true,
 		isAdmin: false,
 		canEditPassword: false,
@@ -73,7 +72,7 @@ const ROLE_POLICIES: Record<AppUserRoleValue, RolPolicy> = {
 		horarioEndpoint: 'by-profesor',
 		menuGroup: 'profesor',
 	},
-	[APP_USER_ROLES.Apoderado]: {
+	Apoderado: {
 		canModerateVideoconference: false,
 		isAdmin: false,
 		canEditPassword: false,
@@ -83,7 +82,7 @@ const ROLE_POLICIES: Record<AppUserRoleValue, RolPolicy> = {
 		horarioEndpoint: 'all',
 		menuGroup: 'apoderado',
 	},
-	[APP_USER_ROLES.Estudiante]: {
+	Estudiante: {
 		canModerateVideoconference: false,
 		isAdmin: false,
 		canEditPassword: false,
@@ -123,7 +122,7 @@ const DEFAULT_POLICY: RolPolicy = {
  */
 export function getRolPolicy(rol: string | undefined): RolPolicy {
 	if (!rol) return DEFAULT_POLICY;
-	const base = ROLE_POLICIES[rol as AppUserRoleValue] ?? DEFAULT_POLICY;
+	const base = ROLE_POLICIES[rol] ?? DEFAULT_POLICY;
 
 	const endpoint = getRolLookup()?.byNombre(rol);
 	if (!endpoint) return base;
@@ -131,10 +130,8 @@ export function getRolPolicy(rol: string | undefined): RolPolicy {
 	// Enrich overlapping flags from endpoint, keeping FE-only flags from the hardcoded table
 	return {
 		...base,
-		/** @deprecated 2026-06-08 — isAdmin derives from Rol.esStaff. Remove nombre check after 2026-07-08. */
-		isAdmin: base.isAdmin || endpoint.esStaff,
-		/** @deprecated 2026-06-08 — requiresSalon derives from Rol.requiereSalon. Remove nombre check after 2026-07-08. */
-		requiresSalon: base.requiresSalon || endpoint.requiereSalon,
+		isAdmin: endpoint.esStaff,
+		requiresSalon: endpoint.requiereSalon,
 	};
 }
 

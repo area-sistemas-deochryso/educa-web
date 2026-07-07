@@ -1,4 +1,3 @@
-import { APP_USER_ROLES } from '@shared/constants';
 import { UsuarioLista } from './services';
 import { UsuarioValidacionItem } from './components/usuarios-validation-dialog/usuarios-validation-dialog.component';
 
@@ -57,7 +56,7 @@ export function validarUsuarios(usuarios: UsuarioLista[]): UsuarioValidacionItem
 	for (const u of usuarios) {
 		const errores: string[] = [];
 		validarDni(u.dni ?? '', errores);
-		if (u.rol === APP_USER_ROLES.Estudiante) {
+		if (u.rol === 'Estudiante') {
 			validarCorreoApoderado(u.correoApoderado ?? '', errores);
 		}
 		if (errores.length > 0) {

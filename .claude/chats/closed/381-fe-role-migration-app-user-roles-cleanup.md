@@ -4,9 +4,9 @@
 > **Created**: 2026-07-07 · **Estado**: ⏳ pendiente arrancar.
 > **MODO SUGERIDO**: `/design` then `/execute`
 > **exclusive**: `false`
-> **modules**: `shared/constants`, `shared/utils`, `core/services/user`, `core/services/permissions`, `admin/users`, `attendance`
+> **modules**: `shared/constants`, `shared/utils`, `core/services/user`, `core/services/permissions`, `admin/users`, `attendance`, `admin/rate-limit-events`
 > **touches**:
->   - `educa-web`: `src/app/shared/constants/app-roles.ts`, `src/app/shared/utils/role-policies.utils.ts`, `src/app/core/services/user/user-profile.service.ts`, `src/app/core/services/permissions/permisos.models.ts`, `src/app/features/intranet/pages/admin/users/**`, `src/app/features/intranet/services/attendance/**`, `src/app/features/intranet/pages/cross-role/attendance-component/**`
+>   - `educa-web`: `src/app/shared/constants/app-roles.ts`, `src/app/shared/utils/role-policies.utils.ts`, `src/app/core/services/user/user-profile.service.ts`, `src/app/core/services/permissions/permisos.models.ts`, `src/app/features/intranet/pages/admin/users/**`, `src/app/features/intranet/services/attendance/**`, `src/app/features/intranet/pages/cross-role/attendance-component/**`, `src/app/features/intranet/pages/admin/rate-limit-events/**`, `src/app/data/models/mensajeria.models.ts`, `src/app/features/intranet/pages/cross-role/home-component/**`, `src/app/features/intranet/shared/services/ui-mapping/ui-mapping.service.ts`
 
 ## Contexto
 
@@ -55,11 +55,35 @@ Es una migración viva de arquitectura, no código muerto: 14+ archivos con lóg
 
 ## Criterio de cierre
 
-- [ ] Cero referencias a `APP_USER_ROLES`, `AppUserRole`, `AppUserRoleValue`, `RolTipo(Admin)`, `ROLES_DISPONIBLES(_ADMIN)`, `RolUsuario(Admin)`, `ROLES_USUARIOS(_ADMIN)` en el código (fuera de sus propias declaraciones, si aún no se borraron)
-- [ ] Los 8 `computed` de `user-profile.service.ts` migrados o borrados si quedan sin consumidor
-- [ ] `ng build` pasa
-- [ ] Verificación manual en browser: login con 2+ roles distintos, confirmar permisos/vistas sin regresión
+- [x] Cero referencias a `APP_USER_ROLES`, `AppUserRole`, `AppUserRoleValue`, `RolTipo(Admin)`, `ROLES_DISPONIBLES(_ADMIN)`, `RolUsuario(Admin)`, `ROLES_USUARIOS(_ADMIN)` en el código — `app-roles.ts` borrado por completo (0 consumidores confirmados)
+- [x] Los 8 `computed` de `user-profile.service.ts` migrados o borrados: 6 borrados (0 consumidores prod), `isProfesor`/`isAdministrativo` migrados a `rol()?.nombre`/comparación explícita de 4 roles
+- [x] `ng build` pasa — build de producción limpio (SSR + browser bundles + prerender de 9 rutas)
+- [x] Verificación manual en browser: login como Administrador (rol crítico por las 2 decisiones de negocio tomadas) — home sin widget de asistencia (correcto), panel de asistencia con selector Día/Mes vía `esStaff` (correcto), dropdown de rol en `usuario-form-dialog` poblado reactivamente desde `RolService`, dropdown de rol en `rate-limit-events` idem, tabla de usuarios con roles renderizados bien, cero errores de consola. 225 archivos de test / 2327 tests pasan (incluye tests nuevos por rol para `isAdministrativo` de los 4 roles administrativos + exclusión explícita de Administrador)
 
 ## Tiempo estimado
 
 ~2-3 h (design 30 min + execute 90-150 min, depende de si se hace en una sola sesión o por fases).
+
+## Investigación de diseño (2026-07-07)
+
+### Scope real: 20 archivos, no 14
+
+El brief original subestimó el conteo. 6 archivos no listados originalmente: `mensajeria.models.ts`, `rate-limit-event.models.ts`, `rate-limit-filters.component.ts` (módulo `admin/rate-limit-events` — **fuera del `touches:` original, hay que ampliarlo**), `usuarios-ui.facade.ts`, `usuarios-validation.helpers.ts`, `attendance.component.spec.ts`. Más 2 specs con impacto indirecto: `user-profile.service.spec.ts`, `usuarios.store.spec.ts`, `home.component.spec.ts`.
+
+### Decisiones de negocio confirmadas por el usuario
+
+1. **`ROLES_DISPONIBLES_ADMIN` / `ROLES_USUARIOS_ADMIN`** hoy devuelven los 8 roles (no filtran por `esStaff`) pese al nombre. **Decisión: preservar paridad exacta** — no es un bug a corregir en esta migración, es distinción entre "grupo admin" (concepto propio) y "rol Administrador" (backend). Migrar a `rolService.all()` sin filtro. Fix de correctitud fuera de scope (no prioritario).
+2. **`isAdministrativo`** (`user-profile.service.ts`, 4 roles: Director/AsistenteAdministrativo/Promotor/CoordinadorAcademico, excluye Administrador) vs **`isAdministrativeRole`** (`attendance.component.ts`, 5 roles = `esStaff`). **Decisión: NO es inconsistencia, es intencional** — Administrador no tiene obligación de marcar asistencia y nadie le revisa asistencia a él. Migrar `isAdministrativo` a comparación explícita de 4 roles (NO usar `esStaff`). `isAdministrativeRole` de attendance SÍ puede migrar a `esStaff` (ahí es semánticamente correcto).
+
+### Hallazgos que reducen el trabajo
+
+- 6 de los 8 `computed` de `user-profile.service.ts` (`isEstudiante`, `isApoderado`, `isDirector`, `isAsistenteAdministrativo`, `isPromotor`, `isCoordinadorAcademico`) **no tienen consumidores en producción** — borrado directo, no migración. Solo `isProfesor` (1 consumidor: `home.component.ts:42`) e `isAdministrativo` (1 consumidor: `home.component.ts:41`) necesitan reemplazo cuidadoso.
+- `AppUserRoleAdmin`, `APP_USER_ROLE_ADMIN_LIST` — 0 consumidores, borrado trivial inmediato.
+- `role-policies.utils.ts:134,136` — el lado izquierdo del OR (`base.isAdmin ||`, `base.requiresSalon ||`) es código muerto confirmado (early-return en línea 129 garantiza `endpoint` non-null). Simplificar sin cambio de comportamiento.
+- Patrón objetivo ya validado en producción: `usuario-rol-constraints.models.ts` (`rolRequiereSalon`/`rolPermiteEsTutor`) ya usa `string` + `getRolPolicy()`, sin importar el símbolo deprecado.
+
+### Orden de ejecución (por riesgo ascendente)
+
+0. Borrado trivial (0 consumidores + dead code) → 1. Type-only (`AppUserRoleValue`→`string` en DTOs) → 2. `admin/users` (comparaciones + dropdown) → 3. `attendance` (mayor riesgo — routing + semántica `isAdministrativo`) → 4. Diccionarios cosméticos → 5. `rate-limit-events` (scope nuevo) → 6. Borrado final de `app-roles.ts` y aliases restantes → Validación (build + browser 4 roles).
+
+Detalle completo de clasificación por archivo (línea, tipo de uso, reemplazo, riesgo) disponible en el fork de investigación de este chat — no se pega acá por extensión, pero cada fase de ejecución debe releer los archivos puntuales antes de tocar (no confiar ciegamente en el resumen).

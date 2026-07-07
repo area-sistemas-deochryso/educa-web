@@ -7,6 +7,7 @@ import { BehaviorSubject } from 'rxjs';
 import { UserProfileService } from './user-profile.service';
 import { AuthService } from '../auth';
 import { AuthUser } from '../auth/auth.models';
+import { RolService } from '@core/services/roles';
 
 // #endregion
 
@@ -26,6 +27,23 @@ function createMockAuthService(user: AuthUser | null = null) {
 		currentUser: user,
 	};
 }
+
+function createMockRolService() {
+	return {
+		byNombre: (nombre: string | undefined) =>
+			nombre
+				? {
+						id: 1,
+						codigo: nombre,
+						nombre,
+						esStaff: nombre !== 'Estudiante' && nombre !== 'Apoderado' && nombre !== 'Profesor',
+						esPasivo: false,
+						requiereSalon: false,
+						orden: 1,
+					}
+				: undefined,
+	};
+}
 // #endregion
 
 // #region Tests
@@ -39,6 +57,7 @@ describe('UserProfileService', () => {
 				providers: [
 					UserProfileService,
 					{ provide: AuthService, useValue: createMockAuthService() },
+					{ provide: RolService, useValue: createMockRolService() },
 				],
 			});
 			service = TestBed.inject(UserProfileService);
@@ -58,9 +77,8 @@ describe('UserProfileService', () => {
 		});
 
 		it('should not detect any role', () => {
-			expect(service.isEstudiante()).toBe(false);
 			expect(service.isProfesor()).toBe(false);
-			expect(service.isDirector()).toBe(false);
+			expect(service.isAdministrativo()).toBe(false);
 		});
 	});
 	// #endregion
@@ -72,6 +90,7 @@ describe('UserProfileService', () => {
 				providers: [
 					UserProfileService,
 					{ provide: AuthService, useValue: createMockAuthService(mockUser) },
+					{ provide: RolService, useValue: createMockRolService() },
 				],
 			});
 			service = TestBed.inject(UserProfileService);
@@ -87,8 +106,7 @@ describe('UserProfileService', () => {
 
 		it('should detect profesor role', () => {
 			expect(service.isProfesor()).toBe(true);
-			expect(service.isEstudiante()).toBe(false);
-			expect(service.isDirector()).toBe(false);
+			expect(service.isAdministrativo()).toBe(false);
 		});
 
 		it('should compute display name (full name)', () => {
@@ -133,27 +151,57 @@ describe('UserProfileService', () => {
 
 	// #region Role detection
 	describe('role detection', () => {
-		const roles = [
-			{ rol: 'Estudiante', check: 'isEstudiante' },
-			{ rol: 'Apoderado', check: 'isApoderado' },
-			{ rol: 'Profesor', check: 'isProfesor' },
-			{ rol: 'Director', check: 'isDirector' },
-			{ rol: 'Asistente Administrativo', check: 'isAsistenteAdministrativo' },
-		] as const;
+		const profesorRoles = [{ rol: 'Profesor', check: 'isProfesor' }] as const;
 
-		for (const { rol, check } of roles) {
+		for (const { rol, check } of profesorRoles) {
 			it(`should detect ${rol} role`, () => {
 				TestBed.resetTestingModule();
 				TestBed.configureTestingModule({
 					providers: [
 						UserProfileService,
 						{ provide: AuthService, useValue: createMockAuthService({ ...mockUser, rol: rol as never }) },
+						{ provide: RolService, useValue: createMockRolService() },
 					],
 				});
 				const s = TestBed.inject(UserProfileService);
 				expect(s[check]()).toBe(true);
 			});
 		}
+
+		const administrativoRoles = [
+			'Director',
+			'Asistente Administrativo',
+			'Promotor',
+			'Coordinador Académico',
+		] as const;
+
+		for (const rol of administrativoRoles) {
+			it(`should detect isAdministrativo for ${rol}`, () => {
+				TestBed.resetTestingModule();
+				TestBed.configureTestingModule({
+					providers: [
+						UserProfileService,
+						{ provide: AuthService, useValue: createMockAuthService({ ...mockUser, rol: rol as never }) },
+						{ provide: RolService, useValue: createMockRolService() },
+					],
+				});
+				const s = TestBed.inject(UserProfileService);
+				expect(s.isAdministrativo()).toBe(true);
+			});
+		}
+
+		it('should NOT detect isAdministrativo for Administrador (no attendance obligation)', () => {
+			TestBed.resetTestingModule();
+			TestBed.configureTestingModule({
+				providers: [
+					UserProfileService,
+					{ provide: AuthService, useValue: createMockAuthService({ ...mockUser, rol: 'Administrador' as never }) },
+					{ provide: RolService, useValue: createMockRolService() },
+				],
+			});
+			const s = TestBed.inject(UserProfileService);
+			expect(s.isAdministrativo()).toBe(false);
+		});
 	});
 	// #endregion
 });

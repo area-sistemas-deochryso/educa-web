@@ -36,7 +36,7 @@
 						<p-select
 							appendTo="body"
 							id="rol"
-							[options]="rolesSelectOptions"
+							[options]="rolesSelectOptions()"
 							[ngModel]="rolValue"
 							(ngModelChange)="onFieldChange('rol', $event)"
 							placeholder="Seleccione el rol"

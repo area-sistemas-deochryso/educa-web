@@ -42,7 +42,6 @@ import {
 	buildToggleUsuarioMessage,
 } from '@app/shared/constants';
 import { environment } from '@env/environment';
-import { APP_USER_ROLES } from '@shared/constants';
 import { logger } from '@core/helpers';
 import { ErrorStateComponent } from '@shared/components';
 import { ExcelService } from '@core/services';
@@ -185,9 +184,9 @@ export class UsersComponent implements AfterViewInit {
 		this.uiFacade.openNew();
 		const tab = this.vm().activeTab;
 		if (tab === 'estudiantes') {
-			this.uiFacade.updateFormField('rol', APP_USER_ROLES.Estudiante);
+			this.uiFacade.updateFormField('rol', 'Estudiante');
 		} else if (tab === 'profesores') {
-			this.uiFacade.updateFormField('rol', APP_USER_ROLES.Profesor);
+			this.uiFacade.updateFormField('rol', 'Profesor');
 		}
 	}
 
@@ -280,7 +279,7 @@ export class UsersComponent implements AfterViewInit {
 		credenciales: { nombreCompleto: string; dni: string; contrasena: string | null; grado: string | null; seccion: string | null }[],
 		rol: string,
 	): Promise<void> {
-		const rolLabel = rol === APP_USER_ROLES.Estudiante ? 'Alumnos' : 'Profesores';
+		const rolLabel = rol === 'Estudiante' ? 'Alumnos' : 'Profesores';
 		const fecha = new Date().toISOString().slice(0, 10);
 
 		await this.excelService.exportToXlsx({

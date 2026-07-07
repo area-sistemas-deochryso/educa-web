@@ -1,7 +1,3 @@
-// #region Imports
-import { AppUserRoleValue } from '@app/shared/constants';
-// #endregion
-
 // #region Response DTOs
 export interface ConversacionListDto {
 	id: number;
@@ -37,7 +33,7 @@ export interface MensajeDto {
 export interface ParticipanteDto {
 	dni: string;
 	nombre: string;
-	rol: AppUserRoleValue;
+	rol: string;
 	ultimaLectura: string | null;
 }
 // #endregion

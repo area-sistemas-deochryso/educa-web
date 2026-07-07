@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, computed, input, output } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, inject, input, output } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 
@@ -9,7 +9,7 @@ import { SelectModule } from 'primeng/select';
 import { ToggleSwitchModule } from 'primeng/toggleswitch';
 import { TooltipModule } from 'primeng/tooltip';
 
-import { APP_USER_ROLE_LIST, AppUserRoleValue } from '@shared/constants';
+import { RolService } from '@core/services/roles';
 
 import {
 	RATE_LIMIT_POLICIES,
@@ -40,6 +40,10 @@ interface SelectOption<T> {
 	changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class RateLimitFiltersComponent {
+	// #region Dependencias
+	private rolService = inject(RolService);
+	// #endregion
+
 	// #region Inputs / Outputs
 	readonly filter = input.required<RateLimitEventFiltro>();
 	readonly filterChange = output<Partial<RateLimitEventFiltro>>();
@@ -47,10 +51,10 @@ export class RateLimitFiltersComponent {
 	// #endregion
 
 	// #region Opciones
-	readonly rolOptions: SelectOption<AppUserRoleValue>[] = [
+	readonly rolOptions = computed<SelectOption<string>[]>(() => [
 		{ label: 'Todos los roles', value: null },
-		...APP_USER_ROLE_LIST.map((rol) => ({ label: rol, value: rol })),
-	];
+		...this.rolService.all().map((rol) => ({ label: rol.nombre, value: rol.nombre })),
+	]);
 
 	readonly policyOptions: SelectOption<RateLimitPolicy>[] = [
 		{ label: 'Todas', value: null },
@@ -72,7 +76,7 @@ export class RateLimitFiltersComponent {
 		this.filterChange.emit({ endpoint: value || undefined });
 	}
 
-	onRolChange(value: AppUserRoleValue | null): void {
+	onRolChange(value: string | null): void {
 		this.filterChange.emit({ rol: value });
 	}
 

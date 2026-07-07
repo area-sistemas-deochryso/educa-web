@@ -12,7 +12,7 @@
 
 	<div class="filter-dropdowns">
 		<p-select
-			[options]="rolOptions"
+			[options]="rolOptions()"
 			[ngModel]="filter().rol"
 			(ngModelChange)="onRolChange($event)"
 			placeholder="Rol"

@@ -2,7 +2,6 @@
 import { Injectable, inject, signal, computed, effect } from '@angular/core';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { AuthService } from '../auth';
-import { APP_USER_ROLES, AppUserRole } from '@app/shared/constants';
 import { RolService } from '@core/services/roles';
 import { type Rol } from '@data/models';
 
@@ -15,7 +14,7 @@ export class UserProfileService {
 	private authService = inject(AuthService);
 	private rolService = inject(RolService);
 
-	private readonly _userRole = signal<AppUserRole>('');
+	private readonly _userRole = signal<string>('');
 	private readonly _userName = signal('');
 	private readonly _entityId = signal<number | null>(null);
 	private readonly _sedeId = signal<number | null>(null);
@@ -34,33 +33,22 @@ export class UserProfileService {
 
 	private readonly currentUser = toSignal(this.authService.currentUser$, { initialValue: null });
 
-	/** @deprecated 2026-06-08 — use rol()?.nombre or behavioral flags (esStaff, esPasivo, requiereSalon). Remove after 2026-07-08. */
-	readonly isEstudiante = computed(() => this._userRole() === APP_USER_ROLES.Estudiante);
-	/** @deprecated 2026-06-08 — use rol()?.nombre or behavioral flags. Remove after 2026-07-08. */
-	readonly isApoderado = computed(() => this._userRole() === APP_USER_ROLES.Apoderado);
-	/** @deprecated 2026-06-08 — use rol()?.nombre or behavioral flags. Remove after 2026-07-08. */
-	readonly isProfesor = computed(() => this._userRole() === APP_USER_ROLES.Profesor);
-	/** @deprecated 2026-06-08 — use rol()?.nombre or behavioral flags. Remove after 2026-07-08. */
-	readonly isDirector = computed(() => this._userRole() === APP_USER_ROLES.Director);
-	/** @deprecated 2026-06-08 — use rol()?.nombre or behavioral flags. Remove after 2026-07-08. */
-	readonly isAsistenteAdministrativo = computed(
-		() => this._userRole() === APP_USER_ROLES.AsistenteAdministrativo,
-	);
-	/** @deprecated 2026-06-08 — use rol()?.nombre or behavioral flags. Remove after 2026-07-08. */
-	readonly isPromotor = computed(() => this._userRole() === APP_USER_ROLES.Promotor);
-	/** @deprecated 2026-06-08 — use rol()?.nombre or behavioral flags. Remove after 2026-07-08. */
-	readonly isCoordinadorAcademico = computed(
-		() => this._userRole() === APP_USER_ROLES.CoordinadorAcademico,
-	);
+	readonly isProfesor = computed(() => this.rol()?.nombre === 'Profesor');
 
-	/** @deprecated 2026-06-08 — use rol()?.esStaff. Remove after 2026-07-08. */
-	readonly isAdministrativo = computed(
-		() =>
-			this.isDirector() ||
-			this.isAsistenteAdministrativo() ||
-			this.isPromotor() ||
-			this.isCoordinadorAcademico(),
-	);
+	/**
+	 * Roles con panel administrativo pero sin obligación de marcar asistencia
+	 * (Administrador queda afuera a propósito: no tiene obligación de marcar
+	 * asistencia y nadie le revisa la suya).
+	 */
+	readonly isAdministrativo = computed(() => {
+		const nombre = this.rol()?.nombre;
+		return (
+			nombre === 'Director' ||
+			nombre === 'Asistente Administrativo' ||
+			nombre === 'Promotor' ||
+			nombre === 'Coordinador Académico'
+		);
+	});
 
 	readonly displayName = computed(() => this._userName());
 
@@ -91,7 +79,7 @@ export class UserProfileService {
 		effect(() => {
 			const user = this.currentUser();
 			if (user) {
-				this._userRole.set(user.rol as AppUserRole);
+				this._userRole.set(user.rol);
 				this._userName.set(user.nombreCompleto);
 				this._entityId.set(user.entityId);
 				this._sedeId.set(user.sedeId);
@@ -105,7 +93,7 @@ export class UserProfileService {
 	private syncWithAuth(): void {
 		const user = this.authService.currentUser;
 		if (user) {
-			this._userRole.set(user.rol as AppUserRole);
+			this._userRole.set(user.rol);
 			this._userName.set(user.nombreCompleto);
 			this._entityId.set(user.entityId);
 			this._sedeId.set(user.sedeId);

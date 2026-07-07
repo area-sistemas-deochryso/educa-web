@@ -1,5 +1,3 @@
-import { AppUserRoleValue } from '@shared/constants';
-
 // #region Tipos semánticos
 /**
  * Policies configuradas en el rate limiter del backend.
@@ -42,7 +40,7 @@ export interface RateLimitEventListaDto {
 
 export interface RateLimitEventFiltro {
 	dni?: string;
-	rol?: AppUserRoleValue | null;
+	rol?: string | null;
 	endpoint?: string;
 	policy?: RateLimitPolicy | null;
 	soloRechazados?: boolean;

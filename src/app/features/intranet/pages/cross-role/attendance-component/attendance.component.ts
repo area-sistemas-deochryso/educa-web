@@ -12,7 +12,6 @@ import { AttendanceDirectorComponent } from './attendance-director/attendance-di
 import { AttendanceEstudianteComponent } from './attendance-estudiante/attendance-estudiante.component';
 import { AttendanceProfesorComponent } from './attendance-profesor/attendance-profesor.component';
 import { UserProfileService } from '@core/services';
-import { APP_USER_ROLES } from '@app/shared/constants';
 
 /**
  * Componente Page/Route para asistencias.
@@ -56,14 +55,14 @@ export class AttendanceComponent implements AfterViewInit {
 	readonly selectedMode = signal<ViewMode>(VIEW_MODE.Dia);
 
 	// * El pill día/mes aplica cuando el usuario mira el panel admin o sus estudiantes.
-	//   - Los 4 roles administrativos: siempre aplica (panel director).
+	//   - Roles de staff (esStaff): siempre aplica (panel director).
 	//   - Profesor: solo cuando tab "Mis estudiantes" está activa.
 	//   - Estudiante / Apoderado: nunca aplica — vista propia mensual.
 	private readonly profesorShowModeSelector = signal(false);
 	readonly showModeSelector = computed(() => {
 		const role = this.userRole();
-		if (this.isAdministrativeRole(role)) return true;
-		if (role === APP_USER_ROLES.Profesor) return this.profesorShowModeSelector();
+		if (this.userProfile.rol()?.esStaff) return true;
+		if (role === 'Profesor') return this.profesorShowModeSelector();
 		return false;
 	});
 
@@ -86,9 +85,9 @@ export class AttendanceComponent implements AfterViewInit {
 	onModeChange(mode: ViewMode): void {
 		this.selectedMode.set(mode);
 		const role = this.userRole();
-		if (role === APP_USER_ROLES.Profesor) {
+		if (role === 'Profesor') {
 			this.profesorComponent?.setViewMode(mode);
-		} else if (this.isAdministrativeRole(role)) {
+		} else if (this.userProfile.rol()?.esStaff) {
 			this.directorComponent?.setViewMode(mode);
 		}
 	}
@@ -96,29 +95,15 @@ export class AttendanceComponent implements AfterViewInit {
 	// * Delegar reload al componente activo segun rol.
 	onReload(): void {
 		const role = this.userRole();
-		if (role === APP_USER_ROLES.Apoderado) {
+		if (role === 'Apoderado') {
 			this.apoderadoComponent?.reload();
-		} else if (role === APP_USER_ROLES.Profesor) {
+		} else if (role === 'Profesor') {
 			this.profesorComponent?.reload();
-		} else if (this.isAdministrativeRole(role)) {
+		} else if (this.userProfile.rol()?.esStaff) {
 			this.directorComponent?.reload();
-		} else if (role === APP_USER_ROLES.Estudiante) {
+		} else if (role === 'Estudiante') {
 			this.estudianteComponent?.reload();
 		}
-	}
-
-	/**
-	 * Los 4 roles administrativos (Director, Asistente Administrativo, Promotor,
-	 * Coordinador Académico) comparten el mismo panel admin de asistencia.
-	 */
-	private isAdministrativeRole(role: string): boolean {
-		return (
-			role === APP_USER_ROLES.Director ||
-			role === APP_USER_ROLES.AsistenteAdministrativo ||
-			role === APP_USER_ROLES.Promotor ||
-			role === APP_USER_ROLES.CoordinadorAcademico ||
-			role === APP_USER_ROLES.Administrador
-		);
 	}
 }
 // #endregion

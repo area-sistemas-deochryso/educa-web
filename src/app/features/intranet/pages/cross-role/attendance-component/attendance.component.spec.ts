@@ -7,7 +7,6 @@ import { AttendanceComponent } from './attendance.component';
 import { UserProfileService } from '@core/services';
 import { AttendanceApoderadoComponent } from './attendance-apoderado/attendance-apoderado.component';
 import { AttendanceEstudianteComponent } from './attendance-estudiante/attendance-estudiante.component';
-import { AppUserRole } from '@shared/constants';
 
 // #endregion
 // #region Implementation
@@ -20,6 +19,7 @@ describe('AttendanceComponent', () => {
 		userProfileMock = {
 			userRole: signal<'Estudiante' | 'Apoderado' | 'Profesor' | 'Director' | ''>('Apoderado'),
 			userName: signal('Test User'),
+			rol: (() => undefined) as UserProfileService['rol'],
 		};
 
 		await TestBed.configureTestingModule({
@@ -90,7 +90,7 @@ describe('AttendanceComponent', () => {
 
 	it('should handle unexpected role in constructor', () => {
 		// This test verifies the component doesn't crash with unexpected roles
-		userProfileMock.userRole = signal('UnknownRole' as AppUserRole);
+		userProfileMock.userRole = signal('UnknownRole');
 
 		// Component should still create without errors
 		expect(() => {

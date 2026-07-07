@@ -40,7 +40,6 @@ import {
 	computeStatsFromAsistencias,
 	profesorToPersonaAsistencia,
 } from '@data/models';
-import { APP_USER_ROLES } from '@shared/constants';
 import { AsistenciaProfesorApiService } from '@intranet-shared/services';
 import { downloadBlob, formatDateLocalIso, viewBlobInNewTab } from '@core/helpers';
 import { ErrorHandlerService } from '@core/services';
@@ -133,7 +132,7 @@ export class AttendanceDirectorProfesoresComponent implements OnInit {
 			nombreCompleto: p.nombreCompleto,
 			grado: '',
 			seccion: '',
-			relacion: APP_USER_ROLES.Profesor,
+			relacion: 'Profesor',
 		})),
 	);
 	readonly ingresos = signal<AttendanceTable>(

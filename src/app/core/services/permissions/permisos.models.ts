@@ -1,8 +1,4 @@
 // * DTOs and role helpers for permisos APIs.
-// #region Imports
-import { APP_USER_ROLE_LIST, AppUserRoleValue } from '@app/shared/constants';
-
-// #endregion
 // #region Implementation
 
 /**
@@ -44,7 +40,7 @@ export interface ActualizarVistaRequest {
  */
 export interface PermisoRol {
 	id: number;
-	rol: AppUserRoleValue;
+	rol: string;
 	vistas: string[];
 	rowVersion?: string;
 }
@@ -53,7 +49,7 @@ export interface PermisoRol {
  * Create role permissions request.
  */
 export interface CrearPermisoRolRequest {
-	rol: AppUserRoleValue;
+	rol: string;
 	vistas: string[];
 }
 
@@ -71,7 +67,7 @@ export interface ActualizarPermisoRolRequest {
 export interface PermisoUsuario {
 	id: number;
 	usuarioId: number;
-	rol: AppUserRoleValue;
+	rol: string;
 	vistas: string[];
 	nombreUsuario?: string;
 	rowVersion?: string;
@@ -82,7 +78,7 @@ export interface PermisoUsuario {
  */
 export interface CrearPermisoUsuarioRequest {
 	usuarioId: number;
-	rol: AppUserRoleValue;
+	rol: string;
 	vistas: string[];
 }
 
@@ -93,18 +89,6 @@ export interface ActualizarPermisoUsuarioRequest {
 	vistas: string[];
 	rowVersion?: string;
 }
-
-/** @deprecated 2026-06-08 — use Rol from @shared/models/rol.models. Remove after 2026-07-08. */
-export type RolTipo = AppUserRoleValue;
-
-/** @deprecated 2026-06-08 — use RolService.all(). Remove after 2026-07-08. */
-export const ROLES_DISPONIBLES: RolTipo[] = APP_USER_ROLE_LIST;
-
-/** @deprecated 2026-06-08 — use Rol from @shared/models/rol.models. Remove after 2026-07-08. */
-export type RolTipoAdmin = AppUserRoleValue;
-
-/** @deprecated 2026-06-08 — use RolService.all() filtered by esStaff. Remove after 2026-07-08. */
-export const ROLES_DISPONIBLES_ADMIN: RolTipoAdmin[] = APP_USER_ROLE_LIST;
 
 /**
  * Vistas stats DTO.
@@ -183,7 +167,7 @@ export interface SetUsuarioCapabilitiesRequest {
 export interface UsuarioBusqueda {
 	id: number;
 	nombreCompleto: string;
-	rol: AppUserRoleValue;
+	rol: string;
 	dni?: string;
 }
 

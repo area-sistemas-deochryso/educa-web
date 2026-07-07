@@ -1,8 +1,4 @@
 // * Usuario DTOs and role helpers.
-// #region Imports
-import { APP_USER_ROLE_LIST, AppUserRoleValue } from '@app/shared/constants';
-
-// #endregion
 // #region Role Tabs
 export type RoleTab = 'estudiantes' | 'profesores' | 'admin' | null;
 
@@ -25,7 +21,7 @@ export interface UsuarioLista {
 	nombres: string;
 	apellidos: string;
 	nombreCompleto: string;
-	rol: AppUserRoleValue;
+	rol: string;
 	estado: boolean;
 	fechaRegistro: string;
 	telefono?: string;
@@ -96,7 +92,7 @@ export interface CrearUsuarioRequest {
 	nombres: string;
 	apellidos: string;
 	contrasena: string;
-	rol: AppUserRoleValue;
+	rol: string;
 	sedeId?: number;
 	telefono?: string;
 	correo?: string;
@@ -158,18 +154,6 @@ export interface UsuariosEstadisticas {
 	usuariosActivos: number;
 	usuariosInactivos: number;
 }
-
-/** @deprecated 2026-06-08 — use Rol from @shared/models/rol.models. Remove after 2026-07-08. */
-export type RolUsuario = AppUserRoleValue;
-
-/** @deprecated 2026-06-08 — use RolService.all(). Remove after 2026-07-08. */
-export const ROLES_USUARIOS: RolUsuario[] = APP_USER_ROLE_LIST;
-
-/** @deprecated 2026-06-08 — use Rol from @shared/models/rol.models. Remove after 2026-07-08. */
-export type RolUsuarioAdmin = AppUserRoleValue;
-
-/** @deprecated 2026-06-08 — use RolService.all(). Remove after 2026-07-08. */
-export const ROLES_USUARIOS_ADMIN: RolUsuarioAdmin[] = APP_USER_ROLE_LIST;
 
 /**
  * Credential export DTO for Excel generation.
