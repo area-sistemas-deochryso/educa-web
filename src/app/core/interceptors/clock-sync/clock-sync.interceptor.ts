@@ -1,6 +1,7 @@
 import { HttpInterceptorFn, HttpResponse } from '@angular/common/http';
 import { inject } from '@angular/core';
 import { tap } from 'rxjs';
+// eslint-disable-next-line layer-enforcement/imports-error -- eager code: barrel import would pull WalService/SyncEngine (~16 kB) into initial bundle, see eager-no-core-services-barrel
 import { WalClockService } from '@core/services/wal/wal-clock.service';
 
 /**

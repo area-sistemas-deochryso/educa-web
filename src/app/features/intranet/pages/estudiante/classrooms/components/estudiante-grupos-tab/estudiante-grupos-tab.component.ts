@@ -4,7 +4,7 @@ import { FormsModule } from '@angular/forms';
 import { SelectModule } from 'primeng/select';
 import { TagModule } from 'primeng/tag';
 import { GruposResumenDto, GrupoContenidoDto } from '@features/intranet/pages/estudiante/models';
-import { AuthStore } from '@core/store/auth/auth.store';
+import { AuthStore } from '@core/store';
 
 @Component({
 	selector: 'app-estudiante-grupos-tab',

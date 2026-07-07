@@ -37,7 +37,7 @@ import {
 	EmailBlacklistMotivo,
 } from '@data/models';
 
-import { HubContextBannerComponent, readHubContext } from '../../../monitoreo/shared';
+import { HubContextBannerComponent, readHubContext } from '@features/intranet/pages/admin/monitoreo/shared';
 import {
 	BlacklistCrudFacade,
 	BlacklistDataFacade,

@@ -7,7 +7,7 @@ import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 
 import { errorInterceptor } from '@core/interceptors/error/error.interceptor';
 import { ErrorHandlerService } from '@core/services/error';
-import { ForceLogoutSignal } from '@core/services/session/force-logout.signal';
+import { ForceLogoutSignal } from '@core/services/session';
 
 describe('Error Recovery Integration', () => {
 	let httpClient: HttpClient;

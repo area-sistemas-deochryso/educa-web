@@ -7,7 +7,7 @@ import { logger, parseProblemDetails } from '@core/helpers';
 // eslint-disable-next-line layer-enforcement/imports-error -- DEBT: AuthApiService is internal to auth/
 import { AuthApiService } from '@core/services/auth/auth-api.service';
 import { ErrorHandlerService, ErrorReporterService } from '@core/services/error';
-import { ForceLogoutSignal } from '@core/services/session/force-logout.signal';
+import { ForceLogoutSignal } from '@core/services/session';
 
 // * Centralizes HTTP error handling and reporting.
 

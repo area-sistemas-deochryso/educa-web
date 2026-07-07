@@ -19,7 +19,7 @@ import { ToastModule } from 'primeng/toast';
 import { MessageService } from 'primeng/api';
 
 import { StatsSkeletonComponent, TableSkeletonComponent } from '@intranet-shared/components';
-import { ErrorStateComponent } from '@shared/components/error-state';
+import { ErrorStateComponent } from '@shared/components';
 import { CorrelationIdPillComponent } from '@intranet-shared/components';
 import { ExcelService } from '@core/services/excel';
 import { environment } from '@config/environment';

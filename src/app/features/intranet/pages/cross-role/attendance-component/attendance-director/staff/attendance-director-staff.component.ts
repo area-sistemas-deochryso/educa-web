@@ -5,7 +5,6 @@ import {
 	Input,
 	OnInit,
 	computed,
-	effect,
 	inject,
 	signal,
 } from '@angular/core';
@@ -45,6 +44,8 @@ import { ErrorHandlerService } from '@core/services';
 import { ButtonModule } from 'primeng/button';
 import { InputTextModule } from 'primeng/inputtext';
 import { TooltipModule } from 'primeng/tooltip';
+
+import { MonthSearchState } from '../month-search-state';
 
 const TIPO_LABELS: Record<string, string> = {
 	C: 'Coordinador',
@@ -123,12 +124,8 @@ export class AttendanceDirectorStaffComponent implements OnInit {
 			relacion: TIPO_LABELS[this.tipoPersona] ?? '',
 		})),
 	);
-	readonly ingresos = signal<AttendanceTable>(
-		this.dataService.createEmptyTable('Ingresos'),
-	);
-	readonly salidas = signal<AttendanceTable>(
-		this.dataService.createEmptyTable('Salidas'),
-	);
+	readonly ingresos = signal<AttendanceTable>(this.dataService.createEmptyTable('Ingresos'));
+	readonly salidas = signal<AttendanceTable>(this.dataService.createEmptyTable('Salidas'));
 	readonly tableReady = signal(false);
 	readonly hasMonthData = computed(() => {
 		const ing = this.ingresos().counts;
@@ -141,42 +138,22 @@ export class AttendanceDirectorStaffComponent implements OnInit {
 	// #endregion
 
 	// #region Month search (unified filter bar)
-	readonly monthSearchTerm = signal('');
-	readonly monthShowSuggestions = signal(false);
+	private readonly monthSearch = new MonthSearchState(this.selectedPerson, (id) => this.selectPerson(id));
+	readonly monthSearchTerm = this.monthSearch.monthSearchTerm;
+	readonly monthShowSuggestions = this.monthSearch.monthShowSuggestions;
 
-	readonly monthFilteredPeople = computed(() => {
-		const term = this.monthSearchTerm().toLowerCase().trim();
-		const hijos = this.peopleAsHijos();
-		if (!term) return hijos;
-		return hijos.filter(h =>
-			h.nombreCompleto.toLowerCase().includes(term) ||
-			(h.dni && h.dni.toLowerCase().includes(term)),
-		);
-	});
-
-	private readonly syncSearchWithSelection = effect(() => {
-		const person = this.selectedPerson();
-		if (person && !this.monthShowSuggestions()) {
-			this.monthSearchTerm.set(person.nombreCompleto);
-		}
-	});
+	readonly monthFilteredPeople = computed(() => this.monthSearch.filteredPeople(this.peopleAsHijos()));
 
 	onMonthSearchFocus(): void {
-		this.monthSearchTerm.set('');
-		this.monthShowSuggestions.set(true);
+		this.monthSearch.onMonthSearchFocus();
 	}
 
 	onMonthSearchBlur(): void {
-		setTimeout(() => {
-			this.monthShowSuggestions.set(false);
-			const person = this.selectedPerson();
-			if (person) this.monthSearchTerm.set(person.nombreCompleto);
-		}, 200);
+		this.monthSearch.onMonthSearchBlur();
 	}
 
 	selectPersonFromSearch(personId: number): void {
-		this.selectPerson(personId);
-		this.monthShowSuggestions.set(false);
+		this.monthSearch.selectPersonFromSearch(personId);
 	}
 	// #endregion
 

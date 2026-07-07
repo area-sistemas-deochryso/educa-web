@@ -5,11 +5,10 @@ import { Subject, debounceTime, distinctUntilChanged } from 'rxjs';
 import { downloadBlob, logger } from '@core/helpers';
 import { WalCrossTabRefetchService } from '@core/services';
 
-import { ErrorGroupTrendDto } from '../models';
 import { ErrorGroupsService } from './error-groups.service';
 import { ErrorGroupsStore } from './error-groups.store';
-
-const TREND_MAX_CONCURRENT = 3;
+import { ErrorGroupsTrendQueue } from './error-groups-trend-queue';
+import { ErrorGroupsHeatmap } from './error-groups-heatmap';
 
 @Injectable({ providedIn: 'root' })
 export class ErrorGroupsDataFacade {
@@ -18,6 +17,12 @@ export class ErrorGroupsDataFacade {
 	private readonly store = inject(ErrorGroupsStore);
 	private readonly crossTabRefetch = inject(WalCrossTabRefetchService);
 	private readonly destroyRef = inject(DestroyRef);
+	private readonly trendQueue = new ErrorGroupsTrendQueue(this.api, this.store, (source$) =>
+		source$.pipe(takeUntilDestroyed(this.destroyRef)),
+	);
+	private readonly heatmap = new ErrorGroupsHeatmap(this.api, this.store, (source$) =>
+		source$.pipe(takeUntilDestroyed(this.destroyRef)),
+	);
 	// #endregion
 
 	// #region Search debounce trigger
@@ -246,55 +251,15 @@ export class ErrorGroupsDataFacade {
 
 	// #region Heatmap (Plan 43 F5:5.2)
 	loadHeatmap(): void {
-		if (this.store.heatmapLoading()) return;
-		this.store.setHeatmapLoading(true);
-		const days = this.store.heatmapDays();
-		const endDate = this.store.heatmapEndDate();
-		const endDateParam = endDate ? endDate.toISOString().slice(0, 10) : undefined;
-
-		if (days === 30) {
-			this.api
-				.getHeatmapCalendar(days, endDateParam)
-				.pipe(takeUntilDestroyed(this.destroyRef))
-				.subscribe({
-					next: (cells) => {
-						this.store.setHeatmapCalendarCells(cells);
-						this.store.setHeatmapCells([]);
-						this.store.setHeatmapLoading(false);
-					},
-					error: (err) => {
-						logger.warn('[ErrorGroupsDataFacade] Heatmap calendar no disponible', err);
-						this.store.setHeatmapCalendarCells([]);
-						this.store.setHeatmapLoading(false);
-					},
-				});
-		} else {
-			this.api
-				.getHeatmap(days, endDateParam)
-				.pipe(takeUntilDestroyed(this.destroyRef))
-				.subscribe({
-					next: (cells) => {
-						this.store.setHeatmapCells(cells);
-						this.store.setHeatmapCalendarCells([]);
-						this.store.setHeatmapLoading(false);
-					},
-					error: (err) => {
-						logger.warn('[ErrorGroupsDataFacade] Heatmap no disponible', err);
-						this.store.setHeatmapCells([]);
-						this.store.setHeatmapLoading(false);
-					},
-				});
-		}
+		this.heatmap.loadHeatmap();
 	}
 
 	setHeatmapPeriod(days: 7 | 30): void {
-		this.store.setHeatmapDays(days);
-		this.loadHeatmap();
+		this.heatmap.setHeatmapPeriod(days);
 	}
 
 	setHeatmapEndDate(date: Date | null): void {
-		this.store.setHeatmapEndDate(date);
-		this.loadHeatmap();
+		this.heatmap.setHeatmapEndDate(date);
 	}
 	// #endregion
 
@@ -363,50 +328,8 @@ export class ErrorGroupsDataFacade {
 	// #endregion
 
 	// #region Trend 30d (Plan 43 Chat 1.2)
-	private readonly trendQueue: number[] = [];
-	private trendInFlight = 0;
-
-	/**
-	 * Solicita el trend de un grupo. Idempotente: si ya hay cache (loading,
-	 * loaded o error), no relanza. Limita concurrencia a `TREND_MAX_CONCURRENT`
-	 * para no saturar BE — el resto entra a cola y se despacha al liberar slot.
-	 */
 	requestTrend(grupoId: number): void {
-		if (this.store.getTrendEntry(grupoId)) return;
-		this.store.setTrendStatus(grupoId, 'loading');
-		this.trendQueue.push(grupoId);
-		this.drainTrendQueue();
-	}
-
-	private drainTrendQueue(): void {
-		while (this.trendInFlight < TREND_MAX_CONCURRENT && this.trendQueue.length > 0) {
-			const grupoId = this.trendQueue.shift()!;
-			this.fetchTrendNow(grupoId);
-		}
-	}
-
-	private fetchTrendNow(grupoId: number): void {
-		this.trendInFlight++;
-		this.api
-			.getTrend(grupoId)
-			.pipe(takeUntilDestroyed(this.destroyRef))
-			.subscribe({
-				next: (trend: ErrorGroupTrendDto[]) => {
-					this.store.setTrendStatus(
-						grupoId,
-						'loaded',
-						(trend ?? []).map((p) => p.count),
-					);
-					this.trendInFlight--;
-					this.drainTrendQueue();
-				},
-				error: (err) => {
-					logger.warn(`[ErrorGroupsDataFacade] Trend ${grupoId} no disponible`, err);
-					this.store.setTrendStatus(grupoId, 'error', []);
-					this.trendInFlight--;
-					this.drainTrendQueue();
-				},
-			});
+		this.trendQueue.requestTrend(grupoId);
 	}
 	// #endregion
 }

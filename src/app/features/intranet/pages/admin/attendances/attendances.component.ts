@@ -24,7 +24,7 @@ import { Tab, TabList, TabPanel, Tabs } from 'primeng/tabs';
 import { ToastModule } from 'primeng/toast';
 
 import { logger } from '@core/helpers';
-import { ErrorStateComponent } from '@shared/components/error-state';
+import { ErrorStateComponent } from '@shared/components';
 import { SkeletonColumnDef, TableSkeletonComponent, StatsSkeletonComponent, PageHeaderComponent } from '@intranet-shared/components';
 import { AttendanceScopeBannerComponent } from '@intranet-shared/components/attendance-scope-banner';
 import { AttendanceReportsComponent } from '../../cross-role/attendance-reports';

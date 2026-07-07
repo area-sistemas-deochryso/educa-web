@@ -90,7 +90,11 @@ export class WalCrudOps<
 			onCommit: (result) => cb?.onCommit?.(result),
 			onError: (err) => {
 				this.store.setSaving(false);
-				cb?.onError ? cb.onError(err) : this._errHandler.handle(err, cb?.errorLabel ?? 'guardar');
+				if (cb?.onError) {
+					cb.onError(err);
+				} else {
+					this._errHandler.handle(err, cb?.errorLabel ?? 'guardar');
+				}
 			},
 		});
 	}
@@ -140,7 +144,11 @@ export class WalCrudOps<
 			onCommit: (result) => cb?.onCommit?.(result),
 			onError: (err) => {
 				this.store.setSaving(false);
-				cb?.onError ? cb.onError(err) : this._errHandler.handle(err, cb?.errorLabel ?? 'guardar');
+				if (cb?.onError) {
+					cb.onError(err);
+				} else {
+					this._errHandler.handle(err, cb?.errorLabel ?? 'guardar');
+				}
 			},
 		});
 	}

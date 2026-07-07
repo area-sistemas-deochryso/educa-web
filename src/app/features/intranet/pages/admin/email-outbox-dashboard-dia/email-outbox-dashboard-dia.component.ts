@@ -2,7 +2,7 @@ import { ChangeDetectionStrategy, Component, computed, inject } from '@angular/c
 import { TabsModule } from 'primeng/tabs';
 
 import { StatsSkeletonComponent, TableSkeletonComponent } from '@intranet-shared/components';
-import { ErrorStateComponent } from '@shared/components/error-state';
+import { ErrorStateComponent } from '@shared/components';
 import type { SkeletonColumnDef } from '@intranet-shared/components';
 
 import { DashboardBouncersTableComponent } from './components/dashboard-bouncers-table/dashboard-bouncers-table.component';

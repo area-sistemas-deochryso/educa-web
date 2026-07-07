@@ -9,6 +9,7 @@ import {
 	getNodeLabel as getNodeLabelHelper,
 	clientToSvg as clientToSvgHelper,
 	svgToScreen as svgToScreenHelper,
+	computeTooltipData,
 } from './campus-editor.helpers';
 
 @Component({
@@ -96,46 +97,16 @@ export class CampusEditorComponent {
 
 	private readonly nodeTypeLabelMap = NODE_TYPE_LABELS;
 
-	readonly tooltipData = computed(() => {
-		const info = this.hoverInfo();
-		if (!info) return null;
-
-		if (info.type === 'node') {
-			const nodo = this.nodoMap().get(info.id);
-			if (!nodo) return null;
-			const size = nodo.width > 0 ? ` · ${nodo.width}×${nodo.height}` : '';
-			return {
-				color: this.nodeColorMap().get(info.id) ?? getNodeColorHelper(nodo.tipo),
-				type: this.nodeTypeLabelMap[nodo.tipo] || nodo.tipo,
-				label: nodo.etiqueta || nodo.salonDescripcion || '',
-				meta: `${Math.round(nodo.x)}, ${Math.round(nodo.y)}${size}`,
-			};
-		}
-
-		if (info.type === 'bloqueo') {
-			const bloqueo = this.bloqueos().find((b) => b.id === info.id);
-			if (!bloqueo) return null;
-			return {
-				color: '#ef4444',
-				type: 'Bloqueo',
-				label: bloqueo.motivo || '',
-				meta: `${bloqueo.width} × ${bloqueo.height}`,
-			};
-		}
-
-		if (info.type === 'arista') {
-			const arista = this.aristas().find((a) => a.id === info.id);
-			if (!arista) return null;
-			return {
-				color: '#6b7280',
-				type: arista.bidireccional ? 'Arista ↔' : 'Arista →',
-				label: '',
-				meta: `Dist: ${arista.peso}`,
-			};
-		}
-
-		return null;
-	});
+	readonly tooltipData = computed(() =>
+		computeTooltipData(
+			this.hoverInfo(),
+			this.nodoMap(),
+			this.nodeColorMap(),
+			this.nodeTypeLabelMap,
+			this.bloqueos(),
+			this.aristas(),
+		),
+	);
 
 	// #endregion
 

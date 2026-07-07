@@ -5,6 +5,7 @@ import { of, Subject, throwError } from 'rxjs';
 
 import { SessionRefreshService } from './session-refresh.service';
 import { SessionCoordinatorService, type SessionMessage } from './session-coordinator.service';
+// eslint-disable-next-line layer-enforcement/imports-error -- DEBT: AuthApiService is internal to auth/
 import { AuthApiService } from '@core/services/auth/auth-api.service';
 import { SwService } from '@core/services/sw';
 // #endregion

@@ -18,7 +18,7 @@
 		<i class="pi pi-check-circle"></i>
 		<span>
 			GC completado
-			@if (gcResult.heapBeforeMB != null) {
+			@if (gcResult.heapBeforeMB !== null) {
 				— Heap antes: {{ gcResult.heapBeforeMB | number: '1.1-1' }} MB,
 				después: {{ gcResult.heapAfterMB | number: '1.1-1' }} MB,
 				liberado: {{ gcResult.collectedMB | number: '1.1-1' }} MB

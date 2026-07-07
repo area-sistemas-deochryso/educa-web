@@ -25,7 +25,7 @@ import {
 
 import { ActivatedRoute } from '@angular/router';
 
-import { HubContextBannerComponent, readHubContext } from '../../../monitoreo/shared';
+import { HubContextBannerComponent, readHubContext } from '@features/intranet/pages/admin/monitoreo/shared';
 import {
 	EmailDomainPauseCrudFacade,
 	EmailDomainPauseDataFacade,

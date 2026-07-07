@@ -4,7 +4,7 @@ import { AttendanceService } from '@intranet-shared/services';
 import { esGradoAsistenciaDiaria } from '@shared/constants';
 import { periodoEnMes, filtrarPorPeriodoAcademico } from '@shared/models';
 import { JustificacionEvent } from '@features/intranet/components/attendance/attendance-day-list/attendance-day-list.component';
-import { ChangeDetectionStrategy, Component, DestroyRef, OnInit, ViewChild, computed, effect, inject, output, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, DestroyRef, OnInit, ViewChild, computed, inject, output, signal } from '@angular/core';
 
 import { AttendanceDayListComponent } from '@features/intranet/components/attendance/attendance-day-list/attendance-day-list.component';
 import { AttendanceLegendComponent } from '@app/features/intranet/components/attendance/attendance-legend/attendance-legend.component';
@@ -35,6 +35,7 @@ import { finalize, forkJoin } from 'rxjs';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
 import { buildPdfExcelMenuItems } from '../../attendance-director/consolidated-pdf.helper';
+import { MonthSearchState } from '../../attendance-director/month-search-state';
 
 /**
  * Vista "Mis estudiantes" del panel profesor (Plan 21 Chat 4).
@@ -120,42 +121,24 @@ export class AttendanceProfesorEstudiantesComponent implements OnInit {
 
 	// #endregion
 	// #region Month search (unified filter bar)
-	readonly monthSearchTerm = signal('');
-	readonly monthShowSuggestions = signal(false);
+	private readonly monthSearch = new MonthSearchState(this.view.selectedEstudiante, (id) =>
+		this.view.selectEstudiante(id),
+	);
+	readonly monthSearchTerm = this.monthSearch.monthSearchTerm;
+	readonly monthShowSuggestions = this.monthSearch.monthShowSuggestions;
 
-	readonly monthFilteredStudents = computed(() => {
-		const term = this.monthSearchTerm().toLowerCase().trim();
-		const hijos = this.view.estudiantesAsHijos();
-		if (!term) return hijos;
-		return hijos.filter(h =>
-			h.nombreCompleto.toLowerCase().includes(term) ||
-			(h.dni && h.dni.toLowerCase().includes(term)),
-		);
-	});
-
-	private readonly syncSearchWithSelection = effect(() => {
-		const est = this.view.selectedEstudiante();
-		if (est && !this.monthShowSuggestions()) {
-			this.monthSearchTerm.set(est.nombreCompleto);
-		}
-	});
+	readonly monthFilteredStudents = computed(() => this.monthSearch.filteredPeople(this.view.estudiantesAsHijos()));
 
 	onMonthSearchFocus(): void {
-		this.monthSearchTerm.set('');
-		this.monthShowSuggestions.set(true);
+		this.monthSearch.onMonthSearchFocus();
 	}
 
 	onMonthSearchBlur(): void {
-		setTimeout(() => {
-			this.monthShowSuggestions.set(false);
-			const est = this.view.selectedEstudiante();
-			if (est) this.monthSearchTerm.set(est.nombreCompleto);
-		}, 200);
+		this.monthSearch.onMonthSearchBlur();
 	}
 
 	selectStudentFromSearch(estudianteId: number): void {
-		this.view.selectEstudiante(estudianteId);
-		this.monthShowSuggestions.set(false);
+		this.monthSearch.selectPersonFromSearch(estudianteId);
 	}
 
 	// #endregion

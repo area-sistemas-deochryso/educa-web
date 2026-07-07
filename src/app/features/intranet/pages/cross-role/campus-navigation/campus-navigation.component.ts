@@ -1,6 +1,6 @@
 import { ChangeDetectionStrategy, Component, inject, input, OnInit, signal, ViewChild } from '@angular/core';
 
-import { ErrorStateComponent } from '@shared/components/error-state';
+import { ErrorStateComponent } from '@shared/components';
 import { CampusNavigationFacade } from './services/campus-navigation.facade';
 import { CampusMapComponent } from './components/campus-map/campus-map.component';
 import { Campus3dViewComponent } from './components/campus-3d-view/campus-3d-view.component';

@@ -46,7 +46,7 @@
 					<span class="role-chip-count">{{ chip.count }}</span>
 				</button>
 			}
-			@if (viewMode() === 'dia' && d.totalSalones != null && d.salonesConRegistro != null) {
+			@if (viewMode() === 'dia' && d.totalSalones !== null && d.salonesConRegistro !== null) {
 				<span
 					class="salones-text"
 					pTooltip="Salones con al menos 1 registro"

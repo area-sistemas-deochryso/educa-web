@@ -44,7 +44,7 @@ import {
 import { environment } from '@env/environment';
 import { APP_USER_ROLES } from '@shared/constants';
 import { logger } from '@core/helpers';
-import { ErrorStateComponent } from '@shared/components/error-state';
+import { ErrorStateComponent } from '@shared/components';
 import { ExcelService } from '@core/services';
 import type { ImportarEstudianteItem } from './services';
 import { validarUsuarios } from './usuarios-validation.helpers';

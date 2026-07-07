@@ -83,7 +83,7 @@ Planes cross-repo con sub-chats FE pendientes: **41** (Correlation Hub F3-F6), *
 
 ### 🟣 Verificaciones post-deploy (`/verify <NNN>`)
 
-16 briefs en `awaiting-prod/`:
+17 briefs en `awaiting-prod/`:
 
 | Brief | Scope |
 |-------|-------|
@@ -101,9 +101,8 @@ Planes cross-repo con sub-chats FE pendientes: **41** (Correlation Hub F3-F6), *
 | `303` | P43 F6.3 FE: gap panel salon filter + export + profile link |
 | `304` | P43 F6.3 FE: student gap profile page |
 | `321` | P64 F5: schedule grid redesign |
-| `330` | P67: runtime health alerts + diagnostics FE |
+| `330` | P67 F3-F4: runtime health alerts UI + diagnostics (Force GC, slow requests, correlation view) — pendiente desde 2026-06-18 |
 | `301` | xP75 FE: heatmap calendar endpoint + prev/next navigation |
-| `330` | P67: runtime health persistence + insights |
 
 ### Notas operativas
 

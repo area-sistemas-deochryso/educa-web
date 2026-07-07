@@ -1,4 +1,4 @@
-import { CampusNodoDto } from '../../models';
+import { CampusNodoDto, CampusAristaDto, CampusBloqueoDto } from '../../models';
 
 export const NODE_COLORS: Record<string, string> = {
 	classroom: '#4f46e5',
@@ -47,4 +47,58 @@ export function svgToScreen(svgEl: SVGSVGElement | undefined, svgX: number, svgY
 	const screenPt = pt.matrixTransform(svgEl.getScreenCTM()!);
 	const rect = svgEl.getBoundingClientRect();
 	return { x: screenPt.x - rect.left, y: screenPt.y - rect.top };
+}
+
+export interface TooltipData {
+	color: string;
+	type: string;
+	label: string;
+	meta: string;
+}
+
+export function computeTooltipData(
+	hoverInfo: { type: 'node' | 'arista' | 'bloqueo'; id: number } | null,
+	nodoMap: Map<number, CampusNodoDto>,
+	nodeColorMap: Map<number, string>,
+	nodeTypeLabelMap: Record<string, string>,
+	bloqueos: CampusBloqueoDto[],
+	aristas: CampusAristaDto[],
+): TooltipData | null {
+	if (!hoverInfo) return null;
+
+	if (hoverInfo.type === 'node') {
+		const nodo = nodoMap.get(hoverInfo.id);
+		if (!nodo) return null;
+		const size = nodo.width > 0 ? ` · ${nodo.width}×${nodo.height}` : '';
+		return {
+			color: nodeColorMap.get(hoverInfo.id) ?? getNodeColor(nodo.tipo),
+			type: nodeTypeLabelMap[nodo.tipo] || nodo.tipo,
+			label: nodo.etiqueta || nodo.salonDescripcion || '',
+			meta: `${Math.round(nodo.x)}, ${Math.round(nodo.y)}${size}`,
+		};
+	}
+
+	if (hoverInfo.type === 'bloqueo') {
+		const bloqueo = bloqueos.find((b) => b.id === hoverInfo.id);
+		if (!bloqueo) return null;
+		return {
+			color: '#ef4444',
+			type: 'Bloqueo',
+			label: bloqueo.motivo || '',
+			meta: `${bloqueo.width} × ${bloqueo.height}`,
+		};
+	}
+
+	if (hoverInfo.type === 'arista') {
+		const arista = aristas.find((a) => a.id === hoverInfo.id);
+		if (!arista) return null;
+		return {
+			color: '#6b7280',
+			type: arista.bidireccional ? 'Arista ↔' : 'Arista →',
+			label: '',
+			meta: `Dist: ${arista.peso}`,
+		};
+	}
+
+	return null;
 }
