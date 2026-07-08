@@ -130,10 +130,14 @@ export class SchedulesDataFacade {
   }
 
   /**
-   * Cargar detalle de un horario
+   * Cargar detalle de un horario.
+   * @param force Bypass el guard de reentrancia. Necesario en refrescos post-mutación
+   * (asignar/desasignar profesor o estudiantes): si la GET original de apertura del
+   * drawer seguía en vuelo, el guard descartaba en silencio el refresh con los datos
+   * ya actualizados, dejando el conteo obsoleto hasta un reload manual.
    */
-  loadDetalle(id: number): void {
-    if (this.store.detailLoading()) return;
+  loadDetalle(id: number, force = false): void {
+    if (!force && this.store.detailLoading()) return;
     this.store.setDetailLoading(true);
     this.store.formStore.openDetailDrawer();
 

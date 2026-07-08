@@ -245,7 +245,7 @@
 			label="Enviar"
 			icon="pi pi-send"
 			(click)="onCrearConversacion()"
-			[disabled]="!canCreate()"
+			[disabled]="!canCreate() || vm().sending"
 			[loading]="vm().sending"
 		></button>
 	</ng-template>

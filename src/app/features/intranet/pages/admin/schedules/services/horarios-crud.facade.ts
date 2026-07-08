@@ -286,7 +286,7 @@ export class SchedulesCrudFacade {
   private get assignmentCallbacks() {
     return {
       refreshHorarios: () => this.dataFacade.silentRefreshAfterCrud(),
-      loadDetalle: (id: number) => this.dataFacade.loadDetalle(id),
+      loadDetalle: (id: number) => this.dataFacade.loadDetalle(id, true),
     };
   }
 

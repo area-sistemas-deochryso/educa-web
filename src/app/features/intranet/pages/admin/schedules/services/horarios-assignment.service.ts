@@ -51,6 +51,7 @@ export class SchedulesAssignmentService {
       payload: data,
       http$: () => this.api.asignarProfesor(data),
       onCommit: () => {
+        this.store.setLoading(false);
         callbacks.refreshHorarios();
 
         if (this.store.formStore.detailDrawerVisible()) {
@@ -93,6 +94,7 @@ export class SchedulesAssignmentService {
       payload: data,
       http$: () => this.api.asignarEstudiantes(data),
       onCommit: () => {
+        this.store.setLoading(false);
         callbacks.refreshHorarios();
         this.errorHandler.showSuccess(
           UI_SUMMARIES.success,
@@ -131,6 +133,7 @@ export class SchedulesAssignmentService {
       payload: { horarioId, usuarioReg },
       http$: () => this.api.asignarTodosEstudiantes(horarioId, usuarioReg),
       onCommit: () => {
+        this.store.setLoading(false);
         callbacks.refreshHorarios();
 
         if (this.store.formStore.detailDrawerVisible()) {

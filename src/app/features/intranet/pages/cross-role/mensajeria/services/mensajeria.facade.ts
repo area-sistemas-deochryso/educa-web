@@ -233,6 +233,11 @@ export class SalonMensajeriaFacade {
 			onCommit: (detalle) => {
 				this.store.setConversacionDetalle(detalle);
 				this.store.setSending(false);
+				// El split-view muestra lista + detalle a la vez, pero este flujo navega
+				// directo al detalle sin pasar por backToList() — sin este refetch la
+				// conversación recién creada no aparece en la lista hasta recargar la página
+				// o hacer click manual en el ícono de refresco.
+				this.loadConversaciones(this.store.currentHorarioId() ?? undefined, true);
 			},
 			onError: (err) => {
 				this.errHandler.handle(err, 'crear conversación');
