@@ -10,6 +10,7 @@ import { EstudianteSalon, GruposResumenDto } from '@features/intranet/pages/estu
 import { EstudianteGruposTabComponent } from '../estudiante-grupos-tab/estudiante-grupos-tab.component';
 import { StudentAttendanceTabComponent } from '../student-attendance-tab/student-attendance-tab.component';
 import { CampusNavigationComponent } from '@features/intranet/pages/cross-role/campus-navigation/campus-navigation.component';
+import { EstudianteNotasComponent } from '@features/intranet/pages/estudiante/notas/estudiante-notas.component';
 import { MiAsistenciaCursoResumenDto } from '@features/intranet/pages/estudiante/models';
 
 // #endregion
@@ -25,6 +26,7 @@ import { MiAsistenciaCursoResumenDto } from '@features/intranet/pages/estudiante
 		EstudianteGruposTabComponent,
 		StudentAttendanceTabComponent,
 		CampusNavigationComponent,
+		EstudianteNotasComponent,
 	],
 	changeDetection: ChangeDetectionStrategy.OnPush,
 	styles: `
@@ -110,10 +112,13 @@ import { MiAsistenciaCursoResumenDto } from '@features/intranet/pages/estudiante
 							<i class="pi pi-users tab-icon"></i>Grupos
 						</p-tab>
 						<p-tab value="1">
+							<i class="pi pi-chart-bar tab-icon"></i>Notas
+						</p-tab>
+						<p-tab value="2">
 							<i class="pi pi-calendar-times tab-icon"></i>Asistencia
 						</p-tab>
 						@if (showCampusNav) {
-							<p-tab value="2">
+							<p-tab value="3">
 								<i class="pi pi-map tab-icon"></i>Ubicación
 							</p-tab>
 						}
@@ -144,9 +149,17 @@ import { MiAsistenciaCursoResumenDto } from '@features/intranet/pages/estudiante
 						</p-tabpanel>
 						<!-- #endregion -->
 
-						<!-- #region Tab Asistencia -->
+						<!-- #region Tab Notas -->
 						<p-tabpanel value="1">
 							@if (activeTab() === '1') {
+								<app-estudiante-notas [cursoNombres]="cursoNombresOptions()" [embedded]="true" />
+							}
+						</p-tabpanel>
+						<!-- #endregion -->
+
+						<!-- #region Tab Asistencia -->
+						<p-tabpanel value="2">
+							@if (activeTab() === '2') {
 								<app-student-attendance-tab
 									[asistenciaData]="asistenciaData()"
 									[loading]="asistenciaLoading()"
@@ -160,8 +173,8 @@ import { MiAsistenciaCursoResumenDto } from '@features/intranet/pages/estudiante
 
 						<!-- #region Tab Ubicación -->
 						@if (showCampusNav) {
-							<p-tabpanel value="2">
-								@if (activeTab() === '2') {
+							<p-tabpanel value="3">
+								@if (activeTab() === '3') {
 									<app-campus-navigation
 										[embedded]="true"
 										[targetSalonId]="s.salonId"
@@ -199,6 +212,8 @@ export class EstudianteSalonDialogComponent {
 	readonly showCampusNav = environment.features.campusNavigation;
 	readonly isFullscreen = signal(false);
 	readonly activeTab = signal('0');
+
+	readonly cursoNombresOptions = computed(() => this.cursosOptions().map((o) => o.label));
 
 	readonly dialogStyle = computed(() =>
 		this.isFullscreen()

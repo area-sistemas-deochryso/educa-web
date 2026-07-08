@@ -24,20 +24,34 @@
 	@if (vm().contenido; as contenido) {
 		<div class="modal-body">
 			<p-tabs [value]="activeTab()" (valueChange)="onTabChange($any($event))">
-				<p-tablist>
-					<p-tab value="0">
-						<i class="pi pi-book tab-icon"></i>
-						Contenido
-					</p-tab>
-					<p-tab value="1">
-						<i class="pi pi-chart-bar tab-icon"></i>
-						Mis Calificaciones
-					</p-tab>
-					<p-tab value="2">
-						<i class="pi pi-info-circle tab-icon"></i>
-						Información
-					</p-tab>
-				</p-tablist>
+				<div class="tabs-header-row">
+					<p-tablist>
+						<p-tab value="0">
+							<i class="pi pi-book tab-icon"></i>
+							Contenido
+						</p-tab>
+						<p-tab value="1">
+							<i class="pi pi-chart-bar tab-icon"></i>
+							Mis Calificaciones
+						</p-tab>
+						<p-tab value="2">
+							<i class="pi pi-info-circle tab-icon"></i>
+							Información
+						</p-tab>
+					</p-tablist>
+					<div class="tabs-header-links">
+						<button type="button" class="ver-asistencia-link" (click)="onVerSalon()">
+							<i class="pi pi-building"></i>
+							Ver salón
+							<i class="pi pi-arrow-right"></i>
+						</button>
+						<button type="button" class="ver-asistencia-link" (click)="onVerAsistencia()">
+							<i class="pi pi-check-square"></i>
+							Ver asistencia
+							<i class="pi pi-arrow-right"></i>
+						</button>
+					</div>
+				</div>
 
 				<p-tabpanels>
 					<!-- #region Tab Contenido -->

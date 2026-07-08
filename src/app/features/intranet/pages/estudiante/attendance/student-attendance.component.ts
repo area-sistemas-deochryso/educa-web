@@ -2,6 +2,7 @@ import {
 	Component,
 	ChangeDetectionStrategy,
 	computed,
+	effect,
 	inject,
 	signal,
 	OnInit,
@@ -9,6 +10,7 @@ import {
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { ActivatedRoute } from '@angular/router';
 import { Select } from 'primeng/select';
 import { TagModule } from 'primeng/tag';
 import { TableModule } from 'primeng/table';
@@ -122,6 +124,7 @@ export class StudentAttendanceComponent implements OnInit {
 	// #region Dependencias
 	private readonly api = inject(EstudianteFacade);
 	private readonly destroyRef = inject(DestroyRef);
+	private readonly route = inject(ActivatedRoute);
 	// #endregion
 
 	// #region Estado
@@ -163,6 +166,23 @@ export class StudentAttendanceComponent implements OnInit {
 	// #endregion
 
 	// #region Lifecycle
+	private readonly pendingHorarioId = signal<number | null>(null);
+
+	constructor() {
+		const qpHorarioId = Number(this.route.snapshot.queryParamMap.get('horarioId'));
+		if (qpHorarioId > 0) this.pendingHorarioId.set(qpHorarioId);
+
+		effect(() => {
+			const opts = this.cursoOptions();
+			const pending = this.pendingHorarioId();
+			if (pending && opts.some((o) => o.value === pending)) {
+				this.pendingHorarioId.set(null);
+				this.selectedHorarioId.set(pending);
+				this.loadAsistencia(pending);
+			}
+		});
+	}
+
 	ngOnInit(): void {
 		this._pageLoading.set(true);
 		this.api
@@ -173,9 +193,9 @@ export class StudentAttendanceComponent implements OnInit {
 					this._horarios.set(horarios);
 					this._pageLoading.set(false);
 
-					// Auto-select first if only one
+					// Auto-select first if only one and no pending query-param selection
 					const opts = this.cursoOptions();
-					if (opts.length === 1) {
+					if (opts.length === 1 && !this.pendingHorarioId()) {
 						this.selectedHorarioId.set(opts[0].value);
 						this.loadAsistencia(opts[0].value);
 					}

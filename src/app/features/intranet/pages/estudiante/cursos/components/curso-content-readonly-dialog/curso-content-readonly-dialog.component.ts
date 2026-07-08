@@ -1,6 +1,7 @@
 import { Component, ChangeDetectionStrategy, inject, signal, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { Router } from '@angular/router';
 import { DialogModule } from 'primeng/dialog';
 import { AccordionModule } from 'primeng/accordion';
 import { ButtonModule } from 'primeng/button';
@@ -43,6 +44,7 @@ export class CursoContentReadonlyDialogComponent {
 	// #region Dependencias
 	private readonly facade = inject(EstudianteCursosFacade);
 	private readonly confirmationService = inject(ConfirmationService);
+	private readonly router = inject(Router);
 	// #endregion
 
 	// #region Estado del facade
@@ -104,6 +106,24 @@ export class CursoContentReadonlyDialogComponent {
 			this.openPanels.set([]);
 			this.notasLoaded = false;
 		}
+	}
+
+	onVerAsistencia(): void {
+		const contenido = this.vm().contenido;
+		if (!contenido) return;
+		this.facade.closeContentDialog();
+		this.router.navigate(['/intranet/estudiante/asistencia'], {
+			queryParams: { horarioId: contenido.horarioId },
+		});
+	}
+
+	onVerSalon(): void {
+		const contenido = this.vm().contenido;
+		if (!contenido) return;
+		this.facade.closeContentDialog();
+		this.router.navigate(['/intranet/estudiante/salones'], {
+			queryParams: { horarioId: contenido.horarioId },
+		});
 	}
 
 	onTabChange(value: string): void {

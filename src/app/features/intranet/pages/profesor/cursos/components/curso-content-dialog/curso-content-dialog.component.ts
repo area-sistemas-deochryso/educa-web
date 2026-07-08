@@ -1,5 +1,6 @@
 import { Component, ChangeDetectionStrategy, inject, signal, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { Router } from '@angular/router';
 import { DialogModule } from 'primeng/dialog';
 import { ButtonModule } from 'primeng/button';
 import { TooltipModule } from 'primeng/tooltip';
@@ -65,6 +66,7 @@ export class CursoContentDialogComponent {
 	private readonly uiFacade = inject(CursoContenidoUiFacade);
 	private readonly calFacade = inject(CalificacionesFacade);
 	private readonly confirmationService = inject(ConfirmationService);
+	private readonly router = inject(Router);
 
 	readonly vm = this.uiFacade.vm;
 	readonly calVm = this.calFacade.vm;
@@ -320,6 +322,26 @@ export class CursoContentDialogComponent {
 
 	onEliminarPeriodo(periodoId: number): void {
 		this.calFacade.eliminarPeriodo(periodoId);
+	}
+
+	// #endregion
+	// #region Navigation
+	onVerAsistencia(): void {
+		const contenido = this.vm().contenido;
+		if (!contenido) return;
+		this.uiFacade.closeContentDialog();
+		this.router.navigate(['/intranet/profesor/asistencia'], {
+			queryParams: { horarioId: contenido.horarioId },
+		});
+	}
+
+	onVerSalon(): void {
+		const contenido = this.vm().contenido;
+		if (!contenido) return;
+		this.uiFacade.closeContentDialog();
+		this.router.navigate(['/intranet/profesor/salones'], {
+			queryParams: { horarioId: contenido.horarioId },
+		});
 	}
 
 	// #endregion

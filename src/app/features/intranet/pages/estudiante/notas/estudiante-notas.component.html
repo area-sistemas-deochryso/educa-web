@@ -24,18 +24,25 @@
 	<!-- #endregion -->
 
 	<!-- #region Header -->
-	<app-page-header icon="pi pi-chart-bar" title="Mis Notas">
-		<button
-			pButton
-			label="Simular"
-			icon="pi pi-calculator"
-			class="p-button-outlined p-button-help"
-			(click)="onOpenSimulador()"
-			[disabled]="!vm().selectedCurso"
-		></button>
-	</app-page-header>
+	@if (!embedded()) {
+		<app-page-header icon="pi pi-chart-bar" title="Mis Notas">
+			<button
+				pButton
+				label="Simular"
+				icon="pi pi-calculator"
+				class="p-button-outlined p-button-help"
+				(click)="onOpenSimulador()"
+				[disabled]="!vm().selectedCurso"
+			></button>
+		</app-page-header>
+	}
 
-	<div class="notas-page p-4 pt-0">
+	<div
+		class="notas-page"
+		[class.p-4]="!embedded()"
+		[class.pt-0]="!embedded()"
+		[class.notas-page-embedded]="embedded()"
+	>
 		<!-- #region Filters -->
 		<div class="notas-filters">
 			@if (vm().cursoOptions.length > 1) {
@@ -50,6 +57,16 @@
 					class="curso-select"
 				/>
 			}
+			@if (embedded()) {
+				<button
+					pButton
+					label="Simular"
+					icon="pi pi-calculator"
+					class="p-button-outlined p-button-help p-button-sm"
+					(click)="onOpenSimulador()"
+					[disabled]="!vm().selectedCurso"
+				></button>
+			}
 		</div>
 		<!-- #endregion -->
 
@@ -58,6 +75,11 @@
 			<app-notas-curso-card
 				[curso]="curso"
 			/>
+		} @else if (vm().isEmptyFiltered) {
+			<div class="flex flex-column align-items-center p-5 text-color-secondary">
+				<i class="pi pi-book text-4xl mb-3"></i>
+				<p class="font-semibold">No tienes notas registradas para este salón</p>
+			</div>
 		}
 		<!-- #endregion -->
 	</div>

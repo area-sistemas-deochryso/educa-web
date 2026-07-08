@@ -91,10 +91,10 @@ const ESTUDIANTE_ROUTES: Route[] = [
 		title: 'Intranet - Mensajería',
 	},
 	{
+		// Las notas se consolidaron en el tab "Notas" de estudiante/salones (ver P83 F5).
 		path: 'estudiante/notas',
-		loadComponent: () =>
-			import('./pages/estudiante').then((m) => m.EstudianteNotasComponent),
-		title: 'Intranet - Mis Calificaciones',
+		redirectTo: 'estudiante/salones',
+		pathMatch: 'full',
 	},
 	{
 		path: 'estudiante/salones',

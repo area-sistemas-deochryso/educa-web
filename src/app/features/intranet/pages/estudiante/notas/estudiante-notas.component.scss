@@ -4,6 +4,11 @@
 	margin: 0 auto;
 }
 
+.notas-page-embedded {
+	max-width: none;
+	margin: 0;
+}
+
 .notas-skeleton {
 	display: flex;
 	flex-direction: column;

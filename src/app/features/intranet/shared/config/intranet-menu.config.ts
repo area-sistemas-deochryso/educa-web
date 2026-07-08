@@ -74,7 +74,7 @@ export const MENU_ITEMS: MenuItemDef[] = [
 	{ route: '/intranet/profesor/calificaciones', label: 'Mis Calificaciones', icon: 'pi pi-chart-bar', capability: 'PROFESOR_CALIFICACIONES', modulo: 'seguimiento', featureFlag: 'profesor', group: { label: 'Mi Seguimiento', icon: 'pi pi-user' }, preview: 'grades', description: 'Registrar y consultar notas' },
 	{ route: '/intranet/profesor/asistencia', label: 'Mi Asistencia', icon: 'pi pi-check-square', capability: 'PROFESOR_ASISTENCIA', modulo: 'seguimiento', featureFlag: 'profesor', group: { label: 'Mi Seguimiento', icon: 'pi pi-user' }, preview: 'attendance', description: 'Pasar lista de tus estudiantes' },
 	// Estudiante — agrupados bajo "Mi Seguimiento"
-	{ route: '/intranet/estudiante/notas', label: 'Mis Calificaciones', icon: 'pi pi-chart-bar', capability: 'ESTUDIANTE_NOTAS', modulo: 'seguimiento', featureFlag: 'estudiante', group: { label: 'Mi Seguimiento', icon: 'pi pi-user' }, preview: 'grades', description: 'Consultar tus calificaciones' },
+	{ route: '/intranet/estudiante/salones', label: 'Mis Calificaciones', icon: 'pi pi-chart-bar', capability: 'ESTUDIANTE_NOTAS', modulo: 'seguimiento', featureFlag: 'estudiante', group: { label: 'Mi Seguimiento', icon: 'pi pi-user' }, preview: 'grades', description: 'Consultar tus calificaciones (tab Notas en tu salón)' },
 	{ route: '/intranet/estudiante/asistencia', label: 'Mi Asistencia', icon: 'pi pi-check-square', capability: 'ESTUDIANTE_ASISTENCIA', modulo: 'seguimiento', featureFlag: 'estudiante', group: { label: 'Mi Seguimiento', icon: 'pi pi-user' }, preview: 'attendance', description: 'Revisar tu registro de asistencia' },
 
 	// --- Comunicación: "Qué necesito saber o decir?" ---

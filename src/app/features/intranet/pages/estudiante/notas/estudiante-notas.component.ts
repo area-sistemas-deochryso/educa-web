@@ -1,4 +1,4 @@
-import { Component, ChangeDetectionStrategy, inject, OnInit } from '@angular/core';
+import { Component, ChangeDetectionStrategy, inject, input, computed, effect, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Select } from 'primeng/select';
@@ -32,7 +32,39 @@ import { SimuladorNotasComponent } from './components/simulador-notas/simulador-
 })
 export class EstudianteNotasComponent implements OnInit {
 	private readonly facade = inject(EstudianteNotasFacade);
-	readonly vm = this.facade.vm;
+	private readonly rawVm = this.facade.vm;
+
+	/** Cuando se define, restringe la vista a estos nombres de curso (uso embebido en el tab de salón). */
+	readonly cursoNombres = input<string[] | null>(null);
+	/** Oculta el header de página cuando se embebe dentro de otro contenedor (ej. tab de salón). */
+	readonly embedded = input(false);
+
+	readonly vm = computed(() => {
+		const raw = this.rawVm();
+		const filter = this.cursoNombres();
+		if (!filter) return { ...raw, isEmptyFiltered: false };
+
+		const cursoOptions = raw.cursoOptions.filter((_, i) =>
+			filter.includes(raw.cursos[i]?.cursoNombre),
+		);
+		const selectedCurso = cursoOptions.some((o) => o.value === raw.selectedCursoIndex)
+			? raw.selectedCurso
+			: (raw.cursos[cursoOptions[0]?.value] ?? null);
+
+		return { ...raw, cursoOptions, selectedCurso, isEmptyFiltered: cursoOptions.length === 0 };
+	});
+
+	constructor() {
+		// Auto-selecciona el primer curso del salón filtrado cuando cambian los datos.
+		effect(() => {
+			const filter = this.cursoNombres();
+			if (!filter) return;
+			const options = this.vm().cursoOptions;
+			if (options.length > 0 && !options.some((o) => o.value === this.facade.vm().selectedCursoIndex)) {
+				this.facade.selectCurso(options[0].value);
+			}
+		});
+	}
 
 	ngOnInit(): void {
 		this.facade.loadNotas();

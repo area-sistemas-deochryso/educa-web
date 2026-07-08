@@ -1,6 +1,6 @@
-import { Component, ChangeDetectionStrategy, inject, OnInit } from '@angular/core';
+import { Component, ChangeDetectionStrategy, inject, effect, signal, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { Router } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { TagModule } from 'primeng/tag';
 import { TooltipModule } from 'primeng/tooltip';
 import { ProgressSpinnerModule } from 'primeng/progressspinner';
@@ -112,8 +112,28 @@ import { EstudianteSalonDialogComponent } from './components/estudiante-salon-di
 export class StudentClassroomsComponent implements OnInit {
 	private readonly facade = inject(StudentClassroomsFacade);
 	private readonly router = inject(Router);
+	private readonly route = inject(ActivatedRoute);
 
 	readonly vm = this.facade.vm;
+
+	// #region Deep-link desde vista de curso
+	private readonly pendingHorarioId = signal<number | null>(null);
+
+	constructor() {
+		const qpHorarioId = Number(this.route.snapshot.queryParamMap.get('horarioId'));
+		if (qpHorarioId > 0) this.pendingHorarioId.set(qpHorarioId);
+
+		effect(() => {
+			const pending = this.pendingHorarioId();
+			const salones = this.vm().salones;
+			if (!pending || salones.length === 0) return;
+
+			const salon = salones.find((s) => s.cursos.some((c) => c.horarioId === pending));
+			this.pendingHorarioId.set(null);
+			if (salon) this.onVerSalon(salon);
+		});
+	}
+	// #endregion
 
 	ngOnInit(): void {
 		this.facade.loadData();

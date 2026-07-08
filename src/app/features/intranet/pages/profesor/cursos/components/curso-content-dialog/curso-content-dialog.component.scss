@@ -38,6 +38,41 @@
 }
 
 // #endregion
+
+// #region Tabs header row
+.tabs-header-row {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	gap: 1rem;
+}
+
+.tabs-header-links {
+	display: flex;
+	align-items: center;
+	gap: 1rem;
+	flex-shrink: 0;
+}
+
+.ver-asistencia-link {
+	display: flex;
+	align-items: center;
+	gap: 0.4rem;
+	flex-shrink: 0;
+	border: none;
+	background: transparent;
+	color: #16a34a;
+	font-size: 0.9rem;
+	font-weight: 600;
+	cursor: pointer;
+	padding: 0.25rem 0.5rem;
+
+	&:hover {
+		text-decoration: underline;
+	}
+}
+
+// #endregion
 // #region Fullscreen toggle
 .dialog-header-custom {
 	display: flex;

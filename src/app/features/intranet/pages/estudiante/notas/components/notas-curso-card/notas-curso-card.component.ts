@@ -1,4 +1,4 @@
-import { Component, ChangeDetectionStrategy, computed, input, signal } from '@angular/core';
+import { Component, ChangeDetectionStrategy, computed, effect, input, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { TagModule } from 'primeng/tag';
 import { AccordionModule } from 'primeng/accordion';
@@ -30,6 +30,16 @@ export class NotasCursoCardComponent {
 
 	readonly openPanels = signal<number[]>([]);
 
+	constructor() {
+		// Expande todos los períodos por defecto para que la nota real sea visible sin clics extra.
+		effect(() => {
+			const groups = this.periodoGroups();
+			if (groups.length > 0 && this.openPanels().length === 0) {
+				this.openPanels.set(groups.map((g) => g.periodo.id));
+			}
+		});
+	}
+
 	readonly promedioGeneral = computed(() => this.curso().promedios.general);
 
 	readonly promedioSeverity = computed(() =>
@@ -38,6 +48,19 @@ export class NotasCursoCardComponent {
 
 	readonly periodoGroups = computed<PeriodoGroup[]>(() => {
 		const curso = this.curso();
+
+		// Curso sin períodos configurados: agrupar todas las evaluaciones bajo un único bloque "General".
+		if (curso.periodos.length === 0) {
+			if (curso.evaluaciones.length === 0) return [];
+			return [
+				{
+					periodo: { id: -1, nombre: 'General', orden: 0, semanaInicio: 0, semanaFin: 0 },
+					promedio: curso.promedios.general,
+					evaluaciones: curso.evaluaciones,
+				},
+			];
+		}
+
 		const periodos = [...curso.periodos].sort((a, b) => a.orden - b.orden);
 		const promedioMap = new Map(
 			curso.promedios.porPeriodo.map((p) => [p.periodoNombre, p.promedio]),

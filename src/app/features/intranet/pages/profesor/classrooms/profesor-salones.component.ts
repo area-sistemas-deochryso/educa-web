@@ -1,6 +1,6 @@
-import { Component, ChangeDetectionStrategy, inject, OnInit } from '@angular/core';
+import { Component, ChangeDetectionStrategy, inject, effect, signal, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { Router } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { TagModule } from 'primeng/tag';
 import { TooltipModule } from 'primeng/tooltip';
 import { ProgressSpinnerModule } from 'primeng/progressspinner';
@@ -34,6 +34,7 @@ export class TeacherClassroomsComponent implements OnInit {
 	// #region Dependencias
 	private readonly facade = inject(ProfesorFacade);
 	private readonly router = inject(Router);
+	private readonly route = inject(ActivatedRoute);
 	readonly gruposFacade = inject(GruposFacade);
 	private readonly mensajeriaFacade = inject(SalonMensajeriaFacade);
 	readonly healthFacade = inject(HealthPermissionsFacade);
@@ -44,6 +45,27 @@ export class TeacherClassroomsComponent implements OnInit {
 	readonly gruposVm = this.gruposFacade.vm;
 	readonly healthVm = this.healthFacade.vm;
 	gruposCursoId: number | null = null;
+	// #endregion
+
+	// #region Deep-link desde vista de curso
+	private readonly pendingHorarioId = signal<number | null>(null);
+
+	constructor() {
+		const qpHorarioId = Number(this.route.snapshot.queryParamMap.get('horarioId'));
+		if (qpHorarioId > 0) this.pendingHorarioId.set(qpHorarioId);
+
+		effect(() => {
+			const pending = this.pendingHorarioId();
+			const horarios = this.vm().horarios;
+			const salones = this.vm().salonesConEstudiantes;
+			if (!pending || horarios.length === 0 || salones.length === 0) return;
+
+			const horario = horarios.find((h) => h.id === pending);
+			const salon = horario ? salones.find((s) => s.salonId === horario.salonId) : undefined;
+			this.pendingHorarioId.set(null);
+			if (salon) this.openSalonDialog(salon);
+		});
+	}
 	// #endregion
 
 	ngOnInit(): void {
