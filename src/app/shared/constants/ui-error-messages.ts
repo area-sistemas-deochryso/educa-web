@@ -188,4 +188,14 @@ export const UI_ERROR_CODES: Record<string, string> = {
 	DUPLICATE_RESOURCE: 'Ya existe un registro con esos datos.',
 };
 
+/**
+ * Mapeo de errorCode del backend → acción correctiva accionable en el toast
+ * (botón con navegación). Solo para códigos donde el usuario puede resolver
+ * el problema navegando a otra pantalla — no todos los errorCode aplican.
+ */
+export const UI_ERROR_CODE_ACTIONS: Record<string, { label: string; route: string }> = {
+	INV_AS01_TUTOR_PLENO: { label: 'Ir a Usuarios', route: '/intranet/admin/usuarios' },
+	INV_AS02_PROFESOR_CURSO: { label: 'Ir a Usuarios', route: '/intranet/admin/usuarios' },
+};
+
 // #endregion

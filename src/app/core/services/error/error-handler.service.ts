@@ -11,11 +11,13 @@ import { Injectable, computed, inject, signal } from '@angular/core';
 
 import { ErrorReporterService } from './error-reporter.service';
 import { HttpErrorResponse } from '@angular/common/http';
+import { Router } from '@angular/router';
 import { logger, parseProblemDetails } from '@core/helpers';
 import { RateLimitCountdownService } from '@core/services/rate-limit-countdown';
 import { RequestTraceFacade } from '@core/services/trace';
 import {
 	UI_CLIENT_ERROR_MESSAGE,
+	UI_ERROR_CODE_ACTIONS,
 	UI_ERROR_CODES,
 	UI_ERROR_SUMMARIES,
 	UI_GENERIC_MESSAGES,
@@ -32,6 +34,7 @@ export class ErrorHandlerService {
 	private readonly errorReporter = inject(ErrorReporterService);
 	private readonly trace = inject(RequestTraceFacade);
 	private readonly rateLimitCountdown = inject(RateLimitCountdownService);
+	private readonly router = inject(Router);
 
 	// Estado con Signals
 	private readonly _errors = signal<AppError[]>([]);
@@ -88,16 +91,21 @@ export class ErrorHandlerService {
 			context: { ...context, httpDetails: details },
 		});
 
+		const errorCode = error.error?.errorCode as string | undefined;
+		const actionCfg = errorCode ? UI_ERROR_CODE_ACTIONS[errorCode] : undefined;
+
 		this.showNotification({
 			severity: 'error',
 			summary: UI_ERROR_SUMMARIES.connection,
 			detail: displayMessage,
 			life: error.status === 401 ? 3000 : 5000,
+			action: actionCfg
+				? { label: actionCfg.label, callback: () => this.router.navigate([actionCfg.route]) }
+				: undefined,
 		});
 
 		// Report errors to backend with breadcrumbs + reproduction context
 		if (error.status >= 400) {
-			const errorCode = error.error?.errorCode as string | undefined;
 			const correlationId = (context?.['requestId'] as string) ?? undefined;
 			this.errorReporter.reportHttpError(
 				error.status, error.url ?? '', method, errorCode, correlationId,
