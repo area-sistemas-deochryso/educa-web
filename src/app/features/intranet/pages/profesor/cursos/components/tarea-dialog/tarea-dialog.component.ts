@@ -77,6 +77,7 @@ import { CursoContenidoTareaDto, CrearTareaRequest, ActualizarTareaRequest } fro
 						<p-datepicker
 							id="tareaFecha"
 							[(ngModel)]="fechaLimite"
+							[minDate]="minFechaLimite"
 							[showIcon]="true"
 							[showButtonBar]="true"
 							dateFormat="dd/mm/yy"
@@ -187,6 +188,8 @@ export class TareaDialogComponent implements OnChanges {
 	descripcion = '';
 	fechaLimite: Date | null = null;
 	esGrupal = false;
+	/** Solo se acota al crear una tarea nueva — editar una tarea ya vencida sigue permitido. */
+	minFechaLimite: Date | null = null;
 
 	ngOnChanges(changes: SimpleChanges): void {
 		if (changes['tarea'] || changes['visible']) {
@@ -197,11 +200,13 @@ export class TareaDialogComponent implements OnChanges {
 					this.descripcion = t.descripcion ?? '';
 					this.fechaLimite = t.fechaLimite ? new Date(t.fechaLimite) : null;
 					this.esGrupal = t.esGrupal;
+					this.minFechaLimite = null;
 				} else {
 					this.titulo = '';
 					this.descripcion = '';
 					this.fechaLimite = null;
 					this.esGrupal = false;
+					this.minFechaLimite = new Date();
 				}
 			}
 		}

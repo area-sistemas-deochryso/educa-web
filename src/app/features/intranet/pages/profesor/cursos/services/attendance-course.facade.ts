@@ -118,17 +118,19 @@ export class AttendanceCourseFacade {
 			})),
 		};
 
+		this.store.setRegistroSaving(true);
+
+		// server-confirmed (no WAL/optimistic queue): un 400 de validación de fecha/horario
+		// debe mostrar toast inmediato, igual que Calificaciones — no encolarse silenciosamente
+		// en "Operaciones pendientes". Ver brief 418 F2.
 		this.wal.execute({
 			operation: 'CREATE',
 			resourceType: 'asistenciaCurso',
 			endpoint: `${this.apiUrl}/horario/${horarioId}/registrar`,
 			method: 'POST',
 			payload: dto,
+			consistencyLevel: 'server-confirmed',
 			http$: () => this.api.registrarAsistenciaCurso(horarioId, dto),
-			optimistic: {
-				apply: () => this.store.setRegistroSaving(true),
-				rollback: () => this.store.setRegistroSaving(false),
-			},
 			onCommit: () => {
 				this.store.setRegistroSaving(false);
 				this.errorHandler.showSuccess(UI_SUMMARIES.success, UI_ASISTENCIA_SUCCESS_MESSAGES.registered);
@@ -136,6 +138,10 @@ export class AttendanceCourseFacade {
 			onError: (err) => {
 				this.errHandler.handle(err, 'registrar asistencia');
 				this.store.setRegistroSaving(false);
+			},
+			optimistic: {
+				apply: () => {},
+				rollback: () => {},
 			},
 		});
 	}

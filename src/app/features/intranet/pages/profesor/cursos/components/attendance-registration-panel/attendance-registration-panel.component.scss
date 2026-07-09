@@ -27,6 +27,22 @@
 	flex-wrap: wrap;
 	gap: 0.5rem;
 }
+
+.fecha-fuera-horario-warning {
+	display: flex;
+	align-items: center;
+	gap: 0.5rem;
+	padding: 0.5rem 0.75rem;
+	margin-bottom: 1rem;
+	border-radius: 6px;
+	background: var(--yellow-50, #fffbeb);
+	color: var(--yellow-700, #b45309);
+	font-size: 0.85rem;
+
+	i {
+		font-size: 0.9rem;
+	}
+}
 // #endregion
 
 // #region Loading

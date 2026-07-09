@@ -126,7 +126,7 @@
 					<div class="chat-header-name">{{ vm().detalle?.asunto }}</div>
 					@if (vm().detalle; as detalle) {
 						<div class="chat-header-participants">
-							{{ detalle.participantes.length }} participantes
+							{{ detalle.participantes?.length ?? 0 }} participantes
 						</div>
 					}
 				</div>

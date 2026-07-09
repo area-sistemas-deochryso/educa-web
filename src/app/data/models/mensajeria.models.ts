@@ -17,7 +17,9 @@ export interface ConversacionDetalleDto {
 	asunto: string;
 	creadorDni: string;
 	fechaCreacion: string;
-	participantes: ParticipanteDto[];
+	// Optional: el GET inmediatamente posterior a crear una conversación puede no
+	// traer los participantes todavía poblados (race en backend). Ver brief 418 F1.
+	participantes?: ParticipanteDto[];
 	mensajes: MensajeDto[];
 }
 

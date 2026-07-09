@@ -89,6 +89,9 @@ export class TeacherClassroomsComponent implements OnInit {
 		this.facade.openSalonDialog(salon);
 		this.gruposCursoId = null;
 		this.gruposFacade.resetGrupos();
+		// "Grupos" es la tab inicial del modal — (gruposTabActivated) del tab-view solo
+		// emite en cambio de tab, nunca en el render inicial de la tab ya activa. Ver brief 418 F6.
+		this.onGruposTabActivated();
 	}
 
 	onDialogVisibleChange(visible: boolean): void {

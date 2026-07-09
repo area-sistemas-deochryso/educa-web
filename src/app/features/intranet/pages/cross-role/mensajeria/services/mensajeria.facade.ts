@@ -56,6 +56,11 @@ export class SalonMensajeriaFacade {
 		this.signalR.nuevoMensaje$
 			.pipe(takeUntilDestroyed(this.destroyRef))
 			.subscribe((mensaje) => {
+				// Mensajes propios ya se aplican vía el onCommit del POST (WAL) —
+				// el eco de SignalR llega con un id que no matchea el tempId optimista
+				// y duplicaba la burbuja. Ver brief 418 F5.
+				if (mensaje.remitenteDni === this.auth.currentUser?.dni) return;
+
 				const localMensaje: MensajeDto = {
 					id: mensaje.id,
 					remitenteDni: mensaje.remitenteDni,
@@ -212,6 +217,7 @@ export class SalonMensajeriaFacade {
 
 	/** Create conversation with WAL → multi-step: create then load detail. */
 	crearConversacion(dto: CrearConversacionDto): void {
+		if (this.store.sending()) return;
 		this.store.setSending(true);
 
 		this.wal.execute({

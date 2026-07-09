@@ -41,6 +41,9 @@ export class AttendanceRegistrationPanelComponent {
 		tardes: 0,
 		faltas: 0,
 	});
+	/** día de semana (0=domingo, 1=lunes...5=viernes) esperado según el horario del curso — null si no aplica. */
+	readonly diaSemanaEsperado = input<number | null>(null);
+	readonly diaSemanaEsperadoDescripcion = input<string | null>(null);
 	// #endregion
 
 	// #region Outputs
@@ -81,6 +84,13 @@ export class AttendanceRegistrationPanelComponent {
 
 	onSave(): void {
 		this.save.emit();
+	}
+
+	/** Advertencia no-bloqueante: la fecha elegida no cae en el día de horario del curso. */
+	fechaFueraDeHorario(): boolean {
+		const dia = this.diaSemanaEsperado();
+		if (dia === null) return false;
+		return this.selectedDate.getDay() !== dia;
 	}
 	// #endregion
 

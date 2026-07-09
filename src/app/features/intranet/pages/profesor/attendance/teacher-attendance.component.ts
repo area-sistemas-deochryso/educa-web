@@ -152,6 +152,8 @@ import { EstadoAsistenciaCurso } from '../models';
 									[loading]="asistenciaVm().registroLoading"
 									[saving]="asistenciaVm().registroSaving"
 									[stats]="asistenciaVm().registroStats"
+									[diaSemanaEsperado]="selectedHorarioDiaSemana()"
+									[diaSemanaEsperadoDescripcion]="selectedHorarioDiaDescripcion()"
 									(fechaChange)="onFechaChange($event)"
 									(estadoChange)="onEstadoChange($event)"
 									(justificacionChange)="onJustificacionChange($event)"
@@ -210,6 +212,17 @@ export class TeacherAttendanceComponent implements OnInit, OnDestroy {
 
 		return options.sort((a, b) => a.label.localeCompare(b.label));
 	});
+
+	private readonly selectedHorario = computed(() => {
+		const id = this.selectedHorarioId();
+		if (!id) return null;
+		return this.facade.vm().horarios.find((h) => h.id === id) ?? null;
+	});
+
+	readonly selectedHorarioDiaSemana = computed(() => this.selectedHorario()?.diaSemana ?? null);
+	readonly selectedHorarioDiaDescripcion = computed(
+		() => this.selectedHorario()?.diaSemanaDescripcion ?? null,
+	);
 	// #endregion
 
 	// #region Lifecycle

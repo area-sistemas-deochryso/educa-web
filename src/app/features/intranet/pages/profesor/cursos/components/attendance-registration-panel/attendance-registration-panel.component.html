@@ -32,6 +32,15 @@
 		</div>
 	}
 </div>
+
+@if (fechaFueraDeHorario()) {
+	<div class="fecha-fuera-horario-warning">
+		<i class="pi pi-exclamation-triangle"></i>
+		<span>
+			La fecha elegida no corresponde al día de horario del curso ({{ diaSemanaEsperadoDescripcion() }}).
+		</span>
+	</div>
+}
 <!-- #endregion -->
 
 <!-- #region Loading -->
