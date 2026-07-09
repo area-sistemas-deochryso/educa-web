@@ -82,7 +82,11 @@
 							<div class="mobile-card-header">
 								<span class="mobile-card-curso">{{ block.cursoNombre }}</span>
 								@if (countdownMap().get(block.id); as cd) {
-									<span class="countdown-badge" [ngClass]="'countdown-' + cd.urgency">
+									<span
+										class="countdown-badge"
+										[ngClass]="'countdown-' + cd.urgency"
+										title="Tiempo restante para la próxima sesión de este curso"
+									>
 										<i class="pi pi-clock"></i>
 										{{ cd.label }}
 									</span>
@@ -143,7 +147,11 @@
 													{{ block.cantidadEstudiantes }}
 												</div>
 												@if (countdownMap().get(block.id); as cd) {
-													<div class="countdown-badge" [ngClass]="'countdown-' + cd.urgency">
+													<div
+														class="countdown-badge"
+														[ngClass]="'countdown-' + cd.urgency"
+														title="Tiempo restante para la próxima sesión de este curso"
+													>
 														<i class="pi pi-clock"></i>
 														{{ cd.label }}
 													</div>

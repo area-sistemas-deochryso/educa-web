@@ -1,5 +1,6 @@
 import { Component, ChangeDetectionStrategy, computed, input, output } from '@angular/core';
 import { CommonModule, SlicePipe } from '@angular/common';
+import { RouterLink } from '@angular/router';
 import { TableModule } from 'primeng/table';
 import { TagModule } from 'primeng/tag';
 import { Select } from 'primeng/select';
@@ -35,6 +36,7 @@ interface SemanaColumnsGroup {
 	imports: [
 		CommonModule,
 		SlicePipe,
+		RouterLink,
 		TableModule,
 		TagModule,
 		Select,

@@ -3,6 +3,7 @@ import { NavMenuItem } from '@intranet-shared/components/layout/intranet-layout/
 import { environment } from '@config/environment';
 import { ModuloId, MODULOS } from '@shared/constants';
 import { CapabilityCode } from '@shared/types';
+import { UserRole } from '@core/services/auth';
 
 // #endregion
 
@@ -58,7 +59,7 @@ export const MENU_ITEMS: MenuItemDef[] = [
 	{ route: '/intranet/profesor/cursos', label: 'Mis Cursos', icon: 'pi pi-book', capability: 'PROFESOR_CURSOS', modulo: 'academico', featureFlag: 'profesor', group: { label: 'Mi Aula', icon: 'pi pi-graduation-cap' }, preview: 'course-cards', description: 'Contenido y materiales de tus cursos' },
 	{ route: '/intranet/profesor/salones', label: 'Mis Salones', icon: 'pi pi-building', capability: 'PROFESOR_SALONES', modulo: 'academico', featureFlag: 'profesor', group: { label: 'Mi Aula', icon: 'pi pi-graduation-cap' }, preview: 'salon-tabs', description: 'Ver los salones asignados' },
 	{ route: '/intranet/profesor/horarios', label: 'Mi Horario', icon: 'pi pi-clock', capability: 'PROFESOR_HORARIOS', modulo: 'academico', featureFlag: 'profesor', group: { label: 'Mi Aula', icon: 'pi pi-graduation-cap' }, preview: 'week-schedule', description: 'Ver tu horario semanal de clases' },
-	{ route: '/intranet/profesor/final-salones', label: 'Administrar Salones', icon: 'pi pi-th-large', capability: 'PROFESOR_FINAL_SALONES', modulo: 'academico', featureFlag: 'profesor', group: { label: 'Mi Aula', icon: 'pi pi-graduation-cap' }, preview: 'admin-table', description: 'Administrar salones del profesor' },
+	{ route: '/intranet/profesor/final-salones', label: 'Notas y Asistencia', icon: 'pi pi-th-large', capability: 'PROFESOR_FINAL_SALONES', modulo: 'academico', featureFlag: 'profesor', group: { label: 'Mi Aula', icon: 'pi pi-graduation-cap' }, preview: 'admin-table', description: 'Aprobación, asistencia y notas por salón' },
 	// Estudiante — agrupados bajo "Mi Aula"
 	{ route: '/intranet/estudiante/cursos', label: 'Mis Cursos', icon: 'pi pi-book', capability: 'ESTUDIANTE_CURSOS', modulo: 'academico', featureFlag: 'estudiante', group: { label: 'Mi Aula', icon: 'pi pi-graduation-cap' }, preview: 'course-cards', description: 'Contenido y materiales de tus cursos' },
 	{ route: '/intranet/estudiante/salones', label: 'Mis Salones', icon: 'pi pi-building', capability: 'ESTUDIANTE_SALONES', modulo: 'academico', featureFlag: 'estudiante', group: { label: 'Mi Aula', icon: 'pi pi-graduation-cap' }, preview: 'salon-tabs', description: 'Ver tus salones asignados' },
@@ -109,17 +110,33 @@ export const MENU_ITEMS: MenuItemDef[] = [
 ];
 // #endregion
 
+/**
+ * Override de label por rol para ítems compartidos entre roles con responsabilidades distintas
+ * (ej. "Gestión (admin)" de asistencia significa cosas distintas para Asistente/Coordinador/Promotor).
+ * Solo cubre los casos detectados en la auditoría 417-F6; roles no listados usan el label base.
+ */
+const LABEL_OVERRIDE_POR_ROL: Partial<Record<CapabilityCode, Partial<Record<UserRole, string>>>> = {
+	ADMIN_ASISTENCIAS: {
+		'Asistente Administrativo': 'Gestión (secretaría)',
+		'Coordinador Académico': 'Gestión (académica)',
+		Promotor: 'Gestión (dirección)',
+	},
+};
+
 // #region Builder
-export function buildModuloMenus(userCapabilities: Set<string>): ModuloMenu[] {
+export function buildModuloMenus(userCapabilities: Set<string>, rol?: UserRole): ModuloMenu[] {
 	const hasPermisos = userCapabilities.size > 0;
 
 	const enabledItems = MENU_ITEMS.filter(
 		(item) => !item.featureFlag || environment.features[item.featureFlag],
 	);
 
-	const permittedItems = hasPermisos
-		? enabledItems.filter((item) => userCapabilities.has(item.capability))
-		: enabledItems;
+	const permittedItems = (
+		hasPermisos ? enabledItems.filter((item) => userCapabilities.has(item.capability)) : enabledItems
+	).map((item) => {
+		const override = rol && LABEL_OVERRIDE_POR_ROL[item.capability]?.[rol];
+		return override ? { ...item, label: override } : item;
+	});
 
 	const itemsByModulo = new Map<ModuloId, MenuItemDef[]>();
 	for (const item of permittedItems) {

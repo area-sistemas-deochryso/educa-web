@@ -10,6 +10,7 @@ import { OfflineIndicatorComponent } from '@intranet-shared/components/offline-i
 import { FeedbackReportDialogComponent } from '@intranet-shared/components/feedback-report-dialog';
 import { FeedbackReportLauncherComponent } from '@intranet-shared/components/feedback-report-launcher';
 import { UserPermissionsService, SessionActivityService, KeyboardShortcutsService, FeedbackReportFacade } from '@core/services';
+import { AuthService } from '@core/services/auth';
 import {
 	NavItemComponent,
 	UserProfileMenuComponent,
@@ -70,6 +71,7 @@ function circularSlice<T>(items: T[], center: number, count: number): T[] {
 })
 export class IntranetLayoutComponent implements OnInit, OnDestroy {
 	private userPermissionsService = inject(UserPermissionsService);
+	private authService = inject(AuthService);
 	private destroyRef = inject(DestroyRef);
 	private flags = inject(FeatureFlagsFacade);
 	private sessionActivity = inject(SessionActivityService);
@@ -115,7 +117,7 @@ export class IntranetLayoutComponent implements OnInit, OnDestroy {
 			const loaded = this.userPermissionsService.loaded();
 			const caps = this.userPermissionsService.userCapabilities();
 			if (loaded) {
-				const modulos = buildModuloMenus(caps);
+				const modulos = buildModuloMenus(caps, this.authService.currentUser?.rol);
 				this._modulos.set(modulos);
 				const id = detectModuloFromUrl(this.router.url, modulos);
 				this.applySelection(id, modulos, this.router.url);
@@ -142,7 +144,10 @@ export class IntranetLayoutComponent implements OnInit, OnDestroy {
 		if (!this.userPermissionsService.loaded()) {
 			this.userPermissionsService.loadPermisos(this.destroyRef);
 		} else {
-			const modulos = buildModuloMenus(this.userPermissionsService.userCapabilities());
+			const modulos = buildModuloMenus(
+				this.userPermissionsService.userCapabilities(),
+				this.authService.currentUser?.rol,
+			);
 			this._modulos.set(modulos);
 			const id = detectModuloFromUrl(this.router.url, modulos);
 			this.applySelection(id, modulos, this.router.url);
