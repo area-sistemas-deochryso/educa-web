@@ -2,6 +2,7 @@ import { Injectable, inject, PLATFORM_ID } from '@angular/core';
 import { isPlatformBrowser } from '@angular/common';
 import { logger } from '@app/core/helpers';
 import { AttendanceMonthData } from './storage.models';
+import { SessionStorageService } from './session-storage.service';
 
 /**
  * Preferences storage for user settings that must persist across sessions.
@@ -77,6 +78,7 @@ export interface GradoSeccionPref {
 })
 export class PreferencesStorageService {
 	private platformId = inject(PLATFORM_ID);
+	private session = inject(SessionStorageService);
 
 	/**
 	 * True when running in the browser.
@@ -86,6 +88,19 @@ export class PreferencesStorageService {
 	 */
 	private get isBrowser(): boolean {
 		return isPlatformBrowser(this.platformId);
+	}
+
+	/**
+	 * Suffix that scopes a preference key to the logged-in user, so switching
+	 * accounts on the same browser (multi-sesión) doesn't leak one user's
+	 * favorites/prefs into another's.
+	 *
+	 * @example
+	 * this.getItem(`${PREFERENCES_KEYS.FAVORITE_ROUTES}${this.userScope}`);
+	 */
+	private get userScope(): string {
+		const user = this.session.getUser();
+		return user ? `_${user.rol}_${user.entityId}` : '';
 	}
 
 	// #region PRIVATE GENERIC HELPERS
@@ -450,11 +465,11 @@ export class PreferencesStorageService {
 	// #region QUICK ACCESS FAVORITES
 
 	getFavoriteRoutes(): string[] {
-		return this.getJSON<string[]>(PREFERENCES_KEYS.FAVORITE_ROUTES) ?? [];
+		return this.getJSON<string[]>(PREFERENCES_KEYS.FAVORITE_ROUTES + this.userScope) ?? [];
 	}
 
 	setFavoriteRoutes(routes: string[]): void {
-		this.setJSON(PREFERENCES_KEYS.FAVORITE_ROUTES, routes);
+		this.setJSON(PREFERENCES_KEYS.FAVORITE_ROUTES + this.userScope, routes);
 	}
 
 	// #endregion
@@ -614,7 +629,7 @@ export class PreferencesStorageService {
 		this.removeItem(PREFERENCES_KEYS.THEME);
 		this.removeItem(PREFERENCES_KEYS.SIDEBAR_COLLAPSED);
 		this.removeItem(PREFERENCES_KEYS.NOTIFICATIONS_SOUND);
-		this.removeItem(PREFERENCES_KEYS.FAVORITE_ROUTES);
+		this.removeItem(PREFERENCES_KEYS.FAVORITE_ROUTES + this.userScope);
 	}
 	// #endregion
 }
