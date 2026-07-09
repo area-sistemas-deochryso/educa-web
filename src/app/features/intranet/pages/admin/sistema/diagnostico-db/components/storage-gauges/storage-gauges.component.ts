@@ -1,9 +1,9 @@
-import { DecimalPipe } from '@angular/common';
 import { ChangeDetectionStrategy, Component, input, output } from '@angular/core';
-import { ButtonModule } from 'primeng/button';
-import { ProgressBarModule } from 'primeng/progressbar';
 
+import { ButtonModule } from 'primeng/button';
 import { DatabaseFileStatsDto } from '../../models/diagnostico-db.models';
+import { DecimalPipe } from '@angular/common';
+import { ProgressBarModule } from 'primeng/progressbar';
 
 @Component({
 	selector: 'app-storage-gauges',
@@ -25,8 +25,8 @@ export class StorageGaugesComponent {
 	}
 
 	getFillColor(fillPercent: number): string {
-		if (fillPercent >= 90) return 'var(--red-500)';
-		if (fillPercent >= 75) return 'var(--yellow-500)';
-		return 'var(--green-500)';
+		if (fillPercent >= 90) return 'var(--red-500, #ef4444)';
+		if (fillPercent >= 75) return 'var(--yellow-500, #eab308)';
+		return 'var(--green-500, #22c55e)';
 	}
 }
