@@ -33,11 +33,11 @@
 					<div class="mi-horas">
 						<div class="hora-item">
 							<span class="hora-label">Entrada</span>
-							<span class="hora-value">{{ m.horaEntrada ?? '—' }}</span>
+							<span class="hora-value">{{ m.horaEntrada | formatTime }}</span>
 						</div>
 						<div class="hora-item">
 							<span class="hora-label">Salida</span>
-							<span class="hora-value">{{ m.horaSalida ?? '—' }}</span>
+							<span class="hora-value">{{ m.horaSalida | formatTime }}</span>
 						</div>
 					</div>
 					<span class="estado-badge" [class]="miEstadoClass()">

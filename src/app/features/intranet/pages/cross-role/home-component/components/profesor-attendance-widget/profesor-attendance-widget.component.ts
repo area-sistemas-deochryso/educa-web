@@ -25,11 +25,17 @@ import {
 import { esGradoAsistenciaDiaria } from '@shared/constants';
 import { AttendanceScopeStudentNoticeComponent } from '@intranet-shared/components/attendance-scope-student-notice';
 import { SkeletonLoaderComponent } from '@shared/components';
+import { FormatTimePipe } from '@intranet-shared/pipes';
 
 @Component({
 	selector: 'app-profesor-attendance-widget',
 	standalone: true,
-	imports: [RouterLink, SkeletonLoaderComponent, AttendanceScopeStudentNoticeComponent],
+	imports: [
+		RouterLink,
+		SkeletonLoaderComponent,
+		AttendanceScopeStudentNoticeComponent,
+		FormatTimePipe,
+	],
 	changeDetection: ChangeDetectionStrategy.OnPush,
 	templateUrl: './profesor-attendance-widget.component.html',
 	styleUrl: './profesor-attendance-widget.component.scss',
