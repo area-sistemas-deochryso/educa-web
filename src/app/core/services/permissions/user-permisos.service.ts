@@ -96,7 +96,7 @@ export class UserPermissionsService {
 
 	// #region Load permissions
 
-	loadPermisos(destroyRef: DestroyRef): void {
+	loadPermisos(): void {
 		if (!this.authService.isAuthenticated) {
 			this.clear();
 			return;
@@ -190,10 +190,10 @@ export class UserPermissionsService {
 		this.storageService.clearPermisos();
 	}
 
-	reloadPermisos(destroyRef: DestroyRef): void {
+	reloadPermisos(): void {
 		this._loaded.set(false);
 		this._loading.set(false);
-		this.loadPermisos(destroyRef);
+		this.loadPermisos();
 	}
 
 	// #endregion

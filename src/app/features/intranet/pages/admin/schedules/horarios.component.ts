@@ -14,7 +14,6 @@ import { SchedulesImportDialogComponent } from './components/horarios-import-dia
 import { PageHeaderComponent, PeriodToggleComponent } from '@intranet-shared/components';
 import { type ImportarHorarioItem } from './helpers/horario-import.config';
 import {
-	type DiaSemana,
 	type EmptySlotClickEvent,
 	HorarioResponseDto,
 	type HorarioVistaType,

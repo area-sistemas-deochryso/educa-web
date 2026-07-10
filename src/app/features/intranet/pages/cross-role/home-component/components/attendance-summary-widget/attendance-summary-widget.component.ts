@@ -1,17 +1,17 @@
 import {
 	ChangeDetectionStrategy,
 	Component,
-	inject,
-	OnInit,
 	DestroyRef,
+	OnInit,
+	inject,
 	signal,
-	computed,
 } from '@angular/core';
-import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import { RouterLink } from '@angular/router';
-import { DirectorAttendanceApiService } from '@intranet-shared/services';
 import { EstadisticasRol, TipoPersona } from '@data/models';
+
+import { DirectorAttendanceApiService } from '@intranet-shared/services';
+import { RouterLink } from '@angular/router';
 import { SkeletonLoaderComponent } from '@shared/components';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
 interface RolDisplay {
 	tipoPersona: TipoPersona;

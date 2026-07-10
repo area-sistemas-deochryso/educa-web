@@ -5,7 +5,6 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { of, throwError } from 'rxjs';
 
 import { BaseCrudFacade, type BaseCrudFacadeConfig, type EstadisticaKeys, type PaginatedResult } from './base-crud.facade';
-import { WalCrudOps } from './wal-crud-ops';
 import { BaseCrudStore } from '@core/store';
 import { ErrorHandlerService, ActivityTrackerService } from '@core/services/error';
 import { SwService } from '@core/services/sw';

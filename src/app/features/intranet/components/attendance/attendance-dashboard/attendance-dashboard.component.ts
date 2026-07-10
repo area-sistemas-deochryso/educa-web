@@ -3,7 +3,7 @@ import { CommonModule } from '@angular/common';
 import { TooltipModule } from 'primeng/tooltip';
 import { SkeletonModule } from 'primeng/skeleton';
 import { firstValueFrom } from 'rxjs';
-import { EstadisticasMultiRolDia, EstadisticasRol, TipoPersona } from '@data/models';
+import { EstadisticasMultiRolDia, TipoPersona } from '@data/models';
 import { DirectorAttendanceApiService } from '@intranet-shared/services';
 import { logger } from '@core/helpers';
 

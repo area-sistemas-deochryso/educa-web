@@ -172,9 +172,19 @@ export class UsersComponent implements AfterViewInit {
 	}
 
 	onRefresh(): void { this.dataFacade.refresh(); }
-	onSearchChange(value: string): void { this.dataFacade.setSearchTerm(value); }
-	onFilterEstadoChange(value: boolean | null): void { this.dataFacade.setFilterEstado(value); }
-	onFilterSalonIdChange(value: number | null): void { this.dataFacade.setFilterSalonId(value); }
+
+	onSearchChange(value: string): void {
+		this.dataFacade.setSearchTerm(value);
+	}
+
+	onFilterEstadoChange(value: boolean | null): void {
+		this.dataFacade.setFilterEstado(value);
+	}
+
+	onFilterSalonIdChange(value: number | null): void {
+		this.dataFacade.setFilterSalonId(value);
+	}
+
 	onClearFilters(): void { this.dataFacade.clearFilters(); }
 	onLazyLoad(event: { page: number; pageSize: number }): void { this.dataFacade.loadPage(event.page, event.pageSize); }
 	// #endregion

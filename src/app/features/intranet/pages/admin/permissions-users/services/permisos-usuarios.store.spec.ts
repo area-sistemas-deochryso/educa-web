@@ -25,12 +25,12 @@ const mockMatrixRows: RolCapabilityMatrixRow[] = [
 const mockUsuario: UsuarioBusqueda = {
 	id: 10,
 	nombreCompleto: 'Juan Pérez',
-	rol: 'Director' as any,
+	rol: 'Director',
 };
 
 const mockUsuarios: UsuarioBusqueda[] = [
 	mockUsuario,
-	{ id: 20, nombreCompleto: 'María García', rol: 'Profesor' as any },
+	{ id: 20, nombreCompleto: 'María García', rol: 'Profesor' },
 ];
 
 const mockOverview: UsuarioCapabilityOverview = {

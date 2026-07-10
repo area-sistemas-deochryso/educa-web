@@ -14,7 +14,6 @@ import { SwService } from '@core/services/sw';
 const TOKEN_LIFETIME_MS = 3_600_000;    // 1 hour
 const REFRESH_TIMER_MS = 3_000_000;     // 50 min
 const RECHECK_INTERVAL_MS = 60_000;     // 60s
-const CROSS_TAB_COOLDOWN_MS = 120_000;  // 2 min
 // #endregion
 
 // #region Mocks

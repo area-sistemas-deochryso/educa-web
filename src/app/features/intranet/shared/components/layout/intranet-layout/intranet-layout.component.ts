@@ -142,7 +142,7 @@ export class IntranetLayoutComponent implements OnInit, OnDestroy {
 	ngOnInit(): void {
 		this.sessionActivity.start();
 		if (!this.userPermissionsService.loaded()) {
-			this.userPermissionsService.loadPermisos(this.destroyRef);
+			this.userPermissionsService.loadPermisos();
 		} else {
 			const modulos = buildModuloMenus(
 				this.userPermissionsService.userCapabilities(),
