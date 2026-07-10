@@ -58,17 +58,19 @@ export class CursosFacade extends BaseCrudFacade<Curso, CursoFormData, CursosEst
 		return this.api.getEstadisticas();
 	}
 
-	/** Override para cargar grados junto con items + stats */
+	/** Override para cargar grados + completitud académica (P84 F3) junto con items + stats */
 	protected override getLoadAllSources(): Record<string, Observable<unknown>> {
 		return {
 			...super.getLoadAllSources(),
 			grados: this.gradosApi.getGrados(),
+			completitud: this.api.getCompletitud(),
 		};
 	}
 
 	protected override applyLoadAllResult(result: Record<string, unknown>): void {
 		super.applyLoadAllResult(result);
 		this.store.setGrados(result['grados'] as never[]);
+		this.store.setCompletitud(result['completitud'] as never[]);
 	}
 	// #endregion
 

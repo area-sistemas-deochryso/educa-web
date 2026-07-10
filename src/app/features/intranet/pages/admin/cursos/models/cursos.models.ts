@@ -46,4 +46,20 @@ export interface CursosEstadisticas {
 	cursosActivos: number;
 	cursosInactivos: number;
 }
+
+/** Horario dentro de la completitud de un curso (P84 F1/F3) */
+export interface HorarioCompletitud {
+	modoAsignacion: string;
+	profesorNombre: string | null;
+	tieneConflicto: boolean;
+}
+
+/** Completitud académica de un curso: profesor asignado / horario creado / conflictos (P84 F1) */
+export interface CursoCompletitud {
+	cursoId: number;
+	tieneHorario: boolean;
+	tieneProfesorAsignado: boolean;
+	cantidadConflictos: number;
+	horarios: HorarioCompletitud[];
+}
 // #endregion

@@ -3,7 +3,7 @@ import { Injectable, signal, computed } from '@angular/core';
 import { BaseCrudStore } from '@core/store';
 import { detectarNivel, removeNivelPrefix, NIVEL_VISUAL_CONFIGS } from '@core/helpers';
 
-import { Curso, CursosEstadisticas, Grado, NivelGradoConfig } from '../models';
+import { Curso, CursoCompletitud, CursosEstadisticas, Grado, NivelGradoConfig } from '../models';
 
 // #region Interfaces
 interface GradoOption {
@@ -171,6 +171,21 @@ export class CursosStore extends BaseCrudStore<Curso, CursoFormData, CursosEstad
 	readonly isFormValid = computed(() => !!this.formData().nombre?.trim());
 	// #endregion
 
+	// #region Estado específico — Completitud académica (P84 F3)
+	private readonly _completitud = signal<CursoCompletitud[]>([]);
+
+	setCompletitud(completitud: CursoCompletitud[]): void {
+		this._completitud.set(completitud);
+	}
+
+	/** Mapa cursoId → completitud, para lookup O(1) desde la tabla */
+	readonly completitudPorCurso = computed(() => {
+		const map = new Map<number, CursoCompletitud>();
+		for (const c of this._completitud()) map.set(c.cursoId, c);
+		return map;
+	});
+	// #endregion
+
 	// #region Mutaciones específicas
 	/** Toggle boolean estado */
 	toggleCursoEstado(id: number): void {
@@ -238,6 +253,7 @@ export class CursosStore extends BaseCrudStore<Curso, CursoFormData, CursosEstad
 		page: this.page(),
 		pageSize: this.pageSize(),
 		totalRecords: this.totalRecords(),
+		completitudPorCurso: this.completitudPorCurso(),
 	}));
 
 	readonly uiVm = computed(() => ({

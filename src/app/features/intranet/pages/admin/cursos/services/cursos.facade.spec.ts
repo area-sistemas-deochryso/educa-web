@@ -10,7 +10,7 @@ import { CursosService } from './cursos.service';
 import { GradosService } from './grados.service';
 import { ErrorHandlerService, WalFacadeHelper, WalCrossTabRefetchService } from '@core/services';
 import type { DestroyRef } from '@angular/core';
-import { Curso, Grado, CursosEstadisticas } from '../models';
+import { Curso, Grado, CursosEstadisticas, CursoCompletitud } from '../models';
 
 // #endregion
 
@@ -27,6 +27,11 @@ const mockGrados: Grado[] = [
 
 const mockStats: CursosEstadisticas = { totalCursos: 2, cursosActivos: 1, cursosInactivos: 1 };
 
+const mockCompletitud: CursoCompletitud[] = [
+	{ cursoId: 1, tieneHorario: true, tieneProfesorAsignado: true, cantidadConflictos: 0, horarios: [] },
+	{ cursoId: 2, tieneHorario: false, tieneProfesorAsignado: false, cantidadConflictos: 0, horarios: [] },
+];
+
 function createMockApi() {
 	return {
 		getCursosPaginated: vi.fn().mockReturnValue(of({ data: mockCursos, page: 1, pageSize: 10, total: 2 })),
@@ -34,6 +39,7 @@ function createMockApi() {
 		crearCurso: vi.fn().mockReturnValue(of({ mensaje: 'ok' })),
 		actualizarCurso: vi.fn().mockReturnValue(of({ mensaje: 'ok' })),
 		eliminarCurso: vi.fn().mockReturnValue(of({ mensaje: 'ok' })),
+		getCompletitud: vi.fn().mockReturnValue(of(mockCompletitud)),
 	};
 }
 
@@ -105,12 +111,13 @@ describe('CursosFacade', () => {
 
 	// #region loadAll
 	describe('loadAll', () => {
-		it('should load cursos, stats, and grados into store', () => {
+		it('should load cursos, stats, grados, and completitud into store', () => {
 			facade.loadAll();
 
 			expect(store.items()).toEqual(mockCursos);
 			expect(store.estadisticas()).toEqual(mockStats);
 			expect(store.grados()).toEqual(mockGrados);
+			expect(store.completitudPorCurso().get(1)).toEqual(mockCompletitud[0]);
 			expect(store.loading()).toBe(false);
 		});
 	});

@@ -556,6 +556,13 @@
 		font-size: 0.9rem;
 	}
 
+	// Badges de completitud académica (P84 F3) - varios tags apilables por curso
+	.completitud-badges {
+		display: flex;
+		flex-wrap: wrap;
+		gap: 0.35rem;
+	}
+
 	// Botón de grados - transparente con borde
 	.grados-button {
 		background: transparent !important;
