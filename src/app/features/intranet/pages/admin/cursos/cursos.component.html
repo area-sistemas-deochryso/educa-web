@@ -137,6 +137,7 @@
 					<th style="width: 100px" pSortableColumn="estado">
 						ESTADO <p-sortIcon field="estado" />
 					</th>
+					<th style="width: 220px">COMPLETITUD</th>
 					<th style="width: 140px">ACCIONES</th>
 				</tr>
 			</ng-template>
@@ -177,6 +178,47 @@
 							[value]="curso.estado | estadoLabel"
 							[severity]="curso.estado | estadoSeverity"
 						/>
+					</td>
+					<td class="text-left">
+						<div class="completitud-badges">
+							@if (!vm().completitudPorCurso.get(curso.id)) {
+								<span class="text-muted">—</span>
+							} @else {
+								@let completitud = vm().completitudPorCurso.get(curso.id)!;
+								@if (
+									completitud.tieneHorario &&
+									completitud.tieneProfesorAsignado &&
+									completitud.cantidadConflictos === 0
+								) {
+									<p-tag value="Completo" severity="success" />
+								} @else {
+									@if (!completitud.tieneHorario) {
+										<p-tag
+											value="Sin horario"
+											severity="warn"
+											pTooltip="El curso no tiene ningún horario creado en Horarios"
+											tooltipPosition="top"
+										/>
+									}
+									@if (completitud.tieneHorario && !completitud.tieneProfesorAsignado) {
+										<p-tag
+											value="Sin profesor"
+											severity="warn"
+											pTooltip="Ningún horario de este curso tiene profesor asignado"
+											tooltipPosition="top"
+										/>
+									}
+									@if (completitud.cantidadConflictos > 0) {
+										<p-tag
+											[value]="completitud.cantidadConflictos + ' conflicto' + (completitud.cantidadConflictos > 1 ? 's' : '')"
+											severity="danger"
+											pTooltip="Conflictos de horario detectados — revisa Horarios para corregirlos"
+											tooltipPosition="top"
+										/>
+									}
+								}
+							}
+						</div>
 					</td>
 					<td>
 						<div class="actions">
@@ -230,7 +272,7 @@
 
 			<ng-template #emptymessage>
 				<tr>
-					<td colspan="5" class="empty-message">
+					<td colspan="6" class="empty-message">
 						<div class="empty-state">
 							<i class="pi pi-inbox"></i>
 							<p>No se encontraron cursos</p>

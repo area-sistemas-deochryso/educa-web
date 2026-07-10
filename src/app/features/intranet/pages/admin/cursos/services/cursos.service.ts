@@ -5,7 +5,7 @@ import { Observable } from 'rxjs';
 
 import { environment } from '@config/environment';
 import { PaginatedResponse } from '@shared/models';
-import { Curso, CrearCursoRequest, ActualizarCursoRequest, CursosEstadisticas } from '../models';
+import { Curso, CrearCursoRequest, ActualizarCursoRequest, CursosEstadisticas, CursoCompletitud } from '../models';
 import { ApiResponse } from '@shared/models';
 
 // #endregion
@@ -59,6 +59,17 @@ export class CursosService {
 
 	eliminarCurso(id: number): Observable<ApiResponse> {
 		return this.http.delete<ApiResponse>(`${this.apiUrl}/${id}/eliminar`);
+	}
+
+	/**
+	 * Completitud académica por curso (P84 F1): profesor asignado / horario creado / conflictos.
+	 * Sin `cursoIds`, el backend devuelve todos los cursos activos.
+	 */
+	getCompletitud(cursoIds?: number[]): Observable<CursoCompletitud[]> {
+		const params: Record<string, string> = {};
+		if (cursoIds?.length) params['cursoIds'] = cursoIds.join(',');
+
+		return this.http.get<CursoCompletitud[]>(`${this.apiUrl}/completitud`, { params });
 	}
 }
 // #endregion
