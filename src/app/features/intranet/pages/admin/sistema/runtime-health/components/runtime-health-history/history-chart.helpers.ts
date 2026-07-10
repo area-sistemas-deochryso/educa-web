@@ -1,4 +1,4 @@
-import { RuntimeHealthHistoryDto } from '../../models/runtime-health.models';
+import { HistoryTimeRange, RuntimeHealthHistoryDto } from '../../models/runtime-health.models';
 
 export interface MetricSummary {
 	label: string;
@@ -31,10 +31,10 @@ export const CHART_COLORS = {
 	pink: '#ec4899',
 } as const;
 
-export function buildDataset(label: string, data: number[], color: string, yAxisID = 'y') {
+export function buildDataset(label: string, points: { x: number; y: number }[], color: string, yAxisID = 'y') {
 	return {
 		label,
-		data,
+		data: points,
 		borderColor: color,
 		backgroundColor: color + '20',
 		borderWidth: 1.5,
@@ -45,8 +45,11 @@ export function buildDataset(label: string, data: number[], color: string, yAxis
 	};
 }
 
-export function formatTimestamp(ts: string): string {
-	const d = new Date(ts);
+export function formatAxisTick(ms: number, range: HistoryTimeRange): string {
+	const d = new Date(ms);
+	if (range === '24h' || range === '7d') {
+		return d.toLocaleString('es-PE', { day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit' });
+	}
 	return d.toLocaleTimeString('es-PE', { hour: '2-digit', minute: '2-digit' });
 }
 

@@ -22,6 +22,7 @@ import {
 	HistoryTimeRange,
 	PATTERN_LABEL,
 	PATTERN_SEVERITY,
+	resolveTimeRange,
 	RuntimeHealthHistoryDto,
 	SaturationPattern,
 	TIME_RANGE_OPTIONS,
@@ -33,7 +34,7 @@ import {
 	buildCorrelationMetrics,
 	buildDataset,
 	computeSummaries,
-	formatTimestamp,
+	formatAxisTick,
 } from './history-chart.helpers';
 
 Chart.register(...registerables);
@@ -127,9 +128,12 @@ export class RuntimeHealthHistoryComponent implements AfterViewInit {
 	}
 
 	// #region Chart creation
+	private toPoints(data: RuntimeHealthHistoryDto[], value: (d: RuntimeHealthHistoryDto) => number): { x: number; y: number }[] {
+		return data.map(d => ({ x: new Date(d.timestamp).getTime(), y: value(d) }));
+	}
+
 	private createCharts(data: RuntimeHealthHistoryDto[]): void {
 		this.destroyCharts();
-		const labels = data.map(d => formatTimestamp(d.timestamp));
 		const baseOpts = this.baseChartOptions();
 
 		const tp = this.threadPoolCanvas()?.nativeElement;
@@ -137,10 +141,9 @@ export class RuntimeHealthHistoryComponent implements AfterViewInit {
 			this.charts.push(new Chart(tp, {
 				type: 'line',
 				data: {
-					labels,
 					datasets: [
-						buildDataset('Workers busy', data.map(d => d.threadPool.workersBusy), CHART_COLORS.blue),
-						buildDataset('Cola pendiente', data.map(d => d.threadPool.queueLength), CHART_COLORS.orange),
+						buildDataset('Workers busy', this.toPoints(data, d => d.threadPool.workersBusy), CHART_COLORS.blue),
+						buildDataset('Cola pendiente', this.toPoints(data, d => d.threadPool.queueLength), CHART_COLORS.orange),
 					],
 				},
 				options: baseOpts,
@@ -152,11 +155,10 @@ export class RuntimeHealthHistoryComponent implements AfterViewInit {
 			this.charts.push(new Chart(rq, {
 				type: 'line',
 				data: {
-					labels,
 					datasets: [
-						buildDataset('p50', data.map(d => d.requests.p50Ms), CHART_COLORS.green),
-						buildDataset('p95', data.map(d => d.requests.p95Ms), CHART_COLORS.yellow),
-						buildDataset('p99', data.map(d => d.requests.p99Ms), CHART_COLORS.red),
+						buildDataset('p50', this.toPoints(data, d => d.requests.p50Ms), CHART_COLORS.green),
+						buildDataset('p95', this.toPoints(data, d => d.requests.p95Ms), CHART_COLORS.yellow),
+						buildDataset('p99', this.toPoints(data, d => d.requests.p99Ms), CHART_COLORS.red),
 					],
 				},
 				options: {
@@ -174,12 +176,11 @@ export class RuntimeHealthHistoryComponent implements AfterViewInit {
 			this.charts.push(new Chart(gc, {
 				type: 'line',
 				data: {
-					labels,
 					datasets: [
-						buildDataset('Heap', data.map(d => d.gc.heapMb), CHART_COLORS.blue, 'y'),
-						buildDataset('Gen0', data.map(d => d.gc.gen0), CHART_COLORS.green, 'y1'),
-						buildDataset('Gen1', data.map(d => d.gc.gen1), CHART_COLORS.yellow, 'y1'),
-						buildDataset('Gen2', data.map(d => d.gc.gen2), CHART_COLORS.red, 'y1'),
+						buildDataset('Heap', this.toPoints(data, d => d.gc.heapMb), CHART_COLORS.blue, 'y'),
+						buildDataset('Gen0', this.toPoints(data, d => d.gc.gen0), CHART_COLORS.green, 'y1'),
+						buildDataset('Gen1', this.toPoints(data, d => d.gc.gen1), CHART_COLORS.yellow, 'y1'),
+						buildDataset('Gen2', this.toPoints(data, d => d.gc.gen2), CHART_COLORS.red, 'y1'),
 					],
 				},
 				options: {
@@ -206,18 +207,25 @@ export class RuntimeHealthHistoryComponent implements AfterViewInit {
 			return;
 		}
 
-		const labels = data.map(d => formatTimestamp(d.timestamp));
 		const dataGroups = [
-			[data.map(d => d.threadPool.workersBusy), data.map(d => d.threadPool.queueLength)],
-			[data.map(d => d.requests.p50Ms), data.map(d => d.requests.p95Ms), data.map(d => d.requests.p99Ms)],
-			[data.map(d => d.gc.heapMb), data.map(d => d.gc.gen0), data.map(d => d.gc.gen1), data.map(d => d.gc.gen2)],
+			[this.toPoints(data, d => d.threadPool.workersBusy), this.toPoints(data, d => d.threadPool.queueLength)],
+			[this.toPoints(data, d => d.requests.p50Ms), this.toPoints(data, d => d.requests.p95Ms), this.toPoints(data, d => d.requests.p99Ms)],
+			[this.toPoints(data, d => d.gc.heapMb), this.toPoints(data, d => d.gc.gen0), this.toPoints(data, d => d.gc.gen1), this.toPoints(data, d => d.gc.gen2)],
 		];
 
+		const { from, to } = resolveTimeRange(this.timeRange());
+		const fromMs = from.getTime();
+		const toMs = to.getTime();
+
 		this.charts.forEach((chart, i) => {
-			chart.data.labels = labels;
-			dataGroups[i].forEach((values, j) => {
+			const xScale = chart.options.scales?.['x'];
+			if (xScale) {
+				xScale.min = fromMs;
+				xScale.max = toMs;
+			}
+			dataGroups[i].forEach((points, j) => {
 				if (chart.data.datasets[j]) {
-					chart.data.datasets[j].data = values;
+					chart.data.datasets[j].data = points;
 				}
 			});
 			chart.update('none');
@@ -236,6 +244,8 @@ export class RuntimeHealthHistoryComponent implements AfterViewInit {
 			.getPropertyValue('--text-color-secondary').trim() || '#94a3b8';
 		const gridColor = getComputedStyle(document.documentElement)
 			.getPropertyValue('--surface-300').trim() || '#e2e8f0';
+		const { from, to } = resolveTimeRange(this.timeRange());
+		const range = this.timeRange();
 		return {
 			responsive: true,
 			maintainAspectRatio: false,
@@ -252,7 +262,14 @@ export class RuntimeHealthHistoryComponent implements AfterViewInit {
 			},
 			scales: {
 				x: {
-					ticks: { color: textColor, maxTicksLimit: 10 },
+					type: 'linear',
+					min: from.getTime(),
+					max: to.getTime(),
+					ticks: {
+						color: textColor,
+						maxTicksLimit: 10,
+						callback: (v: string | number) => formatAxisTick(Number(v), range),
+					},
 					grid: { color: gridColor },
 				},
 				y: {
