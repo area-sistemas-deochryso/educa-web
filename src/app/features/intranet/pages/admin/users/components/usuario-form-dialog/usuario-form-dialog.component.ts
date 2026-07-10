@@ -3,6 +3,7 @@ import { SalonListDto } from '@features/intranet/pages/admin/schedules/models/sa
 import { CursoListaDto } from '@features/intranet/pages/admin/schedules/models/curso.interface';
 import { type ProfesorCursoListaDto } from '@data/models';
 import { resolveModoAsignacion } from '@data/models';
+import { ModoAsignacionBadgeComponent, getModoAsignacionTooltip } from '@shared/components';
 import {
 	ActualizarUsuarioRequest,
 	CrearUsuarioRequest,
@@ -44,7 +45,6 @@ import { PasswordModule } from 'primeng/password';
 import { SelectModule } from 'primeng/select';
 import { Tab, TabList, TabPanel, Tabs } from 'primeng/tabs';
 import { TableModule } from 'primeng/table';
-import { TagModule } from 'primeng/tag';
 import { TooltipModule } from 'primeng/tooltip';
 import { ToggleSwitch } from 'primeng/toggleswitch';
 import { UppercaseInputDirective } from '@intranet-shared/directives';
@@ -76,7 +76,7 @@ export interface FormValidationErrors {
 		MultiSelectModule,
 		SelectModule,
 		Tabs, TabList, Tab, TabPanel,
-		TagModule,
+		ModoAsignacionBadgeComponent,
 		TooltipModule,
 		ToggleSwitch,
 		PasswordModule,
@@ -326,6 +326,8 @@ export class UserFormDialogComponent {
 		const newSalones = current.filter((s) => s.salonId !== salonId);
 		this.fieldChange.emit({ field: 'salones', value: newSalones.length > 0 ? newSalones : undefined });
 	}
+
+	readonly modoTooltipFor = getModoAsignacionTooltip;
 
 	// Toggle tutor de un salón en la lista del profesor (solo aplica en modo Flexible — TutorPleno y PorCurso no muestran el control)
 	onToggleTutor(salonId: number, esTutor: boolean): void {

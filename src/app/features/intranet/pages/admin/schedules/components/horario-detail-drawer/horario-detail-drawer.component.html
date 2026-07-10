@@ -134,16 +134,11 @@
 						</div>
 					}
 
-					@if (modoLabel()) {
+					@if (modoAsignacion()) {
 						<div class="info-item full-width">
 							<label>Modo de asignación</label>
 							<div class="info-value">
-								<p-tag
-									[value]="modoLabel()!"
-									styleClass="tag-neutral"
-									[pTooltip]="modoTooltip()"
-									tooltipPosition="top"
-								/>
+								<app-modo-asignacion-badge [modo]="modoAsignacion()" />
 							</div>
 						</div>
 					}

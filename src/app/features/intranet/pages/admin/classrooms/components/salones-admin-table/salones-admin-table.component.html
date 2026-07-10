@@ -35,10 +35,7 @@
 			<td>{{ salon.grado }}</td>
 			<td>{{ salon.seccion }}</td>
 			<td class="text-center">
-				<p-tag
-					[value]="getModoLabel(getModoAsignacion(salon))"
-					styleClass="tag-neutral"
-				/>
+				<app-modo-asignacion-badge [modo]="getModoAsignacion(salon)" />
 			</td>
 			<td>{{ salon.sede }}</td>
 			<td>{{ salon.tutorNombre || '—' }}</td>

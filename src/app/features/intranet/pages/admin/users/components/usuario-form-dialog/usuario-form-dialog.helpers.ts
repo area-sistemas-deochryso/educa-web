@@ -54,22 +54,6 @@ export interface SalonAsignadoView {
 	salonNombre: string;
 	esTutor: boolean;
 	modo: ModoAsignacion;
-	modoLabel: string;
-	modoTooltip: string;
-}
-
-export function getModoLabel(modo: ModoAsignacion): string {
-	if (modo === 'TutorPleno') return 'Tutor pleno';
-	if (modo === 'PorCurso') return 'Por curso';
-	return 'Flexible';
-}
-
-export function getModoTooltip(modo: ModoAsignacion): string {
-	if (modo === 'TutorPleno')
-		return 'En salones hasta 4to de Primaria, el profesor asignado queda marcado como Tutor obligatoriamente.';
-	if (modo === 'PorCurso')
-		return 'En salones desde 5to de Primaria, la asignación se hace por curso en "Cursos que dicta".';
-	return 'Sección vacacional: sin restricciones de asignación.';
 }
 
 export function computeSalonesAsignados(
@@ -84,8 +68,6 @@ export function computeSalonesAsignados(
 			salonNombre: salon ? `${salon.grado} - ${formatSeccionLabel(salon.seccion)}` : `Salón #${a.salonId}`,
 			esTutor: a.esTutor,
 			modo,
-			modoLabel: getModoLabel(modo),
-			modoTooltip: getModoTooltip(modo),
 		};
 	});
 }
@@ -97,14 +79,12 @@ export function isSalonYaAsignado(salon: SalonListDto | null, asignaciones: Salo
 
 export interface ModoPreview {
 	modo: ModoAsignacion;
-	label: string;
-	tooltip: string;
 }
 
 export function computeModoPreview(salon: SalonListDto | null): ModoPreview | null {
 	if (!salon) return null;
 	const modo = resolveModoAsignacion(salon.gradoOrden, salon.seccion);
-	return { modo, label: getModoLabel(modo), tooltip: getModoTooltip(modo) };
+	return { modo };
 }
 
 // #endregion
