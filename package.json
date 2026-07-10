@@ -14,7 +14,7 @@
 		"bundle-check": "node --max_old_space_size=16384 ./node_modules/@angular/cli/bin/ng build --stats-json && node scripts/bundle-report.mjs --check",
 		"lint": "ng lint",
 		"lint:fix": "ng lint --fix",
-		"compodoc": "node -e \"fs.rmSync('documentacion', { recursive: true, force: true })\" && compodoc -p tsconfig.doc.json -s -w -o --port 8080",
+		"compodoc": "node -e \"fs.rmSync('documentation', { recursive: true, force: true })\" && compodoc -p tsconfig.doc.json -s -w -o --port 8080",
 		"start:prod": "node --max_old_space_size=8192 ./node_modules/@angular/cli/bin/ng serve --configuration production --port=4202",
 		"convert-images": "node scripts/convert-images.mjs",
 		"serve:ssr:educa-angular": "node dist/educa-angular/server/server.mjs",
