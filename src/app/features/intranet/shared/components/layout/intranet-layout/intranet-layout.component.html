@@ -43,6 +43,20 @@
 	</div>
 	<!-- #endregion -->
 
+	<!-- * Breadcrumb de sección activa (brief 428, P84 F6): Módulo › Grupo › Página. -->
+	@if (breadcrumb().length > 1) {
+		<div class="header-container active-section-breadcrumb desktop-header">
+			<nav aria-label="Sección activa">
+				@for (part of breadcrumb(); track $index; let last = $last) {
+					<span class="breadcrumb-part" [class.breadcrumb-part--current]="last">{{ part }}</span>
+					@if (!last) {
+						<i class="pi pi-angle-right breadcrumb-sep"></i>
+					}
+				}
+			</nav>
+		</div>
+	}
+
 	<!-- #region Mobile header -->
 	<div class="header-container mobile-header">
 		<a routerLink="/" class="logo-link">
@@ -65,6 +79,18 @@
 			(logoutClick)="logout()"
 		/>
 	</div>
+	@if (breadcrumb().length > 1) {
+		<div class="header-container active-section-breadcrumb mobile-only">
+			<nav aria-label="Sección activa">
+				@for (part of breadcrumb(); track $index; let last = $last) {
+					<span class="breadcrumb-part" [class.breadcrumb-part--current]="last">{{ part }}</span>
+					@if (!last) {
+						<i class="pi pi-angle-right breadcrumb-sep"></i>
+					}
+				}
+			</nav>
+		</div>
+	}
 	<!-- #endregion -->
 </header>
 
