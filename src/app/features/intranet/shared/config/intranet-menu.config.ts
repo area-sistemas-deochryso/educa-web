@@ -163,6 +163,21 @@ export function buildModuloMenus(userCapabilities: Set<string>, rol?: UserRole):
 	return result;
 }
 
+/**
+ * Dado un URL, encuentra el `MenuItemDef` cuyo `route` matchea (el más específico/largo).
+ * Fuente única para el breadcrumb de "sección activa" (brief 428, P84 F6) — evita que cada
+ * pantalla arme su propio indicador de ubicación.
+ */
+export function findMenuItemDefByUrl(url: string): MenuItemDef | undefined {
+	let best: MenuItemDef | undefined;
+	for (const item of MENU_ITEMS) {
+		if (item.route && url.startsWith(item.route)) {
+			if (!best || item.route.length > best.route.length) best = item;
+		}
+	}
+	return best;
+}
+
 /** Dado un URL, detecta a qué módulo pertenece. Retorna 'inicio' si no hay match. */
 export function detectModuloFromUrl(url: string, modulos: ModuloMenu[]): ModuloId {
 	for (const modulo of modulos) {

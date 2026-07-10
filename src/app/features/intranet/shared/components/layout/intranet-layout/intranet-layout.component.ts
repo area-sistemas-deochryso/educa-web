@@ -19,7 +19,8 @@ import {
 	NavMenuItem,
 } from './components';
 import { ModuloMenu, buildModuloMenus, detectModuloFromUrl } from './intranet-menu.config';
-import { ModuloId } from '@shared/constants';
+import { findMenuItemDefByUrl } from '@intranet-shared/config/intranet-menu.config';
+import { ModuloId, MODULOS } from '@shared/constants';
 import { FeatureFlagsFacade } from '@core/services/feature-flags';
 import { QuickAccessFavoritesService } from '@intranet-shared/services';
 import { AccessDeniedModalComponent } from '@intranet-shared/components/access-denied-modal';
@@ -91,6 +92,19 @@ export class IntranetLayoutComponent implements OnInit, OnDestroy {
 
 	private readonly _selectedModuloId = signal<ModuloId>('inicio');
 	readonly selectedModuloId = this._selectedModuloId.asReadonly();
+
+	// Brief 428 (P84 F6): breadcrumb de "sección activa" — Módulo › Grupo › Página.
+	// Único indicador consistente entre pantallas cuyo grupo de menú difiere (ej. Cursos/Horarios
+	// bajo "Administración" en Académico, Usuarios bajo "Gestión" en Sistema).
+	private readonly _currentUrl = signal('');
+	readonly breadcrumb = computed(() => {
+		const modulo = MODULOS[this._selectedModuloId()];
+		const item = findMenuItemDefByUrl(this._currentUrl());
+		const parts = [modulo.label];
+		if (item?.group) parts.push(item.group.label);
+		if (item) parts.push(item.label);
+		return parts;
+	});
 
 	// Todas las items del módulo seleccionado (sin recortar).
 	private readonly _allItems = computed((): NavMenuItem[] => {
@@ -196,6 +210,7 @@ export class IntranetLayoutComponent implements OnInit, OnDestroy {
 	// #region Helpers privados
 	private applySelection(id: ModuloId, modulos: ModuloMenu[], url: string): void {
 		this._selectedModuloId.set(id);
+		this._currentUrl.set(url);
 
 		const items = id === 'inicio' ? [] : (modulos.find((m) => m.id === id)?.items ?? []);
 		const navIdx = items.findIndex((i) => i.route && url.startsWith(i.route));

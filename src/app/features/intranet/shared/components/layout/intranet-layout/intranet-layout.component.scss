@@ -157,6 +157,40 @@ app-user-profile-menu {
 
 // (Module pills removed — replaced by app-module-selector component)
 
+// #region Active section breadcrumb (brief 428, P84 F6)
+.active-section-breadcrumb {
+	height: auto;
+	padding: 0.35rem 1.75rem;
+	border-top: 1px solid #e5e5e5;
+
+	nav {
+		display: flex;
+		align-items: center;
+		gap: 0.4rem;
+		flex-wrap: wrap;
+	}
+
+	.breadcrumb-part {
+		font-size: 0.75rem;
+		color: var(--text-color-secondary, #6b7280);
+
+		&--current {
+			font-weight: 600;
+			color: var(--intranet-default-text-color);
+		}
+	}
+
+	.breadcrumb-sep {
+		font-size: 0.65rem;
+		color: var(--text-color-secondary, #9ca3af);
+	}
+}
+
+.mobile-only {
+	display: none;
+}
+// #endregion
+
 // #region Content
 .intranet-content {
 	flex: 1;
@@ -214,6 +248,15 @@ app-user-profile-menu {
 
 	.mobile-header {
 		display: flex;
+	}
+
+	.mobile-only {
+		display: block;
+	}
+
+	.active-section-breadcrumb {
+		padding-left: 1rem;
+		padding-right: 1rem;
 	}
 
 	.logo {
