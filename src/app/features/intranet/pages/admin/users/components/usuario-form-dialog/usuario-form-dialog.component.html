@@ -267,14 +267,25 @@
 									@for (salon of salonesAsignados(); track salon.salonId) {
 										<div class="salon-row">
 											<span class="salon-nombre">{{ salon.salonNombre }}</span>
+											<p-tag
+												[value]="salon.modoLabel"
+												styleClass="tag-neutral"
+												[pTooltip]="salon.modoTooltip"
+												tooltipPosition="top"
+											/>
 											<div class="salon-actions">
-												<p-checkbox
-													[inputId]="'tutor-' + salon.salonId"
-													[binary]="true"
-													[ngModel]="salon.esTutor"
-													(ngModelChange)="onToggleTutor(salon.salonId, $event)"
-												/>
-												<label [for]="'tutor-' + salon.salonId" class="tutor-label">Tutor</label>
+												@if (salon.modo !== 'PorCurso') {
+													<p-checkbox
+														[inputId]="'tutor-' + salon.salonId"
+														[binary]="true"
+														[ngModel]="salon.esTutor"
+														[disabled]="salon.modo === 'TutorPleno'"
+														[pTooltip]="salon.modo === 'TutorPleno' ? salon.modoTooltip : ''"
+														tooltipPosition="top"
+														(ngModelChange)="onToggleTutor(salon.salonId, $event)"
+													/>
+													<label [for]="'tutor-' + salon.salonId" class="tutor-label">Tutor</label>
+												}
 												<button
 													pButton
 													icon="pi pi-times"
@@ -318,9 +329,21 @@
 									[pt]="{ root: { 'aria-label': 'Agregar salón' } }"
 								></button>
 							</div>
+							@if (salonSeleccionadoModoPreview(); as preview) {
+								<div class="modo-preview">
+									<p-tag
+										[value]="preview.label"
+										styleClass="tag-neutral"
+										[pTooltip]="preview.tooltip"
+										tooltipPosition="top"
+									/>
+								</div>
+							}
 							<small class="text-muted">
 								<i class="pi pi-info-circle" style="margin-right: 0.25rem"></i>
-								Seleccione grado y sección para agregar salones. Marque "Tutor" en los que corresponda.
+								Seleccione grado y sección para agregar salones. En modo "Tutor pleno" la asignación
+								queda marcada como Tutor automáticamente; en modo "Por curso" se asigna por curso en
+								"Cursos que dicta".
 							</small>
 						</div>
 					}

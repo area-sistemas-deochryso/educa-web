@@ -11,6 +11,7 @@ import {
 } from '../../services';
 import {
 	computeGradosOptions,
+	computeModoPreview,
 	computeSalonesAsignados,
 	computeSeccionesOptions,
 	findSalonSeleccionado,
@@ -44,6 +45,7 @@ import { SelectModule } from 'primeng/select';
 import { Tab, TabList, TabPanel, Tabs } from 'primeng/tabs';
 import { TableModule } from 'primeng/table';
 import { TagModule } from 'primeng/tag';
+import { TooltipModule } from 'primeng/tooltip';
 import { ToggleSwitch } from 'primeng/toggleswitch';
 import { UppercaseInputDirective } from '@intranet-shared/directives';
 import { EstadoLabelPipe } from '@intranet-shared/pipes';
@@ -75,6 +77,7 @@ export interface FormValidationErrors {
 		SelectModule,
 		Tabs, TabList, Tab, TabPanel,
 		TagModule,
+		TooltipModule,
 		ToggleSwitch,
 		PasswordModule,
 		DatePickerModule,
@@ -196,6 +199,9 @@ export class UserFormDialogComponent {
 	readonly salonYaAsignado = computed(() =>
 		isSalonYaAsignado(this.salonSeleccionado(), this.formData().salones ?? []),
 	);
+
+	// Modo de asignación del salón seleccionado en el selector grado/sección (antes de agregarlo)
+	readonly salonSeleccionadoModoPreview = computed(() => computeModoPreview(this.salonSeleccionado()));
 	// #endregion
 
 	// #region Computed — opciones de sede
@@ -302,8 +308,11 @@ export class UserFormDialogComponent {
 		const salon = this.salonSeleccionado();
 		if (!salon || this.salonYaAsignado()) return;
 
+		// En modo tutor pleno, la asignación siempre queda marcada como Tutor (INV-AS06)
+		const esTutor = this.salonSeleccionadoModoPreview()?.modo === 'TutorPleno';
+
 		const current = this.formData().salones ?? [];
-		const newSalones: SalonAsignacion[] = [...current, { salonId: salon.salonId, esTutor: false }];
+		const newSalones: SalonAsignacion[] = [...current, { salonId: salon.salonId, esTutor }];
 		this.fieldChange.emit({ field: 'salones', value: newSalones });
 
 		// Limpiar selector para permitir agregar otro
@@ -318,7 +327,7 @@ export class UserFormDialogComponent {
 		this.fieldChange.emit({ field: 'salones', value: newSalones.length > 0 ? newSalones : undefined });
 	}
 
-	// Toggle tutor de un salón en la lista del profesor
+	// Toggle tutor de un salón en la lista del profesor (solo aplica en modo Flexible — TutorPleno y PorCurso no muestran el control)
 	onToggleTutor(salonId: number, esTutor: boolean): void {
 		const current = this.formData().salones ?? [];
 		const newSalones = current.map((s) =>
