@@ -95,7 +95,8 @@
   gap: 0.5rem;
   flex-shrink: 0;
 
-  ::ng-deep .estado-filter-select {
+  ::ng-deep .estado-filter-select,
+  ::ng-deep .completitud-filter-select {
     min-width: 160px;
   }
 }

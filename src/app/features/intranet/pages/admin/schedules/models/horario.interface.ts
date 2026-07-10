@@ -84,8 +84,11 @@ export interface HorariosEstadisticas {
   horariosInactivos: number;
   horariosConProfesor: number;
   horariosSinProfesor: number;
+  horariosSinEstudiantes: number;
   promedioEstudiantesPorHorario?: number;
 }
+
+export type HorarioCompletitudFiltro = 'sinProfesor' | 'sinEstudiantes';
 
 // #endregion
 // #region Opciones para Filtros y Selectores

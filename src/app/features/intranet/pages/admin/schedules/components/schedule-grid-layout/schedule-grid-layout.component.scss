@@ -6,7 +6,9 @@
   display: grid;
   grid-template-columns: 280px 1fr;
   gap: 1rem;
-  min-height: 600px;
+  height: 70vh;
+  min-height: 520px;
+  max-height: 820px;
 
   @media (max-width: 1200px) {
     grid-template-columns: 240px 1fr;
@@ -14,18 +16,32 @@
 
   @media (max-width: 768px) {
     grid-template-columns: 1fr;
+    height: auto;
     min-height: auto;
+    max-height: none;
   }
 }
 
 .entity-panel {
   min-height: 0;
-  max-height: 750px;
+  height: 100%;
+
+  @media (max-width: 768px) {
+    height: auto;
+    max-height: 400px;
+  }
 }
 
 .grid-panel {
   min-width: 0;
-  overflow: hidden;
+  height: 100%;
+  overflow-y: auto;
+  overflow-x: hidden;
+
+  @media (max-width: 768px) {
+    height: auto;
+    overflow: visible;
+  }
 }
 
 .no-selection {

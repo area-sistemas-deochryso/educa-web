@@ -12,7 +12,7 @@ import {
 import { CursosApiService } from './cursos-api.service';
 import { SchedulesApiService } from './horarios-api.service';
 import { SchedulesStore } from './horarios.store';
-import type { DiaSemana, HorarioVistaType } from '../models/horario.interface';
+import type { DiaSemana, HorarioCompletitudFiltro, HorarioVistaType } from '../models/horario.interface';
 import { ProfesorCursoApiService } from './profesor-curso-api.service';
 import { ProfesoresApiService } from './profesores-api.service';
 import { ClassroomsApiService } from './salones-api.service';
@@ -47,8 +47,9 @@ export class SchedulesDataFacade {
 
   /**
    * Cargar todos los horarios y opciones de filtros.
-   * Profesores: carga solo sus horarios (sin paginación server-side).
-   * Admins: carga paginado con todas las opciones de filtros.
+   * Profesores: carga solo sus horarios.
+   * Admins: carga todos los horarios (sin paginación) con todas las opciones de filtros —
+   * la vista agrupa por salón/profesor, por lo que necesita el conjunto completo para ser correcta.
    */
   loadAll(): void {
     if (this.store.loading()) return;
@@ -173,14 +174,6 @@ export class SchedulesDataFacade {
   }
 
   /**
-   * Cargar página específica (llamado desde onLazyLoad del p-table)
-   */
-  loadPage(page: number, pageSize: number): void {
-    this.store.filterStore.setPaginationData(page, pageSize, this.store.filterStore.totalRecords());
-    this.refreshHorariosOnly();
-  }
-
-  /**
    * Carga los profesores asignados a un curso (modo PorCurso).
    * Se llama cuando se selecciona un curso en un salón con GRA_Orden >= 8.
    */
@@ -215,6 +208,10 @@ export class SchedulesDataFacade {
 
   setFiltroEstadoActivo(estadoActivo: boolean | null): void {
     this.store.filterStore.setFiltroEstadoActivo(estadoActivo);
+  }
+
+  setFiltroCompletitud(completitud: HorarioCompletitudFiltro | null): void {
+    this.store.filterStore.setFiltroCompletitud(completitud);
   }
 
   clearFiltros(): void {
@@ -277,16 +274,16 @@ export class SchedulesDataFacade {
         });
     } else {
       this.api
-        .getAllPaginated(this.store.filterStore.page(), this.store.filterStore.pageSize())
+        .getAll()
         .pipe(
           withRetry({ tag: 'SchedulesDataFacade:refreshHorariosOnly' }),
           takeUntilDestroyed(this.destroyRef),
         )
         .subscribe({
-          next: (response) => {
-            this.store.setHorarios(response.data);
-            this.store.filterStore.setPaginationData(response.page, response.pageSize, response.total);
-            this.calculateEstadisticas(response.data);
+          next: (horarios) => {
+            this.store.setHorarios(horarios);
+            this.store.filterStore.setPaginationData(1, horarios.length, horarios.length);
+            this.calculateEstadisticas(horarios);
             if (!silent) { this.store.setLoading(false); }
           },
           error: (err) => this.handleRefreshError(err, silent),
@@ -297,13 +294,16 @@ export class SchedulesDataFacade {
   /**
    * Calcular estadísticas desde los datos
    */
-  private calculateEstadisticas(horarios: { estado: boolean; profesorId: number | null }[]): void {
+  private calculateEstadisticas(
+    horarios: { estado: boolean; profesorId: number | null; cantidadEstudiantes: number }[],
+  ): void {
     const stats = {
       totalHorarios: horarios.length,
       horariosActivos: horarios.filter((h) => h.estado).length,
       horariosInactivos: horarios.filter((h) => !h.estado).length,
       horariosConProfesor: horarios.filter((h) => h.profesorId !== null).length,
       horariosSinProfesor: horarios.filter((h) => h.profesorId === null).length,
+      horariosSinEstudiantes: horarios.filter((h) => h.cantidadEstudiantes === 0).length,
     };
     this.store.setEstadisticas(stats);
   }
@@ -312,11 +312,8 @@ export class SchedulesDataFacade {
   // #region Helpers privados
 
   private loadAllForAdmin(): void {
-    const page = this.store.filterStore.page();
-    const pageSize = this.store.filterStore.pageSize();
-
     forkJoin({
-      horarios: this.api.getAllPaginated(page, pageSize),
+      horarios: this.api.getAll(),
       salones: this.salonesApi.listar(),
       cursos: this.cursosApi.listar(),
       profesores: this.profesoresApi.listar(),
@@ -327,12 +324,12 @@ export class SchedulesDataFacade {
       )
       .subscribe({
         next: ({ horarios, salones, cursos, profesores }) => {
-          this.store.setHorarios(horarios.data);
-          this.store.filterStore.setPaginationData(horarios.page, horarios.pageSize, horarios.total);
+          this.store.setHorarios(horarios);
+          this.store.filterStore.setPaginationData(1, horarios.length, horarios.length);
           this.store.setSalonesDisponibles(salones);
           this.store.setCursosDisponibles(cursos);
           this.store.setProfesoresDisponibles(profesores);
-          this.calculateEstadisticas(horarios.data);
+          this.calculateEstadisticas(horarios);
           this.store.setLoading(false);
           this.store.setOptionsLoading(false);
           this.store.setStatsReady(true);

@@ -28,6 +28,7 @@ const mockStats: HorariosEstadisticas = {
 	horariosInactivos: 1,
 	horariosConProfesor: 2,
 	horariosSinProfesor: 1,
+	horariosSinEstudiantes: 0,
 };
 
 function buildHorario(overrides: Partial<HorarioResponseDto> = {}): HorarioResponseDto {

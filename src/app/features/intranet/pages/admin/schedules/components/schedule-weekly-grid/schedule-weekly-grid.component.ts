@@ -58,6 +58,10 @@ export class ScheduleWeeklyGridComponent {
     return block.horario.profesorId === null;
   }
 
+  hasNoEstudiantes(block: HorarioWeeklyBlock): boolean {
+    return block.horario.cantidadEstudiantes === 0;
+  }
+
   getBlockTooltip(block: HorarioWeeklyBlock): string {
     const h = block.horario;
     const lines = [
@@ -70,7 +74,11 @@ export class ScheduleWeeklyGridComponent {
     } else {
       lines.push('⚠ Sin profesor asignado');
     }
-    lines.push(`${h.cantidadEstudiantes} estudiantes`);
+    if (h.cantidadEstudiantes > 0) {
+      lines.push(`${h.cantidadEstudiantes} estudiantes`);
+    } else {
+      lines.push('⚠ Sin estudiantes asignados');
+    }
     return lines.join('\n');
   }
 

@@ -3,7 +3,6 @@ import { inject, Injectable } from '@angular/core';
 import { Observable, of } from 'rxjs';
 
 import { environment } from '@config/environment';
-import { PaginatedResponse } from '@shared/models';
 import { type ImportarHorarioItem, type ImportarHorariosResult } from '../helpers/horario-import.config';
 import {
   type DiaSemana,
@@ -25,16 +24,6 @@ export class SchedulesApiService {
 
   getAll(): Observable<HorarioResponseDto[]> {
     return this.http.get<HorarioResponseDto[]>(`${this.apiUrl}`);
-  }
-
-  getAllPaginated(
-    page: number,
-    pageSize: number
-  ): Observable<PaginatedResponse<HorarioResponseDto>> {
-    return this.http.get<PaginatedResponse<HorarioResponseDto>>(
-      `${this.apiUrl}`,
-      { params: { page, pageSize } }
-    );
   }
 
   getById(id: number): Observable<HorarioDetalleResponseDto | null> {

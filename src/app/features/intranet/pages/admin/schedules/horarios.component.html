@@ -97,8 +97,21 @@
 				<i class="pi pi-user-minus"></i>
 			</div>
 			<div class="stat-content">
-				<span class="stat-label">Incompletos</span>
+				<span class="stat-label">Sin profesor</span>
 				<span class="stat-value">{{ vm().estadisticas!.horariosSinProfesor }}</span>
+			</div>
+		</div>
+
+		<div class="stat-card">
+			<div
+				class="stat-icon"
+				style="background: var(--orange-100); color: var(--orange-600)"
+			>
+				<i class="pi pi-users"></i>
+			</div>
+			<div class="stat-content">
+				<span class="stat-label">Sin estudiantes</span>
+				<span class="stat-value">{{ vm().estadisticas!.horariosSinEstudiantes }}</span>
 			</div>
 		</div>
 
@@ -162,6 +175,19 @@
 			appendTo="body"
 			[showClear]="true"
 			styleClass="estado-filter-select"
+		/>
+		<p-select
+			[options]="completitudOptions"
+			[ngModel]="vm().filtroCompletitud"
+			(ngModelChange)="onFiltroCompletitudChange($event)"
+			placeholder="Todos los horarios"
+			optionLabel="label"
+			optionValue="value"
+			appendTo="body"
+			[showClear]="true"
+			styleClass="completitud-filter-select"
+			pTooltip="Filtrar horarios sin profesor o sin estudiantes asignados"
+			tooltipPosition="bottom"
 		/>
 		@if (vm().hasFilters) {
 			<button

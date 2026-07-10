@@ -2,6 +2,7 @@ import { computed, Injectable, signal } from '@angular/core';
 
 import {
 	type DiaSemana,
+	type HorarioCompletitudFiltro,
 	type HorarioResponseDto,
 	type HorarioVistaType,
 	type ScheduleEntityItem,
@@ -15,6 +16,7 @@ export class SchedulesFilterStore {
 	private readonly _filtroProfesorId = signal<number | null>(null);
 	private readonly _filtroDiaSemana = signal<DiaSemana | null>(null);
 	private readonly _filtroEstadoActivo = signal<boolean | null>(null);
+	private readonly _filtroCompletitud = signal<HorarioCompletitudFiltro | null>(null);
 	private readonly _vistaActual = signal<HorarioVistaType>('salon');
 	private readonly _selectedEntityId = signal<number | null>(null);
 	private readonly _page = signal(1);
@@ -29,6 +31,7 @@ export class SchedulesFilterStore {
 	readonly filtroProfesorId = this._filtroProfesorId.asReadonly();
 	readonly filtroDiaSemana = this._filtroDiaSemana.asReadonly();
 	readonly filtroEstadoActivo = this._filtroEstadoActivo.asReadonly();
+	readonly filtroCompletitud = this._filtroCompletitud.asReadonly();
 	readonly vistaActual = this._vistaActual.asReadonly();
 	readonly selectedEntityId = this._selectedEntityId.asReadonly();
 	readonly page = this._page.asReadonly();
@@ -40,14 +43,19 @@ export class SchedulesFilterStore {
 	readonly horariosFiltrados = computed(() => {
 		const horarios = this._horariosSource();
 		const estadoActivo = this._filtroEstadoActivo();
+		const completitud = this._filtroCompletitud();
 
 		return horarios.filter((h) => {
 			if (estadoActivo !== null && h.estado !== estadoActivo) return false;
+			if (completitud === 'sinProfesor' && h.profesorId !== null) return false;
+			if (completitud === 'sinEstudiantes' && h.cantidadEstudiantes !== 0) return false;
 			return true;
 		});
 	});
 
-	readonly hasFilters = computed(() => this._filtroEstadoActivo() !== null);
+	readonly hasFilters = computed(
+		() => this._filtroEstadoActivo() !== null || this._filtroCompletitud() !== null,
+	);
 	// #endregion
 
 	// #region Computed - Entity lists
@@ -149,8 +157,13 @@ export class SchedulesFilterStore {
 		this._filtroEstadoActivo.set(estadoActivo);
 	}
 
+	setFiltroCompletitud(completitud: HorarioCompletitudFiltro | null): void {
+		this._filtroCompletitud.set(completitud);
+	}
+
 	clearFiltros(): void {
 		this._filtroEstadoActivo.set(null);
+		this._filtroCompletitud.set(null);
 		this._page.set(1);
 	}
 	// #endregion

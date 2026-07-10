@@ -172,6 +172,7 @@ export class SchedulesStore {
 		filtroProfesorId: this.filterStore.filtroProfesorId(),
 		filtroDiaSemana: this.filterStore.filtroDiaSemana(),
 		filtroEstadoActivo: this.filterStore.filtroEstadoActivo(),
+		filtroCompletitud: this.filterStore.filtroCompletitud(),
 		hasFilters: this.filterStore.hasFilters(),
 		page: this.filterStore.page(),
 		pageSize: this.filterStore.pageSize(),

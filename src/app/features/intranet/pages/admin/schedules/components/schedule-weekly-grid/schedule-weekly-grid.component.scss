@@ -14,12 +14,14 @@
   grid-template-columns: 70px repeat(5, 1fr);
   border: 1px solid var(--surface-border);
   border-radius: 8px;
-  overflow: hidden;
 }
 
 // #endregion
 // #region Headers
 .grid-header {
+  position: sticky;
+  top: 0;
+  z-index: 10;
   padding: 0.75rem 0.5rem;
   font-weight: 600;
   font-size: 0.85rem;
@@ -56,7 +58,7 @@
   background: var(--surface-100);
   border-right: 2px solid var(--surface-border);
   border-bottom: 1px solid var(--surface-border);
-  min-height: 70px;
+  min-height: 56px;
 }
 
 // #endregion
@@ -65,7 +67,7 @@
   position: relative;
   border-right: 1px solid var(--surface-border);
   border-bottom: 1px solid var(--surface-border);
-  min-height: 70px;
+  min-height: 56px;
   padding: 2px;
 
   &:nth-child(6n+1) {
@@ -171,7 +173,8 @@
     opacity: 0.9;
   }
 
-  .block-profesor {
+  .block-profesor,
+  .block-estudiantes {
     font-size: 0.7rem;
     opacity: 0.9;
     display: flex;

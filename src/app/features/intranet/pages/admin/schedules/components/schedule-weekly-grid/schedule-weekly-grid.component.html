@@ -51,6 +51,12 @@
                     Sin profesor
                   </span>
                 }
+                @if (hasNoEstudiantes(block)) {
+                  <span class="block-estudiantes warning">
+                    <i class="pi pi-exclamation-triangle"></i>
+                    Sin estudiantes
+                  </span>
+                }
               </div>
 
               <!-- Hover actions -->

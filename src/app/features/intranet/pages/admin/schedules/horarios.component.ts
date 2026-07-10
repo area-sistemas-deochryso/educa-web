@@ -1,3 +1,4 @@
+/* eslint-disable max-lines -- Razón: componente de página cohesivo (CRUD + filtros + dialogs + drawer + import). 307 líneas — 7 sobre el límite por el filtro de completitud (sin profesor/sin estudiantes). */
 import { ChangeDetectionStrategy, Component, OnInit, computed, inject } from '@angular/core';
 
 import { ButtonModule } from 'primeng/button';
@@ -15,6 +16,7 @@ import { PageHeaderComponent, PeriodToggleComponent } from '@intranet-shared/com
 import { type ImportarHorarioItem } from './helpers/horario-import.config';
 import {
 	type EmptySlotClickEvent,
+	type HorarioCompletitudFiltro,
 	HorarioResponseDto,
 	type HorarioVistaType,
 } from './models/horario.interface';
@@ -97,6 +99,11 @@ export class SchedulesComponent implements OnInit {
 		{ label: 'Inactivos', value: false },
 	];
 
+	readonly completitudOptions: { label: string; value: HorarioCompletitudFiltro }[] = [
+		{ label: 'Sin profesor', value: 'sinProfesor' },
+		{ label: 'Sin estudiantes', value: 'sinEstudiantes' },
+	];
+
 	// #region Lifecycle
 	ngOnInit(): void {
 		this.loadData();
@@ -177,6 +184,10 @@ export class SchedulesComponent implements OnInit {
 	// #region Event handlers - Filtros y vista
 	onFiltroEstadoChange(estadoActivo: boolean | null): void {
 		this.dataFacade.setFiltroEstadoActivo(estadoActivo);
+	}
+
+	onFiltroCompletitudChange(completitud: HorarioCompletitudFiltro | null): void {
+		this.dataFacade.setFiltroCompletitud(completitud);
 	}
 
 	onClearFiltros(): void {
