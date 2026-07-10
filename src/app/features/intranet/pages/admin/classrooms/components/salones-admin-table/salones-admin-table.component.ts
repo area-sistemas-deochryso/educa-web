@@ -4,15 +4,15 @@ import { CommonModule } from '@angular/common';
 import { TableModule } from 'primeng/table';
 import { ButtonModule } from 'primeng/button';
 import { TagModule } from 'primeng/tag';
-import { TooltipModule } from 'primeng/tooltip';
 
 import { type ModoAsignacion, resolveModoAsignacion } from '@data/models';
+import { ModoAsignacionBadgeComponent } from '@shared/components';
 import { SalonAdminListDto, PeriodoCierreEstado } from '../../models';
 
 @Component({
 	selector: 'app-classrooms-admin-table',
 	standalone: true,
-	imports: [CommonModule, TableModule, ButtonModule, TagModule, TooltipModule],
+	imports: [CommonModule, TableModule, ButtonModule, TagModule, ModoAsignacionBadgeComponent],
 	templateUrl: './salones-admin-table.component.html',
 	styleUrl: './salones-admin-table.component.scss',
 	changeDetection: ChangeDetectionStrategy.OnPush,
@@ -54,18 +54,6 @@ export class ClassroomsAdminTableComponent {
 
 	getModoAsignacion(salon: SalonAdminListDto): ModoAsignacion {
 		return resolveModoAsignacion(salon.gradoOrden, salon.seccion);
-	}
-
-	getModoLabel(modo: ModoAsignacion): string {
-		if (modo === 'TutorPleno') return 'Tutor pleno';
-		if (modo === 'PorCurso') return 'Por curso';
-		return 'Flexible';
-	}
-
-	getModoSeverity(modo: ModoAsignacion): 'info' | 'warn' | 'secondary' {
-		if (modo === 'TutorPleno') return 'info';
-		if (modo === 'PorCurso') return 'warn';
-		return 'secondary';
 	}
 	// #endregion
 }

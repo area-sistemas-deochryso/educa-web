@@ -7,8 +7,7 @@ import { ButtonModule } from 'primeng/button';
 
 import { EstudianteAsistencia } from '@intranet-shared/services';
 import { HorarioResponseDto, SalonNotasResumenDto, resolveModoAsignacion } from '@data/models';
-import { TagModule } from 'primeng/tag';
-import { TooltipModule } from 'primeng/tooltip';
+import { ModoAsignacionBadgeComponent } from '@shared/components';
 
 import {
 	SalonAdminListDto,
@@ -28,8 +27,7 @@ import { ClassroomGradesTabComponent } from '../salon-notas-tab/salon-notas-tab.
 		DialogModule,
 		TabsModule,
 		ButtonModule,
-		TagModule,
-		TooltipModule,
+		ModoAsignacionBadgeComponent,
 		ClassroomApprovalTabComponent,
 		ClassroomAttendanceTabComponent,
 		ClassroomGradesTabComponent,
@@ -86,29 +84,6 @@ export class ClassroomDetailDialogComponent {
 		const s = this.salon();
 		if (!s) return null;
 		return resolveModoAsignacion(s.gradoOrden, s.seccion);
-	});
-
-	readonly modoLabel = computed(() => {
-		const modo = this.modoAsignacion();
-		if (modo === 'TutorPleno') return 'Tutor pleno';
-		if (modo === 'PorCurso') return 'Por curso';
-		if (modo === 'Flexible') return 'Flexible';
-		return null;
-	});
-
-	readonly modoSeverity = computed<'info' | 'warn' | 'secondary'>(() => {
-		const modo = this.modoAsignacion();
-		if (modo === 'TutorPleno') return 'info';
-		if (modo === 'PorCurso') return 'warn';
-		return 'secondary';
-	});
-
-	readonly modoTooltip = computed(() => {
-		const modo = this.modoAsignacion();
-		if (modo === 'TutorPleno') return 'El tutor dicta todos los cursos';
-		if (modo === 'PorCurso') return 'Cada curso tiene un profesor asignado';
-		if (modo === 'Flexible') return 'Sección vacacional: sin restricciones';
-		return '';
 	});
 
 	readonly dialogStyle = computed(() =>

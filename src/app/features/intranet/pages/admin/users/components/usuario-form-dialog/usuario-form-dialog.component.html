@@ -267,12 +267,7 @@
 									@for (salon of salonesAsignados(); track salon.salonId) {
 										<div class="salon-row">
 											<span class="salon-nombre">{{ salon.salonNombre }}</span>
-											<p-tag
-												[value]="salon.modoLabel"
-												styleClass="tag-neutral"
-												[pTooltip]="salon.modoTooltip"
-												tooltipPosition="top"
-											/>
+											<app-modo-asignacion-badge [modo]="salon.modo" />
 											<div class="salon-actions">
 												@if (salon.modo !== 'PorCurso') {
 													<p-checkbox
@@ -280,7 +275,7 @@
 														[binary]="true"
 														[ngModel]="salon.esTutor"
 														[disabled]="salon.modo === 'TutorPleno'"
-														[pTooltip]="salon.modo === 'TutorPleno' ? salon.modoTooltip : ''"
+														[pTooltip]="salon.modo === 'TutorPleno' ? modoTooltipFor(salon.modo) : ''"
 														tooltipPosition="top"
 														(ngModelChange)="onToggleTutor(salon.salonId, $event)"
 													/>
@@ -331,12 +326,7 @@
 							</div>
 							@if (salonSeleccionadoModoPreview(); as preview) {
 								<div class="modo-preview">
-									<p-tag
-										[value]="preview.label"
-										styleClass="tag-neutral"
-										[pTooltip]="preview.tooltip"
-										tooltipPosition="top"
-									/>
+									<app-modo-asignacion-badge [modo]="preview.modo" />
 								</div>
 							}
 							<small class="text-muted">
