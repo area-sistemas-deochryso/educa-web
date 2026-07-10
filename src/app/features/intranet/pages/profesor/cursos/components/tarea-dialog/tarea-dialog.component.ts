@@ -101,6 +101,11 @@ import { CursoContenidoTareaDto, CrearTareaRequest, ActualizarTareaRequest } fro
 						</span>
 					</div>
 				</div>
+
+				<div class="task-eval-hint">
+					<i class="pi pi-info-circle"></i>
+					<span>Esta tarea no se calificará automáticamente. Creá la evaluación correspondiente en Calificaciones.</span>
+				</div>
 			</div>
 
 			<ng-template #footer>
@@ -162,6 +167,16 @@ import { CursoContenidoTareaDto, CrearTareaRequest, ActualizarTareaRequest } fro
 		.field-hint {
 			font-size: 0.72rem;
 			color: var(--text-color-secondary);
+		}
+		.task-eval-hint {
+			display: flex;
+			align-items: center;
+			gap: 0.5rem;
+			font-size: 0.78rem;
+			color: var(--text-color-secondary);
+			i {
+				font-size: 0.9rem;
+			}
 		}
 		.dialog-footer {
 			display: flex;
