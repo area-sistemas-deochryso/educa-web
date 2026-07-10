@@ -1,5 +1,10 @@
 import { HttpErrorResponse } from '@angular/common/http';
 
+export interface SuggestedAction {
+	label: string;
+	route: string;
+}
+
 export interface NormalizedProblemDetails {
 	type: string | null;
 	title: string | null;
@@ -8,6 +13,7 @@ export interface NormalizedProblemDetails {
 	traceId: string | null;
 	errorCode: string | null;
 	validationErrors: Record<string, string[]> | null;
+	suggestedAction: SuggestedAction | null;
 }
 
 // RFC 7807 ProblemDetails + legacy ApiResponse + ValidationProblemDetails
@@ -22,6 +28,7 @@ export function parseProblemDetails(error: HttpErrorResponse): NormalizedProblem
 	const errorCode = asString(body?.['errorCode']) ?? null;
 
 	const validationErrors = extractValidationErrors(body?.['errors']);
+	const suggestedAction = extractSuggestedAction(body?.['suggestedAction']);
 
 	return {
 		type: asString(body?.['type']) ?? null,
@@ -31,6 +38,7 @@ export function parseProblemDetails(error: HttpErrorResponse): NormalizedProblem
 		traceId,
 		errorCode,
 		validationErrors,
+		suggestedAction,
 	};
 }
 
@@ -52,4 +60,14 @@ function extractValidationErrors(errors: unknown): Record<string, string[]> | nu
 	}
 
 	return hasEntries ? result : null;
+}
+
+// INV-PD05 (ProblemDetails.Extensions["suggestedAction"] = { label, route })
+function extractSuggestedAction(value: unknown): SuggestedAction | null {
+	if (!value || typeof value !== 'object') return null;
+
+	const label = asString((value as Record<string, unknown>)['label']);
+	const route = asString((value as Record<string, unknown>)['route']);
+
+	return label && route ? { label, route } : null;
 }

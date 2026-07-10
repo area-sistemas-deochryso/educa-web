@@ -69,6 +69,45 @@ describe('ErrorHandlerService', () => {
 
 			expect(service.errorCounts().http).toBe(2);
 		});
+
+		it('should prefer BE suggestedAction (INV-PD05) over the FE hardcoded map', () => {
+			const httpError = new HttpErrorResponse({
+				status: 400,
+				error: {
+					errorCode: 'INV_AS01_TUTOR_PLENO',
+					suggestedAction: { label: 'Ir a Usuarios', route: '/intranet/admin/usuarios' },
+				},
+			});
+
+			service.handleHttpError(httpError);
+
+			expect(service.currentNotification()!.action).toEqual({
+				label: 'Ir a Usuarios',
+				callback: expect.any(Function),
+			});
+		});
+
+		it('should fall back to the FE hardcoded action map when BE omits suggestedAction', () => {
+			const httpError = new HttpErrorResponse({
+				status: 400,
+				error: { errorCode: 'INV_AS02_PROFESOR_CURSO' },
+			});
+
+			service.handleHttpError(httpError);
+
+			expect(service.currentNotification()!.action?.label).toBe('Ir a Usuarios');
+		});
+
+		it('should have no action when errorCode is unmapped and BE sends no suggestedAction', () => {
+			const httpError = new HttpErrorResponse({
+				status: 400,
+				error: { errorCode: 'SOME_UNMAPPED_CODE' },
+			});
+
+			service.handleHttpError(httpError);
+
+			expect(service.currentNotification()!.action).toBeUndefined();
+		});
 	});
 	// #endregion
 

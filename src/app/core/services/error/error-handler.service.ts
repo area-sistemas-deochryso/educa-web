@@ -92,7 +92,11 @@ export class ErrorHandlerService {
 		});
 
 		const errorCode = error.error?.errorCode as string | undefined;
-		const actionCfg = errorCode ? UI_ERROR_CODE_ACTIONS[errorCode] : undefined;
+		// Doble capa: BE (suggestedAction, INV-PD05) es autoritativo; el mapa
+		// hardcodeado FE es fallback para errorCode que el BE aún no cubre.
+		const suggestedAction = parseProblemDetails(error).suggestedAction;
+		const actionCfg =
+			suggestedAction ?? (errorCode ? UI_ERROR_CODE_ACTIONS[errorCode] : undefined);
 
 		this.showNotification({
 			severity: 'error',
