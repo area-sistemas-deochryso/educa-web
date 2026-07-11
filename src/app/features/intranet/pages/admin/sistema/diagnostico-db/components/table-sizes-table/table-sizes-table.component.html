@@ -28,17 +28,19 @@
 	}
 
 	@if (tables().length > 0) {
-		<p-table [value]="tables()" [tableStyle]="{ 'min-width': '30rem' }" [sortField]="'rowCount'" [sortOrder]="-1">
+		<p-table [value]="tables()" [tableStyle]="{ 'min-width': '30rem' }" [sortField]="'reservedMb'" [sortOrder]="-1">
 			<ng-template #header>
 				<tr>
 					<th pSortableColumn="tableName">Tabla <p-sortIcon field="tableName" /></th>
 					<th pSortableColumn="rowCount" style="width: 10rem">Filas <p-sortIcon field="rowCount" /></th>
+					<th pSortableColumn="reservedMb" style="width: 10rem">Tamaño (MB) <p-sortIcon field="reservedMb" /></th>
 				</tr>
 			</ng-template>
 			<ng-template #body let-row>
 				<tr>
 					<td><code>{{ row.tableName }}</code></td>
 					<td>{{ row.rowCount | number }}</td>
+					<td>{{ row.reservedMb | number: '1.1-1' }} MB</td>
 				</tr>
 			</ng-template>
 		</p-table>

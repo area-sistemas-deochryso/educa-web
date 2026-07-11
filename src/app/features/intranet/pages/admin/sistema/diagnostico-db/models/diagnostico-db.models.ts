@@ -43,6 +43,8 @@ export interface DatabaseFileStatsDto {
 export interface TableSizeDto {
 	tableName: string;
 	rowCount: number;
+	usedMb: number;
+	reservedMb: number;
 }
 // #endregion
 
