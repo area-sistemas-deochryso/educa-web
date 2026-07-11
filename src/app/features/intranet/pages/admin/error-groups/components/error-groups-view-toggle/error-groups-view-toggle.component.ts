@@ -20,7 +20,7 @@ interface ToggleOption {
 }
 
 /**
- * Toggle segmented (Kanban / Tabla) que persiste la preferencia en
+ * Toggle segmented (Kanban / Tabla / Eventos / Heatmap) que persiste la preferencia en
  * `PreferencesStorageService`. Default Kanban primera vez.
  */
 @Component({
@@ -42,6 +42,7 @@ export class ErrorGroupsViewToggleComponent implements OnInit {
 		{ label: 'Kanban', value: 'kanban', icon: 'pi pi-th-large' },
 		{ label: 'Tabla', value: 'table', icon: 'pi pi-list' },
 		{ label: 'Eventos', value: 'events', icon: 'pi pi-bolt' },
+		{ label: 'Heatmap', value: 'heatmap', icon: 'pi pi-calendar' },
 	];
 
 	ngOnInit(): void {

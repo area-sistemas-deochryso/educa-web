@@ -87,18 +87,6 @@
 </section>
 <!-- #endregion -->
 
-<!-- #region Heatmap -->
-<app-error-heatmap
-	[cells]="store.heatmapCells()"
-	[calendarCells]="store.heatmapCalendarCells()"
-	[loading]="store.heatmapLoading()"
-	[totalDays]="store.heatmapDays()"
-	[endDate]="store.heatmapEndDate()"
-	(periodChange)="onHeatmapPeriodChange($event)"
-	(endDateChange)="onHeatmapEndDateChange($event)"
-/>
-<!-- #endregion -->
-
 <!-- #region Filtros -->
 <div class="filters-bar">
 	<p-iconfield class="search-box">
@@ -183,9 +171,19 @@
 </div>
 <!-- #endregion -->
 
-<!-- #region Vista (Kanban, Tabla o Eventos) -->
-@if (!tableReady() && viewMode() !== 'events') {
+<!-- #region Vista (Kanban, Tabla, Eventos o Heatmap) -->
+@if (!tableReady() && viewMode() !== 'events' && viewMode() !== 'heatmap') {
 	<app-table-skeleton [columns]="tableSkeletonColumns" [rows]="10" />
+} @else if (viewMode() === 'heatmap') {
+	<app-error-heatmap
+		[cells]="store.heatmapCells()"
+		[calendarCells]="store.heatmapCalendarCells()"
+		[loading]="store.heatmapLoading()"
+		[totalDays]="store.heatmapDays()"
+		[endDate]="store.heatmapEndDate()"
+		(periodChange)="onHeatmapPeriodChange($event)"
+		(endDateChange)="onHeatmapEndDateChange($event)"
+	/>
 } @else if (viewMode() === 'events') {
 	<!-- Vista por eventos individuales (Plan 45 F2.2) -->
 	@if (eventLoading()) {

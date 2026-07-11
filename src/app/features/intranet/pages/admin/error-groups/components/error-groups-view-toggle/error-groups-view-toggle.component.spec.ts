@@ -61,6 +61,19 @@ describe('ErrorGroupsViewToggleComponent', () => {
 		expect(prefs.getErrorGroupsViewMode()).toBe('table');
 	});
 
+	it('inicializa con heatmap cuando localStorage tiene heatmap', () => {
+		const prefs = TestBed.inject(StorageService);
+		prefs.setErrorGroupsViewMode('heatmap');
+
+		build();
+		expect(component.viewMode()).toBe('heatmap');
+	});
+
+	it('incluye las 4 opciones de vista, con heatmap al final', () => {
+		build();
+		expect(component.options.map((o) => o.value)).toEqual(['kanban', 'table', 'events', 'heatmap']);
+	});
+
 	it('ignora null al cambiar modo (no emite, no persiste)', () => {
 		const prefs = TestBed.inject(StorageService);
 		prefs.setErrorGroupsViewMode('table');

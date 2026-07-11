@@ -174,6 +174,16 @@ describe('PreferencesStorageService', () => {
 			service.setErrorGroupsViewMode('kanban');
 			expect(service.getErrorGroupsViewMode()).toBe('kanban');
 		});
+
+		it('should set and get events mode', () => {
+			service.setErrorGroupsViewMode('events');
+			expect(service.getErrorGroupsViewMode()).toBe('events');
+		});
+
+		it('should set and get heatmap mode', () => {
+			service.setErrorGroupsViewMode('heatmap');
+			expect(service.getErrorGroupsViewMode()).toBe('heatmap');
+		});
 	});
 	// #endregion
 
